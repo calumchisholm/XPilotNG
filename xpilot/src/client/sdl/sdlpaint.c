@@ -49,6 +49,38 @@ double	        hudRadarLimit;		/* Limit for hudradar drawing */
 float           scale;                  /* The scale factor */
 
 
+/* function to reset our viewport after a window resize */
+int Resize_Window( int width, int height )
+{
+
+    draw_width = width;
+    draw_height = height;
+
+    SDL_SetVideoMode( width,
+		      height,
+		      draw_depth, 
+		      SDL_HWSURFACE | SDL_OPENGL | SDL_RESIZABLE ); 
+    
+
+    //    /* change to the projection matrix and set our viewing volume. */
+    glMatrixMode( GL_PROJECTION );
+
+    glLoadIdentity( );
+
+    gluOrtho2D(0, draw_width, 0, draw_height);
+    
+    /* Make sure we're chaning the model view and not the projection */
+    glMatrixMode( GL_MODELVIEW );
+    
+    /* Reset The View */
+    glLoadIdentity( );
+
+    /* Setup our viewport. */
+    glViewport( 0, 0, ( GLint )draw_width, ( GLint )draw_height );
+
+    return 0;
+}
+
 int Paint_init(void)
 {
     if (Init_wreckage() == -1)

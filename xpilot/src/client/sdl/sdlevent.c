@@ -30,6 +30,7 @@ char sdlevent_version[] = VERSION;
 
 extern char *talk_fast_msgs[];	/* talk macros */
 
+
 static BITV_DECL(keyv, NUM_KEYS);
 
 /* TODO: remove these from client.h and put them in *event.h */
@@ -41,6 +42,8 @@ keys_t          buttonMap[5];        /* maps mouse buttons to keys_t */
 
 static int	movement;	/* horizontal mouse movement. */
 
+extern int draw_width;
+extern int draw_height;
 
 int Key_init(void)
 {
@@ -411,6 +414,7 @@ void Set_toggle_shield(bool on)
     }
 }
 
+
 int Process_event(SDL_Event *evt)
 {
     int key_change = 0;
@@ -443,6 +447,14 @@ int Process_event(SDL_Event *evt)
 	if (!pointerControl) break;
 	key_change |= Key_release(buttonMap[evt->button.button - 1]);
 	break;
+
+    case SDL_VIDEORESIZE:      
+ 
+      Resize_Window(evt->resize.w, evt->resize.h);          
+      break;
+
+    default:
+      break;
     }
     
     if (key_change) Net_key_change();

@@ -27,7 +27,7 @@ int Init_playing_windows(void)
     if (SDL_SetVideoMode(draw_width, 
 			 draw_height, 
 			 draw_depth, 
-			 SDL_HWSURFACE|SDL_OPENGL //|SDL_FULLSCREEN
+			 SDL_HWSURFACE|SDL_OPENGL|SDL_RESIZABLE //|SDL_FULLSCREEN
 			 ) == NULL) {
         error("failed to set video mode: %s", SDL_GetError());
         return -1;
