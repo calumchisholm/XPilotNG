@@ -119,6 +119,7 @@ void Alloc_shots(world_t *world, int number)
 
 void Free_shots(world_t *world)
 {
+    UNUSED_PARAM(world);
     XFREE(objArray);
 }
 
