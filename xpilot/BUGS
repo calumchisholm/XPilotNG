@@ -1,3 +1,16 @@
+
+-------------------------------------------------------------------
+Problem : If you build the sdl client you HAVE to make install from root
+          otherwise it will not find the fonts file and Seg Fault!!
+	  seems a bit strange to expect a make install for it to work?
+
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files 
+affected:
+
+
 -------------------------------------------------------------------
 Problem : an empty texturePath in .xpilotrc leads to problems
 	  If you have xpilot.texturePath: in your .xpilotrc it
