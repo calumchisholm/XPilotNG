@@ -108,7 +108,7 @@
 
 struct fuel {
     clpos	pos;
-    long	fuel;
+    double	fuel;
     unsigned	conn_mask;
     long	last_change;
     int		team;
