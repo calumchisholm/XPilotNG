@@ -25,4 +25,4 @@ xpilots_SOURCES = \
 	walls.c walls.h wildmap.c \
 	xp2map.c xpmap.c xpserver.h
 
-xpilots_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
+xpilots_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_EXTRA_LIBS@
