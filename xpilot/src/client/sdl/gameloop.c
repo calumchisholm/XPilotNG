@@ -74,8 +74,7 @@ void Game_loop(void)
     fd_set              rfds;
     int                 n, netfd;
     struct timeval      tv;
-    SDL_Event	    	evt;
-    long    	    	waitingtime;
+    SDL_Event		evt;
 
     if ((netfd = Net_fd()) == -1) {
         error("Bad net fd");
@@ -84,30 +83,20 @@ void Game_loop(void)
     while(1) {
         FD_ZERO(&rfds);
         FD_SET(netfd, &rfds);
-    	tv.tv_sec = 0;
-    	tv.tv_usec = 5000;/* wait max 5 ms */
+        tv.tv_sec = 0;
+        tv.tv_usec = 5000; /* wait max 5 ms */
         n = select(netfd + 1, &rfds, NULL, NULL, &tv);
-    	if (n == -1) {
+	if (n == -1) {
             error("Select failed");
             break;
         }
-    	if (n > 0) {
-	    gettimeofday(&tv,NULL);
-	    waitingtime = next_time.tv_usec - tv.tv_usec + 1000000*(next_time.tv_sec - tv.tv_sec);
-	    if ((waitingtime <= 0) && mouseMovement) {
-	    	Send_pointer_move(mouseMovement);
-		mouseMovement = 0;
-		if (Net_flush() == -1) {
-		    error("Bad net flush");
-		    return;
-		}
-    	    }
+	if (n > 0) {
 	    if (Net_input() == -1) {
-    	    	error("Bad net input");
-    	    	break;
-    	    }
-    	}
-    	while(SDL_PollEvent(&evt)) 
-    	    Process_event(&evt);
+		error("Bad net input");
+		break;
+	    }
+	}
+	while(SDL_PollEvent(&evt)) 
+	    Process_event(&evt);
     }
 }

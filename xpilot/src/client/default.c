@@ -379,9 +379,6 @@ static bool Set_maxFPS(xp_option_t *opt, int val)
 {
     UNUSED_PARAM(opt);
     maxFPS = val;
-    if (maxMouseTurnsPS) {
-    	movement_interval = 1000000 / maxMouseTurnsPS;
-    } else movement_interval = 0;
     Check_client_fps();
     return true;
 }

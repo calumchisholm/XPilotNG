@@ -49,11 +49,6 @@ extern long	 last_loops;
 extern bool      packetMeasurement;
 extern display_t server_display; /* the servers idea about our display */
 
-extern int mouseMovement;
-extern struct timeval next_time;
-extern int maxMouseTurnsPS;
-extern long movement_interval;
-
 int Net_setup(void);
 int Net_verify(char *real, char *nick, char *dpy);
 int Net_init(char *server, int port);

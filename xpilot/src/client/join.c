@@ -53,7 +53,6 @@ static void Input_loop(void)
 			result,
 			clientfd;
     struct timeval	tv;
-    long    	    	waitingtime;
 
     if ((result = Net_input()) == -1) {
 	error("Bad server input");
@@ -79,16 +78,7 @@ static void Input_loop(void)
     FD_SET(netfd, &rfds);
     max = (clientfd > netfd) ? clientfd : netfd;
     for (tfds = rfds; ; rfds = tfds) {
-	if(!movement_interval && mouseMovement) {
-	    gettimeofday(&tv,NULL);
-	    waitingtime = next_time.tv_usec - tv.tv_usec + 1000000*(next_time.tv_sec - tv.tv_sec);
-    	    tv.tv_sec = 0;
-	    if (waitingtime > 0) {
-	    	tv.tv_usec = waitingtime%1000000;
-	    } else {
-	    	tv.tv_usec = 0;
-	    }
-	} else if ((scoresChanged != 0 && ++scoresChanged > SCORE_UPDATE_DELAY)
+	if ((scoresChanged != 0 && ++scoresChanged > SCORE_UPDATE_DELAY)
 	    || result > 1) {
 	    if (scoresChanged > 2 * SCORE_UPDATE_DELAY) {
 		Paint_score_table();
@@ -109,19 +99,13 @@ static void Input_loop(void)
 	    return;
 	}
 	if (n == 0) {
-	    if (!movement_interval && mouseMovement) {
-	    	Send_pointer_move(mouseMovement);
-		mouseMovement = 0;
-		if (Net_flush() == -1) {
-		    error("Bad net flush");
-		    return;
-		}
-	    } else if (scoresChanged > SCORE_UPDATE_DELAY) {
+	    if (scoresChanged > SCORE_UPDATE_DELAY) {
 		Paint_score_table();
 		if (Handle_input(2) == -1)
 		    return;
 		continue;
-	    } else if (result <= 1) {
+	    }
+	    else if (result <= 1) {
 		warn("No response from server");
 		continue;
 	    }

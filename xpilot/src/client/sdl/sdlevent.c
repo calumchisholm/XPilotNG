@@ -33,9 +33,7 @@ char sdlevent_version[] = VERSION;
 bool            initialPointerControl = false;
 bool            pointerControl = false;
 
-/* horizontal mouse movement. */
-int	mouseMovement;
-struct timeval next_time = {0,0};
+static int	mouseMovement;	/* horizontal mouse movement. */
 
 GLWidget *target[NUM_MOUSE_BUTTONS];
 GLWidget *hovertarget = NULL;
@@ -204,7 +202,8 @@ bool Key_press_toggle_fullscreen(void)
 int Process_event(SDL_Event *evt)
 {
     int button;
-    static struct timeval now = {0,0};
+
+    mouseMovement = 0;
 
     if (Console_process(evt)) return 1;
     
@@ -294,18 +293,8 @@ int Process_event(SDL_Event *evt)
     }
     
     if (mouseMovement) {
-    	gettimeofday(&now,NULL);
-    	if (!movement_interval || (now.tv_sec > next_time.tv_sec) || (now.tv_usec > next_time.tv_usec)) {
-	    next_time.tv_sec = now.tv_sec;
-	    next_time.tv_usec = now.tv_usec + movement_interval;
-	    while ( next_time.tv_usec > 1000000 ) {
-	    	++next_time.tv_sec;
-		next_time.tv_usec -= 1000000;
-	    }
-	    Send_pointer_move(mouseMovement);
-	    Net_flush();
-    	    mouseMovement = 0;
-	}
+	Send_pointer_move(mouseMovement);
+	Net_flush();
     }
     return 1;
 }
