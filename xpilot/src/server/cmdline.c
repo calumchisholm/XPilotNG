@@ -3618,31 +3618,35 @@ void Timing_setup(void)
      * Negative values for friction give an "acceleration area".
      * kps - maybe we should remove FrictionArea and add AccelerationArea.
      */
-    LIMIT(options.frictionSetting, -1, 1);
+    LIMIT(options.frictionSetting, -1.0, 1.0);
     friction = options.frictionSetting;
-    if (friction < 1)
-	friction = 1. - pow(1. - friction, timeStep);
+    if (friction < 1.0)
+	friction = 1.0 - pow(1.0 - friction, timeStep);
 
     /* Adjust friction area friction suitable for gameSpeed */
     {
 	int i;
-	double fric;
 
-	LIMIT(options.blockFriction, -1, 1);
+	LIMIT(options.blockFriction, -1.0, 1.0);
 
 	for (i = 0; i < world->NumFrictionAreas; i++) {
 	    friction_area_t *fa = FrictionAreas(world, i);
+	    double fric;
 
+	    /*
+	     * On xp maps, use blockFriction for all the friction areas,
+	     * on xp2 maps each friction area has an own friction value.
+	     */
 	    if (is_polygon_map)
 		fric = fa->friction_setting;
 	    else
 		fric = options.blockFriction;
 
-	    LIMIT(fric, -1, 1);
-	    if (fric < 1)
-		fric = 1. - pow(1. - fric, timeStep);
+	    LIMIT(fric, -1.0, 1.0);
+	    if (fric < 1.0)
+		fric = 1.0 - pow(1.0 - fric, timeStep);
 	    fa->friction = fric;
-	}	
+	}
     }
 
     /* ecm size used to be halved every update on old servers */
