@@ -619,6 +619,12 @@ int Net_setup(void)
             checks[i].bounds.w = BLOCK_SZ;
             checks[i].bounds.h = BLOCK_SZ;
 	}
+	if (0) /* commented out to avoid problems outside testing */
+	{
+	    int hack[1000]; /* number for each polygon loaded in this */
+	    for (i = 0; i < polyc; i++)
+		hack[i] = *ptr++;
+	}
     }
 
     if (Setup->map_order != SETUP_MAP_UNCOMPRESSED) {

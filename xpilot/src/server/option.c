@@ -183,9 +183,18 @@ int *hidptr;
 int ptscount;
 char *mapd;
 
+/* temporary, for testing !@# */
+int hack[1000];
+int hackused;
+
 static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
+
+    if (!strcasecmp(el, "XXX")) {/* temporary !@# */
+	hack[polyc - 1] = atoi(*(attr + 1));
+	hackused = 1;
+    }
 
     if (!strcasecmp(el, "Scale")) {
 	if (!*attr || strcasecmp(*attr, "value"))
