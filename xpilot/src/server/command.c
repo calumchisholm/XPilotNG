@@ -1165,7 +1165,6 @@ static int Cmd_stats(char *arg, player *pl, int oper, char *msg)
 static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 {
     int			i;
-    int			ind = GetInd(pl->id);
     int			team;
     int			swap_allowed;
     char		*arg2;
@@ -1188,22 +1187,19 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     else {
 	team = strtoul(arg, &arg2, 0);
 	if (arg2 && *arg2) {
+	    char *errorstr;
 	    if (!pl->isoperator) {
 		sprintf(msg,
 			"You need operator status to swap other players.");
 		return CMD_RESULT_NOT_OPERATOR;
 	    }
-	    while (isspace(*arg2)) arg2++;
-	    ind = Get_player_index_by_name(arg2);
-	    switch (ind) {
-	    case -1:
-		sprintf(msg, "Name does not match any player.");
-		return CMD_RESULT_ERROR;
-	    case -2:
-		sprintf(msg, "Name matches several players.");
+	    while (isspace(*arg2))
+		arg2++;
+	    pl = Get_player_by_name(arg2, NULL, &errorstr);
+	    if (!pl) {
+		strcpy(msg, errorstr);
 		return CMD_RESULT_ERROR;
 	    }
-	    pl = Players(ind);
 	}
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
