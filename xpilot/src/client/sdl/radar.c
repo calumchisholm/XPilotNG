@@ -5,11 +5,11 @@
 #include "sdlpaint.h"
 #include "SDL_gfxPrimitives.h"
 
-
-color_t wallRadarColor = 0xa0;
-color_t targetRadarColor = 0xa0;
-color_t decorRadarColor = 0xff0000;
-color_t bgRadarColor = 0xa00000ff;
+/* kps - had to add prefix so that these would not conflict with options */
+color_t wallRadarColorValue = 0xa0;
+color_t targetRadarColorValue = 0xa0;
+color_t decorRadarColorValue = 0xff0000;
+color_t bgRadarColorValue = 0xa00000ff;
 
 static SDL_Rect    radar_bounds;      /* radar position and dimensions */
 static SDL_Surface *radar_surface;     /* offscreen image with walls */
@@ -80,23 +80,23 @@ static void Radar_paint_world_blocks(SDL_Surface *s)
 	bcolor[SETUP_REC_RU] =
 	bcolor[SETUP_REC_LD] =
 	bcolor[SETUP_REC_RD] =
-	bcolor[SETUP_FUEL] = wallRadarColor;
+	bcolor[SETUP_FUEL] = wallRadarColorValue;
     for (i = 0; i < 10; i++) {
-	bcolor[SETUP_TARGET+i] = targetRadarColor;
+	bcolor[SETUP_TARGET+i] = targetRadarColorValue;
     }
     for (i = BLUE_BIT; i < 256; i++) {
-	bcolor[i] = wallRadarColor;
+	bcolor[i] = wallRadarColorValue;
     }
     if (BIT(instruments, SHOW_DECOR)) {
 	bcolor[SETUP_DECOR_FILLED] =
 	    bcolor[SETUP_DECOR_LU] =
 	    bcolor[SETUP_DECOR_RU] =
 	    bcolor[SETUP_DECOR_LD] =
-	    bcolor[SETUP_DECOR_RD] = decorRadarColor;
+	    bcolor[SETUP_DECOR_RD] = decorRadarColorValue;
     }
 
     if (SDL_MUSTLOCK(s)) SDL_LockSurface(s);
-    SDL_FillRect(s, NULL, RGBA(bgRadarColor));
+    SDL_FillRect(s, NULL, RGBA(bgRadarColorValue));
 
     /* Scan the map and paint the blocks */
     for (xi = 0; xi < Setup->x; xi++) {
@@ -143,7 +143,7 @@ static void Radar_paint_world_polygons(SDL_Surface *s)
     color_t color;
     
     if (SDL_MUSTLOCK(s)) SDL_LockSurface(s);
-    SDL_FillRect(s, NULL, RGBA(bgRadarColor));
+    SDL_FillRect(s, NULL, RGBA(bgRadarColorValue));
     
     for (i = 0; i < num_polygons; i++) {
 
