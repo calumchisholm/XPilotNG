@@ -1049,20 +1049,22 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 
     i = Get_player_index_by_name(arg);
     if (i >= 0) {
-	if (Players(i)->conn != NOT_CONNECTED) {
-	    if (BIT(Players(i)->status, PLAYING | PAUSE | GAME_OVER | KILLED)
+	player *pl_i = Players(i);
+
+	if (pl_i->conn != NOT_CONNECTED) {
+	    if (BIT(pl_i->status, PLAYING | PAUSE | GAME_OVER | KILLED)
 		== PLAYING) {
 		Kill_player(i, false);
 	    }
 	    if (Team_zero_pausing_available()) {
 		sprintf(msg, "%s was pause-swapped by %s.",
-			Players(i)->name, pl->name);
+			pl_i->name, pl->name);
 		/* apparently Handle_player_command busts it */
-		Handle_player_command(Players(i), "team 0");
+		Handle_player_command(pl_i, "team 0");
 	    } else {
 		Pause_player(i, 1);
 		sprintf(msg, "%s was paused by %s.",
-			Players(i)->name, pl->name);
+			pl_i->name, pl->name);
 	    }
 	    Set_message(msg);
 	    strcpy(msg, "");
