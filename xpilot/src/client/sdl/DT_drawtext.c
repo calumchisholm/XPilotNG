@@ -121,7 +121,7 @@ void DT_DrawText(const char *string, SDL_Surface *surface, int FontType, int x, 
 
 	/* Now draw it */
 	for(loop = 0; loop < characters; loop++) {
-		current = string[loop];
+		current = (const unsigned char)string[loop];
 		if (current<0 || current > 255)
 			current = 0;
 		/* SourceRect.x = string[loop] * CurrentFont->CharWidth; */

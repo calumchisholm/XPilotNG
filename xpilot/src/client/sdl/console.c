@@ -44,8 +44,8 @@ int Console_init(void)
     CON_Alpha(console, 200);
     CON_SetPrompt(console, "xpilot> ");
     Console_print("XPilot console ready");
-    //Console_print("Type /help to get help on commands.");
-    //Console_show();
+    /*Console_print("Type /help to get help on commands.");
+    Console_show();*/
     return 0;
 }
 
@@ -109,7 +109,7 @@ void Console_print(const char *str, ...)
     Console_refresh();
 }
 
-void command_handler(ConsoleInformation *console, char *command)
+void command_handler(ConsoleInformation *con, char *command)
 {
     Net_talk(command);
     Console_hide();

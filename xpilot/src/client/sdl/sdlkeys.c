@@ -62,6 +62,7 @@ static sdlkey_t sdlkeys[] = {
    { "apostrophe",   SDLK_QUOTE },
    { "quoteright",   SDLK_QUOTE },
    { "comma",        SDLK_COMMA },
+   { "plus",         SDLK_PLUS },
    { "minus",        SDLK_MINUS },
    { "period",       SDLK_PERIOD },
    { "slash",        SDLK_SLASH },

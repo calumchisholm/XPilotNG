@@ -189,7 +189,7 @@ extern "C" {
 
 	/*! Internal: draws the commandline the user is typing in to the screen. Called from within CON_DrawConsole() *** Will change in the next major release to
 		void DrawCommandLine(ConsoleInformation* console) *** */
-	extern DECLSPEC void SDLCALL DrawCommandLine();
+	extern DECLSPEC void SDLCALL DrawCommandLine(void);
 
 	/*! Internal: Gets called if you press the LEFT key (move cursor left) */
 	extern DECLSPEC void SDLCALL Cursor_Left(ConsoleInformation *console);

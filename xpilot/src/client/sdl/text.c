@@ -3,7 +3,6 @@
 #include <GL/gl.h>
 #include "SDL.h"
 
-/*FreeType Headers*/
 #ifdef HAVE_FREETYPE2
     #include <ft2build.h>
     #include <freetype/freetype.h>
@@ -16,19 +15,20 @@
 
 #define NUM_TEXTURES 2
 
+#define NUM_CHARS 254 /* SDL_Quit starts segfaulting with 256!!! =( {þ,ÿ} will be missing*/
+
 /*GLuint  texture[NUM_TEXTURES]; *//* Storage For Our Font Texture             */
 int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);
-/*char *mytok(char *s, const char *delim);
+int next_p2 ( int a );
 
-static char *mytok(char *s, const char *delim)
+int next_p2 ( int a )
 {
-    static char buf[1024];
-    strncpy(buf,s,1023);
-    
-    
-}*/
+	int rval=1;
+	while(rval<a) rval<<=1;
+	return rval;
+}
 
 int LoadBMP(font_data *ft_font, const char * fname)
 {
@@ -67,31 +67,23 @@ int LoadBMP(font_data *ft_font, const char * fname)
 }
 
 #ifdef HAVE_FREETYPE2
-int next_p2 ( int a );
 int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base, GLuint *char_width);
 int FTinit(font_data *ft_font, const char * fname, unsigned int w, unsigned int h);
-
-int next_p2 ( int a )
-{
-	int rval=1;
-	while(rval<a) rval<<=1;
-	return rval;
-}
 
 /* Create a display list coresponding to the give character. */
 int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base, GLuint *char_width)
 {
     
     int i,j;
+    Uint16 uni_ch;
     GLubyte *expanded_data;
     FT_Bitmap bitmap;
     
     /* The first thing we do is get FreeType to render our character
      * into a bitmap.  This actually requires a couple of FreeType commands:
      */
- 
-    /*Load the Glyph for our character.*/
-    if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT )) {
+    uni_ch = (const unsigned char)ch;
+    if(FT_Load_Glyph( face, FT_Get_Char_Index( face, uni_ch ), FT_LOAD_DEFAULT )) {
 	error("FT_Load_Glyph failed");
 	return 1;
     }
@@ -140,7 +132,7 @@ int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base, GLu
 
 
     /*Now we just setup some texture paramaters.*/
-    glBindTexture( GL_TEXTURE_2D, tex_base[(GLubyte)ch]);
+    glBindTexture( GL_TEXTURE_2D, tex_base[uni_ch]);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
@@ -210,11 +202,11 @@ int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base, GLu
  */
 int FTinit(font_data *ft_font, const char * fname, unsigned int w, unsigned int h)
 {
-    unsigned char i;
+    Uint16 i;
     
     if (ft_font == NULL) return 1;
     /*Allocate some memory to store the texture ids.*/
-    ft_font->textures = (GLuint *) malloc(128 * sizeof(GLuint));
+    ft_font->textures = (GLuint *) malloc(NUM_CHARS * sizeof(GLuint));
 
     ft_font->h=h;
     ft_font->w=w; /*atm we have to guess this =( */
@@ -245,19 +237,21 @@ int FTinit(font_data *ft_font, const char * fname, unsigned int w, unsigned int 
      * h pixels high, we need to request a size of h*64.
      * (h << 6 is just a prettier way of writting h*64)
      */
-    FT_Set_Char_Size( face, ((int)ft_font->w) << 6, ((int)ft_font->h) << 6, 96, 96);
-    /*FT_Set_Pixel_Sizes( face, (int)ft_font->w, (int)ft_font->h );*/
+    if ( FT_IS_SCALABLE(face) )
+    	FT_Set_Char_Size( face, ((int)ft_font->w) << 6, ((int)ft_font->h) << 6, 96, 96);
+    else
+    	FT_Set_Pixel_Sizes( face, (int)ft_font->w, (int)ft_font->h );
 
     /* Here we ask opengl to allocate resources for
      * all the textures and displays lists which we
      * are about to create. 
      */ 
-    ft_font->list_base=glGenLists(128);
-    ft_font->char_width=(GLuint *) malloc(128 * sizeof(GLuint));
-    glGenTextures( 128, ft_font->textures );
+    ft_font->list_base=glGenLists(next_p2(NUM_CHARS));
+    ft_font->char_width=(GLuint *) malloc(NUM_CHARS * sizeof(GLuint));
+    glGenTextures( NUM_CHARS, ft_font->textures );
 
     /*This is where we actually create each of the fonts display lists.*/
-    for(i=0;i<128;i++)
+    for(i=0;i<NUM_CHARS;i++)
 	if (make_dlist(face,i,ft_font->list_base,ft_font->textures,&ft_font->char_width[i])) return 3;
 
 
@@ -292,15 +286,13 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int w/*this is mos
     if(!LoadBMP(ft_font,fname))
     	return 1;
     
-    ft_font->textures = (GLuint *) malloc(128 * sizeof(GLuint));
-    /* Creating 256 Display List */
-    ft_font->list_base  = glGenLists( 128 );
-    ft_font->char_width = (GLuint *) malloc(128 * sizeof(GLuint));
-    /* Select Our Font Texture */
-    glBindTexture( GL_TEXTURE_2D, *ft_font->textures );
+    ft_font->textures = (GLuint *) malloc(NUM_CHARS * sizeof(GLuint));
+    /* Creating NUM_CHARS Display List */
+    ft_font->list_base  = glGenLists( NUM_CHARS );
+    ft_font->char_width = (GLuint *) malloc(NUM_CHARS * sizeof(GLuint));
 
-    /* Loop Through All 256 Lists */
-    for ( loop = 0; loop < 128; loop++ )
+    /* Loop Through All NUM_CHARS Lists */
+    for ( loop = 0; loop < NUM_CHARS; loop++ )
         {
 	    /* NOTE:
 	     *  BMPs are stored with the top-leftmost pixel being the
@@ -329,7 +321,7 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int w/*this is mos
 	    cy = 1 - ( float )( loop / 16 ) / 16.0f;
 
             /* Start Building A List */
-	    glNewList( ft_font->list_base + ( 128 - loop ), GL_COMPILE );
+	    glNewList( ft_font->list_base + ( next_p2(NUM_CHARS) - loop ), GL_COMPILE );
 	      /* Use A Quad For Each Character */
 	      glBegin( GL_QUADS );
 	        /* Texture Coord (Bottom Left) */
@@ -363,11 +355,11 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int w/*this is mos
 void fontclean(font_data *ft_font)
 {
     if (ft_font == NULL) return;
-    glDeleteLists(ft_font->list_base,128);
+    glDeleteLists(ft_font->list_base,next_p2(NUM_CHARS));
     if (ft_font->char_width != NULL)
     	free(ft_font->char_width);
     if (ft_font->textures != NULL) {
-    	glDeleteTextures(128,ft_font->textures);
+    	glDeleteTextures(NUM_CHARS,ft_font->textures);
     	free(ft_font->textures);
     }
     ft_font = NULL;
@@ -546,7 +538,7 @@ fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float 
     	glPushMatrix();
     	glLoadIdentity();
 		
-    	glTranslatef(x + xoff,y - h*i + yoff,0);
+    	glTranslatef((int)(x + xoff),(int)(y - h*i + yoff),0);
     	glMultMatrixf(modelview_matrix);
 
     	glCallLists(toklen, GL_UNSIGNED_BYTE, (GLubyte *) &text[start]);
