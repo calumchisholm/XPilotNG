@@ -1069,7 +1069,7 @@ static void Xpmap_wormhole_to_polygon(world_t *world, int wormhole_ind)
     es = P_get_edge_id("wormhole_es");
 
     wpos = wormhole->pos;
-    r = (BLOCK_CLICKS / 2) - 1;
+    r = WORMHOLE_RADIUS;
 
     for (i = 0; i < N; i++) {
 	angle = (((double)i)/ N) * 2 * PI;
@@ -1311,7 +1311,7 @@ void Xpmap_blocks_to_polygons(world_t *world)
     P_edgestyle("cannon_es", 3, 0xFFFFFF, 0);
     P_polystyle("cannon_ps", 0xFFFFFF, 2, P_get_edge_id("cannon_es"), 0);
 
-    P_edgestyle("wormhole_es", 2, 0x00FFFF, 0);
+    P_edgestyle("wormhole_es", -1, 0x00FFFF, 0);
     P_polystyle("wormhole_ps", 0x00FFFF, 2, P_get_edge_id("wormhole_es"), 0);
 
     P_edgestyle("fa_es", 2, 0xFF1F00, 0);

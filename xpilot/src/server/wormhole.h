@@ -26,4 +26,10 @@
 #ifndef WORMHOLE_H
 #define WORMHOLE_H
 
+#ifndef CLICK_H
+# include "click.h"
+#endif
+
+#define WORMHOLE_RADIUS ((BLOCK_CLICKS / 2) - 1)
+
 #endif

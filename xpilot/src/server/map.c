@@ -857,7 +857,6 @@ void Compute_gravity(world_t *world)
     Compute_local_gravity(world);
 }
 
-#define WORMHOLE_RADIUS ((BLOCK_CLICKS / 2) - 1)
 shape_t		wormhole_wire;
 
 void Wormhole_line_init(void)
