@@ -154,7 +154,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 		  pl->name, pl->team, td->team);
 
     if (!somebody) {
-	Score(pl, Rate(pl->score, CANNON_SCORE)/2, pos, "Treasure:");
+	Score(pl, Rate(pl->score, TREASURE_SCORE)/2, pos, "Treasure:");
 	return 0;
     }
 

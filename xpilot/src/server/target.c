@@ -194,7 +194,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     sound_play_sensors(targ->pos, DESTROY_TARGET_SOUND);
 
     if (targets_remaining > 0) {
-	sc = Rate(kp->score, CANNON_SCORE)/4;
+	sc = Rate(kp->score, TARGET_SCORE)/4;
 	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
 	if (sc >= 0.01)
 	    Score(kp, sc, targ->pos, "Target: ");
