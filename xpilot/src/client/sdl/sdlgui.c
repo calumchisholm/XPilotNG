@@ -103,6 +103,8 @@ float hudRadarMapScale;
 int hudRadarDotSize = 6;
 int baseWarningType = 1;
 
+static double shipLineWidth;
+
 static GLuint polyListBase = 0;
 static GLuint polyEdgeListBase = 0;
 
@@ -1039,7 +1041,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_LINE_SMOOTH);
-    glLineWidth(2);
+    glLineWidth(shipLineWidth);
     set_alphacolor(Gui_calculate_ship_color(id,other));
 
     glBegin(GL_LINE_LOOP);
@@ -2091,12 +2093,12 @@ static xp_option_t sdlgui_options[] = {
     COLOR(team7ColorRGBA, "#00000000", "team 7"),
     COLOR(team8ColorRGBA, "#00000000", "team 8"),
     COLOR(team9ColorRGBA, "#00000000", "team 9"),
-    COLOR(shipNameColorRGBA, "#00000000", "ship name"),
-    COLOR(baseNameColorRGBA, "#00000000", "base name"),
-    COLOR(manyLivesColorRGBA, "#00000000", "name of ship with many lives"),
-    COLOR(twoLivesColorRGBA, "#00000000", "name of ship with two lives"),
-    COLOR(oneLifeColorRGBA, "#00000000", "name of ship with one life"),
-    COLOR(zeroLivesColorRGBA, "#00000000", "name of ship with no lives"),
+    COLOR(shipNameColorRGBA, "#0000ff88", "ship name"),
+    COLOR(baseNameColorRGBA, "#0000ff88", "base name"),
+    COLOR(manyLivesColorRGBA, "#666666aa", "name of ship with many lives"),
+    COLOR(twoLivesColorRGBA, "#008800aa", "name of ship with two lives"),
+    COLOR(oneLifeColorRGBA, "#aaaa00aa", "name of ship with one life"),
+    COLOR(zeroLivesColorRGBA, "#ff0000aa", "name of ship with no lives"),
     COLOR(hudRadarEnemyColorRGBA, "#ff000088", "enemy on HUD radar"),
     COLOR(hudRadarOtherColorRGBA, "#0000ff88", "friend on HUD radar"),
     COLOR(scoreInactiveSelfColorRGBA, "#88008888", "my score when inactive"),
@@ -2120,6 +2122,13 @@ static xp_option_t sdlgui_options[] = {
 	&meterHeight,
 	NULL,
 	"Set the height of a meter.\n"),
+
+    XP_DOUBLE_OPTION(
+        "shipLineWidth",
+	1.0, 1.0, 10.0,
+	&shipLineWidth,
+	NULL,
+	"Set the line width of ships.\n"),
 
 };
 
