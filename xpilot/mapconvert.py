@@ -626,7 +626,7 @@ def convert(options):
 	elif block == BALL:
 	    ball = Struct()
 	    ball.x = loc.x * BCLICKS + BCLICKS // 2
-	    ball.y = (height - loc.y - 1) % height * BCLICKS + 640
+	    ball.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
 	    ball.loc = loc.copy()
 	    balls.append(ball)
 	elif block == FUEL:
@@ -757,14 +757,14 @@ def convert(options):
 	print "</Polygon>"
 # The styles of these polygons will be changed later...
     for ball in balls:
-	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y)
+	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y - 479)
 	print '<BallArea>'
-	print '<Polygon x="%d" y="%d" style="xpred">' % (ball.x - 1120, ball.y - 640)
+	print '<Polygon x="%d" y="%d" style="xpred">' % (ball.x - 1120, ball.y - 1120)
 	print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
 	print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
 	print '</Polygon></BallArea>'
 	print '<BallTarget team="%d">' % ball.team
-	print '<Polygon x="%d" y="%d" style="emptyyellow">' % (ball.x - 480, ball.y)
+	print '<Polygon x="%d" y="%d" style="emptyyellow">' % (ball.x - 480, ball.y - 480)
 	print '<Offset x="960" y="0"/> <Offset x="0" y="960"/>'
 	print '<Offset x="-960" y="0"/> <Offset x="0" y="-960"/>'
 	print '</Polygon></BallTarget>'
