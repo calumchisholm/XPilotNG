@@ -34,9 +34,9 @@
 
 #ifndef	DEFAULT_MAP
 #    ifdef _WINDOWS
-#         define DEFAULT_MAP		"default.xp"
+#         define DEFAULT_MAP		"polybloods.xp2"
 #    else
-#         define DEFAULT_MAP		"marahacked_teamcup2001.xp"
+#         define DEFAULT_MAP		"polybloods.xp2"
 #    endif
 #endif
 
