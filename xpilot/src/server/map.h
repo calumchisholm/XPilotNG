@@ -234,7 +234,9 @@ typedef struct {
 extern bool is_polygon_map;
 
 struct world {
-    int		x, y;		/* Size of world in blocks */
+    int		x, y;		/* Size of world in blocks, rounded up */
+    int		bwidth_floor;	/* Width of world in blocks, rounded down */
+    int		bheight_floor;	/* Height of world in blocks, rounded down */
     double	diagonal;	/* Diagonal length in blocks */
     int		width, height;	/* Size of world in pixels (optimization) */
     int		cwidth, cheight;/* Size of world in clicks */

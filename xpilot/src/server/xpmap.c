@@ -178,8 +178,8 @@ void Create_blockmap_from_polygons(world_t *world)
 	    World_set_block(world, blk, SPACE);
 
 
-    for (blk.by = 0; blk.by < world->y; blk.by++) {
-	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
+    for (blk.by = 0; blk.by < world->bheight_floor; blk.by++) {
+	for (blk.bx = 0; blk.bx < world->bwidth_floor; blk.bx++) {
 	    int num_inside = 0;
 	    bool r_inside = false, u_inside = false;
 	    bool l_inside = false, d_inside = false;
@@ -267,8 +267,8 @@ void Create_blockmap_from_polygons(world_t *world)
     }
 
     /* find balltargets */
-    for (blk.by = 0; blk.by < world->y; blk.by++) {
-	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
+    for (blk.by = 0; blk.by < world->bheight_floor; blk.by++) {
+	for (blk.bx = 0; blk.bx < world->bwidth_floor; blk.bx++) {
 	    int group;
 	    group_t *gp;
 

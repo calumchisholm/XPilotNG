@@ -553,6 +553,8 @@ static bool Grok_map_size(world_t *world)
     world->x = (world->width - 1) / BLOCK_SZ + 1; /* !@# */
     world->y = (world->height - 1) / BLOCK_SZ + 1;
     world->diagonal = LENGTH(world->x, world->y);
+    world->bwidth_floor = world->width / BLOCK_SZ;
+    world->bheight_floor = world->height / BLOCK_SZ;
 
     return true;
 }
