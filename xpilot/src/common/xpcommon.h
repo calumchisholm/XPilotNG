@@ -46,47 +46,53 @@
 # define HAVE_STRCASECMP 1
 # define HAVE_STRNCASECMP 1
 # define HAVE_LIBZ 1
-# define PACKAGE "xpilot"
+# define PACKAGE "xpilot-ng"
 #endif
 
 #include <stdio.h>
-#if HAVE_STDARG_H
+#ifdef HAVE_STDARG_H
 # include <stdarg.h>
 #else
 # error "ANSI C stdarg.h is needed to compile."
 #endif
 
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
-#if HAVE_SYS_STAT_H
+
+#ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
-#if STDC_HEADERS
+
+#ifdef STDC_HEADERS
 # include <stdlib.h>
 # include <stddef.h>
 #else
-# if HAVE_STDLIB_H
+# ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 # endif
 #endif
-#if HAVE_STRING_H
-# if !STDC_HEADERS && HAVE_MEMORY_H
+
+#ifdef HAVE_STRING_H
+# if ! defined STDC_HEADERS && defined HAVE_MEMORY_H
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H
+
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
-#if HAVE_INTTYPES_H
+
+#ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #else
-# if HAVE_STDINT_H
+# ifdef HAVE_STDINT_H
 #  include <stdint.h>
 # endif
 #endif
-#if HAVE_UNISTD_H
+
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 
@@ -110,11 +116,11 @@
 # include <signal.h>
 #endif
 
-#if TIME_WITH_SYS_TIME
+#ifdef TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
 #else
-# if HAVE_SYS_TIME_H
+# ifdef HAVE_SYS_TIME_H
 #  include <sys/time.h>
 # else
 #  include <time.h>
@@ -220,7 +226,7 @@
 #endif
 
 /* Evil Windows hacks. Yuck. */
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 # include "NT/winNet.h"
   /* need this for printf wrappers. */
 # ifdef	_XPILOTNTSERVER_
