@@ -394,6 +394,7 @@ typedef enum {
     XP_KS_KP_INSERT,
     XP_KS_KP_DELETE,
     XP_KS_PRINT, /* Print Screen */
+    XP_KS_SECTION,
 
 } xp_keysym_t;
 

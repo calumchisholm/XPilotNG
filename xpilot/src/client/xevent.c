@@ -43,6 +43,9 @@ typedef struct {
 } xp_xks2xpks_t;
 
 xp_xks2xpks_t xks2xpks_table[] = {
+
+    /* /usr/include/X11/keysymdef.h */
+
     { XK_BackSpace,	XP_KS_BACKSPACE },
     { XK_Tab,		XP_KS_TAB },
     { XK_Linefeed,	XP_KS_RETURN },
@@ -182,9 +185,10 @@ xp_xks2xpks_t xks2xpks_table[] = {
     { XK_KP_Insert,	XP_KS_KP_INSERT },
     { XK_KP_Delete,	XP_KS_KP_DELETE },
     { XK_Print,		XP_KS_PRINT },
+    { XK_section,	XP_KS_SECTION },   /* § */
 };
 
-xp_keysym_t KeySym_to_xp_keysym(KeySym xks)
+static xp_keysym_t KeySym_to_xp_keysym(KeySym xks)
 {
     int i;
 
@@ -198,7 +202,7 @@ xp_keysym_t KeySym_to_xp_keysym(KeySym xks)
     return XP_KS_UNKNOWN;
 }
 
-keys_t Optionhack_lookup_key(KeySym xks, bool reset)
+static keys_t Optionhack_lookup_key(KeySym xks, bool reset)
 {
     xp_keysym_t xpks;
 

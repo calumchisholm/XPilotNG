@@ -279,7 +279,7 @@ keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
     return ret;
 }
 
-void Store_xpkeydef(xp_keysym_t ks, keys_t key)
+static void Store_xpkeydef(xp_keysym_t ks, keys_t key)
 {
     int i;
     xp_keydefs_t xpkeydef;
@@ -310,7 +310,7 @@ void Store_xpkeydef(xp_keysym_t ks, keys_t key)
 
 	if (kd->key == KEY_DUMMY) {
 	    assert(kd->ks == XP_KS_UNKNOWN);
-	    warn("Store_xpkeydef: Found dummy at index %d", i);
+	    /*warn("Store_xpkeydef: Found dummy at index %d", i);*/
 	    *kd = xpkeydef;
 	    return;
 	}
@@ -334,7 +334,7 @@ static void Remove_key_from_xpkeydefs(keys_t key)
 	 * lazy deletion 
 	 */
 	if (kd->key == key) {
-	    warn("Remove_key_from_xpkeydefs: Removing key at index %d", i);
+	    /*warn("Remove_key_from_xpkeydefs: Removing key at index %d", i);*/
 	    kd->ks = XP_KS_UNKNOWN;
 	    kd->key = KEY_DUMMY;
 	}
@@ -459,11 +459,11 @@ static xp_key_t xpkeys[] = {
     {"Print",		XP_KS_PRINT},
     {"Linefeed",	XP_KS_RETURN},
     {"Select",		XP_KS_UP},
-    
+    {"section",		XP_KS_SECTION},
 
 };
 
-xp_keysym_t String_to_xp_keysym(const char *name)
+static xp_keysym_t String_to_xp_keysym(const char *name)
 {
     int i;
 
@@ -482,7 +482,7 @@ xp_keysym_t String_to_xp_keysym(const char *name)
 
 static bool Set_key_option(xp_option_t *opt, const char *value)
 {
-    bool retval = true;
+    /*bool retval = true;*/
     char *str, *valcpy;
 
     assert(opt);
