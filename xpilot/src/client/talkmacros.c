@@ -372,11 +372,18 @@ int Talk_macro(char *str)
 
 #ifdef OPTIONHACK
 
+static inline int index_by_option(xp_option_t *opt)
+{
+    return atoi(Get_option_name(opt) + strlen("msg")) - 1;
+}
+
 static bool Set_talk_macro(xp_option_t *opt, const char *value)
 {
-    int i = atoi(opt->name + strlen("msg"));
+    int i = index_by_option(opt);
 
     /*printf("Set_talk_macro: i = %d\n", i);*/
+    assert(i >= 0);
+    assert(i < TALK_FAST_NR_OF_MSGS);
 
     if (talk_fast_msgs[i])
 	xp_free(talk_fast_msgs[i]);
@@ -388,9 +395,11 @@ static bool Set_talk_macro(xp_option_t *opt, const char *value)
 
 static char *Get_talk_macro(xp_option_t *opt)
 {
-    int i = atoi(opt->name + strlen("msg"));
+    int i = index_by_option(opt);
 
     /*printf("Get_talk_macro: i = %d\n", i);*/
+    assert(i >= 0);
+    assert(i < TALK_FAST_NR_OF_MSGS);
 
     return talk_fast_msgs[i];
 }

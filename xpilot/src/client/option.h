@@ -59,6 +59,10 @@ typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
  */
 extern void Set_key_binding_callback(xp_key_binding_callback_t callback);
 
+/*
+ * NOTE: DON'T ACCESS THIS STRUCTURE DIRECTLY, USE THE INITIALIZER MACROS,
+ * AND OTHER ACCESS FUNCTIONS.
+ */
 struct xp_option {
     xp_option_type_t type;
 
@@ -227,6 +231,10 @@ void Store_option(xp_option_t *);
 	Store_option(& (option_array) [ii]); \
 } \
 
-
+static const char *Get_option_name(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->name;
+}
 
 #endif
