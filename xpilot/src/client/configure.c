@@ -1851,15 +1851,11 @@ static void Xpilotrc_end(FILE *fp)
 {
     int			i;
 
-    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL) {
+    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL)
 	return;
-    }
+
     for (i = 0; i < num_xpilotrc; i++) {
-	/* a bug in 3.2.8 saved maxFPS, which is wrong!  don't save maxFPS! */
-	if (strncmp(xpilotrc_ptr[i].line + 7, "maxFPS:",
-		    xpilotrc_ptr[i].size + 1) != 0) {
-	    fprintf(fp, "%s", xpilotrc_ptr[i].line);
-	}
+	fprintf(fp, "%s", xpilotrc_ptr[i].line);
 	free(xpilotrc_ptr[i].line);
     }
     free(xpilotrc_ptr);
@@ -2099,7 +2095,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 #endif
     Config_save_float(fp, "scaleFactor", scaleFactor);
     Config_save_float(fp, "altScaleFactor", scaleFactor_s);
-    /* don't save maxFPS */
+    Config_save_int(fp, "maxFPS", maxFPS);
 
     /* colors */
     Config_save_comment(fp,
