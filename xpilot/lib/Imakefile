@@ -1,4 +1,4 @@
-/* $Id$ */
+/*  */
 
 #include "Local.config"
 
@@ -9,4 +9,5 @@ SUBDIRS = maps textures
 
 InstallNonExecFile(sounds,$(INSTLIBDIR))
 InstallNonExecFile(defaults,$(INSTLIBDIR))
+InstallNonExecFile(password,$(INSTLIBDIR))
 InstallNonExecFile(robots,$(INSTLIBDIR))
