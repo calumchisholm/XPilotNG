@@ -941,12 +941,12 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 	    Gui_paint_ship_uncloaked(id, points, ship_color, cnt);
 	    /* shipshapeshack - Mara */
 	    if (shipShapesHackColor >= 1) {
-		Segment_add(shipShapesHackColor,
+		Segment_add(ship_color /*shipShapesHackColor*/,
 			    (X(x + SHIP_SZ * tcos(dir))),
 			    (Y(y + SHIP_SZ * tsin(dir))),
 			    (X(x + (SHIP_SZ + 12) * tcos(dir))),
 			    (Y(y + (SHIP_SZ + 12) * tsin(dir))));
-		Arc_add(shipShapesHackColor,
+		Arc_add(ship_color /*shipShapesHackColor*/,
 			X(x - SHIP_SZ), Y(y + SHIP_SZ),
 			2 * SHIP_SZ - 1, 2 * SHIP_SZ - 1,
 			0, 64 * 360);
