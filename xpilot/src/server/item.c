@@ -276,11 +276,10 @@ void Place_item(player *pl, int item)
 		vel.y += tsin(dir) * v;
 	    }
 	} else {
-	    int bx = CLICK_TO_BLOCK(pos.cx),
-		by = CLICK_TO_BLOCK(pos.cy);
+	    vector gravity = World_gravity(pos);
 
-	    vel.x -= Gravity * World.gravity[bx][by].x;
-	    vel.y -= Gravity * World.gravity[bx][by].y;
+	    vel.x -= Gravity * gravity.x;
+	    vel.y -= Gravity * gravity.y;
 	    vel.x += (int)(rfrac() * 8) - 3;
 	    vel.y += (int)(rfrac() * 8) - 3;
 	}
@@ -855,7 +854,7 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 void do_hyperjump(player *pl)
 {
     SET_BIT(pl->status, WARPING);
-    pl->wormHoleHit = NULL;
+    pl->wormHoleHit = -1;
 }
 
 void do_lose_item(player *pl)

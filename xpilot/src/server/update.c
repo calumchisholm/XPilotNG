@@ -33,19 +33,14 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static char msg[MSG_LEN];
 
-
 /* kps - gravity is block based, even on polygon maps */
 static inline void update_object_speed(object *obj)
 {
     if (BIT(obj->status, GRAVITY)) {
-	obj->vel.x
-	    += (obj->acc.x
-		+ World.gravity[OBJ_X_IN_BLOCKS(obj)][OBJ_Y_IN_BLOCKS(obj)].x)
-	    * timeStep;
-	obj->vel.y
-	    += (obj->acc.y
-		+ World.gravity[OBJ_X_IN_BLOCKS(obj)][OBJ_Y_IN_BLOCKS(obj)].y)
-	    * timeStep;
+	vector gravity = World_gravity(obj->pos);
+
+	obj->vel.x += (obj->acc.x + gravity.x) * timeStep;
+	obj->vel.y += (obj->acc.y + gravity.y) * timeStep;
     } else {
 	obj->vel.x += obj->acc.x * timeStep;
 	obj->vel.y += obj->acc.y * timeStep;

@@ -44,25 +44,17 @@
 #define MIN(a,b)  ((a) < (b) ? (a) : (b))
 #endif
 
-#define	STR80	(80)
-
 typedef struct {
-    char	owner[STR80]; /* ng wants this to be name */
-    char	host[STR80];
+    char	owner[80];
+    char	host[80];
 } server;
-
-/* determine if a block is one of SPACE_BLOCKS */
-#define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
 
 /*
  * Global data.
  */
 
-#ifdef SERVER
 #define FPS		framesPerSecond
 #define NumObjs		(ObjCount + 0)
-
-#define Player_by_id(id)	Players(GetInd(id))
 
 extern player		**PlayersArray;
 extern object		*Obj[];
@@ -361,10 +353,29 @@ extern int		playerPasswordsFileSizeLimit;
 extern bool		fastAim;
 extern bool		maraTurnqueue;
 extern bool		ignoreMaxFPS;
-
-/* kps hack */
 extern bool		polygonMode;
 
-#endif /* SERVER */
+#define Bases(ind)		(&World.bases[(ind)])
+#define Fuels(ind)		(&World.fuels[(ind)])
+#define Cannons(ind)		(&World.cannons[(ind)])
+#define Checks(ind)		(&World.checks[(ind)])
+#define Gravs(ind)		(&World.gravs[(ind)])
+#define Targets(ind)		(&World.targets[(ind)])
+#define Treasures(ind)		(&World.treasures[(ind)])
+#define Wormholes(ind)		(&World.wormholes[(ind)])
+#define AsteroidConcs(ind)	(&World.asteroidConcs[(ind)])
+#define ItemConcs(ind)		(&World.itemConcs[(ind)])
+#define Teams(team)		(&World.teams[(team)])
+
+/* determine if a block is one of SPACE_BLOCKS */
+#define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
+
+#define Player_by_id(id)	Players(GetInd(id))
+
+static inline vector World_gravity(clpos pos)
+{
+    return World.gravity[CLICK_TO_BLOCK(pos.cx)][CLICK_TO_BLOCK(pos.cy)];
+}
 
 #endif /* GLOBAL_H */
+

@@ -275,19 +275,6 @@ typedef struct {
     asteroid_concentrator_t	*asteroidConcs;
 } World_map;
 
-#define Bases(ind)		(&World.bases[(ind)])
-#define Fuels(ind)		(&World.fuels[(ind)])
-#define Cannons(ind)		(&World.cannons[(ind)])
-#define Checks(ind)		(&World.checks[(ind)])
-#define Gravs(ind)		(&World.gravs[(ind)])
-#define Targets(ind)		(&World.targets[(ind)])
-#define Treasures(ind)		(&World.treasures[(ind)])
-#define Wormholes(ind)		(&World.wormholes[(ind)])
-#define AsteroidConcs(ind)	(&World.asteroidConcs[(ind)])
-#define ItemConcs(ind)		(&World.itemConcs[(ind)])
-#define Teams(team)		(&World.teams[(team)])
-
-
 /* kps change 100, 30 etc to something sane */
 struct polystyle {
     char id[100];

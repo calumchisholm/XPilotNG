@@ -253,7 +253,7 @@ void Pause_player(player *pl, bool on)
 
 int Handle_keyboard(player *pl)
 {
-    int	    	i, j, k, key, pressed, cx, cy, dx, dy, xi, yi;
+    int	    	i, j, k, key, pressed, cx, cy, dx, dy;
     double  	minv;
     int	    	ind = GetInd(pl->id);
 
@@ -736,9 +736,6 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_PAUSE:
-		xi = OBJ_X_IN_BLOCKS(pl);
-		yi = OBJ_Y_IN_BLOCKS(pl);
-
 		if (BIT(pl->status, PAUSE))
 		    i = PAUSE;
 		else if (BIT(pl->status, HOVERPAUSE))
@@ -761,9 +758,7 @@ int Handle_keyboard(player *pl)
 			minv = 5.0f;
 			i = HOVERPAUSE;
 		    }
-		    /* kps - implement gravity for poly maps ??? */
-		    if (!is_polygon_map)
-			minv += VECTOR_LENGTH(World.gravity[xi][yi]);
+		    minv += VECTOR_LENGTH(World_gravity(pl->pos));
 		    if (pl->velocity > minv)
 			break;
 		}
