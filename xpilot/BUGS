@@ -1,3 +1,12 @@
+Problem : ngControls break server recordings,
+	  if ncContorls if off, they work.
+Found by: kps
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
 Problem :Hitting the pause key while floating makes the ship got to
 	 autopilot and then start spinning out of control
 Found by:Colonel Blood
