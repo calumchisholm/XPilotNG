@@ -55,6 +55,50 @@ static int team7Color;		/* Color index to associate with team 7 */
 static int team8Color;		/* Color index to associate with team 8 */
 static int team9Color;		/* Color index to associate with team 9 */
 
+
+static int asteroidRawShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS][2] = {
+    { ASTEROID_SHAPE_0 },
+    { ASTEROID_SHAPE_1 },
+};
+
+
+position_t *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
+
+
+int Init_asteroids(void)
+{
+    int		shp, i;
+    size_t	point_size;
+    size_t	total_size;
+    char	*dynmem;
+
+    /*
+     * Allocate memory for all the asteroid points.
+     */
+    point_size = sizeof(position_t) * RES;
+    total_size = point_size * NUM_ASTEROID_POINTS * NUM_ASTEROID_SHAPES;
+    if ((dynmem = (char *) malloc(total_size)) == NULL) {
+	error("Not enough memory for asteroid shapes");
+	return -1;
+    }
+
+    /*
+     * For each asteroid-shape rotate all points.
+     */
+    for ( shp = 0; shp < NUM_ASTEROID_SHAPES; shp++ ) {
+	for ( i = 0; i < NUM_ASTEROID_POINTS; i++ ) {
+	    asteroidShapes[shp][i] = (position_t *) dynmem;
+	    dynmem += point_size;
+	    asteroidShapes[shp][i][0].x = asteroidRawShapes[shp][i][0];
+	    asteroidShapes[shp][i][0].y = asteroidRawShapes[shp][i][1];
+	    Rotate_position( &asteroidShapes[shp][i][0] );
+	}
+    }
+
+    return 0;
+}
+
+
 void Gui_paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int c)
 {
     if (!texturedObjects) {
@@ -283,12 +327,20 @@ void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
     rd.drawLines(dpy, drawPixmap, gameGC, points, cnt, 0);
 }
 
+void Gui_paint_asteroids_begin(void)
+{
+}
+
+void Gui_paint_asteroids_end(void)
+{
+}
 
 void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
 {
     int cnt, tx, ty;
     static XPoint points[NUM_ASTEROID_POINTS+2];
 
+    type = type % NUM_ASTEROID_SHAPES;
     for (cnt = 0; cnt < NUM_ASTEROID_POINTS; cnt++) {
 	tx = (int)(asteroidShapes[type][cnt][rot].x * size * 1.4);
 	ty = (int)(asteroidShapes[type][cnt][rot].y * size * 1.4);

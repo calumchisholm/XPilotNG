@@ -34,6 +34,7 @@
 #include "images.h"
 #include "glwidgets.h"
 #include "text.h"
+#include "asteroid_data.h"
 
 Uint32 nullRGBA    = 0x00000000;
 Uint32 blackRGBA   = 0x000000ff;
@@ -114,6 +115,7 @@ static double shipLineWidth;
 static bool smoothLines;
 static GLuint polyListBase = 0;
 static GLuint polyEdgeListBase = 0;
+static GLuint asteroid = 0;
 
 irec_t *select_bounds;
 
@@ -146,6 +148,7 @@ int GL_Y(int y) {
     return (int)((y - world.y)*scale);
 }
 
+
 /* remove this later maybe? to tedious for me to edit them all away now */
 void Segment_add(Uint32 color, int x_1, int y_1, int x_2, int y_2)
 {
@@ -170,6 +173,24 @@ void Circle(Uint32 color,
     	for (i = 0.0f; i < TABLE_SIZE; i=i+((float)TABLE_SIZE)/resolution)
     	    glVertex2f((x + tcos((int)i)*radius),(y + tsin((int)i)*radius));
     glEnd();
+}
+
+static int wrap(int *xp, int *yp)
+{
+    int			x = *xp, y = *yp;
+    int returnval =1;
+
+    if (x < world.x || x > world.x + ext_view_width) {
+	if (x < realWorld.x || x > realWorld.x + ext_view_width)
+	    returnval = 0;
+	*xp += world.x - realWorld.x;
+    }
+    if (y < world.y || y > world.y + ext_view_height) {
+	if (y < realWorld.y || y > realWorld.y + ext_view_height)
+	    returnval = 0;
+	*yp += world.y - realWorld.y;
+    }
+    return returnval;
 }
 
 #ifndef CALLBACK
@@ -225,6 +246,29 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
     glEndList();
 }
 
+static int asteroid_init(void)
+{
+    int i;
+    if ((asteroid = glGenLists(1)) == 0) 
+	return -1;
+    glNewList(asteroid, GL_COMPILE);
+    glBegin(GL_TRIANGLES);
+    for (i = 0; i < VERTEX_COUNT; i++) {
+	glNormal3fv(normal_vectors[i]); 
+	glTexCoord2fv(uv_vectors[i]);
+	glVertex3fv(vertex_vectors[i]);
+    }
+    glEnd();
+    glEndList();
+    return 0;
+}
+
+static void asteroid_cleanup(void)
+{
+    if (asteroid) 
+	glDeleteLists(asteroid, 1);
+}
+
 int Gui_init(void)
 {
     int i;
@@ -255,11 +299,18 @@ int Gui_init(void)
     }
 
     gluDeleteTess(tess);
+
+    if (asteroid_init() == -1) {
+	error("failed to initialize asteroids");
+	return -1;
+    }
+    
     return 0;
 }
 
 void Gui_cleanup(void)
 {
+    asteroid_cleanup();
     if (polyListBase)
 	glDeleteLists(polyListBase, num_polygons);
 }
@@ -757,8 +808,62 @@ void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
 {
 }
 
+#define FOVY 45.0
+#define EYEZ 1.2071067811865475 /* = 1/(2*tan(FOFY/2)) */ 
+
+void Gui_paint_asteroids_begin(void)
+{
+    image_t *img;
+    GLfloat ambient[] = { 0.7, 0.7, 0.7, 1.0 };
+
+    img = Image_get(IMG_ASTEROID);
+    if (img != NULL) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, img->name);
+    }
+    glColor4ub(255, 255, 255, 255);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glEnable(GL_CULL_FACE);
+}
+
+void Gui_paint_asteroids_end(void)
+{
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+
+/* this displays the asteroid hit area */
+#if 0
+    int i, x, y, size;
+    for (i = 0; i < num_asteroids; i++) {
+	x = asteroid_ptr[i].x;
+	y = asteroid_ptr[i].y;
+	if (wrap(&x, &y)) {
+	    size = asteroid_ptr[i].size;
+	    Circle(whiteRGBA, x, y, (int)(0.8 * SHIP_SZ * size), 0);
+	}
+    }
+#endif
+}
+
 void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
 {
+    GLfloat real_size;
+
+    real_size = 0.9 * SHIP_SZ * size;
+    glPushMatrix();
+    glTranslatef((GLfloat)x, (GLfloat)y, 0.0);
+    glScalef(real_size, real_size, 1.0);
+    glRotatef(360.0 * rot / 128,
+	   (type & 4) - 2,
+	   (type & 2) - 1,
+	   (type & 1) - 0.5);
+    glCallList(asteroid);
+    glEnd();
+    glPopMatrix();
 }
 
 
@@ -1133,24 +1238,6 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     	&& self->id != id
     	&& other != NULL)
     	    Gui_paint_ship_name(x,y,other);
-}
-
-static int wrap(int *xp, int *yp)
-{
-    int			x = *xp, y = *yp;
-    int returnval =1;
-
-    if (x < world.x || x > world.x + ext_view_width) {
-	if (x < realWorld.x || x > realWorld.x + ext_view_width)
-	    returnval = 0;
-	*xp += world.x - realWorld.x;
-    }
-    if (y < world.y || y > world.y + ext_view_height) {
-	if (y < realWorld.y || y > realWorld.y + ext_view_height)
-	    returnval = 0;
-	*yp += world.y - realWorld.y;
-    }
-    return returnval;
 }
 
 void Paint_score_objects(void)

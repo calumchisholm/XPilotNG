@@ -43,15 +43,6 @@ static int wreckageRawShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS][2] = {
 position_t *wreckageShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS];
 
 
-static int asteroidRawShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS][2] = {
-    { ASTEROID_SHAPE_0 },
-    { ASTEROID_SHAPE_1 },
-};
-
-
-position_t *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
-
-
 bool	markingLights;
 
 
@@ -239,11 +230,12 @@ static void Paint_asteroids(void)
     int		type, size, rot;
 
     if ( num_asteroids > 0 ) {
+	Gui_paint_asteroids_begin();
 	for (i = 0; i < num_asteroids; i++) {
 	    x = asteroid_ptr[i].x;
 	    y = asteroid_ptr[i].y;
 	    if (wrap(&x, &y)) {
-		type = (asteroid_ptr[i].type) % NUM_ASTEROID_SHAPES;
+		type = asteroid_ptr[i].type;
 		rot = asteroid_ptr[i].rotation;
 		size = asteroid_ptr[i].size;
 
@@ -251,6 +243,7 @@ static void Paint_asteroids(void)
 	    }
 
 	}
+	Gui_paint_asteroids_end();
 	RELEASE(asteroid_ptr, num_asteroids, max_asteroids);
     }
 }
@@ -599,40 +592,6 @@ int Init_wreckage(void)
 	    wreckageShapes[shp][i][0].x = wreckageRawShapes[shp][i][0];
 	    wreckageShapes[shp][i][0].y = wreckageRawShapes[shp][i][1];
 	    Rotate_position( &wreckageShapes[shp][i][0] );
-	}
-    }
-
-    return 0;
-}
-
-
-int Init_asteroids(void)
-{
-    int		shp, i;
-    size_t	point_size;
-    size_t	total_size;
-    char	*dynmem;
-
-    /*
-     * Allocate memory for all the asteroid points.
-     */
-    point_size = sizeof(position_t) * RES;
-    total_size = point_size * NUM_ASTEROID_POINTS * NUM_ASTEROID_SHAPES;
-    if ((dynmem = (char *) malloc(total_size)) == NULL) {
-	error("Not enough memory for asteroid shapes");
-	return -1;
-    }
-
-    /*
-     * For each asteroid-shape rotate all points.
-     */
-    for ( shp = 0; shp < NUM_ASTEROID_SHAPES; shp++ ) {
-	for ( i = 0; i < NUM_ASTEROID_POINTS; i++ ) {
-	    asteroidShapes[shp][i] = (position_t *) dynmem;
-	    dynmem += point_size;
-	    asteroidShapes[shp][i][0].x = asteroidRawShapes[shp][i][0];
-	    asteroidShapes[shp][i][0].y = asteroidRawShapes[shp][i][1];
-	    Rotate_position( &asteroidShapes[shp][i][0] );
 	}
     }
 

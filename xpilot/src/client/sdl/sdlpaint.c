@@ -243,9 +243,6 @@ int Paint_init(void)
     if (Init_wreckage() == -1)
 	return -1;
     
-    if (Init_asteroids() == -1)
-	return -1;
-
     if (Images_init() == -1) 
 	return -1;
 

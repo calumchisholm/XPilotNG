@@ -36,6 +36,8 @@ void Gui_paint_spark(int color, int x, int y);
 
 void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size);
 
+void Gui_paint_asteroids_begin(void);
+void Gui_paint_asteroids_end(void);
 void Gui_paint_asteroid(int x, int y, int type, int rot, int size);
 
 void Gui_paint_fastshot(int color, int x, int y);
