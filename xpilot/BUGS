@@ -52,7 +52,10 @@ Fixed by:
 Files affected:
 
 -----------------------------------------------------------------
-Problem :
+Problem : Introduction of new option code breaks shipShape file handling
+	  ie. if you have shipShapeFile /home/user/.shipshapes, and just 
+	  use the name of the ship in the .xpilotrc, you get an error 
+	  message "not enough ship points defined" 
 Found by:
 Solution:
 Fixed by:
