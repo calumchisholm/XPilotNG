@@ -24,7 +24,7 @@
 /* Changelog: CB Added metaserver interface improvements */
 /*            CB Fixed Warnings                          */
 
-#include "xpclient.h"
+#include "xpclient_x11.h"
 
 
 char welcome_version[] = VERSION;

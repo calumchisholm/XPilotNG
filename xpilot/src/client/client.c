@@ -24,11 +24,29 @@
 
 #include "xpclient.h"
 
+/* kps - hack */
+extern void Radar_show_target(int x, int y);
+extern void Radar_hide_target(int x, int y);
+extern void Add_message(char *message);
+extern int Bitmap_add_std_textures(void);
+extern void Play_beep(void);
+extern void Quit(void);
+extern int Key_init(void);
+extern int Alloc_msgs(void);
+extern int Bitmap_add(char *filename, int count, bool scalable);
+extern void Paint_frame(void);
+extern int Init_playing_windows(void);
+extern void Init_scale_array(void);
+extern int Bitmap_add_std_objects(void);
+extern int Startup_server_motd(void);
+extern int Check_view_dimensions(void);
+/* kps ugly hack - we should rather include bitmap.h here */
+#define NUM_BITMAPS	47
+
 char client_version[] = VERSION;
 
 
 bool	is_server = false;	/* used in common code */
-char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
 bool	scoresChanged = false;
 unsigned RadarHeight = 0;
@@ -850,6 +868,7 @@ static void parse_styles(char **callptr)
 	exit(1);
     }
 
+    /* kps - why is NUM_BITMAPS used here ? */
     for (i = 0; i < num_polygon_styles; i++) {
 	polygon_styles[i].rgb = get_32bit(&ptr);
 	polygon_styles[i].texture = NUM_BITMAPS + (*ptr++);
@@ -876,8 +895,8 @@ static void parse_styles(char **callptr)
     for (i = 0; i < num_bmaps; i++) {
 	char fname[30];
 	int flags;
-	strncpy(fname, ptr, 30 - 1);
-	fname[30 - 1] = 0;
+
+	strlcpy(fname, ptr, 30);
 	ptr += strlen(fname) + 1;
 	flags = *ptr++;
 	Bitmap_add(fname, 1, flags);

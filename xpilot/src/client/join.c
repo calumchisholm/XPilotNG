@@ -21,15 +21,15 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "xpclient.h"
+/* kps - this file could be made X11 independent easily. */
+
+#include "xpclient_x11.h"
 
 char join_version[] = VERSION;
 
 #ifndef SCORE_UPDATE_DELAY
 # define SCORE_UPDATE_DELAY	4
 #endif
-
-void xpilotShutdown(void);
 
 static int Handle_input(int new_input)
 {
@@ -153,7 +153,7 @@ static void Input_loop(void)
 }
 #endif	/* _WINDOWS */
 
-void xpilotShutdown()
+void xpilotShutdown(void)
 {
     Net_cleanup();
     Client_cleanup();

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -28,9 +27,8 @@
 
 #ifndef PACK_H
 /* need MAX_..._LEN */
-#include "pack.h"
+#  include "pack.h"
 #endif
-
 
 typedef struct Connect_param {
     int			contact_port,
@@ -44,11 +42,6 @@ typedef struct Connect_param {
     unsigned		server_version;
     int			team;
 } Connect_param_t;
-
-
-#ifdef PROTOCLIENT_H
-#error "protoclient.h was included before connectparam.h"
-#endif
 
 #endif
 

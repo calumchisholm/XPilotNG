@@ -24,6 +24,8 @@
 #ifndef	PROTOCLIENT_H
 #define	PROTOCLIENT_H
 
+#include "connectparam.h"
+
 /*
  * about.c
  */
@@ -100,23 +102,16 @@ extern int Init_asteroids(void);
 /*
  * query.c
  */
-#ifdef SOCKLIB_H
 extern int Query_all(sock_t *sockfd, int port, char *msg, int msglen);
-#endif
+
 
 #ifdef	LIMIT_ACCESS
 extern bool		Is_allowed(char *);
 #endif
 
 /*
- * sim.c
- */
-extern void Simulate(void);
-
-/*
  * textinterface.c
  */
-#ifdef CONNECTPARAM_H
 int Connect_to_server(int auto_connect, int list_servers,
 		      int auto_shutdown, char *shutdown_reason,
 		      Connect_param_t *conpar);
@@ -126,7 +121,6 @@ int Contact_servers(int count, char **servers,
                     int find_max, int *num_found,
                     char **server_addresses, char **server_names,
                     Connect_param_t *conpar);
-#endif
 
 /*
  * usleep.c
@@ -136,9 +130,7 @@ extern int micro_delay(unsigned usec);
 /*
  * welcome.c
  */
-#ifdef CONNECTPARAM_H
 int Welcome_screen(Connect_param_t *conpar);
-#endif
 
 /*
  * widget.c

@@ -21,7 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "xpclient.h"
+#include "xpclient_x11.h"
 
 char talk_version[] = VERSION;
 
@@ -54,6 +54,8 @@ static struct {
     int			offset;
     int			point;
 } talk_cursor;
+
+char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
 /* position in history when browsing in the talk window */
 static int		history_pos = 0;

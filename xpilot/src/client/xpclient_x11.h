@@ -21,47 +21,54 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef XPCLIENT_H
-#define XPCLIENT_H
+#ifndef XPCLIENT_X11_H
+#define XPCLIENT_X11_H
 
-#include "xpcommon.h"
+#include "xpclient.h"
 
-#ifdef HAVE_ZLIB_H
-#  include <zlib.h>
-#else
-#  error "Header zlib.h missing. Please install zlib."
+#ifdef HAVE_X11_X_H
+#  include <X11/X.h>
+#endif
+#ifdef HAVE_X11_XLIB_H
+#  include <X11/Xlib.h>
+#endif
+#ifdef HAVE_X11_XOS_H
+#  include <X11/Xos.h>
+#endif
+#ifdef HAVE_X11_XUTIL_H
+#  include <X11/Xutil.h>
+#endif
+#ifdef HAVE_X11_KEYSYM_H
+#  include <X11/keysym.h>
+#endif
+#ifdef HAVE_X11_XATOM_H
+#  include <X11/Xatom.h>
+#endif
+#ifdef HAVE_X11_XMD_H
+#  include <X11/Xmd.h>
+#endif
+#ifdef HAVE_X11_XRESOURCE_H
+#  include <X11/Xresource.h>
 #endif
 
-#ifdef _WINDOWS
-# include "NT/winBitmap.h"
-# include "NT/winConfig.h"
-# include "NT/winAudio.h"
-# include "NT/winX.h"
-# include "NT/winX_.h"
-# include "NT/winXThread.h"
-# include "NT/winXKey.h"
-# include "NT/winXXPilot.h"
-# include <direct.h>
-# define snprintf _snprintf
-# define printf Trace
-# define F_OK 0
-# define W_OK 2
-# define R_OK 4
-# define X_OK 0
-# define mkdir(A,B) _mkdir(A)
-#endif
+#include "keys.h"
 
-#include "client.h"
-#include "clientrank.h"
-#include "connectparam.h"
-#include "datagram.h"
-#include "gfx2d.h"
-#include "gfx3d.h"
-#include "ignore.h"
-#include "netclient.h"
-#include "protoclient.h" /* misc. hacks */
-#include "recordfmt.h"
-#include "talk.h"        /* talk.c depends on X11 */
+#include "bitmaps.h"
+#include "configure.h"
+#include "dbuff.h"
+#include "default.h"
+#include "guimap.h"
+#include "guiobjects.h"
+#include "paint.h"
+#include "paintdata.h"
+#include "paintmacros.h"
+#include "record.h"
+#include "texture.h"
+#include "widget.h"
+#include "xevent.h"
+#include "xeventhandlers.h"
+#include "xinit.h"
+#include "xpmread.h"
 
-#endif /* XPCLIENT_H */
+#endif /* XPCLIENT_X11_H */
 

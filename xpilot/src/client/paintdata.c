@@ -21,7 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "xpclient.h"
+#include "xpclient_x11.h"
 
 char paintdata_version[] = VERSION;
 

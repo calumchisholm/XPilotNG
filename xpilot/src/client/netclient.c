@@ -23,6 +23,10 @@
 
 #include "xpclient.h"
 
+/* kps - fix */
+extern int Key_update(void);
+extern void Game_over_action(u_byte status);
+
 char netclient_version[] = VERSION;
 
 #define TALK_RETRY	2

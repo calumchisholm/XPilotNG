@@ -23,6 +23,9 @@
 
 #include "xpclient.h"
 
+/* kps -remove */
+extern void Add_message(char *message);
+
 #define NUMCOMMANDS 8
 const char c_commands[NUMCOMMANDS][16] = {
     "ignore", "i",

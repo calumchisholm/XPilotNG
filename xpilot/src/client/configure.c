@@ -53,7 +53,7 @@
  *    xpilot@xpilot.org.
  */
 
-#include "xpclient.h"
+#include "xpclient_x11.h"
 
 char configure_version[] = VERSION;
 

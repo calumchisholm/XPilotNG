@@ -21,7 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "xpclient.h"
+#include "xpclient_x11.h"
 
 char paint_version[] = VERSION;
 
@@ -112,7 +112,6 @@ int	ext_view_y_offset;	/* Offset ext_view_height */
 
 bool	titleFlip;		/* Do special title bar flipping? */
 int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */
-char	*texturePath = NULL;		/* Path list of texture directories */
 
 int		maxKeyDefs;
 keydefs_t	*keyDefs = NULL;

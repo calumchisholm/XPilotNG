@@ -137,41 +137,4 @@ xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp);
 void Bitmap_paint (Drawable d, int img, int x, int y, int bmp);
 void Bitmap_paint_area (Drawable d, xp_bitmap_t *bit, int x, int y, irec *r);
 
-
-void PaintBitmap(Drawable d, int type, int x, int y, int width, int height,
-		 int number);
-void PaintFuelSlice(Drawable d, int type, int x, int y, int width, int height, 
-		    int image, int size); 
-void PaintMeter(Drawable d, int type, int x, int y, int width, int height, 
-		int size);
-
-int Block_bitmap_images(int type);
-int Block_bitmaps_create(void);
-
-void Block_bitmap_create_begin(Drawable d, 
-			       xp_pixmap_t *xp_pixmap, int image,
-			       int width, int height);
-
-void Block_bitmap_create_end(Drawable d);
-
-void Block_bitmap_set_pixel(xp_pixmap_t *xp_pixmap, int image, int x, int y, 
-			    RGB_COLOR color);
-void Block_bitmap_paint(Drawable d, int type, int x, int y, 
-			int width, int height,
-		 int number);
-
-void Cache_ships(Drawable d);
-
-void Block_bitmap_create(Display* dpy, Drawable d, 
-			 xp_pixmap_t *xp_pixmap, int number,
-			 int width, int height);
-
-void Block_bitmap_paint_fuel_slice(Drawable d, int type, int x, int y, 
-				   int width, int height, 
-				   int image, int size);
-
-void Block_bitmap_paint_meter(Drawable d, int type, int x, int y, 
-			      int width, int height, 
-			      int size);
-
 #endif

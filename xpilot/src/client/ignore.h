@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *  	Bjørn Stabell		 <bjoern@xpilot.org>
@@ -22,6 +21,10 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef IGNORE_H
+#define IGNORE_H 1
 
 void executeCommand(char *talk_str);
 void crippleTalk(char *msg);
+
+#endif

@@ -21,7 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "xpclient.h"
+#include "xpclient_x11.h"
 
 char painthud_version[] = VERSION;
 
@@ -442,7 +442,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
     char		str[50];
     int			vert_pos, horiz_pos;
     int			i, maxWidth = -1,
-			rect_x, rect_y, rect_width, rect_height;
+			rect_x, rect_y, rect_width = 0, rect_height = 0;
     static int		vertSpacing = -1;
 
     SET_FG(colors[hudItemsColor].pixel);

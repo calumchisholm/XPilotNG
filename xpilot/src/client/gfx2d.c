@@ -26,6 +26,10 @@
 
 char gfx2d_version[] = VERSION;
 
+/* kps hack */
+extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
+char	*texturePath = NULL;		/* Path list of texture directories */
+
 
 #ifndef PATH_MAX
 #define PATH_MAX	1023
