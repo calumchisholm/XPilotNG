@@ -31,7 +31,7 @@
 /* Arguments :                                                             */
 /* Purpose :                                                               */
 /***************************************************************************/
-int ValidateFloatHandler(HandlerInfo info)
+int ValidateFloatHandler(HandlerInfo_t info)
 {
     char *returnval, *charvar;
     char *string, *start;
@@ -66,7 +66,7 @@ int ValidateFloatHandler(HandlerInfo info)
 /* Arguments :                                                             */
 /* Purpose :                                                               */
 /***************************************************************************/
-int ValidatePositiveFloatHandler(HandlerInfo info)
+int ValidatePositiveFloatHandler(HandlerInfo_t info)
 {
     char *returnval, *charvar;
     char *string, *start;
@@ -96,7 +96,7 @@ int ValidatePositiveFloatHandler(HandlerInfo info)
 /* Arguments :                                                             */
 /* Purpose :                                                               */
 /***************************************************************************/
-int ValidateIntHandler(HandlerInfo info)
+int ValidateIntHandler(HandlerInfo_t info)
 {
     char *returnval, *charvar;
     char *string, *start;
@@ -129,7 +129,7 @@ int ValidateIntHandler(HandlerInfo info)
 /* Arguments :                                                             */
 /* Purpose :                                                               */
 /***************************************************************************/
-int ValidatePositiveIntHandler(HandlerInfo info)
+int ValidatePositiveIntHandler(HandlerInfo_t info)
 {
     char *returnval, *charvar;
     char *string, *start;
@@ -158,7 +158,7 @@ int ValidatePositiveIntHandler(HandlerInfo info)
 /* Arguments :                                                             */
 /* Purpose :                                                               */
 /***************************************************************************/
-int PopupCloseHandler(HandlerInfo info)
+int PopupCloseHandler(HandlerInfo_t info)
 {
     T_PopupClose(info.form->window);
     return 0;
@@ -169,7 +169,7 @@ int PopupCloseHandler(HandlerInfo info)
 /* Arguments :                                                             */
 /* Purpose :                                                               */
 /***************************************************************************/
-int FormCloseHandler(HandlerInfo info)
+int FormCloseHandler(HandlerInfo_t info)
 {
     XUnmapWindow(display, info.form->window);
     return 0;

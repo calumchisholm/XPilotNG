@@ -383,12 +383,12 @@ void T_FormKeyPress(XEvent * report)
 /* CallFieldHandler                                                        */
 /* Arguments :                                                             */
 /*   handler                                                               */
-/* Purpose : Set up the HandlerInfo structure and call handler.            */
+/* Purpose : Set up the HandlerInfo_t structure and call handler.            */
 /***************************************************************************/
 void CallFieldHandler(T_Form_t * form, T_Field_t * field, int x, int y,
-		      unsigned int button, int count, int (*handler) ())
+		      unsigned int button, int count, handler_t handler)
 {
-    HandlerInfo info;
+    HandlerInfo_t info;
 
     if (handler == NULL)
 	return;
@@ -503,7 +503,7 @@ T_Form_t **SeekForm(Window win, short add)
 /***************************************************************************/
 void ChangeField(Window win, char *name, char *label,
 		 short type, short active, short x, short y, short width,
-		 short height, short x2, short y2, int (*handler) (),
+		 short height, short x2, short y2, handler_t handler,
 		 int *intvar, char *charvar, int charvar_length,
 		 short null)
 {
@@ -561,7 +561,7 @@ void ChangeField(Window win, char *name, char *label,
 /***************************************************************************/
 void T_FormHoldButton(Window win, char *name, short x, short y,
 		      short width, short height, char *label,
-		      int (*handler) ())
+		      handler_t handler)
 {
     ChangeField(win, name, label, T_HOLD_BUTTON, ACTIVE, x, y, width,
 		height, 0, 0, handler, (int *) NULL, (char *) NULL, 0, 0);
@@ -582,7 +582,7 @@ void T_FormHoldButton(Window win, char *name, short x, short y,
 /***************************************************************************/
 void T_FormButton(Window win, char *name, short x, short y,
 		  short width, short height, char *label,
-		  int (*handler) ())
+		  handler_t handler)
 {
     ChangeField(win, name, label, T_BUTTON, ACTIVE, x, y, width, height, 0,
 		0, handler, (int *) NULL, (char *) NULL, 0, 0);
@@ -626,7 +626,7 @@ void T_FormMultiButton(Window win, char *name, short x, short y,
 /* Purpose : Add a button to form of window win.                           */
 /***************************************************************************/
 void T_FormScrollArea(Window win, char *name, short type, short x, short y,
-		      short width, short height, int (*handler) ())
+		      short width, short height, handler_t handler)
 {
     ChangeField(win, name, NULL, type, ACTIVE, x, y, width, height, 0, 0,
 		handler, (int *) NULL, (char *) NULL, 0, 0);
@@ -670,7 +670,7 @@ void T_FormText(Window win, char *name, short x, short y,
 void T_FormStringEntry(Window win, char *name, short x, short y,
 		       short width, short height, short x2, short y2,
 		       char *label, char *charvar, int charvar_length,
-		       int (*handler) ())
+		       handler_t handler)
 {
     ChangeField(win, name, label, T_STRING_ENTRY, ACTIVE, x, y, width,
 		height, x2, y2, handler, (int *) NULL, charvar,

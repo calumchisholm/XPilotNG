@@ -94,7 +94,7 @@ static char *GetMapDir(void)
 /*   name                                                                  */
 /* Purpose :                                                               */
 /***************************************************************************/
-int SavePrompt(HandlerInfo info)
+int SavePrompt(HandlerInfo_t info)
 {
 
     ClearSelectArea();
@@ -116,7 +116,7 @@ int SavePrompt(HandlerInfo info)
 /*   name                                                                  */
 /* Purpose :                                                               */
 /***************************************************************************/
-int SaveOk(HandlerInfo info)
+int SaveOk(HandlerInfo_t info)
 {
     int len;
 
@@ -226,7 +226,7 @@ int SaveMap(char *file)
 /*   name                                                                  */
 /* Purpose :                                                               */
 /***************************************************************************/
-int LoadPrompt(HandlerInfo info)
+int LoadPrompt(HandlerInfo_t info)
 {
 
     ClearSelectArea();
@@ -255,7 +255,7 @@ int LoadPrompt(HandlerInfo info)
 /*   name                                                                  */
 /* Purpose :                                                               */
 /***************************************************************************/
-int LoadOk(HandlerInfo info)
+int LoadOk(HandlerInfo_t info)
 {
     if (LoadMap(filepromptname)) {
 	return 1;

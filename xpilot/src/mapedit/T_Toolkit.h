@@ -67,34 +67,37 @@ extern Atom KillAtom;
 #define                  T_TEXT            6
 #define                  T_HOLD_BUTTON     7
 
+typedef struct HandlerInfo HandlerInfo_t;
 
-typedef struct T_Field_t {
+typedef int (*handler_t)(HandlerInfo_t);
+
+typedef struct T_Field {
     char *name, *label;
     short type, active;
     short x, y, width, height, x2, y2;
-    int (*handler) ();
+    handler_t handler;
     int *intvar;
     char *charvar;
     int charvar_length;
     short null;
-    struct T_Field_t *next;
+    struct T_Field *next;
 } T_Field_t;
 
-typedef struct T_Form_t {
+typedef struct T_Form {
     Window window;
     T_Field_t *field;
     T_Field_t *entry;
     int entry_cursor, entry_pos;
     char *entry_restore;
-    struct T_Form_t *next;
+    struct T_Form *next;
 } T_Form_t;
 
-typedef struct {
+struct HandlerInfo {
     T_Form_t *form;
     T_Field_t *field;
     unsigned int button;
     int x, y, count;
-} HandlerInfo;
+};
 
 extern T_Form_t *T_Form;
 
@@ -142,31 +145,31 @@ void T_FormButtonPress(XEvent * report);
 void T_FormKeyPress(XEvent * report);
 void CallFieldHandler(T_Form_t * form, T_Field_t * field, int x,
 		      int y, unsigned int button, int count,
-		      int (*handler) ());
+		      handler_t handler);
 void T_FormClear(Window win);
 void T_FormCloseWindow(Window win);
 T_Form_t **SeekForm(Window win, short add);
 void ChangeField(Window win, char *name, char *label,
 		 short type, short active, short x, short y, short width,
-		 short height, short x2, short y2, int (*handler) (),
+		 short height, short x2, short y2, handler_t handler,
 		 int *intvar, char *charvar, int charvar_length,
 		 short null);
 void T_FormButton(Window win, char *name, short x, short y, short width,
-		  short height, char *label, int (*handler) ());
+		  short height, char *label, handler_t handler);
 void T_FormHoldButton(Window win, char *name, short x, short y,
 		      short width, short height, char *label,
-		      int (*handler) ());
+		      handler_t handler);
 void T_FormMultiButton(Window win, char *name, short x, short y,
 		       short width, short height, short x2, short y2,
 		       char *label, int *intvar, short no_null);
 void T_FormScrollArea(Window win, char *name, short type, short x, short y,
-		      short width, short height, int (*handler) ());
+		      short width, short height, handler_t handler);
 void T_FormText(Window win, char *name, short x, short y, short width,
 		short height, char *label, short justify);
 void T_FormStringEntry(Window win, char *name, short x, short y,
 		       short width, short height, short x2, short y2,
 		       char *label, char *charvar, int charvar_length,
-		       int (*handler) ());
+		       handler_t handler);
 void T_DrawEntryField(T_Form_t * form, T_Field_t * field);
 void T_SetEntryField(T_Form_t * form, T_Field_t * field, int x);
 void T_FormRedrawEntryField(char *charvar);
@@ -174,19 +177,19 @@ void T_FormRedrawEntryField(char *charvar);
 /* T_Popup.c prototypes */
 Window T_PopupCreate(int x, int y, int width, int height, char *title);
 Window T_PopupAlert(int type, char *message, char *btn1,
-		    char *btn2, int (*handler1) (), int (*handler2) ());
+		    char *btn2, handler_t handler1, handler_t handler2);
 Window T_PopupPrompt(int x, int y, int width, int height,
 		     char *title, char *message, char *btn1, char *btn2,
-		     char *charvar, int length, int (*handler) ());
+		     char *charvar, int length, handler_t handler);
 int T_IsPopupOpen(Window win);
 void T_PopupClose(Window win);
 
 /* T_Handler.c prototypes */
-int ValidateFloatHandler(HandlerInfo info);
-int ValidatePositiveFloatHandler(HandlerInfo info);
-int ValidateIntHandler(HandlerInfo info);
-int ValidatePositiveIntHandler(HandlerInfo info);
-int PopupCloseHandler(HandlerInfo info);
-int FormCloseHandler(HandlerInfo info);
+int ValidateFloatHandler(HandlerInfo_t info);
+int ValidatePositiveFloatHandler(HandlerInfo_t info);
+int ValidateIntHandler(HandlerInfo_t info);
+int ValidatePositiveIntHandler(HandlerInfo_t info);
+int PopupCloseHandler(HandlerInfo_t info);
+int FormCloseHandler(HandlerInfo_t info);
 
 #endif

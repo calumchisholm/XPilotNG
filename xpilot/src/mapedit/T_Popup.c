@@ -75,7 +75,7 @@ Window T_PopupCreate(int x, int y, int width, int height, char *title)
 /* Purpose :                                                               */
 /***************************************************************************/
 Window T_PopupAlert(int type, char *message, char *btn1, char *btn2,
-		    int (*handler1) (), int (*handler2) ())
+		    handler_t handler1, handler_t handler2)
 {
     int x, y, width, height;
     Window win;
@@ -133,7 +133,7 @@ Window T_PopupAlert(int type, char *message, char *btn1, char *btn2,
 /***************************************************************************/
 Window T_PopupPrompt(int x, int y, int width, int height, char *title,
 		     char *message, char *btn1, char *btn2, char *charvar,
-		     int length, int (*handler) ())
+		     int length, handler_t handler)
 {
     int x2, y2, x3, y3;
     Window win;
