@@ -28,6 +28,9 @@ char default_version[] = VERSION;
 char myName[] = "xpilot";
 char myClass[] = "XPilot";
 
+int	baseWarningType;	/* Which type of base warning you prefer */
+
+
 /*
  * kps TODO:
  * make sure this does not exit if nickname is set using \set command.
@@ -1721,8 +1724,6 @@ void Parse_options(int *argcp, char **argvp)
     }
 
 
-    if (packetLossMeterColor || packetDropMeterColor)
-	packetMeasurement = true;
 
     Get_resource(rDB, "sparkColors", sparkColors, MSG_LEN);
 

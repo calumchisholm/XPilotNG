@@ -42,7 +42,6 @@ static int Config_create_hudRadarScale(int widget_desc, int *height);
 
 static int Config_create_save(int widget_desc, int *height);
 static int Config_update_bool(int widget_desc, void *data, bool *val);
-static int Config_update_instruments(int widget_desc, void *data, bool *val);
 static int Config_close(int widget_desc, void *data, const char **strptr);
 static int Config_next(int widget_desc, void *data, const char **strptr);
 static int Config_prev(int widget_desc, void *data, const char **strptr);
@@ -542,26 +541,6 @@ static int Config_update_bool(int widget_desc, void *data, bool *val)
 
     (void)widget_desc;
     *client_data = *val;
-    return 0;
-}
-
-static int Config_update_instruments(int widget_desc, void *data, bool *val)
-{
-    bool *client_data = (bool *) data;
-
-    (void)widget_desc;
-    *client_data = *val;
-
-    if (packetDropMeterColor || packetLossMeterColor) {
-	packetMeasurement = true;
-	Net_init_measurement();
-	if (!packetMeasurement)
-	    packetDropMeterColor = 
-		packetLossMeterColor = 0;
-    }
-    if (packetLagMeterColor)
-	Net_init_lag_measurement();
-
     return 0;
 }
 

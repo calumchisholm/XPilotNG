@@ -48,7 +48,16 @@ double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
 				   your ship than this factor of visible
 				   range */
 int	hudSize;		/* Size for HUD drawing */
-int	baseWarningType;	/* Which type of base warning you prefer */
+
+int	fuelMeterColor;		/* Color index for fuel meter */
+int	powerMeterColor;	/* Color index for power meter */
+int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
+int	packetSizeMeterColor;	/* Color index for packet size meter */
+int	packetLossMeterColor;	/* Color index for packet loss meter */
+int	packetDropMeterColor;	/* Color index for packet drop meter */
+int	packetLagMeterColor;	/* Color index for packet lag meter */
+int	temporaryMeterColor;	/* Color index for temporary meter drawing */
+int	meterBorderColor;	/* Color index for meter border drawing */
 
 radar_t	*old_radar_ptr;
 int	old_num_radar, old_max_radar;
@@ -987,10 +996,55 @@ void Paint_client_fps(void)
     rd.drawString(dpy, drawPixmap, gameGC, x, y, buf, len);
 }
 
+static void handle_packet_measurement(void)
+{
+    if (packetDropMeterColor || packetLossMeterColor) {
+	packetMeasurement = true;
+	Net_init_measurement();
+	if (!packetMeasurement)
+	    packetDropMeterColor
+		= packetLossMeterColor = 0;
+    }
+}
+
+static bool Set_packetLossMeterColor(xp_option_t *opt, int value)
+{
+    (void)opt;
+
+    packetLossMeterColor = value;
+    handle_packet_measurement();
+
+    return true;
+}
+
+static bool Set_packetDropMeterColor(xp_option_t *opt, int value)
+{
+    (void)opt;
+
+    packetDropMeterColor = value;
+    handle_packet_measurement();
+
+    return true;
+}
+
+static bool Set_packetLagMeterColor(xp_option_t *opt, int value)
+{
+    (void)opt;
+
+    packetLagMeterColor = value;
+    if (packetLagMeterColor)
+	Net_init_lag_measurement();
+
+    return true;
+}
+
 
 xp_option_t hud_options[] = {
 #define COLOR_INDEX_OPTION(name, defval, valptr, help) \
 XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
+
+#define COLOR_INDEX_OPTION_WITH_SETFUNC(name, defval, valptr, setfunc, help) \
+XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, help)
 
     COLOR_INDEX_OPTION(
 	"hudColor",
@@ -1084,6 +1138,69 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	11,
 	&msgScanPopColor,
 	"Which color number to use for drawing pop message.\n"),
+
+
+    COLOR_INDEX_OPTION(
+	"fuelMeterColor",
+	0,
+	&fuelMeterColor,
+	"Which color number to use for drawing the fuel meter.\n"),
+
+    COLOR_INDEX_OPTION(
+	"powerMeterColor",
+	0,
+	&powerMeterColor,
+	"Which color number to use for drawing the power meter.\n"),
+
+    COLOR_INDEX_OPTION(
+	"turnSpeedMeterColor",
+	0,
+	&turnSpeedMeterColor,
+	"Which color number to use for drawing the turn speed meter.\n"),
+
+    COLOR_INDEX_OPTION(
+	"packetSizeMeterColor",
+	0,
+	&packetSizeMeterColor,
+	"Which color number to use for drawing the packet size meter.\n"
+	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"),
+
+    COLOR_INDEX_OPTION_WITH_SETFUNC(
+	"packetLossMeterColor",
+	3,
+	&packetLossMeterColor,
+	Set_packetLossMeterColor,
+	"Which color number to use for drawing the packet loss meter.\n"
+	"This gives the percentage of lost frames due to network failure.\n"),
+
+    COLOR_INDEX_OPTION_WITH_SETFUNC(
+	"packetDropMeterColor",
+	0,
+	&packetDropMeterColor,
+	Set_packetDropMeterColor,
+	"Which color number to use for drawing the packet drop meter.\n"
+	"This gives the percentage of dropped frames due to display\n"
+	"slowness.\n"),
+
+    COLOR_INDEX_OPTION_WITH_SETFUNC(
+	"packetLagMeterColor",
+	3,
+	&packetLagMeterColor,
+	Set_packetLagMeterColor,
+	"Which color number to use for drawing the packet lag meter.\n"
+	"This gives the amount of lag in frames over the past one second.\n"),
+
+    COLOR_INDEX_OPTION(
+	"temporaryMeterColor",
+	3,
+	&temporaryMeterColor,
+	"Which color number to use for drawing temporary meters.\n"),
+
+    COLOR_INDEX_OPTION(
+	"meterBorderColor",
+	2,
+	&meterBorderColor,
+	"Which color number to use for drawing borders of meters.\n"),
 
 
 };

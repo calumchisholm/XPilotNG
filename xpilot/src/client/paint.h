@@ -73,15 +73,6 @@ extern int	mineNameColor;		/* Color index for mine name drawing */
 extern int	teamShotColor;		/* Color index for harmless shot drawing */
 extern int	ballColor;		/* Color index for ball drawing */
 extern int	connColor;		/* Color index for connector drawing */
-extern int	fuelMeterColor;		/* Color index for fuel meter */
-extern int	powerMeterColor;	/* Color index for power meter */
-extern int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
-extern int	packetSizeMeterColor;	/* Color index for packet size meter */
-extern int	packetLossMeterColor;	/* Color index for packet loss meter */
-extern int	packetDropMeterColor;	/* Color index for packet drop meter */
-extern int	packetLagMeterColor;	/* Color index for packet lag meter */
-extern int	temporaryMeterColor;	/* Color index for temporary meters */
-extern int	meterBorderColor;	/* Color index for meter borders */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	fuelColor;		/* Color index for fuel box drawing */

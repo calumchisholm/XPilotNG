@@ -88,15 +88,6 @@ int	spark_color[MAX_COLORS];
 int	buttonColor;		/* Color index for button drawing */
 int	windowColor;		/* Color index for window drawing */
 int	borderColor;		/* Color index for border drawing */
-int	fuelMeterColor;		/* Color index for fuel meter */
-int	powerMeterColor;	/* Color index for power meter */
-int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
-int	packetSizeMeterColor;	/* Color index for packet size meter */
-int	packetLossMeterColor;	/* Color index for packet loss meter */
-int	packetDropMeterColor;	/* Color index for packet drop meter */
-int	packetLagMeterColor;	/* Color index for packet lag meter */
-int	temporaryMeterColor;	/* Color index for temporary meter drawing */
-int	meterBorderColor;	/* Color index for meter border drawing */
 int	clockColor;		/* Clock color index */
 int	scoreColor;		/* Score list color index */
 int	scoreSelfColor;		/* Score list own score color index */
@@ -1377,66 +1368,6 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	&targetRadarColor,
 	"Which color number to use for drawing targets on the radar.\n"
 	"Valid values are all even numbers smaller than maxColors.\n"),
-
-    COLOR_INDEX_OPTION(
-	"fuelMeterColor",
-	0,
-	&fuelMeterColor,
-	"Which color number to use for drawing the fuel meter.\n"),
-
-    COLOR_INDEX_OPTION(
-	"powerMeterColor",
-	0,
-	&powerMeterColor,
-	"Which color number to use for drawing the power meter.\n"),
-
-    COLOR_INDEX_OPTION(
-	"turnSpeedMeterColor",
-	0,
-	&turnSpeedMeterColor,
-	"Which color number to use for drawing the turn speed meter.\n"),
-
-    COLOR_INDEX_OPTION(
-	"packetSizeMeterColor",
-	0,
-	&packetSizeMeterColor,
-	"Which color number to use for drawing the packet size meter.\n"
-	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"),
-
-    COLOR_INDEX_OPTION(
-	"packetLossMeterColor",
-	3,
-	&packetLossMeterColor,
-	"Which color number to use for drawing the packet loss meter.\n"
-	"This gives the percentage of lost frames due to network failure.\n"),
-
-    COLOR_INDEX_OPTION(
-	"packetDropMeterColor",
-	0,
-	&packetDropMeterColor,
-	"Which color number to use for drawing the packet drop meter.\n"
-	"This gives the percentage of dropped frames due to display\n"
-	"slowness.\n"),
-
-    COLOR_INDEX_OPTION(
-	"packetLagMeterColor",
-	0,
-	&packetLagMeterColor,
-	"Which color number to use for drawing the packet lag meter.\n"
-	"This gives the amount of lag in frames over the past one second.\n"),
-
-    COLOR_INDEX_OPTION(
-	"temporaryMeterColor",
-	3,
-	&temporaryMeterColor,
-	"Which color number to use for drawing temporary meters.\n"),
-
-    COLOR_INDEX_OPTION(
-	"meterBorderColor",
-	2,
-	&meterBorderColor,
-	"Which color number to use for drawing borders of meters.\n"),
-
 
     COLOR_INDEX_OPTION(
 	"zeroLivesColor",
