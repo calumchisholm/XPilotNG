@@ -2910,10 +2910,7 @@ static void Turn_player_new(int ind)
     else
 	sign = (pl->dir - new_dir <= RES + new_dir - pl->dir) ? -1 : 1;
 
-    if (pl->team != TEAM_NOT_SET)
-	hitmask = NONBALL_BIT | 1 << pl->team;
-    else
-	hitmask = NONBALL_BIT | NOTEAM_BIT;
+    hitmask = NONBALL_BIT | HITMASK(pl->team);
 
     while (pl->dir != new_dir) {
 	next_dir = MOD2(pl->dir + sign, RES);
