@@ -40,7 +40,7 @@ int wallColor		    = 0x0000ffff;
 int hudColor		    = 0xff000088;
 int connColor	    	    = 0x00ff0088;
 int scoreObjectColor 	    = 0x00ff0088;
-int fuelColor 	    	    = 0xff000088;
+int fuelColor 	    	    = 0xff000044;
 int messagesColor   	    = 0x00aaaa88;
 int oldMessagesColor   	    = 0x00888888;
 int msgScanBallColor   	    = 0xff000088;
@@ -48,12 +48,6 @@ int msgScanSafeColor   	    = 0x00ff0088;
 int msgScanCoverColor  	    = 0xaaaa0088;
 int msgScanPopColor   	    = 0x0000ff88;
 
-int hudSize 	    	= 250;
-static int meterWidth	= 60;
-static int meterHeight	= 10;
-double hudRadarScale = 2.0;
-float hudRadarMapScale;
-int hudRadarDotSize = 6;
 int meterBorderColor   	    = 0x0000ff55;
 int fuelMeterColor   	    = 0xff000055;
 int powerMeterColor   	    = 0xff000055;
@@ -82,10 +76,23 @@ int team6Color   	    = 0x00000000;
 int team7Color   	    = 0x00000000;
 int team8Color   	    = 0x00000000;
 int team9Color   	    = 0x00000000;
+int shipNameColor  	    = 0x0000ff88;
+int baseNameColor  	    = 0x0000ff88;
+int manyLivesColor  	    = 0x666666aa;
+int twoLivesColor  	    = 0x008800aa;
+int oneLifeColor  	    = 0xaaaa00aa;
+int zeroLivesColor  	    = 0xff0000aa;
 
 int hudRadarEnemyColor	    = 0xff000088;
 int hudRadarOtherColor	    = 0x00ff0088;
 
+int hudSize 	    	= 250;
+static int meterWidth	= 60;
+static int meterHeight	= 10;
+double hudRadarScale = 2.0;
+float hudRadarMapScale;
+int hudRadarDotSize = 6;
+int baseWarningType = 1;
 
 /*static void set_color(int color)
 {
@@ -107,10 +114,10 @@ static GLubyte get_alpha(int color)
 }
 
 int GL_X(int x) {
-    return (x - world.x)*scale;
+    return (int)((x - world.x)*scale);
 }
 int GL_Y(int y) {
-    return (y - world.y)*scale;
+    return (int)((y - world.y)*scale);
 }
 
 /* remove this later maybe? to tedious for me to edit them all away now */
@@ -220,6 +227,76 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
         error("Bad base dir.");
         return;
     }    
+
+    int color;
+    homebase_t *base = NULL;
+    other_t *other;
+    bool do_basewarning = false;
+
+    if (!(other = Other_by_id(id))) return;
+
+    if (baseNameColor) {
+	if (!(color = Life_color(other)))
+	    color = baseNameColor;
+    } else
+	color = white;
+
+    x = x + BLOCK_SZ / 2;
+    y = y + BLOCK_SZ / 2;
+
+    base = Homebase_by_id(id);
+    if (base != NULL) {
+	/*
+	 * Hacks to support Mara's base warning on new servers and
+	 * the red "meter" basewarning on old servers.
+	 */
+	if (loops < base->appeartime)
+	    do_basewarning = true;
+
+	if (version < 0x4F12 && do_basewarning) {
+	    if (baseWarningType & 1) {
+		/* We assume the ship will appear after 3 seconds. */
+		int count = 360 * (base->appeartime - loops) / (3 * clientFPS);
+		LIMIT(count, 0, 360);
+		/* red box basewarning */
+		if (count > 0 && (baseWarningType & 1))
+		    Gui_paint_appearing(x, y,
+					id, count);
+	    }
+	}
+    }
+    /* Mara's flashy basewarning */
+    if (do_basewarning && (baseWarningType & 2)) {
+	if (loopsSlow & 1) {
+	    if (color != white)
+		color = white;
+	    else
+		color = red;
+	}
+    }
+    
+    /* TODO : figure out how to make the text stop wobbling */
+    
+    setupPaint_HUD();
+    set_alphacolor(color |= 0x000000ff);
+    switch (type) {
+    case SETUP_BASE_UP:
+	fontprint(&gamefont,CENTER,DOWN,GL_X(x),GL_Y(y - BLOCK_SZ / 2),other->name);
+        break;
+    case SETUP_BASE_DOWN:
+	fontprint(&gamefont,CENTER,DOWN,GL_X(x),GL_Y(y + BLOCK_SZ),other->name);
+        break;
+    case SETUP_BASE_LEFT:
+	fontprint(&gamefont,LEFT,UP,GL_X(x + BLOCK_SZ / 2),GL_Y(y),other->name);
+        break;
+    case SETUP_BASE_RIGHT:
+	fontprint(&gamefont,RIGHT,UP,GL_X(x - BLOCK_SZ / 2),GL_Y(y),other->name);
+        break;
+    default:
+        errno = 0;
+        error("Bad base dir.");
+    }
+    setupPaint_stationary();  
 }
 
 void Gui_paint_decor(int x, int y, int xi, int yi, int type,
@@ -247,7 +324,6 @@ void Gui_paint_visible_border(int x, int y, int xi, int yi)
     	glVertex2i(xi, y);
     glEnd();
     setupPaint_stationary();
-    glDisable(GL_BLEND);
 }
 
 void Gui_paint_hudradar_limit(int x, int y, int xi, int yi)
@@ -421,8 +497,7 @@ void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
     glVertex2i(x_1, y_1);
     glVertex2i(x_2, y_2);
     glEnd();
-    glDisable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    /*glDisable(GL_BLEND);*/
 }
 
 void Gui_paint_mine(int x, int y, int teammine, char *name)
@@ -510,6 +585,34 @@ void Gui_paint_paused(int x, int y, int count)
 
 void Gui_paint_appearing(int x, int y, int id, int count)
 {
+    const unsigned hsize = 3 * BLOCK_SZ / 7;
+    int minx,miny,maxx,maxy;
+    int color;
+    other_t *other = Other_by_id(id);
+
+    /* Make a note we are doing the base warning */
+    if (version >= 0x4F12) {
+	homebase_t *base = Homebase_by_id(id);
+	if (base != NULL)
+	    base->appeartime = loops + (count * clientFPS) / 120;
+    }
+    
+    minx = x - (int)hsize;
+    miny = y - (int)hsize;
+    maxx = minx + 2 * hsize + 1;
+    maxy = miny + (unsigned)(count / 180. * hsize + 1);
+    
+    color = Life_color(other);
+    set_alphacolor((color)?color:red);
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glBegin(GL_QUADS);
+    	glVertex2i(minx , miny);
+    	glVertex2i(maxx , miny);
+    	glVertex2i(maxx , maxy);
+    	glVertex2i(minx , maxy);
+    glEnd();
 }
 
 void Gui_paint_ecm(int x, int y, int size)
@@ -530,6 +633,8 @@ void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
     tmpy = (off -1-loops % (off))*tmpy/len;*/
 
     set_alphacolor(fuelColor);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glLineStipple(stipple, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
@@ -553,7 +658,7 @@ void Gui_paint_connector(int x_0, int y_0, int x_1, int y_1, int tractor)
     glVertex2i(x_1, y_1);
     glEnd();
     glDisable(GL_LINE_STIPPLE);
-    glDisable(GL_BLEND);
+    /*glDisable(GL_BLEND);*/
 }
 
 void Gui_paint_transporter(int x_0, int y_0, int x_1, int y_1)
@@ -592,6 +697,33 @@ int Team_color(int team)
     }
     return 0;
 }
+
+int Life_color_by_life(int life)
+{
+    int color;
+	
+    if (life > 2)
+	color = manyLivesColor;
+    else if (life == 2)
+	color = twoLivesColor;
+    else if (life == 1)
+	color = oneLifeColor;
+    else /* we catch all */
+	color = zeroLivesColor;
+    return color;
+}
+
+int Life_color(other_t *other)
+{
+    int color = 0; /* default is 'no special color' */
+
+    if (other
+	&& (other->mychar == ' ' || other->mychar == 'R')
+	&& BIT(Setup->mode, LIMITED_LIVES))
+	color = Life_color_by_life(other->life);
+    return color;
+}
+
 static int Gui_is_my_tank(other_t *other)
 {
     char	tank_name[MAX_NAME_LEN];
@@ -679,6 +811,35 @@ static int Gui_calculate_ship_color(int id, other_t *other)
     return ship_color;
 }
 
+static void Gui_paint_ship_name(int x, int y, other_t *other)
+{
+    int color = Life_color(other);
+    
+    /* TODO : do all name painting together, so we don't need
+     * all theese setupPaint<foo> calls
+     */
+    setupPaint_HUD();
+    if (shipNameColor) {
+	if (!color)
+	    color = shipNameColor;
+
+	set_alphacolor(color);
+	fontprint(&gamefont, CENTER, DOWN,GL_X(x),GL_Y(y - SHIP_SZ),"%s",other->id_string);
+    } else
+	color = blue;
+
+    if (instruments.showLivesByShip
+	&& BIT(Setup->mode, LIMITED_LIVES)) {
+	if (other->life < 1)
+	    color = white;
+
+	set_alphacolor(color);
+	fontprint(&gamefont, LEFT, CENTER,GL_X(x + SHIP_SZ),GL_Y(y),"%d", other->life);
+    }
+    
+    setupPaint_moving();
+}
+
 void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 		    int shield, int deflector, int eshield)
 {
@@ -688,7 +849,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     other_t 	*other;
 
     ship = Ship_by_id(id);
-    other = Other_by_id(id);
+    if (!(other = Other_by_id(id))) return;
     
     set_alphacolor(Gui_calculate_ship_color(id,other));
     
@@ -698,6 +859,11 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 	glVertex2i(x + point.pxl.x, y + point.pxl.y);
     }
     glEnd();
+
+    if (self != NULL
+    	&& self->id != id
+    	&& other != NULL)
+    	    Gui_paint_ship_name(x,y,other);
 }
 
 static int wrap(int *xp, int *yp)

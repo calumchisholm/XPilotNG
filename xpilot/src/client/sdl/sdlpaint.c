@@ -147,6 +147,7 @@ void setupPaint_stationary(void)
 {
     if (paintSetupMode & STATIONARY_MODE) return;
     paintSetupMode = STATIONARY_MODE;
+    glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
@@ -160,6 +161,7 @@ void setupPaint_moving(void)
 {
     if (paintSetupMode & MOVING_MODE) return;
     paintSetupMode = MOVING_MODE;
+    glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(-world.x * scale, -world.y * scale, 0);
@@ -170,6 +172,7 @@ void setupPaint_HUD(void)
 {
     if (paintSetupMode & HUD_MODE) return;
     paintSetupMode = HUD_MODE;
+    glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glMatrixMode(GL_PROJECTION);
@@ -263,9 +266,6 @@ void Paint_frame(void)
     	Paint_score_objects();
 	Radar_paint();
 	Console_paint();
-
-	glPopMatrix();
-
     }
 
     SDL_GL_SwapBuffers();
