@@ -991,7 +991,7 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
  */
 void Gui_paint_fastshot(int color, int x, int y)
 {
-    int size = MIN(shotSize, 8);
+    int size = MIN(shotSize, 16);
 
     Image_paint(IMG_BULLET,
 		x + world.x - size/2,
@@ -1001,7 +1001,7 @@ void Gui_paint_fastshot(int color, int x, int y)
 
 void Gui_paint_teamshot(int x, int y)
 {
-    int size = MIN(teamShotSize, 8);
+    int size = MIN(teamShotSize, 16);
 
     Image_paint(IMG_BULLET_OWN,
 		x + world.x - size/2,

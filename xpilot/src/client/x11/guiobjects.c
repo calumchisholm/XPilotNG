@@ -401,7 +401,7 @@ void Gui_paint_fastshot(int color, int x, int y)
 	}
     }
     else {
-	int s_size = MIN(shotSize, 8);
+	int s_size = MIN(shotSize, 16);
 	int z = s_size / 2;
 
 	Bitmap_paint(drawPixmap, BM_BULLET, WINSCALE(x) - z,
@@ -437,7 +437,7 @@ void Gui_paint_teamshot(int x, int y)
 	}
     }
     else {
-	int s_size = MIN(teamShotSize, 8);
+	int s_size = MIN(teamShotSize, 16);
 	int z = s_size / 2;
 	Bitmap_paint(drawPixmap, BM_BULLET_OWN, WINSCALE(x) - z,
 		     WINSCALE(y) - z, s_size - 1);

@@ -210,8 +210,8 @@ int Images_init(void)
     DEF_IMG("ship_friend.ppm", 64); /* 128 does not work in some OpenGL implementations. */
     DEF_IMG("ship_friend.ppm", 64); /* My guess is that the texture gets too wide (4096) */
     DEF_IMG("ship_enemy.ppm", 64);
-    DEF_IMG("bullet.ppm", -8);
-    DEF_IMG("bullet_blue.ppm", -8);
+    DEF_IMG("bullet.ppm", -16);
+    DEF_IMG("bullet_blue.ppm", -16);
     DEF_IMG("base_down.ppm", 1);
     DEF_IMG("base_left.ppm", 1);
     DEF_IMG("base_up.ppm", 1);
