@@ -334,9 +334,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     }
 
     sprintf(msg, "%s blew up team %d's %starget.",
-	    kp->name,
-	    (int) targ->team,
-	    (targets_total > 1) ? "last " : "");
+	    kp->name, targ->team, (targets_total > 1) ? "last " : "");
     Set_message(msg);
 
     if (targetKillTeam)
@@ -2805,7 +2803,7 @@ void Move_player(player *pl)
 
 void Turn_player(player *pl)
 {
-    int		new_dir = MOD2((int)(pl->float_dir + 0.5f), RES);
+    int		new_dir = MOD2((int)(pl->float_dir + 0.5), RES);
     int		next_dir, sign, hitmask;
 
     if (recOpt) {
@@ -2814,9 +2812,10 @@ void Turn_player(player *pl)
 	else if (playback)
 	    new_dir = *playback_data++;
     }
-    if (new_dir == pl->dir) {
+
+    if (new_dir == pl->dir)
 	return;
-    }
+
     if (!Player_is_playing(pl)) {
 	/* kps - what is the point of this ??? */
 	pl->dir = new_dir;

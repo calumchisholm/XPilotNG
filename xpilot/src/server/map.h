@@ -124,8 +124,7 @@ struct base {
     clpos	pos;
     int		dir;
     int		ind;
-    uint16_t	team;
-    uint16_t	pad[1];
+    int		team;
 };
 
 struct baseorder {
@@ -141,8 +140,7 @@ struct cannon {
     int		item[NUM_ITEMS];
     player	*tractor_target_pl;
     bool	tractor_is_pressor;
-    uint16_t	team;
-    uint16_t	pad[1];
+    int		team;
     long	used;
     double	dead_time;
     double	damaged;
@@ -189,16 +187,14 @@ struct wormhole {
 struct treasure {
     clpos	pos;
     bool	have;		/* true if this treasure has ball in it */
-    uint16_t	team;		/* team of this treasure */
-    uint16_t	pad[1];
+    int		team;		/* team of this treasure */
     int 	destroyed;	/* how often this treasure destroyed */
     bool	empty;		/* true if this treasure never had a ball */
 };
 
 struct target {
     clpos	pos;
-    uint16_t	team;
-    uint16_t	pad[1];
+    int		team;
     double	dead_time;
     double	damage;
     unsigned	conn_mask;
