@@ -72,8 +72,6 @@ static void Item_update_flags(player_t *pl)
 	    Autopilot(pl, false);
 	CLR_BIT(pl->have, HAS_AUTOPILOT);
     }
-    if (pl->item[ITEM_ARMOR] <= 0)
-	CLR_BIT(pl->have, HAS_ARMOR);
 }
 
 /*
@@ -705,8 +703,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
         break;
     case ITEM_ARMOR:
 	what = "an armor";
-	if (!victim->item[item])
-	    CLR_BIT(victim->have, HAS_ARMOR);
 	break;
     case ITEM_TRANSPORTER:
 	what = "a transporter";
@@ -828,7 +824,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	SET_BIT(pl->have, HAS_MIRROR);
 	break;
     case ITEM_ARMOR:
-	SET_BIT(pl->have, HAS_ARMOR);
 	break;
     case ITEM_DEFLECTOR:
 	SET_BIT(pl->have, HAS_DEFLECTOR);

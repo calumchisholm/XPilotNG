@@ -367,8 +367,8 @@ void Player_remove_tank(player_t *pl, int which_tank)
 
 void Player_hit_armor(player_t *pl)
 {
-    if (--pl->item[ITEM_ARMOR] <= 0)
-	CLR_BIT(pl->have, HAS_ARMOR);
+    assert(pl->item[ITEM_ARMOR] > 0);
+    --pl->item[ITEM_ARMOR];
 }
 
 /*

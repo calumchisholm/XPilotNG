@@ -260,20 +260,20 @@ static void PlayerCollision(world_t *world)
 
 		if (pl->fuel.sum <= 0.0
 		    || (!BIT(pl->used, HAS_SHIELD)
-			&& !BIT(pl->have, HAS_ARMOR)))
+			&& pl->item[ITEM_ARMOR] <= 0))
 		    Player_set_state(pl, PL_STATE_KILLED);
 
 		if (pl_j->fuel.sum <= 0.0
 		    || (!BIT(pl_j->used, HAS_SHIELD)
-			&& !BIT(pl_j->have, HAS_ARMOR)))
+			&& pl_j->item[ITEM_ARMOR] <= 0))
 		    Player_set_state(pl_j, PL_STATE_KILLED);
 
 		if (!BIT(pl->used, HAS_SHIELD)
-		    && BIT(pl->have, HAS_ARMOR))
+		    && pl->item[ITEM_ARMOR] > 0)
 		    Player_hit_armor(pl);
 
 		if (!BIT(pl_j->used, HAS_SHIELD)
-		    && BIT(pl_j->have, HAS_ARMOR))
+		    && pl_j->item[ITEM_ARMOR] > 0)
 		    Player_hit_armor(pl_j);
 
 		if (Player_is_killed(pl_j)) {
@@ -722,7 +722,8 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
     if (pl->fuel.sum > 0) {
 	if (!options.treasureCollisionMayKill || BIT(pl->used, HAS_SHIELD))
 	    return;
-	if (!BIT(pl->used, HAS_SHIELD) && BIT(pl->have, HAS_ARMOR)) {
+	if (!BIT(pl->used, HAS_SHIELD) &&
+	    pl->item[ITEM_ARMOR] > 0) {
 	    Player_hit_armor(pl);
 	    return;
 	}
@@ -802,8 +803,6 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_ARMOR:
 	pl->item[item_index]++;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
-	if (pl->item[item_index] > 0)
-	    SET_BIT(pl->have, HAS_ARMOR);
 	sound_play_sensors(pl->pos, ARMOR_PICKUP_SOUND);
 	break;
     case ITEM_TRANSPORTER:
@@ -1014,7 +1013,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 	|| (obj->type == OBJ_WRECKAGE
 	    && options.wreckageCollisionMayKill
 	    && !BIT(pl->used, HAS_SHIELD)
-	    && !BIT(pl->have, HAS_ARMOR))) {
+	    && pl->item[ITEM_ARMOR] <= 0)) {
 	Player_set_state(pl, PL_STATE_KILLED);
 	sprintf(msg, "%s succumbed to an explosion.", pl->name);
 	if (obj->id != NO_ID) {
@@ -1039,7 +1038,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
     if (obj->type == OBJ_WRECKAGE
 	&& options.wreckageCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
-	&& BIT(pl->have, HAS_ARMOR))
+	&& pl->item[ITEM_ARMOR] > 0)
 	Player_hit_armor(pl);
 }
 
@@ -1064,7 +1063,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
     if (options.asteroidCollisionMayKill
 	&& (pl->fuel.sum == 0.0
 	    || (!BIT(pl->used, HAS_SHIELD)
-		&& !BIT(pl->have, HAS_ARMOR)))) {
+		&& pl->item[ITEM_ARMOR] <= 0))) {
 	Player_set_state(pl, PL_STATE_KILLED);
 	if (pl->velocity > v)
 	    /* player moves faster than asteroid */
@@ -1084,7 +1083,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
     }
     if (options.asteroidCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
-	&& BIT(pl->have, HAS_ARMOR))
+	&& pl->item[ITEM_ARMOR] > 0)
 	Player_hit_armor(pl);
 }
 
@@ -1115,7 +1114,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
      */
 
     if (BIT(pl->used, HAS_SHIELD)
-	|| BIT(pl->have, HAS_ARMOR)
+	|| pl->item[ITEM_ARMOR] > 0
 	|| (obj->type == OBJ_TORPEDO
 	    && Mods_get(obj->mods, ModsNuclear)
 	    && (rfrac() >= 0.25))) {
@@ -1180,7 +1179,8 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 
 	if (pl->fuel.sum <= 0)
 	    CLR_BIT(pl->used, HAS_SHIELD);
-	if (!BIT(pl->used, HAS_SHIELD) && BIT(pl->have, HAS_ARMOR))
+	if (!BIT(pl->used, HAS_SHIELD)
+	    && pl->item[ITEM_ARMOR] > 0)
 	    Player_hit_armor(pl);
 
     } else {

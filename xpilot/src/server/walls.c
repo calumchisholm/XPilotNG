@@ -670,7 +670,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	if (speed > max_speed
 	    && max_speed < options.maxShieldedWallBounceSpeed
 	    && !BIT(pl->used, HAS_SHIELD)
-	    && BIT(pl->have, HAS_ARMOR)) {
+	    && pl->item[ITEM_ARMOR] > 0) {
 	    max_speed = options.maxShieldedWallBounceSpeed;
 	    Player_hit_armor(pl);
 	}
