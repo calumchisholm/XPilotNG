@@ -323,27 +323,7 @@ static option_desc opts[] = {
 	&options.robotLeaveLife,
 	valInt,
 	tuner_dummy,
-	"Max number of lives per robot (0=off).\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"robotLeaveScore",
-	"robotLeaveScore",
-	"-90.0",
-	&options.robotLeaveScore,
-	valReal,
-	tuner_dummy,
-	"Min score for robot to play (0=off).\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"robotLeaveRatio",
-	"robotLeaveRatio",
-	"-5.0",
-	&options.robotLeaveRatio,
-	valReal,
-	tuner_dummy,
-	"Min ratio for robot to play (0=off).\n",
+	"After how many deaths does a robot want to leave? (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

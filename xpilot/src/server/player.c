@@ -1556,14 +1556,13 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	Player_set_life(pl, pl->pl_life - 1);
 	if (pl->pl_life == -1) {
-	    if (Player_is_robot(pl)) {
-		if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
-		    || (options.robotsLeave
-			&& pl->score < options.robotLeaveScore)) {
-		    Robot_delete(pl, false);
-		    return;
-		}
+#if 0 /* kps - handle this in robot.c or robotdef.c */
+	    if (Player_is_robot(pl)
+		&& !BIT(world->rules->mode, TIMING|TEAM_PLAY)) {
+		Robot_delete(pl, false);
+		return;
 	    }
+#endif
 	    Player_set_life(pl, 0);
 	    if (!Player_is_waiting(pl))
 		Player_set_state(pl, PL_STATE_DEAD);

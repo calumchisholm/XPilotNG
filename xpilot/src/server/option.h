@@ -33,8 +33,6 @@ extern struct options {
     int		robotsTalk;
     int		robotsLeave;
     int		robotLeaveLife;
-    double	robotLeaveScore;
-    double	robotLeaveRatio;
     int		robotTeam;
     bool	restrictRobots;
     bool	reserveRobotTeam;

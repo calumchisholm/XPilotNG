@@ -915,12 +915,6 @@ void Robot_war(player_t *pl, player_t *kp)
 
 	Robot_talks(ROBOT_TALK_WAR, pl->name, kp->name);
 
-	/*
-	 * Give fuel for offensive.
-	 * KK: unfair advantage.
-	 */
-	/* pl->fuel.sum = MAX_PLAYER_FUEL; */
-
 	if (Robot_war_on_player(pl) != kp->id) {
 	    sound_play_all(DECLARE_WAR_SOUND);
 	    Robot_set_war(pl, kp->id);
@@ -968,29 +962,21 @@ static void Robot_play(player_t *pl)
  * Return false if robot continues playing,
  * return true if robot leaves the game.
  */
-static int Robot_check_leave(player_t *pl)
+static bool Robot_check_leave(player_t *pl)
 {
     bool leave = false;
     world_t *world = pl->world;
 
-    if (options.robotsLeave
-	&& pl->pl_life > 0
+    if (!options.robotsLeave)
+	return false;
+
+    if (pl->pl_life > 0
 	&& !BIT(world->rules->mode, LIMITED_LIVES)
 	&& (BIT(pl->pl_status, FOO_PLAYING) || pl->recovery_count <= 0)) {
 
 	if (options.robotLeaveLife > 0
 	    && pl->pl_life >= options.robotLeaveLife) {
 	    Set_message_f("%s retired.", pl->name);
-	    leave = true;
-	}
-	else if (options.robotLeaveScore != 0
-		 && pl->score < options.robotLeaveScore) {
-	    Set_message_f("%s left out of disappointment.", pl->name);
-	    leave = true;
-	}
-	else if (options.robotLeaveRatio != 0
-		 && pl->score / (pl->pl_life + 1) < options.robotLeaveRatio) {
-	    Set_message_f("%s played too badly.", pl->name);
 	    leave = true;
 	}
 
