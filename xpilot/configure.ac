@@ -28,7 +28,7 @@ dnl  Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
 dnl AC_HEADER_STDBOOL
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h limits.h memory.h netdb.h netinet/in.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h])
+AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h bstring.h fcntl.h float.h limits.h memory.h net/if.h netdb.h netinet/in.h netinet/tcp.h pwd.h resolv.h setjmp.h stdint.h stdlib.h string.h sys/file.h sys/filio.h sys/fcntl.h sys/ioctl.h sys/param.h sys/socket.h sys/sockio.h sys/time.h unistd.h values.h])
 
 dnl  Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
