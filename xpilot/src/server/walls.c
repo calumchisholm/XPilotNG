@@ -740,8 +740,9 @@ static unsigned short *Shape_lines(const shipobj *shape, int dir)
     lastdir = dir;
 
     for (p = 0; p < shape->num_points; p++) {
-	linet[p + os].start.cx = -shape->pts[p][dir].cx;
-	linet[p + os].start.cy = -shape->pts[p][dir].cy;
+	clpos pt = Ship_get_point_clpos(shape, p, dir);
+	linet[p + os].start.cx = -pt.cx;
+	linet[p + os].start.cy = -pt.cy;
     }
     for (p = 0; p < shape->num_points - 1; p++) {
 	linet[p + os].delta.cx
@@ -1315,8 +1316,9 @@ static void Shape_move(const struct move *move, const shipobj *shape,
     minpoint = -1;
 
     for (p = 0; p < shape->num_points; p++) {
-	msx = WRAP_XCLICK(move->start.cx + shape->pts[p][dir].cx);
-	msy = WRAP_YCLICK(move->start.cy + shape->pts[p][dir].cy);
+	clpos pt = Ship_get_point_clpos(shape, p, dir);
+	msx = WRAP_XCLICK(move->start.cx + pt.cx);
+	msy = WRAP_YCLICK(move->start.cy + pt.cy);
 	block = (msx >> B_SHIFT) + mapx * (msy >> B_SHIFT);
 	if (chx)
 	    msx = -msx;
@@ -1414,10 +1416,14 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
     mv.hit_mask = hitmask;
     mv.obj = (object *)obj;
     for (i = 0; i < shape1->num_points; i++) {
-	mv.start.cx = x + shape1->pts[i][dir1].cx;
-	mv.start.cy = y + shape1->pts[i][dir1].cy;
-	mv.delta.cx = x + shape2->pts[i][dir2].cx - mv.start.cx;
-	mv.delta.cy = y + shape2->pts[i][dir2].cy - mv.start.cy;
+	clpos pt1, pt2;
+
+	pt1 = Ship_get_point_clpos(shape1, i, dir1);
+	pt2 = Ship_get_point_clpos(shape2, i, dir2);
+	mv.start.cx = x + pt1.cx;
+	mv.start.cy = y + pt1.cy;
+	mv.delta.cx = x + pt2.cx - mv.start.cx;
+	mv.delta.cy = y + pt2.cy - mv.start.cy;
 	mv.start.cx = WRAP_XCLICK(mv.start.cx);
 	mv.start.cy = WRAP_YCLICK(mv.start.cy);
 	while (mv.delta.cx || mv.delta.cy) {
@@ -1434,21 +1440,29 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
     /* Convex shapes would be much easier. */
     points = blockline[(x >> B_SHIFT) + mapx * (y >> B_SHIFT)].points;
     while ( (p = *points++) != 65535) {
+	clpos pto1, ptn1;
 	if (linet[p].group
 	    && (!can_hit(&groups[linet[p].group], &mv)))
 	    continue;
 	xp = CENTER_XCLICK(linet[p].start.cx - x);
 	yp = CENTER_YCLICK(linet[p].start.cy - y);
-	xo1 = shape1->pts[shape1->num_points - 1][dir1].cx - xp;
-	yo1 = shape1->pts[shape1->num_points - 1][dir1].cy - yp;
-	xn1 = shape2->pts[shape1->num_points - 1][dir2].cx - xp;
-	yn1 = shape2->pts[shape1->num_points - 1][dir2].cy - yp;
+	pto1 = Ship_get_point_clpos(shape1, shape1->num_points - 1, dir1);
+	ptn1 = Ship_get_point_clpos(shape2, shape1->num_points - 1, dir2);
+
+	xo1 = pto1.cx - xp;
+	yo1 = pto1.cy - yp;
+	xn1 = ptn1.cx - xp;
+	yn1 = ptn1.cy - yp;
 	t = 0;
 	for (i = 0; i < shape1->num_points; i++) {
-	    xo2 = shape1->pts[i][dir1].cx - xp;
-	    yo2 = shape1->pts[i][dir1].cy - yp;
-	    xn2 = shape2->pts[i][dir2].cx - xp;
-	    yn2 = shape2->pts[i][dir2].cy - yp;
+	    clpos pto2, ptn2;
+
+	    pto2 = Ship_get_point_clpos(shape1, i, dir1);
+	    ptn2 = Ship_get_point_clpos(shape2, i, dir2);
+	    xo2 = pto2.cx - xp;
+	    yo2 = pto2.cy - yp;
+	    xn2 = ptn2.cx - xp;
+	    yn2 = ptn2.cy - yp;
 
 #define TEMPFUNC(X1, Y1, X2, Y2)                                           \
 	    if ((X1) < 0) {                                                \

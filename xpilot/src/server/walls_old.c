@@ -1716,7 +1716,7 @@ void Move_player_old(int ind)
     int			bounce;
     int			moves_made = 0;
     int			cor_res;
-    clpos		pos;
+    clpos		pos, pos2;
     clvec		todo;
     clvec		done;
     vector		vel;
@@ -1795,8 +1795,9 @@ void Move_player_old(int ind)
     todo.cx = FLOAT_TO_CLICK(vel.x * timeStep);
     todo.cy = FLOAT_TO_CLICK(vel.y * timeStep);
     for (i = 0; i < pl->ship->num_points; i++) {
-	ms[i].pos.cx = pl->pos.cx + pl->ship->pts[i][pl->dir].cx;
-	ms[i].pos.cy = pl->pos.cy + pl->ship->pts[i][pl->dir].cy;
+	clpos pt = Ship_get_point_clpos(pl->ship, i, pl->dir);
+	ms[i].pos.cx = pl->pos.cx + pt.cx;
+	ms[i].pos.cy = pl->pos.cy + pt.cy;
 	ms[i].vel = vel;
 	ms[i].todo = todo;
 	ms[i].dir = pl->dir;
@@ -1805,9 +1806,11 @@ void Move_player_old(int ind)
     }
 
     for (;; moves_made++) {
+	clpos pt;
 
-	pos.cx = ms[0].pos.cx - pl->ship->pts[0][ms[0].dir].cx;
-	pos.cy = ms[0].pos.cy - pl->ship->pts[0][ms[0].dir].cy;
+	pt = Ship_get_point_clpos(pl->ship, 0, ms[0].dir);
+	pos.cx = ms[0].pos.cx - pt.cx;
+	pos.cy = ms[0].pos.cy - pt.cy;
 	pos.cx = WRAP_XCLICK(pos.cx);
 	pos.cy = WRAP_YCLICK(pos.cy);
 	block.x = pos.cx / BLOCK_CLICKS;
@@ -2077,8 +2080,9 @@ void Move_player_old(int ind)
 	}
     }
 
-    pos.cx = ms[worst].pos.cx - pl->ship->pts[worst][pl->dir].cx;
-    pos.cy = ms[worst].pos.cy - pl->ship->pts[worst][pl->dir].cy;
+    pos2 = Ship_get_point_clpos(pl->ship, worst, pl->dir);
+    pos.cx = ms[worst].pos.cx - pos2.cx;
+    pos.cy = ms[worst].pos.cy - pos2.cy;
     pos.cx = WRAP_XCLICK(pos.cx);
     pos.cy = WRAP_YCLICK(pos.cy);
     Player_position_set_clicks(pl, pos.cx, pos.cy);
@@ -2153,35 +2157,36 @@ void Turn_player_old(int ind)
     for (; pl->dir != new_dir; turns_done++) {
 	dir = MOD2(pl->dir + sign, RES);
 	if (!mi.edge_wrap) {
+	    clpos pt;
 	    if (pos.cx <= 22 * CLICK) {
 		for (i = 0; i < pl->ship->num_points; i++) {
-		    if (pos.cx + pl->ship->pts[i][dir].cx < 0) {
-			pos.cx = -pl->ship->pts[i][dir].cx;
+		    pt = Ship_get_point_clpos(pl->ship, i, dir);
+		    if (pos.cx + pt.cx < 0) {
+			pos.cx = -pt.cx;
 		    }
 		}
 	    }
 	    if (pos.cx >= mp.click_width - 22 * CLICK) {
 		for (i = 0; i < pl->ship->num_points; i++) {
-		    if (pos.cx + pl->ship->pts[i][dir].cx
-			>= mp.click_width) {
-			pos.cx = mp.click_width - 1
-			       - pl->ship->pts[i][dir].cx;
+		    pt = Ship_get_point_clpos(pl->ship, i, dir);
+		    if (pos.cx + pt.cx >= mp.click_width) {
+			pos.cx = mp.click_width - 1 - pt.cx;
 		    }
 		}
 	    }
 	    if (pos.cy <= 22 * CLICK) {
 		for (i = 0; i < pl->ship->num_points; i++) {
-		    if (pos.cy + pl->ship->pts[i][dir].cy < 0) {
-			pos.cy = -pl->ship->pts[i][dir].cy;
+		    pt = Ship_get_point_clpos(pl->ship, i, dir);
+		    if (pos.cy + pt.cy < 0) {
+			pos.cy = -pt.cy;
 		    }
 		}
 	    }
 	    if (pos.cy >= mp.click_height - 22 * CLICK) {
 		for (i = 0; i < pl->ship->num_points; i++) {
-		    if (pos.cy + pl->ship->pts[i][dir].cy
-			>= mp.click_height) {
-			pos.cy = mp.click_height - 1
-			       - pl->ship->pts[i][dir].cy;
+		    pt = Ship_get_point_clpos(pl->ship, i, dir);
+		    if (pos.cy + pt.cy >= mp.click_height) {
+			pos.cy = mp.click_height - 1 - pt.cy;
 		    }
 		}
 	    }
@@ -2191,11 +2196,14 @@ void Turn_player_old(int ind)
 	}
 
 	for (i = 0; i < pl->ship->num_points; i++) {
+	    clpos pt;
+
+	    pt = Ship_get_point_clpos(pl->ship, i, dir);
 	    ms[i].mip = &mi;
-	    ms[i].pos.cx = pos.cx + pl->ship->pts[i][pl->dir].cx;
-	    ms[i].pos.cy = pos.cy + pl->ship->pts[i][pl->dir].cy;
-	    ms[i].todo.cx = pos.cx + pl->ship->pts[i][dir].cx - ms[i].pos.cx;
-	    ms[i].todo.cy = pos.cy + pl->ship->pts[i][dir].cy - ms[i].pos.cy;
+	    ms[i].pos.cx = pos.cx + pt.cx;
+	    ms[i].pos.cy = pos.cy + pt.cy;
+	    ms[i].todo.cx = pos.cx + pt.cx - ms[i].pos.cx;
+	    ms[i].todo.cy = pos.cy + pt.cy - ms[i].pos.cy;
 	    ms[i].vel.x = ms[i].todo.cx + salt.x;
 	    ms[i].vel.y = ms[i].todo.cy + salt.y;
 	    ms[i].target = -1;
