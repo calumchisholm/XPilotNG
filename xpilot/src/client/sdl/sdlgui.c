@@ -1840,16 +1840,11 @@ void Paint_messages(void)
     }
     
     if ( maxMessages < old_maxMessages ) {
-    	while ((tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages))
-	       != NULL) {
-    	    ListWidget_Remove(msg_list[i],tmp);
-	    Close_Widget(&tmp);
-    	}
-    	while ((tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages))
-	       != NULL) {
-    	    ListWidget_Remove(msg_list[i],tmp);
-	    Close_Widget(&tmp);
-    	}
+    	for (i=0;i<2;++i)
+	    while ((tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages)) != NULL) {
+    	    	ListWidget_Remove(msg_list[i],tmp);
+	    	Close_Widget(&tmp);
+    	    }
     }
     
     /* TODO: check whether there is a more efficient way to do this!
