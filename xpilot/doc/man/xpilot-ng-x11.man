@@ -8,7 +8,7 @@ xpilot-ng-x11 \- X11 client for multiplayer space war game.
 .SH DESCRIPTION
 .IP
 Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson.
-XPilot NG 4.6.5 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.6.6 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
 Where options include:
@@ -1683,10 +1683,10 @@ one key may be used by multiple key options.
 If no server is specified on the command line, xpilot will
 display a welcome screen where you can select a server.
 .IP
-XPilot NG 4.6.5 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.6.6 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
-xpilot-ng-x11 4.6.5
+xpilot-ng-x11 4.6.6
 .SH "SEE ALSO"
 The full documentation for
 .B xpilot-ng-x11
