@@ -148,6 +148,7 @@ static int Config_create_texturedDecor(int widget_desc, int *height);
 static int Config_create_texturedBalls(int widget_desc, int *height);
 static int Config_create_maxFPS(int widget_desc, int *height);
 static int Config_create_maxMessages(int widget_desc, int *height);
+static int Config_create_messagesToStdout(int widget_desc, int *height);
 static int Config_create_reverseScroll(int widget_desc, int *height);
 #ifdef SOUND
 static int Config_create_maxVolume(int widget_desc, int *height);
@@ -236,6 +237,7 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_altTurnResistance,
     Config_create_showMessages,
     Config_create_maxMessages,
+    Config_create_messagesToStdout,
     Config_create_reverseScroll,
     Config_create_showHUD,
     Config_create_showHR,
@@ -678,6 +680,12 @@ static int Config_create_maxMessages(int widget_desc, int *height)
     return Config_create_int(widget_desc, height,
 			   "maxMessages", &maxMessages, 1, MAX_MSGS,
 			   NULL, NULL);
+}
+
+static int Config_create_messagesToStdout(int widget_desc, int *height)
+{
+    return Config_create_int(widget_desc, height, "messagesToStdout",
+			     &messagesToStdout, 0, 2, NULL, NULL);
 }
 
 static int Config_create_reverseScroll(int widget_desc, int *height)
@@ -1565,6 +1573,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "showMineName", BIT(instruments, SHOW_MINE_NAME));
     Config_save_bool(fp, "showMessages", BIT(instruments, SHOW_MESSAGES));
     Config_save_int(fp, "maxMessages", maxMessages);
+    Config_save_int(fp, "messagesToStdout", messagesToStdout);
     Config_save_bool(fp, "reverseScroll", BIT(instruments, SHOW_REVERSE_SCROLL));
     Config_save_bool(fp, "showHUD", BIT(instruments, SHOW_HUD_INSTRUMENTS));
     Config_save_bool(fp, "showHR", BIT(instruments, SHOW_HR));

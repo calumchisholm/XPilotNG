@@ -117,6 +117,7 @@ Pixmap	p_draw;			/* Saved pixmap for the drawing */
 Window	players;		/* Player list window */
 				/* monochromes) */
 int	maxMessages;		/* Max. number of messages to display */
+int	messagesToStdout;	/* Send messages to standard output */
 Window	about_w;		/* About window */
 Window	about_close_b;		/* About window's close button */
 Window	about_next_b;		/* About window's next button */

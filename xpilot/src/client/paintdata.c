@@ -800,6 +800,9 @@ int Handle_radar(int x, int y, int size)
 int Handle_message(char *msg)
 {
     Add_message(msg);
+    if (messagesToStdout == 2 || messagesToStdout ==1 && strlen(msg) &&
+	msg[strlen(msg) - 1] == ']')
+	xpprintf("%s\n", msg);
     return 0;
 }
 

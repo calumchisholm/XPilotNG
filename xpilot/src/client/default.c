@@ -650,6 +650,14 @@ struct option {
 	"The maximum number of messages to display.\n"
     },
     {
+	"messagesToStdout",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Send messages to standard output.\n0: Don't.\n1: Only player "
+	"messages.\n2: Player and status messages.\n"
+    },
+    {
 	"reverseScroll",
 	NULL,
 	"No",
@@ -2950,6 +2958,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_resource(rDB, "motdFont", motdFontName, sizeof motdFontName);
 
     Get_int_resource(rDB, "maxMessages", &maxMessages);
+    Get_int_resource(rDB, "messagesToStdout", &messagesToStdout);
 #ifndef _WINDOWS
     Get_bool_resource(rDB, "selectionAndHistory", &selectionAndHistory);
     Get_int_resource(rDB, "maxLinesInHistory", &maxLinesInHistory);
