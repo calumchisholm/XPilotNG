@@ -296,25 +296,27 @@ bool Key_press(keys_t key)
 
     case KEY_POINTER_CONTROL:
 	if (newbie) {
+    	    xp_option_t *opt = Find_option("keyPointerControl");
+	    char msg[MSG_LEN];
+	    const char *val;
+
+	    if (!opt)
+	    	break;
+	    val = Option_value_to_string(opt);
+	    if (strlen(val) == 0)
+	    	break;
+
 	    if(!pointerControl) {
-		xp_option_t *opt = Find_option("keyPointerControl");
-		char msg[MSG_LEN];
-		const char *val;
-
-		if (!opt)
-		    break;
-		val = Option_value_to_string(opt);
-		if (strlen(val) == 0)
-		    break;
-
 		snprintf(msg, sizeof(msg),
 			 "Mouse steering enabled. "
 			 "Disable with one of: %s.", val);
-
-		Add_newbie_message(msg);
+	    } else {
+		snprintf(msg, sizeof(msg),
+			 "Mouse steering disabled. "
+			 "Enable with one of: %s.", val);
 	    }
-	    else
-		Add_newbie_message("Mouse steering disabled.");
+
+    	    Add_newbie_message(msg);
 	}
 	return Key_press_pointer_control();
 

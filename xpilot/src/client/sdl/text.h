@@ -120,6 +120,8 @@ extern font_data mapfont;
 extern int gameFontSize;
 extern int mapFontSize;
 
+extern char *gamefontname;
+
 extern string_tex_t score_object_texs[];
 
 /*typedef struct {

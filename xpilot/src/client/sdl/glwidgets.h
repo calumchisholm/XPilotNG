@@ -435,6 +435,7 @@ typedef struct {
 } WrapperWidget;
 
 GLWidget *Init_MainWidget( font_data *font );
+void MainWidget_ShowMenu( GLWidget *widget, bool show );
 /*******************/
 /* End: MainWidget */
 /*******************/
@@ -444,6 +445,7 @@ GLWidget *Init_MainWidget( font_data *font );
 /**************************/
 #define CONFMENUWIDGET 16
 typedef struct {
+    bool	showconf;
     GLWidget	*scrollpane;
     GLWidget	*ql;
     GLWidget	*qb;

@@ -48,6 +48,7 @@ font_data gamefont;
 font_data mapfont;
 int gameFontSize;
 int mapFontSize;
+char *gamefontname;
 
 /* ugly kps hack */
 bool file_exists(const char *path) 
@@ -91,9 +92,10 @@ int Init_playing_windows(void)
 
 int Init_window(void)
 {
-    char gamefontname[] = CONF_FONTDIR "Test.ttf";
     int value;
-
+    char defaultfontname[] = CONF_FONTDIR "Test.ttf";
+    bool gf_exists = true,df_exists = true,gf_init = false, mf_init = false;
+    
     if (TTF_Init()) {
     	error("SDL_ttf initialization failed: %s", SDL_GetError());
     	return -1;
@@ -121,7 +123,7 @@ int Init_window(void)
 #ifndef _WINDOWS
     videoFlags |= SDL_RESIZABLE;       /* Enable window resizing        */
 #else
-	videoFlags |= SDL_FULLSCREEN;
+    videoFlags |= SDL_FULLSCREEN;
 #endif
 
     /** This checks to see if surfaces can be stored in memory */
@@ -167,19 +169,52 @@ int Init_window(void)
     
     /* this prevents a freetype crash if you pass non existant fonts */
     if (!file_exists(gamefontname)) {
-      error("cannot find your game font '%s'.\n" \
-            "Please check you have run make install, if you have:\n" \
-            "ensure that your fonts and texures are located in\n" \
-	    "%s\n",gamefontname,CONF_FONTDIR);
-      return -1;
+    	error("cannot find your game font '%s'.\n" \
+            "Please check that it exists!",gamefontname);
+    	xpprintf("Reverting to defaultfont '%s'\n",defaultfontname);
+    	gf_exists = false;
     }
-      
-    if (fontinit(&gamefont,gamefontname,gameFontSize)) {
-    	error("Font initialization failed with %s", gamefontname);
+    if (!file_exists(defaultfontname)) {
+    	error("cannot find the default font! '%s'" ,defaultfontname);
+	df_exists = false;
+    }
+    
+    if (!gf_exists && !df_exists) {
+    	error("Failed to find any font files!\n" \
+	    	"Probably you forgot to run 'make install',use '-TTFont <font.ttf>' argument" \
+		" until you do");
 	return -1;
     }
-    if (fontinit(&mapfont,gamefontname,mapFontSize)) {
-    	error("Font initialization failed with %s", gamefontname);
+      
+    if (gf_exists) {
+    	if (fontinit(&gamefont,gamefontname,gameFontSize)) {
+    	    error("Font initialization failed with %s", gamefontname);
+	} else gf_init = true;
+    }
+    if (!gf_init && df_exists) {
+    	if (fontinit(&gamefont,defaultfontname,gameFontSize)) {
+    	    error("Default font initialization failed with %s", defaultfontname);
+    	} else gf_init = true;
+    }
+    
+    if (!gf_init) {
+    	error("Failed to initialize any game font! (quitting)");
+	return -1;
+    }
+    
+    if (gf_exists) {
+    	if (fontinit(&mapfont,gamefontname,mapFontSize)) {
+    	    error("Font initialization failed with %s", gamefontname);
+	} else mf_init = true;
+    }
+    if (!mf_init && df_exists) {
+    	if (fontinit(&mapfont,defaultfontname,mapFontSize)) {
+    	    error("Default font initialization failed with %s", defaultfontname);
+    	} else mf_init = true;
+    }
+
+    if (!mf_init) {
+    	error("Failed to initialize any map font! (quitting)");
 	return -1;
     }
 
@@ -223,6 +258,22 @@ static const char* Get_geometry(xp_option_t *opt)
     return buf;
 }
 
+static bool Set_fontName(xp_option_t *opt, const char *value)
+{
+    UNUSED_PARAM(opt);
+    if (gamefontname)
+	xp_free(gamefontname);
+    gamefontname = xp_safe_strdup(value);
+
+    return true;
+}
+
+static const char *Get_fontName(xp_option_t *opt)
+{
+    UNUSED_PARAM(opt);
+    return gamefontname;
+}
+
 static xp_option_t sdlinit_options[] = {
     XP_STRING_OPTION(
 	"geometry",
@@ -247,8 +298,15 @@ static xp_option_t sdlinit_options[] = {
 	&mapFontSize,
 	NULL,
 	XP_OPTFLAG_DEFAULT,
-	"Height of font used for message strings.\n")
+	"Height of font used for message strings.\n"),
 
+    XP_STRING_OPTION(
+	"TTFont",
+	CONF_FONTDIR "Test.ttf",
+	NULL, 0,
+	Set_fontName, NULL, Get_fontName,
+	XP_OPTFLAG_DEFAULT,
+	"Set the font to use.\n")
 };
 
 void Store_sdlinit_options(void)

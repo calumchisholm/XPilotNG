@@ -61,9 +61,11 @@ bool Key_press_pointer_control(void)
 {
     pointerControl = !pointerControl;
     if (pointerControl) {
+    	MainWidget_ShowMenu(MainWidget,false);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 	SDL_ShowCursor(SDL_DISABLE);
     } else {
+    	MainWidget_ShowMenu(MainWidget,true);
 	SDL_WM_GrabInput(SDL_GRAB_OFF);
 	SDL_ShowCursor(SDL_ENABLE);
     }

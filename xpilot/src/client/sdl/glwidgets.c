@@ -1468,6 +1468,7 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
     IntChooserWidget *wid_info;
     char valuetext[16];
     string_tex_t tmp_tex;
+    int buttonsize;
 
     if (!value) {
     	error("Faulty parameter to Init_IntChooserWidget: value is a NULL pointer!");
@@ -1508,7 +1509,8 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
 	error("Init_IntChooserWidget: Failed to render value string");
 	return NULL;
     }
-
+    buttonsize = wid_info->valuetex.height-4;
+    
     tmp->WIDGET     = INTCHOOSERWIDGET;
     tmp->Draw	    	= Paint_IntChooserWidget;
     tmp->Close  	= Close_IntChooserWidget;
@@ -1530,7 +1532,7 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
 	return NULL;
     }
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,12,16,IntChooserWidget_Subtract,tmp))) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,buttonsize,buttonsize,IntChooserWidget_Subtract,tmp))) ) {
     	Close_Widget(&tmp);
     	error("Init_IntChooserWidget couldn't init leftarrow!");
     	return NULL;
@@ -1538,7 +1540,7 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
     
     if (*(wid_info->value) <= wid_info->minval) ((ArrowWidget *)(wid_info->leftarrow->wid_info))->locked = true;
 
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,12,16,IntChooserWidget_Add,tmp))) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,buttonsize,buttonsize,IntChooserWidget_Add,tmp))) ) {
     	Close_Widget(&tmp);
     	error("Init_IntChooserWidget couldn't init rightarrow!");
     	return NULL;
@@ -1727,6 +1729,7 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
     string_tex_t tmp_tex;
     DoubleChooserWidget *wid_info;
     char valuetext[16];
+    int buttonsize;
     
     if (!value) {
     	error("Faulty parameter to Init_DoubleChooserWidget: value is a NULL pointer!");
@@ -1767,6 +1770,7 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
 	error("Init_DoubleChooserWidget: Failed to render value string");
 	return NULL;
     }
+    buttonsize = wid_info->valuetex.height-4;
 
     tmp->WIDGET     = DOUBLECHOOSERWIDGET;
     tmp->Draw	    	= Paint_DoubleChooserWidget;
@@ -1788,7 +1792,7 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
 	return NULL;
     }
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,12,16,DoubleChooserWidget_Subtract,tmp))) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->leftarrow  = Init_ArrowWidget(LEFTARROW,buttonsize,buttonsize,DoubleChooserWidget_Subtract,tmp))) ) {
     	Close_Widget(&tmp);
     	error("Init_DoubleChooserWidget: couldn't init leftarrow!");
     	return NULL;
@@ -1796,7 +1800,7 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
     
     if (*(wid_info->value) <= wid_info->minval) ((ArrowWidget *)(wid_info->leftarrow->wid_info))->locked = true;
 
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,12,16,DoubleChooserWidget_Add,tmp))) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->rightarrow = Init_ArrowWidget(RIGHTARROW,buttonsize,buttonsize,DoubleChooserWidget_Add,tmp))) ) {
     	Close_Widget(&tmp);
     	error("Init_DoubleChooserWidget: couldn't init rightarrow!");
     	return NULL;
@@ -2872,11 +2876,38 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 /**********************/
 /* Begin: MainWidget  */
 /**********************/
-static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+/*static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );*/
 static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
 static void Close_MainWidget( GLWidget *widget );
 
-static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+void MainWidget_ShowMenu( GLWidget *widget, bool show )
+{
+    WrapperWidget *wid_info;
+    
+    if (!widget) {
+    	error("MainWidget_ShowMenu: widget missing!");
+	return;
+    }
+    if (widget->WIDGET != MAINWIDGET) {
+    	error("Wrong widget type for MainWidget_ShowMenu [%i]",widget->WIDGET);
+	return;
+    }
+    if (!(wid_info = (WrapperWidget *)(widget->wid_info)) ) {
+    	error("MainWidget_ShowMenu: wid_info missing!");
+	return;
+    }
+    
+    if (wid_info->showconf == show) return;
+    
+    wid_info->showconf = show;
+    if (show) {
+    	AppendGLWidgetList(&(widget->children), wid_info->confmenu);
+    } else {
+    	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
+    }
+}
+
+/*static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     GLWidget *widget;
     WrapperWidget *wid_info;
@@ -2887,30 +2918,24 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
     if (state == SDL_PRESSED) {
     	if (button == 2) {
     	    if ((wid_info->showconf = !wid_info->showconf)) {
-    	    	AppendGLWidgetList(&(widget->children), wid_info->confmenu);
-		b.x = x;
-		b.y = y;
+		b.x = x - wid_info->confmenu->bounds.w/2;
+		b.y = y - wid_info->confmenu->bounds.h/2;
 		b.w = wid_info->confmenu->bounds.w;
 		b.h = wid_info->confmenu->bounds.h;
 		SetBounds_GLWidget(wid_info->confmenu,&b);
+    	    	AppendGLWidgetList(&(widget->children), wid_info->confmenu);
 	    } else {
     	    	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
-    	    	/*pointless really
-		for (i=0;i<NUM_MOUSE_BUTTONS;++i)
-    	    	    if (wid_info->confmenu == target[i]) target[i]=NULL;
-    	    	if (wid_info->confmenu == hovertarget) hovertarget=NULL;
-		*/
-    
  	    }
 	}
     }
-}
+}*/
 
 static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
 {
     WrapperWidget *wid_info;
     SDL_Rect bs = {0,0,0,0},*bw;
-    GLWidget *subs[4];
+    GLWidget *subs[5];
     int i,diff;
     bool change;
     
@@ -2930,10 +2955,11 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     subs[1] = wid_info->scorelist;
     subs[2] = wid_info->chat_msgs;
     subs[3] = wid_info->game_msgs;
+    subs[4] = wid_info->confmenu;
     
     bw = &(widget->bounds);
     
-    for ( i=0; i < 4 ; ++i) {
+    for ( i=0; i < 5 ; ++i) {
     	if (subs[i]) {
 	    change = false;
 	    
@@ -2987,6 +3013,7 @@ GLWidget *Init_MainWidget( font_data *font )
 {
     GLWidget *tmp;
     WrapperWidget *wid_info;
+    SDL_Rect b;
     
     tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
@@ -3003,12 +3030,12 @@ GLWidget *Init_MainWidget( font_data *font )
     wid_info->confmenu	= NULL;
     wid_info->font	= font;
     wid_info->BORDER	= 10;
-    wid_info->showconf	= false;
+    wid_info->showconf	= true;
     
     tmp->WIDGET     	= MAINWIDGET;
     tmp->bounds.w   	= draw_width;
     tmp->bounds.h   	= draw_height;
-    tmp->button     	= button_MainWidget;
+    /*tmp->button     	= button_MainWidget;*/
     tmp->buttondata 	= tmp;
     tmp->SetBounds 	= SetBounds_MainWidget;
     tmp->Close	    	= Close_MainWidget;
@@ -3023,13 +3050,19 @@ GLWidget *Init_MainWidget( font_data *font )
 	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !(wid_info->confmenu = Init_ConfMenuWidget(0,0)) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->confmenu = Init_ConfMenuWidget(0,0))) ) {
 	error("confmenu initialization failed");
 	Close_Widget(&tmp);
 	return NULL;
     }
+    b.w = wid_info->confmenu->bounds.w;
+    b.h = wid_info->confmenu->bounds.h;
+    b.x = tmp->bounds.w - b.w - 16;
+    b.y = tmp->bounds.h - b.h - 16;
+    SetBounds_GLWidget(wid_info->confmenu,&b);
+    
     if ( !AppendGLWidgetList(&(tmp->children),
-    	    	(wid_info->chat_msgs = Init_ListWidget(200 + wid_info->BORDER,wid_info->BORDER,
+    	    	(wid_info->chat_msgs = Init_ListWidget(wid_info->radar->bounds.w + 2*wid_info->BORDER,wid_info->BORDER,
 		&nullRGBA,&nullRGBA,&greenRGBA,LW_DOWN,LW_RIGHT,false)))
     	) {
 	error("Failed to initialize chat msg list");
@@ -3057,7 +3090,7 @@ GLWidget *Init_MainWidget( font_data *font )
 static void Paint_ConfMenuWidget( GLWidget *widget );
 static void ConfMenuWidget_Quit( void *data );
 static void ConfMenuWidget_Save( void *data );
-static void ConfMenuWidget_Close( void *data );
+static void ConfMenuWidget_Config( void *data );
 
 static void confmenu_callback( void )
 {
@@ -3103,39 +3136,41 @@ static void ConfMenuWidget_Save( void *data )
     Xpilotrc_write(path);
 }
 
-static void ConfMenuWidget_Close( void *data )
+static void ConfMenuWidget_Config( void *data )
 {
     GLWidget *widget;
-    WrapperWidget *wid_info;
+    ConfMenuWidget *wid_info;
     
-    if (!(widget = (GLWidget *)*(void **)data)) {
+    if (!(widget = (GLWidget *)data)) {
     	error("ConfMenuWidget_Close: widget missing!");
 	return;
     }
-    if ( widget->WIDGET != MAINWIDGET ) {
+    if ( widget->WIDGET != CONFMENUWIDGET ) {
     	error("ConfMenuWidget_Close: Wrong widget type! [%i]",widget->WIDGET);
 	return;
     }
-    if ( !(wid_info = (WrapperWidget *)(widget->wid_info)) ) {
+    if ( !(wid_info = (ConfMenuWidget *)(widget->wid_info)) ) {
     	error("ConfMenuWidget_Close: wid_info missing!");
 	return;
     }
     
-    DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
-    
-    /*pointless really 
-    for (i=0;i<NUM_MOUSE_BUTTONS;++i)
-    	if (wid_info->confmenu == target[i]) target[i]=NULL;
-    if (wid_info->confmenu == hovertarget) hovertarget=NULL;*/
-    
-    wid_info->showconf = false;
-    /*Close_Widget(&(wid_info->confmenu));*/
+    if ((wid_info->showconf = !wid_info->showconf)) {
+    	AppendGLWidgetList(&(widget->children), wid_info->scrollpane);
+    	widget->bounds.y -= 512 - widget->bounds.h;
+    	widget->bounds.h = 512;
+    	SetBounds_GLWidget(widget,&(widget->bounds));
+    } else {
+    	DelGLWidgetListItem(&(widget->children), wid_info->scrollpane);
+    	widget->bounds.h = wid_info->ql->bounds.h + 2;
+    	widget->bounds.y += 512 - widget->bounds.h;
+    	SetBounds_GLWidget(widget,&(widget->bounds));
+    }
 }
 
 static void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
 {
     ConfMenuWidget *wid_info;
-    SDL_Rect bounds;
+    SDL_Rect bounds = {0,0,0,0};
     
     if (!widget ) {
     	error("SetBounds_ConfMenuWidget: tried to change bounds on NULL ConfMenuWidget!");
@@ -3159,32 +3194,33 @@ static void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
     
-    bounds.x = b->x + 1;
-    bounds.y = b->y + 1 + wid_info->ql->bounds.h + 3;
-    bounds.w = b->w - 2;
-    bounds.h = b->h - 2 - wid_info->ql->bounds.h - 3;
+    bounds.x += b->x + 1;
+    bounds.y += b->y + 1;
 
-    SetBounds_GLWidget(wid_info->scrollpane,&bounds);
+    if (wid_info->showconf) {
+    	bounds.w += b->w - 2;
+    	bounds.h += b->h - 2 - wid_info->ql->bounds.h - 3;
+
+    	SetBounds_GLWidget(wid_info->scrollpane,&bounds);
+	bounds.h += 3;
+    }
     
-    bounds.x = b->x;
     bounds.w = b->w/3 - 2;
-    bounds.y = b->y+1;
+    bounds.y += bounds.h;
     bounds.h = wid_info->ql->bounds.h;
     
     SetBounds_GLWidget(wid_info->ql,&bounds);
     SetBounds_GLWidget(wid_info->qb,&bounds);
     
-    bounds.x = b->x + b->w/3;
+    bounds.x += b->w/3;
     bounds.w = b->w/3 - 2;
-    bounds.y = b->y+1;
     bounds.h = wid_info->sl->bounds.h;
     
     SetBounds_GLWidget(wid_info->sl,&bounds);
     SetBounds_GLWidget(wid_info->sb,&bounds);
 
-    bounds.x = b->x + b->w*2/3;
+    bounds.x += b->w/3;
     bounds.w = b->w/3 - 2;
-    bounds.y = b->y+1;
     bounds.h = wid_info->cl->bounds.h;
     
     SetBounds_GLWidget(wid_info->cl,&bounds);
@@ -3247,6 +3283,7 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
     tmp->WIDGET     	= CONFMENUWIDGET;
     tmp->Draw	    	= Paint_ConfMenuWidget;
     tmp->SetBounds  	= SetBounds_ConfMenuWidget;
+    wid_info->showconf	= false;
         
     dummy = Init_EmptyBaseGLWidget();
     if ( !dummy ) {
@@ -3272,7 +3309,14 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
     ListWidget_Append(list,dummy->next);
     Close_Widget(&dummy);
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scrollpane = Init_ScrollPaneWidget(list))) ) {
+    /*if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scrollpane = Init_ScrollPaneWidget(list))) ) {
+    	error("Init_ConfMenuWidget: Couldn't make the scrollpane!");
+	Close_Widget(&list);
+	Close_Widget(&tmp);
+	return NULL;
+    }*/
+    
+    if ( !(wid_info->scrollpane = Init_ScrollPaneWidget(list)) ) {
     	error("Init_ConfMenuWidget: Couldn't make the scrollpane!");
 	Close_Widget(&list);
 	Close_Widget(&tmp);
@@ -3301,13 +3345,13 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
 	return NULL;
     }
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cl = Init_LabelWidget("Close",&yellowRGBA,&but1_color,CENTER,CENTER))) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the close label!");
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cl = Init_LabelWidget("Config",&yellowRGBA,&but1_color,CENTER,CENTER))) ) {
+    	error("Init_ConfMenuWidget: Couldn't make the config label!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Close,&MainWidget))) ) {
-    	error("Init_ConfMenuWidget: Couldn't make the close button!");
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Config,tmp))) ) {
+    	error("Init_ConfMenuWidget: Couldn't make the config button!");
 	Close_Widget(&tmp);
 	return NULL;
     }
@@ -3315,9 +3359,10 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
     tmp->bounds.x   	= x;
     tmp->bounds.y   	= y;
     tmp->bounds.w   	= wid_info->scrollpane->bounds.w+2;
-    tmp->bounds.h   	= 512;
-    
+    /*tmp->bounds.h   	= 512;*/
     wid_info->ql->bounds.h = wid_info->sl->bounds.h = wid_info->cl->bounds.h = wid_info->cl->bounds.h + 2;
+    tmp->bounds.h   	= wid_info->ql->bounds.h + 2;
+    
     
     SetBounds_GLWidget(tmp,&(tmp->bounds));
        
