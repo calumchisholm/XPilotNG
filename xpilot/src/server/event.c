@@ -333,11 +333,8 @@ static void Player_toggle_pause(player_t *pl)
 	pausetype = paused;
     else if (Player_is_hoverpaused(pl))
 	pausetype = hoverpaused;
-    else if (Player_is_appearing(pl)) {
-	 Set_player_message(pl,
-	    "You can't pause while your ship is appearing. [*Server notice*]");
-	 return;
-    }
+    else if (Player_is_appearing(pl))
+	pausetype = paused;
     else {
 	base_t *base = pl->home_base;
 	double dist = Wrap_length(pl->pos.cx - base->pos.cx,
