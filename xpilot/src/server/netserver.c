@@ -1285,15 +1285,17 @@ static void UglyHack(char *string)
 static void LegalizeName(char *string, bool hack)
 {
     char *s = string;
+    static char allowed_chars[] =
+	" !#%&'()-.0123456789="
+	"@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	"_abcdefghijklmnopqrstuvwxyz";
 
     if (hack)
 	UglyHack(s);
 
     while (*s != '\0') {
 	char ch = *s;
-	if (ch == '\"')
-	    ch = '\'';
-	else if (!isprint(ch) || strchr("{[]}:,", ch))
+	if (!strchr(allowed_chars, ch))
 	    ch = 'x';
 	*s++ = ch;
     }
@@ -1301,9 +1303,9 @@ static void LegalizeName(char *string, bool hack)
 
 static void LegalizeHost(char *string)
 {
-    while ( *string != '\0' ) {
+    while (*string != '\0') {
 	char ch = *string;
-	if ( !isalnum(ch) && ch != '.' )
+	if (!isalnum(ch) && ch != '.')
 	    ch = '.';
 	*string++ = ch;
     }

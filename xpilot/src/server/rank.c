@@ -549,22 +549,3 @@ void Rank_write_score_file(void)
     rename(tmp_file, xpilotscorefile);
     remove(tmp_file);
 }
-
-/* This function checks wether the strings contains certain characters
-   that might be hazardous to include on a webpage (ie they screw it up). */
-bool Rank_IsLegalNameUserHost(const char string[])
-{
-    const int length = strlen(string);
-    int i;
-
-    for (i = 0; i < length; i++)
-	switch (string[i]) {
-	case '<':
-	case '>':
-	case '\t':
-	    return false;
-	default:
-	    break;
-	}
-    return true;
-}

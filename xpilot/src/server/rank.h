@@ -76,7 +76,6 @@ typedef struct RankInfo {
 	do { strcpy((rank)->entry.logout, (msg)); } while(0)
 
 void Rank_get_stats(player *pl, char *buf);
-bool Rank_IsLegalNameUserHost(const char string[]);
 RankInfo *Rank_get_by_name(char *name);
 void Rank_nuke_score(RankInfo *rank);
 void Rank_init_saved_scores(void);
