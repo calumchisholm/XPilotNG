@@ -115,7 +115,7 @@ void Add_msg_to_history(char *message)
     /*always */
     save_talk_str = false;
 
-    if (!selectionAndHistory || strlen(message) == 0) {
+    if (strlen(message) == 0) {
 	return;			/* unexpected. nothing to add */
     }
 
@@ -152,10 +152,9 @@ char *Get_msg_from_history(int *pos, char *message, keys_t direction)
     int i;
     char **msg_set;
 
-    if (!selectionAndHistory
-	|| (direction != KEY_TALK_CURSOR_UP
+    if (direction != KEY_TALK_CURSOR_UP
 	    && direction != KEY_TALK_CURSOR_DOWN
-	    && direction != KEY_DUMMY)) {
+	    && direction != KEY_DUMMY) {
 	return NULL;
     }
 
@@ -206,7 +205,7 @@ void Talk_delete_emphasized_text()
     int onewidth = XTextWidth(talkFont, talk_str, 1);
     char new_str[MAX_CHARS];
 
-    if (!(selectionAndHistory && selection.talk.state == SEL_EMPHASIZED)) {
+    if (selection.talk.state != SEL_EMPHASIZED) {
 	return;
     }
 
@@ -286,8 +285,7 @@ int Talk_paste(char *data, size_t data_len, bool overwrite)
     bool cursor_visible = false;
     int i;
 
-    if (!selectionAndHistory || !data || data_len == 0
-	|| strlen(data) == 0) {
+    if (!data || data_len == 0 || strlen(data) == 0) {
 	return 0;
     }
 
@@ -430,9 +428,6 @@ void Clear_draw_selection()
  */
 void Clear_selection()
 {
-    if (!selectionAndHistory)
-	return;
-
     if (talk_mapped && selection.talk.state == SEL_EMPHASIZED) {
 	/* trick to unemphasize */
 	selection.talk.state = SEL_SELECTED;
