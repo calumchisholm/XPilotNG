@@ -203,7 +203,7 @@ int Widget_create_float(int parent_desc,
 			void *user_data);
 int Widget_create_label(int parent_desc,
 			int x, int y,
-			int width, int height,
+			int width, int height, bool centered,
 			int border, const char *str);
 int Widget_create_arrow_right(int parent_desc, int x, int y,
 			      int width, int height,

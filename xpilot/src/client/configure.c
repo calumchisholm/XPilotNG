@@ -608,7 +608,7 @@ static int Config_create_bool(int widget_desc, int *height,
 
     Widget_create_label(widget_desc, config_space, *height
 			    + (config_entry_height - config_text_height) / 2,
-			label_width, config_text_height,
+			label_width, config_text_height, true,
 			0, str);
     if (config_space + label_width > offset) {
 	*height += config_entry_height;
@@ -647,7 +647,7 @@ static int Config_create_int(int widget_desc, int *height,
     }
     Widget_create_label(widget_desc, config_space, *height
 			+ (config_entry_height - config_text_height) / 2,
-			label_width, config_text_height,
+			label_width, config_text_height, true,
 			0, str);
     if (config_space + label_width > offset) {
 	*height += config_entry_height;
@@ -692,7 +692,7 @@ static int Config_create_color(int widget_desc, int *height, int color,
     }
     Widget_create_label(widget_desc, config_space, *height
  			+ (config_entry_height - config_text_height) / 2,
- 			label_width, config_text_height,
+ 			label_width, config_text_height, true,
  			0, str);
     if (config_space + label_width > offset) {
  	*height += config_entry_height;
@@ -742,7 +742,7 @@ static int Config_create_float(int widget_desc, int *height,
     }
     Widget_create_label(widget_desc, config_space, *height
 			+ (config_entry_height - config_text_height) / 2,
-			label_width, config_text_height,
+			label_width, config_text_height, true,
 			0, str);
     if (config_space + label_width > offset) {
 	*height += config_entry_height;

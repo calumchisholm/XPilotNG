@@ -1666,7 +1666,7 @@ int Widget_create_float(int parent_desc,
 
 int Widget_create_label(int parent_desc,
 			int x, int y,
-			int width, int height,
+			int width, int height, bool centered,
 			int border, const char *str)
 {
     int			widget_desc;
@@ -1684,8 +1684,14 @@ int Widget_create_label(int parent_desc,
 	return NO_WIDGET;
     }
     labelw->str = str;
-    labelw->x_offset = (width - XTextWidth(textFont, str, strlen(str))) / 2;
+    if (centered) {
+      labelw->x_offset = (width - XTextWidth(textFont, str, strlen(str))) / 2;
+    }
+    else {
+      labelw->x_offset = 5;
+    }
     labelw->y_offset = (height - (textFont->ascent + textFont->descent)) / 2;
+    
     window =
 	XCreateSimpleWindow(dpy, parent_widget->window,
 			    x, y, width, height,
@@ -1839,8 +1845,8 @@ int Widget_create_confirm(const char *confirm_str,
 	return NO_WIDGET;
     label_desc = Widget_create_label(popup_desc,
 				     (popup_width - label_width) / 2,
-				     label_space,
-				     label_width, label_height,
+				     label_space, label_width, 
+				     label_height, true,
 				     0, confirm_str);
     if (label_desc == NO_WIDGET) {
 	Widget_destroy(popup_desc);
