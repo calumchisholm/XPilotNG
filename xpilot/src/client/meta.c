@@ -333,7 +333,6 @@ void Meta_connect(int *connections_ptr, int *maxfd_ptr)
     int status;
     int connections = 0;
     int max = -1;
-    char buf[MSG_LEN];
 
     for (i = 0; i < NUM_METAS; i++) {
 	if (metas[i].sock.fd != SOCK_FD_INVALID)
