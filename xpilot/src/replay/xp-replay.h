@@ -24,42 +24,13 @@
 #ifndef	XP_REPLAY_H
 #define	XP_REPLAY_H
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
+#include "xpcommon.h"
+
+#ifdef HAVE_X11_XLIB_H
+#  include <X11/Xlib.h>
 #endif
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-#endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <signal.h>
-#include <errno.h>
-#include <math.h>
-#include <time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# ifdef _AIX
-#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
-# endif
-# include <stdarg.h>
-# include <X11/Xlib.h>
-# include <X11/Xutil.h>
-#endif
-
-#ifdef _SEQUENT_
-# include <sys/procstats.h>
-# define gettimeofday(T,X)	get_process_stats(T, PS_SELF, \
-					(struct process_stats *)NULL, \
-					(struct process_stats *)NULL)
+#ifdef HAVE_X11_XUTIL_H
+#  include <X11/Xutil.h>
 #endif
 
 #include "recordfmt.h"
