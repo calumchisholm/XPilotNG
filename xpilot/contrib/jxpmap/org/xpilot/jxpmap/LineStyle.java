@@ -95,6 +95,7 @@ public class LineStyle {
 
 
     public void printXml (PrintWriter out) throws IOException {
+	if (id == "internal") return;
         out.print("<EdgeStyle id=\"");
         out.print(id);
         out.print("\" width=\"");

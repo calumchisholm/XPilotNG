@@ -121,6 +121,9 @@ public class MapModel {
         throws IOException, SAXException, ParserConfigurationException {
 
         edgeStyles.clear();
+	LineStyle ls;
+        ls = new LineStyle("internal", 0, Color.black, LineStyle.STYLE_HIDDEN);
+        edgeStyles.add(ls);
         polyStyles.clear();
 
         System.out.println("parsing map file: "+ fileName);
@@ -196,7 +199,7 @@ public class MapModel {
         private Map bstyles;
         private Map estyles;
         private Map opMap;
-        private int ballAreaTeam;
+        private boolean ballArea;
         private int ballTargetTeam;
         private boolean decor;
 
@@ -204,10 +207,11 @@ public class MapModel {
         public MapDocumentHandler () {
             polys = new ArrayList();
             estyles = new HashMap();
+	    estyles.put("internal", edgeStyles.get(0));
             pstyles = new HashMap();
             bstyles = new HashMap();
             opMap = new HashMap();
-            ballAreaTeam = -1;
+            ballArea = false;
             ballTargetTeam = -1;
             decor = false;
         }
@@ -228,9 +232,8 @@ public class MapModel {
                          Integer.parseInt(atts.getValue("y")), 
                          null));
                     
-                    if (ballAreaTeam != -1) {
+                    if (ballArea) {
                         poly.type = MapPolygon.TYPE_BALLAREA;
-                        poly.team = ballAreaTeam;
                     } else if (ballTargetTeam != -1) {
                         poly.type = MapPolygon.TYPE_BALLTARGET;
                         poly.team = ballTargetTeam;
@@ -341,7 +344,7 @@ public class MapModel {
 
                 } else if (name.equalsIgnoreCase("ballarea")) {
 
-                    ballAreaTeam = Integer.parseInt(atts.getValue("team"));
+                    ballArea = true;
 
                 } else if (name.equalsIgnoreCase("balltarget")) {
 
@@ -367,7 +370,7 @@ public class MapModel {
                     polys.add(poly);
 
                 } else if (name.equalsIgnoreCase("ballarea")) {
-                    ballAreaTeam = -1;
+                    ballArea = false;
 
                 } else if (name.equalsIgnoreCase("balltarget")) {
                     ballTargetTeam = -1;

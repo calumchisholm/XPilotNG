@@ -136,9 +136,7 @@ public class MapPolygon extends MapObject {
         if (polygon.npoints < 2) return;
 
         if (getType() == TYPE_BALLAREA) {
-            out.print("<BallArea team=\"");
-            out.print(getTeam());
-            out.println("\">");
+            out.print("<BallArea>");
         } else if (getType() == TYPE_BALLTARGET) {
             out.print("<BallTarget team=\"");
             out.print(getTeam());
