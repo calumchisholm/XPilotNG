@@ -51,15 +51,6 @@ cl_option_t *options = NULL;
 
 #else
 
-typedef struct {
-    const char		*name;		/* option name */
-    const char		*noArg;		/* value for non-argument options */
-    const char		*fallback;	/* default value */
-    keys_t		key;		/* key if not KEY_DUMMY */
-    const char		*help;		/* user help (multiline) */
-    unsigned		hash;		/* option name hashed. */
-} cl_option_t;
-
 cl_option_t options[];
 
 #endif
@@ -174,6 +165,86 @@ bool turnres_setfunc(const char *name, const char *value, void *private)
     warn("turnres is now %f\n", turnresistance);
     return true;
 }
+
+typedef enum {
+    xp_noarg_opt,
+    xp_int_opt,
+    xp_float_opt,
+    xp_bool_opt,
+    xp_string_opt,
+    xp_color_opt,
+    xp_key_opt,
+} xp_option_type_t;
+
+typedef struct xp_option {
+    xp_option_type_t type;
+
+    const char *name;
+    const char *help;
+
+    /* bool option stuff */
+    bool bool_defval;
+    bool *bool_ptr;
+
+    /* integer option stuff */
+    int int_defval;
+    int int_minval;
+    int int_maxval;
+    int *int_ptr;
+
+    /* floating point option stuff */
+    double flt_defval;
+    double flt_minval;
+    double flt_maxval;
+    double *flt_ptr;
+
+    /* string option stuff */
+    const char *str_defval;
+    char *str_ptr;
+
+    /* color option stuff */
+    /*color_t *color_ptr;*/
+
+    /* key option stuff */
+    /* ... */
+
+} xp_option_t;
+
+#define XP_OPT_BOOL_DUMMY \
+	false, NULL
+#define XP_OPT_INT_DUMMY \
+	0, 0, 0, NULL
+#define XP_OPT_FLOAT_DUMMY \
+	0, 0, 0, NULL
+#define XP_OPT_STRING_DUMMY \
+	NULL, NULL
+
+#define XP_OPT_FLOAT(name, valptr, defval, minval, maxval, setfunc, help) \
+{ \
+    XP_OPT_INT_T,\
+	name,\
+	help,\
+	XP_OPT_BOOL_DUMMY,\
+	XP_OPT_INT_DUMMY,\
+	defval,\
+	minval,\
+	maxval,\
+	valptr,\
+	XP_OPT_STR_DUMMY,\
+}
+
+xp_option_t xxx[] = {
+    XP_OPT_FLOAT(
+	"power",
+	&power,
+	55.0,
+	MIN_PLAYER_POWER,
+	MAX_PLAYER_POWER,
+	NULL,
+	"Set the engine power.\n"
+	"Valid values are in the range 5-55.\n",
+	),
+};
 
 
 cl_option_t default_options[] = {
