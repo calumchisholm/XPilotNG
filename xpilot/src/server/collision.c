@@ -312,17 +312,19 @@ static void PlayerCollision(void)
 	if (BIT(World.rules->mode, CRASH_WITH_PLAYER | BOUNCE_WITH_PLAYER)) {
 	    for (j = i + 1; j < NumPlayers; j++) {
 		player *pl_j = Players(j);
+		int range;
 
 		if (!Player_is_playing(pl_j))
 		    continue;
 		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
 		    continue;
+		range = (2*SHIP_SZ-6) * CLICK;
 		if (is_polygon_map || !useOldCode) {
 		    if (!in_range_acd(pl->prevpos.cx - pl_j->prevpos.cx,
 				      pl->prevpos.cy - pl_j->prevpos.cy,
 				      pl->extmove.cx - pl_j->extmove.cx,
 				      pl->extmove.cy - pl_j->extmove.cy,
-				      (2*SHIP_SZ-6) * CLICK)) {
+				      range)) {
  			continue;
 		    }
 		} else {
@@ -332,7 +334,7 @@ static void PlayerCollision(void)
 					  pl_j->prevpos.cy,
 					  pl_j->pos.cx,
 					  pl_j->pos.cy,
-					  PIXEL_TO_CLICK(2*SHIP_SZ-6))) {
+					  range)) {
 			continue;
 		    }
 		}
@@ -663,7 +665,6 @@ static void PlayerObjectCollision(player *pl)
     int		j, range, radius, hit, obj_count;
     object	*obj, **obj_list;
 
-
     /*
      * Collision between a player and an object.
      */
@@ -677,27 +678,28 @@ static void PlayerObjectCollision(player *pl)
     for (j = 0; j < obj_count; j++) {
 	obj = obj_list[j];
 
+	range = (SHIP_SZ + obj->pl_range) * CLICK;
+
 	if (is_polygon_map || !useOldCode) {
-	    range = SHIP_SZ + obj->pl_range;
 	    switch (obj->collmode) {
 	    case 0:
 		hit = in_range_simple(pl->pos.cx, pl->pos.cy,
 				      obj->pos.cx, obj->pos.cy,
-				      range * CLICK);
+				      range);
 		break;
 	    case 1:
 		hit = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
 				   pl->prevpos.cy - obj->prevpos.cy,
 				   pl->extmove.cx - obj->extmove.cx,
 				   pl->extmove.cy - obj->extmove.cy,
-				   range * CLICK);
+				   range);
 		break;
 	    case 2:
 		hit = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
 				       pl->prevpos.cy - obj->prevpos.cy,
 				       pl->extmove.cx - obj->extmove.cx,
 				       pl->extmove.cy - obj->extmove.cy,
-				       range * CLICK, obj->wall_time);
+				       range, obj->wall_time);
 		break;
 	    case 3:
 	    default:
@@ -712,12 +714,11 @@ static void PlayerObjectCollision(player *pl)
 	    if (obj->life <= 0)
 		continue;
 
-	    range = SHIP_SZ + obj->pl_range;
 	    if (!in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
 				  pl->pos.cx, pl->pos.cy,
 				  obj->prevpos.cx, obj->prevpos.cy,
 				  obj->pos.cx, obj->pos.cy,
-				  range * CLICK)) {
+				  range)) {
 		continue;
 	    }
 	}
@@ -774,7 +775,7 @@ static void PlayerObjectCollision(player *pl)
 	/*
 	 * Objects actually only hit the player if they are really close.
 	 */
-	radius = SHIP_SZ + obj->pl_radius;
+	radius = (SHIP_SZ + obj->pl_radius) * CLICK;
 	if (radius >= range) {
 	    hit = 1;
 	} else {
@@ -783,21 +784,21 @@ static void PlayerObjectCollision(player *pl)
 		case 0:
 		    hit = in_range_simple(pl->pos.cx, pl->pos.cy,
 					  obj->pos.cx, obj->pos.cy,
-					  radius * CLICK);
+					  radius);
 		    break;
 		case 1:
 		    hit = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
 				       pl->prevpos.cy - obj->prevpos.cy,
 				       pl->extmove.cx - obj->extmove.cx,
 				       pl->extmove.cy - obj->extmove.cy,
-				       radius * CLICK);
+				       radius);
 		    break;
 		case 2:
 		    hit = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
 					   pl->prevpos.cy - obj->prevpos.cy,
 					   pl->extmove.cx - obj->extmove.cx,
 					   pl->extmove.cy - obj->extmove.cy,
-					   radius * CLICK, obj->wall_time);
+					   radius, obj->wall_time);
 		    break;
 		default:
 		    warn("Unimplemented collision mode %d", obj->collmode);
@@ -808,7 +809,7 @@ static void PlayerObjectCollision(player *pl)
 				       pl->pos.cx, pl->pos.cy,
 				       obj->prevpos.cx, obj->prevpos.cy,
 				       obj->pos.cx, obj->pos.cy,
-				       range * CLICK);
+				       range);
 
 
 	    }
@@ -910,7 +911,7 @@ static void Player_collides_with_ball(player *pl, object *obj, int radius)
      * shields up, or die with shields down.  The treasure may
      * be destroyed.
      */
-    Obj_repel((object *)pl, obj, PIXEL_TO_CLICK(radius));
+    Obj_repel((object *)pl, obj, radius);
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 	Add_fuel(&(pl->fuel), (long)ED_BALL_HIT);
@@ -1604,27 +1605,27 @@ static void AsteroidCollision(void)
 		&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE))
 		continue;
 
-	    radius = ast->pl_radius + obj->pl_radius;
+	    radius = (ast->pl_radius + obj->pl_radius) * CLICK;
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
 		    hit = in_range_simple(ast->pos.cx, ast->pos.cy,
 					  obj->pos.cx, obj->pos.cy,
-					  radius * CLICK);
+					  radius);
 		    break;
 		case 1:
 		    hit = in_range_acd(ast->prevpos.cx - obj->prevpos.cx,
 				       ast->prevpos.cy - obj->prevpos.cy,
 				       ast->extmove.cx - obj->extmove.cx,
 				       ast->extmove.cy - obj->extmove.cy,
-				       radius * CLICK);
+				       radius);
 		    break;
 		case 2:
 		    hit = in_range_partial(ast->prevpos.cx - obj->prevpos.cx,
 					   ast->prevpos.cy - obj->prevpos.cy,
 					   ast->extmove.cx - obj->extmove.cx,
 					   ast->extmove.cy - obj->extmove.cy,
-					   radius * CLICK, obj->wall_time);
+					   radius, obj->wall_time);
 		    break;
 		case 3:
 		default:
@@ -1640,14 +1641,14 @@ static void AsteroidCollision(void)
 				      ast->pos.cx, ast->pos.cy,
 				      obj->prevpos.cx, obj->prevpos.cy,
 				      obj->pos.cx, obj->pos.cy,
-				      radius * CLICK)) {
+				      radius)) {
 		    continue;
 		}
 	    }
 
 	    switch (obj->type) {
 	    case OBJ_BALL:
-		Obj_repel(ast, obj, PIXEL_TO_CLICK(radius));
+		Obj_repel(ast, obj, radius);
 		if (treasureCollisionDestroys)
 		    obj->life = 0;
 		damage = ED_BALL_HIT;
@@ -1743,7 +1744,7 @@ static void AsteroidCollision(void)
 /* do ball - object and ball - checkpoint collisions */
 static void BallCollision(void)
 {
-    int         i, j, obj_count;
+    int         i, j, obj_count, radius;
     int		ignored_object_types;
     object    **obj_list;
     object     *obj;
@@ -1797,7 +1798,7 @@ static void BallCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
-	    int r, hit;
+	    int hit;
 
 	    obj = obj_list[j];
 
@@ -1816,27 +1817,27 @@ static void BallCollision(void)
 		continue;
 	    }
 
-	    r = (ball->pl_radius + obj->pl_radius) * CLICK;
+	    radius = (ball->pl_radius + obj->pl_radius) * CLICK;
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
 		    hit = in_range_simple(ball->pos.cx, ball->pos.cy,
 					  obj->pos.cx, obj->pos.cy,
-					  r);
+					  radius);
 		    break;
 		case 1:
 		    hit = in_range_acd(ball->prevpos.cx - obj->prevpos.cx,
 				       ball->prevpos.cy - obj->prevpos.cy,
 				       ball->extmove.cx - obj->extmove.cx,
 				       ball->extmove.cy - obj->extmove.cy,
-				       r);
+				       radius);
 		    break;
 		case 2:
 		    hit = in_range_partial(ball->prevpos.cx - obj->prevpos.cx,
 					   ball->prevpos.cy - obj->prevpos.cy,
 					   ball->extmove.cx - obj->extmove.cx,
 					   ball->extmove.cy - obj->extmove.cy,
-					   r, obj->wall_time);
+					   radius, obj->wall_time);
 		    break;
 		default:
 		    warn("Unimplemented collision mode %d", obj->collmode);
@@ -1849,7 +1850,7 @@ static void BallCollision(void)
 				      ball->pos.cx, ball->pos.cy,
 				      obj->prevpos.cx, obj->prevpos.cy,
 				      obj->pos.cx, obj->pos.cy,
-				      r)) {
+				      radius)) {
 		    continue;
 		}
 	    }
@@ -1880,8 +1881,7 @@ static void BallCollision(void)
 		    obj->life  = 0;
 		} else {
 		    /* they bounce */
-		    Obj_repel((object*)ball, obj,
-			      PIXEL_TO_CLICK(ball->pl_radius + obj->pl_radius));
+		    Obj_repel((object*)ball, obj, radius);
 		}
 		break;
 
