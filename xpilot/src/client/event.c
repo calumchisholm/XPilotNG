@@ -210,12 +210,25 @@ static bool Key_press_select_lose_item(void)
     return true;
 }
 
+/* kps hack */
+#define DEFAULT_KEY_POINTER_CONTROL "space"
+
 
 bool Key_press(keys_t key)
 {
+    static bool thrusthelp = false;
+
     Key_check_talk_macro(key);
 
     switch (key) {
+    case KEY_THRUST:
+	if (newbie && !thrusthelp && !pointerControl) {
+	    Add_newbie_message("Steering with mouse is superior. Press " 
+			       DEFAULT_KEY_POINTER_CONTROL " to enable it.");
+	    thrusthelp = true;
+	}
+	break;
+
     case KEY_ID_MODE:
 	return (Key_press_id_mode());
 
@@ -271,9 +284,6 @@ bool Key_press(keys_t key)
 
     case KEY_TOGGLE_MESSAGES:
 	return Key_press_show_messages();
-
-/* kps hack */
-#define DEFAULT_KEY_POINTER_CONTROL "space"
 
     case KEY_POINTER_CONTROL:
 	if (!pointerControl)
