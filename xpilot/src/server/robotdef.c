@@ -97,7 +97,6 @@ static bool Really_empty_space(player_t *pl, int x, int y)
     int inside = 0, outside = 0;
     hitmask_t hitmask = NONBALL_BIT; /* kps - ok ? */
     
-    UNUSED_PARAM(pl);
     /* 	 
      * kps hack - check a few positions inside the block, if none of them
      * are inside, assume it is empty
@@ -108,6 +107,16 @@ static bool Really_empty_space(player_t *pl, int x, int y)
     for (i = -1; i <= 1; i++) {
 	for (j = -1; j <= 1; j++) {
 	    group = is_inside(cx + i * delta, cy + j * delta, hitmask, NULL);
+
+	    /* hack so that robots won't rotate in destination wormholes */
+	    if (group != NO_GROUP) {
+		group_t *gp = groupptr_by_id(group);
+		if (gp != NULL
+		    && gp->type == WORMHOLE
+		    && gp->mapobj_ind == pl->wormHoleDest)
+		    group = NO_GROUP;
+	    }
+
 	    if (group != NO_GROUP)
 		inside++;
 	    else
