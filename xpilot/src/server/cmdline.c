@@ -3591,7 +3591,7 @@ static option_desc options[] = {
     {
 	"ngControls",
 	"ngControls",
-	"false",
+	"true",
 	&ngControls,
 	valBool,
 	tuner_dummy,
