@@ -269,7 +269,10 @@ extern erase_t		erase[2],
 # define PAINT_FREE	1
 #endif
 #if PAINT_FREE
-# define RELEASE(P, N, M)	if (!(N)) ; else (free(P), (M) = 0, (N) = 0)
+# define RELEASE(P, N, M)					\
+do {								\
+	if (!(N)) ; else (free(P), (M) = 0, (N) = 0);		\
+} while (0)
 #else
 # define RELEASE(P, N, M)	((N) = 0)
 #endif
