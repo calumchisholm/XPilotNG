@@ -25,11 +25,7 @@
 
 #include "xpserver.h"
 
-#if defined(_WINDOWS)
-#define	META_VERSION	TITLE
-#else
 #define META_VERSION	VERSION "ng"
-#endif
 
 char metaserver_version[] = VERSION;
 
