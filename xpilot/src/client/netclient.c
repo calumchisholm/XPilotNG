@@ -348,7 +348,11 @@ static void parse_styles(char **callptr)
 	edge_styles[i].width = *ptr++;
 	edge_styles[i].color = wallColor;
 	edge_styles[i].rgb = get_32bit(&ptr);
-	edge_styles[i].style = *ptr++;
+        edge_styles[i].style = 
+            (*ptr == 1) ? LineOnOffDash :
+            (*ptr == 2) ? LineDoubleDash :
+            LineSolid;
+        ptr++;
     }
 
     for (i = 0; i < num_bmaps; i++) {
