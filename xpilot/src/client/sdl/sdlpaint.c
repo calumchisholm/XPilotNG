@@ -3,23 +3,7 @@
  *
  * Copyright (C) 2003-2004 Juha Lindström <juhal@users.sourceforge.net>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
+ * Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -38,7 +22,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include "xpclient.h"
@@ -311,53 +295,6 @@ void Paint_cleanup(void)
     for (i=0;i<2*MAX_MSGS;++i)
     	if (message_texs[i].texture) free_string_texture(&message_texs[i]);
 }
-
-/* kps - can we rather use Check_view_dimensions in paint.c ? */
-#if 0
-int Check_view_dimensions(void)
-{
-    int			width_wanted, height_wanted;
-    int			srv_width, srv_height;
-
-    /* TODO: once the scaling is implemented these should be computed
-     * somehow. For the moment they equal to draw_*
-    width_wanted = (int)(draw_width * scaleFactor + 0.5);
-    height_wanted = (int)(draw_height * scaleFactor + 0.5);
-    */
-    width_wanted = draw_width / scale;
-    height_wanted = draw_height / scale;
-
-    srv_width = width_wanted;
-    srv_height = height_wanted;
-    LIMIT(srv_height, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
-    LIMIT(srv_width, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
-    if (server_display.view_width != srv_width ||
-	server_display.view_height != srv_height) {
-	if (Send_display(srv_width, 
-			 srv_height, 
-			 spark_rand, 
-			 num_spark_colors))
-	    return -1;
-    }
-    active_view_width = server_display.view_width;
-    active_view_height = server_display.view_height;
-    ext_view_x_offset = 0;
-    ext_view_y_offset = 0;
-    if (width_wanted > active_view_width) {
-	ext_view_width = width_wanted;
-	ext_view_x_offset = (width_wanted - active_view_width) / 2;
-    } else {
-	ext_view_width = active_view_width;
-    }
-    if (height_wanted > active_view_height) {
-	ext_view_height = height_wanted;
-	ext_view_y_offset = (height_wanted - active_view_height) / 2;
-    } else {
-	ext_view_height = active_view_height;
-    }
-    return 0;
-}
-#endif
 
 /* This one works best for things that are fixed in position
  * since they won't appear to move relative to eachother
