@@ -177,14 +177,15 @@ static void Paint_objects_radar(void)
     int			i, x, y, xw, yw, color;
 
     for (i = 0; i < num_radar; i++) {
-	int s = radar_ptr[i].size;
+	int rs = radar_ptr[i].size;
+	unsigned s = (rs <= 0 ? 1 : radar_ptr[i].size);
 
-	if (s <= 0)
-	    s = 1;
 	color = WHITE;
 	if (radar_ptr[i].type == friend) {
-	    if (maxColors > 4) color = 4;
-	    else if (!colorSwitch) color = RED;
+	    if (maxColors > 4)
+		color = 4;
+	    else if (!colorSwitch)
+		color = RED;
 	}
 	XSetForeground(dpy, radarGC, colors[color].pixel);
 	x = radar_ptr[i].x - s / 2 - slidingradar_x;
@@ -317,12 +318,12 @@ static void Paint_radar_block(int xi, int yi, int color)
 	xw -= xp;
 	yw = yp - yw;
 	yp = RadarHeight - 1 - yp;
-	XFillRectangle(dpy, radarPixmap2, radarGC, xp, yp, xw+1, yw+1);
+	XFillRectangle(dpy, radarPixmap2, radarGC, xp, yp,
+		       (unsigned)xw+1, (unsigned)yw+1);
     }
-    if (radarPixmap2 == radarPixmap) {
+    if (radarPixmap2 == radarPixmap)
 	XSetPlaneMask(dpy, radarGC,
 		      AllPlanes & ~(dpl_2[0] | dpl_2[1]));
-    }
 }
 
 static void Paint_world_radar_old(void)
