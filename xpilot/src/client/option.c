@@ -1106,49 +1106,6 @@ static void Get_float_resource(XrmDatabase db,
 }
 
 
-
-static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
-{
-    char		resValue[MAX(2*MSG_LEN, PATH_MAX + 1)];
-
-    Get_resource(db, "shipShape", resValue, sizeof resValue);
-    *ship_shape = xp_strdup(resValue);
-    if (*ship_shape && **ship_shape && !strchr(*ship_shape, '(' )) {
-	/* so it must be the name of shipshape defined in the shipshapefile. */
-	Get_resource(db, "shipShapeFile", resValue, sizeof resValue);
-	if (resValue[0] != '\0') {
-	    FILE *fp = fopen(resValue, "r");
-	    if (!fp)
-		perror(resValue);
-	    else {
-		char *ptr;
-		char *str;
-		char line[1024];
-		while (fgets(line, sizeof line, fp)) {
-		    if ((str = strstr(line, "(name:" )) != NULL
-			|| (str = strstr(line, "(NM:" )) != NULL) {
-			str = strchr(str, ':');
-			while (*++str == ' ');
-			if ((ptr = strchr(str, ')' )) != NULL)
-			    *ptr = '\0';
-			if (!strcmp(str, *ship_shape)) {
-			    /* Gotcha */
-			    free(*ship_shape);
-			    if (ptr != NULL)
-				*ptr = ')';
-			    *ship_shape = xp_strdup(line);
-			    break;
-			}
-		    }
-		}
-		fclose(fp);
-	    }
-	}
-    }
-}
-
-
-
 void Parse_options(int *argcp, char **argvp)
 {
     char		*ptr, *str;
