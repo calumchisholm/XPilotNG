@@ -31,8 +31,6 @@
 
 #include "xpserver.h"
 
-char command_version[] = VERSION;
-
 
 /*
  * Look if any player's name is exactly 'str',

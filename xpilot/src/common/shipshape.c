@@ -25,8 +25,6 @@
 
 #include "xpcommon.h"
 
-char shipshape_version[] = VERSION;
-
 static int	Get_shape_keyword(char *keyw);
 static int	shape2wire(char *ship_shape_str, shipshape_t *ship);
 static void	Rotate_ship(shipshape_t *ship);

@@ -54,8 +54,6 @@
 #include "items/itemAutopilot.xbm"
 #include "items/itemEmergencyShield.xbm"
 
-char xinit_version[] = VERSION;
-
 
 /* How far away objects should be placed from each other etc... */
 #define BORDER			10

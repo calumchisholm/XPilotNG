@@ -25,8 +25,6 @@
 
 #include "xpserver.h"
 
-char race_version[] = VERSION;
-
 void Race_compute_game_status(world_t *world)
 {
     /*

@@ -25,8 +25,6 @@
 
 #include "xpclient.h"
 
-char meta_version[] = VERSION;
-
 static struct Meta metas[NUM_METAS] = {
     {META_HOST,     META_IP,     META_INIT_SOCK, MetaConnecting},
     {META_HOST_TWO, META_IP_TWO, META_INIT_SOCK, MetaConnecting}

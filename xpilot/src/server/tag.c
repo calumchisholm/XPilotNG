@@ -23,8 +23,6 @@
 
 #include "xpserver.h"
 
-char tag_version[] = VERSION;
-
 int tagItPlayerId = NO_ID;	/* player who is 'it' */
 
 void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl)

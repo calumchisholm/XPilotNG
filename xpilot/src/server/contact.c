@@ -25,9 +25,6 @@
 
 #include "xpserver.h"
 
-char contact_version[] = VERSION;
-
-
 /*
  * Global variables
  */

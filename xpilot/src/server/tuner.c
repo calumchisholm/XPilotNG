@@ -25,8 +25,6 @@
 
 #include "xpserver.h"
 
-char tuner_version[] = VERSION;
-
 void tuner_plock(world_t *world)
 {
     UNUSED_PARAM(world);

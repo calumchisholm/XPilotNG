@@ -27,9 +27,6 @@
 
 #include "xpserver.h"
 
-char robotdef_version[] = VERSION;
-
-
 #define ROB_LOOK_AH		2
 
 #define WITHIN(NOW,THEN,DIFF) (NOW<=THEN && (THEN-NOW)<DIFF)

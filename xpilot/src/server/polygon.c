@@ -23,8 +23,6 @@
 
 #include "xpserver.h"
 
-char polygon_version[] = VERSION;
-
 /* polygon map format related stuff */
 int num_edges, max_edges;
 

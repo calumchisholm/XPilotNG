@@ -29,8 +29,6 @@
 #include "glwidgets.h"
 #include "../xhacks.h"
 
-char sdlevent_version[] = VERSION;
-
 /* TODO: remove these from client.h and put them in *event.h */
 bool            initialPointerControl = false;
 bool            pointerControl = false;

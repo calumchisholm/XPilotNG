@@ -25,9 +25,6 @@
 
 #include "xpserver.h"
 
-char modifiers_version[] = VERSION;
-
-
 /*
  * Fast conversion of 'num' into 'str' starting at position 'i', returns
  * index of character after converted number.

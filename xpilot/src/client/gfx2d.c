@@ -25,9 +25,6 @@
 
 #include "xpclient.h"
 
-
-char gfx2d_version[] = VERSION;
-
 char	*texturePath = NULL;		/* Path list of texture directories */
 
 /*

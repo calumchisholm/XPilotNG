@@ -30,9 +30,6 @@
 
 #include "xpcommon.h"
 
-char math_version[] = VERSION;
-
-
 double		tbl_sin[TABLE_SIZE];
 double		tbl_cos[TABLE_SIZE];
 

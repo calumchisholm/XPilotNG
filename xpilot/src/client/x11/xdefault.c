@@ -27,8 +27,6 @@
 
 #include "xpclient_x11.h"
 
-char xdefault_version[] = VERSION;
-
 bool	titleFlip;		/* Do special title bar flipping? */
 
 bool pre_exists = False;

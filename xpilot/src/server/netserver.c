@@ -94,8 +94,6 @@
 
 #include "xpserver.h"
 
-char netserver_version[] = VERSION;
-
 static int Init_setup(world_t *world);
 static int Handle_listening(connection_t *connp);
 static int Handle_setup(connection_t *connp);

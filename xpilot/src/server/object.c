@@ -29,9 +29,6 @@
 
 #include "xpserver.h"
 
-char object_version[] = VERSION;
-
-
 /*
  * Global variables
  */

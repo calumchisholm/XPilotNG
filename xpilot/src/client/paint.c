@@ -25,8 +25,6 @@
 
 #include "xpclient.h"
 
-char paint_version[] = VERSION;
-
 /*
  * Globals.
  */

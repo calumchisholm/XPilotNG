@@ -27,8 +27,6 @@
 
 #include "xpclient_x11.h"
 
-char painthud_version[] = VERSION;
-
 int hudColor;		/* Color index for HUD drawing, has to be global for windoze */
 static int hudHLineColor;	/* Color index for horiz. HUD line drawing */
 static int hudVLineColor;	/* Color index for vert. HUD line drawing */

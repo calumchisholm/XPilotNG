@@ -25,10 +25,6 @@
 
 #include "xpserver.h"
 
-char            fileparser_version[] = VERSION;
-
-
-
 static char    *FileName;
 static int      LineNumber;
 

@@ -25,8 +25,6 @@
 
 #include "xpclient.h"
 
-char datagram_version[] = VERSION;
-
 
 int			dgram_one_socket = 0;
 

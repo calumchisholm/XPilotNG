@@ -20,8 +20,6 @@
 
 #include "xpserver.h"
 
-char recwrap_version[] = VERSION;
-
 /* RECORDING WON'T WORK PROPERLY ON WINDOWS BECAUSE OF
  * errno = WSAGetLastError();
  */

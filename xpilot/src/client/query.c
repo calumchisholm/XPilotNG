@@ -25,8 +25,6 @@
 
 #include "xpclient.h"
 
-char query_version[] = VERSION;
-
 
 #if defined(_WINDOWS)
 # ifndef QUERY_FUDGED

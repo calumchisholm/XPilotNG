@@ -38,10 +38,6 @@
 
 #define SOCK_GETHOST_TIMEOUT	6
 
-
-char socklib_version[] = VERSION;
-
-
 static jmp_buf		env;
 
 

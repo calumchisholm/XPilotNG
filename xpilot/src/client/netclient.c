@@ -27,8 +27,6 @@
 
 #include "xpclient.h"
 
-char netclient_version[] = VERSION;
-
 #define TALK_RETRY	2
 #define MAX_MAP_ACK_LEN	500
 #define KEYBOARD_STORE	20

@@ -30,8 +30,6 @@
 
 #include "xpclient_x11.h"
 
-char welcome_version[] = VERSION;
-
 /*
  * Are we in the process of quitting, or joining a game.
  */

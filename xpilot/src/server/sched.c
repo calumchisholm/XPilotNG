@@ -28,8 +28,6 @@
 
 #include "xpserver.h"
 
-char sched_version[] = VERSION;
-
 /* Windows incorrectly uses u_int in FD_CLR */
 #ifdef _WINDOWS
 typedef	u_int	FDTYPE;

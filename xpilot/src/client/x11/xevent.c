@@ -26,9 +26,6 @@
 #include "xpclient_x11.h"
 #include "../xhacks.h"
 
-char xevent_version[] = VERSION;
-
-
 bool		initialPointerControl = false;
 bool		pointerControl = false;
 

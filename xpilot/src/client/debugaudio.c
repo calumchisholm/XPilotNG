@@ -31,8 +31,6 @@
 
 #include "xpclient.h"
 
-char audio_version[] = VERSION;
-
 int audioDeviceInit(char *display)
 {
     printf("debug audio: init\n");

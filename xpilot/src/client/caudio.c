@@ -30,8 +30,6 @@
 #define _CAUDIO_C_
 #include "xpclient.h"
 
-char caudio_version[] = VERSION;
-
 #define	MAX_RANDOM_SOUNDS	6
 
 static int	audioEnabled = 0;

@@ -25,9 +25,6 @@
 
 #include "xpclient_x11.h"
 
-char xeventhandlers_version[] = VERSION;
-
-
 #ifdef DEVELOPMENT
 time_t	back_in_play_since;
 #endif

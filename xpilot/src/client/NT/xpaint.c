@@ -27,8 +27,6 @@
 
 #include "xpclient_x11.h"
 
-char xpaint_version[] = VERSION;
-
 /*
  * Globals.
  */

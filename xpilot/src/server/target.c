@@ -25,8 +25,6 @@
 
 #include "xpserver.h"
 
-char target_version[] = VERSION;
-
 void Target_update(world_t *world)
 {
     int i, j;

@@ -25,8 +25,6 @@
 
 #include "xpclient.h"
 
-char client_version[] = VERSION;
-
 client_data_t	clData;
 
 char	*geometry;

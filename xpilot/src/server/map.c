@@ -30,8 +30,6 @@
 
 #include "xpserver.h"
 
-char map_version[] = VERSION;
-
 #define GRAV_RANGE  10
 
 /*

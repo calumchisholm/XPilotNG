@@ -27,8 +27,6 @@
 
 #include "xpserver.h"
 
-char shot_version[] = VERSION;
-
 #define MISSILE_POWER_SPEED_FACT	0.25
 #define MISSILE_POWER_TURNSPEED_FACT	0.75
 #define MINI_TORPEDO_SPREAD_TIME	6

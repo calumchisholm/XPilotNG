@@ -30,8 +30,6 @@
 
 #include "xpserver.h"
 
-char frame_version[] = VERSION;
-
 
 #define MAX_SHUFFLE_INDEX	65535
 

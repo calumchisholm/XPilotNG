@@ -30,9 +30,6 @@
 
 #include "xpserver.h"
 
-char item_version[] = VERSION;
-
-
 static void Item_update_flags(player_t *pl)
 {
     if (pl->item[ITEM_CLOAK] <= 0

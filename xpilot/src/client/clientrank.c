@@ -20,8 +20,6 @@
 
 #include "xpclient.h"
 
-char clientrank_version[] = VERSION;
-
 #define MAX_SCORES 500
 
 char clientRankFile[PATH_MAX];

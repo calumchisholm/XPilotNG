@@ -25,8 +25,6 @@
 
 #include "xpserver.h"
 
-char option_version[] = VERSION;
-
 /*
  * This module implements an in memory server option database.
  * Each option is made up by its names (one or two) and its

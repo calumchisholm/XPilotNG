@@ -20,9 +20,6 @@
 
 #include "xpserver.h"
 
-char srecord_version[] = VERSION;
-
-
 int   playback = 0;
 int   record = 0;
 int   *playback_ints;

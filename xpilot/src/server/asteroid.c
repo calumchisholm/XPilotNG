@@ -26,9 +26,6 @@
 
 #include "xpserver.h"
 
-char asteroid_version[] = VERSION;
-
-
 /* list containing pointers to all asteroids */
 static list_t	Asteroid_list = NULL;
 

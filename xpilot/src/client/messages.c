@@ -27,9 +27,6 @@
 
 #include "xpclient.h"
 
-char messages_version[] = VERSION;
-
-
 message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
 message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
 char		*HistoryMsg[MAX_HIST_MSGS];

@@ -23,8 +23,6 @@
 
 #include "xpserver.h"
 
-char rank_version[] = VERSION;
-
 /* MAX_SCORES = how many players we remember */
 #define MAX_SCORES 300
 

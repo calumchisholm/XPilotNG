@@ -25,9 +25,6 @@
 
 #include "xpserver.h"
 
-char cell_version[] = VERSION;
-
-
 /* we only search for objects which are at most 28 blocks away. */
 #define MAX_CELL_DIST		28
 

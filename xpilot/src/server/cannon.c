@@ -26,9 +26,6 @@
 
 #include "xpserver.h"
 
-char cannon_version[] = VERSION;
-
-
 static int Cannon_select_weapon(cannon_t *cannon);
 static void Cannon_aim(cannon_t *cannon, int weapon,
 		       player_t **pl_p, int *dir);

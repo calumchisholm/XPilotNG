@@ -29,9 +29,6 @@
 
 #define DEFAULT_ROBOT_TYPE	"default"
 
-char robot_version[] = VERSION;
-
-
 /*
  * Array of different robots which are used
  * when we cannot read a robot configuration file.

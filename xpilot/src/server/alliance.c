@@ -30,9 +30,6 @@
 
 #include "xpserver.h"
 
-char alliance_version[] = VERSION;
-
-
 /*
  * Alliance information.
  */

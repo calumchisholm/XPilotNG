@@ -27,8 +27,6 @@
 
 #include "xpserver.h"
 
-char xpmap_version[] = VERSION;
-
 static int Compress_map(unsigned char *map, size_t size);
 
 static void Xpmap_treasure_to_polygon(world_t *world, int treasure_ind);

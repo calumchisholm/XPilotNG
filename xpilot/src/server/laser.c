@@ -27,9 +27,6 @@
 
 #include "xpserver.h"
 
-char laser_version[] = VERSION;
-
-
 void Fire_laser(player_t *pl)
 {
     clpos_t m_gun, pos;

@@ -27,8 +27,6 @@
 
 #include "xpclient_x11.h"
 
-char guiobjects_version[] = VERSION;
-
 static bool texturedShips = false; /* Turned this off because the images drawn
 				    * don't match the actual shipshape used
 				    * for wall collisions by the server. */

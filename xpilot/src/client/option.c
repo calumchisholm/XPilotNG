@@ -27,8 +27,6 @@
 
 #include "xpclient.h"
 
-char option_version[] = VERSION;
-
 int num_options = 0;
 int max_options = 0;
 

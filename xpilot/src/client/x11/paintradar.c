@@ -27,8 +27,6 @@
 
 #include "xpclient_x11.h"
 
-char paintradar_version[] = VERSION;
-
 Window	radarWindow;
 Pixmap	radarPixmap, radarPixmap2;
 				/* Pixmaps for the radar (implements */

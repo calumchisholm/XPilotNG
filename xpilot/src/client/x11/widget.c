@@ -27,8 +27,6 @@
 
 #include "xpclient_x11.h"
 
-char widget_version[] = VERSION;
-
 typedef enum widget_type {
     WIDGET_DUMMY,
     WIDGET_FORM,

@@ -54,8 +54,6 @@
 
 #include "xpcommon.h"
 
-char randommt_version[] = VERSION;
-
 /*
 ** uint32 must be an unsigned integer type capable of holding at least 32
 ** bits; exactly 32 should be fastest, but 64 is better on an Alpha with

@@ -31,8 +31,6 @@
 
 #include "xpclient_x11.h"
 
-char configure_version[] = VERSION;
-
 static int Config_creator(xp_option_t *opt, int widget_desc, int *height);
 static int Config_create_save(int widget_desc, int *height);
 static int Config_close(int widget_desc, void *data, const char **strptr);

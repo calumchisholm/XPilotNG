@@ -25,9 +25,6 @@
 
 #include "xpserver.h"
 
-char rules_version[] = VERSION;
-
-
 #define MAX_FUEL                10000
 #define MAX_WIDEANGLE           99
 #define MAX_REARSHOT            99

@@ -25,10 +25,6 @@
 
 #include "xpclient_x11.h"
 
-
-char colors_version[] = VERSION;
-
-
 /* Kludge for visuals under C++ */
 #if defined(__cplusplus)
 #define class c_class

@@ -25,8 +25,6 @@
 
 #include "xpclient_x11.h"
 
-char join_version[] = VERSION;
-
 static int Handle_input(int new_input)
 {
     return x_event(new_input);

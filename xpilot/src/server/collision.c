@@ -30,8 +30,6 @@
 
 #include "xpserver.h"
 
-char collision_version[] = VERSION;
-
 /* new acd functions */
 /* doubles because the multiplies might overflow ints */
 static inline bool in_range_acd(double dx, double dy, double dvx, double dvy,

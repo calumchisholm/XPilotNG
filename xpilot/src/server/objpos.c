@@ -25,8 +25,6 @@
 
 #include "xpserver.h"
 
-char objpos_version[] = VERSION;
-
 
 void Object_position_set_clpos(world_t *world, object_t *obj, clpos_t pos)
 {

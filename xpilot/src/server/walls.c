@@ -27,8 +27,6 @@
 
 #include "xpserver.h"
 
-char walls_version[] = VERSION;
-
 struct move_parameters mp;
 static char msg[MSG_LEN];
 

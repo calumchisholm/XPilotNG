@@ -27,8 +27,6 @@
 
 #include "xpserver.h"
 
-char parser_version[] = VERSION;
-
 
 /*
  * Print the option list in "-help" format.

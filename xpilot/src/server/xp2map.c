@@ -25,8 +25,6 @@
 #include <zlib.h>
 #include "xpserver.h"
 
-char xp2map_version[] = VERSION;
-
 #define DEFAULT_POS { -1, -1 }
 
 /*

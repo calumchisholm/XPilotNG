@@ -42,8 +42,6 @@
 
 #define SCORE_BORDER 5
 
-char sdlpaint_version[] = VERSION;
-
 /*
  * Globals.
  */

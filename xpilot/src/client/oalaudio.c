@@ -36,8 +36,6 @@
 #define MAX_SOUNDS 16
 #define VOL_THRESHOLD 10
 
-char audio_version[] = VERSION;
-
 typedef struct {
     ALuint    buffer;
     ALfloat   gain;

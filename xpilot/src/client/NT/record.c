@@ -25,8 +25,6 @@
 
 #include "xpclient_x11.h"
 
-char record_version[] = VERSION;
-
 /*
  * GC elements for line drawing operations.
  */

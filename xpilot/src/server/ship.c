@@ -25,9 +25,6 @@
 
 #include "xpserver.h"
 
-char ship_version[] = VERSION;
-
-
 /******************************
  * Functions for ship movement.
  */

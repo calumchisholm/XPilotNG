@@ -27,8 +27,6 @@
 
 #include "xpserver.h"
 
-char saudio_version[] = VERSION;
-
 #define SOUND_RANGE_FACTOR	0.5	/* factor to increase sound
 					 * range by */
 #define SOUND_DEFAULT_RANGE	(BLOCK_CLICKS*15)

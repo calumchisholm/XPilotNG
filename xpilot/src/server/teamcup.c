@@ -20,8 +20,6 @@
 
 #include "xpserver.h"
 
-char teamcup_version[] = VERSION;
-
 static char teamcup_score_file_name[1024];
 static FILE *teamcup_score_file = NULL;
 

@@ -25,8 +25,6 @@
 
 #include "xpserver.h"
 
-char player_version[] = VERSION;
-
 
 bool		updateScores = true;
 

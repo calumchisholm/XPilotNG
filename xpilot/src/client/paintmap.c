@@ -25,8 +25,6 @@
 
 #include "xpclient.h"
 
-char paintmap_version[] = VERSION;
-
 
 static double 	hrLimitTime = 0.0;
 

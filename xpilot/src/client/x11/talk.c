@@ -25,9 +25,6 @@
 
 #include "xpclient_x11.h"
 
-char talk_version[] = VERSION;
-
-
 /* Information window dimensions */
 #define TALK_TEXT_HEIGHT	(talkFont->ascent + talkFont->descent)
 #define TALK_OUTSIDE_BORDER	2

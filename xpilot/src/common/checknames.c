@@ -25,8 +25,6 @@
 
 #include "xpcommon.h"
 
-char checknames_version[] = VERSION;
-
 int Check_user_name(char *name)
 {
     unsigned char *str;

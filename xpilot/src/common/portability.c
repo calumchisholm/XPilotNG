@@ -29,9 +29,6 @@
 
 #include "xpcommon.h"
 
-char portability_version[] = VERSION;
-
-
 int Get_process_id(void)
 {
 #if defined(_WINDOWS)
@@ -40,7 +37,6 @@ int Get_process_id(void)
     return getpid();
 #endif
 }
-
 
 void Get_login_name(char *buf, size_t size)
 {

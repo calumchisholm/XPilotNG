@@ -30,9 +30,6 @@
 
 #include "xpserver.h"
 
-char event_version[] = VERSION;
-
-
 bool team_dead(int team)
 {
     int i;

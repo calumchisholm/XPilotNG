@@ -25,10 +25,6 @@
 
 #include "xpclient_x11.h"
 
-char dbuff_version[] = VERSION;
-
-
-
 dbuff_state_t   *dbuf_state;	/* Holds current dbuff state */
 
 

@@ -25,9 +25,6 @@
 
 #include "xpclient_x11.h"
 
-
-char guimap_version[] = VERSION;
-
 static int baseNameColor;		/* Color index for base name drawing */
 static int backgroundPointColor;	/* background point drawing */
 static int fuelColor;			/* fuel station drawing */

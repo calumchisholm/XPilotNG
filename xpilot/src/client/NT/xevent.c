@@ -25,9 +25,6 @@
 
 #include "xpclient_x11.h"
 
-char xevent_version[] = VERSION;
-
-
 bool		initialPointerControl = false;
 bool		pointerControl = false;
 

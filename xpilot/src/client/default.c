@@ -27,8 +27,6 @@
 
 #include "xpclient.h"
 
-char default_version[] = VERSION;
-
 static double	hudScale;	/* Scale for HUD drawing */
 
 static bool Set_nickName(xp_option_t *opt, const char *value)

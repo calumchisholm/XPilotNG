@@ -32,9 +32,6 @@
 
 #include "xpserver.h"
 
-char cmdline_version[] = VERSION;
-
-
 double		friction;
 double		coriolisCosine, coriolisSine;	/* cos and sin of cor. angle */
 int		roundsPlayed;		/* # of rounds played sofar. */

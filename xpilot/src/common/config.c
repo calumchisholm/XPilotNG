@@ -25,9 +25,6 @@
 
 #include "xpcommon.h"
 
-char config_version[] = VERSION;
-
-
 char *Conf_datadir(void)
 {
     static char conf[] = CONF_DATADIR;

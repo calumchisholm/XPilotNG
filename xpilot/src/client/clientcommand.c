@@ -27,8 +27,6 @@
 
 #include "xpclient.h"
 
-char clientcommand_version[] = VERSION;
-
 const char c_commands[][16] = {
     "ignore", "i",
     "ignore!", "i!",

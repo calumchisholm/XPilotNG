@@ -27,8 +27,6 @@
 
 #include "xpclient.h"
 
-char textinterface_version[] = VERSION;
-
 
 #define MAX_LINE	MSG_LEN	/* should not be smaller than MSG_LEN */
 

@@ -27,9 +27,6 @@
 
 #define META_VERSION	VERSION
 
-char metaserver_version[] = VERSION;
-
-
 struct MetaServer {
     char name[64];
     char addr[16];

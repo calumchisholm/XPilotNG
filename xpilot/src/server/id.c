@@ -25,9 +25,6 @@
 
 #include "xpserver.h"
 
-char id_version[] = VERSION;
-
-
 static int		ID_queue[NUM_IDS];
 static int		ID_inuse[NUM_IDS + 1];
 static int		ID_inited = 0;

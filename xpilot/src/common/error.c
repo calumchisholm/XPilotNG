@@ -8,8 +8,6 @@
  */
 #include "xpcommon.h"
 
-char error_version[] = VERSION;
-
 /*
  * This file defines several entry points:
  *
