@@ -42,7 +42,8 @@ char myhostname[MAX_HOST_LEN];
 int myteam;
 int myport;
 char *mygeometry = NULL;
-
+char myshutmsg[MAX_CHARS];
+char myshipshapefile[PATH_MAX + 1];
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 { NULL, NULL, NULL, NULL, NULL };
 
@@ -105,6 +106,16 @@ static char *getPointerButtonBinding(xp_option_t *opt)
     assert(ind < MAX_POINTER_BUTTONS);
 
     return pointerButtonBindings[ind];
+}
+
+static bool setShipShape(xp_option_t *opt, const char *value)
+{
+    return true;
+}
+
+static char *getShipShape(xp_option_t *opt)
+{
+    return "FOOBAR";
 }
 
 xp_option_t default_options[] = {
@@ -170,6 +181,48 @@ xp_option_t default_options[] = {
 	0
     },
 #endif
+
+    XP_STRING_OPTION(
+	"shipShape",
+	"",
+	NULL, 0,
+	setShipShape, getShipShape,
+	"Define the ship shape to use.  Because the argument to this option\n"
+	"is rather large (up to 500 bytes) the recommended way to set\n"
+	"this option is in the .xpilotrc file in your home directory.\n"
+	"The exact format is defined in the file doc/README.SHIPS in the\n"
+	"XPilot distribution. Note that there is a nifty Unix tool called\n"
+	"editss for easy ship creation. There is XPShipEditor for Windows\n"
+	"and Ship Shaper for Java.  See the XPilot FAQ for details.\n"
+	"See also the \"shipShapeFile\" option below.\n"),
+
+    XP_STRING_OPTION(
+	"shipShapeFile",
+	SHIP_FILE,  /*conf_ship_file_string,*/
+	myshipshapefile,
+	sizeof myshipshapefile,
+	NULL, NULL,
+	"An optional file where shipshapes can be stored.\n"
+	"If this resource is defined and it refers to an existing file\n"
+	"then shipshapes can be referenced to by their name.\n"
+	"For instance if you define shipShapeFile to be\n"
+	"/home/myself/.shipshapes and this file contains one or more\n"
+	"shipshapes then you can select the shipshape by starting xpilot as:\n"
+	"	xpilot -shipShape myshipshapename\n"
+	"Where \"myshipshapename\" should be the \"name:\" or \"NM:\" of\n"
+	"one of the shipshapes defined in /home/myself/.shipshapes.\n"
+	"Each shipshape definition should be defined on only one line,\n"
+	"where all characters up to the first left parenthesis don't matter.\n"
+	/* shipshopshapshepshit getting nuts from all these shpshp-s. */),
+
+    XP_STRING_OPTION(
+	"shutdown",
+	"",
+	myshutmsg,
+	sizeof myshutmsg,
+	NULL, NULL,
+	"Shutdown the server with a message.\n"
+	"The message used is the first argument to this option.\n"),
 
     XP_STRING_OPTION(
 	"name",
@@ -866,50 +919,6 @@ xp_option_t default_options[] = {
 
 
 
-    {
-	"shutdown",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Shutdown the server with a message.\n"
-	"The message used is the first argument to this option.\n",
-	0
-    },
-
-    {
-	"shipShape",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Define the ship shape to use.  Because the argument to this option\n"
-	"is rather large (up to 500 bytes) the recommended way to set\n"
-	"this option is in the .xpilotrc file in your home directory.\n"
-	"The exact format is defined in the file doc/README.SHIPS in the\n"
-	"XPilot distribution. Note that there is a nifty Unix tool called\n"
-	"editss for easy ship creation. There is XPShipEditor for Windows\n"
-	"and Ship Shaper for Java.  See the XPilot FAQ for details.\n"
-	"See also the \"shipShapeFile\" option below.\n",
-	0
-    },
-    {
-	"shipShapeFile",
-	NULL,
-	conf_ship_file_string,
-	KEY_DUMMY,
-	"An optional file where shipshapes can be stored.\n"
-	"If this resource is defined and it refers to an existing file\n"
-	"then shipshapes can be referenced to by their name.\n"
-	"For instance if you define shipShapeFile to be\n"
-	"/home/myself/.shipshapes and this file contains one or more\n"
-	"shipshapes then you can select the shipshape by starting xpilot as:\n"
-	"	xpilot -shipShape myshipshapename\n"
-	"Where \"myshipshapename\" should be the \"name:\" or \"NM:\" of\n"
-	"one of the shipshapes defined in /home/myself/.shipshapes.\n"
-	"Each shipshape definition should be defined on only one line,\n"
-	"where all characters up to the first left parenthesis don't matter.\n"
-	/* shipshopshapshepshit getting nuts from all these shpshp-s. */,
-	0
-    },
 
 
 
