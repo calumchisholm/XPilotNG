@@ -49,8 +49,8 @@ long			main_loops = 0;		/* needed in events.c */
 bool			is_server = true;	/* used in common code */
 
 static bool		NoPlayersEnteredYet = true;
-int			game_lock = false;
-int			mute_baseless;
+bool			game_lock = false;
+bool			mute_baseless = false;
 
 time_t			gameOverTime = 0;
 time_t			serverStartTime = 0;
