@@ -106,30 +106,38 @@
 
 #ifdef SERVER
 #include "../server/click.h"
-#define SHIPCOORD clpos
 #else
-#define SHIPCOORD position
+typedef int click_t;
+typedef struct {
+    click_t		cx, cy;
+} clpos;
 #endif
 
+typedef struct {
+    clpos clk;
+    position pxl;
+} shapepos;
+
+
 typedef struct {			/* Defines wire-obj, i.e. ship */
-    SHIPCOORD	*pts[MAX_SHIP_PTS];	/* the shape rotated many ways */
+    shapepos	*pts[MAX_SHIP_PTS];	/* the shape rotated many ways */
     int		num_points;		/* total points in object */
-    SHIPCOORD	engine[RES];		/* Engine position */
-    SHIPCOORD	m_gun[RES];		/* Main gun position */
+    shapepos	engine[RES];		/* Engine position */
+    shapepos	m_gun[RES];		/* Main gun position */
     int		num_l_gun,
 		num_r_gun,
 		num_l_rgun,
 		num_r_rgun;		/* number of additional cannons */
-    SHIPCOORD	*l_gun[MAX_GUN_PTS],	/* Additional cannon positions, left*/
+    shapepos	*l_gun[MAX_GUN_PTS],	/* Additional cannon positions, left*/
 		*r_gun[MAX_GUN_PTS],	/* Additional cannon positions, right*/
 		*l_rgun[MAX_GUN_PTS],	/* Additional rear cannon positions, left*/
 		*r_rgun[MAX_GUN_PTS];	/* Additional rear cannon positions, right*/
     int		num_l_light,		/* Number of lights */
 		num_r_light;
-    SHIPCOORD	*l_light[MAX_LIGHT_PTS], /* Left and right light positions */
+    shapepos	*l_light[MAX_LIGHT_PTS], /* Left and right light positions */
 		*r_light[MAX_LIGHT_PTS];
     int		num_m_rack;		/* Number of missile racks */
-    SHIPCOORD	*m_rack[MAX_RACK_PTS];
+    shapepos	*m_rack[MAX_RACK_PTS];
     int		shield_radius;		/* Radius of shield used by client. */
 
 #ifdef	_NAMEDSHIPS
@@ -146,8 +154,11 @@ extern void Calculate_shield_radius(shipobj *w);
 extern int Validate_shape_str(char *str);
 extern void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 				  unsigned shape_version);
-extern void Rotate_point(SHIPCOORD pt[RES]);
+extern void Rotate_point(shapepos pt[RES]);
+extern void Rotate_position(position pt[RES]);
+extern shapepos ipos2shapepos(ipos pos);
 
+#if 0
 #define Ship_get_point_clpos(ship, i, dir)       ((ship)->pts[i][dir])
 #define Ship_get_engine_clpos(ship, dir)         ((ship)->engine[dir])
 #define Ship_get_m_gun_clpos(ship, dir)          ((ship)->m_gun[dir])
@@ -156,10 +167,33 @@ extern void Rotate_point(SHIPCOORD pt[RES]);
 #define Ship_get_l_rgun_clpos(ship, gun, dir)    ((ship)->l_rgun[gun][dir])
 #define Ship_get_r_rgun_clpos(ship, gun, dir)    ((ship)->r_rgun[gun][dir])
 #define Ship_get_m_rack_clpos(ship, rack, dir)   ((ship)->m_rack[rack][dir])
-
 #define Ship_get_point_position(ship, i, dir)   ((ship)->pts[i][dir])
 #define Ship_get_l_light_position(ship, l, dir) ((ship)->l_light[l][dir])
 #define Ship_get_r_light_position(ship, l, dir) ((ship)->r_light[l][dir])
+#endif
+
+position Ship_get_point_position(shipobj *ship, int i, int dir);
+position Ship_get_engine_position(shipobj *ship, int dir);
+position Ship_get_m_gun_position(shipobj *ship, int dir);
+position Ship_get_l_gun_position(shipobj *ship, int gun, int dir);
+position Ship_get_r_gun_position(shipobj *ship, int gun, int dir);
+position Ship_get_l_rgun_position(shipobj *ship, int gun, int dir);
+position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir);
+position Ship_get_l_light_position(shipobj *ship, int l, int dir);
+position Ship_get_r_light_position(shipobj *ship, int l, int dir);
+position Ship_get_m_rack_position(shipobj *ship, int rack, int dir);
+#ifdef SERVER
+clpos Ship_get_point_clpos(shipobj *ship, int i, int dir);
+clpos Ship_get_engine_clpos(shipobj *ship, int dir);
+clpos Ship_get_m_gun_clpos(shipobj *ship, int dir);
+clpos Ship_get_l_gun_clpos(shipobj *ship, int gun, int dir);
+clpos Ship_get_r_gun_clpos(shipobj *ship, int gun, int dir);
+clpos Ship_get_l_rgun_clpos(shipobj *ship, int gun, int dir);
+clpos Ship_get_r_rgun_clpos(shipobj *ship, int gun, int dir);
+clpos Ship_get_l_light_clpos(shipobj *ship, int l, int dir);
+clpos Ship_get_r_light_clpos(shipobj *ship, int l, int dir);
+clpos Ship_get_m_rack_clpos(shipobj *ship, int rack, int dir);
+#endif
 
 extern DFLOAT rfrac(void);
 

@@ -707,7 +707,7 @@ int Init_wreckage(void)
 	    dynmem += point_size;
 	    wreckageShapes[shp][i][0].x = wreckageRawShapes[shp][i][0];
 	    wreckageShapes[shp][i][0].y = wreckageRawShapes[shp][i][1];
-	    Rotate_point( &wreckageShapes[shp][i][0] );
+	    Rotate_position( &wreckageShapes[shp][i][0] );
 	}
     }
 
@@ -741,7 +741,7 @@ int Init_asteroids(void)
 	    dynmem += point_size;
 	    asteroidShapes[shp][i][0].x = asteroidRawShapes[shp][i][0];
 	    asteroidShapes[shp][i][0].y = asteroidRawShapes[shp][i][1];
-	    Rotate_point( &asteroidShapes[shp][i][0] );
+	    Rotate_position( &asteroidShapes[shp][i][0] );
 	}
     }
 
