@@ -414,6 +414,17 @@ static bool Really_empty_space(player *pl, int x, int y)
     return false;*/
 }
 
+static inline int decide_travel_dir(player *pl)
+{
+    if (pl->velocity <= 0.2) {
+	vector grav = World_gravity(pl->pos);
+
+	return (int)findDir(grav.x, grav.y);
+    }
+    return (int)findDir(pl->vel.x, pl->vel.y);
+}
+
+
 static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 {
     int				i;
@@ -445,17 +456,12 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
      * Limit the look ahead.  For very high speeds the current code
      * is ineffective and much too inefficient.
      */
-    if (stop_dist > 10 * BLOCK_SZ) {
+    if (stop_dist > 10 * BLOCK_SZ)
 	stop_dist = 10 * BLOCK_SZ;
-    }
+
     evade = false;
 
-    if (pl->velocity <= 0.2) {
-	vector	*grav = &World.gravity
-	    [OBJ_X_IN_BLOCKS(pl)][OBJ_Y_IN_BLOCKS(pl)];
-	travel_dir = (int)findDir(grav->x, grav->y);
-    } else
-	travel_dir = (int)findDir(pl->vel.x, pl->vel.y);
+    travel_dir = decide_travel_dir(pl);
 
     aux_dir = MOD2(travel_dir + RES / 4, RES);
     px[0] = CLICK_TO_PIXEL(pl->pos.cx);		/* ship center x */
@@ -817,12 +823,7 @@ static bool Check_robot_target(player *pl, clpos item_pos, int new_mode)
     if (!clear_path && new_mode != RM_NAVIGATE)
 	return false;
 
-    if (pl->velocity <= 0.2) {
-	vector	*grav = &World.gravity
-	    [OBJ_X_IN_BLOCKS(pl)][OBJ_Y_IN_BLOCKS(pl)];
-	travel_dir = (int)findDir(grav->x, grav->y);
-    } else
-	travel_dir = (int)findDir(pl->vel.x, pl->vel.y);
+    travel_dir = decide_travel_dir(pl);
 
     pl->turnspeed = MAX_PLAYER_TURNSPEED / 2;
     pl->power = (BIT(World.rules->mode, TIMING) ?
@@ -1123,12 +1124,7 @@ static bool Check_robot_hunt(player *pl)
     ship_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
 				  ship->pos.cy - pl->pos.cy);
 
-    if (pl->velocity <= 0.2) {
-	vector	*grav = &World.gravity
-	    [OBJ_X_IN_BLOCKS(pl)][OBJ_Y_IN_BLOCKS(pl)];
-	travel_dir = (int)findDir(grav->x, grav->y);
-    } else
-	travel_dir = (int)findDir(pl->vel.x, pl->vel.y);
+    travel_dir = decide_travel_dir(pl);
 
     delta_dir = MOD2(ship_dir - travel_dir, RES);
     tooslow = (pl->velocity < my_data->robot_attack_speed/2);
