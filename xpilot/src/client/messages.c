@@ -275,6 +275,32 @@ static void Msg_scan_death(int id)
     }
 }
 
+static bool Want_msg_scan(void)
+{
+    int i;
+    other_t *other;
+    int num_playing = 0;
+
+    /* if only player on server, let's not bother */
+    if (num_others < 2)
+	return false;
+
+    /* if not playing, don't bother */
+    if (!self || strchr("PW", self->mychar))
+	return false;
+
+    for (i = 0; i < num_others; i++) {
+	other = &Others[i];
+	/* alive and dead ships and robots are considered playing */
+	if (strchr(" DR", other->mychar))
+	    num_playing++;
+    }
+
+    if (num_playing > 1)
+	return true;
+    return false;
+}
+
 
 static bool Msg_is_game_msg(char *message)
 {
@@ -293,10 +319,6 @@ static void Msg_scan_game_msg(char *message)
     other_t *other = NULL;
 
     DP(printf("MESSAGE: \"%s\"\n", message));
-
-    /* don't bother to scan messages if not playing */
-    if (num_others < 2 || !self || strchr("PW", self->mychar))
-	return;
 
     /*
      * First check if it is a message indicating end of round.
@@ -487,15 +509,13 @@ static bool Msg_is_in_angle_brackets(char *message)
     return true;
 }
 
-static void Msg_scan_angle_bracketed_msg(char *message)
+static void Msg_scan_angle_bracketed_msg(char *message, bool want_scan)
 {
+    /* let's scan for total reset even if not playing */
     if (Msg_scan_for_total_reset(message))
 	return;
-
-    /* don't bother to scan messages if not playing */
-    if (num_others < 2 || !self || strchr("PW", self->mychar))
+    if (!want_scan)
 	return;
-
     if (Msg_scan_for_ball_destruction(message))
 	return;
     if (Msg_scan_for_replace_treasure(message))
@@ -624,7 +644,7 @@ void Add_message(char *message)
     int			i;
     size_t		len;
     message_t		*tmp, **msg_set;
-    bool		is_game_msg = false;
+    bool		is_game_msg = false, want_scan = false;
     msg_bms_t		bmsinfo = BmsNone;
     char		*bracket = NULL;
 
@@ -659,17 +679,17 @@ void Add_message(char *message)
 	msg_set = GameMsg;
 #endif
 
-    if (is_game_msg)
+    want_scan = Want_msg_scan();
+    if (is_game_msg && want_scan)
 	Msg_scan_game_msg(message);
 
     else if (Msg_is_in_angle_brackets(message))
-	Msg_scan_angle_bracketed_msg(message);
+	Msg_scan_angle_bracketed_msg(message, want_scan);
 
     else if (BIT(hackedInstruments, BALL_MSG_SCAN)
 	     && !is_game_msg
 	     && BIT(Setup->mode, TEAM_PLAY)
-	     && num_others >= 2
-	     && self && !strchr("PW", self->mychar)
+	     && want_scan
 	     && Msg_is_from_our_team(message, &bracket))
 	bmsinfo = Msg_do_bms(message, bracket);
 
