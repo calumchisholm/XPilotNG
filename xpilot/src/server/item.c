@@ -467,7 +467,7 @@ void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
 {
     double maxdist = TRACTOR_MAX_RANGE(items),
 	maxforce = TRACTOR_MAX_FORCE(items),
-	percent, force, dist, cost;
+	percent, force, dist, cost, a;
     int theta;
 
     UNUSED_PARAM(world);
@@ -485,8 +485,9 @@ void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
     if (pl)
 	Player_add_fuel(pl, cost);
 
-    theta = (int)Wrap_cfindDir(pos.cx - victim->pos.cx,
-			       pos.cy - victim->pos.cy);
+    a = Wrap_cfindDir(pos.cx - victim->pos.cx,
+		      pos.cy - victim->pos.cy);
+    theta = (int) a;
 
     if (pl) {
 	pl->vel.x += tcos(theta) * (force / pl->mass);
@@ -545,8 +546,12 @@ void Do_deflector(player_t *pl)
 	dist = (double)(LENGTH(dx, dy) - PIXEL_TO_CLICK(SHIP_SZ));
 	if (dist < range
 	    && dist > 0) {
-	    int dir = (int)findDir(dx, dy);
-	    int idir = MOD2((int)(dir - findDir(obj->vel.x, obj->vel.y)), RES);
+	    int dir, idir;
+	    double a;
+
+	    a = findDir(dx, dy);
+	    dir = (int) a;
+	    idir = MOD2((int)(dir - findDir(obj->vel.x, obj->vel.y)), RES);
 
 	    if (idir > RES * 0.25
 		&& idir < RES * 0.75) {

@@ -476,13 +476,14 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	    break;
 	case 2:
 	    if (tdist < closest) {
-		*dir = (int)findDir(tdx, tdy);
+		double a = findDir(tdx, tdy);
+		*dir = (int) a;
 		found = true;
 	    }
 	    break;
 	case 3:
 	    if (tdist < range) {
-		double t = tdist / speed; /* time */
+		double a, t = tdist / speed; /* time */
 		int npx = (int)(pl->pos.cx
 				+ pl->vel.x * t * CLICK
 				+ pl->acc.x * t * t * CLICK);
@@ -493,7 +494,8 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 
 		tdx = WRAP_DCX(npx - c->pos.cx) / CLICK;
 		tdy = WRAP_DCY(npy - c->pos.cy) / CLICK;
-		tdir = (int)findDir(tdx, tdy);
+		a = findDir(tdx, tdy);
+		tdir = (int) a;
 		ddir = MOD2(tdir - c->dir, RES);
 		if ((ddir < (CANNON_SPREAD * 0.5)
 		     || ddir > RES - (CANNON_SPREAD * 0.5))
