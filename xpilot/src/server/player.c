@@ -768,15 +768,7 @@ void Reset_all_players(void)
 	    for (i = 0; i < World.NumTargets; i++) {
 		if (World.targets[i].damage != TARGET_DAMAGE
 		    || World.targets[i].dead_time != 0) {
-#if 1 /* kps - remove this */
-		    World.block[World.targets[i].pos.cx / BLOCK_CLICKS]
-			[World.targets[i].pos.cy / BLOCK_CLICKS]	= TARGET;
-#endif
-		    World.targets[i].dead_time = 0;
-		    World.targets[i].damage = TARGET_DAMAGE;
-		    World.targets[i].conn_mask = 0;
-		    World.targets[i].update_mask = (unsigned)-1;
-		    World.targets[i].last_change = frame_loops;
+		    Target_restore_on_map(i);
 		}
 	    }
 	}
