@@ -1244,15 +1244,17 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
         poly[j].x = WINSCALE(x);
         poly[j].y = WINSCALE(y);
     }
+    poly[j].x = poly[0].x;
+    poly[j].y = poly[0].y;
     
     if (filled | texture) {
         if (texture) XSetFillStyle(dpy, gc, FillTiled);
-	rd.fillPolygon(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
+	rd.fillPolygon(dpy, p_draw, gc, poly, polygon_ptr[i].num_point,
 		       Nonconvex, CoordModeOrigin);
         if (texture) XSetFillStyle(dpy, gc, FillSolid);
     }
     if (texture || !filled)
-	rd.drawLines(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
+	rd.drawLines(dpy, p_draw, gc, poly, polygon_ptr[i].num_point + 1,
                      CoordModeOrigin);
 
     XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinMiter);
