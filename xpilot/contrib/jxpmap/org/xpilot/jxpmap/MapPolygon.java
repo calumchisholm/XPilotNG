@@ -96,6 +96,19 @@ public class MapPolygon extends MapObject {
     }
 
 
+    public boolean isCounterClockwise () {
+
+        long area = 0;
+        int i, j;
+
+        for (i = polygon.npoints - 1, j = 0; j < polygon.npoints; i = j, j++)
+            area += polygon.xpoints[i] * polygon.ypoints[j] -
+                polygon.xpoints[j] * polygon.ypoints[i];
+
+        return (area > 0);
+    }
+
+
     public void setEdgeStyle (int index, LineStyle style) {
         if (edgeStyles == null) {
             if (style == null) return;
@@ -137,24 +150,47 @@ public class MapPolygon extends MapObject {
 
         LineStyle cls = null;
 
-        for (int i = 1; i <= polygon.npoints; i++) {
-            out.print("<Offset x=\"");
-            out.print(polygon.xpoints[i % polygon.npoints] - 
-                      polygon.xpoints[i - 1]);
-            out.print("\" y=\"");
-            out.print(polygon.ypoints[i % polygon.npoints] - 
-                      polygon.ypoints[i - 1]);
-            
-            if (edgeStyles != null) {
-                LineStyle ls = getEdgeStyle(i - 1);
-                if (ls != cls) {
-                    out.print("\" style=\"");
-                    out.print((ls != null) ? ls.getId() : 
-                              style.getDefaultEdgeStyle().getId());
-                    cls = ls;
+        if (isCounterClockwise()) {
+            for (int i = 1; i <= polygon.npoints; i++) {
+                out.print("<Offset x=\"");
+                out.print(polygon.xpoints[i % polygon.npoints] - 
+                          polygon.xpoints[i - 1]);
+                out.print("\" y=\"");
+                out.print(polygon.ypoints[i % polygon.npoints] - 
+                          polygon.ypoints[i - 1]);
+                
+                if (edgeStyles != null) {
+                    LineStyle ls = getEdgeStyle(i - 1);
+                    if (ls != cls) {
+                        out.print("\" style=\"");
+                        out.print((ls != null) ? ls.getId() : 
+                                  style.getDefaultEdgeStyle().getId());
+                        cls = ls;
+                    }
                 }
+                out.println("\"/>");
             }
-            out.println("\"/>");
+
+        } else {
+            for (int i = polygon.npoints; i > 0; i--) {
+                out.print("<Offset x=\"");
+                out.print(polygon.xpoints[i - 1] - 
+                          polygon.xpoints[i % polygon.npoints]);
+                out.print("\" y=\"");
+                out.print(polygon.ypoints[i - 1] - 
+                          polygon.ypoints[i % polygon.npoints]);
+                
+                if (edgeStyles != null) {
+                    LineStyle ls = getEdgeStyle(i - 1);
+                    if (ls != cls) {
+                        out.print("\" style=\"");
+                        out.print((ls != null) ? ls.getId() : 
+                                  style.getDefaultEdgeStyle().getId());
+                        cls = ls;
+                    }
+                }
+                out.println("\"/>");
+            }
         }
 
         out.println("</Polygon>");
