@@ -1073,26 +1073,29 @@ static int Net_read(frame_buf_t *frame)
  */
 int Net_input(void)
 {
-    int		i, j, n;
-    int		num_buffered_packets;
+    int		i,
+		j,
+		n;
     frame_buf_t	*frame,
 		*last_frame,
 		*oldest_frame = &Frames[0],
 		tmpframe;
-    time_t      time_now;
 
     for (i = 0; i < receive_window_size; i++) {
 	frame = &Frames[i];
 	if (!frame)
-	    continue;
+		continue;
 	if (frame->loops != 0) {
 	    /*
 	     * Already contains a frame.
 	     */
-	    if (frame->loops < oldest_frame->loops || oldest_frame->loops == 0)
+	    if (frame->loops < oldest_frame->loops
+		|| oldest_frame->loops == 0) {
 		oldest_frame = frame;
+	    }
 	}
-	else if (frame->sbuf.len > 0 && frame->sbuf.ptr == frame->sbuf.buf) {
+	else if (frame->sbuf.len > 0
+	    && frame->sbuf.ptr == frame->sbuf.buf) {
 	    /*
 	     * Contains an unidentifiable packet.
 	     * No more input until this one is processed.
@@ -1104,13 +1107,19 @@ int Net_input(void)
 	     */
 	    if ((n = Net_read(frame)) <= 0) {
 		if (n == 0) {
-		    /* No more new packets available. */
-		    if (i == 0)
-			/* No frames to be processed. */
+		    /*
+		     * No more new packets available.
+		     */
+		    if (i == 0) {
+			/*
+			 * No frames to be processed.
+			 */
 			return 0;
+		    }
 		    break;
-		} else
+		} else {
 		    return n;
+		}
 	    }
 	    else if (n == 1) {
 		/*
@@ -1123,8 +1132,9 @@ int Net_input(void)
 		 * Check for duplicate packets.
 		 */
 		for (j = i - 1; j >= 0; j--) {
-		    if (frame->loops == Frames[j].loops)
+		    if (frame->loops == Frames[j].loops) {
 			break;
+		    }
 		}
 		if (j >= 0) {
 		    /*
@@ -1136,16 +1146,16 @@ int Net_input(void)
 		    i--;	/* correct for for loop increment. */
 		    continue;
 		}
-		if (frame->loops < oldest_frame->loops)
+		if (frame->loops < oldest_frame->loops) {
 		    oldest_frame = frame;
+		}
 	    }
 	}
 	if ((i == receive_window_size - 1 && i > 0)
 #ifdef _WINDOWS
-	    || drawPending
-	    || (ThreadedDraw &&
-		!WaitForSingleObject(dinfo.eventNotDrawing, 0)
-		== WAIT_OBJECT_0)
+		|| drawPending
+		|| (ThreadedDraw && 
+				!WaitForSingleObject(dinfo.eventNotDrawing, 0) == WAIT_OBJECT_0)
 #endif
 		) {
 	    /*
@@ -1175,7 +1185,6 @@ int Net_input(void)
      * Find oldest packet.
      */
     last_frame = oldest_frame = &Frames[0];
-    num_buffered_packets = 1; /* Could be 0, but returns before using this */
     for (i = 1; i < receive_window_size; i++, last_frame++) {
 	frame = &Frames[i];
 	if (frame->loops == 0) {
@@ -1184,20 +1193,18 @@ int Net_input(void)
 		 * This is an unidentifiable packet.
 		 * Process it last, because it arrived last.
 		 */
-		num_buffered_packets++;
 		continue;
-	    } else
+	    } else {
 		/*
 		 * Empty.  The rest should be empty too,
 		 * because we have taken care not to have gaps.
 		 */
 		break;
+	    }
 	}
-	else {
-	    num_buffered_packets++;
-	    if (frame->loops < oldest_frame->loops
-		|| oldest_frame->loops == 0)
-		oldest_frame = frame;
+	else if (frame->loops < oldest_frame->loops
+	    || oldest_frame->loops == 0) {
+	    oldest_frame = frame;
 	}
     }
 
@@ -1206,7 +1213,8 @@ int Net_input(void)
 	 * Couldn't find a non-empty packet.
 	 */
 	if (oldest_frame->loops > 0) {
-	    warn("bug %s,%d", __FILE__, __LINE__);
+	    errno = 0;
+	    error("bug %s,%d", __FILE__, __LINE__);
 	    oldest_frame->loops = 0;
 	}
 	return 0;
@@ -1223,7 +1231,7 @@ int Net_input(void)
      */
     n = Net_packet();
 
-    if (last_frame != oldest_frame) {
+    if (last_frame > oldest_frame) {
 	/*
 	 * Switch buffers to prevent gaps.
 	 */
@@ -1235,8 +1243,9 @@ int Net_input(void)
     last_frame->loops = 0;
     rbuf = last_frame->sbuf;
 
-    if (n == -1)
+    if (n == -1) {
 	return -1;
+    }
 
     /*
      * If the server hasn't yet acked our last keyboard change
@@ -1244,22 +1253,23 @@ int Net_input(void)
      * or if we haven't sent anything for a while (keepalive)
      * then we send our current keyboard state.
      */
-    time_now = time(NULL);
     if ((last_keyboard_ack != last_keyboard_change
 	    && last_keyboard_update /*+ 1*/ < last_loops)
-	|| time_now - last_send_anything > 5) {
+	|| last_loops - last_send_anything > 5 * Setup->frames_per_second) {
 	Key_update();
-	last_send_anything = time_now;
-    } else
+	last_send_anything = last_loops;
+    } else {
 	/*
 	 * 4.5.4a2: flush if non-empty
 	 * This should help speedup the map update speed
 	 * for maps with large number of targets or cannons.
 	 */
 	Net_flush();
+    }
 
-    return num_buffered_packets;
+    return 1 + (last_frame > oldest_frame);
 }
+
 
 /*
  * Receive the beginning of a new frame update packet,

@@ -136,6 +136,8 @@ case "$target" in
     *-*-freebsd*)
         MATHLIB="-lm"
         SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
+	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include -I/usr/local/include"
+	LDFLAGS="$LDFLAGS -L/usr/local/lib"
         ;;
     *)
         MATHLIB="-lm"
