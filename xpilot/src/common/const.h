@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -24,11 +23,6 @@
 
 #ifndef CONST_H
 #define CONST_H
-
-#ifndef _WINDOWS
-#include <limits.h>
-#include <math.h>
-#endif
 
 #ifndef TYPES_H
 #include "types.h"
@@ -142,13 +136,6 @@ extern DFLOAT		tbl_cos[];
 #define ENERGY_PACK_FUEL        ((500+(randomMT()&511))<<FUEL_SCALE_BITS)
 
 #define TARGET_DAMAGE		(250<<FUEL_SCALE_BITS)
-#if 0
-#define TARGET_FUEL_REPAIR_PER_FRAME (TARGET_DAMAGE / (12 * 10 * TIME_FACT))
-#define TARGET_REPAIR_PER_FRAME	(TARGET_DAMAGE / (12 * 600 * TIME_FACT))
-#define TARGET_UPDATE_DELAY	(TARGET_DAMAGE / (TARGET_REPAIR_PER_FRAME \
-				    * BLOCK_SZ * TIME_FACT))
-#endif
-
 #define TARGET_UPDATE_DELAY	(TARGET_DAMAGE / (TARGET_REPAIR_PER_FRAME \
 				    * BLOCK_SZ))
 
