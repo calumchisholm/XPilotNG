@@ -39,6 +39,3 @@ This would aid in drawing the outlines of new (and big) map quickly.
 It would perhaps be nice to have a generic Cannon symbol which would,
 when used to draw with, draw a cannon with the base line attached to
 the nearest wall.
-
-----------------------------------------
-$Id$

@@ -1,5 +1,5 @@
 /*
- * XMapEdit, the XPilot Map Editor.  Copyright (C) 1993 by
+ * XPilot NG XP-MapEdit, a map editor for xp maps.  Copyright (C) 1993 by
  *
  *      Aaron Averill           <averila@oes.orst.edu>
  *
@@ -17,24 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Modifications to XMapEdit
+ * Modifications:
  * 1996:
  *      Robert Templeman        <mbcaprt@mphhpd.ph.man.ac.uk>
  * 1997:
  *      William Docter          <wad2@lehigh.edu>
- *
- * $Id$
  */
 
-#include                 <X11/Xlib.h>
-#include                 <X11/Xutil.h>
-#include                 <X11/Xos.h>
-#include                 <X11/Xatom.h>
-#include                 <X11/keysym.h>
-#include                 <stdio.h>
-#include                 <ctype.h>
-
-#include                 "main.h"
+#include "xpmapedit.h"
 
 /*
  * Completely rewritten/redesigned by Bert Gijsbers.
@@ -86,49 +76,49 @@ int RoundMapArea(HandlerInfo info)
     memset(rd_filled, 0, sizeof rd_filled);
     memset(ru_filled, 0, sizeof ru_filled);
 
-    up_filled[MAP_FILLED] = 1;
-    up_filled[MAP_FUEL] = 1;
-    up_filled[MAP_REC_RD] = 1;
-    up_filled[MAP_REC_LD] = 1;
+    up_filled[XPMAP_FILLED] = 1;
+    up_filled[XPMAP_FUEL] = 1;
+    up_filled[XPMAP_REC_RD] = 1;
+    up_filled[XPMAP_REC_LD] = 1;
 
-    left_filled[MAP_FILLED] = 1;
-    left_filled[MAP_FUEL] = 1;
-    left_filled[MAP_REC_RU] = 1;
-    left_filled[MAP_REC_RD] = 1;
+    left_filled[XPMAP_FILLED] = 1;
+    left_filled[XPMAP_FUEL] = 1;
+    left_filled[XPMAP_REC_RU] = 1;
+    left_filled[XPMAP_REC_RD] = 1;
 
-    down_filled[MAP_FILLED] = 1;
-    down_filled[MAP_FUEL] = 1;
-    down_filled[MAP_REC_RU] = 1;
-    down_filled[MAP_REC_LU] = 1;
+    down_filled[XPMAP_FILLED] = 1;
+    down_filled[XPMAP_FUEL] = 1;
+    down_filled[XPMAP_REC_RU] = 1;
+    down_filled[XPMAP_REC_LU] = 1;
 
-    right_filled[MAP_FILLED] = 1;
-    right_filled[MAP_FUEL] = 1;
-    right_filled[MAP_REC_LD] = 1;
-    right_filled[MAP_REC_LU] = 1;
+    right_filled[XPMAP_FILLED] = 1;
+    right_filled[XPMAP_FUEL] = 1;
+    right_filled[XPMAP_REC_LD] = 1;
+    right_filled[XPMAP_REC_LU] = 1;
 
-    lu_filled[MAP_FILLED] = 1;
-    lu_filled[MAP_FUEL] = 1;
-    lu_filled[MAP_REC_LD] = 1;
-    lu_filled[MAP_REC_RD] = 1;
-    lu_filled[MAP_REC_RU] = 1;
+    lu_filled[XPMAP_FILLED] = 1;
+    lu_filled[XPMAP_FUEL] = 1;
+    lu_filled[XPMAP_REC_LD] = 1;
+    lu_filled[XPMAP_REC_RD] = 1;
+    lu_filled[XPMAP_REC_RU] = 1;
 
-    ld_filled[MAP_FILLED] = 1;
-    ld_filled[MAP_FUEL] = 1;
-    ld_filled[MAP_REC_LU] = 1;
-    ld_filled[MAP_REC_RU] = 1;
-    ld_filled[MAP_REC_RD] = 1;
+    ld_filled[XPMAP_FILLED] = 1;
+    ld_filled[XPMAP_FUEL] = 1;
+    ld_filled[XPMAP_REC_LU] = 1;
+    ld_filled[XPMAP_REC_RU] = 1;
+    ld_filled[XPMAP_REC_RD] = 1;
 
-    rd_filled[MAP_FILLED] = 1;
-    rd_filled[MAP_FUEL] = 1;
-    rd_filled[MAP_REC_RU] = 1;
-    rd_filled[MAP_REC_LU] = 1;
-    rd_filled[MAP_REC_LD] = 1;
+    rd_filled[XPMAP_FILLED] = 1;
+    rd_filled[XPMAP_FUEL] = 1;
+    rd_filled[XPMAP_REC_RU] = 1;
+    rd_filled[XPMAP_REC_LU] = 1;
+    rd_filled[XPMAP_REC_LD] = 1;
 
-    ru_filled[MAP_FILLED] = 1;
-    ru_filled[MAP_FUEL] = 1;
-    ru_filled[MAP_REC_RD] = 1;
-    ru_filled[MAP_REC_LD] = 1;
-    ru_filled[MAP_REC_LU] = 1;
+    ru_filled[XPMAP_FILLED] = 1;
+    ru_filled[XPMAP_FUEL] = 1;
+    ru_filled[XPMAP_REC_RD] = 1;
+    ru_filled[XPMAP_REC_LD] = 1;
+    ru_filled[XPMAP_REC_LU] = 1;
 
 #define UP_FILLED       (up_filled[MapData(x,y-1) & 0xFF] == 1)
 #define LEFT_FILLED     (left_filled[MapData(x-1,y) & 0xFF] == 1)
@@ -155,7 +145,7 @@ int RoundMapArea(HandlerInfo info)
     for (y = mapcursory; y < ymax; y++) {
 	for (x = mapcursorx; x < xmax; x++) {
 	    type = MapData(x, y);
-	    if (type == MAP_SPACE) {
+	    if (type == XPMAP_SPACE) {
 		mask = (UP_FILLED << 0) |
 		    (LEFT_FILLED << 1) |
 		    (DOWN_FILLED << 2) | (RIGHT_FILLED << 3);
@@ -167,19 +157,19 @@ int RoundMapArea(HandlerInfo info)
 		case LEFT_BIT | DOWN_BIT | RIGHT_BIT:
 		case DOWN_BIT | UP_BIT:
 		case LEFT_BIT | RIGHT_BIT:
-		    type = MAP_FILLED;
+		    type = XPMAP_FILLED;
 		    break;
 		case UP_BIT | LEFT_BIT:
-		    type = MAP_REC_LU;
+		    type = XPMAP_REC_LU;
 		    break;
 		case UP_BIT | RIGHT_BIT:
-		    type = MAP_REC_RU;
+		    type = XPMAP_REC_RU;
 		    break;
 		case DOWN_BIT | RIGHT_BIT:
-		    type = MAP_REC_RD;
+		    type = XPMAP_REC_RD;
 		    break;
 		case DOWN_BIT | LEFT_BIT:
-		    type = MAP_REC_LD;
+		    type = XPMAP_REC_LD;
 		    break;
 		}
 		if (type != MapData(x, y)) {
@@ -200,10 +190,10 @@ int RoundMapArea(HandlerInfo info)
 	    for (x = mapcursorx; x < xmax; x++) {
 		type = MapData(x, y);
 		switch (type) {
-		case MAP_REC_RD:
-		case MAP_REC_RU:
-		case MAP_REC_LD:
-		case MAP_REC_LU:
+		case XPMAP_REC_RD:
+		case XPMAP_REC_RU:
+		case XPMAP_REC_LD:
+		case XPMAP_REC_LU:
 		    mask = (UP_FILLED << 0) |
 			(LEFT_FILLED << 1) |
 			(DOWN_FILLED << 2) | (RIGHT_FILLED << 3);
@@ -215,19 +205,19 @@ int RoundMapArea(HandlerInfo info)
 		    case LEFT_BIT | DOWN_BIT | RIGHT_BIT:
 		    case DOWN_BIT | UP_BIT:
 		    case LEFT_BIT | RIGHT_BIT:
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 			break;
 		    case UP_BIT | LEFT_BIT:
-			type = MAP_REC_LU;
+			type = XPMAP_REC_LU;
 			break;
 		    case UP_BIT | RIGHT_BIT:
-			type = MAP_REC_RU;
+			type = XPMAP_REC_RU;
 			break;
 		    case DOWN_BIT | RIGHT_BIT:
-			type = MAP_REC_RD;
+			type = XPMAP_REC_RD;
 			break;
 		    case DOWN_BIT | LEFT_BIT:
-			type = MAP_REC_LD;
+			type = XPMAP_REC_LD;
 			break;
 		    }
 		    if (type != MapData(x, y)) {
@@ -249,24 +239,24 @@ int RoundMapArea(HandlerInfo info)
 	    for (x = mapcursorx; x < xmax; x++) {
 		type = MapData(x, y);
 		switch (type) {
-		case MAP_REC_LU:
+		case XPMAP_REC_LU:
 		    if (RIGHT_FILLED == 1 || DOWN_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_LD:
+		case XPMAP_REC_LD:
 		    if (RIGHT_FILLED == 1 || UP_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_RU:
+		case XPMAP_REC_RU:
 		    if (LEFT_FILLED == 1 || DOWN_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_RD:
+		case XPMAP_REC_RD:
 		    if (LEFT_FILLED == 1 || UP_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
 		default:
@@ -290,24 +280,24 @@ int RoundMapArea(HandlerInfo info)
 	    for (x = mapcursorx; x < xmax; x++) {
 		type = MapData(x, y);
 		switch (type) {
-		case MAP_REC_RD:
+		case XPMAP_REC_RD:
 		    if (RIGHT_FILLED == 0 || DOWN_FILLED == 0) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_RU:
+		case XPMAP_REC_RU:
 		    if (RIGHT_FILLED == 0 || UP_FILLED == 0) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_LD:
+		case XPMAP_REC_LD:
 		    if (LEFT_FILLED == 0 || DOWN_FILLED == 0) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_LU:
+		case XPMAP_REC_LU:
 		    if (LEFT_FILLED == 0 || UP_FILLED == 0) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
 		default:
@@ -331,24 +321,24 @@ int RoundMapArea(HandlerInfo info)
 	    for (x = mapcursorx; x < xmax; x++) {
 		type = MapData(x, y);
 		switch (type) {
-		case MAP_REC_RD:
+		case XPMAP_REC_RD:
 		    if (LEFT_FILLED == 1 || UP_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_RU:
+		case XPMAP_REC_RU:
 		    if (LEFT_FILLED == 1 || DOWN_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_LD:
+		case XPMAP_REC_LD:
 		    if (RIGHT_FILLED == 1 || UP_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
-		case MAP_REC_LU:
+		case XPMAP_REC_LU:
 		    if (RIGHT_FILLED == 1 || DOWN_FILLED == 1) {
-			type = MAP_FILLED;
+			type = XPMAP_FILLED;
 		    }
 		    break;
 		default:
@@ -372,7 +362,7 @@ int RoundMapArea(HandlerInfo info)
 	for (y = mapcursory; y < ymax; y++) {
 	    for (x = mapcursorx; x < xmax; x++) {
 		type = MapData(x, y);
-		if (type == MAP_FILLED) {
+		if (type == XPMAP_FILLED) {
 		    mask = (LU_FILLED << 4) |
 			(LD_FILLED << 5) |
 			(RD_FILLED << 6) |
@@ -383,19 +373,19 @@ int RoundMapArea(HandlerInfo info)
 		    switch (mask) {
 		    case RIGHT_BIT | DOWN_BIT | RD_BIT:
 		    case RIGHT_BIT | DOWN_BIT:
-			type = MAP_REC_RD;
+			type = XPMAP_REC_RD;
 			break;
 		    case RIGHT_BIT | UP_BIT | RU_BIT:
 		    case RIGHT_BIT | UP_BIT:
-			type = MAP_REC_RU;
+			type = XPMAP_REC_RU;
 			break;
 		    case LEFT_BIT | DOWN_BIT | LD_BIT:
 		    case LEFT_BIT | DOWN_BIT:
-			type = MAP_REC_LD;
+			type = XPMAP_REC_LD;
 			break;
 		    case LEFT_BIT | UP_BIT | LU_BIT:
 		    case LEFT_BIT | UP_BIT:
-			type = MAP_REC_LU;
+			type = XPMAP_REC_LU;
 			break;
 		    }
 		    if (type != MapData(x, y)) {
@@ -418,7 +408,7 @@ int RoundMapArea(HandlerInfo info)
 	for (y = mapcursory; y < ymax; y++) {
 	    for (x = mapcursorx; x < xmax; x++) {
 		type = MapData(x, y);
-		if (type == MAP_FILLED) {
+		if (type == XPMAP_FILLED) {
 		    mask = (LU_FILLED << 4) |
 			(LD_FILLED << 5) |
 			(RD_FILLED << 6) |
@@ -433,7 +423,7 @@ int RoundMapArea(HandlerInfo info)
 		    case LD_BIT | RIGHT_BIT | DOWN_BIT:
 		    case RU_BIT | RIGHT_BIT | DOWN_BIT | RD_BIT:
 		    case RU_BIT | RIGHT_BIT | DOWN_BIT:
-			type = MAP_REC_RD;
+			type = XPMAP_REC_RD;
 			break;
 		    case LU_BIT | RD_BIT | RIGHT_BIT | UP_BIT | RU_BIT:
 		    case LU_BIT | RD_BIT | RIGHT_BIT | UP_BIT:
@@ -441,7 +431,7 @@ int RoundMapArea(HandlerInfo info)
 		    case LU_BIT | RIGHT_BIT | UP_BIT:
 		    case RD_BIT | RIGHT_BIT | UP_BIT | RU_BIT:
 		    case RD_BIT | RIGHT_BIT | UP_BIT:
-			type = MAP_REC_RU;
+			type = XPMAP_REC_RU;
 			break;
 		    case LU_BIT | RD_BIT | LEFT_BIT | DOWN_BIT | LD_BIT:
 		    case LU_BIT | RD_BIT | LEFT_BIT | DOWN_BIT:
@@ -449,7 +439,7 @@ int RoundMapArea(HandlerInfo info)
 		    case LU_BIT | LEFT_BIT | DOWN_BIT:
 		    case RD_BIT | LEFT_BIT | DOWN_BIT | LD_BIT:
 		    case RD_BIT | LEFT_BIT | DOWN_BIT:
-			type = MAP_REC_LD;
+			type = XPMAP_REC_LD;
 			break;
 		    case LD_BIT | RU_BIT | LEFT_BIT | UP_BIT | LU_BIT:
 		    case LD_BIT | RU_BIT | LEFT_BIT | UP_BIT:
@@ -457,7 +447,7 @@ int RoundMapArea(HandlerInfo info)
 		    case LD_BIT | LEFT_BIT | UP_BIT:
 		    case RU_BIT | LEFT_BIT | UP_BIT | LU_BIT:
 		    case RU_BIT | LEFT_BIT | UP_BIT:
-			type = MAP_REC_LU;
+			type = XPMAP_REC_LU;
 			break;
 		    }
 		    if (type != MapData(x, y)) {
@@ -479,7 +469,7 @@ int RoundMapArea(HandlerInfo info)
 	for (y = mapcursory; y < ymax; y++) {
 	    for (x = mapcursorx; x < xmax; x++) {
 		type = MapData(x, y);
-		if (type == MAP_FILLED) {
+		if (type == XPMAP_FILLED) {
 		    mask = (UP_FILLED << 0) |
 			(LEFT_FILLED << 1) |
 			(DOWN_FILLED << 2) | (RIGHT_FILLED << 3);
@@ -489,7 +479,7 @@ int RoundMapArea(HandlerInfo info)
 		    case DOWN_BIT:
 		    case RIGHT_BIT:
 		    case 0:
-			type = MAP_SPACE;
+			type = XPMAP_SPACE;
 			break;
 		    }
 		    if (type != MapData(x, y)) {

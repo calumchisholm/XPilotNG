@@ -1,5 +1,5 @@
 /*
- * XMapEdit, the XPilot Map Editor.  Copyright (C) 1993 by
+ * XPilot NG XP-MapEdit, a map editor for xp maps.  Copyright (C) 1993 by
  *
  *      Aaron Averill           <averila@oes.orst.edu>
  *
@@ -17,16 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Modifications to XMapEdit
+ * Modifications:
  * 1996:
  *      Robert Templeman        <mbcaprt@mphhpd.ph.man.ac.uk>
  * 1997:
  *      William Docter          <wad2@lehigh.edu>
- *
- * $Id$
  */
 
-#include                 "main.h"
+#include "xpmapedit.h"
 
 typedef struct undo_t {
     int x, y;
@@ -299,33 +297,33 @@ void ChangeMapData(int x, int y, char icon, int save)
 	|| (y2 > mapwin_height))
 	return;
     data = MapData(x - 1, y);
-    if ((data == MAP_FILLED) || (data == MAP_FUEL) ||
-	(data == MAP_REC_RU) || (data == MAP_REC_RD)
-	|| (data == MAP_DEC_RU) || (data == MAP_DEC_RD)
-	|| (data == MAP_DEC_FLD)) {
+    if ((data == XPMAP_FILLED) || (data == XPMAP_FUEL) ||
+	(data == XPMAP_REC_RU) || (data == XPMAP_REC_RD)
+	|| (data == XPMAP_DECOR_RU) || (data == XPMAP_DECOR_RD)
+	|| (data == XPMAP_DECOR_FILLED)) {
 	xo++;
 	wo--;
     }
     data = MapData(x + 1, y);
-    if ((data == MAP_FILLED) || (data == MAP_FUEL) ||
-	(data == MAP_REC_LU) || (data == MAP_REC_LD)
-	|| (data == MAP_DEC_LU) || (data == MAP_DEC_LD)
-	|| (data == MAP_DEC_FLD)) {
+    if ((data == XPMAP_FILLED) || (data == XPMAP_FUEL) ||
+	(data == XPMAP_REC_LU) || (data == XPMAP_REC_LD)
+	|| (data == XPMAP_DECOR_LU) || (data == XPMAP_DECOR_LD)
+	|| (data == XPMAP_DECOR_FILLED)) {
 	wo--;
     }
     data = MapData(x, y - 1);
-    if ((data == MAP_FILLED) || (data == MAP_FUEL) ||
-	(data == MAP_REC_RD) || (data == MAP_REC_LD)
-	|| (data == MAP_DEC_RD) || (data == MAP_DEC_LD)
-	|| (data == MAP_DEC_FLD)) {
+    if ((data == XPMAP_FILLED) || (data == XPMAP_FUEL) ||
+	(data == XPMAP_REC_RD) || (data == XPMAP_REC_LD)
+	|| (data == XPMAP_DECOR_RD) || (data == XPMAP_DECOR_LD)
+	|| (data == XPMAP_DECOR_FILLED)) {
 	yo++;
 	ho--;
     }
     data = MapData(x, y + 1);
-    if ((data == MAP_FILLED) || (data == MAP_FUEL) ||
-	(data == MAP_REC_RU) || (data == MAP_REC_LU)
-	|| (data == MAP_DEC_RU) || (data == MAP_DEC_LU)
-	|| (data == MAP_DEC_FLD)) {
+    if ((data == XPMAP_FILLED) || (data == XPMAP_FUEL) ||
+	(data == XPMAP_REC_RU) || (data == XPMAP_REC_LU)
+	|| (data == XPMAP_DECOR_RU) || (data == XPMAP_DECOR_LU)
+	|| (data == XPMAP_DECOR_FILLED)) {
 	ho--;
     }
     XFillRectangle(display, mapwin, Black_GC, x2 + TOOLSWIDTH + xo,
@@ -1198,28 +1196,28 @@ int NegativeMapArea(HandlerInfo info)
 	for (j = y1; j < y2; j++) {
 	    switch (MapData(i, j)) {
 
-	    case MAP_SPACE:
-		ChangeMapData(i, j, MAP_FILLED, 1);
+	    case XPMAP_SPACE:
+		ChangeMapData(i, j, XPMAP_FILLED, 1);
 		break;
 
-	    case MAP_FILLED:
-		ChangeMapData(i, j, MAP_SPACE, 1);
+	    case XPMAP_FILLED:
+		ChangeMapData(i, j, XPMAP_SPACE, 1);
 		break;
 
-	    case MAP_REC_RD:
-		ChangeMapData(i, j, MAP_REC_LU, 1);
+	    case XPMAP_REC_RD:
+		ChangeMapData(i, j, XPMAP_REC_LU, 1);
 		break;
 
-	    case MAP_REC_LU:
-		ChangeMapData(i, j, MAP_REC_RD, 1);
+	    case XPMAP_REC_LU:
+		ChangeMapData(i, j, XPMAP_REC_RD, 1);
 		break;
 
-	    case MAP_REC_LD:
-		ChangeMapData(i, j, MAP_REC_RU, 1);
+	    case XPMAP_REC_LD:
+		ChangeMapData(i, j, XPMAP_REC_RU, 1);
 		break;
 
-	    case MAP_REC_RU:
-		ChangeMapData(i, j, MAP_REC_LD, 1);
+	    case XPMAP_REC_RU:
+		ChangeMapData(i, j, XPMAP_REC_LD, 1);
 		break;
 	    }
 	}

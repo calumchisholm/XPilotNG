@@ -1,5 +1,5 @@
 /*
- * XMapEdit, the XPilot Map Editor.  Copyright (C) 1993 by
+ * XPilot NG XP-MapEdit, a map editor for xp maps.  Copyright (C) 1993 by
  *
  *      Aaron Averill           <averila@oes.orst.edu>
  *
@@ -17,33 +17,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Modifications to XMapEdit
+ * Modifications:
  * 1996:
  *      Robert Templeman        <mbcaprt@mphhpd.ph.man.ac.uk>
  * 1997:
  *      William Docter          <wad2@lehigh.edu>
- *
- * $Id$
  */
 
-#include                 <X11/Xlib.h>
-#include                 <X11/Xutil.h>
-#include                 <X11/Xos.h>
-#include                 <X11/Xatom.h>
-#include                 <X11/keysym.h>
-#include                 <stdio.h>
-#include                 <stdlib.h>
-#include                 <string.h>
-#include                 <ctype.h>
-#include                 <time.h>
-#include                 <memory.h>
-#include                 <math.h>
+#include "xpmapedit.h"
 
-#include                 "T_Toolkit.h"
-#include                 "defaults.h"
-#include                 "map.h"
-#include                 "proto.h"
-#include                 "file.h"
+#ifndef MAIN_H
+#define MAIN_H
 
 #define MAPWIDTH         0
 #define MAPHEIGHT        1
@@ -371,3 +355,5 @@ extern float smlmap_xscale, smlmap_yscale;
 /* tools.c */
 extern Window changedwin;
 extern int selectfrom_x, selectfrom_y, selectto_x, selectto_y;
+
+#endif

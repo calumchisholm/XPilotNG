@@ -1,5 +1,5 @@
 /*
- * XMapEdit, the XPilot Map Editor.  Copyright (C) 1993 by
+ * XPilot NG XP-MapEdit, a map editor for xp maps.  Copyright (C) 1993 by
  *
  *      Aaron Averill           <averila@oes.orst.edu>
  *
@@ -17,17 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Modifications to XMapEdit
+ * Modifications:
  * 1996:
  *      Robert Templeman        <mbcaprt@mphhpd.ph.man.ac.uk>
  * 1997:
  *      William Docter          <wad2@lehigh.edu>
- *
- * $Id$
  */
 
-#include                 "main.h"
-
+#include "xpmapedit.h"
 
 typedef struct {
     int color;
@@ -50,7 +47,7 @@ segment_t mapicon_seg[35] = {
     {0, 4, {0.00, 1.00, 1.00, 0.00, 0.00}, {0.00, 0.00, 1.00, 0.00, 0.00}},	/*  3:a */
     {0, 4, {0.00, 1.00, 0.00, 0.00, 0.00}, {0.00, 0.00, 1.00, 0.00, 0.00}},	/*  4:s */
 
-    {0, 5, {0.00, 1.00, 1.00, 0.00, 0.00}, {1.00, 1.00, 0.00, 0.00, 1.00}},	/*  5:# MAP_FUEL */
+    {0, 5, {0.00, 1.00, 1.00, 0.00, 0.00}, {1.00, 1.00, 0.00, 0.00, 1.00}},	/*  5:# XPMAP_FUEL */
 
     {1, 4, {0.70, 0.99, 0.99, 0.70, 0.00}, {0.50, 0.99, 0.01, 0.50, 0.00}},	/*  6:d MAP_CANNON */
     {1, 4, {0.01, 0.99, 0.50, 0.01, 0.00}, {0.99, 0.99, 0.70, 0.99, 0.00}},	/*  7:r MAP_CANNON */
@@ -58,17 +55,17 @@ segment_t mapicon_seg[35] = {
     {1, 4, {0.30, 0.01, 0.01, 0.30, 0.00}, {0.50, 0.99, 0.01, 0.50, 0.00}},	/*  9:f MAP_CANNON */
     {1, 2, {0.01, 0.99, 0.00, 0.00, 0.00}, {0.99, 0.99, 0.00, 0.00, 0.00}},	/* 10:_ MAP_BASE */
 
-    {2, 5, {0.50, 0.50, 0.50, 0.30, 0.70}, {0.30, 0.70, 0.50, 0.50, 0.50}},	/* 11:+ MAP_GRAV_POS */
+    {2, 5, {0.50, 0.50, 0.50, 0.30, 0.70}, {0.30, 0.70, 0.50, 0.50, 0.50}},	/* 11:+ XPMAP_POS_GRAV */
     {2, 2, {0.30, 0.70, 0.00, 0.00, 0.00}, {0.50, 0.50, 0.00, 0.00, 0.00}},	/* 12:- MAP_GRAV_NET */
-    {2, 0, {0.00, 0.00, 0.00, 0.00, 0.00}, {0.00, 0.00, 0.00, 0.00, 0.00}},	/* 13:@ MAP_WORM_BOTH */
-    {2, 5, {0.10, 0.70, 0.30, 0.70, 0.70}, {0.10, 0.70, 0.70, 0.70, 0.30}},	/* 14:) MAP_WORM_ */
-    {2, 5, {0.70, 0.10, 0.30, 0.10, 0.10}, {0.70, 0.10, 0.10, 0.10, 0.30}},	/* 15:( MAP_WORM_ */
-    {2, 4, {0.05, 0.05, 0.95, 0.95, 0.00}, {0.50, 0.95, 0.95, 0.50, 0.00}},	/* 16:* MAP_TREASURE */
+    {2, 0, {0.00, 0.00, 0.00, 0.00, 0.00}, {0.00, 0.00, 0.00, 0.00, 0.00}},	/* 13:@ XPMAP_WORMHOLE_BOTH */
+    {2, 5, {0.10, 0.70, 0.30, 0.70, 0.70}, {0.10, 0.70, 0.70, 0.70, 0.30}},	/* 14:) XPMAP_WORMHOLE_ */
+    {2, 5, {0.70, 0.10, 0.30, 0.10, 0.10}, {0.70, 0.10, 0.10, 0.10, 0.30}},	/* 15:( XPMAP_WORMHOLE_ */
+    {2, 4, {0.05, 0.05, 0.95, 0.95, 0.00}, {0.50, 0.95, 0.95, 0.50, 0.00}},	/* 16:* XPMAP_TREASURE */
     {2, 3, {0.60, 0.50, 0.60, 0.00, 0.00}, {0.05, 0.15, 0.30, 0.00, 0.00}},	/* 17:< */
     {2, 3, {0.40, 0.50, 0.40, 0.00, 0.00}, {0.05, 0.15, 0.30, 0.00, 0.00}},	/* 18:> */
-    {2, 5, {0.05, 0.95, 0.95, 0.05, 0.05}, {0.05, 0.05, 0.95, 0.95, 0.05}},	/* 19:! MAP_TARGET */
+    {2, 5, {0.05, 0.95, 0.95, 0.05, 0.05}, {0.05, 0.05, 0.95, 0.95, 0.05}},	/* 19:! XPMAP_TARGET */
 
-    {1, 0, {0.00, 0.00, 0.00, 0.00, 0.00}, {0.00, 0.00, 0.00, 0.00, 0.00}},	/* 20:  MAP_SPACE */
+    {1, 0, {0.00, 0.00, 0.00, 0.00, 0.00}, {0.00, 0.00, 0.00, 0.00, 0.00}},	/* 20:  XPMAP_SPACE */
 
     {3, 5, {0.00, 1.00, 1.00, 0.00, 0.00}, {1.00, 1.00, 0.00, 0.00, 1.00}},	/* 21:b MAP_DECORATION */
     {3, 4, {1.00, 1.00, 0.00, 1.00, 0.00}, {0.00, 1.00, 1.00, 0.00, 0.00}},	/* 22:t */
@@ -82,9 +79,9 @@ segment_t mapicon_seg[35] = {
     {2, 5, {0.99, 0.01, 0.50, 0.01, 0.50}, {0.50, 0.50, 0.75, 0.50, 0.25}},	/* 29:j CURRENT LEFT */
     {2, 5, {0.01, 0.99, 0.50, 0.99, 0.50}, {0.50, 0.50, 0.75, 0.50, 0.25}},	/* 30:k CURRENT RIGHT */
     {2, 5, {0.50, 0.50, 0.75, 0.50, 0.25}, {0.01, 0.99, 0.50, 0.99, 0.50}},	/* 31:m CURRENT DOWN */
-    {2, 4, {0.05, 0.05, 0.95, 0.95, 0.00}, {0.50, 0.95, 0.95, 0.50, 0.00}},	/* 32:^ MAP_EMPTY_TREASURE */
-    {0, 5, {0.00, 1.00, 1.00, 0.00, 0.00}, {1.00, 1.00, 0.00, 0.00, 1.00}},	/* 33:z MAP_FRICTION */
-    {0, 5, {0.10, 0.85, 0.85, 0.10, 0.10}, {0.85, 0.85, 0.10, 0.10, 0.85}},	/* 34:& MAP_FRICTION */
+    {2, 4, {0.05, 0.05, 0.95, 0.95, 0.00}, {0.50, 0.95, 0.95, 0.50, 0.00}},	/* 32:^ XPMAP_EMPTY_TREASURE */
+    {0, 5, {0.00, 1.00, 1.00, 0.00, 0.00}, {1.00, 1.00, 0.00, 0.00, 1.00}},	/* 33:z XPMAP_FRICTION_AREA */
+    {0, 5, {0.10, 0.85, 0.85, 0.10, 0.10}, {0.85, 0.85, 0.10, 0.10, 0.85}},	/* 34:& XPMAP_FRICTION_AREA */
 };
 
 segment_t mapicondet_seg[4] = {
@@ -117,14 +114,14 @@ int mapicon_ptr[91] = {
 };
 
 char iconmenu[36] = { ' ',
-    MAP_FILLED, MAP_REC_RD, MAP_REC_LD, MAP_REC_RU, MAP_REC_LU,
-    MAP_DEC_FLD, MAP_DEC_RD, MAP_DEC_LD, MAP_DEC_RU, MAP_DEC_LU,
-    MAP_FUEL, MAP_CAN_LEFT, MAP_CAN_RIGHT, MAP_CAN_UP, MAP_CAN_DOWN,
-    MAP_TARGET, MAP_TREASURE, MAP_EMPTY_TREASURE, MAP_GRAV_ACWISE,
-	MAP_GRAV_CWISE,
-    MAP_WORM_NORMAL, MAP_WORM_IN, MAP_WORM_OUT, MAP_GRAV_POS, MAP_GRAV_NEG,
-    MAP_CRNT_UP, MAP_CRNT_LT, MAP_CRNT_RT, MAP_CRNT_DN, MAP_ASTEROID_CONC,
-    MAP_BASE, MAP_BASE_ORNT, MAP_ITEM_CONC, MAP_FRICTION, MAP_SPACE
+    XPMAP_FILLED, XPMAP_REC_RD, XPMAP_REC_LD, XPMAP_REC_RU, XPMAP_REC_LU,
+    XPMAP_DECOR_FILLED, XPMAP_DECOR_RD, XPMAP_DECOR_LD, XPMAP_DECOR_RU, XPMAP_DECOR_LU,
+    XPMAP_FUEL, XPMAP_CANNON_LEFT, XPMAP_CANNON_RIGHT, XPMAP_CANNON_UP, XPMAP_CANNON_DOWN,
+    XPMAP_TARGET, XPMAP_TREASURE, XPMAP_EMPTY_TREASURE, XPMAP_ACWISE_GRAV,
+	XPMAP_CWISE_GRAV,
+    XPMAP_WORMHOLE_NORMAL, XPMAP_WORMHOLE_IN, XPMAP_WORMHOLE_OUT, XPMAP_POS_GRAV, XPMAP_NEG_GRAV,
+    XPMAP_UP_GRAV, XPMAP_LEFT_GRAV, XPMAP_RIGHT_GRAV, XPMAP_DOWN_GRAV, XPMAP_ASTEROID_CONCENTRATOR,
+    XPMAP_BASE, XPMAP_BASE_ATTRACTOR, XPMAP_ITEM_CONCENTRATOR, XPMAP_FRICTION_AREA, XPMAP_SPACE
 };
 
 

@@ -1,5 +1,5 @@
 /*
- * XMapEdit, the XPilot Map Editor.  Copyright (C) 1993 by
+ * XPilot NG XP-MapEdit, a map editor for xp maps.  Copyright (C) 1993 by
  *
  *      Aaron Averill           <averila@oes.orst.edu>
  *
@@ -22,8 +22,6 @@
  *      Robert Templeman        <mbcaprt@mphhpd.ph.man.ac.uk>
  * 1997:
  *      William Docter          <wad2@lehigh.edu>
- *
- * $Id$
  */
 #define COLOR_BACKGROUND "black"
 #define COLOR_FOREGROUND  "gray"

@@ -1,5 +1,5 @@
 /*
- * XMapEdit, the XPilot Map Editor.  Copyright (C) 1993 by
+ * XPilot NG XP-MapEdit, a map editor for xp maps.  Copyright (C) 1993 by
  *
  *      Aaron Averill           <averila@oes.orst.edu>
  *
@@ -17,28 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Modifications to XMapEdit
+ * Modifications:
  * 1996:
  *      Robert Templeman        <mbcaprt@mphhpd.ph.man.ac.uk>
  * 1997:
  *      William Docter          <wad2@lehigh.edu>
- *
- * $Id$
  */
 
-#include                 <X11/Xlib.h>
-#include                 <X11/Xutil.h>
-#include                 <X11/Xos.h>
-#include                 <X11/Xatom.h>
-#include                 <X11/keysym.h>
-#include                 <stdio.h>
-#include                 <stdlib.h>
-#include                 <string.h>
-
-#include                 "T_Form.h"
-#include                 "T_Popup.h"
-#include                 "T_Handler.h"
-#include                 "T_proto.h"
+#include "xpmapedit.h"
 
 /* Constants for T_DrawButton */
 #define                  RAISED          0

@@ -1,5 +1,5 @@
 /*
- * XMapEdit, the XPilot Map Editor.  Copyright (C) 1993 by
+ * XPilot NG XP-MapEdit, a map editor for xp maps.  Copyright (C) 1993 by
  *
  *      Aaron Averill           <averila@oes.orst.edu>
  *
@@ -17,24 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Modifications to XMapEdit
+ * Modifications:
  * 1996:
  *      Robert Templeman        <mbcaprt@mphhpd.ph.man.ac.uk>
  * 1997:
  *      William Docter          <wad2@lehigh.edu>
- *
- * $Id$
  */
 
-#include                 <X11/Xlib.h>
-#include                 <X11/Xutil.h>
-#include                 <X11/Xos.h>
-#include                 <X11/Xatom.h>
-#include                 <X11/keysym.h>
-#include                 <stdio.h>
-#include                 <ctype.h>
-
-#include                 "main.h"
+#include "xpmapedit.h"
 
 typedef struct grow_t {
     int x, y;
@@ -105,7 +95,7 @@ int GrowMapArea(HandlerInfo info)
 	grow_filled = 0;
 	for (i = grow_minx; i < grow_maxx; i++) {
 	    for (j = grow_miny; j < grow_maxy; j++) {
-		if (MapData(i, j) != MAP_FILLED) {
+		if (MapData(i, j) != XPMAP_FILLED) {
 		    ChangeMapData(i, j, ' ', 1);
 		} else {
 		    grow_filled++;
@@ -120,7 +110,7 @@ int GrowMapArea(HandlerInfo info)
 
 	/* place a square in the center if there are none */
 	if (grow == NULL) {
-	    ChangeMapData(grow_centerx, grow_centery, MAP_FILLED, 1);
+	    ChangeMapData(grow_centerx, grow_centery, XPMAP_FILLED, 1);
 	    grow = (grow_t *) malloc(sizeof(grow_t));
 	    grow->x = grow_centerx;
 	    grow->y = grow_centery;
@@ -133,12 +123,11 @@ int GrowMapArea(HandlerInfo info)
 	    }
 	}
 
-	time(&seed);
-	srand((unsigned int) seed);
+	seedMT((unsigned)time(NULL) * Get_process_id());
     }
 
     if (grow_filled > 1) {
-	growat = rand() % (grow_filled - 1);
+	growat = randomMT() % (grow_filled - 1);
 	next = grow;
 	while ((next != NULL) && (growat != 0)) {
 	    next = next->next;
@@ -148,13 +137,13 @@ int GrowMapArea(HandlerInfo info)
 	next = grow;
     }
 
-    angle = rand() % 1000;
+    angle = randomMT() % 1000;
 
     dx = grow_xa * cos(2 * 3.14 * angle / 1000);
     dy = grow_ya * sin(2 * 3.14 * angle / 1000);
     x = next->x + dx;
     y = next->y + dy;
-    while (MapData((int) x, (int) y) == MAP_FILLED) {
+    while (MapData((int) x, (int) y) == XPMAP_FILLED) {
 	x += dx;
 	y += dy;
     }
@@ -162,7 +151,7 @@ int GrowMapArea(HandlerInfo info)
 	((int) x < grow_minx) || ((int) y < grow_miny)) {
 	return 1;
     }
-    ChangeMapData((int) x, (int) y, MAP_FILLED, 1);
+    ChangeMapData((int) x, (int) y, XPMAP_FILLED, 1);
     next = grow;
     grow = (grow_t *) malloc(sizeof(grow_t));
     grow->x = (int) x;
