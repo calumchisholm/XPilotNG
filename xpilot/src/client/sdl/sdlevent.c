@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <sys/time.h>
 
 #include "xpclient_sdl.h"
 
@@ -214,7 +213,7 @@ int Process_event(SDL_Event *evt)
     case SDL_QUIT:
         Net_cleanup(); 
         Quit();
-	exit(0);
+		exit(0);
         break;
 	
     case SDL_KEYDOWN:
