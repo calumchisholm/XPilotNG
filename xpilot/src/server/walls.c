@@ -1398,8 +1398,8 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
     mv.hitmask = hitmask;
     mv.obj = (object *)obj;
-    pts1 = Shape_get_points((shape *)shape1, dir1);
-    pts2 = Shape_get_points((shape *)shape2, dir2);
+    /*pts1 = Shape_get_points((shape *)shape1, dir1);
+      pts2 = Shape_get_points((shape *)shape2, dir2);*/
 
     /* kps - can this happen ?? */
     if (shape1->num_points != shape2->num_points)
@@ -1409,10 +1409,10 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
     for (i = 0; i < num_points; i++) {
 	clpos pt1, pt2;
-	clpos ptx1, ptx2;
+	/*clpos ptx1, ptx2;
 
-	ptx1 = pts1[i].clk;
-	ptx2 = pts2[i].clk;
+	  ptx1 = pts1[i].clk;
+	  ptx2 = pts2[i].clk;*/
 	pt1 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
 	pt2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
 
