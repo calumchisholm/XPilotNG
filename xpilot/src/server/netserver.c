@@ -3028,7 +3028,7 @@ static void Handle_talk(connection_t *connp, char *str)
     else if (strcasecmp(str, "god") == 0)
 	Server_log_admin_message(pl, cp);
     else {						/* Player message */
-	char *errmsg;
+	const char *errmsg;
 	player *other_pl = Get_player_by_name(str, NULL, &errmsg);
 
 	if (!other_pl) {
