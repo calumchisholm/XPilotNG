@@ -351,34 +351,31 @@ void xevent_pointer(void)
 {
     XEvent event;
 
-    if (pointerControl) {
-	if (!talk_mapped) {
+    if (!pointerControl || talk_mapped)
+	return;
 
-	    if (mouseMovement != 0) {
-    	    	Send_pointer_move(mouseMovement);
-		delta.x = draw_width / 2 - mousePosition.x;
-		delta.y = draw_height / 2 - mousePosition.y;
-		if (ABS(delta.x) > 3 * draw_width / 8
-		    || ABS(delta.y) > 1 * draw_height / 8) {
+    if (mouseMovement != 0) {
+	Send_pointer_move(mouseMovement);
+	delta.x = draw_width / 2 - mousePosition.x;
+	delta.y = draw_height / 2 - mousePosition.y;
+	if (ABS(delta.x) > 3 * draw_width / 8
+	    || ABS(delta.y) > 1 * draw_height / 8) {
 
-		    memset(&event, 0, sizeof(event));
-		    event.type = MotionNotify;
-		    event.xmotion.display = dpy;
-		    event.xmotion.window = drawWindow;
-		    event.xmotion.x = draw_width/2;
-		    event.xmotion.y = draw_height/2;
-		    XSendEvent(dpy, drawWindow, False,
-			       PointerMotionMask, &event);
-		    XWarpPointer(dpy, None, drawWindow,
-				 0, 0, 0, 0,
-				 (int)draw_width/2, (int)draw_height/2);
-		    XFlush(dpy);
-		}
-	    }
+	    memset(&event, 0, sizeof(event));
+	    event.type = MotionNotify;
+	    event.xmotion.display = dpy;
+	    event.xmotion.window = drawWindow;
+	    event.xmotion.x = draw_width/2;
+	    event.xmotion.y = draw_height/2;
+	    XSendEvent(dpy, drawWindow, False,
+		       PointerMotionMask, &event);
+	    XWarpPointer(dpy, None, drawWindow,
+			 0, 0, 0, 0,
+			 (int)draw_width/2, (int)draw_height/2);
+	    XFlush(dpy);
 	}
     }
 }
-
 
 int x_event(int new_input)
 {
@@ -501,33 +498,26 @@ void xevent_keyboard(int queued)
 
 void xevent_pointer(void)
 {
-    if (pointerControl) {
-	if (!talk_mapped) {
+    POINT point;
 
-	    /* This is a HACK to fix mouse control under windows. */
-	    {
-		 POINT point;
+    if (!pointerControl || talk_mapped)
+	return;
 
-		 GetCursorPos(&point);
-		 mouseMovement = point.x - draw_width/2;
-		 XWarpPointer(dpy, None, drawWindow,
-			      0, 0, 0, 0,
-			      draw_width/2, draw_height/2);
-	    }
-	    /* fix end */
+    GetCursorPos(&point);
+    mouseMovement = point.x - draw_width/2;
+    XWarpPointer(dpy, None, drawWindow,
+		 0, 0, 0, 0,
+		 draw_width/2, draw_height/2);
 
-	    if (mouseMovement != 0) {
-    	    	Send_pointer_move(mouseMovement);
-		delta.x = draw_width / 2 - mousePosition.x;
-		delta.y = draw_height / 2 - mousePosition.y;
-		if (ABS(delta.x) > 3 * draw_width / 8
-		    || ABS(delta.y) > 1 * draw_height / 8)
-		    XFlush(dpy);
-	    }
-	}
+    if (mouseMovement != 0) {
+	Send_pointer_move(mouseMovement);
+	delta.x = draw_width / 2 - mousePosition.x;
+	delta.y = draw_height / 2 - mousePosition.y;
+	if (ABS(delta.x) > 3 * draw_width / 8
+	    || ABS(delta.y) > 1 * draw_height / 8)
+	    XFlush(dpy);
     }
 }
-
 
 int win_xevent(XEvent event)
 {
