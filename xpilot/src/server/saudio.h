@@ -41,7 +41,7 @@
 #define sound_player_on(player, on)
 #define sound_play_player(player, index)
 #define sound_play_all(index)
-#define sound_play_sensors(pos, index)
+#define sound_play_sensors(pos, index)		do { ; } while (0)
 #define sound_play_queued(player)
 #define sound_close(player)
 
