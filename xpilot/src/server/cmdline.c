@@ -1664,7 +1664,8 @@ static option_desc opts[] = {
 	&options.rankFileName,
 	valString,
 	tuner_none,
-	"The filename for the XML file to hold server ranking data.\n",
+	"The filename for the XML file to hold server ranking data.\n"
+	"To reset the ranking, delete this file.\n",
 	OPT_COMMAND | OPT_DEFAULTS
     },
     {
