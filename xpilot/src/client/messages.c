@@ -41,6 +41,7 @@ extern void Delete_pending_messages(void);
 bool ball_shout = false;
 bool need_cover = false;
 
+
 /*
  * Little less ugly message scan hack by Samaseon (ksoderbl@cc.hut.fi)
  *
@@ -157,6 +158,96 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *mn)
 }
 
 
+static bool Msg_scan_for_total_reset(char *message)
+{
+    static char total_reset[] = "Total reset";
+
+    if (strstr(message, total_reset)) {
+	killratio_kills = 0;
+	killratio_deaths = 0;
+	killratio_totalkills = 0;
+	killratio_totaldeaths = 0;
+	ballstats_cashes = 0;
+	ballstats_replaces = 0;
+	ballstats_teamcashes = 0;
+	ballstats_lostballs = 0;
+	played_this_round = false;
+	rounds_played = 0;
+	return true;
+    }
+
+    return false;
+}
+
+static bool Msg_scan_for_replace_treasure(char *message)
+{
+    msgnames_t mn;
+
+    if (!self)
+	return false;
+
+    memset(&mn, 0, sizeof(mn));
+    if (Msg_match_fmt(message,
+		      " < %n (team %t) has replaced the treasure >",
+		      &mn)) {
+	int replacer_team = atoi(mn.name[0]);
+	char *replacer = mn.name[1];
+
+	if (replacer_team == self->team) {
+	    ball_shout = false;
+	    if (!strcmp(replacer, self->name))
+		ballstats_replaces++;
+	    return true;
+	}
+	/*
+	 * Ok, at this point we know that it was not someone in our team
+	 * that replaced the treasure.
+	 *
+	 * If there are only 2 teams playing, and our team did not replace,
+	 * it was the other team.
+	 * In this case, we can clear the cover flag.
+	 */
+	if (num_playing_teams == 2)
+	    need_cover = false;
+	return true;
+    }
+
+    return false;
+}
+
+static bool Msg_scan_for_ball_destruction(char *message)
+{
+    msgnames_t mn;
+
+    if (!self)
+	return false;
+
+    /* don't bother to count if we are not playing */
+    if (strchr("PTW", self->mychar))
+	return false;
+
+    memset(&mn, 0, sizeof(mn));
+    if (Msg_match_fmt(message,
+		      " < %n's (%t) team has destroyed team %t treasure >",
+		      &mn)) {
+	int destroyer_team = atoi(mn.name[0]);
+	int destroyed_team = atoi(mn.name[1]);
+	char *destroyer = mn.name[2];
+	
+	if (destroyer_team == self->team) {
+	    ballstats_teamcashes++;
+	    if (!strcmp(destroyer, self->name))
+		ballstats_cashes++;
+	}
+	if (destroyed_team == self->team)
+	    ballstats_lostballs++;
+	return true;
+    }
+    return false;
+}
+
+
+
 
 /* Needed by base warning hack */
 static void Msg_scan_death(int id)
@@ -185,7 +276,15 @@ static void Msg_scan_death(int id)
     }
 }
 
-static void Msg_parse(char *message, size_t len)
+
+static bool Msg_is_game_msg(char *message)
+{
+    if (message[strlen(message) - 1] == ']' || strncmp(message, " <", 2) == 0)
+	return false;
+    return true;
+}
+
+static void Msg_scan_game_msg(char *message)
 {
     msgnames_t mn;
     char *killer = NULL, *victim = NULL, *victim2 = NULL;
@@ -196,10 +295,31 @@ static void Msg_parse(char *message, size_t len)
 
     DP(printf("MESSAGE: \"%s\"\n", message));
 
-    if (message[len - 1] == ']' || strncmp(message, " <", 2) == 0) {
-	DP(printf("-> not going to parser.\n"));
+    /*
+     * First check if it is a message indicating end of round.
+     */
+    if (strstr(message, "There is no Deadly Player") ||
+	strstr(message, "is the Deadliest Player with") ||
+	strstr(message, "are the Deadly Players with")) {
+
+	/* Mara bmsg scan - clear flags at end of round. */
+	ball_shout = false;
+	need_cover = false;
+
+	if (played_this_round) {
+	    played_this_round = false;
+	    rounds_played++;
+	}
+
+	roundend = true;
+	killratio_totalkills += killratio_kills;
+	killratio_totaldeaths += killratio_deaths;
 	return;
     }
+
+    /*
+     * Now let's check if someone got killed.
+     */
     memset(&mn, 0, sizeof(mn));
     /*
      * note: matched names will be in reverse order in the message names
@@ -351,92 +471,27 @@ static void Msg_parse(char *message, size_t len)
 }
 
 
-static bool Msg_scan_for_total_reset(char *message)
+/*
+ * Checks if the message is in angle brackets, that is,
+ * starts with " < " and ends with ">"
+ */
+static bool Msg_is_in_angle_brackets(char *message)
 {
-    static char total_reset[] = "Total reset";
-
-    if (strstr(message, total_reset)) {
-	killratio_kills = 0;
-	killratio_deaths = 0;
-	killratio_totalkills = 0;
-	killratio_totaldeaths = 0;
-	ballstats_cashes = 0;
-	ballstats_replaces = 0;
-	ballstats_teamcashes = 0;
-	ballstats_lostballs = 0;
-	played_this_round = false;
-	rounds_played = 0;
-	return true;
-    }
-
-    return false;
+    if (strncmp(message, " < ", 3))
+	return false;
+    if (message[strlen(message) - 1] != '>')
+	return false;
+    return true;
 }
 
-static bool Msg_scan_for_replace_treasure(char *message)
+static void Msg_scan_angle_bracketed_msg(char *message)
 {
-    msgnames_t mn;
-
-    if (!self)
-	return false;
-
-    memset(&mn, 0, sizeof(mn));
-    if (Msg_match_fmt(message,
-		      " < %n (team %t) has replaced the treasure >",
-		      &mn)) {
-	int replacer_team = atoi(mn.name[0]);
-	char *replacer = mn.name[1];
-
-	if (replacer_team == self->team) {
-	    ball_shout = false;
-	    if (!strcmp(replacer, self->name))
-		ballstats_replaces++;
-	    return true;
-	}
-	/*
-	 * Ok, at this point we know that it was not someone in our team
-	 * that replaced the treasure.
-	 *
-	 * If there are only 2 teams playing, and our team did not replace,
-	 * it was the other team.
-	 * In this case, we can clear the cover flag.
-	 */
-	if (num_playing_teams == 2)
-	    need_cover = false;
-	return true;
-    }
-
-    return false;
-}
-
-static bool Msg_scan_for_ball_destruction(char *message)
-{
-    msgnames_t mn;
-
-    if (!self)
-	return false;
-
-    /* don't bother to count if we are not playing */
-    if (strchr("PTW", self->mychar))
-	return false;
-
-    memset(&mn, 0, sizeof(mn));
-    if (Msg_match_fmt(message,
-		      " < %n's (%t) team has destroyed team %t treasure >",
-		      &mn)) {
-	int destroyer_team = atoi(mn.name[0]);
-	int destroyed_team = atoi(mn.name[1]);
-	char *destroyer = mn.name[2];
-	
-	if (destroyer_team == self->team) {
-	    ballstats_teamcashes++;
-	    if (!strcmp(destroyer, self->name))
-		ballstats_cashes++;
-	}
-	if (destroyed_team == self->team)
-	    ballstats_lostballs++;
-	return true;
-    }
-    return false;
+    if (Msg_scan_for_ball_destruction(message))
+	return;
+    if (Msg_scan_for_replace_treasure(message))
+	return;
+    if (Msg_scan_for_total_reset(message))
+	return;
 }
 
 /* Mara's ball message scan */
@@ -552,34 +607,14 @@ static bool Msg_is_from_our_team(char *message, char **bracket)
 
 
 /*
- * Checks if the message is in angle brackets, that is,
- * starts with " < " and ends with ">"
- */
-static bool Msg_is_in_angle_brackets(char *message)
-{
-    if (strncmp(message, " < ", 3))
-	return false;
-    if (message[strlen(message) - 1] != '>')
-	return false;
-    return true;
-}
-
-static bool Msg_is_game_msg(char *message)
-{
-    if (message[strlen(message) - 1] == ']' || strncmp(message, " <", 2) == 0)
-	return false;
-    return true;
-}
-
-
-/*
  * add an incoming talk/game message.
  * however, buffer new messages if there is a pending selection.
  * Add_pending_messages() will be called later in Talk_cut_from_messages().
  */
 void Add_message(char *message)
 {
-    int			i, len;
+    int			i;
+    size_t		len;
     message_t		*tmp, **msg_set;
     bool		is_game_msg = false;
     msg_bms_t		bmsinfo = BmsNone;
@@ -593,7 +628,6 @@ void Add_message(char *message)
 
     show_reverse_scroll = BIT(instruments, SHOW_REVERSE_SCROLL);
 
-    len = strlen(message);
     is_game_msg = Msg_is_game_msg(message);
     if (!is_game_msg) {
 	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
@@ -610,7 +644,6 @@ void Add_message(char *message)
 	    msg_set = GameMsg;
     }
 #else
-    len = strlen(message);
     is_game_msg = Msg_is_game_msg(message);
     if (!is_game_msg)
 	msg_set = TalkMsg;
@@ -618,39 +651,17 @@ void Add_message(char *message)
 	msg_set = GameMsg;
 #endif
 
-    if (is_game_msg /* && oldServer)*/)
-	Msg_parse(message, len);
+    if (is_game_msg)
+	Msg_scan_game_msg(message);
 
-    if (is_game_msg &&
-	(strstr(message, "There is no Deadly Player") ||
-	 strstr(message, "is the Deadliest Player with") ||
-	 strstr(message, "are the Deadly Players with"))) {
+    else if (Msg_is_in_angle_brackets(message))
+	Msg_scan_angle_bracketed_msg(message);
 
-	/* Mara bmsg scan - clear flags at end of round. */
-	ball_shout = false;
-	need_cover = false;
-
-	if (played_this_round) {
-	    played_this_round = false;
-	    rounds_played++;
-	}
-
-	roundend = true;
-	killratio_totalkills += killratio_kills;
-	killratio_totaldeaths += killratio_deaths;
-    }
-
-    if (BIT(hackedInstruments, BALL_MSG_SCAN)
+    else if (BIT(hackedInstruments, BALL_MSG_SCAN)
 	&& !is_game_msg
 	&& BIT(Setup->mode, TEAM_PLAY)
 	&& Msg_is_from_our_team(message, &bracket))
 	bmsinfo = Msg_do_bms(message, bracket);
-
-    if (Msg_is_in_angle_brackets(message)) {
-	if (Msg_scan_for_ball_destruction(message));
-	else if (Msg_scan_for_replace_treasure(message));
-	else Msg_scan_for_total_reset(message);
-    }
 
 #ifndef _WINDOWS
     if (selectionAndHistory && is_drawn_talk_message) {
@@ -689,13 +700,14 @@ void Add_message(char *message)
 #endif
 
     tmp = msg_set[maxMessages - 1];
-    for (i = maxMessages - 1; i > 0; i--) {
+    for (i = maxMessages - 1; i > 0; i--)
 	msg_set[i] = msg_set[i - 1];
-    }
+
     msg_set[0] = tmp;
 
     msg_set[0]->lifeTime = MSG_LIFE_TIME;
     strlcpy(msg_set[0]->txt, message, MSG_LEN);
+    len = strlen(message);
     msg_set[0]->len = len;
     msg_set[0]->bmsinfo = bmsinfo;
 
