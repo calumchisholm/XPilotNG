@@ -29,36 +29,43 @@ dnl  We should have some general macro for these.
 AC_ARG_ENABLE(dbe,
 	AC_HELP_STRING([--enable-dbe],
 			[support for X Doublebuffer Extension in client]),
-[if test $enable_dbe = yes; then
+[if test x$enable_dbe = xyes; then
 	AC_DEFINE([DBE], 1, [support for X Doublebuffer Extension in client])
 fi])
 
 AC_ARG_ENABLE(mbx,
 	AC_HELP_STRING([--enable-mbx],
 			[support for X Multibuffer Extension in client]),
-[if test $enable_mbx = yes; then
+[if test x$enable_mbx = xyes; then
 	AC_DEFINE([MBX], 1, [support for X Multibuffer Extension in client])
 fi])
 
 AC_ARG_ENABLE(serversound,
 	AC_HELP_STRING([--enable-serversound],
 			[Turns on sound support in the server (not client)]),
-[if test $enable_serversound = yes; then
+[if test x$enable_serversound = xyes; then
 	AC_DEFINE([SERVER_SOUND], 1, [Turns on sound support in the server])
 fi])
 
 AC_ARG_ENABLE(plockserver,
 	AC_HELP_STRING([--enable-plockserver],
 			[lock the xpilot server (xpilots) into memory]),
-[if test $enable_plockserver = yes; then
+[if test x$enable_plockserver = xyes; then
 	AC_DEFINE([PLOCKSERVER], 1, [lock the xpilot server (xpilots) into memory])
 fi])
 
 AC_ARG_ENABLE(development,
 	AC_HELP_STRING([--enable-development],
 			[enable development code]),
-[if test $enable_development = yes; then
+[if test x$enable_development = xyes; then
 	AC_DEFINE([DEVELOPMENT], 1, [enable development code])
+fi])
+
+AC_ARG_ENABLE(sdl_client,
+	AC_HELP_STRING([--enable-sdl-client],
+			[enable sdl client]),
+[if test x$enable_sdl_client = xyes; then
+	AC_DEFINE([SDL_CLIENT], 1, [enable sdl client])
 fi])
 
 
@@ -101,22 +108,23 @@ case "$target" in
         ;;
 esac
 
+dnl Stuff needed by SDL client.
+if test x$enable_sdl_client = xyes; then
 
-dnl Check for SDL, from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz
-SDL_VERSION=1.2.0
-AM_PATH_SDL($SDL_VERSION,
-            :,
-            AC_MSG_WARN([*** SDL version $SDL_VERSION not found!])
-)
-CFLAGS="$CFLAGS $SDL_CFLAGS"
+	dnl Check for SDL,
+	dnl from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz
+	SDL_VERSION=1.2.0
+	AM_PATH_SDL($SDL_VERSION,
+        	    :,
+	            AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
+	)
+	CFLAGS="$CFLAGS $SDL_CFLAGS"
 
-if test x$no_sdl = xyes; then
-    AC_MSG_WARN(SDL client will not be built.)
-fi
-AM_CONDITIONAL([COND_NO_SDL], [test "$no_sdl" = yes])
+	if test x$no_sdl = xyes; then
+	    AC_MSG_ERROR(SDL client will not be built.)
+	fi
 
-dnl check for SDL_ttf and OpenGL only if SDL client is built.
-if test x$no_sdl != xyes; then
+	dnl check for SDL_ttf and OpenGL only if SDL client is built.
 
 	dnl kps - hack to check for SDL_ttf
 	AC_MSG_CHECKING(for SDL_ttf)
@@ -156,8 +164,7 @@ if test x$no_sdl != xyes; then
 	AC_SUBST(GL_LIBS)
 fi
 
-
-
+AM_CONDITIONAL([COND_SDL_CLIENT], [test x$enable_sdl_client = xyes])
 
 
 dnl  Checks for header files.

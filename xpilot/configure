@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_INSTLIBDIR XP_TITLE XP_WINVERSION XP_VERSION_WINDOWS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS SDL_CONFIG SDL_CFLAGS SDL_LIBS COND_NO_SDL_TRUE COND_NO_SDL_FALSE SDL_EXTRA_LIBS GL_LIBS EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_INSTLIBDIR XP_TITLE XP_WINVERSION XP_VERSION_WINDOWS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -865,6 +865,7 @@ Optional Features:
   --enable-serversound    Turns on sound support in the server (not client)
   --enable-plockserver    lock the xpilot server (xpilots) into memory
   --enable-development    enable development code
+  --enable-sdl-client     enable sdl client
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-sdltest       Do not try to compile and run a test SDL program
@@ -1892,7 +1893,7 @@ XP_VERSION_WINDOWS="13"
 # Check whether --enable-dbe or --disable-dbe was given.
 if test "${enable_dbe+set}" = set; then
   enableval="$enable_dbe"
-  if test $enable_dbe = yes; then
+  if test x$enable_dbe = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define DBE 1
@@ -1904,7 +1905,7 @@ fi;
 # Check whether --enable-mbx or --disable-mbx was given.
 if test "${enable_mbx+set}" = set; then
   enableval="$enable_mbx"
-  if test $enable_mbx = yes; then
+  if test x$enable_mbx = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define MBX 1
@@ -1916,7 +1917,7 @@ fi;
 # Check whether --enable-serversound or --disable-serversound was given.
 if test "${enable_serversound+set}" = set; then
   enableval="$enable_serversound"
-  if test $enable_serversound = yes; then
+  if test x$enable_serversound = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define SERVER_SOUND 1
@@ -1928,7 +1929,7 @@ fi;
 # Check whether --enable-plockserver or --disable-plockserver was given.
 if test "${enable_plockserver+set}" = set; then
   enableval="$enable_plockserver"
-  if test $enable_plockserver = yes; then
+  if test x$enable_plockserver = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define PLOCKSERVER 1
@@ -1940,10 +1941,22 @@ fi;
 # Check whether --enable-development or --disable-development was given.
 if test "${enable_development+set}" = set; then
   enableval="$enable_development"
-  if test $enable_development = yes; then
+  if test x$enable_development = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define DEVELOPMENT 1
+_ACEOF
+
+fi
+fi;
+
+# Check whether --enable-sdl_client or --disable-sdl_client was given.
+if test "${enable_sdl_client+set}" = set; then
+  enableval="$enable_sdl_client"
+  if test x$enable_sdl_client = xyes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define SDL_CLIENT 1
 _ACEOF
 
 fi
@@ -5078,8 +5091,9 @@ case "$target" in
         ;;
 esac
 
+if test x$enable_sdl_client = xyes; then
 
-SDL_VERSION=1.2.0
+			SDL_VERSION=1.2.0
 
 # Check whether --with-sdl-prefix or --without-sdl-prefix was given.
 if test "${with_sdl_prefix+set}" = set; then
@@ -5364,32 +5378,23 @@ rm -f conftest.err conftest.$ac_objext \
      fi
      SDL_CFLAGS=""
      SDL_LIBS=""
-     { echo "$as_me:$LINENO: WARNING: *** SDL version $SDL_VERSION not found!" >&5
-echo "$as_me: WARNING: *** SDL version $SDL_VERSION not found!" >&2;}
+     { { echo "$as_me:$LINENO: error: *** SDL version $SDL_VERSION not found!" >&5
+echo "$as_me: error: *** SDL version $SDL_VERSION not found!" >&2;}
+   { (exit 1); exit 1; }; }
 
   fi
 
 
   rm -f conf.sdltest
 
-CFLAGS="$CFLAGS $SDL_CFLAGS"
+	CFLAGS="$CFLAGS $SDL_CFLAGS"
 
-if test x$no_sdl = xyes; then
-    { echo "$as_me:$LINENO: WARNING: SDL client will not be built." >&5
-echo "$as_me: WARNING: SDL client will not be built." >&2;}
-fi
+	if test x$no_sdl = xyes; then
+	    { { echo "$as_me:$LINENO: error: SDL client will not be built." >&5
+echo "$as_me: error: SDL client will not be built." >&2;}
+   { (exit 1); exit 1; }; }
+	fi
 
-
-if test "$no_sdl" = yes; then
-  COND_NO_SDL_TRUE=
-  COND_NO_SDL_FALSE='#'
-else
-  COND_NO_SDL_TRUE='#'
-  COND_NO_SDL_FALSE=
-fi
-
-
-if test x$no_sdl != xyes; then
 
 		echo "$as_me:$LINENO: checking for SDL_ttf" >&5
 echo $ECHO_N "checking for SDL_ttf... $ECHO_C" >&6
@@ -5520,6 +5525,14 @@ echo "$as_me: error: Unable to find OpenGL headers and libraries" >&2;}
 fi
 
 
+
+if test x$enable_sdl_client = xyes; then
+  COND_SDL_CLIENT_TRUE=
+  COND_SDL_CLIENT_FALSE='#'
+else
+  COND_SDL_CLIENT_TRUE='#'
+  COND_SDL_CLIENT_FALSE=
+fi
 
 
 
@@ -8227,10 +8240,10 @@ echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${COND_NO_SDL_TRUE}" && test -z "${COND_NO_SDL_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COND_NO_SDL\" was never defined.
+if test -z "${COND_SDL_CLIENT_TRUE}" && test -z "${COND_SDL_CLIENT_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COND_SDL_CLIENT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COND_NO_SDL\" was never defined.
+echo "$as_me: error: conditional \"COND_SDL_CLIENT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -8860,10 +8873,10 @@ s,@X_EXTRA_LIBS@,$X_EXTRA_LIBS,;t t
 s,@SDL_CONFIG@,$SDL_CONFIG,;t t
 s,@SDL_CFLAGS@,$SDL_CFLAGS,;t t
 s,@SDL_LIBS@,$SDL_LIBS,;t t
-s,@COND_NO_SDL_TRUE@,$COND_NO_SDL_TRUE,;t t
-s,@COND_NO_SDL_FALSE@,$COND_NO_SDL_FALSE,;t t
 s,@SDL_EXTRA_LIBS@,$SDL_EXTRA_LIBS,;t t
 s,@GL_LIBS@,$GL_LIBS,;t t
+s,@COND_SDL_CLIENT_TRUE@,$COND_SDL_CLIENT_TRUE,;t t
+s,@COND_SDL_CLIENT_FALSE@,$COND_SDL_CLIENT_FALSE,;t t
 s,@EGREP@,$EGREP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@POW_LIB@,$POW_LIB,;t t

@@ -133,8 +133,8 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
-COND_NO_SDL_FALSE = @COND_NO_SDL_FALSE@
-COND_NO_SDL_TRUE = @COND_NO_SDL_TRUE@
+COND_SDL_CLIENT_FALSE = @COND_SDL_CLIENT_FALSE@
+COND_SDL_CLIENT_TRUE = @COND_SDL_CLIENT_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -266,12 +266,12 @@ libxpclient_a_SOURCES = \
 
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
-@COND_NO_SDL_FALSE@MAYBE_SDL = sdl
+@COND_SDL_CLIENT_FALSE@MAYBE_SDL = 
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
 
 # From section Conditional subdirectories with AM_CONDITIONAL
 # in GNU automake manual.
-@COND_NO_SDL_TRUE@MAYBE_SDL = 
+@COND_SDL_CLIENT_TRUE@MAYBE_SDL = sdl
 
 # kps - . in SUBDIRS is needed to make sure libxpclient.a is compiled before
 # SDL client

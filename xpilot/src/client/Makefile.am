@@ -41,10 +41,10 @@ xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @
 
 # From section Conditional subdirectories with AM_CONDITIONAL
 # in GNU automake manual.
-if COND_NO_SDL
-  MAYBE_SDL =
-else
+if COND_SDL_CLIENT
   MAYBE_SDL = sdl
+else
+  MAYBE_SDL =
 endif
 
 # kps - . in SUBDIRS is needed to make sure libxpclient.a is compiled before
