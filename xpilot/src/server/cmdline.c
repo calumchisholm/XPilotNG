@@ -253,7 +253,6 @@ bool		fullFramerate;		/* Are players allowed to watch
 					   others with full framerate? */
 bool		fullZeroFramerate;	/* Are team zero pausers allowed to
 					   watch others with full framerate? */
-bool		teamAssign;		/* Assign player to team if not set? */
 bool		teamImmunity;		/* Is team immune from player action */
 bool		teamShareScore;		/* Are scores shared between members? */
 
@@ -1371,17 +1370,6 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do shots, mines and missiles remain after their owner leaves?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    { /* kps - ng does not want this  */
-	"teamAssign",
-	"teamAssign",
-	"yes",
-	&teamAssign,
-	valBool,
-	tuner_dummy,
-	"If players have not specified which team they like to join\n"
-	"should the server choose a team for them automatically?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
