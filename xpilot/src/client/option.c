@@ -251,6 +251,11 @@ static bool Set_string_option(xp_option_t *opt, const char *value)
     return retval;
 }
 
+typedef struct {
+    xp_keysym_t keysym;
+    keys_t key;
+} xp_keydefs_t;
+
 xp_keydefs_t *xpkeydefs = NULL;
 int num_xpkeydefs = 0;
 int max_xpkeydefs = 0;
@@ -269,7 +274,7 @@ keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
      * Use brute force linear search to find the key.
      */
     for (; i < num_xpkeydefs; i++) {
-	if (ks == xpkeydefs[i].ks) {
+	if (ks == xpkeydefs[i].keysym) {
 	    ret = xpkeydefs[i].key;
 	    i++;
 	    break;
@@ -279,7 +284,7 @@ keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
     return ret;
 }
 
-static void Store_xpkeydef(xp_keysym_t ks, keys_t key)
+static void Store_xpkeydef(int ks, keys_t key)
 {
     int i;
     xp_keydefs_t xpkeydef;
@@ -290,8 +295,8 @@ static void Store_xpkeydef(xp_keysym_t ks, keys_t key)
     for (i = 0; i < num_xpkeydefs; i++) {
 	xp_keydefs_t *kd = &xpkeydefs[i];
 
-	if (kd->ks == ks && kd->key == key) {
-	    warn("Pair (%d, %d) exist from before", (int) ks, (int) key);
+	if (kd->keysym == ks && kd->key == key) {
+	    warn("Pair (%d, %d) exist from before", ks, (int) key);
 	    /*
 	     * already exists, no need to store 
 	     */
@@ -299,7 +304,7 @@ static void Store_xpkeydef(xp_keysym_t ks, keys_t key)
 	}
     }
 
-    xpkeydef.ks = ks;
+    xpkeydef.keysym = ks;
     xpkeydef.key = key;
 
     /*
@@ -309,7 +314,7 @@ static void Store_xpkeydef(xp_keysym_t ks, keys_t key)
 	xp_keydefs_t *kd = &xpkeydefs[i];
 
 	if (kd->key == KEY_DUMMY) {
-	    assert(kd->ks == XP_KS_UNKNOWN);
+	    assert(kd->keysym == XP_KS_UNKNOWN);
 	    /*warn("Store_xpkeydef: Found dummy at index %d", i);*/
 	    *kd = xpkeydef;
 	    return;
@@ -335,149 +340,10 @@ static void Remove_key_from_xpkeydefs(keys_t key)
 	 */
 	if (kd->key == key) {
 	    /*warn("Remove_key_from_xpkeydefs: Removing key at index %d", i);*/
-	    kd->ks = XP_KS_UNKNOWN;
+	    kd->keysym = XP_KS_UNKNOWN;
 	    kd->key = KEY_DUMMY;
 	}
     }
-}
-
-typedef struct {
-    const char *name;
-    xp_keysym_t ks;
-} xp_key_t;
-
-static xp_key_t xpkeys[] = {
-    {"BackSpace",	XP_KS_BACKSPACE},
-    {"Tab",		XP_KS_TAB},
-    {"Return",		XP_KS_RETURN},
-    {"Pause",		XP_KS_PAUSE},
-    {"Scroll_Lock",	XP_KS_SCROLLOCK},
-    {"Escape",		XP_KS_ESCAPE},
-    {"Delete",		XP_KS_DELETE},
-    {"Home",		XP_KS_HOME},
-    {"Left",		XP_KS_LEFT},
-    {"Up",		XP_KS_UP},
-    {"Right",		XP_KS_RIGHT},
-    {"Down",		XP_KS_HOME},
-    {"Page_Up",		XP_KS_PAGEUP},
-    {"Page_Down",	XP_KS_PAGEDOWN},
-    {"End",		XP_KS_END},
-    {"Insert",		XP_KS_INSERT},
-    {"Num_Lock",	XP_KS_NUMLOCK},
-    {"KP_Enter",	XP_KS_KP_ENTER},
-    {"KP_Multiply",	XP_KS_KP_MULTIPLY},
-    {"KP_Add",		XP_KS_KP_PLUS},
-    {"KP_Subtract",	XP_KS_KP_MINUS},
-    {"KP_Decimal",	XP_KS_KP_PERIOD},
-    {"KP_Divide",	XP_KS_KP_DIVIDE},
-    {"KP_Insert",	XP_KS_KP_INSERT},
-    {"KP_Delete",	XP_KS_KP_DELETE},
-    {"KP_0",		XP_KS_KP0},
-    {"KP_1",		XP_KS_KP1},
-    {"KP_2",		XP_KS_KP2},
-    {"KP_3",		XP_KS_KP3},
-    {"KP_4",		XP_KS_KP4},
-    {"KP_5",		XP_KS_KP5},
-    {"KP_6",		XP_KS_KP6},
-    {"KP_7",		XP_KS_KP7},
-    {"KP_8",		XP_KS_KP8},
-    {"KP_9",		XP_KS_KP9},
-    {"F1",		XP_KS_F1},
-    {"F2",		XP_KS_F2},
-    {"F3",		XP_KS_F3},
-    {"F4",		XP_KS_F4},
-    {"F5",		XP_KS_F5},
-    {"F6",		XP_KS_F6},
-    {"F7",		XP_KS_F7},
-    {"F8",		XP_KS_F8},
-    {"F9",		XP_KS_F9},
-    {"F10",		XP_KS_F10},
-    {"F11",		XP_KS_F11},
-    {"F12",		XP_KS_F12},
-    {"Shift_L",		XP_KS_LSHIFT},
-    {"Shift_R",		XP_KS_RSHIFT},
-    {"Control_L",	XP_KS_LCTRL},
-    {"Control_R",	XP_KS_RCTRL},
-    {"Caps_Lock",	XP_KS_CAPSLOCK},
-    {"space",		XP_KS_SPACE},
-    {"apostrophe",	XP_KS_QUOTE},
-    {"quoteright",	XP_KS_QUOTE},
-    {"comma",		XP_KS_COMMA},
-    {"plus",		XP_KS_PLUS},
-    {"minus",		XP_KS_MINUS},
-    {"period",		XP_KS_PERIOD},
-    {"slash",		XP_KS_SLASH},
-    {"semicolon",	XP_KS_SEMICOLON},
-    {"equal",		XP_KS_EQUALS},
-    {"0",		XP_KS_0},
-    {"1",		XP_KS_1},
-    {"2",		XP_KS_2},
-    {"3",		XP_KS_3},
-    {"4",		XP_KS_4},
-    {"5",		XP_KS_5},
-    {"6",		XP_KS_6},
-    {"7",		XP_KS_7},
-    {"8",		XP_KS_8},
-    {"9",		XP_KS_9},
-    {"a",		XP_KS_a},
-    {"b",		XP_KS_b},
-    {"c",		XP_KS_c},
-    {"d",		XP_KS_d},
-    {"e",		XP_KS_e},
-    {"f",		XP_KS_f},
-    {"g",		XP_KS_g},
-    {"h",		XP_KS_h},
-    {"i",		XP_KS_i},
-    {"j",		XP_KS_j},
-    {"k",		XP_KS_k},
-    {"l",		XP_KS_l},
-    {"m",		XP_KS_m},
-    {"n",		XP_KS_n},
-    {"o",		XP_KS_o},
-    {"p",		XP_KS_p},
-    {"q",		XP_KS_q},
-    {"r",		XP_KS_r},
-    {"s",		XP_KS_s},
-    {"t",		XP_KS_t},
-    {"u",		XP_KS_u},
-    {"v",		XP_KS_v},
-    {"w",		XP_KS_w},
-    {"x",		XP_KS_x},
-    {"y",		XP_KS_y},
-    {"z",		XP_KS_z},
-    {"bracketleft",	XP_KS_LEFTBRACKET},
-    {"backslash",	XP_KS_BACKSLASH},
-    {"bracketright",	XP_KS_RIGHTBRACKET},
-    {"grave",		XP_KS_BACKQUOTE},
-    {"quoteleft",	XP_KS_BACKQUOTE},
-
-    /*
-     * kps additions 
-     */
-    {"Prior",		XP_KS_PAGEUP},
-    {"Next",		XP_KS_PAGEDOWN},
-    {"Print",		XP_KS_PRINT},
-    {"Linefeed",	XP_KS_RETURN},
-    {"Select",		XP_KS_UP},
-    {"section",		XP_KS_SECTION},
-
-};
-
-static xp_keysym_t String_to_xp_keysym(const char *name)
-{
-    int i;
-
-    for (i = 0; i < NELEM(xpkeys); i++) {
-	xp_key_t *k = &xpkeys[i];
-	if (!strcmp(k->name, name))
-	    return k->ks;
-	if (!strcasecmp(k->name, name)) {
-	    warn("Correct case of key \"%s\" is \"%s\"", name, k->name);
-	    return k->ks;
-	}
-    }
-
-    return XP_KS_UNKNOWN;
 }
 
 static bool Set_key_option(xp_option_t *opt, const char *value)
