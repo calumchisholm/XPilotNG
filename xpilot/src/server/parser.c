@@ -243,7 +243,7 @@ int Parser_list_option(int *ind, char *buf)
 		*(int *)options[i].variable / FPS);
 	break;
     case valReal:
-	sprintf(buf, "%s:%g", options[i].name, *(DFLOAT *)options[i].variable);
+	sprintf(buf, "%s:%g", options[i].name, *(double *)options[i].variable);
 	break;
     case valBool:
 	sprintf(buf, "%s:%s", options[i].name,
@@ -442,7 +442,7 @@ bool Parser(int argc, char **argv)
 int Tune_option(char *name, char *val)
 {
     int			ival;
-    DFLOAT		fval;
+    double		fval;
     option_desc		*opt;
 
     if (!(opt = Find_option_by_name(name)))
@@ -470,7 +470,7 @@ int Tune_option(char *name, char *val)
     case valReal:
 	if (Convert_string_to_float(val, &fval) != true)
 	    return 0;
-	*(DFLOAT *)opt->variable = fval;
+	*(double *)opt->variable = fval;
 	(*opt->tuner)();
 	return 1;
     case valSec:
@@ -514,7 +514,7 @@ int Get_option_value(const char *name, char *value, unsigned size)
 	sprintf(value, "%d", *((int *)opt->variable));
 	break;
     case valReal:
-	sprintf(value, "%g", *((DFLOAT *)opt->variable));
+	sprintf(value, "%g", *((double *)opt->variable));
 	break;
     case valBool:
 	sprintf(value, "%s", *((bool *)opt->variable) ? "true" : "false");

@@ -65,7 +65,7 @@ static bool in_range_simple(int px, int py, int qx, int qy, int r)
 }
 
 static bool in_range_partial(double dx, double dy, double dvx, double dvy,
-			     double r, DFLOAT wall_time)
+			     double r, double wall_time)
 {
     double	tmin, fminx, fminy;
     double	top, bot;
@@ -187,7 +187,7 @@ void Check_collision(void)
 static void PlayerCollision(void)
 {
     int			i, j;
-    DFLOAT		sc, sc2;
+    double		sc, sc2;
     player		*pl;
 
     /* Player - player, checkpoint, treasure, object and wall */
@@ -391,7 +391,7 @@ static void PlayerCollision(void)
 	    if (ball->life <= 0 || ball->id != NO_ID)
 		pl->ball = NULL;
 	    else {
-		DFLOAT distance = Wrap_length(pl->pos.cx - ball->pos.cx,
+		double distance = Wrap_length(pl->pos.cx - ball->pos.cx,
 					      pl->pos.cy - ball->pos.cy);
 		int group;
 
@@ -697,7 +697,7 @@ static void PlayerObjectCollision(player *pl)
 static void Player_collides_with_ball(player *pl, object *obj, int radius)
 {
     player	*kp;
-    DFLOAT	sc;
+    double	sc;
     ballobject	*ball = BALL_PTR(obj);
 
     /*
@@ -936,7 +936,7 @@ static void Player_collides_with_item(player *pl, object *obj)
 static void Player_collides_with_mine(player *pl, object *obj)
 {
     player	*kp;
-    DFLOAT	sc;
+    double	sc;
     mineobject	*mine = MINE_PTR(obj);
 
     sound_play_sensors(pl->pos, PLAYER_HIT_MINE_SOUND);
@@ -995,10 +995,10 @@ static void Player_collides_with_mine(player *pl, object *obj)
 static void Player_collides_with_debris(player *pl, object *obj)
 {
     player		*kp;
-    DFLOAT		v = VECTOR_LENGTH(obj->vel);
+    double		v = VECTOR_LENGTH(obj->vel);
     long		tmp = (long) (2 * obj->mass * v);
     long		cost = ABS(tmp);
-    DFLOAT		sc;
+    double		sc;
 
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
@@ -1042,7 +1042,7 @@ static void Player_collides_with_debris(player *pl, object *obj)
 
 static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 {
-    DFLOAT	v = VECTOR_LENGTH(ast->vel);
+    double	v = VECTOR_LENGTH(ast->vel);
     long	tmp = (long) (2 * ast->mass * v);
     long	cost = ABS(tmp);
 
@@ -1062,7 +1062,7 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 	&& (pl->fuel.sum == 0
 	    || (!BIT(pl->used, HAS_SHIELD)
 		&& !BIT(pl->have, HAS_ARMOR)))) {
-	DFLOAT sc;
+	double sc;
 	SET_BIT(pl->status, KILLED);
 	if (pl->velocity > v)
 	    /* player moves faster than asteroid */
@@ -1089,8 +1089,8 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 static void Player_collides_with_killing_shot(player *pl, object *obj)
 {
     player	*kp = NULL;
-    DFLOAT	sc;
-    DFLOAT   	drainfactor;
+    double	sc;
+    double   	drainfactor;
     long	drain;
 
     /*
@@ -1153,7 +1153,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 		if (shotHitFuelDrainUsesKineticEnergy) {
-		    DFLOAT rel_velocity = LENGTH(pl->vel.x - obj->vel.x,
+		    double rel_velocity = LENGTH(pl->vel.x - obj->vel.x,
 						 pl->vel.y - obj->vel.y);
 		    drainfactor
 			= ((rel_velocity * rel_velocity * ABS(obj->mass))
@@ -1177,7 +1177,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    Player_hit_armor(pl);
 
     } else {
-	DFLOAT factor;
+	double factor;
 
 	switch (obj->type) {
 	case OBJ_TORPEDO:
@@ -1288,16 +1288,16 @@ static void Player_pass_checkpoint(player *pl)
 		    "%s finished the race. Last lap time: %.2fs. "
 		    "Personal race best lap time: %.2fs.",
 		    pl->name,
-		    (DFLOAT) pl->last_lap_time / FPS,
-		    (DFLOAT) pl->best_lap / FPS);
+		    (double) pl->last_lap_time / FPS,
+		    (double) pl->best_lap / FPS);
 	} else if (pl->round > 1) {
 	    sprintf(msg,
 		    "%s completes lap %d in %.2fs. "
 		    "Personal race best lap time: %.2fs.",
 		    pl->name,
 		    pl->round-1,
-		    (DFLOAT) pl->last_lap_time / FPS,
-		    (DFLOAT) pl->best_lap / FPS);
+		    (double) pl->last_lap_time / FPS,
+		    (double) pl->best_lap / FPS);
 	} else
 	    sprintf(msg, "%s starts lap 1 of %d", pl->name, raceLaps);
 
@@ -1324,7 +1324,7 @@ static void AsteroidCollision(void)
     object	*obj = NULL, **obj_list;
     list_t	list;
     list_iter_t	iter;
-    DFLOAT	damage = 0;
+    double	damage = 0;
     bool	sound = false;
 
     list = Asteroid_get_list();

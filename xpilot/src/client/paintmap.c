@@ -38,15 +38,15 @@ extern XPoint *polys[500];
 extern int polyc;
 extern int polypc[500];
 
-static DFLOAT 	hrLimitTime = 0.0;
+static double 	hrLimitTime = 0.0;
 
 void Paint_vcannon(void)
 {
     int	i;
     if (num_vcannon > 0) {
-	for (i = 0; i < num_vcannon; i++) {
-    	    Gui_paint_cannon(vcannon_ptr[i].x, vcannon_ptr[i].y, vcannon_ptr[i].type);
-	}
+	for (i = 0; i < num_vcannon; i++)
+    	    Gui_paint_cannon(vcannon_ptr[i].x, vcannon_ptr[i].y,
+			     vcannon_ptr[i].type);
 	RELEASE(vcannon_ptr, num_vcannon, max_vcannon);
     }
 }
@@ -55,9 +55,8 @@ void Paint_vfuel(void)
 {
     int	i;
     if (num_vfuel > 0) {
-	for (i = 0; i < num_vfuel; i++) {
+	for (i = 0; i < num_vfuel; i++)
 	    Gui_paint_fuel(vfuel_ptr[i].x, vfuel_ptr[i].y, vfuel_ptr[i].fuel);
-	}
 	RELEASE(vfuel_ptr, num_vfuel, max_vfuel);
     }
 }
@@ -257,23 +256,19 @@ void Paint_world(void)
     static Pixmap	wallTile = None;
     static int		wallTileDoit = false;
     XPoint		points[5];
-    static DFLOAT	oldHRLimit = -1.0;
+    static double	oldHRLimit = -1.0;
 
     wormDrawCount = (wormDrawCount + 1) & 7;
 
     if (!BIT(Setup->mode, WRAP_PLAY)) {
-	if (world.x <= 0) {
+	if (world.x <= 0)
 	    Gui_paint_border(0, 0, 0, Setup->height);
-	}
-	if (world.x + ext_view_width >= Setup->width) {
+	if (world.x + ext_view_width >= Setup->width)
 	    Gui_paint_border(Setup->width, 0, Setup->width, Setup->height);
-	}
-	if (world.y <= 0) {
+	if (world.y <= 0)
 	    Gui_paint_border(0, 0, Setup->width, 0);
-	}
-	if (world.y + ext_view_height >= Setup->height) {
+	if (world.y + ext_view_height >= Setup->height)
 	    Gui_paint_border(0, Setup->height, Setup->width, Setup->height);
-	}
     }
 
     if (visibilityBorderColor &&

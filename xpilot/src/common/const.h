@@ -62,8 +62,8 @@
 
 #define TABLE_SIZE	RES
 
-extern DFLOAT		tbl_sin[];
-extern DFLOAT		tbl_cos[];
+extern double		tbl_sin[];
+extern double		tbl_cos[];
 
 #if 0
   /* The way it was: one table, and always range checking. */

@@ -28,7 +28,7 @@
 	| FUEL_BIT | CANNON_BIT | TREASURE_BIT | TARGET_BIT \
 	| CHECK_BIT | WORMHOLE_BIT)
 
-extern DFLOAT wallBounceExplosionMult;
+extern double wallBounceExplosionMult;
 static char msg[MSG_LEN];
 
 
@@ -853,7 +853,7 @@ static void Move_segment(move_state_t *ms)
 		 * If this is the case then we test if 3 samples
 		 * are not hitting the treasure.
 		 */
-		const DFLOAT r = 0.5f * BLOCK_CLICKS;
+		const double r = 0.5f * BLOCK_CLICKS;
 		off2.cx = offset.cx + delta.cx;
 		off2.cy = offset.cy + delta.cy;
 		mid.cx = (offset.cx + off2.cx) / 2;
@@ -1478,8 +1478,8 @@ void Move_object_old(object *obj)
     dist = walldist[OBJ_X_IN_BLOCKS(obj)][OBJ_Y_IN_BLOCKS(obj)];
     if (dist > 2) {
 	int max = ((dist - 2) * BLOCK_SZ) >> 1;
-	DFLOAT dcx = obj->vel.x * timeStep;
-	DFLOAT dcy = obj->vel.y * timeStep;
+	double dcx = obj->vel.x * timeStep;
+	double dcy = obj->vel.y * timeStep;
 	if (sqr(max) >= sqr(dcx) + sqr(dcy)) {
 	    int cx = obj->pos.cx + FLOAT_TO_CLICK(dcx);
 	    int cy = obj->pos.cy + FLOAT_TO_CLICK(dcy);
@@ -1637,8 +1637,8 @@ void Move_player_old(player *pl)
     ivec		sign;		/* sign (-1 or 1) of direction */
     ipos		block;		/* block index */
     bool		pos_update = false;
-    DFLOAT		fric;
-    DFLOAT		oldvx, oldvy;
+    double		fric;
+    double		oldvx, oldvy;
 
 
     if (!Player_is_playing(pl)) {
@@ -1815,15 +1815,15 @@ void Move_player_old(player *pl)
 	    worst = bounce;
 	    pl->last_wall_touch = frame_loops;
 	    if (ms[worst].bounce != BounceEdge) {
-		DFLOAT	speed = VECTOR_LENGTH(ms[worst].vel);
+		double	speed = VECTOR_LENGTH(ms[worst].vel);
 		int	v = (int) speed >> 2;
 		int	m = (int) (pl->mass - pl->emptymass * 0.75f);
-		DFLOAT	b = 1 - 0.5f * playerWallBrakeFactor;
+		double	b = 1 - 0.5f * playerWallBrakeFactor;
 		long	cost = (long) (b * m * v);
 		int	delta_dir,
 			abs_delta_dir,
 			wall_dir;
-		DFLOAT	max_speed = BIT(pl->used, HAS_SHIELD)
+		double	max_speed = BIT(pl->used, HAS_SHIELD)
 				    ? maxShieldedWallBounceSpeed
 				    : maxUnshieldedWallBounceSpeed;
 		int	max_angle = BIT(pl->used, HAS_SHIELD)
@@ -1954,8 +1954,8 @@ void Move_player_old(player *pl)
 	}
 	else {
 	    for (i = 0; i < pl->ship->num_points; i++) {
-		r[i].x = (vel.x) ? (DFLOAT) ms[i].todo.cx / vel.x : 0;
-		r[i].y = (vel.y) ? (DFLOAT) ms[i].todo.cy / vel.y : 0;
+		r[i].x = (vel.x) ? (double) ms[i].todo.cx / vel.x : 0;
+		r[i].y = (vel.y) ? (double) ms[i].todo.cy / vel.y : 0;
 		r[i].x = ABS(r[i].x);
 		r[i].y = ABS(r[i].y);
 	    }
@@ -2159,7 +2159,7 @@ void Turn_player_old(player *pl)
 
     if (blocked) {
 	if (!maraTurnqueue)
-	    pl->float_dir = (DFLOAT) pl->dir;
+	    pl->float_dir = (double) pl->dir;
 	pl->last_wall_touch = frame_loops;
     }
 

@@ -43,7 +43,7 @@ char update_version[] = VERSION;
 int	round_delay = 0;	/* delay until start of next round */
 int	round_delay_send = 0;	/* number of frames to send round_delay */
 int	roundtime = -1;		/* time left this round */
-static DFLOAT time_to_update = 1;	/* time before less frequent updates */
+static double time_to_update = 1;	/* time before less frequent updates */
 static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static char msg[MSG_LEN];
@@ -60,7 +60,7 @@ static void Transport_to_home(player *pl)
      * This results in a visually pleasing take off and landing.
      */
     clpos		startpos;
-    DFLOAT		dx, dy, t, m;
+    double		dx, dy, t, m;
     const int		T = RECOVERY_DELAY;
 
     if (pl->home_base == NULL) {
@@ -293,14 +293,14 @@ static void do_Autopilot (player *pl)
     int		dir;
     int		afterburners;
     int		ix, iy;
-    DFLOAT	gx, gy;
-    DFLOAT	acc, vel;
-    DFLOAT	delta;
-    DFLOAT	turnspeed, power;
-    const DFLOAT	emergency_thrust_settings_delta = 150.0 / FPS;
-    const DFLOAT	auto_pilot_settings_delta = 15.0 / FPS;
-    const DFLOAT	auto_pilot_turn_factor = 2.5;
-    const DFLOAT	auto_pilot_dead_velocity = 0.5;
+    double	gx, gy;
+    double	acc, vel;
+    double	delta;
+    double	turnspeed, power;
+    const double	emergency_thrust_settings_delta = 150.0 / FPS;
+    const double	auto_pilot_settings_delta = 15.0 / FPS;
+    const double	auto_pilot_turn_factor = 2.5;
+    const double	auto_pilot_dead_velocity = 0.5;
 
     /*
      * If the last movement touched a wall then we shouldn't
@@ -371,7 +371,7 @@ static void do_Autopilot (player *pl)
      * Calculate turnspeed needed to change direction instantaneously by
      * above direction change.
      */
-    turnspeed = ((DFLOAT)vad) / pl->turnresistance - pl->turnvel;
+    turnspeed = ((double)vad) / pl->turnresistance - pl->turnvel;
     if (turnspeed < 0) {
 	turnspeed = -turnspeed;
 	dir = -dir;
@@ -444,7 +444,7 @@ static void do_Autopilot (player *pl)
 static void Fuel_update(void)
 {
     int i;
-    DFLOAT fuel;
+    double fuel;
     int frames_per_update;
 
     if (NumPlayers == 0)
@@ -911,7 +911,7 @@ void Update_objects(void)
 		}
 		if (BIT(pl->status, SELF_DESTRUCT)) {
 		    if (selfDestructScoreMult != 0) {
-			DFLOAT sc = Rate(0, pl->score) * selfDestructScoreMult;
+			double sc = Rate(0, pl->score) * selfDestructScoreMult;
 			Score(pl, -sc, pl->pos, "Self-Destruct");
 		    }
 		    SET_BIT(pl->status, KILLED);
@@ -1041,12 +1041,12 @@ void Update_objects(void)
 	 * Update acceleration vector etc.
 	 */
 	if (BIT(pl->status, THRUSTING)) {
-	    DFLOAT power = pl->power;
-	    DFLOAT f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
+	    double power = pl->power;
+	    double f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
 	    int a = (BIT(pl->used, HAS_EMERGENCY_THRUST)
 		     ? MAX_AFTERBURNER
 		     : pl->item[ITEM_AFTERBURNER]);
-	    DFLOAT inert = pl->mass;
+	    double inert = pl->mass;
 
 	    if (a) {
 		power = AFTER_BURN_POWER(power, a);
@@ -1073,7 +1073,7 @@ void Update_objects(void)
 	if (BIT(pl->status, WARPING)) {
 	    clpos dest;
 	    int wcx, wcy, nearestFront, nearestRear;
-	    DFLOAT proximity, proxFront, proxRear;
+	    double proximity, proxFront, proxRear;
 
 	    /* kps - wormHoleHit is now a pointer */
 	    if (pl->wormHoleHit >= World.NumWormholes) {

@@ -821,7 +821,7 @@ void Robot_delete(player *pl, bool kicked)
 {
     int			i;
     player		*low_pl = NULL;
-    DFLOAT		low_score = (DFLOAT)LONG_MAX;
+    double		low_score = (double)LONG_MAX;
     char		msg[MSG_LEN];
 
     if (pl == NULL) {
@@ -1051,7 +1051,7 @@ void Robot_update(void)
 {
     player		*pl;
     int			i;
-    static DFLOAT	new_robot_delay;
+    static double	new_robot_delay;
     int			num_playing_ships;
     int			num_any_ships;
 

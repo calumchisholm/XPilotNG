@@ -44,7 +44,7 @@ short	nextCheckPoint;
 u_byte	numItems[NUM_ITEMS];	/* Count of currently owned items */
 u_byte	lastNumItems[NUM_ITEMS];/* Last item count shown */
 int	numItemsTime[NUM_ITEMS];/* Number of frames to show this item count */
-DFLOAT	showItemsTime;		/* How long to show changed item count for */
+double	showItemsTime;		/* How long to show changed item count for */
 
 short	autopilotLight;
 
@@ -77,7 +77,7 @@ int	shot_size;		/* size of shot */
 int	teamshot_size;		/* size of team shot */
 bool	showNastyShots = false;	/* show original flavor shots or the new 
 				   "nasty shots" */
-DFLOAT	controlTime;		/* Display control for how long? */
+double	controlTime;		/* Display control for how long? */
 u_byte	spark_rand;		/* Sparkling effect */
 u_byte	old_spark_rand;		/* previous value of spark_rand */
 
@@ -85,26 +85,26 @@ long	fuelSum;		/* Sum of fuel in all tanks */
 long	fuelMax;		/* How much fuel can you take? */
 short	fuelCurrent;		/* Number of currently used tank */
 short	numTanks;		/* Number of tanks */
-DFLOAT	fuelTime;		/* Display fuel for how long? */
+double	fuelTime;		/* Display fuel for how long? */
 int	fuelLevel1;		/* Fuel critical level */
 int	fuelLevel2;		/* Fuel warning level */
 int	fuelLevel3;		/* Fuel notify level */
 
 char	*shipShape;		/* Shape of player's ship */
-DFLOAT	power;			/* Force of thrust */
-DFLOAT	power_s;		/* Saved power fiks */
-DFLOAT	turnspeed;		/* How fast player acc-turns */
-DFLOAT	turnspeed_s;		/* Saved turnspeed */
-DFLOAT	turnresistance;		/* How much is lost in % */
-DFLOAT	turnresistance_s;	/* Saved (see above) */
-DFLOAT	displayedPower;		/* What the server is sending us */
-DFLOAT	displayedTurnspeed;	/* What the server is sending us */
-DFLOAT	displayedTurnresistance;/* What the server is sending us */
-DFLOAT	spark_prob;		/* Sparkling effect user configurable */
+double	power;			/* Force of thrust */
+double	power_s;		/* Saved power fiks */
+double	turnspeed;		/* How fast player acc-turns */
+double	turnspeed_s;		/* Saved turnspeed */
+double	turnresistance;		/* How much is lost in % */
+double	turnresistance_s;	/* Saved (see above) */
+double	displayedPower;		/* What the server is sending us */
+double	displayedTurnspeed;	/* What the server is sending us */
+double	displayedTurnresistance;/* What the server is sending us */
+double	spark_prob;		/* Sparkling effect user configurable */
 int     charsPerSecond;         /* Message output speed (configurable) */
 
-DFLOAT	hud_move_fact;		/* scale the hud-movement (speed) */
-DFLOAT	ptr_move_fact;		/* scale the speed pointer length */
+double	hud_move_fact;		/* scale the hud-movement (speed) */
+double	ptr_move_fact;		/* scale the speed pointer length */
 long	instruments;		/* Instruments on screen (bitmask) */
 char	mods[MAX_CHARS];	/* Current modifiers in effect */
 int	packet_size;		/* Current frame update packet size */
@@ -133,8 +133,8 @@ int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
 byte	lose_item;		/* index for dropping owned item */
 int	lose_item_active;	/* one of the lose keys is pressed */
 
-DFLOAT	scaleFactor;
-DFLOAT	scaleFactor_s;
+double	scaleFactor;
+double	scaleFactor_s;
 
 #ifdef SOUND
 char 	sounds[MAX_CHARS];	/* audio mappings */
@@ -146,7 +146,7 @@ other_t	*Others = 0;
 int	num_others = 0,
 	max_others = 0;
 
-static DFLOAT		teamscores[MAX_TEAMS];
+static double		teamscores[MAX_TEAMS];
 
 fuelstation_t	*fuels = 0;
 int		num_fuels = 0;
@@ -1190,7 +1190,7 @@ int Handle_seek(int programmer_id, int robot_id, int sought_id)
     return 0;
 }
 
-int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance)
+int Handle_score(int id, double score, int life, int mychar, int alliance)
 {
     other_t		*other;
 
@@ -1213,7 +1213,7 @@ int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance)
     return 0;
 }
 
-int Handle_team_score(int team, DFLOAT score)
+int Handle_team_score(int team, double score)
 {
     if (teamscores[team] != score) {
 	teamscores[team] = score;
@@ -1244,7 +1244,7 @@ int Handle_timing(int id, int check, int round)
     return 0;
 }
 
-int Handle_score_object(DFLOAT score, int x, int y, char *msg)
+int Handle_score_object(double score, int x, int y, char *msg)
 {
     score_object_t*	sobj = &score_objects[score_object];
 
@@ -1298,13 +1298,13 @@ static void Print_roundend_messages(other_t **order)
 	sprintf(kdratio, "infinite");
     else
 	sprintf(kdratio, "%.2f",
-		(DFLOAT)killratio_totalkills / killratio_totaldeaths);
+		(double)killratio_totalkills / killratio_totaldeaths);
 
     if (rounds_played == 0)
 	sprintf(killsperround, "0");
     else
 	sprintf(killsperround, "%.2f",
-		(DFLOAT)killratio_totalkills / rounds_played);
+		(double)killratio_totalkills / rounds_played);
 
     sprintf(hackbuf, "Kill ratio - Round: %d/%d Total: %d/%d (%s) "
 	    "Rounds played: %d  Avg.kills/round: %s",
@@ -1361,7 +1361,7 @@ bool Using_score_decimals(void)
 }
 
 struct team_score {
-    DFLOAT	score;
+    double	score;
     int		life;
     int		playing;
 };
@@ -1455,7 +1455,7 @@ static void Determine_order(other_t **order, struct team_score team[])
 #define TEAM_PAUSEHACK 100
 
 static int Team_heading(int entrynum, int teamnum,
-			int teamlives, DFLOAT teamscore)
+			int teamlives, double teamscore)
 {
     other_t tmp;
     tmp.id = -1;
@@ -1683,7 +1683,7 @@ int Client_setup(void)
      * which happens to have the turnresistance patch. */
     if (turnresistance == 0.0 && version < 0x4200 && version != 0x4101)
     {
-	DFLOAT tmp;
+	double tmp;
 #define SWAP(a,b) (tmp = (a), (a) = (b), (b) = tmp)
 	SWAP(power, power_s);
 	SWAP(turnspeed, turnspeed_s);

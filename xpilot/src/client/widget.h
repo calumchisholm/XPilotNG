@@ -105,8 +105,8 @@ typedef struct widget_arrow {
 
 typedef struct widget_int {
     int				*val,		/* Integer pointer */
-					min,		/* Minimum value */
-					max;		/* Maximum value */
+				min,		/* Minimum value */
+				max;		/* Maximum value */
     int				(*callback)(int, void *, int *);
     void			*user_data;
 } widget_int_t;
@@ -120,10 +120,10 @@ typedef struct widget_color {
 } widget_color_t;
 
 typedef struct widget_float {
-    DFLOAT			*val,		/* Float pointer */
-					min,		/* Minimum value */
-					max;		/* Maximum value */
-    int				(*callback)(int, void *, DFLOAT *);
+    double			*val,		/* Float pointer */
+				min,		/* Minimum value */
+				max;		/* Maximum value */
+    int				(*callback)(int, void *, double *);
     void			*user_data;
 } widget_float_t;
 
@@ -198,8 +198,8 @@ int Widget_create_color(int parent_desc, int color,
  		        void *user_data);
 int Widget_create_float(int parent_desc,
 			int x, int y, int width, int height,
-			int border, DFLOAT *val, DFLOAT min, DFLOAT max,
-			int (*callback)(int, void *, DFLOAT *),
+			int border, double *val, double min, double max,
+			int (*callback)(int, void *, double *),
 			void *user_data);
 int Widget_create_label(int parent_desc,
 			int x, int y,

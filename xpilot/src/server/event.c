@@ -26,7 +26,7 @@
 char event_version[] = VERSION;
 
 
-#define SWAP(_a, _b)	    {DFLOAT _tmp = _a; _a = _b; _b = _tmp;}
+#define SWAP(a, b)	    {double tmp = a; a = b; b = tmp;}
 
 /*
  * Globals.
@@ -37,7 +37,7 @@ static char		msg[MSG_LEN];
 static void Refuel(player *pl)
 {
     int i;
-    DFLOAT l, dist = 1e19;
+    double l, dist = 1e19;
     fuel_t *fs;
 
     if (!BIT(pl->have, HAS_REFUEL))
@@ -60,7 +60,7 @@ static void Refuel(player *pl)
 static void Repair(player *pl)
 {
     int i;
-    DFLOAT l, dist = 1e19;
+    double l, dist = 1e19;
     target_t *targ;
 
     if (!BIT(pl->have, HAS_REPAIR))
@@ -134,7 +134,7 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
 int Player_lock_closest(player *pl, bool next)
 {
     int i;
-    DFLOAT dist = 0.0, best, l;
+    double dist = 0.0, best, l;
     player *lock_pl = NULL, *new_pl = NULL;
 
     if (!next)
@@ -254,7 +254,7 @@ void Pause_player(player *pl, bool on)
 int Handle_keyboard(player *pl)
 {
     int	    	i, j, k, key, pressed, cx, cy, dx, dy, xi, yi;
-    DFLOAT  	minv;
+    double  	minv;
     int	    	ind = GetInd(pl->id);
 
     for (key = 0; key < NUM_KEYS; key++) {

@@ -106,8 +106,8 @@
 
 
 typedef struct {
-    DFLOAT	ratio;
-    DFLOAT	score;
+    double	ratio;
+    double	score;
     short	id;
     uint16_t	team;
     short	check;
@@ -189,7 +189,7 @@ typedef struct {
 
 /*#define SCORE_OBJECT_COUNT	100*/
 typedef struct {
-    DFLOAT	score,
+    double	score,
 		life_time;
     int		x,
 		y,
@@ -247,7 +247,7 @@ extern short	nextCheckPoint;
 extern u_byte	numItems[NUM_ITEMS];
 extern u_byte	lastNumItems[NUM_ITEMS];
 extern int	numItemsTime[NUM_ITEMS];
-extern DFLOAT	showItemsTime;
+extern double	showItemsTime;
 extern short	autopilotLight;
 extern int	showScoreDecimals;
 
@@ -280,7 +280,7 @@ extern int	spark_size;		/* size of sparks and debris */
 extern int	shot_size;		/* size of shot */
 extern int	teamshot_size;		/* size of team shot */
 extern bool	showNastyShots;		/* show original flavor shots or the new "nasty shots" */
-extern DFLOAT	controlTime;		/* Display control for how long? */
+extern double	controlTime;		/* Display control for how long? */
 extern u_byte	spark_rand;		/* Sparkling effect */
 extern u_byte	old_spark_rand;		/* previous value of spark_rand */
 
@@ -288,26 +288,26 @@ extern long	fuelSum;		/* Sum of fuel in all tanks */
 extern long	fuelMax;		/* How much fuel can you take? */
 extern short	fuelCurrent;		/* Number of currently used tank */
 extern short	numTanks;		/* Number of tanks */
-extern DFLOAT	fuelTime;		/* Display fuel for how long? */
+extern double	fuelTime;		/* Display fuel for how long? */
 extern int	fuelLevel1;		/* Fuel critical level */
 extern int	fuelLevel2;		/* Fuel warning level */
 extern int	fuelLevel3;		/* Fuel notify level */
 
 extern char	*shipShape;		/* Shape of player's ship */
-extern DFLOAT	power;			/* Force of thrust */
-extern DFLOAT	power_s;		/* Saved power fiks */
-extern DFLOAT	turnspeed;		/* How fast player acc-turns */
-extern DFLOAT	turnspeed_s;		/* Saved turnspeed */
-extern DFLOAT	turnresistance;		/* How much is lost in % */
-extern DFLOAT	turnresistance_s;	/* Saved (see above) */
-extern DFLOAT	displayedPower;		/* What the server is sending us */
-extern DFLOAT	displayedTurnspeed;	/* What the server is sending us */
-extern DFLOAT	displayedTurnresistance;/* What the server is sending us */
-extern DFLOAT	spark_prob;		/* Sparkling effect configurable */
+extern double	power;			/* Force of thrust */
+extern double	power_s;		/* Saved power fiks */
+extern double	turnspeed;		/* How fast player acc-turns */
+extern double	turnspeed_s;		/* Saved turnspeed */
+extern double	turnresistance;		/* How much is lost in % */
+extern double	turnresistance_s;	/* Saved (see above) */
+extern double	displayedPower;		/* What the server is sending us */
+extern double	displayedTurnspeed;	/* What the server is sending us */
+extern double	displayedTurnresistance;/* What the server is sending us */
+extern double	spark_prob;		/* Sparkling effect configurable */
 extern int	charsPerSecond;		/* Message output speed (config) */
 
-extern DFLOAT	hud_move_fact;		/* scale the hud-movement (speed) */
-extern DFLOAT	ptr_move_fact;		/* scale the speed pointer length */
+extern double	hud_move_fact;		/* scale the hud-movement (speed) */
+extern double	ptr_move_fact;		/* scale the speed pointer length */
 extern char	mods[MAX_CHARS];	/* Current modifiers in effect */
 extern long	instruments;		/* Instruments on screen (bitmask) */
 extern long	hackedInstruments;	/* Hacked instruments on screen (bitmask) */
@@ -398,9 +398,9 @@ int Handle_player(int id, int team, int mychar, char *player_name,
 		  char *real_name, char *host_name, char *shape,
 		  int myself);
 int Handle_team(int id, int pl_team);
-int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance);
-int Handle_score_object(DFLOAT score, int x, int y, char *msg);
-int Handle_team_score(int team, DFLOAT score);
+int Handle_score(int id, double score, int life, int mychar, int alliance);
+int Handle_score_object(double score, int x, int y, char *msg);
+int Handle_team_score(int team, double score);
 int Handle_timing(int id, int check, int round);
 int Handle_war(int robot_id, int killer_id);
 int Handle_seek(int programmer_id, int robot_id, int sought_id);

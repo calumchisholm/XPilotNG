@@ -62,7 +62,7 @@ typedef struct RankEntry {
 
 typedef struct RankInfo {
     struct RankEntry entry;
-    DFLOAT score;
+    double score;
     struct player *pl;
 } RankInfo;
 
@@ -86,8 +86,8 @@ void Rank_cashed_ball(player *pl);
 void Rank_won_ball(player *pl);
 void Rank_saved_ball(player *pl);
 void Rank_death(player *pl);
-void Rank_add_score(player *pl, DFLOAT points);
-void Rank_set_score(player *pl, DFLOAT points);
+void Rank_add_score(player *pl, double points);
+void Rank_set_score(player *pl, double points);
 void Rank_fire_shot(player *pl);
 void Rank_write_score_file(void);
 void Rank_write_webpage(void);

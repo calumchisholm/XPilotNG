@@ -2014,7 +2014,7 @@ int Send_team(connection_t *connp, int id, int team)
 /*
  * Send the new score for some player to a client.
  */
-int Send_score(connection_t *connp, int id, DFLOAT score,
+int Send_score(connection_t *connp, int id, double score,
 	       int life, int mychar, int alliance)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
@@ -2046,7 +2046,7 @@ int Send_score(connection_t *connp, int id, DFLOAT score,
 /*
  * Send the new score for some team to a client.
  */
-int Send_team_score(connection_t *connp, int team, DFLOAT score)
+int Send_team_score(connection_t *connp, int team, double score)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for team score(%d,%d)",
@@ -2099,7 +2099,7 @@ int Send_fuel(connection_t *connp, int num, int fuel)
 			 num, fuel >> FUEL_SCALE_BITS);
 }
 
-int Send_score_object(connection_t *connp, DFLOAT score, int cx, int cy,
+int Send_score_object(connection_t *connp, double score, int cx, int cy,
 		      const char *string)
 {
     int			bx, by;
@@ -2587,7 +2587,7 @@ static int Receive_power(connection_t *connp)
     unsigned char	ch;
     short		tmp;
     int			n;
-    DFLOAT		power;
+    double		power;
     int			autopilot;
 
     if ((n = Packet_scanf(&connp->r, "%c%hd", &ch, &tmp)) <= 0) {
@@ -2595,7 +2595,7 @@ static int Receive_power(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    power = (DFLOAT) tmp / 256.0F;
+    power = (double) tmp / 256.0F;
     pl = Player_by_id(connp->id);
     autopilot = BIT(pl->used, HAS_AUTOPILOT);
 
@@ -3407,7 +3407,7 @@ static int Receive_pointer_move(connection_t *connp)
     unsigned char	ch;
     short		movement;
     int			n;
-    DFLOAT		turnspeed, turndir;
+    double		turnspeed, turndir;
 
     if ((n = Packet_scanf(&connp->r, "%c%hd", &ch, &movement)) <= 0) {
 	if (n == -1)

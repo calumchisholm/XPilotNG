@@ -22,8 +22,8 @@
  */
 /* This piece of code was provided by Greg Renda (greg@ncd.com). */
 
-#ifndef _saudio_h
-#define _saudio_h
+#ifndef SAUDIO_H
+#define SAUDIO_H
 
 #if defined(SERVER_SOUND) && defined(SERVER) && !defined(SOUND)
 /* Enable only sound support in the server, not in the client. */
@@ -59,4 +59,4 @@ void		sound_close(player * pl);
 
 #endif						/* SOUND */
 
-#endif						/* _saudio_h */
+#endif						/* SAUDIO_H */

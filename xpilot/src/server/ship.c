@@ -35,13 +35,13 @@ void Thrust(player *pl)
 {
     const int		min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
     const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
-    const DFLOAT	max_speed = 1 + (pl->power * 0.14);
-    const DFLOAT	max_life = 3 + pl->power * 0.35;
+    const double	max_speed = 1 + (pl->power * 0.14);
+    const double	max_life = 3 + pl->power * 0.35;
     clpos		engine = Ship_get_engine_clpos(pl->ship, pl->dir);
     clpos		pos;
     int			afterburners;
-    DFLOAT		tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
-    DFLOAT		alt_sparks;
+    double		tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
+    double		alt_sparks;
 
     pos.cx = pl->pos.cx + engine.cx;
     pos.cy = pl->pos.cy + engine.cy;
@@ -106,7 +106,7 @@ void Record_shove(player *pl, player *pusher, long shove_time)
  * collision. */
 void Delta_mv(object *ship, object *obj)
 {
-    DFLOAT	vx, vy, m;
+    double	vx, vy, m;
 
     m = ship->mass + ABS(obj->mass);
     vx = (ship->vel.x * ship->mass + obj->vel.x * obj->mass) / m;
@@ -131,10 +131,10 @@ void Delta_mv(object *ship, object *obj)
  * objects stay alive after the collision. */
 void Delta_mv_elastic(object *obj1, object *obj2)
 {
-    DFLOAT	m1 = (DFLOAT)obj1->mass,
-		m2 = (DFLOAT)obj2->mass,
+    double	m1 = (double)obj1->mass,
+		m2 = (double)obj2->mass,
 		ms = m1 + m2;
-    DFLOAT	v1x = obj1->vel.x,
+    double	v1x = obj1->vel.x,
 		v1y = obj1->vel.y,
 		v2x = obj2->vel.x,
 		v2y = obj2->vel.y;
@@ -160,7 +160,7 @@ void Delta_mv_elastic(object *obj1, object *obj2)
 
 void Obj_repel(object *obj1, object *obj2, int repel_dist)
 {
-    DFLOAT		xd, yd,
+    double		xd, yd,
 			force, dm,
 			dvx1, dvy1,
 			dvx2, dvy2;
@@ -232,7 +232,7 @@ void Update_tanks(pl_fuel_t *ft)
 	long low_level;
 	long fuel;
 	long *f;
-	DFLOAT frame_refuel = REFUEL_RATE * timeStep;
+	double frame_refuel = REFUEL_RATE * timeStep;
 
 	/* Set low_level to minimum fuel in each tank */
 	low_level = ft->sum / (ft->num_tanks + 1) - 1;
@@ -451,21 +451,21 @@ void Make_wreckage(
     /* vel              */ vector vel,
     /* owner id         */ int    id,
     /* owner team	*/ int    team,
-    /* min,max mass     */ DFLOAT min_mass,     DFLOAT max_mass,
-    /* total mass       */ DFLOAT total_mass,
+    /* min,max mass     */ double min_mass,     double max_mass,
+    /* total mass       */ double total_mass,
     /* status           */ long   status,
     /* color            */ int    color,
     /* max wreckage     */ int    max_wreckage,
     /* min,max dir      */ int    min_dir,      int    max_dir,
-    /* min,max speed    */ DFLOAT min_speed,    DFLOAT max_speed,
-    /* min,max life     */ DFLOAT min_life,     DFLOAT max_life
+    /* min,max speed    */ double min_speed,    double max_speed,
+    /* min,max life     */ double min_life,     double max_life
 )
 {
     wireobject		*wreckage;
     int			i, size;
-    DFLOAT		life;
+    double		life;
     modifiers		mods;
-    DFLOAT		mass, sum_mass = 0.0;
+    double		mass, sum_mass = 0.0;
 
     if (!useWreckage)
 	return;
@@ -488,7 +488,7 @@ void Make_wreckage(
 
     for (i = 0; i < max_wreckage && sum_mass < total_mass; i++) {
 
-	DFLOAT		speed;
+	double		speed;
 	int		dir, radius;
 
 	/* Calculate mass */
@@ -558,7 +558,7 @@ void Make_wreckage(
 void Explode_fighter(player *pl)
 {
     int min_debris;
-    DFLOAT debris_range;
+    double debris_range;
 
     sound_play_sensors(pl->pos, PLAYER_EXPLOSION_SOUND);
 

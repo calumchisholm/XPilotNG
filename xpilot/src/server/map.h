@@ -116,7 +116,7 @@ struct fuel {
 
 struct grav {
     clpos	pos;
-    DFLOAT	force;
+    double	force;
     int		type;
 };
 
@@ -130,7 +130,7 @@ struct base {
 
 struct baseorder {
     int		base_idx;	/* Index in World.base[] */
-    DFLOAT	dist;		/* Distance to first checkpoint */
+    double	dist;		/* Distance to first checkpoint */
 };
 
 struct cannon {
@@ -144,11 +144,11 @@ struct cannon {
     uint16_t	team;
     uint16_t	pad[1];
     long	used;
-    DFLOAT	dead_time;
-    DFLOAT	damaged;
-    DFLOAT	tractor_count;
-    DFLOAT	emergency_shield_left;
-    DFLOAT	phasing_left;
+    double	dead_time;
+    double	damaged;
+    double	tractor_count;
+    double	emergency_shield_left;
+    double	phasing_left;
     int		group;
 };
 
@@ -157,11 +157,11 @@ struct check {
 };
 
 struct item {
-    DFLOAT	prob;		/* Probability [0..1] for item to appear */
+    double	prob;		/* Probability [0..1] for item to appear */
     int		max;		/* Max on world at a given time */
     int		num;		/* Number active right now */
     int		chance;		/* Chance [0..127] for this item to appear */
-    DFLOAT	cannonprob;	/* Relative probability for item to appear */
+    double	cannonprob;	/* Relative probability for item to appear */
     int		min_per_pack;	/* minimum number of elements per item. */
     int		max_per_pack;	/* maximum number of elements per item. */
     int		initial;	/* initial number of elements per player. */
@@ -169,7 +169,7 @@ struct item {
 };
 
 struct asteroid {
-    DFLOAT	prob;		/* Probability [0..1] for asteroid to appear */
+    double	prob;		/* Probability [0..1] for asteroid to appear */
     int		max;		/* Max on world at a given time */
     int		num;		/* Number active right now */
     int		chance;		/* Chance [0..127] for asteroid to appear */
@@ -178,7 +178,7 @@ struct asteroid {
 struct wormhole {
     clpos	pos;
     int		lastdest;	/* last destination wormhole */
-    DFLOAT	countdown;	/* >0 warp to lastdest else random */
+    double	countdown;	/* >0 warp to lastdest else random */
     bool	temporary;	/* wormhole was left by hyperjump */
     wormType	type;
     int		lastID;
@@ -199,7 +199,7 @@ struct target {
     clpos	pos;
     uint16_t	team;
     uint16_t	pad[1];
-    DFLOAT	dead_time;
+    double	dead_time;
     int		damage;
     unsigned	conn_mask;
     unsigned 	update_mask;
@@ -216,8 +216,8 @@ struct team {
     int		TreasuresDestroyed;	/* Number of destroyed treasures */
     int		TreasuresLeft;		/* Number of treasures left */
     int		SwapperId;		/* Player swapping to this full team */
-    DFLOAT	score;
-    DFLOAT	prev_score;
+    double	score;
+    double	prev_score;
 };
 
 struct item_concentrator {

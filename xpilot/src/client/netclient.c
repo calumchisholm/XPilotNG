@@ -2356,7 +2356,7 @@ int Receive_score_object(void)
 {
     int			n;
     unsigned short	x, y;
-    DFLOAT		score = 0;
+    double		score = 0;
     char		msg[MAX_CHARS];
     u_byte		ch;
 
@@ -2370,7 +2370,7 @@ int Receive_score_object(void)
 	int	rcv_score;
 	n = Packet_scanf(&cbuf, "%c%d%hu%hu%s",
 			 &ch, &rcv_score, &x, &y, msg);
-	score = (DFLOAT)rcv_score / 100;
+	score = (double)rcv_score / 100;
     }
     if (n <= 0)
 	return n;
@@ -2384,7 +2384,7 @@ int Receive_score(void)
 {
     int			n;
     short		id, life;
-    DFLOAT		score = 0;
+    double		score = 0;
     u_byte		ch, mychar, alliance = ' ';
 
     if (version < 0x4500 || (version >= 0x4F09 && version < 0x4F11)) {
@@ -2398,7 +2398,7 @@ int Receive_score(void)
 	int	rcv_score;
 	n = Packet_scanf(&cbuf, "%c%hd%d%hd%c%c", &ch,
 			 &id, &rcv_score, &life, &mychar, &alliance);
-	score = (DFLOAT)rcv_score / 100;
+	score = (double)rcv_score / 100;
     }
     if (n <= 0)
 	return n;
@@ -2413,11 +2413,11 @@ int Receive_team_score(void)
     u_byte		ch;
     short		team;
     int			rcv_score;
-    DFLOAT		score;
+    double		score;
 
     if ((n = Packet_scanf(&cbuf, "%c%hd%d", &ch, &team, &rcv_score)) <= 0)
 	return n;
-    score = (DFLOAT)rcv_score / 100;
+    score = (double)rcv_score / 100;
     if ((n = Handle_team_score(team, score)) == -1)
 	return -1;
     return 1;
@@ -2689,7 +2689,7 @@ int Send_shape(char *str)
     return 0;
 }
 
-int Send_power(DFLOAT pwr)
+int Send_power(double pwr)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_POWER,
 		      (int) (pwr * 256.0)) == -1)
@@ -2697,7 +2697,7 @@ int Send_power(DFLOAT pwr)
     return 0;
 }
 
-int Send_power_s(DFLOAT pwr_s)
+int Send_power_s(double pwr_s)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_POWER_S,
 		      (int)(pwr_s * 256.0)) == -1)
@@ -2705,7 +2705,7 @@ int Send_power_s(DFLOAT pwr_s)
     return 0;
 }
 
-int Send_turnspeed(DFLOAT turnspd)
+int Send_turnspeed(double turnspd)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNSPEED,
 		      (int) (turnspd * 256.0)) == -1)
@@ -2713,7 +2713,7 @@ int Send_turnspeed(DFLOAT turnspd)
     return 0;
 }
 
-int Send_turnspeed_s(DFLOAT turnspd_s)
+int Send_turnspeed_s(double turnspd_s)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNSPEED_S,
 		      (int) (turnspd_s * 256.0)) == -1)
@@ -2721,7 +2721,7 @@ int Send_turnspeed_s(DFLOAT turnspd_s)
     return 0;
 }
 
-int Send_turnresistance(DFLOAT turnres)
+int Send_turnresistance(double turnres)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNRESISTANCE,
 		      (int) (turnres * 256.0)) == -1)
@@ -2729,7 +2729,7 @@ int Send_turnresistance(DFLOAT turnres)
     return 0;
 }
 
-int Send_turnresistance_s(DFLOAT turnres_s)
+int Send_turnresistance_s(double turnres_s)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNRESISTANCE_S,
 		      (int) (turnres_s * 256.0)) == -1)

@@ -35,9 +35,9 @@ int	hudItemsColor;		/* Color index for HUD items drawing */
 int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
 int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 int	hudRadarDotSize;	/* Size for hudradar dot drawing */
-DFLOAT	hudRadarScale;		/* Scale for hudradar drawing */
-DFLOAT	hudRadarMapScale;		/* Scale for mapradar drawing */
-DFLOAT	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
+double	hudRadarScale;		/* Scale for hudradar drawing */
+double	hudRadarMapScale;		/* Scale for mapradar drawing */
+double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
 				   your ship than this factor of visible
 				   range */
 int	hudSize;		/* Size for HUD drawing */
@@ -50,7 +50,7 @@ int	msgScanCoverColor;	/* Color index for cover msg */
 int	msgScanPopColor;	/* Color index for pop msg */
 int	messagesColor;		/* Color index for messages */
 int	oldMessagesColor;	/* Color index for old messages */
-DFLOAT	scoreObjectTime;	/* How long to flash score objects */
+double	scoreObjectTime;	/* How long to flash score objects */
 int	baseWarningType;	/* Which type of base warning you prefer */
 
 radar_t	*old_radar_ptr;
@@ -383,14 +383,14 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     }
 }
 
-static void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit,
+static void Paint_hudradar(double hrscale, double xlimit, double ylimit,
 			   int sz)
 {
     int i, x, y;
     int hrw = hrscale * 256;
     int hrh = hrscale * RadarHeight;
-    DFLOAT xf = (DFLOAT) hrw / (DFLOAT) Setup->width;
-    DFLOAT yf = (DFLOAT) hrh / (DFLOAT) Setup->height;
+    double xf = (double) hrw / (double) Setup->width;
+    double yf = (double) hrh / (double) Setup->height;
 
     for (i = 0; i < num_radar; i++) {
 	x = radar_ptr[i].x * hrscale
@@ -491,7 +491,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 		num = -1;
 	} else {
 	    if (num != lastNumItems[i]) {
-		numItemsTime[i] = (int)(showItemsTime * (DFLOAT)FPS);
+		numItemsTime[i] = (int)(showItemsTime * (double)FPS);
 		lastNumItems[i] = num;
 	    }
 	    if (numItemsTime[i]-- <= 0) {
@@ -585,7 +585,7 @@ void Paint_HUD(void)
 		    (int) (ext_view_height / 2 - 100 * tsin(heading)));
 
     if (hudRadarEnemyColor || hudRadarOtherColor) {
-	hudRadarMapScale = (DFLOAT) Setup->width / (DFLOAT) 256;
+	hudRadarMapScale = (double) Setup->width / (double) 256;
 	Paint_hudradar(
 	    hudRadarScale,
 	    (int)(hudRadarLimit * (active_view_width / 2)
@@ -1061,21 +1061,21 @@ void Paint_recording(void)
     int			x, y;
     char		buf[32];
     int			len;
-    DFLOAT		mb;
+    double		mb;
 
     if (!recording || (loopsSlow % 16) < 8)
 	return;
 
     SET_FG(colors[RED].pixel);
-    mb = ((DFLOAT)Record_size()) / 1e6;
+    mb = ((double)Record_size()) / 1e6;
     sprintf(buf, "REC %.1f MB", mb);
     len = strlen(buf);
     w = XTextWidth(gameFont, buf, len);
     x = WINSCALE(ext_view_width) - 10 - w;
     y = 10 + gameFont->ascent;
     XDrawString(dpy, drawPixmap, gameGC, x, y, buf, len);
-    Erase_rectangle( x - 1, WINSCALE(10),
-			 w+2, gameFont->ascent + gameFont->descent);
+    Erase_rectangle(x - 1, WINSCALE(10),
+		    w+2, gameFont->ascent + gameFont->descent);
 }
 
 

@@ -195,16 +195,16 @@ struct _cell_node {
     objposition		pos;		/* World coordinates */		\
     clpos		prevpos;	/* previous position */		\
     clpos		extmove;	/* For collision detection */	\
-    DFLOAT		wall_time;	/* bounce/crash time within frame */ \
+    float		wall_time;	/* bounce/crash time within frame */ \
     int			collmode;	/* collision checking mode */	\
     vector		vel;		/* speed in x,y */		\
     vector		acc;		/* acceleration in x,y */	\
-    DFLOAT		mass;		/* mass in unigrams */		\
+    float		mass;		/* mass in unigrams */		\
     double		life;		/* No of ticks left to live */	\
     long		status;		/* gravity, etc. */		\
     int			type;		/* one bit of OBJ_XXX */	\
-/* Item pack count is kept in the 'count' field, DFLOAT now, change !@# */ \
-    DFLOAT		count;		/* Misc timings */		\
+/* Item pack count is kept in the 'count' field, float now, change !@# */ \
+    float		count;		/* Misc timings */		\
     modifiers		mods;		/* Modifiers to this object */	\
     u_byte		color;		/* Color of object */		\
     u_byte		missile_dir;	/* missile direction */		\
@@ -251,8 +251,8 @@ struct _mineobject {
     OBJECT_EXTEND
 
     int 		owner;		/* Who's object is this ? */
-    DFLOAT		ecm_range;	/* Range from last ecm center */
-    DFLOAT		spread_left;	/* how much spread time left */
+    float		ecm_range;	/* Range from last ecm center */
+    float		spread_left;	/* how much spread time left */
 
 #ifdef __cplusplus
 			_mineobject() {}
@@ -264,9 +264,9 @@ struct _mineobject {
 
 
 #define MISSILE_EXTEND		\
-    DFLOAT		max_speed;	/* speed limitation */		\
-    DFLOAT		turnspeed;	/* how fast to turn */
-    DFLOAT		fusetime;	/* time until deadly to owner */
+    float		max_speed;	/* speed limitation */		\
+    float		turnspeed;	/* how fast to turn */
+    float		fusetime;	/* time until deadly to owner */
 /* up to here all missiles types are the same. */
 
 /*
@@ -303,7 +303,7 @@ struct _smartobject {
     MISSILE_EXTEND
 
     int			new_info;	/* smart re-lock id */
-    DFLOAT		ecm_range;	/* Range from last ecm center */
+    float		ecm_range;	/* Range from last ecm center */
 
 #ifdef __cplusplus
 			_smartobject() {}
@@ -326,7 +326,7 @@ struct _torpobject {
 
     MISSILE_EXTEND
 
-    DFLOAT		spread_left;	/* how much spread time left */
+    float		spread_left;	/* how much spread time left */
 
 #ifdef __cplusplus
 			_torpobject() {}
@@ -349,7 +349,7 @@ struct _ballobject {
 
     int 		owner;		/* Who's object is this ? */
     treasure_t		*treasure;	/* treasure for ball */
-    /*DFLOAT		length;*/	/* distance ball to player */
+    /*float		length;*/	/* distance ball to player */
 
 #ifdef __cplusplus
 			_ballobject() {}
@@ -370,7 +370,7 @@ struct _wireobject {
 
     OBJECT_EXTEND
 
-    DFLOAT		turnspeed;	/* how fast to turn */
+    float		turnspeed;	/* how fast to turn */
 
     u_byte		size;		/* Size of object (wreckage) */
     u_byte		rotation;	/* Rotation direction */
@@ -396,7 +396,7 @@ struct _pulseobject {
     OBJECT_EXTEND
 
     int			dir;		/* Direction of the pulse */
-    DFLOAT		len;		/* Length of the pulse */
+    float		len;		/* Length of the pulse */
     bool		refl;		/* Pulse was reflected ? */
 #ifdef __cplusplus
 			_pulseobject() {}
@@ -444,7 +444,7 @@ struct _visibility {
 
 #define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */
 typedef struct {
-    DFLOAT	size;
+    double	size;
     clpos	pos;
     int		id;
 } ecm_t;
@@ -456,7 +456,7 @@ typedef struct {
     clpos	pos;
     player	*victim;
     int		id;
-    DFLOAT	count;
+    double	count;
 } trans_t;
 
 /*
@@ -488,8 +488,8 @@ struct player {
 
     int		type_ext;		/* extended type info (tank, robot) */
 
-    DFLOAT	turnspeed;		/* How fast player acc-turns */
-    DFLOAT	velocity;		/* Absolute speed */
+    double	turnspeed;		/* How fast player acc-turns */
+    double	velocity;		/* Absolute speed */
 
     int		kills;			/* Number of kills this round */
     int		deaths;			/* Number of deaths this round */
@@ -497,41 +497,41 @@ struct player {
     long	used;			/** Items you use **/
     long	have;			/** Items you have **/
 
-    DFLOAT	shield_time;		/* Shields if no playerShielding */
+    double	shield_time;		/* Shields if no playerShielding */
     pl_fuel_t	fuel;			/* ship tanks and the stored fuel */
-    DFLOAT	emptymass;		/* Mass of empty ship */
-    DFLOAT	float_dir;		/* Direction, in float var */
-    DFLOAT	turnresistance;		/* How much is lost in % */
-    DFLOAT	turnvel;		/* Current velocity of turn (right) */
-    DFLOAT	oldturnvel;		/* Last velocity of turn (right) */
-    DFLOAT	turnacc;		/* Current acceleration of turn */
-    DFLOAT	score;			/* Current score of player */
-    DFLOAT	prev_score;		/* Last score that has been updated */
+    double	emptymass;		/* Mass of empty ship */
+    double	float_dir;		/* Direction, in float var */
+    double	turnresistance;		/* How much is lost in % */
+    double	turnvel;		/* Current velocity of turn (right) */
+    double	oldturnvel;		/* Last velocity of turn (right) */
+    double	turnacc;		/* Current acceleration of turn */
+    double	score;			/* Current score of player */
+    double	prev_score;		/* Last score that has been updated */
     int		prev_life;		/* Last life that has been updated */
     shipshape_t	*ship;			/* wire model of ship shape */
-    DFLOAT	power;			/* Force of thrust */
-    DFLOAT	power_s;		/* Saved power fiks */
-    DFLOAT	turnspeed_s;		/* Saved turnspeed */
-    DFLOAT	turnresistance_s;	/* Saved (see above) */
-    DFLOAT	sensor_range;		/* Range of sensors (radar) */
+    double	power;			/* Force of thrust */
+    double	power_s;		/* Saved power fiks */
+    double	turnspeed_s;		/* Saved turnspeed */
+    double	turnresistance_s;	/* Saved (see above) */
+    double	sensor_range;		/* Range of sensors (radar) */
     int		shots;			/* Number of active shots by player */
     int		missile_rack;		/* Next missile rack to be active */
 
     int		num_pulses;		/* Number of laser pulses in the air. */
 
-    DFLOAT	emergency_thrust_left;	/* how much emergency thrust left */
-    DFLOAT	emergency_shield_left;	/* how much emergency shield left */
+    double	emergency_thrust_left;	/* how much emergency thrust left */
+    double	emergency_shield_left;	/* how much emergency shield left */
 
-    DFLOAT	phasing_left;		/* how much time left */
+    double	phasing_left;		/* how much time left */
 
     int		item[NUM_ITEMS];	/* for each item type how many */
     int		lose_item;		/* which item to drop */
     int		lose_item_state;	/* lose item key state, 2=up,1=down */
 
-    DFLOAT	auto_power_s;		/* autopilot saves of current */
+    double	auto_power_s;		/* autopilot saves of current */
 					/* power, turnspeed and */
-    DFLOAT	auto_turnspeed_s;	/* turnresistance settings. Restored */
-    DFLOAT	auto_turnresistance_s;	/* when autopilot turned off */
+    double	auto_turnspeed_s;	/* turnresistance settings. Restored */
+    double	auto_turnresistance_s;	/* when autopilot turned off */
     modifiers	modbank[NUM_MODBANKS];	/* useful modifier settings */
     bool	tractor_is_pressor;	/* on if tractor is pressor */
     double	shot_time;		/* Time of last shot fired by player */
@@ -554,7 +554,7 @@ struct player {
     struct {
 	int	    tagged;		/* Flag, what is tagged? */
 	int	    pl_id;		/* Tagging player id */
-	DFLOAT	    distance;		/* Distance to object */
+	double	    distance;		/* Distance to object */
     } lock;
     int		lockbank[LOCKBANK_MAX]; /* Saved player locks */
 
@@ -588,12 +588,12 @@ struct player {
 
     struct _visibility *visibility;
 
-    DFLOAT	forceVisible;
-    DFLOAT	damaged;
-    DFLOAT	stunned;
+    double	forceVisible;
+    double	damaged;
+    double	stunned;
     int		updateVisibility;
     wormhole_t	*wormHoleHit, *wormHoleDest;
-    DFLOAT	warped;			/* time player is immune to warped-to
+    double	warped;			/* time player is immune to warped-to
 					   wormhole, replaces WARPED bit */
 
     int		last_target_update;	/* index of last updated target */

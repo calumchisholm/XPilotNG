@@ -27,7 +27,7 @@
 char score_version[] = VERSION;
 
 
-void Score(player *pl, DFLOAT points, clpos pos, const char *msg)
+void Score(player *pl, double points, clpos pos, const char *msg)
 {
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	if (!teamShareScore)
@@ -46,7 +46,7 @@ void Score(player *pl, DFLOAT points, clpos pos, const char *msg)
     updateScores = true;
 }
 
-void TEAM_SCORE(int team, DFLOAT points)
+void TEAM_SCORE(int team, double points)
 {
     if (team == TEAM_NOT_SET)	/* could happen if teamCannons is off */
 	return;
@@ -54,7 +54,7 @@ void TEAM_SCORE(int team, DFLOAT points)
     World.teams[team].score += points;
     if (teamShareScore) {
 	int i;
-	DFLOAT share = World.teams[team].score / World.teams[team].NumMembers;
+	double share = World.teams[team].score / World.teams[team].NumMembers;
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 	    if (pl_i->team == team)
@@ -65,11 +65,11 @@ void TEAM_SCORE(int team, DFLOAT points)
     updateScores = true;
 }
 
-void Alliance_score(int id, DFLOAT points)
+void Alliance_score(int id, double points)
 {
     int		i;
     int		member_count = Get_alliance_member_count(id);
-    DFLOAT	share = points / member_count;
+    double	share = points / member_count;
 
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
@@ -78,9 +78,9 @@ void Alliance_score(int id, DFLOAT points)
     }
 }
 
-DFLOAT Rate(DFLOAT winner, DFLOAT loser)
+double Rate(double winner, double loser)
 {
-    DFLOAT t;
+    double t;
 
     if (constantScoring)
 	return RATE_SIZE / 2;
@@ -105,8 +105,8 @@ DFLOAT Rate(DFLOAT winner, DFLOAT loser)
  * KK 28-4-98: Same for killing your own tank.
  * KK 7-11-1: And for killing a member of your alliance
  */
-void Score_players(player *winner_pl, DFLOAT winner_score, char *winner_msg,
-		   player *loser_pl, DFLOAT loser_score, char *loser_msg)
+void Score_players(player *winner_pl, double winner_score, char *winner_msg,
+		   player *loser_pl, double loser_score, char *loser_msg)
 {
     if (TEAM(winner_pl, loser_pl)
 	|| ALLIANCE(winner_pl, loser_pl)

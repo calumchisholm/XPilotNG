@@ -36,7 +36,7 @@ unsigned SPACE_BLOCKS = (
     );
 
 struct move_parameters mp;
-DFLOAT wallBounceExplosionMult;
+double wallBounceExplosionMult;
 static char msg[MSG_LEN];
 
 /* polygon map related stuff */
@@ -77,8 +77,8 @@ struct tl2 {
 struct bline {
     clvec start;
     clvec delta;
-    DFLOAT c;
-    DFLOAT s;
+    double c;
+    double s;
     short group;
 };
 
@@ -190,7 +190,7 @@ static void Object_hits_target(object *obj, target_t *targ, long player_cost)
 {
     int			j;
     player		*kp;
-    DFLOAT		sc, por,
+    double		sc, por,
 			win_score = 0,
 			lose_score = 0;
     int			win_team_members = 0,
@@ -198,7 +198,7 @@ static void Object_hits_target(object *obj, target_t *targ, long player_cost)
 			somebody_flag = 0,
 			targets_remaining = 0,
 			targets_total = 0;
-    DFLOAT 		drainfactor;
+    double 		drainfactor;
     vector 		zero_vel = {0.0, 0.0};
 
     /* a normal shot or a direct mine hit work, cannons don't */
@@ -523,9 +523,9 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	int		cnt[MAX_RECORDED_SHOVES];
 	int		num_pushers = 0;
 	int		total_pusher_count = 0;
-	DFLOAT		total_pusher_score = 0;
+	double		total_pusher_score = 0;
 	int		i, j;
-	DFLOAT		sc;
+	double		sc;
 
 	SET_BIT(pl->status, KILLED);
 	sprintf(msg, howfmt, pl->name, (!pt) ? " head first" : "");
@@ -659,8 +659,8 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
 
 static int Bounce_object(object *obj, struct move *move, int line, int point)
 {
-    DFLOAT fx, fy;
-    DFLOAT c, s, wall_brake_factor = objectWallBrakeFactor;
+    double fx, fy;
+    double c, s, wall_brake_factor = objectWallBrakeFactor;
     int group, type;
     int mapobj_ind;
 
@@ -734,7 +734,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 
 
     if (line >= num_lines) {
-	DFLOAT x, y, l2;
+	double x, y, l2;
 	x = linet[line].delta.cx;
 	y = linet[line].delta.cy;
 	l2 = (x*x + y*y);
@@ -774,12 +774,12 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 
 static void Bounce_player(player *pl, struct move *move, int line, int point)
 {
-    DFLOAT fx, fy;
-    DFLOAT c, s;
+    double fx, fy;
+    double c, s;
     int group, type, mapobj_ind;
 
     if (line >= num_lines) {
-	DFLOAT x, y, l2;
+	double x, y, l2;
 	x = linet[line].delta.cx;
 	y = linet[line].delta.cy;
 	l2 = (x*x + y*y);
@@ -813,12 +813,12 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 
     pl->last_wall_touch = frame_loops;
     {
-	DFLOAT	speed = VECTOR_LENGTH(pl->vel);
+	double	speed = VECTOR_LENGTH(pl->vel);
 	int	v = (int) speed >> 2;
 	int	m = (int) (pl->mass - pl->emptymass * 0.75f);
-	DFLOAT	b = 1 - 0.5f * playerWallBrakeFactor;
+	double	b = 1 - 0.5f * playerWallBrakeFactor;
 	long	cost = (long) (b * m * v);
-	DFLOAT	max_speed = BIT(pl->used, HAS_SHIELD)
+	double	max_speed = BIT(pl->used, HAS_SHIELD)
 		? maxShieldedWallBounceSpeed
 		: maxUnshieldedWallBounceSpeed;
 
@@ -2499,7 +2499,7 @@ static void Poly_to_lines(void)
 
 void Walls_init(void)
 {
-    DFLOAT x, y, l2;
+    double x, y, l2;
     int i;
 
     mapx = (World.cwidth + B_MASK) >> B_SHIFT;
@@ -2691,7 +2691,7 @@ void Move_player(player *pl)
     clpos  pos;
     struct move mv;
     struct collans ans;
-    DFLOAT fric;
+    double fric;
     vector oldv;
 
     if (!Player_is_playing(pl)) {

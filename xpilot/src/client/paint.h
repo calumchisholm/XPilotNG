@@ -66,7 +66,7 @@ typedef struct {
     char		txt[MSG_LEN];
     short		len;
     short		pixelLen;
-    DFLOAT		lifeTime;
+    double		lifeTime;
     msg_bms_t		bmsinfo;
 } message_t;
 /* typedefs end */
@@ -160,8 +160,8 @@ extern int	hudItemsColor;		/* Color index for HUD items drawing */
 extern int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
 extern int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 extern int	hudRadarDotSize;	/* Size for hudradar dot drawing */
-extern DFLOAT	hudRadarScale;		/* Scale for hudradar drawing */
-extern DFLOAT	hudRadarLimit;		/* Limit for hudradar drawing */
+extern double	hudRadarScale;		/* Scale for hudradar drawing */
+extern double	hudRadarLimit;		/* Limit for hudradar drawing */
 extern int	hudSize;		/* size for hud-drawing */
 extern int	hudLockColor;		/* Color index for lock on HUD drawing */
 extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
@@ -203,7 +203,7 @@ extern int	packetDropMeterColor;	/* Color index for packet drop meter */
 extern int	packetLagMeterColor;	/* Color index for packet lag meter */
 extern int	temporaryMeterColor;	/* Color index for temporary meters */
 extern int	meterBorderColor;	/* Color index for meter borders */
-extern DFLOAT	scoreObjectTime;	/* how long score objects are flashed */
+extern double	scoreObjectTime;	/* how long score objects are flashed */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	fuelColor;		/* Color index for fuel box drawing */
@@ -234,7 +234,7 @@ extern int	active_view_height;	/* Height of active map area displayed. */
 extern int	ext_view_x_offset;	/* Offset of ext_view_width */
 extern int	ext_view_y_offset;	/* Offset of ext_view_height */
 extern u_byte	debris_colors;		/* Number of debris intensities */
-extern DFLOAT	charsPerTick;		/* Output speed of messages */
+extern double	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
 extern bool	titleFlip;		/* Do special titlebar flipping? */
 extern int	shieldDrawMode;		/* How to draw players shield */
@@ -254,13 +254,13 @@ extern unsigned long	loopsSlow;
 extern int	clientFPS;
 extern time_t	currentTime;
 extern bool	newSecond;
-extern DFLOAT	timePerFrame;
+extern double	timePerFrame;
 extern int	maxMessages;
 extern int	messagesToStdout;
 extern bool	selectionAndHistory;
 
-extern DFLOAT	scaleFactor;	/* scale the draw (main playfield) window */
-extern DFLOAT	scaleFactor_s;
+extern double	scaleFactor;	/* scale the draw (main playfield) window */
+extern double	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);
 #define	WINSCALE(__n)	((__n) >= 0 ? scaleArray[(__n)] : -scaleArray[-(__n)])

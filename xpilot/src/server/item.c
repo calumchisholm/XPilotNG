@@ -74,11 +74,11 @@ static void Item_update_flags(player *pl)
  * The `prob' parameter gives the chance that items are lost
  * and, if they are lost, what percentage.
  */
-void Item_damage(player *pl, DFLOAT prob)
+void Item_damage(player *pl, double prob)
 {
     if (prob < 1.0f) {
 	int		i;
-	DFLOAT		loss;
+	double		loss;
 
 	loss = prob;
 	LIMIT(loss, 0.0f, 1.0f);
@@ -86,7 +86,7 @@ void Item_damage(player *pl, DFLOAT prob)
 	for (i = 0; i < NUM_ITEMS; i++) {
 	    if (!BIT(1U << i, ITEM_BIT_FUEL|ITEM_BIT_TANK)) {
 		if (pl->item[i]) {
-		    DFLOAT f = rfrac();
+		    double f = rfrac();
 		    if (f < loss)
 			pl->item[i] = (int)(pl->item[i] * loss + 0.5f);
 		}
@@ -100,13 +100,13 @@ void Item_damage(player *pl, DFLOAT prob)
 int Choose_random_item(void)
 {
     int		i;
-    DFLOAT	item_prob_sum = 0;
+    double	item_prob_sum = 0;
 
     for (i = 0; i < NUM_ITEMS; i++)
 	item_prob_sum += World.items[i].prob;
 
     if (item_prob_sum > 0.0) {
-	DFLOAT sum = item_prob_sum * rfrac();
+	double sum = item_prob_sum * rfrac();
 
 	for (i = 0; i < NUM_ITEMS; i++) {
 	    sum -= World.items[i].prob;
@@ -254,7 +254,7 @@ void Place_item(player *pl, int item)
 	    vel.x += pl->vel.x;
 	    vel.y += pl->vel.y;
 	    if (!BIT(pl->status, KILLED)) {
-		DFLOAT vl = LENGTH(vel.x, vel.y);
+		double vl = LENGTH(vel.x, vel.y);
 		int dvx = (int)(rfrac() * 8);
 		int dvy = (int)(rfrac() * 8);
 		const float drop_speed_factor = 0.75f;
@@ -269,7 +269,7 @@ void Place_item(player *pl, int item)
 		    vel.y -= dvy * (vel.y / vl);
 		}
 	    } else {
-		DFLOAT v = rfrac() * 6;
+		double v = rfrac() * 6;
 		int dir = (int)(rfrac() * RES);
 
 		vel.x += tcos(dir) * v;
@@ -387,7 +387,7 @@ void Detonate_items(player *pl)
     for (i = 0; i < pl->item[ITEM_MINE]; i++) {
 	if (rfrac() < detonateItemOnKillProb) {
 	    int dir = (int)(rfrac() * RES);
-	    DFLOAT speed = rfrac() * 4.0f;
+	    double speed = rfrac() * 4.0f;
 	    vector vel;
 
 	    mods = pl->mods;
@@ -434,7 +434,7 @@ void Detonate_items(player *pl)
 
 void Tractor_beam(player *pl)
 {
-    DFLOAT	maxdist, percent;
+    double	maxdist, percent;
     long	cost;
     player	*locked_pl = Player_by_id(pl->lock.pl_id);
 
@@ -461,7 +461,7 @@ void Tractor_beam(player *pl)
 void General_tractor_beam(player *pl, clpos pos,
 			  int items, player *victim, bool pressor)
 {
-    DFLOAT	maxdist = TRACTOR_MAX_RANGE(items),
+    double	maxdist = TRACTOR_MAX_RANGE(items),
 		maxforce = TRACTOR_MAX_FORCE(items),
 		percent, force, dist;
     long	cost;
@@ -496,12 +496,12 @@ void General_tractor_beam(player *pl, clpos pos,
 
 void Do_deflector(player *pl)
 {
-    DFLOAT	range = (pl->item[ITEM_DEFLECTOR] * 0.5 + 1) * BLOCK_CLICKS;
-    DFLOAT	maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
+    double	range = (pl->item[ITEM_DEFLECTOR] * 0.5 + 1) * BLOCK_CLICKS;
+    double	maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
     object	*obj, **obj_list;
     int		i, obj_count;
     int		dx, dy;
-    DFLOAT	dist;
+    double	dist;
 
     if (pl->fuel.sum < -ED_DEFLECTOR) {
 	if (BIT(pl->used, HAS_DEFLECTOR))
@@ -539,7 +539,7 @@ void Do_deflector(player *pl)
 	dy = WRAP_DCY(obj->pos.cy - pl->pos.cy);
 
 	/* kps - 4.3.1X had some nice code here, consider using it ? */
-	dist = (DFLOAT)(LENGTH(dx, dy) - PIXEL_TO_CLICK(SHIP_SZ));
+	dist = (double)(LENGTH(dx, dy) - PIXEL_TO_CLICK(SHIP_SZ));
 	if (dist < range
 	    && dist > 0) {
 	    int dir = (int)findDir(dx, dy);
@@ -547,12 +547,12 @@ void Do_deflector(player *pl)
 
 	    if (idir > RES * 0.25
 		&& idir < RES * 0.75) {
-		DFLOAT force = ((DFLOAT)(range - dist) / range)
-				* ((DFLOAT)(range - dist) / range)
+		double force = ((double)(range - dist) / range)
+				* ((double)(range - dist) / range)
 				* maxforce
 				* ((RES * 0.25) - ABS(idir - RES * 0.5))
 				/ (RES * 0.25);
-		DFLOAT dv = force / ABS(obj->mass);
+		double dv = force / ABS(obj->mass);
 
 		obj->vel.x += tcos(dir) * dv;
 		obj->vel.y += tsin(dir) * dv;
@@ -565,7 +565,7 @@ void Do_transporter(player *pl)
 {
     player	*victim = NULL;
     int		i;
-    DFLOAT	dist, closest = TRANSPORTER_DISTANCE * CLICK;
+    double	dist, closest = TRANSPORTER_DISTANCE * CLICK;
 
     /* if not available, fail silently */
     if (!pl->item[ITEM_TRANSPORTER]
@@ -763,7 +763,7 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
     case ITEM_FUEL:
 	{
 	    /* choose percantage between 10 and 50. */
-	    DFLOAT percent = 10.0f + 40.0f * rfrac();
+	    double percent = 10.0f + 40.0f * rfrac();
 	    amount = (long)(victim->fuel.sum * percent / 100);
 	    sprintf(msg, "%s stole %ld units (%d%%) of fuel from %s.",
 		    (pl ? pl->name : "A cannon"),
@@ -890,9 +890,9 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
     mineobject		*closest_mine = NULL;
     smartobject		*smart;
     mineobject		*mine;
-    DFLOAT		closest_mine_range = World.hypotenuse;
+    double		closest_mine_range = World.hypotenuse;
     int			i, j;
-    DFLOAT		range, perim, damage;
+    double		range, perim, damage;
     player		*p;
     ecm_t		*ecm;
 

@@ -34,7 +34,7 @@ static list_t	Asteroid_list = NULL;
 /*
  * Prototypes.
  */
-static void Make_asteroid(clpos pos, int size, int dir, DFLOAT speed);
+static void Make_asteroid(clpos pos, int size, int dir, double speed);
 
 
 /*
@@ -92,9 +92,9 @@ static bool Asteroid_remove_from_list(wireobject *ast)
  */
 void Break_asteroid(wireobject *asteroid)
 {
-    DFLOAT	mass, mass3;
-    DFLOAT	speed, speed1, speed2, radius;
-    DFLOAT	velx1, vely1, velx2, vely2;
+    double	mass, mass3;
+    double	speed, speed1, speed2, radius;
+    double	velx1, vely1, velx2, vely2;
     int		dir, dir1, dir2, split_dir;
     clpos	pos1, pos2;
 
@@ -186,7 +186,7 @@ void Break_asteroid(wireobject *asteroid)
 	int	i;
 	vector	vel;
 	int	item, item_dir, num_per_pack;
-	DFLOAT	item_speed;
+	double	item_speed;
 	long	status;
 
 	for (i = 0; i < nitems; i++) {
@@ -223,10 +223,10 @@ void Break_asteroid(wireobject *asteroid)
 /*
  * Creates an asteroid with the given characteristics.
  */
-static void Make_asteroid(clpos pos, int size, int dir, DFLOAT speed)
+static void Make_asteroid(clpos pos, int size, int dir, double speed)
 {
     wireobject	*asteroid;
-    DFLOAT	radius;
+    double	radius;
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
 	return;
@@ -355,12 +355,11 @@ static void Place_asteroid(void)
 	    }
 	}
     }
-    if (okay == true) {
+    if (okay == true)
 	Make_asteroid(pos,
 		      (int)(1 + rfrac() * ASTEROID_MAX_SIZE),
 		      (int)(rfrac() * RES),
-		      (DFLOAT)ASTEROID_START_SPEED);
-    }
+		      (double)ASTEROID_START_SPEED);
 }
 
 

@@ -34,7 +34,7 @@ char laser_version[] = VERSION;
 void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 {
     player		*kp;
-    DFLOAT		sc;
+    double		sc;
     char		msg[MSG_LEN];
 
     kp = Player_by_id(pulse->id);

@@ -503,7 +503,7 @@ void Rank_init_saved_scores(void)
 		node->entry.ballsCashed = ntohs(node->entry.ballsCashed);
 		node->entry.bestball = ntohs(node->entry.bestball);
 		node->score =
-		    (DFLOAT) ((int32_t) ntohl(node->entry.disk_score))
+		    (double) ((int32_t) ntohl(node->entry.disk_score))
 		    / 65536.0;
 		/* Fix buggy first implementation... */
 		if (node->score >= 65000)

@@ -75,7 +75,7 @@ void Cannon_throw_items(cannon_t *c)
 {
     int		i, dir;
     object	*obj;
-    DFLOAT	velocity;
+    double	velocity;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (i == ITEM_FUEL)
@@ -399,7 +399,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	    break;
 	case 3:
 	    if (tdist < range) {
-		DFLOAT t = tdist / speed; /* time */
+		double t = tdist / speed; /* time */
 		int npx = (int)(pl->pos.cx
 				+ pl->vel.x * t * CLICK
 				+ pl->acc.x * t * t * CLICK);

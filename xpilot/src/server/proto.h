@@ -108,7 +108,7 @@ int Map_place_base(clpos pos, int dir, int team);
 int Map_place_cannon(clpos pos, int dir, int team);
 int Map_place_check(clpos pos, int ind);
 int Map_place_fuel(clpos pos, int team);
-int Map_place_grav(clpos pos, DFLOAT force, int type);
+int Map_place_grav(clpos pos, double force, int type);
 int Map_place_target(clpos pos, int team);
 int Map_place_treasure(clpos pos, int team, bool empty);
 int Map_place_wormhole(clpos pos, wormType type);
@@ -117,9 +117,9 @@ int Map_place_asteroid_concentrator(clpos pos);
 
 void Find_base_direction(void);
 void Compute_gravity(void);
-DFLOAT Wrap_findDir(DFLOAT dx, DFLOAT dy);
-DFLOAT Wrap_cfindDir(int dx, int dy);
-DFLOAT Wrap_length(int dx, int dy);
+double Wrap_findDir(double dx, double dy);
+double Wrap_cfindDir(int dx, int dy);
+double Wrap_length(int dx, int dy);
 int Find_closest_team(int cx, int cy);
 
 
@@ -160,7 +160,7 @@ void Record_shove(player *pl, player *pusher, long shove_time);
 void Delta_mv(object *ship, object *obj);
 void Delta_mv_elastic(object *obj1, object *obj2);
 void Obj_repel(object *obj1, object *obj2, int repel_dist);
-void Item_damage(player *pl, DFLOAT prob);
+void Item_damage(player *pl, double prob);
 void Tank_handle_detach(player *pl);
 void Add_fuel(pl_fuel_t *, long);
 void Update_tanks(pl_fuel_t *);
@@ -231,28 +231,28 @@ void Make_debris(
     /* owner id       */ int    id,
     /* owner team     */ int    team,
     /* type           */ int    type,
-    /* mass           */ DFLOAT mass,
+    /* mass           */ double mass,
     /* status         */ long   status,
     /* color          */ int    color,
     /* radius         */ int    radius,
     /* num debris     */ int    num_debris,
     /* min,max dir    */ int    min_dir,    int    max_dir,
-    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
-    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
+    /* min,max speed  */ double min_speed,  double max_speed,
+    /* min,max life   */ double min_life,   double max_life
     );
 void Make_wreckage(
     /* pos            */ clpos  pos,
     /* vel            */ vector vel,
     /* owner id       */ int    id,
     /* owner team     */ int    team,
-    /* min,max mass   */ DFLOAT min_mass,   DFLOAT max_mass,
-    /* total mass     */ DFLOAT total_mass,
+    /* min,max mass   */ double min_mass,   double max_mass,
+    /* total mass     */ double total_mass,
     /* status         */ long   status,
     /* color          */ int    color,
     /* max wreckage   */ int    max_wreckage,
     /* min,max dir    */ int    min_dir,    int    max_dir,
-    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
-    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
+    /* min,max speed  */ double min_speed,  double max_speed,
+    /* min,max life   */ double min_life,   double max_life
     );
 void Make_item(clpos pos,
 	       vector vel,
@@ -405,7 +405,7 @@ void Phasing(player *pl, bool on);
 void Options_parse(void);
 void Options_free(void);
 bool Convert_string_to_int(const char *value_str, int *int_ptr);
-bool Convert_string_to_float(const char *value_str, DFLOAT *float_ptr);
+bool Convert_string_to_float(const char *value_str, double *float_ptr);
 bool Convert_string_to_bool(const char *value_str, bool *bool_ptr);
 void Convert_list_to_string(list_t list, char **string);
 void Convert_string_to_list(const char *value, list_t *list_ptr);

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -40,7 +39,7 @@
 #define BLOCK_CLICKS		(BLOCK_SZ << CLICK_SHIFT)
 #define CLICK_TO_PIXEL(C)	((int)((C) >> CLICK_SHIFT))
 #define CLICK_TO_BLOCK(C)	((int)((C) / (BLOCK_SZ << CLICK_SHIFT)))
-#define CLICK_TO_FLOAT(C)	((DFLOAT)(C) * (1.0f / CLICK))
+#define CLICK_TO_FLOAT(C)	((double)(C) * (1.0f / CLICK))
 #define PIXEL_TO_CLICK(I)	((click_t)(I) << CLICK_SHIFT)
 #define FLOAT_TO_CLICK(F)	((int)((F) * CLICK))
 /* calculate the click coordinate of the center of a block */

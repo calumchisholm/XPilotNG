@@ -2638,7 +2638,7 @@ static void Get_int_resource(XrmDatabase db,
 
 
 static void Get_float_resource(XrmDatabase db,
-			       const char *resource, DFLOAT *result)
+			       const char *resource, double *result)
 {
     int			ind;
     double		temp_result;
@@ -2651,7 +2651,7 @@ static void Get_float_resource(XrmDatabase db,
 	     resValue, resource);
 	sscanf(options[ind].fallback, "%lf", &temp_result);
     }
-    *result = (DFLOAT) temp_result;
+    *result = temp_result;
 }
 
 

@@ -309,7 +309,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Grav")) {
 	clpos pos = DEFAULT_POS;
-	DFLOAT force = 0.0;
+	double force = 0.0;
 	int type = SPACE;
 
 	while (*attr) {
@@ -318,7 +318,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    else if (!strcasecmp(*attr, "y"))
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    else if (!strcasecmp(*attr, "force"))
-		force = (DFLOAT)atof(*(attr + 1));
+		force = atof(*(attr + 1));
 	    else if (!strcasecmp(*attr, "type")) {
 		char *s = (char *)*(attr + 1);
 
@@ -377,7 +377,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "FrictionArea")) {
-	DFLOAT fric = 0.0; /* kps - other default ??? */
+	double fric = 0.0; /* kps - other default ??? */
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "friction"))

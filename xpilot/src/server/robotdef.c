@@ -73,8 +73,8 @@ static void Robot_default_invite(player *pl, player *inviter);
 /*
  * Local static variables
  */
-static DFLOAT	Visibility_distance;
-static DFLOAT	Max_enemy_distance;
+static double	Visibility_distance;
+static double	Max_enemy_distance;
 
 
 /*
@@ -278,7 +278,7 @@ static void Robot_default_invite(player *pl, player *inviter)
     int				war_id = Robot_default_war_on_player(pl);
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
     int				i;
-    DFLOAT			limit;
+    double			limit;
     bool			we_accept = true;
 
     if (pl->alliance != ALLIANCE_NOT_SET) {
@@ -310,7 +310,7 @@ static void Robot_default_invite(player *pl, player *inviter)
 	    we_accept = false;
     }
     else {
-	DFLOAT	avg_score = 0;
+	double	avg_score = 0;
 	int	member_count = Get_alliance_member_count(inviter->alliance);
 
 	for (i = 0; i < NumPlayers; i++) {
@@ -431,7 +431,7 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
     vector			*gravity;
     int				gravity_dir;
     long			dx, dy;
-    DFLOAT			velocity;
+    double			velocity;
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
 
     safe_width = (my_data->defense / 200) * SHIP_SZ;
@@ -955,8 +955,8 @@ static bool Check_robot_target(player *pl, clpos item_pos, int new_mode)
 
 	    if (ship && Player_is_active(ship)) {
 
-		DFLOAT	x2, y2, x3, y3, x4, y4, x5, y5;
-		DFLOAT	ship_dist, dir3, dir4, dir5;
+		double	x2, y2, x3, y3, x4, y4, x5, y5;
+		double	ship_dist, dir3, dir4, dir5;
 		clpos m_gun;
 
 		m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
@@ -996,7 +996,7 @@ static bool Check_robot_target(player *pl, clpos item_pos, int new_mode)
 		&& pl->lock.distance
 		   < TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM])) {
 
-		DFLOAT xvd, yvd, vel;
+		double xvd, yvd, vel;
 		long dir;
 		int away;
 
@@ -1376,7 +1376,7 @@ static bool Ball_handler(player *pl)
 	for (dist = 0;
 	     clear_path && dist < (closest_tr_dist - BLOCK_SZ);
 	     dist += BLOCK_SZ / 2) {
-	    DFLOAT fraction = (DFLOAT)dist / closest_tr_dist;
+	    double fraction = (double)dist / closest_tr_dist;
 	    dx = (int)((fraction * xdist) + OBJ_X_IN_BLOCKS(ball));
 	    dy = (int)((fraction * ydist) + OBJ_Y_IN_BLOCKS(ball));
 
@@ -1807,7 +1807,7 @@ static void Robot_default_play_check_objects(player *pl,
 static void Robot_default_play(player *pl)
 {
     player			*ship;
-    DFLOAT			distance, ship_dist,
+    double			distance, ship_dist,
 				enemy_dist,
 				speed, x_speed, y_speed;
     int				item_dist, mine_dist;
@@ -2261,8 +2261,8 @@ static void Robot_default_play(player *pl)
  */
 static void Robot_default_round_tick(void)
 {
-    DFLOAT		min_visibility = 256.0;
-    DFLOAT		min_enemy_distance = 512.0;
+    double		min_visibility = 256.0;
+    double		min_enemy_distance = 512.0;
 
     /* reduce visibility when there are a lot of robots. */
     Visibility_distance = min_visibility

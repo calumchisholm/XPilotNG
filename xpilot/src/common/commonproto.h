@@ -24,11 +24,6 @@
 #ifndef	COMMONPROTO_H
 #define	COMMONPROTO_H
 
-#ifndef TYPES_H
-/* need DFLOAT */
-#include "types.h"
-#endif
-
 /* randommt.c */
 extern void seedMT(unsigned int seed);
 extern unsigned int reloadMT(void);
@@ -40,7 +35,7 @@ extern int mod(int x, int y);
 extern void Make_table(void);
 extern int ON(char *optval);
 extern int OFF(char *optval);
-extern DFLOAT findDir(DFLOAT x, DFLOAT y);
+extern double findDir(double x, double y);
 
 /* strdup.c */
 extern char *xp_strdup(const char *);

@@ -181,7 +181,7 @@ void Gui_paint_fuel(int x, int y, int fuel)
 	static char		s[2] = "F";
 	static int		text_width = 0;
 	static int		text_is_bigger;
-	static DFLOAT		lastScaleFactor;
+	static double		lastScaleFactor;
 
 	if (!text_width || lastScaleFactor != scaleFactor) {
 	    lastScaleFactor = scaleFactor;

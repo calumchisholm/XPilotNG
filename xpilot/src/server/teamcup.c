@@ -341,17 +341,17 @@ void teamcup_round_end(int winning_team)
     int i;
     int j;
     int *list;
-    DFLOAT team_score[MAX_TEAMS];
+    double team_score[MAX_TEAMS];
     int team_players[MAX_TEAMS];
-    DFLOAT best_score = (DFLOAT)(-100000); /* hack */
+    double best_score = (double)(-100000); /* hack */
     int best;
     player *pl;
-    DFLOAT DFLOAT_MAX;
+    double double_max;
 
     if (!teamcup)
 	return;
 
-    DFLOAT_MAX=(DFLOAT)(100000); /*not really*/
+    double_max=(double)(100000); /*not really*/
 
     list = malloc(NumPlayers * sizeof(int));
     if (list == NULL) {
@@ -363,7 +363,7 @@ void teamcup_round_end(int winning_team)
 	list[i] = i;
 
     for (i = 0; i < MAX_TEAMS; i++)
-	team_score[i] = DFLOAT_MAX;
+	team_score[i] = double_max;
 
     for (i = 0; i < MAX_TEAMS; i++)
 	team_players[i] = 0;
@@ -386,14 +386,14 @@ void teamcup_round_end(int winning_team)
 	teamcup_log("%d\t%d\t%2d/%d\t%s\n", pl->team, (int)(pl->score),
 		    pl->kills, pl->deaths, pl->name);
 
-	if (team_score[pl->team] == DFLOAT_MAX)
+	if (team_score[pl->team] == double_max)
 	    team_score[pl->team] = 0.0;
 	team_score[pl->team] += pl->score;
 	team_players[pl->team]++;
     }
 
     for (i = 0; i < MAX_TEAMS; i++) {
-	if (team_score[i] != DFLOAT_MAX)
+	if (team_score[i] != double_max)
 	    teamcup_log("Team %d\t%d\n", i, (int)(team_score[i]));
     }
     if (teamcup_score_file != NULL)

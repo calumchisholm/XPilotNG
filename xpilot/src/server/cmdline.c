@@ -28,19 +28,19 @@ char cmdline_version[] = VERSION;
 
 
 list_t		expandList;		/* List of predefined settings. */
-DFLOAT		Gravity;		/* Power of gravity */
-DFLOAT		ShipMass;		/* Default mass of ship */
-DFLOAT		ballMass;		/* Default mass of balls */
-DFLOAT		ShotsMass;		/* Default mass of shots */
-DFLOAT		ShotsSpeed;		/* Default speed of shots */
-DFLOAT		ShotsLife;		/* Default number of ticks */
+double		Gravity;		/* Power of gravity */
+double		ShipMass;		/* Default mass of ship */
+double		ballMass;		/* Default mass of balls */
+double		ShotsMass;		/* Default mass of shots */
+double		ShotsSpeed;		/* Default speed of shots */
+double		ShotsLife;		/* Default number of ticks */
 					/* each shot will live */
 
 bool		shotHitFuelDrainUsesKineticEnergy;	/* see option name */
 
-DFLOAT		pulseSpeed;		/* Default speed of laser pulse */
-DFLOAT		pulseLength;		/* Max length of laser pulse */
-DFLOAT		pulseLife;		/* Default number of ticks */
+double		pulseSpeed;		/* Default speed of laser pulse */
+double		pulseLength;		/* Max length of laser pulse */
+double		pulseLife;		/* Default number of ticks */
 					/* each pulse will live */
 int		maxRobots;		/* How many robots should enter */
 int		minRobots;		/* the game? */
@@ -55,7 +55,7 @@ bool		restrictRobots;		/* Restrict robots to robotTeam? */
 bool		reserveRobotTeam;	/* Allow only robots in robotTeam? */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
-DFLOAT		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
+double		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
 double		laserRepeatRate = 2;	/* Ticks per laser fire (0=off) */
 bool		RawMode;		/* Let robots live and calculate
 					   frames even if there are n
@@ -93,17 +93,17 @@ bool		cloakedExhaust;		/* Generate exhaust when cloaked? */
 bool		cloakedShield;		/* Allowed to use shields when cloaked? */
 bool		ecmsReprogramMines;	/* Do ecms reprogram mines? */
 bool		ecmsReprogramRobots;	/* Do ecms reprogram robots? */
-DFLOAT		maxObjectWallBounceSpeed;	/* max object bounce speed */
-DFLOAT		maxShieldedWallBounceSpeed;	/* max shielded bounce speed */
-DFLOAT		maxUnshieldedWallBounceSpeed; /* max unshielded bounce speed */
-DFLOAT		playerWallBrakeFactor;	/* wall lowers speed if less than 1 */
-DFLOAT		objectWallBrakeFactor;	/* wall lowers speed if less than 1 */
-DFLOAT		objectWallBounceLifeFactor;	/* reduce object life */
-DFLOAT		wallBounceFuelDrainMult;/* Wall bouncing fuel drain factor */
-DFLOAT		wallBounceDestroyItemProb;/* Wall bouncing item destroy prob */
+double		maxObjectWallBounceSpeed;	/* max object bounce speed */
+double		maxShieldedWallBounceSpeed;	/* max shielded bounce speed */
+double		maxUnshieldedWallBounceSpeed; /* max unshielded bounce speed */
+double		playerWallBrakeFactor;	/* wall lowers speed if less than 1 */
+double		objectWallBrakeFactor;	/* wall lowers speed if less than 1 */
+double		objectWallBounceLifeFactor;	/* reduce object life */
+double		wallBounceFuelDrainMult;/* Wall bouncing fuel drain factor */
+double		wallBounceDestroyItemProb;/* Wall bouncing item destroy prob */
 bool		limitedVisibility;	/* Is visibility limited? */
-DFLOAT		minVisibilityDistance;	/* Minimum visibility when starting */
-DFLOAT		maxVisibilityDistance;	/* Maximum visibility */
+double		minVisibilityDistance;	/* Minimum visibility when starting */
+double		maxVisibilityDistance;	/* Maximum visibility */
 bool		limitedLives;		/* Are lives limited? */
 int		worldLives;		/* If so, what's the max? */
 bool		endOfRoundReset;	/* Reset the world when round ends? */
@@ -129,7 +129,7 @@ bool		edgeBounce;		/* Do objects bounce when they hit
 					   the edge of the Universe? */
 bool		extraBorder;		/* Give map an extra border? */
 ipos		gravityPoint;		/* Where does gravity originate? */
-DFLOAT		gravityAngle;		/* If gravity is along a uniform line,
+double		gravityAngle;		/* If gravity is along a uniform line,
 					   at what angle is that line? */
 bool		gravityPointSource;	/* Is gravity a point source? */
 bool		gravityClockwise;	/* If so, is it clockwise? */
@@ -150,56 +150,56 @@ int		adminMessageFileSizeLimit;/* Limit on admin message file size */
 
 int		nukeMinSmarts;		/* minimum smarts for a nuke */
 int		nukeMinMines;		/* minimum number of mines for nuke */
-DFLOAT		nukeClusterDamage;	/* multiplier for damage from nuke */
+double		nukeClusterDamage;	/* multiplier for damage from nuke */
 					/* cluster debris, reduces number */
 					/* of particles by similar amount */
 int		mineFuseTime;		/* Length of time mine is fused */
 int		mineLife;		/* lifetime of mines */
-DFLOAT		minMineSpeed;		/* minimum speed of mines */
-DFLOAT		missileLife;		/* lifetime of missiles */
+double		minMineSpeed;		/* minimum speed of mines */
+double		missileLife;		/* lifetime of missiles */
 int		baseMineRange;		/* Distance from base mines may be used */
 int		mineShotDetonateDistance; /* When does a shot trigger a mine? */
 
-DFLOAT		shotKillScoreMult;
-DFLOAT		torpedoKillScoreMult;
-DFLOAT		smartKillScoreMult;
-DFLOAT		heatKillScoreMult;
-DFLOAT		clusterKillScoreMult;
-DFLOAT		laserKillScoreMult;
-DFLOAT		tankKillScoreMult;
-DFLOAT		runoverKillScoreMult;
-DFLOAT		ballKillScoreMult;
-DFLOAT		explosionKillScoreMult;
-DFLOAT		shoveKillScoreMult;
-DFLOAT		crashScoreMult;
-DFLOAT		mineScoreMult;
-DFLOAT		selfKillScoreMult;
-DFLOAT		selfDestructScoreMult;
-DFLOAT		unownedKillScoreMult;
-DFLOAT		asteroidPoints;
-DFLOAT		cannonPoints;
-DFLOAT		asteroidMaxScore;
-DFLOAT		cannonMaxScore;
+double		shotKillScoreMult;
+double		torpedoKillScoreMult;
+double		smartKillScoreMult;
+double		heatKillScoreMult;
+double		clusterKillScoreMult;
+double		laserKillScoreMult;
+double		tankKillScoreMult;
+double		runoverKillScoreMult;
+double		ballKillScoreMult;
+double		explosionKillScoreMult;
+double		shoveKillScoreMult;
+double		crashScoreMult;
+double		mineScoreMult;
+double		selfKillScoreMult;
+double		selfDestructScoreMult;
+double		unownedKillScoreMult;
+double		asteroidPoints;
+double		cannonPoints;
+double		asteroidMaxScore;
+double		cannonMaxScore;
 
-DFLOAT 		movingItemProb;		/* Probability for moving items */
-DFLOAT		randomItemProb;		/* Probability for random-appearing items */
-DFLOAT		dropItemOnKillProb;	/* Probability for players items to */
+double 		movingItemProb;		/* Probability for moving items */
+double		randomItemProb;		/* Probability for random-appearing items */
+double		dropItemOnKillProb;	/* Probability for players items to */
 					/* drop when player is killed */
-DFLOAT		detonateItemOnKillProb;	/* Probaility for remaining items to */
+double		detonateItemOnKillProb;	/* Probaility for remaining items to */
 					/* detonate when player is killed */
-DFLOAT		destroyItemInCollisionProb;
-DFLOAT		asteroidItemProb;	/* prob. that a broken asteroid will */
+double		destroyItemInCollisionProb;
+double		asteroidItemProb;	/* prob. that a broken asteroid will */
 int		asteroidMaxItems;	/* have one or more items */
-DFLOAT		rogueHeatProb;          /* prob. that unclaimed rocketpack */
-DFLOAT		rogueMineProb;          /* or minepack will "activate" */
-DFLOAT		itemProbMult;
-DFLOAT		cannonItemProbMult;
-DFLOAT		maxItemDensity;
-DFLOAT		maxAsteroidDensity;
+double		rogueHeatProb;          /* prob. that unclaimed rocketpack */
+double		rogueMineProb;          /* or minepack will "activate" */
+double		itemProbMult;
+double		cannonItemProbMult;
+double		maxItemDensity;
+double		maxAsteroidDensity;
 int		itemConcentratorRadius;
-DFLOAT		itemConcentratorProb;
+double		itemConcentratorProb;
 int		asteroidConcentratorRadius;
-DFLOAT		asteroidConcentratorProb;
+double		asteroidConcentratorProb;
 
 bool		allowSmartMissiles;
 bool		allowHeatSeekers;
@@ -227,7 +227,7 @@ bool		laserIsStunGun;		/* Is the laser a stun gun? */
 bool		reportToMetaServer;	/* Send status to meta-server? */
 bool		searchDomainForXPilot;	/* Do a DNS lookup for XPilot.domain? */
 char		*denyHosts;		/* Computers which are denied service */
-DFLOAT		gameDuration;		/* total duration of game in minutes */
+double		gameDuration;		/* total duration of game in minutes */
 bool		teamImmunity;		/* Is team immune from player action */
 bool		teamShareScore;		/* Are scores shared between members? */
 
@@ -242,21 +242,21 @@ bool		treasureCollisionMayKill;
 bool		wreckageCollisionMayKill;
 bool		asteroidCollisionMayKill;
 
-DFLOAT		ballConnectorSpringConstant;
-DFLOAT		ballConnectorDamping;
-DFLOAT		maxBallConnectorRatio;
-DFLOAT		ballConnectorLength;
+double		ballConnectorSpringConstant;
+double		ballConnectorDamping;
+double		maxBallConnectorRatio;
+double		ballConnectorLength;
 bool		connectorIsString;	/* can the connector get shorter? */
-DFLOAT		ballRadius;		/* ball radius in pixels */
+double		ballRadius;		/* ball radius in pixels */
 
-DFLOAT		friction;		/* friction only affects ships */
-static DFLOAT	frictionSetting;	/* Above set through this */
-DFLOAT		blockFriction;		/* friction in friction blocks */
+double		friction;		/* friction only affects ships */
+static double	frictionSetting;	/* Above set through this */
+double		blockFriction;		/* friction in friction blocks */
 bool		blockFrictionVisible;	/* if yes, friction blocks are decor; */
 					/* if no, friction blocks are space */
-DFLOAT		coriolis;		/* angle velocity turns each time unit */
-DFLOAT		cor_cos, cor_sin;	/* cosine and sine of cor. angle */
-DFLOAT		checkpointRadius;      	/* in blocks */
+double		coriolis;		/* angle velocity turns each time unit */
+double		cor_cos, cor_sin;	/* cosine and sine of cor. angle */
+double		checkpointRadius;      	/* in blocks */
 int		raceLaps;		/* how many laps per race */
 bool		lockOtherTeam;		/* lock ply from other teams when dead? */
 bool		loseItemDestroys; 	/* destroy item on loseItem? */
@@ -302,9 +302,9 @@ int		playerLimit_orig;	/* how many connections at once */
 int		constantScoring;	/* Fixed points for kills etc? */
 int		eliminationRace;	/* Last player drops each lap? */
 
-DFLOAT		gameSpeed;		/* Speed of game action */
-DFLOAT		timeStep;		/* Game time step per frame */
-DFLOAT		ecmSizeFactor;		/* Factor for ecm size update */
+double		gameSpeed;		/* Speed of game action */
+double		timeStep;		/* Game time step per frame */
+double		ecmSizeFactor;		/* Factor for ecm size update */
 
 int		recordMode;		/* 0=off, 1=record, 2=playback */
 int		recordFlushInterval;	/* Max seconds between storing data */

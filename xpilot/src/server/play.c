@@ -33,7 +33,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
     int			win_score = 0,lose_score = 0;
     int			win_team_members = 0, lose_team_members = 0;
     int			somebody_flag = 0;
-    DFLOAT		sc, por;
+    double		sc, por;
 
     Check_team_members (td->team);
     if (td->team == pl->team)
@@ -125,19 +125,19 @@ void Make_debris(
     /* owner id       */ int    id,
     /* owner team     */ int    team,
     /* type           */ int    type,
-    /* mass           */ DFLOAT  mass,
+    /* mass           */ double  mass,
     /* status         */ long   status,
     /* color          */ int    color,
     /* radius         */ int    radius,
     /* num debris     */ int    num_debris,
     /* min,max dir    */ int    min_dir,    int    max_dir,
-    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
-    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
+    /* min,max speed  */ double min_speed,  double max_speed,
+    /* min,max life   */ double min_life,   double max_life
 )
 {
     object		*debris;
     int			i;
-    DFLOAT		life;
+    double		life;
     modifiers		mods;
 
     pos.cx = WRAP_XCLICK(pos.cx);
@@ -163,7 +163,7 @@ void Make_debris(
 	num_debris = MAX_TOTAL_SHOTS - NumObjs;
 
     for (i = 0; i < num_debris; i++) {
-	DFLOAT		speed, dx, dy, diroff;
+	double		speed, dx, dy, diroff;
 	int		dir, dirplus;
 
 	if ((debris = Object_allocate()) == NULL)
@@ -186,7 +186,7 @@ void Make_debris(
 	if (shotHitFuelDrainUsesKineticEnergy
 	    && type == OBJ_SHOT) {
 	    /* compensate so that m*v^2 is constant */
-	    DFLOAT sp_shotsp = speed / ShotsSpeed;
+	    double sp_shotsp = speed / ShotsSpeed;
 	    debris->mass = mass / (sp_shotsp * sp_shotsp);
 	} else
 	    debris->mass = mass;
@@ -233,20 +233,20 @@ void Ball_is_replaced(ballobject *ball)
 void Ball_is_destroyed(ballobject *ball)
 {
     char msg[MSG_LEN];
-    int frames = (1e6 - ball->life) / timeStep + .5;
     player *pl = Player_by_id(ball->owner);
-    DFLOAT seconds = ((DFLOAT)frames) / framesPerSecond;
+    double frames = (1e6 - ball->life) / timeStep + .5;
+    double seconds = frames / framesPerSecond;
 
     if (timeStep != 1.0) {
-	DFLOAT normalized = ((DFLOAT)frames) * timeStep;
+	double normalized = frames * timeStep;
 
 	sprintf(msg," < The ball was loose for %d frames "
 		"(equals %.2f frames with gamespeed=FPS) / %.2fs >",
-		frames, normalized, seconds);
+		(int)frames, normalized, seconds);
 	Rank_BallRun(pl, normalized);
     } else {
 	sprintf(msg," < The ball was loose for %d frames / %.2fs >",
-		frames, seconds);
+		(int)frames, seconds);
 	Rank_BallRun(pl, frames);
     }
     Set_message(msg);

@@ -272,7 +272,7 @@ int Map_place_asteroid_concentrator(clpos pos)
     return ind;
 }
 
-int Map_place_grav(clpos pos, DFLOAT force, int type)
+int Map_place_grav(clpos pos, double force, int type)
 {
     grav_t t;
     int ind = World.NumGravs;
@@ -611,7 +611,7 @@ bool Grok_map_options(void)
 int Find_closest_team(int cx, int cy)
 {
     int team = TEAM_NOT_SET, i;
-    DFLOAT closest = FLT_MAX, l;
+    double closest = FLT_MAX, l;
 
     for (i = 0; i < World.NumBases; i++) {
 	base_t *base = Bases(i);
@@ -644,7 +644,7 @@ void Find_base_direction(void)
 static void Find_base_order(void)
 {
     int			i, j, k, n;
-    DFLOAT		dist;
+    double		dist;
     clpos		chkpos;
 
     if (!BIT(World.rules->mode, TIMING)) {
@@ -679,21 +679,21 @@ static void Find_base_order(void)
 }
 
 
-DFLOAT Wrap_findDir(DFLOAT dx, DFLOAT dy)
+double Wrap_findDir(double dx, double dy)
 {
     dx = WRAP_DX(dx);
     dy = WRAP_DY(dy);
     return findDir(dx, dy);
 }
 
-DFLOAT Wrap_cfindDir(int dcx, int dcy)
+double Wrap_cfindDir(int dcx, int dcy)
 {
     dcx = WRAP_DCX(dcx);
     dcy = WRAP_DCY(dcy);
     return findDir(dcx, dcy);
 }
 
-DFLOAT Wrap_length(int dcx, int dcy)
+double Wrap_length(int dcx, int dcy)
 {
     dcx = WRAP_DCX(dcx);
     dcy = WRAP_DCY(dcy);
@@ -704,7 +704,7 @@ DFLOAT Wrap_length(int dcx, int dcy)
 static void Compute_global_gravity(void)
 {
     int			xi, yi, dx, dy;
-    DFLOAT		xforce, yforce, strength;
+    double		xforce, yforce, strength;
     double		theta;
     vector		*grav;
 
@@ -776,7 +776,7 @@ static void Compute_local_gravity(void)
     int			xi, yi, g, gx, gy, ax, ay, dx, dy, gtype;
     int			first_xi, last_xi, first_yi, last_yi, mod_xi, mod_yi;
     int			min_xi, max_xi, min_yi, max_yi;
-    DFLOAT		force, fx, fy;
+    double		force, fx, fy;
     vector		*v, *grav, *tab, grav_tab[GRAV_RANGE+1][GRAV_RANGE+1];
 
 
@@ -792,7 +792,7 @@ static void Compute_local_gravity(void)
 	min_yi -= MIN(GRAV_RANGE, World.y);
 	max_yi += MIN(GRAV_RANGE, World.y);
     }
-    for (g=0; g<World.NumGravs; g++) {
+    for (g = 0; g < World.NumGravs; g++) {
 	gx = CLICK_TO_BLOCK(World.gravs[g].pos.cx);
 	gy = CLICK_TO_BLOCK(World.gravs[g].pos.cy);
 	force = World.gravs[g].force;

@@ -297,7 +297,7 @@ static void Xpmap_place_asteroid_concentrator(int x, int y, bool create)
 	Map_place_asteroid_concentrator(Xpmap_get_clpos(x, y));
 }
 
-static void Xpmap_place_grav(int x, int y, DFLOAT force, int type, bool create)
+static void Xpmap_place_grav(int x, int y, double force, int type, bool create)
 {
     World.block[x][y] = type;
     if (create)

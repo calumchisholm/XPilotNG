@@ -88,9 +88,9 @@ void Place_general_mine(player *pl, int team, long status,
 {
     char		msg[MSG_LEN];
     int			used;
-    DFLOAT		life;
+    double		life;
     long		drain;
-    DFLOAT		mass;
+    double		mass;
     int			i, minis;
     vector		mv;
 
@@ -199,9 +199,9 @@ void Place_general_mine(player *pl, int team, long status,
 	if (minis > 1) {
 	    int		space = RES/minis;
 	    int		dir;
-	    DFLOAT	spread;
+	    double	spread;
 
-	    spread = (DFLOAT)((unsigned)mods.spread + 1);
+	    spread = (double)((unsigned)mods.spread + 1);
 	    /*
 	     * Dir gives (S is ship upwards);
 	     *
@@ -249,8 +249,8 @@ void Detonate_mines(player *pl)
 {
     int			i;
     int			closest = -1;
-    DFLOAT		dist;
-    DFLOAT		min_dist = World.hypotenuse * CLICK + 1;
+    double		dist;
+    double		min_dist = World.hypotenuse * CLICK + 1;
 
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	return;
@@ -487,7 +487,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 			side = 0,
 			fired = 0;
     long		drain;
-    DFLOAT		mass = ShotsMass,
+    double		mass = ShotsMass,
 			life = ShotsLife,
 			speed = ShotsSpeed,
 			turnspeed = 0,
@@ -665,14 +665,14 @@ void Fire_general_shot(player *pl, int team, bool cannon,
     speed *= (1 + (mods.power * MISSILE_POWER_SPEED_FACT));
     max_speed *= (1 + (mods.power * MISSILE_POWER_SPEED_FACT));
     turnspeed *= (1 + (mods.power * MISSILE_POWER_TURNSPEED_FACT));
-    spread = (DFLOAT)((unsigned)mods.spread + 1);
+    spread = (double)((unsigned)mods.spread + 1);
     /*
      * Calculate the maximum time it would take to cross one ships width,
      * don't fuse the shot/missile/torpedo for the owner only until that
      * time passes.  This is a hack to stop various odd missile and shot
      * mounting points killing the player when they're firing.
      */
-    fuse += (int)((2.0 * (DFLOAT)SHIP_SZ) / speed + 1.0);
+    fuse += (int)((2.0 * (double)SHIP_SZ) / speed + 1.0);
 
     /*
      * 			Missile Racks and Spread
@@ -938,10 +938,10 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    if (on_this_rack <= 1)
 		angle = 0.0;
 	    else {
-		angle = (DFLOAT)(on_this_rack - 1 - 2 * r);
-		angle /= (3.0 * (DFLOAT)(on_this_rack - 1));
+		angle = (double)(on_this_rack - 1 - 2 * r);
+		angle /= (3.0 * (double)(on_this_rack - 1));
 	    }
-	    angle += (DFLOAT)(2 * side) / (DFLOAT)(3 * SHIP_SZ);
+	    angle += (double)(2 * side) / (double)(3 * SHIP_SZ);
 	}
 
 	/*
@@ -996,7 +996,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
      * firing each mini missile.
      */
     if (pl) {
-	DFLOAT dx, dy;
+	double dx, dy;
 
 	dx = dy = 0;
 	for (i = 0; i < fired; i++) {
@@ -1084,7 +1084,7 @@ void Delete_shot(int ind)
     long		status;
     int			i;
     int			intensity, type, color;
-    DFLOAT		modv, speed_modv, life_modv, num_modv, mass;
+    double		modv, speed_modv, life_modv, num_modv, mass;
 
     switch (shot->type) {
 
@@ -1207,11 +1207,11 @@ void Delete_shot(int ind)
 	     *   num_modv /= (shot->mods.mini + 1);
 	     * triggers a bug in HP C A.09.19.
 	     */
-	    num_modv = num_modv / ((DFLOAT)(unsigned)shot->mods.mini + 1.0f);
+	    num_modv = num_modv / ((double)(unsigned)shot->mods.mini + 1.0f);
 	}
 
 	if (BIT(shot->mods.nuclear, NUCLEAR)) {
-	    DFLOAT nuke_factor;
+	    double nuke_factor;
 	    if (shot->type == OBJ_MINE)
 		nuke_factor = NUKE_MINE_EXPL_MULT * shot->mass / MINE_MASS;
 	    else
@@ -1482,9 +1482,9 @@ void Update_connector_force(ballobject *ball)
 {
     player		*pl = Player_by_id(ball->id);
     vector		D;
-    DFLOAT		length, force, ratio, accell, damping;
-    /* const DFLOAT		k = 1500.0, b = 2.0; */
-    /* const DFLOAT		max_spring_ratio = 0.30; */
+    double		length, force, ratio, accell, damping;
+    /* const double		k = 1500.0, b = 2.0; */
+    /* const double		max_spring_ratio = 0.30; */
 
     /* no player connected ? */
     if (!pl)
@@ -1533,7 +1533,7 @@ void Update_connector_force(ballobject *ball)
 
 void Update_torpedo(torpobject *torp)
 {
-    DFLOAT		acc;
+    double		acc;
 
     if (BIT(torp->mods.nuclear, NUCLEAR))
 	acc = (torp->count < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
@@ -1554,11 +1554,11 @@ void Update_missile(missileobject *shot)
 {
     player		*pl;
     int			angle, theta;
-    DFLOAT		range = 0.0;
-    DFLOAT		acc = SMART_SHOT_ACC;
-    DFLOAT		x_dif = 0.0;
-    DFLOAT		y_dif = 0.0;
-    DFLOAT		shot_speed;
+    double		range = 0.0;
+    double		acc = SMART_SHOT_ACC;
+    double		x_dif = 0.0;
+    double		y_dif = 0.0;
+    double		shot_speed;
 
     if (shot->type == OBJ_HEAT_SHOT) {
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;
@@ -1594,7 +1594,7 @@ void Update_missile(missileobject *shot)
 		|| (range < HEAT_MID_RANGE
 		    && shot->count > HEAT_MID_TIMEOUT + HEAT_MID_ERROR)
 		|| shot->count > HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR) {
-		DFLOAT l;
+		double l;
 		int i;
 
 		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
@@ -1698,7 +1698,7 @@ void Update_missile(missileobject *shot)
 		      pl->pos.cy + PIXEL_TO_CLICK(y_dif) - shot->pos.cy);
 
     {
-	DFLOAT x, y, vx, vy;
+	double x, y, vx, vy;
 	int i, xi, yi, j, freemax, k, foundw;
 	static struct {
 	    int dx, dy;

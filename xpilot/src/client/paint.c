@@ -126,8 +126,8 @@ static time_t	old_time = 0;	/* Previous value of time */
 time_t		currentTime;	/* Current value of time() */
 bool		newSecond = false; /* True if time() incremented this frame */
 static int	frame_count = 0;/* Used to estimate client fps */
-DFLOAT		timePerFrame = 0.0;/* How much real time proceeds per frame */
-static DFLOAT	time_counter = 0.0;
+double		timePerFrame = 0.0;/* How much real time proceeds per frame */
+static double	time_counter = 0.0;
 
 int	cacheShips = 0;		/* cache some ship bitmaps every frame */
 
