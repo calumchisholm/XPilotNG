@@ -214,7 +214,7 @@ static void Robot_default_create(player_t *pl, char *str)
     robot_default_data_t	*my_data;
     world_t *world = &World;
 
-    if (!(my_data = (robot_default_data_t *)malloc(sizeof(*my_data)))) {
+    if (!(my_data = malloc(sizeof(*my_data)))) {
 	error("no mem for default robot");
 	End_game();
     }
@@ -223,15 +223,14 @@ static void Robot_default_create(player_t *pl, char *str)
     my_data->robot_count     = 0;
     my_data->robot_lock      = LOCK_NONE;
     my_data->robot_lock_id   = 0;
-    my_data->longterm_mode   = 0;
 
     if (str != NULL
 	&& *str != '\0'
 	&& sscanf(str, " %d %d", &my_data->attack, &my_data->defense) != 2) {
 	if (str && *str) {
-	    xpprintf("%s invalid parameters for default robot: \"%s\"\n",
-		     showtime(), str);
-	    my_data->attack = (int)(rfrac() * 99.5f);
+	    warn("invalid parameters for default robot %s: \"%s\"",
+		 pl->name, str);
+	    my_data->attack = (int)(rfrac() * 99.5);
 	    my_data->defense = 100 - my_data->attack;
 	}
 	LIMIT(my_data->attack, 1, 99);
@@ -244,16 +243,18 @@ static void Robot_default_create(player_t *pl, char *str)
     if (BIT(world->rules->mode, TIMING)) {
 	my_data->robot_normal_speed = 10.0;
 	my_data->robot_attack_speed = 25.0 + (my_data->attack / 10);
-	my_data->robot_max_speed = 50.0 + (my_data->attack / 20) - (my_data->defense / 50);
+	my_data->robot_max_speed
+	    = 50.0 + (my_data->attack / 20) - (my_data->defense / 50);
     } else {
 	my_data->robot_normal_speed = 6.0;
 	my_data->robot_attack_speed = 15.0 + (my_data->attack / 25);
-	my_data->robot_max_speed = 30.0 + (my_data->attack / 50) - (my_data->defense / 50);
+	my_data->robot_max_speed
+	    = 30.0 + (my_data->attack / 50) - (my_data->defense / 50);
     }
 
-    my_data->fuel_l3 = 500 + my_data->defense - my_data->attack + (int)((rfrac() - 0.5f) * 20);
-    my_data->fuel_l2 = 200 + 2 * (my_data->defense - my_data->attack) / 5 + (int)((rfrac() - 0.5f) * 8);
-    my_data->fuel_l1 = 100 + (my_data->defense - my_data->attack) / 5 + (int)((rfrac() - 0.5f) * 4);
+    my_data->fuel_l3 = 500.0 + 1.0 * (my_data->defense - my_data->attack);
+    my_data->fuel_l2 = 200.0 + 0.4 * (my_data->defense - my_data->attack);
+    my_data->fuel_l1 = 100.0 + 0.2 * (my_data->defense - my_data->attack);
 
     my_data->last_used_ecm	= 0;
     my_data->last_dropped_mine	= 0;
@@ -875,7 +876,7 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 		Place_mine(pl);
 	    else
 		Place_moving_mine(pl);
-	    new_mode = (rfrac() < 0.5f) ? RM_EVADE_RIGHT : RM_EVADE_LEFT;
+	    new_mode = (rfrac() < 0.5) ? RM_EVADE_RIGHT : RM_EVADE_LEFT;
 	}
     } else if (new_mode == RM_CANNON_KILL && item_dist <= 0) {
 
@@ -997,8 +998,6 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 		ship_dist = Wrap_length(PIXEL_TO_CLICK(x3 - x2),
 					PIXEL_TO_CLICK(y3 - y2)) / CLICK;
 
-		/* kps -
-		   changed PULSE_LIFE(pl->item[ITEM_LASER]) to options.pulseLife */
 		if (ship_dist < options.pulseSpeed * options.pulseLife + SHIP_SZ) {
 		    dir3 = Wrap_findDir(x3 - x2, y3 - y2);
 		    x4 = x3 + tcos(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
@@ -1967,8 +1966,7 @@ static void Robot_default_play(player_t *pl)
 	ship = Player_by_id(my_data->robot_lock_id);
 	j = GetInd(ship->id);
 
-	if (Player_is_active(ship)
-	    && Detect_hunt(pl, ship)) {
+	if (Detect_hunt(pl, ship)) {
 
 	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
 		&& my_data->robot_lock_id == ship->id) {
