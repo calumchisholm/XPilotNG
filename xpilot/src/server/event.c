@@ -553,7 +553,7 @@ int Handle_keyboard(player_t *pl)
     int i, key;
     bool pressed;
 
-    assert(!Player_is_killed(pl));
+    /*assert(!Player_is_killed(pl));*/
 
     for (key = 0; key < NUM_KEYS; key++) {
 	/* Find first keyv element where last_keyv isn't equal to prev_keyv. */
