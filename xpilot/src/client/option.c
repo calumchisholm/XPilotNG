@@ -73,6 +73,8 @@ static void Print_default_value(xp_option_t *opt)
     case xp_string_option:
 	if (opt->str_defval && strlen(opt->str_defval) > 0)
 	    printf("        The default value is: %s.\n", opt->str_defval);
+	else
+	    printf("        There is no default value for this option.\n");
 	break;
     case xp_color_option:
 	assert(0 && "TODO");
@@ -84,6 +86,8 @@ static void Print_default_value(xp_option_t *opt)
 		    ? "key is"
 		    : "keys are"),
 		   opt->key_defval);
+	else
+	    printf("        There is no default value for this option.\n");
 	break;
     default:
 	assert(0 && "TODO");
@@ -117,18 +121,6 @@ void Usage(void)
 		putchar('\n');
 	}
 	Print_default_value(opt);
-#if 0
-	if (opt->fallback && opt->fallback[0]) {
-	    printf("        The default %s: %s.\n",
-		   (opt->key == KEY_DUMMY)
-		       ? "value is"
-		       : (strchr(opt->fallback, ' ') == NULL)
-			   ? "key is"
-			   : "keys are",
-		   opt->fallback);
-	}
-#endif
-
 	printf("\n");
     }
     printf(
@@ -149,11 +141,20 @@ static void Set_bool_option(xp_option_t *opt, bool value)
 {
     assert(opt);
     assert(opt->type == xp_bool_option);
+    assert(opt->bool_ptr);
+
+    /*
+     * NOTE: this function assigns the value directly, before calling the
+     * setfunc. If you have an option where you have a setfunc and you would
+     * not want the value to be assinged directly, you must still provide
+     * a bool pointer for this code to assign to. Note that this code
+     * assumes that after the set method (opt->bool_setfunc) returns,
+     * this pointer points to the new value for this option.
+     */
+    *opt->bool_ptr = value;	
 
     if (opt->bool_setfunc)
 	opt->bool_setfunc(opt, value);
-    else
-	*opt->bool_ptr = value;
 
     printf("Value of option %s is now %s.\n", opt->name,
 	   *opt->bool_ptr ? "true" : "false");
@@ -163,13 +164,14 @@ static void Set_int_option(xp_option_t *opt, int value)
 {
     assert(opt);
     assert(opt->type == xp_int_option);
+    assert(opt->int_ptr);
 
     LIMIT(value, opt->int_minval, opt->int_maxval);
 
+    *opt->int_ptr = value;
+
     if (opt->int_setfunc)
 	opt->int_setfunc(opt, value);
-    else
-	*opt->int_ptr = value;
 
     printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);
 }
@@ -178,13 +180,14 @@ static void Set_double_option(xp_option_t *opt, double value)
 {
     assert(opt);
     assert(opt->type == xp_double_option);
+    assert(opt->dbl_ptr);
 
     LIMIT(value, opt->dbl_minval, opt->dbl_maxval);
 
+    *opt->dbl_ptr = value;
+
     if (opt->dbl_setfunc)
 	opt->dbl_setfunc(opt, value);
-    else
-	*opt->dbl_ptr = value;
 
     printf("Value of option %s is now %f.\n", opt->name, *opt->dbl_ptr);
 }
@@ -193,11 +196,18 @@ static void Set_string_option(xp_option_t *opt, const char *value)
 {
     assert(opt);
     assert(opt->type == xp_string_option);
+    assert(opt->str_ptr || opt->str_setfunc);
+    assert(value); /* allow NULL ? */
+
+    /*
+     * The reason string options don't assume a static area is that that
+     * would not allow dynamically allocated strings of arbitrary size.
+     */
+    if (opt->str_ptr)
+	strlcpy(opt->str_ptr, value, opt->str_size);
 
     if (opt->str_setfunc)
 	opt->str_setfunc(opt, value);
-    else
-	strlcpy(opt->str_ptr, value, opt->str_size);
 
     if (opt->str_ptr)
 	printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
@@ -216,36 +226,37 @@ void Set_key_binding_callback(xp_key_binding_callback_t callback)
 
 static void Set_key_option(xp_option_t *opt, const char *value)
 {
+    char *str, *valcpy;
+
     assert(opt);
     assert(opt->name);
     assert(opt->type == xp_key_option);
     assert(value);
 
-    if (opt->key_setfunc)
-	opt->key_setfunc(opt, value);
-    else {
-	char *str, *valcpy = xp_safe_strdup(value);
+    valcpy = xp_safe_strdup(value);
 
-	for (str = strtok(valcpy, " \t\r\n");
-	     str != NULL;
-	     str = strtok(NULL, " \t\r\n")) {
-	    bool ok;
-	    /*
-	     * The platform specific code must register a callback
-	     * for us to bind keys.
-	     */
-	    assert(key_binding_callback != NULL);
-	    ok = (*key_binding_callback)(opt->key, str);
-	    if (!ok)
-		warn("Invalid keysym \"%s\" for key \"%s\".\n",
-		     str, opt->name);
-	    else
-		printf("Keysym \"%s\" was successfully bound to key \"%s\".\n",
-		       str, opt->name);
-	}
-
-	xp_free(valcpy);
+    /*
+     * No setfunc supported, rather a key binding callback is used.
+     */
+    for (str = strtok(valcpy, " \t\r\n");
+	 str != NULL;
+	 str = strtok(NULL, " \t\r\n")) {
+	bool ok;
+	/*
+	 * The platform specific code must register a callback
+	 * for us to bind keys.
+	 */
+	assert(key_binding_callback != NULL);
+	ok = (*key_binding_callback)(opt->key, str);
+	if (!ok)
+	    warn("Invalid keysym \"%s\" for key \"%s\".\n",
+		 str, opt->name);
+	else
+	    printf("Keysym \"%s\" was successfully bound to key \"%s\".\n",
+		   str, opt->name);
     }
+
+    xp_free(valcpy);
 }
 
 /*

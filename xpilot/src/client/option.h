@@ -49,8 +49,6 @@ typedef void (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
 typedef void (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
 typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
 typedef char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
-typedef bool (*xp_key_option_setfunc_t)    (xp_option_t *opt, const char *val);
-
 typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
 
 /*
@@ -117,11 +115,10 @@ struct xp_option {
     /* key option stuff */
 
 #define XP_KEY_OPTION_DUMMY \
-	NULL, KEY_DUMMY, NULL
+	NULL, KEY_DUMMY
 
     const char *key_defval;
     keys_t key;
-    xp_key_option_setfunc_t key_setfunc;
     /* ... */
 
 };
@@ -208,7 +205,7 @@ struct xp_option {
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_KEY_OPTION(name, defval, key, setfunc, help) \
+#define XP_KEY_OPTION(name, defval, key, help) \
 { \
     xp_key_option,\
 	name,\
@@ -219,7 +216,6 @@ struct xp_option {
 	XP_STRING_OPTION_DUMMY,\
 	defval,\
 	key,\
-	setfunc,\
 }
 
 void Store_option(xp_option_t *);

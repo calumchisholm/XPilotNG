@@ -96,6 +96,10 @@ void Usage(void)
 
 #ifdef OPTIONHACK
 
+char mynickname[MAX_NAME_LEN];
+char myusername[MAX_NAME_LEN];
+char myhostname[MAX_HOST_LEN];
+
 xp_option_t default_options[] = {
 
 #if 0
@@ -106,15 +110,84 @@ xp_option_t default_options[] = {
     XP_NOARG_OPTION(
 	"version",
 	"Show the source code version.\n"),
+
+    {
+	"help",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Display this help message.\n",
+	0
+    },
+    {
+	"version",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Show the source code version.\n",
+	0
+    },
+
+    {
+	"join",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Join the game immediately, no questions asked.\n",
+	0
+    },
+    {
+	"noLocalMotd",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Do not display the local Message Of The Day.\n",
+	0
+    },
+
+    {
+	"text",
+	"Yes",
+	"No",
+	KEY_DUMMY,
+	"Use the simple text interface to contact a server\n"
+	"instead of the graphical user interface.\n",
+	0
+    },
+    {
+	"list",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"List all servers running on the local network.\n",
+	0
+    },
 #endif
 
     XP_STRING_OPTION(
 	"name",
 	"",
-	nickname,
-	sizeof nickname,
+	mynickname,
+	sizeof mynickname,
 	NULL, NULL,
 	"Set the nickname.\n"),
+
+    XP_STRING_OPTION(
+	"user",
+	"",
+	myusername,
+	sizeof myusername,
+	NULL, NULL,
+	"Set the username.\n"),
+
+    XP_STRING_OPTION(
+	"host",
+	"",
+	myhostname,
+	sizeof myhostname,
+	NULL, NULL,
+	"Set the hostname.\n"),
+
 
     /*
      * kps - steering stuff, note that set functions might have to be
@@ -229,62 +302,9 @@ xp_option_t default_options[] = {
 	"The default weapon modifier values for the fourth modifier bank.\n"),
 
 #if 0
-    {
-	"help",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Display this help message.\n",
-	0
-    },
-    {
-	"version",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Show the source code version.\n",
-	0
-    },
-    {
-	"name",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Set the nickname.\n",
-	0
-    },
-    {
-	"user",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Set the username.\n",
-	0
-    },
-    {
-	"host",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Set the hostname.\n",
-	0
-    },
-    {
-	"join",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Join the game immediately, no questions asked.\n",
-	0
-    },
-    {
-	"noLocalMotd",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Do not display the local Message Of The Day.\n",
-	0
-    },
+
+
+
     {
 	"autoServerMotdPopup",
 	NULL,
@@ -305,23 +325,7 @@ xp_option_t default_options[] = {
 	"Get a fresh copy of the server MOTD every time it is displayed.\n",
 	0
     },
-    {
-	"text",
-	"Yes",
-	"No",
-	KEY_DUMMY,
-	"Use the simple text interface to contact a server\n"
-	"instead of the graphical user interface.\n",
-	0
-    },
-    {
-	"list",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"List all servers running on the local network.\n",
-	0
-    },
+
     {
 	"team",
 	NULL,
