@@ -40,6 +40,22 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     static int i = 0;
 
     (void)event;
+
+    if (reset)
+	i = 0;
+
+    /*
+     * Variable 'i' is already initialized.
+     * Use brute force linear search to find the key.
+     */
+    for (; i < num_keydefs; i++) {
+	if (ks == keydefs[i].keysym) {
+	    ret = keydefs[i].key;
+	    i++;
+	}
+    }
+
+#if 0
     if (reset) {
 	/* binary search since keydefs is sorted on keysym. */
 	int lo = 0, hi = num_keydefs - 1;
@@ -64,6 +80,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	    i++;
 	}
     }
+#endif
 
     IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
 
