@@ -812,19 +812,9 @@ int sock_readable(sock_t *sock)
 
 static void sock_catch_alarm(int signum)
 {
-#ifndef	_WINDOWS
-
     printf("DNS lookup cancelled\n");
 
     longjmp(env, 1);
-
-#else
-
-    WSACancelAsyncRequest(gethosthandle);
-    hostnameCancelled = TRUE;
-    alarm(0, NULL);
-
-#endif
 }
 
 static struct hostent *sock_get_host_by_name(const char *name)
@@ -850,31 +840,31 @@ static struct hostent *sock_get_host_by_name(const char *name)
     return hp;
 
 #else
-
     /*
      * If you aren't connected to the net, then gethostbyname()
      * can take many minutes to time out.  WSACancelBlockingCall()
      * doesn't affect it.
      */
-
-    static char		chp[MAXGETHOSTSTRUCT+1];
-    struct hostent*	hp = (struct hostent*)&chp;
-
-    alarm(SOCK_GETHOST_TIMEOUT, sock_catch_alarm);
-    hostnameCancelled = FALSE;
-    *hostnameFound = FALSE;
-    gethosthandle = WSAAsyncGetHostByName(notifyWnd, WM_GETHOSTNAME, name,
-					  chp, MAXGETHOSTSTRUCT);
-
-    while (!hostnameCancelled && !*hostnameFound) {
-	Sleep(1000);
+    
+    static char     chp[MAXGETHOSTSTRUCT+1];
+    struct hostent* hp = (struct hostent*)&chp;
+    HANDLE h;
+    MSG msg;
+    int i;
+    
+    h = WSAAsyncGetHostByName(notifyWnd, WM_GETHOSTNAME, name,
+                              chp, MAXGETHOSTSTRUCT);
+    
+    for (i = 0; i < SOCK_GETHOST_TIMEOUT; i++) {
+        if (PeekMessage(&msg, NULL, WM_GETHOSTNAME, 
+                        WM_GETHOSTNAME, PM_REMOVE)) {
+            return (WSAGETASYNCERROR(msg.lParam)) ? NULL : hp;
+        }
+        Sleep(1000);
     }
-    alarm(0, NULL);
-    if (!*hostnameFound) {
-	return (struct hostent *) NULL;
-    }
-    return hp;
-
+    WSACancelAsyncRequest(h);
+    return NULL;
+    
 #endif
 }
 

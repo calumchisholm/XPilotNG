@@ -1,12 +1,22 @@
-#ifdef	_WINDOWS
-#include "NT/winClient.h"
-#else
+#ifndef	_WINDOWS
 #include <unistd.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#endif
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef _WINDOWS
+#include <io.h>
+#include <direct.h>
+#define snprintf _snprintf
+#define F_OK 0
+#define W_OK 2
+#define R_OK 4
+#define X_OK 0
+#define mkdir(A,B) _mkdir(A)
 #endif
 
 #include <zlib.h>
@@ -231,7 +241,8 @@ static int Mapdata_extract (const char *name) {
 static int Mapdata_download (const URL *url, const char *filePath)
 {
     char buf[1024];
-    int rv, header, c, i;
+    int rv, header, c;
+    unsigned int i;
     sock_t s;
     FILE *f;
     size_t len;

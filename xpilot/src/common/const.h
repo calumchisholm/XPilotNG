@@ -25,8 +25,8 @@
 #ifndef CONST_H
 #define	CONST_H
 
-#ifndef	_WINDOWS
 #include <limits.h>
+#ifndef	_WINDOWS
 #include <math.h>
 #endif
 
