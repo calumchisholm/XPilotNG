@@ -438,6 +438,15 @@ void Keyboard_button_pressed(xp_keysym_t ks)
     bool change = false;
     keys_t key;
 
+#if 0
+    {
+	char foo[80];
+
+	sprintf(foo, "keysym = %d (0x%x) []", (int)ks, (int)ks);
+	Add_message(foo);
+    }
+#endif
+
     for (key = Generic_lookup_key(ks, true);
 	 key != KEY_DUMMY;
 	 key = Generic_lookup_key(ks, false))
@@ -571,7 +580,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyFireShot",
-	"Return Linefeed",
+	"Return",	/* Linefeed removed */
 	KEY_FIRE_SHOT,
 	"Fire shot.\n"
 	"Note that shields must be down to fire.\n"),
@@ -620,7 +629,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockClose",
-	"Select Up",
+	"Up",		/* Select removed */
 	KEY_LOCK_CLOSE,
 	"Lock on closest player.\n"),
 
