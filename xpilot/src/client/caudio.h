@@ -31,15 +31,17 @@
 
 #ifdef SOUND
 
-extern	int	Handle_audio(int type, int volume);
-extern	void	audioInit(char *display);
-extern	void	audioCleanup(void);
-extern	void	audioEvents(void);
-
-extern int audioDeviceInit(char *display);
-extern void audioDevicePlay(char *filename, int type,
-			    int volume, void **private);
-extern void audioDeviceEvents(void);
+int  Handle_audio(int type, int volume);
+void audioInit(char *display);
+void audioCleanup(void);
+void audioEvents(void);
+void audioUpdate(void);
+int  audioDeviceInit(char *display);
+void audioDevicePlay(char *filename, int type, int volume, void **private);
+void audioDeviceEvents(void);
+void audioDeviceUpdate(void);
+void audioDeviceFree(void *private);
+void audioDeviceClose(void);
 
 #endif
 

@@ -124,6 +124,12 @@ void audioEvents(void)
 	audioDeviceEvents();
 }
 
+void audioUpdate(void)
+{
+    if (audioEnabled)
+	audioDeviceUpdate();
+}
+
 int Handle_audio(int type, int volume)
 {
     int		pick = 0;

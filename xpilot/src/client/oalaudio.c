@@ -32,160 +32,191 @@
 #include <al.h>
 #include <alut.h>
 #endif
+
+#define MAX_SOUNDS 16
+#define VOL_THRESHOLD 10
+
 char audio_version[] = VERSION;
 
 typedef struct {
-    ALuint buffer;
-    ALuint source;
-    float  gain;
+    ALuint    buffer;
+    ALfloat   gain;
+    ALboolean loop;
+} sample_t;
+
+typedef struct {
+    sample_t *sample;
+    int      volume;
+    long     updated;
 } sound_t;
 
+static ALuint  source[MAX_SOUNDS];
+static sound_t sound[MAX_SOUNDS];
 
-static sound_t *sound_load(const char *filename, float gain)
+static void sample_parse_info(char *filename, sample_t *sample)
 {
-    ALfloat zeroes[] = { 0.0f, 0.0f,  0.0f };
-    ALenum  err;
-    ALsizei size, freq, bits;
-    ALenum format;
-	ALboolean loop;
-    ALvoid *data;
-    sound_t *snd;
+    char *token;
     
-    if (!(snd = (sound_t*)malloc(sizeof(sound_t)))) {
-	error("failed to allocate memory for a sound");
+    sample->gain = 1.0;
+    sample->loop = 0;
+
+    strtok(filename, ",");
+    if (!(token = strtok(NULL, ","))) return;
+    sample->gain = atof(token);
+    if (!(token = strtok(NULL, ","))) return;
+    sample->loop = atoi(token);
+}
+
+static sample_t *sample_load(char *filename)
+{
+    ALenum    err;
+    ALsizei   size, freq, bits;
+    ALboolean loop;
+    ALenum    format;
+    ALvoid    *data;
+    sample_t  *sample;
+    
+    if (!(sample = (sample_t*)malloc(sizeof(sample_t)))) {
+	error("failed to allocate memory for a sample");
 	return NULL;
     }
-    snd->gain = gain;
+    sample_parse_info(filename, sample);
 
     /* create buffer */
     alGetError(); /* clear */
-    alGenBuffers(1, &snd->buffer);
+    alGenBuffers(1, &sample->buffer);
     if((err = alGetError()) != AL_NO_ERROR) {
-	error("failed to create a sound buffer %x %s", 
+	error("failed to create a sample buffer %x %s", 
 	      err, alGetString(err));
-	free(snd);
+	free(sample);
 	return NULL;
     }
-
-    /* create source */
-    alGetError(); /* clear */
-    alGenSources(1, &snd->source);
-    if((err = alGetError()) != AL_NO_ERROR) {
-	error("failed to create a sound source %x %s", 
-	      err, alGetString(err));
-	alDeleteBuffers(1, &snd->buffer);
-	free(snd);
-	return NULL;
-    }
-	
-#ifndef _WINDOWS	
-    alutLoadWAV(filename, &data, &format, &size, &bits, &freq);
-#else
-	alutLoadWAVFile((ALbyte *)filename, &format, &data, &size, &freq, &loop);
-#endif
-
+    alutLoadWAVFile((ALbyte *)filename, &format, &data, &size, &freq, &loop);
     if ((err = alGetError()) != AL_NO_ERROR) {
 	error("failed to load sound file %s: %x %s", 
 	      filename, err, alGetString(err));
-	alDeleteBuffers(1, &snd->buffer);
-	alDeleteSources(1, &snd->source);
-	free(snd);
+	alDeleteBuffers(1, &sample->buffer);
+	free(sample);
 	return NULL;
     }
-    alBufferData(snd->buffer, format, data, size, freq);
+    alBufferData(sample->buffer, format, data, size, freq);
     if((err = alGetError()) != AL_NO_ERROR) {
 	error("failed to load buffer data %x %s\n", 
 	      err, alGetString(err));
-	alDeleteBuffers(1, &snd->buffer);
-	alDeleteSources(1, &snd->source);
-	free(snd);
+	alDeleteBuffers(1, &sample->buffer);
+	free(sample);
 	return NULL;
     }
     alutUnloadWAV(format, data, size, freq);
 
-    /* set static source properties */
-    alSourcei(snd->source, AL_BUFFER, snd->buffer);
-    alSourcei(snd->source, AL_LOOPING, 0);
-    alSourcef(snd->source, AL_REFERENCE_DISTANCE, 10);
-    alSourcefv(snd->source, AL_POSITION, zeroes);
-    alSourcefv(snd->source, AL_VELOCITY, zeroes);
-
-    return snd;
+    return sample;
 }
 
-static void sound_free(sound_t *snd)
+static void sample_free(sample_t *sample)
 {
-    if (snd) {
+    if (sample) {
 /* alDeleteBuffers hangs on linux sometimes */
 #ifdef _WINDOWS 
-	if (snd->buffer)
-	    alDeleteBuffers(1, &snd->buffer);
+	if (sample->buffer)
+	    alDeleteBuffers(1, &sample->buffer);
 #endif
-	if (snd->source)
-	    alDeleteSources(1, &snd->source);
-	free(snd);
+	free(sample);
     }
 }
 
 int audioDeviceInit(char *display)
 {
-    ALfloat zeroes[] = { 0.0f, 0.0f,  0.0f };
-    ALfloat front[]  = { 0.0f, 0.0f,  1.0f, 0.0f, 1.0f, 0.0f };
-    
-    alutInit (NULL, 0); // init OpenAL
-    
-    // global settings
-    alListenerf(AL_GAIN, 1.0);
-    alDopplerFactor(1.0); // don't exaggerate doppler shift
-    alDopplerVelocity(343); // using meters/second
-    
-    alListenerfv(AL_POSITION, zeroes );
-    alListenerfv(AL_VELOCITY, zeroes );
-    alListenerfv(AL_ORIENTATION, front );
+    ALenum err;
+    int    i;
 
+    alutInit (NULL, 0);
+    alListenerf(AL_GAIN, 1.0);
+    alDopplerFactor(1.0);
+    alDopplerVelocity(343);
+    alGetError();
+    alGenSources(MAX_SOUNDS, source);
+    if ((err = alGetError()) != AL_NO_ERROR) {
+	error("failed to create sources %x %s", 
+	      err, alGetString(err));
+	return -1;
+    }
 
     return 0;
 }
 
 void audioDevicePlay(char *filename, int type, int volume, void **private)
 {
-    char *comma;
-    float gain;
-    sound_t *snd = (sound_t *)(*private);
+    int      i, free;
+    ALenum   state;
+    sample_t *sample = (sample_t *)(*private);
 
-    
-    if (!snd) {
-	if ((comma = strchr(filename, ',')) != NULL) {
-	    *comma = '\0';
-	    comma++;
-	    gain = atof(comma);
-	} else {
-	    gain = 1.0f;
-	}
-	snd = sound_load(filename, gain);
-	if (!snd) {
-	    error("failed to load sound %s\n", filename);
+    if (!sample) {
+	sample = sample_load(filename);
+	if (!sample) {
+	    error("failed to load sample %s\n", filename);
 	    return;
 	}
-	*private = snd;
+	*private = sample;
     }
 
-    alSourcef(snd->source, AL_GAIN, snd->gain * volume / 100.0f);
-    alSourcePlay(snd->source);
+    free = -1;
+    for (i = 0; i < MAX_SOUNDS; i++) {
+	if (free == -1) {
+	    alGetSourcei(source[i], AL_SOURCE_STATE, &state);
+	    if (state != AL_PLAYING) {
+		free = i;
+		if (!sample->loop) 
+		    break;
+	    }
+	}
+	if (sample->loop
+	    && sound[i].sample == sample
+	    && sound[i].updated < loops
+	    && ABS(sound[i].volume - volume) < VOL_THRESHOLD) {
+	    alGetSourcei(source[i], AL_SOURCE_STATE, &state);
+	    if (state == AL_PLAYING) {
+		alSourcef(source[i], AL_GAIN, sample->gain * volume / 100.0f);
+		sound[i].updated = loops;
+		return;
+	    }
+	}
+    }
+
+    if (free != -1) {    
+	sound[free].sample  = sample;
+	sound[free].volume  = volume;
+	sound[free].updated = loops;
+	
+	alSourcef(source[free], AL_GAIN, sample->gain * volume / 100.0f);
+	alSourcei(source[free], AL_BUFFER, sample->buffer);
+	alSourcei(source[free], AL_LOOPING, sample->loop);
+	alSourcePlay(source[free]);
+    }
 }
 
 void audioDeviceEvents(void)
 {
 }
 
+void audioDeviceUpdate(void)
+{
+    int i;
+    for (i = 0; i < MAX_SOUNDS; i++)
+	if (sound[i].sample 
+	    && sound[i].sample->loop
+	    && sound[i].updated < loops - 1)
+	    alSourceStop(source[i]);
+}
+
 void audioDeviceFree(void *private) 
 {
     if (private)
-	sound_free((sound_t *)private);
+	sample_free((sample_t *)private);
 }
 
 void audioDeviceClose() 
 {
+    alDeleteSources(MAX_SOUNDS, source);
 #ifdef _WINDOWS /* alutExit hangs on linux sometimes */
     alutExit();
 #endif

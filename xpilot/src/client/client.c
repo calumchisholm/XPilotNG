@@ -1646,6 +1646,9 @@ int Handle_end(long server_loops)
     snooping = (self && eyesId != self->id) ? true : false;
     update_timing();    
     Paint_frame();
+#ifdef SOUND
+    audioUpdate();
+#endif
     return 0;
 }
 
