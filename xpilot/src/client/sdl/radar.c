@@ -4,6 +4,7 @@
 #include "xpclient.h"
 #include "sdlpaint.h"
 #include "SDL_gfxPrimitives.h"
+#include "radar.h"
 
 /* kps - had to add prefix so that these would not conflict with options */
 color_t wallRadarColorValue = 0xa0;

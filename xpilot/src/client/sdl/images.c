@@ -36,11 +36,9 @@ static int Image_init(image_t *img)
     img->data_width = pow2_ceil(img->width);
     img->data_height = pow2_ceil(img->height);
 
-    /*
     printf("Loaded image %s: w=%d, h=%d, fw=%d, dw=%d, dh=%d\n",
 	   img->filename, img->width, img->height, img->frame_width,
 	   img->data_width, img->data_height);
-    */
 
     img->data = calloc(img->data_width * img->data_height, sizeof(unsigned int));
     if (img->data == NULL) {
@@ -103,9 +101,14 @@ image_t *Image_get(int ind) {
     return img;
 }
 
-void Image_use_texture(int ind, int *width, int *height)
+image_t *Image_get_texture(int ind) 
 {
-    image_t *img = Image_get(first_texture + ind);
+    return Image_get(first_texture + ind);
+}
+
+void Image_use_texture(int ind)
+{
+    image_t *img = Image_get_texture(ind);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     if (img == NULL) {
@@ -115,8 +118,6 @@ void Image_use_texture(int ind, int *width, int *height)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, img->name);
     glColor4ub(255, 255, 255, 255);
-    if (width != NULL) *width = img->frame_width;
-    if (height != NULL) *height = img->height;
 }
 
 void Image_no_texture()

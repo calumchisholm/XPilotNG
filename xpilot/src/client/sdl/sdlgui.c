@@ -94,12 +94,11 @@ float hudRadarMapScale;
 int hudRadarDotSize = 6;
 int baseWarningType = 1;
 
-/*static void set_color(int color)
-{
-    glColor3ub((color >> 16) & 255,
-	       (color >> 8) & 255,
-	       color & 255);
-}*/
+static GLuint polyListBase;
+
+int Gui_init(void);
+void Gui_cleanup(void);
+
 /* better to use alpha everywhere, less confusion */
 void set_alphacolor(int color)
 {
@@ -145,6 +144,79 @@ void Circle(int color,
     	for (i = 0.0f; i < TABLE_SIZE; i=i+((float)TABLE_SIZE)/resolution)
     	    glVertex2f((int)(x + tcos((int)i)*radius),(int)(y + tsin((int)i)*radius));
     glEnd();
+}
+
+static void vertex_callback(ipos *p, image_t *texture)
+{
+    if (texture != NULL) {
+	glTexCoord2f(p->x / (GLfloat)texture->frame_width,
+		     p->y / (GLfloat)texture->height);
+    }
+    glVertex2i(p->x, p->y);
+}
+
+static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
+{
+    int j;
+    xp_polygon_t polygon;
+    polygon_style_t p_style;
+    image_t *texture = NULL;
+    GLdouble v[3] = { 0, 0, 0 };
+    ipos p[MAX_VERTICES];
+
+    polygon = polygons[i];
+    p_style = polygon_styles[polygon.style];
+    p[0].x = p[0].y = 0;
+
+    if (BIT(p_style.flags, STYLE_TEXTURED))
+	texture = Image_get_texture(p_style.texture);
+    
+    glNewList(polyListBase + i,  GL_COMPILE);
+    gluTessBeginPolygon(tess, texture);
+    gluTessVertex(tess, v, &p[0]);
+    for (j = 1; j < polygon.num_points; j++) {
+	v[0] = p[j].x = p[j-1].x + polygon.points[j].x;
+	v[1] = p[j].y = p[j-1].y + polygon.points[j].y;
+	gluTessVertex(tess, v, &p[j]);
+    }
+    gluTessEndPolygon(tess);
+    glEndList();
+}
+
+int Gui_init(void)
+{
+    int i;
+    GLUtriangulatorObj *tess;
+
+    polyListBase = glGenLists(num_polygons);
+    if (!polyListBase) {
+	error("failed to generate display lists");
+	return -1;
+    }
+    printf("polyListBase: %d\n", polyListBase);
+
+    tess = gluNewTess();
+    if (tess == NULL) {
+	error("failed to create tessellation object");
+	return -1;
+    }
+    
+    gluTessCallback(tess, GLU_TESS_BEGIN, (_GLUfuncptr)glBegin);
+    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (_GLUfuncptr)vertex_callback);
+    gluTessCallback(tess, GLU_TESS_END, (_GLUfuncptr)glEnd);
+
+    for (i = 0; i < num_polygons; i++) {
+	tessellate_polygon(tess, i);
+    }
+
+    gluDeleteTess(tess);
+    return 0;
+}
+
+void Gui_cleanup(void)
+{
+    if (polyListBase)
+	glDeleteLists(polyListBase, num_polygons);
 }
 
 /* Map painting */
@@ -446,32 +518,46 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     xp_polygon_t    polygon;
     polygon_style_t p_style;
     edge_style_t    e_style;
-    
-    int             x, y, j;
+    int             j, x, y;
 
     polygon = polygons[i];
     p_style = polygon_styles[polygon.style];
     e_style = edge_styles[p_style.def_edge_style];
 
     if (BIT(p_style.flags, STYLE_INVISIBLE)) return;
-    
-    set_alphacolor((e_style.rgb << 8) | 255);
 
-    /* maybe this should be done when changing scale?
-     * not sure that would help when using GL though.. (mara)
-     */
-    x = xoff * Setup->width;
-    y = yoff * Setup->height;
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glScalef(scale, scale, 0);
+    glTranslatef(xoff * Setup->width + polygon.points[0].x - world.x, 
+		 yoff * Setup->height + polygon.points[0].y - world.y,
+		 0);
 
-    glBegin(GL_LINE_LOOP);
-    
-    for (j = 0; j < polygon.num_points; j++) {
-        x += polygon.points[j].x;
-        y += polygon.points[j].y;
-	glVertex2i(x,y);
+    if (instruments.showTexturedWalls
+	|| instruments.showFilledWorld) {
+	if (instruments.showTexturedWalls) {
+	    Image_use_texture(p_style.texture);
+	} else {
+	    set_alphacolor((p_style.rgb << 8) | 0xff);
+	}
+	glCallList(polyListBase + i);	
+	if (instruments.showTexturedWalls) {
+	    Image_no_texture();
+	}
     }
-
+    set_alphacolor((e_style.rgb << 8) | 0xff);
+    glLineWidth(e_style.width);
+    glBegin(GL_LINE_LOOP);
+    x = y = 0;
+    glVertex2i(x, y);
+    for (j = 1; j < polygon.num_points; j++) {
+	x += polygon.points[j].x;
+	y += polygon.points[j].y;
+	glVertex2i(x, y);
+    }
     glEnd();
+    glPopMatrix();
 }
 
 

@@ -28,6 +28,7 @@
 #include "sdlpaint.h"
 #include "images.h"
 #include "console.h"
+#include "radar.h"
 
 char sdlpaint_version[] = VERSION;
 
@@ -83,7 +84,6 @@ int Paint_init(void)
 	return -1;
 
     scale = 1.171875;
-    /*scale = 0.5;*/
     scaleFactor = 1.0 / scale;
     scaleFactor_s = 1.0;
 

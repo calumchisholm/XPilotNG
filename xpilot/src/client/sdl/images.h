@@ -1,3 +1,6 @@
+#ifndef IMAGES_H
+#define IMAGES_H
+
 typedef enum {
     IMG_STATE_UNINITIALIZED,
     IMG_STATE_ERROR,
@@ -70,3 +73,7 @@ int Bitmap_add(char *filename, int count, bool scalable);
 void Image_paint(int ind, int x, int y, int frame, GLubyte alpha);
 void Image_paint_area(int ind, int x, int y, int frame, irec *r, GLubyte alpha);
 image_t *Image_get(int ind);
+image_t *Image_get_texture(int ind);
+void Image_use_texture(int ind);
+void Image_no_texture(void);
+#endif

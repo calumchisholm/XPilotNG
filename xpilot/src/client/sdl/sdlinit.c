@@ -5,6 +5,14 @@
 #include "text.h"
 #include "console.h"
 #include "sdlkeys.h"
+#include "radar.h"
+
+/* These are only needed for the polygon tessellation */
+/* I'd like to move them to Paint_init/cleanup but because it */
+/* is called before the map is ready I need separate functions */
+/* for now.. */
+extern int Gui_init(void);
+extern void Gui_cleanup(void);
 
 int draw_depth;
 
@@ -108,11 +116,16 @@ int Init_playing_windows(void)
 	error("console initialization failed");
 	return -1;
     }
+    if (Gui_init()) {
+	error("gui initialization failed");
+	return -1;
+    }
     return 0;
 }
 
 void Quit(void) 
 {
+    Gui_cleanup();
     Console_cleanup();
     Radar_cleanup();
     fontclean(&gamefont);
