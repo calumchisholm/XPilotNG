@@ -248,8 +248,7 @@ void KeyChanged_event(XEvent *event)
     else if (event->xkey.window == talkWindow) {
         if (event->type == KeyPress) {
 	    talk_key_repeating = 1;
-	    /* TODO: implement gettimeofday() for windows */
-	    IFNWINDOWS(gettimeofday(&talk_key_repeat_time, NULL));
+	    gettimeofday(&talk_key_repeat_time, NULL);
 	    talk_key_repeat_event = *event;
 	}
 	else if (talk_key_repeating && event->xkey.keycode ==
