@@ -858,9 +858,9 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
     glTranslatef((GLfloat)x, (GLfloat)y, 0.0);
     glScalef(real_size, real_size, 1.0);
     glRotatef(360.0 * rot / 128,
-	   (type & 4) - 2,
+	   (type & 1) - 0.5,
 	   (type & 2) - 1,
-	   (type & 1) - 0.5);
+	   (type & 4) - 2);
     glCallList(asteroid);
     glEnd();
     glPopMatrix();
