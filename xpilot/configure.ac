@@ -9,6 +9,12 @@ AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 dnl AC_CANONICAL_HOST
 
+dnl  Copyright & stuff.
+AC_SUBST([XP_COPYRIGHT],["Copyright Å© 1991-2003 by BjÅ¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
+AC_SUBST([XP_RELEASEDATE],["Sep 4, 2003"])
+dnl  Hack.
+AC_SUBST([XP_INSTLIBDIR],$prefix/lib)
+
 
 dnl  Checks for options.
 dnl  We should have some general macro for these.

@@ -1,10 +1,10 @@
 .\" -*-Text-*-
 .\"
-.\" @<COPYRIGHT>@.
+.\" @XP_COPYRIGHT@.
 .\"
 .TH XPILOT 6 "Requires UDP and X11"
 .ds )H GNU Public License 2.0 applies
-.ds ]W XPilot @VERSION@: @<RELEASEDATE>@
+.ds ]W XPilot @VERSION@: @XP_RELEASEDATE@
 .if n .ad l	\" If nroff formatter, adjust left margin only
 .if t .ad b	\" If troff formatter, adjust both margins
 
@@ -1564,7 +1564,7 @@ and Dick Balaska <dick@xpilot.org> from BuckoSoft.COM.
 .SH BUG REPORTS
 
 The product is seemingly stable, so bug reports are highly
-appreciated.  Send email to \fB@<CONTACTADDRESS>@\fP and we will
+appreciated.  Send email to \fB@PACKAGE_BUGREPORT@\fP and we will
 see what we can do.  We merely ask that you remember to include
 the following information:
 .IP
@@ -1595,17 +1595,17 @@ will be to install the GNU C compiler on your system.
 
 .SH COPYRIGHT & DISCLAIMER
 
-xpilot is @<COPYRIGHT>@.  xpilot comes with ABSOLUTELY NO WARRANTY;
+xpilot is @XP_COPYRIGHT@.  xpilot comes with ABSOLUTELY NO WARRANTY;
 for details see the provided COPYING file.
 
 
 .SH FILES
 .PD 0
 .TP 40
-.B @<INSTLIBDIR>@/motd
+.B @XP_INSTLIBDIR@/motd
 Message of the day.
 .TP
-.B @<INSTLIBDIR>@/sounds
+.B @XP_INSTLIBDIR@/sounds
 File containing the sound to sound-file mapping.
 .PD
 

@@ -1,10 +1,10 @@
 .\" -*-Text-*-
 .\"
-.\" @<COPYRIGHT>@.
+.\" @XP_COPYRIGHT@.
 .\"
 .TH XPILOTS 6 "Requires UDP and X11"
 .ds )H GNU Public License 2.0 applies
-.ds ]W XPilot @VERSION@: @<RELEASEDATE>@
+.ds ]W XPilot @VERSION@: @XP_RELEASEDATE@
 .if n .ad l	\" If nroff formatter, adjust left margin only
 .if t .ad b	\" If troff formatter, adjust both margins
 
@@ -124,7 +124,7 @@ or the equivalent
 .B -map fuzz2.xp
 is passed as command line arguments, the server will try to locate a file
 called \fBfuzz2.xp\fP in the current directory, or in a predefined
-directory (default is @<INSTLIBDIR>@/maps/).
+directory (default is @XP_INSTLIBDIR@/maps/).
 
 .TP 15
 .B -contactPort or port \fIinteger\fP
@@ -368,7 +368,7 @@ See the provided CREDITS file.
 
 .SH COPYRIGHT & DISCLAIMER
 
-XPilot is @<COPYRIGHT>@.  XPilot comes with ABSOLUTELY NO WARRANTY;
+XPilot is @XP_COPYRIGHT@.  XPilot comes with ABSOLUTELY NO WARRANTY;
 for details see the provided COPYING file.
 
 
@@ -376,16 +376,16 @@ for details see the provided COPYING file.
 
 .PD 0
 .TP 40
-.B @<INSTLIBDIR>@/maps/
+.B @XP_INSTLIBDIR@/maps/
 Miscellaneous maps.
 .TP 40
-.B @<INSTLIBDIR>@/log
+.B @XP_INSTLIBDIR@/log
 Log file.
 .TP 40
-.B @<INSTLIBDIR>@/defaults
+.B @XP_INSTLIBDIR@/defaults
 Defaults file.
 .TP 40
-.B @<INSTLIBDIR>@/password
+.B @XP_INSTLIBDIR@/password
 Password file.
 .PD
 

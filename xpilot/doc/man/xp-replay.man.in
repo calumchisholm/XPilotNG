@@ -1,10 +1,10 @@
 .\" -*-Text-*-
 .\"
-.\" @<COPYRIGHT>@ & Steven Singer.
+.\" @XP_COPYRIGHT@ & Steven Singer.
 .\"
 .TH XP-REPLAY 6 "Requires X11"
 .ds )H GNU Public License 2.0 applies
-.ds ]W XPilot @VERSION@: @<RELEASEDATE>@
+.ds ]W XPilot @VERSION@: @XP_RELEASEDATE@
 .if n .ad l	\" If nroff formatter, adjust left margin only
 .if t .ad b	\" If troff formatter, adjust both margins
 
@@ -216,7 +216,7 @@ package, which is Copyright (C) 1989, 1991 by Jef Poskanzer.
 
 .SH BUG REPORTS
 
-Bugs can be mailed to \fB@<CONTACTADDRESS>@\fP.
+Bugs can be mailed to \fB@PACKAGE_BUGREPORT@\fP.
 
 
 .SH SEE ALSO
