@@ -33,7 +33,8 @@ allowClusters:          no
 allowModifiers:         yes
 
 # Set the frames per second
-framesPerSecond:	14
+framesPerSecond:	50
+gameSpeed:		12.5
 
 # Define a group of settings which make the world bouncy for players.
 define: SoftWalls \override: \multiline: EndSoftWalls
