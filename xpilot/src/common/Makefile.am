@@ -1,4 +1,6 @@
 
+# awful hack
+CPPFLAGS = -DLIBDIR=\"$(libdir)/xpilot/\"
 noinst_LIBRARIES = libxpcommon.a
 libxpcommon_a_SOURCES = \
 	checknames.c config.c error.c \
