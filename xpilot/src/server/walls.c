@@ -584,10 +584,10 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 
 		if (tagGame) {
 		    if (tagItPlayerId == pusher->id) {
-			sc *= tagItKillMult;
+			sc *= tagItKillScoreMult;
  			pusher_is_tagged = true;
  		    } else if (was_tagged && num_pushers == 1) {
- 			sc *= tagKillItMult;
+ 			sc *= tagKillItScoreMult;
  			Transfer_tag(pl, pusher);
  		    }
  		}
@@ -601,9 +601,9 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 
 	    if (tagGame && num_pushers == 1) {
  		if (was_tagged)
- 		    sc *= tagKillItMult;
+ 		    sc *= tagKillItScoreMult;
 		else if (pusher_is_tagged)
- 		    sc *= tagItKillMult;
+ 		    sc *= tagItKillScoreMult;
  	    }
 
 	    Score(pl, -sc, pl->pos, "[Shove]");

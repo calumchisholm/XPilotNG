@@ -183,8 +183,8 @@ double		mineScoreMult;
 double		selfKillScoreMult;
 double		selfDestructScoreMult;
 double		unownedKillScoreMult;
-double		tagItKillMult;
-double		tagKillItMult;
+double		tagItKillScoreMult;
+double		tagKillItScoreMult;
 double		asteroidPoints;
 double		cannonPoints;
 double		asteroidMaxScore;
@@ -1639,20 +1639,20 @@ static option_desc options[] = {
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"tagKillItMult",
+	"tagKillItScoreMult",
 	"tagKillItMult",
  	"10.0",
- 	&tagKillItMult,
+ 	&tagKillItScoreMult,
  	valReal,
  	tuner_dummy,
  	"Score multiplier for killing 'it' (tagGame must be on).\n",
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"tagItKillMult",
+	"tagItKillScoreMult",
 	"tagItKillMult",
  	"2.0",
- 	&tagItKillMult,
+ 	&tagItKillScoreMult,
  	valReal,
  	tuner_dummy,
  	"Score multiplier when 'it' kills an enemy player\n"
