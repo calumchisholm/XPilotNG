@@ -1,6 +1,5 @@
 
-# awful hack
-CPPFLAGS = -DLIBDIR=\"$(pkglibdir)/\"
+AM_CPPFLAGS = -DLIBDIR=\"$(pkglibdir)/\"
 noinst_LIBRARIES = libxpcommon.a
 libxpcommon_a_SOURCES = \
 	astershape.h audio.h \
