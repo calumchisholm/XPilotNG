@@ -121,7 +121,7 @@ void Usage(void)
 }
 
 
-static bool Set_noarg_option(xp_option_t *opt, bool value)
+bool Set_noarg_option(xp_option_t *opt, bool value)
 {
     assert(opt);
     assert(opt->type == xp_noarg_option);
@@ -136,7 +136,7 @@ static bool Set_noarg_option(xp_option_t *opt, bool value)
 }
 
 
-static bool Set_bool_option(xp_option_t *opt, bool value)
+bool Set_bool_option(xp_option_t *opt, bool value)
 {
     bool retval = true;
 
@@ -155,7 +155,7 @@ static bool Set_bool_option(xp_option_t *opt, bool value)
     return retval;
 }
 
-static bool Set_int_option(xp_option_t *opt, int value)
+bool Set_int_option(xp_option_t *opt, int value)
 {
     bool retval = true;
 
@@ -182,7 +182,7 @@ static bool Set_int_option(xp_option_t *opt, int value)
     return retval;
 }
 
-static bool Set_double_option(xp_option_t *opt, double value)
+bool Set_double_option(xp_option_t *opt, double value)
 {
     bool retval = true;
 
@@ -210,7 +210,7 @@ static bool Set_double_option(xp_option_t *opt, double value)
     return retval;
 }
 
-static bool Set_string_option(xp_option_t *opt, const char *value)
+bool Set_string_option(xp_option_t *opt, const char *value)
 {
     bool retval = true;
 

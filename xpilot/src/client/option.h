@@ -127,6 +127,12 @@ extern void Parse_options(int *argcp, char **argvp);
 extern void Get_xpilotrc_file(char *, unsigned);
 
 extern bool Set_option(const char *name, const char *value);
+extern bool Set_noarg_option(xp_option_t *opt, bool value);
+extern bool Set_bool_option(xp_option_t *opt, bool value);
+extern bool Set_int_option(xp_option_t *opt, int value);
+extern bool Set_double_option(xp_option_t *opt, double value);
+extern bool Set_string_option(xp_option_t *opt, const char *value);
+
 extern xp_option_t *Find_option(const char *name);
 extern void Set_command(const char *command);
 extern void Get_command(const char *command);
