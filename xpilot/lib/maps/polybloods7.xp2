@@ -1,6 +1,6 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
-<Option name="afterburnerpowermult" value="1.2"/>
+<Option name="afterburnerpowermult" value="1.1"/>
 <Option name="allowclusters" value="no"/>
 <Option name="allowlasermodifiers" value="no"/>
 <Option name="allowmodifiers" value="no"/>
@@ -10,7 +10,7 @@
 <Option name="allowplayerkilling" value="yes"/>
 <Option name="allowshields" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
-<Option name="ballconnectorspringconstant" value="1800"/>
+<Option name="ballconnectorspringconstant" value="1650"/>
 <Option name="ballradius" value="10"/>
 <Option name="ballswallbounce" value="yes"/>
 <Option name="baselesspausing" value="yes"/>
