@@ -3055,6 +3055,14 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     	}
     }
     
+    bs.w = wid_info->alert_msgs->bounds.w;
+    bs.x = (b->w - bs.w)/2;
+    bs.h = wid_info->alert_msgs->bounds.h;
+    bs.y = (b->h - bs.h)/2;
+    
+    SetBounds_GLWidget(wid_info->alert_msgs,&bs);
+    
+    
     widget->bounds.x = b->x;
     widget->bounds.w = b->w;
     widget->bounds.y = b->y;
