@@ -225,7 +225,6 @@ extern int	active_view_width;	/* Width of active map area displayed. */
 extern int	active_view_height;	/* Height of active map area displayed. */
 extern int	ext_view_x_offset;	/* Offset of ext_view_width */
 extern int	ext_view_y_offset;	/* Offset of ext_view_height */
-extern u_byte	debris_colors;		/* Number of debris intensities */
 extern double	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
 extern bool	titleFlip;		/* Do special titlebar flipping? */

@@ -50,7 +50,6 @@ static int asteroidRawShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS][2] = {
 position *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
 
 
-u_byte	debris_colors;		/* Number of debris intensities from server */
 bool	markingLights;
 
 
@@ -237,14 +236,14 @@ static void Paint_debris(int x_areas, int y_areas, int areas, int max_)
 #if 0
 /* before "sparkColors" option: */
 #define DEBRIS_COLOR(color) \
-	((debris_colors > 4) ?				\
+	((num_spark_colors > 4) ?			\
 	 (5 + (((color & 1) << 2) | (color >> 1))) :	\
-	 ((debris_colors >= 3) ?			\
+	 ((num_spark_colors >= 3) ?			\
 	  (5 + color) : (color)))
 #else
 /* adjusted for "sparkColors" option: */
 #define DEBRIS_COLOR(color) \
-	((debris_colors > 4) ?				\
+	((num_spark_colors > 4) ?			\
 	 ((((color & 1) << 2) | (color >> 1))) :	\
 	  (color))
 #endif
@@ -436,7 +435,7 @@ void Paint_shots(void)
     x_areas = (active_view_width + 255) >> 8;
     y_areas = (active_view_height + 255) >> 8;
     areas = x_areas * y_areas;
-    max_ = areas * (debris_colors >= 3 ? debris_colors : 4);
+    max_ = areas * (num_spark_colors >= 3 ? num_spark_colors : 4);
 
     Paint_debris(x_areas, y_areas, areas, max_);
 

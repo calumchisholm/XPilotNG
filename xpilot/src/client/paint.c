@@ -168,13 +168,16 @@ int Check_view_dimensions(void)
     LIMIT(srv_height, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
     LIMIT(srv_width, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
     if (server_display.view_width != srv_width ||
-	server_display.view_height != srv_height) {
+	server_display.view_height != srv_height ||
+	server_display.num_spark_colors != num_spark_colors ||
+	server_display.spark_rand != spark_rand) {
 	if (Send_display(srv_width, 
 			 srv_height, 
 			 spark_rand, 
 			 num_spark_colors))
 	    return -1;
     }
+    spark_rand = server_display.spark_rand;
     active_view_width = server_display.view_width;
     active_view_height = server_display.view_height;
     ext_view_x_offset = 0;
