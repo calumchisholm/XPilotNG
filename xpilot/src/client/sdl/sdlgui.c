@@ -28,7 +28,12 @@
 #include "sdlpaint.h"
 #include "images.h"
 
-int wallColor = 0xff;
+int white = 0xffffff;
+int blue = 0x0000ff;
+
+int wallColor = 0x0000ff;
+int hudColor = 0x00ff00;
+int connColor = 0xffffff;
 
 static void set_color(int color)
 {
@@ -126,14 +131,33 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 
 void Gui_paint_border(int x, int y, int xi, int yi)
 {
+    set_color(wallColor);
+    glBegin(GL_LINE);
+    	glVertex2i(x, y);
+    	glVertex2i(xi, yi);
+    glEnd();
 }
 
 void Gui_paint_visible_border(int x, int y, int xi, int yi)
 {
+    set_color(hudColor);
+    glBegin(GL_LINE_LOOP);
+    	glVertex2i(x, y);
+    	glVertex2i(x, yi);
+    	glVertex2i(xi, yi);
+    	glVertex2i(xi, y);
+    glEnd();
 }
 
 void Gui_paint_hudradar_limit(int x, int y, int xi, int yi)
 {
+    set_color(blue);
+    glBegin(GL_LINE_LOOP);
+    	glVertex2i(x, y);
+    	glVertex2i(x, yi);
+    	glVertex2i(xi, yi);
+    	glVertex2i(xi, y);
+    glEnd();
 }
 
 void Gui_paint_setup_check(int x, int y, bool isNext)
@@ -282,7 +306,7 @@ void Gui_paint_ball(int x, int y)
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
 {
-    set_color(0xffffff);
+    set_color(connColor);
     glBegin(GL_LINES);
     glVertex2i(x_1, y_1);
     glVertex2i(x_2, y_2);
@@ -412,7 +436,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     shapepos    point;
 
     ship = Ship_by_id(id);
-    set_color(0xffffff);
+    set_color(white);
     glBegin(GL_LINE_LOOP);
     for (i = 0; i < ship->num_points; i++) {
 	point = Ship_get_point(ship, i, dir);
