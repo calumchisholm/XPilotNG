@@ -241,6 +241,11 @@ int Check_player_password(const char *nick, const char *password)
     }
 
     if (r != PASSWD_ERROR && found_entry && !err) {
+
+	/*
+	 * Update the 'lastaccess' field.
+	 */
+
 	int okay = 0;
 	char *lastaccess_start, newline[3];
 
@@ -327,6 +332,7 @@ int Check_player_password(const char *nick, const char *password)
     }
 
     if (fcont_new) {
+
 	/*
 	 * 'lastaccess' field has been updated and password entry has been
 	 * moved to the beginning of the file.
