@@ -1831,7 +1831,7 @@ static void action_ColorChooserWidget(void *data);
 static void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     ColorChooserWidget *wid_info;
-    GLWidget *name,*button,*mod;
+    GLWidget *name,*button,*m;
     SDL_Rect b2;
     
     if (!widget) return;
@@ -1847,7 +1847,7 @@ static void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
     
     name = ((ColorChooserWidget *)(widget->wid_info))->name;
     button = ((ColorChooserWidget *)(widget->wid_info))->button;
-    mod = ((ColorChooserWidget *)(widget->wid_info))->mod;
+    m = ((ColorChooserWidget *)(widget->wid_info))->mod;
     
     widget->bounds.x = b->x;
     widget->bounds.y = b->y;
@@ -1868,14 +1868,14 @@ static void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
 	    
     SetBounds_GLWidget(button,&b2);
 
-    if (wid_info->expanded && mod) {
+    if (wid_info->expanded && m) {
     	
-    	b2.h = mod->bounds.h;
+    	b2.h = m->bounds.h;
     	b2.w = widget->bounds.w;
     	b2.x = widget->bounds.x;
     	b2.y = widget->bounds.y + name->bounds.h;
 	    
-    	SetBounds_GLWidget(mod,&b2);
+    	SetBounds_GLWidget(m,&b2);
    }
 }
 

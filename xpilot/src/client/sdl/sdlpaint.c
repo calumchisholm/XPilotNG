@@ -192,7 +192,6 @@ bool Set_altScaleFactor(xp_option_t *opt, double val)
 
 int Paint_init(void)
 {
-    extern bool players_exposed; /* paint.c */
     int i;
 
     if (Init_wreckage() == -1)

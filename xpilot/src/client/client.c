@@ -1827,18 +1827,18 @@ int Handle_ball(int x, int y, int id, int style)
 static int predict_self_dir(int received_dir)
 {
     int pointer_delta = 0, dir_delta, new_dir;
-    int index = pointer_move_next - 1;
+    int ind = pointer_move_next - 1;
     int count = 0;
 
-    if (index < 0)
-	index = MAX_POINTER_MOVES - 1;
+    if (ind < 0)
+	ind = MAX_POINTER_MOVES - 1;
     
-    while (pointer_moves[index].id > last_keyboard_ack && count < 50) {
-        pointer_delta += pointer_moves[index].movement
-	    * pointer_moves[index].turnspeed;
-	index--;
-	if (index < 0)
-	    index = MAX_POINTER_MOVES - 1;
+    while (pointer_moves[ind].id > last_keyboard_ack && count < 50) {
+        pointer_delta += pointer_moves[ind].movement
+	    * pointer_moves[ind].turnspeed;
+	ind--;
+	if (ind < 0)
+	    ind = MAX_POINTER_MOVES - 1;
 	count++;
     }
     
