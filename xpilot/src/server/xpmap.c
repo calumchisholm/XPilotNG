@@ -246,6 +246,20 @@ static void Create_blockmap_from_polygons(world_t *world)
 	World_set_block(world, blk, FUEL);
     }
 
+    for (i = 0; i < world->NumAsteroidConcs; i++) {
+	asteroid_concentrator_t *aconc = AsteroidConc_by_index(world, i);
+
+	blk = Clpos_to_blkpos(aconc->pos);
+	World_set_block(world, blk, ASTEROID_CONCENTRATOR);
+    }
+
+    for (i = 0; i < world->NumItemConcs; i++) {
+	item_concentrator_t *iconc = ItemConc_by_index(world, i);
+
+	blk = Clpos_to_blkpos(iconc->pos);
+	World_set_block(world, blk, ITEM_CONCENTRATOR);
+    }
+
     /* find balltargets */
     for (blk.by = 0; blk.by < world->y; blk.by++) {
 	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {

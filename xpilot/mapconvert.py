@@ -589,18 +589,25 @@ def convert(options):
     print >> sys.stderr, "Finding special map features...",
     # First, find the locations of different map features other than walls
     # and put them in these lists.
+    asteroidconcs = []
     bases = []
     balls = []
-    fuels = []
-    targets = []
     cannons = []
     checks = [None] * 27  # 1 extra so it always ends with None
+    decors = []
+    emptytreasures = []
+    fuels = []
+    frictions = []
+    gravs = []
+    itemconcs = []
+    targets = []
+    wormholes = []
     ASTEROIDCONC = '&'
     BASES = '_0123456789'
     BALL = '*'
     CANNONS = 'rdfc'
     CHECKPOINTS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    DECOR = 'bhgyt'	  # add decor polygons ?
+    DECOR = 'bhgyt'
     EMPTYTREASURE = '^'
     FUEL = '#'
     FRICTION = 'z'
@@ -611,7 +618,7 @@ def convert(options):
     WALLS = 'xsawq'       # WALL includes fuel block
     WORMHOLES = '@()'
     ALL = ASTEROIDCONC + BASES + BALL + CHECKPOINTS + CANNONS + DECOR + EMPTYTREASURE + FUEL + FRICTION + GRAVS + ITEMCONC + TARGET + WORMHOLES
-    IGNORE = ATTRACT + DECOR + SPACE + WALLS
+    IGNORE = ATTRACT + SPACE + WALLS
     for x, y in map.ncoords():
 	block = map.data[y][x]
 	if block in IGNORE:
@@ -626,8 +633,7 @@ def convert(options):
 	thing.loc = loc
 	thing.team = -1
 	if block == ASTEROIDCONC:
-	    print >>sys.stderr, "WARNING: can't yet convert asteroid conc."
-	    continue
+	    asteroidconcs.append(thing)
 	elif block in BASES:
 	    if map[loc] == '_':
 		thing.team = 0
@@ -651,6 +657,9 @@ def convert(options):
 	    cannons.append(thing)
 	elif block in CHECKPOINTS:
 	    checks[ord(map[loc]) - ord('A')] = thing
+	elif block in DECOR:
+	    print >>sys.stderr, "WARNING: can't yet convert decor."
+	    continue
 	elif block == EMPTYTREASURE:
 	    print >>sys.stderr, "WARNING: can't yet convert empty treasure."
 	    continue
@@ -663,8 +672,7 @@ def convert(options):
 	    print >>sys.stderr, "WARNING: can't yet convert gravs."
 	    continue
 	elif block == ITEMCONC:
-	    print >>sys.stderr, "WARNING: can't yet convert item conc."
-	    continue
+	    itemconcs.append(thing)
 	elif block == TARGET:
 	    targets.append(thing)
 	elif block in WORMHOLES:
@@ -797,6 +805,8 @@ def convert(options):
 	printedge(curx, cury, prevh, curh)
 	print "</Polygon>"
 # The styles of these polygons will be changed later...
+    for aconc in asteroidconcs:
+	print '<AsteroidConcentrator x="%d" y="%d"/>' % (aconc.x, aconc.y)
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y - 479)
 	print '<BallArea>'
@@ -850,6 +860,8 @@ def convert(options):
 	for x, y in offsets[1:]:
 	    print '<Offset x="%d" y="%d"/>' % (x, y)
 	print '</Polygon></Cannon>'
+    for iconc in itemconcs:
+	print '<ItemConcentrator x="%d" y="%d"/>' % (iconc.x, iconc.y)
     print "</XPilotMap>"
     print >> sys.stderr, "done."
 
