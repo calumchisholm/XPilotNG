@@ -842,9 +842,9 @@ static void parse_styles(char **callptr)
     char *ptr;
 
     ptr = *callptr;
-    num_polygon_styles = *ptr++;
-    num_edge_styles = *ptr++;
-    num_bmaps = *ptr++;
+    num_polygon_styles = *ptr++ & 0xff;
+    num_edge_styles = *ptr++ & 0xff;
+    num_bmaps = *ptr++ & 0xff;
 
     polygon_styles = XMALLOC(polygon_style_t, MAX(1, num_polygon_styles));
     if (polygon_styles == NULL) {
@@ -860,9 +860,9 @@ static void parse_styles(char **callptr)
 
     for (i = 0; i < num_polygon_styles; i++) {
 	polygon_styles[i].rgb = get_32bit(&ptr);
-	polygon_styles[i].texture = (*ptr++);
-	polygon_styles[i].def_edge_style = *ptr++;
-	polygon_styles[i].flags = *ptr++;
+	polygon_styles[i].texture = *ptr++ & 0xff;
+	polygon_styles[i].def_edge_style = *ptr++ & 0xff;
+	polygon_styles[i].flags = *ptr++ & 0xff;
     }
 
     if (num_polygon_styles == 0) {
@@ -873,9 +873,11 @@ static void parse_styles(char **callptr)
     }
 
     for (i = 0; i < num_edge_styles; i++) {
-	edge_styles[i].width = *ptr++;
+	edge_styles[i].width = *ptr++; /* -1 means hidden */
 	edge_styles[i].rgb = get_32bit(&ptr);
 	/* kps - what the **** is this ? */
+	/* baron - it's line style from XSetLineAttributes */
+	/* 0 = LineSolid, 1 = LineOnOffDash, 2 = LineDoubleDash */
 	edge_styles[i].style =
 	    (*ptr == 1) ? 1 :
 	    (*ptr == 2) ? 2 : 0;
@@ -888,7 +890,7 @@ static void parse_styles(char **callptr)
 
 	strlcpy(fname, ptr, 30);
 	ptr += strlen(fname) + 1;
-	flags = *ptr++;
+	flags = *ptr++ & 0xff;
 	Bitmap_add(fname, 1, flags);
     }
     *callptr = ptr;
@@ -917,7 +919,7 @@ static int init_polymap(void)
 
     for (i = 0; i < num_polygons; i++) {
 	poly = &polygons[i];
-	poly->style = *ptr++;
+	poly->style = *ptr++ & 0xff;
 	current_estyle = polygon_styles[poly->style].def_edge_style;
 	dx = 0;
 	dy = 0;
@@ -987,7 +989,7 @@ static int init_polymap(void)
 	poly->bounds.w = max.x - min.x;
 	poly->bounds.h = max.y - min.y;
     }
-    num_bases = *ptr++;
+    num_bases = *ptr++ & 0xff;
     bases = XMALLOC(homebase_t, num_bases);
     if (bases == NULL) {
 	error("No memory for Map bases (%d)", num_bases);
@@ -996,7 +998,7 @@ static int init_polymap(void)
     for (i = 0; i < num_bases; i++) {
 	/* base.pos is not used */
 	bases[i].id = -1;
-	bases[i].team = *ptr++;
+	bases[i].team = *ptr++ & 0xff;
 	cx = get_ushort(&ptr);
 	cy = get_ushort(&ptr);
 	bases[i].bounds.x = cx - BLOCK_SZ / 2;
@@ -1033,7 +1035,7 @@ static int init_polymap(void)
 	fuels[i].bounds.w = BLOCK_SZ;
 	fuels[i].bounds.h = BLOCK_SZ;
     }
-    num_checks = *ptr++;
+    num_checks = *ptr++ & 0xff;
     if (num_checks != 0) {
 
 	checks = XMALLOC(checkpoint_t, num_checks);
