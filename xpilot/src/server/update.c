@@ -861,7 +861,7 @@ void Update_objects(void)
     for (i = 0; i < NumEcms; i++) {
 	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
 	    if (Ecms[i]->id != NO_ID)
-		Players(GetInd(Ecms[i]->id))->ecmcount--;
+		Player_by_id(Ecms[i]->id)->ecmcount--;
 	    free(Ecms[i]);
 	    --NumEcms;
 	    Ecms[i] = Ecms[NumEcms];
@@ -1330,7 +1330,7 @@ void Update_objects(void)
 	    Tractor_beam(i);
 
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
-	    player *lpl = Players(GetInd(pl->lock.pl_id));
+	    player *lpl = Player_by_id(pl->lock.pl_id);
 
 	    pl->lock.distance =
 		Wrap_length(pl->pos.cx - lpl->pos.cx,

@@ -677,8 +677,8 @@ void Destroy_connection(int ind, const char *reason)
     if (connp->id != NO_ID) {
 	id = connp->id;
 	connp->id = NO_ID;
-	Players(GetInd(id))->conn = NOT_CONNECTED;
-	if (Players(GetInd(id))->rectype != 2)
+	Player_by_id(id)->conn = NOT_CONNECTED;
+	if (Player_by_id(id)->rectype != 2)
 	    Delete_player(GetInd(id));
 	else {
 	    int i, ind = GetInd(id);
@@ -2032,7 +2032,7 @@ int Send_seek(int ind, int programmer_id, int robot_id, int sought_id)
 int Send_player(int ind, int id)
 {
     connection_t	*connp = &Conn[ind];
-    player		*pl = Players(GetInd(id));
+    player		*pl = Player_by_id(id);
     int			n;
     char		buf[MSG_LEN], ext[MSG_LEN];
     int			sbuf_len = connp->c.len;
@@ -2074,7 +2074,7 @@ int Send_score(int ind, int id, DFLOAT score,
 
     /* for those poor fools using standard client or haven't
        got 'treatZeroSpecial' on... =) */
-    /* if (teamZeroPausing && (Players(GetInd)connp->id))->team == 0))
+    /* if (teamZeroPausing && (Player_by_id(connp->id)->team == 0))
        score = (DFLOAT)(-5000.0); */
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
@@ -2095,7 +2095,7 @@ int Send_score(int ind, int id, DFLOAT score,
 	    if (announceAlliances) {
 		allchar = alliance + '0';
 	    } else {
-		if (Players(GetInd(connp->id))->alliance == alliance)
+		if (Player_by_id(connp->id)->alliance == alliance)
 		    allchar = '+';
 	    }
 	}
@@ -2615,10 +2615,10 @@ static int Receive_keyboard(int ind)
     }
     else {
 	connp->last_key_change = change;
-	pl = Players(GetInd(connp->id));
+	pl = Player_by_id(connp->id);
 	memcpy(pl->last_keyv, connp->r.ptr, size);
 	connp->r.ptr += size;
-	Players(GetInd(connp->id))->idleCount = 0; /* idle */
+	Player_by_id(connp->id)->idleCount = 0; /* idle */
 	Handle_keyboard(GetInd(connp->id));
     }
     if (connp->num_keyboard_updates++ && (connp->state & CONN_PLAYING)) {
@@ -2698,7 +2698,7 @@ static int Receive_power(int ind)
 	return n;
     }
     power = (DFLOAT) tmp / 256.0F;
-    pl = Players(GetInd(connp->id));
+    pl = Player_by_id(connp->id);
     autopilot = BIT(pl->used, HAS_AUTOPILOT);
 
     switch (ch) {
@@ -3107,7 +3107,7 @@ static int Receive_ack_target(int ind)
 static void Handle_talk(int ind, char *str)
 {
     connection_t	*connp = &Conn[ind];
-    player		*pl = Players(GetInd(connp->id));
+    player		*pl = Player_by_id(connp->id);
     int			i, sent, team;
     unsigned int	len;
     char		*cp,
@@ -3236,7 +3236,7 @@ static int Receive_talk(int ind)
 	}
 	connp->talk_sequence_num = seq;
 	if (*str == '/') {
-	    Handle_player_command(Players(GetInd(connp->id)), str + 1);
+	    Handle_player_command(Player_by_id(connp->id), str + 1);
 	}
 	else {
 	    Handle_talk(ind, str);
@@ -3311,7 +3311,7 @@ static int Receive_modifier_bank(int ind)
 	}
 	return n;
     }
-    pl = Players(GetInd(connp->id));
+    pl = Player_by_id(connp->id);
     if (bank < NUM_MODBANKS) {
 	CLEAR_MODS(mods);
 	if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
@@ -3604,7 +3604,7 @@ static int Receive_pointer_move(int ind)
 	}
 	return n;
     }
-    pl = Players(GetInd(connp->id));
+    pl = Player_by_id(connp->id);
     if (BIT(pl->status, HOVERPAUSE))
 	return 1;
 
@@ -3653,7 +3653,7 @@ static int Receive_fps_request(int ind)
 	return n;
     }
     if (connp->id != NO_ID) {
-	pl = Players(GetInd(connp->id));
+	pl = Player_by_id(connp->id);
 	if (fps == 0)
 	    fps = 1;
 	if ((fps == 20) && ignore20MaxFPS)
@@ -3679,7 +3679,7 @@ static int Receive_audio_request(int ind)
 	return n;
     }
     if (connp->id != NO_ID) {
-	pl = Players(GetInd(connp->id));
+	pl = Player_by_id(connp->id);
 	sound_player_onoff(pl, onoff);
     }
 

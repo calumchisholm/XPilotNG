@@ -116,7 +116,7 @@ int Cancel_invitation(int ind)
 	/* we have not invited anyone */
 	return 0;
     }
-    ally = Players(GetInd(pl->invite));
+    ally = Player_by_id(pl->invite);
     pl->invite = NO_ID;
     if (IS_HUMAN_PTR(ally)) {
 	char msg[MSG_LEN];

@@ -1246,14 +1246,14 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 
     i = World.teams[pl->team].SwapperId;
     while (i != -1) {
-	if ((i = Players(GetInd(i))->team) != team)
+	if ((i = Player_by_id(i)->team) != team)
 	    i = World.teams[i].SwapperId;
 	else {
 	    /* Found a cycle, now change the teams */
 	    int xbase = pl->home_base, xteam = pl->team, xbase2, xteam2;
 	    player *pl2 = pl;
 	    do {
-		pl2 = Players(GetInd(World.teams[xteam].SwapperId));
+		pl2 = Player_by_id(World.teams[xteam].SwapperId);
 		World.teams[xteam].SwapperId = -1;
 		xbase2 = pl2->home_base;
 		xteam2 = pl2->team;

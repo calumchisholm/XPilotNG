@@ -760,7 +760,7 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	    } else if (Team_immune(obj->id, pl->id))
 		continue;
-	    else if (BIT(Players(GetInd(obj->id))->status, PAUSE))
+	    else if (BIT(Player_by_id(obj->id)->status, PAUSE))
 		continue;
 	} else if (BIT(World.rules->mode, TEAM_PLAY)
 		   && teamImmunity
@@ -787,7 +787,7 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	}
 	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID) {
-	    if (BIT(Players(GetInd(obj->id))->used, HAS_PHASING_DEVICE))
+	    if (BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE))
 		continue;
 	}
 	else if (BIT(obj->type, OBJ_PULSE)) {
@@ -1213,7 +1213,7 @@ static void Player_collides_with_mine(int ind, object *obj)
 		pl->name,
 		Describe_shot(mine->type, mine->status, mine->mods,1),
 		BIT(mine->status, GRAVITY) ? "thrown " : "dropped ",
-		Players(GetInd(mine->owner))->name,
+		Player_by_id(mine->owner)->name,
 		reprogrammer_name);
     }
     if (killer != -1) {
@@ -1627,7 +1627,7 @@ static void AsteroidCollision(void)
 	    /* don't collide with phased balls */
 	    if (BIT(obj->type, OBJ_BALL)
 		&& obj->id != NO_ID
-		&& BIT(Players(GetInd(obj->id))->used, HAS_PHASING_DEVICE))
+		&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE))
 		continue;
 
 	    radius = ast->pl_radius + obj->pl_radius;
@@ -1792,7 +1792,7 @@ static void BallCollision(void)
 	if (ball->type != OBJ_BALL ||	/* not a ball */
 	    ball->life <= 0 ||		/* dying ball */
 	    (ball->id != NO_ID
-	     && BIT(Players(GetInd(ball->id))->used, HAS_PHASING_DEVICE)) ||
+	     && BIT(Player_by_id(ball->id)->used, HAS_PHASING_DEVICE)) ||
 					/* phased ball */
 	    World.treasures[ball->treasure].have) {
 					/* safe in a treasure */
@@ -1893,7 +1893,7 @@ static void BallCollision(void)
 			break;
 		    }
 		    if (b2->id != NO_ID
-			&& BIT(Players(GetInd(b2->id))->used,
+			&& BIT(Player_by_id(b2->id)->used,
 			       HAS_PHASING_DEVICE)) {
 			break;
 		    }

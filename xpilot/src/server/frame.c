@@ -486,7 +486,7 @@ static int Frame_status(int conn, int ind)
 		  lock_dist,
 		  lock_dir,
 		  showautopilot,
-		  Players(GetInd(Get_player_id(conn)))->status,
+		  Player_by_id(Get_player_id(conn))->status,
 		  mods);
     if (n <= 0) {
 	return 0;
@@ -843,7 +843,7 @@ static void Frame_shots(int conn, int ind)
 	case OBJ_CANNON_SHOT:
 	    if (Team_immune(shot->id, pl->id)
 		|| (shot->id != NO_ID
-		    && BIT(Players(GetInd(shot->id))->status, PAUSE))
+		    && BIT(Player_by_id(shot->id)->status, PAUSE))
 		|| (shot->id == NO_ID
 		    && BIT(World.rules->mode, TEAM_PLAY)
 		    && shot->team == pl->team)) {
@@ -900,7 +900,7 @@ static void Frame_shots(int conn, int ind)
 			confused = 1;
 		}
 		if (mine->id != NO_ID
-		    && BIT(Players(GetInd(mine->id))->status, PAUSE)) {
+		    && BIT(Player_by_id(mine->id)->status, PAUSE)) {
 		    laid_by_team = 1;
 		} else {
 		    laid_by_team = (Team_immune(mine->id, pl->id)
@@ -961,8 +961,8 @@ static void Frame_ships(int conn, int ind)
     }
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
-	player 	*victim = Players(GetInd(trans->target)),
-		*pl = (trans->id == NO_ID ? NULL : Players(GetInd(trans->id)));
+	player 	*victim = Player_by_id(trans->target),
+		*pl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
 	int 	cx = (pl ? pl->pos.cx : trans->pos.cx),
 		cy = (pl ? pl->pos.cy : trans->pos.cy);
 	Send_trans(conn, victim->pos.cx, victim->pos.cy, cx, cy);
@@ -970,7 +970,7 @@ static void Frame_ships(int conn, int ind)
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->tractor_count > 0) {
-	    player *t = Players(GetInd(cannon->tractor_target));
+	    player *t = Player_by_id(cannon->tractor_target);
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 		for (j = 0; j < 3; j++) {
@@ -1044,7 +1044,7 @@ static void Frame_ships(int conn, int ind)
 	    }
 	}
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
-	    player *t = Players(GetInd(pl_i->lock.pl_id));
+	    player *t = Player_by_id(pl_i->lock.pl_id);
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 

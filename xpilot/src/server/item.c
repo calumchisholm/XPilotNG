@@ -505,11 +505,11 @@ void Tractor_beam(int ind)
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
     if (BIT(pl->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
 	!= (LOCK_PLAYER|LOCK_VISIBLE)
-	|| BIT(Players(GetInd(pl->lock.pl_id))->status,
+	|| BIT(Player_by_id(pl->lock.pl_id)->status,
 	       PLAYING|PAUSE|KILLED|GAME_OVER) != PLAYING
 	|| pl->lock.distance >= maxdist
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
-	|| BIT(Players(GetInd(pl->lock.pl_id))->used, HAS_PHASING_DEVICE)) {
+	|| BIT(Player_by_id(pl->lock.pl_id)->used, HAS_PHASING_DEVICE)) {
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
     }

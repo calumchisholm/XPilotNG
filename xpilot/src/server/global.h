@@ -66,8 +66,9 @@ extern DFLOAT		tbl_cos[];
 #define NumObjs		(ObjCount + 0)
 
 /*extern player		**Players;*/
-#define Players(ind) Players1(ind, __FILE__, __LINE__)
-#define GetInd(id)   GetInd1(id, __FILE__, __LINE__)
+#define Players(ind)	Players1(ind, __FILE__, __LINE__)
+#define GetInd(id)	GetInd1(id, __FILE__, __LINE__)
+#define Player_by_id(id)	Players(GetInd(id))
 
 extern player		**PlayersArray;
 extern object		*Obj[];

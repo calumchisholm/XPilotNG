@@ -514,7 +514,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 	    player *pl = NULL;
 
 	    if (obj->id != NO_ID)
-		pl = Players(GetInd(obj->id));
+		pl = Player_by_id(obj->id);
 
 	    if (!BIT(World.cannon[item_id].used, HAS_EMERGENCY_SHIELD)) {
 		if (World.cannon[item_id].item[ITEM_ARMOR] > 0)
@@ -650,7 +650,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 		}
 	    }
 	    if (j == num_pushers) {
-		pushers[num_pushers++] = Players(GetInd(shove->pusher_id));
+		pushers[num_pushers++] = Player_by_id(shove->pusher_id);
 		cnt[j] = 1;
 	    }
 	    total_pusher_count++;
@@ -2644,7 +2644,7 @@ static void Move_ball(object *obj)
     obj->extmove.cy = mv.delta.cy;
 
     if (obj->id != NO_ID
-	&& BIT(Players(GetInd(obj->id))->used, HAS_PHASING_DEVICE)) {
+	&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE)) {
 
 	int cx = obj->pos.cx + mv.delta.cx;
 	int cy = obj->pos.cy + mv.delta.cy;
@@ -2664,7 +2664,7 @@ static void Move_ball(object *obj)
     if (owner == NO_ID)
 	mv.hitmask = BALL_BIT | NOTEAM_BIT;
     else
-	mv.hitmask = BALL_BIT | HITMASK(Players(GetInd(owner))->team);
+	mv.hitmask = BALL_BIT | HITMASK(Player_by_id(owner)->team);
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
     while (mv.delta.cx || mv.delta.cy) {
@@ -2725,7 +2725,7 @@ static void Move_object_new(object *obj)
 #else
     if (obj->type == OBJ_BALL) {
 	if (obj->owner != NO_ID)
-	    team =  Players(GetInd(obj->owner)).team;
+	    team =  Player_by_id(obj->owner).team;
 	else
 	    team = TEAM_NOT_SET;
 	mv.hitmask = BALL_BIT;

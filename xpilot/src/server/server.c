@@ -627,7 +627,7 @@ void Server_info(char *str, unsigned max_size)
 	if (IS_ROBOT_PTR(pl)) {
 	    if ((k = Robot_war_on_player(GetInd(pl->id))) != NO_ID) {
 		sprintf(name + strlen(name), " (%s)",
-			Players(GetInd(k))->name);
+			Player_by_id(k)->name);
 		if (strlen(name) >= 19) {
 		    strcpy(&name[17], ")");
 		}

@@ -1247,7 +1247,7 @@ void Delete_shot(int ind)
 	if (BIT(shot->mods.warhead, CLUSTER)) {
 	    type = OBJ_SHOT;
 	    if (shot->id != NO_ID) {
-		player *pl = Players(GetInd(shot->id));
+		player *pl = Player_by_id(shot->id);
 		color = pl->color;
 	    }
 	    else
@@ -1328,7 +1328,7 @@ void Delete_shot(int ind)
 	    || BIT(shot->mods.warhead, CLUSTER)) {
 	    break;
 	}
-	pl = Players(GetInd(shot->id));
+	pl = Player_by_id(shot->id);
 	if (--pl->shots <= 0)
 	    pl->shots = 0;
 	break;
@@ -1338,7 +1338,7 @@ void Delete_shot(int ind)
 	    || BIT(shot->status, FROMCANNON)) {
 	    break;
 	}
-	pl = Players(GetInd(shot->id));
+	pl = Player_by_id(shot->id);
 	if (--pl->num_pulses <= 0)
 	    pl->num_pulses = 0;
 	break;
@@ -1750,7 +1750,7 @@ void Move_smart_shot(int ind)
 		}
 	    }
 	}
-	pl = Players(GetInd(shot->info));
+	pl = Player_by_id(shot->info);
     }
     else
 	/*NOTREACHED*/

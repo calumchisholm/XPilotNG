@@ -240,7 +240,7 @@ void Make_debris(
 void Ball_is_replaced(ballobject *ball)
 {
     char msg[MSG_LEN];
-    player *pl = Players(GetInd(ball->owner));
+    player *pl = Player_by_id(ball->owner);
 
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
@@ -290,7 +290,7 @@ void Ball_hits_goal(ballobject *ball, int group)
 	Ball_is_replaced(ball);
 	return;
     }
-    if (groups[group].team == Players(GetInd(ball->owner))->team) {
+    if (groups[group].team == Player_by_id(ball->owner)->team) {
 	Ball_is_destroyed(ball);
 	if (Punish_team(GetInd(ball->owner), ball->treasure,
 			ball->pos.cx, ball->pos.cy))
@@ -332,7 +332,7 @@ bool Balltarget_hitfunc(struct group *group, struct move *move)
 	 * owner is not.
 	 */
 	if (World.treasures[ball->treasure].team == group->team
-	    && Players(GetInd(ball->owner))->team != group->team)
+	    && Player_by_id(ball->owner)->team != group->team)
 	    return false;
 	return true;
     }
