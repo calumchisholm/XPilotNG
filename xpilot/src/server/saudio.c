@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -137,8 +136,9 @@ void sound_play_all(int index)
     SDBG(printf("sound_play_all %d\n", index);)
 
     for (i = 0; i < NumPlayers; i++) {
-	if (BIT(Players[i]->status, WANT_AUDIO)) {
-	    sound_play_player(Players[i], index);
+	player *pl_i = Players(i);
+	if (BIT(pl_i->status, WANT_AUDIO)) {
+	    sound_play_player(pl_i, index);
 	}
     }
 }
@@ -162,7 +162,7 @@ void sound_play_sensors(int cx, int cy, int index)
     SDBG(printf("sound_play_sensors %d, %d, %d\n", cx, cy, index);)
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players[i];
+	pl = Players(i);
 
 	if (!BIT(pl->status, WANT_AUDIO))
 	    continue;
