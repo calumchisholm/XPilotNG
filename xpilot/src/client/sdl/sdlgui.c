@@ -36,12 +36,13 @@
 #include "text.h"
 #include "asteroid_data.h"
 
-Uint32 nullRGBA    = 0x00000000;
-Uint32 blackRGBA   = 0x000000ff;
-Uint32 whiteRGBA   = 0xffffffff;
-Uint32 blueRGBA    = 0x0000ffff;
-Uint32 redRGBA     = 0xff0000ff;
-Uint32 greenRGBA   = 0x00ff00ff;
+Uint32 nullRGBA     = 0x00000000;
+Uint32 blackRGBA    = 0x000000ff;
+Uint32 whiteRGBA    = 0xffffffff;
+Uint32 blueRGBA     = 0x0000ffff;
+Uint32 redRGBA	    = 0xff0000ff;
+Uint32 greenRGBA    = 0x00ff00ff;
+Uint32 yellowRGBA   = 0xffff00ff;
 
 Uint32 wallColorRGBA;
 Uint32 hudColorRGBA;
@@ -1998,20 +1999,16 @@ static const char *get_rgba_color_option(xp_option_t *opt)
 
 static xp_option_t sdlgui_options[] = {
 
-    COLOR(wallColorRGBA, "#0000ffff", "walls on blockmaps"),
-    COLOR(hudColorRGBA, "#ff000088", "the HUD"),
-    COLOR(connColorRGBA, "#00ff0088", "the ball connector"),
-    COLOR(scoreObjectColorRGBA, "#00ff0088", "score objects"),
-    COLOR(fuelColorRGBA, "#ffffff7f", "fuel cells"),
     COLOR(messagesColorRGBA, "#00aaaa88", "messages"),
     COLOR(oldmessagesColorRGBA, "#00888888", "old messages"),
     COLOR(msgScanBallColorRGBA, "#ff000088", "ball warning"),
     COLOR(msgScanSafeColorRGBA, "#00ff0088", "ball safe announcement"),
     COLOR(msgScanCoverColorRGBA, "#4e7cff88", "cover request"),
     COLOR(msgScanPopColorRGBA, "#ffbb1188", "ball pop announcement"),
-    COLOR(ballColorRGBA, "#00ff00ff", "balls"),
+
     COLOR(meterBorderColorRGBA, "#0000ff55", "meter borders"),
     COLOR(fuelMeterColorRGBA, "#ff000055", "fuel meter"),
+    COLOR(fuelGaugeColorRGBA, "#0000ff44", "fuel gauge"),
     COLOR(powerMeterColorRGBA, "#ff000055", "power meter"),
     COLOR(turnSpeedMeterColorRGBA, "#ff000055", "turn speed meter"),
     COLOR(packetSizeMeterColorRGBA, "#ff000055", "packet size meter"),
@@ -2019,14 +2016,31 @@ static xp_option_t sdlgui_options[] = {
     COLOR(packetDropMeterColorRGBA, "#ff000055", "drop meter"),
     COLOR(packetLagMeterColorRGBA, "#ff000055", "lag meter"),
     COLOR(temporaryMeterColorRGBA, "#ff000055", "time meter"),
-    COLOR(dirPtrColorRGBA, "#0000ff22", "direction pointer"),
+
+    COLOR(ballColorRGBA, "#00ff00ff", "balls"),
+    COLOR(connColorRGBA, "#00ff0088", "the ball connector"),
+    COLOR(fuelColorRGBA, "#ffffff7f", "fuel cells"),
+    COLOR(wallColorRGBA, "#0000ffff", "walls on blockmaps"),
+    COLOR(baseNameColorRGBA, "#0000ff88", "base name"),
+    COLOR(shipNameColorRGBA, "#0000ff88", "ship name"),
+    COLOR(scoreObjectColorRGBA, "#00ff0088", "score objects"),
+
+    COLOR(hudColorRGBA, "#ff000088", "the HUD"),
     COLOR(hudHLineColorRGBA, "#0000ff44", "horizontal HUD line"),
     COLOR(hudVLineColorRGBA, "#0000ff44", "vertical HUD line"),
     COLOR(hudItemsColorRGBA, "#0000ff44", "hud items"),
-    COLOR(fuelGaugeColorRGBA, "#0000ff44", "fuel gauge"),
-    COLOR(selfLWColorRGBA, "#ff0000ff", "my ship on last life"),
-    COLOR(teamLWColorRGBA, "#ff00ffff", "team ship on last life"),
-    COLOR(enemyLWColorRGBA, "#ffff00ff", "enemy ship on last life"),
+    COLOR(hudRadarEnemyColorRGBA, "#ff000088", "enemy on HUD radar"),
+    COLOR(hudRadarOtherColorRGBA, "#0000ff88", "friend on HUD radar"),
+    COLOR(dirPtrColorRGBA, "#0000ff22", "direction pointer"),
+    COLOR(selectionColorRGBA, "#ff0000ff", "selection"),
+
+    COLOR(scoreInactiveSelfColorRGBA, "#88008888", "my score when inactive"),
+    COLOR(scoreInactiveColorRGBA, "#8800aa88", "score when inactive"),
+    COLOR(scoreSelfColorRGBA, "#ffff00ff", "my score"),
+    COLOR(scoreColorRGBA, "#888800ff", "score"),
+    COLOR(scoreOwnTeamColorRGBA, "#0000ffff", "my team score"),
+    COLOR(scoreEnemyTeamColorRGBA, "#ff0000ff", "enemy team score"),
+
     COLOR(team0ColorRGBA, "#00000000", "team 0"),
     COLOR(team1ColorRGBA, "#00000000", "team 1"),
     COLOR(team2ColorRGBA, "#00000000", "team 2"),
@@ -2037,22 +2051,15 @@ static xp_option_t sdlgui_options[] = {
     COLOR(team7ColorRGBA, "#00000000", "team 7"),
     COLOR(team8ColorRGBA, "#00000000", "team 8"),
     COLOR(team9ColorRGBA, "#00000000", "team 9"),
-    COLOR(shipNameColorRGBA, "#0000ff88", "ship name"),
-    COLOR(baseNameColorRGBA, "#0000ff88", "base name"),
+    
+    COLOR(selfLWColorRGBA, "#ff0000ff", "my ship on last life"),
+    COLOR(teamLWColorRGBA, "#ff00ffff", "team ship on last life"),
+    COLOR(enemyLWColorRGBA, "#ffff00ff", "enemy ship on last life"),
     COLOR(manyLivesColorRGBA, "#666666aa", "name of ship with many lives"),
     COLOR(twoLivesColorRGBA, "#008800aa", "name of ship with two lives"),
     COLOR(oneLifeColorRGBA, "#aaaa00aa", "name of ship with one life"),
     COLOR(zeroLivesColorRGBA, "#ff0000aa", "name of ship with no lives"),
-    COLOR(hudRadarEnemyColorRGBA, "#ff000088", "enemy on HUD radar"),
-    COLOR(hudRadarOtherColorRGBA, "#0000ff88", "friend on HUD radar"),
-    COLOR(scoreInactiveSelfColorRGBA, "#88008888", "my score when inactive"),
-    COLOR(scoreInactiveColorRGBA, "#8800aa88", "score when inactive"),
-    COLOR(scoreSelfColorRGBA, "#ffff00ff", "my score"),
-    COLOR(scoreColorRGBA, "#888800ff", "score"),
-    COLOR(scoreOwnTeamColorRGBA, "#0000ffff", "my team score"),
-    COLOR(scoreEnemyTeamColorRGBA, "#ff0000ff", "enemy team score"),
-    COLOR(selectionColorRGBA, "#ff0000ff", "selection"),
-
+    
     XP_INT_OPTION(
         "meterWidth",
 	60, 0, 600,

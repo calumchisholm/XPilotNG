@@ -51,6 +51,7 @@ extern Uint32 whiteRGBA;
 extern Uint32 blueRGBA;
 extern Uint32 redRGBA;
 extern Uint32 greenRGBA;
+extern Uint32 yellowRGBA;
 
 extern Uint32 scoreInactiveSelfColorRGBA;
 extern Uint32 scoreInactiveColorRGBA;

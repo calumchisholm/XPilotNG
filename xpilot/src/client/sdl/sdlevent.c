@@ -174,7 +174,7 @@ int Process_event(SDL_Event *evt)
     case SDL_MOUSEBUTTONDOWN:
 	button = evt->button.button;
 	if (!pointerControl) {
-	    if ( (target[button-1] = FindGLWidget(evt->button.x,evt->button.y)) ) {
+	    if ( (target[button-1] = FindGLWidget(MainWidget,evt->button.x,evt->button.y)) ) {
 	    	if (target[button-1]->button) {
 		    target[button-1]->button(button,evt->button.state,
 		    	    	    	    evt->button.x,evt->button.y,
@@ -201,7 +201,7 @@ int Process_event(SDL_Event *evt)
 					target[0]->motiondata);
 		}
 	    } else {
-    	    	GLWidget *tmp = FindGLWidget(evt->button.x,evt->button.y);
+    	    	GLWidget *tmp = FindGLWidget(MainWidget,evt->button.x,evt->button.y);
 		if (tmp != hovertarget) {
 		    if (tmp && tmp->hover)
     	    	    	tmp->hover(true,evt->button.x,evt->button.y,tmp->hoverdata);

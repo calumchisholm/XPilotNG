@@ -412,7 +412,7 @@ void Paint_frame(void)
 	Console_paint();
 	Paint_select();
 
-    	DrawGLWidgets();
+    	DrawGLWidgets(MainWidget);
     	{ /* TODO: find this error */
             /* Check for error conditions. */
             gl_error = glGetError( );
