@@ -1156,20 +1156,11 @@ void Update_objects(void)
 		for (counter = 20; counter > 0; counter--) {
 		    dest.cx = (int)(rfrac() * World.cwidth);
 		    dest.cy = (int)(rfrac() * World.cheight);
-#if 0
-		    if (BIT(1U << World.block
-			    [CLICK_TO_BLOCK(dest.cx)]
-			    [CLICK_TO_BLOCK(dest.cy)],
-			    SPACE_BLOCKS)) {
-			break;
-		    }
-#else
 		    if (shape_is_inside(dest.cx, dest.cy, hitmask,
 					(object *)pl, (shape *)pl->ship,
 					pl->dir)
 			== NO_GROUP)
 			break;
-#endif
 		}
 
 		/* can't find an empty space, hyperjump failed */
