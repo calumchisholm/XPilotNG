@@ -781,6 +781,28 @@ static void Choose_weapon_modifier(player_t *pl, int weapon_type)
     Robot_check_new_modifiers(pl, mods);
 }
 
+/*
+ * Calculate minimum of length of hypotenuse in triangle with sides
+ * 'dcx' and 'dcy' and 'min', taking into account wrapping.
+ * Unit is clicks.
+ */
+static inline double Wrap_length_min(double dcx, double dcy, double min)
+{
+    double len;
+
+    dcx = WRAP_DCX(dcx), dcx = ABS(dcx);
+    if (dcx >= min)
+	return min;
+    dcy = WRAP_DCY(dcy), dcy = ABS(dcy);
+    if (dcy >= min)
+	return min;
+
+    len = LENGTH(dcx, dcy);
+
+    return MIN(len, min);
+}
+
+
 static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 {
     player_t			*ship;
@@ -1457,20 +1479,14 @@ static bool Ball_handler(player_t *pl)
 
 static int Robot_default_play_check_map(player_t *pl)
 {
-    int j, cannon_i, fuel_i, target_i;
-    int dx, dy, distance, cannon_dist, fuel_dist, target_dist;
-    bool fuel_checked;
+    int j, cannon_i = NO_IND, fuel_i = NO_IND, target_i = NO_IND;
+    double cannon_dist = Visibility_distance;
+    double fuel_dist = Visibility_distance;
+    double target_dist = Visibility_distance;
+    double dcx, dcy, distance;
+    bool fuel_checked = false;
     robot_default_data_t *my_data = Robot_default_get_data(pl);
     world_t *world = pl->world;
-
-    fuel_checked = false;
-
-    cannon_i = -1;
-    cannon_dist = Visibility_distance;
-    fuel_i = -1;
-    fuel_dist = Visibility_distance;
-    target_i = -1;
-    target_dist = Visibility_distance;
 
     for (j = 0; j < world->NumFuels; j++) {
 	fuel_t *fs = Fuels(world, j);
@@ -1483,17 +1499,12 @@ static int Robot_default_play_check_map(player_t *pl)
 	    && fs->team != pl->team)
 	    continue;
 
-	if ((dx = (CLICK_TO_PIXEL(fs->pos.cx - pl->pos.cx)),
-		dx = WRAP_DX(dx), ABS(dx)) < fuel_dist
-	    && (dy = (CLICK_TO_PIXEL(fs->pos.cy - pl->pos.cy)),
-		dy = WRAP_DY(dy), ABS(dy)) < fuel_dist
-	    && (distance = LENGTH(dx, dy)) < fuel_dist) {
-	    blkpos_t bpos = Clpos_to_blkpos(fs->pos);
-
-	    if (World_get_block(world, bpos) == FUEL) {
-		fuel_i = j;
-		fuel_dist = distance;
-	    }
+	dcx = fs->pos.cx - pl->pos.cx;
+	dcy = fs->pos.cy - pl->pos.cy;
+	distance = Wrap_length_min(dcx, dcy, fuel_dist * CLICK) / CLICK;
+	if (distance < fuel_dist) {
+	    fuel_i = j;
+	    fuel_dist = distance;
 	}
     }
 
@@ -1506,17 +1517,23 @@ static int Robot_default_play_check_map(player_t *pl)
 	    || Teams(world, targ->team)->NumMembers == 0)
 	    continue;
 
-	if ((dx = CLICK_TO_PIXEL(targ->pos.cx - pl->pos.cx),
-		dx = WRAP_DX(dx), ABS(dx)) < target_dist
-	    && (dy = CLICK_TO_PIXEL(targ->pos.cy - pl->pos.cy),
-		dy = WRAP_DY(dy), ABS(dy)) < target_dist
-	    && (distance = LENGTH(dx, dy)) < target_dist) {
+	dcx = targ->pos.cx - pl->pos.cx;
+	dcy = targ->pos.cy - pl->pos.cy;
+	distance = Wrap_length_min(dcx, dcy, target_dist * CLICK) / CLICK;
+	if (distance < target_dist) {
 	    target_i = j;
 	    target_dist = distance;
 	}
     }
 
-    if (fuel_i >= 0
+#if 0
+    if (fuel_i != NO_IND)
+	warn("Closest fuel   = %d, distance = %.2f", fuel_i, fuel_dist);
+    if (target_i != NO_IND)
+	warn("Closest target = %d, distance = %.2f", target_i, target_dist);
+#endif
+
+    if (fuel_i != NO_IND
 	&& (target_dist > fuel_dist
 	    || !BIT(world->rules->mode, TEAM_PLAY))
 	&& BIT(my_data->longterm_mode, NEED_FUEL)) {
@@ -1528,9 +1545,10 @@ static int Robot_default_play_check_map(player_t *pl)
 	if (Check_robot_target(pl, Fuels(world, fuel_i)->pos, RM_REFUEL))
 	    return 1;
     }
-    if (target_i >= 0) {
+    if (target_i != NO_IND) {
 	SET_BIT(my_data->longterm_mode, TARGET_KILL);
-	if (Check_robot_target(pl, Targets(world, target_i)->pos, RM_CANNON_KILL))
+	if (Check_robot_target(pl, Targets(world, target_i)->pos,
+			       RM_CANNON_KILL))
 	    return 1;
 
 	CLR_BIT(my_data->longterm_mode, TARGET_KILL);
@@ -1546,17 +1564,21 @@ static int Robot_default_play_check_map(player_t *pl)
 	    && cannon->team == pl->team)
 	    continue;
 
-	if ((dx = CLICK_TO_PIXEL(cannon->pos.cx - pl->pos.cx),
-		dx = WRAP_DX(dx), ABS(dx)) < cannon_dist
-	    && (dy = CLICK_TO_PIXEL(cannon->pos.cy - pl->pos.cy),
-		dy = WRAP_DY(dy), ABS(dy)) < cannon_dist
-	    && (distance = LENGTH(dx, dy)) < cannon_dist) {
+	dcx = cannon->pos.cx - pl->pos.cx;
+	dcy = cannon->pos.cy - pl->pos.cy;
+	distance = Wrap_length_min(dcx, dcy, cannon_dist * CLICK) / CLICK;
+	if (distance  < cannon_dist) {
 	    cannon_i = j;
 	    cannon_dist = distance;
 	}
     }
 
-    if (cannon_i >= 0) {
+#if 0
+    if (cannon_i != NO_IND)
+	warn("Closest cannon = %d, distance = %.2f", cannon_i, cannon_dist);
+#endif
+
+    if (cannon_i != NO_IND) {
 	cannon_t *cannon = Cannons(world, cannon_i);
 	clpos_t d = cannon->pos;
 
@@ -1567,7 +1589,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	    return 1;
     }
 
-    if (fuel_i >= 0
+    if (fuel_i != NO_IND
 	&& !fuel_checked
 	&& BIT(my_data->longterm_mode, NEED_FUEL)) {
 
