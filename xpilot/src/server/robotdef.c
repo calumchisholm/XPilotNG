@@ -903,9 +903,9 @@ static bool Check_robot_target(int ind,
 	if (pl->item[ITEM_MINE] && item_dist < 8 * BLOCK_SZ) {
 	    Choose_weapon_modifier(pl, OBJ_MINE);
 	    if (BIT(World.rules->mode, TIMING)) {
-		Place_mine(ind);
+		Place_mine(pl);
 	    } else {
-		Place_moving_mine(ind);
+		Place_moving_mine(pl);
 	    }
 	    new_mode = (rfrac() < 0.5f) ? RM_EVADE_RIGHT : RM_EVADE_LEFT;
 	}
@@ -1145,9 +1145,9 @@ static bool Check_robot_target(int ind,
 		  && !WITHIN(my_data->robot_count, my_data->last_dropped_mine, 10)) {
 	    if (pl->fuel.sum > pl->fuel.l3) {
 		Choose_weapon_modifier(pl, OBJ_MINE);
-		Place_mine(ind);
+		Place_mine(pl);
 	    } else /*if (pl->fuel.sum < pl->fuel.l2)*/ {
-		Place_mine(ind);
+		Place_mine(pl);
 		CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	    }
 	    my_data->last_dropped_mine=my_data->robot_count;

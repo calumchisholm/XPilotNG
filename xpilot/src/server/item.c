@@ -416,19 +416,18 @@ void Throw_items(int ind)
  */
 void Detonate_items(int ind)
 {
-    player		*pl = Players(ind);
+    player		*pl = Players(ind), *owner_pl;
     int			i;
     modifiers		mods;
-    int			owner_ind;
 
     if (!BIT(pl->status, KILLED))
 	return;
 
     /* ZE: Detonated items on tanks should belong to the tank's owner. */
     if (IS_TANK_PTR(pl)) {
-	owner_ind = GetInd(pl->lock.pl_id);
+	owner_pl = Player_by_id(pl->lock.pl_id);
     } else {
-	owner_ind = ind;
+	owner_pl = pl;
     }
 
     /*
@@ -458,7 +457,7 @@ void Detonate_items(int ind)
 		&& pl->item[ITEM_MINE] < nukeMinMines) {
 		CLR_BIT(mods.nuclear, NUCLEAR);
 	    }
-	    Place_general_mine(owner_ind, pl->team, GRAVITY,
+	    Place_general_mine(owner_pl, pl->team, GRAVITY,
 			       pl->pos.cx, pl->pos.cy,
 			       pl->vel.x + vel * tcos(dir),
 			       pl->vel.y + vel * tsin(dir),
@@ -490,7 +489,7 @@ void Detonate_items(int ind)
 		&& pl->item[ITEM_MISSILE] < nukeMinSmarts) {
 		CLR_BIT(mods.nuclear, NUCLEAR);
 	    }
-	    Fire_general_shot(owner_ind, 0, pl->team, pl->pos.cx, pl->pos.cy,
+	    Fire_general_shot(GetInd(owner_pl->id), 0, pl->team, pl->pos.cx, pl->pos.cy,
 			      type, (int)(rfrac() * RES), mods, -1);
 	}
     }

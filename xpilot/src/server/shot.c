@@ -68,28 +68,25 @@ char shot_version[] = VERSION;
  */
 
 
-void Place_mine(int ind)
+void Place_mine(player *pl)
 {
-    player *pl = Players(ind);
-
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining)) {
 	return;
     }
 
     if (minMineSpeed > 0) {
-	Place_moving_mine(ind);
+	Place_moving_mine(pl);
 	return;
     }
 
-    Place_general_mine(ind, pl->team, 0,
+    Place_general_mine(pl, pl->team, 0,
 		       pl->pos.cx, pl->pos.cy, 0.0, 0.0, pl->mods);
 }
 
 
-void Place_moving_mine(int ind)
+void Place_moving_mine(player *pl)
 {
-    player	*pl = Players(ind);
     DFLOAT	vx = pl->vel.x;
     DFLOAT	vy = pl->vel.y;
 
@@ -111,16 +108,15 @@ void Place_moving_mine(int ind)
 	}
     }
 
-    Place_general_mine(ind, pl->team, GRAVITY,
+    Place_general_mine(pl, pl->team, GRAVITY,
 		       pl->pos.cx, pl->pos.cy, vx, vy, pl->mods);
 }
 
-void Place_general_mine(int ind, unsigned short team, long status,
+void Place_general_mine(player *pl, unsigned short team, long status,
 			int cx, int cy,
 			DFLOAT vx, DFLOAT vy, modifiers mods)
 {
     char		msg[MSG_LEN];
-    player		*pl = Players(ind);
     int			used;
     DFLOAT		life;
     long		drain;
@@ -186,7 +182,7 @@ void Place_general_mine(int ind, unsigned short team, long status,
 	if (baseMineRange) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (i != ind
+		if (pl_i->id != pl->id
 		    && !Team_immune(pl_i->id, pl->id)
 		    && !IS_TANK_IND(i)) {
 		    int dx = cx - World.base[pl_i->home_base].pos.cx;
@@ -281,9 +277,8 @@ void Place_general_mine(int ind, unsigned short team, long status,
  *     Cause the mine which is closest to a player and owned
  *     by that player to detonate.
  */
-void Detonate_mines(int ind)
+void Detonate_mines(player *pl)
 {
-    player		*pl = Players(ind);
     int			i;
     int			closest = -1;
     DFLOAT		dist;
@@ -1412,7 +1407,7 @@ void Delete_shot(int ind)
 	}
 	if (addMine) {
 	    long gravity_status = ((rfrac() < 0.5f) ? GRAVITY : 0);
-	    Place_general_mine(-1, TEAM_NOT_SET, gravity_status,
+	    Place_general_mine(NULL, TEAM_NOT_SET, gravity_status,
 			       shot->pos.cx, shot->pos.cy,
 			       0.0, 0.0, mods);
 	}

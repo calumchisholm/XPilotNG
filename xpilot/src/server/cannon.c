@@ -506,7 +506,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
 	}
 	if (rfrac() < 0.5f) {	/* place mine in front of cannon */
-	    Place_general_mine(-1, c->team, FROMCANNON, cx, cy,
+	    Place_general_mine(NULL, c->team, FROMCANNON, cx, cy,
 			       0, 0, mods);
 	    sound_play_sensors(cx, cy, DROP_MINE_SOUND);
 	    played = true;
@@ -516,7 +516,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 		mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
 	    }
 	    speed = (int)(speed * 0.5 + 0.1 * cannonSmartness);
-	    Place_general_mine(-1, c->team, GRAVITY|FROMCANNON, cx, cy,
+	    Place_general_mine(NULL, c->team, GRAVITY|FROMCANNON, cx, cy,
 			       tcos(dir) * speed, tsin(dir) * speed, mods);
 	    sound_play_sensors(cx, cy, DROP_MOVING_MINE_SOUND);
 	    played = true;

@@ -746,15 +746,15 @@ int Handle_keyboard(int ind)
 		break;
 
 	    case KEY_DROP_MINE:
-		Place_mine(ind);
+		Place_mine(pl);
 		break;
 
 	    case KEY_DETACH_MINE:
-		Place_moving_mine(ind);
+		Place_moving_mine(pl);
 		break;
 
 	    case KEY_DETONATE_MINES:
-		Detonate_mines(ind);
+		Detonate_mines(pl);
 		break;
 
 	    case KEY_TURN_LEFT:

@@ -196,11 +196,11 @@ int Choose_random_item(void);
 void Tractor_beam(int ind);
 void General_tractor_beam(int ind, int cx, int cy,
 			  int items, int target, bool pressor);
-void Place_mine(int ind);
-void Place_moving_mine(int ind);
-void Place_general_mine(int ind, unsigned short team, long status,
+void Place_mine(player *pl);
+void Place_moving_mine(player *pl);
+void Place_general_mine(player *pl, unsigned short team, long status,
 			int cx, int cy, DFLOAT vx, DFLOAT vy, modifiers mods);
-void Detonate_mines(int ind);
+void Detonate_mines(player *pl);
 char *Describe_shot(int type, long status, modifiers mods, int hit);
 void Fire_ecm(int ind);
 void Fire_general_ecm(int ind, unsigned short team, int cx, int cy);
