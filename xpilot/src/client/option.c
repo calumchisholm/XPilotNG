@@ -1209,6 +1209,9 @@ void Parse_options(int *argcp, char **argvp)
     if (xpArgs.version)
 	Version();
 
+#ifdef SOUND
+    audioInit(connectParam.disp_name);
+#endif /* SOUND */
 }
 
 
@@ -1221,6 +1224,7 @@ const char *Get_keyHelpString(keys_t key)
 
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
+
 	if (opt->key == key) {
 	    strlcpy(buf, opt->help, sizeof buf);
 	    if ((nl = strchr(buf, '\n')) != NULL)
@@ -1239,6 +1243,7 @@ const char *Get_keyResourceString(keys_t key)
 
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
+
 	if (opt->key == key)
 	    return opt->name;
     }
@@ -1268,93 +1273,3 @@ void Xpilotrc_get_filename(char *path, size_t size)
     strlcpy(path, "xpilotrc.txt", size);
 }
 #endif /* _WINDOWS */
-
-
-
-
-
-#if 0
-
-static int Get_string_resource(XrmDatabase db,
-			       const char *resource, char *result,
-			       unsigned size)
-{
-    char		*src, *dst;
-    int			ind, val;
-
-    val = Find_resource(db, resource, result, size, &ind);
-    src = dst = result;
-    while ((*src & 0x7f) == *src && !isgraph(*src) && *src != '\0')
-	src++;
-
-    while ((*src & 0x7f) != *src || isgraph(*src))
-	*dst++ = *src++;
-
-    *dst = '\0';
-
-    return val;
-}
-
-
-void Parse_options(int *argcp, char **argvp)
-{
-    char		*ptr, *str;
-    int			i, j;
-    int			num;
-    int			firstKeyDef;
-    keys_t		key;
-    KeySym		ks;
-
-    char		resValue[MAX(2*MSG_LEN, PATH_MAX + 1)];
-
-#ifndef _WINDOWS
-
-    if (Get_string_resource(argDB, "display", connectParam.disp_name, MAX_DISP_LEN) == 0
-	|| connectParam.disp_name[0] == '\0') {
-	if ((ptr = getenv(DISPLAY_ENV)) != NULL)
-	    strlcpy(connectParam.disp_name, ptr, MAX_DISP_LEN);
-	else
-	    strlcpy(connectParam.disp_name, DISPLAY_DEF, MAX_DISP_LEN);
-    }
-    if ((dpy = XOpenDisplay(connectParam.disp_name)) == NULL) {
-	error("Can't open display '%s'", connectParam.disp_name);
-	if (strcmp(connectParam.disp_name, "NO_X") == 0) {
-	    /* user does not want X stuff.  experimental.  use at own risk. */
-	    if (*connectParam.user_name)
-		strlcpy(connectParam.nick_name, connectParam.user_name, MAX_NAME_LEN);
-	    else
-		strlcpy(connectParam.nick_name, "X", MAX_NAME_LEN);
-	    connectParam.team = TEAM_NOT_SET;
-	    Get_int_resource(argDB, "port", &connectParam.contact_port);
-	    Get_bool_resource(argDB, "list", &xpArgs.list_servers);
-	    xpArgs.text = true;
-	    xpArgs.auto_connect = false;
-	    XrmDestroyDatabase(argDB);
-	    free(xopt);
-	    return;
-	}
-	exit(1);
-    }
-
-    Get_string_resource(rDB, "geometry", resValue, sizeof resValue);
-    geometry = xp_strdup(resValue);
-#endif
-
-    Get_resource(rDB, "texturePath", resValue, sizeof resValue);
-    texturePath = xp_strdup(resValue);
-
-    Get_int_resource(rDB, "maxFPS", &maxFPS);
-    oldMaxFPS = maxFPS;
-
-    /* Key bindings - removed */
-    /* Pointer button bindings - removed */
-
-
-#ifdef SOUND
-    audioInit(connectParam.disp_name);
-#endif /* SOUND */
-}
-
-
-#endif
-
