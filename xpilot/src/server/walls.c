@@ -2915,26 +2915,29 @@ void Turn_player(player_t *pl, bool push)
 	    if (!push)
 		break;
 
+	    length = 0;
+	    l = 0.0;
+
     	    p = Ship_get_point_clpos((shipshape_t *)pl->ship, ans.point, pl->dir);
     	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship, (ans.point + 1)%(((shape_t *)pl->ship)->num_points), pl->dir);
-
-	    length = 0;
 
 	    if (ans.line != -1) {
 		length = Wrap_length(linet[ans.line].delta.cx,
 				     linet[ans.line].delta.cy);
-    	    	if (length != 0) {
-    	    	    x = linet[ans.line].delta.cx;
-    	    	    y = linet[ans.line].delta.cy;
-		} else {
-		    break;
-		}
+    	    	x = linet[ans.line].delta.cx;
+    	    	y = linet[ans.line].delta.cy;
 	    } else {
     	    	x = p2.cx - p.cx;
     	    	y = p2.cy - p.cy;
 	    }
 	    
     	    l = sqrt(x*x + y*y);
+	    
+	    if (l==0.0) {
+	    	warn("A zero length line somehow prevented turning!");
+		break;
+	    }
+	    
     	    cl = x / l;
     	    sl = y / l;
 
