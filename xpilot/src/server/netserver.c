@@ -1281,11 +1281,12 @@ static void UglyHack(char *string)
     }
 }
 
-static void LegalizeName(char *string)
+static void LegalizeName(char *string, bool hack)
 {
     char *s = string;
 
-    UglyHack(s);
+    if (hack)
+	UglyHack(s);
 
     while (*s != '\0') {
 	char ch = *s;
@@ -1399,8 +1400,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     strlcpy(pl->username, connp->real, MAX_CHARS);
     strlcpy(pl->hostname, connp->host, MAX_CHARS);
     /* kps - what about auth_nick ? */
-    LegalizeName(pl->name);
-    LegalizeName(pl->username);
+    LegalizeName(pl->name, true);
+    LegalizeName(pl->username, false);
     LegalizeHost(pl->hostname);
     pl->isowner = (!strcmp(pl->username, Server.owner) &&
 		   !strcmp(connp->addr, "127.0.0.1"));
