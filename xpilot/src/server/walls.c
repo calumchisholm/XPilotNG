@@ -210,19 +210,9 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     assert(obj->id >= 0);
     kp = Player_by_id(obj->id);
 
-    /*
-     * kps - currently targets are always, even when teamImmunity is off,
-     * immune to own team's objects.
-     */
-#if 0 /* kps - I don't think this code is needed. */
-    /*
-     * In 4.5.4, if the target has no team, it's team is 0 (not TEAM_NOT_SET)
-     * as expected, so this equality targ->team == obj->team will not hold
-     * when teamplay is off.
-     */
+    /* Targets are always team immune. */
     if (targ->team != TEAM_NOT_SET && targ->team == obj->team)
 	return;
-#endif
 
     switch(obj->type) {
     case OBJ_SHOT:

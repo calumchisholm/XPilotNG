@@ -428,7 +428,8 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 
     /* kps - fix this */
 
-    return true;
+    /* allow grabbing of ball */
+    return false;
 }
 
 
@@ -522,10 +523,19 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
  */
 int Target_hitmask(target_t *targ)
 {
+    /* target is destroyed - nothing hits */
     if (targ->dead_time > 0)
 	return ALL_BITS;
+
+    /* everything hits targets that don't belong to a team */
+    if (targ->team == TEAM_NOT_SET)
+	return 0;
+
+    /* if targetTeamCollision is true, everything hits a target */
     if (targetTeamCollision)
 	return 0;
+
+    /* note that targets are always team immune */
     return HITMASK(targ->team);
 }
 
