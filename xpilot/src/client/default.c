@@ -1350,6 +1350,76 @@ option options[] = {
 	"Which color number to use for drawing background points.\n"
     },
     {
+	"team0Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 0 objects.\n"
+    },
+    {
+	"team1Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 1 objects.\n"
+    },
+    {
+	"team2Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 2 objects.\n"
+    },
+    {
+	"team3Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 3 objects.\n"
+    },
+    {
+	"team4Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 4 objects.\n"
+    },
+    {
+	"team5Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 5 objects.\n"
+    },
+    {
+	"team6Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 6 objects.\n"
+    },
+    {
+	"team7Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 7 objects.\n"
+    },
+    {
+	"team8Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 8 objects.\n"
+    },
+    {
+	"team9Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 9 objects.\n"
+    },
+    {
 	"showDecor",
 	NULL,
 	"Yes",
@@ -3170,6 +3240,16 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "targetRadarColor", &targetRadarColor);
     Get_int_resource(rDB, "messagesColor", &messagesColor);
     Get_int_resource(rDB, "oldMessagesColor", &oldMessagesColor);
+    Get_int_resource(rDB, "team0Color", &team0Color);
+    Get_int_resource(rDB, "team1Color", &team1Color);
+    Get_int_resource(rDB, "team2Color", &team2Color);
+    Get_int_resource(rDB, "team3Color", &team3Color);
+    Get_int_resource(rDB, "team4Color", &team4Color);
+    Get_int_resource(rDB, "team5Color", &team5Color);
+    Get_int_resource(rDB, "team6Color", &team6Color);
+    Get_int_resource(rDB, "team7Color", &team7Color);
+    Get_int_resource(rDB, "team8Color", &team8Color);
+    Get_int_resource(rDB, "team9Color", &team9Color);
     Get_resource(rDB, "sparkColors", sparkColors, MSG_LEN);
 
     instruments = 0;

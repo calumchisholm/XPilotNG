@@ -1,5 +1,4 @@
-/* 
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -183,6 +182,16 @@ extern int	hudLockColor;		/* Color index for lock on HUD drawing */
 extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 extern int	dirPtrColor;		/* Color index for dirptr-hack drawing */
 extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
+extern int	team0Color;		/* Preferred color index for team 0 */
+extern int	team1Color;		/* Preferred color index for team 1 */
+extern int	team2Color;		/* Preferred color index for team 2 */
+extern int	team3Color;		/* Preferred color index for team 3 */
+extern int	team4Color;		/* Preferred color index for team 4 */
+extern int	team5Color;		/* Preferred color index for team 5 */
+extern int	team6Color;		/* Preferred color index for team 6 */
+extern int	team7Color;		/* Preferred color index for team 7 */
+extern int	team8Color;		/* Preferred color index for team 8 */
+extern int	team9Color;		/* Preferred color index for team 9 */
 extern int	msgScanBallColor;	/* Color index for ball msg */
 extern int	msgScanSafeColor;	/* Color index for safe msg */
 extern int	msgScanCoverColor;	/* Color index for cover msg */
@@ -349,7 +358,7 @@ void Paint_client_fps(void);
 void Paint_frame(void);
 int Handle_time_left(long sec);
 void Game_over_action(u_byte stat);
-
+int Team_color(int);
 /*
  * Prototype from blockbitmaps.c
  */

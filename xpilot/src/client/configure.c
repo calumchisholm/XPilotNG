@@ -189,6 +189,16 @@ static int Config_create_wallColor(int widget_desc, int *height);
 static int Config_create_fuelColor(int widget_desc, int *height);
 static int Config_create_decorColor(int widget_desc, int *height);
 static int Config_create_backgroundPointColor(int widget_desc, int *height);
+static int Config_create_team0Color(int widget_desc, int *height);
+static int Config_create_team1Color(int widget_desc, int *height);
+static int Config_create_team2Color(int widget_desc, int *height);
+static int Config_create_team3Color(int widget_desc, int *height);
+static int Config_create_team4Color(int widget_desc, int *height);
+static int Config_create_team5Color(int widget_desc, int *height);
+static int Config_create_team6Color(int widget_desc, int *height);
+static int Config_create_team7Color(int widget_desc, int *height);
+static int Config_create_team8Color(int widget_desc, int *height);
+static int Config_create_team9Color(int widget_desc, int *height);
 static int Config_create_showDecor(int widget_desc, int *height);
 static int Config_create_outlineDecor(int widget_desc, int *height);
 static int Config_create_filledDecor(int widget_desc, int *height);
@@ -392,6 +402,16 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_fuelColor,
     Config_create_decorColor,
     Config_create_backgroundPointColor,
+    Config_create_team0Color,
+    Config_create_team1Color,
+    Config_create_team2Color,
+    Config_create_team3Color,
+    Config_create_team4Color,
+    Config_create_team5Color,
+    Config_create_team6Color,
+    Config_create_team7Color,
+    Config_create_team8Color,
+    Config_create_team9Color,
     Config_create_save			/* must be last */
 };
 
@@ -1360,6 +1380,47 @@ static int Config_create_backgroundPointColor(int widget_desc, int *height)
     return CONFIG_CREATE_COLOR(backgroundPointColor);
 }
 
+static int Config_create_team0Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team0Color);
+}
+static int Config_create_team1Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team1Color);
+}
+static int Config_create_team2Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team2Color);
+}
+static int Config_create_team3Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team3Color);
+}
+static int Config_create_team4Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team4Color);
+}
+static int Config_create_team5Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team5Color);
+}
+static int Config_create_team6Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team6Color);
+}
+static int Config_create_team7Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team7Color);
+}
+static int Config_create_team8Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team8Color);
+}
+static int Config_create_team9Color(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(team9Color);
+}
+
 static int Config_create_showDecor(int widget_desc, int *height)
 {
     /* kps - remove */
@@ -2053,6 +2114,16 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "fuelColor", fuelColor);
     Config_save_int(fp, "decorColor", decorColor);
     Config_save_int(fp, "backgroundPointColor", backgroundPointColor);
+    Config_save_int(fp, "team0Color", team0Color);
+    Config_save_int(fp, "team1Color", team1Color);
+    Config_save_int(fp, "team2Color", team2Color);
+    Config_save_int(fp, "team3Color", team3Color);
+    Config_save_int(fp, "team4Color", team4Color);
+    Config_save_int(fp, "team5Color", team5Color);
+    Config_save_int(fp, "team6Color", team6Color);
+    Config_save_int(fp, "team7Color", team7Color);
+    Config_save_int(fp, "team8Color", team8Color);
+    Config_save_int(fp, "team9Color", team9Color);
 
     Config_save_comment(fp,
 			";\n"

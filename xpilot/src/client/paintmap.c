@@ -519,15 +519,15 @@ void Paint_world(void)
 		case SETUP_TARGET+8:
 		case SETUP_TARGET+9:
 		    {
-			int damage, target, own;
+			int damage, team, own;
 
 			if (Target_alive(xi, yi, &damage) != 0)
 			    break;
 
-			target = type - SETUP_TARGET;
-			own = (eyeTeam == target);
+			team = type - SETUP_TARGET;
+			own = (eyeTeam == team);
 
-			Gui_paint_setup_target(x, y, target, damage, own);
+			Gui_paint_setup_target(x, y, team, damage, own);
 
 		    }
 		    break;
@@ -543,13 +543,13 @@ void Paint_world(void)
 		case SETUP_TREASURE+8:
 		case SETUP_TREASURE+9:
 		    {
-			int	treasure;
+			int	team;
 			bool	own;
 
-			treasure = type - SETUP_TREASURE;
-			own = (eyeTeam == treasure);
+			team = type - SETUP_TREASURE;
+			own = (eyeTeam == team);
 
-			Gui_paint_setup_treasure(x, y, treasure, own);
+			Gui_paint_setup_treasure(x, y, team, own);
 		    }
 		    break;
 

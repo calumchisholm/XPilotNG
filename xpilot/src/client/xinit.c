@@ -521,6 +521,16 @@ int Init_top(void)
     COLORCHECK(wallColor, 2);
     COLORCHECK(fuelColor, 3);
     COLORCHECK(backgroundPointColor, 2);
+    COLORCHECK(team0Color, 0);
+    COLORCHECK(team1Color, 1);
+    COLORCHECK(team2Color, 2);
+    COLORCHECK(team3Color, 3);
+    COLORCHECK(team4Color, 4);
+    COLORCHECK(team5Color, 5);
+    COLORCHECK(team6Color, 6);
+    COLORCHECK(team7Color, 7);
+    COLORCHECK(team8Color, 8);
+    COLORCHECK(team9Color, 9);
 
     if (maxColors > 4) {
 	COLORCHECK(msgScanSafeColor, 4);

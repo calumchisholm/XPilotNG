@@ -90,6 +90,16 @@ int ballColor;
 int connColor;
 int teamShotColor;
 int shipShapesHackColor;
+int team0Color;
+int team1Color;
+int team2Color;
+int team3Color;
+int team4Color;
+int team5Color;
+int team6Color;
+int team7Color;
+int team8Color;
+int team9Color;
 
 void Gui_paint_ball(int x, int y)
 {
@@ -639,22 +649,30 @@ static int Gui_is_my_tank(other_t *other)
     return 1;
 }
 
+/*
+ * Assume MAX_TEAMS is 10
+ */
+int Team_color(int team)
+{
+    switch (team) {
+    case 0:	return team0Color;
+    case 1:	return team1Color;
+    case 2:	return team2Color;
+    case 3:	return team3Color;
+    case 4:	return team4Color;
+    case 5:	return team5Color;
+    case 6:	return team6Color;
+    case 7:	return team7Color;
+    case 8:	return team8Color;
+    case 9:	return team9Color;
+    default:    break;
+    }
+    return 0;
+}
 
 static int Gui_calculate_ship_color(int id, other_t *other)
 {
     int ship_color = WHITE;
-
-#if 0 /* Mara - let's not! it's ugly */
-    if (useErase){
-	/*
-	 * Outline the locked ship in a different color,
-	 * instead of mucking around with polygons.
-	 */
-	if (lock_id == id  && id != -1 && lock_dist != 0) {
-	    ship_color = RED;
-	}
-    }
-#endif
 
 #ifndef NO_BLUE_TEAM
     if (BIT(Setup->mode, TEAM_PLAY)
@@ -688,6 +706,13 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 #endif
     if (roundDelay > 0 && ship_color == WHITE) {
 	ship_color = RED;
+    }
+
+    /* Check for team color */
+    if (other && BIT(Setup->mode, TEAM_PLAY)) {
+	int team_color = Team_color(other->team);
+	if (team_color)
+	    return team_color;
     }
 
     /* Vato color hack start, edited by mara & kps */

@@ -185,8 +185,7 @@ void Gui_paint_cannon(int x, int y, int type)
 	    points[2].y = WINSCALE(Y(y+BLOCK_SZ/2));
 	    break;
 	default:
-	    errno = 0;
-	    error("Unknown cannon type %d", type);
+	    warn("Unknown cannon type %d", type);
 	    return;
 	}
 	points[3] = points[0];
@@ -212,8 +211,7 @@ void Gui_paint_cannon(int x, int y, int type)
 			 WINSCALE(Y(y + BLOCK_SZ)), 0);
 	    break;
 	default:
-	    errno = 0;
-	    error("Bad base dir.");
+	    warn("Unknown cannon type %d", type);
 	    return;
 	}
     }
@@ -1110,13 +1108,20 @@ void Gui_paint_decor_dot(int x, int y, int size)
 }
 
 
-void Gui_paint_setup_target(int x, int y, int target, int damage, bool own)
+void Gui_paint_setup_target(int x, int y, int team, int damage, bool own)
 {
     int	    size, a1, a2, b1, b2, color;
     char    s[2];
 
     color = own ? BLUE : RED;
-	
+
+    if (BIT(Setup->mode, TEAM_PLAY)) {
+	int team_color = Team_color(team);
+
+	if (team_color)
+	    color = team_color;
+    }
+
     SET_FG(colors[color].pixel);
 
     a1 = X(x);
@@ -1138,7 +1143,7 @@ void Gui_paint_setup_target(int x, int y, int target, int damage, bool own)
 		 WINSCALE(BLOCK_SZ/2), WINSCALE(BLOCK_SZ/2));
 
     if (BIT(Setup->mode, TEAM_PLAY)) {
-	s[0] = '0' + target; s[1] = '\0';
+	s[0] = '0' + team; s[1] = '\0';
 	size = XTextWidth(gameFont, s, 1);
 	rd.drawString(dpy, p_draw, gc,
 		      WINSCALE(X(x + BLOCK_SZ/2)) - size/2,
@@ -1171,13 +1176,20 @@ void Gui_paint_setup_target(int x, int y, int target, int damage, bool own)
 }
 
 
-void Gui_paint_setup_treasure(int x, int y, int treasure, bool own)
+void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 {
+    int	    color = own ? BLUE : RED;
+
+    if (BIT(Setup->mode, TEAM_PLAY)) {
+	int team_color = Team_color(team);
+
+	if (team_color)
+	    color = team_color;
+    }
+
     if (!texturedObjects) {
 	char    s[2];
-	int	    color;
-	int	    size;
-	color = own ? BLUE : RED;
+	int	size;
 
 	SET_FG(colors[color].pixel);
 	Segment_add(color,
@@ -1195,7 +1207,7 @@ void Gui_paint_setup_treasure(int x, int y, int treasure, bool own)
 		Y(y + BLOCK_SZ),
 		BLOCK_SZ, BLOCK_SZ, 0, 64*180);
 	if (BIT(Setup->mode, TEAM_PLAY)) {
-	    s[1] = '\0'; s[0] = '0' + treasure;
+	    s[1] = '\0'; s[0] = '0' + team;
 	    size = XTextWidth(gameFont, s, 1);
 	    rd.drawString(dpy, p_draw, gc,
 			  WINSCALE(X(x + BLOCK_SZ/2)) - size/2,
@@ -1209,7 +1221,7 @@ void Gui_paint_setup_treasure(int x, int y, int treasure, bool own)
     }
     else {
 	char s[2];
-	int size, type, color;
+	int size, type;
 
 	type = own ? BM_HOLDER_FRIEND : BM_HOLDER_ENEMY;
 
@@ -1217,10 +1229,9 @@ void Gui_paint_setup_treasure(int x, int y, int treasure, bool own)
 		     WINSCALE(Y(y + BLOCK_SZ)), 0);
 
 	if (BIT(Setup->mode, TEAM_PLAY)) {
-	    color = own ? BLUE : RED;
             SET_FG(colors[color].pixel);
 
-	    s[1] = '\0'; s[0] = '0' + treasure;
+	    s[1] = '\0'; s[0] = '0' + team;
 	    size = XTextWidth(gameFont, s, 1);
 	    rd.drawString(dpy, p_draw, gc,
 			  WINSCALE(X(x + BLOCK_SZ/2)) - size/2,
