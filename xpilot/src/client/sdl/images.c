@@ -179,7 +179,7 @@ int Images_init(void)
 
     DEF_IMG("holder1.ppm", 1);
     DEF_IMG("holder2.ppm", 1);
-    DEF_IMG("ball.ppm", 1);
+    DEF_IMG("ball_gray.ppm", 1);
     DEF_IMG("ship_red.ppm", 128); 
     DEF_IMG("ship_blue.ppm", 128);
     DEF_IMG("ship_red2.ppm", 128);

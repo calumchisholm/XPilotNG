@@ -47,6 +47,7 @@ int msgScanBallColorRGBA;
 int msgScanSafeColorRGBA;
 int msgScanCoverColorRGBA;
 int msgScanPopColorRGBA;
+int ballColorRGBA;
 
 int meterBorderColorRGBA;
 int fuelMeterColorRGBA;
@@ -104,7 +105,7 @@ int hudRadarDotSize = 6;
 int baseWarningType = 1;
 
 static double shipLineWidth;
-
+static bool smoothLines;
 static GLuint polyListBase = 0;
 static GLuint polyEdgeListBase = 0;
 
@@ -656,12 +657,17 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 
     set_alphacolor((e_style.rgb << 8) | 0xff);
     glLineWidth(e_style.width * scale);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_LINE_SMOOTH);/* this is about half the cost of drawing objects...*/
+    if (smoothLines) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	/* this is about half the cost of drawing objects...*/
+	glEnable(GL_LINE_SMOOTH);
+    }
     glCallList(polyEdgeListBase + i);
-    glDisable(GL_LINE_SMOOTH);
-    /*glDisable(GL_BLEND);*/
+    if (smoothLines) {
+	glDisable(GL_LINE_SMOOTH);
+	glDisable(GL_BLEND);
+    }
     glLineWidth(1);
     glPopMatrix();
 }
@@ -684,7 +690,7 @@ void Gui_paint_item_object(int type, int x, int y)
 
 void Gui_paint_ball(int x, int y)
 {
-    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0, whiteRGBA);
+    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0, ballColorRGBA);
 }
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
@@ -744,12 +750,10 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
  */
 void Gui_paint_fastshot(int color, int x, int y)
 {
-    /* not sure why i need that 7 to make it right */
-    /* that 2 seems to be the size/2 of the bullet */
     Image_paint(IMG_BULLET,
-		x + world.x - 3,
+		x + world.x - shot_size/2,
 		world.y - 6 + ext_view_height - y,
-		5, whiteRGBA);
+		shot_size - 1, whiteRGBA);
 }
 
 void Gui_paint_teamshot(int x, int y)
@@ -757,7 +761,7 @@ void Gui_paint_teamshot(int x, int y)
     Image_paint(IMG_BULLET_OWN,
 		x + world.x - 3,
 		world.y - 6 + ext_view_height - y,
-		5, whiteRGBA);
+		shot_size - 1, whiteRGBA);
 }
 
 void Gui_paint_missiles_begin(void)
@@ -2109,6 +2113,7 @@ static xp_option_t sdlgui_options[] = {
     COLOR(msgScanSafeColorRGBA, "#00ff0088", "ball safe announcement"),
     COLOR(msgScanCoverColorRGBA, "#4e7cff88", "cover request"),
     COLOR(msgScanPopColorRGBA, "#ffbb1188", "ball pop announcement"),
+    COLOR(ballColorRGBA, "#00ff00ff", "balls"),
     COLOR(meterBorderColorRGBA, "#0000ff55", "meter borders"),
     COLOR(fuelMeterColorRGBA, "#ff000055", "fuel meter"),
     COLOR(powerMeterColorRGBA, "#ff000055", "power meter"),
@@ -2176,6 +2181,13 @@ static xp_option_t sdlgui_options[] = {
 	XP_OPTFLAG_DEFAULT,
 	"Set the line width of ships.\n"),
 
+    XP_BOOL_OPTION(
+        "smoothLines",
+        true,
+	&smoothLines,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Use antialized smooth lines.\n")
 };
 
 void Store_sdlgui_options(void)
