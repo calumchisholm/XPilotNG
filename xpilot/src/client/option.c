@@ -916,7 +916,17 @@ void Parse_options(int *argcp, char **argvp)
 	if (argvp[arg_ind][0] == '-') {
 	    char *arg = &argvp[arg_ind][1];
 
-	    /* Add GNU style option support e.g. --wallcolor=1 ??? */
+	    /*
+	     * kps -
+	     * Incomplete GNU style option support, this only works for
+	     * options with no argument, e.g. --version
+	     * A complete implementation should also support option given
+	     * like this:
+	     * --option=value
+	     */
+	    if (arg[0] == '-')
+		arg++;
+
 	    if (is_noarg_option(arg)) {
 		Set_option(arg, "true", xp_option_origin_cmdline);
 		num_remaining_args--;
