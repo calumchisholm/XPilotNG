@@ -146,6 +146,10 @@ SOURCE=..\gfx2d.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\glwidgets.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\images.c
 # End Source File
 # Begin Source File
@@ -279,10 +283,6 @@ SOURCE=.\todo.c
 # Begin Source File
 
 SOURCE=..\usleep.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\widget_wrappers.c
 # End Source File
 # Begin Source File
 
@@ -459,10 +459,6 @@ SOURCE=..\..\common\types.h
 # Begin Source File
 
 SOURCE=..\..\common\version.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\widget_wrappers.h
 # End Source File
 # Begin Source File
 
