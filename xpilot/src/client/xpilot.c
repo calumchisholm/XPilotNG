@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
 
 #ifdef OPTIONHACK
     Store_default_options();
+    Store_x_options();
 #endif
 
     /*

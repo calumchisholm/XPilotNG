@@ -153,6 +153,9 @@ static void Set_bool_option(xp_option_t *opt, bool value)
 	opt->bool_setfunc(opt, value);
     else
 	*opt->bool_ptr = value;
+
+    printf("Value of option %s is now %s\n", opt->name,
+	   *opt->bool_ptr ? "true" : "false");
 }
 
 static void Set_int_option(xp_option_t *opt, int value)
@@ -165,6 +168,8 @@ static void Set_int_option(xp_option_t *opt, int value)
 	opt->int_setfunc(opt, value);
     else
 	*opt->int_ptr = value;
+
+    printf("Value of option %s is now %d\n", opt->name, *opt->int_ptr);
 }
 
 static void Set_double_option(xp_option_t *opt, double value)
@@ -177,6 +182,21 @@ static void Set_double_option(xp_option_t *opt, double value)
 	opt->dbl_setfunc(opt, value);
     else
 	*opt->dbl_ptr = value;
+
+    printf("Value of option %s is now %f\n", opt->name, *opt->dbl_ptr);
+}
+
+static void Set_string_option(xp_option_t *opt, const char *value)
+{
+    assert(opt);
+    assert(opt->type == xp_double_option);
+    
+    if (opt->str_setfunc)
+	opt->str_setfunc(opt, value);
+    else
+	strlcpy(opt->str_ptr, value, opt->str_size);
+
+    printf("Value of option %s is now \"%s\"\n", opt->name, *opt->str_ptr);
 }
 
 /*
@@ -361,17 +381,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     char path[PATH_MAX + 1];
     char buf[BUFSIZ];
     FILE *fp;
-
-#if 0
-    /* kps - do before Parse_options */
-    {
-	int i;
-
-	for (i = 0; i < NELEM(default_options); i++)
-	    Store_option_struct(&default_options[i]);
-    }
-#endif
-
 
     /*
      * Create data structure holding all options we know of and their values.

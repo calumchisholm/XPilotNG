@@ -60,6 +60,11 @@ extern bool		ignoreWindowManager;
 extern bool		quitting;
 
 /*
+ * xdefault.c
+ */
+extern void Store_x_options(void);
+
+/*
  * Prototypes for xinit.c
  */
 extern const char* Item_get_text(int i);
