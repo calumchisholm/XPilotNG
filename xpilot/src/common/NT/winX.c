@@ -29,6 +29,8 @@
 *																			*
 *  						*
 \***************************************************************************/
+#include "../../client/xpclient_x11.h"
+/*
 #include "winX.h"
 #include "windows.h"
 #include "../../client/NT/winClient.h"
@@ -43,15 +45,14 @@
 #include "../../client/paint.h"
 #include "../../client/xinit.h"
 #include "../../client/widget.h"
-#include "../../client/protoclient.h"
-
+*/
 int iScaleFactor;
 
 // Radar window is updated every RadarDivisor frames.
 int RadarDivisor;
 int ThreadedDraw;
 
-extern Window draw;		// we only want this one
+extern Window drawWindow;		// we only want this one
 
 Window rootWindow = 0;		// The whole screen
 
@@ -73,17 +74,11 @@ BOOL drawPending = FALSE;	// try to throttle the deadly frame backup syndrome
 HPEN pens[WINMAXCOLORS][MAX_LINE_WIDTH][3];
 HBRUSH brushes[WINMAXCOLORS];
 
-// We need to parse and setup the colors during Windows screen init which happens
-// before XPilot window init.
-extern COLORREF GetXPilotColor(int which, COLORREF defcolor);
-extern int GetMaxColors();
-/*extern	int		 GetScoreFontHeight();*/
-
 void WinXExit();
 
 static void WinXSetupRadarWindow()
 {
-    if (radar) {
+    if (radarWindow) {
 	/*      if (instruments & SHOW_SLIDING_RADAR)
 	   {
 	   if (xid[radar].hwnd.hSaveDC != NULL)
@@ -95,10 +90,10 @@ static void WinXSetupRadarWindow()
 	   }
 	   else */
 	{
-	    if (xid[radar].hwnd.hSaveDC == NULL) {
-		HDC hNewDC = GetDC(xid[radar].hwnd.hWnd);
-		xid[radar].hwnd.hSaveDC = xid[radar].hwnd.hBmpDC;
-		xid[radar].hwnd.hBmpDC = hNewDC;
+	    if (xid[radarWindow].hwnd.hSaveDC == NULL) {
+		HDC hNewDC = GetDC(xid[radarWindow].hwnd.hWnd);
+		xid[radarWindow].hwnd.hSaveDC = xid[radarWindow].hwnd.hBmpDC;
+		xid[radarWindow].hwnd.hBmpDC = hNewDC;
 		SelectPalette(hNewDC, myPal, FALSE);
 		RealizePalette(hNewDC);
 	    }
@@ -146,7 +141,7 @@ static void WinXCreateBitmapForXid(HWND hwnd, XID xidno, int cx, int cy)
     RECT r;
 
     WinXDeleteDraw(xidno);
-    if (ThreadedDraw && xidno == draw) {
+    if (ThreadedDraw && xidno == drawWindow) {
 	xid[xidno].hwnd.hBmpa[1] = CreateCompatibleBitmap(hDC, cx, cy);
 	xid[xidno].hwnd.hBmpa[0] = CreateCompatibleBitmap(hDC, cx, cy);
 	hBmp = xid[xidno].hwnd.hBmp = xid[xidno].hwnd.hBmpa[0];
@@ -263,7 +258,7 @@ LRESULT CALLBACK WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
-		MapWindowPoints(xid[xidno].hwnd.hWnd, xid[top].hwnd.hWnd,
+		MapWindowPoints(xid[xidno].hwnd.hWnd, xid[topWindow].hwnd.hWnd,
 				&pt, 1);
 		button->type = ButtonPress;
 		button->window = xidno;
@@ -308,7 +303,7 @@ LRESULT CALLBACK WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
-		MapWindowPoints(xid[xidno].hwnd.hWnd, xid[top].hwnd.hWnd,
+		MapWindowPoints(xid[xidno].hwnd.hWnd, xid[topWindow].hwnd.hWnd,
 				&pt, 1);
 		button->type = ButtonPress;
 		button->window = xidno;
@@ -353,7 +348,7 @@ LRESULT CALLBACK WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
-		MapWindowPoints(xid[xidno].hwnd.hWnd, xid[top].hwnd.hWnd,
+		MapWindowPoints(xid[xidno].hwnd.hWnd, xid[topWindow].hwnd.hWnd,
 				&pt, 1);
 		button->type = ButtonPress;
 		button->window = xidno;
@@ -471,7 +466,7 @@ LRESULT CALLBACK WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 			XEvent event;
 			XExposeEvent *expose = (XExposeEvent *) & event;
 
-			if (ThreadedDraw && xidno == (int) draw) {
+			if (ThreadedDraw && xidno == (int) drawWindow) {
 			    ValidateRect(hwnd, &rect);
 			    winXTDraw(NULL, xidno, &rect);
 			} else {
@@ -494,7 +489,7 @@ LRESULT CALLBACK WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 			    SelectPalette(hDC, myPal, FALSE);
 			    RealizePalette(hDC);
 
-			    if (xidno == (int) draw) {
+			    if (xidno == (int) drawWindow) {
 				//      RECT r;
 				//      WinXUnscaled(hBmpDC);
 				if (ThreadedDraw) {
@@ -694,12 +689,12 @@ void WinXSelectBrush(int gc)
 // These are for SysInfo, we hide the details from him
 HDC WinXGetDrawDC()
 {
-    return (GetDC(xid[draw].hwnd.hWnd));
+    return (GetDC(xid[drawWindow].hwnd.hWnd));
 }
 
 int WinXReleaseDrawDC(HDC hDC)
 {
-    return (ReleaseDC(xid[draw].hwnd.hWnd, hDC));
+    return (ReleaseDC(xid[drawWindow].hwnd.hWnd, hDC));
 }
 
 ////////////////////////////////////////////////////////
@@ -899,17 +894,17 @@ void WinXResize(void)
     draw_width = WinXUnscale(draw_width);
     draw_height = WinXUnscale(draw_height);
 
-    if (radar && (instruments & SHOW_SLIDING_RADAR)) {
-	GetClientRect(xid[radar].hwnd.hWnd, &rect);
-	InvalidateRect(xid[radar].hwnd.hWnd, &rect, FALSE);
+    if (radarWindow && (instruments.showSlidingRadar)) {
+	GetClientRect(xid[radarWindow].hwnd.hWnd, &rect);
+	InvalidateRect(xid[radarWindow].hwnd.hWnd, &rect, FALSE);
     }
-    if (draw) {
-	GetClientRect(xid[draw].hwnd.hWnd, &rect);
-	InvalidateRect(xid[draw].hwnd.hWnd, &rect, FALSE);
+    if (drawWindow) {
+	GetClientRect(xid[drawWindow].hwnd.hWnd, &rect);
+	InvalidateRect(xid[drawWindow].hwnd.hWnd, &rect, FALSE);
     }
-    if (players) {
-	GetClientRect(xid[players].hwnd.hWnd, &rect);
-	InvalidateRect(xid[players].hwnd.hWnd, &rect, FALSE);
+    if (playersWindow) {
+	GetClientRect(xid[playersWindow].hwnd.hWnd, &rect);
+	InvalidateRect(xid[playersWindow].hwnd.hWnd, &rect, FALSE);
     }
 }
 
@@ -924,9 +919,9 @@ void PaintWinClient()
 
     // One time stuff for score window update
     if (updates == 0) {
-	GetClientRect(xid[players].hwnd.hWnd, &rect);
-	InvalidateRect(xid[players].hwnd.hWnd, &rect, FALSE);
-	UpdateWindow(xid[players].hwnd.hWnd);
+	GetClientRect(xid[playersWindow].hwnd.hWnd, &rect);
+	InvalidateRect(xid[playersWindow].hwnd.hWnd, &rect, FALSE);
+	UpdateWindow(xid[playersWindow].hwnd.hWnd);
     }
     updates += 1;
 //      SelectPalette(hDC, myPal, FALSE);
@@ -938,17 +933,17 @@ void PaintWinClient()
 
 //      Paint_frame();
 //      xid[draw].hwnd.hBmpDC = realDC;
-    GetClientRect(xid[draw].hwnd.hWnd, &rect);
+    GetClientRect(xid[drawWindow].hwnd.hWnd, &rect);
     if (ThreadedDraw) {
 //              FillRect(xid[draw].hwnd.hBmpDC, &rect, GetStockObject(WHITE_BRUSH));
-	winXTDraw(NULL, draw, &rect);
+	winXTDraw(NULL, drawWindow, &rect);
     } else {
-	HDC realDC = GetDC(xid[draw].hwnd.hWnd);
+	HDC realDC = GetDC(xid[drawWindow].hwnd.hWnd);
 	SelectPalette(realDC, myPal, FALSE);
 	RealizePalette(realDC);
 	BitBlt(realDC, 0, 0, rect.right, rect.bottom,
-	       xid[draw].hwnd.hBmpDC, 0, 0, SRCCOPY);
-	ReleaseDC(xid[draw].hwnd.hWnd, realDC);
+	       xid[drawWindow].hwnd.hBmpDC, 0, 0, SRCCOPY);
+	ReleaseDC(xid[drawWindow].hwnd.hWnd, realDC);
     }
 }
 
@@ -956,9 +951,9 @@ void MarkPlayersForRedraw()
 {
     RECT rect;
 
-    GetClientRect(xid[players].hwnd.hWnd, &rect);
-    InvalidateRect(xid[players].hwnd.hWnd, &rect, FALSE);
-    UpdateWindow(xid[players].hwnd.hWnd);
+    GetClientRect(xid[playersWindow].hwnd.hWnd, &rect);
+    InvalidateRect(xid[playersWindow].hwnd.hWnd, &rect, FALSE);
+    UpdateWindow(xid[playersWindow].hwnd.hWnd);
 }
 
 void paintItemSymbol(unsigned char type, Drawable d, GC gc, int x, int y,
@@ -1019,7 +1014,7 @@ void WinXFlush(Window w)
 
 void WinXExit()
 {
-    PostMessage(GetParent(xid[top].hwnd.hWnd), WM_CLOSE, 0, 0);
+    PostMessage(GetParent(xid[topWindow].hwnd.hWnd), WM_CLOSE, 0, 0);
 }
 
 void WinXSetEventMask(Window w, long mask)
@@ -1033,7 +1028,7 @@ Window WinXGetParent(Window w)
     XID txid;
     HWND hwnd = GetParent(xid[w].hwnd.hWnd);
     if (!hwnd)
-	return (top);
+	return (topWindow);
     for (i = 0; i < MAX_XIDS; i++) {
 	if (hwnd == xid[i].hwnd.hWnd)
 	    return (i);
@@ -1066,6 +1061,18 @@ BOOL WinXGetWindowRect(Window w, RECT * rect)
 BOOL WinXGetWindowPlacement(Window w, WINDOWPLACEMENT * wp)
 {
     return (GetWindowPlacement(xid[w].hwnd.hWnd, wp));
+}
+
+void WinXParseGeometry(const char* g, int *w, int *h)
+{
+	char *s = g;
+	*w = *h = -1;
+	if (g) {
+		if (g[0] == '=') s++;
+		sscanf(s, "%d%*c%d", w, h);
+	}
+	if (*w == -1) *w = 1024;
+	if (*h == -1) *h = 768;
 }
 
 XID GetFreeXid()

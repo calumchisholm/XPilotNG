@@ -330,9 +330,9 @@ static void Init_disp_prop(Display *d, Window win,
  */
 int Init_top(void)
 {
+    int					top_x, top_y;
 #ifndef _WINDOWS
     int					i;
-    int					top_x, top_y;
     int					x, y;
     unsigned				w, h;
     unsigned long			values;
@@ -443,15 +443,10 @@ int Init_top(void)
 		       top_x, top_y, top_flags);
     }
 #else	/* _WINDOWS */
-    /* MFC already gave us a nice top window...use it */
-    {
-	XRectangle	rect;
-	WinXGetWindowRectangle(0, &rect);
-	top_x = rect.x;
-	top_y = rect.y;
-	top_width = rect.width;
-	top_height = rect.height;
-    }
+	/* Bucko seems to use 0 as the topWindow index */
+	topWindow = 0;
+	top_x = top_y = 0;
+	WinXParseGeometry(geometry, &top_width, &top_height);
 #endif	/* _WINDOWS */
 
 #ifndef _WINDOWS
@@ -578,7 +573,7 @@ int Init_playing_windows(void)
     WinXSetEventMask(drawWindow, NoEventMask);
     radar_exposures = 1;
     radarGC = WinXCreateWinDC(radarWindow);
-    gc = WinXCreateWinDC(drawWindow);
+    gameGC = WinXCreateWinDC(drawWindow);
 
     textWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
 				     0, 0, 0, 0,
@@ -671,7 +666,7 @@ int Init_playing_windows(void)
 			      0, 0,
 			      colors[windowColor].pixel);
 #ifdef _WINDOWS
-    scoreListGC = WinXCreateWinDC(players);
+    scoreListGC = WinXCreateWinDC(playersWindow);
     scoreListFont
 	= Set_font(dpy, scoreListGC, scoreListFontName, "scoreListFont");
 #endif
@@ -765,6 +760,7 @@ int Init_playing_windows(void)
 void WinXCreateItemBitmaps(void)
 {
     int			i;
+	extern int hudColor;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	itemBitmaps[i][ITEM_HUD]

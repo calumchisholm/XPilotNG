@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+#include "../xpclient_x11.h"
+/*
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,6 +40,7 @@
 #include "winConfig.h"
 #include "winClient.h"
 #include "winXXPilot.h"
+  */
 #ifndef	lint
 static char sourceid[] = "@(#)";
 #endif
@@ -84,7 +87,7 @@ void Config_save_window_positions(void)
     Window w;
     RECT rect;
     char s[50];
-    w = WinXGetParent(top);
+    w = WinXGetParent(topWindow);
     WinXGetWindowRect(w, &rect);
     WinXGetWindowPlacement(w, &wp);
     if (wp.showCmd != SW_SHOWMINIMIZED) {

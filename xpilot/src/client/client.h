@@ -32,7 +32,7 @@
 #endif
 
 #ifndef	_WINX_H_
-#include "NT/winX.h"
+//#include "NT/winX.h"
 #endif
 #endif
 

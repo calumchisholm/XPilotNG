@@ -368,6 +368,7 @@ static void X_after(Display *display)
 }
 #endif /* DEVELOPMENT */
 
+#ifndef _WINDOWS
 void Handle_X_options(void)
 {
     char *ptr;
@@ -425,7 +426,7 @@ void Handle_X_options(void)
 #endif
 
 }
-
+#endif /* _WINDOWS */
 
 
 bool Set_scaleFactor(xp_option_t *opt, double val)
@@ -446,7 +447,7 @@ bool Set_altScaleFactor(xp_option_t *opt, double val)
     return true;
 }
 
-xp_keysym_t String_to_xp_keysym(const char *str)
+xp_keysym_t String_to_xp_keysym(char *str)
 {
     KeySym ks;
     xp_keysym_t xpks;

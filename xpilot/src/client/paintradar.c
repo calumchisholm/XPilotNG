@@ -64,7 +64,7 @@ static void Copy_static_radar(void)
     }
 #else
     WinXBltPixToWin(radarPixmap2, radarWindow, 0, 0, 256, RadarHeight, 0, 0);
-    radarPixmap = radar;
+    radarPixmap = radarWindow;
 #endif
     XSetForeground(dpy, radarGC, colors[WHITE].pixel);
 }
@@ -73,8 +73,8 @@ static void Copy_static_radar(void)
 #ifdef _WINDOWS
 static void Windows_copy_sliding_radar(double xf, double yf)
 {
-    slidingradar_x = (int)((pos.x * xf + 0.5) + 128) % 256;
-    slidingradar_y = (RadarHeight - (int)(pos.y * yf + 0.5)
+    slidingradar_x = (int)((selfPos.x * xf + 0.5) + 128) % 256;
+    slidingradar_y = (RadarHeight - (int)(selfPos.y * yf + 0.5)
 		      - 1 + RadarHeight/2) % RadarHeight;
 
     /*
@@ -97,7 +97,7 @@ static void Windows_copy_sliding_radar(double xf, double yf)
 		    0, 1,
 		    slidingradar_x, slidingradar_y,
 		    256-slidingradar_x, RadarHeight-slidingradar_y);
-    radarPixmap = radar;
+    radarPixmap = radarWindow;
 }
 #endif
 
@@ -705,7 +705,7 @@ void Paint_world_radar(void)
     else
 	Paint_world_radar_new();
 	
-    IFWINDOWS(xid[radarGC].hgc.xidhwnd = radar);
+    IFWINDOWS(xid[radarGC].hgc.xidhwnd = radarWindow);
 }
 
 void Radar_show_target(int x, int y)

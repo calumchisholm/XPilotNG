@@ -653,6 +653,13 @@ XFontStruct *XQueryFont(Display * dpy, XID font_ID)
 }
 
 /*****************************************************************************/
+XFreeFontInfo(char **names, XFontStruct *free_info, int count)
+{
+	return (0);
+}
+
+
+/*****************************************************************************/
 XSetFont(Display * dpy, GC gc, Font font)
 {
     if (xid[gc].type != XIDTYPE_HDC)

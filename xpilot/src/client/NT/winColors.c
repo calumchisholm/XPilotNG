@@ -21,12 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <windows.h>
-
-#include "winX_.h"
-#include "../const.h"
-#include "../error.h"
-#include "../client.h"
+#include "../xpclient.h"
 
 #define REDVAL(c) (((c) >> 16) & 0xff)
 #define GREENVAL(c) (((c) >> 8) & 0xff)
@@ -105,3 +100,4 @@ static int Colors_get_palette_index(int rgb)
 
     return i;
 }
+

@@ -155,7 +155,8 @@ static void Input_loop(void)
 }
 #endif	/* _WINDOWS */
 
-static void xpilotShutdown(void)
+/* MFC client needs this to be global */
+void xpilotShutdown(void)
 {
     Net_cleanup();
     Client_cleanup();

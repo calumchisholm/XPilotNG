@@ -227,6 +227,7 @@ static int RGetPixelIndex(unsigned long pixel)
     return WHITE;
 }
 
+#ifndef _WINDOWS
 static XImage *Image_from_pixmap(Pixmap pixmap)
 {
     XImage		*img;
@@ -251,6 +252,7 @@ static XImage *Image_from_pixmap(Pixmap pixmap)
     }
     return img;
 }
+#endif
 
 static void RWriteTile(Pixmap tile)
 {

@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     /*strcpy(clientname,connectParam.nick_name); */
 
     Config_init();
-    Handle_X_options();
+    IFNWINDOWS(Handle_X_options();)
     
     /* CLIENTRANK */
     Init_saved_scores();

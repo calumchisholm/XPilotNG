@@ -51,12 +51,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-extern "C" const char *s_WindowMet = "Window Metrics";
-extern "C" const char *s_L = "Left";
-extern "C" const char *s_T = "Top";
-extern "C" const char *s_R = "Right";
-extern "C" const char *s_B = "Bottom";
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotView
@@ -139,6 +133,8 @@ CString *CheckFileOpts(char *file, int *argc, char **argv)
     return (cs);
 }
 
+extern "C" int top_width, top_height;
+
 void CXpilotView::OnDraw(CDC * pDC)
 {
     CXpilotDoc *pDoc = GetDocument();
@@ -177,11 +173,12 @@ void CXpilotView::OnDraw(CDC * pDC)
 	TRACE("Eat Me\n");
 	notifyWnd = GetSafeHwnd();
 	ret = main(argc, argv);
-
 	for (int i = 0; i < args; i++)
 	    delete ccs[i];
 
 	if (!ret) {
+		GetParentFrame()->MoveWindow(0, 0, top_width, top_height);
+		GetParentFrame()->CenterWindow();
 	    ret =
 		WSAAsyncSelect(Net_fd(), this->m_hWnd, WSA_EVENT,
 			       FD_CLOSE | FD_READ);
@@ -282,19 +279,6 @@ int CXpilotView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
     CWnd *pWnd = GetParent();
     GetParentFrame()->SetWindowText("XPilot");
-    winHelpFile = theApp.m_pszHelpFilePath;	// needed for finding .ini files
-
-    CRect rect;
-    rect.left =
-	GetPrivateProfileInt(s_WindowMet, s_L, 0, Get_xpilotini_file(1));
-    rect.top =
-	GetPrivateProfileInt(s_WindowMet, s_T, 0, Get_xpilotini_file(1));
-    rect.right =
-	GetPrivateProfileInt(s_WindowMet, s_R, 0, Get_xpilotini_file(1));
-    rect.bottom =
-	GetPrivateProfileInt(s_WindowMet, s_B, 0, Get_xpilotini_file(1));
-    if (rect.left != rect.right)	// only move window to valid coordinates
-	pWnd->MoveWindow(rect);
 
     return (0);
 }
@@ -339,64 +323,10 @@ void CXpilotView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	  nFlags);
     Key_event(&xk);
 }
-
-#if 0
-void CXpilotView::OnUpdateConfigureSysinfo(CCmdUI * pCmdUI)
-{
-    // TODO: Add your command update UI handler code here
-    pCmdUI->Enable();
-}
-
-void CXpilotView::OnConfigureSysinfo()
-{
-    // TODO: Add your command handler code here
-    CSysInfo csi;
-    csi.DoModal();
-}
-#endif
-
 extern "C" void DoWinAboutBox()
 {
     theApp.OnCmdMsg(ID_APP_ABOUT, 0, NULL, NULL);
 }
-
-extern "C" COLORREF GetXPilotColor(int which, COLORREF defcolor)
-{
-    CString key;
-    CBSString cs;
-    COLORREF newcolor;
-    key.Format("color%d", which);
-    cs = theApp.GetProfileString("Settings", key);
-    if (!cs.GetLength())
-	return (defcolor);
-    newcolor = cs.ParseColor();
-    return (newcolor);
-}
-
-extern "C" int GetMaxColors()
-{
-    int color;
-//      return(theApp.GetProfileInt("Settings", "maxColors", 0));
-    color =
-	GetPrivateProfileInt("Settings", "maxColors", 0,
-			     Get_xpilotini_file(0));
-    if (!color)
-	color =
-	    GetPrivateProfileInt("Settings", "maxColors", 0,
-				 Get_xpilotini_file(1));
-    if (!color)
-	color =
-	    GetPrivateProfileInt("Settings", "maxColors", 0,
-				 Get_xpilotini_file(2));
-    return (color);
-}
-
-#if 0
-extern "C" int GetScoreFontHeight()
-{
-    return (theApp.GetProfileInt("Settings", "scoreFontHeight", 0));
-}
-#endif
 
 extern "C" int scoresChanged;
 

@@ -30,7 +30,7 @@
 
 char painthud_version[] = VERSION;
 
-static int hudColor;		/* Color index for HUD drawing */
+int hudColor;		/* Color index for HUD drawing, has to be global for windoze */
 static int hudHLineColor;	/* Color index for horiz. HUD line drawing */
 static int hudVLineColor;	/* Color index for vert. HUD line drawing */
 static int hudItemsColor;	/* Color index for HUD items drawing */

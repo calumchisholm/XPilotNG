@@ -447,6 +447,7 @@ extern "C" {
 #define	XrmInitialize	;
 
     extern int WinXGetWindowRectangle(Window window, XRectangle * rect);
+	extern void WinXParseGeometry(const char* g, int *w, int *h);
 
 #ifdef	_DEBUG
 #define	XCreateSimpleWindow(__d, __p, __x, __y, __w, __h, __bw, __b, __bk) \
@@ -573,6 +574,7 @@ extern "C" {
 				XWindowAttributes * attributes);
 #define	NoSymbol	0L
     extern XFontStruct *XQueryFont(Display * dpy, XID font_ID);
+	extern XFreeFontInfo(char **names, XFontStruct *free_info, int count);
     extern XFontStruct *WinXLoadFont(const char *name);
     extern XSetFont(Display * dpy, GC gc, Font font);
     extern GContext XGContextFromGC(GC gc);

@@ -128,5 +128,7 @@ void Bitmap_update_scale (void);
 xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp);
 void Bitmap_paint (Drawable d, int img, int x, int y, int bmp);
 void Bitmap_paint_area (Drawable d, xp_bitmap_t *bit, int x, int y, irec_t *r);
+xp_bitmap_t *Bitmap_get_blended(Drawable d, int img, int rgb);
+void Bitmap_paint_blended(Drawable d, int img, int x, int y, int rgb);
 
 #endif

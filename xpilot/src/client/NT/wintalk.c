@@ -20,22 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-
-#include <errno.h>
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "../paint.h"
-#include "../xinit.h"
-#include "error.h"
-#include "../netclient.h"
-#include "../protoclient.h"
-#include "keys.h"
-#include "bit.h"
+#include "../xpclient_x11.h"
 
 char talk_version[] = VERSION;
 
@@ -207,13 +192,6 @@ char *Get_msg_from_history(int *pos, char *message, keys_t direction)
 	}
     }
     return NULL;		/* no history */
-}
-
-/*
- * Print all available messages to stdout.
- */
-void Print_messages_to_stdout(void)
-{
 }
 
 /*

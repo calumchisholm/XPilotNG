@@ -104,7 +104,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /Zd /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /D "x_BETAEXPIRE" /FR /c
 # SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /G5 /MD /W3 /GX /Zd /O2 /I "..\..\common" /I "..\..\common\NT" /I "..\..\..\zlib\include" /D "NDEBUG" /D "_MBCS" /D "x_BETAEXPIRE" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D PAINT_FREE=0 /FR /FD /c
+# ADD CPP /nologo /G5 /MD /W3 /GX /Zd /O2 /I "..\..\common" /I "..\..\common\NT" /I "..\..\..\..\zlib" /D "NDEBUG" /D "_MBCS" /D "x_BETAEXPIRE" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D PAINT_FREE=0 /D "ZLIB_DLL" /FR /FD /c
 # SUBTRACT CPP /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -115,7 +115,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /map /machine:I386 /out:"Release/XPilotNT.exe"
-# ADD LINK32 winmm.lib ..\..\..\zlib\lib\libz.lib /nologo /subsystem:windows /map /machine:I386 /out:".\Release\XPilot.exe"
+# ADD LINK32 winmm.lib ..\..\..\..\zlib\dll32\zlib.lib /nologo /subsystem:windows /map /machine:I386 /out:".\Release\XPilot.exe"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 PostBuild_Cmds=copy Release\XPilot.exe c:\XPilot
@@ -164,6 +164,14 @@ SOURCE=..\client.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\clientcommand.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\clientcommand.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\clientrank.c
 # End Source File
 # Begin Source File
@@ -208,19 +216,15 @@ SOURCE=..\default.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\event.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\gfx2d.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\gfx2d.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\gfx3d.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\gfx3d.h
 # End Source File
 # Begin Source File
 
@@ -244,14 +248,6 @@ SOURCE=..\icon.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\ignore.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\ignore.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\join.c
 # End Source File
 # Begin Source File
@@ -269,6 +265,14 @@ SOURCE=..\netclient.c
 # Begin Source File
 
 SOURCE=..\netclient.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\option.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\option.h
 # End Source File
 # Begin Source File
 
@@ -308,10 +312,6 @@ SOURCE=..\paintradar.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\protoclient.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\query.c
 # End Source File
 # Begin Source File
@@ -328,10 +328,6 @@ SOURCE=..\recordfmt.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\sim.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\talk.h
 # End Source File
 # Begin Source File
@@ -341,14 +337,6 @@ SOURCE=..\talkmacros.c
 # Begin Source File
 
 SOURCE=..\textinterface.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\texture.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\texture.h
 # End Source File
 # Begin Source File
 
@@ -366,6 +354,10 @@ SOURCE=..\widget.c
 # Begin Source File
 
 SOURCE=..\widget.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\xdefault.c
 # End Source File
 # Begin Source File
 
@@ -390,6 +382,10 @@ SOURCE=..\xinit.c
 # Begin Source File
 
 SOURCE=..\xinit.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\xpaint.c
 # End Source File
 # Begin Source File
 
@@ -490,11 +486,7 @@ SOURCE=.\winColors.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\winConfig.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\winConfig.h
+SOURCE=.\wintalk.c
 # End Source File
 # Begin Source File
 

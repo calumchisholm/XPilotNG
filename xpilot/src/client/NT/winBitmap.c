@@ -20,19 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#include "../../common/NT/winX.h"
-#include "../bitmaps.h"
-
-#include "../gfx2d.h"
-#include "../../common/NT/winX_.h"
-#include <math.h>
-
-#include "../../common/error.h"
-#include "./../common/const.h"
-#include "../paint.h"
-#include "../protoclient.h"
-#include "../../common/setup.h"
-#include "../../common/bit.h"
+#include "../xpclient.h"
 
 /* for blitting items onto the screen */
 extern HDC itemsDC;
@@ -100,7 +88,7 @@ void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap, int image, int x, int y,
 }
 
 void Bitmap_paint_area(Drawable d, xp_bitmap_t * bit, int x, int y,
-		       irec * r)
+		       irec_t * r)
 {
     HDC hDC = xid[d].hwnd.hBmpDC;
 

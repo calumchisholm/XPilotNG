@@ -51,12 +51,9 @@ extern "C" {
 
     extern int received_self;
 
-    extern const char *winHelpFile;	/* used to determine .ini file locations */
-
 /* requests from the xpilot "real code" to mfc */
     extern void _Trace(char *lpszFormat, ...);
     extern const char *mfcDoTalkWindow();
-    extern char *Get_xpilotini_file(int level);
 
 #ifdef	_DEBUG
     extern void xpmemShutdown();
