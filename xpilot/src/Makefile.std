@@ -119,20 +119,6 @@ LINUX_LPLUS = $(LINUX_CFLAGS)
 
 
 #
-# Flags for OS/2 - XFree86/2
-#
-# Actually, only server needs to be compiled multi-threaded. (-Zmtd)
-# Client can be single-threaded.
-#
-OS2_CC = gcc
-#OS2_CFLAGS = $(DEFS) $(INCS) -fno-strength-reduce -Zmtd -Zbsd-signals -I. -I$(X11ROOT)/xfree86/include -DMBX -D__ST_MT_ERRNO__ -D_OS2_ -DFUNCPROTO=15 -DNARROWPROTO -Dstrncasecmp=strnicmp -Dstrcasecmp=stricmp
-OS2_CFLAGS = $(DEFS) $(INCS) -fno-strength-reduce -Zmtd -Zbsd-signals -I. -I$(X11ROOT)/xfree86/include -DMBX -D__ST_MT_ERRNO__ -D_OS2_ -DFUNCPROTO=15 -DNARROWPROTO
-OS2_OPT = -O2
-OS2_MLIB = -lsocket -lbsd -lm -Zbin-files -Zexe
-OS2_XLIB = -L$(X11ROOT)/xfree86/lib -L$(LIBRARY_PATH) -lX11 -lXext
-
-
-#
 # DEFS should be used for program specific defines.
 # Currently supported flags are:
 #
@@ -328,7 +314,7 @@ TARGETS=make-common make-client make-server make-replay
 
 all:
 	@echo "Please specify your system.  Choose one of:"
-	@echo "    hppa/solaris/sun/aix/linux/sgi/os2"
+	@echo "    hppa/solaris/sun/aix/linux/sgi"
 
 targets: $(TARGETS)
 
@@ -432,10 +418,6 @@ linux-checker:
 linux-plus:
 	@$(MAKE) -f Makefile.std $(TARGETS) \
 		"CC=$(LINUX_CPLUSPLUS)" "CFLAGS=$(LINUX_CFLAGS) $(LINUX_PLUS)" "LFLAGS=$(LINUX_LPLUS)" "MLIB=$(LINUX_MLIB)" "XLIB=$(LINUX_XLIB)"
-
-os2:
-	@$(MAKE) -f Makefile.std $(TARGETS) \
-		"CC=$(OS2_CC)" "CFLAGS=$(OS2_CFLAGS) $(OS2_OPT)" "MLIB=$(OS2_MLIB)" "XLIB=$(OS2_XLIB)"
 
 sgi:
 	@$(MAKE) -f Makefile.std $(TARGETS) \

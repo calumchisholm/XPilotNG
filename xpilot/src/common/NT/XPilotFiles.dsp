@@ -202,10 +202,6 @@ SOURCE=..\..\..\Local.rules
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\README.OS2
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\README.txt
 # End Source File
 # Begin Source File
