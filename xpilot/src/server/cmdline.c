@@ -510,11 +510,11 @@ static option_desc options[] = {
     {
 	"pulseLife",
 	"pulseLife",
-	"6.0", /* kps - ok ??? */
+	"6.0", /* kps - should be PULSE_LIFE(lasers) */
 	&pulseLifeSetting,
 	valReal,
 	Timing_setup,
-	"Life of laser pulses shot by players, in ticks.\n",
+	"Life of laser pulses shot by ships, in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
