@@ -330,15 +330,13 @@ int Net_setup(void)
 				 Setup->name, Setup->author);
 		if (Setup->map_order != SETUP_MAP_XY_WITH_LINES) {
 		    oldServer = 1;
-		    Setup->x = Setup->width;
+		    Setup->x = Setup->width; /* received size in blocks */
 		    Setup->width *= BLOCK_SZ;
 		    Setup->y = Setup->height;
 		    Setup->height *= BLOCK_SZ;
 		}
-		else {     /* TO BE REMOVED */
-		    Setup->x = Setup->width / BLOCK_SZ;
-		    Setup->y = Setup->height / BLOCK_SZ;
-		}
+		else
+		    oldServer = 0;
 		if (n <= 0) {
 		    errno = 0;
 		    error("Can't read setup info from reliable data buffer");
@@ -364,10 +362,9 @@ int Net_setup(void)
 		    error("Unknown map order type (%d)", Setup->map_order);
 		    return -1;
 		}
-		size = sizeof(setup_t) + Setup->x * Setup->y;
-		if (Setup->map_order == SETUP_MAP_XY_WITH_LINES)
-		    if (Setup->map_data_len + sizeof(setup_t) > size)
-			size = sizeof(setup_t) + Setup->map_data_len;
+		size = sizeof(setup_t) + Setup->map_data_len;
+		if (oldServer)
+		    size = sizeof(setup_t) + Setup->x * Setup->y;
 		if ((Setup = (setup_t *) realloc(ptr, size)) == NULL) {
 		    error("No memory for setup and map");
 		    return -1;
@@ -2834,4 +2831,3 @@ int Send_fps_request(int fps)
     }
     return 0;
 }
-
