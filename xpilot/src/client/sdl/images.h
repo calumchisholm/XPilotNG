@@ -66,6 +66,7 @@ typedef struct {
 #define IMG_SHIELD        31
 #define IMG_ACWISEGRAV    32
 #define IMG_CWISEGRAV     33
+#define IMG_MISSILE       34
 
 int Images_init(void);
 void Images_cleanup(void);

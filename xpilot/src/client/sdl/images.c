@@ -35,11 +35,11 @@ static int Image_init(image_t *img)
     img->frame_width = img->width / img->num_frames;
     img->data_width = pow2_ceil(img->width);
     img->data_height = pow2_ceil(img->height);
-    /*
+
     printf("Loaded image %s: w=%d, h=%d, fw=%d, dw=%d, dh=%d\n",
 	   img->filename, img->width, img->height, img->frame_width,
 	   img->data_width, img->data_height);
-    */
+
     img->data = calloc(img->data_width * img->data_height, sizeof(unsigned int));
     if (img->data == NULL) {
         error("Failed to allocate memory for: %s size %dx%d",
@@ -211,6 +211,7 @@ int Images_init(void)
     DEF_IMG("shield.ppm", 1);
     DEF_IMG("acwise_grav.ppm", -6);
     DEF_IMG("cwise_grav.ppm", -6);
+    DEF_IMG("missile.ppm", 32);
 
     first_texture = num_images;
 

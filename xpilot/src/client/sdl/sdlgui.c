@@ -672,6 +672,14 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 
 void Gui_paint_item_object(int type, int x, int y)
 {
+    int sz = 16;
+    Image_paint(IMG_ALL_ITEMS, x - 8, y - 4, type, whiteRGBA);
+    set_alphacolor(blueRGBA);
+    glBegin(GL_LINE_LOOP);
+    glVertex2i(x + sz, y + sz);
+    glVertex2i(x, y - sz);
+    glVertex2i(x - sz, y + sz);
+    glEnd();
 }
 
 void Gui_paint_ball(int x, int y)
@@ -762,6 +770,7 @@ void Gui_paint_missiles_end(void)
 
 void Gui_paint_missile(int x, int y, int len, int dir)
 {
+    Image_paint(IMG_MISSILE, x - 16, y - 16, dir/4, whiteRGBA);
 }
 
 void Gui_paint_lasers_begin(void)
