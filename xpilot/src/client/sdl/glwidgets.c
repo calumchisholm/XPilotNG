@@ -3156,13 +3156,21 @@ static void ConfMenuWidget_Config( void *data )
     
     if ((wid_info->showconf = !wid_info->showconf)) {
     	AppendGLWidgetList(&(widget->children), wid_info->scrollpane);
+    	AppendGLWidgetList(&(widget->children), wid_info->sl);
+    	AppendGLWidgetList(&(widget->children), wid_info->sb);
     	widget->bounds.y -= 512 - widget->bounds.h;
     	widget->bounds.h = 512;
+    	widget->bounds.w += wid_info->scrollpane->bounds.w/3;
+    	widget->bounds.x -= wid_info->scrollpane->bounds.w/3;
     	SetBounds_GLWidget(widget,&(widget->bounds));
     } else {
     	DelGLWidgetListItem(&(widget->children), wid_info->scrollpane);
+    	DelGLWidgetListItem(&(widget->children), wid_info->sl);
+    	DelGLWidgetListItem(&(widget->children), wid_info->sb);
     	widget->bounds.h = wid_info->ql->bounds.h + 2;
     	widget->bounds.y += 512 - widget->bounds.h;
+    	widget->bounds.x += wid_info->scrollpane->bounds.w/3;
+    	widget->bounds.w -= wid_info->scrollpane->bounds.w/3;
     	SetBounds_GLWidget(widget,&(widget->bounds));
     }
 }
@@ -3203,28 +3211,25 @@ static void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
 
     	SetBounds_GLWidget(wid_info->scrollpane,&bounds);
 	bounds.h += 3;
-    }
-    
-    bounds.w = b->w/3 - 2;
+    	bounds.w = (b->w - 2)/3 - 1;
+    } else bounds.w = (b->w - 2)/2 - 1;
+    	
     bounds.y += bounds.h;
     bounds.h = wid_info->ql->bounds.h;
     
-    SetBounds_GLWidget(wid_info->ql,&bounds);
-    SetBounds_GLWidget(wid_info->qb,&bounds);
-    
-    bounds.x += b->w/3;
-    bounds.w = b->w/3 - 2;
-    bounds.h = wid_info->sl->bounds.h;
-    
-    SetBounds_GLWidget(wid_info->sl,&bounds);
-    SetBounds_GLWidget(wid_info->sb,&bounds);
-
-    bounds.x += b->w/3;
-    bounds.w = b->w/3 - 2;
-    bounds.h = wid_info->cl->bounds.h;
+    if (wid_info->showconf) {
+    	SetBounds_GLWidget(wid_info->sl,&bounds);
+    	SetBounds_GLWidget(wid_info->sb,&bounds);
+    	bounds.x += bounds.w + 1;
+    }
     
     SetBounds_GLWidget(wid_info->cl,&bounds);
     SetBounds_GLWidget(wid_info->cb,&bounds);
+
+    bounds.x += bounds.w + 1;
+
+    SetBounds_GLWidget(wid_info->ql,&bounds);
+    SetBounds_GLWidget(wid_info->qb,&bounds);
 }
 
 static void Paint_ConfMenuWidget( GLWidget *widget )
@@ -3334,12 +3339,12 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
 	return NULL;
     }
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->sl = Init_LabelWidget("Save",&greenRGBA,&but1_color,CENTER,CENTER))) ) {
+    if ( !(wid_info->sl = Init_LabelWidget("Save",&greenRGBA,&but1_color,CENTER,CENTER)) ) {
     	error("Init_ConfMenuWidget: Couldn't make the save label!");
 	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->sb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Save,tmp))) ) {
+    if ( !(wid_info->sb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Save,tmp)) ) {
     	error("Init_ConfMenuWidget: Couldn't make the save button!");
 	Close_Widget(&tmp);
 	return NULL;
@@ -3358,7 +3363,7 @@ GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
            
     tmp->bounds.x   	= x;
     tmp->bounds.y   	= y;
-    tmp->bounds.w   	= wid_info->scrollpane->bounds.w+2;
+    tmp->bounds.w   	= wid_info->scrollpane->bounds.w*2/3+2;
     /*tmp->bounds.h   	= 512;*/
     wid_info->ql->bounds.h = wid_info->sl->bounds.h = wid_info->cl->bounds.h = wid_info->cl->bounds.h + 2;
     tmp->bounds.h   	= wid_info->ql->bounds.h + 2;
