@@ -605,13 +605,12 @@ static void Paint_world_radar_new(void)
     
     /* loop through all the polygons */
     for (i = 0; i < num_polygons; i++) {
+	if (BIT(polygon_styles[polygons[i].style].flags,
+		STYLE_INVISIBLE_RADAR)) continue;
 	Compute_radar_bounds(&min, &max, &polygons[i].bounds);
 	for (xoff = min.x; xoff <= max.x; xoff++) {
 	    for (yoff = min.y; yoff <= max.y; yoff++) {
 		int x, y;
-
-		if (BIT(polygon_styles[polygons[i].style].flags,
-			STYLE_INVISIBLE_RADAR)) continue;
 
 		x = xoff * Setup->width;
 		y = yoff * Setup->height;
@@ -621,8 +620,8 @@ static void Paint_world_radar_new(void)
 		    x += polygons[i].points[j].x;
 		    y += polygons[i].points[j].y;
 		    poly[j].x = (x * 256) / Setup->width;
-		    poly[j].y = RadarHeight 
-			- ((y * RadarHeight) / Setup->height);
+		    poly[j].y = (int)RadarHeight 
+			- ((y * (int)RadarHeight) / Setup->height);
 		}
 
 		XSetForeground(dpy, radarGC, fullColor ?
