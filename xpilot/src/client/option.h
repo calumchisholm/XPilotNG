@@ -284,4 +284,5 @@ static inline xp_option_t *Option_by_index(int ind)
 typedef int xp_keysym_t;
 xp_keysym_t String_to_xp_keysym(const char *str);
 keys_t Generic_lookup_key(xp_keysym_t ks, bool reset);
-#endif
+
+#endif /* OPTION_H */

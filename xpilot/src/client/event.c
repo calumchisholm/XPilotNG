@@ -417,6 +417,35 @@ void Pointer_button_released(int button)
 
 #ifdef OPTIONHACK
 
+void Keyboard_button_pressed(xp_keysym_t ks)
+{
+    bool change = false;
+    keys_t key;
+
+    for (key = Generic_lookup_key(ks, true);
+	 key != KEY_DUMMY;
+	 key = Generic_lookup_key(ks, false))
+	change |= Key_press(key);
+
+    if (change)
+	Net_key_change();
+}
+void Keyboard_button_released(xp_keysym_t ks)
+{
+    bool change = false;
+    keys_t key;
+
+    for (key = Generic_lookup_key(ks, true);
+	 key != KEY_DUMMY;
+	 key = Generic_lookup_key(ks, false))
+	change |= Key_release(key);
+
+    if (change)
+	Net_key_change();
+}
+
+
+
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 { NULL, NULL, NULL, NULL, NULL };
 

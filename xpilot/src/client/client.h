@@ -47,6 +47,12 @@
 /* need Connect_param_t */
 #include "connectparam.h"
 #endif
+#ifdef OPTIONHACK
+#ifndef OPTION_H
+/* need xp_keysym_t */
+#include "option.h"
+#endif
+#endif
 
 typedef struct {
     bool showShipShapes;
@@ -660,6 +666,10 @@ extern bool played_this_round;
 void Pointer_control_set_state(bool on);
 void Pointer_button_pressed(int button);
 void Pointer_button_released(int button);
+#ifdef OPTIONHACK
+void Keyboard_button_pressed(xp_keysym_t ks);
+void Keyboard_button_released(xp_keysym_t ks);
+#endif
 int Key_init(void);
 int Key_update(void);
 bool Key_press(keys_t key);

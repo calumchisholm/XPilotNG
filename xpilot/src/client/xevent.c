@@ -283,6 +283,24 @@ bool Key_press_toggle_fullscreen(void)
 
 void Key_event(XEvent *event)
 {
+#ifdef OPTIONHACK
+    KeySym ks;
+
+    if ((ks = XLookupKeysym(&event->xkey, 0)) == NoSymbol)
+	return;
+
+    switch(event->type) {
+    case KeyPress:
+	Keyboard_button_pressed((xp_keysym_t)ks);
+	break;
+    case KeyRelease:
+	Keyboard_button_released((xp_keysym_t)ks);
+	break;
+    default:
+	return;
+    }
+
+#else
     KeySym 		ks;
     keys_t		key;
     int			change = false;
@@ -309,6 +327,7 @@ void Key_event(XEvent *event)
 
     if (change)
 	Net_key_change();
+#endif
 }
 
 void Talk_event(XEvent *event)
