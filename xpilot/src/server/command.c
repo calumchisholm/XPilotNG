@@ -1104,26 +1104,15 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
 static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg, size_t size)
 {
-    const char *errorstr;
-    player_t *pl2;
-
     UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
 
-    pl2 = Get_player_by_name(arg, NULL, &errorstr);
-    if (!pl2) {
-	strlcpy(msg, errorstr, size);
+    if (!Rank_get_stats(arg, msg, size)) {
+	snprintf(msg, size, "Player \"%s\" doesn't have ranking stats.", arg);
 	return CMD_RESULT_ERROR;
     }
-
-    if (pl2->rank == NULL) {
-	snprintf(msg, size, "Player doesn't have ranking stats.");
-	return CMD_RESULT_ERROR;
-    }
-
-    Rank_get_stats(pl2, msg);
 
     return CMD_RESULT_SUCCESS;
 }

@@ -316,18 +316,20 @@ void Rank_write_webpage(void)
     fclose(file);
 }
 
-/* Return a line with the ranking status of the specified player. */
-void Rank_get_stats(player_t * pl, char *buf)
-{
-    ranknode_t *rank = pl->rank;
 
-    sprintf(buf, "%-15s  %4d/%4d, R: %3d, S: %5d, %d/%d/%d/%d/%.2f",
-	    pl->name,
-	    rank->kills, rank->deaths,
-	    rank->rounds, rank->shots,
-	    rank->ballsCashed, rank->ballsSaved,
-	    rank->ballsWon, rank->ballsLost,
-	    rank->bestball);
+bool Rank_get_stats(const char *name, char *buf, size_t size)
+{
+    ranknode_t *r = Rank_get_by_name(name);
+
+    if (r == NULL)
+	return false;
+
+    snprintf(buf, size, "%-15s  %4d/%4d, R: %4d, S: %6d, %d/%d/%d/%d/%.2f",
+	     r->name, r->kills, r->deaths, r->rounds, r->shots,
+	     r->ballsCashed, r->ballsSaved, r->ballsWon, r->ballsLost,
+	     r->bestball);
+
+    return true;
 }
 
 
@@ -399,7 +401,7 @@ static void Init_ranknode(ranknode_t *rank,
 }
 
 
-ranknode_t *Rank_get_by_name(char *name)
+ranknode_t *Rank_get_by_name(const char *name)
 {
     int i;
 
@@ -494,7 +496,7 @@ void Rank_get_saved_score(player_t * pl)
 	}
     }
 
-    /* find unused nick */
+    /* find unused rank node */
     for (i = 0; i < MAX_SCORES; i++) {
 	rank = &ranknodes[i];
 

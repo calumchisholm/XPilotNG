@@ -49,8 +49,8 @@ typedef struct ranknode {
     player_t *pl;
 } ranknode_t;
 
-void Rank_get_stats(player_t *pl, char *buf);
-ranknode_t *Rank_get_by_name(char *name);
+bool Rank_get_stats(const char *name, char *buf, size_t size);
+ranknode_t *Rank_get_by_name(const char *name);
 void Rank_nuke_score(ranknode_t *rank);
 void Rank_init_saved_scores(void);
 void Rank_get_saved_score(player_t *pl);
