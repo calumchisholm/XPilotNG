@@ -2210,7 +2210,7 @@ static void Corner_init(void)
     int block, size = mapx * mapy;
     int height, height2, width, by2;
 
-#define DISIZE 500
+#define DISIZE 350
     temp = ralloc(NULL, mapx * mapy * DISIZE * sizeof(short)); /* !@# */
     for (i = 0; i < mapx * mapy; i++)
 	temp[i * DISIZE] = 0;
