@@ -943,16 +943,30 @@ void Fire_general_shot(world_t *world, player_t *pl, int team, bool cannon,
 	}
 
 	/*
-	 * If "NG controls" are activated, use float dir when shooting
-	 * straight ahead.
+	 * Option constantSpeed affects shots' initial velocity.
+	 * This lets you accelerate shots nicely.
 	 */
+	if (pl && options.constantSpeed) {
+	    pl->vel.x += options.constantSpeed * pl->acc.x;
+	    pl->vel.y += options.constantSpeed * pl->acc.y;
+	}
 	if (options.ngControls && pl && ldir == pl->dir) {
+	    /*
+	     * If using "NG controls", use float dir when shooting
+	     * straight ahead.
+	     */
 	    shot->vel.x = mv.x + pl->vel.x + pl->float_dir_cos * speed;
 	    shot->vel.y = mv.y + pl->vel.y + pl->float_dir_sin * speed;
 	} else {
 	    shot->vel.x = mv.x + (pl ? pl->vel.x : 0.0) + tcos(ldir) * speed;
 	    shot->vel.y = mv.y + (pl ? pl->vel.y : 0.0) + tsin(ldir) * speed;
 	}
+	/* remove constantSpeed */
+	if (pl && options.constantSpeed) {
+	     pl->vel.x -= options.constantSpeed * pl->acc.x;
+	     pl->vel.y -= options.constantSpeed * pl->acc.y;
+	}
+
 	shot->status	= status;
 	shot->missile_dir	= ldir;
 	shot->mods  	= mods;
