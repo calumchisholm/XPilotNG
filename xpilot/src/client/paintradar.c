@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -699,7 +698,7 @@ void Paint_world_radar(void)
 	Paint_world_radar_new();
     }
 	
-    IFWINDOWS(xid[radarGC].hgc.xidhwnd = radar;)
+    IFWINDOWS(xid[radarGC].hgc.xidhwnd = radar);
 }
 
 

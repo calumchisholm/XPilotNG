@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -663,7 +662,7 @@ static int Add_server_info(server_info_t *sip)
 
     /* print for debugging */
     D(printf("list size = %d after %08x, %d\n",
-	    List_size(server_list), sip->ip, sip->port);)
+	     List_size(server_list), sip->ip, sip->port));
 
     return 0;
 }
@@ -1075,13 +1074,13 @@ static int Get_meta_data(void)
 	tv.tv_usec = 0;
 
 	D(printf("select for %ld (con %d, read %d, send %d) at %ld\n",
-	       tv.tv_sec, connections, readers, senders, time(0));)
+		 tv.tv_sec, connections, readers, senders, time(0)));
 
 	rset_out = rset_in;
 	wset_out = wset_in;
 	descriptor_count = select(max + 1, &rset_out, &wset_out, NULL, &tv);
 
-	D(printf("select = %d at %ld\n", descriptor_count, time(0));)
+	D(printf("select = %d at %ld\n", descriptor_count, time(0)));
 
 	if (descriptor_count <= 0) {
 	    break;
@@ -1100,7 +1099,7 @@ static int Get_meta_data(void)
 		    sprintf(buf, "%d metaserver%s accepted a connection.",
 			    readers, (readers > 1) ? "s have" : " has");
 		    Welcome_create_label(1, buf);
-		    D(printf("%s\n", buf);)
+		    D(printf("%s\n", buf));
 		}
 		time(&start);
 	    }
@@ -1159,7 +1158,7 @@ static int Get_meta_data(void)
 			    );
 		    Welcome_create_label(1, buf);
 #endif
-		    D(printf("%s\n", buf);)
+		    D(printf("%s\n", buf));
 
 		    /* adjust buffer for newly read bytes. */
 		    md[i].end += bytes_read;
