@@ -172,6 +172,9 @@ void Paint_score_objects(void)
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
 		if (wrap(&x, &y)) {
+		    if (sobj->msg_width == -1)
+			sobj->msg_width = 
+			    XTextWidth(gameFont, sobj->msg, sobj->msg_len);
 		    SET_FG(colors[scoreObjectColor].pixel);
 		    x = WINSCALE(X(x)) - sobj->msg_width / 2,
 		    y = WINSCALE(Y(y)) + gameFont->ascent / 2,
@@ -390,7 +393,7 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit,
  	    x = x + ext_view_width / 2 - sz / 2;
  	    y = -y + ext_view_height / 2 - sz / 2;
 
-	    if (radar_ptr[i].color == WHITE) {
+	    if (radar_ptr[i].type == normal) {
 		if (hudRadarEnemyColor >= 1)
 		    Arc_add(hudRadarEnemyColor, x, y, sz, sz, 0, 64 * 360);
 	    } else {
@@ -661,6 +664,11 @@ void Paint_HUD(void)
 	    score_object_t*	sobj
 		= &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
 	    if (sobj->hud_msg_len > 0) {
+		if (sobj->hud_msg_width == -1)
+		    sobj->hud_msg_width = 
+			XTextWidth(gameFont, 
+				   sobj->hud_msg, 
+				   sobj->hud_msg_len);
 		if (j == 0 &&
 		    sobj->hud_msg_width > WINSCALE(2*hudSize-HUD_OFFSET*2) &&
 		    (did_fuel || hudVLineColor))

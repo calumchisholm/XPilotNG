@@ -41,8 +41,10 @@ typedef struct {
  * Exported variables.
  */
 setup_t			*Setup;
+display_t               server_display;
 int			receive_window_size;
 long			last_loops;
+bool                    packetMeasurement;
 #ifdef _WINDOWS
 int			received_self = FALSE;
 #endif
@@ -57,10 +59,10 @@ static int		(*receive_tbl[256])(void),
 			(*reliable_tbl[256])(void);
 static int		keyboard_delta;
 static unsigned		magic;
+static time_t           last_send_anything;
 static long		last_keyboard_change,
 			last_keyboard_ack,
 			last_keyboard_update,
-			last_send_anything,
 			reliable_offset,
 			talk_pending,
 			talk_sequence_num,
@@ -465,6 +467,11 @@ int Net_init(char *server, int port)
     signal(SIGPIPE, SIG_IGN);
 #endif
 
+    server_display.view_width = 0;
+    server_display.view_height = 0;
+    server_display.spark_rand = 0;
+    server_display.num_spark_colors = 0;
+
     Receive_init();
     if (!clientPortStart || !clientPortEnd ||
 	(clientPortStart > clientPortEnd)) {
@@ -624,7 +631,7 @@ int Net_flush(void)
     if (Sockbuf_flush(&wbuf) == -1)
 	return -1;
     Sockbuf_clear(&wbuf);
-    last_send_anything = last_loops;
+    last_send_anything = time(NULL);
     return 1;
 }
 
@@ -762,12 +769,11 @@ void Net_init_measurement(void)
     packet_loss = 0;
     packet_drop = 0;
     packet_loop = 0;
-    if (packetLossMeterColor || packetDropMeterColor) {
+    if (packetMeasurement) {
 	if (packet_measure == NULL) {
 	    if ((packet_measure = (char *) malloc(FPS)) == NULL) {
 		error("No memory for packet measurement");
-		packetLossMeterColor = 0;
-		packetDropMeterColor = 0;
+		packetMeasurement = false;
 	    } else
 		memset(packet_measure, PACKET_DRAW, FPS);
 	}
@@ -963,7 +969,7 @@ static void Net_lag_measurement(long key_ack)
     for (i = 0; i < KEYBOARD_STORE; i++) {
 	if (keyboard_change[i] == key_ack
 	    && keyboard_acktime[i] == -1) {
-	    keyboard_acktime[i] = loops;
+	    keyboard_acktime[i] =last_loops - 1;
 #if 0
 	    printf("A;%d;%ld;%ld ",
 		   i, keyboard_change[i], keyboard_acktime[i]);
@@ -1066,6 +1072,7 @@ int Net_input(void)
 		*last_frame,
 		*oldest_frame = &Frames[0],
 		tmpframe;
+    time_t      time_now;
 
     for (i = 0; i < receive_window_size; i++) {
 	frame = &Frames[i];
@@ -1229,15 +1236,13 @@ int Net_input(void)
      * and we haven't updated it in the (previous) current time frame
      * or if we haven't sent anything for a while (keepalive)
      * then we send our current keyboard state.
-     *
-     * kps - Setup->frames_per_second was used here previously,
-     * instead of clientFPS.
      */
+    time_now = time(NULL);
     if ((last_keyboard_ack != last_keyboard_change
 	    && last_keyboard_update /*+ 1*/ < last_loops)
-	|| last_loops - last_send_anything > 5 * clientFPS) {
+	|| time_now - last_send_anything > 5) {
 	Key_update();
-	last_send_anything = last_loops;
+	last_send_anything = time_now;
     } else
 	/*
 	 * 4.5.4a2: flush if non-empty
@@ -1404,40 +1409,6 @@ int Net_ask_for_motd(long offset, long maxlen)
     return 0;
 }
 
-
-static void Check_view_dimensions(void)
-{
-    int			width_wanted = draw_width;
-    int			height_wanted = draw_height;
-    int			srv_width, srv_height;
-
-    width_wanted = (int)(width_wanted * scaleFactor + 0.5);
-    height_wanted = (int)(height_wanted * scaleFactor + 0.5);
-
-    srv_width = width_wanted;
-    srv_height = height_wanted;
-    LIMIT(srv_height, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
-    LIMIT(srv_width, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
-    if (ext_view_width != srv_width ||
-	ext_view_height != srv_height) {
-	Send_display();
-    }
-
-    active_view_width = ext_view_width;
-    active_view_height = ext_view_height;
-    ext_view_x_offset = 0;
-    ext_view_y_offset = 0;
-    if (width_wanted > ext_view_width) {
-	ext_view_width = width_wanted;
-	ext_view_x_offset = (width_wanted - active_view_width) / 2;
-    }
-    if (height_wanted > ext_view_height) {
-	ext_view_height = height_wanted;
-	ext_view_y_offset = (height_wanted - active_view_height) / 2;
-    }
-}
-
-
 /*
  * Receive the packet with counts for all the items.
  * New since pack version 4203.
@@ -1505,16 +1476,13 @@ int Receive_self(void)
 		     "%c%c",
 
 		     &currentTank, &sFuelSum, &sFuelMax,
-		     &ext_view_width, &ext_view_height, &debris_colors,
+		     &server_display.view_width, 
+		     &server_display.view_height, 
+		     &server_display.num_spark_colors,
 		     &sStat, &sAutopilotLight
 		     );
     if (n <= 0)
 	return n;
-
-    if (debris_colors > num_spark_colors)
-	debris_colors = num_spark_colors;
-
-    Check_view_dimensions();
 
     Game_over_action(sStat);
     Handle_self(x, y, vx, vy, sHeading,
@@ -1888,9 +1856,6 @@ int Receive_radar(void)
     if ((n = Packet_scanf(&rbuf, "%c%hd%hd%c", &ch, &x, &y, &size)) <= 0)
 	return n;
 
-    x = (int)((double)(x * 256) / Setup->width + 0.5);
-    y = (int)((double)(y * RadarHeight) / Setup->height + 0.5);
-
     if ((n = Handle_radar(x, y, size)) == -1)
 	return -1;
     return 1;
@@ -1918,7 +1883,7 @@ int Receive_fastradar(void)
 	if (*ptr & 0x20)
 	    size |= 0x80;
 	ptr++;
-	r = Handle_radar(x, y, size);
+	r = Handle_fastradar(x, y, size);
 	if (r == -1)
 	    break;
     }
@@ -2114,7 +2079,7 @@ int Receive_timing(void)
 	return n;
     check = timing % num_checks;
     round = timing / num_checks;
-    if ((n = Handle_timing(id, check, round)) == -1)
+    if ((n = Handle_timing(id, check, round, last_loops)) == -1)
 	return -1;
     return 1;
 }
@@ -2486,31 +2451,26 @@ int Send_talk(void)
 }
 
 
-int Send_display(void)
+int Send_display(int width, int height, int sparks, int spark_colors)
 {
-    int			width_wanted = draw_width;
-    int			height_wanted = draw_height;
+    int	width_wanted = width;
+    int	height_wanted = height;
 
-    width_wanted = (int)(width_wanted * scaleFactor + 0.5);
-    height_wanted = (int)(height_wanted * scaleFactor + 0.5);
-
-    LIMIT(width_wanted, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
-    LIMIT(height_wanted, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
-
-    if (width_wanted == ext_view_width &&
-	height_wanted == ext_view_height &&
-	debris_colors == num_spark_colors &&
-	spark_rand == old_spark_rand &&
+    if (width_wanted == server_display.view_width &&
+	height_wanted == server_display.view_height &&
+	spark_colors == server_display.num_spark_colors &&
+	sparks == server_display.spark_rand &&
 	last_loops != 0) {
 	return 0;
     }
 
     if (Packet_printf(&wbuf, "%c%hd%hd%c%c", PKT_DISPLAY,
 		      width_wanted, height_wanted,
-		      num_spark_colors, spark_rand) == -1)
+		      spark_colors, 
+		      sparks) == -1)
 	return -1;
 
-    old_spark_rand = spark_rand;
+    server_display.spark_rand = sparks;
 
     return 0;
 }

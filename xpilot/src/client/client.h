@@ -87,21 +87,75 @@
 #define MIN_SCALEFACTOR		0.2
 #define MAX_SCALEFACTOR		8.0
 
-#if 0
-#define FIND_NAME_WIDTH(other)						\
-    if ((other)->name_width == 0) {					\
-	(other)->name_len = strlen((other)->name);			\
-	(other)->name_width = 2 + XTextWidth(gameFont, (other)->name,	\
-					 (other)->name_len);		\
-    }
-#endif /* 0 */
+#define FUEL_NOTIFY_TIME	3.0
 
-#define FIND_NAME_WIDTH(other)						\
-    if ((other)->name_width == 0) {					\
-	(other)->name_len = strlen((other)->id_string);			\
-	(other)->name_width = 2 + XTextWidth(gameFont, (other)->id_string,\
-					 (other)->name_len);		\
+/*
+ * Macros to manipulate dynamic arrays.
+ */
+
+/*
+ * Macro to add one new element of a given type to a dynamic array.
+ * T is the type of the element.
+ * P is the pointer to the array memory.
+ * N is the current number of elements in the array.
+ * M is the current size of the array.
+ * V is the new element to add.
+ * The goal is to keep the number of malloc/realloc calls low
+ * while not wasting too much memory because of over-allocation.
+ */
+#define STORE(T,P,N,M,V)						\
+    if (N >= M && ((M <= 0)						\
+	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
+	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
+	error("No memory");						\
+	exit(1);							\
+    } else								\
+	(P[N++] = V)
+/*
+ * Macro to make room in a given dynamic array for new elements.
+ * P is the pointer to the array memory.
+ * N is the current number of elements in the array.
+ * M is the current size of the array.
+ * T is the type of the elements.
+ * E is the number of new elements to store in the array.
+ * The goal is to keep the number of malloc/realloc calls low
+ * while not wasting too much memory because of over-allocation.
+ */
+#define EXPAND(P,N,M,T,E)						\
+    if ((N) + (E) > (M)) {						\
+	if ((M) <= 0) {							\
+	    M = (E) + 2;						\
+	    P = (T *) malloc((M) * sizeof(T));				\
+	    N = 0;							\
+	} else {							\
+	    M = ((M) << 1) + (E);					\
+	    P = (T *) realloc(P, (M) * sizeof(T));			\
+	}								\
+	if (P == NULL) {						\
+	    error("No memory");						\
+	    N = M = 0;							\
+	    return;	/* ! */						\
+	}								\
     }
+
+#define UNEXPAND(P,N,M)							\
+    if ((N) < ((M) >> 2)) {						\
+	free(P);							\
+	M = 0;								\
+    }									\
+    N = 0;
+
+#ifndef PAINT_FREE
+# define PAINT_FREE	1
+#endif
+#if PAINT_FREE
+# define RELEASE(P, N, M)					\
+do {								\
+	if (!(N)) ; else (free(P), (M) = 0, (N) = 0);		\
+} while (0)
+#else
+# define RELEASE(P, N, M)	((N) = 0)
+#endif
 
 
 typedef struct {
@@ -159,8 +213,6 @@ typedef struct {
     irec	bounds;		/* Location on map */
 } checkpoint_t;
 
-
-
 typedef struct {
     int width;			/* Line width, -1 means no line */
     unsigned long color;	/* Line color */
@@ -184,6 +236,113 @@ typedef struct {
     int style;			/* index to polygon_styles array */
 } xp_polygon_t;
 
+
+/*
+ * Types for dynamic game data
+ */
+
+typedef struct {
+    short		x0, y0, x1, y1;
+} refuel_t;
+
+typedef struct {
+    short		x0, y0, x1, y1;
+    u_byte		tractor;
+    u_byte		pad[3];
+} connector_t;
+
+typedef struct {
+    unsigned char	color, dir;
+    short		x, y, len;
+} laser_t;
+
+typedef struct {
+    short		x, y, dir;
+    unsigned char	len;
+    u_byte		pad[1];
+} missile_t;
+
+typedef struct {
+    short		x, y, id;
+} ball_t;
+
+typedef struct {
+    short		x, y, id, dir;
+    u_byte		shield, cloak, eshield;
+    u_byte		phased, deflector;
+    u_byte		pad[3];
+} ship_t;
+
+typedef struct {
+    short		x, y, teammine, id;
+} mine_t;
+
+typedef struct {
+    short		x, y, type;
+} itemtype_t;
+
+typedef struct {
+    short		x, y, size;
+} ecm_t;
+
+typedef struct {
+    short		x1, y1, x2, y2;
+} trans_t;
+
+typedef struct {
+    short		x, y, count;
+} paused_t;
+
+typedef struct {
+    short		x, y, id, count;
+} appearing_t;
+
+typedef enum {
+    normal,
+    friend
+} radar_type_t;
+
+typedef struct {
+    short		x, y, size;
+    radar_type_t        type;
+} radar_t;
+
+typedef struct {
+    short		x, y, type;
+} vcannon_t;
+
+typedef struct {
+    short		x, y;
+    long		fuel;
+} vfuel_t;
+
+typedef struct {
+    short		x, y, xi, yi, type;
+} vbase_t;
+
+typedef struct {
+    u_byte		x, y;
+} debris_t;
+
+typedef struct {
+    short		x, y, xi, yi, type;
+} vdecor_t;
+
+typedef struct {
+    short		x, y;
+    u_byte		wrecktype, size, rotation;
+    u_byte		pad[1];
+} wreckage_t;
+
+typedef struct {
+    short		x, y;
+    u_byte		type, size, rotation;
+    u_byte		pad[1];
+} asteroid_t;
+
+typedef struct {
+    short		x, y;
+} wormhole_t;
 
 
 /*#define SCORE_OBJECT_COUNT	100*/
@@ -235,12 +394,9 @@ typedef struct {
     bool	keep_emphasizing;
 } selection_t;
 
-
 extern int      oldServer; /* Compatibility mode for old block-based servers */
 extern ipos	FOOpos;
 extern ipos	FOOvel;
-extern ipos	world;
-extern ipos	realWorld;
 extern short	heading;
 extern short	nextCheckPoint;
 extern u_byte	numItems[NUM_ITEMS];
@@ -249,11 +405,17 @@ extern int	numItemsTime[NUM_ITEMS];
 extern double	showItemsTime;
 extern short	autopilotLight;
 extern int	showScoreDecimals;
+extern double   scoreObjectTime;        /* How long to show score objects */
 
 
 extern short	lock_id;		/* Id of player locked onto */
 extern short	lock_dir;		/* Direction of lock */
 extern short	lock_dist;		/* Distance to player locked onto */
+
+extern int	eyesId;		        /* Player we get frame updates for */
+extern other_t	*eyes;        		/* Player we get frame updates for */
+extern bool	snooping;	        /* are we snooping on someone else? */
+extern int	eyeTeam;	        /* Team of player we get updates for */
 
 extern other_t*	self;			/* Player info */
 extern short	selfVisible;		/* Are we alive and playing? */
@@ -332,12 +494,14 @@ extern bool	pointerControl;		/* current state of mouse ship flying */
 extern int	maxFPS;			/* Client's own FPS */
 extern int 	oldMaxFPS;
 extern int 	FPSDivisor;
+extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */
 
 extern int	clientPortStart;	/* First UDP port for clients */
 extern int	clientPortEnd;		/* Last one (these are for firewalls) */
 
 extern byte	lose_item;		/* flag and index to drop item */
 extern int	lose_item_active;	/* one of the lose keys is pressed */
+
 
 #ifdef SOUND
 extern char 	sounds[MAX_CHARS];	/* audio mappings */
@@ -356,6 +520,8 @@ extern	char		*HistoryMsg[MAX_HIST_MSGS];
 
 /* mapdata accessible to outside world */
 
+extern int	        num_playing_teams;
+
 extern fuelstation_t	*fuels;
 extern int		num_fuels;
 extern homebase_t	*bases;
@@ -369,13 +535,62 @@ extern int		num_edge_styles, max_edge_styles;
 extern polygon_style_t	*polygon_styles;
 extern int		num_polygon_styles, max_polygon_styles;
 
-extern other_t *Others;
-extern int	num_others, max_others;
+/* dynamic global game data */
 
-extern int	num_playing_teams;
+extern other_t          *Others;
+extern int	        num_others, max_others;
+extern refuel_t		*refuel_ptr;
+extern int		 num_refuel, max_refuel;
+extern connector_t	*connector_ptr;
+extern int		 num_connector, max_connector;
+extern laser_t		*laser_ptr;
+extern int		 num_laser, max_laser;
+extern missile_t	*missile_ptr;
+extern int		 num_missile, max_missile;
+extern ball_t		*ball_ptr;
+extern int		 num_ball, max_ball;
+extern ship_t		*ship_ptr;
+extern int		 num_ship, max_ship;
+extern mine_t		*mine_ptr;
+extern int		 num_mine, max_mine;
+extern itemtype_t	*itemtype_ptr;
+extern int		 num_itemtype, max_itemtype;
+extern ecm_t		*ecm_ptr;
+extern int		 num_ecm, max_ecm;
+extern trans_t		*trans_ptr;
+extern int		 num_trans, max_trans;
+extern paused_t		*paused_ptr;
+extern int		 num_paused, max_paused;
+extern appearing_t	*appearing_ptr;
+extern int		 num_appearing, max_appearing;
+extern radar_t		*radar_ptr;
+extern int		 num_radar, max_radar;
+extern vcannon_t	*vcannon_ptr;
+extern int		 num_vcannon, max_vcannon;
+extern vfuel_t		*vfuel_ptr;
+extern int		 num_vfuel, max_vfuel;
+extern vbase_t		*vbase_ptr;
+extern int		 num_vbase, max_vbase;
+extern debris_t		*debris_ptr[DEBRIS_TYPES];
+extern int		 num_debris[DEBRIS_TYPES],
+			 max_debris[DEBRIS_TYPES];
+extern debris_t		*fastshot_ptr[DEBRIS_TYPES * 2];
+extern int		 num_fastshot[DEBRIS_TYPES * 2],
+			 max_fastshot[DEBRIS_TYPES * 2];
+extern vdecor_t		*vdecor_ptr;
+extern int		 num_vdecor, max_vdecor;
+extern wreckage_t	*wreckage_ptr;
+extern int		 num_wreckage, max_wreckage;
+extern asteroid_t	*asteroid_ptr;
+extern int		 num_asteroids, max_asteroids;
+extern wormhole_t	*wormhole_ptr;
+extern int		 num_wormholes, max_wormholes;
 
-extern bool	ball_shout;
-extern bool	need_cover;
+extern bool	        ball_shout;
+extern bool	        need_cover;
+extern long		start_loops, end_loops;
+extern long		time_left;
+
 
 int Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);
@@ -400,24 +615,63 @@ int Handle_team(int id, int pl_team);
 int Handle_score(int id, double score, int life, int mychar, int alliance);
 int Handle_score_object(double score, int x, int y, char *msg);
 int Handle_team_score(int team, double score);
-int Handle_timing(int id, int check, int round);
+int Handle_timing(int id, int check, int round, long loops);
 int Handle_war(int robot_id, int killer_id);
 int Handle_seek(int programmer_id, int robot_id, int sought_id);
+int Handle_start(long server_loops);
+int Handle_end(long server_loops);
+int Handle_self(int x, int y, int vx, int vy, int newHeading,
+		float newPower, float newTurnspeed, float newTurnresistance,
+		int newLockId, int newLockDist, int newLockBearing,
+		int newNextCheckPoint, int newAutopilotLight,
+		u_byte *newNumItems, int newCurrentTank,
+		int newFuelSum, int newFuelMax, int newPacketSize);
+int Handle_self_items(u_byte *newNumItems);
+int Handle_modifiers(char *m);
+int Handle_damaged(int dam);
+int Handle_destruct(int count);
+int Handle_shutdown(int count, int delay);
+int Handle_thrusttime(int count, int max);
+int Handle_shieldtime(int count, int max);
+int Handle_phasingtime(int count, int max);
+int Handle_rounddelay(int count, int max);
+int Handle_refuel(int x_0, int y_0, int x_1, int y_1);
+int Handle_connector(int x_0, int y_0, int x_1, int y_1, int tractor);
+int Handle_laser(int color, int x, int y, int len, int dir);
+int Handle_missile(int x, int y, int dir, int len);
+int Handle_ball(int x, int y, int id);
+int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
+		int eshield, int phased, int deflector);
+int Handle_mine(int x, int y, int teammine, int id);
+int Handle_item(int x, int y, int type);
+int Handle_fastshot(int type, u_byte *p, int n);
+int Handle_debris(int type, u_byte *p, int n);
+int Handle_wreckage(int x, int y, int wrecktype, int size, int rotation);
+int Handle_asteroid(int x, int y, int type, int size, int rotation);
+int Handle_wormhole(int x, int y);
+int Handle_ecm(int x, int y, int size);
+int Handle_trans(int x_1, int y_1, int x_2, int y_2);
+int Handle_paused(int x, int y, int count);
+int Handle_appearing(int x, int y, int id, int count);
+int Handle_radar(int x, int y, int size);
+int Handle_fastradar(int x, int y, int size);
+int Handle_vcannon(int x, int y, int type);
+int Handle_vfuel(int x, int y, long fuel);
+int Handle_vbase(int x, int y, int xi, int yi, int type);
+int Handle_vdecor(int x, int y, int xi, int yi, int type);
+int Handle_message(char *msg);
+int Handle_eyes(int id);
+int Handle_time_left(long sec);
 void Map_dots(void);
 void Map_restore(int startx, int starty, int width, int height);
 void Map_blue(int startx, int starty, int width, int height);
 bool Using_score_decimals(void);
-void Client_score_table(void);
 int Client_init(char *server, unsigned server_version);
 int Client_setup(void);
 void Client_cleanup(void);
 int Client_start(void);
 int Client_fps_request(void);
 int Client_power(void);
-int Client_fd(void);
-int Client_input(int);
-void Client_flush(void);
-void Client_sync(void);
 int Client_wrap_mode(void);
 
 #ifdef _WINDOWS

@@ -31,6 +31,14 @@ char join_version[] = VERSION;
 
 void xpilotShutdown(void);
 
+static int Handle_input(int new_input)
+{
+#ifndef _WINDOWS
+    return x_event(new_input);
+#else
+    return 0;
+#endif
+}
 
 #ifndef _WINDOWS
 static void Input_loop(void)
@@ -48,13 +56,13 @@ static void Input_loop(void)
 	error("Bad server input");
 	return;
     }
-    if (Client_input(2) == -1)
+    if (Handle_input(2) == -1)
 	return;
 
     if (Net_flush() == -1)
 	return;
 
-    if ((clientfd = Client_fd()) == -1) {
+    if ((clientfd = ConnectionNumber(dpy)) == -1) {
 	error("Bad client filedescriptor");
 	return;
     }
@@ -71,7 +79,7 @@ static void Input_loop(void)
 	if ((scoresChanged != 0 && ++scoresChanged > SCORE_UPDATE_DELAY)
 	    || result > 1) {
 	    if (scoresChanged > 2 * SCORE_UPDATE_DELAY) {
-		Client_score_table();
+		Paint_score_table();
 		tv.tv_sec = 10;
 		tv.tv_usec = 0;
 	    } else {
@@ -90,8 +98,8 @@ static void Input_loop(void)
 	}
 	if (n == 0) {
 	    if (scoresChanged > SCORE_UPDATE_DELAY) {
-		Client_score_table();
-		if (Client_input(2) == -1)
+		Paint_score_table();
+		if (Handle_input(2) == -1)
 		    return;
 		continue;
 	    }
@@ -101,7 +109,7 @@ static void Input_loop(void)
 	    }
 	}
 	if (FD_ISSET(clientfd, &rfds)) {
-	    if (Client_input(1) == -1)
+	    if (Handle_input(1) == -1)
 		return;
 
 	    if (Net_flush() == -1) {
@@ -129,15 +137,15 @@ static void Input_loop(void)
 		 * keyboard events and then we wait until the X server
 		 * has finished the drawing of our current frame.
 		 */
-		if (Client_input(1) == -1)
+		if (Handle_input(1) == -1)
 		    return;
 
 		if (Net_flush() == -1) {
 		    error("Bad net flush before sync");
 		    return;
 		}
-		Client_sync();
-		if (Client_input(1) == -1)
+		XSync(dpy, False);
+		if (Handle_input(1) == -1)
 		    return;
 	    }
 	}

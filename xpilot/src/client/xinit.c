@@ -1121,7 +1121,7 @@ void Resize(Window w, unsigned width, unsigned height)
 	draw_width = top_width;
     draw_height = top_height;
 
-    Send_display();
+    Check_view_dimensions();
     Net_flush();
     XResizeWindow(dpy, drawWindow, draw_width, draw_height);
 #ifndef _WINDOWS

@@ -3429,6 +3429,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "packetSizeMeterColor", &packetSizeMeterColor);
     Get_int_resource(rDB, "packetLossMeterColor", &packetLossMeterColor);
     Get_int_resource(rDB, "packetDropMeterColor", &packetDropMeterColor);
+    if (packetLossMeterColor || packetDropMeterColor)
+	packetMeasurement = true;
     Get_int_resource(rDB, "packetLagMeterColor", &packetLagMeterColor);
     Get_int_resource(rDB, "temporaryMeterColor", &temporaryMeterColor);
     Get_int_resource(rDB, "meterBorderColor", &meterBorderColor);

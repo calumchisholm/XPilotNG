@@ -40,7 +40,6 @@
 #define HUD_OFFSET		20	/* Hud line offset */
 #define FUEL_GAUGE_OFFSET	6
 #define HUD_FUEL_GAUGE_SIZE	(2*(MIN_HUD_SIZE-HUD_OFFSET-FUEL_GAUGE_OFFSET))
-#define FUEL_NOTIFY_TIME	3.0
 #define CONTROL_TIME		8.0
 
 #define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
@@ -79,6 +78,23 @@ typedef struct {
 /* how to draw a selection */
 #define DRAW_EMPHASIZED		BLUE
 
+#if 0
+#define FIND_NAME_WIDTH(other)                                          \
+    if ((other)->name_width == 0) {                                     \
+        (other)->name_len = strlen((other)->name);                      \
+        (other)->name_width = 2 + XTextWidth(gameFont, (other)->name,   \
+                                         (other)->name_len);            \
+    }
+#endif /* 0 */
+ 
+#define FIND_NAME_WIDTH(other)                                          \
+    if ((other)->name_width == 0) {                                     \
+        (other)->name_len = strlen((other)->id_string);                 \
+        (other)->name_width = 2 + XTextWidth(gameFont, (other)->id_string,\
+                                         (other)->name_len);            \
+    }
+
+
 /*
  * Global objects.
  */
@@ -94,6 +110,9 @@ extern int ballstats_teamcashes;
 extern int ballstats_lostballs;
 extern bool played_this_round;
 extern int rounds_played;
+
+extern ipos	world;
+extern ipos	realWorld;
 
 extern char	dashes[NUM_DASHES];
 extern char	cdashes[NUM_CDASHES];
@@ -203,7 +222,6 @@ extern int	packetDropMeterColor;	/* Color index for packet drop meter */
 extern int	packetLagMeterColor;	/* Color index for packet lag meter */
 extern int	temporaryMeterColor;	/* Color index for temporary meters */
 extern int	meterBorderColor;	/* Color index for meter borders */
-extern double	scoreObjectTime;	/* how long score objects are flashed */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	fuelColor;		/* Color index for fuel box drawing */
@@ -238,7 +256,6 @@ extern double	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
 extern bool	titleFlip;		/* Do special titlebar flipping? */
 extern int	shieldDrawMode;		/* How to draw players shield */
-extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */
 extern char	*texturePath;		/* Path list of texture directories */
 extern char	*wallTextureFile;	/* Filename of wall texture */
 extern char	*decorTextureFile;	/* Filename of decor texture */
@@ -282,6 +299,7 @@ extern void	Init_scale_array(void);
 
 void Init_paint(void);
 void Add_message(char *message);
+
 int Handle_start(long server_loops);
 int Handle_end(long server_loops);
 int Handle_self(int x, int y, int vx, int vy, int newHeading,
@@ -332,13 +350,15 @@ void Paint_ships(void);
 void Paint_radar(void);
 void Paint_sliding_radar(void);
 void Paint_world_radar(void);
-void Paint_radar_block(int, int, int);
+void Radar_show_target(int x, int y);
+void Radar_hide_target(int x, int y);
 void Paint_vcannon(void);
 void Paint_vfuel(void);
 void Paint_vbase(void);
 void Paint_vdecor(void);
 void Paint_objects(void);
 void Paint_world(void);
+void Paint_score_table(void);
 void Paint_score_entry(int entry_num, other_t *other, bool is_team);
 void Paint_score_start(void);
 void Paint_score_objects(void);
@@ -350,10 +370,11 @@ void Add_pending_messages(void);
 void Paint_recording(void);
 void Paint_client_fps(void);
 void Paint_frame(void);
-int Handle_time_left(long sec);
 void Game_over_action(u_byte status);
 int Team_color(int);
 int Life_color(other_t *other);
 int Life_color_by_life(int life);
+void Play_beep(void);
+int Check_view_dimensions();
 
 #endif

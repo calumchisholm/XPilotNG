@@ -40,6 +40,9 @@ int ballstats_lostballs = 0;
 bool played_this_round = false;
 int rounds_played = 0;
 
+ipos	world;
+ipos	realWorld;
+
 XFontStruct* gameFont;		/* The fonts used in the game */
 XFontStruct* messageFont;
 XFontStruct* scoreListFont;
@@ -109,7 +112,6 @@ int	ext_view_y_offset;	/* Offset ext_view_height */
 
 bool	titleFlip;		/* Do special title bar flipping? */
 int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */
-char	modBankStr[NUM_MODBANKS][MAX_CHARS];	/* modifier banks */
 char	*texturePath = NULL;		/* Path list of texture directories */
 
 int		maxKeyDefs;
@@ -163,6 +165,45 @@ void Game_over_action(u_byte status)
     old_status = status;
 }
 
+int Check_view_dimensions(void)
+{
+    int			width_wanted, height_wanted;
+    int			srv_width, srv_height;
+
+    width_wanted = (int)(draw_width * scaleFactor + 0.5);
+    height_wanted = (int)(draw_height * scaleFactor + 0.5);
+
+    srv_width = width_wanted;
+    srv_height = height_wanted;
+    LIMIT(srv_height, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
+    LIMIT(srv_width, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
+    if (server_display.view_width != srv_width ||
+	server_display.view_height != srv_height) {
+	if (Send_display(srv_width, 
+			 srv_height, 
+			 spark_rand, 
+			 num_spark_colors))
+	    return -1;
+    }
+    active_view_width = server_display.view_width;
+    active_view_height = server_display.view_height;
+    ext_view_x_offset = 0;
+    ext_view_y_offset = 0;
+    if (width_wanted > active_view_width) {
+	ext_view_width = width_wanted;
+	ext_view_x_offset = (width_wanted - active_view_width) / 2;
+    } else {
+	ext_view_width = active_view_width;
+    }
+    if (height_wanted > active_view_height) {
+	ext_view_height = height_wanted;
+	ext_view_y_offset = (height_wanted - active_view_height) / 2;
+    } else {
+	ext_view_width = active_view_width;
+    }
+    return 0;
+}
+
 
 void Paint_frame(void)
 {
@@ -175,6 +216,22 @@ void Paint_frame(void)
     /* send anything to the server before returning to Windows */
     Net_flush();
 #endif
+
+    Check_view_dimensions();
+
+    world.x = FOOpos.x - (ext_view_width / 2);
+    world.y = FOOpos.y - (ext_view_height / 2);
+    realWorld = world;
+    if (BIT(Setup->mode, WRAP_PLAY)) {
+	if (world.x < 0 && world.x + ext_view_width < Setup->width)
+	    world.x += Setup->width;
+	else if (world.x > 0 && world.x + ext_view_width >= Setup->width)
+	    realWorld.x -= Setup->width;
+	if (world.y < 0 && world.y + ext_view_height < Setup->height)
+	    world.y += Setup->height;
+	else if (world.y > 0 && world.y + ext_view_height >= Setup->height)
+	    realWorld.y -= Setup->height;
+    }
 
     if (start_loops != end_loops)
 	warn("Start neq. End (%ld,%ld,%ld)", start_loops, end_loops, loops);
@@ -414,7 +471,7 @@ void Paint_frame(void)
 #endif
 
 #ifdef _WINDOWS
-    Client_score_table();
+    Paint_score_table();
     PaintWinClient();
 #endif
 
@@ -628,6 +685,298 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 }
 
 
+static void Print_roundend_messages(other_t **order)
+{
+    static char		hackbuf[MSG_LEN];
+    static char		hackbuf2[MSG_LEN];
+    static char		kdratio[16];
+    static char		killsperround[16];
+    char		*s;
+    int			i;
+    other_t		*other;
+
+    roundend = false;
+
+    if (killratio_totalkills == 0)
+	sprintf(kdratio, "0");
+    else if (killratio_totaldeaths == 0)
+	sprintf(kdratio, "infinite");
+    else
+	sprintf(kdratio, "%.2f",
+		(double)killratio_totalkills / killratio_totaldeaths);
+
+    if (rounds_played == 0)
+	sprintf(killsperround, "0");
+    else
+	sprintf(killsperround, "%.2f",
+		(double)killratio_totalkills / rounds_played);
+
+    sprintf(hackbuf, "Kill ratio - Round: %d/%d Total: %d/%d (%s) "
+	    "Rounds played: %d  Avg.kills/round: %s",
+	    killratio_kills, killratio_deaths,
+	    killratio_totalkills, killratio_totaldeaths, kdratio,
+	    rounds_played, killsperround);
+
+    killratio_kills = 0;
+    killratio_deaths = 0;
+    Add_message(hackbuf);
+
+    sprintf(hackbuf, "Ballstats - Cash/Repl/Team/Lost: %d/%d/%d/%d",
+	    ballstats_cashes, ballstats_replaces,
+	    ballstats_teamcashes, ballstats_lostballs);
+    Add_message(hackbuf);
+
+    s = hackbuf;
+    s += sprintf(s, "Points - ");
+    /*
+     * Scores are nice to see e.g. in cup recordings.
+     */
+    for (i = 0; i < num_others; i++) {
+	other = order[i];
+	if (other->mychar == 'P')
+	    continue;
+
+	if (Using_score_decimals()) {
+	    sprintf(hackbuf2, "%s: %.*f ", other->name,
+		    showScoreDecimals, other->score);
+	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
+		Add_message(hackbuf);
+		s = hackbuf;
+	    }
+	    s += sprintf(s, "%s", hackbuf2);
+	} else {
+	    sprintf(hackbuf2, "%s: %d ", other->name,
+		    (int) rint(other->score));
+	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
+		Add_message(hackbuf);
+		s = hackbuf;
+	    }
+	    s += sprintf(s,"%s",hackbuf2);
+	}
+    }
+    Add_message(hackbuf);
+}
+
+struct team_score {
+    double	score;
+    int		life;
+    int		playing;
+};
+
+
+static void Determine_team_order(struct team_score *team_order[],
+				 struct team_score team[])
+{
+    int i, j, k;
+
+    num_playing_teams = 0;
+    for (i = 0; i < MAX_TEAMS; i++) {
+	if (team[i].playing) {
+	    for (j = 0; j < num_playing_teams; j++) {
+		if (team[i].score > team_order[j]->score
+		    || (team[i].score == team_order[j]->score
+			&& ((BIT(Setup->mode, LIMITED_LIVES))
+			    ? (team[i].life > team_order[j]->life)
+			    : (team[i].life < team_order[j]->life)))) {
+		    for (k = i; k > j; k--)
+			team_order[k] = team_order[k - 1];
+		    break;
+		}
+	    }
+	    team_order[j] = &team[i];
+	    num_playing_teams++;
+	}
+    }
+}
+
+static void Determine_order(other_t **order, struct team_score team[])
+{
+    other_t		*other;
+    int			i, j, k;
+
+    for (i = 0; i < num_others; i++) {
+	other = &Others[i];
+	if (BIT(Setup->mode, TIMING)) {
+	    /*
+	     * Sort the score table on position in race.
+	     * Put paused and waiting players last as well as tanks.
+	     */
+	    if (strchr("PTW", other->mychar))
+		j = i;
+	    else {
+		for (j = 0; j < i; j++) {
+		    if (order[j]->timing < other->timing)
+			break;
+		    if (strchr("PTW", order[j]->mychar))
+			break;
+		    if (order[j]->timing == other->timing) {
+			if (order[j]->timing_loops > other->timing_loops)
+			    break;
+		    }
+		}
+	    }
+	}
+	else {
+	    for (j = 0; j < i; j++) {
+		if (order[j]->score < other->score)
+		    break;
+	    }
+	}
+	for (k = i; k > j; k--)
+	    order[k] = order[k - 1];
+	order[j] = other;
+
+	if (BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY) {
+	    switch (other->mychar) {
+	    case 'P':
+	    case 'W':
+	    case 'T':
+		break;
+	    case ' ':
+	    case 'R':
+		if (BIT(Setup->mode, LIMITED_LIVES))
+		    team[other->team].life += other->life + 1;
+		else
+		    team[other->team].life += other->life;
+		/*FALLTHROUGH*/
+	    default:
+		team[other->team].playing++;
+		team[other->team].score += other->score;
+		break;
+	    }
+	}
+    }
+    return;
+}
+
+#define TEAM_PAUSEHACK 100
+
+static int Team_heading(int entrynum, int teamnum,
+			int teamlives, double teamscore)
+{
+    other_t tmp;
+    tmp.id = -1;
+    tmp.team = teamnum;
+    tmp.war_id = -1;
+    tmp.name_width = 0;
+    tmp.ship = NULL;
+    if (teamnum != TEAM_PAUSEHACK)
+	sprintf(tmp.name, "TEAM %d", tmp.team);
+    else
+	sprintf(tmp.name, "Pause Wusses");
+    strcpy(tmp.real, tmp.name);
+    strcpy(tmp.host, "");
+#if 0
+    if (BIT(Setup->mode, LIMITED_LIVES) && teamlives == 0)
+	tmp.mychar = 'D';
+    else
+	tmp.mychar = ' ';
+#else
+    tmp.mychar = ' ';
+#endif
+    tmp.score = teamscore;
+    tmp.life = teamlives;
+
+    Paint_score_entry(entrynum++, &tmp, true);
+    return entrynum;
+}
+
+static int Team_score_table(int entrynum, int teamnum,
+			    struct team_score team, other_t **order)
+{
+    other_t *other;
+    int i, j;
+    bool drawn = false;
+
+    for (i = 0; i < num_others; i++) {
+	other = order[i];
+
+	if (teamnum == TEAM_PAUSEHACK) {
+	    if (other->mychar != 'P')
+		continue;
+	} else {
+	    if (other->team != teamnum || other->mychar == 'P')
+		continue;
+	}
+
+	if (!drawn)
+	    entrynum = Team_heading(entrynum, teamnum, team.life, team.score);
+	j = other - Others;
+	Paint_score_entry(entrynum++, other, false);
+	drawn = true;
+    }
+
+    if (drawn)
+	entrynum += 1;
+    return entrynum;
+}
+
+
+void Paint_score_table(void)
+{
+
+    struct team_score	team[MAX_TEAMS],
+			pausers,
+			*team_order[MAX_TEAMS];
+    other_t		*other,
+			**order;
+    int			i, j, entrynum = 0;
+
+    if (!scoresChanged || !players_exposed)
+	return;
+
+    if (num_others < 1) {
+	Paint_score_start();
+	scoresChanged = false;
+	return;
+    }
+
+    if ((order = (other_t **)malloc(num_others * sizeof(other_t *))) == NULL) {
+	error("No memory for score");
+	return;
+    }
+    if (BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY) {
+	memset(&team[0], 0, sizeof team);
+	memset(&pausers, 0, sizeof pausers);
+    }
+    Determine_order(order, team);
+    Paint_score_start();
+    if (!(BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY)) {
+	for (i = 0; i < num_others; i++) {
+	    other = order[i];
+	    j = other - Others;
+	    Paint_score_entry(i, other, false);
+	}
+    } else {
+	Determine_team_order(team_order, team);
+
+	/* add an empty line */
+	entrynum++;
+	for (i = 0; i < MAX_TEAMS; i++)
+	    entrynum = Team_score_table(entrynum, i, team[i], order);
+	/* paint pausers */
+	entrynum = Team_score_table(entrynum, TEAM_PAUSEHACK, pausers, order);
+#if 0
+	for (i = 0; i < num_playing_teams; i++) {
+	    entrynum = Team_heading(entrynum,
+				    team_order[i] - &team[0],
+				    team_order[i]->life,
+				    team_order[i]->score);
+	}
+#endif
+    }
+
+    if (roundend)
+	Print_roundend_messages(order);
+
+    free(order);
+
+    IFWINDOWS( MarkPlayersForRedraw() );
+
+    scoresChanged = false;
+}
+
+
 static void Paint_clock(bool redraw)
 {
     int			second,
@@ -696,4 +1045,10 @@ void ShadowDrawString(Display *display, Window w, GC gc,
     x--; y--;
     XSetForeground(display, gc, fg);
     XDrawString(display, w, gc, x, y, str, strlen(str));
+}
+
+void Play_beep(void)
+{
+    XBell(dpy, 0);
+    XFlush(dpy);
 }

@@ -1604,8 +1604,13 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 	    Map_blue(0, 0, Setup->x, Setup->y);
 	}
     }
-    if (packetDropMeterColor || packetLossMeterColor)
+    if (packetDropMeterColor || packetLossMeterColor) {
+	packetMeasurement = true;
 	Net_init_measurement();
+	if (!packetMeasurement)
+	    packetDropMeterColor = 
+		packetLossMeterColor = 0;
+    }
     if (packetLagMeterColor)
 	Net_init_lag_measurement();
 
@@ -1677,7 +1682,7 @@ static int Config_update_sparkProb(int widget_desc, void *data, double *val)
 {
     (void)widget_desc; (void)data; (void)val;
     spark_rand = (int)(spark_prob * MAX_SPARK_RAND + 0.5f);
-    Send_display();
+    Check_view_dimensions();
     return 0;
 }
 
@@ -1975,7 +1980,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 
     *strptr = "Saving...";
     Widget_draw(widget_desc);
-    Client_flush();
+    XFlush(dpy);
 
     Get_xpilotrc_file(oldfile, sizeof(oldfile));
     if (oldfile[0] == '\0') {
