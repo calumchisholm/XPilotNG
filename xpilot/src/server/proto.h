@@ -196,7 +196,7 @@ void Detonate_mines(player *pl);
 char *Describe_shot(int type, long status, modifiers mods, int hit);
 void Fire_ecm(player *pl);
 void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy);
-void Connector_force(int ind);
+void Update_connector_force(ballobject *ball);
 void Fire_shot(player *pl, int type, int dir);
 void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 		       int cx, int cy, int type, int dir,

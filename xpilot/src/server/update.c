@@ -499,8 +499,8 @@ static void Misc_object_update(void)
 	else if (BIT(obj->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT))
 	    Update_missile(MISSILE_PTR(obj));
 
-	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID)
-	    Connector_force(i);
+	else if (BIT(obj->type, OBJ_BALL))
+	    Update_connector_force(BALL_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {
 	    wireobject *wireobj = WIRE_PTR(obj);
