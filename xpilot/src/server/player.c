@@ -1904,9 +1904,11 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->status		|= DEF_BITS;
     pl->status		&= ~(KILL_BITS);
 
-    for (i = 0; i < NUM_ITEMS; i++) {
-	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-	    pl->item[i] = world->items[i].initial;
+    if (!BIT(pl->status, PAUSE)) {
+	for (i = 0; i < NUM_ITEMS; i++) {
+	    if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+		pl->item[i] = world->items[i].initial;
+	}
     }
 
     pl->forceVisible	= 0;
@@ -1924,11 +1926,13 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->stunned		= 0;
     pl->lock.distance	= 0;
 
-    pl->fuel.sum       	= pl->fuel.sum * 0.90;	/* Loose 10% of fuel */
-    minfuel		= world->items[ITEM_FUEL].initial;
-    minfuel		+= rfrac() * (1.0 + minfuel) * 0.2;
-    pl->fuel.sum	= MAX(pl->fuel.sum, minfuel);
-    Player_init_fuel(pl, pl->fuel.sum);
+    if (!BIT(pl->status, PAUSE)) {
+	pl->fuel.sum	= pl->fuel.sum * 0.90;	/* Loose 10% of fuel */
+	minfuel		= world->items[ITEM_FUEL].initial;
+	minfuel		+= rfrac() * (1.0 + minfuel) * 0.2;
+	pl->fuel.sum	= MAX(pl->fuel.sum, minfuel);
+	Player_init_fuel(pl, pl->fuel.sum);
+    }
 
     /*-BA Handle the combination of limited life games and
      *-BA options.robotLeaveLife by making a robot leave iff it gets
