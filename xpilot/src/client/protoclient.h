@@ -59,7 +59,8 @@ void Colors_debug(void);
 extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 			  int *my_team, int *text, int *list,
 			  int *join, int *noLocalMotd,
-			  char *nickName, char *dispName, char *shut_msg);
+			  char *nickName, char *dispName, char *hostName,
+			  char *shut_msg);
 extern void defaultCleanup(void);				/* memory cleanup */
 
 #ifndef _WINDOWS

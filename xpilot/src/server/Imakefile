@@ -32,12 +32,12 @@ DEFS_DEBUG = -DDEVELOPMENT
 DEFINES = \
        $(DEFS_LOG) $(DEFS_SILENT) $(DEFS_SERVER_SOUND) \
        $(DEFS_PLOCKSERVER) $(DEFS_OTHER) $(DEFS_DEBUG)
-INCLUDES = $(AUDIOINC) -I$(COMMON) $(EXPATINC)
-LOCAL_LDFLAGS = $(EXPATLIBD)
+INCLUDES = $(AUDIOINC) -I$(COMMON) $(EXPATINC) $(CRYPTINC)
+LOCAL_LDFLAGS = $(EXPATLIBD) $(CRYPTLIBD)
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 SRCS = \
-	cannon.c cmdline.c collision.c contact.c \
+	auth.c cannon.c cmdline.c collision.c contact.c \
 	event.c frame.c id.c item.c \
 	map.c metaserver.c netserver.c objpos.c option.c play.c player.c \
 	rank.c recwrap.c rules.c saudio.c sched.c \
@@ -45,7 +45,7 @@ SRCS = \
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 OBJS = \
-	cannon.o cmdline.o collision.o contact.o \
+	auth.o cannon.o cmdline.o collision.o contact.o \
 	event.o frame.o id.o item.o \
 	map.o metaserver.o netserver.o objpos.o option.o play.o player.o \
 	rank.o recwrap.o rules.o saudio.o sched.o \
@@ -55,5 +55,5 @@ DEPLIBS = $(COMMON)libxpcommon.a
 
 PROGRAMS = xpilots
 
-ProgramTarget(xpilots,$(COMMON)libxpcommon.a,$(MATHLIB) $(EXPATLIB) $(EXTRALIB))
+ProgramTarget(xpilots,$(COMMON)libxpcommon.a,$(MATHLIB) $(CRYPTLIB) $(EXPATLIB) $(EXTRALIB))
 CtagFiles(*.[ch] $(COMMON)*.[ch])

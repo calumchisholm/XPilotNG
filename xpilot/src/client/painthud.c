@@ -1188,9 +1188,8 @@ void Add_message(char *message)
     msg_set[0]->pixelLen = XTextWidth(messageFont, msg_set[0]->txt, msg_set[0]->len);
 
     /* Print message to standard output. */
-    if (messagesToStdout == 2 ||
-	messagesToStdout == 1 && *message &&
-	message[strlen(message) - 1] == ']')
+    if (messagesToStdout == 2 || (messagesToStdout == 1 && *message &&
+	message[strlen(message) - 1] == ']'))
 
 	xpprintf("%s\n", message);
 }

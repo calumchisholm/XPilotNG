@@ -64,10 +64,6 @@
 #define MAX_RETRANSMIT		(FPS + 1)
 #define DEFAULT_RETRANSMIT	(FPS / 2)
 
-#if defined(VMS) && !defined(MAXHOSTNAMELEN)
-#define MAXHOSTNAMELEN 64
-#endif
-
 
 /*
  * All the connection state info.
@@ -147,6 +143,7 @@ static int Send_motd(int ind);
 char *showtime(void);
 int Get_motd(char *buf, int offset, int maxlen, int *size_ptr);
 int Setup_net_server(void);
+void Conn_change_nick(int ind, const char *nick);
 void Destroy_connection(int ind, const char *reason);
 int Check_connection(char *real, char *nick, char *dpy, char *addr);
 int Setup_connection(char *real, char *nick, char *dpy, int team,

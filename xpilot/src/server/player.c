@@ -406,6 +406,7 @@ int Init_player(int ind, wireobj *ship)
     pl->fs		= 0;
     pl->repair_target	= 0;
     pl->name[0]		= '\0';
+    pl->auth_nick[0]	= 0;
     pl->num_pulses	= 0;
     pl->emergency_thrust_left = 0;
     pl->emergency_thrust_max = 0;
@@ -490,6 +491,8 @@ int Init_player(int ind, wireobj *ship)
     pl->isoperator = 0;
 
     pl->rectype = 0;
+
+    pl->scorenode = 0;
 
     return pl->id;
 }

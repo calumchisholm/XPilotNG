@@ -37,6 +37,8 @@
 #include "version.h"
 #include "rplay.h"
 #include "audio.h"
+#include "pack.h"
+#include "commonproto.h"
 
 char audio_version[] = VERSION;
 
@@ -45,9 +47,9 @@ static int fd;
 
 int audioDeviceInit(char *display)
 {
-    char host[MAXHOSTNAMELEN], *p;
+    char host[MAX_DISP_LEN], *p;
 
-    strcpy(host, display);
+    strlcpy(host, display, sizeof(host));
 
     if (p = strrchr(host, ':'))
 	*p = 0;

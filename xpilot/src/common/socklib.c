@@ -687,7 +687,8 @@ void sock_get_local_hostname(char *name, unsigned size,
 	++dot;
     }
     if (xpilot_he != NULL) {
-	strncpy(name, xpilot_hostname, size);
+	strncpy(name, xpilot_hostname, size - 1);
+	name[size - 1] = 0;
     }
 
 #endif

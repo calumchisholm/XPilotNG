@@ -24,6 +24,8 @@
 #ifndef	PROTO_H
 #define	PROTO_H
 
+#include "object.h"
+
 #ifdef VMS
 #include "strcasecmp.h"
 #endif
@@ -233,6 +235,7 @@ void Main_loop(void);
 void Contact_cleanup(void);
 void Contact_init(void);
 void Contact(int fd, void *arg);
+void Queue_kick(const char *nick);
 void Queue_loop(void);
 void Set_deny_hosts(void);
 

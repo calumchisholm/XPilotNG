@@ -177,6 +177,7 @@ extern bool		allowClusters;
 extern bool		allowModifiers;
 extern bool		allowLaserModifiers;
 extern bool		allowShipShapes;
+extern bool		allowPlayerPasswords;
 
 extern bool		shieldedItemPickup;
 extern bool		shieldedMining;
@@ -246,6 +247,8 @@ extern char		*recordFileName;
 extern int		FPSMultiplier;
 extern int		framespeed;
 extern DFLOAT		framespeed2;
+extern char		*playerPasswordsFileName;
+extern int		playerPasswordsFileSizeLimit;
 
 
 #endif

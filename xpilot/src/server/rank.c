@@ -28,6 +28,7 @@
 #include "netserver.h"
 #include "error.h"
 #include "object.h"
+#include "checknames.h"
 
 /* MAX_SCORES = how many players we remember */
 #define MAX_SCORES 400
@@ -448,6 +449,9 @@ void Rank_get_saved_score(player *pl)
     int i;
     updateScores = true;
 
+    if (pl->name[strlen(pl->name) - 1] == PROT_EXT)
+	return;
+
     for (i = 0; i < MAX_SCORES; i++) {
 	score = &scores[i];
 	if ( strcasecmp(pl->name, score->nick) == 0 )
@@ -483,6 +487,10 @@ void Rank_get_saved_score(player *pl)
 void Rank_save_score(const player *pl)
 {
     ScoreNode *score = pl->scorenode;
+
+    if (!score)
+	return;
+
     score->score = pl->score;
     strcpy(score->logout, rank_showtime());
     score->pl = 0;

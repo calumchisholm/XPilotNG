@@ -34,6 +34,8 @@ typedef struct _valPair {
     int origin; /* Origin of the setting */
 } valPair;
 
+#include "types.h"
+
 enum valType {
 	valVoid,	/* variable is not a variable */
 	valInt,		/* variable is type int */

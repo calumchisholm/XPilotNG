@@ -421,6 +421,7 @@ struct player {
     int         isoperator;             /* Player has operator privileges */
     int         rectype;                /* normal, saved or spectator */
     ScoreNode	*scorenode;
+    char	auth_nick[MAX_CHARS];	/* Original nick (/auth command) */
 #ifdef __cplusplus
 		player() {}
 #endif

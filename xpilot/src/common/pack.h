@@ -95,8 +95,9 @@
  * 4.2.0.3: different way of sending player item info.
  * 4.2.1.0: high bit in radar size means player is a teammate.
  * 4.3.0.0: transmit phasing separately from cloaking
+ * 4.F.1.0: Send_player(): Additional %c (is 1 when we tell a player about himself).
  */
-#define	MAGIC		0x4F09F4ED
+#define	MAGIC			0x4F10F4ED
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)
 #define VERSION2MAGIC(V)	((((V) & 0xFFFF) << 16) | (MAGIC & 0xFFFF))

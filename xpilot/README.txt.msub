@@ -13,9 +13,6 @@ Installation instructions are in the INSTALL.txt file.
 NT and Win95 users should examine the contrib/NT subdirectory and read
 the README.txt which is in there.
 
-VMS users should examine the contrib/VMS subdirectory and read the
-README.VMS which is in there.
-
 The documentation for XPilot is far from complete.  The map format is
 only explained in doc/README.MAPS and doc/README.MAPS2, not in the server
 manual page, xpilots(6).  The client manual page, xpilot(6), is more or

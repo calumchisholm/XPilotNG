@@ -236,7 +236,7 @@ void Grok_map(void)
 	if (x >= World.x || c == '\n') {
 	    y--; x = -1;
 	    if (c != '\n') {			/* Get rest of line */
-		error("Map file contains extranous characters");
+		error("Map file contains extraneous characters");
 		while (c != '\n' && c != EOF)	/* from file. */
 		    fputc(c = *s++, stderr);
 	    }

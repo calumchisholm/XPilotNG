@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -51,11 +50,11 @@
 #include "net.h"
 #include "connectparam.h"
 #include "protoclient.h"
+#include "commonproto.h"
 #ifdef SUNCMW
 # include "cmw.h"
 #endif /* SUNCMW */
 #include "portability.h"
-#include "checknames.h"
 
 char xpilot_version[] = VERSION;
 
@@ -152,31 +151,18 @@ int main(int argc, char *argv[])
     conpar->contact_port = SERVER_PORT;
     conpar->team = TEAM_NOT_SET;
 
-    cp = getenv("XPILOTHOST");
-    if (cp) {
-	strncpy(hostname, cp, sizeof(hostname) - 1);
-    }
-    else {
-        sock_get_local_hostname(hostname, sizeof hostname, 0);
-    }
-    if (Check_host_name(hostname) == NAME_ERROR) {
-	xpprintf("fixing host from \"%s\" ", hostname);
-	Fix_host_name(hostname);
-	xpprintf("to \"%s\"\n", hostname);
-    }
-
     cp = getenv("XPILOTUSER");
-    if (cp) {
-	strncpy(conpar->real_name, cp, sizeof(conpar->real_name) - 1);
-    }
-    else {
+    if (cp)
+	strlcpy(conpar->real_name, cp, sizeof(conpar->real_name));
+    else
 	Get_login_name(conpar->real_name, sizeof(conpar->real_name) - 1);
-    }
-    if (Check_real_name(conpar->real_name) == NAME_ERROR) {
-	xpprintf("fixing name from \"%s\" ", conpar->real_name);
-	Fix_real_name(conpar->real_name);
-	xpprintf("to \"%s\"\n", conpar->real_name);
-    }
+
+    *hostname = 0;
+    cp = getenv("XPILOTHOST");
+    if (cp)
+	strlcpy(hostname, cp, sizeof(hostname));
+    else
+	sock_get_local_hostname(hostname, sizeof hostname, 0);
 
 #ifdef _WINDOWS
     conpar->disp_name[0] = '\0';
@@ -190,13 +176,7 @@ int main(int argc, char *argv[])
 		  &text, &list_servers,
 		  &auto_connect, &noLocalMotd,
 		  conpar->nick_name, conpar->disp_name,
-		  shutdown_reason);
-    if (Check_nick_name(conpar->nick_name) == NAME_ERROR) {
-	xpprintf("fixing nick from \"%s\" ", conpar->nick_name);
-	Fix_nick_name(conpar->nick_name);
-	xpprintf("to \"%s\"\n", conpar->nick_name);
-    }
-
+		  hostname, shutdown_reason);
     if (list_servers) {
 	auto_connect = true;
     }

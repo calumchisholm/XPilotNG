@@ -1,6 +1,6 @@
-This is the README file for XPilot 4.3.0X.
+This is the README file for XPilot 4.3.1X.
 
-Copyright © 1991-2000 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala.
+Copyright © 1991-2002 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala.
 
 Please see the LICENSE file for further details.  You may not
 distribute this project without all the documentation,
@@ -12,9 +12,6 @@ Installation instructions are in the INSTALL.txt file.
 
 NT and Win95 users should examine the contrib/NT subdirectory and read
 the README.txt which is in there.
-
-VMS users should examine the contrib/VMS subdirectory and read the
-README.VMS which is in there.
 
 The documentation for XPilot is far from complete.  The map format is
 only explained in doc/README.MAPS and doc/README.MAPS2, not in the server

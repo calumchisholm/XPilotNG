@@ -30,6 +30,8 @@
 #include "types.h"
 #endif
 
+#include "const.h"
+
 /*
  * Abstract (non-display system specific) drawing definitions.
  *

@@ -1,10 +1,10 @@
 # /home/jli/xpilot/src/server/xpilots option dump
 # 
-# LIBDIR = /usr/local/games/lib/xpilot/
-# DEFAULTS_FILE_NAME = /usr/local/games/lib/xpilot/defaults
-# MAPDIR = /usr/local/games/lib/xpilot/maps/
+# LIBDIR = /usr/local/lib/xpilot/
+# DEFAULTS_FILE_NAME = /usr/local/lib/xpilot/defaults
+# MAPDIR = /usr/local/lib/xpilot/maps/
 # DEFAULT_MAP = globe.xp
-# SERVERMOTDFILE = /usr/local/games/lib/xpilot/servermotd
+# SERVERMOTDFILE = /usr/local/lib/xpilot/servermotd
 # 
 gravity:                                 -0.14
 shipMass:                                20.0

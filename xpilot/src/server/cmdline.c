@@ -119,6 +119,8 @@ bool		wormholeVisible;	/* Are wormholes visible? */
 bool		itemConcentratorVisible;/* Are itemconcentrators visible? */
 int		wormTime;
 char		*defaultsFileName;	/* Name of defaults file... */
+char		*playerPasswordsFileName;/* Name of player passwords file... */
+int		playerPasswordsFileSizeLimit;/* Limit on player passwords file size */
 
 int		nukeMinSmarts;		/* minimum smarts for a nuke */
 int		nukeMinMines;		/* minimum number of mines for nuke */
@@ -166,6 +168,7 @@ bool		allowClusters;
 bool		allowModifiers;
 bool		allowLaserModifiers;
 bool		allowShipShapes;
+bool		allowPlayerPasswords;
 
 bool		playersOnRadar;		/* Are players visible on radar? */
 bool		missilesOnRadar;	/* Are missiles visible on radar? */
@@ -1050,6 +1053,27 @@ static optionDesc options[] = {
 	OPT_ANY
     },
     {
+	"playerPasswordsFileName",
+	"playerPasswordsFile",
+	NULL,
+	&playerPasswordsFileName,
+	valString,
+	tuner_dummy,
+	"The filename of the player passwords file to read when authenticating.\n",
+	OPT_ANY
+    },
+    {
+	"playerPasswordsFileSizeLimit",
+	"playerPasswordsLimit",
+	"1000000",
+	&playerPasswordsFileSizeLimit,
+	valInt,
+	tuner_none,
+	"Maximum size of player passwords file in bytes (may become a little "
+	"bigger!).\n",
+	OPT_ANY
+    },
+    {
 	"framesPerSecond",
 	"FPS",
 	"14",
@@ -1137,6 +1161,16 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are players allowed to define their own ship shape?\n",
+	OPT_ANY
+    },
+    {
+	"allowPlayerPasswords",
+	"PlayerPasswords",
+	"False",
+	&allowPlayerPasswords,
+	valBool,
+	tuner_dummy,
+	"May players protect their nicks with a password?\n",
 	OPT_ANY
     },
     {
@@ -2531,6 +2565,7 @@ static void Parse_dump(char *progname)
     xpprintf("# \n");
     xpprintf("# LIBDIR = %s\n", Conf_libdir());
     xpprintf("# DEFAULTS_FILE_NAME = %s\n", Conf_defaults_file_name());
+    xpprintf("# PLAYER_PASSWORDS_FILE_NAME = %s\n", Conf_player_passwords_file_name());
     xpprintf("# MAPDIR = %s\n", Conf_mapdir());
     xpprintf("# DEFAULT_MAP = %s\n", Conf_default_map());
     xpprintf("# SERVERMOTDFILE = %s\n", Conf_servermotdfile());

@@ -59,7 +59,7 @@
 #    elif defined(_WINDOWS)
 #        define LIBDIR		"lib/"
 #	 else
-#        define LIBDIR		"/usr/local/games/lib/xpilot/"
+#        define LIBDIR		"/usr/local/lib/xpilot/"
 #    endif
 #endif
 
@@ -68,6 +68,13 @@
 #        define DEFAULTS_FILE_NAME	LIBDIR "defaults.txt"
 #    else
 #        define DEFAULTS_FILE_NAME	LIBDIR "defaults"
+#    endif
+#endif
+#ifndef PLAYER_PASSWORDS_FILE_NAME
+#    if defined(_WINDOWS)
+#        define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords.txt"
+#    else
+#        define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords"
 #    endif
 #endif
 #ifndef ROBOTFILE
@@ -187,6 +194,12 @@ char conf_default_map_string[] = DEFAULT_MAP;
 char *Conf_default_map(void)
 {
     return conf_default_map_string;
+}
+
+char *Conf_player_passwords_file_name(void)
+{
+    static char conf[] = PLAYER_PASSWORDS_FILE_NAME;
+    return conf;
 }
 
 char *Conf_servermotdfile(void)

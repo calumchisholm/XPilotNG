@@ -638,6 +638,30 @@ static void Queue_remove(struct queued_player *qp, struct queued_player *prev)
     NumQueuedPlayers--;
 }
 
+void Queue_kick(const char *nick)
+{
+    unsigned int magic;
+    struct queued_player *qp = qp_list, *prev = NULL;
+
+    while (qp) {
+	if (!strcasecmp(qp->nick_name, nick))
+	    break;
+	prev = qp;
+	qp = qp->next;
+    }
+
+    if (!qp)
+	return;
+
+    magic = Version_to_magic(qp->version);
+    Sockbuf_clear(&ibuf);
+    Packet_printf(&ibuf, "%u%c%c", magic, ENTER_GAME_pack, E_IN_USE);
+    Reply(qp->host_addr, qp->port);
+    Queue_remove(qp, prev);
+
+    return;
+}
+
 static void Queue_ack(struct queued_player *qp, int qpos)
 {
     unsigned		my_magic = Version_to_magic(qp->version);
@@ -767,7 +791,7 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 			char *addr, char *host, unsigned version, int port,
 			int *qpos)
 {
-    int				status = SUCCESS;
+    int				status;
     struct queued_player	*qp, *prev = 0;
     int				num_queued = 0;
     int				num_same_hosts = 0;
@@ -785,7 +809,7 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 	}
 
 	/* same nick? */
-	if (!strcmp(nick, qp->nick_name)) {
+	if (!strcasecmp(nick, qp->nick_name)) {
 	    /* same screen? */
 	    if (!strcmp(addr, qp->host_addr)
 		&& !strcmp(real, qp->real_name)

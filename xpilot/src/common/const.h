@@ -171,6 +171,9 @@ extern DFLOAT		tbl_cos[];
 
 #define FONT_LEN		256
 
+#define MIN_PASS_LEN		5
+#define MAX_PASS_LEN		8
+
 #define NUM_MODBANKS		4
 
 #define MAX_TOTAL_SHOTS		16384	/* must be <= 65536 */

@@ -10,6 +10,9 @@ Release 4.3 credits:
 	Jarrod Miller			Fix base orientation, update mapeditor.
 	Peder Herborg			Fixes for sliding radar under Windows.
 	Ben Jackson			Several fixes.
+	Thorsten Kroeger		Server security fix, player passwords,
+					numerous other patches.
+	Paul Alexander Drees		user/host client options.
 
 Release 4.2 credits:
 

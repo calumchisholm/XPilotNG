@@ -384,7 +384,7 @@ other_t *Other_by_name(char *name); /* Only used by message scan hack */
 wireobj *Ship_by_id(int id);
 int Handle_leave(int id);
 int Handle_player(int id, int team, int mychar, char *player_name,
-		  char *real_name, char *host_name, char *shape);
+		  char *real_name, char *host_name, char *shape, int myself);
 int Handle_score(int id, int score, int life, int mychar);
 int Handle_score_object(int score, int x, int y, char *msg);
 int Handle_timing(int id, int check, int round);

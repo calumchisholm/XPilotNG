@@ -2285,7 +2285,7 @@ int Receive_player(void)
 {
     int			n;
     short		id;
-    u_byte		ch, myteam, mychar;
+    u_byte		ch, myteam, mychar, myself = 0;
     char		name[MAX_CHARS],
 			real[MAX_CHARS],
 			host[MAX_CHARS],
@@ -2303,12 +2303,16 @@ int Receive_player(void)
     real[MAX_NAME_LEN - 1] = '\0';
     host[MAX_HOST_LEN - 1] = '\0';
     if (version > 0x3200) {
-	if ((n = Packet_scanf(&cbuf, "%S", &shape[strlen(shape)])) <= 0) {
+	if (version < 0x4F10)
+	    n = Packet_scanf(&cbuf, "%S", &shape[strlen(shape)]);
+	else
+	    n = Packet_scanf(&cbuf, "%S%c", &shape[strlen(shape)], &myself);
+	if (n <= 0) {
 	    cbuf.ptr = cbuf_ptr;
 	    return n;
 	}
     }
-    if ((n = Handle_player(id, myteam, mychar, name, real, host, shape)) == -1) {
+    if ((n = Handle_player(id, myteam, mychar, name, real, host, shape, myself)) == -1) {
 	return -1;
     }
     return 1;

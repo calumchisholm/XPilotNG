@@ -746,7 +746,8 @@ void Game_Over(void)
  */
 static void Check_server_versions(void)
 {
-    extern char		cannon_version[],
+    extern char		auth_version[],
+			cannon_version[],
 			cmdline_version[],
 			collision_version[],
 			error_version[],
@@ -776,6 +777,7 @@ static void Check_server_versions(void)
 	char		filename[16];
 	char		*versionstr;
     } file_versions[] = {
+	{ "auth", auth_version },
 	{ "cannon", cannon_version },
 	{ "cmdline", cmdline_version },
 	{ "collision", collision_version },

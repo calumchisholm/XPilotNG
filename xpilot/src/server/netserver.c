@@ -128,6 +128,7 @@
 #include "saudio.h"
 #include "checknames.h"
 #include "click.h"
+#include "auth.h"
 
 char netserver_version[] = VERSION;
 
@@ -472,6 +473,16 @@ static void Conn_set_state(connection_t *connp, int state, int drain_state)
     }
 
     login_in_progress = num_conn_busy - num_conn_playing;
+}
+
+void Conn_change_nick(int ind, const char *nick)
+{
+    connection_t	*connp = &Conn[ind];
+
+    if (connp->nick)
+	free(connp->nick);
+
+    connp->nick = strdup(nick);
 }
 
 /*
@@ -844,6 +855,7 @@ static int Handle_listening(int ind)
     else
 	xpprintf("\n");
 #endif
+
     if (connp->r.ptr[0] != PKT_VERIFY) {
 	Send_reply(ind, PKT_VERIFY, PKT_FAILURE);
 	Send_reliable(ind);
@@ -859,7 +871,8 @@ static int Handle_listening(int ind)
     }
     Fix_real_name(real);
     Fix_nick_name(nick);
-    if (strcmp(real, connp->real)) {
+
+    if (strcmp(nick, connp->nick) || strcmp(real, connp->real)) {
 #ifndef SILENT
 	xpprintf("%s Client verified incorrectly (%s,%s)(%s,%s)\n",
 		 showtime(), real, nick, connp->real, connp->nick);
@@ -869,6 +882,7 @@ static int Handle_listening(int ind)
 	Destroy_connection(ind, "verify incorrect");
 	return -1;
     }
+
     Sockbuf_clear(&connp->w);
     if (Send_reply(ind, PKT_VERIFY, PKT_SUCCESS) == -1
 	|| Packet_printf(&connp->c, "%c%u", PKT_MAGIC, connp->magic) <= 0
@@ -956,9 +970,13 @@ static int Handle_login(int ind)
 {
     connection_t	*connp = &Conn[ind];
     player		*pl;
-    int			i,
-			conn_bit;
-    char		msg[MSG_LEN];
+    int			i, r,
+			conn_bit,
+			nick_mod = 0;
+    char		msg[MSG_LEN],
+			old_nick[MAX_NAME_LEN],
+			*p;
+    const char sender[] = "[*Server notice*]";
 
     if (NumPlayers - NumPseudoPlayers >= World.NumBases) {
 	warn("Not enough bases for players");
@@ -994,6 +1012,39 @@ static int Handle_login(int ind)
 	    return -1;
 	}
     }
+    r = PASSWD_OK;
+    if (allowPlayerPasswords)
+	r = Check_player_password(connp->nick, "");
+    if (r == PASSWD_ERROR) {
+	warn("Can't check whether nick \"%s\" is protected.", connp->nick);
+	return -1;
+    }
+    *old_nick = 0;
+    if (r == PASSWD_WRONG) {
+	strcpy(old_nick, connp->nick);
+	nick_mod = 1;
+	while (1) {
+	    p = connp->nick;
+	    if (strlen(p) < MAX_NAME_LEN - 1) {
+		p += strlen(p);
+		*p++ = PROT_EXT;
+		*p = 0;
+	    } else if (p[MAX_NAME_LEN-2] != PROT_EXT)
+		p[MAX_NAME_LEN-2] = PROT_EXT;
+	    else if ((p = strchr(p, PROT_EXT)) && (p > connp->nick + 1))
+		*--p = PROT_EXT;
+	    else {
+		warn("What the heck?! I wasn't able to find an alternative "
+		     "nick for \"%s\".", connp->nick);
+		return -1;
+	    }
+	    for (i = NumPlayers; i--;)
+		if (!strcasecmp(Players[i]->name, connp->nick))
+		    break;
+	    if (i == -1)
+		break;
+	}
+    }
     if (connp->rectype < 2) {
 	if (!Init_player(NumPlayers, connp->ship)) {
 	    return -1;
@@ -1007,6 +1058,7 @@ static int Handle_login(int ind)
     }
     pl->rectype = connp->rectype;
     strcpy(pl->name, connp->nick);
+    strcpy(pl->auth_nick, old_nick);
     strcpy(pl->realname, connp->real);
     strcpy(pl->hostname, connp->host);
     pl->isowner = (!strcmp(pl->realname, Server.name) &&
@@ -1043,6 +1095,10 @@ static int Handle_login(int ind)
 	error("Cannot send play reply");
 	return -1;
     }
+
+    if (nick_mod)
+	xpprintf("%s Nick \"%s\" has been changed to \"%s\".\n",
+		showtime(), old_nick, connp->nick);
 
 #ifndef	SILENT
     xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
@@ -1108,6 +1164,27 @@ static int Handle_login(int ind)
     }
     if (pl->rectype < 2)
 	Set_message(msg);
+
+    if (nick_mod) {
+	sprintf(msg,
+		"Your nick is password-protected and has been modified. %s",
+		sender);
+	Set_player_message(pl, msg);
+	if (connp->version < 0x4F10) {
+	    sprintf(msg,
+		"This modification breaks things in your client. %s",
+		sender);
+	    Set_player_message(pl, msg);
+	    sprintf(msg,
+		"Your client will work correctly once you authenticated. %s",
+		sender);
+	    Set_player_message(pl, msg);
+	}
+	sprintf(msg,
+		"Send a message containing \"/help nick\" for help. %s",
+		sender);
+	Set_player_message(pl, msg);
+    }
 
     conn_bit = (1 << ind);
     for (i = 0; i < World.NumCannons; i++) {
@@ -1518,6 +1595,7 @@ int Send_player(int ind, int id)
     int			n;
     char		buf[MSG_LEN], ext[MSG_LEN];
     int			sbuf_len = connp->c.len;
+    int			himself = (pl->conn == ind);
 
     if (!BIT(connp->state, CONN_PLAYING|CONN_READY)) {
 	warn("Connection not ready for player info (%d,%d)",
@@ -1532,10 +1610,12 @@ int Send_player(int ind, int id)
 		      pl->name, pl->realname, pl->hostname,
 		      buf);
     if (n > 0) {
-	n = Packet_printf(&connp->c, "%S", ext);
-	if (n <= 0) {
+	if (connp->version < 0x4F10)
+	    n = Packet_printf(&connp->c, "%S", ext);
+	else
+	    n = Packet_printf(&connp->c, "%S%c", ext, himself);
+	if (n <= 0)
 	    connp->c.len = sbuf_len;
-	}
     }
     return n;
 }
@@ -2707,8 +2787,8 @@ extern struct queued_player *qp_list;
 
 enum Command {
   KICK_CMD, VERSION_CMD, HELP_CMD, RESET_CMD, TEAM_CMD,
-  PASSWORD_CMD, LOCK_CMD, SET_CMD, PAUSE_CMD, SHOW_CMD,
-  ADVANCE_CMD, NO_CMD
+  PASSWORD_CMD, SETPASS_CMD, AUTH_CMD, LOCK_CMD, SET_CMD, PAUSE_CMD,
+  SHOW_CMD, ADVANCE_CMD, NO_CMD
 };
 
 typedef struct {
@@ -2750,6 +2830,19 @@ static commandInfo commands[] = {
                                       "gives operator status.",
     0,
     PASSWORD_CMD
+  },
+  {
+    "setpass",
+    "/setpass <new pw> <new pw> [old pw]. "
+    "Protects your nick with a password.",
+    0,
+    SETPASS_CMD
+  },
+  {
+    "auth",
+    "/auth <password>. Use this command if your nick is password-protected.",
+    0,
+    AUTH_CMD
   },
   {
     "pause",
@@ -2917,13 +3010,13 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
 	break;
 
     case VERSION_CMD:
-	sprintf(msg, "4.3.0 test version");
+	sprintf(msg, "XPilot version %s.", VERSION);
 	break;
 
     case HELP_CMD:
 	if (!args)
-	    sprintf(msg,"Commands: help team version lock password pause "\
-		    "reset set kick show");
+	    sprintf(msg,"Commands: help team version lock password setpass "
+		    "nick pause reset set kick show");
 	else {
 	    for (i = 0 ; i < NELEM(commands) ; i++)
 		if (!strcasecmp(args, commands[i].name))
@@ -2968,6 +3061,145 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
 	    sprintf(msg, "You got operator status.");
 	}
 	break;
+
+    case SETPASS_CMD: {
+	char *new_pw, *new_pw2, *old_pw;
+	int r, new = 0;
+
+	if (!allowPlayerPasswords) {
+	    strcpy(msg, "Player passwords are disabled on this server.");
+	    break;
+	}
+
+	if (pl->name[strlen(pl->name)-1] == PROT_EXT) {
+	    strcpy(msg, "You cannot set a password for your current nick.");
+	    break;
+	}
+
+	if (!args || !*args) {
+	    strcpy(msg, "Need at least two arguments.");
+	    break;
+	}
+
+	new_pw = strtok(args, " ");
+	new_pw2 = strtok(NULL, " ");
+	old_pw = strtok(NULL, " ");
+	if (!new_pw || strlen(new_pw) < MIN_PASS_LEN) {
+	    sprintf(msg, "Minimum password lenght allowed is %d.", MIN_PASS_LEN);
+	    break;
+	}
+	if (strlen(new_pw) > MAX_PASS_LEN) {
+	    sprintf(msg, "Maximum password lenght allowed is %d.", MAX_PASS_LEN);
+	    break;
+	}
+	if (!new_pw2) {
+	    strcpy(msg, "Please specify new password twice.");
+	    break;
+	}
+	if (strcmp(new_pw, new_pw2)) {
+	    strcpy(msg, "Second password doesn't match first password. Try again.");
+	    break;
+	}
+	if (old_pw && !strcmp(old_pw, new_pw)) {
+	    strcpy(msg, "New and old password are the same. Nothing changed.");
+	    break;
+	}
+
+	r = Check_player_password(pl->name, old_pw ? old_pw : "");
+	switch (r) {
+	    case PASSWD_NONE:
+		new = 1;
+	    case PASSWD_OK:
+		r = Set_player_password(pl->name, new_pw, new);
+		if (!r) {
+		    strcpy(msg, "Okay.");
+		} else {
+		    warn("Command \"/setpass\": Error setting password for "
+			 "player \"%s\".", pl->name);
+		    strcpy(msg, r == -1 ?
+			"Server error." :
+			"Sorry, no more player passwords allowed. Limit reached!");
+		}
+		break;
+	    case PASSWD_WRONG:
+		if (old_pw && old_pw[0])
+		    strcpy(msg, "Old password is wrong. Nothing changed.");
+		else
+		    strcpy(msg, "Need old password as third argument.");
+		break;
+	    case PASSWD_ERROR:
+		warn("Command \"/setpass\": Couldn't check password of "
+		     "player \"%s\".", pl->name);
+		strcpy(msg, "Server error.");
+		break;
+	}
+	break;
+    }
+
+    case AUTH_CMD: {
+	int r, i = -1;
+
+	if (!allowPlayerPasswords) {
+	    strcpy(msg, "Player passwords are disabled on this server.");
+	    break;
+	}
+	if (!*pl->auth_nick) {
+	    strcpy(msg, "You're already authenticated or your nick isn't "
+			"password-protected.");
+	    break;
+	}
+	if (!args || !*args) {
+	    strcpy(msg, "Need a password.");
+	    break;
+	}
+	while (*args == ' ')
+	    args++;
+	if (!*args) {
+	    strcpy(msg, "Need a password.");
+	    break;
+	}
+	r = Check_player_password(pl->auth_nick, args);
+	if (r & (PASSWD_WRONG | PASSWD_ERROR)) {
+	    char *reason = NULL, *reason_p = NULL;
+	    if (r & PASSWD_ERROR)
+		reason_p = "Couldn't check password";
+	    else
+		reason_p = "Wrong password";
+	    if (reason_p)
+		warn("Authentication failed (%s -> %s): %s.", pl->name, pl->auth_nick, reason_p);
+	    sprintf(msg, "Authentication (->%s) failed: %s.", pl->auth_nick, reason ? reason : reason_p);
+	    break;
+	}
+
+	sprintf(msg, "\"%s\" successfully authenticated (%s).", pl->name, pl->auth_nick);
+	warn(msg);
+	Set_message(msg);
+
+	Queue_kick(pl->auth_nick);
+
+	for (i = NumPlayers; i--;)
+	    if (pl != Players[i] &&
+		!strcasecmp(Players[i]->auth_nick, pl->auth_nick))
+	    {
+		sprintf(msg, "%s has been kicked out (nick collision).", Players[i]->name);
+		if (Players[i]->conn == NOT_CONNECTED)
+		    Delete_player(i);
+		else
+		    Destroy_connection(Players[i]->conn, "kicked out (someone else authenticated for the same nick)");
+		warn(msg);
+		Set_message(msg);
+	    }
+
+	Rank_save_score(pl);
+	Conn_change_nick(pl->conn, pl->auth_nick);
+	strcpy(pl->name, pl->auth_nick);
+	Rank_get_saved_score(pl);
+	Send_all_info(pl);
+	pl->auth_nick[0] = 0;
+
+	*msg = 0;
+	break;
+    }
 
     case LOCK_CMD:
 	if (!args)
@@ -3024,8 +3256,10 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
 	break;
     }
 
-    sprintf(msg+strlen(msg), " [*Server reply*]");
-    Set_player_message(pl,msg);
+    if (*msg) {
+	strcat(msg, " [*Server reply*]");
+	Set_player_message(pl,msg);
+    }
     return;
 }
 

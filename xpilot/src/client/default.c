@@ -57,6 +57,7 @@
 #include "audio.h"
 #include "talk.h"
 #include "commonproto.h"
+#include "checknames.h"
 
 #ifdef _WINDOWS
 extern char **Argv;
@@ -154,6 +155,20 @@ struct option {
 	"",
 	KEY_DUMMY,
 	"Set the nickname.\n"
+    },
+    {
+	"user",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Set the username.\n"
+    },
+    {
+	"host",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Set the hostname.\n"
     },
     {
 	"join",
@@ -2237,8 +2252,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
 	result[len] = '\0';
 	return 1;
     }
-    strncpy(result, options[*index].fallback, size);
-    result[size - 1] = '\0';
+    strlcpy(result, options[*index].fallback, size);
 
     return 0;
 
@@ -2556,7 +2570,8 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		   int *my_team, int *text, int *list,
 		   int *join, int *noLocalMotd,
-		   char *nickName, char *dispName, char *shut_msg)
+		   char *nickName, char *dispName, char *hostName,
+		   char *shut_msg)
 {
     char		*ptr;
     char		*str;
@@ -2647,8 +2662,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     if (Get_string_resource(argDB, "display", dispName, MAX_DISP_LEN) == 0
 	|| dispName[0] == '\0') {
 	if ((ptr = getenv(DISPLAY_ENV)) != NULL) {
-	    strncpy(dispName, ptr, MAX_DISP_LEN);
-	    dispName[MAX_DISP_LEN - 1] = '\0';
+	    strlcpy(dispName, ptr, MAX_DISP_LEN);
 	} else {
 	    strcpy(dispName, DISPLAY_DEF);
 	}
@@ -2657,7 +2671,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	error("Can't open display '%s'", dispName);
 	if (strcmp(dispName, "NO_X") == 0) {
 	    /* user does not want X stuff.  experimental.  use at own risk. */
-	    strcpy(nickName, realName);
+	    if (*realName)
+	        strcpy(nickName, realName);
+	    else
+		strcpy(nickName, "X");
 	    *my_team = TEAM_NOT_SET;
 	    Get_int_resource(argDB, "port", port);
 	    Get_bool_resource(argDB, "list", list);
@@ -2673,10 +2690,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     if (Get_string_resource(argDB, "keyboard", resValue, MAX_DISP_LEN) == 0
 	|| resValue[0] == '\0') {
-	if ((ptr = getenv(KEYBOARD_ENV)) != NULL) {
-	    strncpy(resValue, ptr, MAX_DISP_LEN);
-	    resValue[MAX_DISP_LEN - 1] = '\0';
-	}
+	if ((ptr = getenv(KEYBOARD_ENV)) != NULL)
+	    strlcpy(resValue, ptr, MAX_DISP_LEN);
     }
     if (resValue[0] == '\0') {
 	kdpy = NULL;
@@ -2717,6 +2732,26 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     Get_bool_resource(rDB, "ignoreWindowManager", &ignoreWindowManager);
 
+    Get_resource(rDB, "user", resValue, MAX_NAME_LEN);
+    if (resValue[0]) {
+	strlcpy(realName, resValue, MAX_NAME_LEN);
+    }
+    if (Check_real_name(realName) == NAME_ERROR) {
+	xpprintf("Fixing realname from \"%s\" ", realName);
+	Fix_real_name(realName);
+	xpprintf("to \"%s\".\n", realName);
+    }
+
+    Get_resource(rDB, "host", resValue, MAX_HOST_LEN);
+    if (resValue[0]) {
+	strlcpy(hostName, resValue, MAX_HOST_LEN);
+    }
+    if (Check_host_name(hostName) == NAME_ERROR) {
+	xpprintf("Fixing host from \"%s\" ", hostName);
+	Fix_host_name(hostName);
+	xpprintf("to \"%s\".\n", hostName);
+    }
+
     Get_resource(rDB, "name", nickName, MAX_NAME_LEN);
     if (!nickName[0]) {
 	strcpy(nickName, realName);
@@ -2728,16 +2763,13 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	    nickName);
 	exit(1);
     }
-    /* strip trailing whitespace. */
-    for (ptr = &nickName[strlen(nickName)]; ptr-- > nickName; ) {
-	if (isascii(*ptr) && isspace(*ptr)) {
-	    *ptr = '\0';
-	} else {
-	    break;
-	}
+    if (Check_nick_name(nickName) == NAME_ERROR) {
+	xpprintf("Fixing nick from \"%s\" ", nickName);
+	Fix_nick_name(nickName);
+	xpprintf("to \"%s\".\n", nickName);
     }
-    strncpy(realname, realName, sizeof(realname) - 1);
-    strncpy(name, nickName, sizeof(name) - 1);
+    strlcpy(realname, realName, sizeof(realname));
+    strlcpy(name, nickName, sizeof(name));
 
 #ifdef _WINDOWS
     if (*name == '\0') {

@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -45,7 +44,8 @@ int Check_real_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_NAME_LEN - 1] = '\0';
+    if (strlen(name) > MAX_NAME_LEN-1)
+	return NAME_ERROR;
     if (!*name) {
 	return NAME_ERROR;
     }
@@ -63,7 +63,8 @@ void Fix_real_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_NAME_LEN - 1] = '\0';
+    if (strlen(name) > MAX_NAME_LEN-1)
+	name[MAX_NAME_LEN-1] = 0;
     if (!*name) {
 	strcpy(name, "X");
 	return;
@@ -80,7 +81,8 @@ int Check_nick_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_NAME_LEN - 1] = '\0';
+    if (strlen(name) > MAX_NAME_LEN-1)
+	return NAME_ERROR;
     if (!*name) {
 	return NAME_ERROR;
     }
@@ -89,7 +91,7 @@ int Check_nick_name(char *name)
 	return NAME_ERROR;
     }
     for (; *str; str++) {
-	if (!isprint(*str)) {
+	if (!isprint(*str) || *str == PROT_EXT) {
 	    return NAME_ERROR;
 	}
     }
@@ -105,7 +107,8 @@ void Fix_nick_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_NAME_LEN - 1] = '\0';
+    if (strlen(name) > MAX_NAME_LEN-1)
+	name[MAX_NAME_LEN-1] = 0;
     if (!*name) {
 	static int n;
 	sprintf(name, "X%d", n++);
@@ -120,7 +123,7 @@ void Fix_nick_name(char *name)
 	}
     }
     for (; *str; str++) {
-	if (!isprint(*str)) {
+	if (!isprint(*str) || *str == PROT_EXT) {
 	    *str = 'x';
 	}
     }
@@ -143,7 +146,8 @@ int Check_host_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_HOST_LEN - 1] = '\0';
+    if (strlen(name) > MAX_HOST_LEN-1)
+	return NAME_ERROR;
     str = (unsigned char *) name;
     if (!is_alpha_numeric(*str)) {
 	return NAME_ERROR;
@@ -167,7 +171,8 @@ void Fix_host_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_HOST_LEN - 1] = '\0';
+    if (strlen(name) > MAX_HOST_LEN-1)
+	name[MAX_HOST_LEN-1] = 0;
     str = (unsigned char *) name;
     if (!is_alpha_numeric(*str)) {
 	strcpy(name, "xxx.xxx");
@@ -193,7 +198,8 @@ int Check_disp_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_NAME_LEN] = '\0';
+    if (strlen(name) > MAX_DISP_LEN-1)
+	return NAME_ERROR;
     str = (unsigned char *) name;
     for (; *str; str++) {
 	if (!isgraph(*str)) {
@@ -207,7 +213,8 @@ void Fix_disp_name(char *name)
 {
     unsigned char *str;
 
-    name[MAX_NAME_LEN] = '\0';
+    if (strlen(name) > MAX_DISP_LEN-1)
+	name[MAX_DISP_LEN-1] = 0;
     str = (unsigned char *) name;
     for (; *str; str++) {
 	if (!isgraph(*str)) {

@@ -84,12 +84,6 @@ Queries status information from all servers found.
 .B -shutdown [\fImessage\fP]
 Sends a shutdown to the server, the message part is optional.
 .TP 15
-.B -name \fInick\fP
-Specifies your nick name.
-.TP 15
-.B -team \fInumber\fP
-Specifies your wanted team number.
-.TP 15
 .B -display \fIdisplay-string\fP
 Specifies which X server to contact.
 .TP 15
@@ -950,7 +944,7 @@ Define which keys are pressed when mouse button five is pressed.
 
 At startup xpilot will look for X resources in several places.
 First it looks in the LIBDIR (as defined during compilation,
-mostly as something like /usr/local/games/xpilot/lib/)
+mostly as something like /usr/local/lib/xpilot/)
 for the file named XPilot.
 After that it looks for more resources in
 /usr/lib/X11/$LANG/app-defaults/XPilot,

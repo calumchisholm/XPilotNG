@@ -1,6 +1,5 @@
-/* $Id$
- *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/*
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -22,21 +21,16 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef CHECKNAMES_H
-#define CHECKNAMES_H
+#ifndef AUTH_H
+#define AUTH_H
 
-#define NAME_OK		1
-#define NAME_ERROR	0
+#define PASSWD_OK	0
+#define PASSWD_WRONG	1
+#define PASSWD_NONE	2
+#define PASSWD_ERROR	4
 
-#define PROT_EXT	'~'
-
-int Check_real_name(char *name);
-void Fix_real_name(char *name);
-int Check_nick_name(char *name);
-void Fix_nick_name(char *name);
-int Check_host_name(char *name);
-void Fix_host_name(char *name);
-int Check_disp_name(char *name);
-void Fix_disp_name(char *name);
+int Check_player_password(const char *nick, const char *password);
+int Remove_player_password(const char *nick);
+int Set_player_password(const char *nick, const char *password, int new);
 
 #endif

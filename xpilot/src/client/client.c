@@ -1054,7 +1054,7 @@ int Handle_leave(int id)
 }
 
 int Handle_player(int id, int player_team, int mychar, char *player_name,
-		  char *real_name, char *host_name, char *shape)
+		  char *real_name, char *host_name, char *shape, int myself)
 {
     other_t		*other;
 
@@ -1083,7 +1083,7 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 	other = &Others[num_others++];
     }
     if (self == NULL
-	&& strcmp(name, player_name) == 0) {
+	&& (myself || (version < 0x4F10 && strcmp(name, player_name) == 0))) {
 	if (other != &Others[0]) {
 	    /*
 	     * Make `self' the first member of Others[].
