@@ -1198,7 +1198,7 @@ void Update_objects(world_t *world)
 	Ecm_update(world);
     if (world->NumTransporters > 0)
 	Transporter_update(world);
-    if (world->NumCannons > 0)
+    if (Num_cannons(world) > 0)
 	Cannon_update(world, tick);
     if (world->NumTargets > 0)
 	Target_update(world);

@@ -45,9 +45,9 @@ static void Check_map_object_counters(world_t *world)
 {
     int i;
 
-    assert(world->NumCannons == 0);
+    /*assert(world->NumCannons == 0);*/
 
-    assert(world->NumGravs == 0);
+    /*assert(world->NumGravs == 0);*/
     assert(world->NumWormholes == 0);
     assert(world->NumTreasures == 0);
     assert(world->NumTargets == 0);
@@ -91,9 +91,9 @@ if ((M) > (N)) { \
 
 static void Realloc_map_objects(world_t *world)
 {
-    SHRINK(cannon_t, world->cannons, world->NumCannons, world->MaxCannons);
+    /*SHRINK(cannon_t, world->cannons, world->NumCannons, world->MaxCannons);*/
     /*SHRINK(fuel_t, world->fuels, world->NumFuels, world->MaxFuels);*/
-    SHRINK(grav_t, world->gravs, world->NumGravs, world->MaxGravs);
+    /*SHRINK(grav_t, world->gravs, world->NumGravs, world->MaxGravs);*/
     SHRINK(wormhole_t, world->wormholes,
 	   world->NumWormholes, world->MaxWormholes);
     SHRINK(treasure_t, world->treasures,
@@ -111,7 +111,7 @@ static void Realloc_map_objects(world_t *world)
 int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
 {
     cannon_t t, *cannon;
-    int ind = world->NumCannons, i;
+    int ind = Num_cannons(world), i;
 
     t.world = world;
     t.pos = pos;
@@ -131,7 +131,8 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
 	t.initial_items[i] = -1;
     t.shot_speed = -1;
     t.smartness = -1;
-    STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
+    /*STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);*/
+    Arraylist_add(world->cannons, &t);
     cannon = Cannon_by_index(world, ind);
     assert(Cannon_by_id(world, t.id) == cannon);
     return ind;
@@ -342,12 +343,13 @@ int World_place_asteroid_concentrator(world_t *world, clpos_t pos)
 int World_place_grav(world_t *world, clpos_t pos, double force, int type)
 {
     grav_t t;
-    int ind = world->NumGravs;
+    int ind = Num_gravs(world);
 
     t.pos = pos;
     t.force = force;
     t.type = type;
-    STORE(grav_t, world->gravs, world->NumGravs, world->MaxGravs, t);
+    /*STORE(grav_t, world->gravs, world->NumGravs, world->MaxGravs, t);*/
+    Arraylist_add(world->gravs, &t);
     return ind;
 }
 
@@ -395,11 +397,17 @@ int World_init(world_t *world)
 
     memset(world, 0, sizeof(world_t));
 
+    world->bases = Arraylist_create(sizeof(base_t));
+    if (world->bases == NULL)
+	return -1;
+    world->cannons = Arraylist_create(sizeof(cannon_t));
+    if (world->cannons == NULL)
+	return -1;
     world->fuels = Arraylist_create(sizeof(fuel_t));
     if (world->fuels == NULL)
 	return -1;
-    world->bases = Arraylist_create(sizeof(base_t));
-    if (world->bases == NULL)
+    world->gravs = Arraylist_create(sizeof(grav_t));
+    if (world->gravs == NULL)
 	return -1;
 
     for (i = 0; i < MAX_TEAMS; i++)
@@ -414,9 +422,9 @@ void World_free(world_t *world)
 {
     XFREE(world->block);
     XFREE(world->gravity);
-    XFREE(world->gravs);
-    XFREE(world->bases);
-    XFREE(world->cannons);
+    /*XFREE(world->gravs);*/
+    /*XFREE(world->bases);*/
+    /*XFREE(world->cannons);*/
     XFREE(world->checks);
     /*XFREE(world->fuels);*/
     XFREE(world->wormholes);
@@ -443,10 +451,10 @@ static bool World_alloc(world_t *world)
 	malloc(sizeof(vector_t *) * world->x
 	       + world->x * sizeof(vector_t) * world->y);
 
-    assert(world->gravs == NULL);
+    /*assert(world->gravs == NULL);*/
     /*assert(world->bases == NULL);*/
     /*assert(world->fuels == NULL);*/
-    assert(world->cannons == NULL);
+    /*assert(world->cannons == NULL);*/
     assert(world->checks == NULL);
     assert(world->wormholes == NULL);
     assert(world->itemConcs == NULL);
@@ -736,7 +744,7 @@ static void Compute_grav_tab(vector_t grav_tab[GRAV_RANGE+1][GRAV_RANGE+1])
 
 static void Compute_local_gravity(world_t *world)
 {
-    int xi, yi, g, gx, gy, ax, ay, dx, dy, gtype;
+    int xi, yi, i, gx, gy, ax, ay, dx, dy, gtype;
     int first_xi, last_xi, first_yi, last_yi, mod_xi, mod_yi;
     int min_xi, max_xi, min_yi, max_yi;
     double force, fx, fy;
@@ -754,10 +762,12 @@ static void Compute_local_gravity(world_t *world)
 	min_yi -= MIN(GRAV_RANGE, world->y);
 	max_yi += MIN(GRAV_RANGE, world->y);
     }
-    for (g = 0; g < world->NumGravs; g++) {
-	gx = CLICK_TO_BLOCK(world->gravs[g].pos.cx);
-	gy = CLICK_TO_BLOCK(world->gravs[g].pos.cy);
-	force = world->gravs[g].force;
+    for (i = 0; i < Num_gravs(world); i++) {
+	grav_t *g = Grav_by_index(world, i);
+
+	gx = CLICK_TO_BLOCK(g->pos.cx);
+	gy = CLICK_TO_BLOCK(g->pos.cy);
+	force = g->force;
 
 	if ((first_xi = gx - GRAV_RANGE) < min_xi)
 	    first_xi = min_xi;
@@ -768,7 +778,7 @@ static void Compute_local_gravity(world_t *world)
 	if ((last_yi = gy + GRAV_RANGE) > max_yi)
 	    last_yi = max_yi;
 
-	gtype = world->gravs[g].type;
+	gtype = g->type;
 
 	mod_xi = (first_xi < 0) ? (first_xi + world->x) : first_xi;
 	dx = gx - first_xi;

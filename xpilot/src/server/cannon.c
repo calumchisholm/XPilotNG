@@ -51,7 +51,7 @@ void Cannon_update(world_t *world, bool tick)
 {
     int i;
 
-    for (i = 0; i < world->NumCannons; i++) {
+    for (i = 0; i < Num_cannons(world); i++) {
 	cannon_t *c = Cannon_by_index(world, i);
 
 	if (c->dead_ticks > 0) {

@@ -1183,7 +1183,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     }
 
     conn_bit = (1 << connp->ind);
-    for (i = 0; i < world->NumCannons; i++) {
+    for (i = 0; i < Num_cannons(world); i++) {
 	cannon_t *cannon = Cannon_by_index(world, i);
 	/*
 	 * The client assumes at startup that all cannons are active.
@@ -2474,6 +2474,7 @@ static int Receive_ack_cannon(connection_t *connp)
     int n;
     unsigned short num;
     world_t *world = &World;
+    cannon_t *cannon;
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
 			  &ch, &loops_ack, &num)) <= 0) {
@@ -2481,12 +2482,13 @@ static int Receive_ack_cannon(connection_t *connp)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
-    if (num >= world->NumCannons) {
+    if (num >= Num_cannons(world)) {
 	Destroy_connection(connp, "bad cannon ack");
 	return -1;
     }
-    if (loops_ack > world->cannons[num].last_change)
-	SET_BIT(world->cannons[num].conn_mask, 1 << connp->ind);
+    cannon = Cannon_by_index(world, num);
+    if (loops_ack > cannon->last_change)
+	SET_BIT(cannon->conn_mask, 1 << connp->ind);
 
     return 1;
 }

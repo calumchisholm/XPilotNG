@@ -1543,7 +1543,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	CLR_BIT(my_data->longterm_mode, TARGET_KILL);
     }
 
-    for (j = 0; j < world->NumCannons; j++) {
+    for (j = 0; j < Num_cannons(world); j++) {
 	cannon_t *cannon = Cannon_by_index(world, j);
 
 	if (cannon->dead_ticks > 0)

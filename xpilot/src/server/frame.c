@@ -436,10 +436,10 @@ static void Frame_map(connection_t *conn, player_t *pl)
     packet_count = 0;
     max_packet = MAX(5, bytes_left / cannon_packet_size);
     i = MAX(0, pl->last_cannon_update);
-    for (k = 0; k < world->NumCannons; k++) {
+    for (k = 0; k < Num_cannons(world); k++) {
 	cannon_t *cannon;
 
-	if (++i >= world->NumCannons)
+	if (++i >= Num_cannons(world))
 	    i = 0;
 	cannon = Cannon_by_index(world, i);
 	if (clpos_inview(&cv, cannon->pos)) {
@@ -819,7 +819,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	    Send_trans(conn, victim->pos, pos);
     }
 
-    for (i = 0; i < world->NumCannons; i++) {
+    for (i = 0; i < Num_cannons(world); i++) {
 	cannon_t *cannon = Cannon_by_index(world, i);
 
 	if (cannon->tractor_count > 0) {

@@ -145,7 +145,7 @@ void tuner_teamcannons(world_t *world)
     int team;
 
     if (options.teamCannons) {
-	for (i = 0; i < world->NumCannons; i++) {
+	for (i = 0; i < Num_cannons(world); i++) {
 	    cannon_t *cannon = Cannon_by_index(world, i);
 
 	    team = Find_closest_team(world, cannon->pos);
@@ -155,7 +155,7 @@ void tuner_teamcannons(world_t *world)
 	}
     }
     else {
-	for (i = 0; i < world->NumCannons; i++)
+	for (i = 0; i < Num_cannons(world); i++)
 	    Cannon_by_index(world, i)->team = TEAM_NOT_SET;
     }
 }

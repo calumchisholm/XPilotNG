@@ -525,12 +525,13 @@ setup_t *Xpmap_init_setup(world_t *world)
 		break;
 
 	    case CANNON:
-		if (cannon_i >= world->NumCannons) {
+		if (cannon_i >= Num_cannons(world)) {
 		    warn("Too many cannons in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		dir = world->cannons[cannon_i++].dir;
+		dir = Cannon_by_index(world, cannon_i)->dir;
+		cannon_i++;
 		switch (dir) {
 		case DIR_UP:	*mapptr = SETUP_CANNON_UP; break;
 		case DIR_RIGHT:	*mapptr = SETUP_CANNON_RIGHT; break;
@@ -1004,7 +1005,7 @@ void Xpmap_find_map_object_teams(world_t *world)
     }
 
     if (options.teamCannons) {
-	for (i = 0; i < world->NumCannons; i++) {
+	for (i = 0; i < Num_cannons(world); i++) {
 	    cannon_t *cannon = Cannon_by_index(world, i);
 
 	    cannon->team = Find_closest_team(world, cannon->pos);
@@ -1559,7 +1560,7 @@ void Xpmap_blocks_to_polygons(world_t *world)
     for (i = 0; i < world->NumTargets; i++)
 	Xpmap_target_to_polygon(world, i);
 
-    for (i = 0; i < world->NumCannons; i++)
+    for (i = 0; i < Num_cannons(world); i++)
 	Xpmap_cannon_to_polygon(world, i);
 
     for (i = 0; i < world->NumWormholes; i++)

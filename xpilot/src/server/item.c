@@ -1052,7 +1052,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 
     /* in non-team mode cannons are immune to cannon ECMs */
     if (BIT(world->rules->mode, TEAM_PLAY) || pl) {
-	for (i = 0; i < world->NumCannons; i++) {
+	for (i = 0; i < Num_cannons(world); i++) {
 	    cannon_t *c = Cannon_by_index(world, i);
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)
