@@ -216,13 +216,16 @@ void ConfigureNotify_event(XEvent *event)
     
     if (((unsigned) conf->width != conf_width) || 
 	((unsigned) conf->height != conf_height))
-
-      Resize(conf->window, (unsigned)conf->width, (unsigned)conf->height);   
-    else      
-      Widget_event(event); 
-      
-      conf_height = (unsigned)conf->height;
-      conf_width = (unsigned)conf->width;
+      {
+	Resize(conf->window, (unsigned)conf->width, (unsigned)conf->height);  
+	
+	conf_height = (unsigned)conf->height;
+	conf_width = (unsigned)conf->width;	
+      }
+    else
+      {
+	Widget_event(event); 
+      }
 }
 #endif
 
