@@ -48,12 +48,12 @@ static void Input_loop(void)
 	error("Bad server input");
 	return;
     }
-    if (Client_input(2) == -1) {
+    if (Client_input(2) == -1)
 	return;
-    }
-    if (Net_flush() == -1) {
+
+    if (Net_flush() == -1)
 	return;
-    }
+
     if ((clientfd = Client_fd()) == -1) {
 	error("Bad client filedescriptor");
 	return;
@@ -83,18 +83,16 @@ static void Input_loop(void)
 	    tv.tv_usec = 0;
 	}
 	if ((n = select(max + 1, &rfds, NULL, NULL, &tv)) == -1) {
-	    if (errno == EINTR) {
+	    if (errno == EINTR)
 		continue;
-	    }
 	    error("Select failed");
 	    return;
 	}
 	if (n == 0) {
 	    if (scoresChanged > SCORE_UPDATE_DELAY) {
 		Client_score_table();
-		if (Client_input(2) == -1) {
+		if (Client_input(2) == -1)
 		    return;
-		}
 		continue;
 	    }
 	    else if (result <= 1) {
@@ -103,9 +101,9 @@ static void Input_loop(void)
 	    }
 	}
 	if (FD_ISSET(clientfd, &rfds)) {
-	    if (Client_input(1) == -1) {
+	    if (Client_input(1) == -1)
 		return;
-	    }
+
 	    if (Net_flush() == -1) {
 		error("Bad net flush after X input");
 		return;
@@ -131,17 +129,16 @@ static void Input_loop(void)
 		 * keyboard events and then we wait until the X server
 		 * has finished the drawing of our current frame.
 		 */
-		if (Client_input(1) == -1) {
+		if (Client_input(1) == -1)
 		    return;
-		}
+
 		if (Net_flush() == -1) {
 		    error("Bad net flush before sync");
 		    return;
 		}
 		Client_sync();
-		if (Client_input(1) == -1) {
+		if (Client_input(1) == -1)
 		    return;
-		}
 	    }
 	}
     }
