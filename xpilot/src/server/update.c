@@ -897,7 +897,14 @@ static void Update_players(world_t *world)
 	}
 
 	if (pl->recovery_count > 0) {
-	    assert(Player_is_dead(pl) || Player_is_appearing(pl));
+	    if(!(Player_is_dead(pl) || Player_is_appearing(pl))){
+                /* happens when the only present team is the robot */
+	        /* team and a new player enters -> player cannot   */
+                /* appear => pause such players                    */
+	        pl->recovery_count=0;
+	        Pause_player(pl, true);
+	        continue;
+               }
 	    pl->recovery_count -= timeStep;
 	    if (pl->recovery_count <= 0) {
 		/* Player has recovered (unless he is already dead). */
