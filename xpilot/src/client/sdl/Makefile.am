@@ -8,6 +8,7 @@ xpilot_sdl_SOURCES = \
 	SDL_gfxPrimitives_font.h console.c console.h gameloop_x.c \
 	glwidgets.c glwidgets.h images.c images.h main.c radar.c radar.h \
 	sdlevent.c sdlgui.c sdlinit.c sdlkeys.c sdlkeys.h sdlpaint.c \
-	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c
+	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c \
+	sdlmeta.h sdlmeta.c sdlinit.h
 
 xpilot_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
