@@ -1026,7 +1026,7 @@ void DrawSelectArea(void)
 /***************************************************************************/
 int FillMapArea(HandlerInfo_t info)
 {
-    int i, j, x1, y1, x2, y2;
+    int i, j, x1, y_1, x2, y2;
 
     DrawSelectArea();
     ClearUndo();
@@ -1040,14 +1040,14 @@ int FillMapArea(HandlerInfo_t info)
 	x2 = selectfrom_x + 1 + map.view_x;
     }
     if (selectfrom_y < selectto_y) {
-	y1 = selectfrom_y + map.view_y;
+	y_1 = selectfrom_y + map.view_y;
 	y2 = selectto_y + 1 + map.view_y;
     } else {
-	y1 = selectto_y + map.view_y;
+	y_1 = selectto_y + map.view_y;
 	y2 = selectfrom_y + 1 + map.view_y;
     }
     for (i = x1; i < x2; i++)
-	for (j = y1; j < y2; j++)
+	for (j = y_1; j < y2; j++)
 	    ChangeMapData(i, j, iconmenu[drawicon], 1);
     DrawSelectArea();
     return 0;
@@ -1060,7 +1060,7 @@ int FillMapArea(HandlerInfo_t info)
 /***************************************************************************/
 int CopyMapArea(HandlerInfo_t info)
 {
-    int i, j, x1, y1, x2, y2;
+    int i, j, x1, y_1, x2, y2;
 
     DrawSelectArea();
     if (selectfrom_x < 0)
@@ -1073,18 +1073,18 @@ int CopyMapArea(HandlerInfo_t info)
 	x2 = selectfrom_x + 1 + map.view_x;
     }
     if (selectfrom_y < selectto_y) {
-	y1 = selectfrom_y + map.view_y;
+	y_1 = selectfrom_y + map.view_y;
 	y2 = selectto_y + 1 + map.view_y;
     } else {
-	y1 = selectto_y + map.view_y;
+	y_1 = selectto_y + map.view_y;
 	y2 = selectfrom_y + 1 + map.view_y;
     }
     for (i = 0; i < MAX_MAP_SIZE; i++)
 	for (j = 0; j < MAX_MAP_SIZE; j++)
 	    clipdata[i][j] = ' ';
     for (i = x1; i < x2; i++)
-	for (j = y1; j < y2; j++)
-	    clipdata[i - x1][j - y1] = MapData(i, j);
+	for (j = y_1; j < y2; j++)
+	    clipdata[i - x1][j - y_1] = MapData(i, j);
     DrawSelectArea();
     return 0;
 }
@@ -1096,7 +1096,7 @@ int CopyMapArea(HandlerInfo_t info)
 /***************************************************************************/
 int CutMapArea(HandlerInfo_t info)
 {
-    int i, j, x1, y1, x2, y2;
+    int i, j, x1, y_1, x2, y2;
 
     DrawSelectArea();
     ClearUndo();
@@ -1110,18 +1110,18 @@ int CutMapArea(HandlerInfo_t info)
 	x2 = selectfrom_x + 1 + map.view_x;
     }
     if (selectfrom_y < selectto_y) {
-	y1 = selectfrom_y + map.view_y;
+	y_1 = selectfrom_y + map.view_y;
 	y2 = selectto_y + 1 + map.view_y;
     } else {
-	y1 = selectto_y + map.view_y;
+	y_1 = selectto_y + map.view_y;
 	y2 = selectfrom_y + 1 + map.view_y;
     }
     for (i = 0; i < MAX_MAP_SIZE; i++)
 	for (j = 0; j < MAX_MAP_SIZE; j++)
 	    clipdata[i][j] = ' ';
     for (i = x1; i < x2; i++)
-	for (j = y1; j < y2; j++) {
-	    clipdata[i - x1][j - y1] = MapData(i, j);
+	for (j = y_1; j < y2; j++) {
+	    clipdata[i - x1][j - y_1] = MapData(i, j);
 	    ChangeMapData(i, j, ' ', 1);
 	}
     DrawSelectArea();
@@ -1135,7 +1135,7 @@ int CutMapArea(HandlerInfo_t info)
 /***************************************************************************/
 int PasteMapArea(HandlerInfo_t info)
 {
-    int i, j, x1, y1, x2, y2;
+    int i, j, x1, y_1, x2, y2;
 
     DrawSelectArea();
     ClearUndo();
@@ -1149,16 +1149,16 @@ int PasteMapArea(HandlerInfo_t info)
 	x2 = selectfrom_x + 1 + map.view_x;
     }
     if (selectfrom_y < selectto_y) {
-	y1 = selectfrom_y + map.view_y;
+	y_1 = selectfrom_y + map.view_y;
 	y2 = selectto_y + 1 + map.view_y;
     } else {
-	y1 = selectto_y + map.view_y;
+	y_1 = selectto_y + map.view_y;
 	y2 = selectfrom_y + 1 + map.view_y;
     }
     for (i = x1; i < x2; i++)
-	for (j = y1; j < y2; j++)
-	    if (clipdata[i - x1][j - y1] != ' ')
-		ChangeMapData(i, j, clipdata[i - x1][j - y1], 1);
+	for (j = y_1; j < y2; j++)
+	    if (clipdata[i - x1][j - y_1] != ' ')
+		ChangeMapData(i, j, clipdata[i - x1][j - y_1], 1);
     DrawSelectArea();
     return 0;
 }
@@ -1170,7 +1170,7 @@ int PasteMapArea(HandlerInfo_t info)
 /***************************************************************************/
 int NegativeMapArea(HandlerInfo_t info)
 {
-    int i, j, x1, y1, x2, y2;
+    int i, j, x1, y_1, x2, y2;
 
     DrawSelectArea();
     ClearUndo();
@@ -1184,14 +1184,14 @@ int NegativeMapArea(HandlerInfo_t info)
 	x2 = selectfrom_x + 1 + map.view_x;
     }
     if (selectfrom_y < selectto_y) {
-	y1 = selectfrom_y + map.view_y;
+	y_1 = selectfrom_y + map.view_y;
 	y2 = selectto_y + 1 + map.view_y;
     } else {
-	y1 = selectto_y + map.view_y;
+	y_1 = selectto_y + map.view_y;
 	y2 = selectfrom_y + 1 + map.view_y;
     }
     for (i = x1; i < x2; i++)
-	for (j = y1; j < y2; j++) {
+	for (j = y_1; j < y2; j++) {
 	    switch (MapData(i, j)) {
 
 	    case XPMAP_SPACE:

@@ -51,7 +51,7 @@ void DrawMapPic(Window win, int x, int y, int picnum, int zoom);
 void DrawSmallMap(void);
 void UpdateSmallMap(int x, int y);
 void DrawViewBox(void);
-void DrawViewSeg(int x1, int y1, int x2, int y2);
+void DrawViewSeg(int x1, int y_1, int x2, int y2);
 
 /* prototypes for events.c */
 void MainEventLoop(void);

@@ -161,7 +161,7 @@ void DrawTools(void)
 /***************************************************************************/
 void DrawMap(int x, int y, int width, int height)
 {
-    int x1, y1;
+    int x1, y_1;
 
     x -= TOOLSWIDTH;
     if (x < 0) {
@@ -175,13 +175,13 @@ void DrawMap(int x, int y, int width, int height)
 	height = (mapwin_height - y);
     }
     x1 = ((int) (x / map.view_zoom)) * map.view_zoom + TOOLSWIDTH;
-    y1 = ((int) (y / map.view_zoom)) * map.view_zoom;
+    y_1 = ((int) (y / map.view_zoom)) * map.view_zoom;
     x /= map.view_zoom;
     y /= map.view_zoom;
     width /= map.view_zoom;
     height /= map.view_zoom;
 
-    DrawMapSection(x + map.view_x, y + map.view_y, width, height, x1, y1);
+    DrawMapSection(x + map.view_x, y + map.view_y, width, height, x1, y_1);
 }
 
 /***************************************************************************/
@@ -722,46 +722,46 @@ void UpdateSmallMap(int x, int y)
 /***************************************************************************/
 void DrawViewBox(void)
 {
-    int x1, y1, x2, y2;
+    int x1, y_1, x2, y2;
 
     x1 = (map.view_x / smlmap_xscale);
-    y1 = (map.view_y / smlmap_yscale);
+    y_1 = (map.view_y / smlmap_yscale);
     x2 = (mapwin_width - TOOLSWIDTH) / (map.view_zoom * smlmap_xscale);
     y2 = (mapwin_height / smlmap_yscale) / map.view_zoom;
-    DrawViewSeg(x1, y1, x2, y2);
+    DrawViewSeg(x1, y_1, x2, y2);
 }
 
 /***************************************************************************/
 /* DrawViewSeg                                                             */
 /* Arguments :                                                             */
 /*   x1                                                                    */
-/*   y1                                                                    */
+/*   y_1                                                                    */
 /*   x2                                                                    */
 /*   y2                                                                    */
 /* Purpose :                                                               */
 /***************************************************************************/
-void DrawViewSeg(int x1, int y1, int x2, int y2)
+void DrawViewSeg(int x1, int y_1, int x2, int y2)
 {
     if (x1 < 0) {
-	DrawViewSeg(0, y1, x2 + x1, y2);
-	DrawViewSeg(smlmap_width + x1, y1, (0 - x1), y2);
+	DrawViewSeg(0, y_1, x2 + x1, y2);
+	DrawViewSeg(smlmap_width + x1, y_1, (0 - x1), y2);
 	return;
     }
-    if (y1 < 0) {
-	DrawViewSeg(x1, 0, x2, y2 + y1);
-	DrawViewSeg(x1, smlmap_height + y1, x2, (0 - y1));
+    if (y_1 < 0) {
+	DrawViewSeg(x1, 0, x2, y2 + y_1);
+	DrawViewSeg(x1, smlmap_height + y_1, x2, (0 - y_1));
 	return;
     }
     if ((x1 + x2) > smlmap_width) {
-	DrawViewSeg(x1, y1, smlmap_width - x1, y2);
-	DrawViewSeg(0, y1, x1 + x2 - smlmap_width, y2);
+	DrawViewSeg(x1, y_1, smlmap_width - x1, y2);
+	DrawViewSeg(0, y_1, x1 + x2 - smlmap_width, y2);
 	return;
     }
-    if ((y1 + y2) > smlmap_height) {
-	DrawViewSeg(x1, y1, x2, smlmap_height - y1);
-	DrawViewSeg(x1, 0, x2, y1 + y2 - smlmap_height);
+    if ((y_1 + y2) > smlmap_height) {
+	DrawViewSeg(x1, y_1, x2, smlmap_height - y_1);
+	DrawViewSeg(x1, 0, x2, y_1 + y2 - smlmap_height);
 	return;
     }
     XDrawRectangle(display, mapwin, xorgc, x1 + smlmap_x,
-		   y1 + smlmap_y + TOOLSHEIGHT - TOOLSWIDTH, x2, y2);
+		   y_1 + smlmap_y + TOOLSHEIGHT - TOOLSWIDTH, x2, y2);
 }
