@@ -655,14 +655,18 @@ def convert(options):
     # Balls belong to the team that has the nearest base
     for ball in balls:
 	ball.team = closestteam(ball.loc, bases)
+    if KEEP_MAPDATA:
+        def sort_for_old(things):
+            things[:] = [(thing.x, thing.y, thing) for thing in things]
+            things.sort()
+            things[:] = [thing[-1] for thing in things]
+        sort_for_old(bases)
+        sort_for_old(fuels)
+        sort_for_old(cannons)
     # In race mode, bases are ordered according to the distance from the
-    # first checkpoint.
+    # first checkpoint. Confuses order for old clients (above)
     if (options.get('timing') or options.get('race')) in ['yes', 'on', 'true']:
 	bases = [(checks[0].loc.dist2(b.loc), b) for b in bases]
-	bases.sort()
-	bases = [b[1] for b in bases]
-    elif KEEP_MAPDATA: # old client expects this order
-	bases = [((b.x, b.y), b) for b in bases]
 	bases.sort()
 	bases = [b[1] for b in bases]
     # If teamfuel is on, the fuel belongs to the team with the nearest base
