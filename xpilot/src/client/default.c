@@ -67,16 +67,110 @@ static char *getGeometry(xp_option_t *opt)
     return geometry;
 }
 
+/*
+ * This function trys to set the shipShape variable.
+ *
+ * First it looks if ship_shape would be a suitable value.
+ * If not, it assumes ship_shape is the name of a shape
+ * to be loaded from ship_shape_file.
+ */
+static bool tryToSetShipShape(char *ship_shape, char *ship_shape_file)
+{
+    int retval;
+
+    if (!ship_shape)
+	return false;
+
+    if (!strchr(ship_shape, '(' )) {
+	FILE *fp;
+	if (!ship_shape_file || strlen(ship_shape_file) == 0)
+	    return false;
+
+	/*
+	 * Ok, now we assume ship_shape is the name of the shipshape
+	 * and ship_shape_file contains it.
+	 */
+	fp = fopen(ship_shape_file, "r");
+	if (!fp)
+	    warn("%s: %s", ship_shape_file, strerror(errno));
+	else {
+	    char *ptr;
+	    char *str;
+	    char line[1024];
+
+	    /* this should be rewritten */
+	    while (fgets(line, sizeof line, fp)) {
+		if ((str = strstr(line, "(name:" )) != NULL
+		    || (str = strstr(line, "(NM:" )) != NULL) {
+		    str = strchr(str, ':');
+		    while (*++str == ' ');
+		    if ((ptr = strchr(str, ')' )) != NULL)
+			*ptr = '\0';
+		    /* kps - don't bother about case in shipnames. */
+		    if (!strcasecmp(str, ship_shape)) {
+			/* Gotcha */
+			if (ptr != NULL)
+			    *ptr = ')';
+			ship_shape = str;
+			break;
+		    }
+		}
+	    }
+	    fclose(fp);
+	}
+    }
+
+    warn("ship shape string: %s\n", ship_shape);
+
+    /* shape definition */
+    retval = Validate_shape_str(ship_shape);
+    /* free previous ship shape ? */
+    if (retval) {
+	shipShape = ship_shape;
+	return true;
+    }
+    return false;
+}
+
+static char *shipShapeSetting = NULL;
+static char *shipShapeFileSetting = NULL;
+
+/*
+ * Shipshape options.
+ */
 static bool setShipShape(xp_option_t *opt, const char *value)
 {
-    (void)opt; (void)value;
+    if (shipShapeSetting)
+	xp_free(shipShapeSetting);
+    shipShapeSetting = xp_strdup(value);
+    warn("shipShapeSetting is now %s\n", shipShapeSetting);
+
+    tryToSetShipShape(shipShapeSetting, shipShapeFileSetting);
+
     return true;
 }
 
 static char *getShipShape(xp_option_t *opt)
 {
-    (void)opt;
-    return "FOOBAR";
+    return shipShapeSetting;
+}
+
+static bool setShipShapeFile(xp_option_t *opt, const char *value)
+{
+   if (shipShapeFileSetting)
+	xp_free(shipShapeFileSetting);
+    shipShapeFileSetting = xp_strdup(value);
+    warn("shipShapeFileSetting is now %s\n", shipShapeFileSetting);
+
+    if (shipShapeSetting)
+	tryToSetShipShape(shipShapeSetting, shipShapeFileSetting);
+
+    return true;
+}
+
+static char *getShipShapeFile(xp_option_t *opt)
+{
+    return shipShapeSetting;
 }
 
 xp_option_t default_options[] = {
@@ -124,9 +218,8 @@ xp_option_t default_options[] = {
     XP_STRING_OPTION(
 	"shipShapeFile",
 	SHIP_FILE,  /*conf_ship_file_string,*/
-	myshipshapefile,
-	sizeof myshipshapefile,
-	NULL, NULL,
+	NULL, 0,
+	setShipShapeFile, getShipShapeFile,
 	"An optional file where shipshapes can be stored.\n"
 	"If this resource is defined and it refers to an existing file\n"
 	"then shipshapes can be referenced to by their name.\n"
