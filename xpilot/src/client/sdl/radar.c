@@ -66,7 +66,7 @@ static void to_screen(GLWidget *radar, int *x, int *y, int from_w, int from_h)
     fx = *x * rb.w / from_w;
     fy = *y * rb.h / from_h;
 
-    if (instruments.showSlidingRadar) {
+    if (instruments.slidingRadar) {
 	sx = selfPos.x * rb.w / Setup->width;
 	sy = selfPos.y * rb.h / Setup->height;
 	fx = fx - sx;
@@ -273,7 +273,7 @@ static void Radar_paint_self(GLWidget *radar)
 
     if (!selfVisible) return;
 
-    if (instruments.showSlidingRadar) {
+    if (instruments.slidingRadar) {
 	x = rb.x + rb.w/2;
 	/* the sliding radar seems to be off by roughly 1 pixel */
 	y = rb.y + rb.h/2 + 1;
@@ -469,7 +469,7 @@ static void Radar_paint( GLWidget *widget )
     xf = (float)radar_bounds.w / (float)Setup->width;
     yf = (float)radar_bounds.h / (float)Setup->height;
 
-    if (instruments.showSlidingRadar) {
+    if (instruments.slidingRadar) {
 
         int x, y, w, h;
         float xp, yp, xo, yo;

@@ -88,11 +88,11 @@ static void Paint_background_dots(void)
     int xi, yi;
     ipos_t min, max, count;
 
-    if (map_point_distance == 0)
+    if (backgroundPointDist == 0)
 	return;
 
-    count.x = Setup->width / (BLOCK_SZ * map_point_distance);
-    count.y = Setup->height / (BLOCK_SZ * map_point_distance);
+    count.x = Setup->width / (BLOCK_SZ * backgroundPointDist);
+    count.y = Setup->height / (BLOCK_SZ * backgroundPointDist);
 
     dx = (double)Setup->width / count.x;
     dy = (double)Setup->height / count.y;
@@ -111,7 +111,7 @@ static void Paint_background_dots(void)
         for (xi = min.x; xi <= max.x; xi++) {
             Gui_paint_decor_dot((int)(xi * dx - BLOCK_SZ / 2),
 				(int)(yi * dy - BLOCK_SZ / 2),
-				map_point_size);
+				backgroundPointSize);
         }
     }
 }
@@ -342,8 +342,8 @@ void Paint_world(void)
 		switch (type) {
 
 		case SETUP_FILLED_NO_DRAW:
-		    if ((instruments.showFilledWorld
-			 || instruments.showTexturedWalls)
+		    if ((instruments.filledWorld
+			 || instruments.texturedWalls)
 			&& fill_top_left == -1 && oldServer)
 			fill_top_left = fill_bottom_left = x;
 		    break;
@@ -416,7 +416,7 @@ void Paint_world(void)
 		case SETUP_DECOR_DOT_RD:
 		case SETUP_DECOR_DOT_LU:
 		case SETUP_DECOR_DOT_LD:
-		    Gui_paint_decor_dot(x, y, map_point_size);
+		    Gui_paint_decor_dot(x, y, backgroundPointSize);
 		    break;
 
 		case SETUP_BASE_UP:
@@ -486,8 +486,8 @@ void Paint_world(void)
 		}
 	    }
 	    else if (oldServer) {
-		if (!(instruments.showFilledWorld
-		      || instruments.showTexturedWalls)) {
+		if (!(instruments.filledWorld
+		      || instruments.texturedWalls)) {
 		    Gui_paint_walls(x, y, type);
 
 		    if ((type & BLUE_FUEL) == BLUE_FUEL)

@@ -237,7 +237,7 @@ void Paint_radar(void)
     slidingradar_y = 0;
 
 #ifdef _WINDOWS
-    if (instruments.showSlidingRadar)
+    if (instruments.slidingRadar)
 	/*
 	 * Hack to fix slidingradar in windows.
 	 */
@@ -267,7 +267,7 @@ void Paint_sliding_radar(void)
     if (radarPixmap != radarPixmap2)
 	return;
 
-    if (instruments.showSlidingRadar) {
+    if (instruments.slidingRadar) {
 	if (radarPixmap2 != radarWindow)
 	    return;
 

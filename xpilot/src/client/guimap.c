@@ -486,7 +486,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 
     mask = decor[type];
 
-    if (!(instruments.showFilledDecor||instruments.showTexturedDecor)) {
+    if (!(instruments.filledDecor||instruments.texturedDecor)) {
 	if (mask & DECOR_LEFT) {
 	    if ((xi == 0)
 		? (!BIT(Setup->mode, WRAP_PLAY) ||
@@ -516,7 +516,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 	    }
 	}
 	if (mask & DECOR_RIGHT) {
-	    if (!instruments.showOutlineDecor
+	    if (!instruments.outlineDecor
 		|| ((xi == Setup->x - 1)
 		    ? (!BIT(Setup->mode, WRAP_PLAY)
 		       || !(decor[Setup->map_data[yi]]
@@ -531,7 +531,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 	    }
 	}
 	if (mask & DECOR_UP) {
-	    if (!instruments.showOutlineDecor
+	    if (!instruments.outlineDecor
 		|| ((yi == Setup->y - 1)
 		    ? (!BIT(Setup->mode, WRAP_PLAY)
 		       || !(decor[Setup->map_data[xi * Setup->y]]
@@ -1025,8 +1025,8 @@ void Gui_paint_decor_dot(int x, int y, int size)
     if (!backgroundPointColor)
 	return;
     Rectangle_add(backgroundPointColor,
-		  X(x + BLOCK_SZ / 2) - (map_point_size >> 1),
-		  Y(y + BLOCK_SZ / 2) - (map_point_size >> 1),
+		  X(x + BLOCK_SZ / 2) - (backgroundPointSize >> 1),
+		  Y(y + BLOCK_SZ / 2) - (backgroundPointSize >> 1),
 		  size, size);
 }
 
@@ -1166,8 +1166,8 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 
     if (BIT(style.flags, STYLE_INVISIBLE)) return;
 
-    textured = instruments.showTexturedWalls && fullColor;
-    filled = instruments.showFilledWorld;
+    textured = instruments.texturedWalls && fullColor;
+    filled = instruments.filledWorld;
 
     x = xoff * Setup->width;
     y = yoff * Setup->height;

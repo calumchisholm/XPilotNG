@@ -711,10 +711,10 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 		 rint((yoff * Setup->height - world.y) * scale), 0);
     glScalef(scale, scale, 0);
 
-    if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
+    if ((instruments.texturedWalls || instruments.filledWorld) &&
 	    BIT(p_style.flags, STYLE_TEXTURED | STYLE_FILLED)) {
 	if (BIT(p_style.flags, STYLE_TEXTURED)
-	        && instruments.showTexturedWalls) {
+	        && instruments.texturedWalls) {
 	    Image_use_texture(p_style.texture);
 	    glCallList(polyListBase + i);
 	    Image_no_texture();
@@ -805,7 +805,7 @@ void Gui_paint_spark(int color, int x, int y)
     glColor3ub(255 * (color + 1) / 8,
 	       255 * color * color / 64,
 	       0);
-    glPointSize(spark_size);
+    glPointSize(sparkSize);
     glBegin(GL_POINTS);
     glVertex2i(x + world.x, world.y + ext_view_height - y);
     glEnd();
@@ -887,18 +887,22 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
  */
 void Gui_paint_fastshot(int color, int x, int y)
 {
+    int size = MIN(shotSize, 8);
+
     Image_paint(IMG_BULLET,
-		x + world.x - shot_size/2,
+		x + world.x - size/2,
 		world.y - 6 + ext_view_height - y,
-		shot_size - 1, whiteRGBA);
+		size - 1, whiteRGBA);
 }
 
 void Gui_paint_teamshot(int x, int y)
 {
+    int size = MIN(teamShotSize, 8);
+
     Image_paint(IMG_BULLET_OWN,
-		x + world.x - 3,
+		x + world.x - size/2,
 		world.y - 6 + ext_view_height - y,
-		shot_size - 1, whiteRGBA);
+		size - 1, whiteRGBA);
 }
 
 void Gui_paint_missiles_begin(void)

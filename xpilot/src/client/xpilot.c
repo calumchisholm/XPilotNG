@@ -58,8 +58,9 @@ const char *Program_name(void)
  */
 int main(int argc, char *argv[])
 {
-    int				result, retval = 1;
-    bool			auto_shutdown = false;
+    int result, retval = 1;
+    bool auto_shutdown = false;
+    Connect_param_t *conpar = &connectParam;
 
     /*
      * --- Output copyright notice ---
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 
     Check_client_versions();
 
-    memset(&connectParam, 0, sizeof(Connect_param_t));
+    memset(conpar, 0, sizeof(Connect_param_t));
 
     /*
      * --- Create global option array ---
@@ -137,16 +138,16 @@ int main(int argc, char *argv[])
 				 xpArgs.auto_connect, xpArgs.list_servers,
 				 auto_shutdown, xpArgs.shutdown_reason,
 				 0, NULL, NULL, NULL, NULL,
-				 &connectParam);
+				 conpar);
     }
     else {
-	IFNWINDOWS(result = Welcome_screen(&connectParam));
+	IFNWINDOWS(result = Welcome_screen(conpar));
     }
 
     if (result == 1)
-	retval = Join(&connectParam);
+	retval = Join(conpar);
     
-    if (instruments.useClientRanker)
+    if (instruments.clientRanker)
 	Print_saved_scores();
 
     return retval;

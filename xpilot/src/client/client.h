@@ -55,24 +55,24 @@
 #endif
 
 typedef struct {
-    bool showShipShapes;
-    bool showMyShipShape;
-    bool showShipShapesHack;
-    bool showLivesByShip;
-    bool showItems;
+    bool blockProtocol;
+    bool clientRanker;
+    bool clockAMPM;
+    bool filledDecor;
+    bool filledWorld;
+    bool outlineDecor;
+    bool outlineWorld;
     bool showDecor;
-    bool showOutlineWorld;
-    bool showFilledWorld;
-    bool showTexturedWalls;
-    bool showOutlineDecor;
-    bool showFilledDecor;
-    bool showTexturedDecor;
+    bool showItems;
+    bool showLivesByShip;
     bool showMessages;
-    bool showSlidingRadar;
-    bool useClientRanker;
-    bool useAMPMFormatClock;
-    bool useBlockProtocol;
+    bool showMyShipShape;
     bool showNastyShots;
+    bool showShipShapes;
+    bool showShipShapesHack;
+    bool slidingRadar;
+    bool texturedDecor;
+    bool texturedWalls;
 } instruments_t;
 
 typedef struct {
@@ -503,11 +503,11 @@ extern int	roundDelayMax;
 
 extern unsigned	RadarWidth;
 extern unsigned	RadarHeight;
-extern int	map_point_distance;	/* spacing of navigation points */
-extern int	map_point_size;		/* size of navigation points */
-extern int	spark_size;		/* size of sparks and debris */
-extern int	shot_size;		/* size of shot */
-extern int	teamshot_size;		/* size of team shot */
+extern int	backgroundPointDist;	/* spacing of navigation points */
+extern int	backgroundPointSize;	/* size of navigation points */
+extern int	sparkSize;		/* size of sparks and debris */
+extern int	shotSize;		/* size of shot */
+extern int	teamShotSize;		/* size of team shot */
 
 extern double	controlTime;		/* Display control for how long? */
 extern u_byte	spark_rand;		/* Sparkling effect */

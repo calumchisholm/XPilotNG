@@ -300,9 +300,9 @@ void Gui_paint_spark(int color, int x, int y)
     color = spark_color[color];
 
     Rectangle_add(color,
-		  x - spark_size/2,
-		  y - spark_size/2,
-		  spark_size, spark_size);
+		  x - sparkSize/2,
+		  y - sparkSize/2,
+		  sparkSize, sparkSize);
 
 }
 
@@ -384,28 +384,29 @@ void Gui_paint_fastshot(int color, int x, int y)
 	return;
 
     if (!texturedObjects) {
-        int z = shot_size/2;
+        int z = shotSize/2;
 
 	if (instruments.showNastyShots)
 	    Gui_paint_nastyshot(color, x, y, z);
 	else {
 	    /* Show round shots - jiman392 */
-	    if (shot_size > 2) {
+	    if (shotSize > 2) {
 		SET_FG(colors[color].pixel);
 		rd.fillArc(dpy, drawPixmap, gameGC,
 			   WINSCALE(x - z), WINSCALE(y - z),
-			   UWINSCALE(shot_size), UWINSCALE(shot_size), 
+			   UWINSCALE(shotSize), UWINSCALE(shotSize), 
 			   0, 64*360);
 	    } else
 		Rectangle_add(color,
 			      x - z,
 			      y - z,
-			      shot_size, shot_size);
+			      shotSize, shotSize);
 	}
     }
     else {
-	int s_size = (shot_size > 8) ? 8 : shot_size ;
+	int s_size = MIN(shotSize, 8);
 	int z = s_size / 2;
+
 	Bitmap_paint(drawPixmap, BM_BULLET, WINSCALE(x) - z,
 		     WINSCALE(y) - z, s_size - 1);
     }
@@ -413,13 +414,33 @@ void Gui_paint_fastshot(int color, int x, int y)
 
 void Gui_paint_teamshot(int x, int y)
 {
-    if (teamShotColor == 0)
+    int color = teamShotColor;
+
+    if (color == 0)
 	return;
 
-    if (!texturedObjects)
-	Gui_paint_nastyshot(teamShotColor, x, y, shot_size/2);
+    if (!texturedObjects) {
+        int z = teamShotSize/2;
+
+	if (instruments.showNastyShots)
+	    Gui_paint_nastyshot(color, x, y, z);
+	else {
+	    /* Show round shots - jiman392 */
+	    if (teamShotSize > 2) {
+		SET_FG(colors[color].pixel);
+		rd.fillArc(dpy, drawPixmap, gameGC,
+			   WINSCALE(x - z), WINSCALE(y - z),
+			   UWINSCALE(teamShotSize), UWINSCALE(teamShotSize), 
+			   0, 64*360);
+	    } else
+		Rectangle_add(color,
+			      x - z,
+			      y - z,
+			      teamShotSize, teamShotSize);
+	}
+    }
     else {
-	int s_size = (teamshot_size > 8) ? 8 : shot_size ;
+	int s_size = MIN(teamShotSize, 8);
 	int z = s_size / 2;
 	Bitmap_paint(drawPixmap, BM_BULLET_OWN, WINSCALE(x) - z,
 		     WINSCALE(y) - z, s_size - 1);

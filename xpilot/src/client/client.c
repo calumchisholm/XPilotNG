@@ -93,11 +93,11 @@ int	roundDelay;		/* != 0 means we're in a delay */
 int	roundDelayMax;		/* (not yet) used for graph of time
 				   remaining in delay */
 
-int	map_point_distance;	/* spacing of navigation points */
-int	map_point_size;		/* size of navigation points */
-int	spark_size;		/* size of debris and spark */
-int	shot_size;		/* size of shot */
-int	teamshot_size;		/* size of team shot */
+int	backgroundPointDist;	/* spacing of navigation points */
+int	backgroundPointSize;	/* size of navigation points */
+int	sparkSize;		/* size of debris and spark */
+int	shotSize;		/* size of shot */
+int	teamShotSize;		/* size of team shot */
 double	controlTime;		/* Display control for how long? */
 u_byte	spark_rand;		/* Sparkling effect */
 u_byte	old_spark_rand;		/* previous value of spark_rand */
@@ -532,7 +532,7 @@ void Map_dots(void)
     /*
      * Optimize.
      */
-    if (map_point_size > 0) {
+    if (backgroundPointSize > 0) {
 	if (BIT(Setup->mode, WRAP_PLAY)) {
 	    for (x = 0; x < Setup->x; x++) {
 		if (dot[Setup->map_data[x * Setup->y]])
@@ -542,13 +542,13 @@ void Map_dots(void)
 		if (dot[Setup->map_data[y]])
 		    Map_make_dot(&Setup->map_data[y]);
 	    }
-	    start = map_point_distance;
+	    start = backgroundPointDist;
 	} else
 	    start = 0;
 
-	if (map_point_distance > 0) {
-	    for (x = start; x < Setup->x; x += map_point_distance) {
-		for (y = start; y < Setup->y; y += map_point_distance) {
+	if (backgroundPointDist > 0) {
+	    for (x = start; x < Setup->x; x += backgroundPointDist) {
+		for (y = start; y < Setup->y; y += backgroundPointDist) {
 		    if (dot[Setup->map_data[x * Setup->y + y]])
 			Map_make_dot(&Setup->map_data[x * Setup->y + y]);
 		}
@@ -559,9 +559,9 @@ void Map_dots(void)
 	    y = cannons[i].pos % Setup->y;
 	    if ((x == 0 || y == 0) && BIT(Setup->mode, WRAP_PLAY))
 		cannons[i].dot = 1;
-	    else if (map_point_distance > 0
-		&& x % map_point_distance == 0
-		&& y % map_point_distance == 0)
+	    else if (backgroundPointDist > 0
+		&& x % backgroundPointDist == 0
+		&& y % backgroundPointDist == 0)
 		cannons[i].dot = 1;
 	    else
 		cannons[i].dot = 0;
@@ -634,9 +634,9 @@ void Map_blue(int startx, int starty, int width, int height)
     unsigned char	blue[256];
     bool		outline = false;
 
-    if (instruments.showOutlineWorld ||
-	instruments.showFilledWorld ||
-	instruments.showTexturedWalls)
+    if (instruments.outlineWorld ||
+	instruments.filledWorld ||
+	instruments.texturedWalls)
 	outline = true;
     /*
      * Optimize the map for blue.
@@ -1062,7 +1062,7 @@ static int init_polymap(void)
      * kps - hack.
      * Player can disable downloading of textures by having texturedWalls off.
      */
-    if (instruments.showTexturedWalls && Setup->data_url[0])
+    if (instruments.texturedWalls && Setup->data_url[0])
 	Mapdata_setup(Setup->data_url);
     Colors_init_style_colors();    
 
@@ -2187,13 +2187,14 @@ int Client_setup(void)
 	Map_dots();
 	Map_restore(0, 0, Setup->x, Setup->y);
 	Map_blue(0, 0, Setup->x, Setup->y);
+	/* kps -remove this, you shouldn't change options this way */
 	/* No one wants this on old-style maps anyway, so turn it off.
 	 * I do, so turn it on.
 	 * This allows people to turn it on in their .xpilotrc for new maps
 	 * without affecting old ones. It's still possible to turn in on
 	 * from the config menu during play for old maps.
 	 * -- But doesn't seem to work anyway if turned on? Well who cares */
-	instruments.showTexturedWalls = false;
+	instruments.texturedWalls = false;
     }
 
     RadarHeight = (RadarWidth * Setup->height) / Setup->width;

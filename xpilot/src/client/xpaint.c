@@ -220,7 +220,7 @@ void Paint_frame(void)
      * Now switch planes and clear the screen.
      */
     if (radarPixmap != radarWindow && radar_exposures > 0) {
-	if (!instruments.showSlidingRadar
+	if (!instruments.slidingRadar
 	    || BIT(Setup->mode, WRAP_PLAY) == 0) {
 #ifndef _WINDOWS
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
@@ -581,7 +581,7 @@ static void Paint_clock(bool redraw)
     hour = m->tm_hour;
     /*warn("drawing clock at %02d:%02d:%02d", hour, minute, second);*/
 
-    if (!instruments.useAMPMFormatClock)
+    if (!instruments.clockAMPM)
 	sprintf(buf, "%02d:%02d" /*":%02d"*/, hour, minute /*, second*/);
     else {
 	char tmpchar = 'A';
