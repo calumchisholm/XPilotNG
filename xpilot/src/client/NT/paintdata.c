@@ -216,7 +216,7 @@ short	scaleArray[SCALE_ARRAY_SIZE];
 void Init_scale_array(void)
 {
     int		i, start, end, n;
-    double	scaleMultFactor;
+    double	scaleMultFactor, f;
 
     if (scaleFactor == 0.0)
 	scaleFactor = 1.0;
@@ -226,7 +226,8 @@ void Init_scale_array(void)
     scaleArray[0] = 0;
 
     for (i = 1; i < NELEM(scaleArray); i++) {
-	n = floor(i * scaleMultFactor + 0.5);
+	f = floor(i * scaleMultFactor + 0.5);
+	n = (int) f;
 	if (n == 0)
 	    /* keep values for non-zero indices at least 1. */
 	    scaleArray[i] = 1;
@@ -236,7 +237,8 @@ void Init_scale_array(void)
     start = i;
 
     for (i = NELEM(scaleArray) - 1; i >= 0; i--) {
-	n = floor(i * scaleMultFactor + 0.5);
+	f = floor(i * scaleMultFactor + 0.5);
+	n = (int) f;
 	if (n > 32767)
 	    /* keep values lower or equal to max short. */
 	    scaleArray[i] = 32767;
@@ -245,8 +247,10 @@ void Init_scale_array(void)
     }
     end = i;
 
-    for (i = start; i <= end; i++)
-	scaleArray[i] = floor(i * scaleMultFactor + 0.5);
+    for (i = start; i <= end; i++) {
+	f = floor(i * scaleMultFactor + 0.5);
+	scaleArray[i] = (short) f;
+    }
 
     /*
      * verify correct calculations, because of reported gcc optimization
