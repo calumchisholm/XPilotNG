@@ -447,7 +447,7 @@ void load_textscrap(char *text)
     	if ( *cp == '\n' )
     	    *cp = '\r';
     }
-    put_scrap(T('T','E','X','T'), strlen(scrap), scrap);
+    put_scrap(TextScrap('T','E','X','T'), strlen(scrap), scrap);
 }
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */
@@ -3118,17 +3118,12 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
 }
 
 extern int Console_isVisible(void);
-extern int Console_process(SDL_Event *e);
+extern void Paste_String_to_Console(char *text);
 static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
-    WrapperWidget *tmp;
-    SDL_Event event;
-    int i = 0;
-    char c[2];
     int scraplen;
     
     if (!data) return;
-    tmp = (WrapperWidget *)(((GLWidget *)data)->wid_info);
 
     if (state == SDL_PRESSED) {
 	if (button == 1) {
@@ -3137,20 +3132,9 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
 	if (button == 2) {
     	    if (Console_isVisible()) {
 	    	scraptarget = NULL;
-	    	get_scrap(T('T','E','X','T'), &scraplen, &scrap);
+	    	get_scrap(TextScrap('T','E','X','T'), &scraplen, &scrap);
 		if ( scraplen == 0 ) return;
-	    	event.type = SDL_KEYDOWN;
-		event.key.type = SDL_KEYDOWN;
-		event.key.state = SDL_PRESSED;
-		event.key.keysym.mod = KMOD_NONE;
-    	    	c[0] = '\0';
-	    	while (scrap[i] != '\0') {
-		    c[0] = scrap[i];
-		    event.key.keysym.sym = SDLK_a;
-		    event.key.keysym.unicode = (Uint16)c[0];
-		    Console_process(&event);
-		    ++i;
-		}
+		Paste_String_to_Console(scrap);
 	    }
 	}
     }

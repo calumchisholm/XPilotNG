@@ -37,7 +37,7 @@ typedef UINT scrap_type;
 #elif defined(QNX_SCRAP)
 /* * */
 typedef uint32_t scrap_type;
-#define Ph_CL_TEXT T('T', 'E', 'X', 'T')
+#define Ph_CL_TEXT TextScrap('T', 'E', 'X', 'T')
 
 #endif /* scrap type */
 
@@ -67,7 +67,7 @@ convert_format(int type)
   switch (type)
     {
 
-    case T('T', 'E', 'X', 'T'):
+    case TextScrap('T', 'E', 'X', 'T'):
 #if defined(X11_SCRAP)
 /* * */
       return XA_STRING;
@@ -110,7 +110,7 @@ convert_data(int type, char *dst, char *src, int srclen)
   dstlen = 0;
   switch (type)
     {
-    case T('T', 'E', 'X', 'T'):
+    case TextScrap('T', 'E', 'X', 'T'):
       if ( dst )
         {
           while ( --srclen >= 0 )
@@ -190,7 +190,7 @@ convert_scrap(int type, char *dst, char *src, int srclen)
   dstlen = 0;
   switch (type)
     {
-    case T('T', 'E', 'X', 'T'):
+    case TextScrap('T', 'E', 'X', 'T'):
       {
         if ( srclen == 0 )
           srclen = strlen(src);

@@ -1061,6 +1061,25 @@ void Cursor_Add(ConsoleInformation * console, SDL_Event * event)
     }
 }
 
+void Add_String_to_Console(char *text)
+{
+
+    int len = 0, textlen, i;
+    
+    textlen = (int)strlen(text);
+    
+    for ( i = 0 ; i < textlen; ++i) {
+    	/* Again: the commandline has to hold the command and the cursor (+1) */
+    	if (strlen(Topmost->Command) + 1 < CON_CHARS_PER_LINE) {
+	    Topmost->CursorPos++;
+	    len = strlen(Topmost->LCommand);
+	    Topmost->LCommand[len] = text[i];
+	    Topmost->LCommand[len + sizeof(char)] = '\0';
+	    Assemble_Command(Topmost);
+    	}
+    }
+}
+
 void Clear_Command(ConsoleInformation * console)
 {
     Topmost->CursorPos = 0;

@@ -113,6 +113,12 @@ int Console_process(SDL_Event *e)
     return 0;
 }
 
+void Paste_String_to_Console(char *text)
+{
+    Add_String_to_Console(text);
+    Console_refresh();
+}
+
 void Console_cleanup(void)
 {
     CON_Destroy(console);

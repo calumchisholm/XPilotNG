@@ -206,7 +206,10 @@ extern "C" {
 	extern DECLSPEC void SDLCALL Cursor_BSpace(ConsoleInformation *console);
 	/*! Internal: Called if you type in a character (add the char to the command) */
 	extern DECLSPEC void SDLCALL Cursor_Add(ConsoleInformation *console, SDL_Event *event);
-
+    	
+	/* add string to commandline */
+	extern DECLSPEC void SDLCALL Add_String_to_Console(char *text);
+    	
 	/*! Internal: Called if you press Ctrl-C (deletes the commandline) */
 	extern DECLSPEC void SDLCALL Clear_Command(ConsoleInformation *console);
 	/*! Internal: Called if the command line has changed (assemles console->Command from LCommand and RCommand */
