@@ -33,7 +33,6 @@ AC_CHECK_HEADERS([arpa/inet.h \
 	bstring.h \
 	fcntl.h \
 	float.h \
-	in.h \
 	limits.h \
 	memory.h \
 	net/if.h \
@@ -43,7 +42,6 @@ AC_CHECK_HEADERS([arpa/inet.h \
 	pwd.h \
 	resolv.h \
 	setjmp.h \
-	socket.h \
 	stdint.h \
 	stdlib.h \
 	string.h \
