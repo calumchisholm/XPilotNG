@@ -96,6 +96,7 @@ ecm_t			*Ecms[MAX_TOTAL_ECMS];
 trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
 int			GetInd[NUM_IDS + 1 + MAX_OBSERVERS];
 server			Server;
+char			serverAddr[24];
 int			ShutdownServer = -1;
 int			ShutdownDelay = 1000;
 char			ShutdownReason[MAX_CHARS];
@@ -174,9 +175,26 @@ int main(int argc, char **argv)
     /*
      * Get server's official name.
      */
-    sock_get_local_hostname(Server.host, sizeof Server.host,
-		     (reportToMetaServer != 0 && searchDomainForXPilot != 0));
+    if (serverHost) {
+	char *addr;
 
+	addr = sock_get_addr_by_name(serverHost);
+	if (addr == NULL) {
+	    errno = 0;
+	    error("Failed name lookup on serverHost:%s", serverHost);
+#ifndef _WINDOWS
+	    exit(1);
+#else
+	    return(1);
+#endif
+	}
+	strncpy(serverAddr, addr, sizeof(serverAddr) - 1);
+	strncpy(Server.host, serverHost, sizeof(Server.host) - 1);
+    }
+    else {
+	sock_get_local_hostname(Server.host, sizeof Server.host,
+		      (reportToMetaServer != 0 && searchDomainForXPilot != 0));
+    }
     Get_login_name(Server.name, sizeof Server.name);
 
     /*

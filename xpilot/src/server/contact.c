@@ -107,8 +107,9 @@ void Contact_init(void)
     /*
      * Create a socket which we can listen on.
      */
-    if ((status = sock_open_udp(&contactSocket, NULL, contactPort)) ==
+    if ((status = sock_open_udp(&contactSocket, serverAddr, contactPort)) ==
 	SOCK_IS_ERROR) {
+	error("Could not create Dgram contactSocket");
 	End_game();
     }
     sock_set_timeout(&contactSocket, 0, 0);

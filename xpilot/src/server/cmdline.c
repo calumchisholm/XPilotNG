@@ -69,6 +69,7 @@ char		*mapName;		/* Name of the universe */
 char		*mapAuthor;		/* Name of the creator */
 char            *dataURL;               /* URL to client for extra data */
 int		contactPort;		/* Contact port number */
+char		*serverHost;		/* Host name (for multihomed hosts) */
 
 bool		crashWithPlayer;	/* Can players overrun other players? */
 bool		bounceWithPlayer;	/* Can players bounce other players? */
@@ -434,6 +435,16 @@ static optionDesc options[] = {
 	tuner_none,
 	"The server contact port number.\n",
 	MAP("General")
+    },
+    {
+	"serverHost",
+	"serverHost",
+	NULL,
+	&serverHost,
+	valString,
+	tuner_none,
+	"The fully qualified domain name (for multihomed hosts).\n",
+	MAP(NULL)
     },
     {
 	"allowPlayerCrashes",

@@ -623,7 +623,7 @@ void Create_client_socket(sock_t *socket, int *port)
     int i;
 
     if (!clientPortStart || !clientPortEnd) {
-	if (sock_open_udp(socket, NULL, 0) == SOCK_IS_ERROR) {
+	if (sock_open_udp(socket, serverAddr, 0) == SOCK_IS_ERROR) {
 	    error("Cannot create datagram socket (%d)", socket->error.error);
 	    socket->fd = -1;
 	    return;
@@ -631,7 +631,7 @@ void Create_client_socket(sock_t *socket, int *port)
     }
     else {
 	for (i = clientPortStart; i <= clientPortEnd; i++)
-	    if (sock_open_udp(socket, NULL, i) != SOCK_IS_ERROR)
+	    if (sock_open_udp(socket, serverAddr, i) != SOCK_IS_ERROR)
 		goto found;
 	error("Could not find a useable port in given port range");
 	socket->fd = -1;
