@@ -422,7 +422,7 @@ static option_desc options[] = {
     {
 	"minItemMass",
 	"minItemMass",
-	"0.1",		/* kps - 4.5.5beta has default of 1.0 */
+	"0.0",		/* kps - 4.5.5beta has default of 1.0 */
 	&minItemMass,
 	valReal,
 	tuner_dummy,
@@ -3233,7 +3233,7 @@ static option_desc options[] = {
 	&pauseTax,
 	valReal,
 	tuner_dummy,
-	"How many points to subract from pausing players each second.\n",
+	"How many points to subtract from pausing players each second.\n",
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3494,8 +3494,6 @@ static option_desc options[] = {
 	"The filename of the player passwords file to read when authenticating.\n",
 	OPT_COMMAND | OPT_DEFAULTS
     },
-#endif
-#if 0
     {
 	"playerPasswordsFileSizeLimit",
 	"playerPasswordsLimit",
@@ -3507,8 +3505,6 @@ static option_desc options[] = {
 	"if players change passwords!).\n",
 	OPT_COMMAND | OPT_DEFAULTS
     },
-#endif
-#if 0
     {
 	"allowPlayerPasswords",
 	"PlayerPasswords",
