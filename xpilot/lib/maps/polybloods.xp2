@@ -21,7 +21,7 @@
 <Option name="gravity" value="0"/>
 <Option name="initialafterburners" value="2"/>
 <Option name="initialautopilots" value="1"/>
-<Option name="initialfuel" value="500"/>
+<Option name="initialfuel" value="300"/>
 <Option name="itemprobmult" value="0.0"/>
 <Option name="kineticenergyfueldrain" value="no"/>
 <Option name="limitedlives" value="yes"/>
