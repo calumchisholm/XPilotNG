@@ -48,6 +48,7 @@
 #  include <X11/Xmd.h>
 #endif
 
+#include "meta.h"
 #include "bitmaps.h"
 #include "dbuff.h"
 #include "paintdata.h"

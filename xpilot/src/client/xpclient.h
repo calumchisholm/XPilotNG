@@ -55,6 +55,7 @@ typedef unsigned short uint16_t; /* e.g. in client.c */
 extern bool threadedDraw; /* default.c */
 #endif
 
+
 #include "client.h"
 #include "clientcommand.h"
 #include "clientrank.h"
@@ -64,6 +65,7 @@ extern bool threadedDraw; /* default.c */
 #include "gfx2d.h"
 #include "guimap.h"      /* guimap.c depends on X11 */
 #include "guiobjects.h"
+#include "meta.h"
 #include "netclient.h"
 #include "option.h"
 #include "paint.h"

@@ -15,7 +15,7 @@ xpilot_SOURCES = \
 	guimap.c guimap.h guiobjects.c guiobjects.h \
 	icon.h \
 	join.c \
-	mapdata.c messages.c \
+	meta.c meta.h mapdata.c messages.c \
 	netclient.c netclient.h \
 	option.c option.h \
 	paint.c paint.h paintdata.c paintdata.h painthud.c \
@@ -31,8 +31,9 @@ xpilot_SOURCES = \
 noinst_LIBRARIES = libxpclient.a
 libxpclient_a_SOURCES = \
 	netclient.c client.c event.c usleep.c query.c textinterface.c \
-	datagram.c mapdata.c gfx2d.c messages.c clientrank.c talkmacros.c \
-	clientcommand.c paint.c paintmap.c paintobjects.c option.c default.c
+	datagram.c meta.c mapdata.c gfx2d.c messages.c clientrank.c \
+	talkmacros.c clientcommand.c paint.c paintmap.c paintobjects.c \
+	option.c default.c
 
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
