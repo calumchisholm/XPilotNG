@@ -42,6 +42,7 @@
 #include "score.h"
 #include "objpos.h"
 #include "click.h"
+#include "object.h"
 
 char play_version[] = VERSION;
 
@@ -52,7 +53,7 @@ static char sourceid[] =
 
 extern int Rate(int winner, int loser);
 
-int Punish_team(int ind, int t_destroyed, int posx, int posy)
+static int Punish_team(int ind, int t_destroyed, int posx, int posy)
 {
     static char		msg[MSG_LEN];
     treasure_t		*td = &World.treasures[t_destroyed];
@@ -139,6 +140,46 @@ int Punish_team(int ind, int t_destroyed, int posx, int posy)
     updateScores = true;
 
     return 1;
+}
+
+
+void Ball_hits_goal(object *ball, int group)
+{
+    char msg[MSG_LEN];
+    if (ball->owner == -1) {	/* Probably the player quit */
+	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
+	return;
+    }
+    if (World.treasures[ball->treasure].team == groups[group].team) {
+	/*
+	 * Ball has been replaced back in the hoop from whence
+	 * it came. The player must be from the same team as the ball,
+	 * otherwise Bounce_object() wouldn't have been called. It
+	 * should be replaced into the hoop without exploding and
+	 * the player gets some points.
+	 */
+	treasure_t	*tt = &World.treasures[ball->treasure];
+	player	*pl = Players[GetInd[ball->owner]];
+
+	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
+
+	SCORE(GetInd[pl->id], 5,
+	      tt->pos.x, tt->pos.y, "Treasure: ");
+	sprintf(msg, " < %s (team %d) has replaced the treasure >",
+		pl->name, pl->team);
+	Set_message(msg);
+	return;
+    }
+    /*
+     * Ball has been brought back to home treasure.
+     * The team should be punished.
+     */
+    sprintf(msg," < The ball was loose for %ld frames >",
+	    LONG_MAX - ball->life);
+    Set_message(msg);
+    if (Punish_team(GetInd[ball->owner], ball->treasure,
+		    ball->pos.cx, ball->pos.cy))
+	CLR_BIT(ball->status, RECREATE);
 }
 
 

@@ -173,7 +173,6 @@ static char	*FileName;
 static int edg[5000 * 2]; /* !@# change pointers in poly_t when realloc poss.*/
 extern int polyc;
 extern int num_groups;
-extern struct {int type; unsigned int hit_mask; int team;} groups[];
 
 int *edges = edg;
 int *estyleptr;

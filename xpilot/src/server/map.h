@@ -257,11 +257,19 @@ typedef struct {
     int is_decor;
 } poly_t;
 
+struct group {
+    int type;
+    unsigned int hit_mask;
+    int team;
+};
+
 extern struct polystyle pstyles[256];
 extern struct edgestyle estyles[256];
 extern struct bmpstyle  bstyles[256];
 extern poly_t *pdata;
 extern int *estyleptr;
+extern struct group groups[];
+#define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1 << (team))
 
 extern int num_pstyles, num_estyles, num_bstyles;
 #endif

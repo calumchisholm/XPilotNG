@@ -103,12 +103,6 @@ struct bline {
     short group;
 };
 
-struct group {
-    int type;
-    unsigned int hit_mask;
-    int team;
-};
-
 struct blockinfo {
     unsigned short distance;
     unsigned short *lines;
@@ -229,50 +223,8 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
     }
 
     if (type == TREASURE) {
-	if (obj->type != OBJ_BALL) {
-	    obj->life = 0;
-	    return 0;
-	}
-	if (World.treasures[obj->treasure].team == groups[group].team) {
-	    /*
-	     * Ball has been replaced back in the hoop from whence
-	     * it came. The player must be from the same team as the ball,
-	     * otherwise Bounce_object() wouldn't have been called. It
-	     * should be replaced into the hoop without exploding and
-	     * the player gets some points.
-	     */
-	    player	*pl = NULL;
-	    treasure_t	*tt = &World.treasures[obj->treasure];
-
-	    if (obj->owner != -1)
-		pl = Players[GetInd[obj->owner]];
-
-	    obj->life = 0;
-	    SET_BIT(obj->status, (NOEXPLOSION|RECREATE));
-
-	    SCORE(GetInd[pl->id], 5,
-		  tt->pos.x, tt->pos.y, "Treasure: ");
-	    sprintf(msg, " < %s (team %d) has replaced the treasure >",
-		    pl->name, pl->team);
-	    Set_message(msg);
-	    return 0;
-	}
-	if (obj->owner == -1) {
-	    obj->life = 0;
-	    return 0;
-	}
-	if (groups[group].team == Players[GetInd[obj->owner]]->team) {
-	    /*
-	     * Ball has been brought back to home treasure.
-	     * The team should be punished.
-	     */
-	    sprintf(msg," < The ball was loose for %ld frames >",
-		    LONG_MAX - obj->life);
-	    Set_message(msg);
-	    if (Punish_team(GetInd[obj->owner], obj->treasure,
-			    obj->pos.cx, obj->pos.cy))
-		CLR_BIT(obj->status, RECREATE);
-	}
+	if (obj->type == OBJ_BALL)
+	    Ball_hits_goal(obj, group);
 	obj->life = 0;
 	return 0;
     }

@@ -136,7 +136,7 @@ void Fire_right_shot(int ind, int type, int dir, int gun);
 void Fire_left_rshot(int ind, int type, int dir, int gun);
 void Fire_right_rshot(int ind, int type, int dir, int gun);
 void Make_treasure_ball(int treasure);
-int Punish_team(int ind, int t_destroyed, int posx, int posy);
+void Ball_hits_goal(object *ball, int group);
 void Delete_shot(int ind);
 void Fire_laser(int ind);
 void Fire_general_laser(int ind, u_short team, int x, int y, int dir,

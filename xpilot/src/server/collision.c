@@ -647,6 +647,7 @@ static void PlayerCollision(void)
 	    else {
 		DFLOAT distance = Wrap_length(pl->pos.cx - ball->pos.cx,
 					       pl->pos.cy - ball->pos.cy);
+		int group;
 		if (distance >= BALL_STRING_LENGTH) {
 		    ball->id = pl->id;
 		    /* this is only the team of the owner of the ball,
@@ -654,7 +655,7 @@ static void PlayerCollision(void)
 		       found through the ball's treasure */
 		    ball->team = pl->team;
 		    if (ball->owner == -1)
-			ball->life=LONG_MAX;  /* for frame counter */
+			ball->life = LONG_MAX;  /* for frame counter */
 		    ball->owner = pl->id;
 		    SET_BIT(ball->status, GRAVITY);
 		    if (ball->treasure != -1)
@@ -663,6 +664,19 @@ static void PlayerCollision(void)
 		    pl->ball = NULL;
 		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 				       CONNECT_BALL_SOUND);
+		    /* The ball might already be inside the team's ball
+		     * target. This is not a complete check as it only
+		     * checks the center of the ball, but at least it
+		     * should take care of the typical case where this
+		     * really matters on Bloods. Must fix this completely
+		     * later (once there's general code for shape/polygon
+		     * is-inside testing, which should be relatively easy
+		     * to add on top of current features). !@#*/
+		    if ((group = is_inside(ball->pos.cx, ball->pos.cy,
+				  BALL_BIT | HITMASK(pl->team))) != -1) {
+			Ball_hits_goal(ball, group);
+			ball->life = 0;
+		    }
 		}
 	    }
 	} else {
