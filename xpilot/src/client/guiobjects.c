@@ -25,11 +25,9 @@
 
 char guiobjects_version[] = VERSION;
 
-extern XGCValues	gcv;
-
-static int texturedShips = 0; /* Turned this off because the images drawn
-				  * don't match the actual shipshape used
-				  * for wall collisions by the server. */
+static bool texturedShips = false; /* Turned this off because the images drawn
+				    * don't match the actual shipshape used
+				    * for wall collisions by the server. */
 
 int selfLWColor;
 int enemyLWColor;
@@ -57,14 +55,12 @@ void Gui_paint_ball(int x, int y)
     x = X(x);
     y = Y(y);
 
-    if (!texturedObjects) {
+    if (!texturedObjects)
 	Arc_add(ballColor, x - BALL_RADIUS, y - BALL_RADIUS,
 		2 * BALL_RADIUS, 2 * BALL_RADIUS, 0, 64 * 360);
-    }
-    else {
+    else
 	Bitmap_paint(p_draw, BM_BALL, WINSCALE(x - BALL_RADIUS),
 		     WINSCALE(y - BALL_RADIUS), 0);
-    }
 }
 
 
@@ -77,14 +73,12 @@ void Gui_paint_ball_connecter(int x1, int y1, int x2, int y2)
     Segment_add(connColor, x1, y1, x2, y2);
 }
 
-/* used by Paint_mine */
 static void Gui_paint_mine_name(int x, int y, char *name)
 {
     int		name_len, name_width;
 
-    if (!name) {
+    if (!name)
 	return;
-    }
 
     SET_FG(colors[mineNameColor].pixel);
 
@@ -187,9 +181,9 @@ void Gui_paint_spark(int color, int x, int y)
     color = spark_color[color];
 
     Rectangle_add(color,
-		x - spark_size/2,
-		y - spark_size/2,
-		spark_size, spark_size);
+		  x - spark_size/2,
+		  y - spark_size/2,
+		  spark_size, spark_size);
 
 }
 
@@ -334,14 +328,14 @@ void Gui_paint_missile(int x, int y, int len, int dir)
 void Gui_paint_lasers_begin(void)
 {
     XSetLineAttributes(dpy, gc, 3,
-			   LineSolid, CapButt, JoinMiter);
+		       LineSolid, CapButt, JoinMiter);
 }
 
 
 void Gui_paint_lasers_end(void)
 {
     XSetLineAttributes(dpy, gc, 0,
-			   LineSolid, CapButt, JoinMiter);
+		       LineSolid, CapButt, JoinMiter);
 }
 
 

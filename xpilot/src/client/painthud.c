@@ -25,12 +25,8 @@
 
 char painthud_version[] = VERSION;
 
-
-extern setup_t		*Setup;
-extern int		RadarHeight;
 extern score_object_t	score_objects[MAX_SCORE_OBJECTS];
 extern int		score_object;
-extern XGCValues	gcv;
 
 int	hudColor;		/* Color index for HUD drawing */
 int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
@@ -73,22 +69,11 @@ int	packetLagMeterColor;	/* Color index for packet lag meter */
 int	temporaryMeterColor;	/* Color index for temporary meter drawing */
 int	meterBorderColor;	/* Color index for meter border drawing */
 
-extern bool ball_shout;
-extern bool need_cover;
-
 message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
 /* store incoming messages while a cut is pending */
 message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
 /* history of the talk window */
 char		*HistoryMsg[MAX_HIST_MSGS];
-
-#ifndef _WINDOWS
-/* selection in talk- or draw-window */
-extern selection_t selection;
-extern void Delete_pending_messages(void);
-#endif
-
-
 
 /*
  * Draw a meter of some kind on screen.

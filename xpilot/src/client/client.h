@@ -357,28 +357,26 @@ extern	char		*HistoryMsg[MAX_HIST_MSGS];
 
 /* mapdata accessible to outside world */
 
-extern fuelstation_t *fuels;
-extern int num_fuels;
-
-extern homebase_t *bases;
-extern int num_bases;
-
-extern checkpoint_t *checks;
-extern int num_checks;
-
-extern xp_polygon_t *polygons;
-extern int num_polygons, max_polygons;
-
-extern edge_style_t *edge_styles;
-extern int num_edge_styles, max_edge_styles;
-
-extern polygon_style_t *polygon_styles;
-extern int num_polygon_styles, max_polygon_styles;
+extern fuelstation_t	*fuels;
+extern int		num_fuels;
+extern homebase_t	*bases;
+extern int		num_bases;
+extern checkpoint_t	*checks;
+extern int		num_checks;
+extern xp_polygon_t	*polygons;
+extern int		num_polygons, max_polygons;
+extern edge_style_t	*edge_styles;
+extern int		num_edge_styles, max_edge_styles;
+extern polygon_style_t	*polygon_styles;
+extern int		num_polygon_styles, max_polygon_styles;
 
 extern other_t *Others;
 extern int	num_others, max_others;
 
-extern int num_playing_teams;
+extern int	num_playing_teams;
+
+extern bool	ball_shout;
+extern bool	need_cover;
 
 int Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);
