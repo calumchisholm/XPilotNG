@@ -564,7 +564,7 @@ void Detonate_mines(player_t *pl);
 char *Describe_shot(int type, long status, modifiers_t mods, int hit);
 void Fire_ecm(player_t *pl);
 void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos);
-void Update_connector_force(ballobject_t *ball);
+void Update_connector_force(world_t *world, ballobject_t *ball);
 void Fire_shot(player_t *pl, int type, int dir);
 void Fire_general_shot(world_t *world, player_t *pl, int team, bool cannon,
 		       clpos_t pos, int type, int dir,
@@ -593,9 +593,9 @@ void Do_general_transporter(world_t *world, player_t *pl, clpos_t pos,
 			    player_t *victim, int *item, double *amount);
 bool Initiate_hyperjump(player_t *pl);
 void do_lose_item(player_t *pl);
-void Update_torpedo(torpobject_t *torp);
-void Update_missile(missileobject_t *shot);
-void Update_mine(mineobject_t *mine);
+void Update_torpedo(world_t *world, torpobject_t *torp);
+void Update_missile(world_t *world, missileobject_t *shot);
+void Update_mine(world_t *world, mineobject_t *mine);
 void Make_debris(world_t  *world,
 		 clpos_t  pos,
 		 vector_t vel,

@@ -1451,13 +1451,15 @@ void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
  * Changed the value (max_spring_ratio) at which the string snaps
  * from 0.25 to 0.30.  Not sure if that helps enough, or too much.
  */
-void Update_connector_force(ballobject_t *ball)
+void Update_connector_force(world_t *world, ballobject_t *ball)
 {
     player_t		*pl = Player_by_id(ball->id);
     vector_t		D;
     double		length, force, ratio, accell, damping;
     /* const double		k = 1500.0, b = 2.0; */
     /* const double		max_spring_ratio = 0.30; */
+
+    UNUSED_PARAM(world);
 
     /* no player connected ? */
     if (!pl)
@@ -1504,10 +1506,11 @@ void Update_connector_force(ballobject_t *ball)
     ball->vel.y += -D.y * accell * timeStep;
 }
 
-void Update_torpedo(torpobject_t *torp)
+void Update_torpedo(world_t *world, torpobject_t *torp)
 {
-    double		acc;
+    double acc;
 
+    UNUSED_PARAM(world);
     if (BIT(torp->mods.nuclear, NUCLEAR))
 	acc = (torp->count < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
     else
@@ -1523,13 +1526,12 @@ void Update_torpedo(torpobject_t *torp)
     torp->vel.y += acc * tsin(torp->missile_dir);
 }
 
-void Update_missile(missileobject_t *shot)
+void Update_missile(world_t *world, missileobject_t *shot)
 {
     player_t *pl;
     int angle, theta;
     double range = 0.0, acc = SMART_SHOT_ACC;
     double x_dif = 0.0, y_dif = 0.0, shot_speed;
-    world_t *world = &World;
 
     if (shot->type == OBJ_HEAT_SHOT) {
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;
@@ -1818,8 +1820,10 @@ void Update_missile(missileobject_t *shot)
     shot->vel.y = tsin(shot->missile_dir) * shot_speed;
 }
 
-void Update_mine(mineobject_t *mine)
+void Update_mine(world_t *world, mineobject_t *mine)
 {
+    UNUSED_PARAM(world);
+
     if (BIT(mine->status, CONFUSED)) {
 	if ((mine->count -= timeStep) <= 0) {
 	    CLR_BIT(mine->status, CONFUSED);

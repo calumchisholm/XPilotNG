@@ -40,10 +40,8 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static char msg[MSG_LEN];
 
-static inline void update_object_speed(object_t *obj)
+static inline void update_object_speed(world_t *world, object_t *obj)
 {
-    world_t *world = &World;
-
     if (BIT(obj->status, GRAVITY)) {
 	vector_t gravity = World_gravity(world, obj->pos);
 
@@ -474,7 +472,7 @@ static void Fuel_update(world_t *world)
     }
 }
 
-static void Misc_object_update(void)
+static void Misc_object_update(world_t *world)
 {
     int i;
     object_t *obj;
@@ -483,16 +481,16 @@ static void Misc_object_update(void)
 	obj = Obj[i];
 
 	if (BIT(obj->type, OBJ_MINE))
-	    Update_mine(MINE_PTR(obj));
+	    Update_mine(world, MINE_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_TORPEDO))
-	    Update_torpedo(TORP_PTR(obj));
+	    Update_torpedo(world, TORP_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT))
-	    Update_missile(MISSILE_PTR(obj));
+	    Update_missile(world, MISSILE_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_BALL))
-	    Update_connector_force(BALL_PTR(obj));
+	    Update_connector_force(world, BALL_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {
 	    wireobject_t *wireobj = WIRE_PTR(obj);
@@ -506,20 +504,21 @@ static void Misc_object_update(void)
 	    pulseobject_t *pulse = PULSE_PTR(obj);
 
 	    pulse->len += options.pulseSpeed * timeStep;
-	    if (pulse->len > options.pulseLength)
-		pulse->len = options.pulseLength;
+	    LIMIT(pulse->len, 0, options.pulseLength);
 	}
 
-	update_object_speed(obj);
+	update_object_speed(world, obj);
 
 	if (!BIT(obj->type, OBJ_ASTEROID))
 	    Move_object(obj);
     }
 }
 
-static void Ecm_update(void)
+static void Ecm_update(world_t *world)
 {
     int i;
+
+    UNUSED_PARAM(world);
 
     for (i = 0; i < NumEcms; i++) {
 	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
@@ -533,9 +532,11 @@ static void Ecm_update(void)
     }
 }
 
-static void Transporter_update(void)
+static void Transporter_update(world_t *world)
 {
     int i;
+
+    UNUSED_PARAM(world);
 
     for (i = 0; i < NumTransporters; i++) {
 	if ((Transporters[i]->count -= timeStep) <= 0) {
@@ -778,7 +779,7 @@ static inline void Update_visibility(player_t *pl, int ind)
  * Player loop. Computes miscellaneous updates.
  *
  */
-static void Update_players(void)
+static void Update_players(world_t *world)
 {
     int i;
     player_t *pl;
@@ -809,7 +810,11 @@ static void Update_players(void)
 	    pl->rank->score = pl->score;
 
 	if (pl->pause_count > 0) {
-	    assert(BIT(pl->status, PAUSE|HOVERPAUSE));
+	    /*assert(BIT(pl->status, PAUSE|HOVERPAUSE));*/
+
+	    /* kps - this is because of bugs elsewhere */
+	    if (!BIT(pl->status, PAUSE|HOVERPAUSE))
+		pl->pause_count = 0;
 
 	    pl->pause_count -= timeStep;
 	    if (pl->pause_count <= 0)
@@ -923,7 +928,7 @@ static void Update_players(void)
 		Traverse_wormhole(pl);
 	}
 
-	update_object_speed(OBJ_PTR(pl));
+	update_object_speed(world, OBJ_PTR(pl));
 	Move_player(pl);
 
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || options.cloakedExhaust)
@@ -1003,13 +1008,13 @@ void Update_objects(world_t *world)
     }
 
     Fuel_update(world);
-    Misc_object_update();
+    Misc_object_update(world);
     Asteroid_update(world);
-    Ecm_update();
-    Transporter_update();
+    Ecm_update(world);
+    Transporter_update(world);
     Cannon_update(world, do_update_this_frame);
     Target_update(world);
-    Update_players();
+    Update_players(world);
 
     for (i = world->NumWormholes - 1; i >= 0; i--) {
 	wormhole_t *wh = Wormholes(world, i);
