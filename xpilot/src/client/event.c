@@ -553,7 +553,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyFireShot",
-	"Return Linefeed",
+	"Return",
 	KEY_FIRE_SHOT,
 	"Fire shot.\n"
 	"Note that shields must be down to fire.\n"),
@@ -602,7 +602,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockClose",
-	"Select Up",
+	"Up",
 	KEY_LOCK_CLOSE,
 	"Lock on closest player.\n"),
 
