@@ -12,15 +12,12 @@
 <Option name="allowshields" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
 <Option name="allowsmartmissiles" value="True"/>
-<Option name="allowviewing" value="yes"/>
 <Option name="announcealliances" value="no"/>
 <Option name="asteroidcollisionmaykill" value="yes"/>
 <Option name="asteroidconcentratorprob" value="1.0"/>
 <Option name="asteroidconcentratorradius" value="10.0"/>
 <Option name="asteroiditemprob" value="0.0"/>
 <Option name="asteroidmaxitems" value="0"/>
-<Option name="asteroidmaxscore" value="100.0"/>
-<Option name="asteroidpoints" value="1.0"/>
 <Option name="asteroidprob" value="5e-7"/>
 <Option name="asteroidsonradar" value="False"/>
 <Option name="asteroidswallbounce" value="yes"/>
@@ -41,11 +38,7 @@
 <Option name="blockfriction" value="0.0"/>
 <Option name="blockfrictionvisible" value="true"/>
 <Option name="cannonflak" value="yes"/>
-<Option name="cannonitemprobmult" value="1.0"/>
-<Option name="cannonpoints" value="1.0"/>
-<Option name="cannonsdefend" value="yes"/>
 <Option name="cannonsmartness" value="1"/>
-<Option name="cannonsuseitems" value="no"/>
 <Option name="capturetheflag" value="no"/>
 <Option name="cloakedexhaust" value="no"/>
 <Option name="clusterkillscoremult" value="1.0"/>
@@ -136,7 +129,6 @@
 <Option name="mapheight" value="3500"/>
 <Option name="mapname" value="Here Be Dragons!"/>
 <Option name="mapwidth" value="3500"/>
-<Option name="maraturnqueue" value="false"/>
 <Option name="maxafterburners" value="10"/>
 <Option name="maxarmor" value="10"/>
 <Option name="maxasteroiddensity" value="0.0"/>
@@ -172,7 +164,6 @@
 <Option name="maxvisibleobject" value="1000"/>
 <Option name="maxwideangles" value="10"/>
 <Option name="minefuseticks" value="0.0"/>
-<Option name="minefusetime" value="420"/>
 <Option name="minelife" value="7200.0"/>
 <Option name="minescoremult" value="0.17"/>
 <Option name="minesonradar" value="yes"/>
@@ -188,11 +179,8 @@
 <Option name="nukeclusterdamage" value="1.0"/>
 <Option name="nukedebrislife" value="120.0"/>
 <Option name="nukesonradar" value="yes"/>
-<Option name="numberofrounds" value="0"/>
 <Option name="objectwallbouncebrakefactor" value="0.95"/>
 <Option name="objectwallbouncelifefactor" value="0.80"/>
-<Option name="pausedfps" value="30"/>
-<Option name="pausedframespersecond" value="0"/>
 <Option name="pausetax" value="0.0"/>
 <Option name="playerlimit" value="0"/>
 <Option name="playersonradar" value="yes"/>
@@ -208,19 +196,13 @@
 <Option name="resetonhuman" value="0"/>
 <Option name="reset" value="yes"/>
 <Option name="restrictrobots" value="true"/>
-<Option name="robothostname" value="xpilot.org"/>
 <Option name="robotleavelife" value="50"/>
-<Option name="robotleaveratio" value="-5.0"/>
-<Option name="robotleavescore" value="-90.0"/>
 <Option name="robotsleave" value="true"/>
 <Option name="robotstalk" value="false"/>
-<Option name="robots" value="0"/>
 <Option name="robotteam" value="0"/>
-<Option name="robottickspersecond" value="0"/>
 <Option name="robotusername" value="robot"/>
 <Option name="rogueheatprob" value="0.01"/>
 <Option name="roguemineprob" value="0.02"/>
-<Option name="rounddelay" value="0"/>
 <Option name="roundstoplay" value="0"/>
 <Option name="runoverkillscoremult" value="0.33"/>
 <Option name="selfdestructscoremult" value="0.0"/>
@@ -228,7 +210,6 @@
 <Option name="selfkillscoremult" value="0.5"/>
 <Option name="shieldedmining" value="yes"/>
 <Option name="shipmass" value="20"/>
-<Option name="shothitfueldrainuseskineticenergy" value="yes"/>
 <Option name="shotkillscoremult" value="1.0"/>
 <Option name="shotlife" value="60.0"/>
 <Option name="shotmass" value="0.1"/>
@@ -236,7 +217,6 @@
 <Option name="shotspeed" value="21.0"/>
 <Option name="shotswallbounce" value="no"/>
 <Option name="shovekillscoremult" value="0.5"/>
-<Option name="silent" value="false"/>
 <Option name="smartkillscoremult" value="1.0"/>
 <Option name="sound" value="true"/>
 <Option name="sparkswallbounce" value="yes"/>
@@ -257,7 +237,6 @@
 <Option name="teamfuel" value="no"/>
 <Option name="teamimmunity" value="yes"/>
 <Option name="teamplay" value="yes"/>
-<Option name="teamsharescore" value="no"/>
 <Option name="timing" value="no"/>
 <Option name="torpedokillscoremult" value="1.0"/>
 <Option name="treasurecollisiondestroys" value="yes"/>
@@ -266,10 +245,7 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="unownedkillscoremult" value="0.5"/>
 <Option name="usewreckage" value="yes"/>
-<Option name="waitingfps" value="0"/>
-<Option name="waitingframespersecond" value="0"/>
 <Option name="wallbouncedestroyitemprob" value="0.0"/>
-<Option name="wallbouncefueldrainmult" value="0.2"/>
 <Option name="worldlives" value="3"/>
 <Option name="wormholestableticks" value="64.0"/>
 <Option name="wormholevisible" value="false"/>
