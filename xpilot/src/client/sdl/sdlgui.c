@@ -446,16 +446,16 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     switch (type) {
     case SETUP_BASE_UP:
-	mapprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),other->nick_name);
+	mapnprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),maxCharsInNames,other->nick_name);
         break;
     case SETUP_BASE_DOWN:
-	mapprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(y + BLOCK_SZ / 1.5),other->nick_name);
+	mapnprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(y + BLOCK_SZ / 1.5),maxCharsInNames,other->nick_name);
         break;
     case SETUP_BASE_LEFT:
-	mapprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),other->nick_name);
+	mapnprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),maxCharsInNames,other->nick_name);
         break;
     case SETUP_BASE_RIGHT:
-	mapprint(&mapfont,color,LEFT,UP     ,(x - BLOCK_SZ / 2) ,(y),other->nick_name);
+	mapnprint(&mapfont,color,LEFT,UP     ,(x - BLOCK_SZ / 2) ,(y),maxCharsInNames,other->nick_name);
         break;
     default:
         errno = 0;
@@ -780,11 +780,11 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
     Image_paint(teammine ? IMG_MINE_TEAM : IMG_MINE_OTHER,
 		x - 10, y - 7, 0, whiteRGBA);
     if (name) {
-	mapprint(&mapfont, 
-		 teammine ? blueRGBA : whiteRGBA,
-		 CENTER, DOWN,
-		 x, y - 15, 
-		 "%s", name);
+	mapnprint(  &mapfont, 
+    	    	    teammine ? blueRGBA : whiteRGBA,
+    	    	    CENTER, DOWN,
+    	    	    x, y - 15, 
+    	    	    maxCharsInNames,"%s", name	);
     }
 }
 
@@ -1187,7 +1187,7 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
 	if (!color)
 	    color = shipNameColorRGBA;
 
-	mapprint(&mapfont, color, CENTER, DOWN,x,y - SHIP_SZ,"%s",other->id_string);
+	mapnprint(&mapfont, color, CENTER, DOWN,x,y - SHIP_SZ,maxCharsInNames,"%s",other->id_string);
     } else
 	color = blueRGBA;
 
