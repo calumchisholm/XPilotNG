@@ -123,26 +123,32 @@ void Paint_vdecor(void)
 
 static void Paint_background_dots(void)
 {
-    int xi, yi, d;
+    float dx, dy;
+    int xi, yi;
     ipos min, max, count;
 
     if (map_point_distance == 0) return;
-    d = BLOCK_SZ * map_point_distance;
 
-    min.x = world.x / d;
+    count.x = Setup->width / (BLOCK_SZ * map_point_distance);
+    count.y = Setup->height / (BLOCK_SZ * map_point_distance);
+
+    dx = (float)Setup->width / count.x;
+    dy = (float)Setup->height / count.y;
+
+    min.x = world.x / dx;
     if (world.x > 0) min.x++;
-    min.y = world.y / d;
+    min.y = world.y / dy;
     if (world.y > 0) min.y++;
 
-    max.x = (world.x + view_width) / d;
-    max.y = (world.y + view_height) / d;
+    max.x = (world.x + view_width) / dx;
+    max.y = (world.y + view_height) / dy;
 
     for (yi = min.y; yi <= max.y; yi++) {
         for (xi = min.x; xi <= max.x; xi++) {
 
             Gui_paint_decor_dot
-                (xi * d - BLOCK_SZ / 2,
-                 yi * d - BLOCK_SZ / 2,
+                (xi * dx - BLOCK_SZ / 2,
+                 yi * dy - BLOCK_SZ / 2,
                  map_point_size);
         }
     }
