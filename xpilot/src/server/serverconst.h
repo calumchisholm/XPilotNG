@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -271,10 +271,16 @@
 
 #define ENERGY_RANGE_FACTOR	(2.5/FUEL_SCALE_FACT)
 
-/* kps - 7x7 is the smallest map I've seen */
-#define MIN_MAP_SIZE		7
-/* map dimension limitation: ((0x7FFF - 1280) / 35) */
-#define MAX_MAP_SIZE		900
+/* Wall code only considers one way of wrapping around the map, and
+ * assumes that after moving the length of one line or one unit of object
+ * movement (max 32000 clicks) the shortest distance from the start to
+ * the end position is the path that was moved (there are some fudge
+ * factors in the length). For this to hold, the map must be somewhat
+ * larger than 2 * 32000 clicks = 1000 pixels. */
+#define MIN_MAP_SIZE		1100
+/* map dimension limitation: (0x7FFF - 1280) */
+/* Where does 1280 come from? uau */
+#define MAX_MAP_SIZE		31500
 
 #define WORM_BRAKE_FACTOR	1
 #define WORMCOUNT		64

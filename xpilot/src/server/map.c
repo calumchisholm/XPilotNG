@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -515,8 +515,8 @@ static void Verify_wormhole_consistency(void)
 	    worm_in++;
 	else if (type == WORM_OUT)
 	    worm_out++;
-    }	
-    
+    }
+
     /*
      * Verify that the wormholes are consistent, i.e. that if
      * we have no 'out' wormholes, make sure that we don't have
@@ -526,13 +526,13 @@ static void Verify_wormhole_consistency(void)
     if ((worm_norm) ? (worm_norm + worm_out < 2)
 	: (worm_in) ? (worm_out < 1)
 	: (worm_out > 0)) {
-	
+
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
 	for (i = 0; i < World.NumWormholes; i++)
 	    Wormhole_remove_from_map(i);
 	World.NumWormholes = 0;
     }
-    
+
     if (!wormTime) {
 	for (i = 0; i < World.NumWormholes; i++) {
 	    int j = (int)(rfrac() * World.NumWormholes);
@@ -557,29 +557,29 @@ static bool Grok_map_size(void)
 	h *= BLOCK_SZ;
     }
 
-    if (w < MIN_MAP_SIZE * BLOCK_SZ) {
-	warn("mapWidth too small, minimum is %d blocks (%d pixels).\n",
-	     MIN_MAP_SIZE, MIN_MAP_SIZE * BLOCK_SZ);
+    if (w < MIN_MAP_SIZE) {
+	warn("mapWidth too small, minimum is %d pixels (%d blocks).\n",
+	     MIN_MAP_SIZE, MIN_MAP_SIZE / BLOCK_SZ + 1);
 	bad = true;
     }
-    if (w > MAX_MAP_SIZE * BLOCK_SZ) {
-	warn("mapWidth too big, maximum is %d blocks (%d pixels).\n",
-	     MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
+    if (w > MAX_MAP_SIZE) {
+	warn("mapWidth too big, maximum is %d pixels (%d blocks).\n",
+	     MAX_MAP_SIZE, MAX_MAP_SIZE / BLOCK_SZ);
 	bad = true;
     }
-    if (h < MIN_MAP_SIZE * BLOCK_SZ) {
-	warn("mapHeight too small, minimum is %d blocks (%d pixels).\n",
-	     MIN_MAP_SIZE, MIN_MAP_SIZE * BLOCK_SZ);
+    if (h < MIN_MAP_SIZE) {
+	warn("mapHeight too small, minimum is %d pixels (%d blocks).\n",
+	     MIN_MAP_SIZE, MIN_MAP_SIZE / BLOCK_SZ + 1);
 	bad = true;
     }
-    if (h > MAX_MAP_SIZE * BLOCK_SZ) {
-	warn("mapWidth too big, maximum is %d blocks (%d pixels).\n",
-	     MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
+    if (h > MAX_MAP_SIZE) {
+	warn("mapWidth too big, maximum is %d pixels (%d blocks).\n",
+	     MAX_MAP_SIZE, MAX_MAP_SIZE / BLOCK_SZ);
 	bad = true;
     }
 
     if (bad)
-	return false;
+	exit(1);
 
     /* pixel sizes */
     World.width = w;
@@ -607,7 +607,7 @@ bool Grok_map(void)
 {
     if (!is_polygon_map) {
 	if (!Grok_map_options())
-	    return false;
+	    exit(1);
 
 	Xpmap_grok_map_data();
 	Xpmap_allocate_checks();
@@ -616,7 +616,7 @@ bool Grok_map(void)
     }
 
     Verify_wormhole_consistency();
-    
+
     if (BIT(World.rules->mode, TIMING) && World.NumChecks == 0) {
 	xpprintf("No checkpoints found while race mode (timing) was set.\n");
 	xpprintf("Turning off race mode.\n");
@@ -637,7 +637,7 @@ bool Grok_map(void)
 
     if (World.NumBases <= 0) {
 	warn("WARNING: map has no bases!");
-	return false;
+	exit(1);
     }
 
 #ifndef	SILENT
@@ -1053,4 +1053,3 @@ void remove_temp_wormhole(int ind)
 					    World.NumWormholes
 					    * sizeof(wormhole_t));
 }
-
