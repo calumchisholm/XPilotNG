@@ -30,10 +30,6 @@ Task: Turn the item images on the hud in sdl client the right way
 (upside down atm)
 Developer: ?
 
-Task: Fix sdl client talk window bug. Now window closes some times that it
-shouldn't.
-Developer: kps
-
 Task: Support "internal" edges in SDL client.
 Developer: baron ?
 

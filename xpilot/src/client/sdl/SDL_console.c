@@ -91,7 +91,8 @@ SDL_Event *CON_Events(SDL_Event * event)
 	} else {
 	    /* first of all, check if the console hide key was pressed */
 	    if ((int)event->key.keysym.sym == Topmost->HideKey) {
-		CON_Hide(Topmost);
+		/*was: CON_Hide(Topmost);*/
+		Talk_set_state(false);
 		return NULL;
 	    }
 	    switch (event->key.keysym.sym) {
@@ -167,11 +168,16 @@ SDL_Event *CON_Events(SDL_Event * event)
 		}
 		else
 		    /* deactivate Console if return is pressed on empty line */
-		    CON_Hide(Topmost);
+		    
+		    /* was: CON_Hide(Topmost); */
+		    Talk_set_state(false);
 		break;
 	    case SDLK_ESCAPE:
 		/* deactivate Console */
-		CON_Hide(Topmost);
+
+		/*was: CON_Hide(Topmost);*/
+		Talk_set_state(false);
+		
 		return NULL;
 	    default:
 		if (Topmost->InsMode)
