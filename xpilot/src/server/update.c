@@ -38,7 +38,7 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static inline void update_object_speed(world_t *world, object_t *obj)
 {
-    if (BIT(obj->status, GRAVITY)) {
+    if (BIT(obj->obj_status, GRAVITY)) {
 	vector_t gravity = World_gravity(world, obj->pos);
 
 	obj->vel.x += (obj->acc.x + gravity.x) * timeStep;
@@ -110,7 +110,7 @@ void Phasing(player_t *pl, bool on)
 	if (BIT(pl->used, HAS_CONNECTOR))
 	    pl->ball = NULL;
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
-	CLR_BIT(pl->status, GRAVITY);
+	CLR_BIT(pl->obj_status, GRAVITY);
 	sound_play_sensors(pl->pos, PHASING_ON_SOUND);
     } else {
 	hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
@@ -121,7 +121,7 @@ void Phasing(player_t *pl, bool on)
 	    if (pl->item[ITEM_PHASING] <= 0)
 		CLR_BIT(pl->have, HAS_PHASING_DEVICE);
 	}
-	SET_BIT(pl->status, GRAVITY);
+	SET_BIT(pl->obj_status, GRAVITY);
 	sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
 	/* kps - ok to have this check here ? */
 	if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
@@ -240,7 +240,7 @@ void Emergency_shield (player_t *pl, bool on)
  */
 void Autopilot(player_t *pl, bool on)
 {
-    CLR_BIT(pl->status, THRUSTING);
+    CLR_BIT(pl->pl_status, THRUSTING);
     if (on) {
 	pl->auto_power_s = pl->power;
 	pl->auto_turnspeed_s = pl->turnspeed;
@@ -400,7 +400,7 @@ static void do_Autopilot (player_t *pl)
      * will impart some sideways velocity.
      */
     if (pl->turnspeed != turnspeed && vad > RES/32) {
-	CLR_BIT(pl->status, THRUSTING);
+	CLR_BIT(pl->pl_status, THRUSTING);
 	return;
     }
 
@@ -409,9 +409,9 @@ static void do_Autopilot (player_t *pl)
      * we don't want to over thrust.
      */
     if (pl->power > power)
-	CLR_BIT(pl->status, THRUSTING);
+	CLR_BIT(pl->pl_status, THRUSTING);
     else
-	SET_BIT(pl->status, THRUSTING);
+	SET_BIT(pl->pl_status, THRUSTING);
 }
 
 
@@ -538,7 +538,7 @@ static void Players_turn(void)
 	/* Only do autopilot code if switched on and player is not
 	 * damaged (ie. can see). */
 	if (BIT(pl->used, HAS_AUTOPILOT)
-	    || (BIT(pl->status, HOVERPAUSE) && !pl->damaged))
+	    || (BIT(pl->pl_status, HOVERPAUSE) && !pl->damaged))
 	    do_Autopilot(pl);
 
 	pl->turnvel += pl->turnacc * timeStep;
@@ -605,7 +605,7 @@ static void Use_items(player_t *pl)
 
     if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	if (pl->fuel.sum > 0
-	    && BIT(pl->status, THRUSTING)
+	    && BIT(pl->pl_status, THRUSTING)
 	    && (pl->emergency_thrust_left -= timeStep) <= 0) {
 	    if (pl->item[ITEM_EMERGENCY_THRUST])
 		Emergency_thrust(pl, true);
@@ -777,7 +777,7 @@ static void Update_players(world_t *world)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
 
-	if (BIT(pl->status, PAUSE)) {
+	if (Player_is_paused(pl)) {
 	    if (options.pauseTax > 0.0 && (frame_loops % FPS) == 0) {
 		pl->score -= options.pauseTax;
 		updateScores = true;
@@ -801,10 +801,10 @@ static void Update_players(world_t *world)
 	    pl->rank->score = pl->score;
 
 	if (pl->pause_count > 0) {
-	    /*assert(BIT(pl->status, PAUSE|HOVERPAUSE));*/
+	    /*assert(BIT(pl->pl_status, PAUSE|HOVERPAUSE));*/
 
 	    /* kps - this is because of bugs elsewhere */
-	    if (!BIT(pl->status, PAUSE|HOVERPAUSE))
+	    if (!BIT(pl->pl_status, PAUSE|HOVERPAUSE))
 		pl->pause_count = 0;
 
 	    pl->pause_count -= timeStep;
@@ -814,7 +814,7 @@ static void Update_players(world_t *world)
 
 	if (pl->recovery_count > 0) {
 	    /* this shouldn't happen */
-	    if (BIT(pl->status, PLAYING))
+	    if (BIT(pl->pl_status, PLAYING))
 		warn("**** Player %s is playing, recovery count = %f",
 		     pl->name, pl->recovery_count);
 
@@ -822,7 +822,7 @@ static void Update_players(world_t *world)
 	    if (pl->recovery_count <= 0) {
 		/* Player has recovered. */
 		pl->recovery_count = 0;
-		SET_BIT(pl->status, PLAYING);
+		SET_BIT(pl->pl_status, PLAYING);
 		Go_home(pl); 
 	    }
 	    else {
@@ -841,7 +841,7 @@ static void Update_players(world_t *world)
 			* options.selfDestructScoreMult;
 		    Score(pl, -sc, pl->pos, "Self-Destruct");
 		}
-		SET_BIT(pl->status, KILLED);
+		SET_BIT(pl->pl_status, KILLED);
 		Set_message_f("%s has committed suicide.", pl->name);
 		Throw_items(pl);
 		Kill_player(pl, true);
@@ -868,7 +868,7 @@ static void Update_players(world_t *world)
 
 	if (pl->fuel.sum <= 0) {
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_CLOAKING_DEVICE|HAS_DEFLECTOR);
-	    CLR_BIT(pl->status, THRUSTING);
+	    CLR_BIT(pl->pl_status, THRUSTING);
 	}
 	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))
 	    CLR_BIT(pl->used, HAS_REFUEL);
@@ -876,7 +876,7 @@ static void Update_players(world_t *world)
 	/*
 	 * Update acceleration vector etc.
 	 */
-	if (BIT(pl->status, THRUSTING)) {
+	if (BIT(pl->pl_status, THRUSTING)) {
 	    double power = pl->power;
 	    double f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
 	    int a = (BIT(pl->used, HAS_EMERGENCY_THRUST)
@@ -910,9 +910,9 @@ static void Update_players(world_t *world)
 	 */
 #if 0
 	warn("Player %s update, warping = %d",
-	     pl->name, BIT(pl->status, WARPING));
+	     pl->name, BIT(pl->obj_status, WARPING));
 #endif
-	if (BIT(pl->status, WARPING)) {
+	if (BIT(pl->obj_status, WARPING)) {
 	    if (pl->wormHoleHit == -1)
 		Hyperjump(pl);
 	    else
@@ -922,14 +922,14 @@ static void Update_players(world_t *world)
 	/*
 	 * Reset WARPED status, when player is outside a wormhole
 	 */
-	if (BIT(pl->status, WARPED)) {
+	if (BIT(pl->obj_status, WARPED)) {
 	    int group;
 	    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team);
 	    /*
 	     * clear warped, so we can use shape_is inside,
 	     * Wormhole_hitfunc check for WARPED bit.
 	     */
-	    CLR_BIT(pl->status, WARPED);
+	    CLR_BIT(pl->obj_status, WARPED);
 	    group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
 				    OBJ_PTR(pl), (shape_t *)pl->ship,
 				    pl->dir);
@@ -938,13 +938,13 @@ static void Update_players(world_t *world)
 	     * a wormhole ?
 	     */
 	    if (group != NO_GROUP)
-		SET_BIT(pl->status, WARPED);
+		SET_BIT(pl->obj_status, WARPED);
 	}
 	
 	{
 	    vector_t acc = pl->acc;
 
-	    if (BIT(pl->status, GRAVITY)) {
+	    if (BIT(pl->obj_status, GRAVITY)) {
 		vector_t gravity = World_gravity(world, pl->pos);
 
 		acc.x += gravity.x;
@@ -1030,7 +1030,7 @@ static void Update_players(world_t *world)
 
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || options.cloakedExhaust)
 	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {
-	    if (BIT(pl->status, THRUSTING))
+	    if (BIT(pl->pl_status, THRUSTING))
   		Thrust(pl);
 	}
 
@@ -1080,7 +1080,7 @@ void Update_objects(world_t *world)
 		pl->stunned = 0;
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
 	    pl->did_shoot = false;
-	    CLR_BIT(pl->status, THRUSTING);
+	    CLR_BIT(pl->pl_status, THRUSTING);
 	}
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(pl);
@@ -1159,7 +1159,7 @@ void Update_objects(world_t *world)
 	if (Player_is_playing(pl))
 	    Update_tanks(&(pl->fuel));
 
-	if (BIT(pl->status, KILLED)) {
+	if (BIT(pl->pl_status, KILLED)) {
 	    Throw_items(pl);
 
 	    Detonate_items(pl);
@@ -1167,7 +1167,7 @@ void Update_objects(world_t *world)
 	    Kill_player(pl, true);
 	}
 
-	if (BIT(pl->status, PAUSE)) {
+	if (Player_is_paused(pl)) {
 	    pl->pauseTime += timePerFrame;
 	    if (Player_is_human(pl)
 		&& options.maxPauseTime > 0

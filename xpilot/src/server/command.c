@@ -155,13 +155,13 @@ static void Set_swapper_state(player_t *pl)
 	    player_t *pl_i = Player_by_index(i);
 
 	    if (!Players_are_teammates(pl, pl_i) &&
-		!BIT(pl_i->status, PAUSE)) {
+		!Player_is_paused(pl_i)) {
 		/* put team swapping player waiting mode. */
 		if (pl->mychar == ' ')
 		    pl->mychar = 'W';
 		pl->prev_life = 0;
 		pl->life = 0.0;
-		SET_BIT(pl->status, GAME_OVER | PLAYING);
+		SET_BIT(pl->pl_status, GAME_OVER | PLAYING);
 		Player_self_destruct(pl, false);
 		pl->pause_count = 0;
 		pl->recovery_count = 0;
@@ -1196,7 +1196,7 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player_t *pl2 = Player_by_index(i);
 
-	if (pl2->conn != NULL && BIT(pl2->status, PAUSE)
+	if (pl2->conn != NULL && Player_is_paused(pl2)
 	    && (pl2->team == team) && pl2->home_base != NULL) {
 	    base_t *temp;
 

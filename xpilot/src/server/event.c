@@ -97,7 +97,7 @@ bool team_dead(int team)
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Player_by_index(i);
-	if (pl->team == team && !BIT(pl->status, PAUSE|GAME_OVER))
+	if (pl->team == team && !BIT(pl->pl_status, PAUSE|GAME_OVER))
 	    return false;
     }
     return true;
@@ -189,7 +189,7 @@ void Pause_player(player_t *pl, bool on)
     world_t *world = pl->world;
     int i;
 
-    if (on && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
+    if (on && !Player_is_paused(pl)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    world->teams[pl->team].SwapperId = -1;
 	/* Minimum pause time is 10 seconds at gamespeed 12. */
@@ -197,7 +197,7 @@ void Pause_player(player_t *pl, bool on)
 	/* player might have paused when recovering */
 	pl->recovery_count = 0;
 	pl->updateVisibility = 1;
-	SET_BIT(pl->status, PAUSE);
+	SET_BIT(pl->pl_status, PAUSE);
 	/* kps - can this happen ??? */
 	if (pl->pauseTime != 0)
 	    warn("Pause_player: pl pausetime was != 0 (%.3f)", pl->pauseTime);
@@ -229,7 +229,7 @@ void Pause_player(player_t *pl, bool on)
 		world->teams[i].SwapperId = -1;
 	}
     }
-    else if (!on && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
+    else if (!on && Player_is_paused(pl)) { /* Turn pause mode off */
 	if (pl->home_base == NULL) {
 	    Set_player_message(pl, "You don't have a base. "
 			       "Select team to unpause. [*Server notice*]");
@@ -237,17 +237,17 @@ void Pause_player(player_t *pl, bool on)
 	}
 	if (pl->pause_count <= 0) {
 	    pl->idleTime = 0;
-	    CLR_BIT(pl->status, PAUSE);
+	    CLR_BIT(pl->pl_status, PAUSE);
 	    updateScores = true;
 	    if (BIT(world->rules->mode, LIMITED_LIVES)) {
 		/* too late, wait for next round */
 		pl->life = 0;
 		pl->mychar = 'W';
-		SET_BIT(pl->status, GAME_OVER);
+		SET_BIT(pl->pl_status, GAME_OVER);
 	    } else {
 		pl->mychar = ' ';
 		Go_home(pl);
-		SET_BIT(pl->status, PLAYING);
+		SET_BIT(pl->pl_status, PLAYING);
 		if (BIT(world->rules->mode, LIMITED_LIVES))
 		    pl->life = world->rules->lives;
 	    }
@@ -286,7 +286,8 @@ int Handle_keyboard(player_t *pl)
 	/*
 	 * Allow these functions while you're 'dead'.
 	 */
-	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE|HOVERPAUSE) != PLAYING) {
+	if (BIT(pl->pl_status, PLAYING|GAME_OVER|PAUSE|HOVERPAUSE)
+	    != PLAYING) {
 	    switch (key) {
 	    case KEY_PAUSE:
 	    case KEY_LOCK_NEXT:
@@ -411,7 +412,7 @@ int Handle_keyboard(player_t *pl)
 		    if (i == j)
 			break;
 		} while (i == ind
-			 || BIT(Player_by_index(i)->status, GAME_OVER|PAUSE)
+			 || BIT(Player_by_index(i)->pl_status, GAME_OVER|PAUSE)
 			 || !Player_lock_allowed(pl, Player_by_index(i)));
 		if (i == ind)
 		    CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
@@ -620,7 +621,7 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_REPROGRAM:
-		SET_BIT(pl->status, REPROGRAM);
+		SET_BIT(pl->pl_status, REPROGRAM);
 		break;
 
 	    case KEY_LOAD_MODIFIERS_1:
@@ -629,7 +630,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_LOAD_MODIFIERS_4: {
 		modifiers_t *m = &(pl->modbank[key - KEY_LOAD_MODIFIERS_1]);
 
-		if (BIT(pl->status, REPROGRAM))
+		if (BIT(pl->pl_status, REPROGRAM))
 		    *m = pl->mods;
 		else {
 		    pl->mods = *m;
@@ -644,7 +645,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_LOAD_LOCK_4: {
 		int *l = &(pl->lockbank[key - KEY_LOAD_LOCK_1]);
 
-		if (BIT(pl->status, REPROGRAM)) {
+		if (BIT(pl->pl_status, REPROGRAM)) {
 		    if (BIT(pl->lock.tagged, LOCK_PLAYER))
 			*l = pl->lock.pl_id;
 		} else {
@@ -710,9 +711,9 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_PAUSE:
-		if (BIT(pl->status, PAUSE))
+		if (Player_is_paused(pl))
 		    i = PAUSE;
-		else if (BIT(pl->status, HOVERPAUSE))
+		else if (BIT(pl->pl_status, HOVERPAUSE))
 		    i = HOVERPAUSE;
 		else {
 		    pos = pl->home_base->pos;
@@ -738,15 +739,15 @@ int Handle_keyboard(player_t *pl)
 
 		switch (i) {
 		case PAUSE:
-		    if (BIT(pl->status, HOVERPAUSE))
+		    if (BIT(pl->pl_status, HOVERPAUSE))
 			break;
 
 		    if (BIT(pl->used, HAS_AUTOPILOT))
 			Autopilot(pl, false);
 
-		    Pause_player(pl, !BIT(pl->status, PAUSE));
+		    Pause_player(pl, !Player_is_paused(pl));
 
-		    if (BIT(pl->status, PLAYING)) {
+		    if (BIT(pl->pl_status, PLAYING)) {
 			BITV_SET(pl->last_keyv, key);
 			BITV_SET(pl->prev_keyv, key);
 			return 1;
@@ -754,16 +755,16 @@ int Handle_keyboard(player_t *pl)
 		    break;
 
 		case HOVERPAUSE:
-		    if (BIT(pl->status, PAUSE))
+		    if (Player_is_paused(pl))
 			break;
 
-		    if (!BIT(pl->status, HOVERPAUSE)) {
+		    if (!BIT(pl->pl_status, HOVERPAUSE)) {
 			/*
 			 * Turn hover pause on, together with shields.
 			 */
 			pl->pause_count = 5 * 12;
 			Player_self_destruct(pl, false);
-			SET_BIT(pl->status, HOVERPAUSE);
+			SET_BIT(pl->pl_status, HOVERPAUSE);
 
 			if (BIT(pl->used, HAS_EMERGENCY_THRUST))
 			    Emergency_thrust(pl, false);
@@ -788,7 +789,7 @@ int Handle_keyboard(player_t *pl)
 			    SET_BIT(pl->used, HAS_SHIELD);
 		    } else if (pl->pause_count <= 0) {
 			Autopilot(pl, false);
-			CLR_BIT(pl->status, HOVERPAUSE);
+			CLR_BIT(pl->pl_status, HOVERPAUSE);
 			if (!BIT(pl->have, HAS_SHIELD))
 			    CLR_BIT(pl->used, HAS_SHIELD);
 		    }
@@ -800,7 +801,7 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_SWAP_SETTINGS:
-		if (   BIT(pl->status, HOVERPAUSE)
+		if (   BIT(pl->pl_status, HOVERPAUSE)
 		    || BIT(pl->used, HAS_AUTOPILOT))
 		    break;
 		if (pl->turnacc == 0.0) {
@@ -840,7 +841,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
 		    Autopilot(pl, false);
-		SET_BIT(pl->status, THRUSTING);
+		SET_BIT(pl->pl_status, THRUSTING);
 		break;
 
 	    case KEY_CLOAK:
@@ -948,11 +949,11 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
 		    Autopilot(pl, false);
-		CLR_BIT(pl->status, THRUSTING);
+		CLR_BIT(pl->pl_status, THRUSTING);
 		break;
 
 	    case KEY_REPROGRAM:
-		CLR_BIT(pl->status, REPROGRAM);
+		CLR_BIT(pl->pl_status, REPROGRAM);
 		break;
 
 	    case KEY_SELECT_ITEM:

@@ -242,7 +242,7 @@ static const char *Rank_get_logout_message(ranknode_t *rank)
     assert(strlen(rank->name) > 0);
     pl = Get_player_by_name(rank->name, NULL, NULL);
     if (pl) {
-	if (BIT(pl->status, PAUSE))
+	if (Player_is_paused(pl))
 	    snprintf(msg, sizeof(msg), "paused");
 	else
 	    snprintf(msg, sizeof(msg), "playing");

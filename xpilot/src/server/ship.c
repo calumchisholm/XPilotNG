@@ -115,7 +115,7 @@ void Delta_mv(object_t *ship, object_t *obj)
     vy = (ship->vel.y * ship->mass + obj->vel.y * obj->mass) / m;
     if (ship->type == OBJ_PLAYER
 	&& obj->id != NO_ID
-	&& BIT(obj->status, COLLISIONSHOVE)) {
+	&& BIT(obj->obj_status, COLLISIONSHOVE)) {
 	player_t *pl = (player_t *)ship;
 	player_t *pusher = Player_by_id(obj->id);
 	if (pusher != pl)
@@ -151,7 +151,7 @@ void Delta_mv_elastic(object_t *obj1, object_t *obj2)
 		  + (m2 - m1) / ms * v2y;
     if (obj1->type == OBJ_PLAYER
 	&& obj2->id != NO_ID
-	&& BIT(obj2->status, COLLISIONSHOVE)) {
+	&& BIT(obj2->obj_status, COLLISIONSHOVE)) {
 	player_t *pl = (player_t *)obj1;
 	player_t *pusher = Player_by_id(obj2->id);
 	if (pusher != pl)
@@ -410,7 +410,8 @@ void Tank_handle_detach(player_t *pl)
     sound_play_sensors(pl->pos, TANK_DETACH_SOUND);
 
     /* The tank uses shield and thrust */
-    tank->status = PLAYING | GRAVITY | THRUSTING;
+    tank->obj_status = GRAVITY;
+    tank->pl_status = PLAYING | THRUSTING;
     tank->have = DEF_HAVE;
     tank->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
 
@@ -460,7 +461,7 @@ void Make_wreckage(world_t *world,
 		   int      owner_team,
 		   double   min_mass,     double max_mass,
 		   double   total_mass,
-		   long     status,
+		   int      status,
 		   int      color,
 		   int      max_wreckage,
 		   int      min_dir,      int    max_dir,
@@ -552,7 +553,7 @@ void Make_wreckage(world_t *world,
 
 	wreckage->pl_range = radius;
 	wreckage->pl_radius = radius;
-	wreckage->status = status;
+	wreckage->obj_status = status;
 	wreckage->mods = mods;
 	Cell_add_object(world, OBJ_PTR(wreckage));
     }
@@ -586,7 +587,7 @@ void Explode_fighter(player_t *pl)
 		20.0, 20.0 + pl->mass * 0.5,
 		5.0, 5.0 + pl->mass * 1.5);
 
-    if (!BIT(pl->status, KILLED))
+    if (!BIT(pl->pl_status, KILLED))
 	return;
 
     Make_wreckage(pl->world,

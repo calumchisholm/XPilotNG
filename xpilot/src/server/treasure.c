@@ -62,7 +62,7 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->pl_range = BALL_RADIUS;
     ball->pl_radius = BALL_RADIUS;
     CLEAR_MODS(ball->mods);
-    ball->status = RECREATE;
+    ball->obj_status = RECREATE;
     ball->treasure = t;
     ball->style = t->ball_style;
     Cell_add_object(world, OBJ_PTR(ball));
@@ -90,7 +90,7 @@ void Ball_is_replaced(ballobject_t *ball)
     player_t *pl = Player_by_id(ball->owner);
 
     ball->life = 0;
-    SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
+    SET_BIT(ball->obj_status, (NOEXPLOSION|RECREATE));
 
     Score(pl, 5.0, ball->pos, "Treasure: ");
     Set_message_f(" < %s (team %d) has replaced the treasure >",
@@ -133,13 +133,13 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	    player_t *pl_i = Player_by_index(i);
 
 	    if (Player_is_tank(pl_i)
-		|| (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
+		|| (Player_is_paused(pl_i) && pl_i->pause_count <= 0)
 		|| Player_is_waiting(pl_i))
 		continue;
 	    if (pl_i->team == td->team) {
 		lose_score += pl_i->score;
 		lose_team_members++;
-		if (BIT(pl_i->status, GAME_OVER) == 0)
+		if (BIT(pl_i->pl_status, GAME_OVER) == 0)
 		    somebody_flag = 1;
 	    }
 	    else if (pl_i->team == pl->team) {
@@ -169,7 +169,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	player_t *pl_i = Player_by_index(i);
 
 	if (Player_is_tank(pl_i)
-	    || (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
+	    || (Player_is_paused(pl_i) && pl_i->pause_count <= 0)
 	    || Player_is_waiting(pl_i))
 	    continue;
 
@@ -177,7 +177,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	    Score(pl_i, -sc, pos, "Treasure: ");
 	    Rank_lost_ball(pl_i);
 	    if (options.treasureKillTeam)
-		SET_BIT(pl_i->status, KILLED);
+		SET_BIT(pl_i->pl_status, KILLED);
 	}
 	else if (pl_i->team == pl->team &&
 		 (pl_i->team != TEAM_NOT_SET || pl_i->id == pl->id)) {
@@ -210,7 +210,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
      * Player already quit ?
      */
     if (ball->owner == NO_ID) {
-	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
+	SET_BIT(ball->obj_status, (NOEXPLOSION|RECREATE));
 	return;
     }
     /*
@@ -234,7 +234,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 	    Set_message(" < The treasure must be safe before you "
 			"can cash an opponent's! >");
 	else if (Punish_team(owner, td, ball->pos))
-	    CLR_BIT(ball->status, RECREATE);
+	    CLR_BIT(ball->obj_status, RECREATE);
 	return;
     }
 
@@ -259,7 +259,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 	td->team=i; /* give ball to team that has to be punished*/
 	if (Punish_team(owner, td, ball->pos)) 
 	  {
-	    CLR_BIT(ball->status, RECREATE);
+	    CLR_BIT(ball->obj_status, RECREATE);
 	    /*undo treasure counts from Punish_team so we don't 
 	      have to touch that function and possibly break it*/
 	    world->teams[owner->team].TreasuresDestroyed--;
@@ -272,7 +272,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
       world->teams[options.specialBallTeam].TreasuresDestroyed++;
 
       if(!opponent_teams){
-	SET_BIT(ball->status, RECREATE);
+	SET_BIT(ball->obj_status, RECREATE);
 	world->teams[options.specialBallTeam].TreasuresLeft++;
 	if (Punish_team(owner, td, ball->pos));
       }

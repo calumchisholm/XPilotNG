@@ -137,13 +137,13 @@ void Place_item(world_t *world, player_t *pl, int item)
     item_concentrator_t	*con;
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
-	if (pl && !BIT(pl->status, KILLED))
+	if (pl && !BIT(pl->pl_status, KILLED))
 	    pl->item[item]--;
 	return;
     }
 
     if (pl) {
-	if (BIT(pl->status, KILLED)) {
+	if (BIT(pl->pl_status, KILLED)) {
 	    num_lose = pl->item[item] - world->items[item].initial;
 	    if (num_lose <= 0)
 		return;
@@ -182,7 +182,7 @@ void Place_item(world_t *world, player_t *pl, int item)
 	grav = GRAVITY;
 	rand_item = 0;
 	pos = pl->prevpos;
-	if (!BIT(pl->status, KILLED)) {
+	if (!BIT(pl->pl_status, KILLED)) {
 	    /*
 	     * Player is dropping an item on purpose.
 	     * Give the item some offset so that the
@@ -257,7 +257,7 @@ void Place_item(world_t *world, player_t *pl, int item)
 	if (pl) {
 	    vel.x += pl->vel.x;
 	    vel.y += pl->vel.y;
-	    if (!BIT(pl->status, KILLED)) {
+	    if (!BIT(pl->pl_status, KILLED)) {
 		double vl = LENGTH(vel.x, vel.y);
 		int dvx = (int)(rfrac() * 8);
 		int dvy = (int)(rfrac() * 8);
@@ -293,8 +293,7 @@ void Place_item(world_t *world, player_t *pl, int item)
 }
 
 void Make_item(world_t *world, clpos_t pos, vector_t vel,
-	       int item, int num_per_pack,
-	       long status)
+	       int item, int num_per_pack, int status)
 {
     object_t *obj;
 
@@ -310,7 +309,7 @@ void Make_item(world_t *world, clpos_t pos, vector_t vel,
     obj->type = OBJ_ITEM;
     obj->info = item;
     obj->color = RED;
-    obj->status = status;
+    obj->obj_status = status;
     obj->id = NO_ID;
     obj->team = TEAM_NOT_SET;
     Object_position_init_clpos(world, obj, pos);
@@ -363,7 +362,7 @@ void Detonate_items(player_t *pl)
     modifiers_t mods;
     world_t *world = pl->world;
 
-    if (!BIT(pl->status, KILLED))
+    if (!BIT(pl->pl_status, KILLED))
 	return;
 
     /* ZE: Detonated items on tanks should belong to the tank's owner. */
@@ -530,7 +529,7 @@ void Do_deflector(player_t *pl)
 	    continue;
 
 	if (obj->id == pl->id) {
-	    if (BIT(obj->status, OWNERIMMUNE)
+	    if (BIT(obj->obj_status, OWNERIMMUNE)
 		|| frame_time < obj->fusetime
 		|| options.selfImmunity)
 		continue;
@@ -541,7 +540,7 @@ void Do_deflector(player_t *pl)
 
 	/* don't push balls out of treasure boxes */
 	if (obj->type == OBJ_BALL
-	    && !BIT(obj->status, GRAVITY))
+	    && !BIT(obj->obj_status, GRAVITY))
 	    continue;
 
 	dx = WRAP_DCX(obj->pos.cx - pl->pos.cx);
@@ -872,7 +871,7 @@ bool Initiate_hyperjump(player_t *pl)
 	return false;
     pl->item[ITEM_HYPERJUMP]--;
     Player_add_fuel(pl, ED_HYPERJUMP);
-    SET_BIT(pl->status, WARPING);
+    SET_BIT(pl->obj_status, WARPING);
     pl->wormHoleHit = -1;
     return true;
 }
@@ -959,7 +958,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 
 	    if (pl == owner_pl) {
 		if (shot->type == OBJ_MINE) {
-		    if (BIT(shot->status, OWNERIMMUNE))
+		    if (BIT(shot->obj_status, OWNERIMMUNE))
 			continue;
 		}
 		if (shot->type == OBJ_SMART_SHOT) {
@@ -979,7 +978,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 	     * ends.
 	     */
 	    smart = SMART_PTR(shot);
-	    SET_BIT(smart->status, CONFUSED);
+	    SET_BIT(smart->obj_status, CONFUSED);
 	    smart->ecm_range = range;
 	    smart->count = CONFUSED_TIME;
 	    if (pl
@@ -1029,14 +1028,14 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 		break;
 	    }
 	    mine->count = ((8 * (1 - range)) + 2) * 12;
-	    if (!BIT(mine->status, CONFUSED)
+	    if (!BIT(mine->obj_status, CONFUSED)
 		&& (closest_mine == NULL || range < closest_mine_range)) {
 		closest_mine = mine;
 		closest_mine_range = range;
 	    }
-	    SET_BIT(mine->status, CONFUSED);
+	    SET_BIT(mine->obj_status, CONFUSED);
 	    if (mine->count <= 0)
-		CLR_BIT(mine->status, CONFUSED);
+		CLR_BIT(mine->obj_status, CONFUSED);
 	    break;
 	default:
 	    break;

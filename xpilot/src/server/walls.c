@@ -334,7 +334,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	int		i, j;
 	double		sc;
 
-	SET_BIT(pl->status, KILLED);
+	SET_BIT(pl->pl_status, KILLED);
 	sprintf(msg, howfmt, pl->name, (!pt) ? " head first" : "");
 
 	/* get a list of who pushed me */
@@ -429,7 +429,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	}
     }
 
-    if (BIT(pl->status, KILLED) && pl->score < 0 && Player_is_robot(pl)) {
+    if (BIT(pl->pl_status, KILLED) && pl->score < 0 && Player_is_robot(pl)) {
 	pl->home_base = Base_by_index(world, 0);
 	Pick_startpos(pl);
     }
@@ -568,9 +568,9 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 	return 0;
     }
     
-    if (!BIT(obj->status, FROMBOUNCE)
+    if (!BIT(obj->obj_status, FROMBOUNCE)
 	&& obj->type == OBJ_SPARK)
-	CLR_BIT(obj->status, OWNERIMMUNE);
+	CLR_BIT(obj->obj_status, OWNERIMMUNE);
 
 
     if (line >= num_lines) {
@@ -648,7 +648,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 
     if (type == CANNON) {
 	Player_crash(pl, CrashCannon, mapobj_ind, 1);
-	if (BIT(pl->status, KILLED))
+	if (BIT(pl->pl_status, KILLED))
 	    return;
 	/* The player may bounce from the cannon if both have shields up. */
     }
@@ -2772,7 +2772,7 @@ void Move_player(player_t *pl)
     world_t *world = &World;
 
     if (!Player_is_playing(pl)) {
-	if (!BIT(pl->status, KILLED|PAUSE)) {
+	if (!BIT(pl->pl_status, KILLED|PAUSE)) {
 	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
 	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    pos.cx = WRAP_XCLICK(pos.cx);
@@ -2853,14 +2853,14 @@ void Move_player(player_t *pl)
 	    if (ans.line != -1) {
 		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 		    Bounce_player(pl, &mv, ans.line, ans.point);
-		    if (BIT(pl->status, KILLED))
+		    if (BIT(pl->pl_status, KILLED))
 			break;
 		}
 		else if (!Shape_away(&mv, (shape_t *)pl->ship, pl->dir,
 				     ans.line, &ans)) {
 		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 			Bounce_player(pl, &mv, ans.line, ans.point);
-			if (BIT(pl->status, KILLED))
+			if (BIT(pl->pl_status, KILLED))
 			    break;
 		    }
 		    else {

@@ -420,7 +420,7 @@ int Pick_team(int pick_for_type)
 	pl = Player_by_index(i);
 	if (Player_is_tank(pl))
 	    continue;
-	if (BIT(pl->status, PAUSE))
+	if (Player_is_paused(pl))
 	    continue;
 	if (!playing[pl->team]++)
 	    playing_teams++;
@@ -698,7 +698,7 @@ void Game_Over(void)
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Player_by_index(i);
 
-	SET_BIT(pl_i->status, GAME_OVER);
+	SET_BIT(pl_i->pl_status, GAME_OVER);
 	if (Player_is_human(pl_i)) {
 	    if (pl_i->score > maxsc) {
 		maxsc = pl_i->score;

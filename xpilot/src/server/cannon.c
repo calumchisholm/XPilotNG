@@ -173,7 +173,7 @@ void Cannon_throw_items(cannon_t *c)
 		obj->type = OBJ_ITEM;
 		obj->info = i;
 		obj->color = RED;
-		obj->status = GRAVITY;
+		obj->obj_status = GRAVITY;
 		dir = (int)(c->dir
 			   - (CANNON_SPREAD * 0.5)
 			   + (rfrac() * CANNON_SPREAD));
@@ -298,7 +298,7 @@ static int Cannon_in_danger(cannon_t *c)
 	    continue;
 	if (!BIT(OBJ_TYPEBIT(shot->type), kill_shots))
 	    continue;
-	if (BIT(shot->status, FROMCANNON))
+	if (BIT(shot->obj_status, FROMCANNON))
 	    continue;
 	if (BIT(world->rules->mode, TEAM_PLAY)
 	    && options.teamImmunity
@@ -619,7 +619,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    /* FALLTHROUGH */
 	case 1:
 	    if (options.allowHeatSeekers
-		&& BIT(pl->status, THRUSTING)) {
+		&& BIT(pl->pl_status, THRUSTING)) {
 		Fire_general_shot(world, NULL, c, c->team, c->pos,
 				  OBJ_HEAT_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_HEAT_SHOT_SOUND);
@@ -893,7 +893,7 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
      * kps - if no team play, both cannons have team == TEAM_NOT_SET,
      * this code should work, no matter if team play is true or not.
      */
-     if (BIT(obj->status, FROMCANNON)
+     if (BIT(obj->obj_status, FROMCANNON)
          && obj->team == cannon->team) {
          return false;
      }

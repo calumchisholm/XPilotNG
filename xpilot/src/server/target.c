@@ -157,21 +157,21 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < NumPlayers; j++) {
-	    player_t *pl_j = Player_by_index(j);
+	    player_t *pl = Player_by_index(j);
 
-	    if (Player_is_tank(pl_j)
-		|| (BIT(pl_j->status, PAUSE) && pl_j->pause_count <= 0)
-		|| Player_is_waiting(pl_j))
+	    if (Player_is_tank(pl)
+		|| (Player_is_paused(pl) && pl->pause_count <= 0)
+		|| Player_is_waiting(pl))
 		continue;
 
-	    if (pl_j->team == targ->team) {
-		lose_score += pl_j->score;
+	    if (pl->team == targ->team) {
+		lose_score += pl->score;
 		lose_team_members++;
-		if (BIT(pl_j->status, GAME_OVER) == 0)
+		if (BIT(pl->pl_status, GAME_OVER) == 0)
 		    somebody_flag = 1;
 	    }
-	    else if (pl_j->team == kp->team) {
-		win_score += pl_j->score;
+	    else if (pl->team == kp->team) {
+		win_score += pl->score;
 		win_team_members++;
 	    }
 	}
@@ -221,15 +221,15 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	player_t *pl = Player_by_index(j);
 
 	if (Player_is_tank(pl)
-	    || (BIT(pl->status, PAUSE) && pl->pause_count <= 0)
+	    || (Player_is_paused(pl) && pl->pause_count <= 0)
 	    || Player_is_waiting(pl))
 	    continue;
 
 	if (pl->team == targ->team) {
 	    if (options.targetKillTeam
 		&& targets_remaining == 0
-		&& !BIT(pl->status, KILLED|PAUSE|GAME_OVER))
-		SET_BIT(pl->status, KILLED);
+		&& Player_is_playing(pl))
+		SET_BIT(pl->pl_status, KILLED);
 	    Score(pl, -sc, targ->pos, "Target: ");
 	}
 	else if (pl->team == kp->team &&

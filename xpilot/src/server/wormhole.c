@@ -30,7 +30,7 @@ void Object_hits_wormhole(object_t *obj, int ind)
     /*world_t *world = &World;
       wormhole_t *wormhole = Wormhole_by_index(world, ind);*/
 
-    SET_BIT(obj->status, WARPING);
+    SET_BIT(obj->obj_status, WARPING);
     obj->wormHoleHit = ind;
 
 #if 0
@@ -188,8 +188,8 @@ void Traverse_wormhole(player_t *pl)
 	wh_hit->countdown = options.wormholeStableTicks;
     }
 
-    CLR_BIT(pl->status, WARPING);
-    SET_BIT(pl->status, WARPED);
+    CLR_BIT(pl->obj_status, WARPING);
+    SET_BIT(pl->obj_status, WARPED);
 
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 }
@@ -218,7 +218,7 @@ void Hyperjump(player_t *pl)
     if (!counter) {
 	/* need to do something else here ? */
 	Set_player_message(pl, "Could not hyperjump. [*Server notice*]");
-	CLR_BIT(pl->status, WARPING);
+	CLR_BIT(pl->obj_status, WARPING);
 	sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
 	return;
     }
@@ -232,7 +232,7 @@ void Hyperjump(player_t *pl)
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
 
-    CLR_BIT(pl->status, WARPING);
+    CLR_BIT(pl->obj_status, WARPING);
 }
 
 
@@ -259,7 +259,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
     if (obj == NULL)
 	return true;
 
-    if (BIT(obj->status, WARPED|WARPING))
+    if (BIT(obj->obj_status, WARPED|WARPING))
 	return false;
 
     return true;
@@ -281,7 +281,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
     if (obj->type == OBJ_PLAYER) {
 	player_t *pl = (player_t *)obj;
 
-	if (BIT(pl->status, WARPING))
+	if (BIT(pl->obj_status, WARPING))
 	    return false;
 #if 0
 	/*

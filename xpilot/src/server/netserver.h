@@ -44,7 +44,7 @@ int Send_self(connection_t *connp, player_t *pl,
 	      int lock_dist,
 	      int lock_dir,
 	      int autopilotlight,
-	      long status,
+	      int status,
 	      char *mods);
 int Send_leave(connection_t *connp, int id);
 int Send_player(connection_t *connp, int id);

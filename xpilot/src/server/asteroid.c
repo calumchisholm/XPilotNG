@@ -194,9 +194,8 @@ void Break_asteroid(world_t *world, wireobject_t *asteroid)
 	&& (rfrac() < options.asteroidItemProb)) {
 	int nitems = (int)(rfrac() * options.asteroidMaxItems) + 1;
 	vector_t vel;
-	int i, item, item_dir, num_per_pack;
+	int i, item, item_dir, num_per_pack, status;
 	double item_speed;
-	long status;
 
 	for (i = 0; i < nitems; i++) {
 	    item = Choose_random_item(world);
@@ -286,7 +285,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
     asteroid->pl_range = (int)radius;
     asteroid->pl_radius = (int)radius;
     asteroid->fusetime = frame_time + timeStep;
-    asteroid->status = GRAVITY;
+    asteroid->obj_status = GRAVITY;
     CLEAR_MODS(asteroid->mods);
 
     if (Asteroid_add_to_list(asteroid) == true) {

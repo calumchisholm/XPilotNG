@@ -55,10 +55,11 @@
  * The bits that the client needs must fit into a byte,
  * so the first 8 bitvalues are reserved for that purpose.
  */
-#define PLAYING			(1L<<0)		/* Not returning to base */
-#define PAUSE			(1L<<1) 	/* Must stay below 8 */
-#define GAME_OVER		(1L<<2)		/* Must stay below 8 */
-#define WANT_AUDIO		(1L<<5)		/* whether client has SOUND */
+#define PLAYING			(1U<<0)		/* Not returning to base */
+#define PAUSE			(1U<<1) 	/* Must stay below 8 */
+#define THRUSTING		(1U<<3)		/* not used by client? */
+#define GAME_OVER		(1U<<2)		/* Must stay below 8 */
+#define WANT_AUDIO		(1U<<5)		/* whether client has SOUND */
 
 typedef struct {
     int		lives;

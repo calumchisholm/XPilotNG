@@ -196,7 +196,7 @@ static void PlayerCollision(world_t *world)
 	    continue;
 
 	if (!World_contains_clpos(world, pl->pos)) {
-	    SET_BIT(pl->status, KILLED);
+	    SET_BIT(pl->pl_status, KILLED);
 	    Set_message_f("%s left the known universe.", pl->name);
 	    sc = Rate(WALL_SCORE, pl->score);
 	    Score(pl, -sc, pl->pos, pl->name);
@@ -261,12 +261,12 @@ static void PlayerCollision(world_t *world)
 		if (pl->fuel.sum <= 0.0
 		    || (!BIT(pl->used, HAS_SHIELD)
 			&& !BIT(pl->have, HAS_ARMOR)))
-		    SET_BIT(pl->status, KILLED);
+		    SET_BIT(pl->pl_status, KILLED);
 
 		if (pl_j->fuel.sum <= 0.0
 		    || (!BIT(pl_j->used, HAS_SHIELD)
 			&& !BIT(pl_j->have, HAS_ARMOR)))
-		    SET_BIT(pl_j->status, KILLED);
+		    SET_BIT(pl_j->pl_status, KILLED);
 
 		if (!BIT(pl->used, HAS_SHIELD)
 		    && BIT(pl->have, HAS_ARMOR))
@@ -276,8 +276,8 @@ static void PlayerCollision(world_t *world)
 		    && BIT(pl_j->have, HAS_ARMOR))
 		    Player_hit_armor(pl_j);
 
-		if (BIT(pl_j->status, KILLED)) {
-		    if (BIT(pl->status, KILLED)) {
+		if (BIT(pl_j->pl_status, KILLED)) {
+		    if (BIT(pl->pl_status, KILLED)) {
 			Set_message_f("%s and %s crashed.",
 				      pl->name, pl_j->name);
 			if (!Player_is_tank(pl) && !Player_is_tank(pl_j)) {
@@ -333,7 +333,7 @@ static void PlayerCollision(world_t *world)
 		    }
 
 		} else {
-		    if (BIT(pl->status, KILLED)) {
+		    if (BIT(pl->pl_status, KILLED)) {
 			int j_tank_owner = j;
 			player_t *j_tank_owner_pl;
 
@@ -361,13 +361,13 @@ static void PlayerCollision(world_t *world)
 		    }
 		}
 
-		if (BIT(pl_j->status, KILLED)) {
+		if (BIT(pl_j->pl_status, KILLED)) {
 		    if (Player_is_robot(pl_j)
 			&& Robot_war_on_player(pl_j) == pl->id)
 			Robot_reset_war(pl_j);
 		}
 
-		if (BIT(pl->status, KILLED)) {
+		if (BIT(pl->pl_status, KILLED)) {
 		    if (Player_is_robot(pl)
 			&& Robot_war_on_player(pl) == pl_j->id)
 			Robot_reset_war(pl);
@@ -403,7 +403,7 @@ static void PlayerCollision(world_t *world)
 		    if (ball->treasure->have)
 			ball->life = 1e6;  /* for frame counter */
 		    ball->owner = pl->id;
-		    SET_BIT(ball->status, GRAVITY);
+		    SET_BIT(ball->obj_status, GRAVITY);
 		    ball->treasure->have = false;
 		    SET_BIT(pl->have, HAS_BALL);
 		    pl->ball = NULL;
@@ -558,7 +558,7 @@ static void PlayerObjectCollision(player_t *pl)
 	    if (obj->id == pl->id) {
 		if ((obj->type == OBJ_SPARK
 		     || obj->type == OBJ_MINE)
-		    && BIT(obj->status, OWNERIMMUNE))
+		    && BIT(obj->obj_status, OWNERIMMUNE))
 		    continue;
 		else if (options.selfImmunity)
 		    continue;
@@ -568,7 +568,7 @@ static void PlayerObjectCollision(player_t *pl)
 		continue;
 	    else if (Team_immune(obj->id, pl->id))
 		continue;
-	    else if (BIT(Player_by_id(obj->id)->status, PAUSE))
+	    else if (Player_is_paused(Player_by_id(obj->id)))
 		continue;
 	} else if (BIT(world->rules->mode, TEAM_PLAY)
 		   && options.teamImmunity
@@ -579,7 +579,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	if (obj->type == OBJ_ITEM) {
 	    if (BIT(pl->used, HAS_SHIELD) && !options.shieldedItemPickup) {
-		SET_BIT(obj->status, GRAVITY);
+		SET_BIT(obj->obj_status, GRAVITY);
 		Delta_mv((object_t *)pl, obj);
 		continue;
 	    }
@@ -593,7 +593,7 @@ static void PlayerObjectCollision(player_t *pl)
 		continue;
 	}
 	else if (obj->type == OBJ_MINE) {
-	    if (BIT(obj->status, CONFUSED))
+	    if (BIT(obj->obj_status, CONFUSED))
 		continue;
 	}
 	else if (obj->type == OBJ_BALL
@@ -638,7 +638,7 @@ static void PlayerObjectCollision(player_t *pl)
 	    if (!hit)
 		continue;
 	    Player_collides_with_ball(pl, obj);
-	    if (BIT(pl->status, KILLED))
+	    if (BIT(pl->pl_status, KILLED))
 		return;
 	    continue;
 
@@ -656,7 +656,7 @@ static void PlayerObjectCollision(player_t *pl)
 	case OBJ_WRECKAGE:
 	case OBJ_DEBRIS:
 	    Player_collides_with_debris(pl, obj);
-	    if (BIT(pl->status, KILLED))
+	    if (BIT(pl->pl_status, KILLED))
 		return;
 	    break;
 
@@ -665,7 +665,7 @@ static void PlayerObjectCollision(player_t *pl)
 		Player_collides_with_asteroid(pl, WIRE_PTR(obj));
 		Delta_mv_elastic((object_t *)pl, (object_t *)obj);
 	    }
-	    if (BIT(pl->status, KILLED))
+	    if (BIT(pl->pl_status, KILLED))
 		return;
 	    continue;
 
@@ -676,7 +676,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	case OBJ_PULSE:
 	    Laser_pulse_hits_player(pl, PULSE_PTR(obj));
-	    if (BIT(pl->status, KILLED))
+	    if (BIT(pl->pl_status, KILLED))
 		return;
 	    continue;
 
@@ -688,7 +688,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	if (BIT(OBJ_TYPEBIT(obj->type), KILLING_SHOTS)) {
 	    Player_collides_with_killing_shot(pl, obj);
-	    if (BIT(pl->status, KILLED))
+	    if (BIT(pl->pl_status, KILLED))
 		return;
 	}
 
@@ -747,7 +747,7 @@ static void Player_collides_with_ball(player_t *pl, object_t *obj)
 	    Robot_war(pl, kp);
 	}
     }
-    SET_BIT(pl->status, KILLED);
+    SET_BIT(pl->pl_status, KILLED);
 }
 
 
@@ -947,12 +947,14 @@ static void Player_collides_with_mine(player_t *pl, object_t *obj)
     if (mine->id == NO_ID && mine->owner == NO_ID)
 	Set_message_f("%s hit %s.",
 		      pl->name,
-		      Describe_shot(mine->type, mine->status, mine->mods, 1));
+		      Describe_shot(mine->type, mine->obj_status,
+				    mine->mods, 1));
     else if (mine->owner == mine->id) {
 	kp = Player_by_id(mine->owner);
 	Set_message_f("%s hit %s %s by %s.", pl->name,
-		      Describe_shot(mine->type, mine->status, mine->mods,1),
-		      BIT(mine->status, GRAVITY) ? "thrown " : "dropped ",
+		      Describe_shot(mine->type, mine->obj_status,
+				    mine->mods, 1),
+		      BIT(mine->obj_status, GRAVITY) ? "thrown " : "dropped ",
 		      kp->name);
     }
     else if (mine->owner == NO_ID) {
@@ -964,7 +966,8 @@ static void Player_collides_with_mine(player_t *pl, object_t *obj)
 	}
 	Set_message_f("%s hit %s reprogrammed by %s.",
 		      pl->name,
-		      Describe_shot(mine->type, mine->status, mine->mods, 1),
+		      Describe_shot(mine->type, mine->obj_status,
+				    mine->mods, 1),
 		      reprogrammer_name);
     }
     else {
@@ -976,8 +979,9 @@ static void Player_collides_with_mine(player_t *pl, object_t *obj)
 	}
 	Set_message_f("%s hit %s %s by %s and reprogrammed by %s.",
 		      pl->name,
-		      Describe_shot(mine->type, mine->status, mine->mods,1),
-		      BIT(mine->status, GRAVITY) ? "thrown " : "dropped ",
+		      Describe_shot(mine->type, mine->obj_status,
+				    mine->mods, 1),
+		      BIT(mine->obj_status, GRAVITY) ? "thrown " : "dropped ",
 		      Player_by_id(mine->owner)->name,
 		      reprogrammer_name);
     }
@@ -1009,7 +1013,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 	    && options.wreckageCollisionMayKill
 	    && !BIT(pl->used, HAS_SHIELD)
 	    && !BIT(pl->have, HAS_ARMOR))) {
-	SET_BIT(pl->status, KILLED);
+	SET_BIT(pl->pl_status, KILLED);
 	sprintf(msg, "%s succumbed to an explosion.", pl->name);
 	if (obj->id != NO_ID) {
 	    kp = Player_by_id(obj->id);
@@ -1059,7 +1063,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	&& (pl->fuel.sum == 0.0
 	    || (!BIT(pl->used, HAS_SHIELD)
 		&& !BIT(pl->have, HAS_ARMOR)))) {
-	SET_BIT(pl->status, KILLED);
+	SET_BIT(pl->pl_status, KILLED);
 	if (pl->velocity > v)
 	    /* player moves faster than asteroid */
 	    Set_message_f("%s smashed into an asteroid.", pl->name);
@@ -1124,12 +1128,12 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	case OBJ_SMART_SHOT:
 	    if (obj->id == NO_ID)
 		Set_message_f("%s ate %s.", pl->name,
-			      Describe_shot(obj->type, obj->status,
+			      Describe_shot(obj->type, obj->obj_status,
 					    obj->mods, 1));
 	    else {
 		kp = Player_by_id(obj->id);
 		Set_message_f("%s ate %s from %s.", pl->name,
-			      Describe_shot(obj->type, obj->status,
+			      Describe_shot(obj->type, obj->obj_status,
 					    obj->mods, 1),
 			      kp->name);
 	    }
@@ -1178,19 +1182,19 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	case OBJ_HEAT_SHOT:
 	case OBJ_SHOT:
 	case OBJ_CANNON_SHOT:
-	    if (BIT(obj->status, FROMCANNON)) {
+	    if (BIT(obj->obj_status, FROMCANNON)) {
 		sound_play_sensors(pl->pos, PLAYER_HIT_CANNONFIRE_SOUND);
 		Set_message_f("%s was hit by cannonfire.", pl->name);
 		sc = Rate(CANNON_SCORE, pl->score)/4;
 	    } else if (obj->id == NO_ID) {
 		Set_message_f("%s was killed by %s.", pl->name,
-			      Describe_shot(obj->type, obj->status,
+			      Describe_shot(obj->type, obj->obj_status,
 					    obj->mods, 1));
 		sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
 	    } else {
 		kp = Player_by_id(obj->id);
 		Set_message_f("%s was killed by %s from %s.%s", pl->name,
-			      Describe_shot(obj->type, obj->status,
+			      Describe_shot(obj->type, obj->obj_status,
 					    obj->mods, 1),
 			      kp->name,
 			      kp->id == pl->id ? "  How strange!" : "");
@@ -1225,7 +1229,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	    }
 
 	    sc *= factor;
-	    if (BIT(obj->status, FROMCANNON))
+	    if (BIT(obj->obj_status, FROMCANNON))
 		Score(pl, -sc, pl->pos, "Cannon");
 	    else if (obj->id == NO_ID || kp->id == pl->id)
 		Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
@@ -1233,7 +1237,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		Robot_war(pl, kp);
 	    }
-	    SET_BIT(pl->status, KILLED);
+	    SET_BIT(pl->pl_status, KILLED);
 	    return;
 
 	default:
@@ -1284,7 +1288,7 @@ static void AsteroidCollision(world_t *world)
 		 || obj->type == OBJ_SPARK
 		 || obj->type == OBJ_WRECKAGE)
 		&& obj->id == NO_ID
-		&& !BIT(obj->status, FROMCANNON))
+		&& !BIT(obj->obj_status, FROMCANNON))
 		continue;
 	    /* don't collide while still overlapping  after breaking */
 	    if (obj->type == OBJ_ASTEROID && frame_time < ast->fusetime)
@@ -1332,7 +1336,7 @@ static void AsteroidCollision(world_t *world)
 		Delta_mv(ast, obj);
 		break;
 	    case OBJ_MINE:
-		if (!BIT(obj->status, CONFUSED))
+		if (!BIT(obj->obj_status, CONFUSED))
 		    obj->life = 0.0;
 		break;
 	    case OBJ_SHOT:

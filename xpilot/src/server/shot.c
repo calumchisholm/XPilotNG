@@ -97,7 +97,7 @@ void Place_moving_mine(player_t *pl)
 		       vel, pl->mods);
 }
 
-void Place_general_mine(world_t *world, player_t *pl, int team, long status,
+void Place_general_mine(world_t *world, player_t *pl, int team, int status,
 			clpos_t pos, vector_t vel, modifiers_t mods)
 {
     int used, i, minis;
@@ -109,7 +109,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, long status,
 
     pos = World_wrap_clpos(world, pos);
 
-    if (pl && BIT(pl->status, KILLED))
+    if (pl && BIT(pl->pl_status, KILLED))
 	life = rfrac() * 12;
     else if (BIT(status, FROMCANNON))
 	life = CANNON_SHOT_LIFE;
@@ -199,7 +199,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, long status,
 	mine->type = OBJ_MINE;
 	mine->color = BLUE;
 	mine->fusetime = options.mineFuseTicks;
-	mine->status = status;
+	mine->obj_status = status;
 	mine->id = (pl ? pl->id : NO_ID);
 	mine->team = team;
 	mine->owner = mine->id;
@@ -291,7 +291,7 @@ void Detonate_mines(player_t *pl)
  * non-zero this description is part of a collision, otherwise its part
  * of a launch message.
  */
-char *Describe_shot(int type, long status, modifiers_t mods, int hit)
+char *Describe_shot(int type, int status, modifiers_t mods, int hit)
 {
     const char		*name, *howmany = "a ", *plural = "";
     static char		msg[MSG_LEN];
@@ -546,7 +546,7 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 		drain += CLUSTER_MASS_DRAIN(mass);
 	}
 
-	if (pl && BIT(pl->status, KILLED))
+	if (pl && BIT(pl->pl_status, KILLED))
 	    life = rfrac() * 12;
 	else if (!cannon)
 	    life = options.missileLife;
@@ -963,7 +963,7 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 	     pl->vel.y -= options.constantSpeed * pl->acc.y;
 	}
 
-	shot->status	= status;
+	shot->obj_status	= status;
 	shot->missile_dir	= ldir;
 	shot->mods  	= mods;
 	shot->pl_range  = pl_range;
@@ -1066,8 +1066,7 @@ void Delete_shot(world_t *world, int ind)
     player_t *pl;
     bool addMine = false, addHeat = false, addBall = false;
     modifiers_t mods;
-    long status;
-    int i, intensity, type, color, num_debris;
+    int i, intensity, type, color, num_debris, status;
     double modv, speed_modv, life_modv, num_modv, mass, min_life, max_life;
 
     switch (shot->type) {
@@ -1103,11 +1102,11 @@ void Delete_shot(world_t *world, int ind)
 	     * Therefore we force the ball to be recreated.
 	     */
 	    ball->treasure->have = false;
-	    SET_BIT(ball->status, RECREATE);
+	    SET_BIT(ball->obj_status, RECREATE);
 	}
-	if (BIT(ball->status, RECREATE)) {
+	if (BIT(ball->obj_status, RECREATE)) {
 	    addBall = true;
-	    if (BIT(ball->status, NOEXPLOSION))
+	    if (BIT(ball->obj_status, NOEXPLOSION))
 		break;
 	    sound_play_sensors(ball->pos, EXPLODE_BALL_SOUND);
 
@@ -1146,7 +1145,7 @@ void Delete_shot(world_t *world, int ind)
 	status = GRAVITY;
 	if (shot->type == OBJ_MINE)
 	    status |= COLLISIONSHOVE;
-	if (BIT(shot->status, FROMCANNON))
+	if (BIT(shot->obj_status, FROMCANNON))
 	    status |= FROMCANNON;
 
 	if (BIT(shot->mods.nuclear, NUCLEAR))
@@ -1242,7 +1241,7 @@ void Delete_shot(world_t *world, int ind)
 
     case OBJ_SHOT:
 	if (shot->id == NO_ID
-	    || BIT(shot->status, FROMCANNON)
+	    || BIT(shot->obj_status, FROMCANNON)
 	    || BIT(shot->mods.warhead, CLUSTER))
 	    break;
 	pl = Player_by_id(shot->id);
@@ -1252,7 +1251,7 @@ void Delete_shot(world_t *world, int ind)
 
     case OBJ_PULSE:
 	if (shot->id == NO_ID
-	    || BIT(shot->status, FROMCANNON))
+	    || BIT(shot->obj_status, FROMCANNON))
 	    break;
 	pl = Player_by_id(shot->id);
 	if (--pl->num_pulses <= 0)
@@ -1405,7 +1404,7 @@ void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
     pulse->acc.y 	= 0;
     pulse->mass	 	= 0;
     pulse->life 	= life;
-    pulse->status 	= (pl ? 0 : FROMCANNON);
+    pulse->obj_status 	= (pl ? 0 : FROMCANNON);
     pulse->type 	= OBJ_PULSE;
     pulse->count 	= 0;
     pulse->mods 	= mods;
@@ -1573,7 +1572,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 	    pl = NULL;
 	    shot->count = HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR;
 	}
-	if (pl && BIT(pl->status, THRUSTING)) {
+	if (pl && BIT(pl->pl_status, THRUSTING)) {
 	    /*
 	     * Target is thrusting,
 	     * set number to moves to correct error value
@@ -1600,7 +1599,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 		    player_t *pl_i = Player_by_index(i);
 		    clpos_t engine;
 
-		    if (!BIT(pl_i->status, THRUSTING))
+		    if (!BIT(pl_i->pl_status, THRUSTING))
 			continue;
 
 		    engine = Ship_get_engine_clpos(pl_i->ship, pl_i->dir);
@@ -1646,13 +1645,13 @@ void Update_missile(world_t *world, missileobject_t *shot)
 	 * < 1 and when it is cast to int it will be 0, and then
 	 * we get frameloops % 0, which is not good.
 	 */
-	/*if (BIT(smart->status, CONFUSED)
+	/*if (BIT(smart->obj_status, CONFUSED)
 	  && (!(frame_loops
 	  % (int)(CONFUSED_UPDATE_GRANULARITY / options.gameSpeed)
 	  || smart->count == CONFUSED_TIME))) {*/
 	/* not going to fix now, I'll just remove the '/ gamespeed' part */
 
-	if (BIT(smart->status, CONFUSED)
+	if (BIT(smart->obj_status, CONFUSED)
 	    && (!(frame_loops % CONFUSED_UPDATE_GRANULARITY)
 		|| smart->count == CONFUSED_TIME)) {
 
@@ -1661,7 +1660,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 		smart->count -= timeStep;
 	    } else {
 		smart->count = 0;
-		CLR_BIT(smart->status, CONFUSED);
+		CLR_BIT(smart->obj_status, CONFUSED);
 
 		/* range is percentage from center to periphery of ecm burst */
 		range = (ECM_DISTANCE - smart->ecm_range) / ECM_DISTANCE;
@@ -1854,17 +1853,17 @@ void Update_mine(world_t *world, mineobject_t *mine)
 {
     UNUSED_PARAM(world);
 
-    if (BIT(mine->status, CONFUSED)) {
+    if (BIT(mine->obj_status, CONFUSED)) {
 	if ((mine->count -= timeStep) <= 0) {
-	    CLR_BIT(mine->status, CONFUSED);
+	    CLR_BIT(mine->obj_status, CONFUSED);
 	    mine->count = 0;
 	}
     }
 
     /* if options.mineFuseTicks == 0, owner immunity never expires */
-    if (BIT(mine->status, OWNERIMMUNE) && mine->fusetime > 0) {
+    if (BIT(mine->obj_status, OWNERIMMUNE) && mine->fusetime > 0) {
 	if ((mine->fusetime -= timeStep) <= 0) {
-	    CLR_BIT(mine->status, OWNERIMMUNE);
+	    CLR_BIT(mine->obj_status, OWNERIMMUNE);
 	    mine->fusetime = 0;
 	}
     }

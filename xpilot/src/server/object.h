@@ -129,29 +129,31 @@
 #define HAS_BALL		(1U<<3)
 
 /*
- * Possible object and player status bits.
+ * Possible object status bits.
+ */
+#define GRAVITY			(1U<<0)
+#define WARPING			(1U<<1)
+#define WARPED			(1U<<2)
+#define CONFUSED		(1U<<3)
+#define FROMCANNON		(1U<<4)		/* Object from cannon */
+#define RECREATE		(1U<<5)		/* Recreate ball */
+#define FROMBOUNCE		(1U<<6)		/* Spark from wall bounce */
+#define OWNERIMMUNE		(1U<<7)		/* Owner is immune to object */
+#define NOEXPLOSION		(1U<<8)		/* No recreate explosion */
+#define COLLISIONSHOVE		(1U<<9)		/* Collision counts as shove */
+#define RANDOM_ITEM		(1U<<10)	/* item shows up as random */
+
+/*
+ * Possible player status bits.
  * The bits that the client needs must fit into a byte,
  * so the first 8 bitvalues are reserved for that purpose,
  * those are defined in common/rules.h.
  */
-
-#define THRUSTING		(1L<<3)		/* not used by client? */
-#define KILLED			(1L<<10)
-#define GRAVITY			(1L<<11)
-#define WARPING			(1L<<12)
-#define WARPED			(1L<<13)
-#define CONFUSED		(1L<<14)
-#define FROMCANNON		(1L<<15)	/* Object from cannon */
-#define HOVERPAUSE		(1L<<16)	/* Hovering pause */
-#define RECREATE		(1L<<17)	/* Recreate ball */
-#define FROMBOUNCE		(1L<<18)	/* Spark from wall bounce */
-#define OWNERIMMUNE		(1L<<19)	/* Owner is immune to object */
-#define REPROGRAM		(1L<<20)	/* Player reprogramming */
-#define NOEXPLOSION		(1L<<21)	/* No ball recreate explosion */
-#define COLLISIONSHOVE		(1L<<22)	/* Collision counts as shove */
-#define FINISH			(1L<<23)	/* Finished a lap this frame */
-#define RACE_OVER		(1L<<24)	/* After finished and score. */
-#define RANDOM_ITEM		(1L<<25)	/* item shows up as random */
+#define KILLED			(1U<<8)
+#define HOVERPAUSE		(1U<<9)		/* Hovering pause */
+#define REPROGRAM		(1U<<10)	/* Player reprogramming */
+#define FINISH			(1U<<11)	/* Finished a lap this frame */
+#define RACE_OVER		(1U<<12)	/* After finished and score */
 
 
 /*
@@ -226,16 +228,16 @@ struct cell_node {
     vector_t		acc;		/* acceleration in x,y */	\
     float		mass;		/* mass in unigrams */		\
     double		life;		/* No of ticks left to live */	\
-    long		status;		/* gravity, etc. */		\
 /* Item pack count is kept in the 'count' field, float now, change !@# */ \
     float		count;		/* Misc timings */		\
     modifiers_t		mods;		/* Modifiers to this object */	\
-    u_byte		type;		/* one of OBJ_XXX */		\
-    u_byte		color;		/* Color of object */		\
-    u_byte		missile_dir;	/* missile direction */		\
-    u_byte		collmode;	/* collision checking mode */	\
+    uint8_t		type;		/* one of OBJ_XXX */		\
+    uint8_t		color;		/* Color of object */		\
+    uint8_t		missile_dir;	/* missile direction */		\
+    uint8_t		collmode;	/* collision checking mode */	\
     short		wormHoleHit;	\
     short		wormHoleDest;	\
+    uint16_t		obj_status;	/* gravity, etc. */		\
 
 /* up to here all object types are the same as all player types. */
 
@@ -377,8 +379,8 @@ struct xp_wireobject {
 
     float		turnspeed;	/* how fast to turn */
 
-    u_byte		size;		/* Size of object (wreckage) */
-    u_byte		rotation;	/* Rotation direction */
+    uint8_t		size;		/* Size of object (wreckage) */
+    uint8_t		rotation;	/* Rotation direction */
 
 #define WIRE_IND(ind)	((wireobject_t *)Obj[(ind)])
 #define WIRE_PTR(obj)	((wireobject_t *)(obj))
@@ -396,7 +398,7 @@ struct xp_pulseobject {
     OBJECT_EXTEND
 
     float		len;		/* Length of the pulse */
-    u_byte		dir;		/* Direction of the pulse */
+    uint8_t		dir;		/* Direction of the pulse */
     bool		refl;		/* Pulse was reflected ? */
 
 #define PULSE_IND(ind)	((pulseobject_t *)Obj[(ind)])
@@ -482,6 +484,7 @@ struct player {
     /* up to here the player type should be the same as an object. */
 
     int		type_ext;		/* extended type info (tank, robot) */
+    uint16_t	pl_status;		/* playing, etc. */
 
     double	turnspeed;		/* How fast player acc-turns */
     double	velocity;		/* Absolute speed */

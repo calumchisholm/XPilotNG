@@ -65,7 +65,7 @@ static inline bool Player_can_be_tagged(player_t *pl)
 {
     if (Player_is_tank(pl))
 	return false;
-    if (BIT(pl->status, PAUSE))
+    if (Player_is_paused(pl))
 	return false;
     return true;
 }
@@ -133,7 +133,7 @@ void Make_debris(world_t  *world,
 		 int      owner_team,
 		 int      type,
 		 double   mass,
-		 long     status,
+		 int      status,
 		 int      color,
 		 int      radius,
 		 int      num_debris,
@@ -205,7 +205,7 @@ void Make_debris(world_t  *world,
 	debris->fusetime = 0;
 	debris->pl_range = radius;
 	debris->pl_radius = radius;
-	debris->status = status;
+	debris->obj_status = status;
 	debris->mods = mods;
 	Cell_add_object(world, debris);
     }

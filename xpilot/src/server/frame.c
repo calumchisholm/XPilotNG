@@ -34,7 +34,6 @@ char frame_version[] = VERSION;
 
 
 #define MAX_SHUFFLE_INDEX	65535
-#define MAX_VISIBLE_OBJECTS	options.maxVisibleObject
 
 
 typedef unsigned short shuffle_t;
@@ -376,7 +375,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
 		|| Players_are_teammates(pl, lock_pl)
 		|| Players_are_allies(pl, lock_pl))
 #endif
-	    && BIT(lock_pl->status, PLAYING|GAME_OVER) == PLAYING
+	    && BIT(lock_pl->pl_status, PLAYING|GAME_OVER) == PLAYING
 	    && (options.playersOnRadar
 		|| clpos_inview(&cv, lock_pl->pos))
 	    && pl->lock.distance != 0) {
@@ -390,7 +389,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
 	}
     }
 
-    if (BIT(pl->status, HOVERPAUSE))
+    if (BIT(pl->pl_status, HOVERPAUSE))
 	showautopilot = (pl->pause_count <= 0 || (frame_loops_slow % 8) < 4);
     else if (BIT(pl->used, HAS_AUTOPILOT))
 	showautopilot = (frame_loops_slow % 8) < 4;
@@ -441,7 +440,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
 		  lock_dist,
 		  lock_dir,
 		  showautopilot,
-		  Player_by_id(Get_player_id(conn))->status,
+		  Player_by_id(Get_player_id(conn))->pl_status,
 		  mods);
     if (n <= 0)
 	return 0;
@@ -566,7 +565,7 @@ static void Frame_shuffle_objects(void)
 {
     int i;
 
-    num_object_shuffle = MIN(NumObjs, MAX_VISIBLE_OBJECTS);
+    num_object_shuffle = MIN(NumObjs, options.maxVisibleObject);
 
     if (max_object_shuffle < num_object_shuffle) {
 	XFREE(object_shuffle_ptr);
@@ -745,7 +744,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	case OBJ_CANNON_SHOT:
 	    if (Team_immune(shot->id, pl->id)
 		|| (shot->id != NO_ID
-		    && BIT(Player_by_id(shot->id)->status, PAUSE))
+		    && Player_is_paused(Player_by_id(shot->id)))
 		|| (shot->id == NO_ID
 		    && BIT(world->rules->mode, TEAM_PLAY)
 		    && shot->team == pl->team)) {
@@ -804,15 +803,15 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		    id = mine->id;
 		    if (id == NO_ID)
 			id = EXPIRED_MINE_ID;
-		    if (BIT(mine->status, CONFUSED))
+		    if (BIT(mine->obj_status, CONFUSED))
 			confused = 1;
 		}
 		if (mine->id != NO_ID
-		    && BIT(Player_by_id(mine->id)->status, PAUSE)) {
+		    && Player_is_paused(Player_by_id(mine->id))) {
 		    laid_by_team = 1;
 		} else {
 		    laid_by_team = (Team_immune(mine->id, pl->id)
-				    || (BIT(mine->status, OWNERIMMUNE)
+				    || (BIT(mine->obj_status, OWNERIMMUNE)
 					&& mine->owner == pl->id));
 		    if (confused) {
 			id = 0;
@@ -827,7 +826,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	    {
 		int item_type = shot->info;
 
-		if (BIT(shot->status, RANDOM_ITEM))
+		if (BIT(shot->obj_status, RANDOM_ITEM))
 		    item_type = Choose_random_item(world);
 
 		Send_item(conn, pos, item_type);
@@ -901,17 +900,18 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	i = player_shuffle_ptr[k];
 	pl_i = Player_by_index(i);
 
-	if (BIT(pl_i->status, GAME_OVER))
+	if (BIT(pl_i->pl_status, GAME_OVER))
 	    continue;
 
-	if (!BIT(pl_i->status, PLAYING) || BIT(pl_i->status, PAUSE)) {
+	if (!BIT(pl_i->pl_status, PLAYING) 
+	    || Player_is_paused(pl_i)) {
 	    if (pl_i->home_base == NULL)
 		continue;
 
 	    if (!clpos_inview(&cv, pl_i->home_base->pos))
 		continue;
 
-	    if (BIT(pl_i->status, PAUSE))
+	    if (Player_is_paused(pl_i))
 		Send_paused(conn, pl_i->home_base->pos,
 			    (int)pl_i->pause_count);
 	    else
@@ -1168,12 +1168,13 @@ void Frame_update(void)
 	    continue;
 	playback = (pl->rectype == 1);
 	player_fps = FPS;
-	if (BIT(pl->status, PAUSE|GAME_OVER) && pl->rectype != 2) {
+	if (BIT(pl->pl_status, PAUSE|GAME_OVER) && pl->rectype != 2) {
 	    /*
 	     * Lower the frame rate for non-playing players
 	     * to reduce network load.
 	     */
-	    if (BIT(pl->status, PAUSE) && options.pausedFPS)
+	    if (Player_is_paused(pl)
+		&& options.pausedFPS)
 		player_fps = options.pausedFPS;
 	    else if (options.waitingFPS)
 		player_fps = options.waitingFPS;
@@ -1197,17 +1198,17 @@ void Frame_update(void)
 	    Send_time_left(conn, (roundtime + FPS - 1) / FPS);
 	/*
 	 * If status is GAME_OVER or PAUSE'd, the user may look through the
-	 * other players 'eyes'. options.lockOtherTeam determines whether you can
-	 * watch opponents while your own team is still alive (potentially
-	 * giving information to your team).
+	 * other players 'eyes'. Option lockOtherTeam determines whether
+	 * you can watch opponents while your own team is still alive
+	 * (potentially giving information to your team).
 	 *
 	 * This is done by using two indexes, one
 	 * determining which data should be used (ind, set below) and
 	 * one determining which connection to send it to (conn).
 	 */
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)
-	    && (BIT(pl->status, (GAME_OVER|PLAYING)) == (GAME_OVER|PLAYING)
-		|| BIT(pl->status, PAUSE))) {
+	    && (BIT(pl->pl_status, (GAME_OVER|PLAYING)) == (GAME_OVER|PLAYING)
+		|| Player_is_paused(pl))) {
 	    ind = GetInd(pl->lock.pl_id);
 	} else
 	    ind = i;

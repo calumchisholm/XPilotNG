@@ -65,7 +65,7 @@ void Race_compute_game_status(world_t *world)
     /* Handle finishing of laps */
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
-	if (!BIT(pl->status, FINISH))
+	if (!BIT(pl->pl_status, FINISH))
 	    continue;
 	pl->last_lap_time = pl->time - pl->last_lap;
 	if ((pl->best_lap > pl->last_lap_time || pl->best_lap == 0)
@@ -76,7 +76,7 @@ void Race_compute_game_status(world_t *world)
 	if (pl->round > options.raceLaps) {
 	    Player_death_reset(pl);
 	    pl->mychar = 'D';
-	    SET_BIT(pl->status, GAME_OVER);
+	    SET_BIT(pl->pl_status, GAME_OVER);
 	    sprintf(msg, "%s finished the race. Last lap time: %.2fs. "
 		    "Personal race best lap time: %.2fs.",
 		    pl->name,
@@ -93,7 +93,7 @@ void Race_compute_game_status(world_t *world)
 	else {
 	    sprintf(msg, "%s starts lap 1 of %d", pl->name,
 		    options.raceLaps);
-	    CLR_BIT(pl->status, FINISH); /* no elimination from starting */
+	    CLR_BIT(pl->pl_status, FINISH); /* no elimination from starting */
 	}
 	Set_message(msg);
     }
@@ -104,7 +104,7 @@ void Race_compute_game_status(world_t *world)
 
 	    for (i = 0; i < NumPlayers; i++) {
 		pl = Player_by_index(i);
-		if (BIT(pl->status, FINISH) && pl->round < lap) {
+		if (BIT(pl->pl_status, FINISH) && pl->round < lap) {
 		    lap = pl->round;
 		    pli = i;
 		}
@@ -112,7 +112,7 @@ void Race_compute_game_status(world_t *world)
 	    if (lap == INT_MAX)
 		break;
 	    pl_i = Player_by_index(pli);
-	    CLR_BIT(pl_i->status, FINISH);
+	    CLR_BIT(pl_i->pl_status, FINISH);
 	    lap = 0;
 	    for (i = 0; i < NumPlayers; i++) {
 		pl = Player_by_index(i);
@@ -133,7 +133,7 @@ void Race_compute_game_status(world_t *world)
 		if (pl->round < pl_i->round) {
 		    Player_death_reset(pl);
 		    pl->mychar = 'D';
-		    SET_BIT(pl->status, GAME_OVER);
+		    SET_BIT(pl->pl_status, GAME_OVER);
 		    if (count == 1) {
 			sprintf(msg, "%s was the last to complete lap "
 				"%d and is out of the race.",
@@ -155,28 +155,28 @@ void Race_compute_game_status(world_t *world)
     /* First count the players */
     for (i = 0; i < NumPlayers; i++)  {
 	pl = Player_by_index(i);
-	if (BIT(pl->status, PAUSE)
+	if (Player_is_paused(pl)
 	    || Player_is_tank(pl))
 	    continue;
 
-	if (!BIT(pl->status, GAME_OVER))
+	if (!BIT(pl->pl_status, GAME_OVER))
 	    num_alive_players++;
 	else if (pl->mychar == 'W') {
 	    num_waiting_players++;
 	    continue;
 	}
 
-	if (BIT(pl->status, RACE_OVER)) {
+	if (BIT(pl->pl_status, RACE_OVER)) {
 	    num_race_over_players++;
 	    pos++;
 	}
-	else if (BIT(pl->status, FINISH)) {
+	else if (BIT(pl->pl_status, FINISH)) {
 	    if (pl->round > options.raceLaps)
 		num_finished_players++;
 	    else
-		CLR_BIT(pl->status, FINISH);
+		CLR_BIT(pl->pl_status, FINISH);
 	}
-	else if (!BIT(pl->status, GAME_OVER))
+	else if (!BIT(pl->pl_status, GAME_OVER))
 	    alive = pl;
 
 	/*
@@ -210,14 +210,14 @@ void Race_compute_game_status(world_t *world)
 
 	for (i = 0; i < NumPlayers; i++)  {
 	    pl = Player_by_index(i);
-	    if (BIT(pl->status, PAUSE)
+	    if (Player_is_paused(pl)
 		|| Player_is_waiting(pl)
 		|| Player_is_tank(pl))
 		continue;
 
-	    if (BIT(pl->status, FINISH)) {
-		CLR_BIT(pl->status, FINISH);
-		SET_BIT(pl->status, RACE_OVER);
+	    if (BIT(pl->pl_status, FINISH)) {
+		CLR_BIT(pl->pl_status, FINISH);
+		SET_BIT(pl->pl_status, RACE_OVER);
 		if (pts > 0) {
 		    sprintf(msg,
 			    "%s finishes %sin position %d "
@@ -287,7 +287,7 @@ void Race_game_over(world_t *world)
 	    pl = Player_by_index(i);
 	    if (Player_is_tank(pl))
 		continue;
-	    if (BIT(pl->status, PAUSE)
+	    if (Player_is_paused(pl)
 		|| Player_is_waiting(pl)
 		|| pl->best_lap <= 0)
 		j = i;
@@ -298,7 +298,7 @@ void Race_game_over(world_t *world)
 		    if (pl->best_lap < pl_j->best_lap)
 			break;
 
-		    if (BIT(pl_j->status, PAUSE)
+		    if (Player_is_paused(pl_j)
 			|| Player_is_waiting(pl_j))
 			break;
 		}
@@ -323,7 +323,7 @@ void Race_game_over(world_t *world)
 			Send_base(Player_by_index(j)->conn,
 				  pl->id, pl->home_base->ind);
 		}
-		if (BIT(pl->status, PAUSE))
+		if (Player_is_paused(pl))
 		    Go_home(pl);
 	    }
 	}
@@ -332,15 +332,15 @@ void Race_game_over(world_t *world)
 
     for (i = NumPlayers - 1; i >= 0; i--)  {
 	pl = Player_by_index(i);
-	CLR_BIT(pl->status, RACE_OVER | FINISH);
-	if (BIT(pl->status, PAUSE)
+	CLR_BIT(pl->pl_status, RACE_OVER | FINISH);
+	if (Player_is_paused(pl)
 	    || Player_is_waiting(pl)
 	    || Player_is_tank(pl))
 	    continue;
 	num_active_players++;
 
 	/* Kill any remaining players */
-	if (!BIT(pl->status, GAME_OVER))
+	if (!BIT(pl->pl_status, GAME_OVER))
 	    Kill_player(pl, false);
 	else
 	    Player_death_reset(pl, false);
@@ -361,7 +361,7 @@ void Race_game_over(world_t *world)
     if (bestlap > 0) {
 	for (i = 0; i < NumPlayers; i++)  {
 	    pl = Player_by_index(i);
-	    if (BIT(pl->status, PAUSE)
+	    if (Player_is_paused(pl)
 		|| Player_is_waiting(pl)
 		|| Player_is_tank(pl))
 		continue;
@@ -430,7 +430,7 @@ void Player_pass_checkpoint(player_t *pl)
 	    }
 	    Player_death_reset(pl, false);
 	    pl->mychar = 'D';
-	    SET_BIT(pl->status, GAME_OVER|FINISH);
+	    SET_BIT(pl->pl_status, GAME_OVER|FINISH);
 	    Set_message_f("%s finished the race. Last lap time: %.2fs. "
 			  "Personal race best lap time: %.2fs.",
 			  pl->name,
@@ -448,7 +448,7 @@ void Player_pass_checkpoint(player_t *pl)
 			  pl->name, options.raceLaps);
 #else
 	/* this is how 4.3.1X did this */
-	SET_BIT(pl->status, FINISH);
+	SET_BIT(pl->pl_status, FINISH);
 	/* Rest done in Compute_game_status() */
 #endif
     }
@@ -465,12 +465,12 @@ void PlayerCheckpointCollision(player_t *pl)
     world_t *world = pl->world;
 
     if (BIT(world->rules->mode, TIMING)
-	&& BIT(pl->status, PAUSE|GAME_OVER) == 0) {
+	&& BIT(pl->pl_status, PAUSE|GAME_OVER) == 0) {
 	check_t *check = Check_by_index(world, pl->check);
 
 	if (pl->round != 0)
 	    pl->time++;
-	if (BIT(pl->status, PLAYING|KILLED) == PLAYING
+	if (BIT(pl->pl_status, PLAYING|KILLED) == PLAYING
 	    && Wrap_length(pl->pos.cx - check->pos.cx,
 			   pl->pos.cy - check->pos.cy)
 	    < options.checkpointRadius * BLOCK_CLICKS

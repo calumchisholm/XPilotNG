@@ -94,7 +94,8 @@ extern sock_t		contactSocket;
 extern time_t		serverStartTime;
 extern server_t		Server;
 extern char		*serverAddr;
-extern uint32_t		KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
+extern uint32_t		DEF_HAVE, DEF_USED, USED_KILL;
+extern uint16_t		KILL_OBJ_BITS, KILL_PL_BITS;
 extern int		ShutdownServer, ShutdownDelay;
 extern long		main_loops;
 extern int		mapRule;
@@ -560,10 +561,10 @@ void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
 			  int items, player_t *victim, bool pressor);
 void Place_mine(player_t *pl);
 void Place_moving_mine(player_t *pl);
-void Place_general_mine(world_t *world, player_t *pl, int team, long status,
+void Place_general_mine(world_t *world, player_t *pl, int team, int status,
 			clpos_t pos, vector_t vel, modifiers_t mods);
 void Detonate_mines(player_t *pl);
-char *Describe_shot(int type, long status, modifiers_t mods, int hit);
+char *Describe_shot(int type, int status, modifiers_t mods, int hit);
 void Fire_ecm(player_t *pl);
 void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos);
 void Update_connector_force(world_t *world, ballobject_t *ball);
@@ -605,7 +606,7 @@ void Make_debris(world_t  *world,
 		 int      owner_team,
 		 int      type,
 		 double   mass,
-		 long     status,
+		 int      status,
 		 int      color,
 		 int      radius,
 		 int      num_debris,
@@ -619,7 +620,7 @@ void Make_wreckage(world_t  *world,
 		   int      owner_team,
 		   double   min_mass,   double max_mass,
 		   double   total_mass,
-		   long     status,
+		   int      status,
 		   int      color,
 		   int      max_wreckage,
 		   int      min_dir,    int    max_dir,
@@ -627,8 +628,7 @@ void Make_wreckage(world_t  *world,
 		   double   min_life,   double max_life);
 void Make_item(world_t *world, clpos_t pos,
 	       vector_t vel,
-	       int item, int num_per_pack,
-	       long status);
+	       int item, int num_per_pack, int status);
 void Explode_fighter(player_t *pl);
 void Throw_items(player_t *pl);
 void Detonate_items(player_t *pl);
@@ -693,21 +693,28 @@ static inline player_t *Player_by_id(int id)
 
 static inline bool Player_is_playing(player_t *pl)
 {
-    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
+    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
 	return true;
     return false;
 }
 
 static inline bool Player_is_active(player_t *pl)
 {
-    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
+    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	return true;
     return false;
 }
 
 static inline bool Player_is_waiting(player_t *pl)
 {
-    if (BIT(pl->status, GAME_OVER) && pl->mychar == 'W')
+    if (BIT(pl->pl_status, GAME_OVER) && pl->mychar == 'W')
+	return true;
+    return false;
+}
+
+static inline bool Player_is_paused(player_t *pl)
+{
+    if (BIT(pl->pl_status, PAUSE))
 	return true;
     return false;
 }

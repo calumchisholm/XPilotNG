@@ -978,7 +978,7 @@ static int Robot_check_leave(player_t *pl)
     if (options.robotsLeave
 	&& pl->life > 0
 	&& !BIT(world->rules->mode, LIMITED_LIVES)
-	&& (BIT(pl->status, PLAYING) || pl->recovery_count <= 0)) {
+	&& (BIT(pl->pl_status, PLAYING) || pl->recovery_count <= 0)) {
 
 	if (options.robotLeaveLife > 0
 	    && pl->life >= options.robotLeaveLife) {
@@ -1029,9 +1029,9 @@ static void Tank_play(player_t *pl)
     int		t = frame_loops % (TANK_NOTHRUST_TIME + TANK_THRUST_TIME);
 
     if (t == 0)
-	SET_BIT(pl->status, THRUSTING);
+	SET_BIT(pl->pl_status, THRUSTING);
     else if (t == TANK_THRUST_TIME)
-	CLR_BIT(pl->status, THRUSTING);
+	CLR_BIT(pl->pl_status, THRUSTING);
 }
 
 void Robot_update(world_t *world)
@@ -1130,7 +1130,7 @@ void Robot_update(world_t *world)
 	    /* Ignore non-robots. */
 	    continue;
 
-	if (BIT(pl->status, PLAYING|GAME_OVER) != PLAYING) {
+	if (BIT(pl->pl_status, PLAYING|GAME_OVER) != PLAYING) {
 	    /* Only check for leave if not being transported to homebase. */
 	    if (pl->recovery_count <= 0) {
 		if (Robot_check_leave(pl))

@@ -1060,7 +1060,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     if (pl->rectype < 2) {
 	if (BIT(world->rules->mode, TEAM_PLAY) && pl->team == TEAM_NOT_SET) {
-	    SET_BIT(pl->status, PAUSE);
+	    SET_BIT(pl->pl_status, PAUSE);
 	    pl->mychar = 'P';
 	    pl->home_base = NULL;
 	    pl->team = 0;
@@ -1531,6 +1531,30 @@ static int Send_self_items(connection_t *connp, player_t *pl)
     return 5 + item_count;
 }
 
+#if 0
+static char *status2str(int status)
+{
+    static char buf[256];
+
+    buf[0] = '\0';
+
+    if (status & PLAYING)
+	strlcat(buf, "PLAYING ", sizeof(buf));
+    if (status & PAUSE)
+	strlcat(buf, "PAUSE ", sizeof(buf));
+    if (status & GAME_OVER)
+	strlcat(buf, "GAME_OVER ", sizeof(buf));
+    if (status & WANT_AUDIO)
+	strlcat(buf, "WANT_AUDIO ", sizeof(buf));
+    if (status & THRUSTING)
+	strlcat(buf, "THRUSTING ", sizeof(buf));
+    if (status & KILLED)
+	strlcat(buf, "KILLED ", sizeof(buf));
+
+    return buf;
+}
+#endif
+
 /*
  * Send all frame data related to the player self and his HUD.
  */
@@ -1540,10 +1564,14 @@ int Send_self(connection_t *connp,
 	      int lock_dist,
 	      int lock_dir,
 	      int autopilotlight,
-	      long status,
+	      int status,
 	      char *mods)
 {
     int n;
+
+#if 0
+    warn("status bits = %s", status2str(status));
+#endif
 
     /* assumes connp->version >= 0x4203 */
     n = Packet_printf(&connp->w,
@@ -1572,7 +1600,7 @@ int Send_self(connection_t *connp,
 		      connp->view_width, connp->view_height,
 		      connp->debris_colors,
 
-		      (u_byte)status,
+		      (uint8_t)status,
 		      autopilotlight
 	);
     if (n <= 0)
@@ -3050,7 +3078,7 @@ static int Receive_pointer_move(connection_t *connp)
 	return n;
     }
     pl = Player_by_id(connp->id);
-    if (BIT(pl->status, HOVERPAUSE))
+    if (BIT(pl->pl_status, HOVERPAUSE))
 	return 1;
 
     if (FEATURE(connp, F_CUMULATIVETURN)) {

@@ -67,7 +67,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	|| (options.laserIsStunGun == true
 	    && options.allowLaserModifiers == false)) {
 	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
-	    || BIT(pl->status, THRUSTING)) {
+	    || BIT(pl->pl_status, THRUSTING)) {
 	    if (kp)
 		Set_message_f("%s got paralysed by %s's stun laser.%s",
 			      pl->name, kp->name,
@@ -77,7 +77,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 
 	    CLR_BIT(pl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
-	    CLR_BIT(pl->status, THRUSTING);
+	    CLR_BIT(pl->pl_status, THRUSTING);
 	    pl->stunned += 5;
 	}
     } else if (BIT(pulse->mods.laser, BLIND)) {
@@ -89,7 +89,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	Player_add_fuel(pl, ED_LASER_HIT);
 	if (!BIT(pl->used, HAS_SHIELD)
 	    && !BIT(pl->have, HAS_ARMOR)) {
-	    SET_BIT(pl->status, KILLED);
+	    SET_BIT(pl->pl_status, KILLED);
 	    if (kp) {
 		Set_message_f("%s got roasted alive by %s's laser.%s",
 			      pl->name, kp->name,
