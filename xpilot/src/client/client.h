@@ -385,8 +385,8 @@ typedef struct {
     /* a selection in the talk window */
     struct {
         bool    state;	/* current state of the selection */
-        int     x1;	/* string indices */
-        int     x2;
+        size_t  x1;	/* string indices */
+        size_t  x2;
         bool    incl_nl;/* include a `\n'? */
     } talk ;
     /* a selection in the draw window */
@@ -415,7 +415,7 @@ typedef enum {
 
 typedef struct {
     char		txt[MSG_LEN];
-    short		len;
+    size_t		len;
     /*short		pixelLen;*/
     double		lifeTime;
     msg_bms_t		bmsinfo;
