@@ -23,13 +23,6 @@
 #include "sdlinit.h"
 #include "sdlmeta.h"
 
-#ifdef _WINDOWS
-/* from win32hacks.c */
-extern int Winsock_init();
-extern void Winsock_cleanup();
-#endif
-
-
 static void Main_shutdown(void)
 {
     Net_cleanup();
