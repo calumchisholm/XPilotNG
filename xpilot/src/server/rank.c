@@ -477,10 +477,9 @@ Import_Oldest(FILE *file)
 	    scores[i].entry.ballsWon = nodes[i].ballsWon;
 	    scores[i].entry.ballsCashed = nodes[i].ballsCashed;
 	    scores[i].entry.bestball = nodes[i].bestball;
-	    if (scores[i].entry.bestball == 0) {
+	    if (scores[i].entry.bestball == 0)
 		/* Support for loading an even older score file. */
 		scores[i].entry.bestball = 65535;
-	    }
 	    scores[i].pl = NULL;
 	}
 	free(nodes);
@@ -543,9 +542,8 @@ Rank_init_saved_scores(void)
 		node->score = (DFLOAT)((int32_t)ntohl(node->entry.disk_score))
 			/ 65536.0;
 		/* Fix buggy first implementation... */
-		if (node->score >= 65000) {
+		if (node->score >= 65000)
 		    node->score -= 65536;
-		}
 		node->pl = NULL;
 	    }
 	    fclose(file);
@@ -587,9 +585,8 @@ Rank_get_saved_score(player *pl)
 		return;
 	    
 	    }
-	} else if (score->entry.timestamp < scores[oldest].entry.timestamp) {
+	} else if (score->entry.timestamp < scores[oldest].entry.timestamp)
 	    oldest = i;
-	}
     }
 
     /* Didn't find it, use the least-recently-used node. */
@@ -624,9 +621,8 @@ Rank_write_score_file(void)
     int actual;
     int i;
 
-    if (!xpilotscorefile) {
+    if (!xpilotscorefile)
 	return;
-    }
     actual = snprintf(tmpfile, sizeof(tmpfile), "%s-new", xpilotscorefile);
     if (actual < strlen(xpilotscorefile) || actual > sizeof(tmpfile)) {
 	/* Use a shorter path-name and be happy... */
@@ -634,9 +630,8 @@ Rank_write_score_file(void)
     }
 
     file = fopen(tmpfile, "w");
-    if (file == NULL) {
+    if (file == NULL)
 	return;
-    }
 
     memcpy(head.magic, RANK_MAGIC, 4);
     head.version = htonl(RANK_VER_CURRENT);

@@ -216,6 +216,8 @@ int CheckButtonEvent(XEvent *event)
 			      event->xbutton.x < b->width &&
 			      event->xbutton.y < b->height) ? True : False);
 	return(1);
+    default:
+	break;
     }
 
     return(0);

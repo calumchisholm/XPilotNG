@@ -209,6 +209,10 @@ static void Xpmap_place_cannon(int x, int y, int dir, bool create)
 	pos.cx = (x + 0.5) * BLOCK_CLICKS;
 	pos.cy = (y + 0.667) * BLOCK_CLICKS;
 	break;
+    default:
+ 	/* can't happen */
+	assert(0 && "Unknown cannon direction.");
+	break;
     }
 
     World.block[x][y] = CANNON;
@@ -728,6 +732,10 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
 	pos[1].cy = cy + (BLOCK_CLICKS - 1);
 	pos[2].cx = cx;
 	pos[2].cy = cy + (BLOCK_CLICKS - 1);
+	break;
+    default:
+ 	/* can't happen */
+	assert(0 && "Unknown cannon direction.");
 	break;
     }
     pos[3] = pos[0];

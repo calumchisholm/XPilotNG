@@ -305,7 +305,7 @@ int Handle_target(int num, int dead_time, int damage)
     if (dead_time == 0
 	&& (damage < 1
 	|| damage > TARGET_DAMAGE)) {
-	printf ("BUG target %d, dead %d, damage %d\n", num, dead_time, damage);
+	warn("BUG target %d, dead %d, damage %d", num, dead_time, damage);
     }
     if (targets[num].dead_time > 0 && dead_time == 0) {
 	int pos = targets[num].pos;
@@ -793,6 +793,7 @@ static int Map_init(void)
 	case 2: num_cannons++; break;
 	case 3: num_targets++; break;
 	case 4: num_bases++; break;
+	default: break;
 	}
     }
     if (num_bases != 0) {
@@ -862,6 +863,8 @@ static int Map_init(void)
 	case 5:
 	    checks[type - SETUP_CHECK].pos = i;
 	    Setup->map_data[i] = SETUP_CHECK;
+	    break;
+	default:
 	    break;
 	}
     }

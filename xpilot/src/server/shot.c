@@ -614,9 +614,9 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    break;
 
 	case OBJ_SMART_SHOT:
-	    if (pl == NULL) {
+	    if (pl == NULL)
 		lock = target_id;
-	    } else {
+	    else {
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
 		    && BIT(World.rules->mode, LIMITED_VISIBILITY))
@@ -631,6 +631,9 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	case OBJ_TORPEDO:
 	    lock = NO_ID;
 	    fuse = 8;
+	    break;
+
+	default:
 	    break;
 	}
 
@@ -1301,6 +1304,9 @@ void Delete_shot(int ind)
 		    addMine = 1;
 	    }
 	    break;
+
+	default:
+	    break;
 	}
 
 	World.items[shot->info].num--;
@@ -1726,6 +1732,7 @@ void Update_missile(missileobject *shot)
 	    if (xi < 0 || xi >= World.x || yi < 0 || yi >= World.y)
 		break;
 
+	    /* kps - fix */
 	    if (!is_polygon_map) {
 		switch(World.block[xi][yi]) {
 		case TARGET:
@@ -1737,11 +1744,15 @@ void Update_missile(missileobject *shot)
 		case REC_LD:
 		case REC_RD:
 		case CANNON:
-		    if (range > (SMART_SHOT_LOOK_AH-i)*(BLOCK_SZ/BLOCK_PARTS)) {
+		    if (range
+			> (SMART_SHOT_LOOK_AH-i)*(BLOCK_SZ/BLOCK_PARTS)) {
 			if (shot_speed > SMART_SHOT_MIN_SPEED)
 			    shot_speed -= acc * (SMART_SHOT_DECFACT+1);
 		    }
 		    foundw = 1;
+		    break;
+		default:
+		    break;
 		}
 	    }
 	}

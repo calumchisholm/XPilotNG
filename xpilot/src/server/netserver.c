@@ -3192,6 +3192,9 @@ static int Receive_modifier_bank(connection_t *connp)
 		    if (*cp == 'B' || *cp == 'b')
 			SET_BIT(mods.laser, BLIND);
 		    break;
+		default:
+		    /* Ignore unknown modifiers. */
+		    break;
 		}
 	    }
 	}

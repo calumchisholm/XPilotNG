@@ -926,6 +926,10 @@ int Init_playing_windows(void)
 	p_draw = draw;
 	Paint_sliding_radar();
 	break;
+
+    default:
+	assert(0 && "Init_playing_windows: unknown dbuf state type.");
+	break;
     }
 
     XAutoRepeatOff(dpy);	/* We don't want any autofire, yet! */
@@ -957,8 +961,8 @@ int Init_playing_windows(void)
 	XSync(kdpy, False);
     }
 #else
-	/* WinXSetEvent(players, WM_PAINT, WinXPaintPlayers); */
-	pointerControlCursor = !None;
+    /* WinXSetEvent(players, WM_PAINT, WinXPaintPlayers); */
+    pointerControlCursor = !None;
 #endif
 
     Init_spark_colors();

@@ -451,9 +451,8 @@ static int xpm_colors_to_pixels(XPM *xpm, enum XPM_key key,
 	    if (xpm->colors[i].keys[k]) {
 		color_name = xpm->colors[i].keys[k];
 		if (XParseColor(dpy, DefaultColormap(dpy, DefaultScreen(dpy)),
-				color_name, &xcolor)) {
+				color_name, &xcolor))
 		    break;
-		}
 		printf("Can't parse color \"%s\"\n", color_name);
 		color_name = NULL;
 	    }
@@ -462,10 +461,10 @@ static int xpm_colors_to_pixels(XPM *xpm, enum XPM_key key,
 	    for (k = key + 1; k <= XPM_c; k++) {
 		if (xpm->colors[i].keys[k]) {
 		    color_name = xpm->colors[i].keys[k];
-		    if (XParseColor(dpy, DefaultColormap(dpy, DefaultScreen(dpy)),
-				    color_name, &xcolor)) {
+		    if (XParseColor(dpy,
+				    DefaultColormap(dpy, DefaultScreen(dpy)),
+				    color_name, &xcolor))
 			break;
-		    }
 		    printf("Can't parse color \"%s\"\n", color_name);
 		    color_name = NULL;
 		}
@@ -473,12 +472,10 @@ static int xpm_colors_to_pixels(XPM *xpm, enum XPM_key key,
 	}
 	if (!color_name) {
 	    if (xpm->colors[i].keys[XPM_s]
-		&& !strcmp(xpm->colors[i].keys[XPM_s], "None")) {
+		&& !strcmp(xpm->colors[i].keys[XPM_s], "None"))
 		pixels[i] = colors[BLACK].pixel;
-	    }
-	    else {
+	    else
 		return -1;
-	    }
 	}
 	else {
             if (!fullColor) {

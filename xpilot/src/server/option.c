@@ -728,10 +728,9 @@ static void Option_parse_node(hash_node *np)
     if (value == NULL) {
 	/* no value has been set, so get the option default value. */
 	value = desc->defaultValue;
-	if (value == NULL) {
+	if (value == NULL)
 	    /* no value at all.  (mapData or serverHost.) */
 	    return;
-	}
     }
 
     if (!desc->variable) {
@@ -834,6 +833,9 @@ static void Option_parse_node(hash_node *np)
 	    Convert_string_to_list(value, list_ptr);
 	    break;
 	}
+    default:
+	warn("Option_parse_node: unknown option type.");
+	break;
     }
 }
 
@@ -846,13 +848,11 @@ static void Options_parse_expand(void)
     hash_node	*np;
 
     np = Get_hash_node_by_name("expand");
-    if (np == NULL) {
+    if (np == NULL)
 	dumpcore("Could not find option hash node for option '%s'.",
 		 "expand");
-    }
-    else {
+    else
 	Option_parse_node(np);
-    }
 
     if (expandList != NULL) {
 	char *name;
@@ -876,10 +876,9 @@ static void Options_parse_FPS(void)
     if (fpsstr != NULL) {
 	int		frames;
 
-	if (Convert_string_to_int(fpsstr, &frames) != true) {
+	if (Convert_string_to_int(fpsstr, &frames) != true)
 	    warn("Invalid framesPerSecond specification '%s' in %s.",
 		fpsstr, Origin_name(value_origin));
-	}
 	else
 	    framesPerSecond = frames;
     }
@@ -916,10 +915,9 @@ void Options_parse(void)
 
     for (i = 0; i < option_count; i++) {
 	np = Get_hash_node_by_name(options[i].name);
-	if (np == NULL) {
+	if (np == NULL)
 	    dumpcore("Could not find option hash node for option '%s'.",
 		     options[i].name);
-	}
 	else
 	    Option_parse_node(np);
     }

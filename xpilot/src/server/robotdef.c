@@ -1253,6 +1253,9 @@ static int Rank_item_value(player *pl, long itemtype)
 	case ITEM_DEFLECTOR:	/* cost too much fuel */
 	case ITEM_ARMOR:	/* makes you heavier */
 	    return ROBOT_IGNORE_ITEM;
+	default:		/* unknown */
+	    warn("Rank_item_value: unknown item.");
+	    return ROBOT_IGNORE_ITEM;
 	}
     } else {
 	switch (itemtype) {

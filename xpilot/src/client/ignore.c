@@ -202,6 +202,9 @@ void executeCommand(char *talk_str)
     case 7:			/* h */
 	print_help(argument);
 	break;
+    default:
+	warn("BUG: bad command num in executeCommand()");
+	break;
     }
 }
 
@@ -220,7 +223,7 @@ void crippleTalk(char *msg)
     msgEnd = i - 1;
 
     for (i = 0; i < msgEnd; i++) {
-	if (isalpha((int)msg[i]) || isdigit((int)msg[i]))
+	if (isalpha(msg[i]) || isdigit(msg[i]))
 	    msg[i] = '*';
     }
 }

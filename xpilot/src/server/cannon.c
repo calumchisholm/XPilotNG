@@ -256,6 +256,9 @@ static void Cannon_defend(cannon_t *c, int defense)
 	c->item[ITEM_PHASING]--;
 	sound_play_sensors(c->pos, PHASING_ON_SOUND);
 	break;
+    default:
+	warn("Cannon_defend: Unknown defense.");
+	break;
     }
 }
 
@@ -308,8 +311,6 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 {
     int		speed = ShotsSpeed;
     int		range = CANNON_SHOT_LIFE_MAX * speed;
-    int		cx = c->pos.cx;
-    int		cy = c->pos.cy;
     int		visualrange = (int)(CANNON_DISTANCE
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
     bool	found = false, ready = false;
@@ -327,13 +328,12 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	break;
     case CW_ECM:
 	/* smarter cannons wait a little longer before firing an ECM */
-	if (cannonSmartness > 1) {
+	if (cannonSmartness > 1)
 	    range = (int)((ECM_DISTANCE / cannonSmartness
 		     + (int)(rfrac() * (int)(ECM_DISTANCE
 				       - ECM_DISTANCE / cannonSmartness))));
-	} else {
+	else
 	    range = (int)ECM_DISTANCE;
-	}
 	break;
     case CW_TRACTORBEAM:
 	range = TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]);
@@ -351,16 +351,19 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	    range *= 2;
 	}
 	break;
+    default:
+	/* no need to do anything specail for this weapon. */
+	break;
     }
 
     for (i = 0; i < NumPlayers && !ready; i++) {
 	player *pl = Players(i);
 	int tdist, tdx, tdy;
 
-	tdx = WRAP_DCX(pl->pos.cx - cx) / CLICK;
+	tdx = WRAP_DCX(pl->pos.cx - c->pos.cx) / CLICK;
 	if (ABS(tdx) >= visualrange)
 	    continue;
-	tdy = WRAP_DCY(pl->pos.cy - cy) / CLICK;
+	tdy = WRAP_DCY(pl->pos.cy - c->pos.cy) / CLICK;
 	if (ABS(tdy) >= visualrange)
 	    continue;
 	tdist = (int)LENGTH(tdx, tdy);
@@ -405,8 +408,8 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 				+ pl->acc.y * time * time * CLICK);
 		int tdir;
 
-		tdx = WRAP_DCX(npx - cx) / CLICK;
-		tdy = WRAP_DCY(npy - cy) / CLICK;
+		tdx = WRAP_DCX(npx - c->pos.cx) / CLICK;
+		tdy = WRAP_DCY(npy - c->pos.cy) / CLICK;
 		tdir = (int)findDir(tdx, tdy);
 		ddir = MOD2(tdir - c->dir, RES);
 		if ((ddir < (CANNON_SPREAD * 0.5)
@@ -439,11 +442,10 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	break;
     case 2:
 	ddir = MOD2(*dir - c->dir, RES);
-	if (ddir > (CANNON_SPREAD * 0.5) && ddir < RES / 2) {
+	if (ddir > (CANNON_SPREAD * 0.5) && ddir < RES / 2)
 	    *dir = (int)(c->dir + (CANNON_SPREAD * 0.5) + 3);
-	} else if (ddir < RES - (CANNON_SPREAD * 0.5) && ddir > RES / 2) {
+	else if (ddir < RES - (CANNON_SPREAD * 0.5) && ddir > RES / 2)
 	    *dir = (int)(c->dir - (CANNON_SPREAD * 0.5) - 3);
-	}
 	*dir += (int)(rfrac() * 7) - 3;
 	break;
     case 3:
@@ -693,14 +695,12 @@ void Cannon_dies(cannon_t *c, player *pl)
     if (pl) {
 	if (cannonPoints > 0) {
 	    if (BIT(World.rules->mode, TEAM_PLAY)
-		&& teamCannons) {
+		&& teamCannons)
 		TEAM_SCORE(c->team, -cannonPoints);
-	    }
 	    if (pl->score <= cannonMaxScore
 		&& !(BIT(World.rules->mode, TEAM_PLAY)
-		     && pl->team == c->team)) {
+		     && pl->team == c->team))
 		Score(pl, cannonPoints, c->pos, "");
-	    }
 	}
     }
 }

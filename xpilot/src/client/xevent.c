@@ -703,6 +703,11 @@ void xevent_keyboard(int queued)
 	    case MappingNotify:
 		XRefreshKeyboardMapping(&event.xmapping);
 		break;
+
+	    default:
+		warn("Unknown event type (%d) in xevent_keyboard",
+		     event.type);
+		break;
 	    }
 	}
     }

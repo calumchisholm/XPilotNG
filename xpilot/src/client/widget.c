@@ -1134,7 +1134,8 @@ int Widget_event(XEvent *event)
     widget_arrow_t	*arroww;
     widget_slider_t	*sliderw;
 
-    /* xpprintf("Widget_event type=%d w=%d\n", event->type, event->xany.window); */
+    /* xpprintf("Widget_event type=%d w=%d\n",
+       event->type, event->xany.window); */
 
     if (!widgets)
 	return(0);
@@ -1227,6 +1228,10 @@ int Widget_event(XEvent *event)
 			if (strcmp(widgets[i].name, "popup_viewer") == 0)
 			    Widget_resize_viewer(event, i);
 		    }
+		    break;
+		default:
+		    warn("Unknown event type (%d) in Widget_event()",
+			 event->type);
 		    break;
 		}
 		return 1;

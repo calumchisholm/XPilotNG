@@ -1191,6 +1191,9 @@ static void Net_measurement(long loop, int status)
 	    case PACKET_DROP:
 		packet_drop++;
 		break;
+	    default:
+		/* no drop or loss */
+		break;
 	    }
 	    packet_measure[i] = PACKET_LOSS;
 	}
@@ -1214,16 +1217,16 @@ static void Net_lag_measurement(long key_ack)
 	    && keyboard_acktime[i] == -1) {
 	    keyboard_acktime[i] = loops;
 #if 0
-	    printf("A;%d;%ld;%ld ", i, keyboard_change[i], keyboard_acktime[i]);
+	    printf("A;%d;%ld;%ld ",
+		   i, keyboard_change[i], keyboard_acktime[i]);
 #endif
 	    break;
 	}
     }
 
 #if 0
-    if (i == KEYBOARD_STORE) {
+    if (i == KEYBOARD_STORE)
 	printf("N ");
-    }
 #endif
 
     num = 0;
@@ -1297,7 +1300,7 @@ static int Net_read(frame_buf_t *frame)
 	     */
 	}
     }
-	/*IFWINDOWS( Trace("Net_read: wbuf->len=%d\n", wbuf.len) );*/
+    /*IFWINDOWS( Trace("Net_read: wbuf->len=%d\n", wbuf.len) );*/
 }
 
 /*
@@ -1319,7 +1322,7 @@ int Net_input(void)
     for (i = 0; i < receive_window_size; i++) {
 	frame = &Frames[i];
 	if (!frame)
-		continue;
+	    continue;
 	if (frame->loops != 0) {
 	    /*
 	     * Already contains a frame.
@@ -1377,9 +1380,10 @@ int Net_input(void)
 	}
 	if ((i == receive_window_size - 1 && i > 0)
 #ifdef _WINDOWS
-		|| drawPending
-		|| (ThreadedDraw &&
-				!WaitForSingleObject(dinfo.eventNotDrawing, 0) == WAIT_OBJECT_0)
+	    || drawPending
+	    || (ThreadedDraw &&
+		!WaitForSingleObject(dinfo.eventNotDrawing, 0)
+		== WAIT_OBJECT_0)
 #endif
 		) {
 	    /*

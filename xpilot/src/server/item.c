@@ -661,20 +661,18 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	break;
     case ITEM_MISSILE:
 	amount = MIN(victim->item[item], 3);
-	if (amount == 1) {
+	if (amount == 1)
 	    sprintf(msg, "%s stole a missile from %s.",
 		    (pl ? pl->name : "A cannon"), victim->name);
-	} else {
+	else
 	    sprintf(msg, "%s stole %ld missiles from %s",
 		    (pl ? pl->name : "A cannon"), amount, victim->name);
-	}
         break;
     case ITEM_CLOAK:
 	what = "a cloaking device";
 	victim->updateVisibility = 1;
-	if (!victim->item[item]) {
+	if (!victim->item[item])
 	    Cloak(victim, false);
-	}
         break;
     case ITEM_WIDEANGLE:
 	what = "a wideangle";
@@ -707,9 +705,8 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	break;
     case ITEM_DEFLECTOR:
 	what = "a deflector";
-	if (!victim->item[item]) {
+	if (!victim->item[item])
 	    Deflector(victim, false);
-	}
         break;
     case ITEM_HYPERJUMP:
 	what = "a hyperjump";
@@ -778,13 +775,15 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	}
 	Add_fuel(&(victim->fuel), -amount);
         break;
+    default:
+	warn("Do_general_transporter: unknown item type.");
+	break;
     }
 
     /* inform the world about the robbery */
-    if (!msg[0]) {
+    if (!msg[0])
 	sprintf(msg, "%s stole %s from %s.", (pl ? pl->name : "A cannon"),
 		what, victim->name);
-    }
     Set_message(msg);
 
     /* cannons take care of themselves */
@@ -1017,6 +1016,8 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	    if (mine->count <= 0)
 		CLR_BIT(mine->status, CONFUSED);
 	    break;
+	default:
+	    break;
 	}
     }
 
@@ -1105,9 +1106,9 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 		    if (BIT(shot->type, OBJ_BALL)) {
 			ballobject *ball = BALL_PTR(shot);
 			if (ball->owner == p->id) {
-			    if ((int)(rfrac() * 100.0f) < ((int)(20*range)+5)) {
+			    if ((int)(rfrac() * 100.0f)
+				< ((int)(20*range)+5))
 				Detach_ball(p, ball);
-			    }
 			}
 		    }
 		}

@@ -825,6 +825,9 @@ int Handle_keyboard(player *pl)
 			    CLR_BIT(pl->used, HAS_SHIELD);
 		    }
 		    break;
+		default:
+		    warn("Handle_keyboard: unknown pause type %d.", i);
+		    break;
 		}
 		break;
 

@@ -443,6 +443,9 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	x -= BORDER + (other ? other->name_width : 0) + size;
 	y += -WINSCALE(BLOCK_SZ / 2) + gameFont->ascent / 2;
 	break;
+    default:
+	warn("BUG: bad base setup type in Gui_paint_base()");
+	break;
     }
 
     if (other && BIT(instruments, SHOW_EXTRA_BASE_INFO)) {

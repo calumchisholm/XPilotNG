@@ -769,7 +769,8 @@ static void Player_collides_with_item(player *pl, object *obj)
     else if (IsDefensiveItem((enum Item) obj->info)) {
 	int def_items = CountDefensiveItems(pl);
 	if (def_items >= maxDefensiveItems) {
-	    /* Set_player_message(pl, "No space for left for defensive items."); */
+	    /* Set_player_message(pl,
+	       "No space for left for defensive items."); */
 	    Delta_mv((object *)pl, obj);
 	    return;
 	}
@@ -922,6 +923,9 @@ static void Player_collides_with_item(player *pl, object *obj)
 	break;
     case NUM_ITEMS:
 	/* impossible */
+	break;
+    default:
+	warn("Player_collides_with_item: unknown item.");
 	break;
     }
 
@@ -1115,6 +1119,8 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	case OBJ_SMART_SHOT:
 	    sound_play_sensors(pl->pos, PLAYER_EAT_SMART_SHOT_SOUND);
 	    break;
+	default:
+	    break;
 	}
 
 	switch(obj->type) {
@@ -1161,7 +1167,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    break;
 
 	default:
-	    xpprintf("%s You were hit by what?\n", showtime());
+	    warn("Player hit by unknown object type %d.", obj->type);
 	    break;
 	}
 
@@ -1560,6 +1566,8 @@ static void BallCollision(void)
 	    case OBJ_WRECKAGE:
 		Delta_mv(OBJ_PTR(ball), obj);
 		obj->life = 0;
+		break;
+	    default:
 		break;
 	    }
 	}

@@ -196,13 +196,13 @@ typedef struct tile_list {
 } tile_list_t;
 
 struct errorwin {
-    Window		win;			/* Error display window */
-    GC			gc;			/* GC for drawing therein */
-    XFontStruct		*font;			/* Font to use */
-    char		message[4096];		/* Current error message */
-    int			len;			/* length thereof */
-    Button		but;			/* OK button */
-    Bool		grabbed;		/* Have we grabbed the pointer ? */
+    Window		win;		/* Error display window */
+    GC			gc;		/* GC for drawing therein */
+    XFontStruct		*font;		/* Font to use */
+    char		message[4096];	/* Current error message */
+    int			len;		/* length thereof */
+    Button		but;		/* OK button */
+    Bool		grabbed;	/* Have we grabbed the pointer ? */
 };
 
 struct recordwin {
@@ -950,6 +950,9 @@ static void FreeShapes(struct shape *shp)
 		   shp->shape.segments.nsegments * sizeof(XSegment),
 		   MEM_POINT);
 	    break;
+
+	default:
+	    break;
 	}
 
 	shp->type = 0;
@@ -1231,6 +1234,9 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 
 	    case RC_DAMAGED:
 		shp->shape.damage.damaged = RReadByte(rc->fp);
+		break;
+
+	    default:
 		break;
 	    }
 	    break;
@@ -1549,11 +1555,12 @@ static void drawShapes(struct frame *f, XID drawable, struct xprc *rc)
 	    break;
 
 	case RC_DAMAGED:
-	    if (sp->shape.damage.damaged) {
+	    if (sp->shape.damage.damaged)
 		XFillRectangle(dpy, drawable, rc->gc,
-			       0, 0,
-			       f->width, f->height);
-	    }
+			       0, 0, f->width, f->height);
+	    break;
+
+	default:
 	    break;
 
 	}
@@ -2087,7 +2094,10 @@ static void redrawLabel(struct xui *ui, struct xprc *rc, struct label *lb)
 	break;
 
     case LABEL_STRING:
-	strcpy(value_str,lb->data.s);
+	strcpy(value_str, lb->data.s);
+	break;
+
+    default:
 	break;
     }
 
@@ -2900,6 +2910,9 @@ static void WriteFrame(struct xprc *rc, struct frame *f, FILE *fp)
 	    RWriteGC(rc, sp->gc, fp);
 	    RWriteByte(sp->shape.damage.damaged, fp);
 	    break;
+
+	default:
+	    break;
 	}
     }
 
@@ -3102,6 +3115,8 @@ static void dox(struct xui *ui, struct xprc *rc)
 		case 'Q':
 		    XFreeGC(dpy, rc->gc);
 		    return;
+		default:
+		    break;
 		}
 
 	    default:
@@ -3227,11 +3242,10 @@ static void TestInput(struct xprc *rc)
 	    rc->seekable = 0;
 	}
 	if (ch0 == 0x1F && ch1 == 0x8B) {
-	    if (verbose) {
+	    if (verbose)
 		fprintf(stderr,
 			"%s: \"%s\" is in gzip format, starting gzip...\n",
 			*Argv, rc->filename);
-	    }
 	    lseek(fd, 0L, SEEK_SET);
 	    if (rc->fp == stdin)
 		sprintf(buf, "gzip -d");
@@ -3266,13 +3280,11 @@ static void TestInput(struct xprc *rc)
 	}
     }
     if (!rc->seekable) {
-	if (verbose) {
+	if (verbose)
 	    fprintf(stderr,
 		    "Input is not a regular file, this may result\n"
 		    "in limited reverse playback functionality.\n");
-	}
-    }
-    else {
+    } else {
 	if (max_mem > 1 * 1024 * 1024)
 	    max_mem = 1 * 1024 * 1024;
     }
@@ -3483,6 +3495,8 @@ static void rewindCallback(void *data)
     case STATE_PAUSED:
 	frameStep -= 10;
 	break;
+    default:
+	break;
     }
 }
 
@@ -3496,6 +3510,8 @@ static void fastfCallback(void *data)
 	break;
     case STATE_PAUSED:
 	frameStep += 10;
+	break;
+    default:
 	break;
     }
 }
@@ -3511,6 +3527,8 @@ static void playCallback(void *data)
     case STATE_PAUSED:
 	frameStep++;
 	break;
+    default:
+	break;
     }
 }
 
@@ -3524,6 +3542,8 @@ static void revplayCallback(void *data)
 	break;
     case STATE_PAUSED:
 	frameStep--;
+	break;
+    default:
 	break;
     }
 }
