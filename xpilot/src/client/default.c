@@ -452,10 +452,15 @@ static bool Set_showTexturedWalls(xp_option_t *opt, bool val)
 {
     UNUSED_PARAM(opt);
     instruments.showTexturedWalls = val;
-    if (oldServer && Setup) {
-	/* don't bother to check if recalculations are really needed. */
-	Map_restore(0, 0, Setup->x, Setup->y);
-	Map_blue(0, 0, Setup->x, Setup->y);
+
+    if (Setup) {
+	if (oldServer) {
+	    /* don't bother to check if recalculations are really needed. */
+	    Map_restore(0, 0, Setup->x, Setup->y);
+	    Map_blue(0, 0, Setup->x, Setup->y);
+	}
+	else
+	    Mapdata_setup(Setup->data_url);
     }
     return true;
 }

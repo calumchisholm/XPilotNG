@@ -8,18 +8,6 @@ affected:
 
 -----------------------------------------------------------------
 
-
-Problem : Joining a game with textures turned off (walls or objects)
-	  and then trying to turn them on in game, does not work!
-Found by: Colonel Blood
-Solution:
-Fixed by:
-Files 
-affected:
-
------------------------------------------------------------------
-
-
 Problem : Items that form in target areas of the map that has been destroyed,
 	  remain after the targets reform.
 	  A player can also get trapped within a target area if they reform on
@@ -139,6 +127,19 @@ affected:
 FIXED:
 
 -----------------------------------------------------------------
+Problem : Joining a game with textures turned off (walls or objects)
+	  and then trying to turn them on in game, does not work!
+Found by: Colonel Blood
+Solution: Call Mapdata_setup when texturedwalls is changed to true.
+	  Note that if textures aren't yet downloaded, client will
+	  freeze while download is done.
+Fixed by: kps
+Files 
+affected: src/client/mapdata.c src/client/default.c
+
+-----------------------------------------------------------------
+
+
 Problem :Bouncing laser shots dont kill yourself possibly make your 
 	 own lasers deadly to your self or atleast an option that 
 	 stipulates that, along with an option for 

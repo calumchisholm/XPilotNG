@@ -40,6 +40,7 @@ static int Mapdata_download(const URL *url, const char *filePath);
 static int Url_parse(const char *urlstr, URL *url);
 static void Url_free_parsed(URL *url);
 
+static bool setup_done = false;
 
 int Mapdata_setup(const char *urlstr)
 {
@@ -47,6 +48,9 @@ int Mapdata_setup(const char *urlstr)
     const char *name, *dir;
     char path[1024], buf[1024], *ptr;
     int rv = false;
+
+    if (setup_done)
+	return true;
 
     memset(path, 0, sizeof(path));
     memset(buf, 0, sizeof(buf));
@@ -154,6 +158,7 @@ int Mapdata_setup(const char *urlstr)
     }
 
     rv = true;
+    setup_done = true;
 
  end:
     Url_free_parsed(&url);
