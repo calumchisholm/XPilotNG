@@ -495,6 +495,8 @@ int Find_closest_team(clpos pos);
 /*
  * Prototypes for xpmap.c
  */
+void Setup_old_blockmap(world_t *world);
+setup_t *Init_setup_old(world_t *world);
 void Xpmap_print(void);
 void Xpmap_grok_map_data(void);
 void Xpmap_allocate_checks(void);

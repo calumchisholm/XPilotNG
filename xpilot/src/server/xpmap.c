@@ -25,11 +25,14 @@
 
 char xpmap_version[] = VERSION;
 
+static int Compress_map(unsigned char *map, size_t size);
 
 static void Xpmap_treasure_to_polygon(int treasure_ind);
 static void Xpmap_target_to_polygon(int target_ind);
 static void Xpmap_cannon_to_polygon(int cannon_ind);
 static void Xpmap_wormhole_to_polygon(int wormhole_ind);
+
+static bool		compress_maps = true;
 
 static void Xpmap_extra_error(int line_num)
 {
@@ -60,6 +63,314 @@ static void Xpmap_missing_error(int line_num)
 	    xpprintf("And so on...\n");
     }
 }
+
+
+
+/*
+ * Compress the map data using a simple Run Length Encoding algorithm.
+ * If there is more than one consecutive byte with the same type
+ * then we set the high bit of the byte and then the next byte
+ * gives the number of repetitions.
+ * This works well for most maps which have lots of series of the
+ * same map object and is simple enough to got implemented quickly.
+ */
+static int Compress_map(unsigned char *map, size_t size)
+{
+    int			i, j, k;
+
+    for (i = j = 0; i < (int)size; i++, j++) {
+	if (i + 1 < (int)size
+	    && map[i] == map[i + 1]) {
+	    for (k = 2; i + k < (int)size; k++) {
+		if (map[i] != map[i + k])
+		    break;
+		if (k == 255)
+		    break;
+	    }
+	    map[j] = (map[i] | SETUP_COMPRESSED);
+	    map[++j] = k;
+	    i += k - 1;
+	} else
+	    map[j] = map[i];
+    }
+    return j;
+}
+
+
+void Setup_old_blockmap(world_t *world)
+{
+    int x;
+    unsigned char *map_line;
+    unsigned char **map_pointer;
+
+    world->block = (unsigned char **)
+	malloc(sizeof(unsigned char *) * world->x
+	       + world->x * sizeof(unsigned char) * world->y);
+
+    if (world->block == NULL) {
+	error("Couldn't allocate memory");
+	exit(-1);
+    }
+
+    map_pointer = world->block;
+    map_line = (unsigned char *) ((unsigned char **)map_pointer + world->x);
+
+    for (x = 0; x < world->x; x++) {
+	*map_pointer = map_line;
+	map_pointer += 1;
+	map_line += world->y;
+    }
+
+    /* Client will quit if it gets a nonexistent homebase, so create
+     * some bases to make it happy. Of course it's impossible to play
+     * with this, but at least we can tell the player what's wrong... */
+    if (mapData == NULL) {
+	mapData = malloc((size_t)world->NumBases + 1);
+	if (mapData == NULL) {
+	    error("Couldn't allocate memory");
+	    exit(-1);
+	}
+	for (x = 0; x < world->NumBases; x++)
+	    mapData[x] = '1';
+	mapData[world->NumBases] = 0;
+    }
+    Xpmap_grok_map_data();
+    Xpmap_tags_to_internal_data(false);
+}
+
+
+setup_t *Init_setup_old(world_t *world)
+{
+    int			i, x, y, team, type = -1,
+			wormhole = 0,
+			treasure = 0,
+			target = 0,
+			base = 0,
+			cannon = 0;
+    unsigned char	*mapdata, *mapptr;
+    size_t		size, numblocks;
+    setup_t		*setup;
+
+    if (is_polygon_map && world->block) {
+	free(world->block);
+	world->block = NULL;
+    }
+    if (world->block == NULL)
+	Setup_old_blockmap(world);
+
+    numblocks = world->x * world->y;
+    if ((mapdata = malloc(numblocks)) == NULL) {
+	error("No memory for mapdata");
+	return NULL;
+    }
+    memset(mapdata, SETUP_SPACE, numblocks);
+    mapptr = mapdata;
+    errno = 0;
+    for (x = 0; x < world->x; x++) {
+	for (y = 0; y < world->y; y++, mapptr++) {
+	    type = world->block[x][y];
+	    switch (type) {
+	    case ACWISE_GRAV:
+	    case CWISE_GRAV:
+	    case POS_GRAV:
+	    case NEG_GRAV:
+	    case UP_GRAV:
+	    case DOWN_GRAV:
+	    case RIGHT_GRAV:
+	    case LEFT_GRAV:
+		if (!gravityVisible)
+		    type = SPACE;
+		break;
+	    case WORMHOLE:
+		if (!wormholeVisible)
+		    type = SPACE;
+		break;
+	    case ITEM_CONCENTRATOR:
+		if (!itemConcentratorVisible)
+		    type = SPACE;
+		break;
+	    case ASTEROID_CONCENTRATOR:
+		if (!asteroidConcentratorVisible)
+		    type = SPACE;
+		break;
+	    case FRICTION:
+		if (!blockFrictionVisible)
+		    type = SPACE;
+		else
+		    type = DECOR_FILLED;
+		break;
+	    default:
+		break;
+	    }
+	    switch (type) {
+	    case SPACE:		*mapptr = SETUP_SPACE; break;
+	    case FILLED:	*mapptr = SETUP_FILLED; break;
+	    case REC_RU:	*mapptr = SETUP_REC_RU; break;
+	    case REC_RD:	*mapptr = SETUP_REC_RD; break;
+	    case REC_LU:	*mapptr = SETUP_REC_LU; break;
+	    case REC_LD:	*mapptr = SETUP_REC_LD; break;
+	    case FUEL:		*mapptr = SETUP_FUEL; break;
+	    case ACWISE_GRAV:	*mapptr = SETUP_ACWISE_GRAV; break;
+	    case CWISE_GRAV:	*mapptr = SETUP_CWISE_GRAV; break;
+	    case POS_GRAV:	*mapptr = SETUP_POS_GRAV; break;
+	    case NEG_GRAV:	*mapptr = SETUP_NEG_GRAV; break;
+	    case UP_GRAV:	*mapptr = SETUP_UP_GRAV; break;
+	    case DOWN_GRAV:	*mapptr = SETUP_DOWN_GRAV; break;
+	    case RIGHT_GRAV:	*mapptr = SETUP_RIGHT_GRAV; break;
+	    case LEFT_GRAV:	*mapptr = SETUP_LEFT_GRAV; break;
+	    case ITEM_CONCENTRATOR:
+		*mapptr = SETUP_ITEM_CONCENTRATOR; break;
+	    case ASTEROID_CONCENTRATOR:
+		*mapptr = SETUP_ASTEROID_CONCENTRATOR; break;
+	    case DECOR_FILLED:	*mapptr = SETUP_DECOR_FILLED; break;
+	    case DECOR_RU:	*mapptr = SETUP_DECOR_RU; break;
+	    case DECOR_RD:	*mapptr = SETUP_DECOR_RD; break;
+	    case DECOR_LU:	*mapptr = SETUP_DECOR_LU; break;
+	    case DECOR_LD:	*mapptr = SETUP_DECOR_LD; break;
+	    case WORMHOLE:
+		if (wormhole >= world->NumWormholes) {
+		    warn("Too many wormholes in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
+		switch (world->wormholes[wormhole++].type) {
+		case WORM_NORMAL: *mapptr = SETUP_WORM_NORMAL; break;
+		case WORM_IN:     *mapptr = SETUP_WORM_IN; break;
+		case WORM_OUT:    *mapptr = SETUP_WORM_OUT; break;
+		default:
+		    error("Bad wormhole (%d,%d).", x, y);
+		    free(mapdata);
+		    return NULL;
+		}
+		break;
+	    case TREASURE:
+		if (treasure >= world->NumTreasures) {
+		    warn("Too many treasures in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
+		team = world->treasures[treasure++].team;
+		if (team == TEAM_NOT_SET)
+		    team = 0;
+		*mapptr = SETUP_TREASURE + team;
+		break;
+	    case TARGET:
+		if (target >= world->NumTargets) {
+		    warn("Too many targets in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
+		team = world->targets[target++].team;
+		if (team == TEAM_NOT_SET)
+		    team = 0;
+		*mapptr = SETUP_TARGET + team;
+		break;
+	    case BASE:
+		if (base >= world->NumBases) {
+		    warn("Too many bases in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
+		team = world->bases[base].team;
+		if (team == TEAM_NOT_SET)
+		    team = 0;
+		switch (world->bases[base++].dir) {
+		case DIR_UP:    *mapptr = SETUP_BASE_UP + team; break;
+		case DIR_RIGHT: *mapptr = SETUP_BASE_RIGHT + team; break;
+		case DIR_DOWN:  *mapptr = SETUP_BASE_DOWN + team; break;
+		case DIR_LEFT:  *mapptr = SETUP_BASE_LEFT + team; break;
+		default:
+		    error("Bad base at (%d,%d).", x, y);
+		    free(mapdata);
+		    return NULL;
+		}
+		break;
+	    case CANNON:
+		if (cannon >= world->NumCannons) {
+		    warn("Too many cannons in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
+		switch (world->cannons[cannon++].dir) {
+		case DIR_UP:	*mapptr = SETUP_CANNON_UP; break;
+		case DIR_RIGHT:	*mapptr = SETUP_CANNON_RIGHT; break;
+		case DIR_DOWN:	*mapptr = SETUP_CANNON_DOWN; break;
+		case DIR_LEFT:	*mapptr = SETUP_CANNON_LEFT; break;
+		default:
+		    error("Bad cannon at (%d,%d).", x, y);
+		    free(mapdata);
+		    return NULL;
+		}
+		break;
+	    case CHECK:
+		for (i = 0; i < world->NumChecks; i++) {
+		    check_t *check = Checks(i);
+		    blpos bpos = Clpos_to_blpos(check->pos);
+		    if (x != bpos.bx || y != bpos.by)
+			continue;
+		    *mapptr = SETUP_CHECK + i;
+		    break;
+		}
+		if (i >= world->NumChecks) {
+		    error("Bad checkpoint at (%d,%d).", x, y);
+		    free(mapdata);
+		    return NULL;
+		}
+		break;
+	    default:
+		error("Unknown map type (%d) at (%d,%d).", type, x, y);
+		*mapptr = SETUP_SPACE;
+		break;
+	    }
+	}
+    }
+    if (!compress_maps) {
+	type = SETUP_MAP_UNCOMPRESSED;
+	size = numblocks;
+    } else {
+	type = SETUP_MAP_ORDER_XY;
+	size = Compress_map(mapdata, numblocks);
+	if (size <= 0 || size > numblocks) {
+	    warn("Map compression error (%d)", size);
+	    free(mapdata);
+	    return NULL;
+	}
+	if ((mapdata = (unsigned char *)realloc(mapdata, size)) == NULL) {
+	    error("Cannot reallocate mapdata");
+	    return NULL;
+	}
+    }
+
+    if (!silent) {
+	if (type != SETUP_MAP_UNCOMPRESSED) {
+	    xpprintf("%s Block map compression ratio is %-4.2f%%\n",
+		     showtime(), 100.0 * size / numblocks);
+	}
+    }
+
+    if ((setup = malloc(sizeof(setup_t) + size)) == NULL) {
+	error("No memory to hold oldsetup");
+	free(mapdata);
+	return NULL;
+    }
+    memset(setup, 0, sizeof(setup_t) + size);
+    memcpy(setup->map_data, mapdata, size);
+    free(mapdata);
+    setup->setup_size = ((char *) &setup->map_data[0]
+			 - (char *) setup) + size;
+    setup->map_data_len = size;
+    setup->map_order = type;
+    setup->lives = world->rules->lives;
+    setup->mode = world->rules->mode;
+    setup->x = world->x;
+    setup->y = world->y;
+    strlcpy(setup->name, world->name, sizeof(setup->name));
+    strlcpy(setup->author, world->author, sizeof(setup->author));
+
+    return setup;
+}
+
+
 
 
 /*
