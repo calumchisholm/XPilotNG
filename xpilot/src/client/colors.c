@@ -720,7 +720,7 @@ static unsigned long RGB_TC(u_byte r, u_byte g, u_byte b)
  * less color distance.
  */
 static void Fill_color_cube(int reds, int greens, int blues,
-			    XColor colors[256])
+			    XColor colorarray[256])
 {
     int			i, r, g, b;
 
@@ -728,11 +728,11 @@ static void Fill_color_cube(int reds, int greens, int blues,
     for (r = 0; r < reds; r++) {
 	for (g = 0; g < greens; g++) {
 	    for (b = 0; b < blues; b++, i++) {
-		colors[i].pixel = color_cube->pixels[i];
-		colors[i].flags = DoRed | DoGreen | DoBlue;
-		colors[i].red   = (((r * 256) + 128) / reds) * 0x101;
-		colors[i].green = (((g * 256) + 128) / greens) * 0x101;
-		colors[i].blue  = (((b * 256) + 128) / blues) * 0x101;
+		colorarray[i].pixel = color_cube->pixels[i];
+		colorarray[i].flags = DoRed | DoGreen | DoBlue;
+		colorarray[i].red   = (((r * 256) + 128) / reds) * 0x101;
+		colorarray[i].green = (((g * 256) + 128) / greens) * 0x101;
+		colorarray[i].blue  = (((b * 256) + 128) / blues) * 0x101;
 	    }
 	}
     }
@@ -752,7 +752,7 @@ static void Fill_color_cube(int reds, int greens, int blues,
 static int Colors_init_color_cube(void)
 {
     int			i, n, r, g, b;
-    XColor		colors[256];
+    XColor		colorarray[256];
 
     if (color_cube != NULL) {
 	error("Already a cube!\n");
@@ -788,14 +788,14 @@ static int Colors_init_color_cube(void)
 
 	color_cube->mustfree = 1;
 
-	Fill_color_cube(r, g, b, &colors[0]);
+	Fill_color_cube(r, g, b, &colorarray[0]);
 
 	XStoreColors(dpy,
 		     (colormap != 0)
 			 ? colormap
 			 : DefaultColormap(dpy,
 					   DefaultScreen(dpy)),
-		     colors,
+		     colorarray,
 		     n);
 
 	RGB = RGB_PC;
@@ -816,14 +816,15 @@ static void Colors_free_color_cube(void)
 {
     if (color_cube) {
 	if (color_cube->mustfree) {
-	    XFreeColors(dpy,
-			(colormap != 0)
-			    ? colormap
-			    : DefaultColormap(dpy,
-					      DefaultScreen(dpy)),
-			&color_cube->pixels[0],
-			color_cube->reds * color_cube->greens * color_cube->blues,
-			0);
+	    XFreeColors(
+		dpy,
+		(colormap != 0)
+		? colormap
+		: DefaultColormap(dpy,
+				  DefaultScreen(dpy)),
+		&color_cube->pixels[0],
+		color_cube->reds * color_cube->greens * color_cube->blues,
+		0);
 	    color_cube->mustfree = 0;
 	}
 	free(color_cube);
@@ -963,9 +964,8 @@ void Colors_debug(void)
     if (!color_cube) {
 	static struct Color_cube cc;
 	color_cube = &cc;
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < 256; i++)
 	    cc.pixels[i] = i;
-	}
     }
 
     for (i = 0; i < NELEM(rgb_cube_sizes); i++) {
@@ -987,7 +987,9 @@ void Colors_debug(void)
 		}
 	    }
 	}
-	fprintf(fp, "\nblack %3lu\nwhite %3lu\nred   %3lu\ngreen %3lu\nblue  %3lu\n",
+	fprintf(fp,
+		"\nblack %3lu\nwhite %3lu\nred   %3lu"
+		"\ngreen %3lu\nblue  %3lu\n",
 		RGB_PC(0, 0, 0),
 		RGB_PC(255, 255, 255),
 		RGB_PC(255, 0, 0),

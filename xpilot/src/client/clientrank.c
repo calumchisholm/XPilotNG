@@ -97,7 +97,7 @@ static void LegalizeName(char string[])
 /* Sort the ranks and save them to the webpage. */
 static void Rank_score(void)
 {
-    static const char HEADER[] =
+    static const char header[] =
 	"<html><head><title>Xpilot Clientrank - Evolved by Mara</title>\n"
 	/* In order to save space/bandwidth, the table is saved as one */
 	/* giant javascript file, instead of writing all the <TR>, <TD>, etc */
@@ -124,7 +124,7 @@ static void Rank_score(void)
 	"<td align=right><h1><u><b>Ratio</b></u></h1></td>"
 	"</tr>\n" "<SCRIPT language=\"Javascript\">\n" "var i = 1\n";
 
-    static const char HEADERNOJS[] =
+    static const char headernojs[] =
 	"<html><head><title>XPilot Clientrank - Evolved by Mara</title>\n"
 	"</head><body>\n"
 	/* Head of page */
@@ -135,7 +135,7 @@ static void Rank_score(void)
 	"<td align=right><h1><u><b>Deaths</b></u></h1></td>"
 	"<td align=right><h1><u><b>Ratio</b></u></h1></td>" "</tr>\n";
 
-    static const char FOOTER[] =
+    static const char footer[] =
 	"</table>"
 	"<i>Explanation for rank</i>:<br>"
 	"The numbers are k/d/r, where<br>"
@@ -168,8 +168,7 @@ static void Rank_score(void)
 	FILE *const file = fopen(clientRankHTMLFile, "w");
 
 	if (file != NULL && fseek(file, 2000, SEEK_SET) == 0) {
-	    int i;
-	    fprintf(file, "%s", HEADER);
+	    fprintf(file, "%s", header);
 	    for (i = 0; i < MAX_SCORES; i++) {
 		if (scores[kdsort[i]].nick[0] != '\0') {
 		    LegalizeName(scores[kdsort[i]].nick);
@@ -180,7 +179,7 @@ static void Rank_score(void)
 		}
 	    }
 	    fprintf(file, "</script>");
-	    fprintf(file, FOOTER);
+	    fprintf(file, footer);
 	    fclose(file);
 	}
     }
@@ -189,8 +188,7 @@ static void Rank_score(void)
 	FILE *const file = fopen(clientRankHTMLNOJSFile, "w");
 
 	if (file != NULL && fseek(file, 2000, SEEK_SET) == 0) {
-	    int i;
-	    fprintf(file, "%s", HEADERNOJS);
+	    fprintf(file, "%s", headernojs);
 	    for (i = 0; i < MAX_SCORES; i++) {
 		if (scores[kdsort[i]].nick[0] != '\0') {
 		    LegalizeName(scores[kdsort[i]].nick);
@@ -207,7 +205,7 @@ static void Rank_score(void)
 			    scores[kdsort[i]].deaths, kd[i]);
 		}
 	    }
-	    fprintf(file, FOOTER);
+	    fprintf(file, footer);
 	    fclose(file);
 	}
     }
