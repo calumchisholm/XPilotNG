@@ -45,8 +45,8 @@ int messagesColor   	    = 0x00aaaa88;
 int oldMessagesColor   	    = 0x00888888;
 int msgScanBallColor   	    = 0xff000088;
 int msgScanSafeColor   	    = 0x00ff0088;
-int msgScanCoverColor  	    = 0xaaaa0088;
-int msgScanPopColor   	    = 0x0000ff88;
+int msgScanCoverColor  	    = 0x4e7cff88; /* xpblue */
+int msgScanPopColor   	    = 0xffbb1188; /* xpyellow */
 
 int meterBorderColor   	    = 0x0000ff55;
 int fuelMeterColor   	    = 0xff000055;
