@@ -25,52 +25,54 @@
 
 char bitmaps_version[] = VERSION;
 
+/* this gets rid of missing initializer warnings */
+#define XP_PIXMAP_INITIALIZER(f, c) { f,c,0,0,0,false,NULL,{0,0,0,NULL,NULL} }
 
 xp_pixmap_t object_pixmaps[] = {
-    { "holder1.ppm"	    , 1},
-    { "holder2.ppm"	    , 1},
-    { "ball.ppm"	    , 1},
-    { "ship_red.ppm"	    , 128},
-    { "ship_blue.ppm"	    , 128},
-    { "ship_red2.ppm"	    , 128},
-    { "bullet.ppm"	    , -8},
-    { "bullet_blue.ppm"    ,  -8},
-    { "base_down.ppm"	    , 1},
-    { "base_left.ppm"	    , 1},
-    { "base_up.ppm"	    , 1},
-    { "base_right.ppm"	    , 1},
-    { "fuelcell.ppm"	    , 1},
-    { "fuel2.ppm"	    , -16},
-    { "allitems.ppm"	    , -30},
-    { "cannon_down.ppm"    , 1},
-    { "cannon_left.ppm"    , 1},
-    { "cannon_up.ppm"	    , 1},
-    { "cannon_right.ppm"   , 1},
-    { "sparks.ppm"	    , -8},
-    { "paused.ppm"	    , -2},
-    { "wall_top.ppm"	    , 1},
-    { "wall_left.ppm"	    , 1},
-    { "wall_bottom.ppm"    , 1},
-    { "wall_right.ppm"	    , 1},
-    { "wall_ul.ppm"	    , 1},
-    { "wall_ur.ppm"	    , 1},
-    { "wall_dl.ppm"	    , 1},
-    { "wall_dr.ppm"	    , 1},
-    { "wall_fi.ppm"	    , 1},
-    { "wall_url.ppm"	    , 1},
-    { "wall_ull.ppm"	    , 1},
-    { "clouds.ppm"	    , 1},
-    { "logo.ppm"	    , 1},
-    { "refuel.ppm"	    , -4},
-    { "wormhole.ppm"	    , 8},
-    { "mine_team.ppm"	    , 1},
-    { "mine_other.ppm"	    , 1},
-    { "concentrator.ppm"    , 32},
-    { "plus.ppm"	    , 1},
-    { "minus.ppm"	    , 1},
-    { "checkpoint.ppm"	    , -2},
-    { "meter.ppm"	    , -2},
-    { "asteroidconcentrator.ppm"    , 32},
+    XP_PIXMAP_INITIALIZER("holder1.ppm" , 1),
+    XP_PIXMAP_INITIALIZER("holder2.ppm" , 1),
+    XP_PIXMAP_INITIALIZER("ball.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("ship_red.ppm"	    , 128),
+    XP_PIXMAP_INITIALIZER("ship_blue.ppm"	    , 128),
+    XP_PIXMAP_INITIALIZER("ship_red2.ppm"	    , 128),
+    XP_PIXMAP_INITIALIZER("bullet.ppm"	    , -8),
+    XP_PIXMAP_INITIALIZER("bullet_blue.ppm"    ,  -8),
+    XP_PIXMAP_INITIALIZER("base_down.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("base_left.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("base_up.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("base_right.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("fuelcell.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("fuel2.ppm"	    , -16),
+    XP_PIXMAP_INITIALIZER("allitems.ppm"	    , -30),
+    XP_PIXMAP_INITIALIZER("cannon_down.ppm"    , 1),
+    XP_PIXMAP_INITIALIZER("cannon_left.ppm"    , 1),
+    XP_PIXMAP_INITIALIZER("cannon_up.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("cannon_right.ppm"   , 1),
+    XP_PIXMAP_INITIALIZER("sparks.ppm"	    , -8),
+    XP_PIXMAP_INITIALIZER("paused.ppm"	    , -2),
+    XP_PIXMAP_INITIALIZER("wall_top.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_left.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_bottom.ppm"    , 1),
+    XP_PIXMAP_INITIALIZER("wall_right.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_ul.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_ur.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_dl.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_dr.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_fi.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_url.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("wall_ull.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("clouds.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("logo.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("refuel.ppm"	    , -4),
+    XP_PIXMAP_INITIALIZER("wormhole.ppm"	    , 8),
+    XP_PIXMAP_INITIALIZER("mine_team.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("mine_other.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("concentrator.ppm"    , 32),
+    XP_PIXMAP_INITIALIZER("plus.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("minus.ppm"	    , 1),
+    XP_PIXMAP_INITIALIZER("checkpoint.ppm"	    , -2),
+    XP_PIXMAP_INITIALIZER("meter.ppm"	    , -2),
+    XP_PIXMAP_INITIALIZER("asteroidconcentrator.ppm"    , 32),
 };
 
 xp_pixmap_t *pixmaps = 0;
@@ -81,9 +83,9 @@ static int  Bitmap_init (int img);
 static void Bitmap_picture_copy (xp_pixmap_t *xp_pixmap, int image);
 static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image);
 
-int  Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp);
-int  Bitmap_create_end (Drawable d);
-void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
+static int  Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp);
+static int  Bitmap_create_end (Drawable d);
+static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
 
 
 /**
@@ -377,7 +379,7 @@ static GC maskGC;
  * Allocates and prepares a pixmap for drawing in a platform
  * dependent (UNIX) way.
  */
-int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
+static int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 {
     Drawable pixmap;
 
@@ -422,7 +424,7 @@ int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 /**
  * Deallocates resources needed when creating and drawing a pixmap.
  */
-int Bitmap_create_end (Drawable d)
+static int Bitmap_create_end (Drawable d)
 {
     return 0;
 }
@@ -431,9 +433,9 @@ int Bitmap_create_end (Drawable d)
 /*
  * Purpose: set 1 pixel in the device/OS dependent bitmap.
  */
-void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
-		      int bmp, int x, int y,
-		      RGB_COLOR color)
+static void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
+			     int bmp, int x, int y,
+			     RGB_COLOR color)
 {
     unsigned long	pixel;
     unsigned char	r, g, b;
