@@ -357,7 +357,7 @@ int Cannon_hitmask(cannon_t *cannon)
 {
     if (cannon->dead_time)
 	return ALL_BITS;
-    if (teamImmunity)
+    if (BIT(World.rules->mode, TEAM_PLAY) && teamImmunity)
 	return HITMASK(cannon->team);
     return 0;
 }
