@@ -306,6 +306,7 @@ extern struct options {
     double	thrustMass;
     double	sparkSpeed;
     double	constantSpeed;
+    bool	legacyMode;
     bool	ballStyles;
     bool	ignoreMaxFPS;
     bool	polygonMode;

@@ -955,7 +955,11 @@ static void Update_players(world_t *world)
 		SET_BIT(pl->obj_status, WARPED);
 	}
 	
-	{
+	if (options.legacyMode) {
+	    update_object_speed(world, OBJ_PTR(pl));
+	    Move_player(pl);
+	}
+	else {
 	    vector_t acc = pl->acc;
 
 	    if (BIT(pl->obj_status, GRAVITY)) {

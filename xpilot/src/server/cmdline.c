@@ -3478,6 +3478,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"legacyMode",
+	"legacyMode",
+	"false",
+	&options.legacyMode,
+	valBool,
+	tuner_dummy,
+	"Try to emulate classic xpilot behavior.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"constantSpeed",
 	"oldThrust",
 	"0",
