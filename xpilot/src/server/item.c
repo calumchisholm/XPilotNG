@@ -245,7 +245,7 @@ void Place_item(int item, int ind)
 	by = CLICK_TO_BLOCK(cy);
 
 	if (is_polygon_map || !useOldCode) {
-	    if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) != -1)
+	    if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) != NO_GROUP)
 		return;
 	} else {
 	    /*if (!BIT(1U << World.block[bx][by], SPACE_BLOCKS))*/
@@ -297,7 +297,8 @@ void Place_item(int item, int ind)
 	    by = CLICK_TO_BLOCK(cy);
 
 	    if (is_polygon_map || !useOldCode) {
-		if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) == -1)
+		if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL)
+		    == NO_GROUP)
 		    break;
 	    } else {
 		if (BIT(1U << World.block[bx][by], SPACE_BLOCKS|CANNON_BIT))

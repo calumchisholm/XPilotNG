@@ -277,5 +277,6 @@
 #define WORMCOUNT		64
 
 #define POLYGON_MAX_OFFSET	30000
+#define NO_GROUP		(-1)
 
 #endif
