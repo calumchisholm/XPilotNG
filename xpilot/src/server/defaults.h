@@ -33,7 +33,6 @@ enum valType {
     valBool,		/* variable is type bool */
     valIPos,		/* variable is type ipos */
     valString,		/* variable is type char* */
-    valSec,		/* variable is type int (converted to frames) */
     valList		/* variable is a list of elements of type char* */
 };
 

@@ -74,7 +74,6 @@ static void Parse_help(char *progname)
 	       option_descs[j].type == valReal ? "<real>" :
 	       option_descs[j].type == valString ? "<string>" :
 	       option_descs[j].type == valIPos ? "<position>" :
-	       option_descs[j].type == valSec ? "<seconds>" :
 	       option_descs[j].type == valList ? "<list>" :
 	       "");
 	for (str = option_descs[j].helpLine; *str; str++) {
@@ -242,10 +241,6 @@ int Parser_list_option(int *ind, char *buf)
     switch (opts[i].type) {
     case valInt:
 	sprintf(buf, "%s:%d", opts[i].name, *(int *)opts[i].variable);
-	break;
-    case valSec:
-	sprintf(buf, "%s:%d", opts[i].name,
-		*(int *)opts[i].variable / FPS);
 	break;
     case valReal:
 	sprintf(buf, "%s:%g", opts[i].name, *(double *)opts[i].variable);
@@ -479,12 +474,6 @@ int Tune_option(char *name, char *val)
 	*(double *)opt->variable = fval;
 	(*opt->tuner)();
 	return 1;
-    case valSec:
-	if (Convert_string_to_int(val, &ival) != true)
-	    return 0;
-	*(int *)opt->variable = ival * FPS;
-	(*opt->tuner)();
-	return 1;
     case valString:
 	{
 	    char *s = xp_strdup(val);
@@ -529,9 +518,6 @@ int Get_option_value(const char *name, char *value, size_t size)
 	if (*((char **)opt->variable) == NULL)
 	    return -4;
 	strlcpy(value, *((char **)opt->variable), size);
-	break;
-    case valSec:
-	sprintf(value, "%d", *((int *)opt->variable) / FPS);
 	break;
     case valIPos:
 	sprintf(value, "%d, %d",

@@ -819,20 +819,6 @@ static void Option_parse_node(hash_node *np)
 	    break;
 	}
 
-    case valSec:
-	{
-	    int		*ptr = (int *)desc->variable;
-	    double	seconds;
-
-	    if (Convert_string_to_float(value, &seconds) != true) {
-		warn("%s value '%s' not a number.",
-			np->name, value);
-		Convert_string_to_float(desc->defaultValue, &seconds);
-	    }
-	    *ptr = (int)(seconds * FPS);
-	    break;
-	}
-
     case valList:
 	{
 	    list_t	*list_ptr = (list_t *)desc->variable;
@@ -915,6 +901,7 @@ void Options_parse(void)
     Options_parse_expand();
 
     /*
+     * kps - this might not be necessary.
      * This must be done in order that FPS will return the eventual
      * frames per second for computing valSec and valPerSec.
      */

@@ -3272,7 +3272,7 @@ static option_desc opts[] = {
 	"maxPauseTime",
 	"3600",		/* can pause 1 hour by default */
 	&options.maxPauseTime,
-	valSec,
+	valInt,
 	tuner_dummy,
 	"The maximum time a player can stay paused for, in seconds.\n"
 	"After being paused this long, the player will be kicked off.\n"

@@ -1334,10 +1334,12 @@ void Update_objects(void)
 	    }
 	}
 
+	/* kps - if FPS changes, this doesn't work quite right */
 	if (options.maxPauseTime > 0
 	    && Player_is_human(pl)
 	    && BIT(pl->status, PAUSE)
-	    && frame_loops - pl->frame_last_busy > options.maxPauseTime) {
+	    && frame_loops - pl->frame_last_busy
+	    > options.maxPauseTime * FPS) {
 	    sprintf(msg, "%s was auto-kicked for pausing too long "
 		    "[*Server notice*]", pl->name);
 	    Set_message(msg);
