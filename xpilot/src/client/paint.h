@@ -151,15 +151,11 @@ extern long	loops;
 extern int	maxMessages;
 extern bool	selectionAndHistory;
 
-#ifdef	WINDOWSCALING
 extern DFLOAT	scaleFactor;		/* scale the draw (main playfield) window */
 extern DFLOAT	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);
 #define	WINSCALE(__n)	((__n) >= 0 ? scaleArray[(__n)] : -scaleArray[-(__n)])
-#else
-#define	WINSCALE(__n)	(__n)
-#endif
 
 /*
  * Prototypes from the paint*.c files.

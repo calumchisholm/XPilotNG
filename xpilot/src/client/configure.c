@@ -160,10 +160,8 @@ static int Config_create_markingLights(int widget_desc, int *height);
 #ifdef _WINDOWS
 static int Config_create_threadedDraw(int widget_desc, int *height);
 #endif
-#ifdef	WINDOWSCALING
 static int Config_create_scaleFactor(int widget_desc, int *height);
 static int Config_create_altScaleFactor(int widget_desc, int *height);
-#endif
 
 static int Config_create_save(int widget_desc, int *height);
 
@@ -184,10 +182,7 @@ static int Config_update_toggleShield(int widget_desc, void *data, bool *val);
 static int Config_update_autoShield(int widget_desc, void *data, bool *val);
 static int Config_update_maxFPS(int widget_desc, void *data, int *val);
 static int Config_update_texturedObjects(int widget_desc, void *data, bool *val);
-#ifdef	WINDOWSCALING
 static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val);
-#endif
-
 static int Config_close(int widget_desc, void *data, const char **strptr);
 static int Config_next(int widget_desc, void *data, const char **strptr);
 static int Config_prev(int widget_desc, void *data, const char **strptr);
@@ -288,10 +283,8 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
 #ifdef _WINDOWS
 	Config_create_threadedDraw,
 #endif
-#ifdef	WINDOWSCALING
-	Config_create_scaleFactor,
+    Config_create_scaleFactor,
     Config_create_altScaleFactor,
-#endif
     Config_create_save			/* must be last */
 };
 static int		config_widget_ids[NELEM(config_creator)];
@@ -1087,7 +1080,6 @@ static int Config_create_threadedDraw(int widget_desc, int *height)
 }
 #endif
 
-#ifdef	WINDOWSCALING
 static int Config_create_scaleFactor(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
@@ -1102,7 +1094,6 @@ static int Config_create_altScaleFactor(int widget_desc, int *height)
                                MIN_SCALEFACTOR, MAX_SCALEFACTOR,
                                NULL, NULL);
 }
-#endif
 
 static int Config_create_markingLights(int widget_desc, int *height)
 {
@@ -1292,7 +1283,6 @@ static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
     return 0;
 }
 
-#ifdef	WINDOWSCALING
 static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val)
 {
     Init_scale_array();
@@ -1301,7 +1291,6 @@ static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val)
     Bitmap_update_scale();
     return 0;
 }
-#endif
 
 static void Config_save_failed(const char *reason, const char **strptr)
 {
@@ -1542,10 +1531,8 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 #ifdef _WINDOWS
     Config_save_bool(fp, "threadedDraw", ThreadedDraw);
 #endif
-#ifdef	WINDOWSCALING
     Config_save_float(fp, "scaleFactor", scaleFactor);
     Config_save_float(fp, "altScaleFactor", scaleFactor_s);
-#endif
     /* don't save this one: Config_save_int(fp, "maxFPS", maxFPS); */
     buf[0] = '\0';
     for (i = 0, prev_key = KEY_DUMMY; i < maxKeyDefs; i++, prev_key = key) {

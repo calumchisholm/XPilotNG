@@ -240,18 +240,11 @@ void Gui_paint_fuel(int x, int y, long fuel)
 	static int		text_width = 0;
 	static int		text_is_bigger;
 
-#ifndef WINDOWSCALING
-	if (!text_width)
-#else
 	static DFLOAT		lastScaleFactor;
 
 	if (!text_width || lastScaleFactor != scaleFactor)
-#endif
 	{
-#ifdef WINDOWSCALING
-
 	    lastScaleFactor = scaleFactor;
-#endif
 	    text_width = XTextWidth(gameFont, s, 1);
 	    text_is_bigger = text_width+4 > WINSCALE(BLOCK_SZ)+1 ||
 			    (gameFont->ascent + gameFont->descent) > WINSCALE(BLOCK_SZ) + 2;

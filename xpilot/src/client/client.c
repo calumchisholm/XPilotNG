@@ -153,10 +153,8 @@ int	oldMaxFPS;
 byte	lose_item;		/* index for dropping owned item */
 int	lose_item_active;	/* one of the lose keys is pressed */
 
-#ifdef WINDOWSCALING
 DFLOAT scaleFactor;
 DFLOAT scaleFactor_s;
-#endif
 
 #ifdef SOUND
 char 	sounds[MAX_CHARS];	/* audio mappings */
@@ -1455,9 +1453,7 @@ int Client_init(char *server, unsigned server_version)
 	oldServer = 0;
 
     Make_table();
-#ifdef WINDOWSCALING
     Init_scale_array();
-#endif
 
     if ( Init_wreckage() == -1 ) {
 	return -1;

@@ -370,7 +370,6 @@ bool Key_press_swap_settings(keys_t key)
 
 bool Key_press_swap_scalefactor(keys_t key)
 {
-#ifdef WINDOWSCALING
     DFLOAT tmp;
     tmp = scaleFactor;
     scaleFactor = scaleFactor_s;
@@ -380,7 +379,6 @@ bool Key_press_swap_scalefactor(keys_t key)
     Scale_dashes();
     Config_redraw();
     Bitmap_update_scale();
-#endif
 
     return false;
 }

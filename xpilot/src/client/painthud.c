@@ -290,13 +290,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
      * to even tell what the heck it is!  I choose the arbitrary size of
      * 10 pixels wide, which in practice is a scaleFactor <= 1.5.
      */
-    if (
-#ifdef WINDOWSCALING
-	10 * scaleFactor <= 15
-#else
-	1
-#endif
-		              ) {
+    if (scaleFactor <= 1.5) {
 	ship = Ship_by_id(lock_id);
 	for (i = 0; i < ship->num_points; i++) {
 	    points[i].x = WINSCALE((int)(hud_pos_x + ship->pts[i][dir].x / 2 + 60));
