@@ -112,21 +112,15 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
 
     warn("Set_hostName: value = %s", value);
 
-    /* kps - remove hostname */
-    *hostname = 0;
+    connectParam.host_name[0] = '\0';
     if (cp)
-	strlcpy(hostname, cp, sizeof(hostname));
+	strlcpy(connectParam.host_name, cp, sizeof(connectParam.host_name));
     else
-        sock_get_local_hostname(hostname, sizeof hostname, 0);
-
-    if (Check_host_name(hostname) == NAME_ERROR)
-	Fix_host_name(hostname);
+        sock_get_local_hostname(connectParam.host_name,
+				sizeof(connectParam.host_name), 0);
 
     if (strlen(value) > 0)
 	strlcpy(connectParam.host_name, value, sizeof(connectParam.host_name));
-    else
-	strlcpy(connectParam.host_name, hostname,
-		sizeof(connectParam.host_name));
 
     if (Check_host_name(connectParam.host_name) == NAME_ERROR) {
 	xpprintf("Fixing host from \"%s\" ", connectParam.host_name);

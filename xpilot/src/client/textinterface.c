@@ -447,7 +447,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 
 		Packet_printf(ibuf, "%c%s%s%s%d", ENTER_QUEUE_pack,
 			      conpar->nick_name, conpar->disp_name,
-			      hostname, conpar->team);
+			      conpar->host_name, conpar->team);
 		time(&qsent);
 		break;
 
@@ -608,7 +608,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 				      sock_get_port(&ibuf->sock));
 			Packet_printf(ibuf, "%c%s%s%s%d", ENTER_QUEUE_pack,
 				      conpar->nick_name, conpar->disp_name,
-				      hostname, conpar->team);
+				      conpar->host_name, conpar->team);
 			if (sock_write(&ibuf->sock, ibuf->buf, ibuf->len)
 			    != ibuf->len) {
 			    error("Couldn't send request to server.");
