@@ -47,12 +47,6 @@
 
 char shipshape_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 static int	debugShapeParsing = 0;
 static int	verboseShapeParsing;
 static int	shapeLimits;

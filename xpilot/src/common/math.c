@@ -37,12 +37,6 @@
 
 char math_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 DFLOAT		tbl_sin[TABLE_SIZE];
 DFLOAT		tbl_cos[TABLE_SIZE];
 

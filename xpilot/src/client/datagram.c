@@ -52,11 +52,6 @@
 #include "datagram.h"
 #include "portability.h"
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 
 int dgram_one_socket = 0;
 

@@ -53,12 +53,6 @@
 char colors_version[] = VERSION;
 
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 /* Kludge for visuals under C++ */
 #if defined(__cplusplus)
 #define class c_class

@@ -88,11 +88,6 @@
 
 char xinit_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 /* How far away objects should be placed from each other etc... */
 #define BORDER			10
 #define BTN_BORDER		4

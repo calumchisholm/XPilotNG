@@ -54,12 +54,6 @@
 
 char frame_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 /*
  * Structure for calculating if a pixel is visible by a player.
  * The following always holds:

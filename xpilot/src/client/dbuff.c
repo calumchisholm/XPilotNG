@@ -44,12 +44,6 @@
 char dbuff_version[] = VERSION;
 
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 #ifdef SPARC_CMAP_HACK
 extern char   frameBuffer[MAX_CHARS]; /* frame buffer */
 #endif

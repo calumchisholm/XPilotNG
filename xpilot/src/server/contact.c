@@ -63,11 +63,6 @@
 
 char contact_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 /*
  * Global variables
  */

@@ -29,11 +29,6 @@ static char sccsid[] = "@(#)usleep.c	1.3 91/05/24 XLOCK";
 
 #include "types.h"
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 int micro_delay(unsigned usec);
 
 int micro_delay(unsigned usec)

@@ -46,11 +46,6 @@
 
 char event_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 #define SWAP(_a, _b)	    {DFLOAT _tmp = _a; _a = _b; _b = _tmp;}
 
 /*

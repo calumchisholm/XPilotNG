@@ -160,12 +160,6 @@
 char config_version[] = VERSION;
 
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 char *Conf_libdir(void)
 {
     static char conf[] = LIBDIR;

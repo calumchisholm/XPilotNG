@@ -52,11 +52,6 @@
 
 char cannon_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 #ifdef	SOUND
 #define IFSOUND(__x)	__x
 #else

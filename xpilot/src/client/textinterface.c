@@ -56,12 +56,6 @@
 #include "connectparam.h"
 
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 #define MAX_LINE	256	/* should not be smaller than MSG_LEN */
 
 

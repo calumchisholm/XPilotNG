@@ -52,11 +52,6 @@
 
 char collision_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 /*
  * The very first "analytical" collision patch, XPilot 3.6.2
  * Faster than other patches and accurate below half warp-speed

@@ -48,12 +48,6 @@
 
 char ship_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 /******************************
  * Functions for ship movement.
  */

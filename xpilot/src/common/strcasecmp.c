@@ -26,11 +26,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 /*
  * By Ian Malcom Brown.
  * Changes by BG: prototypes with const,

@@ -49,11 +49,6 @@
 
 char talk_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 /* avoid trouble with Atoms and 64 bit archs */
 typedef CARD32  Atom32;
 

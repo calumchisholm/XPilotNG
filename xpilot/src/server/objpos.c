@@ -42,11 +42,6 @@
 
 char objpos_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 void Object_position_set_clicks(object *obj, int cx, int cy)
 {
     struct _objposition		*pos = (struct _objposition *)&obj->pos;

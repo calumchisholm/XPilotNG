@@ -62,11 +62,6 @@
 
 char metaserver_version[] = VERSION;
 
-#ifndef	lint
-char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 struct MetaServer {
     char		name[64];
     char		addr[16];

@@ -55,11 +55,9 @@ void *xp_unsafe_calloc(size_t nmemb, size_t size)
     return p;
 }
 
-void xp_free(void *p)
+void xp_unsafe_free(void *p)
 {
-    if (p) {
-	free(p);
-    }
+    free(p);
 }
 
 void *xp_malloc(size_t size)

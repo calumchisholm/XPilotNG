@@ -69,8 +69,6 @@ char server_version[] = VERSION;
 
 #ifndef	lint
 static char versionid[] = "@(#)$" TITLE " $";
-static char sourceid[] =
-    "@(#)$Id$";
 #endif
 
 /*

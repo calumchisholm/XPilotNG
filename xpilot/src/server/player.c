@@ -49,11 +49,6 @@
 
 char player_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 extern int Rate(int winner, int loser);
 
 bool		updateScores = true;

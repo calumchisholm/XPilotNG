@@ -69,11 +69,6 @@ extern char *talk_fast_msgs[];	/* talk macros */
 char talk_fast_temp_buf[7];		/* can handle up to 999 fast msgs */
 char *talk_fast_temp_buf_big;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 #ifdef VMS
 #define DISPLAY_ENV	"DECW$DISPLAY"
 #define DISPLAY_DEF	"::0.0"

@@ -41,11 +41,6 @@
 
 char id_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 static int		ID_queue[NUM_IDS];
 static int		ID_inuse[NUM_IDS + 1];
 static int		ID_inited = 0;

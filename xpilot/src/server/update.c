@@ -48,12 +48,6 @@ extern unsigned SPACE_BLOCKS;
 
 char update_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 #define update_object_speed(o_)						\
     if (BIT((o_)->status, GRAVITY)) {					\
 	(o_)->vel.x += (o_)->acc.x					\

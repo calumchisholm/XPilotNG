@@ -44,11 +44,6 @@
 
 char cmdline_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 DFLOAT		Gravity;		/* Power of gravity */
 DFLOAT		ShipMass;		/* Default mass of ship */
 DFLOAT		ShotsMass;		/* Default mass of shots */

@@ -42,11 +42,6 @@
 
 char rules_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 #define MAX_FUEL                10000
 #define MAX_WIDEANGLE           99
 #define MAX_REARSHOT            99

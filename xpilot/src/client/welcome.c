@@ -59,12 +59,6 @@
 
 char welcome_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 /*
  * max number of servers we can find on the local network.
  */

@@ -52,12 +52,6 @@
 
 char item_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 #define CONFUSED_TIME			3
 
 extern unsigned SPACE_BLOCKS;

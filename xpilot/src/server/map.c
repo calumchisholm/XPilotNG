@@ -51,12 +51,6 @@ char map_version[] = VERSION;
 
 #define GRAV_RANGE  10
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 /*
  * Globals.
  */

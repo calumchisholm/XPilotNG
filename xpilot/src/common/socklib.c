@@ -85,12 +85,6 @@
 #define timerclear(tvp)   ((tvp)->tv_sec = (tvp)->tv_usec = 0)
 #endif
 
-#ifndef lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 #define SOCK_GETHOST_TIMEOUT	6
 
 

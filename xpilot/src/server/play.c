@@ -46,11 +46,6 @@
 
 char play_version[] = VERSION;
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
 extern int Rate(int winner, int loser);
 
 static int Punish_team(int ind, int t_destroyed, int posx, int posy)

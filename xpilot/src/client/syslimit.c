@@ -40,12 +40,6 @@
 #define WC_L		"/bin/wc -l "
 #define RWHO		"/usr/bin/rwho -a "
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
-
-
 
 /*
  * This routine is not useful outside UiT but may be used as a skeleton for
