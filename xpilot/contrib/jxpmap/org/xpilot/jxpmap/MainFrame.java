@@ -63,7 +63,7 @@ public class MainFrame extends JFrame implements ActionListener {
         buildActionMap();
         buildInputMap();
         setSize(800, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(ss.width / 2 - 400, ss.height / 2 - 300);
         interpreter = new bsh.Interpreter();
@@ -803,6 +803,8 @@ class BshConsole extends JFrame {
         setBounds((d.width - w) / 2, (d.height - h) / 2, w, h);
         getContentPane().add(jc);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        new Thread(interpreter).start();        
+        Thread t = new Thread(interpreter);
+        t.setDaemon(true);
+        t.start();        
     }
 }

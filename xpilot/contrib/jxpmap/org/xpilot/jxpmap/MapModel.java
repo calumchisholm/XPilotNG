@@ -211,15 +211,15 @@ public class MapModel extends ModelObject {
                 if (p.npoints < 1) continue;
                 int x = p.xpoints[0];
                 int y = p.ypoints[0];
-                if (x < 0 || x >= options.size.width
-                || y < 0 || y >= options.size.height) {
+                if (x < 0 || x >= options.getSize().width
+                || y < 0 || y >= options.getSize().height) {
                     return new Object[] {
                     o, "Polygon is located outside map bounds." };
                 }                
             } else {
                 Rectangle b = o.getBounds();
-                if (b.x < 0 || b.x >= options.size.width
-                || b.y < 0 || b.y >= options.size.height) {
+                if (b.x < 0 || b.x >= options.getSize().width
+                || b.y < 0 || b.y >= options.getSize().height) {
                     return new Object[] {
                     o, "Object is located outside map bounds." };
                 }
@@ -294,7 +294,7 @@ public class MapModel extends ModelObject {
     
     
     private String downloadImages() throws IOException {
-        String urlStr = (String)options.get("dataurl");
+        String urlStr = options.get("dataurl");
         if (urlStr == null) {
             JOptionPane.showMessageDialog(null,
                 "The map has no dataURL option");
@@ -505,7 +505,6 @@ public class MapModel extends ModelObject {
         Group temp = new Group();
         readObjects(temp, root, pstyles, estyles);
         objects.addAll(temp.getMembers());
-        options.updated();
     }
     
     private void 
@@ -528,7 +527,7 @@ public class MapModel extends ModelObject {
                             + n2.getNodeName());
                         continue;
                     }
-                    options.put(atts(n2, "name"), atts(n2, "value"));
+                    options.set(atts(n2, "name"), atts(n2, "value"));
                 }
                 
             } else if (name.equalsIgnoreCase("polygon")) {

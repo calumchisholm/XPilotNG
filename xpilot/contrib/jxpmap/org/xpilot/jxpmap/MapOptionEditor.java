@@ -1,63 +1,93 @@
 package org.xpilot.jxpmap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Vector;
+import java.awt.Dimension;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.text.*;
+import javax.swing.table.*;
+import javax.swing.event.*;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-
-
-public class MapOptionEditor extends EditorPanel {
+public class MapOptionEditor extends EditorPanel 
+implements TableModelListener {
 
     private DefaultTableModel tableModel;
     private MapOptions options;
-
-    public MapOptionEditor (MapOptions options) {
+    
+    public MapOptionEditor(MapOptions options) {
         setTitle("Option Manager");
         this.options = options;
+        Vector vec = new Vector();
+        for(Iterator i = options.iterator(); i.hasNext();) {
+            MapOptions.Option o = (MapOptions.Option)i.next();
+            vec.add(o.name);
+        }
+        Collections.sort(vec);
+        JComboBox cb = new JComboBox(vec);
+        cb.setEditable(true);
         tableModel = createTableModel(options);
+        tableModel.addTableModelListener(this);
         JTable table = new JTable(tableModel);
+        table.setRowHeight(24);
+        table.getColumnModel().getColumn(0).setCellEditor(
+            new DefaultCellEditor(cb));
+        Dimension d = table.getPreferredScrollableViewportSize();
+        d.height = 200;
+        table.setPreferredScrollableViewportSize(d);
         JScrollPane pane = new JScrollPane(table);
         add(pane);
     }
 
 
-    private DefaultTableModel createTableModel (MapOptions ops) {
 
-        ArrayList rows = new ArrayList(ops.entrySet());
+
+    private DefaultTableModel createTableModel(MapOptions ops) {
+
+        ArrayList rows = new ArrayList();
+        for(Iterator i = ops.iterator(); i.hasNext();) {
+            MapOptions.Option o = (MapOptions.Option)i.next();
+            if (!o.isModified()) continue;
+            rows.add(new String[] { o.name, o.value }); 
+        }
         Collections.sort(rows, new Comparator () {
                 public int compare (Object o1, Object o2) {
-                    return 
-                        ((String)((Map.Entry)o1).getKey()).compareTo
-                        ((String)((Map.Entry)o2).getKey());
+                    return ((String[])o1)[0].compareTo(((String[])o2)[0]);
                 }
-            });
-        
-        Object data[][] = new Object[rows.size()][2];
-        for (int i = 0; i < rows.size(); i++) {
-            Map.Entry entry = (Map.Entry)rows.get(i);
-            data[i][0] = entry.getKey();
-            data[i][1] = entry.getValue();
-        }
-
+        });
+        rows.add(new Object[] { "", "" });
         Object cols[] = new Object[] { "Option", "Value" };
-
-        return new DefaultTableModel(data, cols);
+        return new DefaultTableModel(
+            (Object[][])rows.toArray(new Object[rows.size()][2]), cols);
     }
 
 
-    public boolean apply () {
+    public boolean apply() {
         Vector v = tableModel.getDataVector();
-        options.clear();
+        options.reset();
         for (int i = 0; i < v.size(); i++) {
             Vector row = (Vector)v.get(i);
-            options.put(row.get(0), row.get(1));
+            String key = row.get(0).toString();
+            if (key.length() > 0)
+                options.set(key, row.get(1).toString());
         }
-        options.updated();
         return true;
+    }
+    
+    public void tableChanged(TableModelEvent e) {
+        if (e.getColumn() == 0) {
+            if (e.getType() == TableModelEvent.UPDATE) {
+                int row = e.getLastRow();
+                DefaultTableModel tm = (DefaultTableModel)e.getSource();
+                if ("".equals(tm.getValueAt(row, 0).toString())) {
+                    if (row != tm.getRowCount() - 1) {
+                        tm.removeRow(row);
+                        return;
+                    }
+                } else {
+                    if (row == tm.getRowCount() - 1) {
+                        tm.addRow(new Object[] { "","" }); 
+                    }
+                }
+            }
+        }
     }
 }

@@ -10,20 +10,23 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
-public class MapOptions extends HashMap {
+public class MapOptions {
 
 
-    public Dimension size;
-    public boolean edgeWrap;
-
+    private Dimension size;
+    private Boolean edgeWrap;
+    private Map options = new HashMap();
     
-    public MapOptions () {
-        super();
+    public MapOptions() {
         try {
             Properties props = new Properties();
             props.load(getClass().getResourceAsStream("defopts"));
-            putAll(props);
-
+            for(Iterator i = props.entrySet().iterator(); i.hasNext();) {
+                Map.Entry entry = (Map.Entry)i.next();
+                Option o = new Option((String)entry.getKey(), 
+                    (String)entry.getValue());
+                options.put(o.name.toLowerCase(), o);
+            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog
                 (null, "Failed to load default options: " + 
@@ -31,68 +34,96 @@ public class MapOptions extends HashMap {
                  JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-        updated();
+        getSize();
+        isEdgeWrap();                   
+    }
+    
+    public MapOptions(MapOptions mo) {
+        this.size = mo.size;
+        this.edgeWrap = mo.edgeWrap;
+        for(Iterator i = mo.iterator(); i.hasNext();) {
+            MapOptions.Option o = (MapOptions.Option)i.next();
+            options.put(o.name.toLowerCase(), new Option(o));
+        }
+        getSize();
+        isEdgeWrap();
+    }
+    
+    public Iterator iterator() {
+        return options.values().iterator();
     }
 
-
-    public MapOptions (Map options) {
-
-        this();
-        putAll(options);
-        updated();
+    public void set(String name, String value) {
+        String key = name.toLowerCase();
+        MapOptions.Option o = (MapOptions.Option)options.get(key);
+        if (o == null) {
+            o = new Option(name, null);
+            options.put(key, o);
+        }
+        o.value = value;
+        size = null;
+        edgeWrap = null;        
     }
-
-
-    public void printXml (PrintWriter out) throws IOException {
+    
+    public void reset() {
+        for(Iterator i = options.values().iterator(); i.hasNext();) {
+            Option o = (Option)i.next();
+            o.value = o.defaultValue;
+        }  
+    }
+    
+    public void printXml(PrintWriter out) throws IOException {
 
         out.println("<GeneralOptions>");
 
-        for (Iterator iter = entrySet().iterator(); iter.hasNext();) {
-            
-            Map.Entry entry = (Map.Entry)iter.next();
+        for (Iterator iter = options.values().iterator(); iter.hasNext();) {
+            Option opt = (Option)iter.next();
+            if (opt.value.equals(opt.defaultValue))
+                continue;
             out.print("<Option name=\"");
-            out.print(entry.getKey());
+            out.print(opt.name);
             out.print("\" value=\"");
-            out.print(xmlEncode((String)entry.getValue()));
+            out.print(xmlEncode(opt.value));
             out.println("\"/>");
         }
 
         out.println("</GeneralOptions>");
     }
-
-
-    public void putAll (Map map) {
-        for (Iterator iter = map.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            put(entry.getKey().toString().toLowerCase(), entry.getValue());
+    
+    public boolean isEdgeWrap() {
+        if (edgeWrap == null) { 
+            Option o = (Option)options.get("edgewrap");
+            if (o == null) {
+                edgeWrap = Boolean.FALSE;
+                set("edgeWrap", "false");
+            } else edgeWrap = new Boolean(o.value);
         }
+        return edgeWrap.booleanValue();
+    }
+    
+    public String get(String name) {
+        return (String)options.get(name);
+    }
+    
+    public Dimension getSize() {
+        if (size == null) {
+            int w = 3500;
+            int h = 3500;
+            Option wo = (Option)options.get("mapwidth");
+            Option ho = (Option)options.get("mapheight");
+            if (wo != null) w = Integer.parseInt(wo.value);
+            else set("mapWidth", "3500");
+            if (ho != null) h = Integer.parseInt(ho.value);
+            else set("mapHeight", "3500");
+            size = new Dimension(w * 64, h * 64);
+        }
+        return size;
     }
 
 
-    public void updated () {
-
-        size = new Dimension();
-        size.width = Integer.parseInt((String)get("mapwidth"));
-        size.height = Integer.parseInt((String)get("mapheight"));
-        
-        size.width *= 64;
-        size.height *= 64;
-        
-        Object oew = get("edgewrap");
-        if (oew != null) {
-            String ew = ((String)oew).toLowerCase();
-            edgeWrap = "yes".equals(ew) || "true".equals(ew);
-        }
-        
-    }
-
-
-    private String xmlEncode (String str) {
-
-        StringBuffer sb = new StringBuffer();
-
+    private String xmlEncode(String str) {
+        StringBuffer sb = new StringBuffer(str.length());
         for (int i = 0; i < str.length(); i++) {
-
             char ch = str.charAt(i);
             switch (ch) {
             case '&':  sb.append("&amp;");  break;
@@ -104,5 +135,25 @@ public class MapOptions extends HashMap {
             }
         }
         return sb.toString();
+    }
+    
+    public class Option {
+        public String name;
+        public String value;
+        public String defaultValue;
+        public Option(Option o) {
+            this.name = o.name;
+            this.value = o.value;
+            this.defaultValue = o.defaultValue;
+        }
+        public Option(String name, String defaultValue) {
+            this.name = name;
+            this.value = this.defaultValue = defaultValue;
+        }
+        public boolean isModified() {
+            if (value == defaultValue) return false;
+            if (value == null && defaultValue != null) return true;
+            return !value.equals(defaultValue);
+        }
     }
 }

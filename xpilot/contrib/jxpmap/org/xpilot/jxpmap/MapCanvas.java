@@ -151,7 +151,7 @@ public class MapCanvas extends JComponent {
         if (fastRendering)
             g.setRenderingHint(RenderingHints.KEY_RENDERING,
                 RenderingHints.VALUE_RENDER_SPEED);
-        Dimension mapSize = model.options.size;
+        Dimension mapSize = model.options.getSize();
 
         g.setColor(Color.black);
         g.fill(g.getClipBounds());
@@ -203,7 +203,7 @@ public class MapCanvas extends JComponent {
         AffineTransform origTx = g.getTransform();
         Point min = new Point();
         Point max = new Point();
-        Dimension mapSize = model.options.size;
+        Dimension mapSize = model.options.getSize();
 
         computeBounds(min, max, view, s.getBounds(), mapSize);
 
@@ -226,7 +226,7 @@ public class MapCanvas extends JComponent {
         Rectangle view,
         Rectangle b,
         Dimension map) {
-        if (model.options.edgeWrap) {            
+        if (model.options.isEdgeWrap()) {            
             min.x = (view.x - (b.x + b.width)) / map.width;
             if (view.x > b.x + b.width)
                 min.x++;
@@ -245,7 +245,7 @@ public class MapCanvas extends JComponent {
     }
 
     public Point[] computeWraps(Rectangle r, Point p) {
-        Dimension mapSize = model.options.size;
+        Dimension mapSize = model.options.getSize();
         Point min = new Point();
         Point max = new Point();
         Rectangle b = new Rectangle(p.x, p.y, 0, 0);
@@ -280,10 +280,10 @@ public class MapCanvas extends JComponent {
         if (at == null) {
             at = new AffineTransform();
             at.translate(
-                -scale * model.options.size.width / 2
+                -scale * model.options.getSize().width / 2
                     + getSize().width / 2
                     - offset.x,
-                scale * model.options.size.height / 2
+                scale * model.options.getSize().height / 2
                     + getSize().height / 2
                     - offset.y);
             at.scale(scale, -scale);
