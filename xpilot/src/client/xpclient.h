@@ -38,14 +38,6 @@
 
 #ifdef _WINDOWS
 #ifdef _MSC_VER
-/*# include "NT/winBitmap.h"
-# include "NT/winConfig.h"
-# include "NT/winAudio.h"
-# include "NT/winX.h"
-# include "NT/winX_.h"
-# include "NT/winXThread.h"
-# include "NT/winXKey.h"
-# include "NT/winXXPilot.h"*/
 # include <direct.h>
 # define snprintf _snprintf
 # define printf Trace
