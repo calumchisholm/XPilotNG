@@ -261,7 +261,7 @@ void sched(void)
 	    if (timer_handler)
 		(*timer_handler)();
 
-#if 0
+#if 1
 	    /* stable 50 fps as deity (2.6.x kernel) */
 	    t_nextframe += frametime - 0.0000028571;
 #else

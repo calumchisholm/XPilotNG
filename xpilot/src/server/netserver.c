@@ -2409,7 +2409,7 @@ static int Receive_ack(connection_t *connp)
     unsigned char ch;
     long rel, rtt;	/* RoundTrip Time */
     long diff, delta, rel_loops;
-
+    
     if ((n = Packet_scanf(&connp->r, "%c%ld%ld",
 			  &ch, &rel, &rel_loops)) <= 0) {
 	warn("Cannot read ack packet (%d)", n);
