@@ -19,7 +19,7 @@ xpilot_ng_server_SOURCES = \
 	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
 	target.c target.h teamcup.h teamcup.c tuner.c tuner.h \
-	update.c \
+	treasure.c update.c \
 	walls.c walls.h wormhole.c wormhole.h \
 	xp2map.c xpmap.c xpserver.h
 
