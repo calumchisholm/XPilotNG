@@ -553,6 +553,7 @@ static void Create_config(void)
 
 static int Config_close(int widget_desc, void *data, const char **strptr)
 {
+    (void)widget_desc; (void)data; (void)strptr;
     Widget_unmap(config_widget_desc[config_page]);
     config_mapped = false;
     return 0;
@@ -562,6 +563,7 @@ static int Config_next(int widget_desc, void *data, const char **strptr)
 {
     int			prev_page = config_page;
 
+    (void)widget_desc; (void)data; (void)strptr;
     if (config_max > 1) {
 	config_page = (config_page + 1) % config_max;
 	Widget_raise(config_widget_desc[config_page]);
@@ -575,6 +577,7 @@ static int Config_prev(int widget_desc, void *data, const char **strptr)
 {
     int			prev_page = config_page;
 
+    (void)widget_desc; (void)data; (void)strptr;
     if (config_max > 1) {
 	config_page = (config_page - 1 + config_max) % config_max;
 	Widget_raise(config_widget_desc[config_page]);
@@ -593,26 +596,22 @@ static int Config_create_bool(int widget_desc, int *height,
 			label_width,
 			boolw;
 
-    if (*height + 2*config_entry_height + 2*config_space >= config_height) {
+    if (*height + 2*config_entry_height + 2*config_space >= config_height)
 	return 0;
-    }
     label_width = XTextWidth(textFont, str, strlen(str))
 		  + 2 * config_text_space;
     offset = config_width - (config_space + config_bool_width);
     if (config_space + label_width > offset) {
-	if (*height + 3*config_entry_height + 2*config_space
-	    >= config_height) {
+	if (*height + 3*config_entry_height + 2*config_space >= config_height)
 	    return 0;
-	}
     }
 
     Widget_create_label(widget_desc, config_space, *height
 			    + (config_entry_height - config_text_height) / 2,
 			label_width, config_text_height, true,
 			0, str);
-    if (config_space + label_width > offset) {
+    if (config_space + label_width > offset)
 	*height += config_entry_height;
-    }
     boolw = Widget_create_bool(widget_desc,
 		       offset, *height
 			   + (config_entry_height - config_bool_height) / 2,
@@ -1591,7 +1590,9 @@ static int Config_create_save(int widget_desc, int *height)
  */
 static int Config_update_bool(int widget_desc, void *data, bool *val)
 {
-    bool*	client_data = (bool *) data;
+    bool *client_data = (bool *) data;
+
+    (void)widget_desc;
     *client_data = *val;
     return 0;
 }
@@ -1605,6 +1606,7 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 				     | SHOW_FILLED_WORLD
 				     | SHOW_TEXTURED_WALLS;
 
+    (void)widget_desc;
     if (*val == false)
 	CLR_BIT(instruments, bit);
     else
@@ -1641,9 +1643,9 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 
 static int Config_update_dots(int widget_desc, void *data, int *val)
 {
-    if (val == &map_point_size && map_point_size > 1) {
+    (void)widget_desc; (void)data;
+    if (val == &map_point_size && map_point_size > 1)
 	return 0;
-    }
     if (oldServer)
 	Map_dots();
     return 0;
@@ -1651,6 +1653,7 @@ static int Config_update_dots(int widget_desc, void *data, int *val)
 
 static int Config_update_power(int widget_desc, void *data, double *val)
 {
+    (void)widget_desc; (void)data;
     Send_power(*val);
     controlTime = CONTROL_TIME;
     return 0;
@@ -1658,37 +1661,45 @@ static int Config_update_power(int widget_desc, void *data, double *val)
 
 static int Config_update_turnSpeed(int widget_desc, void *data, double *val)
 {
+    (void)widget_desc; (void)data;
     Send_turnspeed(*val);
     controlTime = CONTROL_TIME;
     return 0;
 }
 
-static int Config_update_turnResistance(int widget_desc, void *data, double *val)
+static int Config_update_turnResistance(int widget_desc, void *data,
+					double *val)
 {
+    (void)widget_desc; (void)data;
     Send_turnresistance(*val);
     return 0;
 }
 
 static int Config_update_altPower(int widget_desc, void *data, double *val)
 {
+    (void)widget_desc; (void)data;
     Send_power_s(*val);
     return 0;
 }
 
 static int Config_update_altTurnSpeed(int widget_desc, void *data, double *val)
 {
+    (void)widget_desc; (void)data;
     Send_turnspeed_s(*val);
     return 0;
 }
 
-static int Config_update_altTurnResistance(int widget_desc, void *data, double *val)
+static int Config_update_altTurnResistance(int widget_desc, void *data,
+					   double *val)
 {
+    (void)widget_desc; (void)data;
     Send_turnresistance_s(*val);
     return 0;
 }
 
 static int Config_update_sparkProb(int widget_desc, void *data, double *val)
 {
+    (void)widget_desc; (void)data; (void)val;
     spark_rand = (int)(spark_prob * MAX_SPARK_RAND + 0.5f);
     Send_display();
     return 0;
@@ -1696,29 +1707,34 @@ static int Config_update_sparkProb(int widget_desc, void *data, double *val)
 
 static int Config_update_charsPerSecond(int widget_desc, void *data, int *val)
 {
+    (void)widget_desc; (void)data; (void)val;
     return 0;
 }
 
 static int Config_update_toggleShield(int widget_desc, void *data, bool *val)
 {
+    (void)widget_desc; (void)data;
     Set_toggle_shield(*val != false);
     return 0;
 }
 
 static int Config_update_autoShield(int widget_desc, void *data, bool *val)
 {
+    (void)widget_desc; (void)data;
     Set_auto_shield(*val != false);
     return 0;
 }
 
 static int Config_update_maxFPS(int widget_desc, void *data, int *val)
 {
+    (void)widget_desc; (void)data; (void)val;
     Check_client_fps();
     return 0;
 }
 
 static int Config_update_fullColor(int widget_desc, void *data, bool *val)
 {
+    (void)widget_desc; (void)data;
     if ((*val != false) != fullColor) {
 	if (fullColor == false) {
 	    /* see if we can use fullColor at all. */
@@ -1740,8 +1756,10 @@ static int Config_update_fullColor(int widget_desc, void *data, bool *val)
     return 0;
 }
 
-static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
+static int Config_update_texturedObjects(int widget_desc, void *data,
+					 bool *val)
 {
+    (void)widget_desc; (void)data;
     if ((*val != false) != texturedObjects) {
 	if (texturedObjects == false) {
 	    /* Can't use texturedObjects without fullColor */
@@ -1762,6 +1780,7 @@ static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
 
 static int Config_update_scaleFactor(int widget_desc, void *data, double *val)
 {
+    (void)widget_desc; (void)data; (void)val;
     Init_scale_array();
     
     /* Resize removed because it is not needed here */
@@ -2204,6 +2223,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 static int Config_save_confirm_callback(int widget_desc, void *popup_desc,
 					const char **strptr)
 {
+    (void)widget_desc; (void)strptr;
     if (config_save_confirm_desc != NO_WIDGET) {
 	Widget_destroy((int)(long int)popup_desc);
 	config_save_confirm_desc = NO_WIDGET;
