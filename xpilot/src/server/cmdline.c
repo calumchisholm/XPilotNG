@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -2459,7 +2458,7 @@ static optionDesc options[] = {
 
 
 void Timing_setup(void)
-{ 
+{
     framespeed = TIME_FACT / FPSMultiplier;
     framespeed2 = 1. / FPSMultiplier;
     ShotsLife = ShotsLifeSetting * TIME_FACT;

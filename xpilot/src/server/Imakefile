@@ -1,5 +1,3 @@
-/* $Id$ */
-
 TOP=../..
 COMMON = ../common/
 
@@ -53,7 +51,7 @@ OBJS = \
 	rank.o recwrap.o rules.o saudio.o sched.o \
 	server.o ship.o shot.o srecord.o update.o walls.o shipshape.o
 
-DEPLIBS = $(COMMON)libxpcommon.a 
+DEPLIBS = $(COMMON)libxpcommon.a
 
 PROGRAMS = xpilots
 
