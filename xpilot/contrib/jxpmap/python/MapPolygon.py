@@ -66,8 +66,8 @@ class MapPolygon(MapObject):
             df = self.style.getDefaultEdgeStyle()
             if df.getStyle() != LineStyle.STYLE_HIDDEN:
                 gc.foreground = colormap.alloc(*gcolor(df.getColor()))
+                gtk.draw_polygon(di.area, gc, gtk.FALSE, points)
                 # !@# dashed lines, width missing here
-                di.canvas.drawShape(self.polygon, gc, di.area)
         else:
             raise "unimplemented"
 
