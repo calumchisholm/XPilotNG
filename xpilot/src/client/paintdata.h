@@ -30,6 +30,11 @@
 #include "types.h"
 #endif
 
+/* need MAX_COLORS */
+#ifndef PAINT_H
+#include "paint.h"
+#endif
+
 /*
  * Macro to add one new element of a given type to a dynamic array.
  * T is the type of the element.
