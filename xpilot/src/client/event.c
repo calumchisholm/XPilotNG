@@ -280,6 +280,20 @@ bool Key_press(keys_t key)
 {
     static bool thrusthelp = false;
 
+    /* in quit mode only these keys can be used */
+    if (quit_mode) {
+	switch (key) {
+	case KEY_EXIT:
+	    return Key_press_exit();
+	case KEY_YES:
+	    return Key_press_yes();
+	case KEY_NO:
+	    return Key_press_no();
+	default:
+	    return false;
+	}
+    }
+
     Key_check_talk_macro(key);
 
     switch (key) {
