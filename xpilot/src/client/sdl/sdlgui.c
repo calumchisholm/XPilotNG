@@ -1777,6 +1777,7 @@ void Paint_messages(void)
     static message_t **msgs[2];
     static bool revscroll = false;
     static GLWidget *msg_list[2] = {NULL,NULL};
+    static bool showMessages = true;
     message_t	*msg;
     
     msgs[0] = TalkMsg;
@@ -1789,6 +1790,14 @@ void Paint_messages(void)
     	ListWidget_SetScrollorder(msg_list[0],instruments.showReverseScroll);
     	ListWidget_SetScrollorder(msg_list[1],!instruments.showReverseScroll);
 	revscroll = instruments.showReverseScroll;
+    }
+    if ( showMessages != instruments.showMessages ) {
+    	if (!instruments.showMessages)
+	    DelGLWidgetListItem( &(MainWidget->children), ((WrapperWidget *)(MainWidget->wid_info))->game_msgs );
+	else
+	    AppendGLWidgetList( &(MainWidget->children), ((WrapperWidget *)(MainWidget->wid_info))->game_msgs );
+	        
+	showMessages = instruments.showMessages;
     }
     
     if ( maxMessages < old_maxMessages ) {
