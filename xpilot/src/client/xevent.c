@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -245,7 +245,7 @@ bool Key_press_swap_settings(keys_t key)
 {
     DFLOAT _tmp;
 #define SWAP(a, b) (_tmp = (a), (a) = (b), (b) = _tmp)
-	
+
     SWAP(power, power_s);
     SWAP(turnspeed, turnspeed_s);
     SWAP(turnresistance, turnresistance_s);
@@ -354,9 +354,9 @@ bool Key_press_toggle_radar_score(keys_t key)
     if (radar_score_mapped) {
 
 	/* change the draw area to be the size of the window */
-	draw_width = top_width; 
-	draw_height = top_height; 
-	
+	draw_width = top_width;
+	draw_height = top_height;
+
 	/*
 	 * We need to unmap the score and radar windows
 	 * if config is mapped, leave it there its useful
@@ -370,14 +370,14 @@ bool Key_press_toggle_radar_score(keys_t key)
 
 	/* Move the draw area */
 	XMoveWindow(dpy, draw, 0, 0);
-    
+
 	/* Set the global variable to show that */
 	/* the radar and score are now unmapped */
-	radar_score_mapped = false;  
-	
+	radar_score_mapped = false;
+
 	/* Generate resize event */
 	Resize(top, top_width, top_height);
-	
+
     } else {
 
 	/*
@@ -388,14 +388,14 @@ bool Key_press_toggle_radar_score(keys_t key)
 	 */
 	draw_width = top_width - (258);
 	draw_height = top_height;
-	
+
 	XMoveWindow(dpy, draw, 258, 0);
 	Widget_map(button_form);
 	XMapWindow(dpy, radar);
 	XMapWindow(dpy, players);
-	
+
 	/* reflect that we are remapped to the client */
-	
+
 	radar_score_mapped = true;
     }
 
@@ -446,12 +446,12 @@ bool Key_press(keys_t key)
     case KEY_FIRE_HEAT:
     case KEY_DROP_MINE:
     case KEY_DETACH_MINE:
-	Key_press_autoshield_hack(key);    
+	Key_press_autoshield_hack(key);
 	break;
 
     case KEY_SHIELD:
 	if (Key_press_shield(key))
-	    return true; 
+	    return true;
 	break;
 
     case KEY_REFUEL:
@@ -507,7 +507,7 @@ bool Key_press(keys_t key)
 #endif
     case KEY_SELECT_ITEM:
     case KEY_LOSE_ITEM:
-	if (!Key_press_select_lose_item(key)) 
+	if (!Key_press_select_lose_item(key))
 	    return false;
     default:
 	break;
@@ -675,8 +675,10 @@ void Talk_event(XEvent *event)
 }
 
 
-int	talk_key_repeat_count;
+int	talk_key_repeating;
 XEvent	talk_key_repeat_event;
+struct timeval talk_key_repeat_time;
+static struct timeval time_now;
 
 void xevent_keyboard(int queued)
 {
@@ -685,13 +687,16 @@ void xevent_keyboard(int queued)
     XEvent		event;
 #endif
 
-    if (talk_key_repeat_count > 0) {
-	if (++talk_key_repeat_count >= /*client*/FPS
-	    && (((talk_key_repeat_count - /*client*/FPS) % ((/*client*/FPS + 2) / 3))
-		== 0)) {
+    if (talk_key_repeating) {
+	gettimeofday(&time_now, NULL);
+	i = 1000000 * (time_now.tv_sec - talk_key_repeat_time.tv_sec) +
+	    time_now.tv_usec - talk_key_repeat_time.tv_usec;
+	if (talk_key_repeating > 1 && i > 50000 || i > 5000000) {
 	    Talk_event(&talk_key_repeat_event);
+	    talk_key_repeating = 2;
+	    talk_key_repeat_time = time_now;
 	    if (!talk_mapped)
-		talk_key_repeat_count = 0;
+		talk_key_repeating = 0;
 	}
     }
 
@@ -734,7 +739,7 @@ int	movement;	/* horizontal mouse movement. */
 
 
 void xevent_pointer(void)
-{ 
+{
 #ifndef _WINDOWS
     XEvent		event;
 #endif
@@ -748,13 +753,13 @@ void xevent_pointer(void)
 		 POINT point;
 
 		 GetCursorPos(&point);
-		 movement = point.x - draw_width/2; 
+		 movement = point.x - draw_width/2;
 		 XWarpPointer(dpy, None, draw,
 			      0, 0, 0, 0,
 			      draw_width/2, draw_height/2);
 	    }
 		/* fix end */
-#endif 
+#endif
 
 	    if (movement != 0) {
 		Send_pointer_move(movement);
@@ -822,7 +827,7 @@ int win_xevent(XEvent event)
 	     * can access it.
 	     */
 	case SelectionNotify:
-	    SelectionNotify_event(&event);    
+	    SelectionNotify_event(&event);
 	    break;
 	    /*
 	     * we are requested to provide a selection.
@@ -856,7 +861,7 @@ int win_xevent(XEvent event)
 	case UnmapNotify:
 	    UnmapNotify_event(&event);
 	    break;
-	    
+
 	case MappingNotify:
 	    XRefreshKeyboardMapping(&event.xmapping);
 	    break;
@@ -868,7 +873,7 @@ int win_xevent(XEvent event)
 #endif
 
 	case KeyPress:
-	    talk_key_repeat_count = 0;
+	    talk_key_repeating = 0;
 	    /* FALLTHROUGH */
 	case KeyRelease:
 	    KeyChanged_event(&event);
@@ -883,7 +888,7 @@ int win_xevent(XEvent event)
 	    break;
 
 	case ButtonRelease:
-	    if (ButtonRelease_event(&event) == -1) 
+	    if (ButtonRelease_event(&event) == -1)
 	        return -1;
 	    break;
 
@@ -903,9 +908,7 @@ int win_xevent(XEvent event)
     }
 #endif
 
-    xevent_keyboard(queued);	
+    xevent_keyboard(queued);
     xevent_pointer();
     return 0;
 }
-
-

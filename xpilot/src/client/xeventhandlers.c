@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -26,8 +26,9 @@
 char xeventhandlers_version[] = VERSION;
 
 
-extern int	talk_key_repeat_count;  /* xevent.c */
+extern int	talk_key_repeating;  /* xevent.c */
 extern XEvent	talk_key_repeat_event;  /* xevent.c */
+extern struct timeval talk_key_repeat_time;
 extern int	initialPointerControl;
 extern bool	pointerControl;
 extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
@@ -63,7 +64,7 @@ static void Selection_paste(Window win, unsigned prop, int Delete)
     unsigned char  *data;
     Atom            actual_type;
     int             actual_fmt;
- 
+
     if (prop == None)
         return;
 
@@ -91,15 +92,15 @@ static void Selection_paste(Window win, unsigned prop, int Delete)
 static void Selection_request(void)
 {
     Atom prop;
- 
+
     if (selection.txt != NULL) {
 	/* internal selection */
 	if (Talk_paste(selection.txt, selection.len, False) > 0)
 	    save_talk_str = true;
-    } 
+    }
     else if (XGetSelectionOwner(dpy, XA_PRIMARY) == None) {
 	Selection_paste(DefaultRootWindow(dpy), XA_CUT_BUFFER0, False);
-    } 
+    }
     else {
 	prop = XInternAtom(dpy, "VT_SELECTION", False);
 	XConvertSelection(dpy, XA_PRIMARY, XA_STRING, prop, talk_w,
@@ -116,10 +117,10 @@ static void Selection_send(const XSelectionRequestEvent *rq)
     XEvent          ev;
     Atom32          target_list[2];
     static Atom     xa_targets = None;
- 
+
     if (xa_targets == None)
         xa_targets = XInternAtom(dpy, "TARGETS", False);
- 
+
     ev.xselection.type = SelectionNotify;
     ev.xselection.property = None;
     ev.xselection.display = rq->display;
@@ -127,7 +128,7 @@ static void Selection_send(const XSelectionRequestEvent *rq)
     ev.xselection.selection = rq->selection;
     ev.xselection.target = rq->target;
     ev.xselection.time = rq->time;
- 
+
     if (rq->target == xa_targets) {
         target_list[0] = (Atom32) xa_targets;
         target_list[1] = (Atom32) XA_STRING;
@@ -136,7 +137,7 @@ static void Selection_send(const XSelectionRequestEvent *rq)
                         (unsigned char *)target_list,
                         (sizeof(target_list) / sizeof(target_list[0])));
         ev.xselection.property = rq->property;
-    } 
+    }
     else if (rq->target == XA_STRING) {
 	XChangeProperty(dpy, rq->requestor, rq->property,
 			rq->target, 8, PropModeReplace,
@@ -162,7 +163,7 @@ void SelectionRequest_event(XEvent *event)
 void MapNotify_event(XEvent *event)
 {
     if (ignoreWindowManager == 1) {
-        XSetInputFocus(dpy, top, RevertToParent, CurrentTime); 
+        XSetInputFocus(dpy, top, RevertToParent, CurrentTime);
         ignoreWindowManager = 2;
     }
 }
@@ -226,7 +227,7 @@ void ConfigureNotify_event(XEvent *event)
     conf = &(event->xconfigure);
     if (conf->window == top) {
 	Resize(conf->window, conf->width, conf->height);
-    } 
+    }
     else {
         Widget_event(event);
     }
@@ -248,20 +249,20 @@ void KeyChanged_event(XEvent *event)
 #endif
     if (event->xkey.window == top) {
         Key_event(event);
-    } 
+    }
     else if (event->xkey.window == talk_w) {
         if (event->type == KeyPress) {
-	    talk_key_repeat_count = 1;
+	    talk_key_repeating = 1;
+	    gettimeofday(&talk_key_repeat_time, NULL);
 	    talk_key_repeat_event = *event;
-	} 
-	else if (talk_key_repeat_count > 0
-		   && event->xkey.keycode
-		   == talk_key_repeat_event.xkey.keycode) {
-	    talk_key_repeat_count = 0;
+	}
+	else if (talk_key_repeating && event->xkey.keycode ==
+		 talk_key_repeat_event.xkey.keycode) {
+	    talk_key_repeating = 0;
 	}
 	Talk_event(event);
 	if (!talk_mapped)
-	    talk_key_repeat_count = 0;
+	    talk_key_repeating = 0;
     }
 	/* else : here we can add widget.c key uses. */
 }
@@ -279,7 +280,7 @@ void ButtonPress_event(XEvent *event)
 		    Net_key_change();
 		}
 	    }
-	} 
+	}
 #ifndef _WINDOWS
 	else if (selectionAndHistory) {
 	    switch (event->xbutton.button) {
@@ -287,17 +288,17 @@ void ButtonPress_event(XEvent *event)
 	        if (!talk_mapped) {
 		  /* start cutting from the talk messages */
 		  Talk_cut_from_messages(&(event->xbutton));
-		} 
+		}
 		else {
 		    /* start cutting from ... */
 		    if (event->xbutton.window == draw) {
 		        /* ...the talk messages */
 		        Talk_cut_from_messages(&(event->xbutton));
-		    } 
+		    }
 		    else {
 		        /* ...the talk window */
 		        Talk_window_cut(&(event->xbutton));
-		    } 
+		    }
 		}
 		break;
 
@@ -336,7 +337,7 @@ void MotionNotify_event(XEvent *event)
 	    mouse.x = event->xmotion.x;
 	    mouse.y = event->xmotion.y;
 	}
-    } 
+    }
     else {
         Widget_event(event);
     }
@@ -346,7 +347,7 @@ int ButtonRelease_event(XEvent *event)
 {
     if (event->xbutton.window == draw
 	|| event->xbutton.window == talk_w) {
-      
+
         if (pointerControl
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
@@ -356,7 +357,7 @@ int ButtonRelease_event(XEvent *event)
 		    Net_key_change();
 		}
 	    }
-	} 
+	}
 #ifndef _WINDOWS
 	else if (!selectionAndHistory) {
 	    return 0;
@@ -366,7 +367,7 @@ int ButtonRelease_event(XEvent *event)
 		 * finish a cut from the talk messages
 		 */
 	    Talk_cut_from_messages(&(event->xbutton));
-	} 
+	}
 	else if (talk_mapped && event->xbutton.button == 1){
 		/*
 		 * finish a cut from ...
@@ -374,7 +375,7 @@ int ButtonRelease_event(XEvent *event)
 	    if (event->xbutton.window == draw
 		&& selection.draw.state == SEL_PENDING) {
 	        Talk_cut_from_messages(&(event->xbutton));
-	    } 
+	    }
 	    else if (selection.talk.state == SEL_PENDING) {
 	        Talk_window_cut(&(event->xbutton));
 	    }
@@ -407,16 +408,16 @@ void Expose_event(XEvent *event)
 	    players_exposed = true;
 	    scoresChanged++;
 	}
-    } 
+    }
     else if (event->xexpose.window == about_w) {
 	  if (event->xexpose.count == 0) {
 	      Expose_about_window();
 	  }
-    } 
+    }
     else if (event->xexpose.window == radar) {
 	  if (event->xexpose.count <= 1) {
 	      radar_exposures = 1;
-	  } 
+	  }
 	  else {
 	      radar_exposures++;
 	  }
@@ -425,7 +426,7 @@ void Expose_event(XEvent *event)
 	if (event->xexpose.count == 0) {
 	    Talk_event(event);
 	    if (!talk_mapped)
-	      talk_key_repeat_count = 0;
+	      talk_key_repeating = 0;
 	}
     }
     else if (Widget_event(event) == 0) {
