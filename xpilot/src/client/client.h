@@ -659,6 +659,7 @@ bool Key_press_swap_scalefactor(void);
 bool Key_press_talk(void);
 bool Key_press_toggle_radar_score(void);
 bool Key_press_toggle_record(void);
+bool Key_press_toggle_fullscreen(void);
 void Set_auto_shield(bool on);
 void Set_toggle_shield(bool on);
 void Talk_set_state(bool on);
