@@ -334,7 +334,9 @@ bool setScaleFactor(xp_option_t *opt, double val)
     /* Resize removed because it is not needed here */
     Scale_dashes();
     Bitmap_update_scale();
+    return true;
 }
+
 bool setAltScaleFactor(xp_option_t *opt, double val)
 {
     (void)opt;
