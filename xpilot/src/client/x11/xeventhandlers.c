@@ -282,7 +282,7 @@ void ButtonPress_event(XEvent *event)
 	    if (Talk_cut_area_hit(xbutton))
 		/* start cutting from the talk messages */
 		Talk_cut_from_messages(xbutton);
-	    else
+	    else if (!talk_mapped)
 		Pointer_control_set_state(true);
 	    break;
 
