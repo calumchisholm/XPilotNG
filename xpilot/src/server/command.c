@@ -26,7 +26,15 @@
 char command_version[] = VERSION;
 
 
-
+/*
+ * Look if any player's name is exactly 'str',
+ * If not, look if any player's name contains 'str'.
+ * The matching is case insensitive. If there is an
+ * error (no matches or several matches) NULL is returned
+ * and the error code is stored in 'error' if that is not NULL
+ * and a string describing the error is stored in
+ * 'errorstr_p' if that is not NULL.
+ */
 player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 {
     int i;
@@ -498,9 +506,9 @@ static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
     if (pl2) {
 	const char *addr = Player_get_addr(pl2);
 	if (addr == NULL)
-	    sprintf(msg, "Unable to get address for %s.", pl->name);
+	    sprintf(msg, "Unable to get address for %s.", pl2->name);
 	else
-	    sprintf(msg, "%s plays from: %s.", pl->name, addr);
+	    sprintf(msg, "%s plays from: %s.", pl2->name, addr);
     } else {
 	strcpy(msg, errorstr);
 	return CMD_RESULT_ERROR;
