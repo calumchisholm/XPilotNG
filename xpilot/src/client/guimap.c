@@ -1,7 +1,7 @@
 /*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
- *      Bjørn Stabell        <bjoern@xpilot.org>
+ *      BjÃ¸rn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
  *      Bert Gijsbers        <bert@xpilot.org>
  *      Dick Balaska         <dick@xpilot.org>
@@ -1285,7 +1285,9 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	if (width != -1 || !did_fill) {  /* did_fill to avoid invisibility */
 	    if (width == -1)
 		width = 0;
-	    XSetLineAttributes(dpy, gc, WINSCALE(width),
+            width = WINSCALE(width);
+            if (width == 1) width = 0; 
+	    XSetLineAttributes(dpy, gc, width,
 		edge_styles[sindex].style, CapButt, JoinMiter);
 
 	    if (fullColor)
@@ -1314,7 +1316,9 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	    if (sindex != 0 && (edge_styles[sindex].width != -1 || !did_fill)){
 		if (width == -1)
 		    width = 0;
-		XSetLineAttributes(dpy, gc, WINSCALE(width),
+                width = WINSCALE(width);
+                if (width == 1) width = 0;
+		XSetLineAttributes(dpy, gc, width,
 			      edge_styles[sindex].style, CapButt, JoinMiter);
 
 		if (fullColor)
