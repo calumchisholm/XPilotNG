@@ -48,6 +48,7 @@ extern unsigned SPACE_BLOCKS;
 
 char update_version[] = VERSION;
 
+#if 0 /* !@# Will turn gravity back on later */
 #define update_object_speed(o_)						\
     if (BIT((o_)->status, GRAVITY)) {					\
 	(o_)->vel.x += ((o_)->acc.x					\
@@ -55,6 +56,12 @@ char update_version[] = VERSION;
 	(o_)->vel.y += ((o_)->acc.y					\
     + World.gravity[(o_)->pos.bx][(o_)->pos.by].y) * framespeed2;	\
     } else {								\
+	(o_)->vel.x += (o_)->acc.x * framespeed2;			\
+	(o_)->vel.y += (o_)->acc.y * framespeed2;			\
+    }
+#endif
+
+#define update_object_speed(o_)	{					\
 	(o_)->vel.x += (o_)->acc.x * framespeed2;			\
 	(o_)->vel.y += (o_)->acc.y * framespeed2;			\
     }

@@ -3504,8 +3504,8 @@ void Move_object(int ind)
 
     move.start.x = obj->pos.cx;
     move.start.y = obj->pos.cy;
-    move.delta.x = FLOAT_TO_CLICK(obj->vel.x) * framespeed2;
-    move.delta.y = FLOAT_TO_CLICK(obj->vel.y) * framespeed2;
+    move.delta.x = FLOAT_TO_CLICK(obj->vel.x * framespeed2);
+    move.delta.y = FLOAT_TO_CLICK(obj->vel.y * framespeed2);
     obj->extpos.x = WRAP_XCLICK(obj->pos.cx + move.delta.x);
     obj->extpos.y = WRAP_YCLICK(obj->pos.cy + move.delta.y);
     while (move.delta.x || move.delta.y) {
