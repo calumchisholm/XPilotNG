@@ -61,6 +61,7 @@
 #include "talk.h"
 #include "configure.h"
 #include "xeventhandlers.h"
+#include "bitmaps.h"
 
 char xevent_version[] = VERSION;
 
@@ -392,6 +393,7 @@ bool Key_press_swap_scalefactor(keys_t key)
     Init_scale_array();
     Scale_dashes();
     Config_redraw();
+    Bitmap_update_scale();
 #endif
 
     return false;

@@ -106,6 +106,7 @@ int Bitmap_add_std_objects (void);
 int Bitmap_add_std_textures (void);
 int Bitmap_add (char *filename, int count, bool scalable);
 int Bitmap_create (Drawable d, int img);
+void Bitmap_update_scale (void);
 
 xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp);
 void Bitmap_paint (Drawable d, int img, int x, int y, int bmp);

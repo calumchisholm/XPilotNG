@@ -1303,9 +1303,7 @@ static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val)
     Init_scale_array();
     Resize(top, top_width, top_height);
     Scale_dashes();
-    for (i = 0; i < num_pixmaps; i++)
-	if (pixmaps[i].state == BMS_READY) 
-	    pixmaps[i].state = BMS_INITIALIZED;
+    Bitmap_update_scale();
     return 0;
 }
 #endif

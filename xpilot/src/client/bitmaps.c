@@ -203,6 +203,25 @@ int Bitmap_create (Drawable d, int img)
 
 
 /**
+ * Causes all scalable bitmaps to be rescaled (recreated actually) 
+ * next time needed.
+ */
+void Bitmap_update_scale () {
+
+    /* This should do the trick.
+     * All "good" scalable bitmaps are marked as initialized
+     * causing the next Bitmap_get to recreate the bitmap using
+     * the current scale factor. Bitmap_create should take care of
+     * releasing the device pixmaps no longer needed. */
+
+    int i;
+    for (i = 0; i < num_pixmaps; i++)
+	if (pixmaps[i].state == BMS_READY && pixmaps[i].scalable) 
+	    pixmaps[i].state = BMS_INITIALIZED;
+}
+
+
+/**
  * Gets a pointer to the bitmap specified with img and bmp.
  * Ensures that the bitmap returned has been initialized and created
  * properly. Returns NULL if the specified bitmap is not in appropriate
