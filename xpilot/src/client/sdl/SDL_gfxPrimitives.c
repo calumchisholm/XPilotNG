@@ -3597,7 +3597,7 @@ int bezierColor(SDL_Surface * dst, Sint16 * vx, Sint16 * vy, int n, int s, Uint3
 {
     int result;
     int i;
-    double *x, *y, t, stepsize;
+    double *x, *y, t, stepsize, tmpx, tmpy;
     Sint16 x1, y_1, x2, y2;
 
     /*
@@ -3635,12 +3635,16 @@ int bezierColor(SDL_Surface * dst, Sint16 * vx, Sint16 * vy, int n, int s, Uint3
      */
     result = 0;
     t=0.0;
-    x1=(Sint16)evaluateBezier(x,n+1,t);
-    y_1=(Sint16)evaluateBezier(y,n+1,t);
+    tmpx = evaluateBezier(x,n+1,t);
+    tmpy = evaluateBezier(y,n+1,t);
+    x1 = (Sint16) tmpx;
+    y_1 = (Sint16) tmpy;
     for (i = 0; i <= (n*s); i++) {
 	t += stepsize;
-	x2=(Sint16)evaluateBezier(x,n,t);
-	y2=(Sint16)evaluateBezier(y,n,t);
+	tmpx = evaluateBezier(x,n,t);
+	tmpy = evaluateBezier(y,n,t);
+	x2 = (Sint16)tmpx;
+	y2 = (Sint16)tmpy;
 	result |= lineColor(dst, x1, y_1, x2, y2, color);
 	x1 = x2;
 	y_1 = y2;
