@@ -378,7 +378,8 @@ void Pause_player(player_t *pl, bool on)
 	Player_set_state(pl, PL_STATE_PAUSED);
 	pl->pauseTime = 0;
 	if (options.baselessPausing) {
-	    world->teams[pl->team].NumMembers--;
+	    if (pl->team != TEAM_NOT_SET)
+		world->teams[pl->team].NumMembers--;
 	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Player_by_index(i);
