@@ -151,13 +151,10 @@
  * So for the client i route the "debug" printfs to the debug stream 
  * The server gets 'real' messages routed to the messages window 
  */
-#ifndef _WINDOWS
-#  define xpprintf	printf
-#else
+#ifdef _WINDOWS
 #  ifdef _XPILOTNTSERVER_
 #    define xpprintf	xpprintfW
 /* # define xpprintf _Trace  */
-#  else
 #  endif
 #endif
 
