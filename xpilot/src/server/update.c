@@ -79,7 +79,7 @@ static void Transport_to_home(player *pl)
 
     dx = WRAP_DCX(startpos.cx - pl->pos.cx);
     dy = WRAP_DCY(startpos.cy - pl->pos.cy);
-    t = pl->count + 0.5f;
+    t = pl->count + 0.5;
     if (2 * t <= T)
 	m = 2 / t;
     else {
@@ -1229,13 +1229,6 @@ void Update_objects(void)
 	    pl->did_shoot = false;
 	    CLR_BIT(pl->status, THRUSTING);
 	}
-#if 0
-	if (pl->warped > 0) {
-	    pl->warped -= timeStep;
-	    if (pl->warped <= 0)
-		pl->warped = 0;
-	}
-#endif
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(pl);
 	if (BIT(pl->used, HAS_LASER)) {
