@@ -1430,6 +1430,7 @@ void Fire_laser(int ind)
 {
     player	*pl = Players[ind];
     int		cx, cy;
+    int		laserRepeatRate = TIME_FACT;
 
     if (frame_time < pl->laser_time + laserRepeatRate) {
  	return;

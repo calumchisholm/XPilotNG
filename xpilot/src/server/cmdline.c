@@ -82,8 +82,6 @@ int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
 int		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
 static DFLOAT	fireRepeatRateSetting;	/* Above is set through this */
-int		laserRepeatRate;	/* Ticks per autorepeat laser (0=off) */
-static DFLOAT	laserRepeatRateSetting;	/* Above is set through this */
 
 bool		RawMode;		/* Let robots live and calculate
 					   frames even if there are n
@@ -527,18 +525,9 @@ static option_desc options[] = {
 	"Max length of laser pulse.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    /* kps - change to pulseRepeatRate ??? */
-    /* kps - does this work with value == 0 ? */
-    {
-	"laserRepeatRate",
-	"laserRepeat",
-	"1.0",
-	&laserRepeatRateSetting,
-	valReal,
-	Timing_setup,
-	"Number of ticks per automatic laser pulse (0=off).\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
+    /* kps - this is stupid */
+    /* 1. default should be 0 */
+    /* 2. robots = 4 should mean 4 robots, not 4 - numplayers robots */
     {
 	"maxRobots",
 	"robots",
@@ -3774,7 +3763,6 @@ void Timing_setup(void)
 
     ShotsLife = ShotsLifeSetting * TIME_FACT;
     fireRepeatRate = fireRepeatRateSetting * TIME_FACT;
-    laserRepeatRate = laserRepeatRateSetting * TIME_FACT;
     pulseLife = pulseLifeSetting * TIME_FACT;
 
     friction = frictionSetting;
