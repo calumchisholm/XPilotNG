@@ -689,7 +689,8 @@ void Reset_all_players(void)
 	for (i = 0; i < NumObjs; i++) {
 	    object *obj = Obj[i];
 	    if (BIT(obj->type, OBJ_SHOT|OBJ_MINE|OBJ_DEBRIS|OBJ_SPARK
-			       |OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_HEAT_SHOT)) {
+			       |OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_HEAT_SHOT
+			       |OBJ_ITEM)) {
 		obj->life = 0;
 		if (BIT(obj->type, OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_HEAT_SHOT
 				   |OBJ_MINE)) {
