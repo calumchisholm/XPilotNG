@@ -24,6 +24,10 @@
 #ifndef CONST_H
 #define CONST_H
 
+#ifndef XPCONFIG_H
+#include "xpconfig.h"
+#endif
+
 #ifndef TYPES_H
 #include "types.h"
 #endif

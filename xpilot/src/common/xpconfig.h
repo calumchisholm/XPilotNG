@@ -139,9 +139,6 @@
 #    define CONTACTADDRESS	"xpilot@xpilot.org"
 #endif
 
-#ifdef MOD2
-#error "MOD2 already defined - xpconfig.h should be included before const.h"
-#endif
 /*
  * Uncomment this if your machine doesn't use
  * two's complement negative numbers.
