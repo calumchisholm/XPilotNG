@@ -90,7 +90,6 @@ void Place_general_mine(player *pl, int team, long status,
     double		life, drain, mass;
     int			i, minis;
     vector		mv;
-    world_t *world = &World;
 
     if (NumObjs + mods.mini >= MAX_TOTAL_SHOTS)
 	return;

@@ -132,7 +132,7 @@ int Welcome_sort_server_list(void)
 	}
     }
 
-    //#if 0
+    /*#if 0*/
     /* print for debugging */
     printf("\n");
     printf("Printing server list:\n");
@@ -152,7 +152,7 @@ int Welcome_sort_server_list(void)
 	printf("\n");
     }
     printf("\n");
-    //#endif
+    /*#endif*/
 
     List_delete(old_list);
     server_list = new_list;
@@ -556,7 +556,7 @@ void Delete_server_info(server_info_t * sip)
 /*
  * User pressed the Internet button.
  */
-int Get_meta_data(char *error)
+int Get_meta_data(char *errorstr)
 {
     int i;
     int max = -1;
@@ -667,8 +667,8 @@ int Get_meta_data(char *error)
 		bytes_read =
 		    read(metas[i].sock.fd, md[i].end, buffer_space);
 		if (bytes_read <= 0) {
-		  // if (bytes_read == -1)
-		  //	error("Error while reading data from meta %d\n",i + 1);
+		  /* if (bytes_read == -1)
+		     error("Error while reading data from meta %d\n",i + 1);*/
 		    FD_CLR(metas[i].sock.fd, &rset_in);
 		    close(metas[i].sock.fd);
 		    metas[i].sock.fd = SOCK_FD_INVALID;
@@ -746,7 +746,7 @@ int Get_meta_data(char *error)
     } else
 	sprintf(buf, "Could not contact any Internet Meta server");
 
-    strcpy(error,buf);
+    strcpy(errorstr ,buf);
 
     return server_count;
 }

@@ -207,7 +207,7 @@ bool Set_double_option(xp_option_t *opt, double value,
     assert(opt->dbl_ptr);
 
     if (!(value >= opt->dbl_minval && value <= opt->dbl_maxval)) {
-	warn("Bad value %.3f for option \"%s\", using default...",
+	warn("Bad value %.3lf for option \"%s\", using default...",
 	     value, opt->name);
 	value = opt->dbl_defval;
     }
@@ -220,7 +220,7 @@ bool Set_double_option(xp_option_t *opt, double value,
 	*opt->dbl_ptr = value;
 
     /*
-     * printf("Value of option %s is now %.3f.\n", opt->name,
+     * printf("Value of option %s is now %.3lf.\n", opt->name,
      * *opt->dbl_ptr); 
      */
     return retval;

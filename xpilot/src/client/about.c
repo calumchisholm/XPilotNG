@@ -445,8 +445,6 @@ int		keys_viewer = NO_WIDGET;
 
 int Keys_callback(int widget_desc, void *data, const char **unused)
 {
-    (void)widget_desc; (void)data; (void)unused;
-
     unsigned	bufsize = (num_keydefs * 64);
     char	*buf = calloc(bufsize, 1), *end = buf, *str;
     const char	*help;

@@ -32,7 +32,7 @@ typedef enum {
     xp_int_option,
     xp_double_option,
     xp_string_option,
-    xp_key_option,
+    xp_key_option
 } xp_option_type_t;
 
 typedef struct xp_option xp_option_t;
@@ -43,7 +43,7 @@ typedef enum {
     xp_option_origin_env,	/* environment variable */
     xp_option_origin_xpilotrc,	/* xpilotrc file */
     xp_option_origin_config,	/* config menu or such */
-    xp_option_origin_setcmd,	/* set client command */
+    xp_option_origin_setcmd	/* set client command */
 } xp_option_origin_t;
 
 typedef bool (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
