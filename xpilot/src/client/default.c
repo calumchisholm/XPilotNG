@@ -43,6 +43,7 @@ char myusername[MAX_NAME_LEN];
 char myhostname[MAX_HOST_LEN];
 int myteam;
 int myport;
+char *mygeometry = NULL;
 
 static bool setTexturePath(xp_option_t *opt, const char *value)
 {
@@ -57,6 +58,22 @@ static char *getTexturePath(xp_option_t *opt)
 {
     (void)opt;
     return texturePath;
+}
+
+static bool setGeometry(xp_option_t *opt, const char *value)
+{
+    (void)opt;
+    if (mygeometry)
+	xp_free(mygeometry);
+
+    texturePath = xp_safe_strdup(value);
+    return true;
+}
+
+static char *getGeometry(xp_option_t *opt)
+{
+    (void)opt;
+    return mygeometry;
 }
 
 xp_option_t default_options[] = {
@@ -167,6 +184,16 @@ xp_option_t default_options[] = {
 	"Almost all servers use the default port, which is the recommended\n"
 	"policy.  You can find out about which port is used by a server by\n"
 	"querying the XPilot Meta server.\n"),
+
+    XP_STRING_OPTION(
+	"geometry",
+	"1024x768",
+	NULL, 0,
+	setGeometry,
+	getGeometry,
+	"Set the window size and position in standard X geometry format.\n"
+	"The maximum allowed window size is 1922x1440.\n"),
+
 
     /*
      * kps - steering stuff, note that set functions might have to be
@@ -539,7 +566,13 @@ xp_option_t default_options[] = {
     	NULL,
 	"Uses a red line to indicate the current velocity and direction.\n"),
 
-
+    /* eye candy stuff */
+    XP_BOOL_OPTION(
+	"markingLights",
+	false,
+	&markingLights,
+	NULL,
+	"Should the fighters have marking lights, just like airplanes?\n"),
 
     /* modbanks */
     XP_STRING_OPTION(
@@ -583,7 +616,6 @@ xp_option_t default_options[] = {
 
 
 
-
 #if 0
 
 
@@ -603,15 +635,7 @@ xp_option_t default_options[] = {
 
 
 
-    {
-	"geometry",
-	NULL,
-	"1024x768",
-	KEY_DUMMY,
-	"Set the window size and position in standard X geometry format.\n"
-	"The maximum allowed window size is 1922x1440.\n",
-	0
-    },
+
 
     {
 	"shutdown",
@@ -659,14 +683,6 @@ xp_option_t default_options[] = {
     },
 
 
-    {
-	"markingLights",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the fighters have marking lights, just like airplanes?\n",
-	0
-    },
 
 
 
