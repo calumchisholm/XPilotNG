@@ -1,5 +1,5 @@
 #ifndef SDLMETA_H
 #define SDLMETA_H
-void Meta_window(char *servername);
-
+#include "xpclient.h"
+int Meta_window(Connect_param_t *connectParam);
 #endif

@@ -147,6 +147,8 @@ typedef struct {
     string_tex_t    tex;
     int     	    *bgcolor;
     int     	    *fgcolor;
+    int             align;  /* horizontal alignemnt */
+    int             valign; /* vertical alignment   */
 } LabelWidget;
 GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor );
 /********************/

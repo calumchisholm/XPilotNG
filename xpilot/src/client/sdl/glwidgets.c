@@ -718,6 +718,7 @@ void Paint_LabelWidget( GLWidget *widget )
     GLWidget *tmp;
     SDL_Rect *b;
     LabelWidget *wid_info;
+    int x, y;
 
     if (!widget) return;
      
@@ -736,10 +737,29 @@ void Paint_LabelWidget( GLWidget *widget )
      	glEnd();
     }
     
+    x = wid_info->align == LEFT   ? tmp->bounds.x :
+	wid_info->align == CENTER ? tmp->bounds.x + tmp->bounds.w / 2 :
+	tmp->bounds.x + tmp->bounds.w;
+    y = wid_info->valign == DOWN   ? tmp->bounds.y :
+	wid_info->valign == CENTER ? tmp->bounds.y + tmp->bounds.h / 2 :
+	tmp->bounds.y + tmp->bounds.h;
+
     if (wid_info->fgcolor)
-    	disp_text(&(wid_info->tex), *(wid_info->fgcolor), CENTER, CENTER, tmp->bounds.x+tmp->bounds.w/2, draw_height - tmp->bounds.y-tmp->bounds.h/2, true);
+    	disp_text(&(wid_info->tex), 
+		  *(wid_info->fgcolor), 
+		  wid_info->align, 
+		  wid_info->valign, 
+		  x, 
+		  draw_height - y, 
+		  true);
     else
-    	disp_text(&(wid_info->tex), whiteRGBA, CENTER, CENTER, tmp->bounds.x+tmp->bounds.w/2, draw_height - tmp->bounds.y-tmp->bounds.h/2, true);
+    	disp_text(&(wid_info->tex), 
+		  whiteRGBA, 
+		  wid_info->align, 
+		  wid_info->valign, 
+		  x, 
+		  draw_height - y, 
+		  true);
 }
 
 GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor )
@@ -774,6 +794,8 @@ GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor )
     tmp->bounds.h   	= (((LabelWidget *)tmp->wid_info)->tex).height;
     ((LabelWidget *)tmp->wid_info)->fgcolor  = fgcolor;
     ((LabelWidget *)tmp->wid_info)->bgcolor  = bgcolor;
+    ((LabelWidget *)tmp->wid_info)->align    = CENTER;
+    ((LabelWidget *)tmp->wid_info)->valign   = CENTER;
     tmp->Draw	    	= Paint_LabelWidget;
     tmp->Close     	= Close_LabelWidget;
     return tmp;

@@ -39,7 +39,6 @@ static void sigcatch(int signum)
 int main(int argc, char *argv[])
 {
     bool auto_shutdown = false;
-    char servername[512];
 
     init_error(argv[0]);
 
@@ -63,38 +62,32 @@ int main(int argc, char *argv[])
     Init_saved_scores();
 
 #ifdef _WINDOWS
-	if (Winsock_init()) {
-		error("failed to initialize windows networking");
-		exit(1);
-	}
+    if (Winsock_init()) {
+	error("failed to initialize windows networking");
+	exit(1);
+    }
 #endif
 
-     if (argc == 1) {
-       if (Init_window()) {
-	      error("Could not create a drawable window \
-          check your SDL and TTF settings..");
-       }
-              
-       Meta_window(servername);
-       
-       /* search for local servers as well (temporarily here) */
-       if (!Contact_servers(argc - 1, &argv[1],
-			    xpArgs.auto_connect, xpArgs.list_servers,
-			    auto_shutdown, xpArgs.shutdown_reason,
-			    0, NULL, NULL, NULL, NULL,
-			    &connectParam)) return 0;
-       
-     } else {
-       if (!Contact_servers(argc - 1, &argv[1],
-			    xpArgs.auto_connect, xpArgs.list_servers,
-			    auto_shutdown, xpArgs.shutdown_reason,
-			    0, NULL, NULL, NULL, NULL,
-			    &connectParam)) return 0;
-       if (Init_window()) {
-	 error("Could not create a drawable window \
-                check your SDL and TTF settings..");
-       }
-     }
+    if (xpArgs.text || xpArgs.auto_connect || argv[1]) {
+	if (!Contact_servers(argc - 1, &argv[1],
+			     xpArgs.auto_connect, xpArgs.list_servers,
+			     auto_shutdown, xpArgs.shutdown_reason,
+			     0, NULL, NULL, NULL, NULL,
+			     &connectParam))
+	    return 0;
+	if (Init_window()) {
+	    error("Could not initialize SDL, check your settings.");
+	    exit(1);
+	}
+    } else {
+	if (Init_window()) {
+	    error("Could not initialize SDL, check your settings.");
+	    exit(1);
+	}
+	if (Meta_window(&connectParam)) 
+	    return 0;
+    }
+
     /* If something goes wrong before Client_setup I'll leave the
      * cleanup to the OS because afaik Client_cleanup will clean
      * stuff initialized in Client_setup. */
