@@ -57,7 +57,7 @@ int			game_lock = false;
 int			mute_baseless;
 
 time_t			gameOverTime = 0;
-time_t			serverTime = 0;
+time_t			serverStartTime = 0;
 
 static void Check_server_versions(void);
 static void Handle_signal(int sig_no);
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
     /*
      * Set the time the server started
      */
-    serverTime = time(NULL);
+    serverStartTime = time(NULL);
 
     if (!options.silent)
 	xpprintf("%s Server runs at %d frames per second\n",
@@ -208,7 +208,7 @@ void Main_loop(void)
     main_loops++;
 
     if ((main_loops & 0x3F) == 0)
-	Meta_update(0);
+	Meta_update(false);
 
     /*
      * Check for possible shutdown, the server will
@@ -252,7 +252,7 @@ void Main_loop(void)
 	if (!NoPlayersEnteredYet)
 	    End_game();
 
-	if (serverTime + 5*60 < time(NULL)) {
+	if (serverStartTime + 5*60 < time(NULL)) {
 	    error("First player has yet to show his butt, I'm bored... Bye!");
 	    Log_game("NOSHOW");
 	    End_game();

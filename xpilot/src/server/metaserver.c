@@ -138,22 +138,22 @@ void Meta_update_max_size_tuner(world_t *world)
 {
     UNUSED_PARAM(world);
 
-    LIMIT(options.metaUpdateMaxSize, 2 * MSG_LEN, sizeof(meta_update_string));
+    LIMIT(options.metaUpdateMaxSize, 1, sizeof(meta_update_string));
 }
 
-void Meta_update(int change)
+void Meta_update(bool change)
 {
 #define GIVE_META_SERVER_A_HINT	180
 
-    char string[MAX_STR_LEN], freebases[120];
+    char *string = meta_update_string, freebases[120];
     int i, num_active_players, active_per_team[MAX_TEAMS];
-    size_t len;
-    bool first = true;
+    size_t len, max_size;
     time_t currentTime;
     const char *game_mode;
     static time_t lastMetaSendTime = 0;
     static int queue_length = 0;
     world_t *world = &World;
+    bool first;
 
     if (!options.reportToMetaServer)
 	return;
@@ -166,6 +166,10 @@ void Meta_update(int change)
 		return;
 	}
     }
+
+    Meta_update_max_size_tuner(world);
+    max_size = options.metaUpdateMaxSize;
+
     lastMetaSendTime = currentTime;
     queue_length = NumQueuedPlayers;
 
@@ -211,30 +215,30 @@ void Meta_update(int change)
 	snprintf(freebases, sizeof(freebases), "=%d",
 		 world->NumBases - num_active_players - login_in_progress);
 
-    sprintf(string,
-	    "add server %s\n"
-	    "add users %d\n"
-	    "add version %s\n"
-	    "add map %s\n"
-	    "add sizeMap %3dx%3d\n"
-	    "add author %s\n"
-	    "add bases %d\n"
-	    "add fps %d\n"
-	    "add port %d\n"
-	    "add mode %s\n"
-	    "add teams %d\n"
-	    "add free %s\n"
-	    "add timing %d\n"
-	    "add stime %ld\n"
-	    "add queue %d\n"
-	    "add sound %s\n",
-	    Server.host, num_active_players,
-	    META_VERSION, world->name, world->x, world->y, world->author,
-	    world->NumBases, FPS, options.contactPort,
-	    game_mode, world->NumTeamBases, freebases,
-	    BIT(world->rules->mode, TIMING) ? 1:0,
-	    (long)(time(NULL) - serverTime),
-	    queue_length, options.sound ? "yes" : "no");
+    snprintf(string, max_size,
+	     "add server %s\n"
+	     "add users %d\n"
+	     "add version %s\n"
+	     "add map %s\n"
+	     "add sizeMap %3dx%3d\n"
+	     "add author %s\n"
+	     "add bases %d\n"
+	     "add fps %d\n"
+	     "add port %d\n"
+	     "add mode %s\n"
+	     "add teams %d\n"
+	     "add free %s\n"
+	     "add timing %d\n"
+	     "add stime %ld\n"
+	     "add queue %d\n"
+	     "add sound %s\n",
+	     Server.host, num_active_players,
+	     META_VERSION, world->name, world->x, world->y, world->author,
+	     world->NumBases, FPS, options.contactPort,
+	     game_mode, world->NumTeamBases, freebases,
+	     BIT(world->rules->mode, TIMING) ? 1:0,
+	     (long)(time(NULL) - serverStartTime),
+	     queue_length, options.sound ? "yes" : "no");
 
 
     /*
@@ -242,12 +246,13 @@ void Meta_update(int change)
      * non-zero bytes which are in string[].
      */
     len = strlen(string);
+    first = true;
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Players(i);
 
 	if (Player_is_human(pl) && !BIT(pl->status, PAUSE)) {
-	    if ((len + (4 * MAX_CHARS)) < sizeof(string)) {
+	    if ((len + (4 * MAX_CHARS)) < max_size) {
 		sprintf(string + len,
 			"%s%s=%s@%s",
 			(first) ? "add players " : ",",
@@ -266,19 +271,24 @@ void Meta_update(int change)
 	}
     }
 
-    if (len + MSG_LEN < sizeof(string)) {
+    if (len + MSG_LEN < max_size) {
 	char status[MAX_STR_LEN];
 
-	strlcpy(&string[len], "\nadd status ", sizeof(string) - len);
+	strlcpy(&string[len], "\nadd status ", max_size - len);
 	len += strlen(&string[len]);
 
 	Server_info(status, sizeof(status));
 
-	strlcpy(&string[len], status, sizeof(string) - len);
+	strlcpy(&string[len], status, max_size - len);
 	len += strlen(&string[len]);
     }
 
-    /*asciidump(string, len);*/
+#if 0
+    warn("Meta update string len is %d (option is %d)",
+	 len, options.metaUpdateMaxSize);
+
+    asciidump(string, len);
+#endif
 
     Meta_send(string, len + 1);
 }

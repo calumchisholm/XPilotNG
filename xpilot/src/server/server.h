@@ -91,7 +91,7 @@ extern int		NumRobots;
 extern int		login_in_progress;
 extern char		ShutdownReason[];
 extern sock_t		contactSocket;
-extern time_t		serverTime;
+extern time_t		serverStartTime;
 extern server_t		Server;
 extern char		*serverAddr;
 extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
@@ -884,7 +884,7 @@ void Meta_send(char *mesg, size_t len);
 int Meta_from(char *addr, int port);
 void Meta_gone(void);
 void Meta_init(void);
-void Meta_update(int change);
+void Meta_update(bool change);
 void Meta_update_max_size_tuner(world_t *world);
 
 /*

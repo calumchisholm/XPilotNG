@@ -1539,7 +1539,7 @@ int Input(void)
 
     if (num_logins | num_logouts) {
 	/* Tell the meta server */
-	Meta_update(1);
+	Meta_update(true);
 	num_logins = 0;
 	num_logouts = 0;
     }
