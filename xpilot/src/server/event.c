@@ -187,13 +187,18 @@ void Pause_player(player *pl, int on)
 	SET_BIT(pl->status, PAUSE);
 	if (baselessPausing) {
 	    World.teams[pl->team].NumMembers--;
+	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->conn != NULL)
+		if (pl_i->conn != NULL) {
 		    Send_base(pl_i->conn, -1, pl->home_base->ind);
+		    Send_team(pl_i->conn, pl->id, 0);
+		}
 	    }
-	    for (i = observerStart; i < observerStart + NumObservers; i++)
+	    for (i = observerStart; i < observerStart + NumObservers; i++) {
 		Send_base(Players(i)->conn, -1, pl->home_base->ind);
+		Send_team(Players(i)->conn, pl->id, 0);
+	    }
 	    pl->home_base = NULL;
 	}
 	pl->mychar = 'P';
