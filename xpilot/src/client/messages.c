@@ -379,6 +379,7 @@ static bool Msg_scan_for_total_reset(char *message)
 	ballstats_replaces = 0;
 	ballstats_teamcashes = 0;
 	ballstats_lostballs = 0;
+	played_this_round = false;
 	rounds_played = 0;
 	return true;
     }
@@ -623,6 +624,11 @@ void Add_message(char *message)
 	/* Mara bmsg scan - clear flags at end of round. */
 	ball_shout = false;
 	need_cover = false;
+
+	if (played_this_round) {
+	    played_this_round = false;
+	    rounds_played++;
+	}
 
 	roundend = true;
 	killratio_totalkills += killratio_kills;

@@ -81,6 +81,7 @@ int ballstats_cashes = 0;
 int ballstats_replaces = 0;
 int ballstats_teamcashes = 0;
 int ballstats_lostballs = 0;
+bool played_this_round = false;
 int rounds_played = 0;
 
 XFontStruct* gameFont;		/* The fonts used in the game */
@@ -222,6 +223,10 @@ void Paint_frame(void)
 	frame_count = 0;
 	if (clientFPS != 0)
 	    timePerFrame = 1.0 / clientFPS;
+
+	/* kps hack - check once per second if we are playing */
+	if (self && !strchr("PTW", self->mychar))
+	    played_this_round = true;
 	/*xpprintf("clientFPS = %d\n", clientFPS);*/
     }
 

@@ -94,6 +94,7 @@ extern int ballstats_cashes;
 extern int ballstats_replaces;
 extern int ballstats_teamcashes;
 extern int ballstats_lostballs;
+extern bool played_this_round;
 extern int rounds_played;
 extern homebase_t *bases;
 extern int num_bases;

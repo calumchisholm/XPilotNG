@@ -1327,12 +1327,6 @@ static void Print_roundend_messages(other_t **order)
 	    killratio_totalkills, killratio_totaldeaths, kdratio,
 	    rounds_played, killsperround);
 
-    /*
-     * kps - this is ugly, is there some decent way of finding out
-     * if a player played this round ???
-     */
-    if (self && !strchr("PTW", self->mychar))
-	rounds_played++;
     killratio_kills = 0;
     killratio_deaths = 0;
     Add_message(hackbuf);
