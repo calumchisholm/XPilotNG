@@ -3556,6 +3556,8 @@ static option_desc options[] = {
 	Timing_setup,
 	"Rate at which game events happen. Allows using higher\n"
 	"FPS without making the game too fast.\n"
+	"A game speed of X means the game proceeds as fast as on a\n"
+	"version 4.5.4 server running at X FPS.\n"
 	"A value of 0 means the game speed is the same as FPS.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
