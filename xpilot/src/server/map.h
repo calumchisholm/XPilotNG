@@ -145,7 +145,7 @@ typedef struct {
     long		used;
     int			emergency_shield_left;
     int			phasing_left;
-    int			group_id;
+    int			group;
 } cannon_t;
 
 typedef struct {
@@ -195,7 +195,7 @@ typedef struct {
     unsigned		conn_mask;
     unsigned 		update_mask;
     long		last_change;
-    int			group_id;
+    int			group;
 } target_t;
 
 typedef struct {

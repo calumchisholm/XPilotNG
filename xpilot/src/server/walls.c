@@ -173,17 +173,17 @@ int num_groups = 0;
 int mapx, mapy;
 
 #if 1
-#define can_hit(group, move) \
-(((group)->hit_mask & (move)->hit_mask) ? false : \
- ((group)->hit_func == NULL ? true : (group)->hit_func(group, move)))
+#define can_hit(groupptr, move) \
+(((groupptr)->hit_mask & (move)->hit_mask) ? false : \
+ ((groupptr)->hit_func == NULL ? true : (groupptr)->hit_func(groupptr, move)))
 #else
-bool can_hit(struct group *group, struct move *move)
+bool can_hit(struct group *groupptr, struct move *move)
 {
-    if (group->hit_mask & move->hit_mask)
+    if (groupptr->hit_mask & move->hit_mask)
 	return false;
-    if (group->hit_func == NULL)
+    if (groupptr->hit_func == NULL)
 	return true;
-    return group->hit_func(group, move);
+    return groupptr->hit_func(groupptr, move);
 }
 #endif
 
