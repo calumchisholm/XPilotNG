@@ -1429,7 +1429,7 @@ static option_desc options[] = {
 	"yes",
 	&targetTeamCollision,
 	valBool,
-	tuner_dummy,
+	Target_init,
 	"Do team members collide with their own target or not.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },

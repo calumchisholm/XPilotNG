@@ -244,7 +244,7 @@ int P_start_target(int team, int ind)
     groups[current_group].type = TARGET;
     groups[current_group].team = team;
     groups[current_group].hit_mask = HITMASK(team);
-    groups[current_group].hit_func = Target_hit_func;
+    groups[current_group].hit_func = NULL /*Target_hit_func*/;
     groups[current_group].item_id = ind;
     World.targets[ind].group_id = current_group;
     return current_group;
@@ -347,4 +347,15 @@ int P_get_poly_id(const char *s)
 	    return i;
     warn("Undeclared polystyle %s", s);
     return -1;
+}
+
+void P_grouphack(int type, void (*f)(int))
+{
+    int i;
+
+    for (i = 0; i <= num_groups; i++) {
+	if (groups[i].type == type) {
+	    (*f)(groups[i].item_id);
+	}
+    }
 }

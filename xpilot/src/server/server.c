@@ -171,6 +171,7 @@ int main(int argc, char **argv)
 
     /* kps - remove ??? */
     Treasure_init();
+    Target_init();
 
     Rank_init_saved_scores();
 

@@ -230,6 +230,7 @@ bool Balltarget_hit_func(struct group *group, struct move *move);
 void Cannon_restore_on_map(int ind);
 void Cannon_remove_from_map(int ind);
 bool Cannon_hit_func(struct group *group, struct move *move);
+void Target_init(void);
 void Target_restore_on_map(int ind);
 void Target_remove_from_map(int ind);
 bool Target_hit_func(struct group *group, struct move *move);
@@ -503,6 +504,7 @@ void P_end_frictionarea(void);
 int P_get_bmp_id(const char *s);
 int P_get_edge_id(const char *s);
 int P_get_poly_id(const char *s);
+void P_grouphack(int type, void (*f)(int));
 
 /*
  * Prototypes for showtime.c

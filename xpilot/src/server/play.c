@@ -445,6 +445,18 @@ int Target_hitmask(target_t *targ)
     return HITMASK(targ->team);
 }
 
+void Target_set_hitmask(int ind)
+{
+    target_t *targ = &World.targets[ind];
+
+    groups[targ->group_id].hit_mask = Target_hitmask(targ);
+}
+
+void Target_init(void)
+{
+    P_grouphack(TARGET, Target_set_hitmask);
+}
+
 void Target_restore_on_map(int ind)
 {
     target_t		*targ = &World.targets[ind];
@@ -484,6 +496,7 @@ void Target_remove_from_map(int ind)
     World.block[bx][by] = SPACE;
 }
 
+#if 0
 bool Target_hit_func(struct group *group, struct move *move)
 {
     object *obj = NULL;
@@ -507,3 +520,4 @@ bool Target_hit_func(struct group *group, struct move *move)
 
     return true;
 }
+#endif
