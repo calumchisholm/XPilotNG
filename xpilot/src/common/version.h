@@ -31,10 +31,10 @@
 #define	VERSION_H
 
 #ifndef _WINDOWS
-#  define TITLE			"XPilot 4.5.4X2"
+#  define TITLE			"XPilotNG 4.6.0"
 #else
-#  define VERSION		"4.5.4X2"
-#  define TITLE			"4.5.4X2-NT13"
+#  define VERSION		"4.6.0"
+#  define TITLE			"4.6.0ng-NT13"
 #  define VERSION_WINDOWS	"13"
 #endif
 #define AUTHORS			"Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"

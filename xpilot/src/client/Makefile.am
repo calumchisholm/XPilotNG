@@ -1,8 +1,8 @@
 
-bin_PROGRAMS = xpilot
+bin_PROGRAMS = xpilot-ng-x11
 AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
 INCLUDES = -I$(top_srcdir)/src/common
-xpilot_SOURCES = \
+xpilot_ng_x11_SOURCES = \
 	about.c \
 	bitmaps.c bitmaps.h \
 	caudio.c caudio.h client.c client.h \
@@ -36,7 +36,7 @@ libxpclient_a_SOURCES = \
 	option.c default.c
 
 #xpilot_CFLAGS = @X_CFLAGS@
-xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11
+xpilot_ng_x11_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
 
 # From section Conditional subdirectories with AM_CONDITIONAL

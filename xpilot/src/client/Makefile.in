@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 
-SOURCES = $(libxpclient_a_SOURCES) $(xpilot_SOURCES)
+SOURCES = $(libxpclient_a_SOURCES) $(xpilot_ng_x11_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -38,7 +38,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-bin_PROGRAMS = xpilot$(EXEEXT)
+bin_PROGRAMS = xpilot-ng-x11$(EXEEXT)
 subdir = src/client
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -64,22 +64,23 @@ libxpclient_a_OBJECTS = $(am_libxpclient_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_xpilot_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) caudio.$(OBJEXT) \
-	client.$(OBJEXT) clientcommand.$(OBJEXT) clientrank.$(OBJEXT) \
-	colors.$(OBJEXT) configure.$(OBJEXT) datagram.$(OBJEXT) \
-	dbuff.$(OBJEXT) debugaudio.$(OBJEXT) default.$(OBJEXT) \
-	event.$(OBJEXT) gfx2d.$(OBJEXT) guimap.$(OBJEXT) \
-	guiobjects.$(OBJEXT) join.$(OBJEXT) meta.$(OBJEXT) \
-	mapdata.$(OBJEXT) messages.$(OBJEXT) netclient.$(OBJEXT) \
-	option.$(OBJEXT) paint.$(OBJEXT) paintdata.$(OBJEXT) \
-	painthud.$(OBJEXT) paintmap.$(OBJEXT) paintobjects.$(OBJEXT) \
-	paintradar.$(OBJEXT) query.$(OBJEXT) record.$(OBJEXT) \
-	talk.$(OBJEXT) talkmacros.$(OBJEXT) textinterface.$(OBJEXT) \
-	usleep.$(OBJEXT) welcome.$(OBJEXT) widget.$(OBJEXT) \
-	xdefault.$(OBJEXT) xevent.$(OBJEXT) xeventhandlers.$(OBJEXT) \
-	xinit.$(OBJEXT) xpaint.$(OBJEXT) xpilot.$(OBJEXT)
-xpilot_OBJECTS = $(am_xpilot_OBJECTS)
-xpilot_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
+am_xpilot_ng_x11_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) \
+	caudio.$(OBJEXT) client.$(OBJEXT) clientcommand.$(OBJEXT) \
+	clientrank.$(OBJEXT) colors.$(OBJEXT) configure.$(OBJEXT) \
+	datagram.$(OBJEXT) dbuff.$(OBJEXT) debugaudio.$(OBJEXT) \
+	default.$(OBJEXT) event.$(OBJEXT) gfx2d.$(OBJEXT) \
+	guimap.$(OBJEXT) guiobjects.$(OBJEXT) join.$(OBJEXT) \
+	meta.$(OBJEXT) mapdata.$(OBJEXT) messages.$(OBJEXT) \
+	netclient.$(OBJEXT) option.$(OBJEXT) paint.$(OBJEXT) \
+	paintdata.$(OBJEXT) painthud.$(OBJEXT) paintmap.$(OBJEXT) \
+	paintobjects.$(OBJEXT) paintradar.$(OBJEXT) query.$(OBJEXT) \
+	record.$(OBJEXT) talk.$(OBJEXT) talkmacros.$(OBJEXT) \
+	textinterface.$(OBJEXT) usleep.$(OBJEXT) welcome.$(OBJEXT) \
+	widget.$(OBJEXT) xdefault.$(OBJEXT) xevent.$(OBJEXT) \
+	xeventhandlers.$(OBJEXT) xinit.$(OBJEXT) xpaint.$(OBJEXT) \
+	xpilot.$(OBJEXT)
+xpilot_ng_x11_OBJECTS = $(am_xpilot_ng_x11_OBJECTS)
+xpilot_ng_x11_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -110,8 +111,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libxpclient_a_SOURCES) $(xpilot_SOURCES)
-DIST_SOURCES = $(libxpclient_a_SOURCES) $(xpilot_SOURCES)
+SOURCES = $(libxpclient_a_SOURCES) $(xpilot_ng_x11_SOURCES)
+DIST_SOURCES = $(libxpclient_a_SOURCES) $(xpilot_ng_x11_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -231,7 +232,7 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
 INCLUDES = -I$(top_srcdir)/src/common
-xpilot_SOURCES = \
+xpilot_ng_x11_SOURCES = \
 	about.c \
 	bitmaps.c bitmaps.h \
 	caudio.c caudio.h client.c client.h \
@@ -266,7 +267,7 @@ libxpclient_a_SOURCES = \
 
 
 #xpilot_CFLAGS = @X_CFLAGS@
-xpilot_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11
+xpilot_ng_x11_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11
 @COND_SDL_CLIENT_FALSE@MAYBE_SDL = 
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
 
@@ -340,9 +341,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-xpilot$(EXEEXT): $(xpilot_OBJECTS) $(xpilot_DEPENDENCIES) 
-	@rm -f xpilot$(EXEEXT)
-	$(LINK) $(xpilot_LDFLAGS) $(xpilot_OBJECTS) $(xpilot_LDADD) $(LIBS)
+xpilot-ng-x11$(EXEEXT): $(xpilot_ng_x11_OBJECTS) $(xpilot_ng_x11_DEPENDENCIES) 
+	@rm -f xpilot-ng-x11$(EXEEXT)
+	$(LINK) $(xpilot_ng_x11_LDFLAGS) $(xpilot_ng_x11_OBJECTS) $(xpilot_ng_x11_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

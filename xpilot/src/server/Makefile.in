@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(xpilots_SOURCES)
+SOURCES = $(xpilot_ng_server_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -37,7 +37,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-bin_PROGRAMS = xpilots$(EXEEXT)
+bin_PROGRAMS = xpilot-ng-server$(EXEEXT)
 subdir = src/server
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -50,7 +50,7 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_xpilots_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
+am_xpilot_ng_server_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	auth.$(OBJEXT) cannon.$(OBJEXT) cell.$(OBJEXT) \
 	cmdline.$(OBJEXT) collision.$(OBJEXT) command.$(OBJEXT) \
 	contact.$(OBJEXT) event.$(OBJEXT) fileparser.$(OBJEXT) \
@@ -65,8 +65,9 @@ am_xpilots_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	showtime.$(OBJEXT) srecord.$(OBJEXT) teamcup.$(OBJEXT) \
 	tuner.$(OBJEXT) update.$(OBJEXT) walls.$(OBJEXT) \
 	xp2map.$(OBJEXT) xpmap.$(OBJEXT)
-xpilots_OBJECTS = $(am_xpilots_OBJECTS)
-xpilots_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
+xpilot_ng_server_OBJECTS = $(am_xpilot_ng_server_OBJECTS)
+xpilot_ng_server_DEPENDENCIES =  \
+	$(top_builddir)/src/common/libxpcommon.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -97,8 +98,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(xpilots_SOURCES)
-DIST_SOURCES = $(xpilots_SOURCES)
+SOURCES = $(xpilot_ng_server_SOURCES)
+DIST_SOURCES = $(xpilot_ng_server_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -211,7 +212,7 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 INCLUDES = -I$(top_srcdir)/src/common
 AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
-xpilots_SOURCES = \
+xpilot_ng_server_SOURCES = \
 	alliance.c asteroid.c asteroid.h auth.c auth.h \
 	cannon.c cannon.h cell.c click.h cmdline.c collision.c \
 	command.c connection.h contact.c \
@@ -234,7 +235,7 @@ xpilots_SOURCES = \
 	walls.c walls.h \
 	xp2map.c xpmap.c xpserver.h
 
-xpilots_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_EXTRA_LIBS@
+xpilot_ng_server_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_EXTRA_LIBS@
 all: all-am
 
 .SUFFIXES:
@@ -291,9 +292,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-xpilots$(EXEEXT): $(xpilots_OBJECTS) $(xpilots_DEPENDENCIES) 
-	@rm -f xpilots$(EXEEXT)
-	$(LINK) $(xpilots_LDFLAGS) $(xpilots_OBJECTS) $(xpilots_LDADD) $(LIBS)
+xpilot-ng-server$(EXEEXT): $(xpilot_ng_server_OBJECTS) $(xpilot_ng_server_DEPENDENCIES) 
+	@rm -f xpilot-ng-server$(EXEEXT)
+	$(LINK) $(xpilot_ng_server_LDFLAGS) $(xpilot_ng_server_OBJECTS) $(xpilot_ng_server_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

@@ -1,4 +1,3 @@
-SUBDIRS = NT
 AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
 noinst_LIBRARIES = libxpcommon.a
 libxpcommon_a_SOURCES = \

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(xp_replay_SOURCES)
+SOURCES = $(xpilot_ng_replay_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -37,7 +37,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-bin_PROGRAMS = xp-replay$(EXEEXT)
+bin_PROGRAMS = xpilot-ng-replay$(EXEEXT)
 subdir = src/replay
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -50,9 +50,10 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_xp_replay_OBJECTS = buttons.$(OBJEXT) xp-replay.$(OBJEXT)
-xp_replay_OBJECTS = $(am_xp_replay_OBJECTS)
-xp_replay_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
+am_xpilot_ng_replay_OBJECTS = buttons.$(OBJEXT) xp-replay.$(OBJEXT)
+xpilot_ng_replay_OBJECTS = $(am_xpilot_ng_replay_OBJECTS)
+xpilot_ng_replay_DEPENDENCIES =  \
+	$(top_builddir)/src/common/libxpcommon.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -62,8 +63,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(xp_replay_SOURCES)
-DIST_SOURCES = $(xp_replay_SOURCES)
+SOURCES = $(xpilot_ng_replay_SOURCES)
+DIST_SOURCES = $(xpilot_ng_replay_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -183,8 +184,8 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
 INCLUDES = -I$(top_srcdir)/src/common -I$(top_srcdir)/src/client
-xp_replay_SOURCES = buttons.c buttons.h xp-replay.c xp-replay.h
-xp_replay_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
+xpilot_ng_replay_SOURCES = buttons.c buttons.h xp-replay.c xp-replay.h
+xpilot_ng_replay_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
 SUBDIRS = tools
 all: all-recursive
 
@@ -242,9 +243,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-xp-replay$(EXEEXT): $(xp_replay_OBJECTS) $(xp_replay_DEPENDENCIES) 
-	@rm -f xp-replay$(EXEEXT)
-	$(LINK) $(xp_replay_LDFLAGS) $(xp_replay_OBJECTS) $(xp_replay_LDADD) $(LIBS)
+xpilot-ng-replay$(EXEEXT): $(xpilot_ng_replay_OBJECTS) $(xpilot_ng_replay_DEPENDENCIES) 
+	@rm -f xpilot-ng-replay$(EXEEXT)
+	$(LINK) $(xpilot_ng_replay_LDFLAGS) $(xpilot_ng_replay_OBJECTS) $(xpilot_ng_replay_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

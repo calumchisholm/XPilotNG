@@ -1,8 +1,8 @@
 
 INCLUDES = -I$(top_srcdir)/src/common
 AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
-bin_PROGRAMS = xpilots
-xpilots_SOURCES = \
+bin_PROGRAMS = xpilot-ng-server
+xpilot_ng_server_SOURCES = \
 	alliance.c asteroid.c asteroid.h auth.c auth.h \
 	cannon.c cannon.h cell.c click.h cmdline.c collision.c \
 	command.c connection.h contact.c \
@@ -25,4 +25,4 @@ xpilots_SOURCES = \
 	walls.c walls.h \
 	xp2map.c xpmap.c xpserver.h
 
-xpilots_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_EXTRA_LIBS@
+xpilot_ng_server_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_EXTRA_LIBS@

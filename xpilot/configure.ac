@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT(XPilot, 4.5.4X2, kps@users.sourceforge.net, xpilot)
+AC_INIT(XPilotNG, 4.6.0, kps@users.sourceforge.net, xpilot-ng)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
 
@@ -17,12 +17,11 @@ dnl  Copyright & stuff.
 AC_SUBST([XP_AUTHORS],["Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
 AC_SUBST([XP_COPYRIGHTDATE],["1991-2004"])
 AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
-AC_SUBST([XP_RELEASEDATE],["Sep 4, 2003"])
-AC_SUBST([XP_INSTLIBDIR],$prefix/lib/xpilot)
-AC_SUBST([XP_TITLE],["XPilot 4.5.4X2"])
-AC_SUBST([XP_WINVERSION],["4.5.4X2-NT13"])
+AC_SUBST([XP_RELEASEDATE],["Mar 18, 2004"])
+AC_SUBST([XP_INSTLIBDIR],"$prefix/lib/xpilot-ng")
+AC_SUBST([XP_TITLE],["XPilotNG 4.6.0"])
+AC_SUBST([XP_WINVERSION],["4.6.0ng-NT13"])
 AC_SUBST([XP_VERSION_WINDOWS],["13"])
-
 
 dnl  Checks for options.
 dnl  We should have some general macro for these.
@@ -328,11 +327,6 @@ AC_CONFIG_FILES([ \
 	src/Makefile \
 	src/common/Makefile \
 	src/common/version.h \
-	src/common/NT/Makefile \
-	src/common/NT/bindist/Makefile \
-	src/common/NT/bindist/README.txt \
-	src/common/NT/bindist/READMEbin.txt \
-	src/common/NT/bindist/ServerMOTD.txt \
 	src/client/Makefile \
 	src/client/items/Makefile \
 	src/client/sdl/Makefile \
