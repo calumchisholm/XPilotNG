@@ -25,7 +25,8 @@
 
 typedef unsigned int RGB_COLOR;
 
-#define RGB24(r, g, b)  ((((b)&255) << 16) | (((g)&255) << 8) | ((r)&255))
+#define RGB24(r, g, b) \
+((RGB_COLOR)((((b)&255) << 16) | (((g)&255) << 8) | ((r)&255)))
 
 #define RED_VALUE(col) ((col) &255)
 #define GREEN_VALUE(col) (((col) >> 8) &255)

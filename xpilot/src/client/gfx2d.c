@@ -49,11 +49,14 @@ int Picture_init (xp_picture_t *picture, const char *filename, int count)
 	return -1;
     }
 
-    if (Picture_load(picture, filename) == -1) return -1;
-    if (count > 1)
-        if (Picture_rotate(picture) == -1) return -1;
+    if (Picture_load(picture, filename) == -1)
+	return -1;
 
-    picture->bbox = (bbox_t *) malloc(ABS(count) * sizeof(bbox_t));
+    if (count > 1)
+        if (Picture_rotate(picture) == -1)
+	    return -1;
+
+    picture->bbox = malloc(ABS(count) * sizeof(bbox_t));
     if (!picture->bbox) {
 	error("Not enough memory.");
 	return -1;
@@ -242,9 +245,9 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 	}
     }
 
-    for (y = 0 ; y < picture->height ; y++) {
+    for (y = 0 ; y < (int)picture->height ; y++) {
 	for (p = 0; p < count ; p++) {
-	    for (x = 0; x < picture->width ; x++) {
+	    for (x = 0; x < (int)picture->width ; x++) {
 		r = getc(f);
 		g = getc(f);
 		b = getc(f);
@@ -273,17 +276,15 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 int Picture_rotate(xp_picture_t *picture)
 {
     int size, x, y, image;
-    int color;
+    RGB_COLOR color;
+    
     size = picture->height;
-
     for (image = 1; image < picture->count; image++) {
-
         if (!(picture->data[image] =
               malloc(picture->width * picture->height * sizeof(RGB_COLOR)))) {
             error("Not enough memory.");
             return -1;
         }
-
 	for (y = 0; y < size; y++) {
 	    for (x = 0; x < size; x++) {
 		color = Picture_get_rotated_pixel(picture, x, y, image);
@@ -301,7 +302,8 @@ int Picture_rotate(xp_picture_t *picture)
 void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y,
 		       RGB_COLOR color)
 {
-    if (x < 0 || y < 0 || x >= picture->width || y >= picture->height) {
+    if (x < 0 || y < 0
+	|| x >= (int)picture->width || y >= (int)picture->height) {
 	;
 	/*
 	 * this might be an error, but it can be a convenience to allow the
@@ -319,7 +321,8 @@ void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y,
 RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
 			    int x, int y)
 {
-    if (x < 0 || y < 0 || x >= picture->width || y >= picture->height) {
+    if (x < 0 || y < 0
+	|| x >= (int)picture->width || y >= (int)picture->height) {
 	return RGB24(0, 0, 0);
 	/*
 	 * this might be an error, but it can be a convenience to allow the
@@ -483,10 +486,10 @@ static void Picture_scale_x_slice(const xp_picture_t * picture, int image,
 RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image,
 				 double x_1, double y_1, double dx, double dy)
 {
-    int r ,g, b;
+    int r, g, b;
     double area;
 
-    int x,y;
+    int x, y;
     double xfrac, yfrac;
 
     r = 0;
@@ -496,19 +499,19 @@ RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image,
     x = (int)x_1;
     y = (int)y_1;
 
-    xfrac = (x+1) - x_1;
-    yfrac = (y+1) - y_1;
+    xfrac = (x + 1) - x_1;
+    yfrac = (y + 1) - y_1;
 
     area = dx * dy;
 
     if (dy > yfrac) {
 	Picture_scale_x_slice(picture, image, &r, &g, &b, x, y, dx,
 			      xfrac, yfrac);
-	dy -=yfrac;
+	dy -= yfrac;
 	y++;
-	while(dy >= 1.0) {
+	while (dy >= 1.0) {
 	    Picture_scale_x_slice(picture, image, &r, &g, &b, x, y, dx,
-				  xfrac, 1);
+				  xfrac, 1.0);
 	    y++;
 	    dy -=1.0;
 	}
@@ -527,25 +530,28 @@ RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image,
  */
 void Picture_get_bounding_box(xp_picture_t *picture)
 {
-    int		x, y, p;
-    int		color;
+    int		x, y, i;
     bbox_t	*box;
 
-    for (p = 0; p < ABS(picture->count) ; p++) {
-	box = &picture->bbox[p];
+    for (i = 0; i < ABS(picture->count); i++) {
+	box = &picture->bbox[i];
 	box->xmin = picture->width - 1;
 	box->xmax = 0;
 	box->ymin = picture->height - 1;
 	box->ymax = 0;
 
-	for (y = 0 ; y < picture->height ; y++) {
-	    for (x = 0; x < picture->width ; x++) {
-		color = Picture_get_pixel(picture, p, x, y);
+	for (y = 0 ; y < (int)picture->height ; y++) {
+	    for (x = 0; x < (int)picture->width ; x++) {
+		RGB_COLOR color = Picture_get_pixel(picture, i, x, y);
 		if (color) {
-		    if (box->xmin > x) box->xmin = x;
-		    if (box->xmax < x) box->xmax = x;
-		    if (box->ymin > y) box->ymin = y;
-		    if (box->ymax < y) box->ymax = y;
+		    if (box->xmin > x)
+			box->xmin = x;
+		    if (box->xmax < x)
+			box->xmax = x;
+		    if (box->ymin > y)
+			box->ymin = y;
+		    if (box->ymax < y)
+			box->ymax = y;
 		}
 	    }
 	}
