@@ -3281,7 +3281,21 @@ static option_desc opts[] = {
 	tuner_dummy,
 	"Does the server send sound events to players that request sound.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
-    }, 
+    },
+#ifndef NEWSCHED
+    {
+	"timerResolution",
+	"timerResolution",
+	"0",
+	&options.timerResolution,
+	valInt,
+	Timing_setup,
+	"If set to nonzero xpilots will requests signals from the OS at\n"
+	"1/timerResolution second intervals.  The server will then compute\n"
+	"a new frame FPS times out of every timerResolution signals.\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
+    },
+#endif
     {
 	"password",
 	"password",
