@@ -2482,6 +2482,8 @@ static void Poly_to_lines(void)
 	}
     }
     linet = ralloc(linet, (num_lines + S_LINES) * sizeof(struct bline));
+    for (i = num_lines; i < num_lines + S_LINES; i++)
+	linet[i].group = 0; /* initialize for Shape_lines */
     return;
 }
 
