@@ -294,6 +294,15 @@ void Ball_hits_goal(ballobject *ball, struct group *gp)
     }
 }
 
+/*
+ * Here follows some hit functions, used in the walls code to determine
+ * if some object can hit some polygon. The arguments for a hit function
+ * are: the pointer to the polygon group that the polygon belongs to and
+ * the pointer to the move. The hit function checks if the move can hit
+ * the polygon group.
+ * NOTE: hit functions should not have any side effects (i.e. change
+ * anything) unless you know what you are doing.
+ */
 
 /*
  * This function is called when something would hit a balltarget.
@@ -518,6 +527,13 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
     object *obj = move->obj;
     wormhole_t *wormhole = Wormholes(gp->mapobj_ind);
 
+#if 0
+    warn("Wormhole_hitfunc: wormhole %p hit by a %s",
+	 wormhole, Object_typename(move->obj));
+#endif
+    return true;
+
+#if 0
     /* this should never happen, because of the hitmask */
     if (wormhole->type == WORM_OUT) {
 	warn("BUG: Wormhole_hitfunc: wormhole->type == WORM_OUT\n");
@@ -551,6 +567,7 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
     }
 
     return true;
+#endif
 }
 
 void Wormhole_remove_from_map(wormhole_t *wormhole)

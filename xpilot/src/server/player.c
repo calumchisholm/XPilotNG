@@ -439,7 +439,6 @@ int Init_player(int ind, shipshape_t *ship)
     pl->ecmcount	= 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
-    pl->warped		= 0;
 
     pl->status		= PLAYING | GRAVITY | DEF_BITS;
     pl->have		= DEF_HAVE;
@@ -1960,7 +1959,6 @@ void Player_death_reset(player *pl, bool add_rank_death)
     pl->phasing_left	= 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
-    pl->warped		= 0;
     pl->lock.distance	= 0;
 
     pl->fuel.sum       	= pl->fuel.sum * 0.90;	/* Loose 10% of fuel */

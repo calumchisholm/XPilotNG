@@ -375,6 +375,7 @@ void Object_crash(object *obj, int crashtype, int mapobj_ind)
 
     case CrashWormHole:
     default:
+	assert(0 && "Object crashed into wormhole");
 	break;
 
     case CrashTreasure:
@@ -441,6 +442,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	break;
 
     case CrashWormHole:
+	assert(0 && "Player crashed into wormhole");
 	SET_BIT(pl->status, WARPING);
 	pl->wormHoleHit = mapobj_ind;
 	break;

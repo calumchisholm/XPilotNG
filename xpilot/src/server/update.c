@@ -1002,10 +1002,7 @@ static void Do_warping(player *pl)
     }
 
     CLR_BIT(pl->status, WARPING);
-    /*
-     * One second immunity to warped-to wormhole
-     */
-    pl->warped = 12 * 1.0;
+    SET_BIT(pl->status, WARPED);
 
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 }
@@ -1232,11 +1229,13 @@ void Update_objects(void)
 	    pl->did_shoot = false;
 	    CLR_BIT(pl->status, THRUSTING);
 	}
+#if 0
 	if (pl->warped > 0) {
 	    pl->warped -= timeStep;
 	    if (pl->warped <= 0)
 		pl->warped = 0;
 	}
+#endif
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(pl);
 	if (BIT(pl->used, HAS_LASER)) {
