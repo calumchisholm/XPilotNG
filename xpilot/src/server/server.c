@@ -419,7 +419,7 @@ int Pick_team(int pick_for_type)
 	if (!playing[pl->team]++)
 	    playing_teams++;
 	if (Player_is_human(pl) || Player_is_robot(pl))
-	    team_score[pl->team] +=  Get_Score(pl);
+	    team_score[pl->team] += Get_Score(pl);
     }
     if (playing_teams <= 1) {
 	for (i = 0; i < MAX_TEAMS; i++) {
@@ -533,7 +533,7 @@ void Server_info(char *str, size_t max_size)
 	pl = Player_by_index(i);
 
 	for (j = 0; j < i; j++) {
-	    if ( Get_Score(order[j]) <  Get_Score(pl)) {
+	    if (Get_Score(order[j]) < Get_Score(pl)) {
 		for (k = i; k > j; k--)
 		    order[k] = order[k - 1];
 		break;
@@ -544,9 +544,9 @@ void Server_info(char *str, size_t max_size)
     for (i = 0; i < NumPlayers; i++) {
 	pl = order[i];
 	strlcpy(name, pl->name, MAX_CHARS);
-	snprintf(lblstr, sizeof(lblstr), "%c%c %-19s%03d%6d",
+	snprintf(lblstr, sizeof(lblstr), "%c%c %-19s%03d%6.0f",
 		 pl->mychar, pl->team == TEAM_NOT_SET ? ' ' : (pl->team + '0'),
-		 name, pl->pl_life, (int) Get_Score(pl));
+		 name, pl->pl_life, Get_Score(pl));
 	snprintf(msg, sizeof(msg), "%2d... %-36s%s@%s\n",
 		 i + 1, lblstr, pl->username, pl->hostname);
 	if (strlen(msg) + strlen(str) >= max_size)
@@ -644,7 +644,7 @@ void Game_Over(void)
 	minsc = 1e6;
 
 	for (i = 0; i < MAX_TEAMS; i++)
-	    teamscore[i] = 1234567; /* These teams are not used... */
+	    teamscore[i] = FLT_MAX; /* These teams are not used... */
 
 	for (i = 0; i < NumPlayers; i++) {
 	    player_t *pl = Player_by_index(i);
@@ -652,14 +652,14 @@ void Game_Over(void)
 
 	    if (Player_is_human(pl)) {
 		team = pl->team;
-		if (teamscore[team] == 1234567)
+		if (teamscore[team] == FLT_MAX)
 		    teamscore[team] = 0;
-		teamscore[team] +=  Get_Score(pl);
+		teamscore[team] += Get_Score(pl);
 	    }
 	}
 
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (teamscore[i] != 1234567) {
+	    if (teamscore[i] != FLT_MAX) {
 		if (teamscore[i] > maxsc) {
 		    maxsc = teamscore[i];
 		    win_team = i;

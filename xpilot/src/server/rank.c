@@ -205,7 +205,7 @@ static void SortRankings(void)
 	rank_entries = 0;
 	for (i = 0; i < MAX_SCORES; i++) {
 	    ranknode_t *rank = &ranknodes[i];
-	    double sc, kd, kr, hf, dr, rsc, rkd, rkr, rhf;
+	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf;
 
 	    rank_base[i].ind = i;
 	    if (strlen(rank->name) == 0) {

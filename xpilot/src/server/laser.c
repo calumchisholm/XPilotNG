@@ -121,7 +121,6 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 {
     player_t *kp = Player_by_id(pulse->id);
     cannon_t *cannon = NULL;
-    double sc;
 
     if (kp == NULL)
 	/* Perhaps it was a cannon pulse? */
