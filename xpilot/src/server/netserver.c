@@ -1181,7 +1181,7 @@ static int Handle_login(int ind)
 	    Set_player_message(pl, msg);
 	}
 	sprintf(msg,
-		"Send a message containing \"/help nick\" for help. %s",
+		"Send a message containing \"/help auth\" for help. %s",
 		sender);
 	Set_player_message(pl, msg);
     }
