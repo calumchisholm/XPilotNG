@@ -74,8 +74,8 @@ void Pointer_control_set_state(bool on)
     {
 	SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
-	if (SDL_GetWMInfo(&info) > 0) 
-	    Disable_emulate3buttons(pointerControl, info.info.x11.display);
+	if (SDL_GetWMInfo(&info) > 0)
+	    Disable_emulate3buttons(on, info.info.x11.display);
     }
 #endif
 

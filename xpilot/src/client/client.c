@@ -2390,6 +2390,8 @@ void Disable_emulate3buttons(bool disable, Display *display)
 /*#define XF86DEBUG*/
     static bool first_run = true;
     static bool working = true;
+    static bool already_warned = false;
+    static int orig_timeout;
     XF86MiscMouseSettings m;
     Status status;
         
@@ -2420,27 +2422,35 @@ void Disable_emulate3buttons(bool disable, Display *display)
     if (first_run) {
     	if (m.emulate3buttons) {
 	    warn("*** Warning: Emulate3Buttons is enabled.");
+	    orig_timeout = m.emulate3timeout;
 	} else {
-	    working = false; // already set correctly, no need to bother about it anymore
+	    working = false; /* Emulate3Buttons disabled from the start, so function is turned inactive */
 	    return;
 	}
     }
     
     m.emulate3buttons = !disable;
+    m.emulate3timeout = disable ? 0 : orig_timeout;
+
+    #ifdef XF86DEBUG
+	warn("--- set ---");
+	warn("wanted 3buttons : %d", m.emulate3buttons);
+	warn("wanted timeout  : %d", m.emulate3timeout);
+    #endif
+	
     status = XF86MiscSetMouseSettings(display, &m);
     if (status != 1) {
-	warn("*** Warning: Failed to switch Emulate3Buttons.");
+	warn("*** Warning: Failed to set X server mouse settings. Fix your X configuration, please.");
 	working = false;
 	return;
     }
     
     #ifdef XF86DEBUG
-	warn("--- set ---");
-	warn("wanted          : %d", !disable);
 	warn("status          : %d", status);
     #endif
     
     XF86MiscGetMouseSettings(display, &m);
+    
     #ifdef XF86DEBUG
 	warn("--- 2nd get ---");
 	warn("status          : %d", status);
@@ -2456,9 +2466,13 @@ void Disable_emulate3buttons(bool disable, Display *display)
 	warn("flags           : 0x%x", m.flags);
     #endif
     
-    if (m.emulate3buttons != (!disable)) {
-	working = false;
-	warn("*** Warning: Failed to switch Emulate3Buttons.");
+    if (m.emulate3buttons != (!disable) && !already_warned) {
+	warn("*** Warning: Failed to disable Emulate3Buttons. Trying to set timeout to 0.");
+	already_warned = true;
+	if (m.emulate3timeout != (disable ? 0 : orig_timeout)) {
+	    warn("*** Warning: Can't set timeout. Giving up...");
+	    working = false;
+	}
     }
     
     first_run = false;

@@ -298,6 +298,7 @@ int Resize_Window( int width, int height )
 
 void Platform_specific_cleanup(void)
 {
+    Pointer_control_set_state(false);
     Close_Widget(&MainWidget);
     Gui_cleanup();
     Console_cleanup();

@@ -756,6 +756,7 @@ void Platform_specific_cleanup(void)
     /* off so we cant trust that                    */
 
     if (dpy != NULL) {
+	Disable_emulate3buttons(false, dpy);
 	if (pre_exists)
 	    XChangePointerControl(dpy, True, True, pre_acc_num,
 				  pre_acc_denom, pre_threshold);
