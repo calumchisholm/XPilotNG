@@ -1038,6 +1038,43 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 #else
 #include <netinet/in.h>
 #endif
+
+void Polys_to_client(char *ptr)
+{
+    int i, j, startx, starty, dx, dy, group;
+    int *p = polygons;
+
+    *ptr++ = polyc >> 8;
+    *ptr++ = polyc & 0xff;
+    for (i = 0; i < polyc; i++) {
+	group = *p++;
+	j = *p++;
+	dx = 0;
+	dy = 0;
+	startx = *p++;
+	starty = *p++;
+	*ptr++ = 0; /* 2 bytes for type */
+	*ptr++ = 0;
+	*ptr++ = j >> 8;
+	*ptr++ = j & 0xff;
+	*ptr++ = startx >> CLICK_SHIFT + 8;
+	*ptr++ = startx >> CLICK_SHIFT & 0xff;
+	*ptr++ = starty >> CLICK_SHIFT + 8;
+	*ptr++ = starty >> CLICK_SHIFT & 0xff;
+	startx = 0;
+	starty = 0;
+	for (; j > 1; j--) {
+	    dx += *p++;
+	    dy += *p++;
+	    *ptr++ = (dx >> CLICK_SHIFT) - startx;
+	    *ptr++ = (dy >> CLICK_SHIFT) - starty;
+	    startx = dx >> CLICK_SHIFT;
+	    starty = dy >> CLICK_SHIFT;
+	}
+    }
+    return;
+}
+
 void Line_to_client(int *ptr)
 {
     int i;

@@ -376,7 +376,7 @@ static int Init_setup(void)
 	type = SETUP_MAP_UNCOMPRESSED;
 	size = World.x * World.y;
     } else {
-	void Line_to_client(int *ptr);
+	void Polys_to_client(int *ptr);
 	type = SETUP_MAP_ORDER_XY;
 	size = Compress_map(mapdata, World.x * World.y);
 	if (size <= 0 || size > World.x * World.y) {
@@ -393,7 +393,7 @@ static int Init_setup(void)
 	}
 	{
 	    int size2 = size / 4 * 4;
-	    Line_to_client(mapdata + size2 - 19996);
+	    Polys_to_client(mapdata + size2 - 19996);
 	}
     }
 

@@ -274,65 +274,6 @@ static int Uncompress_map(void)
 }
 
 
-static int Store_polygon(int *lines, int *p, int pc) {
-
-  int i, x1, x2, y1, y2, dx, dy, cx, cy;
-  xp_polygon_t poly;
-  ipos *points, min, max;
-          
-  if ((points = malloc(pc * sizeof(ipos))) == NULL) {
-    error("no memory for points");
-    return -1;
-  }
-
-#define DBG if (0) printf          
-  points[0].x = cx = x1 = min.x = max.x = lines[p[0]] >> 6;
-  points[0].y = cy = y1 = min.y = max.y = lines[p[0] + 1] >> 6;
-  DBG("polygon: (%d,%d) ", points[0].x, points[0].y);
-          
-  for (i = 1; i < pc; i++) {
-    x2 = lines[p[i]] >> 6;
-    y2 = lines[p[i] + 1] >> 6;
-            
-    dx = x2 - x1;
-    if (abs(dx - Setup->width) < abs(dx)) dx -= Setup->width;
-    else if (abs(dx + Setup->width) < abs(dx)) dx += Setup->width;
-            
-    dy = y1 - y2;
-    if (abs(dy - Setup->height) < abs(dy)) dy -= Setup->height;
-    else if (abs(dy + Setup->height) < abs(dy)) dy += Setup->height;
-            
-    cx += dx;
-    cy -= dy;
-    if (min.x > cx) min.x = cx;
-    if (min.y > cy) min.y = cy;
-    if (max.x < cx) max.x = cx;
-    if (max.y < cy) max.y = cy;
-            
-    points[i].x = dx;
-    points[i].y = dy;
-    DBG("(%d,%d) ", points[i].x, points[i].y);
-    x1 = x2;
-    y1 = y2;
-  }
-  DBG("\n");
-  
-  poly.point_ptr = points;
-  poly.num_point = pc;
-  poly.bounds.x = min.x;
-  poly.bounds.y = max.y;
-  poly.bounds.w = max.x - min.x;
-  poly.bounds.h = max.y - min.y;
-
-  DBG("bounds: %d, %d, %d, %d\n", poly.bounds.x, poly.bounds.y, poly.bounds.w, poly.bounds.h);
-
-  STORE(xp_polygon_t, polygon_ptr, num_polygon, max_polygon, poly);
-
-#undef DBG
-  return 0;
-}
-
-
 /*
  * Receive the map data and some game parameters from
  * the server.  The map data may be in compressed form.
@@ -470,9 +411,61 @@ int Net_setup(void)
 	}
     }
     if (Setup->map_order == SETUP_MAP_XY_WITH_LINES) {
+	int i, j, startx, starty;
+	int polyc;
+	int dx, dy, cx, cy, pc;
+	xp_polygon_t poly;
+	ipos *points, min, max;
+	int size2 = Setup->map_data_len / 4 * 4;
+	char *ptr;
 
+	size2 = size2 / 4 * 4;
+	ptr = Setup->map_data + size2 - 19996;
+	Setup->map_data_len -= 20000;
+	Setup->map_order = SETUP_MAP_ORDER_XY;
+
+	polyc = (unsigned char)*ptr++ << 8;
+	polyc += (unsigned char)*ptr++;
+	for (i = 0; i < polyc; i++) {
+	    dx = 0;
+	    dy = 0;
+	    ptr += 2; /* No different types implemented yet */
+	    pc = (unsigned char)*ptr++ << 8;
+	    pc += (unsigned char)*ptr++;
+	    if ((points = malloc(pc * sizeof(ipos))) == NULL) {
+		error("no memory for points");
+		return -1;
+	    }
+	    startx = (unsigned char)*ptr++ << 8;
+	    startx += (unsigned char)*ptr++;
+	    starty = (unsigned char)*ptr++ << 8;
+	    starty += (unsigned char)*ptr++;
+	    points[0].x = cx = min.x = max.x = startx;
+	    points[0].y = cy = min.y = max.y = starty;
+	    for (j = 1; j < pc; j++) {
+		dx = *ptr++;
+		dy = -*ptr++;
+		cx += dx;
+		cy -= dy;
+		if (min.x > cx) min.x = cx;
+		if (min.y > cy) min.y = cy;
+		if (max.x < cx) max.x = cx;
+		if (max.y < cy) max.y = cy;
+		points[j].x = dx;
+		points[j].y = dy;
+	    }
+	      poly.point_ptr = points;
+	      poly.num_point = pc;
+	      poly.bounds.x = min.x;
+	      poly.bounds.y = max.y;
+	      poly.bounds.w = max.x - min.x;
+	      poly.bounds.h = max.y - min.y;
+	      STORE(xp_polygon_t, polygon_ptr, num_polygon, max_polygon, poly);
+	}
+    }
+#if 0
 #define DBG if (0) printf
-
+    {
 	int size2 = Setup->map_data_len / 4 * 4;
 	int *ptr, linec, lines[5000];
 	int i, j, k, start, found;
@@ -538,13 +531,14 @@ int Net_setup(void)
 	    }
 	}
     }
+#undef DBG
+#endif
+
     if (Setup->map_order != SETUP_MAP_UNCOMPRESSED) {
 	if (Uncompress_map() == -1) {
 	    return -1;
 	}
     }
-#undef DBG
-
     return 0;
 }
 
