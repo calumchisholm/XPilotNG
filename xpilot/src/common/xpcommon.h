@@ -29,6 +29,12 @@
 #else
 /* If we are not using autoconf, we do the best we can. */
 # define STDC_HEADERS 1
+# define HAVE_ASSERT_H 1
+# define HAVE_CTYPE_H 1
+# define HAVE_ERRNO_H 1
+# define HAVE_MATH_H 1
+# define HAVE_SIGNAL_H 1
+# define HAVE_STDARG_H 1
 # define HAVE_LIMITS_H 1
 # define HAVE_SETJMP_H 1
 # define HAVE_STDLIB_H 1
@@ -82,6 +88,12 @@
 #endif
 
 #include <stdio.h>
+#if HAVE_STDARG_H
+# include <stdarg.h>
+#else
+# error "ANSI C stdarg.h is needed to compile."
+#endif
+
 #if HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
@@ -116,11 +128,23 @@
 # include <unistd.h>
 #endif
 
-#ifdef STDC_HEADERS
+#ifdef HAVE_ASSERT_H
 # include <assert.h>
+#endif
+
+#ifdef HAVE_CTYPE_H
 # include <ctype.h>
+#endif
+
+#ifdef HAVE_ERRNO_H
 # include <errno.h>
+#endif
+
+#ifdef HAVE_MATH_H
 # include <math.h>
+#endif
+
+#ifdef HAVE_SIGNAL_H
 # include <signal.h>
 #endif
 
@@ -241,9 +265,6 @@ static void Win_show_error(char *errmsg);
 # include <io.h>
 # include <process.h>
 # include "NT/winNet.h"
-# undef	va_start
-# undef	va_end
-# include <varargs.h>
   /* Windows needs specific hacks for sockets: */
 # undef close
 # define close(x__) closesocket(x__)
@@ -280,16 +301,6 @@ static void Win_show_error(char *errmsg);
 
 #ifdef	SOUND
 # include "audio.h"
-#endif
-
-#undef HAVE_STDARG
-#undef HAVE_VARARG
-#ifndef _WINDOWS
-# if (defined(__STDC__) && !defined(__sun__) || defined(__cplusplus))
-#  define HAVE_STDARG 1
-# else
-#  define HAVE_VARARG 1
-# endif
 #endif
 
 #endif /* XPCOMMON_H */

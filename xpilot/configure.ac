@@ -93,10 +93,14 @@ dnl AC_HEADER_STDBOOL
 AC_CHECK_HEADERS([ \
 	arpa/inet.h \
 	arpa/nameser.h \
+	assert.h \
 	bstring.h \
+	ctype.h \
+	errno.h \
 	fcntl.h \
 	float.h \
 	limits.h \
+	math.h \
 	net/if.h \
 	netdb.h \
 	netinet/in.h \
@@ -104,6 +108,8 @@ AC_CHECK_HEADERS([ \
 	pwd.h \
 	resolv.h \
 	setjmp.h \
+	signal.h \
+	stdarg.h \
 	stddef.h \
 	sys/file.h \
 	sys/filio.h \
@@ -127,8 +133,12 @@ AC_TYPE_SIZE_T
 AC_STRUCT_TM
 
 dnl  Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
+
+dnl We probably don't need GNU compatible malloc and realloc functions,
+dnl so these are disabled for now.
+dnl AC_FUNC_MALLOC
+dnl AC_FUNC_REALLOC
+
 AC_FUNC_MEMCMP
 AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_SETVBUF_REVERSED

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -34,19 +33,11 @@
 #ifndef	ERROR_H
 #define	ERROR_H
 
-# if (defined(__STDC__) && !defined(__sun__) || defined(__cplusplus) || defined(_WINDOWS))
-#  include <stdarg.h>
-    extern void warn(const char *fmt, ...);
-    extern void error(const char *fmt, ...);
-    extern void fatal(const char *fmt, ...);
-    extern void dumpcore(const char *fmt, ...);
-# else
-#  include <varargs.h>
-    extern void warn();
-    extern void error();
-    extern void fatal();
-    extern void dumpcore();
-# endif
+#include "xpcommon.h"
+extern void warn(const char *fmt, ...);
+extern void error(const char *fmt, ...);
+extern void fatal(const char *fmt, ...);
+extern void dumpcore(const char *fmt, ...);
 
 #ifdef _WINDOWS
 # ifdef	_DEBUG

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -88,21 +87,8 @@ int Sockbuf_write(sockbuf_t *sbuf, char *buf, int len);
 int Sockbuf_read(sockbuf_t *sbuf);
 int Sockbuf_copy(sockbuf_t *dest, sockbuf_t *src, int len);
 
-#if !defined(STDVA)
-#   if defined(__STDC__) && !defined(__sun__) || defined(__cplusplus)
-#	define STDVA	1		/* has ANSI stdarg stuff */
-#   else
-#	define STDVA	0		/* nope, still the K&R way */
-#   endif
-#endif
-
-#if STDVA
-    int Packet_printf(sockbuf_t *, const char *fmt, ...);
-    int Packet_scanf(sockbuf_t *, const char *fmt, ...);
-#else
-    int Packet_printf();
-    int Packet_scanf();
-#endif
+int Packet_printf(sockbuf_t *, const char *fmt, ...);
+int Packet_scanf(sockbuf_t *, const char *fmt, ...);
 
 #endif
 

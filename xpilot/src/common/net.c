@@ -375,12 +375,7 @@ int Sockbuf_copy(sockbuf_t *dest, sockbuf_t *src, int len)
     return len;
 }
 
-#if STDVA
 int Packet_printf(sockbuf_t *sbuf, const char *fmt, ...)
-#else
-int Packet_printf(va_alist)
-    va_dcl
-#endif
 {
 #define PRINTF_FMT	1
 #define PRINTF_IO	2
@@ -402,16 +397,8 @@ int Packet_printf(va_alist)
 			*buf,
 			*stop;
     va_list		ap;
-#if !STDVA
-    char		*fmt;
-    sockbuf_t		*sbuf;
 
-    va_start(ap);
-    sbuf = va_arg(ap, sockbuf_t *);
-    fmt = va_arg(ap, char *);
-#else
     va_start(ap, fmt);
-#endif
 
     /*
      * Stream socket buffers should flush the buffer if running
@@ -567,12 +554,7 @@ int Packet_printf(va_alist)
     return count;
 }
 
-#if STDVA
 int Packet_scanf(sockbuf_t *sbuf, const char *fmt, ...)
-#else
-int Packet_scanf(va_alist)
-    va_dcl
-#endif
 {
     int			i,
 			j,
@@ -589,16 +571,8 @@ int Packet_scanf(va_alist)
     char		*cptr,
 			*str;
     va_list		ap;
-#if !STDVA
-    char		*fmt;
-    sockbuf_t		*sbuf;
 
-    va_start(ap);
-    sbuf = va_arg(ap, sockbuf_t *);
-    fmt = va_arg(ap, char *);
-#else
     va_start(ap, fmt);
-#endif
 
     for (i = j = 0; failure == 0 && fmt[i] != '\0'; i++) {
 	if (fmt[i] == '%') {

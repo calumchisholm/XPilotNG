@@ -53,9 +53,6 @@ void init_error(const char *prog)
     strlcpy(progname, p, MAX_PROG_LENGTH);
 }
 
-
-
-#if HAVE_STDARG
 /*
  * Ok, let's do it the ANSI C way.
  */
@@ -138,110 +135,6 @@ void dumpcore(const char *fmt, ...)
 
     abort();
 }
-
-#endif
-
-
-#if HAVE_VARARG
-/*
- * Hm, we'd better stick to the K&R way.
- */
-void
-    error(va_alist)
-va_dcl
-{
-    va_list	 args;
-    int		 e = errno;		/* Store errno */
-    extern int	 sys_nerr;
-    extern char *sys_errlist[];
-    char	*fmt;
-
-
-    va_start(args);
-
-    if (progname[0] != '\0')
-	fprintf(stderr, "%s: ", progname);
-
-    fmt = va_arg(args, char *);
-    (void) vfprintf(stderr, fmt, args);
-
-    if (e > 0 && e < sys_nerr)
-	fprintf(stderr, " (%s)", sys_errlist[e]);
-
-    fprintf(stderr, "\n");
-
-    va_end(args);
-}
-
-void
-    warn(va_alist)
-va_dcl
-{
-    va_list	 args;
-    char	*fmt;
-
-
-    va_start(args);
-
-    if (progname[0] != '\0')
-	fprintf(stderr, "%s: ", progname);
-
-    fmt = va_arg(args, char *);
-    (void) vfprintf(stderr, fmt, args);
-
-    fprintf(stderr, "\n");
-
-    va_end(args);
-}
-
-void
-    fatal(va_alist)
-va_dcl
-{
-    va_list	 args;
-    char	*fmt;
-
-
-    va_start(args);
-
-    if (progname[0] != '\0')
-	fprintf(stderr, "%s: ", progname);
-
-    fmt = va_arg(args, char *);
-    (void) vfprintf(stderr, fmt, args);
-
-    fprintf(stderr, "\n");
-
-    va_end(args);
-
-    exit(1);
-}
-
-void
-    dumpcore(va_alist)
-va_dcl
-{
-    va_list	 args;
-    char	*fmt;
-
-
-    va_start(args);
-
-    if (progname[0] != '\0')
-	fprintf(stderr, "%s: ", progname);
-
-    fmt = va_arg(args, char *);
-    (void) vfprintf(stderr, fmt, args);
-
-    fprintf(stderr, "\n");
-
-    va_end(args);
-
-    abort();
-}
-
-#endif
-
 
 #ifdef _WINDOWS
 static void Win_show_error(char *s)
