@@ -552,12 +552,21 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
      * should bounce, it is not reactive thrust otherwise wall
      * bouncing would cause acceleration of the player.
      */
-    if (obj->type != OBJ_PULSE &&
+    if (obj->type != OBJ_PULSE && 
+	obj->type != OBJ_SPARK &&
 	sqr(obj->vel.x) + sqr(obj->vel.y)
 	> sqr(options.maxObjectWallBounceSpeed)) {
 	obj->life = 0;
 	return 0;
     }
+    
+    if (obj->type == OBJ_SPARK &&
+	sqr(obj->vel.x) + sqr(obj->vel.y)
+	> sqr(options.maxSparkWallBounceSpeed)) {
+	obj->life = 0;
+	return 0;
+    }
+    
     if (!BIT(obj->status, FROMBOUNCE) && BIT(obj->type, OBJ_SPARK))
 	CLR_BIT(obj->status, OWNERIMMUNE);
 

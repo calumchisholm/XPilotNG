@@ -869,6 +869,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"maxSparkWallBounceSpeed",
+	"maxSparkBounceSpeed",
+	"40.0",
+	&options.maxSparkWallBounceSpeed,
+	valReal,
+	Move_init,
+	"The maximum allowed speed for sparks to bounce off walls.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"maxShieldedWallBounceSpeed",
 	"maxShieldedBounceSpeed",
 	"50.0",

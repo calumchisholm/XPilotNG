@@ -185,6 +185,7 @@ extern struct options {
     bool	ecmsReprogramMines;
     bool	ecmsReprogramRobots;
     double	maxObjectWallBounceSpeed;
+    double	maxSparkWallBounceSpeed;  
     double	maxShieldedWallBounceSpeed;
     double	maxUnshieldedWallBounceSpeed;
     int		playerWallBounceType;
