@@ -88,7 +88,7 @@ bool team_dead(int team)
 
     for (i = 0; i < NumPlayers; i++) {
 	player *pl = Players(i);
-	if (pl->team == team && Player_is_active(pl))
+	if (pl->team == team && !BIT(pl->status, PAUSE|GAME_OVER))
 	    return false;
     }
     return true;
