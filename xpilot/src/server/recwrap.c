@@ -2,11 +2,6 @@
  * errno = WSAGetLastError();
  */
 
-
-#include "srecord.h"
-#include "net.h"
-#include "socklib.h"
-
 #ifndef	_WINDOWS
 #include <unistd.h>
 #endif
@@ -43,6 +38,7 @@
 #include <varargs.h>
 #endif
 
+#include "srecord.h"
 #include "version.h"
 #include "config.h"
 #include "const.h"
