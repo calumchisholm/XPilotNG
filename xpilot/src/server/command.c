@@ -503,7 +503,6 @@ static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
 
-#if 1
     pl2 = Get_player_by_name(arg, NULL, &errorstr);
     if (pl2) {
 	const char *addr = Player_get_addr(pl2);
@@ -515,26 +514,6 @@ static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
 	strcpy(msg, errorstr);
 	return CMD_RESULT_ERROR;
     }
-#else
-    ind = Get_player_index_by_name(arg);
-    if (ind >= 0) {
-	player *pl = Players(ind);
-	const char *addr = Player_get_addr(pl);
-
-	if (addr == NULL) {
-	    sprintf(msg, "Unable to get address for %s.", pl->name);
-	} else {
-	    sprintf(msg, "%s plays from: %s.", pl->name, addr);
-	}
-    } else {
-	if (ind == -1) {
-	    sprintf(msg, "Name does not match any player.");
-	} else if (ind == -2) {
-	    sprintf(msg, "Name matches several players.");
-	}
-	return CMD_RESULT_ERROR;
-    }
-#endif
 
     return CMD_RESULT_SUCCESS;
 }
