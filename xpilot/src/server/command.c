@@ -1055,6 +1055,10 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 	sprintf(msg, " < Total reset by %s! >", pl->name);
 	Set_message(msg);
 	strcpy(msg, "");
+
+	teamcup_close_score_file();
+	teamcup_open_score_file();
+	teamcup_round_start();
     }
     else {
 	Reset_all_players();

@@ -319,10 +319,6 @@ bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
 int		pausedFPS;		/* Limited FPS for pausers */
 int		waitingFPS;		/* Limited FPS for waiters */
 
-bool		teamcup;		/* Is this a teamcup match? */
-char		*teamcupStatServer;	/* Status server to report to */
-int		teamcupStatPort;	/* Port to use on the status server */
-int		teamcupMatchNumber = 0;	/* The number of the match */
 /*
  * Two functions which can be used if an option does not have its own
  * function which should be called after the option value has been

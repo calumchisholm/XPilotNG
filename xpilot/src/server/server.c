@@ -181,6 +181,10 @@ int main(int argc, char **argv)
 	     showtime(), framesPerSecond);
 #endif
 
+    /* kps - move this somewhere else ? */
+    teamcup_open_score_file();
+    teamcup_round_start();
+
     if (timerResolution > 0)
 	timer_tick_rate = timerResolution;
     else
@@ -298,13 +302,14 @@ int End_game(void)
     } else
 	sprintf(msg, "server exiting");
 
+    teamcup_close_score_file();
+
     while (NumPlayers > 0) {	/* Kick out all remaining players */
 	pl = Players(NumPlayers - 1);
-	if (pl->conn == NULL) {
+	if (pl->conn == NULL)
 	    Delete_player(pl);
-	} else {
+	else
 	    Destroy_connection(pl->conn, msg);
-	}
     }
 
     record = playback = 0;
@@ -335,6 +340,8 @@ int End_game(void)
     Free_cells();
     Free_options();
     Log_game("END");			    /* Log end */
+
+    teamcup_kill_child();
 
 #ifndef _WINDOWS
     exit (0);
@@ -646,6 +653,8 @@ void Game_Over(void)
     char		msg[128];
 
     Set_message("Game over...");
+
+    teamcup_game_over();
 
     /*
      * Hack to prevent Compute_Game_Status from starting over again...

@@ -1246,6 +1246,9 @@ void Set_message(const char *message)
 	msg = tmp;
     } else
 	msg = message;
+
+    teamcup_log("    %s\n", message);
+
     if (!rplayback || playback)
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);

@@ -799,6 +799,9 @@ void Check_team_members(int team)
 	}
 	teamp->NumMembers = members;
     }
+
+    if (teamcup)
+	teamcup_round_start();
 }
 
 
@@ -985,6 +988,8 @@ void Team_game_over(int winning_team, const char *reason)
 		Give_individual_bonus(pl_i, average_score);
 	}
     }
+
+    teamcup_round_end(winning_team);
 
     Reset_all_players();
 
