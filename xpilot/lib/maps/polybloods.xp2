@@ -36,7 +36,7 @@
 <Option name="pausedfps" value="0"/>
 <Option name="playersonradar" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
-<Option name="playerwallbouncebrakefactor" value="0.6"/>
+<Option name="playerwallbouncebrakefactor" value="0.5"/>
 <Option name="reserverobotteam" value="no"/>
 <Option name="robots" value="0"/>
 <Option name="robotteam" value="0"/>
