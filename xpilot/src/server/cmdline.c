@@ -903,16 +903,6 @@ static optionDesc options[] = {
 	MAP(NULL)
     },
     {
-	"ignore20MaxFPS",
-	"ignore20MaxFPS",
-	"true",
-	&ignore20MaxFPS,
-	valBool,
-	tuner_dummy,
-	"Ignore client maxFPS request if it is 20 (the default setting).\n",
-	MAP(NULL)
-    },
-    {
 	"timing",
 	"race",
 	"no",
