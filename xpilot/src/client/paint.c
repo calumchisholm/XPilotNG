@@ -78,6 +78,7 @@ int killratio_deaths = 0;
 int killratio_totalkills = 0;
 int killratio_totaldeaths = 0;
 int ballstats_cashes = 0;
+int ballstats_replaces = 0;
 int ballstats_teamcashes = 0;
 int ballstats_lostballs = 0;
 

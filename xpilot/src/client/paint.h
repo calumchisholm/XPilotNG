@@ -91,6 +91,7 @@ extern int killratio_deaths;
 extern int killratio_totalkills;
 extern int killratio_totaldeaths;
 extern int ballstats_cashes;
+extern int ballstats_replaces;
 extern int ballstats_teamcashes;
 extern int ballstats_lostballs;
 extern homebase_t *bases;

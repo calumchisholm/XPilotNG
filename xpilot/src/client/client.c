@@ -1311,8 +1311,9 @@ static void Print_roundend_messages(other_t **order)
     killratio_deaths = 0;
     Add_message(hackbuf);
 
-    sprintf(hackbuf, "Balls cashed - Self/Team/Lost: %d/%d/%d",
-	    ballstats_cashes, ballstats_teamcashes, ballstats_lostballs);
+    sprintf(hackbuf, "Ballstats - Cash/Repl/Team/Lost: %d/%d/%d/%d",
+	    ballstats_cashes, ballstats_replaces,
+	    ballstats_teamcashes, ballstats_lostballs);
     Add_message(hackbuf);
 
     s = hackbuf;

@@ -111,7 +111,7 @@ typedef struct {
 } msgnames_t;
 
 /* recursive descent parser for messages */
-static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
+static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *mn)
 {
     char *fp;
     int i;
@@ -142,8 +142,8 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
 	    name = Others[i].name;
 	    len = strlen(name);
 	    if ((strncmp(msg, name, len) == 0)
-		&& Msg_match_fmt(msg + len, fmt, nm)) {
-		strncpy(nm->name[nm->index++], name, len + 1);
+		&& Msg_match_fmt(msg + len, fmt, mn)) {
+		strncpy(mn->name[mn->index++], name, len + 1);
 		return true;
 	    }
 	}
@@ -152,19 +152,19 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
 	for (i = 0; shottypes[i] != NULL; i++) {
 	    if (strncmp(msg, shottypes[i], strlen(shottypes[i])) == 0) {
 		msg += strlen(shottypes[i]);
-		return Msg_match_fmt(msg, fmt, nm);
+		return Msg_match_fmt(msg, fmt, mn);
 	    }
 	}
 	break;
     case 'h':			/* head first or nothing */
 	if (strncmp(msg, head_first, strlen(head_first)) == 0)
 	    msg += strlen(head_first);
-	return Msg_match_fmt(msg, fmt, nm);
+	return Msg_match_fmt(msg, fmt, mn);
     case 'o':			/* obstacle */
 	for (i = 0; obstacles[i] != NULL; i++) {
 	    if (strncmp(msg, obstacles[i], strlen(obstacles[i])) == 0) {
 		msg += strlen(obstacles[i]);
-		return Msg_match_fmt(msg, fmt, nm);
+		return Msg_match_fmt(msg, fmt, mn);
 	    }
 	}
 	break;
@@ -172,16 +172,16 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
 	for (i = 0; crashes[i] != NULL; i++) {
 	    if (strncmp(msg, crashes[i], strlen(crashes[i])) == 0) {
 		msg += strlen(crashes[i]);
-		return Msg_match_fmt(msg, fmt, nm);
+		return Msg_match_fmt(msg, fmt, mn);
 	    }
 	}
 	break;
     case 't':			/* "name" of a team */
 	for (i = 0; teamnames[i] != NULL; i++) {
 	    if (strncmp(msg, teamnames[i], strlen(teamnames[i])) == 0) {
-		strncpy(nm->name[nm->index++], teamnames[i], 2);
+		strncpy(mn->name[mn->index++], teamnames[i], 2);
 		msg += strlen(teamnames[i]);
-		return Msg_match_fmt(msg, fmt, nm);
+		return Msg_match_fmt(msg, fmt, mn);
 	    }
 	}
 	break;
@@ -381,6 +381,7 @@ static bool Msg_scan_for_total_reset(char *message)
 	killratio_totalkills = 0;
 	killratio_totaldeaths = 0;
 	ballstats_cashes = 0;
+	ballstats_replaces = 0;
 	ballstats_teamcashes = 0;
 	ballstats_lostballs = 0;
 	return true;
@@ -391,26 +392,32 @@ static bool Msg_scan_for_total_reset(char *message)
 
 static bool Msg_scan_for_replace_treasure(char *message)
 {
-    char replace[40];
+    msgnames_t mn;
 
-    if (self == NULL)
+    if (!self)
 	return false;
 
-    sprintf(replace, "(team %d) has replaced the treasure", self->team);
-    if (strstr(message, replace)) {
-	ball_shout = false;
-	return true;
-    }
+    memset(&mn, 0, sizeof(mn));
+    if (Msg_match_fmt(message,
+		      " < %n (team %t) has replaced the treasure >",
+		      &mn)) {
+	int replacer_team = atoi(mn.name[0]);
+	char *replacer = mn.name[1];
 
-    /*
-     * Ok, at this point we know that it was not someone in our team
-     * that replaced the treasure.
-     *
-     * If there are 2 teams playing only and the ball was replace and
-     * it was not our team that replaced the ball, it was the other team.
-     * In this case, we can clear the cover flag.
-     */
-    if (strstr(message, "has replaced the treasure")) {
+	if (replacer_team == self->team) {
+	    ball_shout = false;
+	    if (!strcmp(replacer, self->name))
+		ballstats_replaces++;
+	    return true;
+	}
+	/*
+	 * Ok, at this point we know that it was not someone in our team
+	 * that replaced the treasure.
+	 *
+	 * If there are 2 teams playing only and the ball was replaced and
+	 * it was not our team that replaced the ball, it was the other team.
+	 * In this case, we can clear the cover flag.
+	 */
 	if (num_playing_teams == 2)
 	    need_cover = false;
 	return true;
