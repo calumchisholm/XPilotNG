@@ -95,7 +95,7 @@ int Sockbuf_advance(sockbuf_t *sbuf, int len)
 	sbuf->len = 0;
 	sbuf->ptr = sbuf->buf;
     } else {
-	memmove(sbuf->buf, sbuf->buf + len, sbuf->len - len);
+	memmove(sbuf->buf, sbuf->buf + len, (size_t)(sbuf->len - len));
 	sbuf->len -= len;
 	if (sbuf->ptr - sbuf->buf <= len)
 	    sbuf->ptr = sbuf->buf;
@@ -230,7 +230,7 @@ int Sockbuf_write(sockbuf_t *sbuf, char *buf, int len)
 	if (sbuf->size - sbuf->len < len)
 	    return 0;
     }
-    memcpy(sbuf->buf + sbuf->len, buf, len);
+    memcpy(sbuf->buf + sbuf->len, buf, (size_t)len);
     sbuf->len += len;
 
     return len;
@@ -344,7 +344,7 @@ int Sockbuf_copy(sockbuf_t *dest, sockbuf_t *src, int len)
 	warn("Not enough data in source copy socket buffer");
 	return -1;
     }
-    memcpy(dest->buf + dest->len, src->buf, len);
+    memcpy(dest->buf + dest->len, src->buf, (size_t)len);
     dest->len += len;
 
     return len;
