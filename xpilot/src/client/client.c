@@ -1449,6 +1449,10 @@ int Client_init(char *server, unsigned server_version)
     extern void Make_table(void);
 
     version = server_version;
+    if (server_version < 0x4F00)
+	oldServer = 1;
+    else
+	oldServer = 0;
 
     Make_table();
 #ifdef	WINDOWSCALING

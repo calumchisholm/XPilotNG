@@ -361,7 +361,6 @@ static int Init_setup(void)
     free(mapdata);
     Setup->setup_size = ((char *) &Setup->map_data[0] - (char *) Setup) + size;
     Setup->map_data_len = size;
-    Setup->map_order = SETUP_MAP_XY_WITH_LINES;
     Setup->frames_per_second = FPS;
     Setup->lives = World.rules->lives;
     Setup->mode = World.rules->mode;
@@ -371,6 +370,8 @@ static int Init_setup(void)
     Setup->name[sizeof(Setup->name) - 1] = '\0';
     strncpy(Setup->author, World.author, sizeof(Setup->author) - 1);
     Setup->author[sizeof(Setup->author) - 1] = '\0';
+    strncpy(Setup->data_url, dataURL, sizeof(Setup->data_url) - 1);
+    Setup->data_url[sizeof(Setup->data_url) - 1] = 0;
 
     return 0;
 }
@@ -931,12 +932,12 @@ static int Handle_setup(int ind)
 
     if (connp->setup == 0) {
 	n = Packet_printf(&connp->c,
-			  "%ld" "%ld%hd" "%hd%hd" "%hd%hd" "%s%s",
+			  "%ld" "%ld%hd" "%hd%hd" "%hd%s" "%s%S",
 			  Setup->map_data_len,
 			  Setup->mode, Setup->lives,
 			  Setup->height, Setup->width,
-			  Setup->frames_per_second, Setup->map_order,
-			  Setup->name, strlen(dataURL) > 0 ? dataURL : Setup->author); /* TEMPORARY HACK !@# */
+			  Setup->frames_per_second, Setup->name,
+			  Setup->author, Setup->data_url);
 	if (n <= 0) {
 	    Destroy_connection(ind, "setup 0 write error");
 	    return -1;

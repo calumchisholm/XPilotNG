@@ -96,7 +96,7 @@
  * 4.2.1.0: high bit in radar size means player is a teammate.
  * 4.3.0.0: transmit phasing separately from cloaking
  */
-#define	MAGIC		0x4300F4ED
+#define	MAGIC		0x4F08F4ED
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)
 #define VERSION2MAGIC(V)	((((V) & 0xFFFF) << 16) | (MAGIC & 0xFFFF))
@@ -105,14 +105,22 @@
 /*
  * Which client versions can join this server.
  */
-#define MIN_CLIENT_VERSION	0x4203
+#define MIN_CLIENT_VERSION	0x4F08
 #define MAX_CLIENT_VERSION	MY_VERSION
 
 /*
  * Which server versions can this client join.
  */
-#define MIN_SERVER_VERSION	0x3103
+#define MIN_SERVER_VERSION	0x4F08
 #define MAX_SERVER_VERSION	MY_VERSION
+
+/*
+ * We want to keep support for servers using the old map format in the client,
+ * but make incompatible changes while developing the new format. Therefore
+ * there is a separate "old" range of allowed servers.
+ */
+#define MIN_OLD_SERVER_VERSION  0x3103
+#define MAX_OLD_SERVER_VERSION  0x4300
 
 #define	MAX_STR_LEN		4096
 #define	MAX_DISP_LEN		80

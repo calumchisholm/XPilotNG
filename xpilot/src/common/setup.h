@@ -37,11 +37,11 @@
 
 /*
  * Tell the client how and if the map is compressed.
+ * This is only for client compatibility with the old protocol.
  */
 #define SETUP_MAP_ORDER_XY	1
 #define SETUP_MAP_ORDER_YX	2
 #define SETUP_MAP_UNCOMPRESSED	3
-#define SETUP_MAP_XY_WITH_LINES 4
 
 /*
  * Definitions for the map layout which permit a compact definition
@@ -118,15 +118,16 @@ typedef struct {
     long		map_data_len;		/* num. compressed map bytes */
     long		mode;			/* playing mode */
     short		lives;			/* max. number of lives */
-    short		x;			/* width in blocks */
-    short		y;			/* height in blocks */
+    short		x;			/*OLD  width in blocks */
+    short		y;			/*OLD  height in blocks */
     short		width;			/* width in pixels */
     short		height;			/* height in pixels */
     short		frames_per_second;	/* FPS */
-    short		map_order;		/* row major or col major */
+    short		map_order;		/*OLD  row major or col major*/
     char		name[MAX_CHARS];	/* name of map */
     char		author[MAX_CHARS];	/* name of author of map */
-    int unused;         /* for the line-transmit hack, alignment */
+    char		data_url[MSG_LEN];      /* location where client
+	can load additional data like bitmaps; MSG_LEN to allow >80 chars */
     unsigned char	map_data[4];		/* compressed map data */
     /* plus more mapdata here (HACK) */
 } setup_t;

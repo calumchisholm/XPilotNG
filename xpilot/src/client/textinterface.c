@@ -115,7 +115,7 @@ static bool Get_contact_message(sockbuf_t *sbuf,
 				Connect_param_t *conpar)
 {
     int			len;
-    int			version, allow;
+    int			version;
     unsigned		magic;
     unsigned char	reply_to, status;
     bool		readable = false;
@@ -162,9 +162,11 @@ static bool Get_contact_message(sockbuf_t *sbuf,
 	    error("Bad magic on contact message (0x%x).", magic);
 	}
 	else {
-	    allow = version = MAGIC2VERSION(magic);
-	    LIMIT(allow, MIN_SERVER_VERSION, MAX_SERVER_VERSION);
-	    if (version != allow) {
+	    version = MAGIC2VERSION(magic);
+	    if (!((version >= MIN_SERVER_VERSION &&
+		   version <= MAX_SERVER_VERSION) ||
+		  (version >= MIN_OLD_SERVER_VERSION &&
+		   version <= MAX_OLD_SERVER_VERSION))) {
 		printf("Incompatible version with server %s.\n", conpar->server_name);
 		printf("We run version %04x, while server is running %04x.\n",
 		       MY_VERSION, MAGIC2VERSION(magic));
@@ -910,4 +912,3 @@ int Contact_servers(int count, char **servers,
 
     return connected ? true : false;
 }
-
