@@ -898,9 +898,55 @@ void Record_cleanup(void)
  * Store the name of the file where the user
  * wants recordings to be written to.
  */
-void Record_init(char *filename)
+void Record_init(const char *filename)
 {
     rd = Xdrawing;
-    if (filename != NULL && filename[0] != '\0')
-	record_filename = xp_strdup(filename);
+    if (filename && strlen(filename))
+	record_filename = xp_safe_strdup(filename);
 }
+
+
+#ifdef OPTIONHACK
+
+static char *recordFileName = NULL;
+
+/* kps - TODO */
+static bool setRecordFile(xp_option_t *opt, const char *value)
+{
+    (void)opt;
+    if (strlen(value) == 0)
+	return true;
+
+    if (recordFileName)
+	return true;
+
+    recordFileName = xp_safe_strdup(value);
+    Record_init(value);
+    return true;
+}
+
+static char *getRecordFile(xp_option_t *opt)
+{
+    (void)opt;
+    return recordFileName;
+}
+
+xp_option_t record_options[] = {
+
+    XP_STRING_OPTION(
+	"recordFile",
+	"",
+	NULL, 0,
+	setRecordFile,
+	getRecordFile,
+	"An optional file where a recording of a game can be made.\n"
+	"If this file is undefined then recording isn't possible.\n"),
+
+};
+
+void Store_record_options(void)
+{
+    STORE_OPTIONS(record_options);
+}
+#endif
+

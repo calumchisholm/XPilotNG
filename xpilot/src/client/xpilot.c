@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
     Store_talk_macro_options();
     Store_key_options();
     Store_x_options();
+    Store_record_options();
     Store_color_options();
 #endif
 

@@ -75,7 +75,8 @@ extern int recordFPS;	/* FPS to record. */
 
 long Record_size(void);
 void Record_toggle(void);
-void Record_init(char *filename);
+void Record_init(const char *filename);
 void Record_cleanup(void);
+void Store_record_options(void);
 
 #endif

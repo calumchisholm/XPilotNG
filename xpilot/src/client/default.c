@@ -669,6 +669,13 @@ xp_option_t default_options[] = {
 	NULL,
 	"The maximum number of messages to display at the same time.\n"),
 
+    XP_BOOL_OPTION(
+	"reverseScroll",
+	false,
+	&instruments.showReverseScroll,
+	NULL,
+	"Reverse scroll direction of messages.\n"),
+
     XP_INT_OPTION(
 	"messagesToStdout",
 	0,
@@ -700,6 +707,22 @@ xp_option_t default_options[] = {
 	"`history' is accessible with `keyTalkCursorUp/Down'.\n"),
 
     /* stuff you should not have to touch */
+
+
+    XP_BOOL_OPTION(
+	"toggleShield",
+	false,
+	&toggle_shield,
+	NULL,
+	"Are shields toggled by a keypress only?\n"),
+
+    XP_BOOL_OPTION(
+	"autoShield", /* Don auto-shield hack */
+	true,
+	&auto_shield,
+	NULL,
+	"Are shields lowered automatically for weapon fire?\n"),
+
     XP_BOOL_OPTION(
 	"autoServerMotdPopup",
 	false,
@@ -893,31 +916,6 @@ xp_option_t default_options[] = {
 
 
     {
-	"reverseScroll",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Reverse scroll direction of messages.\n",
-	0
-    },
-
-    {
-	"toggleShield",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Are shields toggled by a keypress only?\n",
-	0
-    },
-    {
-	"autoShield", /* Don auto-shield hack */
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Are shields lowered automatically for weapon fire?\n",
-	0
-    },
-    {
 	"shieldDrawSolid",
 	NULL,
 	"Default",
@@ -927,7 +925,6 @@ xp_option_t default_options[] = {
 	"automatically for your particular display system.\n",
 	0
     },
-
 
     {
 	"clientRanker",
@@ -940,15 +937,7 @@ xp_option_t default_options[] = {
 
 
 
-    {
-	"recordFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"An optional file where a recording of a game can be made.\n"
-	"If this file is undefined then recording isn't possible.\n",
-	0
-    },
+
     {
 	"clientRankFile",
 	NULL,
