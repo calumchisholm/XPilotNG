@@ -165,29 +165,25 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
  * ( in "case KEY_LOCK_NEXT" or in Player_lock_closest() ).
  * I tried to find a solution but now i am bit screwed up..  :)
  */
-int Player_lock_closest(int ind, int next)
+int Player_lock_closest(player *pl, int next)
 {
-    player *pl = Players(ind);
-    int lock, i, newpl;
-    DFLOAT dist, best, l;
+    int i;
+    DFLOAT dist = 0.0, best, l;
+    player *lock_pl = NULL, *new_pl = NULL;
 
     if (!next) {
 	CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
     }
 
     if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
-	lock = GetInd(pl->lock.pl_id);
-	dist = Wrap_length(Players(lock)->pos.cx - pl->pos.cx,
-			   Players(lock)->pos.cy - pl->pos.cy);
-    } else {
-	lock = -1;
-	dist = 0.0;
+	lock_pl = Player_by_id(pl->lock.pl_id);
+	dist = Wrap_length(lock_pl->pos.cx - pl->pos.cx,
+			   lock_pl->pos.cy - pl->pos.cy);
     }
-    newpl = -1;
     best = FLT_MAX;
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
-	if (i == lock
+	if (pl_i == lock_pl
 	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(pl, pl_i)
 	    || OWNS_TANK(pl, pl_i)
@@ -199,15 +195,14 @@ int Player_lock_closest(int ind, int next)
 			pl_i->pos.cy - pl->pos.cy);
 	if (l >= dist && l < best) {
 	    best = l;
-	    newpl = i;
+	    new_pl = pl_i;
 	}
     }
-    if (newpl == -1) {
+    if (new_pl == NULL)
 	return 0;
-    }
 
     SET_BIT(pl->lock.tagged, LOCK_PLAYER);
-    pl->lock.pl_id = Players(newpl)->id;
+    pl->lock.pl_id = new_pl->id;
 
     return 1;
 }
@@ -450,7 +445,7 @@ int Handle_keyboard(player *pl)
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		    || j < 0 || j >= NumPlayers) {
 		    /* better jump to KEY_LOCK_CLOSE... */
-		    Player_lock_closest(ind, 0);
+		    Player_lock_closest(pl, 0);
 		    break;
 		}
 		do {
@@ -497,17 +492,17 @@ int Handle_keyboard(player *pl)
 		    && i != ind) {
 		    break;
 		}
-		Player_lock_closest(ind, 0);
+		Player_lock_closest(pl, 0);
 		break;
 
 	    case KEY_LOCK_NEXT_CLOSE:
-		if (!Player_lock_closest(ind, 1)) {
-		    Player_lock_closest(ind, 0);
+		if (!Player_lock_closest(pl, 1)) {
+		    Player_lock_closest(pl, 0);
 		}
 		break;
 
 	    case KEY_LOCK_CLOSE:
-		Player_lock_closest(ind, 0);
+		Player_lock_closest(pl, 0);
 		break;
 
 	    case KEY_CHANGE_HOME:

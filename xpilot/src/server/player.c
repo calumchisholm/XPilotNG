@@ -2030,7 +2030,7 @@ void Kill_player(player *pl, bool add_rank_death)
 void Player_death_reset(player *pl, bool add_rank_death)
 {
     long		minfuel;
-    int			i, ind = GetInd(pl->id);
+    int			i;
 
 
     if (IS_TANK_PTR(pl)) {
@@ -2108,7 +2108,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 		SET_BIT(pl->status, GAME_OVER);
 		if (pl->mychar != 'W')
 		    pl->mychar = 'D';
-		Player_lock_closest(ind, 0);
+		Player_lock_closest(pl, 0);
 	    }
 	}
 	else {
