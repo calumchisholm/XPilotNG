@@ -460,7 +460,7 @@ public class MapPolygon extends MapObject {
                                     poly.npoints - 1);
                     MapPolygon.this.style = 
                         c.getModel().getDefaultPolygonStyle();
-                    c.getModel().addObject(MapPolygon.this);
+                    c.getModel().addToFront(MapPolygon.this);
 
                     // This hack consumes mouse released and mouse clicked
                     // events associated with this mouse pressed event.

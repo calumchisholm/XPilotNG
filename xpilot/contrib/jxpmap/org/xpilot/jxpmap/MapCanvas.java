@@ -192,7 +192,7 @@ public class MapCanvas extends JComponent {
 
     }
 
-    private AffineTransform getTransform () {
+    public AffineTransform getTransform () {
         if (at == null) {
             at = new AffineTransform();
             at.translate(0, scale * model.options.size.height);
@@ -202,7 +202,7 @@ public class MapCanvas extends JComponent {
     }
 
 
-    private AffineTransform getInverse () {
+    public AffineTransform getInverse () {
         try {
             if (it == null) it = getTransform().createInverse();
             return it;
@@ -305,7 +305,5 @@ public class MapCanvas extends JComponent {
             getInverse().transform(evtp, mapp);
             evt.translatePoint(mapp.x - evtp.x, mapp.y - evtp.y);
         }
-    }
-
-    
+    }    
 }

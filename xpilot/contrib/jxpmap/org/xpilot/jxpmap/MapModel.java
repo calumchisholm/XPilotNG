@@ -85,10 +85,24 @@ public class MapModel {
     }
 
 
-    public void addObject (MapObject moNew) {
+    public void addToFront (MapObject moNew) {
+        addObject(moNew, true);
+    }
+
+
+    public void addToBack (MapObject moNew) {
+        addObject(moNew, false);
+    }
+
+
+    public void addObject (MapObject moNew, boolean front) {
+
         for (ListIterator iter = objects.listIterator(); iter.hasNext();) {
             MapObject moOld = (MapObject)iter.next();
-            if (moNew.getZOrder() <= moOld.getZOrder()) {
+            int znew = moNew.getZOrder();
+            int zold = moOld.getZOrder();
+            
+            if (znew < zold || (front && znew == zold)) {
                 iter.previous();
                 iter.add(moNew);
                 return;
@@ -158,9 +172,9 @@ public class MapModel {
                 PolygonStyle s = (PolygonStyle)iter.next();
                 s.printXml(out);
             }
-            
-            for (Iterator iter = objects.iterator(); iter.hasNext();) {
-                ((MapObject)iter.next()).printXml(out);
+
+            for (int i = objects.size() - 1; i >= 0; i--) {
+                ((MapObject)objects.get(i)).printXml(out);
             }
 
             out.println("</XPilotMap>");
@@ -293,7 +307,7 @@ public class MapModel {
                     MapFuel o = new MapFuel(x, y);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addObject(o);
+                    addToFront(o);
 
                 } else if (name.equalsIgnoreCase("ball")) {
 
@@ -303,7 +317,7 @@ public class MapModel {
                     MapBall o = new MapBall(x, y, team);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addObject(o);
+                    addToFront(o);
 
                 } else if (name.equalsIgnoreCase("base")) {
 
@@ -314,7 +328,7 @@ public class MapModel {
                     MapBase o = new MapBase(x, y, dir, team);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addObject(o);
+                    addToFront(o);
 
                 } else if (name.equalsIgnoreCase("check")) {
 
@@ -323,7 +337,7 @@ public class MapModel {
                     MapCheckPoint o = new MapCheckPoint(x, y);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addObject(o);
+                    addToFront(o);
 
                 } else if (name.equalsIgnoreCase("ballarea")) {
 
@@ -459,7 +473,7 @@ public class MapModel {
                     mp.setType(p.type);
                     mp.setTeam(p.team);
                     
-                    addObject(mp);
+                    addToFront(mp);
                 }
 
                 

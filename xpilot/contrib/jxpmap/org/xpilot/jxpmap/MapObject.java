@@ -3,17 +3,19 @@ package org.xpilot.jxpmap;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
-import javax.swing.ImageIcon;
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.io.IOException;
+
 
 public abstract class MapObject {
     
     protected Rectangle bounds;
     protected Stroke previewStroke;
     protected Image img;
+    protected MapObjectPopup popup;
 
-
+    
     public MapObject () {
         this(null, 0, 0, 0, 0);
     }
@@ -30,8 +32,10 @@ public abstract class MapObject {
 
 
     public MapObject (String imgName, int x, int y, int width, int height) {
+
         bounds = new Rectangle(x, y, width, height);
         if (imgName != null) setImage(imgName);
+        popup = new MapObjectPopup(this);
     }
 
 
@@ -105,29 +109,26 @@ public abstract class MapObject {
 
     public boolean checkAwtEvent (MapCanvas canvas, AWTEvent evt) {
 
-        if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
+        if (evt instanceof MouseEvent) {
             MouseEvent me = (MouseEvent)evt;
-            
-            if (contains(me.getPoint())) {
-                if ((me.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
-                    if (canvas.isErase()) {
-                        canvas.getModel().removeObject(this);
-                        canvas.repaint();
-                    } else {
-                        canvas.setCanvasEventHandler(new MoveHandler(me));
-                    }
-                }
-                return true;
-            }
 
-        } else if (evt.getID() == MouseEvent.MOUSE_CLICKED) {
-            MouseEvent me = (MouseEvent)evt;
-            
             if (contains(me.getPoint())) {
-                if ((me.getModifiers() & InputEvent.BUTTON1_MASK) == 0) {
-                    EditorDialog.show(canvas, this);
-                    canvas.repaint();
+                if (me.isPopupTrigger()) {
+                    Point p = me.getPoint();
+                    canvas.getTransform().transform(p, p);
+                    popup.show(canvas, p.x, p.y);
                     return true;
+
+                } else {
+                    if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
+                        if (canvas.isErase()) {
+                            canvas.getModel().removeObject(this);
+                            canvas.repaint();
+                        } else {
+                            canvas.setCanvasEventHandler(new MoveHandler(me));
+                        }
+                    }
+                    return true;            
                 }
             }
         }
@@ -201,7 +202,7 @@ public abstract class MapObject {
         public void mousePressed (MouseEvent evt) {
 
             MapCanvas c = (MapCanvas)evt.getSource();
-            c.getModel().addObject(MapObject.this);
+            c.getModel().addToFront(MapObject.this);
             MapObject.this.moveTo(evt.getX() - offset.x, 
                                   evt.getY() - offset.y);
             c.setCanvasEventHandler(null);
