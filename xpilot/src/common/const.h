@@ -140,7 +140,6 @@ extern DFLOAT		tbl_cos[];
 #define MAX_PLAYER_FUEL		(2600<<FUEL_SCALE_BITS)
 #define MIN_PLAYER_FUEL		(350<<FUEL_SCALE_BITS)
 #define ENERGY_PACK_FUEL        ((500+(randomMT()&511))<<FUEL_SCALE_BITS)
-#define FUEL_NOTIFY		(3*12)
 
 #define TARGET_DAMAGE		(250<<FUEL_SCALE_BITS)
 #if 0
