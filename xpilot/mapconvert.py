@@ -400,9 +400,11 @@ def convert(options):
     for name, value in options.items():
 	print '<Option name="%s" value="%s"/>' % (name, encode(value))
     print '</GeneralOptions>'
+    print '<Edgestyle id="xpbluethin" width="0" color="0x4E7CFF" style="0"/>'
+    print '<Polystyle id="xpblue" color="0x4E7CFF" defedge="xpbluethin"/>'
 
     for p in polys2:
-	print '<Polygon x="%d" y="%d">' % tuple(p[-1][:2])
+	print '<Polygon x="%d" y="%d" style="xpblue">' % tuple(p[-1][:2])
 	x = p[-1][0]
 	y = p[-1][1]
 	h = not p[-1][2]
@@ -414,7 +416,7 @@ def convert(options):
 	    dy = center(c[1] - y, myc)
 	    if dx * cury != dy * curx or curh != h:
 		if curh:
-		    sstr = ' hidden="yes"'
+		    sstr = ' style="internal"'
 		else:
 		    sstr = ''
 		for i in range((max(abs(curx), abs(cury)) + MAXLEN - 1) / MAXLEN, 0, -1):
@@ -434,15 +436,16 @@ def convert(options):
 	    curx -= curx / i
 	    cury -= cury / i
 	print "</Polygon>"
+# The styles of these polygons will be changed later...
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y)
 	print '<BallArea team="%d">' % ball.team
-	print '<Polygon x="%d" y="%d">' % (ball.x - 1120, ball.y - 640)
+	print '<Polygon x="%d" y="%d" style="xpblue">' % (ball.x - 1120, ball.y - 640)
 	print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
 	print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
 	print '</Polygon></BallArea>'
 	print '<BallTarget team="%d">' % ball.team
-	print '<Polygon x="%d" y="%d">' % (ball.x - 480, ball.y)
+	print '<Polygon x="%d" y="%d" style="xpblue">' % (ball.x - 480, ball.y)
 	print '<Offset x="960" y="0"/> <Offset x="0" y="960"/>'
 	print '<Offset x="-960" y="0"/> <Offset x="0" y="-960"/>'
 	print '</Polygon></BallTarget>'

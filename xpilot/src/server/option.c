@@ -183,11 +183,12 @@ int ptscount, hidcount;
 char *mapd;
 
 struct polystyle pstyles[256];
-struct edgestyle estyles[256];
+struct edgestyle estyles[256] =
+{{"internal", 0, 0, 0}};	/* Style 0 is always this special style */
 struct bmpstyle  bstyles[256];
 poly_t *pdata;
 
-int num_pstyles, num_estyles, num_bstyles;
+int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
 static int max_bases, max_balls, max_fuels, max_checks, max_polys, max_hidden;
 
 
@@ -198,6 +199,7 @@ static int get_bmp_id(const char *s)
     for (i = 0; i < num_bstyles; i++)
 	if (!strcmp(bstyles[i].id, s))
 	    return i;
+    errno = 0;
     error("Undeclared bmpstyle %s", s);
     return 0;
 }
@@ -210,8 +212,9 @@ static int get_edge_id(const char *s)
     for (i = 0; i < num_estyles; i++)
 	if (!strcmp(estyles[i].id, s))
 	    return i;
+    errno = 0;
     error("Undeclared edgestyle %s", s);
-    return 0;
+    return -1;
 }
 
 
@@ -220,8 +223,9 @@ static int get_poly_id(const char *s)
     int i;
 
     for (i = 0; i < num_pstyles; i++)
-	if (!strcmp(estyles[i].id, s))
+	if (!strcmp(pstyles[i].id, s))
 	    return i;
+    errno = 0;
     error("Undeclared polystyle %s", s);
     return 0;
 }
@@ -252,9 +256,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	while (*attr) {
 	    if (!strcasecmp(*attr, "id"))
 		strncpy(pstyles[num_pstyles].id, *(attr + 1),
-			sizeof(pstyles[0].id - 1));
+			sizeof(pstyles[0].id) - 1);
 	    if (!strcasecmp(*attr, "color"))
-		pstyles[num_pstyles].color = atoi(*(attr + 1));
+		pstyles[num_pstyles].color = strtol(*(attr + 1), NULL, 16);
 	    if (!strcasecmp(*attr, "texture"))
 		pstyles[num_pstyles].texture_id = get_bmp_id(*(attr + 1));
 	    if (!strcasecmp(*attr, "defedge"))
@@ -262,6 +266,12 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "flags"))
 		pstyles[num_pstyles].flags = atoi(*(attr + 1)); /* names @!# */
 	    attr += 2;
+	}
+	if (pstyles[num_pstyles].defedge_id == 0) {
+	    errno = 0;
+	    error("Polygon default edgestyle cannot be omitted or set "
+		  "to 'internal'!");
+	    exit(1);
 	}
 	num_pstyles++;
     }
@@ -278,7 +288,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "width"))
 		estyles[num_estyles].width = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "color"))
-		estyles[num_estyles].color = atoi(*(attr + 1));
+		estyles[num_estyles].color = strtol(*(attr + 1), NULL, 16);
 	    if (!strcasecmp(*attr, "style")) /* !@# names later */
 		estyles[num_estyles].style = atoi(*(attr + 1));
 	    attr += 2;
@@ -336,7 +346,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Polygon")) {
-	int x, y, style = 0;
+	int x, y, style = -1;
 	poly_t t;
 
 	while (*attr) {
@@ -347,6 +357,11 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "style"))
 		style = get_poly_id(*(attr + 1));
 	    attr += 2;
+	}
+	if (style == -1) {
+	    errno = 0;
+	    error("Currently you must give polygon style, no default");
+	    exit(1);
 	}
 	ptscount = 0;
 	t.x = x;
@@ -469,25 +484,28 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcmp(el, "Offset")) {
-	int x, y, hidden = 0;
+	int x, y, edgestyle = -1;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
 		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
 		y = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "hidden"))
-		hidden = 1;
+	    if (!strcasecmp(*attr, "style"))
+		edgestyle = get_edge_id(*(attr + 1));
 	    attr += 2;
 	}
 	*edges++ = x;
 	*edges++ = y;
-	if (hidden)
+	if (edgestyle != -1) {
 	    STORE(int, hidptr, hidcount, max_hidden, ptscount);
+	    STORE(int, hidptr, hidcount, max_hidden, edgestyle);
+	}
 	ptscount++;
 	return;
     }
     return;
 }
+
 
 static void tagend(void *data, const char *el)
 {
@@ -504,6 +522,7 @@ static void tagend(void *data, const char *el)
     }
     return;
 }
+
 
 int Load_lines(int fd)
 {
@@ -523,6 +542,7 @@ int Load_lines(int fd)
 	    return false;
 	}
 	if (!XML_Parse(p, buff, len, !len)) {
+	    errno = 0;
 	    error("Parse error reading map at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));

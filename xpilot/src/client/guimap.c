@@ -1281,7 +1281,8 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
                 
                 if (sindex == -1) sindex = style.def_edge_style;
 
-                if (edge_styles[sindex].width != -1) {
+		/* Style 0 means internal edges which are never shown */
+                if (sindex != 0 && edge_styles[sindex].width != -1) {
 
                     XSetLineAttributes
                         (dpy, gc, 

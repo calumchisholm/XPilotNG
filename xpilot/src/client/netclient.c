@@ -344,7 +344,7 @@ static int parse_new(void)
 	points[0].y = cy = min.y = max.y = starty;
 
 	if (!nexthid) {
-	    styles[0] = 1; /* -1 means default */
+	    styles[0] = get_ushort(&hidptr);
 	    hidcount--;
 	    if (hidcount) {
 		nexthid = get_ushort(&hidptr);
@@ -367,14 +367,14 @@ static int parse_new(void)
 	    points[j].y = dy;
 
 	    if (nexthid == j) {
-		styles[j] = 1;
+		styles[j] = get_ushort(&hidptr);
 		hidcount--;
 		if (hidcount) {
 		    nexthid = get_ushort(&hidptr);
 		}
 	    }
 	    else {
-		if (styles) styles[j] = -1;
+		if (styles) styles[j] = 1;
 	    }
 	}
 	poly.points = points;
@@ -499,15 +499,6 @@ static int parse_new(void)
 	edge_styles[i].color = wallColor;
 	edge_styles[i].rgb = get_32bit(&ptr);
 	edge_styles[i].style = *ptr++;
-    }
-
-    if (num_edge_styles == 0) {
-	/* default edge style */
-	edge_styles[0].width = 1;
-	edge_styles[0].rgb = 255;
-	edge_styles[0].color = wallColor;
-	edge_styles[0].style = LineSolid;
-	num_edge_styles = 1;
     }
 
     for (i = 0; i < num_bmaps; i++) {
