@@ -414,6 +414,7 @@ void Rank_nuke_score(RankInfo * node)
 }
 
 
+#if 0
 static int Import_Oldest(FILE * file)
 {
     struct oldScoreNode *nodes;
@@ -451,6 +452,7 @@ static int Import_Oldest(FILE * file)
 
     return imported;
 }
+#endif
 
 /* Read scores from disk, and zero-initialize the ones that are not used.
    Call this on startup. */
@@ -470,8 +472,12 @@ void Rank_init_saved_scores(void)
 		goto init_tail;
 	    }
 	    if (memcmp(rank_head.magic, RANK_MAGIC, 4) != 0) {
+#if 0
 		rewind(file);
 		i = Import_Oldest(file);
+#else
+		warn("Rank file format is too old.\n");
+#endif		
 		goto init_tail;
 	    }
 	    rank_head.version = ntohl(rank_head.version);
@@ -479,6 +485,8 @@ void Rank_init_saved_scores(void)
 	    switch (RANK_VER_MAJ(rank_head.version)) {
 	    case 2:
 		/* Current version. */
+		xpprintf("%s Rank file with %d entries opened successfully.\n",
+			 showtime(), rank_head.entries);
 		break;
 	    default:
 		error("Unknown version of score file!\n");
