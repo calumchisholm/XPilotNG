@@ -1,327 +1,171 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
-<Option name="usedebris" value="no"/>
-<Option name="treasureCollisionMayKill" value="yes"/>
-<Option name="checkpointradius" value="6.0"/>
-<Option name="itemtractorbeamprob" value="0"/>
-<Option name="itememergencythrustprob" value="0"/>
-<Option name="itemsensorprob" value="0"/>
-<Option name="itemautopilotprob" value="0"/>
-<Option name="itemmirrorprob" value="0"/>
-<Option name="itemcloakprob" value="0"/>
-<Option name="itemdeflectorprob" value="0"/>
-<Option name="itemhyperjumpprob" value="0"/>
-<Option name="itemtransporterprob" value="0"/>
-<Option name="itemlaserprob" value="1e-9"/>
-<Option name="itemecmprob" value="1e-8"/>
-<Option name="itemrearshotprob" value="1e-9"/>
-<Option name="itemphasingprob" value="3e-10"/>
-<Option name="itemwideangleprob" value="1e-9"/>
-<Option name="itemprobmult" value="0.6"/>
-<Option name="itemafterburnerprob" value="5e-9"/>
-<Option name="itemconcentratorprob" value="1.0"/>
-<Option name="itemtankprob" value="1e-9"/>
-<Option name="itemmineprob" value="1e-9"/>
-<Option name="itemarmorprob" value="1e-9"/>
-<Option name="itememergencyshieldprob" value="5e-10"/>
-<Option name="itemmissileprob" value="1e-10"/>
-<Option name="itemenergypackprob" value="1e-9"/>
-<Option name="tagkillitscoremult" value="10.0"/>
-<Option name="selfkillscoremult" value="0.3"/>
-<Option name="runoverkillscoremult" value="1.33"/>
-<Option name="shotkillscoremult" value="1.0"/>
-<Option name="unownedkillscoremult" value="0.5"/>
-<Option name="tankkillscoremult" value="3"/>
-<Option name="heatkillscoremult" value="0.4"/>
-<Option name="minescoremult" value="0.33"/>
-<Option name="ballkillscoremult" value="10.0"/>
-<Option name="shovekillscoremult" value="2"/>
-<Option name="tagitkillscoremult" value="2.0"/>
-<Option name="smartkillscoremult" value="0.33"/>
-<Option name="crashscoremult" value="0.15"/>
-<Option name="torpedokillscoremult" value="1.2"/>
-<Option name="explosionkillscoremult" value="0.33"/>
-<Option name="clusterkillscoremult" value="0.33"/>
-<Option name="laserkillscoremult" value="1.0"/>
-<Option name="selfdestructscoremult" value="0.0"/>
-<Option name="missilelife" value="400.0"/>
-<Option name="shieldeditempickup" value="False"/>
-<Option name="mineshotdetonatedistance" value="0.0"/>
-<Option name="nukeminmines" value="5"/>
-<Option name="dropitemonkillprob" value="0.5"/>
-<Option name="maxitemdensity" value="0.00012"/>
+<Option name="itemTractorBeamProb" value="0"/>
+<Option name="missileLife" value="400.0"/>
+<Option name="shieldedItemPickup" value="False"/>
+<Option name="nukeMinMines" value="5"/>
 <Option name="cannonmaxscore" value="100.0"/>
-<Option name="treasuresonradar" value="True"/>
-<Option name="debriswallbounce" value="no"/>
-<Option name="wormholestableticks" value="64.0"/>
-<Option name="ballradius" value="10.0"/>
+<Option name="treasuresOnRadar" value="True"/>
+<Option name="debrisWallBounce" value="no"/>
+<Option name="itemHyperJumpProb" value="0"/>
+<Option name="itemECMProb" value="1e-8"/>
 <Option name="numberofrounds" value="0"/>
-<Option name="pausetax" value="0.0"/>
-<Option name="tankusername" value="tank"/>
 <Option name="timing" value="no"/>
-<Option name="initialarmor" value="0"/>
-<Option name="maxphasings" value="10"/>
-<Option name="allowtorpedoes" value="True"/>
-<Option name="robotsleave" value="true"/>
-<Option name="maxafterburners" value="10"/>
-<Option name="nukeminsmarts" value="2"/>
-<Option name="maxballconnectorratio" value="0.45"/>
-<Option name="dataurl" value="http://chipcheck.chemie.uni-karlsruhe.de/~k/ndh.xpd"/>
-<Option name="maxtransporters" value="10"/>
-<Option name="identifymines" value="True"/>
-<Option name="gravityanticlockwise" value="false"/>
-<Option name="ngcontrols" value="true"/>
-<Option name="movingitemprob" value="0.4"/>
-<Option name="pulseswallbounce" value="yes"/>
-<Option name="initialemergencythrusts" value="0"/>
-<Option name="extraborder" value="no"/>
-<Option name="asteroidconcentratorvisible" value="true"/>
-<Option name="initialemergencyshields" value="0"/>
-<Option name="edgewrap" value="yes"/>
-<Option name="playerstartsshielded" value="yes"/>
-<Option name="maxasteroiddensity" value="0.0"/>
-<Option name="cannondeadticks" value="864.0"/>
-<Option name="initialmirrors" value="0"/>
-<Option name="restrictrobots" value="true"/>
-<Option name="minefuseticks" value="0.0"/>
-<Option name="shotsgravity" value="true"/>
-<Option name="connectorisstring" value="no"/>
-<Option name="gravitypointsource" value="false"/>
-<Option name="initiallasers" value="0"/>
-<Option name="ballswallbounce" value="yes"/>
-<Option name="blockfriction" value="0.0"/>
-<Option name="maxobjectwallbouncespeed" value="140.0"/>
-<Option name="asteroidmaxitems" value="0"/>
-<Option name="targetsync" value="no"/>
-<Option name="minitemmass" value="0.0"/>
-<Option name="allowplayerbounces" value="yes"/>
-<Option name="ballsparkcollisions" value="yes"/>
-<Option name="wormholevisible" value="true"/>
-<Option name="maxmissiles" value="10"/>
-<Option name="maxdefensiveitems" value="100"/>
-<Option name="recordflushinterval" value="0"/>
-<Option name="coriolis" value="0.0"/>
+<Option name="itemCloakProb" value="0"/>
+<Option name="allowTorpedoes" value="True"/>
+<Option name="nukeMinSmarts" value="2"/>
+<Option name="maxBallConnectorRatio" value="0.45"/>
+<Option name="dataURL" value="http://xpilot.sourceforge.net/maps/ndh-1.3.xpd"/>
+<Option name="identifyMines" value="True"/>
+<Option name="ngControls" value="true"/>
+<Option name="movingItemProb" value="0.4"/>
+<Option name="pulsesWallBounce" value="yes"/>
+<Option name="extraBorder" value="no"/>
+<Option name="selfKillScoreMult" value="0.3"/>
+<Option name="edgeWrap" value="true"/>
+<Option name="playerStartsShielded" value="yes"/>
+<Option name="runoverKillScoreMult" value="1.33"/>
+<Option name="connectorIsString" value="no"/>
+<Option name="ballsWallBounce" value="yes"/>
+<Option name="maxObjectWallBounceSpeed" value="140.0"/>
+<Option name="targetSync" value="no"/>
+<Option name="allowPlayerBounces" value="yes"/>
+<Option name="ballSparkCollisions" value="yes"/>
+<Option name="itemDeflectorProb" value="0"/>
 <Option name="robottickspersecond" value="0"/>
-<Option name="gravityvisible" value="true"/>
-<Option name="log" value="false"/>
-<Option name="limitedlives" value="no"/>
-<Option name="maxarmor" value="10"/>
-<Option name="allowplayercrashes" value="yes"/>
-<Option name="ballmass" value="40.0"/>
-<Option name="ballraceconnected" value="false"/>
-<Option name="maxemergencythrusts" value="10"/>
-<Option name="missilesonradar" value="True"/>
-<Option name="teamplay" value="no"/>
-<Option name="ballconnectorspringconstant" value="1500.0"/>
-<Option name="worldlives" value="0"/>
-<Option name="itemconcentratorvisible" value="true"/>
-<Option name="recordmode" value="0"/>
+<Option name="limitedLives" value="no"/>
+<Option name="allowPlayerCrashes" value="yes"/>
+<Option name="ballMass" value="40.0"/>
+<Option name="tankKillScoreMult" value="3"/>
+<Option name="missilesOnRadar" value="True"/>
+<Option name="teamPlay" value="no"/>
+<Option name="heatKillScoreMult" value="0.4"/>
 <Option name="robotleavescore" value="-90.0"/>
-<Option name="tankhostname" value="tanks.org"/>
-<Option name="sound" value="true"/>
-<Option name="allowheatseekers" value="True"/>
-<Option name="teamcupmatchnumber" value="0"/>
-<Option name="mapauthor" value="PeaceMaker, poly by Throat"/>
-<Option name="allowmodifiers" value="yes"/>
-<Option name="loseitemdestroys" value="false"/>
-<Option name="selfimmunity" value="false"/>
-<Option name="itemconcentratorradius" value="10.0"/>
-<Option name="maxminesperpack" value="2"/>
-<Option name="maxvisibilitydistance" value="0.0"/>
-<Option name="initialfuel" value="2000"/>
-<Option name="gameduration" value="0.0"/>
-<Option name="itemswallbounce" value="yes"/>
+<Option name="tankHostName" value="tanks.org"/>
+<Option name="allowHeatSeekers" value="True"/>
+<Option name="itemPhasingProb" value="3e-10"/>
+<Option name="mapAuthor" value="PeaceMaker, poly by Throat"/>
+<Option name="allowModifiers" value="yes"/>
+<Option name="initialFuel" value="2000"/>
+<Option name="playerWallBounceBrakeFactor" value="0.55"/>
 <Option name="cannonsdefend" value="yes"/>
-<Option name="robotteam" value="0"/>
-<Option name="blockfrictionvisible" value="true"/>
-<Option name="allowsmartmissiles" value="True"/>
+<Option name="itemsWallBounce" value="yes"/>
+<Option name="allowSmartMissiles" value="True"/>
 <Option name="teamcupstatport" value="3749"/>
-<Option name="maxhyperjumps" value="10"/>
-<Option name="baseminerange" value="0.0"/>
-<Option name="maxwideangles" value="10"/>
-<Option name="maxautopilots" value="10"/>
-<Option name="robotusername" value="robot"/>
-<Option name="initialafterburners" value="1"/>
-<Option name="initialecms" value="0"/>
-<Option name="cannonsmartness" value="1"/>
-<Option name="greeting" value=""/>
-<Option name="defaultsfilename" value="/usr/local/lib/xpilot/defaults"/>
+<Option name="mineScoreMult" value="0.33"/>
+<Option name="initialAfterburners" value="1"/>
+<Option name="defaultsFileName" value="/usr/local/lib/xpilot/defaults"/>
 <Option name="asteroidmaxscore" value="100.0"/>
-<Option name="allowshields" value="no"/>
-<Option name="minelife" value="7200.0"/>
-<Option name="maxtanks" value="8"/>
-<Option name="constantscoring" value="no"/>
-<Option name="maxoffensiveitems" value="100"/>
-<Option name="allowlasermodifiers" value="yes"/>
-<Option name="mapheight" value="7000"/>
-<Option name="gravitypoint" value="0,0"/>
-<Option name="reserverobotteam" value="true"/>
-<Option name="keepshots" value="no"/>
-<Option name="initialtractorbeams" value="0"/>
-<Option name="maxpausetime" value="6600"/>
-<Option name="asteroidconcentratorprob" value="1.0"/>
-<Option name="allownukes" value="yes"/>
-<Option name="taggame" value="no"/>
-<Option name="reset" value="yes"/>
+<Option name="allowShields" value="no"/>
+<Option name="constantScoring" value="no"/>
+<Option name="allowLaserModifiers" value="yes"/>
+<Option name="mapHeight" value="7000"/>
+<Option name="keepShots" value="no"/>
+<Option name="maxPauseTime" value="6600"/>
+<Option name="allowNukes" value="yes"/>
+<Option name="tagGame" value="no"/>
+<Option name="ballKillScoreMult" value="10.0"/>
 <Option name="cannonpoints" value="1.0"/>
-<Option name="defaultshipshape" value="(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"/>
-<Option name="mineswallbounce" value="no"/>
-<Option name="teamimmunity" value="yes"/>
-<Option name="asteroiditemprob" value="0.0"/>
-<Option name="distinguishmissiles" value="True"/>
-<Option name="initialcloaks" value="0"/>
-<Option name="reporttometaserver" value="yes"/>
-<Option name="pausedframespersecond" value="0"/>
-<Option name="targetteamcollision" value="yes"/>
-<Option name="initialtransporters" value="0"/>
+<Option name="reset" value="yes"/>
+<Option name="defaultShipShape" value="(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)(MR: 15,0)"/>
+<Option name="minesWallBounce" value="no"/>
+<Option name="teamImmunity" value="yes"/>
+<Option name="distinguishMissiles" value="True"/>
+<Option name="reportToMetaServer" value="yes"/>
+<Option name="targetTeamCollision" value="yes"/>
 <Option name="asteroidpoints" value="1.0"/>
-<Option name="maxvisibleobject" value="1000"/>
-<Option name="treasurekillteam" value="no"/>
-<Option name="nukedebrislife" value="120.0"/>
-<Option name="robotstalk" value="false"/>
-<Option name="asteroidsonradar" value="False"/>
+<Option name="treasureKillTeam" value="no"/>
+<Option name="itemProbMult" value="0.6"/>
+<Option name="shoveKillScoreMult" value="2"/>
+<Option name="asteroidsOnRadar" value="False"/>
 <Option name="rounddelay" value="0"/>
-<Option name="objectwallbouncebrakefactor" value="0.9"/>
-<Option name="playerwallbouncebrakefactor" value="0.55"/>
-<Option name="gamespeed" value="12.5"/>
-<Option name="lockotherteam" value="true"/>
-<Option name="targetkillteam" value="no"/>
-<Option name="maxcloaks" value="10"/>
-<Option name="maxrobots" value="5"/>
-<Option name="initialautopilots" value="0"/>
-<Option name="ballconnectordamping" value="2.0"/>
-<Option name="baselesspausing" value="false"/>
-<Option name="maxshieldedwallbouncespeed" value="120"/>
-<Option name="maxemergencyshields" value="10"/>
-<Option name="playersonradar" value="True"/>
-<Option name="wallbouncefueldrainmult" value="0.1"/>
-<Option name="logrobots" value="true"/>
-<Option name="initialtanks" value="0"/>
-<Option name="shotlife" value="60.0"/>
-<Option name="roguemineprob" value="1.0"/>
-<Option name="mapdata" value=""/>
-<Option name="tankscoredecrement" value="500.0"/>
+<Option name="objectWallBounceBrakeFactor" value="0.9"/>
+<Option name="itemAfterburnerProb" value="5e-9"/>
+<Option name="smartKillScoreMult" value="0.33"/>
+<Option name="targetKillTeam" value="no"/>
+<Option name="maxRobots" value="5"/>
+<Option name="maxShieldedWallBounceSpeed" value="120"/>
+<Option name="playersOnRadar" value="True"/>
+<Option name="wallBounceFuelDrainMult" value="0.1"/>
+<Option name="useDebris" value="no"/>
 <Option name="elimination" value="no"/>
-<Option name="laserrepeatrate" value="2.0"/>
 <Option name="cannonitemprobmult" value="1.0"/>
-<Option name="maxunshieldedwallbouncespeed" value="120"/>
-<Option name="cloakedexhaust" value="no"/>
-<Option name="ballstyles" value="true"/>
-<Option name="shothitfueldrainuseskineticenergy" value="yes"/>
-<Option name="asteroidconcentratorradius" value="10.0"/>
-<Option name="maxsensors" value="10"/>
-<Option name="gravityangle" value="90.0"/>
-<Option name="ignoremaxfps" value="false"/>
-<Option name="pulselife" value="6.0"/>
+<Option name="maxUnshieldedWallBounceSpeed" value="120"/>
+<Option name="cloakedExhaust" value="no"/>
+<Option name="shotHitFuelDrainUsesKineticEnergy" value="yes"/>
 <Option name="silent" value="false"/>
-<Option name="wallbouncedestroyitemprob" value="0.0"/>
-<Option name="gravityclockwise" value="false"/>
-<Option name="adminmessagefilesizelimit" value="20202"/>
-<Option name="pulselength" value="85.0"/>
-<Option name="allowalliances" value="yes"/>
-<Option name="mapname" value="New Dark Hell-Next Generation"/>
-<Option name="initialsensors" value="0"/>
-<Option name="ecmsreprogrammines" value="yes"/>
-<Option name="roundstoplay" value="0"/>
-<Option name="shieldedmining" value="False"/>
-<Option name="clientportstart" value="0"/>
-<Option name="resetonhuman" value="0"/>
-<Option name="shipmass" value="7"/>
-<Option name="treasurecollisionmaykill" value="no"/>
-<Option name="ballcollisions" value="no"/>
-<Option name="announcealliances" value="no"/>
-<Option name="maxmirrors" value="10"/>
-<Option name="maxfuel" value="10000"/>
-<Option name="mapwidth" value="7000"/>
+<Option name="crashScoreMult" value="0.15"/>
+<Option name="allowAlliances" value="yes"/>
+<Option name="itemEmergencyThrustProb" value="0"/>
+<Option name="mapName" value="New Dark Hell-Next Generation"/>
+<Option name="ecmsReprogramMines" value="yes"/>
+<Option name="itemSensorProb" value="0"/>
+<Option name="shieldedMining" value="False"/>
+<Option name="shipMass" value="7"/>
+<Option name="treasureCollisionMayKill" value="no"/>
+<Option name="ballCollisions" value="no"/>
+<Option name="announceAlliances" value="no"/>
+<Option name="mapWidth" value="7000"/>
 <Option name="cannonsuseitems" value="no"/>
 <Option name="friction" value="0.015"/>
-<Option name="maxrearshots" value="10"/>
-<Option name="plockserver" value="false"/>
-<Option name="framespersecond" value="50"/>
-<Option name="laserisstungun" value="False"/>
-<Option name="maxlasers" value="5"/>
-<Option name="asteroidprob" value="5e-7"/>
+<Option name="laserIsStunGun" value="False"/>
 <Option name="teamsharescore" value="no"/>
-<Option name="shotmass" value="0.1"/>
-<Option name="cannonflak" value="no"/>
-<Option name="detonateitemonkillprob" value="1.0"/>
+<Option name="itemAutopilotProb" value="0"/>
+<Option name="cannonFlak" value="no"/>
+<Option name="detonateItemOnKillProb" value="1.0"/>
 <Option name="robotleaveratio" value="-5.0"/>
-<Option name="polygonmode" value="false"/>
-<Option name="asteroidswallbounce" value="yes"/>
-<Option name="initialphasings" value="0"/>
-<Option name="minrobots" value="-1"/>
-<Option name="maxdeflectors" value="10"/>
-<Option name="initialmissiles" value="0"/>
-<Option name="allowshipshapes" value="True"/>
-<Option name="destroyitemincollisionprob" value="0.0"/>
-<Option name="minvisibilitydistance" value="0.0"/>
-<Option name="targetdeadticks" value="720.0"/>
-<Option name="nukesonradar" value="True"/>
-<Option name="maxmines" value="10"/>
-<Option name="initialrearshots" value="0"/>
-<Option name="tankshipshape" value="(NM:fueltank)(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 9,-8 14,-5)(EN: -15,0)(MG: 15,0)"/>
-<Option name="edgebounce" value="yes"/>
-<Option name="teamcup" value="false"/>
-<Option name="robothostname" value="xpilot.org"/>
-<Option name="ecmsreprogramrobots" value="yes"/>
-<Option name="wreckagecollisionmaykill" value="no"/>
-<Option name="initialwideangles" value="0"/>
-<Option name="maxroundtime" value="0"/>
-<Option name="initialhyperjumps" value="0"/>
-<Option name="teamcannons" value="no"/>
-<Option name="firerepeatrate" value="2.0"/>
-<Option name="objectwallbouncelifefactor" value="0.80"/>
-<Option name="allowclusters" value="yes"/>
-<Option name="initialdeflectors" value="0"/>
-<Option name="shotspeed" value="21.0"/>
-<Option name="shotswallbounce" value="no"/>
-<Option name="capturetheflag" value="no"/>
-<Option name="gravity" value="0.0"/>
-<Option name="allowplayerkilling" value="yes"/>
-<Option name="minesonradar" value="False"/>
-<Option name="ignore20maxfps" value="true"/>
-<Option name="limitedvisibility" value="no"/>
-<Option name="ballrace" value="false"/>
-<Option name="sparkswallbounce" value="no"/>
-<Option name="initialmines" value="0"/>
-<Option name="missileswallbounce" value="no"/>
-<Option name="rogueheatprob" value="1.0"/>
-<Option name="ballconnectorlength" value="120.0"/>
-<Option name="maxplayershots" value="256"/>
-<Option name="teamfuel" value="no"/>
-<Option name="maxmissilesperpack" value="4"/>
-<Option name="idlerun" value="false"/>
-<Option name="usewreckage" value="true"/>
-<Option name="randomitemprob" value="0.0"/>
-<Option name="robotleavelife" value="7"/>
-<Option name="minminespeed" value="0.0"/>
-<Option name="treasurecollisiondestroys" value="no"/>
-<Option name="nukeclusterdamage" value="1.0"/>
-<Option name="playerlimit" value="0"/>
-<Option name="maxecms" value="10"/>
-<Option name="asteroidcollisionmaykill" value="yes"/>
-<Option name="waitingframespersecond" value="0"/>
-<Option name="pulsespeed" value="90.0"/>
+<Option name="itemMirrorProb" value="0"/>
+<Option name="asteroidsWallBounce" value="yes"/>
+<Option name="itemEmergencyShieldProb" value="5e-10"/>
+<Option name="torpedoKillScoreMult" value="1.2"/>
+<Option name="allowShipShapes" value="True"/>
+<Option name="nukesOnRadar" value="True"/>
+<Option name="itemMissileProb" value="1e-10"/>
+<Option name="tankShipShape" value="(NM:fueltank)(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 9,-8 14,-5)(EN: -15,0)(MG: 15,0)"/>
+<Option name="edgeBounce" value="yes"/>
+<Option name="robotHostName" value="xpilot.org"/>
+<Option name="ecmsReprogramRobots" value="yes"/>
+<Option name="wreckageCollisionMayKill" value="no"/>
+<Option name="itemTransporterProb" value="0"/>
+<Option name="teamCannons" value="no"/>
+<Option name="allowClusters" value="yes"/>
+<Option name="clusterKillScoreMult" value="0.33"/>
+<Option name="shotsWallBounce" value="no"/>
+<Option name="captureTheFlag" value="no"/>
+<Option name="allowPlayerKilling" value="yes"/>
+<Option name="minesOnRadar" value="False"/>
+<Option name="limitedVisibility" value="no"/>
+<Option name="sparksWallBounce" value="no"/>
+<Option name="missilesWallBounce" value="no"/>
+<Option name="teamFuel" value="no"/>
+<Option name="robotLeaveLife" value="7"/>
+<Option name="treasureCollisionDestroys" value="no"/>
+<Option name="asteroidCollisionMayKill" value="yes"/>
 </GeneralOptions>
-<BmpStyle id="bakedmud.pnm" filename="bakedmud.pnm" flags="1"/>
-<BmpStyle id="bark1.gif.pnm" filename="bark1.gif.pnm" flags="1"/>
-<BmpStyle id="blackwhite_gravel.pnm" filename="blackwhite_gravel.pnm" flags="1"/>
-<BmpStyle id="dirt12.jpg.pnm" filename="dirt12.jpg.pnm" flags="1"/>
-<BmpStyle id="dirt4.gif.pnm" filename="dirt4.gif.pnm" flags="1"/>
-<BmpStyle id="greenpat.pnm" filename="greenpat.pnm" flags="1"/>
-<BmpStyle id="lava1.jpg.pnm" filename="lava1.jpg.pnm" flags="1"/>
-<BmpStyle id="glass.pnm" filename="glass.pnm" flags="1"/>
-<BmpStyle id="mars_soil.pnm" filename="mars_soil.pnm" flags="1"/>
-<BmpStyle id="moss1.jpg.pnm" filename="moss1.jpg.pnm" flags="1"/>
-<BmpStyle id="structurewall.pnm" filename="structurewall.pnm" flags="1"/>
+<BmpStyle id="bakedmud.pnm" filename="bakedmud.pnm" scalable="yes"/>
+<BmpStyle id="bark1.gif.pnm" filename="bark1.gif.pnm" scalable="yes"/>
+<BmpStyle id="blackwhite_gravel.pnm" filename="blackwhite_gravel.pnm" scalable="yes"/>
+<BmpStyle id="dirt12.jpg.pnm" filename="dirt12.jpg.pnm" scalable="yes"/>
+<BmpStyle id="dirt4.gif.pnm" filename="dirt4.gif.pnm" scalable="yes"/>
+<BmpStyle id="greenpat.pnm" filename="greenpat.pnm" scalable="yes"/>
+<BmpStyle id="lava1.jpg.pnm" filename="lava1.jpg.pnm" scalable="yes"/>
+<BmpStyle id="glass.pnm" filename="glass.pnm" scalable="yes"/>
+<BmpStyle id="mars_soil.pnm" filename="mars_soil.pnm" scalable="yes"/>
+<BmpStyle id="moss1.jpg.pnm" filename="moss1.jpg.pnm" scalable="yes"/>
+<BmpStyle id="structurewall.pnm" filename="structurewall.pnm" scalable="yes"/>
+<BmpStyle id="wormholetx.ppm" filename="wormholetx.ppm" scalable="yes"/>
+<BmpStyle id="cannone.ppm" filename="cannone.ppm" scalable="yes"/>
+<BmpStyle id="cannonn.ppm" filename="cannonn.ppm" scalable="yes"/>
+<BmpStyle id="cannonw.ppm" filename="cannonw.ppm" scalable="yes"/>
 <EdgeStyle id="xpbluehidden" width="-1" color="4E7CFF" style="0"/>
-<Edgestyle id="dummy" width="2" color="FFFFFF" style="0"/>
+<EdgeStyle id="dummy" width="2" color="FFFFFF" style="0"/>
 <EdgeStyle id="xpredhidden" width="-1" color="FF3A27" style="0"/>
 <EdgeStyle id="yellow" width="2" color="FFFF00" style="0"/>
 <EdgeStyle id="white" width="2" color="FFFFFF" style="0"/>
 <EdgeStyle id="invisiedge" width="-1" color="000000" style="0"/>
+<EdgeStyle id="hidden" width="-1" color="FFFFFF" style="0"/>
 <PolyStyle id="xpblue" color="4E7CFF" defedge="xpbluehidden" flags="1"/>
-<PolyStyle id="xpred" color="FF3A27" defedge="xpredhidden" flags="1"/>
+<PolyStyle id="xpred" color="FF3A27" texture="wormholetx.ppm" defedge="xpredhidden" flags="3"/>
 <PolyStyle id="emptyyellow" color="0000FF" defedge="yellow" flags="0"/>
 <PolyStyle id="emptywhite" color="0000FF" defedge="white" flags="0"/>
 <PolyStyle id="invisible" color="000000" defedge="invisiedge" flags="12"/>
@@ -331,7 +175,10 @@
 <PolyStyle id="glass" color="999999" texture="glass.pnm" defedge="xpbluehidden" flags="3"/>
 <PolyStyle id="massoil" color="A70A0A" texture="mars_soil.pnm" defedge="xpbluehidden" flags="3"/>
 <PolyStyle id="moss" color="33FF33" texture="moss1.jpg.pnm" defedge="xpbluehidden" flags="3"/>
-<Polystyle id="t4ball" color="FFFF00" defedge="dummy"/>
+<PolyStyle id="t4ball" color="FFFF00" defedge="dummy" flags="1"/>
+<PolyStyle id="cannone.ppm" color="000080" texture="cannone.ppm" defedge="hidden" flags="3"/>
+<PolyStyle id="cannonw.ppm" color="000080" texture="cannonw.ppm" defedge="hidden" flags="3"/>
+<PolyStyle id="cannonn.ppm" color="000080" texture="cannonn.ppm" defedge="hidden" flags="3"/>
 <Wormhole x="243040" y="272160" type="out">
 </Wormhole>
 <Wormhole x="175840" y="267680" type="out">
@@ -776,16 +623,16 @@
 <Offset x="2240" y="2240"/>
 <Offset x="6720" y="-11200" style="xpbluehidden"/>
 <Offset x="3520" y="64"/>
-<Offset x="3072" y="2176"/>
+<Offset x="3072" y="2176" style="xpbluehidden"/>
 <Offset x="2688" y="0"/>
 <Offset x="4160" y="-2240" style="xpbluehidden"/>
 <Offset x="2240" y="0" style="xpbluehidden"/>
-<Offset x="6720" y="6720"/>
-<Offset x="0" y="4480"/>
+<Offset x="6720" y="6720" style="xpbluehidden"/>
+<Offset x="0" y="4480" style="xpbluehidden"/>
 <Offset x="-2240" y="2240"/>
 <Offset x="0" y="2240" style="xpbluehidden"/>
 <Offset x="-6720" y="2240"/>
-<Offset x="-4480" y="0"/>
+<Offset x="-4480" y="0" style="xpbluehidden"/>
 <Offset x="-2240" y="4480"/>
 <Offset x="-4480" y="0"/>
 <Offset x="-4480" y="2240"/>
@@ -1671,62 +1518,6 @@
 <Offset x="0" y="2240"/>
 <Offset x="-17920" y="0"/>
 </Polygon>
-<Cannon x="7467" y="283360" dir="0">
-<Polygon x="7467" y="283360" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="-747" y="1120"/>
-<Offset x="0" y="-2240"/>
-<Offset x="747" y="1120"/>
-</Polygon>
-</Cannon>
-<Cannon x="418133" y="283360" dir="64">
-<Polygon x="418133" y="283360" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="747" y="-1120"/>
-<Offset x="0" y="2240"/>
-<Offset x="-747" y="-1120"/>
-</Polygon>
-</Cannon>
-<Cannon x="7467" y="220640" dir="0">
-<Polygon x="7467" y="220640" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="-747" y="1120"/>
-<Offset x="0" y="-2240"/>
-<Offset x="747" y="1120"/>
-</Polygon>
-</Cannon>
-<Cannon x="418133" y="220640" dir="64">
-<Polygon x="418133" y="220640" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="747" y="-1120"/>
-<Offset x="0" y="2240"/>
-<Offset x="-747" y="-1120"/>
-</Polygon>
-</Cannon>
-<Cannon x="310240" y="162027" dir="32">
-<Polygon x="310240" y="162027" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="-1120" y="-747"/>
-<Offset x="2240" y="0"/>
-<Offset x="-1120" y="747"/>
-</Polygon>
-</Cannon>
-<Cannon x="7467" y="155680" dir="0">
-<Polygon x="7467" y="155680" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="-747" y="1120"/>
-<Offset x="0" y="-2240"/>
-<Offset x="747" y="1120"/>
-</Polygon>
-</Cannon>
-<Cannon x="418133" y="155680" dir="64">
-<Polygon x="418133" y="155680" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="747" y="-1120"/>
-<Offset x="0" y="2240"/>
-<Offset x="-747" y="-1120"/>
-</Polygon>
-</Cannon>
-<Cannon x="122080" y="144107" dir="32">
-<Polygon x="122080" y="144107" style="emptywhite"><Style state="destroyed" id="invisible"/>
-<Offset x="-1120" y="-747"/>
-<Offset x="2240" y="0"/>
-<Offset x="-1120" y="747"/>
-</Polygon>
-</Cannon>
 <Wormhole x="169120" y="440160" type="normal">
 <Polygon x="168000" y="439040" style="xpred">
 <Offset x="2240" y="0"/>
@@ -1839,6 +1630,222 @@
 <Offset x="0" y="-2240"/>
 </Polygon>
 </Wormhole>
+<Cannon x="7200" y="283552" dir="0">
+<Polygon x="6848" y="284544" style="cannone.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="-64" y="-192"/>
+<Offset x="0" y="-1472"/>
+<Offset x="64" y="-192"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="0"/>
+<Offset x="64" y="64"/>
+<Offset x="128" y="320"/>
+<Offset x="128" y="64"/>
+<Offset x="0" y="256"/>
+<Offset x="192" y="0"/>
+<Offset x="128" y="64"/>
+<Offset x="64" y="64"/>
+<Offset x="0" y="320"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+<Offset x="-192" y="256"/>
+<Offset x="-128" y="0"/>
+<Offset x="-128" y="128"/>
+<Offset x="0" y="320"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+</Polygon>
+</Cannon>
+<Cannon x="310368" y="161760" dir="32">
+<Polygon x="310208" y="162240" style="cannonn.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="-64" y="-128"/>
+<Offset x="0" y="-192"/>
+<Offset x="-256" y="0"/>
+<Offset x="-64" y="-128"/>
+<Offset x="-320" y="-128"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-128"/>
+<Offset x="64" y="-64"/>
+<Offset x="192" y="-64"/>
+<Offset x="1472" y="0"/>
+<Offset x="192" y="64"/>
+<Offset x="64" y="64"/>
+<Offset x="0" y="128"/>
+<Offset x="-64" y="64"/>
+<Offset x="-320" y="0"/>
+<Offset x="-128" y="128"/>
+<Offset x="0" y="128"/>
+<Offset x="-256" y="192"/>
+<Offset x="0" y="128"/>
+<Offset x="-64" y="64"/>
+<Offset x="-320" y="0"/>
+</Polygon>
+</Cannon>
+<Cannon x="418368" y="220608" dir="64">
+<Polygon x="418592" y="221600" style="cannonw.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-320"/>
+<Offset x="-128" y="-128"/>
+<Offset x="-128" y="0"/>
+<Offset x="-192" y="-256"/>
+<Offset x="-128" y="0"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-320"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="-64"/>
+<Offset x="192" y="0"/>
+<Offset x="0" y="-256"/>
+<Offset x="128" y="-64"/>
+<Offset x="128" y="-320"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="0"/>
+<Offset x="64" y="64"/>
+<Offset x="64" y="192"/>
+<Offset x="0" y="1472"/>
+<Offset x="-64" y="192"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+</Polygon>
+</Cannon>
+<Cannon x="7200" y="220576" dir="0">
+<Polygon x="6848" y="221568" style="cannone.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="-64" y="-192"/>
+<Offset x="0" y="-1472"/>
+<Offset x="64" y="-192"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="0"/>
+<Offset x="64" y="64"/>
+<Offset x="128" y="320"/>
+<Offset x="128" y="64"/>
+<Offset x="0" y="256"/>
+<Offset x="192" y="0"/>
+<Offset x="128" y="64"/>
+<Offset x="64" y="64"/>
+<Offset x="0" y="320"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+<Offset x="-192" y="256"/>
+<Offset x="-128" y="0"/>
+<Offset x="-128" y="128"/>
+<Offset x="0" y="320"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+</Polygon>
+</Cannon>
+<Cannon x="7200" y="155552" dir="0">
+<Polygon x="6848" y="156544" style="cannone.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="-64" y="-192"/>
+<Offset x="0" y="-1472"/>
+<Offset x="64" y="-192"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="0"/>
+<Offset x="64" y="64"/>
+<Offset x="128" y="320"/>
+<Offset x="128" y="64"/>
+<Offset x="0" y="256"/>
+<Offset x="192" y="0"/>
+<Offset x="128" y="64"/>
+<Offset x="64" y="64"/>
+<Offset x="0" y="320"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+<Offset x="-192" y="256"/>
+<Offset x="-128" y="0"/>
+<Offset x="-128" y="128"/>
+<Offset x="0" y="320"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+</Polygon>
+</Cannon>
+<Cannon x="122208" y="143904" dir="32">
+<Polygon x="122048" y="144384" style="cannonn.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="-64" y="-128"/>
+<Offset x="0" y="-192"/>
+<Offset x="-256" y="0"/>
+<Offset x="-64" y="-128"/>
+<Offset x="-320" y="-128"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-128"/>
+<Offset x="64" y="-64"/>
+<Offset x="192" y="-64"/>
+<Offset x="1472" y="0"/>
+<Offset x="192" y="64"/>
+<Offset x="64" y="64"/>
+<Offset x="0" y="128"/>
+<Offset x="-64" y="64"/>
+<Offset x="-320" y="0"/>
+<Offset x="-128" y="128"/>
+<Offset x="0" y="128"/>
+<Offset x="-256" y="192"/>
+<Offset x="0" y="128"/>
+<Offset x="-64" y="64"/>
+<Offset x="-320" y="0"/>
+</Polygon>
+</Cannon>
+<Cannon x="418368" y="283328" dir="64">
+<Polygon x="418592" y="284320" style="cannonw.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-320"/>
+<Offset x="-128" y="-128"/>
+<Offset x="-128" y="0"/>
+<Offset x="-192" y="-256"/>
+<Offset x="-128" y="0"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-320"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="-64"/>
+<Offset x="192" y="0"/>
+<Offset x="0" y="-256"/>
+<Offset x="128" y="-64"/>
+<Offset x="128" y="-320"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="0"/>
+<Offset x="64" y="64"/>
+<Offset x="64" y="192"/>
+<Offset x="0" y="1472"/>
+<Offset x="-64" y="192"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+</Polygon>
+</Cannon>
+<Cannon x="418368" y="155616" dir="64">
+<Polygon x="418592" y="156608" style="cannonw.ppm">
+<Style state="destroyed" id="invisible"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-320"/>
+<Offset x="-128" y="-128"/>
+<Offset x="-128" y="0"/>
+<Offset x="-192" y="-256"/>
+<Offset x="-128" y="0"/>
+<Offset x="-64" y="-64"/>
+<Offset x="0" y="-320"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="-64"/>
+<Offset x="192" y="0"/>
+<Offset x="0" y="-256"/>
+<Offset x="128" y="-64"/>
+<Offset x="128" y="-320"/>
+<Offset x="64" y="-64"/>
+<Offset x="128" y="0"/>
+<Offset x="64" y="64"/>
+<Offset x="64" y="192"/>
+<Offset x="0" y="1472"/>
+<Offset x="-64" y="192"/>
+<Offset x="-64" y="64"/>
+<Offset x="-128" y="0"/>
+</Polygon>
+</Cannon>
 <Base x="54880" y="312480" team="0" dir="32"/>
 <Base x="372960" y="305760" team="0" dir="32"/>
 <Base x="54880" y="281120" team="0" dir="32"/>
@@ -1855,7 +1862,7 @@
 <Base x="372960" y="148960" team="0" dir="32"/>
 <Base x="54880" y="128800" team="0" dir="32"/>
 <Base x="372960" y="108640" team="0" dir="32"/>
-<Ball x="169568" y="379649" style="t4ball"/>
+<Ball x="169568" y="379649" style="t4ball" team="65535"/>
 <Fuel x="384160" y="413280"/>
 <Fuel x="384160" y="411040"/>
 <Fuel x="386400" y="411040"/>
