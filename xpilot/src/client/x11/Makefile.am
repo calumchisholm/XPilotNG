@@ -13,7 +13,7 @@ xpilot_ng_x11_SOURCES = \
 	talk.c \
 	welcome.c widget.c widget.h \
 	xdefault.c xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
-	xinit.c xinit.h xpaint.c xpaint.h xpclient_x11.h xpilot.c
+	../xhacks.h xinit.c xinit.h xpaint.c xpaint.h xpclient_x11.h xpilot.c
 
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_ng_x11_LDADD = $(top_builddir)/src/client/libxpclient.a $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11 @SOUND_LIBS@

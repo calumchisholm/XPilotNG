@@ -27,6 +27,7 @@
 #include "console.h"
 #include "sdlpaint.h"
 #include "glwidgets.h"
+#include "../xhacks.h"
 
 char sdlevent_version[] = VERSION;
 

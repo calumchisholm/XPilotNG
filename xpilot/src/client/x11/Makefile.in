@@ -211,7 +211,7 @@ xpilot_ng_x11_SOURCES = \
 	talk.c \
 	welcome.c widget.c widget.h \
 	xdefault.c xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
-	xinit.c xinit.h xpaint.c xpaint.h xpclient_x11.h xpilot.c
+	../xhacks.h xinit.c xinit.h xpaint.c xpaint.h xpclient_x11.h xpilot.c
 
 
 #xpilot_CFLAGS = @X_CFLAGS@

@@ -63,7 +63,8 @@ am__xpilot_ng_sdl_SOURCES_DIST = asteroid_data.h DT_drawtext.c \
 	scrap.c scrap.h radar.c radar.h sdlevent.c sdlgui.c sdlinit.c \
 	sdlkeys.c sdlkeys.h sdlpaint.c sdlpaint.h sdlwindow.c \
 	sdlwindow.h text.c text.h todo.c sdlmeta.h sdlmeta.c sdlinit.h \
-	xpclient_sdl.h gameloop.c gameloop_x.c win32hacks.c
+	../xhacks.h xpclient_sdl.h gameloop.c gameloop_x.c \
+	win32hacks.c
 @COND_SDL_GAMELOOP_TRUE@am__objects_1 = gameloop.$(OBJEXT)
 @COND_SDL_GAMELOOP_FALSE@am__objects_2 = gameloop_x.$(OBJEXT)
 @COND_WINDOWS_TRUE@am__objects_3 = win32hacks.$(OBJEXT)
@@ -223,7 +224,8 @@ xpilot_ng_sdl_SOURCES = asteroid_data.h DT_drawtext.c DT_drawtext.h \
 	scrap.c scrap.h radar.c radar.h sdlevent.c sdlgui.c sdlinit.c \
 	sdlkeys.c sdlkeys.h sdlpaint.c sdlpaint.h sdlwindow.c \
 	sdlwindow.h text.c text.h todo.c sdlmeta.h sdlmeta.c sdlinit.h \
-	xpclient_sdl.h $(am__append_1) $(am__append_2) $(am__append_3)
+	../xhacks.h xpclient_sdl.h $(am__append_1) $(am__append_2) \
+	$(am__append_3)
 xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a \
 	$(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ \
 	@SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ \
