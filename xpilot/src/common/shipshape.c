@@ -142,19 +142,19 @@ shipobj *Default_ship(void)
 	sh.l_light[0] = &pts[3][0];
 	pos.x = -9;
 	pos.y = 8;
-	Ship_set_l_light(&sh, pos);
+	Ship_set_l_light(&sh, 0, pos);
 
 	sh.num_r_light = 1;
 	sh.r_light[0] = &pts[4][0];
 	pos.x = -9;
 	pos.y = -8;
-	Ship_set_r_light(&sh, pos);
+	Ship_set_r_light(&sh, 0, pos);
 
 	sh.num_m_rack = 1;
 	sh.m_rack[0] = &pts[5][0];
 	pos.x = 15;
 	pos.y = 0;
-	Ship_set_m_rack(&sh, pos);
+	Ship_set_m_rack(&sh, 0, pos);
 
 	sh.num_l_gun = sh.num_r_gun = sh.num_l_rgun = sh.num_r_rgun = 0;
 
@@ -1010,34 +1010,34 @@ static int shape2wire(char *ship_shape_str, shipobj *ship)
 
 
     for (i = 0; i < ship->num_points; i++)
-	ship->pts[i][0] = ipos2shapepos(pt[i]);
+	Ship_set_point(ship, i, pt[i]);
 
     if (engineSet)
-	ship->engine[0] = ipos2shapepos(engine);
+	Ship_set_engine(ship, engine);
 
     if (mainGunSet)
-	ship->m_gun[0] = ipos2shapepos(m_gun);
+	Ship_set_m_gun(ship, m_gun);
 
     for (i = 0; i < ship->num_l_gun; i++)
-	ship->l_gun[i][0] = ipos2shapepos(l_gun[i]);
+	Ship_set_l_gun(ship, i, l_gun[i]);
 
     for (i = 0; i < ship->num_r_gun; i++)
-	ship->r_gun[i][0] = ipos2shapepos(r_gun[i]);
+	Ship_set_r_gun(ship, i, r_gun[i]);
 
     for (i = 0; i < ship->num_l_rgun; i++)
-	ship->l_rgun[i][0] = ipos2shapepos(l_rgun[i]);
+	Ship_set_l_rgun(ship, i, l_rgun[i]);
 
     for (i = 0; i < ship->num_r_rgun; i++)
-	ship->r_rgun[i][0] = ipos2shapepos(r_rgun[i]);
+	Ship_set_r_rgun(ship, i, r_rgun[i]);
 
     for (i = 0; i < ship->num_l_light; i++)
-	ship->l_light[i][0] = ipos2shapepos(l_light[i]);
+	Ship_set_l_light(ship, i, l_light[i]);
 
     for (i = 0; i < ship->num_r_light; i++)
-	ship->r_light[i][0] = ipos2shapepos(r_light[i]);
+	Ship_set_r_light(ship, i, r_light[i]);
 
     for (i = 0; i < ship->num_m_rack; i++)
-	ship->m_rack[i][0] = ipos2shapepos(m_rack[i]);
+	Ship_set_m_rack(ship, i, m_rack[i]);
 
     Rotate_ship(ship);
 
@@ -1458,19 +1458,39 @@ void Ship_set_m_gun(shipobj *ship, ipos pos)
     ship->m_gun[0] = ipos2shapepos(pos);
 }
 
-void Ship_set_l_light(shipobj *ship, ipos pos)
+void Ship_set_l_gun(shipobj *ship, int i, ipos pos)
 {
-    ship->l_light[0][0] = ipos2shapepos(pos);
+    ship->l_gun[i][0] = ipos2shapepos(pos);
 }
 
-void Ship_set_r_light(shipobj *ship, ipos pos)
+void Ship_set_r_gun(shipobj *ship, int i, ipos pos)
 {
-    ship->r_light[0][0] = ipos2shapepos(pos);
+    ship->r_gun[i][0] = ipos2shapepos(pos);
 }
 
-void Ship_set_m_rack(shipobj *ship, ipos pos)
+void Ship_set_l_rgun(shipobj *ship, int i, ipos pos)
 {
-    ship->m_rack[0][0] = ipos2shapepos(pos);
+    ship->l_rgun[i][0] = ipos2shapepos(pos);
+}
+
+void Ship_set_r_rgun(shipobj *ship, int i, ipos pos)
+{
+    ship->r_rgun[i][0] = ipos2shapepos(pos);
+}
+
+void Ship_set_l_light(shipobj *ship, int i, ipos pos)
+{
+    ship->l_light[i][0] = ipos2shapepos(pos);
+}
+
+void Ship_set_r_light(shipobj *ship, int i, ipos pos)
+{
+    ship->r_light[i][0] = ipos2shapepos(pos);
+}
+
+void Ship_set_m_rack(shipobj *ship, int i, ipos pos)
+{
+    ship->m_rack[i][0] = ipos2shapepos(pos);
 }
 
 shapepos ipos2shapepos(ipos pos)
