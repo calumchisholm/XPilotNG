@@ -1182,7 +1182,7 @@ static bool Check_robot_hunt(player_t *pl)
 
 static bool Detect_hunt(player_t *pl, player_t *ship)
 {
-    int		dx, dy;
+    double distance;
 
     if (!Player_is_playing(ship))
 	return false;		/* can't go after non-playing ships */
@@ -1196,9 +1196,9 @@ static bool Detect_hunt(player_t *pl, player_t *ship)
     /* can't see it, so it must be cloaked
 	maybe we can detect it's presence from other clues? */
 
-    dx = CLICK_TO_PIXEL(ship->pos.cx - pl->pos.cx), dx = WRAP_DX(dx);
-    dy = CLICK_TO_PIXEL(ship->pos.cy - pl->pos.cy), dy = WRAP_DY(dy);
-    if (sqr(dx) + sqr(dy) > sqr(Visibility_distance))
+    distance = Wrap_length(ship->pos.cx - pl->pos.cx,
+			   ship->pos.cy - pl->pos.cy) / CLICK;
+    if (distance > Visibility_distance)
 	return false;		/* can't detect ships beyond visual range */
 
     if (BIT(ship->status, THRUSTING) && options.cloakedExhaust)
@@ -1500,7 +1500,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	    && (distance = LENGTH(dx, dy)) < fuel_dist) {
 	    blkpos_t bpos = Clpos_to_blkpos(fs->pos);
 
-	    if (world->block[bpos.bx][bpos.by] == FUEL) {
+	    if (World_get_block(world, bpos) == FUEL) {
 		fuel_i = j;
 		fuel_dist = distance;
 	    }
@@ -1884,7 +1884,6 @@ static void Robot_default_play(player_t *pl)
 
     if (pl->fuel.sum < pl->fuel.max * 0.80) {
 	for (j = 0; j < world->NumFuels; j++) {
-	    int dx, dy;
 	    fuel_t *fs = Fuels(world, j);
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)
@@ -1892,11 +1891,8 @@ static void Robot_default_play(player_t *pl)
 		&& fs->team != pl->team)
 		continue;
 
-	    dx = CLICK_TO_PIXEL(fs->pos.cx - pl->pos.cx);
-	    dy = CLICK_TO_PIXEL(fs->pos.cy - pl->pos.cy);
-	    /* dx = WRAP_DX(dx);
-	       dy = WRAP_DY(dy); */
-	    if (sqr(dx) + sqr(dy) <= sqr(90)
+	    if ((Wrap_length(pl->pos.cx - fs->pos.cx,
+			     pl->pos.cy - fs->pos.cy) <= 90.0 * CLICK)
 		&& fs->fuel > REFUEL_RATE * timeStep) {
 		pl->fs = j;
 		SET_BIT(pl->used, HAS_REFUEL);
@@ -1920,12 +1916,9 @@ static void Robot_default_play(player_t *pl)
 	    if (targ->team == pl->team
 		&& targ->damage < TARGET_DAMAGE
 		&& targ->dead_time >= 0) {
-		/* kps - this can overflow ?? */
-		int dx = CLICK_TO_PIXEL(targ->pos.cx - pl->pos.cx);
-		int dy = CLICK_TO_PIXEL(targ->pos.cy - pl->pos.cy);
-		/* dx = WRAP_DX(dx);
-		   dy = WRAP_DY(dy); */
-		if (sqr(dx) + sqr(dy) <= sqr(90)) {
+
+		if (Wrap_length(pl->pos.cx - targ->pos.cx,
+				pl->pos.cy - targ->pos.cy) <= 90.0 * CLICK) {
 		    pl->repair_target = j;
 		    SET_BIT(pl->used, HAS_REPAIR);
 		    break;
@@ -1978,7 +1971,6 @@ static void Robot_default_play(player_t *pl)
 
 	if (Player_is_active(ship)
 	    && Detect_hunt(pl, ship)) {
-	    int dx, dy;
 
 	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
 		&& my_data->robot_lock_id == ship->id) {
@@ -1987,11 +1979,8 @@ static void Robot_default_play(player_t *pl)
 		my_data->lock_last_pos.y = CLICK_TO_PIXEL(ship->pos.cy);
 	    }
 
-	    dx = CLICK_TO_PIXEL(ship->pos.cx - pl->pos.cx);
-	    dx = WRAP_DX(dx);
-	    dy = CLICK_TO_PIXEL(ship->pos.cy - pl->pos.cy);
-	    dy = WRAP_DY(dy);
-	    distance = LENGTH(dx, dy);
+	    distance = Wrap_length(ship->pos.cx - pl->pos.cx,
+				   ship->pos.cy - pl->pos.cy) / CLICK;
 
 	    if (distance < ship_dist) {
 		ship_i = GetInd(my_data->robot_lock_id);
@@ -2008,7 +1997,6 @@ static void Robot_default_play(player_t *pl)
     if (ship_i == -1 || enemy_i == -1) {
 
 	for (j = 0; j < NumPlayers; j++) {
-	    int dx, dy;
 
 	    ship = Players(j);
 	    if (j == GetInd(pl->id)
@@ -2019,9 +2007,8 @@ static void Robot_default_play(player_t *pl)
 	    if (!Detect_hunt(pl, ship))
 		continue;
 
-	    dx = CLICK_TO_PIXEL(ship->pos.cx - pl->pos.cx), dx = WRAP_DX(dx);
-	    dy = CLICK_TO_PIXEL(ship->pos.cy - pl->pos.cy), dy = WRAP_DY(dy);
-	    distance = LENGTH(dx, dy);
+	    distance = Wrap_length(ship->pos.cx - pl->pos.cx,
+				   ship->pos.cy - pl->pos.cy) / CLICK;
 
 	    if (distance < ship_dist) {
 		ship_i = j;
