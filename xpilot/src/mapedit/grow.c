@@ -36,6 +36,11 @@
 
 #include                 "main.h"
 
+typedef struct grow_t {
+    int x, y;
+    struct grow_t *next;
+} grow_t;
+
 int grow_minx, grow_miny, grow_maxx, grow_maxy,
     grow_w, grow_h, grow_centerx, grow_centery, grow_filled = 0;
 double grow_xa = 1.0, grow_ya = 1.0;

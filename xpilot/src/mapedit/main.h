@@ -47,7 +47,6 @@
 #include                 "expose.h"
 #include                 "file.h"
 #include                 "help.h"
-#include                 "grow.h"
 
 #define MAPWIDTH         0
 #define MAPHEIGHT        1
