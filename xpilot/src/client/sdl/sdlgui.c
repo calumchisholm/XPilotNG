@@ -1241,7 +1241,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     ship = Ship_by_id(id);
     if (!(other = Other_by_id(id))) return;
 
-    color = Gui_calculate_ship_color(id,other);
+    if (!(color = Gui_calculate_ship_color(id,other))) return;
     
     if (shield) {
     	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, (color & 0xffffff00) + ((color & 0x000000ff)/2));
