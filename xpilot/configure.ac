@@ -26,7 +26,6 @@ AC_SUBST([XP_COPYRIGHT])
 AC_SUBST([XP_RELEASEDATE],["Sep 13, 2004"])
 AC_SUBST([XP_DATADIR],"$prefix/share/xpilot-ng")
 
-
 dnl  Checks for options.
 dnl  We should have some general macro for these.
 AC_ARG_ENABLE(dbe,
@@ -50,13 +49,6 @@ AC_ARG_ENABLE(plockserver,
 	AC_DEFINE([PLOCKSERVER], 1, [lock the xpilot-ng server into memory])
 fi])
 
-AC_ARG_ENABLE(server_only,
-	AC_HELP_STRING([--enable-server-only],
-			[build only the server]),
-[if test x$enable_server_only = xyes; then
-	AC_DEFINE([SERVER_ONLY], 1, [build only the server])
-fi])
-
 AC_ARG_ENABLE(development,
 	AC_HELP_STRING([--enable-development],
 			[enable development code]),
@@ -71,17 +63,17 @@ AC_ARG_ENABLE(newsched,
 AC_ARG_ENABLE(replay,
 	AC_HELP_STRING([--disable-replay],
 			[disable building of replay program]),
-[], [enable_replay=yes])
+[], [enable_replay=yes; need_x=yes])
 
 AC_ARG_ENABLE(x11_client,
 	AC_HELP_STRING([--disable-x11-client],
 			[disable X11 client]),
-[], [enable_x11_client=yes])
+[], [enable_x11_client=yes; need_x=yes])
 
 AC_ARG_ENABLE(sdl_client,
 	AC_HELP_STRING([--disable-sdl-client],
 			[disable SDL/OpenGL client]),
-[], [enable_sdl_client=yes])
+[], [enable_sdl_client=yes; need_x=yes])
 if test x$enable_sdl_client = xyes; then
 	AC_DEFINE([SDL_CLIENT], 1, [enable sdl client])
 fi
@@ -92,10 +84,17 @@ AC_ARG_ENABLE(sdl_gameloop,
 			[enable sdl gameloop in sdl client
 			 (otherwise use gameloop optimised for X11)]))
 
+AC_ARG_ENABLE(server_only,
+	AC_HELP_STRING([--enable-server-only],
+			[build only the server]),
+[if test x$enable_server_only = xyes; then
+	AC_DEFINE([SERVER_ONLY], 1, [build only the server])
+	need_x=no
+fi])
+
 AC_ARG_ENABLE(sound,
 	AC_HELP_STRING([--enable-sound],
 			[enable OpenAL sound]), [])
-
 
 dnl  Checks for programs.
 AC_PROG_CC
@@ -164,13 +163,16 @@ if test x$windows_target = xyes; then
 	enable_sdl_gameloop=yes
 	enable_replay=no
 	enable_x11_client=no
-else
-	dnl marvin - Don't check for X11 headers and libraries if compiling for windows
-	AC_PATH_X
-	AC_PATH_XTRA
+	need_x=no
+fi
+
+AC_PATH_X
+if test x$need_x = xyes; then
 	if test x$no_x == xyes; then
 		AC_MSG_ERROR([*** Couldn't find X headers or libraries!])
 	fi
+	
+	AC_PATH_XTRA
 
 	dnl kps - Hack to link with libXext if DBE or MBX is configured
 	if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then

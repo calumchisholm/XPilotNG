@@ -863,7 +863,6 @@ Optional Features:
   --enable-dbe            support for X Doublebuffer Extension in client
   --enable-mbx            support for X Multibuffer Extension in client
   --enable-plockserver    lock the xpilot-ng server into memory
-  --enable-server-only    build only the server
   --enable-development    enable development code
   --enable-newsched       enable new server scheduling most useful on Linux
                           2.6
@@ -872,6 +871,7 @@ Optional Features:
   --disable-sdl-client    disable SDL/OpenGL client
   --enable-sdl-gameloop   enable sdl gameloop in sdl client (otherwise use
                           gameloop optimised for X11)
+  --enable-server-only    build only the server
   --enable-sound          enable OpenAL sound
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
@@ -1893,7 +1893,6 @@ XP_RELEASEDATE="Sep 13, 2004"
 XP_DATADIR="$prefix/share/xpilot-ng"
 
 
-
 # Check whether --enable-dbe or --disable-dbe was given.
 if test "${enable_dbe+set}" = set; then
   enableval="$enable_dbe"
@@ -1930,18 +1929,6 @@ _ACEOF
 fi
 fi;
 
-# Check whether --enable-server_only or --disable-server_only was given.
-if test "${enable_server_only+set}" = set; then
-  enableval="$enable_server_only"
-  if test x$enable_server_only = xyes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define SERVER_ONLY 1
-_ACEOF
-
-fi
-fi;
-
 # Check whether --enable-development or --disable-development was given.
 if test "${enable_development+set}" = set; then
   enableval="$enable_development"
@@ -1965,7 +1952,7 @@ if test "${enable_replay+set}" = set; then
   enableval="$enable_replay"
 
 else
-  enable_replay=yes
+  enable_replay=yes; need_x=yes
 fi;
 
 # Check whether --enable-x11_client or --disable-x11_client was given.
@@ -1973,7 +1960,7 @@ if test "${enable_x11_client+set}" = set; then
   enableval="$enable_x11_client"
 
 else
-  enable_x11_client=yes
+  enable_x11_client=yes; need_x=yes
 fi;
 
 # Check whether --enable-sdl_client or --disable-sdl_client was given.
@@ -1981,7 +1968,7 @@ if test "${enable_sdl_client+set}" = set; then
   enableval="$enable_sdl_client"
 
 else
-  enable_sdl_client=yes
+  enable_sdl_client=yes; need_x=yes
 fi;
 if test x$enable_sdl_client = xyes; then
 
@@ -1997,12 +1984,24 @@ if test "${enable_sdl_gameloop+set}" = set; then
 
 fi;
 
+# Check whether --enable-server_only or --disable-server_only was given.
+if test "${enable_server_only+set}" = set; then
+  enableval="$enable_server_only"
+  if test x$enable_server_only = xyes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define SERVER_ONLY 1
+_ACEOF
+
+	need_x=no
+fi
+fi;
+
 # Check whether --enable-sound or --disable-sound was given.
 if test "${enable_sound+set}" = set; then
   enableval="$enable_sound"
 
 fi;
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3577,8 +3576,10 @@ _ACEOF
 	enable_sdl_gameloop=yes
 	enable_replay=no
 	enable_x11_client=no
-else
-		ac_ext=c
+	need_x=no
+fi
+
+ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -4046,6 +4047,13 @@ else
   echo "$as_me:$LINENO: result: libraries $x_libraries, headers $x_includes" >&5
 echo "${ECHO_T}libraries $x_libraries, headers $x_includes" >&6
 fi
+
+if test x$need_x = xyes; then
+	if test x$no_x == xyes; then
+		{ { echo "$as_me:$LINENO: error: *** Couldn't find X headers or libraries!" >&5
+echo "$as_me: error: *** Couldn't find X headers or libraries!" >&2;}
+   { (exit 1); exit 1; }; }
+	fi
 
 	if test "$no_x" = yes; then
   # Not all programs may use this symbol, but it does not hurt to define it.
@@ -5201,11 +5209,6 @@ fi
 
 fi
 
-	if test x$no_x == xyes; then
-		{ { echo "$as_me:$LINENO: error: *** Couldn't find X headers or libraries!" >&5
-echo "$as_me: error: *** Couldn't find X headers or libraries!" >&2;}
-   { (exit 1); exit 1; }; }
-	fi
 
 		if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then
 		X_EXTENSIONS_LIB="-lXext"
