@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XP-Replay, playback an XPilot session.  Copyright (C) 1994-98 by
  *

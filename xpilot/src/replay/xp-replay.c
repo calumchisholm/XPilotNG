@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XP-Replay, playback an XPilot session.  Copyright (C) 1994-98 by
  *
@@ -34,34 +34,41 @@
 ** implied warranty.
  */
 
-#ifdef VMS
-#include <socket.h>
+#if !defined(_WINDOWS)
+# include <unistd.h>
 #endif
-#include <unistd.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
 #include <errno.h>
 #include <math.h>
-#include <sys/time.h>
-#include <sys/types.h>
+#include <time.h>
 #include <sys/stat.h>
-#ifdef _AIX
-#include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
+#include <sys/types.h>
+
+#ifndef _WINDOWS
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# ifdef _AIX
+#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
+# endif
+# include <stdarg.h>
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# if !defined(select) && defined(__linux__)
+#  define select(N, R, W, E, T)   select((N),             \
+        (fd_set*)(R), (fd_set*)(W), (fd_set*)(E), (T))
+# endif
 #endif
-#include <stdarg.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+
 #ifdef _SEQUENT_
-#include <sys/procstats.h>
-#define gettimeofday(T,X)	get_process_stats(T, PS_SELF, \
+# include <sys/procstats.h>
+# define gettimeofday(T,X)	get_process_stats(T, PS_SELF, \
 					(struct process_stats *)NULL, \
 					(struct process_stats *)NULL)
-#endif
-#if !defined(select) && defined(__linux__)
-#define select(N, R, W, E, T)   select((N),             \
-        (fd_set*)(R), (fd_set*)(W), (fd_set*)(E), (T))
 #endif
 
 #include "recordfmt.h"
@@ -3423,9 +3430,7 @@ int main(int argc, char **argv)
 	    verbose = 1;
 	}
 	else if (!strcmp(argv[argi], "-compress")) {
-#ifndef VMS
 	    compress = 1;
-#endif
 	}
 	else if (!strcmp(argv[argi], "-scale")) {
 	    if (++argi == argc || sscanf(argv[argi], "%lf", &scale) != 1) {

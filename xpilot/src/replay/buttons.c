@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XP-Replay, playback an XPilot session.  Copyright (C) 1994-98 by
  *
@@ -22,13 +22,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	_WINDOWS
-#include <unistd.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <X11/Xlib.h>
+
+#ifndef _WINDOWS
+# include <unistd.h>
+# include <X11/Xlib.h>
+#endif
 
 #include "buttons.h"
 #include "xp-replay.h"
