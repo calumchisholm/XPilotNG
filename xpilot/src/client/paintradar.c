@@ -628,106 +628,96 @@ void Paint_world_radar_old(void)
 
 void Paint_world_radar(void)
 {
-  int i,j,k;
-  static XPoint poly[10000];
+    int i,j,k;
+    static XPoint poly[10000];
 
 #define DBG if(0) printf
 
-  if (oldServer) {
-    Paint_world_radar_old();
-    return;
-  }
+    if (oldServer) {
+	Paint_world_radar_old();
+	return;
+    }
 
-  /* what the heck is this? */
-  radar_exposures = 2;
+    /* what the heck is this? */
+    radar_exposures = 2;
 
-  if (s_radar == p_radar)
-    XSetPlaneMask(dpy, radarGC,
-                  AllPlanes&(~(dpl_1[0]|dpl_1[1])));
-  if (s_radar != radar) {
-    /* Clear radar */
-    XSetForeground(dpy, radarGC, colors[BLACK].pixel);
-    XFillRectangle(dpy, s_radar, radarGC, 0, 0, 256, RadarHeight);
-  } else {
-    XClearWindow(dpy, radar);
-  }
+    if (s_radar == p_radar)
+	XSetPlaneMask(dpy, radarGC,
+		      AllPlanes&(~(dpl_1[0]|dpl_1[1])));
+    if (s_radar != radar) {
+	/* Clear radar */
+	XSetForeground(dpy, radarGC, colors[BLACK].pixel);
+	XFillRectangle(dpy, s_radar, radarGC, 0, 0, 256, RadarHeight);
+    } else {
+	XClearWindow(dpy, radar);
+    }
 
 
 #ifdef _WINDOWS
-			XSetForeground(dpy, s_radar, wallRadarColor);
+    XSetForeground(dpy, s_radar, wallRadarColor);
 #else
-			XSetForeground(dpy, radarGC, colors[wallRadarColor].pixel);
+    XSetForeground(dpy, radarGC, colors[wallRadarColor].pixel);
 #endif
 
-  /*
-   * The radar is drawn 9 times into different locations
-   * so that polygons going over the world edge seem to
-   * appear on the other side. The locations are like
-   * the following:
-   * 012
-   * 345
-   * 678
-   * The copy number 4 is the world being displayed. Now if
-   * a polygon extends from 4 to 5, it appears on the left
-   * side of 4 because the copy drawn in 3 extends to 4.
-   */
-  for (k = 0; k < 9; k++) {
+    /*
+     * The radar is drawn 9 times into different locations
+     * so that polygons going over the world edge seem to
+     * appear on the other side. The locations are like
+     * the following:
+     * 012
+     * 345
+     * 678
+     * The copy number 4 is the world being displayed. Now if
+     * a polygon extends from 4 to 5, it appears on the left
+     * side of 4 because the copy drawn in 3 extends to 4.
+     */
+    for (k = 0; k < 9; k++) {
 
-    /* offsets of the current copy */
-    int x_offset = ((k % 3) - 1) * Setup->width;
-    int y_offset = ((k / 3) - 1) * Setup->height;
+	/* offsets of the current copy */
+	int x_offset = ((k % 3) - 1) * Setup->width;
+	int y_offset = ((k / 3) - 1) * Setup->height;
 
-    /* loop through all the polygons */
-    for (i = 0; i < num_polygons; i++) {
+	/* loop through all the polygons */
+	for (i = 0; i < num_polygons; i++) {
 
-      /* location of current polygon */
-      int x = polygons[i].points[0].x + x_offset;
-      int y = Setup->height - polygons[i].points[0].y + y_offset;
+	    /* location of current polygon */
+	    int x = polygons[i].points[0].x + x_offset;
+	    int y = Setup->height - polygons[i].points[0].y + y_offset;
 
-      if (BIT(polygon_styles[polygons[i].style].flags,
-              STYLE_INVISIBLE_RADAR)) continue;
+	    if (BIT(polygon_styles[polygons[i].style].flags,
+		    STYLE_INVISIBLE_RADAR)) continue;
 
-      poly[0].x = (x * 256) / Setup->width;
-      poly[0].y = (y * RadarHeight) / Setup->height;
+	    poly[0].x = (x * 256) / Setup->width;
+	    poly[0].y = (y * RadarHeight) / Setup->height;
 
-      DBG("poly[k=%d, i=%d, x=%d, y=%d] = ", k, i, x, y);
-      DBG("(%d,%d) ", poly[0].x, poly[0].y);
+	    DBG("poly[k=%d, i=%d, x=%d, y=%d] = ", k, i, x, y);
+	    DBG("(%d,%d) ", poly[0].x, poly[0].y);
 
-      /* loop through the points in the current polygon */
-      for (j = 1; j < polygons[i].num_points; j++) {
+	    /* loop through the points in the current polygon */
+	    for (j = 1; j < polygons[i].num_points; j++) {
 
-        x += polygons[i].points[j].x;
-        y -= polygons[i].points[j].y;
+		x += polygons[i].points[j].x;
+		y -= polygons[i].points[j].y;
 
-        poly[j].x = (x * 256) / Setup->width;
-        poly[j].y = (y * RadarHeight) / Setup->height;
-        DBG("(%d,%d) ", poly[j].x, poly[j].y);
-      }
+		poly[j].x = (x * 256) / Setup->width;
+		poly[j].y = (y * RadarHeight) / Setup->height;
+		DBG("(%d,%d) ", poly[j].x, poly[j].y);
+	    }
 
-      DBG("\n");
-      XFillPolygon(dpy, s_radar, radarGC, poly, polygons[i].num_points,
-                   Nonconvex, CoordModeOrigin);
+	    DBG("\n");
+	    XSetForeground(dpy, radarGC, fullColor ?
+			   polygon_styles[polygons[i].style].color :
+			   colors[wallRadarColor].pixel);
+	    XFillPolygon(dpy, s_radar, radarGC, poly, polygons[i].num_points,
+			 Nonconvex, CoordModeOrigin);
+	}
     }
-  }
 
 #undef DBG
 
-  if (s_radar == p_radar)
-    XSetPlaneMask(dpy, radarGC,
-                  AllPlanes&(~(dpl_2[0]|dpl_2[1])));
-
-  if (oldServer) {
-    for (i = 0;; i++) {
-      int dead_time, damage, xi, yi;
-      if (Target_by_index(i, &xi, &yi, &dead_time, &damage) == -1) {
-	break;
-      }
-      if (dead_time) {
-	continue;
-      }
-      Paint_radar_block(xi, yi, targetRadarColor);
-    }
-  }
+    if (s_radar == p_radar)
+	XSetPlaneMask(dpy, radarGC,
+		      AllPlanes&(~(dpl_2[0]|dpl_2[1])));
 }
 
 
