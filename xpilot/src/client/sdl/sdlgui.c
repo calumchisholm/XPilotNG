@@ -552,10 +552,10 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glPushMatrix();
     glLoadIdentity();
 
-    glTranslatef(polygon.points[0].x * scale +
-		 rint((xoff * Setup->width - world.x) * scale),
-		 polygon.points[0].y * scale +
-		 rint((yoff * Setup->height - world.y) * scale), 0);
+    /* This makes the walls wobble in synchronization (pretty ok) */
+    glTranslatef((int)((xoff * Setup->width)*scale) - (int)(world.x*scale) + polygon.points[0].x*scale,
+		 (int)((yoff * Setup->height)*scale) - (int)(world.y*scale) + polygon.points[0].y*scale,
+	0);
     glScalef(scale, scale, 0);
 
     if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
@@ -570,10 +570,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	    glCallList(polyListBase + i);
 	}
     }
-/* might be useful when trying to fix wall-wobbling */
-#if 0
-    mapprint(&mapfont,whiteRGBA,LEFT,DOWN,0,0,"%i %i %i %i %i",i,polygon.points[0].x,world.x,polygon.points[0].y,world.y);
-#endif
+
     set_alphacolor((e_style.rgb << 8) | 0xff);
     glLineWidth(e_style.width * scale);
     glEnable(GL_BLEND);
