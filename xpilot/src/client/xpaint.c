@@ -81,9 +81,6 @@ Window	about_next_b;		/* About window's next button */
 Window	about_prev_b;		/* About window's previous button */
 Window	keys_close_b;		/* Help window's close button */
 Window	talkWindow;
-XColor	colors[MAX_COLORS];
-Colormap	colormap;	/* Private colormap */
-int	maxColors;		/* Max. number of colors to use */
 bool	gotFocus;
 bool	players_exposed;
 int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */

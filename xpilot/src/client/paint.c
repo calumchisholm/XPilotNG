@@ -31,7 +31,6 @@ char paint_version[] = VERSION;
 ipos	world;
 ipos	realWorld;
 
-int	maxColors;		/* Max. number of colors to use */
 bool	gotFocus;
 bool	players_exposed;
 short	ext_view_width;		/* Width of extended visible area */

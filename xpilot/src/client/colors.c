@@ -36,24 +36,35 @@ char colors_version[] = VERSION;
 /*
  * The number of X11 visuals.
  */
-#define MAX_VISUAL_CLASS	6
+#define MAX_VISUAL_CLASS	4
 
 
 /*
  * Default colors.
  */
-char			color_names[MAX_COLORS][MAX_COLOR_LEN];
+#define XP_COLOR0		"#000000"
+#define XP_COLOR1		"#FFFFFF"
+#define XP_COLOR2		"#4E7CFF"
+#define XP_COLOR3		"#FF3A27"
+#define XP_COLOR4		"#33BB44"
+#define XP_COLOR5		"#992200"
+#define XP_COLOR6		"#BB7700"
+#define XP_COLOR7		"#EE9900"
+#define XP_COLOR8		"#002299"
+#define XP_COLOR9		"#CC4400"
+#define XP_COLOR10		"#DD8800"
+#define XP_COLOR11		"#FFBB11"
+#define XP_COLOR12		"#9F9F9F"
+#define XP_COLOR13		"#5F5F5F"
+#define XP_COLOR14		"#DFDFDF"
+#define XP_COLOR15		"#202020"
+
+char		color_names[MAX_COLORS][MAX_COLOR_LEN];
 static const char	*color_defaults[MAX_COLORS] = {
-    "#000000", "#FFFFFF", "#4E7CFF", "#FF3A27",
-    "#33BB44", "#992200", "#BB7700", "#EE9900",
-    "#002299", "#CC4400", "#DD8800", "#FFBB11",
-    "#9f9f9f", "#5f5f5f", "#dfdfdf", "#202020"
-};
-static const char	*gray_defaults[MAX_COLORS] = {
-    "#000000", "#FFFFFF", "#AAAAAA", "#CCCCCC",
-    "#BBBBBB", "#888888", "#AAAAAA", "#CCCCCC",
-    "#777777", "#999999", "#BBBBBB", "#DDDDDD",
-    "#9f9f9f", "#5f5f5f", "#dfdfdf", "#202020"
+    XP_COLOR0,  XP_COLOR1,  XP_COLOR2,  XP_COLOR3,
+    XP_COLOR4,  XP_COLOR5,  XP_COLOR6,  XP_COLOR7,
+    XP_COLOR8,  XP_COLOR9,  XP_COLOR10, XP_COLOR11,
+    XP_COLOR12, XP_COLOR13, XP_COLOR14, XP_COLOR15
 };
 
 char		visualName[MAX_VISUAL_NAME];
@@ -67,6 +78,9 @@ bool		fullColor;	/* Whether to try using colors as close to
 bool		texturedObjects; /* Whether to draw bitmaps for some objects.
 				  * Previously this variable determined
 				  * fullColor too. */
+int		maxColors;	/* Max. number of colors to use */
+XColor		colors[MAX_COLORS];
+Colormap	colormap;	/* Private colormap */
 
 #ifndef _WINDOWS
 
@@ -109,8 +123,6 @@ static struct Visual_class_name {
     int		visual_class;
     const char	*visual_name;
 } visual_class_names[MAX_VISUAL_CLASS] = {
-    { StaticGray,	"StaticGray"  },
-    { GrayScale,	"GrayScale"   },
     { StaticColor,	"StaticColor" },
     { PseudoColor,	"PseudoColor" },
     { TrueColor,	"TrueColor"   },
@@ -276,10 +288,9 @@ static void Choose_visual(void)
 	num = 0;
 	if ((vinfo_ptr = XGetVisualInfo(dpy, mask, &my_vinfo, &num)) == NULL
 	    || num <= 0) {
-	    if (using_default == false) {
+	    if (using_default == false)
 		warn("No visuals available with class name \"%s\", "
 		     "using default", visualName);
-	    }
 	    visual_class = -1;
 	}
 	else {
@@ -318,27 +329,21 @@ static void Choose_visual(void)
 static int Parse_colors(Colormap cmap)
 {
     int			i;
-    const char		**def;
+    const char		**def = &color_defaults[0];
 
     /*
      * Get the color definitions.
      */
-
-    if (visual->class == StaticGray || visual->class == GrayScale)
-	def = &gray_defaults[0];
-    else
-	def = &color_defaults[0];
-
     for (i = 0; i < maxColors; i++) {
 	if (color_names[i][0] != '\0') {
 	    if (XParseColor(dpy, cmap, color_names[i], &colors[i]))
 		continue;
-	    printf("Can't parse color %d \"%s\"\n", i, color_names[i]);
+	    warn("Can't parse color %d \"%s\".", i, color_names[i]);
 	}
 	if (def[i] != NULL && def[i][0] != '\0') {
 	    if (XParseColor(dpy, cmap, def[i], &colors[i]))
 		continue;
-	    printf("Can't parse default color %d \"%s\"\n", i, def[i]);
+	    warn("Can't parse default color %d \"%s\".", i, def[i]);
 	}
 	if (i < NUM_COLORS)
 	    return -1;
@@ -415,8 +420,7 @@ int Colors_init(void)
     /*
      * Get misc. display info.
      */
-    if (visual->class == StaticGray ||
-	visual->class == StaticColor ||
+    if (visual->class == StaticColor ||
 	visual->class == TrueColor)
 	colorSwitch = false;
 
@@ -438,7 +442,7 @@ int Colors_init(void)
 	: 2;
 
     if (Parse_colors(DefaultColormap(dpy, DefaultScreen(dpy))) == -1) {
-	printf("Color parsing failed\n");
+	warn("Color parsing failed.");
 	return -1;
     }
 
@@ -520,8 +524,7 @@ int Colors_init(void)
 #endif
 
     default:
-	printf("Unknown dbuf state %d\n", dbuf_state->type);
-	exit(1);
+	fatal("Unknown dbuf state %d.", dbuf_state->type);
     }
 
     for (i = maxColors; i < MAX_COLORS; i++)
@@ -589,16 +592,9 @@ static int Colors_init_bitmap_colors(void)
 	r = Colors_init_true_color();
 	break;
 
-    case GrayScale:
-    case StaticGray:
-	/*
-	 * Haven't implemented implemented bitmaps for gray colors yet.
-	 */
-	/*FALLTHROUGH*/
-
     default:
-	printf("fullColor not implemented for visual \"%s\"\n",
-		Visual_class_name(visual->class));
+	warn("fullColor not implemented for visual \"%s\"",
+	     Visual_class_name(visual->class));
 	fullColor = false;
 	texturedObjects = false;
 	break;
@@ -783,7 +779,7 @@ static int Colors_init_color_cube(void)
 	return 0;
     }
 
-    printf("Could not alloc colors for RGB cube\n");
+    warn("Could not alloc colors for RGB cube.");
 
     return -1;
 }
@@ -981,3 +977,169 @@ void Colors_debug(void)
 
 
 #endif	/* _WINDOWS */
+
+
+#ifdef OPTIONHACK
+
+xp_option_t color_options[] = {
+
+    XP_INT_OPTION(
+	"maxColors",
+	4,
+	MAX_COLORS,
+	MAX_COLORS,
+	&maxColors,
+	NULL,
+	"The number of colors to use.  Valid values are 4, 8 and 16.\n"),
+
+    /* 16 user definable color values */
+    XP_STRING_OPTION(
+	"color0",
+	XP_COLOR0,
+	color_names[0],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the first color.\n"),
+
+    XP_STRING_OPTION(
+	"color1",
+	XP_COLOR1,
+	color_names[1],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the second color.\n"),
+
+    XP_STRING_OPTION(
+	"color2",
+	XP_COLOR2,
+	color_names[2],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the third color.\n"),
+
+    XP_STRING_OPTION(
+	"color3",
+	XP_COLOR3,
+	color_names[3],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the fourth color.\n"),
+
+    XP_STRING_OPTION(
+	"color4",
+	XP_COLOR4,
+	color_names[4],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the fifth color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n"),
+
+    XP_STRING_OPTION(
+	"color5",
+	XP_COLOR5,
+	color_names[5],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the sixth color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n"),
+
+    XP_STRING_OPTION(
+	"color6",
+	XP_COLOR6,
+	color_names[6],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the seventh color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n"),
+
+    XP_STRING_OPTION(
+	"color7",
+	XP_COLOR7,
+	color_names[7],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the eighth color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n"),
+
+    XP_STRING_OPTION(
+	"color8",
+	XP_COLOR8,
+	color_names[8],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the nineth color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+
+    XP_STRING_OPTION(
+	"color9",
+	XP_COLOR9,
+	color_names[9],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the tenth color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+
+    XP_STRING_OPTION(
+	"color10",
+	XP_COLOR10,
+	color_names[10],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the eleventh color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+
+    XP_STRING_OPTION(
+	"color11",
+	XP_COLOR11,
+	color_names[11],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the twelfth color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+
+    XP_STRING_OPTION(
+	"color12",
+	XP_COLOR12,
+	color_names[12],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the thirteenth color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+
+    XP_STRING_OPTION(
+	"color13",
+	XP_COLOR13,
+	color_names[13],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the fourteenth color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+
+    XP_STRING_OPTION(
+	"color14",
+	XP_COLOR14,
+	color_names[14],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the fifteenth color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+
+    XP_STRING_OPTION(
+	"color15",
+	XP_COLOR15,
+	color_names[15],
+	MAX_COLOR_LEN,
+	NULL, NULL,
+	"The color value for the sixteenth color.\n"
+	"This is only used if maxColors is set to 16.\n"),
+};
+
+
+void Store_color_options(void)
+{
+    STORE_OPTIONS(color_options);
+}
+
+
+#endif /* OPTIONHACK */
+
