@@ -2753,7 +2753,6 @@ void Move_player(player *pl)
 		frictionarea_t *fa = FrictionAreas(world, i);
 
 		if (fa->group == group) {
-		     /* kps - this should depend on gamespeed */
 		    fric = fa->friction;
 		    break;
 		}

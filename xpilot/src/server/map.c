@@ -249,7 +249,8 @@ int World_place_frictionarea(world_t *world, double fric)
     frictionarea_t t;
     int ind = world->NumFrictionAreas;
 
-    t.friction = fric;
+    t.friction_setting = fric;
+    /*t.friction = ... ; handled in timing setup */
     STORE(frictionarea_t, world->frictionAreas,
 	  world->NumFrictionAreas, world->MaxFrictionAreas, t);
     return ind;

@@ -3586,6 +3586,8 @@ static void Check_baseless(void)
 
 void Timing_setup(void)
 {
+    world_t *world = &World;
+
     if (FPS > 100)
 	FPS = 100;
     if (FPS < 1)
@@ -3617,6 +3619,21 @@ void Timing_setup(void)
      * don't bother making it "FPSMultiplier independent" */
     if (friction < 1)
 	friction = 1. - pow(1. - friction, timeStep);
+
+    /* Adjust friction area friction suitable for gameSpeed */
+    {
+	int i;
+	double fric;
+
+	for (i = 0; i < world->NumFrictionAreas; i++) {
+	    frictionarea_t *fa = FrictionAreas(world, i);
+
+	    fric = fa->friction_setting;
+	    if (fric < 1)
+		fric = 1. - pow(1. - fric, timeStep);
+	    fa->friction = fric;
+	}	
+    }
 
     /* ecm size used to be halved every update on old servers */
     ecmSizeFactor = pow(0.5, timeStep);

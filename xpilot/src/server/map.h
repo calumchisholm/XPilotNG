@@ -225,7 +225,8 @@ typedef struct asteroid_concentrator {
 } asteroid_concentrator_t;
 
 typedef struct frictionarea {
-    double	friction;
+    double	friction_setting;	/* Setting from map */
+    double	friction;		/* Changes with gameSpeed */
     int		group;
 } frictionarea_t;
 
