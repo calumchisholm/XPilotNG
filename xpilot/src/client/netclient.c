@@ -301,34 +301,6 @@ static int get_32bit(char **ptr)
 }
 
 
-static void Create_polygon_styles_for_testing ()
-{
-    int i;
-    extern int Bitmap_add(const char *, int, bool);
-
-    char *textureNames[] = {
-        "texture0.ppm",
-        "texture1.ppm",
-        "texture2.ppm",
-        "texture3.ppm",
-        "texture4.ppm",
-        "texture5.ppm",
-        "texture6.ppm",
-        "texture7.ppm",
-    };
-
-
-    /* a few polygon styles with a texture */
-    for (i = 0; i < 8; i++) {
-        polygon_styles[2 + i].visible = true;
-        polygon_styles[2 + i].visible_in_radar = true;
-        polygon_styles[2 + i].method = TEXTURED;
-        polygon_styles[2 + i].def_edge_style = (i < 6) ? 0 : 1;
-        polygon_styles[2 + i].texture =
-            Bitmap_add(textureNames[i], 1, true);
-    }
-}
-
 /*
  * Receive the map data and some game parameters from
  * the server.  The map data may be in compressed form.
@@ -655,21 +627,6 @@ int Net_setup(void)
             checks[i].bounds.y = cy - BLOCK_SZ / 2;
             checks[i].bounds.w = BLOCK_SZ;
             checks[i].bounds.h = BLOCK_SZ;
-	}
-	if (0) /* commented out to avoid problems outside testing */
-	{
-            extern int Mapdata_setup (const char *);
-
-            if (Mapdata_setup(Setup->author)) {
-
-                Create_polygon_styles_for_testing();
-
-                for (i = 0; i < polyc; i++) {
-                    int sid = 0; /* set styles elsewhere */
-                    if (sid == 100 || sid < 0 || sid >= 9) sid = rand() % 9;
-                    polygons[i].style = sid;
-                }
-            }
 	}
 	{
 	    struct polystyle {
