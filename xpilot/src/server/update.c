@@ -924,6 +924,62 @@ static void Update_players(world_t *world)
 	update_object_speed(world, OBJ_PTR(pl));
 	Move_player(pl);
 
+	/*
+	 * kps - hack to measure distance travelled, use e.g. with
+	 * acceleration.xp map.
+	 * This can be removed when Mara's "oldThrust" hack has been
+	 * tested.
+	 */
+	if (0) {
+	    static double olddist = 0;
+	    double dist
+		= Wrap_length(pl->pos.cx - pl->home_base->pos.cx,
+			      pl->pos.cy - pl->home_base->pos.cy) / CLICK;
+
+	    /* use with 12fps/12gs or 48fps/12gs */
+
+	    if (FPS == 12) {
+		assert(timeStep == 1.0);
+		if (dist > 0.0) {
+		    double delta = dist - olddist;
+
+		    pl->count += timeStep;
+		    if (olddist == 0)
+			printf("\t0.000 %% 0.00\n");
+		    printf("\t%.3f\n"
+			   "\t%.3f\n"
+			   "\t%.3f\n"
+			   "\t%.3f %% %.2f\n",
+			   olddist + 0.25 * delta,
+			   olddist + 0.50 * delta,
+			   olddist + 0.75 * delta,
+			   dist,
+			   pl->count);
+		    
+		    olddist = dist;
+		} else
+		    pl->count = 0;
+	    } else {
+		assert(timeStep == 0.25);
+		if (dist > 0.0) {
+		    int foo;
+		    double bar;
+		    pl->count += timeStep;
+		    if (olddist == 0)
+			printf("\t0.000 %% 0.00\n");
+		    foo = (int)pl->count;
+		    bar = pl->count - ((float)foo);
+		    bar = ABS(bar);
+		    if (bar < 0.01)
+			printf("\t%.3f %% %.2f\n", dist, pl->count);
+		    else
+			printf("\t%.3f\n", dist);
+		    olddist = dist;
+		} else
+		    pl->count = 0;
+	    }
+	}
+
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || options.cloakedExhaust)
 	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {
 	    if (BIT(pl->status, THRUSTING))
