@@ -452,22 +452,6 @@ typedef struct {
     int		id;
 } ecm_t;
 
-#if 0 /* laserhack */
-/*
- * Structure holding the info for one pulse of a laser.
- */
-typedef struct {
-    clpos		pos;
-    int			dir;
-    int			len;
-    int			life;
-    int			id;
-    unsigned short	team;
-    modifiers		mods;
-    bool		refl;
-} pulse_t;
-#endif
-
 /*
  * Transporter info.
  */
