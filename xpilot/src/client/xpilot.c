@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
      * --- Create global option array ---
      */
     Store_default_options();
+    Store_hud_options();
     Store_talk_macro_options();
     Store_key_options();
     Store_X_options();

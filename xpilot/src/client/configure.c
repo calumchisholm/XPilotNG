@@ -485,7 +485,7 @@ static int Config_create_showNastyShots(int widget_desc, int *height)
                               Config_update_bool, &showNastyShots);
 }
 
-
+extern int hudHLineColor;
 static int Config_create_hudHLineColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(hudHLineColor);

@@ -88,15 +88,6 @@ int	spark_color[MAX_COLORS];
 int	buttonColor;		/* Color index for button drawing */
 int	windowColor;		/* Color index for window drawing */
 int	borderColor;		/* Color index for border drawing */
-int	hudColor;		/* Color index for HUD drawing */
-int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
-int	hudVLineColor;		/* Color index for vert. HUD line drawing */
-int	hudItemsColor;		/* Color index for HUD items drawing */
-int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
-int	hudRadarOtherColor;	/* Color index for other hudradar dots */
-int	hudLockColor;		/* Color index for lock on HUD drawing */
-int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
-int	dirPtrColor;		/* Color index for dirptr drawing */
 int	msgScanBallColor;	/* Color index for ball msg */
 int	msgScanSafeColor;	/* Color index for safe msg */
 int	msgScanCoverColor;	/* Color index for cover msg */
@@ -1329,57 +1320,11 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	&backgroundPointColor,
 	"Which color number to use for drawing background points.\n"),
 
-
-    COLOR_INDEX_OPTION(
-	"hudColor",
-	2,
-	&hudColor,
-	"Which color number to use for drawing the HUD.\n"),
-
-    COLOR_INDEX_OPTION(
-	"hudHLineColor",
-	2,
-	&hudHLineColor,
-	"Which color number to use for drawing the horizontal lines\n"),
-
-    COLOR_INDEX_OPTION(
-	"hudVLineColor",
-	0,
-	&hudVLineColor,
-	"Which color number to use for drawing the vertical lines\n"
-	"in the HUD.\n"),
-
-    COLOR_INDEX_OPTION(
-	"hudItemsColor",
-	2,
-	&hudItemsColor,
-	"Which color number to use for drawing owned items on the HUD.\n"),
-
-    COLOR_INDEX_OPTION(
-	"hudRadarEnemyColor",
-	11,
-	&hudRadarEnemyColor,
-	"Which color number to use for drawing hudradar dots\n"
-	"that represent enemy ships.\n"),
-
-    COLOR_INDEX_OPTION(
-	"hudRadarOtherColor",
-	4,
-	&hudRadarOtherColor,
-	"Which color number to use for drawing hudradar dots\n"
-	"that represent friendly ships or other objects.\n"),
-
     COLOR_INDEX_OPTION(
 	"teamShotColor",
 	2,
 	&teamShotColor,
 	"Which color number to use for drawing harmless shots.\n"),
-
-    COLOR_INDEX_OPTION(
-	"dirPtrColor",
-	0,
-	&dirPtrColor,
-	"Which color number to use for drawing the direction pointer hack.\n"),
 
     COLOR_INDEX_OPTION(
 	"shipShapesHackColor",
@@ -1388,22 +1333,10 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	"Which color number to use for drawing the shipshapes hack.\n"),
 
     COLOR_INDEX_OPTION(
-	"hudLockColor",
-	0,
-	&hudLockColor,
-	"Which color number to use for drawing the lock on the HUD.\n"),
-
-    COLOR_INDEX_OPTION(
 	"visibilityBorderColor",
 	2,
 	&visibilityBorderColor,
 	"Which color number to use for drawing the visibility border.\n"),
-
-    COLOR_INDEX_OPTION(
-	"fuelGaugeColor",
-	0,
-	&fuelGaugeColor,
-	"Which color number to use for drawing the fuel gauge.\n"),
 
     COLOR_INDEX_OPTION(
 	"clockColor",

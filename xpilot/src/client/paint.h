@@ -58,19 +58,11 @@ extern ipos	realWorld;
 extern char	dashes[NUM_DASHES];
 extern char	cdashes[NUM_CDASHES];
 
-extern int	hudColor;		/* Color index for HUD drawing */
-extern int	hudHLineColor;		/* Color index for horiz. HUD line */
-extern int	hudVLineColor;		/* Color index for vert. HUD line */
-extern int	hudItemsColor;		/* Color index for HUD items drawing */
-extern int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
-extern int	hudRadarOtherColor;	/* Color index for other hudradar dots */
+extern int	hudSize;		/* Size for HUD drawing */
 extern int	hudRadarDotSize;	/* Size for hudradar dot drawing */
 extern double	hudRadarScale;		/* Scale for hudradar drawing */
-extern double	hudRadarLimit;		/* Limit for hudradar drawing */
-extern int	hudSize;		/* size for hud-drawing */
-extern int	hudLockColor;		/* Color index for lock on HUD drawing */
+extern double 	hudRadarLimit;		/* Limit for hudradar drawing */
 extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
-extern int	dirPtrColor;		/* Color index for dirptr-hack drawing */
 extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
 extern int	zeroLivesColor;		/* Color to associate with 0 lives */
 extern int	oneLifeColor;		/* Color to associate with 1 life */
@@ -202,5 +194,6 @@ int Life_color(other_t *other);
 int Life_color_by_life(int life);
 void Play_beep(void);
 int Check_view_dimensions(void);
+void Store_hud_options(void);
 
 #endif
