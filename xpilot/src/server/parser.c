@@ -125,6 +125,7 @@ static void Parser_dump_options(char *progname)
     option_desc		*options;
     int			option_count;
 
+    (void)progname;
     options = Get_option_descs(&option_count);
 
     for (j = 0; j < option_count; j++) {
@@ -151,6 +152,7 @@ static void Parser_dump_flags(char *progname)
     int			option_count;
     char		msg[MSG_LEN];
 
+    (void)progname;
     options = Get_option_descs(&option_count);
 
     for (j = 0; j < option_count; j++) {
