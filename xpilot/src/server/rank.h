@@ -61,6 +61,7 @@ void Rank_show_ranks(void);
 static inline void Rank_add_score(player_t *pl, double points)
 {
     pl->score += points;
+    pl->update_score = true;
     if (pl->rank)
 	pl->rank->score += points;
 }
@@ -68,6 +69,7 @@ static inline void Rank_add_score(player_t *pl, double points)
 static inline void Rank_set_score(player_t *pl, double points)
 {
     pl->score = points;
+    pl->update_score = true;
     if (pl->rank)
 	pl->rank->score = points;
 }

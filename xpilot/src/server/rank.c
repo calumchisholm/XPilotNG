@@ -525,11 +525,11 @@ void Rank_get_saved_score(player_t * pl)
 	    if (rank->pl == NULL) {
 		/* Ok, found it. */
 		rank->pl = pl;
-		pl->score = rank->score;
+		Player_set_score(pl,rank->score);
 		pl->rank = rank;
 	    } else {
 		/* That ranknode is already in use by another player! */
-		pl->score = 0;
+		Player_set_score(pl,0);
 		pl->rank = NULL;
 	    }
 	    return;
@@ -569,7 +569,7 @@ void Rank_get_saved_score(player_t * pl)
     Init_ranknode(rank, pl->name, pl->username, pl->hostname);
     rank->pl = pl;
     rank->timestamp = time(NULL);
-    pl->score = 0;
+    Player_set_score(pl,0);
     pl->rank = rank;
 }
 

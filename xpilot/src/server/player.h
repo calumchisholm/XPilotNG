@@ -223,8 +223,7 @@ struct player {
     double	oldturnvel;		/* Last velocity of turn (right) */
     double	turnacc;		/* Current acceleration of turn */
     double	score;			/* Current score of player */
-    double	prev_score;		/* Last score that has been updated */
-    int		prev_life;		/* Last life that has been updated */
+    bool    	update_score;	    	/* score table info needs to be sent */
     shipshape_t	*ship;			/* wire model of ship shape */
     double	power;			/* Force of thrust */
     double	power_s;		/* Saved power fiks */
@@ -280,13 +279,11 @@ struct player {
 
     short	dir;			/* Direction of acceleration */
     char	mychar;			/* Special char for player */
-    char	prev_mychar;		/* Special char for player */
     char	name[MAX_CHARS];	/* Nick-name of player */
     char	username[MAX_CHARS];	/* Real name of player */
     char	hostname[MAX_CHARS];	/* Hostname of client player uses */
     uint16_t	pseudo_team;		/* Which team for detaching tanks */
     int		alliance;		/* Member of which alliance? */
-    int		prev_alliance;		/* prev. alliance for score */
     int		invite;			/* Invitation for alliance */
     ballobject_t	*ball;
 
@@ -403,6 +400,36 @@ static inline bool Player_is_paused(player_t *pl)
 	return true;
     return false;
 #endif
+}
+
+static inline bool Player_add_score(player_t *pl, double points)
+{
+    pl->score += points;
+    pl->update_score = true;
+}
+
+static inline bool Player_set_score(player_t *pl, double points)
+{
+    pl->score = points;
+    pl->update_score = true;
+}
+
+static inline bool Player_set_mychar(player_t *pl, char mychar)
+{
+    pl->mychar = mychar;
+    pl->update_score = true;
+}
+
+static inline bool Player_set_life(player_t *pl, double life)
+{
+    pl->life = life;
+    pl->update_score = true;
+}
+
+static inline bool Player_set_alliance(player_t *pl, int alliance)
+{
+    pl->alliance = alliance;
+    pl->update_score = true;
 }
 
 static inline void Player_thrust(player_t *pl, bool on)

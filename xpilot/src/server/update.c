@@ -788,7 +788,7 @@ static void Update_players(world_t *world)
 
 	if (Player_is_paused(pl)) {
 	    if (options.pauseTax > 0.0 && (frame_loops % FPS) == 0) {
-		pl->score -= options.pauseTax;
+		Player_add_score(pl,-options.pauseTax);
 		updateScores = true;
 	    }
 	}
@@ -1226,6 +1226,6 @@ void Update_objects(world_t *world)
     /*
      * Now update labels if need be.
      */
-    if (updateScores && frame_loops % UPDATE_SCORE_DELAY == 0)
+    if (updateScores && ((frame_loops % UPDATE_SCORE_DELAY) == 0))
 	Update_score_table(world);
 }

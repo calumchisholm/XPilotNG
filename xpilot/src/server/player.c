@@ -451,9 +451,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 
 	pl->pseudo_team = pseudo_team_no++;
     }
-    pl->prev_mychar = pl->mychar;
     pl->life = world->rules->lives;
-    pl->prev_life = (int)pl->life;
 
     pl->player_fps = 50; /* Client should send a value after startup */
     pl->maxturnsps = MAX_SERVER_FPS;
@@ -472,14 +470,12 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
      */
     if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0) {
 	Player_set_state(pl, PL_STATE_WAITING);
-	pl->prev_life = 0;
 	pl->life = 0.0;
     }
 
     pl->team		= TEAM_NOT_SET;
 
     pl->alliance	= ALLIANCE_NOT_SET;
-    pl->prev_alliance	= ALLIANCE_NOT_SET;
     pl->invite		= NO_ID;
 
     pl->lock.tagged	= LOCK_NONE;
@@ -490,6 +486,8 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 
     for (i = 0; i < MAX_RECORDED_SHOVES; i++)
 	pl->shove_record[i].pusher_id = NO_ID;
+	
+    pl->update_score = true;
 
     return pl->id;
 }
@@ -551,14 +549,8 @@ void Update_score_table(world_t *world)
 
     for (j = 0; j < NumPlayers; j++) {
 	pl = Player_by_index(j);
-	if (pl->score != pl->prev_score
-	    || pl->life != pl->prev_life
-	    || pl->mychar != pl->prev_mychar
-	    || pl->alliance != pl->prev_alliance) {
-	    pl->prev_score = pl->score;
-	    pl->prev_life = (int)pl->life;
-	    pl->prev_mychar = pl->mychar;
-	    pl->prev_alliance = pl->alliance;
+	if (pl->update_score) {
+	    pl->update_score = false;
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Player_by_index(i);
 
@@ -636,7 +628,7 @@ void Reset_all_players(world_t *world)
 	    assert(pl->recovery_count == RECOVERY_DELAY);
 	    Player_set_state(pl, PL_STATE_APPEARING);
 	    pl->idleTime = 0;
-	    pl->life = world->rules->lives;
+	    Player_set_life(pl,world->rules->lives);
 	    if (BIT(world->rules->mode, TIMING))
 		pl->recovery_count = RECOVERY_DELAY;
 	}
@@ -1443,8 +1435,8 @@ void Add_spectator(player_t *pl)
     pl->home_base = NULL;
     pl->team = 0;
     GetIndArray[pl->id] = spectatorStart + NumSpectators;
-    pl->score = -6666;
-    pl->mychar = 'S';
+    Player_set_score(pl,-6666);
+    Player_set_mychar(pl,'S');
     NumSpectators++;
 }
 
@@ -1570,7 +1562,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 	    Rank_add_death(pl);
 
 	if (BIT(world->rules->mode, LIMITED_LIVES)) {
-	    pl->life--;
+	    Player_set_life(pl,pl->life-1);
 	    if (pl->life == -1) {
 		if (Player_is_robot(pl)) {
 		    if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
@@ -1580,14 +1572,14 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 			return;
 		    }
 		}
-		pl->life = 0;
+		Player_set_life(pl,0);
 		if (!Player_is_waiting(pl))
 		    Player_set_state(pl, PL_STATE_DEAD);
 		Player_lock_closest(pl, false);
 	    }
 	}
 	else
-	    pl->life++;
+	    Player_set_life(pl,pl->life+1);;
     }
 
     pl->have	= DEF_HAVE;
@@ -1726,15 +1718,15 @@ void Player_set_state(player_t *pl, int state)
 
     switch (state) {
     case PL_STATE_WAITING:
-	pl->mychar = 'W';
+	Player_set_mychar(pl,'W');
 	SET_BIT(pl->pl_status, GAME_OVER);
 	break;
     case PL_STATE_APPEARING:
-	pl->mychar = pl->pl_type_mychar;
+	Player_set_mychar(pl,pl->pl_type_mychar);
 	CLR_BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED);
 	break;
     case PL_STATE_ALIVE:
-	pl->mychar = pl->pl_type_mychar;
+	Player_set_mychar(pl,pl->pl_type_mychar);
 	SET_BIT(pl->pl_status, PLAYING);
 	CLR_BIT(pl->pl_status, PAUSE|GAME_OVER|KILLED);
 	break;
@@ -1742,11 +1734,11 @@ void Player_set_state(player_t *pl, int state)
 	SET_BIT(pl->pl_status, KILLED);
 	break;
     case PL_STATE_DEAD:
-	pl->mychar = 'D';
+	Player_set_mychar(pl,'D');
 	SET_BIT(pl->pl_status, GAME_OVER);
 	break;
     case PL_STATE_PAUSED:
-	pl->mychar = 'P';
+	Player_set_mychar(pl,'P');
 	SET_BIT(pl->pl_status, PAUSE);
 	break;
     case PL_STATE_GAME_OVER:

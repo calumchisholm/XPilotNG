@@ -133,7 +133,9 @@ static void Send_info_about_player(player_t *pl)
 	pl_i = Player_by_index(i);
 	if (pl_i->conn != NULL) {
 	    Send_team(pl_i->conn, pl->id, pl->team);
+	    /*if we do either, we do both... but is either necessary?*/
 	    updateScores = true;
+	    pl->update_score = true;
 	    if (pl->home_base != NULL)
 		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
@@ -161,8 +163,7 @@ static void Set_swapper_state(player_t *pl)
 		 * not sure what that was good for.
 		 */
 		Player_set_state(pl, PL_STATE_WAITING);
-		pl->prev_life = 0;
-		pl->life = 0.0;
+		Player_set_life(pl,0.0);
 		SET_BIT(pl->pl_status, PLAYING);
 		Player_self_destruct(pl, false);
 		pl->pause_count = 0;

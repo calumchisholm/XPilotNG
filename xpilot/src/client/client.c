@@ -1411,6 +1411,7 @@ int Handle_team(int id, int pl_team)
 	return 0;
     }
     other->team = pl_team;
+    scoresChanged = true;
 
     return 0;
 }
