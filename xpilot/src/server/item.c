@@ -531,7 +531,7 @@ void Do_deflector(player_t *pl)
 
 	if (obj->id == pl->id) {
 	    if (BIT(obj->obj_status, OWNERIMMUNE)
-		|| frame_time < obj->fusetime
+		|| obj->fuse > 0
 		|| options.selfImmunity)
 		continue;
 	} else {

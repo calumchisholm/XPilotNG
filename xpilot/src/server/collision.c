@@ -589,7 +589,7 @@ static void PlayerObjectCollision(player_t *pl)
 		 || obj->type == OBJ_TORPEDO
 		 || obj->type == OBJ_SHOT
 		 || obj->type == OBJ_CANNON_SHOT) {
-	    if (pl->id == obj->id && frame_time < obj->fusetime)
+	    if (pl->id == obj->id && obj->fuse > 0)
 		continue;
 	}
 	else if (obj->type == OBJ_MINE) {
@@ -1343,7 +1343,7 @@ static void AsteroidCollision(world_t *world)
 		&& !BIT(obj->obj_status, FROMCANNON))
 		continue;
 	    /* don't collide while still overlapping  after breaking */
-	    if (obj->type == OBJ_ASTEROID && frame_time < ast->fusetime)
+	    if (obj->type == OBJ_ASTEROID && ast->fuse > 0)
 		continue;
 	    /* don't collide with self */
 	    if (obj == ast)
@@ -1373,7 +1373,7 @@ static void AsteroidCollision(world_t *world)
 		damage = -collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
 		Delta_mv_elastic(ast, obj);
 		/* avoid doing collision twice */
-		obj->fusetime = frame_time + timeStep;
+		obj->fuse = timeStep;
 		sound = true;
 		break;
 	    case OBJ_SPARK:

@@ -101,7 +101,7 @@ void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
     pulse->mods 	= mods;
     pulse->color	= WHITE;
 
-    pulse->fusetime	= frame_time;
+    pulse->fuse		= 0;
     pulse->pl_range 	= 0;
     pulse->pl_radius 	= 0;
 

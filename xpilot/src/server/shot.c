@@ -200,7 +200,7 @@ void Place_general_mine(world_t *world, int id, int team, int status,
 
 	mine->type = OBJ_MINE;
 	mine->color = BLUE;
-	mine->fusetime = options.mineFuseTicks;
+	mine->fuse = options.mineFuseTicks > 0 ? options.mineFuseTicks : -1;
 	mine->obj_status = status;
 	mine->id = (pl ? pl->id : NO_ID);
 	mine->team = team;
@@ -208,11 +208,9 @@ void Place_general_mine(world_t *world, int id, int team, int status,
 	mine->mine_count = 0.0;
 	Object_position_init_clpos(world, OBJ_PTR(mine), pos);
 	if (minis > 1) {
-	    int		space = RES/minis;
-	    int		dir;
-	    double	spread;
+	    int space = RES/minis, dir;
+	    double spread = (double)(Get_spread_modifier(mods) + 1);
 
-	    spread = (double)((unsigned)Get_spread_modifier(mods) + 1);
 	    /*
 	     * Dir gives (S is ship upwards);
 	     *
@@ -859,7 +857,7 @@ void Fire_general_shot(world_t *world, int id, int team,
 	    break;
 
 	shot->life 	= life / minis;
-	shot->fusetime 	= frame_time + fuse;
+	shot->fuse 	= fuse;
 	shot->mass	= mass / minis;
 	shot->type	= type;
 	shot->id	= (pl ? pl->id : NO_ID);
@@ -1813,13 +1811,12 @@ void Update_mine(world_t *world, mineobject_t *mine)
 	}
     }
 
-    /* if options.mineFuseTicks == 0, owner immunity never expires */
-    if (BIT(mine->obj_status, OWNERIMMUNE) && mine->fusetime > 0) {
-	if ((mine->fusetime -= timeStep) <= 0) {
-	    CLR_BIT(mine->obj_status, OWNERIMMUNE);
-	    mine->fusetime = 0;
-	}
-    }
+    /*
+     * If the value of option mineFuseTicks is 0, owner immunity never expires.
+     * In this case, mine->fuse has the special value -1.
+     */
+    if (BIT(mine->obj_status, OWNERIMMUNE) && mine->fuse == 0)
+	CLR_BIT(mine->obj_status, OWNERIMMUNE);
 
     if (Get_mini_modifier(mine->mods)) {
 	if ((mine->mine_spread_left -= timeStep) <= 0) {

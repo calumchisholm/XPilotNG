@@ -132,7 +132,7 @@ struct cell_node {
     cell_node_t		cell;		/* node in cell linked list */	\
     short		pl_range;	/* distance for collision */	\
     short		pl_radius;	/* distance for hit */		\
-    double		fusetime;	/* Frame when considered fused */ \
+    float		fuse;		/* ticks until fused */ \
 
 /* up to here all object types are the same. */
 

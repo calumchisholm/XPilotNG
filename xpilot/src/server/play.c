@@ -202,7 +202,7 @@ void Make_debris(world_t  *world,
 	debris->type = type;
 	life = min_life + rfrac() * (max_life - min_life);
 	debris->life = life;
-	debris->fusetime = 0;
+	debris->fuse = 0;
 	debris->pl_range = radius;
 	debris->pl_radius = radius;
 	debris->obj_status = status;

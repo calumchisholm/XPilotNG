@@ -282,7 +282,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
     radius = ASTEROID_RADIUS(size) / CLICK;
     asteroid->pl_range = (int)radius;
     asteroid->pl_radius = (int)radius;
-    asteroid->fusetime = frame_time + timeStep;
+    asteroid->fuse = timeStep;
     asteroid->obj_status = GRAVITY;
     CLEAR_MODS(asteroid->mods);
 

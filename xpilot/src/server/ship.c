@@ -538,7 +538,7 @@ void Make_wreckage(world_t *world,
 	life = min_life + rfrac() * (max_life - min_life);
 
 	wreckage->life = life;
-	wreckage->fusetime = 0;
+	wreckage->fuse = 0;
 
 	/* Wreckage type, rotation, and size */
 	wreckage->wire_turnspeed = 0.02 + rfrac() * 0.35;

@@ -454,6 +454,12 @@ static void Misc_object_update(world_t *world)
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
 
+	if (obj->fuse > 0) {
+	    obj->fuse -= timeStep;
+	    if (obj->fuse <= 0)
+		obj->fuse = 0;
+	}
+
 	if (obj->type == OBJ_MINE)
 	    Update_mine(world, MINE_PTR(obj));
 
