@@ -94,8 +94,8 @@ void Break_asteroid(wireobject *asteroid)
 {
     double	mass, mass3;
     double	speed, speed1, speed2, radius;
-    double	velx1, vely1, velx2, vely2;
-    int		dir, dir1, dir2, split_dir;
+    double	velx1, vely1, velx2, vely2, dir;
+    int		dir1, dir2, split_dir;
     clpos	pos1, pos2;
 
     if (asteroid->size == 1) {
@@ -110,8 +110,8 @@ void Break_asteroid(wireobject *asteroid)
 		      WHITE,
 		      10,
 		      0, RES-1,
-		      5, 10,
-		      3, 10);
+		      5.0, 10.0,
+		      3.0, 10.0);
 	Make_debris(asteroid->pos,
 		    asteroid->vel,
 		    NO_ID,
@@ -121,15 +121,15 @@ void Break_asteroid(wireobject *asteroid)
 		    GRAVITY,
 		    RED,
 		    8,
-		    20 + 30 * rfrac(),
+		    (int)(20 + 30 * rfrac()),
 		    0, RES-1,
-		    5, 10,
-		    3, 10);
+		    5.0, 10.0,
+		    3.0, 10.0);
     } else {
 	/* foo[12] refer to the mini-asteroids
 	   foo3 refers to the wreckage and debris */
 	speed = VECTOR_LENGTH(asteroid->vel);
-	dir = (int)findDir(asteroid->vel.x, asteroid->vel.y);
+	dir = findDir(asteroid->vel.x, asteroid->vel.y);
 	mass3 = asteroid->mass * ASTEROID_DUST_FACT;
 	mass = ASTEROID_MASS(asteroid->size - 1);
 	dir1 = MOD2((int)(dir
@@ -139,14 +139,14 @@ void Break_asteroid(wireobject *asteroid)
 			  + ASTEROID_DELTA_DIR / 4
 			  + (rfrac() * ASTEROID_DELTA_DIR / 4)), RES);
 	speed1 = (speed * (1 - ASTEROID_DUST_FACT))
-		 / tcos(ABS(dir - dir1));
+		 / tcos(ABS((int)dir - dir1));
 	speed2 = (speed * (1 - ASTEROID_DUST_FACT))
-		 / tcos(ABS(dir2 - dir));
+		 / tcos(ABS(dir2 - (int)dir));
 	velx1 = tcos(dir1) * speed1;
 	vely1 = tsin(dir1) * speed1;
 	velx2 = tcos(dir2) * speed2;
 	vely2 = tsin(dir2) * speed2;
-	split_dir = MOD2(dir - RES/4, RES);
+	split_dir = MOD2((int)dir - RES/4, RES);
 	radius = ASTEROID_RADIUS(asteroid->size - 1);
 	pos1.cx = WRAP_XCLICK(asteroid->pos.cx + tcos(split_dir) * radius);
 	pos1.cy = WRAP_YCLICK(asteroid->pos.cy + tsin(split_dir) * radius);
@@ -164,8 +164,8 @@ void Break_asteroid(wireobject *asteroid)
 		      WHITE,
 		      10,
 		      0, RES-1,
-		      5, 10,
-		      3, 10);
+		      5.0, 10.0,
+		      3.0, 10.0);
 	Make_debris(asteroid->pos,
 		    asteroid->vel,
 		    NO_ID,
@@ -175,10 +175,10 @@ void Break_asteroid(wireobject *asteroid)
 		    GRAVITY,
 		    RED,
 		    8,
-		    20 + 30 * rfrac(),
+		    (int)(20 + 30 * rfrac()),
 		    0, RES-1,
-		    5, 10,
-		    3, 10);
+		    5.0, 10.0,
+		    3.0, 10.0);
     }
 
     if ((asteroidMaxItems > 0) && (rfrac() < asteroidItemProb)) {
