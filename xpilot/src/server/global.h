@@ -354,7 +354,6 @@ extern double		timeStep;
 extern double		ecmSizeFactor;
 extern char		*playerPasswordsFileName;
 extern int		playerPasswordsFileSizeLimit;
-extern bool		fastAim;
 extern bool		maraTurnqueue;
 extern bool		ignoreMaxFPS;
 extern bool		polygonMode;

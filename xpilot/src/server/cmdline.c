@@ -317,7 +317,6 @@ char		*recordFileName;
 
 bool		polygonMode;		/* Run server in polygon mode even
 					   with block based (.xp) mapfile */
-bool		fastAim;		/* Turn before shooting in frame */
 bool		ignoreMaxFPS;		/* Temporary hack */
 bool		baselessPausing;
 bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
@@ -3573,19 +3572,6 @@ static option_desc options[] = {
 	"Force use of polygon protocol when communicating with clients?\n"
 	"(useful for debugging if you want to see the polygons created\n"
 	"in the blocks to polygons conversion function).\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"fastAim",
-	"fastAim",
-	"true",
-	&fastAim,
-	valBool,
-	tuner_dummy,
-	"When calculating a frame, turn the ship before firing.\n"
-	"This means you can change aim one frame faster.\n"
-	"Added this option to see how much difference changing the order\n"
-	"would make.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

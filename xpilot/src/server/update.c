@@ -1031,8 +1031,12 @@ void Update_objects(void)
 
     Robot_update();
 
-    if (fastAim)
-	Players_turn();
+    /*
+     * Fast aim:
+     * When calculating a frame, turn the ship before firing.
+     * This means you can change aim one frame faster.
+     */
+    Players_turn();
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
@@ -1079,9 +1083,6 @@ void Update_objects(void)
     Transporter_update();
     Cannon_update();
     Target_update();
-
-    if (!fastAim)
-	Players_turn();
 
     /* * * * * *
      *
@@ -1146,7 +1147,8 @@ void Update_objects(void)
 		}
 		if (BIT(pl->status, SELF_DESTRUCT)) {
 		    if (selfDestructScoreMult != 0) {
-			double sc = Rate(0, pl->score) * selfDestructScoreMult;
+			double sc = Rate(0.0, pl->score)
+			    * selfDestructScoreMult;
 			Score(pl, -sc, pl->pos, "Self-Destruct");
 		    }
 		    SET_BIT(pl->status, KILLED);
