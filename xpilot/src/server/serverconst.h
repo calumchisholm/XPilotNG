@@ -150,13 +150,17 @@
 #define MAX_PSEUDO_PLAYERS      16
 
 #define MIN_PASS_LEN		5
-#define MAX_PASS_LEN		16      /* 8 => 16 by kps */
+#define MAX_PASS_LEN		16
 
 #define MAX_TOTAL_SHOTS		16384	/* must be <= 65536 */
 #define MAX_TOTAL_PULSES	(5 * 64)
 #define MAX_TOTAL_ECMS		64
 #define MAX_TOTAL_TRANSPORTERS	(2 * 64)
 
+#define MAX_PLAYER_FUEL		(2600<<FUEL_SCALE_BITS)
+#define MIN_PLAYER_FUEL		(350<<FUEL_SCALE_BITS)
+#define ENERGY_PACK_FUEL        ((long)((500+(randomMT()&511)) \
+				    <<FUEL_SCALE_BITS))
 
 #define LG2_MAX_AFTERBURNER     4
 #define ALT_SPARK_MASS_FACT     4.2
@@ -170,11 +174,7 @@
 #define AFTER_BURN_FUEL(f,n)    \
  (((f)*((MAX_AFTERBURNER+1)+(n)*(ALT_FUEL_FACT-1)))/(MAX_AFTERBURNER+1.0))
 
-#define TURN_FUEL(acc)          (0.005*FUEL_SCALE_FACT*ABS(acc))
-#define TURN_SPARKS(tf)         (5+((tf)>>((FUEL_SCALE_BITS)-6)))
-
 #define THRUST_MASS             0.7
-
 #define ARMOR_MASS		(ShipMass / 14)
 
 #define MAX_TANKS               8
