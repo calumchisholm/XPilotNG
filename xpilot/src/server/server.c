@@ -104,6 +104,7 @@ int main(int argc, char **argv)
     /* Lock the server into memory */
     plock_server(options.pLockServer);
 
+    Asteroid_line_init(world);
     Walls_init(world);
 
     /* Allocate memory for players, shots and messages */

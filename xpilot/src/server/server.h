@@ -419,9 +419,9 @@ enum TeamPickType {
 };
 
 #ifndef	_WINDOWS
-#define	APPNAME	"xpilots"
+#define	APPNAME	"xpilot-ng-server"
 #else
-#define	APPNAME	"XPilotServer"
+#define	APPNAME	"XPilotNGServer"
 #endif
 
 
@@ -639,7 +639,7 @@ void remove_temp_wormhole(world_t *world, int ind);
 void Break_asteroid(world_t *world, wireobject_t *asteroid);
 void Asteroid_update(world_t *world);
 list_t Asteroid_get_list(void);
-
+void Asteroid_line_init(world_t *world);
 
 /*
  * Prototypes for cannon.c

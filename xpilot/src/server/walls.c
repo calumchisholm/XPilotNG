@@ -60,7 +60,8 @@ static char msg[MSG_LEN];
 #define SEPARATION_DIST 64
 /* This must be increased if the ship corners are allowed to go farther
  * when turning! */
-#define MAX_SHAPE_OFFSET (15 * CLICK)
+/* this is big enough for asteroids of size 4 */
+#define MAX_SHAPE_OFFSET (52 * CLICK)
 
 #if ((-3) / 2 != -1) || ((-3) % 2 != -1)
 #error "This code assumes that negative numbers round upwards."
@@ -2381,6 +2382,74 @@ void Treasure_init(world_t *world)
 	Make_treasure_ball(world, Treasures(world, i));
 }
 
+extern shape_t asteroid_wire1;
+extern shape_t asteroid_wire2;
+extern shape_t asteroid_wire3;
+extern shape_t asteroid_wire4;
+
+
+static void Move_asteroid(object_t *obj)
+{
+    move_t mv;
+    struct collans ans;
+    world_t *world = &World;
+    wireobject_t *asteroid = (wireobject_t *)obj;
+
+    mv.delta.cx = FLOAT_TO_CLICK(obj->vel.x * timeStep);
+    mv.delta.cy = FLOAT_TO_CLICK(obj->vel.y * timeStep);
+    mv.obj = obj;
+    obj->extmove.cx = mv.delta.cx;
+    obj->extmove.cy = mv.delta.cy;
+
+    /* asteroid can't phaze */
+
+    mv.hitmask = NONBALL_BIT; /* hit everything for now */
+
+    mv.start.cx = obj->pos.cx;
+    mv.start.cy = obj->pos.cy;
+    while (mv.delta.cx || mv.delta.cy) {
+	shape_t *shape;
+
+	switch (asteroid->size) {
+	case 1: shape = &asteroid_wire1; break;
+	case 2: shape = &asteroid_wire2; break;
+	case 3: shape = &asteroid_wire3; break;
+	case 4: shape = &asteroid_wire4; break;
+	default: assert(0); break;
+	}
+
+	Shape_move(&mv, shape, 0, &ans);
+	mv.start.cx = WRAP_XCLICK(mv.start.cx + ans.moved.cx);
+	mv.start.cy = WRAP_YCLICK(mv.start.cy + ans.moved.cy);
+	mv.delta.cx -= ans.moved.cx;
+	mv.delta.cy -= ans.moved.cy;
+	if (ans.line != -1) {
+	    if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
+		if (!Bounce_object(obj, &mv, ans.line, ans.point))
+		    break;
+	    }
+	    else if (!Shape_away(&mv, shape, 0, ans.line, &ans)) {
+		if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
+		    if (!Bounce_object(obj, &mv, ans.line, ans.point))
+			break;
+		}
+		else {
+		    /* This case could be handled better,
+		     * I'll write the code for that if this
+		     * happens too often. */
+		    mv.delta.cx = 0;
+		    mv.delta.cy = 0;
+		    obj->vel.x = 0;
+		    obj->vel.y = 0;
+		}
+	    }
+	}
+    }
+    Object_position_set_clvec(world, obj, mv.start);
+    Cell_add_object(world, obj);
+    return;
+}
+
 
 static void Move_ball(object_t *obj)
 {
@@ -2467,6 +2536,11 @@ void Move_object(object_t *obj)
     Object_position_remember(obj);
 
     obj->collmode = 1;
+
+    if (obj->type == OBJ_ASTEROID) {
+	Move_asteroid(obj);
+	return;
+    }
 
 #if 1
     if (obj->type == OBJ_BALL) {
