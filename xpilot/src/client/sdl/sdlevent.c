@@ -59,28 +59,27 @@ bool Key_press_talk(void)
     return false;	/* server doesn't need to know */
 }
 
-bool Key_press_pointer_control(void)
+void Pointer_control_set_state(bool on)
 {
-    pointerControl = !pointerControl;
-    if (pointerControl) {
-    	MainWidget_ShowMenu(MainWidget,false);
+    if (on) {
+    	MainWidget_ShowMenu(MainWidget, false);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 	SDL_ShowCursor(SDL_DISABLE);
     } else {
-    	MainWidget_ShowMenu(MainWidget,true);
+    	MainWidget_ShowMenu(MainWidget, true);
 	SDL_WM_GrabInput(SDL_GRAB_OFF);
 	SDL_ShowCursor(SDL_ENABLE);
     }
     
 #ifdef HAVE_XF86MISC
-    {
+    if (0) { /* kps - causes crash on my machine */
 	SDL_SysWMinfo info;
 	SDL_GetWMInfo(&info);
 	Disable_emulate3buttons(pointerControl, info.info.x11.display);
     }
-#endif    
-    
-    return false;	/* server doesn't need to know */
+#endif
+
+    pointerControl = on;
 }
 
 bool Key_press_toggle_record(void)

@@ -669,7 +669,6 @@ int Key_update(void);
 void Key_clear_counts(void);
 bool Key_press(keys_t key);
 bool Key_release(keys_t key);
-bool Key_press_pointer_control(void);
 bool Key_press_swap_scalefactor(void);
 bool Key_press_talk(void);
 bool Key_press_toggle_radar_score(void);

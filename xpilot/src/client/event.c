@@ -231,6 +231,12 @@ static bool Key_press_show_messages(void)
     return false;	/* server doesn't need to know */
 }
 
+static bool Key_press_pointer_control(void)
+{
+    Pointer_control_set_state(!pointerControl);
+    return false;	/* server doesn't need to know */
+}
+
 static bool Key_press_msgs_stdout(void)
 {
     Print_messages_to_stdout();

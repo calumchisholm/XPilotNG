@@ -23,9 +23,6 @@ Task: Remove X client radar bug (this appears e.g. on polygon version of
 newdarkhell).
 Developer: ?
 
-Task: Grab mouse pointer in X client when pressing mouse button.
-Developer: kps
-
 Task: Create a useful set of newbie messages that are shown to players
 using the Add_newbie_message() function if client option 'newbie' is on.
 Developer: kps
@@ -240,3 +237,7 @@ Task: Add support for MinGW/MSys build environment and making console
 server work under Windows
 Developer: marvn
 
+Task: Optimise Frame_radar() so that object list is not traversed if
+there are no objects that could be shown on radar. This can be implemented
+e.g. by keeping a count of nukes, missiles etc.
+Developer: kps

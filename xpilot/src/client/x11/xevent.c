@@ -71,8 +71,10 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 void Pointer_control_set_state(bool on)
 {
     if (on) {
-	pointerControl = true;
-	XGrabPointer(dpy, drawWindow, true, 0, GrabModeAsync,
+	if (mouseAccelInClient)
+	    XChangePointerControl(dpy, True, True,
+				  new_acc_num, new_acc_denom, new_threshold);
+	XGrabPointer(dpy, drawWindow, True, 0, GrabModeAsync,
 		     GrabModeAsync, drawWindow, pointerControlCursor,
 		     CurrentTime);
 	XWarpPointer(dpy, None, drawWindow,
@@ -82,18 +84,20 @@ void Pointer_control_set_state(bool on)
 	XSelectInput(dpy, drawWindow,
 		     PointerMotionMask | ButtonPressMask | ButtonReleaseMask);
     } else {
-	pointerControl = false;
+	if (mouseAccelInClient && pre_exists)
+	    XChangePointerControl(dpy, True, True, 
+				  pre_acc_num, pre_acc_denom, pre_threshold);
 	XUngrabPointer(dpy, CurrentTime);
 	XDefineCursor(dpy, drawWindow, None);
 	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 	XFlush(dpy);
     }
     Disable_emulate3buttons(on, dpy);
+    pointerControl = on;
 }
 
 void Talk_set_state(bool on)
 {
-
     if (on) {
 	/* Enable talking, disable pointer control if it is enabled. */
 	if (pointerControl) {
@@ -112,22 +116,6 @@ void Talk_set_state(bool on)
 	    Pointer_control_set_state(true);
 	}
     }
-}
-
-bool Key_press_pointer_control(void)
-{
-    if (mouseAccelInClient) {    
-	if (pre_exists && pointerControl)
-	    XChangePointerControl(dpy, True, True, 
-				  pre_acc_num, pre_acc_denom, pre_threshold);
-	else
-	    XChangePointerControl(dpy, True, True,
-				  new_acc_num, new_acc_denom, new_threshold);
-    }
-
-    Pointer_control_set_state(!pointerControl);
-    
-    return false;	/* server doesn't need to know */
 }
 
 bool Key_press_swap_scalefactor(void)

@@ -112,13 +112,6 @@ static void Talk_set_state(bool on)
     scoresChanged = true;
 }
 
-bool Key_press_pointer_control(void)
-{
-    Pointer_control_set_state(!pointerControl);
-    
-    return false;	/* server doesn't need to know */
-}
-
 bool Key_press_swap_scalefactor(void)
 {
     double tmp;
