@@ -359,6 +359,7 @@ bool Set_option(const char *name, const char *value)
 }
 
 
+/* kps - these commands need some fine tuning. */
 /*
  * \set client command
  */
@@ -366,10 +367,7 @@ void Set_command(const char *args)
 {
     char *name, *value, *valcpy;
 
-    if (!args) {
-	warn("foobar");
-	return;
-    }
+    assert(args);
 
     valcpy = xp_safe_strdup(args);
 
@@ -379,11 +377,48 @@ void Set_command(const char *args)
     if (name && value) {
 	warn("Calling Set_option(\"%s\", \"%s\")", name, value);
 	Set_option(name, value);
+    } else {
+	;
+	/* usage, e.g. return false */
     }
 
     xp_free(valcpy);
 }
+char *Option_value_to_string(xp_option_t *opt);
+char *Option_value_to_string(xp_option_t *opt)
+{
+    (void)opt;
+    return "unknown at this time";
+}
 
+
+/*
+ * \set glient command
+ */
+void Get_command(const char *args)
+{
+    char *name, *valcpy;
+    xp_option_t *opt;
+    char msg[MSG_LEN];
+
+    assert(args);
+
+    valcpy = xp_safe_strdup(args);
+
+    name = strtok(valcpy, " \t\r\n");
+    opt = Find_option(name);
+
+    if (opt) {
+	snprintf(msg, sizeof(msg), "The value of %s is %s. [*Client reply*]",
+		 Option_get_name(opt), Option_value_to_string(opt));
+	Add_message(msg);
+    } else {
+	sprintf(msg, "No client option named %s. [*Client reply*]", name);
+	Add_message(msg);
+    }
+
+    xp_free(valcpy);
+}
 
 /*
  * NOTE: Store option assumes the passed pointers will remain valid.

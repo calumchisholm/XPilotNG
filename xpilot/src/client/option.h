@@ -133,6 +133,7 @@ extern void Get_xpilotrc_file(char *, unsigned);
 extern bool Set_option(const char *name, const char *value);
 extern xp_option_t *Find_option(const char *name);
 extern void Set_command(const char *command);
+extern void Get_command(const char *command);
 
 extern void Usage(void);
 extern const char *Get_keyHelpString(keys_t key);

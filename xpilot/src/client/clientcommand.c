@@ -25,13 +25,13 @@
 
 char clientcommand_version[] = VERSION;
 
-#define NUMCOMMANDS 10
-const char c_commands[NUMCOMMANDS][16] = {
+const char c_commands[][16] = {
     "ignore", "i",
     "ignore!", "i!",
     "unignore", "u",
     "help", "h",
-    "set", "s"
+    "set", "s",
+    "get", "g",
 };
 
 static void print_ignorelist(void)
@@ -81,7 +81,7 @@ static void print_help(char *arg)
     Add_message(arg);
 
     if (arg[0] == '\0') {
-	for (i = 0; i < NUMCOMMANDS; i += 2) {
+	for (i = 0; i < NELEM(c_commands); i += 2) {
 	    strcat(message, c_commands[i]);
 	    strcat(message, " ");
 	}
@@ -89,7 +89,7 @@ static void print_help(char *arg)
 
 	Add_message(message);
     } else {
-	for (i = 0; i < NUMCOMMANDS; i++) {
+	for (i = 0; i < NELEM(c_commands); i++) {
 	    if (!strcmp(arg, c_commands[i]))
 		break;
 	}
@@ -121,6 +121,11 @@ static void print_help(char *arg)
 	case 8:		/* set */
 	case 9:		/* s */
 	    Add_message("'\\set <option> <value>' sets an option value. "
+			"[*Client reply*]");
+	    break;
+	case 10:	/* get */
+	case 11:	/* g */
+	    Add_message("'\\get <option>' gets an option value. "
 			"[*Client reply*]");
 	    break;
 	default:
@@ -181,12 +186,12 @@ void executeCommand(char *talk_str)
     if (i + 2 < strlen(talk_str))
 	strcpy(argument, &talk_str[i + 2]);
 
-    for (i = 0; i < NUMCOMMANDS; i++) {
+    for (i = 0; i < NELEM(c_commands); i++) {
 	if (!strcmp(command, c_commands[i]))
 	    break;
     }
 
-    if (i == NUMCOMMANDS) {
+    if (i == NELEM(c_commands)) {
 	Add_message("Invalid clientcommand. [*Client reply*]");
 	return;
     }
@@ -218,8 +223,17 @@ void executeCommand(char *talk_str)
 	Add_message("Not implemented. [*Client reply*]");
 #endif
 	break;
+    case 10:			/* get */
+    case 11:			/* g */
+#ifdef OPTIONHACK
+	Get_command(argument);
+#else
+	Add_message("Not implemented. [*Client reply*]");
+#endif
+	break;
     default:
-	warn("BUG: bad command num in executeCommand()");
+	warn("BUG: bad command num %d in executeCommand()", command_num);
+	assert(0);
 	break;
     }
 }
