@@ -730,7 +730,7 @@ static void sched_select_error(void)
  * Windows pumps this one time
  */
 
-unsigned long skip_to = 0;
+long skip_to = 0;
 
 #ifndef _WINDOWS
 void sched(void)

@@ -271,7 +271,7 @@ static void do_Autopilot (player_t *pl)
     int vad;	/* Velocity Away Delta */
     int dir, afterburners;
     vector_t gravity;
-    double acc, vel, delta, turnspeed, power;
+    double acc, vel, delta, turnspeed, power, a;
     const double emergency_thrust_settings_delta = 150.0 / FPS;
     const double auto_pilot_settings_delta = 15.0 / FPS;
     const double auto_pilot_turn_factor = 2.5;
@@ -327,12 +327,13 @@ static void do_Autopilot (player_t *pl)
      */
     if (vel == 0.0) {
 	if (gravity.x == 0 && gravity.y == 0)
-	    vad = pl->dir;
+	    a = pl->dir;
 	else
-	    vad = (int)findDir(-gravity.x, -gravity.y);
+	    a = findDir(-gravity.x, -gravity.y);
     } else
-	vad = (int)findDir(-pl->vel.x, -pl->vel.y);
+	a = findDir(-pl->vel.x, -pl->vel.y);
 
+    vad = MOD2((int) (a + 0.5), RES);
     vad = MOD2(vad - pl->dir, RES);
     if (vad > RES/2) {
 	vad = RES - vad;

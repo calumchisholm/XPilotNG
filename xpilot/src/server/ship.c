@@ -162,11 +162,8 @@ void Delta_mv_elastic(object_t *obj1, object_t *obj2)
 
 void Obj_repel(object_t *obj1, object_t *obj2, int repel_dist)
 {
-    double		xd, yd,
-			force, dm,
-			dvx1, dvy1,
-			dvx2, dvy2;
-    int			obj_theta;
+    double xd, yd, force, dm, dvx1, dvy1, dvx2, dvy2, a;
+    int obj_theta;
 
     xd = WRAP_DCX(obj2->pos.cx - obj1->pos.cx);
     yd = WRAP_DCY(obj2->pos.cy - obj1->pos.cy);
@@ -177,7 +174,8 @@ void Obj_repel(object_t *obj1, object_t *obj2, int repel_dist)
 
     force = MIN(force, 10);
 
-    obj_theta = (int)findDir(xd, yd);
+    a = findDir(xd, yd);
+    obj_theta = MOD2((int) (a + 0.5), RES);
 
     dm = obj1->mass / obj2->mass;
     dvx2 = tcos(obj_theta) * force * dm;

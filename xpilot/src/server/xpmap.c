@@ -1002,7 +1002,9 @@ void Xpmap_find_base_direction(world_t *world)
 	     */
 	    dir = DIR_UP;
 	else {
-	    dir = (int)findDir(-gravity.x, -gravity.y);
+	    double a = findDir(-gravity.x, -gravity.y);
+
+	    dir = MOD2((int) (a + 0.5), RES);
 	    dir = ((dir + RES/8) / (RES/4)) * (RES/4);	/* round it */
 	    dir = MOD2(dir, RES);
 	}

@@ -140,7 +140,7 @@ void Meta_update_max_size_tuner(world_t *world)
 {
     UNUSED_PARAM(world);
 
-    LIMIT(options.metaUpdateMaxSize, 1, sizeof(meta_update_string));
+    LIMIT(options.metaUpdateMaxSize, 1, (int) sizeof(meta_update_string));
 }
 
 void Meta_update(bool change)
