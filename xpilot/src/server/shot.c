@@ -1507,6 +1507,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     pulse->team 	= team;
     Object_position_init_clicks(OBJ_PTR(pulse), cx, cy);
 #define PulseSpeed 90.0
+#define PulseLength PULSE_LENGTH
     pulse->vel.x 	= PulseSpeed * tcos(dir);
     pulse->vel.y 	= PulseSpeed * tsin(dir);
     pulse->acc.x 	= 0;
@@ -1525,49 +1526,13 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     pulse->pl_radius 	= 0;
 
     pulse->dir  	= dir;
-    pulse->len  	= 128 * 10;
+    pulse->len  	= PulseLength;
     pulse->refl 	= false;
 
     Cell_add_object(OBJ_PTR(pulse));
 
     if (pl)
 	pl->num_pulses++;
-
-#if 0 /* laserhack */
-    player		*pl = ((ind == -1) ? NULL : Players[ind]);
-    pulse_t		*pulse;
-    int			life;
-
-    if (pl) {
-	Add_fuel(&(pl->fuel), (long)ED_LASER);
-	sound_play_sensors(cx, cy, FIRE_LASER_SOUND);
-	life = (int)PULSE_LIFE(pl->item[ITEM_LASER]);
-    } else {
-	life = (int)PULSE_LIFE(CANNON_PULSES);
-    }
-
-    if (NumPulses >= MAX_TOTAL_PULSES) {
-	return;
-    }
-    Pulses[NumPulses] = (pulse_t *)malloc(sizeof(pulse_t));
-    if (Pulses[NumPulses] == NULL) {
-	return;
-    }
-
-    pulse = Pulses[NumPulses];
-    pulse->id = (pl ? pl->id : NO_ID);
-    pulse->team = team;
-    pulse->dir = dir;
-    pulse->len = PULSE_LENGTH;
-    pulse->life = life;
-    pulse->mods = mods;
-    pulse->refl = false;
-    pulse->pos.cx = cx - (int)(PULSE_SPEED * tcos(dir) * timeStep2);
-    pulse->pos.cy = cy - (int)(PULSE_SPEED * tsin(dir) * timeStep2);
-    NumPulses++;
-    if (pl)
-	pl->num_pulses++;
-#endif
 }
 
 
