@@ -2,6 +2,7 @@ import re
 import os
 import wx
 import wx.lib.mixins.listctrl as listmix
+import serverui
 
 class OptionListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
 	def __init__(self, parent, ID, pos=wx.DefaultPosition,
@@ -149,7 +150,7 @@ class OptionsPanel(wx.Panel):
 class ClientOptionsPanel(OptionsPanel):
 	def __init__(self, parent, client, xpilotrc):
 		self.xpilotrc = xpilotrc
-		opts = parse_options([client, '-help'])
+		opts = parse_options(self, [client, '-help'])
 		if os.path.exists(xpilotrc):
 			vals = parse_xpilotrc(xpilotrc)
 			join_options_with_values(opts, vals)
@@ -166,10 +167,53 @@ class ClientOptionsPanel(OptionsPanel):
 					o.write(f)
 			f.close()
 
-class ServerOptionsPanel(OptionsPanel):
-	def __init__(self, parent, server):
+class ServerOptionsPanel(wx.Notebook):
+	def __init__(self, parent, client, server, mapdir):
+		wx.Notebook.__init__(self, parent, -1, style=wx.BOTTOM|wx.RIGHT)
+		self.SetBackgroundColour(wx.Color(0,0,128))
+		self.SetForegroundColour(wx.Color(255,255,255))
+		self.AddPage(BasicServerOptionsPanel(self, client, server, mapdir),
+					 "Basic")
+		self.AddPage(AdvancedServerOptionsPanel(self, client, server),
+					 "Advanced")
+					 
+class BasicServerOptionsPanel(wx.Panel):
+	def __init__(self, parent, client, server, mapdir):
+		wx.Panel.__init__(self, parent, -1)
+		self.client = client
 		self.server = server
-		opts = parse_options([server, '-help'])
+		self.mapdir = mapdir
+		sz1 = wx.BoxSizer(wx.HORIZONTAL)
+		l = wx.StaticText(self, -1, "Select a map:")
+		l.SetForegroundColour(wx.Color(255,255,255))
+		sz1.Add((0,0), wx.EXPAND, 0, 0)
+		sz1.Add(l, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+		maps = filter(lambda x: x[-4:-1] == '.xp' or x[-3:] == '.xp', 
+					  os.listdir(mapdir))
+		self.selected = maps[0]
+		self.choice = wx.Choice(self, -1, choices=maps)
+		self.Bind(wx.EVT_CHOICE, self.on_select, self.choice)
+		sz1.Add(self.choice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+		b = wx.Button(self, -1, "Start")
+		self.Bind(wx.EVT_BUTTON, self.start, b)
+		sz1.Add(b, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+		sz1.Add((0,0), wx.EXPAND, 0, 0)
+		self.SetSizer(sz1)
+	def on_select(self, evt):
+		self.selected = evt.GetString()
+	def start(self, evt):
+		opts = [self.server, '-map', os.path.join(self.mapdir, self.selected)]
+		console = serverui.Console(self, self.client)
+		server = serverui.Server(console, opts)
+		console.attach_server(server)
+		console.Show()
+		server.run()		
+		
+class AdvancedServerOptionsPanel(OptionsPanel):
+	def __init__(self, parent, client, server):
+		self.client = client
+		self.server = server
+		opts = parse_options(self, [server, '-help'])
 		sort_options(opts)
 		OptionsPanel.__init__(self, parent, opts, ('Start', self.start))
 		self.filter('[ Flags: command,')
@@ -185,7 +229,11 @@ class ServerOptionsPanel(OptionsPanel):
 				else:
 					opts.append('-' + o.names[0])
 					opts.append(o.value)
-		os.system(reduce(lambda x,y: x + ' ' + y, opts) + '&')
+		console = serverui.Console(self, self.client)
+		server = serverui.Server(console, opts)
+		console.attach_server(server)
+		console.Show()
+		server.run()
 
 class Option:
 	def __init__(self, names, type, desc, value):
@@ -203,30 +251,26 @@ class Option:
 	def write(self, f):
 		f.write('xpilot.' + self.names[0] + ': ' + self.value + '\n')
 
-class Popen:
-	def __init__(self, cmd):
-		self.stdout = os.popen2(cmd)[1]
-	def wait(self):
-		return 0
-
-def parse_options(cmd):
+def parse_options(win, cmd):
 	opts = []
 	r = re.compile('    -(/\+)?([^<]*)(<\w*>)?')
-	p = Popen(cmd)
-	for line in p.stdout:
-		m = r.match(line)
-		if not m: continue
-		if m.group(1): type = '<bool>'
-		elif m.group(3): type = m.group(3)
-		else: continue
-		names = [x for x in m.group(2).split() if x != 'or']
-		desc = ''
-		while 1:
-			line = p.stdout.next().strip()
-			if not line: break
-			desc += ' ' + line
-		opts.append(Option(names, type, desc.lstrip(), None))
-	p.wait()
+	p = os.popen(' '.join(cmd))
+	try:
+		for line in p:
+			m = r.match(line)
+			if not m: continue
+			if m.group(1): type = '<bool>'
+			elif m.group(3): type = m.group(3)
+			else: continue
+			names = [x for x in m.group(2).split() if x != 'or']
+			desc = ''
+			while 1:
+				line = p.next().strip()
+				if not line: break
+				desc += ' ' + line
+			opts.append(Option(names, type, desc.lstrip(), None))
+	finally:
+		p.close()
 	return opts
 
 def parse_xpilotrc(fn):
@@ -253,27 +297,3 @@ def join_options_with_values(opts, vals):
 
 def sort_options(opts):
 	opts.sort(lambda o1,o2: cmp(o1.names[0], o2.names[0]))
-
-
-class Frame(wx.Frame):
-	    def __init__(
-			self, parent, ID, title, pos=wx.DefaultPosition,
-            size=(800,600), style=wx.DEFAULT_FRAME_STYLE
-			):
-			wx.Frame.__init__(self, parent, ID, title, pos, size, style)
-			box = wx.BoxSizer(wx.VERTICAL)
-			box.Add(ClientOptionsPanel(
-					self, 'xpilot-ng-sdl', os.environ['HOME'] + '/.xpilotrc'),
-					wx.EXPAND, wx.EXPAND, 0, 0)
-			self.SetSizer(box)
-
-class App(wx.App):
-	def OnInit(self):
-		frame = Frame(None, -1, "")
-		self.SetTopWindow(frame)
-		frame.Show(True)
-		return True
-
-if __name__ == '__main__':
-	app = App(0)
-	app.MainLoop()

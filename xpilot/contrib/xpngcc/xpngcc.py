@@ -8,6 +8,8 @@ import metaui
 import config
 import options
 import ircui
+import xputil
+import serverui
 
 nick = None
 def get_nick():
@@ -20,15 +22,6 @@ def get_nick():
 		nick = os.environ['USER']
 	return nick
 
-def launch(parent, program):
-	rv = os.system(program + "&")
-	# unfortunately this doesn't work with &
-	if rv:
-		wx.MessageDialog(parent, 
-						 "Program %s failed with error %d." 
-						 % (program, rv), "Error", 
-						 wx.OK|wx.ICON_ERROR).ShowModal()
-
 class RecordingsPanel(html.HtmlWindow):
 	def __init__(self, parent):
 		html.HtmlWindow.__init__(self, parent)
@@ -36,7 +29,7 @@ class RecordingsPanel(html.HtmlWindow):
 		self.LoadPage(self.baseurl)
 	def OnLinkClicked(self, link):
 		file = urllib.urlretrieve(self.baseurl + link.GetHref())[0]
-		launch(self, "%s %s" % (config.xpreplay, file))
+		xputil.Process(self, (config.xpreplay, file)).run()
 
 class MenuPanel(wx.Panel):
 	def __init__(self, parent, items):
@@ -87,9 +80,9 @@ class  MapEditorMenu(MenuPanel):
 							 ("Block map editor", self.onBlock),
 							 ])
 	def onPoly(self, evt):
-		launch(self, "%s %s" % (config.javaws, config.jxpmap_url))
+		xputil.Process(self, (config.javaws, config.jxpmap_url)).run()
 	def onBlock(self, evt):
-		launch(self, config.mapedit)
+		xputil.Process(self, (config.mapedit,)).run()
 
 class ToolsMenu(MenuPanel):
 	def __init__(self, parent):
@@ -108,7 +101,7 @@ class ToolsMenu(MenuPanel):
             None, message="Choose a recording", defaultDir=os.getcwd(), 
             defaultFile="", wildcard="*.xpr*", style=wx.OPEN | wx.CHANGE_DIR)
 		if dlg.ShowModal() == wx.ID_OK:
-			launch(self, "%s %s" % (config.replay, dlg.GetPath()))
+			xputil.Process(self, (config.xpreplay, dlg.GetPath())).run()
 	def onClientConfig(self, evt):
 		self.show(options.ClientOptionsPanel(
 				self.frame, config.client, config.xpilotrc))
@@ -124,7 +117,9 @@ class MainMenu(MenuPanel):
 							 ("Quit", self.onQuit),
 							 ])
 	def onInternet(self, evt):
-		meta = metaui.Panel(self.frame)
+		meta = metaui.Panel(self.frame,
+							config.meta,
+							xputil.Client(self, config.client))
 		self.show(meta)
 		meta.RefreshList()
 	def onTools(self, evt):
@@ -133,7 +128,10 @@ class MainMenu(MenuPanel):
 		self.frame.Close()
 	def onStart(self, evt):
 		self.show(options.ServerOptionsPanel(
-				self.frame, config.server))
+				self.frame, 
+				xputil.Client(self, config.client), 
+				config.server,
+				'/opt2/projects/xpilot/lib/maps'))
 	def onChat(self, evt):
 		self.show(ircui.IrcPanel(self.frame, config.irc_server, get_nick(), 
 								 config.irc_channel))

@@ -4,7 +4,53 @@ import sys
 import os
 import wx
 import wx.lib.mixins.listctrl as listmix
-import meta
+import socket
+import StringIO
+from string import atoi
+
+def fetch(meta):
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	try:
+		s.connect(meta)
+		data = ""
+		while True:
+			buf = s.recv(1024)
+			if not buf:	return parse(data)
+			data += buf
+	finally:
+		s.close()
+		
+def parse(data):
+	lines = StringIO.StringIO(data).readlines()
+	servers = []
+	for line in lines: servers.append(Server(line.decode('iso-8859-1')))
+	return servers
+
+class Server:
+	def __init__(self, line):
+		self.line = line.strip()
+		fields = self.line.split(":")
+		self.version = fields[0]
+		self.host = fields[1]
+		self.port = atoi(fields[2])
+		self.count = atoi(fields[3])
+		self.mapname = fields[4]
+		self.mapsize = fields[5]
+		self.author = fields[6]
+		self.status = fields[7]
+		self.bases = atoi(fields[8])
+		self.fps = atoi(fields[9])
+		self.playlist = fields[10]
+		self.sound = fields[11]
+		self.teambases = atoi(fields[13])
+		self.uptime = atoi(fields[12])
+		self.timing = fields[14]
+		self.ip = fields[15]
+		self.freebases = fields[16]
+		self.queue = atoi(fields[17])
+        
+	def __str__(self):
+		return "Server:" + self.line
 
 class AutoSizeListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
 	def __init__(self, parent, ID, pos=wx.DefaultPosition,
@@ -13,8 +59,10 @@ class AutoSizeListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
 		listmix.ListCtrlAutoWidthMixin.__init__(self)
 
 class Panel(wx.Panel):
-	def __init__(self, parent):
+	def __init__(self, parent, meta, client):
 		wx.Panel.__init__(self, parent, -1)
+		self.meta = meta
+		self.client = client
 		self.serverList = AutoSizeListCtrl(self, -1)
 		for label in [ "Server", "Version", "#", "Map" ]:
 			self.serverList.InsertColumn(sys.maxint, label)
@@ -50,7 +98,7 @@ class Panel(wx.Panel):
 	def RefreshList(self):
 		list = self.serverList
 		list.DeleteAllItems()
-		self.servers = meta.fetch()
+		self.servers = fetch(self.meta)
 		self.servers.sort(lambda x, y: y.count-x.count)
 		row = 0
 		for server in self.servers:
@@ -82,20 +130,19 @@ class Panel(wx.Panel):
 			self.playerList.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 	
 	def OnJoin(self, evt):
-		os.system("xpilot-ng-x11 %s -port %d -join"
-				  % (self.selected.ip, self.selected.port))
+		if self.client: 
+			self.client.join(self.selected.ip, self.selected.port)
 	
 	def OnRefresh(self, evt):
 		self.RefreshList()
 		
-
 class Frame(wx.Frame):
 	    def __init__(
 			self, parent, ID, title, pos=wx.DefaultPosition,
             size=(800,600), style=wx.DEFAULT_FRAME_STYLE
 			):
 			wx.Frame.__init__(self, parent, ID, title, pos, size, style)
-			panel = Panel(self)
+			panel = Panel(self, ("meta.xpilot.org", 4401), None)
 			panel.RefreshList()
 			box = wx.BoxSizer(wx.HORIZONTAL)
 			box.Add(panel, wx.EXPAND, wx.EXPAND, 0, 0)

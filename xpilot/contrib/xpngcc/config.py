@@ -1,5 +1,6 @@
 import os
 
+meta = ('meta.xpilot.org', 4401)
 client = 'xpilot-ng-x11'
 server = 'xpilot-ng-server'
 xpilotrc = os.environ['HOME'] + '/.xpilotrc'
