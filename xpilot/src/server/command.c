@@ -113,8 +113,7 @@ static void Send_info_about_player(player * pl)
 	pl_i = Players(i);
 	if (pl_i->conn != NULL) {
 	    Send_team(pl_i->conn, pl->id, pl->team);
-	    Send_score(pl_i->conn, pl->id, pl->score, (int)pl->life,
-		       pl->mychar, pl->alliance);
+	    updateScores = true;
 	    if (pl->home_base != NULL)
 		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
