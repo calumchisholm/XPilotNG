@@ -347,13 +347,9 @@ static bool Really_empty_space(player *pl, int x, int y)
     int delta = BLOCK_CLICKS / 4;
     int inside = 0, outside = 0;
     int hitmask = NONBALL_BIT; /* kps - ok ? */
-    int	type = World.block[x][y];
-
-    if (!is_polygon_map && useOldCode)
-	goto blockbased;
 
     /*
-     * kps hack - check a few positions inside the block, if only a few of them
+     * kps hack - check a few positions inside the block, if none of them
      * are inside, assume it is empty
      */
     cx = BLOCK_CENTER(x);
@@ -374,7 +370,9 @@ static bool Really_empty_space(player *pl, int x, int y)
     return true;
 
 
- blockbased:
+    /* blockbased:
+
+       int	type = World.block[x][y];
 
     if (EMPTY_SPACE(type))
 	return true;
@@ -417,7 +415,7 @@ static bool Really_empty_space(player *pl, int x, int y)
     default:
 	break;
     }
-    return false;
+    return false;*/
 }
 
 static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
