@@ -116,8 +116,11 @@ static sound_t *sound_load(const char *filename, float gain)
 static void sound_free(sound_t *snd)
 {
     if (snd) {
+/* alDeleteBuffers hangs on linux sometimes */
+#ifdef _WINDOWS 
 	if (snd->buffer)
 	    alDeleteBuffers(1, &snd->buffer);
+#endif
 	if (snd->source)
 	    alDeleteSources(1, &snd->source);
 	free(snd);
@@ -183,5 +186,7 @@ void audioDeviceFree(void *private)
 
 void audioDeviceClose() 
 {
+#ifdef _WINDOWS /* alutExit hangs on linux sometimes */
     alutExit();
+#endif
 }
