@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -22,8 +21,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef LIST_H_INCLUDED
-#define LIST_H_INCLUDED
+#ifndef LIST_H
+#define LIST_H
 
 /*
  * A double linked list similar to the STL list, but implemented in C.

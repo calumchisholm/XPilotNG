@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -25,8 +24,8 @@
 /*
  * Include portability related stuff in one file.
  */
-#ifndef PORTABILITY_H_INCLUDED
-#define PORTABILITY_H_INCLUDED
+#ifndef PORTABILITY_H
+#define PORTABILITY_H
 
 #ifdef _WINDOWS
 #undef max
@@ -38,36 +37,6 @@
 #pragma warning (disable : 4244)
 
 #endif /* _WINDOWS */
-
-/*
- * Portability fixes for Sony NeWS.
- */
-#ifdef sony_news
-#define setvbuf(A,B,C,D)	setlinebuf(A)
-
-typedef unsigned int    sigset_t;
-
-#define sigemptyset(set)        (*(set) = 0)
-#define sigfillset(set)         (*(set) = ~(sigset_t)0, 0)
-#define sigaddset(set,signo)    (*(set) |= sigmask(signo), 0)
-#define sigdelset(set,signo)    (*(set) &= ~sigmask(signo), 0)
-#define sigismember(set,signo)  ((*(set) & sigmask(signo)) != 0)
-
-#define SIG_BLOCK		1
-#define SIG_UNBLOCK		2
-#define SIG_SETMASK		3
-
-extern int sigprocmask(int how, const sigset_t *set, sigset_t *oset);
-
-/*
- * Sony NEWS doesn't have sigaction(), using sigvec() instead.
- */
-#define sigaction	sigvec
-#define sa_handler	sv_handler
-#define sa_mask		sv_mask
-#define sa_flags	sv_flags
-
-#endif
 
 /*
  * In Windows, just exiting won't tell the user the reason.
@@ -110,14 +79,9 @@ extern int Get_process_id(void);	/* getpid */
 extern void Get_login_name(char *buf, int size);
 
 /*
- * Prototypes for other (ANSI C library) wrapper functions.
- */
-extern void move_memory(void *dst, void *src, size_t len);
-
-/*
  * Prototypes for testing if we are running under a certain OS.
  */
-extern int is_this_windows(void);
+extern bool is_this_windows(void);
 
 
 /*
@@ -128,4 +92,4 @@ double rint(double x);
 #endif
 
 
-#endif /* PORTABILITY_H_INCLUDED */
+#endif /* PORTABILITY_H */

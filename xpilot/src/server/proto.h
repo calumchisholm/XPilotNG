@@ -29,7 +29,7 @@
 #include "object.h"
 #endif
 
-#ifndef LIST_H_INCLUDED
+#ifndef LIST_H
 /* need list_t */
 #include "list.h"
 #endif
