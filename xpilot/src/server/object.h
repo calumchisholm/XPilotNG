@@ -183,6 +183,7 @@ struct _cell_node {
 #define OBJECT_BASE	\
     short		id;		/* For shots => id of player */	\
     uint16_t		team;		/* Team of player or cannon */	\
+/* Object position pos must only be changed with the proper functions! */ \
     clpos		pos;		/* World coordinates */		\
     clpos		prevpos;	/* previous position */		\
     clpos		extmove;	/* For collision detection */	\

@@ -185,9 +185,12 @@ static void tryToSetShipShape(void)
     FILE *fp;
     char *ptr, *str, line[1024], *ss_candidate = NULL;
 
-    /* If there is already a ship shape, let's not change that. */
+    /*
+     * Let's allow overriding shipshape with another. E.g the first
+     * one is from xpilotrc, the other from command line.
+     */
     if (shipShape)
-	return;
+	xp_free(shipShape);
 
     /* If there is no shipShapeSetting, there is nothing we can do. */
     if (shipShapeSetting == NULL || strlen(shipShapeSetting) == 0)
@@ -203,10 +206,10 @@ static void tryToSetShipShape(void)
     if (is_shape) {
 	valid = Validate_shape_str(shipShapeSetting);
 	if (valid) {
-	    shipShape = shipShapeSetting;
-	    xpprintf("Your shipShape was valid. Have a nice day.\n");
+	    shipShape = xp_safe_strdup(shipShapeSetting);
+	    xpprintf("Your shipShape is valid. Have a nice day.\n");
 	} else
-	    warn("Your shipShape wasn't valid. Please fix.");
+	    warn("Your shipShape isn't valid. Please fix it.");
 	return;
     }
 
@@ -219,7 +222,7 @@ static void tryToSetShipShape(void)
 
     fp = fopen(shipShapeFile, "r");
     if (!fp) {
-	error("Can't open shipShapeFile %s", shipShapeFile);
+	error("Can't open shipShapeFile \"%s\".", shipShapeFile);
 	return;
     }
 
@@ -245,7 +248,7 @@ static void tryToSetShipShape(void)
     fclose(fp);
 
     if (!ss_candidate) {
-	warn("Could not find your ship \"%s\" in shipShapeFile %s.",
+	warn("Could not find the ship \"%s\" in shipShapeFile %s.",
 	     shipShapeSetting, shipShapeFile);
 	return;
     }
@@ -256,7 +259,7 @@ static void tryToSetShipShape(void)
 	shipShape = ss_candidate;
     } else {
 	xp_free(ss_candidate);
-	warn("Your shipShape \"%s\" wasn't valid. Please fix.",
+	warn("Your shipShape \"%s\" isn't valid. Please fix it.",
 	     shipShapeSetting);
     }
 }
