@@ -22,6 +22,7 @@
  */
 
 /* Changelog: CB Added metaserver interface improvements */
+/*            CB Fixed Warnings                          */
 
 #include "xpclient.h"
 
@@ -1275,6 +1276,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
     int increment = 0;
     char *p = NULL;
     char *playslist = xp_strdup(sip->playlist);
+    static char longest_text[] = "                              ";
 
     struct Label {
 	const char *label;
@@ -1316,7 +1318,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
     label_border = 1;
     label_space = 5;
     label_height = textFont->ascent + textFont->descent + 5;
-    static char longest_text[] = "                              ";
+ 
     data_label_width =  XTextWidth(buttonFont,longest_text,strlen(longest_text));
     player_label_width = 500;
     max_label_width = 0;
@@ -1595,7 +1597,9 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     int all_offset = 0;
     server_info_t *sip;
     list_iter_t start_server_it = server_it;
-
+    static char next_text[] = "Next Server Page >>>";
+    static char first_text[] = "<< First Server Page";
+    static char ping_text[] = "Ping Servers";
 
     Widget_get_dimensions(subform_widget, &subform_width, &subform_height);
 
@@ -1746,9 +1750,7 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     }
 
     int height_avail = subform_height - yoff;
-    static char next_text[] = "Next Server Page >>>";
-    static char first_text[] = "<< First Server Page";
-    static char ping_text[] = "Ping Servers";
+ 
     int next_border = border ? border : 1;
     int first_border = next_border;
     int next_width = XTextWidth(buttonFont,
@@ -1766,11 +1768,8 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     
     int next_height = label_height + 2 * (next_border - border);
     int first_height = next_height;
-    int ping_height = next_height;
-    int next_x_offset = ping_offset;
-    int next_y_offset = yoff + (height_avail - next_height + 1) / 2;
-    
-    
+
+
     if (!next_page_widget)
       next_page_widget = 
 	Widget_create_activate(form_widget,
