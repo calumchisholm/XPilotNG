@@ -77,7 +77,7 @@ extern GLWidget *MainWidget;
     
 /* should free any resources committed by the init_foo function */
 void Close_Widget ( GLWidget **widget );
-void Close_WidgetTree ( GLWidget **widget );
+/*void Close_WidgetTree ( GLWidget **widget );*/
 /* to reshape the widget, and automagically reshape and place sub-widgets */
 void SetBounds_GLWidget(GLWidget *wid, SDL_Rect *b );
 /* Initializes the appropriate config widget (if implemented), returns NULL otherwise */
@@ -89,6 +89,8 @@ bool DelGLWidgetListItem( GLWidget **list, GLWidget *widget );
 
 void DrawGLWidgets( GLWidget *list );
 GLWidget *FindGLWidget( GLWidget *list, Uint16 x,Uint16 y );
+void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h);
+GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
 
 extern GLWidget *target[NUM_MOUSE_BUTTONS];
 extern GLWidget *hovertarget;
@@ -421,6 +423,7 @@ extern GLWidget *Init_ScorelistWidget( void );
 /**********************/
 #define MAINWIDGET 15
 typedef struct {
+    bool	showconf;
     GLWidget	*confmenu;
     GLWidget	*radar;
     GLWidget	*scorelist;
@@ -449,7 +452,7 @@ typedef struct {
     GLWidget	*cb;
 } ConfMenuWidget;
 
-GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );
+GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y );
 /***********************/
 /* End: ConfMenuWidget */
 /***********************/

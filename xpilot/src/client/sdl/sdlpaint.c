@@ -95,7 +95,7 @@ int Resize_Window( int width, int height )
     return 0;
 }
 
-void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
+static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
 {
     GLWidget *widget = (GLWidget *)data;
     if (state == SDL_PRESSED) {
@@ -116,7 +116,7 @@ void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
     }
 }
 
-void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
+static void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
 {
     if (scoreListMoving) {
 	((GLWidget *)data)->bounds.x = scoreListWin.x += xrel;
@@ -125,19 +125,19 @@ void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
 }
 
 
-void Scorelist_cleanup( GLWidget *widget )
+static void Scorelist_cleanup( GLWidget *widget )
 {
     TTF_CloseFont(scoreListFont);
     sdl_window_destroy(&scoreListWin);
 }
 
-void SetBounds_ScoreList(GLWidget *widget, SDL_Rect *b )
+static void SetBounds_ScoreList(GLWidget *widget, SDL_Rect *b )
 {
     widget->bounds.x = scoreListWin.x = b->x;
     widget->bounds.y = scoreListWin.y = b->y;
 }
 
-void Scorelist_paint(GLWidget *widget)
+static void Scorelist_paint(GLWidget *widget)
 {
     if (scoresChanged) {
 	/* This is the easiest way to track if

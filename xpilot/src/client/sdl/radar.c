@@ -37,9 +37,9 @@ static GLuint      radar_texture;     /* above as an OpenGL texture */
 static SDL_Rect    radar_bounds;
 static GLWidget    *radar_widget;
 
-void Radar_cleanup( GLWidget *widget );
+static void Radar_cleanup( GLWidget *widget );
 static void Radar_paint( GLWidget *widget );
-void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data);
+static void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data);
 
 #define RGBA(RGB) \
     ((RGB) & 0xff000000 ? (RGB) & 0xff000000 : 0xff000000 \
@@ -321,13 +321,13 @@ static void Radar_paint_checkpoint(GLWidget *radar)
     }    
 }
 
-void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
+static void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
 {
     ((GLWidget *)data)->bounds.x += xrel;
     ((GLWidget *)data)->bounds.y += yrel;
 }
 
-void button( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     GLWidget *widget = (GLWidget *)data;
     if (state == SDL_PRESSED) {
@@ -404,7 +404,7 @@ GLWidget *Init_RadarWidget(void)
     return tmp;
 }
 
-void Radar_cleanup( GLWidget *widget )
+static void Radar_cleanup( GLWidget *widget )
 {
     glDeleteTextures(1, &radar_texture);
     SDL_FreeSurface(radar_surface);

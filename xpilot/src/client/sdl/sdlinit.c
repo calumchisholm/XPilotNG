@@ -173,7 +173,7 @@ int Init_window(void)
 
 void Quit(void)
 {
-    Close_WidgetTree(&MainWidget);
+    Close_Widget(&MainWidget);
     Gui_cleanup();
     Console_cleanup();
     fontclean(&gamefont);

@@ -29,9 +29,8 @@
 /* BEGIN: Main GLWidget stuff	    	    	    */
 /****************************************************/
 
-void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h );
-GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
-void option_callback( void *opt, const char *value );
+static void option_callback( void *opt, const char *value );
+static void confmenu_callback( GLWidget *widget, xp_option_t *opt );
 
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
@@ -62,7 +61,7 @@ GLWidget *Init_EmptyBaseGLWidget( void )
 /* only supposed to take care of mallocs done on behalf of the
  * appropriate Init_<foo> function
  */
-void Close_WidgetTree ( GLWidget **widget )
+static void Close_WidgetTree ( GLWidget **widget )
 {
     if (!widget) return;
     if (!(*widget)) return;
@@ -89,7 +88,7 @@ void Close_Widget ( GLWidget **widget )
     	error("pointer passed to Close_Widget points to NULL !");
 	return;
     }
-
+    
     Close_WidgetTree( &((*widget)->children) );
 
     if ((*widget)->Close) (*widget)->Close(*widget);
@@ -122,7 +121,7 @@ void SetBounds_GLWidget( GLWidget *widget, SDL_Rect *b )
     }
 }
 
-void option_callback( void *tmp, const char *value )
+static void option_callback( void *tmp, const char *value )
 {
     xp_option_t *opt;
     
@@ -174,7 +173,7 @@ GLWidget *Init_OptionWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor 
 	    break;
     	case xp_string_option:
 	    if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_COLORS)
-	    	return Init_ColorModWidget(opt->name,opt->private_data,fgcolor,bgcolor,option_callback,opt);
+	    	return Init_ColorChooserWidget(opt->name,opt->private_data,fgcolor,bgcolor,option_callback,opt);
 	    break;
     	default:
 	    break;
@@ -349,10 +348,10 @@ GLWidget *FindGLWidget( GLWidget *list, Uint16 x, Uint16 y )
 /**********************/
 /* Begin:  ArrowWidget*/
 /**********************/
-void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-void Paint_ArrowWidget( GLWidget *widget );
+static void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void Paint_ArrowWidget( GLWidget *widget );
 
-void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     ArrowWidget *tmp;
     
@@ -374,7 +373,7 @@ void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *
     }
 }
 
-void Paint_ArrowWidget( GLWidget *widget )
+static void Paint_ArrowWidget( GLWidget *widget )
 {
     GLWidget *tmp;
     SDL_Rect *b;
@@ -470,10 +469,10 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction,int width, int height,
 /**********************/
 /* Begin:  ButtonWidget*/
 /**********************/
-void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-void Paint_ButtonWidget( GLWidget *widget );
+static void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void Paint_ButtonWidget( GLWidget *widget );
 
-void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     ButtonWidget *tmp;
     
@@ -485,14 +484,9 @@ void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void 
 	    if (tmp->action) tmp->action(tmp->actiondata);
 	}
     }
-    if (state == SDL_RELEASED) {
-	if (button == 1) {
-    	    tmp->pressed = false;
-	}
-    }
 }
 
-void Paint_ButtonWidget( GLWidget *widget )
+static void Paint_ButtonWidget( GLWidget *widget )
 {
     ButtonWidget *wid_info;
     int color;
@@ -504,6 +498,7 @@ void Paint_ButtonWidget( GLWidget *widget )
     	if (wid_info->pressed_color)
 	    color = *(wid_info->pressed_color);
 	else color = redRGBA;
+	wid_info->pressed = false;
     } else {
     	if (wid_info->normal_color)
 	    color = *(wid_info->normal_color);
@@ -551,10 +546,10 @@ GLWidget *Init_ButtonWidget( Uint32 *normal_color, Uint32 *pressed_color, void (
 /**********************/
 /* Begin: SlideWidget*/
 /**********************/
-void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
-void Paint_SlideWidget( GLWidget *widget );
+static void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
+static void Paint_SlideWidget( GLWidget *widget );
 
-void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
+static void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
 {
     SlideWidget *tmp;
     
@@ -574,7 +569,7 @@ void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *da
     }
 }
 
-void Paint_SlideWidget( GLWidget *widget )
+static void Paint_SlideWidget( GLWidget *widget )
 {
     GLWidget *tmp;
     SDL_Rect *b;
@@ -650,13 +645,13 @@ GLWidget *Init_SlideWidget( bool locked,
 /*************************/
 /* Begin: ScrollbarWidget*/
 /*************************/
-void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data );
-void release_ScrollbarWidget( void *releasedata );
-void Paint_ScrollbarWidget( GLWidget *widget );
-void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b );
-void Close_ScrollbarWidget ( GLWidget *widget );
+static void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data );
+static void release_ScrollbarWidget( void *releasedata );
+static void Paint_ScrollbarWidget( GLWidget *widget );
+static void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b );
+static void Close_ScrollbarWidget ( GLWidget *widget );
 
-void Close_ScrollbarWidget ( GLWidget *widget )
+static void Close_ScrollbarWidget ( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=SCROLLBARWIDGET) {
@@ -665,7 +660,7 @@ void Close_ScrollbarWidget ( GLWidget *widget )
     }
 }
 
-void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b )
 {
     ScrollbarWidget *tmp;
     SDL_Rect sb;
@@ -705,7 +700,7 @@ void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b )
     SetBounds_GLWidget(tmp->slide,&sb);
 }
 
-void Paint_ScrollbarWidget( GLWidget *widget )
+static void Paint_ScrollbarWidget( GLWidget *widget )
 {
     static Uint32 bgcolor  = 0x00000044;
     SDL_Rect *b = &(widget->bounds);
@@ -720,7 +715,7 @@ void Paint_ScrollbarWidget( GLWidget *widget )
     glEnd();
 }
 
-void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data )
+static void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data )
 {
     GLWidget *tmp;
     ScrollbarWidget *wid_info;
@@ -774,7 +769,7 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
     	wid_info->poschange(wid_info->pos,wid_info->poschangedata);
 }
 
-void release_ScrollbarWidget( void *releasedata )
+static void release_ScrollbarWidget( void *releasedata )
 {
     GLWidget *tmp;
     ScrollbarWidget *wid_info;
@@ -850,10 +845,10 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWi
 /***********************/
 /* Begin:  LabelWidget*/
 /***********************/
-void Paint_LabelWidget( GLWidget *widget );
-void Close_LabelWidget ( GLWidget *widget );
+static void Paint_LabelWidget( GLWidget *widget );
+static void Close_LabelWidget ( GLWidget *widget );
 
-void Close_LabelWidget( GLWidget *widget )
+static void Close_LabelWidget( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=LABELWIDGET) {
@@ -882,7 +877,7 @@ bool LabelWidget_SetColor( GLWidget *widget , Uint32 *fgcolor, Uint32 *bgcolor )
     
     return true;
 }
-void Paint_LabelWidget( GLWidget *widget )
+static void Paint_LabelWidget( GLWidget *widget )
 {
     GLWidget *tmp;
     SDL_Rect *b;
@@ -976,10 +971,10 @@ GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor,
 /***********************************/
 /* Begin:  LabeledRadiobuttonWidget*/
 /***********************************/
-void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-void Paint_LabeledRadiobuttonWidget( GLWidget *widget );
+static void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void Paint_LabeledRadiobuttonWidget( GLWidget *widget );
 
-void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     LabeledRadiobuttonWidget *tmp;
     if (!data) return;
@@ -995,7 +990,7 @@ void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uin
     }
 }
 
-void Paint_LabeledRadiobuttonWidget( GLWidget *widget )
+static void Paint_LabeledRadiobuttonWidget( GLWidget *widget )
 {
     GLWidget *tmp;
     SDL_Rect *b;
@@ -1072,16 +1067,16 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
 /*****************************/
 /* Begin:  BoolChooserWidget */
 /*****************************/
-void Paint_BoolChooserWidget( GLWidget *widget );
-void BoolChooserWidget_SetValue( bool state, void *data );
-void Close_BoolChooserWidget ( GLWidget *widget );
-void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b );
+static void Paint_BoolChooserWidget( GLWidget *widget );
+static void BoolChooserWidget_SetValue( bool state, void *data );
+static void Close_BoolChooserWidget ( GLWidget *widget );
+static void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b );
 
 static int num_BoolChooserWidget = 0;
 static string_tex_t *BoolChooserWidget_ontex = NULL;
 static string_tex_t *BoolChooserWidget_offtex = NULL;
 
-void Close_BoolChooserWidget( GLWidget *widget )
+static void Close_BoolChooserWidget( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=BOOLCHOOSERWIDGET) {
@@ -1100,7 +1095,7 @@ void Close_BoolChooserWidget( GLWidget *widget )
     }
 }
 
-void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     GLWidget *tmp;
     SDL_Rect b2;
@@ -1136,7 +1131,7 @@ void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b )
     SetBounds_GLWidget(tmp,&b2);
 }
 
-void BoolChooserWidget_SetValue( bool state, void *data )
+static void BoolChooserWidget_SetValue( bool state, void *data )
 {
     GLWidget *wid;
     BoolChooserWidget *wi;
@@ -1162,14 +1157,25 @@ void BoolChooserWidget_SetValue( bool state, void *data )
     	wi->callback( wi->data, NULL );
 }
 
-void Paint_BoolChooserWidget( GLWidget *widget )
+static void Paint_BoolChooserWidget( GLWidget *widget )
 {
     /*static int name_color   = 0xffff66ff;*/
     BoolChooserWidget *wid_info;
 
-    if (!widget) return;
+    if (!widget) {
+    	error("Paint_BoolChooserWidget: widget missing!");
+	return;
+    }
     
-    if ( !(wid_info = (BoolChooserWidget *)(widget->wid_info))) return;
+    if ( widget->WIDGET != BOOLCHOOSERWIDGET ) {
+    	error("Paint_BoolChooserWidget: wrong type of widget!");
+	return;
+    }
+    
+    if ( !(wid_info = (BoolChooserWidget *)(widget->wid_info)) ) {
+    	error("Paint_BoolChooserWidget: wid_info missing!");
+	return;
+    }
 
     if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
     	set_alphacolor( *(wid_info->bgcolor) );
@@ -1284,13 +1290,13 @@ GLWidget *Init_BoolChooserWidget( const char *name, bool *value, Uint32 *fgcolor
 /***************************/
 /* Begin: IntChooserWidget */
 /***************************/
-void IntChooserWidget_Add( void *data );
-void IntChooserWidget_Subtract( void *data );
-void Paint_IntChooserWidget( GLWidget *widget );
-void Close_IntChooserWidget ( GLWidget *widget );
-void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b );
+static void IntChooserWidget_Add( void *data );
+static void IntChooserWidget_Subtract( void *data );
+static void Paint_IntChooserWidget( GLWidget *widget );
+static void Close_IntChooserWidget ( GLWidget *widget );
+static void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b );
 
-void Close_IntChooserWidget ( GLWidget *widget )
+static void Close_IntChooserWidget ( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=INTCHOOSERWIDGET) {
@@ -1301,7 +1307,7 @@ void Close_IntChooserWidget ( GLWidget *widget )
     free_string_texture( &(((IntChooserWidget *)widget->wid_info)->valuetex) );
 }
 
-void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     IntChooserWidget *tmp;
     GLWidget *tmp2;
@@ -1340,7 +1346,7 @@ void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b )
     SetBounds_GLWidget(tmp2,&b2);
 }
 
-void IntChooserWidget_Add( void *data )
+static void IntChooserWidget_Add( void *data )
 {
     IntChooserWidget *tmp;
     char valuetext[16];
@@ -1374,7 +1380,7 @@ void IntChooserWidget_Add( void *data )
     }
 }
 
-void IntChooserWidget_Subtract( void *data )
+static void IntChooserWidget_Subtract( void *data )
 {
     IntChooserWidget *tmp;
     int step;
@@ -1408,7 +1414,7 @@ void IntChooserWidget_Subtract( void *data )
     }
 }
 
-void Paint_IntChooserWidget( GLWidget *widget )
+static void Paint_IntChooserWidget( GLWidget *widget )
 {
     IntChooserWidget *wid_info;
 
@@ -1541,13 +1547,13 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
 /******************************/
 /* Begin: DoubleChooserWidget */
 /******************************/
-void DoubleChooserWidget_Add( void *data );
-void DoubleChooserWidget_Subtract( void *data );
-void Paint_DoubleChooserWidget( GLWidget *widget );
-void Close_DoubleChooserWidget ( GLWidget *widget );
-void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b );
+static void DoubleChooserWidget_Add( void *data );
+static void DoubleChooserWidget_Subtract( void *data );
+static void Paint_DoubleChooserWidget( GLWidget *widget );
+static void Close_DoubleChooserWidget ( GLWidget *widget );
+static void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b );
 
-void Close_DoubleChooserWidget ( GLWidget *widget )
+static void Close_DoubleChooserWidget ( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=DOUBLECHOOSERWIDGET) {
@@ -1558,7 +1564,7 @@ void Close_DoubleChooserWidget ( GLWidget *widget )
     free_string_texture( &(((DoubleChooserWidget *)widget->wid_info)->valuetex) );
 }
 
-void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     DoubleChooserWidget *tmp;
     GLWidget *tmp2;
@@ -1597,7 +1603,7 @@ void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b )
     SetBounds_GLWidget(tmp2,&b2);
 }
 
-void DoubleChooserWidget_Add( void *data )
+static void DoubleChooserWidget_Add( void *data )
 {
     DoubleChooserWidget *tmp;
     double step;
@@ -1631,7 +1637,7 @@ void DoubleChooserWidget_Add( void *data )
     }
 }
 
-void DoubleChooserWidget_Subtract( void *data )
+static void DoubleChooserWidget_Subtract( void *data )
 {
     DoubleChooserWidget *tmp;
     double step;
@@ -1665,7 +1671,7 @@ void DoubleChooserWidget_Subtract( void *data )
     }
 }
 
-void Paint_DoubleChooserWidget( GLWidget *widget )
+static void Paint_DoubleChooserWidget( GLWidget *widget )
 {
     DoubleChooserWidget *wid_info;
 
@@ -1799,11 +1805,11 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
 /*****************************/
 /* Begin: ColorChooserWidget */
 /*****************************/
-void Paint_ColorChooserWidget( GLWidget *widget );
-void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b );
-void action_ColorChooserWidget(void *data);
+static void Paint_ColorChooserWidget( GLWidget *widget );
+static void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b );
+static void action_ColorChooserWidget(void *data);
 
-void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     ColorChooserWidget *tmp;
     GLWidget *tmp2;
@@ -1840,7 +1846,7 @@ void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
     SetBounds_GLWidget(tmp2,&b2);
 }
 
-void Paint_ColorChooserWidget( GLWidget *widget )
+static void Paint_ColorChooserWidget( GLWidget *widget )
 {
     ColorChooserWidget *wid_info;
 
@@ -1867,7 +1873,7 @@ void Paint_ColorChooserWidget( GLWidget *widget )
     }
 }
 
-void action_ColorChooserWidget(void *data)
+static void action_ColorChooserWidget(void *data)
 {
     ColorChooserWidget *wid_info;
     GLWidget *widget;
@@ -1888,8 +1894,8 @@ void action_ColorChooserWidget(void *data)
     	error("action_ColorChooserWidget: wid_info missing");
 	return;
     }
-
-    xpprintf("action_ColorChooserWidget!\n");
+    
+    confmenu_callback(widget,(xp_option_t *)(wid_info->data));
 }
 
 GLWidget *Init_ColorChooserWidget( const char *name, Uint32 *value, Uint32 *fgcolor, Uint32 *bgcolor,
@@ -1953,11 +1959,11 @@ GLWidget *Init_ColorChooserWidget( const char *name, Uint32 *value, Uint32 *fgco
 /*****************************/
 /* Begin: ColorModWidget */
 /*****************************/
-void Paint_ColorModWidget( GLWidget *widget );
-void SetBounds_ColorModWidget( GLWidget *widget, SDL_Rect *b );
-void Callback_ColorModWidget(void *tmp, const char *value);
+static void Paint_ColorModWidget( GLWidget *widget );
+static void SetBounds_ColorModWidget( GLWidget *widget, SDL_Rect *b );
+static void Callback_ColorModWidget(void *tmp, const char *value);
 
-void SetBounds_ColorModWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_ColorModWidget( GLWidget *widget, SDL_Rect *b )
 {
     ColorModWidget *wi;
     GLWidget *tmp2;
@@ -2026,7 +2032,7 @@ void SetBounds_ColorModWidget( GLWidget *widget, SDL_Rect *b )
     SetBounds_GLWidget(tmp2,&b2);
 }
 
-void Paint_ColorModWidget( GLWidget *widget )
+static void Paint_ColorModWidget( GLWidget *widget )
 {
     ColorModWidget *wid_info;
     SDL_Rect b;
@@ -2099,7 +2105,7 @@ void Paint_ColorModWidget( GLWidget *widget )
     glEnd();
 }
 
-void Callback_ColorModWidget(void *tmp, const char *value)
+static void Callback_ColorModWidget(void *tmp, const char *value)
 {
     GLWidget *widget;
     ColorModWidget *wid_info;
@@ -2220,15 +2226,15 @@ GLWidget *Init_ColorModWidget( const char *name, Uint32 *value, Uint32 *fgcolor,
 
     return tmp;
 }
-/***************************/
-/* End: ColorChooserWidget */
-/***************************/
+/***********************/
+/* End: ColorModWidget */
+/***********************/
 
 /**********************/
 /* Begin: ListWidget  */
 /**********************/
-void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b );
-void Paint_ListWidget( GLWidget *widget );
+static void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b );
+static void Paint_ListWidget( GLWidget *widget );
 
 bool ListWidget_Append( GLWidget *list, GLWidget *item )
 {
@@ -2527,7 +2533,7 @@ GLWidget *ListWidget_GetItemByIndex( GLWidget *list, int i )
 }
 
 
-void Paint_ListWidget( GLWidget *widget )
+static void Paint_ListWidget( GLWidget *widget )
 {
     ListWidget *wid_info;
     GLWidget *curr;
@@ -2568,7 +2574,7 @@ void Paint_ListWidget( GLWidget *widget )
  * The only way to properly bound a ListWidget is to make a
  * bounding widget adopt it. (i.e. a scrollpane)
  */
-void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b )
 {
     ListWidget *tmp;
     SDL_Rect bounds,b2;
@@ -2680,10 +2686,10 @@ GLWidget *Init_ListWidget( Uint16 x, Uint16 y, Uint32 *bg1, Uint32 *bg2, Uint32 
 /****************************/
 /* Begin: ScrollPaneWidget  */
 /****************************/
-void ScrollPaneWidget_poschange( GLfloat pos , void *data );
-void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b );
+static void ScrollPaneWidget_poschange( GLfloat pos , void *data );
+static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b );
 
-void ScrollPaneWidget_poschange( GLfloat pos , void *data )
+static void ScrollPaneWidget_poschange( GLfloat pos , void *data )
 {
     GLWidget *widget;
     ScrollPaneWidget *wid_info;
@@ -2706,7 +2712,7 @@ void ScrollPaneWidget_poschange( GLfloat pos , void *data )
     }    
 }
 
-void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
+static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
 {
     ScrollPaneWidget *wid_info;
     SDL_Rect bounds;
@@ -2834,34 +2840,35 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 /**********************/
 /* Begin: MainWidget  */
 /**********************/
-void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
-void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
+static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
+static void Close_MainWidget( GLWidget *widget );
 
-void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     GLWidget *widget;
     WrapperWidget *wid_info;
+    SDL_Rect b;
     
     widget = (GLWidget *)data;
     wid_info = ((WrapperWidget *)widget->wid_info);
     if (state == SDL_PRESSED) {
-    	if (button != 1) {
-	    if (!wid_info->confmenu) {
-    	    	wid_info->confmenu = Init_ConfMenuWidget( wid_info->font, x, y );
-		if (!(wid_info->confmenu)) {
-		    error("failed to create conf menu!");
-		    return;
-		}
-		AppendGLWidgetList(&(widget->children), wid_info->confmenu);
+    	if (button == 2) {
+    	    if ((wid_info->showconf = !wid_info->showconf)) {
+    	    	AppendGLWidgetList(&(widget->children), wid_info->confmenu);
+		b.x = x;
+		b.y = y;
+		b.w = wid_info->confmenu->bounds.w;
+		b.h = wid_info->confmenu->bounds.h;
+		SetBounds_GLWidget(wid_info->confmenu,&b);
 	    } else {
-	    	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
-		Close_Widget(&(wid_info->confmenu));
-	    }
+    	    	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
+ 	    }
 	}
     }
 }
 
-void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
 {
     WrapperWidget *wid_info;
     SDL_Rect bs = {0,0,0,0},*bw;
@@ -2919,6 +2926,25 @@ void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     
 }
 
+static void Close_MainWidget( GLWidget *widget )
+{
+    WrapperWidget *wid_info;
+    
+    if (!widget) return;
+    if (widget->WIDGET != MAINWIDGET) {
+    	error("Wrong widget type for Close_MainWidget [%i]",widget->WIDGET);
+	return;
+    }
+
+    if (!(wid_info = (WrapperWidget *)(widget->wid_info))) {
+    	error("Close_MainWidget: wid_info missing!");
+	return;
+    }
+    
+    if (!(wid_info->showconf))
+    	Close_Widget(&(wid_info->confmenu));
+}
+
 GLWidget *Init_MainWidget( font_data *font )
 {
     GLWidget *tmp;
@@ -2939,6 +2965,7 @@ GLWidget *Init_MainWidget( font_data *font )
     wid_info->confmenu	= NULL;
     wid_info->font	= font;
     wid_info->BORDER	= 10;
+    wid_info->showconf	= false;
     
     tmp->WIDGET     	= MAINWIDGET;
     tmp->bounds.w   	= draw_width;
@@ -2946,6 +2973,7 @@ GLWidget *Init_MainWidget( font_data *font )
     tmp->button     	= button_MainWidget;
     tmp->buttondata 	= tmp;
     tmp->SetBounds 	= SetBounds_MainWidget;
+    tmp->Close	    	= Close_MainWidget;
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->radar = Init_RadarWidget())) ) {
 	error("radar initialization failed");
@@ -2954,6 +2982,11 @@ GLWidget *Init_MainWidget( font_data *font )
     }
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scorelist = Init_ScorelistWidget())) ) {
 	error("scorelist initialization failed");
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    if ( !(wid_info->confmenu = Init_ConfMenuWidget(0,0)) ) {
+	error("confmenu initialization failed");
 	Close_Widget(&tmp);
 	return NULL;
     }
@@ -2983,19 +3016,66 @@ GLWidget *Init_MainWidget( font_data *font )
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
-void Paint_ConfMenuWidget( GLWidget *widget );
-void ConfMenuWidget_Quit( void *data );
-void ConfMenuWidget_Save( void *data );
-void ConfMenuWidget_Close( void *data );
+static void Paint_ConfMenuWidget( GLWidget *widget );
+static void ConfMenuWidget_Quit( void *data );
+static void ConfMenuWidget_Save( void *data );
+static void ConfMenuWidget_Close( void *data );
 
-void ConfMenuWidget_Quit( void *data )
+static void confmenu_callback( GLWidget *widget, xp_option_t *opt )
+{
+    GLWidget *list;
+    ColorChooserWidget *wi;
+    WrapperWidget *mw;
+    ConfMenuWidget *cm;
+    ScrollPaneWidget *sp;
+    
+    if (!widget) {
+    	error("confmenu_callback: argument is NULL!");
+	return;
+    }
+    
+    if (widget->WIDGET != COLORCHOOSERWIDGET) {
+    	error("confmenu_callback: wrong type widget!");
+	return;
+    }
+    
+    if ( !(wi = (ColorChooserWidget *)(widget->wid_info)) ) {
+    	error("confmenu_callback: wid_info missing!");
+	return;
+    }
+    
+    if ( !(mw = (WrapperWidget *)(MainWidget->wid_info)) ) {
+    	error("confmenu_callback: MainWidget missing!");
+	return;
+    }
+    if ( !(cm = (ConfMenuWidget*)(mw->confmenu->wid_info)) ) {
+    	error("confmenu_callback: confmenu missing!");
+	return;
+    }
+    if ( !(sp = (ScrollPaneWidget *)(cm->scrollpane->wid_info)) ) {
+    	error("confmenu_callback: scrollpane missing!");
+	return;
+    }
+    list = sp->content;
+    if ( !list ) {
+    	error("confmenu_callback: list missing!");
+	return;
+    }
+    
+    ListWidget_Insert(list,widget,Init_ColorModWidget(Option_get_name(opt),wi->value,wi->fgcolor,wi->bgcolor,wi->callback,wi->data));
+    ListWidget_Remove(list,widget);
+    
+    SetBounds_GLWidget(mw->confmenu,&(mw->confmenu->bounds));
+}
+
+static void ConfMenuWidget_Quit( void *data )
 {
     SDL_Event quit;
     quit.type = SDL_QUIT;
     SDL_PushEvent(&quit);
 }
 
-void ConfMenuWidget_Save( void *data )
+static void ConfMenuWidget_Save( void *data )
 {
     char path[PATH_MAX + 1];
 
@@ -3003,12 +3083,12 @@ void ConfMenuWidget_Save( void *data )
     Xpilotrc_write(path);
 }
 
-void ConfMenuWidget_Close( void *data )
+static void ConfMenuWidget_Close( void *data )
 {
     GLWidget *widget;
     WrapperWidget *wid_info;
     
-    if (!(widget = (GLWidget *)data)) {
+    if (!(widget = (GLWidget *)*(void **)data)) {
     	error("ConfMenuWidget_Close: widget missing!");
 	return;
     }
@@ -3022,11 +3102,11 @@ void ConfMenuWidget_Close( void *data )
     }
     
     DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
-    Close_Widget(&(wid_info->confmenu));
-    
+    wid_info->showconf = false;
+    /*Close_Widget(&(wid_info->confmenu));*/
 }
 
-void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
+static void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
 {
     ConfMenuWidget *wid_info;
     SDL_Rect bounds;
@@ -3085,7 +3165,7 @@ void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
     SetBounds_GLWidget(wid_info->cb,&bounds);
 }
 
-void Paint_ConfMenuWidget( GLWidget *widget )
+static void Paint_ConfMenuWidget( GLWidget *widget )
 {
     Uint32 edgeColor = 0xff0000ff;
     Uint32 bgColor = 0x0000ff88;
@@ -3114,7 +3194,7 @@ void Paint_ConfMenuWidget( GLWidget *widget )
     glEnd();
 }
 
-GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
+GLWidget *Init_ConfMenuWidget( Uint16 x, Uint16 y )
 {
     GLWidget *tmp, *item, *dummy, *list;
     ConfMenuWidget *wid_info;
@@ -3156,69 +3236,56 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
 	}
     }
 
-    if (!dummy) {
-    	error("Init_ConfMenuWidget: Couldn't make dummy!");
-	Close_Widget(&tmp);
-	return NULL;
-    }
-
     if (!(list = Init_ListWidget(0,0,&bg1_color,&bg2_color,&nullRGBA,LW_DOWN,LW_RIGHT,false))) {
     	error("Init_ConfMenuWidget: Couldn't make the list widget!");
-	Close_WidgetTree(&(dummy->next));
+	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
 	return NULL;
     }
     
     ListWidget_Append(list,dummy->next);
-
+    Close_Widget(&dummy);
+    
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scrollpane = Init_ScrollPaneWidget(list))) ) {
     	error("Init_ConfMenuWidget: Couldn't make the scrollpane!");
-	Close_WidgetTree(&dummy);
+	Close_Widget(&list);
 	Close_Widget(&tmp);
 	return NULL;
     }
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->ql = Init_LabelWidget("Quit",&redRGBA,&but1_color,CENTER,CENTER))) ) {
     	error("Init_ConfMenuWidget: Couldn't make the quit label!");
-	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
 	return NULL;
     }
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->qb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Quit,tmp))) ) {
     	error("Init_ConfMenuWidget: Couldn't make the quit button!");
-	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
 	return NULL;
     }
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->sl = Init_LabelWidget("Save",&greenRGBA,&but1_color,CENTER,CENTER))) ) {
     	error("Init_ConfMenuWidget: Couldn't make the save label!");
-	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
 	return NULL;
     }
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->sb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Save,tmp))) ) {
     	error("Init_ConfMenuWidget: Couldn't make the save button!");
-	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
 	return NULL;
     }
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cl = Init_LabelWidget("Close",&yellowRGBA,&but1_color,CENTER,CENTER))) ) {
     	error("Init_ConfMenuWidget: Couldn't make the close label!");
-	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
 	return NULL;
     }
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Close,MainWidget))) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->cb = Init_ButtonWidget(&nullRGBA,&but1_color,ConfMenuWidget_Close,&MainWidget))) ) {
     	error("Init_ConfMenuWidget: Couldn't make the close button!");
-	Close_WidgetTree(&dummy);
 	Close_Widget(&tmp);
 	return NULL;
     }
-    
-    Close_Widget(&dummy);
-       
+           
     tmp->bounds.x   	= x;
     tmp->bounds.y   	= y;
     tmp->bounds.w   	= wid_info->scrollpane->bounds.w+2;
