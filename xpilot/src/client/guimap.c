@@ -326,7 +326,7 @@ void Gui_paint_fuel(int x, int y, int fuel)
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
-    int color;
+    int color = 0;
     int i;
     const int BORDER = 4;		/* in pixels */
     int size = 0, size2 = 0;
@@ -334,11 +334,6 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     char s[3];
     char info[6];
     homebase_t *base = NULL;
-
-    if (baseNameColor)
-	color = baseNameColor;
-    else
-	color = WHITE;
 
     if (id != -1) {
 	for (i = 0; i < num_bases; i++) {
@@ -348,6 +343,15 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	    }
 	}
     }
+
+    other = Other_by_id(id);
+
+    if (baseNameColor) {
+	color = Life_color(other);
+	if (!color)
+	    color = baseNameColor;
+    } else
+	color = WHITE;
 
     if (base != NULL
 	&& base->deathtime > loops - baseWarningFrames) {
@@ -429,7 +433,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     x = SCALEX(x);
     y = SCALEY(y);
 
-    if ((other = Other_by_id(id)) != NULL) {
+    if (other) {
 	if (other->name_width == 0) {
 	    other->name_len = strlen(other->id_string);
 	    other->name_width =

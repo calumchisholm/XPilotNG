@@ -589,11 +589,15 @@ static void Gui_paint_rounddelay(int x, int y)
 
 
 /*  Here starts the paint functions for ships  (MM) */
-static void Gui_paint_ship_name(int x , int y, other_t *other)
+static void Gui_paint_ship_name(int x, int y, other_t *other)
 {
     FIND_NAME_WIDTH(other);
     if (shipNameColor) {
-	SET_FG(colors[shipNameColor].pixel);
+	int color = Life_color(other);
+	if (!color)
+	    color = shipNameColor;
+
+	SET_FG(colors[color].pixel);
 	rd.drawString(dpy, p_draw, gc,
 		      WINSCALE(X(x)) - other->name_width / 2,
 		      WINSCALE(Y(y) + 16) + gameFont->ascent,
@@ -668,6 +672,25 @@ int Team_color(int team)
     default:    break;
     }
     return 0;
+}
+
+int Life_color(other_t *other)
+{
+    int color = 0;
+
+    if (other
+	&& (other->mychar == ' ' || other->mychar == 'R')
+	&& BIT(Setup->mode, LIMITED_LIVES)) {
+	if (other->life > 2)
+	    color = manyLivesColor;
+	else if (other->life == 2)
+	    color = twoLivesColor;
+	else if (other->life == 1)
+	    color = oneLifeColor;
+	else
+	    color = zeroLivesColor;
+    }
+    return color;
 }
 
 static int Gui_calculate_ship_color(int id, other_t *other)
@@ -952,7 +975,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 	&& self->id != id
 	&& other != NULL) {
 
-	Gui_paint_ship_name(x , y, other);
+	Gui_paint_ship_name(x, y, other);
     }
 
     if (roundDelay > 0 && roundDelay % FPS < FPS/2) {

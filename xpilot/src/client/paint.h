@@ -182,6 +182,10 @@ extern int	hudLockColor;		/* Color index for lock on HUD drawing */
 extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 extern int	dirPtrColor;		/* Color index for dirptr-hack drawing */
 extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
+extern int	zeroLivesColor;		/* Color to associate with 0 lives */
+extern int	oneLifeColor;		/* Color to associate with 1 life */
+extern int	twoLivesColor;		/* Color to associate with 2 lives */
+extern int	manyLivesColor;		/* Color to associate with >2 lives */
 extern int	team0Color;		/* Preferred color index for team 0 */
 extern int	team1Color;		/* Preferred color index for team 1 */
 extern int	team2Color;		/* Preferred color index for team 2 */
@@ -345,7 +349,7 @@ void Paint_vbase(void);
 void Paint_vdecor(void);
 void Paint_objects(void);
 void Paint_world(void);
-void Paint_score_entry(int entry_num, other_t* other, bool is_team);
+void Paint_score_entry(int entry_num, other_t *other, bool is_team);
 void Paint_score_start(void);
 void Paint_score_objects(void);
 void Paint_meters(void);
@@ -359,6 +363,7 @@ void Paint_frame(void);
 int Handle_time_left(long sec);
 void Game_over_action(u_byte stat);
 int Team_color(int);
+int Life_color(other_t *other);
 /*
  * Prototype from blockbitmaps.c
  */

@@ -1106,6 +1106,38 @@ option options[] = {
 	"Which color number to use for drawing pop message.\n"
     },
     {
+	"zeroLivesColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color to associate with ships with zero lives left.\n"
+	"This can be used to paint for example ship and base names.\n"
+    },
+    {
+	"oneLifeColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color to associate with ships with one life left.\n"
+	"This can be used to paint for example ship and base names.\n"
+    },
+    {
+	"twoLivesColor",
+	NULL,
+	"11",
+	KEY_DUMMY,
+	"Which color to associate with ships with two lives left.\n"
+	"This can be used to paint for example ship and base names.\n"
+    },
+    {
+	"manyLivesColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color to associate with ships with more than two lives left.\n"
+	"This can be used to paint for example ship and base names.\n"
+    },
+    {
 	"selfLWColor",
 	NULL,
 	"1",
@@ -3208,6 +3240,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "msgScanSafeColor", &msgScanSafeColor);
     Get_int_resource(rDB, "msgScanCoverColor", &msgScanCoverColor);
     Get_int_resource(rDB, "msgScanPopColor", &msgScanPopColor);
+    Get_int_resource(rDB, "zeroLivesColor", &zeroLivesColor);
+    Get_int_resource(rDB, "oneLifeColor", &oneLifeColor);
+    Get_int_resource(rDB, "twoLivesColor", &twoLivesColor);
+    Get_int_resource(rDB, "manyLivesColor", &manyLivesColor);
     Get_int_resource(rDB, "selfLWColor", &selfLWColor);
     Get_int_resource(rDB, "enemyLWColor", &enemyLWColor);
     Get_int_resource(rDB, "teamLWColor", &teamLWColor);

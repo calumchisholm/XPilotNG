@@ -179,6 +179,11 @@ int	scoreInactiveSelfColor;	/* Score list inactive self color index */
 int	scoreZeroColor;		/* Score list team zero color index */
 int	scoreObjectColor;	/* Color index for map score objects */
 
+int	zeroLivesColor;		/* Color to associate with 0 lives */
+int	oneLifeColor;		/* Color to associate with 1 life */
+int	twoLivesColor;		/* Color to associate with 2 lives */
+int	manyLivesColor;		/* Color to associate with >2 lives */
+
 static void Paint_clock(int redraw);
 
 void Game_over_action(u_byte stat)

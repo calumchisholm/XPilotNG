@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -495,8 +494,11 @@ int Init_top(void)
     COLORCHECK(dirPtrColor, 0);
     COLORCHECK(msgScanBallColor, 3);
     COLORCHECK(msgScanCoverColor, 2);
-    COLORCHECK(selfLWColor, 3);
-    COLORCHECK(enemyLWColor, 3);
+    COLORCHECK(zeroLivesColor, 1);
+    COLORCHECK(oneLifeColor, 3);
+    COLORCHECK(selfLWColor, 1);
+    COLORCHECK(teamLWColor, 2);
+    COLORCHECK(enemyLWColor, 1);
     COLORCHECK(teamShotColor, 2);
     COLORCHECK(shipNameColor, 2);
     COLORCHECK(baseNameColor, 1);
@@ -535,12 +537,12 @@ int Init_top(void)
     if (maxColors > 4) {
 	COLORCHECK(msgScanSafeColor, 4);
 	COLORCHECK(decorColor, 6);
-	COLORCHECK(teamLWColor, 4);
+	COLORCHECK(manyLivesColor, 4);
 	COLORCHECK(scoreZeroColor, 4);
     } else {
 	COLORCHECK(msgScanSafeColor, 2);
 	COLORCHECK(decorColor, 3);
-	COLORCHECK(teamLWColor, 2);
+	COLORCHECK(manyLivesColor, 0);
 	COLORCHECK(scoreZeroColor, 1);
     }
 
@@ -551,6 +553,7 @@ int Init_top(void)
 	COLORCHECK(scoreInactiveSelfColor, 12);
 	COLORCHECK(messagesColor, 12);
 	COLORCHECK(oldMessagesColor, 13);
+	COLORCHECK(twoLivesColor, 11);
     } else {
 	COLORCHECK(msgScanPopColor, 1);
 	COLORCHECK(windowColor, 2);
@@ -558,6 +561,7 @@ int Init_top(void)
 	COLORCHECK(scoreInactiveSelfColor, 1);
 	COLORCHECK(messagesColor, 3);
 	COLORCHECK(oldMessagesColor, 2);
+	COLORCHECK(twoLivesColor, 0);
     }
 
 #undef COLORCHECK

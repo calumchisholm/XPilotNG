@@ -160,6 +160,10 @@ static int Config_create_msgScanBallColor(int widget_desc, int *height);
 static int Config_create_msgScanSafeColor(int widget_desc, int *height);
 static int Config_create_msgScanCoverColor(int widget_desc, int *height);
 static int Config_create_msgScanPopColor(int widget_desc, int *height);
+static int Config_create_zeroLivesColor(int widget_desc, int *height);
+static int Config_create_oneLifeColor(int widget_desc, int *height);
+static int Config_create_twoLivesColor(int widget_desc, int *height);
+static int Config_create_manyLivesColor(int widget_desc, int *height);
 static int Config_create_selfLWColor(int widget_desc, int *height);
 static int Config_create_enemyLWColor(int widget_desc, int *height);
 static int Config_create_teamLWColor(int widget_desc, int *height);
@@ -373,6 +377,10 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_msgScanSafeColor,
     Config_create_msgScanCoverColor,
     Config_create_msgScanPopColor,
+    Config_create_zeroLivesColor,
+    Config_create_oneLifeColor,
+    Config_create_twoLivesColor,
+    Config_create_manyLivesColor,
     Config_create_selfLWColor,
     Config_create_enemyLWColor,
     Config_create_teamLWColor,
@@ -1220,6 +1228,26 @@ static int Config_create_msgScanCoverColor(int widget_desc, int *height)
 static int Config_create_msgScanPopColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(msgScanPopColor);
+}
+
+static int Config_create_zeroLivesColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(zeroLivesColor);
+}
+
+static int Config_create_oneLifeColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(oneLifeColor);
+}
+
+static int Config_create_twoLivesColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(twoLivesColor);
+}
+
+static int Config_create_manyLivesColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(manyLivesColor);
 }
 
 static int Config_create_selfLWColor(int widget_desc, int *height)
@@ -2095,6 +2123,10 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "msgScanSafeColor", msgScanSafeColor);
     Config_save_int(fp, "msgScanCoverColor", msgScanCoverColor);
     Config_save_int(fp, "msgScanPopColor", msgScanPopColor);
+    Config_save_int(fp, "zeroLivesColor", zeroLivesColor);
+    Config_save_int(fp, "oneLifeColor", oneLifeColor);
+    Config_save_int(fp, "twoLivesColor", twoLivesColor);
+    Config_save_int(fp, "manyLivesColor", manyLivesColor);
     Config_save_int(fp, "selfLWColor", selfLWColor);
     Config_save_int(fp, "enemyLWColor", enemyLWColor);
     Config_save_int(fp, "teamLWColor", teamLWColor);
