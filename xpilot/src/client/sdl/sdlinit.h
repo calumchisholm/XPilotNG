@@ -22,6 +22,6 @@
 #define SDLINIT_H
 
 int Init_window(void);
-
+int Resize_Window( int width, int height );
 
 #endif

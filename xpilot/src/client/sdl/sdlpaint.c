@@ -58,42 +58,6 @@ int paintSetupMode;
 
 GLWidget *MainWidget = NULL;
 
-/* function to reset our viewport after a window resize */
-int Resize_Window( int width, int height )
-{
-    extern int videoFlags;
-    SDL_Rect b = {0,0,0,0};
-    
-    b.w = draw_width = width;
-    b.h = draw_height = height;
-    
-    SetBounds_GLWidget(MainWidget,&b);
-    
-    if (!SDL_SetVideoMode( width,
-			   height,
-			   draw_depth, 
-			   videoFlags ))
-	return -1;
-    
-
-    /* change to the projection matrix and set our viewing volume. */
-    glMatrixMode( GL_PROJECTION );
-
-    glLoadIdentity( );
-
-    gluOrtho2D(0, draw_width, 0, draw_height);
-    
-    /* Make sure we're chaning the model view and not the projection */
-    glMatrixMode( GL_MODELVIEW );
-    
-    /* Reset The View */
-    glLoadIdentity( );
-
-    /* Setup our viewport. */
-    glViewport( 0, 0, ( GLint )draw_width, ( GLint )draw_height );
-    return 0;
-}
-
 static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
 {
     GLWidget *widget = (GLWidget *)data;

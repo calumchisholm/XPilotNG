@@ -30,10 +30,6 @@ typedef unsigned int color_t;
 extern int draw_depth;
 extern double scale;              /* The opengl scale factor */
 
-/* code to set the viewport size */
-int Resize_Window( int width, int height );
-
-
 #define STATIONARY_MODE 1
 #define MOVING_MODE 	2
 #define HUD_MODE    	4

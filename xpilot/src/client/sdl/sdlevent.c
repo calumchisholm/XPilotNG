@@ -87,32 +87,6 @@ bool Key_press_toggle_radar_score(void)
     return false;
 }
 
-static bool find_size(int *w, int *h)
-{
-    extern int videoFlags;
-    SDL_Rect **modes;
-    int i;
-
-    modes = SDL_ListModes(NULL, videoFlags);
-    if (modes == NULL) return false;
-    if (modes == (SDL_Rect**)-1) return true;
-
-    if (!modes[1]) {
-	*w = modes[0]->w;
-	*h = modes[0]->h;
-    } else {
-	for (i = 1; modes[i]; i++) {
-	    if (*w > modes[i]->w) {
-		*w = modes[i - 1]->w;
-		*h = modes[i - 1]->h;
-		break;
-	    }
-	}
-    }
-
-    return true;
-}
-
 #ifndef _WINDOWS
 bool Key_press_toggle_fullscreen(void)
 {
@@ -135,9 +109,8 @@ bool Key_press_toggle_fullscreen(void)
     h = initial_h = draw_height;
 
     videoFlags ^= SDL_FULLSCREEN;
-    if (find_size(&w, &h)
-	&& Resize_Window(w, h) == 0)
-	return false;
+    if (Resize_Window(w, h) == 0)
+		return false;
     
     videoFlags ^= SDL_FULLSCREEN;
     Resize_Window(initial_w, initial_h);
