@@ -95,7 +95,6 @@ static void shrink(void **pp, size_t size)
 
 #define SHRINK(T,P,N,M) { \
 if ((M) > (N)) { \
-  xpprintf("Shrinking " #P " from %d to %d.\n", (M), (N)); \
   shrink((void **)&(P), (N) * sizeof(T)); \
   M = (N); \
 } } \
