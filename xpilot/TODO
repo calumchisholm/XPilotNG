@@ -56,18 +56,20 @@ Developer: kps
 Task: Make baselesspausing option work for non-teamplay maps.
 Developer: kps
 
-
+Task: Change ball-wall brakefactor to be a property of the polygon.
+      Allow for negative brakefactors. 
+Developer: -
 
 SOME OTHER TASKS TODO FOR XPILOT NG
 -----------------------------------
 
-Task: Run net input in server at at least 50 Hz. This makes it so that there
-is less networking stuff todo when the frame update is to be done which
+Task: Run net input in server at at least 50 Hz. This way, there
+is less networking to do when the frame update is to be done which
 reduces latency.
 Developer: kps
 
-Task: Make it so that server requests only very few (1) alarm signals
-if no one is playing.
+Task: Let server request only very few (1) alarm signals if no one 
+      is playing.
 Developer: kps
 
 Task: Implement compatibility mode for old clients (block protocol) in server,
@@ -86,7 +88,7 @@ src/server/collision.c. More difficult task would be to write collision
 detection code for an arbitrary, possibly a concave shape.
 Developer: kps
 
-Task: Make a "physically correct" replacement for the oldthrust hack. This
+Task: Create a "physically correct" replacement for the oldthrust hack. This
 could possibly be done by adding an emergency thruster that would activate
 when the ship has turned. Idea with this is that when ship has turned,
 it is assumed the player tries to maneuver, and the emergency thruster
@@ -105,7 +107,7 @@ or at least so that variance in time between frames is minimised. Possibly
 send frame updates earliest to the players with the largest net lag
 Developer: kps
 
-Task: Make it so that server uses only 1 or 2 ports. Currently server uses
+Task: Change server to use only 1 or 2 ports. Currently server uses
 one contact port and one port per client. In case server is made to use only
 one port, that would mean active clients would use that same port for
 communication. If server is made to use 2 ports, the contact port would be
@@ -142,8 +144,8 @@ to find ways to speed up processing in places where the server uses a lot
 of time.
 Developer: kps
 
-Task: Make it so that one can use -list command in client even if X is not
-running.
+Task: Remove the need to have X running, if the client ist started with
+      the -list command 
 Developer: kps
 
 Task: Add code that handles the case when some map object reappears on top
@@ -210,8 +212,10 @@ team members have different roles, e.g. fighters and bombers.
 http://groups.google.ca/groups?hl=en&lr=&threadm=4iu3mg%2462t%40oban.cc.ic.ac.uk&rnum=1&prev=/groups%3Fq%3Dpredators%2Bxpilot%26hl%3Den%26lr%3D%26ie%3DUTF-8%26scoring%3Dr%26selm%3D4iu3mg%252462t%2540oban.cc.ic.ac.uk%26rnum%3D1
 Developer: kps
 
-Task: Make it so that if a team has a treasure, players get bases first that
-are closer to the treasure.
+Task: Put entering players first on bases close to team treasure, if a treasure
+      exists for that team.
+      Comment: not sure this complies with the possibility to put boxes
+               and balls on different locations on the map and "special" balls.
 Developer: kps
 
 Task: Add support for cannons having individual id, score, smartness etc.
