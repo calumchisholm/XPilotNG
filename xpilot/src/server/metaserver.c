@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -59,9 +59,8 @@ void Meta_send(char *mesg, int len)
 {
     int			i;
 
-    if (!reportToMetaServer) {
+    if (!reportToMetaServer)
 	return;
-    }
 
     for (i = 0; i < NELEM(meta_servers); i++) {
 	if (sock_send_dest(&contactSocket, meta_servers[i].addr, META_PORT, mesg, len) != len) {
@@ -76,9 +75,8 @@ int Meta_from(char *addr, int port)
     int			i;
 
     for (i = 0; i < NELEM(meta_servers); i++) {
-	if (!strcmp(addr, meta_servers[i].addr)) {
+	if (!strcmp(addr, meta_servers[i].addr))
 	    return (port == META_PORT);
-	}
     }
     return 0;
 }
@@ -96,30 +94,25 @@ void Meta_init(void)
     int			i;
     char		*addr;
 
-    if (!reportToMetaServer) {
+    if (!reportToMetaServer)
 	return;
-    }
 
 #ifndef SILENT
     xpprintf("%s Locating Internet Meta server... ", showtime()); fflush(stdout);
 #endif
     for (i = 0; i < NELEM(meta_servers); i++) {
 	addr = sock_get_addr_by_name(meta_servers[i].name);
-	if (addr) {
-	    strlcpy(meta_servers[i].addr, addr,
-		    sizeof(meta_servers[i].addr));
-	}
+	if (addr)
+	    strlcpy(meta_servers[i].addr, addr, sizeof(meta_servers[i].addr));
 #ifndef SILENT
-	if (addr) {
+	if (addr)
 	    xpprintf("found %d", i + 1);
-	} else {
+	else
 	    xpprintf("%d not found", i + 1);
-	}
-	if (i + 1 == NELEM(meta_servers)) {
+	if (i + 1 == NELEM(meta_servers))
 	    xpprintf("\n");
-	} else {
+	else
 	    xpprintf("... ");
-	}
 	fflush(stdout);
 #endif
     }
@@ -153,9 +146,8 @@ void Meta_update(int change)
     if (!change) {
 	if (currentTime - lastMetaSendTime < GIVE_META_SERVER_A_HINT) {
 	    if (NumQueuedPlayers == queue_length ||
-		currentTime - lastMetaSendTime < 5) {
+			currentTime - lastMetaSendTime < 5)
 		return;
-	    }
 	}
     }
     lastMetaSendTime = currentTime;
@@ -168,9 +160,8 @@ void Meta_update(int change)
 	player *pl = Players(i);
 	if (IS_HUMAN_PTR(pl) && !BIT(pl->status, PAUSE)) {
 	    num_active_players++;
-	    if (BIT(World.rules->mode, TEAM_PLAY)) {
-		active_per_team[i]++;
-	    }
+	    if (BIT(World.rules->mode, TEAM_PLAY))
+		active_per_team[pl->team]++;
 	}
     }
 
@@ -184,9 +175,8 @@ void Meta_update(int change)
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	j = 0;
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (i == robotTeam && reserveRobotTeam) {
+	    if (i == robotTeam && reserveRobotTeam)
 		continue;
-	    }
 	    if (World.teams[i].NumBases > 0) {
 		sprintf(&freebases[j], "%d=%d,", i,
 			World.teams[i].NumBases - active_per_team[i]);
@@ -194,14 +184,12 @@ void Meta_update(int change)
 	    }
 	}
 	/* strip trailing comma. */
-	if (j) {
+	if (j)
 	    freebases[j-1] = '\0';
-	}
     }
-    else {
+    else
 	sprintf(freebases, "=%d",
 		World.NumBases - num_active_players - login_in_progress);
-    }
 
     sprintf(string,
 	    "add server %s\n"
@@ -272,4 +260,3 @@ void Meta_update(int change)
 
     Meta_send(string, len + 1);
 }
-
