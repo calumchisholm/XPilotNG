@@ -80,23 +80,22 @@ void Paint_item_symbol(u_byte type, Drawable d, GC mygc, int x, int y, int color
 {
     if (!texturedObjects) {
 #ifdef _WINDOWS
-    rd.paintItemSymbol(type, d, mygc, x, y, color);
+	rd.paintItemSymbol(type, d, mygc, x, y, color);
 #else
-    gcv.stipple = itemBitmaps[type];
-    gcv.fill_style = FillStippled;
-    gcv.ts_x_origin = x;
-    gcv.ts_y_origin = y;
-    XChangeGC(dpy, mygc,
-	      GCStipple|GCFillStyle|GCTileStipXOrigin|GCTileStipYOrigin,
-	      &gcv);
-    rd.paintItemSymbol(type, d, mygc, x, y, color);
-    XFillRectangle(dpy, d, mygc, x, y, ITEM_SIZE, ITEM_SIZE);
-    gcv.fill_style = FillSolid;
-    XChangeGC(dpy, mygc, GCFillStyle, &gcv);
+	gcv.stipple = itemBitmaps[type];
+	gcv.fill_style = FillStippled;
+	gcv.ts_x_origin = x;
+	gcv.ts_y_origin = y;
+	XChangeGC(dpy, mygc,
+		  GCStipple|GCFillStyle|GCTileStipXOrigin|GCTileStipYOrigin,
+		  &gcv);
+	rd.paintItemSymbol(type, d, mygc, x, y, color);
+	XFillRectangle(dpy, d, mygc, x, y, ITEM_SIZE, ITEM_SIZE);
+	gcv.fill_style = FillSolid;
+	XChangeGC(dpy, mygc, GCFillStyle, &gcv);
 #endif
-    } else {
+    } else
 	Bitmap_paint(d, BM_ALL_ITEMS, x, y, type);
-    }
 }
 
 
@@ -261,9 +260,10 @@ static void Paint_debris(int x_areas, int y_areas, int areas, int max_)
 	    y = BASE_Y(i);
 	    color = COLOR(i);
 	    color = DEBRIS_COLOR(color);
-	    for (j = 0; j < num_debris[i]; j++) {
-		Gui_paint_spark(color, x + debris_ptr[i][j].x , y - debris_ptr[i][j].y);
-	    }
+	    for (j = 0; j < num_debris[i]; j++)
+		Gui_paint_spark(color,
+				x + debris_ptr[i][j].x,
+				y - debris_ptr[i][j].y);
 	    RELEASE(debris_ptr[i], num_debris[i], max_debris[i]);
 	}
     }
@@ -364,21 +364,21 @@ static void Paint_missiles(void)
 
 static void Paint_lasers(void)
 {
-    int		color, i, x1, y1, len, dir;
+    int		color, i, x_1, y_1, len, dir;
 
     if (num_laser > 0) {
 
 	Gui_paint_lasers_begin();
 
 	for (i = 0; i < num_laser; i++) {
-	    x1 = laser_ptr[i].x;
-	    y1 = laser_ptr[i].y;
+	    x_1 = laser_ptr[i].x;
+	    y_1 = laser_ptr[i].y;
 	    len = laser_ptr[i].len;
 	    dir = laser_ptr[i].dir;
 	    color = laser_ptr[i].color;
 
-	    if (wrap(&x1, &y1))
-		Gui_paint_laser(color, x1, y1, len, dir);
+	    if (wrap(&x_1, &y_1))
+		Gui_paint_laser(color, x_1, y_1, len, dir);
 	}
 	Gui_paint_lasers_end();
 
@@ -550,17 +550,17 @@ static void Paint_all_ships(void)
 
 static void Paint_refuel(void)
 {
-    int	    i, x0, y0, x1, y1;
+    int	    i, x_0, y_0, x_1, y_1;
 
     if (num_refuel > 0) {
 
 	for (i = 0; i < num_refuel; i++) {
-	    x0 = refuel_ptr[i].x0;
-	    y0 = refuel_ptr[i].y0;
-	    x1 = refuel_ptr[i].x1;
-	    y1 = refuel_ptr[i].y1;
-	    if (wrap(&x0, &y0) && wrap(&x1, &y1))
-		Gui_paint_refuel(x0, y0, x1, y1);
+	    x_0 = refuel_ptr[i].x0;
+	    y_0 = refuel_ptr[i].y0;
+	    x_1 = refuel_ptr[i].x1;
+	    y_1 = refuel_ptr[i].y1;
+	    if (wrap(&x_0, &y_0) && wrap(&x_1, &y_1))
+		Gui_paint_refuel(x_0, y_0, x_1, y_1);
 	}
 	RELEASE(refuel_ptr, num_refuel, max_refuel);
     }
@@ -569,17 +569,18 @@ static void Paint_refuel(void)
 
 static void Paint_connectors(void)
 {
-    int	    i, x0, y0, x1, y1;
+    int	    i, x_0, y_0, x_1, y_1;
 
     if (num_connector > 0) {
 
 	for (i = 0; i < num_connector; i++) {
-	    x0 = connector_ptr[i].x0;
-	    y0 = connector_ptr[i].y0;
-	    x1 = connector_ptr[i].x1;
-	    y1 = connector_ptr[i].y1;
-	    if (wrap(&x0, &y0) && wrap(&x1, &y1))
-		Gui_paint_connector(x0, y0, x1, y1, connector_ptr[i].tractor);
+	    x_0 = connector_ptr[i].x0;
+	    y_0 = connector_ptr[i].y0;
+	    x_1 = connector_ptr[i].x1;
+	    y_1 = connector_ptr[i].y1;
+	    if (wrap(&x_0, &y_0) && wrap(&x_1, &y_1))
+		Gui_paint_connector(x_0, y_0, x_1, y_1,
+				    connector_ptr[i].tractor);
 	}
 	RELEASE(connector_ptr, num_connector, max_connector);
     }
@@ -588,17 +589,17 @@ static void Paint_connectors(void)
 
 static void Paint_transporters(void)
 {
-    int	    i, x0, y0, x1, y1;
+    int	    i, x_0, y_0, x_1, y_1;
 
     if (num_trans > 0) {
 
 	for (i = 0; i < num_trans; i++) {
-	    x0 = trans_ptr[i].x1;
-	    y0 = trans_ptr[i].y1;
-	    x1 = trans_ptr[i].x2;
-	    y1 = trans_ptr[i].y2;
-	    if (wrap(&x0, &y0) && wrap(&x1, &y1))
-		Gui_paint_transporter(x0, y0, x1, y1);
+	    x_0 = trans_ptr[i].x1;
+	    y_0 = trans_ptr[i].y1;
+	    x_1 = trans_ptr[i].x2;
+	    y_1 = trans_ptr[i].y2;
+	    if (wrap(&x_0, &y_0) && wrap(&x_1, &y_1))
+		Gui_paint_transporter(x_0, y_0, x_1, y_1);
 	}
 	RELEASE(trans_ptr, num_trans, max_trans);
     }

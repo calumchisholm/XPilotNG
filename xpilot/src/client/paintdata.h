@@ -295,7 +295,7 @@ extern void Erase_do_rectangles(XRectangle *rectp, int n);
 extern void Erase_do_arc(int x, int y, int width, int height,
                       int angle1, int angle2);
 extern void Erase_do_arcs(XArc *arcp, int n);
-extern void Erase_do_segment(int width, int x1, int y1, int x2, int y2);
+extern void Erase_do_segment(int width, int x_1, int y_1, int x_2, int y_2);
 extern void Erase_do_segments(XSegment *segp, int n);
 extern void Erase_do_points(int width, XPoint *pointp, int n);
 extern void Erase_do_4point(int x, int y, int width, int height);
