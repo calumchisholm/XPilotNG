@@ -1139,8 +1139,10 @@ static void Update_players(void)
 	/*
 	 * Handle hyperjumps and wormholes.
 	 */
+#if 0
 	warn("Player %s update, warping = %d",
 	     pl->name, BIT(pl->status, WARPING));
+#endif
 	if (BIT(pl->status, WARPING)) {
 	    if (pl->wormHoleHit == -1)
 		Hyperjump(pl);
