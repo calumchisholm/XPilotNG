@@ -1606,7 +1606,7 @@ int Net_input(void)
      */
     n = Net_packet();
 
-    if (last_frame->loops > oldest_frame->loops) {
+    if (last_frame /*->loops*/ > oldest_frame /*->loops*/) {
 	/*
 	 * Switch buffers to prevent gaps.
 	 */
@@ -1648,7 +1648,9 @@ int Net_input(void)
      * Should still read this whole function and check whether it makes
      * sense (there was discussion on xpilot-hacks, but the patch from
      * C R Johnson looked wrong too). XXX !@# */
-    return 1;
+    /* kps - the "fix" causes massive client lag */
+    /* "fix": return 1; */
+    return 1 + (last_frame > oldest_frame);
 }
 
 /*
