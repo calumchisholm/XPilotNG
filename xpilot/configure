@@ -855,7 +855,6 @@ Optional Features:
   --enable-dbe            support for X Doublebuffer Extension in client
   --enable-mbx            support for X Multibuffer Extension in client
   --enable-log            Try to log every server start to log file
-  --enable-silent         Makes the server real silent
   --enable-serversound    Turns on sound support in the server (not client)
   --enable-plockserver    lock the xpilot server (xpilots) into memory
   --enable-development    enable development code
@@ -1729,18 +1728,6 @@ if test "${enable_log+set}" = set; then
 
 cat >>confdefs.h <<\_ACEOF
 #define LOG 1
-_ACEOF
-
-fi
-fi;
-
-# Check whether --enable-silent or --disable-silent was given.
-if test "${enable_silent+set}" = set; then
-  enableval="$enable_silent"
-  if test $enable_silent = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define SILENT 1
 _ACEOF
 
 fi

@@ -93,24 +93,26 @@ void Meta_init(void)
     if (!reportToMetaServer)
 	return;
 
-#ifndef SILENT
-    xpprintf("%s Locating Internet Meta server... ", showtime()); fflush(stdout);
-#endif
+    if (!silent) {
+	xpprintf("%s Locating Internet Meta server... ", showtime());
+	fflush(stdout);
+    }
+
     for (i = 0; i < NELEM(meta_servers); i++) {
 	addr = sock_get_addr_by_name(meta_servers[i].name);
 	if (addr)
 	    strlcpy(meta_servers[i].addr, addr, sizeof(meta_servers[i].addr));
-#ifndef SILENT
-	if (addr)
-	    xpprintf("found %d", i + 1);
-	else
-	    xpprintf("%d not found", i + 1);
-	if (i + 1 == NELEM(meta_servers))
-	    xpprintf("\n");
-	else
-	    xpprintf("... ");
-	fflush(stdout);
-#endif
+	if (!silent) {
+	    if (addr)
+		xpprintf("found %d", i + 1);
+	    else
+		xpprintf("%d not found", i + 1);
+	    if (i + 1 == NELEM(meta_servers))
+		xpprintf("\n");
+	    else
+		xpprintf("... ");
+	    fflush(stdout);
+	}
     }
 }
 

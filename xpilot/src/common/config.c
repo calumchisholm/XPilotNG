@@ -181,9 +181,6 @@ void Conf_print(void)
 #ifdef LOG
     xpprintf("LOG\n");
 #endif
-#ifdef SILENT
-    xpprintf("SILENT\n");
-#endif
 #ifdef SERVER_SOUND
     xpprintf("SERVER_SOUND\n");
 #endif

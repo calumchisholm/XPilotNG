@@ -419,12 +419,12 @@ static int Init_setup_old(void)
 	}
     }
 
-#ifndef SILENT
-    if (type != SETUP_MAP_UNCOMPRESSED) {
-	xpprintf("%s Block map compression ratio is %-4.2f%%\n", showtime(),
-	    100.0 * size / numblocks);
+    if (!silent) {
+	if (type != SETUP_MAP_UNCOMPRESSED) {
+	    xpprintf("%s Block map compression ratio is %-4.2f%%\n",
+		     showtime(), 100.0 * size / numblocks);
+	}
     }
-#endif
 
     if ((Oldsetup = malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold oldsetup");
@@ -467,10 +467,9 @@ static int Init_setup(void)
 	return result;
 
     size = Polys_to_client(&mapdata);
-#ifndef SILENT
-    xpprintf("%s Server->client polygon map transfer size is %d bytes.\n",
-	     showtime(), size);
-#endif
+    if (!silent)
+	xpprintf("%s Server->client polygon map transfer size is %d bytes.\n",
+		 showtime(), size);
 
     if ((Setup = malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold setup");
@@ -657,15 +656,14 @@ void Destroy_connection(connection_t *connp, const char *reason)
 	sock_get_errorRec(sock);
 	sock_writeRec(sock, pkt, len);
     }
-#ifndef SILENT
-    xpprintf("%s Goodbye %s=%s@%s|%s (\"%s\")\n",
-	   showtime(),
-	   connp->nick ? connp->nick : "",
-	   connp->real ? connp->real : "",
-	   connp->host ? connp->host : "",
-	   connp->dpy ? connp->dpy : "",
-	   reason);
-#endif
+    if (!silent)
+	xpprintf("%s Goodbye %s=%s@%s|%s (\"%s\")\n",
+		 showtime(),
+		 connp->nick ? connp->nick : "",
+		 connp->real ? connp->real : "",
+		 connp->host ? connp->host : "",
+		 connp->dpy ? connp->dpy : "",
+		 reason);
 
     Conn_set_state(connp, CONN_FREE, CONN_FREE);
 
@@ -968,10 +966,9 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     }
 
     if (free_conn_index >= max_connections) {
-#ifndef SILENT
-	xpprintf("%s Full house for %s(%s)@%s(%s)\n",
-		 showtime(), real, nick, host, dpy);
-#endif
+	if (!silent)
+	    xpprintf("%s Full house for %s(%s)@%s(%s)\n",
+		     showtime(), real, nick, host, dpy);
 	return -1;
     }
     connp = &Conn[free_conn_index];
@@ -1103,11 +1100,12 @@ static int Handle_listening(connection_t *connp)
 	    return -1;
 	}
     }
-#ifndef SILENT
-    xpprintf("%s Welcome %s=%s@%s|%s (%s/%d)", showtime(), connp->nick,
-	   connp->real, connp->host, connp->dpy, connp->addr, connp->his_port);
-    xpprintf(" (version %04x)\n", connp->version);
-#endif
+    if (!silent) {
+	xpprintf("%s Welcome %s=%s@%s|%s (%s/%d)", showtime(),
+		 connp->nick, connp->real, connp->host, connp->dpy,
+		 connp->addr, connp->his_port);
+	xpprintf(" (version %04x)\n", connp->version);
+    }
     if (connp->r.ptr[0] != PKT_VERIFY) {
 	Send_reply(connp, PKT_VERIFY, PKT_FAILURE);
 	Send_reliable(connp);
@@ -1124,10 +1122,9 @@ static int Handle_listening(connection_t *connp)
     Fix_real_name(real);
     Fix_nick_name(nick);
     if (strcmp(real, connp->real) || strcmp(nick, connp->nick)) {
-#ifndef SILENT
-	xpprintf("%s Client verified incorrectly (%s,%s)(%s,%s)\n",
-		 showtime(), real, nick, connp->real, connp->nick);
-#endif
+	if (!silent)
+	    xpprintf("%s Client verified incorrectly (%s,%s)(%s,%s)\n",
+		     showtime(), real, nick, connp->real, connp->nick);
 	Send_reply(connp, PKT_VERIFY, PKT_FAILURE);
 	Send_reliable(connp);
 	Destroy_connection(connp, "verify incorrect");
@@ -1402,15 +1399,15 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	xpprintf("%s Nick \"%s\" has been changed to \"%s\".\n",
 		 showtime(), old_nick, connp->nick);
 
-#ifndef	SILENT
-    if (pl->rectype < 2)
-	xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
-		 pl->name, NumPlayers, pl->home_base ? pl->home_base->ind :
-		 -1);
-    else
-	xpprintf("%s spectator %s (%d) starts.\n", showtime(), pl->name,
-		 NumObservers);
-#endif
+    if (!silent) {
+	if (pl->rectype < 2)
+	    xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
+		     pl->name, NumPlayers, pl->home_base ? pl->home_base->ind :
+		     -1);
+	else
+	    xpprintf("%s spectator %s (%d) starts.\n", showtime(), pl->name,
+		     NumObservers);
+    }
 
     /*
      * Tell him about himself first.

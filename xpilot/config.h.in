@@ -328,9 +328,6 @@
    release 3. */
 #undef SETVBUF_REVERSED
 
-/* Makes the server real silent */
-#undef SILENT
-
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 

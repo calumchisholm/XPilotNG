@@ -172,10 +172,9 @@ int main(int argc, char **argv)
      */
     serverTime = time(NULL);
 
-#ifndef SILENT
-    xpprintf("%s Server runs at %d frames per second\n",
-	     showtime(), framesPerSecond);
-#endif
+    if (!silent)
+	xpprintf("%s Server runs at %d frames per second\n",
+		 showtime(), framesPerSecond);
 
     /* kps - move this somewhere else ? */
     teamcup_open_score_file();

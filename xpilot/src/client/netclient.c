@@ -392,12 +392,10 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 		return -1;
 	    }
 	    time(&last);
-#ifndef SILENT
 	    if (retries > 1) {
 		printf("Waiting for verify response\n");
 		IFWINDOWS( Progress("Waiting for verify response") );
 	    }
-#endif
 	}
 	sock_set_timeout(&rbuf.sock, 1, 0);
 	if (sock_readable(&rbuf.sock) == 0)
@@ -442,12 +440,10 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 	}
 	break;
     }
-#ifndef SILENT
     if (retries > 1) {
 	printf("Verified correctly\n");
 	IFWINDOWS( Progress("Verified correctly") );
     }
-#endif
     return 0;
 }
 

@@ -57,6 +57,7 @@ int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
 double		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
 double		laserRepeatRate = 2;	/* Ticks per laser fire (0=off) */
+bool		silent;			/* Make server really silent ? */
 bool		RawMode;		/* Let robots live and calculate
 					   frames even if there are n
 					   players logged in */
@@ -712,6 +713,16 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are bullets afflicted by gravity.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"silent",
+	"silent",
+	"false",
+	&silent,
+	valBool,
+	tuner_dummy,
+	"Is the server really silent?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

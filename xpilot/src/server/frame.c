@@ -1238,9 +1238,8 @@ void Set_message(const char *message)
     char		tmp[MSG_LEN];
 
     if ((i = strlen(message)) >= MSG_LEN) {
-#ifndef SILENT
-	warn("Max message len exceed (%d,%s)", i, message);
-#endif
+	if (!silent)
+	    warn("Max message len exceed (%d,%s)", i, message);
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;
     } else
@@ -1270,9 +1269,8 @@ void Set_player_message(player *pl, const char *message)
 	return;
 
     if ((i = strlen(message)) >= MSG_LEN) {
-#ifndef SILENT
-	warn("Max message len exceed (%d,%s)", i, message);
-#endif
+	if (!silent)
+	    warn("Max message len exceed (%d,%s)", i, message);
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;
     } else

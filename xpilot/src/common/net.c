@@ -681,7 +681,8 @@ int Packet_scanf(sockbuf_t *sbuf, const char *fmt, ...)
 		k = 0;
 		for (;;) {
 		    if (&sbuf->buf[sbuf->len] < &sbuf->ptr[j + 1]) {
-			if (BIT(sbuf->state, SOCKBUF_DGRAM | SOCKBUF_LOCK) != 0) {
+			if (BIT(sbuf->state, SOCKBUF_DGRAM | SOCKBUF_LOCK)
+			    != 0) {
 			    failure = 3;
 			    break;
 			}
@@ -694,9 +695,8 @@ int Packet_scanf(sockbuf_t *sbuf, const char *fmt, ...)
 			    break;
 			}
 		    }
-		    if ((str[k++] = sbuf->ptr[j++]) == '\0') {
+		    if ((str[k++] = sbuf->ptr[j++]) == '\0')
 			break;
-		    }
 		    else if (k >= max_str_size) {
 			/*
 			 * What to do now is unclear to me.
@@ -704,30 +704,24 @@ int Packet_scanf(sockbuf_t *sbuf, const char *fmt, ...)
 			 * the client has more difficulty with that
 			 * if this is the reliable data buffer.
 			 */
-#ifndef SILENT
-			errno = 0;
-			error("String overflow while scanning (%d,%d)",
+			warn("String overflow while scanning (%d,%d)",
 			      k, max_str_size);
-#endif
-			if (BIT(sbuf->state, SOCKBUF_LOCK) != 0) {
+			if (BIT(sbuf->state, SOCKBUF_LOCK) != 0)
 			    failure = 2;
-			} else {
+			else
 			    failure = 3;
-			}
 			break;
 		    }
 		}
-		if (failure != 0) {
+		if (failure != 0)
 		    strcpy(str, "ErRoR");
-		}
 		break;
 	    default:
 		failure = 1;
 		break;
 	    }
-	} else {
+	} else
 	    failure = 1;
-	}
     }
     if (failure == 1)
 	warn("Error in format string (%s)", fmt);
