@@ -2847,6 +2847,11 @@ void Turn_player(player_t *pl, bool push)
 	return;
     }
 
+    if (Player_is_phasing(pl)) {
+	pl->dir = new_dir;
+	return;
+    }
+
     if (new_dir > pl->dir) {
     	if (new_dir - pl->dir <= RES + pl->dir - new_dir) {
 	    sign = 1;
