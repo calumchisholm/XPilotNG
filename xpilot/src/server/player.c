@@ -393,22 +393,25 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
 int Init_player(int ind, shipshape_t *ship)
 {
     player_t *pl = Players(ind);
-    bool too_late = false;
-    int i;
     world_t *world = &World;
+    visibility_t *v = pl->visibility;
+    int i;
 
-    /*memset(pl, 0, sizeof(player));*/
+    memset(pl, 0, sizeof(player_t));
+    pl->visibility = v;
 
-    pl->vel.x = pl->vel.y = 0.0;
-    pl->acc.x = pl->acc.y = 0.0;
+    /*
+     * Make sure floats, doubles and pointers are correctly zeroed.
+     */
+    assert(pl->count == 0);
+    assert(pl->life  == 0);
+    assert(pl->conn  == NULL);
+
     pl->dir = DIR_UP;
     Player_set_float_dir(pl, (double)pl->dir);
 
-    pl->turnvel		= 0.0;
-    pl->oldturnvel	= 0.0;
-    pl->turnacc		= 0.0;
-    pl->mass		= options.shipMass;
-    pl->emptymass	= options.shipMass;
+    pl->mass = options.shipMass;
+    pl->emptymass = options.shipMass;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
@@ -418,11 +421,6 @@ int Init_player(int ind, shipshape_t *ship)
     pl->fuel.sum = world->items[ITEM_FUEL].initial;
     Player_init_fuel(pl, pl->fuel.sum);
 
-    /*
-     * If you don't want to allow shipshapes because the shape
-     * requirements have not been rewritten yet, set
-     * options.allowShipShapes to false.
-     */
     if (options.allowShipShapes && ship)
 	pl->ship = ship;
     else {
@@ -434,52 +432,17 @@ int Init_player(int ind, shipshape_t *ship)
 	    pl->ship = Default_ship();
     }
 
-    pl->power			= 55.0;
-    pl->turnspeed		= 10.0;
-    pl->turnresistance		= 0.0;
-    pl->power_s			= 25.0;
-    pl->turnspeed_s		= 7;
-    pl->turnresistance_s	= 0;
+    pl->power = pl->power_s = MAX_PLAYER_POWER;
+    pl->turnspeed = pl->turnspeed_s = MIN_PLAYER_TURNSPEED;
 
-    pl->check		= 0;
-    pl->round		= 0;
-    pl->time		= 0;
-    pl->last_lap_time	= 0;
-    pl->last_lap	= 0;
-    pl->best_lap	= 0;
-    pl->count		= 10000;
-    pl->shield_time	= 0;
-    pl->last_wall_touch	= 0;
+    pl->type = OBJ_PLAYER;
 
-    pl->type		= OBJ_PLAYER;
-    pl->type_ext	= 0;		/* assume human player */
-    pl->shots		= 0;
-    pl->missile_rack	= 0;
-    pl->forceVisible	= 0;
     Compute_sensor_range(pl);
-    pl->shot_time	= 0;
-    pl->laser_time	= 0;
-    pl->color		= WHITE;
-    pl->score		= 0;
-    pl->prev_score	= 0;
-    pl->prev_check	= 0;
-    pl->prev_round	= 0;
-    pl->fs		= 0;
-    pl->repair_target	= 0;
-    pl->name[0]		= '\0';
-    /*pl->auth_nick[0]	= 0;*/
-    pl->num_pulses	= 0;
-    pl->emergency_thrust_left = 0;
-    pl->emergency_shield_left = 0;
-    pl->phasing_left	= 0;
-    pl->self_destruct_count = 0;
-    pl->ecmcount	= 0;
-    pl->damaged 	= 0;
-    pl->stunned		= 0;
 
-    pl->status		= PLAYING | GRAVITY | DEF_BITS;
-    pl->have		= DEF_HAVE;
-    pl->used		= DEF_USED;
+    pl->color = WHITE;
+    pl->status = PLAYING | GRAVITY | DEF_BITS;
+    pl->have = DEF_HAVE;
+    pl->used = DEF_USED;
 
     if (pl->item[ITEM_CLOAK] > 0)
 	SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
@@ -487,27 +450,25 @@ int Init_player(int ind, shipshape_t *ship)
     CLEAR_MODS(pl->mods);
     for (i = 0; i < NUM_MODBANKS; i++)
 	CLEAR_MODS(pl->modbank[i]);
+
     for (i = 0; i < LOCKBANK_MAX; i++)
-	pl->lockbank[i] = -1;
+	pl->lockbank[i] = NO_ID;
 
     {
 	static unsigned short	pseudo_team_no = 0;
 
 	pl->pseudo_team = pseudo_team_no++;
     }
-    pl->mychar		= ' ';
-    pl->prev_mychar	= pl->mychar;
-    pl->life		= world->rules->lives;
-    pl->prev_life	= pl->life;
-    pl->ball 		= NULL;
+    pl->mychar = ' ';
+    pl->prev_mychar = pl->mychar;
+    pl->life = world->rules->lives;
+    pl->prev_life = pl->life;
 
-    pl->player_fps	= 50; /* Client should send a value after startup */
+    pl->player_fps = 50; /* Client should send a value after startup */
 
     Rank_ClearKills(pl);
     Rank_ClearDeaths(pl);
 
-    pl->pauseTime = 0;
-    pl->idleTime = 0;
     pl->flooding = -1;
 
     /*
@@ -519,11 +480,8 @@ int Init_player(int ind, shipshape_t *ship)
      * only one on the server. Mara's change (always too_late) meant
      * there was a round reset when the first player joined. -uau
      */
-    if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0)
-	too_late = true;
-
-    if (too_late) {
-	pl->mychar	= 'W';
+    if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0) {
+	pl->mychar = 'W';
 	pl->prev_life = pl->life = 0;
 	SET_BIT(pl->status, GAME_OVER);
     }
@@ -535,27 +493,13 @@ int Init_player(int ind, shipshape_t *ship)
     pl->invite		= NO_ID;
 
     pl->lock.tagged	= LOCK_NONE;
-    pl->lock.pl_id	= 0;
-
-    pl->robot_data_ptr	= NULL;
+    pl->lock.pl_id	= 0; /* kps - ??? */
 
     pl->id		= peek_ID();
     GetIndArray[pl->id]	= ind;
-    pl->conn		= NULL;
-    pl->audio		= NULL;
 
-    pl->lose_item	= 0;
-    pl->lose_item_state	= 0;
-
-    pl->shove_next = 0;
     for (i = 0; i < MAX_RECORDED_SHOVES; i++)
 	pl->shove_record[i].pusher_id = NO_ID;
-
-    pl->isowner = 0;
-    pl->isoperator = 0;
-    pl->privs = 0;
-
-    pl->rectype = 0;
 
     return pl->id;
 }
@@ -570,8 +514,6 @@ void Alloc_players(int number)
     visibility_t *t;
     size_t n = number;
     int i;
-
-    /* kps - fix this so you can memset the player struct to 0 later */
 
     /* Allocate space for pointers */
     PlayersArray = (player_t **) calloc(n, sizeof(player_t *));
@@ -601,19 +543,9 @@ void Alloc_players(int number)
 
 void Free_players(void)
 {
-#if 1
-    if (PlayersArray) {
-	free(PlayersArray);
-	PlayersArray = NULL;
-
-	free(playerArray);
-	free(visibilityArray);
-    }
-#else /* ng wants this, fix later */
-    free(PlayersArray);
-    free(playerArray);
-    free(visibilityArray);
-#endif
+    XFREE(PlayersArray);
+    XFREE(playerArray);
+    XFREE(visibilityArray);
 }
 
 
@@ -751,7 +683,11 @@ void Reset_all_players(void)
 
 		ball->id = NO_ID;
 		ball->life = 0;
-		ball->owner = 0;	/* why not -1 ??? */
+		/*
+		 * why not -1 ???
+		 * naive question, obviously yet another dirty hack
+		 */
+		ball->owner = 0;
 		CLR_BIT(ball->status, RECREATE);
 		Delete_shot(j);
 	    }
@@ -1903,7 +1839,7 @@ void Delete_player(player_t *pl)
 
 	for (j = 0; j < LOCKBANK_MAX; j++) {
 	    if (pl_i->lockbank[j] == id)
-		pl_i->lockbank[j] = -1;
+		pl_i->lockbank[j] = NO_ID;
 	}
 	for (j = 0; j < MAX_RECORDED_SHOVES; j++) {
 	    if (pl_i->shove_record[j].pusher_id == id)
