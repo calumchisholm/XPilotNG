@@ -267,9 +267,6 @@ static bool Msg_scan_for_ball_destruction(const char *message)
     return false;
 }
 
-
-
-
 /* Needed by base warning hack */
 static void Msg_scan_death(int id)
 {
@@ -283,11 +280,7 @@ static void Msg_scan_death(int id)
     if (!other)
 	return;
 
-    /*
-     * kps - hack, we don't want to do base warning for players who
-     * lost their last life. If deathtime is used for anything else
-     * this must be done some other way.
-     */
+    /* don't do base warning for players who lost their last life */
     if (BIT(Setup->mode, LIMITED_LIVES)	&& other->life == 0)
 	return;
 

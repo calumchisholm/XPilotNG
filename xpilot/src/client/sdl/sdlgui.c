@@ -1323,7 +1323,7 @@ void Paint_client_fps(void)
     /* Better make sure it's below the meters */
     y = draw_height - 9*(MAX(meterHeight,gamefont.h) + 6);
 ;
-    HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %d",clientFPS);
+    HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %.3f",clientFPS);
 }
 
 static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,

@@ -143,12 +143,12 @@ bool	shields = true;		/* When shields are considered up */
 bool	auto_shield = true;	/* shield drops for fire */
 char	modBankStr[NUM_MODBANKS][MAX_CHARS]; /* modifier banks */
 
-int	maxFPS;			/* Maximum FPS player wants from server */
+int	maxFPS;			/* Max FPS player wants from server */
 int	oldMaxFPS = 0;
-int	clientFPS = 1;	        /* How many fps we actually get */
-int	recordFPS = 0;		/* Optimal FPS to record at. */
-time_t	currentTime;	        /* Current value of time() */
-bool	newSecond = false;      /* True if time() incremented this frame */
+double	clientFPS = 1.0;	/* FPS client is drawing at */
+int	recordFPS = 0;		/* What FPS to record at */
+time_t	currentTime = 0;	/* Current value of time() */
+bool	newSecond = false;	/* Did time() increment this frame? */
 
 int	maxMouseTurnsPS = 0;
 int	mouseMovementInterval = 0;
@@ -1142,7 +1142,7 @@ static int init_blockmap(void)
 	num_cannons = 0;
     }
     if (num_checks != 0) {
-	checks = (checkpoint_t *)malloc(num_checks * sizeof(checkpoint_t));
+	checks = malloc(num_checks * sizeof(checkpoint_t));
 	if (checks == NULL) {
 	    error("No memory for Map checks (%d)", num_checks);
 	    return -1;
@@ -1306,22 +1306,6 @@ other_t *Other_by_name(const char *name, bool show_error_msg)
 	return NULL;
     }
 }
-
-#if 0
-other_t *Other_by_name(char *name)
-{
-    int i;
-
-    if (name == NULL)
-	return NULL;
-
-    for (i = 0; i < num_others; i++) {
-	if (!strcmp(name, Others[i].nick_name))
-	    return &Others[i];
-    }
-    return NULL;
-}
-#endif
 
 shipshape_t *Ship_by_id(int id)
 {
@@ -1626,15 +1610,21 @@ int Handle_start(long server_loops)
 
 static void update_timing(void)
 {
-    static int    frame_counter = 0;
-    static time_t old_time = 0;
-    
+    static int frame_counter = 0;
+    static struct timeval old_tv = {0, 0};
+    struct timeval now;
+
     frame_counter++;
-    currentTime = time(NULL);
-    if (currentTime != old_time) {
-	old_time = currentTime;
+    gettimeofday(&now, NULL);
+    if (now.tv_sec != old_tv.tv_sec) {
+	double usecs, fps;
+
+	currentTime = time(NULL);
+	usecs = 1e6 + (now.tv_usec - old_tv.tv_usec);
+	fps = (1e6 * frame_counter) / usecs;
+	old_tv = now;
 	newSecond = true;
-	clientFPS = frame_counter > 1 ? frame_counter : 1;
+	clientFPS = MAX(1.0, fps);
 	frame_counter = 0;
     } else
 	newSecond = false;

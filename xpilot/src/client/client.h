@@ -555,12 +555,12 @@ extern bool	shields;		/* When shields are considered up */
 extern bool	auto_shield;            /* drops shield for fire */
 extern bool	initialPointerControl;	/* Start by using mouse for control? */
 extern bool	pointerControl;		/* current state of mouse ship flying */
-extern int	maxFPS;			/* Client's own FPS */
+extern int	maxFPS;			/* Max FPS player wants from server */
 extern int 	oldMaxFPS;
-extern int	clientFPS;	        /* How many fps we actually get */
-extern int	recordFPS;		/* Optimal FPS to record at. */
+extern double	clientFPS;		/* FPS client is drawing at */
+extern int	recordFPS;		/* What FPS to record at */
 extern time_t	currentTime;	        /* Current value of time() */
-extern bool	newSecond;              /* True if time() incremented this frame */
+extern bool	newSecond;              /* Did time() increment this frame? */
 extern int	maxMouseTurnsPS;
 extern int	mouseMovementInterval;
 extern int	cumulativeMouseMovement;

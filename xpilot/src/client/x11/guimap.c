@@ -299,8 +299,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     if (base != NULL) {
 	/*
-	 * Hacks to support Mara's base warning on new servers and
-	 * the red "meter" basewarning on old servers.
+	 * Hacks to support base warnings.
 	 */
 	if (loops < base->appeartime)
 	    do_basewarning = true;

@@ -1635,7 +1635,7 @@ static void DoubleChooserWidget_Add( void *data )
     tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
 
     if (tmp->direction > 0)
-    	step = (tmp->maxval-tmp->minval)/(((double)clientFPS)*10.0);
+    	step = (tmp->maxval-tmp->minval)/(clientFPS*10.0);
     else
     	step = 0.01;
     
@@ -1669,7 +1669,7 @@ static void DoubleChooserWidget_Subtract( void *data )
     tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
 
     if (tmp->direction < 0)
-    	step = (tmp->maxval-tmp->minval)/(((double)clientFPS)*10.0);
+    	step = (tmp->maxval-tmp->minval)/(clientFPS*10.0);
     else
     	step = 0.01;
 

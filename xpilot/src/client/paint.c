@@ -120,7 +120,7 @@ void Paint_frame_start(void)
      */
     if (newSecond) {
 	/* kps - improve */
-	recordFPS = clientFPS;
+	recordFPS = (int)(clientFPS + 0.5);
 	timePerFrame = 1.0 / clientFPS;
 
 	/* TODO: move this somewhere else */

@@ -395,7 +395,7 @@ bool Key_release(keys_t key)
 	if (lose_item_active == 2)
 	    lose_item_active = 1;
 	else
-	    lose_item_active = -clientFPS;
+	    lose_item_active = -(int)(clientFPS + 0.5);
         break;
 
     default:

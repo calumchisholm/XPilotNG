@@ -987,7 +987,7 @@ void Paint_client_fps(void)
 	return;
 
     SET_FG(colors[hudColor].pixel);
-    sprintf(buf, "FPS: %d", clientFPS);
+    sprintf(buf, "FPS: %.3f", clientFPS);
     len = strlen(buf);
     w = XTextWidth(gameFont, buf, len);
     x = WINSCALE(ext_view_width) - 10 - w;
