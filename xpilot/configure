@@ -6962,7 +6962,7 @@ fi
 done
 
 
-                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile doc/man/xpilot.man doc/man/xp-replay.man doc/man/xp-mapedit.man doc/man/xpilots.man lib/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/common/NT/Makefile src/common/NT/bindist/Makefile src/common/NT/bindist/README.txt src/common/NT/bindist/READMEbin.txt src/common/NT/bindist/ServerMOTD.txt src/client/Makefile src/client/items/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
+                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile doc/man/xpilot.man doc/man/xp-replay.man doc/man/xp-mapedit.man doc/man/xpilots.man lib/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/common/NT/Makefile src/common/NT/bindist/Makefile src/common/NT/bindist/README.txt src/common/NT/bindist/READMEbin.txt src/common/NT/bindist/ServerMOTD.txt src/client/Makefile src/client/items/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7513,6 +7513,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+  "README" ) CONFIG_FILES="$CONFIG_FILES README" ;;
   "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
   "doc/man/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/man/Makefile" ;;
   "doc/man/xpilot.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xpilot.man" ;;

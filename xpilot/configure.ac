@@ -212,6 +212,7 @@ AC_CHECK_FUNCS([ \
 
 AC_CONFIG_FILES([ \
 	Makefile \
+	README \
 	doc/Makefile \
 	doc/man/Makefile \
 	doc/man/xpilot.man \

@@ -119,12 +119,15 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = src lib doc
+noinst_DATA = mapconvert.py
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = README
 DIST_SOURCES =
+DATA = $(noinst_DATA)
+
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	ps-recursive install-info-recursive uninstall-info-recursive \
@@ -132,7 +135,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = README $(srcdir)/Makefile.in $(srcdir)/configure AUTHORS \
-	COPYING ChangeLog INSTALL Makefile.am NEWS aclocal.m4 \
+	COPYING ChangeLog INSTALL Makefile.am NEWS README.in aclocal.m4 \
 	config.h.in config/depcomp config/install-sh config/missing \
 	config/mkinstalldirs configure configure.ac
 DIST_SUBDIRS = $(SUBDIRS)
@@ -173,6 +176,8 @@ $(srcdir)/config.h.in:  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+README: $(top_builddir)/config.status README.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -315,7 +320,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/config $(distdir)/doc/man $(distdir)/src/common $(distdir)/src/common/NT/bindist
+	$(mkinstalldirs) $(distdir)/. $(distdir)/config $(distdir)/doc/man $(distdir)/src/common $(distdir)/src/common/NT/bindist
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -426,7 +431,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile config.h
+all-am: Makefile $(DATA) config.h
 installdirs: installdirs-recursive
 installdirs-am:
 

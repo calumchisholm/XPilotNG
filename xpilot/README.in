@@ -1,6 +1,6 @@
-This is the README file for XPilot 4.5.4X2.
+This is the README file for XPilot @VERSION@.
 
-Copyright Å© 1991-2003 by BjÅ¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala.
+@XP_COPYRIGHT@.
 
 Please see the COPYING file for further details.  You may not
 distribute this project without all the documentation,
@@ -54,7 +54,7 @@ REPORTING PROBLEMS AND BUGS
 
 If you're completely stuck, found a bug, or want to say Hi! e-mail us at:
 
-        ksoderbl@cc.hut.fi
+        @PACKAGE_BUGREPORT@
 
 Remember to include the version of XPilot, your platform and the symptoms
 in as much detail as possible.
