@@ -89,6 +89,7 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
     cannon_t t, *cannon;
     int ind = world->NumCannons;
 
+    t.world = world;
     t.pos = pos;
     t.dir = dir;
     t.team = team;

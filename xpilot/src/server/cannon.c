@@ -50,10 +50,9 @@ long CANNON_USE_ITEM = (ITEM_BIT_FUEL|ITEM_BIT_WIDEANGLE
 			|ITEM_BIT_TRACTOR_BEAM|ITEM_BIT_MISSILE
 			|ITEM_BIT_PHASING);
 
-void Cannon_update(bool do_less_frequent_update)
+void Cannon_update(world_t *world, bool do_less_frequent_update)
 {
     int i;
-    world_t *world = &World;
 
     for (i = 0; i < world->NumCannons; i++) {
 	cannon_t *c = Cannons(world, i);
@@ -132,7 +131,7 @@ void Cannon_update(bool do_less_frequent_update)
    fuel is given in 'units', but is stored in fuelpacks. */
 void Cannon_add_item(cannon_t *c, int item, double amount)
 {
-    world_t *world = &World;
+    world_t *world = c->world;
 
     switch (item) {
     case ITEM_TANK:
@@ -157,7 +156,7 @@ void Cannon_throw_items(cannon_t *c)
     int i, dir;
     object_t *obj;
     double velocity;
-    world_t *world = &World;
+    world_t *world = c->world;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (i == ITEM_FUEL)
@@ -204,8 +203,8 @@ void Cannon_throw_items(cannon_t *c)
    items. */
 void Cannon_init(cannon_t *c)
 {
-    int		i;
-    world_t *world = &World;
+    int i;
+    world_t *world = c->world;
 
     c->last_change = frame_loops;
     for (i = 0; i < NUM_ITEMS; i++) {
@@ -270,7 +269,7 @@ static int Cannon_select_defense(cannon_t *c)
    modes 1 - 3 use progressively more accurate detection. */
 static int Cannon_in_danger(cannon_t *c)
 {
-    world_t *world = &World;
+    world_t *world = c->world;
     const int range = 4 * BLOCK_SZ;
     const long kill_shots = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT
 	    			| OBJ_PULSE | OBJ_SMART_SHOT | OBJ_HEAT_SHOT
@@ -392,14 +391,14 @@ static int Cannon_select_weapon(cannon_t *c)
  */
 static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 {
-    world_t *world = &World;
-    double	speed = options.shotSpeed;
-    double	range = CANNON_SHOT_LIFE_MAX * speed;
-    double	visualrange = (CANNON_DISTANCE
+    world_t *world = c->world;
+    double speed = options.shotSpeed;
+    double range = CANNON_SHOT_LIFE_MAX * speed;
+    double visualrange = (CANNON_DISTANCE
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
-    bool	found = false, ready = false;
-    double	closest = range;
-    int		ddir, i;
+    bool found = false, ready = false;
+    double closest = range;
+    int ddir, i;
 
     switch (weapon) {
     case CW_MINE:
@@ -543,7 +542,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
    have more than one possible use. */
 static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 {
-    world_t *world = &World;
+    world_t *world = c->world;
     modifiers_t	mods;
     bool played = false;
     int i;
@@ -743,7 +742,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 
 void Cannon_dies(cannon_t *c, player_t *pl)
 {
-    world_t *world = &World;
+    world_t *world = c->world;
     vector_t zero_vel = { 0.0, 0.0 };
 
     World_remove_cannon(world, c);

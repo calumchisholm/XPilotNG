@@ -107,6 +107,7 @@
 #define DIR_LEFT		(RES/2)
 #define DIR_DOWN		(3*RES/4)
 
+typedef struct world world_t;
 
 typedef struct fuel {
     clpos_t	pos;
@@ -135,6 +136,7 @@ typedef struct baseorder {
 } baseorder_t;
 
 typedef struct cannon {
+    world_t	*world;
     clpos_t	pos;
     int		dir;
     unsigned	conn_mask;
@@ -238,7 +240,7 @@ typedef struct friction_area {
 
 extern bool is_polygon_map;
 
-typedef struct {
+struct world {
     int		x, y;		/* Size of world in blocks */
     double	diagonal;	/* Diagonal length in blocks */
     int		width, height;	/* Size of world in pixels (optimization) */
@@ -283,7 +285,7 @@ typedef struct {
     asteroid_concentrator_t	*asteroidConcs;
     int		NumFrictionAreas, MaxFrictionAreas;
     friction_area_t		*frictionAreas;
-} world_t;
+};
 
 extern world_t		World;
 

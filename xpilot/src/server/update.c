@@ -1247,7 +1247,7 @@ void Update_objects(world_t *world)
     Asteroid_update(world);
     Ecm_update();
     Transporter_update();
-    Cannon_update(do_update_this_frame);
+    Cannon_update(world, do_update_this_frame);
     Target_update(world);
     Update_players();
 

@@ -27,6 +27,10 @@
 #ifndef CANNON_H
 #define CANNON_H
 
+#ifndef MAP_H
+# include "map.h"
+#endif
+
 extern long CANNON_USE_ITEM;
 
 /* the different weapons a cannon can use.
@@ -76,6 +80,6 @@ extern long CANNON_USE_ITEM;
 /* sector in which cannonfire is possible */
 #define CANNON_SPREAD		(RES / 3)
 
-extern void Cannon_update(bool do_less_frequent_update);
+extern void Cannon_update(world_t *world, bool do_less_frequent_update);
 
 #endif
