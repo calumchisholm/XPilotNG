@@ -332,7 +332,7 @@ DFLOAT		gameSpeed;		/* FPS/FPSMultiplier */
 int		timeStep;		/* Game time step per frame */
 DFLOAT		timeStep2;		/* timeStep /TIME_FACT */
 					/* before: framespeed, framespeed2 */
-
+DFLOAT		ecmSizeFactor;		/* Factor for ecm size update */
 
 int		recordMode;		/* 0=off, 1=record, 2=playback */
 int		recordFlushInterval;	/* Max seconds between storing data */
@@ -3743,6 +3743,8 @@ void Timing_setup(void)
     if (friction < 1)
 	friction = 1. - pow(1. - friction, 1. / FPSMultiplier);
 
+    /* ecm size used to be halved every update on old servers */
+    ecmSizeFactor = pow(0.5, 1. / FPSMultiplier);
 #if 0
     xpprintf(__FILE__ ": gameSpeed         = %f\n", gameSpeed);
     xpprintf(__FILE__ ": FPSMultiplier     = %f\n", FPSMultiplier);

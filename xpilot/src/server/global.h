@@ -360,6 +360,7 @@ extern DFLOAT		FPSMultiplier;
 extern DFLOAT		gameSpeed;
 extern int		timeStep;
 extern DFLOAT		timeStep2;
+extern DFLOAT		ecmSizeFactor;
 extern char		*playerPasswordsFileName;
 extern int		playerPasswordsFileSizeLimit;
 

@@ -972,7 +972,7 @@ static void Frame_ships(int conn, int ind)
     }
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];
-	Send_ecm(conn, ecm->pos.cx, ecm->pos.cy, ecm->size);
+	Send_ecm(conn, ecm->pos.cx, ecm->pos.cy, (int)ecm->size);
     }
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];

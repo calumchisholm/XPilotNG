@@ -616,10 +616,8 @@ void Update_objects(void)
     /*
      * Update ECM blasts
      */
-    /* kps - shifting by 1 bit each frame here is not too clever at
-     * high fps */
     for (i = 0; i < NumEcms; i++) {
-	if ((Ecms[i]->size >>= 1) == 0) {
+	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
 	    if (Ecms[i]->id != NO_ID)
 		Players[GetInd[Ecms[i]->id]]->ecmcount--;
 	    free(Ecms[i]);

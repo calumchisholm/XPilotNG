@@ -999,7 +999,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
     ecm->pos.cx = cx;
     ecm->pos.cy = cy;
     ecm->id = (pl ? pl->id : NO_ID);
-    ecm->size = (int)ECM_DISTANCE;
+    ecm->size = ECM_DISTANCE;
     NumEcms++;
     if (pl) {
 	pl->ecmcount++;

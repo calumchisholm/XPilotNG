@@ -419,7 +419,7 @@ struct _visibility {
 
 #define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */
 typedef struct {
-    int		size;
+    DFLOAT	size;
     clpos	pos;
     int		id;
 } ecm_t;
