@@ -58,8 +58,7 @@ static size_t cell_dist_size;
 
 static void Free_cell_dist(void)
 {
-    if (cell_dist)
-	XFREE(cell_dist);
+    XFREE(cell_dist);
 }
 
 
@@ -139,16 +138,14 @@ static void Init_cell_dist(void)
 
 void Free_cells(void)
 {
-    if (Cells)
-	XFREE(Cells);
-
+    XFREE(Cells);
     Free_cell_dist();
 }
 
 
 void Alloc_cells(void)
 {
-    unsigned size;
+    size_t size;
     cell_node_t *cell_ptr;
     int x, y;
     world_t *world = &World;
@@ -248,9 +245,7 @@ void Cell_get_objects(clpos_t pos,
 		      object_t *** obj_list, int *count_ptr)
 {
     static object_t *ObjectList[MAX_TOTAL_SHOTS + 1];
-    int i, count;
-    int x, y, xw, yw;
-    int wrap;
+    int i, count, x, y, xw, yw, wrap;
     object_t *obj;
     cell_node_t *cell_node_ptr, *next;
     double dist;
