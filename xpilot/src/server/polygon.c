@@ -67,24 +67,16 @@ static int Create_group(int type, int team, hitmask_t hitmask,
 	warn("Broken map: map object defined inside another.");
 	exit(1);
     }
-#ifdef DYNAMIC_GROUPS
+
     current_group = num_groups;
     STORE(group_t, groups, num_groups, max_groups, gp);
     return current_group;
-#else
-    current_group = num_groups++;
-    Check_groupcount();
-    groups[current_group] = gp;
-    return current_group;
-#endif
 }
 
 void Groups_init(void)
 {
-#ifdef DYNAMIC_GROUPS
     Create_group(FILLED, TEAM_NOT_SET, 0, NULL, NO_IND);
     current_group = 0;
-#endif
 }
 
 void P_edgestyle(const char *id, int width, int color, int style)

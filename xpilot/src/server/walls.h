@@ -159,13 +159,7 @@ extern struct bmpstyle  bstyles[256];
 extern poly_t *pdata;
 extern int *estyleptr;
 extern int *edgeptr;
-
-#define DYNAMIC_GROUPS 1
-#ifdef DYNAMIC_GROUPS
 extern group_t *groups;
-#else
-extern group_t groups[];
-#endif
 extern int num_groups, max_groups;
 
 static inline group_t *groupptr_by_id(int group)

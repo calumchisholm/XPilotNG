@@ -116,16 +116,8 @@ shape_t ball_wire;
 struct bline *linet;
 #define S_LINES 100 /* stupid hack */
 
-#ifdef DYNAMIC_GROUPS
 struct group *groups = NULL;
 int num_groups = 0, max_groups = 0;
-#else
-int num_groups = 1;
-struct group groups[1000] = { /* !@# */
-    {0, 0, 0, NULL, NO_IND},
-    {0, 0, 0, NULL, NO_IND},
-    {0, 0, 0, NULL, NO_IND}};
-#endif
 
 struct blockinfo *blockline;
 unsigned short *llist;
@@ -2543,9 +2535,8 @@ void Walls_init(void)
      * arbitrary point on the map is inside something. */
     Inside_init();
 
-#ifndef DYNAMIC_GROUPS
-    groups[0].type = FILLED;
-#endif
+    /* kps - remove some time */
+    assert(groups[0].type == FILLED);
 
     /* Precalculate the .c and .s values used when calculating a bounce
      * from the line. */
