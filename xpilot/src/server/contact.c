@@ -282,7 +282,7 @@ void Contact(int fd, void *arg)
     ibuf.len = bytes;
 
     strlcpy(host_addr, sock_get_last_addr(&contactSocket), sizeof(host_addr));
-    xpprintf("%s Checking Adress:(%s)\n",showtime(),host_addr);
+    xpprintf("%s Checking Address:(%s)\n",showtime(),host_addr);
     if (Check_address(host_addr)) {
 	xpprintf("%s Host blocked!:(%s)\n",showtime(),host_addr);
 	return;
