@@ -928,19 +928,41 @@ static void Update_players(world_t *world)
 		Traverse_wormhole(pl);
 	}
 
+	/*
+	 * Reset WARPED status, when player is outside a wormhole
+	 */
+	if (BIT(pl->status, WARPED)) {
+	    int group;
+	    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team);
+	    /*
+	     * clear warped, so we can use shape_is inside,
+	     * Wormhole_hitfunc check for WARPED bit.
+	     */
+	    CLR_BIT(pl->status, WARPED);
+	    group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
+				    OBJ_PTR(pl), (shape_t *)pl->ship,
+				    pl->dir);
+	    /*
+	     * kps - we might possibly have entered another polygon, e.g.
+	     * a wormhole ?
+	     */
+	    if (group != NO_GROUP)
+		SET_BIT(pl->status, WARPED);
+	}
 	
 	{
-	    double ax = pl->acc.x;
-	    double ay = pl->acc.y;
+	    vector_t acc = pl->acc;
+
 	    if (BIT(pl->status, GRAVITY)) {
 		vector_t gravity = World_gravity(world, pl->pos);
-		ax += gravity.x;
-		ay += gravity.y;
+
+		acc.x += gravity.x;
+		acc.y += gravity.y;
 	    }
-	    ax *= timeStep / 2;
-	    ay *= timeStep / 2;
-	    pl->vel.x += ax;
-	    pl->vel.y += ay;
+	    acc.x *= timeStep / 2;
+	    acc.y *= timeStep / 2;
+	    pl->vel.x += acc.x;
+	    pl->vel.y += acc.y;
 	    if (options.constantSpeed) {
 		pl->vel.x += options.constantSpeed * pl->acc.x;
 		pl->vel.y += options.constantSpeed * pl->acc.y;
@@ -955,8 +977,8 @@ static void Update_players(world_t *world)
 	    }
 	    else
 		Move_player(pl);
-	    pl->vel.x += ax;
-	    pl->vel.y += ay;
+	    pl->vel.x += acc.x;
+	    pl->vel.y += acc.y;
 	}
 
 	/*
