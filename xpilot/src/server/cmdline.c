@@ -3534,7 +3534,7 @@ static option_desc opts[] = {
 	&options.sparkSpeed,
 	valReal,
 	tuner_dummy,
-	"Avg. speed (relative ship) of thrust sparks\n",
+	"Multiplier affecting avg. speed (relative ship) of thrust sparks\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

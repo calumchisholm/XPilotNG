@@ -2884,7 +2884,6 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 /**********************/
 /* Begin: MainWidget  */
 /**********************/
-/*static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );*/
 static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b );
 static void Close_MainWidget( GLWidget *widget );
 
@@ -2914,30 +2913,6 @@ void MainWidget_ShowMenu( GLWidget *widget, bool show )
     	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
     }
 }
-
-/*static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
-{
-    GLWidget *widget;
-    WrapperWidget *wid_info;
-    SDL_Rect b;
-    
-    widget = (GLWidget *)data;
-    wid_info = ((WrapperWidget *)widget->wid_info);
-    if (state == SDL_PRESSED) {
-    	if (button == 2) {
-    	    if ((wid_info->showconf = !wid_info->showconf)) {
-		b.x = x - wid_info->confmenu->bounds.w/2;
-		b.y = y - wid_info->confmenu->bounds.h/2;
-		b.w = wid_info->confmenu->bounds.w;
-		b.h = wid_info->confmenu->bounds.h;
-		SetBounds_GLWidget(wid_info->confmenu,&b);
-    	    	AppendGLWidgetList(&(widget->children), wid_info->confmenu);
-	    } else {
-    	    	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
- 	    }
-	}
-    }
-}*/
 
 static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
 {
