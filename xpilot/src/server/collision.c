@@ -37,7 +37,7 @@ char collision_version[] = VERSION;
  */
 
 /* kps - note: the arguments are all given in clicks here */
-static int in_range_acd_old(
+static bool in_range_acd_old(
 	int p1x, int p1y, int p2x, int p2y,
 	int q1x, int q1y, int q2x, int q2y,
 	int r)
@@ -113,25 +113,26 @@ static int in_range_acd_old(
      * Do the detection
      */
     if ((p2x - q2x) * (p2x - q2x) + (p2y - q2y) * (p2y - q2y) < r * r)
-	return 1;
+	return true;
     fac1 = -p1x + p2x + q1x - q2x;
     fac2 = -p1y + p2y + q1y - q2y;
     top = -(fac1 * (-p2x + q2x) + fac2 * (-p2y + q2y));
     bot = (fac1 * fac1 + fac2 * fac2);
     if (top < 0 || bot < 1 || top > bot)
-	return 0;
+	return false;
     tmin = ((double)top) / ((double)bot);
     fminx = -p2x + q2x + fac1 * tmin;
     fminy = -p2y + q2y + fac2 * tmin;
     if (fminx * fminx + fminy * fminy < r * r)
-	return 1;
+	return true;
     else
-	return 0;
+	return false;
 }
 
 /* new acd functions */
 /* doubles because the multiplies might overflow ints */
-static int in_range_acd(double dx, double dy, double dvx, double dvy, double r)
+static bool in_range_acd(double dx, double dy, double dvx, double dvy,
+			 double r)
 {
     double	tmin, fminx, fminy;
     double	top, bot;
@@ -151,21 +152,21 @@ static int in_range_acd(double dx, double dy, double dvx, double dvy, double r)
     }
 
     if (dx * dx + dy * dy < r * r)
-	return 1;
+	return true;
     top = -(dvx * dx + dvy * dy);
     bot = dvx * dvx + dvy * dvy;
     if (top < 0 || bot < CLICK * CLICK || top > bot)
-	return 0;
+	return false;
     tmin = top / bot;
     fminx = dx + dvx * tmin;
     fminy = dy + dvy * tmin;
     if (fminx * fminx + fminy * fminy < r * r)
-	return 1;
+	return true;
     else
-	return 0;
+	return false;
 }
 
-static int in_range_simple(int px, int py, int qx, int qy, int r)
+static bool in_range_simple(int px, int py, int qx, int qy, int r)
 {
     int dx = px - qx, dy = py - qy;
 
@@ -178,13 +179,13 @@ static int in_range_simple(int px, int py, int qx, int qy, int r)
     else if (dy < -World.cheight >> 1)
 	dy += World.cheight;
     if ((double)dx * dx + (double)dy * dy < r * r)
-	return 1;
+	return true;
     else
-	return 0;
+	return false;
 }
 
-static int in_range_partial(double dx, double dy, double dvx, double dvy,
-			    double r, DFLOAT wall_time)
+static bool in_range_partial(double dx, double dy, double dvx, double dvy,
+			     double r, DFLOAT wall_time)
 {
     double	tmin, fminx, fminy;
     double	top, bot;
@@ -206,7 +207,7 @@ static int in_range_partial(double dx, double dy, double dvx, double dvy,
     top = -(dvx * dx + dvy * dy);
     bot = dvx * dvx + dvy * dvy;
     if (top <= 0)
-	return 0;
+	return false;
     if (bot < 5 * CLICK * CLICK || top >= bot)
 	tmin = wall_time;
     else
@@ -214,9 +215,9 @@ static int in_range_partial(double dx, double dy, double dvx, double dvy,
     fminx = dx + dvx * tmin;
     fminy = dy + dvy * tmin;
     if (fminx * fminx + fminy * fminy < r * r)
-	return 1;
+	return true;
     else
-	return 0;
+	return false;
 }
 
 /* Collmodes:
@@ -249,7 +250,7 @@ static int in_range_partial(double dx, double dy, double dvx, double dvy,
 */
 static bool in_range(object *obj1, object *obj2, double range)
 {
-    int hit;
+    bool hit;
 
     if (is_polygon_map || !useOldCode) {
 	switch (obj2->collmode) {
@@ -363,6 +364,10 @@ static void PlayerCollision(void)
 		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
 		    continue;
 		range = (2*SHIP_SZ-6) * CLICK;
+#if 1
+		if (!in_range(OBJ_PTR(pl), OBJ_PTR(pl_j), range))
+		    continue;
+#else
 		if (is_polygon_map || !useOldCode) {
 		    if (!in_range_acd(pl->prevpos.cx - pl_j->prevpos.cx,
 				      pl->prevpos.cy - pl_j->prevpos.cy,
@@ -382,7 +387,7 @@ static void PlayerCollision(void)
 			continue;
 		    }
 		}
-
+#endif
 		/*
 		 * Here we can add code to do more accurate player against
 		 * player collision detection.
@@ -724,6 +729,10 @@ static void PlayerObjectCollision(player *pl)
 
 	range = (SHIP_SZ + obj->pl_range) * CLICK;
 
+#if 1
+	if (!in_range(OBJ_PTR(pl), obj, range))
+	    continue;
+#else
 	if (is_polygon_map || !useOldCode) {
 	    switch (obj->collmode) {
 	    case 0:
@@ -766,6 +775,7 @@ static void PlayerObjectCollision(player *pl)
 		continue;
 	    }
 	}
+#endif
 
 	if (obj->id != NO_ID) {
 	    if (obj->id == pl->id) {
@@ -820,9 +830,19 @@ static void PlayerObjectCollision(player *pl)
 	 * Objects actually only hit the player if they are really close.
 	 */
 	radius = (SHIP_SZ + obj->pl_radius) * CLICK;
+	if (radius != range)
+	    warn("(radius (%d) != range (%d))", radius, range);
+
 	if (radius >= range) {
-	    hit = 1;
+	    hit = true;
 	} else {
+#if 1
+	    /*
+	     * kps - why is radius used in the NG functions and range
+	     * in the old one ?
+	     */
+	    hit = in_range(OBJ_PTR(pl), obj, radius);
+#else
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
@@ -857,6 +877,7 @@ static void PlayerObjectCollision(player *pl)
 
 
 	    }
+#endif
 	}
 
 #if 0
@@ -1650,6 +1671,11 @@ static void AsteroidCollision(void)
 		continue;
 
 	    radius = (ast->pl_radius + obj->pl_radius) * CLICK;
+
+#if 1
+	    if (!in_range(OBJ_PTR(ast), obj, radius))
+		continue;
+#else
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
@@ -1689,6 +1715,7 @@ static void AsteroidCollision(void)
 		    continue;
 		}
 	    }
+#endif
 
 	    switch (obj->type) {
 	    case OBJ_BALL:
@@ -1842,7 +1869,7 @@ static void BallCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
-	    int hit;
+	    bool hit;
 
 	    obj = obj_list[j];
 
@@ -1862,6 +1889,11 @@ static void BallCollision(void)
 	    }
 
 	    radius = (ball->pl_radius + obj->pl_radius) * CLICK;
+
+#if 1
+	    if (!in_range(OBJ_PTR(ball), obj, radius))
+		continue;
+#else
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
@@ -1898,7 +1930,7 @@ static void BallCollision(void)
 		    continue;
 		}
 	    }
-
+#endif
 	    /* bang! */
 
 	    switch (obj->type) {
@@ -1984,7 +2016,8 @@ static void MineCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
-	    int r, hit;
+	    int r;
+	    bool hit;
 
 	    obj = obj_list[j];
 
