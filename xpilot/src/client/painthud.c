@@ -1014,7 +1014,6 @@ static char *crashes[] = { "crashed", "smashed", "smacked", "was trashed",
 };
 static char *obstacles[] =
     { "wall", "target", "treasure", "cannon", NULL };
-
 static char *teamnames[] =
     { "2", "4", "0", "1", "3", "5", "6", "7", "8", "9", NULL };
 
@@ -1094,10 +1093,8 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
 	    }
 	}
 	break;
-    case 't':
+    case 't':			/* "name" of a team */
 	for (i = 0; teamnames[i] != NULL; i++) {
-	    printf("msg = \"%s\", trying teamname \"%s\"\n",
-		   msg, teamnames[i]);
 	    if (strncmp(msg, teamnames[i], strlen(teamnames[i])) == 0) {
 		strncpy(nm->name[nm->index++], teamnames[i], 2);
 		msg += strlen(teamnames[i]);
