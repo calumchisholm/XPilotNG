@@ -33,7 +33,6 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static char msg[MSG_LEN];
 
-/* kps - gravity is block based, even on polygon maps */
 static inline void update_object_speed(object *obj)
 {
     if (BIT(obj->status, GRAVITY)) {
@@ -290,8 +289,7 @@ static void do_Autopilot (player *pl)
     int		vad;	/* Velocity Away Delta */
     int		dir;
     int		afterburners;
-    int		ix, iy;
-    double	gx, gy;
+    vector	gravity;
     double	acc, vel;
     double	delta;
     double	turnspeed, power;
@@ -324,10 +322,7 @@ static void do_Autopilot (player *pl)
     } else
 	afterburners = pl->item[ITEM_AFTERBURNER];
 
-    ix = OBJ_X_IN_BLOCKS(pl);
-    iy = OBJ_Y_IN_BLOCKS(pl);
-    gx = World.gravity[ix][iy].x;
-    gy = World.gravity[ix][iy].y;
+    gravity = World_gravity(pl->pos);
 
     /*
      * Due to rounding errors if the velocity is very small we were probably
@@ -342,7 +337,7 @@ static void do_Autopilot (player *pl)
      * Calculate power needed to change instantaneously to stopped.  We
      * must include gravity here for next time round the update loop.
      */
-    acc = LENGTH(gx, gy) + vel;
+    acc = LENGTH(gravity.x, gravity.y) + vel;
     power = acc * pl->mass;
     if (afterburners)
 	power /= AFTER_BURN_POWER_FACTOR(afterburners);
@@ -351,10 +346,10 @@ static void do_Autopilot (player *pl)
      * Calculate direction change needed to reduce velocity to zero.
      */
     if (vel == 0.0) {
-	if (gx == 0 && gy == 0)
+	if (gravity.x == 0 && gravity.y == 0)
 	    vad = pl->dir;
 	else
-	    vad = (int)findDir(-gx, -gy);
+	    vad = (int)findDir(-gravity.x, -gravity.y);
     } else
 	vad = (int)findDir(-pl->vel.x, -pl->vel.y);
 
