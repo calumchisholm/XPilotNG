@@ -291,6 +291,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
  * anything) unless you know what you are doing.
  */
 
+extern bool in_legacy_mode_ball_hack;
 /*
  * This function is called when something would hit a balltarget.
  * The function determines if it hits or not.
@@ -305,16 +306,14 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
     if (move->obj == NULL)
 	return true;
 
-    /* can this happen ? */
-    if (move->obj->type != OBJ_BALL) {
-	printf("Balltarget_hitfunc: hit by a %s.\n",
-	       Object_typename(move->obj));
-	return true;
-    }
+    assert(move->obj->type == OBJ_BALL);
 
     ball = BALL_PTR(move->obj);
 
     if (ball->ball_owner == NO_ID)
+	return true;
+
+    if (in_legacy_mode_ball_hack)
 	return true;
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
@@ -323,7 +322,7 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 	 * the ball and the target are of the same team, but the
 	 * owner is not.
 	 */
-	if (ball->ball_treasure->team != options.specialBallTeam 
+	if (ball->ball_treasure->team != options.specialBallTeam /* kps - ? */
 	    && ball->ball_treasure->team == gp->team
 	    && Player_by_id(ball->ball_owner)->team != gp->team)
 	    return false;

@@ -446,6 +446,35 @@ static void Fuel_update(world_t *world)
     }
 }
 
+bool in_legacy_mode_ball_hack = false;
+
+static void legacy_mode_ball_hack(world_t *world, ballobject_t *ball)
+{
+    int group;
+    group_t *gp;
+
+    if (ball->ball_treasure->have)
+	return;
+
+    in_legacy_mode_ball_hack = true;
+    group = is_inside(ball->pos.cx, ball->pos.cy, BALL_BIT,
+		      (const object_t *)ball);
+    in_legacy_mode_ball_hack = false;
+
+    if (group == NO_GROUP)
+	return;
+
+    gp = groupptr_by_id(group);
+    if (gp->type != TREASURE)
+	return;
+
+    /* ok it hit some treasure, let's just set ball loose counter to 0 */
+    ball->ball_loose_ticks = 0;
+    /*warn("set loose ticks to 0 for ball %p", ball);*/
+}
+
+
+
 static void Misc_object_update(world_t *world)
 {
     int i;
@@ -474,6 +503,9 @@ static void Misc_object_update(world_t *world)
 	    ballobject_t *ball = BALL_PTR(obj);
 	    
 	    ball->ball_loose_ticks += timeStep;
+
+	    if (options.legacyMode)
+		legacy_mode_ball_hack(world, ball);
 
 	    Update_connector_force(world, ball);
 	}
