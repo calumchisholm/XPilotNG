@@ -345,6 +345,7 @@ static void Tune_robot_user_name(void) { Fix_user_name(robotUserName); }
 static void Tune_robot_host_name(void) { Fix_host_name(robotHostName); }
 static void Tune_tank_user_name(void)  { Fix_user_name(tankUserName); }
 static void Tune_tank_host_name(void)  { Fix_host_name(tankHostName); }
+static void Tune_tagGame(void)         { if (!tagGame) tag = NO_ID; }
 static void Check_baseless(void);
 
 static option_desc options[] = {
@@ -1628,7 +1629,7 @@ static option_desc options[] = {
  	"no",
  	&tagGame,
  	valBool,
- 	tuner_none,
+ 	Tune_tagGame,
  	"Are we going to play a game of tag?\n"
  	"One player is 'it' (is worth more points when killed than the\n"
  	"others). After this player is killed, the one who killed them\n"
