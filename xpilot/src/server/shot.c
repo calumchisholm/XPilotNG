@@ -47,7 +47,8 @@ void Place_mine(player *pl)
     vector	zero_vel = { 0.0, 0.0 };
 
     if (pl->item[ITEM_MINE] <= 0
-	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !options.shieldedMining))
+	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
+	    && !options.shieldedMining))
 	return;
 
     if (options.minMineSpeed > 0) {
@@ -64,7 +65,8 @@ void Place_moving_mine(player *pl)
     vector	vel = pl->vel;
 
     if (pl->item[ITEM_MINE] <= 0
-	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !options.shieldedMining))
+	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
+	    && !options.shieldedMining))
 	return;
 
     if (options.minMineSpeed > 0) {
@@ -153,7 +155,8 @@ void Place_general_mine(player *pl, int team, long status,
 		    && !Player_is_tank(pl_i)) {
 		    int dx = pos.cx - pl_i->home_base->pos.cx;
 		    int dy = pos.cy - pl_i->home_base->pos.cy;
-		    if (Wrap_length(dx, dy) <= options.baseMineRange * BLOCK_CLICKS) {
+		    if (Wrap_length(dx, dy)
+			<= options.baseMineRange * BLOCK_CLICKS) {
 			Set_player_message(pl, "No base mining!");
 			return;
 		    }
@@ -206,7 +209,7 @@ void Place_general_mine(player *pl, int team, long status,
 	     *			    o   o	    o   o
 	     */
 	    dir = (i * space) + space/2 + (minis-2)*(RES/2) + (pl?pl->dir:0);
-	    dir += (int)((rfrac() - 0.5f) * space * 0.5f);
+	    dir += (int)((rfrac() - 0.5) * space * 0.5);
 	    dir = MOD2(dir, RES);
 	    mv.x = MINI_MINE_SPREAD_SPEED * tcos(dir) / spread;
 	    mv.y = MINI_MINE_SPREAD_SPEED * tsin(dir) / spread;
@@ -390,7 +393,8 @@ void Fire_main_shot(player *pl, int type, int dir)
 {
     clpos m_gun, pos;
 
-    if (pl->shots >= options.ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
+    if (pl->shots >= options.ShotsMax
+	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
@@ -402,7 +406,8 @@ void Fire_main_shot(player *pl, int type, int dir)
 
 void Fire_shot(player *pl, int type, int dir)
 {
-    if (pl->shots >= options.ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
+    if (pl->shots >= options.ShotsMax
+	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     Fire_general_shot(pl, pl->team, 0, pl->pos, type, dir, pl->mods, NO_ID);
@@ -412,7 +417,8 @@ void Fire_left_shot(player *pl, int type, int dir, int gun)
 {
     clpos l_gun, pos;
 
-    if (pl->shots >= options.ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
+    if (pl->shots >= options.ShotsMax
+	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     l_gun = Ship_get_l_gun_clpos(pl->ship, gun, pl->dir);
@@ -426,7 +432,8 @@ void Fire_right_shot(player *pl, int type, int dir, int gun)
 {
     clpos r_gun, pos;
 
-    if (pl->shots >= options.ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
+    if (pl->shots >= options.ShotsMax
+	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     r_gun = Ship_get_r_gun_clpos(pl->ship, gun, pl->dir);
@@ -440,7 +447,8 @@ void Fire_left_rshot(player *pl, int type, int dir, int gun)
 {
     clpos l_rgun, pos;
 
-    if (pl->shots >= options.ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
+    if (pl->shots >= options.ShotsMax
+	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     l_rgun = Ship_get_l_rgun_clpos(pl->ship, gun, pl->dir);
@@ -454,7 +462,8 @@ void Fire_right_rshot(player *pl, int type, int dir, int gun)
 {
     clpos r_rgun, pos;
 
-    if (pl->shots >= options.ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
+    if (pl->shots >= options.ShotsMax
+	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     r_rgun = Ship_get_r_rgun_clpos(pl->ship, gun, pl->dir);
@@ -532,7 +541,8 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 
     case OBJ_SMART_SHOT:
     case OBJ_HEAT_SHOT:
-	if (type == OBJ_HEAT_SHOT ? !options.allowHeatSeekers : !options.allowSmartMissiles) {
+	if (type == OBJ_HEAT_SHOT
+	    ? !options.allowHeatSeekers : !options.allowSmartMissiles) {
 	    if (options.allowTorpedoes)
 		type = OBJ_TORPEDO;
 	    else
@@ -567,11 +577,13 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    } else
 		used = options.nukeMinSmarts;
 	    mass = MISSILE_MASS * used * NUKE_MASS_MULT;
-	    pl_range = (type == OBJ_TORPEDO) ? (int)NUKE_RANGE : MISSILE_RANGE;
+	    pl_range = (type == OBJ_TORPEDO)
+	      ? (int)NUKE_RANGE : MISSILE_RANGE;
 	} else {
 	    mass = MISSILE_MASS;
 	    used = 1;
-	    pl_range = (type == OBJ_TORPEDO) ? (int)TORPEDO_RANGE : MISSILE_RANGE;
+	    pl_range = (type == OBJ_TORPEDO)
+	      ? (int)TORPEDO_RANGE : MISSILE_RANGE;
 	}
 	pl_range /= mods.mini + 1;
 	pl_radius = MISSILE_LEN;
@@ -585,7 +597,8 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	if (pl && BIT(pl->status, KILLED))
 	    life = rfrac() * 12;
 	else if (!cannon)
-	    life = (options.missileLife ? options.missileLife : MISSILE_LIFETIME);
+	    life = (options.missileLife
+		    ? options.missileLife : MISSILE_LIFETIME);
 
 	switch (type) {
 	case OBJ_HEAT_SHOT:
@@ -1049,7 +1062,8 @@ void Fire_normal_shots(player *pl)
 	    if (pl->ship->num_l_rgun > 0) {
 		Fire_left_rshot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
 		    + ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) * shot_angle) / 2,
-			RES), (i - (pl->item[ITEM_REARSHOT] + 1) / 2) % pl->ship->num_l_rgun);
+			RES), (i - (pl->item[ITEM_REARSHOT] + 1) / 2)
+				% pl->ship->num_l_rgun);
 	    }
 	    else {
 		Fire_shot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
@@ -1061,7 +1075,8 @@ void Fire_normal_shots(player *pl)
 	    if (pl->ship->num_r_rgun > 0) {
 		Fire_right_rshot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
 		    + ((pl->item[ITEM_REARSHOT] - 1 - 2 * i) * shot_angle) / 2,
-			RES), (pl->item[ITEM_REARSHOT] / 2 - i - 1) % pl->ship->num_r_rgun);
+			RES), (pl->item[ITEM_REARSHOT] / 2 - i - 1)
+				 % pl->ship->num_r_rgun);
 	    }
 	    else {
 		Fire_shot(pl, OBJ_SHOT, MOD2(pl->dir + RES/2
@@ -1189,11 +1204,11 @@ void Delete_shot(int ind)
 	    modv = 1 << shot->mods.velocity;
 	    num_modv = 4;
 	    if (BIT(shot->mods.nuclear, NUCLEAR)) {
-		modv *= 4.0f;
+		modv *= 4.0;
 		num_modv = 1;
 	    }
-	    life_modv = modv * 0.20f;
-	    speed_modv = 1.0f / modv;
+	    life_modv = modv * 0.20;
+	    speed_modv = 1.0 / modv;
 	    intensity = (int)CLUSTER_MASS_SHOTS(shot->mass);
 	} else {
 	    type = OBJ_DEBRIS;
@@ -1212,7 +1227,7 @@ void Delete_shot(int ind)
 	     *   num_modv /= (shot->mods.mini + 1);
 	     * triggers a bug in HP C A.09.19.
 	     */
-	    num_modv = num_modv / ((double)(unsigned)shot->mods.mini + 1.0f);
+	    num_modv = num_modv / ((double)(unsigned)shot->mods.mini + 1.0);
 	}
 
 	if (BIT(shot->mods.nuclear, NUCLEAR)) {
@@ -1245,8 +1260,8 @@ void Delete_shot(int ind)
 	    /* status         */ status,
 	    /* color          */ color,
 	    /* radius         */ 6,
-	    /* num debris     */ (int)((0.20f * intensity * num_modv) +
-	                         (0.10f * intensity * num_modv * rfrac())),
+	    /* num debris     */ (int)((0.20 * intensity * num_modv) +
+	                         (0.10 * intensity * num_modv * rfrac())),
 	    /* min,max dir    */ 0, RES-1,
 	    /* min,max speed  */ 20 * speed_modv,
 				 (intensity >> 2) * speed_modv,
@@ -1329,16 +1344,16 @@ void Delete_shot(int ind)
 
     if (addMine || addHeat) {
 	CLEAR_MODS(mods);
-	if (BIT(world->rules->mode, ALLOW_CLUSTERS) && (rfrac() <= 0.333f))
+	if (BIT(world->rules->mode, ALLOW_CLUSTERS) && (rfrac() <= 0.333))
 	    SET_BIT(mods.warhead, CLUSTER);
-	if (BIT(world->rules->mode, ALLOW_MODIFIERS) && (rfrac() <= 0.333f))
+	if (BIT(world->rules->mode, ALLOW_MODIFIERS) && (rfrac() <= 0.333))
 	    SET_BIT(mods.warhead, IMPLOSION);
 	if (BIT(world->rules->mode, ALLOW_MODIFIERS))
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
 	if (BIT(world->rules->mode, ALLOW_MODIFIERS))
 	    mods.power = (int)(rfrac() * (MODS_POWER_MAX + 1));
 	if (addMine) {
-	    long gravity_status = ((rfrac() < 0.5f) ? GRAVITY : 0);
+	    long gravity_status = ((rfrac() < 0.5) ? GRAVITY : 0);
 	    vector zero_vel = { 0.0, 0.0 };
 
 	    Place_general_mine(NULL, TEAM_NOT_SET, gravity_status,
@@ -1524,8 +1539,8 @@ void Update_connector_force(ballobject *ball)
 	return;
     }
 
-    damping = -options.ballConnectorDamping * ((pl->vel.x - ball->vel.x) * D.x +
-				       (pl->vel.y - ball->vel.y) * D.y);
+    damping = -options.ballConnectorDamping
+	* ((pl->vel.x - ball->vel.x) * D.x + (pl->vel.y - ball->vel.y) * D.y);
 
     /* compute accelleration for player, assume t = 1 */
     accell = (force + damping) / pl->mass;
@@ -1657,7 +1672,8 @@ void Update_missile(missileobject *shot)
 	 * we get frameloops % 0, which is not good.
 	 */
 	/*if (BIT(smart->status, CONFUSED)
-	  && (!(frame_loops % (int)(CONFUSED_UPDATE_GRANULARITY / options.gameSpeed)
+	  && (!(frame_loops
+	  % (int)(CONFUSED_UPDATE_GRANULARITY / options.gameSpeed)
 	  || smart->count == CONFUSED_TIME))) {*/
 	/* not going to fix now, I'll just remove the '/ gamespeed' part */
 
@@ -1794,7 +1810,7 @@ void Update_missile(missileobject *shot)
 	    }
 	    if (k > freemax
 		|| (k == freemax
-		    && ((j == -1 && (rfrac() < 0.5f)) || j == 0 || j == 1))) {
+		    && ((j == -1 && (rfrac() < 0.5)) || j == 0 || j == 1))) {
 		freemax = k > 2 ? 2 : k;
 		angle = i + j;
 	    }
