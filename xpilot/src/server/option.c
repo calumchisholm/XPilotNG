@@ -167,7 +167,7 @@ char *getOption(const char *name)
 
 static char	*FileName;
 
-#include "../../expat/include/expat.h"
+#include <expat.h>
 #define NOTEAM_BIT (1 << 10) /* !@# use same defines with walls.c */
 #define BALL_BIT (1 << 11)
 #define NONBALL_BIT (1 << 12)
