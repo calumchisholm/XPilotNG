@@ -86,38 +86,6 @@ static void Realloc_map_objects(void)
 	   World.NumAsteroidConcs, max_asteroidconcs);
 }
 
-#if 0
-void asciidump(void *p, size_t size)
-{
-    int i;
-    unsigned char *up = p;
-    char c;
-
-    for (i = 0; i < size; i++) {
-       if (!(i % 64))
-           printf("\n%p ", up + i);
-       c = *(up + i);
-       if (isprint(c))
-           printf("%c", c);
-       else
-           printf(".");
-    }
-    printf("\n\n");
-}
-void hexdump(void *p, size_t size)
-{
-    int i;
-    unsigned char *up = p;
-
-    for (i = 0; i < size; i++) {
-	if (!(i % 16))
-	    printf("\n%p ", up + i);
-	printf("%02x ", *(up + i));
-    }
-    printf("\n\n");
-}
-#endif
-
 int Map_place_cannon(clpos pos, int dir, int team)
 {
     cannon_t t, *cannon;
@@ -533,25 +501,8 @@ bool Grok_map_options(void)
 {
     Reset_map_object_counters();
 
-#if 0
-    if (!Grok_map_size()) {
-	if (mapData != NULL) {
-	    free(mapData);
-	    mapData = NULL;
-	}
-    }
-
-    if (!mapData) {
-	errno = 0;
-	error("Generating random map");
-	Generate_random_map();
-	if (!mapData)
-	    return false;
-    }
-#else
     if (!Grok_map_size())
 	return false;
-#endif
 
     strlcpy(World.name, mapName, sizeof(World.name));
     strlcpy(World.author, mapAuthor, sizeof(World.author));
@@ -623,8 +574,7 @@ static void Find_base_order(void)
 	exit(-1);
     }
 
-    if ((World.baseorder = (baseorder_t *)
-	    malloc(n * sizeof(baseorder_t))) == NULL) {
+    if ((World.baseorder = malloc(n * sizeof(baseorder_t))) == NULL) {
 	error("Out of memory - baseorder");
 	exit(-1);
     }
@@ -850,9 +800,8 @@ void add_temp_wormholes(int xin, int yin, int xout, int yout)
 {
     wormhole_t inhole, outhole, *wwhtemp;
 
-    if ((wwhtemp = (wormhole_t *)realloc(World.wormholes,
-					 (World.NumWormholes + 2)
-					 * sizeof(wormhole_t)))
+    if ((wwhtemp = realloc(World.wormholes,
+			   (World.NumWormholes + 2) * sizeof(wormhole_t)))
 	== NULL) {
 	error("No memory for temporary wormholes.");
 	return;
@@ -894,7 +843,6 @@ void remove_temp_wormhole(int ind)
     if (ind != World.NumWormholes)
 	World.wormholes[ind] = World.wormholes[World.NumWormholes];
 
-    World.wormholes = (wormhole_t *)realloc(World.wormholes,
-					    World.NumWormholes
-					    * sizeof(wormhole_t));
+    World.wormholes = realloc(World.wormholes,
+			      World.NumWormholes * sizeof(wormhole_t));
 }
