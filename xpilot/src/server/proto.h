@@ -111,7 +111,7 @@ void filter_mods(modifiers *mods);
 void Alloc_map(void);
 void Free_map(void);
 bool Grok_map(void);
-bool Grok_map_new(void);
+bool Grok_map_options(void);
 
 int Map_get_itemid(int x, int y);
 int Map_place_cannon(int cx, int cy, int dir, int team);

@@ -562,6 +562,11 @@ bool Grok_map(void)
 
 bool Grok_map_options(void)
 {
+    Reset_map_object_counters();
+
+    if (!Grok_map_size())
+	return false;
+
     strlcpy(World.name, mapName, sizeof(World.name));
     strlcpy(World.author, mapAuthor, sizeof(World.author));
     strlcpy(World.dataURL, dataURL, sizeof(World.dataURL));
@@ -578,16 +583,6 @@ bool Grok_map_options(void)
     }
 
     return true;
-}
-
-bool Grok_map_new(void)
-{
-    Reset_map_object_counters();
-
-    if (!Grok_map_size())
-	return false;
-
-    return Grok_map_options();
 }
 
 
@@ -686,6 +681,7 @@ static bool Grok_map_old(void)
     if (is_polygon_map)
 	return true;
 
+#if 0
     Reset_map_object_counters();
 
     if (!Grok_map_size()) {
@@ -703,8 +699,10 @@ static bool Grok_map_old(void)
 	    return false;
 	}
     }
+#endif
 
-    Grok_map_options();
+    if (!Grok_map_options())
+	return false;
 
     Xpmap_grok_map_data();
 

@@ -465,7 +465,8 @@ static void tagend(void *data, const char *el)
     if (!strcasecmp(el, "GeneralOptions")) {
 	/* ok, got to the end of options */
 	Options_parse();
-	Grok_map_new();
+	/* kps - this can fail - fix */
+	Grok_map_options();
     }
     return;
 }
