@@ -25,9 +25,13 @@
  */
 
 #include "xpclient.h"
+#ifndef _WINDOWS
 #include <AL/al.h>
 #include <AL/alut.h>
-
+#else
+#include <al.h>
+#include <alut.h>
+#endif
 char audio_version[] = VERSION;
 
 typedef struct {
@@ -43,6 +47,7 @@ static sound_t *sound_load(const char *filename, float gain)
     ALenum  err;
     ALsizei size, freq, bits;
     ALenum format;
+	ALboolean loop;
     ALvoid *data;
     sound_t *snd;
     
@@ -72,8 +77,13 @@ static sound_t *sound_load(const char *filename, float gain)
 	free(snd);
 	return NULL;
     }
-
+	
+#ifndef _WINDOWS	
     alutLoadWAV(filename, &data, &format, &size, &bits, &freq);
+#else
+	alutLoadWAVFile((ALbyte *)filename, &format, &data, &size, &freq, &loop);
+#endif
+
     if ((err = alGetError()) != AL_NO_ERROR) {
 	error("failed to load sound file %s: %x %s", 
 	      filename, err, alGetString(err));
