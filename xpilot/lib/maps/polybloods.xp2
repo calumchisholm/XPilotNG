@@ -1,6 +1,5 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
-<Option name="afterburnerpowermult" value="1.1"/>
 <Option name="allowclusters" value="no"/>
 <Option name="allowlasermodifiers" value="no"/>
 <Option name="allowmodifiers" value="no"/>
@@ -10,7 +9,7 @@
 <Option name="allowshields" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
 <Option name="ballconnectorspringconstant" value="1650"/>
-<Option name="ballradius" value="10"/>
+<Option name="ballradius" value="8"/>
 <Option name="ballstyles" value="false"/>
 <Option name="ballswallbounce" value="yes"/>
 <Option name="baselesspausing" value="yes"/>
@@ -20,7 +19,6 @@
 <Option name="gravity" value="0"/>
 <Option name="initialafterburners" value="2"/>
 <Option name="initialautopilots" value="1"/>
-<Option name="initialfuel" value="750"/>
 <Option name="itemprobmult" value="0.0"/>
 <Option name="kineticenergyfueldrain" value="no"/>
 <Option name="limitedlives" value="yes"/>
@@ -48,7 +46,6 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="usewreckage" value="no"/>
 <Option name="waitingfps" value="0"/>
-<Option name="wallbouncefueldrainmult" value="0.01"/>
 <Option name="worldlives" value="3"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
