@@ -801,7 +801,8 @@ static GLWidget *Init_MetaTableWidget(GLWidget *meta, list_t servers)
 static void Paint_MetaWidget(GLWidget *widget)
 {
     MetaWidget *info;
-    
+    SDL_Rect *b;
+
     if (widget->WIDGET != METAWIDGET) {
 	error("expected METAWIDGET got [%d]", widget->WIDGET);
 	return;
@@ -809,7 +810,7 @@ static void Paint_MetaWidget(GLWidget *widget)
     info = (MetaWidget*)widget->wid_info;
     if (info->texture == 0) return;
     
-    SDL_Rect *b = &(widget->bounds);
+    b = &(widget->bounds);
     glColor4ub(255, 255, 255, 255);
     glBindTexture(GL_TEXTURE_2D, info->texture);
     glEnable(GL_TEXTURE_2D);
@@ -904,7 +905,7 @@ int Meta_window(Connect_param_t *conpar)
 {
     static char err[MSG_LEN] = {0};
     int num_serv = 0;
-    server_info_t *sip;
+   
     GLWidget *meta, *target = NULL;
     SDL_Event evt;
     
