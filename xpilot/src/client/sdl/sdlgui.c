@@ -193,7 +193,6 @@ int Gui_init(void)
 	error("failed to generate display lists");
 	return -1;
     }
-    printf("polyListBase: %d\n", polyListBase);
 
     tess = gluNewTess();
     if (tess == NULL) {
@@ -529,10 +528,22 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+#if 0
+    /* This makes the textures flicker */
     glScalef(scale, scale, 0);
-    glTranslatef(xoff * Setup->width + polygon.points[0].x - world.x, 
+    glTranslatef(xoff * Setup->width + polygon.points[0].x - world.x,
 		 yoff * Setup->height + polygon.points[0].y - world.y,
 		 0);
+#endif
+#if 1
+    /* This makes the walls wobble */
+    glTranslatef((int)((xoff * Setup->width + polygon.points[0].x 
+			- world.x) * scale),
+		 (int)((yoff * Setup->height + polygon.points[0].y 
+			- world.y) * scale),
+	0);
+    glScalef(scale, scale, 0);
+#endif
 
     if (instruments.showTexturedWalls
 	|| instruments.showFilledWorld) {
@@ -547,7 +558,10 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	}
     }
     set_alphacolor((e_style.rgb << 8) | 0xff);
-    glLineWidth(e_style.width);
+    glLineWidth(e_style.width * scale);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_LINE_SMOOTH);
     glBegin(GL_LINE_LOOP);
     x = y = 0;
     glVertex2i(x, y);
@@ -557,6 +571,8 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	glVertex2i(x, y);
     }
     glEnd();
+    glDisable(GL_LINE_SMOOTH);
+    /*glDisable(GL_BLEND);*/
     glLineWidth(1);
     glPopMatrix();
 }
@@ -931,15 +947,21 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 
     ship = Ship_by_id(id);
     if (!(other = Other_by_id(id))) return;
-    
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_LINE_SMOOTH);
     set_alphacolor(Gui_calculate_ship_color(id,other));
-    
+
     glBegin(GL_LINE_LOOP);
     for (i = 0; i < ship->num_points; i++) {
 	point = Ship_get_point(ship, i, dir);
 	glVertex2i(x + point.pxl.x, y + point.pxl.y);
     }
     glEnd();
+
+    glDisable(GL_LINE_SMOOTH);
+    glDisable(GL_BLEND);
 
     if (self != NULL
     	&& self->id != id

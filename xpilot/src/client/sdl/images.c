@@ -35,11 +35,11 @@ static int Image_init(image_t *img)
     img->frame_width = img->width / img->num_frames;
     img->data_width = pow2_ceil(img->width);
     img->data_height = pow2_ceil(img->height);
-
+    /*
     printf("Loaded image %s: w=%d, h=%d, fw=%d, dw=%d, dh=%d\n",
 	   img->filename, img->width, img->height, img->frame_width,
 	   img->data_width, img->data_height);
-
+    */
     img->data = calloc(img->data_width * img->data_height, sizeof(unsigned int));
     if (img->data == NULL) {
         error("Failed to allocate memory for: %s size %dx%d",
@@ -53,7 +53,7 @@ static int Image_init(image_t *img)
 		img->data[(x + img->frame_width * i) + (y * img->data_width)]
 		    /* the pixels needs to be mirrored over x-axis because
 		     * of the used OpenGL projection */
-		    = Picture_get_pixel(&pic, i, x, img->height - y)
+		    = Picture_get_pixel(&pic, i, x, img->height - y - 1)
 		    | 0xff000000; /* alpha */
 		if (!(img->data[(x + img->frame_width * i) + (y * img->data_width)] & 0x00ffffff))
 		    img->data[(x + img->frame_width * i) + (y * img->data_width)] = 0x00000000;
@@ -122,7 +122,7 @@ void Image_use_texture(int ind)
 
 void Image_no_texture()
 {
-    glDisable(GL_BLEND);
+    /*glDisable(GL_BLEND);*/
     glDisable(GL_TEXTURE_2D);
 }
 
