@@ -281,6 +281,7 @@ extern struct options {
     bool	targetSync;
     double	targetDeadTicks;
     bool	reportToMetaServer;
+    int		metaUpdateMaxSize;
     bool	searchDomainForXPilot;
     char	*denyHosts;
 
@@ -884,6 +885,7 @@ int Meta_from(char *addr, int port);
 void Meta_gone(void);
 void Meta_init(void);
 void Meta_update(int change);
+void Meta_update_max_size_tuner(world_t *world);
 
 /*
  * Prototypes for frame.c

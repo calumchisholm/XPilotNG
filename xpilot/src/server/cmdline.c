@@ -930,6 +930,16 @@ static option_desc opts[] = {
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
+	"metaUpdateMaxSize",
+	"metaUpdateMaxSize",
+	"4096",
+	&options.metaUpdateMaxSize,
+	valInt,
+	Meta_update_max_size_tuner,
+	"Maximum size of meta update messages.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"searchDomainForXPilot",
 	"searchDomainForXPilot",
 	"no",

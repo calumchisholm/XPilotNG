@@ -31,10 +31,10 @@ char metaserver_version[] = VERSION;
 
 
 struct MetaServer {
-    char		name[64];
-    char		addr[16];
+    char name[64];
+    char addr[16];
 };
-struct MetaServer	meta_servers[2] = {
+struct MetaServer meta_servers[2] = {
     {
 	META_HOST,
 	META_IP
@@ -45,11 +45,9 @@ struct MetaServer	meta_servers[2] = {
     },
 };
 
-static char	msg[MSG_LEN];
-
 void Meta_send(char *mesg, size_t len)
 {
-    int			i;
+    int i;
 
     if (!options.reportToMetaServer)
 	return;
@@ -66,7 +64,7 @@ void Meta_send(char *mesg, size_t len)
 
 int Meta_from(char *addr, int port)
 {
-    int			i;
+    int i;
 
     for (i = 0; i < NELEM(meta_servers); i++) {
 	if (!strcmp(addr, meta_servers[i].addr))
@@ -77,16 +75,18 @@ int Meta_from(char *addr, int port)
 
 void Meta_gone(void)
 {
+    char msg[MSG_LEN];
+
     if (options.reportToMetaServer) {
-	sprintf(msg, "server %s\nremove", Server.host);
+	snprintf(msg, sizeof(msg), "server %s\nremove", Server.host);
 	Meta_send(msg, strlen(msg) + 1);
     }
 }
 
 void Meta_init(void)
 {
-    int			i;
-    char		*addr;
+    int i;
+    char *addr;
 
     if (!options.reportToMetaServer)
 	return;
@@ -114,12 +114,39 @@ void Meta_init(void)
     }
 }
 
+static void asciidump(void *p, size_t size)
+{
+    int i;
+    unsigned char *up = p;
+    char c;
+
+    for (i = 0; i < size; i++) {
+       if (!(i % 64))
+           printf("\n%08x ", i);
+       c = *(up + i);
+       if (isprint(c))
+           printf("%c", c);
+       else
+           printf(".");
+    }
+    printf("\n\n");
+}
+
+static char meta_update_string[MAX_STR_LEN];
+
+void Meta_update_max_size_tuner(world_t *world)
+{
+    UNUSED_PARAM(world);
+
+    LIMIT(options.metaUpdateMaxSize, 2 * MSG_LEN, sizeof(meta_update_string));
+}
+
 void Meta_update(int change)
 {
 #define GIVE_META_SERVER_A_HINT	180
 
     char string[MAX_STR_LEN], freebases[120];
-    int i, j, num_active_players, active_per_team[MAX_TEAMS];
+    int i, num_active_players, active_per_team[MAX_TEAMS];
     size_t len;
     bool first = true;
     time_t currentTime;
@@ -135,7 +162,7 @@ void Meta_update(int change)
     if (!change) {
 	if (currentTime - lastMetaSendTime < GIVE_META_SERVER_A_HINT) {
 	    if (NumQueuedPlayers == queue_length ||
-			currentTime - lastMetaSendTime < 5)
+		currentTime - lastMetaSendTime < 5)
 		return;
 	}
     }
@@ -161,23 +188,28 @@ void Meta_update(int change)
     /* calculate number of available homebases per team. */
     freebases[0] = '\0';
     if (BIT(world->rules->mode, TEAM_PLAY)) {
-	j = 0;
+	bool firstteam = true;
+
 	for (i = 0; i < MAX_TEAMS; i++) {
+	    team_t *team = Teams(world, i);
+
 	    if (i == options.robotTeam && options.reserveRobotTeam)
 		continue;
-	    if (world->teams[i].NumBases > 0) {
-		sprintf(&freebases[j], "%d=%d,", i,
-			world->teams[i].NumBases - active_per_team[i]);
-		j += strlen(&freebases[j]);
+
+	    if (team->NumBases > 0) {
+		char str[32];
+
+		snprintf(str, sizeof(str), "%s%d=%d",
+			 (firstteam ? "" : ","), i,
+			 team->NumBases - active_per_team[i]);
+		firstteam = false;
+		strlcat(freebases, str, sizeof(freebases));
 	    }
 	}
-	/* strip trailing comma. */
-	if (j)
-	    freebases[j-1] = '\0';
     }
     else
-	sprintf(freebases, "=%d",
-		world->NumBases - num_active_players - login_in_progress);
+	snprintf(freebases, sizeof(freebases), "=%d",
+		 world->NumBases - num_active_players - login_in_progress);
 
     sprintf(string,
 	    "add server %s\n"
@@ -212,20 +244,20 @@ void Meta_update(int change)
     len = strlen(string);
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl = Players(i);
 
-	if (Player_is_human(pl_i) && !BIT(pl_i->status, PAUSE)) {
+	if (Player_is_human(pl) && !BIT(pl->status, PAUSE)) {
 	    if ((len + (4 * MAX_CHARS)) < sizeof(string)) {
 		sprintf(string + len,
 			"%s%s=%s@%s",
 			(first) ? "add players " : ",",
-			pl_i->name,
-			pl_i->username,
-			pl_i->hostname);
+			pl->name,
+			pl->username,
+			pl->hostname);
 		len += strlen(&string[len]);
 
 		if (BIT(world->rules->mode, TEAM_PLAY)) {
-		    sprintf(string + len,"{%d}", pl_i->team);
+		    sprintf(string + len,"{%d}", pl->team);
 		    len += strlen(&string[len]);
 		}
 
@@ -245,6 +277,8 @@ void Meta_update(int change)
 	strlcpy(&string[len], status, sizeof(string) - len);
 	len += strlen(&string[len]);
     }
+
+    /*asciidump(string, len);*/
 
     Meta_send(string, len + 1);
 }
