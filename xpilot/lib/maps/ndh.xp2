@@ -42,6 +42,7 @@
 <Option name="elimination" value="no"/>
 <Option name="extraBorder" value="no"/>
 <Option name="friction" value="0"/>
+<Option name="gravity" value="0"/>
 <Option name="heatKillScoreMult" value="0.4"/>
 <Option name="identifyMines" value="yes"/>
 <Option name="initialAfterburners" value="3"/>
