@@ -855,13 +855,9 @@ static void Parse_xpilotrc_line(const char *line)
 	}
     }
 
-    if (!value) {
-	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
-	warn("No value given for option %s, ignoring.", name);
-	/* treat as comment */
-	t.comment = xp_safe_strdup(line);
-	goto out;
-    }
+    /* strtok might return NULL for an empty option value. */
+    if (!value)
+	value = "";
 
     /* remove leading whitespace */
     while (isspace(*value))
@@ -1068,16 +1064,16 @@ int Xpilotrc_write(const char *path)
 	origin = Option_get_origin(opt);
 	assert(origin != xp_option_origin_xpilotrc);
 
-	if (origin == xp_option_origin_default)
-	    t.comment = xp_safe_strdup("; " PACKAGE_STRING " default");
+	/*if (origin == xp_option_origin_default)
+	  t.comment = xp_safe_strdup("\t\t; default");*/
 	if (origin == xp_option_origin_cmdline)
 	    continue;
 	if (origin == xp_option_origin_env)
 	    continue;
-	if (origin == xp_option_origin_config)
-	    t.comment = xp_safe_strdup("; from config menu");
+	/*if (origin == xp_option_origin_config)
+	    t.comment = xp_safe_strdup("\t\t; from config menu");
 	if (origin == xp_option_origin_setcmd)
-	    t.comment = xp_safe_strdup("; from set command");
+	t.comment = xp_safe_strdup("\t\t; from set command");*/
 	t.opt = opt;
 
 	STORE(xpilotrc_line_t,
