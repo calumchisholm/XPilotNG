@@ -543,15 +543,11 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 	if (obj->life <= 0)
 	    return 0;
     }
+
     /*
      * Any bouncing sparks are no longer owner immune to give
      * "reactive" thrust.  This is exactly like ground effect
      * in the real world.  Very useful for stopping against walls.
-     *
-     * If the FROMBOUNCE bit is set the spark was caused by
-     * the player bouncing of a wall and thus although the spark
-     * should bounce, it is not reactive thrust otherwise wall
-     * bouncing would cause acceleration of the player.
      */
     if (obj->type != OBJ_PULSE && 
 	obj->type != OBJ_SPARK &&
@@ -568,10 +564,8 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 	return 0;
     }
     
-    if (!BIT(obj->obj_status, FROMBOUNCE)
-	&& obj->type == OBJ_SPARK)
+    if (obj->type == OBJ_SPARK)
 	CLR_BIT(obj->obj_status, OWNERIMMUNE);
-
 
     if (line >= num_lines) {
 	double x, y, l2;
@@ -701,25 +695,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 		Player_crash(pl, CrashWallNoFuel, NO_IND, 1);
 	    return;
 	}
-	/* !@# I didn't implement wall direction calculation yet. */
 	if (cost) {
-#if 0
-	    int intensity = (int)(cost * wallBounceExplosionMult);
-	    Make_debris(world,
-			pl->pos,
-			pl->vel,
-			pl->id,
-			pl->team,
-			OBJ_SPARK,
-			3.5,
-			GRAVITY | OWNERIMMUNE | FROMBOUNCE,
-			RED,
-			1,
-			(intensity>>1) + (intensity>>1) * rfrac(),
-			wall_dir - (RES/4), wall_dir + (RES/4),
-			20, 20 + (intensity >> 2),
-			10, 10 + (intensity >> 1));
-#endif
 	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
 		cost *= options.wallBounceFuelDrainMult / 4.0;

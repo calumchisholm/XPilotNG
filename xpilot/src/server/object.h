@@ -137,7 +137,6 @@
 #define CONFUSED		(1U<<3)
 #define FROMCANNON		(1U<<4)		/* Object from cannon */
 #define RECREATE		(1U<<5)		/* Recreate ball */
-#define FROMBOUNCE		(1U<<6)		/* Spark from wall bounce */
 #define OWNERIMMUNE		(1U<<7)		/* Owner is immune to object */
 #define NOEXPLOSION		(1U<<8)		/* No recreate explosion */
 #define COLLISIONSHOVE		(1U<<9)		/* Collision counts as shove */
