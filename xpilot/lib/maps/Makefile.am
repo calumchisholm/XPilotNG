@@ -18,6 +18,7 @@ xpilotmap_DATA = \
 	pad.xp \
 	pit.xp \
 	planetx.xp \
+	polybloods.xp2 \
 	teamball.xp \
 	tourmination.xp \
 	tournament.xp \
