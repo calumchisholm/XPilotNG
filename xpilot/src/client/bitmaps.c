@@ -413,7 +413,7 @@ static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp)
  */
 static int Bitmap_create_end(Drawable d)
 {
-    (void)d;
+    UNUSED_PARAM(d);
     return 0;
 }
 

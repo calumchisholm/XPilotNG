@@ -234,7 +234,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
 	drawPixmap = state->dbe.dbe_draw;
     }
 #else
-    (void)state;
+    UNUSED_PARAM(state);
 #endif
 }
 
@@ -321,7 +321,7 @@ void dbuff_list(Display *display)
 #ifdef DBE
     dbuff_list_dbe(display);
 #else
-    (void)display;
+    UNUSED_PARAM(display);
 #endif
 }
 

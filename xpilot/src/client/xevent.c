@@ -34,7 +34,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
     keys_t ret = Generic_lookup_key((xp_keysym_t)ks, reset);
 
-    (void)event;
+    UNUSED_PARAM(event);
     IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
 
 #ifdef DEVELOPMENT

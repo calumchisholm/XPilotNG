@@ -717,7 +717,7 @@ void Radar_hide_target(int x, int y)
 
 static bool Set_wallRadarColor(xp_option_t *opt, int value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     wallRadarColor = value;
     if ((wallRadarColor & 5) && colorSwitch)
@@ -728,7 +728,7 @@ static bool Set_wallRadarColor(xp_option_t *opt, int value)
 
 static bool Set_decorRadarColor(xp_option_t *opt, int value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     decorRadarColor = value;
     if ((decorRadarColor & 5) && colorSwitch)
@@ -739,7 +739,7 @@ static bool Set_decorRadarColor(xp_option_t *opt, int value)
 
 static bool Set_targetRadarColor(xp_option_t *opt, int value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     targetRadarColor = value;
     if ((targetRadarColor & 5) && colorSwitch)

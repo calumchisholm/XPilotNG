@@ -906,7 +906,7 @@ static Bool Widget_check_motion(Display *d, XEvent *e, char *p)
 {
     struct widget_check_event	*cm = (struct widget_check_event *) p;
 
-    (void)d;
+    UNUSED_PARAM(d);
     if (e->xany.window == cm->window) {
 	if (e->type == MotionNotify)
 	    cm->found++;
@@ -1211,7 +1211,7 @@ static void Widget_inside(XEvent *event, int widget_desc, bool inside)
     widget_activate_t	*activw;
     widget_arrow_t	*arroww;
 
-    (void)event;
+    UNUSED_PARAM(event);
     if ((widget = Widget_pointer(widget_desc)) == NULL) {
 	warn("Widget inside invalid");
 	return;
@@ -2185,7 +2185,7 @@ static int Widget_viewer_save_callback(int widget_desc, void *data,
     widget_viewer_t	*viewer_sub;
     FILE		*fp;
 
-    (void)widget_desc; (void)strptr;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(strptr);
     formw = (widget_form_t *)popup->sub;
     viewer_desc = formw->children[0];
     viewer_widget = Widget_pointer(viewer_desc);
@@ -2201,7 +2201,7 @@ static int Widget_viewer_save_callback(int widget_desc, void *data,
 static int Widget_viewer_close_callback(int widget_desc, void *data,
 					const char **strptr)
 {
-    (void)widget_desc; (void)strptr;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(strptr);
     Widget_unmap((int)(long)data);
     return 0;
 }

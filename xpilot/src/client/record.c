@@ -66,7 +66,8 @@ extern void paintItemSymbol(int type, Drawable drawable, GC mygc,
 static void Dummy_paintItemSymbol(int type, Drawable drawable,
 				  GC mygc, int x, int y, int color)
 {
-    (void)type; (void)drawable; (void)mygc; (void)x; (void)y; (void)color;
+    UNUSED_PARAM(type); UNUSED_PARAM(drawable); UNUSED_PARAM(mygc);
+    UNUSED_PARAM(x); UNUSED_PARAM(y); UNUSED_PARAM(color);
 }
 #endif
 
@@ -666,7 +667,7 @@ static void RPaintItemSymbol(int type, Drawable drawable, GC mygc,
 #ifdef _WINDOWS
     paintItemSymbol(type, drawable, mygc, x, y, color);
 #else
-    (void)mygc; (void)color;
+    UNUSED_PARAM(mygc); UNUSED_PARAM(color);
 #endif
     if (drawable == drawPixmap) {
 	putc(RC_PAINTITEMSYMBOL, recordFP);
@@ -910,7 +911,7 @@ void Record_init(const char *filename)
 
 static bool setRecordFile(xp_option_t *opt, const char *value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     assert(value);
     /* Don't allow changing record file after file has been opened. */
@@ -922,7 +923,7 @@ static bool setRecordFile(xp_option_t *opt, const char *value)
 
 static const char *getRecordFile(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return record_filename;
 }
 

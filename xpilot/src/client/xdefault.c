@@ -63,7 +63,7 @@ static char keyboardName[MAX_DISP_LEN];
 
 static bool Set_geometry(xp_option_t *opt, const char *value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     if (geometry)
 	xp_free(geometry);
 
@@ -73,7 +73,7 @@ static bool Set_geometry(xp_option_t *opt, const char *value)
 
 static const char *Get_geometry(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return geometry;
 }
 
@@ -81,7 +81,7 @@ static bool Set_texturedObjects(xp_option_t *opt, bool val);
 
 static bool Set_fullColor(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     if (val == fullColor)
 	return true;
@@ -106,7 +106,7 @@ static bool Set_fullColor(xp_option_t *opt, bool val)
 
 static bool Set_texturedObjects(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     if (val == texturedObjects)
 	return true;
@@ -358,7 +358,7 @@ static void X_after(Display *display)
 {
     static int		n;
 
-    (void)display;
+    UNUSED_PARAM(display);
     if (n < 1000)
 	printf("_X_ %4d\n", n++);
 }
@@ -426,7 +426,7 @@ void Handle_X_options(void)
 
 bool Set_scaleFactor(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     scaleFactor = val;
     Init_scale_array();
     /* Resize removed because it is not needed here */
@@ -437,7 +437,7 @@ bool Set_scaleFactor(xp_option_t *opt, double val)
 
 bool Set_altScaleFactor(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     scaleFactor_s = val;
     return true;
 }

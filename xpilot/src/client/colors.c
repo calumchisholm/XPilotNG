@@ -1049,7 +1049,7 @@ void Init_spark_colors(void)
 
 static bool Set_sparkColors (xp_option_t *opt, const char *val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     strlcpy(sparkColors, val, sizeof sparkColors);
     Init_spark_colors();
     /* might fail to set what we wanted, but return ok nonetheless */
@@ -1058,7 +1058,7 @@ static bool Set_sparkColors (xp_option_t *opt, const char *val)
 
 static bool Set_maxColors (xp_option_t *opt, int val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     if (val == 4 || val == 8) {
 	warn("WARNING: Values 4 or 8 for maxColors are not actively "
 	     "supported. Use at own risk.");

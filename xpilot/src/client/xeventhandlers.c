@@ -140,7 +140,7 @@ void SelectionRequest_event(XEvent *event)
 
 void MapNotify_event(XEvent *event)
 {
-    (void)event;
+    UNUSED_PARAM(event);
     if (ignoreWindowManager == 1) {
         XSetInputFocus(dpy, topWindow, RevertToParent, CurrentTime);
         ignoreWindowManager = 2;
@@ -176,7 +176,7 @@ int ClientMessage_event(XEvent *event)
 
 void FocusIn_event(XEvent *event)
 {
-    (void)event;
+    UNUSED_PARAM(event);
 #ifdef DEVELOPMENT
     if (!gotFocus)
         time(&back_in_play_since);
@@ -191,7 +191,7 @@ void FocusIn_event(XEvent *event)
 
 void UnmapNotify_event(XEvent *event)
 {
-    (void)event;
+    UNUSED_PARAM(event);
     if (pointerControl) {
         initialPointerControl = true;
         Pointer_control_set_state(false);

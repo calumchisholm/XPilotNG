@@ -783,21 +783,21 @@ void WinXCreateItemBitmaps(void)
 
 static int Config_callback(int widget_desc, void *data, const char **str)
 {
-    (void)widget_desc; (void)data; (void)str;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     Config(true, CONFIG_DEFAULT);
     return 0;
 }
 
 static int Colors_callback(int widget_desc, void *data, const char **str)
 {
-    (void)widget_desc; (void)data; (void)str;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     Config(true, CONFIG_COLORS);
     return 0;
 }
 
 static int Score_callback(int widget_desc, void *data, const char **str)
 {
-    (void)widget_desc; (void)data; (void)str;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     Config(false, CONFIG_NONE);
     if (showUserName != false) {
 	showUserName = false;
@@ -808,7 +808,7 @@ static int Score_callback(int widget_desc, void *data, const char **str)
 
 static int Player_callback(int widget_desc, void *data, const char **str)
 {
-    (void)widget_desc; (void)data; (void)str;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     Config(false, CONFIG_NONE);
     if (showUserName != true) {
 	showUserName = true;
@@ -819,7 +819,7 @@ static int Player_callback(int widget_desc, void *data, const char **str)
 
 static int Quit_callback(int widget_desc, void *data, const char **str)
 {
-    (void)widget_desc; (void)data; (void)str;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     quitting = true;
     return 0;
 }
@@ -898,7 +898,7 @@ void Quit(void)
 
 int FatalError(Display *display)
 {
-    (void)display;
+    UNUSED_PARAM(display);
     Net_cleanup();
     /*
      * Quit(&client);

@@ -1001,7 +1001,7 @@ static void handle_packet_measurement(void)
 
 static bool Set_packetLossMeterColor(xp_option_t *opt, int value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     packetLossMeterColor = value;
     handle_packet_measurement();
@@ -1011,7 +1011,7 @@ static bool Set_packetLossMeterColor(xp_option_t *opt, int value)
 
 static bool Set_packetDropMeterColor(xp_option_t *opt, int value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     packetDropMeterColor = value;
     handle_packet_measurement();
@@ -1021,7 +1021,7 @@ static bool Set_packetDropMeterColor(xp_option_t *opt, int value)
 
 static bool Set_packetLagMeterColor(xp_option_t *opt, int value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
 
     packetLagMeterColor = value;
     if (packetLagMeterColor)

@@ -40,7 +40,7 @@ static double	hudScale;	/* Scale for HUD drawing */
  */
 static bool Set_nickName(xp_option_t *opt, const char *value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     assert(value);
 
     /*
@@ -71,7 +71,7 @@ static bool Set_userName(xp_option_t *opt, const char *value)
 {
     char *cp = getenv("XPILOTUSER");
 
-    (void)opt;
+    UNUSED_PARAM(opt);
     assert(value);
 
     if (cp)
@@ -99,7 +99,7 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
 {
     char *cp = getenv("XPILOTHOST");
 
-    (void)opt;
+    UNUSED_PARAM(opt);
     assert(value);
 
     connectParam.host_name[0] = '\0';
@@ -123,25 +123,25 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
 
 static const char *Get_nickName(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return connectParam.nick_name;
 }
 
 static const char *Get_userName(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return connectParam.user_name;
 }
 
 static const char *Get_hostName(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return connectParam.host_name;
 }
 
 static bool Set_team(xp_option_t *opt, int value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     if (value >= 0 && value < MAX_TEAMS)
 	connectParam.team = value;
     else
@@ -152,7 +152,7 @@ static bool Set_team(xp_option_t *opt, int value)
 
 static bool Set_texturePath(xp_option_t *opt, const char *value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     if (texturePath)
 	xp_free(texturePath);
 
@@ -161,7 +161,7 @@ static bool Set_texturePath(xp_option_t *opt, const char *value)
 }
 static const char *Get_texturePath(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return texturePath;
 }
 
@@ -269,7 +269,7 @@ static void tryToSetShipShape(void)
  */
 static bool Set_shipShape(xp_option_t *opt, const char *value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     if (shipShapeSetting)
 	xp_free(shipShapeSetting);
     shipShapeSetting = xp_safe_strdup(value);
@@ -281,13 +281,13 @@ static bool Set_shipShape(xp_option_t *opt, const char *value)
 
 static const char *Get_shipShape(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return shipShapeSetting;
 }
 
 static bool Set_shipShapeFile(xp_option_t *opt, const char *value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     if (shipShapeFile)
 	xp_free(shipShapeFile);
     shipShapeFile = xp_safe_strdup(value);
@@ -299,13 +299,13 @@ static bool Set_shipShapeFile(xp_option_t *opt, const char *value)
 
 static const char *Get_shipShapeFile(xp_option_t *opt)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     return shipShapeFile;
 }
 
 static bool Set_power(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Send_power(val);
     power = val;
     controlTime = CONTROL_TIME;
@@ -313,7 +313,7 @@ static bool Set_power(xp_option_t *opt, double val)
 }
 static bool Set_turnSpeed(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Send_turnspeed(val);
     turnspeed = val;
     controlTime = CONTROL_TIME;
@@ -321,7 +321,7 @@ static bool Set_turnSpeed(xp_option_t *opt, double val)
 }
 static bool Set_turnResistance(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Send_turnresistance(val);
     turnresistance = val;
     return true;
@@ -329,7 +329,7 @@ static bool Set_turnResistance(xp_option_t *opt, double val)
 
 static bool Set_altPower(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Send_power_s(val);
     power_s = val;
     controlTime = CONTROL_TIME;
@@ -337,7 +337,7 @@ static bool Set_altPower(xp_option_t *opt, double val)
 }
 static bool Set_altTurnSpeed(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Send_turnspeed_s(val);
     turnspeed_s = val;
     controlTime = CONTROL_TIME;
@@ -345,7 +345,7 @@ static bool Set_altTurnSpeed(xp_option_t *opt, double val)
 }
 static bool Set_altTurnResistance(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Send_turnresistance_s(val);
     turnresistance_s = val;
     return true;
@@ -353,21 +353,21 @@ static bool Set_altTurnResistance(xp_option_t *opt, double val)
 
 static bool Set_autoShield(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Set_auto_shield(val);
     return true;
 }
 
 static bool Set_toggleShield(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     Set_toggle_shield(val);
     return true;
 }
 
 static bool Set_maxFPS(xp_option_t *opt, int val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     maxFPS = val;
     Check_client_fps();
     return true;
@@ -375,7 +375,7 @@ static bool Set_maxFPS(xp_option_t *opt, int val)
 
 static bool Set_sparkProb(xp_option_t *opt, double val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     sparkProb = val;
     spark_rand = (int)(sparkProb * MAX_SPARK_RAND + 0.5);
     Check_view_dimensions();
@@ -384,7 +384,7 @@ static bool Set_sparkProb(xp_option_t *opt, double val)
 
 static bool Set_hudScale(xp_option_t *opt, double value)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     hudScale = value;
     hudSize = (int)(MIN_HUD_SIZE * hudScale);
     return true;
@@ -392,7 +392,7 @@ static bool Set_hudScale(xp_option_t *opt, double value)
 
 static bool Set_backgroundPointDist(xp_option_t *opt, int val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     map_point_distance = val;
     if (oldServer)
 	Map_dots();
@@ -401,7 +401,7 @@ static bool Set_backgroundPointDist(xp_option_t *opt, int val)
 
 static bool Set_backgroundPointSize(xp_option_t *opt, int val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     map_point_size = val;
     if (oldServer)
 	Map_dots();
@@ -410,7 +410,7 @@ static bool Set_backgroundPointSize(xp_option_t *opt, int val)
 
 static bool Set_showSlidingRadar(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     instruments.showSlidingRadar = val;
     Paint_sliding_radar();
     return true;
@@ -418,7 +418,7 @@ static bool Set_showSlidingRadar(xp_option_t *opt, bool val)
 
 static bool Set_showReverseScroll(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     instruments.showReverseScroll = val;
     Talk_reverse_cut();
     return true;
@@ -426,7 +426,7 @@ static bool Set_showReverseScroll(xp_option_t *opt, bool val)
 
 static bool Set_showOutlineWorld(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     instruments.showOutlineWorld = val;
     if (oldServer && Setup) {
 	/* don't bother to check if recalculations are really needed. */
@@ -438,7 +438,7 @@ static bool Set_showOutlineWorld(xp_option_t *opt, bool val)
 
 static bool Set_showFilledWorld(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     instruments.showFilledWorld = val;
     if (oldServer && Setup) {
 	/* don't bother to check if recalculations are really needed. */
@@ -450,7 +450,7 @@ static bool Set_showFilledWorld(xp_option_t *opt, bool val)
 
 static bool Set_showTexturedWalls(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     instruments.showTexturedWalls = val;
     if (oldServer && Setup) {
 	/* don't bother to check if recalculations are really needed. */
@@ -462,7 +462,7 @@ static bool Set_showTexturedWalls(xp_option_t *opt, bool val)
 
 static bool Set_showDecor(xp_option_t *opt, bool val)
 {
-    (void)opt;
+    UNUSED_PARAM(opt);
     instruments.showDecor = val;
     if (!Setup)
 	return true;
