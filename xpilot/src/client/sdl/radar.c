@@ -83,8 +83,8 @@ static void to_screen(GLWidget *radar, int *x, int *y, int from_w, int from_h)
 	fy += rb.h/2;
     }
 
-    *x = rb.x + (fx + 0.5);
-    *y = rb.y + rb.h - (fy + 0.5);
+    *x = (int)(rb.x + (fx + 0.5));
+    *y = (int)(rb.y + rb.h - (fy + 0.5));
 }
 
 static void Radar_paint_border(GLWidget *radar)
@@ -249,7 +249,7 @@ static void Radar_paint_objects( GLWidget *radar )
 	to_screen(radar, &x, &y, RadarWidth, RadarHeight);
 	x -= s/2;
 	y -= s/2;
-	if (radar_ptr[i].type == friend) glColor3ub(0, 0xff, 0);
+	if (radar_ptr[i].type == friendly) glColor3ub(0, 0xff, 0);
 	else glColor3ub(0xff, 0xff, 0xff);
 	glBegin(GL_QUADS);
 	glVertex2i(x, y);

@@ -35,20 +35,16 @@ dbuff_state_t   *dbuf_state;	/* Holds current dbuff state */
 static void dbuff_release(dbuff_state_t *state)
 {
     if (state != NULL) {
-	if (state->colormaps[0] != NULL)
-	    free(state->colormaps[0]);
-	if (state->colormaps[1] != NULL)
-	    free(state->colormaps[1]);
-	if (state->planes != NULL)
-	    free(state->planes);
+	XFREE(state->colormaps[0]);
+	XFREE(state->colormaps[1]);
+	XFREE(state->planes);
 #ifdef MBX
 	if (state->type == MULTIBUFFER
 	    && state->colormap_index != 2)
 	    XmbufDestroyBuffers(state->display, drawWindow);
 #endif
 
-	free(state);
-	state = NULL;
+	XFREE(state);
     }
 }
 
@@ -77,16 +73,14 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
     dbuff_state_t	*state;
     int			i, high_mask, low_mask;
 
-    state = calloc(1, sizeof(dbuff_state_t));
+    state = XCALLOC(dbuff_state_t, 1);
     if (state == NULL)
 	return NULL;
 
     state->colormap_size = 1 << (2 * num_planes);
-    state->colormaps[0]
-	= (XColor *) malloc(state->colormap_size * sizeof(XColor));
-    state->colormaps[1]
-	= (XColor *) malloc(state->colormap_size * sizeof(XColor));
-    state->planes = calloc(2 * num_planes, sizeof(long));
+    state->colormaps[0] = XMALLOC(XColor ,state->colormap_size);
+    state->colormaps[1]	= XMALLOC(XColor, state->colormap_size);
+    state->planes = XCALLOC(unsigned long, 2 * num_planes);
     if (state->colormaps[1] == NULL ||
 	state->colormaps[0] == NULL ||
 	state->planes == NULL) {

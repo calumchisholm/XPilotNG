@@ -23,8 +23,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _audio_h
-#define _audio_h
+#ifndef AUDIO_H
+#define AUDIO_H
 
 #define SOUND_MAX_VOLUME	100
 #define SOUND_MIN_VOLUME	10
@@ -213,6 +213,6 @@ extern	int	Handle_audio(int type, int volume);
 
 extern	int	audioDeviceInit(char *display);
 extern	void	audioDeviceEvents(void);
-extern	void	audioDevicePlay(char *filename, int type, int volume, void **private);
+extern	void	audioDevicePlay(char *filename, int type, int volume, void **private_foobar);
 
-#endif						/* _audio_h */
+#endif						/* AUDIO_H */

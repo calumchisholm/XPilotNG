@@ -282,7 +282,7 @@ void Race_game_over(world_t *world)
      * Reassign players's starting positions based upon
      * personal best lap times.
      */
-    if ((order = malloc(NumPlayers * sizeof(int))) != NULL) {
+    if ((order = XMALLOC(int, NumPlayers)) != NULL) {
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Player_by_index(i);
 	    if (Player_is_tank(pl))

@@ -213,7 +213,7 @@ static int Init_setup(world_t *world)
 	xpprintf("%s Server->client polygon map transfer size is %d bytes.\n",
 		 showtime(), size);
 
-    if ((Setup = malloc(sizeof(setup_t) + size)) == NULL) {
+    if ((Setup = (setup_t *)malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold setup");
 	free(mapdata);
 	return -1;
@@ -301,7 +301,6 @@ static void Init_receive(void)
  */
 int Setup_net_server(void)
 {
-    size_t size;
     world_t *world = &World;
 
     Init_receive();
@@ -317,12 +316,10 @@ int Setup_net_server(void)
     max_connections
 	= MIN((int)MAX_SELECT_FD - 5,
 	      options.playerLimit_orig + MAX_SPECTATORS * !!rplayback);
-    size = max_connections * sizeof(*Conn);
-    if ((Conn = malloc(size)) == NULL) {
+    if ((Conn = XCALLOC(connection_t, max_connections)) == NULL) {
 	error("Cannot allocate memory for connections");
 	return -1;
     }
-    memset(Conn, 0, size);
 
     return 0;
 }
@@ -1307,7 +1304,7 @@ int recSpecial;
 
 static void Handle_input(int fd, void *arg)
 {
-    connection_t *connp = arg;
+    connection_t *connp = (connection_t *)arg;
     int type, result, (**receive_tbl)(connection_t *);
     short *pbscheck = NULL;
     char *pbdcheck = NULL;
@@ -3005,7 +3002,7 @@ static int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 		return 0;
 	    }
 	    XFREE(motd_buf);
-	    if ((motd_buf = malloc(size)) == NULL) {
+	    if ((motd_buf = XMALLOC(char, size)) == NULL) {
 		close(fd);
 		return -1;
 	    }

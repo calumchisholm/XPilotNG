@@ -61,7 +61,6 @@ Window	about_prev_b;		/* About window's previous button */
 Window	keys_close_b;		/* Help window's close button */
 Window	talkWindow;
 bool	gotFocus;
-bool	players_exposed;
 
 static int clockColor;		/* Clock color index */
 static int scoreColor;		/* Score list color indices */
@@ -215,12 +214,17 @@ void Paint_frame(void)
 	    assert(yp >= 0.0);
 	    assert(yp < RadarHeight);
 
+#if 0
 	    /* kps - i don't see what adding 0.5 to these helps. */
 	    x = xp - xo /*+ 0.5*/;
 	    y = yp - yo /*+ 0.5*/;
-	    if (x <= 0.0)
+#else
+	    x = (int)(xp - xo + 0.5);
+	    y = (int)(yp - yo + 0.5);
+#endif
+	    if (x <= 0)
 		x += 256;
-	    if (y <= 0.0)
+	    if (y <= 0)
 		y += RadarHeight;
 	    w1 = (unsigned)x;
 	    h1 = (unsigned)y;
@@ -423,8 +427,8 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 		    9 - showScoreDecimals, showScoreDecimals,
 		    other->score);
 	else {
-	    int sc = rint(other->score);
-	    sprintf(scoreStr, "%6d", sc);
+	    /*int sc = rint(other->score);*/
+	    sprintf(scoreStr, "%6d", rint(other->score));
 	}
 
 	if (BIT(Setup->mode, TEAM_PLAY))

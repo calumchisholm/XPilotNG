@@ -589,8 +589,8 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 	wall_brake_factor = 1.0;
     fx = move->delta.cx * c + move->delta.cy * s;
     fy = move->delta.cx * s - move->delta.cy * c;
-    move->delta.cx = fx * wall_brake_factor;
-    move->delta.cy = fy * wall_brake_factor;
+    move->delta.cx = (click_t)(fx * wall_brake_factor);
+    move->delta.cy = (click_t)(fy * wall_brake_factor);
     fx = obj->vel.x * c + obj->vel.y * s;
     fy = obj->vel.x * s - obj->vel.y * c;
     obj->vel.x = fx * wall_brake_factor;
@@ -602,7 +602,7 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
     if (obj->type == OBJ_PULSE) {
 	pulseobject_t *pulse = PULSE_PTR(obj);
 
-	pulse->dir = Wrap_findDir(pulse->vel.x, pulse->vel.y);
+	pulse->dir = (int)Wrap_findDir(pulse->vel.x, pulse->vel.y);
 	pulse->len = 0;
 	pulse->refl = true;
     }
@@ -743,8 +743,8 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 
 	fx = move->delta.cx * c + move->delta.cy * s;
 	fy = move->delta.cx * s - move->delta.cy * c;
-	move->delta.cx = fx * options.playerWallBounceBrakeFactor;
-	move->delta.cy = fy * options.playerWallBounceBrakeFactor;
+	move->delta.cx = (click_t)(fx * options.playerWallBounceBrakeFactor);
+	move->delta.cy = (click_t)(fy * options.playerWallBounceBrakeFactor);
 	fx = pl->vel.x * c + pl->vel.y * s;
 	fy = pl->vel.x * s - pl->vel.y * c;
 	pl->vel.x = fx * options.playerWallBounceBrakeFactor;
@@ -836,8 +836,8 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	/* iv. Rotate the whole thing anti-clockwise. */
 	pl->vel.x = vel.x * cl + vel.y * (-sl);
 	pl->vel.y = vel.x * sl + vel.y *   cl;
-	move->delta.cx = mvd.x * cl + mvd.y * (-sl);
-	move->delta.cy = mvd.x * sl + mvd.y *   cl;
+	move->delta.cx = (click_t)(mvd.x * cl + mvd.y * (-sl));
+	move->delta.cy = (click_t)(mvd.x * sl + mvd.y *   cl);
     }
 }
 
@@ -1036,8 +1036,9 @@ static void Move_point(const move_t *move, struct collans *answer)
 
     /* 46341*46341 overflows signed 32-bit int */
     if (mdx > 45000) {
-      mdy = (float)mdy * 45000 / mdx; /* might overflow without float */
-      mdx = 45000;
+	/* might overflow without float */
+	mdy = (int)((float)mdy * 45000 / mdx);
+	mdx = 45000;
     }
 
     mindone = mdx;
@@ -1130,8 +1131,9 @@ static void Shape_move(const move_t *move, const shape_t *s,
 
     /* 46341*46341 overflows signed 32-bit int */
     if (mdx > 45000) {
-      mdy = (float)mdy * 45000 / mdx; /* might overflow without float */
-      mdx = 45000;
+	/* might overflow without float */
+	mdy = (int)((float)mdy * 45000 / mdx);
+	mdx = 45000;
     }
 
     mindone = mdx;
@@ -1592,7 +1594,7 @@ static void store_byte(int value, unsigned char **start, int *offset, int *sz)
     (*start)[(*offset)++] = value;
     if (*offset == *sz) {
 	*sz *= 2;
-	*start = ralloc(*start, *sz);
+	*start = (unsigned char *)ralloc(*start, *sz);
     }
 }
 
@@ -1620,7 +1622,7 @@ int Polys_to_client(unsigned char **start)
 #define STORE2(x) store_2byte(x, start, &offset, &size)
 #define STORE4(x) store_4byte(x, start, &offset, &size)
 
-    *start = ralloc(NULL, 100);
+    *start = (unsigned char *)ralloc(NULL, 100);
     size = 100;
     offset = 0;
 
@@ -1858,7 +1860,7 @@ static void insert_y(int block, int y)
 	free(ptr);
 	return;
     }
-    *prev = ralloc(NULL, sizeof(struct tempy));
+    *prev = (struct tempy *)ralloc(NULL, sizeof(struct tempy));
     (*prev)->y = y;
     (*prev)->next = ptr;
 }
@@ -1876,7 +1878,7 @@ static void store_inside_line(int bx, int by, int ox, int oy, int dx, int dy)
 	insert_y(block, oy);
     if (oy + dy >= 0 && oy + dy < B_CLICKS && ox + dx >= B_CLICKS)
 	insert_y(block, oy + dy);
-    s = ralloc(NULL, sizeof(struct templine));
+    s = (struct templine *)ralloc(NULL, sizeof(struct templine));
     s->x1 = ox;
     s->x2 = ox + dx;
     s->y1 = oy;
@@ -1900,7 +1902,8 @@ static void finish_inside(int block, int group)
     if (gblock->group != NO_GROUP) {
 	while (gblock->next) /* Maintain group order*/
 	    gblock = gblock->next;
-	gblock->next = ralloc(NULL, sizeof(struct inside_block));
+	gblock->next
+	    = (struct inside_block *)ralloc(NULL, sizeof(struct inside_block));
 	gblock = gblock->next;
     }
     gblock->group = group;
@@ -1912,7 +1915,7 @@ static void finish_inside(int block, int group)
 	yptr = yptr->next;
     }
     if (j > 0) {
-	ptr = ralloc(NULL, (j + 1) * sizeof(short));
+	ptr = (short *)ralloc(NULL, (j + 1) * sizeof(short));
 	gblock->y = ptr;
 	yptr = temparray[block].y;
 	while (yptr) {
@@ -1932,7 +1935,7 @@ static void finish_inside(int block, int group)
 	lptr = lptr->next;
     }
     if (j > 0) {
-	ptr = ralloc(NULL, (j * 4 + 1) * sizeof(short));
+	ptr = (short *)ralloc(NULL, (j * 4 + 1) * sizeof(short));
 	gblock->lines = ptr;
 	lptr = temparray[block].lines;
 	while (lptr) {
@@ -1986,8 +1989,10 @@ static void allocate_inside(void)
 {
     int i;
 
-    inside_table = ralloc(NULL, mapx * mapy * sizeof(struct inside_block));
-    temparray = ralloc(NULL, mapx * mapy * sizeof(struct test));
+    inside_table = (struct inside_block *)
+	ralloc(NULL, mapx * mapy * sizeof(struct inside_block));
+    temparray = (struct test *)
+	ralloc(NULL, mapx * mapy * sizeof(struct test));
     for (i = 0; i < mapx * mapy; i++) {
 	temparray[i].distance = 1e20;
 	temparray[i].inside = 2;
@@ -2176,9 +2181,10 @@ static void Distance_init(void)
 
     /* max line delta 30000 */
 
-    blockline = ralloc(NULL, mapx * mapy * sizeof(struct blockinfo));
-    lineno = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
-    dis = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
+    blockline = (struct blockinfo *)
+	ralloc(NULL, mapx * mapy * sizeof(struct blockinfo));
+    lineno = (int *)ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
+    dis = (int *)ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
     size = 1; /* start with end marker */
     for (bx = 0; bx < mapx; bx++)
 	for (by = 0; by < mapy; by++)
@@ -2305,7 +2311,7 @@ static void Distance_init(void)
 		; /* semicolon for ansi compatibility */
 	    }
 	}
-    llist = ralloc(NULL, size * sizeof(short));
+    llist = (unsigned short *)ralloc(NULL, size * sizeof(unsigned short));
     lptr = llist;
     *lptr++ = 65535; /* All blocks with no lines stored point to this. */
     for (bx = 0; bx < mapx; bx++)
@@ -2335,7 +2341,8 @@ static void Corner_init(void)
     int height, height2, width, by2;
 
 #define DISIZE 350
-    temp = ralloc(NULL, mapx * mapy * DISIZE * sizeof(short)); /* !@# */
+    temp = (unsigned short *)
+	ralloc(NULL, mapx * mapy * DISIZE * sizeof(unsigned short)); /* !@# */
     for (i = 0; i < mapx * mapy; i++)
 	temp[i * DISIZE] = 0;
     for (i = 0; i < num_lines; i++) {
@@ -2371,7 +2378,7 @@ static void Corner_init(void)
 		size++;
 	    }
     }
-    plist = ralloc(NULL, size * sizeof(short));
+    plist = (unsigned short *)ralloc(NULL, size * sizeof(unsigned short));
     ptr = plist;
     for (block = 0; block < mapx * mapy; block++) {
 	blockline[block].points = ptr;
@@ -2401,10 +2408,10 @@ void Ball_line_init(world_t *world)
     ball_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	ball_wire.pts[i] = coords + i;
-	coords[i].cx
-	    = cos(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
-	coords[i].cy
-	    = sin(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
+	coords[i].cx = (click_t) (cos(i * 2 * PI / MAX_SHIP_PTS)
+				  * options.ballRadius * CLICK);
+	coords[i].cy = (click_t) (sin(i * 2 * PI / MAX_SHIP_PTS)
+				  * options.ballRadius * CLICK);
     }
 
     return;
@@ -2440,7 +2447,8 @@ static void Poly_to_lines(void)
 		continue;
 	    }
 	    if (!(num_lines % 2000))
-		linet = ralloc(linet, (num_lines + 2000) * sizeof(struct bline));
+		linet = (struct bline *)
+		    ralloc(linet, (num_lines + 2000) * sizeof(struct bline));
 	    linet[num_lines].group = group;
 	    linet[num_lines].start.cx = TWRAP_XCLICK(startx + dx);
 	    linet[num_lines].start.cy = TWRAP_YCLICK(starty + dy);
@@ -2455,7 +2463,8 @@ static void Poly_to_lines(void)
 	    exit(1);
 	}
     }
-    linet = ralloc(linet, (num_lines + S_LINES) * sizeof(struct bline));
+    linet = (struct bline *)
+	ralloc(linet, (num_lines + S_LINES) * sizeof(struct bline));
     for (i = num_lines; i < num_lines + S_LINES; i++)
 	linet[i].group = 0; /* initialize for Shape_lines */
     return;
@@ -2921,7 +2930,8 @@ void Turn_player(player_t *pl)
 	    cl = x / l;
 	    sl = y / l;
 	    
-	    velo = abs(pl->vel.x * (-sl) + pl->vel.y * cl); /*perpenticular velocity*/
+	    /* kps - changed from abs() to ABS(), abs() returns int */
+	    velo = ABS(pl->vel.x * (-sl) + pl->vel.y * cl); /*perpenticular velocity*/
 
 	    /* different functions used for different values of pushType */
 	    /* (turnPush = 0: off and all this isn't executed) */

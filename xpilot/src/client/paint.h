@@ -67,7 +67,6 @@ extern double 	hudRadarLimit;		/* Limit for hudradar drawing */
 
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	decorColor;		/* Color index for decoration drawing */
-extern bool	gotFocus;		/* Do we have the mouse pointer */
 extern bool	talk_mapped;		/* Is talk window visible */
 extern bool     radar_score_mapped;     /* Is the radar and score window mapped */
 extern unsigned	draw_width, draw_height;
@@ -87,6 +86,8 @@ extern int	num_spark_colors;
 extern long	loops;
 extern long	loopsSlow;
 extern double	timePerFrame;
+
+extern bool	players_exposed;
 
 extern double	scaleFactor;	/* scale the draw (main playfield) window */
 extern double	scaleFactor_s;

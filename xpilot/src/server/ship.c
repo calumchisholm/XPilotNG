@@ -177,7 +177,7 @@ void Obj_repel(object_t *obj1, object_t *obj2, int repel_dist)
 
     force = MIN(force, 10);
 
-    obj_theta = findDir(xd, yd);
+    obj_theta = (int)findDir(xd, yd);
 
     dm = obj1->mass / obj2->mass;
     dvx2 = tcos(obj_theta) * force * dm;

@@ -482,10 +482,10 @@ void Parse_robot_file(void)
 		    if (num_robs == max_robs) {
 			if (max_robs == 0) {
 			    max_robs = 10;
-			    robs = malloc(max_robs* sizeof(robot_t));
+			    robs = XMALLOC(robot_t, max_robs);
 			} else {
 			    max_robs += 10;
-			    robs = realloc(robs, max_robs * sizeof(robot_t));
+			    robs = XREALLOC(robot_t, robs, max_robs);
 			}
 			if (!robs) {
 			    error("Not enough memory to parse robotsfile");
@@ -689,7 +689,7 @@ static void Robot_create(world_t *world)
     if (peek_ID() == 0)
 	return;
 
-    if ((new_data = malloc(sizeof(robot_data_t))) == NULL) {
+    if ((new_data = XMALLOC(robot_data_t, 1)) == NULL) {
 	error("malloc robot_data");
 	return;
     }

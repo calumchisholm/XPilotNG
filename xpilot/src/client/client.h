@@ -328,7 +328,7 @@ typedef struct {
 
 typedef enum {
     normal,
-    friend
+    friendly
 } radar_type_t;
 
 typedef struct {

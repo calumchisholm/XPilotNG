@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.57)
 AC_INIT([XPilot NG], 4.6.6, kps@users.sourceforge.net, xpilot-ng)
 AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_SRCDIR(src/client/x11/xpilot.c)
+AC_CONFIG_SRCDIR(src/client/xpclient.h)
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -90,7 +90,11 @@ dnl  Checks for programs.
 AC_PROG_CC
 dnl AC_PROG_GCC_TRADITIONAL
 dnl AC_PROG_CPP
+
+dnl Needed if you want to compile with g++ e.g.
 dnl AC_PROG_CXX
+dnl AC_PROG_CXXCPP
+
 dnl AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
@@ -164,6 +168,7 @@ if test x$enable_sdl_client = xyes; then
 	            AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
 	)
 	CFLAGS="$CFLAGS $SDL_CFLAGS"
+	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 
 	if test x$no_sdl = xyes; then
 	    AC_MSG_ERROR(SDL client will not be built.)

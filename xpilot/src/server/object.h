@@ -217,9 +217,9 @@ struct xp_object {
 
     OBJECT_EXTEND
 
-#ifdef __cplusplus
+    /*#ifdef __cplusplus
 			_object() {}
-#endif
+			#endif*/
 
 #define OBJ_IND(ind)	(Obj[(ind)])
 #define OBJ_PTR(ptr)	((object_t *)(ptr))
@@ -241,9 +241,9 @@ struct xp_mineobject {
     float		ecm_range;	/* Range from last ecm center */
     float		spread_left;	/* how much spread time left */
 
-#ifdef __cplusplus
+  /*#ifdef __cplusplus
 			_mineobject() {}
-#endif
+			#endif*/
 
 #define MINE_IND(ind)	((mineobject_t *)Obj[(ind)])
 #define MINE_PTR(ptr)	((mineobject_t *)(ptr))
@@ -268,9 +268,9 @@ struct xp_missileobject {
 
     MISSILE_EXTEND
 
-#ifdef __cplusplus
+    /*#ifdef __cplusplus
 			_missileobject() {}
-#endif
+			#endif*/
 
 #define MISSILE_IND(ind)	((missileobject_t *)Obj[(ind)])
 #define MISSILE_PTR(ptr)	((missileobject_t *)(ptr))
@@ -292,9 +292,9 @@ struct xp_smartobject {
     int			new_info;	/* smart re-lock id */
     float		ecm_range;	/* Range from last ecm center */
 
-#ifdef __cplusplus
+  /*#ifdef __cplusplus
 			_smartobject() {}
-#endif
+			#endif*/
 
 #define SMART_IND(ind)	((smartobject_t *)Obj[(ind)])
 #define SMART_PTR(ptr)	((smartobject_t *)(ptr))
@@ -315,9 +315,9 @@ struct xp_torpobject {
 
     float		spread_left;	/* how much spread time left */
 
-#ifdef __cplusplus
+  /*#ifdef __cplusplus
 			_torpobject() {}
-#endif
+			#endif*/
 
 #define TORP_IND(ind)	((torpobject_t *)Obj[(ind)])
 #define TORP_PTR(ptr)	((torpobject_t *)(ptr))
@@ -338,9 +338,9 @@ struct xp_ballobject {
     treasure_t		*treasure;	/* treasure for ball */
     int 		style;		/* What polystyle to use */
 
-#ifdef __cplusplus
+  /*#ifdef __cplusplus
 			_ballobject() {}
-#endif
+			#endif*/
 
 #define BALL_IND(ind)	((ballobject_t *)Obj[(ind)])
 #define BALL_PTR(obj)	((ballobject_t *)(obj))
@@ -363,9 +363,9 @@ struct xp_wireobject {
     short		rotation;	/* Rotation direction */
     u_byte		pad[1];
 
-#ifdef __cplusplus
+  /*#ifdef __cplusplus
 			_wireobject() {}
-#endif
+			#endif*/
 
 #define WIRE_IND(ind)	((wireobject_t *)Obj[(ind)])
 #define WIRE_PTR(obj)	((wireobject_t *)(obj))
@@ -385,9 +385,9 @@ struct xp_pulseobject {
     int			dir;		/* Direction of the pulse */
     float		len;		/* Length of the pulse */
     bool		refl;		/* Pulse was reflected ? */
-#ifdef __cplusplus
+  /*#ifdef __cplusplus
 			_pulseobject() {}
-#endif
+			#endif*/
 
 #define PULSE_IND(ind)	((pulseobject_t *)Obj[(ind)])
 #define PULSE_PTR(obj)	((pulseobject_t *)(obj))
@@ -622,9 +622,9 @@ struct player {
 
     world_t	*world;			/* World player is in */
 
-#ifdef __cplusplus
+  /*#ifdef __cplusplus
 		player() {}
-#endif
+		#endif*/
 
 };
 

@@ -312,7 +312,7 @@ static void Msg_scan_death(int id)
 
     for (i = 0; i < num_bases; i++) {
 	if (bases[i].id == id) {
-	    bases[i].appeartime = end_loops + 3 * clientFPS;
+	    bases[i].appeartime = (long) (end_loops + 3 * clientFPS);
 	    break;
 	}
     }
@@ -664,13 +664,13 @@ int Alloc_msgs(void)
     message_t		*x, *x2 = NULL;
     int			i;
 
-    if ((x = malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL){
+    if ((x = XMALLOC(message_t, 2 * MAX_MSGS)) == NULL) {
 	error("No memory for messages");
 	return -1;
     }
 
     if (selectionAndHistory &&
-	((x2 = malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL)){
+	((x2 = XMALLOC(message_t, 2 * MAX_MSGS)) == NULL)) {
 	error("No memory for history messages");
 	free(x);
 	return -1;
@@ -717,7 +717,8 @@ int Alloc_history(void)
     int		i;
 
     /* maxLinesInHistory is a runtime constant */
-    if ((hist_ptr = malloc((size_t)maxLinesInHistory * MAX_CHARS)) == NULL) {
+    hist_ptr = XMALLOC(char, (size_t)maxLinesInHistory * MAX_CHARS);
+    if (hist_ptr == NULL) {
 	error("No memory for history");
 	return -1;
     }
@@ -983,9 +984,9 @@ void Add_roundend_messages(other_t **order)
 	    }
 	    s += sprintf(s, "%s", hackbuf2);
 	} else {
-	    int sc = rint(other->score);
+	    /*int sc = rint(other->score);*/
 
-	    sprintf(hackbuf2, "%s: %d ", other->nick_name, sc);
+	    sprintf(hackbuf2, "%s: %d ", other->nick_name, rint(other->score));
 	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
 		Add_message(hackbuf);
 		s = hackbuf;

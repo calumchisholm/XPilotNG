@@ -159,7 +159,8 @@ static void Set_swapper_state(player_t *pl)
 		/* put team swapping player waiting mode. */
 		if (pl->mychar == ' ')
 		    pl->mychar = 'W';
-		pl->prev_life = pl->life = 0;
+		pl->prev_life = 0;
+		pl->life = 0.0;
 		SET_BIT(pl->status, GAME_OVER | PLAYING);
 		Player_self_destruct(pl, false);
 		pl->pause_count = 0;

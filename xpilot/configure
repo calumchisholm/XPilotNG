@@ -273,7 +273,7 @@ PACKAGE_VERSION='4.6.6'
 PACKAGE_STRING='XPilot NG 4.6.6'
 PACKAGE_BUGREPORT='kps@users.sourceforge.net'
 
-ac_unique_file="src/client/x11/xpilot.c"
+ac_unique_file="src/client/xpclient.h"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -3092,6 +3092,8 @@ else
 fi
 
 
+
+
 echo "$as_me:$LINENO: checking whether ${MAKE-make} sets \$(MAKE)" >&5
 echo $ECHO_N "checking whether ${MAKE-make} sets \$(MAKE)... $ECHO_C" >&6
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y,:./+-,___p_,'`
@@ -5705,6 +5707,7 @@ echo "$as_me: error: *** SDL version $SDL_VERSION not found!" >&2;}
   rm -f conf.sdltest
 
 	CFLAGS="$CFLAGS $SDL_CFLAGS"
+	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 
 	if test x$no_sdl = xyes; then
 	    { { echo "$as_me:$LINENO: error: SDL client will not be built." >&5

@@ -97,15 +97,15 @@ static void Paint_background_dots(void)
     dx = (double)Setup->width / count.x;
     dy = (double)Setup->height / count.y;
 
-    min.x = world.x / dx;
+    min.x = (int)(world.x / dx);
     if (world.x > 0)
 	min.x++;
-    min.y = world.y / dy;
+    min.y = (int)(world.y / dy);
     if (world.y > 0)
 	min.y++;
 
-    max.x = (world.x + ext_view_width) / dx;
-    max.y = (world.y + ext_view_height) / dy;
+    max.x = (int)((world.x + ext_view_width) / dx);
+    max.y = (int)((world.y + ext_view_height) / dy);
 
     for (yi = min.y; yi <= max.y; yi++) {
         for (xi = min.x; xi <= max.x; xi++) {

@@ -429,8 +429,8 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 		    7 - showScoreDecimals, showScoreDecimals,
 		    other->score);
 	else {
-	    int sc = rint(other->score);
-	    sprintf(scoreStr, "%6d", sc);
+	    /*int sc = rint(other->score);*/
+	    sprintf(scoreStr, "%6d", rint(other->score));
 	}
 
 	if (BIT(Setup->mode, TEAM_PLAY))

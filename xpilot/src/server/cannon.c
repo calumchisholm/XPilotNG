@@ -303,11 +303,11 @@ static int Cannon_in_danger(cannon_t *c)
 	npx = CLICK_TO_PIXEL(shot->pos.cx);
 	npy = CLICK_TO_PIXEL(shot->pos.cy);
 	if (options.cannonSmartness > 1) {
-	    npx += shot->vel.x;
-	    npy += shot->vel.y;
+	    npx += (int)shot->vel.x;
+	    npy += (int)shot->vel.y;
 	    if (options.cannonSmartness > 2) {
-		npx += shot->acc.x;
-		npy += shot->acc.y;
+		npx += (int)shot->acc.x;
+		npy += (int)shot->acc.y;
 	    }
 	}
 	tdx = WRAP_DX(npx - cpx);
@@ -476,7 +476,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	    break;
 	case 2:
 	    if (tdist < closest) {
-		*dir = findDir(tdx, tdy);
+		*dir = (int)findDir(tdx, tdy);
 		found = true;
 	    }
 	    break;
@@ -493,7 +493,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 
 		tdx = WRAP_DCX(npx - c->pos.cx) / CLICK;
 		tdy = WRAP_DCY(npy - c->pos.cy) / CLICK;
-		tdir = findDir(tdx, tdy);
+		tdir = (int)findDir(tdx, tdy);
 		ddir = MOD2(tdir - c->dir, RES);
 		if ((ddir < (CANNON_SPREAD * 0.5)
 		     || ddir > RES - (CANNON_SPREAD * 0.5))

@@ -139,8 +139,8 @@ static inline bool Gravity_is_strong(player_t *pl, clpos_t pos, int travel_dir)
 
     grav = World_gravity(world, pos);
     if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
-	gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
-			      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
+	gravity_dir = (int)findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
+				   grav.y - CLICK_TO_PIXEL(pl->pos.cy));
 	if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
 	    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4)
 	    return true;
@@ -231,7 +231,7 @@ static void Robot_default_create(player_t *pl, char *str)
     robot_default_data_t *my_data;
     world_t *world = &World;
 
-    if (!(my_data = malloc(sizeof(*my_data)))) {
+    if (!(my_data = XMALLOC(robot_default_data_t, 1))) {
 	error("no mem for default robot");
 	End_game();
     }
@@ -409,9 +409,9 @@ static inline int decide_travel_dir(player_t *pl)
     if (pl->velocity <= 0.2) {
 	vector_t grav = World_gravity(world, pl->pos);
 
-	return findDir(grav.x, grav.y);
+	return (int)findDir(grav.x, grav.y);
     }
-    return findDir(pl->vel.x, pl->vel.y);
+    return (int)findDir(pl->vel.x, pl->vel.y);
 }
 
 
@@ -495,10 +495,10 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 
     if (mine_i >= 0) {
 	shot = Obj[mine_i];
-	aux_dir = Wrap_cfindDir(shot->pos.cx + PIXEL_TO_CLICK(shot->vel.x)
-				- pl->pos.cx,
-				shot->pos.cy + PIXEL_TO_CLICK(shot->vel.y)
-				- pl->pos.cy);
+	aux_dir = (int)Wrap_cfindDir(shot->pos.cx + PIXEL_TO_CLICK(shot->vel.x)
+				     - pl->pos.cx,
+				     shot->pos.cy + PIXEL_TO_CLICK(shot->vel.y)
+				     - pl->pos.cy);
 	delta_dir = MOD2(aux_dir - travel_dir, RES);
 	if (delta_dir < RES / 4) {
 	    left_ok = false;
@@ -511,10 +511,10 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
     }
     if (ship_i >= 0) {
 	ship = Player_by_index(ship_i);
-	aux_dir = Wrap_cfindDir(ship->pos.cx - pl->pos.cx
-				+ PIXEL_TO_CLICK(ship->vel.x * 2),
-				ship->pos.cy - pl->pos.cy
-				+ PIXEL_TO_CLICK(ship->vel.y * 2));
+	aux_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx
+				     + PIXEL_TO_CLICK(ship->vel.x * 2),
+				     ship->pos.cy - pl->pos.cy
+				     + PIXEL_TO_CLICK(ship->vel.y * 2));
 	delta_dir = MOD2(aux_dir - travel_dir, RES);
 	if (delta_dir < RES / 4) {
 	    left_ok = false;
@@ -862,10 +862,10 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 
     if (dx == 0 && dy == 0) {
 	vector_t grav = World_gravity(world, pl->pos);
-	item_dir = findDir(grav.x, grav.y);
+	item_dir = (int)findDir(grav.x, grav.y);
 	item_dir = MOD2(item_dir + RES/2, RES);
     } else
-	item_dir = findDir((double)dx, (double)dy);
+	item_dir = (int)findDir((double)dx, (double)dy);
 
     if (new_mode == RM_REFUEL)
 	item_dist = item_dist - 90;
@@ -1115,8 +1115,8 @@ static bool Check_robot_hunt(player_t *pl)
     if (!Detect_ship(pl, ship))
 	return false;
 
-    ship_dir = Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
-			     ship->pos.cy - pl->pos.cy);
+    ship_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
+				  ship->pos.cy - pl->pos.cy);
 
     travel_dir = decide_travel_dir(pl);
 
@@ -1217,9 +1217,9 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	return ROBOT_IGNORE_ITEM;		/* never useful for robots */
     if (pl->item[itemtype] >= world->items[itemtype].limit)
 	return ROBOT_IGNORE_ITEM;		/* already full */
-    if ((IsDefensiveItem(itemtype)
+    if ((IsDefensiveItem((enum Item)itemtype)
 	 && CountDefensiveItems(pl) >= options.maxDefensiveItems)
-	|| (IsOffensiveItem(itemtype)
+	|| (IsOffensiveItem((enum Item)itemtype)
 	 && CountOffensiveItems(pl) >= options.maxOffensiveItems))
 	return ROBOT_IGNORE_ITEM;
     if (itemtype == ITEM_FUEL) {
@@ -1369,9 +1369,9 @@ static bool Ball_handler(player_t *pl)
 		dist_np = dist;
 	}
 	closest_treasure = Treasure_by_index(world, closest_tr);
-	bdir = findDir(ball->vel.x, ball->vel.y);
-	tdir = Wrap_cfindDir(closest_treasure->pos.cx - ball->pos.cx,
-			     closest_treasure->pos.cy - ball->pos.cy);
+	bdir = (int)findDir(ball->vel.x, ball->vel.y);
+	tdir = (int)Wrap_cfindDir(closest_treasure->pos.cx - ball->pos.cx,
+				  closest_treasure->pos.cy - ball->pos.cy);
 	bbpos = Clpos_to_blkpos(ball->pos);
 	xdist = (closest_treasure->pos.cx / BLOCK_CLICKS) - bbpos.bx;
 	ydist = (closest_treasure->pos.cy / BLOCK_CLICKS) - bbpos.by;
@@ -1551,8 +1551,8 @@ static int Robot_default_play_check_map(player_t *pl)
 	cannon_t *cannon = Cannon_by_index(world, cannon_i);
 	clpos_t d = cannon->pos;
 
-	d.cx += (BLOCK_CLICKS * 0.1 * tcos(cannon->dir));
-	d.cy += (BLOCK_CLICKS * 0.1 * tsin(cannon->dir));
+	d.cx += (click_t)(BLOCK_CLICKS * 0.1 * tcos(cannon->dir));
+	d.cy += (click_t)(BLOCK_CLICKS * 0.1 * tsin(cannon->dir));
 
 	if (Check_robot_target(pl, d, RM_CANNON_KILL))
 	    return 1;
@@ -1701,12 +1701,12 @@ static void Robot_default_play_check_objects(player_t *pl,
 		*mine_i = j;
 		*mine_dist = distance;
 	    }
-	    if ((dx = ((CLICK_TO_PIXEL(shot->pos.cx - pl->pos.cx))
+	    if ((dx = (int)((CLICK_TO_PIXEL(shot->pos.cx - pl->pos.cx))
 			     + (shot->vel.x - pl->vel.x)),
-		    dx = WRAP_DX(dx), ABS(dx)) < *mine_dist
-		&& (dy = ((CLICK_TO_PIXEL(shot->pos.cy - pl->pos.cy))
+		    dx = (int)WRAP_DX(dx), ABS(dx)) < *mine_dist
+		&& (dy = (int)((CLICK_TO_PIXEL(shot->pos.cy - pl->pos.cy))
 				 + (shot->vel.y - pl->vel.y)),
-		    dy = WRAP_DY(dy), ABS(dy)) < *mine_dist
+		    dy = (int)WRAP_DY(dy), ABS(dy)) < *mine_dist
 		&& (distance = LENGTH(dx, dy)) < *mine_dist) {
 		*mine_i = j;
 		*mine_dist = distance;
@@ -1715,12 +1715,12 @@ static void Robot_default_play_check_objects(player_t *pl,
 
 	shield_range = 21 + SHIP_SZ + shot->pl_range;
 
-	if ((dx = (CLICK_TO_PIXEL(shot->pos.cx)
+	if ((dx = (int)(CLICK_TO_PIXEL(shot->pos.cx)
 		   + shot->vel.x
 		   - (CLICK_TO_PIXEL(pl->pos.cx) + pl->vel.x)),
 		dx = WRAP_DX(dx),
 		ABS(dx)) < shield_range
-	    && (dy = (CLICK_TO_PIXEL(shot->pos.cy) + shot->vel.y
+	    && (dy = (int)(CLICK_TO_PIXEL(shot->pos.cy) + shot->vel.y
 		      - (CLICK_TO_PIXEL(pl->pos.cy) + pl->vel.y)),
 		dy = WRAP_DY(dy),
 		ABS(dy)) < shield_range

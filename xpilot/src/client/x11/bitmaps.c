@@ -120,7 +120,7 @@ void Bitmaps_cleanup(void)
  * Adds a new bitmap needed by the current map into global pixmaps.
  * Returns the index of the newly added bitmap in the array.
  */
-int Bitmap_add(char *filename, int count, bool scalable)
+int Bitmap_add(const char *filename, int count, bool scalable)
 {
     xp_pixmap_t pixmap;
 
@@ -299,7 +299,7 @@ static int Bitmap_init(int img)
 
     count = ABS(pixmaps[img].count);
 
-    if (!(pixmaps[img].bitmaps = malloc(count * sizeof(xp_bitmap_t)))) {
+    if (!(pixmaps[img].bitmaps = XMALLOC(xp_bitmap_t, count))) {
 	error("not enough memory for bitmaps");
 	pixmaps[img].state = BMS_ERROR;
 	return -1;

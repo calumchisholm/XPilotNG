@@ -36,12 +36,10 @@ typedef unsigned char	u_byte;
  * On others bool is already a builtin type.
  * Using preprocessor macros to circumvent both situations.
  */
-#define false	0
-#define true	1
-
-#ifndef	_XPMONNT_
-#define bool	int
-/*typedef enum { false = 0, true = 1 } bool;*/
+#ifndef __cplusplus
+# define false	0
+# define true	1
+# define bool	int
 #endif
 
 typedef struct { double x, y; }		vector_t;

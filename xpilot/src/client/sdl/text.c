@@ -403,7 +403,7 @@ bool draw_text_fraq(font_data *ft_font, int color, int XALIGN, int YALIGN, int x
         
     if (!string_tex) {
     	remove_tex = true;
-    	string_tex = malloc(sizeof(string_tex_t));
+    	string_tex = XMALLOC(string_tex_t, 1);
     }
     
     if (render_text(ft_font,text,string_tex)) {
@@ -416,10 +416,8 @@ bool draw_text_fraq(font_data *ft_font, int color, int XALIGN, int YALIGN, int x
     	}
     }
     
-    if (remove_tex) {
-    	free(string_tex);
-    	string_tex = NULL;
-    }
+    if (remove_tex)
+    	XFREE(string_tex);
     
     return true;
 }
@@ -440,8 +438,8 @@ void disp_text_fraq(string_tex_t *string_tex, int color, int XALIGN, int YALIGN,
     set_alphacolor(color);
     glBindTexture(GL_TEXTURE_2D, string_tex->texture);
     
-    x -= string_tex->width/2.0f*XALIGN;
-    y += string_tex->height/2.0f*YALIGN - string_tex->height;
+    x -= (int)(string_tex->width/2.0f*XALIGN);
+    y += (int)(string_tex->height/2.0f*YALIGN - string_tex->height);
     
     if (onHUD) pushScreenCoordinateMatrix();
     glEnable(GL_TEXTURE_2D);

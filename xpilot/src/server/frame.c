@@ -250,15 +250,13 @@ static void Frame_radar_buffer_send(connection_t *conn, player_t *pl)
     const int radar_width = 256;
     int radar_height, radar_x, radar_y, send_x, send_y;
     shuffle_t *radar_shuffle;
-    size_t shuffle_bufsize;
     world_t *world = pl->world;
 
     radar_height = (radar_width * world->height) / world->width;
 
     if (num_radar > MIN(256, MAX_SHUFFLE_INDEX))
 	num_radar = MIN(256, MAX_SHUFFLE_INDEX);
-    shuffle_bufsize = (num_radar * sizeof(shuffle_t));
-    radar_shuffle = malloc(shuffle_bufsize);
+    radar_shuffle = XMALLOC(shuffle_t, num_radar);
     if (radar_shuffle == NULL)
 	return;
     for (i = 0; i < num_radar; i++)
@@ -383,8 +381,8 @@ static int Frame_status(connection_t *conn, player_t *pl)
 		|| clpos_inview(&cv, lock_pl->pos))
 	    && pl->lock.distance != 0) {
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
-	    lock_dir = Wrap_cfindDir(lock_pl->pos.cx - pl->pos.cx,
-				     lock_pl->pos.cy - pl->pos.cy);
+	    lock_dir = (int)Wrap_cfindDir(lock_pl->pos.cx - pl->pos.cx,
+					  lock_pl->pos.cy - pl->pos.cy);
 	    lock_dist = (int)pl->lock.distance;
 	}
     }
@@ -571,8 +569,7 @@ static void Frame_shuffle_objects(void)
     if (max_object_shuffle < num_object_shuffle) {
 	XFREE(object_shuffle_ptr);
 	max_object_shuffle = num_object_shuffle;
-	memsize = max_object_shuffle * sizeof(shuffle_t);
-	object_shuffle_ptr = malloc(memsize);
+	object_shuffle_ptr = XMALLOC(shuffle_t, max_object_shuffle);
 	if (object_shuffle_ptr == NULL)
 	    max_object_shuffle = 0;
     }
@@ -597,15 +594,13 @@ static void Frame_shuffle_objects(void)
 static void Frame_shuffle_players(void)
 {
     int				i;
-    size_t			memsize;
 
     num_player_shuffle = MIN(NumPlayers, MAX_SHUFFLE_INDEX);
 
     if (max_player_shuffle < num_player_shuffle) {
 	XFREE(player_shuffle_ptr);
 	max_player_shuffle = num_player_shuffle;
-	memsize = max_player_shuffle * sizeof(shuffle_t);
-	player_shuffle_ptr = malloc(memsize);
+	player_shuffle_ptr = XMALLOC(shuffle_t, max_player_shuffle);
 	if (player_shuffle_ptr == NULL)
 	    max_player_shuffle = 0;
     }
@@ -664,8 +659,10 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	    if (clpos_inview(&cv, pos))
 		ldir = MOD2(pulse->dir + RES/2, RES);
 	    else {
-		pos.cx = pos.cx - tcos(pulse->dir) * pulse->len * CLICK;
-		pos.cy = pos.cy - tsin(pulse->dir) * pulse->len * CLICK;
+		pos.cx = (click_t)(pos.cx
+				   - tcos(pulse->dir) * pulse->len * CLICK);
+		pos.cy = (click_t)(pos.cy
+				   - tsin(pulse->dir) * pulse->len * CLICK);
 		pos = World_wrap_clpos(world, pos);
 		ldir = pulse->dir;
 		if (!clpos_inview(&cv, pos))

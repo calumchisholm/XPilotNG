@@ -110,6 +110,12 @@ extern double		tbl_cos[];
 #endif	/* MOD2 */
 
 /* borrowed from autobook */
+#define XCALLOC(type, num) \
+        ((type *) calloc ((num), sizeof(type)))
+#define XMALLOC(type, num) \
+        ((type *) malloc ((num) * sizeof(type)))
+#define XREALLOC(type, p, num) \
+        ((type *) realloc ((p), (num) * sizeof(type)))
 #define XFREE(ptr) \
 do { \
     if (ptr) { free(ptr);  ptr = NULL; } \

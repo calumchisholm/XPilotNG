@@ -77,7 +77,7 @@ static int skipspace(char **map_ptr)
  */
 static char *getMultilineValue(char **map_ptr, char *delimiter)
 {
-    char *s = malloc(32768);
+    char *s = XMALLOC(char, 32768);
     size_t i = 0, slen = 32768;
     char *bol;
     int ich;
@@ -87,7 +87,7 @@ static char *getMultilineValue(char **map_ptr, char *delimiter)
 	ich = **map_ptr;
 	(*map_ptr)++;
 	if (ich == '\0') {
-	    s = realloc(s, i + 1);
+	    s = (char *)realloc(s, i + 1);
 	    s[i] = '\0';
 	    return s;
 	}
@@ -95,7 +95,7 @@ static char *getMultilineValue(char **map_ptr, char *delimiter)
 	    char *t = s;
 
 	    slen += (slen / 2) + 8192;
-	    s = realloc(s, slen);
+	    s = (char *)realloc(s, slen);
 	    bol += s - t;
 	}
 	if (ich == '\n') {
@@ -103,7 +103,7 @@ static char *getMultilineValue(char **map_ptr, char *delimiter)
 	    if (delimiter && !strcmp(bol, delimiter)) {
 		char *t = s;
 
-		s = realloc(s, (size_t) (bol - s + 1));
+		s = (char *)realloc(s, (size_t) (bol - s + 1));
 		s[bol - t] = '\0';
 		return s;
 	    }
@@ -142,12 +142,12 @@ static char *getMultilineValue(char **map_ptr, char *delimiter)
  */
 #define EXPAND				\
     if (i == slen)			\
-	s = realloc(s, slen *= 2);
+	s = (char *)realloc(s, slen *= 2);
 
 static void parseLine(char **map_ptr, optOrigin opt_origin)
 {
     int ich, override = 0, multiline = 0;
-    char *value, *head, *name, *s = malloc(128), *p;
+    char *value, *head, *name, *s = XMALLOC(char, 128), *p;
     size_t slen = 128, i = 0;
 
     ich = **map_ptr;
@@ -224,7 +224,8 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
     s[i++] = '\0';
     name = s;
 
-    s = malloc(slen = 128);
+    slen = 128;
+    s = XMALLOC(char, slen);
     i = 0;
     do {
 	EXPAND;
@@ -260,7 +261,7 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
 	 * name becomes value 
 	 */
 	free(name);
-	name = malloc((size_t) (p - value + 1));
+	name = XMALLOC(char, (size_t) (p - value + 1));
 	memcpy(name, value, (size_t) (p - value));
 	name[p - value] = '\0';
 
@@ -361,7 +362,7 @@ static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
 
     map_offset = 0;
     map_size = 2 * MAP_CHUNK_SIZE;
-    map_buf = malloc(map_size + 1);
+    map_buf = XMALLOC(char, map_size + 1);
     if (!map_buf) {
 	error("Not enough memory to read the map!");
 	return false;
@@ -380,7 +381,7 @@ static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
 
 	if (map_size - map_offset < MAP_CHUNK_SIZE) {
 	    map_size += (map_size / 2) + MAP_CHUNK_SIZE;
-	    map_buf = realloc(map_buf, map_size + 1);
+	    map_buf = (char *)realloc(map_buf, map_size + 1);
 	    if (!map_buf) {
 		error("Not enough memory to read the map!");
 		return false;
@@ -388,7 +389,7 @@ static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
 	}
     }
 
-    map_buf = realloc(map_buf, map_offset + 1);
+    map_buf = (char *)realloc(map_buf, map_offset + 1);
     map_buf[map_offset] = '\0';	/* EOF */
 
     if (isdigit(*map_buf)) {
@@ -477,7 +478,7 @@ static char *fileJoin(const char *dir, const char *file)
     static const char sep = '/';
     char *path;
 
-    path = malloc(strlen(dir) + 1 + strlen(file) + 1);
+    path = XMALLOC(char, strlen(dir) + 1 + strlen(file) + 1);
     if (path)
 	sprintf(path, "%s%c%s", dir, sep, file);
     return path;
@@ -492,7 +493,7 @@ static char *fileAddExtension(const char *file, const char *ext)
 {
     char *path;
 
-    path = malloc(strlen(file) + strlen(ext) + 1);
+    path = XMALLOC(char, strlen(file) + strlen(ext) + 1);
     if (path)
 	sprintf(path, "%s%s", file, ext);
     return path;
@@ -541,7 +542,8 @@ static FILE *openCompressedFile(const char *filename)
 	filename = newname;
     }
     if (access(filename, 4) == 0) {
-	cmdline = malloc(strlen(CONF_ZCAT_FORMAT) + strlen(filename) + 1);
+	cmdline = XMALLOC(char,
+			  strlen(CONF_ZCAT_FORMAT) + strlen(filename) + 1);
 	if (cmdline) {
 	    sprintf(cmdline, CONF_ZCAT_FORMAT, filename);
 	    fp = popen(cmdline, "r");
@@ -554,10 +556,8 @@ static FILE *openCompressedFile(const char *filename)
 	    }
 	}
     }
-    if (newname)
-	free(newname);
-    if (cmdline)
-	free(cmdline);
+    XFREE(newname);
+    XFREE(cmdline);
     return fp;
 }
 

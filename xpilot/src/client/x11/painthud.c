@@ -274,7 +274,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     static int	mapdiag = 0;
 
     if (mapdiag == 0)
-	mapdiag = LENGTH(Setup->width, Setup->height);
+	mapdiag = (int)LENGTH(Setup->width, Setup->height);
 
     /*
      * Display direction arrow and miscellaneous target information.
@@ -352,16 +352,16 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit,
 			   int sz)
 {
     int i, x, y;
-    int hrw = hrscale * 256;
-    int hrh = hrscale * RadarHeight;
+    int hrw = (int)(hrscale * 256);
+    int hrh = (int)(hrscale * RadarHeight);
     double xf = (double) hrw / (double) Setup->width;
     double yf = (double) hrh / (double) Setup->height;
 
     for (i = 0; i < num_radar; i++) {
-	x = radar_ptr[i].x * hrscale
-	    - (world.x + ext_view_width / 2) * xf;
-	y = radar_ptr[i].y * hrscale
-	    - (world.y + ext_view_height / 2) * yf;
+	x = (int)(radar_ptr[i].x * hrscale
+		  - (world.x + ext_view_width / 2) * xf);
+	y = (int)(radar_ptr[i].y * hrscale
+		  - (world.y + ext_view_height / 2) * yf);
 
 	if (x < -hrw / 2)
 	    x += hrw;
@@ -723,7 +723,7 @@ void Paint_HUD(void)
 			 UWINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
 			 UWINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
 
-	size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
+	size = (int)((HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax);
 	rd.fillRectangle(dpy, drawPixmap, gameGC,
 			 WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 				  + FUEL_GAUGE_OFFSET) + 1,
@@ -823,7 +823,7 @@ void Paint_messages(void)
 	    y = bot_y;
 	    bot_y -= SPACING;
 	}
-	len = charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime);
+	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
 	len = MIN(msg->len, len);
 
 	/*

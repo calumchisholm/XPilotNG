@@ -34,7 +34,7 @@ static void confmenu_callback( void );
 
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
-    GLWidget *tmp	= malloc(sizeof(GLWidget));
+    GLWidget *tmp = XMALLOC(GLWidget, 1);
     if ( !tmp ) return NULL;
     tmp->WIDGET     	= -1;
     tmp->bounds.x   	= 0;
@@ -185,7 +185,7 @@ GLWidget *Init_OptionWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor 
 	    break;
     	case xp_string_option:
 	    if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_COLORS)
-	    	return Init_ColorChooserWidget(opt->name,opt->private_data,fgcolor,bgcolor,option_callback,opt);
+	    	return Init_ColorChooserWidget(opt->name,(Uint32 *)opt->private_data,fgcolor,bgcolor,option_callback,opt);
 	    break;
     	default:
 	    break;
@@ -880,7 +880,7 @@ bool LabelWidget_SetColor( GLWidget *widget , Uint32 *fgcolor, Uint32 *bgcolor )
 	return false;
     }
     
-    if ( !(wi = widget->wid_info) ) {
+    if ( !(wi = (LabelWidget *)widget->wid_info) ) {
     	error("LabelWidget_SetColor: widget->wid_info missing!");
 	return false;
     }
@@ -1217,10 +1217,9 @@ GLWidget *Init_BoolChooserWidget( const char *name, bool *value, Uint32 *fgcolor
 
     
     if (!BoolChooserWidget_ontex) {
-    	if ((BoolChooserWidget_ontex = malloc(sizeof(string_tex_t)))) {
-	    if (!(BoolChooserWidget_offtex = malloc(sizeof(string_tex_t)))) {
-	    	free(BoolChooserWidget_ontex);
-		BoolChooserWidget_ontex = NULL;
+    	if ((BoolChooserWidget_ontex = XMALLOC(string_tex_t, 1))) {
+	    if (!(BoolChooserWidget_offtex = XMALLOC(string_tex_t, 1))) {
+	    	XFREE(BoolChooserWidget_ontex);
 	    	error("Failed to malloc BoolChooserWidget_offtex in Init_BoolChooserWidget");
 	    	return NULL;
 	    }
@@ -1232,18 +1231,14 @@ GLWidget *Init_BoolChooserWidget( const char *name, bool *value, Uint32 *fgcolor
     	    if (!render_text(&gamefont,"False",BoolChooserWidget_offtex)) {
 	    	error("Failed to render 'False' in Init_BoolChooserWidget");
 		free_string_texture(BoolChooserWidget_ontex);
-		free(BoolChooserWidget_ontex);
-		BoolChooserWidget_ontex = NULL;
-		free(BoolChooserWidget_offtex);
-		BoolChooserWidget_offtex = NULL;
+		XFREE(BoolChooserWidget_ontex);
+		XFREE(BoolChooserWidget_offtex);
 		return NULL;
 	    }
     	} else {
 	    error("Failed to render 'True' in Init_BoolChooserWidget");
-    	    free(BoolChooserWidget_ontex);
-    	    BoolChooserWidget_ontex = NULL;
-    	    free(BoolChooserWidget_offtex);
-    	    BoolChooserWidget_offtex = NULL;
+    	    XFREE(BoolChooserWidget_ontex);
+    	    XFREE(BoolChooserWidget_offtex);
     	    return NULL;
 	}
     }
@@ -1509,7 +1504,7 @@ GLWidget *Init_IntChooserWidget( const char *name, int *value, int minval, int m
     	valuespace = 50;
     }
     
-    wid_info = tmp->wid_info;
+    wid_info = (IntChooserWidget *)tmp->wid_info;
 
     snprintf(valuetext,15,"%i",*(value));
     if(!render_text(&gamefont,valuetext,&(wid_info->valuetex))) {
@@ -1753,7 +1748,7 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
         error("Failed to malloc in Init_DoubleChooserWidget");
 	return NULL;
     }
-    tmp->wid_info   = malloc(sizeof(DoubleChooserWidget));
+    tmp->wid_info   = XMALLOC(DoubleChooserWidget, 1);
     if ( !(tmp->wid_info) ) {
     	free(tmp);
         error("Failed to malloc in Init_DoubleChooserWidget");
@@ -1770,7 +1765,7 @@ GLWidget *Init_DoubleChooserWidget( const char *name, double *value, double minv
     	valuespace = 50;
     }
     
-    wid_info = tmp->wid_info;
+    wid_info = (DoubleChooserWidget *)tmp->wid_info;
 
     snprintf(valuetext,15,"%1.2f",*(value));
     if(!render_text(&gamefont,valuetext,&(wid_info->valuetex))) {
@@ -1981,14 +1976,14 @@ GLWidget *Init_ColorChooserWidget( const char *name, Uint32 *value, Uint32 *fgco
         error("Failed to malloc in Init_ColorChooserWidget.");
 	return NULL;
     }
-    tmp->wid_info   = malloc(sizeof(ColorChooserWidget));
+    tmp->wid_info = XMALLOC(ColorChooserWidget, 1);
     if ( !(tmp->wid_info) ) {
     	free(tmp);
         error("Failed to malloc in Init_ColorChooserWidget.");
 	return NULL;
     }
     
-    wid_info = tmp->wid_info;
+    wid_info = (ColorChooserWidget *)tmp->wid_info;
 
     tmp->WIDGET     	= COLORCHOOSERWIDGET;
     tmp->Draw	    	= Paint_ColorChooserWidget;
@@ -2142,22 +2137,22 @@ static void Paint_ColorModWidget( GLWidget *widget )
     
     glBegin(GL_POLYGON);
     	set_alphacolor(whiteRGBA);
-    	glVertex2i(b.x + 0.9*b.w    ,b.y + b.h	    );
+    	glVertex2i(b.x + (GLint)(0.9*b.w)    ,b.y + b.h	    );
     	glVertex2i(b.x + b.w	    ,b.y + b.h      );
-    	glVertex2i(b.x + b.w	    ,b.y + 0.9*b.h  );
+    	glVertex2i(b.x + b.w	    ,b.y + (GLint)(0.9*b.h)  );
     	set_alphacolor(blackRGBA);
-    	glVertex2i(b.x + 0.1*b.w    ,b.y    	    );
+    	glVertex2i(b.x + (GLint)(0.1*b.w)    ,b.y    	    );
     	glVertex2i(b.x	    	    ,b.y    	    );
-    	glVertex2i(b.x	    	    ,b.y + 0.1*b.h  );
+    	glVertex2i(b.x	    	    ,b.y + (GLint)(0.1*b.h)  );
     glEnd();
     
     glBegin(GL_QUADS);
     	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     	set_alphacolor(*(wid_info->value));
-    	glVertex2i(b.x + 0.1*b.w   ,b.y + 0.1*b.h );
-    	glVertex2i(b.x + 0.1*b.w   ,b.y + 0.9*b.h );
-    	glVertex2i(b.x + 0.9*b.w   ,b.y + 0.9*b.h );
-    	glVertex2i(b.x + 0.9*b.w   ,b.y + 0.1*b.h );
+    	glVertex2i(b.x + (GLint)(0.1*b.w)   ,b.y + (GLint)(0.1*b.h) );
+    	glVertex2i(b.x + (GLint)(0.1*b.w)   ,b.y + (GLint)(0.9*b.h) );
+    	glVertex2i(b.x + (GLint)(0.9*b.w)   ,b.y + (GLint)(0.9*b.h) );
+    	glVertex2i(b.x + (GLint)(0.9*b.w)   ,b.y + (GLint)(0.1*b.h) );
     glEnd();
 }
 
@@ -2209,14 +2204,14 @@ GLWidget *Init_ColorModWidget( Uint32 *value, Uint32 *fgcolor, Uint32 *bgcolor,
         error("Failed to malloc in Init_ColorModWidget.");
 	return NULL;
     }
-    tmp->wid_info   = malloc(sizeof(ColorModWidget));
+    tmp->wid_info   = XMALLOC(ColorModWidget, 1);
     if ( !(tmp->wid_info) ) {
     	free(tmp);
         error("Failed to malloc in Init_ColorModWidget.");
 	return NULL;
     }
     
-    wid_info = tmp->wid_info;
+    wid_info = (ColorModWidget *)tmp->wid_info;
 
     tmp->WIDGET     	= COLORMODWIDGET;
     tmp->Draw	    	= Paint_ColorModWidget;
@@ -2293,7 +2288,7 @@ bool ListWidget_Append( GLWidget *list, GLWidget *item )
     	error("ListWidget_Append: list is not a LISTWIDGET! [%i]",list->WIDGET);
 	return false;
     }
-    if (!(wid_info = list->wid_info)) {
+    if (!(wid_info = (ListWidget *)list->wid_info)) {
     	error("ListWidget_Append: list->wid_info missing!");
 	return false;
     }
@@ -2345,7 +2340,7 @@ bool ListWidget_Prepend( GLWidget *list, GLWidget *item )
     	error("ListWidget_Prepend: list is not a LISTWIDGET! [%i]",list->WIDGET);
 	return false;
     }
-    if (!(wid_info = list->wid_info)) {
+    if (!(wid_info = (ListWidget *)list->wid_info)) {
     	error("ListWidget_Prepend: list->wid_info missing!");
 	return false;
     }
@@ -2399,7 +2394,7 @@ bool ListWidget_Insert( GLWidget *list, GLWidget *target, GLWidget *item )
     	error("ListWidget_Insert: list is not a LISTWIDGET! [%i]",list->WIDGET);
 	return false;
     }
-    if (!(wid_info = list->wid_info)) {
+    if (!(wid_info = (ListWidget *)list->wid_info)) {
     	error("ListWidget_Insert: list->wid_info missing!");
 	return false;
     }
@@ -2461,7 +2456,7 @@ bool ListWidget_Remove( GLWidget *list, GLWidget *item )
     	error("ListWidget_Remove: list is not a LISTWIDGET! [%i]",list->WIDGET);
 	return false;
     }
-    if (!(wid_info = list->wid_info)) {
+    if (!(wid_info = (ListWidget *)list->wid_info)) {
     	error("ListWidget_Remove: list->wid_info missing!");
 	return false;
     }
@@ -2508,7 +2503,7 @@ bool ListWidget_SetScrollorder( GLWidget *list, bool order )
     	error("ListWidget_SetScrollorder: list is not a LISTWIDGET! [%i]",list->WIDGET);
 	return false;
     }
-    if (!(wid_info = list->wid_info)) {
+    if (!(wid_info = (ListWidget *)list->wid_info)) {
     	error("ListWidget_SetScrollorder: list->wid_info missing!");
 	return false;
     }
@@ -2535,7 +2530,7 @@ int ListWidget_NELEM( GLWidget *list )
     	error("ListWidget_NELEM: list is not a LISTWIDGET! [%i]",list->WIDGET);
 	return -1;
     }
-    if (!(wid_info = list->wid_info)) {
+    if (!(wid_info = (ListWidget *)list->wid_info)) {
     	error("ListWidget_Remove: list->wid_info missing!");
 	return -1;
     }
@@ -2557,7 +2552,7 @@ GLWidget *ListWidget_GetItemByIndex( GLWidget *list, int i )
     	error("ListWidget_NELEM: list is not a LISTWIDGET! [%i]",list->WIDGET);
 	return NULL;
     }
-    if (!(wid_info = list->wid_info)) {
+    if (!(wid_info = (ListWidget *)list->wid_info)) {
     	error("ListWidget_Remove: list->wid_info missing!");
 	return NULL;
     }
@@ -2748,7 +2743,7 @@ static void ScrollPaneWidget_poschange( GLfloat pos , void *data )
     wid_info = ((ScrollPaneWidget *)(widget->wid_info));
 
     if (wid_info->content) {
-    	bounds.y = widget->bounds.y - pos*(wid_info->content->bounds.h);
+    	bounds.y = (Sint16)(widget->bounds.y - pos*(wid_info->content->bounds.h));
     	bounds.x = wid_info->content->bounds.x;
     	bounds.w = wid_info->content->bounds.w;
     	bounds.h = wid_info->content->bounds.h;
@@ -2811,7 +2806,7 @@ static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
 	ScrollbarWidget_SetSlideSize(wid_info->scroller,MIN(((GLfloat)widget->bounds.h)/((GLfloat)bounds.h),1.0f));
 
     	pos = MIN( ((ScrollbarWidget *)(wid_info->scroller->wid_info))->pos, 1.0f - ((ScrollbarWidget *)(wid_info->scroller->wid_info))->size);
-    	bounds.y = widget->bounds.y - pos*(wid_info->content->bounds.h);
+    	bounds.y = (Sint16)(widget->bounds.y - pos*(wid_info->content->bounds.h));
 	
     	SetBounds_GLWidget(wid_info->content,&bounds);
     }
@@ -3460,7 +3455,7 @@ GLWidget *Init_ImageButtonWidget(const char *text,
         error("Failed to malloc in Init_ImageButtonWidget");
 	return NULL;
     }
-    info = malloc(sizeof(ImageButtonWidget));
+    info = XMALLOC(ImageButtonWidget, 1);
     if (!info) {
     	free(tmp);
         error("Failed to malloc in Init_ImageButtonWidget");

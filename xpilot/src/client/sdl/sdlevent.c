@@ -22,6 +22,7 @@
 
 #include "xpclient_sdl.h"
 
+#include "sdlinit.h"
 #include "sdlkeys.h"
 #include "console.h"
 #include "sdlpaint.h"

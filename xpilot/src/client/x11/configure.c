@@ -100,7 +100,7 @@ static xp_option_t *Config_creator_option(int i)
 
 static int Update_bool_option(int widget_desc, void *data, bool *val)
 {
-    xp_option_t *opt = data;
+    xp_option_t *opt = (xp_option_t *)data;
 
     UNUSED_PARAM(widget_desc);
     Set_bool_option(opt, *val, xp_option_origin_config);
@@ -110,7 +110,7 @@ static int Update_bool_option(int widget_desc, void *data, bool *val)
 
 static int Update_int_option(int widget_desc, void *data, int *val)
 {
-    xp_option_t *opt = data;
+    xp_option_t *opt = (xp_option_t *)data;
 
     UNUSED_PARAM(widget_desc);
     Set_int_option(opt, *val, xp_option_origin_config);
@@ -120,7 +120,7 @@ static int Update_int_option(int widget_desc, void *data, int *val)
 
 static int Update_double_option(int widget_desc, void *data, double *val)
 {
-    xp_option_t *opt = data;
+    xp_option_t *opt = (xp_option_t *)data;
 
     UNUSED_PARAM(widget_desc);
     Set_double_option(opt, *val, xp_option_origin_config);
@@ -183,7 +183,7 @@ static void Create_config(void)
     config_double_width = 4 + XTextWidth(buttonFont, "0.222", 5);
 
     config_max = Nelem_config_creator();
-    config_widget_desc = malloc(config_max * sizeof(int));
+    config_widget_desc = XMALLOC(int, config_max);
     if (config_widget_desc == NULL) {
 	error("No memory for config");
 	return;
@@ -267,8 +267,7 @@ static void Create_config(void)
 	config_mapped = false;
     } else {
 	config_max = num + 1;
-	config_widget_desc = realloc(config_widget_desc,
-				     config_max * sizeof(int));
+	config_widget_desc = XREALLOC(int, config_widget_desc, config_max);
 	config_page = 0;
 	for (i = 0; i < config_max; i++)
 	    Widget_map_sub(config_widget_desc[i]);
@@ -679,7 +678,7 @@ void Config_init(void)
 
     /* +1 is for the save widget */
     max_ids = MAX(num_color_options, num_default_options) + 1;
-    config_widget_ids = malloc(max_ids * sizeof(int));
+    config_widget_ids = XMALLOC(int, max_ids);
     if (config_widget_ids == NULL) {
 	error("Config_init: not enough memory.");
 	exit(1);

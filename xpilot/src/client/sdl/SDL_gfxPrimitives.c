@@ -3635,8 +3635,8 @@ int bezierColor(SDL_Surface * dst, Sint16 * vx, Sint16 * vy, int n, int s, Uint3
      */
     result = 0;
     t=0.0;
-    x1=evaluateBezier(x,n+1,t);
-    y_1=evaluateBezier(y,n+1,t);
+    x1=(Sint16)evaluateBezier(x,n+1,t);
+    y_1=(Sint16)evaluateBezier(y,n+1,t);
     for (i = 0; i <= (n*s); i++) {
 	t += stepsize;
 	x2=(Sint16)evaluateBezier(x,n,t);

@@ -60,7 +60,7 @@ static int Image_init(image_t *img)
 		   img->filename, img->width, img->height, img->frame_width,
 		   img->data_width, img->data_height);
 	
-    img->data = calloc(img->data_width * img->data_height, sizeof(unsigned int));
+    img->data = XCALLOC(unsigned int, img->data_width * img->data_height);
     if (img->data == NULL) {
         error("Failed to allocate memory for: %s size %dx%d",
               img->filename, img->data_width, img->data_height);

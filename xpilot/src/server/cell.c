@@ -115,7 +115,7 @@ static void Init_cell_dist(world_t *world)
     cell_dist_height = cell_max_down + 1 + cell_max_up;
     cell_dist_size = cell_dist_width * cell_dist_height;
 
-    cell_dist = malloc(cell_dist_size * sizeof(cell_dist_t));
+    cell_dist = XMALLOC(cell_dist_t, cell_dist_size);
     if (cell_dist == NULL) {
 	error("No cell dist mem");
 	End_game();

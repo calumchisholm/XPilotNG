@@ -33,7 +33,6 @@ char paint_version[] = VERSION;
 ipos_t	world;
 ipos_t	realWorld;
 
-bool	gotFocus;
 bool	players_exposed;
 short	ext_view_width;		/* Width of extended visible area */
 short	ext_view_height;	/* Height of extended visible area */

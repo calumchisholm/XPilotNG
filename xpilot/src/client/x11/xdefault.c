@@ -195,7 +195,7 @@ static bool Set_mouseAccelThresh(xp_option_t *opt, int value)
 
 static bool Set_fontName(xp_option_t *opt, const char *val)
 {
-    char *buf = Option_get_private_data(opt);
+    char *buf = (char *)Option_get_private_data(opt);
     char *tmpval, *fontname;
 
     assert(val != NULL);

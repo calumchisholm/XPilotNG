@@ -356,7 +356,7 @@ setup_t *Xpmap_init_setup(world_t *world)
     }
 
     numblocks = world->x * world->y;
-    if ((mapdata = malloc(numblocks)) == NULL) {
+    if ((mapdata = XMALLOC(unsigned char, numblocks)) == NULL) {
 	error("No memory for mapdata");
 	return NULL;
     }
@@ -550,20 +550,19 @@ setup_t *Xpmap_init_setup(world_t *world)
 	    free(mapdata);
 	    return NULL;
 	}
-	if ((mapdata = realloc(mapdata, size)) == NULL) {
+	if ((mapdata = XREALLOC(unsigned char, mapdata, size)) == NULL) {
 	    error("Cannot reallocate mapdata");
 	    return NULL;
 	}
     }
 
     if (!options.silent) {
-	if (type != SETUP_MAP_UNCOMPRESSED) {
+	if (type != SETUP_MAP_UNCOMPRESSED)
 	    xpprintf("%s Block map compression ratio is %-4.2f%%\n",
 		     showtime(), 100.0 * size / numblocks);
-	}
     }
 
-    if ((setup = malloc(sizeof(setup_t) + size)) == NULL) {
+    if ((setup = (setup_t *)malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold oldsetup");
 	free(mapdata);
 	return NULL;
@@ -668,20 +667,20 @@ static void Xpmap_place_cannon(world_t *world, blkpos_t blk, int dir)
 
     switch (dir) {
     case DIR_UP:
-	pos.cx = (blk.bx + 0.5) * BLOCK_CLICKS;
-	pos.cy = (blk.by + 0.333) * BLOCK_CLICKS;
+	pos.cx = (click_t)((blk.bx + 0.5) * BLOCK_CLICKS);
+	pos.cy = (click_t)((blk.by + 0.333) * BLOCK_CLICKS);
 	break;
     case DIR_LEFT:
-	pos.cx = (blk.bx + 0.667) * BLOCK_CLICKS;
-	pos.cy = (blk.by + 0.5) * BLOCK_CLICKS;
+	pos.cx = (click_t)((blk.bx + 0.667) * BLOCK_CLICKS);
+	pos.cy = (click_t)((blk.by + 0.5) * BLOCK_CLICKS);
 	break;
     case DIR_RIGHT:
-	pos.cx = (blk.bx + 0.333) * BLOCK_CLICKS;
-	pos.cy = (blk.by + 0.5) * BLOCK_CLICKS;
+	pos.cx = (click_t)((blk.bx + 0.333) * BLOCK_CLICKS);
+	pos.cy = (click_t)((blk.by + 0.5) * BLOCK_CLICKS);
 	break;
     case DIR_DOWN:
-	pos.cx = (blk.bx + 0.5) * BLOCK_CLICKS;
-	pos.cy = (blk.by + 0.667) * BLOCK_CLICKS;
+	pos.cx = (click_t)((blk.bx + 0.5) * BLOCK_CLICKS);
+	pos.cy = (click_t)((blk.by + 0.667) * BLOCK_CLICKS);
 	break;
     default:
  	/* can't happen */
@@ -1003,7 +1002,7 @@ void Xpmap_find_base_direction(world_t *world)
 	     */
 	    dir = DIR_UP;
 	else {
-	    dir = findDir(-gravity.x, -gravity.y);
+	    dir = (int)findDir(-gravity.x, -gravity.y);
 	    dir = ((dir + RES/8) / (RES/4)) * (RES/4);	/* round it */
 	    dir = MOD2(dir, RES);
 	}
@@ -1104,8 +1103,8 @@ static void Xpmap_treasure_to_polygon(world_t *world, int treasure_ind)
 
     for (i = 0; i < n; i++) {
 	angle = (((double)i)/(n - 1)) * PI;
-	pos[i + 2].cx = cx + r * cos(angle);
-	pos[i + 2].cy = cy + r * sin(angle);
+	pos[i + 2].cx = (click_t)(cx + r * cos(angle));
+	pos[i + 2].cy = (click_t)(cy + r * sin(angle));
     }
 
     pos[N] = pos[0];
@@ -1258,8 +1257,8 @@ static void Xpmap_wormhole_to_polygon(world_t *world, int wormhole_ind)
 
     for (i = 0; i < N; i++) {
 	angle = (((double)i)/ N) * 2 * PI;
-	pos[i].cx = wpos.cx + r * cos(angle);
-	pos[i].cy = wpos.cy + r * sin(angle);
+	pos[i].cx = (click_t)(wpos.cx + r * cos(angle));
+	pos[i].cy = (click_t)(wpos.cy + r * sin(angle));
     }
     pos[N] = pos[0];
 

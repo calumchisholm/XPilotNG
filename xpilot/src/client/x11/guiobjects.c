@@ -551,7 +551,7 @@ void Gui_paint_appearing(int x, int y, int id, int count)
     if (version >= 0x4F12) {
 	homebase_t *base = Homebase_by_id(id);
 	if (base != NULL)
-	    base->appeartime = loops + (count * clientFPS) / 120;
+	    base->appeartime = (long)(loops + (count * clientFPS) / 120);
     }
 
     SET_FG(colors[color].pixel);
@@ -945,13 +945,18 @@ static int set_shipshape(int world_x, int world_y,
     for (cnt = 0; cnt < ship->num_points; cnt++) {
 	ship_point_pos = Ship_get_point_position(ship, cnt, dir);
 	off_x = ship_point_pos.x / scaleFactor;
-	if (off_x>0.0) off_x += 0.5;
-	else if (off_x<0.0) off_x -= 0.5;
+	if (off_x > 0.0)
+	    off_x += 0.5;
+	else if (off_x < 0.0)
+	    off_x -= 0.5;
 	off_y = ship_point_pos.y / scaleFactor;
-	if (off_y>0.0) off_y += 0.5;
-	else if (off_y<0.0) off_y -= 0.5;
-	xpts->x = ((world_x - world.x) / scaleFactor) + off_x;
-	xpts->y = ((world.y + ext_view_height - world_y) / scaleFactor) - off_y;
+	if (off_y > 0.0)
+	    off_y += 0.5;
+	else if (off_y < 0.0)
+	    off_y -= 0.5;
+	xpts->x = (short)(((world_x - world.x) / scaleFactor) + off_x);
+	xpts->y = (short)(((world.y + ext_view_height - world_y)
+			   / scaleFactor) - off_y);
 	xpts++;
     }
     points[cnt++] = points[0];

@@ -239,8 +239,8 @@ void Place_item(world_t *world, player_t *pl, int item)
 
 		dist = (int)(rfrac() * ((options.itemConcentratorRadius
 					 * BLOCK_CLICKS) + 1));
-		pos.cx = con->pos.cx + dist * tcos(dir);
-		pos.cy = con->pos.cy + dist * tsin(dir);
+		pos.cx = (click_t)(con->pos.cx + dist * tcos(dir));
+		pos.cy = (click_t)(con->pos.cy + dist * tsin(dir));
 		pos = World_wrap_clpos(world, pos);
 		if (!World_contains_clpos(world, pos))
 		    continue;
@@ -485,7 +485,8 @@ void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
     if (pl)
 	Player_add_fuel(pl, cost);
 
-    theta = Wrap_cfindDir(pos.cx - victim->pos.cx, pos.cy - victim->pos.cy);
+    theta = (int)Wrap_cfindDir(pos.cx - victim->pos.cx,
+			       pos.cy - victim->pos.cy);
 
     if (pl) {
 	pl->vel.x += tcos(theta) * (force / pl->mass);
@@ -544,7 +545,7 @@ void Do_deflector(player_t *pl)
 	dist = (double)(LENGTH(dx, dy) - PIXEL_TO_CLICK(SHIP_SZ));
 	if (dist < range
 	    && dist > 0) {
-	    int dir = findDir(dx, dy);
+	    int dir = (int)findDir(dx, dy);
 	    int idir = MOD2((int)(dir - findDir(obj->vel.x, obj->vel.y)), RES);
 
 	    if (idir > RES * 0.25
@@ -798,7 +799,7 @@ void Do_general_transporter(world_t *world, player_t *pl, clpos_t pos,
     /* update thief */
     if (!(item == ITEM_FUEL
 	  || item == ITEM_TANK))
-	pl->item[item] += amount;
+	pl->item[item] += (int)amount;
     switch(item) {
     case ITEM_AFTERBURNER:
 	SET_BIT(pl->have, HAS_AFTERBURNER);
@@ -909,7 +910,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
     if (NumEcms >= MAX_TOTAL_ECMS)
 	return;
 
-    Ecms[NumEcms] = malloc(sizeof(ecm_t));
+    Ecms[NumEcms] = XMALLOC(ecm_t, 1);
     if (Ecms[NumEcms] == NULL)
 	return;
 

@@ -46,7 +46,7 @@ typedef struct {
     GLuint list_base; /* start of the texture list for this font */
     GLuint h; /* char height */
     GLuint linespacing; /* proper line spacing according to FT */
-    void *ttffont;
+    TTF_Font *ttffont;
 } font_data;
 
 typedef struct {

@@ -1072,7 +1072,7 @@ static bool Set_maxColors (xp_option_t *opt, int val)
 
 static bool Set_color(xp_option_t *opt, const char *val)
 {
-    char *buf = Option_get_private_data(opt);
+    char *buf = (char *)Option_get_private_data(opt);
 
     /*warn("Set_color: name=%s, val=\"%s\", buf=%p", opt->name, val, buf);*/
     assert(val != NULL);

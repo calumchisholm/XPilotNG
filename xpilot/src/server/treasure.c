@@ -100,7 +100,7 @@ void Ball_is_destroyed(ballobject_t *ball)
 {
     player_t *pl = Player_by_id(ball->owner);
     double ticks = 1e6 - ball->life;
-    int frames = ticks / timeStep + .5;
+    int frames = (int)(ticks / timeStep + .5);
     double seconds = ticks / options.gameSpeed;
 
     Set_message_f(" < The ball was loose for %d frames / "

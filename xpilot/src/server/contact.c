@@ -729,8 +729,9 @@ void Queue_loop(world_t *world)
 
 	/* slow down the rate at which players enter the game. */
 	if (last_unqueued_loops + 2 + (FPS >> 2) < main_loops) {
-	    int lim = MIN(options.playerLimit,
-			  options.baselessPausing ? 1e6 : world->NumBases);
+	    int lim = (int)MIN(options.playerLimit,
+			       options.baselessPausing
+			       ? 1e6 : world->NumBases);
 
 	    /* is there a homebase available? */
 	    if (NumPlayers - NumPseudoPlayers + login_in_progress < lim

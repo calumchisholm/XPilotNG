@@ -73,7 +73,7 @@ static void Convert_from_host(void *start, int len, int type)
     case CHAR:
 	return;
     case INT:
-	iptr = start;
+	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
 	    *iptr = htonl(*iptr);
@@ -81,7 +81,7 @@ static void Convert_from_host(void *start, int len, int type)
 	}
 	return;
     case SHORT:
-	sptr = start;
+	sptr = (short *)start;
 	sendp = sptr + len / 2;
 	while (sptr < sendp) {
 	    *sptr = htons(*sptr);
@@ -89,7 +89,7 @@ static void Convert_from_host(void *start, int len, int type)
 	}
 	return;
     case ERRNO:
-	iptr = start;
+	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
 	    err = htonl(*iptr);
@@ -118,7 +118,7 @@ static void Convert_to_host(void *start, int len, int type)
     case CHAR:
 	return;
     case INT:
-	iptr = start;
+	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
 	    *iptr = ntohl(*iptr);
@@ -126,7 +126,7 @@ static void Convert_to_host(void *start, int len, int type)
 	}
 	return;
     case SHORT:
-	sptr = start;
+	sptr = (short *)start;
 	sendp = sptr + len / 2;
 	while (sptr < sendp) {
 	    *sptr = ntohs(*sptr);
@@ -134,7 +134,7 @@ static void Convert_to_host(void *start, int len, int type)
 	}
 	return;
     case ERRNO:
-	iptr = start;
+	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
 	    err = ntohl(*iptr);

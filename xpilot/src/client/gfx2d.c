@@ -41,7 +41,7 @@ char	*texturePath = NULL;		/* Path list of texture directories */
 int Picture_init (xp_picture_t *picture, const char *filename, int count)
 {
     picture->count = count;
-    picture->data = (RGB_COLOR **) malloc(ABS(count) * sizeof(RGB_COLOR*));
+    picture->data = XMALLOC(RGB_COLOR *, ABS(count));
     if (!picture->data) {
 	error("Not enough memory.");
 	return -1;
@@ -54,7 +54,7 @@ int Picture_init (xp_picture_t *picture, const char *filename, int count)
         if (Picture_rotate(picture) == -1)
 	    return -1;
 
-    picture->bbox = malloc(ABS(count) * sizeof(bbox_t));
+    picture->bbox = XMALLOC(bbox_t, ABS(count));
     if (!picture->bbox) {
 	error("Not enough memory.");
 	return -1;
@@ -226,8 +226,7 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 
     for (p = 0; p < count; p++) {
 	if (!(picture->data[p] =
-	      malloc(picture->width * picture->height *
-		     sizeof(RGB_COLOR)))) {
+	      XMALLOC(RGB_COLOR, picture->width * picture->height))) {
 	    error("Not enough memory.");
 	    return -1;
 	}
@@ -269,7 +268,7 @@ int Picture_rotate(xp_picture_t *picture)
     size = picture->height;
     for (image = 1; image < picture->count; image++) {
         if (!(picture->data[image] =
-              malloc(picture->width * picture->height * sizeof(RGB_COLOR)))) {
+              XMALLOC(RGB_COLOR, picture->width * picture->height))) {
             error("Not enough memory.");
             return -1;
         }

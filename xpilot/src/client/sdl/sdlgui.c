@@ -301,10 +301,10 @@ int Gui_init(void)
 	return -1;
     }
 
-    gluTessCallback(tess, GLU_TESS_BEGIN, glBegin);
+    gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)())glBegin);
 	/* TODO: figure out proper casting here do not use _GLUfuncptr */
 	/* it doesn't work on windows  or MAC OS X */
-    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, vertex_callback);
+    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (GLvoid (*)())vertex_callback);
     gluTessCallback(tess, GLU_TESS_END, glEnd);
 
     for (i = 0; i < num_polygons; i++) {
@@ -368,12 +368,13 @@ void Gui_paint_fuel(int x, int y, double fuel)
     if (frame >= img->num_frames)
 	frame = (2 * img->num_frames - 1) - frame;
 
-    size = (BLOCK_SZ - 2 * FUEL_BORDER) * fuel / MAX_STATION_FUEL;
+    size = (int)((BLOCK_SZ - 2 * FUEL_BORDER) * fuel / MAX_STATION_FUEL);
 
     Image_paint(IMG_FUELCELL, x, y, 0, fuelColorRGBA);
 
     area.x = 0;
-    area.y = (BLOCK_SZ - 2 * FUEL_BORDER) * (1 - fuel / MAX_STATION_FUEL);
+    area.y = (int)((BLOCK_SZ - 2 * FUEL_BORDER)
+		   * (1 - fuel / MAX_STATION_FUEL));
     area.w = BLOCK_SZ - 2 * FUEL_BORDER;
     area.h = size;
     Image_paint_area(IMG_FUEL,
@@ -433,7 +434,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	if (version < 0x4F12 && do_basewarning) {
 	    if (baseWarningType & 1) {
 		/* We assume the ship will appear after 3 seconds. */
-		int count = 360 * (base->appeartime - loops) / (3 * clientFPS);
+		int count = (int)(360 * (base->appeartime - loops)
+				  / (3 * clientFPS));
 		LIMIT(count, 0, 360);
 		/* red box basewarning */
 		if (count > 0 && (baseWarningType & 1))
@@ -457,7 +459,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	mapnprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),maxCharsInNames,other->nick_name);
         break;
     case SETUP_BASE_DOWN:
-	mapnprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(y + BLOCK_SZ / 1.5),maxCharsInNames,other->nick_name);
+	mapnprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(int)(y + BLOCK_SZ / 1.5),maxCharsInNames,other->nick_name);
         break;
     case SETUP_BASE_LEFT:
 	mapnprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),maxCharsInNames,other->nick_name);
@@ -993,7 +995,7 @@ void Gui_paint_appearing(int x, int y, int id, int count)
     if (version >= 0x4F12) {
 	homebase_t *base = Homebase_by_id(id);
 	if (base != NULL)
-	    base->appeartime = loops + (count * clientFPS) / 120;
+	    base->appeartime = (long)(loops + (count * clientFPS) / 120);
     }
 
     minx = x - (int)hsize;
@@ -1563,16 +1565,16 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
 {
     Uint32 c;
     int i, x, y, shape, size;
-    int hrw = hrscale * 256;
-    int hrh = hrscale * RadarHeight;
+    int hrw = (int)(hrscale * 256);
+    int hrh = (int)(hrscale * RadarHeight);
     double xf = (double) hrw / (double) Setup->width;
     double yf = (double) hrh / (double) Setup->height;
 
     for (i = 0; i < num_radar; i++) {
-	x = radar_ptr[i].x * hrscale
-	    - (world.x + ext_view_width / 2) * xf;
-	y = radar_ptr[i].y * hrscale
-	    - (world.y + ext_view_height / 2) * yf;
+	x = (int)(radar_ptr[i].x * hrscale
+		  - (world.x + ext_view_width / 2) * xf);
+	y = (int)(radar_ptr[i].y * hrscale
+		  - (world.y + ext_view_height / 2) * yf);
 
 	if (x < -hrw / 2)
 	    x += hrw;
@@ -1680,10 +1682,10 @@ void Paint_HUD(void)
     /* message scan hack by mara*/
     if (ball_shout && msgScanBallColorRGBA)
 	Circle(msgScanBallColorRGBA, draw_width / 2,
-	       draw_height / 2, 8*scale,0);
+	       draw_height / 2, (int)(8*scale),0);
     if (need_cover && msgScanCoverColorRGBA)
 	Circle(msgScanCoverColorRGBA, draw_width / 2,
-	       draw_height / 2, 6*scale,0);
+	       draw_height / 2, (int)(6*scale),0);
 
     glEnable(GL_BLEND);
 
@@ -1772,7 +1774,7 @@ void Paint_HUD(void)
 	    if (sobj->hud_msg_len > 0) {
 	    	dummy = printsize(&gamefont,sobj->hud_msg);
 		if (sobj->hud_msg_width == -1)
-		    sobj->hud_msg_width = dummy.width;
+		    sobj->hud_msg_width = (int)dummy.width;
 		if (j == 0 &&
 		    sobj->hud_msg_width > 2*hudSize-HUD_OFFSET*2 &&
 		    (did_fuel || hudVLineColorRGBA))
@@ -1876,7 +1878,7 @@ void Paint_HUD(void)
 	    glVertex2i(tempx+tempw,tempy);
 	glEnd();
 
-	size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
+	size = (int)((HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax);
 	tempx = hud_pos_x + hudSize - HUD_OFFSET + FUEL_GAUGE_OFFSET + 1;
     	tempy = hud_pos_y - hudSize + HUD_OFFSET + FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size + 1;
     	tempw = HUD_OFFSET - (2*FUEL_GAUGE_OFFSET);

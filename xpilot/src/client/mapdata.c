@@ -124,7 +124,7 @@ int Mapdata_setup(const char *urlstr)
     if (texturePath == NULL) {
 	texturePath = strdup(path);
     } else {
-	char *temp = malloc(strlen(texturePath) + strlen(path) + 2);
+	char *temp = XMALLOC(char, strlen(texturePath) + strlen(path) + 2);
 	if (temp == NULL) {
 	    error("not enough memory to new texturePath");
 	    goto end;

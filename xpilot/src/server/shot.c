@@ -1195,7 +1195,7 @@ void Delete_shot(world_t *world, int ind)
 		nuke_factor = NUKE_SMART_EXPL_MULT * shot->mass / MISSILE_MASS;
 
 	    nuke_factor *= ((shot->mods.mini + 1) / SHOT_MULT(shot));
-	    intensity *= nuke_factor;
+	    intensity = (int)(intensity * nuke_factor);
 	}
 
 	if (BIT(shot->mods.warhead, IMPLOSION))
@@ -1692,8 +1692,10 @@ void Update_missile(world_t *world, missileobject_t *shot)
 			pl->pos.cy - shot->pos.cy) / CLICK;
     x_dif += pl->vel.x * (range / shot_speed);
     y_dif += pl->vel.y * (range / shot_speed);
-    theta = Wrap_cfindDir(pl->pos.cx + PIXEL_TO_CLICK(x_dif) - shot->pos.cx,
-			  pl->pos.cy + PIXEL_TO_CLICK(y_dif) - shot->pos.cy);
+    theta = (int)Wrap_cfindDir(pl->pos.cx
+			       + PIXEL_TO_CLICK(x_dif) - shot->pos.cx,
+			       pl->pos.cy
+			       + PIXEL_TO_CLICK(y_dif) - shot->pos.cy);
 
     {
 	double x, y, vx, vy;
@@ -1800,7 +1802,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 
 	if (angle >= 0) {
 	    i = angle&7;
-	    theta = Wrap_findDir(
+	    theta = (int)Wrap_findDir(
 		(yi + sur[i].dy) * BLOCK_SZ - (CLICK_TO_PIXEL(shot->pos.cy)
 					       + 2 * shot->vel.y),
 		(xi + sur[i].dx) * BLOCK_SZ - (CLICK_TO_PIXEL(shot->pos.cx)

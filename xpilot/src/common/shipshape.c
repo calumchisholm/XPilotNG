@@ -975,22 +975,29 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     }
     /*MARA evil hack*/
 
-    i = sizeof(clpos_t) * RES;
-    if (!(ship->pts[0] = malloc((size_t)ship->num_points * i))
+    i = RES;
+    if (!(ship->pts[0] = XMALLOC(clpos_t, (size_t)ship->num_points * i))
 	|| (ship->num_l_gun
-	    && !(ship->l_gun[0] = malloc((size_t)ship->num_l_gun * i)))
+	    && !(ship->l_gun[0]
+		 = XMALLOC(clpos_t, (size_t)ship->num_l_gun * i)))
 	|| (ship->num_r_gun
-	    && !(ship->r_gun[0] = malloc((size_t)ship->num_r_gun * i)))
+	    && !(ship->r_gun[0]
+		 = XMALLOC(clpos_t, (size_t)ship->num_r_gun * i)))
 	|| (ship->num_l_rgun
-	    && !(ship->l_rgun[0] = malloc((size_t)ship->num_l_rgun * i)))
+	    && !(ship->l_rgun[0]
+		 = XMALLOC(clpos_t, (size_t)ship->num_l_rgun * i)))
 	|| (ship->num_r_rgun
-	    && !(ship->r_rgun[0] = malloc((size_t)ship->num_r_rgun * i)))
+	    && !(ship->r_rgun[0]
+		 = XMALLOC(clpos_t, (size_t)ship->num_r_rgun * i)))
 	|| (ship->num_l_light
-	    && !(ship->l_light[0] = malloc((size_t)ship->num_l_light * i)))
+	    && !(ship->l_light[0]
+		 = XMALLOC(clpos_t, (size_t)ship->num_l_light * i)))
 	|| (ship->num_r_light
-	    && !(ship->r_light[0] = malloc((size_t)ship->num_r_light * i)))
+	    && !(ship->r_light[0]
+		 = XMALLOC(clpos_t, (size_t)ship->num_r_light * i)))
 	|| (ship->num_m_rack
-	    && !(ship->m_rack[0] = malloc((size_t)ship->num_m_rack * i)))) {
+	    && !(ship->m_rack[0]
+		 = XMALLOC(clpos_t, (size_t)ship->num_m_rack * i)))) {
 	error("Not enough memory for ship shape");
 	XFREE(ship->pts[0]);
 	XFREE(ship->l_gun[0]);
@@ -1072,7 +1079,7 @@ static shipshape_t *do_parse_shape(char *str)
 	    warn("shape str not set");
 	return Default_ship();
     }
-    if (!(ship = malloc(sizeof(*ship)))) {
+    if (!(ship = XMALLOC(shipshape_t, 1))) {
 	error("No mem for ship shape");
 	return Default_ship();
     }

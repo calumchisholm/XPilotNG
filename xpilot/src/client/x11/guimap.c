@@ -255,7 +255,8 @@ void Gui_paint_fuel(int x, int y, double fuel)
 	    image = (2 * fuel_images - 1) - image;
 
 
-	size = (BLOCK_SZ - 2 * BITMAP_FUEL_BORDER) * fuel / MAX_STATION_FUEL;
+	size = (int)((BLOCK_SZ - 2 * BITMAP_FUEL_BORDER)
+		     * fuel / MAX_STATION_FUEL);
 
 	Bitmap_paint(drawPixmap, BM_FUELCELL,
 		     SCALEX(x), SCALEY(y + BLOCK_SZ), 0);
@@ -307,7 +308,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	if (version < 0x4F12 && do_basewarning) {
 	    if (baseWarningType & 1) {
 		/* We assume the ship will appear after 3 seconds. */
-		int count = 360 * (base->appeartime - loops) / (3 * clientFPS);
+		int count = (int)(360 * (base->appeartime - loops)
+				  / (3 * clientFPS));
 		LIMIT(count, 0, 360);
 		/* red box basewarning */
 		if (count > 0 && (baseWarningType & 1))
@@ -1072,7 +1074,7 @@ void Gui_paint_setup_target(int x, int y, int team, double damage, bool own)
     }
 
     if (damage != TARGET_DAMAGE) {
-	size = (damage * BLOCK_SZ) / (TARGET_DAMAGE * 2);
+	size = (int)((damage * BLOCK_SZ) / (TARGET_DAMAGE * 2));
 	a1 = x + size;
 	a2 = y + size;
 	b1 = x + (BLOCK_SZ - size);

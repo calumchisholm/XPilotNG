@@ -659,7 +659,7 @@ bool Convert_string_to_bool(const char *value_str, bool *bool_ptr)
 }
 
 
-void Convert_list_to_string(list_t list, char **string)
+void Convert_list_to_string(list_t list, char **str)
 {
     list_iter_t	iter;
     size_t	size = 0;
@@ -669,14 +669,14 @@ void Convert_list_to_string(list_t list, char **string)
 	 LI_FORWARD(iter))
 	size += 1 + strlen((const char *) LI_DATA(iter));
 
-    *string = xp_safe_malloc(size);
-    **string = '\0';
+    *str = (char *)xp_safe_malloc(size);
+    **str = '\0';
     for (iter = List_begin(list);
 	 iter != List_end(list);
 	 LI_FORWARD(iter)) {
 	if (iter != List_begin(list))
-	    strlcat(*string, ",", size);
-	strlcat(*string, (const char *) LI_DATA(iter), size);
+	    strlcat(*str, ",", size);
+	strlcat(*str, (const char *) LI_DATA(iter), size);
     }
 }
 
@@ -709,7 +709,7 @@ void Convert_string_to_list(const char *value, list_t *list_ptr)
 	if (start < end) {
 	    size_t size = end - start;
 
-	    str = xp_safe_malloc(size + 1);
+	    str = (char *)xp_safe_malloc(size + 1);
 	    memcpy(str, start, size);
 	    str[size] = '\0';
 	    if (NULL == List_push_back(*list_ptr, str))

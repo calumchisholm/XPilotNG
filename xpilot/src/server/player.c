@@ -74,7 +74,7 @@ void Pick_startpos(player_t *pl)
     if (prev_num_bases != world->NumBases) {
 	prev_num_bases = world->NumBases;
 	XFREE(free_bases);
-	free_bases = malloc(world->NumBases * sizeof(*free_bases));
+	free_bases = XMALLOC(char, world->NumBases);
 	if (free_bases == NULL) {
 	    error("Can't allocate memory for free_bases");
 	    End_game();
@@ -176,14 +176,16 @@ void Go_home(player_t *pl)
 	pos = pl->home_base->pos;
 	dir = pl->home_base->dir;
 	vx = vy = velo = 0;
-    } else
-	pos.cx = pos.cy = dir = vx = vy = velo = 0;
+    } else {
+	pos.cx = pos.cy = dir = 0;
+	vx = vy = velo = 0.0;
+    }
 
     pl->dir = dir;
     Player_set_float_dir(pl, (double)dir);
     pl->wanted_float_dir = pl->float_dir;/*TURNQUEUE*/
-    initpos.cx = pos.cx + CLICK * vx;
-    initpos.cy = pos.cy + CLICK * vy;
+    initpos.cx = (click_t)(pos.cx + CLICK * vx);
+    initpos.cy = (click_t)(pos.cy + CLICK * vy);
     Player_position_init_clpos(pl, initpos);
     pl->vel.x = vx;
     pl->vel.y = vy;
@@ -442,7 +444,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
     pl->mychar = ' ';
     pl->prev_mychar = pl->mychar;
     pl->life = world->rules->lives;
-    pl->prev_life = pl->life;
+    pl->prev_life = (int)pl->life;
 
     pl->player_fps = 50; /* Client should send a value after startup */
     pl->maxturnsps = MAX_SERVER_FPS;
@@ -461,7 +463,8 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
      */
     if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0) {
 	pl->mychar = 'W';
-	pl->prev_life = pl->life = 0;
+	pl->prev_life = 0;
+	pl->life = 0.0;
 	SET_BIT(pl->status, GAME_OVER);
     }
 
@@ -495,13 +498,13 @@ void Alloc_players(int number)
     int i;
 
     /* Allocate space for pointers */
-    PlayersArray = (player_t **) calloc(n, sizeof(player_t *));
+    PlayersArray = XCALLOC(player_t *, n);
 
     /* Allocate space for all entries, all player structs */
-    p = playerArray = calloc(n, sizeof(player_t));
+    p = playerArray = XCALLOC(player_t, n);
 
     /* Allocate space for all visibility arrays, n arrays of n entries */
-    t = visibilityArray = calloc(n * n, sizeof(visibility_t));
+    t = visibilityArray = XCALLOC(visibility_t, n * n);
 
     if (!PlayersArray || !playerArray || !visibilityArray) {
 	error("Not enough memory for Players.");
@@ -545,7 +548,7 @@ void Update_score_table(world_t *world)
 	    || pl->mychar != pl->prev_mychar
 	    || pl->alliance != pl->prev_alliance) {
 	    pl->prev_score = pl->score;
-	    pl->prev_life = pl->life;
+	    pl->prev_life = (int)pl->life;
 	    pl->prev_mychar = pl->mychar;
 	    pl->prev_alliance = pl->alliance;
 	    for (i = 0; i < NumPlayers; i++) {
@@ -860,7 +863,7 @@ void Team_game_over(world_t *world, int winning_team, const char *reason)
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
 
-    if (!(best_players = malloc(NumPlayers * sizeof(int)))) {
+    if (!(best_players = XMALLOC(int, NumPlayers))) {
 	warn("no mem");
 	End_game();
     }
@@ -929,7 +932,7 @@ void Individual_game_over(world_t *world, int winner)
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
 
-    if (!(best_players = malloc(NumPlayers * sizeof(int)))) {
+    if (!(best_players = XMALLOC(int, NumPlayers))) {
 	warn("no mem");
 	End_game();
     }

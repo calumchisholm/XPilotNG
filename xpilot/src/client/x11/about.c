@@ -457,7 +457,7 @@ int		keys_viewer = NO_WIDGET;
 int Keys_callback(int widget_desc, void *data, const char **unused)
 {
     unsigned	bufsize = (num_keydefs * 64);
-    char	*buf = calloc(bufsize, 1), *end = buf, *str;
+    char	*buf = XCALLOC(char, bufsize), *end = buf, *str;
     const char	*help;
     int		i, len, maxkeylen = 0;
 
@@ -477,7 +477,7 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
 	if ((end - buf) + (maxkeylen + strlen(help) + 4) >= bufsize) {
 	    bufsize += 4096;
 	    xpprintf("realloc: %d\n", bufsize);
-	    if (!(buf = realloc(buf, bufsize))) {
+	    if (!(buf = XREALLOC(char, buf, bufsize))) {
 		error("No memory for key list");
 		return 0;
 	    }
@@ -548,7 +548,7 @@ int Handle_motd(long off, char *buf, int len, long filesize)
     if (!motd_buf) {
 	motd_size = MIN(filesize, MAX_MOTD_SIZE);
 	i = MAX(motd_size, (long)(sizeof no_motd_msg)) + 1;
-	if (!(motd_buf = malloc((size_t)i))) {
+	if (!(motd_buf = XMALLOC(char, (size_t)i))) {
 	    error("No memory for MOTD");
 	    return -1;
 	}

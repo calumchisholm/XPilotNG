@@ -125,7 +125,7 @@ static char *Talk_macro_get_field(char *buf, int wanted_field)
 
     }
     len = (size_t) (end_ptr - start_ptr);
-    if ((field_ptr = malloc(len + 1)) == NULL) {
+    if ((field_ptr = XMALLOC(char, len + 1)) == NULL) {
 	error("Can't allocate memory for talk macro");
 	return NULL;
     }
@@ -202,7 +202,8 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
 			error("Talk_macro_get_field (1) error!");
 			break;
 		    }
-		    if ((tmpptr1 = malloc(MSG_PARSED_FIELD_LEN)) == NULL) {
+		    if ((tmpptr1
+			 = XMALLOC(char, MSG_PARSED_FIELD_LEN)) == NULL) {
 			error("Can't allocate memory for talk macro.");
 			free(tmpptr);	/* successful malloc from before */
 			break;
@@ -215,7 +216,8 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
 			error("Talk_macro_get_field (2) error!");
 			break;
 		    }
-		    if ((tmpptr2 = malloc(MSG_PARSED_FIELD_LEN)) == NULL) {
+		    if ((tmpptr2
+			 = XMALLOC(char, MSG_PARSED_FIELD_LEN)) == NULL) {
 			error("Can't allocate memory for talk macro.");
 			free(tmpptr);	/* successful malloc from before */
 			break;
@@ -259,7 +261,8 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
 			break;
 		    }
 		    inbuf = nextpos;
-		    if ((filename = malloc(TALK_FAST_MSG_FNLEN)) == NULL) {
+		    if ((filename
+			 = XMALLOC(char, TALK_FAST_MSG_FNLEN)) == NULL) {
 			error("Can't allocate memory for talk macro.");
 			break;
 		    }
@@ -279,7 +282,7 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
 		    fsize = ftell(fp);
 		    rewind(fp);
 
-		    if ((tmpptr = malloc(fsize + 1)) == NULL) {
+		    if ((tmpptr = XMALLOC(char, fsize + 1)) == NULL) {
 			fclose(fp);
 			break;
 		    }

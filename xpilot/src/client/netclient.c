@@ -779,7 +779,7 @@ void Net_init_measurement(void)
 	    /*
 	     * Server FPS can change so we had better allocate enough.
 	     */
-	    if ((packet_measure = malloc(MAX_SUPPORTED_FPS)) == NULL) {
+	    if ((packet_measure = XMALLOC(char, MAX_SUPPORTED_FPS)) == NULL) {
 		error("No memory for packet measurement");
 		packetMeasurement = false;
 	    } else

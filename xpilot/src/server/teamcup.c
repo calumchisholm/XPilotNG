@@ -345,7 +345,7 @@ void teamcup_round_end(int winning_team)
 
     double_max=(double)(100000); /*not really*/
 
-    list = malloc(NumPlayers * sizeof(int));
+    list = XMALLOC(int, NumPlayers);
     if (list == NULL) {
 	error("Can't allocate memory for list");
 	End_game();

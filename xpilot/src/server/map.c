@@ -866,8 +866,8 @@ void Wormhole_line_init(world_t *world)
     wormhole_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	wormhole_wire.pts[i] = coords + i;
-	coords[i].cx = cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
-	coords[i].cy = sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
+	coords[i].cx = (int)(cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
+	coords[i].cy = (int)(sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
     }
 
     return;

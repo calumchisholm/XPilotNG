@@ -329,9 +329,9 @@ static void do_Autopilot (player_t *pl)
 	if (gravity.x == 0 && gravity.y == 0)
 	    vad = pl->dir;
 	else
-	    vad = findDir(-gravity.x, -gravity.y);
+	    vad = (int)findDir(-gravity.x, -gravity.y);
     } else
-	vad = findDir(-pl->vel.x, -pl->vel.y);
+	vad = (int)findDir(-pl->vel.x, -pl->vel.y);
 
     vad = MOD2(vad - pl->dir, RES);
     if (vad > RES/2) {
@@ -424,7 +424,7 @@ static void Fuel_update(world_t *world)
 	return;
 
     fuel = (NumPlayers * STATION_REGENERATION * timeStep);
-    frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
+    frames_per_update = (int)(MAX_STATION_FUEL / (fuel * BLOCK_SZ));
 
     for (i = 0; i < world->NumFuels; i++) {
 	fuel_t *fs = Fuel_by_index(world, i);

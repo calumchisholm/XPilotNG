@@ -27,7 +27,7 @@
 #include "xpclient.h"
 
 /* kps - move to some header */
-extern int Bitmap_add(char *filename, int count, bool scalable);
+extern int Bitmap_add(const char *filename, int count, bool scalable);
 
 char client_version[] = VERSION;
 
@@ -853,14 +853,13 @@ static void parse_styles(char **callptr)
     num_edge_styles = *ptr++;
     num_bmaps = *ptr++;
 
-    polygon_styles =
-	malloc(MAX(1, num_polygon_styles) * sizeof(polygon_style_t));
+    polygon_styles = XMALLOC(polygon_style_t, MAX(1, num_polygon_styles));
     if (polygon_styles == NULL) {
 	error("no memory for polygon styles");
 	exit(1);
     }
 
-    edge_styles = malloc(MAX(1, num_edge_styles) * sizeof(edge_style_t));
+    edge_styles = XMALLOC(edge_style_t, MAX(1, num_edge_styles));
     if (edge_styles == NULL) {
 	error("no memory for edge styles");
 	exit(1);
@@ -917,7 +916,7 @@ static int init_polymap(void)
     parse_styles(&ptr);
 
     num_polygons = get_ushort(&ptr);
-    polygons = malloc(num_polygons * sizeof(xp_polygon_t));
+    polygons = XMALLOC(xp_polygon_t, num_polygons);
     if (polygons == NULL) {
 	error("no memory for polygons");
 	exit(1);
@@ -937,12 +936,12 @@ static int init_polymap(void)
 	    edgechange = INT_MAX;
 	ptr += ecount * 2;
 	pc = get_ushort(&ptr);
-	if ((points = malloc(pc * sizeof(ipos_t))) == NULL) {
+	if ((points = XMALLOC(ipos_t, pc)) == NULL) {
 	    error("no memory for points");
 	    exit(1);
 	}
 	if (ecount) {
-	    if ((styles = malloc(pc * sizeof(int))) == NULL) {
+	    if ((styles = XMALLOC(int, pc)) == NULL) {
 		error("no memory for special edges");
 		exit(1);
 	    }
@@ -996,7 +995,7 @@ static int init_polymap(void)
 	poly->bounds.h = max.y - min.y;
     }
     num_bases = *ptr++;
-    bases = malloc(num_bases * sizeof(homebase_t));
+    bases = XMALLOC(homebase_t, num_bases);
     if (bases == NULL) {
 	error("No memory for Map bases (%d)", num_bases);
 	exit(1);
@@ -1026,7 +1025,7 @@ static int init_polymap(void)
     }
     num_fuels = get_ushort(&ptr);
     if (num_fuels != 0) {
-	fuels = malloc(num_fuels * sizeof(fuelstation_t));
+	fuels = XMALLOC(fuelstation_t, num_fuels);
 	if (fuels == NULL) {
 	    error("No memory for Map fuels (%d)", num_fuels);
 	    exit(1);
@@ -1044,7 +1043,7 @@ static int init_polymap(void)
     num_checks = *ptr++;
     if (num_checks != 0) {
 
-	checks = malloc(num_checks * sizeof(checkpoint_t));
+	checks = XMALLOC(checkpoint_t, num_checks);
 	if (checks == NULL) {
 	    error("No memory for checkpoints (%d)", num_checks);
 	    exit(1);
@@ -1111,7 +1110,7 @@ static int init_blockmap(void)
 	}
     }
     if (num_bases != 0) {
-	bases = malloc(num_bases * sizeof(homebase_t));
+	bases = XMALLOC(homebase_t, num_bases);
 	if (bases == NULL) {
 	    error("No memory for Map bases (%d)", num_bases);
 	    return -1;
@@ -1119,7 +1118,7 @@ static int init_blockmap(void)
 	num_bases = 0;
     }
     if (num_fuels != 0) {
-	fuels = malloc(num_fuels * sizeof(fuelstation_t));
+	fuels = XMALLOC(fuelstation_t, num_fuels);
 	if (fuels == NULL) {
 	    error("No memory for Map fuels (%d)", num_fuels);
 	    return -1;
@@ -1127,7 +1126,7 @@ static int init_blockmap(void)
 	num_fuels = 0;
     }
     if (num_targets != 0) {
-	targets = malloc(num_targets * sizeof(target_t));
+	targets = XMALLOC(target_t, num_targets);
 	if (targets == NULL) {
 	    error("No memory for Map targets (%d)", num_targets);
 	    return -1;
@@ -1135,7 +1134,7 @@ static int init_blockmap(void)
 	num_targets = 0;
     }
     if (num_cannons != 0) {
-	cannons = malloc(num_cannons * sizeof(cannontime_t));
+	cannons = XMALLOC(cannontime_t, num_cannons);
 	if (cannons == NULL) {
 	    error("No memory for Map cannons (%d)", num_cannons);
 	    return -1;
@@ -1143,7 +1142,7 @@ static int init_blockmap(void)
 	num_cannons = 0;
     }
     if (num_checks != 0) {
-	checks = malloc(num_checks * sizeof(checkpoint_t));
+	checks = XMALLOC(checkpoint_t, num_checks);
 	if (checks == NULL) {
 	    error("No memory for Map checks (%d)", num_checks);
 	    return -1;
@@ -1369,9 +1368,9 @@ int Handle_player(int id, int player_team, int mychar,
 	if (num_others >= max_others) {
 	    max_others += 5;
 	    if (num_others == 0)
-		Others = malloc(max_others * sizeof(other_t));
+		Others = XMALLOC(other_t, max_others);
 	    else
-		Others = realloc(Others, max_others * sizeof(other_t));
+		Others = XREALLOC(other_t, Others, max_others);
 	    if (Others == NULL)
 		fatal("Not enough memory for player info");
 	    if (self != NULL)
@@ -1549,8 +1548,8 @@ int Handle_score_object(double score, int x, int y, char *msg)
 	if (Using_score_decimals())
 	    sprintf(sobj->hud_msg, "%s %.*f", msg, showScoreDecimals, score);
 	else {
-	    int sc = rint(score);
-	    sprintf(sobj->hud_msg, "%s %d", msg, sc);
+	    /*int sc = rint(score);*/
+	    sprintf(sobj->hud_msg, "%s %d", msg, rint(score));
 	}
 	sobj->hud_msg_len = strlen(sobj->hud_msg);
 	sobj->hud_msg_width = -1;
@@ -1561,8 +1560,8 @@ int Handle_score_object(double score, int x, int y, char *msg)
     if (Using_score_decimals())
 	sprintf(sobj->msg, "%.*f", showScoreDecimals, score);
     else {
-	int sc = rint(score);
-	sprintf(sobj->msg, "%d", sc);
+	/*int sc = rint(score);*/
+	sprintf(sobj->msg, "%d", rint(score));
     }
     sobj->msg_len = strlen(sobj->msg);
     sobj->msg_width = -1;
@@ -2032,7 +2031,7 @@ int Handle_fastradar(int x, int y, int size)
     t.type = normal;
     
     if ((size & 0x80) != 0) {
-	t.type = friend;
+	t.type = friendly;
 	size &= ~0x80;
     }
     
