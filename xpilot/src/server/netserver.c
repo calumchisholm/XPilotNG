@@ -2344,7 +2344,7 @@ int Send_appearing(connection_t *connp, int cx, int cy, int id, int count)
 	return 0;
 
     return Packet_printf(&connp->w, "%c%hd%hd%hd%hd", PKT_APPEARING,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), count);
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id, count);
 }
 
 int Send_ecm(connection_t *connp, int cx, int cy, int size)
