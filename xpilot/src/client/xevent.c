@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -109,9 +108,9 @@ extern Cursor	pointerControlCursor;
 #define JS_BUTTON0	KEY_FIRE_SHOT
 #define JS_BUTTON1	KEY_SHIELD
 
-static int Key_set(int key, int onoff)
+static int Key_set(int key, int on)
 {
-    if (onoff) {
+    if (on) {
 	if (!BITV_ISSET(keyv, key)) {
 	    BITV_SET(keyv, key);
 	    return true;
@@ -214,9 +213,9 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     return (ret);
 }
 
-void Pointer_control_set_state(int onoff)
+void Pointer_control_set_state(int on)
 {
-    if (onoff) {
+    if (on) {
 	pointerControl = true;
 	XGrabPointer(dpy, draw, true, 0, GrabModeAsync,
 		     GrabModeAsync, draw, pointerControlCursor, CurrentTime);
@@ -240,10 +239,10 @@ void Pointer_control_set_state(int onoff)
 
 #ifndef _WINDOWS
 
-static void Talk_set_state(bool onoff)
+static void Talk_set_state(bool on)
 {
 
-    if (onoff) {
+    if (on) {
 	/* Enable talking, disable pointer control if it is enabled. */
 	if (pointerControl) {
 	    initialPointerControl = true;
@@ -267,9 +266,9 @@ static void Talk_set_state(bool onoff)
 
 #else
 
-static void Talk_set_state(bool onoff)
+static void Talk_set_state(bool on)
 {
-	char* wintalkstr;
+    char* wintalkstr;
 
     if (pointerControl) {
 	initialPointerControl = true;
@@ -782,14 +781,14 @@ void Reset_shields(void)
     }
 }
 
-void Set_auto_shield(int onoff)
+void Set_auto_shield(int on)
 {
-    auto_shield = onoff;
+    auto_shield = on;
 }
 
-void Set_toggle_shield(int onoff)
+void Set_toggle_shield(int on)
 {
-    toggle_shield = onoff;
+    toggle_shield = on;
     if (toggle_shield) {
 	if (auto_shield) {
 	    shields = 1;

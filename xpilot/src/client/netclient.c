@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -3136,19 +3135,19 @@ int Send_pointer_move(int movement)
     return 0;
 }
 
-int Send_audio_request(int onoff)
+int Send_audio_request(int on)
 {
 #ifdef DEBUG_SOUND
-    printf("Send_audio_request %d\n", onoff);
+    printf("Send_audio_request %d\n", on);
 #endif
 
     if (version < 0x3250) {
 	return 0;
     }
 #ifndef SOUND
-    onoff = 0;
+    on = 0;
 #endif
-    if (Packet_printf(&wbuf, "%c%c", PKT_REQUEST_AUDIO, (onoff != 0)) == -1) {
+    if (Packet_printf(&wbuf, "%c%c", PKT_REQUEST_AUDIO, (on != 0)) == -1) {
 	return -1;
     }
     return 0;

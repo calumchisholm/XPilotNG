@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -63,6 +62,7 @@
 #include "paintdata.h"
 #include "talk.h"
 #include "configure.h"
+#include "xevent.h"
 #include "xeventhandlers.h"
 
 
@@ -71,14 +71,6 @@ char xeventhandlers_version[] = VERSION;
 
 extern int	talk_key_repeat_count;  /* xevent.c */
 extern XEvent	talk_key_repeat_event;  /* xevent.c */
-
-extern void Talk_event(XEvent *event);  /* xevent.c */
-extern void Key_event(XEvent *event);   /* xevent.c */
-extern bool Key_press(keys_t key);	/* xevent.c */
-extern bool Key_release(keys_t key);	/* xevent.c */
-extern void Pointer_control_set_state(int onoff); /* xevent.c */
-
-
 extern int	initialPointerControl;
 extern bool	pointerControl;
 extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
