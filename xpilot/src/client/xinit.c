@@ -322,7 +322,7 @@ extern int		Argc;
 extern char		myClass[];
 
 static void Init_disp_prop(Display *d, Window win,
-			   int w, int h, int x, int y,
+			   unsigned w, unsigned h, int x, int y,
 			   int flags)
 {
     XClassHint		xclh;
