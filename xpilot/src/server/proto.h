@@ -53,6 +53,7 @@ void Move_init(void);
 void Move_object(int ind);
 void Move_player(int ind);
 void Turn_player(int ind);
+int is_inside(int x, int y);
 
 /*
  * Prototypes for event.c

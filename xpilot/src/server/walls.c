@@ -121,12 +121,19 @@ struct blockinfo {
 struct inside_block {
     short *y;
     short *lines;
-    short num_y;
-    short num_lines;
     short base_value;
 };
 
-struct inside_block inside_table[110*110];
+struct inside_block *inside_table;
+
+struct test {
+    double distance;
+    int inside;
+    struct tempy *y;
+    struct templine *lines;
+};
+
+struct test *temparray;
 
 wireobj ball_wire;
 
@@ -1385,14 +1392,17 @@ int Polys_to_client(char *ptr)
 }
 
 
-#if 0
-struct test {
-    double distance;
-    int inside;
+#if 1
+struct tempy {
+    short y;
+    struct tempy *next;
 };
 
 
-struct test array[110][110];
+struct templine {
+    short x1, x2, y1, y2;
+    struct templine *next;
+};
 
 
 #define STORE(T,P,N,M,V)						\
@@ -1417,15 +1427,16 @@ int is_inside(int x, int y)
 
     block = (x >> B_SHIFT) + mapx * (y >> B_SHIFT);
     inside = inside_table[block].base_value;
-    if (inside_table[block].num_lines == 0)
+    if (inside_table[block].lines == NULL)
 	return inside;
     x &= B_MASK;
     y &= B_MASK;
     ptr = inside_table[block].y;
-    while (y > *ptr++)
-	inside++;
+    if (ptr)
+	while (y > *ptr++)
+	    inside++;
     ptr = inside_table[block].lines;
-    while (*ptr != -1) {
+    while (*ptr != 32767) {
 	x1 = *ptr++ - x;
 	y1 = *ptr++ - y;
 	x2 = *ptr++ - x;
@@ -1469,83 +1480,113 @@ static void closest_line(int bx, int by, double dist, int inside)
 {
     if (dist == 0)
 	dist = 4 * B_CLICKS;
-    if (dist <= array[bx][by].distance) {
-	if (dist == array[bx][by].distance) {
+    if (dist <= temparray[bx + mapx *by].distance) {
+	if (dist == temparray[bx + mapx * by].distance) {
 	    /* dist need not be the best possible double representation of
 	     * the true distance, so this might not be detected */
 	    errno = 0;
 	    error("bx = %d, by = %d", bx, by);
+	    inside = 1;
 	}
-	array[bx][by].distance = dist;
-	array[bx][by].inside = inside;
+	temparray[bx + mapx * by].distance = dist;
+	temparray[bx + mapx * by].inside = inside;
     }
 }
 
 
-static void insert_y(struct inside_block *s, int y)
+static void insert_y(int block, int y)
 {
-    int i;
-    short *ptr;
+    struct tempy *ptr;
+    struct tempy **prev;
 
-    ptr = s->y;
-    i = 0;
-    while (*ptr < y)
-	ptr++;
-    if (*ptr == y) {
-	do {
-	    *ptr = *(ptr + 1);
-	} while (*ptr != 32767);
+    ptr = temparray[block].y;
+    prev = &temparray[block].y;
+    while (ptr && ptr->y < y) {
+	prev = &ptr->next;
+	ptr = ptr->next;
+    }
+    if (ptr && ptr->y == y) {
+	*prev = ptr->next;
+	free(ptr);
 	return;
     }
-    if (s->y[s->num_y - 2] != 32767) {
-	s->num_y += 5;
-	s->y = ralloc(s->y, sizeof(*(s->y) * s->num_y));
-	for (i = 1; i <= 5; i++)
-	    s->y[s->num_y - i] = 32767;
-    }
-    do {
-	i = *ptr;
-	*ptr++ = y;
-	y = i;
-    } while (*ptr != 32767);
+    *prev = ralloc(NULL, sizeof(struct tempy));
+    (*prev)->y = y;
+    (*prev)->next = ptr;
 }
 
 
 static void store_inside_line(int bx, int by, int ox, int oy, int dx, int dy)
 {
     int block;
-    struct inside_block *s;
+    struct templine *s;
 
-    block = by * mapx + bx;
-    s = &inside_table[block];
+    block = bx + mapx * by;
     if (oy >= 0 && oy < B_CLICKS && ox >= B_CLICKS)
-	insert_y(s, oy);
+	insert_y(block, oy);
     if (oy + dy >= 0 && oy + dy < B_CLICKS && ox + dx >= B_CLICKS)
-	insert_y(s, oy + dy);
-    s->lines = ralloc(s->lines, (s->num_lines + 2) * sizeof(short) * 4);
-    s->lines[s->num_lines * 4] = ox;
-    s->lines[s->num_lines * 4 + 1] = oy;
-    s->lines[s->num_lines * 4 + 2] = ox + dx;
-    s->lines[s->num_lines * 4 + 3] = oy + dy;
-    s->num_lines++;
-    s->lines[s->num_lines * 4] = -1;
+	insert_y(block, oy + dy);
+    s = ralloc(NULL, sizeof(struct templine));
+    s->x1 = ox;
+    s->x2 = ox + dx;
+    s->y1 = oy;
+    s->y2 = oy + dy;
+    s->next = temparray[block].lines;
+    temparray[block].lines = s;
 }
 
 
 static void finish_inside(void)
 {
-    int bx, by, block, inside;
+    int block, inside;
     short *ptr;
-    int x1, x2, y1, y2, s;
+    int x1, x2, y1, y2, s, j;
+    struct tempy *yptr;
+    struct templine *lptr;
 
-    for (bx = 0; bx < mapx; bx++)
-	for (by = 0; by < mapy; by++) {
-	    block = by * mapx + bx;
-	    if (inside_table[block].num_lines == 0)
-		continue;
-	    ptr = inside_table[block].lines;
-	    inside = array[bx][by].inside;
-	    while (*ptr != -1) {
+    for (block = 0; block < mapx * mapy; block++) {
+	j = 0;
+	yptr = temparray[block].y;
+	while (yptr) {
+	    j++;
+	    yptr = yptr->next;
+	}
+	if (j > 0) {
+	    ptr = ralloc(NULL, (j + 1) * sizeof(short));
+	    inside_table[block].y = ptr;
+	    yptr = temparray[block].y;
+	    while (yptr) {
+		*ptr++ = yptr->y;
+		yptr = yptr->next;
+	    }
+	    *ptr = 32767;
+	}
+	else
+	    inside_table[block].y = NULL;
+	j = 0;
+	lptr = temparray[block].lines;
+	while (lptr) {
+	    j++;
+	    lptr = lptr->next;
+	}
+	if (j > 0) {
+	    ptr = ralloc(NULL, (j * 4 + 1) * sizeof(short));
+	    inside_table[block].lines = ptr;
+	    lptr = temparray[block].lines;
+	    while (lptr) {
+		*ptr++ = lptr->x1;
+		*ptr++ = lptr->y1;
+		*ptr++ = lptr->x2;
+		*ptr++ = lptr->y2;
+		lptr = lptr->next;
+	    }
+	    *ptr = 32767;
+	}
+	else
+	    inside_table[block].lines = NULL;
+	inside = temparray[block].inside;
+	if ( (ptr = inside_table[block].lines) != NULL) {
+	    while (*ptr != 32767) {
 		x1 = *ptr++ * 2 - B_CLICKS * 2 + 1;
 		y1 = *ptr++ * 2 + 1;
 		x2 = *ptr++ * 2 - B_CLICKS * 2 + 1;
@@ -1570,29 +1611,21 @@ static void finish_inside(void)
 	    }
 	    inside_table[block].base_value = inside & 1;
 	}
+    }
 }
 
 
 static void init_inside(void)
 {
-    int i, j;
-    struct inside_block *s;
+    int i;
 
-    for (i = 0; i < mapx; i++)
-	for (j = 0; j < mapy; j++) {
-	    array[i][j].distance = 1e20;
-	    array[i][j].inside = 2;
-	}
-    for (i = 0; i < 110*110; i++) {
-	s = &inside_table[i];
-	s->num_y = 5;
-	s->y = ralloc(NULL, 5 * sizeof(short));
-	for (j = 0; j < 5; j++)
-	    s->y[j] = 32767;
-	s->num_lines = 0;
-	s->lines = ralloc(s->lines, 4 * sizeof(short));
-	*s->lines = -1;
-	s->base_value = 0;
+    inside_table = ralloc(NULL, mapx * mapy * sizeof(struct inside_block));
+    temparray = ralloc(NULL, mapx * mapy * sizeof(struct test));
+    for (i = 0; i < mapx * mapy; i++) {
+	temparray[i].distance = 1e20;
+	temparray[i].inside = 2;
+	temparray[i].y = NULL;
+	temparray[i].lines = NULL;
     }
 }
 
@@ -1720,27 +1753,28 @@ static void inside_test(void)
 	    for (j = POSMOD(minx, mapx); bx2-- > 0; j++) {
 		if (j == mapx)
 		    j = 0;
-		if (array[j][i].inside < 2) {
-		    x1 = array[j][i].distance >= B_CLICKS &&
-			array[j][i].inside == 1;
+		if (temparray[j + mapx * i].inside < 2) {
+		    x1 = temparray[j + mapx * i].distance >= B_CLICKS &&
+			temparray[j + mapx * i].inside == 1;
 		}
 		else {
 		    if (x1) {
 			fuel_t t;
 			extern int max_fuels;
 
+			temparray[i * mapx + j].inside = 1;
 			inside_table[i * mapx + j].base_value = 1;
-			t.clk_pos.x = j * B_CLICKS + B_CLICKS / 2;
+/*			t.clk_pos.x = j * B_CLICKS + B_CLICKS / 2;
 			t.clk_pos.y = i * B_CLICKS + B_CLICKS / 2;
 			t.fuel = START_STATION_FUEL;
 			t.conn_mask = (unsigned)-1;
 			t.last_change = frame_loops;
 			t.team = 1;
 			STORE(fuel_t, World.fuel, World.NumFuels, max_fuels,t);
-		    }
+*/		    }
 		}
-//		array[j][i].inside = 2;
-//		array[j][i].distance = 1e20;
+//		temparray[j + mapx * i].inside = 2;
+//		temparray[j + mapx * i].distance = 1e20;
 	    }
 	}
     }
@@ -2062,7 +2096,7 @@ void Walls_init(void)
     Distance_init();
     Corner_init();
     Ball_line_init();
-#if 0
+#if 1
     inside_test();
 #endif
     groups[0].type = FILLED;

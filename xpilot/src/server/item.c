@@ -227,11 +227,8 @@ void Place_item(int item, int ind)
 	    py -= World.cheight;
 	bx = px / BLOCK_CLICKS;
 	by = py / BLOCK_CLICKS;
-	/* !@#
-	if (!BIT(1U << World.block[bx][by], SPACE_BLOCKS)) {
+	if (is_inside(px, py))
 	    return;
-	}
-	*/
     } else {
 	if (rfrac() < movingItemProb) {
 	    grav = GRAVITY;
@@ -278,11 +275,8 @@ void Place_item(int item, int ind)
 		bx = px / BLOCK_CLICKS;
 		by = py / BLOCK_CLICKS;
 	    }
-	    /* !@#
-	    if (BIT(1U << World.block[bx][by], SPACE_BLOCKS|CANNON_BIT)) {
+	    if (!is_inside(px, py))
 		break;
-	    }
-	    */
 	}
     }
     vx = vy = 0;
