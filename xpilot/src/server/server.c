@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     char *addr;
     world_t *world = &World;
 
-    memset(world, 0, sizeof(world_t));
+    World_init(world);
 
     /*
      * Make output always linebuffered.  By default pipes

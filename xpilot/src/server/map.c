@@ -40,9 +40,7 @@ char map_version[] = VERSION;
 world_t World;
 bool is_polygon_map = false;
 
-/*static void Generate_random_map(void);*/
 static void Find_base_direction(world_t *world);
-static void Find_base_order(world_t *world);
 static void Reset_map_object_counters(world_t *world);
 
 
@@ -311,6 +309,16 @@ int World_place_friction_area(world_t *world, clpos_t pos, double fric)
     return ind;
 }
 
+void World_init(world_t *world)
+{
+    int i;
+
+    memset(world, 0, sizeof(world_t));
+
+    for (i = 0; i < MAX_TEAMS; i++)
+	Teams(world, i)->SwapperId = NO_ID;
+}
+
 void World_free(world_t *world)
 {
     XFREE(world->block);
@@ -339,14 +347,16 @@ static void World_alloc(world_t *world)
     world->gravity =
 	(vector_t **)malloc(sizeof(vector_t *)*world->x
 			  + world->x*sizeof(vector_t)*world->y);
-    world->gravs = NULL;
-    world->bases = NULL;
-    world->fuels = NULL;
-    world->cannons = NULL;
-    world->checks = NULL;
-    world->wormholes = NULL;
-    world->itemConcs = NULL;
-    world->asteroidConcs = NULL;
+
+    assert(world->gravs == NULL);
+    assert(world->bases == NULL);
+    assert(world->fuels == NULL);
+    assert(world->cannons == NULL);
+    assert(world->checks == NULL);
+    assert(world->wormholes == NULL);
+    assert(world->itemConcs == NULL);
+    assert(world->asteroidConcs == NULL);
+
     if (world->block == NULL || world->gravity == NULL) {
 	World_free(world);
 	fatal("Couldn't allocate memory for map");
@@ -374,33 +384,6 @@ static void World_alloc(world_t *world)
 }
 
 
-static void Reset_map_object_counters(world_t *world)
-{
-    int i;
-
-    world->NumCannons = 0;
-    world->NumFuels = 0;
-    world->NumGravs = 0;
-    world->NumWormholes = 0;
-    world->NumTreasures = 0;
-    world->NumTargets = 0;
-    world->NumBases = 0;
-    world->NumItemConcs = 0;
-    world->NumAsteroidConcs = 0;
-
-    for (i = 0; i < MAX_TEAMS; i++) {
-	world->teams[i].NumMembers = 0;
-	world->teams[i].NumRobots = 0;
-	world->teams[i].NumBases = 0;
-	world->teams[i].NumTreasures = 0;
-	world->teams[i].NumEmptyTreasures = 0;
-	world->teams[i].TreasuresDestroyed = 0;
-	world->teams[i].TreasuresLeft = 0;
-	world->teams[i].score = 0;
-	world->teams[i].prev_score = 0;
-	world->teams[i].SwapperId = NO_ID;
-    }
-}
 
 
 static void Verify_wormhole_consistency(world_t *world)
@@ -536,9 +519,6 @@ bool Grok_map(world_t *world)
     if (options.minRobots == -1)
 	options.minRobots = options.maxRobots;
 
-    if (BIT(world->rules->mode, TIMING))
-	Find_base_order(world);
-
     Realloc_map_objects(world);
 
     if (world->NumBases <= 0) {
@@ -617,47 +597,6 @@ static void Find_base_direction(world_t *world)
     if (!is_polygon_map)
 	Xpmap_find_base_direction(world);
 }
-
-/*
- * Determine the order in which players are placed
- * on starting positions after race mode reset.
- */
-static void Find_base_order(world_t *world)
-{
-    int			i, j, k, n;
-    double		dist;
-    clpos_t		chkpos;
-
-    if (!BIT(world->rules->mode, TIMING)) {
-	world->baseorder = NULL;
-	return;
-    }
-    if ((n = world->NumBases) <= 0) {
-	warn("Cannot support race mode in a map without bases");
-	exit(-1);
-    }
-
-    if ((world->baseorder = malloc(n * sizeof(baseorder_t))) == NULL) {
-	error("Out of memory - baseorder");
-	exit(-1);
-    }
-
-    chkpos = Checks(world, 0)->pos;
-    for (i = 0; i < n; i++) {
-	clpos_t bpos = Bases(world, i)->pos;
-	dist = Wrap_length(bpos.cx - chkpos.cx, bpos.cy - chkpos.cy) / CLICK;
-	for (j = 0; j < i; j++) {
-	    if (world->baseorder[j].dist > dist)
-		break;
-	}
-	for (k = i - 1; k >= j; k--)
-	    world->baseorder[k + 1] = world->baseorder[k];
-
-	world->baseorder[j].base_idx = i;
-	world->baseorder[j].dist = dist;
-    }
-}
-
 
 double Wrap_findDir(double dx, double dy)
 {
@@ -965,4 +904,36 @@ void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2)
 	}
     }
 #endif
+}
+
+
+
+
+
+static void Reset_map_object_counters(world_t *world)
+{
+    int i;
+
+    assert(world->NumCannons == 0);
+    assert(world->NumFuels == 0);
+    assert(world->NumGravs == 0);
+    assert(world->NumWormholes == 0);
+    assert(world->NumTreasures == 0);
+    assert(world->NumTargets == 0);
+    assert(world->NumBases == 0);
+    assert(world->NumItemConcs == 0);
+    assert(world->NumAsteroidConcs == 0);
+
+    for (i = 0; i < MAX_TEAMS; i++) {
+	assert(world->teams[i].NumMembers == 0);
+	assert(world->teams[i].NumRobots == 0);
+	assert(world->teams[i].NumBases == 0);
+	assert(world->teams[i].NumTreasures == 0);
+	assert(world->teams[i].NumEmptyTreasures == 0);
+	assert(world->teams[i].TreasuresDestroyed == 0);
+	assert(world->teams[i].TreasuresLeft == 0);
+	assert(world->teams[i].score == 0);
+	assert(world->teams[i].prev_score == 0);
+	assert(world->teams[i].SwapperId == NO_ID);
+    }
 }

@@ -337,7 +337,6 @@ bool Parser(int argc, char **argv)
     option_desc		*desc;
     world_t *world = &World;
 
-    memset(world, 0, sizeof(world_t));
     options.mapData = NULL;
     options.mapWidth = 0;
     options.mapHeight = 0;

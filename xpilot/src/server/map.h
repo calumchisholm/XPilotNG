@@ -130,11 +130,6 @@ typedef struct base {
     int		team;
 } base_t;
 
-typedef struct baseorder {
-    int		base_idx;	/* Index in World.base[] */
-    double	dist;		/* Distance to first checkpoint */
-} baseorder_t;
-
 typedef struct cannon {
     world_t	*world;
     clpos_t	pos;
@@ -264,7 +259,6 @@ struct world {
     int		NumTeamBases;	/* How many 'different' teams are allowed */
     int		NumBases, MaxBases;
     base_t	*bases;
-    baseorder_t	*baseorder;
     int		NumFuels, MaxFuels;
     fuel_t	*fuels;
     int		NumGravs, MaxGravs;

@@ -121,8 +121,7 @@ void Pick_startpos(player_t *pl)
 
     if (BIT(world->rules->mode, TIMING)) {	/* pick first free base */
 	for (i = 0; i < world->NumBases; i++) {
-	    /* kps - ng wants no base orders => change to if (free_bases[i]) */
-	    if (free_bases[world->baseorder[i].base_idx])
+	    if (free_bases[i])
 		break;
 	}
     } else {
@@ -143,9 +142,7 @@ void Pick_startpos(player_t *pl)
 	      ind, world->NumBases, num_free, pick, seen);
 	End_game();
     } else {
-	pl->home_base = Bases(world,
-			      BIT(world->rules->mode, TIMING) ?
-			      world->baseorder[i].base_idx : i);
+	pl->home_base = Bases(world, i);
 	if (ind < NumPlayers) {
 	    for (i = 0; i < spectatorStart + NumSpectators; i++) {
 		player_t *pl_i;
@@ -1087,8 +1084,8 @@ void Race_game_over(world_t *world)
 	}
 	for (i = 0; i < num_ordered_players; i++) {
 	    pl = Players(order[i]);
-	    if (pl->home_base->ind != world->baseorder[i].base_idx) {
-		pl->home_base = Bases(world, world->baseorder[i].base_idx);
+	    if (pl->home_base->ind != i) {
+		pl->home_base = Bases(world, i);
 		for (j = 0; j < spectatorStart + NumSpectators; j++) {
 		    if (j == NumPlayers) {
 			if (NumSpectators)
