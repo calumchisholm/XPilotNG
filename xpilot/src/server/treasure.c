@@ -70,6 +70,13 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     t->have = true;
 }
 
+void Treasure_init(world_t *world)
+{
+    int i;
+
+    for (i = 0; i < world->NumTreasures; i++)
+	Make_treasure_ball(world, Treasure_by_index(world, i));
+}
 
 /*
  * Ball has been replaced back in the hoop from whence

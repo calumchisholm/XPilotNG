@@ -513,6 +513,7 @@ int Find_closest_team(world_t *world, clpos_t pos);
 /*
  * Prototypes for xpmap.c
  */
+void Create_blockmap_from_polygons(world_t *world);
 setup_t *Xpmap_init_setup(world_t *world);
 void Xpmap_print(void);
 void Xpmap_grok_map_data(world_t *world);

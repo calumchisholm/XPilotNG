@@ -2334,6 +2334,51 @@ static void Distance_init(void)
     free(dis);
 }
 
+/*
+  cut and paste from #xpilot irc channel:
+
+<uau> the current values used for creating the wall tables are unoptimal
+<kps> what wall tables ?
+<kps> corners, etc ?
+<uau> especially after you made the "ship size" value bigger
+      (for asteroids IIRC?) it can be bad
+<kps> do i make that ship size smaller or what do you suggest ?
+<kps> or how should this be done if one wanted to make it right ?
+<uau> the server creates a table for "nearby" lines for each 32x32 pixel block
+<uau> where "nearby" depends on how close closest lines are
+<uau> and then later creates a table of corners for the same distance+shipsize
+<kps> is it struct blockinfo *blockline; ?
+<uau> if shipsize is big then the latter can include lots of corners
+<uau> blockline.distance is the distance for which features are listed for
+      that block
+<uau> blockline.lines contains all lines that are within that distance of
+      the block (away from the block edges, whole inside has value 0)
+<uau> distance is measured as MIN of x,y distance
+<uau> blockline.points contains all corners (identified as a line starting
+      from that point) within distance blockline.distance+C from that block
+<uau> where C was some constant which depends on ship size
+<uau> the heuristic for choosing a suitable blockline.distance could be
+      improved
+<kps> that would help how ?
+<uau> now it always includes some lines IIRC; it would probably be better
+      to choose the maximum distance such that no lines are included instead
+      if that is big enough
+<uau> MAX_SHAPE_OFFSET being big is a separate problem
+<uau> now blockline.distance is chosen based on the lines only,
+      blockline.points is then calculated afterwards to allow shapes to be
+      moved "compatibly"
+<uau> if MAX_SHAPE_OFFSET is big that means a value for blockline.distance
+      which is good for moving objects can create inefficiently big corner
+      lists for in blockline.points
+<kps> maybe it says there is not enough corner space since my xp map to
+      polygon conversion function creates many polygons where one could
+      have only one
+<kps> so there is a lot of corners close to each other
+<uau> the problem place is one where there is a lot of free space around,
+      so that blockline.distance can be chosen large
+<uau> but then there are suddenly a lot of corners inside
+      distance+MAX_SHAPE_OFFSET
+ */
 
 static void Corner_init(void)
 {
@@ -2507,14 +2552,14 @@ void Walls_init(world_t *world)
 	linet[i].c = (x*x - y*y) / l2;
 	linet[i].s = 2*x*y / l2;
     }
-}
 
-void Treasure_init(world_t *world)
-{
-    int i;
-
-    for (i = 0; i < world->NumTreasures; i++)
-	Make_treasure_ball(world, Treasure_by_index(world, i));
+    if (is_polygon_map) {
+	if (options.mapData) {
+	    warn("Option mapData is not supported on polygon maps.");
+	    warn("Server automatically creates block map from polygons.");
+	}
+	Create_blockmap_from_polygons(world);
+    }
 }
 
 
@@ -2593,14 +2638,7 @@ static void Move_ball(object_t *obj)
 
 	pos.cx = obj->pos.cx + mv.delta.cx;
 	pos.cy = obj->pos.cy + mv.delta.cy;
-	while (pos.cx >= world->cwidth)
-	    pos.cx -= world->cwidth;
-	while (pos.cx < 0)
-	    pos.cx += world->cwidth;
-	while (pos.cy >= world->cheight)
-	    pos.cy -= world->cheight;
-	while (pos.cy < 0)
-	    pos.cy += world->cheight;
+	pos = World_wrap_clpos(world, pos);
 	Object_position_set_clpos(world, obj, pos);
 	Cell_add_object(world, obj);
 	return;
@@ -2799,14 +2837,7 @@ void Move_player(player_t *pl)
     if (BIT(pl->used, HAS_PHASING_DEVICE)) {
 	pos.cx = pl->pos.cx + mv.delta.cx;
 	pos.cy = pl->pos.cy + mv.delta.cy;
-	while (pos.cx >= world->cwidth)
-	    pos.cx -= world->cwidth;
-	while (pos.cx < 0)
-	    pos.cx += world->cwidth;
-	while (pos.cy >= world->cheight)
-	    pos.cy -= world->cheight;
-	while (pos.cy < 0)
-	    pos.cy += world->cheight;
+	pos = World_wrap_clpos(world, pos);
 	Player_position_set_clpos(pl, pos);
     }
     else {

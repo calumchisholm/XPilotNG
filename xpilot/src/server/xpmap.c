@@ -102,7 +102,7 @@ static int Compress_map(unsigned char *map, size_t size)
 }
 
 
-static void Create_blockmap_from_polygons(world_t *world)
+void Create_blockmap_from_polygons(world_t *world)
 {
     int i, h, type;
     blkpos_t blk;
@@ -367,14 +367,6 @@ setup_t *Xpmap_init_setup(world_t *world)
     unsigned char *mapdata, *mapptr;
     size_t size, numblocks;
     setup_t *setup;
-
-    if (is_polygon_map) {
-	if (options.mapData) {
-	    warn("Option mapData is not supported on polygon maps.");
-	    warn("Server automatically creates block map from polygons.");
-	}
-	Create_blockmap_from_polygons(world);
-    }
 
     numblocks = world->x * world->y;
     if ((mapdata = XMALLOC(unsigned char, numblocks)) == NULL) {
