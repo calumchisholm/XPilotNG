@@ -113,11 +113,6 @@ typedef struct {
 #define MSG_FLASH_TIME		105.0	/* Old messages have life time less
 					   than this */
 #define MAX_POINTER_BUTTONS	5
-#define MAX_BUTTON_DEFS		3
-
-extern int Num_buttonDefs(int ind);
-#define NUM_BUTTON_DEFS(i) Num_buttonDefs(i)
-extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 /*
  * Macros to manipulate dynamic arrays.

@@ -25,10 +25,36 @@
 
 char event_version[] = VERSION;
 
+#define MAX_BUTTON_DEFS		3
 
 static BITV_DECL(keyv, NUM_KEYS);
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
+
+char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
+{ NULL, NULL, NULL, NULL, NULL };
+
+static inline int pointer_button_index_by_option(xp_option_t *opt)
+{
+    return atoi(Option_get_name(opt) + strlen("pointerButton")) - 1;
+}
+
+static int numButtonDefs[MAX_POINTER_BUTTONS] = { 0, 0, 0, 0, 0 };
+
+static int Num_buttonDefs(int ind)
+{
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+    return numButtonDefs[ind];
+}
+
+static void Clear_buttonDefs(int ind)
+{
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+    numButtonDefs[ind] = 0;
+}
+
 
 
 int Key_init(void)
@@ -392,7 +418,7 @@ void Pointer_button_pressed(int button)
     if (button < 1 || button > MAX_POINTER_BUTTONS)
 	return;
 
-    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++)
+    for (i = 0; i < Num_buttonDefs(b_index); i++)
 	key_change |= Key_press(buttonDefs[b_index][i]);
 
     if (key_change)
@@ -407,7 +433,7 @@ void Pointer_button_released(int button)
     if (button < 1 || button > MAX_POINTER_BUTTONS)
 	return;
 
-    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++)
+    for (i = 0; i < Num_buttonDefs(b_index); i++)
 	key_change |= Key_release(buttonDefs[b_index][i]);
 
     if (key_change)
@@ -443,30 +469,6 @@ void Keyboard_button_released(xp_keysym_t ks)
 }
 
 
-
-char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
-{ NULL, NULL, NULL, NULL, NULL };
-
-static inline int pointer_button_index_by_option(xp_option_t *opt)
-{
-    return atoi(Option_get_name(opt) + strlen("pointerButton")) - 1;
-}
-
-static int numButtonDefs[MAX_POINTER_BUTTONS] = { 0, 0, 0, 0, 0 };
-
-int Num_buttonDefs(int ind)
-{
-    assert(ind >= 0);
-    assert(ind < MAX_POINTER_BUTTONS);
-    return numButtonDefs[ind];
-}
-
-static void Clear_buttonDefs(int ind)
-{
-    assert(ind >= 0);
-    assert(ind < MAX_POINTER_BUTTONS);
-    numButtonDefs[ind] = 0;
-}
 
 static void Bind_key_to_pointer_button(keys_t key, int ind)
 {
