@@ -585,9 +585,9 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glLineWidth(e_style.width * scale);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_LINE_SMOOTH);/* this is about half the cost of drawing objects...*/
+    glEnable(GL_LINE_SMOOTH);/* this is about half the cost of drawing objects...*/
     glCallList(polyEdgeListBase + i);
-    //glDisable(GL_LINE_SMOOTH);
+    glDisable(GL_LINE_SMOOTH);
     /*glDisable(GL_BLEND);*/
     glLineWidth(1);
     glPopMatrix();
