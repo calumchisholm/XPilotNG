@@ -60,7 +60,7 @@ initialemergencythrusts:0
 initialemergencyshields:0
 initialafterburners:2
 initialautopilots:1
-emcsreprogrammines:yes
+ecmsreprogrammines:yes
 playerminimumstartfuel:500
 targetteamcollision:no
 allowplayerbounces:no
@@ -81,7 +81,7 @@ distinguishmissiles:yes
 identifymines:yes
 nukeminsmarts:3
 nukeminmines:3
-emcsreprogrammines:yes
+ecmsreprogrammines:yes
 maxmissilesperpack:1
 minefusetime:420
 detonateitemonkillprob:0.5
