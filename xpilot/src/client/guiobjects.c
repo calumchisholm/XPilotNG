@@ -589,8 +589,6 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
 	char keff[4] = "";
 
 	sprintf(keff, "%03d", other->life);
-	if (other->life < 1)
-	    SET_FG(colors[WHITE].pixel);
 	rd.drawString(dpy, drawPixmap, gameGC,
 		      WINSCALE(X(x) + SHIP_SZ),
 		      WINSCALE(Y(y) - SHIP_SZ) + gameFont->ascent,
@@ -624,7 +622,6 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 {
     int ship_color = WHITE;
 
-#ifndef NO_BLUE_TEAM
     if (BIT(Setup->mode, TEAM_PLAY)
 	&& eyesId != id
 	&& other != NULL
@@ -652,7 +649,7 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 
     if (Gui_is_my_tank(other))
 	ship_color = BLUE;
-#endif
+
     if (roundDelay > 0 && ship_color == WHITE)
 	ship_color = RED;
 
