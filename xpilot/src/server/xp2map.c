@@ -308,7 +308,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	/*Map_place_...(cx, cy);*/
+	Map_place_item_concentrator(cx, cy);
 	return;
     }
 
@@ -322,7 +322,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	/*Map_place_...(cx, cy);*/
+	Map_place_asteroid_concentrator(cx, cy);
 	return;
     }
 
@@ -365,7 +365,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    warn("Illegal type in grav tag.\n");
 	    exit(1);
 	}	
-	/*Map_place_...(cx, cy, force, type);*/
+	Map_place_grav(cx, cy, force, type);
 	return;
     }
 
