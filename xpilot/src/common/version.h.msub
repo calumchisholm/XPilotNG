@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) @<COPYRIGHTDATE>@ by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -31,7 +30,9 @@
 #   pragma VERSIONID		"@<TITLE>@"
 #endif
 
-#define VERSION			"@<VERSION>@"
+#ifndef VERSION
+#  define VERSION			"@<VERSION>@"
+#endif
 #ifdef	_WINDOWS
 #define	TITLE			"@<WINVERSION>@"
 #define	VERSION_WINDOWS	"@<VERSION_WINDOWS>@"
