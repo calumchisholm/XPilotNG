@@ -61,6 +61,7 @@ extern bool		quitting;
  * xdefault.c
  */
 extern void Store_x_options(void);
+extern void Handle_x_options(void);
 
 /*
  * Prototypes for xinit.c

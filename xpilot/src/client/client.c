@@ -30,7 +30,7 @@ extern int Startup_server_motd(void);
 
 char client_version[] = VERSION;
 
-
+xp_args_t xpArgs;
 bool	is_server = false;	/* used in common code */
 
 bool	scoresChanged = false;

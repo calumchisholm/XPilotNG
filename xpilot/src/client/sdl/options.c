@@ -3032,11 +3032,9 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 #endif	/* _WINDOWS*/
 
 
-void Parse_options(int *argcp, char **argvp, char *realName, int *port,
-		   int *my_team, bool *text, bool *list,
-		   bool *join,
-		   char *nickName, char *dispName, char *hostName,
-		   char *shut_msg)
+void Parse_options(int *argcp, char **argvp, char *realName,
+		   int *port, int *my_team,
+		   char *nickName, char *dispName, char *hostName)
 {
     char		*ptr, *str;
     int			i, j;
@@ -3123,7 +3121,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	exit(1);
     }
 
-    Get_resource(argDB, "shutdown", shut_msg, MAX_CHARS);
+    Get_resource(argDB, "shutdown", xpArgs.shutdown_reason, MAX_CHARS);
 
     Get_file_defaults(&rDB);
 
@@ -3194,9 +3192,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	*my_team = TEAM_NOT_SET;
 
     Get_int_resource(rDB, "port", port);
-    Get_bool_resource(rDB, "text", text);
-    Get_bool_resource(rDB, "list", list);
-    Get_bool_resource(rDB, "join", join);
+    Get_bool_resource(rDB, "text", &xpArgs.text);
+    Get_bool_resource(rDB, "list", &xpArgs.list_servers);
+    Get_bool_resource(rDB, "join", &xpArgs.auto_connect);
 
     Get_shipshape_resource(rDB, &shipShape);
     Validate_shape_str(shipShape);

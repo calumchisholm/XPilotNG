@@ -65,6 +65,15 @@ typedef struct {
     bool useAMPMFormatClock;
 } instruments_t;
 
+typedef struct {
+    bool help;
+    bool version;
+    bool text;
+    bool list_servers; /* list */
+    bool auto_connect; /* join */
+    char shutdown_reason[MAX_CHARS]; /* shutdown reason */
+} xp_args_t;
+
 #define PACKET_LOSS		0
 #define PACKET_DROP		1
 #define PACKET_DRAW		2
@@ -422,6 +431,7 @@ typedef struct {
 } message_t;
 /* typedefs end */
 
+extern xp_args_t	xpArgs;
 extern message_t	*TalkMsg[];
 extern message_t	*GameMsg[];
 extern message_t	*TalkMsg_pending[];	/* store incoming messages */

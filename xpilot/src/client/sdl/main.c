@@ -22,11 +22,9 @@ static void sigcatch(int signum)
 
 int main(int argc, char *argv[])
 {
-    bool			auto_connect = false, text = false,
-				list_servers = false, auto_shutdown = false;
-    Connect_param_t             conpar;
-    char			shutdown_reason[MAX_CHARS];
-    char                        *cp;
+    Connect_param_t conpar;
+    char *cp;
+    bool auto_shutdown = false;
 
     init_error(argv[0]);
 
@@ -44,19 +42,18 @@ int main(int argc, char *argv[])
     if (cp) strlcpy(conpar.real_name, cp, sizeof(conpar.real_name));
     else Get_login_name(conpar.real_name, sizeof(conpar.real_name) - 1);
 
+    memset(&xpArgs, 0, sizeof(xp_args_t));
     Parse_options(&argc, argv, conpar.real_name,
 		  &conpar.contact_port, &conpar.team,
-		  &text, &list_servers,
-		  &auto_connect,
 		  conpar.nick_name, conpar.disp_name,
-		  hostname, shutdown_reason);
+		  hostname);
 
     /* CLIENTRANK */
     Init_saved_scores();
 
     if (!Contact_servers(argc - 1, &argv[1],
-			 auto_connect, list_servers,
-			 auto_shutdown, shutdown_reason,
+			 xpArgs.auto_connect, xpArgs.list_servers,
+			 auto_shutdown, xpArgs.shutdown_reason,
 			 0, 0, 0, 0,
 			 &conpar)) return 0;
 

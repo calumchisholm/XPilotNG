@@ -58,8 +58,7 @@ static void printfile(const char *filename)
 int main(int argc, char *argv[])
 {
     int				result, retval = 1;
-    bool			auto_connect = false, text = false,
-				list_servers = false, auto_shutdown = false;
+    bool			auto_shutdown = false;
     char			*cp;
     Connect_param_t		*conpar;
     static char			shutdown_reason[MAX_CHARS];
@@ -127,31 +126,28 @@ int main(int argc, char *argv[])
     /*
      * --- Check commandline arguments and resource files ---
      */
+    memset(&xpArgs, 0, sizeof(xp_args_t));
     Parse_options(&argc, argv, conpar->real_name,
 		  &conpar->contact_port, &conpar->team,
-		  &text, &list_servers,
-		  &auto_connect, conpar->nick_name, conpar->disp_name,
-		  hostname, shutdown_reason);
+		  conpar->nick_name, conpar->disp_name,
+		  hostname);
 
     /*strcpy(clientname,conpar->nick_name); */
 
 #ifdef OPTIONHACK
     /*Usage();*/
-
-extern void Handle_x_options(void);
-
     Handle_x_options();
 #endif
     
     /* CLIENTRANK */
     Init_saved_scores();
 
-    if (list_servers)
-	auto_connect = true;
+    if (xpArgs.list_servers)
+	xpArgs.auto_connect = true;
 
-    if (shutdown_reason[0] != '\0') {
+    if (xpArgs.shutdown_reason[0] != '\0') {
 	auto_shutdown = true;
-	auto_connect = true;
+	xpArgs.auto_connect = true;
     }
 
     /*
@@ -159,13 +155,13 @@ extern void Handle_x_options(void);
      */
     printfile(Conf_localmotdfile());
 
-    if (text || auto_connect || argv[1] || is_this_windows()) {
-	if (list_servers)
+    if (xpArgs.text || xpArgs.auto_connect || argv[1] || is_this_windows()) {
+	if (xpArgs.list_servers)
 	    printf("LISTING AVAILABLE SERVERS:\n");
 
 	result = Contact_servers(argc - 1, &argv[1],
-				 auto_connect, list_servers,
-				 auto_shutdown, shutdown_reason,
+				 xpArgs.auto_connect, xpArgs.list_servers,
+				 auto_shutdown, xpArgs.shutdown_reason,
 				 0, 0, 0, 0,
 				 conpar);
     }

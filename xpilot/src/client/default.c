@@ -36,19 +36,12 @@ keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 #ifdef OPTIONHACK
 
-bool noarg_help;
-bool noarg_version;
-bool noarg_join;
-bool noarg_text;
-bool noarg_list;
-
 char mynickname[MAX_NAME_LEN];
 char myusername[MAX_NAME_LEN];
 char myhostname[MAX_HOST_LEN];
 int myteam;
 int myport;
 char *mygeometry = NULL;
-char myshutmsg[MAX_CHARS];
 char myshipshapefile[PATH_MAX + 1];
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 { NULL, NULL, NULL, NULL, NULL };
@@ -128,28 +121,28 @@ xp_option_t default_options[] = {
 
     XP_NOARG_OPTION(
 	"help",
-	&noarg_help,
+	&xpArgs.help,
 	"Display this help message.\n"),
 
     XP_NOARG_OPTION(
 	"version",
-	&noarg_version,
+	&xpArgs.version,
 	"Show the source code version.\n"),
 
     XP_NOARG_OPTION(
 	"join",
-	&noarg_join,
+	&xpArgs.auto_connect,
 	"Join the game immediately, no questions asked.\n"),
 
     XP_NOARG_OPTION(
 	"text",
-	&noarg_text,
+	&xpArgs.text,
 	"Use the simple text interface to contact a server\n"
 	"instead of the graphical user interface.\n"),
 
     XP_NOARG_OPTION(
 	"list",
-	&noarg_list,
+	&xpArgs.list_servers,
 	"List all servers running on the local network.\n"),
 
     XP_STRING_OPTION(
@@ -188,8 +181,8 @@ xp_option_t default_options[] = {
     XP_STRING_OPTION(
 	"shutdown",
 	"",
-	myshutmsg,
-	sizeof myshutmsg,
+	xpArgs.shutdown_reason,
+	sizeof xpArgs.shutdown_reason,
 	NULL, NULL,
 	"Shutdown the server with a message.\n"
 	"The message used is the first argument to this option.\n"),
@@ -4041,11 +4034,9 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 #endif	/* _WINDOWS*/
 
 
-void Parse_options(int *argcp, char **argvp, char *realName, int *port,
-		   int *my_team, bool *text, bool *list,
-		   bool *join,
-		   char *nickName, char *dispName, char *hostName,
-		   char *shut_msg)
+void Parse_options(int *argcp, char **argvp, char *realName,
+		   int *port, int *my_team,
+		   char *nickName, char *dispName, char *hostName)
 {
     char		*ptr, *str;
     int			i, j;
@@ -4121,7 +4112,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	exit(0);
     }
 
-    Get_resource(argDB, "shutdown", shut_msg, MAX_CHARS);
+    Get_resource(argDB, "shutdown", xpArgs.shutdown_reason, MAX_CHARS);
 
     if (Get_string_resource(argDB, "display", dispName, MAX_DISP_LEN) == 0
 	|| dispName[0] == '\0') {
@@ -4140,9 +4131,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		strlcpy(nickName, "X", MAX_NAME_LEN);
 	    *my_team = TEAM_NOT_SET;
 	    Get_int_resource(argDB, "port", port);
-	    Get_bool_resource(argDB, "list", list);
-	    *text = true;
-	    *join = false;
+	    Get_bool_resource(argDB, "list", &xpArgs.list_servers);
+	    xpArgs.text = true;
+	    xpArgs.auto_connect = false;
 	    XrmDestroyDatabase(argDB);
 	    free(xopt);
 	    return;
@@ -4241,9 +4232,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	*my_team = TEAM_NOT_SET;
 
     Get_int_resource(rDB, "port", port);
-    Get_bool_resource(rDB, "text", text);
-    Get_bool_resource(rDB, "list", list);
-    Get_bool_resource(rDB, "join", join);
+    Get_bool_resource(rDB, "text", &xpArgs.text);
+    Get_bool_resource(rDB, "list", &xpArgs.list_servers);
+    Get_bool_resource(rDB, "join", &xpArgs.auto_connect);
     Get_bool_resource(rDB, "autoServerMotdPopup", &autoServerMotdPopup);
 
     Get_shipshape_resource(rDB, &shipShape);
