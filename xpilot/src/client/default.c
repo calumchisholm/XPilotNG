@@ -64,7 +64,7 @@ static bool Set_nickName(xp_option_t *opt, const char *value)
 	     nick, connectParam.nick_name);
     }
 
-    warn("Nick name set to \"%s\".\n", connectParam.nick_name);
+    /*warn("Nick name set to \"%s\".\n", connectParam.nick_name);*/
 
     return true;
 }
@@ -97,7 +97,7 @@ static bool Set_userName(xp_option_t *opt, const char *value)
     if (strlen(connectParam.nick_name) == 0)
 	Set_nickName(NULL, connectParam.user_name);
 
-    warn("User name set to \"%s\".\n", connectParam.user_name);
+    /*warn("User name set to \"%s\".\n", connectParam.user_name);*/
 
     return true;
 }
@@ -128,7 +128,7 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
 	     host, connectParam.host_name);
     }
 
-    warn("Host name set to \"%s\".\n", connectParam.host_name);
+    /*warn("Host name set to \"%s\".\n", connectParam.host_name);*/
 
     return true;
 }
