@@ -1574,10 +1574,10 @@ for details see the provided COPYING file.
 .SH FILES
 .PD 0
 .TP 40
-.B @XP_INSTLIBDIR@/motd
+.B @XP_DATADIR@/motd
 Message of the day.
 .TP
-.B @XP_INSTLIBDIR@/sounds
+.B @XP_DATADIR@/sounds
 File containing the sound to sound-file mapping.
 .PD
 

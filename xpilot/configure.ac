@@ -14,12 +14,19 @@ AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(config.h)
 
 dnl  Copyright & stuff.
-AC_SUBST([XP_AUTHORS],["Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
-AC_SUBST([XP_COPYRIGHTDATE],["1991-2004"])
-AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
-AC_SUBST([XP_RELEASEDATE],["Mar 18, 2004"])
-AC_SUBST([XP_INSTLIBDIR],"$prefix/lib/xpilot-ng")
+XP_AUTHORS="Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"
+AC_SUBST([XP_AUTHORS])
+
+XP_COPYRIGHTDATE="1991-2004"
+AC_SUBST([XP_COPYRIGHTDATE])
+
+XP_COPYRIGHT="Copyright © $XP_COPYRIGHTDATE by $XP_AUTHORS"
+AC_SUBST([XP_COPYRIGHT])
+
 AC_SUBST([XP_TITLE],["XPilotNG 4.6.0"])
+AC_SUBST([XP_RELEASEDATE],["Mar 18, 2004"])
+AC_SUBST([XP_DATADIR],"$prefix/share/xpilot-ng")
+
 
 dnl  Checks for options.
 dnl  We should have some general macro for these.

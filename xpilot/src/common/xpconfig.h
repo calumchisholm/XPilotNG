@@ -179,7 +179,7 @@
 #endif
 
 void Conf_print(void);
-char *Conf_libdir(void);
+char *Conf_datadir(void);
 char *Conf_defaults_file_name(void);
 char *Conf_password_file_name(void);
 char *Conf_player_passwords_file_name(void);

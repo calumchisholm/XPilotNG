@@ -35,8 +35,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
 subdir = doc/man
-DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/xpilot-ng-replay.man.in \
+DIST_COMMON = README $(dist_man6_MANS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/xpilot-ng-replay.man.in \
 	$(srcdir)/xpilot-ng-sdl.man.in \
 	$(srcdir)/xpilot-ng-server.man.in \
 	$(srcdir)/xpilot-ng-x11.man.in
@@ -53,7 +53,7 @@ DIST_SOURCES =
 man6dir = $(mandir)/man6
 am__installdirs = "$(DESTDIR)$(man6dir)"
 NROFF = nroff
-MANS = $(man6_MANS)
+MANS = $(dist_man6_MANS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -112,7 +112,7 @@ VERSION = @VERSION@
 XP_AUTHORS = @XP_AUTHORS@
 XP_COPYRIGHT = @XP_COPYRIGHT@
 XP_COPYRIGHTDATE = @XP_COPYRIGHTDATE@
-XP_INSTLIBDIR = @XP_INSTLIBDIR@
+XP_DATADIR = @XP_DATADIR@
 XP_RELEASEDATE = @XP_RELEASEDATE@
 XP_TITLE = @XP_TITLE@
 X_CFLAGS = @X_CFLAGS@
@@ -160,13 +160,12 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-man6_MANS = \
-	xpilot-ng-sdl.man.in \
-	xpilot-ng-x11.man.in \
-	xpilot-ng-server.man.in \
-	xpilot-ng-replay.man.in
+dist_man6_MANS = \
+	xpilot-ng-sdl.man \
+	xpilot-ng-x11.man \
+	xpilot-ng-server.man \
+	xpilot-ng-replay.man
 
-EXTRA_DIST = $(man6_MANS)
 all: all-am
 
 .SUFFIXES:
