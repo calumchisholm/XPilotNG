@@ -410,23 +410,20 @@ static const char *Get_talk_macro(xp_option_t *opt)
 
 
 xp_option_t talk_macro_options[] = {
-
-    /* talk macros: */
+    /*
+     * Default warning macros for newbies.
+     */
     XP_STRING_OPTION(
 	"msg1",
-	"Hello world!",
+	"#t:***    BALL! Our ball is gone! Save it!   ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 1.\n"),
 
-    /*
-     * This macro swaps between teams 2 and 4, useful on Blood's Music
-     * maps.
-     */
     XP_STRING_OPTION(
 	"msg2",
-	"#=[#t|2|/team 4|/team 2]",
+	"#t:*** SAFE! Our ball is safe. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -434,7 +431,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg3",
-	"",
+	"#t:*** COVER! The enemy ball is approaching our base. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -442,15 +439,19 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg4",
-	"",
+	"#t:*** POP! The enemy ball is back at the enemy base. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
 	"Talkmessage 4.\n"),
 
+    /*
+     * This macro swaps between teams 2 and 4, useful on Blood's Music
+     * maps.
+     */
     XP_STRING_OPTION(
 	"msg5",
-	"#t:***    BALL! Our ball is gone! Save it!   ***",
+	"#=[#t|2|/team 4|/team 2]",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -458,7 +459,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg6",
-	"#t:*** SAFE! Our ball is safe. ***",
+	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -466,7 +467,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg7",
-	"#t:*** COVER! The enemy ball is approaching our base. ***",
+	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -474,7 +475,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg8",
-	"#t:*** POP! The enemy ball is back at the enemy base. ***",
+	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
