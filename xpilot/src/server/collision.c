@@ -163,7 +163,6 @@ static bool in_range(object_t *obj1, object_t *obj2, double range)
 
 static void PlayerCollision(world_t *world);
 static void PlayerObjectCollision(player_t *pl);
-static void PlayerCheckpointCollision(player_t *pl);
 static void AsteroidCollision(world_t *world);
 static void BallCollision(world_t *world);
 static void MineCollision(world_t *world);
@@ -1232,87 +1231,6 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	default:
 	    break;
 	}
-    }
-}
-
-static void Player_pass_checkpoint(player_t *pl)
-{
-    int j;
-    world_t *world = pl->world;
-
-    if (pl->check == 0) {
-	pl->round++;
-#if 1
-	pl->last_lap_time = pl->time - pl->last_lap;
-	if ((pl->best_lap > pl->last_lap_time
-	     || pl->best_lap == 0)
-	    && pl->time != 0
-	    && pl->round != 1) {
-	    pl->best_lap = pl->last_lap_time;
-	}
-	pl->last_lap = pl->time;
-	if (pl->round > options.raceLaps) {
-	    if (options.ballrace) {
-		/* Balls are made unowned when their owner finishes the race
-		   This way, they can be reused by other players */
-		for (j = 0; j < NumObjs; j++) {
-		    if (Obj[j]->type == OBJ_BALL) {
-			ballobject_t *ball = BALL_PTR(Obj[j]);
-
-			if (ball->owner == pl->id)
-			    ball->owner = NO_ID;
-		    }
-		}
-	    }
-	    Player_death_reset(pl, false);
-	    pl->mychar = 'D';
-	    SET_BIT(pl->status, GAME_OVER|FINISH);
-	    Set_message_f("%s finished the race. Last lap time: %.2fs. "
-			  "Personal race best lap time: %.2fs.",
-			  pl->name,
-			  (double) pl->last_lap_time / FPS,
-			  (double) pl->best_lap / FPS);
-	} else if (pl->round > 1) {
-	    Set_message_f("%s completes lap %d in %.2fs. "
-			  "Personal race best lap time: %.2fs.",
-			  pl->name,
-			  pl->round-1,
-			  (double) pl->last_lap_time / FPS,
-			  (double) pl->best_lap / FPS);
-	} else
-	    Set_message_f("%s starts lap 1 of %d.",
-			  pl->name, options.raceLaps);
-#else
-	/* this is how 4.3.1X did this */
-	SET_BIT(pl->status, FINISH);
-	/* Rest done in Compute_game_status() */
-#endif
-    }
-
-    if (++pl->check == world->NumChecks)
-	pl->check = 0;
-    pl->last_check_dir = pl->dir;
-
-    updateScores = true;
-}
-
-static void PlayerCheckpointCollision(player_t *pl)
-{
-    world_t *world = pl->world;
-
-    if (BIT(world->rules->mode, TIMING)
-	&& BIT(pl->status, PAUSE|GAME_OVER) == 0) {
-	check_t *check = Check_by_index(world, pl->check);
-
-	if (pl->round != 0)
-	    pl->time++;
-	if (BIT(pl->status, PLAYING|KILLED) == PLAYING
-	    && Wrap_length(pl->pos.cx - check->pos.cx,
-			   pl->pos.cy - check->pos.cy)
-	    < options.checkpointRadius * BLOCK_CLICKS
-	    && !Player_is_tank(pl)
-	    && !options.ballrace)
-	    Player_pass_checkpoint(pl);
     }
 }
 

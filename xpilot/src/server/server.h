@@ -806,9 +806,9 @@ void Detach_ball(player_t *pl, ballobject_t *ball);
 void Kill_player(player_t *pl, bool add_rank_death);
 void Player_death_reset(player_t *pl, bool add_rank_death);
 void Player_pause_reset(player_t *pl);
+void Count_rounds(void);
 void Team_game_over(world_t *world, int winning_team, const char *reason);
 void Individual_game_over(world_t *world, int winner);
-void Race_game_over(world_t *world);
 bool Team_immune(int id1, int id2);
 
 static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
@@ -820,6 +820,14 @@ static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
     } else
 	pl->float_dir = new_float_dir;
 }
+
+/*
+ * Prototypes for race.c
+ */
+void Race_compute_game_status(world_t *world);
+void Race_game_over(world_t *world);
+void Player_pass_checkpoint(player_t *pl);
+void PlayerCheckpointCollision(player_t *pl);
 
 /*
  * Prototypes for robot.c

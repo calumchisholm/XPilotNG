@@ -13,7 +13,7 @@ xpilot_ng_server_SOURCES = \
 	netserver.c netserver.h \
 	object.c object.h objpos.c objpos.h option.c \
 	parser.c play.c player.c polygon.c \
-	rank.c rank.h recwrap.c recwrap.h \
+	race.c rank.c rank.h recwrap.c recwrap.h \
 	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \

@@ -60,14 +60,14 @@ am_xpilot_ng_server_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	metaserver.$(OBJEXT) netserver.$(OBJEXT) object.$(OBJEXT) \
 	objpos.$(OBJEXT) option.$(OBJEXT) parser.$(OBJEXT) \
 	play.$(OBJEXT) player.$(OBJEXT) polygon.$(OBJEXT) \
-	rank.$(OBJEXT) recwrap.$(OBJEXT) robot.$(OBJEXT) \
-	robotdef.$(OBJEXT) rules.$(OBJEXT) saudio.$(OBJEXT) \
-	sched.$(OBJEXT) score.$(OBJEXT) server.$(OBJEXT) \
-	ship.$(OBJEXT) shot.$(OBJEXT) showtime.$(OBJEXT) \
-	srecord.$(OBJEXT) target.$(OBJEXT) teamcup.$(OBJEXT) \
-	tuner.$(OBJEXT) treasure.$(OBJEXT) update.$(OBJEXT) \
-	walls.$(OBJEXT) wormhole.$(OBJEXT) xp2map.$(OBJEXT) \
-	xpmap.$(OBJEXT)
+	race.$(OBJEXT) rank.$(OBJEXT) recwrap.$(OBJEXT) \
+	robot.$(OBJEXT) robotdef.$(OBJEXT) rules.$(OBJEXT) \
+	saudio.$(OBJEXT) sched.$(OBJEXT) score.$(OBJEXT) \
+	server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
+	showtime.$(OBJEXT) srecord.$(OBJEXT) target.$(OBJEXT) \
+	teamcup.$(OBJEXT) tuner.$(OBJEXT) treasure.$(OBJEXT) \
+	update.$(OBJEXT) walls.$(OBJEXT) wormhole.$(OBJEXT) \
+	xp2map.$(OBJEXT) xpmap.$(OBJEXT)
 xpilot_ng_server_OBJECTS = $(am_xpilot_ng_server_OBJECTS)
 xpilot_ng_server_DEPENDENCIES =  \
 	$(top_builddir)/src/common/libxpcommon.a
@@ -208,7 +208,7 @@ xpilot_ng_server_SOURCES = \
 	netserver.c netserver.h \
 	object.c object.h objpos.c objpos.h option.c \
 	parser.c play.c player.c polygon.c \
-	rank.c rank.h recwrap.c recwrap.h \
+	race.c rank.c rank.h recwrap.c recwrap.h \
 	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
@@ -309,6 +309,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/play.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polygon.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/race.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rank.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/recwrap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/robot.Po@am__quote@
