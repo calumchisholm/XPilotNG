@@ -50,6 +50,11 @@ long CANNON_USE_ITEM = (ITEM_BIT_FUEL|ITEM_BIT_WIDEANGLE
 			|ITEM_BIT_TRACTOR_BEAM|ITEM_BIT_MISSILE
 			|ITEM_BIT_PHASING);
 
+static inline int Cannon_get_smartness(cannon_t *c)
+{
+    return options.cannonSmartness;
+}
+
 void Cannon_update(world_t *world, bool do_less_frequent_update)
 {
     int i;
@@ -246,8 +251,10 @@ void Cannon_check_fire(cannon_t *c)
 /* selects one of the available defenses. see cannon.h for descriptions. */
 static int Cannon_select_defense(cannon_t *c)
 {
+    int smartness = Cannon_get_smartness(c);
+
     /* mode 0 does not defend */
-    if (options.cannonSmartness == 0)
+    if (smartness == 0)
 	return -1;
 
     /* still protected */
@@ -280,8 +287,9 @@ static int Cannon_in_danger(cannon_t *c)
     int obj_count, i, danger = false;
     int npx, npy, tdx, tdy;
     int cpx = CLICK_TO_PIXEL(c->pos.cx), cpy = CLICK_TO_PIXEL(c->pos.cy);
+    int smartness = Cannon_get_smartness(c);
 
-    if (options.cannonSmartness == 0)
+    if (smartness == 0)
 	return false;
 
     if (NumObjs >= options.cellGetObjectsThreshold)
@@ -308,17 +316,17 @@ static int Cannon_in_danger(cannon_t *c)
 
 	npx = CLICK_TO_PIXEL(shot->pos.cx);
 	npy = CLICK_TO_PIXEL(shot->pos.cy);
-	if (options.cannonSmartness > 1) {
+	if (smartness > 1) {
 	    npx += (int)shot->vel.x;
 	    npy += (int)shot->vel.y;
-	    if (options.cannonSmartness > 2) {
+	    if (smartness > 2) {
 		npx += (int)shot->acc.x;
 		npy += (int)shot->acc.y;
 	    }
 	}
 	tdx = WRAP_DX(npx - cpx);
 	tdy = WRAP_DY(npy - cpy);
-	if (LENGTH(tdx, tdy) <= ((4.5 - options.cannonSmartness) * BLOCK_SZ)) {
+	if (LENGTH(tdx, tdy) <= ((4.5 - smartness) * BLOCK_SZ)) {
 	    danger = true;
 	    break;
 	}
@@ -404,12 +412,12 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
     bool found = false, ready = false;
     double closest = range;
-    int ddir, i;
+    int ddir, i, smartness = Cannon_get_smartness(c);
 
     switch (weapon) {
     case CW_MINE:
-	speed = speed * 0.5 + 0.1 * options.cannonSmartness;
-	range = range * 0.5 + 0.1 * options.cannonSmartness;
+	speed = speed * 0.5 + 0.1 * smartness;
+	range = range * 0.5 + 0.1 * smartness;
 	break;
     case CW_LASER:
 	speed = options.pulseSpeed;
@@ -417,10 +425,10 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	break;
     case CW_ECM:
 	/* smarter cannons wait a little longer before firing an ECM */
-	if (options.cannonSmartness > 1)
-	    range = ((ECM_DISTANCE / options.cannonSmartness
+	if (smartness > 1)
+	    range = ((ECM_DISTANCE / smartness
 		      + (rfrac() * (int)(ECM_DISTANCE
-					 - ECM_DISTANCE / options.cannonSmartness))));
+					 - ECM_DISTANCE / smartness))));
 	else
 	    range = ECM_DISTANCE;
 	break;
@@ -430,8 +438,8 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
     case CW_TRANSPORTER:
 	/* smarter cannons have a smaller chance of using a transporter when
 	   target is out of range */
-	if (options.cannonSmartness > 2
-	    || (int)(rfrac() * sqr(options.cannonSmartness + 1)))
+	if (smartness > 2
+	    || (int)(rfrac() * sqr(smartness + 1)))
 	    range = TRANSPORTER_DISTANCE;
 	break;
     case CW_GASJET:
@@ -467,11 +475,11 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 		&& BIT(pl->used, HAS_CLOAKING_DEVICE)
 		&& (int)(rfrac() * (pl->item[ITEM_CLOAK] + 1))
 		   > (int)(rfrac() * (c->item[ITEM_SENSOR] + 1)))
-	    || (options.cannonSmartness > 2
+	    || (smartness > 2
 		&& BIT(pl->used, HAS_PHASING_DEVICE)))
 	    continue;
 
-	switch (options.cannonSmartness) {
+	switch (smartness) {
 	case 0:
 	    ready = true;
 	    break;
@@ -522,7 +530,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	return;
     }
 
-    switch (options.cannonSmartness) {
+    switch (smartness) {
     case 0:
 	*dir = c->dir;
 	break;
@@ -553,7 +561,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     world_t *world = c->world;
     modifiers_t	mods;
     bool played = false;
-    int i;
+    int i, smartness = Cannon_get_smartness(c);
     double speed = options.shotSpeed;
     vector_t zero_vel = { 0.0, 0.0 };
 
@@ -580,7 +588,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 		mods.mini = (int)(rfrac() * MODS_MINI_MAX) + 1;
 		mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
 	    }
-	    speed = speed * 0.5 + 0.1 * options.cannonSmartness;
+	    speed = speed * 0.5 + 0.1 * smartness;
 	    vel.x = tcos(dir) * speed;
 	    vel.y = tsin(dir) * speed;
 	    Place_general_mine(world, NULL, c->team, GRAVITY|FROMCANNON,
@@ -608,7 +616,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    */
 	}
 	/* smarter cannons use more advanced missile types */
-	switch ((int)(rfrac() * (1 + options.cannonSmartness))) {
+	switch ((int)(rfrac() * (1 + smartness))) {
 	default:
 	    if (options.allowSmartMissiles) {
 		Fire_general_shot(world, NULL, c, c->team, c->pos,
@@ -641,7 +649,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	/* stun and blinding lasers are very dangerous,
 	   so we don't use them often */
 	if (BIT(world->rules->mode, ALLOW_LASER_MODIFIERS)
-	    && (rfrac() * (8 - options.cannonSmartness)) >= 1)
+	    && (rfrac() * (8 - smartness)) >= 1)
 	    mods.laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
 	Fire_general_laser(world, NULL, c->team, c->pos, dir, mods);
 	sound_play_sensors(c->pos, FIRE_LASER_SOUND);
@@ -655,9 +663,9 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	break;
     case CW_TRACTORBEAM:
 	/* smarter cannons use tractors more often and also push/pull longer */
-	c->tractor_is_pressor = (rfrac() * (options.cannonSmartness + 1) >= 1);
+	c->tractor_is_pressor = (rfrac() * (smartness + 1) >= 1);
 	c->tractor_target_pl = pl;
-	c->tractor_count = 11 + rfrac() * (3 * options.cannonSmartness + 1);
+	c->tractor_count = 11 + rfrac() * (3 * smartness + 1);
 	break;
     case CW_TRANSPORTER:
 	c->item[ITEM_TRANSPORTER]--;
@@ -688,8 +696,8 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			RED,
 			8,
 			(int)(300 + 400 * rfrac()),
-			dir - 4 * (4 - options.cannonSmartness),
-			dir + 4 * (4 - options.cannonSmartness),
+			dir - 4 * (4 - smartness),
+			dir + 4 * (4 - smartness),
 			0.1, speed * 4,
 			3.0, 20.0);
 	    c->item[ITEM_EMERGENCY_THRUST]--;
@@ -705,8 +713,8 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			RED,
 			8,
 			(int)(150 + 200 * rfrac()),
-			dir - 3 * (4 - options.cannonSmartness),
-			dir + 3 * (4 - options.cannonSmartness),
+			dir - 3 * (4 - smartness),
+			dir + 3 * (4 - smartness),
 			0.1, speed * 2,
 			3.0, 20.0);
 	}
@@ -722,7 +730,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	   can therefore narrow their bullet streams */
 	for (i = 0; i < (1 + 2 * c->item[ITEM_WIDEANGLE]); i++) {
 	    int a_dir = dir
-			+ (4 - options.cannonSmartness)
+			+ (4 - smartness)
 			* (-c->item[ITEM_WIDEANGLE] +  i);
 	    a_dir = MOD2(a_dir, RES);
 	    Fire_general_shot(world, NULL, c, c->team, c->pos,
@@ -733,7 +741,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	   target. */
 	for (i = 0; i < c->item[ITEM_REARSHOT]; i++) {
 	    int a_dir = (int)(dir + (RES / 2)
-			+ (4 - options.cannonSmartness)
+			+ (4 - smartness)
 			* (-((c->item[ITEM_REARSHOT] - 1) * 0.5) + i));
 	    a_dir = MOD2(a_dir, RES);
 	    Fire_general_shot(world, NULL, c, c->team, c->pos,
