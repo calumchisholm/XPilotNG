@@ -210,7 +210,6 @@ int		maxRoundTime;		/* max. duration of each round */
 
 bool		pLockServer;		/* Is server swappable out of memory?  */
 
-bool		ignore20MaxFPS;		/* ignore client maxFPS request if it is 20 */
 int             timerResolution;        /* OS timer resolution (ticks/s) */
 char            *password;              /* password for operator status */
 int             numberOfRounds;         /* how many rounds to play */
@@ -2313,16 +2312,6 @@ static optionDesc options[] = {
 	tuner_plock,
 	"Whether the server is prevented from being swapped out of memory.\n",
 	MAP("General")
-    },
-    {
-	"ignore20MaxFPS",
-	"ignore20MaxFPS",
-	"true",
-	&ignore20MaxFPS,
-	valBool,
-	tuner_dummy,
-	"Ignore client maxFPS request if it is 20 (the default setting).\n",
-	MAP(NULL)
     },
     {
 	"timerResolution",

@@ -3454,7 +3454,6 @@ static int Receive_fps_request(int ind)
 	if (fps > FPS) pl->player_fps = FPS;
 	if (fps < (FPS / 2)) pl->player_fps = (FPS+1) / 2;
 	if (fps == 0) pl->player_fps = FPS;
-	if ((fps == 20) && ignore20MaxFPS) pl->player_fps = FPS;
 	n = FPS - pl->player_fps;
 	if (n <= 0) {
 	    pl->player_count = 0;

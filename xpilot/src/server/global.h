@@ -231,7 +231,6 @@ extern int		maxRoundTime;
 extern int		roundtime;
 
 extern bool		useWreckage;
-extern bool		ignore20MaxFPS;
 extern int              timerResolution;
 extern char             *password;
 extern int              numberOfRounds;

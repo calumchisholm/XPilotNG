@@ -1686,7 +1686,7 @@ struct option {
     {
 	"maxFPS",
 	NULL,
-	"20",
+	"100",
 	KEY_DUMMY,
 	"Set client's maximum FPS supported.\n"
     },
