@@ -259,8 +259,8 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
     world_t *world = &World;
     wormhole_t *wormhole = Wormholes(world, gp->mapobj_ind);
 
-    /* this should never happen, because of the hitmask */
-    assert(wormhole->type != WORM_OUT);
+    if (wormhole->type == WORM_OUT)
+	return false;
 
     if (obj == NULL)
 	return true;
