@@ -210,7 +210,6 @@ extern struct options {
     int		specialBallTeam;
     bool	treasureCollisionDestroys;
     bool	treasureCollisionMayKill;
-    bool	treasureCollisionCostsFuel;
     bool	wreckageCollisionMayKill;
     bool	asteroidCollisionMayKill;
 

@@ -1609,16 +1609,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"treasureCollisionCostsFuel",
-	"treasureUnshieldedCollisionCostsFuel",
-	"false",
-	&options.treasureCollisionCostsFuel,
-	valBool,
-	tuner_dummy,
-	"Does a ball drain a player's fuel when the player touches it unshielded?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"wreckageCollisionMayKill",
 	"wreckageUnshieldedCollisionKills",
 	"false",

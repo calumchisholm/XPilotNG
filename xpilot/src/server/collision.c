@@ -645,7 +645,7 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
      * be destroyed.
      */
     Delta_mv(OBJ_PTR(pl), OBJ_PTR(ball));
-    if (options.treasureCollisionCostsFuel && !Player_uses_emergency_shield(pl))
+    if (!Player_uses_emergency_shield(pl))
 	Player_add_fuel(pl, ED_BALL_HIT);
 
     if (options.treasureCollisionDestroys) {
