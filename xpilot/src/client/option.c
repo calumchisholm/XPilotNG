@@ -334,6 +334,13 @@ void Store_option(xp_option_t *opt)
 	assert(0);
     }
 
+    /* Check that default value is in range */
+    /* NOTE: these assertions will hold also for options of other types */
+    assert(opt->int_defval >= opt->int_minval);
+    assert(opt->int_defval <= opt->int_maxval);
+    assert(opt->dbl_defval >= opt->dbl_minval);
+    assert(opt->dbl_defval <= opt->dbl_maxval);
+
     memcpy(&option, opt, sizeof(xp_option_t));
 
     STORE(xp_option_t, options, num_options, max_options, option);
