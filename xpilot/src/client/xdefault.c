@@ -141,8 +141,10 @@ bool Set_acc(xp_option_t *opt, int value)
   } else {
     new_acc_num = value;
     if (dpy) {
+#ifndef _WINDOWS
       XChangePointerControl(dpy, True, True, value,
 			    new_acc_denom, new_threshold);
+#endif
     }
     return true;
   }
@@ -156,8 +158,10 @@ bool Set_accdenom(xp_option_t *opt, int value)
   } else {
     new_acc_denom = value;
     if (dpy) {
-      XChangePointerControl(dpy, True, True, new_acc_num,
+#ifndef _WINDOWS
+	XChangePointerControl(dpy, True, True, new_acc_num,
 			    value, new_threshold);
+#endif
     }
     return true;
   }
@@ -171,8 +175,10 @@ bool Set_accthresh(xp_option_t *opt, int value)
   } else {    
     new_threshold = value;
     if (dpy) {
+#ifndef _WINDOWS
       XChangePointerControl(dpy, True, True, new_acc_num,
 			    new_acc_denom, value);
+#endif
     }
     return true;
   }
