@@ -1198,10 +1198,10 @@ void Frame_update(void)
 	     * Lower the frame rate for non-playing players
 	     * to reduce network load.
 	     */
-	    if (BIT(pl->status, PAUSE) && pausedFrameRate)
-		player_fps = pausedFrameRate;
-	    else if (waitingFrameRate)
-		player_fps = waitingFrameRate;
+	    if (BIT(pl->status, PAUSE) && pausedFPS)
+		player_fps = pausedFPS;
+	    else if (waitingFPS)
+		player_fps = waitingFPS;
 	}
 	player_fps = MIN(player_fps, pl->player_fps);
 

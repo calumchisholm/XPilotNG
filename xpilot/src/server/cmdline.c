@@ -318,8 +318,8 @@ bool		fastAim;		/* Turn before shooting in frame */
 bool		ignoreMaxFPS;		/* Temporary hack */
 bool		baselessPausing;
 bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
-int		pausedFrameRate;	/* Limited FPS for pausers */
-int		waitingFrameRate;	/* Limited FPS for waiters */
+int		pausedFPS;		/* Limited FPS for pausers */
+int		waitingFPS;		/* Limited FPS for waiters */
 
 /*
 ** Two functions which can be used if an option
@@ -3594,10 +3594,10 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"pausedFrameRate",
-	"pausedFrameRate",
+	"pausedFramesPerSecond",
+	"pausedFPS",
 	"0",
-	&pausedFrameRate,
+	&pausedFPS,
 	valInt,
 	tuner_dummy,
 	"Maximum FPS shown to paused players. 0 means full framerate.\n"
@@ -3605,10 +3605,10 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"waitingFrameRate",
-	"waitingFrameRate",
+	"waitingFramesPerSecond",
+	"waitingFPS",
 	"0",
-	&waitingFrameRate,
+	&waitingFPS,
 	valInt,
 	tuner_dummy,
 	"Maximum FPS shown to players waiting for a new round to start.\n"

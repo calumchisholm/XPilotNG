@@ -287,8 +287,8 @@ extern int		asteroidConcentratorRadius;
 extern DFLOAT		asteroidConcentratorProb;
 extern DFLOAT		gameDuration;
 extern bool		baselessPausing;
-extern int		pausedFrameRate;
-extern int		waitingFrameRate;
+extern int		pausedFPS;
+extern int		waitingFPS;
 extern int		game_lock;
 extern int		mute_baseless;
 
