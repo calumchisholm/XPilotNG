@@ -692,12 +692,6 @@ static int Cmd_get(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_ERROR;
     }
 
-    if (!strcasecmp(arg, "password") ||
-	!strcasecmp(arg, "mapData")) {
-	strcpy(msg, "Cannot retrieve that option.");
-	return CMD_RESULT_ERROR;
-    }
-
     i = Get_option_value(arg, value, sizeof(value));
 
     switch (i) {
@@ -706,6 +700,12 @@ static int Cmd_get(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_SUCCESS;
     case -2:
 	sprintf(msg, "No option named %s.", arg);
+	break;
+    case -3:
+	sprintf(msg, "Cannot show the value of this option");
+	break;
+    case -4:
+	sprintf(msg, "No value has been set for option %s", arg);
 	break;
     default:
 	strcpy(msg, "Generic error.");

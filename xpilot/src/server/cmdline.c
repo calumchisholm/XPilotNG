@@ -828,8 +828,8 @@ static option_desc options[] = {
 	&mapData,
 	valString,
 	tuner_none,
-	"The map's topology.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
+	"Block map topology.\n",
+	OPT_MAP
     },
     {
 	"allowPlayerCrashes",
@@ -3618,7 +3618,7 @@ static option_desc options[] = {
 	"Port of the teamcup status server.\n",
 	OPT_COMMAND | OPT_VISIBLE
     },
-    { 
+    {
 	"teamcupMatchNumber",
 	"match",
 	"0",
