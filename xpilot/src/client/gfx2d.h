@@ -57,15 +57,14 @@ typedef struct {
 
 typedef struct {
     int		width, height;
-    int		images;
+    int		count;
     RGB_COLOR	**data;
-
     bbox_t	*bbox;
 } xp_picture_t;
 
-int Picture_init(xp_picture_t *picture, int height, int width, int images);
+int Picture_init(xp_picture_t *picture, const char *filename, int count);
 int Picture_load( xp_picture_t *picture, const char *path);
-void Picture_rotate(xp_picture_t *picture);
+int Picture_rotate(xp_picture_t *picture);
 
 void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y, 
 		       RGB_COLOR color);

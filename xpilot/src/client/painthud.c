@@ -51,7 +51,7 @@
 #include "record.h"
 #include "xinit.h"
 #include "protoclient.h"
-#include "blockbitmaps.h"
+#include "bitmaps.h"
 
 char painthud_version[] = VERSION;
 
@@ -108,7 +108,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max)
 	x = view_width - (METER_WIDTH - xoff);
         xstr = WINSCALE(x) - (BORDER + XTextWidth(gameFont, title, strlen(title)));
     }
-    if (!blockBitmaps) {
+    if (1 || !blockBitmaps) {
 	Rectangle_add(RED,
 		      x+2, y+2,
 		      (int)(((METER_WIDTH-3)*val)/(max?max:1)), METER_HEIGHT-3);
@@ -127,11 +127,13 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max)
 	Segment_add(WHITE, x+mw3_4, y-1,	x+mw3_4, y+METER_HEIGHT+1);
     } else {
 	int width = WINSCALE((int)(((METER_WIDTH-3)*val)/(max?max:1)));
-	
+	printf("TODO: implement paint meter\n");
+        /*
 	PaintMeter(p_draw, BM_METER,
 		   WINSCALE(x), WINSCALE(y),
 		   WINSCALE(METER_WIDTH), WINSCALE(11),
 		   width);
+        */
         SET_FG(colors[WHITE].pixel);
     }
 

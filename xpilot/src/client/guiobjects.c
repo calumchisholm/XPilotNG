@@ -56,7 +56,7 @@
 #include "xinit.h"
 #include "protoclient.h"
 #include "portability.h"
-#include "blockbitmaps.h"
+#include "bitmaps.h"
 
 
 char guiobjects_version[] = VERSION;
@@ -123,9 +123,8 @@ void Gui_paint_ball(int x, int y)
 
 	x = X(x);
 	y = Y(y);
-	PaintBitmap(p_draw, BM_BALL, WINSCALE(x - BALL_RADIUS),
-		    WINSCALE(y - BALL_RADIUS), WINSCALE(BALL_RADIUS * 2 + 1),
-		    WINSCALE(BALL_RADIUS * 2 + 1), 0);
+	Bitmap_paint(p_draw, BM_BALL, WINSCALE(x - BALL_RADIUS),
+                     WINSCALE(y - BALL_RADIUS), 0);
     }
 }
 
@@ -231,13 +230,13 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 	y = Y(y);
 	if (teammine == 0) {
 	    SET_FG(colors[BLUE].pixel);
-	    PaintBitmap(p_draw, BM_MINE_OTHER, WINSCALE(x - 10), WINSCALE(y - 7),
-			WINSCALE(21), WINSCALE(15), 0);
+	    Bitmap_paint(p_draw, BM_MINE_OTHER, WINSCALE(x - 10), 
+                         WINSCALE(y - 7), 0);
 	}
 	else {
 	    SET_FG(colors[WHITE].pixel);
-	    PaintBitmap(p_draw, BM_MINE_TEAM, WINSCALE(x - 10), WINSCALE(y - 7),
-			WINSCALE(21), WINSCALE(15), 0);
+	    Bitmap_paint(p_draw, BM_MINE_TEAM, WINSCALE(x - 10), 
+                         WINSCALE(y - 7), 0);
 	}
 
 	if (name)
@@ -325,7 +324,8 @@ void Gui_paint_fastshot(int color, int x, int y)
     else {
 	int s_size = (shot_size > 8) ? 8 : shot_size ;
 	int z = s_size / 2;
-	PaintBitmap(p_draw, BM_BULLET, WINSCALE(x ) - z, WINSCALE(y ) - z, 8, 8, s_size - 1);
+	Bitmap_paint(p_draw, BM_BULLET, WINSCALE(x) - z, 
+                     WINSCALE(y) - z, s_size - 1);
     }
 }
 
@@ -337,7 +337,8 @@ void Gui_paint_teamshot(int color, int x, int y)
     else {
 	int s_size = (teamshot_size > 8) ? 8 : shot_size ;
 	int z = s_size / 2;
-	PaintBitmap(p_draw, BM_BULLET_OWN, WINSCALE(x ) - z, WINSCALE(y ) - z, 8, 8, s_size - 1);
+	Bitmap_paint(p_draw, BM_BULLET_OWN, WINSCALE(x) - z, 
+                     WINSCALE(y) - z, s_size - 1);
     }
 }
 
@@ -450,9 +451,9 @@ void Gui_paint_paused(int x, int y, int count)
 
     }
     else {
-	PaintBitmap(p_draw, BM_PAUSED, WINSCALE(X(x - BLOCK_SZ / 2)),
-		    WINSCALE(Y(y + BLOCK_SZ / 2)), WINSCALE(35), WINSCALE(35),
-		    (count <= 0 || loops % 10 >= 5) ? 1 : 0);
+	Bitmap_paint(p_draw, BM_PAUSED, WINSCALE(X(x - BLOCK_SZ / 2)),
+                     WINSCALE(Y(y + BLOCK_SZ / 2)),
+                     (count <= 0 || loops % 10 >= 5) ? 1 : 0);
     }
 }
 
@@ -492,9 +493,9 @@ void Gui_paint_refuel(int x0, int y0, int x1, int y1)
 	dx = (double)(x1 - x0) / 16;
 	dy = (double)(y1 - y0) / 16;
 	for (i = 0; i < 16; i++) {
-	    PaintBitmap(p_draw, BM_REFUEL, (int)(x0 + (dx * i) - size / 2),
-			(int)(y0 + (dy * i) - size / 2), size, size,
-			fuel[(loops + 16 - i) % 16]);
+	    Bitmap_paint(p_draw, BM_REFUEL, (int)(x0 + (dx * i) - size / 2),
+                         (int)(y0 + (dy * i) - size / 2),
+                         fuel[(loops + 16 - i) % 16]);
 	}
     }
 }
@@ -744,8 +745,7 @@ void Gui_paint_ship_phased(int ship_color, XPoint *points, int point_count)
 
 void generic_paint_ship(int x, int y, int ang, int ship)
 {
-    PaintBitmap(p_draw, ship, WINSCALE(X(x) - 16), WINSCALE(Y(y) - 16),
-		WINSCALE(32), WINSCALE(32), ang);
+    Bitmap_paint(p_draw, ship, WINSCALE(X(x) - 16), WINSCALE(Y(y) - 16), ang);
 }
 
 
@@ -842,10 +842,10 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     ship_color = Gui_calculate_ship_color(id, other);
 
     if (cloak == 0 && phased == 0) {
-	if (!blockBitmaps || !blockBitmapShips) {
+        if (!blockBitmaps || !blockBitmapShips) {
 	    Gui_paint_ship_uncloaked(id, points, ship_color, cnt);
-	}
-	else {
+        }
+        else {
 	    if (ship_color == BLUE)
 		ship_shape = BM_SHIP_FRIEND;
 	    else if (self != NULL && self->id != id) 
@@ -854,7 +854,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 		ship_shape = BM_SHIP_SELF;
 
 	    generic_paint_ship(x, y, dir, ship_shape);
-	}
+        }
 
     }
 

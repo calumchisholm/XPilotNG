@@ -605,6 +605,102 @@ Pixmap xpm_pixmap_from_file(char *filename)
     return pixmap;
 }
 
+int xpm_picture_from_file(xp_picture_t *pic, char *filename)
+{
+    int            x, y, p, i, k, count;
+    XPM            xpm;
+    enum XPM_key   key;
+    RGB_COLOR      colors[256];
+    XColor	   xcolor;
+    char	   *color_name;
+
+    memset(&xpm, 0, sizeof(xpm));
+    if (xpm_read_xpm_from_file(filename, &xpm)) return FALSE;
+
+    if (mono) {
+        key = XPM_m;
+    }
+    else if (visual->class == GrayScale) {
+        if (maxColors == 4) {
+            key = XPM_g4;
+        }
+        else {
+            key = XPM_g;
+        }
+    }
+    else {
+        key = XPM_c;
+    }
+    
+    for (i = 0; i < xpm.ncolors; i++) {
+	memset(&xcolor, 0, sizeof(xcolor));
+	color_name = NULL;
+	for (k = key; k >= 0; k--) {
+	    if (xpm.colors[i].keys[k]) {
+		color_name = xpm.colors[i].keys[k];
+		if (XParseColor(dpy, DefaultColormap(dpy, DefaultScreen(dpy)),
+				color_name, &xcolor)) {
+		    break;
+		}
+		printf("Can't parse color \"%s\"\n", color_name);
+		color_name = NULL;
+	    }
+	}
+	if (!color_name) {
+	    for (k = key + 1; k <= XPM_c; k++) {
+		if (xpm.colors[i].keys[k]) {
+		    color_name = xpm.colors[i].keys[k];
+		    if (XParseColor(dpy, DefaultColormap(dpy, DefaultScreen(dpy)),
+				    color_name, &xcolor)) {
+			break;
+		    }
+		    printf("Can't parse color \"%s\"\n", color_name);
+		    color_name = NULL;
+		}
+	    }
+	}
+	if (!color_name) {
+	    if (xpm.colors[i].keys[XPM_s]
+		&& !strcmp(xpm.colors[i].keys[XPM_s], "None")) {
+		colors[i] = 0;
+	    }
+	    else {
+		return FALSE;
+	    }
+	}
+	else {
+            colors[i] = 
+                RGB24(xcolor.red >> 8, xcolor.green >> 8, xcolor.blue >> 8);
+	}
+    }
+
+    pic->height = xpm.height;
+    if (pic->count > 0) {
+        count = 1;
+        pic->width = xpm.width;
+    } else {
+        count = -pic->count;
+        pic->width = xpm.width / count;
+    }
+
+    for (p = 0; p < count; p++) {
+        if (!(pic->data[p] = 
+              malloc(pic->width * pic->height * sizeof(RGB_COLOR)))) {
+            error("Not enough memory.");
+            return -1;
+        }
+        
+        for (y = 0 ; y < pic->height ; y++) {
+	    for (x = 0; x < pic->width ; x++) {
+                i = x + p * pic->width + y * xpm.width;
+		Picture_set_pixel(pic, p, x, y, colors[xpm.pixels[i]]);
+	    }
+	}
+    }
+
+    return TRUE;
+}
+
 XImage *xpm_image_from_pixmap(Pixmap pixmap)
 {
     XImage		*img;

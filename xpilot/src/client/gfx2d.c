@@ -42,7 +42,6 @@
 #include "const.h"
 #include "portability.h"
 
-
 #ifndef PATH_MAX
 #define PATH_MAX	1023
 #endif
@@ -50,51 +49,38 @@
 
 extern char	*texturePath;		/* Path list of texture directories */
 
+/* from xpmread.c */
+extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
+
 
 /*
-    Purpose: initialize dimensions of a xp_picture structure and 
-    allocate memory for it.
+    Purpose: initialize xp_picture structure and load it from file.
     Error handling is incomplete.
 
     return 0 on success.
     return -1 on error.
 */
 
-int Picture_init(xp_picture_t *picture, int height, int width, int images)
+int Picture_init (xp_picture_t *picture, const char *filename, int count)
 {
-    int			i;
-
-    picture->height = height;
-    picture->width = width;
-    picture->images = images;
-    picture->data  = (RGB_COLOR **) malloc(images * sizeof(RGB_COLOR*));
-
+    picture->count = count;
+    picture->data = (RGB_COLOR **) malloc(ABS(count) * sizeof(RGB_COLOR*));
     if (!picture->data) {
 	error("Not enough memory.");
 	return -1;
     }
-    for (i = 0; i < images; i++) {
-	picture->data[i] = (RGB_COLOR *) malloc(picture->width * picture->height * 
-						sizeof(RGB_COLOR));
-	if (!picture->data[i]) {
-	    error("Not enough memory.");
-	    return -1;
-	}
-    }
 
-    picture->bbox = (bbox_t *) malloc(images * sizeof(bbox_t));
+    if (Picture_load(picture, filename) == -1) return -1;
+    if (count > 1) 
+        if (Picture_rotate(picture) == -1) return -1;
+    
+    picture->bbox = (bbox_t *) malloc(ABS(count) * sizeof(bbox_t));
     if (!picture->bbox) {
 	error("Not enough memory.");
 	return -1;
     }
-    for (i = 0; i < images; i++) {
-	/* set bounding box to safe values. */
-	picture->bbox[i].xmin = 0;
-	picture->bbox[i].xmax = width - 1;
-	picture->bbox[i].ymin = 0;
-	picture->bbox[i].ymax = height - 1;
-    }
-
+    Picture_get_bounding_box(picture);
+    
     return 0;
 }
 
@@ -222,15 +208,23 @@ int Picture_load(xp_picture_t *picture, const char *filename)
     int			x, y;
     int			r, g, b;
     int			p;
-    int			width, height, maxval;
-    int			images;
+    int			width, height, maxval, count;
     char		path[PATH_MAX + 1];
-
 
     if (!Picture_find_path(filename, path)) {
 	error("Cannot find picture file \"%s\"", filename);
 	return -1;
     }
+
+    if (strcmp("xpm", filename + strlen(filename) - 3) == 0) {
+        if (!xpm_picture_from_file(picture, path)) {
+            error("Failed to load XPM bitmap \"%s\"", path);
+            return -1;
+        }
+        return 0;
+    } 
+
+
     if ((f = fopen(path, "rb")) == NULL) {
 	error("Cannot open \"%s\"", path);
 	return -1;
@@ -259,32 +253,41 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 	return -1;
     }
 
-    /* images in file might be 1, and will be rotated later on */
-
-    if (picture->width * picture->images == width || picture->width == width ) {
-	images = width / picture->width;
-    } else  {
-	error("image size is wrong (%d %d) (%d %d)", 
-	      picture->width, picture->height, width, height); 
-	fclose(f);
-	return -1;
+    picture->height = height;
+    if (picture->count > 0) {
+        count = 1;
+        picture->width = width;
+    } else {
+        count = -picture->count;
+        picture->width = width / count;
     }
 
+    for (p = 0; p < count; p++) {
+        if (!(picture->data[p] = 
+              malloc(picture->width * picture->height * sizeof(RGB_COLOR)))) {
+            error("Not enough memory.");
+            return -1;
+        }
+    }
+    
     for (y = 0 ; y < picture->height ; y++) {
-	for (p = 0; p < images ; p++) {
-	    for (x = 0; x < picture->width ; x++) {
-		r = getc(f);
-		g = getc(f);
-		b = getc(f);
-		Picture_set_pixel(picture, p, x, y, RGB24(r, g, b));
-	    }
-	}
+        for (p = 0; p < count ; p++) {
+            for (x = 0; x < picture->width ; x++) {
+                r = getc(f);
+                g = getc(f);
+                b = getc(f);
+                Picture_set_pixel(picture, p, x, y, RGB24(r, g, b));
+            }
+        }
+        /* skip the rest */
+        for (p = width % count * 3; p > 0; p--) getc(f);
     }
-
+    
     fclose(f);
 
     return 0;
 }
+
 
 /*
     Purpose: We want to provide rotation, a picture which is rotated has 
@@ -295,12 +298,20 @@ int Picture_load(xp_picture_t *picture, const char *filename)
     the corresponding source colorvalue, this assures there will be no
     gaps in the image.
 */
-void Picture_rotate(xp_picture_t *picture)
+int Picture_rotate(xp_picture_t *picture)
 {
     int size, x, y, image;
     int color;    
     size = picture->height;
-    for (image = 1; image < picture->images; image++) {
+
+    for (image = 1; image < picture->count; image++) {
+
+        if (!(picture->data[image] = 
+              malloc(picture->width * picture->height * sizeof(RGB_COLOR)))) {
+            error("Not enough memory.");
+            return -1;
+        }
+        
 	for (y = 0; y < size; y++) {
 	    for (x = 0; x < size; x++) {
 		color = Picture_get_rotated_pixel(picture, x, y, image);
@@ -308,6 +319,7 @@ void Picture_rotate(xp_picture_t *picture)
 	    }
 	}
     }
+    return 0;
 }
 
 /*
@@ -403,7 +415,7 @@ RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture,
     int		angle;
     double	rot_x, rot_y;
 
-    angle = ((image  * RES) / picture->images) % 128;
+    angle = ((image  * RES) / picture->count) % 128;
 
     x -= picture->width / 2;
     y -= picture->height / 2;
@@ -541,7 +553,7 @@ void Picture_get_bounding_box(xp_picture_t *picture)
     int		color;
     bbox_t	*box;
 
-    for (p = 0; p < picture->images ; p++) {
+    for (p = 0; p < ABS(picture->count) ; p++) {
 	box = &picture->bbox[p];
 	box->xmin = picture->width - 1;
 	box->xmax = 0;

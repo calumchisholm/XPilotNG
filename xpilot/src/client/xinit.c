@@ -53,6 +53,7 @@
 #include "dbuff.h"
 #include "protoclient.h"
 #include "portability.h"
+#include "bitmaps.h"
 
 /*
  * Item structures.
@@ -621,6 +622,7 @@ int Init_top(void)
 				    ITEM_SIZE, ITEM_SIZE);
     }
 
+
     /*
      * Creates and initializes the graphic contexts.
      */
@@ -692,6 +694,15 @@ int Init_top(void)
     if (dbuf_state->type == COLOR_SWITCH) {
 	XSetPlaneMask(dpy, gc, dbuf_state->drawing_planes);
     }
+
+    /*
+     * Create all the other bitmaps
+     */
+    if (blockBitmaps) {
+        Bitmaps_init();
+        Bitmaps_create(top);
+    }
+
 
 #endif
 
@@ -943,6 +954,8 @@ void WinXCreateItemBitmaps()
 				       ITEM_SIZE, ITEM_SIZE, colors[RED].pixel);
     }
     Colors_init_block_bitmaps();
+    Bitmaps_init();
+    Bitmaps_create(draw);
     
 }
 #endif

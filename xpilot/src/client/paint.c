@@ -56,7 +56,7 @@
 #include "paintdata.h"
 #include "record.h"
 #include "xinit.h"
-#include "blockbitmaps.h"
+#include "bitmaps.h"
 #include "portability.h"
 #include "client.h"
 
@@ -271,9 +271,6 @@ void Paint_frame(void)
 	XSetFunction(dpy, gc, GXcopy);
 	SET_FG(colors[BLACK].pixel);
     }
-    if (cacheShips && blockBitmaps) {
-	Cache_ships(draw);
-    }
     prev_prev_damaged = prev_damaged;
     prev_damaged = damaged;
 
@@ -408,10 +405,7 @@ void Paint_score_background(int thisLine)
 				  0, 0,
 				  players_width, BG_IMAGE_HEIGHT); )
 
-	PaintBitmap(players, BM_SCORE_BG,
-		    0, 0,
-		    players_width, BG_IMAGE_HEIGHT,
-		    0);
+	Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
 
 	if (players_height > BG_IMAGE_HEIGHT + LOGO_HEIGHT) {
 	    XFillRectangle(dpy, players, scoreListGC,
@@ -419,10 +413,7 @@ void Paint_score_background(int thisLine)
 			   players_width,
 			   players_height - (BG_IMAGE_HEIGHT + LOGO_HEIGHT));
 	}
-	PaintBitmap(players, BM_LOGO,
-		    0, players_height - LOGO_HEIGHT,
-		    players_width, LOGO_HEIGHT,
-		    0);
+	Bitmap_paint(players, BM_LOGO, 0, players_height - LOGO_HEIGHT, 0);
 
 	XFlush(dpy);
     }

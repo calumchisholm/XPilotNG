@@ -46,6 +46,7 @@
 #include "error.h"
 #include "dbuff.h"
 #include "protoclient.h"
+#include "bitmaps.h"
 
 
 char colors_version[] = VERSION;
@@ -684,16 +685,6 @@ int Colors_init_block_bitmaps(void)
 	    blockBitmaps = false;
 	}
     }
-    if (blockBitmaps) {
-	if (Block_bitmaps_create() == -1) {
-	    /*
-	    ** not sure if this is possible after
-	    ** blockbitmap colors have been created.
-	    */
-	    blockBitmaps = false;
-	}
-    }
-
     return (blockBitmaps == true) ? 0 : -1;
 }
 

@@ -56,7 +56,7 @@
 #include "portability.h"
 #include "guiobjects.h"
 #include "gfx3d.h"
-#include "blockbitmaps.h" /* can go away if Paint_item_symbol is moved to gui_objects.c */
+#include "bitmaps.h" /* can go away if Paint_item_symbol is moved to gui_objects.c */
 
 char paintobjects_version[] = VERSION;
 
@@ -136,7 +136,7 @@ void Paint_item_symbol(u_byte type, Drawable d, GC mygc, int x, int y, int color
     XChangeGC(dpy, mygc, GCFillStyle, &gcv);
 #endif
     } else {
-	  PaintBitmap(d, BM_ALL_ITEMS, x, y, ITEM_SIZE, ITEM_SIZE, type); 	
+	  Bitmap_paint(d, BM_ALL_ITEMS, x, y, type);
     }
 }
 

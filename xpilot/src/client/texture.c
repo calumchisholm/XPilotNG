@@ -58,6 +58,8 @@
 
 char texture_version[] = VERSION;
 
+#if 0
+
 enum TextureStatus {
     TextureUnloaded = 0,
     TextureLoaded = 1,
@@ -202,5 +204,27 @@ Pixmap Texture_decor(void)
 Pixmap Texture_ball(void)
 {
     return Texture_load(&ball_texture_info);
+}
+
+#endif
+
+#include "bitmaps.h"
+
+Pixmap Texture_wall(void)
+{
+    if (!blockBitmaps) return None;
+    return pixmaps[BM_WALL_TEXTURE].bitmaps[0].bitmap;
+}
+
+Pixmap Texture_decor(void)
+{
+    if (!blockBitmaps) return None;
+    return pixmaps[BM_DECOR_TEXTURE].bitmaps[0].bitmap;
+}
+
+Pixmap Texture_ball(void)
+{
+    if (!blockBitmaps) return None;
+    return pixmaps[BM_BALL_TEXTURE].bitmaps[0].bitmap;
 }
 

@@ -24,6 +24,7 @@
 #ifndef XPM_READ_H
 #define XPM_READ_H
 
+#include "gfx2d.h"
 /*
  * This XPM loader is based upon the XPM 3.0 specification.
  * It was written from scratch because we needed a small
@@ -36,6 +37,7 @@
  */
 extern Pixmap xpm_pixmap_from_data(const char **data);
 extern Pixmap xpm_pixmap_from_file(char *filename);
+extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
 #ifndef	_WINDOWS
 extern XImage *xpm_image_from_pixmap(Pixmap pixmap);
 #endif
