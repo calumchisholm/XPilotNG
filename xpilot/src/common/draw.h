@@ -140,8 +140,10 @@ extern void Calculate_shield_radius(shipobj *w);
 extern int Validate_shape_str(char *str);
 extern void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 				  unsigned shape_version);
+extern int shape2wire(char *ship_shape_str, shipobj *w);
 extern void Rotate_point(shapepos pt[RES]);
 extern void Rotate_position(position pt[RES]);
+extern void Rotate_ship(shipobj *w);
 extern shapepos ipos2shapepos(ipos pos);
 extern shipobj *do_parse_shape(char *str);
 

@@ -54,19 +54,7 @@ int	shapeLimits;
 
 extern void	Make_table(void);
 
-#if 0
-
-void Rotate_point(position pt[RES])
-{
-    int			i;
-
-    for (i = 1; i < RES; i++) {
-	pt[i].x = tcos(i) * pt[0].x - tsin(i) * pt[0].y;
-	pt[i].y = tsin(i) * pt[0].x + tcos(i) * pt[0].y;
-    }
-}
-
-static void Rotate_ship(shipobj *w)
+void Rotate_ship(shipobj *w)
 {
     int			i;
 
@@ -97,6 +85,8 @@ static void Rotate_ship(shipobj *w)
 	Rotate_point(&w->m_rack[i][0]);
     }
 }
+
+#if 0
 
 /*
  * Return a pointer to a default ship.
@@ -1084,6 +1074,7 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 
     return 0;
 }
+#endif
 
 static shipobj *do_parse_shape(char *str)
 {
@@ -1131,8 +1122,6 @@ void Free_ship_shape(shipobj *w)
 	free(w);
     }
 }
-
-#endif
 
 shipobj *Parse_shape_str(char *str)
 {

@@ -75,38 +75,6 @@ void Rotate_position(position pt[RES])
     }
 }
 
-static void Rotate_ship(shipobj *w)
-{
-    int			i;
-
-    for (i = 0; i < w->num_points; i++) {
-	Rotate_point(&w->pts[i][0]);
-    }
-    Rotate_point(&w->engine[0]);
-    Rotate_point(&w->m_gun[0]);
-    for (i = 0; i < w->num_l_gun; i++) {
-	Rotate_point(&w->l_gun[i][0]);
-    }
-    for (i = 0; i < w->num_r_gun; i++) {
-	Rotate_point(&w->r_gun[i][0]);
-    }
-    for (i = 0; i < w->num_l_rgun; i++) {
-	Rotate_point(&w->l_rgun[i][0]);
-    }
-    for (i = 0; i < w->num_r_rgun; i++) {
-	Rotate_point(&w->r_rgun[i][0]);
-    }
-    for (i = 0; i < w->num_l_light; i++) {
-	Rotate_point(&w->l_light[i][0]);
-    }
-    for (i = 0; i < w->num_r_light; i++) {
-	Rotate_point(&w->r_light[i][0]);
-    }
-    for (i = 0; i < w->num_m_rack; i++) {
-	Rotate_point(&w->m_rack[i][0]);
-    }
-}
-
 /*
  * Return a pointer to a default ship.
  * This function should always succeed,
@@ -160,7 +128,7 @@ shipobj *Default_ship(void)
     return &sh;
 }
 
-static int shape2wire(char *ship_shape_str, shipobj *w)
+int shape2wire(char *ship_shape_str, shipobj *w)
 {
 /*
  * Macros to simplify limit-checking for ship points.
@@ -1082,53 +1050,6 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
     Rotate_ship(w);
 
     return 0;
-}
-
-shipobj *do_parse_shape(char *str)
-{
-    shipobj		*w;
-
-    if (!str || !*str) {
-	if (debugShapeParsing) {
-	    xpprintf("shape str not set\n");
-	}
-	return Default_ship();
-    }
-    if (!(w = (shipobj *)malloc(sizeof(*w)))) {
-	error("No mem for ship shape");
-	return Default_ship();
-    }
-    if (shape2wire(str, w) != 0) {
-	free(w);
-	if (debugShapeParsing) {
-	    xpprintf("shape2wire failed\n");
-	}
-	return Default_ship();
-    }
-    if (debugShapeParsing) {
-	xpprintf("shape2wire succeeded\n");
-    }
-
-    return(w);
-}
-
-void Free_ship_shape(shipobj *w)
-{
-    if (w != NULL && w != Default_ship()) {
-	if (w->num_points > 0 && w->pts[0]) free(w->pts[0]);
-	if (w->num_l_gun > 0 && w->l_gun[0]) free(w->l_gun[0]);
-	if (w->num_r_gun > 0 && w->r_gun[0]) free(w->r_gun[0]);
-	if (w->num_l_rgun > 0 && w->l_rgun[0]) free(w->l_rgun[0]);
-	if (w->num_r_rgun > 0 && w->r_rgun[0]) free(w->r_rgun[0]);
-	if (w->num_l_light > 0 && w->l_light[0]) free(w->l_light[0]);
-	if (w->num_r_light > 0 && w->r_light[0]) free(w->r_light[0]);
-	if (w->num_m_rack > 0 && w->m_rack[0]) free(w->m_rack[0]);
-#ifdef	_NAMEDSHIPS
-	if (w->name) free(w->name);
-	if (w->author) free(w->author);
-#endif
-	free(w);
-    }
 }
 
 void Calculate_shield_radius(shipobj *w)
