@@ -611,8 +611,6 @@ struct player {
     int		rectype;		/* normal, saved or spectator */
     struct RankInfo	*rank;
 
-    int		idleCount;		/* idle */
-
     double	pauseTime;		/* seconds player has paused */
     double	idleTime;		/* seconds player has idled */
 

@@ -242,7 +242,7 @@ void Pause_player(player_t *pl, bool on)
 	if (pl->pause_count <= 0) {
 	    bool toolate = false;
 
-	    pl->idleCount = 0;
+	    pl->idleTime = 0;
 	    CLR_BIT(pl->status, PAUSE);
 	    updateScores = true;
 	    if (BIT(world->rules->mode, LIMITED_LIVES))

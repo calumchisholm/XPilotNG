@@ -506,7 +506,6 @@ int Init_player(int ind, shipshape_t *ship)
     Rank_ClearKills(pl);
     Rank_ClearDeaths(pl);
 
-    pl->idleCount = 0;
     pl->pauseTime = 0;
     pl->idleTime = 0;
     pl->flooding = -1;
