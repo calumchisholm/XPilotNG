@@ -71,9 +71,6 @@ static void Print_default_value(xp_option_t *opt)
 	else
 	    printf("        There is no default value for this option.\n");
 	break;
-    case xp_color_option:
-	assert(0 && "TODO");
-	break;
     case xp_key_option:
 	if (opt->key_defval && strlen(opt->key_defval) > 0)
 	    printf("        The default %s: %s.\n",

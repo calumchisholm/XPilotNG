@@ -30,7 +30,6 @@ typedef enum {
     xp_int_option,
     xp_double_option,
     xp_string_option,
-    xp_color_option,
     xp_key_option,
 } xp_option_type_t;
 
@@ -42,8 +41,6 @@ typedef bool (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
 typedef bool (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
 typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
 typedef const char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
-typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
-
 
 /*
  * NOTE: DON'T ACCESS THIS STRUCTURE DIRECTLY, USE THE INITIALIZER MACROS,
@@ -104,9 +101,6 @@ struct xp_option {
     xp_string_option_setfunc_t str_setfunc;
     xp_string_option_getfunc_t str_getfunc;
 
-    /* color option stuff */
-    /*color_t *color_ptr;*/
-
     /* key option stuff */
 
 #define XP_KEY_OPTION_DUMMY \
@@ -141,13 +135,6 @@ extern void Usage(void);
 extern const char *Get_keyHelpString(keys_t key);
 extern const char *Get_keyResourceString(keys_t key);
 extern const char *Option_value_to_string(xp_option_t *opt);
-
-/*
- * Client implementations should call this function to set a callback for
- * handling key option bindings.
- */
-extern void Set_key_binding_callback(xp_key_binding_callback_t callback);
-
 
 void Store_option(xp_option_t *);
 
