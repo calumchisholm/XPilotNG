@@ -494,9 +494,9 @@ static void Misc_object_update(void)
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {
 	    wireobject *wireobj = WIRE_PTR(obj);
-	    /* kps - fix */
 	    wireobj->rotation =
-		(wireobj->rotation + (int) (wireobj->turnspeed * RES)) % RES;
+		(wireobj->rotation
+		 + (int) (wireobj->turnspeed * timeStep * RES)) % RES;
 	}
 
 	else if (BIT(obj->type, OBJ_PULSE)) {
@@ -656,7 +656,7 @@ static void Transporter_update(void)
     }
 }
 
-static void Player_turns(void)
+static void Players_turn(void)
 {
     int i;
     player *pl;
@@ -763,6 +763,89 @@ static void Use_items(player *pl)
     }
 }
 
+/*
+ * Player is refueling.
+ */
+static void Do_refuel(player *pl)
+{
+    fuel_t *fs = Fuels(pl->fs);
+
+    if ((Wrap_length(pl->pos.cx - fs->pos.cx,
+		     pl->pos.cy - fs->pos.cy)
+	 > 90.0 * CLICK)
+	|| (pl->fuel.sum >= pl->fuel.max)
+	|| BIT(pl->used, HAS_PHASING_DEVICE)
+	|| (BIT(World.rules->mode, TEAM_PLAY)
+	    && teamFuel
+	    && fs->team != pl->team)) {
+	CLR_BIT(pl->used, HAS_REFUEL);
+    } else {
+	int n = pl->fuel.num_tanks;
+	int ct = pl->fuel.current;
+
+	do {
+	    if (fs->fuel > REFUEL_RATE * timeStep) {
+		fs->fuel -= REFUEL_RATE * timeStep;
+		fs->conn_mask = 0;
+		fs->last_change = frame_loops;
+		Add_fuel(&(pl->fuel), REFUEL_RATE * timeStep);
+	    } else {
+		Add_fuel(&(pl->fuel), fs->fuel);
+		fs->fuel = 0;
+		fs->conn_mask = 0;
+		fs->last_change = frame_loops;
+		CLR_BIT(pl->used, HAS_REFUEL);
+		break;
+	    }
+	    if (pl->fuel.current == pl->fuel.num_tanks)
+		pl->fuel.current = 0;
+	    else
+		pl->fuel.current += 1;
+	} while (n--);
+	pl->fuel.current = ct;
+    }
+}
+
+/*
+ * Player is repairing a target.
+ */
+static void Do_repair(player *pl)
+{
+    target_t *targ = Targets(pl->repair_target);
+
+    if ((Wrap_length(pl->pos.cx - targ->pos.cx,
+		     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
+	|| targ->damage >= TARGET_DAMAGE
+	|| targ->dead_time > 0
+	|| BIT(pl->used, HAS_PHASING_DEVICE))
+	CLR_BIT(pl->used, HAS_REPAIR);
+    else {
+	int n = pl->fuel.num_tanks;
+	int ct = pl->fuel.current;
+
+	do {
+	    if (pl->fuel.tank[pl->fuel.current]
+		> REFUEL_RATE * timeStep) {
+		targ->damage += TARGET_FUEL_REPAIR_PER_FRAME;
+		targ->conn_mask = 0;
+		targ->last_change = frame_loops;
+		Add_fuel(&(pl->fuel), -REFUEL_RATE * timeStep);
+		if (targ->damage > TARGET_DAMAGE) {
+		    targ->damage = TARGET_DAMAGE;
+		    break;
+		}
+	    } else
+		CLR_BIT(pl->used, HAS_REPAIR);
+
+	    if (pl->fuel.current == pl->fuel.num_tanks)
+		pl->fuel.current = 0;
+	    else
+		pl->fuel.current += 1;
+	} while (n--);
+	pl->fuel.current = ct;
+    }
+}
+
 
 /********** **********
  * Updating objects and the like.
@@ -797,7 +880,7 @@ void Update_objects(void)
     Robot_update();
 
     if (fastAim)
-	Player_turns();
+	Players_turn();
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
@@ -846,7 +929,7 @@ void Update_objects(void)
     Target_update();
 
     if (!fastAim)
-	Player_turns();
+	Players_turn();
 
     /* * * * * *
      *
@@ -954,81 +1037,11 @@ void Update_objects(void)
 	    }
 	}
 
-	if (BIT(pl->used, HAS_REFUEL)) {
-	    fuel_t *fs = Fuels(pl->fs);
+	if (BIT(pl->used, HAS_REFUEL))
+	    Do_refuel(pl);
 
-	    if ((Wrap_length(pl->pos.cx - fs->pos.cx,
-			     pl->pos.cy - fs->pos.cy)
-		 > 90.0 * CLICK)
-		|| (pl->fuel.sum >= pl->fuel.max)
-		|| BIT(pl->used, HAS_PHASING_DEVICE)
-		|| (BIT(World.rules->mode, TEAM_PLAY)
-		    && teamFuel
-		    && fs->team != pl->team)) {
-		CLR_BIT(pl->used, HAS_REFUEL);
-	    } else {
-		int n = pl->fuel.num_tanks;
-		int ct = pl->fuel.current;
-
-		do {
-		    if (fs->fuel > REFUEL_RATE * timeStep) {
-			fs->fuel -= REFUEL_RATE * timeStep;
-			fs->conn_mask = 0;
-			fs->last_change = frame_loops;
-			Add_fuel(&(pl->fuel), REFUEL_RATE * timeStep);
-		    } else {
-			Add_fuel(&(pl->fuel), fs->fuel);
-			fs->fuel = 0;
-			fs->conn_mask = 0;
-			fs->last_change = frame_loops;
-			CLR_BIT(pl->used, HAS_REFUEL);
-			break;
-		    }
-		    if (pl->fuel.current == pl->fuel.num_tanks)
-			pl->fuel.current = 0;
-		    else
-			pl->fuel.current += 1;
-		} while (n--);
-		pl->fuel.current = ct;
-	    }
-	}
-
-	/* target repair */
-	if (BIT(pl->used, HAS_REPAIR)) {
-	    target_t *targ = Targets(pl->repair_target);
-
-	    if ((Wrap_length(pl->pos.cx - targ->pos.cx,
-			     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
-		|| targ->damage >= TARGET_DAMAGE
-		|| targ->dead_time > 0
-		|| BIT(pl->used, HAS_PHASING_DEVICE))
-		CLR_BIT(pl->used, HAS_REPAIR);
-	    else {
-		int n = pl->fuel.num_tanks;
-		int ct = pl->fuel.current;
-
-		do {
-		    if (pl->fuel.tank[pl->fuel.current]
-			> REFUEL_RATE * timeStep) {
-			targ->damage += TARGET_FUEL_REPAIR_PER_FRAME;
-			targ->conn_mask = 0;
-			targ->last_change = frame_loops;
-			Add_fuel(&(pl->fuel), -REFUEL_RATE * timeStep);
-			if (targ->damage > TARGET_DAMAGE) {
-			    targ->damage = TARGET_DAMAGE;
-			    break;
-			}
-		    } else
-			CLR_BIT(pl->used, HAS_REPAIR);
-
-		    if (pl->fuel.current == pl->fuel.num_tanks)
-			pl->fuel.current = 0;
-		    else
-			pl->fuel.current += 1;
-		} while (n--);
-		pl->fuel.current = ct;
-	    }
-	}
+	if (BIT(pl->used, HAS_REPAIR))
+	    Do_repair(pl);
 
 	if (pl->fuel.sum <= 0) {
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_CLOAKING_DEVICE|HAS_DEFLECTOR);
