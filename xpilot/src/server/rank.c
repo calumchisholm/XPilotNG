@@ -361,8 +361,10 @@ bool Rank_get_stats(const char *name, char *buf, size_t size)
     if (r == NULL)
 	return false;
 
-    snprintf(buf, size, "%-15s  %4d/%4d, R: %4d, S: %6d, %d/%d/%d/%d/%.2f",
-	     r->name, r->kills, r->deaths, r->rounds, r->shots,
+    snprintf(buf, size,
+	     "%-15s  SC: %7.1f  K/D: %5d/%5d  R: %4d  SH: %6d  "
+	     "B: %d/%d/%d/%d/%.2f",
+	     r->name, r->score, r->kills, r->deaths, r->rounds, r->shots,
 	     r->ballsCashed, r->ballsSaved, r->ballsWon, r->ballsLost,
 	     r->bestball);
 
