@@ -55,7 +55,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private bsh.Interpreter interpreter;
     
     public MainFrame() throws Exception {
-        super("jXPMap Editor");
+        super("XPilotNG Map Editor");
         canvas = new MapCanvas();
         getContentPane().add(canvas, BorderLayout.CENTER);
         buildMenuBar();
@@ -192,17 +192,15 @@ public class MainFrame extends JFrame implements ActionListener {
         tb1.add(newToggle("eraseMode", "/images/eraseicon.gif", "Erasing mode"));
         tb1.add(newToggle("copyMode", "/images/copyicon.gif", "Copy mode"));
         tb1.addSeparator();        
+        tb1.add(newButton("undo", "/images/undo.gif", "Undo"));
+        tb1.add(newButton("redo", "/images/redo.gif", "Redo"));  
+        tb1.addSeparator();        
+        tb1.add(makeGridSpinner());
+        tb1.add(makeGridToggle());
+        tb1.add(makeFastRenderingToggle());
         tb1.add(newButton("zoomIn", "/images/zoominicon.gif", "Zoom in"));
         tb1.add(newButton("zoomOut", "/images/zoomouticon.gif", "Zoom out"));
         tb1.add(lblZoom);
-        tb1.addSeparator();
-        tb1.add(newButton("undo", "/images/undo.gif", "Undo"));
-        tb1.add(newButton("redo", "/images/redo.gif", "Redo"));  
-        tb1.addSeparator();
-        tb1.add(makeGridSpinner());
-        tb1.add(makeGridToggle());
-        tb1.addSeparator();
-        tb1.add(makeFastRenderingToggle());
         
         tb2.add(newToggle("newWall", "/images/polyicon.gif", "New wall"));        
         tb2.add(newToggle("newFuel", "/images/fuelicon.gif", "New fuel station"));
@@ -301,7 +299,6 @@ public class MainFrame extends JFrame implements ActionListener {
                         canvas.setGrid(getNumber().intValue());
                 }
             });
-        gridSpinner.setEnabled(false);
         gridSpinner.setToolTipText("Edit grid size");
         gridSpinner.setPreferredSize(new Dimension(34, 26));
         gridSpinner.setMaximumSize(new Dimension(34, 26));
@@ -339,10 +336,8 @@ public class MainFrame extends JFrame implements ActionListener {
     private void grid() {
         if (gridToggle.isSelected()) {
             canvas.setGrid(((Number)gridSpinner.getValue()).intValue());
-            gridSpinner.setEnabled(true);
         } else {
-            canvas.setGrid(-1);
-            gridSpinner.setEnabled(false);            
+            canvas.setGrid(-1);           
         }
     }
     

@@ -315,6 +315,9 @@ public class MapPolygon extends MapObject {
                 g.setColor(def.getColor());
                 g.setStroke(def.getStroke(scale));
                 g.draw(p);
+            } else if (fastRendering) {
+                g.setColor(Color.darkGray);
+                g.draw(p);
             }
         } else {
             for (int i = 0; i < p.npoints;) {
@@ -350,7 +353,7 @@ public class MapPolygon extends MapObject {
             }
         }
         
-        if (!fastRendering && isSelected()) {
+        if (isSelected()) {
             //g.setStroke(SELECTED_STROKE);
             g.setColor(Color.white);
             int sz = (int)(5 / scale);

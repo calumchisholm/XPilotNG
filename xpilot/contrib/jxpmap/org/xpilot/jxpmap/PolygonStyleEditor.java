@@ -2,24 +2,25 @@ package org.xpilot.jxpmap;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-public class PolygonStyleEditor extends EditorPanel implements ActionListener {
+public class PolygonStyleEditor extends EditorPanel {
 
     private JComboBox cmbFillStyle;
     private JComboBox cmbTexture;
     private JComboBox cmbEdgeStyle;
-    private JButton bColor;
+    private JPanel bColor;
     private JCheckBox cbVisible;
     private JCheckBox cbVisibleInRadar;
     private JTextField tfName;
@@ -56,8 +57,16 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
         add(cmbFillStyle);
         
         add(new JLabel("Color:"));
-        bColor = new JButton();
-        bColor.addActionListener(this);
+        bColor = new JPanel();
+        bColor.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+            Color c = JColorChooser.showDialog
+                (PolygonStyleEditor.this, "Pick a color", Color.black);
+                if (c != null) {
+                    bColor.setBackground(c);
+                }
+            }
+        });
         Color c = style.getColor();
         if (c == null) c = Color.black;
         bColor.setBackground(c);
@@ -149,13 +158,6 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
         }
         return true;
     }
-
-
-    public void actionPerformed (ActionEvent evt) {
-        if (evt.getSource() == bColor) {
-            Color c = JColorChooser.showDialog
-                (this, "Pick a color", Color.black);
-            if (c != null) bColor.setBackground(c);
-        }
-    }
 }
+
+ 
