@@ -6,7 +6,7 @@ icon.h join.c MainFrm.cpp MainFrm.h \
 paintdata.c paintdata.h painthud.c paintradar.c \
 record.c RecordDummy.c record.h resource.h \
 Splash.cpp Splash.h StdAfx.cpp StdAfx.h TalkWindow.cpp TalkWindow.h \
-welcome.c widget.c widget.h \
+widget.c widget.h \
 winAbout.cpp winAbout.h winAudio.c winAudio.h winBitmap.c winBitmap.h \
 winClient.h winColors.c winConfig.c winConfig.h wintalk.c \
 winXThread.c winXThread.h winXXPilot.c winXXPilot.h \

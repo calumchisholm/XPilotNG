@@ -340,11 +340,6 @@ SOURCE=..\usleep.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\welcome.c
-# PROP Exclude_From_Build 1
-# End Source File
-# Begin Source File
-
 SOURCE=.\widget.c
 # End Source File
 # Begin Source File
