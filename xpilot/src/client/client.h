@@ -100,7 +100,7 @@ typedef struct {
 #define MIN_SHOW_ITEMS_TIME	0.0
 #define MAX_SHOW_ITEMS_TIME	300.0
 
-#define MIN_SCALEFACTOR		0.2
+#define MIN_SCALEFACTOR		0.4
 #define MAX_SCALEFACTOR		8.0
 
 #define FUEL_NOTIFY_TIME	3.0
