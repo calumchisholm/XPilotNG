@@ -36,9 +36,6 @@
 #include <X11/keysym.h>
 
 #include "T_Toolkit.h"
-#include "T_Form.h"
-#include "T_Popup.h"
-#include "T_proto.h"
 
 #include "defaults.h"
 #include "default_colors.h"
