@@ -92,7 +92,7 @@ static void Item_update_flags(player *pl)
 	CLR_BIT(pl->have, HAS_TRACTOR_BEAM);
     if (pl->item[ITEM_AUTOPILOT] <= 0) {
 	if (BIT(pl->used, HAS_AUTOPILOT))
-	    Autopilot (GetInd[pl->id], 0);
+	    Autopilot (GetInd(pl->id), 0);
 	CLR_BIT(pl->have, HAS_AUTOPILOT);
     }
     if (pl->item[ITEM_ARMOR] <= 0)
@@ -426,7 +426,7 @@ void Detonate_items(int ind)
 
     /* ZE: Detonated items on tanks should belong to the tank's owner. */
     if (IS_TANK_PTR(pl)) {
-	owner_ind = GetInd[pl->lock.pl_id];
+	owner_ind = GetInd(pl->lock.pl_id);
     } else {
 	owner_ind = ind;
     }
@@ -505,11 +505,11 @@ void Tractor_beam(int ind)
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
     if (BIT(pl->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
 	!= (LOCK_PLAYER|LOCK_VISIBLE)
-	|| BIT(Players(GetInd[pl->lock.pl_id])->status,
+	|| BIT(Players(GetInd(pl->lock.pl_id))->status,
 	       PLAYING|PAUSE|KILLED|GAME_OVER) != PLAYING
 	|| pl->lock.distance >= maxdist
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
-	|| BIT(Players(GetInd[pl->lock.pl_id])->used, HAS_PHASING_DEVICE)) {
+	|| BIT(Players(GetInd(pl->lock.pl_id))->used, HAS_PHASING_DEVICE)) {
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
     }
@@ -521,7 +521,7 @@ void Tractor_beam(int ind)
     }
     General_tractor_beam(ind, pl->pos.cx, pl->pos.cy,
 			 pl->item[ITEM_TRACTOR_BEAM],
-			 GetInd[pl->lock.pl_id], pl->tractor_is_pressor);
+			 GetInd(pl->lock.pl_id), pl->tractor_is_pressor);
 }
 
 void General_tractor_beam(int ind, int cx, int cy,
@@ -1010,7 +1010,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 	 * team members if team immunity is on.
 	 */
 	if (shot->id != NO_ID) {
-	    owner = GetInd[shot->id];
+	    owner = GetInd(shot->id);
 	    if (ind == owner) {
 		if (shot->type == OBJ_MINE) {
 		    if (BIT(shot->status, OWNERIMMUNE)) {
@@ -1043,7 +1043,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
 		&& (pl->lock.distance <= pl->sensor_range
 		    || !BIT(World.rules->mode, LIMITED_VISIBILITY))
-		&& pl->visibility[GetInd[pl->lock.pl_id]].canSee)
+		&& pl->visibility[GetInd(pl->lock.pl_id)].canSee)
 		smart->new_info = pl->lock.pl_id;
 	    else
 		smart->new_info = Players((int)(rfrac() * NumPlayers))->id;
@@ -1051,7 +1051,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 	    /* So let the missile keep on following this unlucky player. */
 	    /*-BA Why not redirect missiles to team mates?
 	     *-BA It's not ideal, but better them than me...
-	     *if (TEAM_IMMUNE(ind, GetInd[smart->new_info])) {
+	     *if (TEAM_IMMUNE(ind, GetInd(smart->new_info))) {
 	     *	smart->new_info = ind;
 	     * }
 	     */
@@ -1204,9 +1204,9 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 		if (BIT(pl->lock.tagged, LOCK_PLAYER)
 		    && (pl->lock.distance < pl->sensor_range
 			|| !BIT(World.rules->mode, LIMITED_VISIBILITY))
-		    && pl->visibility[GetInd[pl->lock.pl_id]].canSee
+		    && pl->visibility[GetInd(pl->lock.pl_id)].canSee
 		    && pl->lock.pl_id != p->id
-		    /*&& !TEAM_IMMUNE(ind, GetInd[pl->lock.pl_id])*/) {
+		    /*&& !TEAM_IMMUNE(ind, GetInd(pl->lock.pl_id))*/) {
 
 		    /*
 		     * Player programs robot to seek target.

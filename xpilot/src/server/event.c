@@ -182,7 +182,7 @@ int Player_lock_closest(int ind, int next)
     }
 
     if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
-	lock = GetInd[pl->lock.pl_id];
+	lock = GetInd(pl->lock.pl_id);
 	dist = Wrap_length(Players(lock)->pos.cx - pl->pos.cx,
 			   Players(lock)->pos.cy - pl->pos.cy);
     } else {
@@ -469,7 +469,7 @@ int Handle_keyboard(int ind)
 
 	    case KEY_LOCK_NEXT:
 	    case KEY_LOCK_PREV:
-		j = i = GetInd[pl->lock.pl_id];
+		j = i = GetInd(pl->lock.pl_id);
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		    || j < 0 || j >= NumPlayers) {
 		    /* better jump to KEY_LOCK_CLOSE... */
@@ -514,7 +514,7 @@ int Handle_keyboard(int ind)
 		if (BIT(pl->lock.tagged, LOCK_PLAYER)
 		    && NumPlayers > 1
 		    && (k = pl->lock.pl_id) > 0
-		    && (i = GetInd[k]) > 0
+		    && (i = GetInd(k)) > 0
 		    && i < NumPlayers
 		    && Players(i)->id == k
 		    && i != ind) {
@@ -735,7 +735,7 @@ int Handle_keyboard(int ind)
 		    }
 		} else {
 		    if (*l != NOT_CONNECTED
-			    && Player_lock_allowed(ind, GetInd[*l])) {
+			    && Player_lock_allowed(ind, GetInd(*l))) {
 			pl->lock.pl_id = *l;
 			SET_BIT(pl->lock.tagged, LOCK_PLAYER);
 		    }

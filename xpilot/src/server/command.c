@@ -67,7 +67,7 @@ int Get_player_index_by_name(char *name)
     if (isdigit(*name)) {
 	i = atoi(name);
 	if ((i > 0 && i <= NUM_IDS)
-	    && (j = GetInd[i]) >= 0
+	    && (j = GetInd(i)) >= 0
 	    && j < NumPlayers
 	    && Players(j)->id == i) {
 	    return j;
@@ -122,7 +122,7 @@ static void Send_info_about_player(player * pl)
 
 static void Set_swapper_state(player * pl)
 {
-    int ind = GetInd[pl->id];
+    int ind = GetInd(pl->id);
 
     if (BIT(pl->have, HAS_BALL))
 	Detach_ball(ind, -1);
@@ -580,13 +580,13 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	    int i = Get_player_index_by_name(arg);
 	    if (i >= 0) {
 		if (cmd == AllyInvite) {
-		    Invite_player(GetInd[pl->id], i);
+		    Invite_player(GetInd(pl->id), i);
 		}
 		else if (cmd == AllyRefuse) {
-		    Refuse_alliance(GetInd[pl->id], i);
+		    Refuse_alliance(GetInd(pl->id), i);
 		}
 		else if (cmd == AllyAccept) {
-		    Accept_alliance(GetInd[pl->id], i);
+		    Accept_alliance(GetInd(pl->id), i);
 		}
 		else {
 		    strlcpy(msg, usage, MSG_LEN);
@@ -607,19 +607,19 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	} else {
 	    /* no player name is specified */
 	    if (cmd == AllyCancel) {
-		Cancel_invitation(GetInd[pl->id]);
+		Cancel_invitation(GetInd(pl->id));
 	    }
 	    else if (cmd == AllyRefuse) {
-		Refuse_all_alliances(GetInd[pl->id]);
+		Refuse_all_alliances(GetInd(pl->id));
 	    }
 	    else if (cmd == AllyAccept) {
-		Accept_all_alliances(GetInd[pl->id]);
+		Accept_all_alliances(GetInd(pl->id));
 	    }
 	    else if (cmd == AllyLeave) {
-		Leave_alliance(GetInd[pl->id]);
+		Leave_alliance(GetInd(pl->id));
 	    }
 	    else if (cmd == AllyList) {
-		Alliance_player_list(GetInd[pl->id]);
+		Alliance_player_list(GetInd(pl->id));
 	    }
 	    else {
 		strlcpy(msg, usage, MSG_LEN);
@@ -1160,7 +1160,7 @@ static int Cmd_stats(char *arg, player *pl, int oper, char *msg)
 static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 {
     int			i;
-    int			ind = GetInd[pl->id];
+    int			ind = GetInd(pl->id);
     int			team;
     int			swap_allowed;
     char		*arg2;
@@ -1246,14 +1246,14 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 
     i = World.teams[pl->team].SwapperId;
     while (i != -1) {
-	if ((i = Players(GetInd[i])->team) != team)
+	if ((i = Players(GetInd(i))->team) != team)
 	    i = World.teams[i].SwapperId;
 	else {
 	    /* Found a cycle, now change the teams */
 	    int xbase = pl->home_base, xteam = pl->team, xbase2, xteam2;
 	    player *pl2 = pl;
 	    do {
-		pl2 = Players(GetInd[World.teams[xteam].SwapperId]);
+		pl2 = Players(GetInd(World.teams[xteam].SwapperId));
 		World.teams[xteam].SwapperId = -1;
 		xbase2 = pl2->home_base;
 		xteam2 = pl2->team;

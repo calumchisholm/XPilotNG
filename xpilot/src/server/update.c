@@ -592,7 +592,7 @@ static void Cannon_update(void)
 	if ((cannon->damaged -= timeStep) <= 0)
 	    cannon->damaged = 0;
 	if (cannon->tractor_count > 0) {
-	    int ind = GetInd[cannon->tractor_target];
+	    int ind = GetInd(cannon->tractor_target);
 
 	    if ((Wrap_length(Players(ind)->pos.cx - cannon->pos.cx,
 			    Players(ind)->pos.cy - cannon->pos.cy)
@@ -861,7 +861,7 @@ void Update_objects(void)
     for (i = 0; i < NumEcms; i++) {
 	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
 	    if (Ecms[i]->id != NO_ID)
-		Players(GetInd[Ecms[i]->id])->ecmcount--;
+		Players(GetInd(Ecms[i]->id))->ecmcount--;
 	    free(Ecms[i]);
 	    --NumEcms;
 	    Ecms[i] = Ecms[NumEcms];
@@ -956,7 +956,7 @@ void Update_objects(void)
 		if (BIT(pl->status, SELF_DESTRUCT)) {
 		    if (selfDestructScoreMult != 0) {
 			DFLOAT sc = Rate(0, pl->score) * selfDestructScoreMult;
-			SCORE(GetInd[pl->id], -sc, pl->pos.cx, pl->pos.cy,
+			SCORE(GetInd(pl->id), -sc, pl->pos.cx, pl->pos.cy,
 			      "Self-Destruct");
 		    }
 		    SET_BIT(pl->status, KILLED);
@@ -1330,11 +1330,11 @@ void Update_objects(void)
 	    Tractor_beam(i);
 
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
+	    player *lpl = Players(GetInd(pl->lock.pl_id));
+
 	    pl->lock.distance =
-		Wrap_length(pl->pos.cx
-			    - Players(GetInd[pl->lock.pl_id])->pos.cx,
-			    pl->pos.cy
-			    - Players(GetInd[pl->lock.pl_id])->pos.cy) / CLICK;
+		Wrap_length(pl->pos.cx - lpl->pos.cx,
+			    pl->pos.cy - lpl->pos.cy) / CLICK;
 	}
     }
 

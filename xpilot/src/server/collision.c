@@ -411,14 +411,14 @@ static void PlayerCollision(void)
 			    Score_players(i, -sc, Players(j)->name,
 					  j, -sc2, pl->name);
 			} else if (IS_TANK_IND(i)) {
-			    int i_tank_owner = GetInd[Players(i)->lock.pl_id];
+			    int i_tank_owner = GetInd(Players(i)->lock.pl_id);
 			    sc = Rate(Players(i_tank_owner)->score,
 				      Players(j)->score)
 					    * tankKillScoreMult;
 			    Score_players(i_tank_owner, sc, Players(j)->name,
 					  j, -sc, pl->name);
 			} else if (IS_TANK_IND(j)) {
-			    int j_tank_owner = GetInd[Players(j)->lock.pl_id];
+			    int j_tank_owner = GetInd(Players(j)->lock.pl_id);
 			    sc = Rate(Players(j_tank_owner)->score,
 						 pl->score)
 					    * tankKillScoreMult;
@@ -428,7 +428,7 @@ static void PlayerCollision(void)
 		    } else {
 			int i_tank_owner = i;
 			if (IS_TANK_IND(i)) {
-			    i_tank_owner = GetInd[Players(i)->lock.pl_id];
+			    i_tank_owner = GetInd(Players(i)->lock.pl_id);
 			    if (i_tank_owner == j) {
 				i_tank_owner = i;
 			    }
@@ -456,7 +456,7 @@ static void PlayerCollision(void)
 		    if (BIT(pl->status, KILLED)) {
 			int j_tank_owner = j;
 			if (IS_TANK_IND(j)) {
-			    j_tank_owner = GetInd[Players(j)->lock.pl_id];
+			    j_tank_owner = GetInd(Players(j)->lock.pl_id);
 			    if (j_tank_owner == i) {
 				j_tank_owner = j;
 			    }
@@ -760,7 +760,7 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	    } else if (Team_immune(obj->id, pl->id))
 		continue;
-	    else if (BIT(Players(GetInd[obj->id])->status, PAUSE))
+	    else if (BIT(Players(GetInd(obj->id))->status, PAUSE))
 		continue;
 	} else if (BIT(World.rules->mode, TEAM_PLAY)
 		   && teamImmunity
@@ -787,7 +787,7 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	}
 	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID) {
-	    if (BIT(Players(GetInd[obj->id])->used, HAS_PHASING_DEVICE))
+	    if (BIT(Players(GetInd(obj->id))->used, HAS_PHASING_DEVICE))
 		continue;
 	}
 	else if (BIT(obj->type, OBJ_PULSE)) {
@@ -958,7 +958,7 @@ static void Player_collides_with_ball(int ind, object *obj, int radius)
 		* unownedKillScoreMult;
 	SCORE(ind, -sc, pl->pos.cx, pl->pos.cy, "Ball");
     } else {
-	killer = GetInd[ball->owner];
+	killer = GetInd(ball->owner);
 
 	sprintf(msg, "%s was killed by a ball owned by %s.",
 		pl->name, Players(killer)->name);
@@ -1186,7 +1186,7 @@ static void Player_collides_with_mine(int ind, object *obj)
 		Describe_shot(mine->type, mine->status, mine->mods, 1));
     }
     else if (mine->owner == mine->id) {
-	killer = GetInd[mine->owner];
+	killer = GetInd(mine->owner);
 	sprintf(msg, "%s hit %s %s by %s.", pl->name,
 		Describe_shot(mine->type, mine->status, mine->mods,1),
 		BIT(mine->status, GRAVITY) ? "thrown " : "dropped ",
@@ -1195,7 +1195,7 @@ static void Player_collides_with_mine(int ind, object *obj)
     else if (mine->owner == NO_ID) {
 	const char *reprogrammer_name = "some jerk";
 	if (mine->id != NO_ID) {
-	    killer = GetInd[mine->id];
+	    killer = GetInd(mine->id);
 	    reprogrammer_name = Players(killer)->name;
 	}
 	sprintf(msg, "%s hit %s reprogrammed by %s.",
@@ -1206,14 +1206,14 @@ static void Player_collides_with_mine(int ind, object *obj)
     else {
 	const char *reprogrammer_name = "some jerk";
 	if (mine->id != NO_ID) {
-	    killer = GetInd[mine->id];
+	    killer = GetInd(mine->id);
 	    reprogrammer_name = Players(killer)->name;
 	}
 	sprintf(msg, "%s hit %s %s by %s and reprogrammed by %s.",
 		pl->name,
 		Describe_shot(mine->type, mine->status, mine->mods,1),
 		BIT(mine->status, GRAVITY) ? "thrown " : "dropped ",
-		Players(GetInd[mine->owner])->name,
+		Players(GetInd(mine->owner))->name,
 		reprogrammer_name);
     }
     if (killer != -1) {
@@ -1253,7 +1253,7 @@ static void Player_collides_with_debris(int ind, object *obj)
 	sprintf(msg, "%s succumbed to an explosion.", pl->name);
 	killer = -1;
 	if (obj->id != NO_ID) {
-	    killer = GetInd[obj->id];
+	    killer = GetInd(obj->id);
 	    sprintf(msg + strlen(msg) - 1, " from %s.",
 		    Players(killer)->name);
 	    if (obj->id == pl->id) {
@@ -1321,7 +1321,7 @@ static void Player_collides_with_asteroid(int ind, wireobject *ast)
 	sc = Rate(0, pl->score) * unownedKillScoreMult;
 	SCORE(ind, -sc, pl->pos.cx, pl->pos.cy, "[Asteroid]");
 	if (IS_TANK_PTR(pl) && asteroidPoints > 0) {
-	    int owner = GetInd[pl->lock.pl_id];
+	    int owner = GetInd(pl->lock.pl_id);
 	    if (Players(owner)->score <= asteroidMaxScore) {
 		SCORE(owner, asteroidPoints, ast->pos.cx, ast->pos.cy, "");
 	    }
@@ -1387,7 +1387,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 		sprintf(msg, "%s ate %s from %s.", pl->name,
 			Describe_shot(obj->type, obj->status,
 				      obj->mods, 1),
-			Players( killer=GetInd[obj->id] )->name);
+			Players( killer=GetInd(obj->id) )->name);
 	    drain = (long)(ED_SMART_SHOT_HIT /
 		((obj->mods.mini + 1) * (obj->mods.power + 1)));
 	    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
@@ -1449,7 +1449,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 		sprintf(msg, "%s was killed by %s from %s.", pl->name,
 			Describe_shot(obj->type, obj->status,
 				      obj->mods, 1),
-			Players( killer=GetInd[obj->id] )->name);
+			Players( killer=GetInd(obj->id) )->name);
 		if (killer == ind) {
 		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 				       PLAYER_SHOT_THEMSELF_SOUND);
@@ -1627,7 +1627,7 @@ static void AsteroidCollision(void)
 	    /* don't collide with phased balls */
 	    if (BIT(obj->type, OBJ_BALL)
 		&& obj->id != NO_ID
-		&& BIT(Players(GetInd[obj->id])->used, HAS_PHASING_DEVICE))
+		&& BIT(Players(GetInd(obj->id))->used, HAS_PHASING_DEVICE))
 		continue;
 
 	    radius = ast->pl_radius + obj->pl_radius;
@@ -1751,7 +1751,7 @@ static void AsteroidCollision(void)
 			int owner_id = ((obj->type == OBJ_BALL)
 					? BALL_PTR(obj)->owner
 					: obj->id);
-			int ind = GetInd[owner_id];
+			int ind = GetInd(owner_id);
 			if (Players(ind)->score <= asteroidMaxScore) {
 			    SCORE(ind, asteroidPoints,
 				  ast->pos.cx, ast->pos.cy, "");
@@ -1792,7 +1792,7 @@ static void BallCollision(void)
 	if (ball->type != OBJ_BALL ||	/* not a ball */
 	    ball->life <= 0 ||		/* dying ball */
 	    (ball->id != NO_ID
-	     && BIT(Players(GetInd[ball->id])->used, HAS_PHASING_DEVICE)) ||
+	     && BIT(Players(GetInd(ball->id))->used, HAS_PHASING_DEVICE)) ||
 					/* phased ball */
 	    World.treasures[ball->treasure].have) {
 					/* safe in a treasure */
@@ -1803,7 +1803,7 @@ static void BallCollision(void)
 	if (BIT(World.rules->mode, TIMING)
 	    && ballrace
 	    && ball->owner != NO_ID) {
-	    int owner_ind = GetInd[ball->owner];
+	    int owner_ind = GetInd(ball->owner);
 	    player *owner = Players(owner_ind);
 
 	    if (!ballrace_connect || ball->id == owner->id) {
@@ -1893,7 +1893,7 @@ static void BallCollision(void)
 			break;
 		    }
 		    if (b2->id != NO_ID
-			&& BIT(Players(GetInd[b2->id])->used,
+			&& BIT(Players(GetInd(b2->id))->used,
 			       HAS_PHASING_DEVICE)) {
 			break;
 		    }

@@ -134,7 +134,7 @@ void Score_players(int winner, DFLOAT winner_score, char *winner_msg,
 	|| (Players(winner)->alliance != ALLIANCE_NOT_SET
 	    && Players(winner)->alliance == Players(loser)->alliance)
 	|| (IS_TANK_IND(loser)
-	    && GetInd[Players(loser)->lock.pl_id] == winner)) {
+	    && GetInd(Players(loser)->lock.pl_id) == winner)) {
 	if (winner_score > 0)
 	    winner_score = -winner_score;
 	if (loser_score > 0)

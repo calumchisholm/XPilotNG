@@ -65,7 +65,7 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
     char		msg[MSG_LEN];
 
     if (pulse->id != NO_ID) {
-	killer = GetInd[pulse->id];
+	killer = GetInd(pulse->id);
 	pl = Players(killer);
     } else {
 	killer = -1;

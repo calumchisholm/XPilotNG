@@ -132,7 +132,7 @@
 #define OWNS_TANK(i, j) \
 	(IS_TANK_IND(j) \
 	&& (Players(j)->lock.pl_id != -1) \
-	&& (GetInd[Players(j)->lock.pl_id] == (i)))
+	&& (GetInd(Players(j)->lock.pl_id) == (i)))
 
 
 #define RECOVERY_DELAY		(12 * 3)

@@ -89,7 +89,7 @@ int			NumObservers = 0;
 int			NumOperators = 0;
 int			observerStart;
 player			**PlayersArray;
-int			GetInd[NUM_IDS + MAX_OBSERVERS + 1];
+int			GetIndArray[NUM_IDS + MAX_OBSERVERS + 1];
 server			Server;
 char			*serverAddr;
 int			ShutdownServer = -1;
@@ -625,9 +625,9 @@ void Server_info(char *str, unsigned max_size)
 	pl = order[i];
 	strlcpy(name, pl->name, MAX_CHARS);
 	if (IS_ROBOT_PTR(pl)) {
-	    if ((k = Robot_war_on_player(GetInd[pl->id])) != NO_ID) {
+	    if ((k = Robot_war_on_player(GetInd(pl->id))) != NO_ID) {
 		sprintf(name + strlen(name), " (%s)",
-			Players(GetInd[k])->name);
+			Players(GetInd(k))->name);
 		if (strlen(name) >= 19) {
 		    strcpy(&name[17], ")");
 		}

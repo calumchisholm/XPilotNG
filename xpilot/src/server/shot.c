@@ -683,7 +683,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
 		    && BIT(World.rules->mode, LIMITED_VISIBILITY))
-		|| !pl->visibility[GetInd[pl->lock.pl_id]].canSee)
+		|| !pl->visibility[GetInd(pl->lock.pl_id)].canSee)
 		    return;
 		lock = pl->lock.pl_id;
 	    }
@@ -1167,7 +1167,7 @@ void Delete_shot(int ind)
     case OBJ_BALL:
 	ball = BALL_PTR(shot);
 	if (ball->id != NO_ID)
-	    Detach_ball(GetInd[ball->id], ind);
+	    Detach_ball(GetInd(ball->id), ind);
 	else {
 	    /*
 	     * Maybe some player is still busy trying to connect to this ball.
@@ -1247,7 +1247,7 @@ void Delete_shot(int ind)
 	if (BIT(shot->mods.warhead, CLUSTER)) {
 	    type = OBJ_SHOT;
 	    if (shot->id != NO_ID) {
-		player *pl = Players(GetInd[shot->id]);
+		player *pl = Players(GetInd(shot->id));
 		color = pl->color;
 	    }
 	    else
@@ -1328,7 +1328,7 @@ void Delete_shot(int ind)
 	    || BIT(shot->mods.warhead, CLUSTER)) {
 	    break;
 	}
-	pl = Players(GetInd[shot->id]);
+	pl = Players(GetInd(shot->id));
 	if (--pl->shots <= 0)
 	    pl->shots = 0;
 	break;
@@ -1338,7 +1338,7 @@ void Delete_shot(int ind)
 	    || BIT(shot->status, FROMCANNON)) {
 	    break;
 	}
-	pl = Players(GetInd[shot->id]);
+	pl = Players(GetInd(shot->id));
 	if (--pl->num_pulses <= 0)
 	    pl->num_pulses = 0;
 	break;
@@ -1561,7 +1561,7 @@ void Connector_force(int ind)
      */
 
     ballobject		*ball = BALL_IND(ind);
-    player		*pl = Players( GetInd[ball->id] );
+    player		*pl = Players( GetInd(ball->id) );
     vector		D;
     DFLOAT		length, force, ratio, accell, damping;
     /* const DFLOAT		k = 1500.0, b = 2.0; */
@@ -1591,7 +1591,7 @@ void Connector_force(int ind)
 
     /* if the tether is too long or too short, release it */
     if (ABS(ratio) > maxBallConnectorRatio) {
-	Detach_ball(GetInd[ball->id], ind);
+	Detach_ball(GetInd(ball->id), ind);
 	return;
     }
 
@@ -1646,7 +1646,7 @@ void Move_smart_shot(int ind)
 	if (shot->info >= 0) {
 	    clpos engine;
 	    /* Get player and set min to distance */
-	    pl = Players( GetInd[shot->info] );
+	    pl = Players( GetInd(shot->info) );
 	    engine = Ship_get_engine_clpos(pl->ship, pl->dir);
 	    range = Wrap_length(pl->pos.cx + engine.cx - shot->pos.cx,
 				pl->pos.cy + engine.cy - shot->pos.cy)
@@ -1750,7 +1750,7 @@ void Move_smart_shot(int ind)
 		}
 	    }
 	}
-	pl = Players(GetInd[shot->info]);
+	pl = Players(GetInd(shot->info));
     }
     else
 	/*NOTREACHED*/

@@ -138,7 +138,7 @@ void Delta_mv(object *ship, object *obj)
 	&& obj->id != NO_ID
 	&& BIT(obj->status, COLLISIONSHOVE)) {
 	player *pl = (player *)ship;
-	player *pusher = Players(GetInd[obj->id]);
+	player *pusher = Players(GetInd(obj->id));
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -175,7 +175,7 @@ void Delta_mv_elastic(object *obj1, object *obj2)
 	&& obj2->id != NO_ID
 	&& BIT(obj2->status, COLLISIONSHOVE)) {
 	player *pl = (player *)obj1;
-	player *pusher = Players(GetInd[obj2->id]);
+	player *pusher = Players(GetInd(obj2->id));
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -211,7 +211,7 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
 
     if (obj1->type == OBJ_PLAYER && obj2->id != NO_ID) {
 	player *pl = (player *)obj1;
-	player *pusher = Players(GetInd[obj2->id]);
+	player *pusher = Players(GetInd(obj2->id));
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -219,7 +219,7 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
 
     if (obj2->type == OBJ_PLAYER && obj1->id != NO_ID) {
 	player *pl = (player *)obj2;
-	player *pusher = Players(GetInd[obj1->id]);
+	player *pusher = Players(GetInd(obj1->id));
 	if (pusher != pl) {
 	    Record_shove(pl, pusher, frame_loops);
 	}
@@ -429,7 +429,7 @@ void Tank_handle_detach(player *pl)
 
     /* Possibly join alliance. */
     if (pl->alliance != ALLIANCE_NOT_SET) {
-	Player_join_alliance(GetInd[dummy->id], GetInd[pl->id]);
+	Player_join_alliance(GetInd(dummy->id), GetInd(pl->id));
     }
 
     sound_play_sensors(pl->pos.cx, pl->pos.cy, TANK_DETACH_SOUND);
@@ -447,13 +447,13 @@ void Tank_handle_detach(player *pl)
     for (i=0; i < NumObjs; i++) {
 	if (Obj[i]->type == OBJ_HEAT_SHOT
 	    && Obj[i]->info > 0
-	    && Players( GetInd[Obj[i]->info] ) == pl) {
+	    && Players( GetInd(Obj[i]->info) ) == pl) {
 	    Obj[i]->info = NumPlayers - 1;
 	}
     }
 
     /* Remove tank, fuel and mass from myself */
-    Player_remove_tank(GetInd[pl->id], ct);
+    Player_remove_tank(GetInd(pl->id), ct);
 
     for (i = 0; i < NumPlayers - 1; i++) {
 	if (Players(i)->conn != NOT_CONNECTED) {

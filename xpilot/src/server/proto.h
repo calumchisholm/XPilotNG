@@ -325,6 +325,7 @@ int Get_player_index_by_name(char *name);
  */
 /*player *Players(int ind);*/
 player *Players1(int ind, char *file, int line);
+int GetInd1(int id, char *file, int line);
 void Pick_startpos(int ind);
 void Go_home(int ind);
 void Compute_sensor_range(player *);

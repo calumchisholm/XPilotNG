@@ -414,7 +414,7 @@ static int Frame_status(int conn, int ind)
     CLR_BIT(pl->lock.tagged, LOCK_VISIBLE);
     if (BIT(pl->lock.tagged, LOCK_PLAYER) && BIT(pl->used, HAS_COMPASS)) {
 	lock_id = pl->lock.pl_id;
-	lock_ind = GetInd[lock_id];
+	lock_ind = GetInd(lock_id);
 
 	if ((!BIT(World.rules->mode, LIMITED_VISIBILITY)
 	     || pl->lock.distance <= pl->sensor_range)
@@ -486,7 +486,7 @@ static int Frame_status(int conn, int ind)
 		  lock_dist,
 		  lock_dir,
 		  showautopilot,
-		  Players(GetInd[Get_player_id(conn)])->status,
+		  Players(GetInd(Get_player_id(conn)))->status,
 		  mods);
     if (n <= 0) {
 	return 0;
@@ -843,7 +843,7 @@ static void Frame_shots(int conn, int ind)
 	case OBJ_CANNON_SHOT:
 	    if (Team_immune(shot->id, pl->id)
 		|| (shot->id != NO_ID
-		    && BIT(Players(GetInd[shot->id])->status, PAUSE))
+		    && BIT(Players(GetInd(shot->id))->status, PAUSE))
 		|| (shot->id == NO_ID
 		    && BIT(World.rules->mode, TEAM_PLAY)
 		    && shot->team == pl->team)) {
@@ -900,7 +900,7 @@ static void Frame_shots(int conn, int ind)
 			confused = 1;
 		}
 		if (mine->id != NO_ID
-		    && BIT(Players(GetInd[mine->id])->status, PAUSE)) {
+		    && BIT(Players(GetInd(mine->id))->status, PAUSE)) {
 		    laid_by_team = 1;
 		} else {
 		    laid_by_team = (Team_immune(mine->id, pl->id)
@@ -961,8 +961,8 @@ static void Frame_ships(int conn, int ind)
     }
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
-	player 	*victim = Players(GetInd[trans->target]),
-		*pl = (trans->id == NO_ID ? NULL : Players(GetInd[trans->id]));
+	player 	*victim = Players(GetInd(trans->target)),
+		*pl = (trans->id == NO_ID ? NULL : Players(GetInd(trans->id)));
 	int 	cx = (pl ? pl->pos.cx : trans->pos.cx),
 		cy = (pl ? pl->pos.cy : trans->pos.cy);
 	Send_trans(conn, victim->pos.cx, victim->pos.cy, cx, cy);
@@ -970,7 +970,7 @@ static void Frame_ships(int conn, int ind)
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->tractor_count > 0) {
-	    player *t = Players(GetInd[cannon->tractor_target]);
+	    player *t = Players(GetInd(cannon->tractor_target));
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 		for (j = 0; j < 3; j++) {
@@ -1044,7 +1044,7 @@ static void Frame_ships(int conn, int ind)
 	    }
 	}
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
-	    player *t = Players(GetInd[pl_i->lock.pl_id]);
+	    player *t = Players(GetInd(pl_i->lock.pl_id));
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 
@@ -1162,7 +1162,7 @@ static void Frame_radar(int conn, int ind)
 	    }
 	    if (BIT(pl->used, HAS_COMPASS)
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
-		&& GetInd[pl->lock.pl_id] == i
+		&& GetInd(pl->lock.pl_id) == i
 		&& frame_loops_slow % 5 >= 3) {
 		continue;
 	    }
@@ -1321,12 +1321,12 @@ void Frame_update(void)
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)
 	    && (BIT(pl->status, (GAME_OVER|PLAYING)) == (GAME_OVER|PLAYING)
 		|| BIT(pl->status, PAUSE))) {
-	    ind = GetInd[pl->lock.pl_id];
+	    ind = GetInd(pl->lock.pl_id);
 	} else
 	    ind = i;
 	if (pl->rectype == 2) {
 	    if (BIT(pl->lock.tagged, LOCK_PLAYER))
-		ind = GetInd[pl->lock.pl_id];
+		ind = GetInd(pl->lock.pl_id);
 	    else
 		ind = 0;
 	}
@@ -1406,6 +1406,6 @@ void Set_player_message(player *pl, const char *message)
 	Send_message(pl->conn, msg);
     }
     else if (IS_ROBOT_PTR(pl)) {
-	Robot_message(GetInd[pl->id], msg);
+	Robot_message(GetInd(pl->id), msg);
     }
 }

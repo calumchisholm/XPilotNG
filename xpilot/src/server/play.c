@@ -240,12 +240,12 @@ void Make_debris(
 void Ball_is_replaced(ballobject *ball)
 {
     char msg[MSG_LEN];
-    player *pl = Players(GetInd[ball->owner]);
+    player *pl = Players(GetInd(ball->owner));
 
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 
-    SCORE(GetInd[pl->id], 5, ball->pos.cx, ball->pos.cy, "Treasure: ");
+    SCORE(GetInd(pl->id), 5, ball->pos.cx, ball->pos.cy, "Treasure: ");
     sprintf(msg, " < %s (team %d) has replaced the treasure >",
 	    pl->name, pl->team);
     Set_message(msg);
@@ -261,7 +261,7 @@ void Ball_is_destroyed(ballobject *ball)
 {
     char msg[MSG_LEN];
     int frames = (1e6 - ball->life) / timeStep + .5;
-    int ind = GetInd[ball->owner];
+    int ind = GetInd(ball->owner);
     DFLOAT seconds = ((DFLOAT)frames) / framesPerSecond;
 
     if (timeStep != 1.0) {
@@ -290,9 +290,9 @@ void Ball_hits_goal(ballobject *ball, int group)
 	Ball_is_replaced(ball);
 	return;
     }
-    if (groups[group].team == Players(GetInd[ball->owner])->team) {
+    if (groups[group].team == Players(GetInd(ball->owner))->team) {
 	Ball_is_destroyed(ball);
-	if (Punish_team(GetInd[ball->owner], ball->treasure,
+	if (Punish_team(GetInd(ball->owner), ball->treasure,
 			ball->pos.cx, ball->pos.cy))
 	    CLR_BIT(ball->status, RECREATE);
 	return;
@@ -332,7 +332,7 @@ bool Balltarget_hitfunc(struct group *group, struct move *move)
 	 * owner is not.
 	 */
 	if (World.treasures[ball->treasure].team == group->team
-	    && Players(GetInd[ball->owner])->team != group->team)
+	    && Players(GetInd(ball->owner))->team != group->team)
 	    return false;
 	return true;
     }

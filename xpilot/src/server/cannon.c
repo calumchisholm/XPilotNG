@@ -720,7 +720,7 @@ void Cannon_dies(int ind, player *pl)
 	);
 
     if (pl) {
-	killer = GetInd[pl->id];
+	killer = GetInd(pl->id);
 	if (cannonPoints > 0) {
 	    if (BIT(World.rules->mode, TEAM_PLAY)
 		&& teamCannons) {

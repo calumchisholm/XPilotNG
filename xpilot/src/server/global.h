@@ -67,6 +67,7 @@ extern DFLOAT		tbl_cos[];
 
 /*extern player		**Players;*/
 #define Players(ind) Players1(ind, __FILE__, __LINE__)
+#define GetInd(id)   GetInd1(id, __FILE__, __LINE__)
 
 extern player		**PlayersArray;
 extern object		*Obj[];
@@ -107,7 +108,7 @@ extern bool		shotHitFuelDrainUsesKineticEnergy;
 extern DFLOAT		fireRepeatRate;
 extern int		laserRepeatRate;
 extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
-extern int		GetInd[];
+extern int		GetIndArray[];
 extern int		ShutdownServer, ShutdownDelay;
 extern bool		RawMode;
 extern bool		NoQuit;

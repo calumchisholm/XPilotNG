@@ -71,6 +71,16 @@ player *Players1(int ind, char *file, int line)
     return PlayersArray[ind];
 }
 
+int GetInd1(int id, char *file, int line)
+{
+    if (id < 0 || id >= NUM_IDS + MAX_OBSERVERS + 1) {
+	warn("%s: %d: GetInd: id = %d, array size = %d\n",
+	     file, line, id, NUM_IDS + MAX_OBSERVERS + 1);
+	return -1;
+    }
+    return GetIndArray[id];
+}
+
 /********* **********
  * Functions on player array.
  */
@@ -537,7 +547,7 @@ int Init_player(int ind, shipobj *ship)
     pl->robot_data_ptr	= NULL;
 
     pl->id		= peek_ID();
-    GetInd[pl->id]	= ind;
+    GetIndArray[pl->id]	= ind;
     pl->conn		= NOT_CONNECTED;
     pl->audio		= NULL;
 
@@ -1918,8 +1928,8 @@ void Delete_player(int ind)
     PlayersArray[ind]		= pl;
     pl				= Players(NumPlayers);	/* Restore pointer. */
 
-    GetInd[Players(ind)->id] = ind;
-    GetInd[Players(NumPlayers)->id] = NumPlayers;
+    GetIndArray[Players(ind)->id] = ind;
+    GetIndArray[Players(NumPlayers)->id] = NumPlayers;
 
     Check_team_members(pl->team);
 
@@ -2124,8 +2134,8 @@ int Team_immune(int id1, int id2)
 	return 0;
     }
 
-    ind1 = GetInd[id1];
-    ind2 = GetInd[id2];
+    ind1 = GetInd(id1);
+    ind2 = GetInd(id2);
 
     if (TEAM(ind1, ind2)) {
 	/* players are teammates */

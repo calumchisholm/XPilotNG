@@ -677,11 +677,11 @@ void Destroy_connection(int ind, const char *reason)
     if (connp->id != NO_ID) {
 	id = connp->id;
 	connp->id = NO_ID;
-	Players(GetInd[id])->conn = NOT_CONNECTED;
-	if (Players(GetInd[id])->rectype != 2)
-	    Delete_player(GetInd[id]);
+	Players(GetInd(id))->conn = NOT_CONNECTED;
+	if (Players(GetInd(id))->rectype != 2)
+	    Delete_player(GetInd(id));
 	else {
-	    int i, ind = GetInd[id];
+	    int i, ind = GetInd(id);
 	    player *pl;
 
 	    NumObservers--;
@@ -690,8 +690,8 @@ void Destroy_connection(int ind, const char *reason)
 	    PlayersArray[ind] = pl;
 	    pl = Players(observerStart + NumObservers);
 
-	    GetInd[Players(ind)->id] = ind;
-	    GetInd[pl->id] = observerStart + NumObservers;
+	    GetIndArray[Players(ind)->id] = ind;
+	    GetIndArray[pl->id] = observerStart + NumObservers;
 
 	    Free_ship_shape(pl->ship);
 	    for (i = NumObservers - 1; i >= 0; i--)
@@ -1416,7 +1416,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	request_ID();
     } else {
 	pl->id = NUM_IDS + 1 + ind - observerStart;
-	GetInd[pl->id] = observerStart + NumObservers;
+	GetIndArray[pl->id] = observerStart + NumObservers;
 	pl->score = -6666;
 	pl->mychar = 'S';
 	NumObservers++;
@@ -1430,7 +1430,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
     Conn_set_state(connp, CONN_READY, CONN_PLAYING);
 
     if (teamZeroPausing && pl->team == 0)
-	Pause_player(GetInd[pl->id], 1);
+	Pause_player(GetInd(pl->id), 1);
 
     if (Send_reply(ind, PKT_PLAY, PKT_SUCCESS) <= 0) {
 	strlcpy(errmsg, "Cannot send play reply", errsize);
@@ -2032,7 +2032,7 @@ int Send_seek(int ind, int programmer_id, int robot_id, int sought_id)
 int Send_player(int ind, int id)
 {
     connection_t	*connp = &Conn[ind];
-    player		*pl = Players(GetInd[id]);
+    player		*pl = Players(GetInd(id));
     int			n;
     char		buf[MSG_LEN], ext[MSG_LEN];
     int			sbuf_len = connp->c.len;
@@ -2074,7 +2074,7 @@ int Send_score(int ind, int id, DFLOAT score,
 
     /* for those poor fools using standard client or haven't
        got 'treatZeroSpecial' on... =) */
-    /* if (teamZeroPausing && (Players[GetInd[connp->id]]->team == 0))
+    /* if (teamZeroPausing && (Players(GetInd)connp->id))->team == 0))
        score = (DFLOAT)(-5000.0); */
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
@@ -2095,7 +2095,7 @@ int Send_score(int ind, int id, DFLOAT score,
 	    if (announceAlliances) {
 		allchar = alliance + '0';
 	    } else {
-		if (Players(GetInd[connp->id])->alliance == alliance)
+		if (Players(GetInd(connp->id))->alliance == alliance)
 		    allchar = '+';
 	    }
 	}
@@ -2615,11 +2615,11 @@ static int Receive_keyboard(int ind)
     }
     else {
 	connp->last_key_change = change;
-	pl = Players(GetInd[connp->id]);
+	pl = Players(GetInd(connp->id));
 	memcpy(pl->last_keyv, connp->r.ptr, size);
 	connp->r.ptr += size;
-	Players(GetInd[connp->id])->idleCount = 0; /* idle */
-	Handle_keyboard(GetInd[connp->id]);
+	Players(GetInd(connp->id))->idleCount = 0; /* idle */
+	Handle_keyboard(GetInd(connp->id));
     }
     if (connp->num_keyboard_updates++ && (connp->state & CONN_PLAYING)) {
 	Destroy_connection(ind, "no macros");
@@ -2698,7 +2698,7 @@ static int Receive_power(int ind)
 	return n;
     }
     power = (DFLOAT) tmp / 256.0F;
-    pl = Players(GetInd[connp->id]);
+    pl = Players(GetInd(connp->id));
     autopilot = BIT(pl->used, HAS_AUTOPILOT);
 
     switch (ch) {
@@ -3107,7 +3107,7 @@ static int Receive_ack_target(int ind)
 static void Handle_talk(int ind, char *str)
 {
     connection_t	*connp = &Conn[ind];
-    player		*pl = Players(GetInd[connp->id]);
+    player		*pl = Players(GetInd(connp->id));
     int			i, sent, team;
     unsigned int	len;
     char		*cp,
@@ -3161,7 +3161,7 @@ static void Handle_talk(int ind, char *str)
 	}
     }
     else if (strcasecmp(str, "god") == 0) {
-	Server_log_admin_message(GetInd[connp->id], cp);
+	Server_log_admin_message(GetInd(connp->id), cp);
     }
     else {						/* Player message */
 	sent = -1;
@@ -3236,7 +3236,7 @@ static int Receive_talk(int ind)
 	}
 	connp->talk_sequence_num = seq;
 	if (*str == '/') {
-	    Handle_player_command(Players(GetInd[connp->id]), str + 1);
+	    Handle_player_command(Players(GetInd(connp->id)), str + 1);
 	}
 	else {
 	    Handle_talk(ind, str);
@@ -3311,7 +3311,7 @@ static int Receive_modifier_bank(int ind)
 	}
 	return n;
     }
-    pl = Players(GetInd[connp->id]);
+    pl = Players(GetInd(connp->id));
     if (bank < NUM_MODBANKS) {
 	CLEAR_MODS(mods);
 	if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
@@ -3604,12 +3604,12 @@ static int Receive_pointer_move(int ind)
 	}
 	return n;
     }
-    pl = Players(GetInd[connp->id]);
+    pl = Players(GetInd(connp->id));
     if (BIT(pl->status, HOVERPAUSE))
 	return 1;
 
     if (BIT(pl->used, HAS_AUTOPILOT))
-	Autopilot(GetInd[connp->id], 0);
+	Autopilot(GetInd(connp->id), 0);
     turnspeed = movement * pl->turnspeed / MAX_PLAYER_TURNSPEED;
     if (turnspeed < 0) {
 	turndir = -1.0;
@@ -3653,7 +3653,7 @@ static int Receive_fps_request(int ind)
 	return n;
     }
     if (connp->id != NO_ID) {
-	pl = Players(GetInd[connp->id]);
+	pl = Players(GetInd(connp->id));
 	if (fps == 0)
 	    fps = 1;
 	if ((fps == 20) && ignore20MaxFPS)
@@ -3679,7 +3679,7 @@ static int Receive_audio_request(int ind)
 	return n;
     }
     if (connp->id != NO_ID) {
-	pl = Players(GetInd[connp->id]);
+	pl = Players(GetInd(connp->id));
 	sound_player_onoff(pl, onoff);
     }
 
