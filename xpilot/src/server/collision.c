@@ -440,7 +440,7 @@ static void PlayerCollision(void)
 			ball->life = 1e6;  /* for frame counter */
 		    ball->owner = pl->id;
 		    SET_BIT(ball->status, GRAVITY);
-		    World.treasures[ball->treasure].have = false;
+		    ball->treasure->have = false;
 		    SET_BIT(pl->have, HAS_BALL);
 		    pl->ball = NULL;
 		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
@@ -474,7 +474,7 @@ static void PlayerCollision(void)
 				       pl->pos.cy - Obj[j]->pos.cy);
 		    if (dist < mindist) {
 			ballobject *ball = BALL_PTR(Obj[j]);
-			int bteam = World.treasures[ball->treasure].team;
+			int bteam = ball->treasure->team;
 
 			/*
 			 * The treasure's team cannot connect before
@@ -1555,7 +1555,7 @@ static void BallCollision(void)
 	    (ball->id != NO_ID
 	     && BIT(Player_by_id(ball->id)->used, HAS_PHASING_DEVICE)) ||
 					/* phased ball */
-	    World.treasures[ball->treasure].have) {
+	    ball->treasure->have) {
 					/* safe in a treasure */
 	    continue;
 	}
@@ -1607,14 +1607,12 @@ static void BallCollision(void)
 		 * the treasure: */
 		{
 		    ballobject *b2 = BALL_PTR(obj);
-		    if (World.treasures[b2->treasure].have) {
+		    if (b2->treasure->have)
 			break;
-		    }
+
 		    if (b2->id != NO_ID
-			&& BIT(Player_by_id(b2->id)->used,
-			       HAS_PHASING_DEVICE)) {
+			&& BIT(Player_by_id(b2->id)->used, HAS_PHASING_DEVICE))
 			break;
-		    }
 		}
 
 		/* if the collision was too violent, destroy ball and object */
@@ -1625,7 +1623,7 @@ static void BallCollision(void)
 		    obj->life  = 0;
 		} else {
 		    /* they bounce */
-		    Obj_repel((object*)ball, obj, radius);
+		    Obj_repel(OBJ_PTR(ball), obj, radius);
 		}
 		break;
 

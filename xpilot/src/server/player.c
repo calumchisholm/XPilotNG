@@ -727,15 +727,19 @@ void Reset_all_players(void)
 
 	/* Reset the treasures */
 	for (i = 0; i < World.NumTreasures; i++) {
-	    World.treasures[i].destroyed = 0;
-	    World.treasures[i].have = false;
-	    Make_treasure_ball(i);
+	    treasure_t *treasure = &World.treasures[i];
+
+	    treasure->destroyed = 0;
+	    treasure->have = false;
+	    Make_treasure_ball(treasure);
 	}
 
 	/* Reset the teams */
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    World.teams[i].TreasuresDestroyed = 0;
-	    World.teams[i].TreasuresLeft = World.teams[i].NumTreasures - World.teams[i].NumEmptyTreasures;
+	    team_t *team = &World.teams[i];
+
+	    team->TreasuresDestroyed = 0;
+	    team->TreasuresLeft = team->NumTreasures - team->NumEmptyTreasures;
 	}
 
 	if (endOfRoundReset) {

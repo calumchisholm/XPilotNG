@@ -276,7 +276,7 @@ void Ball_hits_goal(ballobject *ball, struct group *groupptr)
     if (!BIT(World.rules->mode, TEAM_PLAY))
 	return;
 
-    td = &World.treasures[ball->treasure];
+    td = ball->treasure;
     if (td->team == groupptr->team) {
 	Ball_is_replaced(ball);
 	return;
@@ -329,7 +329,7 @@ bool Balltarget_hitfunc(struct group *groupptr, struct move *move)
 	 * the ball and the target are of the same team, but the
 	 * owner is not.
 	 */
-	if (World.treasures[ball->treasure].team == groupptr->team
+	if (ball->treasure->team == groupptr->team
 	    && Player_by_id(ball->owner)->team != groupptr->team)
 	    return false;
 	return true;

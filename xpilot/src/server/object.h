@@ -347,7 +347,7 @@ struct _ballobject {
     OBJECT_EXTEND
 
     int 		owner;		/* Who's object is this ? */
-    int			treasure;	/* treasure for ball */
+    treasure_t		*treasure;	/* treasure for ball */
     /*DFLOAT		length;*/	/* distance ball to player */
 
 #ifdef __cplusplus

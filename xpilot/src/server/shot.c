@@ -46,9 +46,8 @@ char shot_version[] = VERSION;
 void Place_mine(player *pl)
 {
     if (pl->item[ITEM_MINE] <= 0
-	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining)) {
+	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining))
 	return;
-    }
 
     if (minMineSpeed > 0) {
 	Place_moving_mine(pl);
@@ -66,9 +65,8 @@ void Place_moving_mine(player *pl)
     DFLOAT	vy = pl->vel.y;
 
     if (pl->item[ITEM_MINE] <= 0
-	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining)) {
+	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining))
 	return;
-    }
 
     if (minMineSpeed > 0) {
 	if (pl->velocity < minMineSpeed) {
@@ -132,9 +130,8 @@ void Place_general_mine(player *pl, unsigned short team, long status,
 		Set_player_message (pl, msg);
 		return;
 	    }
-	} else {
+	} else
 	    used = nukeMinMines;
-	}
 	mass = MINE_MASS * used * NUKE_MASS_MULT;
     } else {
 	mass = (BIT(status, FROMCANNON) ? MINE_MASS * 0.6 : MINE_MASS);
@@ -143,9 +140,8 @@ void Place_general_mine(player *pl, unsigned short team, long status,
 
     if (pl) {
 	drain = ED_MINE;
-	if (BIT(mods.warhead, CLUSTER)) {
+	if (BIT(mods.warhead, CLUSTER))
 	    drain += (long)(CLUSTER_MASS_DRAIN(mass));
-	}
 	if (pl->fuel.sum < -drain) {
 	    sprintf(msg, "You need at least %ld fuel units to %s %s!",
 		    (-drain) >> FUEL_SCALE_BITS,
@@ -190,12 +186,10 @@ void Place_general_mine(player *pl, unsigned short team, long status,
     SET_BIT(status, OWNERIMMUNE);
 
     for (i = 0; i < minis; i++) {
-
 	mineobject *mine;
 
-	if ((mine = MINE_PTR(Object_allocate())) == NULL) {
+	if ((mine = MINE_PTR(Object_allocate())) == NULL)
 	    break;
-	}
 
 	mine->type = OBJ_MINE;
 	mine->color = BLUE;
@@ -288,10 +282,9 @@ void Detonate_mines(player *pl)
     return;
 }
 
-void Make_treasure_ball(int treasure)
+void Make_treasure_ball(treasure_t *t)
 {
     ballobject *ball;
-    treasure_t *t = &(World.treasures[treasure]);
     int cx = t->pos.cx;
     int cy = t->pos.cy;
 
@@ -301,16 +294,15 @@ void Make_treasure_ball(int treasure)
     if (t->empty)
 	return;
     if (t->have) {
-	xpprintf("%s Failed Make_treasure_ball(treasure=%d):\n",
-		 showtime(), treasure);
+	xpprintf("%s Failed Make_treasure_ball(treasure=%ld):\n",
+		 showtime(), (long)t);
 	xpprintf("\ttreasure: destroyed = %d, team = %d, have = %d\n",
 		 t->destroyed, t->team, t->have);
 	return;
     }
 
-    if ((ball = BALL_PTR(Object_allocate())) == NULL) {
+    if ((ball = BALL_PTR(Object_allocate())) == NULL)
 	return;
-    }
 
     ball->life = 1e6;
     ball->mass = ballMass;
@@ -329,7 +321,7 @@ void Make_treasure_ball(int treasure)
     ball->pl_radius = BALL_RADIUS;
     CLEAR_MODS(ball->mods);
     ball->status = RECREATE;
-    ball->treasure = treasure;
+    ball->treasure = t;
     Cell_add_object(OBJ_PTR(ball));
 
     t->have = true;
@@ -366,9 +358,8 @@ char *Describe_shot(int type, long status, modifiers mods, int hit)
 	if (BIT(mods.warhead, CLUSTER)) {
 	    howmany = "";
 	    name = "flak";
-	} else {
+	} else
 	    name = "shot";
-	}
 	break;
     default:
 	/*
@@ -378,9 +369,8 @@ char *Describe_shot(int type, long status, modifiers mods, int hit)
 	if (BIT(mods.warhead, CLUSTER)) {
 	    howmany = "";
 	    name = "debris";
-	} else {
+	} else
 	    name = "shot";
-	}
 	break;
     }
 
@@ -555,12 +545,11 @@ void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 
     case OBJ_SMART_SHOT:
     case OBJ_HEAT_SHOT:
-	if ((type == OBJ_HEAT_SHOT) ? !allowHeatSeekers : !allowSmartMissiles) {
-	    if (allowTorpedoes) {
+	if (type == OBJ_HEAT_SHOT ? !allowHeatSeekers : !allowSmartMissiles) {
+	    if (allowTorpedoes)
 		type = OBJ_TORPEDO;
-	    } else {
+	    else
 		return;
-	    }
 	}
 	/* FALLTHROUGH */
     case OBJ_TORPEDO:
@@ -1144,7 +1133,7 @@ void Delete_shot(int ind)
 	     * have been destroyed is by being knocked out of the goal.
 	     * Therefore we force the ball to be recreated.
 	     */
-	    World.treasures[ball->treasure].have = false;
+	    ball->treasure->have = false;
 	    SET_BIT(ball->status, RECREATE);
 	}
 	if (BIT(ball->status, RECREATE)) {

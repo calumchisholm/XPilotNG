@@ -2553,9 +2553,8 @@ void Walls_init(void)
 void Treasure_init(void)
 {
     int i;
-    for (i = 0; i < World.NumTreasures; i++) {
-	Make_treasure_ball(i);
-    }
+    for (i = 0; i < World.NumTreasures; i++)
+	Make_treasure_ball(&World.treasures[i]);
 }
 
 
