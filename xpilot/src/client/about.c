@@ -506,16 +506,17 @@ void Keys_destroy(void)
 static char		*motd_buf = NULL;
 static size_t		motd_size;
        int		motd_viewer = NO_WIDGET;
-static int		motd_auto_popup;
+static bool		motd_auto_popup;
 
 int Motd_callback(int widget_desc, void *data, const char **str)
 {
     (void)widget_desc; (void)data; (void)str;
-    if (motd_buf == NULL || refreshMotd) {
-	motd_auto_popup = 0;
-	Net_ask_for_motd(0, MAX_MOTD_SIZE);
-	Net_flush();
-    }
+
+    /* always refresh motd */
+    motd_auto_popup = false;
+    Net_ask_for_motd(0, MAX_MOTD_SIZE);
+    Net_flush();
+
     if (motd_viewer != NO_WIDGET)
 	Widget_map(motd_viewer);
     return 0;
@@ -592,7 +593,7 @@ int Handle_motd(long off, char *buf, int len, long filesize)
 int Startup_server_motd(void)
 {
     if (autoServerMotdPopup) {
-	motd_auto_popup = 1;
+	motd_auto_popup = true;
 	return Net_ask_for_motd(0, MAX_MOTD_SIZE);
     }
     return 0;

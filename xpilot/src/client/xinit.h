@@ -55,7 +55,6 @@ extern unsigned		top_width, top_height;
 extern unsigned		players_width, players_height;
 extern char		*geometry;
 extern bool		autoServerMotdPopup;
-extern bool		refreshMotd;
 extern bool		ignoreWindowManager;
 extern bool		quitting;
 

@@ -539,14 +539,6 @@ xp_option_t default_options[] = {
 	"Automatically popup the MOTD of the server on startup.\n",
 	0
     },
-    {
-	"refreshMotd",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Get a fresh copy of the server MOTD every time it is displayed.\n",
-	0
-    },
 
 
 
@@ -1177,14 +1169,6 @@ cl_option_t options[] = {
 #endif
 	KEY_DUMMY,
 	"Automatically popup the MOTD of the server on startup.\n",
-	0
-    },
-    {
-	"refreshMotd",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Get a fresh copy of the server MOTD every time it is displayed.\n",
 	0
     },
     {
@@ -4301,7 +4285,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bool_resource(rDB, "join", join);
     Get_bool_resource(rDB, "noLocalMotd", noLocalMotd);
     Get_bool_resource(rDB, "autoServerMotdPopup", &autoServerMotdPopup);
-    Get_bool_resource(rDB, "refreshMotd", &refreshMotd);
 
     Get_shipshape_resource(rDB, &shipShape);
     Validate_shape_str(shipShape);
