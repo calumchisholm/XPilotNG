@@ -244,7 +244,7 @@ static void Win_show_error(char *errmsg);
 # undef	va_start
 # undef	va_end
 # include <varargs.h>
-  /* Windows needs specific system calls for sockets: */
+  /* Windows needs specific hacks for sockets: */
 # undef close
 # define close(x__) closesocket(x__)
 # undef ioctl
