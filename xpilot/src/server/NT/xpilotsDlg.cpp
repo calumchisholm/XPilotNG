@@ -466,7 +466,7 @@ BOOL CXpilotsDlg::PreTranslateMessage(MSG* pMsg)
 extern "C" int MsgAvail0;
 extern "C" int MsgAvail1;
 extern "C" int NumPlayers;
-extern "C" int NumRobots;
+//extern "C" int NumRobots;
 extern "C" int NumPseudoPlayers;
 afx_msg LONG CXpilotsDlg::OnMsgAvailable(UINT which, LONG s)
 {
@@ -496,15 +496,15 @@ afx_msg LONG CXpilotsDlg::OnMsgAvailable(UINT which, LONG s)
 afx_msg LONG CXpilotsDlg::OnUpdateScores(UINT unused, LONG unused1)
 {
 	char	st[10];
-	sprintf(st, "%d", NumPlayers - NumRobots - NumPseudoPlayers);
+	sprintf(st, "%d", NumPlayers - /*NumRobots -*/ NumPseudoPlayers);
 	TRACE("OnUpdateScores <%s>\n", st);
 	SendDlgItemMessage(IDC_PLAYERCOUNT, WM_SETTEXT, 0, (LPARAM)st);
 	return(0);
 
 }
-afx_msg LONG CXpilotsDlg::OnGetHostName(UINT unused, LONG unused1)
+afx_msg LRESULT CXpilotsDlg::OnGetHostName(WPARAM wParam, LPARAM lParam)
 {
-	m_ServerThreadInfo.m_hostNameFound = TRUE;
+	m_pServerWorkerThread->PostThreadMessage(WM_GETHOSTNAME, wParam, lParam);
 	return(0);
 }
 afx_msg LONG CXpilotsDlg::OnStartTimer(UINT unused, LONG fps)

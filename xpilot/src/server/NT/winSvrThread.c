@@ -115,7 +115,11 @@ UINT ServerThreadProc(LPVOID pParam)
 		// need to free zargv, add later.
 
 		notifyWnd = pServerInfo->m_hwndNotifyProgress;
-		hostnameFound = &pServerInfo->m_hostNameFound;
+		// force the system to create a message queue for this thread
+		{ 
+			MSG msg;
+			PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+		}
 		// Exit the thread if the main application sets the "kill server"
 		// event. The main application will set the "start game" event
 		// before setting the "kill server" event.

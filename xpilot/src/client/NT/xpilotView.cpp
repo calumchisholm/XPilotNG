@@ -43,6 +43,7 @@
 #define _XPDOC
 #include "winClient.h"
 #include "winXXPilot.h"
+#include "winNet.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -179,6 +180,7 @@ void CXpilotView::OnDraw(CDC* pDC)
 		// Here is where we call xpilot proper.
 		// This gives Windows/MFC time to setup/settle down before we do fun things
 		TRACE("Eat Me\n");
+                notifyWnd = GetSafeHwnd();
 		ret = main(argc, argv);
 
 		for (int i=0; i<args; i++)
