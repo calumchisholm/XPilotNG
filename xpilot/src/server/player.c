@@ -975,7 +975,7 @@ void Team_game_over(world_t *world, int winning_team, const char *reason)
 
     /* Ranking */
     Rank_write_webpage();
-    Rank_write_score_file();
+    Rank_write_rankfile();
     Rank_show_ranks();
 }
 
@@ -1782,7 +1782,7 @@ void Delete_player(player_t *pl)
 	Rank_save_score(pl);
    	if (NumPlayers == NumRobots + NumPseudoPlayers) {
 	    Rank_write_webpage();
-	    Rank_write_score_file();
+	    Rank_write_rankfile();
    	}
     }
 

@@ -33,10 +33,9 @@ char rank_version[] = VERSION;
 "<a href=\"previous_ranks.html\">Previous rankings</a> " \
 "<a href=\"rank_explanation.html\">How does the ranking work?</a><hr>\n"
 
-static bool Rank_parse_scorefile(FILE *file);
+static bool Rank_parse_rankfile(FILE *file);
 
 /* Score data */
-static const char *xpilotscorefile = NULL;
 static ranknode_t ranknodes[MAX_SCORES];
 
 typedef struct rank {
@@ -249,7 +248,7 @@ void Rank_write_webpage(void)
 
     SortRankings();
 
-    filename = getenv("XPILOTNOJSRANKINGPAGE");
+    filename = options.rankWebpageFileName;
     if (!filename)
 	return;
 
@@ -414,17 +413,31 @@ void Rank_init_saved_scores(void)
 	memset(rank, 0, sizeof(ranknode_t));
     }
 
-    xpilotscorefile = getenv("XPILOTSCOREFILE");
-    if (!xpilotscorefile)
+    if (getenv("XPILOTSCOREFILE")) {
+	warn("Environment variable XPILOTSCOREFILE is obsolete.");
+	warn("Use server option rankFileName instead.");
+    }
+
+    if (getenv("XPILOTRANKINGPAGE")) {
+	warn("Environment variable XPILOTRANKINGPAGE is obsolete.");
+	warn("Use server option rankWebpageFileName instead.");
+    }
+
+    if (getenv("XPILOTNOJSRANKINGPAGE")) {
+	warn("Environment variable XPILOTNOJSRANKINGPAGE is obsolete.");
+	warn("Use server option rankWebpageFileName instead.");
+    }
+
+    if (!options.rankFileName)
 	return;
 
-    file = fopen(xpilotscorefile, "r");
+    file = fopen(options.rankFileName, "r");
     if (!file) {
-	error("Couldn't open score file \"%s\"", xpilotscorefile);
+	error("Couldn't open rank file \"%s\"", options.rankFileName);
 	return;
     }
 
-    Rank_parse_scorefile(file);
+    Rank_parse_rankfile(file);
 
     fclose(file);
 
@@ -511,16 +524,16 @@ void Rank_save_score(player_t * pl)
 }
 
 /* Save the scores to disk (not the webpage). */
-void Rank_write_score_file(void)
+void Rank_write_rankfile(void)
 {
     FILE *file = NULL;
     char tmp_file[PATH_MAX];
     int i;
 
-    if (!xpilotscorefile)
+    if (!options.rankFileName)
 	return;
 
-    snprintf(tmp_file, sizeof(tmp_file), "%s-new", xpilotscorefile);
+    snprintf(tmp_file, sizeof(tmp_file), "%s-new", options.rankFileName);
 
     file = fopen(tmp_file, "w");
     if (file == NULL) {
@@ -606,9 +619,9 @@ void Rank_write_score_file(void)
     }
     file = NULL;
 
-    /* Overwrite old score file. */
-    if (rename(tmp_file, xpilotscorefile) < 0) {
-	error("Rename \"%s\" to \"%s\"", tmp_file, xpilotscorefile);	
+    /* Overwrite old rank file. */
+    if (rename(tmp_file, options.rankFileName) < 0) {
+	error("Rename \"%s\" to \"%s\"", tmp_file, options.rankFileName);
 	goto failed;
     }
 
@@ -628,7 +641,7 @@ void Rank_write_score_file(void)
 	fclose(file);
 	remove(tmp_file);
     }
-    warn("Couldn't save ranking data to file \"%s\".", xpilotscorefile);
+    warn("Couldn't save ranking data to file \"%s\".", options.rankFileName);
 
     return;
 }
@@ -649,17 +662,17 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	if (version == 0.0)
-	    warn("Score file version is 0.0.");
+	    warn("Rank file version is 0.0.");
 	else if (version > 0.0) {
-	    warn("Score file has newer version than this server recognizes.");
-	    warn("The score file might use unsupported features.");
+	    warn("Rank file has newer version than this server recognizes.");
+	    warn("The file might use unsupported features.");
 	}
 	xptag = true;
 	return;
     }
 
     if (!xptag) {
-	fatal("This doesn't look like a score file "
+	fatal("This doesn't look like a rank file "
 	      " (XPilotNGRank must be first tag).");
 	return; /* not reached */
     }
@@ -714,7 +727,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	return;
     }
 
-    warn("Unknown tag in score file: \"%s\"", el);
+    warn("Unknown tag in rank file: \"%s\"", el);
     return;
 }
 
@@ -732,7 +745,7 @@ static void tagend(void *data, const char *el)
 
 
 
-static bool Rank_parse_scorefile(FILE *file)
+static bool Rank_parse_rankfile(FILE *file)
 {
     char buff[8192];
     int len, fd;
@@ -750,11 +763,11 @@ static bool Rank_parse_scorefile(FILE *file)
     do {
 	len = read(fd, buff, 8192);
 	if (len < 0) {
-	    error("Error reading rank scorefile!");
+	    error("Error reading rankfile!");
 	    return false;
 	}
 	if (!XML_Parse(p, buff, len, !len)) {
-	    warn("Parse error reading rank scorefile at line %d:\n%s\n",
+	    warn("Parse error reading rankfile at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));
 	    return false;

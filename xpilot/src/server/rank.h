@@ -61,7 +61,7 @@ void Rank_nuke_score(ranknode_t *rank);
 void Rank_init_saved_scores(void);
 void Rank_get_saved_score(player_t *pl);
 void Rank_save_score(player_t *pl);
-void Rank_write_score_file(void);
+void Rank_write_rankfile(void);
 void Rank_write_webpage(void);
 void Rank_show_ranks(void);
 

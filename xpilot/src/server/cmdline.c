@@ -1658,6 +1658,26 @@ static option_desc opts[] = {
 	OPT_COMMAND | OPT_DEFAULTS
     },
     {
+	"rankFileName",
+	"rankFileName",
+	NULL,
+	&options.rankFileName,
+	valString,
+	tuner_none,
+	"The filename for the XML file to hold server ranking data.\n",
+	OPT_COMMAND | OPT_DEFAULTS
+    },
+    {
+	"rankWebpageFileName",
+	"rankWebpage",
+	NULL,
+	&options.rankWebpageFileName,
+	valString,
+	tuner_none,
+	"The filename for the webpage with the server ranking list.\n",
+	OPT_COMMAND | OPT_DEFAULTS
+    },
+    {
 	"framesPerSecond",
 	"FPS",
 	"50",

@@ -330,8 +330,8 @@ int End_game(void)
     Contact_cleanup();
 
     /* Ranking. */
-    Rank_write_webpage();     /* "Rank_score" */
-    Rank_write_score_file();
+    Rank_write_webpage();
+    Rank_write_rankfile();
 
     Free_players();
     Free_shots(world);

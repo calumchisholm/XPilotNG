@@ -336,6 +336,8 @@ extern struct options {
     char	*scoreTableFileName;
     char	*adminMessageFileName;
     int		adminMessageFileSizeLimit;
+    char	*rankFileName;
+    char	*rankWebpageFileName;
     double	frictionSetting;
     double	blockFriction;
     bool	blockFrictionVisible;
