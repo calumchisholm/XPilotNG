@@ -438,8 +438,8 @@ void Rank_init_saved_scores(void)
  */
 void Rank_get_saved_score(player_t * pl)
 {
-    ranknode_t *rank;
-    int oldest = 0, i;
+    ranknode_t *rank, *unused = NULL;
+    int i;
 
     updateScores = true;
 
@@ -458,12 +458,38 @@ void Rank_get_saved_score(player_t * pl)
 		pl->rank = NULL;
 	    }
 	    return;
-	} else if (rank->timestamp < ranknodes[oldest].timestamp)
-	    oldest = i;
+	}
     }
 
-    /* Didn't find it, use the least-recently-used node. */
-    rank = &ranknodes[oldest];
+    /* find unused nick */
+    for (i = 0; i < MAX_SCORES; i++) {
+	rank = &ranknodes[i];
+
+	if (strlen(rank->name) == 0) {
+	    unused = rank;
+	    /*warn("found unused node %d", i);*/
+	    break;
+	}
+    }
+
+    /*
+     * If all entries are in use, use the least-recently-used node
+     * of the bottom half of the list.
+     */
+    if (!unused) {
+	for (i = MAX_SCORES / 2; i < MAX_SCORES; i++) {
+	    rank = &ranknodes[rank_base[i].ind];
+
+	    /*warn("i is %d, index is %d, timestamp is %u",
+	      i, rank_base[i].ind, rank->timestamp); */
+
+	    if (!unused || rank->timestamp < unused->timestamp)
+		unused = rank;
+	}
+    }
+
+    rank = unused;
+    /*warn("timestamp of lru node = %u", rank->timestamp);*/
 
     Init_ranknode(rank, pl->name, pl->username, pl->hostname);
     rank->pl = pl;
