@@ -528,7 +528,7 @@ int Handle_motd(long off, char *buf, int len, long filesize)
 
     if (!motd_buf) {
 	motd_size = MIN(filesize, MAX_MOTD_SIZE);
-	i = MAX(motd_size, sizeof no_motd_msg) + 1;
+	i = MAX(motd_size, (long)(sizeof no_motd_msg)) + 1;
 	if (!(motd_buf = (char *) malloc(i))) {
 	    error("No memory for MOTD");
 	    return -1;
@@ -562,14 +562,14 @@ int Handle_motd(long off, char *buf, int len, long filesize)
     if (motd_viewer == NO_WIDGET) {
 	char title[100];
 	sprintf(title, "XPilot motd from %s", servername);
-	motd_viewer =
-	    Widget_create_viewer(motd_buf,
-				 (off || len) ? (off + len) : strlen(motd_buf),
-				 2*DisplayWidth(dpy, DefaultScreen(dpy))/3,
-				 4*DisplayHeight(dpy, DefaultScreen(dpy))/8,
-				 2,
-				 title, "XPilot:motd",
-				 motdFont);
+	motd_viewer = Widget_create_viewer(
+	    motd_buf,
+	    (off || len) ? (off + len) : (int)strlen(motd_buf),
+	    2*DisplayWidth(dpy, DefaultScreen(dpy))/3,
+	    4*DisplayHeight(dpy, DefaultScreen(dpy))/8,
+	    2,
+	    title, "XPilot:motd",
+	    motdFont);
 	if (motd_viewer == NO_WIDGET)
 	    warn("Can't create MOTD viewer");
     }
