@@ -129,11 +129,10 @@ void Player_position_debug(player *pl, const char *msg)
 	       CLICK_TO_BLOCK(pt.cy),
 	       CLICK_TO_PIXEL(pt.cx),
 	       CLICK_TO_PIXEL(pt.cy),
-	       pt.cx),
-	       pt.cy),
+	       pt.cx,
+	       pt.cy,
 	       pl->prevpos.cx + pts.cx,
 	       pl->prevpos.cy + pts.cy);
     }
 #endif
 }
-
