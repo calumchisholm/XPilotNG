@@ -740,7 +740,6 @@ static void Robot_create(world_t *world)
     strlcpy(robot->username, options.robotUserName, MAX_CHARS);
     strlcpy(robot->hostname, options.robotHostName, MAX_CHARS);
 
-    robot->color = WHITE;
     robot->turnspeed = MAX_PLAYER_TURNSPEED;
     robot->turnspeed_s = MAX_PLAYER_TURNSPEED;
     robot->turnresistance = 0.12;

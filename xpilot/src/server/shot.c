@@ -855,7 +855,7 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 	shot->type	= type;
 	shot->id	= (pl ? pl->id : NO_ID);
 	shot->team	= team;
-	shot->color	= (pl ? pl->color : WHITE);
+	shot->color	= WHITE;
 
 	/* shot->count = 0;
 	   shot->info 	= lock; */
@@ -1181,10 +1181,7 @@ void Delete_shot(world_t *world, int ind)
 
 	if (BIT(shot->mods.warhead, CLUSTER)) {
 	    type = OBJ_SHOT;
-	    if (shot->id != NO_ID)
-		color = Player_by_id(shot->id)->color;
-	    else
-		color = WHITE;
+	    color = WHITE;
 	    mass = options.shotMass * 3;
 	    modv = 1 << shot->mods.velocity;
 	    num_modv = 4;
@@ -1432,7 +1429,7 @@ void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
     pulse->obj_status 	= (pl ? 0 : FROMCANNON);
     pulse->type 	= OBJ_PULSE;
     pulse->mods 	= mods;
-    pulse->color	= (pl ? pl->color : WHITE);
+    pulse->color	= WHITE;
 
     pulse->fusetime	= frame_time;
     pulse->pl_range 	= 0;

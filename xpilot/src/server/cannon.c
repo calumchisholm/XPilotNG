@@ -779,7 +779,6 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 		  3.5, 23.0,
 		  28.0,
 		  GRAVITY,
-		  WHITE,
 		  10,
 		  (int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
 		  10.0, 25.0,

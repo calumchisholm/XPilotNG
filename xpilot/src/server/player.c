@@ -430,7 +430,6 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 
     Compute_sensor_range(pl);
 
-    pl->color = WHITE;
     pl->obj_status = GRAVITY;
     assert(pl->pl_status == 0);
     assert(pl->pl_state == PL_STATE_UNDEFINED);
