@@ -6,7 +6,7 @@ xpilot_ng_server_SOURCES = \
 	command.c connection.h contact.c \
 	defaults.h \
 	event.c \
-	fileparser.c frame.c \
+	fileparser.c frame.c gravity.c \
 	id.c item.c \
 	laser.c \
 	map.c map.h metaserver.c modifiers.c modifiers.h \

@@ -25,6 +25,26 @@
 
 #include "xpserver.h"
 
+
+shape_t		wormhole_wire;
+
+void Wormhole_line_init(world_t *world)
+{
+    int i;
+    static clpos_t coords[MAX_SHIP_PTS];
+
+    UNUSED_PARAM(world);
+    wormhole_wire.num_points = MAX_SHIP_PTS;
+    for (i = 0; i < MAX_SHIP_PTS; i++) {
+	wormhole_wire.pts[i] = coords + i;
+	coords[i].cx = (int)(cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
+	coords[i].cy = (int)(sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS);
+    }
+
+    return;
+}
+
+
 void Object_hits_wormhole(object_t *obj, int ind)
 {
     /*world_t *world = &World;
