@@ -49,8 +49,8 @@ extern void Colors_init_style_colors(void);
  */
 extern void defaultCleanup(void);			/* memory cleanup */
 
-extern bool setScaleFactor(xp_option_t *opt, double val);
-extern bool setAltScaleFactor(xp_option_t *opt, double val);
+extern bool Set_scaleFactor(xp_option_t *opt, double val);
+extern bool Set_altScaleFactor(xp_option_t *opt, double val);
 
 #ifdef _WINDOWS
 extern char *Get_xpilotini_file(int level);

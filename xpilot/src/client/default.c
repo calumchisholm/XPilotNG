@@ -36,7 +36,7 @@ char myClass[] = "XPilot";
 
 char myshipshapefile[PATH_MAX + 1];
 
-static bool setTexturePath(xp_option_t *opt, const char *value)
+static bool Set_texturePath(xp_option_t *opt, const char *value)
 {
     (void)opt;
     if (texturePath)
@@ -45,13 +45,13 @@ static bool setTexturePath(xp_option_t *opt, const char *value)
     texturePath = xp_safe_strdup(value);
     return true;
 }
-static char *getTexturePath(xp_option_t *opt)
+static char *Get_texturePath(xp_option_t *opt)
 {
     (void)opt;
     return texturePath;
 }
 
-static bool setGeometry(xp_option_t *opt, const char *value)
+static bool Set_geometry(xp_option_t *opt, const char *value)
 {
     (void)opt;
     if (geometry)
@@ -61,7 +61,7 @@ static bool setGeometry(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *getGeometry(xp_option_t *opt)
+static char *Get_geometry(xp_option_t *opt)
 {
     (void)opt;
     return geometry;
@@ -139,8 +139,9 @@ static char *shipShapeFileSetting = NULL;
 /*
  * Shipshape options.
  */
-static bool setShipShape(xp_option_t *opt, const char *value)
+static bool Set_shipShape(xp_option_t *opt, const char *value)
 {
+    (void)opt;
     if (shipShapeSetting)
 	xp_free(shipShapeSetting);
     shipShapeSetting = xp_strdup(value);
@@ -150,13 +151,15 @@ static bool setShipShape(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *getShipShape(xp_option_t *opt)
+static char *Get_shipShape(xp_option_t *opt)
 {
+    (void)opt;
     return shipShapeSetting;
 }
 
-static bool setShipShapeFile(xp_option_t *opt, const char *value)
+static bool Set_shipShapeFile(xp_option_t *opt, const char *value)
 {
+    (void)opt;
    if (shipShapeFileSetting)
 	xp_free(shipShapeFileSetting);
     shipShapeFileSetting = xp_strdup(value);
@@ -167,50 +170,69 @@ static bool setShipShapeFile(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *getShipShapeFile(xp_option_t *opt)
+static char *Get_shipShapeFile(xp_option_t *opt)
 {
+    (void)opt;
     return shipShapeFileSetting;
 }
 
-static bool setPower(xp_option_t *opt, double val)
+static bool Set_power(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_power(val);
     controlTime = CONTROL_TIME;
     return true;
 }
-static bool setTurnSpeed(xp_option_t *opt, double val)
+static bool Set_turnSpeed(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnspeed(val);
     controlTime = CONTROL_TIME;
     return true;
 }
-static bool setTurnResistance(xp_option_t *opt, double val)
+static bool Set_turnResistance(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnresistance(val);
     return true;
 }
 
-static bool setAltPower(xp_option_t *opt, double val)
+static bool Set_altPower(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_power_s(val);
     controlTime = CONTROL_TIME;
     return true;
 }
-static bool setAltTurnSpeed(xp_option_t *opt, double val)
+static bool Set_altTurnSpeed(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnspeed_s(val);
     controlTime = CONTROL_TIME;
     return true;
 }
-static bool setAltTurnResistance(xp_option_t *opt, double val)
+static bool Set_altTurnResistance(xp_option_t *opt, double val)
 {
     (void)opt;
     Send_turnresistance_s(val);
+    return true;
+}
+
+static bool Set_toggleShield(xp_option_t *opt, bool val)
+{
+    (void)opt;
+    Set_toggle_shield(val);
+    return true;
+}
+
+static bool Set_maxFPS(xp_option_t *opt, int val)
+{
+    (void)opt; (void)val;
+    if (oldMaxFPS != maxFPS) {
+	oldMaxFPS = maxFPS;
+	if (Send_fps_request(maxFPS) < 0)
+	    return false;
+    }
     return true;
 }
 
@@ -248,7 +270,7 @@ xp_option_t default_options[] = {
 	"shipShape",
 	"",
 	NULL, 0,
-	setShipShape, getShipShape,
+	Set_shipShape, Get_shipShape,
 	"Define the ship shape to use.  Because the argument to this option\n"
 	"is rather large (up to 500 bytes) the recommended way to set\n"
 	"this option is in the .xpilotrc file in your home directory.\n"
@@ -262,7 +284,7 @@ xp_option_t default_options[] = {
 	"shipShapeFile",
 	SHIP_FILE,  /*conf_ship_file_string,*/
 	NULL, 0,
-	setShipShapeFile, getShipShapeFile,
+	Set_shipShapeFile, Get_shipShapeFile,
 	"An optional file where shipshapes can be stored.\n"
 	"If this resource is defined and it refers to an existing file\n"
 	"then shipshapes can be referenced to by their name.\n"
@@ -353,8 +375,7 @@ xp_option_t default_options[] = {
 	"geometry",
 	"1024x768",
 	NULL, 0,
-	setGeometry,
-	getGeometry,
+	Set_geometry, Get_geometry,
 	"Set the window size and position in standard X geometry format.\n"
 	"The maximum allowed window size is 1922x1440.\n"),
 
@@ -370,7 +391,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_POWER,
 	MAX_PLAYER_POWER,
 	&power,
-	setPower,
+	Set_power,
 	"Set the engine power.\n"
 	"Valid values are in the range 5-55.\n"),
 
@@ -380,7 +401,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_TURNSPEED,
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed,
-	setTurnSpeed,
+	Set_turnSpeed,
 	"Set the ship's turn speed.\n"
 	"Valid values are in the range 4-64.\n"
 	"See also turnResistance.\n"),
@@ -391,7 +412,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_TURNRESISTANCE,
 	MAX_PLAYER_TURNRESISTANCE,
 	&turnresistance,
-	setTurnResistance,
+	Set_turnResistance,
 	"Set the ship's turn resistance.\n"
 	"This determines the speed at which a ship stops turning.\n"
 	"Valid values are in the range 0.0-1.0.\n"
@@ -404,7 +425,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_POWER,
 	MAX_PLAYER_POWER,
 	&power_s,
-	setAltPower,
+	Set_altPower,
 	"Set the ship's alternate engine power.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -414,7 +435,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_TURNSPEED,
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed_s,
-	setAltTurnSpeed,
+	Set_altTurnSpeed,
 	"Set the ship's alternate turn speed.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -424,7 +445,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_TURNRESISTANCE,
 	MAX_PLAYER_TURNRESISTANCE,
 	&turnresistance_s,
-	setAltTurnResistance,
+	Set_altTurnResistance,
 	"Set the ship's alternate turn resistance.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -434,7 +455,7 @@ xp_option_t default_options[] = {
 	MIN_SCALEFACTOR,
 	MAX_SCALEFACTOR,
 	&scaleFactor,
-	setScaleFactor,
+	Set_scaleFactor,
 	"Specifies scaling factor for the drawing window.\n"),
 
     XP_DOUBLE_OPTION(
@@ -443,7 +464,7 @@ xp_option_t default_options[] = {
 	MIN_SCALEFACTOR,
 	MAX_SCALEFACTOR,
 	&scaleFactor_s,
-	setAltScaleFactor,
+	Set_altScaleFactor,
         "Specifies alternative scaling factor for the drawing window.\n"),
 
     XP_INT_OPTION(
@@ -452,7 +473,7 @@ xp_option_t default_options[] = {
 	1,
 	MAX_SUPPORTED_FPS,
 	&maxFPS,
-	NULL,  /* we need a setfunc here */
+	Set_maxFPS,
 	"Set maximum FPS supported by the client. The server will try to\n"
 	"send at most this many frames per second to the client.\n"),
 
@@ -792,7 +813,7 @@ xp_option_t default_options[] = {
 	"toggleShield",
 	false,
 	&toggle_shield,
-	NULL,
+	Set_toggleShield,
 	"Are shields toggled by a keypress only?\n"),
 
     XP_BOOL_OPTION(
@@ -915,8 +936,7 @@ xp_option_t default_options[] = {
 	"texturePath",
 	TEXTUREDIR, /* conf_texturedir_string, */
 	NULL, 0,
-	setTexturePath,
-	getTexturePath,
+	Set_texturePath, Get_texturePath,
 	"Search path for texture files.\n"
 	"This is a list of one or more directories separated by colons.\n"),
 

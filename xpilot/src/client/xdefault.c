@@ -326,7 +326,7 @@ void Handle_x_options(void)
 
 
 
-bool setScaleFactor(xp_option_t *opt, double val)
+bool Set_scaleFactor(xp_option_t *opt, double val)
 {
     (void)opt;
     scaleFactor = val;
@@ -337,7 +337,7 @@ bool setScaleFactor(xp_option_t *opt, double val)
     return true;
 }
 
-bool setAltScaleFactor(xp_option_t *opt, double val)
+bool Set_altScaleFactor(xp_option_t *opt, double val)
 {
     (void)opt;
     scaleFactor_s = val;
