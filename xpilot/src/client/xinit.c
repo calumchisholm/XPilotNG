@@ -449,6 +449,7 @@ int Init_top(void)
       xpprintf("Value of option \"" #c "\" (%d) is out of range, " \
                "setting default value " #d ".\n", c); c = d ; }
 
+    /* Color checks for colors with a default of 0-3. */
     COLORCHECK(hudColor, 2);
     COLORCHECK(hudHLineColor, 2);
     COLORCHECK(hudVLineColor, 0);
@@ -502,21 +503,26 @@ int Init_top(void)
     COLORCHECK(team8Color, 0);
     COLORCHECK(team9Color, 0);
 
+    /* Color checks for colors with a default of 4-7. */
     if (maxColors > 4) {
 	COLORCHECK(msgScanSafeColor, 4);
 	COLORCHECK(decorColor, 6);
 	COLORCHECK(manyLivesColor, 4);
+	COLORCHECK(scoreOwnTeamColor, 4);
     } else {
 	COLORCHECK(msgScanSafeColor, 2);
 	COLORCHECK(decorColor, 3);
 	COLORCHECK(manyLivesColor, 0);
+	COLORCHECK(scoreOwnTeamColor, 1);
     }
 
+    /* Color checks for colors with a default of 8-15. */
     if (maxColors > 8) {
 	COLORCHECK(msgScanPopColor, 11);
 	COLORCHECK(windowColor, 8);
 	COLORCHECK(scoreInactiveColor, 12);
 	COLORCHECK(scoreInactiveSelfColor, 12);
+	COLORCHECK(scoreEnemyTeamColor, 11);
 	COLORCHECK(messagesColor, 12);
 	COLORCHECK(oldMessagesColor, 13);
 	COLORCHECK(twoLivesColor, 11);
@@ -525,6 +531,7 @@ int Init_top(void)
 	COLORCHECK(windowColor, 2);
 	COLORCHECK(scoreInactiveColor, 1);
 	COLORCHECK(scoreInactiveSelfColor, 1);
+	COLORCHECK(scoreEnemyTeamColor, 1);
 	COLORCHECK(messagesColor, 3);
 	COLORCHECK(oldMessagesColor, 2);
 	COLORCHECK(twoLivesColor, 0);

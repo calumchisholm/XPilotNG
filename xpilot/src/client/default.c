@@ -1270,6 +1270,21 @@ option options[] = {
 	"Which color number to use for drawing your score when inactive.\n"
     },
     {
+	"scoreOwnTeamColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing your own team score.\n"
+    },
+
+    {
+	"scoreEnemyTeamColor",
+	NULL,
+	"11",
+	KEY_DUMMY,
+	"Which color number to use for drawing enemy team score.\n"
+    },
+    {
 	"scoreObjectColor",
 	NULL,
 	"4",
@@ -3212,6 +3227,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "scoreInactiveColor", &scoreInactiveColor);
     Get_int_resource(rDB, "scoreInactiveSelfColor",
 		     &scoreInactiveSelfColor);
+    Get_int_resource(rDB, "scoreOwnTeamColor", &scoreOwnTeamColor);
+    Get_int_resource(rDB, "scoreEnemyTeamColor", &scoreEnemyTeamColor);
     Get_int_resource(rDB, "scoreObjectColor", &scoreObjectColor);
     Get_float_resource(rDB, "scoreObjectTime", &scoreObjectTime);
     Get_int_resource(rDB, "baseWarningType", &baseWarningType);

@@ -148,6 +148,8 @@ static int Config_create_scoreColor(int widget_desc, int *height);
 static int Config_create_scoreSelfColor(int widget_desc, int *height);
 static int Config_create_scoreInactiveColor(int widget_desc, int *height);
 static int Config_create_scoreInactiveSelfColor(int widget_desc, int *height);
+static int Config_create_scoreOwnTeamColor(int widget_desc, int *height);
+static int Config_create_scoreEnemyTeamColor(int widget_desc, int *height);
 static int Config_create_scoreObjectColor(int widget_desc, int *height);
 static int Config_create_scoreObjectTime(int widget_desc, int *height);
 static int Config_create_baseWarningType(int widget_desc, int *height);
@@ -366,6 +368,8 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_scoreSelfColor,
     Config_create_scoreInactiveColor,
     Config_create_scoreInactiveSelfColor,
+    Config_create_scoreOwnTeamColor,
+    Config_create_scoreEnemyTeamColor,
     Config_create_scoreObjectColor,
     Config_create_wallColor,
     Config_create_fuelColor,
@@ -1372,6 +1376,16 @@ static int Config_create_scoreInactiveSelfColor(int widget_desc, int *height)
     return CONFIG_CREATE_COLOR(scoreInactiveSelfColor);
 }
 
+static int Config_create_scoreOwnTeamColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreOwnTeamColor);
+}
+
+static int Config_create_scoreEnemyTeamColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreEnemyTeamColor);
+}
+
 static int Config_create_scoreObjectColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(scoreObjectColor);
@@ -2143,6 +2157,8 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "scoreSelfColor", scoreSelfColor);
     Config_save_int(fp, "scoreInactiveColor", scoreInactiveColor);
     Config_save_int(fp, "scoreInactiveSelfColor", scoreInactiveSelfColor);
+    Config_save_int(fp, "scoreOwnTeamColor", scoreOwnTeamColor);
+    Config_save_int(fp, "scoreEnemyTeamColor", scoreEnemyTeamColor);
     Config_save_int(fp, "scoreObjectColor", scoreObjectColor);
     Config_save_int(fp, "wallColor", wallColor);
     Config_save_int(fp, "fuelColor", fuelColor);

@@ -223,6 +223,8 @@ extern int	scoreColor;		/* Score list color index */
 extern int	scoreSelfColor;		/* Score list own score color index */
 extern int	scoreInactiveColor;	/* Score list inactive player color index */
 extern int	scoreInactiveSelfColor;	/* Score list inactive self color index */
+extern int	scoreOwnTeamColor;	/* Score list own team color index */
+extern int	scoreEnemyTeamColor;	/* Score list enemy team color index */
 extern int	scoreObjectColor;	/* Color index for map score objects */
 
 extern bool	gotFocus;		/* Do we have the mouse pointer */
