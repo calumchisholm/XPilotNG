@@ -9,7 +9,8 @@ affected:
 
 -------------------------------------------------------------------
 Problem : shotsize 8 with texturedObjects works ok in the lg [old] client
-          while it doesnt work in ng
+          while it doesnt work in ng X11 client (in ng shotsize comes out
+          too small)
 Found by: Throat
 Solution:
 Fixed by:
