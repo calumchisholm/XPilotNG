@@ -489,8 +489,20 @@ static void Msg_scan_game_msg(const char *message)
     }
 
     /* handle killratio */
-    if (i_am_killer && !i_am_victim)
+    if (i_am_killer && !i_am_victim) {
 	killratio_kills++;
+	if ((killratio_kills % 10) == 0) {
+	    static char		mybuf[MSG_LEN];
+
+	    if (killratio_deaths > 0)
+		sprintf(mybuf, "Current kill ratio: %d/%d (%.02f).",
+			killratio_kills, killratio_deaths, 
+			(double)killratio_kills / killratio_deaths);
+
+	    Add_message(mybuf);
+	}
+    }
+
 
     if (i_am_victim || i_am_victim2)
 	killratio_deaths++;
