@@ -3582,18 +3582,7 @@ static option_desc opts[] = {
 	"Can be used to reduce server bandwidth consumption.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    {
-	"waitingFramesPerSecond",
-	"waitingFPS",
-	"0",
-	&options.waitingFPS,
-	valInt,
-	tuner_dummy,
-	"Maximum FPS shown to players waiting for a new round to start.\n"
-	"0 means full framerate. Can be used to limit bandwidth used.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    /* options.teamcup related options */
+    /* teamcup related options */
     {
 	"teamcup",
 	"teamcup",
