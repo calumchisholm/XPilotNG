@@ -7,6 +7,4 @@ class MapBall(MapObject):
 
     def printXml(self, file):
         file.write('<Ball x="%d" y="%d" team="%d"/>\n' % (
-            self.getBounds().x + self.getBounds().width / 2,
-            self.getBounds().y + self.getBounds().height / 2,
-            self.team))
+            self.x, self.y, self.team))

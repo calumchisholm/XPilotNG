@@ -137,8 +137,6 @@ class MapDocumentHandler(xml.sax.ContentHandler):
         def getint(name, base = 10):
             return int(atts[name], base)
         def addobj(o):
-            r = o.getBounds()
-            o.moveTo(r.x - r.width / 2, r.y - r.height / 2)
             self.model.addToFront(o)
         if name == "polygon":
             poly = Poly()

@@ -7,6 +7,4 @@ class MapCheckPoint(MapObject):
                            bmstore["checkpoint.gif"])
 
     def printXml(self, file):
-        b = self.getBounds()
-        file.write('<Check x="%d" y="%d"/>\n' % (b.x + b.width / 2,
-                                               b.y + b.height / 2))
+        file.write('<Check x="%d" y="%d"/>\n' % (self.x, self.y))

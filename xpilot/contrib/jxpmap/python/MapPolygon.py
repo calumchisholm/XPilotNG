@@ -17,6 +17,7 @@ class MapPolygon(MapObject):
         self.polygon = p
         self.style = style
         self.edgeStyles = edgeStyles
+        self.type = self.TYPE_NORMAL
 
     def getCreateHandler(self):
         return CreateHandler(self)
@@ -37,8 +38,7 @@ class MapPolygon(MapObject):
         return self.polygon
 
     def moveTo(self, x, y):
-        r = self.getBounds()
-        self.polygon.transform(AffineTransform(x - r.x, y - r.y))
+        self.polygon.transform(AffineTransform(x - self.x, y - self.y))
 
     def paint(self, di):
         gc = di.gc
@@ -151,6 +151,10 @@ class MapPolygon(MapObject):
                                 self, me, i, wrap))
                             return 1
 
+        # MapObject's move handler needs x and y. Would be nicer to trap
+        # their access and return appropriate values then...
+        self.x = self.polygon.points[0].x
+        self.y = self.polygon.points[0].y
         return MapObject.checkEvent(self, canvas, me)
 
     def removePoint(self, i):
@@ -177,6 +181,17 @@ class MapPolygon(MapObject):
             area += x1 * y2 - x2 * y1
             x1, y1 = x2, y2
         return area > 0
+
+    def checkWrapping(self, mapsize):
+        xwrap = self.polygon.points[0].x
+        xwrap -= xwrap % mapsize.width
+        ywrap = self.polygon.points[0].y
+        ywrap -= ywrap % mapsize.height
+        if xwrap != 0 or ywrap != 0:
+            for p in self.polygon.points:
+                p.x -= xwrap
+                p.y -= ywrap
+            self.polygon.recalculate_bounds()
 
     def printXml(self, file):
         if self.polygon.npoints < 3:
@@ -248,10 +263,12 @@ class CreateHandler(MouseEventHandler):
         latest = me.point
         self.poly.points[self.poly.npoints - 1] = latest
         if me.button == 3:
-            self.poly.recalculate_bounds()
-            self.object.polygon = self.poly
-            self.object.style = c.getModel().getDefaultPolygonStyle()
-            c.getModel().addToFront(self.object)
+            if len(self.poly.points) > 2:
+                self.poly.recalculate_bounds()
+                self.object.polygon = self.poly
+                self.object.style = c.getModel().getDefaultPolygonStyle()
+                self.object.checkWrapping(c.model.options.size)
+                c.getModel().addToFront(self.object)
             c.setCanvasEventHandler(None)
             c.repaint()
             return
@@ -303,6 +320,8 @@ class PolygonPointMoveHandler(MouseEventHandler):
         p.y += self.wrap[1]
         self.obj.polygon.points[self.index] = evt.point
         self.obj.polygon.recalculate_bounds()
+        if self.index == 0:
+            self.obj.checkWrapping(c.model.options.size)
         c.setCanvasEventHandler(None)
         c.repaint()
 

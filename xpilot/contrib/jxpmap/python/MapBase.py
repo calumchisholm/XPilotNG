@@ -23,6 +23,4 @@ class MapBase(MapObject):
 
     def printXml(self, file):
         file.write('<Base x="%d" y="%d" team="%d" dir="%d"/>\n' % (
-            self.getBounds().x + self.getBounds().width / 2,
-            self.getBounds().y + self.getBounds().height / 2,
-            self.team, self.dir))
+            self.x, self.y, self.team, self.dir))

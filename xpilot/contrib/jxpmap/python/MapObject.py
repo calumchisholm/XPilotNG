@@ -9,7 +9,9 @@ import EditorDialog
 
 class MapObject:
     def __init__(self, x, y, width, height, img):
-        self.bounds = Rectangle(x, y, width, height)
+        self.bounds = Rectangle(x - width / 2, y - height / 2, width, height)
+        self.x = x
+        self.y = y
         self.img = img
 
     def getBounds(self):
@@ -28,8 +30,10 @@ class MapObject:
         return CreateHandler(self)
 
     def moveTo(self, x, y):
-        self.bounds.x = x
-        self.bounds.y = y
+        self.x = x
+        self.y = y
+        self.bounds.x = x - self.bounds.width / 2
+        self.bounds.y = y - self.bounds.height / 2
 
     def getPreviewShape(self):
         return self.getBounds()
@@ -72,52 +76,49 @@ class MapObject:
 class CreateHandler:
     def __init__(self, object):
         self.object = object
-        ob = object.getBounds()
-        self.offset = Point(ob.width / 2, ob.height / 2)
         self.preview = object.getPreviewShape()
         self.toBeRemoved = None
 
     def mouseMoved(self, evt):
         c = evt.canvas
         gc = c.previewgc
-        ob = self.object.getBounds()
         if self.toBeRemoved is not None:
             c.drawShape(self.toBeRemoved, gc)
         s = self.preview.copy()
-        s.transform(AffineTransform(evt.x - self.offset.x - ob.x,
-                                    evt.y - self.offset.y - ob.y))
+        s.transform(AffineTransform(evt.x - self.object.x,
+                                    evt.y - self.object.y))
         c.drawShape(s)
         self.toBeRemoved = s
 
     def mousePressed(self, evt):
         c = evt.canvas
         c.getModel().addToFront(self.object)
-        self.object.moveTo(evt.x - self.offset.x, evt.y - self.offset.y)
+        mapsize = c.model.options.size
+        self.object.moveTo(evt.x % mapsize.width, evt.y % size.mapheight)
         c.setCanvasEventHandler(None)
         c.repaint()
 
 class MoveHandler(MouseEventHandler):
     def __init__(self, obj, evt):
-        self.obj = obj
-        ob = obj.getBounds()
-        self.offset = Point(evt.x - ob.x, evt.y - ob.y)
+        self.object = obj
+        self.offset = Point(evt.x - obj.x, evt.y - obj.y)
         self.preview = obj.getPreviewShape()
         self.toBeRemoved = None
 
     def mouseMoved(self, evt):
-        ob = self.obj.getBounds()
         c = evt.canvas
         if self.toBeRemoved is not None:
             c.drawShape(self.toBeRemoved)
         s = self.preview.copy()
-        s.transform(AffineTransform(evt.x - self.offset.x - ob.x,
-                                    evt.y - self.offset.y - ob.y))
+        s.transform(AffineTransform(evt.x - self.offset.x - self.object.x,
+                                    evt.y - self.offset.y - self.object.y))
         c.drawShape(s)
         self.toBeRemoved = s
 
     def mouseReleased(self, evt):
         c = evt.canvas
-        self.obj.moveTo(evt.x - self.offset.x,
-                           evt.y - self.offset.y)
+        mapsize = c.model.options.size
+        self.object.moveTo((evt.x - self.offset.x) % mapsize.width,
+                           (evt.y - self.offset.y) % mapsize.height)
         c.setCanvasEventHandler(None)
         c.repaint()
