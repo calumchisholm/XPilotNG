@@ -1120,7 +1120,7 @@ void Delete_shot(int ind)
 	break;
 
     case OBJ_ASTEROID:
-	Break_asteroid(ind);
+	Break_asteroid(WIRE_PTR(shot));
 	break;
 
     case OBJ_BALL:

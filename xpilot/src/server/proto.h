@@ -289,7 +289,7 @@ void remove_temp_wormhole(int ind);
 /*
  * Prototypes for asteroid.c
  */
-void Break_asteroid(int ind);
+void Break_asteroid(wireobject *asteroid);
 void Asteroid_update(void);
 #ifdef LIST_H_INCLUDED
 list_t Asteroid_get_list(void);

@@ -32,7 +32,7 @@ static list_t	Asteroid_list = NULL;
 
 
 /*
-** Prototypes.
+ * Prototypes.
 */
 static void Make_asteroid(int cx, int cy,
 			  int size, int dir,
@@ -40,8 +40,8 @@ static void Make_asteroid(int cx, int cy,
 
 
 /*
-** Return the asteroid list.
-*/
+ * Return the asteroid list.
+ */
 list_t Asteroid_get_list(void)
 {
     return Asteroid_list;
@@ -92,9 +92,8 @@ static bool Asteroid_remove_from_list(wireobject *ast)
  * the wreckage and the debris should be about equal to the mass
  * of the original asteroid.
  */
-void Break_asteroid(int ind)
+void Break_asteroid(wireobject *asteroid)
 {
-    wireobject	*asteroid = WIRE_IND(ind);
     DFLOAT	mass, mass3;
     DFLOAT	speed, speed1, speed2, radius;
     DFLOAT	velx1, vely1, velx2, vely2, velx3, vely3;
@@ -318,8 +317,10 @@ static void Place_asteroid(void)
     else
 	con = NULL;
 
-    /* we bail out after 8 unsuccessful attempts to avoid wasting
-     * too much time on crowded maps */
+    /*
+     * We bail out after some unsuccessful attempts to avoid wasting
+     * too much time on crowded maps.
+     */
     okay = false;
     for (place_count = 0; okay != true; place_count++) {
 	if (place_count >= 10)
@@ -388,10 +389,10 @@ static void Asteroid_rotate(wireobject *wireobj)
 
 
 /*
-** Called once each frame update to update everything
-** related to asteroids including creation, destruction,
-** rotation and movement.
-*/
+ * Called once each frame update to update everything
+ * related to asteroids including creation, destruction,
+ * rotation and movement.
+ */
 void Asteroid_update(void)
 {
     int		num;
@@ -401,14 +402,15 @@ void Asteroid_update(void)
 
     list = Asteroid_get_list();
     if (list) {
-	/* if there are more asteroids than are wanted, mark
+	/*
+	 * if there are more asteroids than are wanted, mark
 	 * all asteroids to be removed (by Delete_shot()),
 	 * until enough of size 1 have been removed
 	 * (only breaking of size 1 actually lowers the
 	 * total number of asteroids)
 	 * one iteration may not remove enough asteroids
 	 * the rest are left until the next frame then
-	 * */
+	 */
 	num = World.asteroids.num;
 	if (num > World.asteroids.max) {
 	    for (iter = List_begin(list);
