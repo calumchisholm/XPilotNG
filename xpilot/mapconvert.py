@@ -1,20 +1,80 @@
-# Requires python 2.0
+#!/usr/bin/env python
+from __future__ import division, generators
+# Requires python 2.2 or newer
 
-# Doesn't yet work for maps where a single wall wraps all around the map
-# back to the same point.
+# Some parts could be written more clearly with higher-level constructs,
+# but have been optimized for speed (converting big maps can still take
+# several seconds).
 
-# Some parts of this code are really hacky and ugly, they're probably
-# difficult to read even in Python. If this was Perl or something I
-# probably couldn't read them myself...
+removedopts = """
+analyticalcollisiondetection ecmsreprogramrobots edgebounce
+extraborder maxdefensiveitems maxoffensiveitems maxrobots
+maxshieldedplayerwallbounceangle maxunshieldedplayerwallbounceangle
+minrobots oneplayeronly reserverobotteam restrictrobots robotfile
+robotleavelife robotleaveratio robotleavescore robotteam robots
+robotsleave robotstalk scoretablefilename teamassign usewreckage
+""".split()
 
-removedopts = ['analyticalcollisiondetection', 'ecmsreprogramrobots', 'edgebounce', 'extraborder', 'maxdefensiveitems', 'maxoffensiveitems', 'maxrobots', 'maxshieldedplayerwallbounceangle', 'maxunshieldedplayerwallbounceangle', 'minrobots', 'oneplayeronly', 'reserverobotteam', 'restrictrobots', 'robotfile', 'robotleavelife', 'robotleaveratio', 'robotleavescore', 'robotteam', 'robots', 'robotsleave', 'robotstalk', 'scoretablefilename', 'teamassign', 'usewreckage']
 # 'mapdata' has been removed too, but isn't ignored by this script.
 # 'numberofrounds', 'numrounds' and 'roundstoplay' have been used for the same
 # thing
 
-illegalopts = ['noquit', 'plockserver', 'timerresolution']
+illegalopts = "noquit plockserver timerresolution".split()
 
-knownopts = ['allowclusters', 'allowheatseekers', 'allowlasermodifiers', 'allowmodifiers', 'allownukes', 'allowplayerbounces', 'allowplayercrashes', 'allowplayerkilling', 'allowshields', 'allowshipshapes', 'allowsmartmissiles', 'allowtorpedoes', 'allowviewing', 'ballkillscoremult', 'ballswallbounce', 'baseminerange', 'cannonitemprobmult', 'cannonsmartness', 'cannonsuseitems', 'checkpointradius', 'cloakedexhaust', 'cloakedshield', 'clusterkillscoremult', 'contactport', 'crashscoremult', 'debriswallbounce', 'defaultsfilename', 'denyhosts', 'destroyitemincollisionprob', 'detonateitemonkillprob', 'distinguishmissiles', 'dropitemonkillprob', 'dump', 'ecmsreprogrammines', 'edgewrap', 'explosionkillscoremult', 'firerepeatrate', 'framespersecond', 'friction', 'fullframerate', 'fullzeroframerate', 'gameduration', 'gravity', 'gravityangle', 'gravityanticlockwise', 'gravityclockwise', 'gravitypoint', 'gravitypointsource', 'gravityvisible', 'heatkillscoremult', 'help', 'identifymines', 'idlerun', 'ignore20maxfps', 'ignore20maxfps', 'initialafterburners', 'initialarmor', 'initialautopilots', 'initialcloaks', 'initialdeflectors', 'initialecms', 'initialemergencyshields', 'initialemergencythrusts', 'initialfuel', 'initialhyperjumps', 'initiallasers', 'initialmines', 'initialmirrors', 'initialmissiles', 'initialphasings', 'initialrearshots', 'initialsensors', 'initialtanks', 'initialtractorbeams', 'initialtransporters', 'initialwideangles', 'itemafterburnerprob', 'itemarmorprob', 'itemautopilotprob', 'itemcloakprob', 'itemconcentratorprob', 'itemconcentratorradius', 'itemconcentratorvisible', 'itemdeflectorprob', 'itemecmprob', 'itememergencyshieldprob', 'itememergencythrustprob', 'itemenergypackprob', 'itemhyperjumpprob', 'itemlaserprob', 'itemmineprob', 'itemmirrorprob', 'itemmissileprob', 'itemphasingprob', 'itemprobmult', 'itemrearshotprob', 'itemsensorprob', 'itemswallbounce', 'itemtankprob', 'itemtractorbeamprob', 'itemtransporterprob', 'itemwideangleprob', 'keepshots', 'laserisstungun', 'laserkillscoremult', 'limitedlives', 'limitedvisibility', 'lockotherteam', 'loseitemdestroys', 'mapauthor', 'mapfilename', 'mapheight', 'mapname', 'mapwidth', 'maxafterburners', 'maxarmor', 'maxautopilots', 'maxcloaks', 'maxdeflectors', 'maxecms', 'maxemergencyshields', 'maxemergencythrusts', 'maxfuel', 'maxhyperjumps', 'maxitemdensity', 'maxlasers', 'maxmines', 'maxminesperpack', 'maxmirrors', 'maxmissiles', 'maxmissilesperpack', 'maxobjectwallbouncespeed', 'maxphasings', 'maxplayershots', 'maxrearshots', 'maxroundtime', 'maxsensors', 'maxshieldedwallbouncespeed', 'maxtanks', 'maxtractorbeams', 'maxtransporters', 'maxunshieldedwallbouncespeed', 'maxvisibilitydistance', 'maxwideangles', 'minefusetime', 'minelife', 'minescoremult', 'minesonradar', 'mineswallbounce', 'minvisibilitydistance', 'missilelife', 'missilesonradar', 'missileswallbounce', 'movingitemprob', 'noquit', 'nukeclusterdamage', 'nukeminmines', 'nukeminsmarts', 'nukesonradar', 'numberofrounds', 'objectwallbouncebrakefactor', 'objectwallbouncelifefactor', 'password', 'playerlimit', 'playersonradar', 'playerstartsshielded', 'playerwallbouncebrakefactor', 'plockserver', 'racelaps', 'recordmode', 'reporttometaserver', 'reset', 'resetonhuman', 'rogueheatprob', 'roguemineprob', 'rounddelay', 'roundstoplay', 'runoverkillscoremult', 'searchdomainforxpilot', 'shieldeditempickup', 'shieldedmining', 'shipmass', 'shotkillscoremult', 'shotlife', 'shotmass', 'shotsgravity', 'shotspeed', 'shotswallbounce', 'shovekillscoremult', 'smartkillscoremult', 'sparkswallbounce', 'tankkillscoremult', 'targetkillteam', 'targetsync', 'targetteamcollision', 'teamcannons', 'teamcup', 'teamfuel', 'teamimmunity', 'teamplay', 'teamzeropausing', 'timerresolution', 'timing', 'torpedokillscoremult', 'treasurecollisiondestroys', 'treasurecollisionmaykill', 'treasurekillteam', 'treasuresonradar', 'version', 'wallbouncedestroyitemprob', 'wallbouncefueldrainmult', 'worldlives', 'wormholevisible', 'wormtime', 'wreckagecollisionmaykill', 'mapdata']
+knownopts = """
+allowclusters allowheatseekers allowlasermodifiers allowmodifiers
+allownukes allowplayerbounces allowplayercrashes allowplayerkilling
+allowshields allowshipshapes allowsmartmissiles allowtorpedoes
+allowviewing ballkillscoremult ballswallbounce baseminerange
+cannonitemprobmult cannonsmartness cannonsuseitems checkpointradius
+cloakedexhaust cloakedshield clusterkillscoremult contactport
+crashscoremult debriswallbounce defaultsfilename denyhosts
+destroyitemincollisionprob detonateitemonkillprob distinguishmissiles
+dropitemonkillprob dump ecmsreprogrammines edgewrap
+explosionkillscoremult firerepeatrate framespersecond friction
+gameduration gravity gravityangle gravityanticlockwise
+gravityclockwise gravitypoint gravitypointsource gravityvisible
+heatkillscoremult help identifymines idlerun ignore20maxfps
+ignore20maxfps initialafterburners initialarmor initialautopilots
+initialcloaks initialdeflectors initialecms initialemergencyshields
+initialemergencythrusts initialfuel initialhyperjumps initiallasers
+initialmines initialmirrors initialmissiles initialphasings
+initialrearshots initialsensors initialtanks initialtractorbeams
+initialtransporters initialwideangles itemafterburnerprob
+itemarmorprob itemautopilotprob itemcloakprob itemconcentratorprob
+itemconcentratorradius itemconcentratorvisible itemdeflectorprob
+itemecmprob itememergencyshieldprob itememergencythrustprob
+itemenergypackprob itemhyperjumpprob itemlaserprob itemmineprob
+itemmirrorprob itemmissileprob itemphasingprob itemprobmult
+itemrearshotprob itemsensorprob itemswallbounce itemtankprob
+itemtractorbeamprob itemtransporterprob itemwideangleprob keepshots
+laserisstungun laserkillscoremult limitedlives limitedvisibility
+lockotherteam loseitemdestroys mapauthor mapfilename mapheight mapname
+mapwidth maxafterburners maxarmor maxautopilots maxcloaks
+maxdeflectors maxecms maxemergencyshields maxemergencythrusts maxfuel
+maxhyperjumps maxitemdensity maxlasers maxmines maxminesperpack
+maxmirrors maxmissiles maxmissilesperpack maxobjectwallbouncespeed
+maxphasings maxplayershots maxrearshots maxroundtime maxsensors
+maxshieldedwallbouncespeed maxtanks maxtractorbeams maxtransporters
+maxunshieldedwallbouncespeed maxvisibilitydistance maxwideangles
+minefusetime minelife minescoremult minesonradar mineswallbounce
+minvisibilitydistance missilelife missilesonradar missileswallbounce
+movingitemprob noquit nukeclusterdamage nukeminmines nukeminsmarts
+nukesonradar numberofrounds objectwallbouncebrakefactor
+objectwallbouncelifefactor password playerlimit playersonradar
+playerstartsshielded playerwallbouncebrakefactor plockserver racelaps
+recordmode reporttometaserver reset resetonhuman rogueheatprob
+roguemineprob rounddelay runoverkillscoremult searchdomainforxpilot
+shieldeditempickup shieldedmining shipmass shotkillscoremult shotlife
+shotmass shotsgravity shotspeed shotswallbounce shovekillscoremult
+smartkillscoremult sparkswallbounce tankkillscoremult targetkillteam
+targetsync targetteamcollision teamcannons teamfuel teamimmunity
+teamplay timerresolution timing torpedokillscoremult
+treasurecollisiondestroys treasurecollisionmaykill treasurekillteam
+treasuresonradar version wallbouncedestroyitemprob
+wallbouncefueldrainmult worldlives wormholevisible wormtime
+wreckagecollisionmaykill mapdata
+""".split()
 
 def checkopts(options):
     dany = 0
@@ -36,10 +96,12 @@ def checkopts(options):
     if dany:
 	print >> sys.stderr
     if illegal:
-        print >> sys.stderr, "The following options may no more be set in map file"
-        print >>sys.stderr, illegal
+        print >> sys.stderr, "The following options may no more be set "\
+              "in map file"
+        print >> sys.stderr, illegal
     for opt in unknown:
-	print >> sys.stderr, "WARNING did not recognize option %s, removed!" % opt
+	print >> sys.stderr, "WARNING: did not recognize option %s, "\
+              "removed!" % opt
 
 def parse(lines):
     options = {}
@@ -62,52 +124,26 @@ def parse(lines):
 	options[option] = value
     return options
 
-repl = (('&', '&amp;'), ('"', '&quot;'), ("'", '&apos;'),
-	    ('<', '&lt;'), ('>', '&gt;'))
-
-def encode(text):
-    for t, r in repl:
-	text = text.replace(t, r)
-    return text
-
-def center(coord, size):
-    return ((coord + size / 2) % size - size / 2)
-
-dirs = ((1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1))
 FILLED = 'x#' # Consider fuel stations as a filled block
-REC_LU = 's'
-REC_RU = 'a'
-REC_LD = 'w'
-REC_RD = 'q'
+REC_UL = 's'
+REC_UR = 'a'
+REC_DL = 'w'
+REC_DR = 'q'
+WALL = FILLED + REC_UL + REC_UR + REC_DL + REC_DR
 ATTRACT = '$'
 BCLICKS = 35 * 64
 MAXLEN = 30000
 
-class Wrapcoords:
+dirs = ((1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1))
+
+class Wrapcoords(object):
     def __init__(self, width, height, x = 0, y = 0):
 	self.width = width
 	self.height = height
 	self.x = x % width
 	self.y = y % height
-    def __cmp__(self, other):
-	return self.x != other.x or self.y != other.y
-    def u(self):
-	return Wrapcoords(self.width, self.height, self.x, self.y - 1)
-    def d(self):
-	return Wrapcoords(self.width, self.height, self.x, self.y + 1)
-    def l(self):
-	return Wrapcoords(self.width, self.height, self.x - 1, self.y)
-    def r(self):
-	return Wrapcoords(self.width, self.height, self.x + 1, self.y)
-    def ur(self):
-	return self.r().u()
-    def ul(self):
-	return self.l().u()
-    def dl(self):
-	return self.l().d()
-    def dr(self):
-	return self.r().d()
-	self.x = (self.x + 1) % self.width
+    def __eq__(self, other):
+	return self.x == other.x and self.y == other.y
     def copy(self):
 	return Wrapcoords(self.width, self.height, self.x, self.y)
     def godir(self, dir):
@@ -116,11 +152,21 @@ class Wrapcoords:
 	self.x %= self.width
 	self.y %= self.height
     def dist2(self, other):
-	x = (self.x - other.x + self.width / 2) % self.width - self.width / 2
-	y = (self.y - other.y + self.height /2) % self.height - self.height / 2
+	x = (self.x - other.x + self.width // 2) % self.width - self.width // 2
+	y = (self.y - other.y + self.height//2) % self.height - self.height //2
 	return x * x + y * y
+# Give class Wrapcoords methods called .u() etc that return a separate
+# object one block above etc
+dirnames = "r ur u ul l dl d dr".split()
+for i in range(8):
+    def movedir(self, dir = i):
+        result = self.copy()
+        result.godir(dir)
+        return result
+    setattr(Wrapcoords, dirnames[i], movedir)
+del i
 
-class Map:
+class Map(object):
     def __init__(self, data, width, height):
 	self.data = data
 	self.width = width
@@ -129,28 +175,176 @@ class Map:
 	return self.data[coords.y][coords.x]
     def __setitem__(self, coords, value):
 	self.data[coords.y][coords.x] = value
-    def d(self, loc, d):
+    def noedge(self, loc, d):
+        # Return whether there's solid wall to the right of the
+        # direction d. Used when following polygon edge.
 	if d == 0 :
-	    return self[loc] in FILLED + REC_LU + REC_RU
+	    return self[loc] in FILLED + REC_UL + REC_UR
 	elif d == 1:
-	    return self[loc.u()] in FILLED + REC_LD + REC_RD
+	    return self[loc.u()] in FILLED + REC_DL + REC_DR
 	elif d == 2:
-	    return self[loc.u()] in FILLED + REC_LU + REC_LD
+	    return self[loc.u()] in FILLED + REC_UL + REC_DL
 	elif d == 3:
-	    return self[loc.ul()] in FILLED + REC_RU + REC_RD
+	    return self[loc.ul()] in FILLED + REC_UR + REC_DR
 	elif d == 4:
-	    return self[loc.ul()] in FILLED + REC_LD + REC_RD
+	    return self[loc.ul()] in FILLED + REC_DL + REC_DR
 	elif d == 5:
-	    return self[loc.l()] in FILLED + REC_RU + REC_LU
+	    return self[loc.l()] in FILLED + REC_UR + REC_UL
 	elif d == 6:
-	    return self[loc.l()] in FILLED + REC_RD + REC_RU
+	    return self[loc.l()] in FILLED + REC_DR + REC_UR
 	elif d == 7:
-	    return self[loc] in FILLED + REC_LD + REC_LU
-    def coords(self, x = 0, y = 0):
-	return Wrapcoords(self.width, self.height, x, y)
+	    return self[loc] in FILLED + REC_DL + REC_UL
+    def coords(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                yield Wrapcoords(self.width, self.height, x, y)
+    def ncoords(self):
+        return [(x, y) for y in range(self.height) for x in range(self.width)]
+    def scratch(self):
+        return Map([[None] * self.width for _ in range(self.height)],
+                   self.width, self.height)
 
 class Struct:
     pass
+
+def dist2(x1, y1, x2, y2, width, height):
+    x = (x1 - x2 + (width >> 1)) % width - (width >> 1)
+    y = (y1 - y2 + (height >> 1)) % height - (height >> 1)
+    return 1. * x * x + 1. * y * y
+
+def closestteam(loc, bases):
+    maxd = 30000 * 30000
+    for bs in bases:
+	if loc.dist2(bs.loc) < maxd:
+	    maxd = loc.dist2(bs.loc)
+	    ans = bs.team
+    return ans
+
+def poly_partition(map):
+    ways = {}
+    for i in FILLED:
+        ways[i] = [0, 2, 4, 6]
+    ways[REC_UR] = [0, 2]
+    ways[REC_UL] = [2, 4]
+    ways[REC_DL] = [4, 6]
+    ways[REC_DR] = [6, 0]
+    mapparts = map.scratch()
+    partnum = 0
+    width, height = map.width, map.height
+    for x, y in map.ncoords():
+        if map.data[y][x] in WALL and mapparts.data[y][x] is None:
+            left = [(x, y)]
+            mapparts.data[y][x] = (partnum, x, y)
+            while left:
+                x2, y2 = left.pop()
+                c = map.data[y2 % height][x2 % width]
+                for d in ways[c]:
+                    x3 = x2 + dirs[d][0]
+                    y3 = y2 + dirs[d][1]
+                    xw = x3 % width
+                    yw = y3 % height
+                    if map.data[yw][xw] not in WALL or \
+                           ((d + 4) % 8) not in ways[map.data[yw][xw]]:
+                        continue
+                    if mapparts.data[yw][xw] is None:
+                        left.append((x3, y3))
+                        mapparts.data[yw][xw] = (partnum, x3, y3)
+                        continue
+            partnum += 1
+    return mapparts, partnum
+
+def poly_findedges(map, mapparts, partcount):
+    partpolys = [[] for _ in range(partcount)]
+    done = map.scratch()
+    # Follow the edge of a polygon and return the polygon.
+    def tracepoly(x, y, startdir, okdir = None):
+        dir = startdir
+        l = Wrapcoords(map.width, map.height, x, y)
+        startloc = l.copy()
+	poly = []
+	while 1:
+	    poly.append((x, y, dirs[dir]))
+            x += dirs[dir][0]
+            y += dirs[dir][1]
+	    if dir in [6, 7]:
+		done[l] = 1
+	    elif dir == 5:
+		done[l.l()] = 1
+            elif dir == 3:
+                done[l.ul()] = 1
+            elif dir == 1:
+                done[l.u()] = 1
+	    l.godir(dir)
+	    dir = (dir + 3) % 8  # always turn as much left as possible
+	    while map.noedge(l, dir):
+		dir = (dir - 1) % 8  # that much wasn't possible
+	    if l == startloc and dir == startdir:
+		break
+            if okdir is not None:
+                if dir not in okdir:
+                    return None
+                if dir == 2:
+                    done[l.u()] = -1
+        return poly
+
+    width, height = map.width, map.height
+    for x, y in map.ncoords():
+        if done.data[y][x]:
+            continue
+        block = map.data[y][x]
+        if block not in WALL:
+	    continue
+	if block == REC_UR:
+	    dir = 7
+            dx = dy = 0
+	elif block == REC_DR:
+            dx = 1
+            dy = 0
+	    dir = 5
+        elif block == REC_DL:
+            dx = dy = 1
+            dir = 3
+        elif block == REC_UL:
+            dx = 0
+            dy = 1
+            dir = 1
+        elif block in FILLED + REC_DL + REC_UL and \
+               map.data[y][(x-1)%width] not in FILLED + REC_DR + REC_UR:
+            dx = dy = 0
+	    dir = 6
+	else:
+	    continue
+        sl = mapparts.data[y][x]
+	partpolys[sl[0]].append(tracepoly(sl[1] + dx, sl[2] + dy, dir))
+
+    # Handle special (wrapping) edges that aren't detected above
+    for loc in map.coords():
+        if loc.y > 0:
+            break
+        if map[loc] not in FILLED + REC_DL + REC_UL and \
+           map[loc.l()] in FILLED and done[loc] != -1:
+            done[loc] = -1
+            sl = mapparts[loc.l()]
+            poly = tracepoly(sl[1] + 1, sl[2] + 1, 2, (0, 2, 4))
+            if poly:
+                partpolys[sl[0]].append(poly)
+
+    loc = Wrapcoords(map.width, map.height, 0, 0)
+    while 1:
+        if map[loc] in FILLED and map[loc.u()] not in FILLED + REC_DL + REC_DR:
+            sl = mapparts[loc]
+            poly = tracepoly(sl[1] + 1, sl[2], 4, (4,))
+            if poly:
+                partpolys[sl[0]].append(poly)
+        if map[loc] in FILLED and map[loc.d()] not in FILLED + REC_UR + REC_UL:
+            sl = mapparts[loc]
+            poly = tracepoly(sl[1], sl[2] + 1, 0, (0,))
+            if poly:
+                partpolys[sl[0]].append(poly)
+        loc.godir(6)
+        if loc.y == 0:
+            break
+    return partpolys
 
 def polydir(poly):
     xd, yd = poly[-1][2]
@@ -160,42 +354,215 @@ def polydir(poly):
 	    side = xd * point[2][1] - point[2][0] * yd
 	    if side != 0:
 		if side > 0:
-		    wind += 1
-		else:
 		    wind -= 1
+		else:
+		    wind += 1
 	xd, yd = point[2]
-    return wind / 2
+    return wind // 2
 
-def dist2(x1, y1, x2, y2, width, height):
-    x = (x1 - x2 + (width >> 1)) % width - (width >> 1)
-    y = (y1 - y2 + (height >> 1)) % height - (height >> 1)
-    return 1. * x * x + 1. * y * y
+def findmin(part1, part2, mindist, distfunc2):
+    from math import sqrt
+    result = None
+    mind = sqrt(mindist)
+    far = (mind + 4) ** 2
+    swap = 0
+    if len(part1) > len(part2):
+        part1, part2 = part2, part1
+        swap = 1
+    for k in range(len(part1)):
+        x = part1[k][0]
+        y = part1[k][1]
+        l = 0
+        while l < len(part2):
+            dx, dy = distfunc2(part2[l][0] - x, part2[l][1] - y)
+            d = dx **2 + dy ** 2
+            if d < mindist:
+                mindist = d
+                mind = sqrt(mindist)
+                far = (mind + 4) ** 2
+                result = (mindist, k, l, dx, dy)
+                l += 1
+            elif d < far:
+                l += 1
+            else:
+                l += int((sqrt(d) - mind) / 1.4143)
+    if not swap or not result:
+        return result
+    return (result[0], result[2], result[1], -result[3], -result[4])
 
-# Only for polygons converted from blocks and going in the right direction.
-def inside(x, y, poly, width, height):
-    lastdir = poly[-1][2]
-    mindir1 = None
-    mindist = width
-    for p in poly:
-	if p[1] == y and (p[0] - x) % width < mindist:
-	    mindir1 = lastdir
-	    mindir2 = p[2]
-	    mindist = (p[0] - x) % width
-	lastdir = p[2]
-    if not mindir1:
-	return 0
-    elif mindir1[0] + mindir2[0] <= 0:
-	return mindir2[1] > 0
+class Polynode(object):
+    def __init__(self, poly):
+        self.poly = poly
+        self.linkstarts = []
+        self.linktargets = []
+        self.dist = (1e98, 0, 0)
+    def traverse(self, x, y, start, reslist):
+        i = start
+        while 1:
+            while i in self.linkstarts:
+                j = self.linkstarts.index(i)
+                lt = self.linktargets[j]
+                reslist.append((x, y, (lt.dx, lt.dy), 1))
+                lt.targetnode.traverse(x + lt.dx, y + lt.dy,
+                                       lt.targetindex, reslist)
+                reslist.append((x + lt.dx, y + lt.dy, (-lt.dx, -lt.dy), 1))
+                del self.linkstarts[j]
+                del self.linktargets[j]
+            dx, dy = self.poly[i][2][0], self.poly[i][2][1]
+            reslist.append((x, y, (dx, dy), 0))
+            x += dx
+            y += dy
+            i = (i + 1) % len(self.poly)
+            if i == start:
+                break
+
+def poly_handle_totalwrap(poly, map):
+    res = []
+    prev = (0, 0)
+    for r in poly:
+        if max(prev[0], prev[1]) > 1:
+            for _ in range(max(prev[2][0], prev[2][1]) - 1):
+                # Don't let findmin skip optimization break
+                res.append((r[0], r[1], (0, 0), r[3]))
+        res.append(r)
+        prev = r
+    def minwrap(dx, dy, wx = map.width, wy = map.height):
+        dx2 = (dx + (wx >> 1)) % wx - (wx >> 1)
+        dy2 = (dy + (wy >> 1)) % wy - (wy >> 1)
+        if dx2 == dx and dy2 == dy:
+            if abs(dx2) > abs(dy2):
+                if dx2 > 0:
+                    dx2 -= wx
+                else:
+                    dx2 += wx
+            else:
+                if dy2 > 0:
+                    dy2 -= wy
+                else:
+                    dy2 += wy
+        return dx2, dy2
+    r = findmin(res, res, 1e99, minwrap)
+    wx = res[r[2]][0] - res[r[1]][0] - r[3]
+    wy = res[r[2]][1] - res[r[1]][1] - r[4]
+    assert wx % map.width == 0
+    assert wy % map.height == 0
+    a = (1, 0, wx // map.width)
+    b = (0, 1, wy // map.height)
+    while a[2]:
+        d = b[2] // a[2]
+        a, b = (b[0] - d * a[0], b[1] - d * a[1], b[2] - d * a[2]), a
+    assert abs(b[2]) == 1
+    wx2 = b[1] * b[2]
+    wy2 = -b[0] * b[2]
+    assert wy // map.height * wx2 + (-wx // map.width) * wy2 == 1
+    if r[1] < r[2]:
+        p1 = res[r[1]:r[2] + 1]
+        p2 = res[r[2]:] + res[:r[1] + 1]
     else:
-	return mindir1[1] > 0
+        p1 = res[r[1]:] + res[:r[2] + 1]
+        p2 = res[r[2]:r[1] + 1]
+    p1[-1] = (p1[-1][0], p1[-1][1], (-r[3], -r[4]), 1)
+    p2[-1] = (p2[-1][0], p2[-1][1], (r[3], r[4]), 1)
+    wx2 *= map.width
+    wy2 *= map.height
+    p2 = [(p[0] + wx2, p[1] + wy2, p[2], p[3]) for p in p2]
+    def minwrap(dx, dy, wx = wx, wy = wy, l2 = wx **2 + wy ** 2):
+        d = int(round((wx * dx + wy * dy) / l2))
+        return dx - d * wx, dy - d * wy
+    r2 = findmin(p1, p2, 1e99, minwrap)
+    assert (p1[r2[1]][0] + r2[3] - p2[r2[2]][0]) % map.width == 0
+    assert (p1[r2[1]][1] + r2[4] - p2[r2[2]][1]) % map.height == 0
+    res = p1[:r2[1]]
+    res.append((p1[r2[1]][0], p1[r2[1]][1], (r2[3], r2[4]), 1))
+    res += p2[r2[2]:] + p2[:r2[2]]
+    res.append((p2[r2[2]][0], p2[r2[2]][1], (-r2[3], -r2[4]), 1))
+    res += p1[r2[1]:]
+    x, y = res[0][0], res[0][1]
+    result = []
+    for p in res:
+        result.append((x, y, p[2], p[3]))
+        x += p[2][0]
+        y += p[2][1]
+    return result
 
-def closestteam(loc, bases):
-    maxd = 30000 * 30000
-    for bs in bases:
-	if loc.dist2(bs.loc) < maxd:
-	    maxd = loc.dist2(bs.loc)
-	    ans = bs.team
-    return ans
+def poly_link(polys, map):
+    neglist = []
+    poslist = []
+    zerolist = []
+    for p in polys:
+        direction = polydir(p)
+	if direction > 0:
+	    poslist.append(p)
+	elif direction < 0:
+	    neglist.append(p)
+        else:
+            zerolist.append(p)
+    if poslist and not zerolist:
+        assert len(poslist) <= 1, "Can't have multiple + polygons in one part"
+        def minwrap(dx, dy):
+            return dx, dy
+        extrawrap = 0
+    elif not zerolist and not poslist:
+        def minwrap(dx, dy, wx = map.width, wy = map.height):
+            dx = (dx + (wx >> 1)) % wx - (wx >> 1)
+            dy = (dy + (wy >> 1)) % wy - (wy >> 1)
+            return dx, dy
+        extrawrap = 1
+    else:
+        assert not poslist, "Can't have both zero and + polygons in one part"
+        assert len(zerolist) == 2, "BUG"
+        dx = dy = 0
+        for p in zerolist[0]:
+            dx += p[2][0]
+            dy += p[2][1]
+        assert abs(dx) + abs(dy) > 0, "Wrapping polygon with no wrap?"
+        assert dx % map.width == 0, "Garbled coordinates"
+        assert dy % map.height == 0, "Garbled coordinates"
+        def minwrap(dx, dy, wx = dx, wy = dy, l2 = dx **2 + dy ** 2):
+            d = int(round((wx * dx + wy * dy) / l2))
+            return dx - d * wx, dy - d * wy
+        extrawrap = 0
+    totlist = [Polynode(p) for p in neglist + poslist + zerolist]
+    res = last = totlist.pop()
+
+    while totlist:
+        for j in totlist:
+            result = findmin(last.poly, j.poly, j.dist[0], minwrap)
+            if result:
+                j.dist = (result[0], result[1], result[2], result[3],
+                          result[4], last)
+        mindist = 1e99
+        mink = -2.1
+        for j in totlist:
+            if j.dist[0] < mindist:
+                mink = j
+                mindist = j.dist[0]
+        totlist.remove(mink)
+        r = mink.dist[5]
+        r.linkstarts.append(mink.dist[1])
+        s = Struct()
+        (s.targetnode, s.targetindex, s.dx, s.dy) = (mink, mink.dist[2],
+                                                    mink.dist[3], mink.dist[4])
+        r.linktargets.append(s)
+        last = mink
+    result = []
+    res.traverse(res.poly[0][0], res.poly[0][1], 0, result)
+    if extrawrap:
+        result = poly_handle_totalwrap(result, map)
+    return result
+
+def makepolys(map):
+    print >> sys.stderr, "   Partitioning map...",
+    mapparts, partcount = poly_partition(map)
+    print >> sys.stderr, partcount, "parts."
+    print >> sys.stderr, "   Finding edges...",
+    partpolys = poly_findedges(map, mapparts, partcount)
+    print >> sys.stderr, "done."
+    allpolys = []
+    print >> sys.stderr, "   Linking each part...",
+    allpolys = [poly_link(polys, map) for polys in partpolys]
+    print >> sys.stderr, "done."
+    return allpolys
 
 def convert(options):
     height = int(options['mapheight'])
@@ -211,17 +578,28 @@ def convert(options):
     options['mapwidth'] = `width * 35`
     options['mapheight'] = `height * 35`
     map = Map(map, width, height)
-    done = Map([[0] * width for i in range(height)], width, height)
+
+    print >> sys.stderr, "Finding special map features...",
+    # First, find the locations of different map features other than walls
+    # and put them in these lists.
     bases = []
     balls = []
     fuels = []
     checks = [None] * 27  # 1 extra so it always ends with None
-    polys = []
-    for loc in [map.coords(x, y) for x in range(width) for y in range(height)]:
-	if map[loc] in '_0123456789':
+    BASES = '_0123456789'
+    BALL = '*'
+    FUEL = '#'
+    CHECKPOINTS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    ALL = BASES + BALL + FUEL + CHECKPOINTS
+    for x, y in map.ncoords():
+        block = map.data[y][x]
+        if block not in ALL:
+            continue
+        loc = Wrapcoords(map.width, map.height, x, y)
+	if block in BASES:
 	    base = Struct()
-	    base.x = loc.x * BCLICKS + BCLICKS / 2
-	    base.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
+	    base.x = loc.x * BCLICKS + BCLICKS // 2
+	    base.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
 	    if map[loc] == '_':
 		base.team = 9
 	    else:
@@ -239,179 +617,71 @@ def convert(options):
 		base.dir = 64
 	    base.loc = loc.copy()
 	    bases.append(base)
-	if map[loc] == '*':
+	elif block == BALL:
 	    ball = Struct()
-	    ball.x = loc.x * BCLICKS + BCLICKS / 2
+	    ball.x = loc.x * BCLICKS + BCLICKS // 2
 	    ball.y = (height - loc.y - 1) % height * BCLICKS + 640
 	    ball.loc = loc.copy()
 	    balls.append(ball)
-	if map[loc] == '#':
+	elif block == FUEL:
 	    fuel = Struct()
-	    fuel.x = loc.x * BCLICKS + BCLICKS / 2
-	    fuel.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
+	    fuel.x = loc.x * BCLICKS + BCLICKS // 2
+	    fuel.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
 	    fuel.loc = loc.copy()
 	    fuels.append(fuel)
-	if map[loc] in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+	elif block in CHECKPOINTS:
 	    check = Struct()
-	    check.x = loc.x * BCLICKS + BCLICKS / 2
-	    check.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
+	    check.x = loc.x * BCLICKS + BCLICKS // 2
+	    check.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
 	    check.loc = loc.copy()
 	    checks[ord(map[loc]) - ord('A')] = check
-	if done[loc]:
-	    continue
-	if map[loc] in FILLED + REC_LD + REC_LU and \
-		map[loc.l()] not in FILLED + REC_RD + REC_RU:
-	    startloc = loc
-	    dir = 6
-	elif map[loc] in REC_RU:
-	    startloc = loc
-	    dir = 7
-	elif map[loc] in REC_RD:
-	    startloc = loc.r()
-	    dir = 5
-	else:
-	    continue
-	l = startloc.copy()
-	startdir = dir
-	poly = []
-	while 1:
-	    poly.append((l.x, l.y, dirs[dir]))
-	    if dir in [6, 7]:
-		done[l] = 1
-	    elif dir == 5:
-		done[l.l()] = 1
-	    l.godir(dir)
-	    dir = (dir + 3) % 8
-	    while map.d(l, dir):
-		dir = (dir - 1) % 8
-	    if l == startloc and dir == startdir:
-		break
-	polys.append(poly)
-
-    mxc = BCLICKS * width
-    myc = BCLICKS * height
+    if not bases:
+        print >>sys.stderr, "Map has no bases???"
+        sys.exit(1)
+    # Balls belong to the team that has the nearest base
     for ball in balls:
 	ball.team = closestteam(ball.loc, bases)
+    # In race mode, bases are ordered according to the distance from the
+    # first checkpoint.
     if (options.get('timing') or options.get('race')) in ['yes', 'on', 'true']:
 	bases = [(checks[0].loc.dist2(b.loc), b) for b in bases]
 	bases.sort()
 	bases = [b[1] for b in bases]
+    # If teamfuel is on, the fuel belongs to the team with the nearest base
     if options.get('teamfuel') in ['yes', 'on', 'true']: #default off
 	for fuel in fuels:
 	    fuel.team = closestteam(fuel.loc, bases)
     else:
 	for fuel in fuels:
 	    fuel.team = -1
-    polys2 = []
-    for p in polys:
-	polys2.append([[q[0] * BCLICKS, q[1] * BCLICKS, q[2]] for q in p])
-    # Invert the map vertically.
-    for p in polys2:
-	for p2 in p:
-	    if p2[1]:  # Keep 0 at 0, don't move to maxheight + 1 !
-		p2[1] = height * BCLICKS - p2[1]
-	    p2[2] = (p2[2][0], -p2[2][1])
-    neglist = []
-    poslist = []
-    for p in polys2:
-        direction = polydir(p)
-	if direction > 0:
-	    poslist.append(p)
-	elif direction < 0:
-	    neglist.append(p)
-        else:
-            print >> sys.stderr, "Converting this map isn't supported (yet?)"
-            sys.exit(1)
-    totlist = neglist + poslist
-    negcount = len(neglist)
-    poscount = len(poslist)
-    totcount = len(totlist)
-    cdict = [{} for i in range(totcount)]
-    clist = [[] for i in range(totcount)]
-    for i in range(negcount):
-	closest = 0
-	for j in range(negcount, negcount + poscount):
-	    if closest and cdict[j].has_key(closest):
-		continue
-	    if inside(neglist[i][0][0], neglist[i][0][1], totlist[j], mxc, myc):
-		if not closest or cdict[closest].has_key(j):
-		    closest = j
-		else:
-		    if inside(totlist[closest][0][0], totlist[closest][0][1], totlist[j], mxc, myc):
-			cdict[j][closest] = 1
-		    else:
-			cdict[closest][j] = 1
-			closest = j
-	if closest:
-	    clist[closest].append(i)
-    reslist = []
-    for i in range(negcount, totcount):
-	if not clist[i]:
-	    reslist.append(totlist[i])
-	    continue
-	dist = [(1e98, 0, 0)] * len(clist[i])
-	count = len(clist[i])
-	res = totlist[i]
-	offset = 0
-	last = i
-	while count > 0:
-	    for j in range(len(clist[i])):
-		if clist[i][j] < 0:
-		    continue
-		r = totlist[clist[i][j]]
-		mindist = dist[j][0]
-		for k in range(len(totlist[last])):
-		    x = totlist[last][k][0]
-		    y = totlist[last][k][1]
-		    for l in range(len(r)):
-			d = dist2(r[l][0], r[l][1], x, y, mxc, myc)
-			if d < mindist:
-			    mindist = d
-			    dist[j] = (mindist, k + offset, l)
-	    mindist = 1e99
-	    mink = -2.1
-	    for k in range(len(clist[i])):
-		if clist[i][k] < 0:
-		    continue
-		if dist[k][0] < mindist:
-		    mink = k
-		    mindist = dist[k][0]
-	    r = totlist[clist[i][mink]]
-	    r = r[dist[mink][2]:] + r[:dist[mink][2]+1]
-	    totlist[clist[i][mink]] = r
-	    o = dist[mink][1]
-	    offset = o + 1
-	    res = res[:o + 1] + r + res[o:]
-	    res[o] = res[o][:]
-	    res[o][2] = None
-	    res[o + len(r)] = res[o + len(r)][:]
-	    res[o + len(r)][2] = None
-	    last = clist[i][mink]
-	    clist[i][mink] = -1
-	    count -= 1
-	    for k in range(len(clist[i])):
-		if clist[i][k] < 0:
-		    continue
-		if dist[k][1] > o:
-		    dist[k] = (dist[k][0], dist[k][1] + len(r) + 1, dist[k][2])
-	reslist.append(res)
-    polys2 = reslist
+
+    print >> sys.stderr, "done."
+    print >> sys.stderr, "Creating polygons:"
+    polys = makepolys(map)
 
     # Turn this on if you want to randomize the map edges
+    # Needs some changes to work now because of other changes elsewhere
     if 0:
 	from math import sin
-	for p in polys2:
+	for p in polys:
 	    for l in p:
 		l[0] = int(l[0] + sin(1. * l[0] * l[1] / 2786) * (2240 / 3)) % mxc
 		l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
 
+    print >> sys.stderr, "Writing converted map...",
     print '<XPilotMap version="1.0">'
 
-    mapd = options['mapdata']
     del options['mapdata']
     print '<GeneralOptions>'
+
+    def xmlencode(text):
+        repl = (('&', '&amp;'), ('"', '&quot;'), ("'", '&apos;'),
+                ('<', '&lt;'), ('>', '&gt;'))
+        for t, r in repl:
+            text = text.replace(t, r)
+        return text
     for name, value in options.items():
-	print '<Option name="%s" value="%s"/>' % (name, encode(value))
+	print '<Option name="%s" value="%s"/>' % (name, xmlencode(value))
     print '</GeneralOptions>'
     print '<Edgestyle id="xpbluehidden" width="-1" color="4E7CFF" style="0"/>'
     print '<Edgestyle id="xpredhidden" width="-1" color="FF3A27" style="0"/>'
@@ -420,31 +690,35 @@ def convert(options):
     print '<Polystyle id="xpred" color="FF3A27" defedge="xpredhidden" flags="1"/>'
     print '<Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>'
 
-    for p in polys2:
-        while center(p[-1][0] - p[-2][0], mxc) * center(p[0][1] - p[-1][1], myc) == center(p[-1][1] - p[-2][1], myc) * center(p[0][0] - p[-1][0], mxc):
+    def printedge(dx, dy, prevh, curh):
+        if curh and not prevh:
+            sstr = ' style="internal"'
+        elif prevh and not curh:
+            sstr = ' style="xpbluehidden"'
+        else:
+            sstr = ''
+        for i in range((max(abs(dx), abs(dy)) + MAXLEN - 1) // MAXLEN, 0, -1):
+            print '<Offset x="%d" y="%d"%s/>' % (dx // i, dy // i, sstr)
+            sstr= ''
+            dx -= dx // i
+            dy -= dy // i
+
+    for p in polys:
+        while p[-1][2][0] * p[0][2][1] == p[-1][2][1] * p[0][2][0]:
             p.insert(0, p.pop())
-	print '<Polygon x="%d" y="%d" style="xpblue">' % tuple(p[-1][:2])
-	x = p[-1][0]
-	y = p[-1][1]
-	h = not p[-1][2]
-	curx = 0
-	cury = 0
-	curh = h
+        edges = [(point[2][0] * BCLICKS, -point[2][1]* BCLICKS, point[3])
+                 for point in p if point[2] != (0, 0)]
+	x = (p[0][0] % map.width) * BCLICKS
+	y = (-p[0][1] % map.height) * BCLICKS
+	print '<Polygon x="%d" y="%d" style="xpblue">' % (x, y)
         prevh = 0
+        curh = edges[0][2]
+        curx = cury = 0
         sstr = ''
-	for c in p:
-	    dx = center(c[0] - x, mxc)
-	    dy = center(c[1] - y, myc)
+	for edge in edges:
+            (dx, dy, h) = edge
 	    if dx * cury != dy * curx or curh != h:
-                if curh and not prevh:
-		    sstr = ' style="internal"'
-		elif prevh and not curh:
-                    sstr = ' style="xpbluehidden"'
-		for i in range((max(abs(curx), abs(cury)) + MAXLEN - 1) / MAXLEN, 0, -1):
-		    print '<Offset x="%d" y="%d"%s/>' % (curx / i, cury / i, sstr)
-                    sstr= ''
-		    curx -= curx / i
-		    cury -= cury / i
+                printedge(curx, cury, prevh, curh)
 		curx = dx
 		cury = dy
                 prevh = curh
@@ -452,12 +726,7 @@ def convert(options):
 	    else:
 		curx += dx
 		cury += dy
-	    x, y, h = c
-	    h = not h
-	for i in range((max(abs(curx), abs(cury)) + MAXLEN - 1) / MAXLEN, 0, -1):
-	    print '<Offset x="%d" y="%d"%s/>' % (curx / i, cury / i, sstr)
-	    curx -= curx / i
-	    cury -= cury / i
+        printedge(curx, cury, prevh, curh)
 	print "</Polygon>"
 # The styles of these polygons will be changed later...
     for ball in balls:
@@ -486,6 +755,7 @@ def convert(options):
 	    break
 	print '<Check x="%d" y="%d"/>' % (check.x, check.y)
     print "</XPilotMap>"
+    print >> sys.stderr, "done."
 
 if __name__ == '__main__':
     import sys
