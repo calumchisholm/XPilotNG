@@ -3471,7 +3471,7 @@ static option_desc options[] = {
     {
 	"maxClientsPerIP",
 	"maxPerIP",
-	"3",		/* if more try to join they get "game locked" */
+	"2",		/* if more try to join they get "game locked" */
 	&maxClientsPerIP,
 	valInt,
 	tuner_dummy,
