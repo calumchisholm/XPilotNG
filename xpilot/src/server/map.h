@@ -124,7 +124,8 @@ struct base {
     clpos	pos;
     int		dir;
     int		ind;
-    unsigned short	team;
+    uint16_t	team;
+    uint16_t	pad[1];
 };
 
 struct baseorder {
@@ -140,7 +141,8 @@ struct cannon {
     int		item[NUM_ITEMS];
     player	*tractor_target_pl;
     bool	tractor_is_pressor;
-    unsigned short	team;
+    uint16_t	team;
+    uint16_t	pad[1];
     long	used;
     DFLOAT	dead_time;
     DFLOAT	damaged;
@@ -179,21 +181,24 @@ struct wormhole {
     DFLOAT	countdown;	/* >0 warp to lastdest else random */
     bool	temporary;	/* wormhole was left by hyperjump */
     wormType	type;
-    u_byte	lastblock;	/* block it occluded */
     int		lastID;
+    u_byte	lastblock;	/* block it occluded */
+    u_byte	pad[3];
 };
 
 struct treasure {
     clpos	pos;
     bool	have;		/* true if this treasure has ball in it */
-    unsigned short	team;	/* team of this treasure */
+    uint16_t	team;		/* team of this treasure */
+    uint16_t	pad[1];
     int 	destroyed;	/* how often this treasure destroyed */
     bool	empty;		/* true if this treasure never had a ball */
 };
 
 struct target {
     clpos	pos;
-    unsigned short	team;
+    uint16_t	team;
+    uint16_t	pad[1];
     DFLOAT	dead_time;
     int		damage;
     unsigned	conn_mask;
@@ -301,7 +306,7 @@ struct edgestyle {
 
 struct bmpstyle {
     char id[100];
-    char filename[30];
+    char filename[32];
     int flags;
 };
 

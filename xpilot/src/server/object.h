@@ -191,7 +191,7 @@ struct _cell_node {
 
 #define OBJECT_BASE	\
     short		id;		/* For shots => id of player */	\
-    unsigned short	team;		/* Team of player or cannon */	\
+    uint16_t		team;		/* Team of player or cannon */	\
     objposition		pos;		/* World coordinates */		\
     clpos		prevpos;	/* previous position */		\
     clpos		extmove;	/* For collision detection */	\
@@ -566,7 +566,7 @@ struct player {
     char	auth_nick[MAX_CHARS];	/* Original nick (/auth command) */
     char	realname[MAX_CHARS];	/* Real name of player */
     char	hostname[MAX_CHARS];	/* Hostname of client player uses */
-    unsigned short	pseudo_team;	/* Which team for detaching tanks */
+    uint16_t	pseudo_team;	/* Which team for detaching tanks */
     int		alliance;		/* Member of which alliance? */
     int		prev_alliance;		/* prev. alliance for score */
     int		invite;			/* Invitation for alliance */

@@ -10,16 +10,16 @@ struct oldScoreNode {
     char logout[MAX_CHARS];
     int  timestamp;
     short score;
-    unsigned short kills;
-    unsigned short deaths;
-    unsigned short rounds;
-    unsigned long  firedShots;
+    uint16_t kills;
+    uint16_t deaths;
+    uint16_t rounds;
+    uint32_t firedShots;
 
-    unsigned short ballsSaved;
-    unsigned short ballsLost;
-    unsigned short ballsWon;
-    unsigned short ballsCashed;
-    unsigned short bestball;
+    uint16_t ballsSaved;
+    uint16_t ballsLost;
+    uint16_t ballsWon;
+    uint16_t ballsCashed;
+    uint16_t bestball;
 
     char  futureextensions[6];
     struct player *pl;

@@ -271,7 +271,7 @@ void Contact(int fd, void *arg)
     unsigned		magic,
 			version,
 			my_magic;
-    unsigned short	port;
+    uint16_t		port;
     char		ch,
 			real_name[MAX_CHARS],
 			disp_name[MAX_CHARS],

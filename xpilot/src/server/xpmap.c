@@ -460,7 +460,7 @@ void Xpmap_find_map_object_teams(void)
      * Determine which team a treasure belongs to.
      */
     if (BIT(World.rules->mode, TEAM_PLAY)) {
-	unsigned short team = TEAM_NOT_SET;
+	int team = TEAM_NOT_SET;
 
 	for (i = 0; i < World.NumTreasures; i++) {
 	    treasure_t *treasure = Treasures(i);
