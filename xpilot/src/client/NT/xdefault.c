@@ -263,7 +263,7 @@ xp_option_t xdefault_options[] = {
 	displayName,
 	sizeof displayName,
 	NULL, NULL, NULL,
-	XP_OPTFLAG_NO_SAVE,
+	XP_OPTFLAG_KEEP,
 	"Set the X display.\n"),
 
     XP_STRING_OPTION(
@@ -272,7 +272,7 @@ xp_option_t xdefault_options[] = {
 	keyboardName,
 	sizeof keyboardName,
 	NULL, NULL, NULL,
-	XP_OPTFLAG_NO_SAVE,
+	XP_OPTFLAG_KEEP,
 	"Set the X keyboard input if you want keyboard input from\n"
 	"another display.  The default is to use the keyboard input from\n"
 	"the X display.\n"),
@@ -283,7 +283,7 @@ xp_option_t xdefault_options[] = {
 	visualName,
 	sizeof visualName,
 	NULL, NULL, NULL,
-	XP_OPTFLAG_NO_SAVE,
+	XP_OPTFLAG_KEEP,
 	"Specify which visual to use for allocating colors.\n"
 	"To get a listing of all possible visuals on your dislay\n"
 	"set the argument for this option to list.\n"),
@@ -293,7 +293,7 @@ xp_option_t xdefault_options[] = {
 	true,
 	&colorSwitch,
 	NULL,
-	XP_OPTFLAG_NO_SAVE,
+	XP_OPTFLAG_KEEP,
 	"Use color buffering or not.\n"
 	"Usually color buffering is faster, especially on 8-bit\n"
 	"PseudoColor displays.\n"),
@@ -439,34 +439,6 @@ xp_option_t xdefault_options[] = {
 	Set_mouseAccelThresh,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the mouse acceleration threshold\n"),
-
-	
-    /* X debug stuff */
-#ifdef DEVELOPMENT
-    XP_NOARG_OPTION(
-        "testxsync",
-	&testxsync,
-	XP_OPTFLAG_NO_SAVE,
-        "Test XSynchronize() ?\n"),
-
-    XP_NOARG_OPTION(
-        "testxdebug",
-	&testxdebug,
-	XP_OPTFLAG_NO_SAVE,
-        "Test X_error_handler() ?\n"),
-
-    XP_NOARG_OPTION(
-        "testxafter",
-	&testxafter,
-	XP_OPTFLAG_NO_SAVE,
-        "Test XAfterFunction ?\n"),
-
-    XP_NOARG_OPTION(
-        "testxcolors",
-	&testxcolors,
-	XP_OPTFLAG_NO_SAVE,
-        "Do Colors_debug() ?\n"),
-#endif
 
 
 };

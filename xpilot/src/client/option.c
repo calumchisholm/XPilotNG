@@ -779,6 +779,14 @@ static void Parse_xpilotrc_line(const char *line)
     if (opt == NULL)
 	goto line_is_comment;
 
+    if (Option_get_flags(opt) & XP_OPTFLAG_NEVER_SAVE) {
+	/* discard the line */
+	warn("Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	warn("Option %s must not be specified in xpilotrc.", name);
+	warn("It will be removed from xpilotrc if you save configuration.");
+	XFREE(lcpy);
+	return;
+    }
 
     /* did we see this before ? */
     for (i = 0; i < num_xpilotrc_lines; i++) {
@@ -977,8 +985,11 @@ int Xpilotrc_write(const char *path)
 	if (was_in_xpilotrc)
 	    continue;
 
+	/* If this wasn't in xpilotrc, don't save it */
+	if (Option_get_flags(opt) & XP_OPTFLAG_KEEP)
+	    continue;
 	/* Let's not save these */
-	if (Option_get_flags(opt) & XP_OPTFLAG_NO_SAVE)
+	if (Option_get_flags(opt) & XP_OPTFLAG_NEVER_SAVE)
 	    continue;
 
 	origin = Option_get_origin(opt);
