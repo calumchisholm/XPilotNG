@@ -61,7 +61,7 @@ char colors_version[] = VERSION;
 #define XP_COLOR14		"#DFDFDF"
 #define XP_COLOR15		"#202020"
 
-char		color_names[MAX_COLORS][MAX_COLOR_LEN];
+static char		color_names[MAX_COLORS][MAX_COLOR_LEN];
 static const char	*color_defaults[MAX_COLORS] = {
     XP_COLOR0,  XP_COLOR1,  XP_COLOR2,  XP_COLOR3,
     XP_COLOR4,  XP_COLOR5,  XP_COLOR6,  XP_COLOR7,
