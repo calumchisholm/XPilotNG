@@ -29,6 +29,91 @@
 
 char laser_version[] = VERSION;
 
+
+void Fire_laser(player_t *pl)
+{
+    clpos_t m_gun, pos;
+    world_t *world = pl->world;
+
+    if (frame_time
+	<= pl->laser_time + options.laserRepeatRate - timeStep + 1e-3)
+ 	return;
+    pl->laser_time = MAX(frame_time, pl->laser_time + options.laserRepeatRate);
+
+    if (pl->item[ITEM_LASER] > pl->num_pulses
+	&& pl->velocity < options.pulseSpeed) {
+	if (pl->fuel.sum < -ED_LASER)
+	    CLR_BIT(pl->used, HAS_LASER);
+	else {
+	    m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
+	    pos.cx = pl->pos.cx + m_gun.cx
+		+ FLOAT_TO_CLICK(pl->vel.x * timeStep);
+	    pos.cy = pl->pos.cy + m_gun.cy
+		+ FLOAT_TO_CLICK(pl->vel.y * timeStep);
+	    pos = World_wrap_clpos(world, pos);
+	    if (is_inside(pos.cx, pos.cy, NONBALL_BIT | NOTEAM_BIT, NULL)
+		!= NO_GROUP)
+		return;
+	    Fire_general_laser(pl->world, pl, pl->team, pos,
+			       pl->dir, pl->mods);
+	}
+    }
+}
+
+void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
+			int dir, modifiers_t mods)
+{
+    double life;
+    pulseobject_t *pulse;
+
+    if (!World_contains_clpos(world, pos)) {
+	warn("Fire_general_laser: outside world.\n");
+	return;
+    }
+
+    if (NumObjs >= MAX_TOTAL_SHOTS)
+	return;
+
+    if ((pulse = PULSE_PTR(Object_allocate())) == NULL)
+	return;
+
+    if (pl) {
+	Player_add_fuel(pl, ED_LASER);
+	sound_play_sensors(pos, FIRE_LASER_SOUND);
+	life = options.pulseLife;
+	/*Rank_FireLaser(pl);*/
+    } else
+	life = (int)CANNON_PULSE_LIFE;
+
+    pulse->id		= (pl ? pl->id : NO_ID);
+    pulse->team 	= team;
+    Object_position_init_clpos(world, OBJ_PTR(pulse), pos);
+    pulse->vel.x 	= options.pulseSpeed * tcos(dir);
+    pulse->vel.y 	= options.pulseSpeed * tsin(dir);
+    pulse->acc.x 	= 0;
+    pulse->acc.y 	= 0;
+    pulse->mass	 	= 0;
+    pulse->life 	= life;
+    pulse->obj_status 	= (pl ? 0 : FROMCANNON);
+    pulse->type 	= OBJ_PULSE;
+    pulse->mods 	= mods;
+    pulse->color	= WHITE;
+
+    pulse->fusetime	= frame_time;
+    pulse->pl_range 	= 0;
+    pulse->pl_radius 	= 0;
+
+    pulse->pulse_dir  	= dir;
+    pulse->pulse_len  	= 0 /*options.pulseLength * CLICK*/;
+    pulse->pulse_refl 	= false;
+
+    Cell_add_object(world, OBJ_PTR(pulse));
+
+    if (pl)
+	pl->num_pulses++;
+}
+
+
 /*
  * Do what needs to be done when a laser pulse
  * actually hits a player.
