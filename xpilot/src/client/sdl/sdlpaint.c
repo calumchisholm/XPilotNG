@@ -41,14 +41,15 @@ double	        hudRadarLimit;		/* Limit for hudradar drawing */
 /* function to reset our viewport after a window resize */
 int Resize_Window( int width, int height )
 {
-
+    extern int videoFlags;
+  
     draw_width = width;
     draw_height = height;
 
     SDL_SetVideoMode( width,
-		      height,
-		      draw_depth, 
-		      SDL_HWSURFACE | SDL_OPENGL | SDL_RESIZABLE ); 
+ 		      height,
+ 		      draw_depth, 
+		      videoFlags ); 
     
 
     //    /* change to the projection matrix and set our viewing volume. */

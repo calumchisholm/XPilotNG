@@ -8,14 +8,23 @@
 
 int draw_depth;
 
+/* This holds video information assigned at initialise */
+const SDL_VideoInfo *videoInfo;
+
+/* Flags to pass to SDL_SetVideoMode */
+int videoFlags;
+
 int Init_playing_windows(void)
 {
     char defaultfont[] = "defaultfont.bmp"; /* TODO make bmp fonts work */
     char testfont[] = "Test.ttf";
     int fontsize = 12;
     int mapfontsize = 12;
+
     /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
     
+    Conf_print();
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         error("failed to initialize SDL: %s", SDL_GetError());
         return -1;
@@ -23,18 +32,38 @@ int Init_playing_windows(void)
 
     atexit(SDL_Quit);
 
+    /* Fetch the video info */
+    videoInfo = SDL_GetVideoInfo( );
+    
     draw_depth=24;
     num_spark_colors=8;
+
+    /* the flags to pass to SDL_SetVideoMode */
+    videoFlags  = SDL_OPENGL;          /* Enable OpenGL in SDL          */
+    videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering       */
+    videoFlags |= SDL_HWPALETTE;       /* Store the palette in hardware */
+    videoFlags |= SDL_RESIZABLE;       /* Enable window resizing        */
+
+    /** This checks to see if surfaces can be stored in memory */
+    if ( videoInfo->hw_available )
+        videoFlags |= SDL_HWSURFACE;
+    else
+        videoFlags |= SDL_SWSURFACE;
+
+    /* This checks if hardware blits can be done */
+    if ( videoInfo->blit_hw )
+        videoFlags |= SDL_HWACCEL;
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
     if (SDL_SetVideoMode(draw_width, 
 			 draw_height, 
 			 draw_depth, 
-			 SDL_HWSURFACE|SDL_OPENGL|SDL_RESIZABLE //|SDL_FULLSCREEN
+			 videoFlags
 			 ) == NULL) {
         error("failed to set video mode: %s", SDL_GetError());
         return -1;
