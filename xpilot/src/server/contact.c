@@ -285,6 +285,7 @@ void Contact(int fd, void *arg)
     ibuf.len = bytes;
 
     strlcpy(host_addr, sock_get_last_addr(&contactSocket), sizeof(host_addr));
+    xpprintf("%s Checking Adress:(%s)\n",showtime(),host_addr);
     if (Check_address(host_addr))
 	return;
 
@@ -1028,9 +1029,9 @@ void Set_deny_hosts(world_t *world)
 	if (slash) {
 	    *slash = '\0';
 	    mask = sock_get_inet_by_addr(slash + 1);
-	    if (mask == (unsigned long) -1
-		&& strcmp(slash + 1, "255.255.255.255"))
-		continue;
+	    if (mask == (unsigned long) -1 && strcmp(slash + 1, "255.255.255.255")) {
+ 		continue;
+	    }
 
 	    if (mask == 0)
 		continue;
@@ -1038,8 +1039,9 @@ void Set_deny_hosts(world_t *world)
 	    mask = 0xFFFFFFFF;
 
 	addr = sock_get_inet_by_addr(tok);
-	if (addr == (unsigned long) -1 && strcmp(tok, "255.255.255.255"))
+	if (addr == (unsigned long) -1 && strcmp(tok, "255.255.255.255")) {
 	    continue;
+    	}
 
 	addr_mask_list[num_addr_mask].addr = addr;
 	addr_mask_list[num_addr_mask].mask = mask;
