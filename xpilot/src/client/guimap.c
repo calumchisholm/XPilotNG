@@ -285,6 +285,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     char s[3];
     char info[6];
     homebase_t *base = NULL;
+    bool do_basewarning = false;
 
     other = Other_by_id(id);
     base = Homebase_by_id(id);
@@ -296,25 +297,38 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     } else
 	color = WHITE;
 
-    /* Base warnings based on message scan. Newer servers send appearing
-     * info explicitly. */
-    if (version < 0x4F12) {
-	if (base != NULL && base->deathtime > loops - 3 * clientFPS) {
-
-	    /* red box basewarning */
-	    if (baseWarningType & 1)
-		Gui_paint_appearing(x + BLOCK_SZ / 2, y + BLOCK_SZ / 2,
-				    id, 360);
-
-	    /* Mara's flashy basewarning */
-	    if (baseWarningType & 2) {
-		if (loopsSlow & 1) {
-		    color = WHITE;
-		    /*Paint_baseInfoOnHudRadar(x,y); */
-		} else
-		    color = RED;
+    if (base != NULL) {
+	/*
+	 * Hacks to support Mara's base warning on new servers and
+	 * the red "meter" basewarning on old servers.
+	 */
+	if (version >= 0x4F12) {
+	    if (loops <= base->deathtime + 1)
+		do_basewarning = true;
+	} else {
+	    if (base->deathtime > loops - 3 * clientFPS) {
+		do_basewarning = true;
+		if (baseWarningType & 1) {
+		    int count = (360
+				 * (base->deathtime + 3 * clientFPS - loops))
+			/ (3 * clientFPS);
+		    LIMIT(count, 0, 360);
+		    /* red box basewarning */
+		    if (count > 0 && (baseWarningType & 1))
+			Gui_paint_appearing(x + BLOCK_SZ / 2, y + BLOCK_SZ / 2,
+					    id, count);
+		}
 	    }
 	}
+
+    }
+
+    /* Mara's flashy basewarning */
+    if (do_basewarning && (baseWarningType & 2)) {
+	if (loopsSlow & 1)
+	    color = WHITE;
+	else
+	    color = RED;
     }
 
     SET_FG(colors[color].pixel);

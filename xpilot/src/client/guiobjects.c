@@ -400,6 +400,14 @@ void Gui_paint_paused(int x, int y, int count)
 void Gui_paint_appearing(int x, int y, int id, int count)
 {
     const int hsize = 3 * BLOCK_SZ / 7;
+
+    /* Make a note we are doing the base warning */
+    if (version >= 0x4F12) {
+	homebase_t *base = Homebase_by_id(id);
+	/* hack */
+	base->deathtime = loops;
+    }
+
 #if 1
     SET_FG(colors[RED].pixel);
     rd.fillRectangle(dpy, p_draw, gameGC,
