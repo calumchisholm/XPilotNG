@@ -251,9 +251,9 @@ void Paint_frame(void)
      * We don't want things to happen too fast at high fps.
      */
     time_counter += timePerFrame;
-    if (time_counter >= 1.0 / 20) {
+    if (time_counter >= 1.0 / 12) {
 	loopsSlow++;
-	time_counter = 0.0;
+	time_counter -= (1.0 / 12);
     }
 
     /*

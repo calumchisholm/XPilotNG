@@ -198,10 +198,26 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *mn)
 static void Msg_scan_death(int id)
 {
     int i;
+    other_t *other;
+
+    other = Other_by_id(id);
+    if (!other)
+	return;
+
+    /*
+     * kps - hack, we don't want to do base warning for players who
+     * lost their last life. If deathtime is used for anything else
+     * this must be done some other way.
+     */
+    if (BIT(Setup->mode, LIMITED_LIVES)
+	&& other->life == 0)
+	return;
 
     for (i = 0; i < num_bases; i++) {
-	if (bases[i].id == id)
+	if (bases[i].id == id) {
 	    bases[i].deathtime = loops;
+	    break;
+	}
     }
 }
 
