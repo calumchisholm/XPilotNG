@@ -41,6 +41,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 
     (void)event;
 
+#if 1 /* linear search */
     if (reset)
 	i = 0;
 
@@ -54,8 +55,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	    i++;
 	}
     }
-
-#if 0
+#else /* binary search */
     if (reset) {
 	/* binary search since keydefs is sorted on keysym. */
 	int lo = 0, hi = num_keydefs - 1;
