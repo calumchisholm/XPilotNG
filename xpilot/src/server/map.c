@@ -41,8 +41,35 @@ world_t World;
 bool is_polygon_map = false;
 
 static void Find_base_direction(world_t *world);
-static void Reset_map_object_counters(world_t *world);
 
+
+static void Check_map_object_counters(world_t *world)
+{
+    int i;
+
+    assert(world->NumCannons == 0);
+    assert(world->NumFuels == 0);
+    assert(world->NumGravs == 0);
+    assert(world->NumWormholes == 0);
+    assert(world->NumTreasures == 0);
+    assert(world->NumTargets == 0);
+    assert(world->NumBases == 0);
+    assert(world->NumItemConcs == 0);
+    assert(world->NumAsteroidConcs == 0);
+
+    for (i = 0; i < MAX_TEAMS; i++) {
+	assert(world->teams[i].NumMembers == 0);
+	assert(world->teams[i].NumRobots == 0);
+	assert(world->teams[i].NumBases == 0);
+	assert(world->teams[i].NumTreasures == 0);
+	assert(world->teams[i].NumEmptyTreasures == 0);
+	assert(world->teams[i].TreasuresDestroyed == 0);
+	assert(world->teams[i].TreasuresLeft == 0);
+	assert(world->teams[i].score == 0);
+	assert(world->teams[i].prev_score == 0);
+	assert(world->teams[i].SwapperId == NO_ID);
+    }
+}
 
 static void shrink(void **pp, size_t size)
 {
@@ -467,7 +494,7 @@ static bool Grok_map_size(world_t *world)
     }
 
     if (bad)
-	exit(1);
+	return false;
 
     /* pixel sizes */
     world->width = w;
@@ -490,6 +517,30 @@ static bool Grok_map_size(world_t *world)
     return true;
 }
 
+bool Grok_map_options(world_t *world)
+{
+    Check_map_object_counters(world);
+
+    if (!Grok_map_size(world))
+	return false;
+
+    strlcpy(world->name, options.mapName, sizeof(world->name));
+    strlcpy(world->author, options.mapAuthor, sizeof(world->author));
+    strlcpy(world->dataURL, options.dataURL, sizeof(world->dataURL));
+
+    World_alloc(world);
+
+    Set_world_rules(world);
+    Set_world_items(world);
+    Set_world_asteroids(world);
+
+    if (BIT(world->rules->mode, TEAM_PLAY|TIMING) == (TEAM_PLAY|TIMING)) {
+	warn("Cannot teamplay while in race mode -- ignoring teamplay");
+	CLR_BIT(world->rules->mode, TEAM_PLAY);
+    }
+
+    return true;
+}
 
 bool Grok_map(world_t *world)
 {
@@ -504,7 +555,6 @@ bool Grok_map(world_t *world)
     }
 
     Verify_wormhole_consistency(world);
-    Wormhole_line_init();
 
     if (BIT(world->rules->mode, TIMING) && world->NumChecks == 0) {
 	xpprintf("No checkpoints found while race mode (timing) was set.\n");
@@ -540,32 +590,6 @@ bool Grok_map(world_t *world)
 
     return true;
 }
-
-bool Grok_map_options(world_t *world)
-{
-    Reset_map_object_counters(world);
-
-    if (!Grok_map_size(world))
-	return false;
-
-    strlcpy(world->name, options.mapName, sizeof(world->name));
-    strlcpy(world->author, options.mapAuthor, sizeof(world->author));
-    strlcpy(world->dataURL, options.dataURL, sizeof(world->dataURL));
-
-    World_alloc(world);
-
-    Set_world_rules(world);
-    Set_world_items(world);
-    Set_world_asteroids(world);
-
-    if (BIT(world->rules->mode, TEAM_PLAY|TIMING) == (TEAM_PLAY|TIMING)) {
-	warn("Cannot teamplay while in race mode -- ignoring teamplay");
-	CLR_BIT(world->rules->mode, TEAM_PLAY);
-    }
-
-    return true;
-}
-
 
 /*
  * Return the team that is closest to this click position.
@@ -798,11 +822,12 @@ void Compute_gravity(world_t *world)
 
 shape_t		wormhole_wire;
 
-void Wormhole_line_init(void)
+void Wormhole_line_init(world_t *world)
 {
     int i;
     static shapepos_t coords[MAX_SHIP_PTS];
 
+    UNUSED_PARAM(world);
     wormhole_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	wormhole_wire.pts[i] = coords + i;
@@ -904,36 +929,4 @@ void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2)
 	}
     }
 #endif
-}
-
-
-
-
-
-static void Reset_map_object_counters(world_t *world)
-{
-    int i;
-
-    assert(world->NumCannons == 0);
-    assert(world->NumFuels == 0);
-    assert(world->NumGravs == 0);
-    assert(world->NumWormholes == 0);
-    assert(world->NumTreasures == 0);
-    assert(world->NumTargets == 0);
-    assert(world->NumBases == 0);
-    assert(world->NumItemConcs == 0);
-    assert(world->NumAsteroidConcs == 0);
-
-    for (i = 0; i < MAX_TEAMS; i++) {
-	assert(world->teams[i].NumMembers == 0);
-	assert(world->teams[i].NumRobots == 0);
-	assert(world->teams[i].NumBases == 0);
-	assert(world->teams[i].NumTreasures == 0);
-	assert(world->teams[i].NumEmptyTreasures == 0);
-	assert(world->teams[i].TreasuresDestroyed == 0);
-	assert(world->teams[i].TreasuresLeft == 0);
-	assert(world->teams[i].score == 0);
-	assert(world->teams[i].prev_score == 0);
-	assert(world->teams[i].SwapperId == NO_ID);
-    }
 }

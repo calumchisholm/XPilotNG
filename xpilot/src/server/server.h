@@ -500,7 +500,7 @@ int World_place_asteroid_concentrator(world_t *world, clpos_t pos);
 int World_place_friction_area(world_t *world, clpos_t pos, double fric);
 
 void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2);
-void Wormhole_line_init(void);
+void Wormhole_line_init(world_t *world);
 
 void Compute_gravity(world_t *world);
 double Wrap_findDir(double dx, double dy);
