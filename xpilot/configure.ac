@@ -92,8 +92,8 @@ dnl AC_PROG_GCC_TRADITIONAL
 dnl AC_PROG_CPP
 
 dnl Needed if you want to compile with g++ e.g.
-AC_PROG_CXX
-AC_PROG_CXXCPP
+dnl AC_PROG_CXX
+dnl AC_PROG_CXXCPP
 
 dnl AC_PROG_LN_S
 AC_PROG_MAKE_SET
