@@ -166,6 +166,8 @@ char *Conf_sounddir(void)
 void Conf_print(void)
 {
     xpprintf("============================================================\n");
+    xpprintf("VERSION                   = %s\n", VERSION);
+    xpprintf("PACKAGE                   = %s\n", PACKAGE);
     xpprintf("Conf_libdir()             = %s\n", Conf_libdir());
     xpprintf("Conf_defaults_file_name() = %s\n", Conf_defaults_file_name());
     xpprintf("Conf_password_file_name() = %s\n", Conf_password_file_name());
