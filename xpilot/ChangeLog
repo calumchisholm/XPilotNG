@@ -1,3 +1,247 @@
+2004-04-03 15:57  kps
+
+	* configure, configure.ac: A bit better configure help for
+	  --enable-sdl-gameloop
+
+2004-04-03 15:37  kps
+
+	* Makefile.in, config.h.in, configure, configure.ac,
+	  doc/Makefile.in, doc/man/Makefile.in, lib/Makefile.in,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.am, src/client/sdl/Makefile.in,
+	  src/client/sdl/gameloop.c, src/common/Makefile.in,
+	  src/replay/Makefile.in, src/replay/tools/Makefile.in,
+	  src/server/Makefile.in: Use SDL gameloop in sdl client by using
+	  configure flag --enable-sdl-gameloop.
+
+2004-04-03 00:14  kps
+
+	* src/client/: client.c, client.h, default.c, sdl/SDL_console.h,
+	  sdl/sdlgui.c, sdl/sdlinit.c, sdl/sdlpaint.c, sdl/sdlpaint.h,
+	  sdl/text.c, sdl/text.h, sdl/xpclient_sdl.h: Includes of SDL and
+	  OpenGL stuff fixed for Mac OS X.  Fixes: VARIABLES MUST BE
+	  EXTERNED IN H FILES!!!! that is, in foo.h do extern int foobar;
+	  NOT int foobar; Otherwise linking will fail on some platforms.
+
+2004-04-02 21:16  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: FrictionArea.java,
+	  MapModel.java: fixed frictionarea import bug
+
+2004-04-02 18:29  kps
+
+	* src/client/sdl/: DT_drawtext.c, DT_drawtext.h, Makefile.am,
+	  Makefile.in, SDL_console.c, SDL_console.h, SDL_gfxPrimitives.c,
+	  SDL_gfxPrimitives.h, console.c, console.h, gameloop.c,
+	  gameloop_x.c, glwidgets.c, glwidgets.h, images.c, images.h,
+	  main.c, radar.c, sdlevent.c, sdlgui.c, sdlinit.c, sdlkeys.c,
+	  sdlkeys.h, sdlmeta.c, sdlmeta.h, sdlpaint.c, sdlpaint.h,
+	  sdlwindow.c, sdlwindow.h, text.c, text.h, todo.c, xpclient_sdl.h:
+	  Added xpclient_sdl.h file. Include this in sdl client c files.
+	  Fixed some warnings, e.g. removed C++ style comments (// blah),
+	  commented unused variables etc.
+
+2004-04-02 17:59  kps
+
+	* src/client/paintradar.c: trivial fix.
+
+2004-04-02 17:49  juhal
+
+	* src/client/paintradar.c: fixed bug in painting wrapped polygons
+
+2004-04-02 14:53  kps
+
+	* src/server/: command.c, netserver.c: Added PACKAGE_NAME
+	  ("XPilotNG") to version related messages.
+
+2004-04-02 12:31  kps
+
+	* src/server/object.h: Removed unecessary 'fusetime' global
+	  variable.
+
+2004-04-01 19:48  kps
+
+	* src/common/xpcommon.h: Use #ifdef instead of #if in many places
+	  (avoid use of #if for undefined symbols).
+
+2004-03-31 22:50  maximan
+
+	* src/client/sdl/sdlgui.c: instruments.showMessages works now
+	  /virus
+
+2004-03-31 21:00  kps
+
+	* doc/man/xpilot-ng-server.man: Updates due to 2 new rankserver
+	  related options.
+
+2004-03-31 20:06  kps
+
+	* src/server/asteroid.c: Use shape_is_inside while placing asteroid
+	  so they don't appear inside walls.
+
+2004-03-31 19:55  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, sdlgui.c, sdlpaint.c:
+	  Just a quick bandaid patch preventing messagelists,radar etc from
+	  disappearing when resizing the window smaller, don't move back
+	  when it is larger again tho (working on that, need options for
+	  them to too remeber positins between sessions)
+
+	  /virus
+
+2004-03-31 19:18  kps
+
+	* src/server/: asteroid.h, walls.c: Added inline function
+	  Asteroid_get_shape_by_size() which just returns a ball shape with
+	  the right radius.
+
+2004-03-31 16:40  kps
+
+	* src/server/: asteroid.c, server.c, server.h, walls.c: Make
+	  asteroids bounce off walls more realistically. Previously they
+	  bounced like they were pointsize, now they bounce like they are
+	  balls, where the ball radius equals the asteroid radius. Added
+	  Move_asteroid() to walls.c.
+
+2004-03-31 15:35  kps
+
+	* src/server/: map.c, wormhole.h, xpmap.c: Define WORMHOLE_RADIUS
+	  in wormhole.h.
+
+2004-03-30 23:17  kps
+
+	* src/server/: cmdline.c, player.c, rank.c, rank.h, server.c,
+	  server.h: Added server options rankFileName and
+	  rankWebpageFileName. These replace environment variables
+	  XPILOTSCOREFILE, XPILOTRANKINGPAGE and XPILOTNOJSRANKINGPAGE.
+
+2004-03-30 22:31  kps
+
+	* src/server/: cannon.c, play.c, server.h, shot.c, target.c,
+	  treasure.c, update.c, walls.c, wormhole.c: Moved cannon, target,
+	  treasure and wormhole specific functions to appropriate files.
+
+2004-03-30 22:14  kps
+
+	* src/server/object.c: unused param warning fixed.
+
+2004-03-30 21:59  kps
+
+	* src/server/: Makefile.am, Makefile.in, treasure.c: Added
+	  treasure.c to hold ball related stuff.
+
+2004-03-30 19:14  darelcullen
+
+	* src/client/sdl/sdlgui.c: fix some syntax errors..
+
+2004-03-30 18:58  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, sdlevent.c, sdlgui.c,
+	  sdlmeta.c, text.c, text.h:
+	  Lots of work in progress on list widgets and scrollpane widget,
+	  new function for message painting (i.e. uses label widgets in
+	  listwidgets) seems to work (hopefully will remove the scale bug
+	  e.g. filled box bug; where msgs are wrongly painted in the
+	  client) TODO: add more features and use the new stuff where
+	  appropriate i.e. meta interface
+
+	  /virus
+
+2004-03-30 17:39  kps
+
+	* src/server/: cell.c, cmdline.c, contact.c, item.c, rank.c,
+	  robot.c, srecord.c, tuner.c, walls.c: Warning and whitespace
+	  fixes.
+
+2004-03-30 13:36  kps
+
+	* src/server/: Makefile.am, Makefile.in, target.c, target.h,
+	  wormhole.c, wormhole.h, xpserver.h: Added files for target and
+	  wormhole specific hacks.
+
+2004-03-30 01:28  kps
+
+	* README, README.in: Updated README a bit.
+
+2004-03-29 23:40  kps
+
+	* src/server/rank.c: When selecting a ranknode for a joining
+	  player, if player is not found in ranking list, first look for an
+	  unused entry, if that is not found, use the least recently used
+	  node from the bottom half of the rank list.
+
+2004-03-29 21:27  kps
+
+	* src/server/rank.c: Removed some unecessary obfuscations.
+
+2004-03-29 21:04  kps
+
+	* src/server/: command.c, object.h, rank.c, rank.h: Renamed
+	  rankinfo to ranknode, renamed pointers to this to rank.
+
+2004-03-29 19:22  kps
+
+	* src/server/rank.c: Some code simplifications.
+
+2004-03-29 14:23  kps
+
+	* src/server/rank.c: Cleaned up Rank_show_ranks(), Added top ranks
+	  message.
+
+2004-03-29 13:24  kps
+
+	* src/server/rank.c: Use qsort(3) when sorting ranks.
+
+2004-03-28 00:55  darelcullen
+
+	* BUGS: update bugs
+
+2004-03-27 19:13  kps
+
+	* src/server/: command.c, play.c, rank.c, rank.h: Changed rank
+	  score file format from binary format to xml.
+
+2004-03-26 22:54  kps
+
+	* src/server/: play.c, rank.h: Calculate number of ticks used for
+	  ballrun correctly (I hope).  Changed ballrun message, now message
+	  will look like this: < The ball was loose for 155 frames / 155.00
+	  ticks (best 67.00) / 12.92s >
+
+2004-03-26 18:19  juhal
+
+	* contrib/jxpmap/README: updated
+
+2004-03-25 22:05  kps
+
+	* src/server/: command.c, object.h, player.c, rank.c, rank.h,
+	  robot.c: Robots now have ranking stats.  Changed ranking related
+	  types, e.g. RankInfo -> rankinfo_t.
+
+2004-03-25 21:49  kps
+
+	* src/client/default.c: print out nick, user and host when setting
+	  them.
+
+2004-03-25 21:30  darelcullen
+
+	* src/client/: xdefault.c, xevent.c, xinit.c: made the
+	  mouseAccelInClient option a real toggle
+
+2004-03-25 20:23  kps
+
+	* doc/man/: xpilot-ng-sdl.man, xpilot-ng-x11.man: updates.
+
+2004-03-25 19:54  juhal
+
+	* src/client/option.c: updated help message
+
+2004-03-25 19:48  darelcullen
+
+	* ChangeLog: update the changelog
+
 2004-03-25 19:22  darelcullen
 
 	* src/client/: xevent.c, xdefault.c: Option to turn off or on in
