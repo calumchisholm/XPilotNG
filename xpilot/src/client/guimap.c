@@ -305,10 +305,6 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	 * Hacks to support Mara's base warning on new servers and
 	 * the red "meter" basewarning on old servers.
 	 */
-	/*
-	 * Is it just me, or is basewarning broken on old servers?
-	 * Seems all message scanning is gone...(Mara)
-	 */
 	if (version >= 0x4F12) {
 		/*
 		 * Since this is the next (displayed) frame add FPSDivisor
@@ -316,7 +312,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	    if (loops <= base->deathtime + FPSDivisor)
 		do_basewarning = true;
 	} else {
-	    if (base->deathtime > loops - 3 * clientFPS) {/* This test always fails */
+	    if (base->deathtime > loops - 3 * clientFPS) {
 		do_basewarning = true;
 		if (baseWarningType & 1) {
 		    int count = (360
