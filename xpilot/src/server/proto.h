@@ -225,6 +225,9 @@ void Ball_hits_goal(ballobject *ball, int group);
 void Ball_is_replaced(ballobject *ball);
 void Ball_is_destroyed(ballobject *ball);
 bool Balltarget_hit_func(struct group *group, struct move *move);
+void Restore_cannon_on_map(int ind);
+void Remove_cannon_from_map(int ind);
+bool Cannon_hit_func(struct group *group, struct move *move);
 void Delete_shot(int ind);
 void Fire_laser(int ind);
 void Fire_general_laser(int ind, unsigned short team, int cx, int cy, int dir,

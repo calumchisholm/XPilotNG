@@ -277,7 +277,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 		dir = atoi(*(attr + 1));
 	    attr += 2;
 	}
-	/* ind = ... */
+	ind = Map_place_cannon(cx, cy, dir, team);
+	/* kps - check ind ? */
 	P_start_cannon(cx, cy, dir, team, ind);
 	return;
     }    

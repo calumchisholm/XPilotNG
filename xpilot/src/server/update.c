@@ -651,16 +651,8 @@ void Update_objects(void)
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->dead_time > 0) {
-	    if ((cannon->dead_time -= timeStep) <= 0) {
-		int bx, by;
-
-		bx = CLICK_TO_BLOCK(cannon->pos.cx);
-		by = CLICK_TO_BLOCK(cannon->pos.cy);
-		World.block[bx][by] = CANNON;
-		cannon->conn_mask = 0;
-		cannon->last_change = frame_loops;
-		cannon->dead_time = 0;
-	    }
+	    if ((cannon->dead_time -= timeStep) <= 0)
+		Restore_cannon_on_map(i);
 	    continue;
 	} else {
 	    /* don't check too often, because this gets quite expensive

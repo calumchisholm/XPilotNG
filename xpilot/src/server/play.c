@@ -351,6 +351,85 @@ bool Balltarget_hit_func(struct group *group, struct move *move)
 }
 
 
+void Restore_cannon_on_map(int ind)
+{
+    cannon_t *cannon = World.cannon + ind;
+    int bx, by;
+
+    bx = CLICK_TO_BLOCK(cannon->pos.cx);
+    by = CLICK_TO_BLOCK(cannon->pos.cy);
+    World.block[bx][by] = CANNON;
+    cannon->conn_mask = 0;
+    cannon->last_change = frame_loops;
+    cannon->dead_time = 0;
+}
+
+void Remove_cannon_from_map(int ind)
+{
+    cannon_t		*cannon = &World.cannon[ind];
+
+    cannon->dead_time = cannonDeadTime * TIME_FACT;
+    cannon->conn_mask = 0;
+    World.block
+	[CLICK_TO_BLOCK(cannon->pos.cx)]
+	[CLICK_TO_BLOCK(cannon->pos.cy)] = SPACE;
+}
+
+static unsigned long cannon_mask;
+/*
+ * This function is called when something would hit a cannon.
+ *
+ * Ideas stolen from Move_segment in walls_old.c
+ */
+bool Cannon_hit_func(struct group *group, struct move *move)
+{
+    object *obj = NULL;
+    int ind = group->item_id;
+    cannon_t *cannon = &World.cannon[ind];
+
+    /* cannon is dead ? */
+    if (cannon->dead_time != 0)
+	return false;
+
+    if (move->obj == NULL)
+	return true;
+    obj = move->obj;
+
+    /* check cannon mask */
+    cannon_mask =
+	OBJ_PLAYER | (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT |
+	OBJ_PULSE | OBJ_SMART_SHOT | OBJ_TORPEDO | OBJ_HEAT_SHOT |
+	OBJ_ASTEROID;
+
+    if (cannonsUseItems)
+	cannon_mask |= OBJ_ITEM;
+
+    if (!BIT(cannon_mask, obj->type))
+	return false;
+
+    if (BIT(obj->status, FROMCANNON)
+	&& !BIT(World.rules->mode, TEAM_PLAY))
+	return false;
+
+    if (BIT(cannon->used, HAS_PHASING_DEVICE))
+	return false;
+
+    /*
+     * kps - this should be taken care of by the hit_mask
+     * note that current hit masks don't bother about checking
+     * teamImmunity option
+     */
+    if (BIT(World.rules->mode, TEAM_PLAY)
+	&& (teamImmunity
+	    || BIT(obj->status, FROMCANNON))
+	&& obj->team == cannon->team) {
+	return false;
+    }
+
+    return true;
+}
+
+
 
 
 

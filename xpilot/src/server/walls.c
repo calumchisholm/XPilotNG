@@ -289,9 +289,7 @@ void Cannon_dies(int ind, player *pl)
     int			cy = cannon->pos.cy;
     int			killer = -1;
 
-    cannon->dead_time = cannonDeadTime * TIME_FACT;
-    cannon->conn_mask = 0;
-    World.block[CLICK_TO_BLOCK(cx)][CLICK_TO_BLOCK(cy)] = SPACE;
+    Remove_cannon_from_map(ind);
     Cannon_throw_items(ind);
     Cannon_init(ind);
     sound_play_sensors(cx, cy, CANNON_EXPLOSION_SOUND);
@@ -552,7 +550,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 {
     player *pl = NULL;
 
-    /* kps hack - not ok, check Cannon_dies_old() */
+    /* kps hack - is this ok ? */
     if (obj->id != NO_ID)
 	pl = Players[GetInd[obj->id]];
 
@@ -587,10 +585,6 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 	break;
 
     case CrashCannon:
-	/*
-	 * kps - determine which player fired the shot that killed the cannon
-	 * and change to Cannon_dies(item_id, pl);
-	 */
 	obj->life = 0;
 	if (BIT(obj->type, OBJ_ITEM)) {
 	    Cannon_add_item(item_id, obj->info, obj->count);
@@ -979,6 +973,13 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     /* kps hack */
     if (type == WORMHOLE) {
 	Player_crash(pl, move, CrashWormHole, item_id, 1);
+	return;
+    }
+    /* kps hack */
+
+    /* kps hack */
+    if (type == CANNON) {
+	Player_crash(pl, move, CrashCannon, item_id, 1);
 	return;
     }
     /* kps hack */

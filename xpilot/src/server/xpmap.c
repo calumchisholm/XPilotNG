@@ -734,39 +734,38 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
     int cy = cannon->pos.cy;
     int i;
 
+    pos[0].cx = cx;
+    pos[0].cy = cy;
+
     cx = CLICK_TO_BLOCK(cx) * BLOCK_CLICKS;
     cy = CLICK_TO_BLOCK(cy) * BLOCK_CLICKS;
 
     switch (cannon->dir) {
+    case DIR_RIGHT:
+	pos[1].cx = cx;
+	pos[1].cy = cy + (BLOCK_CLICKS - 1);
+	pos[2].cx = cx;
+	pos[2].cy = cy;
+	break;
     case DIR_UP:
-	pos[0].cx = cx;
-	pos[0].cy = cy;
-	pos[1].cx = cx + (BLOCK_CLICKS - 1);
+	pos[1].cx = cx;
 	pos[1].cy = cy;
+	pos[2].cx = cx + (BLOCK_CLICKS - 1);
+	pos[2].cy = cy;
 	break;
     case DIR_LEFT:
-	pos[0].cx = cx + (BLOCK_CLICKS - 1);
-	pos[0].cy = cy;
 	pos[1].cx = cx + (BLOCK_CLICKS - 1);
-	pos[1].cy = cy + (BLOCK_CLICKS - 1);
+	pos[1].cy = cy;
+	pos[2].cx = cx + (BLOCK_CLICKS - 1);
+	pos[2].cy = cy + (BLOCK_CLICKS - 1);
 	break;
     case DIR_DOWN:
-	pos[0].cx = cx + (BLOCK_CLICKS - 1);
-	pos[0].cy = cy + (BLOCK_CLICKS - 1);
-	pos[1].cx = cx;
+	pos[1].cx = cx + (BLOCK_CLICKS - 1);
 	pos[1].cy = cy + (BLOCK_CLICKS - 1);
-	break;
-    case DIR_RIGHT:
-	pos[0].cx = cx;
-	pos[0].cy = cy + (BLOCK_CLICKS - 1);
-	pos[1].cx = cx;
-	pos[1].cy = cy;
+	pos[2].cx = cx;
+	pos[2].cy = cy + (BLOCK_CLICKS - 1);
 	break;
     }
-
-    /* we already calculated the cannon coordinates earlier */
-    pos[2].cx = cannon->pos.cx;
-    pos[2].cy = cannon->pos.cy;
     pos[3] = pos[0];
 
     P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
@@ -780,9 +779,6 @@ static void Xpmap_cannon_to_polygon(int ind)
 {
     int ps, es;
     cannon_t *c = &World.cannon[ind];
-
-    /* too buggy currently */
-    return ;
 
     ps = P_get_poly_id("cannon_ps");
     es = P_get_edge_id("cannon_es");

@@ -252,7 +252,7 @@ void P_start_cannon(int cx, int cy, int dir, int team, int ind)
     groups[current_group].type = CANNON;
     groups[current_group].team = team;
     groups[current_group].hit_mask = HITMASK(team);
-    groups[current_group].hit_func = NULL;
+    groups[current_group].hit_func = Cannon_hit_func;
     groups[current_group].item_id = ind;
 }
 
