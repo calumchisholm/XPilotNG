@@ -25,6 +25,7 @@
 #include <GL/glu.h>
 #include "SDL.h"
 #include "SDL_ttf.h"
+#include "SDL_gfxPrimitives.h"
 #include "xpclient.h"
 #include "sdlpaint.h"
 #include "images.h"
@@ -45,6 +46,9 @@ static double       time_counter = 0.0;
 static TTF_Font     *scoreListFont;
 static char         *scoreListFontName = "VeraMoBd.ttf";
 static sdl_window_t scoreListWin;
+static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
+static guiarea_t    *scoreListArea;
+static bool         scoreListMoving;
 static guiarea_t    *window_guiarea;
 
 guiarea_t *register_guiarea(	SDL_Rect bounds,
@@ -168,17 +172,43 @@ int Resize_Window( int width, int height )
     return 0;
 }
 
+static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y)
+{
+    if (state == SDL_PRESSED) {
+    	if (button == 1)
+	    scoreListMoving = true;
+    }
+    
+    if (state == SDL_RELEASED) {
+    	if (button == 1)
+	    scoreListMoving = false;
+    }
+}
+
+static void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y)
+{
+    if (scoreListMoving) {
+	scoreListWin.x += xrel;
+	scoreListWin.y += yrel;
+	scoreListArea->bounds.x = scoreListWin.x;
+	scoreListArea->bounds.y = scoreListWin.y;
+    }
+}
+
+
 static int Scorelist_init(void)
 {
+    SDL_Rect r = { 10, 240, 200, 100 };
     scoreListFont = TTF_OpenFont(scoreListFontName, 12);
     if (scoreListFont == NULL) {
 	error("opening font %s failed", scoreListFontName);
 	return -1;
     }
-    if (sdl_window_init(&scoreListWin, 10, 240, 200, 500)) {
+    if (sdl_window_init(&scoreListWin, r.x, r.y, r.w, r.h)) {
 	error("failed to init scorelist window");
 	return -1;
     }
+    scoreListArea = register_guiarea(r, Scorelist_button, Scorelist_move);
     return 0;
 }
 
@@ -186,6 +216,49 @@ static void Scorelist_cleanup(void)
 {
     TTF_CloseFont(scoreListFont);
     sdl_window_destroy(&scoreListWin);
+}
+
+static void Scorelist_paint(void)
+{
+    if (scoresChanged) {
+	/* This is the easiest way to track if
+	 * the height of the score window should be changed */
+	int y = scoreEntryRect.y;
+        Paint_score_table();
+	if (y != scoreEntryRect.y) {
+	    sdl_window_resize(&scoreListWin, scoreListWin.w,
+			      scoreEntryRect.y + scoreEntryRect.h
+			      + 2 * SCORE_BORDER);
+	    /* Unfortunately the resize loses the surface
+	     * so I have to repaint it */
+	    scoresChanged = true;
+	    Paint_score_table();
+	    scoreListArea->bounds.w = scoreListWin.w;
+	    scoreListArea->bounds.h = scoreListWin.h;
+	}
+	sdl_window_refresh(&scoreListWin);
+    }
+    glColor4ub(0, 0x20, 0, 0x90);
+    glEnable(GL_BLEND);
+    glBegin(GL_QUADS);
+    glVertex2i(scoreListWin.x, scoreListWin.y + scoreListWin.h + 2);    
+    glVertex2i(scoreListWin.x, scoreListWin.y);
+    glVertex2i(scoreListWin.x + scoreListWin.w, scoreListWin.y);
+    glVertex2i(scoreListWin.x + scoreListWin.w, 
+               scoreListWin.y + scoreListWin.h + 2);
+    glEnd();
+    sdl_window_paint(&scoreListWin);
+    glBegin(GL_LINE_LOOP);
+    glColor4ub(0, 0, 0, 0xff);
+    glVertex2i(scoreListWin.x, scoreListWin.y + scoreListWin.h + 2);    
+    glColor4ub(0, 0x90, 0x00, 0xff);
+    glVertex2i(scoreListWin.x, scoreListWin.y);
+    glColor4ub(0, 0, 0, 0xff);
+    glVertex2i(scoreListWin.x + scoreListWin.w, scoreListWin.y);
+    glColor4ub(0, 0x90, 0x00, 0xff);
+    glVertex2i(scoreListWin.x + scoreListWin.w, 
+               scoreListWin.y + scoreListWin.h + 2);
+    glEnd();
 }
 
 int Paint_init(void)
@@ -206,6 +279,10 @@ int Paint_init(void)
     if (Images_init() == -1) 
 	return -1;
 
+    select_bounds = NULL;
+    SDL_Rect bounds = {0,0,draw_width,draw_height};
+    window_guiarea = register_guiarea(bounds,select_button,select_move);
+
     if (Scorelist_init() == -1)
 	return -1;
 
@@ -215,11 +292,7 @@ int Paint_init(void)
     scaleFactor_s = 1.0;
     scoresChanged = true;
     players_exposed = true;
-    
-    select_bounds = NULL;
-    SDL_Rect bounds = {0,0,draw_width,draw_height};
-    window_guiarea = register_guiarea(bounds,select_button,select_move);
-    
+        
     return 0;
 }
 
@@ -406,11 +479,7 @@ void Paint_frame(void)
     	Paint_messages();       
 	Radar_paint();
 	Console_paint();
-	if (scoresChanged) {
-	    Paint_score_table();
-	    sdl_window_refresh(&scoreListWin);
-	}
-	sdl_window_paint(&scoreListWin);
+	Scorelist_paint();
 	Paint_select();
 	glPopMatrix();
     }
@@ -423,7 +492,6 @@ void Paint_score_start(void)
 {
     char	headingStr[MSG_LEN];
     SDL_Surface *header;
-    SDL_Rect    dst = { SCORE_BORDER, SCORE_BORDER, 0, 0 };
 
     if (showRealName)
 	strlcpy(headingStr, "NICK=USER@HOST", sizeof(headingStr));
@@ -449,8 +517,14 @@ void Paint_score_start(void)
 	error("scorelist header rendering failed: %s", SDL_GetError());
 	return;
     }
+    scoreEntryRect.x = scoreEntryRect.y = SCORE_BORDER;
     SDL_SetAlpha(header, 0, 0);
-    SDL_BlitSurface(header, NULL, scoreListWin.surface, &dst);
+    SDL_BlitSurface(header, NULL, scoreListWin.surface, &scoreEntryRect);
+    lineRGBA(scoreListWin.surface, SCORE_BORDER,
+	     scoreEntryRect.y + header->h + 2,
+	     scoreListWin.w - SCORE_BORDER,
+	     scoreEntryRect.y + header->h + 2,
+	     0, 128, 0, 255);
     SDL_FreeSurface(header);
 }
 
@@ -460,7 +534,6 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
     static int		lineSpacing = -1, firstLine;
     char		scoreStr[16];
     SDL_Surface         *line;
-    SDL_Rect            dst = { SCORE_BORDER, 0, 0, 0 };
     int     	    	color;
 
     /*
@@ -474,11 +547,10 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	teamStr[1] = ' ';
 	raceStr[2] = ' ';
 
-	lineSpacing = TTF_FontLineSkip(scoreListFont);
+	lineSpacing = TTF_FontLineSkip(scoreListFont) + 1;
 	firstLine = 2*SCORE_BORDER + lineSpacing;
-
     }
-    dst.y = firstLine + lineSpacing * entry_num;
+    scoreEntryRect.y = firstLine + lineSpacing * entry_num;
 
     /*
      * Setup the status line
@@ -567,7 +639,20 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	return;
     }
     SDL_SetAlpha(line, 0, 0);
-    SDL_BlitSurface(line, NULL, scoreListWin.surface, &dst);
+    SDL_BlitSurface(line, NULL, scoreListWin.surface, &scoreEntryRect);
+    scoreEntryRect.h = line->h;
+
+    /*
+     * Underline the teams
+     */
+    if (is_team) {
+	lineRGBA(scoreListWin.surface, scoreEntryRect.x, 
+		 scoreEntryRect.y + line->h - 1,
+		 scoreEntryRect.x + scoreEntryRect.w,
+		 scoreEntryRect.y + line->h - 1,
+		 fg.r, fg.g, fg.b, 255);
+    }
+
     SDL_FreeSurface(line);
 }
 

@@ -51,8 +51,9 @@ int sdl_window_resize(sdl_window_t *win, int width, int height)
 	return -1;
     }
 
-    if (win->surface != NULL)
+    if (win->surface != NULL) {
 	SDL_FreeSurface(win->surface);
+    }
 
     win->surface = surface;
     win->w = width;
