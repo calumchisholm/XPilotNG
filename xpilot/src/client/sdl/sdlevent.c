@@ -25,6 +25,7 @@
 #include "sdlkeys.h"
 #include "SDL.h"
 #include "console.h"
+#include "sdlpaint.h"
 
 char sdlevent_version[] = VERSION;
 
@@ -38,7 +39,13 @@ int Process_event(SDL_Event *evt);
 
 bool Key_press_swap_scalefactor(void)
 {
-    /* TODO */
+    double tmp;
+    
+    tmp = scaleFactor;
+    scaleFactor = scaleFactor_s;
+    scaleFactor_s = tmp;
+
+    scale = 1.0 / scaleFactor;
     return false;
 }
 

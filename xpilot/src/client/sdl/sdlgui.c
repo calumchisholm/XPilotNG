@@ -247,6 +247,7 @@ void Gui_paint_visible_border(int x, int y, int xi, int yi)
     	glVertex2i(xi, y);
     glEnd();
     setupPaint_stationary();
+    glDisable(GL_BLEND);
 }
 
 void Gui_paint_hudradar_limit(int x, int y, int xi, int yi)
@@ -518,12 +519,24 @@ void Gui_paint_ecm(int x, int y, int size)
 void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
 {
     /*if (texturedObjects) return;*/
+    int stipple = 4;
+    /*int off = 2*stipple;
+    float tmpx,tmpy,len;
+
+    tmpx = x_0 - x_1;
+    tmpy = y_0 - y_1;
+    len = sqrt(tmpx*tmpx + tmpy*tmpy);
+    tmpx = (off -1-loops % (off))*tmpx/len;
+    tmpy = (off -1-loops % (off))*tmpy/len;*/
+
     set_alphacolor(fuelColor);
-    glLineStipple(3, 0xAAAA);
+    glLineStipple(stipple, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
+    /*glVertex2i(x_1 + tmpx, y_1 + tmpy);*/
     glVertex2i(x_0, y_0);
     glVertex2i(x_1, y_1);
+    /*glVertex2i(x_1 + tmpx, y_1 + tmpy);*/
     glEnd();
     glDisable(GL_LINE_STIPPLE);
 }

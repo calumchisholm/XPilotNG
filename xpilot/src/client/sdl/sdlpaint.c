@@ -37,7 +37,6 @@ char sdlpaint_version[] = VERSION;
 static double   time_counter = 0.0;
 
 double	        hudRadarLimit;		/* Limit for hudradar drawing */
-double          scale;                  /* The opengl scale factor */
 
 /* function to reset our viewport after a window resize */
 int Resize_Window( int width, int height )
@@ -82,8 +81,9 @@ int Paint_init(void)
     if (Images_init() == -1) 
 	return -1;
 
-    scale = 1.171975;
+    scale = 1.171875;
     scaleFactor = 1.0 / scale;
+    scaleFactor_s = 1.0;
 
     return 0;
 }

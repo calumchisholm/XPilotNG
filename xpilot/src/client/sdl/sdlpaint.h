@@ -18,7 +18,7 @@
 typedef unsigned int color_t;
 
 extern int              draw_depth;
-extern double           scale;              /* The opengl scale factor */
+double           scale;              /* The opengl scale factor */
 
 /* code to set the viewport size */
 int Resize_Window( int width, int height );
