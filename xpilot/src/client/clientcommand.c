@@ -32,6 +32,7 @@ const char c_commands[][16] = {
     "help", "h",
     "set", "s",
     "get", "g",
+    "quit", "q",
 };
 
 static void print_ignorelist(void)
@@ -126,6 +127,11 @@ static void print_help(char *arg)
 	case 10:	/* get */
 	case 11:	/* g */
 	    Add_message("'\\get <option>' gets an option value. "
+			"[*Client reply*]");
+	    break;
+	case 12:	/* quit */
+	case 13:	/* q */
+	    Add_message("'\\quit' quits the game, no questions asked. "
 			"[*Client reply*]");
 	    break;
 	default:
@@ -230,6 +236,13 @@ void executeCommand(char *talk_str)
 #else
 	Add_message("Not implemented. [*Client reply*]");
 #endif
+	break;
+    case 12:			/* quit */
+    case 13:			/* q */
+	/* kps - is this ok ? */
+	Net_cleanup();
+	Quit();
+	exit(0);
 	break;
     default:
 	warn("BUG: bad command num %d in executeCommand()", command_num);
