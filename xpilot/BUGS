@@ -8,6 +8,15 @@ affected:
 
 
 -------------------------------------------------------------------
+Problem : If you use \set geometry in windows sdl client all the
+textures are lost.
+Found by: Baron
+Solution: Upgrade to linux ;)
+Fixed by:
+Files 
+affected:
+
+-------------------------------------------------------------------
 Problem :Toggle full screen does not work in the sdl client
 if you have a geometry that cannot work in fullscreenmode
 Found by: Colonel Blood
