@@ -30,15 +30,13 @@ int   rplayback;
 int   recOpt;
 
 static enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, OPTTOUT, NOMORE};
-static void *threshold[NOMORE];
+static char *threshold[NOMORE];
 static int notfirst[NOMORE];
-static void *readto[NOMORE];
-/* These cause unnecessary warnings because C is too stupid to understand
-   the similarity of (void *)a = (char *)b; and (void **a) = &(char *)b; */
-static void **startb[NOMORE] = {&playback_ints_start, &playback_errnos_start,
+static char *readto[NOMORE];
+static char **startb[NOMORE] = {&playback_ints_start, &playback_errnos_start,
         &playback_shorts_start, &playback_data_start, &playback_sched_start,
         &playback_ei_start, &playback_es_start, &playback_opttout_start};
-static void **curb[NOMORE] = {&playback_ints, &playback_errnos,
+static char **curb[NOMORE] = {&playback_ints, &playback_errnos,
         &playback_shorts, &playback_data, &playback_sched, &playback_ei,
         &playback_es, &playback_opttout};
 
@@ -53,7 +51,7 @@ static void Write_data(int type)
     FILE *f;
     int len;
     char *startc = *startb[type], *curc = *curb[type];
-    
+
     if (notfirst[type])
 	f = recf2;
     else {
@@ -81,7 +79,7 @@ static void Read_data(int type, int len)
     fread(readto[type], 1, len, recf1);
     readto[type] += len;
 }
-    
+
 void Init_recording(void)
 {
     static int oldMode = 0;
