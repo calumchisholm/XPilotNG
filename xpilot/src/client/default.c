@@ -371,15 +371,6 @@ option options[] = {
 	0
     },
     {
-	"showExtraBaseInfo",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Paint remaining lives or D (dead), P (paused) or \n"
-	"W (waiting for next round) at base.\n",
-	0
-    },
-    {
 	"fuelNotify",
 	NULL,
 	"500",
@@ -3488,8 +3479,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "ballMsgScan", &instruments, BALL_MSG_SCAN);
     Get_bit_resource(rDB, "showLivesByShip", &instruments,
 		     SHOW_LIVES_BY_SHIP);
-    Get_bit_resource(rDB, "showExtraBaseInfo", &instruments,
-		     SHOW_EXTRA_BASE_INFO);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
     Get_bit_resource(rDB, "showItems", &instruments, SHOW_ITEMS);
     Get_bit_resource(rDB, "clockAMPM", &instruments, SHOW_CLOCK_AMPM_FORMAT);

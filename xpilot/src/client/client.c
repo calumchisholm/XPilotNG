@@ -30,8 +30,8 @@ bool	is_server = false;	/* used in common code */
 char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
 bool	scoresChanged = false;
-int	RadarHeight = 0;
-int	RadarWidth = 256;	/* must always be 256! */
+unsigned	RadarHeight = 0;
+unsigned	RadarWidth = 256;	/* must always be 256! */
 
 int     oldServer;
 ipos	FOOpos;

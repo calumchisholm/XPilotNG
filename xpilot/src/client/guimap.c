@@ -424,7 +424,11 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	break;
     }
 
-    if (other && BIT(instruments, SHOW_EXTRA_BASE_INFO)) {
+    /*
+     * Determine whether to paint remaining lives or D (dead), P (paused) or
+     * W (waiting for next round) at base.
+     */
+    if (other) {
 	if (other->mychar == ' ' || other->mychar == 'R') {
 	    if (BIT(Setup->mode, LIMITED_LIVES))
 		sprintf(info, " %d", other->life);
@@ -436,6 +440,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	size2 = XTextWidth(gameFont, info, (int)strlen(info));
     }
 
+    /* Team number */
     if (size) {
 	rd.drawString(dpy, drawPixmap, gameGC, x, y, s, other ? 2 : 1);
 	x += size;
@@ -445,6 +450,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 		      other->name, other->name_len);
 	x += other->name_width;
     }
+    /* Extra base info */
     if (size2)
 	rd.drawString(dpy, drawPixmap, gameGC, x, y, info, strlen(info));
 }

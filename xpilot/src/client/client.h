@@ -64,7 +64,6 @@
 #define CLIENT_RANKER		(1L << 16)
 #define MAP_RADAR		(1L << 17)
 #define SHOW_LIVES_BY_SHIP	(1L << 18)
-#define SHOW_EXTRA_BASE_INFO	(1L << 19)
 
 
 #define PACKET_LOSS		0
@@ -272,8 +271,8 @@ extern short	phasingtimemax;
 extern int	roundDelay;
 extern int	roundDelayMax;
 
-extern int	RadarWidth;
-extern int	RadarHeight;
+extern unsigned	RadarWidth;
+extern unsigned	RadarHeight;
 extern int	map_point_distance;	/* spacing of navigation points */
 extern int	map_point_size;		/* size of navigation points */
 extern int	spark_size;		/* size of sparks and debris */
