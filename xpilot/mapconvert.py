@@ -592,69 +592,56 @@ def convert(options):
     bases = []
     balls = []
     fuels = []
+    targets = []
     cannons = []
     checks = [None] * 27  # 1 extra so it always ends with None
     BASES = '_0123456789'
     BALL = '*'
     FUEL = '#'
+    TARGET = '!'
     CANNONS = 'rdfc'
     CHECKPOINTS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    ALL = BASES + BALL + FUEL + CHECKPOINTS + CANNONS
+    ALL = BASES + BALL + FUEL + TARGET + CHECKPOINTS + CANNONS
     for x, y in map.ncoords():
         block = map.data[y][x]
         if block not in ALL:
             continue
         loc = Wrapcoords(map.width, map.height, x, y)
+        thing = Struct()
+        thing.x = loc.x * BCLICKS + BCLICKS // 2
+        thing.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
+        thing.loc = loc
+        thing.team = -1
 	if block in BASES:
-	    base = Struct()
-	    base.x = loc.x * BCLICKS + BCLICKS // 2
-	    base.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
 	    if map[loc] == '_':
-		base.team = 0
+		thing.team = 0
 	    else:
-		base.team = ord(map[loc]) - ord('0')
-	    base.dir = 32
+		thing.team = ord(map[loc]) - ord('0')
+	    thing.dir = 32
 	    if map[loc.u()] in ATTRACT:
-		base.dir = 32
+		thing.dir = 32
 	    elif map[loc.d()] in ATTRACT:
-		base.dir = 96
+		thing.dir = 96
 	    elif map[loc.r()] in ATTRACT:
-		base.dir = 0
+		thing.dir = 0
 	    elif map[loc.l()] in ATTRACT:
-		base.dir = 64
-	    base.loc = loc.copy()
-	    bases.append(base)
-	elif block == BALL:
-	    ball = Struct()
-	    ball.x = loc.x * BCLICKS + BCLICKS // 2
-	    ball.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
-	    ball.loc = loc.copy()
-	    balls.append(ball)
-	elif block == FUEL:
-	    fuel = Struct()
-	    fuel.x = loc.x * BCLICKS + BCLICKS // 2
-	    fuel.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
-	    fuel.loc = loc.copy()
-	    fuels.append(fuel)
-	elif block in CHECKPOINTS:
-	    check = Struct()
-	    check.x = loc.x * BCLICKS + BCLICKS // 2
-	    check.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
-	    check.loc = loc.copy()
-	    checks[ord(map[loc]) - ord('A')] = check
+		thing.dir = 64
+	    thing.loc = loc
+	    bases.append(thing)
+        elif block == BALL:
+            balls.append(thing)
+        elif block == FUEL:
+            fuels.append(thing)
+        elif block == TARGET:
+            targets.append(thing)
+        elif block in CHECKPOINTS:
+            checks[ord(map[loc]) - ord('A')] = thing
         elif block in CANNONS:
-            cannon = Struct()
-            cannon.x = loc.x * BCLICKS + BCLICKS // 2
-            cannon.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
-            cannon.loc = loc.copy()
-            cannon.dir = 'frdc'.index(block) * 32
-            cannons.append(cannon)
+            thing.dir = 'frdc'.index(block) * 32
+            cannons.append(thing)
     if not bases:
         print >>sys.stderr, "Map has no bases???"
         sys.exit(1)
-    # Balls belong to the team that has the nearest base
-    for ball in balls:
-	ball.team = closestteam(ball.loc, bases)
     if KEEP_MAPDATA:
         def sort_for_old(things):
             things[:] = [(thing.x, thing.y, thing) for thing in things]
@@ -663,6 +650,12 @@ def convert(options):
         sort_for_old(bases)
         sort_for_old(fuels)
         sort_for_old(cannons)
+    # Balls belong to the team that has the nearest base
+    if options.get('teamplay'):
+        for ball in balls:
+            ball.team = closestteam(ball.loc, bases)
+        for target in targets:
+            target.team = closestteam(target.loc, bases)
     # In race mode, bases are ordered according to the distance from the
     # first checkpoint. Confuses order for old clients (above)
     if (options.get('timing') or options.get('race')) in ['yes', 'on', 'true']:
@@ -673,15 +666,9 @@ def convert(options):
     if options.get('teamfuel') in ['yes', 'on', 'true']: #default off
 	for fuel in fuels:
 	    fuel.team = closestteam(fuel.loc, bases)
-    else:
-	for fuel in fuels:
-	    fuel.team = -1
     if options.get('teamcannons') in ['yes', 'on', 'true']: #default off
 	for cannon in cannons:
 	    cannon.team = closestteam(cannon.loc, bases)
-    else:
-	for cannon in cannons:
-	    cannon.team = -1
 
     print >> sys.stderr, "done."
     print >> sys.stderr, "Creating polygons:"
@@ -798,6 +785,12 @@ def convert(options):
 	if fuel.team != -1:
 	    print (' team="%d"' % fuel.team),
 	print '/>'
+    for target in targets:
+        text = '<Target x="%d" y="%d"' % (target.x, target.y)
+        if target.team != -1:
+            text += ' team="%d"' % target.team
+        text += '><Polygon> STUFF MISSING HERE </Polygon></Target>'
+        print text
     for check in checks:
 	if not check:
 	    break
