@@ -297,7 +297,7 @@ static void Player_repair(player_t *pl)
 
 static void Player_swap_settings(player_t *pl)
 {
-    if (BIT(pl->pl_status, HOVERPAUSE)
+    if (Player_is_hoverpaused(pl)
 	|| BIT(pl->used, HAS_AUTOPILOT))
 	return;
 
@@ -381,7 +381,8 @@ void Pause_player(player_t *pl, bool on)
 	updateScores = true;
 
 	Detach_ball(pl, NULL);
-	if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->pl_status, HOVERPAUSE)) {
+	if (BIT(pl->used, HAS_AUTOPILOT)
+	    || Player_is_hoverpaused(pl)) {
 	    CLR_BIT(pl->pl_status, HOVERPAUSE);
 	    Autopilot(pl, false);
 	}
@@ -822,7 +823,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_PAUSE:
 		if (Player_is_paused(pl))
 		    i = PAUSE;
-		else if (BIT(pl->pl_status, HOVERPAUSE))
+		else if (Player_is_hoverpaused(pl))
 		    i = HOVERPAUSE;
 		else {
 		    pos = pl->home_base->pos;
@@ -848,7 +849,7 @@ int Handle_keyboard(player_t *pl)
 
 		switch (i) {
 		case PAUSE:
-		    if (BIT(pl->pl_status, HOVERPAUSE))
+		    if (Player_is_hoverpaused(pl))
 			break;
 
 		    if (BIT(pl->used, HAS_AUTOPILOT))
@@ -867,7 +868,7 @@ int Handle_keyboard(player_t *pl)
 		    if (Player_is_paused(pl))
 			break;
 
-		    if (!BIT(pl->pl_status, HOVERPAUSE)) {
+		    if (!Player_is_hoverpaused(pl)) {
 			/*
 			 * Turn hover pause on, together with shields.
 			 */

@@ -387,7 +387,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
 	}
     }
 
-    if (BIT(pl->pl_status, HOVERPAUSE))
+    if (Player_is_hoverpaused(pl))
 	showautopilot = (pl->pause_count <= 0 || (frame_loops_slow % 8) < 4);
     else if (BIT(pl->used, HAS_AUTOPILOT))
 	showautopilot = (frame_loops_slow % 8) < 4;

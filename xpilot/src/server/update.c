@@ -535,10 +535,13 @@ static void Players_turn(void)
 	if (!Player_is_active(pl))
 	    continue;
 
-	/* Only do autopilot code if switched on and player is not
-	 * damaged (ie. can see). */
-	if (BIT(pl->used, HAS_AUTOPILOT)
-	    || (BIT(pl->pl_status, HOVERPAUSE) && !pl->damaged))
+	/*
+	 * Only do autopilot code if switched on and player is not
+	 * damaged (ie. can see).
+	 */
+	if ((BIT(pl->used, HAS_AUTOPILOT)
+	     || Player_is_hoverpaused(pl))
+	    && !pl->damaged)
 	    do_Autopilot(pl);
 
 	pl->turnvel += pl->turnacc * timeStep;
@@ -810,10 +813,12 @@ static void Update_players(world_t *world)
 	    pl->rank->score = pl->score;
 
 	if (pl->pause_count > 0) {
-	    /*assert(BIT(pl->pl_status, PAUSE|HOVERPAUSE));*/
+	    /*assert(Player_is_paused(pl)
+	      || Player_is_hoverpaused(pl));*/
 
 	    /* kps - this is because of bugs elsewhere */
-	    if (!BIT(pl->pl_status, PAUSE|HOVERPAUSE))
+	    if (!(Player_is_paused(pl)
+		  || Player_is_hoverpaused(pl)))
 		pl->pause_count = 0;
 
 	    pl->pause_count -= timeStep;

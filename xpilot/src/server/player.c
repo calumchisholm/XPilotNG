@@ -1507,7 +1507,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 	return;
 
     Detach_ball(pl, NULL);
-    if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->pl_status, HOVERPAUSE)) {
+    if (BIT(pl->used, HAS_AUTOPILOT)
+	|| Player_is_hoverpaused(pl)) {
 	CLR_BIT(pl->pl_status, HOVERPAUSE);
 	Autopilot(pl, false);
     }

@@ -3050,7 +3050,9 @@ static int Receive_pointer_move(connection_t *connp)
 	return n;
     }
     pl = Player_by_id(connp->id);
-    if (BIT(pl->pl_status, HOVERPAUSE))
+
+    /* kps - ??? */
+    if (Player_is_hoverpaused(pl))
 	return 1;
 
     if (FEATURE(connp, F_CUMULATIVETURN)) {

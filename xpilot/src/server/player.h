@@ -437,6 +437,17 @@ static inline bool Player_is_paused(player_t *pl)
 #endif
 }
 
+static inline bool Player_is_hoverpaused(player_t *pl)
+{
+#ifdef USE_PL_STATE
+    /* nothing here yet */
+#else
+    if (BIT(pl->pl_status, HOVERPAUSE))
+	return true;
+    return false;
+#endif
+}
+
 static inline void Player_add_score(player_t *pl, double points)
 {
     pl->score += points;
