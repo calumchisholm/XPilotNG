@@ -484,37 +484,51 @@ int Init_top(void)
       xpprintf("Value of option \"" #c "\" (%d) is out of range, " \
                "setting default value " #d ".\n", c); c = d ; }
 
-    COLORCHECK(hudColor, BLUE);
+    COLORCHECK(hudColor, 2);
     COLORCHECK(hudLockColor, hudColor);
-    COLORCHECK(hudRadarEnemyColor, RED);
-    COLORCHECK(hudRadarOtherColor, BLUE);
-    COLORCHECK(shipShapesHackColor, BLACK);
-    COLORCHECK(dirPtrColor, BLACK);
-    COLORCHECK(msgScanBallColor, RED);
-    COLORCHECK(msgScanCoverColor, BLUE);
-    COLORCHECK(selfLWColor, RED);
-    COLORCHECK(enemyLWColor, RED);
-    COLORCHECK(teamLWColor, 4);
-    COLORCHECK(teamShotColor, BLUE);
-    COLORCHECK(shipNameColor, BLUE);
-    COLORCHECK(baseNameColor, BLUE);
-    COLORCHECK(mineNameColor, BLUE);
-    COLORCHECK(ballColor, WHITE);
-    COLORCHECK(connColor, BLUE);
-    COLORCHECK(windowColor, 8);
-    COLORCHECK(buttonColor, BLUE);
-    COLORCHECK(borderColor, WHITE);
-    COLORCHECK(scoreColor, WHITE);
-    COLORCHECK(scoreSelfColor, RED);
-    COLORCHECK(scoreInactiveColor, 12);
-    COLORCHECK(scoreInactiveSelfColor, 12);
-    COLORCHECK(scoreZeroColor, 4);
+    COLORCHECK(hudRadarEnemyColor, 3);
+    COLORCHECK(hudRadarOtherColor, 2);
+    COLORCHECK(shipShapesHackColor, 0);
+    COLORCHECK(dirPtrColor, 0);
+    COLORCHECK(msgScanBallColor, 3);
+    COLORCHECK(msgScanCoverColor, 2);
+    COLORCHECK(selfLWColor, 3);
+    COLORCHECK(enemyLWColor, 3);
+    COLORCHECK(teamShotColor, 2);
+    COLORCHECK(shipNameColor, 2);
+    COLORCHECK(baseNameColor, 2);
+    COLORCHECK(mineNameColor, 2);
+    COLORCHECK(ballColor, 1);
+    COLORCHECK(connColor, 2);
+    COLORCHECK(buttonColor, 2);
+    COLORCHECK(borderColor, 1);
+    COLORCHECK(scoreColor, 1);
+    COLORCHECK(scoreSelfColor, 3);
     COLORCHECK(scoreObjectColor, hudColor);
-    COLORCHECK(wallColor, BLUE);
-    COLORCHECK(fuelColor, RED);
-    COLORCHECK(messagesColor, RED);
-    COLORCHECK(oldMessagesColor, BLUE);
-    COLORCHECK(decorColor, RED);
+    COLORCHECK(wallColor, 2);
+    COLORCHECK(fuelColor, 3);
+    COLORCHECK(messagesColor, 3);
+    COLORCHECK(oldMessagesColor, 2);
+    COLORCHECK(decorColor, 3);
+
+    if (maxColors > 4) {
+	COLORCHECK(teamLWColor, 4);
+	COLORCHECK(scoreZeroColor, 4);
+    } else {
+	COLORCHECK(teamLWColor, 2);
+	COLORCHECK(scoreZeroColor, 1);
+    }
+
+    if (maxColors > 8) {
+	COLORCHECK(windowColor, 8);
+	COLORCHECK(scoreInactiveColor, 12);
+	COLORCHECK(scoreInactiveSelfColor, 12);
+    } else {
+	COLORCHECK(windowColor, 2);
+	COLORCHECK(scoreInactiveColor, 1);
+	COLORCHECK(scoreInactiveSelfColor, 1);
+    }
+
 #undef COLORCHECK
 
     if (wallRadarColor >= maxColors
