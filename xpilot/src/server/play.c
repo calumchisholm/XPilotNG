@@ -621,10 +621,8 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
     /* this should never happen, because of the hitmask */
     assert(wormhole->type != WORM_OUT);
 
-    if (obj == NULL) {
-	warn("Wormhole_hitfunc: wormhole %p hit by NULL.", wormhole);
+    if (obj == NULL)
 	return true;
-    }
 
     if (BIT(obj->status, WARPED|WARPING))
 	return false;
