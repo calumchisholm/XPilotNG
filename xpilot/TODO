@@ -26,10 +26,6 @@ player to select/swap team. Keep only those teams in the menu that
 have bases on the map.
 Developer: virus / kps ?
 
-Task: Turn the item images on the hud in sdl client the right way
-(upside down atm)
-Developer: ?
-
 Task: Create a useful set of newbie messages that are shown to players
 using the Add_newbie_message() function if client option 'newbie' is on.
 Examples: message that 'm' is used to talk, message when you pick up an
