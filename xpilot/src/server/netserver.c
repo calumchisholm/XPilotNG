@@ -1254,16 +1254,46 @@ static int Handle_setup(connection_t *connp)
     return 0;
 }
 
+/*
+ * Ugly hack to prevent people from confusing Mara BMS.
+ * This should be removed ASAP.
+ */
+static void UglyHack(char *string)
+{
+    static const char *we_dont_want_these_substrings[] = {
+	"BALL", "Ball", "VAKK", "B A L L", "ball",
+	"SAFE", "Safe", "safe", "S A F E",
+	"COVER", "Cover", "cover", "INCOMING", "Incoming", "incoming",
+	"POP", "Pop", "pop"
+    };
+    int i;
+
+    for (i = 0; i < NELEM(we_dont_want_these_substrings); i++) {
+	const char *substr = we_dont_want_these_substrings[i];
+	char *s;
+
+	/* not really needed, but here for safety */
+	if (substr == NULL)
+	    break;
+
+	while ((s = strstr(string, substr)) != NULL)
+	    *s = 'X';
+    }
+}
 
 static void LegalizeName(char *string)
 {
-    while (*string != '\0') {
-	char ch = *string;
+    char *s = string;
+
+    UglyHack(s);
+
+    while (*s != '\0') {
+	char ch = *s;
 	if (ch == '\"')
 	    ch = '\'';
 	else if (!isprint(ch) || strchr("{[]}:,", ch))
 	    ch = 'x';
-	*string++ = ch;
+	*s++ = ch;
     }
 }
 
