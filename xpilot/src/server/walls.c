@@ -1688,6 +1688,16 @@ int is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj)
     struct inside_block *gblock;
     move_t mv;
 
+#if 0
+    /* kps - is_inside seems to assume that cx and cy are inside the map */
+    clpos_t pos;
+
+    pos.cx = cx;
+    pos.cy = cy;
+
+    assert(World_contains_clpos(&World, pos));
+#endif
+
     mv.hitmask = hitmask;
     mv.obj = OBJ_PTR(obj);
     gblock = &inside_table[(cx >> B_SHIFT) + mapx * (cy >> B_SHIFT)];

@@ -106,7 +106,13 @@ static bool Really_empty_space(player_t *pl, int bx, int by)
     
     for (i = -1; i <= 1; i++) {
 	for (j = -1; j <= 1; j++) {
-	    group = is_inside(cx + i * delta, cy + j * delta, hitmask, NULL);
+	    clpos_t pos;
+
+	    pos.cx = cx + i * delta;
+	    pos.cy = cy + j * delta;
+	    pos = World_wrap_clpos(pl->world, pos);
+
+	    group = is_inside(pos.cx, pos.cy, hitmask, NULL);
 
 	    /* hack so that robots won't rotate in destination wormholes */
 	    if (group != NO_GROUP) {
