@@ -557,22 +557,19 @@ void Paint_HUD(void)
 	    / hudRadarMapScale,
 	    hudRadarDotSize);
 
-	if (instruments.showMapRadar)
-	    Paint_hudradar(hudRadarMapScale,
-			   (double)active_view_width / 2,
-			   (double)active_view_height / 2,
-			   SHIP_SZ);
+	Paint_hudradar(hudRadarMapScale,
+		       (double)active_view_width / 2,
+		       (double)active_view_height / 2,
+		       SHIP_SZ);
     }
 
     /* message scan hack by mara*/
-    if (instruments.useBallMessageScan) {
-	if (ball_shout && msgScanBallColor)
-	    Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
-		    ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
-	if (need_cover && msgScanCoverColor)
-	    Arc_add(msgScanCoverColor, ext_view_width / 2 - 4,
-		    ext_view_height / 2 - 4, 8, 8, 0, 64 * 360);
-    }
+    if (ball_shout && msgScanBallColor)
+	Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
+		ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
+    if (need_cover && msgScanCoverColor)
+	Arc_add(msgScanCoverColor, ext_view_width / 2 - 4,
+		ext_view_height / 2 - 4, 8, 8, 0, 64 * 360);
 
     /*
      * Display the HUD

@@ -791,8 +791,7 @@ void Add_message(const char *message)
     else if (Msg_is_in_angle_brackets(message))
 	Msg_scan_angle_bracketed_msg(message, want_scan);
 
-    else if (instruments.useBallMessageScan
-	     && !is_game_msg
+    else if (!is_game_msg
 	     && BIT(Setup->mode, TEAM_PLAY)
 	     && want_scan
 	     && Msg_is_from_our_team(message, &msg2))

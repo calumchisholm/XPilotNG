@@ -781,13 +781,6 @@ xp_option_t default_options[] = {
 
 
     /* instruments */
-    XP_BOOL_OPTION(
-	"mapRadar",
-	true,
-	&instruments.showMapRadar,
-	NULL,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Paint radar dots' positions on the map.\n"),
 
     XP_BOOL_OPTION(
 	"slidingRadar",
@@ -822,15 +815,6 @@ xp_option_t default_options[] = {
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Should the ship shapes hack be displayed or not.\n"),
-
-    XP_BOOL_OPTION(
-	"ballMsgScan",
-	true,
-	&instruments.useBallMessageScan,
-	NULL,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Scan messages for BALL, SAFE, COVER and POP and paint\n"
-	"warning circles inside ship.\n"),
 
     XP_BOOL_OPTION(
 	"showLivesByShip",

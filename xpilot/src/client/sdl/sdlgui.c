@@ -1580,24 +1580,22 @@ void Paint_HUD(void)
 		  * hudRadarScale / hudRadarMapScale),
 	    hudRadarDotSize);
 
-	if (instruments.showMapRadar)
-	    Paint_hudradar(hudRadarMapScale*scale,
-    	    	    	   (active_view_width / 2)*scale,
-			   (active_view_height / 2)*scale,
-			   SHIP_SZ);
+	Paint_hudradar(hudRadarMapScale*scale,
+		       (active_view_width / 2)*scale,
+		       (active_view_height / 2)*scale,
+		       SHIP_SZ);
     }
 
 
     glDisable(GL_BLEND);
     /* message scan hack by mara*/
-    if (instruments.useBallMessageScan) {
-	if (ball_shout && msgScanBallColorRGBA)
-	    Circle(msgScanBallColorRGBA, draw_width / 2,
-		    draw_height / 2, 8*scale,0);
-	if (need_cover && msgScanCoverColorRGBA)
-	    Circle(msgScanCoverColorRGBA, draw_width / 2,
-		    draw_height / 2, 6*scale,0);
-    }
+    if (ball_shout && msgScanBallColorRGBA)
+	Circle(msgScanBallColorRGBA, draw_width / 2,
+	       draw_height / 2, 8*scale,0);
+    if (need_cover && msgScanCoverColorRGBA)
+	Circle(msgScanCoverColorRGBA, draw_width / 2,
+	       draw_height / 2, 6*scale,0);
+
     glEnable(GL_BLEND);
 
     /*

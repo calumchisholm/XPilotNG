@@ -68,9 +68,7 @@ typedef struct {
     bool showFilledDecor;
     bool showTexturedDecor;
     bool showMessages;
-    bool showMapRadar;
     bool showSlidingRadar;
-    bool useBallMessageScan;
     bool useClientRanker;
     bool useAMPMFormatClock;
 } instruments_t;
