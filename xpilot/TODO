@@ -64,7 +64,8 @@ Developer: throat
 
 Task: Server lag should be minimised, ideally so that when the time comes
 to send the next frame to the clients, the frame could be sent at once,
-or at least so that variance in time between frames is minimised.
+or at least so that variance in time between frames is minimised. Possibly
+send frame updates earliest to the players with the largets net lag
 Developer: kps
 
 Task: Make it so that server uses only 1 or 2 ports. Currently server uses
