@@ -86,41 +86,10 @@ void Pointer_control_set_state(bool on)
 	pointerControl = false;
 	XUngrabPointer(dpy, CurrentTime);
 	XDefineCursor(dpy, drawWindow, None);
-	if (!selectionAndHistory)
-	    XSelectInput(dpy, drawWindow, 0);
-	else
-	    XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
+	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 	XFlush(dpy);
     }
 }
-
-#ifndef _WINDOWS
-
-void Talk_set_state(bool on)
-{
-
-    if (on) {
-	/* Enable talking, disable pointer control if it is enabled. */
-	if (pointerControl) {
-	    initialPointerControl = true;
-	    Pointer_control_set_state(false);
-	}
-	if (selectionAndHistory)
-	    XSelectInput(dpy, drawWindow, PointerMotionMask
-			 | ButtonPressMask | ButtonReleaseMask);
-	Talk_map_window(true);
-    }
-    else {
-	/* Disable talking, enable pointer control if it was enabled. */
-	Talk_map_window(false);
-	if (initialPointerControl) {
-	    initialPointerControl = false;
-	    Pointer_control_set_state(true);
-	}
-    }
-}
-
-#else
 
 static void Talk_set_state(bool on)
 {
@@ -142,27 +111,6 @@ static void Talk_set_state(bool on)
 
     scoresChanged = true;
 }
-#endif
-
-#ifndef _WINDOWS
-
-bool Key_press_pointer_control(void)
-{
-    if (mouseAccelInClient) {    
-	if (pre_exists && pointerControl)
-	    XChangePointerControl(dpy, True, True, 
-				  pre_acc_num, pre_acc_denom, pre_threshold);
-	else
-	    XChangePointerControl(dpy, True, True,
-				  new_acc_num, new_acc_denom, new_threshold);
-    }
-
-    Pointer_control_set_state(!pointerControl);
-    
-    return false;	/* server doesn't need to know */
-}
-
-#else
 
 bool Key_press_pointer_control(void)
 {
@@ -170,8 +118,6 @@ bool Key_press_pointer_control(void)
     
     return false;	/* server doesn't need to know */
 }
-
-#endif
 
 bool Key_press_swap_scalefactor(void)
 {
@@ -302,195 +248,6 @@ static void Handle_talk_key_repeat(void)
     }
 }
 
-#ifndef _WINDOWS
-
-void xevent_keyboard(int queued)
-{
-    int i, n;
-    XEvent event;
-
-    Handle_talk_key_repeat();
-
-    if (kdpy) {
-	n = XEventsQueued(kdpy, queued);
-	for (i = 0; i < n; i++) {
-	    XNextEvent(kdpy, &event);
-	    switch (event.type) {
-	    case KeyPress:
-	    case KeyRelease:
-		Key_event(&event);
-		break;
-
-		/* Back in play */
-	    case FocusIn:
-		gotFocus = true;
-		XAutoRepeatOff(kdpy);
-		break;
-
-		/* Probably not playing now */
-	    case FocusOut:
-	    case UnmapNotify:
-		gotFocus = false;
-		XAutoRepeatOn(kdpy);
-		break;
-
-	    case MappingNotify:
-		XRefreshKeyboardMapping(&event.xmapping);
-		break;
-
-	    default:
-		warn("Unknown event type (%d) in xevent_keyboard",
-		     event.type);
-		break;
-	    }
-	}
-    }
-}
-
-void xevent_pointer(void)
-{
-    XEvent event;
-
-    if (!pointerControl || talk_mapped)
-	return;
-
-    if (mouseMovement != 0) {
-	Client_pointer_move(mouseMovement);
-	delta.x = draw_width / 2 - mousePosition.x;
-	delta.y = draw_height / 2 - mousePosition.y;
-	if (ABS(delta.x) > 3 * draw_width / 8
-	    || ABS(delta.y) > 1 * draw_height / 8) {
-
-	    memset(&event, 0, sizeof(event));
-	    event.type = MotionNotify;
-	    event.xmotion.display = dpy;
-	    event.xmotion.window = drawWindow;
-	    event.xmotion.x = draw_width/2;
-	    event.xmotion.y = draw_height/2;
-	    XSendEvent(dpy, drawWindow, False,
-		       PointerMotionMask, &event);
-	    XWarpPointer(dpy, None, drawWindow,
-			 0, 0, 0, 0,
-			 (int)draw_width/2, (int)draw_height/2);
-	    XFlush(dpy);
-	}
-    }
-}
-
-int x_event(int new_input)
-{
-    int queued = 0, i, n;
-    XEvent event;
-
-#ifdef SOUND
-    audioEvents();
-#endif /* SOUND */
-
-    mouseMovement = 0;
-
-    switch (new_input) {
-    case 0: queued = QueuedAlready; break;
-    case 1: queued = QueuedAfterReading; break;
-    case 2: queued = QueuedAfterFlush; break;
-    default:
-	warn("Bad input queue type (%d)", new_input);
-	return -1;
-    }
-    n = XEventsQueued(dpy, queued);
-    for (i = 0; i < n; i++) {
-	XNextEvent(dpy, &event);
-
-	switch (event.type) {
-	    /*
-	     * after requesting a selection we are notified that we
-	     * can access it.
-	     */
-	case SelectionNotify:
-	    SelectionNotify_event(&event);
-	    break;
-	    /*
-	     * we are requested to provide a selection.
-	     */
-	case SelectionRequest:
-	    SelectionRequest_event(&event);
-	    break;
-
-	case SelectionClear:
-	    if (selectionAndHistory)
-		Clear_selection();
-	    break;
-
-	case MapNotify:
-	    MapNotify_event(&event);
-	    break;
-
-	case ClientMessage:
-	    if (ClientMessage_event(&event) == -1)
-		return -1;
-	    break;
-
-	    /* Back in play */
-	case FocusIn:
-	    FocusIn_event(&event);
-	    break;
-
-	    /* Probably not playing now */
-	case FocusOut:
-	case UnmapNotify:
-	    UnmapNotify_event(&event);
-	    break;
-
-	case MappingNotify:
-	    XRefreshKeyboardMapping(&event.xmapping);
-	    break;
-
-
-	case ConfigureNotify:
-	    ConfigureNotify_event(&event);
-	    break;
-
-
-	case KeyPress:
-	    talk_key_repeating = 0;
-	    /* FALLTHROUGH */
-	case KeyRelease:
-	    KeyChanged_event(&event);
-	    break;
-
-	case ButtonPress:
-	    ButtonPress_event(&event);
-	    break;
-
-	case MotionNotify:
-	    MotionNotify_event(&event);
-	    break;
-
-	case ButtonRelease:
-	    if (ButtonRelease_event(&event) == -1)
-	        return -1;
-	    break;
-
-	case Expose:
-	    Expose_event(&event);
-	    break;
-
-	case EnterNotify:
-	case LeaveNotify:
-	    Widget_event(&event);
-	    break;
-
-	default:
-	    break;
-	}
-    }
-
-    xevent_keyboard(queued);
-    xevent_pointer();
-    return 0;
-}
-
-#else  /* _WINDOWS */
-
 void xevent_keyboard(int queued)
 {
     Handle_talk_key_repeat();
@@ -567,5 +324,3 @@ int win_xevent(XEvent event)
     xevent_pointer();
     return 0;
 }
-
-#endif /* _WINDOWS */

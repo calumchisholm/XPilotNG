@@ -129,8 +129,6 @@ static void Selection_send(const XSelectionRequestEvent *rq)
 
 void SelectionNotify_event(XEvent *event)
 {
-    if (selectionAndHistory)
-
     Selection_paste(event->xselection.requestor,
 		    event->xselection.property, True);
 }
@@ -271,38 +269,6 @@ void ButtonPress_event(XEvent *event)
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
 	    Pointer_button_pressed((int)event->xbutton.button);
 
-#ifndef _WINDOWS
-	else if (selectionAndHistory) {
-	    switch (event->xbutton.button) {
-	    case Button1:
-	        if (!talk_mapped)
-		  /* start cutting from the talk messages */
-		  Talk_cut_from_messages(&(event->xbutton));
-		else {
-		    /* start cutting from ... */
-		    if (event->xbutton.window == drawWindow)
-		        /* ...the talk messages */
-		        Talk_cut_from_messages(&(event->xbutton));
-		    else
-		        /* ...the talk window */
-		        Talk_window_cut(&(event->xbutton));
-		}
-		break;
-
-	    case Button2:
-	        if (talk_mapped) {
-		    if (event->xbutton.window == talkWindow)
-		        Talk_place_cursor(&(event->xbutton), false);
-		    Selection_request();
-		}
-		break;
-
-	    default:
-	        break;
-	    } /* switch */
-	      /* end of selectionAndHistory */
-	}
-#endif /* not _WINDOWS */
 	return;
     }
     if (Widget_event(event) != 0)
@@ -335,26 +301,6 @@ int ButtonRelease_event(XEvent *event)
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
 	    Pointer_button_released((int)event->xbutton.button);
 
-#ifndef _WINDOWS
-	else if (!selectionAndHistory)
-	    return 0;
-
-	if (!talk_mapped && event->xbutton.button == 1)
-	    /*
-	     * finish a cut from the talk messages
-	     */
-	    Talk_cut_from_messages(&(event->xbutton));
-	else if (talk_mapped && event->xbutton.button == 1) {
-	    /*
-	     * finish a cut from ...
-	     */
-	    if (event->xbutton.window == drawWindow
-		&& selection.draw.state == SEL_PENDING)
-	        Talk_cut_from_messages(&(event->xbutton));
-	    else if (selection.talk.state == SEL_PENDING)
-	        Talk_window_cut(&(event->xbutton));
-	}
-#endif /* not _WINDOWS */
 	return 0;
     }
     if (Widget_event(event) != 0) {
