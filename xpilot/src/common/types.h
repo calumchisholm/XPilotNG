@@ -42,7 +42,7 @@ typedef unsigned char	u_byte;
 # define bool	char
 #endif
 
-typedef struct { double x, y; }		vector_t;
+typedef struct { float x, y; }		vector_t;
 typedef vector_t			position_t;
 typedef struct { int x, y; }		ivec_t;
 typedef ivec_t				ipos_t;
