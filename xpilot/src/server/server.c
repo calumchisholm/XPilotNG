@@ -346,6 +346,11 @@ void End_game(void)
     record = rrecord;
     playback = rplayback;
 
+    if (recordMode != 0) {
+	recordMode = 0;
+	Init_recording();
+    }
+
     /* Tell meta server that we are gone. */
     Meta_gone();
 

@@ -26,10 +26,10 @@ int   rrecord;
 int   rplayback;
 int   recOpt;
 
-enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, NOMORE};
-void *threshold[NOMORE];
-int notfirst[NOMORE];
-void *readto[NOMORE];
+static enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, NOMORE};
+static void *threshold[NOMORE];
+static int notfirst[NOMORE];
+static void *readto[NOMORE];
 /* These cause unnecessary warnings because C is too stupid to understand
    the similarity of (void *)a = (char *)b; and (void **a) = &(char *)b; */
 static void **startb[NOMORE] = {&playback_ints_start, &playback_errnos_start,
@@ -42,8 +42,8 @@ static void **curb[NOMORE] = {&playback_ints, &playback_errnos,
 static int next_type;
 static int next_len;
 
-FILE *recf1;
-FILE *recf2;
+static FILE *recf1;
+static FILE *recf2;
 
 static void Write_data(int type)
 {
