@@ -116,18 +116,22 @@ shape_t ball_wire;
 struct bline *linet;
 #define S_LINES 100 /* stupid hack */
 
-/* kps - dynamic creation of groups asap! */
+#ifdef DYNAMIC_GROUPS
+struct group *groups = NULL;
+int num_groups = 0, max_groups = 0;
+#else
+int num_groups = 1;
 struct group groups[1000] = { /* !@# */
     {0, 0, 0, NULL, NO_IND},
     {0, 0, 0, NULL, NO_IND},
     {0, 0, 0, NULL, NO_IND}};
+#endif
 
 struct blockinfo *blockline;
 unsigned short *llist;
 unsigned short *plist;
 int num_lines = 0;
 int num_polys = 0;
-int num_groups = 1;
 int mapx, mapy;
 
 static inline bool can_hit(group_t *gp, move_t *move)
@@ -2498,7 +2502,6 @@ static void Poly_to_lines(void)
     return;
 }
 
-
 void Walls_init(void)
 {
     double x, y, l2;
@@ -2525,7 +2528,9 @@ void Walls_init(void)
      * arbitrary point on the map is inside something. */
     Inside_init();
 
+#ifndef DYNAMIC_GROUPS
     groups[0].type = FILLED;
+#endif
 
     /* Precalculate the .c and .s values used when calculating a bounce
      * from the line. */

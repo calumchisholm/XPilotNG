@@ -535,8 +535,6 @@ static void Target_set_hitmask(int group, target_t *targ)
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
-extern int num_groups;
-
 void Target_init(void)
 {
     int group;
@@ -685,7 +683,7 @@ void Team_immunity_init(void)
 }
 
 /* kps - called at server startup to initialize hit masks */
-void Groups_init(void)
+void Hitmasks_init(void)
 {
     Target_init();
     Team_immunity_init();

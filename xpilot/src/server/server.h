@@ -440,6 +440,7 @@ void release_ID(int id);
 /*
  * Prototypes for walls.c
  */
+void Groups_init(void);
 void Walls_init(void);
 void Treasure_init(void);
 void Move_init(void);
@@ -577,7 +578,7 @@ bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
 void Wormhole_remove_from_map(wormhole_t *wormhole);
 
 void Team_immunity_init(void);
-void Groups_init(void);
+void Hitmasks_init(void);
 void Transfer_tag(player *oldtag_pl, player *newtag_pl);
 /*double Handle_tag(double score, player *victim_pl, player* killer_pl);*/
 void Check_tag(void);

@@ -87,8 +87,10 @@ int main(int argc, char **argv)
     /*seedMT((unsigned)time((time_t *)0) * Get_process_id());*/
     /* Removed seeding random number generator because of server recordings. */
 
+    Groups_init();
     if (Parser(argc, argv) == false)
 	exit(1);
+    warn("num_groups is %d", num_groups);
 
     Init_recording();
     plock_server(pLockServer);           /* Lock the server into memory */
@@ -111,7 +113,7 @@ int main(int argc, char **argv)
     /* kps - remove ??? */
     Treasure_init();
 
-    Groups_init();
+    Hitmasks_init();
 
     Rank_init_saved_scores();
 
