@@ -24,6 +24,11 @@
 #ifndef	NETSERVER_H
 #define	NETSERVER_H
 
+#ifndef OBJECT_H
+/* need player */
+#include "object.h"
+#endif
+
 int Setup_net_server(void);
 void Conn_change_nick(connection_t *connp, const char *nick);
 void Destroy_connection(connection_t *connp, const char *reason);

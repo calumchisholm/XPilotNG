@@ -36,9 +36,6 @@
 /* need NUM_ITEMS */
 #include "item.h"
 #endif
-#ifndef SERVER_H
-#include "server.h"
-#endif
 
 #define SPACE			0
 #define BASE			1
@@ -106,6 +103,22 @@
 #define DIR_LEFT		(RES/2)
 #define DIR_DOWN		(3*RES/4)
 
+typedef struct fuel fuel_t;
+typedef struct grav grav_t;
+typedef struct base base_t;
+typedef struct baseorder baseorder_t;
+typedef struct cannon cannon_t;
+typedef struct check check_t;
+typedef struct item item_t;
+typedef struct asteroid asteroid_t;
+typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
+typedef struct wormhole wormhole_t;
+typedef struct treasure treasure_t;
+typedef struct target target_t;
+typedef struct team team_t;
+typedef struct item_concentrator item_concentrator_t;
+typedef struct asteroid_concentrator asteroid_concentrator_t;
+
 struct fuel {
     clpos	pos;
     double	fuel;
@@ -138,7 +151,7 @@ struct cannon {
     unsigned	conn_mask;
     long	last_change;
     int		item[NUM_ITEMS];
-    player	*tractor_target_pl;
+    struct player	*tractor_target_pl;
     bool	tractor_is_pressor;
     int		team;
     long	used;

@@ -3,6 +3,11 @@
 
 #include "xpcommon.h"
 
+#ifndef OBJECT_H
+/* need player */
+#include "object.h"
+#endif
+
 struct oldScoreNode {
     char nick[MAX_CHARS];
     char real[MAX_CHARS];

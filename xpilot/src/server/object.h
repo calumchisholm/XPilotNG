@@ -28,10 +28,6 @@
 /* need MAX_TANKS */
 #include "serverconst.h"
 #endif
-#ifndef SERVER_H
-/* need wormhole_t */
-#include "server.h"
-#endif
 #ifndef KEYS_H
 /* need NUM_KEYS */
 #include "keys.h"
@@ -52,9 +48,9 @@
 /* need CLICK */
 #include "click.h"
 #endif
-#ifndef RANK_H
-/* need RankInfo */
-#include "rank.h"
+#ifndef MAP_H
+/* need treasure_t */
+#include "map.h"
 #endif
 
 #ifdef _WINDOWS
@@ -239,6 +235,7 @@ struct _object {
 #define OBJ_PTR(ptr)	((object *)(ptr))
 };
 
+typedef struct player player;
 
 /*
  * Mine object
@@ -473,6 +470,7 @@ typedef struct {
 } shove_t;
 
 struct robot_data;
+struct RankInfo;
 
 /* IMPORTANT
  *
@@ -620,7 +618,7 @@ struct player {
     int		isowner;		/* player started this server? */
     int		isoperator;		/* player has operator privileges? */
     int		rectype;		/* normal, saved or spectator */
-    RankInfo	*rank;
+    struct RankInfo	*rank;
 
     int		idleCount;		/* idle */
     int	 	flooding;
