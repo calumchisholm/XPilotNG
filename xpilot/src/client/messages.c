@@ -54,16 +54,19 @@ bool need_cover = false;
 /*#define DP(x) x*/
 #define DP(x)
 
-static char *shottypes[] = { "a shot", NULL };
-static char head_first[] = " head first";
-static char *crashes[] = { "crashed", "smashed", "smacked", "was trashed",
-    NULL
+static const char *shottypes[] = {
+    "a shot", NULL
 };
-static char *obstacles[] =
-    { "wall", "target", "treasure", "cannon", NULL };
-static char *teamnames[] =
-    { "2", "4", "0", "1", "3", "5", "6", "7", "8", "9", NULL };
-
+static const char head_first[] = " head first";
+static const char *crashes[] = {
+    "crashed", "smashed", "smacked", "was trashed", NULL
+};
+static const char *obstacles[] = {
+    "wall", "target", "treasure", "cannon", NULL
+};
+static const char *teamnames[] = {
+    "2", "4", "0", "1", "3", "5", "6", "7", "8", "9", NULL
+};
 
 /* increase if you want to look for messages with more player names. */
 #define MSG_MAX_NAMES 3
@@ -75,7 +78,7 @@ typedef struct {
 } msgnames_t;
 
 /* recursive descent parser for messages */
-static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *mn)
+static bool Msg_match_fmt(char *msg, const char *fmt, msgnames_t *mn)
 {
     char *fp;
     int i;
@@ -419,10 +422,9 @@ static void Msg_scan_game_msg(char *message)
 	DP(printf("hit by cannonfire:\n"));
 	victim = mn.name[0];
 
-    } else {
+    } else
 	/* none of the above, nothing to do */
 	return;
-    }
 
 
     if (killer != NULL) {
@@ -699,18 +701,16 @@ void Add_message(char *message)
 	/* how many talk messages */
         last_msg_index = 0;
         while (last_msg_index < maxMessages
-		&& TalkMsg[last_msg_index]->len != 0) {
+		&& TalkMsg[last_msg_index]->len != 0)
             last_msg_index++;
-        }
         last_msg_index--; /* make it an index */
 
 	/*
 	 * if show_reverse_scroll, it will really _scroll if there were
 	 * already maxMessages (one will be added now)
 	 */
-	if (show_reverse_scroll && last_msg_index == maxMessages - 1) {
+	if (show_reverse_scroll && last_msg_index == maxMessages - 1)
 	    scrolling = true;
-	}
 
 	/*
 	 * keep the emphasizing (`jumping' from talk window to talk messages)
@@ -747,7 +747,7 @@ void Add_message(char *message)
      * scroll also the emphasizing
      */
     if (selectionAndHistory && is_drawn_talk_message
-	  && selection.draw.state == SEL_EMPHASIZED ) {
+	&& selection.draw.state == SEL_EMPHASIZED ) {
 
 	if ((scrolling && selection.draw.y2 == 0)
 	      || (!show_reverse_scroll && selection.draw.y1
@@ -760,18 +760,16 @@ void Add_message(char *message)
 	} else {
 	    if (scrolling) {
 		selection.draw.y2--;
-		if ( selection.draw.y1 == 0) {
+		if (selection.draw.y1 == 0)
 		    selection.draw.x1 = 0;
-		} else {
+		else
 		    selection.draw.y1--;
-		}
 	    } else if (!show_reverse_scroll) {
 		selection.draw.y1++;
-		if (selection.draw.y2 == maxMessages - 1) {
+		if (selection.draw.y2 == maxMessages - 1)
 		    selection.draw.x2 = msg_set[selection.draw.y2]->len - 1;
-		} else {
+		else
 		    selection.draw.y2++;
-		}
 	    }
 	}
     }
@@ -785,10 +783,8 @@ void Add_message(char *message)
     if (messagesToStdout == 2 ||
 	(messagesToStdout == 1 &&
 	 message[0] &&
-	 message[strlen(message)-1] == ']')) {
-
+	 message[strlen(message)-1] == ']'))
 	xpprintf("%s\n", message);
-    }
 }
 
 
@@ -830,12 +826,10 @@ void Add_pending_messages(void)
 	return;
     /* just through all messages */
     for (i = maxMessages-1; i >= 0; i--) {
-	if (TalkMsg_pending[i]->len > 0) {
+	if (TalkMsg_pending[i]->len > 0)
 	    Add_message(TalkMsg_pending[i]->txt);
-	}
-	if (GameMsg_pending[i]->len > 0) {
+	if (GameMsg_pending[i]->len > 0)
 	    Add_message(GameMsg_pending[i]->txt);
-	}
     }
     Delete_pending_messages();
 }
