@@ -23,8 +23,6 @@
 
 int simulating;
 
-#define SIMULATING_ONLY
-
 #ifdef SIMULATING_ONLY
 
 #include "xpclient.h"
