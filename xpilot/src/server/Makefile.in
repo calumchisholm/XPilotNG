@@ -141,7 +141,7 @@ xpilots_SOURCES = \
 xpilots_LDADD = $(top_builddir)/src/common/libxpcommon.a
 subdir = src/server
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 bin_PROGRAMS = xpilots$(EXEEXT)
@@ -168,7 +168,7 @@ xpilots_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilots_LDFLAGS =
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/alliance.Po ./$(DEPDIR)/asteroid.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/auth.Po ./$(DEPDIR)/cannon.Po \

@@ -9,9 +9,7 @@
 #
 
 set -x
-# mkdir config
-# aclocal -I config
-aclocal
+aclocal -I config
 autoheader
 automake --gnu --add-missing --copy
 autoconf

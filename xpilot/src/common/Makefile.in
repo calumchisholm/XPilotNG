@@ -135,7 +135,7 @@ libxpcommon_a_SOURCES = \
 
 subdir = src/common
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
@@ -150,7 +150,7 @@ am_libxpcommon_a_OBJECTS = checknames.$(OBJEXT) config.$(OBJEXT) \
 libxpcommon_a_OBJECTS = $(am_libxpcommon_a_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/checknames.Po ./$(DEPDIR)/config.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/error.Po ./$(DEPDIR)/list.Po \
