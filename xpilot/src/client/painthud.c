@@ -97,7 +97,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     } else {
 	x = ext_view_width - (meterWidth - xoff);
         xstr = WINSCALE(x)
-	    - (BORDER + XTextWidth(gameFont, title, strlen(title)));
+	    - (BORDER + XTextWidth(gameFont, title, (int)strlen(title)));
     }
 
     Rectangle_add(meter_color,
@@ -132,7 +132,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     Erase_rectangle(xstr,
 		    WINSCALE(y)+(gameFont->ascent+meterHeight)/2
 		    - gameFont->ascent - 1,
-		    XTextWidth(gameFont, title, strlen(title)) + 2,
+		    XTextWidth(gameFont, title, (int)strlen(title)) + 2,
 		    gameFont->ascent + gameFont->descent + 1);
 
     /* texturedObjects - TODO */
@@ -685,7 +685,7 @@ void Paint_HUD(void)
 		    str, strlen(str));
 	Erase_rectangle(WINSCALE(hud_pos_x + hudSize-HUD_OFFSET+BORDER) - 1,
 			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER) ,
-			XTextWidth(gameFont, str, strlen(str)) + 2,
+			XTextWidth(gameFont, str, (int)strlen(str)) + 2,
 			gameFont->ascent + gameFont->descent);
 	if (numItems[ITEM_TANK]) {
 	    if (fuelCurrent == 0)
@@ -693,15 +693,15 @@ void Paint_HUD(void)
 	    else
 		sprintf(str, "T%d", fuelCurrent);
 	    rd.drawString(dpy, drawPixmap, gameGC,
-			WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER),
-			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
-			+ gameFont->descent + 2*gameFont->ascent,
-			str, strlen(str));
+			  WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER),
+			  WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
+			  + gameFont->descent + 2*gameFont->ascent,
+			  str, strlen(str));
 	    Erase_rectangle(WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER)
 				 - 1,
 			    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 				+ gameFont->descent + gameFont->ascent,
-			    XTextWidth(gameFont, str, strlen(str)) + 2,
+			    XTextWidth(gameFont, str, (int)strlen(str)) + 2,
 			    gameFont->ascent + gameFont->descent);
 	}
     }
@@ -741,7 +741,7 @@ void Paint_HUD(void)
 	if (time_left > 0) {
 	    sprintf(str, "%3d:%02d",
 		    (int)(time_left / 60), (int)(time_left % 60));
-	    size = XTextWidth(gameFont, str, strlen(str));
+	    size = XTextWidth(gameFont, str, (int)strlen(str));
 	    rd.drawString(dpy, drawPixmap, gameGC,
 			  WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER)
 			  - size,

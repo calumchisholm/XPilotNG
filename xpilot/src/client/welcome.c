@@ -270,7 +270,7 @@ static int Welcome_create_label(int pos, const char *label_text)
     Widget_destroy_children(subform_widget);	/*? */
     subform_label_widget = NO_WIDGET;
     Widget_get_dimensions(subform_widget, &subform_width, &subform_height);
-    label_width = XTextWidth(textFont, label_text, strlen(label_text));
+    label_width = XTextWidth(textFont, label_text, (int)strlen(label_text));
     label_width += 40;
     label_height = textFont->ascent + textFont->descent;
     label_x = (subform_width - label_width) / 2;
@@ -453,7 +453,7 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
 	for (i = 0; i < n; i++) {
 	    int text_width = XTextWidth(textFont,
 					name_ptrs[i],
-					strlen(name_ptrs[i]));
+					(int)strlen(name_ptrs[i]));
 	    if (text_width > max_width)
 		max_width = text_width;
 	}
@@ -1342,14 +1342,15 @@ static int Internet_server_show_cb(int widget, void *user_data,
     label_height = textFont->ascent + textFont->descent + 5;
 
     data_label_width =
-	XTextWidth(buttonFont, longest_text, strlen(longest_text));
+	XTextWidth(buttonFont, longest_text, (int)strlen(longest_text));
 
     max_label_width = 0;
 
 
     for (i = 0; i < NELEM(labels); i++) {
 	label_width = XTextWidth(textFont,
-				 labels[i].label, strlen(labels[i].label));
+				 labels[i].label,
+				 (int)strlen(labels[i].label));
 	max_label_width = MAX(label_width, max_label_width);
 
 	labels[i].yoff = label_y;
@@ -1851,17 +1852,11 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 
     next_border = border ? border : 1;
     first_border = next_border;
-    next_width = XTextWidth(buttonFont,
-				next_text,
-				strlen(next_text))
+    next_width = XTextWidth(buttonFont, next_text, (int)strlen(next_text))
 	+ extra_width + 2 * next_border;
-    first_width = XTextWidth(buttonFont,
-				 first_text,
-				 strlen(first_text))
+    first_width = XTextWidth(buttonFont, first_text, (int)strlen(first_text))
 	+ extra_width + 2 * first_border;
-    pingw_width = XTextWidth(buttonFont,
-				 ping_text,
-				 strlen(ping_text))
+    pingw_width = XTextWidth(buttonFont, ping_text, (int)strlen(ping_text))
 	+ extra_width + 2 * first_border;
 
     next_height = label_height + 2 * (next_border - border);
@@ -2053,7 +2048,7 @@ static int Welcome_create_windows(Connect_param_t * conpar)
     for (i = 0; i < NELEM(my_buttons); i++) {
 	text_width = XTextWidth(buttonFont,
 				my_buttons[i].text,
-				strlen(my_buttons[i].text));
+				(int)strlen(my_buttons[i].text));
 	if (text_width > max_width)
 	    max_width = text_width;
     }

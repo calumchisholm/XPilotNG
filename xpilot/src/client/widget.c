@@ -320,8 +320,8 @@ static void Widget_draw_button(widget_t *widget, bool inverse, const char *label
 	fg = colors[WHITE].pixel;
 	bg = colors[BLACK].pixel;
     }
-    y = (widget->height - (buttonFont->ascent + buttonFont->descent)) / 2;
-    x = (widget->width - XTextWidth(buttonFont, label, strlen(label))) / 2;
+    y = (widget->height - (buttonFont->ascent + buttonFont->descent))/2;
+    x = (widget->width - XTextWidth(buttonFont, label, (int)strlen(label)))/2;
     ShadowDrawString(dpy, widget->window, buttonGC,
 		     x, buttonFont->ascent + y,
 		     label, fg, bg);
@@ -333,7 +333,7 @@ static void Widget_draw_input(widget_t *widget, const char *str)
     IFWINDOWS( Trace("Widget_draw_input: w=%d <%s>\n", widget->window, str) );
     XDrawString(dpy, widget->window, textGC,
 		(widget->width
-		 - XTextWidth(textFont, str, strlen(str))) / 2,
+		 - XTextWidth(textFont, str, (int)strlen(str))) / 2,
 		textFont->ascent + (widget->height
 		 - (textFont->ascent + textFont->descent)) / 2,
 		str, strlen(str));
@@ -354,7 +354,7 @@ static void Widget_draw_color(widget_t *widget, const char *str, int color)
     XClearWindow(dpy, widget->window);
     XDrawString(dpy, widget->window, textGC,
 		(widget->width
-		 - XTextWidth(textFont, str, strlen(str))) / 2,
+		 - XTextWidth(textFont, str, (int)strlen(str))) / 2,
 		textFont->ascent
 		+(widget->height - (textFont->ascent + textFont->descent)) / 2,
 		str, strlen(str));
@@ -1468,7 +1468,7 @@ int Widget_add_pulldown_entry(int menu_desc, const char *str,
     entryw->user_data = user_data;
 
     height = menu_widget->height;
-    width = XTextWidth(buttonFont, str, strlen(str))
+    width = XTextWidth(buttonFont, str, (int)strlen(str))
 	+ (height - (buttonFont->ascent + buttonFont->descent));
     if (width < pulldown_widget->width - 2)
 	width = pulldown_widget->width - 2;
@@ -1689,12 +1689,11 @@ int Widget_create_label(int parent_desc,
 	return NO_WIDGET;
     }
     labelw->str = str;
-    if (centered) {
-      labelw->x_offset = (width - XTextWidth(textFont, str, strlen(str))) / 2;
-    }
-    else {
-      labelw->x_offset = 5;
-    }
+    if (centered)
+	labelw->x_offset
+	    = (width - XTextWidth(textFont, str, (int)strlen(str))) / 2;
+    else
+	labelw->x_offset = 5;
     labelw->y_offset = (height - (textFont->ascent + textFont->descent)) / 2;
     
     window =
@@ -1734,12 +1733,11 @@ int Widget_create_colored_label(int parent_desc,
 	return NO_WIDGET;
     }
     labelw->str = str;
-    if (centered) {
-      labelw->x_offset = (width - XTextWidth(textFont, str, strlen(str))) / 2;
-    }
-    else {
-      labelw->x_offset = 5;
-    }
+    if (centered)
+	labelw->x_offset
+	    = (width - XTextWidth(textFont, str, (int)strlen(str))) / 2;
+    else
+	labelw->x_offset = 5;
     labelw->y_offset = (height - (textFont->ascent + textFont->descent)) / 2;
     
     window =
@@ -1875,10 +1873,10 @@ int Widget_create_confirm(const char *confirm_str,
 			button_height = 3 * (buttonFont->ascent
 				+ buttonFont->descent) / 2,
 			label_width = 10 + XTextWidth(textFont, confirm_str,
-						      strlen(confirm_str)),
+						      (int)strlen(confirm_str)),
 			button_width = 2 * button_height
 				+ XTextWidth(buttonFont, button_str,
-					     strlen(button_str)),
+					     (int)strlen(button_str)),
 			label_space = 2 * label_height,
 			button_space = button_height,
 			popup_height = 2 * label_space + label_height

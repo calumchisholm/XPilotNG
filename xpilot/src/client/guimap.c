@@ -459,7 +459,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	} else
 	    sprintf(info, " %c", other->mychar);
 
-	size2 = XTextWidth(gameFont, info, strlen(info));
+	size2 = XTextWidth(gameFont, info, (int)strlen(info));
     }
 
     if (size) {

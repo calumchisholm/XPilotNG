@@ -678,7 +678,7 @@ static void Paint_clock(bool redraw)
 	}
 	sprintf(buf, "%2d:%02d%cM", hour, minute, tmpchar);
     }
-    width = XTextWidth(scoreListFont, buf, strlen(buf));
+    width = XTextWidth(scoreListFont, buf, (int)strlen(buf));
     XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
     /* kps - Vato does not want this to be done on windows */ 
     IFNWINDOWS(XFillRectangle(dpy, playersWindow, scoreListGC,
