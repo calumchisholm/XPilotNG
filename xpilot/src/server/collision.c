@@ -470,8 +470,8 @@ static void PlayerCollision(void)
 	    if (pl->round != 0)
 		pl->time++;
 	    if (BIT(pl->status, PLAYING|KILLED) == PLAYING
-		&& Wrap_length(pl->pos.cx - World.check[pl->check].cx,
-			       pl->pos.cy - World.check[pl->check].cy)
+		&& Wrap_length(pl->pos.cx - Checks(pl->check)->cx,
+			       pl->pos.cy - Checks(pl->check)->cy)
 		    < checkpointRadius * BLOCK_CLICKS
 		&& !IS_TANK_PTR(pl)
 		&& !ballrace)
@@ -1517,8 +1517,8 @@ static void BallCollision(void)
 	    player *owner = Player_by_id(ball->owner);
 
 	    if (!ballrace_connect || ball->id == owner->id) {
-		if (Wrap_length(ball->pos.cx - World.check[owner->check].cx,
-				ball->pos.cy - World.check[owner->check].cy)
+		if (Wrap_length(ball->pos.cx - Checks(owner->check)->cx,
+				ball->pos.cy - Checks(owner->check)->cy)
 		    < checkpointRadius * BLOCK_CLICKS)
 		    Player_pass_checkpoint(owner);
 	    }

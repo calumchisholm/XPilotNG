@@ -45,7 +45,7 @@ static void Refuel(player *pl)
 
     CLR_BIT(pl->used, HAS_REFUEL);
     for (i = 0; i < World.NumFuels; i++) {
-	fs = &World.fuel[i];
+	fs = Fuels(i);
 	l = Wrap_length(pl->pos.cx - fs->pos.cx,
 			pl->pos.cy - fs->pos.cy);
 	if (BIT(pl->used, HAS_REFUEL) == 0 || l < dist) {
@@ -68,7 +68,7 @@ static void Repair(player *pl)
 
     CLR_BIT(pl->used, HAS_REPAIR);
     for (i = 0; i < World.NumTargets; i++) {
-	targ = &World.targets[i];
+	targ = Targets(i);
 	if (targ->team == pl->team
 	    && targ->dead_time <= 0) {
 	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
@@ -491,7 +491,7 @@ int Handle_keyboard(player *pl)
 		cy = pl->pos.cy;
 		msg[0] = '\0';
 		for (i = 0; i < World.NumBases; i++) {
-		    base_t *base = &World.base[i];
+		    base_t *base = Bases(i);
 		    dx = ABS(CENTER_XCLICK(base->pos.cx - cx));
 		    dy = ABS(CENTER_YCLICK(base->pos.cy - cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {

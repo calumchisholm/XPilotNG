@@ -503,11 +503,14 @@ static void Frame_map(connection_t *conn, player *pl)
     max_packet = MAX(5, bytes_left / cannon_packet_size);
     i = MAX(0, pl->last_cannon_update);
     for (k = 0; k < World.NumCannons; k++) {
+	cannon_t *cannon;
+
 	if (++i >= World.NumCannons)
 	    i = 0;
-	if (click_inview(&cv, World.cannon[i].pos.cx, World.cannon[i].pos.cy)) {
-	    if (BIT(World.cannon[i].conn_mask, conn_bit) == 0) {
-		Send_cannon(conn, i, (int)World.cannon[i].dead_time);
+	cannon = Cannons(i);
+	if (click_inview(&cv, cannon->pos.cx, cannon->pos.cy)) {
+	    if (BIT(cannon->conn_mask, conn_bit) == 0) {
+		Send_cannon(conn, i, (int)cannon->dead_time);
 		pl->last_cannon_update = i;
 		bytes_left -= max_packet * cannon_packet_size;
 		if (++packet_count >= max_packet)
@@ -520,14 +523,17 @@ static void Frame_map(connection_t *conn, player *pl)
     max_packet = MAX(5, bytes_left / fuel_packet_size);
     i = MAX(0, pl->last_fuel_update);
     for (k = 0; k < World.NumFuels; k++) {
+	fuel_t *fs;
 	if (++i >= World.NumFuels)
 	    i = 0;
-	if (BIT(World.fuel[i].conn_mask, conn_bit) == 0) {
-	    if ((CENTER_XCLICK(World.fuel[i].pos.cx - pl->pos.cx) <
+
+	fs = Fuels(i);
+	if (BIT(fs->conn_mask, conn_bit) == 0) {
+	    if ((CENTER_XCLICK(fs->pos.cx - pl->pos.cx) <
 		 (view_width << CLICK_SHIFT) + BLOCK_CLICKS) &&
-		(CENTER_YCLICK(World.fuel[i].pos.cy - pl->pos.cy) <
+		(CENTER_YCLICK(fs->pos.cy - pl->pos.cy) <
 		 (view_height << CLICK_SHIFT) + BLOCK_CLICKS)) {
-		Send_fuel(conn, i, (int) World.fuel[i].fuel);
+		Send_fuel(conn, i, (int) fs->fuel);
 		pl->last_fuel_update = i;
 		bytes_left -= max_packet * fuel_packet_size;
 		if (++packet_count >= max_packet)
@@ -543,7 +549,7 @@ static void Frame_map(connection_t *conn, player *pl)
 	wormhole_t *worm;
 	if (++i >= World.NumWormholes)
 	    i = 0;
-	worm = &World.wormHoles[i];
+	worm = Wormholes(i);
 	if (wormholeVisible
 	    && worm->temporary
 	    && (worm->type == WORM_IN
@@ -866,7 +872,7 @@ static void Frame_ships(connection_t *conn, player *pl)
 	Send_trans(conn, victim->pos.cx, victim->pos.cy, cx, cy);
     }
     for (i = 0; i < World.NumCannons; i++) {
-	cannon_t *cannon = World.cannon + i;
+	cannon_t *cannon = Cannons(i);
 	if (cannon->tractor_count > 0) {
 	    player *t = cannon->tractor_target_pl;
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
@@ -898,7 +904,8 @@ static void Frame_ships(connection_t *conn, player *pl)
 		Send_paused(conn, pl_i->home_base->pos.cx,
 			    pl_i->home_base->pos.cy, (int)pl_i->count);
 	    else
-		Send_appearing(conn, pl_i->home_base->pos.cx, pl_i->home_base->pos.cy,
+		Send_appearing(conn, pl_i->home_base->pos.cx,
+			       pl_i->home_base->pos.cy,
 			       pl_i->id, (int)(pl_i->count * 10));
 	    continue;
 	}
@@ -925,24 +932,22 @@ static void Frame_ships(connection_t *conn, player *pl)
 		      BIT(pl_i->used, HAS_DEFLECTOR) != 0
 	    );
 	}
+
 	if (BIT(pl_i->used, HAS_REFUEL)) {
-	    if (click_inview(&cv,
-			     World.fuel[pl_i->fs].pos.cx,
-			     World.fuel[pl_i->fs].pos.cy)) {
-		Send_refuel(conn,
-			    World.fuel[pl_i->fs].pos.cx,
-			    World.fuel[pl_i->fs].pos.cy,
-			    pl_i->pos.cx,
-			    pl_i->pos.cy);
-	    }
+	    fuel_t *fs = Fuels(pl_i->fs);
+	    if (click_inview(&cv, fs->pos.cx, fs->pos.cy))
+		Send_refuel(conn, fs->pos.cx, fs->pos.cy,
+			    pl_i->pos.cx, pl_i->pos.cy);
 	}
+
 	if (BIT(pl_i->used, HAS_REPAIR)) {
-	    int cx = World.targets[pl_i->repair_target].pos.cx,
-		cy = World.targets[pl_i->repair_target].pos.cy;
-	    if (click_inview(&cv, cx, cy))
+	    target_t *targ = Targets(pl_i->repair_target);
+	    if (click_inview(&cv, targ->pos.cx, targ->pos.cy))
 		/* same packet as refuel */
-		Send_refuel(conn, pl_i->pos.cx, pl_i->pos.cy, cx, cy);
+		Send_refuel(conn, pl_i->pos.cx, pl_i->pos.cy,
+			    targ->pos.cx, targ->pos.cy);
 	}
+
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
 	    player *t = Player_by_id(pl_i->lock.pl_id);
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {

@@ -212,22 +212,20 @@ void Place_item(player *pl, int item)
 	    return;
 
     } else {
-	if (rfrac() < movingItemProb) {
+	if (rfrac() < movingItemProb)
 	    grav = GRAVITY;
-	} else {
+	else
 	    grav = 0;
-	}
-	if (rfrac() < randomItemProb) {
+
+	if (rfrac() < randomItemProb)
 	    rand = RANDOM_ITEM;
-	} else {
+	else
 	    rand = 0;
-	}
-	if (World.NumItemConcentrators > 0 && rfrac() < itemConcentratorProb) {
-	    con = &World.itemConcentrators
-		[(int)(rfrac() * World.NumItemConcentrators)];
-	} else {
+
+	if (World.NumItemConcs > 0 && rfrac() < itemConcentratorProb)
+	    con = ItemConcs((int)(rfrac() * World.NumItemConcs));
+	else
 	    con = NULL;
-	}
 	/*
 	 * kps - write a generic function that can be used here and
 	 * with asteroids.
@@ -238,9 +236,9 @@ void Place_item(player *pl, int item)
 	 * So bail out after a few retries.
 	 */
 	for (place_count = 0; ; place_count++) {
-	    if (place_count >= 8) {
+	    if (place_count >= 8)
 		return;
-	    }
+
 	    if (con) {
 		/* change to use clicks */
 		dir = (int)(rfrac() * RES);
@@ -252,8 +250,7 @@ void Place_item(player *pl, int item)
 		cy = WRAP_YCLICK(cy);
 		if (!INSIDE_MAP(cx, cy))
 		    continue;
-	    }
-	    else {
+	    } else {
 		cx = (int)(rfrac() * World.cwidth);
 		cy = (int)(rfrac() * World.cheight);
 	    }
@@ -1058,7 +1055,7 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
     /* in non-team mode cannons are immune to cannon ECMs */
     if (BIT(World.rules->mode, TEAM_PLAY) || pl) {
 	for (i = 0; i < World.NumCannons; i++) {
-	    cannon_t *c = World.cannon + i;
+	    cannon_t *c = Cannons(i);
 	    if (BIT(World.rules->mode, TEAM_PLAY)
 		&& c->team == team)
 		continue;

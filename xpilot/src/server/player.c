@@ -81,7 +81,7 @@ void Pick_startpos(player *pl)
     static char	*free_bases = NULL;
 
     if (IS_TANK_PTR(pl)) {
-	pl->home_base = &World.base[0];
+	pl->home_base = Bases(0);
 	return;
     }
 
@@ -98,7 +98,7 @@ void Pick_startpos(player *pl)
 
     num_free = 0;
     for (i = 0; i < World.NumBases; i++) {
-	if (World.base[i].team == pl->team) {
+	if (World.bases[i].team == pl->team) {
 	    num_free++;
 	    free_bases[i] = 1;
 	} else
@@ -139,7 +139,7 @@ void Pick_startpos(player *pl)
 	      ind, World.NumBases, num_free, pick, seen);
 	End_game();
     } else {
-	pl->home_base = &World.base[BIT(World.rules->mode, TIMING) ?
+	pl->home_base = &World.bases[BIT(World.rules->mode, TIMING) ?
 			World.baseorder[i].base_idx : i];
 	if (ind < NumPlayers) {
 	    for (i = 0; i < observerStart + NumObservers; i++) {
@@ -182,8 +182,8 @@ void Go_home(player *pl)
 	    check = pl->check - 1;
 	else
 	    check = World.NumChecks - 1;
-	cx = World.check[check].cx;
-	cy = World.check[check].cy;
+	cx = Checks(check)->cx;
+	cy = Checks(check)->cy;
 	vx = (rfrac() - 0.5) * 0.1;
 	vy = (rfrac() - 0.5) * 0.1;
 	velo = LENGTH(vx, vy);
@@ -1137,7 +1137,7 @@ void Race_game_over(void)
 	for (i = 0; i < num_ordered_players; i++) {
 	    pl = Players(order[i]);
 	    if (pl->home_base->ind != World.baseorder[i].base_idx) {
-		pl->home_base = &World.base[World.baseorder[i].base_idx];
+		pl->home_base = Bases(World.baseorder[i].base_idx);
 		for (j = 0; j < observerStart + NumObservers; j++) {
 		    if (j == NumPlayers) {
 			if (NumObservers)

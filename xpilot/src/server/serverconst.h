@@ -116,6 +116,10 @@
 /*#define TEAM_IMMUNE(pl1, pl2)	(teamImmunity && TEAM((pl1), (pl2)))*/
 
 #define NO_ID			(-1)
+/*
+ * Used when we want to pass an index which is not in use.
+ */
+#define NO_IND			(-1)
 
 /*
  * Used where we wish to know if two players are members of the same alliance.

@@ -84,8 +84,9 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
 		    const shape *s, int dir);
 int Polys_to_client(unsigned char **);
 void Ball_line_init(void);
-void Player_crash(player *pl, int crashtype, void *mapobj, int pt);
-void Object_crash(object *obj, struct move *move, int crashtype, void *mapobj);
+void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt);
+void Object_crash(object *obj, struct move *move, int crashtype,
+		  int mapobj_ind);
 
 /*
  * Prototypes for event.c
@@ -103,16 +104,16 @@ void Free_map(void);
 bool Grok_map(void);
 bool Grok_map_options(void);
 
-base_t *Map_place_base(int cx, int cy, int dir, int team);
-cannon_t *Map_place_cannon(int cx, int cy, int dir, int team);
-clpos *Map_place_check(int cx, int cy, int index);
-fuel_t *Map_place_fuel(int cx, int cy, int team);
-grav_t *Map_place_grav(int cx, int cy, DFLOAT force, int type);
-target_t *Map_place_target(int cx, int cy, int team);
-treasure_t *Map_place_treasure(int cx, int cy, int team, bool empty);
-wormhole_t *Map_place_wormhole(int cx, int cy, wormType type);
-item_concentrator_t *Map_place_item_concentrator(int cx, int cy);
-asteroid_concentrator_t *Map_place_asteroid_concentrator(int cx, int cy);
+int Map_place_base(int cx, int cy, int dir, int team);
+int Map_place_cannon(int cx, int cy, int dir, int team);
+int Map_place_check(int cx, int cy, int index);
+int Map_place_fuel(int cx, int cy, int team);
+int Map_place_grav(int cx, int cy, DFLOAT force, int type);
+int Map_place_target(int cx, int cy, int team);
+int Map_place_treasure(int cx, int cy, int team, bool empty);
+int Map_place_wormhole(int cx, int cy, wormType type);
+int Map_place_item_concentrator(int cx, int cy);
+int Map_place_asteroid_concentrator(int cx, int cy);
 
 void Find_base_direction(void);
 void Compute_gravity(void);
@@ -479,13 +480,13 @@ void P_vertex(int cx, int cy, int edgestyle);
 void P_end_polygon(void);
 int P_start_ballarea(void);
 void P_end_ballarea(void);
-int P_start_balltarget(int team, treasure_t *t);
+int P_start_balltarget(int team, int treasure_ind);
 void P_end_balltarget(void);
-int P_start_target(target_t *targ);
+int P_start_target(int target_ind);
 void P_end_target(void);
-int P_start_cannon(cannon_t *cannon);
+int P_start_cannon(int cannon_ind);
 void P_end_cannon(void);
-int P_start_wormhole(wormhole_t *wormhole);
+int P_start_wormhole(int wormhole_ind);
 void P_end_wormhole(void);
 void P_start_decor(void);
 void P_end_decor(void);
@@ -494,7 +495,7 @@ void P_end_frictionarea(void);
 int P_get_bmp_id(const char *s);
 int P_get_edge_id(const char *s);
 int P_get_poly_id(const char *s);
-void P_grouphack(int type, void (*f)(void *));
+/*void P_grouphack(int type, void (*f)(int group, void *mapobj));*/
 void P_set_hitmask(int group, int hitmask);
 
 /*

@@ -65,6 +65,24 @@ static void Check_groupcount(void)
     }
 }
 
+static int Create_group(int type, int team, int hitmask,
+			bool (*hitfunc)(struct group *gp, struct move *move),
+			int mapobj_ind)
+{
+    if (current_group != 0) {
+	warn("Broken map: map object defined inside another.");
+	exit(1);
+    }
+    current_group = ++num_groups;
+    Check_groupcount();
+    groups[current_group].type = type;
+    groups[current_group].team = team;
+    groups[current_group].hitmask = hitmask;
+    groups[current_group].hitfunc = hitfunc;
+    groups[current_group].mapobj_ind = mapobj_ind;
+    return current_group;    
+}
+
 void P_edgestyle(char *id, int width, int color, int style)
 {
     if (num_estyles > 255) {
@@ -80,7 +98,7 @@ void P_edgestyle(char *id, int width, int color, int style)
 }
 
 void P_polystyle(char *id, int color, int texture_id, int defedge_id,
-		   int flags)
+		 int flags)
 {
     if (num_pstyles > 255) {
 	warn("Too many polygon styles");
@@ -200,14 +218,11 @@ void P_end_polygon(void)
 
 int P_start_ballarea(void)
 {
-    current_group = ++num_groups;
-    Check_groupcount();
-    groups[current_group].type = TREASURE;
-    groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hitmask = BALL_BIT;
-    groups[current_group].hitfunc = NULL;
-    groups[current_group].mapobj = NULL;
-    return current_group;
+    return Create_group(TREASURE,
+			TEAM_NOT_SET,
+			BALL_BIT,
+			NULL,
+			NO_IND);
 }
 
 void P_end_ballarea(void)
@@ -215,17 +230,13 @@ void P_end_ballarea(void)
     current_group = 0;
 }
 
-int P_start_balltarget(int team, treasure_t *t)
+int P_start_balltarget(int team, int treasure_ind)
 {
-    current_group = ++num_groups;
-    Check_groupcount();
-    groups[current_group].type = TREASURE;
-    groups[current_group].team = team;
-    groups[current_group].hitmask = NONBALL_BIT;
-    /*= NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));*/
-    groups[current_group].hitfunc = Balltarget_hitfunc;
-    groups[current_group].mapobj = t;
-    return current_group;
+    return Create_group(TREASURE,
+			team,
+			NONBALL_BIT,
+			Balltarget_hitfunc,
+			treasure_ind);
 }
 
 void P_end_balltarget(void)
@@ -233,17 +244,16 @@ void P_end_balltarget(void)
     current_group = 0;
 }
 
-int P_start_target(target_t *targ)
+int P_start_target(int target_ind)
 {
-    current_group = ++num_groups;
-    Check_groupcount();
-    groups[current_group].type = TARGET;
-    groups[current_group].team = targ->team;
-    groups[current_group].hitmask = Target_hitmask(targ);
-    groups[current_group].hitfunc = NULL;
-    groups[current_group].mapobj = targ;
-    targ->group = current_group;
-    return current_group;
+    target_t *targ = Targets(target_ind);
+
+    targ->group = Create_group(TARGET,
+			       targ->team,
+			       Target_hitmask(targ),
+			       NULL,
+			       target_ind);
+    return targ->group;
 }
 
 void P_end_target(void)
@@ -251,17 +261,16 @@ void P_end_target(void)
     current_group = 0;
 }
 
-int P_start_cannon(cannon_t *cannon)
+int P_start_cannon(int cannon_ind)
 {
-    current_group = ++num_groups;
-    Check_groupcount();
-    groups[current_group].type = CANNON;
-    groups[current_group].team = cannon->team;
-    groups[current_group].hitmask = Cannon_hitmask(cannon);
-    groups[current_group].hitfunc = Cannon_hitfunc;
-    groups[current_group].mapobj = cannon;
-    cannon->group = current_group;
-    return current_group;
+    cannon_t *cannon = Cannons(cannon_ind);
+
+    cannon->group = Create_group(CANNON,
+				 cannon->team,
+				 Cannon_hitmask(cannon),
+				 Cannon_hitfunc,
+				 cannon_ind);
+    return cannon->group;
 }
 
 void P_end_cannon(void)
@@ -269,16 +278,15 @@ void P_end_cannon(void)
     current_group = 0;
 }
 
-int P_start_wormhole(wormhole_t *wormhole)
+int P_start_wormhole(int wormhole_ind)
 {
-    current_group = ++num_groups;
-    Check_groupcount();
-    groups[current_group].type = WORMHOLE;
-    groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hitmask = Wormhole_hitmask(wormhole);
-    groups[current_group].hitfunc = Wormhole_hitfunc;
-    groups[current_group].mapobj = wormhole;
-    return current_group;
+    wormhole_t *wormhole = Wormholes(wormhole_ind);
+
+    return Create_group(WORMHOLE,
+			TEAM_NOT_SET,
+			Wormhole_hitmask(wormhole),
+			Wormhole_hitfunc,
+			wormhole_ind);
 }
 
 void P_end_wormhole(void)
@@ -288,14 +296,11 @@ void P_end_wormhole(void)
 
 int P_start_frictionarea(void)
 {
-    current_group = ++num_groups;
-    Check_groupcount();
-    groups[current_group].type = FRICTION;
-    groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hitmask = ALL_BITS;
-    groups[current_group].hitfunc = NULL;
-    groups[current_group].mapobj = NULL;
-    return current_group;
+    return Create_group(FRICTION,
+			TEAM_NOT_SET,
+			ALL_BITS,
+			NULL,
+			NO_IND);
 }
 
 void P_end_frictionarea(void)
@@ -355,7 +360,8 @@ int P_get_poly_id(const char *s)
  * kps - which group numbers are ok ???
  * Is it 1 to num_groups ???
  */
-void P_grouphack(int type, void (*f)(void *))
+#if 0
+void P_grouphack(int type, void (*f)(int, void *))
 {
     int group;
 
@@ -363,13 +369,13 @@ void P_grouphack(int type, void (*f)(void *))
 	struct group *gp = groupptr_by_id(group);
 
 	if (gp->type == type)
-	    (*f)(gp->mapobj);
+	    (*f)(group, gp->mapobj);
     }
 }
+#endif
 
 void P_set_hitmask(int group, int hitmask)
 {
-    /*warn("group = %d", group);*/
     assert(group >= 0);
     assert(group <= num_groups);
     groups[group].hitmask = hitmask;

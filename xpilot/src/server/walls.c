@@ -118,9 +118,9 @@ struct bline *linet;
 
 /* kps - dynamic creation of groups asap! */
 struct group groups[1000] = { /* !@# */
-    {0, 0, 0, 0, NULL},
-    {0, 0, 0, 0, NULL},
-    {0, 0, 0, 0, NULL}};
+    {0, 0, 0, NULL, NO_IND},
+    {0, 0, 0, NULL, NO_IND},
+    {0, 0, 0, NULL, NO_IND}};
 
 struct blockinfo *blockline;
 unsigned short *llist;
@@ -131,42 +131,31 @@ int num_groups = 0;
 int mapx, mapy;
 
 #if 1
-#define can_hit(groupptr, move) \
-(((groupptr)->hitmask & (move)->hitmask) ? false : \
- ((groupptr)->hitfunc == NULL ? true : (groupptr)->hitfunc(groupptr, move)))
+#define can_hit(gp, move) \
+(((gp)->hitmask & (move)->hitmask) ? false : \
+ ((gp)->hitfunc == NULL ? true : (gp)->hitfunc(gp, move)))
 #else
-bool can_hit(struct group *groupptr, struct move *move)
+bool can_hit(struct group *gp, struct move *move)
 {
-    if (groupptr->hitmask & move->hitmask)
+    if (gp->hitmask & move->hitmask)
 	return false;
-    if (groupptr->hitfunc == NULL)
+    if (gp->hitfunc == NULL)
 	return true;
-    return groupptr->hitfunc(groupptr, move);
+    return gp->hitfunc(gp, move);
 }
 #endif
 
 void Move_init(void)
 {
-    mp.click_width = PIXEL_TO_CLICK(World.width);
-    mp.click_height = PIXEL_TO_CLICK(World.height);
-
     LIMIT(maxObjectWallBounceSpeed, 0, World.hypotenuse);
     LIMIT(maxShieldedWallBounceSpeed, 0, World.hypotenuse);
     LIMIT(maxUnshieldedWallBounceSpeed, 0, World.hypotenuse);
-
-    /* kps - ng does not want the following 2 */
-    LIMIT(maxShieldedWallBounceAngle, 0, 180);
-    LIMIT(maxUnshieldedWallBounceAngle, 0, 180);
 
     LIMIT(playerWallBrakeFactor, 0, 1);
     LIMIT(objectWallBrakeFactor, 0, 1);
     LIMIT(objectWallBounceLifeFactor, 0, 1);
     LIMIT(wallBounceFuelDrainMult, 0, 1000);
     wallBounceExplosionMult = sqrt(wallBounceFuelDrainMult);
-
-    /* kps - ng does not want the following 2 */
-    mp.max_shielded_angle = (int)(maxShieldedWallBounceAngle * RES / 360);
-    mp.max_unshielded_angle = (int)(maxUnshieldedWallBounceAngle * RES / 360);
 
     mp.obj_bounce_mask = 0;
     if (sparksWallBounce)
@@ -381,7 +370,8 @@ void Object_hits_target(object *obj, target_t *targ, long player_cost)
 
 
 
-void Object_crash(object *obj, struct move *move, int crashtype, void *mapobj)
+void Object_crash(object *obj, struct move *move, int crashtype,
+		  int mapobj_ind)
 {
     switch (crashtype) {
 
@@ -400,7 +390,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, void *mapobj)
 
     case CrashTarget:
 	obj->life = 0;
-	Object_hits_target(obj, mapobj, -1);
+	Object_hits_target(obj, Targets(mapobj_ind), -1);
 	break;
 
     case CrashWall:
@@ -414,7 +404,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, void *mapobj)
 
     case CrashCannon:
         {
-	    cannon_t *c = mapobj;
+	    cannon_t *c = Cannons(mapobj_ind);
 	    obj->life = 0;
 	    if (BIT(obj->type, OBJ_ITEM))
 		Cannon_add_item(c, obj->info, obj->count);
@@ -438,7 +428,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, void *mapobj)
 }
 
 
-void Player_crash(player *pl, int crashtype, void *mapobj, int pt)
+void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 {
     const char		*howfmt = NULL;
     const char          *hudmsg = NULL;
@@ -454,7 +444,7 @@ void Player_crash(player *pl, int crashtype, void *mapobj, int pt)
 
     case CrashWormHole:
 	SET_BIT(pl->status, WARPING);
-	pl->wormHoleHit = mapobj;
+	pl->wormHoleHit = Wormholes(mapobj_ind);
 	break;
 
     case CrashWall:
@@ -485,7 +475,7 @@ void Player_crash(player *pl, int crashtype, void *mapobj, int pt)
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	Object_hits_target(OBJ_PTR(pl), mapobj, -1);
+	Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), -1);
 	break;
 
     case CrashTreasure:
@@ -496,7 +486,7 @@ void Player_crash(player *pl, int crashtype, void *mapobj, int pt)
 
     case CrashCannon:
         {
-	    cannon_t *cannon = mapobj;
+	    cannon_t *cannon = Cannons(mapobj_ind);
 	    if (BIT(pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
 		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 		howfmt = "%s smashed%s against a cannon";
@@ -594,10 +584,8 @@ void Player_crash(player *pl, int crashtype, void *mapobj, int pt)
 		sc = cnt[i] * Rate(pusher->score, pl->score)
 				    * shoveKillScoreMult / total_pusher_count;
 		Score(pusher, sc, pl->pos.cx, pl->pos.cy, pl->name);
-		if (i >= num_pushers - 1) {
+		if (i >= num_pushers - 1)
 		    Rank_AddKill(pusher);
-		}
-
 	    }
 	    sc = Rate(average_pusher_score, pl->score)
 		* shoveKillScoreMult;
@@ -613,7 +601,7 @@ void Player_crash(player *pl, int crashtype, void *mapobj, int pt)
     }
 
     if (BIT(pl->status, KILLED) && pl->score < 0 && IS_ROBOT_PTR(pl)) {
-	pl->home_base = &World.base[0];
+	pl->home_base = Bases(0);
 	Pick_startpos(pl);
     }
 }
@@ -674,11 +662,11 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
     DFLOAT fx, fy;
     DFLOAT c, s, wall_brake_factor = objectWallBrakeFactor;
     int group, type;
-    void *mapobj;
+    int mapobj_ind;
 
     group = linet[line >= num_lines ? point : line].group;
     type = groups[group].type;
-    mapobj = groups[group].mapobj;
+    mapobj_ind = groups[group].mapobj_ind;
 
     if (obj->collmode == 1) {
 	fx = ABS(obj->vel.x) + ABS(obj->vel.y);
@@ -700,18 +688,18 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 
     if (type == TARGET) {
 	obj->life = 0;
-	Object_hits_target(obj, mapobj, -1);
+	Object_hits_target(obj, Targets(mapobj_ind), -1);
 	return 0;
     }
 
     if (type == CANNON) {
-	Object_crash(obj, move, CrashCannon, mapobj);
+	Object_crash(obj, move, CrashCannon, mapobj_ind);
 	return 0;
     }
 
     /* kps - wormhole polygons disabled */
     if (type == WORMHOLE) {
-	Object_crash(obj, move, CrashWormHole, mapobj);
+	Object_crash(obj, move, CrashWormHole, mapobj_ind);
 	return 0;
     }
 
@@ -788,8 +776,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 {
     DFLOAT fx, fy;
     DFLOAT c, s;
-    int group, type;
-    void *mapobj;
+    int group, type, mapobj_ind;
 
     if (line >= num_lines) {
 	DFLOAT x, y, l2;
@@ -806,19 +793,19 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	s = linet[line].s;
     }
     type = groups[group].type;
-    mapobj = groups[group].mapobj;
+    mapobj_ind = groups[group].mapobj_ind;
     if (type == TREASURE) {
-	Player_crash(pl, CrashTreasure, NULL, 1);
+	Player_crash(pl, CrashTreasure, NO_IND, 1);
 	return;
     }
 
     if (type == WORMHOLE) {
-	Player_crash(pl, CrashWormHole, mapobj, 1);
+	Player_crash(pl, CrashWormHole, mapobj_ind, 1);
 	return;
     }
 
     if (type == CANNON) {
-	Player_crash(pl, CrashCannon, mapobj, 1);
+	Player_crash(pl, CrashCannon, mapobj_ind, 1);
 	if (BIT(pl->status, KILLED))
 	    return;
 	/* The player may bounce from the cannon if both have shields up. */
@@ -851,9 +838,9 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 
 	if (speed > max_speed) {
 	    if (type == TARGET)
-		Player_crash(pl, CrashTarget, mapobj, 1);
+		Player_crash(pl, CrashTarget, mapobj_ind, 1);
 	    else
-		Player_crash(pl, CrashWallSpeed, NULL, 1);
+		Player_crash(pl, CrashWallSpeed, NO_IND, 1);
 	    return;
 	}
 
@@ -871,9 +858,9 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	}
 	if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
 	    if (type == TARGET)
-		Player_crash(pl, CrashTarget, mapobj, 1);
+		Player_crash(pl, CrashTarget, mapobj_ind, 1);
 	    else
-		Player_crash(pl, CrashWallNoFuel, NULL, 1);
+		Player_crash(pl, CrashWallNoFuel, NO_IND, 1);
 	    return;
 	}
 	/* !@# I didn't implement wall direction calculation yet. */
@@ -900,11 +887,9 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 			       PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
-		target_t *targ = mapobj;
-
 		cost <<= FUEL_SCALE_BITS;
 		cost = (long)(cost * (wallBounceFuelDrainMult / 4.0));
-		Object_hits_target(OBJ_PTR(pl), targ, cost);
+		Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), cost);
 	    }
 	}
     }
@@ -1730,23 +1715,23 @@ int Polys_to_client(unsigned char **start)
     }
     STORE1(World.NumBases);
     for (i = 0; i < World.NumBases; i++) {
-	if (World.base[i].team == TEAM_NOT_SET)
+	if (World.bases[i].team == TEAM_NOT_SET)
 	    STORE1(0);
 	else
-	    STORE1(World.base[i].team);
-	STORE2(World.base[i].pos.cx >> CLICK_SHIFT);
-	STORE2(World.base[i].pos.cy >> CLICK_SHIFT);
-	STORE1(World.base[i].dir);
+	    STORE1(World.bases[i].team);
+	STORE2(World.bases[i].pos.cx >> CLICK_SHIFT);
+	STORE2(World.bases[i].pos.cy >> CLICK_SHIFT);
+	STORE1(World.bases[i].dir);
     }
     STORE2(World.NumFuels);
     for (i = 0; i < World.NumFuels; i++) {
-	STORE2(World.fuel[i].pos.cx >> CLICK_SHIFT);
-	STORE2(World.fuel[i].pos.cy >> CLICK_SHIFT);
+	STORE2(World.fuels[i].pos.cx >> CLICK_SHIFT);
+	STORE2(World.fuels[i].pos.cy >> CLICK_SHIFT);
     }
     STORE1(World.NumChecks);
     for (i = 0; i < World.NumChecks; i++) {
-	STORE2(World.check[i].cx >> CLICK_SHIFT);
-	STORE2(World.check[i].cy >> CLICK_SHIFT);
+	STORE2(World.checks[i].cx >> CLICK_SHIFT);
+	STORE2(World.checks[i].cy >> CLICK_SHIFT);
     }
     return offset;
 }

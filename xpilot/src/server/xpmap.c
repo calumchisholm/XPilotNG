@@ -26,10 +26,10 @@
 char xpmap_version[] = VERSION;
 
 
-static void Xpmap_treasure_to_polygon(treasure_t *);
-static void Xpmap_target_to_polygon(target_t *);
-static void Xpmap_cannon_to_polygon(cannon_t *);
-/*static void Xpmap_wormhole_to_polygon(wormhole_t *wormhole);*/
+static void Xpmap_treasure_to_polygon(int treasure_ind);
+static void Xpmap_target_to_polygon(int target_ind);
+static void Xpmap_cannon_to_polygon(int cannon_ind);
+static void Xpmap_wormhole_to_polygon(int wormhole_ind);
 
 #ifdef DEBUG
 void Xpmap_print(void)			/* Debugging only. */
@@ -178,7 +178,7 @@ void Xpmap_allocate_checks(void)
 	}
     }
 
-    if ((World.check = (clpos *)
+    if ((World.checks = (clpos *)
 	 malloc(OLD_MAX_CHECKS * sizeof(clpos))) == NULL) {
 	error("Out of memory - checks");
 	exit(-1);
@@ -479,43 +479,50 @@ void Xpmap_find_map_object_teams(void)
      */
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	unsigned short team = TEAM_NOT_SET;
+
 	for (i = 0; i < World.NumTreasures; i++) {
-	    team = Find_closest_team(World.treasures[i].pos.cx,
-				     World.treasures[i].pos.cy);
-	    World.treasures[i].team = team;
+	    treasure_t *treasure = Treasures(i);
+
+	    team = Find_closest_team(treasure->pos.cx, treasure->pos.cy);
+	    treasure->team = team;
 	    if (team == TEAM_NOT_SET)
-		error("Couldn't find a matching team for the treasure.");
+		warn("Couldn't find a matching team for the treasure.");
 	    else {
 		World.teams[team].NumTreasures++;
-		if (!World.treasures[i].empty)
+		if (!treasure->empty)
 		    World.teams[team].TreasuresLeft++;
 		else
 		    World.teams[team].NumEmptyTreasures++;
 	    }
 	}
+
 	for (i = 0; i < World.NumTargets; i++) {
-	    team = Find_closest_team(World.targets[i].pos.cx,
-				     World.targets[i].pos.cy);
+	    target_t *targ = Targets(i);
+
+	    team = Find_closest_team(targ->pos.cx, targ->pos.cy);
 	    if (team == TEAM_NOT_SET)
-		error("Couldn't find a matching team for the target.");
-	    World.targets[i].team = team;
+		warn("Couldn't find a matching team for the target.");
+	    targ->team = team;
 	}
+
 	if (teamCannons) {
 	    for (i = 0; i < World.NumCannons; i++) {
-		team = Find_closest_team(World.cannon[i].pos.cx,
-					 World.cannon[i].pos.cy);
+		cannon_t *cannon = Cannons(i);
+
+		team = Find_closest_team(cannon->pos.cx, cannon->pos.cy);
 		if (team == TEAM_NOT_SET)
-		    error("Couldn't find a matching team for the cannon.");
-		World.cannon[i].team = team;
+		    warn("Couldn't find a matching team for the cannon.");
+		cannon->team = team;
 	    }
 	}
 	
 	for (i = 0; i < World.NumFuels; i++) {
-	    team = Find_closest_team(World.fuel[i].pos.cx,
-				     World.fuel[i].pos.cy);
+	    fuel_t *fs = Fuels(i);
+
+	    team = Find_closest_team(fs->pos.cx, fs->pos.cy);
 	    if (team == TEAM_NOT_SET)
-		error("Couldn't find a matching team for fuelstation.");
-	    World.fuel[i].team = team;
+		warn("Couldn't find a matching team for fuelstation.");
+	    fs->team = team;
 	}
     }
 
@@ -535,8 +542,8 @@ void Xpmap_find_base_direction(void)
     int	i;
 
     for (i = 0; i < World.NumBases; i++) {
-	int	x = World.base[i].pos.cx / BLOCK_CLICKS,
-		y = World.base[i].pos.cy / BLOCK_CLICKS,
+	int	x = World.bases[i].pos.cx / BLOCK_CLICKS,
+		y = World.bases[i].pos.cy / BLOCK_CLICKS,
 		dir,
 		att;
 	double	dx = World.gravity[x][y].x,
@@ -593,7 +600,7 @@ void Xpmap_find_base_direction(void)
 	}
 	if (att != -1)
 	    dir = att;
-	World.base[i].dir = dir;
+	World.bases[i].dir = dir;
     }
     for (i = 0; i < World.x; i++) {
 	int j;
@@ -610,11 +617,12 @@ void Xpmap_find_base_direction(void)
 
 /* number of vertices in polygon */
 #define N (2 + 12)
-static void Xpmap_treasure_to_polygon(treasure_t *treasure)
+static void Xpmap_treasure_to_polygon(int treasure_ind)
 {
     int cx, cy, i, r, n;
     double angle;
     int polystyle, edgestyle;
+    treasure_t *treasure = Treasures(treasure_ind);
     clpos pos[N + 1];
 
     polystyle = P_get_poly_id("treasure_ps");
@@ -644,7 +652,7 @@ static void Xpmap_treasure_to_polygon(treasure_t *treasure)
     pos[N] = pos[0];
 
     /* create balltarget */
-    P_start_balltarget(treasure->team, treasure);
+    P_start_balltarget(treasure->team, treasure_ind);
     P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
     for (i = 1; i <= N; i++)
 	P_vertex(pos[i].cx, pos[i].cy, edgestyle); 
@@ -687,9 +695,10 @@ static void Xpmap_block_polygon(int cx, int cy, int polystyle, int edgestyle)
 }
 
 
-static void Xpmap_target_to_polygon(target_t *targ)
+static void Xpmap_target_to_polygon(int target_ind)
 {
     int cx, cy, ps, es;
+    target_t *targ = Targets(target_ind);
 
     ps = P_get_poly_id("target_ps");
     es = P_get_edge_id("target_es");
@@ -698,7 +707,7 @@ static void Xpmap_target_to_polygon(target_t *targ)
     cy = targ->pos.cy;
 
     /* create target polygon */
-    P_start_target(targ);
+    P_start_target(target_ind);
     Xpmap_block_polygon(cx, cy, ps, es);
     P_end_target();
 }
@@ -753,24 +762,25 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
 }
 
 
-static void Xpmap_cannon_to_polygon(cannon_t *cannon)
+static void Xpmap_cannon_to_polygon(int cannon_ind)
 {
     int ps, es;
+    cannon_t *cannon = Cannons(cannon_ind);
 
     ps = P_get_poly_id("cannon_ps");
     es = P_get_edge_id("cannon_es");
 
-    P_start_cannon(cannon);
+    P_start_cannon(cannon_ind);
     Xpmap_cannon_polygon(cannon, ps, es);
     P_end_cannon();
 }
 
-#if 0
 #define N 12
-static void Xpmap_wormhole_to_polygon(wormhole_t *wormhole)
+static void Xpmap_wormhole_to_polygon(int wormhole_ind)
 {
     int cx, cy, ps, es, i, r;
     double angle;
+    wormhole_t *wormhole = Wormholes(wormhole_ind);
     clpos pos[N + 1];
 
     /* don't make a polygon for an out wormhole */
@@ -791,14 +801,13 @@ static void Xpmap_wormhole_to_polygon(wormhole_t *wormhole)
     }
     pos[N] = pos[0];
 
-    P_start_wormhole(wormhole);
+    P_start_wormhole(wormhole_ind);
     P_start_polygon(pos[0].cx, pos[0].cy, ps);
     for (i = 1; i <= N; i++)
 	P_vertex(pos[i].cx, pos[i].cy, es); 
     P_end_polygon();
     P_end_wormhole();
 }
-#endif
 
 
 /*
@@ -1029,17 +1038,17 @@ void Xpmap_blocks_to_polygons(void)
 	is_polygon_map = true;
 
     for (i = 0; i < World.NumTreasures; i++)
-	Xpmap_treasure_to_polygon(&World.treasures[i]);
+	Xpmap_treasure_to_polygon(i);
 
     for (i = 0; i < World.NumTargets; i++)
-	Xpmap_target_to_polygon(&World.targets[i]);
+	Xpmap_target_to_polygon(i);
 
     for (i = 0; i < World.NumCannons; i++)
-	Xpmap_cannon_to_polygon(&World.cannon[i]);
+	Xpmap_cannon_to_polygon(i);
 
 #if 0
     for (i = 0; i < World.NumWormholes; i++)
-	Xpmap_wormhole_to_polygon(&World.wormHoles[i]);
+	Xpmap_wormhole_to_polygon(i);
 #endif
 
     xpprintf("Created %d polygons.\n", num_polys);

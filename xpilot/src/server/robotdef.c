@@ -1462,7 +1462,7 @@ static int Robot_default_play_check_map(player *pl)
     target_dist = Visibility_distance;
 
     for (j = 0; j < World.NumFuels; j++) {
-	fuel_t *fs = &World.fuel[j];
+	fuel_t *fs = Fuels(j);
 
 	if (fs->fuel < 100 * FUEL_SCALE_FACT)
 	    continue;
@@ -1511,8 +1511,8 @@ static int Robot_default_play_check_map(player *pl)
 	&& BIT(my_data->longterm_mode, NEED_FUEL)) {
 
 	fuel_checked = true;
-	dx = World.fuel[fuel_i].pos.cx;
-	dy = World.fuel[fuel_i].pos.cy;
+	dx = Fuels(fuel_i)->pos.cx;
+	dy = Fuels(fuel_i)->pos.cy;
 
 	SET_BIT(pl->used, HAS_REFUEL);
 	pl->fs = fuel_i;
@@ -1521,8 +1521,8 @@ static int Robot_default_play_check_map(player *pl)
 	    return 1;
     }
     if (target_i >= 0) {
-	dx = World.targets[target_i].pos.cx;
-	dy = World.targets[target_i].pos.cy;
+	dx = Targets(target_i)->pos.cx;
+	dy = Targets(target_i)->pos.cy;
 
 	SET_BIT(my_data->longterm_mode, TARGET_KILL);
 	if (Check_robot_target(pl, dx, dy, RM_CANNON_KILL))
@@ -1532,7 +1532,7 @@ static int Robot_default_play_check_map(player *pl)
     }
 
     for (j = 0; j < World.NumCannons; j++) {
-	cannon_t *cannon = &World.cannon[j];
+	cannon_t *cannon = Cannons(j);
 
 	if (cannon->dead_time > 0)
 	    continue;
@@ -1552,7 +1552,7 @@ static int Robot_default_play_check_map(player *pl)
     }
 
     if (cannon_i >= 0) {
-	cannon_t *cannon = &World.cannon[cannon_i];
+	cannon_t *cannon = Cannons(cannon_i);
 
 	dx = cannon->pos.cx;
 	dx += (BLOCK_CLICKS * 0.1 * tcos(cannon->dir));
@@ -1567,8 +1567,8 @@ static int Robot_default_play_check_map(player *pl)
 	&& !fuel_checked
 	&& BIT(my_data->longterm_mode, NEED_FUEL)) {
 
-	dx = World.fuel[fuel_i].pos.cx;
-	dy = World.fuel[fuel_i].pos.cy;
+	dx = Fuels(fuel_i)->pos.cx;
+	dy = Fuels(fuel_i)->pos.cy;
 
 	SET_BIT(pl->used, HAS_REFUEL);
 	pl->fs = fuel_i;
@@ -1884,7 +1884,7 @@ static void Robot_default_play(player *pl)
     if (pl->fuel.sum < pl->fuel.max * 0.80)
 	for (j = 0; j < World.NumFuels; j++) {
 	    int dx, dy;
-	    fuel_t *fs = &World.fuel[j];
+	    fuel_t *fs = Fuels(j);
 
 	    if (BIT(World.rules->mode, TEAM_PLAY)
 		&& teamFuel
@@ -2135,8 +2135,8 @@ static void Robot_default_play(player *pl)
 	    || (delta_dir < 3 * RES / 4 && delta_dir > RES / 4)) {
 	    navigate_checked = true;
 	    if (Check_robot_target(pl,
-				   World.check[pl->check].cx,
-				   World.check[pl->check].cy,
+				   Checks(pl->check)->cx,
+				   Checks(pl->check)->cy,
 		 		   RM_NAVIGATE))
 		return;
 	}

@@ -39,7 +39,7 @@ void Object_position_set_clicks(object *obj, int cx, int cy)
 	} else {
 	    struct move mv;
 
-	    Object_crash(obj, &mv, CrashUnknown, NULL);
+	    Object_crash(obj, &mv, CrashUnknown, NO_IND);
 	    return;
 	}
     }
@@ -70,7 +70,7 @@ void Player_position_set_clicks(player *pl, int cx, int cy)
 	    *(double *)(-1) = 4321.0;
 	    abort();
 	} else {
-	    Player_crash(pl, CrashUnknown, NULL, 1);
+	    Player_crash(pl, CrashUnknown, NO_IND, 1);
 	    return;
 	}
     }

@@ -334,7 +334,7 @@ static int Init_setup_old(void)
 	    case DECOR_LU:	*mapptr = SETUP_DECOR_LU; break;
 	    case DECOR_LD:	*mapptr = SETUP_DECOR_LD; break;
 	    case WORMHOLE:
-		switch (World.wormHoles[wormhole++].type) {
+		switch (World.wormholes[wormhole++].type) {
 		case WORM_NORMAL: *mapptr = SETUP_WORM_NORMAL; break;
 		case WORM_IN:     *mapptr = SETUP_WORM_IN; break;
 		case WORM_OUT:    *mapptr = SETUP_WORM_OUT; break;
@@ -351,11 +351,11 @@ static int Init_setup_old(void)
 		*mapptr = SETUP_TARGET + World.targets[target++].team;
 		break;
 	    case BASE:
-		if (World.base[base].team == TEAM_NOT_SET)
+		if (World.bases[base].team == TEAM_NOT_SET)
 		    team = 0;
 		else
-		    team = World.base[base].team;
-		switch (World.base[base++].dir) {
+		    team = World.bases[base].team;
+		switch (World.bases[base++].dir) {
 		case DIR_UP:    *mapptr = SETUP_BASE_UP + team; break;
 		case DIR_RIGHT: *mapptr = SETUP_BASE_RIGHT + team; break;
 		case DIR_DOWN:  *mapptr = SETUP_BASE_DOWN + team; break;
@@ -367,7 +367,7 @@ static int Init_setup_old(void)
 		}
 		break;
 	    case CANNON:
-		switch (World.cannon[cannon++].dir) {
+		switch (World.cannons[cannon++].dir) {
 		case DIR_UP:	*mapptr = SETUP_CANNON_UP; break;
 		case DIR_RIGHT:	*mapptr = SETUP_CANNON_RIGHT; break;
 		case DIR_DOWN:	*mapptr = SETUP_CANNON_DOWN; break;
@@ -380,8 +380,8 @@ static int Init_setup_old(void)
 		break;
 	    case CHECK:
 		for (i = 0; i < World.NumChecks; i++) {
-		    if (x != CLICK_TO_BLOCK(World.check[i].cx)
-			|| y != CLICK_TO_BLOCK(World.check[i].cy)) {
+		    if (x != CLICK_TO_BLOCK(World.checks[i].cx)
+			|| y != CLICK_TO_BLOCK(World.checks[i].cy)) {
 			continue;
 		    }
 		    *mapptr = SETUP_CHECK + i;
@@ -1546,34 +1546,37 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 
     conn_bit = (1 << connp->ind);
     for (i = 0; i < World.NumCannons; i++) {
+	cannon_t *cannon = Cannons(i);
 	/*
 	 * The client assumes at startup that all cannons are active.
 	 */
-	if (World.cannon[i].dead_time == 0)
-	    SET_BIT(World.cannon[i].conn_mask, conn_bit);
+	if (cannon->dead_time == 0)
+	    SET_BIT(cannon->conn_mask, conn_bit);
 	else
-	    CLR_BIT(World.cannon[i].conn_mask, conn_bit);
+	    CLR_BIT(cannon->conn_mask, conn_bit);
     }
     for (i = 0; i < World.NumFuels; i++) {
+	fuel_t *fs = Fuels(i);
 	/*
 	 * The client assumes at startup that all fuelstations are filled.
 	 */
-	if (World.fuel[i].fuel == MAX_STATION_FUEL)
-	    SET_BIT(World.fuel[i].conn_mask, conn_bit);
+	if (fs->fuel == MAX_STATION_FUEL)
+	    SET_BIT(fs->conn_mask, conn_bit);
 	else
-	    CLR_BIT(World.fuel[i].conn_mask, conn_bit);
+	    CLR_BIT(fs->conn_mask, conn_bit);
     }
     for (i = 0; i < World.NumTargets; i++) {
+	target_t *targ = Targets(i);
 	/*
 	 * The client assumes at startup that all targets are not damaged.
 	 */
-	if (World.targets[i].dead_time == 0
-	    && World.targets[i].damage == TARGET_DAMAGE) {
-	    SET_BIT(World.targets[i].conn_mask, conn_bit);
-	    CLR_BIT(World.targets[i].update_mask, conn_bit);
+	if (targ->dead_time == 0
+	    && targ->damage == TARGET_DAMAGE) {
+	    SET_BIT(targ->conn_mask, conn_bit);
+	    CLR_BIT(targ->update_mask, conn_bit);
 	} else {
-	    CLR_BIT(World.targets[i].conn_mask, conn_bit);
-	    SET_BIT(World.targets[i].update_mask, conn_bit);
+	    CLR_BIT(targ->conn_mask, conn_bit);
+	    SET_BIT(targ->update_mask, conn_bit);
 	}
     }
 
@@ -2905,8 +2908,8 @@ static int Receive_ack_cannon(connection_t *connp)
 	Destroy_connection(connp, "bad cannon ack");
 	return -1;
     }
-    if (loops_ack > World.cannon[num].last_change)
-	SET_BIT(World.cannon[num].conn_mask, 1 << connp->ind);
+    if (loops_ack > World.cannons[num].last_change)
+	SET_BIT(World.cannons[num].conn_mask, 1 << connp->ind);
 
     return 1;
 }
@@ -2928,8 +2931,8 @@ static int Receive_ack_fuel(connection_t *connp)
 	Destroy_connection(connp, "bad fuel ack");
 	return -1;
     }
-    if (loops_ack > World.fuel[num].last_change)
-	SET_BIT(World.fuel[num].conn_mask, 1 << connp->ind);
+    if (loops_ack > World.fuels[num].last_change)
+	SET_BIT(World.fuels[num].conn_mask, 1 << connp->ind);
     return 1;
 }
 

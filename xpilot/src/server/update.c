@@ -73,11 +73,11 @@ static void Transport_to_home(player *pl)
 	int check;
 
 	if (pl->check)
-		check = pl->check - 1;
+	    check = pl->check - 1;
 	else
-		check = World.NumChecks - 1;
-	cx = World.check[check].cx;
-	cy = World.check[check].cy;
+	    check = World.NumChecks - 1;
+	cx = Checks(check)->cx;
+	cy = Checks(check)->cy;
     } else {
 	cx = pl->home_base->pos.cx;
 	cy = pl->home_base->pos.cy;
@@ -129,7 +129,7 @@ void Phasing(player *pl, int on)
 				     OBJ_PTR(pl), (shape *)pl->ship, pl->dir))
 	    != NO_GROUP) {
 	    /* kps - check for crashes against targets etc ??? */
-	    Player_crash(pl, CrashWall, NULL, 0);
+	    Player_crash(pl, CrashWall, NO_IND, 0);
 	}
     }
 }
@@ -466,7 +466,7 @@ static void Fuel_update(void)
     frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
 
     for (i = 0; i < World.NumFuels; i++) {
-	fuel_t *fs = &World.fuel[i];
+	fuel_t *fs = Fuels(i);
 
 	if (fs->fuel == MAX_STATION_FUEL)
 	    continue;
@@ -528,7 +528,7 @@ static void Cannon_update(void)
 {
     int i;
     for (i = 0; i < World.NumCannons; i++) {
-	cannon_t *c = &World.cannon[i];
+	cannon_t *c = Cannons(i);
 
 	if (c->dead_time > 0) {
 	    if ((c->dead_time -= timeStep) <= 0)
@@ -973,7 +973,7 @@ void Update_objects(void)
 	}
 
 	if (BIT(pl->used, HAS_REFUEL)) {
-	    fuel_t *fs = &World.fuel[pl->fs];
+	    fuel_t *fs = Fuels(pl->fs);
 
 	    if ((Wrap_length(pl->pos.cx - fs->pos.cx,
 			     pl->pos.cy - fs->pos.cy)
@@ -1103,22 +1103,22 @@ void Update_objects(void)
 	    }
 
 	    if (pl->wormHoleHit != -1) {
-		wormhole_t *wh_hit = &World.wormHoles[pl->wormHoleHit];
+		wormhole_t *wh_hit = Wormholes(pl->wormHoleHit);
 
 		if (wh_hit->countdown > 0) {
 		    j = wh_hit->lastdest;
 		} else if (rfrac() < 0.10f) {
 		    do
 			j = (int)(rfrac() * World.NumWormholes);
-		    while (World.wormHoles[j].type == WORM_IN
+		    while (World.wormholes[j].type == WORM_IN
 			   || pl->wormHoleHit == j
-			   || World.wormHoles[j].temporary);
+			   || World.wormholes[j].temporary);
 		} else {
 		    nearestFront = nearestRear = -1;
 		    proxFront = proxRear = 1e20;
 
 		    for (j = 0; j < World.NumWormholes; j++) {
-			wormhole_t *wh = &World.wormHoles[j];
+			wormhole_t *wh = Wormholes(j);
 
 			if (j == pl->wormHoleHit
 			    || wh->type == WORM_IN
@@ -1152,14 +1152,14 @@ void Update_objects(void)
 			} else {
 			    do
 				j = (int)(rfrac() * World.NumWormholes);
-			    while (World.wormHoles[j].type == WORM_IN
+			    while (World.wormholes[j].type == WORM_IN
 				   || j == pl->wormHoleHit);
 			}
 		    }
 		}
 
 		sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
-		dest = World.wormHoles[j].pos;
+		dest = World.wormholes[j].pos;
 
 	    } else { /* wormHoleHit == -1 */
 		int counter;
@@ -1246,9 +1246,9 @@ void Update_objects(void)
 	    pl->forceVisible += 15;
 
 	    if ((j != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
-		World.wormHoles[pl->wormHoleHit].lastdest = j;
-		if (!World.wormHoles[j].temporary) {
-		    World.wormHoles[pl->wormHoleHit].countdown = (wormTime ?
+		World.wormholes[pl->wormHoleHit].lastdest = j;
+		if (!World.wormholes[j].temporary) {
+		    World.wormholes[pl->wormHoleHit].countdown = (wormTime ?
 			wormTime : WORMCOUNT);
 		}
 	    }
@@ -1279,7 +1279,7 @@ void Update_objects(void)
     }
 
     for (i = World.NumWormholes - 1; i >= 0; i--) {
-	wormhole_t *wh = &World.wormHoles[i];
+	wormhole_t *wh = Wormholes(i);
 
 	if ((wh->countdown -= timeStep) <= 0)
 	    wh->countdown = 0;

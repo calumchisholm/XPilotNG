@@ -244,27 +244,39 @@ typedef struct {
 
     int		NumTeamBases;	/* How many 'different' teams are allowed */
     int		NumBases;
-    base_t	*base;
+    base_t	*bases;
     baseorder_t	*baseorder;
     int		NumFuels;
-    fuel_t	*fuel;
+    fuel_t	*fuels;
     int		NumGravs;
-    grav_t	*grav;
+    grav_t	*gravs;
     int		NumCannons;
-    cannon_t	*cannon;
+    cannon_t	*cannons;
     int		NumChecks;
-    clpos	*check;
+    clpos	*checks;
     int		NumWormholes;
-    wormhole_t	*wormHoles;
+    wormhole_t	*wormholes;
     int		NumTreasures;
     treasure_t	*treasures;
     int		NumTargets;
     target_t	*targets;
-    int		NumItemConcentrators;
-    item_concentrator_t		*itemConcentrators;
+    int		NumItemConcs;
+    item_concentrator_t		*itemConcs;
     int		NumAsteroidConcs;
     asteroid_concentrator_t	*asteroidConcs;
 } World_map;
+
+#define Bases(ind)		(&World.bases[(ind)])
+#define Fuels(ind)		(&World.fuels[(ind)])
+#define Cannons(ind)		(&World.cannons[(ind)])
+#define Checks(ind)		(&World.checks[(ind)])
+#define Gravs(ind)		(&World.gravs[(ind)])
+#define Targets(ind)		(&World.targets[(ind)])
+#define Treasures(ind)		(&World.treasures[(ind)])
+#define Wormholes(ind)		(&World.wormholes[(ind)])
+#define AsteroidConcs(ind)	(&World.asteroidConcs[(ind)])
+#define ItemConcs(ind)		(&World.itemConcs[(ind)])
+
 
 /* kps change 100, 30 etc to something sane */
 struct polystyle {
@@ -309,9 +321,9 @@ struct move {
 struct group {
     int type;
     int team;
-    unsigned int hitmask;
+    int hitmask;
     bool (*hitfunc)(struct group *groupptr, struct move *move);
-    void *mapobj;
+    int mapobj_ind;
 };
 
 extern struct polystyle pstyles[256];

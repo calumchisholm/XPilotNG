@@ -257,7 +257,7 @@ void Ball_is_destroyed(ballobject *ball)
 
 
 
-void Ball_hits_goal(ballobject *ball, struct group *groupptr)
+void Ball_hits_goal(ballobject *ball, struct group *gp)
 {
     player *owner;
     treasure_t *td;
@@ -277,13 +277,13 @@ void Ball_hits_goal(ballobject *ball, struct group *groupptr)
 	return;
 
     td = ball->treasure;
-    if (td->team == groupptr->team) {
+    if (td->team == gp->team) {
 	Ball_is_replaced(ball);
 	return;
     }
     owner = Player_by_id(ball->owner);
-    if (groupptr->team == owner->team) {
-	treasure_t *tt = groupptr->mapobj;
+    if (gp->team == owner->team) {
+	treasure_t *tt = Treasures(gp->mapobj_ind);
 
 	Ball_is_destroyed(ball);
 
@@ -302,7 +302,7 @@ void Ball_hits_goal(ballobject *ball, struct group *groupptr)
  * This function is called when something would hit a balltarget.
  * The function determines if it hits or not.
  */
-bool Balltarget_hitfunc(struct group *groupptr, struct move *move)
+bool Balltarget_hitfunc(struct group *gp, struct move *move)
 {
     ballobject *ball = NULL;
 
@@ -329,8 +329,8 @@ bool Balltarget_hitfunc(struct group *groupptr, struct move *move)
 	 * the ball and the target are of the same team, but the
 	 * owner is not.
 	 */
-	if (ball->treasure->team == groupptr->team
-	    && Player_by_id(ball->owner)->team != groupptr->team)
+	if (ball->treasure->team == gp->team
+	    && Player_by_id(ball->owner)->team != gp->team)
 	    return false;
 	return true;
     }
@@ -355,41 +355,41 @@ int Cannon_hitmask(cannon_t *cannon)
     return 0;
 }
 
-void Cannon_set_hitmask(void *c)
+void Cannon_set_hitmask(int group, cannon_t *cannon)
 {
-    cannon_t *cannon = c;
+    assert(group == cannon->group);
 
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
 
 
-void Cannon_restore_on_map(cannon_t *c)
+void Cannon_restore_on_map(cannon_t *cannon)
 {
     int			bx, by;
 
-    bx = CLICK_TO_BLOCK(c->pos.cx);
-    by = CLICK_TO_BLOCK(c->pos.cy);
+    bx = CLICK_TO_BLOCK(cannon->pos.cx);
+    by = CLICK_TO_BLOCK(cannon->pos.cy);
     World.block[bx][by] = CANNON;
 
-    c->conn_mask = 0;
-    c->last_change = frame_loops;
-    c->dead_time = 0;
+    cannon->conn_mask = 0;
+    cannon->last_change = frame_loops;
+    cannon->dead_time = 0;
 
-    P_set_hitmask(c->group, Cannon_hitmask(c));
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
 
-void Cannon_remove_from_map(cannon_t *c)
+void Cannon_remove_from_map(cannon_t *cannon)
 {
     int			bx, by;
 
-    c->dead_time = cannonDeadTime;
-    c->conn_mask = 0;
+    cannon->dead_time = cannonDeadTime;
+    cannon->conn_mask = 0;
 
-    bx = CLICK_TO_BLOCK(c->pos.cx);
-    by = CLICK_TO_BLOCK(c->pos.cy);
+    bx = CLICK_TO_BLOCK(cannon->pos.cx);
+    by = CLICK_TO_BLOCK(cannon->pos.cy);
     World.block[bx][by] = SPACE;
 
-    P_set_hitmask(c->group, Cannon_hitmask(c));
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
 
 
@@ -399,10 +399,10 @@ extern struct move_parameters mp;
  *
  * Ideas stolen from Move_segment in walls_old.c
  */
-bool Cannon_hitfunc(struct group *groupptr, struct move *move)
+bool Cannon_hitfunc(struct group *gp, struct move *move)
 {
     object *obj = move->obj;
-    cannon_t *cannon = groupptr->mapobj;
+    cannon_t *cannon = Cannons(gp->mapobj_ind);
     unsigned long cannon_mask;
 
     /* this should never happen if hitmasks are ok */
@@ -444,16 +444,28 @@ int Target_hitmask(target_t *targ)
     return HITMASK(targ->team);
 }
 
-void Target_set_hitmask(void *t)
+void Target_set_hitmask(int group, target_t *targ)
 {
-    target_t *targ = t;
-
+    assert(targ->group == group);
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
+extern int num_groups;
+
 void Target_init(void)
 {
+    int group;
+
+    for (group = 0; group <= num_groups; group++) {
+	struct group *gp = groupptr_by_id(group);
+
+	if (gp->type == TARGET)
+	    Target_set_hitmask(group, Targets(gp->mapobj_ind));
+    }
+
+#if 0
     P_grouphack(TARGET, Target_set_hitmask);
+#endif
 }
 
 void Target_restore_on_map(target_t *targ)
@@ -504,10 +516,10 @@ int Wormhole_hitmask(wormhole_t *wormhole)
     return 0;
 }
 
-bool Wormhole_hitfunc(struct group *groupptr, struct move *move)
+bool Wormhole_hitfunc(struct group *gp, struct move *move)
 {
     object *obj = move->obj;
-    wormhole_t *wormhole = groupptr->mapobj;
+    wormhole_t *wormhole = Wormholes(gp->mapobj_ind);
 
     /* this should never happen, because of the hitmask */
     if (wormhole->type == WORM_OUT) {
@@ -553,16 +565,29 @@ void Wormhole_remove_from_map(wormhole_t *wormhole)
     /*Map_set_itemid(bx, by, wormhole->lastID);*/
 }
 
-
+extern void Describe_group(int group);
 /*
  * Handling of group properties
  */
 void Team_immunity_init(void)
 {
+    int group;
+
+    for (group = 0; group <= num_groups; group++) {
+	struct group *gp = groupptr_by_id(group);
+
+	if (gp->type == CANNON) {
+	    cannon_t *cannon = Cannons(gp->mapobj_ind);
+	    assert(cannon->group == group);
+	    Cannon_set_hitmask(group, cannon);
+	}
+    }
+
+#if 0
     /* change hitmask of all cannons */
     P_grouphack(CANNON, Cannon_set_hitmask);
+#endif
 }
-
 
 /* kps - called at server startup to initialize hit masks */
 void Groups_init(void)
@@ -570,3 +595,4 @@ void Groups_init(void)
     Target_init();
     Team_immunity_init();
 }
+
