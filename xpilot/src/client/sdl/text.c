@@ -544,8 +544,8 @@ void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, 
     	Y = (int)(y - ft_font->linespacing*i + yoff);
 	
     	if (color) set_alphacolor(color);
-	if (onHUD) glTranslatef(X,Y,0);
-	else glTranslatef(X*scale,Y*scale,0);
+	if (onHUD) glTranslatef(X, Y, 0);
+	else glTranslatef(X * clData.scale,Y * clData.scale, 0);
     	glMultMatrixf(modelview_matrix);
 
     	glCallLists(toklen, GL_UNSIGNED_BYTE, (GLubyte *) &text[start]);

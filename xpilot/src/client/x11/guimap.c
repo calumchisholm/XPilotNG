@@ -208,8 +208,8 @@ void Gui_paint_fuel(int x, int y, double fuel)
 	static int		text_is_bigger;
 	static double		lastScaleFactor;
 
-	if (!text_width || lastScaleFactor != scaleFactor) {
-	    lastScaleFactor = scaleFactor;
+	if (!text_width || lastScaleFactor != clData.scaleFactor) {
+	    lastScaleFactor = clData.scaleFactor;
 	    text_width = XTextWidth(gameFont, s, 1);
 	    text_is_bigger = (text_width + 4 > WINSCALE(BLOCK_SZ) + 1)
 		|| (gameFont->ascent + gameFont->descent)

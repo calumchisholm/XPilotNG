@@ -26,9 +26,11 @@
 #ifndef PAINT_H
 #define PAINT_H
 
-#ifdef _WINDOWS
-#include "types.h"
-#include "client.h"
+#ifndef TYPES_H
+# include "types.h"
+#endif
+#ifndef CLIENT_H
+# include "client.h"
 #endif
 
 /* constants begin */
@@ -76,13 +78,44 @@ extern double	timePerFrame;
 
 extern bool	players_exposed;
 
-extern double	scaleFactor;	/* scale the draw (main playfield) window */
-extern double	scaleFactor_s;
-extern short	scaleArray[];
-extern void	Init_scale_array(void);
+static inline float WINSCALE_f(float x)
+{
+    return x * clData.fscale;
+}
 
-#define	WINSCALE(x)	((x) >= 0 ? scaleArray[(x)] : -scaleArray[-(x)])
-#define	UWINSCALE(x)	((unsigned)(scaleArray[(x)]))
+static inline double WINSCALE_d(double x)
+{
+    return x * clData.scale;
+}
+
+static inline int WINSCALE(int x)
+{
+    bool negative = false;
+    int y, t = x;
+    float f = (float)0.0;
+
+    if (x == 0)
+	return 0;
+
+    if (t < 0) {
+	negative = true;
+	t = -t;
+    }
+
+    f = WINSCALE_f(t);
+    y = (int) (f + (float)0.5);
+
+    if (y < 1)
+	y = 1;
+
+    if (negative)
+	y = -y;
+
+    return y;
+}
+
+#define	UWINSCALE(x)	((unsigned)WINSCALE(x))
+
 #define SCALEX(co) ((int) (WINSCALE(co) - WINSCALE(world.x)))
 #define SCALEY(co) ((int) (WINSCALE(world.y + ext_view_height) - WINSCALE(co)))
 #define X(co)	((int) ((co) - world.x))

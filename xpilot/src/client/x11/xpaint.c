@@ -75,8 +75,6 @@ static void Paint_clock(bool redraw);
 
 int Paint_init(void)
 {
-    Init_scale_array();
-
     if (Init_wreckage() == -1)
 	return -1;
 

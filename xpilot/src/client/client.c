@@ -158,9 +158,6 @@ int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
 byte	lose_item;		/* index for dropping owned item */
 int	lose_item_active;	/* one of the lose keys is pressed */
 
-double	scaleFactor;
-double	scaleFactor_s;
-
 #ifdef SOUND
 char 	sounds[PATH_MAX];	/* audio mappings */
 char 	audioServer[PATH_MAX];	/* audio server */

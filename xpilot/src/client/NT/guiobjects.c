@@ -248,9 +248,9 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 	    { 0, -2 }
 	};
 
-	if (lastScaleFactor != scaleFactor) {
+	if (lastScaleFactor != clData.scaleFactor) {
 	    int			i;
-	    lastScaleFactor = scaleFactor;
+	    lastScaleFactor = clData.scaleFactor;
 	    for (i = 1; i < 21; ++i) {
 		mine_points[i].x = WINSCALE(world_mine_points[i].x);
 		mine_points[i].y = WINSCALE(world_mine_points[i].y);

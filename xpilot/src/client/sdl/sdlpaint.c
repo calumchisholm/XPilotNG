@@ -53,7 +53,6 @@ static sdl_window_t scoreListWin;
 static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
 static bool         scoreListMoving;
 
-double scale;              /* The opengl scale factor */
 int paintSetupMode;
 
 GLWidget *MainWidget = NULL;
@@ -179,14 +178,15 @@ GLWidget *Init_ScorelistWidget(void)
 
 bool Set_scaleFactor(xp_option_t *opt, double val)
 {
-    scaleFactor = val;
-    scale = 1 / val;
+    clData.scaleFactor = val;
+    clData.scale = 1.0 / val;
+    clData.fscale = (float)clData.scale;
     return true;
 }
 
 bool Set_altScaleFactor(xp_option_t *opt, double val)
 {
-    scaleFactor_s = val;
+    clData.altScaleFactor = val;
     return true;
 }
 
@@ -233,8 +233,10 @@ void setupPaint_stationary(void)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(rint(-world.x * scale), rint(-world.y * scale), 0);
-    glScalef(scale, scale, 0);
+    glTranslatef(rint(-world.x * clData.scale),
+		 rint(-world.y * clData.scale),
+		 0);
+    glScalef(clData.scale, clData.scale, 0);
 }
 
 /* This one works best for things that move, since they don't get
@@ -248,8 +250,8 @@ void setupPaint_moving(void)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(-world.x * scale, -world.y * scale, 0);
-    glScalef(scale, scale, 0);
+    glTranslatef(-world.x * clData.scale, -world.y * clData.scale, 0);
+    glScalef(clData.scale, clData.scale, 0);
 }
 
 void setupPaint_HUD(void)

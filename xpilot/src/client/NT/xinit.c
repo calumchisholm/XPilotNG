@@ -759,10 +759,18 @@ void Scale_dashes(void)
 	return;
 
     dashes[0] = WINSCALE(8);
+    if (dashes[0] < 1)
+	dashes[0] = 1;
     dashes[1] = WINSCALE(4);
-
+    if (dashes[1] < 1)
+	dashes[1] = 1;
+ 
     cdashes[0] = WINSCALE(3);
+    if (cdashes[0] < 1)
+	cdashes[0] = 1;
     cdashes[1] = WINSCALE(9);
+    if (cdashes[1] < 1)
+	cdashes[1] = 1;
 
     XSetDashes(dpy, gameGC, 0, dashes, NUM_DASHES);
 }

@@ -245,9 +245,9 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 	    { 0, -2 }
 	};
 
-	if (lastScaleFactor != scaleFactor) {
+	if (lastScaleFactor != clData.scaleFactor) {
 	    int			i;
-	    lastScaleFactor = scaleFactor;
+	    lastScaleFactor = clData.scaleFactor;
 	    for (i = 1; i < 21; ++i) {
 		mine_points[i].x = WINSCALE(world_mine_points[i].x);
 		mine_points[i].y = WINSCALE(world_mine_points[i].y);
@@ -945,19 +945,19 @@ static int set_shipshape(int world_x, int world_y,
 
     for (cnt = 0; cnt < ship->num_points; cnt++) {
 	ship_point_pos = Ship_get_point_position(ship, cnt, dir);
-	off_x = ship_point_pos.x / scaleFactor;
+	off_x = ship_point_pos.x / clData.scaleFactor;
 	if (off_x > 0.0)
 	    off_x += 0.5;
 	else if (off_x < 0.0)
 	    off_x -= 0.5;
-	off_y = ship_point_pos.y / scaleFactor;
+	off_y = ship_point_pos.y / clData.scaleFactor;
 	if (off_y > 0.0)
 	    off_y += 0.5;
 	else if (off_y < 0.0)
 	    off_y -= 0.5;
-	xpts->x = (short)(((world_x - world.x) / scaleFactor) + off_x);
+	xpts->x = (short)(((world_x - world.x) / clData.scaleFactor) + off_x);
 	xpts->y = (short)(((world.y + ext_view_height - world_y)
-			   / scaleFactor) - off_y);
+			   / clData.scaleFactor) - off_y);
 	xpts++;
     }
     points[cnt++] = points[0];

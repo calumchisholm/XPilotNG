@@ -55,8 +55,8 @@ int Check_view_dimensions(void)
     int			width_wanted, height_wanted;
     int			srv_width, srv_height;
 
-    width_wanted = (int)(draw_width * scaleFactor + 0.5);
-    height_wanted = (int)(draw_height * scaleFactor + 0.5);
+    width_wanted = (int)(draw_width * clData.scaleFactor + 0.5);
+    height_wanted = (int)(draw_height * clData.scaleFactor + 0.5);
 
     srv_width = width_wanted;
     srv_height = height_wanted;
@@ -357,67 +357,4 @@ void Paint_score_table(void)
     IFWINDOWS( MarkPlayersForRedraw() );
 
     scoresChanged = false;
-}
-
-
-#define SCALE_ARRAY_SIZE	32768
-short	scaleArray[SCALE_ARRAY_SIZE];
-
-void Init_scale_array(void)
-{
-    int		i, start, end, n;
-    double	scaleMultFactor, f;
-
-    if (scaleFactor == 0.0)
-	scaleFactor = 1.0;
-    LIMIT(scaleFactor, MIN_SCALEFACTOR, MAX_SCALEFACTOR);
-    scaleMultFactor = 1.0 / scaleFactor;
-
-    scaleArray[0] = 0;
-
-    for (i = 1; i < NELEM(scaleArray); i++) {
-	f = floor(i * scaleMultFactor + 0.5);
-	n = (int) f;
-	if (n == 0)
-	    /* keep values for non-zero indices at least 1. */
-	    scaleArray[i] = 1;
-	else
-	    break;
-    }
-    start = i;
-
-    for (i = NELEM(scaleArray) - 1; i >= 0; i--) {
-	f = floor(i * scaleMultFactor + 0.5);
-	n = (int) f;
-	if (n > 32767)
-	    /* keep values lower or equal to max short. */
-	    scaleArray[i] = 32767;
-	else
-	    break;
-    }
-    end = i;
-
-    for (i = start; i <= end; i++) {
-	f = floor(i * scaleMultFactor + 0.5);
-	scaleArray[i] = (short) f;
-    }
-
-    /*
-     * verify correct calculations, because of reported gcc optimization
-     * bugs.
-     */
-    for (i = 1; i < NELEM(scaleArray); i++) {
-	if (scaleArray[i] < 1)
-	    break;
-    }
-
-    if (i != SCALE_ARRAY_SIZE) {
-	fprintf(stderr,
-		"Error: Illegal value %d in scaleArray[%d].\n"
-		"\tThis error may be due to a bug in your compiler.\n"
-		"\tEither try a lower optimization level,\n"
-		"\tor a different compiler version or vendor.\n",
-		scaleArray[i], i);
-	exit(1);
-    }
 }

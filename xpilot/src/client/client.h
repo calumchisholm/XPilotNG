@@ -51,6 +51,10 @@
 
 typedef struct {
     double	clientLag;
+    double	scaleFactor;
+    double	scale;
+    float	fscale;
+    double	altScaleFactor;
 } client_data_t;
 
 typedef struct {
@@ -101,8 +105,8 @@ typedef struct {
 #define MIN_SHOW_ITEMS_TIME	0.0
 #define MAX_SHOW_ITEMS_TIME	300.0
 
-#define MIN_SCALEFACTOR		0.4
-#define MAX_SCALEFACTOR		8.0
+#define MIN_SCALEFACTOR		0.1
+#define MAX_SCALEFACTOR		20.0
 
 #define FUEL_NOTIFY_TIME	3.0
 #define CONTROL_TIME		8.0

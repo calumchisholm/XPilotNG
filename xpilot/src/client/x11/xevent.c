@@ -126,11 +126,13 @@ void Swap_scalefactor(void)
 {
     double tmp;
 
-    tmp = scaleFactor;
-    scaleFactor = scaleFactor_s;
-    scaleFactor_s = tmp;
+    tmp = clData.scaleFactor;
+    clData.scaleFactor = clData.altScaleFactor;
+    clData.altScaleFactor = tmp;
 
-    Init_scale_array();
+    clData.scale = 1.0 / clData.scaleFactor;
+    clData.fscale = (float)clData.scale;
+
     Scale_dashes();
     Config_redraw();
     Bitmap_update_scale();

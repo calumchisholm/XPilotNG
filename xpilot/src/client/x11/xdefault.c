@@ -564,8 +564,9 @@ void Handle_X_options(void)
 bool Set_scaleFactor(xp_option_t *opt, double val)
 {
     UNUSED_PARAM(opt);
-    scaleFactor = val;
-    Init_scale_array();
+    clData.scaleFactor = val;
+    clData.scale = 1.0 / val;
+    clData.fscale = (float)clData.scale;
     /* Resize removed because it is not needed here */
     Scale_dashes();
     Bitmap_update_scale();
@@ -575,7 +576,7 @@ bool Set_scaleFactor(xp_option_t *opt, double val)
 bool Set_altScaleFactor(xp_option_t *opt, double val)
 {
     UNUSED_PARAM(opt);
-    scaleFactor_s = val;
+    clData.altScaleFactor = val;
     return true;
 }
 

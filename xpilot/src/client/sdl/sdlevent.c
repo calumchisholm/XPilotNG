@@ -46,11 +46,12 @@ void Swap_scalefactor(void)
 {
     double tmp;
     
-    tmp = scaleFactor;
-    scaleFactor = scaleFactor_s;
-    scaleFactor_s = tmp;
+    tmp = clData.scaleFactor;
+    clData.scaleFactor = clData.altScaleFactor;
+    clData.altScaleFactor = tmp;
 
-    scale = 1.0 / scaleFactor;
+    clData.scale = 1.0 / clData.scaleFactor;
+    clData.fscale = (float)clData.scale;
 }
 
 bool Key_press_talk(void)

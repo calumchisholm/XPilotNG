@@ -28,7 +28,6 @@
 typedef unsigned int color_t;
 
 extern int draw_depth;
-extern double scale;              /* The opengl scale factor */
 
 #define STATIONARY_MODE 1
 #define MOVING_MODE 	2

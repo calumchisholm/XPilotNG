@@ -148,11 +148,14 @@ static GLubyte get_alpha(Uint32 color)
     return (color & 255);
 }
 
-int GL_X(int x) {
-    return (int)((x - world.x)*scale);
+int GL_X(int x)
+{
+    return (int)((x - world.x) * clData.scale);
 }
-int GL_Y(int y) {
-    return (int)((y - world.y)*scale);
+
+int GL_Y(int y)
+{
+    return (int)((y - world.y) * clData.scale);
 }
 
 
@@ -794,11 +797,11 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glPushMatrix();
     glLoadIdentity();
 
-    glTranslatef(polygon.points[0].x * scale +
-		 rint((xoff * Setup->width - world.x) * scale),
-		 polygon.points[0].y * scale +
-		 rint((yoff * Setup->height - world.y) * scale), 0);
-    glScalef(scale, scale, 0);
+    glTranslatef(polygon.points[0].x * clData.scale +
+		 rint((xoff * Setup->width - world.x) * clData.scale),
+		 polygon.points[0].y * clData.scale +
+		 rint((yoff * Setup->height - world.y) * clData.scale), 0);
+    glScalef(clData.scale, clData.scale, 0);
 
     if ((instruments.texturedWalls || instruments.filledWorld) &&
 	    BIT(p_style.flags, STYLE_TEXTURED | STYLE_FILLED)) {
@@ -815,7 +818,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 
     if (e_style.width != -1) {
 	set_alphacolor((e_style.rgb << 8) | 0xff);
-	glLineWidth(e_style.width * scale);
+	glLineWidth(e_style.width * clData.scale);
 	if (smoothLines) {
 	    glEnable(GL_BLEND);
 	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1859,9 +1862,9 @@ void Paint_HUD(void)
 		  * hudRadarScale / hudRadarMapScale),
 	    hudRadarDotSize);
 
-	Paint_hudradar(hudRadarMapScale*scale,
-		       (active_view_width / 2)*scale,
-		       (active_view_height / 2)*scale,
+	Paint_hudradar(hudRadarMapScale*clData.scale,
+		       (active_view_width / 2)*clData.scale,
+		       (active_view_height / 2)*clData.scale,
 		       SHIP_SZ);
     }
 
@@ -1870,10 +1873,10 @@ void Paint_HUD(void)
     /* message scan hack by mara*/
     if (ball_shout && msgScanBallColorRGBA)
 	Circle(msgScanBallColorRGBA, draw_width / 2,
-	       draw_height / 2, (int)(8*scale),0);
+	       draw_height / 2, (int)(8*clData.scale),0);
     if (need_cover && msgScanCoverColorRGBA)
 	Circle(msgScanCoverColorRGBA, draw_width / 2,
-	       draw_height / 2, (int)(6*scale),0);
+	       draw_height / 2, (int)(6*clData.scale),0);
 
     glEnable(GL_BLEND);
 
