@@ -347,12 +347,17 @@ static int Parse_colors(Colormap cmap)
      * Get the color definitions.
      */
     for (i = 0; i < maxColors; i++) {
-	if (color_names[i][0] != '\0') {
-	    if (XParseColor(dpy, cmap, color_names[i], &colors[i]))
+	if (strlen(color_names[i]) > 0) {
+	    char cname[MAX_COLOR_LEN], *tmp;
+
+	    strlcpy(cname, color_names[i], sizeof(cname));
+	    tmp = strtok(cname, " \t");
+
+	    if (tmp && XParseColor(dpy, cmap, tmp, &colors[i]))
 		continue;
 	    warn("Can't parse color %d \"%s\".", i, color_names[i]);
 	}
-	if (def[i] != NULL && def[i][0] != '\0') {
+	if (def[i] != NULL && strlen(def[i]) > 0) {
 	    if (XParseColor(dpy, cmap, def[i], &colors[i]))
 		continue;
 	    warn("Can't parse default color %d \"%s\".", i, def[i]);
@@ -1072,21 +1077,11 @@ static bool Set_maxColors (xp_option_t *opt, int val)
 
 static bool Set_color (xp_option_t *opt, const char *val)
 {
-    char *buf = Option_get_private_data(opt), *tmpval, *tmp;
+    char *buf = Option_get_private_data(opt);
 
     /*warn("Set_color: name=%s, val=\"%s\", buf=%p", opt->name, val, buf);*/
-
     assert(val != NULL);
-    /* remove whitespace */
-    tmp = xp_safe_strdup(val);
-    tmpval = strtok(tmp, " \t");
-    if (tmpval == NULL) {
-	xp_free(tmp);
-	return false;
-    }
-
-    strlcpy(buf, tmpval, MAX_COLOR_LEN);
-    xp_free(tmp);
+    strlcpy(buf, val, MAX_COLOR_LEN);
 
     return true;
 }
