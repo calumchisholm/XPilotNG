@@ -1,4 +1,4 @@
-This is the README file for XPilot @VERSION@.
+This is the README file for @PACKAGE_STRING@.
 
 @XP_COPYRIGHT@.
 
@@ -10,13 +10,7 @@ source code, and the COPYING file.
 
 Installation instructions are in the INSTALL file.
 
-Windows users should examine the src/common/NT/bindist subdirectory
-and read the README.txt which is in there.
-
-The documentation for XPilot is far from complete.  The map format is
-only explained in doc/README.MAPS and doc/README.MAPS2, not in the server
-manual page, xpilots(6).  The client manual page, xpilot(6), is more or
-less up to date.
+The documentation for @PACKAGE_NAME@ is far from complete.
 
 For further reading, see the manuals in the doc/man directory.
 
@@ -24,7 +18,7 @@ For further reading, see the manuals in the doc/man directory.
 
 OTHER SOURCES OF INFORMATION ON THE INTERNET
 
-Improved XPilot: http://xpilot.sourceforge.net/
+XPilot NG: http://xpilot.sourceforge.net/
 
 XPilot FAQ: telnet meta.xpilot.org 4402
 	(also in the doc/ subdirectory)
@@ -43,10 +37,8 @@ XPilot newsgroup: rec.games.computer.xpilot
 CONTRIBUTED SOFTWARE
 
 Check out the contrib directory subdirectory for some extra nifty programs.
-Especially TkXpInterface is a very convenient program for starting the
-xpilots and xpilot programs.
 
-Also try the mapeditor which is included in this XPilot distribution.  
+Also try the xp2 mapeditor which is included in this XPilot distribution.
 It is a nifty graphical editor with which you can design a new XPilot world.
 
 
@@ -56,8 +48,8 @@ If you're completely stuck, found a bug, or want to say Hi! e-mail us at:
 
         @PACKAGE_BUGREPORT@
 
-Remember to include the version of XPilot, your platform and the symptoms
-in as much detail as possible.
+Remember to include the version of @PACKAGE_NAME@, your platform and the
+symptoms in as much detail as possible.
 
 
 DEVELOPERS CORNER
