@@ -37,6 +37,11 @@ Task: Add support for Add_alert_message() in X client.
 like the "really quit (y/n)?" message.
 Developer: kps
 
+Task: Fix the bug that causes the dynamically generated texture lookup path 
+(texturePath) to be saved in .xpilotrc when the configuration is saved. This
+bug is also known as the polybloods/polybloods/... bug.
+Developer: baron
+
 
 Server:
 
