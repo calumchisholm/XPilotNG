@@ -865,7 +865,8 @@ Optional Features:
   --enable-plockserver    lock the xpilot server (xpilots) into memory
   --enable-development    enable development code
   --enable-sdl-client     enable sdl client
-  --enable-sdl-gameloop   enable sdl gameloop in sdl client
+  --enable-sdl-gameloop   enable sdl gameloop in sdl client (otherwise use
+                          gameloop optimised for X11)
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-sdltest       Do not try to compile and run a test SDL program

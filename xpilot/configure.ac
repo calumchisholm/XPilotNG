@@ -67,7 +67,8 @@ fi])
 dnl  Do this if you want to use the gameloop without the X11 hack.
 AC_ARG_ENABLE(sdl_gameloop,
 	AC_HELP_STRING([--enable-sdl-gameloop],
-			[enable sdl gameloop in sdl client]),
+			[enable sdl gameloop in sdl client
+			 (otherwise use gameloop optimised for X11)]),
 [if test x$enable_sdl_gameloop = xyes; then
 	AC_DEFINE([SDL_GAMELOOP], 1, [enable sdl gameloop in sdl client])
 fi])
