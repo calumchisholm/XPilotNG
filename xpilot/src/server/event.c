@@ -896,7 +896,7 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_HYPERJUMP:
-		Do_hyperjump(pl);
+		Initiate_hyperjump(pl);
 		break;
 
 	    case KEY_PHASING:

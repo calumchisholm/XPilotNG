@@ -1758,7 +1758,7 @@ static void Robot_default_play_check_objects(player *pl,
 				|OBJ_HEAT_SHOT|OBJ_MINE)
 		&& (pl->fuel.sum < pl->fuel.l3
 		    || !BIT(pl->have, HAS_SHIELD))) {
-	      if (Do_hyperjump(pl))
+	      if (Initiate_hyperjump(pl))
 		  break;
 	    }
 	}
@@ -2033,7 +2033,7 @@ static void Robot_default_play(player *pl)
 
     if (ship_dist <= 10*BLOCK_SZ && pl->fuel.sum <= pl->fuel.l3
 	&& !BIT(world->rules->mode, TIMING)) {
-	if (Do_hyperjump(pl))
+	if (Initiate_hyperjump(pl))
 	    return;
     }
 

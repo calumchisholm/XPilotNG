@@ -849,7 +849,7 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 /*
  * Returns true if warp status was achieved.
  */
-bool Do_hyperjump(player *pl)
+bool Initiate_hyperjump(player *pl)
 {
     if (pl->item[ITEM_HYPERJUMP] <= 0)
 	return false;
