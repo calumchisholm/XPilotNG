@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -36,8 +35,11 @@ extern unsigned int reloadMT(void);
 extern unsigned int randomMT(void);
 
 /* math.c */
+extern int ON(char *optval);
+extern int OFF(char *optval);
 extern DFLOAT rfrac(void);
 extern int mod(int x, int y);
+extern DFLOAT findDir(DFLOAT x, DFLOAT y);
 extern void Make_table(void);
 
 /* strdup.c */

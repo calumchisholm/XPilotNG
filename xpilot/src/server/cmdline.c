@@ -40,6 +40,7 @@
 #include "defaults.h"
 #include "error.h"
 #include "portability.h"
+#include "commonproto.h"
 
 char cmdline_version[] = VERSION;
 

@@ -63,6 +63,7 @@
 #include "error.h"
 #include "portability.h"
 #include "srecord.h"
+#include "commonproto.h"
 
 char server_version[] = VERSION;
 

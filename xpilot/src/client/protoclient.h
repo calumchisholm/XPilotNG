@@ -80,12 +80,6 @@ extern int Join(char *server_addr, char *server_name, int port,
 extern int metaclient(int, char **);
 
 /*
- * math.c
- */
-extern int ON(char *optval);
-extern int OFF(char *optval);
-
-/*
  * paintdata.c
  */
 extern void paintdataCleanup(void);		/* memory cleanup */

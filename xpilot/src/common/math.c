@@ -42,7 +42,6 @@ DFLOAT		tbl_cos[TABLE_SIZE];
 
 int ON(char *optval);
 int OFF(char *optval);
-int f2i(DFLOAT f);
 DFLOAT findDir(DFLOAT x, DFLOAT y);
 void Make_table(void);
 
@@ -73,11 +72,6 @@ int mod(int x, int y)
     return x;
 }
 
-
-int f2i(DFLOAT f)
-{
-    return (f < 0) ? -(int)(0.5f - f) : (int)(f + 0.5f);
-}
 
 DFLOAT findDir(DFLOAT x, DFLOAT y)
 {

@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -57,6 +56,7 @@
 #include "protoclient.h"
 #include "audio.h"
 #include "talk.h"
+#include "commonproto.h"
 
 #ifdef _WINDOWS
 extern char **Argv;

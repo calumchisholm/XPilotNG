@@ -45,6 +45,7 @@
 #include "bit.h"
 #include "error.h"
 #include "click.h"
+#include "commonproto.h"
 
 char map_version[] = VERSION;
 

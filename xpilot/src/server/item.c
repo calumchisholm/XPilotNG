@@ -48,6 +48,7 @@
 #include "error.h"
 #include "objpos.h"
 #include "click.h"
+#include "commonproto.h"
 
 char item_version[] = VERSION;
 
