@@ -961,7 +961,7 @@ xp_option_t default_options[] = {
 
     XP_INT_OPTION(
 	"shotSize",
-	5,
+	6,
 	MIN_SHOT_SIZE,
 	MAX_SHOT_SIZE,
 	&shotSize,
@@ -971,7 +971,7 @@ xp_option_t default_options[] = {
 
     XP_INT_OPTION(
 	"teamShotSize",
-	3,
+	4,
 	MIN_TEAMSHOT_SIZE,
 	MAX_TEAMSHOT_SIZE,
 	&teamShotSize,
