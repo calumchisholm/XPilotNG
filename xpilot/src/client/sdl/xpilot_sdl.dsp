@@ -174,6 +174,14 @@ SOURCE=..\messages.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\meta.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\meta.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\common\net.c
 # End Source File
 # Begin Source File
@@ -234,7 +242,19 @@ SOURCE=.\sdlinit.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\sdlinit.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\sdlkeys.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\sdlmeta.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\sdlmeta.h
 # End Source File
 # Begin Source File
 

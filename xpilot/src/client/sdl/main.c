@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
 
      if (argc == 1) {
        if (Init_window()) {
-	 error("Could not create a drawable window \
-                check your SDL and TTF settings..");
+	      error("Could not create a drawable window \
+          check your SDL and TTF settings..");
        }
               
        Meta_window(servername);

@@ -319,17 +319,20 @@ int sock_open_tcp_connected_non_blocking(sock_t *sock, char *host, int port)
 	    = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
     }
 
-#ifndef _WINDOWS
     if (connect(sock->fd, (struct sockaddr *)&dest,
-		sizeof(struct sockaddr_in)) < 0
-	&& errno != EINPROGRESS)
-    {
-	sock_set_error(sock, errno, SOCK_CALL_CONNECT, __LINE__);
-	sock_close(sock);
-	return SOCK_IS_ERROR;
-    }
+		sizeof(struct sockaddr_in)) < 0) {
+
+#ifndef _WINDOWS
+  	if (errno != EINPROGRESS) {
+#else
+ 	if (WSAGetLastError() != 10035) {
 #endif
 
+		sock_set_error(sock, errno, SOCK_CALL_CONNECT, __LINE__);
+		sock_close(sock);
+		return SOCK_IS_ERROR;
+		}
+	}
     sock_flags_add(sock, SOCK_FLAG_CONNECT);
 
     return SOCK_IS_OK;
