@@ -58,18 +58,6 @@ Files
 affected:
 
 -----------------------------------------------------------------
-Problem :Bouncing laser shots dont kill yourself possibly make your 
-	 own lasers deadly to your self or atleast an option that 
-	 stipulates that, along with an option for 
-	 laserfirerepeatrate like shots so you can have a solid 
-	 laser beam.
-Found by:Colonel Blood
-Solution:
-Fixed by:
-Files 
-affected:
-
------------------------------------------------------------------
 Problem: The wall textures are only drawn partially on the left side of
 	 the view in the X client. This problem only appears on some systems.
 Found by:kps (Tarzan reported this bug earlier)
@@ -149,6 +137,20 @@ affected:
 
 
 FIXED:
+
+-----------------------------------------------------------------
+Problem :Bouncing laser shots dont kill yourself possibly make your 
+	 own lasers deadly to your self or atleast an option that 
+	 stipulates that, along with an option for 
+	 laserfirerepeatrate like shots so you can have a solid 
+	 laser beam.
+Found by:Colonel Blood
+Solution: Added laserrepeatrate server option, made pulses deadly to whoever
+	  fired it (after wall bounce; requires pulsesWallBounce true).
+Fixed by: kps
+Files 
+affected: walls.c cmdline.c
+
 
 -----------------------------------------------------------------
 Problem : nuke shots last for a long long long time

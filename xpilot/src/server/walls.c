@@ -794,8 +794,9 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
     if (obj->type == OBJ_PULSE) {
 	pulseobject_t *pulse = PULSE_PTR(obj);
 
-	pulse->dir = (int)Wrap_findDir(pulse->vel.x, pulse->vel.y);
+	pulse->dir = Wrap_findDir(pulse->vel.x, pulse->vel.y);
 	pulse->len = 0;
+	pulse->refl = true;
     }
 
     return 1;
