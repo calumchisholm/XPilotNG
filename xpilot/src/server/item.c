@@ -227,7 +227,7 @@ void Place_item(int item, int ind)
 	    py -= World.cheight;
 	bx = px / BLOCK_CLICKS;
 	by = py / BLOCK_CLICKS;
-	if (is_inside(px, py, 0) != -1) /* !@# */
+	if (is_inside(px, py, NOTEAM_BIT | NONBALL_BIT) != -1)
 	    return;
     } else {
 	if (rfrac() < movingItemProb) {
@@ -275,7 +275,7 @@ void Place_item(int item, int ind)
 		bx = px / BLOCK_CLICKS;
 		by = py / BLOCK_CLICKS;
 	    }
-	    if (is_inside(px, py, 0) == -1) /* !@# */
+	    if (is_inside(px, py, NOTEAM_BIT | NONBALL_BIT) == -1)
 		break;
 	}
     }

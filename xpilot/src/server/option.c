@@ -169,9 +169,6 @@ char *getOption(const char *name)
 static char	*FileName;
 
 #include <expat.h>
-#define NOTEAM_BIT (1 << 10) /* !@# use same defines with walls.c */
-#define BALL_BIT (1 << 11)
-#define NONBALL_BIT (1 << 12)
 
 static int edg[5000 * 2]; /* !@# change pointers in poly_t when realloc poss.*/
 extern int polyc;

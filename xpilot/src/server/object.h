@@ -135,6 +135,11 @@ typedef struct {
 
 #define NOT_CONNECTED		(-1)
 
+
+#define BALL_BIT (1 << 11)
+#define NONBALL_BIT (1 << 12)
+#define NOTEAM_BIT (1 << 10)
+
 /*
  * Object position is non-modifiable, except at one place.
  *

@@ -72,9 +72,6 @@ static struct move_parameters mp; /* moved here */
 /* This must be increased if the ship corners are allowed to go farther
    when turning! */
 #define MAX_SHAPE_OFFSET (15 * CLICK)
-#define NOTEAM_BIT (1 << 10)
-#define BALL_BIT (1 << 11)
-#define NONBALL_BIT (1 << 12)
 
 #if ((-3) / 2 != -1) || ((-3) % 2 != -1)
 #error "This code assumes that negative numbers round upwards."

@@ -1153,29 +1153,15 @@ void Delete_shot(int ind)
 	    if (BIT(shot->status, NOEXPLOSION))
 		break;
 	    sound_play_sensors(shot->pos.cx, shot->pos.cy, EXPLODE_BALL_SOUND);
-	    if (0){   /* was if (!anaColDet) */
-		Make_debris(
-		    /* pos.x, pos.y   */ shot->prevpos.x, shot->prevpos.y,
-		    /* vel.x, vel.y   */ shot->vel.x, shot->vel.y,
-		    /* owner id       */ shot->id,
-		    /* owner team	  */ shot->team,
-		    /* kind           */ OBJ_DEBRIS,
-		    /* mass           */ DEBRIS_MASS,
-		    /* status         */ GRAVITY,
-		    /* color          */ RED,
-		    /* radius         */ 8,
-		    /* min,max debris */ 75, 150,
-		    /* min,max dir    */ 0, RES-1,
-		    /* min,max speed  */ 20, 95,
-		    /* min,max life   */ 10, 2*(FPS+15)
-		    );
-	    } else {
-		Make_debris(
-		    shot->prevpos.x, shot->prevpos.y, shot->vel.x, shot->vel.y,
-		    shot->id, shot->team, OBJ_DEBRIS, DEBRIS_MASS, GRAVITY,
-		    RED, 8, 10, 20, 0, RES-1, 10, 50, 10, 2*(FPS+15));
-	    }
-
+	    /* The ball could be inside a BallArea, check whether the sparks
+	     * can exist here. Should we set a team? */
+	    if (is_inside(shot->prevpos.x, shot->prevpos.y,
+			  NONBALL_BIT | NOTEAM_BIT) != -1)
+		break;
+	    Make_debris(
+		shot->prevpos.x, shot->prevpos.y, shot->vel.x, shot->vel.y,
+		shot->id, shot->team, OBJ_DEBRIS, DEBRIS_MASS, GRAVITY,
+		RED, 8, 10, 20, 0, RES-1, 10, 50, 10, 2*(FPS+15));
 	}
 	break;
 	/* Shots related to a player. */
