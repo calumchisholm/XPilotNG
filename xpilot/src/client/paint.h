@@ -78,7 +78,13 @@ extern bool	players_exposed;
 
 extern double	scaleFactor;	/* scale the draw (main playfield) window */
 extern double	scaleFactor_s;
+extern short	scaleArray[];
+extern void	Init_scale_array(void);
 
+#define	WINSCALE(x)	((x) >= 0 ? scaleArray[(x)] : -scaleArray[-(x)])
+#define	UWINSCALE(x)	((unsigned)(scaleArray[(x)]))
+#define SCALEX(co) ((int) (WINSCALE(co) - WINSCALE(world.x)))
+#define SCALEY(co) ((int) (WINSCALE(world.y + ext_view_height) - WINSCALE(co)))
 #define X(co)	((int) ((co) - world.x))
 #define Y(co)	((int) (world.y + ext_view_height - (co)))
 
