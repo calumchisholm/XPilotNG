@@ -61,7 +61,7 @@ class MapObject:
                     canvas.setCanvasEventHandler(MoveHandler(self, me))
                 return 1
             elif me.button == 3:
-                self.a = MapObjectPopup(self, me.orig, canvas)
+                MapObjectPopup(self, me.orig, canvas)
                 return 1
         return 0
 

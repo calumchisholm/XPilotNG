@@ -133,7 +133,7 @@ class MapPolygon(MapObject):
                         if self.polygon.npoints > 3:
                             self.removePoint(i)
                             canvas.repaint()
-                            self.canvas.saveUndo()
+                            canvas.saveUndo()
                     else:
                         canvas.setCanvasEventHandler(PolygonPointMoveHandler(
                             self, me, i, canvas.wrap(p, point)))
