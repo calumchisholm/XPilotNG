@@ -45,6 +45,7 @@ Uint32 greenRGBA    = 0x00ff00ff;
 Uint32 yellowRGBA   = 0xffff00ff;
 
 Uint32 wallColorRGBA;
+Uint32 decorColorRGBA;
 Uint32 hudColorRGBA;
 Uint32 connColorRGBA;
 Uint32 scoreObjectColorRGBA;
@@ -482,6 +483,51 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 		     bool last, bool more_y)
 {
+	int mask;
+    static unsigned char    decor[256];
+    static int		    decorReady = 0;
+
+    if (!decorReady) {
+		memset(decor, 0, sizeof decor);
+		decor[SETUP_DECOR_FILLED]
+			= DECOR_UP | DECOR_LEFT | DECOR_DOWN | DECOR_RIGHT;
+		decor[SETUP_DECOR_RU] = DECOR_UP | DECOR_RIGHT | DECOR_CLOSED;
+		decor[SETUP_DECOR_RD]
+			= DECOR_DOWN | DECOR_RIGHT | DECOR_OPEN | DECOR_BELOW;
+		decor[SETUP_DECOR_LU] = DECOR_UP | DECOR_LEFT | DECOR_OPEN;
+		decor[SETUP_DECOR_LD]
+			= DECOR_LEFT | DECOR_DOWN | DECOR_CLOSED | DECOR_BELOW;
+    }
+
+    mask = decor[type];
+
+    set_alphacolor(decorColorRGBA);
+    glBegin(GL_LINES);
+
+    if (mask & DECOR_LEFT) {
+		glVertex2i(x, y);
+		glVertex2i(x, y + BLOCK_SZ);
+    }
+    if (mask & DECOR_DOWN) {
+		glVertex2i(x, y);
+		glVertex2i(x + BLOCK_SZ, y);
+    }
+    if (mask & DECOR_RIGHT) {
+		glVertex2i(x + BLOCK_SZ, y);
+		glVertex2i(x + BLOCK_SZ, y + BLOCK_SZ);
+    }
+    if (mask & DECOR_UP) {
+		glVertex2i(x, y + BLOCK_SZ);
+		glVertex2i(x + BLOCK_SZ, y + BLOCK_SZ);
+    }
+	if (mask & DECOR_OPEN) {
+		glVertex2i(x, y);
+		glVertex2i(x + BLOCK_SZ, y + BLOCK_SZ);
+    } else if (mask & DECOR_CLOSED) {
+		glVertex2i(x, y + BLOCK_SZ);
+		glVertex2i(x + BLOCK_SZ, y);
+    }
+    glEnd();
 }
 
 void Gui_paint_border(int x, int y, int xi, int yi)
@@ -644,10 +690,43 @@ void Gui_paint_setup_asteroid_concentrator(int x, int y)
 
 void Gui_paint_decor_dot(int x, int y, int size)
 {
+	set_alphacolor(wallColorRGBA);
+	glBegin(GL_QUADS);
+	glVertex2i(x + ((BLOCK_SZ - size) >> 1),
+			   y + ((BLOCK_SZ - size) >> 1));
+	glVertex2i(x + ((BLOCK_SZ - size) >> 1),
+			   y + ((BLOCK_SZ + size) >> 1));
+	glVertex2i(x + ((BLOCK_SZ + size) >> 1),
+			   y + ((BLOCK_SZ + size) >> 1));
+	glVertex2i(x + ((BLOCK_SZ + size) >> 1),
+			   y + ((BLOCK_SZ - size) >> 1));
+	glEnd();
 }
 
 void Gui_paint_setup_target(int x, int y, int team, double damage, bool own)
 {
+	int damage_y;
+
+	Image_paint(IMG_TARGET, x, y, 0, whiteRGBA);
+	if (BIT(Setup->mode, TEAM_PLAY)) {
+		mapprint(&mapfont, whiteRGBA, RIGHT, UP, x + BLOCK_SZ, y, "%d", team);
+	}
+	if (damage != TARGET_DAMAGE) {
+		damage_y = y + (int)((BLOCK_SZ - 3) * (damage / TARGET_DAMAGE));
+		set_alphacolor(own ? blueRGBA : redRGBA);
+		glBegin(GL_LINE_LOOP);
+		glVertex2i(x, y + 3);
+		glVertex2i(x, y + BLOCK_SZ);
+		glVertex2i(x + 5, y + BLOCK_SZ);
+		glVertex2i(x + 5, y + 3);
+		glEnd();
+		glBegin(GL_QUADS);
+		glVertex2i(x, y + 3);
+		glVertex2i(x, damage_y);
+		glVertex2i(x + 5, damage_y);
+		glVertex2i(x + 5, y + 3);	
+		glEnd();
+	}
 }
 
 void Gui_paint_setup_treasure(int x, int y, int team, bool own)
@@ -2229,6 +2308,7 @@ static xp_option_t sdlgui_options[] = {
     COLOR(connColorRGBA, "#00ff0088", "the ball connector"),
     COLOR(fuelColorRGBA, "#ffffff7f", "fuel cells"),
     COLOR(wallColorRGBA, "#0000ffff", "walls on blockmaps"),
+    COLOR(decorColorRGBA, "#bb7700ff", "decorations on blockmaps"),
     COLOR(baseNameColorRGBA, "#0000ff88", "base name"),
     COLOR(shipNameColorRGBA, "#0000ff88", "ship name"),
     COLOR(scoreObjectColorRGBA, "#00ff0088", "score objects"),

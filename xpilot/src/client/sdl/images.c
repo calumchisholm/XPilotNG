@@ -240,6 +240,7 @@ int Images_init(void)
     DEF_IMG("cwise_grav.ppm", -6);
     DEF_IMG("missile.ppm", 32);
     DEF_IMG("asteroid.ppm", 1);
+    DEF_IMG("target.ppm", 1);
 
     first_texture = num_images;
 

@@ -55,6 +55,7 @@ xpilottextures_DATA = \
 	ship_red2.ppm \
 	ship_red3.ppm \
 	sparks.ppm \
+	target.ppm \
 	volcanic.ppm \
 	wall_bottom.ppm \
 	wall_dl.ppm \
