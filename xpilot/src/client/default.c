@@ -646,39 +646,6 @@ xp_option_t default_options[] = {
 	"See also turnSpeed.\n"),
 
     XP_DOUBLE_OPTION(
-	"altPower",
-	55.0,
-	MIN_PLAYER_POWER,
-	MAX_PLAYER_POWER,
-	&power_s,
-	Set_altPower,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set the ship's alternate engine power.\n"
-	"See also the keySwapSettings option.\n"),
-
-    XP_DOUBLE_OPTION(
-	"altTurnSpeed",
-	16.0,
-	MIN_PLAYER_TURNSPEED,
-	MAX_PLAYER_TURNSPEED,
-	&turnspeed_s,
-	Set_altTurnSpeed,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set the ship's alternate turn speed.\n"
-	"See also the keySwapSettings option.\n"),
-
-    XP_DOUBLE_OPTION(
-	"altTurnResistance",
-	0.0,
-	MIN_PLAYER_TURNRESISTANCE,
-	MAX_PLAYER_TURNRESISTANCE,
-	&turnresistance_s,
-	Set_altTurnResistance,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Set the ship's alternate turn resistance.\n"
-	"See also the keySwapSettings option.\n"),
-
-    XP_DOUBLE_OPTION(
 	"scaleFactor",
 	1.0,
 	MIN_SCALEFACTOR,
@@ -1123,6 +1090,39 @@ xp_option_t default_options[] = {
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The number of decimals to use when displaying scores.\n"),
+
+    XP_DOUBLE_OPTION(
+	"altPower",
+	55.0,
+	MIN_PLAYER_POWER,
+	MAX_PLAYER_POWER,
+	&power_s,
+	Set_altPower,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set the ship's alternate engine power.\n"
+	"See also the keySwapSettings option.\n"),
+
+    XP_DOUBLE_OPTION(
+	"altTurnSpeed",
+	16.0,
+	MIN_PLAYER_TURNSPEED,
+	MAX_PLAYER_TURNSPEED,
+	&turnspeed_s,
+	Set_altTurnSpeed,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set the ship's alternate turn speed.\n"
+	"See also the keySwapSettings option.\n"),
+
+    XP_DOUBLE_OPTION(
+	"altTurnResistance",
+	0.0,
+	MIN_PLAYER_TURNRESISTANCE,
+	MAX_PLAYER_TURNRESISTANCE,
+	&turnresistance_s,
+	Set_altTurnResistance,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set the ship's alternate turn resistance.\n"
+	"See also the keySwapSettings option.\n"),
 
 #if 0
     /* kps - remove option later */
