@@ -330,7 +330,8 @@ static void Paint_world_radar_old(void)
 {
     int			i, xi, yi, xm, ym, xp, yp = 0;
     int			xmoff, xioff;
-    int			type, vis, damage;
+    int			type, vis;
+    double		damage;
     float		xs, ys;
     int			npoint = 0, nsegment = 0;
     int			start, end;
@@ -515,9 +516,8 @@ static void Paint_world_radar_old(void)
 		ym = (int)(yi * ys + 0.5);
 		type = Setup->map_data[xmoff + ym];
 		vis = visible[type];
-		if (type >= SETUP_TARGET && type < SETUP_TARGET + 10) {
+		if (type >= SETUP_TARGET && type < SETUP_TARGET + 10)
 		    vis = (Target_alive(xm, ym, &damage) == 0);
-		}
 		if (vis) {
 		    yp = yi;
 		    if (start == -1) {
