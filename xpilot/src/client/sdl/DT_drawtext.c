@@ -123,7 +123,7 @@ void DT_DrawText(const char *string, SDL_Surface *surface, int FontType, int x, 
 	if(x > surface->w || y > surface->h)
 		return;
 
-	if(strlen(string) < (surface->w - x) / CurrentFont->CharWidth)
+	if((int)strlen(string) < (surface->w - x) / CurrentFont->CharWidth)
 		characters = strlen(string);
 	else
 		characters = (surface->w - x) / CurrentFont->CharWidth;

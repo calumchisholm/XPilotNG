@@ -92,10 +92,10 @@ GLWidget *FindGLWidget( GLWidget *list, Uint16 x,Uint16 y );
 void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h);
 GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
 
-extern GLWidget *target[NUM_MOUSE_BUTTONS];
+extern GLWidget *clicktarget[NUM_MOUSE_BUTTONS];
 extern GLWidget *hovertarget;
 
-static char copybuffer[256];
+char copybuffer[256];
 void copytext(const char *text);
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */

@@ -271,7 +271,7 @@ void pop_projection_matrix(void)
 
 fontbounds nprintsize(font_data *ft_font, int length, const char *fmt, ...)
 {
-    unsigned int i=0,j,textlength;
+    int i=0,j,textlength;
     float len;
     fontbounds returnval;
     int start,end,toklen;
@@ -290,7 +290,7 @@ fontbounds nprintsize(font_data *ft_font, int length, const char *fmt, ...)
     	vsnprintf(text, BUFSIZE, fmt, ap);    /* And Converts Symbols To Actual Numbers */
     	va_end(ap); 	    	    /* Results Are Stored In Text */
     }
-    if (!(textlength = MIN(strlen(text),length))) {
+    if (!(textlength = MIN((int)strlen(text),length))) {
     	return returnval;
     }
 
@@ -480,7 +480,7 @@ void free_string_texture(string_tex_t *string_tex)
 
 void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *text, bool onHUD)
 {
-    unsigned int i=0,j,textlength;
+    int i=0,j,textlength;
     fontbounds returnval,dummy;
     float xoff = 0.0,yoff = 0.0;
     int start,end,toklen;
@@ -566,7 +566,7 @@ void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, 
 
 void mapnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *fmt,...)
 {
-    unsigned int textlength;
+    int textlength;
     
     char		text[BUFSIZE];  /* Holds Our String */
     va_list		ap; 	    /* Pointer To List Of Arguments */
@@ -578,7 +578,7 @@ void mapnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int
     	vsnprintf(text, BUFSIZE, fmt, ap);    /* And Converts Symbols To Actual Numbers */
     	va_end(ap); 	    	    /* Results Are Stored In Text */
     }
-    if (!(textlength = MIN(strlen(text),length))) {
+    if (!(textlength = MIN((int)strlen(text),length))) {
     	return;
     }
 
@@ -589,7 +589,7 @@ void mapnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int
 
 void HUDnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *fmt, ...)
 {
-    unsigned int textlength;
+    int textlength;
     
     char		text[BUFSIZE];  /* Holds Our String */
     va_list		ap; 	    /* Pointer To List Of Arguments */
@@ -601,7 +601,7 @@ void HUDnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int
     	vsnprintf(text, BUFSIZE, fmt, ap);    /* And Converts Symbols To Actual Numbers */
     	va_end(ap); 	    	    /* Results Are Stored In Text */
     }
-    if (!(textlength = MIN(strlen(text),length))) {
+    if (!(textlength = MIN((int)strlen(text),length))) {
     	return;
     }
     

@@ -28,6 +28,23 @@
 #define clip_ymax(surface) surface->clip_rect.y+surface->clip_rect.h-1
 
 /* ----- Pixel - fast, no blending, no locking, clipping */
+int fastPixelColorNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color);
+int fastPixelColorNolockNoclip(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color);
+int fastPixelColor(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color);
+int fastPixelRGBA(SDL_Surface * dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int fastPixelRGBANolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int _putPixelAlpha(SDL_Surface * surface, Sint16 x, Sint16 y, Uint32 color, Uint8 alpha);
+int pixelColorNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color);
+int _filledRectAlpha(SDL_Surface * surface, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color, Uint8 alpha);
+int filledRectAlpha(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color);
+int HLineAlpha(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color);
+int VLineAlpha(SDL_Surface * dst, Sint16 x, Sint16 y_1, Sint16 y2, Uint32 color);
+int pixelColorWeight(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color, Uint32 weight);
+int pixelColorWeightNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color, Uint32 weight);
+int hlineColorStore(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color);
+int hlineRGBAStore(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int aalineColorInt(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color, int draw_endpoint);
+double evaluateBezier (double *data, int ndata, double t);
 
 int fastPixelColorNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
 {

@@ -33,8 +33,6 @@ static void option_callback( void *opt, const char *value );
 static void confmenu_callback( void );
 static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data );
 
-static char copybuffer[256];
-
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
     GLWidget *tmp = XMALLOC(GLWidget, 1);
@@ -77,7 +75,7 @@ static void Close_WidgetTree ( GLWidget **widget )
     if ((*widget)->Close) (*widget)->Close(*widget);
 
     for (i=0;i<NUM_MOUSE_BUTTONS;++i)
-    	if (*widget == target[i]) target[i]=NULL;
+    	if (*widget == clicktarget[i]) clicktarget[i]=NULL;
     if (*widget == hovertarget) hovertarget=NULL;
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
@@ -104,7 +102,7 @@ void Close_Widget ( GLWidget **widget )
     if ((*widget)->Close) (*widget)->Close(*widget);
 
     for (i=0;i<NUM_MOUSE_BUTTONS;++i)
-    	if (*widget == target[i]) target[i]=NULL;
+    	if (*widget == clicktarget[i]) clicktarget[i]=NULL;
     if (*widget == hovertarget) hovertarget=NULL;
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
@@ -155,7 +153,7 @@ static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data )
     opt = (xp_option_t *)data;
     
     if (over) {
-    	if (help = Option_get_help(opt)) {
+    	if ((help = Option_get_help(opt))) {
     	    if (!(hoverWidget = Init_ListWidget( x, y, &nullRGBA, &nullRGBA, &nullRGBA, DOWN, LEFT ,false ))) {
 	    	error("hover_optionWidget: Failed to create ListWidget\n");
 		return;
@@ -943,7 +941,6 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWi
 /***********************/
 static void Paint_LabelWidget( GLWidget *widget );
 static void Close_LabelWidget ( GLWidget *widget );
-static void Paint_LabelWidget( GLWidget *widget );
 
 static void button_LabelWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
@@ -3095,6 +3092,8 @@ static void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     
 }
 
+extern int Console_isVisible(void);
+extern int Console_process(SDL_Event *e);
 static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     WrapperWidget *tmp;

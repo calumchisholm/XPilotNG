@@ -308,8 +308,8 @@ int Gui_init(void)
     gluTessCallback(tess, GLU_TESS_BEGIN, glBegin);
     gluTessCallback(tess, GLU_TESS_VERTEX_DATA, vertex_callback);
 #else
-    gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)())glBegin);
-    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (GLvoid (*)())vertex_callback);
+    gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)(void))glBegin);
+    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (GLvoid (*)(void))vertex_callback);
 #endif
     gluTessCallback(tess, GLU_TESS_END, glEnd);
 
@@ -393,7 +393,7 @@ void Gui_paint_fuel(int x, int y, double fuel)
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
-    int color;
+    Uint32 color;
     homebase_t *base = NULL;
     other_t *other;
     bool do_basewarning = false;
@@ -994,7 +994,7 @@ void Gui_paint_appearing(int x, int y, int id, int count)
 {
     const unsigned hsize = 3 * BLOCK_SZ / 7;
     int minx,miny,maxx,maxy;
-    int color;
+    Uint32 color;
     other_t *other = Other_by_id(id);
 
     /* Make a note we are doing the base warning */
@@ -1147,7 +1147,7 @@ static int Gui_is_my_tank(other_t *other)
 
 static int Gui_calculate_ship_color(int id, other_t *other)
 {
-    int ship_color = whiteRGBA;
+    Uint32 ship_color = whiteRGBA;
 
 #ifndef NO_BLUE_TEAM
     if (BIT(Setup->mode, TEAM_PLAY)
@@ -1350,7 +1350,7 @@ void Paint_client_fps(void)
 
     x = draw_width - 20;
     /* Better make sure it's below the meters */
-    y = draw_height - 9*(MAX(meterHeight,gamefont.h) + 6);
+    y = draw_height - 9*(MAX((GLuint)meterHeight,gamefont.h) + 6);
 
     HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %.3f",clientFPS);
 }
@@ -1417,7 +1417,7 @@ static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
 
 void Paint_meters(void)
 {
-    int spacing = MAX(meterHeight,gamefont.h) + 6;
+    int spacing = MAX((GLuint)meterHeight,gamefont.h) + 6;
     int y = spacing, color;
     static bool setup_texs = true;
 

@@ -36,7 +36,7 @@ bool            pointerControl = false;
 
 static int	mouseMovement;	/* horizontal mouse movement. */
 
-GLWidget *target[NUM_MOUSE_BUTTONS];
+GLWidget *clicktarget[NUM_MOUSE_BUTTONS];
 GLWidget *hovertarget = NULL;
 
 int Process_event(SDL_Event *evt);
@@ -89,9 +89,9 @@ bool Key_press_toggle_radar_score(void)
 }
 
 #ifndef _WINDOWS
+extern int videoFlags;
 bool Key_press_toggle_fullscreen(void)
 {
-    extern int videoFlags;
     static int initial_w = -1, initial_h = -1;
     int w, h;
 
@@ -155,11 +155,11 @@ int Process_event(SDL_Event *evt)
     case SDL_MOUSEBUTTONDOWN:
 	button = evt->button.button;
 	if (!pointerControl) {
-	    if ( (target[button-1] = FindGLWidget(MainWidget,evt->button.x,evt->button.y)) ) {
-	    	if (target[button-1]->button) {
-		    target[button-1]->button(button,evt->button.state,
+	    if ( (clicktarget[button-1] = FindGLWidget(MainWidget,evt->button.x,evt->button.y)) ) {
+	    	if (clicktarget[button-1]->button) {
+		    clicktarget[button-1]->button(button,evt->button.state,
 		    	    	    	    evt->button.x,evt->button.y,
-					    target[button-1]->buttondata);
+					    clicktarget[button-1]->buttondata);
 		}
 	    }
 	    
@@ -174,12 +174,12 @@ int Process_event(SDL_Event *evt)
 	} else {
 	    /*xpprintf("mouse motion xrel=%i yrel=%i\n",evt->motion.xrel,evt->motion.yrel);*/
 	    /*for (i = 0;i<NUM_MOUSE_BUTTONS;++i)*/ /* dragdrop for all mouse buttons*/
-	    if (target[0]) { /*is button one pressed?*/
+	    if (clicktarget[0]) { /*is button one pressed?*/
 	    	/*xpprintf("SDL_MOUSEBUTTONDOWN drag: area found!\n");*/
-	    	if (target[0]->motion) {
-		    target[0]->motion(evt->motion.xrel,evt->motion.yrel,
+	    	if (clicktarget[0]->motion) {
+		    clicktarget[0]->motion(evt->motion.xrel,evt->motion.yrel,
 		    	    	    	evt->button.x,evt->button.y,
-					target[0]->motiondata);
+					clicktarget[0]->motiondata);
 		}
 	    } else {
     	    	GLWidget *tmp = FindGLWidget(MainWidget,evt->button.x,evt->button.y);
@@ -201,13 +201,13 @@ int Process_event(SDL_Event *evt)
 	if (pointerControl) {
 	    Pointer_button_released(button);
 	} else {
-	    if ( target[button-1] ) {
-	    	if (target[button-1]->button) {
-		    target[button-1]->button(button,evt->button.state,
+	    if ( clicktarget[button-1] ) {
+	    	if (clicktarget[button-1]->button) {
+		    clicktarget[button-1]->button(button,evt->button.state,
 		    	    	    	    	evt->button.x,evt->button.y,
-						target[button-1]->buttondata);
+						clicktarget[button-1]->buttondata);
 		}
-		target[button-1] = NULL;
+		clicktarget[button-1] = NULL;
 	    }
 	}
 	break;

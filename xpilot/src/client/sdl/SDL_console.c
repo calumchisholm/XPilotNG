@@ -90,7 +90,7 @@ SDL_Event *CON_Events(SDL_Event * event)
 #endif
 	} else {
 	    /* first of all, check if the console hide key was pressed */
-	    if (event->key.keysym.sym == Topmost->HideKey) {
+	    if ((int)event->key.keysym.sym == Topmost->HideKey) {
 		CON_Hide(Topmost);
 		return NULL;
 	    }
@@ -340,7 +340,7 @@ ConsoleInformation *CON_Init(const char *FontName,
     newinfo->CursorPos = 0;
     newinfo->CommandScrollBack = 0;
     newinfo->OutputScreen = DisplayScreen;
-    newinfo->Prompt = CON_DEFAULT_PROMPT;
+    newinfo->Prompt = (char *)&CON_DEFAULT_PROMPT;
     newinfo->HideKey = CON_DEFAULT_HIDEKEY;
 
     CON_SetExecuteFunction(newinfo, Default_CmdFunction);
@@ -654,7 +654,7 @@ void CON_Out(ConsoleInformation * console, const char *str, ...)
        width so we have to cut it into several pieces */
 
     if (console->ConsoleLines) {
-	while (strlen(ptemp) > console->VChars) {
+	while ((int)strlen(ptemp) > console->VChars) {
 	    CON_NewLineConsole(console);
 	    strncpy(console->ConsoleLines[0], ptemp, console->VChars);
 	    console->ConsoleLines[0][console->VChars] = '\0';
@@ -886,7 +886,7 @@ void CON_SetPrompt(ConsoleInformation * console, char *newprompt)
 	return;
 
     /* check length so we can still see at least 1 char :-) */
-    if (strlen(newprompt) < console->VChars)
+    if ((int)strlen(newprompt) < console->VChars)
 	console->Prompt = strdup(newprompt);
     else
 	CON_Out(console, "prompt too long. (max. %i chars)",
@@ -995,7 +995,7 @@ void Cursor_Right(ConsoleInformation * console)
 {
     char temp[CON_CHARS_PER_LINE + 1];
 
-    if (Topmost->CursorPos < strlen(Topmost->Command)) {
+    if (Topmost->CursorPos < (int)strlen(Topmost->Command)) {
 	Topmost->CursorPos++;
 	strncat(Topmost->LCommand, Topmost->RCommand, 1);
 	strcpy(temp, Topmost->RCommand);

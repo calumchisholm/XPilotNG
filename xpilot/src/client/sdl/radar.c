@@ -469,8 +469,6 @@ static void Radar_paint( GLWidget *widget )
 {
     float xf, yf;
     
-    SDL_Rect radar_bounds;
-
     radar_bounds.x = ((GLWidget *)widget)->bounds.x;
     radar_bounds.y = ((GLWidget *)widget)->bounds.y;
     radar_bounds.w = ((GLWidget *)widget)->bounds.w-1;

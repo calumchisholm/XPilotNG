@@ -47,4 +47,4 @@ if [ "x$CC" != "xg++" ]; then
     CFLAGS="$CFLAGS $CFLAGS_C"
 fi
 
-./configure --prefix=$HOME --enable-sdl-client
+./configure --prefix=$HOME
