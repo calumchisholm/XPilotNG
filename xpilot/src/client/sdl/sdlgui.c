@@ -177,7 +177,7 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
 
     if (BIT(p_style.flags, STYLE_TEXTURED))
 	texture = Image_get_texture(p_style.texture);
-    
+
     glNewList(polyListBase + i,  GL_COMPILE);
     gluTessBeginPolygon(tess, texture);
     gluTessVertex(tess, v, &p[0]);
@@ -208,7 +208,7 @@ int Gui_init(void)
 	error("failed to create tessellation object");
 	return -1;
     }
-    
+
     gluTessCallback(tess, GLU_TESS_BEGIN, (_GLUfuncptr)glBegin);
     gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (_GLUfuncptr)vertex_callback);
     gluTessCallback(tess, GLU_TESS_END, (_GLUfuncptr)glEnd);
@@ -280,10 +280,10 @@ void Gui_paint_fuel(int x, int y, double fuel)
     area.y = (BLOCK_SZ - 2 * FUEL_BORDER) * (1 - fuel / MAX_STATION_FUEL);
     area.w = BLOCK_SZ - 2 * FUEL_BORDER;
     area.h = size;
-    Image_paint_area(IMG_FUEL, 
-		     x + FUEL_BORDER, 
-		     y + FUEL_BORDER, 
-		     frame, 
+    Image_paint_area(IMG_FUEL,
+		     x + FUEL_BORDER,
+		     y + FUEL_BORDER,
+		     frame,
 		     &area,
 		     get_alpha(fuelColorRGBA));
 }
@@ -307,7 +307,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
         errno = 0;
         error("Bad base dir.");
         return;
-    }    
+    }
 
     int color;
     homebase_t *base = NULL;
@@ -355,9 +355,9 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 		color = redRGBA;
 	}
     }
-    
+
     /* TODO : figure out how to make the text stop wobbling */
-    
+
     color |= 0x000000ff;
     switch (type) {
     case SETUP_BASE_UP:
@@ -546,31 +546,30 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 #endif
 #if 1
     /* This makes the walls wobble */
-    glTranslatef((int)((xoff * Setup->width + polygon.points[0].x 
+    glTranslatef((int)((xoff * Setup->width + polygon.points[0].x
 			- world.x) * scale),
-		 (int)((yoff * Setup->height + polygon.points[0].y 
+		 (int)((yoff * Setup->height + polygon.points[0].y
 			- world.y) * scale),
 	0);
     glScalef(scale, scale, 0);
 #endif
 
-    if (!instruments.showOutlineWorld) {
-
+    if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
+	    BIT(p_style.flags, STYLE_TEXTURED | STYLE_FILLED)) {
 	if (BIT(p_style.flags, STYLE_TEXTURED)
 	    && instruments.showTexturedWalls) {
 
 	    Image_use_texture(p_style.texture);
 	    glCallList(polyListBase + i);
 	    Image_no_texture();
-
 	} else if (BIT(p_style.flags, STYLE_FILLED)
 		   || instruments.showFilledWorld
-		   || (BIT(p_style.flags, STYLE_TEXTURED) 
+		   || (BIT(p_style.flags, STYLE_TEXTURED)
 		       && !instruments.showTexturedWalls)) {
 
 	    set_alphacolor((p_style.rgb << 8) | 0xff);
 	    glCallList(polyListBase + i);
-	} 
+	}
     }
 
     set_alphacolor((e_style.rgb << 8) | 0xff);
@@ -625,12 +624,12 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 void Gui_paint_spark(int color, int x, int y)
 {
     /*
-    Image_paint(IMG_SPARKS, 
-		x + world.x, 
-		world.y + ext_view_height - y, 
+    Image_paint(IMG_SPARKS,
+		x + world.x,
+		world.y + ext_view_height - y,
 		color);
     */
-    glColor3ub(255 * (color + 1) / 8, 
+    glColor3ub(255 * (color + 1) / 8,
 	       255 * color * color / 64,
 	       0);
     glBegin(GL_POINTS);
@@ -655,17 +654,17 @@ void Gui_paint_fastshot(int color, int x, int y)
 {
     /* not sure why i need that 7 to make it right */
     /* that 2 seems to be the size/2 of the bullet */
-    Image_paint(IMG_BULLET, 
-		x + world.x - 3, 
-		world.y - 6 + ext_view_height - y, 
+    Image_paint(IMG_BULLET,
+		x + world.x - 3,
+		world.y - 6 + ext_view_height - y,
 		5,255);
 }
 
 void Gui_paint_teamshot(int x, int y)
 {
-    Image_paint(IMG_BULLET_OWN, 
-		x + world.x - 3, 
-		world.y - 6 + ext_view_height - y, 
+    Image_paint(IMG_BULLET_OWN,
+		x + world.x - 3,
+		world.y - 6 + ext_view_height - y,
 		5,255);
 }
 
@@ -695,7 +694,7 @@ void Gui_paint_laser(int color, int x_1, int y_1, int len, int dir)
 
 void Gui_paint_paused(int x, int y, int count)
 {
-    Image_paint(IMG_PAUSED, 
+    Image_paint(IMG_PAUSED,
 		x - BLOCK_SZ / 2,
 		y - BLOCK_SZ / 2,
 		(count <= 0 || loopsSlow % 10 >= 5) ? 1 : 0,128);
@@ -714,15 +713,15 @@ void Gui_paint_appearing(int x, int y, int id, int count)
 	if (base != NULL)
 	    base->appeartime = loops + (count * clientFPS) / 120;
     }
-    
+
     minx = x - (int)hsize;
     miny = y - (int)hsize;
     maxx = minx + 2 * hsize + 1;
     maxy = miny + (unsigned)(count / 180. * hsize + 1);
-    
+
     color = Life_color(other);
     set_alphacolor((color)?color:redRGBA);
-    
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glBegin(GL_QUADS);
@@ -819,7 +818,7 @@ int Team_color(int team)
 int Life_color_by_life(int life)
 {
     int color;
-	
+
     if (life > 2)
 	color = manyLivesColorRGBA;
     else if (life == 2)
@@ -932,7 +931,7 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 static void Gui_paint_ship_name(int x, int y, other_t *other)
 {
     int color = Life_color(other);
-    
+
     /* TODO : do all name painting together, so we don't need
      * all theese setupPaint<foo> calls
      */
@@ -1073,8 +1072,8 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     	glVertex2i(x+(int)(((meterWidth)*val)/(max?max:1)),y+2+meterHeight-3);
     	glVertex2i(x+(int)(((meterWidth)*val)/(max?max:1)),y);
     glEnd();
-    
-    
+
+
 
     /* meterBorderColorRGBA = 0 obviously means no meter borders are drawn */
     if (meterBorderColorRGBA) {
@@ -1224,7 +1223,7 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
 
  	    x = x + draw_width / 2;
  	    y = -y + draw_height / 2;
-	    
+
 	    if (radar_ptr[i].type == normal) {
 		if (hudRadarEnemyColorRGBA)
 		    Circle(hudRadarEnemyColorRGBA, x, y, sz, 1);
@@ -1251,7 +1250,7 @@ void Paint_HUD(void)
     int tempx,tempy,tempw,temph;
     fontbounds dummy;
     hudRadarLimit = 0.050;
-        
+
     glEnable(GL_BLEND);
     /*
      * Show speed pointer
@@ -1275,11 +1274,11 @@ void Paint_HUD(void)
 		    (int) (draw_width / 2 + 100 * tcos(heading)),
 		    (int) (draw_height / 2 - 100 * tsin(heading)));
     }
-    
+
     /* TODO */
     /* This should be done in a nicer way now (using radar.c maybe) */
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     if (hudRadarEnemyColorRGBA || hudRadarOtherColorRGBA) {
 	hudRadarMapScale = (double) Setup->width / (double) 256;
 	Paint_hudradar(
@@ -1296,7 +1295,7 @@ void Paint_HUD(void)
 			   (active_view_height / 2)*scale,
 			   SHIP_SZ);
     }
-    
+
 
     glDisable(GL_BLEND);
     /* message scan hack by mara*/
@@ -1325,7 +1324,7 @@ void Paint_HUD(void)
     	glBegin(GL_LINES);
     	    glVertex2i(hud_pos_x - hudSize,hud_pos_y - hudSize + HUD_OFFSET);
 	    glVertex2i(hud_pos_x + hudSize,hud_pos_y - hudSize + HUD_OFFSET);
-    	    
+
 	    glVertex2i(hud_pos_x - hudSize,hud_pos_y + hudSize - HUD_OFFSET);
 	    glVertex2i(hud_pos_x + hudSize,hud_pos_y + hudSize - HUD_OFFSET);
     	glEnd();
@@ -1335,7 +1334,7 @@ void Paint_HUD(void)
     	glBegin(GL_LINES);
     	    glVertex2i(hud_pos_x - hudSize + HUD_OFFSET,hud_pos_y - hudSize);
 	    glVertex2i(hud_pos_x - hudSize + HUD_OFFSET,hud_pos_y + hudSize);
-    	    
+
 	    glVertex2i(hud_pos_x + hudSize - HUD_OFFSET,hud_pos_y - hudSize);
 	    glVertex2i(hud_pos_x + hudSize - HUD_OFFSET,hud_pos_y + hudSize);
     	glEnd();
@@ -1655,4 +1654,3 @@ void Paint_messages(void)
 	width = nprintsize(&messagefont,MIN(len, msg->len),msg->txt).width; /*this is not accurate*/
     }
 }
-
