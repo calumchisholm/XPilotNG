@@ -627,9 +627,8 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	    result = CMD_RESULT_ERROR;
 	}
 	else if (arg) {
-	    char		*errorstr;
 	    /* a name is specified */
-#if 1
+	    char *errorstr;
 	    player *pl2 = Get_player_by_name(arg, NULL, &errorstr);
 	    if (pl2) {
 		if (cmd == AllyInvite)
@@ -646,37 +645,6 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 		strcpy(msg, errorstr);
 		result = CMD_RESULT_ERROR;
 	    }
-#else
-	    int i = Get_player_index_by_name(arg);
-	    if (i >= 0) {
-		player *pl2 = Players(i);
-
-		if (cmd == AllyInvite) {
-		    Invite_player(pl, pl2);
-		}
-		else if (cmd == AllyRefuse) {
-		    Refuse_alliance(pl, pl2);
-		}
-		else if (cmd == AllyAccept) {
-		    Accept_alliance(pl, pl2);
-		}
-		else {
-		    strlcpy(msg, usage, MSG_LEN);
-		    result = CMD_RESULT_ERROR;
-		}
-	    } else {
-		if (i == -1) {
-		    sprintf(msg, "Name does not match any player.");
-		}
-		else if (i == -2) {
-		    sprintf(msg, "Name matches several players.");
-		}
-		else {
-		    sprintf(msg, "Error.");
-		}
-		result = CMD_RESULT_ERROR;
-	    }
-#endif
 	} else {
 	    /* no player name is specified */
 	    if (cmd == AllyCancel) {
@@ -860,7 +828,6 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
 
-#if 1
     kicked_pl = Get_player_by_name(arg, NULL, &errorstr);
     if (kicked_pl) {
 	sprintf(msg, "%s kicked %s out! [*Server notice*]",
@@ -874,32 +841,6 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_SUCCESS;
     }
     strcpy(msg, errorstr);
-#else
-    i = Get_player_index_by_name(arg);
-    if (i >= 0) {
-	player *pl_i = Players(i);
-	sprintf(msg, "%s kicked %s out! [*Server notice*]",
-		pl->name, pl_i->name);
-	if (pl_i->conn == NOT_CONNECTED) {
-	    Delete_player(pl_i);
-	}
-	else {
-	    Destroy_connection(pl_i->conn, "kicked out");
-	}
-	Set_message(msg);
-	strcpy(msg, "");
-	return CMD_RESULT_SUCCESS;
-    }
-    else if (i == -1) {
-	sprintf(msg, "Name does not match any player.");
-    }
-    else if (i == -2) {
-	sprintf(msg, "Name matches several players.");
-    }
-    else {
-	sprintf(msg, "Error.");
-    }
-#endif
 
     return CMD_RESULT_ERROR;
 }
@@ -1050,29 +991,16 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
     name = strpbrk(arg, " \t");
     if (name) {
 	char *errorstr;
-	/*int ind;*/
 
 	*name++ = '\0';
-	while (isspace(*name)) name++;
+	while (isspace(*name))
+	    name++;
 
-#if 1
 	pl = Get_player_by_name(name, NULL, &errorstr);
 	if (!pl) {
 	    strcpy(msg, errorstr);
 	    return CMD_RESULT_ERROR;
 	}
-#else
-	ind = Get_player_index_by_name(name);
-	switch (ind) {
-	case -1:
-	    sprintf(msg, "Name does not match any player.");
-	    return CMD_RESULT_ERROR;
-	case -2:
-	    sprintf(msg, "Name matches several players.");
-	    return CMD_RESULT_ERROR;
-	}
-	pl = Players(ind);
-#endif
     }
 
     priv = 0;
@@ -1148,7 +1076,6 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
 
-#if 1
     pl2 = Get_player_by_name(arg, NULL, &errorstr);
     if (!pl2) {
 	strcpy(msg, errorstr);
@@ -1173,34 +1100,6 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
     }
 
     return CMD_RESULT_SUCCESS;
-#else
-    i = Get_player_index_by_name(arg);
-    if (i >= 0) {
-	player *pl_i = Players(i);
-
-	if (pl_i->conn != NOT_CONNECTED) {
-	    if (Player_is_playing(pl_i))
-		Kill_player(pl_i, false);
-	    if (Team_zero_pausing_available()) {
-		sprintf(msg, "%s was pause-swapped by %s.",
-			pl_i->name, pl->name);
-		/* apparently Handle_player_command busts it */
-		Handle_player_command(pl_i, "team 0");
-	    } else {
-		Pause_player(pl_i, true);
-		sprintf(msg, "%s was paused by %s.",
-			pl_i->name, pl->name);
-	    }
-	    Set_message(msg);
-	    strcpy(msg, "");
-	    return CMD_RESULT_SUCCESS;
-	}
-    }
-
-    sprintf(msg, "Invalid player id.");
-
-    return CMD_RESULT_ERROR;
-#endif
 }
 
 
