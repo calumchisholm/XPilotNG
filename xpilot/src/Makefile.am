@@ -1,1 +1,7 @@
-SUBDIRS = common client server replay
+if COND_SERVER_ONLY
+  MAYBE_CLIENT_REPLAY =
+else
+  MAYBE_CLIENT_REPLAY = client replay
+endif
+
+SUBDIRS = common server $(MAYBE_CLIENT_REPLAY)

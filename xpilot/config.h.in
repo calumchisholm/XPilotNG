@@ -320,6 +320,9 @@
 /* Define to the type of arg 5 for `select'. */
 #undef SELECT_TYPE_ARG5
 
+/* build only the server */
+#undef SERVER_ONLY
+
 /* Define to 1 if the `setvbuf' function takes the buffering type as its
    second argument and the buffer pointer as the third, as on System V before
    release 3. */
@@ -342,6 +345,9 @@
 
 /* Define to 1 if the X Window System is missing or not being used. */
 #undef X_DISPLAY_MISSING
+
+/* compiling for windows target */
+#undef _WINDOWS
 
 /* Define like PROTOTYPES; this can be used by system headers. */
 #undef __PROTOTYPES

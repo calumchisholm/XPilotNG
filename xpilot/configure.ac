@@ -50,6 +50,13 @@ AC_ARG_ENABLE(plockserver,
 	AC_DEFINE([PLOCKSERVER], 1, [lock the xpilot-ng server into memory])
 fi])
 
+AC_ARG_ENABLE(server_only,
+	AC_HELP_STRING([--enable-server-only],
+			[build only the server]),
+[if test x$enable_server_only = xyes; then
+	AC_DEFINE([SERVER_ONLY], 1, [build only the server])
+fi])
+
 AC_ARG_ENABLE(development,
 	AC_HELP_STRING([--enable-development],
 			[enable development code]),
@@ -134,28 +141,43 @@ dnl Figure out which math library to use
 dnl (borrowed from from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz)
 case "$target" in
     *-*-mingw32*)
-        MATHLIB=""
-        SYS_GL_LIBS="-lopengl32 -lglu32"
-        ;;
+	MATHLIB=""
+	SYS_GL_LIBS="-lopengl32 -lglu32"
+	windows_target=yes
+	;;
     *-*-beos*)
-        MATHLIB=""
-        SYS_GL_LIBS="-lGL"
-        ;;
+	MATHLIB=""
+	SYS_GL_LIBS="-lGL"
+	;;
     *-*-linux*)
-        MATHLIB="-lm"
-        SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
-        ;;
+	MATHLIB="-lm"
+	SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
+	;;
     *-*-freebsd*)
-        MATHLIB="-lm"
-        SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
+	MATHLIB="-lm"
+	SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
 	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include -I/usr/local/include"
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
-        ;;
+	;;
     *)
-        MATHLIB="-lm"
-        SYS_GL_LIBS="-lGL -lGLU"
-        ;;
+	MATHLIB="-lm"
+	SYS_GL_LIBS="-lGL -lGLU"
+	;;
 esac
+
+dnl marvin - enable newsched and server-only when building for windows
+if test x$windows_target = xyes; then
+	W32_LIBS="-lmingw32 -lwsock32"
+	AC_SUBST(W32_LIBS)
+	AC_DEFINE([_WINDOWS], 1, [compiling for windows target])
+	
+	enable_newsched=yes
+	AC_DEFINE([NEWSCHED], 1,
+		[enable new server scheduling most useful on Linux 2.6])
+		
+	enable_server_only=yes
+	AC_DEFINE([SERVER_ONLY], 1, [build only the server])
+fi
 
 dnl Stuff needed by SDL client.
 if test x$enable_sdl_client = xyes; then
@@ -164,8 +186,8 @@ if test x$enable_sdl_client = xyes; then
 	dnl from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz
 	SDL_VERSION=1.2.0
 	AM_PATH_SDL($SDL_VERSION,
-        	    :,
-	            AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
+		    :,
+		    AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
 	)
 	CFLAGS="$CFLAGS $SDL_CFLAGS"
 	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
@@ -233,6 +255,7 @@ if test x$enable_sdl_client = xyes; then
 	AC_SUBST(GL_LIBS)
 fi
 
+AM_CONDITIONAL([COND_SERVER_ONLY], [test x$enable_server_only = xyes])
 AM_CONDITIONAL([COND_SDL_CLIENT], [test x$enable_sdl_client = xyes])
 AM_CONDITIONAL([COND_SDL_GAMELOOP], [test x$enable_sdl_gameloop = xyes])
 
