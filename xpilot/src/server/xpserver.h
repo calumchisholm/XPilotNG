@@ -27,8 +27,10 @@
 #define SERVER
 #include "xpcommon.h"
 
-#ifdef HAVE_EXPAT_H
+#ifdef HAVE_LIBEXPAT
 #  include <expat.h>
+#else
+#  error "Header expat.h missing. Please install expat."
 #endif
 
 #ifdef PLOCKSERVER

@@ -90,7 +90,6 @@ AC_CHECK_HEADERS([ \
 	bstring.h \
 	ctype.h \
 	errno.h \
-	expat.h \
 	fcntl.h \
 	float.h \
 	limits.h \
@@ -117,7 +116,6 @@ AC_CHECK_HEADERS([ \
 	sys/sockio.h \
 	sys/time.h \
 	values.h \
-	zlib.h \
 	X11/X.h \
 	X11/Xlib.h \
 	X11/Xos.h \

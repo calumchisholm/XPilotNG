@@ -30,9 +30,6 @@
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
-/* Define to 1 if you have the <expat.h> header file. */
-#undef HAVE_EXPAT_H
-
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
@@ -276,9 +273,6 @@
 
 /* Define to 1 if you have the <X11/X.h> header file. */
 #undef HAVE_X11_X_H
-
-/* Define to 1 if you have the <zlib.h> header file. */
-#undef HAVE_ZLIB_H
 
 /* Try to log every server start to log file */
 #undef LOG
