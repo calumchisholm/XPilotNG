@@ -142,7 +142,7 @@ int linec = 0;
 
 int polyc = 0;
 
-int groupc = 0;
+int num_groups = 0;
 
 int mapx, mapy;
 

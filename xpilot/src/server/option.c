@@ -174,7 +174,7 @@ static char	*FileName;
 
 static int edg[5000 * 2]; /* !@# change pointers in poly_t when realloc poss.*/
 extern int polyc;
-extern int groupc;
+extern int num_groups;
 extern struct {int type; unsigned int hit_mask; int team;} groups[];
 
 int *edges = edg;
@@ -190,7 +190,7 @@ poly_t *pdata;
 
 int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
 static int max_bases, max_balls, max_fuels, max_checks, max_polys,max_echanges;
-static int current_estyle;
+static int current_estyle, current_group;
 
 static int get_bmp_id(const char *s)
 {
@@ -326,10 +326,10 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "BallArea")) {
 	int team;
-	groupc++;
-	groups[groupc].type = TREASURE;
-	groups[groupc].team = team;
-	groups[groupc].hit_mask = BALL_BIT;
+	current_group = num_groups++;
+	groups[current_group].type = TREASURE;
+	groups[current_group].team = team;
+	groups[current_group].hit_mask = BALL_BIT;
     }
 
     if (!strcasecmp(el, "BallTarget")) {
@@ -339,10 +339,10 @@ static void tagstart(void *data, const char *el, const char **attr)
 		team = atoi(*(attr + 1));
 	    attr += 2;
 	}
-	groupc++;
-	groups[groupc].type = TREASURE;
-	groups[groupc].team = team;
-	groups[groupc].hit_mask = NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));
+	current_group = num_groups++;
+	groups[current_group].type = TREASURE;
+	groups[current_group].team = team;
+	groups[current_group].hit_mask = NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));
     }
 
     if (!strcasecmp(el, "Polygon")) {
@@ -366,7 +366,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	ptscount = 0;
 	t.x = x;
 	t.y = y;
-	t.group = groupc;
+	t.group = current_group;
 	t.edges = edges;
 	t.style = style;
 	t.estyles_start = ecount;
@@ -512,6 +512,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 static void tagend(void *data, const char *el)
 {
     void cmdhack(void);
+    if (!strcasecmp(el, "BallArea") || !strcasecmp(el, "BallTarget"))
+	current_group = 0;
     if (!strcasecmp(el, "Polygon")) {
 	pdata[polyc - 1].num_points = ptscount;
 	pdata[polyc - 1].num_echanges = ecount -pdata[polyc - 1].estyles_start;
