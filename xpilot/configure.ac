@@ -469,6 +469,8 @@ AC_CHECK_FUNCS([ \
 AC_CONFIG_FILES([ \
 	Makefile \
 	README \
+	contrib/Makefile \
+	contrib/xpngcc/Makefile \
 	doc/Makefile \
 	doc/man/Makefile \
 	lib/Makefile \
