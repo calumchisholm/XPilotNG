@@ -324,6 +324,11 @@ static void Player_toggle_pause(player_t *pl)
 	pausetype = paused;
     else if (Player_is_hoverpaused(pl))
 	pausetype = hoverpaused;
+    else if (Player_is_appearing(pl)) {
+	 Set_player_message(pl,
+	    "You can't pause while your ship is appearing. [*Server notice*]");
+	 return;
+    }
     else {
 	base_t *base = pl->home_base;
 	double dist = Wrap_length(pl->pos.cx - base->pos.cx,
@@ -334,13 +339,15 @@ static void Player_toggle_pause(player_t *pl)
 	    minv = 3.0;
 	    pausetype = paused;
 	} else {
-	    /* Too far away from normal pause, use hoverpause. */
 	    minv = 5.0;
 	    pausetype = hoverpaused;
 	}
 	minv += VECTOR_LENGTH(World_gravity(world, pl->pos));
-	if (pl->velocity > minv)
+	if (pl->velocity > minv) {
+	    Set_player_message(pl,
+		       "You need to slow down to pause. [*Server notice*]");
 	    return;
+	}
     }
 
     switch (pausetype) {
