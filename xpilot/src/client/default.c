@@ -387,7 +387,7 @@ option options[] = {
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Scan messages for BALL,SAFE,COVER,POP and paint \n"
+	"Scan messages for BALL, SAFE, COVER and POP and paint \n"
 	"warning circles inside ship.\n"
     },
     {
@@ -1081,7 +1081,7 @@ option options[] = {
 	NULL,
 	"2.0",
 	KEY_DUMMY,
-	"Scales radar to hud filtering out everything but enemies.\n"
+	"The relative size of the hudradar.\n"
     },
     {
 	"hudRadarLimit",
