@@ -404,6 +404,9 @@ static void Init_ranknode(ranknode_t *rank,
 ranknode_t *Rank_get_by_name(const char *name)
 {
     int i;
+    player_t *pl;
+
+    assert(name != NULL);
 
     for (i = 0; i < MAX_SCORES; i++) {
 	ranknode_t *rank = &ranknodes[i];
@@ -412,16 +415,17 @@ ranknode_t *Rank_get_by_name(const char *name)
 	    return rank;
     }
 
+    /*
+     * If name doesn't equal any nick in the ranking list (ignoring case),
+     * let's see if it could be an abbreviation of the nick of some player
+     * who is currently playing.
+     */
+    pl = Get_player_by_name(name, NULL, NULL);
+    if (pl && pl->rank)
+	return pl->rank;
+
     return NULL;
 }
-
-
-void Rank_nuke_score(ranknode_t *rank)
-{
-    Init_ranknode(rank, "", "", "");
-    assert(rank->timestamp == 0);
-}
-
 
 /* Read scores from disk, and zero-initialize the ones that are not used.
    Call this on startup. */
