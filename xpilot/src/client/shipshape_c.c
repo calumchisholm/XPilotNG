@@ -28,7 +28,7 @@ char shipshape_c_version[] = VERSION;
 extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
 
-bool do_sshack = false;
+bool is_server = false;
 
 void Rotate_point(shapepos pt[RES])
 {
@@ -38,60 +38,6 @@ void Rotate_point(shapepos pt[RES])
 	pt[i].pxl.x = (tcos(i) * pt[0].pxl.x - tsin(i) * pt[0].pxl.y) + .5;
 	pt[i].pxl.y = (tsin(i) * pt[0].pxl.x + tcos(i) * pt[0].pxl.y) + .5;
     }
-}
-
-/*
- * Return a pointer to a default ship.
- * This function should always succeed,
- * therefore no malloc()ed memory is used.
- */
-shipobj *Default_ship(void)
-{
-    static shipobj	sh;
-    static shapepos	pts[6][RES];
-
-    if (!sh.num_points) {
-	sh.num_points = 3;
-	sh.num_orig_points = 3;
-	sh.pts[0] = &pts[0][0];
-	sh.pts[0][0].pxl.x = 15;
-	sh.pts[0][0].pxl.y = 0;
-	sh.pts[1] = &pts[1][0];
-	sh.pts[1][0].pxl.x = -9;
-	sh.pts[1][0].pxl.y = 8;
-	sh.pts[2] = &pts[2][0];
-	sh.pts[2][0].pxl.x = -9;
-	sh.pts[2][0].pxl.y = -8;
-
-	sh.engine[0].pxl.x = -9;
-	sh.engine[0].pxl.y = 0;
-
-	sh.m_gun[0].pxl.x = 15;
-	sh.m_gun[0].pxl.y = 0;
-
-	sh.num_l_light = 1;
-	sh.l_light[0] = &pts[3][0];
-	sh.l_light[0][0].pxl.x = -9;
-	sh.l_light[0][0].pxl.y = 8;
-
-	sh.num_r_light = 1;
-	sh.r_light[0] = &pts[4][0];
-	sh.r_light[0][0].pxl.x = -9;
-	sh.r_light[0][0].pxl.y = -8;
-
-	sh.num_m_rack = 1;
-	sh.m_rack[0] = &pts[5][0];
-	sh.m_rack[0][0].pxl.x = 15;
-	sh.m_rack[0][0].pxl.y = 0;
-
-	sh.num_l_gun = sh.num_r_gun = sh.num_l_rgun = sh.num_r_rgun = 0;
-
-	Make_table();
-
-	Rotate_ship(&sh);
-    }
-
-    return &sh;
 }
 
 void Calculate_shield_radius(shipobj *w)

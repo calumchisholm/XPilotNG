@@ -197,6 +197,13 @@ position Ship_get_m_rack_position(shipobj *ship, int rack, int dir);
 
 #endif
 
+void Ship_set_point(shipobj *ship, int i, DFLOAT x, DFLOAT y);
+void Ship_set_engine(shipobj *ship, DFLOAT x, DFLOAT y);
+void Ship_set_m_gun(shipobj *ship, DFLOAT x, DFLOAT y);
+void Ship_set_l_light(shipobj *ship, DFLOAT x, DFLOAT y);
+void Ship_set_r_light(shipobj *ship, DFLOAT x, DFLOAT y);
+void Ship_set_m_rack(shipobj *ship, DFLOAT x, DFLOAT y);
+
 extern DFLOAT rfrac(void);
 
 extern int mod(int x, int y);

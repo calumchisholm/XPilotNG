@@ -25,8 +25,7 @@
 
 char shipshape_s_version[] = VERSION;
 
-/* always do SSHACK, it seems to work */
-bool do_sshack = true;
+bool is_server = true;
 
 extern void	Make_table(void);
 
@@ -34,75 +33,20 @@ void Rotate_point(shapepos pt[RES])
 {
     int			i;
 
-    pt[0].clk.cx *= CLICK;
-    pt[0].clk.cy *= CLICK;
+    /*pt[0].clk.cx *= CLICK;
+      pt[0].clk.cy *= CLICK;*/
     for (i = 1; i < RES; i++) {
 	pt[i].clk.cx = (tcos(i) * pt[0].clk.cx - tsin(i) * pt[0].clk.cy) + .5;
 	pt[i].clk.cy = (tsin(i) * pt[0].clk.cx + tcos(i) * pt[0].clk.cy) + .5;
     }
 }
 
-/*
- * Return a pointer to a default ship.
- * This function should always succeed,
- * therefore no malloc()ed memory is used.
- */
-shipobj *Default_ship(void)
-{
-    static shipobj	sh;
-    static shapepos	pts[6][RES];
-
-    if (!sh.num_points) {
-	sh.num_points = 3;
-	sh.num_orig_points = 3;
-	sh.pts[0] = &pts[0][0];
-	sh.pts[0][0].clk.cx = 15;
-	sh.pts[0][0].clk.cy = 0;
-	sh.pts[1] = &pts[1][0];
-	sh.pts[1][0].clk.cx = -9;
-	sh.pts[1][0].clk.cy = 8;
-	sh.pts[2] = &pts[2][0];
-	sh.pts[2][0].clk.cx = -9;
-	sh.pts[2][0].clk.cy = -8;
-
-	sh.engine[0].clk.cx = -9;
-	sh.engine[0].clk.cy = 0;
-
-	sh.m_gun[0].clk.cx = 15;
-	sh.m_gun[0].clk.cy = 0;
-
-	sh.num_l_light = 1;
-	sh.l_light[0] = &pts[3][0];
-	sh.l_light[0][0].clk.cx = -9;
-	sh.l_light[0][0].clk.cy = 8;
-
-	sh.num_r_light = 1;
-	sh.r_light[0] = &pts[4][0];
-	sh.r_light[0][0].clk.cx = -9;
-	sh.r_light[0][0].clk.cy = -8;
-
-	sh.num_m_rack = 1;
-	sh.m_rack[0] = &pts[5][0];
-	sh.m_rack[0][0].clk.cx = 15;
-	sh.m_rack[0][0].clk.cy = 0;
-
-	sh.num_l_gun = sh.num_r_gun = sh.num_l_rgun = sh.num_r_rgun = 0;
-
-	Make_table();
-
-	Rotate_ship(&sh);
-    }
-
-    return &sh;
-}
-
 shapepos ipos2shapepos(ipos pos)
 {
     shapepos shpos;
 
-    /* kps - this should be foo = FLOAT_TO_CLICK(bar); */
-    shpos.clk.cx = pos.x;
-    shpos.clk.cy = pos.y;
+    shpos.clk.cx = PIXEL_TO_CLICK(pos.x);
+    shpos.clk.cy = PIXEL_TO_CLICK(pos.y);
 
     return shpos;
 }
