@@ -38,7 +38,11 @@ char myClass[] = "XPilot";
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
-static void Set_option(char *option, char *value)
+/*
+ * This could also be used from a client '\set' command, e.g.
+ * "\set scalefactor 1.5"
+ */
+void Set_option(char *option, char *value)
 {
     printf("setting option '%s' to '%s'\n", option, value);
 }
@@ -148,16 +152,10 @@ void Get_xpilotrc_file(char *path, unsigned size)
 }
 #endif
 
-void Read_xpilotrc_file(FILE *file)
-{
-
-
-}
 
 
 
-
-#else
+#else /* OPTIONHACK */
 
 
 #include "xpclient_x11.h"
