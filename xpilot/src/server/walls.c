@@ -58,7 +58,7 @@
 
 static struct move_parameters mp; /* moved here */
 
-/* Maximum line length 32767.
+/* Maximum line length 32767-B_CLICKS, 30000 used in checks
    There's a minimum map size to avoid "too much wrapping". A bit smaller
    than that would cause rare errors for fast-moving things. I haven't
    bothered to figure out what the limit is. 80k x 80k clicks should
@@ -121,11 +121,12 @@ struct blockinfo {
 struct inside_block {
     short *y;
     short *lines;
+    short num_y;
+    short num_lines;
+    short base_value;
 };
 
-struct inside_block *inside_table[10];
-
-static struct inside_block filled_block;
+struct inside_block inside_table[110*110];
 
 wireobj ball_wire;
 
@@ -1411,20 +1412,19 @@ int is_inside(int x, int y)
 {
     int block;
     short *ptr;
-    int inside = 0;
+    int inside;
     int x1, x2, y1, y2, s;
 
     block = (x >> B_SHIFT) + mapx * (y >> B_SHIFT);
-    if (inside_table[block] == NULL)
-	return 0;
-    else if (inside_table[block] == &filled_block)
-	return 1;
+    inside = inside_table[block].base_value;
+    if (inside_table[block].num_lines == 0)
+	return inside;
     x &= B_MASK;
     y &= B_MASK;
-    ptr = inside_table[block]->y;
+    ptr = inside_table[block].y;
     while (y > *ptr++)
 	inside++;
-    ptr = inside_table[block]->lines;
+    ptr = inside_table[block].lines;
     while (*ptr != -1) {
 	x1 = *ptr++ - x;
 	y1 = *ptr++ - y;
@@ -1465,18 +1465,134 @@ int is_inside(int x, int y)
 }
 
 
-static void store_inside_line(int bx, int by, double dist, int inside)
+static void closest_line(int bx, int by, double dist, int inside)
 {
+    if (dist == 0)
+	dist = 4 * B_CLICKS;
     if (dist <= array[bx][by].distance) {
 	if (dist == array[bx][by].distance) {
 	    /* dist need not be the best possible double representation of
 	     * the true distance, so this might not be detected */
-	    error("Invalid map, lines in the same group may "
-		  "meet at endpoints only.");
-	    exit(1);
+	    errno = 0;
+	    error("bx = %d, by = %d", bx, by);
 	}
 	array[bx][by].distance = dist;
 	array[bx][by].inside = inside;
+    }
+}
+
+
+static void insert_y(struct inside_block *s, int y)
+{
+    int i;
+    short *ptr;
+
+    ptr = s->y;
+    i = 0;
+    while (*ptr < y)
+	ptr++;
+    if (*ptr == y) {
+	do {
+	    *ptr = *(ptr + 1);
+	} while (*ptr != 32767);
+	return;
+    }
+    if (s->y[s->num_y - 2] != 32767) {
+	s->num_y += 5;
+	s->y = ralloc(s->y, sizeof(*(s->y) * s->num_y));
+	for (i = 1; i <= 5; i++)
+	    s->y[s->num_y - i] = 32767;
+    }
+    do {
+	i = *ptr;
+	*ptr++ = y;
+	y = i;
+    } while (*ptr != 32767);
+}
+
+
+static void store_inside_line(int bx, int by, int ox, int oy, int dx, int dy)
+{
+    int block;
+    struct inside_block *s;
+
+    block = by * mapx + bx;
+    s = &inside_table[block];
+    if (oy >= 0 && oy < B_CLICKS && ox >= B_CLICKS)
+	insert_y(s, oy);
+    if (oy + dy >= 0 && oy + dy < B_CLICKS && ox + dx >= B_CLICKS)
+	insert_y(s, oy + dy);
+    s->lines = ralloc(s->lines, (s->num_lines + 2) * sizeof(short) * 4);
+    s->lines[s->num_lines * 4] = ox;
+    s->lines[s->num_lines * 4 + 1] = oy;
+    s->lines[s->num_lines * 4 + 2] = ox + dx;
+    s->lines[s->num_lines * 4 + 3] = oy + dy;
+    s->num_lines++;
+    s->lines[s->num_lines * 4] = -1;
+}
+
+
+static void finish_inside(void)
+{
+    int bx, by, block, inside;
+    short *ptr;
+    int x1, x2, y1, y2, s;
+
+    for (bx = 0; bx < mapx; bx++)
+	for (by = 0; by < mapy; by++) {
+	    block = by * mapx + bx;
+	    if (inside_table[block].num_lines == 0)
+		continue;
+	    ptr = inside_table[block].lines;
+	    inside = array[bx][by].inside;
+	    while (*ptr != -1) {
+		x1 = *ptr++ * 2 - B_CLICKS * 2 + 1;
+		y1 = *ptr++ * 2 + 1;
+		x2 = *ptr++ * 2 - B_CLICKS * 2 + 1;
+		y2 = *ptr++ * 2 + 1;
+		if (y1 < 0) {
+		    if (y2 >= 0) {
+			if (x1 > 0 && x2 >= 0)
+			    inside++;
+			else if ((x1 >= 0 || x2 >= 0) &&
+				 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) > 0)
+			    inside++;
+		    }
+		}
+		else
+		    if (y2 <= 0) {
+			if (x1 > 0 && x2 >= 0)
+			    inside++;
+			else if ((x1 >= 0 || x2 >= 0) &&
+				 (s = y1 * (x1 - x2) - x1 * (y1 - y2)) < 0)
+			    inside++;
+		    }
+	    }
+	    inside_table[block].base_value = inside & 1;
+	}
+}
+
+
+static void init_inside(void)
+{
+    int i, j;
+    struct inside_block *s;
+
+    for (i = 0; i < mapx; i++)
+	for (j = 0; j < mapy; j++) {
+	    array[i][j].distance = 1e20;
+	    array[i][j].inside = 2;
+	}
+    for (i = 0; i < 110*110; i++) {
+	s = &inside_table[i];
+	s->num_y = 5;
+	s->y = ralloc(NULL, 5 * sizeof(short));
+	for (j = 0; j < 5; j++)
+	    s->y[j] = 32767;
+	s->num_lines = 0;
+	s->lines = ralloc(s->lines, 4 * sizeof(short));
+	*s->lines = -1;
+	s->base_value = 0;
     }
 }
 
@@ -1489,11 +1605,7 @@ static void inside_test(void)
     double xdist, ydist, dist;
     int *edges;
 
-    for (i = 0; i < mapx; i++)
-	for (j = 0; j < mapy; j++) {
-	    array[i][j].distance = 1e20;
-	    array[i][j].inside = 2;
-	}
+    init_inside();
     last_width = (World.cwidth - 1) % B_CLICKS + 1;
     last_height = (World.cheight - 1) % B_CLICKS + 1;
     for (poly = 0; poly < polyc; poly++) {
@@ -1510,6 +1622,7 @@ static void inside_test(void)
 	bx2 = minx = maxx = bx;
 	by2 = miny = maxy = by;
 	edges = pdata[poly].edges;
+	closest_line(bx, by, 1e10, 0); /* For polygons within one box */
 	for (j = 0; j < num_points; j++) {
 	    if (startx >> B_SHIFT != bx || starty >> B_SHIFT != by)
 		while (1);
@@ -1520,6 +1633,7 @@ static void inside_test(void)
 	    x1 = 0;
 	    y1 = 0;
 	    while (1) {	/* All boxes which contain a part of this line */
+		store_inside_line(bx, by, ox - x1, oy - y1, dx, dy);
 		x2 = x1 + ((bx == mapx - 1) ? last_width : B_CLICKS);
 		y2 = y1 + ((by == mapy - 1) ? last_height : B_CLICKS);
 		if (dx > 0)
@@ -1542,17 +1656,17 @@ static void inside_test(void)
 		 * with the smallest value. */
 		if (ABS(dy) * xdist < ABS(dx) * ydist) {
 		    if (dx > 0)
-			dist = oy - y1 + dy * xdist / dx;
+			dist = oy - y1 + .5 + dy * xdist / dx;
 		    else
-			dist = 3 * B_CLICKS - oy + y1 + dy * xdist / dx;
+			dist = 3 * B_CLICKS - oy + y1 - .5 + dy * xdist / dx;
 		}
 		else {
 		    if (dy > 0)
-			dist = 2 * B_CLICKS - ox + x1 - dx * ydist / dy;
+			dist = 2 * B_CLICKS - ox + x1 - .5 - dx * ydist / dy;
 		    else
-			dist = 3 * B_CLICKS + ox - x1 - dx * ydist / dy;
+			dist = 3 * B_CLICKS + ox - x1 + .5 - dx * ydist / dy;
 		}
-		store_inside_line(bx, by, dist, 0);
+		closest_line(bx, by, dist, 0);
 		if (ABS(dy) * xdist <= ABS(dx) * ydist) {
 		    if (dx > 0) {
 			bx2++;
@@ -1561,7 +1675,7 @@ static void inside_test(void)
 		    else {
 			bx2--;
 			x1 -= (bx == 0) ? last_width : B_CLICKS;
-		    }			
+		    }
 		    if (bx2 > maxx)
 			maxx = bx2;
 		    if (bx2 < minx)
@@ -1583,9 +1697,11 @@ static void inside_test(void)
 		    if (by2 < miny)
 			miny = by2;
 		    by = POSMOD(by2, mapy);
+		    if (dist == 0)
+			dist = 4 * B_CLICKS;
 		    dist = 5 * B_CLICKS - dist;
 		}
-		store_inside_line(bx, by, dist, 1);
+		closest_line(bx, by, dist, 1);
 	    }
 	    startx = WRAP_XCLICK(startx + dx);
 	    starty = WRAP_YCLICK(starty + dy);
@@ -1605,13 +1721,15 @@ static void inside_test(void)
 		if (j == mapx)
 		    j = 0;
 		if (array[j][i].inside < 2) {
-		    x1 = array[j][i].distance > B_CLICKS &&
+		    x1 = array[j][i].distance >= B_CLICKS &&
 			array[j][i].inside == 1;
 		}
 		else {
 		    if (x1) {
 			fuel_t t;
 			extern int max_fuels;
+
+			inside_table[i * mapx + j].base_value = 1;
 			t.clk_pos.x = j * B_CLICKS + B_CLICKS / 2;
 			t.clk_pos.y = i * B_CLICKS + B_CLICKS / 2;
 			t.fuel = START_STATION_FUEL;
@@ -1621,11 +1739,12 @@ static void inside_test(void)
 			STORE(fuel_t, World.fuel, World.NumFuels, max_fuels,t);
 		    }
 		}
-		array[j][i].inside = 2;
-		array[j][i].distance = 1e20;
+//		array[j][i].inside = 2;
+//		array[j][i].distance = 1e20;
 	    }
 	}
     }
+    finish_inside();
     return;
 }
 #endif
@@ -1651,7 +1770,7 @@ static void Distance_init(void)
     int distbound, size;
     unsigned short *lptr;
 
-    /* max line delta 32767 */
+    /* max line delta 30000 */
 
     blockline = ralloc(NULL, mapx * mapy * sizeof(struct blockinfo));
     lineno = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
