@@ -615,19 +615,14 @@ void Paint_HUD(void)
 
     /* message scan hack by mara*/
     if (BIT(hackedInstruments, BALL_MSG_SCAN)) {
-	if (ball_shout) {
+	if (ball_shout && msgScanBallColor) {
 	    Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
 		    ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
 	}
-	if (need_cover) {
+	if (need_cover && msgScanCoverColor) {
 	    Arc_add(msgScanCoverColor, ext_view_width / 2 - 4,
 		    ext_view_height / 2 - 4, 8, 8, 0, 64 * 360);
 	}
-    }
-
-    /* kps - remove */
-    if (!hudColor) {
-	return;
     }
 
     /*
@@ -688,14 +683,13 @@ void Paint_HUD(void)
     }
     gcv.line_style = LineSolid;
     XChangeGC(dpy, gc, GCLineStyle, &gcv);
-    SET_FG(colors[hudColor].pixel);
 
     if (hudItemsColor)
 	Paint_HUD_items(hud_pos_x, hud_pos_y);
-    SET_FG(colors[hudColor].pixel);
 
     /* Fuel notify, HUD meter on */
-    if (fuelTime > 0.0 || fuelSum < fuelLevel3) {
+    if (hudColor && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
+	SET_FG(colors[hudColor].pixel);
 	did_fuel = 1;
 	sprintf(str, "%04d", (int)fuelSum);
 	rd.drawString(dpy, p_draw, gc,
@@ -730,73 +724,82 @@ void Paint_HUD(void)
     Paint_lock(hud_pos_x, hud_pos_y);
 
     /* Draw last score on hud if it is an message attached to it */
-    for (i=0, j=0; i < MAX_SCORE_OBJECTS; i++) {
-	score_object_t*	sobj
-	    = &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
-	if (sobj->hud_msg_len > 0) {
-	    if (j == 0 &&
-		sobj->hud_msg_width > WINSCALE(2*hudSize-HUD_OFFSET*2) &&
-	        (did_fuel || hudVLineColor))
-			++j;
-	    rd.drawString(dpy, p_draw, gc,
-			WINSCALE(hud_pos_x) - sobj->hud_msg_width/2,
-			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
-			+ gameFont->ascent
-			+ j * (gameFont->ascent + gameFont->descent),
-			sobj->hud_msg, sobj->hud_msg_len);
-	    Erase_rectangle(WINSCALE(hud_pos_x) - sobj->hud_msg_width/2 - 1,
-			    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
+    if (hudColor) {
+	SET_FG(colors[hudColor].pixel);
+
+	for (i = 0, j = 0; i < MAX_SCORE_OBJECTS; i++) {
+	    score_object_t*	sobj
+		= &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
+	    if (sobj->hud_msg_len > 0) {
+		if (j == 0 &&
+		    sobj->hud_msg_width > WINSCALE(2*hudSize-HUD_OFFSET*2) &&
+		    (did_fuel || hudVLineColor))
+		    ++j;
+		rd.drawString(dpy, p_draw, gc,
+			      WINSCALE(hud_pos_x) - sobj->hud_msg_width/2,
+			      WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
+			      + gameFont->ascent
+			      + j * (gameFont->ascent + gameFont->descent),
+			      sobj->hud_msg, sobj->hud_msg_len);
+		Erase_rectangle(WINSCALE(hud_pos_x)
+				- sobj->hud_msg_width/2 - 1,
+				WINSCALE(hud_pos_y + hudSize-HUD_OFFSET
+					 + BORDER)
 				+ j * (gameFont->ascent + gameFont->descent),
-			    sobj->hud_msg_width + 2,
-			    gameFont->ascent + gameFont->descent);
-	    j++;
+				sobj->hud_msg_width + 2,
+				gameFont->ascent + gameFont->descent);
+		j++;
+	    }
 	}
-    }
-
-    if (time_left > 0) {
-	sprintf(str, "%3d:%02d", (int)(time_left / 60), (int)(time_left % 60));
-	size = XTextWidth(gameFont, str, strlen(str));
-	rd.drawString(dpy, p_draw, gc,
-		    WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER) - size,
-		    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
-			- gameFont->descent,
-		    str, strlen(str));
-	Erase_rectangle(WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER)
+	
+	if (time_left > 0) {
+	    sprintf(str, "%3d:%02d",
+		    (int)(time_left / 60), (int)(time_left % 60));
+	    size = XTextWidth(gameFont, str, strlen(str));
+	    rd.drawString(dpy, p_draw, gc,
+			  WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER)
+			  - size,
+			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
+			  - gameFont->descent,
+			  str, strlen(str));
+	    Erase_rectangle(WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER)
 			    - size - 1,
-			WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
+			    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			    - gameFont->ascent - gameFont->descent,
-			size + 2,
-			gameFont->ascent + gameFont->descent);
-    }
-
-    /* Update the modifiers */
-    modlen = strlen(mods);
-    rd.drawString(dpy, p_draw, gc,
-		WINSCALE(hud_pos_x - hudSize+HUD_OFFSET-BORDER)
-		    - XTextWidth(gameFont, mods, modlen),
-		WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
-		    + gameFont->ascent,
-		mods, strlen(mods));
-
-    Erase_rectangle(WINSCALE(hud_pos_x - hudSize + HUD_OFFSET - BORDER)
-			- XTextWidth(gameFont, mods, modlen) - 1,
-		    WINSCALE(hud_pos_y + hudSize - HUD_OFFSET + BORDER) ,
-			XTextWidth(gameFont, mods, modlen) + 1,
-		    gameFont->ascent + gameFont->descent);
-
-    if (autopilotLight) {
-	int text_width = XTextWidth(gameFont, autopilot, sizeof(autopilot)-1);
+			    size + 2,
+			    gameFont->ascent + gameFont->descent);
+	}
+	
+	/* Update the modifiers */
+	modlen = strlen(mods);
 	rd.drawString(dpy, p_draw, gc,
-		    WINSCALE(hud_pos_x) - text_width/2,
-		    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
-				 - gameFont->descent * 2 - gameFont->ascent,
-		    autopilot, sizeof(autopilot)-1);
+		      WINSCALE(hud_pos_x - hudSize+HUD_OFFSET-BORDER)
+		      - XTextWidth(gameFont, mods, modlen),
+		      WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
+		      + gameFont->ascent,
+		      mods, strlen(mods));
 
-	Erase_rectangle(WINSCALE(hud_pos_x) - text_width/2,
-			WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
-			    - gameFont->descent * 2 - gameFont->ascent * 2,
-			text_width + 2,
+	Erase_rectangle(WINSCALE(hud_pos_x - hudSize + HUD_OFFSET - BORDER)
+			- XTextWidth(gameFont, mods, modlen) - 1,
+			WINSCALE(hud_pos_y + hudSize - HUD_OFFSET + BORDER) ,
+			XTextWidth(gameFont, mods, modlen) + 1,
 			gameFont->ascent + gameFont->descent);
+
+	if (autopilotLight) {
+	    int text_width = XTextWidth(gameFont, autopilot,
+					sizeof(autopilot)-1);
+	    rd.drawString(dpy, p_draw, gc,
+			  WINSCALE(hud_pos_x) - text_width/2,
+			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
+			  - gameFont->descent * 2 - gameFont->ascent,
+			  autopilot, sizeof(autopilot)-1);
+	    
+	    Erase_rectangle(WINSCALE(hud_pos_x) - text_width/2,
+			    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
+			    - gameFont->descent * 2 - gameFont->ascent * 2,
+			    text_width + 2,
+			    gameFont->ascent + gameFont->descent);
+	}
     }
 
     if (fuelTime > 0.0) {
