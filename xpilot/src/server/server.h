@@ -556,14 +556,14 @@ void Fire_left_rshot(player *pl, int type, int dir, int gun);
 void Fire_right_rshot(player *pl, int type, int dir, int gun);
 void Make_treasure_ball(treasure_t *t);
 
-void Ball_hits_goal(ballobject *ball, struct group *groupptr);
+void Ball_hits_goal(ballobject *ball, group_t *groupptr);
 void Ball_is_replaced(ballobject *ball);
 void Ball_is_destroyed(ballobject *ball);
 
-bool Balltarget_hitfunc(struct group *groupptr, struct move *move);
+bool Balltarget_hitfunc(group_t *groupptr, move_t *move);
 
 int Cannon_hitmask(cannon_t *cannon);
-bool Cannon_hitfunc(struct group *groupptr, struct move *move);
+bool Cannon_hitfunc(group_t *groupptr, move_t *move);
 void Cannon_restore_on_map(cannon_t *cannon);
 void Cannon_remove_from_map(cannon_t *cannon);
 
@@ -573,7 +573,7 @@ void Target_restore_on_map(target_t *targ);
 void Target_remove_from_map(target_t *targ);
 
 int Wormhole_hitmask(wormhole_t *wormhole);
-bool Wormhole_hitfunc(struct group *groupptr, struct move *move);
+bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
 void Wormhole_remove_from_map(wormhole_t *wormhole);
 
 void Team_immunity_init(void);

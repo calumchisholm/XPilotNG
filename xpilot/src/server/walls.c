@@ -130,12 +130,7 @@ int num_polys = 0;
 int num_groups = 1;
 int mapx, mapy;
 
-#if 0
-#define can_hit(gp, move) \
-(((gp)->hitmask & (move)->hitmask) ? false : \
- ((gp)->hitfunc == NULL ? true : (gp)->hitfunc(gp, move)))
-#else
-static inline bool can_hit(struct group *gp, struct move *move)
+static inline bool can_hit(group_t *gp, move_t *move)
 {
     if (gp->hitmask & move->hitmask)
 	return false;
@@ -143,7 +138,6 @@ static inline bool can_hit(struct group *gp, struct move *move)
 	return true;
     return gp->hitfunc(gp, move);
 }
-#endif
 
 void Move_init(void)
 {
@@ -672,7 +666,7 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
 }
 
 
-static int Bounce_object(object *obj, struct move *move, int line, int point)
+static int Bounce_object(object *obj, move_t *move, int line, int point)
 {
     double fx, fy;
     double c, s, wall_brake_factor = objectWallBrakeFactor;
@@ -786,7 +780,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 
 
 
-static void Bounce_player(player *pl, struct move *move, int line, int point)
+static void Bounce_player(player *pl, move_t *move, int line, int point)
 {
     double fx, fy;
     double c, s;
@@ -916,7 +910,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
  * (in the list given by *lines) that the given trajectory hits. */
 static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 		       const unsigned short *lines, int chx, int chy,
-		       int chxy, const struct move *move, int *minline,
+		       int chxy, const move_t *move, int *minline,
 		       int *height)
 {
     int lsx, lsy, ldx, ldy, temp, mirror, start, end, i, x, sy, ey, prod;
@@ -924,7 +918,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 
     while ( (i = *lines++) != 65535) {
 	if (linet[i].group
-	    && (!can_hit(&groups[linet[i].group], (struct move *)move)))
+	    && (!can_hit(&groups[linet[i].group], (move_t *)move)))
 	    continue;
 	lsx = linet[i].start.cx;
 	lsy = linet[i].start.cy;
@@ -1069,7 +1063,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 /* Do not call this with no movement. */
 /* May not be called with point already on top of line.
  * Maybe I should change that to allow lines that could be crossed. */
-static void Move_point(const struct move *move, struct collans *answer)
+static void Move_point(const move_t *move, struct collans *answer)
 {
     int minline, mindone, minheight;
     int block;
@@ -1169,7 +1163,7 @@ static void Move_point(const struct move *move, struct collans *answer)
  * For example, there's no need to consider all the points
  * separately if the shape is not close to a wall.
  */
-static void Shape_move(const struct move *move, const shape_t *s,
+static void Shape_move(const move_t *move, const shape_t *s,
 		       int dir, struct collans *answer)
 {
     int minline, mindone, minheight, minpoint;
@@ -1260,7 +1254,7 @@ static void Shape_move(const struct move *move, const shape_t *s,
     x = -1;
     while ( ( i = *points++) != 65535) {
 	if (linet[i].group
-	    && (!can_hit(&groups[linet[i].group], (struct move *)move)))
+	    && (!can_hit(&groups[linet[i].group], (move_t *)move)))
 	    continue;
 	msx = move->start.cx - linet[i].start.cx;
 	msy = move->start.cy - linet[i].start.cy;
@@ -1311,7 +1305,7 @@ static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
     unsigned short *points;
-    struct move mv;
+    move_t mv;
     /*shapepos *pts1, *pts2;*/
     int num_points;
 
@@ -1456,7 +1450,7 @@ static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
  * from the line.
  * Return -1 if successful, number of another line blocking movement
  * otherwise (the number of the line is not used when writing this). */
-static int Away(struct move *move, int line)
+static int Away(move_t *move, int line)
 {
     int dx, dy, lsx, lsy;
     clvec delta_saved;
@@ -1517,7 +1511,7 @@ static int Away(struct move *move, int line)
  * outwards from the corner so discreteness doesn't make moving it so hard. */
 /* This function should get called only rarely, so it doesn't need to
  * be too efficient. */
-static int Clear_corner(struct move *move, object *obj, int l1, int l2)
+static int Clear_corner(move_t *move, object *obj, int l1, int l2)
 {
     int x, y, xm, ym;
     int l1sx, l2sx, l1sy, l2sy;
@@ -1610,7 +1604,7 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 
 /* Move a shape away from a line after a collision. Needed for the same
  * reason as Away(). */
-static int Shape_away(struct move *move, const shape_t *s,
+static int Shape_away(move_t *move, const shape_t *s,
 		      int dir, int line, struct collans *ans)
 {
     int dx, dy;
@@ -1769,7 +1763,7 @@ int is_inside(int cx, int cy, int hitmask, const object *obj)
     short *ptr;
     int inside, cx1, cx2, cy1, cy2, s;
     struct inside_block *gblock;
-    struct move mv;
+    move_t mv;
 
     mv.hitmask = hitmask;
     mv.obj = OBJ_PTR(obj);
@@ -2554,7 +2548,7 @@ void Treasure_init(void)
 
 static void Move_ball(object *obj)
 {
-    struct move mv;
+    move_t mv;
     struct collans ans;
     int owner;
 
@@ -2626,7 +2620,7 @@ static void Move_ball(object *obj)
 void Move_object(object *obj)
 {
     int t;
-    struct move mv;
+    move_t mv;
     struct collans ans;
     int trycount = 5000;
     int team;            /* !@# should make TEAM_NOT_SET 0 */
@@ -2697,7 +2691,7 @@ void Move_object(object *obj)
 void Move_player(player *pl)
 {
     clpos  pos;
-    struct move mv;
+    move_t mv;
     struct collans ans;
     double fric;
     vector oldv;

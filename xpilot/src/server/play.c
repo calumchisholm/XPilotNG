@@ -337,7 +337,7 @@ void Ball_is_destroyed(ballobject *ball)
 
 
 
-void Ball_hits_goal(ballobject *ball, struct group *gp)
+void Ball_hits_goal(ballobject *ball, group_t *gp)
 {
     player *owner;
     treasure_t *td;
@@ -391,7 +391,7 @@ void Ball_hits_goal(ballobject *ball, struct group *gp)
  * This function is called when something would hit a balltarget.
  * The function determines if it hits or not.
  */
-bool Balltarget_hitfunc(struct group *gp, struct move *move)
+bool Balltarget_hitfunc(group_t *gp, move_t *move)
 {
     ballobject *ball = NULL;
 
@@ -484,7 +484,7 @@ extern struct move_parameters mp;
  *
  * Ideas stolen from Move_segment in walls_old.c
  */
-bool Cannon_hitfunc(struct group *gp, struct move *move)
+bool Cannon_hitfunc(group_t *gp, move_t *move)
 {
     object *obj = move->obj;
     cannon_t *cannon = Cannons(gp->mapobj_ind);
@@ -542,7 +542,7 @@ void Target_init(void)
     int group;
 
     for (group = 0; group < num_groups; group++) {
-	struct group *gp = groupptr_by_id(group);
+	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == TARGET)
 	    Target_set_hitmask(group, Targets(gp->mapobj_ind));
@@ -597,7 +597,7 @@ int Wormhole_hitmask(wormhole_t *wormhole)
     return 0;
 }
 
-bool Wormhole_hitfunc(struct group *gp, struct move *move)
+bool Wormhole_hitfunc(group_t *gp, move_t *move)
 {
     object *obj = move->obj;
     wormhole_t *wormhole = Wormholes(gp->mapobj_ind);
@@ -669,7 +669,7 @@ void Team_immunity_init(void)
     int group;
 
     for (group = 0; group < num_groups; group++) {
-	struct group *gp = groupptr_by_id(group);
+	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == CANNON) {
 	    cannon_t *cannon = Cannons(gp->mapobj_ind);

@@ -25,12 +25,9 @@
 
 char polygon_version[] = VERSION;
 
-
-
 /* polygon map format related stuff */
 int num_edges, max_edges;
 extern int num_polys;
-extern int num_groups;
 
 int *edgeptr;
 int *estyleptr;
@@ -55,7 +52,7 @@ static void Check_groupcount(void)
 }
 
 static int Create_group(int type, int team, int hitmask,
-			bool (*hitfunc)(struct group *gp, struct move *move),
+			bool (*hitfunc)(group_t *gp, move_t *move),
 			int mapobj_ind)
 {
     if (current_group != 0) {
@@ -363,7 +360,7 @@ void P_grouphack(int type, void (*f)(int, void *))
     int group;
 
     for (group = 0; group < num_groups; group++) {
-	struct group *gp = groupptr_by_id(group);
+	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == type)
 	    (*f)(group, gp->mapobj);
