@@ -3546,9 +3546,7 @@ static option_desc options[] = {
 	tuner_dummy,
 	"This is a temporary option to test Mara's \"turnqueue\" hack.\n"
 	"The idea is that if a ship is turning when it hits the wall,\n"
-	"the turn will be completed after the bounce..\n"
-	"Added this option to see how much difference changing the order\n"
-	"would make.\n",
+	"the turn will be completed after the bounce.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
