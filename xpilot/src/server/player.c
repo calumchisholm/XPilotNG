@@ -468,10 +468,8 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
      * only one on the server. Mara's change (always too_late) meant
      * there was a round reset when the first player joined. -uau
      */
-    if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0) {
+    if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0)
 	Player_set_state(pl, PL_STATE_WAITING);
-	Player_set_life(pl, 0);
-    }
 
     pl->team		= TEAM_NOT_SET;
 
@@ -1675,6 +1673,7 @@ void Player_set_state(player_t *pl, int state)
     switch (state) {
     case PL_STATE_WAITING:
 	Player_set_mychar(pl, 'W');
+	Player_set_life(pl, 0);
 	SET_BIT(pl->pl_status, GAME_OVER);
 	break;
     case PL_STATE_APPEARING:

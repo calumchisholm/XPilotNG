@@ -275,7 +275,6 @@ void Pause_player(player_t *pl, bool on)
 	    updateScores = true;
 	    if (BIT(world->rules->mode, LIMITED_LIVES)) {
 		/* too late, wait for next round */
-		Player_set_life(pl, 0);
 		Player_set_state(pl, PL_STATE_WAITING);
 	    } else {
 		Player_set_state(pl, PL_STATE_ALIVE);
