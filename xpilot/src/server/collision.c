@@ -1191,8 +1191,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 		sc = Rate(CANNON_SCORE, pl->score)/4;
 	    } else if (obj->id == NO_ID) {
 		sprintf(msg, "%s was killed by %s.", pl->name,
-			Describe_shot(obj->type, obj->status,
-				      obj->mods, 1));
+			Describe_shot(obj->type, obj->status, obj->mods, 1));
 		sc = Rate(0.0, pl->score) * unownedKillScoreMult;
 	    } else {
 		kp = Player_by_id(obj->id);
@@ -1378,10 +1377,10 @@ static void AsteroidCollision(void)
 		sound = true;
 		break;
 	    case OBJ_ASTEROID:
-		obj->life -= ASTEROID_FUEL_HIT(ABS(2 * ast->mass
-					           * VECTOR_LENGTH(ast->vel)),
-				               WIRE_PTR(obj)->size);
-		damage = -ABS(2 * obj->mass * VECTOR_LENGTH(obj->vel));
+		obj->life -= ASTEROID_FUEL_HIT(
+		    collision_cost(ast->mass, VECTOR_LENGTH(ast->vel)),
+		    WIRE_PTR(obj)->size);
+		damage = -collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
 		Delta_mv_elastic(ast, obj);
 		/* avoid doing collision twice */
 		obj->fusetime = frame_time + timeStep;
@@ -1395,7 +1394,7 @@ static void AsteroidCollision(void)
 	    case OBJ_DEBRIS:
 	    case OBJ_WRECKAGE:
 		obj->life = 0.0;
-		damage = -ABS(2 * obj->mass * VECTOR_LENGTH(obj->vel));
+		damage = -collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
 		Delta_mv(ast, obj);
 		break;
 	    case OBJ_MINE:
