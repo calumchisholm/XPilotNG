@@ -1102,7 +1102,7 @@ void Update_objects(void)
 	 * Wormholes and warping
 	 */
 	if (BIT(pl->status, WARPING)) {
-	    clpos w2;
+	    clpos dest;
 	    int wcx, wcy, nearestFront, nearestRear;
 	    DFLOAT proximity, proxFront, proxRear;
 
@@ -1170,38 +1170,51 @@ void Update_objects(void)
 		}
 
 		sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
-		w2 = World.wormHoles[j].pos;
+		dest = World.wormHoles[j].pos;
 
 	    } else { /* wormHoleHit == -1 */
 		int counter;
+		int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
+
+		/* try to find empty space to hyperjump to */
 		for (counter = 20; counter > 0; counter--) {
-		    w2.cx = (int)(rfrac() * World.cwidth);
-		    w2.cy = (int)(rfrac() * World.cheight);
+		    dest.cx = (int)(rfrac() * World.cwidth);
+		    dest.cy = (int)(rfrac() * World.cheight);
+#if 0
 		    if (BIT(1U << World.block
-			    [CLICK_TO_BLOCK(w2.cx)]
-			    [CLICK_TO_BLOCK(w2.cy)],
+			    [CLICK_TO_BLOCK(dest.cx)]
+			    [CLICK_TO_BLOCK(dest.cy)],
 			    SPACE_BLOCKS)) {
 			break;
 		    }
-		}
-		if (!counter) {
-		    w2.cx = pl->pos.cx;
-		    w2.cy = pl->pos.cy;
+#else
+		    if (shape_is_inside(dest.cx, dest.cy, hitmask,
+					NULL, pl->ship, pl->dir) == NO_GROUP)
+			break;
+#endif
 		}
 
+		/* can't find an empty space, hyperjump failed */
+		if (!counter) {
+		    dest.cx = pl->pos.cx;
+		    dest.cy = pl->pos.cy;
+		}
+
+#if 0 /* kps - temporary wormholes disabled currently */
 		if (counter
 		    && wormTime
 		    && BIT(1U << World.block[OBJ_X_IN_BLOCKS(pl)]
 					    [OBJ_Y_IN_BLOCKS(pl)],
 			   SPACE_BIT)
-		    && BIT(1U << World.block[CLICK_TO_BLOCK(w2.cx)]
-					    [CLICK_TO_BLOCK(w2.cy)],
+		    && BIT(1U << World.block[CLICK_TO_BLOCK(dest.cx)]
+					    [CLICK_TO_BLOCK(dest.cy)],
 			   SPACE_BIT)) {
 		    add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
 				       OBJ_Y_IN_BLOCKS(pl),
-				       CLICK_TO_BLOCK(w2.cx),
-				       CLICK_TO_BLOCK(w2.cy));
+				       CLICK_TO_BLOCK(dest.cx),
+				       CLICK_TO_BLOCK(dest.cy));
 		}
+#endif
 		j = -2;
 		sound_play_sensors(pl->pos.cx, pl->pos.cy, HYPERJUMP_SOUND);
 	    }
@@ -1223,8 +1236,8 @@ void Update_objects(void)
 		    object *b = Obj[k];
 		    if (BIT(b->type, OBJ_BALL) && b->id == pl->id) {
 			clpos ballpos;
-			ballpos.cx = b->pos.cx + w2.cx - pl->pos.cx;
-			ballpos.cy = b->pos.cy + w2.cy - pl->pos.cy;
+			ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
+			ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
 			ballpos.cx = WRAP_XCLICK(ballpos.cx);
 			ballpos.cy = WRAP_YCLICK(ballpos.cy);
 			if (!INSIDE_MAP(ballpos.cx, ballpos.cy)) {
@@ -1241,7 +1254,7 @@ void Update_objects(void)
 	    }
 
 	    pl->wormHoleDest = j;
-	    Player_position_init_clicks(pl, w2.cx, w2.cy);
+	    Player_position_init_clicks(pl, dest.cx, dest.cy);
 	    pl->vel.x *= WORM_BRAKE_FACTOR;
 	    pl->vel.y *= WORM_BRAKE_FACTOR;
 	    pl->forceVisible += 15;
