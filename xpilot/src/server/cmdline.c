@@ -222,7 +222,7 @@ extern char	conf_default_map_string[];	/* from common/config.c */
 static void tuner_none(void)  {}
 static void tuner_dummy(void) {}
 
-optionDesc options[] = {
+static optionDesc options[] = {
     {
 	"help",
 	"help",
@@ -900,7 +900,8 @@ optionDesc options[] = {
 	"Can ships be destroyed when hit by wreckage?\n",
 	MAP(NULL)
     },
-    {   "ignore20MaxFPS",
+    {
+	"ignore20MaxFPS",
 	"ignore20MaxFPS",
 	"true",
 	&ignore20MaxFPS,
