@@ -789,3 +789,88 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 	}
     }
 }
+
+
+hitmask_t Cannon_hitmask(cannon_t *cannon)
+{
+    world_t *world = &World;
+
+    if (cannon->dead_ticks > 0)
+	return ALL_BITS;
+    if (BIT(world->rules->mode, TEAM_PLAY) && options.teamImmunity)
+	return HITMASK(cannon->team);
+    return 0;
+}
+
+void Cannon_set_hitmask(int group, cannon_t *cannon)
+{
+    assert(group == cannon->group);
+
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
+}
+
+
+void World_restore_cannon(world_t *world, cannon_t *cannon)
+{
+    blkpos_t blk = Clpos_to_blkpos(cannon->pos);
+
+    World_set_block(world, blk, CANNON);
+
+    cannon->conn_mask = 0;
+    cannon->last_change = frame_loops;
+    cannon->dead_ticks = 0;
+
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
+}
+
+void World_remove_cannon(world_t *world, cannon_t *cannon)
+{
+    blkpos_t blk = Clpos_to_blkpos(cannon->pos);
+
+    cannon->dead_ticks = options.cannonDeadTicks;
+    cannon->conn_mask = 0;
+
+    World_set_block(world, blk, SPACE);
+
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
+}
+
+
+extern struct move_parameters mp;
+/*
+ * This function is called when something would hit a cannon.
+ *
+ * Ideas stolen from Move_segment in walls_old.c
+ */
+bool Cannon_hitfunc(group_t *gp, move_t *move)
+{
+    object_t *obj = move->obj;
+    world_t *world = &World;
+    cannon_t *cannon = Cannons(world, gp->mapobj_ind);
+    unsigned long cannon_mask;
+
+    /* this should never happen if hitmasks are ok */
+    assert (! (cannon->dead_ticks > 0));
+
+    /* if cannon is phased nothing will hit it */
+    if (BIT(cannon->used, HAS_PHASING_DEVICE))
+	return false;
+
+    if (obj == NULL)
+	return true;
+
+    cannon_mask = mp.obj_cannon_mask | OBJ_PLAYER;
+    if (!BIT(cannon_mask, obj->type))
+	return false;
+
+    /*
+     * kps - if no team play, both cannons have team == TEAM_NOT_SET,
+     * this code should work, no matter if team play is true or not.
+     */
+     if (BIT(obj->status, FROMCANNON)
+         && obj->team == cannon->team) {
+         return false;
+     }
+
+     return true;
+}

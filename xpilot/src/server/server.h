@@ -572,27 +572,6 @@ void Fire_left_shot(player_t *pl, int type, int dir, int gun);
 void Fire_right_shot(player_t *pl, int type, int dir, int gun);
 void Fire_left_rshot(player_t *pl, int type, int dir, int gun);
 void Fire_right_rshot(player_t *pl, int type, int dir, int gun);
-void Make_treasure_ball(world_t *world, treasure_t *t);
-
-void Ball_hits_goal(ballobject_t *ball, group_t *groupptr);
-void Ball_is_replaced(ballobject_t *ball);
-void Ball_is_destroyed(ballobject_t *ball);
-
-bool Balltarget_hitfunc(group_t *groupptr, move_t *move);
-
-hitmask_t Cannon_hitmask(cannon_t *cannon);
-bool Cannon_hitfunc(group_t *groupptr, move_t *move);
-void World_restore_cannon(world_t *world, cannon_t *cannon);
-void World_remove_cannon(world_t *world, cannon_t *cannon);
-
-hitmask_t Target_hitmask(target_t *targ);
-void Target_init(world_t *world);
-void World_restore_target(world_t *world, target_t *targ);
-void World_remove_target(world_t *world, target_t *targ);
-
-hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
-bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
-void World_remove_wormhole(world_t *world, wormhole_t *wormhole);
 
 bool Friction_area_hitfunc(group_t *groupptr, move_t *move);
 
@@ -669,12 +648,19 @@ void Cannon_throw_items(cannon_t *cannon);
 void Cannon_check_defense(cannon_t *cannon);
 void Cannon_check_fire(cannon_t *cannon);
 void Cannon_dies(cannon_t *cannon, player_t *pl);
+hitmask_t Cannon_hitmask(cannon_t *cannon);
+void Cannon_set_hitmask(int group, cannon_t *cannon);
+bool Cannon_hitfunc(group_t *groupptr, move_t *move);
+void World_restore_cannon(world_t *world, cannon_t *cannon);
+void World_remove_cannon(world_t *world, cannon_t *cannon);
+
 
 /*
  * Prototypes for command.c
  */
 void Handle_player_command(player_t *pl, char *cmd);
 player_t *Get_player_by_name(char *str, int *errcode, const char **errorstr_p);
+
 
 /*
  * Prototypes for player.c
@@ -1004,5 +990,36 @@ char *showtime(void);
 void Init_recording(world_t *world);
 void Handle_recording_buffers(void);
 void Get_recording_data(void);
+
+/*
+ * Prototypes for target.c
+ */
+void Target_update(world_t *world);
+void Object_hits_target(object_t *obj, target_t *targ, double player_cost);
+hitmask_t Target_hitmask(target_t *targ);
+void Target_set_hitmask(int group, target_t *targ);
+void Target_init(world_t *world);
+void World_restore_target(world_t *world, target_t *targ);
+void World_remove_target(world_t *world, target_t *targ);
+
+/*
+ * Prototypes for treasure.c
+ */
+void Make_treasure_ball(world_t *world, treasure_t *t);
+void Ball_hits_goal(ballobject_t *ball, group_t *groupptr);
+void Ball_is_replaced(ballobject_t *ball);
+void Ball_is_destroyed(ballobject_t *ball);
+bool Balltarget_hitfunc(group_t *groupptr, move_t *move);
+
+/*
+ * Prototypes for wormhole.c
+ */
+void Traverse_wormhole(player_t *pl);
+void Hyperjump(player_t *pl);
+void Object_hits_wormhole(object_t *obj, int ind);
+hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
+bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
+void World_remove_wormhole(world_t *world, wormhole_t *wormhole);
+
 
 #endif
