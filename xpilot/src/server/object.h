@@ -69,13 +69,6 @@
 #define OBJ_CANNON_SHOT_BIT	OBJ_TYPEBIT(OBJ_CANNON_SHOT)
 
 /*
- * Some object types are overloaded.
- * These bits are set in the player->type_ext field.
- */
-#define OBJ_EXT_TANK		(1U<<1)
-#define OBJ_EXT_ROBOT		(1U<<2)
-
-/*
  * Possible object status bits.
  */
 #define GRAVITY			(1U<<0)
@@ -88,19 +81,6 @@
 #define NOEXPLOSION		(1U<<8)		/* No recreate explosion */
 #define COLLISIONSHOVE		(1U<<9)		/* Collision counts as shove */
 #define RANDOM_ITEM		(1U<<10)	/* item shows up as random */
-
-/*
- * Possible player status bits.
- * The bits that the client needs must fit into a byte,
- * so the first 8 bitvalues are reserved for that purpose,
- * those are defined in common/rules.h.
- */
-#define KILLED			(1U<<8)
-#define HOVERPAUSE		(1U<<9)		/* Hovering pause */
-#define REPROGRAM		(1U<<10)	/* Player reprogramming */
-#define FINISH			(1U<<11)	/* Finished a lap this frame */
-#define RACE_OVER		(1U<<12)	/* After finished and score */
-
 
 /*
  * Weapons modifiers.

@@ -733,7 +733,7 @@ static void Robot_create(world_t *world)
 		options.allowShipShapes ? Parse_shape_str(rob->shape) : NULL);
 
     robot = Player_by_index(NumPlayers);
-    SET_BIT(robot->type_ext, OBJ_EXT_ROBOT);
+    robot->pl_type = PL_TYPE_ROBOT;
     robot->robot_data_ptr = new_data;
 
     strlcpy(robot->name, rob->name, MAX_CHARS);

@@ -64,6 +64,13 @@
 #endif
 
 /*
+ * These values are set in the player->pl_type field.
+ */
+#define PL_TYPE_HUMAN		0
+#define PL_TYPE_ROBOT		1
+#define PL_TYPE_TANK		2
+
+/*
  * Different types of attributes a player can have.
  * These are the bits of the player->have and player->used fields.
  */
@@ -168,7 +175,7 @@ struct player {
 
     /* up to here the player type should be the same as an object. */
 
-    int		type_ext;		/* extended type info (tank, robot) */
+    int		pl_type;		/* extended type info (tank, robot) */
     uint16_t	pl_status;		/* playing, etc. */
 
     double	turnspeed;		/* How fast player acc-turns */
@@ -388,19 +395,19 @@ static inline void Player_self_destruct(player_t *pl, bool on)
 	pl->self_destruct_count = 0.0;
 }
 
-static inline bool Player_is_tank(player_t *pl)
+static inline bool Player_is_human(player_t *pl)
 {
-    return (BIT(pl->type_ext, OBJ_EXT_TANK) == OBJ_EXT_TANK) ? true : false;
+    return pl->pl_type == PL_TYPE_HUMAN ? true : false;
 }
 
 static inline bool Player_is_robot(player_t *pl)
 {
-    return (BIT(pl->type_ext, OBJ_EXT_ROBOT) == OBJ_EXT_ROBOT) ? true : false;
+    return pl->pl_type == PL_TYPE_ROBOT ? true : false;
 }
 
-static inline bool Player_is_human(player_t *pl)
+static inline bool Player_is_tank(player_t *pl)
 {
-    return (!BIT(pl->type_ext, OBJ_EXT_TANK|OBJ_EXT_ROBOT)) ? true : false;
+    return pl->pl_type == PL_TYPE_TANK ? true : false;
 }
 
 static inline bool Player_owns_tank(player_t *pl, player_t *tank)

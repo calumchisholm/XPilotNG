@@ -350,7 +350,7 @@ void Tank_handle_detach(player_t *pl)
     while (tank->fuel.num_tanks > 0)
 	Player_remove_tank(tank, tank->fuel.num_tanks);
 
-    SET_BIT(tank->type_ext, OBJ_EXT_TANK);
+    tank->pl_type = PL_TYPE_TANK;
     Player_position_init_clpos(tank, pl->pos);
     tank->vel = pl->vel;
     tank->acc = pl->acc;

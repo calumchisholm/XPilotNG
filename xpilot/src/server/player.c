@@ -418,6 +418,11 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
     pl->turnqueue = true;
 
     pl->type = OBJ_PLAYER;
+    /*
+     * Assume human (client) for now.
+     * Robots and tanks will change this field.
+     */
+    pl->pl_type = PL_TYPE_HUMAN;
 
     Compute_sensor_range(pl);
 
