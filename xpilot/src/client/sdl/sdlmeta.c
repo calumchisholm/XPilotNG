@@ -914,6 +914,37 @@ static bool join_server(Connect_param_t *conpar, server_info_t *sip)
     return false;
 }
 
+void handleKeyPress(GLWidget *meta, SDL_keysym *keysym )
+{
+  static unsigned int row = 1;
+
+  switch ( keysym->sym )
+    {
+    case SDLK_ESCAPE:
+      /* ESC key was pressed */
+      exit(0);
+      break;
+    case SDLK_F1:
+      /* F1 key was pressed
+       * this toggles fullscreen mode
+       */
+#ifndef _WINDOWS
+      SDL_WM_ToggleFullScreen(MainSDLSurface);
+#endif
+      break;
+    case SDLK_UP: 
+      /* move the cursor up */
+      break;
+    case SDLK_DOWN: 
+      /* move the curor down */
+      break;
+    default:
+      break;
+    }
+  
+  return;
+}
+
 int Meta_window(Connect_param_t *conpar)
 {
     static char err[MSG_LEN] = {0};
@@ -982,7 +1013,12 @@ int Meta_window(Connect_param_t *conpar)
 		    return 0;
 		}
 		break;
-		
+
+	    case SDL_KEYDOWN:
+	        /* handle key presses */
+	        handleKeyPress( meta, &evt.key.keysym );
+	        break;
+
 	    case SDL_MOUSEBUTTONDOWN:
 		target = FindGLWidgeti(meta, evt.button.x, evt.button.y);
 		if (target && target->button)
