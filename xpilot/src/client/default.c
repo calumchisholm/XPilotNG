@@ -398,13 +398,6 @@ option options[] = {
 	"W (waiting for next round) at base.\n"
     },
     {
-	"treatZeroSpecial",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Do special tricks for team zero pausing in scorelist. \n"
-    },
-    {
 	"fuelNotify",
 	NULL,
 	"500",
@@ -1319,13 +1312,6 @@ option options[] = {
 	"12",
 	KEY_DUMMY,
 	"Which color number to use for drawing your score when inactive.\n"
-    },
-    {
-	"scoreZeroColor",
-	NULL,
-	"4",
-	KEY_DUMMY,
-	"Which color number to use for drawing team zero scores (when special).\n"
     },
     {
 	"scoreObjectColor",
@@ -3270,7 +3256,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "scoreInactiveColor", &scoreInactiveColor);
     Get_int_resource(rDB, "scoreInactiveSelfColor",
 		     &scoreInactiveSelfColor);
-    Get_int_resource(rDB, "scoreZeroColor", &scoreZeroColor);
     Get_int_resource(rDB, "scoreObjectColor", &scoreObjectColor);
     Get_float_resource(rDB, "scoreObjectTime", &scoreObjectTime);
     Get_int_resource(rDB, "baseWarningType", &baseWarningType);
@@ -3309,8 +3294,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		     SHOW_LIVES_BY_SHIP);
     Get_bit_resource(rDB, "showExtraBaseInfo", &hackedInstruments,
 		     SHOW_EXTRA_BASE_INFO);
-    Get_bit_resource(rDB, "treatZeroSpecial", &hackedInstruments,
-		     TREAT_ZERO_SPECIAL);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
     Get_bit_resource(rDB, "showItems", &instruments, SHOW_ITEMS);
     Get_bit_resource(rDB, "clockAMPM", &instruments, SHOW_CLOCK_AMPM_FORMAT);

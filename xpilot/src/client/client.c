@@ -1342,8 +1342,7 @@ static void Print_roundend_messages(other_t **order)
      */
     for (i = 0; i < num_others; i++) {
 	other = order[i];
-	if (other->team == 0
-	    && BIT(hackedInstruments, TREAT_ZERO_SPECIAL))
+	if (other->mychar != 'P')
 	    continue;
 
 	if (Using_score_decimals()) {
@@ -1479,6 +1478,8 @@ static void Determine_order(other_t **order, struct team_score team[])
     return;
 }
 
+#define TEAM_PAUSEHACK 100
+
 static int Team_heading(int entrynum, int teamnum,
 			int teamlives, DFLOAT teamscore)
 {
@@ -1488,10 +1489,13 @@ static int Team_heading(int entrynum, int teamnum,
     tmp.war_id = -1;
     tmp.name_width = 0;
     tmp.ship = NULL;
-    sprintf(tmp.name, "TEAM %d", tmp.team);
+    if (teamnum != TEAM_PAUSEHACK)
+	sprintf(tmp.name, "TEAM %d", tmp.team);
+    else
+	sprintf(tmp.name, "Pause Wusses", tmp.team);
     strcpy(tmp.real, tmp.name);
     strcpy(tmp.host, "");
-#if 1
+#if 0
     if (BIT(Setup->mode, LIMITED_LIVES) && teamlives == 0) {
 	tmp.mychar = 'D';
     } else {
@@ -1503,8 +1507,7 @@ static int Team_heading(int entrynum, int teamnum,
     tmp.score = teamscore;
     tmp.life = teamlives;
 
-    if (teamnum != 0 || !BIT(hackedInstruments, TREAT_ZERO_SPECIAL))
-	Paint_score_entry(entrynum++, &tmp, true);
+    Paint_score_entry(entrynum++, &tmp, true);
     return entrynum;
 }
 
@@ -1517,8 +1520,15 @@ static int Team_score_table(int entrynum, int teamnum,
 
     for (i = 0; i < num_others; i++) {
 	other = order[i];
-	if (other->team != teamnum)
-	    continue;
+
+	if (teamnum == TEAM_PAUSEHACK) {
+	    if (other->mychar != 'P')
+		continue;
+	} else {
+	    if (other->team != teamnum || other->mychar == 'P')
+		continue;
+	}
+
 	if (!drawn)
 	    entrynum = Team_heading(entrynum, teamnum, team.life, team.score);
 	j = other - Others;
@@ -1527,7 +1537,7 @@ static int Team_score_table(int entrynum, int teamnum,
     }
 
     if (drawn)
-	entrynum += 2;
+	entrynum += 1;
     return entrynum;
 }
 
@@ -1535,6 +1545,7 @@ static int Team_score_table(int entrynum, int teamnum,
 void Client_score_table(void)
 {
     struct team_score	team[MAX_TEAMS],
+			pausers,
 			*team_order[MAX_TEAMS];
     other_t		*other,
 			**order;
@@ -1560,6 +1571,7 @@ void Client_score_table(void)
     }
     if (BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY) {
 	memset(&team[0], 0, sizeof team);
+	memset(&pausers, 0, sizeof pausers);
     }
     Determine_order(order, team);
     Paint_score_start();
@@ -1574,14 +1586,10 @@ void Client_score_table(void)
 
 	/* add an empty line */
 	entrynum++;
-	for (i = (BIT(hackedInstruments, TREAT_ZERO_SPECIAL) ? 1 : 0);
-	     i < MAX_TEAMS;
-	     i++) {
+	for (i = 0; i < MAX_TEAMS; i++)
 	    entrynum = Team_score_table(entrynum, i, team[i], order);
-	}
-	if (BIT(hackedInstruments, TREAT_ZERO_SPECIAL)) {
-	    entrynum = Team_score_table(entrynum, 0, team[0], order);
-	}
+	/* paint pausers */
+	entrynum = Team_score_table(entrynum, TEAM_PAUSEHACK, pausers, order);
 #if 0
 	for (i = 0; i < num_playing_teams; i++) {
 	    entrynum = Team_heading(entrynum,

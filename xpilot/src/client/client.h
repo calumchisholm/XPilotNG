@@ -69,7 +69,6 @@
 #define CLIENT_RANKER		(1L << 7)
 #define MAP_RADAR		(1L << 12)
 #define SHOW_LIVES_BY_SHIP	(1L << 13)
-#define TREAT_ZERO_SPECIAL	(1L << 14)
 #define SHOW_EXTRA_BASE_INFO	(1L << 15)
 
 

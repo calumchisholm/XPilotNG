@@ -538,12 +538,10 @@ int Init_top(void)
 	COLORCHECK(msgScanSafeColor, 4);
 	COLORCHECK(decorColor, 6);
 	COLORCHECK(manyLivesColor, 4);
-	COLORCHECK(scoreZeroColor, 4);
     } else {
 	COLORCHECK(msgScanSafeColor, 2);
 	COLORCHECK(decorColor, 3);
 	COLORCHECK(manyLivesColor, 0);
-	COLORCHECK(scoreZeroColor, 1);
     }
 
     if (maxColors > 8) {

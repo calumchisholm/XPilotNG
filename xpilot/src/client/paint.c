@@ -176,7 +176,6 @@ int	scoreColor;		/* Score list color index */
 int	scoreSelfColor;		/* Score list own score color index */
 int	scoreInactiveColor;	/* Score list inactive player color index */
 int	scoreInactiveSelfColor;	/* Score list inactive self color index */
-int	scoreZeroColor;		/* Score list team zero color index */
 int	scoreObjectColor;	/* Color index for map score objects */
 
 int	zeroLivesColor;		/* Color to associate with 0 lives */
@@ -647,9 +646,7 @@ void Paint_score_entry(int entry_num,
 	|| other->mychar == 'W')
 	&& !mono) {
 
-	if (BIT(hackedInstruments, TREAT_ZERO_SPECIAL) && other->team == 0)
-	    XSetForeground(dpy, scoreListGC, colors[scoreZeroColor].pixel);
-	else if (other->id == self->id)
+	if (other->id == self->id)
 	    XSetForeground(dpy, scoreListGC,
 			   colors[scoreInactiveSelfColor].pixel);
 	else
