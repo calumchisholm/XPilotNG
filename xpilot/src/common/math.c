@@ -26,14 +26,8 @@
 char math_version[] = VERSION;
 
 
-
 DFLOAT		tbl_sin[TABLE_SIZE];
 DFLOAT		tbl_cos[TABLE_SIZE];
-
-int ON(char *optval);
-int OFF(char *optval);
-DFLOAT findDir(DFLOAT x, DFLOAT y);
-void Make_table(void);
 
 int ON(char *optval)
 {
