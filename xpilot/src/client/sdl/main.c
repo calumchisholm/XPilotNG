@@ -59,6 +59,7 @@ static void sigcatch(int signum)
 int main(int argc, char *argv[])
 {
     bool auto_shutdown = false;
+    int result;
 
     init_error(argv[0]);
 
@@ -104,8 +105,11 @@ int main(int argc, char *argv[])
 	    error("Could not initialize SDL, check your settings.");
 	    exit(1);
 	}
-	if (Meta_window(&connectParam)) 
-	    return 0;
+	while (1) {
+	    result = Meta_window(&connectParam);
+	    if (result < 0) return 0;
+	    if (result == 0) break;
+	}
     }
 
     /* If something goes wrong before Client_setup I'll leave the

@@ -21,6 +21,7 @@
 #ifndef GLWIDGETS_H
 #define GLWIDGETS_H
 
+#include <GL/gl.h>
 #include "SDL.h"
 #include "text.h"
 
@@ -295,6 +296,32 @@ typedef struct {
 GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );
 /***********************/
 /* End: ConfMenuWidget */
+/***********************/
+
+/**************************/
+/* Begin: ImageButtonWidget  */
+/**************************/
+#define IMAGEBUTTONWIDGET 12
+typedef struct {
+    Uint32 fg;
+    Uint32 bg;
+    Uint8 state;
+    string_tex_t tex;
+    GLuint imageUp;
+    GLuint imageDown;
+    texcoord_t txcUp;
+    texcoord_t txcDown;
+    void (*onClick)(GLWidget *widget);
+} ImageButtonWidget;
+
+GLWidget *Init_ImageButtonWidget(const char *text,
+				 const char *upImage,
+				 const char *downImage,
+				 Uint32 bg, 
+				 Uint32 fg,
+				 void (*onClick)(GLWidget *widget));
+/***********************/
+/* End: ImageButtonWidget */
 /***********************/
 
 #endif

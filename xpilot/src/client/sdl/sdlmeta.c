@@ -31,6 +31,9 @@
 #include "SDL_image.h"
 #endif
 
+#define EVENT_JOIN 0
+#define EVENT_REFRESH 1
+
 #define SELECTED_BG 0x009000ff
 #define ROW_FG 0xffff00ff
 #define ROW_BG1 0x0000a0ff
@@ -52,6 +55,8 @@
 #define COUNT_WIDTH 20
 #define META_WIDTH 837
 #define META_HEIGHT 768
+#define BUTTON_BG 0xff0000ff
+#define BUTTON_FG 0xffff00ff
 
 #define METAWIDGET        100
 #define METATABLEWIDGET   101
@@ -435,7 +440,11 @@ static void SelectRow_MetaWidget(GLWidget *widget, MetaRowWidget *row)
     MetaWidget *meta;
     MetaTableWidget *table;
     SDL_Rect status_bounds, plist_bounds;
-    
+
+    if (widget->WIDGET != METAWIDGET) {
+	error("expected METAWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
     meta = (MetaWidget*)widget->wid_info;
     if (meta->status != NULL) {
 	DelGLWidgetListItem(&(widget->children), meta->status);
@@ -472,6 +481,18 @@ static void SelectRow_MetaWidget(GLWidget *widget, MetaRowWidget *row)
     if (table->selected)
 	table->selected->is_selected = false;
     table->selected = row;
+}
+
+static server_info_t *GetSelectedServer_MetaWidget(GLWidget *widget)
+{
+    MetaWidget *meta;
+
+    if (widget->WIDGET != METAWIDGET) {
+	error("expected METAWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
+    meta = (MetaWidget*)widget->wid_info;
+    return ((MetaTableWidget*)meta->table->wid_info)->selected->sip;
 }
 
 static void Paint_MetaRowWidget(GLWidget *widget)
@@ -547,6 +568,7 @@ static void Button_MetaRowWidget(Uint8 button, Uint8 state, Uint16 x,
     row = (MetaRowWidget*)widget->wid_info;
     if (row->is_selected) {
 	evt.type = SDL_USEREVENT;
+	evt.user.code = EVENT_JOIN;
 	evt.user.data1 = row->sip;
 	SDL_PushEvent(&evt);
     } else {
@@ -841,6 +863,31 @@ static void Close_MetaWidget(GLWidget *widget)
     if (info->texture) glDeleteTextures(1, &(info->texture));
 }
 
+static void OnClick_Join(GLWidget *widget)
+{
+    SDL_Event evt;
+    evt.type = SDL_USEREVENT;
+    evt.user.code = EVENT_JOIN;
+    evt.user.data1 = NULL;
+    SDL_PushEvent(&evt);
+}
+
+static void OnClick_Refresh(GLWidget *widget)
+{
+    SDL_Event evt;
+    evt.type = SDL_USEREVENT;
+    evt.user.code = EVENT_REFRESH;
+    evt.user.data1 = NULL;
+    SDL_PushEvent(&evt);
+}
+
+static void OnClick_Quit(GLWidget *widget)
+{
+    SDL_Event evt;
+    evt.type = SDL_QUIT;
+    SDL_PushEvent(&evt);
+}
+
 static GLWidget *Init_MetaWidget(list_t servers)
 {
     GLWidget *tmp;
@@ -863,8 +910,8 @@ static GLWidget *Init_MetaWidget(list_t servers)
     info->players       = NULL;
     info->texture       = 0;
     tmp->WIDGET     	= METAWIDGET;
-    tmp->bounds.x   	= (draw_width - META_WIDTH) / 2;
-    tmp->bounds.y   	= (draw_height - META_HEIGHT) / 2;
+    tmp->bounds.x       = (draw_width - META_WIDTH) / 2;
+    tmp->bounds.y       = (draw_height - META_HEIGHT) / 2;
     tmp->bounds.w       = META_WIDTH;
     tmp->bounds.h       = META_HEIGHT;
     tmp->wid_info       = info;
@@ -916,42 +963,45 @@ static bool join_server(Connect_param_t *conpar, server_info_t *sip)
 
 void handleKeyPress(GLWidget *meta, SDL_keysym *keysym )
 {
-  static unsigned int row = 1;
-
-  switch ( keysym->sym )
+    static unsigned int row = 1;
+    SDL_Event evt;
+    
+    switch ( keysym->sym )
     {
     case SDLK_ESCAPE:
-      /* ESC key was pressed */
-      exit(0);
-      break;
+	/* ESC key was pressed */
+	evt.type = SDL_QUIT;
+	SDL_PushEvent(&evt);
+	break;
     case SDLK_F11:
-      /* F1 key was pressed
-       * this toggles fullscreen mode
-       */
+	/* F11 key was pressed
+	 * this toggles fullscreen mode
+	 */
 #ifndef _WINDOWS
-      SDL_WM_ToggleFullScreen(MainSDLSurface);
+	SDL_WM_ToggleFullScreen(MainSDLSurface);
 #endif
-      break;
+	break;
     case SDLK_UP: 
-      /* move the cursor up */
-      break;
+	/* move the cursor up */
+	break;
     case SDLK_DOWN: 
-      /* move the curor down */
-      break;
+	/* move the curor down */
+	break;
     default:
-      break;
+	break;
     }
-  
-  return;
+    
+    return;
 }
 
 int Meta_window(Connect_param_t *conpar)
 {
     static char err[MSG_LEN] = {0};
     int num_serv = 0;
-   
-    GLWidget *meta, *target = NULL;
+    int btn_x, btn_y, btn_h;
+    GLWidget *btn, *root, *meta, *target = NULL;
     SDL_Event evt;
+    server_info_t *server = NULL;
     
     if (!server_list ||
 	List_size(server_list) < 10 ||
@@ -971,9 +1021,62 @@ int Meta_window(Connect_param_t *conpar)
 	error("out of memory");
 	return -1;
     }
-    
-    meta = Init_MetaWidget(server_list);
-    if (!meta) return -1;
+
+    if (!(root = Init_EmptyBaseGLWidget())) {
+        error("Widget init failed");
+	return -1;
+    }
+    root->bounds.x = root->bounds.y = 0;
+    root->bounds.w = draw_width;
+    root->bounds.w = draw_height;
+
+    if (!(meta = Init_MetaWidget(server_list))) {
+	free(root);
+	return -1;
+    }
+    AppendGLWidgetList(&(root->children), meta);
+
+    btn_x = (draw_width - META_WIDTH) / 2 - 80;
+    btn_y = (draw_height - META_HEIGHT) / 2 + 60;
+    btn = Init_ImageButtonWidget("Join", 
+				 "metabtnup.png", 
+				 "metabtndown.png",
+				 BUTTON_BG,
+				 BUTTON_FG,
+				 OnClick_Join);
+    if (btn) {
+	btn->bounds.x = btn_x;
+	btn->bounds.y = btn_y;
+	btn_h = btn->bounds.h;
+	btn_y += btn_h + 5;
+	AppendGLWidgetList(&(root->children), btn);
+    }
+    btn = Init_ImageButtonWidget("Refresh", 
+				 "metabtnup.png", 
+				 "metabtndown.png",
+				 BUTTON_BG,
+				 BUTTON_FG,
+				 OnClick_Refresh);
+    if (btn) {
+	btn->bounds.x = btn_x;
+	btn->bounds.y = btn_y;
+	btn_h = btn->bounds.h;
+	btn_y += btn_h + 5;
+	AppendGLWidgetList(&(root->children), btn);
+    }
+    btn = Init_ImageButtonWidget("Quit", 
+				 "metabtnup.png", 
+				 "metabtndown.png",
+				 BUTTON_BG,
+				 BUTTON_FG,
+				 OnClick_Quit);
+    if (btn) {
+	btn->bounds.x = btn_x;
+	btn->bounds.y = btn_y;
+	btn_h = btn->bounds.h;
+	btn_y += btn_h + 5;
+	AppendGLWidgetList(&(root->children), btn);
+    }
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -1004,13 +1107,22 @@ int Meta_window(Connect_param_t *conpar)
 		return -1;
 		
 	    case SDL_USEREVENT:
-		if (join_server(conpar, (server_info_t*)evt.user.data1)) {
-		    Close_Widget(&meta);
-		    glEnable(GL_BLEND);
-		    glMatrixMode(GL_PROJECTION);
-		    glLoadIdentity();
-		    gluOrtho2D(0, draw_width, 0, draw_height);
-		    return 0;
+		if (evt.user.code == EVENT_JOIN) {
+		    server = (server_info_t*)evt.user.data1;
+		    if (server == NULL)
+			server = GetSelectedServer_MetaWidget(meta);
+		    if (!server) break;
+		    if (join_server(conpar, server)) {
+			Close_Widget(&root);
+			glEnable(GL_BLEND);
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			gluOrtho2D(0, draw_width, 0, draw_height);
+			return 0;
+		    }
+		} else if (evt.user.code == EVENT_REFRESH) {
+		    Close_Widget(&root);
+		    return 1;
 		}
 		break;
 

@@ -26,6 +26,10 @@
 #include "text.h"
 #include "glwidgets.h"
 
+#ifdef HAVE_SDL_IMAGE
+#include "SDL_image.h"
+#endif
+
 /****************************************************/
 /* BEGIN: Main GLWidget stuff	    	    	    */
 /****************************************************/
@@ -1811,4 +1815,186 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
 }
 /***********************/
 /* End: ConfMenuWidget */
+/***********************/
+/**************************/
+/* Begin: ImageButtonWidget */
+/**************************/
+
+static void Button_ImageButtonWidget(Uint8 button, Uint8 state, Uint16 x, 
+			      Uint16 y, void *data)
+{
+    GLWidget *widget;
+    ImageButtonWidget *info;
+
+    widget = (GLWidget*)data;
+    if (widget->WIDGET != IMAGEBUTTONWIDGET) {
+	error("expected IMAGEBUTTONWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
+    info = (ImageButtonWidget*)widget->wid_info;
+    if (info->state == state) return;
+    info->state = state;
+
+    if (state != SDL_PRESSED && info->onClick) {
+	if (x >= widget->bounds.x
+	    && x <= widget->bounds.x + widget->bounds.w
+	    && y >= widget->bounds.y
+	    && y <= widget->bounds.y + widget->bounds.h)
+	    info->onClick(widget);
+    }
+}
+
+static void Close_ImageButtonWidget(GLWidget *widget)
+{
+    ImageButtonWidget *info;
+    if (!widget) return;
+    if (widget->WIDGET != IMAGEBUTTONWIDGET) {
+    	error("Wrong widget type for Close_ImageButtonWidget [%i]",
+	      widget->WIDGET);
+	return;
+    }
+    info = (ImageButtonWidget*)widget->wid_info;
+    free_string_texture(&(info->tex));
+    if (info->imageUp) glDeleteTextures(1, &(info->imageUp));
+    if (info->imageDown) glDeleteTextures(1, &(info->imageDown));
+}
+
+static void Paint_ImageButtonWidget(GLWidget *widget)
+{
+    SDL_Rect *b;
+    ImageButtonWidget *info;
+    int x, y, c;
+
+    if (!widget) return;
+     
+    b = &(widget->bounds);
+    info = (ImageButtonWidget*)(widget->wid_info);
+
+    if (info->state != SDL_PRESSED) {
+	if (info->imageUp) {
+	    set_alphacolor(info->bg);
+	    glBindTexture(GL_TEXTURE_2D, info->imageUp);
+	    glEnable(GL_TEXTURE_2D);
+	    glBegin(GL_QUADS);
+	    glTexCoord2f(info->txcUp.MinX, info->txcUp.MinY); 
+	    glVertex2i(b->x, b->y);
+	    glTexCoord2f(info->txcUp.MaxX, info->txcUp.MinY); 
+	    glVertex2i(b->x + b->w , b->y);
+	    glTexCoord2f(info->txcUp.MaxX, info->txcUp.MaxY); 
+	    glVertex2i(b->x + b->w , b->y + b->h);
+	    glTexCoord2f(info->txcUp.MinY, info->txcUp.MaxY); 
+	    glVertex2i(b->x, b->y + b->h);
+	    glEnd();
+	}
+    } else {
+	if (info->imageDown) {
+	    set_alphacolor(info->bg);
+	    glBindTexture(GL_TEXTURE_2D, info->imageDown);
+	    glEnable(GL_TEXTURE_2D);
+	    glBegin(GL_QUADS);
+	    glTexCoord2f(info->txcDown.MinX, info->txcDown.MinY); 
+	    glVertex2i(b->x, b->y);
+	    glTexCoord2f(info->txcDown.MaxX, info->txcDown.MinY); 
+	    glVertex2i(b->x + b->w , b->y);
+	    glTexCoord2f(info->txcDown.MaxX, info->txcDown.MaxY); 
+	    glVertex2i(b->x + b->w , b->y + b->h);
+	    glTexCoord2f(info->txcDown.MinY, info->txcDown.MaxY); 
+	    glVertex2i(b->x, b->y + b->h);
+	    glEnd();
+	}
+    }
+    
+    x = widget->bounds.x + widget->bounds.w / 2;
+    y = widget->bounds.y + widget->bounds.h / 2;
+    c = (int)(info->fg ? info->fg : whiteRGBA);
+    if (info->state == SDL_PRESSED) {
+	x += 1;
+	y += 1;
+    }
+    disp_text(&(info->tex), c,
+	      CENTER, CENTER, 
+	      x, draw_height - y, 
+	      true);
+}
+
+GLWidget *Init_ImageButtonWidget(const char *text,
+				 const char *upImage,
+				 const char *downImage,
+				 Uint32 bg, 
+				 Uint32 fg,
+				 void (*onClick)(GLWidget *widget))
+{
+    GLWidget *tmp;
+    ImageButtonWidget *info;
+    SDL_Surface *surface;
+    char imagePath[256];
+    int width, height;
+    
+    if (!text) {
+    	error("text missing for Init_ImageButtonWidget.");
+	return NULL;
+    }
+    tmp	= Init_EmptyBaseGLWidget();
+    if ( !tmp ) {
+        error("Failed to malloc in Init_ImageButtonWidget");
+	return NULL;
+    }
+    info = malloc(sizeof(ImageButtonWidget));
+    if (!info) {
+    	free(tmp);
+        error("Failed to malloc in Init_ImageButtonWidget");
+	return NULL;
+    }
+
+    info->onClick = onClick;
+    info->fg = fg;
+    info->bg = bg;
+    info->state = SDL_RELEASED;
+    info->imageUp = 0;
+    info->imageDown = 0;
+
+    if (!render_text(&gamefont, text, &(info->tex))) {
+    	free(info);
+    	free(tmp);
+        error("Failed to render text in Init_ImageButtonWidget");
+	return NULL;
+    }
+    width = info->tex.width + 1;
+    height = info->tex.height + 1;
+
+#ifdef HAVE_SDL_IMAGE
+    sprintf(imagePath, "%s%s", CONF_TEXTUREDIR, upImage);
+    surface = IMG_Load(imagePath);
+    if (surface) {
+	info->imageUp = SDL_GL_LoadTexture(surface, &(info->txcUp));
+	SDL_FreeSurface(surface);
+	if (width < surface->w) width = surface->w;
+	if (height < surface->h) height = surface->h;
+    } else {
+	error("Failed to load button image %s", imagePath);
+    }
+    sprintf(imagePath, "%s%s", CONF_TEXTUREDIR, downImage);
+    surface = IMG_Load(imagePath);
+    if (surface) {
+	info->imageDown = SDL_GL_LoadTexture(surface, &(info->txcDown));
+	SDL_FreeSurface(surface);
+	if (width < surface->w) width = surface->w;
+	if (height < surface->h) height = surface->h;
+    } else {
+	error("Failed to load button image %s", imagePath);
+    }
+#endif
+
+    tmp->WIDGET     	= IMAGEBUTTONWIDGET;
+    tmp->wid_info       = info;
+    tmp->bounds.w   	= width;
+    tmp->bounds.h   	= height;
+    tmp->Draw	    	= Paint_ImageButtonWidget;
+    tmp->Close     	= Close_ImageButtonWidget;
+    tmp->button         = Button_ImageButtonWidget;
+    tmp->buttondata     = tmp;
+    return tmp;
+}
+/***********************/
+/* End: ImageButtonWidget */
 /***********************/
