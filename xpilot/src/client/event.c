@@ -177,7 +177,11 @@ static bool Key_press_swap_settings(void)
 
 static bool Key_press_swap_scalefactor(void)
 {
-    Swap_scalefactor();
+    double a = clData.altScaleFactor;
+
+    Set_altScaleFactor(NULL, clData.scaleFactor);
+    Set_scaleFactor(NULL, a);
+
     return false;
 }
 

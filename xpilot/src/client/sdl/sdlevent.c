@@ -42,18 +42,6 @@ GLWidget *hovertarget = NULL;
 
 int Process_event(SDL_Event *evt);
 
-void Swap_scalefactor(void)
-{
-    double tmp;
-    
-    tmp = clData.scaleFactor;
-    clData.scaleFactor = clData.altScaleFactor;
-    clData.altScaleFactor = tmp;
-
-    clData.scale = 1.0 / clData.scaleFactor;
-    clData.fscale = (float)clData.scale;
-}
-
 bool Key_press_talk(void)
 {
     Console_show();

@@ -669,7 +669,6 @@ int Bitmap_add(const char *filename, int count, bool scalable);
  * Platform specific code needs to implement these.
  */
 void Pointer_control_set_state(bool on);
-void Swap_scalefactor(void);
 void Record_toggle(void);
 void Toggle_fullscreen(void);
 void Toggle_radar_and_scorelist(void);

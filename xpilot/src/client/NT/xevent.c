@@ -115,22 +115,6 @@ static void Talk_set_state(bool on)
     scoresChanged = true;
 }
 
-void Swap_scalefactor(void)
-{
-    double tmp;
-
-    tmp = clData.scaleFactor;
-    clData.scaleFactor = clData.altScaleFactor;
-    clData.altScaleFactor = tmp;
-
-    clData.scale = 1.0 / clData.scaleFactor;
-    clData.fscale = (float)clData.scale;
-
-    Scale_dashes();
-    Config_redraw();
-    Bitmap_update_scale();
-}
-
 bool Key_press_talk(void)
 {
     Talk_set_state((talk_mapped == false) ? true : false);
