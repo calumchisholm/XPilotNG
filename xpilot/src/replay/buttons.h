@@ -41,11 +41,12 @@ typedef struct button *Button;
  * the button is released. Otherwise it is taken when the button is pressed
  */
 
-void SetGlobalButtonAttributes(unsigned long, unsigned long, unsigned long, unsigned long);
+void SetGlobalButtonAttributes(unsigned long, unsigned long,
+			       unsigned long, unsigned long);
 
 Button CreateButton(Display *, Window, int, int, unsigned int, unsigned int,
-		    union button_image, int, int, unsigned long, void (*)(void *),
-		    void *, int, int);
+		    union button_image, unsigned int, unsigned int,
+		    unsigned long, void (*)(void *), void *, int, int);
 int CheckButtonEvent(XEvent *);
 void RedrawButton(Button);
 void EnableButton(Button);
@@ -54,6 +55,6 @@ void ReleaseableButton(Button);
 void NonreleaseableButton(Button);
 void ChangeButtonGroup(Button, int);
 void MoveButton(Button, int, int);
-void GetButtonSize(Button, int *, int *);
+void GetButtonSize(Button, unsigned *, unsigned *);
 
 #endif

@@ -33,8 +33,8 @@ struct button {
     unsigned int	width;
     unsigned int	height;
     union button_image	image;
-    int			imagewidth;
-    int			imageheight;
+    unsigned int	imagewidth;
+    unsigned int	imageheight;
     int			flags;
     int			group;
     void		(*callback)(void *);
@@ -85,7 +85,8 @@ static void SetButtonFont(Display *display)
 Button CreateButton(Display *display, Window parent,
 		    int x, int y,
 		    unsigned int width, unsigned int height,
-		    union button_image image, int iw, int ih,
+		    union button_image image,
+		    unsigned iw, unsigned ih,
 		    unsigned long foreground,
 		    void (*callback)(void *),
 		    void *data, int flags, int group)
@@ -365,7 +366,7 @@ void MoveButton(Button b, int x, int y)
     XConfigureWindow(b->display, b->window, CWX | CWY, &values);
 }
 
-void GetButtonSize(Button b, int *width, int *height)
+void GetButtonSize(Button b, unsigned *width, unsigned *height)
 {
     *width = b->width;
     *height = b->height;

@@ -68,7 +68,7 @@
 
 struct rGC {
     struct rGC		*next;		/* linked list */
-    long		mask;		/* XGCValues mask */
+    unsigned long	mask;		/* XGCValues mask */
     unsigned long	foreground;
     unsigned long	background;
     unsigned char	line_width;
@@ -109,7 +109,7 @@ struct rString {
     short		x;
     short		y;
     unsigned char	font;
-    short		length;
+    size_t		length;
     char		*string;
 };
 
@@ -182,8 +182,8 @@ struct frame {
     struct frame	*older;		/* to next on LRU list */
     struct frame	*newer;		/* to previous on LRU list */
     long		filepos;	/* position in record file */
-    unsigned short	width;		/* width of view window */
-    unsigned short	height;		/* height of view window */
+    unsigned		width;		/* width of view window */
+    unsigned		height;		/* height of view window */
     struct shape	*shapes;	/* head of shape list */
     int			number;		/* frame sequence number */
 };
@@ -310,9 +310,9 @@ static void saveStartToEndXPR(void *);
 
 static struct button_init {
     unsigned char *data;
-    char colour;
-    int width;
-    int height;
+    char color;
+    unsigned width;
+    unsigned height;
     void (*callback)(void *);
     int flags;
     int group;
@@ -1165,7 +1165,8 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 		shp->shape.string.y = RReadShort(rc->fp);
 		shp->shape.string.font = RReadByte(rc->fp);
 		shp->shape.string.length = c = RReadUShort(rc->fp);
-		shp->shape.string.string = cp = MyMalloc(c, MEM_STRING);
+		shp->shape.string.string
+		    = cp = MyMalloc((size_t)c, MEM_STRING);
 		while (c--)
 		    *cp++ = getc(rc->fp);
 		break;
@@ -1496,7 +1497,7 @@ static void drawShapes(struct frame *f, XID drawable, struct xprc *rc)
 	    XDrawString(dpy, drawable, rc->gc,
 			sp->shape.string.x, sp->shape.string.y,
 			sp->shape.string.string,
-			sp->shape.string.length);
+			(int)sp->shape.string.length);
 	    break;
 
 	case RC_FILLARC:
@@ -1568,13 +1569,13 @@ static void OverWriteMsg(struct xprc *rc, const char *msg)
 {
     XFontStruct		*font = rc->gameFont;
     int			len = strlen(msg);
-    int			text_w = XTextWidth(font, msg, len);
-    int			text_h = font->ascent + font->descent;
+    unsigned int	text_w = XTextWidth(font, msg, len);
+    unsigned int	text_h = font->ascent + font->descent;
     int			text_x = (rc->cur->width - text_w) / 2;
     int			text_y = (rc->cur->height - text_h) / 2;
-    int			area_w = (text_w < rc->cur->width / 2)
+    unsigned int	area_w = (text_w < rc->cur->width / 2)
 				 ? (rc->cur->width / 2) : text_w;
-    int			area_h = rc->cur->height / 4;
+    unsigned int	area_h = rc->cur->height / 4;
     int			area_x = (rc->cur->width - area_w) / 2;
     int			area_y = (rc->cur->height - area_h) / 2;
 
@@ -1607,8 +1608,8 @@ static void redrawWindow(struct xprc *rc)
 
     XGetWindowAttributes(dpy, rc->topview, &attrib);
 
-    if (attrib.width != rc->cur->width ||
-	attrib.height != rc->cur->height) {
+    if (attrib.width != (int)rc->cur->width ||
+	attrib.height != (int)rc->cur->height) {
 	XWindowChanges values;
 
 	values.width = rc->cur->width;
@@ -1627,10 +1628,10 @@ static void redrawWindow(struct xprc *rc)
  * Initialize miscellaneous window hints and properties.
  */
 static void Init_wm_prop(Window win,
-			 int w, int h,
 			 int x, int y,
-			 int min_w, int min_h,
-			 int max_w, int max_h,
+			 unsigned w, unsigned h,
+			 unsigned min_w, unsigned min_h,
+			 unsigned max_w, unsigned max_h,
 			 int flags)
 {
     XClassHint		xclh;
@@ -1687,7 +1688,8 @@ static void Init_wm_prop(Window win,
 static struct recordwin *Init_recordwindow(unsigned long bg, void *data)
 {
     struct recordwin	*rwin = MyMalloc(sizeof(struct recordwin), MEM_UI);
-    int			w, h, x, y;
+    int			x, y;
+    unsigned		w, h;
     XWindowChanges	values;
     union button_image	image;
 
@@ -1719,7 +1721,7 @@ static struct recordwin *Init_recordwindow(unsigned long bg, void *data)
 					BUTTON_TEXT | BUTTON_RELEASE,
 					0);
     GetButtonSize(rwin->mark_start_but, &w, &h);
-    if (x < w)
+    if (x < (int)w)
 	x = w;
     y += h + 5;
 
@@ -1733,7 +1735,7 @@ static struct recordwin *Init_recordwindow(unsigned long bg, void *data)
 				      BUTTON_TEXT | BUTTON_RELEASE,
 				      0);
     GetButtonSize(rwin->mark_end_but, &w, &h);
-    if (x < w)
+    if (x < (int)w)
 	x = w;
     y += h + 5;
 
@@ -1747,7 +1749,7 @@ static struct recordwin *Init_recordwindow(unsigned long bg, void *data)
 				BUTTON_TEXT | BUTTON_RELEASE,
 				0);
     GetButtonSize(rwin->recbut, &w, &h);
-    if (x < w)
+    if (x < (int)w)
 	x = w;
     y += h + 5;
 
@@ -1761,7 +1763,7 @@ static struct recordwin *Init_recordwindow(unsigned long bg, void *data)
 				BUTTON_TEXT | BUTTON_RELEASE,
 				0);
     GetButtonSize(rwin->recbut, &w, &h);
-    if (x < w)
+    if (x < (int)w)
 	x = w;
     y += h + 5;
 
@@ -1784,7 +1786,8 @@ static struct recordwin *Init_recordwindow(unsigned long bg, void *data)
 
 static void openErrorWindow(struct errorwin *ewin, const char *fmt, ...)
 {
-    int w, h, i;
+    unsigned w, h;
+    int i;
     va_list ap;
     XWindowChanges values;
     char *p = ewin->message, *q = ewin->message;
@@ -1802,7 +1805,7 @@ static void openErrorWindow(struct errorwin *ewin, const char *fmt, ...)
 	while(*p != '\0' && *p != '\n')
 	    p++;
 	if (p != q)
-	    if ((i = XTextWidth(ewin->font, q, p-q)) > w)
+	    if ((i = XTextWidth(ewin->font, q, p-q)) > (int)w)
 		w = i;
 	if (*p != '\0')
 	    p++;
@@ -1811,12 +1814,12 @@ static void openErrorWindow(struct errorwin *ewin, const char *fmt, ...)
     }
 
     h *= ewin->font->ascent + ewin->font->descent + 2;
-    MoveButton(ewin->but, 5, h + 5);
+    MoveButton(ewin->but, 5, (int)(h + 5));
     values.width = w + 10;
     values.height = h + 15;
     GetButtonSize(ewin->but, &w, &h);
     values.height += h;
-    if (values.width < w + 10)
+    if (values.width < (int)(w + 10))
 	values.width = w + 10;
     values.x = (DisplayWidth(dpy, screen_num) - values.width)/2;
     values.y = (DisplayHeight(dpy, screen_num) - values.height)/2;
@@ -1852,7 +1855,8 @@ static void closeErrorWindow(void *data)
 static struct errorwin *Init_errorwindow(unsigned long bg)
 {
     struct errorwin *ewin = MyMalloc(sizeof(struct errorwin), MEM_UI);
-    int w, h, x, y;
+    int x, y;
+    unsigned w, h;
     union button_image image;
 
     w = 100;
@@ -1893,8 +1897,8 @@ static struct errorwin *Init_errorwindow(unsigned long bg)
 static void Init_topview(struct xprc *rc)
 {
     int			i;
-    int			w = rc->view_width;
-    int			h = rc->view_height;
+    unsigned int	w = rc->view_width;
+    unsigned int	h = rc->view_height;
     int			x = 0;
     int			y = (DisplayHeight(dpy, screen_num) - h) / 2;
 
@@ -1933,7 +1937,8 @@ static void Init_topview(struct xprc *rc)
 
 static void Init_topmain(struct xui *ui, struct xprc *rc)
 {
-    int			topx, topy, topw, toph, i, x, y, w, mw;
+    int			topx, topy, i, x, y, w, mw;
+    unsigned		topw, toph;
     XWindowChanges	values;
 
     ui->black = BlackPixel(dpy, screen_num);
@@ -1952,11 +1957,11 @@ static void Init_topmain(struct xui *ui, struct xprc *rc)
 
 
    ui->topmain = XCreateSimpleWindow(dpy, RootWindow(dpy, screen_num),
-				      0, 0,
-				      topw, toph+100,
-				      1,
-				      BlackPixel(dpy, screen_num),
-				      ui->mainbg);
+				     0, 0,
+				     topw, toph+100,
+				     1,
+				     BlackPixel(dpy, screen_num),
+				     ui->mainbg);
 
     ui->gc = XCreateGC(dpy, ui->topmain, 0, NULL);
 
@@ -1984,10 +1989,11 @@ static void Init_topmain(struct xui *ui, struct xprc *rc)
 	    x += 16;
 
 	ui->buttons[i] =
-	    CreateButton(dpy, ui->topmain, x, y - (buttonInit[i].height>>1),
+	    CreateButton(dpy, ui->topmain,
+			 x, (int)(y - (buttonInit[i].height>>1)),
 			 buttonInit[i].width+4, buttonInit[i].height+4, p,
 			 buttonInit[i].width, buttonInit[i].height,
-			 (buttonInit[i].colour == 0) ? ui->black : ui->red,
+			 (buttonInit[i].color == 0) ? ui->black : ui->red,
 			 buttonInit[i].callback, (void *) ui,
 			 buttonInit[i].flags, buttonInit[i].group);
 	x += buttonInit[i].width+BUTTON_BORDER+BUTTON_SPACING;
@@ -2031,7 +2037,7 @@ static void Init_topmain(struct xui *ui, struct xprc *rc)
     toph = ui->labels[4].y + ui->boldFont->ascent + ui->boldFont->descent + 5;
     for (i = 0; i < 5; i++) {
 	w = XTextWidth(ui->boldFont, ui->labels[i].name,
-		       strlen(ui->labels[i].name));
+		       (int)strlen(ui->labels[i].name));
 	if (w > mw)
 	    mw = w;
     }
@@ -2065,7 +2071,8 @@ static void Init_topmain(struct xui *ui, struct xprc *rc)
 
 static void redrawLabel(struct xui *ui, struct xprc *rc, struct label *lb)
 {
-    int			fn, hr, min, sec, fr, lw, vw, cw;
+    int			fn, hr, min, sec, fr;
+    unsigned		lw, vw, cw;
     char		value_str[256];
 
     XSetForeground(dpy, ui->gc, ui->black);
@@ -2094,11 +2101,11 @@ static void redrawLabel(struct xui *ui, struct xprc *rc, struct label *lb)
     }
 
     if (lb->w == 0)
-	lw = XTextWidth(ui->boldFont, lb->name, strlen(lb->name));
+	lw = XTextWidth(ui->boldFont, lb->name, (int)strlen(lb->name));
     else
 	lw = lb->w;
     cw = XTextWidth(ui->boldFont, ": ", 2);
-    vw = XTextWidth(ui->smallFont, value_str, strlen(value_str));
+    vw = XTextWidth(ui->smallFont, value_str, (int)strlen(value_str));
 #if 0
 	XClearArea(dpy, ui->topmain,
 		   lb->x, lb->y,
@@ -2107,9 +2114,9 @@ static void redrawLabel(struct xui *ui, struct xprc *rc, struct label *lb)
 		   False);
 #endif
     XClearArea(dpy, ui->topmain,
-	       lb->x + lw + cw + 1, lb->y,
+	       (int)(lb->x + lw + cw + 1), lb->y,
 	       vw + 2,
-	       ui->smallFont->ascent + ui->smallFont->descent,
+	       (unsigned)(ui->smallFont->ascent + ui->smallFont->descent),
 	       False);
     if (lb->j) {
 	lw = -lw-cw-vw;
@@ -2122,15 +2129,15 @@ static void redrawLabel(struct xui *ui, struct xprc *rc, struct label *lb)
     }
     XSetFont(dpy, ui->gc, ui->boldFont->fid);
     XDrawString(dpy, ui->topmain, ui->gc,
-		lb->x + 1 + lw, lb->y + ui->boldFont->ascent,
-		lb->name, strlen(lb->name));
+		(int)(lb->x + 1 + lw), lb->y + ui->boldFont->ascent,
+		lb->name, (int)strlen(lb->name));
     XDrawString(dpy, ui->topmain, ui->gc,
-		lb->x + 1 + cw, lb->y + ui->boldFont->ascent,
+		(int)(lb->x + 1 + cw), lb->y + ui->boldFont->ascent,
 		": ", 2);
     XSetFont(dpy, ui->gc, ui->smallFont->fid);
     XDrawString(dpy, ui->topmain, ui->gc,
-		lb->x + 1 + vw, lb->y + ui->smallFont->ascent,
-		value_str, strlen(value_str));
+		(int)(lb->x + 1 + vw), lb->y + ui->smallFont->ascent,
+		value_str, (int)strlen(value_str));
 }
 
 static void redrawMain(struct xui *ui, struct xprc *rc)
@@ -2194,7 +2201,7 @@ static void GammaCorrect(unsigned char *data, int size, unsigned char tbl[256])
     }
 }
 
-static void ScalePPM(unsigned char *rgbdata, int cols, int rows,
+static void ScalePPM(unsigned char *rgbdata, unsigned cols, unsigned rows,
 		     double scale, double gamma_val, FILE *fp)
 {
 #define SCALE		4096
@@ -2205,8 +2212,9 @@ static void ScalePPM(unsigned char *rgbdata, int cols, int rows,
     unsigned char	*newxelrow;
     unsigned char	*xP;
     unsigned char	*nxP;
-    int			rowsread, newrows, newcols;
-    int			row, col, needtoreadrow;
+    size_t		rowsread, newrows, newcols;
+    unsigned		row, col;
+    int			needtoreadrow;
     double		xscale, yscale;
     long		sxscale, syscale;
     long		fracrowtofill, fracrowleft;
@@ -2222,8 +2230,8 @@ static void ScalePPM(unsigned char *rgbdata, int cols, int rows,
     if (gamma_val > 0)
 	BuildGamma(gammatbl, gamma_val);
 
-    newcols = (int) (cols * scale + 0.999);
-    newrows = (int) (rows * scale + 0.999);
+    newcols = (size_t) (cols * scale + 0.999);
+    newrows = (size_t) (rows * scale + 0.999);
     xscale = (double) newcols / (double) cols;
     yscale = (double) newrows / (double) rows;
     sxscale = (long) (xscale * SCALE);
@@ -2351,7 +2359,7 @@ static void ScalePPM(unsigned char *rgbdata, int cols, int rows,
 	    *nxP++ = b;
 	}
 	if (gamma_val > 0)
-	    GammaCorrect(newxelrow, 3 * newcols, gammatbl);
+	    GammaCorrect(newxelrow, (int)(3 * newcols), gammatbl);
 	fwrite(newxelrow, 1, 3 * newcols, fp);
     }
 
@@ -2400,16 +2408,17 @@ static void SaveFramesPPM(struct xprc *rc)
 
     pixmap = XCreatePixmap(dpy, RootWindow(dpy, screen_num),
 			   rc->view_width, rc->view_height,
-			   DefaultDepth(dpy, screen_num));
+			   (unsigned)DefaultDepth(dpy, screen_num));
     if (pixmap == BadAlloc || pixmap == BadValue) {
 	openErrorWindow(rc->ewin, "Can't allocate a pixmap. Unable to save");
 	return;
     }
     if (rc->scale > 0) {
-	rgbdata = MyMalloc(3 * rc->view_width * rc->view_height, MEM_MISC);
+	rgbdata = MyMalloc((size_t)(3 * rc->view_width * rc->view_height),
+			   MEM_MISC);
 	line = NULL;
     } else {
-	line = MyMalloc(3 * rc->view_width, MEM_MISC);
+	line = MyMalloc((size_t)(3 * rc->view_width), MEM_MISC);
 	rgbdata = NULL;
     }
 
@@ -2475,7 +2484,7 @@ static void SaveFramesPPM(struct xprc *rc)
 	    if (rc->scale > 0)
 		line = ptr;
 	    else
-		fwrite(line, 1, 3 * rc->view_width, fp);
+		fwrite(line, 1, (size_t)(3 * rc->view_width), fp);
 	}
 	XDestroyImage(img);
 
@@ -2497,9 +2506,10 @@ static void SaveFramesPPM(struct xprc *rc)
     }
 
     if (rc->scale > 0)
-	MyFree(rgbdata, 3 * rc->view_width * rc->view_height, MEM_MISC);
+	MyFree(rgbdata, (size_t)(3 * rc->view_width * rc->view_height),
+	       MEM_MISC);
     else
-	MyFree(line, 3 * rc->view_width, MEM_MISC);
+	MyFree(line, (size_t)(3 * rc->view_width), MEM_MISC);
 
     XFreePixmap(dpy, pixmap);
 
@@ -2741,7 +2751,7 @@ static void WriteHeader(struct xprc *rc, FILE *fp)
     /* Write info about graphics setup. */
     putc(rc->maxColors, fp);
     for (i = 0; i < rc->maxColors; i++) {
-	RWriteULong(rc->colors[i].pixel, fp);
+	RWriteULong((int)rc->colors[i].pixel, fp);
 	RWriteUShort(rc->colors[i].red, fp);
 	RWriteUShort(rc->colors[i].green, fp);
 	RWriteUShort(rc->colors[i].blue, fp);
@@ -2760,8 +2770,8 @@ static void WriteFrame(struct xprc *rc, struct frame *f, FILE *fp)
     int			i;
 
     putc(RC_NEWFRAME, fp);
-    RWriteUShort(f->width, fp);
-    RWriteUShort(f->height, fp);
+    RWriteUShort((int)f->width, fp);
+    RWriteUShort((int)f->height, fp);
 
     for (sp = f->shapes; sp != NULL; sp = sp->next) {
 
@@ -2813,8 +2823,8 @@ static void WriteFrame(struct xprc *rc, struct frame *f, FILE *fp)
 	    RWriteShort(sp->shape.string.x, fp);
 	    RWriteShort(sp->shape.string.y, fp);
 	    RWriteByte(sp->shape.string.font, fp);
-	    RWriteUShort(sp->shape.string.length, fp);
-	    for (i = 0; i < sp->shape.string.length; i++)
+	    RWriteUShort((int)sp->shape.string.length, fp);
+	    for (i = 0; i < (int)sp->shape.string.length; i++)
 		putc(sp->shape.string.string[i], fp);
 	    break;
 
