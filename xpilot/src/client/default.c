@@ -43,6 +43,7 @@ static bool Set_texturePath(xp_option_t *opt, const char *value)
 	xp_free(texturePath);
 
     texturePath = xp_safe_strdup(value);
+    warn("texturePath is now %s", texturePath);
     return true;
 }
 static char *Get_texturePath(xp_option_t *opt)
@@ -537,8 +538,8 @@ xp_option_t default_options[] = {
 	NULL,
 	"Which type of base warning you prefer.\n"
 	"A value of 0 disables base warning.\n"
-	"A value of 1 draws a red box on a base when someone has died.\n"
-	"A value of 2 makes the base name flash when someone has died.\n"
+	"A value of 1 draws a time meter on a base when a ship is appearing.\n"
+	"A value of 2 makes the base name flash when a ship is appearing.\n"
 	"A value of 3 combines the effects of values 1 and 2.\n"),
 
     /* instruments */
