@@ -464,23 +464,15 @@ void Contact(int fd, void *arg)
 
     case SHUTDOWN_pack:
     {
+	char reason[MAX_CHARS];
 	/*
 	 * Shutdown the entire server.
 	 */
 
-	if (Packet_scanf(&ibuf, "%d%s", &delay, ShutdownReason) <= 0)
+	if (Packet_scanf(&ibuf, "%d%s", &delay, reason) <= 0)
 	    status = E_INVAL;
-	else {
-	    Set_message_f("|*******| %s (%s) |*******| \"%s\"",
-			  (delay > 0) ? "SHUTTING DOWN" : "SHUTDOWN STOPPED",
-			  user_name, ShutdownReason);
-	    if (delay > 0) {
-		/* delay is in seconds */;
-		ShutdownServer = delay * FPS;
-		ShutdownDelay = ShutdownServer;
-	    } else
-		ShutdownServer = -1;
-	}
+	else
+	    Server_shutdown(user_name, delay, reason);
 
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);

@@ -394,6 +394,7 @@ void Server_info(char *str, size_t max_size);
 void Log_game(const char *heading);
 const char *Describe_game_status(void);
 void Game_Over(void);
+void Server_shutdown(const char *user_name, int delay, const char *reason);
 void Server_log_admin_message(player_t *pl, const char *str);
 int plock_server(bool on);
 void Main_loop(void);

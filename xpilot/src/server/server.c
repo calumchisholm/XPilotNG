@@ -721,6 +721,19 @@ void Game_Over(void)
     }
 }
 
+void Server_shutdown(const char *user_name, int delay, const char *reason)
+{
+    Set_message_f("|*******| %s (%s) |*******| \"%s\" [*Server notice*]",
+		  (delay > 0) ? "SHUTTING DOWN" : "SHUTDOWN STOPPED",
+		  user_name, reason);
+    strlcpy(ShutdownReason, reason, sizeof(ShutdownReason));
+    if (delay > 0) {
+	/* delay is in seconds */;
+	ShutdownServer = delay * FPS;
+	ShutdownDelay = ShutdownServer;
+    } else
+	ShutdownServer = -1;
+}
 
 void Server_log_admin_message(player_t *pl, const char *str)
 {
