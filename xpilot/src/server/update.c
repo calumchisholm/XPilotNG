@@ -1200,7 +1200,7 @@ void Update_objects(world_t *world)
 	    if (Player_is_human(pl)
 		&& options.maxIdleTime > 0
 		&& pl->idleTime > options.maxIdleTime
-		&& (NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
+		/*&& (NumPlayers - NumRobots - NumPseudoPlayers) > 1*/) {
 		Set_message_f("%s was paused for idling. "
 			      "[*Server notice*]", pl->name);
 		Pause_player(pl, true);

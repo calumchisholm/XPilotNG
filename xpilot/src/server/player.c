@@ -626,7 +626,6 @@ void Reset_all_players(world_t *world)
 
 	if (!Player_is_paused(pl)) {
 	    Player_set_state(pl, PL_STATE_APPEARING);
-	    pl->idleTime = 0;
 	    Player_set_life(pl, world->rules->lives);
 	}
     }

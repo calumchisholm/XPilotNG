@@ -1273,14 +1273,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		      (BIT(world->rules->mode, TIMING) ? "race" : "round"));
     }
 
-    /* kps - dubious */
-    for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Player_by_index(i);
-
-	if (pl_i->mychar == ' ')
-	    pl_i->idleTime = 0;
-    }
-
     return 0;
 }
 
@@ -2141,7 +2133,6 @@ static int Receive_keyboard(connection_t *connp)
 	pl = Player_by_id(connp->id);
 	memcpy(pl->last_keyv, connp->r.ptr, size);
 	connp->r.ptr += size;
-	pl->idleTime = 0;
 	Handle_keyboard(pl);
     }
     if (connp->num_keyboard_updates++ && (connp->state & CONN_PLAYING)) {
