@@ -992,6 +992,18 @@ other_t *Other_by_id(int id)
     return NULL;
 }
 
+/* Only used by message scan hack */
+other_t *Other_by_name(char *name)
+{
+    int i;
+
+    for (i = 0; i < num_others; i++) {
+	if (!strcmp(name, Others[i].name))
+	    return &Others[i];
+    }
+    return NULL;
+}
+
 wireobj *Ship_by_id(int id)
 {
     other_t		*other;

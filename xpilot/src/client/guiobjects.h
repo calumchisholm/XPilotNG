@@ -47,6 +47,7 @@ void Gui_paint_lasers_end(void);
 void Gui_paint_laser(int color, int x1, int y1, int len, int dir);
 
 void Gui_paint_paused(int x, int y, int count);
+void Gui_paint_appearing(int x, int y, int id, int count);
 
 void Gui_paint_ecm(int x, int y, int size);
 

@@ -380,6 +380,7 @@ int Handle_base(int id, int ind);
 int Check_pos_by_index(int ind, int *xp, int *yp);
 int Check_index_by_pos(int x, int y);
 other_t *Other_by_id(int id);
+other_t *Other_by_name(char *name); /* Only used by message scan hack */
 wireobj *Ship_by_id(int id);
 int Handle_leave(int id);
 int Handle_player(int id, int team, int mychar, char *player_name,

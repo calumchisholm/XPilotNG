@@ -410,6 +410,15 @@ void Gui_paint_paused(int x, int y, int count)
 }
 
 
+void Gui_paint_appearing(int x, int y, int id, int count)
+{
+    const int hsize = 3 * BLOCK_SZ / 7;
+    SET_FG(colors[RED].pixel);
+    rd.fillRectangle(dpy, p_draw, gc, SCALEX(x - hsize), SCALEY(y + hsize),
+		     WINSCALE(2 * hsize + 1), WINSCALE(2 * hsize + 1));
+}
+
+
 void Gui_paint_ecm(int x, int y, int size)
 {
     Arc_add(WHITE,

@@ -65,6 +65,15 @@ typedef struct {
  * Global objects.
  */
 
+/* Message scan hack for basewarnings on old servers */
+struct deathhack {
+    int id;
+    int deathtime;
+};
+extern struct deathhack deatharray[10];
+extern int deathpos;
+
+
 extern char	dashes[NUM_DASHES];
 extern char	cdashes[NUM_CDASHES];
 

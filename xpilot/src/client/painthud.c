@@ -945,6 +945,104 @@ void Paint_messages(void)
 }
 
 
+
+/* Ugly message scan hack for basewarnings on old servers */
+
+static char was_shot[]= " was killed by a shot from ";
+static int was_shot_len= 27;
+static char smashed[]= " smashed";
+static int smashed_len = 8;
+static char smacked []= " smacked";
+static int smacked_len = 8;
+static char and[]= " and ";
+static int and_len= 5;
+static char crashed[]= " crashed.";
+static int crashed_len= 9;
+static char ran_over[]= " ran over ";
+static int ran_over_len = 10;
+static char suicide[]= " has committed suicide.";
+static int suicide_len = 23;
+/*static char deadly_players[]=  " Deadly Players";
+static char deadly_player[]:=  " Deadly Player.";
+static char deadliest_player[]=" Deadliest Player";*/
+static char victim[MSG_LEN];
+static char victim2[MSG_LEN];
+
+struct deathhack deatharray[10];
+int deathpos;
+
+static void Message_scan_hack_death(char *name)
+{
+    int i;
+    other_t *victim;
+
+    victim = Other_by_name(name);
+    if (victim == NULL) {
+	warn("Message scan hack failing");
+	return;
+    }
+    for (i = 0; i < 10; i++)
+	if (deatharray[i].id == victim->id)
+	    deatharray[i].id = -1;
+    deatharray[deathpos].id = victim->id;
+    deatharray[deathpos].deathtime = loops;   \
+    deathpos = (deathpos + 1) % 10;
+}
+
+static void Message_scan_hack(char *message, int len)
+{
+    int i;
+    int andi = 0, kill = 0, was_crash = 0;
+
+    for (i = 0; i < len - 3; i++) {
+	if (message[i]== and[0] && !strncmp(&message[i], and, and_len)) {
+	    andi = i;
+	}
+	else if (!strncmp(&message[i], was_shot, was_shot_len)) {
+	    strncpy(victim, &message[0], i); /*who was shot?*/
+	    victim[i] = '\0';
+	    kill = true;
+	    break;
+        }
+	else if (!strncmp(&message[i], crashed, crashed_len) && andi > 0) {
+	    was_crash = true;
+	    strncpy(victim, &message[0], andi);
+	    victim[andi] = '\0';
+	    kill = true;
+	    strncpy(victim2, &message[andi+and_len], i - andi - and_len);
+	    victim2[i - andi - and_len] = '\0';
+	    break;
+	}
+	else if (!strncmp(&message[i], ran_over, ran_over_len)) {
+	    kill = true;
+	    strncpy(victim, &message[i + ran_over_len], strlen(&message[i + ran_over_len])-1 );/*who did he run over?*/
+	    victim[strlen(&message[i + ran_over_len]) - 1] = '\0';
+	    break;
+ 	}
+	else if (!strncmp(&message[i], smashed, smashed_len)) {
+	    strncpy(victim, &message[0],i);
+	    victim[i] = '\0';
+	    kill = true;
+	    break;
+ 	}
+	else if (!strncmp(&message[i], smacked, smacked_len)) {
+	    strncpy(victim, &message[0], i);
+	    victim[i] = '\0';
+	    kill = true;
+	    break;
+	}
+    }
+    if (kill == true) {
+	Message_scan_hack_death(victim);
+	if (was_crash)
+	    Message_scan_hack_death(victim2);
+    }
+}
+
+
+
+
+
 /*
  * add an incoming talk/game message.
  * however, buffer new messages if there is a pending selection.
@@ -979,6 +1077,7 @@ void Add_message(char *message)
 #endif
 	}
     } else {
+	Message_scan_hack(message, len);
 #ifndef _WINDOWS
 	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
 	    msg_set = GameMsg_pending;

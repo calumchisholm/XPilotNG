@@ -93,13 +93,22 @@ void Paint_vfuel(void)
     }
 }
 
+/* Easier to paint appearing ships from here for old servers, therefore
+ * this declaration of a function from guiobjects.c */
+extern void Gui_paint_appearing(int x, int y, int id, int count);
 void Paint_vbase(void)
 {
-    int	i, id, team;
+    int	i, j, id, team;
     if (num_vbase > 0) {
 	for (i = 0; i < num_vbase; i++) {
             Base_info_by_pos(vbase_ptr[i].xi, vbase_ptr[i].yi, &id, &team);
 	    Gui_paint_base(vbase_ptr[i].x, vbase_ptr[i].y, id, team, vbase_ptr[i].type);
+	    for (j = 0; j < 10; j++) {
+		if (deatharray[j].id == id &&
+				deatharray[j].deathtime > loops - 3 * FPS)
+		    Gui_paint_appearing(vbase_ptr[i].x + BLOCK_SZ / 2,
+					vbase_ptr[i].y + BLOCK_SZ / 2, id, 1);
+	    }
 	}
 	RELEASE(vbase_ptr, num_vbase, max_vbase);
     }
