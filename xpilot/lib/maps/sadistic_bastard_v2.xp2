@@ -1,5 +1,6 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
+<Option name="oldthrust" value="0.5"/>
 <Option name="allowshields" value="no"/>
 <Option name="robotstalk" value="no"/>
 <Option name="maxtransporters" value="10"/>

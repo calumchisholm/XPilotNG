@@ -3485,7 +3485,7 @@ static option_desc opts[] = {
     },
     {
 	"constantSpeed",
-	"constantSpeed",
+	"oldThrust",
 	"0",
 	&options.constantSpeed,
 	valReal,
@@ -3495,10 +3495,15 @@ static option_desc opts[] = {
 	"is proportional to the product of the acceleration of the ship\n"
 	"(varying with ship mass and afterburners) and the value of this\n"
 	"option. Note that this option is quite unphysical and can using it\n"
-	"can cause weird effects (with bounces for example).\n",
+	"can cause weird effects (with bounces for example).\n"
+	"Low values close to 0.5 (maybe in the range 0.3 to 1) for this\n"
+	"option can be used if you want to increase ship agility without\n"
+	"increasing speeds otherwise. This can improve gameplay for example\n"
+	"on the Blood's Music map. Higher values make the ship behaviour\n"
+	"visibly weird.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    { /* kps - temp hack to disable ball styles during runtime */
+    {
 	"ballStyles",
 	"ballStyles",
 	"true",

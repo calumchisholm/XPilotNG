@@ -1,5 +1,6 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
+<Option name="oldthrust" value="0.5"/>
 <Option name="wallBounceFuelDrainMult" value="0.2"/>
 <Option name="maxplayershots" value="12"/>
 <Option name="teamimmunity" value="yes"/>
@@ -38,7 +39,7 @@
 <Option name="worldlives" value="3"/>
 <Option name="allowplayerkilling" value="yes"/>
 <Option name="limitedvisibility" value="no"/>
-<Option name="mapname" value="Polygon Blood's Music v8.1"/>
+<Option name="mapname" value="Polygon Blood's Music v8.2"/>
 <Option name="waitingfps" value="0"/>
 <Option name="allowplayerbounces" value="no"/>
 <Option name="initialfuel" value="1000"/>
