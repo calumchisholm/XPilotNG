@@ -25,15 +25,13 @@
  * client audio
  */
 
-#ifdef SOUND
-
-#define	MAX_RANDOM_SOUNDS	6
-
-#define _CAUDIO_C_
-
 #include "xpclient.h"
 
 char caudio_version[] = VERSION;
+
+#ifdef SOUND
+
+#define	MAX_RANDOM_SOUNDS	6
 
 static int	audioEnabled;
 
@@ -163,11 +161,5 @@ int Handle_audio(int type, int volume)
 
     return 0;
 }
-
-#else
-
-#include "xpclient.h"
-
-char caudio_version[] = VERSION;
 
 #endif /* SOUND */
