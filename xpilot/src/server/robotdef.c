@@ -1879,6 +1879,7 @@ static void Robot_default_play_check_objects(int ind,
 
 static void Robot_default_play_check_lasers(int ind)
 {
+    /* kps - move this to check objects function above */
 #if 0 /* laserhack */
     player			*pl = Players[ind];
     int				j;
