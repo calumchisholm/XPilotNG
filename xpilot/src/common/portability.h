@@ -76,7 +76,7 @@ extern	int ServerKilled;
  * Prototypes for OS function wrappers in portability.c.
  */
 extern int Get_process_id(void);	/* getpid */
-extern void Get_login_name(char *buf, int size);
+extern void Get_login_name(char *buf, size_t size);
 
 /*
  * Prototypes for testing if we are running under a certain OS.
