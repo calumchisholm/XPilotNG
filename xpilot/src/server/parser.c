@@ -113,8 +113,8 @@ static void Parse_help(char *progname)
 "    probability that an event will occur in a block per second.\n"
 "    Boolean options are turned off by using +<option>.\n"
 "    \n"
-"    Please refer to the manual pages, xpilots(6) and xpilot(6),\n"
-"    for more specific help.\n"
+"    Please refer to the manual pages, xpilot-ng-server(6),\n"
+"    xpilot-ng-x11(6) and xpilot-ng-sdl(6) for more specific help.\n"
 	  );
 }
 
