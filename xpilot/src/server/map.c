@@ -721,7 +721,7 @@ static bool Grok_map_old(void)
      */
     Reset_map_object_counters();
     Reset_itemid_array();
-    Xpmap_create_map_objects();
+    Xpmap_tags_to_internal_data(true);
 
     Verify_wormhole_consistency();
     

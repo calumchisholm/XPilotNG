@@ -147,7 +147,7 @@ int Wildmap(
 void Xpmap_print(void);
 void Xpmap_grok_map_data(void);
 void Xpmap_allocate_checks(void);
-void Xpmap_create_map_objects(void);
+void Xpmap_tags_to_internal_data(bool create_objects);
 void Xpmap_find_map_object_teams(void);
 void Xpmap_find_base_direction(void);
 void Xpmap_blocks_to_polygons(void);
