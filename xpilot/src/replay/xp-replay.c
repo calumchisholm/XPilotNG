@@ -386,6 +386,7 @@ struct xui {
 static char small_font[] = "-*-helvetica-medium-r-*--14-*-*-*-*-*-iso8859-1";
 static char small_bold_font[] =
 	"-*-helvetica-bold-r-*--14-*-*-*-*-*-iso8859-1";
+static char alternative_font[] = "fixed";
 
 static int		Argc;
 static char		**Argv;
@@ -1359,8 +1360,13 @@ static XFontStruct *loadQueryFont(const char *fontName, GC gc)
     XFontStruct		*font;
 
     if ((font = XLoadQueryFont(dpy, fontName)) == NULL) {
-	fprintf(stderr, "Can't load font \"%s\".\n", fontName);
-	font = XQueryFont(dpy, XGContextFromGC(gc));
+	fprintf(stderr, "Can't load font \"%s\", using \"%s\" instead.\n",
+		fontName, alternative_font);
+	if ((font = XLoadQueryFont(dpy, alternative_font)) == NULL) {
+	    fprintf(stderr, "Can't load alternative font \"%s\".\n",
+		    alternative_font);
+	    font = XQueryFont(dpy, XGContextFromGC(gc));
+	}
     }
     return font;
 }
