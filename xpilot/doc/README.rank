@@ -1,0 +1,39 @@
+How to use the server.
+
+I suppose the important part is the rankingstuff.
+You control it with two different environmentvariables:
+XPILOTRANKINGPAGE and XPILOTSCOREFILE
+
+if XPILOTSCOREFILE is set and contains a filename then the server
+will remember the scores of the 400 most recent players and use that
+file to save the scores between server uptimes.
+
+if XPILOTRANKINGPAGE is set and contains a filename then the server
+will write a webpage with the rankings in that file.
+
+example: on svan I have:
+export XPILOTSCOREFILE=~/lib/xpilot/scores
+export XPILOTRANKINGPAGE=~/public_html/xpilot/ranks.html
+
+To reset the scores, simply delete the XPILOTSCOREFILE file.
+
+There is another variable you can use: XPILOTSERVERMOTD points to the
+motd-file to use.
+Example: on svan I have
+export XPILOTSERVERMOTD=~/lib/xpilot/servermotd
+
+This is just in case the server would not be able to find it otherwise.
+(I compile and run svan on two different systems)
+
+Anything else I've forgotten.
+
+: Yes, you did.
+: There is also the environmentvariable XPILOTGREETING.
+: When a player joins, the server will say XPILOTGREETING
+:
+: Example :
+:
+:	export XPILOTGREETING='Welcome! Oh mighy warrior [*Server notice*]'
+:
+: If you don't end your message with a ], the message will appear between the
+: servermessages.
