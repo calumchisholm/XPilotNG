@@ -450,7 +450,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg5",
-	"***    BALL! Our ball is gone! Save it!   ***",
+	"#t:***    BALL! Our ball is gone! Save it!   ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -458,7 +458,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg6",
-	"*** SAFE! Our ball is safe. ***",
+	"#t:*** SAFE! Our ball is safe. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -466,7 +466,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg7",
-	"*** COVER! The enemy ball is approaching our base. ***",
+	"#t:*** COVER! The enemy ball is approaching our base. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
@@ -474,7 +474,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg8",
-	"*** POP! The enemy ball is back at the enemy base. ***",
+	"#t:*** POP! The enemy ball is back at the enemy base. ***",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,
