@@ -118,7 +118,7 @@ void Talk_set_state(bool on)
     }
 }
 
-bool Key_press_swap_scalefactor(void)
+void Swap_scalefactor(void)
 {
     double tmp;
 
@@ -130,8 +130,6 @@ bool Key_press_swap_scalefactor(void)
     Scale_dashes();
     Config_redraw();
     Bitmap_update_scale();
-
-    return false;
 }
 
 bool Key_press_talk(void)

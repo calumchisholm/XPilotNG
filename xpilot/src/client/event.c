@@ -174,6 +174,12 @@ static bool Key_press_swap_settings(void)
     return true;
 }
 
+static bool Key_press_swap_scalefactor(void)
+{
+    Swap_scalefactor();
+    return false;
+}
+
 static bool Key_press_increase_power(void)
 {
     power = power * 1.10;

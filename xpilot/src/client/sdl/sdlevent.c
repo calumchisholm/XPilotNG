@@ -41,7 +41,7 @@ GLWidget *hovertarget = NULL;
 
 int Process_event(SDL_Event *evt);
 
-bool Key_press_swap_scalefactor(void)
+void Swap_scalefactor(void)
 {
     double tmp;
     
@@ -50,7 +50,6 @@ bool Key_press_swap_scalefactor(void)
     scaleFactor_s = tmp;
 
     scale = 1.0 / scaleFactor;
-    return false;
 }
 
 bool Key_press_talk(void)

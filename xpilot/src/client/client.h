@@ -653,12 +653,17 @@ extern bool played_this_round;
  * somewhere
  */
 const char *Program_name(void);
-extern int Bitmap_add(const char *filename, int count, bool scalable);
+int Bitmap_add(const char *filename, int count, bool scalable);
+
+/*
+ * Platform specific code needs to implement these.
+ */
+void Pointer_control_set_state(bool on);
+void Swap_scalefactor(void);
 
 /*
  * event.c
  */
-void Pointer_control_set_state(bool on);
 void Pointer_button_pressed(int button);
 void Pointer_button_released(int button);
 void Keyboard_button_pressed(xp_keysym_t ks);
@@ -669,7 +674,6 @@ int Key_update(void);
 void Key_clear_counts(void);
 bool Key_press(keys_t key);
 bool Key_release(keys_t key);
-bool Key_press_swap_scalefactor(void);
 bool Key_press_talk(void);
 bool Key_press_toggle_radar_score(void);
 bool Key_press_toggle_record(void);
