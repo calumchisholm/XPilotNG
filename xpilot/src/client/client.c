@@ -1682,7 +1682,7 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 		int newNextCheckPoint, int newAutopilotLight,
 		u_byte *newNumItems, int newCurrentTank,
 		double newFuelSum, double newFuelMax, int newPacketSize,
-		u_byte status)
+		int status)
 {
     selfPos.x = x;
     selfPos.y = y;

@@ -193,7 +193,7 @@ int Join(char *server_addr, char *server_name, int port, char *real,
 	return -1;
     }
     IFWINDOWS( Progress("Net_verify '%s'= '%s'", nick, real) );
-    if (Net_verify(real, nick, display, my_team) == -1) {
+    if (Net_verify(real, nick, display) == -1) {
 	Net_cleanup();
 	Client_cleanup();
 	return -1;

@@ -32,6 +32,8 @@
 #define MIN_RECEIVE_WINDOW_SIZE		1
 #define MAX_RECEIVE_WINDOW_SIZE		4
 
+#define MAX_SUPPORTED_FPS		200
+
 typedef struct {
     int view_width;
     int view_height;
@@ -47,7 +49,7 @@ extern bool      packetMeasurement;
 extern display_t server_display; /* the servers idea about our display */
 
 int Net_setup(void);
-int Net_verify(char *real, char *nick, char *dpy, int my_team);
+int Net_verify(char *real, char *nick, char *dpy);
 int Net_init(char *server, int port);
 void Net_cleanup(void);
 void Net_key_change(void);

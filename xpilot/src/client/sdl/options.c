@@ -616,15 +616,6 @@ cl_option_t options[] = {
 	0
     },
     {
-	"showNastyShots",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
-	"You will probably want to increase your shotSize if you use this.\n",
-	0
-    },
-    {
 	"backgroundPointDist",
 	NULL,
 	"8",
@@ -3239,7 +3230,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     LIMIT(shot_size, MIN_SHOT_SIZE, MAX_SHOT_SIZE);
     Get_int_resource(rDB, "teamShotSize", &teamshot_size);
     LIMIT(teamshot_size, MIN_TEAMSHOT_SIZE, MAX_TEAMSHOT_SIZE);
-    Get_bool_resource(rDB, "showNastyShots", &showNastyShots);
     Get_bool_resource(rDB, "toggleShield", &toggle_shield);
     Get_bool_resource(rDB, "autoShield", &auto_shield);
 

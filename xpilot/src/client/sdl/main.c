@@ -77,8 +77,7 @@ int main(int argc, char *argv[])
     }
     if (Net_verify(conpar.real_name, 
 		   conpar.nick_name, 
-		   conpar.disp_name, 
-		   conpar.team)) {
+		   conpar.disp_name)) {
 	error("failed to verify networking"); 
 	exit(1);
     }

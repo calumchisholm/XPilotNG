@@ -299,7 +299,8 @@ int Net_setup(void)
 		done = (char *) &Setup->map_data[0] - ptr;
 		todo = Setup->map_data_len;
 	    } else {
-		memcpy(&ptr[done], cbuf.ptr, len);
+		assert(len > 0);
+		memcpy(&ptr[done], cbuf.ptr, (size_t)len);
 		Sockbuf_advance(&cbuf, len + cbuf.ptr - cbuf.buf);
 		done += len;
 		todo -= len;
@@ -366,7 +367,7 @@ int Net_setup(void)
  * this info from the ENTER_GAME_pack.
  */
 #define	MAX_VERIFY_RETRIES	5
-int Net_verify(char *real, char *nick, char *disp, int my_team)
+int Net_verify(char *real, char *nick, char *disp)
 {
     int		n,
 		type,
@@ -374,7 +375,6 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 		retries;
     time_t	last;
 
-    (void)my_team;
     for (retries = 0;;) {
 	if (retries == 0 || time(NULL) - last >= 3) {
 	    if (retries++ >= MAX_VERIFY_RETRIES) {
@@ -762,6 +762,7 @@ int Net_start(void)
     return 0;
 }
 
+
 void Net_init_measurement(void)
 {
     packet_loss = 0;
@@ -769,11 +770,14 @@ void Net_init_measurement(void)
     packet_loop = 0;
     if (packetMeasurement) {
 	if (packet_measure == NULL) {
-	    if ((packet_measure = (char *) malloc(FPS)) == NULL) {
+	    /*
+	     * Server FPS can change so we had better allocate enough.
+	     */
+	    if ((packet_measure = malloc(MAX_SUPPORTED_FPS)) == NULL) {
 		error("No memory for packet measurement");
 		packetMeasurement = false;
 	    } else
-		memset(packet_measure, PACKET_DRAW, FPS);
+		memset(packet_measure, PACKET_DRAW, MAX_SUPPORTED_FPS);
 	}
     }
     else if (packet_measure != NULL) {
@@ -1504,7 +1508,7 @@ int Receive_self(void)
 		sNextCheckPoint, sAutopilotLight,
 		num_items,
 		currentTank, (double)sFuelSum, (double)sFuelMax, rbuf.len,
-		sStat);
+		(int)sStat);
 
 #ifdef _WINDOWS
     received_self = TRUE;
@@ -2310,7 +2314,7 @@ int Send_keyboard(u_byte *keyboard_vector)
 	/* Not enough write buffer space for keyboard state */
 	return 0;
     Packet_printf(&wbuf, "%c%ld", PKT_KEYBOARD, last_keyboard_change);
-    memcpy(&wbuf.buf[wbuf.len], keyboard_vector, size);
+    memcpy(&wbuf.buf[wbuf.len], keyboard_vector, (size_t)size);
     wbuf.len += size;
     last_keyboard_update = last_loops;
     Net_keyboard_track();

@@ -41,6 +41,8 @@ keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 char mynickname[MAX_NAME_LEN];
 char myusername[MAX_NAME_LEN];
 char myhostname[MAX_HOST_LEN];
+int myteam;
+int myport;
 
 static bool setTexturePath(xp_option_t *opt, const char *value)
 {
@@ -145,6 +147,26 @@ xp_option_t default_options[] = {
 	NULL, NULL,
 	"Set the hostname.\n"),
 
+    XP_INT_OPTION(
+	"team",
+	TEAM_NOT_SET,
+	0,
+	TEAM_NOT_SET,
+	&myteam,
+	NULL,
+	"Set the team to join.\n"),
+
+    XP_INT_OPTION(
+	"port",
+	SERVER_PORT,
+	0,
+	65535,
+	&myport,
+	NULL,
+	"Set the port number of the server.\n"
+	"Almost all servers use the default port, which is the recommended\n"
+	"policy.  You can find out about which port is used by a server by\n"
+	"querying the XPilot Meta server.\n"),
 
     /*
      * kps - steering stuff, note that set functions might have to be
@@ -237,7 +259,7 @@ xp_option_t default_options[] = {
 	"maxFPS",
 	100,
 	1,
-	200,
+	MAX_SUPPORTED_FPS,
 	&maxFPS,
 	NULL,  /* we need a setfunc here */
 	"Set maximum FPS supported by the client. The server will try to\n"
@@ -526,14 +548,6 @@ xp_option_t default_options[] = {
 	0
     },
 
-    {
-	"team",
-	NULL,
-	TEAM_NOT_SET_STR,
-	KEY_DUMMY,
-	"Set the team to join.\n",
-	0
-    },
 
 
     {
@@ -555,17 +569,7 @@ xp_option_t default_options[] = {
 	"The message used is the first argument to this option.\n",
 	0
     },
-    {
-	"port",
-	NULL,
-	SERVER_PORT_STR,
-	KEY_DUMMY,
-	"Set the port number of the server.\n"
-	"Almost all servers use the default port, which is the\n"
-	"recommended policy.  You can find out about which port\n"
-	"is used by a server by querying the XPilot Meta server.\n",
-	0
-    },
+
     {
 	"shipShape",
 	NULL,
