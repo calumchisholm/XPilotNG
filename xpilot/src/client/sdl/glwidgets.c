@@ -73,9 +73,9 @@ static void Close_WidgetTree ( GLWidget **widget )
         
     if ((*widget)->Close) (*widget)->Close(*widget);
 
-    /*for (i=0;i<NUM_MOUSE_BUTTONS;++i)
+    for (i=0;i<NUM_MOUSE_BUTTONS;++i)
     	if (*widget == target[i]) target[i]=NULL;
-    if (*widget == hovertarget) hovertarget=NULL;*/
+    if (*widget == hovertarget) hovertarget=NULL;
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
     free(*widget);
