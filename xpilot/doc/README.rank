@@ -26,14 +26,3 @@ This is just in case the server would not be able to find it otherwise.
 (I compile and run svan on two different systems)
 
 Anything else I've forgotten.
-
-: Yes, you did.
-: There is also the environmentvariable XPILOTGREETING.
-: When a player joins, the server will say XPILOTGREETING
-:
-: Example :
-:
-:	export XPILOTGREETING='Welcome! Oh mighy warrior [*Server notice*]'
-:
-: If you don't end your message with a ], the message will appear between the
-: servermessages.
