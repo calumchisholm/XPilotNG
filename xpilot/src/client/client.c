@@ -61,11 +61,11 @@ short	lock_dir;		/* Direction of lock */
 short	lock_dist;		/* Distance to player locked onto */
 
 int	eyesId;                 /* Player we get frame updates for */
-other_t	*eyes;		        /* Player we get frame updates for */
+other_t	*eyes = NULL;	        /* Player we get frame updates for */
 bool	snooping;               /* are we snooping on someone else? */
 int	eyeTeam = TEAM_NOT_SET;
 
-other_t	*self;		        /* player info */
+other_t	*self = NULL;	        /* player info */
 short	selfVisible;		/* Are we alive and playing? */
 short	damaged;		/* Damaged by ECM */
 short	destruct;		/* If self destructing */
@@ -100,7 +100,7 @@ double	fuelLevel1;		/* Fuel critical level */
 double	fuelLevel2;		/* Fuel warning level */
 double	fuelLevel3;		/* Fuel notify level */
 
-char	*shipShape;		/* Shape of player's ship */
+char	*shipShape = NULL;	/* Shape of player's ship */
 double	power;			/* Force of thrust */
 double	power_s;		/* Saved power fiks */
 double	turnspeed;		/* How fast player acc-turns */
@@ -158,27 +158,27 @@ int 	maxVolume;		/* maximum volume (in percent) */
 #endif /* SOUND */
 
 static double       teamscores[MAX_TEAMS];
-static cannontime_t *cannons = 0;
+static cannontime_t *cannons = NULL;
 static int          num_cannons = 0;
-static target_t     *targets = 0;
+static target_t     *targets = NULL;
 static int          num_targets = 0;
 
-fuelstation_t       *fuels = 0;
+fuelstation_t       *fuels = NULL;
 int                 num_fuels = 0;
-homebase_t          *bases = 0;
+homebase_t          *bases = NULL;
 int                 num_bases = 0;
-checkpoint_t        *checks = 0;
+checkpoint_t        *checks = NULL;
 int                 num_checks = 0;
-xp_polygon_t        *polygons = 0;
+xp_polygon_t        *polygons = NULL;
 int                 num_polygons = 0;
-edge_style_t        *edge_styles = 0;
+edge_style_t        *edge_styles = NULL;
 int                 num_edge_styles = 0;
-polygon_style_t     *polygon_styles = 0;
+polygon_style_t     *polygon_styles = NULL;
 int                 num_polygon_styles = 0;
 
 score_object_t      score_objects[MAX_SCORE_OBJECTS];
 int                 score_object = 0;
-other_t             *Others = 0;
+other_t             *Others = NULL;
 int                 num_others = 0, max_others = 0;
 refuel_t            *refuel_ptr;
 int                 num_refuel, max_refuel;
