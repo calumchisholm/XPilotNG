@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 from __future__ import division, generators
+
+KEEP_MAPDATA = 0
+
 # Requires python 2.2 or newer
 
 # Some parts could be written more clearly with higher-level constructs,
@@ -647,6 +650,10 @@ def convert(options):
 	bases = [(checks[0].loc.dist2(b.loc), b) for b in bases]
 	bases.sort()
 	bases = [b[1] for b in bases]
+    elif KEEP_MAPDATA: # old client expects this order
+	bases = [((b.x, -b.y), b) for b in bases]
+	bases.sort()
+	bases = [b[1] for b in bases]
     # If teamfuel is on, the fuel belongs to the team with the nearest base
     if options.get('teamfuel') in ['yes', 'on', 'true']: #default off
 	for fuel in fuels:
@@ -671,12 +678,14 @@ def convert(options):
     print >> sys.stderr, "Writing converted map...",
     print '<XPilotMap version="1.0">'
 
-    del options['mapdata']
+    if not KEEP_MAPDATA:
+        del options['mapdata']
+
     print '<GeneralOptions>'
 
     def xmlencode(text):
         repl = (('&', '&amp;'), ('"', '&quot;'), ("'", '&apos;'),
-                ('<', '&lt;'), ('>', '&gt;'))
+                ('<', '&lt;'), ('>', '&gt;'), ('\n', '&#xA;'))
         for t, r in repl:
             text = text.replace(t, r)
         return text
