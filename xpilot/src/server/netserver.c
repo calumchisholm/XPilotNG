@@ -2838,11 +2838,23 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
     else
 	i = commands[i].number;
 
+    /* The queue system from the original server is not replicated
+     * during playback. Therefore interactions with it in the
+     * recording can cause problems (at least different message
+     * lengths in acks from client). It would be possible to work
+     * around this, but not implemented now. Currently queue and advance
+     * commands are disabled during recording. */
+
     switch(i) {
     case NO_CMD:
 	break;
 
     case ADVANCE_CMD:
+	if (record || playback) {
+	    strcpy(msg, "Command currently disabled during recording for "
+		   "technical reasons.");
+	    break;
+	}
 	if (!args)
 	    sprintf(msg, "You must give a player name as an argument.");
 	else {
@@ -2875,6 +2887,11 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
 	break;
 
     case SHOW_CMD:
+	if (record || playback) {
+	    strcpy(msg, "Command currently disabled during recording for "
+		   "technical reasons.");
+	    break;
+	}
 	if (!args)
 	    sprintf(msg, "Show what?");
 	else if (!strcasecmp(args,"queue")) {
