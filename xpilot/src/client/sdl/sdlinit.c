@@ -4,6 +4,7 @@
 #include "xpclient.h"
 #include "text.h"
 #include "console.h"
+#include "sdlkeys.h"
 
 int draw_depth;
 
@@ -81,5 +82,6 @@ void Quit(void)
     Radar_cleanup();
     fontclean(&gamefont);
     fontclean(&messagefont);
+    freeKeyMap();
     SDL_Quit();
 }

@@ -350,7 +350,6 @@ void fontclean(font_data *ft_font)
     if (ft_font->textures != NULL) {
     	glDeleteTextures(NUMCHARS,ft_font->textures);
     }
-    free(ft_font);
 }
 
 /* A fairly straight forward function that pushes

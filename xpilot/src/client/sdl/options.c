@@ -73,10 +73,6 @@ extern char conf_ship_file_string[];
 extern char conf_texturedir_string[];
 extern char conf_soundfile_string[];
 
-/* from sdlevent.c */
-extern keys_t keyMap[SDLK_LAST];   /* maps SDLKeys to keys_t */
-extern keys_t buttonMap[5];        /* maps mouse buttons to keys_t */
-
 /*
  * Structure to store all the client options.
  * The most important field is the help field.
@@ -3334,6 +3330,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	XParseGeometry(resValue, &dummy, &dummy, &draw_width, &draw_height);
     }
 
+    
+    for (i = 0; i < SDLK_LAST; ++i) {
+    	keyMap[i] = NULL;
+    }
     /*
      * Key bindings
      */
@@ -3344,14 +3344,20 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	Get_resource(rDB, options[i].name, resValue, sizeof resValue);
 	firstKeyDef = num;
 	for (str = strtok(resValue, " \t\r\n");
-	     str != NULL;
-	     str = strtok(NULL, " \t\r\n")) {
+    	    str != NULL;
+    	    str = strtok(NULL, " \t\r\n")) {
 	    if ((ks = Get_key_by_name(str)) == SDLK_UNKNOWN) {
 		printf("Invalid keysym \"%s\" for key \"%s\".\n",
 		       str, options[i].name);
 		continue;
 	    }
-	    keyMap[ks] = key;
+	    
+	    /* enter this key into the list (for this SDL key) */
+	    keylist *temp = keyMap[ks];
+    	    keyMap[ks] = (keylist *)malloc(sizeof(keylist));
+	    keyMap[ks]->next = temp;
+	    	
+	    keyMap[ks]->key = key;
 	}
     }
 

@@ -709,7 +709,7 @@ void Paint_score_objects(void)
 {
     int		i, x, y;
 
-    if (!scoreObjectColor)
+    if (!get_alpha(scoreObjectColor))
 	return;
 
     for (i = 0; i < MAX_SCORE_OBJECTS; i++) {

@@ -22,7 +22,7 @@
  */
 
 #include "xpclient.h"
-#include "keys.h"
+#include "sdlkeys.h"
 #include "SDL.h"
 #include "console.h"
 
@@ -31,9 +31,6 @@ char sdlevent_version[] = VERSION;
 /* TODO: remove these from client.h and put them in *event.h */
 bool            initialPointerControl = false;
 bool            pointerControl = false;
-
-keys_t          keyMap[SDLK_LAST];   /* maps SDLKeys to keys_t */
-keys_t          buttonMap[5];        /* maps mouse buttons to keys_t */
 
 static int	movement;	/* horizontal mouse movement. */
 
@@ -93,12 +90,20 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_KEYDOWN:
 	if (Console_isVisible()) break;
-	key_change |= Key_press(keyMap[evt->key.keysym.sym]);
+    	keylist *temp = keyMap[evt->key.keysym.sym];
+    	while (temp) {
+    	    key_change |= Key_press(temp->key);
+	    temp = (keylist *)temp->next;
+    	}
 	break;
 	
     case SDL_KEYUP:
 	if (Console_isVisible()) break;
-	key_change |= Key_release(keyMap[evt->key.keysym.sym]);
+    	keylist *temp2 = keyMap[evt->key.keysym.sym];
+    	while (temp2) {
+    	    key_change |= Key_release(temp2->key);
+	    temp2 = (keylist *)temp2->next;
+    	}
 	break;
 	
     case SDL_MOUSEBUTTONDOWN:
