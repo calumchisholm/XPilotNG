@@ -602,6 +602,7 @@ struct player {
     void	*audio;			/* audio private data */
 
     int		player_fps;		/* FPS that this player can do */
+    int		maxturnsps;		/* turns per second limit */
 
     int		isowner;		/* player started this server? */
     int		isoperator;		/* player has operator privileges? */

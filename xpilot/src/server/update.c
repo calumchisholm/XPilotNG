@@ -542,6 +542,15 @@ static void Players_turn(void)
 	pl->turnvel += pl->turnacc * timeStep;
 
 	/*
+	 * Possibly reduce turn rate.
+	 */
+	if (pl->maxturnsps < FPS) {
+	    int divisor = (FPS - 1) / pl->maxturnsps + 1;
+	    if (frame_loops % divisor)
+ 		continue;
+	}
+
+	/*
 	 * turnresistance is zero: client requests linear turning behaviour
 	 * when playing with pointer control.
 	 */

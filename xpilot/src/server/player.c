@@ -443,6 +443,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
     pl->prev_life = pl->life;
 
     pl->player_fps = 50; /* Client should send a value after startup */
+    pl->maxturnsps = MAX_SERVER_FPS;
 
     Rank_clear_kills(pl);
     Rank_clear_deaths(pl);

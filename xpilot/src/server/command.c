@@ -185,6 +185,7 @@ static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_help(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_kick(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size);
+static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_mutepaused(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_op(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_password(char *arg, player_t *pl, int oper, char *msg, size_t size);
@@ -275,6 +276,14 @@ static Command_info commands[] = {
 	"(operator)",
 	0,      /* checked in the function */
 	Cmd_lock
+    },
+    {
+	"maxturnsps",
+	"maxturns",
+	"/maxturnsps <number> set max amount of turns per second.  "
+	"(EXPERIMENTAL FEATURE)",
+	0,
+	Cmd_maxturnsps
     },
     {
 	"mutepaused",
@@ -835,6 +844,30 @@ static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return CMD_RESULT_SUCCESS;
 }
 
+/* temporary hack */
+static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t size)
+{
+    int new_maxturnsps;
+
+    UNUSED_PARAM(oper);
+
+    if (!arg || !*arg) {
+	snprintf(msg, size, "Your current maxturnsps is %d.", pl->maxturnsps);
+	return CMD_RESULT_SUCCESS;
+    }
+
+    new_maxturnsps = atoi(arg);
+    if (new_maxturnsps <= 0) {
+	snprintf(msg, size, "Value of maxturnsps must be > 0.");
+	return CMD_RESULT_ERROR;
+    }
+
+    pl->maxturnsps = new_maxturnsps;
+    Set_player_message_f(pl, "Max number of turns/s is now %d. "
+			 "[*Server reply*]", pl->maxturnsps);
+
+    return CMD_RESULT_SUCCESS;
+}
 
 static int Cmd_mutepaused(char *arg, player_t *pl, int oper,
 			  char *msg, size_t size)
