@@ -125,50 +125,51 @@ void Create_blockmap_from_polygons(world_t *world)
 	d_wire.pts[i] = &d_coords[i];
 
     /*
-     * Block is divided to 4 parts, r, u, l and d, the middle 6x6 area of
-     * of the block looking like this (each char is an area of 1x1 click).
-     * The capital r 'R' is the middle of the block (coordinates 0,0).
+     * Block is divided to 4 parts, r, u, l and d, the middle of the block
+     * looking like this. Each char represents a square click. The middle
+     * of the block is at 'x', square clicks with 'x' or ' ' are considered
+     * not part of any of the block parts r, u, l or d.
      *
-     * uuuuur
-     * luuurr
-     * lluRrr
-     * llldrr
-     * lldddr
-     * lddddd
+     *  uuu
+     * l U r
+     * lLxRr
+     * l D r
+     *  ddd
+     *
      */
 
-    h = BLOCK_CLICKS / 2;
+    h = BLOCK_CLICKS / 2 - 2;
 
     /* right part of block */
     r_coords[0].cx = 0;
     r_coords[0].cy = 0; /* this is the R position in the block */
-    r_coords[1].cx = h - 1; 
-    r_coords[1].cy = 1 - h;
-    r_coords[2].cx = h - 1;
-    r_coords[2].cy = h - 1;
+    r_coords[1].cx = h;
+    r_coords[1].cy = -h;
+    r_coords[2].cx = h;
+    r_coords[2].cy = h;
 
     /* up part of block */
-    u_coords[0].cx = -1;
+    u_coords[0].cx = 0;
     u_coords[0].cy = 0;
-    u_coords[1].cx = h - 2;
-    u_coords[1].cy = h - 1;
+    u_coords[1].cx = h;
+    u_coords[1].cy = h;
     u_coords[2].cx = -h;
-    u_coords[2].cy = h - 1;
+    u_coords[2].cy = h;
 
     /* left part of block */
-    l_coords[0].cx = -1;
-    l_coords[0].cy = -1;
+    l_coords[0].cx = 0;
+    l_coords[0].cy = 0;
     l_coords[1].cx = -h;
-    l_coords[1].cy = h - 2;
+    l_coords[1].cy = h;
     l_coords[2].cx = -h;
     l_coords[2].cy = -h;
 
     /* down part of block */
     d_coords[0].cx = 0;
-    d_coords[0].cy = -1;
-    d_coords[1].cx = 1 - h;
+    d_coords[0].cy = 0;
+    d_coords[1].cx = -h;
     d_coords[1].cy = -h;
-    d_coords[2].cx = h - 1;
+    d_coords[2].cx = h;
     d_coords[2].cy = -h;
 
     /*
@@ -187,19 +188,19 @@ void Create_blockmap_from_polygons(world_t *world)
 
 	    pos = Block_get_center_clpos(blk);
 
-	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &r_wire, 0) == 0) {
+	    if (shape_is_inside(pos.cx+1, pos.cy, 0, NULL, &r_wire, 0) == 0) {
 		r_inside = true;
 		num_inside++;
 	    }
-	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &u_wire, 0) == 0) {
+	    if (shape_is_inside(pos.cx, pos.cy+1, 0, NULL, &u_wire, 0) == 0) {
 		u_inside = true;
 		num_inside++;
 	    }
-	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &l_wire, 0) == 0) {
+	    if (shape_is_inside(pos.cx-1, pos.cy, 0, NULL, &l_wire, 0) == 0) {
 		l_inside = true;
 		num_inside++;
 	    }
-	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &d_wire, 0) == 0) {
+	    if (shape_is_inside(pos.cx, pos.cy-1, 0, NULL, &d_wire, 0) == 0) {
 		d_inside = true;
 		num_inside++;
 	    }
