@@ -17,29 +17,6 @@ Task:
   library provides the necessary functionality.
 Developer:
 
-Task:
-  Implement radar painting. The most effective way would probably be
-  to use similar strategy as the X client uses. The radar walls are
-  painted to an image which is then painted to the screen.
-Developer: baron
-
-Task:
-  Text/font handling. OpenGL does not provide any easy way to draw text.
-  My propose is to use bitmaps for each character and implement a function
-  that uses those bitmaps to draw text.
-Developer: Colonel & Mara (whoever gets around to it first)
-
-Task:
-  Talk window. This task depends on the text/font handling task.
-Developer:
-
-Task:
-  Message display. This task depends on the text/font handling task.
-Developer:
-
-Task:
-  Score display. This task depends on the text/font handling task.
-Developer:
 
 Task:
   Scalefactor. This could be done with OpenGL's glScale but the rounding
@@ -52,13 +29,11 @@ Task:
   Game_loop without using X.
 Developer:
 
-Task:
-  Rewrite options.c so that it does not use X resources. This would be a 
-  useful feature in the X client as well.
-Developer: kps
 
 Task:
-  Add more tasks here.
+  Meta interface in SDL, make it so that you can change to another server whilst in game (saves doing quit and restart).
+Developer: colonel
+
 
 
   
