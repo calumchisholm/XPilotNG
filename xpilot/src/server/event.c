@@ -223,7 +223,7 @@ void Pause_player(player_t *pl, bool on)
 	}
 	pl->mychar = 'P';
 	updateScores = true;
-	Player_death_reset(pl, false);
+	Player_pause_reset(pl);
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (world->teams[i].SwapperId == pl->id)
 		world->teams[i].SwapperId = -1;

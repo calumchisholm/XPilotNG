@@ -810,6 +810,7 @@ void Delete_spectator(player_t *pl);
 void Detach_ball(player_t *pl, ballobject_t *ball);
 void Kill_player(player_t *pl, bool add_rank_death);
 void Player_death_reset(player_t *pl, bool add_rank_death);
+void Player_pause_reset(player_t *pl);
 void Team_game_over(world_t *world, int winning_team, const char *reason);
 void Individual_game_over(world_t *world, int winner);
 void Race_game_over(world_t *world);
