@@ -760,7 +760,7 @@ static void Robot_create(world_t *world)
 
     Pick_startpos(robot);
 
-    (*rob_type->create)(robot, rob->config);
+    (*rob_type->robot_create)(robot, rob->config);
 
     Go_home(robot);
 
@@ -808,7 +808,9 @@ static void Robot_create(world_t *world)
 
 void Robot_destroy(player_t *pl)
 {
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].destroy)(pl);
+    robot_type_t *rob_type = &robot_types[pl->robot_data_ptr->robot_types_ind];
+
+    (*rob_type->robot_destroy)(pl);
     XFREE(pl->robot_data_ptr);
 }
 
@@ -851,7 +853,9 @@ void Robot_delete(player_t *pl, bool kicked)
  */
 void Robot_invite(player_t *pl, player_t *inviter)
 {
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].invite)(pl, inviter);
+    robot_type_t *rob_type = &robot_types[pl->robot_data_ptr->robot_types_ind];
+
+    (*rob_type->robot_invite)(pl, inviter);
 }
 
 /*
@@ -859,7 +863,9 @@ void Robot_invite(player_t *pl, player_t *inviter)
  */
 static void Robot_set_war(player_t *pl, int victim_id)
 {
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].set_war)(pl, victim_id);
+    robot_type_t *rob_type = &robot_types[pl->robot_data_ptr->robot_types_ind];
+
+    (*rob_type->robot_set_war)(pl, victim_id);
 }
 
 
@@ -889,10 +895,9 @@ void Robot_program(player_t *pl, int victim_id)
  */
 int Robot_war_on_player(player_t *pl)
 {
-    robot_type_t	*rob_type =
-			    &robot_types[pl->robot_data_ptr->robot_types_ind];
+    robot_type_t *rob_type = &robot_types[pl->robot_data_ptr->robot_types_ind];
 
-    return (*rob_type->war_on_player)(pl);
+    return (*rob_type->robot_war_on_player)(pl);
 }
 
 
@@ -955,7 +960,9 @@ void Robot_war(player_t *pl, player_t *kp)
  */
 void Robot_go_home(player_t *pl)
 {
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].go_home)(pl);
+    robot_type_t *rob_type = &robot_types[pl->robot_data_ptr->robot_types_ind];
+
+    (*rob_type->robot_go_home)(pl);
 }
 
 
@@ -965,10 +972,9 @@ void Robot_go_home(player_t *pl)
  */
 void Robot_message(player_t *pl, const char *message)
 {
-    robot_type_t *rob_type =
-	&robot_types[pl->robot_data_ptr->robot_types_ind];
+    robot_type_t *rob_type = &robot_types[pl->robot_data_ptr->robot_types_ind];
 
-    (*rob_type->message)(pl, message);
+    (*rob_type->robot_message)(pl, message);
 }
 
 
@@ -977,7 +983,9 @@ void Robot_message(player_t *pl, const char *message)
  */
 static void Robot_play(player_t *pl)
 {
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].play)(pl);
+    robot_type_t *rob_type = &robot_types[pl->robot_data_ptr->robot_types_ind];
+
+    (*rob_type->robot_play)(pl);
 }
 
 
@@ -1032,7 +1040,7 @@ static void Robot_round_tick(world_t *world)
 
     if (NumRobots > 0) {
 	for (i = 0; i < num_robot_types; i++)
-	    (*robot_types[i].round_tick)(world);
+	    (*robot_types[i].robot_round_tick)(world);
     }
 }
 
