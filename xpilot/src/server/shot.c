@@ -54,8 +54,7 @@ void Place_mine(player *pl)
 	return;
     }
 
-    Place_general_mine(pl, pl->team, 0,
-		       pl->pos.cx, pl->pos.cy, 0.0, 0.0, pl->mods);
+    Place_general_mine(pl, pl->team, 0, pl->pos, 0.0, 0.0, pl->mods);
 }
 
 
@@ -73,21 +72,18 @@ void Place_moving_mine(player *pl)
 	    if (pl->velocity >= 1) {
 		vx *= (minMineSpeed / pl->velocity);
 		vy *= (minMineSpeed / pl->velocity);
-	    }
-	    else {
+	    } else {
 		vx = minMineSpeed * tcos(pl->dir);
 		vy = minMineSpeed * tsin(pl->dir);
 	    }
 	}
     }
 
-    Place_general_mine(pl, pl->team, GRAVITY,
-		       pl->pos.cx, pl->pos.cy, vx, vy, pl->mods);
+    Place_general_mine(pl, pl->team, GRAVITY, pl->pos, vx, vy, pl->mods);
 }
 
 void Place_general_mine(player *pl, int team, long status,
-			int cx, int cy,
-			DFLOAT vx, DFLOAT vy, modifiers mods)
+			clpos pos, DFLOAT vx, DFLOAT vy, modifiers mods)
 {
     char		msg[MSG_LEN];
     int			used;
@@ -100,8 +96,8 @@ void Place_general_mine(player *pl, int team, long status,
     if (NumObjs + mods.mini >= MAX_TOTAL_SHOTS)
 	return;
 
-    cx = WRAP_XCLICK(cx);
-    cy = WRAP_YCLICK(cy);
+    pos.cx = WRAP_XCLICK(pos.cx);
+    pos.cy = WRAP_YCLICK(pos.cy);
 
     if (pl && BIT(pl->status, KILLED))
 	life = rfrac() * 12;
@@ -158,8 +154,8 @@ void Place_general_mine(player *pl, int team, long status,
 		if (pl_i->id != pl->id
 		    && !Team_immune(pl_i->id, pl->id)
 		    && !IS_TANK_PTR(pl_i)) {
-		    int dx = cx - pl_i->home_base->pos.cx;
-		    int dy = cy - pl_i->home_base->pos.cy;
+		    int dx = pos.cx - pl_i->home_base->pos.cx;
+		    int dy = pos.cy - pl_i->home_base->pos.cy;
 		    if (Wrap_length(dx, dy) <= baseMineRange * BLOCK_CLICKS) {
 			Set_player_message(pl, "No base mining!");
 			return;
@@ -198,7 +194,7 @@ void Place_general_mine(player *pl, int team, long status,
 	mine->id = (pl ? pl->id : NO_ID);
 	mine->team = team;
 	mine->owner = mine->id;
-	Object_position_init_clicks(OBJ_PTR(mine), cx, cy);
+	Object_position_init_clicks(OBJ_PTR(mine), pos.cx, pos.cy);
 	if (minis > 1) {
 	    int		space = RES/minis;
 	    int		dir;
@@ -395,17 +391,16 @@ char *Describe_shot(int type, long status, modifiers mods, int hit)
 
 void Fire_main_shot(player *pl, int type, int dir)
 {
-    int cx, cy;
-    clpos m_gun;
+    clpos m_gun, pos;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
-    cx = pl->pos.cx + m_gun.cx;
-    cy = pl->pos.cy + m_gun.cy;
+    pos.cx = pl->pos.cx + m_gun.cx;
+    pos.cy = pl->pos.cy + m_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_shot(player *pl, int type, int dir)
@@ -413,73 +408,67 @@ void Fire_shot(player *pl, int type, int dir)
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    Fire_general_shot(pl, pl->team, 0, pl->pos.cx, pl->pos.cy,
-		      type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl, pl->team, 0, pl->pos, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_left_shot(player *pl, int type, int dir, int gun)
 {
-    int cx, cy;
-    clpos l_gun;
+    clpos l_gun, pos;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     l_gun = Ship_get_l_gun_clpos(pl->ship, gun, pl->dir);
-    cx = pl->pos.cx + l_gun.cx;
-    cy = pl->pos.cy + l_gun.cy;
+    pos.cx = pl->pos.cx + l_gun.cx;
+    pos.cy = pl->pos.cy + l_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_right_shot(player *pl, int type, int dir, int gun)
 {
-    int cx, cy;
-    clpos r_gun;
+    clpos r_gun, pos;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     r_gun = Ship_get_r_gun_clpos(pl->ship, gun, pl->dir);
-    cx = pl->pos.cx + r_gun.cx;
-    cy = pl->pos.cy + r_gun.cy;
+    pos.cx = pl->pos.cx + r_gun.cx;
+    pos.cy = pl->pos.cy + r_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_left_rshot(player *pl, int type, int dir, int gun)
 {
-    int cx, cy;
-    clpos l_rgun;
+    clpos l_rgun, pos;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     l_rgun = Ship_get_l_rgun_clpos(pl->ship, gun, pl->dir);
-    cx = pl->pos.cx + l_rgun.cx;
-    cy = pl->pos.cy + l_rgun.cy;
+    pos.cx = pl->pos.cx + l_rgun.cx;
+    pos.cy = pl->pos.cy + l_rgun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_right_rshot(player *pl, int type, int dir, int gun)
 {
-    int cx, cy;
-    clpos r_rgun;
+    clpos r_rgun, pos;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
     r_rgun = Ship_get_r_rgun_clpos(pl->ship, gun, pl->dir);
-    cx = pl->pos.cx + r_rgun.cx;
-    cy = pl->pos.cy + r_rgun.cy;
+    pos.cx = pl->pos.cx + r_rgun.cx;
+    pos.cy = pl->pos.cy + r_rgun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_general_shot(player *pl, int team, bool cannon,
-		       int cx, int cy,
-		       int type, int dir,
+		       clpos pos, int type, int dir,
 		       modifiers mods, int target_id)
 {
     char		msg[MSG_LEN];
@@ -910,8 +899,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    MISSILE_PTR(shot)->max_speed = max_speed;
 	}
 
-	shotpos.cx	= cx;
-	shotpos.cy	= cy;
+	shotpos = pos;
 	if (pl && type != OBJ_SHOT) {
 	    clpos m_rack;
 	    if (r == on_this_rack) {
@@ -936,16 +924,16 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	shotpos.cy = WRAP_YCLICK(shotpos.cy);
 	Object_position_init_clicks(shot, shotpos.cx, shotpos.cy);
 
-	if (type == OBJ_SHOT || !pl) {
+	if (type == OBJ_SHOT || !pl)
 	    angle = 0.0;
-	} else {
+	else {
 	    /*
 	     * Calculate the percentage unmodified launch angle for missiles.
 	     * (See Comment Point 3).
 	     */
-	    if (on_this_rack <= 1) {
+	    if (on_this_rack <= 1)
 		angle = 0.0;
-	    } else {
+	    else {
 		angle = (DFLOAT)(on_this_rack - 1 - 2 * r);
 		angle /= (3.0 * (DFLOAT)(on_this_rack - 1));
 	    }
@@ -1349,12 +1337,10 @@ void Delete_shot(int ind)
 	if (addMine) {
 	    long gravity_status = ((rfrac() < 0.5f) ? GRAVITY : 0);
 	    Place_general_mine(NULL, TEAM_NOT_SET, gravity_status,
-			       shot->pos.cx, shot->pos.cy,
-			       0.0, 0.0, mods);
+			       shot->pos, 0.0, 0.0, mods);
 	}
 	else if (addHeat)
-	    Fire_general_shot(NULL, TEAM_NOT_SET, 0,
-			      shot->pos.cx, shot->pos.cy,
+	    Fire_general_shot(NULL, TEAM_NOT_SET, 0, shot->pos,
 			      OBJ_HEAT_SHOT, (int)(rfrac() * RES),
 			      mods, NO_ID);
     }
@@ -1366,9 +1352,8 @@ void Delete_shot(int ind)
 
 void Fire_laser(player *pl)
 {
-    int		cx, cy;
     double	laserRepeatRate = 2;
-    clpos	m_gun;
+    clpos	m_gun, pos;
 
     if (frame_time <= pl->laser_time + laserRepeatRate - timeStep + 1e-3)
  	return;
@@ -1380,26 +1365,24 @@ void Fire_laser(player *pl)
 	    CLR_BIT(pl->used, HAS_LASER);
 	else {
 	    m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
-	    cx = pl->pos.cx + m_gun.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
-	    cy = pl->pos.cy + m_gun.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
-	    cx = WRAP_XCLICK(cx);
-	    cy = WRAP_YCLICK(cy);
-	    Fire_general_laser(pl, pl->team, cx, cy, pl->dir, pl->mods);
+	    pos.cx = pl->pos.cx + m_gun.cx
+		+ FLOAT_TO_CLICK(pl->vel.x * timeStep);
+	    pos.cy = pl->pos.cy + m_gun.cy
+		+ FLOAT_TO_CLICK(pl->vel.y * timeStep);
+	    pos.cx = WRAP_XCLICK(pos.cx);
+	    pos.cy = WRAP_YCLICK(pos.cy);
+	    Fire_general_laser(pl, pl->team, pos, pl->dir, pl->mods);
 	}
     }
 }
 
-void Fire_general_laser(player *pl, int team, int cx, int cy,
+void Fire_general_laser(player *pl, int team, clpos pos,
 			int dir, modifiers mods)
 {
     int			life;
     pulseobject		*pulse;
-    clpos		pos;
 
-    pos.cx = cx;
-    pos.cy = cy;
-
-    if (!INSIDE_MAP(cx, cy)) {
+    if (!INSIDE_MAP(pos.cx, pos.cy)) {
 	warn("Fire_general_laser: not inside map.\n");
 	return;
     }
@@ -1422,7 +1405,7 @@ void Fire_general_laser(player *pl, int team, int cx, int cy,
 
     pulse->id		= (pl ? pl->id : NO_ID);
     pulse->team 	= team;
-    Object_position_init_clicks(OBJ_PTR(pulse), cx, cy);
+    Object_position_init_clicks(OBJ_PTR(pulse), pos.cx, pos.cy);
     pulse->vel.x 	= pulseSpeed * tcos(dir);
     pulse->vel.y 	= pulseSpeed * tsin(dir);
     pulse->acc.x 	= 0;

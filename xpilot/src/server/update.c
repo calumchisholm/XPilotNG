@@ -548,9 +548,10 @@ static void Cannon_update(void)
 		    && cannonItemProbMult > 0
 		    && (int)(rfrac() * (60 * 12))
 		    < (cannonItemProbMult * World.items[item].cannonprob))
-		    Cannon_add_item(c, item, (item == ITEM_FUEL ?
-					ENERGY_PACK_FUEL >> FUEL_SCALE_BITS
-					: 1));
+		    Cannon_add_item(c, item,
+				    (item == ITEM_FUEL ?
+				     ENERGY_PACK_FUEL >> FUEL_SCALE_BITS
+				     : 1));
 	    }
 	}
 	if ((c->damaged -= timeStep) <= 0)
@@ -562,9 +563,8 @@ static void Cannon_update(void)
 			     tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
 		&& Player_is_playing(tpl)) {
-		General_tractor_beam(NULL, c->pos.cx, c->pos.cy,
-				     c->item[ITEM_TRACTOR_BEAM], tpl,
-				     c->tractor_is_pressor);
+		General_tractor_beam(NULL, c->pos, c->item[ITEM_TRACTOR_BEAM],
+				     tpl, c->tractor_is_pressor);
 		if ((c->tractor_count -= timeStep) <= 0)
 		    c->tractor_count = 0;
 	    } else

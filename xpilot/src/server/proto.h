@@ -175,20 +175,20 @@ void Update_tanks(pl_fuel_t *);
 void Place_item(player *pl, int type);
 int Choose_random_item(void);
 void Tractor_beam(player *pl);
-void General_tractor_beam(player *pl, int cx, int cy,
+void General_tractor_beam(player *pl, clpos pos,
 			  int items, player *victim, bool pressor);
 void Place_mine(player *pl);
 void Place_moving_mine(player *pl);
 void Place_general_mine(player *pl, int team, long status,
-			int cx, int cy, DFLOAT vx, DFLOAT vy, modifiers mods);
+			clpos pos, DFLOAT vx, DFLOAT vy, modifiers mods);
 void Detonate_mines(player *pl);
 char *Describe_shot(int type, long status, modifiers mods, int hit);
 void Fire_ecm(player *pl);
-void Fire_general_ecm(player *pl, int team, int cx, int cy);
+void Fire_general_ecm(player *pl, int team, clpos pos);
 void Update_connector_force(ballobject *ball);
 void Fire_shot(player *pl, int type, int dir);
 void Fire_general_shot(player *pl, int team, bool cannon,
-		       int cx, int cy, int type, int dir,
+		       clpos pos, int type, int dir,
 		       modifiers mods, int target_id);
 void Fire_normal_shots(player *pl);
 void Fire_main_shot(player *pl, int type, int dir);
@@ -224,11 +224,11 @@ void Team_immunity_init(void);
 void Groups_init(void);
 void Delete_shot(int ind);
 void Fire_laser(player *pl);
-void Fire_general_laser(player *pl, int team, int cx, int cy,
+void Fire_general_laser(player *pl, int team, clpos pos,
 			int dir, modifiers mods);
 void Do_deflector(player *pl);
 void Do_transporter(player *pl);
-void Do_general_transporter(player *pl, int cx, int cy, player *victim,
+void Do_general_transporter(player *pl, clpos pos, player *victim,
 			    int *item, long *amount);
 void do_hyperjump(player *pl);
 void do_lose_item(player *pl);
@@ -241,7 +241,7 @@ void Make_debris(
 	    /* owner id       */ int    id,
 	    /* owner team     */ int    team,
 	    /* type           */ int    type,
-	    /* mass           */ DFLOAT  mass,
+	    /* mass           */ DFLOAT mass,
 	    /* status         */ long   status,
 	    /* color          */ int    color,
 	    /* radius         */ int    radius,
@@ -264,7 +264,7 @@ void Make_wreckage(
 	    /* min,max speed  */ DFLOAT min_speed,  DFLOAT max_speed,
 	    /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
 	    );
-void Make_item(int cx, int cy,
+void Make_item(clpos pos,
 	       int vx, int vy,
 	       int item, int num_per_pack,
 	       long status);

@@ -211,7 +211,7 @@ void Break_asteroid(wireobject *asteroid)
 				       - World.items[item].min_per_pack));
 	    }
 
-	    Make_item(asteroid->pos.cx, asteroid->pos.cy,
+	    Make_item(asteroid->pos,
 		      vx, vy,
 		      item, num_per_pack,
 		      status);
