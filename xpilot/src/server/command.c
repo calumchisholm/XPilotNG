@@ -364,10 +364,9 @@ void Handle_player_command(player *pl, char *cmd)
     }
 
     args = strchr(cmd + 1, ' ');
-    if (!args) {
+    if (!args)
 	/* point to end of string. */
 	args = cmd + strlen(cmd);
-    }
     else {
 	/* zero terminate cmd and advance 1 byte. */
 	*args++ = '\0';
@@ -383,10 +382,8 @@ void Handle_player_command(player *pl, char *cmd)
 	size_t len1 = strlen(commands[i].abbrev);
 	size_t len2 = strlen(cmd);
 
-	if (!strncasecmp(cmd, commands[i].name,
-			 MAX(len1, len2))) {
+	if (!strncasecmp(cmd, commands[i].name, MAX(len1, len2)))
 	    break;
-	}
     }
 
     if (i == NELEM(commands)) {
@@ -408,25 +405,22 @@ void Handle_player_command(player *pl, char *cmd)
 	break;
 
     case CMD_RESULT_ERROR:
-	if (msg[0] == '\0') {
+	if (msg[0] == '\0')
 	    strcpy(msg, "Error.");
-	}
 	break;
 
     case CMD_RESULT_NOT_OPERATOR:
-	if (msg[0] == '\0') {
+	if (msg[0] == '\0')
 	    strlcpy(msg,
 		    "You need operator status to use this command.",
 		    sizeof(msg));
-	}
 	break;
 
     case CMD_RESULT_NO_NAME:
-	if (msg[0] == '\0') {
+	if (msg[0] == '\0')
 	    strlcpy(msg,
 		    "You must give a player name as an argument.",
 		    sizeof(msg));
-	}
 	break;
 
     default:
@@ -491,15 +485,13 @@ static int Cmd_advance(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_ERROR;
     }
 
-    if (!arg || !*arg) {
+    if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
-    }
 
     result = Queue_advance_player(arg, msg);
 
-    if (result < 0) {
+    if (result < 0)
 	return CMD_RESULT_ERROR;
-    }
 
     return CMD_RESULT_SUCCESS;
 }
@@ -541,15 +533,13 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
     }
     else {
 	if ((arg = strtok(NULL, "")) != NULL) {
-	    while (*arg == ' ') {
+	    while (*arg == ' ')
 		++arg;
-	    }
 	}
 	cmd = -1;
 	for (i = 0; i < NumAllyCmds; i++) {
-	    if (!strncasecmp(cmds[i], command, strlen(command))) {
+	    if (!strncasecmp(cmds[i], command, strlen(command)))
 		cmd = (cmd == -1) ? i : (-2);
-	    }
 	}
 	if (cmd < 0) {
 	    strlcpy(msg, usage, MSG_LEN);
@@ -576,21 +566,16 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	    }
 	} else {
 	    /* no player name is specified */
-	    if (cmd == AllyCancel) {
+	    if (cmd == AllyCancel)
 		Cancel_invitation(pl);
-	    }
-	    else if (cmd == AllyRefuse) {
+	    else if (cmd == AllyRefuse)
 		Refuse_all_alliances(pl);
-	    }
-	    else if (cmd == AllyAccept) {
+	    else if (cmd == AllyAccept)
 		Accept_all_alliances(pl);
-	    }
-	    else if (cmd == AllyLeave) {
+	    else if (cmd == AllyLeave)
 		Leave_alliance(pl);
-	    }
-	    else if (cmd == AllyList) {
+	    else if (cmd == AllyList)
 		Alliance_player_list(pl);
-	    }
 	    else {
 		strlcpy(msg, usage, MSG_LEN);
 		result = CMD_RESULT_ERROR;
@@ -702,10 +687,10 @@ static int Cmd_get(char *arg, player *pl, int oper, char *msg)
 	sprintf(msg, "No option named %s.", arg);
 	break;
     case -3:
-	sprintf(msg, "Cannot show the value of this option");
+	sprintf(msg, "Cannot show the value of this option.");
 	break;
     case -4:
-	sprintf(msg, "No value has been set for option %s", arg);
+	sprintf(msg, "No value has been set for option %s.", arg);
 	break;
     default:
 	strcpy(msg, "Generic error.");
@@ -730,16 +715,13 @@ static int Cmd_help(char *arg, player *pl, int oper, char *msg)
     else {
 	for (i = 0; i < NELEM(commands); i++) {
 	    if (!strncasecmp(arg, commands[i].name,
-			     strlen(commands[i].abbrev))) {
+			     strlen(commands[i].abbrev)))
 		break;
-	    }
 	}
-	if (i == NELEM(commands)) {
+	if (i == NELEM(commands))
 	    sprintf(msg, "No help for nonexistent command '%s'.", arg);
-	}
-	else {
+	else
 	    strcpy(msg, commands[i].help);
-	}
     }
 
     return CMD_RESULT_SUCCESS;
@@ -785,25 +767,21 @@ static int Cmd_lock(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_SUCCESS;
     }
 
-    if (!oper) {
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
-    if (!strcmp(arg, "1")) {
+    if (!strcmp(arg, "1"))
 	new_lock = 1;
-    }
-    else if (!strcmp(arg, "0")) {
+    else if (!strcmp(arg, "0"))
 	new_lock = 0;
-    }
     else {
 	sprintf(msg, "Invalid argument '%s'.  Specify either 0 or 1.", arg);
 	return CMD_RESULT_ERROR;
     }
 
-    if (new_lock == game_lock) {
+    if (new_lock == game_lock)
 	sprintf(msg, "Game is already %s.",
 		game_lock ? "locked" : "unlocked");
-    }
     else {
 	game_lock = new_lock;
 	sprintf(msg, " < The game has been %s by %s! >",
@@ -942,11 +920,11 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 	}
 	arg++;
     }
-    if (cmd == '+') {
+    if (cmd == '+')
 	pl->privs |= priv;
-    } else {
+    else
 	pl->privs &= ~priv;
-    }
+
     if (pl != issuer) {
 	sprintf(msg, "%s executed '/op %s' on you. [*Server notice*]",
 		issuer->name, origarg);
@@ -1042,9 +1020,8 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_NOT_OPERATOR;
 
     if (arg && !strcasecmp(arg, "all")) {
-	for (i = NumPlayers - 1; i >= 0; i--) {
+	for (i = NumPlayers - 1; i >= 0; i--)
 	    Rank_SetScore(Players(i), 0);
-	}
 	for (i = 0; i < MAX_TEAMS; i++)
 	    World.teams[i].score = 0;
 	Reset_all_players();
@@ -1265,9 +1242,8 @@ static int Cmd_set(char *arg, player *pl, int oper, char *msg)
     char		*option;
     char		*value;
 
-    if (!oper) {
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
     if (!arg
 	|| !(option = strtok(arg, " "))
@@ -1292,18 +1268,14 @@ static int Cmd_set(char *arg, player *pl, int oper, char *msg)
 	    return CMD_RESULT_SUCCESS;
 	}
     }
-    else if (i == 0) {
+    else if (i == 0)
 	sprintf(msg, "Invalid value.");
-    }
-    else if (i == -1) {
+    else if (i == -1)
 	sprintf(msg, "This option cannot be changed at runtime.");
-    }
-    else if (i == -2) {
+    else if (i == -2)
 	sprintf(msg, "No option named '%s'.", option);
-    }
-    else {
+    else
 	sprintf(msg, "Error.");
-    }
 
     return CMD_RESULT_ERROR;
 }
@@ -1374,11 +1346,10 @@ static int Cmd_setpass(char *arg, player *pl, int oper, char *msg)
 	break;
 
     case PASSWD_WRONG:
-	if (old_pw && old_pw[0]) {
+	if (old_pw && old_pw[0])
 	    strcpy(msg, "Old password is wrong. Nothing changed.");
-	} else {
+	else
 	    strcpy(msg, "Need old password as third argument.");
-	}
 	return CMD_RESULT_ERROR;
 
     case PASSWD_ERROR:

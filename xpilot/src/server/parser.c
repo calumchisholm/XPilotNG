@@ -500,9 +500,8 @@ int Get_option_value(const char *name, char *value, unsigned size)
 {
     option_desc		*opt;
 
-    if (size < 12) {
+    if (size < 12)
 	return -1;	/* Generic error. */
-    }
 
     if (!(opt = Find_option_by_name(name)))
 	return -2;	/* Variable not found */
