@@ -53,6 +53,30 @@ void Arraylist_add(arraylist_t *alp, void *element)
     Arraylist_add(alp, element);
 }
 
+void Arraylist_remove(arraylist_t *alp, int ind)
+{
+    void *p, *last_p;
+
+    /* get pointer to the element to remove */
+    p = Arraylist_get(alp, ind);
+    if (!p)
+	/* warn or return error ? */
+	return;
+
+    /* last element? */
+    if (ind == alp->num_elements - 1) {
+	/* no need to copy anything */
+	alp->num_elements--;
+	return;
+    }
+
+    /* copy last element to index 'ind' */
+    last_p = Arraylist_get(alp, alp->num_elements - 1);
+    assert(last_p != NULL);
+    memcpy(p, last_p, alp->element_padded_size);
+    alp->num_elements--;
+}
+
 #define ARRAYLIST_INITIAL_NUM_ELEMENTS 16
 #define ARRAYLIST_ELEMENT_ALIGNMENT sizeof(double)
 

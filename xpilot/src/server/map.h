@@ -267,11 +267,8 @@ struct world {
     int		NumFrictionAreas, MaxFrictionAreas;
     friction_area_t		*frictionAreas;
 
-    int		NumEcms, MaxEcms;
-    ecm_t	*ecms;
-
-    int		NumTransporters, MaxTransporters;
-    transporter_t	*transporters;
+    arraylist_t	*ecms;
+    arraylist_t	*transporters;
 
     bool	have_options;
 };
@@ -354,6 +351,11 @@ static inline clpos_t World_wrap_clpos(world_t *world, clpos_t pos)
 #define Treasure_by_index(w, i)	((treasure_t *)Arraylist_get((w)->treasures, (i)))
 #define Num_wormholes(w)	Arraylist_get_num_elements((w)->wormholes)
 #define Wormhole_by_index(w, i)	((wormhole_t *)Arraylist_get((w)->wormholes, (i)))
+#define Num_ecms(w)		Arraylist_get_num_elements((w)->ecms)
+#define Ecm_by_index(w, i)	((ecm_t *)Arraylist_get((w)->ecms, (i)))
+#define Num_transporters(w)	Arraylist_get_num_elements((w)->transporters)
+#define Transporter_by_index(w, i) \
+	((transporter_t *)Arraylist_get((w)->transporters, (i)))
 
 
 static inline check_t *Check_by_index(world_t *world, int ind)
@@ -382,20 +384,6 @@ static inline friction_area_t *FrictionArea_by_index(world_t *world, int ind)
 {
     if (ind >= 0 && ind < world->NumFrictionAreas)
 	return &world->frictionAreas[ind];
-    return NULL;
-}
-
-static inline ecm_t *Ecm_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumEcms)
-	return &world->ecms[ind];
-    return NULL;
-}
-
-static inline transporter_t *Transporter_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumTransporters)
-	return &world->transporters[ind];
     return NULL;
 }
 

@@ -797,14 +797,14 @@ static void Frame_ships(connection_t *conn, player_t *pl)
     int i, k;
     world_t *world = pl->world;
 
-    for (i = 0; i < world->NumEcms; i++) {
+    for (i = 0; i < Num_ecms(world); i++) {
 	ecm_t *ecm = Ecm_by_index(world, i);
 
 	if (clpos_inview(&cv, ecm->pos))
 	    Send_ecm(conn, ecm->pos, (int)ecm->size);
     }
 
-    for (i = 0; i < world->NumTransporters; i++) {
+    for (i = 0; i < Num_transporters(world); i++) {
 	transporter_t *trans = Transporter_by_index(world, i);
 	player_t *victim = Player_by_id(trans->victim_id);
 	player_t *tpl = Player_by_id(trans->id);

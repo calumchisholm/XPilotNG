@@ -55,8 +55,8 @@ static void Check_map_object_counters(world_t *world)
     assert(world->NumItemConcs == 0);
     assert(world->NumAsteroidConcs == 0);
     assert(world->NumFrictionAreas == 0);
-    assert(world->NumEcms == 0);
-    assert(world->NumTransporters == 0);
+    /*assert(world->NumEcms == 0);*/
+    /*assert(world->NumTransporters == 0);*/
 
     for (i = 0; i < MAX_TEAMS; i++) {
 	assert(world->teams[i].NumMembers == 0);
@@ -410,6 +410,11 @@ int World_init(world_t *world)
     if ((world->treasures = Arraylist_create(sizeof(treasure_t))) == NULL)
 	return -1;
     if ((world->wormholes = Arraylist_create(sizeof(wormhole_t))) == NULL)
+	return -1;
+    if ((world->ecms = Arraylist_create(sizeof(ecm_t))) == NULL)
+	return -1;
+    if ((world->transporters = Arraylist_create(sizeof(transporter_t)))
+	== NULL)
 	return -1;
 
     for (i = 0; i < MAX_TEAMS; i++)

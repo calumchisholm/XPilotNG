@@ -546,7 +546,7 @@ static void Ecm_update(world_t *world)
 {
     int i;
 
-    for (i = 0; i < world->NumEcms; i++) {
+    for (i = 0; i < Num_ecms(world); i++) {
 	ecm_t *ecm = Ecm_by_index(world, i);
 
 	if ((ecm->size *= ecmSizeFactor) < 1.0) {
@@ -556,8 +556,12 @@ static void Ecm_update(world_t *world)
 		if (pl)
 		    pl->ecmcount--;
 	    }
+#if 0
 	    --world->NumEcms;
 	    world->ecms[i] = world->ecms[world->NumEcms];
+#else
+	    Arraylist_remove(world->ecms, i);
+#endif
 	    i--;
 	}
     }
@@ -567,13 +571,17 @@ static void Transporter_update(world_t *world)
 {
     int i;
 
-    for (i = 0; i < world->NumTransporters; i++) {
+    for (i = 0; i < Num_transporters(world); i++) {
 	transporter_t *trans = Transporter_by_index(world, i);
 
 	if ((trans->count -= timeStep) <= 0) {
+#if 0
 	    --world->NumTransporters;
 	    world->transporters[i]
 		= world->transporters[world->NumTransporters];
+#else
+	    Arraylist_remove(world->transporters, i);
+#endif
 	    i--;
 	}
     }
@@ -1194,9 +1202,9 @@ void Update_objects(world_t *world)
     Fuel_update(world);
     Misc_object_update(world);
     Asteroid_update(world);
-    if (world->NumEcms > 0)
+    if (Num_ecms(world) > 0)
 	Ecm_update(world);
-    if (world->NumTransporters > 0)
+    if (Num_transporters(world) > 0)
 	Transporter_update(world);
     if (Num_cannons(world) > 0)
 	Cannon_update(world, tick);

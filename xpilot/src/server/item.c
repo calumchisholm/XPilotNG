@@ -647,8 +647,7 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	t.victim_id = victim->id;
 	t.id = (pl ? pl->id : NO_ID);
 	t.count = 5.0;
-	STORE(transporter_t, world->transporters,
-	      world->NumTransporters, world->MaxTransporters, t);
+	Arraylist_add(world->transporters, &t);
 	sound_play_sensors(pos, TRANSPORTER_SUCCESS_SOUND);
     }
 
@@ -919,9 +918,13 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
     t.pos = pos;
     t.id = (pl ? pl->id : NO_ID);
     t.size = ECM_DISTANCE;
-    STORE(ecm_t, world->ecms, world->NumEcms, world->MaxEcms, t);
+    Arraylist_add(world->ecms, &t);
 
-    ecm = Ecm_by_index(world, world->NumEcms - 1);
+    /*
+     * Arraylist_add could return index ??
+     * Here I assume the added ecm goes last in the list.
+     */
+    ecm = Ecm_by_index(world, Num_ecms(world) - 1);
     if (pl) {
 	pl->ecmcount++;
 	pl->item[ITEM_ECM]--;

@@ -43,6 +43,7 @@ static inline int Arraylist_get_num_elements(arraylist_t *alp)
 
 void *Arraylist_get(arraylist_t *alp, int ind);
 void Arraylist_add(arraylist_t *alp, void *element);
+void Arraylist_remove(arraylist_t *alp, int ind);
 arraylist_t *Arraylist_create(size_t element_size);
 
 #endif
