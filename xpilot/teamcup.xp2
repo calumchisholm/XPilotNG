@@ -472,29 +472,6 @@
 <Offset x="-866" y="-1276"/>
 <Offset x="-3394" y="2507"/>
 </Polygon>
-<Polygon x="87360" y="0">
-<Offset x="1650" y="-1570"/>
-<Offset x="2424" y="-2304"/>
-<Offset x="2571" y="119"/>
-<Offset x="1703" y="-3335"/>
-<Offset x="2795" y="-2030"/>
-<Offset x="2710" y="-2580"/>
-<Offset x="2275" y="-2080"/>
-<Offset x="2137" y="-2134"/>
-<Offset x="1256" y="-256"/>
-<Offset x="2632" y="3372"/>
-<Offset x="-336" y="1741"/>
-<Offset x="-2308" y="1351"/>
-<Offset x="-1718" y="3071"/>
-<Offset x="-2381" y="402"/>
-<Offset x="-1337" y="1273"/>
-<Offset x="-3502" y="1976"/>
-<Offset x="629" y="2984"/>
-<Offset x="-2104" y="1711"/>
-<Offset x="-3026" y="1248"/>
-<Offset x="-892" y="-679"/>
-<Offset x="-3187" y="91"/>
-</Polygon>
 <Polygon x="90238" y="90048">
 <Offset x="-3579" y="-3062"/>
 <Offset x="-33" y="-2601"/>
@@ -1095,23 +1072,23 @@
 <BallArea team="4">
 <Polygon x="118720" y="181440">
 <Offset x="2240" y="0"/> <Offset x="0" y="2240"/>
-<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>
+<Offset x="-2240" y="0"/>
 </Polygon></BallArea>
 <BallTarget team="4">
 <Polygon x="119360" y="182080">
 <Offset x="960" y="0"/> <Offset x="0" y="960"/>
-<Offset x="-960" y="0"/> <Offset x="0" y="-960"/>
+<Offset x="-960" y="0"/>
 </Polygon></BallTarget>
 <Ball team="2" x="140000" y="49920"/>
 <BallArea team="2">
 <Polygon x="138880" y="49280">
 <Offset x="2240" y="0"/> <Offset x="0" y="2240"/>
-<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>
+<Offset x="-2240" y="0"/>
 </Polygon></BallArea>
 <BallTarget team="2">
 <Polygon x="139520" y="49920">
 <Offset x="960" y="0"/> <Offset x="0" y="960"/>
-<Offset x="-960" y="0"/> <Offset x="0" y="-960"/>
+<Offset x="-960" y="0"/>
 </Polygon></BallTarget>
 <Base team="4" x="59360" y="169120" dir = "32"/>
 <Base team="4" x="75040" y="166880" dir = "32"/>
