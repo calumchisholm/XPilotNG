@@ -1094,7 +1094,10 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
     other->war_id = -1;
     other->name_width = 0;
     strncpy(other->name, player_name, sizeof(other->name));
-    sprintf(other->id_string, "%d", id);
+    if (BIT(instruments, SHOW_SHIP_ID))
+	sprintf(other->id_string, "%d", id);
+    else
+	strncpy(other->id_string, player_name, sizeof(other->id_string));
     other->name[sizeof(other->name) - 1] = '\0';
     strncpy(other->real, real_name, sizeof(other->real));
     other->real[sizeof(other->real) - 1] = '\0';

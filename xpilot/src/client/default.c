@@ -517,6 +517,13 @@ struct option {
 	"You may also need to enable multibuffering or double-buffering.\n"
     },
     {
+	"showID",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Should ID numbers be shown instead of ship names on the playfield?\n"
+    },
+    {
 	"markingLights",
 	NULL,
 	"Yes",
@@ -2870,6 +2877,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "texturedDecor", &instruments, SHOW_TEXTURED_DECOR);
     Get_bit_resource(rDB, "texturedBalls", &instruments, SHOW_TEXTURED_BALLS);
     Get_bit_resource(rDB, "reverseScroll", &instruments, SHOW_REVERSE_SCROLL);
+    Get_bit_resource(rDB, "showID", &instruments, SHOW_SHIP_ID);
 
     Get_bool_resource(rDB, "texturedObjects", &blockBitmaps);
     Get_bool_resource(rDB, "pointerControl", &initialPointerControl);

@@ -71,6 +71,7 @@
 #define SHOW_CLOCK_AMPM_FORMAT	(1L << 24)
 #define SHOW_TEXTURED_BALLS	(1L << 25)
 #define SHOW_REVERSE_SCROLL	(1L << 26)
+#define SHOW_SHIP_ID            (1L << 27)
 
 #define PACKET_LOSS		0
 #define PACKET_DROP		1
@@ -128,7 +129,7 @@ typedef struct {
     char	name[MAX_CHARS];
     char	real[MAX_CHARS];
     char	host[MAX_CHARS];
-    char        id_string[5];
+    char        id_string[MAX_CHARS];
 } other_t;
 
 typedef struct {
