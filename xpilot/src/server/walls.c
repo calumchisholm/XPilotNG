@@ -1711,7 +1711,8 @@ int Polys_to_client(unsigned char **start)
 	    STORE1(World.bases[i].team);
 	STORE2(World.bases[i].pos.cx >> CLICK_SHIFT);
 	STORE2(World.bases[i].pos.cy >> CLICK_SHIFT);
-	STORE1(World.bases[i].dir);
+	/* Send the direction like RES was 128. */
+	STORE1(128 * World.bases[i].dir / RES);
     }
     STORE2(World.NumFuels);
     for (i = 0; i < World.NumFuels; i++) {

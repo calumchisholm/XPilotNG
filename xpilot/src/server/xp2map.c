@@ -214,7 +214,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "y"))
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "dir"))
-		dir = atoi(*(attr + 1));
+		dir = (RES * atoi(*(attr + 1))) / 128;
 	    attr += 2;
 	}
 	if (team < 0 || team >= MAX_TEAMS) {
@@ -254,7 +254,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    else if (!strcasecmp(*attr, "y"))
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    else if (!strcasecmp(*attr, "dir"))
-		dir = atoi(*(attr + 1));
+		dir = (RES * atoi(*(attr + 1))) / 128;
 	    attr += 2;
 	}
 	cannon_ind = Map_place_cannon(pos, dir, team);

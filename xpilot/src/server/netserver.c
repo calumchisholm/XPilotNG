@@ -1918,11 +1918,11 @@ int Send_self(connection_t *connp,
 		      PKT_SELF,
 		      CLICK_TO_PIXEL(pl->pos.cx), CLICK_TO_PIXEL(pl->pos.cy),
 		      (int) pl->vel.x, (int) pl->vel.y,
-		      pl->dir,
+		      128 * pl->dir / RES,
 		      (int) (pl->power + 0.5),
 		      (int) (pl->turnspeed + 0.5),
 		      (int) (pl->turnresistance * 255.0 + 0.5),
-		      lock_id, lock_dist, lock_dir,
+		      lock_id, lock_dist, 128 * lock_dir / RES,
 		      pl->check,
 
 		      pl->fuel.current,
@@ -2357,7 +2357,7 @@ int Send_ship(connection_t *connp, int cx, int cy, int id, int dir,
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd" "%c" "%c",
 			 PKT_SHIP, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id,
-			 dir,
+			 128 * dir / RES,
 			 (shield != 0)
 			 | ((cloak != 0) << 1)
 			 | ((emergency_shield != 0) << 2)
