@@ -26,6 +26,8 @@
 
 #include "xpcommon.h"
 
+#include "keys.h"
+
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #else

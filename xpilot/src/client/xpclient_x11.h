@@ -51,8 +51,6 @@
 #  include <X11/Xresource.h>
 #endif
 
-#include "keys.h"
-
 #include "bitmaps.h"
 #include "configure.h"
 #include "dbuff.h"

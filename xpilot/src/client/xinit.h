@@ -33,10 +33,6 @@
 #define MAX_TOP_HEIGHT	1440
 #define DEF_TOP_HEIGHT	1024
 
-#define MAX_POINTER_BUTTONS	5
-#define MAX_BUTTON_DEFS		3
-#define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
-
 #ifdef _WINDOWS
 # ifndef O_BINARY
 #  define O_BINARY		0 /* compability with MSDOS */

@@ -44,7 +44,6 @@
 #include "item.h"
 #endif
 
-
 #define SHOW_SLIDING_RADAR	(1L << 0)
 #define SHOW_ITEMS		(1L << 1)
 #define SHOW_MESSAGES		(1L << 2)
@@ -96,6 +95,9 @@
 #define MSG_LIFE_TIME		120.0	/* Seconds */
 #define MSG_FLASH_TIME		105.0	/* Old messages have life time less
 					   than this */
+#define MAX_POINTER_BUTTONS	5
+#define MAX_BUTTON_DEFS		3
+#define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
 
 /*
  * Macros to manipulate dynamic arrays.

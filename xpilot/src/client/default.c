@@ -21,6 +21,63 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifdef OPTIONHACK
+
+/* kps tries to make this work without Xrm */
+
+#include "xpclient.h"
+
+char default_version[] = VERSION;
+
+char myName[] = "xpilot";
+char myClass[] = "XPilot";
+
+keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
+
+void Parse_options(int *argcp, char **argvp, char *realName, int *port,
+		   int *my_team, bool *text, bool *list,
+		   bool *join, bool *noLocalMotd,
+		   char *nickName, char *dispName, char *hostName,
+		   char *shut_msg)
+{
+}
+
+char *Get_keyHelpString(keys_t key)
+{
+    return "foobar";
+}
+
+const char *Get_keyResourceString(keys_t key)
+{
+    return "raboof";
+}
+
+void defaultCleanup(void)
+{
+}
+
+#ifndef _WINDOWS
+void Get_xpilotrc_file(char *path, unsigned size)
+{
+    const char		*home = getenv("HOME");
+    const char		*defaultFile = ".xpilotrc";
+    const char		*optionalFile = getenv("XPILOTRC");
+
+    if (optionalFile != NULL)
+	strlcpy(path, optionalFile, size);
+    else if (home != NULL) {
+	strlcpy(path, home, size);
+	strlcat(path, "/", size);
+	strlcat(path, defaultFile, size);
+    } else
+	strlcpy(path, "", size);
+}
+#endif
+
+
+#else
+
+
 #include "xpclient_x11.h"
 
 
@@ -3782,3 +3839,5 @@ static void Get_test_resources(XrmDatabase rDB)
     (void)rDB;
 }
 #endif
+
+#endif /* OPTIONHACK */
