@@ -1,3 +1,248 @@
+2004-04-12 11:32  darelcullen
+
+	* doc/xpilot-ng-x11.spec: Add an ng x11 target rpm
+
+2004-04-12 11:31  darelcullen
+
+	* doc/xpilot-ng-sdl.spec: First attempt at an sdl rpm, some
+	  problems with handling of opengl
+
+2004-04-11 20:46  darelcullen
+
+	* src/client/sdl/sdlgui.c: Clearup windows warnings with float to
+	  double conversions being done implicitly in windows
+
+2004-04-11 20:41  darelcullen
+
+	* src/client/sdl/asteroid_data.h: clear up 3000 windows warnings or
+	  so
+
+2004-04-08 01:28  kps
+
+	* src/server/: metaserver.c, server.c, server.h: Added
+	  Describe_game_status() which returns a string.
+
+2004-04-07 23:04  kps
+
+	* src/server/server.c: Updates: -use decimal scores -Server_info()
+	  updated:  - changed EXPERIMENTAL SERVER to XPILOT NG SERVER  -
+	  changed MAX SPEED to CURRENT FPS  - removed unnecessary data like
+	  the '*' for the player with the best ratio	and who robots have
+	  declared war on -use snprintf instead of sprintf
+
+2004-04-07 22:04  maximan
+
+	* src/client/sdl/sdlgui.c: [no log message]
+
+2004-04-07 17:37  kps
+
+	* src/: client/textinterface.c, common/pack.h, server/contact.c:
+	  Removed use of MAX_ROBOT_pack (use OPTION_TUNE_pack to set
+	  maxrobots).
+
+2004-04-07 03:53  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, radar.c, sdlinit.c,
+	  sdlpaint.c: Confmenu now starts with online color indicators,
+	  click the colored square and it changes into a color setup widget
+	  (roughly 4 lines high)
+
+	  Now the confmenu is persistant from start 'til finish since there
+	  is some serious bug with closing it =( couldn't find what was
+	  going on.  Good side is that the cnf menu now remembers its
+	  position (i.e. scroll position) and wich colors were edited this
+	  session (their widgets are still expanded) Bad side is that the
+	  entire conf menu is persistant in memory, and uses up alot of
+	  texture space =( Atleast *I* can't make it crash now, but the
+	  trick to crash it seems diff erent between machines (col's method
+	  didn't crash it on my comp, but on my comp it started crapping
+	  stuff up if a message appeared while confmenu was up, and I
+	  closed with the button)
+
+	  /virus
+
+2004-04-07 01:20  kps
+
+	* config.h.in, configure, configure.ac: Make configure fail if math
+	  lib, zlib or expat is not found.  Make it fail if SDL_image is
+	  not found when enable-sdl-client option is given.  Other small
+	  cleanups.
+
+2004-04-07 00:14  kps
+
+	* src/server/netserver.c: Disabled stuff when nick was modified in
+	  Handle_login, added [*Server reply*] to some messages in
+	  Handle_talk.
+
+2004-04-06 21:10  kps
+
+	* configure, configure.ac: Modifications to possibly fix linking on
+	  freebsd and other systems.
+
+2004-04-06 20:54  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, sdlevent.c, sdlgui.c,
+	  sdlpaint.c, sdlpaint.h: Almost completed conf menu widget, only
+	  thing remaining is to use a oneline color indicator widget until
+	  you click the color (to make the list shorter) the 'conf menu'
+	  now has buttons 'Quit' 'Save' 'Close' (the last one simply closes
+	  the confmenu, same as clicking somewhere else in the bg)
+	  Reordered the RGBA colors bugfixes
+
+	  /virus
+
+2004-04-06 18:46  kps
+
+	* src/server/: connection.h, netserver.c: Changed connp->real to
+	  connp->user.
+
+2004-04-06 15:15  kps
+
+	* src/server/: command.c, player.c, server.h: Fixed initialisation
+	  and handling of GetIndArray so that GetInd() wouldn't return
+	  pointers to unused player structures.  Get_player_by_name() now
+	  accepts player id numbers.
+
+2004-04-06 14:30  kps
+
+	* src/server/: command.c, contact.c, server.h: Use strlcpy, strlcat
+	  or snprintf instead of strcpy, strcat or sprintf in Cmd_*
+	  functions, Queue_advance_player() and Queue_show_list().
+
+2004-04-06 13:23  kps
+
+	* src/server/command.c: Added size arguments to commands, most are
+	  unused in this revision though.
+
+2004-04-06 13:21  kps
+
+	* src/client/client.h: Removed redundant declarations.
+
+2004-04-06 11:54  kps
+
+	* src/server/: map.c, map.h: Added world member have_options which
+	  tells if options have been initialised.
+
+2004-04-05 19:42  darelcullen
+
+	* src/client/sdl/sdlgui.c: repair windows and mac os x breakage
+
+2004-04-05 18:51  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, sdlgui.c: Bugfix, and
+	  some early stuff preparing for color conf widgets
+
+	  /virus
+
+2004-04-05 13:41  kps
+
+	* src/server/: map.c, xpmap.c: Allocate world->block only in
+	  World_alloc.
+
+2004-04-05 13:08  kps
+
+	* src/server/: map.c, server.c, server.h: Wormhole_line_init()
+	  takes world argument. Other trivial changes.
+
+2004-04-05 12:53  kps
+
+	* src/server/: fileparser.c, parser.c, server.c, server.h,
+	  xp2map.c: Parser() takes world argument.
+
+2004-04-05 12:18  kps
+
+	* src/server/option.c: Using mineLife=0 or missileLife=0 to set
+	  default value is obsolete, not deprecated.
+
+2004-04-05 12:16  kps
+
+	* src/client/: client.c, client.h, messages.c, sdl/sdlgui.c,
+	  sdl/sdlpaint.c: Removed duplicates of global variables. Moved
+	  some selection and history stuff to messages.c.
+
+2004-04-05 12:13  kps
+
+	* src/client/bitmaps.c: Fixed warnings.
+
+2004-04-04 22:26  juhal
+
+	* src/client/sdl/sdlgui.c: asteroids work now also on old maps
+
+2004-04-04 21:59  kps
+
+	* src/server/walls.c: Increased DISIZE from 200 to 500. This was
+	  because on the active volcano map, there wasn't enough corner
+	  space. This was probably because of the earlier increase in
+	  MAX_SHAPE_OFFSET.
+
+2004-04-04 21:08  kps
+
+	* src/client/sdl/Makefile.am, src/client/sdl/Makefile.in,
+	  lib/textures/Makefile.in: Baron added sdl asteroid stuff.
+
+2004-04-04 20:49  juhal
+
+	* src/client/sdl/asteroid_data.h: added 3d asteroids for sdl client
+
+2004-04-04 20:05  juhal
+
+	* src/client/sdl/sdlgui.c: changed asteroid rotation to increase
+	  light
+
+2004-04-04 19:40  juhal
+
+	* lib/textures/: asteroid.ppm, Makefile.am: added 3d asteroids for
+	  sdl client
+
+2004-04-04 19:40  juhal
+
+	* src/client/: guiobjects.c, guiobjects.h, paintobjects.c,
+	  sdl/images.c, sdl/images.h, sdl/sdlgui.c, sdl/sdlpaint.c: added
+	  3d asteroids for sdl client, modified generic client to support
+	  that
+
+2004-04-04 18:08  maximan
+
+	* src/client/sdl/glwidgets.c: bugfix /virus
+
+2004-04-04 16:49  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, sdlgui.c, sdlkeys.c,
+	  sdlpaint.c, sdlpaint.h, sdlwindow.h: tweaks & fixes moved RGBA
+	  colors from ints to Uint32 all over
+
+	  /virus
+
+2004-04-03 23:55  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, sdlgui.c, sdlmeta.c:
+	  widget tweaks
+
+	  /virus
+
+2004-04-03 22:50  kps
+
+	* src/server/: map.c, map.h, parser.c, player.c, server.c,
+	  server.h: Removed baseorders (again; uau had already removed them
+	  in 4.3.1X) Cleaned up world initialisation a bit.
+
+2004-04-03 18:52  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, radar.c, sdlevent.c,
+	  sdlgui.c, sdlinit.c, sdlpaint.c, text.c, text.h: Fixes and
+	  utilization of listwidget stuff. few bugfixes and tweaks (can add
+	  entire wists lists in one go to the listwidgets now)
+
+	  /virus
+
+2004-04-03 18:37  darelcullen
+
+	* ChangeLog: ChangeLog Updates
+
+2004-04-03 18:37  darelcullen
+
+	* BUGS: SDL ttf without makeinstall seg fault bug
+
 2004-04-03 15:57  kps
 
 	* configure, configure.ac: A bit better configure help for
