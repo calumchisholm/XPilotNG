@@ -3,6 +3,7 @@
 #include "SDL.h"
 #include "xpclient.h"
 #include "text.h"
+#include "console.h"
 
 int draw_depth;
 
@@ -62,12 +63,20 @@ int Init_playing_windows(void)
     sdl_init_colors();
     Init_spark_colors();
     */
-    Radar_init();
+    if (Radar_init()) {
+	error("radar initialization failed");
+	return -1;
+    }
+    if (Console_init()) {
+	error("console initialization failed");
+	return -1;
+    }
     return 0;
 }
 
 void Quit(void) 
 {
+    Console_cleanup();
     Radar_cleanup();
     fontclean(&gamefont);
     fontclean(&messagefont);

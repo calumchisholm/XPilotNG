@@ -24,6 +24,7 @@
 #include "xpclient.h"
 #include "keys.h"
 #include "SDL.h"
+#include "console.h"
 
 char sdlevent_version[] = VERSION;
 
@@ -159,7 +160,7 @@ bool Key_press_decrease_turnspeed(void)
 
 bool Key_press_talk(void)
 {
-    /* TODO */
+    Console_show();
     return false;	/* server doesn't need to know */
 }
 
@@ -416,6 +417,8 @@ int Process_event(SDL_Event *evt)
 {
     int key_change = 0;
     movement = 0;
+
+    if (Console_process(evt)) return 1;
     
     switch (evt->type) {
 	
@@ -423,10 +426,12 @@ int Process_event(SDL_Event *evt)
 	return 0;
 	
     case SDL_KEYDOWN:
+	if (Console_isVisible()) break;
 	key_change |= Key_press(keyMap[evt->key.keysym.sym]);
 	break;
 	
     case SDL_KEYUP:
+	if (Console_isVisible()) break;
 	key_change |= Key_release(keyMap[evt->key.keysym.sym]);
 	break;
 	

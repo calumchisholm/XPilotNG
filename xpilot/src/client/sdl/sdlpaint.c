@@ -27,6 +27,7 @@
 #include "xpclient.h"
 #include "sdlpaint.h"
 #include "images.h"
+#include "console.h"
 
 char sdlpaint_version[] = VERSION;
 
@@ -247,6 +248,7 @@ void Paint_frame(void)
     	Paint_messages();       
     	Paint_score_objects();
 	Radar_paint();
+	Console_paint();
 
 	glPopMatrix();
 

@@ -6,11 +6,12 @@
 
 static image_t *images = NULL;
 static int num_images = 0, max_images = 0;
+static int first_texture = 0;
 
 static int pow2_ceil(int t) 
 {
-    int r;
-    for (r = 1; r < t; r <<= 1);
+    int r = 1;
+    while (r < t) r <<= 1;
     return r;   
 }
 
@@ -35,9 +36,11 @@ static int Image_init(image_t *img)
     img->data_width = pow2_ceil(img->width);
     img->data_height = pow2_ceil(img->height);
 
+    /*
     printf("Loaded image %s: w=%d, h=%d, fw=%d, dw=%d, dh=%d\n",
 	   img->filename, img->width, img->height, img->frame_width,
 	   img->data_width, img->data_height);
+    */
 
     img->data = calloc(img->data_width * img->data_height, sizeof(unsigned int));
     if (img->data == NULL) {
@@ -100,6 +103,27 @@ image_t *Image_get(int ind) {
     return img;
 }
 
+void Image_use_texture(int ind, int *width, int *height)
+{
+    image_t *img = Image_get(first_texture + ind);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    if (img == NULL) {
+	printf("texture %d is undefined\n", ind);
+    }
+    if (img == NULL) return;
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D, img->name);
+    glColor4ub(255, 255, 255, 255);
+    if (width != NULL) *width = img->frame_width;
+    if (height != NULL) *height = img->height;
+}
+
+void Image_no_texture()
+{
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+}
 
 void Image_paint(int ind, int x, int y, int frame)
 {
@@ -183,6 +207,8 @@ int Images_init(void)
     DEF_IMG("checkpoint.ppm", -2);
     DEF_IMG("meter.ppm", -2);
     DEF_IMG("asteroidconcentrator.ppm", 32);
+
+    first_texture = num_images;
 
 #undef DEF_IMG
     return 0;
