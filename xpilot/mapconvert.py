@@ -379,13 +379,15 @@ def convert(options):
 	    sstr += ' hidedges="%d"' % len(internal)
 	sstr += '>'
 	print sstr
-	x = p[0][0]
-	y = p[0][1]
-	h = p[0][2]
-	for c in p[1:]:
+	x = p[-1][0]
+	y = p[-1][1]
+	h = p[-1][2]
+	for c in p:
+	    sstr = '<Offset x="%d" y="%d"' % (center(c[0] - x, mxc), center(c[1] - y, myc))
 	    if not h:
-		print '<Hidden/>'
-	    print '<Offset x="%d" y="%d"/>' % (center(c[0] - x, mxc), center(c[1] - y, myc))
+		sstr += ' hidden="yes"'
+	    sstr += '/>'
+	    print sstr
 	    x, y, h = c
 	print "</Polygon>"
     for ball in balls:
