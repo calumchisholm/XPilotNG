@@ -49,7 +49,7 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="usewreckage" value="no"/>
 <Option name="waitingfps" value="0"/>
-<Option name="wallbouncefueldrainmult" value="0"/>
+<Option name="wallbouncefueldrainmult" value="0.01"/>
 <Option name="worldlives" value="3"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
