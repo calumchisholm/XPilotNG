@@ -477,10 +477,8 @@ void Paint_score_start(void)
 	strlcpy(headingStr, "     SCORE   NAME     LIFE", sizeof(headingStr));
     else {
 	strlcpy(headingStr, "  ", sizeof(headingStr));
-	if (BIT(Setup->mode, TIMING)) {
-	    if (version >= 0x3261)
-		strcat(headingStr, "LAP ");
-	}
+	if (BIT(Setup->mode, TIMING))
+	    strcat(headingStr, "LAP ");
 	strlcpy(headingStr, " AL ", sizeof(headingStr));
 	strcat(headingStr, "  SCORE  ");
 	if (BIT(Setup->mode, LIMITED_LIVES))
@@ -544,15 +542,13 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 	if (BIT(Setup->mode, TIMING)) {
 	    raceStr[0] = ' ';
 	    raceStr[1] = ' ';
-	    if (version >= 0x3261) {
-		if ((other->mychar == ' ' || other->mychar == 'R')
-		    && other->round + other->check > 0) {
-		    if (other->round > 99)
-			sprintf(raceStr, "%3d", other->round);
-		    else
-			sprintf(raceStr, "%d.%c",
-				other->round, other->check + 'a');
-		}
+	    if ((other->mychar == ' ' || other->mychar == 'R')
+		&& other->round + other->check > 0) {
+		if (other->round > 99)
+		    sprintf(raceStr, "%3d", other->round);
+		else
+		    sprintf(raceStr, "%d.%c",
+			    other->round, other->check + 'a');
 	    }
 	}
 	if (BIT(Setup->mode, TEAM_PLAY))

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -135,7 +134,7 @@
  * but make incompatible changes while developing the new format. Therefore
  * there is a separate "old" range of allowed servers.
  */
-#define MIN_OLD_SERVER_VERSION  0x3103
+#define MIN_OLD_SERVER_VERSION  0x4203
 #define MAX_OLD_SERVER_VERSION  0x4501
 /* Which old-style (non-polygon) protocol version we support. */
 #define COMPATIBILITY_MAGIC 0x4501F4ED

@@ -327,10 +327,7 @@ bool Key_press_show_messages(keys_t key)
 
 bool Key_press_pointer_control(keys_t key)
 {
-    if (version < 0x3202)
-	warn("Cannot use pointer control below version 3.2.3");
-    else
-        Pointer_control_set_state(!pointerControl);
+    Pointer_control_set_state(!pointerControl);
     return false;	/* server doesn't need to know */
 }
 
@@ -405,12 +402,6 @@ bool Key_press_msgs_stdout(keys_t key)
 
 bool Key_press_select_lose_item(keys_t key)
 {
-    if (version < 0x3400) {
-        static int before;
-        if (!before++)
-	    warn("Servers less than 3.4.0 dont know how to drop items");
-	return false;
-    }
     if (lose_item_active == 1)
         lose_item_active = 2;
     else
@@ -560,8 +551,6 @@ bool Key_release(keys_t key)
 
     case KEY_SELECT_ITEM:
     case KEY_LOSE_ITEM:
-	if (version < 0x3400)
-	    return false;
 	if (lose_item_active == 2)
 	    lose_item_active = 1;
 	else

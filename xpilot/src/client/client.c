@@ -1677,23 +1677,6 @@ int Client_setup(void)
     if (Alloc_history() == -1)
 	return -1;
 
-    /* Old servers can't deal with 0.0 turnresistance, so swap to
-     * the alternate bank, and hope there's something better there. */
-    /* HACK: Hanging Gardens runs an old server (version code 0x4101)
-     * which happens to have the turnresistance patch. */
-    if (turnresistance == 0.0 && version < 0x4200 && version != 0x4101)
-    {
-	double tmp;
-#define SWAP(a,b) (tmp = (a), (a) = (b), (b) = tmp)
-	SWAP(power, power_s);
-	SWAP(turnspeed, turnspeed_s);
-	SWAP(turnresistance, turnresistance_s);
-#undef SWAP
-	controlTime = CONTROL_TIME;
-	Add_message("Old server can't handle turnResistance=0.0; "
-		    "swapping to alternate settings [*Client message*]");
-    }
-
     return 0;
 }
 

@@ -445,16 +445,10 @@ static bool Process_commands(sockbuf_t *ibuf,
 		else if (linebuf[1] != '\0') {
 		    conpar->team = TEAM_NOT_SET;
 		}
-		if (conpar->server_version < 0x3430) {
-		    Packet_printf(ibuf, "%c%s%s%s%d", ENTER_GAME_pack,
-				  conpar->nick_name, conpar->disp_name,
-				  hostname, conpar->team);
-		} else {
-		    Packet_printf(ibuf, "%c%s%s%s%d", ENTER_QUEUE_pack,
-				  conpar->nick_name, conpar->disp_name,
-				  hostname, conpar->team);
-		    time(&qsent);
-		}
+		Packet_printf(ibuf, "%c%s%s%s%d", ENTER_QUEUE_pack,
+			      conpar->nick_name, conpar->disp_name,
+			      hostname, conpar->team);
+		time(&qsent);
 		break;
 
 	    case 'S':				/* Report status. */
