@@ -8,7 +8,7 @@ xpilot-ng-server \- server for multiplayer space war game.
 .SH DESCRIPTION
 .IP
 Copyright © 1991\-2005 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson.
-XPilot NG 4.7.0ng\-a1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.6.6ng47a1 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
 Option flags specify where an option can be used and whether it
@@ -138,12 +138,6 @@ Are robots restricted to their own team?
 \-/+reserveRobotTeam
 .IP
 Is the robot team only for robots?
-.HP
-\fB\-robotTicksPerSecond\fR or robotTicks <integer>
-.IP
-How many times per second to call robot round tick?
-The value will be limited into the range 1 to server FPS.
-A value of 0 means one tick per frame.
 .HP
 \fB\-robotUserName\fR or robotRealName <string>
 .IP
@@ -305,8 +299,8 @@ Effect of turnPush on very slow bounces
 \fB\-pushType\fR <integer>
 .IP
 What kind of dependency of turnpush to perpendicular bounce speed?
-0 = no turnPush, 1= linear relation, 2= tanh relation, 3=sinoid relation
-4 = sinesqr 5 = sine to the power of 4
+0 = no turnPush, 1 = linear relation, 2 = tanh relation,
+3 = sinoid relation 4 = sinesqr 5 = sine to the power of 4
 at zero\-speed pushMax is applied, at speeds over turnPush pushMin
 .HP
 \-/+minesWallBounce
@@ -1390,12 +1384,7 @@ How many defensive items a player can carry.
 .IP
 The maximum duration of each round, in seconds.
 .HP
-\fB\-roundsToPlay\fR <integer>
-.TP
-The number of rounds to play.
-Unlimited if 0.
-.HP
-\fB\-numberOfRounds\fR or numRounds <integer>
+\fB\-roundsToPlay\fR or numRounds <integer>
 .TP
 The number of rounds to play.
 Unlimited if 0.
@@ -1586,16 +1575,23 @@ players' names in the score list.
 \-/+teamcup
 .IP
 Is this a teamcup match?.
+[ Flags: command, any, invisible ]
 .HP
-\fB\-teamcupStatServer\fR or statServer <string>
+\fB\-teamcupName\fR <string>
 .IP
-Teamcup status server to report to.
-[ Flags: command ]
+The name of the teamcup (used only if teamcup is true).
+[ Flags: command, any, invisible ]
 .HP
-\fB\-teamcupStatPort\fR or statPort <integer>
+\fB\-teamcupMailAddress\fR <string>
 .IP
-Port of the teamcup status server.
-[ Flags: command ]
+The mail address where players should send match results.
+[ Flags: command, any, invisible ]
+.HP
+\fB\-teamcupScoreFileNamePrefix\fR <string>
+.IP
+First part of file name for teamcup score files.
+The whole filename will be this followed by the match number.
+[ Flags: command, any, invisible ]
 .HP
 \fB\-teamcupMatchNumber\fR or match <integer>
 .IP
@@ -1620,10 +1616,10 @@ Boolean options are turned off by using +<option>.
 Please refer to the manual pages, xpilot\-ng\-server(6),
 xpilot\-ng\-x11(6) and xpilot\-ng\-sdl(6) for more specific help.
 .IP
-XPilot NG 4.7.0ng\-a1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.6.6ng47a1 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
-XPilot NG 4.7.0ng\-a1
+XPilot NG 4.6.6ng47a1
 .SH "SEE ALSO"
 The full documentation for
 .B xpilot-ng-server
