@@ -150,18 +150,6 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin);
 
 
 /*
- * Prototypes for math.c
- */
-int ON(char *optval);
-int OFF(char *optval);
-int mod(int x, int y);
-int f2i(DFLOAT f);
-DFLOAT findDir(DFLOAT x, DFLOAT y);
-DFLOAT rfrac(void);
-void Make_table(void);
-
-
-/*
  * Prototypes for cmdline.c
  */
 void tuner_none(void);

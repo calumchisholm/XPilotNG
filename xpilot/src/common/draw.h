@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -207,9 +207,4 @@ void Ship_set_l_light(shipobj *ship, int i, ipos pos);
 void Ship_set_r_light(shipobj *ship, int i, ipos pos);
 void Ship_set_m_rack(shipobj *ship, int i, ipos pos);
 
-extern DFLOAT rfrac(void);
-
-extern int mod(int x, int y);
-
 #endif
-

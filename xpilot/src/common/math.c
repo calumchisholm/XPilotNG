@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -77,13 +77,13 @@ DFLOAT findDir(DFLOAT x, DFLOAT y)
 }
 
 
-DFLOAT rfrac(void)
+double rfrac(void)
 {
     /*
      * Return a pseudo-random value in the range { 0.0 <= x < 1.0 }.
      * Use randomMT() which returns a 32 bit PRN and multiply by 1/(1<<32).
      */
-    return (DFLOAT)((double) randomMT() * 0.00000000023283064365386962890625);
+    return (double) randomMT() * 0.00000000023283064365386962890625;
 }
 
 
@@ -96,4 +96,3 @@ void Make_table(void)
 	tbl_cos[i] = cos(i * (2.0 * PI / TABLE_SIZE));
     }
 }
-
