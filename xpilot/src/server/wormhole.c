@@ -53,7 +53,7 @@ static void Warp_balls(player_t *pl, clpos_t dest)
     /*
      * Don't connect to balls while warping.
      */
-    if (BIT(pl->used, HAS_CONNECTOR))
+    if (Player_uses_connector(pl))
 	pl->ball = NULL;
 
     if (BIT(pl->have, HAS_BALL)) {

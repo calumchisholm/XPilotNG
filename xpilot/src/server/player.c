@@ -1542,7 +1542,7 @@ void Detach_ball(player_t *pl, ballobject_t *ball)
 
     if (ball == NULL || ball == pl->ball) {
 	pl->ball = NULL;
-	CLR_BIT(pl->used, HAS_CONNECTOR);
+	CLR_BIT(pl->used, USES_CONNECTOR);
     }
 
     if (BIT(pl->have, HAS_BALL)) {

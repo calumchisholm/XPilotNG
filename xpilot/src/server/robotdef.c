@@ -847,7 +847,7 @@ static void Robotdef_do_tractor_beam(player_t *pl)
 		       && vel > my_data->robot_normal_speed)
 		SET_BIT(pl->used, USES_TRACTOR_BEAM);
 	}
-	if (BIT(pl->used, USES_TRACTOR_BEAM))
+	if (Player_uses_tractor_beam(pl))
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
     }
 }
@@ -1198,12 +1198,12 @@ static bool Detect_ship(player_t *pl, player_t *ship)
 	&& options.cloakedExhaust)
 	return true;
 
-    if (BIT(ship->used, HAS_SHOT|
-			HAS_LASER|
-			HAS_REFUEL|
-			HAS_REPAIR|
-			HAS_CONNECTOR|
-			USES_TRACTOR_BEAM))
+    if (BIT(ship->used, HAS_SHOT)
+	|| BIT(ship->used, HAS_LASER)
+	|| Player_is_refueling(pl)
+	|| Player_is_repairing(pl)
+	|| Player_uses_connector(pl)
+	|| Player_uses_tractor_beam(pl))
 	return true;
 
     if (BIT(ship->have, HAS_BALL))
@@ -1416,7 +1416,7 @@ static bool Ball_handler(player_t *pl)
 	    && clear_path
 	    && sqr(ball->vel.x) + sqr(ball->vel.y) > 60) {
 	    Detach_ball(pl, NULL);
-	    CLR_BIT(pl->used, HAS_CONNECTOR);
+	    CLR_BIT(pl->used, USES_CONNECTOR);
 	    my_data->last_thrown_ball = my_data->robot_count;
 	    CLR_BIT(my_data->longterm_mode, FETCH_TREASURE);
 	} else {
@@ -1524,7 +1524,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	&& BIT(my_data->longterm_mode, NEED_FUEL)) {
 
 	fuel_checked = true;
-	SET_BIT(pl->used, HAS_REFUEL);
+	SET_BIT(pl->used, USES_REFUEL);
 	pl->fs = fuel_i;
 
 	if (Check_robot_target(pl, Fuel_by_index(world, fuel_i)->pos,
@@ -1579,7 +1579,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	&& !fuel_checked
 	&& BIT(my_data->longterm_mode, NEED_FUEL)) {
 
-	SET_BIT(pl->used, HAS_REFUEL);
+	SET_BIT(pl->used, USES_REFUEL);
 	pl->fs = fuel_i;
 
 	if (Check_robot_target(pl, Fuel_by_index(world, fuel_i)->pos,
@@ -1647,7 +1647,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 	    && !WITHIN(my_data->last_thrown_ball,
 		       my_data->robot_count,
 		       3 * FPS))
-	    SET_BIT(pl->used, HAS_CONNECTOR);
+	    SET_BIT(pl->used, USES_CONNECTOR);
 
 	/* Ignore shots and laser pulses if shields already up
 	   - nothing else to do anyway */
@@ -1887,10 +1887,10 @@ static void Robot_default_play(player_t *pl)
 			     pl->pos.cy - fs->pos.cy) <= 90.0 * CLICK)
 		&& fs->fuel > REFUEL_RATE * timeStep) {
 		pl->fs = j;
-		SET_BIT(pl->used, HAS_REFUEL);
+		SET_BIT(pl->used, USES_REFUEL);
 		break;
 	    } else
-		CLR_BIT(pl->used, HAS_REFUEL);
+		CLR_BIT(pl->used, USES_REFUEL);
 	}
     }
 
@@ -1898,7 +1898,7 @@ static void Robot_default_play(player_t *pl)
     if (pl->fuel.sum < (BIT(world->rules->mode, TIMING) ?
 			my_data->fuel_l1 : my_data->fuel_l3))
 	SET_BIT(my_data->longterm_mode, NEED_FUEL);
-    else if (!BIT(pl->used, HAS_REFUEL))
+    else if (!Player_is_refueling(pl))
 	CLR_BIT(my_data->longterm_mode, NEED_FUEL);
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
@@ -1912,7 +1912,7 @@ static void Robot_default_play(player_t *pl)
 		if (Wrap_length(pl->pos.cx - targ->pos.cx,
 				pl->pos.cy - targ->pos.cy) <= 90.0 * CLICK) {
 		    pl->repair_target = j;
-		    SET_BIT(pl->used, HAS_REPAIR);
+		    SET_BIT(pl->used, USES_REPAIR);
 		    break;
 		}
 	    }

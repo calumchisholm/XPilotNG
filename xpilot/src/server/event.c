@@ -254,17 +254,15 @@ static void Player_refuel(player_t *pl)
     double l, dist = 1e19;
     world_t *world = pl->world;
 
-    if (!BIT(pl->have, HAS_REFUEL))
-	return;
-
-    CLR_BIT(pl->used, HAS_REFUEL);
+    CLR_BIT(pl->used, USES_REFUEL);
     for (i = 0; i < world->NumFuels; i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
 
 	l = Wrap_length(pl->pos.cx - fs->pos.cx,
 			pl->pos.cy - fs->pos.cy);
-	if (!BIT(pl->used, HAS_REFUEL) || l < dist) {
-	    SET_BIT(pl->used, HAS_REFUEL);
+	if (!Player_is_refueling(pl)
+	    || l < dist) {
+	    SET_BIT(pl->used, USES_REFUEL);
 	    pl->fs = i;
 	    dist = l;
 	}
@@ -278,10 +276,7 @@ static void Player_repair(player_t *pl)
     double l, dist = 1e19;
     world_t *world = pl->world;
 
-    if (!BIT(pl->have, HAS_REPAIR))
-	return;
-
-    CLR_BIT(pl->used, HAS_REPAIR);
+    CLR_BIT(pl->used, USES_REPAIR);
     for (i = 0; i < world->NumTargets; i++) {
 	target_t *targ = Target_by_index(world, i);
 
@@ -289,8 +284,9 @@ static void Player_repair(player_t *pl)
 	    && targ->dead_ticks <= 0) {
 	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
 			    pl->pos.cy - targ->pos.cy);
-	    if (!BIT(pl->used, HAS_REPAIR) || l < dist) {
-		SET_BIT(pl->used, HAS_REPAIR);
+	    if (!Player_is_repairing(pl)
+		|| l < dist) {
+		SET_BIT(pl->used, USES_REPAIR);
 		pl->repair_target = i;
 		dist = l;
 	    }
@@ -963,8 +959,7 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_CONNECTOR:
-		if (BIT(pl->have, HAS_CONNECTOR))
-		    SET_BIT(pl->used, HAS_CONNECTOR);
+		SET_BIT(pl->used, USES_CONNECTOR);
 		break;
 
 	    case KEY_PRESSOR_BEAM:
@@ -1052,15 +1047,15 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_REFUEL:
-		CLR_BIT(pl->used, HAS_REFUEL);
+		CLR_BIT(pl->used, USES_REFUEL);
 		break;
 
 	    case KEY_REPAIR:
-		CLR_BIT(pl->used, HAS_REPAIR);
+		CLR_BIT(pl->used, USES_REPAIR);
 		break;
 
 	    case KEY_CONNECTOR:
-		CLR_BIT(pl->used, HAS_CONNECTOR);
+		CLR_BIT(pl->used, USES_CONNECTOR);
 		break;
 
 	    case KEY_TRACTOR_BEAM:

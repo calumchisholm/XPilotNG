@@ -381,7 +381,7 @@ static void PlayerCollision(world_t *world)
 	}
 
 	/* Player picking up ball/treasure */
-	if (!BIT(pl->used, HAS_CONNECTOR)
+	if (!Player_uses_connector(pl)
 	    || Player_is_phasing(pl))
 	    pl->ball = NULL;
 	else if (pl->ball != NULL) {

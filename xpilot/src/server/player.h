@@ -93,10 +93,10 @@ extern bool		updateScores;
 #define HAS_LASER		(1U<<27)
 #define USES_CLOAKING_DEVICE	(1U<<26)
 #define HAS_SHIELD		(1U<<25)
-#define HAS_REFUEL		(1U<<24)
-#define HAS_REPAIR		(1U<<23)
+#define USES_REFUEL		(1U<<24)
+#define USES_REPAIR		(1U<<23)
 #define HAS_COMPASS		(1U<<22)
-#define HAS_CONNECTOR		(1U<<20)
+#define USES_CONNECTOR		(1U<<20)
 #define HAS_EMERGENCY_SHIELD	(1U<<19)
 #define USES_DEFLECTOR		(1U<<18)
 #define USES_PHASING_DEVICE	(1U<<17)
@@ -449,6 +449,20 @@ static inline bool Player_is_thrusting(player_t *pl)
     return false;
 }
 
+static inline bool Player_is_refueling(player_t *pl)
+{
+    if (BIT(pl->used, USES_REFUEL))
+	return true;
+    return false;
+}
+
+static inline bool Player_is_repairing(player_t *pl)
+{
+    if (BIT(pl->used, USES_REPAIR))
+	return true;
+    return false;
+}
+
 static inline bool Player_is_self_destructing(player_t *pl)
 {
     return (pl->self_destruct_count > 0.0) ? true : false;
@@ -519,6 +533,20 @@ static inline bool Players_are_allies(player_t *pl1, player_t *pl2)
 static inline bool Player_uses_autopilot(player_t *pl)
 {
     if (BIT(pl->used, USES_AUTOPILOT))
+	return true;
+    return false;
+}
+
+static inline bool Player_uses_connector(player_t *pl)
+{
+    if (BIT(pl->used, USES_CONNECTOR))
+	return true;
+    return false;
+}
+
+static inline bool Player_uses_tractor_beam(player_t *pl)
+{
+    if (BIT(pl->used, USES_TRACTOR_BEAM))
 	return true;
     return false;
 }

@@ -882,14 +882,14 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	    );
 	}
 
-	if (BIT(pl_i->used, HAS_REFUEL)) {
+	if (Player_is_refueling(pl_i)) {
 	    fuel_t *fs = Fuel_by_index(world, pl_i->fs);
 
 	    if (clpos_inview(&cv, fs->pos))
 		Send_refuel(conn, fs->pos, pl_i->pos);
 	}
 
-	if (BIT(pl_i->used, HAS_REPAIR)) {
+	if (Player_is_repairing(pl_i)) {
 	    target_t *targ = Target_by_index(world, pl_i->repair_target);
 
 	    if (clpos_inview(&cv, targ->pos))
@@ -897,7 +897,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 		Send_refuel(conn, pl_i->pos, targ->pos);
 	}
 
-	if (BIT(pl_i->used, USES_TRACTOR_BEAM)) {
+	if (Player_uses_tractor_beam(pl_i)) {
 	    player_t *t = Player_by_id(pl_i->lock.pl_id);
 
 	    if (clpos_inview(&cv, t->pos)) {

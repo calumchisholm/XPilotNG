@@ -107,9 +107,9 @@ void Phasing(player_t *pl, bool on)
 		pl->item[ITEM_PHASING]--;
 	    }
 	    SET_BIT(pl->used, USES_PHASING_DEVICE);
-	    CLR_BIT(pl->used, HAS_REFUEL);
-	    CLR_BIT(pl->used, HAS_REPAIR);
-	    if (BIT(pl->used, HAS_CONNECTOR))
+	    CLR_BIT(pl->used, USES_REFUEL);
+	    CLR_BIT(pl->used, USES_REPAIR);
+	    if (Player_uses_connector(pl))
 		pl->ball = NULL;
 	    CLR_BIT(pl->used, USES_TRACTOR_BEAM);
 	    CLR_BIT(pl->obj_status, GRAVITY);
@@ -707,7 +707,7 @@ static void Do_refuel(player_t *pl)
 	|| (BIT(world->rules->mode, TEAM_PLAY)
 	    && options.teamFuel
 	    && fs->team != pl->team)) {
-	CLR_BIT(pl->used, HAS_REFUEL);
+	CLR_BIT(pl->used, USES_REFUEL);
     } else {
 	int n = pl->fuel.num_tanks;
 	int ct = pl->fuel.current;
@@ -723,7 +723,7 @@ static void Do_refuel(player_t *pl)
 		fs->fuel = 0;
 		fs->conn_mask = 0;
 		fs->last_change = frame_loops;
-		CLR_BIT(pl->used, HAS_REFUEL);
+		CLR_BIT(pl->used, USES_REFUEL);
 		break;
 	    }
 	    if (pl->fuel.current == pl->fuel.num_tanks)
@@ -748,7 +748,7 @@ static void Do_repair(player_t *pl)
 	|| targ->damage >= TARGET_DAMAGE
 	|| targ->dead_ticks > 0
 	|| Player_is_phasing(pl))
-	CLR_BIT(pl->used, HAS_REPAIR);
+	CLR_BIT(pl->used, USES_REPAIR);
     else {
 	int n = pl->fuel.num_tanks;
 	int ct = pl->fuel.current;
@@ -765,7 +765,7 @@ static void Do_repair(player_t *pl)
 		    break;
 		}
 	    } else
-		CLR_BIT(pl->used, HAS_REPAIR);
+		CLR_BIT(pl->used, USES_REPAIR);
 
 	    if (pl->fuel.current == pl->fuel.num_tanks)
 		pl->fuel.current = 0;
@@ -922,18 +922,20 @@ static void Update_players(world_t *world)
 
 	Use_items(pl);
 
-	if (BIT(pl->used, HAS_REFUEL))
+	if (Player_is_refueling(pl))
 	    Do_refuel(pl);
 
-	if (BIT(pl->used, HAS_REPAIR))
+	if (Player_is_repairing(pl))
 	    Do_repair(pl);
 
 	if (pl->fuel.sum <= 0) {
-	    CLR_BIT(pl->used, HAS_SHIELD|USES_CLOAKING_DEVICE|USES_DEFLECTOR);
+	    CLR_BIT(pl->used, HAS_SHIELD);
+	    CLR_BIT(pl->used, USES_CLOAKING_DEVICE);
+	    CLR_BIT(pl->used, USES_DEFLECTOR);
 	    Player_thrust(pl, false);
 	}
 	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))
-	    CLR_BIT(pl->used, HAS_REFUEL);
+	    CLR_BIT(pl->used, USES_REFUEL);
 
 	/*
 	 * Update acceleration vector etc.
@@ -1206,7 +1208,7 @@ void Update_objects(world_t *world)
 		pl->updateVisibility = true;
 	}
 
-	if (BIT(pl->used, USES_TRACTOR_BEAM))
+	if (Player_uses_tractor_beam(pl))
 	    Tractor_beam(pl);
 
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
