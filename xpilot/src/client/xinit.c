@@ -496,7 +496,7 @@ int Init_top(void)
     COLORCHECK(enemyLWColor, 3);
     COLORCHECK(teamShotColor, 2);
     COLORCHECK(shipNameColor, 2);
-    COLORCHECK(baseNameColor, 2);
+    COLORCHECK(baseNameColor, 1);
     COLORCHECK(mineNameColor, 2);
     COLORCHECK(ballColor, 1);
     COLORCHECK(connColor, 2);

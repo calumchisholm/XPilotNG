@@ -1165,7 +1165,7 @@ option options[] = {
     {
 	"baseNameColor",
 	NULL,
-	"2",
+	"1",
 	KEY_DUMMY,
 	"Which color number to use for drawing names of bases.\n"
     },
