@@ -232,12 +232,6 @@ int Paint_init(void)
     extern bool players_exposed; /* paint.c */
     int i;
 
-    if (TTF_Init()) {
-	error("SDL_ttf initialization failed: %s", SDL_GetError());
-	return -1;
-    }
-    xpprintf("SDL_ttf initialized\n");
-
     if (Init_wreckage() == -1)
 	return -1;
     
@@ -259,7 +253,6 @@ void Paint_cleanup(void)
 {
     int i;
     Images_cleanup();
-    TTF_Quit();
 
     for (i=0;i<MAX_SCORE_OBJECTS;++i)
     	if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
@@ -272,14 +265,9 @@ void Paint_cleanup(void)
  */
 void setupPaint_stationary(void)
 {
-    GLenum gl_error;
-    
     if (paintSetupMode & STATIONARY_MODE) return;
     paintSetupMode = STATIONARY_MODE;
     glPopMatrix();
-    { /* glPopMatrix produces an error */
-        gl_error = glGetError( );
-    }
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -317,8 +305,6 @@ void setupPaint_HUD(void)
 
 void Paint_frame(void)
 {
-    GLenum gl_error;
-    
     Check_view_dimensions();
     
     world.x = selfPos.x - (ext_view_width / 2);
@@ -383,6 +369,8 @@ void Paint_frame(void)
 	/* This one works best for things that are fixed in position
 	 * since they won't appear to move relative to eachother
 	 */
+    	
+    	glPushMatrix();
     	setupPaint_stationary();
 	
     	Paint_world();
@@ -413,10 +401,6 @@ void Paint_frame(void)
 	Paint_select();
 
     	DrawGLWidgets(MainWidget);
-    	{ /* TODO: find this error */
-            /* Check for error conditions. */
-            gl_error = glGetError( );
-    	}
     		
 	glPopMatrix();
     }

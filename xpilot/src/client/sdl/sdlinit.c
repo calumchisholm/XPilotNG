@@ -73,22 +73,22 @@ int Init_playing_windows(void)
 
 int Init_window(void)
 {
-  char defaultfont[] = CONF_FONTDIR "defaultfont.bmp"; /* TODO make bmp fonts work */
-  char testfont[] = CONF_FONTDIR "Test.ttf";
-  int gamefontsize = 12;
-  int messagefontsize = 16;
-  int mapfontsize = 12;
-  int value;
-  /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
+    char defaultfont[] = CONF_FONTDIR "defaultfont.bmp"; /* TODO make bmp fonts work */
+    char testfont[] = CONF_FONTDIR "Test.ttf";
+    int gamefontsize = 12;
+    int messagefontsize = 16;
+    int mapfontsize = 12;
+    int value;
+    /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
 
 
-  if (TTF_Init()) {
-    error("SDL_ttf initialization failed: %s", SDL_GetError());
-    return -1;
-  }
-  xpprintf("SDL_ttf initialized\n");
+    if (TTF_Init()) {
+    	error("SDL_ttf initialization failed: %s", SDL_GetError());
+    	return -1;
+    }
+    xpprintf("SDL_ttf initialized\n");
 
- Conf_print();
+    Conf_print();
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         error("failed to initialize SDL: %s", SDL_GetError());
@@ -178,6 +178,7 @@ void Quit(void)
     Console_cleanup();
     fontclean(&gamefont);
     fontclean(&messagefont);
+    TTF_Quit();
     SDL_Quit();
 }
 
