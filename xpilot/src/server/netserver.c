@@ -3144,7 +3144,8 @@ static void Handle_talk(int ind, char *str)
 
 	if (!other_pl) {
 	    sprintf(msg, "Message not sent. ");
-	    strcat(msg, errmsg);
+	    strlcat(msg, errmsg, sizeof(msg));
+	    strlcat(msg, " [*Server reply*]", sizeof(msg));
 	    Set_player_message(pl, msg);
 	    return;
 	}
