@@ -394,12 +394,6 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
     int button_x;
     int button_y;
     
-    /*    int button2; */
-    int button2_width;
-    int button2_height;
-    int button2_x;
-    int button2_y;
-    
     int button3;
     int button3_width;
     int button3_height;
@@ -1987,8 +1981,6 @@ static int Internet_cb(int widget, void *user_data, const char **text)
  */
 static int Configure_cb(int widget, void *user_data, const char **text)
 {
-    Connect_param_t *conpar = (Connect_param_t *) user_data;
-
     (void)widget; (void)text;
 
     Config(true, CONFIG_DEFAULT);
