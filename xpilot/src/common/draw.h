@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -107,11 +106,21 @@ typedef union {
     position pxl;
 } shapepos;
 
+typedef struct {
+    shapepos	*pts[MAX_SHIP_PTS2];	/* the shape rotated many ways */
+    int		num_points;		/* total points in object */
+    int		num_orig_points;	/* points before SSHACK */
+    shapepos	cashed_pts[MAX_SHIP_PTS2];
+    int		cashed_dir;
+} shape;
 
 typedef struct {			/* Defines wire-obj, i.e. ship */
     shapepos	*pts[MAX_SHIP_PTS2];	/* the shape rotated many ways */
     int		num_points;		/* total points in object */
     int		num_orig_points;	/* points before SSHACK */
+    shapepos	cashed_pts[MAX_SHIP_PTS2];
+    int		cashed_dir;
+
     shapepos	engine[RES];		/* Engine position */
     shapepos	m_gun[RES];		/* Main gun position */
     int		num_l_gun,
@@ -163,6 +172,8 @@ extern shapepos ipos2shapepos(ipos pos);
 #define Ship_get_l_light_position(ship, l, dir) ((ship)->l_light[l][dir])
 #define Ship_get_r_light_position(ship, l, dir) ((ship)->r_light[l][dir])
 #endif
+
+extern shapepos *Shape_get_points(shape *s, int dir);
 
 position Ship_get_point_position(shipobj *ship, int i, int dir);
 position Ship_get_engine_position(shipobj *ship, int dir);

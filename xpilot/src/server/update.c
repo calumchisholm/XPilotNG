@@ -147,7 +147,7 @@ void Phasing(int ind, int on)
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_OFF_SOUND);
 	/* kps - ok to have this check here ? */
 	if (shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-			    (object *)pl, pl->ship, pl->dir) != NO_GROUP) {
+			    (object *)pl, (shape *)pl->ship, pl->dir) != NO_GROUP) {
 	    struct move mv;
 	    Player_crash(pl, &mv, CrashWall, NO_ID, 0);
 	}
@@ -1207,7 +1207,8 @@ void Update_objects(void)
 		    }
 #else
 		    if (shape_is_inside(dest.cx, dest.cy, hitmask,
-					(object *)pl, pl->ship, pl->dir)
+					(object *)pl, (shape *)pl->ship,
+					pl->dir)
 			== NO_GROUP)
 			break;
 #endif

@@ -148,7 +148,7 @@ struct test {
 
 struct test *temparray;
 
-shipobj ball_wire;
+shape ball_wire;
 
 #define LINEY(X, Y, BASE, ARG)  (((Y)*(ARG)+(BASE))/(X))
 #define SIDE(X, Y, LINE) (linet[(LINE)].delta.cy * (X) - linet[(LINE)].delta.cx * (Y))
@@ -732,28 +732,31 @@ static void *ralloc(void *ptr, size_t size)
     return ptr;
 }
 
-static unsigned short *Shape_lines(const shipobj *shape, int dir)
+static unsigned short *Shape_lines(const shape *s, int dir)
 {
     int p;
     static unsigned short foo[100];
-    static const shipobj *lastshape;
+    static const shape *lastshape;
     static int lastdir;
     const int os = num_lines;
+    shapepos *pts;
 
     /* linet[i].group MUST BE INITIALIZED TO 0 */
 
-    if (shape == lastshape && dir == lastdir)
+    if (s == lastshape && dir == lastdir)
 	return foo;
 
-    lastshape = shape;
+    lastshape = s;
     lastdir = dir;
 
-    for (p = 0; p < shape->num_points; p++) {
-	clpos pt = Ship_get_point_clpos((shipobj *)shape, p, dir);
+    pts = Shape_get_points((shape *)s, dir);
+    for (p = 0; p < s->num_points; p++) {
+	clpos pt = pts[p].clk;
+	/*clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);*/
 	linet[p + os].start.cx = -pt.cx;
 	linet[p + os].start.cy = -pt.cy;
     }
-    for (p = 0; p < shape->num_points - 1; p++) {
+    for (p = 0; p < s->num_points - 1; p++) {
 	linet[p + os].delta.cx
 	    = linet[p + os + 1].start.cx - linet[p + os].start.cx;
 	linet[p + os].delta.cy
@@ -761,7 +764,7 @@ static unsigned short *Shape_lines(const shipobj *shape, int dir)
     }
     linet[p + os].delta.cx = linet[os].start.cx - linet[p + os].start.cx;
     linet[p + os].delta.cy = linet[os].start.cy - linet[p + os].start.cy;
-    for (p = 0; p < shape->num_points; p++)
+    for (p = 0; p < s->num_points; p++)
 	foo[p] = p + os;
     foo[p] = 65535;
     return foo;
@@ -1281,7 +1284,7 @@ static void Move_point(const struct move *move, struct collans *answer)
  * For example, there's no need to consider all the points
  * separately if the shape is not close to a wall.
  */
-static void Shape_move(const struct move *move, const shipobj *shape,
+static void Shape_move(const struct move *move, const shape *s,
 		       int dir, struct collans *answer)
 {
     int minline, mindone, minheight, minpoint;
@@ -1293,6 +1296,7 @@ static void Shape_move(const struct move *move, const shipobj *shape,
     int x, temp;
     unsigned short *lines;
     unsigned short *points;
+    shapepos *pts;
 
     if (mdx < 0) {
 	mdx = -mdx;
@@ -1324,8 +1328,10 @@ static void Shape_move(const struct move *move, const shipobj *shape,
     minline = -1;
     minpoint = -1;
 
-    for (p = 0; p < shape->num_points; p++) {
-	clpos pt = Ship_get_point_clpos((shipobj *)shape, p, dir);
+    pts = Shape_get_points((shape *)s, dir);
+    for (p = 0; p < s->num_points; p++) {
+	/*clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);*/
+	clpos pt = pts[p].clk;
 	msx = WRAP_XCLICK(move->start.cx + pt.cx);
 	msy = WRAP_YCLICK(move->start.cy + pt.cy);
 	block = (msx >> B_SHIFT) + mapx * (msy >> B_SHIFT);
@@ -1365,7 +1371,7 @@ static void Shape_move(const struct move *move, const shipobj *shape,
 
     block = (move->start.cx >> B_SHIFT) + mapx * (move->start.cy >> B_SHIFT);
     points = blockline[block].points;
-    lines = Shape_lines(shape, dir);
+    lines = Shape_lines(s, dir);
     x = -1;
     while ( ( p = *points++) != 65535) {
 	if (linet[p].group
@@ -1414,21 +1420,34 @@ static void Shape_move(const struct move *move, const shipobj *shape,
  * not explicitly constructed in the algorithm). Return the number of a group
  * that would be hit during morphing or NO_GROUP if there is enough room. */
 /* This might be useful elsewhere in the code, need not be kept static */
-static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
+static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 		       int dir2, int hitmask, const object *obj, int x, int y)
 {
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
     unsigned short *points;
     struct move mv;
+    shapepos *pts1, *pts2;
+    int num_points;
 
     mv.hitmask = hitmask;
     mv.obj = (object *)obj;
-    for (i = 0; i < shape1->num_points; i++) {
+    pts1 = Shape_get_points((shape *)shape1, dir1);
+    pts2 = Shape_get_points((shape *)shape2, dir2);
+
+    /* kps - can this happen ?? */
+    if (shape1->num_points != shape2->num_points) {
+	warn("Shape_morph: shapes have different number of points!");
+    }
+    num_points = shape1->num_points;
+
+    for (i = 0; i < num_points; i++) {
 	clpos pt1, pt2;
 
-	pt1 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
-	pt2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
+	/*pt1 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
+	  pt2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);*/
+	pt1 = pts1[i].clk;
+	pt2 = pts2[i].clk;
 	mv.start.cx = x + pt1.cx;
 	mv.start.cy = y + pt1.cy;
 	mv.delta.cx = x + pt2.cx - mv.start.cx;
@@ -1455,19 +1474,21 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
 	    continue;
 	xp = CENTER_XCLICK(linet[p].start.cx - x);
 	yp = CENTER_YCLICK(linet[p].start.cy - y);
-	pto1 = Ship_get_point_clpos((shipobj *)shape1, shape1->num_points - 1, dir1);
-	ptn1 = Ship_get_point_clpos((shipobj *)shape2, shape1->num_points - 1, dir2);
+
+	pto1 = pts1[num_points - 1].clk;
+	ptn1 = pts2[num_points - 1].clk;
 
 	xo1 = pto1.cx - xp;
 	yo1 = pto1.cy - yp;
 	xn1 = ptn1.cx - xp;
 	yn1 = ptn1.cy - yp;
 	t = 0;
-	for (i = 0; i < shape1->num_points; i++) {
+
+	for (i = 0; i < num_points; i++) {
 	    clpos pto2, ptn2;
 
-	    pto2 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
-	    ptn2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
+	    pto2 = pts1[i].clk;
+	    ptn2 = pts2[i].clk;
 	    xo2 = pto2.cx - xp;
 	    yo2 = pto2.cy - yp;
 	    xn2 = ptn2.cx - xp;
@@ -1690,7 +1711,7 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 
 /* Move a shape away from a line after a collision. Needed for the same
  * reason as Away(). */
-static int Shape_away(struct move *move, const shipobj *shape,
+static int Shape_away(struct move *move, const shape *s,
 		      int dir, int line, struct collans *ans)
 {
     int dx, dy;
@@ -1708,7 +1729,7 @@ static int Shape_away(struct move *move, const shipobj *shape,
     delta_saved = move->delta;
     move->delta.cx = dx;
     move->delta.cy = dy;
-    Shape_move(move, shape, dir, ans);
+    Shape_move(move, s, dir, ans);
     move->start.cx = WRAP_XCLICK(move->start.cx + ans->moved.cx);
     move->start.cy = WRAP_YCLICK(move->start.cy + ans->moved.cy);
     move->delta = delta_saved;
@@ -1924,10 +1945,10 @@ int is_inside(int cx, int cy, int hitmask, const object *obj)
 /* Similar to the above, except check whether any part of the shape
  * (edge or inside) would hit the group. */
 int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
-		    const shipobj *shape, int dir)
+		    const shape *s, int dir)
 {
     static shapepos zeropos;
-    static shipobj zeroshape;
+    static shape zeroshape;
     int i, group;
 
     /* Implemented by first checking whether the middle point of the
@@ -1943,14 +1964,14 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
      * kps - Ship numpoints can be > MAX_SHIP_PTS because of
      * SSHACK. This should somehow be fixed.
      */
-    zeroshape.num_points = shape->num_points;
+    zeroshape.num_points = s->num_points;
 
     if (zeroshape.pts[0] == NULL) {
 	for (i = 0; i < MAX_SHIP_PTS2; i++)
 	    zeroshape.pts[i] = &zeropos;
     }
 
-    return Shape_morph(&zeroshape, 0, shape, dir, hitmask, obj, cx, cy);
+    return Shape_morph(&zeroshape, 0, s, dir, hitmask, obj, cx, cy);
 }
 
 
@@ -2850,7 +2871,7 @@ static void Move_player_new(int ind)
 	mv.start.cx = pl->pos.cx;
 	mv.start.cy = pl->pos.cy;
 	while (mv.delta.cx || mv.delta.cy) {
-	    Shape_move(&mv, pl->ship, pl->dir, &ans);
+	    Shape_move(&mv, (shape *)pl->ship, pl->dir, &ans);
 	    mv.start.cx = WRAP_XCLICK(mv.start.cx + ans.moved.cx);
 	    mv.start.cy = WRAP_YCLICK(mv.start.cy + ans.moved.cy);
 	    mv.delta.cx -= ans.moved.cx;
@@ -2858,7 +2879,7 @@ static void Move_player_new(int ind)
 	    if (ans.line != -1) {
 		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0)
 		    Bounce_player(pl, &mv, ans.line, ans.point);
-		else if (!Shape_away(&mv, pl->ship, pl->dir, ans.line, &ans)) {
+		else if (!Shape_away(&mv, (shape *)pl->ship, pl->dir, ans.line, &ans)) {
 		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0)
 			Bounce_player(pl, &mv, ans.line, ans.point);
 		    else {
@@ -2918,7 +2939,7 @@ static void Turn_player_new(int ind)
 
     while (pl->dir != new_dir) {
 	next_dir = MOD2(pl->dir + sign, RES);
-	if (Shape_morph(pl->ship, pl->dir, pl->ship, next_dir, hitmask,
+	if (Shape_morph((shape *)pl->ship, pl->dir, (shape *)pl->ship, next_dir, hitmask,
 			(object *)pl, pl->pos.cx, pl->pos.cy) != NO_GROUP) {
 	    if (!maraTurnqueue)
 		pl->float_dir = pl->dir;

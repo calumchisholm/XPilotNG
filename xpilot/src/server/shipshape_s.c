@@ -151,6 +151,18 @@ shapepos ipos2shapepos(ipos pos)
     return shpos;
 }
 
+/* kps - tmp hack */
+shapepos *Shape_get_points(shape *s, int dir)
+{
+    int i;
+
+    /* kps - optimize if cashed_dir == dir */
+    for (i = 0; i < s->num_points; i++)
+	s->cashed_pts[i] = s->pts[i][dir];
+
+    return s->cashed_pts;
+}
+
 
 clpos Ship_get_point_clpos(shipobj *ship, int i, int dir)
 {

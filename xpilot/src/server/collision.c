@@ -531,7 +531,7 @@ static void PlayerCollision(void)
 		    if (is_polygon_map || !useOldCode) {
 			/* The ball might already be inside the team's ball
 			 * target. */
-			extern shipobj ball_wire;
+			extern shape ball_wire;
 			group = shape_is_inside(ball->pos.cx,
 						ball->pos.cy,
 						BALL_BIT | HITMASK(pl->team),
