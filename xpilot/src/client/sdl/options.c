@@ -78,10 +78,6 @@ extern char conf_soundfile_string[];
 extern keys_t keyMap[SDLK_LAST];   /* maps SDLKeys to keys_t */
 extern keys_t buttonMap[5];        /* maps mouse buttons to keys_t */
 
-/* from sdlinit.c */
-extern int draw_width;
-extern int draw_height;
-
 /*
  * Structure to store all the client options.
  * The most important field is the help field.
@@ -458,17 +454,7 @@ option options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Allows drawing polygon bitmaps specified by the (new-style) map\n"
-	"See also the wallTextureFile option.\n"
 	"Be warned that this needs a reasonably fast graphics system.\n",
-	0
-    },
-    {
-	"wallTextureFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Specify a XPM format pixmap file to load wall texture from.\n"
-	"(this only affects old-style maps, generally useless)\n",
 	0
     },
     {
@@ -1544,16 +1530,7 @@ option options[] = {
 	NULL,
 	"No",
 	KEY_DUMMY,
-	"Draws the map decoration filled with a texture pattern.\n"
-	"See also the decorTextureFile and texturedWalls options.\n",
-	0
-    },
-    {
-	"decorTextureFile",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Specify a XPM format pixmap file to load the decor texture from.\n",
+	"Draws the map decoration filled with a texture pattern.\n",
 	0
     },
     {

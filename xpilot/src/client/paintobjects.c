@@ -25,8 +25,6 @@
 
 char paintobjects_version[] = VERSION;
 
-/* TODO: move these to some generic header */
-extern int      num_spark_colors;
 
 #define COLOR(i)	(i / areas)
 #define BASE_X(i)	(((i % x_areas) << 8) + ext_view_x_offset)

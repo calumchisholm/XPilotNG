@@ -131,6 +131,8 @@ extern int	scoreObjectColor;	/* Color index for map score objects */
 extern bool	gotFocus;		/* Do we have the mouse pointer */
 extern bool	talk_mapped;		/* Is talk window visible */
 extern bool     radar_score_mapped;     /* Is the radar and score window mapped */
+extern int	draw_width, draw_height;
+
 extern short	ext_view_width;		/* Width of extended visible area */
 extern short	ext_view_height;	/* Height of extended visible area */
 extern int	active_view_width;	/* Width of active map area displayed. */
@@ -141,6 +143,10 @@ extern double	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
 extern bool	titleFlip;		/* Do special titlebar flipping? */
 extern int	shieldDrawMode;		/* How to draw players shield */
+
+extern char	sparkColors[MSG_LEN];
+extern int	spark_color[MAX_COLORS];
+extern int	num_spark_colors;
 
 extern int	maxKeyDefs;
 extern long	loops;

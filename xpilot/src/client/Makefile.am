@@ -23,7 +23,7 @@ xpilot_SOURCES = \
 	usleep.c \
 	welcome.c widget.c widget.h \
 	xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
-	xinit.c xinit.h xpaint.h xpclient.h xpclient_x11.h xpilot.c
+	xinit.c xinit.h xpaint.c xpaint.h xpclient.h xpclient_x11.h xpilot.c
 
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11

@@ -1452,9 +1452,10 @@ int Receive_self(void)
 {
     int		n;
     short	x, y, vx, vy, lockId, lockDist,
-		sFuelSum, sFuelMax;
-    u_byte	ch, sHeading, sPower, sTurnSpeed, sTurnResistance,
-		sNextCheckPoint, lockDir, sAutopilotLight, currentTank, sStat;
+		sFuelSum, sFuelMax, sViewWidth, sViewHeight;
+    u_byte	ch, sNumSparkColors, sHeading, sPower, sTurnSpeed,
+		sTurnResistance, sNextCheckPoint, lockDir, sAutopilotLight,
+		currentTank, sStat;
     u_byte	num_items[NUM_ITEMS];
 
     n = Packet_scanf(&rbuf,
@@ -1477,13 +1478,20 @@ int Receive_self(void)
 		     "%c%c",
 
 		     &currentTank, &sFuelSum, &sFuelMax,
-		     &server_display.view_width, 
-		     &server_display.view_height, 
-		     &server_display.num_spark_colors,
+		     &sViewWidth, &sViewHeight, &sNumSparkColors,
 		     &sStat, &sAutopilotLight
 		     );
     if (n <= 0)
 	return n;
+
+    /*
+     * These assignments are done here because the server_display
+     * structure members are not of the type that Packet_scanf()
+     * expects, which breaks things on big endian architectures.
+     */
+    server_display.view_width = sViewWidth;
+    server_display.view_height = sViewHeight;
+    server_display.num_spark_colors = sNumSparkColors;
 
     Handle_self(x, y, vx, vy, sHeading,
 		(double) sPower,

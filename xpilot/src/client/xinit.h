@@ -51,15 +51,11 @@ extern bool		colorSwitch;
 extern bool		multibuffer;
 extern char		color_names[MAX_COLORS][MAX_COLOR_LEN];
 extern int		button_form;
-extern unsigned		top_width, top_height;
-extern unsigned		draw_width, draw_height;
-extern unsigned		players_width, players_height;
+extern int		top_width, top_height;
+extern int		players_width, players_height;
 extern char		*geometry;
 extern bool		autoServerMotdPopup;
 extern bool		refreshMotd;
-extern char		sparkColors[MSG_LEN];
-extern int		spark_color[MAX_COLORS];
-extern int		num_spark_colors;
 extern bool		ignoreWindowManager;
 extern bool		quitting;
 

@@ -33,20 +33,10 @@ char sdlpaint_version[] = VERSION;
 /*
  * Globals.
  */
-ipos	        world;
-ipos	        realWorld;
-short	        ext_view_width;		/* Width of extended visible area */
-short	        ext_view_height;	/* Height of extended visible area */
-int	        active_view_width;	/* Width of active map area displayed. */
-int	        active_view_height;	/* Height of active map area displayed. */
-int	        ext_view_x_offset;	/* Offset ext_view_width */
-int	        ext_view_y_offset;	/* Offset ext_view_height */
-long		loops = 0;
-unsigned long	loopsSlow = 0;	        /* Proceeds slower than loops */
 static double   time_counter = 0.0;
-double          timePerFrame = 0.0;
+
 double	        hudRadarLimit;		/* Limit for hudradar drawing */
-float           scale;                  /* The scale factor */
+double          scale;                  /* The opengl scale factor */
 
 
 /* function to reset our viewport after a window resize */
@@ -93,6 +83,7 @@ int Paint_init(void)
 	return -1;
 
     scale = 0.7;
+    scaleFactor = 1.0 / scale;
 
     return 0;
 }
@@ -102,6 +93,8 @@ void Paint_cleanup(void)
     Images_cleanup();
 }
 
+/* kps - can we rather use Check_view_dimensions in paint.c ? */
+#if 0
 int Check_view_dimensions(void)
 {
     int			width_wanted, height_wanted;
@@ -145,7 +138,7 @@ int Check_view_dimensions(void)
     }
     return 0;
 }
-
+#endif
 
 void Paint_frame(void)
 {
@@ -237,5 +230,15 @@ void Paint_frame(void)
     }
 
     SDL_GL_SwapBuffers();
+}
+
+void Paint_score_start(void)
+{
+}
+
+void Paint_score_entry(int entry_num, other_t *other, bool is_team)
+{
+    printf("%c %.1f %s %d\n", 
+	   other->mychar, other->score, other->name, other->life);
 }
 

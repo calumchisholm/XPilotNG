@@ -42,9 +42,6 @@ keys_t          buttonMap[5];        /* maps mouse buttons to keys_t */
 
 static int	movement;	/* horizontal mouse movement. */
 
-extern int draw_width;
-extern int draw_height;
-
 int Key_init(void)
 {
     if (sizeof(keyv) != KEYBOARD_SIZE) {

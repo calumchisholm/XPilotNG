@@ -17,11 +17,8 @@
 
 typedef unsigned int color_t;
 
-extern int              draw_width;
-extern int              draw_height;
 extern int              draw_depth;
-extern int              num_spark_colors;
-extern float            scale;              /* The scale factor */
+extern double           scale;              /* The opengl scale factor */
 
 /* code to set the viewport size */
 int Resize_Window( int width, int height );
