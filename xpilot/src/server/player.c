@@ -59,7 +59,7 @@ int GetInd(int id)
 
 void Pick_startpos(player_t *pl)
 {
-    int ind = GetInd(pl->id), i, num_free, pick = 0, seen = 0;
+    int ind = GetInd(pl->id), i, num_free, pick = 0, seen = 0, order, min_order = INT_MAX;
     static int prev_num_bases = 0;
     static char	*free_bases = NULL;
     world_t *world = pl->world;
@@ -79,13 +79,12 @@ void Pick_startpos(player_t *pl)
 	}
     }
 
-    num_free = 0;
     for (i = 0; i < Num_bases(world); i++) {
 	if (Base_by_index(world, i)->team == pl->team) {
-	    num_free++;
 	    free_bases[i] = 1;
-	} else
+	} else {
 	    free_bases[i] = 0;	/* other team */
+	}
     }
 
     for (i = 0; i < NumPlayers; i++) {
@@ -96,25 +95,40 @@ void Pick_startpos(player_t *pl)
 	    && pl_i->home_base
 	    && free_bases[pl_i->home_base->ind]) {
 	    free_bases[pl_i->home_base->ind] = 0;	/* occupado */
-	    num_free--;
 	}
     }
 
-    if (BIT(world->rules->mode, TIMING)) {	/* pick first free base */
-	for (i = 0; i < Num_bases(world); i++) {
-	    if (free_bases[i])
-		break;
-	}
-    } else {
-	pick = (int)(rfrac() * num_free);
-	seen = 0;
-	for (i = 0; i < Num_bases(world); i++) {
-	    if (free_bases[i] != 0) {
-		if (seen < pick)
-		    seen++;
-		else
-		    break;
+    /* find out the lowest order of all free bases */
+    for (i = 0; i < Num_bases(world); i++) {
+	if (free_bases[i] != 0) {
+	    order = Base_by_index(world, i)->order;
+	    if (order < min_order) {
+	        min_order = order;
 	    }
+	}
+    }
+	
+    /* mark all bases with higher order as occupied */
+    num_free = 0;
+    for (i = 0; i < Num_bases(world); i++) {
+	if (free_bases[i] != 0) {
+	    if (Base_by_index(world, i)->order <= min_order) {
+		num_free++;
+	    } else {
+		free_bases[i] = 0;
+	    }
+	}
+    }
+
+    /* pick a random base of all bases marked free */
+    pick = (int)(rfrac() * num_free);
+    seen = 0;
+    for (i = 0; i < Num_bases(world); i++) {
+	if (free_bases[i] != 0) {
+	    if (seen < pick)
+		seen++;
+	    else
+		break;
 	}
     }
 

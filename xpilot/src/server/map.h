@@ -98,6 +98,7 @@ typedef struct base {
     int		dir;
     int		ind;
     int		team;
+    int		order;
     int		initial_items[NUM_ITEMS];
 } base_t;
 

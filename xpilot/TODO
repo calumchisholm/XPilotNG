@@ -213,11 +213,5 @@ team members have different roles, e.g. fighters and bombers.
 http://groups.google.ca/groups?hl=en&lr=&threadm=4iu3mg%2462t%40oban.cc.ic.ac.uk&rnum=1&prev=/groups%3Fq%3Dpredators%2Bxpilot%26hl%3Den%26lr%3D%26ie%3DUTF-8%26scoring%3Dr%26selm%3D4iu3mg%252462t%2540oban.cc.ic.ac.uk%26rnum%3D1
 Developer: kps
 
-Task: Put entering players first on bases close to team treasure, if a treasure
-      exists for that team.
-      Comment: not sure this complies with the possibility to put boxes
-               and balls on different locations on the map and "special" balls.
-Developer: kps
-
 Task: Add support for cannons having individual id, score, smartness etc.
 Developer: kps

@@ -228,7 +228,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Base")) {
-	int team = TEAM_NOT_SET, dir = DIR_UP;
+	int team = TEAM_NOT_SET, dir = DIR_UP, order = 0;
 	clpos_t pos = DEFAULT_POS;
 	int ind;
 
@@ -241,13 +241,15 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cy = (click_t)(atoi(*(attr + 1)) * scale);
 	    if (!strcasecmp(*attr, "dir"))
 		dir = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "order"))
+		order = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	if (team < 0 || team >= MAX_TEAMS) {
 	    warn("Illegal team number in base tag.\n");
 	    exit(1);
 	}
-	ind = World_place_base(world, pos, dir, team);
+	ind = World_place_base(world, pos, dir, team, order);
 	current_base = Base_by_index(world, ind);
 	return;
     }

@@ -730,7 +730,7 @@ static void Xpmap_place_cannon(world_t *world, blkpos_t blk, int dir)
 static void Xpmap_place_base(world_t *world, blkpos_t blk, int team)
 {
     World_set_block(world, blk, BASE);
-    World_place_base(world, Block_get_center_clpos(blk), DIR_UP, team);
+    World_place_base(world, Block_get_center_clpos(blk), DIR_UP, team, 0);
 }
 
 static void Xpmap_place_fuel(world_t *world, blkpos_t blk)

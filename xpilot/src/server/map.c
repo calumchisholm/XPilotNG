@@ -151,12 +151,13 @@ int World_place_fuel(world_t *world, clpos_t pos, int team)
     return ind;
 }
 
-int World_place_base(world_t *world, clpos_t pos, int dir, int team)
+int World_place_base(world_t *world, clpos_t pos, int dir, int team, int order)
 {
     base_t t;
     int ind = Num_bases(world), i;
 
     t.pos = pos;
+    t.order = order;
     /*
      * The direction of the base should be so that it points
      * up with respect to the gravity in the region.  This

@@ -187,7 +187,7 @@ void World_free(world_t *world);
 bool Grok_map(world_t *world);
 bool Grok_map_options(world_t *world);
 
-int World_place_base(world_t *world, clpos_t pos, int dir, int team);
+int World_place_base(world_t *world, clpos_t pos, int dir, int team, int order);
 int World_place_cannon(world_t *world, clpos_t pos, int dir, int team);
 int World_place_check(world_t *world, clpos_t pos, int ind);
 int World_place_fuel(world_t *world, clpos_t pos, int team);
