@@ -38,7 +38,7 @@ sock_t			contactSocket;
 static sockbuf_t	ibuf;
 static char		msg[MSG_LEN];
 
-static bool Owner(char request, char *user_name, char *host_addr,
+static bool Owner(int request, char *user_name, char *host_addr,
 		  int host_port, int pass);
 static int Queue_player(char *real, char *nick, char *disp, int team,
 			char *addr, char *host, unsigned version, int port,
@@ -280,6 +280,7 @@ void Contact(int fd, void *arg)
 			host_addr[24],
 			str[MSG_LEN];
 
+    (void)fd; (void)arg;
     /*
      * Someone connected to us, now try and decipher the message :)
      */
@@ -360,7 +361,8 @@ void Contact(int fd, void *arg)
 	if (Packet_scanf(&ibuf, "%ld", &key) <= 0)
 	    return;
 
-	if (!Owner(reply_to, user_name, host_addr, port, key == credentials)) {
+	if (!Owner((int)reply_to, user_name, host_addr, port,
+		   key == credentials)) {
 	    Sockbuf_clear(&ibuf);
 	    Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, E_NOT_OWNER);
 	    Reply(host_addr, port);
@@ -422,7 +424,8 @@ void Contact(int fd, void *arg)
 		     showtime(), user_name, host_addr);
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, SUCCESS);
-	Server_info(ibuf.buf + ibuf.len, ibuf.size - ibuf.len);
+	assert(ibuf.size - ibuf.len >= 0);
+	Server_info(ibuf.buf + ibuf.len, (size_t)(ibuf.size - ibuf.len));
 	ibuf.buf[ibuf.size - 1] = '\0';
 	ibuf.len += strlen(ibuf.buf + ibuf.len) + 1;
     }
@@ -1008,7 +1011,7 @@ int Queue_show_list(char *qmsg)
 /*
  * Returns true if <name> has owner status of this server.
  */
-static bool Owner(char request, char *user_name, char *host_addr,
+static bool Owner(int request, char *user_name, char *host_addr,
 		  int host_port, int pass)
 {
     if (pass || request == CREDENTIALS_pack) {
