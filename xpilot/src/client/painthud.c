@@ -358,58 +358,61 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     if ((target = Other_by_id(lock_id)) == NULL)
 	return;
 
-    FIND_NAME_WIDTH(target);
-    rd.drawString(dpy, p_draw, gc,
-		WINSCALE(hud_pos_x) - target->name_width / 2,
-		WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
-			- gameFont->descent ,
-		target->id_string, target->name_len);
-    Erase_rectangle(WINSCALE(hud_pos_x) - target->name_width / 2 - 1,
-		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
-			- gameFont->descent - gameFont->ascent ,
-		    target->name_width + 2,
-		    gameFont->ascent + gameFont->descent);
+    if (hudColor) {
+	SET_FG(colors[hudColor].pixel);
 
-    /* lives left is a better info than distance in team games MM */
-    if (BIT(Setup->mode, LIMITED_LIVES)) {
-	sprintf(str, "%03d", target->life);
-    } else {
-	sprintf(str, "%03d", lock_dist / BLOCK_SZ);
-    }
-
-    if (BIT(Setup->mode, LIMITED_LIVES) || lock_dist !=0) {
-
- 	if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0)
-	    SET_FG(colors[RED].pixel);
-	else
-	    SET_FG(colors[hudColor].pixel);
-
+	FIND_NAME_WIDTH(target);
 	rd.drawString(dpy, p_draw, gc,
-		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET + BORDER),
-		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER)
-					 - gameFont->descent,
-		    str, 3);
-	Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
-			 + BORDER) - 1,
+		      WINSCALE(hud_pos_x) - target->name_width / 2,
+		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
+		      - gameFont->descent ,
+		      target->id_string, target->name_len);
+	Erase_rectangle(WINSCALE(hud_pos_x) - target->name_width / 2 - 1,
 			WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
-			 - gameFont->descent - gameFont->ascent ,
-			XTextWidth(gameFont, str, 3) + 2,
+			- gameFont->descent - gameFont->ascent ,
+			target->name_width + 2,
 			gameFont->ascent + gameFont->descent);
+
+	/* lives left is a better info than distance in team games MM */
+	if (BIT(Setup->mode, LIMITED_LIVES))
+	    sprintf(str, "%03d", target->life);
+	else
+	    sprintf(str, "%03d", lock_dist / BLOCK_SZ);
+
+	if (BIT(Setup->mode, LIMITED_LIVES) || lock_dist !=0) {
+	    if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0)
+		SET_FG(colors[RED].pixel);
+	    else
+		SET_FG(colors[hudColor].pixel);
+
+	    rd.drawString(dpy, p_draw, gc,
+			  WINSCALE(hud_pos_x + hudSize - HUD_OFFSET + BORDER),
+			  WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER)
+			  - gameFont->descent,
+			  str, 3);
+	    Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
+				     + BORDER) - 1,
+			    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
+				     - BORDER )
+			    - gameFont->descent - gameFont->ascent ,
+			    XTextWidth(gameFont, str, 3) + 2,
+			    gameFont->ascent + gameFont->descent);
+	}
     }
-    SET_FG(colors[hudColor].pixel);
 
     if (lock_dist != 0 && hudLockColor) {
-
 	if (lock_dist > WARNING_DISTANCE || (loopsSlow & 1)) {
 	    int size = MIN(mapdiag / lock_dist, 10);
 
-	    if (size == 0) {
+	    if (size == 0)
 		size = 1;
-	    }
+
 	    if (self != NULL
-		&& ((self->team == target->team && BIT(Setup->mode, TEAM_PLAY))
-		|| (self->alliance != ' ' && self->alliance == target->alliance))) {
-		Arc_add(hudColor,
+		&& ((self->team == target->team
+		     && BIT(Setup->mode, TEAM_PLAY))
+		    || (self->alliance != ' '
+			&& self->alliance == target->alliance))) {
+		Arc_add(BLUE,
 			(int)(hud_pos_x + MIN_HUD_SIZE * 0.6 * tcos(lock_dir)
 			      - size * 0.5),
 			(int)(hud_pos_y - MIN_HUD_SIZE * 0.6 * tsin(lock_dir)
@@ -426,7 +429,6 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 			 WINSCALE(size), WINSCALE(size), 0, 64*360);
 		Erase_rectangle(WINSCALE(x), WINSCALE(y),
 				 WINSCALE(size), WINSCALE(size));
-		SET_FG(colors[hudColor].pixel);
 	    }
 	}
     }
