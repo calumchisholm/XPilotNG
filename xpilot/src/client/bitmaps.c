@@ -157,7 +157,7 @@ int Bitmap_add (char *filename, int count, bool scalable)
     pixmap.scalable = scalable;
     pixmap.state = BMS_UNINITIALIZED;
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
-    return num_pixmaps;
+    return num_pixmaps - 1;
 }
 
 
@@ -210,6 +210,8 @@ int Bitmap_create (Drawable d, int img)
  */
 xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp) {
     
+    extern int blockBitmaps; /* i don't like this variable at all :( */
+    if (!blockBitmaps || img < 0 || img >= num_pixmaps) return NULL;
     if (pixmaps[img].state != BMS_READY) {
 	if (Bitmap_create(d, img) == -1) return NULL;
     }

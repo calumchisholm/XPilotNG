@@ -119,6 +119,12 @@ static struct rgb_cube_size {
     { 4, 4, 3 },	/* 48 */
 };
 
+/* This assumes that the RGB values are encoded in 24 bits
+ * so that bits 0-7 encode the blue value, bits 8-15 encode
+ * the green value and bits 16-24 encode the red value.
+ */
+#define RGB2COLOR(c) RGB(((c) >> 16) & 255, ((c) >> 8) & 255, ((c) & 255))
+
 unsigned long		(*RGB)(u_byte r, u_byte g, u_byte b);
 static unsigned long	RGB_PC(u_byte r, u_byte g, u_byte b);
 static unsigned long	RGB_TC(u_byte r, u_byte g, u_byte b);
@@ -684,6 +690,15 @@ int Colors_init_block_bitmaps(void)
 	if (Colors_init_block_bitmap_colors() == -1) {
 	    blockBitmaps = false;
 	}
+    }
+    if (blockBitmaps) {
+        int i;
+        for (i = 0; i < num_polygon_styles; i++)
+            polygon_styles[i].color = 
+                RGB2COLOR(polygon_styles[i].rgb);
+        for (i = 0; i < num_edge_styles; i++)
+            edge_styles[i].color =
+                RGB2COLOR(edge_styles[i].rgb);
     }
     return (blockBitmaps == true) ? 0 : -1;
 }

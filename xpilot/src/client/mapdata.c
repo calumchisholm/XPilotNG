@@ -94,7 +94,6 @@ int Mapdata_setup (const char *urlstr) {
         free(texturePath);
         texturePath = temp;
     }
-
     
     if (access(path, F_OK) == 0) {
         printf("Required bitmaps have already been downloaded.\n");

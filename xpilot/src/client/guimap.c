@@ -1218,7 +1218,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
     points[j].y = points[0].y;
     
 
-    if (filled || textured || style.method != NOFILL) {
+    if (!outline && (filled || textured || style.method != NOFILL)) {
         if (textured || style.method == TEXTURED) {
 	    xp_bitmap_t *bmp = 
 		Bitmap_get(p_draw, 
@@ -1255,8 +1255,12 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
                 XSetLineAttributes
                     (dpy, gc, WINSCALE(edge_styles[sindex].width),
                      edge_styles[sindex].style, CapButt, JoinMiter);
-                SET_FG(colors[edge_styles[sindex].color].pixel);
-                
+
+                if (blockBitmaps) 
+                    SET_FG(edge_styles[sindex].color);
+                else
+                    SET_FG(colors[wallColor].pixel);
+
                 rd.drawLines
                     (dpy, p_draw, gc, points, 
                      polygon.num_points + 1, CoordModeOrigin);
@@ -1283,7 +1287,11 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
                         (dpy, gc, 
                          WINSCALE(edge_styles[sindex].width), 
                          edge_styles[sindex].style, CapButt, JoinMiter);
-                    SET_FG(colors[edge_styles[sindex].color].pixel);
+
+                    if (blockBitmaps) 
+                        SET_FG(edge_styles[sindex].color);
+                    else
+                        SET_FG(colors[wallColor].pixel);
                 
                     rd.drawLines
                         (dpy, p_draw, gc, 

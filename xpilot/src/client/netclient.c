@@ -451,7 +451,7 @@ int Net_setup(void)
     }
     else {
 	int i, j, startx, starty, polyc, hidcount, nexthid;
-	int dx, dy, cx, cy, pc;
+	int dx, dy, cx, cy, pc, num_bmaps;
         int *styles;
 	xp_polygon_t poly;
 	ipos *points, min, max;
@@ -461,36 +461,6 @@ int Net_setup(void)
 	ptr = Setup->map_data;
 	Setup->map_order = SETUP_MAP_UNCOMPRESSED;
 
-
-        /* TODO Get these from server somehow */
-        edge_styles = malloc(2 * sizeof(edge_style_t));
-        if (edge_styles == NULL) {
-            error("no memory for edge styles");
-            return -1;
-        }
-
-        /* default edge style */
-        edge_styles[0].width = 3;
-        edge_styles[0].color = wallColor;
-        edge_styles[0].style = LineSolid;
-
-        /* hidden edge style */
-        edge_styles[1].width = -1;
-
-        polygon_styles = malloc(10 * sizeof(polygon_style_t));
-        if (polygon_styles == NULL) {
-            error("no memory for polygon styles");
-            return -1;
-        }
-
-        /* default polygon style */
-        polygon_styles[0].visible = true;
-        polygon_styles[0].visible_in_radar = true;
-        polygon_styles[0].method = NOFILL;
-        polygon_styles[0].def_edge_style = 0;
-
-        /* hidden polygon style */
-        polygon_styles[1].visible = false;
 
 	polyc = get_ushort(&ptr);
 	for (i = 0; i < polyc; i++) {
@@ -628,61 +598,83 @@ int Net_setup(void)
             checks[i].bounds.w = BLOCK_SZ;
             checks[i].bounds.h = BLOCK_SZ;
 	}
-	{
-	    struct polystyle {
-		int color;
-		int texture_id;
-		int defedge_id;
-		int flags;
-	    };
 
-	    struct edgestyle {
-		int width;
-		int color;
-		int style;
-	    };
+        num_polygon_styles = *ptr++;
+        num_edge_styles = *ptr++;
+        num_bmaps = *ptr++;
 
-	    struct bmpstyle {
-		char filename[30];
-		int flags;
-	    };
+        polygon_styles = 
+            malloc(MAX(1, num_polygon_styles) * sizeof(polygon_style_t));
+        if (polygon_styles == NULL) {
+            error("no memory for polygon styles");
+            return -1;
+        }
 
-	    struct polydata {
-		int style;
-	    };
+        edge_styles = 
+            malloc(MAX(1, num_edge_styles) * sizeof(edge_style_t));
+        if (edge_styles == NULL) {
+            error("no memory for edge styles");
+            return -1;
+        }
+                        
+        for (i = 0; i < num_polygon_styles; i++) {
+            int flags;
+            polygon_styles[i].color = wallColor;
+            polygon_styles[i].rgb = get_32bit(&ptr);
+            polygon_styles[i].texture = 46 + (*ptr++);
+            polygon_styles[i].def_edge_style = *ptr++;
+            flags = *ptr++;
+            /*
+            polygon_styles[i].method = (fill_style_t)(flags & 3);
+            polygon_styles[i].visible = ((flags & (1 << 3)) != 0);
+            polygon_styles[i].visible_in_radar = 
+                ((flags & (1 << 4)) != 0); 
+            */
+            polygon_styles[i].visible = true;
+            polygon_styles[i].visible_in_radar = true;
+            polygon_styles[i].method = TEXTURED;
+        }
 
-	    struct polystyle pstyles[256];
-	    struct edgestyle estyles[256];
-	    struct bmpstyle  bstyles[256];
-	    struct polydata  pdata[1000];
+        if (num_polygon_styles == 0) {                
+            /* default polygon style */
+            polygon_styles[0].visible = true;
+            polygon_styles[0].visible_in_radar = true;
+            polygon_styles[0].method = NOFILL;
+            polygon_styles[0].def_edge_style = 0;
+            num_polygon_styles = 1;
+        }
 
-	    int num_pstyles, num_estyles, num_bstyles;
+        for (i = 0; i < num_edge_styles; i++) {
+            edge_styles[i].width = *ptr++;
+            edge_styles[i].color = wallColor;
+            edge_styles[i].rgb = get_32bit(&ptr);
+            edge_styles[i].style = *ptr++;
+        }
 
-	    num_pstyles = *ptr++;
-	    num_estyles = *ptr++;
-	    num_bstyles = *ptr++;
-	    for (i = 0; i < num_pstyles; i++) {
-		pstyles[i].color = get_32bit(&ptr);
-		pstyles[i].texture_id = *ptr++;
-		pstyles[i].defedge_id = *ptr++;
-		pstyles[i].flags = *ptr++;
-	    }
-	    for (i = 0; i < num_estyles; i++) {
-		estyles[i].width = *ptr++;
-		estyles[i].color = get_32bit(&ptr);
-		estyles[i].style = *ptr++;
-	    }
-	    for (i = 0; i < num_bstyles; i++) {
-		strncpy(bstyles[i].filename, ptr,
-			sizeof(bstyles[0].filename - 1));
-		bstyles[i].filename[sizeof(bstyles[0].filename) - 1] = 0;
-		ptr += strlen(bstyles[i].filename) + 1;
-		bstyles[i].flags = *ptr++;
-	    }
-	    for (i = 0; i < polyc; i++) {
-		pdata[i].style = *ptr++;
-	    }
-	}
+        if (num_edge_styles == 0) {
+            /* default edge style */
+            edge_styles[0].width = 1;
+            edge_styles[0].rgb = 255;
+            edge_styles[0].color = wallColor;
+            edge_styles[0].style = LineSolid;
+            num_edge_styles = 1;
+        }
+
+        for (i = 0; i < num_bmaps; i++) {
+            char fname[30];
+            int flags;
+            strncpy(fname, ptr, 30 - 1);
+            fname[30 - 1] = 0;
+            ptr += strlen(fname) + 1;
+            flags = *ptr++;
+            Bitmap_add(fname, 1, flags);
+        }
+
+        for (i = 0; i < num_polygons; i++) {
+            polygons[i].style = *ptr++;
+        }
+
+        Mapdata_setup(Setup->author);
     }
 
     if (Setup->map_order != SETUP_MAP_UNCOMPRESSED) {

@@ -167,6 +167,7 @@ typedef struct {
 typedef struct {
     int        width;           /* Line width, -1 means no line */
     int        color;           /* Line color */
+    int        rgb;             /* RGB values corresponding to color */
     int        style;           /* LineSolid, LineOnOffDash, LineDoubleDash */
 } edge_style_t;
 
@@ -182,6 +183,7 @@ typedef struct {
     bool         visible;         /* Should the polygon be drawn at all */
     bool         visible_in_radar;/* Should the polygon be drawn in radar */
     int          color;           /* The color if drawn in filled mode */
+    int          rgb;             /* RGB values corresponding to color */
     int          texture;         /* The texture if drawn in texture mode */
     fill_style_t method;          /* Recommended drawing method */
     int          def_edge_style;  /* The default style for edges */ 
