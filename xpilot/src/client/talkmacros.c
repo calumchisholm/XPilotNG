@@ -369,3 +369,204 @@ int Talk_macro(char *str)
 
     return 0;
 }
+
+#ifdef OPTIONHACK
+
+static bool Set_talk_macro(xp_option_t *opt, const char *value)
+{
+    int i = atoi(opt->name + strlen("msg"));
+
+    /*printf("Set_talk_macro: i = %d\n", i);*/
+
+    if (talk_fast_msgs[i])
+	xp_free(talk_fast_msgs[i]);
+
+    talk_fast_msgs[i] = xp_safe_strdup(value);
+
+    return true;
+}
+
+static char *Get_talk_macro(xp_option_t *opt)
+{
+    int i = atoi(opt->name + strlen("msg"));
+
+    /*printf("Get_talk_macro: i = %d\n", i);*/
+
+    return talk_fast_msgs[i];
+}
+
+
+
+xp_option_t talk_macro_options[] = {
+
+    /* talk macros: */
+    XP_STRING_OPTION(
+	"msg1",
+	NULL, 0,
+	"Hello world!",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 1.\n"),
+
+    /*
+     * This macro swaps between teams 2 and 4, useful on Blood's Music
+     * maps.
+     */
+    XP_STRING_OPTION(
+	"msg2",
+	NULL, 0,
+	"#=[#t|2|/team 4|/team 2]",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 2.\n"),
+
+    XP_STRING_OPTION(
+	"msg3",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 3.\n"),
+
+    XP_STRING_OPTION(
+	"msg4",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 4.\n"),
+
+    XP_STRING_OPTION(
+	"msg5",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 5.\n"),
+
+    XP_STRING_OPTION(
+	"msg6",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 6.\n"),
+
+    XP_STRING_OPTION(
+	"msg7",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 7.\n"),
+
+    XP_STRING_OPTION(
+	"msg8",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 8.\n"),
+
+    XP_STRING_OPTION(
+	"msg9",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 9.\n"),
+
+    XP_STRING_OPTION(
+	"msg10",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 10.\n"),
+
+    XP_STRING_OPTION(
+	"msg11",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 11.\n"),
+
+    XP_STRING_OPTION(
+	"msg12",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 12.\n"),
+
+    XP_STRING_OPTION(
+	"msg13",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 13.\n"),
+
+    XP_STRING_OPTION(
+	"msg14",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 14.\n"),
+
+    XP_STRING_OPTION(
+	"msg15",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 15.\n"),
+
+    XP_STRING_OPTION(
+	"msg16",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 16.\n"),
+
+    XP_STRING_OPTION(
+	"msg17",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 17.\n"),
+
+    XP_STRING_OPTION(
+	"msg18",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 18.\n"),
+
+    XP_STRING_OPTION(
+	"msg19",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 19.\n"),
+
+    XP_STRING_OPTION(
+	"msg20",
+	NULL, 0,
+	"",
+	Set_talk_macro,
+	Get_talk_macro,
+	"Talkmessage 20.\n"),
+};
+
+void Store_talk_macro_options(void)
+{
+    STORE_OPTIONS(talk_macro_options);
+}
+#endif

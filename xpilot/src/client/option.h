@@ -48,6 +48,7 @@ typedef void (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
 typedef void (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
 typedef void (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
 typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
+typedef char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
 typedef bool (*xp_key_option_setfunc_t)    (xp_option_t *opt, const char *val);
 
 typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
@@ -98,12 +99,13 @@ struct xp_option {
     /* string option stuff */
 
 #define XP_STRING_OPTION_DUMMY \
-	NULL, NULL, 0, NULL
+	NULL, NULL, 0, NULL, NULL
 
     const char *str_defval;
     char *str_ptr;
     size_t str_size;
     xp_string_option_setfunc_t str_setfunc;
+    xp_string_option_getfunc_t str_getfunc;
 
     /* color option stuff */
     /*color_t *color_ptr;*/
@@ -186,7 +188,7 @@ struct xp_option {
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_STRING_OPTION(name, valptr, size, defval, setfunc, help) \
+#define XP_STRING_OPTION(name, valptr, size, defval, setfunc, getfunc, help) \
 { \
     xp_string_option,\
 	name,\
@@ -198,6 +200,7 @@ struct xp_option {
 	valptr,\
 	size,\
 	setfunc,\
+	getfunc,\
 	XP_KEY_OPTION_DUMMY,\
 }
 

@@ -34,6 +34,7 @@ char myClass[] = "XPilot";
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
+
 #ifndef OPTIONHACK
 
 cl_option_t options[];
@@ -112,7 +113,7 @@ xp_option_t default_options[] = {
 	nickname,
 	sizeof nickname,
 	"",
-	NULL,
+	NULL, NULL,
 	"Set the nickname.\n"),
 
     XP_BOOL_OPTION(
@@ -128,6 +129,1734 @@ xp_option_t default_options[] = {
 	true,
 	NULL,
 	"Should your own shipshape be displayed or not.\n"),
+
+#if 0
+    {
+	"help",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Display this help message.\n",
+	0
+    },
+    {
+	"version",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Show the source code version.\n",
+	0
+    },
+    {
+	"name",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Set the nickname.\n",
+	0
+    },
+    {
+	"user",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Set the username.\n",
+	0
+    },
+    {
+	"host",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Set the hostname.\n",
+	0
+    },
+    {
+	"join",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Join the game immediately, no questions asked.\n",
+	0
+    },
+    {
+	"noLocalMotd",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Do not display the local Message Of The Day.\n",
+	0
+    },
+    {
+	"autoServerMotdPopup",
+	NULL,
+#ifdef _WINDOWS
+	"No",	/* temporary till i straighten out the motd woes. */
+#else
+	"Yes",
+#endif
+	KEY_DUMMY,
+	"Automatically popup the MOTD of the server on startup.\n",
+	0
+    },
+    {
+	"refreshMotd",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Get a fresh copy of the server MOTD every time it is displayed.\n",
+	0
+    },
+    {
+	"text",
+	"Yes",
+	"No",
+	KEY_DUMMY,
+	"Use the simple text interface to contact a server\n"
+	"instead of the graphical user interface.\n",
+	0
+    },
+    {
+	"list",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"List all servers running on the local network.\n",
+	0
+    },
+    {
+	"team",
+	NULL,
+	TEAM_NOT_SET_STR,
+	KEY_DUMMY,
+	"Set the team to join.\n",
+	0
+    },
+    {
+	"display",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Set the X display.\n",
+	0
+    },
+    {
+	"keyboard",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Set the X keyboard input if you want keyboard input from\n"
+	"another display.  The default is to use the keyboard input from\n"
+	"the X display.\n",
+	0
+    },
+    {
+	"geometry",
+	NULL,
+	"1024x768",
+	KEY_DUMMY,
+	"Set the window size and position in standard X geometry format.\n"
+	"The maximum allowed window size is 1922x1440.\n",
+	0
+    },
+    {
+	"ignoreWindowManager",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Ignore the window manager when opening the top level player window.\n"
+	"This can be handy if you want to have your XPilot window on a\n"
+	"preferred position without window manager borders.\n"
+	"Also sometimes window managers may interfere when switching\n"
+	"colormaps. This option may prevent that.\n",
+	0
+    },
+    {
+	"shutdown",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Shutdown the server with a message.\n"
+	"The message used is the first argument to this option.\n",
+	0
+    },
+    {
+	"port",
+	NULL,
+	SERVER_PORT_STR,
+	KEY_DUMMY,
+	"Set the port number of the server.\n"
+	"Almost all servers use the default port, which is the\n"
+	"recommended policy.  You can find out about which port\n"
+	"is used by a server by querying the XPilot Meta server.\n",
+	0
+    },
+    {
+	"shipShape",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Define the ship shape to use.  Because the argument to this option\n"
+	"is rather large (up to 500 bytes) the recommended way to set\n"
+	"this option is in the .xpilotrc file in your home directory.\n"
+	"The exact format is defined in the file doc/README.SHIPS in the\n"
+	"XPilot distribution. Note that there is a nifty Unix tool called\n"
+	"editss for easy ship creation. There is XPShipEditor for Windows\n"
+	"and Ship Shaper for Java.  See the XPilot FAQ for details.\n"
+	"See also the \"shipShapeFile\" option below.\n",
+	0
+    },
+    {
+	"shipShapeFile",
+	NULL,
+	conf_ship_file_string,
+	KEY_DUMMY,
+	"An optional file where shipshapes can be stored.\n"
+	"If this resource is defined and it refers to an existing file\n"
+	"then shipshapes can be referenced to by their name.\n"
+	"For instance if you define shipShapeFile to be\n"
+	"/home/myself/.shipshapes and this file contains one or more\n"
+	"shipshapes then you can select the shipshape by starting xpilot as:\n"
+	"	xpilot -shipShape myshipshapename\n"
+	"Where \"myshipshapename\" should be the \"name:\" or \"NM:\" of\n"
+	"one of the shipshapes defined in /home/myself/.shipshapes.\n"
+	"Each shipshape definition should be defined on only one line,\n"
+	"where all characters up to the first left parenthesis don't matter.\n"
+	/* shipshopshapshepshit getting nuts from all these shpshp-s. */,
+	0
+    },
+    {
+	"power",
+	NULL,
+	"55.0",
+	KEY_DUMMY,
+	"Set the engine power.\n"
+	"Valid values are in the range 5-55.\n",
+	0
+    },
+    {
+	"turnSpeed",
+	NULL,
+	"35.0",
+	KEY_DUMMY,
+	"Set the ship's turn speed.\n"
+	"Valid values are in the range 4-64.\n"
+	"See also turnResistance.\n",
+	0
+    },
+    {
+	"turnResistance",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Set the ship's turn resistance.\n"
+	"This determines the speed at which a ship stops turning.\n"
+	"Valid values are in the range 0.0-1.0.\n"
+	"This should always be 0, other values are for compatibility.\n"
+	"See also turnSpeed.\n",
+	0
+    },
+    {
+	"altPower",
+	NULL,
+	"35.0",
+	KEY_DUMMY,
+	"Set the alternate engine power.\n"
+	"See also the keySwapSettings option.\n",
+	0
+    },
+    {
+	"altTurnSpeed",
+	NULL,
+	"25.0",
+	KEY_DUMMY,
+	"Set the alternate ship's turn speed.\n"
+	"See also the keySwapSettings option.\n",
+	0
+    },
+    {
+	"altTurnResistance",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Set the alternate ship's turn resistance.\n"
+	"See also the keySwapSettings option.\n",
+	0
+    },
+    {
+	"mapRadar",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Paint radar dots' position on the map \n",
+	0
+    },
+    {
+	"showShipShapes",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should others' shipshapes be displayed or not.\n",
+	0
+    },
+    {
+	"showMyShipShape",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should your own shipshape be displayed or not.\n",
+	0
+    },
+    {
+	"ballMsgScan",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Scan messages for BALL, SAFE, COVER and POP and paint \n"
+	"warning circles inside ship.\n",
+	0
+    },
+    /* these 2 should really be color options */
+    {
+	"showLivesByShip",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Paint remaining lives next to ships.\n",
+	0
+    },
+    {
+	"fuelNotify",
+	NULL,
+	"500.0",
+	KEY_DUMMY,
+	"The limit when the HUD fuel bar will become visible.\n",
+	0
+    },
+    {
+	"fuelWarning",
+	NULL,
+	"200.0",
+	KEY_DUMMY,
+	"The limit when the HUD fuel bar will start flashing.\n",
+	0
+    },
+    {
+	"fuelCritical",
+	NULL,
+	"100.0",
+	KEY_DUMMY,
+	"The limit when the HUD fuel bar will flash faster.\n",
+	0
+    },
+    {
+	"speedFactHUD",
+	NULL,
+	"0.0",
+	KEY_DUMMY,
+	"Should the HUD be moved, to indicate the current velocity?\n",
+	0
+    },
+    {
+	"speedFactPTR",
+	NULL,
+	"0.0",
+	KEY_DUMMY,
+	"Uses a red line to indicate the current velocity and direction.\n",
+	0
+    },
+    {
+	"slidingRadar",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"If the game is in edgewrap mode then the radar will keep your\n"
+	"position on the radar in the center and raw the rest of the radar\n"
+	"around it.  Note that this requires a fast graphics system.\n",
+	0
+    },
+    {
+	"outlineWorld",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Draws only the outline of all the blue map constructs.\n",
+	0
+    },
+    {
+	"filledWorld",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Draws the walls solid, filled with one color,\n"
+	"unless overridden by texture.\n"
+	"Be warned that this option needs fast graphics.\n",
+	0
+    },
+    {
+	"texturedWalls",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Allows drawing polygon bitmaps specified by the (new-style) map.\n"
+	"Be warned that this needs a reasonably fast graphics system.\n",
+	0
+    },
+    {
+	"texturePath",
+	NULL,
+	conf_texturedir_string,
+	KEY_DUMMY,
+	"Search path for texture files.\n"
+	"This is a list of one or more directories separated by colons.\n",
+	0
+    },
+    {
+	"fullColor",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Whether to use a colors as close as possible to the specified ones\n"
+	"or use a few standard colors for everything. May require more\n"
+	"resources from your system.\n",
+	0
+    },
+    {
+	"texturedObjects",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Whether to draw certain game objects with textures.\n"
+	"Be warned that this requires more graphics speed.\n"
+	"fullColor must be on for this to work.\n"
+	"You may also need to enable multibuffering or double-buffering.\n",
+	0
+    },
+    {
+	"showID",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Should ID numbers be shown instead of ship names on the playfield?\n",
+	0
+    },
+    {
+	"markingLights",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Should the fighters have marking lights, just like airplanes?\n",
+	0
+    },
+    {
+	"sparkProb",
+	NULL,
+	"0.25",
+	KEY_DUMMY,
+	"The chance that sparks are drawn or not.\n"
+	"This gives a sparkling effect.\n"
+	"Valid values are in the range [0.0-1.0]\n",
+	0
+    },
+    {
+	"sparkSize",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Size of sparks in pixels.\n",
+	0
+    },
+    {
+	"charsPerSecond",
+	NULL,
+	"100",
+	KEY_DUMMY,
+	"Speed in which messages appear on screen in characters per second.\n",
+	0
+    },
+    {
+	"clockAMPM",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"12 or 24 hour format for clock display.\n",
+	0
+    },
+    {
+	"pointerControl",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Enable mouse control.  This allows ship direction control by\n"
+	"moving the mouse to the left for an anti-clockwise turn and\n"
+	"moving the mouse to the right for a clockwise turn.\n"
+	"Also see the pointerButton options for use of the mouse buttons.\n",
+	0
+    },
+    {
+	"gameFont",
+	NULL,
+	GAME_FONT,
+	KEY_DUMMY,
+	"The font used on the HUD and for most other text.\n",
+	0
+    },
+    {
+	"scoreListFont",
+	NULL,
+	SCORE_LIST_FONT,
+	KEY_DUMMY,
+	"The font used on the score list.\n"
+	"This must be a non-proportional font.\n",
+	0
+    },
+    {
+	"buttonFont",
+	NULL,
+	BUTTON_FONT,
+	KEY_DUMMY,
+	"The font used on all buttons.\n",
+	0
+    },
+    {
+	"textFont",
+	NULL,
+	TEXT_FONT,
+	KEY_DUMMY,
+	"The font used in the help and about windows.\n",
+	0
+    },
+    {
+	"talkFont",
+	NULL,
+	TALK_FONT,
+	KEY_DUMMY,
+	"The font used in the talk window.\n",
+	0
+    },
+    {
+	"motdFont",
+	NULL,
+	MOTD_FONT,
+	KEY_DUMMY,
+	"The font used in the MOTD window and key list window.\n"
+	"This must be a non-proportional font.\n",
+	0
+    },
+    {
+	"messageFont",
+	NULL,
+	MESSAGE_FONT,
+	KEY_DUMMY,
+	"The font used for drawing messages.\n",
+	0
+    },
+    {
+	"maxMessages",
+	NULL,
+	"8",
+	KEY_DUMMY,
+	"The maximum number of messages to display.\n",
+	0
+    },
+    {
+	"messagesToStdout",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Send messages to standard output.\n"
+	"0: Don't.\n"
+	"1: Only player messages.\n"
+	"2: Player and status messages.\n",
+	0
+    },
+    {
+	"reverseScroll",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Reverse scroll direction of messages.\n",
+	0
+    },
+#ifndef _WINDOWS
+    {
+	"selectionAndHistory",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Provide cut&paste for the player messages and the talk window and\n"
+	"a `history' for the talk window.\n",
+	0
+    },
+    {
+	"maxLinesInHistory",
+	NULL,
+	"32",
+	KEY_DUMMY,
+	"Number of your messages saved in the `history' of the talk window.\n"
+	"`history' is accessible with `keyTalkCursorUp/Down'.\n",
+	0
+    },
+#endif
+    {
+	"shotSize",
+	NULL,
+	"5",
+	KEY_DUMMY,
+	"The size of shots in pixels.\n",
+	0
+    },
+    {
+	"teamShotSize",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"The size of team shots in pixels.\n"
+	"Note that team shots are drawn in teamShotColor.\n",
+	0
+    },
+    {
+	"teamShotColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing harmless shots.\n",
+	0
+    },
+    {
+	"showNastyShots",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
+	"You will probably want to increase your shotSize if you use this.\n",
+	0
+    },
+    {
+	"backgroundPointDist",
+	NULL,
+	"8",
+	KEY_DUMMY,
+	"The distance between points in the background measured in blocks.\n"
+	"These are drawn in empty map regions to keep feeling for which\n"
+	"direction the ship is moving to.\n",
+	0
+    },
+    {
+	"backgroundPointSize",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Specifies the size of the background points.  0 means no points.\n",
+	0
+    },
+    {
+	"titleFlip",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should the title bar change or not.\n"
+	"Some window managers like twm may have problems with\n"
+	"flipping title bars.  Hence this option to turn it off.\n",
+	0
+    },
+    {
+	"toggleShield",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Are shields toggled by a keypress only?\n",
+	0
+    },
+    {
+	"autoShield", /* Don auto-shield hack */
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Are shields lowered automatically for weapon fire?\n",
+	0
+    },
+    {
+	"shieldDrawSolid",
+	NULL,
+	"Default",
+	KEY_DUMMY,
+	"Are shields drawn in a solid line.\n"
+	"Not setting a value for this option will select the best value\n"
+	"automatically for your particular display system.\n",
+	0
+    },
+    {
+	"showMessages",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should messages appear on screen.\n",
+	0
+    },
+    {
+	"showItems",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should owned items be displayed permanently on the HUD?\n",
+	0
+    },
+    {
+	"showItemsTime",
+	NULL,
+	"3.0",
+	KEY_DUMMY,
+	"If showItems is false, the time in seconds to display item\n"
+	"information on the HUD when it has changed.\n",
+	0
+    },
+    {
+	"showScoreDecimals",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"The number of decimals to use when displaying scores.\n",
+	0
+    },
+    {
+	"receiveWindowSize",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Too complicated.  Keep it on 3.\n",
+	0
+    },
+    {
+	"visual",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Specify which visual to use for allocating colors.\n"
+	"To get a listing of all possible visuals on your dislay\n"
+	"set the argument for this option to list.\n",
+	0
+    },
+    {
+	"colorSwitch",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Use color buffering or not.\n"
+	"Usually color buffering is faster, especially on 8-bit\n"
+	"PseudoColor displays.\n",
+	0
+    },
+    {
+	"multibuffer",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Use the X windows multibuffer extension if present.\n",
+	0
+    },
+    {
+	"maxColors",
+	NULL,
+	"16",
+	KEY_DUMMY,
+	"The number of colors to use.  Valid values are 4, 8 and 16.\n",
+	0
+    },
+    {
+	"color0",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the first color.\n",
+	0
+    },
+    {
+	"color1",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the second color.\n",
+	0
+    },
+    {
+	"color2",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the third color.\n",
+	0
+    },
+    {
+	"color3",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the fourth color.\n",
+	0
+    },
+    {
+	"color4",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the fifth color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
+    },
+    {
+	"color5",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the sixth color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
+    },
+    {
+	"color6",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the seventh color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
+    },
+    {
+	"color7",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the eighth color.\n"
+	"This is only used if maxColors is set to 8 or 16.\n",
+	0
+    },
+    {
+	"color8",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the nineth color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"color9",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the tenth color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"color10",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the eleventh color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"color11",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the twelfth color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"color12",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the thirteenth color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"color13",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the fourteenth color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"color14",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the fifteenth color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"color15",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The color value for the sixteenth color.\n"
+	"This is only used if maxColors is set to 16.\n",
+	0
+    },
+    {
+	"hudColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing the HUD.\n",
+	0
+    },
+    {
+	"hudHLineColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing the horizontal lines\n"
+	"in the HUD.\n",
+	0
+    },
+    {
+	"hudVLineColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the vertical lines\n"
+	"in the HUD.\n",
+	0
+    },
+    {
+	"hudItemsColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing owned items on the HUD.\n",
+	0
+    },
+    {
+	"hudRadarEnemyColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing hudradar dots\n"
+	"that represent enemy ships.\n",
+	0
+    },
+    {
+	"hudRadarOtherColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing hudradar dots\n"
+	"that represent friendly ships or other objects.\n",
+	0
+    },
+    {
+	"hudRadarDotSize",
+	NULL,
+	"8",
+	KEY_DUMMY,
+	"Which size to use for drawing the hudradar dots.\n",
+	0
+    },
+    {
+	"hudRadarScale",
+	NULL,
+	"1.5",
+	KEY_DUMMY,
+	"The relative size of the hudradar.\n",
+	0
+    },
+    {
+	"hudRadarLimit",
+	NULL,
+	"0.05",
+	KEY_DUMMY,
+	"Hudradar dots closer than this to your ship are not drawn.\n"
+	"A value of 1.0 means that the dots are not drawn for ships in\n"
+	"your active view area.\n",
+	0
+    },
+    {
+	"hudSize",
+	NULL,
+	"90",
+	KEY_DUMMY,
+	"Which size to use for drawing the hud.\n",
+	0
+    },
+    {
+	"dirPtrColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the direction pointer hack.\n",
+	0
+    },
+    {
+	"shipShapesHackColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the shipshapes hack.\n",
+	0
+    },
+    {
+	"hudLockColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the lock on the HUD.\n",
+	0
+    },
+    {
+	"visibilityBorderColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing the visibility border.\n",
+	0
+    },
+    {
+	"fuelGaugeColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the fuel gauge.\n",
+	0
+    },
+    {
+	"msgScanBallColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing ball message warning.\n",
+	0
+    },
+    {
+	"msgScanSafeColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing safe message.\n",
+	0
+    },
+    {
+	"msgScanCoverColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing cover message.\n",
+	0
+    },
+    {
+	"msgScanPopColor",
+	NULL,
+	"11",
+	KEY_DUMMY,
+	"Which color number to use for drawing pop message.\n",
+	0
+    },
+    {
+	"zeroLivesColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color to associate with ships with zero lives left.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
+    },
+    {
+	"oneLifeColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color to associate with ships with one life left.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
+    },
+    {
+	"twoLivesColor",
+	NULL,
+	"11",
+	KEY_DUMMY,
+	"Which color to associate with ships with two lives left.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
+    },
+    {
+	"manyLivesColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color to associate with ships with more than two lives left.\n"
+	"This can be used to paint for example ship and base names.\n",
+	0
+    },
+    {
+	"selfLWColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color to use to paint your ship in when on last life.\n"
+	"Original color for this is red.\n",
+	0
+    },
+    {
+	"enemyLWColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color to use to paint enemy ships in when on last life.\n"
+	"Original color for this is red.\n",
+	0
+    },
+    {
+	"teamLWColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color to use to paint teammate ships in when on last life.\n"
+	"Original color for this is green.\n",
+	0
+    },
+    {
+	"shipNameColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing names of ships.\n",
+	0
+    },
+    {
+	"baseNameColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing names of bases.\n",
+	0
+    },
+    {
+	"mineNameColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing names of mines.\n",
+	0
+    },
+    {
+	"ballColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing balls.\n",
+	0
+    },
+    {
+	"connColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing connectors.\n",
+	0
+    },
+    {
+	"fuelMeterColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the fuel meter.\n",
+	0
+    },
+    {
+	"powerMeterColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the power meter.\n",
+	0
+    },
+    {
+	"turnSpeedMeterColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the turn speed meter.\n",
+	0
+    },
+    {
+	"packetSizeMeterColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet size meter.\n"
+	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n",
+	0
+    },
+    {
+	"packetLossMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet loss meter.\n"
+	"This gives the percentage of lost frames due to network failure.\n",
+	0
+    },
+    {
+	"packetDropMeterColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet drop meter.\n"
+	"This gives the percentage of dropped frames due to display slowness.\n",
+	0
+    },
+    {
+	"packetLagMeterColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet lag meter.\n"
+	"This gives the amount of lag in frames over the past one second.\n",
+	0
+    },
+    {
+	"temporaryMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing temporary meters.\n",
+	0
+    },
+    {
+	"meterBorderColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing borders of meters.\n",
+	0
+    },
+    {
+	"windowColor",
+	NULL,
+	"8",
+	KEY_DUMMY,
+	"Which color number to use for drawing windows.\n",
+	0
+    },
+    {
+	"buttonColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing buttons.\n",
+	0
+    },
+    {
+	"borderColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing borders.\n",
+	0
+    },
+    {
+	"clockColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing the clock.\n"
+	"The clock is displayed in the top right of the score window.\n",
+	0
+    },
+    {
+	"scoreColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing score list entries.\n",
+	0
+    },
+    {
+	"scoreSelfColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing your own score.\n",
+	0
+    },
+    {
+	"scoreInactiveColor",
+	NULL,
+	"12",
+	KEY_DUMMY,
+	"Which color number to use for drawing inactive players's scores.\n",
+	0
+    },
+    {
+	"scoreInactiveSelfColor",
+	NULL,
+	"12",
+	KEY_DUMMY,
+	"Which color number to use for drawing your score when inactive.\n",
+	0
+    },
+    {
+	"scoreOwnTeamColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing your own team score.\n",
+	0
+    },
+
+    {
+	"scoreEnemyTeamColor",
+	NULL,
+	"11",
+	KEY_DUMMY,
+	"Which color number to use for drawing enemy team score.\n",
+	0
+    },
+    {
+	"scoreObjectColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing score objects.\n",
+	0
+    },
+    {
+	"scoreObjectTime",
+	NULL,
+	"3.0",
+	KEY_DUMMY,
+	"How many seconds score objects remain visible on the map.\n",
+	0
+    },
+    {
+	"baseWarningType",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which type of base warning you prefer.\n"
+	"A value of 0 disables base warning.\n"
+	"A value of 1 draws a red box on a base when someone has died.\n"
+	"A value of 2 makes the base name flash when someone has died.\n"
+	"A value of 3 combines the effects of values 1 and 2.\n",
+	0
+    },
+    {
+	"wallColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing walls.\n",
+	0
+    },
+    {
+	"fuelColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing fuel stations.\n",
+	0
+    },
+    {
+	"wallRadarColor",
+	NULL,
+	"8",
+	KEY_DUMMY,
+	"Which color number to use for drawing walls on the radar.\n"
+	"Valid values all even numbers smaller than maxColors.\n",
+	0
+    },
+    {
+	"decorColor",
+	NULL,
+	"6",
+	KEY_DUMMY,
+	"Which color number to use for drawing decorations.\n",
+	0
+    },
+    {
+	"backgroundPointColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing background points.\n",
+	0
+    },
+    {
+	"team0Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 0 objects.\n",
+	0
+    },
+    {
+	"team1Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 1 objects.\n",
+	0
+    },
+    {
+	"team2Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 2 objects.\n",
+	0
+    },
+    {
+	"team3Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 3 objects.\n",
+	0
+    },
+    {
+	"team4Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 4 objects.\n",
+	0
+    },
+    {
+	"team5Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 5 objects.\n",
+	0
+    },
+    {
+	"team6Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 6 objects.\n",
+	0
+    },
+    {
+	"team7Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 7 objects.\n",
+	0
+    },
+    {
+	"team8Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 8 objects.\n",
+	0
+    },
+    {
+	"team9Color",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing team 9 objects.\n",
+	0
+    },
+    {
+	"showDecor",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should decorations be displayed on the screen and radar?\n",
+	0
+    },
+    {
+	"decorRadarColor",
+	NULL,
+	"6",
+	KEY_DUMMY,
+	"Which color number to use for drawing decorations on the radar.\n"
+	"Valid values are all even numbers smaller than maxColors.\n",
+	0
+    },
+    {
+	"messagesColor",
+	NULL,
+	"12",
+	KEY_DUMMY,
+	"Which color number to use for drawing messages.\n",
+	0
+    },
+    {
+	"oldMessagesColor",
+	NULL,
+	"13",
+	KEY_DUMMY,
+	"Which color number to use for drawing old messages.\n",
+	0
+    },
+    {
+	"clientRanker",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Scan messages and make personal kill/death ranking.\n",
+	0
+    },
+    {
+	"outlineDecor",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Draws only the outline of the map decoration.\n",
+	0
+    },
+    {
+	"filledDecor",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Draws filled decorations.\n",
+	0
+    },
+    {
+	"texturedDecor",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Draws the map decoration filled with a texture pattern.\n",
+	0
+    },
+    {
+	"targetRadarColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing targets on the radar.\n"
+	"Valid values are all even numbers smaller than maxColors.\n",
+	0
+    },
+    {
+	"sparkColors",
+	NULL,
+	"5,6,7,3",
+	KEY_DUMMY,
+	"Which color numbers to use for spark and debris particles.\n",
+	0
+    },
+    {
+	"modifierBank1",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The default weapon modifier values for the first modifier bank.\n",
+	0
+    },
+    {
+	"modifierBank2",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The default weapon modifier values for the second modifier bank.\n",
+	0
+    },
+    {
+	"modifierBank3",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The default weapon modifier values for the third modifier bank.\n",
+	0
+    },
+    {
+	"modifierBank4",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The default weapon modifier values for the fourth modifier bank.\n",
+	0
+    },
+    {
+	"pointerButton1",
+	NULL,
+	"keyFireShot",
+	KEY_DUMMY,
+	"The key to activate when pressing the first mouse button.\n",
+	0
+    },
+    {
+	"pointerButton2",
+	NULL,
+	"keyThrust",
+	KEY_DUMMY,
+	"The key to activate when pressing the second mouse button.\n",
+	0
+    },
+    {
+	"pointerButton3",
+	NULL,
+	"keyDropBall",
+	KEY_DUMMY,
+	"The key to activate when pressing the third mouse button.\n",
+	0
+    },
+    {
+	"pointerButton4",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The key to activate when pressing the fourth mouse button.\n",
+	0
+    },
+    {
+	"pointerButton5",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"The key to activate when pressing the fifth mouse button.\n",
+	0
+    },
+    {
+	"maxFPS",
+	NULL,
+	"100",
+	KEY_DUMMY,
+	"Set client's maximum FPS supported.\n",
+	0
+    },
+    {
+	"recordFile",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"An optional file where a recording of a game can be made.\n"
+	"If this file is undefined then recording isn't possible.\n",
+	0
+    },
+    {
+	"clientRankFile",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"An optional file where clientside kill/death rank is stored.\n",
+	0
+    },
+    {
+	"clientRankHTMLFile",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"An optional file where clientside kill/death rank is\n"
+	"published in HTML format. \n",
+	0
+    },
+    {
+	"clientRankHTMLNOJSFile",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"An optional file where clientside kill/death rank is\n"
+	"published in HTML format, w/o JavaScript. \n",
+	0
+    },
+    {
+	"clientPortStart",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n",
+	0
+    },
+    {
+	"clientPortEnd",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n",
+	0
+    },
+#ifdef _WINDOWS
+    {
+	"threadedDraw",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Tell Windows to do the heavy BitBlt in another thread\n",
+	0
+	},
+    {
+	"radarDivisor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Specifies how many frames between radar window updates.\n",
+	0
+	},
+#endif
+    {
+	"scaleFactor",
+	NULL,
+	"1.0",
+	KEY_DUMMY,
+	"Specifies scaling factor for the drawing window.\n",
+	0
+    },
+    {
+        "altScaleFactor",
+        NULL,
+        "2.0",
+        KEY_DUMMY,
+        "Specifies alternative scaling factor for the drawing window.\n",
+	0
+    },
+#ifdef SOUND
+    {
+	"sounds",
+	NULL,
+	conf_soundfile_string,
+	KEY_DUMMY,
+	"Specifies the sound file.\n",
+	0
+    },
+    {
+	"maxVolume",
+	NULL,
+	"100",
+	KEY_DUMMY,
+	"Specifies the volume to play sounds with.\n",
+	0
+    },
+    {
+	"audioServer",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"Specifies the audio server to use.\n",
+	0
+    },
+#endif
+#ifdef DEVELOPMENT
+    {
+        "test",
+        NULL,
+        "",
+        KEY_DUMMY,
+        "Which development testing parameters to use?\n",
+	0
+    },
+#endif
+
+#endif
+
 
 
 };

@@ -199,7 +199,11 @@ static void Set_string_option(xp_option_t *opt, const char *value)
     else
 	strlcpy(opt->str_ptr, value, opt->str_size);
 
-    printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
+    if (opt->str_ptr)
+	printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
+    else
+	printf("Value of option %s is now \"%s\".\n",
+	       opt->name, opt->str_getfunc(opt));
 }
 
 static xp_key_binding_callback_t key_binding_callback = NULL;

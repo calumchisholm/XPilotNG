@@ -33,5 +33,6 @@
 #define TALK_FAST_SPECIAL_TALK_CHAR	'#'
 
 extern int Talk_macro(char *str);
+extern void Store_talk_macro_options(void);
 
 #endif

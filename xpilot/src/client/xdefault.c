@@ -53,6 +53,7 @@ xp_option_t xdefault_options[] = {
 	sizeof xdisplay,
 	"",
 	NULL,
+	NULL,
 	"Set the X display.\n"),
 };
 
