@@ -29,6 +29,12 @@ bool	titleFlip;		/* Do special title bar flipping? */
 bool	showNastyShots = false;	/* show original flavor shots or the new 
 				   "nasty shots" */
 
+#ifdef DEVELOPMENT
+static bool testxsync = false;
+static bool testxdebug = false;
+static bool testxafter = false;
+static bool testxcolors = false;
+#endif /* DEVELOPMENT */
 
 #ifdef OPTIONHACK
 
@@ -202,12 +208,62 @@ xp_option_t xdefault_options[] = {
 	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
 	"You will probably want to increase your shotSize if you use this.\n"),
 
+    /* X debug stuff */
+#ifdef DEVELOPMENT
+    XP_NOARG_OPTION(
+        "testxsync",
+	&testxsync,
+        "Test XSynchronize() ?\n"),
+
+    XP_NOARG_OPTION(
+        "testxdebug",
+	&testxdebug,
+        "Test X_error_handler() ?\n"),
+
+    XP_NOARG_OPTION(
+        "testxafter",
+	&testxafter,
+        "Test XAfterFunction ?\n"),
+
+    XP_NOARG_OPTION(
+        "testxcolors",
+	&testxcolors,
+        "Do Colors_debug() ?\n"),
+#endif
+
+
 };
 
 void Store_x_options(void)
 {
     STORE_OPTIONS(xdefault_options);
 }
+
+
+#ifdef DEVELOPMENT
+static int X_error_handler(Display *display, XErrorEvent *xev)
+{
+    char		buf[1024];
+
+    fflush(stdout);
+    fprintf(stderr, "X error\n");
+    XGetErrorText(display, xev->error_code, buf, sizeof buf);
+    buf[sizeof(buf) - 1] = '\0';
+    fprintf(stderr, "%s\n", buf);
+    fflush(stderr);
+    *(double *) -3 = 2.10;	/*core dump*/
+    exit(1);
+    return 0;
+}
+
+static void X_after(Display *display)
+{
+    static int		n;
+
+    if (n < 1000)
+	printf("_X_ %4d\n", n++);
+}
+#endif /* DEVELOPMENT */
 
 void Handle_x_options(void)
 {
@@ -244,12 +300,29 @@ void Handle_x_options(void)
 	exit(0);
     }
 
+#ifdef DEVELOPMENT
+    if (testxsync) {
+	XSynchronize(dpy, True);
+	XSetErrorHandler(X_error_handler);
+    }
 
-    
+    if (testxdebug)
+	XSetErrorHandler(X_error_handler);
+
+    if (testxafter) {
+	XSetAfterFunction(dpy, (int (*)(
+#if NeedNestedPrototypes
+	    Display *
+#endif
+	    )) X_after);
+    }
+
+    if (testxcolors)
+	Colors_debug();
+#endif
 
 }
 
 #endif
-
 
 

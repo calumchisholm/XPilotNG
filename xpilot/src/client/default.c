@@ -927,16 +927,6 @@ xp_option_t default_options[] = {
 	KEY_DUMMY,
 	"Specifies the audio server to use.\n"),
 #endif
-#ifdef DEVELOPMENT
-    {
-        "test",
-        NULL,
-        "",
-        KEY_DUMMY,
-        "Which development testing parameters to use?\n",
-	0
-    },
-#endif
 
 };
 
@@ -1037,8 +1027,6 @@ void Usage(void)
 char talk_fast_temp_buf[7];		/* can handle up to 999 fast msgs */
 char *talk_fast_temp_buf_big;
 
-
-static void Get_test_resources(XrmDatabase rDB);
 
 /* from common/config.c */
 extern char conf_ship_file_string[];
@@ -3354,16 +3342,6 @@ cl_option_t options[] = {
 	0
     },
 #endif
-#ifdef DEVELOPMENT
-    {
-        "test",
-        NULL,
-        "",
-        KEY_DUMMY,
-        "Which development testing parameters to use?\n",
-	0
-    },
-#endif
 /* talk macros: */
     {
 	"keySendMsg1",
@@ -4432,8 +4410,6 @@ void Parse_options(int *argcp, char **argvp)
     Get_resource(rDB, "audioServer", audioServer, sizeof audioServer);
 #endif
 
-    Get_test_resources(rDB);
-
     /*
      * Key bindings
      */
@@ -4565,65 +4541,5 @@ void	defaultCleanup(void)
 #endif /* SOUND */
 }
 
-
-#ifdef DEVELOPMENT
-static int X_error_handler(Display *display, XErrorEvent *xev)
-{
-    char		buf[1024];
-
-    fflush(stdout);
-    fprintf(stderr, "X error\n");
-    XGetErrorText(display, xev->error_code, buf, sizeof buf);
-    buf[sizeof(buf) - 1] = '\0';
-    fprintf(stderr, "%s\n", buf);
-    fflush(stderr);
-    *(double *) -3 = 2.10;	/*core dump*/
-    exit(1);
-    return 0;
-}
-
-static void X_after(Display *display)
-{
-    static int		n;
-
-    if (n < 1000)
-	printf("_X_ %4d\n", n++);
-}
-
-static void Get_test_resources(XrmDatabase rDB)
-{
-    char	*s;
-    char testBuffer[256];
-
-    Get_string_resource(rDB, "test", testBuffer, sizeof testBuffer);
-
-    for (s = strtok(testBuffer, ":"); s != NULL; s = strtok(NULL, ":")) {
-	if (!strncasecmp(s, "xsync", 3)) {
-	    XSynchronize(dpy, True);
-	    XSetErrorHandler(X_error_handler);
-	}
-	else if (!strncasecmp(s, "xdebug", 4))
-	    XSetErrorHandler(X_error_handler);
-	else if (!strncasecmp(s, "after", 5)) {
-	    XSetAfterFunction(dpy, (int (*)(
-#if NeedNestedPrototypes
-					    Display *
-#endif
-					    )) X_after);
-	}
-	else if (!strncasecmp(s, "color", 3))
-	    Colors_debug();
-	else {
-	    printf("typo %s\n", s);
-	    exit(1);
-	}
-    }
-}
-#else
-static void Get_test_resources(XrmDatabase rDB)
-{
-    (void)rDB;
-}
-#endif
 
 #endif /* OPTIONHACK */
