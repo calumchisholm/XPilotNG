@@ -1883,7 +1883,6 @@ void Kill_player(player_t *pl, bool add_rank_death)
 
 void Player_death_reset(player_t *pl, bool add_rank_death)
 {
-    double minfuel;
     int i;
     world_t *world = pl->world;
 
@@ -1926,13 +1925,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->stunned		= 0;
     pl->lock.distance	= 0;
 
-    if (!BIT(pl->status, PAUSE)) {
-	pl->fuel.sum	= pl->fuel.sum * 0.90;	/* Loose 10% of fuel */
-	minfuel		= world->items[ITEM_FUEL].initial;
-	minfuel		+= rfrac() * (1.0 + minfuel) * 0.2;
-	pl->fuel.sum	= MAX(pl->fuel.sum, minfuel);
-	Player_init_fuel(pl, pl->fuel.sum);
-    }
+    if (!BIT(pl->status, PAUSE))
+	Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
 
     /*-BA Handle the combination of limited life games and
      *-BA options.robotLeaveLife by making a robot leave iff it gets
