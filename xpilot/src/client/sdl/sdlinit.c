@@ -48,6 +48,23 @@ font_data gamefont;
 font_data messagefont;
 font_data mapfont;
 
+/* ugly kps hack */
+bool file_exists(const char *path) 
+{ 
+  FILE *fp;
+
+  if (!path) {
+    return false; 
+  } else {
+    fp = fopen(path ? path : "", "r");
+    if (fp) { 
+      fclose(fp); 
+      return true;
+    }
+    return false; 
+  }
+}
+
 int Init_playing_windows(void)
 {
     /*
@@ -149,7 +166,15 @@ int Init_window(void)
 
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
-
+    /* this prevents a freetype crash if you pass non existant fonts */
+    if (!file_exists(gamefontname)) {
+      error("cannot find your game fonts.\n" \
+            "Please check you have run make install, if you have check" \
+	    "the setting of Conf_Datadir() in the text above this error" \
+            "ensure that your fonts and texures are located there.");
+      return -1;
+    }
+      
     if (fontinit(&gamefont,gamefontname,gamefontsize)) {
     	error("Font initialization failed with %s", gamefontname);
 	return -1;
