@@ -879,7 +879,7 @@ static void Update_players(world_t *world)
 	    pl->flooding--;
 
 	/* ugly hack */
-	if (Player_is_human(pl))
+	if (Player_is_human(pl)||Player_is_robot(pl))
 	    pl->rank->score =  Get_Score(pl);
 
 	if (pl->pause_count > 0) {
