@@ -794,9 +794,6 @@ void Paint_messages(void)
     int		msg_color;
     int		last_msg_index = 0;
 
-    if (charsPerSecond <= 10 || charsPerSecond > 255)
-	charsPerSecond = 50;
-
     top_y = BORDER + messageFont->ascent;
     bot_y = WINSCALE(ext_view_height) - messageFont->descent - BORDER;
 
