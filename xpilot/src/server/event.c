@@ -1056,6 +1056,7 @@ int Handle_keyboard(int ind)
 		     * and hacked clients.
 		     */
 		    pl->shot_time = frame_time;
+		    pl->laser_time = frame_time;
 		}
 		break;
 
