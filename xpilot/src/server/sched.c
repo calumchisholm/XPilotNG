@@ -130,6 +130,10 @@ static void catch_timer(int signum)
     if (timer_count >= (unsigned)timerResolution) {
 	timer_count -= timerResolution;
 	timer_ticks++;
+	if (timer_count >= timerResolution)
+	    /* Don't let timer_count grow boundlessly with timerResolution 0
+	     * now that timerResolution can be changed at runtime. */
+	    timer_count = 0;
     }
 }
 
@@ -201,7 +205,8 @@ static void setup_timer(void)
 #ifndef _WINDOWS
 void install_timer_tick(void (*func)(void), int freq)
 {
-    timer_handler = func;
+    if (func != NULL) /* NULL to change freq, keep same handler */
+	timer_handler = func;
     timer_freq = freq;
     setup_timer();
 }
@@ -211,7 +216,8 @@ typedef void (__stdcall *windows_timer_t)(void *, unsigned int, unsigned int, un
 
 void install_timer_tick(windows_timer_t func, int freq)
 {
-    timer_handler = (TIMERPROC)func;
+    if (func != NULL)
+	timer_handler = (TIMERPROC)func;
     timer_freq = freq;
     setup_timer();
 }

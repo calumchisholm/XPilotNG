@@ -45,6 +45,7 @@
 #include "checknames.h"
 #include "commonproto.h"
 #include "tuner.h"
+#include "sched.h"
 
 char cmdline_version[] = VERSION;
 
@@ -1856,7 +1857,7 @@ static option_desc options[] = {
 	"12",
 	&framesPerSecond,
 	valInt,
-	tuner_none,
+	Timing_setup,
 	"The number of frames per second the server should strive for.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -3417,7 +3418,7 @@ static option_desc options[] = {
 	"0",
 	&timerResolution,
 	valInt,
-	tuner_dummy,
+	Timing_setup,
 	"If set to nonzero xpilots will requests signals from the OS at\n"
 	"1/timerResolution second intervals.  The server will then compute\n"
 	"a new frame FPS times out of every timerResolution signals.\n",
@@ -3740,9 +3741,14 @@ option_desc* Find_option_by_name(const char* name)
 
 void Timing_setup(void)
 {
-#if 0
-    FPSMultiplier = FPS / gameSpeed;
-#else
+    if (FPS > 100)
+	FPS = 100;
+    if (FPS < 1)
+	FPS = 1;
+    if (timerResolution > 100)
+	timerResolution = 100;
+    if (timerResolution < 0)
+	timerResolution = 0;
     if (gameSpeed > FPS)
 	gameSpeed = FPS;
     if (gameSpeed < 0.0)
@@ -3764,7 +3770,6 @@ void Timing_setup(void)
 	FPSMultiplier = 64.0;
 
     gameSpeed = FPS / FPSMultiplier;
-#endif
 
     /*
      * Calculate amount of game time that elapses per frame.
@@ -3778,13 +3783,14 @@ void Timing_setup(void)
 
     friction = frictionSetting;
 
-    /* If friction < 0, the result is silly - allow such settings but
+    /* If friction > 1, the result is silly - allow such settings but
      * don't bother making it "FPSMultiplier independent" */
     if (friction < 1)
 	friction = 1. - pow(1. - friction, 1. / FPSMultiplier);
 
     /* ecm size used to be halved every update on old servers */
     ecmSizeFactor = pow(0.5, 1. / FPSMultiplier);
+    install_timer_tick(NULL, timerResolution ? timerResolution : FPS);
 #if 0
     xpprintf(__FILE__ ": gameSpeed         = %f\n", gameSpeed);
     xpprintf(__FILE__ ": FPSMultiplier     = %f\n", FPSMultiplier);
