@@ -90,8 +90,6 @@ extern bool		updateScores;
 #define PL_STATE_DEAD 		5
 /* pl_status = {PAUSE},                   mychar = 'P' */
 #define PL_STATE_PAUSED 	6
-/* pl_status = {GAME_OVER, [PLAYING]},    mychar = ' ' */
-/*#define PL_STATE_GAME_OVER	7*/
 
 /*
  * Different types of attributes a player can have.
@@ -575,9 +573,16 @@ static inline bool Player_used_emergency_shield(player_t *pl)
 
 static inline bool Player_is_active(player_t *pl)
 {
+#ifdef USE_PL_STATE
+    if (Player_is_alive(pl)
+	|| Player_is_killed(pl))
+	return true;
+    return false;
+#else
     if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	return true;
     return false;
+#endif
 }
 
 
