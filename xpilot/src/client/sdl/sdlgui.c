@@ -812,7 +812,7 @@ void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
 void Gui_paint_asteroids_begin(void)
 {
     image_t *img;
-    GLfloat ambient[] = { 0.7, 0.7, 0.7, 1.0 };
+    GLfloat ambient[] = { 0.7F, 0.7F, 0.7F, 1.0F };
 
     img = Image_get(IMG_ASTEROID);
     if (img != NULL) {
