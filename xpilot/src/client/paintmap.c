@@ -50,6 +50,7 @@
 #include "xinit.h"
 #include "protoclient.h"
 #include "guimap.h"
+
 char paintmap_version[] = VERSION;
 
 #define X(co)  ((int) ((co) - world.x))
@@ -120,24 +121,67 @@ void Paint_vdecor(void)
 }
 
 
+static void Paint_background_dots(void)
+{
+    float dx, dy;
+    int xi, yi;
+    ipos min, max, count;
+    
+    if (map_point_distance == 0) return;
+
+    count.x = Setup->x / map_point_distance;
+    count.y = Setup->y / map_point_distance;
+
+    dx = (float)Setup->width / count.x;
+    dy = (float)Setup->height / count.y;
+
+    min.x = world.x / dx;
+    if (world.x > 0) min.x++;
+    min.y = world.y / dy;
+    if (world.y > 0) min.y++;
+
+    max.x = (world.x + view_width) / dx;
+    max.y = (world.y + view_height) / dy;
+    
+    for (yi = min.y; yi <= max.y; yi++) {
+        /*if (yi % count.y == 0) continue;*/
+        for (xi = min.x; xi <= max.x; xi++) {
+            /*if (xi % count.x == 0) continue;*/
+
+            Gui_paint_decor_dot
+                (xi * dx - BLOCK_SZ / 2, 
+                 yi * dy - BLOCK_SZ / 2, 
+                 map_point_size);
+        }
+    }
+}
+
+
+
+static void Compute_bounds(ipos *min, ipos *max, const irec *b)
+{
+    min->x = (world.x - (b->x + b->w)) / Setup->width;
+    if (world.x > b->x + b->w) min->x++;
+    max->x = (world.x + view_width - b->x) / Setup->width;
+    if (world.x + view_width < b->x) max->x--;
+    min->y = (world.y - (b->y + b->h)) / Setup->height;
+    if (world.y > b->y + b->h) min->y++;
+    max->y = (world.y + view_height - b->y) / Setup->height;
+    if (world.y + view_height < b->y) max->y--;
+    
+}
+
+
 void Paint_objects(void) 
 {
     int i, xoff, yoff;
     ipos min, max;
-    irec b;
 
     for (i = 0; i < num_polygon; i++) {
 
-        b = polygon_ptr[i].bounds;
+        irec b = polygon_ptr[i].bounds;
         b.y -= b.h;
-        min.x = (world.x - (b.x + b.w)) / Setup->width;
-        if (world.x > b.x + b.w) min.x++;
-        max.x = (world.x + view_width - b.x) / Setup->width;
-        if (world.x + view_width < b.x) max.x--;
-        min.y = (world.y - (b.y + b.h)) / Setup->height;
-        if (world.y > b.y + b.h) min.y++;
-        max.y = (world.y + view_height - b.y) / Setup->height;
-        if (world.y + view_height < b.y) max.y--;
+        Compute_bounds(&min, &max, &b);
 
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {
@@ -149,22 +193,13 @@ void Paint_objects(void)
     
     for (i = 0; i < num_bases; i++) {
 
-        b = bases[i].bounds;
+        Compute_bounds(&min, &max, &bases[i].bounds);
         
-        min.x = (world.x - (b.x + b.w)) / Setup->width;
-        if (world.x > b.x + b.w) min.x++;
-        max.x = (world.x + view_width - b.x) / Setup->width;
-        if (world.x + view_width < b.x) max.x--;
-        min.y = (world.y - (b.y + b.h)) / Setup->height;
-        if (world.y > b.y + b.h) min.y++;
-        max.y = (world.y + view_height - b.y) / Setup->height;
-        if (world.y + view_height < b.y) max.y--;
-
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {
                 Gui_paint_base
-                    (b.x + xoff * Setup->width, 
-                     b.y + yoff * Setup->height, 
+                    (bases[i].bounds.x + xoff * Setup->width, 
+                     bases[i].bounds.y + yoff * Setup->height, 
                      bases[i].id, bases[i].team, 
                      bases[i].type);
             }
@@ -173,22 +208,13 @@ void Paint_objects(void)
 
     for (i = 0; i < num_fuels; i++) {
 
-        b = fuels[i].bounds;
+        Compute_bounds(&min, &max, &fuels[i].bounds);
         
-        min.x = (world.x - (b.x + b.w)) / Setup->width;
-        if (world.x > b.x + b.w) min.x++;
-        max.x = (world.x + view_width - b.x) / Setup->width;
-        if (world.x + view_width < b.x) max.x--;
-        min.y = (world.y - (b.y + b.h)) / Setup->height;
-        if (world.y > b.y + b.h) min.y++;
-        max.y = (world.y + view_height - b.y) / Setup->height;
-        if (world.y + view_height < b.y) max.y--;
-
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {
                 Gui_paint_fuel
-                    (b.x + xoff * Setup->width, 
-                     b.y + yoff * Setup->height, 
+                    (fuels[i].bounds.x + xoff * Setup->width, 
+                     fuels[i].bounds.y + yoff * Setup->height, 
                      fuels[i].fuel);
             }
         }
@@ -246,17 +272,6 @@ void Paint_world(void)
     int			wallTileDoit = false;
     XPoint		points[5];
 
-    if (BIT(instruments, SHOW_TEXTURED_WALLS)) {
-	if (!wallTileReady) {
-	    wallTile = Texture_wall();
-	    wallTileReady = (wallTile == None) ? -1 : 1;
-	}
-	if (wallTileReady == 1) {
-	    wallTileDoit = true;
-	    XSetTile(dpy, gc, wallTile);
-	    XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), WINSCALE(realWorld.y));
-	}
-    }
 
     wormDrawCount = (wormDrawCount + 1) & 7;
 
@@ -294,6 +309,26 @@ void Paint_world(void)
 			     world.y + view_height/2 - MAX_VIEW_SIZE/2,
 			     world.x + view_width/2 + MAX_VIEW_SIZE/2,
 			     world.y + view_height/2 + MAX_VIEW_SIZE/2);
+
+    if (num_polygon) {
+        Paint_background_dots();
+        return;
+    }
+
+
+    if (BIT(instruments, SHOW_TEXTURED_WALLS)) {
+	if (!wallTileReady) {
+	    wallTile = Texture_wall();
+	    wallTileReady = (wallTile == None) ? -1 : 1;
+	}
+	if (wallTileReady == 1) {
+	    wallTileDoit = true;
+	    XSetTile(dpy, gc, wallTile);
+	    XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), 
+                         WINSCALE(realWorld.y));
+	}
+    }
+
 
     for (ryb = yb; ryb <= ye; ryb++, yi++, y += BLOCK_SZ, mapbase++) {
 

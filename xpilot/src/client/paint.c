@@ -224,7 +224,7 @@ void Paint_frame(void)
 	Rectangle_start();
 	Segment_start();
 
-	if (!num_polygon) Paint_world();
+	Paint_world();
 
 	Segment_end();
 	Rectangle_end();
