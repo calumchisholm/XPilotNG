@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -243,21 +242,20 @@ static void Command_help(void)
 	   "N    -   Next server, skip this one.\n"
 	   "S    -   list Status.\n"
 	   "T    -   set Team.\n"
-	   "Q    -   Quit.\n"
-	   "K    -   Kick a player.                (only owner)\n"
+	   "Q    -   Quit.\n");
+    printf("K    -   Kick a player.                (only owner)\n"
 	   "M    -   send a Message.               (only owner)\n"
 	   "L    -   Lock/unLock server access.    (only owner)\n"
 	   "D(*) -   shutDown/cancel shutDown.     (only owner)\n"
 	   "R(#) -   set maximum number of Robots. (only owner)\n"
 	   "O    -   Modify a server option.       (only owner)\n"
 	   "V    -   View the server options.\n"
-	   "J(&) or just Return enters the game.\n"
-	   "(*) If you don't specify any delay, you will signal that\n"
+	   "J(&) or just Return enters the game.\n");
+    printf("(*) If you don't specify any delay, you will signal that\n"
 	   "    the server should stop an ongoing shutdown.\n"
 	   "(#) Not specifying the maximum number of robots is\n"
 	   "    the same as specifying 0 robots.\n"
-	   "(&) You may specify a team number after the J.\n"
-	  );
+	   "(&) You may specify a team number after the J.\n");
 }
 
 
