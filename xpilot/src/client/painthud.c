@@ -49,9 +49,9 @@ int	hudLockColor;		/* Color index for lock on HUD drawing */
 int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 int	dirPtrColor;		/* Color index for dirptr drawing */
 int	msgScanBallColor;	/* Color index for ball msg */
-int	msgScanSafeColor = 4;	/* Color index for safe msg */
+int	msgScanSafeColor;	/* Color index for safe msg */
 int	msgScanCoverColor;	/* Color index for cover msg */
-int	msgScanPopColor = 11;	/* Color index for pop msg */
+int	msgScanPopColor;	/* Color index for pop msg */
 int	messagesColor;		/* Color index for messages */
 int	oldMessagesColor;	/* Color index for old messages */
 DFLOAT	scoreObjectTime;	/* How long to flash score objects */
@@ -138,9 +138,8 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 	Segment_add(color, x+mw3_4, y-1,	x+mw3_4, y+meterHeight+1);
     }
 
-    if (!meterBorderColor) {
+    if (!meterBorderColor)
 	SET_FG(colors[meter_color].pixel);
-    }
 
     rd.drawString(dpy, p_draw, gc,
 		  (xstr), WINSCALE(y)+(gameFont->ascent+meterHeight)/2,
@@ -168,15 +167,13 @@ static int wrap(int *xp, int *yp)
     int			x = *xp, y = *yp;
 
     if (x < world.x || x > world.x + ext_view_width) {
-	if (x < realWorld.x || x > realWorld.x + ext_view_width) {
+	if (x < realWorld.x || x > realWorld.x + ext_view_width)
 	    return 0;
-	}
 	*xp += world.x - realWorld.x;
     }
     if (y < world.y || y > world.y + ext_view_height) {
-	if (y < realWorld.y || y > realWorld.y + ext_view_height) {
+	if (y < realWorld.y || y > realWorld.y + ext_view_height)
 	    return 0;
-	}
 	*yp += world.y - realWorld.y;
     }
     return 1;
@@ -443,6 +440,37 @@ void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit, int sz)
 }
 
 
+
+/*called from guimap for basewarning */
+/*void Paint_baseInfoOnHudRadar(int xi, int yi)*/
+/*{
+   float x,y,x2,y2,x3,y3;
+	float hrscale = hrScale;
+	float hrw = (float)hrscale * (float)256;
+	float hrh = (float)hrscale * (float)RadarHeight;
+	int sz = hrSize;
+	float xf = (float) hrw / (float) Setup->width;
+   float yf = (float) hrh / (float) Setup->height;
+   
+   x = X(xi) + SHIP_SZ/2;
+   y = Y(yi) - SHIP_SZ*4/3;
+   x2 = (ext_view_width / 2) - (sz/2);
+   y2 = (ext_view_height / 2) -(sz/2);
+   x3 = (x-x2)*xf + x2;
+   y3 = (y-y2)*yf + y2;
+
+   if (hrColor1 >= 1)
+	   Arc_add(hrColor1, (int)x, (int)y, sz, sz, 0,
+			   64 * 360);
+   if (hrColor1 >= 1)
+	   Arc_add(hrColor1, (int)x2,(int)y2, sz, sz, 0,
+			   64 * 360);
+   if (hrColor2 >= 1)
+	   Arc_add(hrColor2, (int)x3, (int)y3, sz, sz, 0,
+			   64 * 360);
+		      		   }*//*doesn't work (yet) since client only knows visible bases */
+
+
 void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 {
     const int		BORDER = 3;
@@ -518,7 +546,8 @@ void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	    maxWidth = MAX(maxWidth, width + BORDER + ITEM_SIZE);
 	    vert_pos += vertSpacing;
 
-	    if (vert_pos+vertSpacing > WINSCALE(hud_pos_y+hudSize-HUD_OFFSET-BORDER)) {
+	    if (vert_pos+vertSpacing
+		> WINSCALE(hud_pos_y+hudSize-HUD_OFFSET-BORDER)) {
 		rect_width += maxWidth + 2*BORDER;
 		rect_height = MAX(rect_height, vert_pos - rect_y);
 		horiz_pos -= maxWidth + 2*BORDER;
@@ -527,13 +556,12 @@ void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	    }
 	}
     }
-    if (maxWidth != -1) {
+    if (maxWidth != -1)
 	rect_width += maxWidth + BORDER;
-    }
+
     if (rect_width > 0) {
-	if (rect_height == 0) {
+	if (rect_height == 0)
 	    rect_height = vert_pos - rect_y;
-	}
 	rect_x -= rect_width;
 	Erase_rectangle(rect_x - 1, rect_y - 4,
 			rect_width + 2, rect_height + 8);
@@ -592,14 +620,12 @@ void Paint_HUD(void)
 
     /* message scan hack by mara*/
     if (BIT(hackedInstruments, BALL_MSG_SCAN)) {
-	if (ball_shout && msgScanBallColor) {
+	if (ball_shout && msgScanBallColor)
 	    Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
 		    ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
-	}
-	if (need_cover && msgScanCoverColor) {
+	if (need_cover && msgScanCoverColor)
 	    Arc_add(msgScanCoverColor, ext_view_width / 2 - 4,
 		    ext_view_height / 2 - 4, 8, 8, 0, 64 * 360);
-	}
     }
 
     /*
@@ -850,13 +876,13 @@ void Paint_messages(void)
     }
 
     for (i = (BIT(instruments, SHOW_REVERSE_SCROLL) ? 2 * maxMessages - 1 : 0);
-	 (BIT(instruments, SHOW_REVERSE_SCROLL) ? i >= 0 : i < 2 * maxMessages);
+	 (BIT(instruments, SHOW_REVERSE_SCROLL)
+	  ? i >= 0 : i < 2 * maxMessages);
 	 i += (BIT(instruments, SHOW_REVERSE_SCROLL) ? -1 : 1)) {
-	if (i < maxMessages) {
+	if (i < maxMessages)
 	    msg = TalkMsg[i];
-	} else {
+	else
 	    msg = GameMsg[i - maxMessages];
-	}
 	if (msg->len == 0)
 	    continue;
 
@@ -889,9 +915,9 @@ void Paint_messages(void)
 	    }
 #endif
 
-	if (msg->lifeTime <= MSG_FLASH_TIME) {
+	if (msg->lifeTime <= MSG_FLASH_TIME)
 	    msg_color = oldMessagesColor;
-	} else {
+	else {
 	    switch (msg->bmsinfo) {
 	    case BmsBall:	msg_color = msgScanBallColor;	break;
 	    case BmsSafe:	msg_color = msgScanSafeColor;	break;
@@ -909,9 +935,8 @@ void Paint_messages(void)
 	    y = top_y;
 	    top_y += SPACING;
 	} else {
-	    if (!BIT(instruments, SHOW_MESSAGES)) {
+	    if (!BIT(instruments, SHOW_MESSAGES))
 		continue;
-	    }
 	    x = BORDER;
 	    y = bot_y;
 	    bot_y -= SPACING;
@@ -953,22 +978,25 @@ void Paint_messages(void)
 		ptr2 = msg->txt;
 		l2 = len;
 		xoff2 = 0;
-	    } else if (TALK_MSG_SCREENPOS(last_msg_index,i) == selection.draw.y1) {
+	    } else if (TALK_MSG_SCREENPOS(last_msg_index,i)
+		       == selection.draw.y1) {
 		    /* first/only line */
 		    /*___xxx[___]*/
 		ptr = msg->txt;
 		xoff = 0;
-		if ( len < selection.draw.x1) {
+		if ( len < selection.draw.x1)
 		    l = len;
-		} else {
+		else {
 			/* at least two parts */
 			/*___xxx[___]*/
 			/*    ^      */
 		    l = selection.draw.x1;
 		    ptr2 = &(msg->txt[selection.draw.x1]);
-		    xoff2 = XTextWidth(messageFont, msg->txt, selection.draw.x1);
+		    xoff2 = XTextWidth(messageFont, msg->txt,
+				       selection.draw.x1);
 
-		    if (TALK_MSG_SCREENPOS(last_msg_index,i) < selection.draw.y2) {
+		    if (TALK_MSG_SCREENPOS(last_msg_index,i)
+			< selection.draw.y2) {
 			    /* first line */
 			    /*___xxxxxx*/
 			    /*     ^   */
@@ -976,16 +1004,17 @@ void Paint_messages(void)
 		    } else {
 			    /* only line */
 			    /*___xxx___*/
-			if (len <= selection.draw.x2) {
+			if (len <= selection.draw.x2)
 				/*___xxx___*/
 				/*    ^    */
 			    l2 = len - selection.draw.x1;
-			} else {
+			else {
 				/*___xxx___*/
 				/*       ^ */
 			    l2 = selection.draw.x2 - selection.draw.x1 + 1;
 			    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
-			    xoff3 = XTextWidth(messageFont, msg->txt, selection.draw.x2 + 1);
+			    xoff3 = XTextWidth(messageFont, msg->txt,
+					       selection.draw.x2 + 1);
 			    l3 = len - selection.draw.x2 - 1;
 			}
 		    } /* only line */
@@ -995,17 +1024,18 @@ void Paint_messages(void)
 		    /*xxxxxx[___]*/
 		ptr2 = msg->txt;
 		xoff2 = 0;
-		if (len <= selection.draw.x2 + 1) {
+		if (len <= selection.draw.x2 + 1)
 			/* all blue */
 			/*xxxxxx[___]*/
 			/*  ^        */
 		    l2 = len;
-		} else {
+		else {
 			/*xxxxxx___*/
 			/*       ^ */
 		    l2 = selection.draw.x2 + 1;
 		    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
-		    xoff3 = XTextWidth(messageFont, msg->txt, selection.draw.x2 + 1);
+		    xoff3 = XTextWidth(messageFont, msg->txt,
+				       selection.draw.x2 + 1);
 		    l3 = len - selection.draw.x2 - 1;
 		}
 	    } /* last line */
@@ -1031,11 +1061,10 @@ void Paint_messages(void)
 	    rd.drawString(dpy, p_draw, messageGC, x, y, msg->txt, len);
 	}
 
-	if (len < msg->len) {
+	if (len < msg->len)
 	    width = XTextWidth(messageFont, msg->txt, len);
-	} else {
+	else
 	    width = msg->pixelLen;
-	}
 	Erase_rectangle((x) - 1,
 			(y) - messageFont->ascent ,
 			width + 2,
