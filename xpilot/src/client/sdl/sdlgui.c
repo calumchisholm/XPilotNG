@@ -517,7 +517,7 @@ static void paint_dir_grav(int x, int y, int dir)
 	     sz-p2, 0, sz-p2, sz,
 	        0,  0,     0, sz);
 	break;
-    }    
+    }
 #undef GRAV
 
     glDisable(GL_BLEND);
@@ -1314,10 +1314,10 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 
     if (hudColorRGBA) {
 	int color = Life_color(target);
-	
+
 	if (!color)
 	    color = hudColorRGBA;
-	
+
 	HUDnprint(&gamefont,
 		  color,CENTER,CENTER,
 		  hud_pos_x,
@@ -1708,19 +1708,9 @@ void Paint_messages(void)
 
     static msg_txt_t talk_texts[MAX_MSGS];
     static msg_txt_t game_texts[MAX_MSGS];
-    static bool first_time = true;
     int offset;
 
 bool newcode = true;
-
-    if (first_time) {
-    	for (j = 0 ; j < MAX_MSGS ; ++j) {
-	    strlcpy(talk_texts[i],"\0",MSG_LEN);
-	    strlcpy(game_texts[i],"\0",MSG_LEN);
-    	}
-    	first_time = false;
-    }
-
 
 /* TODO: find a nicer solution for this, its a bit of a hack ;)
  * couldn't think of one that didn't include changing client.h
@@ -2052,7 +2042,7 @@ static const char *get_rgba_color_option(xp_option_t *opt)
 		     get_rgba_color_option, \
 		     XP_OPTFLAG_DEFAULT, \
 		     "The color of " description ".\n")
-    
+
 
 static xp_option_t sdlgui_options[] = {
 
@@ -2109,7 +2099,7 @@ static xp_option_t sdlgui_options[] = {
     COLOR(scoreOwnTeamColorRGBA, "#0000ffff", "my team score"),
     COLOR(scoreEnemyTeamColorRGBA, "#ff0000ff", "enemy team score"),
     COLOR(selectionColorRGBA, "#ff0000ff", "selection"),
-    
+
     XP_INT_OPTION(
         "meterWidth",
 	60, 0, 600,
