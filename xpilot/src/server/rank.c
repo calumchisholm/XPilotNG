@@ -321,21 +321,57 @@ void Rank_get_stats(player_t * pl, char *buf)
 /* Send a line with the ranks of the current players to the game. */
 void Rank_show_ranks(void)
 {
-    char buf[1000] = "";
-    int i;
+    char msg[MSG_LEN];
+    char tmpbuf[MSG_LEN];
+    int i, num = 0, numranks = 0;
+
+    snprintf(msg, sizeof(msg), "Ranks: ");
 
     for (i = 0; i < MAX_SCORES; i++) {
 	rankinfo_t *score = &scores[rank_base[i].ind];
 
-	if (score->pl != NULL) {
-	    char msg[MSG_LEN];
+	if (score->name[0] != '\0')
+	    numranks++;
 
-	    sprintf(msg, "%s [%d], ", score->name, i + 1);
-	    strcat(buf, msg);
+	if (score->pl != NULL) {
+	    if (num > 0)
+		strlcat(msg, ", ", sizeof(msg));
+	    snprintf(tmpbuf, sizeof(tmpbuf), "%s [%d]", score->name, i + 1);
+	    strlcat(msg, tmpbuf, sizeof(msg));
+	    num++;
 	}
     }
 
-    Set_message(buf);
+    strlcat(msg, ".", sizeof(msg));
+    Set_message(msg);
+
+    /* let's not show top rankings if playing teamcup */
+    if (options.teamcup)
+	return;
+
+    /* show a few best ranks */
+    snprintf(msg, sizeof(msg), " < Top %d ranks: ",
+	     numranks < 3 ? numranks : 3);
+    num = 0;
+    for (i = 0; i < MAX_SCORES; i++) {
+	rankinfo_t *score = &scores[rank_base[i].ind];
+
+	if (score->name[0] == '\0')
+	    continue;
+
+	if (num > 0)
+	    strlcat(msg, ", ", sizeof(msg));
+	snprintf(tmpbuf, sizeof(tmpbuf), "%d. %s (%.1f)",
+		 num + 1, score->name, rank_base[i].ratio);
+	strlcat(msg, tmpbuf, sizeof(msg));
+	num++;
+	if (num > 2)
+	    break;
+    }
+
+    strlcat(msg, " >", sizeof(msg));
+    Set_message(msg);
+
     return;
 }
 
