@@ -1936,7 +1936,8 @@ static bool Ball_handler(player_t *pl)
 
 	    dx = WRAP_XBLOCK(dx);
 	    dy = WRAP_YBLOCK(dy);
-	    if (dx < 0 || dx >= world->x || dy < 0 || dy >= world->y) {
+	    if (dx < 0 || dx >= world->bwidth_floor
+		|| dy < 0 || dy >= world->bheight_floor) {
 		clear_path = false;
 		continue;
 	    }
