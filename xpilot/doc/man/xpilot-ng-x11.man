@@ -104,24 +104,6 @@ This should always be 0, other values are for compatibility.
 See also turnSpeed.
 The default value is: 0.000.
 .HP
-\fB\-altPower\fR <value>
-.IP
-Set the ship's alternate engine power.
-See also the keySwapSettings option.
-The default value is: 55.000.
-.HP
-\fB\-altTurnSpeed\fR <value>
-.IP
-Set the ship's alternate turn speed.
-See also the keySwapSettings option.
-The default value is: 16.000.
-.HP
-\fB\-altTurnResistance\fR <value>
-.IP
-Set the ship's alternate turn resistance.
-See also the keySwapSettings option.
-The default value is: 0.000.
-.HP
 \fB\-scaleFactor\fR <value>
 .IP
 Specifies scaling factor for the drawing window.
@@ -372,6 +354,24 @@ The default value is: 0.000.
 .IP
 The number of decimals to use when displaying scores.
 The default value is: 1.
+.HP
+\fB\-altPower\fR <value>
+.IP
+Set the ship's alternate engine power.
+See also the keySwapSettings option.
+The default value is: 55.000.
+.HP
+\fB\-altTurnSpeed\fR <value>
+.IP
+Set the ship's alternate turn speed.
+See also the keySwapSettings option.
+The default value is: 16.000.
+.HP
+\fB\-altTurnResistance\fR <value>
+.IP
+Set the ship's alternate turn resistance.
+See also the keySwapSettings option.
+The default value is: 0.000.
 .HP
 \fB\-markingLights\fR <value>
 .IP
@@ -1012,28 +1012,28 @@ There is no default value for this option.
 \fB\-keyTurnLeft\fR <value>
 .IP
 Turn left (anti-clockwise).
-The default keys are: a Left.
+The default key is: Left.
 .HP
 \fB\-keyTurnRight\fR <value>
 .IP
 Turn right (clockwise).
-The default keys are: s Right.
+The default key is: Right.
 .HP
 \fB\-keyThrust\fR <value>
 .IP
 Thrust.
-The default keys are: Shift_L Up.
+The default key is: Up.
 .HP
 \fB\-keyShield\fR <value>
 .IP
 Raise or toggle the shield.
-The default keys are: Caps_Lock Down.
+The default key is: space.
 .HP
 \fB\-keyFireShot\fR <value>
 .IP
 Fire shot.
 Note that shields must be down to fire.
-The default key is: Return.
+The default keys are: Shift_L Shift_R Control_L Control_R.
 .HP
 \fB\-keyFireMissile\fR <value>
 .IP
@@ -1078,7 +1078,7 @@ There is no default value for this option.
 \fB\-keyLockNextClose\fR <value>
 .IP
 Lock on next closest player.
-There is no default value for this option.
+The default key is: Down.
 .HP
 \fB\-keyLockNext\fR <value>
 .IP
@@ -1093,7 +1093,7 @@ The default key is: Prior.
 \fB\-keyRefuel\fR <value>
 .IP
 Refuel.
-The default keys are: f Control_L Control_R.
+The default key is: f.
 .HP
 \fB\-keyRepair\fR <value>
 .IP
@@ -1146,12 +1146,12 @@ The default keys are: Home h.
 \fB\-keyConnector\fR <value>
 .IP
 Connect to a ball.
-The default keys are: f Control_L Control_R.
+The default key is: f.
 .HP
 \fB\-keyDropBall\fR <value>
 .IP
 Drop a ball.
-The default keys are: d Shift_R.
+The default key is: d.
 .HP
 \fB\-keyTankNext\fR <value>
 .IP
@@ -1271,7 +1271,7 @@ The default key is: j.
 \fB\-keyEmergencyShield\fR <value>
 .IP
 Toggle emergency shield power.
-The default key is: g.
+The default key is: Caps_Lock.
 .HP
 \fB\-keyTractorBeam\fR <value>
 .IP
@@ -1396,7 +1396,7 @@ The default key is: Down.
 \fB\-keyPointerControl\fR <value>
 .IP
 Toggle pointer control.
-The default keys are: space KP_Enter.
+The default keys are: Return KP_Enter.
 .HP
 \fB\-keySendMsg1\fR <value>
 .IP
@@ -1511,7 +1511,7 @@ The default value is: keyThrust.
 \fB\-pointerButton3\fR <value>
 .IP
 The keys to activate when pressing the third mouse button.
-The default value is: keyDropBall.
+The default value is: keyThrust.
 .HP
 \fB\-pointerButton4\fR <value>
 .IP
