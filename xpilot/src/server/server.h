@@ -189,6 +189,7 @@ extern struct options {
     double	objectWallBounceLifeFactor;
     double	wallBounceFuelDrainMult;
     double	wallBounceDestroyItemProb;
+    double	afterburnerPowerMult;
 
     bool	limitedVisibility;
     double	minVisibilityDistance;

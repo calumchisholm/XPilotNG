@@ -134,7 +134,8 @@
 #define MAX_AFTERBURNER	((1<<LG2_MAX_AFTERBURNER)-1)
 /*#define AFTER_BURN_SPARKS(s,n)  (((s)*(n))>>LG2_MAX_AFTERBURNER)*/
 #define AFTER_BURN_POWER_FACTOR(n) \
- (1.0+(n)*((ALT_SPARK_MASS_FACT-1.0)/(MAX_AFTERBURNER+1.0)))
+ (options.afterburnerPowerMult \
+  * (1.0+(n)*((ALT_SPARK_MASS_FACT-1.0)/(MAX_AFTERBURNER+1.0))))
 #define AFTER_BURN_POWER(p,n)   \
  ((p)*AFTER_BURN_POWER_FACTOR(n))
 #define AFTER_BURN_FUEL(f,n)    \

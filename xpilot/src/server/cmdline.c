@@ -903,6 +903,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"afterburnerPowerMult",
+	"afterburnerPower",
+	"1.0",
+	&options.afterburnerPowerMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor for afterburner power.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"wallBounceDestroyItemProb",
 	"wallBounceDestroyItemProb",
 	"0.0",
