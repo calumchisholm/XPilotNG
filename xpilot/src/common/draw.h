@@ -97,8 +97,22 @@
 #define MAX_LIGHT_PTS	    3
 #define MAX_RACK_PTS	    4
 
-/* kps - fix this somehow */
-#include "../server/click.h"
+/* kps - moved here from server/click.h */
+typedef int click_t;
+
+typedef struct {
+    click_t		cx, cy;
+} clpos;
+
+#define CLICK_SHIFT		6
+#define CLICK			(1 << CLICK_SHIFT)
+#define PIXEL_CLICKS		CLICK
+#define BLOCK_CLICKS		(BLOCK_SZ << CLICK_SHIFT)
+#define CLICK_TO_PIXEL(C)	((int)((C) >> CLICK_SHIFT))
+#define CLICK_TO_BLOCK(C)	((int)((C) / (BLOCK_SZ << CLICK_SHIFT)))
+#define CLICK_TO_FLOAT(C)	((double)(C) * (1.0 / CLICK))
+#define PIXEL_TO_CLICK(I)	((click_t)(I) << CLICK_SHIFT)
+#define FLOAT_TO_CLICK(F)	((int)((F) * CLICK))
 
 /* clk used on server, pxl on client */
 typedef union {

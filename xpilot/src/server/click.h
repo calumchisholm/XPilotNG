@@ -24,6 +24,10 @@
 #ifndef CLICK_H
 #define CLICK_H
 
+#ifndef DRAW_H
+# include "draw.h"
+#endif
+
 /*
  * The wall collision detection routines depend on repeatability
  * (getting the same result even after some "neutral" calculations)
@@ -33,15 +37,7 @@
  * However, a resolution of a pixel is a bit rough and ugly.
  * Therefore a fixed point sub-pixel resolution is used called clicks.
  */
-#define CLICK_SHIFT		6
-#define CLICK			(1 << CLICK_SHIFT)
-#define PIXEL_CLICKS		CLICK
-#define BLOCK_CLICKS		(BLOCK_SZ << CLICK_SHIFT)
-#define CLICK_TO_PIXEL(C)	((int)((C) >> CLICK_SHIFT))
-#define CLICK_TO_BLOCK(C)	((int)((C) / (BLOCK_SZ << CLICK_SHIFT)))
-#define CLICK_TO_FLOAT(C)	((double)(C) * (1.0f / CLICK))
-#define PIXEL_TO_CLICK(I)	((click_t)(I) << CLICK_SHIFT)
-#define FLOAT_TO_CLICK(F)	((int)((F) * CLICK))
+
 /* calculate the click coordinate of the center of a block */
 #define BLOCK_CENTER(B)		((int)((B) * BLOCK_CLICKS) + BLOCK_CLICKS / 2)
 
@@ -113,11 +109,13 @@
 	         (X) - World.cheight : \
 	         (X)))
 
+#if 0 /* kps -moved to common/draw.h because shipshapes needs this */
 typedef int click_t;
 
 typedef struct {
     click_t		cx, cy;
 } clpos;
+#endif
 
 typedef struct {
     click_t		cx, cy;
