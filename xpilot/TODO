@@ -30,9 +30,6 @@ Task: Turn the item images on the hud in sdl client the right way
 (upside down atm)
 Developer: ?
 
-Task: Support "internal" edges in SDL client.
-Developer: baron ?
-
 Task: Remove X client radar bug (this appears e.g. on polygon version of
 newdarkhell).
 Developer: ?

@@ -218,11 +218,9 @@ static void CALLBACK vertex_callback(ipos_t *p, irec_t *trec)
     glVertex2i(p->x, p->y);
 }
 
-static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
+static void tessellate_polygon(GLUtriangulatorObj *tess, int ind)
 {
-    int j;
-    int x, y, minx, miny;
-
+    int i, x, y, minx, miny;
     xp_polygon_t polygon;
     polygon_style_t p_style;
     image_t *texture = NULL;
@@ -230,7 +228,7 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
     GLdouble v[3] = { 0, 0, 0 };
     ipos_t p[MAX_VERTICES];
 
-    polygon = polygons[i];
+    polygon = polygons[ind];
     p_style = polygon_styles[polygon.style];
     
     p[0].x = p[0].y = 0;
@@ -238,9 +236,9 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
 	texture = Image_get_texture(p_style.texture);
 	if (texture != NULL) {
 	    x = y = minx = miny = 0;
-	    for (j = 1; j < polygon.num_points; j++) {
-		x += polygon.points[j].x;
-		y += polygon.points[j].y;
+	    for (i = 1; i < polygon.num_points; i++) {
+		x += polygon.points[i].x;
+		y += polygon.points[i].y;
 		if (x < minx) minx = x;
 		if (y < miny) miny = y;
 	    }
@@ -250,27 +248,49 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
 	    trec.h = texture->height;
 	}
     }
-    glNewList(polyListBase + i,  GL_COMPILE);
+    glNewList(polyListBase + ind,  GL_COMPILE);
     gluTessBeginPolygon(tess, texture ? &trec : NULL);
     gluTessVertex(tess, v, &p[0]);
-    for (j = 1; j < polygon.num_points; j++) {
-	v[0] = p[j].x = p[j-1].x + polygon.points[j].x;
-	v[1] = p[j].y = p[j-1].y + polygon.points[j].y;
-	gluTessVertex(tess, v, &p[j]);
+    for (i = 1; i < polygon.num_points; i++) {
+	v[0] = p[i].x = p[i - 1].x + polygon.points[i].x;
+	v[1] = p[i].y = p[i - 1].y + polygon.points[i].y;
+	gluTessVertex(tess, v, &p[i]);
     }
     gluTessEndPolygon(tess);
     glEndList();
 
-    glNewList(polyEdgeListBase + i,  GL_COMPILE);
-    glBegin(GL_LINE_LOOP);
-    x = y = 0;
-    glVertex2i(x, y);
-    for (j = 1; j < polygon.num_points; j++) {
-	x += polygon.points[j].x;
-	y += polygon.points[j].y;
+    glNewList(polyEdgeListBase + ind,  GL_COMPILE);
+    if (polygon.edge_styles == NULL) { /* No special edges */
+	glBegin(GL_LINE_LOOP);
+	x = y = 0;
 	glVertex2i(x, y);
+	for (i = 1; i < polygon.num_points; i++) {
+	    x += polygon.points[i].x;
+	    y += polygon.points[i].y;
+	    glVertex2i(x, y);
+	}
+	glEnd();
     }
-    glEnd();
+    else { 	/* This polygon has special edges */
+	ipos_t pos1, pos2;
+	int sindex;
+
+	glBegin(GL_LINES);
+	pos1.x = 0;
+	pos1.y = 0;
+	for (i = 1; i < polygon.num_points; i++) {
+	    pos2.x = pos1.x + polygon.points[i].x;
+	    pos2.y = pos1.y + polygon.points[i].y;
+	    sindex = polygon.edge_styles[i - 1];
+	    /* Style 0 means internal edges which are never shown */
+	    if (sindex != 0) {
+		glVertex2i(pos1.x, pos1.y);
+		glVertex2i(pos2.x, pos2.y);
+	    }
+	    pos1 = pos2;
+	}
+	glEnd();
+    }
     glEndList();
 }
 
