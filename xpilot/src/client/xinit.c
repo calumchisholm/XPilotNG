@@ -112,6 +112,7 @@ Atom			ProtocolAtom, KillAtom;
 int			buttonColor, windowColor, borderColor;
 int			scoreColor, scoreSelfColor, scoreInactiveColor;
 int			scoreInactiveSelfColor, scoreZeroColor;
+int			scoreObjectColor;
 int			quitting = false;
 int			top_width, top_height, top_x, top_y, top_posmask;
 int			draw_width, draw_height;
@@ -507,8 +508,8 @@ int Init_top(void)
     COLORCHECK(scoreSelfColor, RED);
     COLORCHECK(scoreInactiveColor, 12);
     COLORCHECK(scoreInactiveSelfColor, 12);
-    /* kps - add scoreObjectColor */
     COLORCHECK(scoreZeroColor, 4);
+    COLORCHECK(scoreObjectColor, hudColor);
     COLORCHECK(wallColor, BLUE);
     COLORCHECK(fuelColor, RED);
     COLORCHECK(messagesColor, RED);
@@ -542,7 +543,7 @@ int Init_top(void)
     OPTIONCHECK(hudSize,
 		>=, 6 * MIN_HUD_SIZE, <, MIN_HUD_SIZE, \
 		"%d", MIN_HUD_SIZE);
-    OPTIONCHECK(scoreObjectTime, >,  10.0,    <,  0.0, "%.2f", 2.0);
+    OPTIONCHECK(scoreObjectTime, >,  10.0,    <,  0.0, "%.2f", 3.0);
     OPTIONCHECK(baseWarningType, >,  3,       <,  0,   "%d",   2);
     OPTIONCHECK(charsPerSecond,  >,  255,     <,  10,  "%d",   50);
 #undef OPTIONCHECK

@@ -199,7 +199,7 @@ void Paint_score_objects(void)
 {
     int		i, x, y;
 
-    if (!shipNameColor)
+    if (!scoreObjectColor)
 	return;
 
     /* kps - move SET_FG here ? */
@@ -211,7 +211,7 @@ void Paint_score_objects(void)
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
 		if (wrap(&x, &y)) {
-		    SET_FG(colors[shipNameColor].pixel);
+		    SET_FG(colors[scoreObjectColor].pixel);
 		    x = WINSCALE(X(x)) - sobj->msg_width / 2,
 		    y = WINSCALE(Y(y)) + gameFont->ascent / 2,
 		    rd.drawString(dpy, p_draw, gc,

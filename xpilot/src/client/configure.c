@@ -170,6 +170,7 @@ static int Config_create_scoreSelfColor(int widget_desc, int *height);
 static int Config_create_scoreInactiveColor(int widget_desc, int *height);
 static int Config_create_scoreInactiveSelfColor(int widget_desc, int *height);
 static int Config_create_scoreZeroColor(int widget_desc, int *height);
+static int Config_create_scoreObjectColor(int widget_desc, int *height);
 static int Config_create_scoreObjectTime(int widget_desc, int *height);
 static int Config_create_baseWarningType(int widget_desc, int *height);
 static int Config_create_wallColor(int widget_desc, int *height);
@@ -376,6 +377,7 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_scoreInactiveColor,
     Config_create_scoreInactiveSelfColor,
     Config_create_scoreZeroColor,
+    Config_create_scoreObjectColor,
     Config_create_wallColor,
     Config_create_fuelColor,
     Config_create_decorColor,
@@ -1260,6 +1262,11 @@ static int Config_create_scoreZeroColor(int widget_desc, int *height)
     return CONFIG_CREATE_COLOR(scoreZeroColor);
 }
 
+static int Config_create_scoreObjectColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreObjectColor);
+}
+
 static int Config_create_scoreObjectTime(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
@@ -2031,6 +2038,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "scoreInactiveColor", scoreInactiveColor);
     Config_save_int(fp, "scoreInactiveSelfColor", scoreInactiveSelfColor);
     Config_save_int(fp, "scoreZeroColor", scoreZeroColor);
+    Config_save_int(fp, "scoreObjectColor", scoreObjectColor);
     Config_save_int(fp, "wallColor", wallColor);
     Config_save_int(fp, "fuelColor", fuelColor);
     Config_save_int(fp, "decorColor", decorColor);
