@@ -285,6 +285,8 @@ static void Win_show_error(char *errmsg);
 # define read(x__, y__, z__) recv(x__, y__, z__,0)
 # undef write
 # define write(x__, y__, z__) send(x__, y__, z__,0)
+  /* Windows some more hacks: */
+# define getpid() _getpid()
 #endif
 
 /* Common XPilot header files. */

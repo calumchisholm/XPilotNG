@@ -86,6 +86,7 @@ extern int		NumTransporters;
 extern int		NumAlliances;
 extern int		NumRobots, maxRobots, minRobots;
 extern int		login_in_progress;
+extern char		ShutdownReason[];
 
 extern char		*robotFile;
 extern int		robotsTalk, robotsLeave, robotLeaveLife;

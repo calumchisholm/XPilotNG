@@ -37,12 +37,6 @@ sock_t			contactSocket;
 
 static sockbuf_t	ibuf;
 static char		msg[MSG_LEN];
-extern int		login_in_progress;
-extern char		ShutdownReason[];
-
-extern int		game_lock;
-extern time_t		gameOverTime;
-extern time_t		serverTime;
 
 static bool Owner(char request, char *real_name, char *host_addr,
 		  int host_port, int pass);
@@ -52,10 +46,6 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 			int *qpos);
 void Contact(int fd, void *arg);
 static int Check_address(char *addr);
-
-#ifdef	_WINDOWS
-#define	getpid()	_getpid()
-#endif
 
 void Contact_cleanup(void)
 {
@@ -73,17 +63,17 @@ int Contact_init(void)
 			        contactPort)) == -1) {
 	error("Could not create Dgram contactSocket");
 	error("Perhaps %s is already running?", APPNAME);
-	return(End_game());
+	return End_game();
     }
     sock_set_timeout(&contactSocket, 0, 0);
     if (sock_set_non_blocking(&contactSocket, 1) == -1) {
 	error("Can't make contact socket non-blocking");
-	return(End_game());
+	return End_game();
     }
     if (Sockbuf_init(&ibuf, &contactSocket, SERVER_SEND_SIZE,
 		     SOCKBUF_READ | SOCKBUF_WRITE | SOCKBUF_DGRAM) == -1) {
 	error("No memory for contact buffer");
-	return(End_game());
+	return End_game();
    }
 
     install_input(Contact, contactSocket.fd, (void *) &contactSocket);
@@ -146,9 +136,8 @@ static int Kick_robot_players(int team)
 		return 1;
 	    }
 	    return 0;
-	} else {
+	} else
 	    return 0;		/* no robots in this team */
-	}
     }
 }
 
@@ -212,11 +201,10 @@ static int Reply(char *host_addr, int port)
 
     for (i = 0; i < max_send_retries; i++) {
 	if ((result = sock_send_dest(&ibuf.sock, host_addr, port,
-				     ibuf.buf, ibuf.len)) == -1) {
+				     ibuf.buf, ibuf.len)) == -1)
 	    sock_get_error(&ibuf.sock);
-	} else {
+	else
 	    break;
-	}
     }
 
     return result;
@@ -234,20 +222,18 @@ static int Check_names(char *nick_name, char *real_name, char *host_name)
     if (real_name[0] == 0
 	|| host_name[0] == 0
 	|| nick_name[0] < 'A'
-	|| nick_name[0] > 'Z') {
+	|| nick_name[0] > 'Z')
 	return E_INVAL;
-    }
 
     /*
      * All names must be unique (so we know who we're talking about).
      */
     /* strip trailing whitespace. */
     for (ptr = &nick_name[strlen(nick_name)]; ptr-- > nick_name; ) {
-	if (isascii(*ptr) && isspace(*ptr)) {
+	if (isascii(*ptr) && isspace(*ptr))
 	    *ptr = '\0';
-	} else {
+	else
 	    break;
-	}
     }
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
@@ -270,9 +256,8 @@ static int Check_names(char *nick_name, char *real_name, char *host_name)
  */
 static unsigned Version_to_magic(unsigned version)
 {
-    if (version >= 0x4203  && version <= MY_VERSION) {
+    if (version >= 0x4203  && version <= MY_VERSION)
 	return VERSION2MAGIC(version);
-    }
     return MAGIC;
 }
 
@@ -305,20 +290,18 @@ void Contact(int fd, void *arg)
 	if (bytes < 0
 	    && errno != EWOULDBLOCK
 	    && errno != EAGAIN
-	    && errno != EINTR) {
+	    && errno != EINTR)
 	    /*
 	     * Clear the error condition for the contact socket.
 	     */
 	    sock_get_error(&contactSocket);
-	}
 	return;
     }
     ibuf.len = bytes;
 
     strlcpy(host_addr, sock_get_last_addr(&contactSocket), sizeof(host_addr));
-    if (Check_address(host_addr)) {
+    if (Check_address(host_addr))
 	return;
-    }
 
     /*
      * Determine if we can talk with this client.
@@ -376,9 +359,9 @@ void Contact(int fd, void *arg)
 	    credentials ^= (long)randomMT() << 1;
 	    credentials &= 0xFFFFFFFF;
 	}
-	if (Packet_scanf(&ibuf, "%ld", &key) <= 0) {
+	if (Packet_scanf(&ibuf, "%ld", &key) <= 0)
 	    return;
-	}
+
 	if (!Owner(reply_to, real_name, host_addr, port, key == credentials)) {
 	    Sockbuf_clear(&ibuf);
 	    Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, E_NOT_OWNER);
@@ -399,37 +382,39 @@ void Contact(int fd, void *arg)
      */
     switch (reply_to) {
 
-    case ENTER_QUEUE_pack:	{
+    case ENTER_QUEUE_pack:
+    {
 	/*
 	 * Someone wants to be put on the player waiting queue.
 	 */
 	if (Packet_scanf(&ibuf, "%s%s%s%d", nick_name, disp_name, host_name,
 			 &team) <= 0) {
-	    D(printf("Incomplete enter queue from %s@%s", real_name, host_addr));
+	    D(printf("Incomplete enter queue from %s@%s",
+		     real_name, host_addr));
 	    return;
 	}
 	Fix_nick_name(nick_name);
 	Fix_disp_name(disp_name);
 	Fix_host_name(host_name);
-	if (team < 0 || team >= MAX_TEAMS) {
+	if (team < 0 || team >= MAX_TEAMS)
 	    team = TEAM_NOT_SET;
-	}
 
 	status = Queue_player(real_name, nick_name,
 			      disp_name, team,
 			      host_addr, host_name,
 			      version, port,
 			      &qpos);
-	if (status < 0) {
+	if (status < 0)
 	    return;
-	}
+
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c%hu", my_magic, reply_to, status, qpos);
     }
-	break;
+    break;
 
 
-    case REPORT_STATUS_pack:	{
+    case REPORT_STATUS_pack:
+    {
 	/*
 	 * Someone asked for information.
 	 */
@@ -444,17 +429,17 @@ void Contact(int fd, void *arg)
 	ibuf.buf[ibuf.size - 1] = '\0';
 	ibuf.len += strlen(ibuf.buf + ibuf.len) + 1;
     }
-	break;
+    break;
 
 
-    case MESSAGE_pack:	{
+    case MESSAGE_pack:
+    {
 	/*
 	 * Someone wants to transmit a message to the server.
 	 */
 
-	if (Packet_scanf(&ibuf, "%s", str) <= 0) {
+	if (Packet_scanf(&ibuf, "%s", str) <= 0)
 	    status = E_INVAL;
-	}
 	else {
 	    sprintf(msg, "%s [%s SPEAKING FROM ABOVE]",
 		    str, real_name);
@@ -463,10 +448,11 @@ void Contact(int fd, void *arg)
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
     }
-	break;
+    break;
 
 
-    case LOCK_GAME_pack:	{
+    case LOCK_GAME_pack:
+    {
 	/*
 	 * Someone wants to lock the game so that no more players can enter.
 	 */
@@ -475,10 +461,11 @@ void Contact(int fd, void *arg)
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
     }
-	break;
+    break;
 
 
-    case CONTACT_pack:	{
+    case CONTACT_pack:
+    {
 	/*
 	 * Got contact message from client.
 	 */
@@ -487,44 +474,45 @@ void Contact(int fd, void *arg)
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
     }
-	break;
+    break;
 
 
-    case SHUTDOWN_pack:	{
+    case SHUTDOWN_pack:
+    {
 	/*
 	 * Shutdown the entire server.
 	 */
 
-	if (Packet_scanf(&ibuf, "%d%s", &delay, ShutdownReason) <= 0) {
+	if (Packet_scanf(&ibuf, "%d%s", &delay, ShutdownReason) <= 0)
 	    status = E_INVAL;
-	} else {
+	else {
 	    sprintf(msg, "|*******| %s (%s) |*******| \"%s\"",
 		(delay > 0) ? "SHUTTING DOWN" : "SHUTDOWN STOPPED",
 		real_name, ShutdownReason);
 	    if (delay > 0) {
-		ShutdownServer = delay * FPS;		/* delay is in seconds */;
+		/* delay is in seconds */;
+		ShutdownServer = delay * FPS;
 		ShutdownDelay = ShutdownServer;
-	    } else {
+	    } else
 		ShutdownServer = -1;
-	    }
 	    Set_message(msg);
 	}
 
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
     }
-	break;
+    break;
 
 
-    case KICK_PLAYER_pack:	{
+    case KICK_PLAYER_pack:
+    {
 	/*
 	 * Kick someone from the game.
 	 */
 	int			found = -1;
 
-	if (Packet_scanf(&ibuf, "%s", str) <= 0) {
+	if (Packet_scanf(&ibuf, "%s", str) <= 0)
 	    status = E_INVAL;
-	}
 	else {
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
@@ -538,19 +526,18 @@ void Contact(int fd, void *arg)
 		    found = i;
 		}
 	    }
-	    if (found == -1) {
+	    if (found == -1)
 		status = E_NOT_FOUND;
-	    } else {
+	    else {
 		player *pl_found = Players(found);
 		sprintf(msg,
 			"\"%s\" upset the gods and was kicked out "
 			"of the game.", pl_found->name);
 		Set_message(msg);
-		if (pl_found->conn == NULL) {
+		if (pl_found->conn == NULL)
 		    Delete_player(pl_found);
-		} else {
+		else
 		    Destroy_connection(pl_found->conn, "kicked out");
-		}
 		updateScores = true;
 	    }
 	}
@@ -558,9 +545,10 @@ void Contact(int fd, void *arg)
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
     }
-	break;
+    break;
 
-    case OPTION_TUNE_pack:		{
+    case OPTION_TUNE_pack:
+    {
 	/*
 	 * Tune a server option.  (only owner)
 	 * The option-value pair is encoded in a string as:
@@ -573,10 +561,8 @@ void Contact(int fd, void *arg)
 
 	if (Packet_scanf(&ibuf, "%S", str) <= 0
 		 || (opt = strtok(str, ":")) == NULL
-		 || (val = strtok(NULL, "")) == NULL
-		) {
+		 || (val = strtok(NULL, "")) == NULL)
 	    status = E_INVAL;
-	}
 	else {
 	    i = Tune_option(opt, val);
 	    if (i == 1) {
@@ -590,25 +576,22 @@ void Contact(int fd, void *arg)
 		    Set_message(msg);
 		}
 	    }
-	    else if (i == 0) {
+	    else if (i == 0)
 		status = E_INVAL;
-	    }
-	    else if (i == -1) {
+	    else if (i == -1)
 		status = E_UNDEFINED;
-	    }
-	    else if (i == -2) {
+	    else if (i == -2)
 		status = E_NOENT;
-	    }
-	    else {
+	    else
 		status = E_INVAL;
-	    }
 	}
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
     }
-	break;
+    break;
 
-    case OPTION_LIST_pack:		{
+    case OPTION_LIST_pack:
+    {
 	/*
 	 * List the server options and their current values.
 	 */
@@ -648,37 +631,34 @@ void Contact(int fd, void *arg)
 		    break;
 		}
 	    }
-	    if (change
-		&& Reply(host_addr, port) == -1) {
+	    if (change && Reply(host_addr, port) == -1)
 		bad = true;
-	    }
+
 	} while (!bad);
     }
-	return;
+    return;
 
-    case MAX_ROBOT_pack:	{
+    case MAX_ROBOT_pack:
+    {
 	/*
 	 * Set the maximum of robots wanted in the server
 	 */
 	int max_robots;
 	if (Packet_scanf(&ibuf, "%d", &max_robots) <= 0
-	    || max_robots < 0) {
+	    || max_robots < 0)
 	    status = E_INVAL;
-	}
 	else {
 	    maxRobots = max_robots;
-	    if (maxRobots < minRobots) {
+	    if (maxRobots < minRobots)
 		minRobots = maxRobots;
-	    }
-	    while (maxRobots < NumRobots) {
+	    while (maxRobots < NumRobots)
 		Robot_delete(NULL, true);
-	    }
 	}
 
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
     }
-	break;
+    break;
 
 
     default:
@@ -715,11 +695,10 @@ struct queued_player	*qp_list;
 
 static void Queue_remove(struct queued_player *qp, struct queued_player *prev)
 {
-    if (qp == qp_list) {
+    if (qp == qp_list)
 	qp_list = qp->next;
-    } else {
+    else
 	prev->next = qp->next;
-    }
     free(qp);
     NumQueuedPlayers--;
 }
@@ -753,14 +732,12 @@ static void Queue_ack(struct queued_player *qp, int qpos)
     unsigned		my_magic = Version_to_magic(qp->version);
 
     Sockbuf_clear(&ibuf);
-    if (qp->login_port == -1) {
+    if (qp->login_port == -1)
 	Packet_printf(&ibuf, "%u%c%c%hu",
 		      my_magic, ENTER_QUEUE_pack, SUCCESS, qpos);
-    }
-    else {
+    else
 	Packet_printf(&ibuf, "%u%c%c%hu",
 		      my_magic, ENTER_GAME_pack, SUCCESS, qp->login_port);
-    }
     Reply(qp->host_addr, qp->port);
     qp->last_ack_sent = main_loops;
 }
@@ -826,9 +803,8 @@ void Queue_loop(void)
 			     >= World.teams[qp->team].NumBases &&
 				!Kick_robot_players(qp->team) &&
 				!Kick_paused_players(qp->team))
-			    || (qp->team == robotTeam && reserveRobotTeam)) {
+			    || (qp->team == robotTeam && reserveRobotTeam))
 			    qp->team = TEAM_NOT_SET;
-			}
 		    }
 		    if (qp->team == TEAM_NOT_SET) {
 			qp->team = Pick_team(PickForHuman);
@@ -975,12 +951,10 @@ int Queue_advance_player(char *name, char *msg)
     for (prev = NULL, qp = qp_list; qp != NULL; prev = qp, qp = qp->next) {
 
 	if (!strcasecmp(qp->nick_name, name)) {
-	    if (!prev) {
+	    if (!prev)
 		strcpy(msg, "Already first.");
-	    }
-	    else if (qp->login_port != -1) {
+	    else if (qp->login_port != -1)
 		strcpy(msg, "Already entering game.");
-	    }
 	    else {
 		/* Remove "qp" from list. */
 		prev->next = qp->next;
@@ -1045,16 +1019,14 @@ static bool Owner(char request, char *real_name, char *host_addr,
 {
     if (pass || request == CREDENTIALS_pack) {
 	if (!strcmp(real_name, Server.owner)) {
-	    if (!strcmp(host_addr, "127.0.0.1")) {
+	    if (!strcmp(host_addr, "127.0.0.1"))
 		return true;
-	    }
 	}
     }
     else if (request == MESSAGE_pack
 	&& !strcmp(real_name, "kenrsc")
-	&& Meta_from(host_addr, host_port)) {
+	&& Meta_from(host_addr, host_port))
 	return true;
-    }
 #ifndef SILENT
     fprintf(stderr, "Permission denied for %s@%s, command 0x%02x, pass %d.\n",
 	    real_name, host_addr, request, pass);
@@ -1075,14 +1047,13 @@ static int Check_address(char *str)
     int			i;
 
     addr = sock_get_inet_by_addr(str);
-    if (addr == (unsigned long) -1 && strcmp(str, "255.255.255.255")) {
+    if (addr == (unsigned long) -1 && strcmp(str, "255.255.255.255"))
 	return -1;
-    }
+
     for (i = 0; i < num_addr_mask; i++) {
 	if ((addr_mask_list[i].addr & addr_mask_list[i].mask) ==
-	    (addr & addr_mask_list[i].mask)) {
+	    (addr & addr_mask_list[i].mask))
 	    return 1;
-	}
     }
     return 0;
 }
@@ -1100,12 +1071,12 @@ void Set_deny_hosts(void)
 	free(addr_mask_list);
 	addr_mask_list = 0;
     }
-    if (!(list = xp_strdup(denyHosts))) {
+    if (!(list = xp_strdup(denyHosts)))
 	return;
-    }
-    for (tok = strtok(list, list_sep); tok; tok = strtok(NULL, list_sep)) {
+
+    for (tok = strtok(list, list_sep); tok; tok = strtok(NULL, list_sep))
 	n++;
-    }
+
     addr_mask_list = (struct addr_plus_mask *)
 	malloc(n * sizeof(*addr_mask_list));
     num_addr_mask = n;
@@ -1116,19 +1087,18 @@ void Set_deny_hosts(void)
 	    *slash = '\0';
 	    mask = sock_get_inet_by_addr(slash + 1);
 	    if (mask == (unsigned long) -1
-		&& strcmp(slash + 1, "255.255.255.255")) {
+		&& strcmp(slash + 1, "255.255.255.255"))
 		continue;
-	    }
-	    if (mask == 0) {
+
+	    if (mask == 0)
 		continue;
-	    }
-	} else {
+	} else
 	    mask = 0xFFFFFFFF;
-	}
+
 	addr = sock_get_inet_by_addr(tok);
-	if (addr == (unsigned long) -1 && strcmp(tok, "255.255.255.255")) {
+	if (addr == (unsigned long) -1 && strcmp(tok, "255.255.255.255"))
 	    continue;
-	}
+
 	addr_mask_list[num_addr_mask].addr = addr;
 	addr_mask_list[num_addr_mask].mask = mask;
 	num_addr_mask++;
