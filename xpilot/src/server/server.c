@@ -38,7 +38,6 @@ int			NumObservers = 0;
 int			NumOperators = 0;
 int			observerStart;
 player			**PlayersArray;
-int			GetIndArray[NUM_IDS + MAX_OBSERVERS + 1];
 server			Server;
 char			*serverAddr;
 int			ShutdownServer = -1;

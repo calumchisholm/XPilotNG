@@ -409,23 +409,8 @@ void Destroy_connection(connection_t *connp, const char *reason)
 	pl->conn = NULL;
 	if (pl->rectype != 2)
 	    Delete_player(pl);
-	else {
-	    /* kps - write a Delete_observer() function */
-	    int i, ind = GetInd(id);
-
-	    NumObservers--;
-	    pl = Players(observerStart + NumObservers); /* Swap leaver last */
-	    PlayersArray[observerStart + NumObservers] = Players(ind);
-	    PlayersArray[ind] = pl;
-	    pl = Players(observerStart + NumObservers);
-
-	    GetIndArray[Players(ind)->id] = ind;
-	    GetIndArray[pl->id] = observerStart + NumObservers;
-
-	    Free_ship_shape(pl->ship);
-	    for (i = NumObservers - 1; i >= 0; i--)
-		Send_leave(Players(i + observerStart)->conn, id);
-	}
+	else
+	    Delete_spectator(pl);
     }
     if (connp->real != NULL)
 	free(connp->real);
@@ -1141,13 +1126,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	NumPlayers++;
 	request_ID();
     } else {
-	pl->home_base = NULL;
-	pl->team = 0;
 	pl->id = NUM_IDS + 1 + connp->ind - observerStart;
-	GetIndArray[pl->id] = observerStart + NumObservers;
-	pl->score = -6666;
-	pl->mychar = 'S';
-	NumObservers++;
+	Add_spectator(pl);
     }
 
     connp->id = pl->id;

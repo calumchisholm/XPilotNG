@@ -29,6 +29,7 @@ char player_version[] = VERSION;
 bool		updateScores = true;
 
 static int	playerArrayNumber;
+static int	GetIndArray[NUM_IDS + MAX_OBSERVERS + 1];
 
 /*
  * Get player with index 'ind' from Players array.
@@ -1923,6 +1924,34 @@ void Delete_player(player *pl)
 	Send_leave(Players(i + observerStart)->conn, id);
 
     release_ID(id);
+}
+
+void Add_spectator(player *pl)
+{
+    pl->home_base = NULL;
+    pl->team = 0;
+    GetIndArray[pl->id] = observerStart + NumObservers;
+    pl->score = -6666;
+    pl->mychar = 'S';
+    NumObservers++;
+}
+
+void Delete_spectator(player *pl)
+{
+    int i, ind = GetInd(pl->id);
+
+    NumObservers--;
+    pl = Players(observerStart + NumObservers); /* Swap leaver last */
+    PlayersArray[observerStart + NumObservers] = Players(ind);
+    PlayersArray[ind] = pl;
+    pl = Players(observerStart + NumObservers);
+
+    GetIndArray[Players(ind)->id] = ind;
+    GetIndArray[pl->id] = observerStart + NumObservers;
+
+    Free_ship_shape(pl->ship);
+    for (i = NumObservers - 1; i >= 0; i--)
+	Send_leave(Players(i + observerStart)->conn, pl->id);
 }
 
 void Detach_ball(player *pl, ballobject *ball)
