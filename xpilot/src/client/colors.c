@@ -633,14 +633,12 @@ static int Colors_init_bitmap_colors(void)
 void Colors_init_style_colors(void)
 {
     int i;
-    if (fullColor && RGB) {
-        for (i = 0; i < num_polygon_styles; i++)
-            polygon_styles[i].color =
-                RGB2COLOR(polygon_styles[i].rgb);
-        for (i = 0; i < num_edge_styles; i++)
-            edge_styles[i].color =
-                RGB2COLOR(edge_styles[i].rgb);
-    }
+    for (i = 0; i < num_polygon_styles; i++)
+	polygon_styles[i].color = (fullColor && RGB) ?
+	    RGB2COLOR(polygon_styles[i].rgb) : wallColor;
+    for (i = 0; i < num_edge_styles; i++)
+	edge_styles[i].color = (fullColor && RGB) ?
+	    RGB2COLOR(edge_styles[i].rgb) : wallColor;
 }
 
 

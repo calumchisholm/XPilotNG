@@ -166,7 +166,7 @@ typedef struct {
     int width;			/* Line width, -1 means no line */
     unsigned long color;	/* Line color */
     int rgb;			/* RGB values corresponding to color */
-    int style;			/* LineSolid, LineOnOffDash, LineDoubleDash */
+    int style;			/* 0=LineSolid, 1=LineOnOffDash, 2=LineDoubleDash */
 } edge_style_t;
 
 typedef struct {

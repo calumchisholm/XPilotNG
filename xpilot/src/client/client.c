@@ -761,7 +761,246 @@ void Map_blue(int startx, int starty, int width, int height)
     }
 }
 
-static int Map_init(void)
+/* Get signed short and advance ptr */
+static int get_short(char **ptr)
+{
+    *ptr += 2;
+    return ((signed char) *(*ptr - 2) << 8) + (unsigned char) (*(*ptr - 1));
+}
+
+/* Unsigned version */
+static unsigned int get_ushort(char **ptr)
+{
+    *ptr += 2;
+    return ((unsigned char) *(*ptr - 2) << 8) + (unsigned char) *(*ptr - 1);
+}
+
+static int get_32bit(char **ptr)
+{
+    int res;
+
+    res = get_ushort(ptr) << 16;
+    return res + get_ushort(ptr);
+}
+
+static void parse_styles(char **callptr)
+{
+    int i, num_bmaps;
+    char *ptr;
+
+    ptr = *callptr;
+    num_polygon_styles = *ptr++;
+    num_edge_styles = *ptr++;
+    num_bmaps = *ptr++;
+
+    polygon_styles =
+	malloc(MAX(1, num_polygon_styles) * sizeof(polygon_style_t));
+    if (polygon_styles == NULL) {
+	error("no memory for polygon styles");
+	exit(1);
+    }
+
+    edge_styles = malloc(MAX(1, num_edge_styles) * sizeof(edge_style_t));
+    if (edge_styles == NULL) {
+	error("no memory for edge styles");
+	exit(1);
+    }
+
+    for (i = 0; i < num_polygon_styles; i++) {
+	polygon_styles[i].rgb = get_32bit(&ptr);
+	polygon_styles[i].texture = NUM_BITMAPS + (*ptr++);
+	polygon_styles[i].def_edge_style = *ptr++;
+	polygon_styles[i].flags = *ptr++;
+    }
+
+    if (num_polygon_styles == 0) {
+	/* default polygon style */
+	polygon_styles[0].flags = 0;
+	polygon_styles[0].def_edge_style = 0;
+	num_polygon_styles = 1;
+    }
+
+    for (i = 0; i < num_edge_styles; i++) {
+	edge_styles[i].width = *ptr++;
+	edge_styles[i].rgb = get_32bit(&ptr);
+	edge_styles[i].style =
+	    (*ptr == 1) ? 1 :
+	    (*ptr == 2) ? 2 : 0;
+	ptr++;
+    }
+
+    for (i = 0; i < num_bmaps; i++) {
+	char fname[30];
+	int flags;
+	strncpy(fname, ptr, 30 - 1);
+	fname[30 - 1] = 0;
+	ptr += strlen(fname) + 1;
+	flags = *ptr++;
+	Bitmap_add(fname, 1, flags);
+    }
+    *callptr = ptr;
+}
+
+static int init_polymap(void)
+{
+    int i, j, startx, starty, polyc, ecount, edgechange, current_estyle;
+    int dx, dy, cx, cy, pc;
+    int *styles;
+    xp_polygon_t poly;
+    ipos *points, min, max;
+    char *ptr, *edgeptr;
+
+    oldServer = 0;
+    ptr = (char *)Setup->map_data;
+
+    parse_styles(&ptr);
+
+    polyc = get_ushort(&ptr);
+
+    for (i = 0; i < polyc; i++) {
+	poly.style = *ptr++;
+	current_estyle = polygon_styles[poly.style].def_edge_style;
+	dx = 0;
+	dy = 0;
+	ecount = get_ushort(&ptr);
+	edgeptr = ptr;
+	if (ecount)
+	    edgechange = get_ushort(&edgeptr);
+	else
+	    edgechange = INT_MAX;
+	ptr += ecount * 2;
+	pc = get_ushort(&ptr);
+	if ((points = malloc(pc * sizeof(ipos))) == NULL) {
+	    error("no memory for points");
+	    exit(1);
+	}
+	if (ecount) {
+	    if ((styles = malloc(pc * sizeof(int))) == NULL) {
+		error("no memory for special edges");
+		exit(1);
+	    }
+	} else
+	    styles = NULL;
+	startx = get_ushort(&ptr);
+	starty = get_ushort(&ptr);
+	points[0].x = cx = min.x = max.x = startx;
+	points[0].y = cy = min.y = max.y = starty;
+
+	if (!edgechange) {
+	    current_estyle = get_ushort(&edgeptr);
+	    ecount--;
+	    if (ecount)
+		edgechange = get_ushort(&edgeptr);
+	}
+	if (styles)
+	    styles[0] = current_estyle;
+
+	for (j = 1; j < pc; j++) {
+	    dx = get_short(&ptr);
+	    dy = get_short(&ptr);
+	    cx += dx;
+	    cy += dy;
+	    if (min.x > cx)
+		min.x = cx;
+	    if (min.y > cy)
+		min.y = cy;
+	    if (max.x < cx)
+		max.x = cx;
+	    if (max.y < cy)
+		max.y = cy;
+	    points[j].x = dx;
+	    points[j].y = dy;
+
+	    if (edgechange == j) {
+		current_estyle = get_ushort(&edgeptr);
+		ecount--;
+		if (ecount)
+		    edgechange = get_ushort(&edgeptr);
+	    }
+	    if (styles)
+		styles[j] = current_estyle;
+	}
+	poly.points = points;
+	poly.edge_styles = styles;
+	poly.num_points = pc;
+	poly.bounds.x = min.x;
+	poly.bounds.y = min.y;
+	poly.bounds.w = max.x - min.x;
+	poly.bounds.h = max.y - min.y;
+	STORE(xp_polygon_t, polygons, num_polygons, max_polygons, poly);
+    }
+    num_bases = *ptr++;
+    bases = (homebase_t *) malloc(num_bases * sizeof(homebase_t));
+    if (bases == NULL) {
+	error("No memory for Map bases (%d)", num_bases);
+	exit(1);
+    }
+    for (i = 0; i < num_bases; i++) {
+	/* base.pos is not used */
+	bases[i].id = -1;
+	bases[i].team = *ptr++;
+	cx = get_ushort(&ptr);
+	cy = get_ushort(&ptr);
+	bases[i].bounds.x = cx - BLOCK_SZ / 2;
+	bases[i].bounds.y = cy - BLOCK_SZ / 2;
+	bases[i].bounds.w = BLOCK_SZ;
+	bases[i].bounds.h = BLOCK_SZ;
+	if (*ptr < 16)
+	    bases[i].type = SETUP_BASE_RIGHT;
+	else if (*ptr < 48)
+	    bases[i].type = SETUP_BASE_UP;
+	else if (*ptr < 80)
+	    bases[i].type = SETUP_BASE_LEFT;
+	else if (*ptr < 112)
+	    bases[i].type = SETUP_BASE_DOWN;
+	else
+	    bases[i].type = SETUP_BASE_RIGHT;
+	bases[i].deathtime = -10000; /* kps hack */
+	ptr++;
+    }
+    num_fuels = get_ushort(&ptr);
+    if (num_fuels != 0) {
+	fuels = (fuelstation_t *) malloc(num_fuels * sizeof(fuelstation_t));
+	if (fuels == NULL) {
+	    error("No memory for Map fuels (%d)", num_fuels);
+	    exit(1);
+	}
+    }
+    for (i = 0; i < num_fuels; i++) {
+	cx = get_ushort(&ptr);
+	cy = get_ushort(&ptr);
+	fuels[i].fuel = MAX_STATION_FUEL;
+	fuels[i].bounds.x = cx - BLOCK_SZ / 2;
+	fuels[i].bounds.y = cy - BLOCK_SZ / 2;
+	fuels[i].bounds.w = BLOCK_SZ;
+	fuels[i].bounds.h = BLOCK_SZ;
+    }
+    num_checks = *ptr++;
+    if (num_checks != 0) {
+
+	checks = malloc(num_checks * sizeof(checkpoint_t));
+	if (checks == NULL) {
+	    error("No memory for checkpoints (%d)", num_checks);
+	    exit(1);
+	}
+    }
+    for (i = 0; i < num_checks; i++) {
+	cx = get_ushort(&ptr);
+	cy = get_ushort(&ptr);
+	checks[i].bounds.x = cx - BLOCK_SZ / 2;
+	checks[i].bounds.y = cy - BLOCK_SZ / 2;
+	checks[i].bounds.w = BLOCK_SZ;
+	checks[i].bounds.h = BLOCK_SZ;
+    }
+
+    if (Setup->data_url[0])
+	Mapdata_setup(Setup->data_url);
+    Colors_init_style_colors();    
+
+    return 0;
+}
+
+static int init_blockmap(void)
 {
     int			i,
 			max,
@@ -772,10 +1011,12 @@ static int Map_init(void)
     num_bases = 0;
     num_cannons = 0;
     num_targets = 0;
+    num_checks = 0;
     fuels = NULL;
     bases = NULL;
     cannons = NULL;
     targets = NULL;
+    checks = NULL;
     memset(types, 0, sizeof types);
     types[SETUP_FUEL] = 1;
     types[SETUP_CANNON_UP] = 2;
@@ -786,6 +1027,8 @@ static int Map_init(void)
 	types[i] = 3;
     for (i = SETUP_BASE_LOWEST; i <= SETUP_BASE_HIGHEST; i++)
 	types[i] = 4;
+    for (i = 0; i < OLD_MAX_CHECKS; i++)
+	types[SETUP_CHECK + i] = 5;
     max = Setup->x * Setup->y;
     for (i = 0; i < max; i++) {
 	switch (types[Setup->map_data[i]]) {
@@ -793,6 +1036,7 @@ static int Map_init(void)
 	case 2: num_cannons++; break;
 	case 3: num_targets++; break;
 	case 4: num_bases++; break;
+	case 5: num_checks++; break;
 	default: break;
 	}
     }
@@ -828,8 +1072,14 @@ static int Map_init(void)
 	}
 	num_cannons = 0;
     }
-    for (i = 0; i < num_checks; i++)
-	types[SETUP_CHECK + i] = 5;
+    if (num_checks != 0) {
+	checks = (checkpoint_t *)malloc(num_checks * sizeof(checkpoint_t));
+	if (checks == NULL) {
+	    error("No memory for Map checks (%d)", num_checks);
+	    return -1;
+	}
+	num_checks = 0;
+    }
 
     for (i = 0; i < max; i++) {
 	type = Setup->map_data[i];
@@ -862,6 +1112,7 @@ static int Map_init(void)
 	    break;
 	case 5:
 	    checks[type - SETUP_CHECK].pos = i;
+	    num_checks++;
 	    Setup->map_data[i] = SETUP_CHECK;
 	    break;
 	default:
@@ -869,6 +1120,11 @@ static int Map_init(void)
 	}
     }
     return 0;
+}
+
+Map_init(void)
+{
+    return oldServer ? init_blockmap() : init_polymap();
 }
 
 static int Map_cleanup(void)
@@ -1651,9 +1907,9 @@ int Client_init(char *server, unsigned server_version)
 
 int Client_setup(void)
 {
+    if (Map_init() == -1) return -1;
+
     if (oldServer) {
-	if (Map_init() == -1)
-	    return -1;
 	Map_dots();
 	Map_restore(0, 0, Setup->x, Setup->y);
 	Map_blue(0, 0, Setup->x, Setup->y);
