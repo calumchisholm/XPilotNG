@@ -90,7 +90,7 @@ DEFINES = \
        $(DEFS_ERASE) $(DEFS_SPARC_CMAP_HACK) $(DEFS_MBX) $(DEFS_DBE) \
        $(DEFS_JOYSTICK) $(AUDIODEF) $(DEFS_SCALING) \
        $(DEFS_OTHER) $(DEFS_DEBUG)
-INCLUDES = $(AUDIOINC) -I$(COMMON) -I../../lib/
+INCLUDES = $(AUDIOINC) -I$(COMMON) -I../../lib/ $(ZLIBINC)
 LOCAL_LDFLAGS = $(ZLIBD)
 
 # keep this variable consistent with its counterpart in ../Makefile.std
