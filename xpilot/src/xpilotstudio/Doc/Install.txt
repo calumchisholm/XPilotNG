@@ -1,27 +1,4 @@
-XpilotStudio is OS independent! This means it should run on either Windows or Unix.
-No guarantee's of anykind are made about this product however.
+To Compile and Install XpilotStudio:For Windows 9*/NT/2000:**The following instructions assume you have Microsoft Visual C++ 5.0 or laterinstalled on your system, and configured in the standard manner.1. Change directory to the "windows" subdirectory, of the XpilotStudio Source code.2. Open the XpilotStudio.dsw file in MS V C++. 3. Under the Build Menu, set the active configuration to "Release"
 
-To Compile and Install XpilotStudio:
-
-For Windows 9*/NT/2000:
-**The following instructions assume you have Microsoft Visual C++ 5.0 or later
-installed on your system, and configured in the standard manner.
-1. Open a MS-DOS command prompt.
-
-1. Change directory to the "windows" subdirectory, of the XpilotStudio Source code.
-
-2. nmake -f win_xpilotstudio.mak
-
-4. In the current directory, an new folder called "XpilotStudio" will have been created.
-Copy this folder to the location of your Xpilot Installation. If you don't have Xpilot
-installed...see www.xpilot.org for details on obtaining a copy of the source.
-
-6. Create any Desktop Icon's or Shortcuts you desire...at some point an installation
-program will probably be developed.
-
-7. Double click the file XpilotStudio.exe to start the editor.
-
-For *NIX:
-
-
-
+4. Copy the file called "XpilotStudio.exe" from the release directory to the location
+of your Xpilot Installation. If you don't have Xpilotinstalled...see www.xpilot.org for details on obtaining a copy of the source.6. Create any Desktop Icon's or Shortcuts you desire...at some point an installationprogram will probably be developed.7. Double click the file XpilotStudio.exe to start the editor.For *NIX:
