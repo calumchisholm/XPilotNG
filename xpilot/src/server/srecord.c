@@ -42,7 +42,8 @@ int   rplayback;
 int   recOpt;
 
 enum types {CHAR, INT, SHORT, ERRNO };
-struct buf {
+#define BUF_INITIALIZER(p,t,s,tr,st,nr) { p, t, s, tr, st, nr }
+static struct buf {
     void ** const curp;
     const enum types type;
     const int size;
@@ -51,14 +52,14 @@ struct buf {
     int num_read;
 } bufs[] =
 {
-    {(void **)&playback_ints, INT, 5000, 4000},
-    {(void **)&playback_errnos, ERRNO, 5000, 4000},
-    {(void **)&playback_shorts, SHORT, 25000, 23000},
-    {(void **)&playback_data, CHAR, 200000, 100000},
-    {(void **)&playback_sched, CHAR, 50000, 40000},
-    {(void **)&playback_ei, INT, 2000, 1000},
-    {(void **)&playback_es, CHAR, 5000, 4000},
-    {(void **)&playback_opttout, INT, 2000, 1000}
+    BUF_INITIALIZER((void **)&playback_ints, INT, 5000, 4000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_errnos, ERRNO, 5000, 4000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_shorts, SHORT, 25000, 23000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_data, CHAR, 200000, 100000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_sched, CHAR, 50000, 40000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_ei, INT, 2000, 1000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_es, CHAR, 5000, 4000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_opttout, INT, 2000, 100, NULL, 0)
 };
 
 const int num_types = sizeof(bufs) / sizeof(struct buf);
