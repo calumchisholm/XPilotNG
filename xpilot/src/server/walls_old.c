@@ -1561,7 +1561,7 @@ void Move_object_old(object *obj)
 
     Object_position_remember(obj);
 
-    dist = walldist[obj->pos.bx][obj->pos.by];
+    dist = walldist[OBJ_X_IN_BLOCKS(obj)][OBJ_Y_IN_BLOCKS(obj)];
     if (dist > 2) {
 	int max = ((dist - 2) * BLOCK_SZ) >> 1;
 	DFLOAT dcx = obj->vel.x * timeStep;
@@ -1748,7 +1748,7 @@ void Move_player_old(int ind)
 	fric = friction;
     }
     else {
-	switch (World.block[pl->pos.bx][pl->pos.by]) {
+	switch (World.block[OBJ_X_IN_BLOCKS(pl)][OBJ_Y_IN_BLOCKS(pl)]) {
 	case FRICTION:
 	    fric = blockFriction;
 	    break;
@@ -1766,7 +1766,7 @@ void Move_player_old(int ind)
 
     Player_position_remember(pl);
 
-    dist = walldist[pl->pos.bx][pl->pos.by];
+    dist = walldist[OBJ_X_IN_BLOCKS(pl)][OBJ_Y_IN_BLOCKS(pl)];
     if (dist > 3) {
 	int max = ((dist - 3) * BLOCK_SZ) >> 1;
 	if (max >= pl->velocity) {
@@ -2121,7 +2121,7 @@ void Turn_player_old(int ind)
 	return;
     }
 
-    if (walldist[pl->pos.bx][pl->pos.by] > 2) {
+    if (walldist[OBJ_X_IN_BLOCKS(pl)][OBJ_Y_IN_BLOCKS(pl)] > 2) {
 	pl->dir = new_dir;
 	return;
     }

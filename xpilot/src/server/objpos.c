@@ -46,7 +46,7 @@ char objpos_version[] = VERSION;
 
 void Object_position_set_clicks(object *obj, int cx, int cy)
 {
-    struct _objposition		*pos = (struct _objposition *)&obj->pos;
+    clpos		*pos = (clpos *)&obj->pos;
 
     if (!INSIDE_MAP(cx, cy)) {
 	if (0) {
@@ -63,11 +63,7 @@ void Object_position_set_clicks(object *obj, int cx, int cy)
     }
 
     pos->cx = cx;
-    pos->px = CLICK_TO_PIXEL(cx);
-    pos->bx = CLICK_TO_BLOCK(cx);
     pos->cy = cy;
-    pos->py = CLICK_TO_PIXEL(cy);
-    pos->by = CLICK_TO_BLOCK(cy);
 }
 
 void Object_position_init_clicks(object *obj, int cx, int cy)
@@ -84,7 +80,7 @@ void Player_position_restore(player *pl)
 
 void Player_position_set_clicks(player *pl, int cx, int cy)
 {
-    struct _objposition		*pos = (struct _objposition *)&pl->pos;
+    clpos		*pos = (clpos *)&pl->pos;
 
     if (!INSIDE_MAP(cx, cy)) {
 	if (0) {
@@ -100,11 +96,7 @@ void Player_position_set_clicks(player *pl, int cx, int cy)
     }
 
     pos->cx = cx;
-    pos->px = CLICK_TO_PIXEL(cx);
-    pos->bx = CLICK_TO_BLOCK(cx);
     pos->cy = cy;
-    pos->py = CLICK_TO_PIXEL(cy);
-    pos->by = CLICK_TO_BLOCK(cy);
 }
 
 void Player_position_init_clicks(player *pl, int cx, int cy)
@@ -116,14 +108,13 @@ void Player_position_init_clicks(player *pl, int cx, int cy)
 
 void Player_position_limit(player *pl)
 {
-    int			x = pl->pos.px, ox = x;
-    int			y = pl->pos.py, oy = y;
+    int			cx = pl->pos.cx, ox = cx;
+    int			cy = pl->pos.cy, oy = cy;
 
-    LIMIT(x, 0, World.width - 1);
-    LIMIT(y, 0, World.height - 1);
-    if (x != ox || y != oy) {
-	Player_position_set_clicks(pl, PIXEL_TO_CLICK(x), PIXEL_TO_CLICK(y));
-    }
+    LIMIT(cx, 0, World.cwidth - 1);
+    LIMIT(cy, 0, World.cheight - 1);
+    if (cx != ox || cy != oy)
+	Player_position_set_clicks(pl, cx, cy);
 }
 
 void Player_position_debug(player *pl, const char *msg)
@@ -135,26 +126,31 @@ void Player_position_debug(player *pl, const char *msg)
     if (msg) printf("(%s)", msg);
     printf("\n");
     printf("\tB %d, %d, P %d, %d, C %d, %d, O %d, %d\n",
-	   pl->pos.bx,
-	   pl->pos.by,
-	   pl->pos.px,
-	   pl->pos.py,
+	   CLICK_TO_BLOCK(pl->pos.cx),
+	   CLICK_TO_BLOCK(pl->pos.cy),
+	   CLICK_TO_PIXEL(pl->pos.cx),
+	   CLICK_TO_PIXEL(pl->pos.cy),
 	   pl->pos.cx,
 	   pl->pos.cy,
 	   pl->prevpos.cx,
 	   pl->prevpos.cy);
     for (i = 0; i < pl->ship->num_points; i++) {
 	clpos pts = Ship_get_point_clpos(pl->ship, i, pl->dir);
+	clpos pt;
+
+	pt.cx = pl->pos.cx + pts.cx;
+	pt.cy = pl->pos.cy + pts.cy;
+
 	printf("\t%2d\tB %d, %d, P %d, %d, C %d, %d, O %d, %d\n",
-		i,
-	       (int)((pl->pos.bx + CLICK_TO_BLOCK(pts.cx))),
-	       (int)((pl->pos.by + CLICK_TO_BLOCK(pts.cy))),
-	       (int)(pl->pos.px + CLICK_TO_PIXEL(pts.cx)),
-	       (int)(pl->pos.py + CLICK_TO_PIXEL(pts.cy)),
-	       (int)(pl->pos.cx + pts.cx),
-	       (int)(pl->pos.cy + pts.cy),
-	       (int)(pl->prevpos.cx + pts.cx),
-	       (int)(pl->prevpos.cy + pts.cy));
+	       i,
+	       CLICK_TO_BLOCK(pt.cx),
+	       CLICK_TO_BLOCK(pt.cy),
+	       CLICK_TO_PIXEL(pt.cx),
+	       CLICK_TO_PIXEL(pt.cy),
+	       pt.cx),
+	       pt.cy),
+	       pl->prevpos.cx + pts.cx,
+	       pl->prevpos.cy + pts.cy);
     }
 #endif
 }

@@ -242,8 +242,8 @@ static int Cannon_in_danger(int ind)
 	    && shot->team == c->team)
 	    continue;
 
-	npx = shot->pos.px;
-	npy = shot->pos.py;
+	npx = CLICK_TO_PIXEL(shot->pos.cx);
+	npy = CLICK_TO_PIXEL(shot->pos.cy);
 	if (cannonSmartness > 1) {
 	    npx += shot->vel.x;
 	    npy += shot->vel.y;

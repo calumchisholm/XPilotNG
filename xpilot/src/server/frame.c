@@ -429,8 +429,9 @@ static int Frame_status(int conn, int ind)
 				Players[lock_ind]->pos.cy))
 	    && pl->lock.distance != 0) {
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
-	    lock_dir = (int)Wrap_findDir((int)(Players[lock_ind]->pos.px - pl->pos.px),
-				    (int)(Players[lock_ind]->pos.py - pl->pos.py));
+	    lock_dir
+		= (int)Wrap_cfindDir(Players[lock_ind]->pos.cx - pl->pos.cx,
+				     Players[lock_ind]->pos.cy - pl->pos.cy);
 	    lock_dist = (int)pl->lock.distance;
 	}
     }

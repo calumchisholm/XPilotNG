@@ -174,17 +174,11 @@ typedef struct {
 
 /*
  * Object position is non-modifiable, except at one place.
- *
- * NB: position in pixels used to be a float.
  */
-typedef const struct _objposition objposition;
-struct _objposition {
-    int		cx, cy;			/* object position in clicks. */
-    int		px, py;			/* object position in pixels. */
-    int		bx, by;			/* object position in blocks. */
-};
-#define OBJ_X_IN_BLOCKS(obj)	((obj)->pos.bx)
-#define OBJ_Y_IN_BLOCKS(obj)	((obj)->pos.by)
+typedef const clpos objposition;
+
+#define OBJ_X_IN_BLOCKS(obj)	CLICK_TO_BLOCK((obj)->pos.cx)
+#define OBJ_Y_IN_BLOCKS(obj)	CLICK_TO_BLOCK((obj)->pos.cy)
 
 
 /*
