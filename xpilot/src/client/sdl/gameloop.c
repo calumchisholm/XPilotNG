@@ -22,7 +22,18 @@
 
 extern int Process_event(SDL_Event *evt);
 
+#ifndef __GNUC__
+#define EPOCHFILETIME (116444736000000000i64)
+#else
+#define EPOCHFILETIME (116444736000000000LL)
+#endif
+
 #ifndef HAVE_GETTIMEOFDAY
+struct timezone {
+    int tz_minuteswest; /* minutes W of Greenwich */
+    int tz_dsttime;     /* type of dst correction */
+};
+
 __inline int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
     FILETIME        ft;
