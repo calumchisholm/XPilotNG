@@ -25,7 +25,7 @@
 
 char event_version[] = VERSION;
 
-#define MAX_BUTTON_DEFS		3
+#define MAX_BUTTON_DEFS		10
 
 static BITV_DECL(keyv, NUM_KEYS);
 
