@@ -735,6 +735,10 @@ bool Xpilotrc_write(const char *path)
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
 
+	/* Let's not save these */
+	if (Option_get_type(opt) == xp_noarg_option)
+	    continue;
+
 	Xpilotrc_write_resource(fp,
 				Option_get_name(opt),
 				Option_value_to_string(opt));
@@ -749,7 +753,7 @@ bool Xpilotrc_write(const char *path)
 void Parse_options(int *argcp, char **argvp)
 {
     int arg_ind, num_remaining_args, num_servers = 0, i;
-    char *filename;
+    const char *filename;
 
     filename = Xpilotrc_get_filename();
     Xpilotrc_read(filename);
