@@ -98,6 +98,7 @@ typedef struct base {
     int		dir;
     int		ind;
     int		team;
+    int		initial_items[NUM_ITEMS];
 } base_t;
 
 typedef struct cannon {

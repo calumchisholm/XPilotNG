@@ -67,7 +67,7 @@ void Pick_startpos(player_t *pl)
     world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
-	pl->home_base = Base_by_index(world, 0);
+	pl->home_base = NULL;
 	return;
     }
 
@@ -198,6 +198,7 @@ void Go_home(player_t *pl)
     memset(pl->prev_keyv, 0, sizeof(pl->prev_keyv));
     Emergency_shield(pl, false);
     Player_used_kill(pl);
+    Player_init_items(pl);
 
     if (options.playerStartsShielded) {
 	SET_BIT(pl->used, HAS_SHIELD);
@@ -222,6 +223,12 @@ void Go_home(player_t *pl)
 void Base_set_option(base_t *base, const char *name, const char *value)
 {
     warn("setting base %p option %s to value %s", base, name, value);
+
+    if (!strcasecmp(name, "initialafterburners"))
+	base->initial_items[ITEM_AFTERBURNER] = atoi(value);
+    if (!strcasecmp(name, "initiallasers"))
+	base->initial_items[ITEM_LASER] = atoi(value);
+
 }
 
 /*
@@ -356,11 +363,10 @@ void Player_set_mass(player_t *pl)
  * Give player the initial number of tanks and amount of fuel.
  * Upto the maximum allowed.
  */
-static void Player_init_fuel(player_t *pl, double total_fuel)
+static void Player_init_fuel(player_t *pl, int num_tanks, double total_fuel)
 {
     double fuel = total_fuel;
     int i;
-    world_t *world = pl->world;
 
     pl->fuel.num_tanks  = 0;
     pl->fuel.current    = 0;
@@ -372,10 +378,44 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
 
     fuel -= pl->fuel.sum;
 
-    for (i = 1; i <= world->items[ITEM_TANK].initial; i++) {
+    for (i = 1; i <= num_tanks; i++) {
 	Player_add_tank(pl, fuel);
 	fuel -= pl->fuel.tank[i];
     }
+}
+
+/*
+ * Set initial items for a player.
+ * Number of initial items can depend on which base the player starts from.
+ */
+void Player_init_items(player_t *pl)
+{
+    int i, num_tanks;
+    double total_fuel;
+    world_t *world = pl->world;
+    base_t *base = pl->home_base;
+
+    for (i = 0; i < NUM_ITEMS; i++) {
+	if (BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+	    continue;
+
+	if (base && base->initial_items[i] >= 0)
+	    pl->item[i] = base->initial_items[i];
+	else
+	    pl->item[i] = world->items[i].initial;
+    }
+
+    if (base && base->initial_items[ITEM_TANK] >= 0)
+	num_tanks = base->initial_items[ITEM_TANK];
+    else
+	num_tanks = world->items[ITEM_TANK].initial;
+
+    if (base && base->initial_items[ITEM_FUEL] >= 0)
+	total_fuel = (double)base->initial_items[ITEM_FUEL];
+    else
+	total_fuel = (double)world->items[ITEM_FUEL].initial;
+
+    Player_init_fuel(pl, num_tanks, total_fuel);
 }
 
 int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
@@ -401,14 +441,6 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     pl->mass = options.shipMass;
     pl->emptymass = options.shipMass;
 
-    for (i = 0; i < NUM_ITEMS; i++) {
-	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-	    pl->item[i] = world->items[i].initial;
-    }
-
-    pl->fuel.sum = world->items[ITEM_FUEL].initial;
-    Player_init_fuel(pl, pl->fuel.sum);
-
     if (options.allowShipShapes && ship)
 	pl->ship = ship;
     else {
@@ -432,6 +464,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     else if (type == PL_TYPE_TANK)
 	pl->pl_type_mychar = 'T';
 
+    Player_init_items(pl);
     Compute_sensor_range(pl);
 
     pl->obj_status = GRAVITY;
@@ -607,8 +640,6 @@ void Reset_all_players(world_t *world)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
 
-	/*Player_print_state(pl, "Reset_all_players1");*/
-
 	if (options.endOfRoundReset) {
 	    if (Player_is_paused(pl))
 		Player_death_reset(pl, false);
@@ -627,8 +658,6 @@ void Reset_all_players(world_t *world)
 	if (!Player_is_paused(pl)
 	    && !Player_is_waiting(pl))
 	    Rank_add_round(pl);
-
-	/*Player_print_state(pl, "Reset_all_players2");*/
 
 	CLR_BIT(pl->have, HAS_BALL);
 	Player_reset_timing(pl);
@@ -1290,12 +1319,6 @@ void Delete_player(player_t *pl)
 	if (world->teams[i].SwapperId == id)
 	    world->teams[i].SwapperId = -1;
 
-#if 0 /* kps - why "if 0" ? */
-    if (teamp)
-	/* Swapping a queued player might be better */
-	teamp->SwapperId = NO_ID;
-#endif
-
     /* Delete remaining shots */
     for (i = NumObjs - 1; i >= 0; i--) {
 	obj = Obj[i];
@@ -1502,7 +1525,6 @@ void Kill_player(player_t *pl, bool add_rank_death)
 
 void Player_death_reset(player_t *pl, bool add_rank_death)
 {
-    int i;
     world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
@@ -1545,11 +1567,6 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 	Player_set_state(pl, PL_STATE_APPEARING);
     }
 
-    for (i = 0; i < NUM_ITEMS; i++) {
-	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-	    pl->item[i] = world->items[i].initial;
-    }
-
     pl->forceVisible	= 0;
     assert(pl->recovery_count == RECOVERY_DELAY);
     pl->ecmcount	= 0;
@@ -1561,7 +1578,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->stunned		= 0;
     pl->lock.distance	= 0;
 
-    Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
+    assert(pl->home_base != NULL);
+    Player_init_items(pl);
 
     if (add_rank_death) {
 	Rank_add_death(pl);

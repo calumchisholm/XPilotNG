@@ -150,7 +150,7 @@ int World_place_fuel(world_t *world, clpos_t pos, int team)
 int World_place_base(world_t *world, clpos_t pos, int dir, int team)
 {
     base_t t;
-    int ind = world->NumBases;
+    int ind = world->NumBases, i;
 
     t.pos = pos;
     /*
@@ -180,6 +180,10 @@ int World_place_base(world_t *world, clpos_t pos, int dir, int team)
     } else
 	t.team = TEAM_NOT_SET;
     t.ind = world->NumBases;
+
+    for (i = 0; i < NUM_ITEMS; i++)
+	t.initial_items[i] = -1;
+
     STORE(base_t, world->bases, world->NumBases, world->MaxBases, t);
     return ind;
 }
