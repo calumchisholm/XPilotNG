@@ -247,6 +247,9 @@ void Move_init(void)
     if (asteroidsWallBounce) {
 	SET_BIT(mp.obj_bounce_mask, OBJ_ASTEROID);
     }
+    if (1 /* kps ??? */) {
+	SET_BIT(mp.obj_bounce_mask, OBJ_PULSE);
+    }
 
     mp.obj_cannon_mask = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT | OBJ_PULSE |
 			OBJ_SMART_SHOT | OBJ_TORPEDO | OBJ_HEAT_SHOT |
@@ -763,7 +766,7 @@ static unsigned short *Shape_lines(const shipobj *shape, int dir)
 static int Bounce_object(object *obj, struct move *move, int line, int point)
 {
     DFLOAT fx, fy;
-    DFLOAT c, s;
+    DFLOAT c, s, wall_brake_factor = objectWallBrakeFactor;
     int group, type, item_id;
 
     group = linet[line >= num_lines ? point : line].group;
@@ -817,7 +820,8 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 	return 0;
     }
 
-    if (obj->type != OBJ_BALL) {
+    if (obj->type != OBJ_BALL
+	&& obj->type != OBJ_PULSE) {
 	obj->life = (long)(obj->life * objectWallBounceLifeFactor);
 	if (obj->life <= 0)
 	    return 0;
@@ -832,7 +836,8 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
      * should bounce, it is not reactive thrust otherwise wall
      * bouncing would cause acceleration of the player.
      */
-    if (sqr(obj->vel.x) + sqr(obj->vel.y) > sqr(maxObjectWallBounceSpeed)){
+    if (obj->type != OBJ_PULSE &&
+	sqr(obj->vel.x) + sqr(obj->vel.y) > sqr(maxObjectWallBounceSpeed)) {
 	obj->life = 0;
 	return 0;
     }
@@ -852,14 +857,17 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 	c = linet[line].c;
 	s = linet[line].s;
     }
+
+    if (obj->type == OBJ_PULSE)
+	wall_brake_factor = 1.0;
     fx = move->delta.cx * c + move->delta.cy * s;
     fy = move->delta.cx * s - move->delta.cy * c;
-    move->delta.cx = fx * objectWallBrakeFactor;
-    move->delta.cy = fy * objectWallBrakeFactor;
+    move->delta.cx = fx * wall_brake_factor;
+    move->delta.cy = fy * wall_brake_factor;
     fx = obj->vel.x * c + obj->vel.y * s;
     fy = obj->vel.x * s - obj->vel.y * c;
-    obj->vel.x = fx * objectWallBrakeFactor;
-    obj->vel.y = fy * objectWallBrakeFactor;
+    obj->vel.x = fx * wall_brake_factor;
+    obj->vel.y = fy * wall_brake_factor;
     if (obj->collmode == 2)
 	obj->collmode = 3;
     return 1;
@@ -2698,7 +2706,7 @@ static char msg[MSG_LEN];
 
 
 
-static void Move_ball_new(object *obj)
+static void Move_ball(object *obj)
 {
     /*object		*obj = Obj[ind];*/
     int line, point;
@@ -2791,7 +2799,7 @@ static void Move_object_new(object *obj)
 
 #if 1
     if (obj->type == OBJ_BALL) {
-	Move_ball_new(obj);
+	Move_ball(obj);
 	return;
     }
 #else
