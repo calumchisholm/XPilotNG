@@ -2567,11 +2567,10 @@ int Receive_reliable(void)
 	warn("Incomplete reliable data packet");
 	return 0;
     }
-#if DEBUG
-    if (reliable_offset >= rel + len) {
+#ifdef DEBUG
+    if (reliable_offset >= rel + len)
 	printf("Reliable my=%ld pkt=%ld len=%d loops=%ld\n",
 	       reliable_offset, rel, len, rel_loops);
-    }
 #endif
     if (len <= 0) {
 	warn("Bad reliable data length (%d)", len);

@@ -97,9 +97,9 @@ void Player_position_limit(player *pl)
 	Player_position_set_clicks(pl, cx, cy);
 }
 
+#ifdef DEVELOPMENT
 void Player_position_debug(player *pl, const char *msg)
 {
-#if DEVELOPMENT
     int			i;
 
     printf("pl %s pos dump: ", pl->name);
@@ -132,5 +132,5 @@ void Player_position_debug(player *pl, const char *msg)
 	       pl->prevpos.cx + pts.cx,
 	       pl->prevpos.cy + pts.cy);
     }
-#endif
 }
+#endif

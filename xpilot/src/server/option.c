@@ -452,8 +452,8 @@ static void Option_change_node(
 	node->value->override = override;
 	node->value->origin = opt_origin;
     }
-#if DEVELOPMENT
-    else {
+#ifdef DEVELOPMENT
+    if (set_ok != true) {
 	const char *old_value_origin_name = Origin_name(node->value->origin);
 	const char *new_value_origin_name = Origin_name(opt_origin);
 	warn("Not modifying %s option '%s' from %s\n",
