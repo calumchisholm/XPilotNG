@@ -61,6 +61,7 @@ REC_LD = 'w'
 REC_RD = 'q'
 ATTRACT = '$'
 BCLICKS = 35 * 64
+MAXLEN = 32000
 
 class Wrapcoords:
     def __init__(self, width, height, x = 0, y = 0):
@@ -390,14 +391,34 @@ def convert(options):
 	print sstr
 	x = p[-1][0]
 	y = p[-1][1]
-	h = p[-1][2]
+	h = not p[-1][2]
+	curx = 0
+	cury = 0
+	curh = h
 	for c in p:
-	    sstr = '<Offset x="%d" y="%d"' % (center(c[0] - x, mxc), center(c[1] - y, myc))
-	    if not h:
-		sstr += ' hidden="yes"'
-	    sstr += '/>'
-	    print sstr
+	    dx = center(c[0] - x, mxc)
+	    dy = center(c[1] - y, myc)
+	    if dx * cury != dy * curx or curh != h:
+		if curh:
+		    sstr = ' hidden="yes"'
+		else:
+		    sstr = ''
+		for i in range((max(abs(curx), abs(cury)) + MAXLEN - 1) / MAXLEN, 0, -1):
+		    print '<Offset x="%d" y="%d"%s/>' % (curx / i, cury / i, sstr)
+		    curx -= curx / i
+		    cury -= cury / i
+		curx = dx
+		cury = dy
+		curh = h
+	    else:
+		curx += dx
+		cury += dy
 	    x, y, h = c
+	    h = not h
+	for i in range((max(abs(curx), abs(cury)) + MAXLEN - 1) / MAXLEN, 0, -1):
+	    print '<Offset x="%d" y="%d"%s/>' % (curx / i, cury / i, sstr)
+	    curx -= curx / i
+	    cury -= cury / i
 	print "</Polygon>"
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y)
