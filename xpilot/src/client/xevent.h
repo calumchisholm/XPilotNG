@@ -41,7 +41,6 @@ int Key_update(void);
 bool Key_press(keys_t key);
 bool Key_release(keys_t key);
 void Key_event(XEvent *event);
-void Reset_shields(void);
 void Set_auto_shield(int on);
 void Set_toggle_shield(int on);
 void Talk_event(XEvent *event);

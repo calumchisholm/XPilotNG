@@ -64,7 +64,6 @@ extern bool		quitting;
  */
 extern const char* Item_get_text(int i);
 extern int Init_top(void);
-extern int Init_playing_windows(void);
 extern void Expose_info_window(void);
 extern void Expose_button_window(int color, Window w);
 extern void Info(Window w);
@@ -79,7 +78,6 @@ extern void Talk_cut_from_messages(XButtonEvent *xbutton);
 extern void Clear_selection(void);
 extern void Print_messages_to_stdout(void);
 extern void Talk_reverse_cut(void);
-extern void Quit(void);
 extern int FatalError(Display *);
 extern void Draw_score_table(void);
 extern void Resize(Window w, unsigned width, unsigned height);

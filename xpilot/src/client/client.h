@@ -718,6 +718,11 @@ int Client_fps_request(void);
 int Client_power(void);
 int Client_wrap_mode(void);
 
+int Init_playing_windows(void);
+void Raise_window(void);
+void Reset_shields(void);
+void Quit(void);
+
 #ifdef _WINDOWS
 void MarkPlayersForRedraw(void);
 #endif

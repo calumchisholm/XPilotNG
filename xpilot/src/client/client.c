@@ -25,13 +25,10 @@
 #include "xpclient.h"
 
 /* kps - hack */
-extern void Raise_window(void);
+
 extern int Key_init(void);
 extern int Bitmap_add(char *filename, int count, bool scalable);
-extern int Init_playing_windows(void);
-extern void Quit(void);
 extern int Startup_server_motd(void);
-extern void Reset_shields(void);
 
 char client_version[] = VERSION;
 
