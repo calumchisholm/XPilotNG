@@ -95,6 +95,23 @@ public class MapPolygon extends MapObject {
         polygon.translate(x - r.x, y - r.y);
     }
 
+
+    public void setEdgeStyle (int index, LineStyle style) {
+        if (edgeStyles == null) {
+            if (style == null) return;
+            edgeStyles = new ArrayList(polygon.npoints);
+            for (int i = 0; i < polygon.npoints; i++)
+                edgeStyles.add(null);
+        }
+        edgeStyles.set(index, style);
+    }
+
+
+    public LineStyle getEdgeStyle (int index) {
+        if (edgeStyles == null) return style.getDefaultEdgeStyle();
+        return (LineStyle)edgeStyles.get(index);
+    }
+
     
     public void printXml (PrintWriter out) throws IOException {
 
@@ -118,16 +135,24 @@ public class MapPolygon extends MapObject {
         out.print(getStyle().getId());
         out.println("\">");
 
-        for (int i = 1; i < polygon.npoints; i++) {
+        LineStyle cls = null;
+
+        for (int i = 1; i <= polygon.npoints; i++) {
             out.print("<Offset x=\"");
-            out.print(polygon.xpoints[i] - polygon.xpoints[i - 1]);
+            out.print(polygon.xpoints[i % polygon.npoints] - 
+                      polygon.xpoints[i - 1]);
             out.print("\" y=\"");
-            out.print(polygon.ypoints[i] - polygon.ypoints[i - 1]);
+            out.print(polygon.ypoints[i % polygon.npoints] - 
+                      polygon.ypoints[i - 1]);
             
-            LineStyle es = getEdgeStyle(i - 1);
-            if (es != null && es != getStyle().getDefaultEdgeStyle()) {
-                out.print("\" style=\"");
-                out.print(es.getId());
+            if (edgeStyles != null) {
+                LineStyle ls = getEdgeStyle(i - 1);
+                if (ls != cls) {
+                    out.print("\" style=\"");
+                    out.print((ls != null) ? ls.getId() : 
+                              style.getDefaultEdgeStyle().getId());
+                    cls = ls;
+                }
             }
             out.println("\"/>");
         }
@@ -168,47 +193,38 @@ public class MapPolygon extends MapObject {
                 g.draw(p);
             }
         } else {
-            for (int i = 0; i < p.npoints - 1;) {
+            for (int i = 0; i < p.npoints;) {
                 int begin = i;
-                LineStyle ls = (LineStyle)getEdgeStyle(i++);
+                LineStyle ls = getEdgeStyle(i++);
                 
-                while (i < p.npoints - 1 && getEdgeStyle(i) == ls) i++;
-                
+                while (i < p.npoints && getEdgeStyle(i) == ls) i++;
                 if (ls == null) ls = style.getDefaultEdgeStyle();
-
-                if (i == p.npoints - 2 && ls == style.getDefaultEdgeStyle())
-                    edgeStyles = null; // use the other branch next time
-
+                if (i == p.npoints && 
+                    ls == style.getDefaultEdgeStyle() && 
+                    begin == 0) edgeStyles = null;
+                
                 if (ls.getStyle() != LineStyle.STYLE_HIDDEN) {
                     g.setColor(ls.getColor());
                     g.setStroke(ls.getStroke(scale));
                     
-                    int nump = i + 1 - begin;
+                    int nump = i - begin + 1;
                     int[] xp = new int[nump];
                     int[] yp = new int[nump];
+                    int aclen = nump;
+                    
+                    if (begin + nump > p.npoints) {
+                        aclen--;
+                        xp[aclen] = p.xpoints[0];
+                        yp[aclen] = p.ypoints[0];
+                    }
 
-                    System.arraycopy(p.xpoints, begin, xp, 0, nump);
-                    System.arraycopy(p.ypoints, begin, yp, 0, nump);
-
+                    System.arraycopy(p.xpoints, begin, xp, 0, aclen);
+                    System.arraycopy(p.ypoints, begin, yp, 0, aclen);
+                    
                     g.drawPolyline(xp, yp, nump);
                 }
             }
         }
-    }
-
-
-    public void setEdgeStyle (int index, LineStyle style) {
-        if (edgeStyles == null) edgeStyles = new ArrayList();
-        while (edgeStyles.size() < index + 1) edgeStyles.add(null);
-        edgeStyles.set(index, style);
-    }
-
-
-    public LineStyle getEdgeStyle (int index) {
-        return 
-            (edgeStyles == null || index > edgeStyles.size() - 1) ?
-            style.getDefaultEdgeStyle() : 
-            (LineStyle)edgeStyles.get(index);
     }
 
 
@@ -296,7 +312,7 @@ public class MapPolygon extends MapObject {
 
 
     public void removePoint (int i) {
-
+        
         int pc = polygon.npoints - 1;
         int[] xps = remove(polygon.xpoints, i);
         int[] yps = remove(polygon.ypoints, i);
@@ -304,15 +320,14 @@ public class MapPolygon extends MapObject {
         polygon = new Polygon(xps, yps, pc);
         
         if (edgeStyles != null) {
-            int pi = i - 1;
-            if (pi < 0) pi += polygon.npoints;
-            if (edgeStyles.size() > pi) 
-                edgeStyles.remove(pi);
+            if (i == 0) edgeStyles.remove(edgeStyles.size() - 1);
+            else edgeStyles.remove(i - 1);
         }
     }
 
     
     public void insertPoint (int i, Point p) {
+        if (i <= 0) throw new IllegalArgumentException("i = " + i);
         int pc = polygon.npoints + 1;
         int xps[] = insert(p.x, polygon.xpoints, i);
         int yps[] = insert(p.y, polygon.ypoints, i);
@@ -321,12 +336,7 @@ public class MapPolygon extends MapObject {
         
         if (edgeStyles != null) {
             LineStyle es = getEdgeStyle(i - 1);
-            if (i - 1 < edgeStyles.size()) {
-                edgeStyles.add(i - 1, es);
-            } else {
-                if (es != null && es != getStyle().getDefaultEdgeStyle()) 
-                    setEdgeStyle(i - 1, es);
-            }
+            edgeStyles.add(i - 1, es);
         }
     }
 
@@ -398,15 +408,25 @@ public class MapPolygon extends MapObject {
             latest = me.getPoint();
 
             if (poly.npoints > 2) {
-                if (first.distanceSq(latest) < 100 * 64 * 64) {
-                    poly.xpoints[poly.npoints - 1] = first.x;
-                    poly.ypoints[poly.npoints - 1] = first.y;
-                    MapPolygon.this.polygon = poly;
+                if ((me.getModifiers() & InputEvent.BUTTON1_MASK) == 0) {
+                    MapPolygon.this.polygon = 
+                        new Polygon(poly.xpoints, 
+                                    poly.ypoints, 
+                                    poly.npoints - 1);
                     MapPolygon.this.style = 
                         c.getModel().getDefaultPolygonStyle();
-                    
                     c.getModel().addObject(MapPolygon.this);
-                    c.setCanvasEventHandler(null);
+
+                    // This hack consumes mouse released and mouse clicked
+                    // events associated with this mouse pressed event.
+                    // It prevents the property dialogs from appearing
+                    // when finishing a new polygon.
+                    c.setCanvasEventHandler(new CanvasEventAdapter () {
+                            public void mouseClicked (MouseEvent _me) {
+                                MapCanvas _c = (MapCanvas)_me.getSource();
+                                _c.setCanvasEventHandler(null);
+                            }
+                        });
                     if (cmd != null) cmd.run();
                     c.repaint();
                     return;

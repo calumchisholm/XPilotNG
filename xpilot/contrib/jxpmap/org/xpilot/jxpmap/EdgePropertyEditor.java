@@ -26,28 +26,29 @@ public class EdgePropertyEditor extends EditorPanel {
 
         add(new JLabel("Style:"));
         cmbStyle = new JComboBox();
-        cmbStyle.addItem("default");
         for (Iterator iter = model.edgeStyles.iterator(); iter.hasNext();) {
             LineStyle style = (LineStyle)iter.next();
             cmbStyle.addItem(style.getId());
         }
-
-        if (polygon.edgeStyles != null 
-            && polygon.edgeStyles.size() > edgeIndex) {
-            LineStyle style = (LineStyle)polygon.edgeStyles.get(edgeIndex);
-            if (style != null) cmbStyle.setSelectedItem(style.getId());
-        }
-        
         add(cmbStyle);
+
+        if (polygon.edgeStyles != null) {
+            LineStyle style = (LineStyle)polygon.edgeStyles.get(edgeIndex);
+            if (style != null) {
+                cmbStyle.setSelectedItem(style.getId());
+                return;
+            }
+        }
+
+        cmbStyle.setSelectedItem(model.getDefaultEdgeStyle().getId());
     }
 
 
     public boolean apply () {
 
         int styleIndex = cmbStyle.getSelectedIndex();
-
-        LineStyle style = (styleIndex > 0) ? 
-            (LineStyle)model.edgeStyles.get(styleIndex - 1) : null;
+        LineStyle style = (LineStyle)model.edgeStyles.get(styleIndex);
+        if (style == polygon.getStyle().getDefaultEdgeStyle()) style = null;
         polygon.setEdgeStyle(edgeIndex, style);
         canvas.repaint();
         return true;

@@ -112,6 +112,7 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
         else style.setTexture((Pixmap)model.pixmaps.get(i - 1));
         i = cmbEdgeStyle.getSelectedIndex();
         style.setDefaultEdgeStyle((LineStyle)model.edgeStyles.get(i));
+        model.setDefaultEdgeStyle(i);
         style.setVisible(cbVisible.isSelected());
         style.setVisibleInRadar(cbVisibleInRadar.isSelected());
         

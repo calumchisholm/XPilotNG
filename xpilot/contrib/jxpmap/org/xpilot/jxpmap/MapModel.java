@@ -18,41 +18,36 @@ public class MapModel {
     List edgeStyles;
     List polyStyles;
     MapOptions options;
-    PolygonStyle defPolyStyle;
-    LineStyle defLineStyle;
     float defaultScale;
+    int defEdgeStyleIndex;
+    int defPolygonStyleIndex;
 
     
     public MapModel () {
+
         defaultScale = 1f / 64;
         objects = new ArrayList();
         polyStyles = new ArrayList();
         pixmaps = new ArrayList();
         edgeStyles = new ArrayList();
         options = new MapOptions();
+
+        LineStyle ls;
+        ls = new LineStyle("internal", 1, Color.black, LineStyle.STYLE_HIDDEN);
+        edgeStyles.add(ls);
+        ls = new LineStyle("default", 1, Color.blue, LineStyle.STYLE_SOLID);
+        edgeStyles.add(ls);
+        defEdgeStyleIndex = 1;
         
-        defLineStyle = new LineStyle
-            ("0", 1, Color.blue, LineStyle.STYLE_SOLID);
-                
-        defPolyStyle = new PolygonStyle();
-        defPolyStyle.setId("0");
-        defPolyStyle.setVisible(true);
-        defPolyStyle.setVisibleInRadar(true);
-        defPolyStyle.setFillStyle(defPolyStyle.FILL_NONE);
-        defPolyStyle.setDefaultEdgeStyle(defLineStyle);
-
-        edgeStyles.add(getDefaultEdgeStyle());
-        polyStyles.add(getDefaultPolygonStyle());
-    }
-
-
-    public PolygonStyle getDefaultPolygonStyle () {
-        return defPolyStyle;
-    }
-    
-    
-    public LineStyle getDefaultEdgeStyle () {
-        return defLineStyle;
+        PolygonStyle ps;
+        ps = new PolygonStyle();
+        ps.setId("default");
+        ps.setVisible(true);
+        ps.setVisibleInRadar(true);
+        ps.setFillStyle(PolygonStyle.FILL_NONE);
+        ps.setDefaultEdgeStyle(ls);
+        polyStyles.add(ps);
+        defPolygonStyleIndex = 1;
     }
 
 
@@ -63,6 +58,30 @@ public class MapModel {
 
     public void setDefaultScale (float def) {
         this.defaultScale = def;
+    }
+
+
+    public LineStyle getDefaultEdgeStyle () {
+        if (defEdgeStyleIndex >= edgeStyles.size()) 
+            defEdgeStyleIndex = edgeStyles.size() - 1;
+        return (LineStyle)edgeStyles.get(defEdgeStyleIndex);
+    }
+
+
+    public void setDefaultEdgeStyle (int index) {
+        defEdgeStyleIndex = index;
+    }
+
+
+    public PolygonStyle getDefaultPolygonStyle () {
+        if (defPolygonStyleIndex >= polyStyles.size()) 
+            defPolygonStyleIndex = polyStyles.size() - 1;
+        return (PolygonStyle)polyStyles.get(defPolygonStyleIndex);
+    }
+    
+    
+    public void setDefaultPolygonStyle (int index) {
+        defPolygonStyleIndex = index;
     }
 
 
@@ -109,42 +128,19 @@ public class MapModel {
             px.load();
         }
 
-        if (edgeStyles.size() == 0) edgeStyles.add(getDefaultEdgeStyle());
-        if (polyStyles.size() == 0) polyStyles.add(getDefaultPolygonStyle());
+        defEdgeStyleIndex = edgeStyles.size() - 1;
+        defPolygonStyleIndex = polyStyles.size() - 1;
 
         System.out.println("ready");
     }
 
 
     public void save (File file) throws IOException {
-
-        int baseCount = 0;
-        int ballCount = 0;
-        int fuelCount = 0;
-        int checkCount = 0;
-
-        for (Iterator iter = objects.iterator(); iter.hasNext();) {
-            Object o = iter.next();
-            if (o instanceof MapBase) baseCount++;
-            else if (o instanceof MapBall) ballCount++;
-            else if (o instanceof MapFuel) fuelCount++;
-            else if (o instanceof MapCheckPoint) checkCount++;
-        }
         
         FileWriter fw = new FileWriter(file);
         try {
             PrintWriter out = new PrintWriter(new BufferedWriter(fw));
             out.println("<XPilotMap>");
-
-            out.print("<Featurecount bases=\"");
-            out.print(baseCount);
-            out.print("\" balls=\"");
-            out.print(ballCount);
-            out.print("\" fuels=\"");
-            out.print(fuelCount);
-            out.print("\" checks=\"");
-            out.print(checkCount);
-            out.println("\"/>");
 
             options.printXml(out);
 
@@ -209,13 +205,13 @@ public class MapModel {
                     
                     poly = new Poly();
                     poly.style = atts.getValue("style");
-                    poly.points = new ArrayList();
-                    
+
+                    poly.points = new ArrayList();                    
                     poly.points.add(new PolyPoint
                         (Integer.parseInt(atts.getValue("x")), 
                          Integer.parseInt(atts.getValue("y")), 
                          null));
-
+                    
                     if (ballAreaTeam != -1) {
                         poly.type = MapPolygon.TYPE_BALLAREA;
                         poly.team = ballAreaTeam;
@@ -386,12 +382,13 @@ public class MapModel {
                         style.setFillStyle(style.FILL_NONE);
                     }
                     
-                    if (ps.defEdgeId != null) {
-                        style.setDefaultEdgeStyle
-                            ((LineStyle)estyles.get(ps.defEdgeId));
-                    }
-                    polyStyles.add(style);
+                    LineStyle ls = (LineStyle)estyles.get(ps.defEdgeId);
+                    if (ls == null)
+                        throw new SAXException
+                            ("Undefined edge style: " + ps.defEdgeId);
+                    style.setDefaultEdgeStyle(ls);
 
+                    polyStyles.add(style);
                     ps.ref = style;
                 }
 
@@ -399,17 +396,16 @@ public class MapModel {
                 for (Iterator iter = polys.iterator(); iter.hasNext();) {
 
                     Poly p = (Poly)iter.next();
-
-                    PolygonStyle style = null;
-                    if (p.style != null) {
-                        PolyStyle ps = (PolyStyle)pstyles.get(p.style);
-                        if (ps != null) style = ps.ref;
-                    }
-                    if (style == null) style = defPolyStyle;
                     
+                    PolyStyle ps = (PolyStyle)pstyles.get(p.style);
+                    if (ps == null) 
+                        throw new SAXException
+                            ("Undefined polygon style: " + p.style);
+                    PolygonStyle style = ps.ref;
+
+                    LineStyle defls = style.getDefaultEdgeStyle();
                     ArrayList edges = p.hasSpecialEdges ? 
                         new ArrayList() : null;
-
                     Polygon awtp = new Polygon();
                     
                     Iterator i2 = p.points.iterator();
@@ -418,24 +414,41 @@ public class MapModel {
                     int y = pnt.y;
                     awtp.addPoint(x, y);
                     
-                    while (i2.hasNext()) {
-                        pnt = (PolyPoint)i2.next();
-                        x += pnt.x;
-                        y += pnt.y;
-                        awtp.addPoint(x, y);
-                        if (edges != null) 
-                            edges.add(pnt.style != null ? 
-                                      estyles.get(pnt.style) : null);
-                    }
+                    // Current line style. 
+                    // Using null to indicate default.
+                    LineStyle cls = null;
 
+                    while (i2.hasNext()) {
+
+                        pnt = (PolyPoint)i2.next();
+
+                        // last point is not needed
+                        if (i2.hasNext()) {
+                            x += pnt.x;
+                            y += pnt.y;
+                            awtp.addPoint(x, y);
+                        }
+
+                        if (edges != null) {
+                            if (pnt.style != null) {
+                                cls = (LineStyle)estyles.get(pnt.style);
+                                if (cls == null)
+                                    throw new SAXException
+                                        ("Undefined edge style: " + pnt.style);
+                                if (cls == defls) cls = null;
+                            }
+                            edges.add(cls);
+                        }
+                    }
+                    
                     MapPolygon mp = new MapPolygon(awtp, style, edges);
                     mp.setType(p.type);
                     mp.setTeam(p.team);
                     
                     addObject(mp);
                 }
-                
 
+                
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new SAXException(e);
@@ -476,7 +489,7 @@ public class MapModel {
             PolygonStyle ref;
 
             PolyStyle (String id, Color color, String textureId, 
-                    String defEdgeId, int flags) {
+                       String defEdgeId, int flags) {
                 this.id = id;
                 this.color = color;
                 this.textureId = textureId;

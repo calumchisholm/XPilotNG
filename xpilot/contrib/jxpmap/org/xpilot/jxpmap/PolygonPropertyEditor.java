@@ -56,7 +56,8 @@ public class PolygonPropertyEditor extends EditorPanel {
 
         int styleIndex = cmbStyle.getSelectedIndex();
         PolygonStyle style = (PolygonStyle)model.polyStyles.get(styleIndex);
-        if (style != null) polygon.setStyle(style);
+        polygon.setStyle(style);
+        model.setDefaultPolygonStyle(styleIndex);
         
         polygon.setType(cmbType.getSelectedIndex());
         
