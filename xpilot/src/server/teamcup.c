@@ -81,8 +81,7 @@ static void teamcup_open_score_file(void)
     teamcup_log("1) Fill the names of the teams below.\n"
 		"2) Fill the team number of total winner only if "
 		"this was the second match.\n"
-		"3) Send this file to %s with subject "
-		"%s-RESULT\n"
+		"3) Send this file to %s with subject %s-RESULT.\n"
 		"4) Copy this file in a safe place.  "
 		"Do not delete it after sending.\n"
 		"\nTeam 2 name: \n"
@@ -90,8 +89,7 @@ static void teamcup_open_score_file(void)
 		"Match: %d\n"
 		"Total winner (team number): \n"
 		"\nDO NOT CHANGE ANYTHING AFTER THIS LINE\n\n",
-		options.teamcupMailAddress,
-		options.teamcupName,
+		options.teamcupMailAddress, options.teamcupName,
 		options.teamcupMatchNumber
 	);
 }
