@@ -804,10 +804,17 @@ void Gui_paint_spark(int color, int x, int y)
 
 void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
 {
-}
+    int cnt, tx, ty;
 
-#define FOVY 45.0
-#define EYEZ 1.2071067811865475 /* = 1/(2*tan(FOFY/2)) */ 
+    set_alphacolor(deadly ? whiteRGBA : redRGBA);
+    glBegin(GL_LINE_LOOP);
+    for (cnt = 0; cnt < NUM_WRECKAGE_POINTS; cnt++) {
+	tx = (int)(wreckageShapes[wtype][cnt][rot].x * size) >> 8;
+	ty = (int)(wreckageShapes[wtype][cnt][rot].y * size) >> 8;
+	glVertex2i(x + tx, y + ty);
+    }
+    glEnd();
+}
 
 void Gui_paint_asteroids_begin(void)
 {
