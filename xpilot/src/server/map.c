@@ -485,13 +485,16 @@ bool Grok_map(void)
 
     Realloc_map_objects();
 
+    if (World.NumBases <= 0) {
+	warn("WARNING: map has no bases!");
+	return FALSE;
+    }
+
 #ifndef	SILENT
     xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
 	     "Team play: %s\n", World.name, World.NumBases, World.width,
 	     World.height, BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
 #endif
-
-    D( Xpmap_print() );
 
     return TRUE;
 }
@@ -539,18 +542,6 @@ void Allocate_map_objects(void)
 	error("Out of memory - checks");
 	exit(-1);
     }
-#if 0
-    /* kps - add the below warning somewhere else */
-    if (World.NumBases > 0) {
-	if ((World.base = (base_t *)
-	    malloc(World.NumBases * sizeof(base_t))) == NULL) {
-	    error("Out of memory - bases");
-	    exit(-1);
-	}
-    } else {
-	error("WARNING: map has no bases!");
-    }
-#endif
 }
 
 
