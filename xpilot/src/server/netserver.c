@@ -1004,7 +1004,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 {
     player_t *pl;
     int i, conn_bit;
-    char msg[MSG_LEN];
     const char sender[] = "[*Server notice*]";
     world_t *world = &World;
 
@@ -1168,35 +1167,28 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 			  pl->name, pl->username, world->name, world->author);
     }
 
-    if (options.greeting) {
-	snprintf(msg, sizeof(msg), "%s %s", options.greeting, sender);
-	Set_player_message(pl, msg);
-    }
+    if (options.greeting)
+	Set_player_message_f(pl, "%s [*Server greeting*]", options.greeting);
 
     if (connp->version < MY_VERSION) {
-	sprintf(msg, "Server runs %s version %s. %s",
-		PACKAGE_NAME, VERSION, sender);
-	Set_player_message(pl, msg);
-	if (!FEATURE(connp, F_FASTRADAR)) {
-	    sprintf(msg,
-		    "Your client does not support the fast radar packet. %s",
-		   sender);
-	    Set_player_message(pl, msg);
-	}
-	if (!FEATURE(connp, F_ASTEROID) && options.maxAsteroidDensity > 0) {
-	    sprintf(msg,
-		    "Your client will see the %d asteroids as balls. %s",
-		    (int)world->asteroids.max,
-		    sender);
-	    Set_player_message(pl, msg);
-	}
+	Set_player_message_f(pl, "Server runs %s version %s. %s",
+			     PACKAGE_NAME, VERSION, sender);
+
+	if (!FEATURE(connp, F_FASTRADAR))
+	    Set_player_message_f(pl, "Your client does not support the "
+			       "fast radar packet. %s", sender);
+
+	if (!FEATURE(connp, F_ASTEROID) && options.maxAsteroidDensity > 0)
+	    Set_player_message_f(pl, "Your client will see asteroids as "
+				 "balls. %s", sender);
+
 	if (is_polygon_map && !FEATURE(connp, F_POLY)) {
-	    sprintf(msg, "Your client doesn't support polygon maps. "
-		    "What you see might not match the real map. %s", sender);
-	    Set_player_message(pl, msg);
-	    sprintf(msg, "See http://xpilot.sf.net/ for information "
-		    "about polygon map format. %s", sender);
-	    Set_player_message(pl, msg);
+	    Set_player_message_f(pl, "Your client doesn't support "
+				 "polygon maps. What you see might not match "
+				 "the real map. %s", sender);
+	    Set_player_message_f(pl, "See http://xpilot.sourceforge.net/ for "
+				 "for a client that supports polygon maps. %s",
+				 sender);
 	}
     }
 
