@@ -477,6 +477,18 @@ int Meta_window(Connect_param_t *conpar)
 				   evt.button.y,
 				   target->motiondata);
 		break;
+
+	    case SDL_VIDEOEXPOSE:
+		glDisable(GL_SCISSOR_TEST);
+		set_alphacolor(blackRGBA);
+		glBegin(GL_QUADS);
+		glVertex2i(0,0);
+		glVertex2i(draw_width,0);
+		glVertex2i(draw_width,draw_height);
+		glVertex2i(0,draw_height);
+		glEnd();
+		glEnable(GL_SCISSOR_TEST);
+		break;
 	    }
 	} while (SDL_PollEvent(&evt));
     }	
