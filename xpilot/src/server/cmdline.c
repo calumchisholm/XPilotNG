@@ -230,10 +230,6 @@ bool		reportToMetaServer;	/* Send status to meta-server? */
 bool		searchDomainForXPilot;	/* Do a DNS lookup for XPilot.domain? */
 char		*denyHosts;		/* Computers which are denied service */
 DFLOAT		gameDuration;		/* total duration of game in minutes */
-bool		fullFramerate;		/* Are players allowed to watch
-					   others with full framerate? */
-bool		fullZeroFramerate;	/* Are team zero pausers allowed to
-					   watch others with full framerate? */
 bool		teamImmunity;		/* Is team immune from player action */
 bool		teamShareScore;		/* Are scores shared between members? */
 
@@ -321,6 +317,8 @@ bool		fastAim;		/* Turn before shooting in frame */
 bool		ignoreMaxFPS;		/* Temporary hack */
 bool		teamZeroPausing;
 bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
+int		pausedFrameRate;	/* Limited FPS for pausers */
+int		waitingFrameRate;	/* Limited FPS for waiters */
 
 /*
 ** Two functions which can be used if an option
@@ -3169,28 +3167,6 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"fullFramerate",
-	"fullFramerate",
-	"true",
-	&fullFramerate,
-	valBool,
-	tuner_dummy,
-	"Are active players allowed to watch other players with full "
-	"framerate?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"fullZeroFramerate",
-	"fullZeroFramerate",
-	"false",
-	&fullZeroFramerate,
-	valBool,
-	tuner_dummy,
-	"Are teamzero pausers allowed to watch other players with full "
-	"framerate?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"teamZeroPausing",
 	"teamZeroPausing",
 	"false",
@@ -3612,6 +3588,27 @@ static option_desc options[] = {
 	"handling. Those clients could be better dealt with separately.\n"
 	"This option will be removed in the future (hopefully).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"pausedFrameRate",
+	"pausedFrameRate",
+	"0",
+	&pausedFrameRate,
+	valInt,
+	tuner_dummy,
+	"Maximum FPS shown to paused players. 0 means full framerate.\n"
+	"Can be used to reduce server bandwidth consumption.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"waitingFrameRate",
+	"waitingFrameRate",
+	"0",
+	&waitingFrameRate,
+	valInt,
+	tuner_dummy,
+	"Maximum FPS shown to players waiting for a new round to start.\n"
+	"0 means full framerate. Can be used to limit bandwidth used.\n"
     },
 };
 

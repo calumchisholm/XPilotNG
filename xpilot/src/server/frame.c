@@ -1059,11 +1059,10 @@ static void Frame_radar(connection_t *conn, player *pl)
 		continue;
 
 	    shownuke = (nukesOnRadar && (shot)->mods.nuclear);
-	    if (shownuke && (frame_loops_slow & 2)) {
+	    if (shownuke && (frame_loops_slow & 2))
 		size = 3;
-	    } else {
+	    else
 		size = 0;
-	    }
 
 	    if (BIT(shot->type, OBJ_MINE)) {
 		if (!minesOnRadar && !shownuke)
@@ -1119,9 +1118,8 @@ static void Frame_radar(connection_t *conn, player *pl)
 	    cy = pl_i->pos.cy;
 	    if (BIT(World.rules->mode, LIMITED_VISIBILITY)
 		&& Wrap_length(pl->pos.cx - cx,
-			       pl->pos.cy - cy) > pl->sensor_range * CLICK) {
+			       pl->pos.cy - cy) > pl->sensor_range * CLICK)
 		continue;
-	    }
 	    if (BIT(pl->used, HAS_COMPASS)
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
 		&& GetInd(pl->lock.pl_id) == i
@@ -1129,9 +1127,8 @@ static void Frame_radar(connection_t *conn, player *pl)
 		continue;
 	    }
 	    size = 3;
-	    if (TEAM(pl_i, pl) || ALLIANCE(pl, pl_i) || OWNS_TANK(pl, pl_i)) {
+	    if (TEAM(pl_i, pl) || ALLIANCE(pl, pl_i) || OWNS_TANK(pl, pl_i))
 		size |= 0x80;
-	    }
 	    Frame_radar_buffer_add(cx, cy, size);
 	}
     }
@@ -1183,8 +1180,7 @@ static void Frame_parameters(connection_t *conn, player *pl)
 
 void Frame_update(void)
 {
-    int			i,
-			ind;
+    int			i, ind, player_fps;
     connection_t        *conn;
     player		*pl, *pl2;
     time_t		newTimeLeft = 0;
@@ -1220,52 +1216,37 @@ void Frame_update(void)
 	    continue;
 	pl = Players(i);
 	conn = pl->conn;
-	if (conn == NULL) {
+	if (conn == NULL)
 	    continue;
-	}
 	playback = (pl->rectype == 1);
-	if (BIT(pl->status, PAUSE|GAME_OVER)
-	    && pl->rectype != 2
-	    && !pl->isowner) {
+	player_fps = FPS;
+	if (BIT(pl->status, PAUSE|GAME_OVER) && pl->rectype != 2) {
 	    /*
 	     * Lower the frame rate for non-playing players
 	     * to reduce network load.
-	     * Owner always gets full framerate even if paused.
-	     * With fullFramerate on, everyone gets full framerate.
 	     */
-	    if (!fullFramerate) {
-		if (teamZeroPausing && pl->team == 0) {
-		    if (frame_loops & 0x07)
-			continue;
-		} else if (BIT(pl->status, PAUSE)) {
-		    if (frame_loops & 0x03)
-			continue;
-		} else {
-		    if (frame_loops & 0x01)
-			continue;
-		}
-	    }
+	    if (BIT(pl->status, PAUSE) && pausedFrameRate)
+		player_fps = pausedFrameRate;
+	    else if (waitingFrameRate)
+		player_fps = waitingFrameRate;
 	}
+	player_fps = MIN(player_fps, pl->player_fps);
 
 	/*
 	 * Reduce frame rate to player's own rate.
 	 */
-	if (pl->player_fps < FPS && !ignoreMaxFPS) {
-	    int divisor = (FPS - 1) / pl->player_fps + 1;
-	    /* Even combined with above pause check gives at least every
-	     * (4 * divisor)th frame. */
+	if (player_fps < FPS && !ignoreMaxFPS) {
+	    int divisor = (FPS - 1) / player_fps + 1;
 	    if (frame_loops % divisor)
  		continue;
 	}
 
-	if (Send_start_of_frame(conn) == -1) {
+	if (Send_start_of_frame(conn) == -1)
 	    continue;
-	}
-	if (newTimeLeft != oldTimeLeft) {
+	if (newTimeLeft != oldTimeLeft)
 	    Send_time_left(conn, newTimeLeft);
-	} else if (maxRoundTime > 0 && roundtime >= 0) {
+	else if (maxRoundTime > 0 && roundtime >= 0)
 	    Send_time_left(conn, (roundtime + FPS - 1) / FPS);
-	}
 	/*
 	 * If status is GAME_OVER or PAUSE'd, the user may look through the
 	 * other players 'eyes'. lockOtherTeam determines whether you can
@@ -1327,9 +1308,8 @@ void Set_message(const char *message)
 #endif
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;
-    } else {
+    } else
 	msg = message;
-    }
     if (!rplayback || playback)
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
@@ -1358,13 +1338,10 @@ void Set_player_message(player *pl, const char *message)
 #endif
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;
-    } else {
+    } else
 	msg = message;
-    }
-    if (pl->conn != NULL) {
+    if (pl->conn != NULL)
 	Send_message(pl->conn, msg);
-    }
-    else if (IS_ROBOT_PTR(pl)) {
+    else if (IS_ROBOT_PTR(pl))
 	Robot_message(pl, msg);
-    }
 }
