@@ -127,7 +127,7 @@ static char *Talk_macro_get_field(char *buf, int wanted_field)
 	error("Can't allocate memory for talk macro");
 	return NULL;
     }
-    strlcpy(field_ptr, start_ptr, len);
+    strlcpy(field_ptr, start_ptr, len + 1);
     return field_ptr;
 }
 
@@ -148,7 +148,6 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
     char *nextpos;
     char *filename;
     other_t *player = NULL;
-
 
     while (!done && (c = *inbuf++) != '\0') {
 	if (pos >= max - 2) {
@@ -242,8 +241,7 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
 			    free(tmpptr2);
 			    break;
 			}
-			pos = Talk_macro_parse_mesg(outbuf, tmpptr3,
-						    pos, max);
+			pos = Talk_macro_parse_mesg(outbuf, tmpptr3, pos, max);
 		    }
 		    inbuf = nextpos;
 		    free(tmpptr1);
@@ -312,7 +310,6 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos,
 		    break;
 		case 'n':
 		    outbuf[pos] = '\0';
-
 		    if (Net_talk(outbuf) == -1)
 			return -1;
 		    pos = 0;
@@ -369,5 +366,6 @@ int Talk_macro(char *str)
 
     if (Talk_macro_parse_mesg(final_str, str, 0L, MAX_CHARS) > 0)
 	Net_talk(final_str);
+
     return 0;
 }
