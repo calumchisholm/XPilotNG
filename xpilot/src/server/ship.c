@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -64,8 +64,8 @@ void Thrust(int ind)
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);
     const int		max_life = 3 * TIME_FACT
 	                		+ (int)(pl->power * 0.35 * TIME_FACT);
-    int			cx = pl->pos.cx + pl->ship->engine[pl->dir].cx; 
-    int			cy = pl->pos.cy + pl->ship->engine[pl->dir].cy; 
+    int			cx = pl->pos.cx + pl->ship->engine[pl->dir].cx;
+    int			cy = pl->pos.cy + pl->ship->engine[pl->dir].cy;
     int			afterburners;
     DFLOAT		tot_sparks = (pl->power * 0.15 + 2.5) * timeStep2;
     DFLOAT		alt_sparks;
@@ -112,50 +112,13 @@ void Thrust(int ind)
 	);
 }
 
-
-void Turn_thrust(int ind,int num_sparks)
-{
-    player	*pl = Players[ind];
-    int		dir = pl->dir + ((pl->turnacc > 0.0) ? (RES/4) : (3*(RES/4)));
-    int		cx = pl->pos.cx + pl->ship->pts[0][pl->dir].cx;
-    int		cy = pl->pos.cy + pl->ship->pts[0][pl->dir].cy; 
-
-    if (turnThrust
-	 && (!BIT(pl->used, HAS_CLOAKING_DEVICE)
-	     || cloakedExhaust))
-	Make_debris(
-	    /* pos.x, pos.y   */ cx, cy,
-	    /* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
-	    /* owner id       */ pl->id,
-	    /* owner team	  */ pl->team,
-	    /* kind           */ OBJ_SPARK,
-	    /* mass           */ THRUST_MASS,
-	    /* status         */ GRAVITY | OWNERIMMUNE,
-	    /* color          */ RED,
-	    /* radius         */ 1,
-	    /* num debris     */ num_sparks,
-	    /* min,max dir    */ dir - (RES*0.1) -1, dir + (RES*0.1) + 1,
-	    /* min,max speed  */ 1, 3,
-	    /* min,max life   */ 1 * TIME_FACT, 24 * TIME_FACT
-	    );
-}
-
 /* Calculates the recoil if a ship fires a shot */
 void Recoil(object *ship, object *shot)
 {
-#if 0
-/* old code, not used anymore. */
-    ship->vel.x -= ((tcos(shot->dir) * ABS(shot->vel.x-ship->vel.x) *
-	shot->mass) / ship->mass);
-    ship->vel.y -= ((tsin(shot->dir) * ABS(shot->vel.y-ship->vel.y) *
-	shot->mass) / ship->mass);
-#else
-/* new code thanks to Uoti Urpala. */
     ship->vel.x -= (((shot->vel.x - ship->vel.x) *
 	shot->mass) / ship->mass);
     ship->vel.y -= (((shot->vel.y - ship->vel.y) *
 	shot->mass) / ship->mass);
-#endif
 }
 
 void Record_shove(player *pl, player *pusher, long time)
@@ -678,4 +641,3 @@ void Explode_fighter(int ind)
 	);
 
 }
-

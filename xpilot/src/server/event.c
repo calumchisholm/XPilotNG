@@ -603,7 +603,9 @@ int Handle_keyboard(int ind)
 		if (!BIT(pl->used, HAS_SHIELD|HAS_SHOT)
 		    && BIT(pl->have, HAS_SHOT)) {
 		    SET_BIT(pl->used, HAS_SHOT);
-		    Fire_normal_shots(ind);
+		    /* Set this so that one shot is fired even if player
+		     * releases the key during the same frame */
+		    pl->did_shoot = true;
 		}
 		break;
 

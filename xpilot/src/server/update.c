@@ -48,10 +48,6 @@
 #include "commonproto.h"
 #include "netserver.h"
 
-#define TURN_FUEL(acc)          (0.005*FUEL_SCALE_FACT*ABS(acc))
-#define TURN_SPARKS(tf)         (5+((tf)>>((FUEL_SCALE_BITS)-6)))
-
-
 char update_version[] = VERSION;
 
 
@@ -125,7 +121,7 @@ static void Transport_to_home(int ind)
 /*
  * Turn phasing on or off.
  */
-void Phasing (int ind, int on)
+void Phasing(int ind, int on)
 {
     player	*pl = Players[ind];
     const int	phasing_time = 4 * 12 * TIME_FACT;
@@ -165,12 +161,10 @@ void Cloak(int ind, int on)
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
 	    if (!cloakedShield) {
-		if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
+		if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
 		    Emergency_shield(ind, false);
-		}
-		if (BIT(pl->used, HAS_DEFLECTOR)) {
+		if (BIT(pl->used, HAS_DEFLECTOR))
 		    Deflector(ind, false);
-		}
 		CLR_BIT(pl->used, HAS_SHIELD);
 		CLR_BIT(pl->have, HAS_SHIELD);
 	    }
@@ -184,20 +178,17 @@ void Cloak(int ind, int on)
 	    pl->updateVisibility = 1;
 	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	}
-	if (!pl->item[ITEM_CLOAK]) {
+	if (!pl->item[ITEM_CLOAK])
 	    CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
-	}
 	if (!cloakedShield) {
 	    if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
 		SET_BIT(pl->have, HAS_SHIELD);
 		Emergency_shield(ind, true);
 	    }
-	    if (BIT(DEF_HAVE, HAS_SHIELD) && !BIT(pl->have, HAS_SHIELD)) {
+	    if (BIT(DEF_HAVE, HAS_SHIELD) && !BIT(pl->have, HAS_SHIELD))
 		SET_BIT(pl->have, HAS_SHIELD);
-	    }
-	    if (BITV_ISSET(pl->last_keyv, KEY_SHIELD)) {
+	    if (BITV_ISSET(pl->last_keyv, KEY_SHIELD))
 		SET_BIT(pl->used, HAS_SHIELD);
-	    }
 	}
     }
 }
@@ -221,9 +212,8 @@ void Deflector(int ind, int on)
 	    CLR_BIT(pl->used, HAS_DEFLECTOR);
 	    sound_play_player(pl, DEFLECTOR_SOUND);
 	}
-	if (!pl->item[ITEM_DEFLECTOR]) {
+	if (!pl->item[ITEM_DEFLECTOR])
 	    CLR_BIT(pl->have, HAS_DEFLECTOR);
-	}
     }
 }
 
@@ -383,20 +373,8 @@ static void do_Autopilot (player *pl)
      * This enables the ship to orient away from gravity and set up the
      * thrust to counteract it.
      */
-    if ((vel = VECTOR_LENGTH(pl->vel)) < auto_pilot_dead_velocity) {
+    if ((vel = VECTOR_LENGTH(pl->vel)) < auto_pilot_dead_velocity)
 	pl->vel.x = pl->vel.y = vel = 0.0;
-	/*
-	 * http://www.ben.com/XPilot/todo.html
-	 *
-	 * Autopilot code contains a call to Player_position_restore().
-	 * This shouldn't be used since it only restores the position
-	 * approximately and can move the ship inside a wall. See the
-	 * xpilot-hacks post "Using autopilot near walls can destroy
-	 * your ship". I think this can be fixed by just removing the
-	 * call. Does anyone see why it would be needed?
-	 */
-	/*Player_position_restore(pl);*/
-    }
 
     /*
      * Calculate power needed to change instantaneously to stopped.  We
@@ -506,27 +484,28 @@ static void Fuel_update(void)
 {
     int i;
 
-    if (NumPlayers > 0) {
-	DFLOAT fuel = (NumPlayers * STATION_REGENERATION);
-	int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
-	for (i = 0; i < World.NumFuels; i++) {
-	    if (World.fuel[i].fuel == MAX_STATION_FUEL) {
-		continue;
-	    }
-	    if ((World.fuel[i].fuel += fuel) >= MAX_STATION_FUEL) {
-		World.fuel[i].fuel = MAX_STATION_FUEL;
-	    }
-	    else if (World.fuel[i].last_change + frames_per_update
-		     > frame_loops) {
-		/*
-		 * We don't send fuelstation info to the clients every frame
-		 * if it wouldn't change their display.
-		 */
-		continue;
-	    }
-	    World.fuel[i].conn_mask = 0;
-	    World.fuel[i].last_change = frame_loops;
+    if (NumPlayers == 0)
+	return;
+
+    DFLOAT fuel = (NumPlayers * STATION_REGENERATION);
+    int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
+    for (i = 0; i < World.NumFuels; i++) {
+	if (World.fuel[i].fuel == MAX_STATION_FUEL) {
+	    continue;
 	}
+	if ((World.fuel[i].fuel += fuel) >= MAX_STATION_FUEL) {
+	    World.fuel[i].fuel = MAX_STATION_FUEL;
+	}
+	else if (World.fuel[i].last_change + frames_per_update
+		 > frame_loops) {
+	    /*
+	     * We don't send fuelstation info to the clients every frame
+	     * if it wouldn't change their display.
+	     */
+	    continue;
+	}
+	World.fuel[i].conn_mask = 0;
+	World.fuel[i].last_change = frame_loops;
     }
 }
 
@@ -687,6 +666,124 @@ static void Target_update(void)
 }
 
 
+static void Player_turns(void)
+{
+    int i;
+    player *pl;
+
+    for (i = 0; i < NumPlayers; i++) {
+	pl = Players[i];
+
+	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE) != PLAYING)
+	    continue;
+
+	/* Only do autopilot code if switched on and player is not
+	 * damaged (ie. can see). */
+	if (BIT(pl->used, HAS_AUTOPILOT)
+	    || (BIT(pl->status, HOVERPAUSE) && !pl->damaged))
+	    do_Autopilot(pl);
+
+	pl->turnvel += pl->turnacc;
+
+	/*
+	 * turnresistance is zero: client requests linear turning behaviour
+	 * when playing with pointer control.
+	 */
+	if (pl->turnresistance)
+	    pl->turnvel *= pl->turnresistance;
+
+	pl->float_dir += pl->turnvel;
+
+	while (pl->float_dir < 0)
+	    pl->float_dir += RES;
+	while (pl->float_dir >= RES)
+	    pl->float_dir -= RES;
+
+	if (!pl->turnresistance)
+	    pl->turnvel = 0;
+
+	Turn_player(i);
+    }
+}
+
+static void Use_items(int i)
+{
+    player *pl = Players[i];
+
+    if (pl->shield_time > 0) {
+	if ((pl->shield_time -= timeStep) <= 0) {
+	    pl->shield_time = 0;
+	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD))
+		CLR_BIT(pl->used, HAS_SHIELD);
+	}
+	if (BIT(pl->used, HAS_SHIELD) == 0) {
+	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD))
+		CLR_BIT(pl->have, HAS_SHIELD);
+	    pl->shield_time = 0;
+	}
+    }
+
+    if (BIT(pl->used, HAS_PHASING_DEVICE)) {
+	if ((pl->phasing_left -= timeStep) <= 0) {
+	    if (pl->item[ITEM_PHASING])
+		Phasing(i, 1);
+	    else
+		Phasing(i, 0);
+	}
+    }
+
+    if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
+	if (pl->fuel.sum > 0
+	    && BIT(pl->status, THRUSTING)
+	    && (pl->emergency_thrust_left -= timeStep) <= 0) {
+	    if (pl->item[ITEM_EMERGENCY_THRUST])
+		Emergency_thrust(i, true);
+	    else
+		Emergency_thrust(i, false);
+	}
+    }
+
+    if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
+	if (pl->fuel.sum > 0
+	    && BIT(pl->used, HAS_SHIELD)
+	    && ((pl->emergency_shield_left -= timeStep) <= 0)) {
+	    if (pl->item[ITEM_EMERGENCY_SHIELD])
+		Emergency_shield(i, true);
+	    else
+		Emergency_shield(i, false);
+	}
+    }
+
+    if (BIT(pl->used, HAS_LASER)) {
+	if (pl->item[ITEM_LASER] <= 0
+	    || BIT(pl->used, HAS_PHASING_DEVICE))
+	    CLR_BIT(pl->used, HAS_LASER);
+	else
+	    Fire_laser(i);
+    }
+
+    if (do_update_this_frame && BIT(pl->used, HAS_DEFLECTOR))
+	Do_deflector(i);	/* !@# no real need for do_update_this_frame */
+
+    /*
+     * Compute energy drainage
+     */
+    if (do_update_this_frame) {
+	if (BIT(pl->used, HAS_SHIELD))
+	    Add_fuel(&(pl->fuel), (long)ED_SHIELD);
+
+	if (BIT(pl->used, HAS_PHASING_DEVICE))
+	    Add_fuel(&(pl->fuel), (long)ED_PHASING_DEVICE);
+
+	if (BIT(pl->used, HAS_CLOAKING_DEVICE))
+	    Add_fuel(&(pl->fuel), (long)ED_CLOAKING_DEVICE);
+
+	if (BIT(pl->used, HAS_DEFLECTOR))
+	    Add_fuel(&(pl->fuel), (long)ED_DEFLECTOR);
+    }
+}
+
+
 /********** **********
  * Updating objects and the like.
  */
@@ -719,6 +816,8 @@ void Update_objects(void)
      */
     Robot_update();
 
+    if (fastAim)
+	Player_turns();
     /*
      * Autorepeat fire, must unfortunately be done here, not in
      * the player loop below, because of collisions between the shots
@@ -727,9 +826,9 @@ void Update_objects(void)
     if (fireRepeatRate > 0) {
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players[i];
-	    if (BIT(pl->used, HAS_SHOT)) {
+	    if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 		Fire_normal_shots(i);
-	    }
+	    pl->did_shoot = false;
 	}
     }
 
@@ -740,9 +839,8 @@ void Update_objects(void)
 	for (i = 0; i < NUM_ITEMS; i++)
 	    if (World.items[i].num < World.items[i].max
 		&& World.items[i].chance > 0
-		&& (rfrac() * World.items[i].chance) < 1.0f) {
+		&& (rfrac() * World.items[i].chance) < 1.0f)
 		Place_item(i, -1);
-	    }
     }
 
     Fuel_update();
@@ -778,14 +876,15 @@ void Update_objects(void)
     Cannon_update(do_update_this_frame);
     Target_update();
 
+    if (!fastAim)
+	Player_turns();
+
     /* * * * * *
      *
      * Player loop. Computes miscellaneous updates.
      *
      */
     for (i = 0; i < NumPlayers; i++) {
-	long tf = 0;
-
 	pl = Players[i];
 
 	if ((pl->damaged -= timeStep) <= 0)
@@ -878,145 +977,7 @@ void Update_objects(void)
 	    CLR_BIT(pl->status, THRUSTING);
 	}
 
-	if (pl->shield_time > 0) {
-	    if ((pl->shield_time -= timeStep) <= 0) {
-		pl->shield_time = 0;
-		if (!BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
-		    CLR_BIT(pl->used, HAS_SHIELD);
-		}
-	    }
-	    if (BIT(pl->used, HAS_SHIELD) == 0) {
-		/* BG 95/06/03: change test on "have" to "used". */
-		if (!BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
-		    CLR_BIT(pl->have, HAS_SHIELD);
-		}
-		pl->shield_time = 0;
-	    }
-	}
-
-	if (BIT(pl->used, HAS_PHASING_DEVICE)) {
-	    if ((pl->phasing_left -= timeStep) <= 0) {
-		if (pl->item[ITEM_PHASING]) {
-		    Phasing(i, 1);
-		} else {
-		    Phasing(i, 0);
-		}
-	    }
-	}
-
-	if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
-	    if (pl->fuel.sum > 0
-		&& BIT(pl->status, THRUSTING)
-		&& (pl->emergency_thrust_left -= timeStep) <= 0) {
-		if (pl->item[ITEM_EMERGENCY_THRUST]) {
-		    Emergency_thrust(i, true);
-		} else {
-		    Emergency_thrust(i, false);
-		}
-	    }
-	}
-
-	if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
-	    if (pl->fuel.sum > 0
-		&& BIT(pl->used, HAS_SHIELD)
-		&& ((pl->emergency_shield_left -= timeStep) <= 0)) {
-		if (pl->item[ITEM_EMERGENCY_SHIELD]) {
-		    Emergency_shield(i, true);
-		} else {
-		    Emergency_shield(i, false);
-		}
-	    }
-	}
-
-	if (BIT(pl->used, HAS_LASER)) {
-	    if (pl->item[ITEM_LASER] <= 0
-		|| BIT(pl->used, HAS_PHASING_DEVICE)) {
-		CLR_BIT(pl->used, HAS_LASER);
-	    } else {
-		Fire_laser(i);
-	    }
-	}
-
-	if (do_update_this_frame
-	    && BIT(pl->used, HAS_DEFLECTOR)) {
-	    Do_deflector(i);
-	}
-
-	/*
-	 * Only do autopilot code if switched on and player is not
-	 * damaged (ie. can see).
-	 */
-	if (   (BIT(pl->used, HAS_AUTOPILOT))
-	    || (BIT(pl->status, HOVERPAUSE) && !pl->damaged)) {
-		do_Autopilot(pl);
-	}
-
-	/*
-	 * Compute turn
-	 */
-	pl->turnvel += pl->turnacc;
-
-	/*
-	 * turnresistance is zero: client requests linear turning behaviour
-	 * when playing with pointer control.
-	 */
-	if (pl->turnresistance)
-	    pl->turnvel *= pl->turnresistance;
-
-	/* kps - ng does not want this */
-	if (turnThrust) {
-	    tf = pl->oldturnvel - pl->turnvel;
-	    tf = TURN_FUEL(tf);
-	    if (pl->fuel.sum <= tf) {
-		tf = 0;
-		pl->turnacc = 0.0;
-		pl->turnvel = pl->oldturnvel;
-	    } else {
-		Add_fuel(&(pl->fuel),-tf);
-		pl->oldturnvel = pl->turnvel;
-	    }
-	}
-
-
-	pl->float_dir += pl->turnvel;
-
-	while (pl->float_dir < 0)
-	    pl->float_dir += RES;
-	while (pl->float_dir >= RES)
-	    pl->float_dir -= RES;
-
-	/*
-	 * turnresistance is zero: client requests linear turning behaviour
-	 * when playing with pointer control.
-	 */
-	if (!pl->turnresistance) {
-	    pl->turnvel = 0;
-	}
-
-	Turn_player(i);
-
-
-	/*
-	 * Compute energy drainage
-	 */
-	if (do_update_this_frame) {
-	    if (BIT(pl->used, HAS_SHIELD))
-		Add_fuel(&(pl->fuel), (long)ED_SHIELD);
-
-	    if (BIT(pl->used, HAS_PHASING_DEVICE))
-		Add_fuel(&(pl->fuel), (long)ED_PHASING_DEVICE);
-
-	    if (BIT(pl->used, HAS_CLOAKING_DEVICE))
-		Add_fuel(&(pl->fuel), (long)ED_CLOAKING_DEVICE);
-
-#if 0
-	    /* kps - consider adding this if Do_deflector is done
-	     * every update
-	     */
-	    if (BIT(pl->used, HAS_DEFLECTOR))
-		Add_fuel(&(pl->fuel), (long)ED_DEFLECTOR);
-#endif
-	}
+	Use_items(i);
 
 #define UPDATE_RATE 100
 
@@ -1324,17 +1285,13 @@ void Update_objects(void)
 	/* kps - ng wants an endif here */
 	/*#endif*/ /* not-yet-supported warping stuff */
 
-	if (!BIT(pl->status, PAUSE)) {
-	    update_object_speed(pl);	    /* New position */
-	    Move_player(i);
-	}
+	update_object_speed(pl);	    /* New position */
+	Move_player(i);
 
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || cloakedExhaust)
 	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {
 	    if (BIT(pl->status, THRUSTING))
   		Thrust(i);
-	    if (tf && turnThrust)
-		Turn_thrust(i, TURN_SPARKS(tf));
 	}
 
 	Compute_sensor_range(pl);
@@ -1352,7 +1309,6 @@ void Update_objects(void)
 	    remove_temp_wormhole(i);
 	}
     }
-
 
 
     for (i = 0; i < NumPlayers; i++) {

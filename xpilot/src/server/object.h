@@ -563,6 +563,7 @@ struct player {
 /* kps -ng does not want this */    int		shot_max;		/* Maximum number of shots active */
     long	shot_time;		/* Time of last shot fired by player */
     long	laser_time;		/* Time of last laser pulse fired by player */
+    bool	did_shoot;		/* Pressed fire during this frame */
     int		repair_target;		/* Repairing this target */
     int		fs;			/* Connected to fuel station fs */
     int		check;			/* Next check point to pass */

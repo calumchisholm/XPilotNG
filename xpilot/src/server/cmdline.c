@@ -318,7 +318,6 @@ char		*tankHostName;		/* Host name for tank */
 int		tankScoreDecrement;	/* Amount by which the tank's score */
 					/* is decreased from the player's */
 
-bool		turnThrust;		/* Does turning use fuel and shoot sparks? */
 bool		selfImmunity;		/* Are players immune to their own weapons? */
 
 char		*defaultShipShape;	/* What ship shape is used for players */
@@ -349,6 +348,7 @@ char		*recordFileName;
 bool		useOldCode;		/* Choice of new and old code */
 bool		polygonMode;		/* Run server in polygon mode even
 					   with block based (.xp) mapfile */
+bool		fastAim;		/* Turn before shooting in frame */
 
 /*
 ** Two functions which can be used if an option
@@ -690,16 +690,6 @@ static option_desc options[] = {
 	valInt,
 	tuner_dummy,
 	"How much lower is the tank's score than the player's?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"turnThrust",
-	"turnFuel",
-	"false",
-	&turnThrust,
-	valBool,
-	tuner_dummy,
-	"Does turning use fuel and create sparks?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3627,6 +3617,18 @@ static option_desc options[] = {
 	"(useful for debugging if you want to see the polygons created\n"
 	"in the blocks to polygons conversion function).\n",
 	OPT_ORIGIN_ANY | OPT_DEFAULTS
+    },
+    {
+	"fastAim",
+	"fastAim",
+	"false",
+	&fastAim,
+	valBool,
+	tuner_dummy,
+	"When calculating a frame, turn the ship before firing.\n"
+	"This means you can change aim one frame faster.\n"
+	"Added this option to see how much difference changing the order\n"
+	"would make.\n"
     },
 };
 

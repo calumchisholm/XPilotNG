@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -331,7 +331,6 @@ extern char		*tankRealName;
 extern char		*tankHostName;
 extern int		tankScoreDecrement;
 
-extern bool		turnThrust;
 extern bool		selfImmunity;
 
 extern char		*defaultShipShape;
@@ -364,6 +363,7 @@ extern DFLOAT		timeStep2;
 extern DFLOAT		ecmSizeFactor;
 extern char		*playerPasswordsFileName;
 extern int		playerPasswordsFileSizeLimit;
+extern bool		fastAim;
 
 /* kps hack */
 extern bool		useOldCode;
@@ -372,4 +372,3 @@ extern bool		polygonMode;
 #endif /* SERVER */
 
 #endif /* GLOBAL_H */
-
