@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     IFWINDOWS( connectParam.disp_name[0] = '\0' );
 
 #ifdef OPTIONHACK
-    Set_key_binding_callback(Key_binding_callback);
+    /*Set_key_binding_callback(Key_binding_callback);*/
     Store_default_options();
     Store_talk_macro_options();
     Store_key_options();

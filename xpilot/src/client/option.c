@@ -76,11 +76,9 @@ static void Print_default_value(xp_option_t *opt)
 	break;
     case xp_key_option:
 	if (opt->key_defval && strlen(opt->key_defval) > 0)
-	    printf("        The default %s: %s.\n", 
+	    printf("        The default %s: %s.\n",
 		   (strchr(opt->key_defval, ' ') == NULL
-		    ? "key is"
-		    : "keys are"),
-		   opt->key_defval);
+		    ? "key is" : "keys are"), opt->key_defval);
 	else
 	    printf("        There is no default value for this option.\n");
 	break;
@@ -92,13 +90,10 @@ static void Print_default_value(xp_option_t *opt)
 
 void Usage(void)
 {
-    int			i;
+    int i;
 
-    printf(
-"Usage: xpilot [-options ...] [server]\n"
-"Where options include:\n"
-"\n"
-	  );
+    printf("Usage: xpilot [-options ...] [server]\n"
+	   "Where options include:\n" "\n");
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
 
@@ -118,15 +113,13 @@ void Usage(void)
 	Print_default_value(opt);
 	printf("\n");
     }
-    printf(
-"Most of these options can also be set in the .xpilotrc file\n"
-"in your home directory.\n"
-"Each key option may have multiple keys bound to it and\n"
-"one key may be used by multiple key options.\n"
-"If no server is specified then xpilot will search\n"
-"for servers on your local network.\n"
-"For a listing of remote servers try: telnet meta.xpilot.org 4400 \n"
-	  );
+    printf("Most of these options can also be set in the .xpilotrc file\n"
+	   "in your home directory.\n"
+	   "Each key option may have multiple keys bound to it and\n"
+	   "one key may be used by multiple key options.\n"
+	   "If no server is specified then xpilot will search\n"
+	   "for servers on your local network.\n"
+	   "For a listing of remote servers try: telnet meta.xpilot.org 4400 \n");
 
     exit(1);
 }
@@ -139,8 +132,10 @@ static bool Set_noarg_option(xp_option_t *opt, bool value)
     assert(opt->noarg_ptr);
 
     *opt->noarg_ptr = value;
-    /*printf("Value of option %s is now %s.\n", opt->name,
-     *opt->noarg_ptr ? "true" : "false");*/
+    /*
+     * printf("Value of option %s is now %s.\n", opt->name, opt->noarg_ptr 
+     * ? "true" : "false");
+     */
     return true;
 }
 
@@ -161,13 +156,15 @@ static bool Set_bool_option(xp_option_t *opt, bool value)
      * assumes that after the set method (opt->bool_setfunc) returns,
      * this pointer points to the new value for this option.
      */
-    *opt->bool_ptr = value;	
+    *opt->bool_ptr = value;
 
     if (opt->bool_setfunc)
 	retval = opt->bool_setfunc(opt, value);
 
-    /*printf("Value of option %s is now %s.\n", opt->name,
-     *opt->bool_ptr ? "true" : "false");*/
+    /*
+     * printf("Value of option %s is now %s.\n", opt->name, opt->bool_ptr
+     * ? "true" : "false");
+     */
     return retval;
 }
 
@@ -192,7 +189,10 @@ static bool Set_int_option(xp_option_t *opt, int value)
     if (opt->int_setfunc)
 	retval = opt->int_setfunc(opt, value);
 
-    /*printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);*/
+    /*
+     * printf("Value of option %s is now %d.\n", opt->name,
+     * *opt->int_ptr); 
+     */
     return retval;
 }
 
@@ -217,7 +217,10 @@ static bool Set_double_option(xp_option_t *opt, double value)
     if (opt->dbl_setfunc)
 	retval = opt->dbl_setfunc(opt, value);
 
-    /*printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);*/
+    /*
+     * printf("Value of option %s is now %.3f.\n", opt->name,
+     * *opt->dbl_ptr); 
+     */
     return retval;
 }
 
@@ -228,7 +231,7 @@ static bool Set_string_option(xp_option_t *opt, const char *value)
     assert(opt);
     assert(opt->type == xp_string_option);
     assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
-    assert(value); /* allow NULL ? */
+    assert(value);		/* allow NULL ? */
 
     /*
      * The reason string options don't assume a static area is that that
@@ -240,14 +243,383 @@ static bool Set_string_option(xp_option_t *opt, const char *value)
     if (opt->str_setfunc)
 	retval = opt->str_setfunc(opt, value);
 
-    /*if (opt->str_ptr)
-      printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
-      else
-      printf("Value of option %s is now \"%s\".\n",
-      opt->name, opt->str_getfunc(opt));*/
+    /*
+     * if (opt->str_ptr) printf("Value of option %s is now \"%s\".\n",
+     * opt->name, opt->str_ptr); else printf("Value of option %s is now
+     * \"%s\".\n", opt->name, opt->str_getfunc(opt)); 
+     */
     return retval;
 }
 
+
+
+
+typedef enum {
+    XP_KS_UNKNOWN = 0,
+    XP_KS_BACKSPACE,
+    XP_KS_TAB,
+    XP_KS_RETURN,
+    XP_KS_PAUSE,
+    XP_KS_SCROLLOCK,
+    XP_KS_ESCAPE,
+    XP_KS_DELETE,
+    XP_KS_LEFT,
+    XP_KS_UP,
+    XP_KS_RIGHT,
+    XP_KS_HOME,
+    XP_KS_PAGEUP,
+    XP_KS_PAGEDOWN,
+    XP_KS_END,
+    XP_KS_INSERT,
+    XP_KS_NUMLOCK,
+    XP_KS_KP_ENTER,
+    XP_KS_KP_MULTIPLY,
+    XP_KS_KP_PLUS,
+    XP_KS_KP_MINUS,
+    XP_KS_KP_PERIOD,
+    XP_KS_KP_DIVIDE,
+    XP_KS_KP0,
+    XP_KS_KP1,
+    XP_KS_KP2,
+    XP_KS_KP3,
+    XP_KS_KP4,
+    XP_KS_KP5,
+    XP_KS_KP6,
+    XP_KS_KP7,
+    XP_KS_KP8,
+    XP_KS_KP9,
+    XP_KS_F1,
+    XP_KS_F2,
+    XP_KS_F3,
+    XP_KS_F4,
+    XP_KS_F5,
+    XP_KS_F6,
+    XP_KS_F7,
+    XP_KS_F8,
+    XP_KS_F9,
+    XP_KS_F10,
+    XP_KS_F11,
+    XP_KS_F12,
+    XP_KS_LSHIFT,
+    XP_KS_RSHIFT,
+    XP_KS_LCTRL,
+    XP_KS_RCTRL,
+    XP_KS_CAPSLOCK,
+    XP_KS_SPACE,
+    XP_KS_QUOTE,
+    XP_KS_COMMA,
+    XP_KS_PLUS,
+    XP_KS_MINUS,
+    XP_KS_PERIOD,
+    XP_KS_SLASH,
+    XP_KS_0,
+    XP_KS_1,
+    XP_KS_2,
+    XP_KS_3,
+    XP_KS_4,
+    XP_KS_5,
+    XP_KS_6,
+    XP_KS_7,
+    XP_KS_8,
+    XP_KS_9,
+    XP_KS_SEMICOLON,
+    XP_KS_EQUALS,
+    XP_KS_a,
+    XP_KS_b,
+    XP_KS_c,
+    XP_KS_d,
+    XP_KS_e,
+    XP_KS_f,
+    XP_KS_g,
+    XP_KS_h,
+    XP_KS_i,
+    XP_KS_j,
+    XP_KS_k,
+    XP_KS_l,
+    XP_KS_m,
+    XP_KS_n,
+    XP_KS_o,
+    XP_KS_p,
+    XP_KS_q,
+    XP_KS_r,
+    XP_KS_s,
+    XP_KS_t,
+    XP_KS_u,
+    XP_KS_v,
+    XP_KS_w,
+    XP_KS_x,
+    XP_KS_y,
+    XP_KS_z,
+    XP_KS_LEFTBRACKET,
+    XP_KS_BACKSLASH,
+    XP_KS_RIGHTBRACKET,
+    XP_KS_BACKQUOTE,
+
+    /*
+     * kps additions 
+     */
+    XP_KS_KP_INSERT,
+    XP_KS_KP_DELETE,
+    XP_KS_KP_PRINT, /* Print Screen */
+
+} xp_keysym_t;
+
+typedef struct {
+    xp_keysym_t ks;
+    keys_t key;
+} xp_keydefs_t;
+
+xp_keydefs_t *xpkeydefs = NULL;
+int num_xpkeydefs = 0;
+int max_xpkeydefs = 0;
+
+void Store_xpkeydef(xp_keysym_t ks, keys_t key)
+{
+    int i;
+    xp_keydefs_t xpkeydef;
+
+    /*
+     * first check if pair (ks, key) already exists 
+     */
+    for (i = 0; i < num_xpkeydefs; i++) {
+	xp_keydefs_t *kd = &xpkeydefs[i];
+
+	if (kd->ks == ks && kd->key == key) {
+	    warn("Pair (%d, %d) exist from before", (int) ks, (int) key);
+	    /*
+	     * already exists, no need to store 
+	     */
+	    return;
+	}
+    }
+
+    xpkeydef.ks = ks;
+    xpkeydef.key = key;
+
+    /*
+     * find first KEY_DUMMY after lazy deletion 
+     */
+    for (i = 0; i < num_xpkeydefs; i++) {
+	xp_keydefs_t *kd = &xpkeydefs[i];
+
+	if (kd->key == KEY_DUMMY) {
+	    assert(kd->ks == XP_KS_UNKNOWN);
+	    warn("Store_xpkeydef: Found dummy at index %d", i);
+	    *kd = xpkeydef;
+	    return;
+	}
+    }
+
+    /*
+     * ok just store it then 
+     */
+    STORE(xp_keydefs_t, xpkeydefs, num_xpkeydefs, max_xpkeydefs, xpkeydef);
+}
+
+static void Remove_key_from_xpkeydefs(keys_t key)
+{
+    int i;
+
+    assert(key != KEY_DUMMY);
+    for (i = 0; i < num_xpkeydefs; i++) {
+	xp_keydefs_t *kd = &xpkeydefs[i];
+
+	/*
+	 * lazy deletion 
+	 */
+	if (kd->key == key) {
+	    warn("Remove_key_from_xpkeydefs: Removing key at index %d", i);
+	    kd->ks = XP_KS_UNKNOWN;
+	    kd->key = KEY_DUMMY;
+	}
+    }
+}
+
+typedef struct {
+    const char *name;
+    xp_keysym_t ks;
+} xp_key_t;
+
+static xp_key_t xpkeys[] = {
+    {"BackSpace",	XP_KS_BACKSPACE},
+    {"Tab",		XP_KS_TAB},
+    {"Return",		XP_KS_RETURN},
+    {"Pause",		XP_KS_PAUSE},
+    {"Scroll_Lock",	XP_KS_SCROLLOCK},
+    {"Escape",		XP_KS_ESCAPE},
+    {"Delete",		XP_KS_DELETE},
+    {"Home",		XP_KS_HOME},
+    {"Left",		XP_KS_LEFT},
+    {"Up",		XP_KS_UP},
+    {"Right",		XP_KS_RIGHT},
+    {"Down",		XP_KS_HOME},
+    {"Page_Up",		XP_KS_PAGEUP},
+    {"Page_Down",	XP_KS_PAGEDOWN},
+    {"End",		XP_KS_END},
+    {"Insert",		XP_KS_INSERT},
+    {"Num_Lock",	XP_KS_NUMLOCK},
+    {"KP_Enter",	XP_KS_KP_ENTER},
+    {"KP_Multiply",	XP_KS_KP_MULTIPLY},
+    {"KP_Add",		XP_KS_KP_PLUS},
+    {"KP_Subtract",	XP_KS_KP_MINUS},
+    {"KP_Decimal",	XP_KS_KP_PERIOD},
+    {"KP_Divide",	XP_KS_KP_DIVIDE},
+    {"KP_Insert",	XP_KS_KP_INSERT},
+    {"KP_Delete",	XP_KS_KP_DELETE},
+    {"KP_0",		XP_KS_KP0},
+    {"KP_1",		XP_KS_KP1},
+    {"KP_2",		XP_KS_KP2},
+    {"KP_3",		XP_KS_KP3},
+    {"KP_4",		XP_KS_KP4},
+    {"KP_5",		XP_KS_KP5},
+    {"KP_6",		XP_KS_KP6},
+    {"KP_7",		XP_KS_KP7},
+    {"KP_8",		XP_KS_KP8},
+    {"KP_9",		XP_KS_KP9},
+    {"F1",		XP_KS_F1},
+    {"F2",		XP_KS_F2},
+    {"F3",		XP_KS_F3},
+    {"F4",		XP_KS_F4},
+    {"F5",		XP_KS_F5},
+    {"F6",		XP_KS_F6},
+    {"F7",		XP_KS_F7},
+    {"F8",		XP_KS_F8},
+    {"F9",		XP_KS_F9},
+    {"F10",		XP_KS_F10},
+    {"F11",		XP_KS_F11},
+    {"F12",		XP_KS_F12},
+    {"Shift_L",		XP_KS_LSHIFT},
+    {"Shift_R",		XP_KS_RSHIFT},
+    {"Control_L",	XP_KS_LCTRL},
+    {"Control_R",	XP_KS_RCTRL},
+    {"Caps_Lock",	XP_KS_CAPSLOCK},
+    {"space",		XP_KS_SPACE},
+    {"apostrophe",	XP_KS_QUOTE},
+    {"quoteright",	XP_KS_QUOTE},
+    {"comma",		XP_KS_COMMA},
+    {"plus",		XP_KS_PLUS},
+    {"minus",		XP_KS_MINUS},
+    {"period",		XP_KS_PERIOD},
+    {"slash",		XP_KS_SLASH},
+    {"semicolon",	XP_KS_SEMICOLON},
+    {"equal",		XP_KS_EQUALS},
+    {"0",		XP_KS_0},
+    {"1",		XP_KS_1},
+    {"2",		XP_KS_2},
+    {"3",		XP_KS_3},
+    {"4",		XP_KS_4},
+    {"5",		XP_KS_5},
+    {"6",		XP_KS_6},
+    {"7",		XP_KS_7},
+    {"8",		XP_KS_8},
+    {"9",		XP_KS_9},
+    {"a",		XP_KS_a},
+    {"b",		XP_KS_b},
+    {"c",		XP_KS_c},
+    {"d",		XP_KS_d},
+    {"e",		XP_KS_e},
+    {"f",		XP_KS_f},
+    {"g",		XP_KS_g},
+    {"h",		XP_KS_h},
+    {"i",		XP_KS_i},
+    {"j",		XP_KS_j},
+    {"k",		XP_KS_k},
+    {"l",		XP_KS_l},
+    {"m",		XP_KS_m},
+    {"n",		XP_KS_n},
+    {"o",		XP_KS_o},
+    {"p",		XP_KS_p},
+    {"q",		XP_KS_q},
+    {"r",		XP_KS_r},
+    {"s",		XP_KS_s},
+    {"t",		XP_KS_t},
+    {"u",		XP_KS_u},
+    {"v",		XP_KS_v},
+    {"w",		XP_KS_w},
+    {"x",		XP_KS_x},
+    {"y",		XP_KS_y},
+    {"z",		XP_KS_z},
+    {"bracketleft",	XP_KS_LEFTBRACKET},
+    {"backslash",	XP_KS_BACKSLASH},
+    {"bracketright",	XP_KS_RIGHTBRACKET},
+    {"grave",		XP_KS_BACKQUOTE},
+    {"quoteleft",	XP_KS_BACKQUOTE},
+
+    /*
+     * kps additions 
+     */
+    {"Prior",		XP_KS_PAGEUP},
+    {"Next",		XP_KS_PAGEDOWN},
+    {"Print",		XP_KS_KP_PRINT},
+    {"Linefeed",	XP_KS_RETURN},
+    {"Select",		XP_KS_UP},
+    
+
+};
+
+xp_keysym_t String_to_xp_keysym(const char *name)
+{
+    int i;
+
+    for (i = 0; i < NELEM(xpkeys); i++) {
+	xp_key_t *k = &xpkeys[i];
+	if (!strcmp(k->name, name))
+	    return k->ks;
+	if (!strcasecmp(k->name, name)) {
+	    warn("Correct case of key \"%s\" is \"%s\"", name, k->name);
+	    return k->ks;
+	}
+    }
+
+    return XP_KS_UNKNOWN;
+}
+
+static bool Set_key_option(xp_option_t *opt, const char *value)
+{
+    bool retval = true;
+    char *str, *valcpy;
+
+    assert(opt);
+    assert(opt->name);
+    assert(opt->type == xp_key_option);
+    assert(opt->key != KEY_DUMMY);
+    assert(value);
+
+    /*
+     * warn("Setting key option %s to \"%s\"", opt->name, value); 
+     */
+
+    /*
+     * First remove the old setting.
+     */
+    if (opt->key_string)
+	xp_free(opt->key_string);
+    Remove_key_from_xpkeydefs(opt->key);
+
+    /*
+     * Store the new setting.
+     */
+    opt->key_string = xp_safe_strdup(value);
+    valcpy = xp_safe_strdup(value);
+    for (str = strtok(valcpy, " \t\r\n");
+	 str != NULL;
+	 str = strtok(NULL, " \t\r\n")) {
+	xp_keysym_t ks = String_to_xp_keysym(str);
+
+	if (ks == XP_KS_UNKNOWN) {
+	    warn("Invalid keysym \"%s\" for key \"%s\".\n", str,
+		 opt->name);
+	    continue;
+	}
+
+	Store_xpkeydef(ks, opt->key);
+    }
+
+    xp_free(valcpy);
+    return true;
+}
+
+#if 0
 static xp_key_binding_callback_t key_binding_callback = NULL;
 
 void Set_key_binding_callback(xp_key_binding_callback_t callback)
@@ -283,19 +655,21 @@ static bool Set_key_option(xp_option_t *opt, const char *value)
 	 * for us to bind keys.
 	 */
 	assert(key_binding_callback != NULL);
-	ok = (*key_binding_callback)(opt->key, str);
+	ok = (*key_binding_callback) (opt->key, str);
 	if (!ok)
 	    warn("Invalid keysym \"%s\" for key \"%s\".\n",
 		 str, opt->name);
-	/*else
-	    printf("Keysym \"%s\" was successfully bound to key \"%s\".\n",
-	    str, opt->name);*/
+	/*
+	 * else printf("Keysym \"%s\" was successfully bound to key
+	 * \"%s\".\n", str, opt->name); 
+	 */
     }
 
     xp_free(valcpy);
     /* not currently returning false even if keysyms are invalid */
     return retval;
 }
+#endif
 
 static bool is_legal_value(xp_option_type_t type, const char *value)
 {
@@ -325,7 +699,9 @@ static bool is_legal_value(xp_option_type_t type, const char *value)
  * This could also be used from a client '\set' command, e.g.
  * "\set scalefactor 1.5"
  */
-/* returns true if ok */
+/*
+ * returns true if ok 
+ */
 bool Set_option(const char *name, const char *value)
 {
     xp_option_t *opt;
@@ -362,8 +738,10 @@ bool Set_option(const char *name, const char *value)
 }
 
 
-/* kps - these commands need some fine tuning. */
-/* TODO - unset a value, i.e. set it to empty */
+/*
+ * kps - these commands need some fine tuning. 
+ * TODO - unset a value, i.e. set it to empty 
+ */
 /*
  * Handler for \set client command.
  */
@@ -395,7 +773,9 @@ void Set_command(const char *args)
 	Add_message(msg);
     } else {
 	Add_message("Boring... [*Client reply*]");
-	/* usage, e.g. return false */
+	/*
+	 * usage, e.g. return false 
+	 */
     }
 
     xp_free(valcpy);
@@ -419,7 +799,9 @@ const char *Option_value_to_string(xp_option_t *opt)
 	sprintf(buf, "%.3lf", *opt->dbl_ptr);
 	break;
     case xp_string_option:
-	/* Assertion in Store_option guarantees one of these is not NULL. */
+	/*
+	 * Assertion in Store_option guarantees one of these is not NULL. 
+	 */
 	if (opt->str_ptr)
 	    return opt->str_ptr;
 	else
@@ -460,7 +842,7 @@ void Get_command(const char *args)
 	    sprintf(msg, "The option %s has no value. [*Client reply*]", nm);
 	Add_message(msg);
     } else {
-	sprintf(msg, "No client option named \"%s\". [*Client reply*]", name);
+	sprintf(msg, "No client option named \"%s\". [*Client reply*]",	name);
 	Add_message(msg);
     }
 
@@ -479,21 +861,22 @@ void Store_option(xp_option_t *opt)
     assert(opt->help);
     assert(strlen(opt->help) > 0);
 
-    /* Let's not allow several options with the same name */
+    /*
+     * Let's not allow several options with the same name 
+     */
     if (Find_option(opt->name) != NULL) {
 	warn("Trying to store duplicate option \"%s\"", opt->name);
 	assert(0);
     }
 
-    /* Check that default value is in range */
-    /* NOTE: these assertions will hold also for options of other types */
+    /*
+     * Check that default value is in range 
+     * NOTE: these assertions will hold also for options of other types 
+     */
     assert(opt->int_defval >= opt->int_minval);
     assert(opt->int_defval <= opt->int_maxval);
     assert(opt->dbl_defval >= opt->dbl_minval);
     assert(opt->dbl_defval <= opt->dbl_maxval);
-
-    if (opt->type == xp_string_option)
-	assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
 
     memcpy(&option, opt, sizeof(xp_option_t));
 
@@ -502,7 +885,7 @@ void Store_option(xp_option_t *opt)
     opt = Find_option(opt->name);
     assert(opt);
 
-    /* Set the default value */
+    /* Set the default value. */
     switch (opt->type) {
     case xp_noarg_option:
 	Set_noarg_option(opt, false);
@@ -518,10 +901,12 @@ void Store_option(xp_option_t *opt)
 	break;
     case xp_string_option:
 	assert(opt->str_defval);
+	assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
 	Set_string_option(opt, opt->str_defval);
 	break;
     case xp_key_option:
 	assert(opt->key_defval);
+	assert(opt->key != KEY_DUMMY);
 	Set_key_option(opt, opt->key_defval);
 	break;
     default:
@@ -537,25 +922,27 @@ static void Parse_xpilotrc_line(const char *line)
 {
     char *s;
 
-    /*printf("parsing xpilotrc line \"%s\"\n", line);*/
+    /* printf("parsing xpilotrc line \"%s\"\n", line); */
     /*
      * Ignore lines that don't start with xpilot. or
      * xpilot*
      */
     if (!(strncasecmp(line, "xpilot.", 7) == 0
 	  || strncasecmp(line, "xpilot*", 7) == 0))
-	/* not interested */
+	/*
+	 * not interested 
+	 */
 	return;
 
-    /*printf("-> line is now \"%s\"\n", line);*/
+    /* printf("-> line is now \"%s\"\n", line); */
     line += 7;
-    /*printf("-> line is now \"%s\"\n", line);*/
+    /* printf("-> line is now \"%s\"\n", line); */
     if (!(s = strchr(line, ':'))) {
 	/* no colon on line with xpilot. or xpilot* */
 	/* warn("line missing colon"); */
 	return;
     }
-    
+
     /*
      * Zero the colon, advance to next char, remove leading whitespace
      * from option value.
@@ -589,11 +976,12 @@ void Parse_options(int *argcp, char **argvp)
      */
     Get_xpilotrc_file(path, sizeof(path));
     warn("Using xpilotrc file %s\n", path);
-    if (strlen(path) > 0
-	&& ((fp = fopen(path, "r")) != NULL)) {
+    if (strlen(path) > 0 && ((fp = fopen(path, "r")) != NULL)) {
 	while (fgets(buf, sizeof buf, fp)) {
 	    char *cp;
-	    /* kps - remove NL and CR, does this work in windows ? */
+	    /*
+	     * kps - remove NL and CR, does this work in windows ? 
+	     */
 	    cp = strchr(buf, '\n');
 	    if (cp)
 		*cp = '\0';
@@ -649,7 +1037,7 @@ void Parse_options(int *argcp, char **argvp)
 	    num_servers++;
 	}
     }
-    
+
     /*
      * The remaining args are assumed to be names of servers to try to contact.
      * + 1 is for the program name.
@@ -670,9 +1058,9 @@ void Parse_options(int *argcp, char **argvp)
 
 const char *Get_keyHelpString(keys_t key)
 {
-    int			i;
-    char		*nl;
-    static char		buf[MAX_CHARS];
+    int i;
+    char *nl;
+    static char buf[MAX_CHARS];
 
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
@@ -690,7 +1078,7 @@ const char *Get_keyHelpString(keys_t key)
 
 const char *Get_keyResourceString(keys_t key)
 {
-    int			i;
+    int i;
 
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
@@ -708,9 +1096,9 @@ void defaultCleanup(void)
 #ifndef _WINDOWS
 void Get_xpilotrc_file(char *path, unsigned size)
 {
-    const char		*home = getenv("HOME");
-    const char		*defaultFile = ".xpilotrc";
-    const char		*optionalFile = getenv("XPILOTRC");
+    const char *home = getenv("HOME");
+    const char *defaultFile = ".xpilotrc";
+    const char *optionalFile = getenv("XPILOTRC");
 
     if (optionalFile != NULL)
 	strlcpy(path, optionalFile, size);
