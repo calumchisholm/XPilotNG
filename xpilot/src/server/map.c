@@ -469,7 +469,131 @@ void Alloc_map(void)
 }
 
 
-static bool Grok_map_old(void);
+static void Reset_map_object_counters(void)
+{
+    int i;
+
+    World.NumCannons = 0;
+    World.NumFuels = 0;
+    World.NumGravs = 0;
+    World.NumWormholes = 0;
+    World.NumTreasures = 0;
+    World.NumTargets = 0;
+    World.NumBases = 0;
+    World.NumItemConcentrators = 0;
+    World.NumAsteroidConcs = 0;
+
+    for (i = 0; i < MAX_TEAMS; i++) {
+	World.teams[i].NumMembers = 0;
+	World.teams[i].NumRobots = 0;
+	World.teams[i].NumBases = 0;
+	World.teams[i].NumTreasures = 0;
+	World.teams[i].NumEmptyTreasures = 0;
+	World.teams[i].TreasuresDestroyed = 0;
+	World.teams[i].TreasuresLeft = 0;
+	World.teams[i].score = 0;
+	World.teams[i].prev_score = 0;
+	World.teams[i].SwapperId = NO_ID;
+    }
+}
+
+
+static void Reset_itemid_array(void)
+{
+    int x, y;
+    for (x = 0; x < World.x; x++)
+	for (y = 0; y < World.y; y++)
+	    Map_set_itemid(x, y, -1);
+}
+
+
+static void Verify_wormhole_consistency(void)
+{
+    int i;
+    int	worm_in = 0,
+	worm_out = 0,
+	worm_norm = 0;
+
+    /* count wormhole types */
+    for (i = 0; i < World.NumWormholes; i++) {
+	int type = World.wormHoles[i].type;
+	if (type == WORM_NORMAL)
+	    worm_norm++;
+	else if (type == WORM_IN)
+	    worm_in++;
+	else if (type == WORM_OUT)
+	    worm_out++;
+    }	
+    
+    /*
+     * Verify that the wormholes are consistent, i.e. that if
+     * we have no 'out' wormholes, make sure that we don't have
+     * any 'in' wormholes, and (less critical) if we have no 'in'
+     * wormholes, make sure that we don't have any 'out' wormholes.
+     */
+    if ((worm_norm) ? (worm_norm + worm_out < 2)
+	: (worm_in) ? (worm_out < 1)
+	: (worm_out > 0)) {
+	
+	int i;
+	
+	xpprintf("Inconsistent use of wormholes, removing them.\n");
+	for (i = 0; i < World.NumWormholes; i++) {
+	    int bx, by;
+	    
+	    bx = CLICK_TO_BLOCK(World.wormHoles[i].pos.cx);
+	    by = CLICK_TO_BLOCK(World.wormHoles[i].pos.cy);
+	    World.block[bx][by] = SPACE;
+	    Map_set_itemid(bx, by, -1);
+	}
+	World.NumWormholes = 0;
+    }
+    
+    if (!wormTime) {
+	for (i = 0; i < World.NumWormholes; i++) {
+	    int j = (int)(rfrac() * World.NumWormholes);
+	    while (World.wormHoles[j].type == WORM_IN)
+		j = (int)(rfrac() * World.NumWormholes);
+	    World.wormHoles[i].lastdest = j;
+	}
+    }
+}
+
+
+static bool Grok_map_old(void)
+{
+    if (is_polygon_map)
+	return true;
+
+    if (!Grok_map_options())
+	return false;
+
+    Xpmap_grok_map_data();
+
+    Xpmap_allocate_checks();
+
+    /*
+     * Now reset all counters since we will recount everything
+     * and reuse these counters while inserting the objects
+     * into structures.
+     */
+    Reset_map_object_counters();
+    Reset_itemid_array();
+    Xpmap_tags_to_internal_data(true);
+
+    Verify_wormhole_consistency();
+    
+    if (BIT(World.rules->mode, TIMING) && World.NumChecks == 0) {
+	xpprintf("No checkpoints found while race mode (timing) was set.\n");
+	xpprintf("Turning off race mode.\n");
+	CLR_BIT(World.rules->mode, TIMING);
+    }
+
+    Xpmap_find_map_object_teams();
+
+    return true;
+}
+
 
 /*
  * This function can be called after the map options have been read.
@@ -599,131 +723,6 @@ bool Grok_map_options(void)
 	error("Cannot teamplay while in race mode -- ignoring teamplay");
 	CLR_BIT(World.rules->mode, TEAM_PLAY);
     }
-
-    return true;
-}
-
-
-void Verify_wormhole_consistency(void)
-{
-    int i;
-    int	worm_in = 0,
-	worm_out = 0,
-	worm_norm = 0;
-
-    /* count wormhole types */
-    for (i = 0; i < World.NumWormholes; i++) {
-	int type = World.wormHoles[i].type;
-	if (type == WORM_NORMAL)
-	    worm_norm++;
-	else if (type == WORM_IN)
-	    worm_in++;
-	else if (type == WORM_OUT)
-	    worm_out++;
-    }	
-    
-    /*
-     * Verify that the wormholes are consistent, i.e. that if
-     * we have no 'out' wormholes, make sure that we don't have
-     * any 'in' wormholes, and (less critical) if we have no 'in'
-     * wormholes, make sure that we don't have any 'out' wormholes.
-     */
-    if ((worm_norm) ? (worm_norm + worm_out < 2)
-	: (worm_in) ? (worm_out < 1)
-	: (worm_out > 0)) {
-	
-	int i;
-	
-	xpprintf("Inconsistent use of wormholes, removing them.\n");
-	for (i = 0; i < World.NumWormholes; i++) {
-	    int bx, by;
-	    
-	    bx = CLICK_TO_BLOCK(World.wormHoles[i].pos.cx);
-	    by = CLICK_TO_BLOCK(World.wormHoles[i].pos.cy);
-	    World.block[bx][by] = SPACE;
-	    Map_set_itemid(bx, by, -1);
-	}
-	World.NumWormholes = 0;
-    }
-    
-    if (!wormTime) {
-	for (i = 0; i < World.NumWormholes; i++) {
-	    int j = (int)(rfrac() * World.NumWormholes);
-	    while (World.wormHoles[j].type == WORM_IN)
-		j = (int)(rfrac() * World.NumWormholes);
-	    World.wormHoles[i].lastdest = j;
-	}
-    }
-}
-
-
-
-static void Reset_map_object_counters(void)
-{
-    int i;
-
-    World.NumCannons = 0;
-    World.NumFuels = 0;
-    World.NumGravs = 0;
-    World.NumWormholes = 0;
-    World.NumTreasures = 0;
-    World.NumTargets = 0;
-    World.NumBases = 0;
-    World.NumItemConcentrators = 0;
-    World.NumAsteroidConcs = 0;
-
-    for (i = 0; i < MAX_TEAMS; i++) {
-	World.teams[i].NumMembers = 0;
-	World.teams[i].NumRobots = 0;
-	World.teams[i].NumBases = 0;
-	World.teams[i].NumTreasures = 0;
-	World.teams[i].NumEmptyTreasures = 0;
-	World.teams[i].TreasuresDestroyed = 0;
-	World.teams[i].TreasuresLeft = 0;
-	World.teams[i].score = 0;
-	World.teams[i].prev_score = 0;
-	World.teams[i].SwapperId = NO_ID;
-    }
-}
-
-static void Reset_itemid_array(void)
-{
-    int x, y;
-    for (x = 0; x < World.x; x++)
-	for (y = 0; y < World.y; y++)
-	    Map_set_itemid(x, y, -1);
-}
-
-static bool Grok_map_old(void)
-{
-    if (is_polygon_map)
-	return true;
-
-    if (!Grok_map_options())
-	return false;
-
-    Xpmap_grok_map_data();
-
-    Xpmap_allocate_checks();
-
-    /*
-     * Now reset all counters since we will recount everything
-     * and reuse these counters while inserting the objects
-     * into structures.
-     */
-    Reset_map_object_counters();
-    Reset_itemid_array();
-    Xpmap_tags_to_internal_data(true);
-
-    Verify_wormhole_consistency();
-    
-    if (BIT(World.rules->mode, TIMING) && World.NumChecks == 0) {
-	xpprintf("No checkpoints found while race mode (timing) was set.\n");
-	xpprintf("Turning off race mode.\n");
-	CLR_BIT(World.rules->mode, TIMING);
-    }
-
-    Xpmap_find_map_object_teams();
 
     return true;
 }
