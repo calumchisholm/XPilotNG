@@ -1,6 +1,8 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
 <Option name="survivalScore" value="1"/>
+<Option name="mincannonshotlife" value="100"/>
+<Option name="maxcannonshotlife" value="100"/>
 <Option name="maxIdleTime" value="17"/>
 <Option name="afterburnerpowermult" value="1.05"/>
 <Option name="allowplayerbounces" value="yes"/>
