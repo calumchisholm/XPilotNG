@@ -116,12 +116,12 @@ static void print_help(char *arg)
 	case 7:		/* h */
 	    Add_message("'\\help <command>' shows help about <command>. "
 			"Just '\\help' show avaiable commands "
-			"[*Client reply *]");
+			"[*Client reply*]");
 	    break;
 	case 8:		/* set */
 	case 9:		/* s */
 	    Add_message("'\\set <option> <value>' sets an option value. "
-			"[*Client reply *]");
+			"[*Client reply*]");
 	    break;
 	default:
 	    Add_message("No such command [*Client reply*]");
