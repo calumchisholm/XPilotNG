@@ -324,7 +324,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
 	    /* red box basewarning */
 	    if (baseWarningType & 1)
-		Gui_paint_appearing(x + BLOCK_SZ / 2, y + BLOCK_SZ / 2, id, 1);
+		Gui_paint_appearing(x + BLOCK_SZ / 2, y + BLOCK_SZ / 2,
+				    id, 360);
 
 	    /* Mara's flashy basewarning */
 	    if (baseWarningType & 2) {
