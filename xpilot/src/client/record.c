@@ -44,6 +44,7 @@ char record_version[] = VERSION;
 static char		*record_filename = NULL;/* Name of recordfile. */
 static FILE		*recordFP = NULL;	/* File handle for writing
 						 * recording frames to. */
+int			recordFPS = 0;		/* FPS to record. */
 bool			recording = false;	/* Are we recording or not. */
 static bool		record_start = false;	/* Should we start recording
 						 * at the next frame. */
@@ -154,7 +155,24 @@ static void RWriteHeader(void)
     RWriteString(realname);
     RWriteString(hostname);
     RWriteString(servername);
-    RWriteByte(FPS);
+
+    /*
+     * The client will try to determine an optimal recording FPS value,
+     * however, if it has not done that, server FPS will be used.
+     */
+    {
+	int fps;
+	char tmpbuf[64];
+
+	if (recordFPS > 0)
+	    fps = recordFPS;
+	else
+	    fps = FPS;
+	sprintf(tmpbuf, "Started recording at %d FPS. [*Client notice*]", fps);
+	Add_message(tmpbuf);
+	RWriteByte(fps);
+    }
+
     time(&t);
     strlcpy(buf, ctime(&t), sizeof(buf));
     if ((ptr = strchr(buf, '\n')) != NULL)

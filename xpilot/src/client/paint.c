@@ -193,6 +193,8 @@ void Paint_frame(void)
      */
     if (newSecond) {
 	clientFPS = frame_count;
+	/* kps - improve */
+	recordFPS = clientFPS;
 	frame_count = 0;
 	/*
 	 * I've changed some places that used FPS (from setup) in client
