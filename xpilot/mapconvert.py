@@ -234,7 +234,7 @@ def convert(options):
 	for p2 in p:
 	    if p2[1]:  # Keep 0 at 0, don't move to maxheight + 1 !
 		p2[1] = height * BCLICKS - p2[1]
-		p2[2] = (p2[2][0], -p2[2][1])
+	    p2[2] = (p2[2][0], -p2[2][1])
     neglist = []
     poslist = [] 
     for p in polys2:
