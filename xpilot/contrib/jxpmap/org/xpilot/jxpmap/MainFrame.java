@@ -801,7 +801,7 @@ class BshConsole extends JFrame {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((d.width - w) / 2, (d.height - h) / 2, w, h);
         getContentPane().add(jc);
-        setDefaultCloseOperation(HIDE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         Thread t = new Thread(interpreter);
         t.setDaemon(true);
         t.start();        

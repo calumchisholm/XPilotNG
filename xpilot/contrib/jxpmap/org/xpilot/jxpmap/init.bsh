@@ -296,10 +296,11 @@ import java.awt.image.*;
 vec(x, y) {
     add(v) { return vec(v.x + x, v.y + y); }
     mul(a) { return vec(a*x, a*y); }
-    len() { return Math.sqrt(x*x + y*y); }
+    len() { return Math.sqrt(1.0*x*x + 1.0*y*y); }
     unit() { return mul(1d/len()); }
     normal() { return vec(-y, x); }
-    dot(v) { return x*v.x + y*v.y; } 
+    dot(v) { return x*v.x + y*v.y; }
+    eq(v) { return v.x == x && v.y == y; }
     return this;
 }
 
@@ -405,6 +406,23 @@ getTexturedStyle(level, orig) {
     return ps;   
 }
 
+/**
+ * Returns equivalent polygon without edges with length 0.
+ */
+filterPoints(poly) {
+    var pnew = new Polygon();
+    int x = poly.xpoints[0];
+    int y = poly.ypoints[0];
+    pnew.addPoint(x, y);
+    for(int i = 1; i < poly.npoints; i++) {
+        int x2 = poly.xpoints[i];
+        int y2 = poly.ypoints[i];
+        if (x == x2 && y == y2) continue;
+        pnew.addPoint(x2, y2);
+        x = x2; y = y2;
+    }
+    return pnew;
+}
 
 /**
  * Returns a group of polygons that makes the given map polygon look like
@@ -425,23 +443,26 @@ makeDepthBorder(mp, d, view, light, tex, decor) {
     int sgn = mp.isCounterClockwise() ? -1 : 1;
     var dv = view.mul(-d);
     var quads = new ArrayList();
-    var p = mp.polygon;
-    var np = p.npoints;
+    var p = filterPoints(mp.polygon);
+    int np = p.npoints;
+    if (np < 2) return;
     if (mp.defaultStyle.fillStyle != PolygonStyle.FILL_TEXTURED)
         tex = false;
     var orig = tex ? mp.defaultStyle : getAverageColor(mp.defaultStyle);
+    var p1 = vec(p.xpoints[0], p.ypoints[0]);
     for(int i = 0; i < np; i++) {
-        var p1 = vec(p.xpoints[i % np], p.ypoints[i % np]);  
         var p2 = vec(p.xpoints[(i + 1) % np], p.ypoints[(i + 1) % np]);
         var n = p2.add(p1.mul(-1)).mul(sgn).normal().unit();
-        if (n.dot(view) > 0) continue;
-        var level = n.dot(lu);
-        var style = tex ? getTexturedStyle(level, orig) 
-            : getColoredStyle(level, mp.defaultStyle.id, orig);
-        quads.add(new MapPolygon(new Polygon(
-            new int[] {p1.x, (int)(p1.x + dv.x), (int)(p2.x + dv.x), p2.x},
-            new int[] {p1.y, (int)(p1.y + dv.y), (int)(p2.y + dv.y), p2.y},
-            4), style));
+        if (n.dot(view) <= 0) {
+            var level = n.dot(lu);
+            var style = tex ? getTexturedStyle(level, orig) 
+                : getColoredStyle(level, mp.defaultStyle.id, orig);
+            quads.add(new MapPolygon(new Polygon(
+                new int[] {p1.x, (int)(p1.x + dv.x), (int)(p2.x + dv.x), p2.x},
+                new int[] {p1.y, (int)(p1.y + dv.y), (int)(p2.y + dv.y), p2.y},
+                4), style));
+        }
+        p1 = p2;            
     }
     if (decor) return new Decoration(quads);
     return new Group(quads);
@@ -453,15 +474,16 @@ makeBevelBorder(mp, d, light, tex) {
     var lu = light.unit();
     int sgn = mp.isCounterClockwise() ? 1 : -1;
     var quads = new ArrayList();
-    var p = mp.polygon;
+    var p = filterPoints(mp.polygon);
     var np = p.npoints;
+    if (np < 3) return;
     if (mp.defaultStyle.fillStyle != PolygonStyle.FILL_TEXTURED)
         tex = false;
     var orig = tex ? mp.defaultStyle : getAverageColor(mp.defaultStyle);
+    var p1 = vec(p.xpoints[0], p.ypoints[0]);
+    var p2 = vec(p.xpoints[1], p.ypoints[1]);
+    var p3 = vec(p.xpoints[2], p.ypoints[2]);    
     for(int i = 0; i < np; i++) {
-        var p1 = vec(p.xpoints[i % np], p.ypoints[i % np]);  
-        var p2 = vec(p.xpoints[(i + 1) % np], p.ypoints[(i + 1) % np]);
-        var p3 = vec(p.xpoints[(i + 2) % np], p.ypoints[(i + 2) % np]);
         var p4 = vec(p.xpoints[(i + 3) % np], p.ypoints[(i + 3) % np]);
         var n12 = p2.add(p1.mul(-1)).mul(sgn).normal().unit();
         var n23 = p3.add(p2.mul(-1)).mul(sgn).normal().unit();
@@ -475,6 +497,7 @@ makeBevelBorder(mp, d, light, tex) {
             new int[] {p2.x, p3.x, newp3.x, newp2.x},
             new int[] {p2.y, p3.y, newp3.y, newp2.y},
             4), style));
+        p1 = p2; p2 = p3; p3 = p4;
     }
     return new Group(quads);    
 }
@@ -510,7 +533,7 @@ depthDecor() {
     var value = prompt("Enter depth in pixels", "10");
     if (value == null) return;
     var height = Integer.parseInt(value) * 64;
-    var db = makeDepthBorder(mp, height, vec(-1,2), vec(1,-1), true, true);
+    var db = makeDepthBorder(mp, height, vec(-1,2), vec(1,-1), true, false);
     editor.model.addToBack(db);
     editor.repaint();
 }
