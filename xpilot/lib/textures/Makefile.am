@@ -42,6 +42,7 @@ xpilottextures_DATA = \
 	radar3.ppm \
 	refuel.ppm \
 	rock4.ppm \
+	sdlmetabg.png \
 	shield.ppm \
 	ship.ppm \
 	ship_blue.ppm \
