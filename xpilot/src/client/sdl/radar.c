@@ -17,8 +17,8 @@ static SDL_Surface *radar_surface;     /* offscreen image with walls */
 static GLuint      radar_texture;     /* above as an OpenGL texture */
 static guiarea_t *guiarea;
 
-void Radar_guiReg(void *LI);
-void Radar_guiUnReg(void *LI);
+void Radar_guiReg(widget_list_t *LI);
+void Radar_guiUnReg(widget_list_t *LI);
 
 #define RGBA(RGB) \
     ((RGB) & 0xff000000 ? (RGB) & 0xff000000 : 0xff000000 \
@@ -335,29 +335,29 @@ static void Radar_blit_world(SDL_Rect *sr, SDL_Rect *dr)
     glDisable(GL_TEXTURE_2D);
 }
 
-void Radar_guiReg(void *LI)
+void Radar_guiReg(widget_list_t *LI)
 {
-    ((widget_list_t *)LI)->GuiUnRegData = register_guiarea(*(SDL_Rect *)(((widget_list_t *)LI)->GuiRegData),NULL,NULL,move,(widget_list_t *)LI,NULL,NULL);
-    ((widget_list_t *)LI)->GuiUnReg = Radar_guiUnReg;
+    LI->GuiUnRegData = register_guiarea(*((SDL_Rect *)(LI->GuiRegData)),NULL,NULL,move,LI,NULL,NULL);
+    LI->GuiUnReg = Radar_guiUnReg;
 }
 
-void Radar_guiUnReg(void *LI)
+void Radar_guiUnReg(widget_list_t *LI)
 {
-    unregister_guiarea(((widget_list_t *)LI)->GuiUnRegData);
-    free(((widget_list_t *)LI)->DrawData);
-    ((widget_list_t *)LI)->DrawData = ((widget_list_t *)LI)->GuiRegData = NULL;
-    DelListItem(MainList,((widget_list_t *)LI));
+    unregister_guiarea(LI->GuiUnRegData);
+    free(LI->DrawData);
+    LI->DrawData = LI->GuiRegData = NULL;
+    DelListItem(MainList,LI);
 }
 
 /*
  * Paints the radar surface and objects to the screen.
  */
-static void Radar_paint(void *LI)
+static void Radar_paint(widget_list_t *LI)
 {
-    radar_bounds.x = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->x;
-    radar_bounds.y = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->y;
-    radar_bounds.w = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->w;
-    radar_bounds.h = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->h;
+    radar_bounds.x = ((SDL_Rect *)LI->DrawData)->x;
+    radar_bounds.y = ((SDL_Rect *)LI->DrawData)->y;
+    radar_bounds.w = ((SDL_Rect *)LI->DrawData)->w;
+    radar_bounds.h = ((SDL_Rect *)LI->DrawData)->h;
     
     const float	xf = (float)radar_bounds.w / (float)Setup->width;
     const float yf = (float)radar_bounds.h / (float)Setup->height;

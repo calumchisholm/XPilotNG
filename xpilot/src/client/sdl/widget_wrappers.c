@@ -63,7 +63,7 @@ int unregister_guiarea(guiarea_t *guiarea)
 	    *tmp = NULL;
 	    break;
 	}
-	tmp = (guiarea_t **)&((*tmp)->next);
+	tmp = &((*tmp)->next);
     }
     
     return failure;
@@ -92,9 +92,9 @@ void clean_guiarea_list(void) {
 }
 
 widget_list_t *MakeWidgetList(
-    	    	    void (*Draw)(void *LI), void *DrawData,
-		    void (*GuiReg)(void *LI), void *GuiRegData,
-		    void (*GuiUnReg)(void *LI), void *GuiUnRegData
+    	    	    void (*Draw)(widget_list_t *LI), void *DrawData,
+		    void (*GuiReg)(widget_list_t *LI), void *GuiRegData,
+		    void (*GuiUnReg)(widget_list_t *LI), void *GuiUnRegData
 		    )
 {
     static widget_list_t *tmp;
@@ -110,15 +110,15 @@ widget_list_t *MakeWidgetList(
 }
 
 widget_list_t *AppendListItem( widget_list_t *list,
-    	    	    	    	void (*Draw)(void *LI), void *DrawData,
-				void (*GuiReg)(void *LI), void *GuiRegData,
-				void (*GuiUnReg)(void *LI), void *GuiUnRegData )
+    	    	    	    	void (*Draw)(widget_list_t *LI), void *DrawData,
+				void (*GuiReg)(widget_list_t *LI), void *GuiRegData,
+				void (*GuiUnReg)(widget_list_t *LI), void *GuiUnRegData )
 {
     if (!list) return NULL;
     static widget_list_t **curr;
-    curr = (widget_list_t **)&list;
+    curr = &list;
     while (*curr) {
-    	curr = (widget_list_t **)&((*curr)->next);
+    	curr = &((*curr)->next);
     }
     return (*curr) = MakeWidgetList(Draw,DrawData,GuiReg,GuiRegData,GuiUnReg,GuiUnRegData);
 }
@@ -136,7 +136,7 @@ int DelListItem( widget_list_t *list, widget_list_t *item )
 	    free(tmp);
 	    return 1;
 	}
-    	curr = (widget_list_t **)&((*curr)->next);
+    	curr = &((*curr)->next);
     }
     return 0;
 }
@@ -161,7 +161,7 @@ void AddListGuiAreas( widget_list_t *list )
     	if (curr->GuiReg) {
 	    curr->GuiReg(curr);
 	}
-	curr = (widget_list_t *)(curr->next);
+	curr = curr->next;
     }
 }
 
@@ -172,7 +172,7 @@ void DelListGuiAreas( widget_list_t *list )
     widget_list_t *curr = list;
     while (curr) {
     	if (curr->GuiUnReg) curr->GuiUnReg(curr);
-	curr = (widget_list_t *)(curr->next);
+	curr = curr->next;
     }
 }
 
@@ -182,7 +182,7 @@ void DrawWidgetList( widget_list_t *list )
     widget_list_t *curr = list;
     while (curr) {
     	if (curr->Draw) curr->Draw(curr);
-	curr = (widget_list_t *)(curr->next);
+	curr = curr->next;
     }
 }
 

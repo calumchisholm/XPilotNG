@@ -30,17 +30,17 @@
 #include "text.h"
 #include "glwidgets.h"
 
-/*widget_list_t *ListAdd_GLWidget( widget_list_t *list, GLWidget *widget)
-{
-    return AppendListItem( list, widget->draw, *widget, widget->GuiReg, *widget, widget->GuiUnReg, *widget );
-}*/
-
-
+/****************************************************/
+/* BEGIN: Main GLWidget stuff	    	    	    */
+/****************************************************/
 /* one size should fit all */
+void GuiReg(widget_list_t *LI);
+void GuiUnReg(widget_list_t *LI);
+
 /* LI->data should be a SDL_Rect with the bounds */
-void GuiReg(void *LI)
+void GuiReg(widget_list_t *LI)
 {
-    GLWidget *widget = (GLWidget *)(((widget_list_t *)LI)->GuiRegData);
+    GLWidget *widget = (GLWidget *)(LI->GuiRegData);
     widget->guiarea = register_guiarea(widget->bounds,
     	    	    	    	widget->button,
     	    	    	    	widget->buttondata,
@@ -52,9 +52,9 @@ void GuiReg(void *LI)
 }
 
 /* one size should fit all */
-void GuiUnReg(void *LI)
+void GuiUnReg(widget_list_t *LI)
 {
-    GLWidget *tmp = (GLWidget *)(((widget_list_t *)LI)->GuiUnRegData);
+    GLWidget *tmp = (GLWidget *)(LI->GuiUnRegData);
     unregister_guiarea(tmp->guiarea);
 }
 
@@ -78,6 +78,7 @@ void Close_Widget (GLWidget *widget)
     free(widget);
 }
 
+/* IMPORTANT: compound widgets need to edit this function */
 void SetBounds_GLWidget(GLWidget *widget, SDL_Rect *b)
 {
     widget->bounds.x = b->x;
@@ -126,10 +127,15 @@ void SetBounds_GLWidget(GLWidget *widget, SDL_Rect *b)
 	default: break;
     }
 }
+/****************************************************/
+/* END: Main GLWidget stuff 	    	    	    */
+/****************************************************/
 
+/**********************/
 /* Begin:  ArrowWidget*/
+/**********************/
 void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data);
-void Paint_ArrowWidget(void *LI);
+void Paint_ArrowWidget(widget_list_t *LI);
 
 void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data)
 {
@@ -147,20 +153,17 @@ void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *
 	if (button == 1) {
     	    tmp->press = false;
 	}
-	if (button == 2) {
-	    /*tmp->tap = false;*/
-	}
     }
 }
 
-void Paint_ArrowWidget(void *LI)
+void Paint_ArrowWidget(widget_list_t *LI)
 {
     static int normalcolor  = 0xff0000ff;
     static int presscolor   = 0x00ff00ff;
     static int tapcolor     = 0xffffffff;
     static int lockcolor    = 0x88000088;
      
-    GLWidget *tmp = (GLWidget *)(((widget_list_t *)LI)->DrawData);
+    GLWidget *tmp = (GLWidget *)(LI->DrawData);
     SDL_Rect *b = &(tmp->bounds);
     ArrowWidget *wid_info = (ArrowWidget *)(tmp->wid_info);
     
@@ -242,37 +245,36 @@ GLWidget *Init_ArrowWidget(widget_list_t *list, ArrowWidget_dir_t direction,int 
     return tmp;
 }
 
+/********************/
 /* End:  ArrowWidget*/
+/********************/
 
+/***********************************/
 /* Begin:  LabeledRadiobuttonWidget*/
+/***********************************/
 void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data);
-void Paint_LabeledRadiobuttonWidget(void *LI);
+void Paint_LabeledRadiobuttonWidget(widget_list_t *LI);
 
 void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data)
 {
     LabeledRadiobuttonWidget *tmp = (LabeledRadiobuttonWidget *)(((GLWidget *)data)->wid_info);
     if (state == SDL_PRESSED) {
 	if (button == 1) {
-	    tmp->state = true;
+	    /* Toggle state, and call (*action)*/
+	    tmp->state = !(tmp->state);
 	    if (tmp->action) tmp->action(tmp->state,tmp->actiondata);
 	}
     }
-    if (state == SDL_RELEASED) {
-	if (button == 1) {
-    	    tmp->state = false;
-	    if (tmp->action) tmp->action(tmp->state,tmp->actiondata);
-    	}
-    }
 }
 
-void Paint_LabeledRadiobuttonWidget(void *LI)
+void Paint_LabeledRadiobuttonWidget(widget_list_t *LI)
 {
     static int false_bg_color	= 0x000000ff;
     static int true_bg_color	= 0x000000ff;
     static int false_text_color	= 0xff0000ff;
     static int true_text_color	= 0xffffffff;
      
-    GLWidget *tmp = (GLWidget *)(((widget_list_t *)LI)->DrawData);
+    GLWidget *tmp = (GLWidget *)(LI->DrawData);
     SDL_Rect *b = &(tmp->bounds);
     LabeledRadiobuttonWidget *wid_info = (LabeledRadiobuttonWidget *)(tmp->wid_info);
     
@@ -332,13 +334,16 @@ GLWidget *Init_LabeledRadiobuttonWidget(widget_list_t *list, string_tex_t *ontex
     tmp->listPtr    	= AppendListItem( list, Paint_LabeledRadiobuttonWidget, tmp, GuiReg, tmp, GuiUnReg, tmp );
     return tmp;
 }
-
+/*********************************/
 /* End:  LabeledRadiobuttonWidget*/
+/*********************************/
 
+/***************************/
 /* Begin: IntChooserWidget */
+/***************************/
 void IntChooserWidget_Add( void *data );
 void IntChooserWidget_Subtract( void *data );
-void Paint_IntChooserWidget(void *LI);
+void Paint_IntChooserWidget(widget_list_t *LI);
 
 void IntChooserWidget_Add( void *data )
 {
@@ -392,13 +397,13 @@ void IntChooserWidget_Subtract( void *data )
     }
 }
 
-void Paint_IntChooserWidget(void *LI)
+void Paint_IntChooserWidget(widget_list_t *LI)
 {
     static int bg_color     = 0x0000ff88;
     static int name_color   = 0xffff66ff;
     static int value_color  = 0x00ff00ff;
     
-    GLWidget *widget = (GLWidget *)(((widget_list_t *)LI)->DrawData);
+    GLWidget *widget = (GLWidget *)(LI->DrawData);
     IntChooserWidget *wid_info = (IntChooserWidget *)(widget->wid_info);
     
     if (wid_info->direction > 0) --(wid_info->direction);
@@ -497,12 +502,16 @@ GLWidget *Init_IntChooserWidget(widget_list_t *list, const char *name, font_data
     error("Failed to initialize Init_IntChooserWidget %s (couldn't render text)",name);
     return NULL;
 }
+/*************************/
 /* End: IntChooserWidget */
+/*************************/
 
+/***************************/
 /* Begin: IntChooserWidget */
+/***************************/
 void DoubleChooserWidget_Add( void *data );
 void DoubleChooserWidget_Subtract( void *data );
-void Paint_DoubleChooserWidget(void *LI);
+void Paint_DoubleChooserWidget(widget_list_t *LI);
 
 void DoubleChooserWidget_Add( void *data )
 {
@@ -556,13 +565,13 @@ void DoubleChooserWidget_Subtract( void *data )
     }
 }
 
-void Paint_DoubleChooserWidget(void *LI)
+void Paint_DoubleChooserWidget(widget_list_t *LI)
 {
     static int bg_color     = 0x0000ff88;
     static int name_color   = 0xffff66ff;
     static int value_color  = 0x00ff00ff;
     
-    GLWidget *widget = (GLWidget *)(((widget_list_t *)LI)->DrawData);
+    GLWidget *widget = (GLWidget *)(LI->DrawData);
     DoubleChooserWidget *wid_info = (DoubleChooserWidget *)(widget->wid_info);
 
     if (wid_info->direction > 0) --(wid_info->direction);
@@ -661,4 +670,6 @@ GLWidget *Init_DoubleChooserWidget(widget_list_t *list, const char *name, font_d
     error("Failed to initialize Init_DoubleChooserWidget %s (couldn't render text)",name);
     return NULL;
 }
+/****************************/
 /* End: DoubleChooserWidget */
+/****************************/
