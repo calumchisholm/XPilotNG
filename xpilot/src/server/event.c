@@ -40,7 +40,12 @@ bool team_dead(int team)
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Player_by_index(i);
 
-	if (pl->team == team && !BIT(pl->pl_status, FOO_PAUSE|FOO_GAME_OVER))
+	if (pl->team != team)
+	    continue;
+
+	if (Player_is_alive(pl)
+	    || Player_is_appearing(pl)
+	    || Player_is_killed(pl))
 	    return false;
     }
     return true;
@@ -455,16 +460,23 @@ void Pause_player(player_t *pl, bool on)
 
 int Handle_keyboard(player_t *pl)
 {
-    int i, key, pressed, dx, dy;
-    clpos_t pos;
-    double minv;
+    int i, key;
+    bool pressed;
     world_t *world = pl->world;
+    enum pausetype {
+	unknown, paused, hoverpaused
+    } pausetype = unknown;
+
+    assert(!Player_is_killed(pl));
 
     for (key = 0; key < NUM_KEYS; key++) {
+	/* Find first keyv element where last_keyv isn't equal to prev_keyv. */
 	if (pl->last_keyv[key / BITV_SIZE] == pl->prev_keyv[key / BITV_SIZE]) {
-	    key |= (BITV_SIZE - 1);	/* Skip to next keyv element */
+	    /* Skip to next keyv element. */
+	    key |= (BITV_SIZE - 1);
 	    continue;
 	}
+	/* Now check which specific key it is that has changed state. */
 	while (BITV_ISSET(pl->last_keyv, key)
 	       == BITV_ISSET(pl->prev_keyv, key)) {
 	    if (++key >= NUM_KEYS)
@@ -473,16 +485,20 @@ int Handle_keyboard(player_t *pl)
 	if (key >= NUM_KEYS)
 	    break;
 
-	pressed = BITV_ISSET(pl->last_keyv, key) != 0;
+	pressed = (BITV_ISSET(pl->last_keyv, key) != 0) ? true : false;
 	BITV_TOGGLE(pl->prev_keyv, key);
-	if (key != KEY_SHIELD)	/* would interfere with auto-idle-pause.. */
-	    pl->idleTime = 0;	/* due to client auto-shield */
+	/*
+	 * KEY_SHIELD would interfere with auto-idle-pause
+	 * due to client auto-shield hack.
+	 */
+	if (key != KEY_SHIELD)
+	    pl->idleTime = 0;
 
 	/*
 	 * Allow these functions while you're 'dead'.
 	 */
-	if (BIT(pl->pl_status, FOO_PLAYING|FOO_GAME_OVER|FOO_PAUSE|HOVERPAUSE)
-	    != FOO_PLAYING) {
+	if (!Player_is_alive(pl)
+	    || Player_is_hoverpaused(pl)) {
 	    switch (key) {
 	    case KEY_PAUSE:
 	    case KEY_LOCK_NEXT:
@@ -822,16 +838,18 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_PAUSE:
 		if (Player_is_paused(pl))
-		    i = FOO_PAUSE;
+		    pausetype = paused;
 		else if (Player_is_hoverpaused(pl))
-		    i = HOVERPAUSE;
+		    pausetype = hoverpaused;
 		else {
-		    pos = pl->home_base->pos;
-		    dx = ABS(CENTER_XCLICK(pl->pos.cx - pos.cx));
-		    dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
+		    clpos_t pos = pl->home_base->pos;
+		    int dx = ABS(CENTER_XCLICK(pl->pos.cx - pos.cx));
+		    int dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
+		    double minv;
+
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
 			minv = 3.0;
-			i = FOO_PAUSE;
+			pausetype = paused;
 		    } else {
 			/*
 			 * Hover pause doesn't work within two squares of the
@@ -840,15 +858,15 @@ int Handle_keyboard(player_t *pl)
 			if (dx < 2 * BLOCK_CLICKS && dy < 2 * BLOCK_CLICKS)
 			    break;
 			minv = 5.0;
-			i = HOVERPAUSE;
+			pausetype = hoverpaused;
 		    }
 		    minv += VECTOR_LENGTH(World_gravity(world, pl->pos));
 		    if (pl->velocity > minv)
 			break;
 		}
 
-		switch (i) {
-		case FOO_PAUSE:
+		switch (pausetype) {
+		case paused:
 		    if (Player_is_hoverpaused(pl))
 			break;
 
@@ -857,14 +875,20 @@ int Handle_keyboard(player_t *pl)
 
 		    Pause_player(pl, !Player_is_paused(pl));
 
-		    if (BIT(pl->pl_status, FOO_PLAYING)) {
+		    if (Player_is_alive(pl)) {
+			/*
+			 * kps - this never happens with current code because
+			 * the player is never put to alive state after being
+			 * unpaused.
+			 */
+			assert(0);
 			BITV_SET(pl->last_keyv, key);
 			BITV_SET(pl->prev_keyv, key);
 			return 1;
 		    }
 		    break;
 
-		case HOVERPAUSE:
+		case hoverpaused:
 		    if (Player_is_paused(pl))
 			break;
 
@@ -905,7 +929,7 @@ int Handle_keyboard(player_t *pl)
 		    }
 		    break;
 		default:
-		    warn("Handle_keyboard: unknown pause type %d.", i);
+		    warn("Handle_keyboard: unknown pause type.");
 		    break;
 		}
 		break;
