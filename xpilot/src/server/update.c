@@ -483,12 +483,12 @@ static void do_Autopilot (player *pl)
 static void Fuel_update(void)
 {
     int i;
+    DFLOAT fuel = (NumPlayers * STATION_REGENERATION);
+    int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
 
     if (NumPlayers == 0)
 	return;
 
-    DFLOAT fuel = (NumPlayers * STATION_REGENERATION);
-    int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
     for (i = 0; i < World.NumFuels; i++) {
 	if (World.fuel[i].fuel == MAX_STATION_FUEL) {
 	    continue;
