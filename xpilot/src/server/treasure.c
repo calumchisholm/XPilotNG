@@ -80,16 +80,14 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
  */
 void Ball_is_replaced(ballobject_t *ball)
 {
-    char msg[MSG_LEN];
     player_t *pl = Player_by_id(ball->owner);
 
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 
     Score(pl, 5.0, ball->pos, "Treasure: ");
-    sprintf(msg, " < %s (team %d) has replaced the treasure >",
-	    pl->name, pl->team);
-    Set_message(msg);
+    Set_message(" < %s (team %d) has replaced the treasure >",
+		pl->name, pl->team);
     Rank_saved_ball(pl);
 }
 
@@ -100,22 +98,19 @@ void Ball_is_replaced(ballobject_t *ball)
  */
 void Ball_is_destroyed(ballobject_t *ball)
 {
-    char msg[MSG_LEN];
     player_t *pl = Player_by_id(ball->owner);
     double ticks = 1e6 - ball->life;
     int frames = ticks / timeStep + .5;
     double seconds = ticks / options.gameSpeed;
 
-    sprintf(msg," < The ball was loose for %d frames / "
-	    "%.2f ticks (best %.2f) / %.2fs >",
-	    frames, ticks, Rank_get_best_ballrun(pl), seconds);
+    Set_message(" < The ball was loose for %d frames / "
+		"%.2f ticks (best %.2f) / %.2fs >",
+		frames, ticks, Rank_get_best_ballrun(pl), seconds);
     Rank_ballrun(pl, ticks);
-    Set_message(msg);
 }
 
 static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 {
-    static char msg[MSG_LEN];
     int i;
     double win_score = 0.0,lose_score = 0.0;
     int win_team_members = 0, lose_team_members = 0, somebody_flag = 0;
@@ -148,9 +143,8 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
     }
 
     sound_play_all(DESTROY_BALL_SOUND);
-    sprintf(msg, " < %s's (%d) team has destroyed team %d treasure >",
-	    pl->name, pl->team, td->team);
-    Set_message(msg);
+    Set_message(" < %s's (%d) team has destroyed team %d treasure >",
+		pl->name, pl->team, td->team);
 
     if (!somebody_flag) {
 	Score(pl, Rate(pl->score, CANNON_SCORE)/2, pos, "Treasure:");
@@ -202,7 +196,6 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 {
     player_t *owner;
     treasure_t *td;
-    char msg[MSG_LEN];
     world_t *world = &World;
 
     /*
@@ -229,11 +222,10 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 
 	Ball_is_destroyed(ball);
 
-	if (options.captureTheFlag && !tt->have && !tt->empty) {
-	    sprintf(msg, " < The treasure must be safe before you "
-		    "can cash an opponent's! >");
-	    Set_message(msg);
-	} else if (Punish_team(owner, td, ball->pos))
+	if (options.captureTheFlag && !tt->have && !tt->empty)
+	    Set_message(" < The treasure must be safe before you "
+			"can cash an opponent's! >");
+	else if (Punish_team(owner, td, ball->pos))
 	    CLR_BIT(ball->status, RECREATE);
 	return;
     }
