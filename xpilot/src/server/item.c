@@ -535,7 +535,7 @@ void Do_deflector(player_t *pl)
 	}
 
 	/* don't push balls out of treasure boxes */
-	if (BIT(obj->type, OBJ_BALL)
+	if (obj->type == OBJ_BALL
 	    && !BIT(obj->status, GRAVITY))
 	    continue;
 
@@ -934,7 +934,8 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
     for (i = 0; i < NumObjs; i++) {
 	shot = Obj[i];
 
-	if (! BIT(shot->type, OBJ_SMART_SHOT|OBJ_MINE))
+	if (!(shot->type == OBJ_SMART_SHOT
+	      || shot->type == OBJ_MINE))
 	    continue;
 	if ((range = (Wrap_length(pos.cx - shot->pos.cx,
 				  pos.cy - shot->pos.cy) / CLICK))
@@ -1121,7 +1122,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 	    if (BIT(p->have, HAS_BALL)) {
 		for (j = 0; j < NumObjs; j++) {
 		    shot = Obj[j];
-		    if (BIT(shot->type, OBJ_BALL)) {
+		    if (shot->type == OBJ_BALL) {
 			ballobject_t *ball = BALL_PTR(shot);
 
 			if (ball->owner == p->id) {

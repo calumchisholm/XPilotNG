@@ -1370,7 +1370,8 @@ static bool Ball_handler(player_t *pl)
 	    ball = pl->ball;
 	else {
 	    for (i = 0; i < NumObjs; i++) {
-		if (BIT(Obj[i]->type, OBJ_BALL) && Obj[i]->id == pl->id) {
+		if (Obj[i]->type == OBJ_BALL
+		    && Obj[i]->id == pl->id) {
 		    ball = BALL_PTR(Obj[i]);
 		    break;
 		}
@@ -1637,10 +1638,11 @@ static void Robot_default_play_check_objects(player_t *pl,
 	shot = obj_list[j];
 
 	/* Get rid of the most common object types first for speed. */
-	if (BIT(shot->type, OBJ_DEBRIS|OBJ_SPARK))
+	if (shot->type == OBJ_SPARK
+	    || shot->type == OBJ_DEBRIS)
 	    continue;
 
-	if (BIT(shot->type, OBJ_BALL)
+	if (shot->type == OBJ_BALL
 	    && !WITHIN(my_data->last_thrown_ball,
 		       my_data->robot_count,
 		       3 * FPS))
@@ -1648,7 +1650,9 @@ static void Robot_default_play_check_objects(player_t *pl,
 
 	/* Ignore shots and laser pulses if shields already up
 	   - nothing else to do anyway */
-	if (BIT(shot->type, OBJ_SHOT|OBJ_CANNON_SHOT|OBJ_PULSE)
+	if ((shot->type == OBJ_SHOT
+	     || shot->type == OBJ_CANNON_SHOT
+	     || shot->type == OBJ_PULSE)
 	    && BIT(pl->used, HAS_SHIELD))
 	    continue;
 
@@ -1664,7 +1668,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 	if (!BIT(shot->type, killing_shots)) {
 
 	    /* Find closest item */
-	    if (BIT(shot->type, OBJ_ITEM)) {
+	    if (shot->type == OBJ_ITEM) {
 		if (ABS(dx) < *item_dist
 		    && ABS(dy) < *item_dist) {
 		    int imp;
@@ -1696,7 +1700,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 	    continue;
 
 	/* Own non-reflected laser pulses too. */
-	if (BIT(shot->type, OBJ_PULSE)) {
+	if (shot->type == OBJ_PULSE) {
 	    pulseobject_t *pulse = PULSE_PTR(shot);
 
 	    if (pulse->id == pl->id
@@ -1705,15 +1709,19 @@ static void Robot_default_play_check_objects(player_t *pl,
 	}
 
 	/* Find nearest missile/mine */
-	if (BIT(shot->type, OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_ASTEROID
-			    |OBJ_HEAT_SHOT|OBJ_BALL|OBJ_CANNON_SHOT)
-	    || (BIT(shot->type, OBJ_SHOT)
+	if (shot->type == OBJ_TORPEDO
+	    || shot->type == OBJ_SMART_SHOT
+	    || shot->type == OBJ_ASTEROID
+	    || shot->type == OBJ_HEAT_SHOT
+	    || shot->type == OBJ_BALL
+	    || shot->type == OBJ_CANNON_SHOT
+	    || (shot->type == OBJ_SHOT
 		&& !BIT(world->rules->mode, TIMING)
 		&& shot->id != pl->id
 		&& shot->id != NO_ID)
-	    || (BIT(shot->type, OBJ_MINE)
+	    || (shot->type == OBJ_MINE
 		&& shot->id != pl->id)
-	    || (BIT(shot->type, OBJ_WRECKAGE)
+	    || (shot->type == OBJ_WRECKAGE
 		&& !BIT(world->rules->mode, TIMING))) {
 	    if (ABS(dx) < *mine_dist
 		&&  ABS(dy) < *mine_dist
@@ -1750,30 +1758,33 @@ static void Robot_default_play_check_objects(player_t *pl,
 	    SET_BIT(pl->used, HAS_SHIELD);
 	    SET_BIT(pl->status, THRUSTING);
 
-	    if (BIT(shot->type, OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_ASTEROID
-				|OBJ_HEAT_SHOT|OBJ_MINE)
+	    if ((shot->type == OBJ_TORPEDO
+		 || shot->type == OBJ_SMART_SHOT
+		 || shot->type == OBJ_ASTEROID
+		 || shot->type == OBJ_HEAT_SHOT
+		 || shot->type == OBJ_MINE)
 		&& (pl->fuel.sum < my_data->fuel_l3
 		    || !BIT(pl->have, HAS_SHIELD))) {
 	      if (Initiate_hyperjump(pl))
 		  break;
 	    }
 	}
-	if (BIT(shot->type, OBJ_SMART_SHOT)) {
+	if (shot->type == OBJ_SMART_SHOT) {
 	    if (*mine_dist < ECM_DISTANCE / 4)
 		Fire_ecm(pl);
 	}
-	if (BIT(shot->type, OBJ_MINE)) {
+	if (shot->type == OBJ_MINE) {
 	    if (*mine_dist < ECM_DISTANCE / 2)
 		Fire_ecm(pl);
 	}
-	if (BIT(shot->type, OBJ_HEAT_SHOT)) {
+	if (shot->type == OBJ_HEAT_SHOT) {
 	    CLR_BIT(pl->status, THRUSTING);
 	    if (pl->fuel.sum < my_data->fuel_l3
 		&& pl->fuel.sum > my_data->fuel_l1
 		&& pl->fuel.num_tanks > 0)
 		Tank_handle_detach(pl);
 	}
-	if (BIT(shot->type, OBJ_ASTEROID)) {
+	if (shot->type == OBJ_ASTEROID) {
 	    int delta_dir = 0;
 	    if (*mine_dist > (WIRE_PTR(shot)->size == 1 ? 2 : 4) * BLOCK_SZ
 		&& *mine_dist < 8 * BLOCK_SZ

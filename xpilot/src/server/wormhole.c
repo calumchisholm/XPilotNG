@@ -34,7 +34,7 @@ void Object_hits_wormhole(object_t *obj, int ind)
     obj->wormHoleHit = ind;
 
 #if 0
-    if (BIT(obj->type, OBJ_PLAYER)) {
+    if (obj->type == OBJ_PLAYER) {
 	player_t *pl = (player_t *)obj;
 
 	warn("Player %s hits wormhole %d.", pl->name, ind);
@@ -63,9 +63,11 @@ static void Warp_balls(player_t *pl, clpos_t dest)
 	 * allowed, so long as the ball itself doesn't collide.
 	 */
 	int k;
+
 	for (k = 0; k < NumObjs; k++) {
 	    object_t *b = Obj[k];
-	    if (BIT(b->type, OBJ_BALL) && b->id == pl->id) {
+
+	    if (b->type == OBJ_BALL && b->id == pl->id) {
 		clpos_t ballpos;
 		hitmask_t hitmask = BALL_BIT|HITMASK(pl->team);
 

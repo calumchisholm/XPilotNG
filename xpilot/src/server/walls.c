@@ -214,7 +214,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 	    cannon_t *c = Cannon_by_index(world, mapobj_ind);
 
 	    obj->life = 0;
-	    if (BIT(obj->type, OBJ_ITEM))
+	    if (obj->type == OBJ_ITEM)
 		Cannon_add_item(c, obj->info, obj->count);
 	    else {
 		player_t *pl = Player_by_id(obj->id);
@@ -567,7 +567,7 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 	return 0;
     }
     
-    if (!BIT(obj->status, FROMBOUNCE) && BIT(obj->type, OBJ_SPARK))
+    if (!BIT(obj->status, FROMBOUNCE) && obj->type == OBJ_SPARK)
 	CLR_BIT(obj->status, OWNERIMMUNE);
 
 

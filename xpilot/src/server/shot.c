@@ -265,7 +265,7 @@ void Detonate_mines(player_t *pl)
     for (i = 0; i < NumObjs; i++) {
 	object_t *mine = Obj[i];
 
-	if (! BIT(mine->type, OBJ_MINE))
+	if (! (mine->type == OBJ_MINE))
 	    continue;
 	/*
 	 * Mines which have been ECM reprogrammed should only be detonatable
@@ -857,7 +857,9 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 	shot->team	= team;
 	shot->color	= (pl ? pl->color : WHITE);
 
-	if (BIT(shot->type, OBJ_TORPEDO | OBJ_HEAT_SHOT | OBJ_SMART_SHOT)) {
+	if (shot->type == OBJ_TORPEDO
+	    || shot->type == OBJ_HEAT_SHOT
+	    || shot->type == OBJ_SMART_SHOT) {
 	    MISSILE_PTR(shot)->turnspeed = turnspeed;
 	    MISSILE_PTR(shot)->max_speed = max_speed;
 	}
@@ -1149,7 +1151,7 @@ void Delete_shot(world_t *world, int ind)
 
 	if (BIT(shot->mods.nuclear, NUCLEAR))
 	    sound_play_all(NUKE_EXPLOSION_SOUND);
-	else if (BIT(shot->type, OBJ_MINE))
+	else if (shot->type == OBJ_MINE)
 	    sound_play_sensors(shot->pos, MINE_EXPLOSION_SOUND);
 	else
 	    sound_play_sensors(shot->pos, OBJECT_EXPLOSION_SOUND);
@@ -1201,7 +1203,9 @@ void Delete_shot(world_t *world, int ind)
 	if (BIT(shot->mods.warhead, IMPLOSION))
 	    mass = -mass;
 
-	if (BIT(shot->type, OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_SMART_SHOT))
+	if (shot->type == OBJ_TORPEDO
+	    || shot->type == OBJ_HEAT_SHOT
+	    || shot->type == OBJ_SMART_SHOT)
 	    intensity /= (1 + shot->mods.power);
 
 	num_debris = (int)(intensity * num_modv * (0.20 + (0.10 * rfrac())));

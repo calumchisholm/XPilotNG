@@ -52,7 +52,7 @@ void tuner_ballmass(world_t *world)
     UNUSED_PARAM(world);
 
     for (i = 0; i < NumObjs; i++) {
-	if (BIT(Obj[i]->type, OBJ_BALL))
+	if (Obj[i]->type == OBJ_BALL)
 	    Obj[i]->mass = options.ballMass;
     }
 }

@@ -641,7 +641,7 @@ void Reset_all_players(world_t *world)
 	/* Detach any balls and kill ball */
 	/* We are starting all over again */
 	for (j = NumObjs - 1; j >= 0 ; j--) {
-	    if (BIT(Obj[j]->type, OBJ_BALL)) {
+	    if (Obj[j]->type == OBJ_BALL) {
 		ballobject_t *ball = BALL_IND(j);
 
 		ball->id = NO_ID;
@@ -1299,7 +1299,8 @@ void Delete_player(player_t *pl)
 		Delete_shot(world, i);
 		BALL_PTR(obj)->owner = NO_ID;
 	    }
-	    else if (BIT(obj->type, OBJ_DEBRIS | OBJ_SPARK))
+	    else if (obj->type == OBJ_DEBRIS
+		     || obj->type == OBJ_SPARK)
 		/* Okay, so you want robot explosions to exist,
 		 * even if the robot left the game. */
 		obj->id = NO_ID;
@@ -1312,12 +1313,12 @@ void Delete_player(player_t *pl)
 			obj->mass = 0;
 		}
 	        obj->id = NO_ID;
-		if (BIT(obj->type, OBJ_MINE))
+		if (obj->type == OBJ_MINE)
 		    MINE_PTR(obj)->owner = NO_ID;
 	    }
 	}
 	else {
-	    if (BIT(obj->type, OBJ_MINE)) {
+	    if (obj->type == OBJ_MINE) {
 		mineobject_t *mine = MINE_PTR(obj);
 
 		if (mine->owner == id) {
@@ -1328,7 +1329,7 @@ void Delete_player(player_t *pl)
 		    }
 		}
 	    }
-	    else if (BIT(obj->type, OBJ_BALL)) {
+	    else if (obj->type == OBJ_BALL) {
 		ballobject_t *ball = BALL_PTR(obj);
 
 		if (ball->owner == id)

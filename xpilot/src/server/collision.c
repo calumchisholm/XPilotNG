@@ -433,7 +433,8 @@ static void PlayerCollision(world_t *world)
 	    for (j = 0; j < NumObjs; j++) {
 		object_t *obj = Obj[j];
 
-		if (BIT(obj->type, OBJ_BALL) && obj->id == NO_ID) {
+		if (obj->type == OBJ_BALL
+		    && obj->id == NO_ID) {
 		    dist = Wrap_length(pl->pos.cx - obj->pos.cx,
 				       pl->pos.cy - obj->pos.cy);
 		    if (dist < mindist) {
@@ -550,7 +551,8 @@ static void PlayerObjectCollision(player_t *pl)
 
 	if (obj->id != NO_ID) {
 	    if (obj->id == pl->id) {
-		if (BIT(obj->type, OBJ_SPARK|OBJ_MINE)
+		if ((obj->type == OBJ_SPARK
+		     || obj->type == OBJ_MINE)
 		    && BIT(obj->status, OWNERIMMUNE))
 		    continue;
 		else if (options.selfImmunity)
@@ -577,20 +579,24 @@ static void PlayerObjectCollision(player_t *pl)
 		continue;
 	    }
 	}
-	else if (BIT(obj->type, OBJ_HEAT_SHOT | OBJ_SMART_SHOT | OBJ_TORPEDO
-				| OBJ_SHOT | OBJ_CANNON_SHOT)) {
+	else if (obj->type == OBJ_HEAT_SHOT
+		 || obj->type == OBJ_SMART_SHOT
+		 || obj->type == OBJ_TORPEDO
+		 || obj->type == OBJ_SHOT
+		 || obj->type == OBJ_CANNON_SHOT) {
 	    if (pl->id == obj->id && frame_time < obj->fusetime)
 		continue;
 	}
-	else if (BIT(obj->type, OBJ_MINE)) {
+	else if (obj->type == OBJ_MINE) {
 	    if (BIT(obj->status, CONFUSED))
 		continue;
 	}
-	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID) {
+	else if (obj->type == OBJ_BALL
+		 && obj->id != NO_ID) {
 	    if (BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE))
 		continue;
 	}
-	else if (BIT(obj->type, OBJ_PULSE)) {
+	else if (obj->type == OBJ_PULSE) {
 	    pulseobject_t *pulse = PULSE_PTR(obj);
 
 	    if (pl->id == pulse->id && !pulse->refl)
@@ -1248,7 +1254,7 @@ static void AsteroidCollision(world_t *world)
     for (iter = List_begin(list); iter != List_end(list); LI_FORWARD(iter)) {
 	ast = (object_t *)LI_DATA(iter);
 
-	assert(BIT(ast->type, OBJ_ASTEROID));
+	assert(ast->type == OBJ_ASTEROID);
 
 	if (ast->life <= 0.0)
 	    continue;
@@ -1263,7 +1269,10 @@ static void AsteroidCollision(world_t *world)
 	    assert(obj != NULL);
 
 	    /* asteroids don't hit these objects */
-	    if (BIT(obj->type, OBJ_ITEM|OBJ_DEBRIS|OBJ_SPARK|OBJ_WRECKAGE)
+	    if ((obj->type == OBJ_ITEM
+		 || obj->type == OBJ_DEBRIS
+		 || obj->type == OBJ_SPARK
+		 || obj->type == OBJ_WRECKAGE)
 		&& obj->id == NO_ID
 		&& !BIT(obj->status, FROMCANNON))
 		continue;
@@ -1274,7 +1283,7 @@ static void AsteroidCollision(world_t *world)
 	    if (obj == ast)
 		continue;
 	    /* don't collide with phased balls */
-	    if (BIT(obj->type, OBJ_BALL)
+	    if (obj->type == OBJ_BALL
 		&& obj->id != NO_ID
 		&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE))
 		continue;
@@ -1496,21 +1505,9 @@ static void MineCollision(world_t *world)
     object_t **obj_list;
     object_t *obj;
     mineobject_t *mine;
-    int collide_object_types;
 
     if (!options.mineShotDetonateDistance)
 	return;
-
-    /*
-     * These object types ignored;
-     * some are handled by other code,
-     * some don't interact.
-     */
-    collide_object_types = OBJ_SHOT |
-			   OBJ_TORPEDO |
-			   OBJ_SMART_SHOT |
-			   OBJ_HEAT_SHOT |
-			   OBJ_CANNON_SHOT;
 
     for (i = 0; i < NumObjs; i++) {
 	mine = MINE_IND(i);
@@ -1527,7 +1524,16 @@ static void MineCollision(world_t *world)
 
 	    obj = obj_list[j];
 
-	    if (!BIT(obj->type, collide_object_types))
+	    /*
+	     * These object types ignored;
+	     * some are handled by other code,
+	     * some don't interact.
+	     */
+	    if (!(obj->type == OBJ_SHOT
+		  || obj->type == OBJ_TORPEDO
+		  || obj->type == OBJ_SMART_SHOT
+		  || obj->type == OBJ_HEAT_SHOT
+		  || obj->type == OBJ_CANNON_SHOT))
 		continue;
 
 	    radius = (options.mineShotDetonateDistance + obj->pl_radius)

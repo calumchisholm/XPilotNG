@@ -454,19 +454,20 @@ static void Misc_object_update(world_t *world)
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
 
-	if (BIT(obj->type, OBJ_MINE))
+	if (obj->type == OBJ_MINE)
 	    Update_mine(world, MINE_PTR(obj));
 
-	else if (BIT(obj->type, OBJ_TORPEDO))
+	else if (obj->type == OBJ_TORPEDO)
 	    Update_torpedo(world, TORP_PTR(obj));
 
-	else if (BIT(obj->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT))
+	else if (obj->type == OBJ_SMART_SHOT
+		 || obj->type == OBJ_HEAT_SHOT)
 	    Update_missile(world, MISSILE_PTR(obj));
 
-	else if (BIT(obj->type, OBJ_BALL))
+	else if (obj->type == OBJ_BALL)
 	    Update_connector_force(world, BALL_PTR(obj));
 
-	else if (BIT(obj->type, OBJ_WRECKAGE)) {
+	else if (obj->type == OBJ_WRECKAGE) {
 	    wireobject_t *wireobj = WIRE_PTR(obj);
 
 	    wireobj->rotation =
@@ -474,7 +475,7 @@ static void Misc_object_update(world_t *world)
 		 + (int) (wireobj->turnspeed * timeStep * RES)) % RES;
 	}
 
-	else if (BIT(obj->type, OBJ_PULSE)) {
+	else if (obj->type == OBJ_PULSE) {
 	    pulseobject_t *pulse = PULSE_PTR(obj);
 
 	    pulse->len += options.pulseSpeed * timeStep;
@@ -483,7 +484,7 @@ static void Misc_object_update(world_t *world)
 
 	update_object_speed(world, obj);
 
-	if (!BIT(obj->type, OBJ_ASTEROID))
+	if (!(obj->type == OBJ_ASTEROID))
 	    Move_object(obj);
     }
 }

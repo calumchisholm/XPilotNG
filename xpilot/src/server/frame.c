@@ -1009,14 +1009,14 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 	    else
 		size = 0;
 
-	    if (BIT(shot->type, OBJ_MINE)) {
+	    if (shot->type == OBJ_MINE) {
 		if (!options.minesOnRadar && !shownuke)
 		    continue;
 		if (frame_loops_slow % 8 >= 6)
 		    continue;
-	    } else if (BIT(shot->type, OBJ_BALL)) {
+	    } else if (shot->type == OBJ_BALL) {
 		size = 2;
-	    } else if (BIT(shot->type, OBJ_ASTEROID)) {
+	    } else if (shot->type == OBJ_ASTEROID) {
 		size = WIRE_PTR(shot)->size + 1;
 		size |= 0x80;
 	    } else {
