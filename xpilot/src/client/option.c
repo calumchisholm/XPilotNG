@@ -520,39 +520,6 @@ void Parse_options(int *argcp, char **argvp)
 	fclose(fp);
     }
 
-#if 0
-    /* evil and ugly argv parsing */
-    for (i = 1; i < *argcp; i++) {
-	if (argvp[i][0] == '-') {
-	    char *arg = &argvp[i][1];
-	    /* allow --foo options */
-	    if (arg[0] == '-')
-		arg++;
-	    if (is_noarg_option(arg)) {
-		Set_option(arg, "true");
-		argvp[i][0] = '\0'; /* remove option */
-		continue;
-	    } else {
-		bool ok = false;
-
-		if (i + 1 < *argcp) {
-		    ok = Set_option(arg, argvp[i + 1]);
-		    if (ok) {
-			argvp[i][0] = '\0';
-			argvp[i + 1][0] = '\0';
-			i++; /* evil hack */
-		    }
-		}
-		if (!ok) {
-		    warn("Unknown or incomplete option '%s'", argvp[i]);
-		    warn("Type: %s -help to see a list of options", argvp[0]);
-		    exit(1);
-		}
-	    }
-	}
-	/*printf("arg %d: %s\n", i, argvp[i]);*/
-    }
-#else
     /*
      * Here we step trough argc - 1 arguments, leaving
      * only the arguments that might be server names.
@@ -603,8 +570,6 @@ void Parse_options(int *argcp, char **argvp)
      * + 1 is for the program name.
      */
     *argcp = num_servers + 1;
-
-#endif
 
     if (xpArgs.help)
 	Usage();
