@@ -57,10 +57,6 @@
 
 char configure_version[] = VERSION;
 
-#ifndef PATH_MAX
-#define PATH_MAX	1023
-#endif
-
 static int Config_create_power(int widget_desc, int *height);
 static int Config_create_turnSpeed(int widget_desc, int *height);
 static int Config_create_turnResistance(int widget_desc, int *height);

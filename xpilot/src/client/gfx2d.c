@@ -28,12 +28,6 @@ char gfx2d_version[] = VERSION;
 
 char	*texturePath = NULL;		/* Path list of texture directories */
 
-
-#ifndef PATH_MAX
-#define PATH_MAX	1023
-#endif
-
-
 /*
  *   Purpose: initialize xp_picture structure and load it from file.
  *   Error handling is incomplete.
