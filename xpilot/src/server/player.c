@@ -466,9 +466,15 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
      * At least don't make the player wait for a new round if he's the
      * only one on the server. Mara's change (always too_late) meant
      * there was a round reset when the first player joined. -uau
+     *
+     * In individual games, make the new players appear after a small delay.
      */
-    if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0)
-	Player_set_state(pl, PL_STATE_WAITING);
+    if (NumPlayers > 0) {
+	if (BIT(world->rules->mode, LIMITED_LIVES))
+	    Player_set_state(pl, PL_STATE_WAITING);
+	else
+	    Player_set_state(pl, PL_STATE_APPEARING);
+    }
 
     pl->team		= TEAM_NOT_SET;
 
