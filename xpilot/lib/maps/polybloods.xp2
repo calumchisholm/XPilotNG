@@ -1,53 +1,53 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
-<Option name="oldthrust" value="0.5"/>
-<Option name="wallBounceFuelDrainMult" value="0.2"/>
-<Option name="maxplayershots" value="12"/>
-<Option name="teamimmunity" value="yes"/>
-<Option name="gravity" value="0"/>
-<Option name="allowshields" value="no"/>
-<Option name="maxunshieldedwallbouncespeed" value="90"/>
-<Option name="playersonradar" value="yes"/>
-<Option name="teamplay" value="yes"/>
-<Option name="initialafterburners" value="2"/>
-<Option name="pausedfps" value="0"/>
-<Option name="allowplayercrashes" value="yes"/>
-<Option name="playerstartsshielded" value="yes"/>
-<Option name="ballradius" value="8"/>
-<Option name="baselesspausing" value="yes"/>
-<Option name="allowmodifiers" value="no"/>
-<Option name="playerwallbouncebrakefactor" value="0.6"/>
-<Option name="ballswallbounce" value="yes"/>
 <Option name="allowclusters" value="no"/>
-<Option name="mapheight" value="3500"/>
-<Option name="debriswallbounce" value="no"/>
-<Option name="limitedlives" value="yes"/>
 <Option name="allowlasermodifiers" value="no"/>
-<Option name="reserverobotteam" value="no"/>
-<Option name="robotteam" value="0"/>
-<Option name="mapwidth" value="3500"/>
-<Option name="usewreckage" value="no"/>
-<Option name="treasuresonradar" value="no"/>
-<Option name="allowshipshapes" value="yes"/>
-<Option name="itemprobmult" value="0.0000"/>
-<Option name="mapauthor" value="Blood, Samaseon and Throat"/>
-<Option name="roundstoplay" value="0"/>
-<Option name="initialautopilots" value="1"/>
-<Option name="robots" value="0"/>
-<Option name="maxshieldedwallbouncespeed" value="100"/>
-<Option name="sparkswallbounce" value="yes"/>
-<Option name="worldlives" value="3"/>
-<Option name="allowplayerkilling" value="yes"/>
-<Option name="limitedvisibility" value="no"/>
-<Option name="mapname" value="Polygon Blood's Music v8.2"/>
-<Option name="waitingfps" value="0"/>
+<Option name="allowmodifiers" value="no"/>
 <Option name="allowplayerbounces" value="no"/>
-<Option name="initialfuel" value="1000"/>
-<Option name="edgewrap" value="yes"/>
-<Option name="shotswallbounce" value="no"/>
-<Option name="dataURL" value="http://xpilot.sourceforge.net/maps/polybloods.xpd"/>
-<Option name="kineticenergyfueldrain" value="no"/>
+<Option name="allowplayercrashes" value="yes"/>
+<Option name="allowplayerkilling" value="yes"/>
+<Option name="allowshields" value="no"/>
+<Option name="allowshipshapes" value="yes"/>
+<Option name="ballradius" value="8"/>
 <Option name="ballstyles" value="false"/>
+<Option name="ballswallbounce" value="yes"/>
+<Option name="baselesspausing" value="yes"/>
+<Option name="constantspeed" value="0.5"/>
+<Option name="dataURL" value="http://xpilot.sourceforge.net/maps/polybloods.xpd"/>
+<Option name="debriswallbounce" value="no"/>
+<Option name="edgewrap" value="yes"/>
+<Option name="gravity" value="0"/>
+<Option name="initialafterburners" value="2"/>
+<Option name="initialautopilots" value="1"/>
+<Option name="initialfuel" value="1000"/>
+<Option name="itemprobmult" value="0.0000"/>
+<Option name="kineticenergyfueldrain" value="no"/>
+<Option name="limitedlives" value="yes"/>
+<Option name="limitedvisibility" value="no"/>
+<Option name="mapauthor" value="Blood, Samaseon and Throat"/>
+<Option name="mapheight" value="3500"/>
+<Option name="mapname" value="Polygon Blood's Music v8.2"/>
+<Option name="mapwidth" value="3500"/>
+<Option name="maxplayershots" value="12"/>
+<Option name="maxshieldedwallbouncespeed" value="100"/>
+<Option name="maxunshieldedwallbouncespeed" value="90"/>
+<Option name="pausedfps" value="0"/>
+<Option name="playersonradar" value="yes"/>
+<Option name="playerstartsshielded" value="yes"/>
+<Option name="playerwallbouncebrakefactor" value="0.6"/>
+<Option name="reserverobotteam" value="no"/>
+<Option name="robots" value="0"/>
+<Option name="robotteam" value="0"/>
+<Option name="roundstoplay" value="0"/>
+<Option name="shotswallbounce" value="no"/>
+<Option name="sparkswallbounce" value="yes"/>
+<Option name="teamimmunity" value="yes"/>
+<Option name="teamplay" value="yes"/>
+<Option name="treasuresonradar" value="no"/>
+<Option name="usewreckage" value="no"/>
+<Option name="waitingfps" value="0"/>
+<Option name="wallBounceFuelDrainMult" value="0.2"/>
+<Option name="worldlives" value="3"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
 <BmpStyle id="tx8.ppm" filename="tx8.ppm" flags="1"/>
