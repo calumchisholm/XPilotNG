@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -344,10 +344,6 @@ int Handle_keyboard(int ind)
 	    case KEY_TOGGLE_VELOCITY:
 	    case KEY_TOGGLE_CLUSTER:
 	    case KEY_SWAP_SETTINGS:
-	    case KEY_INCREASE_POWER:
-	    case KEY_DECREASE_POWER:
-	    case KEY_INCREASE_TURNSPEED:
-	    case KEY_DECREASE_TURNSPEED:
 	    case KEY_LOCK_NEXT_CLOSE:
 	    case KEY_TOGGLE_COMPASS:
 	    case KEY_TOGGLE_MINI:
@@ -402,10 +398,6 @@ int Handle_keyboard(int ind)
 	    case KEY_LOAD_LOCK_4:
 	    case KEY_REPROGRAM:
 	    case KEY_SWAP_SETTINGS:
-	    case KEY_INCREASE_POWER:
-	    case KEY_DECREASE_POWER:
-	    case KEY_INCREASE_TURNSPEED:
-	    case KEY_DECREASE_TURNSPEED:
 	    case KEY_TANK_NEXT:
 	    case KEY_TANK_PREV:
 	    case KEY_TURN_LEFT:		/* Needed so that we don't get */
@@ -434,10 +426,6 @@ int Handle_keyboard(int ind)
 	    case KEY_TOGGLE_VELOCITY:
 	    case KEY_TOGGLE_CLUSTER:
 	    case KEY_SWAP_SETTINGS:
-	    case KEY_INCREASE_POWER:
-	    case KEY_DECREASE_POWER:
-	    case KEY_INCREASE_TURNSPEED:
-	    case KEY_DECREASE_TURNSPEED:
 	    case KEY_THRUST:
 	    case KEY_CLOAK:
 	    case KEY_DROP_BALL:
@@ -959,40 +947,6 @@ int Handle_keyboard(int ind)
 		    pl->tractor_is_pressor = false;
 		    SET_BIT(pl->used, HAS_TRACTOR_BEAM);
 		}
-		break;
-
-	    case KEY_INCREASE_POWER:
-		if (   BIT(pl->status, HOVERPAUSE)
-		    || BIT(pl->used, HAS_AUTOPILOT))
-		    break;
-		pl->power *= 1.10;
-		pl->power = MIN(pl->power, MAX_PLAYER_POWER);
-		break;
-
-	    case KEY_DECREASE_POWER:
-		if (   BIT(pl->status, HOVERPAUSE)
-		    || BIT(pl->used, HAS_AUTOPILOT))
-		    break;
-		pl->power *= 0.90;
-		pl->power = MAX(pl->power, MIN_PLAYER_POWER);
-		break;
-
-	    case KEY_INCREASE_TURNSPEED:
-		if (   BIT(pl->status, HOVERPAUSE)
-		    || BIT(pl->used, HAS_AUTOPILOT))
-		    break;
-		if (pl->turnacc == 0.0)
-		    pl->turnspeed *= 1.05;
-		pl->turnspeed = MIN(pl->turnspeed, MAX_PLAYER_TURNSPEED);
-		break;
-
-	    case KEY_DECREASE_TURNSPEED:
-		if (   BIT(pl->status, HOVERPAUSE)
-		    || BIT(pl->used, HAS_AUTOPILOT))
-		    break;
-		if (pl->turnacc == 0.0)
-		    pl->turnspeed *= 0.95;
-		pl->turnspeed = MAX(pl->turnspeed, MIN_PLAYER_TURNSPEED);
 		break;
 
 	    case KEY_THRUST:

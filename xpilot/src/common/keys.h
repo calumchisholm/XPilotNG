@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -59,10 +59,10 @@ typedef enum {
     KEY_SWAP_SETTINGS,
     KEY_REFUEL,
     KEY_CONNECTOR,
-    KEY_INCREASE_POWER,
-    KEY_DECREASE_POWER,
-    KEY_INCREASE_TURNSPEED,
-    KEY_DECREASE_TURNSPEED,
+    KEY_UNUSED_26,		/* Was KEY_INCREASE_POWER */
+    KEY_UNUSED_27,		/* Was KEY_DECREASE_POWER */
+    KEY_UNUSED_28,		/* Was KEY_INCREASE_TURNSPEED */
+    KEY_UNUSED_29,		/* Was KEY_DECREASE_TURNSPEED */
     KEY_THRUST,							/* 30 */
     KEY_CLOAK,
     KEY_ECM,
@@ -98,7 +98,7 @@ typedef enum {
     KEY_HYPERJUMP,		/* Was KEY_POINTER_CONTROL up to 3.2.5 */
     KEY_DETONATE_MINES,
     KEY_DEFLECTOR,		/* since 3.8.0 */
-    KEY_TOGGLE_RADAR_SCORE,	/* 4.5.4X */
+    KEY_UNUSED_65,
     KEY_UNUSED_66,
     KEY_UNUSED_67,
     KEY_UNUSED_68,
@@ -148,6 +148,11 @@ typedef enum {
     KEY_TALK_CURSOR_UP,
     KEY_TALK_CURSOR_DOWN,
     KEY_SWAP_SCALEFACTOR,
+    KEY_TOGGLE_RADAR_SCORE,
+    KEY_INCREASE_POWER,
+    KEY_DECREASE_POWER,
+    KEY_INCREASE_TURNSPEED,
+    KEY_DECREASE_TURNSPEED,
     NUM_CLIENT_KEYS	/* The number of keys really used by the client. */
 #endif
 } keys_t;
