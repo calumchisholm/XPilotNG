@@ -274,6 +274,20 @@ static int Uncompress_map(void)
 }
 
 
+/* Get signed short and advance ptr */
+static int get_short(char **ptr)
+{
+    *ptr += 2;
+    return ((signed char)*(*ptr - 2) << 8) + (unsigned char)(*(*ptr - 1));
+}
+
+/* Unsigned version */
+static unsigned int get_ushort(char **ptr)
+{
+    *ptr += 2;
+    return ((unsigned char)*(*ptr - 2) << 8) + (unsigned char)*(*ptr - 1);
+}
+
 /*
  * Receive the map data and some game parameters from
  * the server.  The map data may be in compressed form.
@@ -423,8 +437,7 @@ int Net_setup(void)
         int *styles;
 	xp_polygon_t poly;
 	ipos *points, min, max;
-	signed char *ptr;
-	unsigned char *hidptr;
+	char *ptr, *hidptr;
 
 	oldServer = 0;
 	ptr = Setup->map_data;
@@ -457,27 +470,23 @@ int Net_setup(void)
         polygon_styles[0].visible_in_radar = true;
         polygon_styles[0].method = NOFILL;
         polygon_styles[0].def_edge_style = 0;
-        
+
         /* hidden polygon style */
         polygon_styles[1].visible = false;
 
-	polyc = (unsigned char)*ptr++ << 8;
-	polyc += (unsigned char)*ptr++;
+	polyc = get_ushort(&ptr);
 	for (i = 0; i < polyc; i++) {
 	    dx = 0;
 	    dy = 0;
-	    hidcount = (unsigned char)*ptr++ << 8;
-	    hidcount += (unsigned char)*ptr++;
+	    hidcount = get_ushort(&ptr);
 	    hidptr = ptr;
 	    if (hidcount) {
-		nexthid = *hidptr++ << 8;
-		nexthid += *hidptr++;
+		nexthid = get_ushort(&hidptr);
 	    }
 	    else
 		nexthid = INT_MAX;
 	    ptr += hidcount * 2;
-	    pc = (unsigned char)*ptr++ << 8;
-	    pc += (unsigned char)*ptr++;
+	    pc = get_ushort(&ptr);
 	    if ((points = malloc(pc * sizeof(ipos))) == NULL) {
 		error("no memory for points");
 		return -1;
@@ -490,19 +499,16 @@ int Net_setup(void)
             } else {
                 styles = NULL;
             }
-	    startx = (unsigned char)*ptr++ << 8;
-	    startx += (unsigned char)*ptr++;
-	    starty = (unsigned char)*ptr++ << 8;
-	    starty += (unsigned char)*ptr++;
+	    startx = get_ushort(&ptr);
+	    starty = get_ushort(&ptr);
 	    points[0].x = cx = min.x = max.x = startx;
 	    points[0].y = cy = min.y = max.y = starty;
 
 	    if (!nexthid) {
-		styles[0] = 0; /* -1 means default */
+		styles[0] = 1; /* -1 means default */
 		hidcount--;
 		if (hidcount) {
-		    nexthid = *hidptr++ << 8;
-		    nexthid += *hidptr++;
+		    nexthid = get_ushort(&hidptr);
 		}
 	    }
 	    else {
@@ -510,10 +516,8 @@ int Net_setup(void)
             }
 
 	    for (j = 1; j < pc; j++) {
-		dx = *ptr++ << 8;
-		dx += (unsigned char)*ptr++;
-		dy = *ptr++ << 8;
-		dy += (unsigned char)*ptr++;
+		dx = get_short(&ptr);
+		dy = get_short(&ptr);
 		cx += dx;
 		cy += dy;
 		if (min.x > cx) min.x = cx;
@@ -527,8 +531,7 @@ int Net_setup(void)
 		    styles[j] = 1;
 		    hidcount--;
 		    if (hidcount) {
-			nexthid = *hidptr++ << 8;
-			nexthid += *hidptr++;
+			nexthid = get_ushort(&hidptr);
 		    }
 		}
 		else {
@@ -555,10 +558,8 @@ int Net_setup(void)
 	    /* base.pos is not used */
 	    bases[i].id = -1;
 	    bases[i].team = *ptr++;
-	    cx = *ptr++ << 8;
-	    cx += (unsigned char)*ptr++;
-	    cy = *ptr++ << 8;
-	    cy += (unsigned char)*ptr++;
+	    cx = get_ushort(&ptr);
+	    cy = get_ushort(&ptr);
             bases[i].bounds.x = cx - BLOCK_SZ / 2;
             bases[i].bounds.y = cy - BLOCK_SZ / 2;
             bases[i].bounds.w = BLOCK_SZ;
@@ -575,7 +576,7 @@ int Net_setup(void)
 		bases[i].type = SETUP_BASE_RIGHT;
 	    ptr++;
 	}
-	num_fuels = *ptr++;
+	num_fuels = get_ushort(&ptr);
 	if (num_fuels != 0) {
 	    fuels = (fuelstation_t *)malloc(num_fuels * sizeof(fuelstation_t));
 	    if (fuels == NULL) {
@@ -584,10 +585,8 @@ int Net_setup(void)
 	    }
 	}
 	for (i = 0; i < num_fuels; i++) {
-	    cx = *ptr++ << 8;
-	    cx += (unsigned char)*ptr++;
-	    cy = *ptr++ << 8;
-	    cy += (unsigned char)*ptr++;
+	    cx = get_ushort(&ptr);
+	    cy = get_ushort(&ptr);
 	    fuels[i].fuel = MAX_STATION_FUEL;
             fuels[i].bounds.x = cx - BLOCK_SZ / 2;
             fuels[i].bounds.y = cy - BLOCK_SZ / 2;
@@ -604,10 +603,8 @@ int Net_setup(void)
 	    }
 	}
 	for (i = 0; i < num_checks; i++) {
-	    cx = *ptr++ << 8;
-	    cx += (unsigned char)*ptr++;
-	    cy = *ptr++ << 8;
-	    cy += (unsigned char)*ptr++;
+	    cx = get_ushort(&ptr);
+	    cy = get_ushort(&ptr);
             checks[i].bounds.x = cx - BLOCK_SZ / 2;
             checks[i].bounds.y = cy - BLOCK_SZ / 2;
             checks[i].bounds.w = BLOCK_SZ;

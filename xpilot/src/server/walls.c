@@ -1283,23 +1283,27 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 #include <netinet/in.h>
 #endif
 
+static void store_short(char **ptr, int i)
+{
+    *(*ptr)++ = i >> 8;
+    *(*ptr)++ = i & 0xff;
+}
+
+
 int Polys_to_client(char *ptr)
 {
     int i, j, startx, starty, dx, dy, group, hid;
     int *p = polygons;
     char *start = ptr;
 
-    *ptr++ = polyc >> 8;
-    *ptr++ = polyc & 0xff;
+    store_short(&ptr, polyc);
     for (i = 0; i < polyc; i++) {
 	group = *p++;
 	j = *p++;
 	hid = *p++;
-	*ptr++ = hid >> 8;
-	*ptr++ = hid & 0xff;
+	store_short(&ptr, hid);
 	while (*p != INT_MAX) {
-	    *ptr++ = *p >> 8;
-	    *ptr++ = *p & 0xff;
+	    store_short(&ptr, *p);
 	    p++;
 	}
 	p++; /* skip the INT_MAX */
@@ -1307,22 +1311,17 @@ int Polys_to_client(char *ptr)
 	dy = 0;
 	startx = *p++;
 	starty = *p++;
-	*ptr++ = j >> 8;
-	*ptr++ = j & 0xff;
-	*ptr++ = startx >> CLICK_SHIFT + 8;
-	*ptr++ = startx >> CLICK_SHIFT & 0xff;
-	*ptr++ = starty >> CLICK_SHIFT + 8;
-	*ptr++ = starty >> CLICK_SHIFT & 0xff;
+	store_short(&ptr, j);
+	store_short(&ptr, startx >> CLICK_SHIFT);
+	store_short(&ptr, starty >> CLICK_SHIFT);
 	startx = 0;
 	starty = 0;
 	for (; j > 0; j--) {
 	    dx += *p++;
 	    dy += *p++;
 	    if (j != 1) {
-		*ptr++ = (dx >> CLICK_SHIFT) - startx >> 8;
-		*ptr++ = (dx >> CLICK_SHIFT) - startx & 0xff;
-		*ptr++ = (dy >> CLICK_SHIFT) - starty >> 8;
-		*ptr++ = (dy >> CLICK_SHIFT) - starty & 0xff;
+		store_short(&ptr, (dx >> CLICK_SHIFT) - startx);
+		store_short(&ptr, (dy >> CLICK_SHIFT) - starty);
 	    }
 	    startx = dx >> CLICK_SHIFT;
 	    starty = dy >> CLICK_SHIFT;
@@ -1334,25 +1333,20 @@ int Polys_to_client(char *ptr)
 	    *ptr++ = 0;
 	else
 	    *ptr++ = World.base[i].team;
-	*ptr++ = World.base[i].pos.x >> CLICK_SHIFT + 8;
-	*ptr++ = World.base[i].pos.x >> CLICK_SHIFT & 0xff;
-	*ptr++ = World.base[i].pos.y >> CLICK_SHIFT + 8;
-	*ptr++ = World.base[i].pos.y >> CLICK_SHIFT & 0xff;
+	store_short(&ptr, World.base[i].pos.x >> CLICK_SHIFT);
+	store_short(&ptr, World.base[i].pos.y >> CLICK_SHIFT);
 	*ptr++ = World.base[i].dir;
     }
-    *ptr++ = World.NumFuels;
+    *ptr++ = World.NumFuels >> 8;
+    *ptr++ = World.NumFuels & 0xff;
     for (i = 0; i < World.NumFuels; i++) {
-	*ptr++ = World.fuel[i].clk_pos.x >> CLICK_SHIFT + 8;
-	*ptr++ = World.fuel[i].clk_pos.x >> CLICK_SHIFT & 0xff;
-	*ptr++ = World.fuel[i].clk_pos.y >> CLICK_SHIFT + 8;
-	*ptr++ = World.fuel[i].clk_pos.y >> CLICK_SHIFT & 0xff;
+	store_short(&ptr, World.fuel[i].clk_pos.x >> CLICK_SHIFT);
+	store_short(&ptr, World.fuel[i].clk_pos.y >> CLICK_SHIFT);
     }
     *ptr++ = World.NumChecks;
     for (i = 0; i < World.NumChecks; i++) {
-	*ptr++ = World.check[i].x >> CLICK_SHIFT + 8;
-	*ptr++ = World.check[i].x >> CLICK_SHIFT & 0xff;
-	*ptr++ = World.check[i].y >> CLICK_SHIFT + 8;
-	*ptr++ = World.check[i].y >> CLICK_SHIFT & 0xff;
+	store_short(&ptr, World.check[i].x >> CLICK_SHIFT);
+	store_short(&ptr, World.check[i].y >> CLICK_SHIFT);
     }
     return ptr - start;
 }
