@@ -94,6 +94,37 @@ static char *rank_showtime(const time_t t)
     return buf;
 }
 
+/*
+ * Encode 'str' for XML or HTML.
+ */
+static char *encode(const char *str)
+{
+    static char result[MAX_CHARS];
+    char c;
+
+    result[0] = '\0';
+    while ((c = *str++) != '\0') {
+	if (c == '<')
+	    strlcat(result, "&lt;", sizeof(result));
+	else if (c == '>')
+	    strlcat(result, "&gt;", sizeof(result));
+	else if (c == '&')
+	    strlcat(result, "&amp;", sizeof(result));
+	else if (c == '\'')
+	    strlcat(result, "&apos;", sizeof(result));
+	else if (c == '"')
+	    strlcat(result, "&quot;", sizeof(result));
+	else {
+	    char tmp[2];
+
+	    sprintf(tmp, "%c", c);
+	    strlcat(result, tmp, sizeof(result));
+	}
+    }
+
+    return result;
+}
+
 /* Here's where we calculate the ranks. Figure it out yourselves! */
 static void SortRankings(void)
 {
@@ -289,7 +320,11 @@ void Rank_write_webpage(void)
 
 	fprintf(file,
 		"<tr><td align=left><tt>%d</tt>"
-		"<td align=left><b>%s</b>"
+		"<td align=left><b>%s</b>",
+		i + 1,
+		encode(rank->name));
+
+	fprintf(file,
 		"<td align=right>%.1f"
 		"<td align=right>%u"
 		"<td align=right>%u"
@@ -297,19 +332,21 @@ void Rank_write_webpage(void)
 		"<td align=right>%u"
 		"<td align=center>%u/%u/%u/%u/%.2f"
 		"<td align=right>%.2f"
-		"<td align=right>%s"
-		"<td align=left>%s"
-		"<td align=center>%s\n"
-		"</tr>\n",
-		i + 1,
-		rank->name, rank->score,
+		"<td align=right>%s",
+		rank->score,
 		rank->kills, rank->deaths,
 		rank->rounds, rank->shots,
 		rank->ballsCashed, rank->ballsSaved,
 		rank->ballsWon, rank->ballsLost,
 		rank->bestball,
 		rank_base[i].ratio,
-		rank->user, rank->host,
+		encode(rank->user));
+
+	fprintf(file,
+		"<td align=left>%s"
+		"<td align=center>%s\n"
+		"</tr>\n",
+		encode(rank->host),
 		Rank_get_logout_message(rank));
     }
     fprintf(file, footer, rank_showtime(time(NULL)));
@@ -460,7 +497,8 @@ void Rank_init_saved_scores(void)
 
     file = fopen(options.rankFileName, "r");
     if (!file) {
-	error("Couldn't open rank file \"%s\"", options.rankFileName);
+	if (errno != ENOENT)
+	    error("Couldn't open rank file \"%s\"", options.rankFileName);
 	return;
     }
 
@@ -567,7 +605,7 @@ void Rank_write_rankfile(void)
 
     if (fprintf(file,
 		"<?xml version=\"1.0\"?>\n"
-		"<XPilotNGRank version=\"0.0\">\n"
+		"<XPilotNGRank version=\"1.0\">\n"
 		"<Players>\n") < 0)
 	goto writefailed;
     
@@ -578,10 +616,16 @@ void Rank_write_rankfile(void)
 	if (strlen(rank->name) == 0)
 	    continue;
 
+	if (fprintf(file, "<Player "
+		    "name=\"%s\" ", encode(rank->name)) < 0)
+	    goto writefailed;
+
 	if (fprintf(file,
-		    "<Player "
-		    "name=\"%s\" user=\"%s\" host=\"%s\" ",
-		    rank->name, rank->user, rank->host) < 0)
+		    "user=\"%s\" ", encode(rank->user)) < 0)
+	    goto writefailed;
+
+	if (fprintf(file,
+		    "host=\"%s\" ", encode(rank->host)) < 0)
 	    goto writefailed;
 
 	if (rank->score != 0.0
@@ -685,9 +729,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		version = atof(*(attr + 1));
 	    attr += 2;
 	}
-	if (version == 0.0)
-	    warn("Rank file version is 0.0.");
-	else if (version > 0.0) {
+	if (version > 1.0) {
 	    warn("Rank file has newer version than this server recognizes.");
 	    warn("The file might use unsupported features.");
 	}
@@ -755,7 +797,6 @@ static void tagstart(void *data, const char *el, const char **attr)
     return;
 }
 
-
 static void tagend(void *data, const char *el)
 {
     UNUSED_PARAM(data);
@@ -766,12 +807,9 @@ static void tagend(void *data, const char *el)
     return;
 }
 
-
-
-
 static bool Rank_parse_rankfile(FILE *file)
 {
-    char buff[8192];
+    char buf[8192];
     int len, fd;
     XML_Parser p = XML_ParserCreate(NULL);
 
@@ -785,12 +823,12 @@ static bool Rank_parse_rankfile(FILE *file)
     }
     XML_SetElementHandler(p, tagstart, tagend);
     do {
-	len = read(fd, buff, 8192);
+	len = read(fd, buf, sizeof(buf));
 	if (len < 0) {
 	    error("Error reading rankfile!");
 	    return false;
 	}
-	if (!XML_Parse(p, buff, len, !len)) {
+	if (!XML_Parse(p, buf, len, !len)) {
 	    warn("Parse error reading rankfile at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));
