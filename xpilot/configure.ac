@@ -45,9 +45,9 @@ fi])
 
 AC_ARG_ENABLE(plockserver,
 	AC_HELP_STRING([--enable-plockserver],
-			[lock the xpilot server (xpilots) into memory]),
+			[lock the xpilot-ng server into memory]),
 [if test x$enable_plockserver = xyes; then
-	AC_DEFINE([PLOCKSERVER], 1, [lock the xpilot server (xpilots) into memory])
+	AC_DEFINE([PLOCKSERVER], 1, [lock the xpilot-ng server into memory])
 fi])
 
 AC_ARG_ENABLE(development,
@@ -59,7 +59,7 @@ fi])
 
 AC_ARG_ENABLE(sdl_client,
 	AC_HELP_STRING([--enable-sdl-client],
-			[enable sdl client]),
+			[enable SDL/OpenGL client]),
 [if test x$enable_sdl_client = xyes; then
 	AC_DEFINE([SDL_CLIENT], 1, [enable sdl client])
 fi])
@@ -85,9 +85,21 @@ AC_PROG_RANLIB
 AC_PROG_INSTALL
 
 dnl  Checks for libraries.
+dnl kps - these should be cleaned up and not use the autoconf internal
+dnl shell variables.
 AC_CHECK_LIB(m, cos)
+if test x$ac_cv_lib_m_cos != xyes; then
+	AC_MSG_ERROR([*** Math library not found!])
+fi
 AC_CHECK_LIB(z, gzopen)
+if test x$ac_cv_lib_z_gzopen != xyes; then
+	AC_MSG_ERROR([*** Required library zlib not found!])
+fi
 AC_CHECK_LIB(expat, XML_ParserCreate)
+if test x$ac_cv_lib_expat_XML_ParserCreate != xyes; then
+	AC_MSG_ERROR([*** Required library Expat not found!])
+fi
+
 AC_PATH_X
 AC_PATH_XTRA
 
@@ -156,7 +168,7 @@ if test x$enable_sdl_client = xyes; then
 	if test x$have_libsdl_ttf = xyes; then
 	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_ttf"
 	else
-	    AC_MSG_ERROR(Unable to find SDL_ttf headers and libraries)
+	    AC_MSG_ERROR([*** Unable to find SDL_ttf headers and libraries!])
 	fi
 	AC_SUBST(SDL_EXTRA_LIBS)
 
@@ -173,9 +185,10 @@ if test x$enable_sdl_client = xyes; then
 	AC_MSG_RESULT($have_libsdl_image)
 	if test x$have_libsdl_image = xyes; then
 	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_image"
-	    AC_DEFINE([HAVE_SDL_IMAGE], 1, [hack])
+	    AC_DEFINE([HAVE_SDL_IMAGE], 1,
+			[Define to 1 if you have the SDL_image library.])
 	else
-	    AC_MSG_WARN(Unable to find SDL_image headers and libraries)
+	    AC_MSG_ERROR([*** Unable to find SDL_image headers and libraries!])
 	fi
 	AC_SUBST(SDL_EXTRA_LIBS)
 
@@ -193,7 +206,7 @@ if test x$enable_sdl_client = xyes; then
 	if test x$have_opengl = xyes; then
 	    GL_LIBS="$SDL_LIBS $SYS_GL_LIBS"
 	else
-	    AC_MSG_ERROR(Unable to find OpenGL headers and libraries)
+	    AC_MSG_ERROR([*** Unable to find OpenGL headers and libraries!])
 	fi
 	AC_SUBST(GL_LIBS)
 fi

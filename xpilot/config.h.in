@@ -114,7 +114,7 @@
 /* Define to 1 if you have the `rint' function. */
 #undef HAVE_RINT
 
-/* hack */
+/* Define to 1 if you have the SDL_image library. */
 #undef HAVE_SDL_IMAGE
 
 /* Define to 1 if you have the `select' function. */
@@ -299,7 +299,7 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* lock the xpilot server (xpilots) into memory */
+/* lock the xpilot-ng server into memory */
 #undef PLOCKSERVER
 
 /* Define to 1 if the C compiler supports function prototypes. */

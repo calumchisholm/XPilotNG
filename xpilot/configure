@@ -862,9 +862,9 @@ Optional Features:
 			  (and sometimes confusing) to the casual installer
   --enable-dbe            support for X Doublebuffer Extension in client
   --enable-mbx            support for X Multibuffer Extension in client
-  --enable-plockserver    lock the xpilot server (xpilots) into memory
+  --enable-plockserver    lock the xpilot-ng server into memory
   --enable-development    enable development code
-  --enable-sdl-client     enable sdl client
+  --enable-sdl-client     enable SDL/OpenGL client
   --enable-sdl-gameloop   enable sdl gameloop in sdl client (otherwise use
                           gameloop optimised for X11)
   --disable-dependency-tracking  speeds up one-time build
@@ -3317,6 +3317,11 @@ _ACEOF
 
 fi
 
+if test x$ac_cv_lib_m_cos != xyes; then
+	{ { echo "$as_me:$LINENO: error: *** Math library not found!" >&5
+echo "$as_me: error: *** Math library not found!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 echo "$as_me:$LINENO: checking for gzopen in -lz" >&5
 echo $ECHO_N "checking for gzopen in -lz... $ECHO_C" >&6
@@ -3390,6 +3395,11 @@ _ACEOF
 
 fi
 
+if test x$ac_cv_lib_z_gzopen != xyes; then
+	{ { echo "$as_me:$LINENO: error: *** Required library zlib not found!" >&5
+echo "$as_me: error: *** Required library zlib not found!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 echo "$as_me:$LINENO: checking for XML_ParserCreate in -lexpat" >&5
 echo $ECHO_N "checking for XML_ParserCreate in -lexpat... $ECHO_C" >&6
@@ -3461,6 +3471,12 @@ _ACEOF
 
   LIBS="-lexpat $LIBS"
 
+fi
+
+if test x$ac_cv_lib_expat_XML_ParserCreate != xyes; then
+	{ { echo "$as_me:$LINENO: error: *** Required library Expat not found!" >&5
+echo "$as_me: error: *** Required library Expat not found!" >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
 ac_ext=c
@@ -5709,8 +5725,8 @@ echo "${ECHO_T}$have_libsdl_ttf" >&6
 	if test x$have_libsdl_ttf = xyes; then
 	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_ttf"
 	else
-	    { { echo "$as_me:$LINENO: error: Unable to find SDL_ttf headers and libraries" >&5
-echo "$as_me: error: Unable to find SDL_ttf headers and libraries" >&2;}
+	    { { echo "$as_me:$LINENO: error: *** Unable to find SDL_ttf headers and libraries!" >&5
+echo "$as_me: error: *** Unable to find SDL_ttf headers and libraries!" >&2;}
    { (exit 1); exit 1; }; }
 	fi
 
@@ -5777,8 +5793,9 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 	else
-	    { echo "$as_me:$LINENO: WARNING: Unable to find SDL_image headers and libraries" >&5
-echo "$as_me: WARNING: Unable to find SDL_image headers and libraries" >&2;}
+	    { { echo "$as_me:$LINENO: error: *** Unable to find SDL_image headers and libraries!" >&5
+echo "$as_me: error: *** Unable to find SDL_image headers and libraries!" >&2;}
+   { (exit 1); exit 1; }; }
 	fi
 
 
@@ -5839,8 +5856,8 @@ echo "${ECHO_T}$have_opengl" >&6
 	if test x$have_opengl = xyes; then
 	    GL_LIBS="$SDL_LIBS $SYS_GL_LIBS"
 	else
-	    { { echo "$as_me:$LINENO: error: Unable to find OpenGL headers and libraries" >&5
-echo "$as_me: error: Unable to find OpenGL headers and libraries" >&2;}
+	    { { echo "$as_me:$LINENO: error: *** Unable to find OpenGL headers and libraries!" >&5
+echo "$as_me: error: *** Unable to find OpenGL headers and libraries!" >&2;}
    { (exit 1); exit 1; }; }
 	fi
 
