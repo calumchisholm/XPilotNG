@@ -2384,19 +2384,18 @@ void Client_exit(int status)
 #include <X11/extensions/xf86misc.h>
 #endif
 
-void Disable_emulate3buttons(bool disable, Display *dpy)
+void Disable_emulate3buttons(bool disable, Display *display)
 {
 #ifdef HAVE_XF86MISC
 /*#define XF86DEBUG*/
-    static bool orig_emulate;
     static bool first_run = true;
     static bool working = true;
-    bool wanted_emulate;
+    XF86MiscMouseSettings m;
+    Status status;
         
     if (!working) return;
     
-    XF86MiscMouseSettings m;
-    Status status = XF86MiscGetMouseSettings(dpy, &m);
+    status = XF86MiscGetMouseSettings(display, &m);
     #ifdef XF86DEBUG
 	warn("--- 1st get ---");
 	warn("status          : %d", status);
@@ -2412,22 +2411,17 @@ void Disable_emulate3buttons(bool disable, Display *dpy)
 	warn("flags           : 0x%x", m.flags);
     #endif
 
-    if (first_run && m.emulate3buttons) {
-	warn("*** Warning: Emulate3Buttons is enabled.");
-    }
-    
     if (first_run) {
-	orig_emulate = m.emulate3buttons;
+    	if (m.emulate3buttons) {
+	    warn("*** Warning: Emulate3Buttons is enabled.");
+	} else {
+	    working = false; // already set correctly, no need to bother about it anymore
+	    return;
+	}
     }
     
-    if (disable) {
-        wanted_emulate = false;
-    } else {
-        wanted_emulate = orig_emulate;
-    }
-    
-    m.emulate3buttons = wanted_emulate;
-    status = XF86MiscSetMouseSettings(dpy, &m);
+    m.emulate3buttons = !disable;
+    status = XF86MiscSetMouseSettings(display, &m);
 
     #ifdef XF86DEBUG
 	warn("--- set ---");
@@ -2435,7 +2429,7 @@ void Disable_emulate3buttons(bool disable, Display *dpy)
 	warn("status          : %d", status);
     #endif
     
-    XF86MiscGetMouseSettings(dpy, &m);
+    XF86MiscGetMouseSettings(display, &m);
     #ifdef XF86DEBUG
 	warn("--- 2nd get ---");
 	warn("status          : %d", status);
@@ -2451,9 +2445,9 @@ void Disable_emulate3buttons(bool disable, Display *dpy)
 	warn("flags           : 0x%x", m.flags);
     #endif
     
-    if (m.emulate3buttons != wanted_emulate) {
+    if (m.emulate3buttons != (!disable)) {
 	working = false;
-	warn("*** Warning: Failed to disable Emulate3Buttons.");
+	warn("*** Warning: Failed to switch Emulate3Buttons.");
     }
     
     first_run = false;
