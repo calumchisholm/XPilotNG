@@ -454,6 +454,7 @@ void Laser_pulse_collision(void)
 	pulse = Pulses[p];
 
 	/* check for end of pulse life */
+	/* kps - why check pulse->len here ??? */
 	if ((pulse->life -= timeStep) < 0 || pulse->len < PULSE_LENGTH) {
 	    Laser_pulse_destroy_one(p);
 	    continue;
@@ -660,6 +661,7 @@ void Laser_pulse_collision(void)
 
 #if 0
 /* kps - take stuff from poly version and move into the above */
+/* commented everything that is handled ok in Laser_pulse_collision() */
 static void LaserCollision(void)
 {
     int				ind, j, p, sc,
@@ -671,53 +673,17 @@ static void LaserCollision(void)
     char			msg[MSG_LEN];
 
     for (p = 0; p < NumPulses; p++) {
-	pulse = Pulses[p];
-	if (pulse->id != -1) {
-	    ind = GetInd[pulse->id];
-	    pl = Players[ind];
-	} else {
-	    ind = -1;
-	    pl = NULL;
-	}
-	if (--pulse->life < 0) {
-	    free(Pulses[p]);
-	    if (--NumPulses > p) {
-		Pulses[p] = Pulses[NumPulses];
-		p--;
-	    }
-	    if (pl)
-		pl->num_pulses--;
-	    continue;
-	}
-	if (pulse->len < PULSE_LENGTH) {
-	    pulse->len = 0;
-	    continue;
-	}
-	if (obj == NULL) {
-	    if (NumObjs >= MAX_TOTAL_SHOTS) {
-		pulse->len = 0;
-		continue;
-	    }
-	    objnum = NumObjs++;
-	    obj = Obj[objnum];
-	}
+	/* removed determine ind and pl */
+	/* removed checking end of pulse life */
+	/* removed setting pulse->len to 0 for pulses < PULSE_LENGTH */
+	/* removed allocation of obj */
+	/* removed pulse moves every frame part */
 
-	dx = (int)(tcos(pulse->dir) * PULSE_SPEED);
-	dy = (int)(tsin(pulse->dir) * PULSE_SPEED);
-	pulse->pos.x += dx;
-	pulse->pos.y += dy;
-	pulse->pos.x = WRAP_XCLICK(pulse->pos.x);
-	pulse->pos.y = WRAP_YCLICK(pulse->pos.y);
+	/* ng did not have calculation of pulse start and end points */
+	/* ng did not have Laser_pulse_find_victims */
+	/* ng did not have Laser_pulse_get_object_list */
 
-	obj->type = OBJ_PULSE;
-	obj->life = 1;
-	obj->owner = pulse->id;
-	obj->id = pulse->id;
-	obj->team = pulse->team;
-	obj->count = 0;
-	if (pulse->id == -1)
-	    obj->status = FROMCANNON;
-	Object_position_init_clicks(obj, pulse->pos.x, pulse->pos.y);
+	/* removed setting of obj->type etc. and object position */
 
 	obj->vel.x = CLICK_TO_FLOAT(dx);
 	obj->vel.y = CLICK_TO_FLOAT(dy);
@@ -779,80 +745,7 @@ static void LaserCollision(void)
 		    continue;
 		}
 #endif
-		sound_play_sensors(vic->pos.cx, vic->pos.cy,
-				   PLAYER_EAT_LASER_SOUND);
-		if (BIT(vic->used, (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD))
-		    == (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD))
-		    continue;
-		if (!BIT(obj->type, KILLING_SHOTS))
-		    continue;
-		if (BIT(pulse->mods.laser, STUN)
-		    || (laserIsStunGun == true
-			&& allowLaserModifiers == false)) {
-		    if (BIT(vic->used, OBJ_SHIELD|OBJ_LASER|OBJ_SHOT)
-			|| BIT(vic->status, THRUSTING)) {
-			if (pl) {
-			    sprintf(msg,
-				    "%s got paralysed by %s's stun laser.",
-				    vic->name, pl->name);
-			    if (vic->id == pl->id)
-				strcat(msg, " How strange!");
-			} else {
-			    sprintf(msg,
-				    "%s got paralysed by a stun laser.",
-				    vic->name);
-			}
-			Set_message(msg);
-			CLR_BIT(vic->used,
-				OBJ_SHIELD|OBJ_LASER|OBJ_SHOT);
-			CLR_BIT(vic->status, THRUSTING);
-			vic->stunned += 5 * TIME_FACT;
-		    }
-		} else if (BIT(pulse->mods.laser, BLIND)) {
-		    vic->damaged += (12 + 6) * TIME_FACT;
-		    vic->forceVisible += (12 + 6) * TIME_FACT;
-		    if (pl)
-			Record_shove(vic, pl, frame_loops + 12 + 6);
-		} else {
-		    Add_fuel(&(vic->fuel), (long)ED_LASER_HIT);
-		    if (!BIT(vic->used, OBJ_SHIELD)
-			&& !BIT(vic->have, OBJ_ARMOR)) {
-			SET_BIT(vic->status, KILLED);
-			if (pl) {
-			    sprintf(msg,
-				    "%s got roasted alive by %s's laser.",
-				    vic->name, pl->name);
-			    if (vic->id == pl->id) {
-				SCORE(j, PTS_PR_PL_SHOT, vic->pos.cx,
-				      vic->pos.cy, vic->name);
-				strcat(msg, " How strange!");
-			    } else {
-				sc = (int)floor(Rate(pl->score,
-						     vic->score)
-						* laserKillScoreMult);
-				Score_players(ind, sc, vic->name,
-					      j, -sc,
-					      pl->name);
-			    }
-			} else {
-			    sc = Rate(CANNON_SCORE, vic->score) / 4;
-			    SCORE(j, -sc, vic->pos.cx, vic->pos.cy, "Cannon");
-			    sprintf(msg,
-				    "%s got roasted alive by cannonfire.",
-				    vic->name);
-			}
-			sound_play_sensors(vic->pos.cx, vic->pos.cy,
-					   PLAYER_ROASTED_SOUND);
-			Set_message(msg);
-			if (pl && pl->id != vic->id) {
-			    Rank_kill(pl);
-			}
-		    }
-		    if (!BIT(vic->used, OBJ_SHIELD)
-			&& BIT(vic->have, OBJ_ARMOR)) {
-			Player_hit_armor(j);
-		    }
-		}
+		/* removed laser pulse hits player stuff */
 	    }
 	}
     }
