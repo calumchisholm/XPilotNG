@@ -35,11 +35,8 @@ char laser_version[] = VERSION;
  */
 void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 {
-    player_t *kp;
+    player_t *kp = Player_by_id(pulse->id);
     double sc;
-    world_t *world = pl->world;
-
-    kp = Player_by_id(pulse->id);
 
     pl->forceVisible += 1;
     if (BIT(pl->have, HAS_MIRROR)
@@ -110,9 +107,6 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    } else {
 		sc = Rate(CANNON_SCORE, pl->score) / 4;
 		Score(pl, -sc, pl->pos, "Cannon");
-		if (BIT(world->rules->mode, TEAM_PLAY)
-		    && pl->team != pulse->team)
-		    Team_score(world, pulse->team, sc);
 		Set_message_f("%s got roasted alive by cannonfire.", pl->name);
 	    }
 	    sound_play_sensors(pl->pos, PLAYER_ROASTED_SOUND);

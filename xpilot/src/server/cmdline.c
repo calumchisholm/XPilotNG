@@ -1061,8 +1061,8 @@ static option_desc opts[] = {
 	tuner_allowalliances,
 	"Are alliances between players allowed?\n"
 	"Alliances are like teams, except they can be formed and dissolved\n"
-	"at any time. Notably, teamImmunity and teamShareScore work for\n"
-	"alliances too. To manage alliances, use the '/ally' talk command:\n"
+	"at any time. Notably, teamImmunity works for alliances too.\n"
+	"To manage alliances, use the '/ally' talk command:\n"
 	"'/ally invite <player name>' to invite another player to join you.\n"
 	"'/ally cancel' to cancel such an invitation.\n"
 	"'/ally refuse <player name>' to decline an invitation from a player.\n"
@@ -1203,17 +1203,6 @@ static option_desc opts[] = {
 	valBool,
 	Team_immunity_init,
 	"Should other team members be immune to various shots thrust etc.?\n"
-	"This works for alliances too.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"teamShareScore",
-	"teamShareScore",
-	"no",
-	&options.teamShareScore,
-	valBool,
-	tuner_dummy,
-	"Are points gained or lost divided equally over all team members?\n"
 	"This works for alliances too.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },

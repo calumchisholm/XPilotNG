@@ -1078,7 +1078,6 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 {
     player_t *kp = NULL;
     double sc, drainfactor, drain;
-    world_t *world = pl->world;
 
     /*
      * Player got hit by a potentially deadly object.
@@ -1217,12 +1216,9 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	    }
 
 	    sc *= factor;
-	    if (BIT(obj->status, FROMCANNON)) {
+	    if (BIT(obj->status, FROMCANNON))
 		Score(pl, -sc, pl->pos, "Cannon");
-		if (BIT(world->rules->mode, TEAM_PLAY)
-		    && pl->team != obj->team)
-		    Team_score(world, obj->team, sc);
-	    } else if (obj->id == NO_ID || kp->id == pl->id)
+	    else if (obj->id == NO_ID || kp->id == pl->id)
 		Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
 	    else {
 		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);

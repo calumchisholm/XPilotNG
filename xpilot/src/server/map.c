@@ -65,8 +65,6 @@ static void Check_map_object_counters(world_t *world)
 	assert(world->teams[i].NumEmptyTreasures == 0);
 	assert(world->teams[i].TreasuresDestroyed == 0);
 	assert(world->teams[i].TreasuresLeft == 0);
-	assert(world->teams[i].score == 0);
-	assert(world->teams[i].prev_score == 0);
 	assert(world->teams[i].SwapperId == NO_ID);
     }
 }

@@ -1118,12 +1118,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    team_t *teamp = Team_by_index(world, pl->team);
 
 	    teamp->NumMembers++;
-	    if (options.teamShareScore) {
-		if (teamp->NumMembers == 1)
-		    /* reset team score on first player */
-		    teamp->score = 0;
-	    }
-	    Team_score(world, pl->team, pl->score);
 	}
 	NumPlayers++;
 	request_ID();
@@ -1187,15 +1181,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		   (int)pl_i->life, pl_i->mychar, pl_i->alliance);
 	if (!Player_is_tank(pl_i) && pl_i->home_base != NULL)
 	    Send_base(pl->conn, pl_i->id, pl_i->home_base->ind);
-    }
-    /*
-     * And about all the teams.
-     */
-    if (BIT(world->rules->mode, TEAM_PLAY)) {
-	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (world->teams[i].NumMembers > 0)
-		Send_team_score(pl->conn, i, world->teams[i].score);
-	}
     }
     /*
      * And tell all the others about him.
@@ -1792,22 +1777,6 @@ int Send_score(connection_t *connp, int id, double score,
 			     (int)(score * 100 + (score > 0 ? 0.5 : -0.5)),
 			     life, mychar, allchar);
     }
-}
-
-/*
- * Send the new score for some team to a client.
- */
-int Send_team_score(connection_t *connp, int team, double score)
-{
-    if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	warn("Connection not ready for team score(%d,%d)",
-	      connp->state, connp->id);
-	return 0;
-    }
-    if (!FEATURE(connp, F_TEAMSCORE))
-	return 0;
-    return Packet_printf(&connp->c, "%c%hd%d", PKT_TEAM_SCORE,
-		         team, (int)(score * 100 + (score > 0 ? 0.5 : -0.5)));
 }
 
 /*

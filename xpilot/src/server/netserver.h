@@ -54,7 +54,6 @@ int Send_team(connection_t *connp, int id, int team);
 int Send_score(connection_t *connp, int id, double score,
 	       int life, int mychar, int alliance);
 int Send_score_object(connection_t *connp, double score, clpos_t pos, const char *string);
-int Send_team_score(connection_t *connp, int team, double score);
 int Send_timing(connection_t *connp, int id, int check, int round);
 int Send_base(connection_t *connp, int id, int num);
 int Send_fuel(connection_t *connp, int num, double fuel);
@@ -103,7 +102,6 @@ int Check_max_clients_per_IP(char *host_addr);
 #define FEATURE(connp, feature)	((connp)->features & (feature))
 #define F_POLY			(1 << 0)
 #define F_FLOATSCORE		(1 << 1)
-#define F_TEAMSCORE		F_FLOATSCORE
 #define F_EXPLICITSELF		(1 << 2)
 #define F_ASTEROID		(1 << 3)
 #define F_TEMPWORM		(1 << 4)

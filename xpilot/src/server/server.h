@@ -209,7 +209,6 @@ extern struct options {
     double	cannonDeadTicks;
     bool	keepShots;
     bool	teamImmunity;
-    bool	teamShareScore;
     bool	tagGame;
     bool	timing;
     bool	ballrace;

@@ -183,8 +183,6 @@ typedef struct team {
     int		TreasuresDestroyed;	/* Number of destroyed treasures */
     int		TreasuresLeft;		/* Number of treasures left */
     int		SwapperId;		/* Player swapping to this full team */
-    double	score;
-    double	prev_score;
 } team_t;
 
 typedef struct item_concentrator {

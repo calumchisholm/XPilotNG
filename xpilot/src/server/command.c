@@ -1027,8 +1027,6 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size)
     if (arg && !strcasecmp(arg, "all")) {
 	for (i = NumPlayers - 1; i >= 0; i--)
 	    Rank_set_score(Player_by_index(i), 0.0);
-	for (i = 0; i < MAX_TEAMS; i++)
-	    world->teams[i].score = 0;
 	Reset_all_players(world);
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
@@ -1143,13 +1141,10 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
     if (world->teams[team].NumBases > world->teams[team].NumMembers) {
 	snprintf(msg, size, "%s has swapped to team %d.", pl->name, team);
 	Set_message(msg);
-	if (pl->home_base) {
+	if (pl->home_base)
 	    world->teams[pl->team].NumMembers--;
-	    Team_score(world, pl->team, -(pl->score));
-	}
 	pl->team = team;
 	world->teams[pl->team].NumMembers++;
-	Team_score(world, pl->team, pl->score);
 	Set_swapper_state(pl);
 	if (pl->home_base == NULL) {
 	    Pick_startpos(pl);
@@ -1180,8 +1175,6 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
 		xteam2 = pl2->team;
 		pl2->team = xteam;
 		pl2->home_base = xbase;
-		Team_score(world, xteam2, -(pl2->score));
-		Team_score(world, pl2->team, pl2->score);
 		Set_swapper_state(pl2);
 		Send_info_about_player(pl2);
 		/* This can send a huge amount of data if several
@@ -1195,8 +1188,6 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	    xteam = pl->team;
 	    pl->team = team;
 	    pl->home_base = xbase;
-	    Team_score(world, xteam, -(pl->score));
-	    Team_score(world, pl->team, pl->score);
 	    Set_swapper_state(pl);
 	    Send_info_about_player(pl);
 	    snprintf(msg, size, "Some players swapped teams.");
@@ -1213,12 +1204,8 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	    && (pl2->team == team) && pl2->home_base != NULL) {
 	    base_t *temp;
 
-	    Team_score(world, pl->team, -(pl->score));
-	    Team_score(world, pl2->team, -(pl2->score));
 	    pl2->team = pl->team;
 	    pl->team = team;
-	    Team_score(world, pl->team, pl->score);
-	    Team_score(world, pl2->team, pl2->score);
 	    temp = pl2->home_base;
 	    pl2->home_base = pl->home_base;
 	    pl->home_base = temp;

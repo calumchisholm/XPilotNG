@@ -34,62 +34,10 @@ char score_version[] = VERSION;
 
 void Score(player_t *pl, double points, clpos_t pos, const char *msg)
 {
-    world_t *world = pl->world;
-
-    if (BIT(world->rules->mode, TEAM_PLAY)) {
-	if (!options.teamShareScore)
-	    Rank_add_score(pl, points);
-	Team_score(world, pl->team, points);
-    } else {
-	if (pl->alliance != ALLIANCE_NOT_SET && options.teamShareScore)
-	    Alliance_score(pl->alliance, points);
-	else
-	    Rank_add_score(pl, points);
-    }
-
+    Rank_add_score(pl, points);
     if (pl->conn != NULL)
 	Send_score_object(pl->conn, points, pos, msg);
-
     updateScores = true;
-}
-
-void Team_score(world_t *world, int team, double points)
-{
-    team_t *teamp;
-
-    if (team == TEAM_NOT_SET)	/* could happen if teamCannons is off */
-	return;
-
-    teamp = Team_by_index(world, team);
-    teamp->score += points;
-
-    if (options.teamShareScore) {
-	int i;
-	double share = teamp->score / teamp->NumMembers;
-
-	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Player_by_index(i);
-
-	    if (pl_i->team == team)
-		Rank_set_score(pl_i, share);
-	}
-    }
-
-    updateScores = true;
-}
-
-void Alliance_score(int id, double points)
-{
-    int i;
-    int member_count = Get_alliance_member_count(id);
-    double share = points / member_count;
-
-    for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Player_by_index(i);
-
-	if (pl_i->alliance == id)
-	    Rank_add_score(pl_i, share);
-    }
 }
 
 double Rate(double winner, double loser)
@@ -101,7 +49,7 @@ double Rate(double winner, double loser)
     t = ((RATE_SIZE / 2) * RATE_RANGE) / (ABS(loser - winner) + RATE_RANGE);
     if (loser > winner)
 	t = RATE_SIZE - t;
-    return (t);
+    return t;
 }
 
 /*

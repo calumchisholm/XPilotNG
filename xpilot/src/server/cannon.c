@@ -779,9 +779,6 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 
     if (pl) {
 	if (options.cannonPoints > 0) {
-	    if (BIT(world->rules->mode, TEAM_PLAY)
-		&& options.teamCannons)
-		Team_score(world, c->team, -options.cannonPoints);
 	    if (pl->score <= options.cannonMaxScore
 		&& !(BIT(world->rules->mode, TEAM_PLAY)
 		     && pl->team == c->team))

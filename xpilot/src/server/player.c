@@ -575,21 +575,6 @@ void Update_score_table(world_t *world)
 	    }
 	}
     }
-    if (BIT(world->rules->mode, TEAM_PLAY)) {
-	for (j = 0; j < MAX_TEAMS; j++) {
-	    team_t *teamp = Team_by_index(world, j);
-
-	    if (teamp->score != teamp->prev_score) {
-		teamp->prev_score = teamp->score;
-		for (i = 0; i < NumPlayers; i++) {
-		    player_t *pl_i = Player_by_index(i);
-
-		    if (pl_i->conn != NULL)
-			Send_team_score(pl_i->conn, j, teamp->score);
-		}
-	    }
-	}
-    }
     updateScores = false;
 #ifdef _WINDOWS
     SendDialogUpdate();
@@ -1739,7 +1724,6 @@ void Delete_player(player_t *pl)
 
     if (teamp && !Player_is_tank(pl) && pl->home_base) {
 	teamp->NumMembers--;
-	Team_score(world, pl->team, -(pl->score));
 	if (Player_is_robot(pl))
 	    teamp->NumRobots--;
     }

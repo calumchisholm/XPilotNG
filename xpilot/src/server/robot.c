@@ -770,13 +770,6 @@ static void Robot_create(world_t *world)
 
     Rank_get_saved_score(robot);
 
-    if (BIT(world->rules->mode, TEAM_PLAY) && options.teamShareScore) {
-	if (teamp->NumMembers == 1)
-	    /* reset team score on first player */
-	    teamp->score = 0.0;
-	Team_score(world, robot->team, 0.0);
-    }
-
     for (i = 0; i < NumPlayers - 1; i++) {
 	player_t *pl_i = Player_by_index(i);
 
