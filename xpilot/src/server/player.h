@@ -392,6 +392,17 @@ static inline bool Player_is_waiting(player_t *pl)
 #endif
 }
 
+static inline bool Player_is_dead(player_t *pl)
+{
+#ifdef USE_PL_STATE
+    return pl->pl_state == PL_STATE_DEAD ? true : false;
+#else
+    if (BIT(pl->pl_status, GAME_OVER) && pl->mychar == 'D')
+	return true;
+    return false;
+#endif
+}
+
 static inline bool Player_is_paused(player_t *pl)
 {
 #ifdef USE_PL_STATE
