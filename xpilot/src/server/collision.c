@@ -1618,23 +1618,18 @@ static void AsteroidCollision(void)
     bool	sound = false;
 
     list = Asteroid_get_list();
-    if (!list) {
+    if (!list)
 	return;
-    }
 
     for (iter = List_begin(list); iter != List_end(list); LI_FORWARD(iter)) {
 	ast = LI_DATA(iter);
 
 	assert(BIT(ast->type, OBJ_ASTEROID));
 
-	if (ast->life <= 0) {
+	if (ast->life <= 0)
 	    continue;
-	}
 
-	assert(OBJ_X_IN_BLOCKS(ast) >= 0);
-	assert(OBJ_X_IN_BLOCKS(ast) < World.x);
-	assert(OBJ_Y_IN_BLOCKS(ast) >= 0);
-	assert(OBJ_Y_IN_BLOCKS(ast) < World.y);
+	assert(INSIDE_MAP(ast->pos.cx, ast->pos.cy));
 
 	Cell_get_objects(OBJ_X_IN_BLOCKS(ast), OBJ_Y_IN_BLOCKS(ast),
 			 ast->pl_radius / BLOCK_SZ + 1, 300,
@@ -1824,9 +1819,8 @@ static void BallCollision(void)
      * some don't interact.
      */
     ignored_object_types = OBJ_PLAYER | OBJ_ASTEROID | OBJ_MINE | OBJ_ITEM;
-    if (!ballSparkCollisions) {
+    if (!ballSparkCollisions)
 	ignored_object_types |= OBJ_SPARK;
-    }
 
     for (i = 0; i < NumObjs; i++) {
 	ball = BALL_IND(i);
