@@ -161,6 +161,8 @@ static bool Set_texturePath(xp_option_t *opt, const char *value)
     UNUSED_PARAM(opt);
     XFREE(texturePath);
     texturePath = xp_safe_strdup(value);
+    if (realTexturePath == NULL) 
+	realTexturePath = xp_safe_strdup(value);
     return true;
 }
 static const char *Get_texturePath(xp_option_t *opt)

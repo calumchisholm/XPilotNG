@@ -25,7 +25,8 @@
 
 #include "xpclient.h"
 
-char	*texturePath = NULL;		/* Path list of texture directories */
+char	*texturePath = NULL;    /* Configured list of texture directories */
+char    *realTexturePath = NULL; /* Real texture lookup path */
 
 /*
  *   Purpose: initialize xp_picture structure and load it from file.
@@ -76,10 +77,10 @@ static int Picture_find_path(const char *filename, char *path,
 
     /*
      * If filename doesn't contain a slash
-     * then we also try the texturePath, if it exists.
+     * then we also try the realTexturePath, if it exists.
      */
-    if (!strchr(filename, PATHNAME_SEP) && texturePath != NULL) {
-	for (dir = texturePath; *dir; dir = colon) {
+    if (!strchr(filename, PATHNAME_SEP) && realTexturePath != NULL) {
+	for (dir = realTexturePath; *dir; dir = colon) {
 	    if (!(colon = strchr(dir, ':'))) {
 		len = strlen(dir);
 		colon = &dir[len];

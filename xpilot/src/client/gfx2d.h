@@ -27,7 +27,7 @@
 #define GFX2D_H
 
 extern char	*texturePath;		/* Path list of texture directories */
-
+extern char     *realTexturePath;       /* Real texture lookup path */
 
 typedef unsigned int RGB_COLOR;
 
