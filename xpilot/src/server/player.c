@@ -195,6 +195,7 @@ void Go_home(int ind)
     pl->turnacc = pl->turnvel = 0.0;
     memset(pl->last_keyv, 0, sizeof(pl->last_keyv));
     memset(pl->prev_keyv, 0, sizeof(pl->prev_keyv));
+    Emergency_shield(ind, 0);
     pl->used &= ~USED_KILL;
 
     if (playerStartsShielded != 0) {

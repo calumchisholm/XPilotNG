@@ -693,7 +693,8 @@ void Update_objects(void)
 	    continue;
 
 	if (!cloakedShield && BIT(pl->used, OBJ_CLOAKING_DEVICE)) {
-	    CLR_BIT(pl->used, OBJ_SHIELD | OBJ_EMERGENCY_SHIELD | OBJ_DEFLECTOR);
+	    Emergency_shield(i, 0);
+	    CLR_BIT(pl->used, OBJ_SHIELD | OBJ_DEFLECTOR);
 	}
 
 	if (pl->stunned > 0) {
