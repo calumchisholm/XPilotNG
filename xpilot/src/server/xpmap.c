@@ -528,24 +528,29 @@ void Xpmap_find_base_direction(void)
     int	i;
 
     for (i = 0; i < World.NumBases; i++) {
-	int	x = World.bases[i].pos.cx / BLOCK_CLICKS,
-		y = World.bases[i].pos.cy / BLOCK_CLICKS,
-		dir,
-		att;
-	double	dx = World.gravity[x][y].x,
-		dy = World.gravity[x][y].y;
+	base_t *base = Bases(i);
+	int x, y, dir, att;
+	vector gravity = World_gravity(base->pos);
 
-	if (dx == 0.0 && dy == 0.0)	/* Undefined direction? */
-	    dir = DIR_UP;	/* Should be set to direction of gravity! */
+	if (gravity.x == 0.0 && gravity.y == 0.0)
+	    /*
+	     * Undefined direction
+	     * Should be set to direction of gravity!
+	     */
+	    dir = DIR_UP;
 	else {
-	    dir = (int)findDir(-dx, -dy);
+	    dir = (int)findDir(-gravity.x, -gravity.y);
 	    dir = ((dir + RES/8) / (RES/4)) * (RES/4);	/* round it */
 	    dir = MOD2(dir, RES);
 	}
 	att = -1;
-	/*BASES SNAP TO UPWARDS ATTRACTOR FIRST*/
+
+	x = CLICK_TO_BLOCK(base->pos.cx);
+	y = CLICK_TO_BLOCK(base->pos.cy);
+
+	/* First check upwards attractor */
         if (y == World.y - 1 && World.block[x][0] == BASE_ATTRACTOR
-	    && BIT(World.rules->mode, WRAP_PLAY)) {  /*check wrapped*/
+	    && BIT(World.rules->mode, WRAP_PLAY)) {
 	    if (att == -1 || dir == DIR_UP)
 		att = DIR_UP;
 	}
@@ -553,9 +558,10 @@ void Xpmap_find_base_direction(void)
 	    if (att == -1 || dir == DIR_UP)
 		att = DIR_UP;
 	}
-	/*THEN DOWNWARDS ATTRACTORS*/
+
+	/* then downwards */
         if (y == 0 && World.block[x][World.y-1] == BASE_ATTRACTOR
-	    && BIT(World.rules->mode, WRAP_PLAY)) { /*check wrapped*/
+	    && BIT(World.rules->mode, WRAP_PLAY)) {
 	    if (att == -1 || dir == DIR_DOWN)
 		att = DIR_DOWN;
 	}
@@ -563,9 +569,10 @@ void Xpmap_find_base_direction(void)
 	    if (att == -1 || dir == DIR_DOWN)
 		att = DIR_DOWN;
 	}
-	/*THEN RIGHTWARDS ATTRACTORS*/
+
+	/* then rightwards */
 	if (x == World.x - 1 && World.block[0][y] == BASE_ATTRACTOR
-	    && BIT(World.rules->mode, WRAP_PLAY)) { /*check wrapped*/
+	    && BIT(World.rules->mode, WRAP_PLAY)) {
 	    if (att == -1 || dir == DIR_RIGHT)
 		att = DIR_RIGHT;
 	}
@@ -573,9 +580,10 @@ void Xpmap_find_base_direction(void)
 	    if (att == -1 || dir == DIR_RIGHT)
 		att = DIR_RIGHT;
 	}
-	/*THEN LEFTWARDS ATTRACTORS*/
+
+	/* then leftwards */
 	if (x == 0 && World.block[World.x-1][y] == BASE_ATTRACTOR
-	    && BIT(World.rules->mode, WRAP_PLAY)) { /*check wrapped*/
+	    && BIT(World.rules->mode, WRAP_PLAY)) {
 	    if (att == -1 || dir == DIR_LEFT)
 		att = DIR_LEFT;
 	}
@@ -583,9 +591,10 @@ void Xpmap_find_base_direction(void)
 	    if (att == -1 || dir == DIR_LEFT)
 		att = DIR_LEFT;
 	}
+
 	if (att != -1)
 	    dir = att;
-	World.bases[i].dir = dir;
+	base->dir = dir;
     }
     for (i = 0; i < World.x; i++) {
 	int j;
