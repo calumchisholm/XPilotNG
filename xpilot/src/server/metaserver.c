@@ -53,7 +53,7 @@ void Meta_send(char *mesg, size_t len)
 {
     int			i;
 
-    if (!reportToMetaServer)
+    if (!options.reportToMetaServer)
 	return;
 
     for (i = 0; i < NELEM(meta_servers); i++) {
@@ -79,7 +79,7 @@ int Meta_from(char *addr, int port)
 
 void Meta_gone(void)
 {
-    if (reportToMetaServer) {
+    if (options.reportToMetaServer) {
 	sprintf(msg, "server %s\nremove", Server.host);
 	Meta_send(msg, strlen(msg) + 1);
     }
@@ -90,10 +90,10 @@ void Meta_init(void)
     int			i;
     char		*addr;
 
-    if (!reportToMetaServer)
+    if (!options.reportToMetaServer)
 	return;
 
-    if (!silent) {
+    if (!options.silent) {
 	xpprintf("%s Locating Internet Meta server... ", showtime());
 	fflush(stdout);
     }
@@ -102,7 +102,7 @@ void Meta_init(void)
 	addr = sock_get_addr_by_name(meta_servers[i].name);
 	if (addr)
 	    strlcpy(meta_servers[i].addr, addr, sizeof(meta_servers[i].addr));
-	if (!silent) {
+	if (!options.silent) {
 	    if (addr)
 		xpprintf("found %d", i + 1);
 	    else
@@ -139,7 +139,7 @@ void Meta_update(int change)
     world_t *world = &World;
 
 
-    if (!reportToMetaServer)
+    if (!options.reportToMetaServer)
 	return;
 
     currentTime = time(NULL);
@@ -175,7 +175,7 @@ void Meta_update(int change)
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	j = 0;
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (i == robotTeam && reserveRobotTeam)
+	    if (i == options.robotTeam && options.reserveRobotTeam)
 		continue;
 	    if (world->teams[i].NumBases > 0) {
 		sprintf(&freebases[j], "%d=%d,", i,
@@ -210,7 +210,7 @@ void Meta_update(int change)
 	    "add sound " SOUND_SUPPORT_STR "\n",
 	    Server.host, num_active_players,
 	    META_VERSION, world->name, world->x, world->y, world->author,
-	    world->NumBases, FPS, contactPort,
+	    world->NumBases, FPS, options.contactPort,
 	    game_mode, world->NumTeamBases, freebases,
 	    BIT(world->rules->mode, TIMING) ? 1:0,
 	    (long)(time(NULL) - serverTime),

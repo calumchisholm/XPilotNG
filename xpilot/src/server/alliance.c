@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -293,7 +293,7 @@ static int Create_alliance(player *pl1, player *pl2)
     Alliance_add_player(alliance, pl1);
     Alliance_add_player(alliance, pl2);
     /* announcement */
-    if (announceAlliances) {
+    if (options.announceAlliances) {
 	sprintf(msg, " < %s and %s have formed alliance %d >", pl1->name,
 		pl2->name, alliance->id);
 	Set_message(msg);
@@ -314,7 +314,7 @@ void Player_join_alliance(player *pl, player *ally)
 
     if (!Player_is_tank(pl)) {
 	/* announce first to avoid sending the player two messages */
-	if (announceAlliances) {
+	if (options.announceAlliances) {
 	    sprintf(msg, " < %s has joined alliance %d >",
 		    pl->name, alliance->id);
 	    Set_message(msg);
@@ -363,7 +363,7 @@ int Leave_alliance(player *pl)
     Alliance_remove_player(alliance, pl);
     /* announcement */
     if (!Player_is_tank(pl)) {
-	if (announceAlliances) {
+	if (options.announceAlliances) {
 	    sprintf(msg, " < %s has left alliance %d >", pl->name,
 		    alliance->id);
 	    Set_message(msg);
@@ -403,7 +403,7 @@ static void Dissolve_alliance(int id)
 	player *pl2 = Players(i);
 	if (pl2->alliance == id) {
 	    Alliance_remove_player(alliance, pl2);
-	    if (!announceAlliances && Player_is_human(pl2)) {
+	    if (!options.announceAlliances && Player_is_human(pl2)) {
 		Set_player_message(pl2,
 				   " < Your alliance has been dissolved >");
 	    }
@@ -424,7 +424,7 @@ static void Dissolve_alliance(int id)
     /* move the last alliance to that index */
     Alliances[i] = Alliances[NumAlliances - 1];
     /* announcement */
-    if (announceAlliances) {
+    if (options.announceAlliances) {
 	char msg[MSG_LEN];
 	sprintf(msg, " < Alliance %d has been dissolved >", alliance->id);
 	Set_message(msg);
@@ -473,7 +473,7 @@ void Alliance_player_list(player *pl)
     }
     else {
 	/* note: 80 is assumed to be much less than MSG_LEN */
-	if (announceAlliances) {
+	if (options.announceAlliances) {
 	    sprintf(msg, " < Alliance %d:", pl->alliance);
 	} else {
 	    sprintf(msg, " < Your alliance: ");
@@ -513,4 +513,3 @@ void Alliance_player_list(player *pl)
 	Set_player_message(pl, msg);
     }
 }
-

@@ -215,9 +215,9 @@ void Go_home(player *pl)
     Emergency_shield(pl, false);
     Player_used_kill(pl);
 
-    if (playerStartsShielded != 0) {
+    if (options.playerStartsShielded != 0) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (playerShielding == 0) {
+	if (options.playerShielding == 0) {
 	    pl->shield_time = SHIELD_TIME;
 	    SET_BIT(pl->have, HAS_SHIELD);
 	}
@@ -247,17 +247,17 @@ void Compute_sensor_range(player *pl)
     world_t *world = &World;
 
     if (!init) {
-	if (minVisibilityDistance <= 0.0)
-	    minVisibilityDistance = VISIBILITY_DISTANCE;
+	if (options.minVisibilityDistance <= 0.0)
+	    options.minVisibilityDistance = VISIBILITY_DISTANCE;
 	else
-	    minVisibilityDistance *= BLOCK_SZ;
-	if (maxVisibilityDistance <= 0.0)
-	    maxVisibilityDistance = world->hypotenuse;
+	    options.minVisibilityDistance *= BLOCK_SZ;
+	if (options.maxVisibilityDistance <= 0.0)
+	    options.maxVisibilityDistance = world->hypotenuse;
 	else
-	    maxVisibilityDistance *= BLOCK_SZ;
+	    options.maxVisibilityDistance *= BLOCK_SZ;
 
 	if (world->items[ITEM_FUEL].initial > 0.0) {
-	    EnergyRangeFactor = minVisibilityDistance /
+	    EnergyRangeFactor = options.minVisibilityDistance /
 		(world->items[ITEM_FUEL].initial
 		 * (1.0 + ((double)world->items[ITEM_SENSOR].initial * 0.25)));
 	} else
@@ -267,10 +267,10 @@ void Compute_sensor_range(player *pl)
 
     pl->sensor_range = pl->fuel.sum * EnergyRangeFactor;
     pl->sensor_range *= (1.0 + ((double)pl->item[ITEM_SENSOR] * 0.25));
-    if (pl->sensor_range < minVisibilityDistance)
-	pl->sensor_range = minVisibilityDistance;
-    if (pl->sensor_range > maxVisibilityDistance)
-	pl->sensor_range = maxVisibilityDistance;
+    if (pl->sensor_range < options.minVisibilityDistance)
+	pl->sensor_range = options.minVisibilityDistance;
+    if (pl->sensor_range > options.maxVisibilityDistance)
+	pl->sensor_range = options.maxVisibilityDistance;
 }
 
 /*
@@ -355,7 +355,7 @@ void Player_set_mass(player *pl)
 	    item_mass = pl->item[ITEM_ARMOR] * ARMOR_MASS;
 	    break;
 	default:
-	    item_mass = pl->item[item] * minItemMass;
+	    item_mass = pl->item[item] * options.minItemMass;
 	    break;
 	}
 	sum_item_mass += item_mass;
@@ -381,7 +381,7 @@ static void Player_init_fuel(player *pl, double total_fuel)
     pl->fuel.max	= TANK_CAP(0);
     pl->fuel.sum	= MIN(fuel, pl->fuel.max);
     pl->fuel.tank[0]	= pl->fuel.sum;
-    pl->emptymass	= ShipMass;
+    pl->emptymass	= options.ShipMass;
     pl->item[ITEM_TANK]	= pl->fuel.num_tanks;
 
     fuel -= pl->fuel.sum;
@@ -409,8 +409,8 @@ int Init_player(int ind, shipshape_t *ship)
     pl->turnvel		= 0.0;
     pl->oldturnvel	= 0.0;
     pl->turnacc		= 0.0;
-    pl->mass		= ShipMass;
-    pl->emptymass	= ShipMass;
+    pl->mass		= options.ShipMass;
+    pl->emptymass	= options.ShipMass;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
@@ -423,12 +423,12 @@ int Init_player(int ind, shipshape_t *ship)
     /*
      * If you don't want to allow shipshapes because the shape
      * requirements have not been rewritten yet, set
-     * allowShipShapes to false.
+     * options.allowShipShapes to false.
      */
-    if (allowShipShapes && ship)
+    if (options.allowShipShapes && ship)
 	pl->ship = ship;
     else {
-	shipshape_t *tryship = Parse_shape_str(defaultShipShape);
+	shipshape_t *tryship = Parse_shape_str(options.defaultShipShape);
 
 	if (tryship)
 	    pl->ship = tryship;
@@ -696,7 +696,7 @@ void Reset_all_players(void)
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (endOfRoundReset) {
+	if (options.endOfRoundReset) {
 	    if (BIT(pl->status, PAUSE))
 		Player_death_reset(pl, false);
 	    else {
@@ -767,7 +767,7 @@ void Reset_all_players(void)
 	    team->TreasuresLeft = team->NumTreasures - team->NumEmptyTreasures;
 	}
 
-	if (endOfRoundReset) {
+	if (options.endOfRoundReset) {
 	    /* Reset the targets */
 	    for (i = 0; i < world->NumTargets; i++) {
 		target_t *targ = Targets(world, i);
@@ -778,7 +778,7 @@ void Reset_all_players(void)
 	}
     }
 
-    if (endOfRoundReset) {
+    if (options.endOfRoundReset) {
 	for (i = 0; i < NumObjs; i++) {
 	    object *obj = Obj[i];
 	    if (BIT(obj->type, OBJ_SHOT|OBJ_MINE|OBJ_DEBRIS|OBJ_SPARK
@@ -795,18 +795,18 @@ void Reset_all_players(void)
 
     if (round_delay_send > 0)
 	round_delay_send--;
-    if (roundDelaySeconds) {
+    if (options.roundDelaySeconds) {
 	/* Hold your horses! The next round will start in a few moments. */
-	round_delay = roundDelaySeconds * FPS;
+	round_delay = options.roundDelaySeconds * FPS;
 	/* Send him an extra seconds worth to be sure he gets the 0. */
 	round_delay_send = round_delay+FPS;
 	roundtime = -1;
 	sprintf(msg, "Delaying %d seconds until start of next %s.",
-		roundDelaySeconds,
+		options.roundDelaySeconds,
 		(BIT(world->rules->mode, TIMING)? "race" : "round"));
 	Set_message(msg);
     } else
-	roundtime = maxRoundTime * FPS;
+	roundtime = options.maxRoundTime * FPS;
 
     Update_score_table();
 }
@@ -840,7 +840,7 @@ void Check_team_members(int team)
 	teamp->NumMembers = members;
     }
 
-    if (teamcup)
+    if (options.teamcup)
 	teamcup_round_start();
 }
 
@@ -950,16 +950,16 @@ static void Count_rounds(void)
 {
     char		msg[MSG_LEN];
 
-    if (!roundsToPlay)
+    if (!options.roundsToPlay)
 	return;
 
     ++roundsPlayed;
 
     sprintf(msg, " < Round %d out of %d completed. >",
-	    roundsPlayed, roundsToPlay);
+	    roundsPlayed, options.roundsToPlay);
     Set_message(msg);
     /* only do the game over once */
-    if (roundsPlayed == roundsToPlay)
+    if (roundsPlayed == options.roundsToPlay)
 	Game_Over();
 }
 
@@ -1251,7 +1251,7 @@ void Compute_game_status(void)
 	    sprintf(msg, "%s starts now.",
 		    (BIT(world->rules->mode, TIMING) ? "Race" : "Round"));
 	    Set_message(msg);
-	    roundtime = maxRoundTime * FPS;
+	    roundtime = options.maxRoundTime * FPS;
 	    /*
 	     * Make sure players get the full 60 seconds
 	     * of allowed idle time.
@@ -1312,7 +1312,7 @@ void Compute_game_status(void)
 		pl->best_lap = pl->last_lap_time;
 	    }
 	    pl->last_lap = pl->time;
-	    if (pl->round > raceLaps) {
+	    if (pl->round > options.raceLaps) {
 		Player_death_reset(pl);
 		pl->mychar = 'D';
 		SET_BIT(pl->status, GAME_OVER);
@@ -1331,12 +1331,12 @@ void Compute_game_status(void)
 			(double) pl->best_lap / FPS);
 	    else {
 		sprintf(msg, "%s starts lap 1 of %d", pl->name,
-			raceLaps);
+			options.raceLaps);
 		CLR_BIT(pl->status, FINISH); /* no elimination from starting */
 	    }
 	    Set_message(msg);
 	}
-	if (eliminationRace) {
+	if (options.eliminationRace) {
 	    for (;;) {
 		int pli, count = 0, lap = INT_MAX;
 		player *pl_i;
@@ -1409,7 +1409,7 @@ void Compute_game_status(void)
 		pos++;
 	    }
 	    else if (BIT(pl->status, FINISH)) {
-		if (pl->round > raceLaps)
+		if (pl->round > options.raceLaps)
 		    num_finished_players++;
 		else
 		    CLR_BIT(pl->status, FINISH);
@@ -1484,7 +1484,7 @@ void Compute_game_status(void)
 	/*
 	 * If the maximum allowed time for this race is over, end it.
 	 */
-	if (maxRoundTime > 0 && roundtime == 0) {
+	if (options.maxRoundTime > 0 && roundtime == 0) {
 	    Set_message("Timer expired. Race ends now.");
 	    Race_game_over();
 	    return;
@@ -1602,10 +1602,10 @@ void Compute_game_status(void)
 	     * Game is not over if more than one team has treasure.
 	     */
 	    if ((teams_with_treasure > 1 || !max_destroyed)
-		&& (roundtime != 0 || maxRoundTime <= 0))
+		&& (roundtime != 0 || options.maxRoundTime <= 0))
 		return;
 
-	    if (maxRoundTime > 0 && roundtime == 0)
+	    if (options.maxRoundTime > 0 && roundtime == 0)
 		Set_message("Timer expired. Round ends now.");
 
 	    /*
@@ -1726,7 +1726,7 @@ void Compute_game_status(void)
 
 	for (i = 0; i < NumPlayers; i++)  {
 	    player *pl_i = Players(i);
-	    if (BIT(pl_i->status, PAUSE) || Player_is_tank(pl_i)) 
+	    if (BIT(pl_i->status, PAUSE) || Player_is_tank(pl_i))
 		continue;
 	    if (!BIT(pl_i->status, GAME_OVER)) {
 		num_alive_players++;
@@ -1747,7 +1747,7 @@ void Compute_game_status(void)
 		    && num_alive_players == num_alive_robots
 		    && num_active_humans > 0)
 	    Individual_game_over(-2);
-	else if (maxRoundTime > 0 && roundtime == 0) {
+	else if (options.maxRoundTime > 0 && roundtime == 0) {
 	    Set_message("Timer expired. Round ends now.");
 	    Individual_game_over(-1);
 	}
@@ -1764,7 +1764,7 @@ void Delete_player(player *pl)
     /* call before important player structures are destroyed */
     Leave_alliance(pl);
 
-    if (tagGame && tagItPlayerId == pl->id)
+    if (options.tagGame && tagItPlayerId == pl->id)
 	tagItPlayerId = NO_ID;
 
     if (Player_is_robot(pl))
@@ -1800,7 +1800,7 @@ void Delete_player(player *pl)
 		 * even if the robot left the game. */
 		obj->id = NO_ID;
 	    else {
-		if (!keepShots) {
+		if (!options.keepShots) {
 		    obj->life = 0;
 		    if (BIT(obj->type,
 			    OBJ_CANNON_SHOT|OBJ_MINE|OBJ_SMART_SHOT
@@ -1817,14 +1817,14 @@ void Delete_player(player *pl)
 		mineobject *mine = MINE_PTR(obj);
 		if (mine->owner == id) {
 		    mine->owner = NO_ID;
-		    if (!keepShots) {
+		    if (!options.keepShots) {
 			obj->life = 0;
 			obj->mass = 0;
 		    }
 		}
 	    }
 	    else if (BIT(obj->type, OBJ_CANNON_SHOT)) {
-		if (!keepShots) {
+		if (!options.keepShots) {
 		    obj->life = 0;
 		    obj->mass = 0;
 		}
@@ -1885,7 +1885,7 @@ void Delete_player(player *pl)
 	if (Player_is_tank(pl_i)
 	    && pl_i->lock.pl_id == id) {
 	    /* remove tanks which were released by this player. */
-	    if (keepShots)
+	    if (options.keepShots)
 		pl_i->lock.pl_id = NO_ID;
 	    else
 		Delete_player(pl_i);
@@ -2010,7 +2010,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 
     pl->vel.x		= pl->vel.y	= 0.0;
     pl->acc.x		= pl->acc.y	= 0.0;
-    pl->emptymass	= pl->mass	= ShipMass;
+    pl->emptymass	= pl->mass	= options.ShipMass;
     pl->status		|= DEF_BITS;
     pl->status		&= ~(KILL_BITS);
 
@@ -2039,9 +2039,9 @@ void Player_death_reset(player *pl, bool add_rank_death)
     Player_init_fuel(pl, pl->fuel.sum);
 
     /*-BA Handle the combination of limited life games and
-     *-BA robotLeaveLife by making a robot leave iff it gets
-     *-BA eliminated in any round.  Means that robotLeaveLife
-     *-BA is ignored, but that robotsLeave is still respected.
+     *-BA options.robotLeaveLife by making a robot leave iff it gets
+     *-BA eliminated in any round.  Means that options.robotLeaveLife
+     *-BA is ignored, but that options.robotsLeave is still respected.
      *-KK Added check on race mode. Since in race mode everyone
      *-KK gets killed at the end of the round, all robots would
      *-KK be replaced in the next round. I don't think that's
@@ -2061,7 +2061,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 	    if (pl->life == -1) {
 		if (Player_is_robot(pl)) {
 		    if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
-			|| (robotsLeave && pl->score < robotLeaveScore)) {
+			|| (options.robotsLeave && pl->score < options.robotLeaveScore)) {
 			Robot_delete(pl, false);
 			return;
 		    }
@@ -2092,7 +2092,7 @@ bool Team_immune(int id1, int id2)
     if (id1 == id2)
 	return false;
 
-    if (!teamImmunity)
+    if (!options.teamImmunity)
 	return false;
 
     if (id1 == NO_ID || id2 == NO_ID)

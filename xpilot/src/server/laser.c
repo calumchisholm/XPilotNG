@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -47,9 +47,9 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 					 pl->pos.cy - pulse->pos.cy)
 			   * 2 - RES / 2 - pulse->dir);
 	pulse->dir = MOD2(pulse->dir, RES);
-	
-	pulse->vel.x = pulseSpeed * tcos(pulse->dir);
-	pulse->vel.y = pulseSpeed * tsin(pulse->dir);
+
+	pulse->vel.x = options.pulseSpeed * tcos(pulse->dir);
+	pulse->vel.y = options.pulseSpeed * tsin(pulse->dir);
 
 	pulse->life += pl->item[ITEM_MIRROR];
 	pulse->len = 0 /*PULSE_LENGTH*/;
@@ -66,8 +66,8 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
      * not removed in the same frame that its life ends ?? */
     pulse->life = 0;
     if (BIT(pulse->mods.laser, STUN)
-	|| (laserIsStunGun == true
-	    && allowLaserModifiers == false)) {
+	|| (options.laserIsStunGun == true
+	    && options.allowLaserModifiers == false)) {
 	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
 	    || BIT(pl->status, THRUSTING)) {
 	    if (kp) {
@@ -103,13 +103,13 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 			pl->name, kp->name);
 		if (pl->id == kp->id) {
 		    sc = Rate(0.0, kp->score)
-			* laserKillScoreMult
-			* selfKillScoreMult;
+			* options.laserKillScoreMult
+			* options.selfKillScoreMult;
 		    Score(kp, -sc, kp->pos, kp->name);
 		    strcat(msg, " How strange!");
 		} else {
 		    sc = Rate(kp->score, pl->score)
-			* laserKillScoreMult;
+			* options.laserKillScoreMult;
 		    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
 		}
 	    } else {

@@ -42,7 +42,6 @@ char			*serverAddr;
 int			ShutdownServer = -1;
 int			ShutdownDelay = 1000;
 char			ShutdownReason[MAX_CHARS];
-int 			framesPerSecond = 18;
 long			main_loops = 0;		/* needed in events.c */
 bool			is_server = true;	/* used in common code */
 
@@ -94,7 +93,7 @@ int main(int argc, char **argv)
     warn("num_groups is %d", num_groups);
 
     Init_recording();
-    plock_server(pLockServer);           /* Lock the server into memory */
+    plock_server(options.pLockServer);           /* Lock the server into memory */
     Make_table();			/* Make trigonometric tables */
     Compute_gravity();
     Find_base_direction(world);
@@ -121,10 +120,10 @@ int main(int argc, char **argv)
     /*
      * Get server's official name.
      */
-    if (serverHost) {
-	addr = sock_get_addr_by_name(serverHost);
+    if (options.serverHost) {
+	addr = sock_get_addr_by_name(options.serverHost);
 	if (addr == NULL) {
-	    warn("Failed name lookup on: %s", serverHost);
+	    warn("Failed name lookup on: %s", options.serverHost);
 #ifndef _WINDOWS
 	    exit(1);
 #else
@@ -132,16 +131,16 @@ int main(int argc, char **argv)
 #endif
 	}
 	serverAddr = xp_strdup(addr);
-	strlcpy(Server.host, serverHost, sizeof(Server.host));
+	strlcpy(Server.host, options.serverHost, sizeof(Server.host));
     } else
 	sock_get_local_hostname(Server.host, sizeof Server.host,
-				(reportToMetaServer != 0 &&
-				 searchDomainForXPilot != 0));
+				(options.reportToMetaServer != 0 &&
+				 options.searchDomainForXPilot != 0));
 
     Get_login_name(Server.owner, sizeof Server.owner);
 
     /*
-     * Log, if enabled.
+     * options.Log, if enabled.
      */
     Log_game("START");
 
@@ -156,7 +155,7 @@ int main(int argc, char **argv)
     if (Setup_net_server() == -1)
 	End_game();
 #ifndef _WINDOWS
-    if (NoQuit)
+    if (options.NoQuit)
 	signal(SIGHUP, SIG_IGN);
     else
 	signal(SIGHUP, Handle_signal);
@@ -172,16 +171,16 @@ int main(int argc, char **argv)
      */
     serverTime = time(NULL);
 
-    if (!silent)
+    if (!options.silent)
 	xpprintf("%s Server runs at %d frames per second\n",
-		 showtime(), framesPerSecond);
+		 showtime(), options.framesPerSecond);
 
     /* kps - move this somewhere else ? */
     teamcup_open_score_file();
     teamcup_round_start();
 
-    if (timerResolution > 0)
-	timer_tick_rate = timerResolution;
+    if (options.timerResolution > 0)
+	timer_tick_rate = options.timerResolution;
     else
 	timer_tick_rate = FPS;
 
@@ -220,16 +219,16 @@ void Main_loop(void)
 
     Input();
 
-    if (NumPlayers > NumRobots + NumPseudoPlayers || RawMode) {
+    if (NumPlayers > NumRobots + NumPseudoPlayers || options.RawMode) {
 
 	if (NoPlayersEnteredYet) {
 	    if (NumPlayers > NumRobots + NumPseudoPlayers) {
 		NoPlayersEnteredYet = false;
-		if (gameDuration > 0.0) {
+		if (options.gameDuration > 0.0) {
 		    xpprintf("%s Server will stop in %g minutes.\n",
-			     showtime(), gameDuration);
+			     showtime(), options.gameDuration);
 		    gameOverTime
-			= (time_t)(gameDuration * 60) + time((time_t *)NULL);
+			= (time_t)(options.gameDuration * 60) + time((time_t *)NULL);
 		}
 	    }
 	}
@@ -240,7 +239,7 @@ void Main_loop(void)
 	    Frame_update();
     }
 
-    if (!NoQuit
+    if (!options.NoQuit
 	&& NumPlayers == NumRobots + NumPseudoPlayers
 	&& !login_in_progress
 	&& !NumQueuedPlayers) {
@@ -317,8 +316,8 @@ int End_game(void)
     record = rrecord;
     playback = rplayback;
 
-    if (recordMode != 0) {
-	recordMode = 0;
+    if (options.recordMode != 0) {
+	options.recordMode = 0;
 	Init_recording();
     }
 
@@ -336,7 +335,7 @@ int End_game(void)
     World_free(world);
     Free_cells();
     Free_options();
-    Log_game("END");			    /* Log end */
+    Log_game("END");			    /* options.Log end */
 
     teamcup_kill_child();
 
@@ -362,7 +361,7 @@ int End_game(void)
  * If all non-empty teams are full, the player is assigned
  * to a randomly chosen available team.
  *
- * Prefer not to place players in the robotTeam if possible.
+ * Prefer not to place players in the options.robotTeam if possible.
  */
 int Pick_team(int pick_for_type)
 {
@@ -390,17 +389,17 @@ int Pick_team(int pick_for_type)
 	team_score[i] = 0;
 	available_teams[i] = 0;
     }
-    if (restrictRobots) {
+    if (options.restrictRobots) {
 	if (pick_for_type == PickForRobot) {
-	    if (free_bases[robotTeam] > 0)
-		return robotTeam;
+	    if (free_bases[options.robotTeam] > 0)
+		return options.robotTeam;
 	    else
 		return TEAM_NOT_SET;
 	}
     }
-    if (reserveRobotTeam) {
+    if (options.reserveRobotTeam) {
 	if (pick_for_type != PickForRobot)
-	    free_bases[robotTeam] = 0;
+	    free_bases[options.robotTeam] = 0;
     }
 
     /*
@@ -458,7 +457,7 @@ int Pick_team(int pick_for_type)
 	losing_score = LONG_MAX;
 	for (i = 0; i < num_available_teams; i++) {
 	    if (team_score[available_teams[i]] < losing_score
-		&& available_teams[i] != robotTeam) {
+		&& available_teams[i] != options.robotTeam) {
 		losing_team = available_teams[i];
 		losing_score = team_score[losing_team];
 	    }
@@ -584,7 +583,7 @@ static void Handle_signal(int sig_no)
     switch (sig_no) {
 
     case SIGHUP:
-	if (NoQuit) {
+	if (options.NoQuit) {
 	    signal(SIGHUP, SIG_IGN);
 	    return;
 	}
@@ -619,7 +618,7 @@ void Log_game(const char *heading)
     time_t lt;
     world_t *world = &World;
 
-    if (!Log)
+    if (!options.Log)
 	return;
 
     lt = time(NULL);
@@ -656,7 +655,7 @@ void Game_Over(void)
     /*
      * Hack to prevent Compute_Game_Status from starting over again...
      */
-    gameDuration = -1.0;
+    options.gameDuration = -1.0;
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	int teamscore[MAX_TEAMS];
@@ -742,8 +741,8 @@ void Server_log_admin_message(player *pl, const char *str)
      * Only log the message if logfile already exists,
      * is writable and less than some KBs in size.
      */
-    const char		*logfilename = adminMessageFileName;
-    const int		logfile_size_limit = adminMessageFileSizeLimit;
+    const char		*logfilename = options.adminMessageFileName;
+    const int		logfile_size_limit = options.adminMessageFileSizeLimit;
     FILE		*fp;
     struct stat		st;
     char		msg[MSG_LEN * 2];
@@ -908,7 +907,7 @@ static void Check_server_versions(void)
 #if defined(PLOCKSERVER) && defined(__linux__)
 /*
  * Patches for Linux plock support by Steve Payne <srp20@cam.ac.uk>
- * also added the -pLockServer command line option.
+ * also added the -options.pLockServer command line option.
  * All messed up by BG again, with thanks and apologies to Steve.
  */
 /* Linux doesn't seem to have plock(2).  *sigh* (BG) */

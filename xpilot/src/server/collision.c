@@ -248,11 +248,11 @@ static void PlayerCollision(void)
 		if (BIT(world->rules->mode, BOUNCE_WITH_PLAYER)) {
 		    if (!Player_used_emergency_shield(pl)) {
 			Player_add_fuel(pl, ED_PL_CRASH);
-			Item_damage(pl, destroyItemInCollisionProb);
+			Item_damage(pl, options.destroyItemInCollisionProb);
 		    }
 		    if (!Player_used_emergency_shield(pl_j)) {
 			Player_add_fuel(pl_j, ED_PL_CRASH);
-			Item_damage(pl_j, destroyItemInCollisionProb);
+			Item_damage(pl_j, options.destroyItemInCollisionProb);
 		    }
 		    pl->forceVisible = 20;
 		    pl_j->forceVisible = 20;
@@ -287,23 +287,23 @@ static void PlayerCollision(void)
 			Set_message(msg);
 			if (!Player_is_tank(pl) && !Player_is_tank(pl_j)) {
 			    sc = Rate(pl_j->score, pl->score)
-				* crashScoreMult;
+				* options.crashScoreMult;
 			    sc2 = Rate(pl->score, pl_j->score)
-				* crashScoreMult;
+				* options.crashScoreMult;
 			    Score_players(pl, -sc, pl_j->name,
 					  pl_j, -sc2, pl->name);
 			} else if (Player_is_tank(pl)) {
 			    player *i_tank_owner_pl
 				= Player_by_id(pl->lock.pl_id);
 			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
-				* tankKillScoreMult;
+				* options.tankKillScoreMult;
 			    Score_players(i_tank_owner_pl, sc, pl_j->name,
 					  pl_j, -sc, pl->name);
 			} else if (Player_is_tank(pl_j)) {
 			    player *j_tank_owner_pl
 				= Player_by_id(pl_j->lock.pl_id);
 			    sc = Rate(j_tank_owner_pl->score, pl->score)
-				* tankKillScoreMult;
+				* options.tankKillScoreMult;
 			    Score_players(j_tank_owner_pl, sc, pl->name,
 					  pl, -sc, pl_j->name);
 			} /* don't bother scoring two tanks */
@@ -324,10 +324,10 @@ static void PlayerCollision(void)
 			Rank_AddKill(pl);
 			if (Player_is_tank(pl))
 			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
-				* tankKillScoreMult;
+				* options.tankKillScoreMult;
 			else
 			    sc = Rate(pl->score, pl_j->score)
-				* runoverKillScoreMult;
+				* options.runoverKillScoreMult;
 			Score_players(i_tank_owner_pl, sc, pl_j->name,
 				      pl_j, -sc, pl->name);
 		    }
@@ -350,10 +350,10 @@ static void PlayerCollision(void)
 			Rank_AddKill(pl_j);
 			if (Player_is_tank(pl_j))
 			    sc = Rate(j_tank_owner_pl->score, pl->score)
-				* tankKillScoreMult;
+				* options.tankKillScoreMult;
 			else
 			    sc = Rate(pl_j->score, pl->score)
-				* runoverKillScoreMult;
+				* options.runoverKillScoreMult;
 
 			Score_players(j_tank_owner_pl, sc, pl->name,
 				      pl, -sc, pl_j->name);
@@ -393,7 +393,7 @@ static void PlayerCollision(void)
 					      pl->pos.cy - ball->pos.cy);
 		int group;
 
-		if (distance >= ballConnectorLength * CLICK) {
+		if (distance >= options.ballConnectorLength * CLICK) {
 		    ball->id = pl->id;
 		    /* this is only the team of the owner of the ball,
 		     * not the team the ball belongs to. the latter is
@@ -427,7 +427,7 @@ static void PlayerCollision(void)
 	     * We want a separate list of balls to avoid searching
 	     * the object list for balls.
 	     */
-	    int dist, mindist = ballConnectorLength * CLICK;
+	    int dist, mindist = options.ballConnectorLength * CLICK;
 	    for (j = 0; j < NumObjs; j++) {
 		object *obj = Obj[j];
 		if (BIT(obj->type, OBJ_BALL) && obj->id == NO_ID) {
@@ -550,9 +550,9 @@ static void PlayerObjectCollision(player *pl)
 		if (BIT(obj->type, OBJ_SPARK|OBJ_MINE)
 		    && BIT(obj->status, OWNERIMMUNE))
 		    continue;
-		else if (selfImmunity)
+		else if (options.selfImmunity)
 		    continue;
-	    } else if (selfImmunity &&
+	    } else if (options.selfImmunity &&
 		       Player_is_tank(pl) &&
 		       (pl->lock.pl_id == obj->id))
 		continue;
@@ -561,14 +561,14 @@ static void PlayerObjectCollision(player *pl)
 	    else if (BIT(Player_by_id(obj->id)->status, PAUSE))
 		continue;
 	} else if (BIT(world->rules->mode, TEAM_PLAY)
-		   && teamImmunity
+		   && options.teamImmunity
 		   && obj->team == pl->team
 		   /* allow players to destroy their team's unowned balls */
 		   && obj->type != OBJ_BALL)
 	    continue;
 
 	if (obj->type == OBJ_ITEM) {
-	    if (BIT(pl->used, HAS_SHIELD) && !shieldedItemPickup) {
+	    if (BIT(pl->used, HAS_SHIELD) && !options.shieldedItemPickup) {
 		SET_BIT(obj->status, GRAVITY);
 		Delta_mv((object *)pl, obj);
 		continue;
@@ -696,11 +696,11 @@ static void Player_collides_with_ball(player *pl, object *obj)
     Delta_mv((object *)pl, obj);
     if (!Player_used_emergency_shield(pl)) {
 	Player_add_fuel(pl, ED_BALL_HIT);
-	if (treasureCollisionDestroys)
+	if (options.treasureCollisionDestroys)
 	    ball->life = 0;
     }
     if (pl->fuel.sum > 0) {
-	if (!treasureCollisionMayKill || BIT(pl->used, HAS_SHIELD))
+	if (!options.treasureCollisionMayKill || BIT(pl->used, HAS_SHIELD))
 	    return;
 	if (!BIT(pl->used, HAS_SHIELD) && BIT(pl->have, HAS_ARMOR)) {
 	    Player_hit_armor(pl);
@@ -710,8 +710,8 @@ static void Player_collides_with_ball(player *pl, object *obj)
     if (ball->owner == NO_ID) {
 	sprintf(msg, "%s was killed by a ball.", pl->name);
 	sc = Rate(0.0, pl->score)
-		* ballKillScoreMult
-		* unownedKillScoreMult;
+		* options.ballKillScoreMult
+		* options.unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "Ball");
     } else {
 	player *kp = Player_by_id(ball->owner);
@@ -722,12 +722,12 @@ static void Player_collides_with_ball(player *pl, object *obj)
 	if (kp->id == pl->id) {
 	    strcat(msg, "  How strange!");
 	    sc = Rate(0.0, pl->score)
-		   * ballKillScoreMult
-		   * selfKillScoreMult;
+		   * options.ballKillScoreMult
+		   * options.selfKillScoreMult;
 	    Score(pl, -sc, pl->pos, kp->name);
 	} else {
 	    Rank_AddKill(kp);
-	    sc = Rate(kp->score, pl->score) * ballKillScoreMult;
+	    sc = Rate(kp->score, pl->score) * options.ballKillScoreMult;
 	    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
 	    Robot_war(pl, kp);
 	}
@@ -745,26 +745,26 @@ static void Player_collides_with_item(player *pl, object *obj)
 
     if (IsOffensiveItem((enum Item) obj->info)) {
 	int off_items = CountOffensiveItems(pl);
-	if (off_items >= maxOffensiveItems) {
+	if (off_items >= options.maxOffensiveItems) {
 	    /* Set_player_message(pl, "No space left for offensive items."); */
 	    Delta_mv((object *)pl, obj);
 	    return;
 	}
 	else if (obj->count > 1
-		 && off_items + obj->count > maxOffensiveItems)
-	    obj->count = maxOffensiveItems - off_items;
+		 && off_items + obj->count > options.maxOffensiveItems)
+	    obj->count = options.maxOffensiveItems - off_items;
     }
     else if (IsDefensiveItem((enum Item) obj->info)) {
 	int def_items = CountDefensiveItems(pl);
-	if (def_items >= maxDefensiveItems) {
+	if (def_items >= options.maxDefensiveItems) {
 	    /* Set_player_message(pl,
 	       "No space for left for defensive items."); */
 	    Delta_mv((object *)pl, obj);
 	    return;
 	}
 	else if (obj->count > 1
-		 && def_items + obj->count > maxDefensiveItems)
-	    obj->count = maxDefensiveItems - def_items;
+		 && def_items + obj->count > options.maxDefensiveItems)
+	    obj->count = options.maxDefensiveItems - def_items;
     }
 
     item_index = (enum Item) obj->info;
@@ -970,7 +970,7 @@ static void Player_collides_with_mine(player *pl, object *obj)
 	 * for a low-scored-player hitting a high-scored-player's mine.
 	 * Maybe not.
 	 */
-	sc = Rate(kp->score, pl->score) * mineScoreMult;
+	sc = Rate(kp->score, pl->score) * options.mineScoreMult;
 	Score_players(kp, sc, pl->name, pl, -sc, kp->name);
     }
     Set_message(msg);
@@ -988,7 +988,7 @@ static void Player_collides_with_debris(player *pl, object *obj)
 	Player_add_fuel(pl, -cost);
     if (pl->fuel.sum == 0.0
 	|| (obj->type == OBJ_WRECKAGE
-	    && wreckageCollisionMayKill
+	    && options.wreckageCollisionMayKill
 	    && !BIT(pl->used, HAS_SHIELD)
 	    && !BIT(pl->have, HAS_ARMOR))) {
 	SET_BIT(pl->status, KILLED);
@@ -1002,18 +1002,18 @@ static void Player_collides_with_debris(player *pl, object *obj)
 	Set_message(msg);
 	if (!kp || kp->id == pl->id) {
 	    sc = Rate(0.0, pl->score)
-		* explosionKillScoreMult * selfKillScoreMult;
+		* options.explosionKillScoreMult * options.selfKillScoreMult;
 	    Score(pl, -sc, pl->pos, (kp == NULL) ? "[Explosion]" : pl->name);
 	} else {
 	    Rank_AddKill(kp);
-	    sc = Rate(kp->score, pl->score) * explosionKillScoreMult;
+	    sc = Rate(kp->score, pl->score) * options.explosionKillScoreMult;
 	    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
 	}
 	obj->life = 0.0;
 	return;
     }
     if (obj->type == OBJ_WRECKAGE
-	&& wreckageCollisionMayKill
+	&& options.wreckageCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
 	&& BIT(pl->have, HAS_ARMOR))
 	Player_hit_armor(pl);
@@ -1029,14 +1029,14 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
     if (ast->life < 0.0)
 	ast->life = 0.0;
     if (ast->life == 0.0
-	&& asteroidPoints > 0.0
-	&& pl->score <= asteroidMaxScore)
-	Score(pl, asteroidPoints, ast->pos, "");
+	&& options.asteroidPoints > 0.0
+	&& pl->score <= options.asteroidMaxScore)
+	Score(pl, options.asteroidPoints, ast->pos, "");
 
     if (!Player_used_emergency_shield(pl))
 	Player_add_fuel(pl, -cost);
 
-    if (asteroidCollisionMayKill
+    if (options.asteroidCollisionMayKill
 	&& (pl->fuel.sum == 0.0
 	    || (!BIT(pl->used, HAS_SHIELD)
 		&& !BIT(pl->have, HAS_ARMOR)))) {
@@ -1048,16 +1048,16 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 	else
 	    sprintf(msg, "%s was hit by an asteroid.", pl->name);
 	Set_message(msg);
-	sc = Rate(0.0, pl->score) * unownedKillScoreMult;
+	sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "[Asteroid]");
-	if (Player_is_tank(pl) && asteroidPoints > 0) {
+	if (Player_is_tank(pl) && options.asteroidPoints > 0) {
 	    player *owner_pl = Player_by_id(pl->lock.pl_id);
-	    if (owner_pl->score <= asteroidMaxScore)
-		Score(owner_pl, asteroidPoints, ast->pos, "");
+	    if (owner_pl->score <= options.asteroidMaxScore)
+		Score(owner_pl, options.asteroidPoints, ast->pos, "");
 	}
 	return;
     }
-    if (asteroidCollisionMayKill
+    if (options.asteroidCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
 	&& BIT(pl->have, HAS_ARMOR))
 	Player_hit_armor(pl);
@@ -1126,12 +1126,12 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	case OBJ_CANNON_SHOT:
 	    sound_play_sensors(pl->pos, PLAYER_EAT_SHOT_SOUND);
 	    if (!Player_used_emergency_shield(pl)) {
-		if (shotHitFuelDrainUsesKineticEnergy) {
+		if (options.shotHitFuelDrainUsesKineticEnergy) {
 		    double rel_velocity = LENGTH(pl->vel.x - obj->vel.x,
 						 pl->vel.y - obj->vel.y);
 		    drainfactor
 			= ((rel_velocity * rel_velocity * ABS(obj->mass))
-			   / (ShotsSpeed * ShotsSpeed * ShotsMass));
+			   / (options.ShotsSpeed * options.ShotsSpeed * options.ShotsMass));
 		} else
 		    drainfactor = 1.0;
 		drain = ED_SHOT_HIT * drainfactor * SHOT_MULT(obj);
@@ -1166,7 +1166,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    } else if (obj->id == NO_ID) {
 		sprintf(msg, "%s was killed by %s.", pl->name,
 			Describe_shot(obj->type, obj->status, obj->mods, 1));
-		sc = Rate(0.0, pl->score) * unownedKillScoreMult;
+		sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
 	    } else {
 		kp = Player_by_id(obj->id);
 		sprintf(msg, "%s was killed by %s from %s.", pl->name,
@@ -1176,7 +1176,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 		if (kp->id == pl->id) {
 		    sound_play_sensors(pl->pos, PLAYER_SHOT_THEMSELF_SOUND);
 		    strcat(msg, "  How strange!");
-		    sc = Rate(0.0, pl->score) * selfKillScoreMult;
+		    sc = Rate(0.0, pl->score) * options.selfKillScoreMult;
 		} else {
 		    Rank_AddKill(kp);
 		    sc = Rate(kp->score, pl->score);
@@ -1186,21 +1186,21 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    switch (obj->type) {
 	    case OBJ_SHOT:
 		if (BIT(obj->mods.warhead, CLUSTER))
-		    factor = clusterKillScoreMult;
+		    factor = options.clusterKillScoreMult;
 		else
-		    factor = shotKillScoreMult;
+		    factor = options.shotKillScoreMult;
 		break;
 	    case OBJ_TORPEDO:
-		factor = torpedoKillScoreMult;
+		factor = options.torpedoKillScoreMult;
 		break;
 	    case OBJ_SMART_SHOT:
-		factor = smartKillScoreMult;
+		factor = options.smartKillScoreMult;
 		break;
 	    case OBJ_HEAT_SHOT:
-		factor = heatKillScoreMult;
+		factor = options.heatKillScoreMult;
 		break;
 	    default:
-		factor = shotKillScoreMult;
+		factor = options.shotKillScoreMult;
 		break;
 	    }
 
@@ -1242,8 +1242,8 @@ static void Player_pass_checkpoint(player *pl)
 	    pl->best_lap = pl->last_lap_time;
 	}
 	pl->last_lap = pl->time;
-	if (pl->round > raceLaps) {
-	    if (ballrace) {
+	if (pl->round > options.raceLaps) {
+	    if (options.ballrace) {
 		/* Balls are made unowned when their owner finishes the race
 		   This way, they can be reused by other players */
 		for (j = 0; j < NumObjs; j++) {
@@ -1272,7 +1272,7 @@ static void Player_pass_checkpoint(player *pl)
 		    (double) pl->last_lap_time / FPS,
 		    (double) pl->best_lap / FPS);
 	} else
-	    sprintf(msg, "%s starts lap 1 of %d", pl->name, raceLaps);
+	    sprintf(msg, "%s starts lap 1 of %d", pl->name, options.raceLaps);
 
 	Set_message(msg);
 #else
@@ -1300,9 +1300,9 @@ static void PlayerCheckpointCollision(player *pl)
 	if (BIT(pl->status, PLAYING|KILLED) == PLAYING
 	    && Wrap_length(pl->pos.cx - Checks(world, pl->check)->pos.cx,
 			   pl->pos.cy - Checks(world, pl->check)->pos.cy)
-	    < checkpointRadius * BLOCK_CLICKS
+	    < options.checkpointRadius * BLOCK_CLICKS
 	    && !Player_is_tank(pl)
-	    && !ballrace)
+	    && !options.ballrace)
 	    Player_pass_checkpoint(pl);
     }
 }
@@ -1364,7 +1364,7 @@ static void AsteroidCollision(void)
 	    switch (obj->type) {
 	    case OBJ_BALL:
 		Obj_repel(ast, obj, radius);
-		if (treasureCollisionDestroys)
+		if (options.treasureCollisionDestroys)
 		    obj->life = 0.0;
 		damage = ED_BALL_HIT;
 		sound = true;
@@ -1431,7 +1431,7 @@ static void AsteroidCollision(void)
 		if (ast->life < 0.0)
 		    ast->life = 0.0;
 		if (ast->life == 0.0) {
-		    if (asteroidPoints > 0.0
+		    if (options.asteroidPoints > 0.0
 			&& (obj->id != NO_ID
 			    || (obj->type == OBJ_BALL
 				&& BALL_PTR(obj)->owner != NO_ID))) {
@@ -1439,8 +1439,8 @@ static void AsteroidCollision(void)
 					? BALL_PTR(obj)->owner
 					: obj->id);
 			player *pl = Player_by_id(owner_id);
-			if (pl->score <= asteroidMaxScore)
-			    Score(pl, asteroidPoints, ast->pos, "");
+			if (pl->score <= options.asteroidMaxScore)
+			    Score(pl, options.asteroidPoints, ast->pos, "");
 		    }
 
 		    /* break; */
@@ -1467,7 +1467,7 @@ static void BallCollision(void)
      * some don't interact.
      */
     ignored_object_types = OBJ_PLAYER | OBJ_ASTEROID | OBJ_MINE | OBJ_ITEM;
-    if (!ballSparkCollisions)
+    if (!options.ballSparkCollisions)
 	ignored_object_types |= OBJ_SPARK;
 
     for (i = 0; i < NumObjs; i++) {
@@ -1484,20 +1484,20 @@ static void BallCollision(void)
 
 	/* Ball - checkpoint */
 	if (BIT(world->rules->mode, TIMING)
-	    && ballrace
+	    && options.ballrace
 	    && ball->owner != NO_ID) {
 	    player *owner = Player_by_id(ball->owner);
 
-	    if (!ballrace_connect || ball->id == owner->id) {
+	    if (!options.ballrace_connect || ball->id == owner->id) {
 		if (Wrap_length(ball->pos.cx - Checks(world, owner->check)->pos.cx,
 				ball->pos.cy - Checks(world, owner->check)->pos.cy)
-		    < checkpointRadius * BLOCK_CLICKS)
+		    < options.checkpointRadius * BLOCK_CLICKS)
 		    Player_pass_checkpoint(owner);
 	    }
 	}
 
 	/* Ball - object */
-	if (!ballCollisions)
+	if (!options.ballCollisions)
 	    continue;
 
 	Cell_get_objects(OBJ_X_IN_BLOCKS(ball), OBJ_Y_IN_BLOCKS(ball),
@@ -1538,7 +1538,7 @@ static void BallCollision(void)
 		/* if the collision was too violent, destroy ball and object */
 		if ((sqr(ball->vel.x - obj->vel.x) +
 		     sqr(ball->vel.y - obj->vel.y)) >
-		    sqr(maxObjectWallBounceSpeed)) {
+		    sqr(options.maxObjectWallBounceSpeed)) {
 		    ball->life = 0.0;
 		    obj->life  = 0.0;
 		} else
@@ -1575,7 +1575,7 @@ static void MineCollision(void)
     mineobject	*mine;
     int		collide_object_types;
 
-    if (!mineShotDetonateDistance)
+    if (!options.mineShotDetonateDistance)
 	return;
 
     /*
@@ -1608,7 +1608,7 @@ static void MineCollision(void)
 	    if (!BIT(obj->type, collide_object_types))
 		continue;
 
-	    radius = (mineShotDetonateDistance + obj->pl_radius) * CLICK;
+	    radius = (options.mineShotDetonateDistance + obj->pl_radius) * CLICK;
 	    if (!in_range(OBJ_PTR(mine), obj, radius))
 		continue;
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -21,14 +21,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
- 
+
 #ifndef ASTEROID_H
 #define ASTEROID_H
 
 /* maximum size of asteroid */
 #define ASTEROID_MAX_SIZE	4
 /* mass of asteroid size 1 */
-#define ASTEROID_BASE_MASS	(ShipMass * 3)
+#define ASTEROID_BASE_MASS	(options.ShipMass * 3)
 /* amount of mass lost in breaking, relative to asteroids size n - 1 */
 #define ASTEROID_DUST_MASS	0.25
 /* factor of above, relative to asteroid size n */

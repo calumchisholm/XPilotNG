@@ -184,7 +184,7 @@ static void Dump_data(void)
 	fwrite(bufs[i].start, 1, len, recf1);
 	*bufs[i].curp = bufs[i].start;
     }
-    if (recordFlushInterval)
+    if (options.recordFlushInterval)
 	fflush(recf1);
 #ifdef RECSTAT
     printf("\n");
@@ -224,11 +224,11 @@ void Init_recording(void)
     static int oldMode = 0;
     int i;
 
-    if (!recordFileName) {
-	if (recordMode != 0)
+    if (!options.recordFileName) {
+	if (options.recordMode != 0)
 	    warn("Can't do anything with recordings when recordFileName "
 		  "isn't specified.");
-	recordMode = 0;
+	options.recordMode = 0;
 	return;
     }
     if (sizeof(int) != 4 || sizeof(short) != 2) {
@@ -243,10 +243,10 @@ void Init_recording(void)
 
     recOpt = 1; /* Less robust but produces smaller files. */
     if (oldMode == 0) {
-	oldMode = recordMode + 10;
-	if (recordMode == 1) {
+	oldMode = options.recordMode + 10;
+	if (options.recordMode == 1) {
 	    record = rrecord = 1;
-	    recf1 = fopen(recordFileName, "wb");
+	    recf1 = fopen(options.recordFileName, "wb");
 	    if (!recf1) {
 		error("Opening record file failed");
 		exit(1);
@@ -256,21 +256,21 @@ void Init_recording(void)
 		*bufs[i].curp = bufs[i].start;
 	    }
 	    return;
-	} else if (recordMode == 2) {
+	} else if (options.recordMode == 2) {
 	    rplayback = 1;
 	    for (i = 0; i < num_types; i++) {
 		bufs[i].start = malloc(bufs[i].size);
 		*bufs[i].curp = bufs[i].start;
 		bufs[i].num_read = 0;
 	    }
-	    recf1 = fopen(recordFileName, "rb");
+	    recf1 = fopen(options.recordFileName, "rb");
 	    if (!recf1) {
 		error("Opening record file failed");
 		exit(1);
 	    }
 	    Get_recording_data();
 	    return;
-	} else if (recordMode == 0)
+	} else if (options.recordMode == 0)
 	    return;
 	else {
 	    warn("Trying to start recording or playback when the server is\n"
@@ -278,8 +278,8 @@ void Init_recording(void)
 	    return;
 	}
     }
-    if (recordMode != 0 || oldMode < 11 || oldMode > 12) {
-	recordMode = oldMode - 10;
+    if (options.recordMode != 0 || oldMode < 11 || oldMode > 12) {
+	options.recordMode = oldMode - 10;
 	return;
     }
     if (oldMode == 11) {
@@ -300,12 +300,12 @@ void Handle_recording_buffers(void)
     static time_t t;
     time_t tt;
 
-    if (recordMode != 1)
+    if (options.recordMode != 1)
 	return;
 
     tt = time(NULL);
-    if (recordFlushInterval) {
-	if (tt > t + recordFlushInterval) {
+    if (options.recordFlushInterval) {
+	if (tt > t + options.recordFlushInterval) {
 	    if (t == 0)
 		t = tt;
 	    else {

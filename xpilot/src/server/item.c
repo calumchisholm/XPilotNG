@@ -142,7 +142,7 @@ void Place_item(player *pl, int item)
 	    if (num_lose <= 0)
 		return;
 	    pl->item[item] -= num_lose;
-	    num_per_pack = (int)(num_lose * dropItemOnKillProb);
+	    num_per_pack = (int)(num_lose * options.dropItemOnKillProb);
 	    if (num_per_pack < world->items[item].min_per_pack)
 		return;
 	}
@@ -200,17 +200,17 @@ void Place_item(player *pl, int item)
 	    return;
 
     } else {
-	if (rfrac() < movingItemProb)
+	if (rfrac() < options.movingItemProb)
 	    grav = GRAVITY;
 	else
 	    grav = 0;
 
-	if (rfrac() < randomItemProb)
+	if (rfrac() < options.randomItemProb)
 	    rand_item = RANDOM_ITEM;
 	else
 	    rand_item = 0;
 
-	if (world->NumItemConcs > 0 && rfrac() < itemConcentratorProb)
+	if (world->NumItemConcs > 0 && rfrac() < options.itemConcentratorProb)
 	    con = ItemConcs(world, (int)(rfrac() * world->NumItemConcs));
 	else
 	    con = NULL;
@@ -230,7 +230,7 @@ void Place_item(player *pl, int item)
 	    if (con) {
 		int dir = (int)(rfrac() * RES);
 
-		dist = (int)(rfrac() * ((itemConcentratorRadius
+		dist = (int)(rfrac() * ((options.itemConcentratorRadius
 					 * BLOCK_CLICKS) + 1));
 		pos.cx = con->pos.cx + dist * tcos(dir);
 		pos.cy = con->pos.cy + dist * tsin(dir);
@@ -278,8 +278,8 @@ void Place_item(player *pl, int item)
 	} else {
 	    vector gravity = World_gravity(world, pos);
 
-	    vel.x -= Gravity * gravity.x;
-	    vel.y -= Gravity * gravity.y;
+	    vel.x -= options.Gravity * gravity.x;
+	    vel.y -= options.Gravity * gravity.y;
 	    vel.x += (int)(rfrac() * 8) - 3;
 	    vel.y += (int)(rfrac() * 8) - 3;
 	}
@@ -329,7 +329,7 @@ void Throw_items(player *pl)
     int			num_items_to_throw, remain, item;
     world_t *world = &World;
 
-    if (!dropItemOnKillProb || !pl)
+    if (!options.dropItemOnKillProb || !pl)
 	return;
 
     for (item = 0; item < NUM_ITEMS; item++) {
@@ -387,14 +387,14 @@ void Detonate_items(player *pl)
      * slowly out from the ship (velocity relative).
      */
     for (i = 0; i < pl->item[ITEM_MINE]; i++) {
-	if (rfrac() < detonateItemOnKillProb) {
+	if (rfrac() < options.detonateItemOnKillProb) {
 	    int dir = (int)(rfrac() * RES);
 	    double speed = rfrac() * 4.0f;
 	    vector vel;
 
 	    mods = pl->mods;
 	    if (BIT(mods.nuclear, NUCLEAR)
-		&& pl->item[ITEM_MINE] < nukeMinMines)
+		&& pl->item[ITEM_MINE] < options.nukeMinMines)
 		CLR_BIT(mods.nuclear, NUCLEAR);
 
 	    vel.x = pl->vel.x + speed * tcos(dir);
@@ -404,10 +404,10 @@ void Detonate_items(player *pl)
 	}
     }
     for (i = 0; i < pl->item[ITEM_MISSILE]; i++) {
-	if (rfrac() < detonateItemOnKillProb) {
+	if (rfrac() < options.detonateItemOnKillProb) {
 	    int	type;
 
-	    if (pl->shots >= ShotsMax)
+	    if (pl->shots >= options.ShotsMax)
 		break;
 
 	    /*
@@ -425,7 +425,7 @@ void Detonate_items(player *pl)
 
 	    mods = pl->mods;
 	    if (BIT(mods.nuclear, NUCLEAR)
-		&& pl->item[ITEM_MISSILE] < nukeMinSmarts)
+		&& pl->item[ITEM_MISSILE] < options.nukeMinSmarts)
 		CLR_BIT(mods.nuclear, NUCLEAR);
 
 	    Fire_general_shot(owner_pl, 0, pl->team, pl->pos,
@@ -521,7 +521,7 @@ void Do_deflector(player *pl)
 	if (obj->id == pl->id) {
 	    if (BIT(obj->status, OWNERIMMUNE)
 		|| frame_time < obj->fusetime
-		|| selfImmunity)
+		|| options.selfImmunity)
 		continue;
 	} else {
 	    if (Team_immune(obj->id, pl->id))
@@ -880,7 +880,7 @@ void do_lose_item(player *pl)
     if (pl->item[item] <= 0)
 	return;
 
-    if (loseItemDestroys == false && !BIT(pl->used, HAS_PHASING_DEVICE))
+    if (options.loseItemDestroys == false && !BIT(pl->used, HAS_PHASING_DEVICE))
 	Place_item(pl, item);
     else
 	pl->item[item]--;
@@ -1031,7 +1031,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
      *  50		75
      *	 0 (closest)	100
      */
-    if (ecmsReprogramMines && closest_mine != NULL) {
+    if (options.ecmsReprogramMines && closest_mine != NULL) {
 	range = closest_mine_range;
 	if (range <= 0 || (int)(rfrac() * 100.0f) < (100 - (int)(50*range)))
 	    closest_mine->id = (pl ? pl->id : NO_ID);
@@ -1124,7 +1124,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 		p->item[ITEM_LASER]
 		    -= (int)(range * p->item[ITEM_LASER] + 0.5);
 
-	    if (!Player_is_robot(p) || !ecmsReprogramRobots || !pl) {
+	    if (!Player_is_robot(p) || !options.ecmsReprogramRobots || !pl) {
 		/* player is blinded by light flashes. */
 		long duration
 		    = (long)(damage * pow(0.75, (double)p->item[ITEM_SENSOR]));

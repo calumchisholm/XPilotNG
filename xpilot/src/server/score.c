@@ -32,11 +32,11 @@ void Score(player *pl, double points, clpos pos, const char *msg)
     world_t *world = &World;
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
-	if (!teamShareScore)
+	if (!options.teamShareScore)
 	    Rank_AddScore(pl, points);
 	TEAM_SCORE(pl->team, points);
     } else {
-	if (pl->alliance != ALLIANCE_NOT_SET && teamShareScore)
+	if (pl->alliance != ALLIANCE_NOT_SET && options.teamShareScore)
 	    Alliance_score(pl->alliance, points);
 	else
 	    Rank_AddScore(pl, points);
@@ -52,11 +52,11 @@ void TEAM_SCORE(int team, double points)
 {
     world_t *world = &World;
 
-    if (team == TEAM_NOT_SET)	/* could happen if teamCannons is off */
+    if (team == TEAM_NOT_SET)	/* could happen if options.teamCannons is off */
 	return;
 
     world->teams[team].score += points;
-    if (teamShareScore) {
+    if (options.teamShareScore) {
 	int i;
 	double share = world->teams[team].score / world->teams[team].NumMembers;
 	for (i = 0; i < NumPlayers; i++) {
@@ -86,7 +86,7 @@ double Rate(double winner, double loser)
 {
     double t;
 
-    if (constantScoring)
+    if (options.constantScoring)
 	return RATE_SIZE / 2;
     t = ((RATE_SIZE / 2) * RATE_RANGE) / (ABS(loser - winner) + RATE_RANGE);
     if (loser > winner)
@@ -122,13 +122,13 @@ void Score_players(player *winner_pl, double winner_score, char *winner_msg,
 	    loser_score = -loser_score;
     }
 
-    if (tagGame && winner_score > 0.0 && loser_score < 0.0) {
+    if (options.tagGame && winner_score > 0.0 && loser_score < 0.0) {
 	if (tagItPlayerId == winner_pl->id) {
-	    winner_score *= tagItKillScoreMult;
-	    loser_score *= tagItKillScoreMult;
+	    winner_score *= options.tagItKillScoreMult;
+	    loser_score *= options.tagItKillScoreMult;
 	} else if (tagItPlayerId == loser_pl->id) {
-	    winner_score *= tagKillItScoreMult;
-	    loser_score *= tagKillItScoreMult;
+	    winner_score *= options.tagKillItScoreMult;
+	    loser_score *= options.tagKillItScoreMult;
 	    Transfer_tag(loser_pl, winner_pl);
 	}
     }

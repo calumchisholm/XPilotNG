@@ -349,7 +349,7 @@ static void Option_change_node(
 			break;
 
 		    case OPT_PASSWORD:
-			/* never modify if set by password file. */
+			/* never modify if set by options.password file. */
 			break;
 
 		    case OPT_INIT:
@@ -380,7 +380,7 @@ static void Option_change_node(
 			break;
 
 		    case OPT_PASSWORD:
-			/* never modify if set by password file. */
+			/* never modify if set by options.password file. */
 			break;
 
 		    case OPT_INIT:
@@ -399,12 +399,12 @@ static void Option_change_node(
 			break;
 
 		    case OPT_DEFAULTS:
-			/* password file always wins over defaults. */
+			/* options.password file always wins over defaults. */
 			set_ok = true;
 			break;
 
 		    case OPT_MAP:
-			/* password file always wins over map. */
+			/* options.password file always wins over map. */
 			set_ok = true;
 			break;
 
@@ -725,7 +725,7 @@ static void Option_parse_node(hash_node *np)
 	/* no value has been set, so get the option default value. */
 	value = desc->defaultValue;
 	if (value == NULL)
-	    /* no value at all.  (mapData or serverHost.) */
+	    /* no value at all.  (options.mapData or options.serverHost.) */
 	    return;
     }
 
@@ -850,12 +850,12 @@ static void Options_parse_expand(void)
     else
 	Option_parse_node(np);
 
-    if (expandList != NULL) {
+    if (options.expandList != NULL) {
 	char *name;
-	while ((name = (char *) List_pop_front(expandList)) != NULL)
+	while ((name = (char *) List_pop_front(options.expandList)) != NULL)
 	    expandKeyword(name);
-	List_delete(expandList);
-	expandList = NULL;
+	List_delete(options.expandList);
+	options.expandList = NULL;
     }
 }
 
@@ -876,7 +876,7 @@ static void Options_parse_FPS(void)
 	    warn("Invalid framesPerSecond specification '%s' in %s.",
 		fpsstr, Origin_name(value_origin));
 	else
-	    framesPerSecond = frames;
+	    options.framesPerSecond = frames;
     }
 
     if (FPS <= 0)

@@ -94,12 +94,12 @@ static void catch_timer(int signum)
 
     (void)signum;
     timer_count += FPS;
-    if (timer_count >= (unsigned)timerResolution) {
-	timer_count -= timerResolution;
+    if (timer_count >= (unsigned)options.timerResolution) {
+	timer_count -= options.timerResolution;
 	timer_ticks++;
-	if (timer_count >= (unsigned)timerResolution)
-	    /* Don't let timer_count grow boundlessly with timerResolution 0
-	     * now that timerResolution can be changed at runtime. */
+	if (timer_count >= (unsigned)options.timerResolution)
+	    /* Don't let timer_count grow boundlessly with options.timerResolution 0
+	     * now that options.timerResolution can be changed at runtime. */
 	    timer_count = 0;
     }
 }
@@ -561,10 +561,10 @@ void sched(void)
 	tv.tv_sec = 0;
 	/* KOERBER */
 	/*	tv.tv_usec = 1000000 / (3 * timer_freq + 1); */
-	tv.tv_usec = 1000000 / (10 * timer_freq + 1); 
+	tv.tv_usec = 1000000 / (10 * timer_freq + 1);
     }
     else {
-	/* slow I/O checks are possible here... (2 times per second) */ ; 
+	/* slow I/O checks are possible here... (2 times per second) */
 	tv.tv_sec = 0;
 	tv.tv_usec = 500000;
     }

@@ -955,7 +955,7 @@ static int Cmd_password(char *arg, player *pl, int oper, char *msg)
 {
     (void)oper;
 
-    if (!password || !arg || strcmp(arg, password)) {
+    if (!options.password || !arg || strcmp(arg, options.password)) {
 	strcpy(msg, "Wrong.");
 	if (pl->isoperator && pl->rectype != 2) {
 	    NumOperators--;
@@ -1044,8 +1044,8 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 	for (i = 0; i < MAX_TEAMS; i++)
 	    world->teams[i].score = 0;
 	Reset_all_players();
-	if (gameDuration == -1)
-	    gameDuration = 0;
+	if (options.gameDuration == -1)
+	    options.gameDuration = 0;
 	roundsPlayed = 0;
 
 	sprintf(msg, " < Total reset by %s! >", pl->name);
@@ -1058,8 +1058,8 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
     }
     else {
 	Reset_all_players();
-	if (gameDuration == -1)
-	    gameDuration = 0;
+	if (options.gameDuration == -1)
+	    options.gameDuration = 0;
 
 	sprintf(msg, " < Round reset by %s! >", pl->name);
 	Set_message(msg);
@@ -1155,7 +1155,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	    sprintf(msg, "You already are on team %d.", team);
 	else if (world->teams[team].NumBases == 0)
 	    sprintf(msg, "There are no bases for team %d on this map.", team);
-	else if (reserveRobotTeam && team == robotTeam)
+	else if (options.reserveRobotTeam && team == options.robotTeam)
 	    sprintf(msg, "You cannot join the robot team on this server.");
 	else if (pl->rectype == 2)
 	    sprintf(msg, "Spectators cannot change team.");

@@ -28,7 +28,7 @@ char auth_version[] = VERSION;
 #if 0
 /*
  * This function returns -1 if an error occurred or 0 if there aren't any
- * nicks with password protection. Otherwise, it returns 1 and saves the
+ * nicks with options.password protection. Otherwise, it returns 1 and saves the
  * memory address of the file's contents to *p.
  */
 static int Read_player_passwords_file(char **p, int *size)
@@ -133,7 +133,7 @@ static int Write_player_passwords_file(const char *data)
     return rv;
 }
 
-int Check_player_password(const char *nick, const char *password)
+int Check_player_password(const char *nick, const char *options.password)
 {
     char *fcont, salt[3], nick_l[MAX_NAME_LEN], *p, *p2, *line_start = NULL,
 	*colon = NULL, *fcont_new = NULL;
@@ -175,7 +175,7 @@ int Check_player_password(const char *nick, const char *password)
 	    /* Wrong or invalid entry. */
 	    continue;
 
-	/* Okay, we found a password entry for the nick. */
+	/* Okay, we found a options.password entry for the nick. */
 	found_entry = 1;
 	p++;
 	p2 = strpbrk(p, ":\r\n");
@@ -200,7 +200,7 @@ int Check_player_password(const char *nick, const char *password)
 
 	colon = p2;
 	strncpy(salt, p, 2);
-	p2 = crypt(password, salt);
+	p2 = crypt(options.password, salt);
 	if (!p2) {
 	    warn("crypt() failed when trying to check the password of "
 		 "player \"%s\".", nick_l);
@@ -231,7 +231,7 @@ int Check_player_password(const char *nick, const char *password)
 
 	p = colon + 1;
 
-	/* 'p' now points at the entry after the password entry. */
+	/* 'p' now points at the entry after the options.password entry. */
 
 	while (*p && isdigit(*p))
 	    p++;
@@ -314,7 +314,7 @@ int Check_player_password(const char *nick, const char *password)
     if (fcont_new) {
 
 	/*
-	 * 'lastaccess' field has been updated and password entry has been
+	 * 'lastaccess' field has been updated and options.password entry has been
 	 * moved to the beginning of the file.
 	 */
 
@@ -401,7 +401,7 @@ int Remove_player_password(const char *nick)
     return r;
 }
 
-int Set_player_password(const char *nick, const char *password, int new)
+int Set_player_password(const char *nick, const char *options.password, int new)
 {
     char *fcont = NULL, *p, *p2, *cpass, salt[3];
     int r, fsize;
@@ -433,7 +433,7 @@ int Set_player_password(const char *nick, const char *password, int new)
     salt[0] = nick[0];
     salt[1] = nick[strlen(nick)-1];
     salt[2] = 0;
-    cpass = crypt(password, salt);
+    cpass = crypt(options.password, salt);
     if (!cpass) {
 	warn("crypt() failed when trying to set a player password.");
 	free(fcont);
@@ -466,7 +466,7 @@ int Set_player_password(const char *nick, const char *password, int new)
 
     /*
      * We update old passwords regardless of the file size limit, since
-     * we already removed the password and we should update it now even
+     * we already removed the options.password and we should update it now even
      * if the new line is a little longer than the old line.
      */
     if  (new && strlen(p) > playerPasswordsFileSizeLimit) {

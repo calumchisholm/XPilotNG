@@ -32,11 +32,6 @@ static int teamcup_status_fd = -1;
 static int teamcup_have_fork = 0;
 static int teamcup_child_pid = 0;
 
-bool		teamcup;		/* Is this a teamcup match? */
-char		*teamcupStatServer;	/* Status server to report to */
-int		teamcupStatPort;	/* Port to use on the status server */
-int		teamcupMatchNumber = 0;	/* The number of the match */
-
 #define STATUSBUFS 8
 #define STATBUFSIZE 512
 
@@ -140,8 +135,8 @@ teamcup_status_thread(int readfd)
     for (i = 0; i < 64; i++)
 	signal(i, _exit);
 
-    if (sock_open_tcp_connected_non_blocking(&sock, teamcupStatServer,
-					     teamcupStatPort) != SOCK_IS_OK) {
+    if (sock_open_tcp_connected_non_blocking(&sock, options.teamcupStatServer,
+					     options.teamcupStatPort) != SOCK_IS_OK) {
 	xpprintf("\n!!! Unable to connect to master server\n\n");
 	_exit(1);
     }
@@ -220,7 +215,7 @@ teamcup_status_thread(int readfd)
 
 void teamcup_open_score_file(void)
 {
-    if (!teamcup)
+    if (!options.teamcup)
 	return;
 
     if (teamcup_score_file != NULL) {
@@ -257,10 +252,10 @@ void teamcup_open_score_file(void)
 		"Match: %d\n"
 		"Total winner (team number): \n"
 		"\nDO NOT CHANGE ANYTHING AFTER THIS LINE\n\n",
-		teamcupMatchNumber
+		options.teamcupMatchNumber
 	);
 
-    if (teamcupMatchNumber && !teamcup_have_fork) {
+    if (options.teamcupMatchNumber && !teamcup_have_fork) {
 	int mypipes[2];
 
 	if (pipe(mypipes) != 0) {
@@ -291,7 +286,7 @@ void teamcup_close_score_file(void)
 {
     char msg[MSG_LEN];
 
-    if (!teamcup || teamcup_score_file == NULL)
+    if (!options.teamcup || teamcup_score_file == NULL)
 	return;
 
     fclose(teamcup_score_file);
@@ -311,7 +306,7 @@ void teamcup_game_over(void)
 	struct teamcup_match_end mend;
 
 	mend.magic = htons(END_MATCH_MAGIC);
-	mend.matchno = htons(teamcupMatchNumber);
+	mend.matchno = htons(options.teamcupMatchNumber);
 	write(teamcup_status_fd, &mend, sizeof(mend));
     }
     teamcup_close_score_file();
@@ -319,9 +314,9 @@ void teamcup_game_over(void)
 
 void teamcup_log(const char *fmt, ...)
 {
-    if (teamcup && teamcup_score_file) {
+    if (options.teamcup && teamcup_score_file) {
 	va_list ap;
-  
+
 	va_start(ap, fmt);
 	vfprintf(teamcup_score_file, fmt, ap);
   	va_end(ap);
@@ -330,7 +325,7 @@ void teamcup_log(const char *fmt, ...)
 
 void teamcup_round_start(void)
 {
-    if (!teamcup)
+    if (!options.teamcup)
 	return;
 
     teamcup_log("\nRound %d\n", roundsPlayed + 1);
@@ -348,7 +343,7 @@ void teamcup_round_end(int winning_team)
     player *pl;
     double double_max;
 
-    if (!teamcup)
+    if (!options.teamcup)
 	return;
 
     double_max=(double)(100000); /*not really*/
@@ -406,7 +401,7 @@ void teamcup_round_end(int winning_team)
 	    struct teamcup_match_init minit;
 
 	    minit.magic = htons(INIT_MATCH_MAGIC);
-	    minit.matchno = htons(teamcupMatchNumber);
+	    minit.matchno = htons(options.teamcupMatchNumber);
 	    minit.t2players = team_players[2];
 	    minit.t4players = team_players[4];
 	    write(teamcup_status_fd, &minit, sizeof(minit));
@@ -478,7 +473,7 @@ int Get_scorefileHeader(char *buf, int offset, int maxlen, int *size_ptr)
 
 	motd_loops = main_loops;
 
-	if ((fd = open(motdFileName, O_RDONLY)) == -1) {
+	if ((fd = open(options.motdFileName, O_RDONLY)) == -1) {
 	    motd_size = 0;
 	    return -1;
 	}

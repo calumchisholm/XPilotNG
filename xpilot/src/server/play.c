@@ -174,7 +174,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
 	if (pl_i->team == td->team) {
 	    Score(pl_i, -sc, pos, "Treasure: ");
 	    Rank_LostBall(pl_i);
-	    if (treasureKillTeam)
+	    if (options.treasureKillTeam)
 		SET_BIT(pl_i->status, KILLED);
 	}
 	else if (pl_i->team == pl->team &&
@@ -189,7 +189,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
 	}
     }
 
-    if (treasureKillTeam)
+    if (options.treasureKillTeam)
 	Rank_AddKill(pl);
 
     updateScores = true;
@@ -239,7 +239,7 @@ void Make_debris(
 
     if (type == OBJ_SHOT) {
 	SET_BIT(mods.warhead, CLUSTER);
-	if (!ShotsGravity)
+	if (!options.ShotsGravity)
 	    CLR_BIT(status, GRAVITY);
     }
 
@@ -267,10 +267,10 @@ void Make_debris(
 	debris->vel.y = vel.y + dy * speed;
 	debris->acc.x = 0;
 	debris->acc.y = 0;
-	if (shotHitFuelDrainUsesKineticEnergy
+	if (options.shotHitFuelDrainUsesKineticEnergy
 	    && type == OBJ_SHOT) {
 	    /* compensate so that m*v^2 is constant */
-	    double sp_shotsp = speed / ShotsSpeed;
+	    double sp_shotsp = speed / options.ShotsSpeed;
 	    debris->mass = mass / (sp_shotsp * sp_shotsp);
 	} else
 	    debris->mass = mass;
@@ -319,7 +319,7 @@ void Ball_is_destroyed(ballobject *ball)
     char msg[MSG_LEN];
     player *pl = Player_by_id(ball->owner);
     double frames = (1e6 - ball->life) / timeStep + .5;
-    double seconds = frames / framesPerSecond;
+    double seconds = frames / options.framesPerSecond;
 
     if (timeStep != 1.0) {
 	double normalized = frames * timeStep;
@@ -369,7 +369,7 @@ void Ball_hits_goal(ballobject *ball, group_t *gp)
 
 	Ball_is_destroyed(ball);
 
-	if (captureTheFlag && !tt->have && !tt->empty) {
+	if (options.captureTheFlag && !tt->have && !tt->empty) {
 	    sprintf(msg, " < The treasure must be safe before you "
 		    "can cash an opponent's! >");
 	    Set_message(msg);
@@ -445,7 +445,7 @@ hitmask_t Cannon_hitmask(cannon_t *cannon)
 
     if (cannon->dead_time > 0)
 	return ALL_BITS;
-    if (BIT(world->rules->mode, TEAM_PLAY) && teamImmunity)
+    if (BIT(world->rules->mode, TEAM_PLAY) && options.teamImmunity)
 	return HITMASK(cannon->team);
     return 0;
 }
@@ -475,7 +475,7 @@ void World_remove_cannon(world_t *world, cannon_t *cannon)
 {
     blpos blk = Clpos_to_blpos(cannon->pos);
 
-    cannon->dead_time = cannonDeadTime;
+    cannon->dead_time = options.cannonDeadTime;
     cannon->conn_mask = 0;
 
     World_set_block(world, blk, SPACE);
@@ -537,8 +537,8 @@ hitmask_t Target_hitmask(target_t *targ)
     if (targ->team == TEAM_NOT_SET)
 	return 0;
 
-    /* if targetTeamCollision is true, everything hits a target */
-    if (targetTeamCollision)
+    /* if options.targetTeamCollision is true, everything hits a target */
+    if (options.targetTeamCollision)
 	return 0;
 
     /* note that targets are always team immune */
@@ -590,7 +590,7 @@ void World_remove_target(world_t *world, target_t *targ)
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
     targ->damage = TARGET_DAMAGE;
-    targ->dead_time = targetDeadTime;
+    targ->dead_time = options.targetDeadTime;
 
     /*
      * Destroy target.

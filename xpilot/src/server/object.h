@@ -484,7 +484,7 @@ struct player {
     long	used;			/** Items you use **/
     long	have;			/** Items you have **/
 
-    double	shield_time;		/* Shields if no playerShielding */
+    double	shield_time;		/* Shields if no options.playerShielding */
     pl_fuel_t	fuel;			/* ship tanks and the stored fuel */
     double	emptymass;		/* Mass of empty ship */
     double	float_dir;		/* Direction, in float var */
@@ -595,7 +595,7 @@ struct player {
     BITV_DECL(last_keyv, NUM_KEYS);	/* Keyboard state */
     BITV_DECL(prev_keyv, NUM_KEYS);	/* Keyboard state */
 
-    uint16_t	unused3;		/* padding for alignment */    
+    uint16_t	unused3;		/* padding for alignment */
 
     long	frame_last_busy;	/* When player touched keyboard. */
 
@@ -618,7 +618,7 @@ struct player {
 #ifdef __cplusplus
 		player() {}
 #endif
-    
+
 };
 
 #endif

@@ -138,7 +138,7 @@ void Cloak(player *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
-	    if (!cloakedShield) {
+	    if (!options.cloakedShield) {
 		if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
 		    Emergency_shield(pl, false);
 		if (BIT(pl->used, HAS_DEFLECTOR))
@@ -158,7 +158,7 @@ void Cloak(player *pl, bool on)
 	}
 	if (!pl->item[ITEM_CLOAK])
 	    CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
-	if (!cloakedShield) {
+	if (!options.cloakedShield) {
 	    if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
 		SET_BIT(pl->have, HAS_SHIELD);
 		Emergency_shield(pl, true);
@@ -179,7 +179,7 @@ void Deflector(player *pl, bool on)
     if (on) {
 	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
 	    /* only allow deflector when cloaked shielding or not cloaked */
-	    if (cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
+	    if (options.cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
 		SET_BIT(pl->used, HAS_DEFLECTOR);
 		sound_play_player(pl, DEFLECTOR_SOUND);
 	    }
@@ -231,7 +231,7 @@ void Emergency_shield (player *pl, bool on)
 		pl->emergency_shield_left += EMERGENCY_SHIELD_TIME;
 		pl->item[ITEM_EMERGENCY_SHIELD]--;
 	    }
-	    if (cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
+	    if (options.cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
 		SET_BIT(pl->have, HAS_SHIELD);
 		if (!BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
 		    SET_BIT(pl->used, HAS_EMERGENCY_SHIELD);
@@ -500,9 +500,9 @@ static void Misc_object_update(void)
 
 	else if (BIT(obj->type, OBJ_PULSE)) {
 	    pulseobject *pulse = PULSE_PTR(obj);
-	    pulse->len += pulseSpeed * timeStep;
-	    if (pulse->len > pulseLength)
-		pulse->len = pulseLength;
+	    pulse->len += options.pulseSpeed * timeStep;
+	    if (pulse->len > options.pulseLength)
+		pulse->len = options.pulseLength;
 	}
 
 	update_object_speed(obj);
@@ -524,7 +524,7 @@ static void Target_update(void)
 	    if ((targ->dead_time -= timeStep) <= 0) {
 		World_restore_target(world, targ);
 
-		if (targetSync) {
+		if (options.targetSync) {
 		    for (j = 0; j < world->NumTargets; j++) {
 			target_t *t = Targets(world, j);
 			if (t->team == targ->team)
@@ -707,7 +707,7 @@ static void Do_refuel(player *pl)
 	|| (pl->fuel.sum >= pl->fuel.max)
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
 	|| (BIT(world->rules->mode, TEAM_PLAY)
-	    && teamFuel
+	    && options.teamFuel
 	    && fs->team != pl->team)) {
 	CLR_BIT(pl->used, HAS_REFUEL);
     } else {
@@ -868,7 +868,7 @@ static void Do_warping(player *pl)
 
 #if 0 /* kps - temporary wormholes disabled currently */
 	if (counter
-	    && wormTime
+	    && options.wormTime
 	    && BIT(1U << world->block[OBJ_X_IN_BLOCKS(pl)]
 		   [OBJ_Y_IN_BLOCKS(pl)],
 		   SPACE_BIT)
@@ -935,7 +935,7 @@ static void Do_warping(player *pl)
 	world->wormholes[pl->wormHoleHit].lastdest = wh_dest;
 	if (!world->wormholes[wh_dest].temporary)
 	    world->wormholes[pl->wormHoleHit].countdown
-		= (wormTime ? wormTime : WORMCOUNT);
+		= (options.wormTime ? options.wormTime : WORMCOUNT);
     }
 
     CLR_BIT(pl->status, WARPING);
@@ -959,8 +959,8 @@ static void Update_players(void)
 	pl = Players(i);
 
 	if (BIT(pl->status, PAUSE)) {
-	    if (pauseTax > 0.0 && (frame_loops % FPS) == 0) {
-		pl->score -= pauseTax;
+	    if (options.pauseTax > 0.0 && (frame_loops % FPS) == 0) {
+		pl->score -= options.pauseTax;
 		updateScores = true;
 	    }
 	}
@@ -1019,9 +1019,9 @@ static void Update_players(void)
 		    Go_home(pl);
 		}
 		if (BIT(pl->status, SELF_DESTRUCT)) {
-		    if (selfDestructScoreMult != 0) {
+		    if (options.selfDestructScoreMult != 0) {
 			double sc = Rate(0.0, pl->score)
-			    * selfDestructScoreMult;
+			    * options.selfDestructScoreMult;
 			Score(pl, -sc, pl->pos, "Self-Destruct");
 		    }
 		    SET_BIT(pl->status, KILLED);
@@ -1093,7 +1093,7 @@ static void Update_players(void)
 		f = AFTER_BURN_FUEL(f, a);
 	    }
 
-	    if (!ngControls) {
+	    if (!options.ngControls) {
 		pl->acc.x = power * tcos(pl->dir) / inert;
 		pl->acc.y = power * tsin(pl->dir) / inert;
 	    } else {
@@ -1116,7 +1116,7 @@ static void Update_players(void)
 	update_object_speed(OBJ_PTR(pl));
 	Move_player(pl);
 
-	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || cloakedExhaust)
+	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || options.cloakedExhaust)
 	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {
 	    if (BIT(pl->status, THRUSTING))
   		Thrust(pl);
@@ -1269,10 +1269,10 @@ void Update_objects(void)
 	    }
 	}
 
-	if (maxPauseTime > 0
+	if (options.maxPauseTime > 0
 	    && Player_is_human(pl)
 	    && BIT(pl->status, PAUSE)
-	    && frame_loops - pl->frame_last_busy > maxPauseTime) {
+	    && frame_loops - pl->frame_last_busy > options.maxPauseTime) {
 	    sprintf(msg, "%s was auto-kicked for pausing too long "
 		    "[*Server notice*]", pl->name);
 	    Set_message(msg);
@@ -1290,7 +1290,7 @@ void Update_objects(void)
      /*
       * In tag games, check if anyone is tagged. otherwise, tag someone.
       */
-    if (tagGame) {
+    if (options.tagGame) {
 	int oldtag = tagItPlayerId;
 
 	Check_tag();
@@ -1305,7 +1305,7 @@ void Update_objects(void)
      * Compute general game status, do we have a winner?
      * (not called after Game_Over() )
      */
-    if (gameDuration >= 0.0 || maxRoundTime > 0)
+    if (options.gameDuration >= 0.0 || options.maxRoundTime > 0)
 	Compute_game_status();
 
     /*

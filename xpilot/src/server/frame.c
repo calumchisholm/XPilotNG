@@ -27,7 +27,7 @@ char frame_version[] = VERSION;
 
 
 #define MAX_SHUFFLE_INDEX	65535
-#define MAX_VISIBLE_OBJECTS	maxVisibleObject
+#define MAX_VISIBLE_OBJECTS	options.maxVisibleObject
 
 
 typedef unsigned short shuffle_t;
@@ -384,7 +384,7 @@ static int Frame_status(connection_t *conn, player *pl)
 		|| Players_are_allies(pl, lock_pl))
 #endif
 	    && BIT(lock_pl->status, PLAYING|GAME_OVER) == PLAYING
-	    && (playersOnRadar
+	    && (options.playersOnRadar
 		|| clpos_inview(&cv, lock_pl->pos))
 	    && pl->lock.distance != 0) {
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
@@ -467,7 +467,7 @@ static int Frame_status(connection_t *conn, player *pl)
     if (ShutdownServer != -1)
 	Send_shutdown(conn, ShutdownServer, ShutdownDelay);
     if (round_delay_send > 0)
-	Send_rounddelay(conn, round_delay, roundDelaySeconds * FPS);
+	Send_rounddelay(conn, round_delay, options.roundDelaySeconds * FPS);
 
     return 1;
 }
@@ -556,7 +556,7 @@ static void Frame_map(connection_t *conn, player *pl)
 	if (++i >= world->NumWormholes)
 	    i = 0;
 	worm = Wormholes(world, i);
-	if (wormholeVisible
+	if (options.wormholeVisible
 	    && worm->temporary
 	    && (worm->type == WORM_IN
 		|| worm->type == WORM_NORMAL)
@@ -740,7 +740,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    break;
 
 	case OBJ_WRECKAGE:
-	    if (spark_rand != 0 || wreckageCollisionMayKill) {
+	    if (spark_rand != 0 || options.wreckageCollisionMayKill) {
 		wireobject *wreck = WIRE_PTR(shot);
 		Send_wreckage(conn, pos, (u_byte)wreck->info,
 			      wreck->size, wreck->rotation);
@@ -765,7 +765,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 		color = BLUE;
 		teamshot = DEBRIS_TYPES;
 	    } else if (shot->id == pl->id
-		&& selfImmunity) {
+		&& options.selfImmunity) {
 		color = BLUE;
 		teamshot = DEBRIS_TYPES;
 	    } else if (shot->mods.nuclear && (frame_loops_slow & 2)) {
@@ -781,15 +781,15 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    break;
 
 	case OBJ_TORPEDO:
-	    len = distinguishMissiles ? TORPEDO_LEN : MISSILE_LEN;
+	    len = options.distinguishMissiles ? TORPEDO_LEN : MISSILE_LEN;
 	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_SMART_SHOT:
-	    len = distinguishMissiles ? SMART_SHOT_LEN : MISSILE_LEN;
+	    len = options.distinguishMissiles ? SMART_SHOT_LEN : MISSILE_LEN;
 	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_HEAT_SHOT:
-	    len = distinguishMissiles ? HEAT_SHOT_LEN : MISSILE_LEN;
+	    len = options.distinguishMissiles ? HEAT_SHOT_LEN : MISSILE_LEN;
 	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_BALL:
@@ -803,7 +803,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 		mineobject *mine = MINE_PTR(shot);
 
 		/* calculate whether ownership of mine can be determined */
-		if (identifyMines
+		if (options.identifyMines
 		    && (Wrap_length(pl->pos.cx - mine->pos.cx,
 				    pl->pos.cy - mine->pos.cy) / CLICK
 			< (SHIP_SZ + MINE_SENSE_BASE_RANGE
@@ -847,7 +847,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 
 		if (Team_immune(pulse->id, pl->id))
 		    color = BLUE;
-		else if (pulse->id == pl->id && selfImmunity)
+		else if (pulse->id == pl->id && options.selfImmunity)
 		    color = BLUE;
 		else
 		    color = RED;
@@ -985,16 +985,16 @@ static void Frame_radar(connection_t *conn, player *pl)
     Frame_radar_buffer_reset();
 
 #ifndef NO_SMART_MIS_RADAR
-    if (nukesOnRadar)
+    if (options.nukesOnRadar)
 	mask = OBJ_SMART_SHOT|OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_MINE;
     else {
-	mask = (missilesOnRadar ?
+	mask = (options.missilesOnRadar ?
 		(OBJ_SMART_SHOT|OBJ_TORPEDO|OBJ_HEAT_SHOT) : 0);
-	mask |= (minesOnRadar) ? OBJ_MINE : 0;
+	mask |= (options.minesOnRadar) ? OBJ_MINE : 0;
     }
-    if (treasuresOnRadar)
+    if (options.treasuresOnRadar)
 	mask |= OBJ_BALL;
-    if (asteroidsOnRadar)
+    if (options.asteroidsOnRadar)
 	mask |= OBJ_ASTEROID;
 
     if (mask) {
@@ -1003,14 +1003,14 @@ static void Frame_radar(connection_t *conn, player *pl)
 	    if (! BIT(shot->type, mask))
 		continue;
 
-	    shownuke = (nukesOnRadar && (shot)->mods.nuclear);
+	    shownuke = (options.nukesOnRadar && (shot)->mods.nuclear);
 	    if (shownuke && (frame_loops_slow & 2))
 		size = 3;
 	    else
 		size = 0;
 
 	    if (BIT(shot->type, OBJ_MINE)) {
-		if (!minesOnRadar && !shownuke)
+		if (!options.minesOnRadar && !shownuke)
 		    continue;
 		if (frame_loops_slow % 8 >= 6)
 		    continue;
@@ -1020,7 +1020,7 @@ static void Frame_radar(connection_t *conn, player *pl)
 		size = WIRE_PTR(shot)->size + 1;
 		size |= 0x80;
 	    } else {
-		if (!missilesOnRadar && !shownuke)
+		if (!options.missilesOnRadar && !shownuke)
 		    continue;
 		if (frame_loops_slow & 1)
 		    continue;
@@ -1034,7 +1034,7 @@ static void Frame_radar(connection_t *conn, player *pl)
     }
 #endif
 
-    if (playersOnRadar
+    if (options.playersOnRadar
 	|| BIT(world->rules->mode, TEAM_PLAY)
 	|| NumPseudoPlayers > 0
 	|| NumAlliances > 0) {
@@ -1047,14 +1047,14 @@ static void Frame_radar(connection_t *conn, player *pl)
 	     *		Ourselves (not necessarily same as who we watch).
 	     *		People who are not playing.
 	     *		People in other teams or alliances if;
-	     *			no playersOnRadar or if not visible
+	     *			no options.playersOnRadar or if not visible
 	     */
 	    if (pl_i->conn == conn
 		|| !Player_is_active(pl_i) /* kps - active / playing ??? */
 		|| (!Players_are_teammates(pl_i, pl)
 		    && !Players_are_allies(pl, pl_i)
 		    && !Player_owns_tank(pl, pl_i)
-		    && (!playersOnRadar || !pl->visibility[i].canSee))) {
+		    && (!options.playersOnRadar || !pl->visibility[i].canSee))) {
 		continue;
 	    }
 	    pos = pl_i->pos;
@@ -1138,7 +1138,7 @@ void Frame_update(void)
 
     Frame_shuffle();
 
-    if (gameDuration > 0.0
+    if (options.gameDuration > 0.0
 	&& game_over_called == false
 	&& oldTimeLeft != (newTimeLeft = gameOverTime - time(NULL))) {
 	/*
@@ -1165,17 +1165,17 @@ void Frame_update(void)
 	     * Lower the frame rate for non-playing players
 	     * to reduce network load.
 	     */
-	    if (BIT(pl->status, PAUSE) && pausedFPS)
-		player_fps = pausedFPS;
-	    else if (waitingFPS)
-		player_fps = waitingFPS;
+	    if (BIT(pl->status, PAUSE) && options.pausedFPS)
+		player_fps = options.pausedFPS;
+	    else if (options.waitingFPS)
+		player_fps = options.waitingFPS;
 	}
 	player_fps = MIN(player_fps, pl->player_fps);
 
 	/*
 	 * Reduce frame rate to player's own rate.
 	 */
-	if (player_fps < FPS && !ignoreMaxFPS) {
+	if (player_fps < FPS && !options.ignoreMaxFPS) {
 	    int divisor = (FPS - 1) / player_fps + 1;
 	    if (frame_loops % divisor)
  		continue;
@@ -1185,11 +1185,11 @@ void Frame_update(void)
 	    continue;
 	if (newTimeLeft != oldTimeLeft)
 	    Send_time_left(conn, newTimeLeft);
-	else if (maxRoundTime > 0 && roundtime >= 0)
+	else if (options.maxRoundTime > 0 && roundtime >= 0)
 	    Send_time_left(conn, (roundtime + FPS - 1) / FPS);
 	/*
 	 * If status is GAME_OVER or PAUSE'd, the user may look through the
-	 * other players 'eyes'. lockOtherTeam determines whether you can
+	 * other players 'eyes'. options.lockOtherTeam determines whether you can
 	 * watch opponents while your own team is still alive (potentially
 	 * giving information to your team).
 	 *
@@ -1242,7 +1242,7 @@ void Set_message(const char *message)
     char		tmp[MSG_LEN];
 
     if ((i = strlen(message)) >= MSG_LEN) {
-	if (!silent)
+	if (!options.silent)
 	    warn("Max message len exceed (%d,%s)", i, message);
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;
@@ -1273,7 +1273,7 @@ void Set_player_message(player *pl, const char *message)
 	return;
 
     if ((i = strlen(message)) >= MSG_LEN) {
-	if (!silent)
+	if (!options.silent)
 	    warn("Max message len exceed (%d,%s)", i, message);
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;

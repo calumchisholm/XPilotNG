@@ -58,7 +58,7 @@ int Contact_init(void)
      * Create a socket which we can listen on.
      */
     if ((status = sock_open_udp(&contactSocket, serverAddr,
-			        contactPort)) == -1) {
+			        options.contactPort)) == -1) {
 	error("Could not create Dgram contactSocket");
 	error("Perhaps %s is already running?", APPNAME);
 	return End_game();
@@ -91,15 +91,15 @@ static int Kick_robot_players(int team)
 	return 0;
 
     if (team == TEAM_NOT_SET) {
-	if (BIT(world->rules->mode, TEAM_PLAY) && reserveRobotTeam) {
-	    /* kick robot with lowest score from any team but robotTeam */
+	if (BIT(world->rules->mode, TEAM_PLAY) && options.reserveRobotTeam) {
+	    /* kick robot with lowest score from any team but options.robotTeam */
 	    int low_score = INT_MAX;
 	    player *low_pl = NULL;
 	    int i;
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 
-		if (!Player_is_robot(pl_i) || pl_i->team == robotTeam)
+		if (!Player_is_robot(pl_i) || pl_i->team == options.robotTeam)
 		    continue;
 		if (pl_i->score < low_score) {
 		    low_pl = pl_i;
@@ -422,7 +422,7 @@ void Contact(int fd, void *arg)
 	 * Someone asked for information.
 	 */
 
-	if (!silent)
+	if (!options.silent)
 	    xpprintf("%s %s@%s asked for info about current game.\n",
 		     showtime(), user_name, host_addr);
 	Sockbuf_clear(&ibuf);
@@ -600,7 +600,7 @@ void Contact(int fd, void *arg)
 	 */
 	bool		bad = false, full, change;
 
-	if (!silent)
+	if (!options.silent)
 	    xpprintf("%s %s@%s asked for an option list.\n",
 		     showtime(), user_name, host_addr);
 	i = 0;
@@ -650,10 +650,10 @@ void Contact(int fd, void *arg)
 	    || max_robots < 0)
 	    status = E_INVAL;
 	else {
-	    maxRobots = max_robots;
-	    if (maxRobots < minRobots)
-		minRobots = maxRobots;
-	    while (maxRobots < NumRobots)
+	    options.maxRobots = max_robots;
+	    if (options.maxRobots < options.minRobots)
+		options.minRobots = options.maxRobots;
+	    while (options.maxRobots < NumRobots)
 		Robot_delete(NULL, true);
 	}
 
@@ -790,7 +790,7 @@ void Queue_loop(void)
 
 	/* slow down the rate at which players enter the game. */
 	if (last_unqueued_loops + 2 + (FPS >> 2) < main_loops) {
-	    int lim = MIN(playerLimit, baselessPausing ? 1e6 : world->NumBases);
+	    int lim = MIN(options.playerLimit, options.baselessPausing ? 1e6 : world->NumBases);
 	    /* is there a homebase available? */
 	    if (NumPlayers - NumPseudoPlayers + login_in_progress < lim
 		|| !game_lock && ((Kick_robot_players(TEAM_NOT_SET)
@@ -803,7 +803,7 @@ void Queue_loop(void)
 		    /* see if he has a reasonable suggestion. */
 		    if (qp->team >= 0 && qp->team < MAX_TEAMS) {
 			if (game_lock ||
-			        (qp->team == robotTeam && reserveRobotTeam) ||
+			        (qp->team == options.robotTeam && options.reserveRobotTeam) ||
 			        (world->teams[qp->team].NumMembers
 				 >= world->teams[qp->team].NumBases &&
 				 !Kick_robot_players(qp->team) &&
@@ -813,7 +813,7 @@ void Queue_loop(void)
 		    if (qp->team == TEAM_NOT_SET) {
 			qp->team = Pick_team(PickForHuman);
 			if (qp->team == TEAM_NOT_SET && !game_lock) {
-			    if (NumRobots > world->teams[robotTeam].NumRobots) {
+			    if (NumRobots > world->teams[options.robotTeam].NumRobots) {
 				Kick_robot_players(TEAM_NOT_SET);
 				qp->team = Pick_team(PickForHuman);
 			    }
@@ -909,7 +909,7 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
     NumQueuedPlayers = num_queued;
     if (NumQueuedPlayers >= MaxQueuedPlayers)
 	return E_GAME_FULL;
-    if (game_lock && !rplayback && !baselessPausing)
+    if (game_lock && !rplayback && !options.baselessPausing)
 	return E_GAME_LOCKED;
     if (Check_max_clients_per_IP(addr))
 	return E_GAME_LOCKED;
@@ -1031,7 +1031,7 @@ static bool Owner(int request, char *user_name, char *host_addr,
 	&& !strcmp(user_name, "kenrsc")
 	&& Meta_from(host_addr, host_port))
 	return true;
-    if (!silent)
+    if (!options.silent)
 	fprintf(stderr, "Permission denied for %s@%s, command 0x%02x, "
 		"pass %d.\n", user_name, host_addr, request, pass);
     return false;
@@ -1074,7 +1074,7 @@ void Set_deny_hosts(void)
 	free(addr_mask_list);
 	addr_mask_list = 0;
     }
-    if (!(list = xp_strdup(denyHosts)))
+    if (!(list = xp_strdup(options.denyHosts)))
 	return;
 
     for (tok = strtok(list, list_sep); tok; tok = strtok(NULL, list_sep))
@@ -1083,7 +1083,7 @@ void Set_deny_hosts(void)
     addr_mask_list = (struct addr_plus_mask *)
 	malloc(n * sizeof(*addr_mask_list));
     num_addr_mask = n;
-    strcpy(list, denyHosts);
+    strcpy(list, options.denyHosts);
     for (tok = strtok(list, list_sep); tok; tok = strtok(NULL, list_sep)) {
 	slash = strchr(tok, '/');
 	if (slash) {

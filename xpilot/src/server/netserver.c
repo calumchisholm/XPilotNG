@@ -200,7 +200,7 @@ static int Init_setup(world_t *world)
     }
 
     size = Polys_to_client(&mapdata);
-    if (!silent)
+    if (!options.silent)
 	xpprintf("%s Server->client polygon map transfer size is %d bytes.\n",
 		 showtime(), size);
 
@@ -220,7 +220,7 @@ static int Init_setup(world_t *world)
     Setup->height = world->height;
     strlcpy(Setup->name, world->name, sizeof(Setup->name));
     strlcpy(Setup->author, world->author, sizeof(Setup->author));
-    strlcpy(Setup->data_url, dataURL, sizeof(Setup->data_url));
+    strlcpy(Setup->data_url, options.dataURL, sizeof(Setup->data_url));
 
     return 0;
 }
@@ -305,7 +305,7 @@ int Setup_net_server(void)
      * the contact socket, and the socket for the resolver library routines.
      */
     max_connections = MIN((int)MAX_SELECT_FD - 5,
-			  playerLimit_orig + MAX_SPECTATORS * !!rplayback);
+			  options.playerLimit_orig + MAX_SPECTATORS * !!rplayback);
     size = max_connections * sizeof(*Conn);
     if ((Conn = (connection_t *) malloc(size)) == NULL) {
 	error("Cannot allocate memory for connections");
@@ -390,7 +390,7 @@ void Destroy_connection(connection_t *connp, const char *reason)
 	sock_get_errorRec(sock);
 	sock_writeRec(sock, pkt, len);
     }
-    if (!silent)
+    if (!options.silent)
 	xpprintf("%s Goodbye %s=%s@%s|%s (\"%s\")\n",
 		 showtime(),
 		 connp->nick ? connp->nick : "",
@@ -462,14 +462,14 @@ static void Create_client_socket(sock_t *sock, int *port)
 {
     int i;
 
-    if (clientPortStart && (!clientPortEnd || clientPortEnd > 65535))
-	clientPortEnd = 65535;
+    if (options.clientPortStart && (!options.clientPortEnd || options.clientPortEnd > 65535))
+	options.clientPortEnd = 65535;
 
-    if (clientPortEnd && (!clientPortStart || clientPortStart < 1024))
-	clientPortStart = 1024;
+    if (options.clientPortEnd && (!options.clientPortStart || options.clientPortStart < 1024))
+	options.clientPortStart = 1024;
 
-    if (!clientPortStart || !clientPortEnd ||
-	(clientPortStart > clientPortEnd)) {
+    if (!options.clientPortStart || !options.clientPortEnd ||
+	(options.clientPortStart > options.clientPortEnd)) {
 
         if (sock_open_udp(sock, serverAddr, 0) == SOCK_IS_ERROR) {
             error("Cannot create datagram socket (%d)", sock->error.error);
@@ -478,7 +478,7 @@ static void Create_client_socket(sock_t *sock, int *port)
         }
     }
     else {
-        for (i = clientPortStart; i <= clientPortEnd; i++) {
+        for (i = options.clientPortStart; i <= options.clientPortEnd; i++) {
             if (sock_open_udp(sock, serverAddr, i) != SOCK_IS_ERROR)
 		goto found;
 	}
@@ -653,10 +653,10 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 
     for (i = 0; i < max_connections; i++) {
 	if (playback) {
-	    if (i >= playerLimit_orig)
+	    if (i >= options.playerLimit_orig)
 		break;
 	}
-	else if (rplayback && i < playerLimit_orig)
+	else if (rplayback && i < options.playerLimit_orig)
 	    continue;
 	connp = &Conn[i];
 	if (connp->state == CONN_FREE) {
@@ -683,7 +683,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     }
 
     if (free_conn_index >= max_connections) {
-	if (!silent)
+	if (!options.silent)
 	    xpprintf("%s Full house for %s(%s)@%s(%s)\n",
 		     showtime(), real, nick, host, dpy);
 	return -1;
@@ -818,7 +818,7 @@ static int Handle_listening(connection_t *connp)
 	    return -1;
 	}
     }
-    if (!silent) {
+    if (!options.silent) {
 	xpprintf("%s Welcome %s=%s@%s|%s (%s/%d)", showtime(),
 		 connp->nick, connp->real, connp->host, connp->dpy,
 		 connp->addr, connp->his_port);
@@ -840,7 +840,7 @@ static int Handle_listening(connection_t *connp)
     Fix_user_name(real);
     Fix_nick_name(nick);
     if (strcmp(real, connp->real) || strcmp(nick, connp->nick)) {
-	if (!silent)
+	if (!options.silent)
 	    xpprintf("%s Client verified incorrectly (%s,%s)(%s,%s)\n",
 		     showtime(), real, nick, connp->real, connp->nick);
 	Send_reply(connp, PKT_VERIFY, PKT_FAILURE);
@@ -887,7 +887,7 @@ static int Handle_setup(connection_t *connp)
 			      S->map_data_len,
 			      S->mode, S->lives,
 			      S->x, S->y,
-			      framesPerSecond, S->map_order,
+			      options.framesPerSecond, S->map_order,
 			      S->name, S->author);
 	else
 	    n = Packet_printf(&connp->c,
@@ -895,7 +895,7 @@ static int Handle_setup(connection_t *connp)
 			      S->map_data_len,
 			      S->mode, S->lives,
 			      S->width, S->height,
-			      framesPerSecond, S->name,
+			      options.framesPerSecond, S->name,
 			      S->author, S->data_url);
 	if (n <= 0) {
 	    Destroy_connection(connp, "setup 0 write error");
@@ -1017,7 +1017,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	if (connp->team < 0 || connp->team >= MAX_TEAMS
-		    || (reserveRobotTeam && (connp->team == robotTeam)))
+		    || (options.reserveRobotTeam && (connp->team == options.robotTeam)))
 	    connp->team = TEAM_NOT_SET;
 	else if (world->teams[connp->team].NumBases <= 0)
 	    connp->team = TEAM_NOT_SET;
@@ -1114,7 +1114,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	Rank_get_saved_score(pl);
 	if (pl->team != TEAM_NOT_SET && pl->home_base != NULL) {
 	    world->teams[pl->team].NumMembers++;
-	    if (teamShareScore) {
+	    if (options.teamShareScore) {
 		if (world->teams[pl->team].NumMembers == 1)
 		    /* reset team score on first player */
 		    world->teams[pl->team].score = 0;
@@ -1145,7 +1145,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	xpprintf("%s Nick \"%s\" has been changed to \"%s\".\n",
 		 showtime(), old_nick, connp->nick);
 
-    if (!silent) {
+    if (!options.silent) {
 	if (pl->rectype < 2)
 	    xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
 		     pl->name, NumPlayers, pl->home_base ? pl->home_base->ind :
@@ -1254,8 +1254,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	Set_player_message(pl, msg);
     }
 
-    if (greeting) {
-	snprintf(msg, sizeof(msg), "%s %s", greeting, sender);
+    if (options.greeting) {
+	snprintf(msg, sizeof(msg), "%s %s", options.greeting, sender);
 	Set_player_message(pl, msg);
     }
 
@@ -1268,7 +1268,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		   sender);
 	    Set_player_message(pl, msg);
 	}
-	if (!FEATURE(connp, F_ASTEROID) && maxAsteroidDensity > 0) {
+	if (!FEATURE(connp, F_ASTEROID) && options.maxAsteroidDensity > 0) {
 	    sprintf(msg,
 		    "Your client will see the %d asteroids as balls. %s",
 		    (int)world->asteroids.max,
@@ -1327,8 +1327,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     num_logins++;
 
-    if (resetOnHuman > 0
-	&& (NumPlayers - NumPseudoPlayers - NumRobots) <= resetOnHuman
+    if (options.resetOnHuman > 0
+	&& (NumPlayers - NumPseudoPlayers - NumRobots) <= options.resetOnHuman
 	&& !round_delay) {
 	if (BIT(world->rules->mode, TIMING))
 	    Race_game_over();
@@ -1340,13 +1340,13 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     /* if the next round is delayed, delay it again */
     if (round_delay > 0 || NumPlayers == 1) {
-	round_delay = roundDelaySeconds * FPS;
-	if (maxRoundTime > 0 && roundDelaySeconds == 0)
-	    roundtime = maxRoundTime * FPS;
+	round_delay = options.roundDelaySeconds * FPS;
+	if (options.maxRoundTime > 0 && options.roundDelaySeconds == 0)
+	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
 	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
-		roundDelaySeconds, (BIT(world->rules->mode, TIMING) ?
+		options.roundDelaySeconds, (BIT(world->rules->mode, TIMING) ?
 			     "race" : "round"));
 	Set_message(msg);
     }
@@ -1777,7 +1777,7 @@ int Send_score(connection_t *connp, int id, double score,
     else {
 	int allchar = ' ';
 	if (alliance != ALLIANCE_NOT_SET) {
-	    if (announceAlliances)
+	    if (options.announceAlliances)
 		allchar = alliance + '0';
 	    else {
 		if (Player_by_id(connp->id)->alliance == alliance)
@@ -1933,7 +1933,7 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, unsigned n)
 int Send_wreckage(connection_t *connp, clpos pos,
 		  int wrtype, int size, int rot)
 {
-    if (wreckageCollisionMayKill)
+    if (options.wreckageCollisionMayKill)
 	/* Set the highest bit when wreckage is deadly. */
 	wrtype |= 0x80;
     else
@@ -3048,7 +3048,7 @@ static int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 
 	motd_loops = main_loops;
 
-	if ((fd = open(motdFileName, O_RDONLY)) == -1) {
+	if ((fd = open(options.motdFileName, O_RDONLY)) == -1) {
 	    motd_size = 0;
 	    return -1;
 	}
@@ -3214,7 +3214,7 @@ static int Receive_fps_request(connection_t *connp)
 	pl = Player_by_id(connp->id);
 	if (fps == 0)
 	    fps = 1;
-	if (!FEATURE(connp, F_POLY) && (fps == 20) && ignore20MaxFPS)
+	if (!FEATURE(connp, F_POLY) && (fps == 20) && options.ignore20MaxFPS)
 	    fps = 100;
  	pl->player_fps = fps;
     }
@@ -3247,7 +3247,7 @@ int Check_max_clients_per_IP(char *host_addr)
     int			i, clients_per_ip = 0;
     connection_t	*connp;
 
-    if (maxClientsPerIP <= 0)
+    if (options.maxClientsPerIP <= 0)
 	return 0;
 
     for (i = 0; i < max_connections; i++) {
@@ -3256,7 +3256,7 @@ int Check_max_clients_per_IP(char *host_addr)
 	    clients_per_ip++;
     }
 
-    if (clients_per_ip >= maxClientsPerIP)
+    if (clients_per_ip >= options.maxClientsPerIP)
 	return 1;
 
     return 0;

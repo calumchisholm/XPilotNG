@@ -123,8 +123,8 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
     if (Players_are_teammates(pl, lock_pl))
 	return true;
 
-    /* if lockOtherTeam is true then we can always lock on other teams. */
-    if (lockOtherTeam)
+    /* if options.lockOtherTeam is true then we can always lock on other teams. */
+    if (options.lockOtherTeam)
 	return true;
 
     /* if our own team is dead then we can lock on anyone. */
@@ -190,7 +190,7 @@ void Pause_player(player *pl, bool on)
 	pl->updateVisibility = 1;
 	CLR_BIT(pl->status, SELF_DESTRUCT|PLAYING);
 	SET_BIT(pl->status, PAUSE);
-	if (baselessPausing) {
+	if (options.baselessPausing) {
 	    world->teams[pl->team].NumMembers--;
 	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
@@ -962,7 +962,7 @@ int Handle_keyboard(player *pl)
 		if (BIT(pl->used, HAS_SHIELD) && round_delay == 0) {
 		    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER);
 		    /*
-		     * Insert the default fireRepeatRate between lowering
+		     * Insert the default options.fireRepeatRate between lowering
 		     * shields and firing in order to prevent macros
 		     * and hacked clients.
 		     */

@@ -405,8 +405,8 @@ static robot_type_t robot_types[NELEM(robot_type_setups)];
 
 void Parse_robot_file(void)
 {
-    if (robotFile && *robotFile) {
-	FILE *fp = fopen(robotFile, "r");
+    if (options.robotFile && *options.robotFile) {
+	FILE *fp = fopen(options.robotFile, "r");
 	if (fp) {
 	    char buf[1024];
 	    char name_buf[MAX_NAME_LEN];
@@ -512,8 +512,8 @@ void Parse_robot_file(void)
 
 #ifdef DEVELOPMENT
     if (getenv("XPILOTS_DUMP_ROBOTS_TO_ROBOT_FILE") != NULL) {
-	if (robotFile && *robotFile) {
-	    FILE *fp = fopen(robotFile, "w");
+	if (options.robotFile && *options.robotFile) {
+	    FILE *fp = fopen(options.robotFile, "w");
 	    if (fp) {
 		int i;
 		for (i = 0; i < MAX_ROBOTS; i++) {
@@ -559,8 +559,8 @@ void Robot_init(void)
 
     Parse_robot_file();
 
-    if (robotTeam < 0 || robotTeam >= MAX_TEAMS)
-	robotTeam = 0;
+    if (options.robotTeam < 0 || options.robotTeam >= MAX_TEAMS)
+	options.robotTeam = 0;
 }
 
 
@@ -630,7 +630,7 @@ static void Robot_talks(enum robot_talk_t says_what,
     int			two, i, n;
     char		msg[MSG_LEN];
 
-    if (robotsTalk != true && says_what != ROBOT_TALK_ENTER)
+    if (options.robotsTalk != true && says_what != ROBOT_TALK_ENTER)
 	return;
 
     switch (says_what) {
@@ -728,7 +728,7 @@ static void Robot_create(void)
     }
     rob_type = &robot_types[new_data->robot_types_ind];
 
-    Init_player(NumPlayers, (allowShipShapes)
+    Init_player(NumPlayers, (options.allowShipShapes)
 			    ? Parse_shape_str(rob->shape)
 			    : (shipshape_t *)NULL);
     robot = Players(NumPlayers);
@@ -736,8 +736,8 @@ static void Robot_create(void)
     robot->robot_data_ptr = new_data;
 
     strlcpy(robot->name, rob->name, MAX_CHARS);
-    strlcpy(robot->username, robotUserName, MAX_CHARS);
-    strlcpy(robot->hostname, robotHostName, MAX_CHARS);
+    strlcpy(robot->username, options.robotUserName, MAX_CHARS);
+    strlcpy(robot->hostname, options.robotHostName, MAX_CHARS);
 
     robot->color = WHITE;
     robot->turnspeed = MAX_PLAYER_TURNSPEED;
@@ -769,7 +769,7 @@ static void Robot_create(void)
     NumPlayers++;
     NumRobots++;
 
-    if (BIT(world->rules->mode, TEAM_PLAY) && teamShareScore) {
+    if (BIT(world->rules->mode, TEAM_PLAY) && options.teamShareScore) {
 	if (world->teams[robot->team].NumMembers == 1)
 	    /* reset team score on first player */
 	    world->teams[robot->team].score = 0.0;
@@ -786,20 +786,20 @@ static void Robot_create(void)
 
     Robot_talks(ROBOT_TALK_ENTER, robot->name, "");
 
-    if (!silent && logRobots)
+    if (!options.silent && options.logRobots)
 	xpprintf("%s %s (%d, %s) starts at startpos %d.\n",
 		 showtime(), robot->name, NumPlayers, robot->username,
 		 robot->home_base->ind);
 
     if (round_delay > 0 || NumPlayers == 1) {
-	round_delay = roundDelaySeconds * FPS;
+	round_delay = options.roundDelaySeconds * FPS;
 	round_delay_send = round_delay + FPS;  /* delay him an extra second */
-	if (maxRoundTime > 0 && roundDelaySeconds == 0)
-	    roundtime = maxRoundTime * FPS;
+	if (options.maxRoundTime > 0 && options.roundDelaySeconds == 0)
+	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
 	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
-		roundDelaySeconds,
+		options.roundDelaySeconds,
 		(BIT(world->rules->mode, TIMING)? "race" : "round"));
 	Set_message(msg);
     }
@@ -993,17 +993,17 @@ static int Robot_check_leave(player *pl)
     char		msg[MSG_LEN];
     world_t *world = &World;
 
-    if (robotsLeave
+    if (options.robotsLeave
 	&& pl->life > 0
 	&& !BIT(world->rules->mode, LIMITED_LIVES)
 	&& (BIT(pl->status, PLAYING) || pl->count <= 0)) {
 	msg[0] = '\0';
-	if (robotLeaveLife > 0 && pl->life >= robotLeaveLife)
+	if (options.robotLeaveLife > 0 && pl->life >= options.robotLeaveLife)
 	    sprintf(msg, "%s retired.", pl->name);
-	else if (robotLeaveScore != 0 && pl->score < robotLeaveScore)
+	else if (options.robotLeaveScore != 0 && pl->score < options.robotLeaveScore)
 	    sprintf(msg, "%s left out of disappointment.", pl->name);
-	else if (robotLeaveRatio != 0
-		 && pl->score / (pl->life + 1) < robotLeaveRatio)
+	else if (options.robotLeaveRatio != 0
+		 && pl->score / (pl->life + 1) < options.robotLeaveRatio)
 	    sprintf(msg, "%s played too badly.", pl->name);
 
 	if (msg[0] != '\0') {
@@ -1058,15 +1058,15 @@ void Robot_update(void)
 
     num_any_ships = NumPlayers + login_in_progress;
     num_playing_ships = num_any_ships - NumPseudoPlayers;
-    if ((num_playing_ships < maxRobots
-	 || NumRobots < minRobots)
+    if ((num_playing_ships < options.maxRobots
+	 || NumRobots < options.minRobots)
 	&& num_playing_ships < world->NumBases
 	&& num_any_ships < NUM_IDS
 	&& NumRobots < MAX_ROBOTS
 	&& !(BIT(world->rules->mode, TEAM_PLAY)
-	     && restrictRobots
-	     && world->teams[robotTeam].NumMembers >=
-		world->teams[robotTeam].NumBases)) {
+	     && options.restrictRobots
+	     && world->teams[options.robotTeam].NumMembers >=
+		world->teams[options.robotTeam].NumBases)) {
 
 	new_robot_delay += timeStep;
 	if (new_robot_delay >= ROBOT_CREATE_DELAY) {
@@ -1079,7 +1079,7 @@ void Robot_update(void)
 	if (NumRobots > 0) {
 	    if ((num_playing_ships > world->NumBases)
 		|| (num_any_ships > NUM_IDS)
-		|| (num_playing_ships > maxRobots && NumRobots > minRobots))
+		|| (num_playing_ships > options.maxRobots && NumRobots > options.minRobots))
 		Robot_delete(NULL, false);
 	}
     }
@@ -1089,7 +1089,7 @@ void Robot_update(void)
 
     /*
      * Robots play better the more updates they get. They can be made
-     * easier opponents by setting a lower value for robotTicksPerSecond.
+     * easier opponents by setting a lower value for options.robotTicksPerSecond.
      */
     {
 	static time_t oldtime = 0;
@@ -1119,8 +1119,8 @@ void Robot_update(void)
 	      updates_per_second, ticks_per_second);*/
 	    ticks_per_second = 0;
 	    updates_per_second = 0;
-	    assert(robotTicksPerSecond > 0);
-	    seconds_per_tick = 1.0 / (double)robotTicksPerSecond;
+	    assert(options.robotTicksPerSecond > 0);
+	    seconds_per_tick = 1.0 / (double)options.robotTicksPerSecond;
 	}
     }
 

@@ -143,7 +143,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	/*
 	 * kps - Currently we don't know mapobj for balltargets,
-	 * this means that captureTheFlag stuff does not work
+	 * this means that options.captureTheFlag stuff does not work
 	 * on xp2 maps.
 	 */
 	P_start_balltarget(team, NO_IND);
@@ -187,7 +187,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Fuel")) {
-	int team = TEAM_NOT_SET; 
+	int team = TEAM_NOT_SET;
 	clpos pos = DEFAULT_POS;
 
 	while (*attr) {

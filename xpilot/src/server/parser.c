@@ -223,45 +223,45 @@ static void Parser_dump_all(char *progname)
 int Parser_list_option(int *ind, char *buf)
 {
     int			i = *ind;
-    option_desc		*options;
+    option_desc		*opts;
     int			option_count;
 
-    options = Get_option_descs(&option_count);
+    opts = Get_option_descs(&option_count);
 
 
     if (i < 0 || i >= option_count)
 	return -1;
-    if (options[i].defaultValue == NULL)
+    if (opts[i].defaultValue == NULL)
 	return 0;
-    if ((options[i].flags & OPT_VISIBLE) == 0)
+    if ((opts[i].flags & OPT_VISIBLE) == 0)
 	return 0;
-    switch (options[i].type) {
+    switch (opts[i].type) {
     case valInt:
-	sprintf(buf, "%s:%d", options[i].name, *(int *)options[i].variable);
+	sprintf(buf, "%s:%d", opts[i].name, *(int *)opts[i].variable);
 	break;
     case valSec:
-	sprintf(buf, "%s:%d", options[i].name,
-		*(int *)options[i].variable / FPS);
+	sprintf(buf, "%s:%d", opts[i].name,
+		*(int *)opts[i].variable / FPS);
 	break;
     case valReal:
-	sprintf(buf, "%s:%g", options[i].name, *(double *)options[i].variable);
+	sprintf(buf, "%s:%g", opts[i].name, *(double *)opts[i].variable);
 	break;
     case valBool:
-	sprintf(buf, "%s:%s", options[i].name,
-		*(bool *)options[i].variable ? "yes" : "no");
+	sprintf(buf, "%s:%s", opts[i].name,
+		*(bool *)opts[i].variable ? "yes" : "no");
 	break;
     case valIPos:
-	sprintf(buf, "%s:%d,%d", options[i].name,
-		((ipos *)options[i].variable)->x,
-		((ipos *)options[i].variable)->y);
+	sprintf(buf, "%s:%d,%d", opts[i].name,
+		((ipos *)opts[i].variable)->x,
+		((ipos *)opts[i].variable)->y);
 	break;
     case valString:
-	sprintf(buf, "%s:%s", options[i].name, *(char **)options[i].variable);
+	sprintf(buf, "%s:%s", opts[i].name, *(char **)opts[i].variable);
 	break;
     case valList:
 	{
-	    list_t list = *(list_t *)options[i].variable;
-	    sprintf(buf, "%s:", options[i].name);
+	    list_t list = *(list_t *)opts[i].variable;
+	    sprintf(buf, "%s:", opts[i].name);
 	    if (list) {
 		list_iter_t iter;
 		for (iter = List_begin(list);
@@ -339,9 +339,9 @@ bool Parser(int argc, char **argv)
     world_t *world = &World;
 
     memset(world, 0, sizeof(world_t));
-    mapData = NULL;
-    mapWidth = 0;
-    mapHeight = 0;
+    options.mapData = NULL;
+    options.mapWidth = 0;
+    options.mapHeight = 0;
 
     if (Init_options() == false)
 	return false;

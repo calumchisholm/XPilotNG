@@ -29,7 +29,7 @@ char tuner_version[] = VERSION;
 
 void tuner_plock(void)
 {
-    pLockServer = (plock_server(pLockServer) == 1) ? true : false;
+    options.pLockServer = (plock_server(options.pLockServer) == 1) ? true : false;
 }
 
 void tuner_shipmass(void)
@@ -37,7 +37,7 @@ void tuner_shipmass(void)
     int i;
 
     for (i = 0; i < NumPlayers; i++)
-	Players(i)->emptymass = ShipMass;
+	Players(i)->emptymass = options.ShipMass;
 }
 
 void tuner_ballmass(void)
@@ -46,7 +46,7 @@ void tuner_ballmass(void)
 
     for (i = 0; i < NumObjs; i++) {
 	if (BIT(Obj[i]->type, OBJ_BALL))
-	    Obj[i]->mass = ballMass;
+	    Obj[i]->mass = options.ballMass;
     }
 }
 
@@ -54,23 +54,23 @@ void tuner_maxrobots(void)
 {
     world_t *world = &World;
 
-    if (maxRobots < 0)
-	maxRobots = world->NumBases;
+    if (options.maxRobots < 0)
+	options.maxRobots = world->NumBases;
 
-    if (maxRobots < minRobots)
-	minRobots = maxRobots;
+    if (options.maxRobots < options.minRobots)
+	options.minRobots = options.maxRobots;
 
-    while (maxRobots < NumRobots)
+    while (options.maxRobots < NumRobots)
 	Robot_delete(NULL, true);
 }
 
 void tuner_minrobots(void)
 {
-    if (minRobots < 0)
-	minRobots = maxRobots;
+    if (options.minRobots < 0)
+	options.minRobots = options.maxRobots;
 
-    if (maxRobots < minRobots)
-	maxRobots = minRobots;
+    if (options.maxRobots < options.minRobots)
+	options.maxRobots = options.minRobots;
 }
 
 void tuner_playershielding(void)
@@ -79,7 +79,7 @@ void tuner_playershielding(void)
 
     Set_world_rules();
 
-    if (playerShielding) {
+    if (options.playerShielding) {
 	SET_BIT(DEF_HAVE, HAS_SHIELD);
 
 	for (i = 0; i < NumPlayers; i++) {
@@ -104,30 +104,30 @@ void tuner_playershielding(void)
 
 void tuner_playerstartsshielded(void)
 {
-    if (playerShielding)
+    if (options.playerShielding)
 	/* Doesn't make sense to turn off when shields are on. */
-	playerStartsShielded = true;
+	options.playerStartsShielded = true;
 }
 
 void tuner_worldlives(void)
 {
     world_t *world = &World;
 
-    if (worldLives < 0)
-	worldLives = 0;
+    if (options.worldLives < 0)
+	options.worldLives = 0;
 
     Set_world_rules();
 
     if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	Reset_all_players();
-	if (gameDuration == -1)
-	    gameDuration = 0;
+	if (options.gameDuration == -1)
+	    options.gameDuration = 0;
     }
 }
 
 void tuner_cannonsmartness(void)
 {
-    LIMIT(cannonSmartness, 0, 3);
+    LIMIT(options.cannonSmartness, 0, 3);
 }
 
 void tuner_teamcannons(void)
@@ -136,7 +136,7 @@ void tuner_teamcannons(void)
     int team;
     world_t *world = &World;
 
-    if (teamCannons) {
+    if (options.teamCannons) {
 	for (i = 0; i < world->NumCannons; i++) {
 	    cannon_t *cannon = Cannons(world, i);
 	    team = Find_closest_team(world, cannon->pos);
@@ -164,7 +164,7 @@ void tuner_cannonsuseitems(void)
 	for (j = 0; j < NUM_ITEMS; j++) {
 	    c->item[j] = 0;
 
-	    if (cannonsUseItems)
+	    if (options.cannonsUseItems)
 		Cannon_add_item(c, j,
 				(int)(rfrac() * (world->items[j].initial + 1)));
 	}
@@ -176,12 +176,12 @@ void tuner_wormtime(void)
     int i;
     world_t *world = &World;
 
-    if (wormTime < 0)
-	wormTime = 0;
+    if (options.wormTime < 0)
+	options.wormTime = 0;
 
-    if (wormTime) {
+    if (options.wormTime) {
 	for (i = 0; i < world->NumWormholes; i++)
-	    Wormholes(world, i)->countdown = wormTime;
+	    Wormholes(world, i)->countdown = options.wormTime;
     }
     else {
 	for (i = 0; i < world->NumWormholes; i++) {
@@ -205,10 +205,10 @@ void tuner_modifiers(void)
 
 void tuner_gameduration(void)
 {
-    if (gameDuration <= 0.0)
+    if (options.gameDuration <= 0.0)
 	gameOverTime = time((time_t *) NULL);
     else
-	gameOverTime = (time_t) (gameDuration * 60) + time((time_t *) NULL);
+	gameOverTime = (time_t) (options.gameDuration * 60) + time((time_t *) NULL);
 }
 
 void tuner_racelaps(void)
@@ -217,8 +217,8 @@ void tuner_racelaps(void)
 
     if (BIT(world->rules->mode, TIMING)) {
 	Reset_all_players();
-	if (gameDuration == -1)
-	    gameDuration = 0;
+	if (options.gameDuration == -1)
+	    options.gameDuration = 0;
     }
 }
 

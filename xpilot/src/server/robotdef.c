@@ -387,7 +387,7 @@ static bool Really_empty_space(player *pl, int x, int y)
 	return false;
 
     case WORMHOLE:
-	if (!wormholeVisible
+	if (!options.wormholeVisible
 	    || world->wormHoles[Map_get_itemid(x, y)].type == WORM_OUT) {
 	    return true;
 	} else {
@@ -395,7 +395,7 @@ static bool Really_empty_space(player *pl, int x, int y)
 	}
 
     case TARGET:
-	if (!targetTeamCollision
+	if (!options.targetTeamCollision
 	    && BIT(world->rules->mode, TEAM_PLAY)
 	    && world->targets[Map_get_itemid(x, y)].team == pl->team) {
 	    return true;
@@ -404,7 +404,7 @@ static bool Really_empty_space(player *pl, int x, int y)
 	}
 
     case CANNON:
-	if (teamImmunity
+	if (options.teamImmunity
 	    && BIT(world->rules->mode, TEAM_PLAY)
 	    && world->cannon[Map_get_itemid(x, y)].team == pl->team) {
 	    return true;
@@ -722,14 +722,14 @@ static void Choose_weapon_modifier(player *pl, int weapon_type)
 
     case OBJ_MINE:
 	stock = pl->item[ITEM_MINE];
-	min = nukeMinMines;
+	min = options.nukeMinMines;
 	break;
 
     case OBJ_SMART_SHOT:
     case OBJ_HEAT_SHOT:
     case OBJ_TORPEDO:
 	stock = pl->item[ITEM_MISSILE];
-	min = nukeMinSmarts;
+	min = options.nukeMinSmarts;
 	if ((my_data->robot_count % 4) == 0)
 	    mods.power = (int)(rfrac() * (MODS_POWER_MAX + 1));
 	break;
@@ -978,8 +978,8 @@ static bool Check_robot_target(player *pl, clpos item_pos, int new_mode)
 					PIXEL_TO_CLICK(y3 - y2)) / CLICK;
 
 		/* kps -
-		   changed PULSE_LIFE(pl->item[ITEM_LASER]) to pulseLife */
-		if (ship_dist < pulseSpeed * pulseLife + SHIP_SZ) {
+		   changed PULSE_LIFE(pl->item[ITEM_LASER]) to options.pulseLife */
+		if (ship_dist < options.pulseSpeed * options.pulseLife + SHIP_SZ) {
 		    dir3 = Wrap_findDir(x3 - x2, y3 - y2);
 		    x4 = x3 + tcos(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
 		    y4 = y3 + tsin(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
@@ -1056,7 +1056,7 @@ static bool Check_robot_target(player *pl, clpos item_pos, int new_mode)
 	    if (Detect_hunt(pl, Player_by_id(pl->lock.pl_id))
 		&& !pl->visibility[GetInd(pl->lock.pl_id)].canSee)
 		type = OBJ_HEAT_SHOT;
-	    if (type == OBJ_SMART_SHOT && !allowSmartMissiles)
+	    if (type == OBJ_SMART_SHOT && !options.allowSmartMissiles)
 		type = OBJ_HEAT_SHOT;
 	    Choose_weapon_modifier(pl, type);
 	    Fire_shot(pl, type, pl->dir);
@@ -1188,7 +1188,7 @@ static bool Detect_hunt(player *pl, player *ship)
     if (sqr(dx) + sqr(dy) > sqr(Visibility_distance))
 	return false;		/* can't detect ships beyond visual range */
 
-    if (BIT(ship->status, THRUSTING) && cloakedExhaust)
+    if (BIT(ship->status, THRUSTING) && options.cloakedExhaust)
 	return true;
 
     if (BIT(ship->used, HAS_SHOT|
@@ -1223,9 +1223,9 @@ static int Rank_item_value(player *pl, long itemtype)
     if (pl->item[itemtype] >= world->items[itemtype].limit)
 	return ROBOT_IGNORE_ITEM;		/* already full */
     if ((IsDefensiveItem(itemtype)
-	 && CountDefensiveItems(pl) >= maxDefensiveItems)
+	 && CountDefensiveItems(pl) >= options.maxDefensiveItems)
 	|| (IsOffensiveItem(itemtype)
-	 && CountOffensiveItems(pl) >= maxOffensiveItems))
+	 && CountOffensiveItems(pl) >= options.maxOffensiveItems))
 	return ROBOT_IGNORE_ITEM;
     if (itemtype == ITEM_FUEL) {
 	if (pl->fuel.sum >= pl->fuel.max * 0.90)
@@ -1273,13 +1273,13 @@ static int Rank_item_value(player *pl, long itemtype)
 
 	case ITEM_REARSHOT:
 	case ITEM_WIDEANGLE:
-	    if (ShotsMax <= 0 || ShotsLife <= 0	|| !playerKillings)
+	    if (options.ShotsMax <= 0 || options.ShotsLife <= 0	|| !options.playerKillings)
 		return ROBOT_HANDY_ITEM;
 	    else
 		return ROBOT_MUST_HAVE_ITEM;
 
 	case ITEM_MISSILE:
-	    if (ShotsMax <= 0 || ShotsLife <= 0	|| !playerKillings)
+	    if (options.ShotsMax <= 0 || options.ShotsLife <= 0	|| !options.playerKillings)
 		return ROBOT_IGNORE_ITEM;
 	    else
 		return ROBOT_MUST_HAVE_ITEM;
@@ -1289,7 +1289,7 @@ static int Rank_item_value(player *pl, long itemtype)
 	    return ROBOT_MUST_HAVE_ITEM;
 
 	case ITEM_LASER:
-	    if (playerKillings)
+	    if (options.playerKillings)
 		return ROBOT_MUST_HAVE_ITEM;
 	    else
 		return ROBOT_HANDY_ITEM;
@@ -1435,7 +1435,7 @@ static bool Ball_handler(player *pl)
 				       world->treasures[closest_ntr].pos,
 				       RM_NAVIGATE));
 	} else if (closest_ball_dist < (my_data->robot_count / 10) * BLOCK_SZ
-		   && closest_ball_dist > ballConnectorLength) {
+		   && closest_ball_dist > options.ballConnectorLength) {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
 	    return (Check_robot_target(pl,
 				       Obj[closest_ball]->pos,
@@ -1471,7 +1471,7 @@ static int Robot_default_play_check_map(player *pl)
 	    continue;
 
 	if (BIT(world->rules->mode, TEAM_PLAY)
-	    && teamFuel
+	    && options.teamFuel
 	    && fs->team != pl->team)
 	    continue;
 
@@ -1602,11 +1602,11 @@ static void Robot_default_play_check_objects(player *pl,
     const int                   max_objs = 1000;
 
     killing_shots = KILLING_SHOTS;
-    if (treasureCollisionMayKill)
+    if (options.treasureCollisionMayKill)
 	killing_shots |= OBJ_BALL;
-    if (wreckageCollisionMayKill)
+    if (options.wreckageCollisionMayKill)
 	killing_shots |= OBJ_WRECKAGE;
-    if (asteroidCollisionMayKill)
+    if (options.asteroidCollisionMayKill)
 	killing_shots |= OBJ_ASTEROID;
 
     Cell_get_objects(OBJ_X_IN_BLOCKS(pl), OBJ_Y_IN_BLOCKS(pl),
@@ -1695,7 +1695,7 @@ static void Robot_default_play_check_objects(player *pl,
 
 	/* Self shots may be passive too... */
 	if (shot->id == pl->id
-	    && selfImmunity)
+	    && options.selfImmunity)
 	    continue;
 
 	/* Own non-reflected laser pulses too. */
@@ -1750,7 +1750,7 @@ static void Robot_default_play_check_objects(player *pl,
 	    && (int)(rfrac() * 100) <
 	       (85 + (my_data->defense / 7) - (my_data->attack / 50))) {
 	    SET_BIT(pl->used, HAS_SHIELD);
-	    if (!cloakedShield)
+	    if (!options.cloakedShield)
 		CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	    SET_BIT(pl->status, THRUSTING);
 
@@ -1863,7 +1863,7 @@ static void Robot_default_play(player *pl)
        put up shields and return */
     if (pl->damaged > 0) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (!cloakedShield)
+	if (!options.cloakedShield)
 	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	return;
     }
@@ -1874,7 +1874,7 @@ static void Robot_default_play(player *pl)
 	    fuel_t *fs = Fuels(world, j);
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)
-		&& teamFuel
+		&& options.teamFuel
 		&& fs->team != pl->team)
 		continue;
 
@@ -1930,8 +1930,8 @@ static void Robot_default_play(player *pl)
     /* KK: ps. I tried to change that function, but I don't grok it */
     /*if (!(BIT(pl->used, HAS_SHIELD) && BIT(pl->status, THRUSTING))
 	&& Check_robot_navigate(ind, &evade_checked)) {
-	if (playerShielding == 0
-	    && playerStartsShielded != 0
+	if (options.playerShielding == 0
+	    && options.playerStartsShielded != 0
 	    && BIT(pl->have, HAS_SHIELD)) {
 	    SET_BIT(pl->used, HAS_SHIELD);
 	}
@@ -2027,7 +2027,7 @@ static void Robot_default_play(player *pl)
 
     if (ship_dist < 3*SHIP_SZ && BIT(pl->have, HAS_SHIELD)) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (!cloakedShield)
+	if (!options.cloakedShield)
 	   CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
     }
 
@@ -2085,18 +2085,18 @@ static void Robot_default_play(player *pl)
     }
     if (!evade_checked) {
 	if (Check_robot_evade(pl, mine_i, ship_i)) {
-	    if (playerShielding == 0
-		&& playerStartsShielded != 0
+	    if (options.playerShielding == 0
+		&& options.playerStartsShielded != 0
 		&& BIT(pl->have, HAS_SHIELD)) {
 		SET_BIT(pl->used, HAS_SHIELD);
-		if (!cloakedShield)
+		if (!options.cloakedShield)
 		    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	    }
-	    else if (maxShieldedWallBounceSpeed >
-		    maxUnshieldedWallBounceSpeed
+	    else if (options.maxShieldedWallBounceSpeed >
+		    options.maxUnshieldedWallBounceSpeed
 		&& BIT(pl->have, HAS_SHIELD)) {
 		SET_BIT(pl->used, HAS_SHIELD);
-		if (!cloakedShield)
+		if (!options.cloakedShield)
 		    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	    }
 	    return;
@@ -2150,7 +2150,7 @@ static void Robot_default_play(player *pl)
 	clpos d;
 
 	ship = Player_by_id(pl->lock.pl_id);
-	shoot_time = (int)(pl->lock.distance / (ShotsSpeed + 1));
+	shoot_time = (int)(pl->lock.distance / (options.ShotsSpeed + 1));
 	d.cx = (long)(ship->pos.cx + ship->vel.x * shoot_time * CLICK);
 	d.cy = (long)(ship->pos.cy + ship->vel.y * shoot_time * CLICK);
 	/*-BA Also allow for our own momentum. */
@@ -2192,11 +2192,11 @@ static void Robot_default_play(player *pl)
     }
 
     if (Check_robot_hunt(pl)) {
-	if (playerShielding == 0
-	    && playerStartsShielded != 0
+	if (options.playerShielding == 0
+	    && options.playerStartsShielded != 0
 	    && BIT(pl->have, HAS_SHIELD)) {
 	    SET_BIT(pl->used, HAS_SHIELD);
-	    if (!cloakedShield)
+	    if (!options.cloakedShield)
 		CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	}
 	return;
@@ -2205,11 +2205,11 @@ static void Robot_default_play(player *pl)
     if (Robot_default_play_check_map(pl) == 1)
 	return;
 
-    if (playerShielding == 0
-	&& playerStartsShielded != 0
+    if (options.playerShielding == 0
+	&& options.playerStartsShielded != 0
 	&& BIT(pl->have, HAS_SHIELD)) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (!cloakedShield)
+	if (!options.cloakedShield)
 	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
     }
 

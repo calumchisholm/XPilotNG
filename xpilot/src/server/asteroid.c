@@ -184,8 +184,8 @@ void Break_asteroid(wireobject *asteroid)
 		    3.0, 10.0);
     }
 
-    if ((asteroidMaxItems > 0) && (rfrac() < asteroidItemProb)) {
-	int	nitems = (int)(rfrac() * asteroidMaxItems) + 1;
+    if ((options.asteroidMaxItems > 0) && (rfrac() < options.asteroidItemProb)) {
+	int	nitems = (int)(rfrac() * options.asteroidMaxItems) + 1;
 	int	i;
 	vector	vel;
 	int	item, item_dir, num_per_pack;
@@ -199,7 +199,7 @@ void Break_asteroid(wireobject *asteroid)
 	    vel.x = asteroid->vel.x + item_speed * tcos(item_dir);
 	    vel.y = asteroid->vel.y + item_speed * tsin(item_dir);
 	    status = GRAVITY;
-	    if (rfrac() < randomItemProb)
+	    if (rfrac() < options.randomItemProb)
 		status |= RANDOM_ITEM;
 	    if (world->items[item].min_per_pack
 		== world->items[item].max_per_pack)
@@ -307,7 +307,7 @@ static void Place_asteroid(void)
     space |= FRICTION_BIT;
     /* would be dubious: space |= CANNON_BIT; */
 
-    if (world->NumAsteroidConcs > 0 && rfrac() < asteroidConcentratorProb)
+    if (world->NumAsteroidConcs > 0 && rfrac() < options.asteroidConcentratorProb)
 	con = AsteroidConcs(world, (int)(rfrac() * world->NumAsteroidConcs));
     else
 	con = NULL;
@@ -323,7 +323,7 @@ static void Place_asteroid(void)
 
 	if (con) {
 	    dir = (int)(rfrac() * RES);
-	    dist = (int)(rfrac() * ((asteroidConcentratorRadius
+	    dist = (int)(rfrac() * ((options.asteroidConcentratorRadius
 				     * BLOCK_CLICKS) + 1));
 	    pos.cx = con->pos.cx + dist * tcos(dir);
 	    pos.cy = con->pos.cy + dist * tsin(dir);

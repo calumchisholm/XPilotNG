@@ -60,7 +60,7 @@ extern long CANNON_USE_ITEM;
 /* base visibility distance (modified by sensors) */
 #define CANNON_DISTANCE		(VISIBILITY_DISTANCE * 0.5)
 
-/* chance of throwing an item upon death (multiplied by dropItemOnKillProb) */
+/* chance of throwing an item upon death (multiplied by options.dropItemOnKillProb) */
 #define CANNON_DROP_ITEM_PROB	0.7
 
 #define CANNON_MINE_MASS	(MINE_MASS * 0.6)

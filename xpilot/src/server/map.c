@@ -367,7 +367,7 @@ static void Verify_wormhole_consistency(world_t *world)
 	world->NumWormholes = 0;
     }
 
-    if (!wormTime) {
+    if (!options.wormTime) {
 	for (i = 0; i < world->NumWormholes; i++) {
 	    int j = (int)(rfrac() * world->NumWormholes);
 
@@ -385,7 +385,7 @@ static void Verify_wormhole_consistency(world_t *world)
 static bool Grok_map_size(world_t *world)
 {
     bool bad = false;
-    int w = mapWidth, h = mapHeight;
+    int w = options.mapWidth, h = options.mapHeight;
 
     if (!is_polygon_map) {
 	w *= BLOCK_SZ;
@@ -419,7 +419,7 @@ static bool Grok_map_size(world_t *world)
     /* pixel sizes */
     world->width = w;
     world->height = h;
-    if (!is_polygon_map && extraBorder) {
+    if (!is_polygon_map && options.extraBorder) {
 	world->width += 2 * BLOCK_SZ;
 	world->height += 2 * BLOCK_SZ;
     }
@@ -444,8 +444,8 @@ bool Grok_map(world_t *world)
 	if (!Grok_map_options(world))
 	    exit(1);
 
-	Xpmap_grok_map_data(world, mapData);
-	XFREE(mapData);
+	Xpmap_grok_map_data(world, options.mapData);
+	XFREE(options.mapData);
 	Xpmap_allocate_checks(world);
 	Xpmap_tags_to_internal_data(world, true);
 	Xpmap_find_map_object_teams(world);
@@ -460,11 +460,11 @@ bool Grok_map(world_t *world)
     }
 
     /* kps - what are these doing here ? */
-    if (maxRobots == -1)
-	maxRobots = world->NumBases;
+    if (options.maxRobots == -1)
+	options.maxRobots = world->NumBases;
 
-    if (minRobots == -1)
-	minRobots = maxRobots;
+    if (options.minRobots == -1)
+	options.minRobots = options.maxRobots;
 
     if (BIT(world->rules->mode, TIMING))
 	Find_base_order(world);
@@ -476,7 +476,7 @@ bool Grok_map(world_t *world)
 	exit(1);
     }
 
-    if (!silent)
+    if (!options.silent)
 	xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
 		 "Team play: %s\n",
 		 world->name, world->NumBases, world->width, world->height,
@@ -495,9 +495,9 @@ bool Grok_map_options(world_t *world)
     if (!Grok_map_size(world))
 	return false;
 
-    strlcpy(world->name, mapName, sizeof(world->name));
-    strlcpy(world->author, mapAuthor, sizeof(world->author));
-    strlcpy(world->dataURL, dataURL, sizeof(world->dataURL));
+    strlcpy(world->name, options.mapName, sizeof(world->name));
+    strlcpy(world->author, options.mapAuthor, sizeof(world->author));
+    strlcpy(world->dataURL, options.dataURL, sizeof(world->dataURL));
 
     World_alloc(world);
 
@@ -540,7 +540,7 @@ int Find_closest_team(world_t *world, clpos pos)
 
 void Find_base_direction(world_t *world)
 {
-    /* kps - this might go wrong if we run in -polygonMode ? */
+    /* kps - this might go wrong if we run in -options.polygonMode ? */
     if (!is_polygon_map)
 	Xpmap_find_base_direction(world);
 }
@@ -616,10 +616,10 @@ static void Compute_global_gravity(world_t *world)
     vector		*grav;
 
 
-    if (gravityPointSource == false) {
-	theta = (gravityAngle * PI) / 180.0;
-	xforce = cos(theta) * Gravity;
-	yforce = sin(theta) * Gravity;
+    if (options.gravityPointSource == false) {
+	theta = (options.gravityAngle * PI) / 180.0;
+	xforce = cos(theta) * options.Gravity;
+	yforce = sin(theta) * options.Gravity;
 	for (xi = 0; xi < world->x; xi++) {
 	    grav = world->gravity[xi];
 
@@ -631,11 +631,11 @@ static void Compute_global_gravity(world_t *world)
     } else {
 	for (xi = 0; xi < world->x; xi++) {
 	    grav = world->gravity[xi];
-	    dx = (xi - gravityPoint.x) * BLOCK_SZ;
+	    dx = (xi - options.gravityPoint.x) * BLOCK_SZ;
 	    dx = WRAP_DX(dx);
 
 	    for (yi = 0; yi < world->y; yi++, grav++) {
-		dy = (yi - gravityPoint.y) * BLOCK_SZ;
+		dy = (yi - options.gravityPoint.y) * BLOCK_SZ;
 		dy = WRAP_DX(dy);
 
 		if (dx == 0 && dy == 0) {
@@ -643,12 +643,12 @@ static void Compute_global_gravity(world_t *world)
 		    grav->y = 0.0;
 		    continue;
 		}
-		strength = Gravity / LENGTH(dx, dy);
-		if (gravityClockwise) {
+		strength = options.Gravity / LENGTH(dx, dy);
+		if (options.gravityClockwise) {
 		    grav->x =  dy * strength;
 		    grav->y = -dx * strength;
 		}
-		else if (gravityAnticlockwise) {
+		else if (options.gravityAnticlockwise) {
 		    grav->x = -dy * strength;
 		    grav->y =  dx * strength;
 		}
@@ -802,7 +802,7 @@ void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 
     inhole.pos.cx = BLOCK_CENTER(xin);
     inhole.pos.cy = BLOCK_CENTER(yin);
-    inhole.countdown = wormTime;
+    inhole.countdown = options.wormTime;
     inhole.lastdest = world->NumWormholes + 1;
     inhole.temporary = true;
     inhole.type = WORM_IN;
@@ -814,7 +814,7 @@ void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 
     outhole.pos.cx = BLOCK_CENTER(xout);
     outhole.pos.cy = BLOCK_CENTER(yout);
-    outhole.countdown = wormTime;
+    outhole.countdown = options.wormTime;
     outhole.temporary = true;
     outhole.type = WORM_OUT;
     outhole.lastblock = world->block[xout][yout];

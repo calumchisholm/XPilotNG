@@ -81,7 +81,7 @@
  * Not used where we wish to know if a player is on the same team
  * and has immunity to shots, thrust sparks, lasers, ecms, etc.
  */
-/*#define TEAM_IMMUNE(pl1, pl2)	(teamImmunity && TEAM((pl1), (pl2)))*/
+/*#define TEAM_IMMUNE(pl1, pl2)	(options.teamImmunity && TEAM((pl1), (pl2)))*/
 
 #define NO_ID			(-1)
 /*
@@ -139,10 +139,10 @@
  (((f)*((MAX_AFTERBURNER+1)+(n)*(ALT_FUEL_FACT-1)))/(MAX_AFTERBURNER+1.0))
 
 #define THRUST_MASS             0.7
-#define ARMOR_MASS		(ShipMass / 14)
+#define ARMOR_MASS		(options.ShipMass / 14)
 
 #define MAX_TANKS               8
-#define TANK_MASS               (ShipMass/10)
+#define TANK_MASS               (options.ShipMass/10)
 #define TANK_CAP(n)             (!(n)?MAX_PLAYER_FUEL:(MAX_PLAYER_FUEL/3))
 #define TANK_FUEL(n)            ((TANK_CAP(n)*(5+(randomMT()&3)))/32)
 #define TANK_REFILL_LIMIT       (350.0/8.0)
@@ -160,7 +160,7 @@
 
 #define SHOT_MULT(o) \
 	((BIT((o)->mods.nuclear, NUCLEAR) && BIT((o)->mods.warhead, CLUSTER)) \
-	 ? nukeClusterDamage : 1.0f)
+	 ? options.nukeClusterDamage : 1.0f)
 
 #define MINE_RADIUS		8
 #define MINE_RANGE              (VISIBILITY_DISTANCE*0.1)
@@ -203,7 +203,7 @@
 #define HEAT_WIDE_TIMEOUT       (8 * 12)
 #define HEAT_WIDE_ERROR         16
 
-#define CLUSTER_MASS_SHOTS(mass) ((mass) * 0.9 / ShotsMass)
+#define CLUSTER_MASS_SHOTS(mass) ((mass) * 0.9 / options.ShotsMass)
 #define CLUSTER_MASS_DRAIN(mass) (CLUSTER_MASS_SHOTS(mass)*ED_SHOT)
 
 #define SMART_SHOT_LEN		12

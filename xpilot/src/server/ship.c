@@ -340,8 +340,8 @@ void Tank_handle_detach(player *pl)
      * Player structures contain pointers to dynamic memory...
      */
 
-    Init_player(NumPlayers, (allowShipShapes)
-			    ? Parse_shape_str(tankShipShape)
+    Init_player(NumPlayers, (options.allowShipShapes)
+			    ? Parse_shape_str(options.tankShipShape)
 			    : NULL);
     /* Released tanks don't have tanks... */
     while (dummy->fuel.num_tanks > 0)
@@ -363,15 +363,15 @@ void Tank_handle_detach(player *pl)
 
     strlcpy(dummy->name, pl->name, MAX_CHARS);
     strlcat(dummy->name, "'s tank", MAX_CHARS);
-    strlcpy(dummy->username, tankUserName, MAX_CHARS);
-    strlcpy(dummy->hostname, tankHostName, MAX_CHARS);
+    strlcpy(dummy->username, options.tankUserName, MAX_CHARS);
+    strlcpy(dummy->hostname, options.tankHostName, MAX_CHARS);
     dummy->home_base	= pl->home_base;
     dummy->team		= pl->team;
     dummy->pseudo_team	= pl->pseudo_team;
     dummy->alliance	= ALLIANCE_NOT_SET;
     dummy->invite	= NO_ID;
     dummy->mychar       = 'T';
-    dummy->score	= pl->score - tankScoreDecrement;
+    dummy->score	= pl->score - options.tankScoreDecrement;
     updateScores	= true;
 
     /* Fuel is the one from chosen tank */
@@ -382,7 +382,7 @@ void Tank_handle_detach(player *pl)
     dummy->fuel.num_tanks = 0;
 
     /* Mass is only tank + fuel */
-    dummy->mass = (dummy->emptymass = ShipMass) + FUEL_MASS(dummy->fuel.sum);
+    dummy->mass = (dummy->emptymass = options.ShipMass) + FUEL_MASS(dummy->fuel.sum);
     dummy->power *= TANK_THRUST_FACT;
 
     /* Reset visibility. */
@@ -410,7 +410,7 @@ void Tank_handle_detach(player *pl)
     dummy->status = (DEF_BITS & ~KILL_BITS) | PLAYING | GRAVITY | THRUSTING;
     dummy->have = DEF_HAVE;
     dummy->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
-    if (playerShielding == 0) {
+    if (options.playerShielding == 0) {
 	dummy->shield_time = 30 * 12;
 	dummy->have |= HAS_SHIELD;
     }
@@ -468,7 +468,7 @@ void Make_wreckage(
     double		mass, sum_mass = 0.0;
     world_t *world = &World;
 
-    if (!useWreckage)
+    if (!options.useWreckage)
 	return;
 
     pos = World_wrap_clpos(world, pos);
