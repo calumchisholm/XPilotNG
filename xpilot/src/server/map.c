@@ -656,6 +656,12 @@ bool Grok_map(void)
 	     World.height, BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
 #endif
 
+    if (!is_polygon_map) {
+	xpprintf("Converting blocks to polygons...\n");
+	Xpmap_blocks_to_polygons();
+	xpprintf("Done creating polygons.\n");
+    }
+
     return true;
 }
 

@@ -481,16 +481,8 @@ bool Parser(int argc, char **argv)
      * Construct the World structure from the options.
      */
     status = Grok_map();
-    if (status == false)
-	return false;
 
-    if (!is_polygon_map) {
-	xpprintf("Converting blocks to polygons...\n");
-	Xpmap_blocks_to_polygons();
-	xpprintf("Done creating polygons.\n");
-    }
-
-    return true;
+    return status;
 }
 
 
