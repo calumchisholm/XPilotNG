@@ -344,101 +344,6 @@ int Init_top(void)
 	return -1;
 #endif
 
-    /* check that colors have sane values, if not, set a default */
-#define COLORCHECK(c, d) if (c >= maxColors || c < 0) { \
-      xpprintf("Value of option \"" #c "\" (%d) is out of range, " \
-               "setting default value " #d ".\n", c); c = d ; }
-
-    /* Color checks for colors with a default of 0-3. */
-    COLORCHECK(hudColor, 2);
-    COLORCHECK(hudHLineColor, 2);
-    COLORCHECK(hudVLineColor, 0);
-    COLORCHECK(hudItemsColor, 2);
-    COLORCHECK(hudLockColor, 0);
-    COLORCHECK(hudRadarOtherColor, 1);
-    COLORCHECK(hudRadarOtherColor, 2);
-    COLORCHECK(visibilityBorderColor, 2);
-    COLORCHECK(fuelGaugeColor, 2);
-    COLORCHECK(shipShapesHackColor, 0);
-    COLORCHECK(dirPtrColor, 0);
-    COLORCHECK(msgScanBallColor, 3);
-    COLORCHECK(msgScanCoverColor, 2);
-    COLORCHECK(zeroLivesColor, 1);
-    COLORCHECK(oneLifeColor, 3);
-    COLORCHECK(selfLWColor, 1);
-    COLORCHECK(teamLWColor, 2);
-    COLORCHECK(enemyLWColor, 1);
-    COLORCHECK(teamShotColor, 2);
-    COLORCHECK(shipNameColor, 2);
-    COLORCHECK(baseNameColor, 1);
-    COLORCHECK(mineNameColor, 2);
-    COLORCHECK(ballColor, 1);
-    COLORCHECK(connColor, 2);
-    COLORCHECK(fuelMeterColor, 3);
-    COLORCHECK(powerMeterColor, 3);
-    COLORCHECK(turnSpeedMeterColor, 3);
-    COLORCHECK(packetSizeMeterColor, 3);
-    COLORCHECK(packetLossMeterColor, 3);
-    COLORCHECK(packetDropMeterColor, 3);
-    COLORCHECK(packetLagMeterColor, 3);
-    COLORCHECK(temporaryMeterColor, 3);
-    COLORCHECK(meterBorderColor, 2);
-    COLORCHECK(buttonColor, 2);
-    COLORCHECK(borderColor, 1);
-    COLORCHECK(clockColor, 1);
-    COLORCHECK(scoreColor, 1);
-    COLORCHECK(scoreSelfColor, 3);
-    COLORCHECK(scoreObjectColor, hudColor);
-    COLORCHECK(wallColor, 2);
-    COLORCHECK(fuelColor, 3);
-    COLORCHECK(backgroundPointColor, 2);
-    COLORCHECK(team0Color, 0);
-    COLORCHECK(team1Color, 0);
-    COLORCHECK(team2Color, 0);
-    COLORCHECK(team3Color, 0);
-    COLORCHECK(team4Color, 0);
-    COLORCHECK(team5Color, 0);
-    COLORCHECK(team6Color, 0);
-    COLORCHECK(team7Color, 0);
-    COLORCHECK(team8Color, 0);
-    COLORCHECK(team9Color, 0);
-
-    /* Color checks for colors with a default of 4-7. */
-    if (maxColors > 4) {
-	COLORCHECK(msgScanSafeColor, 4);
-	COLORCHECK(decorColor, 6);
-	COLORCHECK(manyLivesColor, 4);
-	COLORCHECK(scoreOwnTeamColor, 4);
-    } else {
-	COLORCHECK(msgScanSafeColor, 2);
-	COLORCHECK(decorColor, 3);
-	COLORCHECK(manyLivesColor, 0);
-	COLORCHECK(scoreOwnTeamColor, 1);
-    }
-
-    /* Color checks for colors with a default of 8-15. */
-    if (maxColors > 8) {
-	COLORCHECK(msgScanPopColor, 11);
-	COLORCHECK(windowColor, 8);
-	COLORCHECK(scoreInactiveColor, 12);
-	COLORCHECK(scoreInactiveSelfColor, 12);
-	COLORCHECK(scoreEnemyTeamColor, 11);
-	COLORCHECK(messagesColor, 12);
-	COLORCHECK(oldMessagesColor, 13);
-	COLORCHECK(twoLivesColor, 11);
-    } else {
-	COLORCHECK(msgScanPopColor, 1);
-	COLORCHECK(windowColor, 2);
-	COLORCHECK(scoreInactiveColor, 1);
-	COLORCHECK(scoreInactiveSelfColor, 1);
-	COLORCHECK(scoreEnemyTeamColor, 1);
-	COLORCHECK(messagesColor, 3);
-	COLORCHECK(oldMessagesColor, 2);
-	COLORCHECK(twoLivesColor, 0);
-    }
-
-#undef COLORCHECK
-
     if (wallRadarColor >= maxColors
 	|| ((wallRadarColor & 5) && colorSwitch))
 	wallRadarColor = BLUE;
@@ -451,23 +356,6 @@ int Init_top(void)
     if (decorRadarColor >= maxColors
 	|| ((decorRadarColor & 5) && colorSwitch))
 	decorRadarColor = 2;
-
-#define OPTIONCHECK(o, cmp1, max, cmp2, min, fmt, d) \
-    if (o cmp1 (max) || o cmp2 (min)) { \
-      xpprintf("Value of option \"" #o "\" (" fmt ") is out of range, " \
-               "setting default value " #d ".\n", o); \
-      o = d ; }
-
-    OPTIONCHECK(hudRadarDotSize, >=, SHIP_SZ, <=, 0,   "%d",   6);
-    OPTIONCHECK(hudRadarScale,   >,  5.0,     <,  0.5, "%.2f", 1.5);
-    OPTIONCHECK(hudRadarLimit,   >,  5.0,     <,  0.0, "%.2f", 0.05);
-    OPTIONCHECK(hudSize,
-		>=, 6 * MIN_HUD_SIZE, <, MIN_HUD_SIZE, \
-		"%d", MIN_HUD_SIZE);
-    OPTIONCHECK(scoreObjectTime, >,  10.0,    <,  0.0, "%.2f", 3.0);
-    OPTIONCHECK(baseWarningType, >,  3,       <,  0,   "%d",   2);
-    OPTIONCHECK(charsPerSecond,  >,  255,     <,  10,  "%d",   50);
-#undef OPTIONCHECK
 
     radarDrawRectanglePtr = XFillRectangle;
 
