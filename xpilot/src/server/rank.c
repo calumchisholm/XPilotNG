@@ -29,7 +29,6 @@ char rank_version[] = VERSION;
 #define MAX_SCORES 400
 
 #define XPILOTSCOREFILE		"XPILOTSCOREFILE"
-#define XPILOTRANKINGPAGE	"XPILOTRANKINGPAGE"
 #define XPILOTNOJSRANKINGPAGE	"XPILOTNOJSRANKINGPAGE"
 #define RANKING_SERVER		"Ranking server"
 
@@ -207,33 +206,6 @@ static void SortRankings(void)
     }
 }
 
-
-/* Sort the ranks and save them to the webpage. */
-void Rank_write_webpage(void)
-{
-    static const char header[] =
-	"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
-/* In order to save space/bandwidth, the table is saved as one
-   giant javascript file, instead of writing all the <TR>, <TD>, etc */
-	"<SCRIPT language=\"Javascript\">\n<!-- Hide script\n"
-	"function g(nick, score, kills, deaths, rounds, shots, ballsCashed, "
-	"           ballsSaved, ballsWon, ballsLost, bestball, ratio, user, log) {\n"
-	"document.write('<tr><td align=left><tt>', i, '</tt></td>');\n"
-	"document.write('<td align=left><b>', nick, '</b></td>');\n"
-	"document.write('<td align=right>', score, '</td>');\n"
-	"document.write('<td align=right>', kills, '</td>');\n"
-	"document.write('<td align=right>', deaths, '</td>');\n"
-	"document.write('<td align=right>', rounds, '</td>');\n"
-	"document.write('<td align=right>', shots, '</td>');\n"
-	"document.write('<td align=center>', ballsCashed);\n"
-	"document.write('/', ballsSaved, '/', ballsWon, '/', ballsLost);\n"
-	"document.write('/', bestball);\n"
-	"document.write('</td>');\n"
-	"document.write('<td align=right>', ratio, '</td>');\n"
-	"document.write('<td align=center>', user, '</td>');\n"
-	"document.write('<td align=center>', log, '</td>');\n"
-	"document.write('</tr>\\n');\n"
-	"i = i + 1\n" "}\n// Hide script --></SCRIPT>\n" "</head><body>\n"
 #define TABLEHEAD \
 "<table><tr><td></td>" /* First column is the position */ \
 "<td align=left><h1><u><b>Player</b></u></h1></td>" \
@@ -247,52 +219,27 @@ void Rank_write_webpage(void)
 "<td align=center><h1><u><b>User @ Host</b></u></h1></td>" \
 "<td align=center><h1><u><b>Logout</b></u></h1></td>" \
 "</tr>\n"
-	PAGEHEAD
-	"<noscript>"
-	"<blink><h1>YOU MUST HAVE JAVASCRIPT FOR THIS PAGE</h1></blink>"
-	"Please go <A href=\"index_nojs.html\">here</A> for the non-js page"
-	"</noscript>\n"
-	TABLEHEAD "<SCRIPT language=\"Javascript\">\n" "var i = 1\n";
 
+/* Sort the ranks and save them to the webpage. */
+void Rank_write_webpage(void)
+{
     static const char headernojs[] =
 	"<html><head><title>XPilot @ " RANKING_SERVER "</title>\n"
 	"</head><body>\n" PAGEHEAD TABLEHEAD;
 
-    static const char footer[] = "</table>" "<i>Explanation for ballstats</i>:<br>" "The numbers are c/s/w/l/b, where<br>" "c = The number of enemy balls you have cashed.<br>" "s = The number of your own balls you have returned.<br>" "w = The number of enemy balls your team has cashed.<br>" "l = The number of your own balls you have lost.<br>" "b = The fastest ballrun you have made.<br>" "<hr>%s<BR>\n\n"	/* <-- Insert time here. */
+    static const char footer[] = "</table>"
+	"<i>Explanation for ballstats</i>:<br>"
+	"The numbers are c/s/w/l/b, where<br>"
+	"c = The number of enemy balls you have cashed.<br>"
+	"s = The number of your own balls you have returned.<br>"
+	"w = The number of enemy balls your team has cashed.<br>"
+	"l = The number of your own balls you have lost.<br>"
+	"b = The fastest ballrun you have made.<br>"
+	"<hr>%s<BR>\n\n"	/* <-- Insert time here. */
 	"</body></html>";
 
     SortRankings();
 
-    if (getenv(XPILOTRANKINGPAGE) != NULL) {
-	FILE *const file = fopen(getenv(XPILOTRANKINGPAGE), "w");
-	if (file != NULL) {
-	    int i;
-	    fprintf(file, "%s", header);
-	    for (i = 0; i < MAX_SCORES; i++) {
-		const int j = rankedplayer[i];
-		const RankInfo *score = &scores[j];
-		if (score->entry.nick[0] != '\0') {
-		    fprintf(file, "g(\"%s\", %.1f, %u, %u, %u, %u, "
-			    "%u, %u, %u, %u, %u, %.1f, \"%s@%s\", '%s');\n",
-			    score->entry.nick,
-			    score->score,
-			    score->entry.kills,
-			    score->entry.deaths,
-			    score->entry.rounds,
-			    score->entry.shots,
-			    score->entry.ballsCashed,
-			    score->entry.ballsSaved, score->entry.ballsWon,
-			    score->entry.ballsLost, score->entry.bestball,
-			    rankedscore[i], score->entry.real,
-			    score->entry.host, score->entry.logout);
-		}
-	    }
-	    fprintf(file, "</script>");
-	    fprintf(file, footer, rank_showtime());
-	    fclose(file);
-	} else
-	    error("Could not open the rank file.");
-    }
     if (getenv(XPILOTNOJSRANKINGPAGE) != NULL) {
 	FILE *const file = fopen(getenv(XPILOTNOJSRANKINGPAGE), "w");
 	if (file != NULL) {
@@ -414,46 +361,6 @@ void Rank_nuke_score(RankInfo * node)
 }
 
 
-#if 0
-static int Import_Oldest(FILE * file)
-{
-    struct oldScoreNode *nodes;
-    int imported = 0;
-
-    nodes = malloc(sizeof(*nodes) * MAX_SCORES);
-    if (nodes) {
-	int i;
-
-	imported = fread(nodes, sizeof(*nodes), MAX_SCORES, file);
-	for (i = 0; i < imported; i++) {
-	    memset(&scores[i].entry, sizeof(scores[i].entry), 0);
-	    strlcpy(scores[i].entry.nick, nodes[i].nick, MAX_CHARS);
-	    strlcpy(scores[i].entry.real, nodes[i].real, MAX_CHARS);
-	    strlcpy(scores[i].entry.host, nodes[i].host, MAX_CHARS);
-	    strlcpy(scores[i].entry.logout, nodes[i].logout, MAX_CHARS);
-	    scores[i].entry.timestamp = nodes[i].timestamp;
-	    scores[i].score = nodes[i].score;
-	    scores[i].entry.kills = nodes[i].kills;
-	    scores[i].entry.deaths = nodes[i].deaths;
-	    scores[i].entry.rounds = nodes[i].rounds;
-	    scores[i].entry.shots = nodes[i].firedShots;
-	    scores[i].entry.ballsSaved = nodes[i].ballsSaved;
-	    scores[i].entry.ballsLost = nodes[i].ballsLost;
-	    scores[i].entry.ballsWon = nodes[i].ballsWon;
-	    scores[i].entry.ballsCashed = nodes[i].ballsCashed;
-	    scores[i].entry.bestball = nodes[i].bestball;
-	    if (scores[i].entry.bestball == 0)
-		/* Support for loading an even older score file. */
-		scores[i].entry.bestball = 65535;
-	    scores[i].pl = NULL;
-	}
-	free(nodes);
-    }
-
-    return imported;
-}
-#endif
-
 /* Read scores from disk, and zero-initialize the ones that are not used.
    Call this on startup. */
 void Rank_init_saved_scores(void)
@@ -461,6 +368,10 @@ void Rank_init_saved_scores(void)
     int i = 0;
 
     xpilotscorefile = getenv(XPILOTSCOREFILE);
+
+    if (getenv("XPILOTRANKINGPAGE") != NULL)
+	warn("Support for Javascript ranking pages has been removed.");
+
     if (xpilotscorefile != NULL) {
 	FILE *file = fopen(xpilotscorefile, "r");
 	if (file != NULL) {
@@ -472,12 +383,7 @@ void Rank_init_saved_scores(void)
 		goto init_tail;
 	    }
 	    if (memcmp(rank_head.magic, RANK_MAGIC, 4) != 0) {
-#if 0
-		rewind(file);
-		i = Import_Oldest(file);
-#else
 		warn("Rank file format is too old.\n");
-#endif		
 		goto init_tail;
 	    }
 	    rank_head.version = ntohl(rank_head.version);
