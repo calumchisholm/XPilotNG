@@ -416,7 +416,7 @@ static void Bind_key_to_pointer_button(keys_t key, int ind)
 
     num_defs = Num_buttonDefs(ind);
     if (num_defs == MAX_BUTTON_DEFS) {
-	warn("Can only have %d keys bound to pointer button %d",
+	warn("Can only have %d keys bound to pointerButton%d.",
 	     MAX_BUTTON_DEFS, ind + 1);
 	return;
     }
@@ -467,7 +467,7 @@ static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
 	    }
 	}
 	if (j == num_options)
-	    warn("Unknown key \"%s\" for pointer button %d", ptr, ind + 1);
+	    warn("Unknown key \"%s\" for %s.", ptr, Option_get_name(opt));
     }
 
     xp_free(valcpy);
