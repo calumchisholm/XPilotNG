@@ -72,25 +72,15 @@ extern bool		updateScores;
 #define PL_TYPE_ROBOT		1
 #define PL_TYPE_TANK		2
 
-#define USE_PL_STATE
-
 /*
  * These values are set in the player->pl_state field.
  */
 #define PL_STATE_UNDEFINED	0
-/* pl_status = {FOO_GAME_OVER, [FOO_PLAYING]},    mychar = 'W' */
 #define PL_STATE_WAITING	1
-/* pl_status = {},                                mychar = ' ' */
 #define PL_STATE_APPEARING	2
-/* pl_status = {FOO_PLAYING},                     mychar = ' ' */
 #define PL_STATE_ALIVE		3
-/* pl_status = {FOO_KILLED, ...},                 mychar = ... */
-/* killed this frame */
 #define PL_STATE_KILLED		4
-/* pl_status = {FOO_GAME_OVER, [FOO_PLAYING]},    mychar = 'D' */
-/* dead, waiting for next round */
 #define PL_STATE_DEAD 		5
-/* pl_status = {FOO_PAUSE},                       mychar = 'P' */
 #define PL_STATE_PAUSED 	6
 
 /*
@@ -122,7 +112,6 @@ extern bool		updateScores;
  * so the first 8 bitvalues are reserved for that purpose,
  * those are defined in common/rules.h.
  */
-#define FOO_KILLED			(1U<<8)		/* Killed this frame */
 #define HOVERPAUSE		(1U<<9)		/* Hovering pause */
 #define REPROGRAM		(1U<<10)	/* Player reprogramming */
 #define FINISH			(1U<<11)	/* Finished a lap this frame */
@@ -181,10 +170,13 @@ typedef struct player {
 
     int		pl_type;		/* extended type info (tank, robot) */
     char	pl_type_mychar;		/* Special char for player type */
-    uint16_t	pl_status;		/* FOO_PLAYING, etc. */
+    uint8_t	pl_old_status;		/* OLD_PLAYING etc. */
+
+    uint16_t	pl_status;		/* HOVERPAUSE etc. */
     uint16_t	pl_state;		/* one of PL_STATE_* */
     int		pl_life;		/* Lives left (if lives limited) */
-    int		pl_leave_life;		/* Deaths since last joining server */
+    int		pl_deaths_since_join;	/* Deaths since last joining server */
+
 
     double	turnspeed;		/* How fast player acc-turns */
     double	velocity;		/* Absolute speed */
@@ -372,70 +364,33 @@ static inline player_t *Player_by_id(int id)
 
 static inline bool Player_is_waiting(player_t *pl)
 {
-#ifdef USE_PL_STATE
     return pl->pl_state == PL_STATE_WAITING ? true : false;
-#else
-    if (BIT(pl->pl_status, FOO_GAME_OVER) && pl->mychar == 'W')
-	return true;
-    return false;
-#endif
 }
 
 static inline bool Player_is_appearing(player_t *pl)
 {
-#ifdef USE_PL_STATE
     return pl->pl_state == PL_STATE_APPEARING ? true : false;
-#else
-    /* actually for a the undefined state this would return true also. */
-    if (BIT(pl->pl_status, FOO_PLAYING|FOO_PAUSE|FOO_GAME_OVER|FOO_KILLED) == 0)
-	return true;
-    return false;
-#endif
 }
 
 static inline bool Player_is_alive(player_t *pl)
 {
-#ifdef USE_PL_STATE
     return pl->pl_state == PL_STATE_ALIVE ? true : false;
-#else
-    if (BIT(pl->pl_status, FOO_PLAYING|FOO_PAUSE|FOO_GAME_OVER|FOO_KILLED) == FOO_PLAYING)
-	return true;
-    return false;
-#endif
 }
 
 /* player was killed this frame ? */
 static inline bool Player_is_killed(player_t *pl)
 {
-#ifdef USE_PL_STATE
     return pl->pl_state == PL_STATE_KILLED ? true : false;
-#else
-    if (BIT(pl->pl_status, FOO_KILLED))
-	return true;
-    return false;
-#endif
 }
 
 static inline bool Player_is_dead(player_t *pl)
 {
-#ifdef USE_PL_STATE
     return pl->pl_state == PL_STATE_DEAD ? true : false;
-#else
-    if (BIT(pl->pl_status, FOO_GAME_OVER) && pl->mychar == 'D')
-	return true;
-    return false;
-#endif
 }
 
 static inline bool Player_is_paused(player_t *pl)
 {
-#ifdef USE_PL_STATE
     return pl->pl_state == PL_STATE_PAUSED ? true : false;
-#else
-    if (BIT(pl->pl_status, FOO_PAUSE))
-	return true;
-    return false;
-#endif
 }
 
 static inline bool Player_is_hoverpaused(player_t *pl)
@@ -572,16 +527,10 @@ static inline bool Player_used_emergency_shield(player_t *pl)
 
 static inline bool Player_is_active(player_t *pl)
 {
-#ifdef USE_PL_STATE
     if (Player_is_alive(pl)
 	|| Player_is_killed(pl))
 	return true;
     return false;
-#else
-    if (BIT(pl->pl_status, FOO_PLAYING|FOO_PAUSE|FOO_GAME_OVER) == FOO_PLAYING)
-	return true;
-    return false;
-#endif
 }
 
 

@@ -969,7 +969,7 @@ static bool Robot_check_leave(player_t *pl)
 	return false;
 
     if (options.robotLeaveLife > 0
-	&& pl->pl_leave_life >= options.robotLeaveLife) {
+	&& pl->pl_deaths_since_join >= options.robotLeaveLife) {
 	Set_message_f("%s retired.", pl->name);
 	leave = true;
     }

@@ -1560,7 +1560,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 
     if (add_rank_death) {
 	Rank_add_death(pl);
-	pl->pl_leave_life++;
+	pl->pl_deaths_since_join++;
     }
 
     pl->have	= DEF_HAVE;
@@ -1597,22 +1597,18 @@ bool Team_immune(int id1, int id2)
     return false;
 }
 
-static char *status2str(int status)
+static char *old_status2str(int old_status)
 {
     static char buf[256];
 
     buf[0] = '\0';
 
-    if (status & FOO_PLAYING)
-	strlcat(buf, "FOO_PLAYING ", sizeof(buf));
-    if (status & FOO_PAUSE)
-	strlcat(buf, "FOO_PAUSE ", sizeof(buf));
-    if (status & FOO_GAME_OVER)
-	strlcat(buf, "FOO_GAME_OVER ", sizeof(buf));
-    if (status & THRUSTING)
-	strlcat(buf, "THRUSTING ", sizeof(buf));
-    if (status & FOO_KILLED)
-	strlcat(buf, "FOO_KILLED ", sizeof(buf));
+    if (old_status & OLD_PLAYING)
+	strlcat(buf, "OLD_PLAYING ", sizeof(buf));
+    if (old_status & OLD_PAUSE)
+	strlcat(buf, "OLD_PAUSE ", sizeof(buf));
+    if (old_status & OLD_GAME_OVER)
+	strlcat(buf, "OLD_GAME_OVER ", sizeof(buf));
 
     return buf;
 }
@@ -1644,19 +1640,7 @@ static char *state2str(int state)
 void Player_print_state(player_t *pl, const char *funcname)
 {
     warn("%-20s: %-16s (%c): %-20s %s ", funcname, pl->name, pl->mychar,
-	 state2str(pl->pl_state), status2str(pl->pl_status));
-    if (Player_is_waiting(pl))
-	warn("Player_is_waiting");
-    if (Player_is_appearing(pl))
-	warn("Player_is_appearing");
-    if (Player_is_alive(pl))
-	warn("Player_is_alive");
-    if (Player_is_killed(pl))
-	warn("Player_is_killed");
-    if (Player_is_dead(pl))
-	warn("Player_is_dead");
-    if (Player_is_paused(pl))
-	warn("Player_is_paused");
+	 state2str(pl->pl_state), old_status2str(pl->pl_old_status));
 }
 
 void Player_set_state(player_t *pl, int state)
@@ -1667,31 +1651,27 @@ void Player_set_state(player_t *pl, int state)
     case PL_STATE_WAITING:
 	Player_set_mychar(pl, 'W');
 	Player_set_life(pl, 0);
-	SET_BIT(pl->pl_status, FOO_GAME_OVER);
-	CLR_BIT(pl->pl_status, FOO_PAUSE|FOO_KILLED); /* what about FOO_PLAYING ? */
+	pl->pl_old_status = OLD_GAME_OVER;
 	break;
     case PL_STATE_APPEARING:
 	Player_set_mychar(pl, pl->pl_type_mychar);
 	/*Player_set_mychar(pl, 'A');*/
-	CLR_BIT(pl->pl_status, FOO_PLAYING|FOO_PAUSE|FOO_GAME_OVER|FOO_KILLED);
+	pl->pl_old_status = 0;
 	pl->recovery_count = RECOVERY_DELAY;
 	break;
     case PL_STATE_ALIVE:
 	Player_set_mychar(pl, pl->pl_type_mychar);
-	SET_BIT(pl->pl_status, FOO_PLAYING);
-	CLR_BIT(pl->pl_status, FOO_PAUSE|FOO_GAME_OVER|FOO_KILLED);
+	pl->pl_old_status = OLD_PLAYING;
 	break;
     case PL_STATE_KILLED:
-	SET_BIT(pl->pl_status, FOO_KILLED);
 	break;
     case PL_STATE_DEAD:
 	Player_set_mychar(pl, 'D');
-	SET_BIT(pl->pl_status, FOO_GAME_OVER);
+	pl->pl_old_status = OLD_GAME_OVER;
 	break;
     case PL_STATE_PAUSED:
 	Player_set_mychar(pl, 'P');
-	SET_BIT(pl->pl_status, FOO_PAUSE);
-	CLR_BIT(pl->pl_status, FOO_PLAYING|FOO_GAME_OVER|FOO_KILLED);
+	pl->pl_old_status = OLD_PAUSE;
 	break;
     default:
 	break;

@@ -50,13 +50,13 @@
 #define CLIENT_RULES_MASK	(WRAP_PLAY|TEAM_PLAY|TIMING|LIMITED_LIVES|\
 				 ALLIANCES)
 /*
- * Player status bits.
+ * Old player status bits, currently only used in network protocol.
  * The bits that the client needs must fit into a byte,
  * so the first 8 bitvalues are reserved for that purpose.
  */
-#define FOO_PLAYING		(1U<<0)		/* Ugly hack */
-#define FOO_PAUSE		(1U<<1) 	/* Player is paused */
-#define FOO_GAME_OVER		(1U<<2)		/* Ugly hack */
+#define OLD_PLAYING		(1U<<0)		/* alive or killed */
+#define OLD_PAUSE		(1U<<1) 	/* paused */
+#define OLD_GAME_OVER		(1U<<2)		/* waiting or dead */
 
 typedef struct {
     int		lives;

@@ -438,7 +438,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
 		  lock_dist,
 		  lock_dir,
 		  showautopilot,
-		  Player_by_id(Get_player_id(conn))->pl_status,
+		  Player_by_id(Get_player_id(conn))->pl_old_status,
 		  mods);
     if (n <= 0)
 	return 0;

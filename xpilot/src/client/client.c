@@ -1585,13 +1585,13 @@ static void update_status(int status)
 {
     static int old_status = 0;
 
-    if (BIT(old_status, FOO_GAME_OVER) && !BIT(status, FOO_GAME_OVER)
-	&& !BIT(status, FOO_PAUSE))
+    if (BIT(old_status, OLD_GAME_OVER) && !BIT(status, OLD_GAME_OVER)
+	&& !BIT(status, OLD_PAUSE))
 	Raise_window();
 
-    /* FOO_GAME_OVER -> FOO_PLAYING */
-    if (BIT(old_status, FOO_PLAYING|FOO_PAUSE|FOO_GAME_OVER) != FOO_PLAYING) {
-	if (BIT(status, FOO_PLAYING|FOO_PAUSE|FOO_GAME_OVER) == FOO_PLAYING)
+    /* Player appeared? */
+    if (BIT(old_status, OLD_PLAYING|OLD_PAUSE|OLD_GAME_OVER) != OLD_PLAYING) {
+	if (BIT(status, OLD_PLAYING|OLD_PAUSE|OLD_GAME_OVER) == OLD_PLAYING)
 	    Reset_shields();
     }
 
