@@ -1421,7 +1421,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 
     COLOR_INDEX_OPTION(
 	"buttonColor",
-	2,
+	3,
 	&buttonColor,
 	"Which color number to use for drawing buttons.\n"),
 
