@@ -30,12 +30,7 @@
 #ifndef	_WINSOCKAPI_
 #include <winsock.h>
 #endif
-
-#ifndef	_WINX_H_
-/*#include "NT/winX.h"*/
 #endif
-#endif
-
 
 #ifndef DRAW_H
 /* need shipshape_t */
