@@ -28,8 +28,6 @@ char objpos_version[] = VERSION;
 
 void Object_position_set_clicks(object *obj, int cx, int cy)
 {
-    clpos		*pos = (clpos *)&obj->pos;
-
     if (!INSIDE_MAP(cx, cy)) {
 	if (0) {
 	    printf("BUG!  Illegal object position %d,%d\n", cx, cy);
@@ -42,8 +40,8 @@ void Object_position_set_clicks(object *obj, int cx, int cy)
 	}
     }
 
-    pos->cx = cx;
-    pos->cy = cy;
+    obj->pos.cx = cx;
+    obj->pos.cy = cy;
 }
 
 void Object_position_init_clicks(object *obj, int cx, int cy)
@@ -60,8 +58,6 @@ void Player_position_restore(player *pl)
 
 void Player_position_set_clicks(player *pl, int cx, int cy)
 {
-    clpos		*pos = (clpos *)&pl->pos;
-
     if (!INSIDE_MAP(cx, cy)) {
 	if (0) {
 	    printf("BUG!  Illegal player position %d,%d\n", cx, cy);
@@ -73,8 +69,8 @@ void Player_position_set_clicks(player *pl, int cx, int cy)
 	}
     }
 
-    pos->cx = cx;
-    pos->cy = cy;
+    pl->pos.cx = cx;
+    pl->pos.cy = cy;
 }
 
 void Player_position_init_clicks(player *pl, int cx, int cy)

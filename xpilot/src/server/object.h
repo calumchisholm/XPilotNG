@@ -166,11 +166,6 @@ typedef struct {
 #define NOTEAM_BIT		(1U << 10)
 #define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1U << (team))
 
-/*
- * Object position is non-modifiable, except at one place.
- */
-typedef const clpos objposition;
-
 #define OBJ_X_IN_BLOCKS(obj)	CLICK_TO_BLOCK((obj)->pos.cx)
 #define OBJ_Y_IN_BLOCKS(obj)	CLICK_TO_BLOCK((obj)->pos.cy)
 
@@ -188,7 +183,7 @@ struct _cell_node {
 #define OBJECT_BASE	\
     short		id;		/* For shots => id of player */	\
     uint16_t		team;		/* Team of player or cannon */	\
-    objposition		pos;		/* World coordinates */		\
+    clpos		pos;		/* World coordinates */		\
     clpos		prevpos;	/* previous position */		\
     clpos		extmove;	/* For collision detection */	\
     float		wall_time;	/* bounce/crash time within frame */ \
