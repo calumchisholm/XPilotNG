@@ -72,6 +72,7 @@ typedef struct {
     bool useClientRanker;
     bool useAMPMFormatClock;
     bool useBlockProtocol;
+    bool showNastyShots;
 } instruments_t;
 
 typedef struct {
@@ -93,9 +94,9 @@ typedef struct {
 #define MIN_SPARK_SIZE		1
 #define MAX_MAP_POINT_SIZE	8
 #define MIN_MAP_POINT_SIZE	0
-#define MAX_SHOT_SIZE		8
+#define MAX_SHOT_SIZE		20
 #define MIN_SHOT_SIZE		1
-#define MAX_TEAMSHOT_SIZE	8
+#define MAX_TEAMSHOT_SIZE	20
 #define MIN_TEAMSHOT_SIZE	1
 
 #define MIN_SHOW_ITEMS_TIME	0.0

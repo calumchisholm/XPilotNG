@@ -30,8 +30,6 @@
 char xdefault_version[] = VERSION;
 
 bool	titleFlip;		/* Do special title bar flipping? */
-bool	showNastyShots = false;	/* show original flavor shots or the new 
-				   "nasty shots" */
 
 bool pre_exists = False;
 int pre_acc_num, new_acc_num = 0;   /* pre are the Saved mouse settings */
@@ -402,12 +400,12 @@ xp_option_t xdefault_options[] = {
     XP_BOOL_OPTION(
 	"showNastyShots",
 	false,
-	&showNastyShots,
+	&instruments.showNastyShots,
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
+	"Use the Nasty Looking Shots instead of the round shots.\n"
 	"You will probably want to increase your shotSize if you use this.\n"),
-    
+
     XP_BOOL_OPTION(
         "mouseAccelInClient",
 	true,

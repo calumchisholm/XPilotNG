@@ -386,13 +386,22 @@ void Gui_paint_fastshot(int color, int x, int y)
     if (!texturedObjects) {
         int z = shot_size/2;
 
-	if (showNastyShots)
+	if (instruments.showNastyShots)
 	    Gui_paint_nastyshot(color, x, y, z);
-	else
-	    Rectangle_add(color,
-			  x - z,
-			  y - z,
-			  shot_size, shot_size);
+	else {
+	    /* Show round shots - jiman392 */
+	    if (shot_size > 2) {
+		SET_FG(colors[color].pixel);
+		rd.fillArc(dpy, drawPixmap, gameGC,
+			   WINSCALE(x - z), WINSCALE(y - z),
+			   UWINSCALE(shot_size), UWINSCALE(shot_size), 
+			   0, 64*360);
+	    } else
+		Rectangle_add(color,
+			      x - z,
+			      y - z,
+			      shot_size, shot_size);
+	}
     }
     else {
 	int s_size = (shot_size > 8) ? 8 : shot_size ;
