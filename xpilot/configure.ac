@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([XPilot NG], 4.6.6ng47a1, kps@users.sourceforge.net, xpilot-ng)
+AC_INIT([XPilot NG], 4.6.6ng47a1, xpilot-hacks@lists.sourceforge.net, xpilot-ng)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpclient.h)
 
