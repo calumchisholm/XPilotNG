@@ -98,7 +98,10 @@ static bool tryToSetShipShape(char *ship_shape, char *ship_shape_file)
 	    char *str;
 	    char line[1024];
 
-	    /* this should be rewritten */
+	    /*
+	     * kps - this probably does not work if the ship name is
+	     * at the border of two 1024 byte blocks.
+	     */
 	    while (fgets(line, sizeof line, fp)) {
 		if ((str = strstr(line, "(name:" )) != NULL
 		    || (str = strstr(line, "(NM:" )) != NULL) {
@@ -119,8 +122,6 @@ static bool tryToSetShipShape(char *ship_shape, char *ship_shape_file)
 	    fclose(fp);
 	}
     }
-
-    warn("ship shape string: %s\n", ship_shape);
 
     /* shape definition */
     retval = Validate_shape_str(ship_shape);
@@ -143,7 +144,6 @@ static bool setShipShape(xp_option_t *opt, const char *value)
     if (shipShapeSetting)
 	xp_free(shipShapeSetting);
     shipShapeSetting = xp_strdup(value);
-    warn("shipShapeSetting is now %s\n", shipShapeSetting);
 
     tryToSetShipShape(shipShapeSetting, shipShapeFileSetting);
 
@@ -160,7 +160,6 @@ static bool setShipShapeFile(xp_option_t *opt, const char *value)
    if (shipShapeFileSetting)
 	xp_free(shipShapeFileSetting);
     shipShapeFileSetting = xp_strdup(value);
-    warn("shipShapeFileSetting is now %s\n", shipShapeFileSetting);
 
     if (shipShapeSetting)
 	tryToSetShipShape(shipShapeSetting, shipShapeFileSetting);
