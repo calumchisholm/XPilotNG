@@ -246,7 +246,7 @@ void Gui_paint_fuel(int x, int y, double fuel)
 	 * The ABS is needed to ensure image is not negative even with
 	 * large scale factors. */
 
-	image = ABS((loops + x + x * y) % (fuel_images * 2));
+	image = ABS((loopsSlow + x + x * y) % (fuel_images * 2));
 
 	/* the animation is played from image 0-15 then back again
 	 * from image 15-0 */
@@ -854,7 +854,7 @@ void Gui_paint_setup_left_grav(int x, int y)
 
 void Gui_paint_setup_worm(int x, int y)
 {
-    int wormDrawCount = loops & 7;
+    int wormDrawCount = loopsSlow & 7;
     if (!texturedObjects) {
 	static const int	INSIDE_BL = BLOCK_SZ - 2;
 	static int wormOffset[8][3] = {
@@ -951,7 +951,7 @@ void Gui_paint_setup_item_concentrator(int x, int y)
 	}
     } else
 	Bitmap_paint(drawPixmap, BM_CONCENTRATOR, WINSCALE(X(x)),
-		     WINSCALE(Y(y + BLOCK_SZ)), (loops + (x + x * y)) % 32);
+		     WINSCALE(Y(y + BLOCK_SZ)), (loopsSlow + (x + x * y)) % 32);
 }
 
 
@@ -1022,7 +1022,7 @@ void Gui_paint_setup_asteroid_concentrator(int x, int y)
 	}
     } else
 	Bitmap_paint(drawPixmap, BM_ASTEROIDCONC, WINSCALE(X(x)),
-		     WINSCALE(Y(y + BLOCK_SZ)), (loops + (x + x * y)) % 32);
+		     WINSCALE(Y(y + BLOCK_SZ)), (loopsSlow + (x + x * y)) % 32);
 }
 
 
