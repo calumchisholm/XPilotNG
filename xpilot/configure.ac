@@ -144,6 +144,24 @@ if test x$enable_sdl_client = xyes; then
 	fi
 	AC_SUBST(SDL_EXTRA_LIBS)
 
+	dnl kps - hack to check for SDL_image
+	AC_MSG_CHECKING(for SDL_image)
+	have_libsdl_image=no
+	AC_TRY_COMPILE([
+	 #include "SDL.h"
+	 #include "SDL/SDL_image.h"
+	],[
+	],[
+	have_libsdl_image=yes
+	])
+	AC_MSG_RESULT($have_libsdl_image)
+	if test x$have_libsdl_image = xyes; then
+	    SDL_EXTRA_LIBS="-lSDL_image"
+	    AC_DEFINE([HAVE_SDL_IMAGE], 1, [hack])
+	else
+	    AC_MSG_WARN(Unable to find SDL_image headers and libraries)
+	fi
+	AC_SUBST(SDL_EXTRA_LIBS)
 
 	dnl Check for OpenGL
 	AC_MSG_CHECKING(for OpenGL support)
