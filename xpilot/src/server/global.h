@@ -368,7 +368,6 @@ extern bool		maraTurnqueue;
 extern bool		ignoreMaxFPS;
 
 /* kps hack */
-extern bool		useOldCode;
 extern bool		polygonMode;
 
 #endif /* SERVER */

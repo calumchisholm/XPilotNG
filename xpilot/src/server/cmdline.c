@@ -315,7 +315,6 @@ int		recordMode;		/* 0=off, 1=record, 2=playback */
 int		recordFlushInterval;	/* Max seconds between storing data */
 char		*recordFileName;
 
-bool		useOldCode;		/* Choice of new and old code */
 bool		polygonMode;		/* Run server in polygon mode even
 					   with block based (.xp) mapfile */
 bool		fastAim;		/* Turn before shooting in frame */
@@ -3559,17 +3558,6 @@ static option_desc options[] = {
 	"A game speed of X means the game proceeds as fast as on a\n"
 	"version 4.5.4 server running at X FPS.\n"
 	"A value of 0 means the game speed is the same as FPS.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    /* useOldCode - kps tmp hack */
-    {
-	"useOldCode",
-	"useOldCode",
-	"false",
-	&useOldCode,
-	valBool,
-	tuner_dummy,
-	"Use old code in some places when playing on a block based map?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
