@@ -928,19 +928,18 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
     smartobject		*smart;
     mineobject		*mine;
     DFLOAT		closest_mine_range = World.hypotenuse;
-    int			i, j, owner;
+    int			i, j;
     DFLOAT		range, perim, damage;
-    player		*p;
+    player		*p, *owner_pl;
     ecm_t		*ecm;
-    int			ind = GetInd(pl->id);
 
-    if (NumEcms >= MAX_TOTAL_ECMS) {
+    if (NumEcms >= MAX_TOTAL_ECMS)
 	return;
-    }
+
     Ecms[NumEcms] = (ecm_t *)malloc(sizeof(ecm_t));
-    if (Ecms[NumEcms] == NULL) {
+    if (Ecms[NumEcms] == NULL)
 	return;
-    }
+
     ecm = Ecms[NumEcms];
     ecm->pos.cx = cx;
     ecm->pos.cy = cy;
@@ -972,19 +971,17 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
 	 * team members if team immunity is on.
 	 */
 	if (shot->id != NO_ID) {
-	    owner = GetInd(shot->id);
-	    if (ind == owner) {
+	    owner_pl = Player_by_id(shot->id);
+	    if (pl == owner_pl) {
 		if (shot->type == OBJ_MINE) {
-		    if (BIT(shot->status, OWNERIMMUNE)) {
+		    if (BIT(shot->status, OWNERIMMUNE))
 			continue;
-		    }
 		}
 		if (shot->type == OBJ_SMART_SHOT) {
-		    if (shot->info != owner) {
+		    if (shot->info != owner_pl->id)
 			continue;
-		    }
 		}
-	    } else if ((pl && Team_immune(pl->id, owner))
+	    } else if ((pl && Team_immune(pl->id, owner_pl->id))
 		       || (BIT(World.rules->mode, TEAM_PLAY)
 			   && team == shot->team)) {
 		continue;
@@ -1072,7 +1069,7 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
     }
 
     /* in non-team mode cannons are immune to cannon ECMs */
-    if (BIT(World.rules->mode, TEAM_PLAY) || ind != -1) {
+    if (BIT(World.rules->mode, TEAM_PLAY) || pl) {
 	for (i = 0; i < World.NumCannons; i++) {
 	    cannon_t *c = World.cannon + i;
 	    if (BIT(World.rules->mode, TEAM_PLAY)
@@ -1092,10 +1089,11 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
     }
 
     for (i = 0; i < NumPlayers; i++) {
-	if (i == ind)
+	p = Players(i);
+
+	if (p == pl)
 	    continue;
 
-	p = Players(i);
 	/*
 	 * Team members are always immune from ECM effects from other
 	 * team members.  Its too nasty otherwise.
