@@ -39,7 +39,7 @@ typedef unsigned char	u_byte;
 #ifndef __cplusplus
 # define false	0
 # define true	1
-# define bool	int
+# define bool	char
 #endif
 
 typedef struct { double x, y; }		vector_t;

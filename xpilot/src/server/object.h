@@ -493,10 +493,10 @@ struct player {
     double	auto_turnspeed_s;	/* turnresistance settings. Restored */
     double	auto_turnresistance_s;	/* when autopilot turned off */
     modifiers_t	modbank[NUM_MODBANKS];	/* useful modifier settings */
-    bool	tractor_is_pressor;	/* on if tractor is pressor */
     double	shot_time;		/* Time of last shot fired by player */
     double	laser_time;		/* Time of last laser pulse fired by player */
     bool	did_shoot;		/* Pressed fire during this frame */
+    bool	tractor_is_pressor;	/* on if tractor is pressor */
     int		repair_target;		/* Repairing this target */
     int		fs;			/* Connected to fuel station fs */
     int		check;			/* Next check point to pass */
@@ -569,8 +569,6 @@ struct player {
     int		player_fps;		/* FPS that this player can do */
     int		maxturnsps;		/* turns per second limit */
 
-    int		isowner;		/* player started this server? */
-    int		isoperator;		/* player has operator privileges? */
     int		rectype;		/* normal, saved or spectator */
     struct ranknode	*rank;
 
@@ -578,7 +576,10 @@ struct player {
     double	idleTime;		/* seconds player has idled */
 
     int	 	flooding;
-    int	 	muted;
+
+    bool	muted;			/* player started is muted? */
+    bool	isowner;		/* player started this server? */
+    bool	isoperator;		/* player has operator privileges? */
 
     int		privs;			/* Player privileges */
 
