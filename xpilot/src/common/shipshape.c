@@ -310,7 +310,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 {
     grid_t grid;
     int i, j, x, y, dx, dy, max, shape_version = 0;
-    ipos_t pt[MAX_SHIP_PTS2], in, engine, m_gun;
+    ipos_t pt[MAX_SHIP_PTS2], in, old_in, engine, m_gun;
     ipos_t l_light[MAX_LIGHT_PTS], r_light[MAX_LIGHT_PTS];
     ipos_t l_gun[MAX_GUN_PTS], r_gun[MAX_GUN_PTS];
     ipos_t l_rgun[MAX_GUN_PTS], r_rgun[MAX_GUN_PTS], m_rack[MAX_RACK_PTS];
@@ -363,7 +363,8 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 
 	case 0:		/* Keyword is 'shape' */
 	    while (teststr) {
-		while (*teststr == ' ') teststr++;
+		while (*teststr == ' ')
+		    teststr++;
 		if (sscanf(teststr, "%d,%d", &in.x, &in.y) != 2) {
 		    if (verboseShapeParsing)
 			warn("Missing ship shape coordinate in: \"%s\"",
@@ -374,12 +375,34 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 		    if (verboseShapeParsing)
 			warn("Too many ship shape coordinates");
 		} else {
-		    pt[ship->num_points++] = in;
-		    if (debugShapeParsing)
-			warn("ship point at %d,%d", in.x, in.y);
+		    if (ship->num_points > 0
+			&& old_in.x == in.x
+			&& old_in.y == in.y) {
+			if (verboseShapeParsing) {
+			    warn("Duplicte ship point at %d,%d", in.x, in.y);
+			    warn("Removing edge with length 0 from ship.");
+			}
+		    }
+		    else {
+			pt[ship->num_points++] = in;
+			old_in = in;
+			if (debugShapeParsing)
+			    warn("ship point at %d,%d", in.x, in.y);
+		    }
 		}
 		teststr = strchr(teststr, ' ');
 	    }
+	    if (ship->num_points > 0
+		&& pt[ship->num_points - 1].x == pt[0].x
+		&& pt[ship->num_points - 1].y == pt[0].y) {
+		if (verboseShapeParsing) {
+		    warn("Ship last point equals first point at %d,%d",
+			 pt[0].x, pt[0].y);
+		    warn("Removing edge with length 0 from ship.");
+		}
+		ship->num_points--;
+	    }
+	    
 	    break;
 
 	case 1:		/* Keyword is 'mainGun' */
