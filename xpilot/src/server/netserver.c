@@ -3016,7 +3016,7 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
     case HELP_CMD:
 	if (!args)
 	    sprintf(msg,"Commands: help team version lock password setpass "
-		    "nick pause reset set kick show");
+		    "auth pause reset set kick show");
 	else {
 	    for (i = 0 ; i < NELEM(commands) ; i++)
 		if (!strcasecmp(args, commands[i].name))
