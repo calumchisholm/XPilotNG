@@ -281,9 +281,6 @@ void Check_collision(void)
 	PlayerCollision();
     }
 
-#if 0
-    Laser_pulse_collision();
-#endif
     AsteroidCollision();
 }
 
@@ -802,7 +799,6 @@ static void PlayerObjectCollision(int ind)
 		continue;
 	    }
 	}
-	/* laserhack */
 	else if (BIT(obj->type, OBJ_PULSE)) {
 	    pulseobject *pulse = PULSE_PTR(obj);
 	    if (pl->id == pulse->id && !pulse->refl)
@@ -910,7 +906,6 @@ static void PlayerObjectCollision(int ind)
 	    CLR_BIT(obj->mods.warhead, CLUSTER);
 	    break;
 
-	    /* laserhack */
 	case OBJ_PULSE:
 	    Laser_pulse_hits_player(ind, PULSE_PTR(obj));
 	    if (BIT(pl->status, KILLED)) {
@@ -1739,7 +1734,6 @@ static void AsteroidCollision(void)
 			 / ((obj->mods.mini + 1) * (obj->mods.power + 1));
 		sound = true;
 		break;
-		/* laserhack */
 	    case OBJ_PULSE:
 		obj->life = 0;
 		damage = ED_LASER_HIT;

@@ -1336,7 +1336,6 @@ void Delete_shot(int ind)
 	}
 	break;
 
-	/* laserhack */
     case OBJ_PULSE:
 	if (shot->id == NO_ID
 	    || BIT(shot->status, FROMCANNON)) {

@@ -68,9 +68,6 @@ extern DFLOAT		tbl_cos[];
 
 extern player		**Players;
 extern object		*Obj[];
-#if 0 /* laserhack */
-extern pulse_t		*Pulses[];
-#endif
 extern ecm_t		*Ecms[];
 extern trans_t		*Transporters[];
 extern long		frame_loops;
@@ -82,9 +79,6 @@ extern int		NumOperators;
 extern int		NumPseudoPlayers;
 extern int		NumQueuedPlayers;
 extern int		ObjCount;
-#if 0 /* laserhack */
-extern int		NumPulses;
-#endif
 extern int		NumEcms;
 extern int		NumTransporters;
 extern int		NumAlliances;

@@ -871,7 +871,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
     if (obj->collmode == 2)
 	obj->collmode = 3;
 
-    /* laserhack */
+    /* find direction of pulse after bounce */
     if (obj->type == OBJ_PULSE) {
 	pulseobject *pulse = PULSE_PTR(obj);
 

@@ -610,15 +610,14 @@ void Update_objects(void)
 		(wireobj->rotation + (int) (wireobj->turnspeed * RES)) % RES;
 	}
 
-	update_object_speed(obj);
-
-	/* laserhack */
-	if (obj->type == OBJ_PULSE) {
+	else if (BIT(obj->type, OBJ_PULSE)) {
 	    pulseobject *pulse = PULSE_PTR(obj);
 	    pulse->len += pulseSpeed * timeStep2;
 	    if (pulse->len > pulseLength)
 		pulse->len = pulseLength;
 	}
+
+	update_object_speed(obj);
 
 	if (!BIT(obj->type, OBJ_ASTEROID)) {
 	    Move_object(obj);

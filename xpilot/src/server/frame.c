@@ -762,7 +762,6 @@ static void Frame_shots(int conn, int ind)
 	cx = shot->pos.cx;
 	cy = shot->pos.cy;
 
-	/* laserhack */
 	if (shot->type != OBJ_PULSE) {
 	    if (!click_inview(&cv, cx, cy))
 		continue;
@@ -940,7 +939,6 @@ static void Frame_shots(int conn, int ind)
 	    }
 	    break;
 
-	    /* laserhack */
 	case OBJ_PULSE:
 	    {
 		pulseobject *pulse = PULSE_PTR(shot);

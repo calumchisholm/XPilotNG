@@ -1875,21 +1875,6 @@ void Delete_player(int ind)
 	}
     }
 
-#if 0 /* laserhack */
-    if (pl->num_pulses) {
-	for (i = 0; i < NumPulses; i++) {
-	    if (Pulses[i]->id == pl->id) {
-		free(Pulses[i]);
-		if (--NumPulses > i) {
-		    Pulses[i] = Pulses[NumPulses];
-		    i--;
-		}
-	    }
-	}
-	pl->num_pulses = 0;
-    }
-#endif
-
     Free_ship_shape(pl->ship);
 
     sound_close(pl);
