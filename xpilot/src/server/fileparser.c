@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -363,6 +363,8 @@ static bool parseOpenFile(FILE *ifile, optOrigin opt_origin)
 
     fd = fileno(ifile);
 
+    is_polygon_map = FALSE; /* In case first map fails and this is another */
+
     /* kps - first try the new map format */
     if (isXp2MapFile(fd)) {
 	is_polygon_map = TRUE;
@@ -466,13 +468,13 @@ static void fileClose(FILE *fp)
 static int hasMapExtension(const char *filename)
 {
     int fnlen = strlen(filename);
-    if (fnlen > 4 && !strcmp(&filename[fnlen - 4], ".xp2")){ 
+    if (fnlen > 4 && !strcmp(&filename[fnlen - 4], ".xp2")){
 	return 1;
     }
-    if (fnlen > 3 && !strcmp(&filename[fnlen - 3], ".xp")){ 
+    if (fnlen > 3 && !strcmp(&filename[fnlen - 3], ".xp")){
 	return 1;
     }
-    if (fnlen > 4 && !strcmp(&filename[fnlen - 4], ".map")){ 
+    if (fnlen > 4 && !strcmp(&filename[fnlen - 4], ".map")){
 	return 1;
     }
     return 0;
@@ -746,7 +748,7 @@ bool parseMapFile(const char *filename)
     result = parseOpenFile(ifile, OPT_MAP);
     closeMapFile(ifile);
 
-    return true;
+    return result;
 }
 
 
