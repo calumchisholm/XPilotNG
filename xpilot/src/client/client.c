@@ -21,46 +21,10 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <math.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <X11/Xlib.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winClient.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "setup.h"
-#include "error.h"
-#include "rules.h"
-#include "bit.h"
-#include "netclient.h"
-#include "paint.h"
-#include "xinit.h"
-#include "protoclient.h"
-#include "portability.h"
-#include "talk.h"
-#include "commonproto.h"
-#include "bitmaps.h"
+#include "xpclient.h"
 
 char client_version[] = VERSION;
 
-/*#define MAX_CHECKPOINT	26*/
 
 char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
@@ -1342,7 +1306,7 @@ static void Print_roundend_messages(other_t **order)
      */
     for (i = 0; i < num_others; i++) {
 	other = order[i];
-	if (other->mychar != 'P')
+	if (other->mychar == 'P')
 	    continue;
 
 	if (Using_score_decimals()) {
@@ -1492,7 +1456,7 @@ static int Team_heading(int entrynum, int teamnum,
     if (teamnum != TEAM_PAUSEHACK)
 	sprintf(tmp.name, "TEAM %d", tmp.team);
     else
-	sprintf(tmp.name, "Pause Wusses", tmp.team);
+	sprintf(tmp.name, "Pause Wusses");
     strcpy(tmp.real, tmp.name);
     strcpy(tmp.host, "");
 #if 0

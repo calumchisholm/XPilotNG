@@ -21,31 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-# include <X11/Xutil.h>
-# include <X11/Xatom.h>
-# include <X11/Xmd.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "xinit.h"
-#include "error.h"
-#include "netclient.h"
-#include "protoclient.h"
-#include "keys.h"
-#include "bit.h"
-#include "commonproto.h"
+#include "xpclient.h"
 
 char talk_version[] = VERSION;
 
@@ -63,6 +39,7 @@ typedef CARD32  Atom32;
 #define TALK_WINDOW_WIDTH	(draw_width \
 				    - 2*(TALK_WINDOW_X + TALK_OUTSIDE_BORDER))
 
+#undef CTRL
 #define CTRL(c)			((c) & 0x1F)
 
 /*

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -22,16 +21,9 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>		/* Could be moved below the #ifdef, but then */
-				/* we would get a warning (empty source file) */
-				/* each time LIMIT_ACCESS isn't defined. */
+#include "xpclient.h"
+
 #ifdef	LIMIT_ACCESS
-
-#include <stdlib.h>
-#include <time.h>
-#include <sys/types.h>
-
-#include "types.h"
 
 #define PATTERN		"lglab[01]"
 #define FREELIMIT	7

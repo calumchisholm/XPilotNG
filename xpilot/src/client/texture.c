@@ -21,32 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <limits.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include <io.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "xinit.h"
-#include "error.h"
-#include "xpmread.h"
-#include "texture.h"
-#include "portability.h"
-#include "bitmaps.h"
+#include "xpclient.h"
 
 char texture_version[] = VERSION;
 

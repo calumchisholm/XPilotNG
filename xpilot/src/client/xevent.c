@@ -21,50 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <math.h>
-
-#ifndef _WINDOWS
-# include <X11/Xlib.h>
-# include <X11/Xos.h>
-# include <X11/Xutil.h>
-# include <X11/keysym.h>
-# include <X11/Xatom.h>
-# include <X11/Xmd.h>
-# ifdef	__apollo
-#  include <X11/ap_keysym.h>
-# endif
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include "NT/winAudio.h"
-# include "NT/winClient.h"
-# include "NT/winXKey.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "xinit.h"
-#include "keys.h"
-#include "packet.h"
-#include "bit.h"
-#include "setup.h"
-#include "netclient.h"
-#include "widget.h"
-#include "error.h"
-#include "record.h"
-#include "portability.h"
-#include "paintdata.h"
-#include "talk.h"
-#include "configure.h"
-#include "xeventhandlers.h"
-#include "xevent.h"
-#include "bitmaps.h"
+#include "xpclient.h"
 
 char xevent_version[] = VERSION;
 

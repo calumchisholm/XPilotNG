@@ -21,31 +21,56 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-#include <fcntl.h>
-#include <sys/stat.h>
+#include "xpclient.h"
 
-#ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#endif
+/*
+ * Different visual keys in the XPM format.
+ */
+enum XPM_key {
+    XPM_m,		/* mono visual */
+    XPM_g4,		/* 4-level grayscale visual */
+    XPM_g,		/* grayscale visual */
+    XPM_c,		/* (pseudo-)color visual */
+    XPM_s,		/* symbolic color name ("None") */
+    XPM_nkeys		/* number of color keys supported  */
+};
 
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "xinit.h"
-#include "error.h"
-#include "commonproto.h"
+/*
+ * Structure for an XPM color.
+ */
+typedef struct XPM_color_struct {
+    char		*keys[XPM_nkeys];	/* X color names */
+} XPM_color;
 
-#define XPM_READ_C
-#include "xpmread.h"
+/*
+ * The real XPM user-level structure.
+ */
+typedef struct XPM_struct {
+    unsigned		width;			/* pixmap width */
+    unsigned		height;			/* pixmap height */
+    unsigned		ncolors;		/* number of colors */
+    unsigned		cpp;			/* chars-per-pixel. */
+    XPM_color		*colors;		/* color definitions */
+    unsigned char	*pixels;		/* as colors[] indices */
+} XPM;
+
+/*
+ * Structure to store internal data while reading a XPM file
+ * or processing a statically linked XPM structure.
+ */
+typedef struct XPM_read_struct {
+    char		*filename;
+    char		*data;
+    const char		**static_data;
+    unsigned		data_size;
+    char		*ptr;
+    char		*token;
+    XPM			*xpm;
+    char		**chars_ptr;	/* color representation pointers */
+    char		*chars_mem;	/* color representation memory */
+    const char		*error_str;	/* string giving error reason */
+} XPM_read;
+
 
 /* From colors.c */
 extern unsigned long (*RGB)(u_byte r, u_byte g, u_byte b);

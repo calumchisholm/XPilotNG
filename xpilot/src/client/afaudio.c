@@ -66,17 +66,8 @@
  *
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#ifndef _WINDOWS
-# include <sys/file.h>
-#endif
+#include "xpclient.h"
 #include <AF/AFlib.h>
-
-#include "version.h"
-#include "audio.h"
 
 char audio_version[] = VERSION;
 

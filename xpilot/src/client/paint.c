@@ -21,52 +21,9 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-#include <limits.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-# include <X11/Xos.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include "NT/winClient.h"
-# include "NT/winXXPilot.h"
-# include "netclient.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "bit.h"
-#include "types.h"
-#include "keys.h"
-#include "rules.h"
-#include "setup.h"
-#include "dbuff.h"
-#include "texture.h"
-#include "paint.h"
-#include "paintdata.h"
-#include "record.h"
-#include "xinit.h"
-#include "bitmaps.h"
-#include "portability.h"
-#include "client.h"
-#include "commonproto.h"
+#include "xpclient.h"
 
 char paint_version[] = VERSION;
-
-extern setup_t		*Setup;
-extern int		RadarHeight;
 
 /*
  * Globals.

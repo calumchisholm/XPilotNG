@@ -25,41 +25,7 @@ int simulating;
 
 #ifdef SIMULATING_ONLY
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <signal.h>
-#include <string.h>
-#include <errno.h>
-#include <math.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <X11/Xlib.h>
-#endif
-
-#ifdef  _WINDOWS
-# include "NT/winClient.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "setup.h"
-#include "error.h"
-#include "rules.h"
-#include "bit.h"
-#include "netclient.h"
-#include "paint.h"
-#include "xinit.h"
-#include "pack.h"
-#include "protoclient.h"
-#include "portability.h"
-#include "commonproto.h"
+#include "xpclient.h"
 
 DFLOAT findDir(DFLOAT x, DFLOAT y);
 

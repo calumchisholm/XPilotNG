@@ -21,40 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-
-#if !defined(_WINDOWS)
-# include <unistd.h>
-# include <sys/param.h>
-# include <sys/socket.h>
-# include <sys/ioctl.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <netdb.h>
-# if defined(SVR4) || defined(__svr4__)
-#  include <sys/sockio.h>
-# endif
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <net/if.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winClient.h"
-# include "NT/winNet.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "error.h"
-#include "socklib.h"
-#include "protoclient.h"
+#include "xpclient.h"
 
 char query_version[] = VERSION;
 

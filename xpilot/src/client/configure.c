@@ -53,44 +53,7 @@
  *    xpilot@xpilot.org.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <pwd.h>
-# include <X11/Xlib.h>
-# include <X11/Xos.h>
-# include <X11/Xutil.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include "NT/winClient.h"
-# include "NT/winXXPilot.h"
-# include "NT/winConfig.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "xinit.h"
-#include "bit.h"
-#include "keys.h"
-#include "netclient.h"
-#include "widget.h"
-#include "configure.h"
-#include "setup.h"
-#include "error.h"
-#include "protoclient.h"
-#include "portability.h"
-#include "commonproto.h"
-#include "bitmaps.h"
+#include "xpclient.h"
 
 char configure_version[] = VERSION;
 

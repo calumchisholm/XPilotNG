@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -24,6 +23,8 @@
 
 #ifndef ASTERSHAPE_H
 #define ASTERSHAPE_H
+
+#include "types.h"
 
 #define NUM_ASTEROID_SHAPES 2
 #define NUM_ASTEROID_POINTS 12

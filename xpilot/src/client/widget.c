@@ -21,36 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
-#include <string.h>
-#include <limits.h>
-
-#ifndef _WINDOWS
-# include <X11/Xlib.h>
-# include <X11/Xos.h>
-# include <X11/Xutil.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include "NT/winClient.h"
-# include "NT/winXXPilot.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "paintdata.h"
-#include "xinit.h"
-#include "bit.h"
-#include "error.h"
-#include "widget.h"
-#include "protoclient.h"
-#include "portability.h"
+#include "xpclient.h"
 
 char widget_version[] = VERSION;
 

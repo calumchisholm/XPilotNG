@@ -21,51 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xos.h>
-# include <X11/keysym.h>
-# include <X11/Xlib.h>
-# include <X11/Xresource.h>
-# ifdef	__apollo
-#  include <X11/ap_keysym.h>
-# endif
-# include <sys/param.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include "NT/winXXPilot.h"
-# include "NT/winConfig.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "pack.h"
-#include "bit.h"
-#include "keys.h"
-#include "netclient.h"
-#include "xinit.h"
-#include "error.h"
-#include "types.h"
-#include "protoclient.h"
-#include "audio.h"
-#include "commonproto.h"
-#include "portability.h"
-#include "talk.h"
-#include "default.h"
-#include "checknames.h"
-#include "clientrank.h"
+#include "xpclient.h"
 
 
 char default_version[] = VERSION;

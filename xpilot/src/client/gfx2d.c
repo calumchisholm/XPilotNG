@@ -21,29 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-#include <math.h>
-#include <limits.h>
-#include <ctype.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-#endif
-
-#ifdef _WINDOWS
-# include <io.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "gfx2d.h"
-#include "error.h"
-#include "const.h"
-#include "portability.h"
-#include "commonproto.h"
+#include "xpclient.h"
 
 
 char gfx2d_version[] = VERSION;

@@ -21,35 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include "NT/winXXPilot.h"
-# include "NT/winClient.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "keys.h"
-#include "paint.h"
-#include "xinit.h"
-#include "widget.h"
-#include "configure.h"
-#include "error.h"
-#include "netclient.h"
-#include "dbuff.h"
-#include "protoclient.h"
+#include "xpclient.h"
 
 char about_version[] = VERSION;
 

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -29,19 +28,8 @@
  * RPlay audio driver.
  */
 
-#include <stdlib.h>
-#include <string.h>
-
-#if !defined(_WINDOWS)
-# include <netdb.h>
-# include <sys/param.h>
-#endif
-
-#include "version.h"
-#include "rplay.h"
-#include "audio.h"
-#include "pack.h"
-#include "commonproto.h"
+#include "xpclient.h"
+#include <rplay.h>
 
 char audio_version[] = VERSION;
 

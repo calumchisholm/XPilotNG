@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -30,15 +29,7 @@
  * The problem is that sounds are lagging behind all the time.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-#endif
-
-#include "version.h"
+#include "xpclient.h"
 
 char audio_version[] = VERSION;
 
@@ -51,10 +42,6 @@ char audio_version[] = VERSION;
 typedef struct { unsigned short data_offset; } *handle_t;
 #define idl_base
 #include <audio/Alib.h>
-
-
-#include "audio.h"
-
 
 static Audio		*audio;
 static AGainDB		min_gain, max_gain;

@@ -21,35 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-
-#ifdef _WINDOWS
-# include "NT/winclient.h"
-# include "NT/winNet.h"
-# include "NT/winAudio.h"
-# include "NT/winX.h"
-# include "NT/winXThread.h"
-# include "NT/winXXPilot.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "client.h"
-#include "netclient.h"		/* Net_talk(char *str) */
-#include "setup.h"
-#include "bit.h"
-#include "error.h"
-#include "protoclient.h"
-#include "portability.h"
-#include "talk.h"
-#include "rules.h"		/* TEAM_PLAY, LIMITED_LIVES */
-#include "commonproto.h"
-
+#include "xpclient.h"
 
 char talkmacros_version[] = VERSION;
 

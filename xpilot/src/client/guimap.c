@@ -21,43 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-# include <X11/Xos.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-# include "NT/winBitmap.h"
-#endif
-
-#include "gfx2d.h"
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "bit.h"
-#include "types.h"
-#include "keys.h"
-#include "rules.h"
-#include "setup.h"
-#include "texture.h"
-#include "paint.h"
-#include "paintdata.h"
-#include "paintmacros.h"
-#include "record.h"
-#include "xinit.h"
-#include "protoclient.h"
-#include "bitmaps.h"
-#include "guimap.h"
-#include "guiobjects.h"
+#include "xpclient.h"
 
 
 char guimap_version[] = VERSION;

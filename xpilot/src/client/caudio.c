@@ -31,20 +31,7 @@
 
 #define _CAUDIO_C_
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "types.h"
-#include "audio.h"
-#include "client.h"
-#include "error.h"
-#include "commonproto.h"
+#include "xpclient.h"
 
 char caudio_version[] = VERSION;
 
@@ -179,7 +166,7 @@ int Handle_audio(int type, int volume)
 
 #else
 
-#include "version.h"
+#include "xpclient.h"
 
 char caudio_version[] = VERSION;
 

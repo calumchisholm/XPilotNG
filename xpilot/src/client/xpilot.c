@@ -21,44 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <sys/param.h>
-# include <netdb.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winNet.h"
-# include "NT/winClient.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "types.h"
-#include "pack.h"
-#include "bit.h"
-#include "error.h"
-#include "socklib.h"
-#include "net.h"
-#include "connectparam.h"
-#include "protoclient.h"
-#include "portability.h"
-#include "checknames.h"
-#include "commonproto.h"
-#include "clientrank.h"
-#include "client.h"
+#include "xpclient.h"
 
 char xpilot_version[] = VERSION;
 

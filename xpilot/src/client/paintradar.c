@@ -21,41 +21,9 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-# include <X11/Xos.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX_.h"
-# include "NT/winXXPilot.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "bit.h"
-#include "keys.h"
-#include "rules.h"
-#include "setup.h"
-#include "paint.h"
-#include "paintdata.h"
-#include "xinit.h"
-#include "portability.h"
+#include "xpclient.h"
 
 char paintradar_version[] = VERSION;
-
-extern DFLOAT		tbl_sin[];
-extern DFLOAT		tbl_cos[];
-extern setup_t		*Setup;
-extern int		RadarHeight;
 
 Window	radar;			/* Radar window */
 Pixmap	p_radar, s_radar;	/* Pixmaps for the radar (implements */

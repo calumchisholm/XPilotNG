@@ -21,48 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# ifdef _AIX
-#  include <sys/select.h>
-# endif
-# include <X11/Xlib.h>
-#endif
-
-#ifdef _WINDOWS
-# include "../common/NT/winX.h"
-# include "NT/winclient.h"
-# include "NT/winXXPilot.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "paint.h"
-#include "xinit.h"
-#include "list.h"
-#include "widget.h"
-#include "error.h"
-#include "dbuff.h"
-#include "socklib.h"
-#include "net.h"
-#include "pack.h"
-#include "connectparam.h"
-#include "protoclient.h"
-#include "portability.h"
-#include "socklib.h"
-#include "commonproto.h"
-
+#include "xpclient.h"
 
 char welcome_version[] = VERSION;
 

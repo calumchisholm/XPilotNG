@@ -21,67 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-
-#if !defined(_WINDOWS)
-# include <unistd.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <netdb.h>
-# include <sys/param.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <X11/Xlib.h>
-#endif
-
-#ifdef _WINDOWS
-# include <limits.h>
-# include "NT/winclient.h"
-# include "NT/winNet.h"
-# include "NT/winAudio.h"
-# include "NT/winX.h"
-# include "NT/winXThread.h"
-# include "NT/winXXPilot.h"
-#endif
-
-#ifdef VMS
-# include <socket.h>
-# include <in.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "net.h"
-#include "netclient.h"
-#include "setup.h"
-#include "packet.h"
-#include "bit.h"
-#include "paint.h"
-#include "paintdata.h"
-#include "xinit.h"
-#include "pack.h"
-#include "types.h"
-#include "socklib.h"
-#include "protoclient.h"
-#include "portability.h"
-#include "talk.h"
-#include "bitmaps.h"
-#include "commonproto.h"
-#include "ignore.h"
-
-#ifdef	SOUND
-# include "audio.h"
-#endif
+#include "xpclient.h"
 
 char netclient_version[] = VERSION;
 

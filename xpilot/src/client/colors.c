@@ -21,32 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#include <X11/Xutil.h>
-#else
-#include "NT/winX.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "types.h"
-#include "paint.h"
-#include "xinit.h"
-#include "error.h"
-#include "dbuff.h"
-#include "protoclient.h"
-#include "bitmaps.h"
+#include "xpclient.h"
 
 
 char colors_version[] = VERSION;

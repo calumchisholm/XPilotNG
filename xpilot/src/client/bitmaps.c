@@ -1,6 +1,5 @@
 /* 
- *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2003 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -22,27 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef _WINDOWS
-#include "../common/NT/winX.h"
-#include "NT/winbitmap.h"
-#include "NT/winClient.h"
-#endif
-#ifndef _WINDOWS
-#include <stdlib.h>
-#include <string.h>
-#include <X11/Xlib.h>
-#endif
-
-#include "bitmaps.h"
-#include "gfx2d.h"
-#include "xpmread.h"
-
-#include "version.h"
-#include "error.h"
-#include "const.h"
-#include "paint.h"
-#include "paintdata.h"
-#include "commonproto.h"
+#include "xpclient.h"
 
 char bitmaps_version[] = VERSION;
 
@@ -391,8 +370,6 @@ void Bitmap_paint(Drawable d, int img, int x, int y, int bmp)
 /*
  * Maybe move this part to a sperate file.
  */
-
-#include "paintdata.h"
 
 extern int		dispDepth;
 extern unsigned long	(*RGB)(unsigned char r, unsigned char g, unsigned char b);

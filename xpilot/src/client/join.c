@@ -21,41 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# ifdef _AIX
-#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
-# endif
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <netdb.h>
-#endif
-
-#ifdef _WINDOWS
-# include <winsock.h>
-# include "NT/winClient.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "client.h"
-#include "types.h"
-#include "netclient.h"
-#include "protoclient.h"
-#include "portability.h"
+#include "xpclient.h"
 
 char join_version[] = VERSION;
 

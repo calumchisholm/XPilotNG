@@ -21,23 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "draw.h"
-#include "bit.h"
-#include "dbuff.h"
-
-#if defined(MBX) || defined(DBE)
-/* Needed for windows ... */
-# include "paint.h"
-#endif
+#include "xpclient.h"
 
 
 char dbuff_version[] = VERSION;

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -22,8 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "gfx3d.h"
-#include "const.h"
+#include "xpclient.h"
 
 int Angle_add(int x, int dx)
 {
@@ -57,19 +55,19 @@ void Rotate_point3d(point3d *sv, point3d *v,
     zSin = tsin(angle_z);
     zCos = tcos(angle_z);
 
-/* rotate coord around z axis */
+    /* rotate coord around z axis */
     tempx = newx*zCos - newy*zSin;
     tempy = newx*zSin + newy*zCos;
     newx = tempx;
     newy = tempy;
 
-  /* then y axis */
+    /* then y axis */
     tempx=newx*yCos - newz*ySin;
     tempz=newx*ySin + newz*yCos;
     newx=tempx;
     newz=tempz;
 
-  /* then x axis */
+    /* then x axis */
     tempy=newy*xCos - newz*xSin;
     tempz=newy*xSin + newz*xCos;
 

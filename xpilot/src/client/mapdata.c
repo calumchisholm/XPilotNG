@@ -1,31 +1,29 @@
-#ifndef	_WINDOWS
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif
+/* 
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2003 by
+ *
+ *      Bjørn Stabell        <bjoern@xpilot.org>
+ *      Ken Ronny Schouten   <ken@xpilot.org>
+ *      Bert Gijsbers        <bert@xpilot.org>
+ *      Dick Balaska         <dick@xpilot.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "xpclient.h"
 
-#ifdef _WINDOWS
-#include <io.h>
-#include <direct.h>
-#define snprintf _snprintf
-#define printf Trace
-#define F_OK 0
-#define W_OK 2
-#define R_OK 4
-#define X_OK 0
-#define mkdir(A,B) _mkdir(A)
-#endif
-
-#include <zlib.h>
-
-#include "socklib.h"
-#include "const.h"
-#include "error.h"
-
+/* kps - you should be able to change this without a recompile */
 #define DATADIR ".xpilot_data"
 #define COPY_BUF_SIZE 8192
 

@@ -24,19 +24,7 @@
 #ifndef PAINT_H
 #define PAINT_H
 
-#include <time.h>
-
-/* includes begin */
-#ifndef TYPES_H
-/* need u_byte */
-#include "types.h"
-#endif
-#ifndef CLIENT_H
-/* need other_t */
-#include "client.h"
-#endif
-/* includes end */
-
+#include "xpclient.h"
 
 /* constants begin */
 #define MAX_COLORS		16	/* Max. switched colors ever */

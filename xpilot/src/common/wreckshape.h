@@ -25,6 +25,8 @@
 #ifndef WRECKSHAPE_H
 #define WRECKSHAPE_H
 
+#include "types.h"
+
 #define NUM_WRECKAGE_SHAPES 3
 #define NUM_WRECKAGE_POINTS 12
 

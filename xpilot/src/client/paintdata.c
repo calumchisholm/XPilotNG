@@ -21,37 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <math.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winX.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "bit.h"
-#include "client.h"
-#include "setup.h"
-#include "rules.h"
-#include "paint.h"
-#include "paintdata.h"
-#include "record.h"
-#include "xinit.h"
-#include "protoclient.h"
-#include "dbuff.h"
-#include "commonproto.h"
-#include "ignore.h"
+#include "xpclient.h"
 
 char paintdata_version[] = VERSION;
 

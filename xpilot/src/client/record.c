@@ -21,41 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-#include <time.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/X.h>
-# include <X11/Xlib.h>
-# include <X11/Xutil.h>
-# include <X11/Xos.h>
-#else
-# include <fcntl.h>
-#endif
-
-#ifdef _WINDOWS
-# include "winX.h"
-# include "winX_.h"
-# include <io.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "error.h"
-#include "const.h"
-#include "client.h"
-#include "paint.h"
-#include "setup.h"
-#include "record.h"
-#include "recordfmt.h"
-#include "xpmread.h"
-#include "commonproto.h"
-#include "xinit.h"
+#include "xpclient.h"
 
 char record_version[] = VERSION;
 

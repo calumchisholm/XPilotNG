@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *  	Bjørn Stabell		 <bjoern@xpilot.org>
@@ -21,12 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "client.h"
-#include "ignore.h"
-#include "commonproto.h"
+
+#include "xpclient.h"
 
 #define NUMCOMMANDS 8
 const char c_commands[16][NUMCOMMANDS] = {

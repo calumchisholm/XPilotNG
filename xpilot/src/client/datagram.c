@@ -21,31 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <sys/param.h>
-# include <netdb.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winNet.h"
-# include "NT/winClient.h"
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "error.h"
-#include "client.h"
-#include "socklib.h"
-#include "protoclient.h"
-#include "datagram.h"
-#include "portability.h"
+#include "xpclient.h"
 
 extern int	clientPortStart;	/* First UDP port for clients */
 extern int	clientPortEnd;		/* Last one (these are for firewalls) */

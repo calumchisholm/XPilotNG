@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -27,12 +26,13 @@
  */
 
 #ifdef SOUND
-#include <stdlib.h>
+
+#include "xpclient.h"
+
 #include <audio/audiolib.h>
 #include <audio/soundlib.h>
 
-#include "version.h"
-#include "audio.h"
+
 
 char audio_version[] = VERSION;
 
