@@ -1338,7 +1338,7 @@ void Paint_client_fps(void)
     x = draw_width - 20;
     /* Better make sure it's below the meters */
     y = draw_height - 9*(MAX(meterHeight,gamefont.h) + 6);
-;
+
     HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %.3f",clientFPS);
 }
 
@@ -1615,6 +1615,99 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
 
 static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 {
+    const int		BORDER = 3;
+    char		str[50];
+    int			vert_pos, horiz_pos, minx, miny, maxx, maxy;
+    int			i, maxWidth = -1,
+			rect_x, rect_y, rect_width = 0, rect_height = 0;
+    static int		vertSpacing = -1;
+    static fontbounds	fb;
+
+
+    /* Special itemtypes */
+    if (vertSpacing < 0)
+	vertSpacing = MAX(ITEM_SIZE, gamefont.h) + 1;
+    /* find the scaled location, then work in pixels */
+    vert_pos = hud_pos_y - hudSize+HUD_OFFSET + BORDER;
+    horiz_pos = hud_pos_x - hudSize+HUD_OFFSET - BORDER;
+    rect_width = 0;
+    rect_height = 0;
+    rect_x = horiz_pos;
+    rect_y = vert_pos;
+
+    for (i = 0; i < NUM_ITEMS; i++) {
+	int num = numItems[i];
+
+	if (i == ITEM_FUEL)
+	    continue;
+
+	if (instruments.showItems) {
+	    lastNumItems[i] = num;
+	    if (num <= 0)
+		num = -1;
+	} else {
+	    if (num != lastNumItems[i]) {
+		numItemsTime[i] = (int)(showItemsTime * (double)FPS);
+		lastNumItems[i] = num;
+	    }
+	    if (numItemsTime[i]-- <= 0) {
+		numItemsTime[i] = 0;
+		num = -1;
+	    }
+	}
+
+	if (num >= 0) {
+
+    	    Image_paint(IMG_ALL_ITEMS, horiz_pos - ITEM_SIZE, vert_pos, (u_byte)i, hudItemsColorRGBA | 0xffffff00);
+
+	    if (i == lose_item) {
+		if (lose_item_active != 0) {
+		    if (lose_item_active < 0)
+			lose_item_active++;
+			minx = horiz_pos-ITEM_SIZE-2;
+			maxx = horiz_pos;
+			miny = vert_pos-2;
+			maxy = vert_pos + ITEM_SIZE;
+			
+    	    	    	glBegin(GL_LINE_LOOP);
+    	    	    	    glVertex2i(minx , miny);
+    	    	    	    glVertex2i(maxx , miny);
+    	    	    	    glVertex2i(maxx , maxy);
+    	    	    	    glVertex2i(minx , maxy);
+    	    	    	glEnd();
+		}
+	    }
+
+	    /* Paint item count */
+	    sprintf(str, "%d", num);
+	    fb = printsize(&gamefont,str);
+
+	    maxWidth = MAX(maxWidth, fb.width + BORDER + ITEM_SIZE);
+	    
+	    HUDprint(&gamefont,hudItemsColorRGBA,RIGHT,UP,horiz_pos - ITEM_SIZE - BORDER
+	    	    ,draw_height - vert_pos - ITEM_SIZE,str);
+
+	    vert_pos += vertSpacing;
+
+	    if (vert_pos+vertSpacing
+		> hud_pos_y+hudSize-HUD_OFFSET-BORDER) {
+		rect_width += maxWidth + 2*BORDER;
+		rect_height = MAX(rect_height, vert_pos - rect_y);
+		horiz_pos -= maxWidth + 2*BORDER;
+		vert_pos = hud_pos_y - hudSize+HUD_OFFSET + BORDER;
+		maxWidth = -1;
+	    }
+	}
+    }
+    if (maxWidth != -1)
+	rect_width += maxWidth + BORDER;
+
+    if (rect_width > 0) {
+	if (rect_height == 0)
+	    rect_height = vert_pos - rect_y;
+	rect_x -= rect_width;
+    }
+
 }
 
 typedef char hud_text_t[50];
@@ -1829,11 +1922,7 @@ void Paint_HUD(void)
 		    	,hud_pos_x - hudSize+HUD_OFFSET-BORDER
 	    	    	,hud_pos_y - hudSize+HUD_OFFSET-BORDER
 	    	    	,true	);    
-	    } else
-    	    	HUDprint(&gamefont,hudColorRGBA,RIGHT,UP,
-		    	hud_pos_x - hudSize+HUD_OFFSET-BORDER,
-		    	hud_pos_y - hudSize+HUD_OFFSET-BORDER,
-		    	mods);
+    	}
 
 	if (autopilotLight) {
 	    tex_index=5;
@@ -2067,7 +2156,7 @@ static xp_option_t sdlgui_options[] = {
     COLOR(hudColorRGBA, "#ff000088", "the HUD"),
     COLOR(hudHLineColorRGBA, "#0000ff44", "horizontal HUD line"),
     COLOR(hudVLineColorRGBA, "#0000ff44", "vertical HUD line"),
-    COLOR(hudItemsColorRGBA, "#0000ff44", "hud items"),
+    COLOR(hudItemsColorRGBA, "#0000ff88", "hud items"),
     COLOR(hudRadarEnemyColorRGBA, "#ff000088", "enemy on HUD radar"),
     COLOR(hudRadarOtherColorRGBA, "#0000ff88", "friend on HUD radar"),
     COLOR(hudRadarObjectColorRGBA, "#00000000", "small object on HUD radar"),

@@ -2992,7 +2992,6 @@ GLWidget *Init_MainWidget( font_data *font )
     tmp->WIDGET     	= MAINWIDGET;
     tmp->bounds.w   	= draw_width;
     tmp->bounds.h   	= draw_height;
-    tmp->buttondata 	= tmp;
     tmp->SetBounds 	= SetBounds_MainWidget;
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->radar = Init_RadarWidget())) ) {
