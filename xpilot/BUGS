@@ -1,3 +1,14 @@
+Problem : Items that form in target areas of the map that has been destroyed,
+	  remain after the targets reform.
+	  A player can also get trapped within a target area if they reform on
+	  top of you.
+Found by: Ross Venable
+Solution:
+Fixed by:
+Files 
+affected:
+-----------------------------------------------------------------
+
 Problem : ngControls break server recordings,
 	  if ncContorls if off, they work.
 Found by: kps
