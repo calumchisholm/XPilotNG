@@ -44,6 +44,11 @@ extern int Arc_add(int color,
 		   int x, int y,
 		   int width, int height,
 		   int angle1, int angle2);
+extern int Arc_add_rgb(unsigned long color, /* Used if fullColor is on. */
+		       int fallback_color,  /* Used if fullColor is off. */
+		       int x, int y,
+		       int width, int height,
+		       int angle1, int angle2);
 extern void Segment_start(void);
 extern void Segment_end(void);
 extern int Segment_add(int color, int x_1, int y_1, int x_2, int y_2);

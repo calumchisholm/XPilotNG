@@ -32,6 +32,14 @@ static int		num_arc[MAX_COLORS], max_arc[MAX_COLORS];
 static XSegment		*seg_ptr[MAX_COLORS];
 static int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
 
+typedef struct {
+    unsigned long color;
+    XArc arc;
+} rgb_arc_t;
+
+static rgb_arc_t	*rgb_arc_ptr;
+static int		num_rgb_arc, max_rgb_arc;
+
 unsigned long	current_foreground;
 
 void Rectangle_start(void)
@@ -75,6 +83,7 @@ void Arc_start(void)
 
     for (i = 0; i < maxColors; i++)
 	num_arc[i] = 0;
+    num_rgb_arc = 0;
 }
 
 void Arc_end(void)
@@ -88,6 +97,19 @@ void Arc_end(void)
 	    RELEASE(arc_ptr[i], num_arc[i], max_arc[i]);
 	}
     }
+
+    /* fullcolor arcs */
+    for (i = 0; i < num_rgb_arc; i++) {
+	rgb_arc_t *p = &rgb_arc_ptr[i];
+
+	SET_FG(p->color);
+	rd.drawArc(dpy, drawPixmap, gameGC,
+		   p->arc.x, p->arc.y,
+		   p->arc.width, p->arc.height,
+		   p->arc.angle1, p->arc.angle2);
+    }
+    if (num_rgb_arc > 0)
+	RELEASE(rgb_arc_ptr, num_rgb_arc, max_rgb_arc);
 }
 
 int Arc_add(int color,
@@ -105,6 +127,30 @@ int Arc_add(int color,
     t.angle1 = angle1;
     t.angle2 = angle2;
     STORE(XArc, arc_ptr[color], num_arc[color], max_arc[color], t);
+    return 0;
+}
+
+int Arc_add_rgb(unsigned long color,
+		int fallback_color,
+		int x, int y,
+		int width, int height,
+		int angle1, int angle2)
+{
+    rgb_arc_t t;
+
+    /* hack */
+    if (!fullColor)
+	return Arc_add(fallback_color, x, y, width, height, angle1, angle2);
+
+    t.color = color;
+    t.arc.x = WINSCALE(x);
+    t.arc.y = WINSCALE(y);
+    t.arc.width = WINSCALE(width+x) - t.arc.x;
+    t.arc.height = WINSCALE(height+y) - t.arc.y;
+
+    t.arc.angle1 = angle1;
+    t.arc.angle2 = angle2;
+    STORE(rgb_arc_t, rgb_arc_ptr, num_rgb_arc, max_rgb_arc, t);
     return 0;
 }
 
