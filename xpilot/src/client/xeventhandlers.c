@@ -251,7 +251,7 @@ void ButtonPress_event(XEvent *event)
         if (pointerControl
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
-	    Pointer_button_pressed(event->xbutton.button);
+	    Pointer_button_pressed((int)event->xbutton.button);
 
 #ifndef _WINDOWS
 	else if (selectionAndHistory) {
@@ -315,7 +315,7 @@ int ButtonRelease_event(XEvent *event)
         if (pointerControl
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
-	    Pointer_button_released(event->xbutton.button);
+	    Pointer_button_released((int)event->xbutton.button);
 
 #ifndef _WINDOWS
 	else if (!selectionAndHistory)

@@ -34,21 +34,96 @@ char myClass[] = "XPilot";
 
 #ifdef OPTIONHACK
 
-char myshipshapefile[PATH_MAX + 1];
-
 static bool Set_nickName(xp_option_t *opt, const char *value)
 {
-    return false;
+    assert(value);
+
+    /*
+     * This is a hack. User name will be used as nickname,
+     * look in Set_userName().
+     */
+    if (strlen(value) == 0)
+	return true;
+
+    strlcpy(connectParam.nick_name, value, sizeof(connectParam.nick_name));
+    CAP_LETTER(connectParam.nick_name[0]);
+    if (connectParam.nick_name[0] < 'A' || connectParam.nick_name[0] > 'Z') {
+	warn("Your player name \"%s\" should start with an uppercase letter.",
+	     connectParam.nick_name);
+	exit(1);
+    }
+
+    if (Check_nick_name(connectParam.nick_name) == NAME_ERROR) {
+	xpprintf("Fixing nick from \"%s\" ", connectParam.nick_name);
+	Fix_nick_name(connectParam.nick_name);
+	xpprintf("to \"%s\".\n", connectParam.nick_name);
+    }
+
+    /* kps - remove nickname */
+    strlcpy(nickname, connectParam.nick_name, sizeof(nickname));
+
+    return true;
 }
 
 static bool Set_userName(xp_option_t *opt, const char *value)
 {
-    return false;
+    char *cp = getenv("XPILOTUSER");
+
+    assert(value);
+
+    if (cp)
+	strlcpy(connectParam.user_name, cp, sizeof(connectParam.user_name));
+    else
+	Get_login_name(connectParam.user_name, sizeof(connectParam.user_name));
+
+    if (strlen(value) > 0)
+	strlcpy(connectParam.user_name, value, sizeof(connectParam.user_name));
+
+    if (Check_user_name(connectParam.user_name) == NAME_ERROR) {
+	xpprintf("Fixing username from \"%s\" ", connectParam.user_name);
+	Fix_user_name(connectParam.user_name);
+	xpprintf("to \"%s\".\n", connectParam.user_name);
+    }
+
+    /* kps - remove username */
+    strlcpy(username, connectParam.user_name, sizeof(username));
+
+    /* hack - if nickname is not set, set nickname to username */
+    if (strlen(connectParam.nick_name) == 0)
+	Set_nickName(NULL, connectParam.user_name);
+
+    return true;
 }
 
 static bool Set_hostName(xp_option_t *opt, const char *value)
 {
-    return false;
+    char *cp = getenv("XPILOTHOST");
+
+    assert(value);
+
+    /* kps - remove hostname */
+    *hostname = 0;
+    if (cp)
+	strlcpy(hostname, cp, sizeof(hostname));
+    else
+        sock_get_local_hostname(hostname, sizeof hostname, 0);
+
+    if (Check_host_name(hostname) == NAME_ERROR)
+	Fix_host_name(hostname);
+
+    if (strlen(value) > 0)
+	strlcpy(connectParam.host_name, value, sizeof(connectParam.host_name));
+    else
+	strlcpy(connectParam.host_name, hostname,
+		sizeof(connectParam.host_name));
+
+    if (Check_host_name(connectParam.host_name) == NAME_ERROR) {
+	xpprintf("Fixing host from \"%s\" ", connectParam.host_name);
+	Fix_host_name(connectParam.host_name);
+	xpprintf("to \"%s\".\n", connectParam.host_name);
+    }
+
+    return true;
 }
 
 static char *Get_nickName(xp_option_t *opt)
@@ -66,7 +141,7 @@ static char *Get_userName(xp_option_t *opt)
 static char *Get_hostName(xp_option_t *opt)
 {
     (void)opt;
-    return hostname;
+    return connectParam.host_name;
 }
 
 static bool Set_texturePath(xp_option_t *opt, const char *value)
@@ -346,35 +421,20 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_nickName, Get_nickName,
-#if 0
-	connectParam.nick_name,
-	sizeof connectParam.nick_name,
-	NULL, NULL,
-#endif
 	"Set the nickname.\n"),
 
     XP_STRING_OPTION(
 	"user",
-	"newbie",
+	"",
 	NULL, 0,
 	Set_userName, Get_userName,
-#if 0
-	connectParam.user_name,
-	sizeof connectParam.user_name,
-	NULL, NULL,
-#endif
 	"Set the username.\n"),
 
     XP_STRING_OPTION(
 	"host",
-	"xpilot",
+	"",
 	NULL, 0,
 	Set_hostName, Get_hostName,
-#if 0
-	hostname,        /* netclient.c */
-	sizeof hostname,
-	NULL, NULL,
-#endif
 	"Set the hostname.\n"),
 
     XP_INT_OPTION(

@@ -92,6 +92,7 @@ int main(int argc, char *argv[])
     connectParam.contact_port = SERVER_PORT;
     connectParam.team = TEAM_NOT_SET;
 
+#ifndef OPTIONHACK
     *hostname = 0;
     cp = getenv("XPILOTHOST");
     if (cp)
@@ -103,7 +104,8 @@ int main(int argc, char *argv[])
     if (cp)
 	strlcpy(connectParam.user_name, cp, sizeof(connectParam.user_name));
     else
-	Get_login_name(connectParam.user_name, sizeof(connectParam.user_name) - 1);
+	Get_login_name(connectParam.user_name, sizeof(connectParam.user_name));
+#endif /* OPTIONHACK */
 
     IFWINDOWS( connectParam.disp_name[0] = '\0' );
 
