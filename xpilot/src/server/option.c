@@ -735,9 +735,11 @@ static void Option_parse_node(hash_node *np)
     if (value == NULL) {
 	/* no value has been set, so get the option default value. */
 	value = desc->defaultValue;
-	if (value == NULL)
+	if (value == NULL) {
 	    /* no value at all.  (options.mapData or options.serverHost.) */
+	    assert(desc->type == valString);
 	    return;
+	}
     }
 
     if (!desc->variable) {
