@@ -568,8 +568,8 @@ void Fire_ecm(player_t *pl);
 void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos);
 void Update_connector_force(world_t *world, ballobject_t *ball);
 void Fire_shot(player_t *pl, int type, int dir);
-void Fire_general_shot(world_t *world, player_t *pl, int team, bool cannon,
-		       clpos_t pos, int type, int dir,
+void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
+		       int team, clpos_t pos, int type, int dir,
 		       modifiers_t mods, int target_id);
 void Fire_normal_shots(player_t *pl);
 void Fire_main_shot(player_t *pl, int type, int dir);

@@ -370,7 +370,7 @@ void Fire_main_shot(player_t *pl, int type, int dir)
     pos.cx = pl->pos.cx + m_gun.cx;
     pos.cy = pl->pos.cy + m_gun.cy;
 
-    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+    Fire_general_shot(pl->world, pl, NULL, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -379,7 +379,7 @@ void Fire_shot(player_t *pl, int type, int dir)
     if (!Player_can_fire_shot(pl))
 	return;
 
-    Fire_general_shot(pl->world, pl, pl->team, 0, pl->pos, type,
+    Fire_general_shot(pl->world, pl, NULL, pl->team, pl->pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -394,7 +394,7 @@ void Fire_left_shot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + l_gun.cx;
     pos.cy = pl->pos.cy + l_gun.cy;
 
-    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+    Fire_general_shot(pl->world, pl, NULL, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -409,7 +409,7 @@ void Fire_right_shot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + r_gun.cx;
     pos.cy = pl->pos.cy + r_gun.cy;
 
-    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+    Fire_general_shot(pl->world, pl, NULL, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -424,7 +424,7 @@ void Fire_left_rshot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + l_rgun.cx;
     pos.cy = pl->pos.cy + l_rgun.cy;
 
-    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+    Fire_general_shot(pl->world, pl, NULL, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
@@ -439,12 +439,12 @@ void Fire_right_rshot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + r_rgun.cx;
     pos.cy = pl->pos.cy + r_rgun.cy;
 
-    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+    Fire_general_shot(pl->world, pl, NULL, pl->team, pos, type,
 		      dir, pl->mods, NO_ID);
 }
 
-void Fire_general_shot(world_t *world, player_t *pl, int team, bool cannon,
-		       clpos_t pos, int type, int dir,
+void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
+		       int team, clpos_t pos, int type, int dir,
 		       modifiers_t mods, int target_id)
 {
     int used, fuse = 0, lock = 0, status = GRAVITY, i, ldir, minis,
@@ -1327,7 +1327,7 @@ void Delete_shot(world_t *world, int ind)
 			       shot->pos, zero_vel, mods);
 	}
 	else if (addHeat)
-	    Fire_general_shot(world, NULL, TEAM_NOT_SET, 0, shot->pos,
+	    Fire_general_shot(world, NULL, NULL, TEAM_NOT_SET, shot->pos,
 			      OBJ_HEAT_SHOT, (int)(rfrac() * RES),
 			      mods, NO_ID);
     }
@@ -1548,7 +1548,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
     player_t *pl;
     int angle, theta;
     double range = 0.0, acc = SMART_SHOT_ACC;
-    double x_dif = 0.0, y_dif = 0.0, shot_speed;
+    double x_dif = 0.0, y_dif = 0.0, shot_speed, a;
 
     if (shot->type == OBJ_HEAT_SHOT) {
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;
@@ -1692,10 +1692,9 @@ void Update_missile(world_t *world, missileobject_t *shot)
 			pl->pos.cy - shot->pos.cy) / CLICK;
     x_dif += pl->vel.x * (range / shot_speed);
     y_dif += pl->vel.y * (range / shot_speed);
-    theta = (int)Wrap_cfindDir(pl->pos.cx
-			       + PIXEL_TO_CLICK(x_dif) - shot->pos.cx,
-			       pl->pos.cy
-			       + PIXEL_TO_CLICK(y_dif) - shot->pos.cy);
+    a = Wrap_cfindDir(pl->pos.cx + PIXEL_TO_CLICK(x_dif) - shot->pos.cx,
+		      pl->pos.cy + PIXEL_TO_CLICK(y_dif) - shot->pos.cy);
+    theta = MOD2((int) (a + 0.5), RES);
 
     {
 	double x, y, vx, vy;
@@ -1802,11 +1801,12 @@ void Update_missile(world_t *world, missileobject_t *shot)
 
 	if (angle >= 0) {
 	    i = angle&7;
-	    theta = (int)Wrap_findDir(
+	    a = Wrap_findDir(
 		(yi + sur[i].dy) * BLOCK_SZ - (CLICK_TO_PIXEL(shot->pos.cy)
 					       + 2 * shot->vel.y),
 		(xi + sur[i].dx) * BLOCK_SZ - (CLICK_TO_PIXEL(shot->pos.cx)
 					       - 2 * shot->vel.x));
+	    theta = MOD2((int) (a + 0.5), RES);
 #ifdef SHOT_EXTRA_SLOWDOWN
 	    if (!foundw && range > (SHOT_LOOK_AH-i) * BLOCK_SZ) {
 		if (shot_speed

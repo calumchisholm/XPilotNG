@@ -605,7 +605,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	switch ((int)(rfrac() * (1 + options.cannonSmartness))) {
 	default:
 	    if (options.allowSmartMissiles) {
-		Fire_general_shot(world, NULL, c->team, 1, c->pos,
+		Fire_general_shot(world, NULL, c, c->team, c->pos,
 				  OBJ_SMART_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_SMART_SHOT_SOUND);
 		played = true;
@@ -615,7 +615,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	case 1:
 	    if (options.allowHeatSeekers
 		&& BIT(pl->status, THRUSTING)) {
-		Fire_general_shot(world, NULL, c->team, 1, c->pos,
+		Fire_general_shot(world, NULL, c, c->team, c->pos,
 				  OBJ_HEAT_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_HEAT_SHOT_SOUND);
 		played = true;
@@ -623,7 +623,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    }
 	    /* FALLTHROUGH */
 	case 0:
-	    Fire_general_shot(world, NULL, c->team, 1, c->pos,
+	    Fire_general_shot(world, NULL, c, c->team, c->pos,
 			      OBJ_TORPEDO, dir, mods, NO_ID);
 	    sound_play_sensors(c->pos, FIRE_TORPEDO_SOUND);
 	    played = true;
@@ -719,7 +719,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			+ (4 - options.cannonSmartness)
 			* (-c->item[ITEM_WIDEANGLE] +  i);
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(world, NULL, c->team, 1, c->pos,
+	    Fire_general_shot(world, NULL, c, c->team, c->pos,
 			      OBJ_CANNON_SHOT, a_dir, mods, NO_ID);
 	}
 	/* I'm not sure cannons should use rearshots.
@@ -730,7 +730,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			+ (4 - options.cannonSmartness)
 			* (-((c->item[ITEM_REARSHOT] - 1) * 0.5) + i));
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(world, NULL, c->team, 1, c->pos,
+	    Fire_general_shot(world, NULL, c, c->team, c->pos,
 			      OBJ_CANNON_SHOT, a_dir, mods, NO_ID);
 	}
     }
