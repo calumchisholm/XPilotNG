@@ -1043,8 +1043,7 @@ void Xpilotrc_get_filename(char *path, size_t size)
 #else
 void Xpilotrc_get_filename(char *path, size_t size)
 {
-    /* kps - wouldn't xpilotrc.txt be a better name ? */
-    strlcpy(path, ".xpilotrc", size);
+    strlcpy(path, "xpilotrc.txt", size);
 }
 #endif /* _WINDOWS */
 
