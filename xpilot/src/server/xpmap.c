@@ -183,16 +183,24 @@ static void Xpmap_setup(world_t *world)
 	    World_set_block(world, blk, BASE);
 	}
 
-#if 0
-	for (i = 0; i < world->NumTreasures; i++) {
-	    treasure_t *t = Treasures(world, i);
+	/* find balltargets, only looks at middle point of block */
+	for (blk.by = 0; blk.by < world->y; blk.by++) {
+	    for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
+		int group;
+		group_t *gp;
 
-	    blk = Clpos_to_blkpos(t->pos);
-	    /*World_set_block(world, blk, TREASURE);*/
-	    warn("TREASURE %d: team %d", i, t->team);
-
+		pos = Block_get_center_clpos(blk);
+		group = is_inside(pos.cx, pos.cy, BALL_BIT, NULL);
+		if (group == NO_GROUP || group == 0)
+		    continue;
+		gp = groupptr_by_id(group);
+		if (gp == NULL)
+		    continue;
+		if (gp->type == TREASURE && gp->hitmask == NONBALL_BIT)
+		    World_set_block(world, blk, TREASURE);
+	    }
 	}
-#endif
+
     }
 }
 
