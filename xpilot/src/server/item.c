@@ -278,7 +278,7 @@ void Place_item(player *pl, int item)
 		vel.y += tsin(dir) * v;
 	    }
 	} else {
-	    vector gravity = World_gravity(pos);
+	    vector gravity = World_gravity(world, pos);
 
 	    vel.x -= Gravity * gravity.x;
 	    vel.y -= Gravity * gravity.y;

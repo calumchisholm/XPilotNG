@@ -35,8 +35,10 @@ static char msg[MSG_LEN];
 
 static inline void update_object_speed(object *obj)
 {
+    world_t *world = &World;
+
     if (BIT(obj->status, GRAVITY)) {
-	vector gravity = World_gravity(obj->pos);
+	vector gravity = World_gravity(world, obj->pos);
 
 	obj->vel.x += (obj->acc.x + gravity.x) * timeStep;
 	obj->vel.y += (obj->acc.y + gravity.y) * timeStep;
@@ -299,6 +301,7 @@ static void do_Autopilot (player *pl)
     const double	auto_pilot_settings_delta = 15.0 / FPS;
     const double	auto_pilot_turn_factor = 2.5;
     const double	auto_pilot_dead_velocity = 0.5;
+    world_t *world = &World;
 
     /*
      * If the last movement touched a wall then we shouldn't
@@ -324,7 +327,7 @@ static void do_Autopilot (player *pl)
     } else
 	afterburners = pl->item[ITEM_AFTERBURNER];
 
-    gravity = World_gravity(pl->pos);
+    gravity = World_gravity(world, pl->pos);
 
     /*
      * Due to rounding errors if the velocity is very small we were probably

@@ -765,7 +765,7 @@ int Handle_keyboard(player *pl)
 			minv = 5.0;
 			i = HOVERPAUSE;
 		    }
-		    minv += VECTOR_LENGTH(World_gravity(pl->pos));
+		    minv += VECTOR_LENGTH(World_gravity(world, pl->pos));
 		    if (pl->velocity > minv)
 			break;
 		}

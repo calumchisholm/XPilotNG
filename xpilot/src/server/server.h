@@ -381,19 +381,6 @@ extern bool		polygonMode;
 
 extern shape_t		ball_wire;
 
-#if 0
-#define Bases(ind)		(&World.bases[(ind)])
-#define Fuels(ind)		(&World.fuels[(ind)])
-#define Cannons(ind)		(&World.cannons[(ind)])
-#define Checks(ind)		(&World.checks[(ind)])
-#define Gravs(ind)		(&World.gravs[(ind)])
-#define Targets(ind)		(&World.targets[(ind)])
-#define Treasures(ind)		(&World.treasures[(ind)])
-#define Wormholes(ind)		(&World.wormholes[(ind)])
-#define AsteroidConcs(ind)	(&World.asteroidConcs[(ind)])
-#define ItemConcs(ind)		(&World.itemConcs[(ind)])
-#define Teams(team)		(&World.teams[(team)])
-#else
 static inline base_t *Bases(world_t *world, int ind)
 {
     return &world->bases[ind];
@@ -439,14 +426,12 @@ static inline team_t *Teams(world_t *world, int team)
     return &world->teams[team];
 }
 
-#endif
-
 /* determine if a block is one of SPACE_BLOCKS */
 #define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
 
-static inline vector World_gravity(clpos pos)
+static inline vector World_gravity(world_t *world, clpos pos)
 {
-    return World.gravity[CLICK_TO_BLOCK(pos.cx)][CLICK_TO_BLOCK(pos.cy)];
+    return world->gravity[CLICK_TO_BLOCK(pos.cx)][CLICK_TO_BLOCK(pos.cy)];
 }
 
 enum TeamPickType {

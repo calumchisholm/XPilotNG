@@ -420,8 +420,10 @@ static bool Really_empty_space(player *pl, int x, int y)
 
 static inline int decide_travel_dir(player *pl)
 {
+    world_t *world = &World;
+
     if (pl->velocity <= 0.2) {
-	vector grav = World_gravity(pl->pos);
+	vector grav = World_gravity(world, pl->pos);
 
 	return findDir(grav.x, grav.y);
     }

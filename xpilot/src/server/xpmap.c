@@ -850,7 +850,7 @@ void Xpmap_find_base_direction(world_t *world)
     for (i = 0; i < world->NumBases; i++) {
 	base_t *base = Bases(world, i);
 	int x, y, dir, att;
-	vector gravity = World_gravity(base->pos);
+	vector gravity = World_gravity(world, base->pos);
 
 	if (gravity.x == 0.0 && gravity.y == 0.0)
 	    /*
