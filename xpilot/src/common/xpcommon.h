@@ -54,12 +54,16 @@
 # endif
 # include <sys/file.h>
 # include <sys/param.h>
-# include <sys/ioctl.h>
 # include <sys/socket.h>
+# include <sys/ioctl.h>
 # include <netinet/in.h>
 # include <netinet/tcp.h>
 # include <arpa/inet.h>
 # include <netdb.h>
+# if defined(SVR4) || defined(__svr4__)
+#  include <sys/sockio.h>
+# endif
+# include <net/if.h>
 #endif
 
 #ifdef __sgi
@@ -81,6 +85,11 @@
 # include <resolv.h>
 #endif
 
+#ifdef VMS
+# include <socket.h>
+# include <in.h>
+#endif
+
 #if defined(_WINDOWS)
 # include "NT/winNet.h"
   /* need this for printf wrappers. */
@@ -93,10 +102,6 @@ extern char *showtime(void);
 #  include "../client/NT/winClient.h"
 # endif
 static void Win_show_error(char *errmsg);
-#endif
-
-#ifdef _WINDOWS
-# include <windows.h>
 # include <io.h>
 # include <process.h>
 # include "NT/winNet.h"
@@ -116,6 +121,7 @@ static void Win_show_error(char *errmsg);
 
 #include "version.h"
 #include "xpconfig.h"
+#include "astershape.h"
 #include "bit.h"
 #include "checknames.h"
 #include "commonproto.h"
@@ -129,7 +135,14 @@ static void Win_show_error(char *errmsg);
 #include "packet.h"
 #include "portability.h"
 #include "rules.h"
+#include "setup.h"
 #include "socklib.h"
+#include "types.h"
+#include "wreckshape.h"
+
+#ifdef	SOUND
+# include "audio.h"
+#endif
 
 #undef HAVE_STDARG
 #undef HAVE_VARARG

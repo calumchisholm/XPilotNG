@@ -24,41 +24,11 @@
 #ifndef XPCLIENT_H
 #define XPCLIENT_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-#include <limits.h>
-#include <math.h>
-#include <signal.h>
-#include <time.h>
+#include "xpcommon.h"
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <zlib.h>
 
 #ifndef _WINDOWS
-# include <unistd.h>
-# include <pwd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# ifdef _AIX
-#  include <sys/select.h>
-# endif
-# include <sys/file.h>
-# include <sys/param.h>
-# include <sys/socket.h>
-# include <sys/ioctl.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <netdb.h>
-# if defined(SVR4) || defined(__svr4__)
-#  include <sys/sockio.h>
-# endif
-# include <net/if.h>
 # include <X11/X.h>
 # include <X11/Xlib.h>
 # include <X11/Xos.h>
@@ -74,16 +44,13 @@
 
 #ifdef _WINDOWS
 # include "NT/winBitmap.h"
-# include "NT/winClient.h"
 # include "NT/winConfig.h"
-# include "NT/winNet.h"
 # include "NT/winAudio.h"
 # include "NT/winX.h"
 # include "NT/winX_.h"
 # include "NT/winXThread.h"
 # include "NT/winXKey.h"
 # include "NT/winXXPilot.h"
-# include <io.h>
 # include <direct.h>
 # define snprintf _snprintf
 # define printf Trace
@@ -94,33 +61,7 @@
 # define mkdir(A,B) _mkdir(A)
 #endif
 
-#ifdef VMS
-# include <socket.h>
-# include <in.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "astershape.h"
-#include "bit.h"
-#include "checknames.h"
-#include "commonproto.h"
-#include "const.h"
-#include "error.h"
 #include "keys.h"
-#include "list.h"
-#include "net.h"
-#include "pack.h"
-#include "packet.h"
-#include "portability.h"
-#include "rules.h"
-#include "setup.h"
-#include "socklib.h"
-#include "types.h"
-#include "wreckshape.h"
-#ifdef	SOUND
-# include "audio.h"
-#endif
 
 #include "bitmaps.h"
 #include "client.h"
