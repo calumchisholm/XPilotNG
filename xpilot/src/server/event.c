@@ -312,6 +312,99 @@ static void Player_repair(player_t *pl)
     }
 }
 
+/* Player pressed pause key. */
+static void Player_toggle_pause(player_t *pl)
+{
+    world_t *world = pl->world;
+    enum pausetype {
+	unknown, paused, hoverpaused
+    } pausetype = unknown;
+
+    if (Player_is_paused(pl))
+	pausetype = paused;
+    else if (Player_is_hoverpaused(pl))
+	pausetype = hoverpaused;
+    else {
+	clpos_t pos = pl->home_base->pos;
+	int dx = ABS(CENTER_XCLICK(pl->pos.cx - pos.cx));
+	int dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
+	double minv;
+
+	if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
+	    minv = 3.0;
+	    pausetype = paused;
+	} else {
+	    /*
+	     * Hover pause doesn't work within two squares of the
+	     * players home base, they would want the better pause.
+	     */
+	    if (dx < 2 * BLOCK_CLICKS && dy < 2 * BLOCK_CLICKS)
+		return;
+	    minv = 5.0;
+	    pausetype = hoverpaused;
+	}
+	minv += VECTOR_LENGTH(World_gravity(world, pl->pos));
+	if (pl->velocity > minv)
+	    return;
+    }
+
+    switch (pausetype) {
+    case paused:
+	if (Player_is_hoverpaused(pl))
+	    break;
+
+	if (Player_uses_autopilot(pl))
+	    Autopilot(pl, false);
+
+	Pause_player(pl, !Player_is_paused(pl));
+	break;
+
+    case hoverpaused:
+	if (Player_is_paused(pl))
+	    break;
+
+	if (!Player_is_hoverpaused(pl)) {
+	    /*
+	     * Turn hover pause on, together with shields.
+	     */
+	    pl->pause_count = 5 * 12;
+	    Player_self_destruct(pl, false);
+	    SET_BIT(pl->pl_status, HOVERPAUSE);
+
+	    if (Player_uses_emergency_thrust(pl))
+		Emergency_thrust(pl, false);
+
+	    if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
+		Emergency_shield(pl, false);
+
+	    if (!Player_uses_autopilot(pl))
+		Autopilot(pl, true);
+
+	    if (Player_is_phasing(pl))
+		Phasing(pl, false);
+
+	    /*
+	     * Don't allow firing while paused. Similar
+	     * reasons exist for refueling, connector and
+	     * tractor beams.  Other items are allowed (esp.
+	     * cloaking).
+	     */
+	    Player_used_kill(pl);
+	    if (BIT(pl->have, HAS_SHIELD))
+		SET_BIT(pl->used, HAS_SHIELD);
+	} else if (pl->pause_count <= 0) {
+	    Autopilot(pl, false);
+	    CLR_BIT(pl->pl_status, HOVERPAUSE);
+	    if (!BIT(pl->have, HAS_SHIELD))
+		CLR_BIT(pl->used, HAS_SHIELD);
+	}
+	break;
+    default:
+	warn("Player_toggle_pause: BUG: unknown pause type.");
+	break;
+    }
+}
+
 #define FOOBARSWAP(a, b)	    {double tmp = a; a = b; b = tmp;}
 
 static void Player_swap_settings(player_t *pl)
@@ -459,9 +552,6 @@ int Handle_keyboard(player_t *pl)
     int i, key;
     bool pressed;
     world_t *world = pl->world;
-    enum pausetype {
-	unknown, paused, hoverpaused
-    } pausetype = unknown;
 
     assert(!Player_is_killed(pl));
 
@@ -849,101 +939,7 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_PAUSE:
-		if (Player_is_paused(pl))
-		    pausetype = paused;
-		else if (Player_is_hoverpaused(pl))
-		    pausetype = hoverpaused;
-		else {
-		    clpos_t pos = pl->home_base->pos;
-		    int dx = ABS(CENTER_XCLICK(pl->pos.cx - pos.cx));
-		    int dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
-		    double minv;
-
-		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
-			minv = 3.0;
-			pausetype = paused;
-		    } else {
-			/*
-			 * Hover pause doesn't work within two squares of the
-			 * players home base, they would want the better pause.
-			 */
-			if (dx < 2 * BLOCK_CLICKS && dy < 2 * BLOCK_CLICKS)
-			    break;
-			minv = 5.0;
-			pausetype = hoverpaused;
-		    }
-		    minv += VECTOR_LENGTH(World_gravity(world, pl->pos));
-		    if (pl->velocity > minv)
-			break;
-		}
-
-		switch (pausetype) {
-		case paused:
-		    if (Player_is_hoverpaused(pl))
-			break;
-
-		    if (Player_uses_autopilot(pl))
-			Autopilot(pl, false);
-
-		    Pause_player(pl, !Player_is_paused(pl));
-
-		    if (Player_is_alive(pl)) {
-			/*
-			 * kps - this never happens with current code because
-			 * the player is never put to alive state after being
-			 * unpaused.
-			 */
-			assert(0);
-			BITV_SET(pl->last_keyv, key);
-			BITV_SET(pl->prev_keyv, key);
-			return 1;
-		    }
-		    break;
-
-		case hoverpaused:
-		    if (Player_is_paused(pl))
-			break;
-
-		    if (!Player_is_hoverpaused(pl)) {
-			/*
-			 * Turn hover pause on, together with shields.
-			 */
-			pl->pause_count = 5 * 12;
-			Player_self_destruct(pl, false);
-			SET_BIT(pl->pl_status, HOVERPAUSE);
-
-			if (Player_uses_emergency_thrust(pl))
-			    Emergency_thrust(pl, false);
-
-			if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
-			    Emergency_shield(pl, false);
-
-			if (!Player_uses_autopilot(pl))
-			    Autopilot(pl, true);
-
-			if (Player_is_phasing(pl))
-			    Phasing(pl, false);
-
-			/*
-			 * Don't allow firing while paused. Similar
-			 * reasons exist for refueling, connector and
-			 * tractor beams.  Other items are allowed (esp.
-			 * cloaking).
-			 */
-			Player_used_kill(pl);
-			if (BIT(pl->have, HAS_SHIELD))
-			    SET_BIT(pl->used, HAS_SHIELD);
-		    } else if (pl->pause_count <= 0) {
-			Autopilot(pl, false);
-			CLR_BIT(pl->pl_status, HOVERPAUSE);
-			if (!BIT(pl->have, HAS_SHIELD))
-			    CLR_BIT(pl->used, HAS_SHIELD);
-		    }
-		    break;
-		default:
-		    warn("Handle_keyboard: unknown pause type.");
-		    break;
-		}
+		Player_toggle_pause(pl);
 		break;
 
 	    case KEY_SWAP_SETTINGS:
