@@ -151,6 +151,12 @@ static inline const char *Option_get_name(xp_option_t *opt)
     return opt->name;
 }
 
+static inline xp_option_type_t Option_get_type(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->type;
+}
+
 static inline keys_t Option_get_key(xp_option_t *opt)
 {
     assert(opt);
