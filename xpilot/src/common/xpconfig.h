@@ -211,6 +211,7 @@ this makes for harder to read code (and was tiring with each patch)
 #pragma warning (disable : 4244 4761)
 #endif
 
+void Conf_print(void);
 char *Conf_libdir(void);
 char *Conf_defaults_file_name(void);
 char *Conf_password_file_name(void);

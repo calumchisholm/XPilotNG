@@ -86,6 +86,8 @@ int main(int argc, char **argv)
 	      "for details see the\n"
 	   "  provided COPYING file.\n\n");
 
+    Conf_print();
+
     init_error(argv[0]);
     Check_server_versions();
 
