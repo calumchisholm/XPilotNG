@@ -279,7 +279,6 @@ void Gui_paint_fuel(int x, int y, int fuel)
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     int color = 0;
-    int i;
     const int BORDER = 4;		/* in pixels */
     int size = 0, size2 = 0;
     other_t *other;
@@ -287,16 +286,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     char info[6];
     homebase_t *base = NULL;
 
-    if (id != -1) {
-	for (i = 0; i < num_bases; i++) {
-	    if (bases[i].id == id) {
-		base = &bases[i];
-		break;
-	    }
-	}
-    }
-
     other = Other_by_id(id);
+    base = Homebase_by_id(id);
 
     if (baseNameColor) {
 	color = Life_color(other);

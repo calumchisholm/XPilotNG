@@ -900,9 +900,23 @@ static int Map_cleanup(void)
     return 0;
 }
 
+
+homebase_t *Homebase_by_id(int id)
+{
+    int i;
+
+    if (id != -1) {
+	for (i = 0; i < num_bases; i++) {
+	    if (bases[i].id == id)
+		return &bases[i];
+	}
+    }
+    return NULL;
+}
+
 other_t *Other_by_id(int id)
 {
-    int			i;
+    int i;
 
     if (id != -1) {
 	for (i = 0; i < num_others; i++) {

@@ -140,7 +140,7 @@ typedef struct {
     uint16_t	team;		/* Team this base belongs to */
     irec	bounds;		/* Location on map */
     int		type;		/* orientation */
-    int		deathtime;	/* For base warning */
+    long	deathtime;	/* For base warning */
 } homebase_t;
 
 typedef struct {
@@ -388,6 +388,7 @@ int Base_info_by_pos(int x, int y, int *id, int *team);
 int Handle_base(int id, int ind);
 int Check_pos_by_index(int ind, int *xp, int *yp);
 int Check_index_by_pos(int x, int y);
+homebase_t *Homebase_by_id(int id);
 other_t *Other_by_id(int id);
 other_t *Other_by_name(char *name, bool show_error_msg);
 shipshape_t *Ship_by_id(int id);
