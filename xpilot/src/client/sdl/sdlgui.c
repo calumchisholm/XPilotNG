@@ -1768,9 +1768,10 @@ bool newcode = true;
 
 void Paint_messages(void)
 {
-    int j,i,*msg_color;;
+    int j,i,*msg_color;
     const int BORDER = 10;
-    GLWidget *tmp = NULL,*tmp2 = NULL;
+    GLWidget *tmp = NULL;
+    GLWidget *tmp2 = NULL;
     LabelWidget *wi;
     static old_maxMessages = 0;
     static message_t **msgs[2];
