@@ -3194,7 +3194,7 @@ static void TestInput(struct xprc *rc)
 {
     int			fd = fileno(rc->fp);
     struct stat		st;
-    unsigned char	ch0, ch1;
+    unsigned char	ch0, ch1, ch2;
     char		buf[1024];
 
     rc->seekable = False;
@@ -3206,6 +3206,7 @@ static void TestInput(struct xprc *rc)
     if (rc->seekable) {
 	ch0 = getc(rc->fp);
 	ch1 = getc(rc->fp);
+	ch2 = getc(rc->fp);
 	rewind(rc->fp);
 	if (ch0 == 0x1F && ch1 == 0x9D) {
 	    if (verbose) {
@@ -3240,6 +3241,25 @@ static void TestInput(struct xprc *rc)
 	    }
 	    if ((rc->fp = popen(buf, "r")) == NULL) {
 		perror("Unable to start gzip");
+		exit(1);
+	    }
+	    rc->seekable = 0;
+	}
+	if (ch0 == 'B' && ch1 == 'Z' && ch2 == 'h') {
+	    if (verbose) {
+		fprintf(stderr,
+			"%s: \"%s\" is in bzip2 format, starting bzip2...\n",
+			*Argv, rc->filename);
+	    }
+	    lseek(fd, 0L, SEEK_SET);
+	    if (rc->fp == stdin)
+		sprintf(buf, "bzip2 -d");
+	    else {
+		fclose(rc->fp);
+		sprintf(buf, "bzip2 -d < %s", rc->filename);
+	    }
+	    if ((rc->fp = popen(buf, "r")) == NULL) {
+		perror("Unable to start bzip2");
 		exit(1);
 	    }
 	    rc->seekable = 0;
