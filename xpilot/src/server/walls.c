@@ -477,12 +477,6 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 
 void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 {
-    player *pl = NULL;
-
-    /* kps hack - is this ok ? */
-    if (obj->id != NO_ID)
-	pl = Players[GetInd[obj->id]];
-
     switch (crashtype) {
 
     case CrashWormHole:
@@ -518,6 +512,11 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 	if (BIT(obj->type, OBJ_ITEM)) {
 	    Cannon_add_item(item_id, obj->info, obj->count);
 	} else {
+	    player *pl = NULL;
+
+	    if (obj->id != NO_ID)
+		pl = Players[GetInd[obj->id]];
+
 	    if (!BIT(World.cannon[item_id].used, HAS_EMERGENCY_SHIELD)) {
 		if (World.cannon[item_id].item[ITEM_ARMOR] > 0)
 		    World.cannon[item_id].item[ITEM_ARMOR]--;
@@ -600,7 +599,12 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 	    sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_CANNON_SOUND);
 	}
 	if (!BIT(World.cannon[item_id].used, HAS_EMERGENCY_SHIELD)) {
-	    Cannon_dies(item_id, pl);
+	    /* player gets points if the cannon is rammed with shields up */
+	    if (BIT(pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
+		== (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+		Cannon_dies(item_id, pl);
+	    else
+		Cannon_dies(item_id, NULL);
 	}
 	break;
 
