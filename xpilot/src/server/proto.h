@@ -460,10 +460,10 @@ const char *Object_typename(object *obj);
 /*
  * Prototypes for polygon.c
  */
-void P_edgestyle(char *id, int width, int color, int style);
-void P_polystyle(char *id, int color, int texture_id, int defedge_id,
+void P_edgestyle(const char *id, int width, int color, int style);
+void P_polystyle(const char *id, int color, int texture_id, int defedge_id,
 		 int flags);
-void P_bmpstyle(char *id, char *filename, int flags);
+void P_bmpstyle(const char *id, const char *filename, int flags);
 void P_start_polygon(clpos pos, int style);
 void P_offset(clpos offset, int edgestyle);
 void P_vertex(clpos pos, int edgestyle);

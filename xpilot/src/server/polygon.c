@@ -83,7 +83,7 @@ static int Create_group(int type, int team, int hitmask,
     return current_group;    
 }
 
-void P_edgestyle(char *id, int width, int color, int style)
+void P_edgestyle(const char *id, int width, int color, int style)
 {
     if (num_estyles > 255) {
 	warn("Too many edgestyles");
@@ -97,7 +97,7 @@ void P_edgestyle(char *id, int width, int color, int style)
     num_estyles++;
 }
 
-void P_polystyle(char *id, int color, int texture_id, int defedge_id,
+void P_polystyle(const char *id, int color, int texture_id, int defedge_id,
 		 int flags)
 {
     if (num_pstyles > 255) {
@@ -120,7 +120,7 @@ void P_polystyle(char *id, int color, int texture_id, int defedge_id,
 }
 
 
-void P_bmpstyle(char *id, char *filename, int flags)
+void P_bmpstyle(const char *id, const char *filename, int flags)
 {
     if (num_bstyles > 255) {
 	warn("Too many bitmap styles");
