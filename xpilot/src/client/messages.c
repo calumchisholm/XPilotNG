@@ -952,8 +952,9 @@ void Add_roundend_messages(other_t **order)
 	    }
 	    s += sprintf(s, "%s", hackbuf2);
 	} else {
-	    sprintf(hackbuf2, "%s: %d ", other->name,
-		    (int) rint(other->score));
+	    int sc = rint(other->score);
+
+	    sprintf(hackbuf2, "%s: %d ", other->name, sc);
 	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
 		Add_message(hackbuf);
 		s = hackbuf;
