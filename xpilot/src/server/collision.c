@@ -538,11 +538,11 @@ static void PlayerObjectCollision(player_t *pl)
     if (!Player_is_playing(pl))
 	return;
 
-    if (ObjCount >= options.cellGetObjectsThreshold)
+    if (NumObjs >= options.cellGetObjectsThreshold)
 	Cell_get_objects(world, pl->pos, 4, 500, &obj_list, &obj_count);
     else {
 	obj_list = Obj;
-	obj_count = ObjCount;
+	obj_count = NumObjs;
     }
    
     for (j = 0; j < obj_count; j++) {
@@ -1266,12 +1266,12 @@ static void AsteroidCollision(world_t *world)
 
 	assert(World_contains_clpos(world, ast->pos));
 
-	if (ObjCount >= options.cellGetObjectsThreshold)
+	if (NumObjs >= options.cellGetObjectsThreshold)
 	    Cell_get_objects(world, ast->pos, ast->pl_radius / BLOCK_SZ + 1,
 			     300, &obj_list, &obj_count);
 	else {
 	    obj_list = Obj;
-	    obj_count = ObjCount;
+	    obj_count = NumObjs;
 	}
 
 	for (j = 0; j < obj_count; j++) {
@@ -1443,11 +1443,11 @@ static void BallCollision(world_t *world)
 	if (!options.ballCollisions)
 	    continue;
 
-	if (ObjCount >= options.cellGetObjectsThreshold)
+	if (NumObjs >= options.cellGetObjectsThreshold)
 	    Cell_get_objects(world, ball->pos, 4, 300, &obj_list, &obj_count);
 	else {
 	    obj_list = Obj;
-	    obj_count = ObjCount;
+	    obj_count = NumObjs;
 	}
 	    
 	for (j = 0; j < obj_count; j++) {
@@ -1532,11 +1532,11 @@ static void MineCollision(world_t *world)
 	    mine->life <= 0.0)		/* dying mine */
 	    continue;
 
-	if (ObjCount >= options.cellGetObjectsThreshold)
+	if (NumObjs >= options.cellGetObjectsThreshold)
 	    Cell_get_objects(world, mine->pos, 4, 300, &obj_list, &obj_count);
 	else {
 	    obj_list = Obj;
-	    obj_count = ObjCount;
+	    obj_count = NumObjs;
 	}
 
 	for (j = 0; j < obj_count; j++) {
