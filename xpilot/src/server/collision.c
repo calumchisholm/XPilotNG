@@ -784,12 +784,12 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 
     switch (item_index) {
     case ITEM_WIDEANGLE:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, WIDEANGLE_SHOT_PICKUP_SOUND);
 	break;
     case ITEM_ECM:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, ECM_PICKUP_SOUND);
 	break;
@@ -801,61 +801,61 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 	sound_play_sensors(pl->pos, ARMOR_PICKUP_SOUND);
 	break;
     case ITEM_TRANSPORTER:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, TRANSPORTER_PICKUP_SOUND);
 	break;
     case ITEM_MIRROR:
-	pl->item[ITEM_MIRROR] += (int)item->item_count;
+	pl->item[ITEM_MIRROR] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_MIRROR);
 	sound_play_sensors(pl->pos, MIRROR_PICKUP_SOUND);
 	break;
     case ITEM_DEFLECTOR:
-	pl->item[ITEM_DEFLECTOR] += (int)item->item_count;
+	pl->item[ITEM_DEFLECTOR] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_DEFLECTOR);
 	sound_play_sensors(pl->pos, DEFLECTOR_PICKUP_SOUND);
 	break;
     case ITEM_HYPERJUMP:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, HYPERJUMP_PICKUP_SOUND);
 	break;
     case ITEM_PHASING:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_PHASING_DEVICE);
 	sound_play_sensors(pl->pos, PHASING_DEVICE_PICKUP_SOUND);
 	break;
     case ITEM_SENSOR:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	pl->updateVisibility = true;
 	sound_play_sensors(pl->pos, SENSOR_PACK_PICKUP_SOUND);
 	break;
     case ITEM_AFTERBURNER:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_AFTERBURNER);
 	sound_play_sensors(pl->pos, AFTERBURNER_PICKUP_SOUND);
 	break;
     case ITEM_REARSHOT:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, BACK_SHOT_PICKUP_SOUND);
 	break;
     case ITEM_MISSILE:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, ROCKET_PACK_PICKUP_SOUND);
 	break;
     case ITEM_CLOAK:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
@@ -867,17 +867,17 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 	sound_play_sensors(pl->pos, ENERGY_PACK_PICKUP_SOUND);
 	break;
     case ITEM_MINE:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, MINE_PACK_PICKUP_SOUND);
 	break;
     case ITEM_LASER:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	sound_play_sensors(pl->pos, LASER_PICKUP_SOUND);
 	break;
     case ITEM_EMERGENCY_THRUST:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_EMERGENCY_THRUST);
@@ -885,7 +885,7 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 	break;
     case ITEM_EMERGENCY_SHIELD:
 	old_have = pl->have;
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_EMERGENCY_SHIELD);
@@ -901,14 +901,14 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 	    Emergency_shield(pl, true);
 	break;
     case ITEM_TRACTOR_BEAM:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_TRACTOR_BEAM);
 	sound_play_sensors(pl->pos, TRACTOR_BEAM_PICKUP_SOUND);
 	break;
     case ITEM_AUTOPILOT:
-	pl->item[item_index] += (int)item->item_count;
+	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_AUTOPILOT);
