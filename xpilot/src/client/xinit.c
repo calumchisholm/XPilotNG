@@ -454,8 +454,8 @@ int Init_top(void)
     COLORCHECK(hudHLineColor, 2);
     COLORCHECK(hudVLineColor, 0);
     COLORCHECK(hudItemsColor, 2);
-    COLORCHECK(hudLockColor, 2);
-    COLORCHECK(hudRadarEnemyColor, 3);
+    COLORCHECK(hudLockColor, 0);
+    COLORCHECK(hudRadarOtherColor, 1);
     COLORCHECK(hudRadarOtherColor, 2);
     COLORCHECK(visibilityBorderColor, 2);
     COLORCHECK(fuelGaugeColor, 2);

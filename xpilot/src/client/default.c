@@ -911,7 +911,7 @@ option options[] = {
     {
 	"hudColor",
 	NULL,
-	"4",
+	"2",
 	KEY_DUMMY,
 	"Which color number to use for drawing the HUD.\n"
     },
@@ -941,7 +941,7 @@ option options[] = {
     {
 	"hudRadarEnemyColor",
 	NULL,
-	"3",
+	"1",
 	KEY_DUMMY,
 	"Which color number to use for drawing hudradar dots\n"
 	"that represent enemy ships.\n"
@@ -957,14 +957,14 @@ option options[] = {
     {
 	"hudRadarDotSize",
 	NULL,
-	"6",
+	"8",
 	KEY_DUMMY,
 	"Which size to use for drawing the hudradar dots.\n"
     },
     {
 	"hudRadarScale",
 	NULL,
-	"2.0",
+	"1.5",
 	KEY_DUMMY,
 	"The relative size of the hudradar.\n"
     },
