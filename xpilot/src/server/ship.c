@@ -90,9 +90,9 @@ void Record_shove(player *pl, player *pusher, long time)
 {
     shove_t		*shove = &pl->shove_record[pl->shove_next];
 
-    if (++pl->shove_next == MAX_RECORDED_SHOVES) {
+    if (++pl->shove_next == MAX_RECORDED_SHOVES)
 	pl->shove_next = 0;
-    }
+
     shove->pusher_id = pusher->id;
     shove->time = time;
 }
@@ -114,9 +114,8 @@ void Delta_mv(object *ship, object *obj)
 	&& BIT(obj->status, COLLISIONSHOVE)) {
 	player *pl = (player *)ship;
 	player *pusher = Player_by_id(obj->id);
-	if (pusher != pl) {
+	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
-	}
     }
     ship->vel.x = vx;
     ship->vel.y = vy;
@@ -151,9 +150,8 @@ void Delta_mv_elastic(object *obj1, object *obj2)
 	&& BIT(obj2->status, COLLISIONSHOVE)) {
 	player *pl = (player *)obj1;
 	player *pusher = Player_by_id(obj2->id);
-	if (pusher != pl) {
+	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
-	}
     }
 }
 
@@ -187,17 +185,15 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
     if (obj1->type == OBJ_PLAYER && obj2->id != NO_ID) {
 	player *pl = (player *)obj1;
 	player *pusher = Player_by_id(obj2->id);
-	if (pusher != pl) {
+	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
-	}
     }
 
     if (obj2->type == OBJ_PLAYER && obj1->id != NO_ID) {
 	player *pl = (player *)obj2;
 	player *pusher = Player_by_id(obj1->id);
-	if (pusher != pl) {
+	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
-	}
     }
 
     obj1->vel.x += dvx1;
@@ -346,9 +342,9 @@ void Tank_handle_detach(player *pl)
 			    ? Parse_shape_str(tankShipShape)
 			    : NULL);
     /* Released tanks don't have tanks... */
-    while (dummy->fuel.num_tanks > 0) {
+    while (dummy->fuel.num_tanks > 0)
 	Player_remove_tank(dummy, dummy->fuel.num_tanks);
-    }
+
     SET_BIT(dummy->type_ext, OBJ_EXT_TANK);
     Player_position_init_clicks(dummy, pl->pos.cx, pl->pos.cy);
     dummy->vel		= pl->vel;
@@ -403,9 +399,8 @@ void Tank_handle_detach(player *pl)
     updateScores = true;
 
     /* Possibly join alliance. */
-    if (pl->alliance != ALLIANCE_NOT_SET) {
+    if (pl->alliance != ALLIANCE_NOT_SET)
 	Player_join_alliance(dummy, pl);
-    }
 
     sound_play_sensors(pl->pos.cx, pl->pos.cy, TANK_DETACH_SOUND);
 
@@ -470,9 +465,8 @@ void Make_wreckage(
     modifiers		mods;
     DFLOAT		mass, sum_mass = 0.0;
 
-    if (!useWreckage) {
+    if (!useWreckage)
 	return;
-    }
 
     cx = WRAP_XCLICK(cx);
     cy = WRAP_YCLICK(cy);
@@ -485,9 +479,8 @@ void Make_wreckage(
     if (max_speed < min_speed)
 	max_speed = min_speed;
 
-    if (max_wreckage > MAX_TOTAL_SHOTS - NumObjs) {
+    if (max_wreckage > MAX_TOTAL_SHOTS - NumObjs)
 	max_wreckage = MAX_TOTAL_SHOTS - NumObjs;
-    }
 
     CLEAR_MODS(mods);
 
@@ -498,18 +491,16 @@ void Make_wreckage(
 
 	/* Calculate mass */
 	mass = min_mass + rfrac() * (max_mass - min_mass);
-	if ( sum_mass + mass > total_mass ) {
+	if ( sum_mass + mass > total_mass )
 	    mass = total_mass - sum_mass;
-	}
-	if (mass < min_mass) {
+
+	if (mass < min_mass)
 	    /* not enough mass available. */
 	    break;
-	}
 
 	/* Allocate object */
-	if ((wreckage = WIRE_PTR(Object_allocate())) == NULL) {
+	if ((wreckage = WIRE_PTR(Object_allocate())) == NULL)
 	    break;
-	}
 
 	wreckage->color = color;
 	wreckage->id = id;
@@ -520,7 +511,8 @@ void Make_wreckage(
 	Object_position_init_clicks(OBJ_PTR(wreckage), cx, cy);
 
 	/* Direction */
-	dir = MOD2(min_dir + (int)(rfrac() * MOD2(max_dir - min_dir, RES)), RES);
+	dir = MOD2(min_dir + (int)(rfrac() * MOD2(max_dir - min_dir, RES)),
+		   RES);
 
 	/* Velocity and acceleration */
 	speed = min_speed + rfrac() * (max_speed - min_speed);
@@ -549,13 +541,14 @@ void Make_wreckage(
 	wreckage->info = (int)(rfrac() * 256);
 
 	radius = wreckage->size * 16 / 256;
-	if (radius < 8) radius = 8;
+	if (radius < 8)
+	    radius = 8;
 
 	wreckage->pl_range = radius;
 	wreckage->pl_radius = radius;
 	wreckage->status = status;
 	wreckage->mods = mods;
-	Cell_add_object((object *) wreckage);
+	Cell_add_object(OBJ_PTR(wreckage));
     }
 }
 
