@@ -443,6 +443,7 @@ int Init_player(int ind, shipobj *ship)
     pl->ecmcount	= 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
+    pl->warped		= 0;
 
     pl->status		= PLAYING | GRAVITY | DEF_BITS;
     pl->have		= DEF_HAVE;
@@ -519,8 +520,6 @@ int Init_player(int ind, shipobj *ship)
     pl->lock.pl_id	= 0;
 
     pl->robot_data_ptr	= NULL;
-
-    pl->wormDrawCount   = 0;
 
     pl->id		= peek_ID();
     GetInd[pl->id]	= ind;
@@ -2041,6 +2040,7 @@ void Player_death_reset(int ind)
     pl->phasing_left	= 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
+    pl->warped		= 0;
     pl->lock.distance	= 0;
 
     pl->fuel.sum       	= (long)(pl->fuel.sum*0.90);	/* Loose 10% of fuel */

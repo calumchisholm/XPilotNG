@@ -617,7 +617,9 @@ struct player {
     DFLOAT	damaged;
     DFLOAT	stunned;
     int		updateVisibility;
-    int		wormDrawCount, wormHoleHit, wormHoleDest;
+    int		wormHoleHit, wormHoleDest;
+    DFLOAT	warped;			/* time player is immune to warped-to
+					   wormhole, replaces WARPED bit */
 
     int		last_target_update;	/* index of last updated target */
     int		last_cannon_update;	/* index of last updated cannon */

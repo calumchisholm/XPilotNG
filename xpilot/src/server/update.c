@@ -808,6 +808,11 @@ void Update_objects(void)
 	    pl->did_shoot = false;
 	    CLR_BIT(pl->status, THRUSTING);
 	}
+	if (pl->warped > 0) {
+	    pl->warped -= timeStep;
+	    if (pl->warped <= 0)
+		pl->warped = 0;
+	}
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(i);
 	if (BIT(pl->used, HAS_LASER)) {
@@ -1256,7 +1261,8 @@ void Update_objects(void)
 	    }
 
 	    CLR_BIT(pl->status, WARPING);
-	    SET_BIT(pl->status, WARPED);
+	    /* kps - define a constant for this ? */
+	    pl->warped = 12 * 1.0;
 
 	    sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
 	}

@@ -568,9 +568,9 @@ bool Wormhole_hitfunc(struct group *group, struct move *move)
     int ind = group->item_id;
     wormhole_t *wormhole = &World.wormHoles[ind];
 
-    /* this should never happen */
+    /* this should never happen, because of the hitmask */
     if (wormhole->type == WORM_OUT) {
-	warn("wormhole->type == WORM_OUT\n");
+	warn("BUG: Wormhole_hitfunc: wormhole->type == WORM_OUT\n");
 	return false;
     }
 
@@ -583,9 +583,14 @@ bool Wormhole_hitfunc(struct group *group, struct move *move)
 	if (BIT(pl->status, WARPING))
 	    return false;
 
-	if (BIT(pl->status, WARPED)) {
-	    ;
-	}
+	/*
+	 * Don't warp again if we are still on the
+	 * same wormhole we have just been warped to.
+	 */
+	if (pl->warped > 0
+	    && wormhole->type == WORM_NORMAL
+	    && pl->wormHoleDest == ind)
+	    return false;
 
     } else {
 	int last = wormhole->lastdest;
@@ -613,6 +618,7 @@ void Wormhole_remove_from_map(int ind)
  */
 void Team_immunity_init(void)
 {
+    /* change hitmask of all cannons */
     P_grouphack(CANNON, Cannon_set_hitmask);
 }
 

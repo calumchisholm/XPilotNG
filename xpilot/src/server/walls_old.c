@@ -685,7 +685,7 @@ static void Move_segment(move_state_t *ms)
 	if (mi->pl) {
 	    blk2.x = OBJ_X_IN_BLOCKS(mi->pl);
 	    blk2.y = OBJ_Y_IN_BLOCKS(mi->pl);
-	    if (BIT(mi->pl->status, WARPED)) {
+	    if (mi->pl->warped > 0) {
 		if (World.block[blk2.x][blk2.y] == WORMHOLE) {
 		    int oldhole = wormXY(blk2.x, blk2.y);
 		    if (World.wormHoles[oldhole].type == WORM_NORMAL
@@ -697,7 +697,7 @@ static void Move_segment(move_state_t *ms)
 			break;
 		    }
 		}
-		CLR_BIT(mi->pl->status, WARPED);
+		mi->pl->warped = 0;
 	    }
 	    if (blk2.x == block.x && blk2.y == block.y) {
 		ms->wormhole = hole;
