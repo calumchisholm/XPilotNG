@@ -523,12 +523,8 @@ static bool Check_robot_evade(int ind, int mine_i, int ship_i)
 	    dx = (long)((px[i] + dist * tcos(travel_dir)) / BLOCK_SZ);
 	    dy = (long)((py[i] + dist * tsin(travel_dir)) / BLOCK_SZ);
 
-	    if (BIT(World.rules->mode, WRAP_PLAY)) {
-		if (dx < 0) dx += World.x;
-		else if (dx >= World.x) dx -= World.x;
-		if (dy < 0) dy += World.y;
-		else if (dy >= World.y) dy -= World.y;
-	    }
+	    dx = WRAP_XBLOCK(dx);
+	    dy = WRAP_YBLOCK(dy);
 	    if (dx < 0 || dx >= World.x || dy < 0 || dy >= World.y) {
 		evade = true;
 		if (i == 1)
@@ -607,12 +603,8 @@ static bool Check_robot_evade(int ind, int mine_i, int ship_i)
 	    dx = (long)((px[0] + dist * tcos(aux_dir)) / BLOCK_SZ);
 	    dy = (long)((py[0] + dist * tsin(aux_dir)) / BLOCK_SZ);
 
-	    if (BIT(World.rules->mode, WRAP_PLAY)) {
-		if (dx < 0) dx += World.x;
-		else if (dx >= World.x) dx -= World.x;
-		if (dy < 0) dy += World.y;
-		else if (dy >= World.y) dy -= World.y;
-	    }
+	    dx = WRAP_XBLOCK(dx);
+	    dy = WRAP_YBLOCK(dy);
 	    if (dx < 0 || dx >= World.x || dy < 0 || dy >= World.y) {
 		left_ok = false;
 		continue;
@@ -641,12 +633,8 @@ static bool Check_robot_evade(int ind, int mine_i, int ship_i)
 	    dx = (long)((px[0] + dist * tcos(aux_dir)) / BLOCK_SZ);
 	    dy = (long)((py[0] + dist * tsin(aux_dir)) / BLOCK_SZ);
 
-	    if (BIT(World.rules->mode, WRAP_PLAY)) {
-		if (dx < 0) dx += World.x;
-		else if (dx >= World.x) dx -= World.x;
-		if (dy < 0) dy += World.y;
-		else if (dy >= World.y) dy -= World.y;
-	    }
+	    dx = WRAP_XBLOCK(dx);
+	    dy = WRAP_YBLOCK(dy);
 	    if (dx < 0 || dx >= World.x || dy < 0 || dy >= World.y) {
 		right_ok = false;
 		continue;
@@ -852,12 +840,8 @@ static bool Check_robot_target(int ind,
 	dx = (long)((pl->pos.px + dist * tcos(item_dir)) / BLOCK_SZ);
 	dy = (long)((pl->pos.py + dist * tsin(item_dir)) / BLOCK_SZ);
 
-	if (BIT(World.rules->mode, WRAP_PLAY)) {
-	    if (dx < 0) dx += World.x;
-	    else if (dx >= World.x) dx -= World.x;
-	    if (dy < 0) dy += World.y;
-	    else if (dy >= World.y) dy -= World.y;
-	}
+	dx = WRAP_XBLOCK(dx);
+	dy = WRAP_YBLOCK(dy);
 	if (dx < 0 || dx >= World.x || dy < 0 || dy >= World.y) {
 	    clear_path = false;
 	    continue;
@@ -1456,16 +1440,9 @@ static bool Ball_handler(int ind)
 	    DFLOAT fraction = (DFLOAT)dist / closest_t_dist;
 	    dx = (int)((fraction * xdist) + OBJ_X_IN_BLOCKS(ball));
 	    dy = (int)((fraction * ydist) + OBJ_Y_IN_BLOCKS(ball));
-	    if (BIT(World.rules->mode, WRAP_PLAY)) {
-		if (dx < 0)
-		    dx += World.x;
-		else if (dx >= World.x)
-		    dx -= World.x;
-		if (dy < 0)
-		    dy += World.y;
-		else if (dy >= World.y)
-		    dy -= World.y;
-	    }
+
+	    dx = WRAP_XBLOCK(dx);
+	    dy = WRAP_YBLOCK(dy);
 	    if (dx < 0 || dx >= World.x || dy < 0 || dy >= World.y) {
 		clear_path = false;
 		continue;
