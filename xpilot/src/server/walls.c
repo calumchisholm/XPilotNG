@@ -277,7 +277,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	for (j = 0; j < NumPlayers; j++) {
 	    player *pl_j = Players(j);
 
-	    if (IS_TANK_PTR(pl_j)
+	    if (Player_is_tank(pl_j)
 		|| (BIT(pl_j->status, PAUSE)
 		    && pl_j->count <= 0)
 		|| (Player_is_waiting(pl_j)
@@ -341,7 +341,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     for (j = 0; j < NumPlayers; j++) {
 	player *pl = Players(j);
 
-	if (IS_TANK_PTR(pl)
+	if (Player_is_tank(pl)
 	    || (BIT(pl->status, PAUSE)
 		&& pl->count <= 0)
 	    || (Player_is_waiting(pl)
@@ -615,7 +615,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	}
     }
 
-    if (BIT(pl->status, KILLED) && pl->score < 0 && IS_ROBOT_PTR(pl)) {
+    if (BIT(pl->status, KILLED) && pl->score < 0 && Player_is_robot(pl)) {
 	pl->home_base = Bases(world, 0);
 	Pick_startpos(pl);
     }

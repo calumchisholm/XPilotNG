@@ -702,7 +702,7 @@ static void Robot_create(void)
     }
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
-	if (IS_ROBOT_PTR(pl_i)) {
+	if (Player_is_robot(pl_i)) {
 	    data = (robot_data_t *)pl_i->robot_data_ptr;
 	    if (Robots[data->robots_ind].used < Robots[most_used].used)
 		Robots[data->robots_ind].used = Robots[most_used].used;
@@ -829,7 +829,7 @@ void Robot_delete(player *pl, bool kicked)
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl2 = Players(i);
 
-	    if (!IS_ROBOT_PTR(pl2))
+	    if (!Player_is_robot(pl2))
 		continue;
 
 	    if (pl2->score < low_score) {
@@ -914,7 +914,7 @@ void Robot_war(player *pl, player *kp)
     if (kp->id == pl->id)
 	return;
 
-    if (IS_ROBOT_PTR(kp)) {
+    if (Player_is_robot(kp)) {
 	Robot_talks(ROBOT_TALK_KILL, kp->name, pl->name);
 
 	if (Robot_war_on_player(kp) == pl->id)
@@ -926,7 +926,7 @@ void Robot_war(player *pl, player *kp)
 	Robot_set_war(kp, -1);
     }
 
-    if (IS_ROBOT_PTR(pl)
+    if (Player_is_robot(pl)
 	&& (int)(rfrac() * 100) < kp->score - pl->score
 	&& !TEAM(pl, kp)
 	&& !ALLIANCE(pl, kp)) {
@@ -1133,12 +1133,12 @@ void Robot_update(void)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
 
-	if (IS_TANK_PTR(pl)) {
+	if (Player_is_tank(pl)) {
 	    Tank_play(pl);
 	    continue;
 	}
 
-	if (!IS_ROBOT_PTR(pl))
+	if (!Player_is_robot(pl))
 	    /* Ignore non-robots. */
 	    continue;
 

@@ -158,7 +158,7 @@ void Meta_update(int change)
     memset(active_per_team, 0, sizeof active_per_team);
     for (i = 0; i < NumPlayers; i++) {
 	player *pl = Players(i);
-	if (IS_HUMAN_PTR(pl) && !BIT(pl->status, PAUSE)) {
+	if (Player_is_human(pl) && !BIT(pl->status, PAUSE)) {
 	    num_active_players++;
 	    if (BIT(world->rules->mode, TEAM_PLAY))
 		active_per_team[pl->team]++;
@@ -226,7 +226,7 @@ void Meta_update(int change)
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 
-	if (IS_HUMAN_PTR(pl_i) && !BIT(pl_i->status, PAUSE)) {
+	if (Player_is_human(pl_i) && !BIT(pl_i->status, PAUSE)) {
 	    if ((len + (4 * MAX_CHARS)) < sizeof(string)) {
 		sprintf(string + len,
 			"%s%s=%s@%s",

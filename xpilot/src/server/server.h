@@ -742,6 +742,34 @@ static inline bool Player_is_waiting(player *pl)
     return false;
 }
 
+/* Replacement for macro IS_TANK_PTR */
+static inline bool Player_is_tank(player *pl)
+{
+    return (BIT(pl->type_ext, OBJ_EXT_TANK) == OBJ_EXT_TANK) ? true : false;
+}
+
+/* Replacement for macro IS_ROBOT_PTR */
+static inline bool Player_is_robot(player *pl)
+{
+    return (BIT(pl->type_ext, OBJ_EXT_ROBOT) == OBJ_EXT_ROBOT) ? true : false;
+}
+
+/* Replacement for macro IS_HUMAN_PTR */
+static inline bool Player_is_human(player *pl)
+{
+    return (!BIT(pl->type_ext, OBJ_EXT_TANK|OBJ_EXT_ROBOT)) ? true : false;
+}
+
+/* Replacement for macro OWNS_TANK */
+static inline bool Player_owns_tank(player *pl, player *tank)
+{
+    if (Player_is_tank(tank)
+	&& tank->lock.pl_id != NO_ID  /* kps - probably redundant */
+	&& tank->lock.pl_id == pl->id)
+	return true;
+    return false;
+}
+
 void Pick_startpos(player *pl);
 void Go_home(player *pl);
 void Compute_sensor_range(player *pl);

@@ -114,7 +114,7 @@ void Score_players(player *winner_pl, double winner_score, char *winner_msg,
 {
     if (TEAM(winner_pl, loser_pl)
 	|| ALLIANCE(winner_pl, loser_pl)
-	|| (IS_TANK_PTR(loser_pl)
+	|| (Player_is_tank(loser_pl)
 	    && loser_pl->lock.pl_id == winner_pl->id)) {
 	if (winner_score > 0)
 	    winner_score = -winner_score;

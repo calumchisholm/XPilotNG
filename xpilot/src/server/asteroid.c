@@ -344,7 +344,7 @@ static void Place_asteroid(void)
 
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl = Players(i);
-		if (IS_HUMAN_PTR(pl)) {
+		if (Player_is_human(pl)) {
 		    dpx = WRAP_DCX(pos.cx - pl->pos.cx);
 		    dpy = WRAP_DCY(pos.cy - pl->pos.cy);
 		    if (QUICK_LENGTH(dpx, dpy) < 2 * ASTEROID_MIN_DIST

@@ -379,7 +379,7 @@ static int Frame_status(connection_t *conn, player *pl)
 	     || pl->lock.distance <= pl->sensor_range)
 #ifndef SHOW_CLOAKERS_RANGE
 	    && (pl->visibility[lock_ind].canSee
-		|| OWNS_TANK(pl, lock_pl)
+		|| Player_owns_tank(pl, lock_pl)
 		|| TEAM(pl, lock_pl)
 		|| ALLIANCE(pl, lock_pl))
 #endif
@@ -1054,7 +1054,7 @@ static void Frame_radar(connection_t *conn, player *pl)
 		|| !Player_is_active(pl_i) /* kps - active / playing ??? */
 		|| (!TEAM(pl_i, pl)
 		    && !ALLIANCE(pl, pl_i)
-		    && !OWNS_TANK(pl, pl_i)
+		    && !Player_owns_tank(pl, pl_i)
 		    && (!playersOnRadar || !pl->visibility[i].canSee))) {
 		continue;
 	    }
@@ -1070,7 +1070,9 @@ static void Frame_radar(connection_t *conn, player *pl)
 		continue;
 	    }
 	    size = 3;
-	    if (TEAM(pl_i, pl) || ALLIANCE(pl, pl_i) || OWNS_TANK(pl, pl_i))
+	    if (TEAM(pl_i, pl)
+		|| ALLIANCE(pl, pl_i)
+		|| Player_owns_tank(pl, pl_i))
 		size |= 0x80;
 	    Frame_radar_buffer_add(pos, size);
 	}
@@ -1280,6 +1282,6 @@ void Set_player_message(player *pl, const char *message)
 	msg = message;
     if (pl->conn != NULL)
 	Send_message(pl->conn, msg);
-    else if (IS_ROBOT_PTR(pl))
+    else if (Player_is_robot(pl))
 	Robot_message(pl, msg);
 }

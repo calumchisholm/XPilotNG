@@ -81,7 +81,7 @@ void Pick_startpos(player *pl)
     static char	*free_bases = NULL;
     world_t *world = &World;
 
-    if (IS_TANK_PTR(pl)) {
+    if (Player_is_tank(pl)) {
 	pl->home_base = Bases(world, 0);
 	return;
     }
@@ -109,7 +109,7 @@ void Pick_startpos(player *pl)
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 
-	if (pl_i->id != pl->id && !IS_TANK_PTR(pl_i) && pl_i->home_base
+	if (pl_i->id != pl->id && !Player_is_tank(pl_i) && pl_i->home_base
 		    && free_bases[pl_i->home_base->ind]) {
 	    free_bases[pl_i->home_base->ind] = 0;	/* occupado */
 	    num_free--;
@@ -172,7 +172,7 @@ void Go_home(player *pl)
     clpos		pos, initpos;
     world_t *world = &World;
 
-    if (IS_TANK_PTR(pl)) {
+    if (Player_is_tank(pl)) {
 	/*NOTREACHED*/
 	/* Tanks have no homebase. */
 	warn("BUG: gohome tank");
@@ -230,7 +230,7 @@ void Go_home(player *pl)
 	Players(i)->visibility[ind].lastChange = 0;
     }
 
-    if (IS_ROBOT_PTR(pl))
+    if (Player_is_robot(pl))
 	Robot_go_home(pl);
 }
 
@@ -729,9 +729,9 @@ void Reset_all_players(void)
 	    if (BIT(world->rules->mode, TIMING))
 		pl->count = RECOVERY_DELAY;
 	}
-	if (IS_TANK_PTR(pl))
+	if (Player_is_tank(pl))
 	    pl->mychar = 'T';
-	else if (IS_ROBOT_PTR(pl))
+	else if (Player_is_robot(pl))
 	    pl->mychar = 'R';
     }
     if (BIT(world->rules->mode, TEAM_PLAY)) {
@@ -823,7 +823,7 @@ void Check_team_members(int team)
 
     for (members = i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (!IS_TANK_PTR(pl) && pl->team == team && pl->home_base != NULL)
+	if (!Player_is_tank(pl) && pl->team == team && pl->home_base != NULL)
 	    members++;
     }
     teamp = Teams(world, team);
@@ -832,7 +832,7 @@ void Check_team_members(int team)
 	     team, teamp->NumMembers, members);
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
-	    if (!IS_TANK_PTR(pl) && pl->team == team && pl->home_base != NULL)
+	    if (!Player_is_tank(pl) && pl->team == team && pl->home_base != NULL)
 		warn("Team %d currently has player %d: \"%s\"",
 		     team, i+1, pl->name);
 	}
@@ -862,7 +862,7 @@ static void Compute_end_of_round_values(double *average_score,
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 
-	if (IS_TANK_PTR(pl_i)
+	if (Player_is_tank(pl_i)
 	    || (BIT(pl_i->status, PAUSE)
 	       && pl_i->count <= 0)) {
 	    continue;
@@ -1009,7 +1009,7 @@ void Team_game_over(int winning_team, const char *reason)
 	    if (pl_i->team != winning_team)
 		continue;
 
-	    if (IS_TANK_PTR(pl_i)
+	    if (Player_is_tank(pl_i)
 		|| (BIT(pl_i->status, PAUSE)
 		    && pl_i->count <= 0)
 		|| (Player_is_waiting(pl_i)
@@ -1091,7 +1091,7 @@ void Individual_game_over(int winner)
     else if (winner == -2) {
 	for (j = 0; j < NumPlayers; j++) {
 	    player *pl_j = Players(j);
-	    if (IS_ROBOT_PTR(pl_j)) {
+	    if (Player_is_robot(pl_j)) {
 		for (i = 0; i < num_best_players; i++) {
 		    if (j == best_players[i])
 			break;
@@ -1130,7 +1130,7 @@ void Race_game_over(void)
     if ((order = (int *)malloc(NumPlayers * sizeof(int))) != NULL) {
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
-	    if (IS_TANK_PTR(pl))
+	    if (Player_is_tank(pl))
 		continue;
 	    if (BIT(pl->status, PAUSE)
 		|| Player_is_waiting(pl)
@@ -1178,7 +1178,7 @@ void Race_game_over(void)
 	CLR_BIT(pl->status, RACE_OVER | FINISH);
 	if (BIT(pl->status, PAUSE)
 	    || Player_is_waiting(pl)
-	    || IS_TANK_PTR(pl))
+	    || Player_is_tank(pl))
 	    continue;
 	num_active_players++;
 
@@ -1206,7 +1206,7 @@ void Race_game_over(void)
 	    pl = Players(i);
 	    if (BIT(pl->status, PAUSE)
 		|| Player_is_waiting(pl)
-		|| IS_TANK_PTR(pl))
+		|| Player_is_tank(pl))
 		continue;
 
 	    if (pl->best_lap == bestlap) {
@@ -1393,7 +1393,7 @@ void Compute_game_status(void)
 	for (i = 0; i < NumPlayers; i++)  {
 	    pl = Players(i);
 	    if (BIT(pl->status, PAUSE)
-		|| IS_TANK_PTR(pl))
+		|| Player_is_tank(pl))
 		continue;
 
 	    if (!BIT(pl->status, GAME_OVER))
@@ -1449,7 +1449,7 @@ void Compute_game_status(void)
 		pl = Players(i);
 		if (BIT(pl->status, PAUSE)
 		    || Player_is_waiting(pl)
-		    || IS_TANK_PTR(pl))
+		    || Player_is_tank(pl))
 		    continue;
 
 		if (BIT(pl->status, FINISH)) {
@@ -1526,7 +1526,7 @@ void Compute_game_status(void)
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 
-	    if (IS_TANK_PTR(pl_i))
+	    if (Player_is_tank(pl_i))
 		/* Ignore tanks. */
 		continue;
 	    else if (BIT(pl_i->status, PAUSE))
@@ -1633,7 +1633,7 @@ void Compute_game_status(void)
 
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (BIT(pl_i->status, PAUSE) || IS_TANK_PTR(pl_i))
+		if (BIT(pl_i->status, PAUSE) || Player_is_tank(pl_i))
 		    continue;
 		team_score[pl_i->team] += pl_i->score;
 	    }
@@ -1725,15 +1725,15 @@ void Compute_game_status(void)
 
 	for (i = 0; i < NumPlayers; i++)  {
 	    player *pl_i = Players(i);
-	    if (BIT(pl_i->status, PAUSE) || IS_TANK_PTR(pl_i)) 
+	    if (BIT(pl_i->status, PAUSE) || Player_is_tank(pl_i)) 
 		continue;
 	    if (!BIT(pl_i->status, GAME_OVER)) {
 		num_alive_players++;
-		if (IS_ROBOT_PTR(pl_i))
+		if (Player_is_robot(pl_i))
 		    num_alive_robots++;
 		winner = i; 	/* Tag player that's alive */
 	    }
-	    else if (IS_HUMAN_PTR(pl_i))
+	    else if (Player_is_human(pl_i))
 		num_active_humans++;
 	    num_active_players++;
 	}
@@ -1766,7 +1766,7 @@ void Delete_player(player *pl)
     if (tagGame && tagItPlayerId == pl->id)
 	tagItPlayerId = NO_ID;
 
-    if (IS_ROBOT_PTR(pl))
+    if (Player_is_robot(pl))
 	Robot_destroy(pl);
     if (pl->isoperator) {
 	if (!--NumOperators && game_lock) {
@@ -1841,11 +1841,11 @@ void Delete_player(player *pl)
     sound_close(pl);
 
     NumPlayers--;
-    if (IS_TANK_PTR(pl))
+    if (Player_is_tank(pl))
 	NumPseudoPlayers--;
 
     /* Ranking. */
-    if (IS_HUMAN_PTR(pl)) {
+    if (Player_is_human(pl)) {
 	Rank_save_score(pl);
    	if (NumPlayers == NumRobots + NumPseudoPlayers) {
 	    Rank_write_webpage();
@@ -1853,14 +1853,14 @@ void Delete_player(player *pl)
    	}
     }
 
-    if (pl->team != TEAM_NOT_SET && !IS_TANK_PTR(pl) && pl->home_base) {
+    if (pl->team != TEAM_NOT_SET && !Player_is_tank(pl) && pl->home_base) {
 	world->teams[pl->team].NumMembers--;
 	TEAM_SCORE(pl->team, -(pl->score));	/* recalculate teamscores */
-	if (IS_ROBOT_PTR(pl))
+	if (Player_is_robot(pl))
 	    world->teams[pl->team].NumRobots--;
     }
 
-    if (IS_ROBOT_PTR(pl))
+    if (Player_is_robot(pl))
 	NumRobots--;
 
     /*
@@ -1881,7 +1881,7 @@ void Delete_player(player *pl)
 
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player *pl_i = Players(i);
-	if (IS_TANK_PTR(pl_i)
+	if (Player_is_tank(pl_i)
 	    && pl_i->lock.pl_id == id) {
 	    /* remove tanks which were released by this player. */
 	    if (keepShots)
@@ -1895,7 +1895,7 @@ void Delete_player(player *pl)
 	    CLR_BIT(pl_i->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE);
 	    CLR_BIT(pl_i->used, HAS_TRACTOR_BEAM);
 	}
-	if (IS_ROBOT_PTR(pl_i)
+	if (Player_is_robot(pl_i)
 	    && Robot_war_on_player(pl_i) == id)
 	    Robot_reset_war(pl_i);
 
@@ -1913,7 +1913,7 @@ void Delete_player(player *pl)
 	player *pl_i = Players(i);
 	if (pl_i->conn != NULL)
 	    Send_leave(pl_i->conn, id);
-	else if (IS_TANK_PTR(pl_i)) {
+	else if (Player_is_tank(pl_i)) {
 	    if (pl_i->lock.pl_id == id)
 		Delete_player(pl_i);
 	}
@@ -1968,7 +1968,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
     int			i;
     world_t *world = &World;
 
-    if (IS_TANK_PTR(pl)) {
+    if (Player_is_tank(pl)) {
 	Delete_player(pl);
 	return;
     }
@@ -2030,7 +2030,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 	if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	    pl->life--;
 	    if (pl->life == -1) {
-		if (IS_ROBOT_PTR(pl)) {
+		if (Player_is_robot(pl)) {
 		    if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
 			|| (robotsLeave && pl->score < robotLeaveScore)) {
 			Robot_delete(pl, false);

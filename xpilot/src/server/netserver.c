@@ -1200,7 +1200,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	Send_player(pl->conn, pl_i->id);
 	Send_score(pl->conn, pl_i->id, pl_i->score,
 		   (int)pl_i->life, pl_i->mychar, pl_i->alliance);
-	if (!IS_TANK_PTR(pl_i) && pl_i->home_base != NULL)
+	if (!Player_is_tank(pl_i) && pl_i->home_base != NULL)
 	    Send_base(pl->conn, pl_i->id, pl_i->home_base->ind);
     }
     /*
@@ -1235,7 +1235,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	/*
 	 * And tell him about the relationships others have with eachother.
 	 */
-	else if (IS_ROBOT_PTR(pl_i)) {
+	else if (Player_is_robot(pl_i)) {
 	    if ((war_on_id = Robot_war_on_player(pl_i)) != NO_ID)
 		Send_war(pl->conn, pl_i->id, war_on_id);
 	}

@@ -87,12 +87,6 @@
 #define OBJ_EXT_TANK		(1U<<1)
 #define OBJ_EXT_ROBOT		(1U<<2)
 
-/* macros to query the type of player. */
-#define IS_TANK_PTR(pl)	 (BIT((pl)->type_ext, OBJ_EXT_TANK) == OBJ_EXT_TANK)
-#define IS_ROBOT_PTR(pl) (BIT((pl)->type_ext, OBJ_EXT_ROBOT) == OBJ_EXT_ROBOT)
-#define IS_HUMAN_PTR(pl) (!BIT((pl)->type_ext, OBJ_EXT_TANK|OBJ_EXT_ROBOT))
-
-
 /*
  * Different types of attributes a player can have.
  * These are the bits of the player->have and player->used fields.

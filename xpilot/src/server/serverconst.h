@@ -128,14 +128,6 @@
 	(((pl1)->alliance != ALLIANCE_NOT_SET) \
 	&& ((pl1)->alliance == (pl2)->alliance))
 
-/*
- * Used where we wish to know if a player pl owns a tank t.
- */
-#define OWNS_TANK(pl, t) \
-	(IS_TANK_PTR(t) \
-	&& ((t)->lock.pl_id != NO_ID) \
-	&& ((t)->lock.pl_id == (pl)->id))
-
 #define RECOVERY_DELAY		(12 * 3)
 #define ROBOT_CREATE_DELAY	(12 * 2)
 

@@ -410,13 +410,13 @@ int Pick_team(int pick_for_type)
      */
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (IS_TANK_PTR(pl))
+	if (Player_is_tank(pl))
 	    continue;
 	if (BIT(pl->status, PAUSE))
 	    continue;
 	if (!playing[pl->team]++)
 	    playing_teams++;
-	if (IS_HUMAN_PTR(pl) || IS_ROBOT_PTR(pl))
+	if (Player_is_human(pl) || Player_is_robot(pl))
 	    team_score[pl->team] += pl->score;
     }
     if (playing_teams <= 1) {
@@ -551,7 +551,7 @@ void Server_info(char *str, size_t max_size)
     for (i = 0; i < NumPlayers; i++) {
 	pl = order[i];
 	strlcpy(name, pl->name, MAX_CHARS);
-	if (IS_ROBOT_PTR(pl)) {
+	if (Player_is_robot(pl)) {
 	    if ((k = Robot_war_on_player(pl)) != NO_ID) {
 		sprintf(name + strlen(name), " (%s)",
 			Player_by_id(k)->name);
@@ -565,7 +565,7 @@ void Server_info(char *str, size_t max_size)
 		name, (int)pl->life, (int)pl->score);
 	sprintf(msg, "%2d... %-36s%s@%s\n",
 		i+1, lblstr, pl->username,
-		IS_HUMAN_PTR(pl)
+		Player_is_human(pl)
 		? pl->hostname
 		: "xpilot.org");
 	if (strlen(msg) + strlen(str) >= max_size)
@@ -670,7 +670,7 @@ void Game_Over(void)
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl = Players(i);
 	    int team;
-	    if (IS_HUMAN_PTR(pl)) {
+	    if (Player_is_human(pl)) {
 		team = pl->team;
 		if (teamscore[team] == 1234567)
 		    teamscore[team] = 0;
@@ -712,7 +712,7 @@ void Game_Over(void)
 	player *pl_i = Players(i);
 
 	SET_BIT(pl_i->status, GAME_OVER);
-	if (IS_HUMAN_PTR(pl_i)) {
+	if (Player_is_human(pl_i)) {
 	    if (pl_i->score > maxsc) {
 		maxsc = pl_i->score;
 		win = i;

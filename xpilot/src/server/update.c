@@ -977,7 +977,7 @@ static void Update_players(void)
 
 #define IDLETHRESHOLD (FPS * 60)
 
-	if (IS_HUMAN_PTR(pl)) {
+	if (Player_is_human(pl)) {
 	    pl->rank->score = pl->score;
 	    if ( pl->mychar == ' ' ) {
 		if ( pl->idleCount++ == IDLETHRESHOLD ) {
@@ -1256,7 +1256,7 @@ void Update_objects(void)
 
 	    Kill_player(pl, true);
 
-	    if (IS_HUMAN_PTR(pl)) {
+	    if (Player_is_human(pl)) {
 		if (frame_loops - pl->frame_last_busy > 60 * FPS) {
 		    if ((NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
 			Pause_player(pl, true);
@@ -1268,7 +1268,7 @@ void Update_objects(void)
 	}
 
 	if (maxPauseTime > 0
-	    && IS_HUMAN_PTR(pl)
+	    && Player_is_human(pl)
 	    && BIT(pl->status, PAUSE)
 	    && frame_loops - pl->frame_last_busy > maxPauseTime) {
 	    sprintf(msg, "%s was auto-kicked for pausing too long "

@@ -155,7 +155,7 @@ int Player_lock_closest(player *pl, bool next)
 	if (pl_i == lock_pl
 	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(pl, pl_i)
-	    || OWNS_TANK(pl, pl_i)
+	    || Player_owns_tank(pl, pl_i)
 	    || TEAM(pl, pl_i)
 	    || ALLIANCE(pl, pl_i))
 	    continue;
@@ -511,7 +511,7 @@ int Handle_keyboard(player *pl)
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
 		    if (pl_i->id != pl->id
-			&& !IS_TANK_PTR(pl_i)
+			&& !Player_is_tank(pl_i)
 			&& pl->home_base == pl_i->home_base) {
 			Pick_startpos(pl_i);
 			sprintf(msg, "%s has taken over %s's home base.",

@@ -127,7 +127,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
 
-	    if (IS_TANK_PTR(pl_i)
+	    if (Player_is_tank(pl_i)
 		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
 		|| Player_is_waiting(pl_i))
 		continue;
@@ -164,7 +164,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 
-	if (IS_TANK_PTR(pl_i)
+	if (Player_is_tank(pl_i)
 	    || (BIT(pl_i->status, PAUSE)
 		&& pl_i->count <= 0)
 	    || Player_is_waiting(pl_i))
