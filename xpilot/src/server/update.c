@@ -828,7 +828,10 @@ static void Update_players(world_t *world)
 		/* Player has recovered. */
 		/* kps - unless he was killed on last life ... */
 		pl->recovery_count = 0;
-		SET_BIT(pl->pl_status, PLAYING);
+		if (BIT(world->rules->mode, LIMITED_LIVES))
+		    SET_BIT(pl->pl_status, PLAYING);
+		else
+		    Player_set_state(pl, PL_STATE_ALIVE);
 		Go_home(pl); 
 	    }
 	    else {
