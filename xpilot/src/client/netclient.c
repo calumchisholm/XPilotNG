@@ -1957,8 +1957,7 @@ int Receive_war(void)
     if ((n = Packet_scanf(&cbuf, "%c%hd%hd",
 			  &ch, &robot_id, &killer_id)) <= 0)
 	return n;
-    if ((n = Handle_war(robot_id, killer_id)) == -1)
-	return -1;
+    /* not interested */
     return 1;
 }
 
@@ -1971,8 +1970,7 @@ int Receive_seek(void)
     if ((n = Packet_scanf(&cbuf, "%c%hd%hd%hd", &ch,
 			  &programmer_id, &robot_id, &sought_id)) <= 0)
 	return n;
-    if ((n = Handle_seek(programmer_id, robot_id, sought_id)) == -1)
-	return -1;
+    /* not interested */
     return 1;
 }
 

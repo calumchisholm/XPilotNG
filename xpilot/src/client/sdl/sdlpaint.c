@@ -401,8 +401,6 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	sprintf(label, "%s=%s@%s",
 		other->nick_name, other->user_name, other->host_name);
     else {
-	other_t *war = Other_by_id(other->war_id);
-
 	if (BIT(Setup->mode, TIMING)) {
 	    raceStr[0] = ' ';
 	    raceStr[1] = ' ';
@@ -436,16 +434,11 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	if (BIT(Setup->mode, TEAM_PLAY))
 	    sprintf(label, "%c%s %-15s%s",
 		    other->mychar, scoreStr, other->nick_name, lifeStr);
-	else {
+	else
 	    sprintf(label, "%c %s%s%s%s  %s",
 		    other->mychar, raceStr, teamStr,
 		    scoreStr, lifeStr,
 		    other->nick_name);
-	    if (war) {
-		if (strlen(label) + strlen(war->nick_name) + 5 < sizeof(label))
-		    sprintf(label + strlen(label), " (%s)", war->nick_name);
-	    }
-	}
     }
 
     /*

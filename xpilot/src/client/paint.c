@@ -241,7 +241,6 @@ static int Team_heading(int entrynum, int teamnum,
     other_t tmp;
     tmp.id = -1;
     tmp.team = teamnum;
-    tmp.war_id = -1;
     tmp.name_width = 0;
     tmp.ship = NULL;
     if (teamnum != TEAM_PAUSEHACK)

@@ -1318,7 +1318,6 @@ shipshape_t *Ship_by_id(int id)
 int Handle_leave(int id)
 {
     other_t		*other;
-    int			i;
     char		msg[MSG_LEN];
 
     if ((other = Other_by_id(id)) != NULL) {
@@ -1341,13 +1340,6 @@ int Handle_leave(int id)
 	    other++;
 	}
 	scoresChanged = true;
-    }
-    for (i = 0; i < num_others; i++) {
-	other = &Others[i];
-	if (other->war_id == id) {
-	    other->war_id = -1;
-	    scoresChanged = true;
-	}
     }
     return 0;
 }
@@ -1393,7 +1385,6 @@ int Handle_player(int id, int player_team, int mychar,
     other->id = id;
     other->team = player_team;
     other->mychar = mychar;
-    other->war_id = -1;
     strlcpy(other->nick_name, nick_name, sizeof(other->nick_name));
     strlcpy(other->user_name, user_name, sizeof(other->user_name));
     strlcpy(other->host_name, host_name, sizeof(other->host_name));
@@ -1420,61 +1411,6 @@ int Handle_team(int id, int pl_team)
 	return 0;
     }
     other->team = pl_team;
-
-    return 0;
-}
-
-int Handle_war(int robot_id, int killer_id)
-{
-    other_t		*robot,
-			*killer;
-    char		msg[MSG_LEN];
-
-    if ((robot = Other_by_id(robot_id)) == NULL) {
-	warn("Can't update war for non-existing player (%d,%d)",
-	      robot_id, killer_id);
-	return 0;
-    }
-    if (killer_id == -1) {
-	/*
-	 * Robot is no longer in war mode.
-	 */
-	robot->war_id = -1;
-	return 0;
-    }
-    if ((killer = Other_by_id(killer_id)) == NULL) {
-	warn("Can't update war against non-existing player (%d,%d)",
-	      robot_id, killer_id);
-	return 0;
-    }
-    robot->war_id = killer_id;
-    sprintf(msg, "%s declares war on %s.",
-	    robot->nick_name, killer->nick_name);
-    Add_message(msg);
-    scoresChanged = true;
-
-    return 0;
-}
-
-int Handle_seek(int programmer_id, int robot_id, int sought_id)
-{
-    other_t		*programmer,
-			*robot,
-			*sought;
-    char		msg[MSG_LEN];
-
-    if ((programmer = Other_by_id(programmer_id)) == NULL
-	|| (robot = Other_by_id(robot_id)) == NULL
-	|| (sought = Other_by_id(sought_id)) == NULL) {
-	warn("Bad player seek (%d,%d,%d)",
-	      programmer_id, robot_id, sought_id);
-	return 0;
-    }
-    robot->war_id = sought_id;
-    sprintf(msg, "%s has programmed %s to seek %s.",
-	    programmer->nick_name, robot->nick_name, sought->nick_name);
-    Add_message(msg);
-    scoresChanged = true;
 
     return 0;
 }

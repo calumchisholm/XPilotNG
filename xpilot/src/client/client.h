@@ -196,7 +196,6 @@ typedef struct {
     short	life;
     short	mychar;
     short	alliance;
-    short	war_id;
     short	name_width;	/* In pixels */
     short	name_len;	/* In bytes */
     short	max_chars_in_names;	/* name_width was calculated
@@ -724,7 +723,6 @@ int Handle_score(int id, double score, int life, int mychar, int alliance);
 int Handle_score_object(double score, int x, int y, char *msg);
 int Handle_team_score(int team, double score);
 int Handle_timing(int id, int check, int round, long loops);
-int Handle_war(int robot_id, int killer_id);
 int Handle_seek(int programmer_id, int robot_id, int sought_id);
 int Handle_start(long server_loops);
 int Handle_end(long server_loops);
