@@ -1450,10 +1450,10 @@ static void inside_test(void)
 		if (bx == mapx - 1)
 		    x1 = last_width;
 	    }
-	    if (ox >= array[bx][by].distance && (ox >array[bx][by].distance
-		|| ABS(((double)dx) / dy) < array[bx][by].direction) && dy) {
+	    if (ox >= array[bx][by].distance && (ox > array[bx][by].distance
+		|| dy && ABS(((double)dx) / dy) < array[bx][by].direction)) {
 		    array[bx][by].distance = ox;
-		    array[bx][by].direction = ABS(((double)dx)/dy);
+		    array[bx][by].direction = ABS(((double)dx) / dy);
 		    array[bx][by].fill = dy < 0;
 	    }
 	    x2 = x1 + xsign * B_CLICKS;
@@ -1466,26 +1466,18 @@ static void inside_test(void)
 		if (array[bx][by].fill == 2)
 		    array[bx][by].fill = 0;
 		if (ABS(dx) >= ABS(dy)) {
-		    xdist = (x2 - ox) * xsign;
-		    if (xdist == -dx)
-			xdist = 32768;
+		    xdist = (x2 - .5 - ox) * xsign;
 		    ydist = 32768;
 		    if (dy != 0)
-			ydist = ((double)(y2 - oy) * dx) / dy * xsign;
-		    if (ydist == -dy)
-			ydist = 32768;
+			ydist = ((double)(y2 - .5 - oy) * dx) / dy * xsign;
 		    if (xdist > dx * xsign && ydist > dx * xsign)
 			break;
 		}
 		else {
-		    ydist = (y2 - oy) * ysign;
-		    if (ydist == -dy)
-			ydist = 32768;
+		    ydist = (y2 - .5 - oy) * ysign;
 		    xdist = 32768;
 		    if (dx != 0)
-			xdist = ((double)(x2 - ox) * dy) / dx * ysign;
-		    if (xdist == -dx)
-			xdist = 32768;
+			xdist = ((double)(x2 - .5 - ox) * dy) / dx * ysign;
 		    if (xdist > dy * ysign && ydist > dy * ysign)
 			break;
 		}
@@ -1495,15 +1487,14 @@ static void inside_test(void)
 		    else
 			dist = ox + ydist * ysign * dx / dy -
 			    (xsign > 0 ? x1 : x2);
-	    if (dist >= array[bx][by].distance && (dist >array[bx][by].distance
-		|| ABS(((double)dx) / dy) < array[bx][by].direction)) {
-		    array[bx][by].distance = dist;
-		    array[bx][by].direction = ABS(((double)dx)/dy);
-		    array[bx][by].fill = dy < 0;
-	    }
+		    if (dist >= array[bx][by].distance && 
+			(dist > array[bx][by].distance ||
+			 ABS(((double)dx) / dy) < array[bx][by].direction)) {
+			array[bx][by].distance = dist;
+			array[bx][by].direction = ABS(((double)dx)/dy);
+			array[bx][by].fill = dy < 0;
+		    }
 		}
-		/* If x/ydist is an integer, it should be exact
-		 * on modern processors. */
 		if (xdist <= ydist) {
 		    bx2 += xsign;
 		    if (bx2 > maxx)
@@ -1515,11 +1506,11 @@ static void inside_test(void)
 		    x2 = x1 + xsign * B_CLICKS;
 		    if (bx != mapx - 1) {
 			x2 = x1 + xsign * B_CLICKS;
-			dist -= B_CLICKS * xsign;
+			dist -= xsign * B_CLICKS;
 		    }
 		    else {
 			x2 = x1 + xsign * last_width;
-			dist -= B_CLICKS * xsign;
+			dist -= xsign * last_width;
 		    }
 		}
 		if (ydist <= xdist) {
@@ -1533,12 +1524,13 @@ static void inside_test(void)
 		    y2 = y1 + ysign * B_CLICKS;
 		    if (by == mapy - 1)
 			y2 = y1 + ysign * last_height;
-	    if (dist >= array[bx][by].distance && (dist >array[bx][by].distance
-		|| ABS(((double)dx) / dy) < array[bx][by].direction)) {
-		    array[bx][by].distance = dist;
-		    array[bx][by].direction = ABS(((double)dx)/dy);
-		    array[bx][by].fill = dy < 0;
-	    }
+		    if (dist >= array[bx][by].distance &&
+			(dist >array[bx][by].distance ||
+			 ABS(((double)dx) / dy) < array[bx][by].direction)) {
+			array[bx][by].distance = dist;
+			array[bx][by].direction = ABS(((double)dx)/dy);
+			array[bx][by].fill = dy < 0;
+		    }
 		}
 	    }
 	    startx = WRAP_XCLICK(startx + dx);
