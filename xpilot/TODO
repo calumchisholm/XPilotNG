@@ -54,15 +54,6 @@ Task: Make cannons fire if a player is "anywhere near" and not paused
        (this could be a bit harder without breaking old behavior.)
 Developer: throat / kps
 
-Task: Add support for "fixed" type wormholes in server. In xml they look like
-this:
-<Wormhole x="260960" y="148960" type="fixed">
-<Polygon ...></Polygon>
-</Wormhole>
-The x and y values in a fixed wormhole tell to what destination stuff will
-be warped.
-Developer: kps / throat
-
 Task: Make wormholes warp other objects than players.
 Developer: kps
 

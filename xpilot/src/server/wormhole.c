@@ -97,6 +97,9 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
     int wh_dest, wcx, wcy, nearestFront, nearestRear;
     double proximity, proxFront, proxRear;
 
+    if (wh_hit->type == WORM_FIXED)
+	return pl->wormHoleHit;
+
     if (wh_hit->countdown > 0)
 	return wh_hit->lastdest;
 

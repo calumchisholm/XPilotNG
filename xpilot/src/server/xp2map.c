@@ -401,6 +401,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 		    type = WORM_IN;
 		else if (!strcasecmp(s, "out"))
 		    type = WORM_OUT;
+		else if (!strcasecmp(s, "fixed"))
+		    type = WORM_FIXED;
 	    }
 
 	    attr += 2;

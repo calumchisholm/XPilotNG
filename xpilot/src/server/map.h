@@ -148,7 +148,12 @@ typedef struct asteroid {
     int		chance;		/* Chance [0..127] for asteroid to appear */
 } asteroid_t;
 
-typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormtype_t;
+typedef enum {
+    WORM_NORMAL,
+    WORM_IN,
+    WORM_OUT,
+    WORM_FIXED
+} wormtype_t;
 
 typedef struct wormhole {
     clpos_t	pos;

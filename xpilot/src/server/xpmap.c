@@ -452,9 +452,16 @@ setup_t *Xpmap_init_setup(world_t *world)
 		}
 		wtype = world->wormholes[wormhole++].type;
 		switch (wtype) {
-		case WORM_NORMAL: *mapptr = SETUP_WORM_NORMAL; break;
-		case WORM_IN:     *mapptr = SETUP_WORM_IN; break;
-		case WORM_OUT:    *mapptr = SETUP_WORM_OUT; break;
+		case WORM_NORMAL:
+		case WORM_FIXED:
+		    *mapptr = SETUP_WORM_NORMAL;
+		    break;
+		case WORM_IN:
+		    *mapptr = SETUP_WORM_IN;
+		    break;
+		case WORM_OUT:
+		    *mapptr = SETUP_WORM_OUT;
+		    break;
 		default:
 		    warn("Bad wormhole (%d,%d).", x, y);
 		    *mapptr = SETUP_SPACE;
