@@ -20,9 +20,9 @@ optionally status messages) to go to standard output. (Thorsten Kroeger)
 
 Player passwords support. Several new server options: allowPlayerPasswords
 (-PlayerPasswords), playerPasswordsFileName and playerPasswordsFileSizeLimit
-(-playerPasswordsFile and -playerPasswordsLimit). Default file name is
-LIBDIR/player_passwords. Default limit is 1 megabyte (file may grow a little
-bigger than the limit!). (Thorsten Kroeger)
+(-playerPasswordsFile and -playerPasswordsLimit). Passwords are disabled by
+default. Default file name is LIBDIR/player_passwords. Default limit is
+1 megabyte (file may grow a little bigger than the limit!). (Thorsten Kroeger)
 
 Regarding the player passwords support, have a look at the new commands
 /setpass and /auth.
