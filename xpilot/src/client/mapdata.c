@@ -31,7 +31,7 @@ typedef struct {
     char *protocol;
     char *host;
     int   port;
-    char *path;
+    const char *path;
     char *query;
 } URL;
 
@@ -44,8 +44,8 @@ static void Url_free_parsed (URL *url);
 int Mapdata_setup(const char *urlstr)
 {
     URL url;
-    char *name, *dir, *ptr;
-    char path[1024], buf[1024];
+    const char *name, *dir;
+    char path[1024], buf[1024], *ptr;
     int rv = false;
 
     memset(path, 0, sizeof(path));
@@ -161,17 +161,17 @@ int Mapdata_setup(const char *urlstr)
 }
 
 
-static int Mapdata_extract (const char *name) {
-
+static int Mapdata_extract (const char *name)
+{
     gzFile in;
     FILE *out;
+    int retval;
     size_t rlen, wlen;
     char dir[256], buf[COPY_BUF_SIZE], fname[256], *ptr;
     long int size;
     int count, i;
 
-    dir[255] = '\0';
-    strncpy(dir, name, 255);
+    strlcpy(dir, name, sizeof dir);
     ptr = strrchr(dir, '.');
     if (ptr == NULL) {
 	error("file name has no extension %s", dir);
@@ -233,20 +233,21 @@ static int Mapdata_extract (const char *name) {
 	}
 
 	while (size > 0) {
-	    rlen = gzread(in, buf, MIN(COPY_BUF_SIZE, size));
-	    if (rlen == -1) {
+	    retval = gzread(in, buf, MIN(COPY_BUF_SIZE, (unsigned)size));
+	    if (retval == -1) {
 		error("error when reading %s", name);
 		gzclose(in);
 		fclose(out);
 		return 0;
 	    }
-	    if (rlen == 0) {
+	    if (retval == 0) {
 		error("unexpected end of file %s", name);
 		gzclose(in);
 		fclose(out);
 		return 0;
 	    }
 
+	    rlen = retval;
 	    wlen = fwrite(buf, 1, rlen, out);
 	    if (wlen != rlen) {
 		error("failed to write to %s", fname);
@@ -269,11 +270,10 @@ static int Mapdata_extract (const char *name) {
 static int Mapdata_download (const URL *url, const char *filePath)
 {
     char buf[1024];
-    int rv, header, c;
-    unsigned int i;
+    int rv, header, c, len, i;
     sock_t s;
     FILE *f;
-    size_t len;
+    size_t n;
 
     if (strncmp("http", url->protocol, 4) != 0) {
 	error("unsupported protocol %s", url->protocol);
@@ -319,7 +319,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
 	}
     }
 
-    if (sock_write(&s, buf, strlen(buf)) == -1) {
+    if (sock_write(&s, buf, (int)strlen(buf)) == -1) {
 	error("socket write failed");
 	fclose(f);
 	sock_close(&s);
@@ -346,15 +346,18 @@ static int Mapdata_download (const URL *url, const char *filePath)
 
 	if (header) {
 	    for (i = 0; i < len; i++) {
-
-		if (c % 2 == 0 && buf[i] == '\r') c++;
-		else if (c % 2 == 1 && buf[i] == '\n') c++;
-		else c = 0;
+		if (c % 2 == 0 && buf[i] == '\r')
+		    c++;
+		else if (c % 2 == 1 && buf[i] == '\n')
+		    c++;
+		else
+		    c = 0;
 
 		if (c == 4) {
 		    header = 0;
 		    if (i < len - 1) {
-			memmove(buf, buf + i + 1, len - i - 1);
+			n = len - i - 1;
+			memmove(buf, buf + i + 1, n);
 			len = len - i - 1;
 		    }
 		}
@@ -362,7 +365,8 @@ static int Mapdata_download (const URL *url, const char *filePath)
 	}
 
 	if (!header) {
-	    if (fwrite(buf, 1, len, f) == -1) {
+	    n = len;
+	    if (fwrite(buf, 1, n, f) < n) {
 		error("file write failed");
 		rv =  false;
 		break;
