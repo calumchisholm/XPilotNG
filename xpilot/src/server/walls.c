@@ -1854,11 +1854,6 @@ unsigned SPACE_BLOCKS = (
 
 static char msg[MSG_LEN];
 
-/*
- * Two dimensional array giving for each point the distance
- * to the nearest wall.  Measured in blocks times 2.
- */
-static unsigned char **walldist;
 
 void Move_init(void)
 {
@@ -1902,6 +1897,8 @@ void Move_init(void)
     mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL | OBJ_PULSE;
 }
 
+
+#if 0
 static void Bounce_wall(move_state_t *ms, move_bounce_t bounce)
 {
     /* This set ->dir too */
@@ -2830,6 +2827,7 @@ static void Move_segment(move_state_t *ms)
     }
 }
 
+
 static void Cannon_dies(move_state_t *ms)
 {
     cannon_t           *cannon = World.cannon + ms->cannon;
@@ -3101,6 +3099,7 @@ static void Object_hits_target(move_state_t *ms, long player_cost)
     }
 }
 
+
 static void Object_crash(move_state_t *ms)
 {
     object		*obj = ms->mip->obj;
@@ -3172,6 +3171,8 @@ static void Object_crash(move_state_t *ms)
 	break;
     }
 }
+#endif
+
 
 static void Move_ball(int ind)
 {
@@ -3180,9 +3181,21 @@ static void Move_ball(int ind)
     struct move move;
     struct collans ans;
 
-    obj->extpos.x = WRAP_XCLICK(obj->pos.cx + FLOAT_TO_CLICK(obj->vel.x));
-    obj->extpos.y = WRAP_YCLICK(obj->pos.cy + FLOAT_TO_CLICK(obj->vel.y));
+    obj->extpos.x = obj->pos.cx + FLOAT_TO_CLICK(obj->vel.x);
+    while (obj->extpos.x >= World.cwidth)
+	obj->extpos.x -= World.cwidth;
+    while (obj->extpos.x <= 0)
+	obj->extpos.x += World.cwidth;
+    obj->extpos.y = obj->pos.cy + FLOAT_TO_CLICK(obj->vel.y);
+    while (obj->extpos.y >= World.cheight)
+	obj->extpos.y -= World.cheight;
+    while (obj->extpos.y <0)
+	obj->extpos.y += World.cheight;
 
+    if (obj->id != -1 && BIT(Players[GetInd[obj->id]]->used, OBJ_PHASING_DEVICE)) {
+	Object_position_set_clicks(obj, obj->extpos.x, obj->extpos.y);
+	return;
+    }
     if (obj->owner == -1 || Players[GetInd[obj->owner]]->team == TEAM_NOT_SET)
 	move.hit_mask = BALL_BIT | NOTEAM_BIT;
     else
@@ -3229,207 +3242,82 @@ static void Move_ball(int ind)
 
 void Move_object(int ind)
 {
-    object		*obj = Obj[ind];
-    int			nothing_done = 0;
-    int			dist;
-    move_info_t		mi;
-    move_state_t	ms;
-    bool		pos_update = false;
+    int t;
+    struct move move;
+    struct collans ans;
+    int trycount = 5000;
+    int team;            /* !@# should make TEAM_NOT_SET 0 */
+    object *obj = Obj[ind];
 
     Object_position_remember(obj);
 
     obj->collmode = 1;
 
-    {
-	int t;
-	struct move move;
-	struct collans ans;
-	int trycount = 5000;
-	int team; /* !@# should make TEAM_NOT_SET 0 */
 #if 1
-	if (obj->type == OBJ_BALL) {
-	    Move_ball(ind);
-	    return;
-	}
-	{
+    if (obj->type == OBJ_BALL) {
+	Move_ball(ind);
+	return;
+    }
 #else
-	if (obj->type == OBJ_BALL) {
-	    if (obj->owner != -1)
-		team =  Players[GetInd[obj->owner]].team;
-	    else
-		team = TEAM_NOT_SET;
+    if (obj->type == OBJ_BALL) {
+	if (obj->owner != -1)
+	    team =  Players[GetInd[obj->owner]].team;
+	else
+	    team = TEAM_NOT_SET;
 	move.hit_mask = BALL_BIT;
-	}
-	else {
+    }
+    else
 #endif
+	{
 	    move.hit_mask = NONBALL_BIT;
 	    team = obj->team;
 	}
-	if (team == TEAM_NOT_SET)
-	    move.hit_mask |= NOTEAM_BIT;
-	else
-	    move.hit_mask |= 1 << team;
-	obj->extpos.x = WRAP_XCLICK(obj->pos.cx + FLOAT_TO_CLICK(obj->vel.x));
-	obj->extpos.y = WRAP_YCLICK(obj->pos.cy + FLOAT_TO_CLICK(obj->vel.y));
+    if (team == TEAM_NOT_SET)
+	move.hit_mask |= NOTEAM_BIT;
+    else
+	move.hit_mask |= 1 << team;
+    obj->extpos.x = WRAP_XCLICK(obj->pos.cx + FLOAT_TO_CLICK(obj->vel.x));
+    obj->extpos.y = WRAP_YCLICK(obj->pos.cy + FLOAT_TO_CLICK(obj->vel.y));
 
-	move.start.x = obj->pos.cx;
-	move.start.y = obj->pos.cy;
-	move.delta.x = FLOAT_TO_CLICK(obj->vel.x);
-	move.delta.y = FLOAT_TO_CLICK(obj->vel.y);
-	while (move.delta.x || move.delta.y) {
-	    if (!trycount--) {
-		sprintf(msg, "COULDN'T MOVE OBJECT!!!! Type = %d, x = %d, y = %d. Object was DELETED. [*DEBUG*]", obj->type, move.start.x, move.start.y);
-		Set_message(msg);
-		obj->life = 0;
-		return;
-	    }
-	    Move_point(&move, &ans);
-	    move.delta.x -= ans.moved.x;
-	    move.delta.y -= ans.moved.y;
-	    move.start.x = WRAP_XCLICK(move.start.x + ans.moved.x);
-	    move.start.y = WRAP_YCLICK(move.start.y + ans.moved.y);
-	    if (ans.line != -1) {
-		if ( (t = Away(&move, ans.line)) != -1) {
-		    if (!Clear_corner(&move, obj, ans.line, t))
-			break;
-		}
-		else if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
-		    if (!Bounce_object(obj, &move, ans.line, 0))
-			break;
-		}
-	    }
+    move.start.x = obj->pos.cx;
+    move.start.y = obj->pos.cy;
+    move.delta.x = FLOAT_TO_CLICK(obj->vel.x);
+    move.delta.y = FLOAT_TO_CLICK(obj->vel.y);
+    while (move.delta.x || move.delta.y) {
+	if (!trycount--) {
+	    sprintf(msg, "COULDN'T MOVE OBJECT!!!! Type = %d, x = %d, y = %d. Object was DELETED. [*DEBUG*]", obj->type, move.start.x, move.start.y);
+	    Set_message(msg);
+	    obj->life = 0;
+	    return;
 	}
-	Object_position_set_clicks(obj, move.start.x, move.start.y);
-	return;
-    }
-
-    dist = walldist[obj->pos.bx][obj->pos.by];
-
-    {
-	int x = obj->pos.cx + FLOAT_TO_CLICK(obj->vel.x);
-	int y = obj->pos.cy + FLOAT_TO_CLICK(obj->vel.y);
-	x = WRAP_XCLICK(x);
-	y = WRAP_YCLICK(y);
-	obj->extpos.x = x;
-	obj->extpos.y = y;
-	if (dist > 2) {
-	    int max = ((dist - 2) * BLOCK_SZ) >> 1;
-	    if (sqr(max) >= sqr(obj->vel.x) + sqr(obj->vel.y)) {
-		Object_position_set_clicks(obj, (int)(x), (int)(y));
-		return;
-	    }
-	}
-    }
-    mi.pl = NULL;
-    mi.obj = obj;
-    mi.edge_wrap = BIT(World.rules->mode, WRAP_PLAY);
-    mi.edge_bounce = 0; /* edgeBounce removed */
-    mi.wall_bounce = BIT(mp.obj_bounce_mask, obj->type);
-    mi.cannon_crashes = BIT(mp.obj_cannon_mask, obj->type);
-    mi.target_crashes = BIT(mp.obj_target_mask, obj->type);
-    mi.treasure_crashes = BIT(mp.obj_treasure_mask, obj->type);
-    mi.wormhole_warps = true;
-    if (BIT(obj->type, OBJ_BALL) && obj->id != -1) {
-	mi.phased = BIT(Players[GetInd[obj->id]]->used, OBJ_PHASING_DEVICE);
-    } else {
-	mi.phased = 0;
-    }
-
-    ms.pos.x = obj->pos.cx;
-    ms.pos.y = obj->pos.cy;
-    ms.vel = obj->vel;
-    ms.todo.x = FLOAT_TO_CLICK(ms.vel.x);
-    ms.todo.y = FLOAT_TO_CLICK(ms.vel.y);
-    ms.dir = obj->dir;
-    ms.mip = &mi;
-
-    for (;;) {
-        if (pos_update && obj->collmode == 2)
-	    obj->collmode = 3;   /* object didn't disappear after bounce */
-	Move_segment(&ms);
-	if (!(ms.done.x | ms.done.y)) {
-	    if (!pos_update && (ms.crash | ms.bounce)) {
-		DFLOAT f = ABS(ms.vel.x) + ABS(ms.vel.y);
-
-		/* If f<1, there is practically no movement. Object
-		   collision detection can ignore the bounce. */
-		if (f > 1) {
-		    obj->wall_time = 1 -
-			CLICK_TO_FLOAT(ABS(ms.todo.x) + ABS(ms.todo.y)) / f;
-		    obj->collmode = 2;
-		}
-		pos_update = 1;
-	    }
-	    if (ms.crash) {
-		break;
-	    }
-	    if (ms.bounce && ms.bounce != BounceEdge) {
-		if (obj->type != OBJ_BALL)
-		    obj->life = (long)(obj->life * objectWallBounceLifeFactor);
-		if (obj->life <= 0) {
+	Move_point(&move, &ans);
+	move.delta.x -= ans.moved.x;
+	move.delta.y -= ans.moved.y;
+	move.start.x = WRAP_XCLICK(move.start.x + ans.moved.x);
+	move.start.y = WRAP_YCLICK(move.start.y + ans.moved.y);
+	if (ans.line != -1) {
+	    if ( (t = Away(&move, ans.line)) != -1) {
+		if (!Clear_corner(&move, obj, ans.line, t))
 		    break;
-		}
-		/*
-		 * Any bouncing sparks are no longer owner immune to give
-		 * "reactive" thrust.  This is exactly like ground effect
-		 * in the real world.  Very useful for stopping against walls.
-		 *
-		 * If the FROMBOUNCE bit is set the spark was caused by
-		 * the player bouncing of a wall and thus although the spark
-		 * should bounce, it is not reactive thrust otherwise wall
-		 * bouncing would cause acceleration of the player.
-		 */
-		if (sqr(ms.vel.x) + sqr(ms.vel.y) > sqr(maxObjectWallBounceSpeed)) {
-		    obj->life = 0;
+	    }
+	    else if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
+		if (!Bounce_object(obj, &move, ans.line, 0))
 		    break;
-		}
-		if (!BIT(obj->status, FROMBOUNCE) && BIT(obj->type, OBJ_SPARK))
-		    CLR_BIT(obj->status, OWNERIMMUNE);
-		ms.vel.x *= objectWallBrakeFactor;
-		ms.vel.y *= objectWallBrakeFactor;
-		ms.todo.x = (int)(ms.todo.x * objectWallBrakeFactor);
-		ms.todo.y = (int)(ms.todo.y * objectWallBrakeFactor);
 	    }
-	    if (++nothing_done >= 5) {
-		ms.crash = CrashUnknown;
-		break;
-	    }
-	} else {
-	    ms.pos.x += ms.done.x;
-	    ms.pos.y += ms.done.y;
-	    nothing_done = 0;
-	}
-	if (!(ms.todo.x | ms.todo.y)) {
-	    break;
 	}
     }
-    if (mi.edge_wrap) {
-	if (ms.pos.x < 0) {
-	    ms.pos.x += mp.click_width;
-	}
-	if (ms.pos.x >= mp.click_width) {
-	    ms.pos.x -= mp.click_width;
-	}
-	if (ms.pos.y < 0) {
-	    ms.pos.y += mp.click_height;
-	}
-	if (ms.pos.y >= mp.click_height) {
-	    ms.pos.y -= mp.click_height;
-	}
-    }
-    Object_position_set_clicks(obj, ms.pos.x, ms.pos.y);
-    obj->vel = ms.vel;
-    obj->dir = ms.dir;
-    if (ms.crash) {
-	Object_crash(&ms);
-    }
+    Object_position_set_clicks(obj, move.start.x, move.start.y);
+    return;
 }
 
 
 void Move_player(int ind)
 {
-    player		*pl = Players[ind];
-    clpos		pos;
+    player *pl = Players[ind];
+    clpos  pos;
+    int    line, point;
+    struct move move;
+    struct collans ans;
 
 
     if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
@@ -3454,14 +3342,20 @@ void Move_player(int ind)
 
     pl->collmode = 1;
 
-    if (1) {
-	int line, point;
-	struct move move;
-	struct collans ans;
+    pl->extpos.x = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x);
+    while (pl->extpos.x >= World.cwidth)
+	pl->extpos.x -= World.cwidth;
+    while (pl->extpos.x <= 0)
+	pl->extpos.x += World.cwidth;
+    pl->extpos.y = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y);
+    while (pl->extpos.y >= World.cheight)
+	pl->extpos.y -= World.cheight;
+    while (pl->extpos.y <0)
+	pl->extpos.y += World.cheight;
 
-	pl->extpos.x = WRAP_XCLICK(pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x));
-	pl->extpos.y = WRAP_YCLICK(pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y));
-
+    if (BIT(pl->used, OBJ_PHASING_DEVICE))
+	Player_position_set_clicks(pl, pl->extpos.x, pl->extpos.y);
+    else {
 	if (pl->team != TEAM_NOT_SET)
 	    move.hit_mask = NONBALL_BIT | 1 << pl->team;
 	else
@@ -3497,9 +3391,9 @@ void Move_player(int ind)
 	    }
 	}
 	Player_position_set_clicks(pl, move.start.x, move.start.y);
-	pl->velocity = VECTOR_LENGTH(pl->vel);
-	return;
     }
+    pl->velocity = VECTOR_LENGTH(pl->vel);
+    return;
 }
 
 void Turn_player(int ind)

@@ -813,7 +813,7 @@ int Handle_keyboard(int ind)
 			minv = 5.0f;
 			i = HOVERPAUSE;
 		    }
-		    minv += VECTOR_LENGTH(World.gravity[pl->pos.bx][pl->pos.by]);
+ /*      minv += VECTOR_LENGTH(World.gravity[pl->pos.bx][pl->pos.by]); !@# */
 		    if (pl->velocity > minv)
 			break;
 		}
