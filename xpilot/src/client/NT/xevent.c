@@ -71,6 +71,9 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 
 void Pointer_control_set_state(bool on)
 {
+    if (pointerControl == on)
+	return;
+
     if (on) {
 	pointerControl = true;
 	XGrabPointer(dpy, drawWindow, true, 0, GrabModeAsync,

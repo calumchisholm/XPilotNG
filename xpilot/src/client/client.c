@@ -2222,16 +2222,9 @@ int Client_start(void)
 
 void Client_cleanup(void)
 {
-    int		i;
+    int i;
 
-    /*
-     * kps - Pointer_control_set_state(false); causes
-     * X Error of failed request: BadWindow (invalid Window parameter)
-     * if client window is closed by pressing the window manager close
-     * button.
-     */
-    /*Pointer_control_set_state(false);*/
-
+    Pointer_control_set_state(false);
     Platform_specific_cleanup();
     Free_selectionAndHistory();
     Free_msgs();

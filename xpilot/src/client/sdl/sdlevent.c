@@ -60,6 +60,9 @@ bool Key_press_talk(void)
 
 void Pointer_control_set_state(bool on)
 {
+    if (pointerControl == on)
+	return;
+
     if (on) {
     	MainWidget_ShowMenu(MainWidget, false);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
