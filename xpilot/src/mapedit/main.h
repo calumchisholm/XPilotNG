@@ -43,7 +43,6 @@
 #include                 "defaults.h"
 #include                 "map.h"
 #include                 "proto.h"
-#include                 "tools.h"
 #include                 "file.h"
 
 #define MAPWIDTH         0
@@ -368,3 +367,7 @@ extern int mapicon_ptr[91];
 extern char iconmenu[36];
 extern int smlmap_x, smlmap_y, smlmap_width, smlmap_height;
 extern float smlmap_xscale, smlmap_yscale;
+
+/* tools.c */
+extern Window changedwin;
+extern int selectfrom_x, selectfrom_y, selectto_x, selectto_y;

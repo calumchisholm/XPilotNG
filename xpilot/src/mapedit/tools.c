@@ -28,6 +28,12 @@
 
 #include                 "main.h"
 
+typedef struct undo_t {
+    int x, y;
+    char icon;
+    struct undo_t *next;
+} undo_t;
+
 Window changedwin;
 int prefx = PREF_X, prefy = PREF_Y;
 int prevdraw_x, prevdraw_y;
