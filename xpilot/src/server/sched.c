@@ -198,127 +198,6 @@ void install_timer_tick(windows_timer_t func, int freq)
 }
 #endif
 
-
-/*
- * Linked list of timeout callbacks.
- */
-struct to_handler {
-    struct to_handler	*next;
-    time_t		when;
-    void		(*func)(void *);
-    void		*arg;
-};
-static struct to_handler *to_busy_list = NULL;
-static struct to_handler *to_free_list = NULL;
-static int		to_min_free = 3;
-static int		to_max_free = 5;
-static int		to_cur_free = 0;
-
-static void to_fill(void)
-{
-    if (to_cur_free < to_min_free) {
-	do {
-	    struct to_handler *top =
-		(struct to_handler *)malloc(sizeof(struct to_handler));
-	    if (!top) {
-		break;
-	    }
-	    top->next = to_free_list;
-	    to_free_list = top;
-	    to_cur_free++;
-	} while (to_cur_free < to_max_free);
-    }
-}
-
-static struct to_handler *to_alloc(void)
-{
-    struct to_handler *top;
-
-    to_fill();
-    if (!to_free_list) {
-	error("Not enough memory for timeouts");
-	exit(1);
-    }
-
-    top = to_free_list;
-    to_free_list = top->next;
-    to_cur_free--;
-    top->next = 0;
-
-    return top;
-}
-
-static void to_free(struct to_handler *top)
-{
-    if (to_cur_free < to_max_free) {
-	top->next = to_free_list;
-	to_free_list = top;
-	to_cur_free++;
-    }
-    else {
-	free(top);
-    }
-}
-
-/*
- * Configure timout callback.
- */
-void install_timeout(void (*func)(void *), int offset, void *arg)
-{
-    struct to_handler *top = to_alloc();
-    top->func = func;
-    top->when = current_time + offset;
-    top->arg = arg;
-    if (!to_busy_list || to_busy_list->when >= top->when) {
-	top->next = NULL;
-	to_busy_list = top;
-    }
-    else {
-	struct to_handler *prev = to_busy_list;
-	struct to_handler *lp = prev->next;
-	while (lp && lp->when < top->when) {
-	    prev = lp;
-	    lp = lp->next;
-	}
-	top->next = lp;
-	prev->next = top;
-    }
-}
-
-void remove_timeout(void (*func)(void *), void *arg)
-{
-    struct to_handler *prev = 0;
-    struct to_handler *lp = to_busy_list;
-    while (lp) {
-	if (lp->func == func && lp->arg == arg) {
-	    struct to_handler *top = lp;
-	    lp = lp->next;
-	    if (prev) {
-		prev->next = lp;
-	    } else {
-		to_busy_list = lp;
-	    }
-	    to_free(top);
-	}
-	else {
-	    prev = lp;
-	    lp = lp->next;
-	}
-    }
-}
-
-static void timeout_chime(void)
-{
-    while (to_busy_list && to_busy_list->when <= current_time) {
-	struct to_handler *top = to_busy_list;
-	void (*func)(void *) = top->func;
-	void *arg = top->arg;
-	to_busy_list = top->next;
-	to_free(top);
-	(*func)(arg);
-    }
-}
-
 #ifndef _WINDOWS
 #define NUM_SELECT_FD		((int)sizeof(int) * 8)
 #else
@@ -510,7 +389,6 @@ void sched(void)
 		if (--ticks_till_second <= 0) {
 		    ticks_till_second += timer_freq;
 		    current_time++;
-		    timeout_chime();
 		}
 	    } while (timers_used + 1 < timer_ticks);
 	}
@@ -587,7 +465,6 @@ void sched(void)
 	    if (--ticks_till_second <= 0) {
 		ticks_till_second += timer_freq;
 		current_time++;
-		timeout_chime();
 	    }
 	} while (timers_used + 1 < timer_ticks);
     }
