@@ -448,10 +448,9 @@ int Process_event(SDL_Event *evt)
 	key_change |= Key_release(buttonMap[evt->button.button - 1]);
 	break;
 
-    case SDL_VIDEORESIZE:      
- 
-      Resize_Window(evt->resize.w, evt->resize.h);          
-      break;
+    case SDL_VIDEORESIZE:     
+        Resize_Window(evt->resize.w, evt->resize.h);          
+        break;
 
     default:
       break;
