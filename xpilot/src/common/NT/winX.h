@@ -275,7 +275,7 @@ typedef	struct XColor XColor;
 
 /* Polygon shapes */
 #define Complex			0	/* paths may intersect */
-/*#define Nonconvex		1	/* no paths intersect, but not convex */
+#define Nonconvex		1	/* no paths intersect, but not convex */
 #define Convex			2	/* wholly convex */
 
 

@@ -39,7 +39,7 @@
 
 #include "../error.h"
 #include "../const.h"
-#include "../../client/draw.h"
+#include "../draw.h"
 #include "../../client/paint.h"
 #include "../../client/xinit.h"
 #include "../../client/widget.h"
