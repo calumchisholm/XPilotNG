@@ -10,10 +10,14 @@ AM_CONFIG_HEADER(config.h)
 dnl AC_CANONICAL_HOST
 
 dnl  Copyright & stuff.
+AC_SUBST([XP_AUTHORS],["BjÅ¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
+AC_SUBST([XP_COPYRIGHTDATE],["1991-2003"])
 AC_SUBST([XP_COPYRIGHT],["Copyright Å© 1991-2003 by BjÅ¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
 AC_SUBST([XP_RELEASEDATE],["Sep 4, 2003"])
-dnl  Hack.
 AC_SUBST([XP_INSTLIBDIR],$prefix/lib)
+AC_SUBST([XP_TITLE],["XPilot 4.5.4X2"])
+AC_SUBST([XP_WINVERSION],["4.5.4X2-NT13"])
+AC_SUBST([XP_VERSION_WINDOWS],["13"])
 
 
 dnl  Checks for options.
@@ -219,6 +223,7 @@ AC_CONFIG_FILES([ \
 	lib/textures/Makefile \
 	src/Makefile \
 	src/common/Makefile \
+	src/common/version.h \
 	src/client/Makefile \
 	src/client/items/Makefile \
 	src/server/Makefile \

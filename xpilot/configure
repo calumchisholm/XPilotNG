@@ -310,7 +310,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot XP_COPYRIGHT XP_RELEASEDATE XP_INSTLIBDIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_INSTLIBDIR XP_TITLE XP_WINVERSION XP_VERSION_WINDOWS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1696,11 +1696,22 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
           ac_config_headers="$ac_config_headers config.h"
 
 
+XP_AUTHORS="Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"
+
+XP_COPYRIGHTDATE="1991-2003"
+
 XP_COPYRIGHT="Copyright © 1991-2003 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"
 
 XP_RELEASEDATE="Sep 4, 2003"
 
 XP_INSTLIBDIR=$prefix/lib
+
+XP_TITLE="XPilot 4.5.4X2"
+
+XP_WINVERSION="4.5.4X2-NT13"
+
+XP_VERSION_WINDOWS="13"
+
 
 
 
@@ -6952,7 +6963,7 @@ fi
 done
 
 
-                                                                                                                                                                          ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile doc/man/xpilot.man doc/man/xp-replay.man doc/man/xp-mapedit.man doc/man/xpilots.man lib/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/client/Makefile src/client/items/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
+                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile doc/Makefile doc/man/Makefile doc/man/xpilot.man doc/man/xp-replay.man doc/man/xp-mapedit.man doc/man/xpilots.man lib/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/client/Makefile src/client/items/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7514,6 +7525,7 @@ do
   "lib/textures/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/textures/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/common/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/common/Makefile" ;;
+  "src/common/version.h" ) CONFIG_FILES="$CONFIG_FILES src/common/version.h" ;;
   "src/client/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/client/Makefile" ;;
   "src/client/items/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/client/items/Makefile" ;;
   "src/server/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/server/Makefile" ;;
@@ -7625,9 +7637,14 @@ s,@INSTALL_STRIP_PROGRAM@,$INSTALL_STRIP_PROGRAM,;t t
 s,@AWK@,$AWK,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
 s,@am__leading_dot@,$am__leading_dot,;t t
+s,@XP_AUTHORS@,$XP_AUTHORS,;t t
+s,@XP_COPYRIGHTDATE@,$XP_COPYRIGHTDATE,;t t
 s,@XP_COPYRIGHT@,$XP_COPYRIGHT,;t t
 s,@XP_RELEASEDATE@,$XP_RELEASEDATE,;t t
 s,@XP_INSTLIBDIR@,$XP_INSTLIBDIR,;t t
+s,@XP_TITLE@,$XP_TITLE,;t t
+s,@XP_WINVERSION@,$XP_WINVERSION,;t t
+s,@XP_VERSION_WINDOWS@,$XP_VERSION_WINDOWS,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
