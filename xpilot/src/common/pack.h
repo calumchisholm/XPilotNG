@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -117,7 +117,7 @@
  * Which client versions can join this server.
  */
 #ifdef SERVER
-#define MIN_CLIENT_VERSION	(is_polygon_map ? 0x4F09 : 0x4203)
+#define MIN_CLIENT_VERSION	0x4203
 #define MAX_CLIENT_VERSION	MY_VERSION
 #endif
 

@@ -165,6 +165,7 @@ char netserver_version[] = VERSION;
 static connection_t	*Conn = NULL;
 static int		max_connections = 0;
 static setup_t		*Setup = NULL;
+static setup_t		*Oldsetup;
 static int		(*playing_receive[256])(int ind),
 			(*login_receive[256])(int ind),
 			(*drain_receive[256])(int ind);
@@ -206,13 +207,48 @@ static int Compress_map(unsigned char *map, int size)
     return j;
 }
 
-/*
- * Initialize the structure that gives the client information
- * about our setup.  Like the map and playing rules.
- * We only setup this structure once to save time when new
- * players log in during play.
- */
-static int Init_setup(void)
+
+static void Setup_old_blockmap(void)
+{
+    int x;
+    unsigned char *map_line;
+    unsigned char **map_pointer;
+
+    World.block = (unsigned char **)malloc(sizeof(unsigned char *)*World.x
+				     + World.x*sizeof(unsigned char)*World.y);
+    if (World.block == NULL) {
+	error("Couldn't allocate memory");
+	exit(-1);
+    }
+
+    map_pointer = World.block;
+    map_line = (unsigned char*) ((unsigned char**)map_pointer + World.x);
+
+    for (x=0; x<World.x; x++) {
+	*map_pointer = map_line;
+	map_pointer += 1;
+	map_line += World.y;
+    }
+
+    /* Client will quit if it gets a nonexistent homebase, so create
+     * some bases to make it happy. Of course it's impossible to play
+     * with this, but at least we can tell the player what's wrong... */
+    if (mapData == NULL) {
+	mapData = malloc(World.NumBases + 1);
+	if (mapData == NULL) {
+	    error("Couldn't allocate memory");
+	    exit(-1);
+	}
+	for (x = 0; x < World.NumBases; x++)
+	    mapData[x] = '1';
+	mapData[World.NumBases] = 0;
+    }
+    Xpmap_grok_map_data();
+    Xpmap_tags_to_internal_data(false);
+}
+
+
+static int Init_setup_old(void)
 {
     int			i, x, y, team, type = -1, size,
 			wormhole = 0,
@@ -222,9 +258,12 @@ static int Init_setup(void)
 			cannon = 0;
     unsigned char	*mapdata, *mapptr;
 
-    /* kps - hack, i don't want to indent this part now, fix later */
-    if (is_polygon_map)
-	goto poly;
+    if (is_polygon_map && World.block) {
+	free(World.block);
+	World.block = NULL;
+    }
+    if (World.block == NULL)
+	Setup_old_blockmap(); /* Never freed as of now */
 
     if ((mapdata = (unsigned char *) malloc(World.x * World.y)) == NULL) {
 	error("No memory for mapdata");
@@ -385,20 +424,57 @@ static int Init_setup(void)
     }
 #endif
 
- poly:
-    if (is_polygon_map) {
-	/* This could be sized dynamically !@# */
-	if ( (mapdata = (unsigned char *) malloc(1000000)) == NULL) {
-	    error("No memory for mapdata");
-	    return -1;
-	}
-
-	size = Polys_to_client(mapdata);
-#ifndef SILENT
-	xpprintf("%s Server->client map transfer size is %d bytes.\n",
-		 showtime(), size);
-#endif
+    if ((Oldsetup = (setup_t *) malloc(sizeof(setup_t) + size)) == NULL) {
+	error("No memory to hold oldsetup");
+	free(mapdata);
+	return -1;
     }
+    memset(Oldsetup, 0, sizeof(setup_t) + size);
+    memcpy(Oldsetup->map_data, mapdata, size);
+    free(mapdata);
+    Oldsetup->setup_size = ((char *) &Oldsetup->map_data[0] - (char *) Oldsetup) + size;
+    Oldsetup->map_data_len = size;
+    Oldsetup->map_order = type; /* kps - !ng */
+    Oldsetup->frames_per_second = FPS;
+    Oldsetup->lives = World.rules->lives;
+    Oldsetup->mode = World.rules->mode;
+    Oldsetup->x = World.x;
+    Oldsetup->y = World.y;
+    strlcpy(Oldsetup->name, World.name, sizeof(Oldsetup->name));
+    strlcpy(Oldsetup->author, World.author, sizeof(Oldsetup->author));
+
+    return 0;
+}
+
+
+/*
+ * Initialize the structure that gives the client information
+ * about our setup.  Like the map and playing rules.
+ * We only setup this structure once to save time when new
+ * players log in during play.
+ */
+static int Init_setup(void)
+{
+    int			size;
+    int			result;
+    unsigned char	*mapdata;
+
+    result = Init_setup_old();
+
+    if (!is_polygon_map)
+	return result;
+
+    /* This could be sized dynamically !@# */
+    if ( (mapdata = (unsigned char *) malloc(1000000)) == NULL) {
+	error("No memory for mapdata");
+	return -1;
+    }
+
+    size = Polys_to_client(mapdata);
+#ifndef SILENT
+    xpprintf("%s Server->client map transfer size is %d bytes.\n",
+	     showtime(), size);
+#endif
 
     if ((Setup = (setup_t *) malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold setup");
@@ -410,12 +486,9 @@ static int Init_setup(void)
     free(mapdata);
     Setup->setup_size = ((char *) &Setup->map_data[0] - (char *) Setup) + size;
     Setup->map_data_len = size;
-    Setup->map_order = type; /* kps - !ng */
     Setup->frames_per_second = FPS;
     Setup->lives = World.rules->lives;
     Setup->mode = World.rules->mode;
-    Setup->x = World.x;
-    Setup->y = World.y;
     Setup->width = World.width;
     Setup->height = World.height;
     strlcpy(Setup->name, World.name, sizeof(Setup->name));
@@ -1101,38 +1174,43 @@ static int Handle_setup(int ind)
 {
     connection_t	*connp = &Conn[ind];
     char		*buf;
-    int			n,
-			len;
+    int			n, len;
+    setup_t		*S;
 
     if (connp->state != CONN_SETUP) {
 	Destroy_connection(ind, "not setup");
 	return -1;
     }
 
+    if (connp->version >= 0x4F00)
+	S = Setup;
+    else
+	S = Oldsetup;
+
     if (connp->setup == 0) {
-	if (!is_polygon_map)
+	if (connp->version < 0x4F00 || !is_polygon_map)
 	    n = Packet_printf(&connp->c,
 			      "%ld" "%ld%hd" "%hd%hd" "%hd%hd" "%s%s",
-			      Setup->map_data_len,
-			      Setup->mode, Setup->lives,
-			      Setup->x, Setup->y,
-			      Setup->frames_per_second, Setup->map_order,
-			      Setup->name, Setup->author);
+			      S->map_data_len,
+			      S->mode, S->lives,
+			      S->x, S->y,
+			      S->frames_per_second, S->map_order,
+			      S->name, S->author);
 	else
 	    n = Packet_printf(&connp->c,
 			      "%ld" "%ld%hd" "%hd%hd" "%hd%s" "%s%S",
-			      Setup->map_data_len,
-			      Setup->mode, Setup->lives,
-			      Setup->width, Setup->height,
-			      Setup->frames_per_second, Setup->name,
-			      Setup->author, Setup->data_url);
+			      S->map_data_len,
+			      S->mode, S->lives,
+			      S->width, S->height,
+			      S->frames_per_second, S->name,
+			      S->author, S->data_url);
 	if (n <= 0) {
 	    Destroy_connection(ind, "setup 0 write error");
 	    return -1;
 	}
-	connp->setup = (char *) &Setup->map_data[0] - (char *) Setup;
+	connp->setup = (char *) &S->map_data[0] - (char *) S;
     }
-    else if (connp->setup < Setup->setup_size) {
+    else if (connp->setup < S->setup_size) {
 	if (connp->c.len > 0) {
 	    /* If there is still unacked reliable data test for acks. */
 	    Handle_input(-1, (void *) ind);
@@ -1141,16 +1219,16 @@ static int Handle_setup(int ind)
 	    }
 	}
     }
-    if (connp->setup < Setup->setup_size) {
+    if (connp->setup < S->setup_size) {
 	len = MIN(connp->c.size, 4096) - connp->c.len;
 	if (len <= 0) {
 	    /* Wait for acknowledgement of previously transmitted data. */
 	    return 0;
 	}
-	if (len > Setup->setup_size - connp->setup) {
-	    len = Setup->setup_size - connp->setup;
+	if (len > S->setup_size - connp->setup) {
+	    len = S->setup_size - connp->setup;
 	}
-	buf = (char *) Setup;
+	buf = (char *) S;
 	if (Sockbuf_writeRec(&connp->c, &buf[connp->setup], len) != len) {
 	    Destroy_connection(ind, "sockbuf write setup error");
 	    return -1;
@@ -1160,7 +1238,7 @@ static int Handle_setup(int ind)
 	    connp->start += (len * FPS) / (8 * 512) + 1;
 	}
     }
-    if (connp->setup >= Setup->setup_size) {
+    if (connp->setup >= S->setup_size) {
 	Conn_set_state(connp, CONN_DRAIN, CONN_LOGIN);
     }
 #if 0
@@ -1500,6 +1578,11 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 		    "Your client will see the %d asteroids as balls. %s",
 		    (int)World.asteroids.max,
 		    sender);
+	    Set_player_message(pl, msg);
+	}
+	if (is_polygon_map && connp->version < 0x4F00) {
+	    sprintf(msg, "Your client doesn't support polygon maps. "
+		    "What you see might not match the real map. %s", sender);
 	    Set_player_message(pl, msg);
 	}
     }
