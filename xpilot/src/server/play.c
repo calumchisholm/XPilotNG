@@ -241,9 +241,9 @@ void Ball_is_destroyed(ballobject *ball)
 	double normalized = frames * timeStep;
 
 	sprintf(msg," < The ball was loose for %d frames "
-		"(equals %.2f frames with gamespeed=FPS) / %.2fs >",
-		(int)frames, normalized, seconds);
-	Rank_BallRun(pl, normalized);
+		"/ %.2f frames at gamespeed=FPS (best %d) / %.2fs >",
+		(int)frames, normalized, Rank_GetBestBall(pl), seconds);
+	Rank_BallRun(pl, (int)(normalized + 0.5));
     } else {
 	sprintf(msg," < The ball was loose for %d frames / %.2fs >",
 		(int)frames, seconds);
@@ -532,7 +532,7 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
 
 	if (BIT(pl->status, WARPING))
 	    return false;
-
+#if 0
 	/*
 	 * Don't warp again if we are still on the
 	 * same wormhole we have just been warped to.
@@ -543,7 +543,7 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
 	    /* kps - wormHoleDest is now pointer */
 	    /*&& pl->wormHoleDest == ind */)
 	    return false;
-
+#endif
     } else {
 	    /*int last = wormhole->lastdest;*/
 
