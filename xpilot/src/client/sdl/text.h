@@ -7,6 +7,13 @@
 
 #include "xpclient.h"
 
+/*alignments*/
+#define LEFT 0
+#define DOWN 0
+#define CENTER 1
+#define RIGHT 2
+#define UP 2
+
 /* This holds all of the information related to any
  * freetype font that we want to create.
  */ 
@@ -15,6 +22,7 @@ typedef struct {
 	float w;    	    /* Holds the width of the font.*/
 	GLuint * textures;  /* Holds the texture id's */
 	GLuint list_base;   /* Holds the first display list id */
+	GLuint * char_width;   /* Holds the first display list id */
 } font_data;
 
 /* The init function will create a font of
@@ -30,11 +38,18 @@ typedef struct {
 	float height;
 } fontbounds;
 
+/* Calcs the bounding width,height for the text if it were printed
+ * to screen with given font
+ */
+fontbounds fontprintsize(font_data *ft_font, const char *fmt, ...);
 /* The flagship function of the library - this thing will print
  * out text at window coordinates x,y, using the font ft_font.
  * The current modelview matrix will also be applied to the text.
- */ 
-fontbounds fontprint(font_data *ft_font, float x, float y, const char *fmt, ...) ;
+ */
+/* You can now align the text differently to the choords x,y
+ * it will align the entire text block vertically, and each line horisontally
+ */
+fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float y, const char *fmt, ...) ;
 
 font_data gamefont;
 font_data messagefont;

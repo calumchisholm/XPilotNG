@@ -20,6 +20,15 @@ GLuint  texture[NUM_TEXTURES]; /* Storage For Our Font Texture             */
 int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);
+/*char *mytok(char *s, const char *delim);
+
+static char *mytok(char *s, const char *delim)
+{
+    static char buf[1024];
+    strncpy(buf,s,1023);
+    
+    
+}*/
 
 int LoadBMP(font_data *ft_font, const char * fname)
 {
@@ -63,7 +72,7 @@ int LoadBMP(font_data *ft_font, const char * fname)
 
 #ifdef HAVE_FREETYPE2
 int next_p2 ( int a );
-int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base );
+int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base, GLuint *char_width);
 int FTinit(font_data *ft_font, const char * fname, unsigned int w, unsigned int h);
 
 int next_p2 ( int a )
@@ -74,7 +83,7 @@ int next_p2 ( int a )
 }
 
 /* Create a display list coresponding to the give character. */
-int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base )
+int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base, GLuint *char_width)
 {
     
     int i,j;
@@ -179,6 +188,7 @@ int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base )
     float	x=(float)bitmap.width / (float)width,
 		y=(float)bitmap.rows / (float)height;
 
+    *char_width = face->glyph->advance.x >> 6;
     /* Here we draw the texturemaped quads.
      * The bitmap that we got from FreeType was not 
      * oriented quite like we would like it to be,
@@ -192,13 +202,7 @@ int make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base )
         glTexCoord2d(x,0); glVertex2f(bitmap.width,bitmap.rows);
     glEnd();
     glPopMatrix();
-    glTranslatef(face->glyph->advance.x >> 6 ,0,0);
-
-
-    /* increment the raster position as if we were a bitmap font.
-     * (only needed if you want to calculate text length)
-     */
-    glBitmap(0,0,0,0,face->glyph->advance.x >> 6,0,NULL);
+    glTranslatef(*char_width ,0,0);
 
     /*Finish the display list*/
     glEndList();
@@ -253,11 +257,13 @@ int FTinit(font_data *ft_font, const char * fname, unsigned int w, unsigned int 
      * are about to create. 
      */ 
     ft_font->list_base=glGenLists(128);
+    ft_font->char_width=(GLuint *) malloc(128 * sizeof(GLuint));
     glGenTextures( 128, ft_font->textures );
 
     /*This is where we actually create each of the fonts display lists.*/
     for(i=0;i<128;i++)
-	if (make_dlist(face,i,ft_font->list_base,ft_font->textures)) return 3;
+	if (make_dlist(face,i,ft_font->list_base,ft_font->textures,&ft_font->char_width[i])) return 3;
+
 
     /* We don't need the face information now that the display
      * lists have been created, so we free the assosiated resources.
@@ -291,12 +297,13 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int w/*this is mos
     	return 1;
     
     /* Creating 256 Display List */
-    ft_font->list_base  = glGenLists( 256 );
+    ft_font->list_base  = glGenLists( 128 );
+    ft_font->char_width = (GLuint *) malloc(128 * sizeof(GLuint));
     /* Select Our Font Texture */
     glBindTexture( GL_TEXTURE_2D, texture[0] );
 
     /* Loop Through All 256 Lists */
-    for ( loop = 0; loop < 256; loop++ )
+    for ( loop = 0; loop < 128; loop++ )
         {
 	    /* NOTE:
 	     *  BMPs are stored with the top-leftmost pixel being the
@@ -318,7 +325,7 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int w/*this is mos
 	     * and that is why we load the texture using GL_BGR. It's
 	     * bass-ackwards I know but whattaya gonna do?
 	     */
-
+    	    ft_font->char_width[loop] = ft_font->w;
 	    /* X Position Of Current Character */
 	    cx = 1 - ( float )( loop % 16 ) / 16.0f;
 	    /* Y Position Of Current Character */
@@ -360,9 +367,12 @@ void fontclean(font_data *ft_font)
 {
     if (ft_font == NULL) return;
     glDeleteLists(ft_font->list_base,128);
-    if (ft_font->textures == NULL) return;
-    glDeleteTextures(128,ft_font->textures);
-    free(ft_font->textures);
+    if (ft_font->char_width != NULL)
+    	free(ft_font->char_width);
+    if (ft_font->textures != NULL) {
+    	glDeleteTextures(128,ft_font->textures);
+    	free(ft_font->textures);
+    }
     ft_font = NULL;
 }
 
@@ -393,40 +403,110 @@ void pop_projection_matrix(void)
 	glPopAttrib();
 }
 
-/* The flagship function of the library - this thing will print
- * out text at window coordinates x,y, using the font ft_font.
- * The current modelview matrix will also be applied to the text.
- * Also it will return the height and width of the text written.
- */ 
-fontbounds fontprint(font_data *ft_font, float x, float y, const char *fmt, ...)  {
+
+fontbounds fontprintsize(font_data *ft_font, const char *fmt, ...)
+{
 	
-    unsigned int i=0;
-    char *token;
-    char newline = '\n';
-    float rpos[4],len;
+    unsigned int bufsize = 1024;
+    unsigned int i=0,j,textlength;
+    float len;
     fontbounds returnval;
+    int start,end,toklen;
     
     returnval.width=0.0;
     returnval.height=0.0;
     
     if (ft_font == NULL) return returnval;
-    /* We want a coordinate system where things coresponding to window pixels.*/
-    pushScreenCoordinateMatrix();					
-    
-    GLuint font=ft_font->list_base;
-    float h=ft_font->h/.63f; 	    /*We make the height about 1.5* that of */
+     float h=ft_font->h/.63f; 	    /*We make the height about 1.5* that of */
 
-    char		text[1024];  /* Holds Our String */
+    char		text[bufsize];  /* Holds Our String */
     va_list		ap; 	    /* Pointer To List Of Arguments */
 
     if (fmt == NULL)	    	    /* If There's No Text */
     	*text=0;    	    	    /* Do Nothing */
     else {
     	va_start(ap, fmt);  	    /* Parses The String For Variables */
-    	vsprintf(text, fmt, ap);    /* And Converts Symbols To Actual Numbers */
+    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
     	va_end(ap); 	    	    /* Results Are Stored In Text */
     }
+    if (!(textlength = strlen(text))) {
+    	return returnval;
+	error("Someone tried to measure a null string =(");
+    }
 
+    start = 0;
+    for (;;) {
+	
+	for (end=start;end<textlength-1;++end)
+	    if (text[end] == '\n') {
+	    	break;
+	    }
+	
+	toklen = end - start + 1;
+	
+	len = (end-start +1)*1.0;
+	for (j=start;j<=end;++j)
+	    len = len + ft_font->char_width[(GLubyte)text[j]];
+	
+    	if (len > returnval.width)
+	    returnval.width = len;	
+
+    	++i;
+	
+	if (end >= textlength - 1) break;
+	
+	start = end + 1;
+    }
+    
+    returnval.height = h*i;
+    
+    return returnval;
+}
+
+/* The flagship function of the library - this thing will print
+ * out text at window coordinates x,y, using the font ft_font.
+ * The current modelview matrix will also be applied to the text.
+ * Also it will return the height and width of the text written.
+ */ 
+fontbounds fontprint(font_data *ft_font, int XALIGN, int YALIGN, float x, float y, const char *fmt, ...)
+{
+	
+    unsigned int bufsize = 1024;
+    unsigned int i=0,j,textlength;
+    fontbounds returnval,dummy;
+    float xoff = 0.0,yoff = 0.0;
+    int start,end,toklen;
+    
+    returnval.width = 0.0;
+    returnval.height = 0.0;
+    
+     if (ft_font == NULL) return returnval;
+    /* We want a coordinate system where things coresponding to window pixels.*/
+
+    GLuint font=ft_font->list_base;
+    float h=ft_font->h/.63f; 	    /*We make the height about 1.5* that of */
+
+    char		text[bufsize];  /* Holds Our String */
+    va_list		ap; 	    /* Pointer To List Of Arguments */
+    
+    if (fmt == NULL)	    	    /* If There's No Text */
+    	*text=0;    	    	    /* Do Nothing */
+    else {
+    	va_start(ap, fmt);  	    /* Parses The String For Variables */
+    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
+    	va_end(ap); 	    	    /* Results Are Stored In Text */
+    }
+    if (!(textlength = strlen(text))) {
+    	return returnval;
+	error("Someone tried to print a null string =(");
+    }
+    
+    returnval = fontprintsize(ft_font,text);
+    
+    yoff = (returnval.height/2.0f)*((float)YALIGN) - ft_font->h;
+
+    pushScreenCoordinateMatrix();					
+    
     glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);	
     glMatrixMode(GL_MODELVIEW);
     glDisable(GL_LIGHTING);
@@ -448,37 +528,40 @@ fontbounds fontprint(font_data *ft_font, float x, float y, const char *fmt, ...)
      * draw it modifies the current matrix so that the next character
      * will be drawn immediatly after it. 
      */
-    token = strtok(text,&newline);
-    returnval.width = 0.0;
-    returnval.height = 0.0;
-    len = 0.0;
-    while (token != NULL) {
-		
+    /* make sure not to use mytok until we are done!!! */
+    
+    start = 0;
+    for (;;) {
+	
+	for (end=start;end<textlength-1;++end)
+	    if (text[end] == '\n') {
+	    	break;
+	    }
+	
+	toklen = end - start + 1;
+	
+	dummy.width = (end-start +1)*1.0;
+	for (j=start;j<=end;++j)
+	    dummy.width = dummy.width + ft_font->char_width[(GLubyte)text[j]];
+	
+	xoff = - (dummy.width/2.0f)*((float)XALIGN);
 
     	glPushMatrix();
     	glLoadIdentity();
-    	glTranslatef(x,y-h*i,0);
+		
+    	glTranslatef(x + xoff,y - h*i + yoff,0);
     	glMultMatrixf(modelview_matrix);
 
-    	/* The commented out raster position stuff can be useful if you need to
-    	 * know the length of the text that you are creating.
-    	 * If you decide to use it make sure to also uncomment the glBitmap command
-    	 * in make_dlist().
-	 */
-    	glRasterPos2f(0,0);
-    	glCallLists(strlen(token), GL_UNSIGNED_BYTE, (GLubyte *) token);
+    	glCallLists(toklen, GL_UNSIGNED_BYTE, (GLubyte *) &text[start]);
 		
-    	glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
-    	if ((len=rpos[0]-x) > returnval.width)
-	    returnval.width = len;	
     	glPopMatrix();
 
     	++i;
-    	newline = '\n';
-    	token = strtok(NULL,&newline);
+	
+	if (end >= textlength - 1) break;
+	
+	start = end + 1;
     }
-    
-    returnval.height = h*i;
     
     glPopAttrib();		
 

@@ -139,6 +139,22 @@ int Check_view_dimensions(void)
 }
 #endif
 
+void setupPaint_stationary(void)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
+    glScalef(scale, scale, scale);
+}
+void setupPaint_moving(void)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(-world.x * scale, -world.y * scale, 0);
+    glScalef(scale, scale, scale);
+}
+
+
 void Paint_frame(void)
 {
     Check_view_dimensions();
@@ -186,23 +202,16 @@ void Paint_frame(void)
 	time_counter -= (1.0 / 12);
     }
     
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
-    glScalef(scale, scale, scale);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
     if (damaged <= 0) {
-    	glMatrixMode(GL_MODELVIEW);
-    	glLoadIdentity();
-    	glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
-    	glScalef(scale, scale, scale);
-
     	glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_BLEND);
     	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	/* This one works best for things that are fixed in position
+	 * since they won't appear to move relative to eachother
+	 */
+    	setupPaint_stationary();
 	
     	Paint_world();
 
@@ -214,7 +223,12 @@ void Paint_frame(void)
 	} else
 	    Paint_objects();
 
+	/* This one works best for things that move, since they don't get
+	 * painted differently depending on map position
+	 */
+	
 	Paint_shots();
+	setupPaint_moving();
 	Paint_ships();
 
     	glDisable(GL_BLEND);
