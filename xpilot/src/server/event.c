@@ -197,8 +197,6 @@ void Pause_player(player_t *pl, bool on)
 	/* player might have paused when recovering */
 	pl->recovery_count = 0;
 	pl->updateVisibility = 1;
-	CLR_BIT(pl->status, PLAYING);
-	Player_self_destruct(pl, false);
 	SET_BIT(pl->status, PAUSE);
 	/* kps - can this happen ??? */
 	if (pl->pauseTime != 0)
@@ -225,8 +223,7 @@ void Pause_player(player_t *pl, bool on)
 	}
 	pl->mychar = 'P';
 	updateScores = true;
-	if (BIT(pl->have, HAS_BALL))
-	    Detach_ball(pl, NULL);
+	Player_death_reset(pl, false);
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (world->teams[i].SwapperId == pl->id)
 		world->teams[i].SwapperId = -1;
