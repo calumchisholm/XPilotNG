@@ -51,6 +51,7 @@
 #define NUM_TEXTURES 1
 
 float modelview_matrix[16];
+const int bufsize = 1024;
 	
 int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
@@ -389,10 +390,8 @@ void pop_projection_matrix(void)
 }
 
 
-fontbounds printsize(font_data *ft_font, int length, const char *fmt, ...)
+fontbounds nprintsize(font_data *ft_font, int length, const char *fmt, ...)
 {
-	
-    unsigned int bufsize = 1024;
     unsigned int i=0,j,textlength;
     float len;
     fontbounds returnval;
@@ -413,12 +412,10 @@ fontbounds printsize(font_data *ft_font, int length, const char *fmt, ...)
     	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
     	va_end(ap); 	    	    /* Results Are Stored In Text */
     }
-    if (!(textlength = strlen(text))) {
+    if (!(textlength = MIN(strlen(text),length))) {
     	return returnval;
-	error("Someone tried to measure a null string =(");
     }
 
-    if (length) textlength = MIN(textlength,length);
     start = 0;
     for (;;) {
 	
@@ -448,6 +445,28 @@ fontbounds printsize(font_data *ft_font, int length, const char *fmt, ...)
     return returnval;
 }
 
+fontbounds printsize(font_data *ft_font, const char *fmt, ...)
+{
+    fontbounds returnval;
+    
+    returnval.width=0.0;
+    returnval.height=0.0;
+    
+    if (ft_font == NULL) return returnval;
+
+    char		text[bufsize];  /* Holds Our String */
+    va_list		ap; 	    /* Pointer To List Of Arguments */
+
+    if (fmt == NULL)	    	    /* If There's No Text */
+    	*text=0;    	    	    /* Do Nothing */
+    else {
+    	va_start(ap, fmt);  	    /* Parses The String For Variables */
+    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
+    	va_end(ap); 	    	    /* Results Are Stored In Text */
+    }
+    return nprintsize(ft_font, bufsize, text);
+}
+
 void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *text, bool onHUD)
 {
     unsigned int i=0,j,textlength;
@@ -458,10 +477,12 @@ void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, 
     
     returnval.width = 0.0;
     returnval.height = 0.0;
+
+    if (!(textlength = MIN(strlen(text),length))) return;
     
     GLuint font=ft_font->list_base;
 
-    returnval = printsize(ft_font,length,text);
+    returnval = nprintsize(ft_font,length,text);
     
     yoff = (returnval.height/2.0f)*((float)YALIGN) - ft_font->h;
 
@@ -488,8 +509,6 @@ void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, 
      * will be drawn immediatly after it. 
      */
     /* make sure not to use mytok until we are done!!! */
-    textlength = strlen(text);
-    if (length) textlength = MIN(textlength,length);
     start = 0;
     for (;;) {
 	
@@ -535,7 +554,52 @@ void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, 
 
 void mapnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *fmt,...)
 {
-    unsigned int bufsize = 1024;
+    unsigned int textlength;
+    
+    char		text[bufsize];  /* Holds Our String */
+    va_list		ap; 	    /* Pointer To List Of Arguments */
+    
+    if (fmt == NULL)	    	    /* If There's No Text */
+    	*text=0;    	    	    /* Do Nothing */
+    else {
+    	va_start(ap, fmt);  	    /* Parses The String For Variables */
+    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
+    	va_end(ap); 	    	    /* Results Are Stored In Text */
+    }
+    if (!(textlength = MIN(strlen(text),length))) {
+    	return;
+    }
+
+    if (ft_font == NULL) return;
+
+    print(ft_font, color, XALIGN, YALIGN, x, y, length, text, false);
+}
+
+void HUDnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *fmt, ...)
+{
+    unsigned int textlength;
+    
+    char		text[bufsize];  /* Holds Our String */
+    va_list		ap; 	    /* Pointer To List Of Arguments */
+    
+    if (fmt == NULL)	    	    /* If There's No Text */
+    	*text=0;    	    	    /* Do Nothing */
+    else {
+    	va_start(ap, fmt);  	    /* Parses The String For Variables */
+    	vsnprintf(text, bufsize, fmt, ap);    /* And Converts Symbols To Actual Numbers */
+    	va_end(ap); 	    	    /* Results Are Stored In Text */
+    }
+    if (!(textlength = MIN(strlen(text),length))) {
+    	return;
+    }
+    
+    if (ft_font == NULL) return;
+
+    print( ft_font, color, XALIGN, YALIGN, x, y, length, text, true);
+}
+
+void mapprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt,...)
+{
     unsigned int textlength;
     
     char		text[bufsize];  /* Holds Our String */
@@ -550,17 +614,17 @@ void mapnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int
     }
     if (!(textlength = strlen(text))) {
     	return;
-	error("Someone tried to print a null string =(");
     }
 
     if (ft_font == NULL) return;
 
-    print(ft_font, color, XALIGN, YALIGN, x, y, length, text, false);
+    print(ft_font, color, XALIGN, YALIGN, x, y, bufsize, text, false);
 }
 
-void HUDnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, int length, const char *fmt, ...)
+void HUDprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, const char *fmt, ...)
 {
-    unsigned int textlength,bufsize = 1024;
+    unsigned int textlength;
+    
     char		text[bufsize];  /* Holds Our String */
     va_list		ap; 	    /* Pointer To List Of Arguments */
     
@@ -573,10 +637,9 @@ void HUDnprint(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int
     }
     if (!(textlength = strlen(text))) {
     	return;
-	error("Someone tried to print a null string =(");
     }
     
     if (ft_font == NULL) return;
 
-    print( ft_font, color, XALIGN, YALIGN, x, y, length, text, true);
+    print( ft_font, color, XALIGN, YALIGN, x, y, bufsize, text, true);
 }
