@@ -142,6 +142,14 @@ typedef struct {
     long last_change;
 } poly_t;
 
+/*
+ * Hitmasks are 32 bits.
+ */
+#define ALL_BITS		0xffffffffU
+#define BALL_BIT		(1U << 11)
+#define NONBALL_BIT		(1U << 12)
+#define NOTEAM_BIT		(1U << 10)
+#define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1U << (team))
 typedef uint32_t hitmask_t;
 
 typedef struct move {

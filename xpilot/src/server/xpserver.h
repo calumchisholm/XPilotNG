@@ -45,6 +45,9 @@
 #  endif
 #endif
 
+#include "serverconst.h"
+#include "object.h"
+#include "player.h"
 #include "asteroid.h"
 #include "cannon.h"
 #include "click.h"
@@ -53,6 +56,7 @@
 #include "map.h"
 #include "netserver.h"
 #include "objpos.h"
+#include "option.h"
 #include "packet.h"
 #include "rank.h"
 #include "recwrap.h"
@@ -61,13 +65,12 @@
 #include "sched.h"
 #include "setup.h"
 #include "score.h"
-#include "server.h"
-#include "serverconst.h"
 #include "srecord.h"
 #include "target.h"
 #include "teamcup.h"
 #include "tuner.h"
 #include "walls.h"
 #include "wormhole.h"
+#include "server.h"
 
 #endif /* XPSERVER_H */

@@ -209,8 +209,8 @@ xpilot_ng_server_SOURCES = \
 	laser.c \
 	map.c map.h metaserver.c \
 	netserver.c netserver.h \
-	object.c object.h objpos.c objpos.h option.c \
-	parser.c play.c player.c polygon.c \
+	object.c object.h objpos.c objpos.h option.c option.h \
+	parser.c play.c player.c player.h polygon.c \
 	race.c rank.c rank.h recwrap.c recwrap.h \
 	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \

@@ -26,9 +26,9 @@
 #ifndef	NETSERVER_H
 #define	NETSERVER_H
 
-#ifndef OBJECT_H
+#ifndef PLAYER_H
 /* need player_t */
-#include "object.h"
+#include "player.h"
 #endif
 
 int Setup_net_server(void);

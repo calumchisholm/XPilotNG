@@ -26,9 +26,9 @@
 
 #include "xpcommon.h"
 
-#ifndef OBJECT_H
+#ifndef PLAYER_H
 /* need player */
-#include "object.h"
+#include "player.h"
 #endif
 
 typedef struct ranknode {
