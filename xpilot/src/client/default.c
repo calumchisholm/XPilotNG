@@ -410,9 +410,10 @@ option options[] = {
 	"",
 	KEY_DUMMY,
 	"Ignore the window manager when opening the top level player window.\n"
-	"This can be handy if you want to have your XPilot window on a preferred\n"
-	"position without window manager borders.  Also sometimes window managers\n"
-	"may interfere when switching colormaps.  This option may prevent that.\n",
+	"This can be handy if you want to have your XPilot window on a\n"
+	"preferred position without window manager borders.\n"
+	"Also sometimes window managers may interfere when switching\n"
+	"colormaps. This option may prevent that.\n",
 	0
     },
     {
@@ -443,9 +444,9 @@ option options[] = {
 	"Define the ship shape to use.  Because the argument to this option\n"
 	"is rather large (up to 500 bytes) the recommended way to set\n"
 	"this option is in the .xpilotrc file in your home directory.\n"
-	"The exact format is defined in the file doc/README.SHIPS in the XPilot\n"
-	"distribution.  Note that there is a nifty Unix tool called editss for\n"
-	"easy ship creation.  There is XPShipEditor for Windows\n"
+	"The exact format is defined in the file doc/README.SHIPS in the\n"
+	"XPilot distribution. Note that there is a nifty Unix tool called\n"
+	"editss for easy ship creation. There is XPShipEditor for Windows\n"
 	"and Ship Shaper for Java.  See the XPilot FAQ for details.\n"
 	"See also the \"shipShapeFile\" option below.\n",
 	0
@@ -1923,7 +1924,7 @@ option options[] = {
 	NULL,
 	"equal",
 	KEY_DETONATE_MINES,
-	"Detonate the mine you have dropped or thrown, which is closest to you.\n",
+	"Detonate the closest mine you have dropped or thrown.\n",
 	0
     },
     {
