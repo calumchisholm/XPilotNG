@@ -520,13 +520,13 @@ static char *Get_domain_from_hostname(char *hostname)
 	    dom = strrchr(hostname, '.');
 	}
     }
-    if (dom && !isdigit((int) dom[1]) && strlen(dom + 1) >= 2)
+    if (dom && !isdigit(dom[1]) && strlen(dom + 1) >= 2)
 	return dom + 1;
 
     if (dom) {
 	dom++;			/* skip dot */
 	/* test toplevel domain for validity */
-	if (!isdigit((int) *dom) && strlen(dom) >= 2 && strlen(dom) <= 3)
+	if (!isdigit(*dom) && strlen(dom) >= 2 && strlen(dom) <= 3)
 	    return dom;
     }
 

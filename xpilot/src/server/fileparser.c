@@ -240,14 +240,14 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
     s[i++] = 0;
     head = value = s;
     s = value + strlen(value) - 1;
-    while (s >= value && isascii((int)*s) && isspace((int)*s))
+    while (s >= value && isascii(*s) && isspace(*s))
 	--s;
     *++s = 0;
 
     /* Deal with `define: MACRO \multiline: TAG'. */
     if (strcmp(name, "define") == 0) {
 	p = value;
-	while (*p && isascii((int)*p) && !isspace((int)*p))
+	while (*p && isascii(*p) && !isspace(*p))
 	    p++;
 	*p++ = '\0';
 
@@ -258,7 +258,7 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
 	name[p - value] = '\0';
 
 	/* Move value to \multiline */
-	while (*p && isspace((int)*p))
+	while (*p && isspace(*p))
 	    p++;
 	value = p;
     }
@@ -267,13 +267,13 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
 	override = 1;
 	value += 10;
     }
-    while (*value && isascii((int)*value) && isspace((int)*value))
+    while (*value && isascii(*value) && isspace(*value))
 	++value;
     if (!strncmp(value, "\\multiline:", 11)) {
 	multiline = 1;
 	value += 11;
     }
-    while (*value && isascii((int)*value) && isspace((int)*value))
+    while (*value && isascii(*value) && isspace(*value))
 	++value;
     if (!*value) {
 	error("%s line %d: no value specified.\n",
@@ -373,7 +373,7 @@ static bool parseOpenFile(FILE *ifile, optOrigin opt_origin)
     map_buf = (char *) realloc(map_buf, map_offset + 1);
     map_buf[map_offset] = '\0'; /* EOF */
 
-    if (isdigit((int)*map_buf)) {
+    if (isdigit(*map_buf)) {
 	warn("%s is in old (v1.x) format, please convert it with mapmapper",
 	     FileName);
 	free(map_buf);

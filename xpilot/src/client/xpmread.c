@@ -131,7 +131,7 @@ static char *xpm_next_token(XPM_read *xpmr)
 
     do {
 	/* skip whitespace */
-	while (isascii((int)*ptr) && isspace((int)*ptr))
+	while (isascii(*ptr) && isspace(*ptr))
 	    ptr++;
 
 	/* where token starts */
@@ -164,11 +164,11 @@ static char *xpm_next_token(XPM_read *xpmr)
 	    }
 	}
 	/* if it's something else. */
-#define ISKEYWORD(c)	(isupper((int)(c)) || islower((int)(c)) || (c) == '_')
-#define ISKEYWORDEXT(c)	(ISKEYWORD((int)(c)) || isdigit((int)(c)))
-	else if (isascii((int)*ptr) && ISKEYWORD(*ptr)) {
+#define ISKEYWORD(c)	(isupper((c)) || islower((c)) || (c) == '_')
+#define ISKEYWORDEXT(c)	(ISKEYWORD((c)) || isdigit((c)))
+	else if (isascii(*ptr) && ISKEYWORD(*ptr)) {
 	    for (ptr++; *ptr; ptr++) {
-		if (!isascii((int)*ptr) || !ISKEYWORDEXT(*ptr))
+		if (!isascii(*ptr) || !ISKEYWORDEXT(*ptr))
 		    break;
 	    }
 	    /* one too far in all cases, so backup one position. */

@@ -97,7 +97,7 @@ void asciidump(void *p, size_t size)
        if (!(i % 64))
            printf("\n%p ", up + i);
        c = *(up + i);
-       if (isprint((int)c))
+       if (isprint(c))
            printf("%c", c);
        else
            printf(".");

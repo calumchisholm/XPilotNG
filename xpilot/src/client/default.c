@@ -2610,10 +2610,10 @@ static int Get_string_resource(XrmDatabase db,
 
     val = Find_resource(db, resource, result, size, &ind);
     src = dst = result;
-    while ((*src & 0x7f) == *src && isgraph((int)*src) == 0 && *src != '\0')
+    while ((*src & 0x7f) == *src && isgraph(*src) == 0 && *src != '\0')
 	src++;
 
-    while ((*src & 0x7f) != *src || isgraph((int)*src) != 0)
+    while ((*src & 0x7f) != *src || isgraph(*src) != 0)
 	*dst++ = *src++;
 
     *dst = '\0';

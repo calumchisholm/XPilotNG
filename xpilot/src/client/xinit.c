@@ -279,13 +279,13 @@ static void Init_spark_colors(void)
 
      /* hack but protocol will allow max 9 (MM) */ 
     for (src = sparkColors; *src && (num_spark_colors < 9); src++) {
-	if (isascii((int)*src) && isdigit((int)*src)) {
+	if (isascii(*src) && isdigit(*src)) {
 	    dst = &buf[0];
 	    do {
 		*dst++ = *src++;
 	    } while (*src &&
-		     isascii((int)*src) &&
-		     isdigit((int)*src) &&
+		     isascii(*src) &&
+		     isdigit(*src) &&
 		     ((dst - buf) < (sizeof(buf) - 1)));
 	    *dst = '\0';
 	    src--;

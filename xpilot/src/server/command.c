@@ -370,7 +370,7 @@ void Handle_player_command(player *pl, char *cmd)
     else {
 	/* zero terminate cmd and advance 1 byte. */
 	*args++ = '\0';
-	while (isspace((int)*args))
+	while (isspace(*args))
 	    args++;
     }
 
@@ -887,7 +887,7 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 	char *errorstr;
 
 	*name++ = '\0';
-	while (isspace((int)*name))
+	while (isspace(*name))
 	    name++;
 
 	pl = Get_player_by_name(name, NULL, &errorstr);
@@ -1096,7 +1096,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	sprintf(msg, "You do not currently have a team.");
     else if (!arg)
 	sprintf(msg, "No team specified.");
-    else if (!isdigit((int)*arg))
+    else if (!isdigit(*arg))
 	sprintf(msg, "Invalid team specification.");
     else {
 	team = strtoul(arg, &arg2, 0);
@@ -1107,7 +1107,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 			"You need operator status to swap other players.");
 		return CMD_RESULT_NOT_OPERATOR;
 	    }
-	    while (isspace((int)*arg2))
+	    while (isspace(*arg2))
 		arg2++;
 	    pl = Get_player_by_name(arg2, NULL, &errorstr);
 	    if (!pl) {

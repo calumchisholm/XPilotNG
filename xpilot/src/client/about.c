@@ -74,7 +74,7 @@ int DrawShadowText(Display *display, Window w, GC gc,
 	char word[LINE_MAX];
 	int wordLen, i;
 
-	for (i = 0; *str && !isspace((int)*str) && i < LINE_MAX-1; str++, i++)
+	for (i = 0; *str && !isspace(*str) && i < LINE_MAX-1; str++, i++)
 	    word[i] = *str;
 	word[i] = '\0';
 
@@ -92,7 +92,7 @@ int DrawShadowText(Display *display, Window w, GC gc,
 	x += wordLen;
 
 	/* Handle whitespace */
-	for (; isspace((int)*str); str++)
+	for (; isspace(*str); str++)
 	    switch (*str) {
 		/* New paragraph */
 	    case '\n':

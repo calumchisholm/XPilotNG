@@ -464,11 +464,11 @@ void Parse_robot_file(void)
 		    }
 		    if (key > 0) {
 			char *ptr = strchr(buf, ':') + 1;
-			while (isspace((int)*ptr))
+			while (isspace(*ptr))
 			    ptr++;
 			strlcpy(dst, ptr, size);
 			ptr = &dst[strlen(dst)];
-			while (--ptr >= dst && isspace((int)*ptr))
+			while (--ptr >= dst && isspace(*ptr))
 			    *ptr = '\0';
 		    }
 		}
