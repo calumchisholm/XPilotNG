@@ -157,12 +157,11 @@ void Race_compute_game_status(world_t *world)
 	    || Player_is_tank(pl))
 	    continue;
 
-	if (!BIT(pl->pl_status, FOO_GAME_OVER))
-	    num_alive_players++;
-	else if (pl->mychar == 'W') {
+	if (Player_is_waiting(pl)) {
 	    num_waiting_players++;
 	    continue;
-	}
+	} else if (!Player_is_dead(pl))
+	    num_alive_players++;
 
 	if (BIT(pl->pl_status, RACE_OVER)) {
 	    num_race_over_players++;
@@ -174,7 +173,7 @@ void Race_compute_game_status(world_t *world)
 	    else
 		CLR_BIT(pl->pl_status, FINISH);
 	}
-	else if (!BIT(pl->pl_status, FOO_GAME_OVER))
+	else if (!Player_is_dead(pl))
 	    alive = pl;
 
 	/*
@@ -338,7 +337,7 @@ void Race_game_over(world_t *world)
 	num_active_players++;
 
 	/* Kill any remaining players */
-	if (!BIT(pl->pl_status, FOO_GAME_OVER))
+	if (!Player_is_dead(pl))
 	    Kill_player(pl, false);
 	else
 	    Player_death_reset(pl, false);
