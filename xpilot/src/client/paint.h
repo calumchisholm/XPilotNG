@@ -135,7 +135,8 @@ extern Pixmap	itemBitmaps[];
 extern GC	gameGC, messageGC, radarGC, buttonGC;
 extern GC	scoreListGC, textGC, talkGC, motdGC;
 extern XGCValues gcv;
-extern Window	top, draw, keyboard, radar, players;
+extern Window	topWindow, drawWindow, keyboardWindow;
+extern Window	radarWindow, playersWindow;
 #ifdef _WINDOWS				/* see paint.c for details */
 extern Window	textWindow, msgWindow, buttonWindow;
 #endif

@@ -1818,7 +1818,7 @@ int Widget_create_popup(int width, int height, int border,
     widget->name = "popup";
     XStoreName(dpy, widget->window, window_name);
     XSetIconName(dpy, widget->window, icon_name);
-    XSetTransientForHint(dpy, widget->window, top);
+    XSetTransientForHint(dpy, widget->window, topWindow);
     return popup_desc;
 }
 

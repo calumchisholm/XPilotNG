@@ -25,7 +25,7 @@
 
 char paintradar_version[] = VERSION;
 
-Window	radar;			/* Radar window */
+Window	radarWindow;		/* Radar window */
 Pixmap	p_radar, s_radar;	/* Pixmaps for the radar (implements */
 				/* the planes hack on the radar for */
 				/* monochromes) */
@@ -57,7 +57,7 @@ static void Copy_static_radar(void)
 		       radarGC, 0, 0, 256, RadarHeight);
     }
 #else
-    WinXBltPixToWin(s_radar, radar, 0, 0, 256, RadarHeight, 0, 0);
+    WinXBltPixToWin(s_radar, radarWindow, 0, 0, 256, RadarHeight, 0, 0);
     p_radar = radar;
 #endif
     XSetForeground(dpy, radarGC, colors[WHITE].pixel);
@@ -74,20 +74,20 @@ static void Windows_copy_sliding_radar(float xf, float yf)
     /*
      * Draw slidingradar in four chunks onto the screen.
      */
-    WinXBltPixToWin(s_radar, radar,
+    WinXBltPixToWin(s_radar, radarWindow,
 		    slidingradar_x , slidingradar_y,
 		    256-slidingradar_x, RadarHeight-slidingradar_y,
 		    0, 0);
-    WinXBltPixToWin(s_radar, radar,
+    WinXBltPixToWin(s_radar, radarWindow,
 		    0, slidingradar_y,
 		    slidingradar_x, RadarHeight-slidingradar_y,
 		    256-slidingradar_x, 0);
-    WinXBltPixToWin(s_radar, radar,
+    WinXBltPixToWin(s_radar, radarWindow,
 		    slidingradar_x, 1,
 		    256-slidingradar_x, slidingradar_y
 		    , 0,
 		    RadarHeight-slidingradar_y);
-    WinXBltPixToWin(s_radar, radar,
+    WinXBltPixToWin(s_radar, radarWindow,
 		    0, 1,
 		    slidingradar_x, slidingradar_y,
 		    256-slidingradar_x, RadarHeight-slidingradar_y);
@@ -254,21 +254,21 @@ void Paint_sliding_radar(void)
 	return;
 
     if (BIT(instruments, SHOW_SLIDING_RADAR) != 0) {
-	if (s_radar != radar)
+	if (s_radar != radarWindow)
 	    return;
 
-	s_radar = XCreatePixmap(dpy, radar,
+	s_radar = XCreatePixmap(dpy, radarWindow,
 				256, RadarHeight,
 				dispDepth);
 	p_radar = s_radar;
 	if (radar_exposures > 0)
 	    Paint_world_radar();
     } else {
-	if (s_radar == radar)
+	if (s_radar == radarWindow)
 	    return;
 	XFreePixmap(dpy, s_radar);
-	s_radar = radar;
-	p_radar = radar;
+	s_radar = radarWindow;
+	p_radar = radarWindow;
 	if (radar_exposures > 0)
 	    Paint_world_radar();
     }
@@ -295,12 +295,12 @@ static void Paint_world_radar_old(void)
 	XSetPlaneMask(dpy, radarGC,
 		      AllPlanes & ~(dpl_1[0] | dpl_1[1]));
 
-    if (s_radar != radar) {
+    if (s_radar != radarWindow) {
 	/* Clear radar */
 	XSetForeground(dpy, radarGC, colors[BLACK].pixel);
 	XFillRectangle(dpy, s_radar, radarGC, 0, 0, 256, RadarHeight);
     } else
-	XClearWindow(dpy, radar);
+	XClearWindow(dpy, radarWindow);
 
     /*
      * Calculate an array which is later going to be indexed
@@ -582,13 +582,12 @@ static void Paint_world_radar_new(void)
     
     if (s_radar == p_radar)
 	XSetPlaneMask(dpy, radarGC, AllPlanes & (~(dpl_1[0] | dpl_1[1])));
-    if (s_radar != radar) {
+    if (s_radar != radarWindow) {
 	/* Clear radar */
 	XSetForeground(dpy, radarGC, colors[BLACK].pixel);
 	XFillRectangle(dpy, s_radar, radarGC, 0, 0, 256, RadarHeight);
-    } else {
-	XClearWindow(dpy, radar);
-    }
+    } else
+	XClearWindow(dpy, radarWindow);
         
     XSetForeground(dpy, radarGC, colors[wallRadarColor].pixel);
     

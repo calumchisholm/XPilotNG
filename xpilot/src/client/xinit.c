@@ -406,7 +406,7 @@ int Init_top(void)
     XSetWindowAttributes		sattr;
     unsigned long			mask;
 
-    if (top) {
+    if (topWindow) {
 	error("Init_top called twice");
 	exit(1);
     }
@@ -633,39 +633,40 @@ int Init_top(void)
 	sattr.override_redirect = True;
 	mask |= CWOverrideRedirect;
     }
-    top = XCreateWindow(dpy,
-			DefaultRootWindow(dpy),
-			top_x, top_y,
-			top_width, top_height,
-			0, dispDepth,
-			InputOutput, visual,
-			mask, &sattr);
-    XSelectInput(dpy, top,
+    topWindow = XCreateWindow(dpy,
+			      DefaultRootWindow(dpy),
+			      top_x, top_y,
+			      top_width, top_height,
+			      0, dispDepth,
+			      InputOutput, visual,
+			      mask, &sattr);
+    XSelectInput(dpy, topWindow,
 		 KeyPressMask | KeyReleaseMask
 		 | FocusChangeMask | StructureNotifyMask);
-    Init_disp_prop(dpy, top, top_width, top_height, top_x, top_y, top_flags);
+    Init_disp_prop(dpy, topWindow, top_width, top_height,
+		   top_x, top_y, top_flags);
     if (kdpy) {
 	int scr = DefaultScreen(kdpy);
-	keyboard = XCreateSimpleWindow(kdpy,
-				       DefaultRootWindow(kdpy),
-				       top_x, top_y,
-				       top_width, top_height,
-				       0, 0, BlackPixel(dpy, scr));
-	XSelectInput(kdpy, keyboard,
+	keyboardWindow = XCreateSimpleWindow(kdpy,
+					     DefaultRootWindow(kdpy),
+					     top_x, top_y,
+					     top_width, top_height,
+					     0, 0, BlackPixel(dpy, scr));
+	XSelectInput(kdpy, keyboardWindow,
 		     KeyPressMask | KeyReleaseMask | FocusChangeMask);
-	Init_disp_prop(kdpy, keyboard, top_width, top_height,
+	Init_disp_prop(kdpy, keyboardWindow, top_width, top_height,
 		       top_x, top_y, top_flags);
     }
 #else	/* _WINDOWS */
-	/* MFC already gave us a nice top window...use it */
-	{
-		XRectangle	rect;
-		WinXGetWindowRectangle(0, &rect);
-		top_x = rect.x;
-		top_y = rect.y;
-		top_width = rect.width;
-		top_height = rect.height;
-	}
+    /* MFC already gave us a nice top window...use it */
+    {
+	XRectangle	rect;
+	WinXGetWindowRectangle(0, &rect);
+	top_x = rect.x;
+	top_y = rect.y;
+	top_width = rect.width;
+	top_height = rect.height;
+    }
 #endif	/* _WINDOWS */
 
 #ifndef _WINDOWS
@@ -674,7 +675,7 @@ int Init_top(void)
      */
     for (i = 0; i < NUM_ITEMS; i++) {
 	itemBitmaps[i]
-	    = XCreateBitmapFromData(dpy, top,
+	    = XCreateBitmapFromData(dpy, topWindow,
 				    (char *)itemBitmapData[i].data,
 				    ITEM_SIZE, ITEM_SIZE);
     }
@@ -690,14 +691,14 @@ int Init_top(void)
     values
 	= GCLineWidth|GCLineStyle|GCCapStyle|GCJoinStyle|GCGraphicsExposures;
 
-    messageGC	= XCreateGC(dpy, top, values, &xgc);
-    radarGC	= XCreateGC(dpy, top, values, &xgc);
-    buttonGC	= XCreateGC(dpy, top, values, &xgc);
-    scoreListGC	= XCreateGC(dpy, top, values, &xgc);
-    textGC	= XCreateGC(dpy, top, values, &xgc);
-    talkGC	= XCreateGC(dpy, top, values, &xgc);
-    motdGC	= XCreateGC(dpy, top, values, &xgc);
-    gameGC	= XCreateGC(dpy, top, values, &xgc);
+    messageGC	= XCreateGC(dpy, topWindow, values, &xgc);
+    radarGC	= XCreateGC(dpy, topWindow, values, &xgc);
+    buttonGC	= XCreateGC(dpy, topWindow, values, &xgc);
+    scoreListGC	= XCreateGC(dpy, topWindow, values, &xgc);
+    textGC	= XCreateGC(dpy, topWindow, values, &xgc);
+    talkGC	= XCreateGC(dpy, topWindow, values, &xgc);
+    motdGC	= XCreateGC(dpy, topWindow, values, &xgc);
+    gameGC	= XCreateGC(dpy, topWindow, values, &xgc);
     XSetBackground(dpy, gameGC, colors[BLACK].pixel);
 
     /*
@@ -762,7 +763,7 @@ int Init_playing_windows(void)
     int				i;
 #endif
 
-    if (!top) {
+    if (!topWindow) {
 	if (Init_top())
 	    return -1;
     }
@@ -778,47 +779,47 @@ int Init_playing_windows(void)
      * Since i know draw is the first window created (after top),
      * i can cheat it.
      */
-    draw = 1;
+    drawWindow = 1;
 #endif
-    draw = XCreateSimpleWindow(dpy, top, 258, 0,
-			       draw_width, draw_height,
-			       0, 0, colors[BLACK].pixel);
-    IFWINDOWS( if (draw != 1) error("draw != 1") );
-    radar = XCreateSimpleWindow(dpy, top, 0, 0,
-				256, RadarHeight, 0, 0,
-				colors[BLACK].pixel);
+    drawWindow = XCreateSimpleWindow(dpy, topWindow, 258, 0,
+				     draw_width, draw_height,
+				     0, 0, colors[BLACK].pixel);
+    IFWINDOWS( if (drawWindow != 1) error("draw != 1") );
+    radarWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
+				      256, RadarHeight, 0, 0,
+				      colors[BLACK].pixel);
     radar_score_mapped = true;
 
 #ifdef _WINDOWS
-    WinXSetEventMask(draw, NoEventMask);
+    WinXSetEventMask(drawWindow, NoEventMask);
     radar_exposures = 1;
-    radarGC = WinXCreateWinDC(radar);
-    gc = WinXCreateWinDC(draw);
+    radarGC = WinXCreateWinDC(radarWindow);
+    gc = WinXCreateWinDC(drawWindow);
 
-    textWindow = XCreateSimpleWindow(dpy, top, 0, 0,
-				0, 0, 0, 0,
-				colors[BLACK].pixel);
+    textWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
+				     0, 0, 0, 0,
+				     colors[BLACK].pixel);
     textGC = WinXCreateWinDC(textWindow);
 
-    msgWindow = XCreateSimpleWindow(dpy, top, 0, 0,
-				0, 0, 0, 0,
-				colors[BLACK].pixel);
+    msgWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
+				    0, 0, 0, 0,
+				    colors[BLACK].pixel);
     messageGC = WinXCreateWinDC(msgWindow);
-    motdGC = WinXCreateWinDC(top);
+    motdGC = WinXCreateWinDC(topWindow);
 
-    for (i = 0; i < MAX_COLORS; i++) {
+    for (i = 0; i < MAX_COLORS; i++)
 	colors[i].pixel = i;
-    }
+
     players_exposed = 1;
     /* p_radar = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth); */
-    s_radar = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth);
+    s_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
     /*
      * Create item bitmaps AFTER the windows
      */
     WinXCreateItemBitmaps();
     /* create the fonts AFTER the windows */
     gameFont
-	= Set_font(dpy, gc, gameFontName, "gameFont");
+	= Set_font(dpy, gameGC, gameFontName, "gameFont");
     messageFont
 	= Set_font(dpy, messageGC, messageFontName, "messageFont");
     textFont
@@ -826,9 +827,9 @@ int Init_playing_windows(void)
     motdFont
 	= Set_font(dpy, motdGC, motdFontName, "motdFont");
 
-    buttonWindow = XCreateSimpleWindow(dpy, top, 0, 0,
-				0, 0, 0, 0,
-				colors[BLACK].pixel);
+    buttonWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
+				       0, 0, 0, 0,
+				       colors[BLACK].pixel);
     buttonGC = WinXCreateWinDC(buttonWindow);
     buttonFont
 	= Set_font(dpy, buttonGC, buttonFontName, "buttonFont");
@@ -839,7 +840,7 @@ int Init_playing_windows(void)
     ButtonHeight = buttonFont->ascent + buttonFont->descent + 2*BTN_BORDER;
 
     button_form
-	= Widget_create_form(0, top,
+	= Widget_create_form(0, topWindow,
 			     0, RadarHeight,
 			     256, ButtonHeight + 2,
 			     0);
@@ -879,8 +880,8 @@ int Init_playing_windows(void)
     /* Create score list window */
     players_width = RadarWidth;
     players_height = top_height - (RadarHeight + ButtonHeight + 2);
-    players
-	= XCreateSimpleWindow(dpy, top,
+    playersWindow
+	= XCreateSimpleWindow(dpy, topWindow,
 			      0, RadarHeight + ButtonHeight + 2,
 			      players_width, players_height,
 			      0, 0,
@@ -894,13 +895,13 @@ int Init_playing_windows(void)
     /*
      * Selecting the events we can handle.
      */
-    XSelectInput(dpy, radar, ExposureMask);
-    XSelectInput(dpy, players, ExposureMask);
+    XSelectInput(dpy, radarWindow, ExposureMask);
+    XSelectInput(dpy, playersWindow, ExposureMask);
 #ifndef _WINDOWS
     if (!selectionAndHistory)
-	XSelectInput(dpy, draw, 0);
+	XSelectInput(dpy, drawWindow, 0);
     else
-	XSelectInput(dpy, draw, ButtonPressMask | ButtonReleaseMask);
+	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 
     /*
      * Initialize misc. pixmaps if we're not color switching.
@@ -909,21 +910,22 @@ int Init_playing_windows(void)
     switch (dbuf_state->type) {
 
     case PIXMAP_COPY:
-	p_radar = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth);
-	s_radar = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth);
-	p_draw  = XCreatePixmap(dpy, draw, draw_width, draw_height, dispDepth);
+	p_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+	s_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+	p_draw  = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
+				dispDepth);
 	break;
 
     case MULTIBUFFER:
-	p_radar = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth);
-	s_radar = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth);
+	p_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+	s_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
 	dbuff_init_buffer(dbuf_state);
 	break;
 
     case COLOR_SWITCH:
-	s_radar = radar;
-	p_radar = radar;
-	p_draw = draw;
+	s_radar = radarWindow;
+	p_radar = radarWindow;
+	p_draw = drawWindow;
 	Paint_sliding_radar();
 	break;
 
@@ -939,8 +941,8 @@ int Init_playing_windows(void)
     /*
      * Define a blank cursor for use with pointer control
      */
-    XQueryBestCursor(dpy, draw, 1, 1, &w, &h);
-    pix = XCreatePixmap(dpy, draw, w, h, 1);
+    XQueryBestCursor(dpy, drawWindow, 1, 1, &w, &h);
+    pix = XCreatePixmap(dpy, drawWindow, w, h, 1);
     cursorGC = XCreateGC(dpy, pix, 0, NULL);
     XSetForeground(dpy, cursorGC, 0);
     XFillRectangle(dpy, pix, cursorGC, 0, 0, w, h);
@@ -952,12 +954,12 @@ int Init_playing_windows(void)
     /*
      * Maps the windows, makes the visible. Voila!
      */
-    XMapSubwindows(dpy, top);
-    XMapWindow(dpy, top);
+    XMapSubwindows(dpy, topWindow);
+    XMapWindow(dpy, topWindow);
     XSync(dpy, False);
 
     if (kdpy) {
-	XMapWindow(kdpy, keyboard);
+	XMapWindow(kdpy, keyboardWindow);
 	XSync(kdpy, False);
     }
 #else
@@ -977,12 +979,12 @@ void WinXCreateItemBitmaps(void)
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	itemBitmaps[i][ITEM_HUD]
-	    = WinXCreateBitmapFromData(dpy, draw,
+	    = WinXCreateBitmapFromData(dpy, drawWindow,
 				       (char *)itemBitmapData[i].data,
 				       ITEM_SIZE, ITEM_SIZE,
 				       colors[hudColor].pixel);
 	itemBitmaps[i][ITEM_PLAYFIELD]
-	    = WinXCreateBitmapFromData(dpy, draw,
+	    = WinXCreateBitmapFromData(dpy, drawWindow,
 				       (char *)itemBitmapData[i].data,
 				       ITEM_SIZE, ITEM_SIZE,
 				       colors[RED].pixel);
@@ -1100,7 +1102,7 @@ static int Quit_callback(int widget_desc, void *data, const char **str)
 
 void Resize(Window w, int width, int height)
 {
-    if (w != top)
+    if (w != topWindow)
 	return;
 
     /* ignore illegal resizes */
@@ -1108,7 +1110,7 @@ void Resize(Window w, int width, int height)
     LIMIT(height, MIN_TOP_HEIGHT, MAX_TOP_HEIGHT);
     top_width = width;
     top_height = height;
-    if (!draw)
+    if (!drawWindow)
 	return;
 
     if (radar_score_mapped)
@@ -1119,15 +1121,16 @@ void Resize(Window w, int width, int height)
 
     Send_display();
     Net_flush();
-    XResizeWindow(dpy, draw, draw_width, draw_height);
+    XResizeWindow(dpy, drawWindow, draw_width, draw_height);
 #ifndef _WINDOWS
     if (dbuf_state->type == PIXMAP_COPY) {
 	XFreePixmap(dpy, p_draw);
-	p_draw = XCreatePixmap(dpy, draw, draw_width, draw_height, dispDepth);
+	p_draw = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
+			       dispDepth);
     }
 #endif
     players_height = top_height - (RadarHeight + ButtonHeight + 2);
-    XResizeWindow(dpy, players,
+    XResizeWindow(dpy, playersWindow,
 		  players_width, players_height);
 #ifdef _WINDOWS
     WinXResize();

@@ -474,7 +474,7 @@ static void Create_config(void)
 	    full = false;
 	    num++;
 	    config_widget_desc[num]
-		= Widget_create_form(NO_WIDGET, top,
+		= Widget_create_form(NO_WIDGET, topWindow,
 				     config_x, config_y,
 				     config_width, config_height,
 				     0);

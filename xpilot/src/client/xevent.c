@@ -93,22 +93,23 @@ void Pointer_control_set_state(int on)
 {
     if (on) {
 	pointerControl = true;
-	XGrabPointer(dpy, draw, true, 0, GrabModeAsync,
-		     GrabModeAsync, draw, pointerControlCursor, CurrentTime);
-	XWarpPointer(dpy, None, draw,
+	XGrabPointer(dpy, drawWindow, true, 0, GrabModeAsync,
+		     GrabModeAsync, drawWindow, pointerControlCursor,
+		     CurrentTime);
+	XWarpPointer(dpy, None, drawWindow,
 		     0, 0, 0, 0,
 		     draw_width/2, draw_height/2);
-	XDefineCursor(dpy, draw, pointerControlCursor);
-	XSelectInput(dpy, draw,
+	XDefineCursor(dpy, drawWindow, pointerControlCursor);
+	XSelectInput(dpy, drawWindow,
 		     PointerMotionMask | ButtonPressMask | ButtonReleaseMask);
     } else {
 	pointerControl = false;
 	XUngrabPointer(dpy, CurrentTime);
-	XDefineCursor(dpy, draw, None);
+	XDefineCursor(dpy, drawWindow, None);
 	if (!selectionAndHistory)
-	    XSelectInput(dpy, draw, 0);
+	    XSelectInput(dpy, drawWindow, 0);
 	else
-	    XSelectInput(dpy, draw, ButtonPressMask | ButtonReleaseMask);
+	    XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 	XFlush(dpy);
     }
 }
@@ -125,7 +126,7 @@ static void Talk_set_state(bool on)
 	    Pointer_control_set_state(false);
 	}
 	if (selectionAndHistory)
-	    XSelectInput(dpy, draw, PointerMotionMask
+	    XSelectInput(dpy, drawWindow, PointerMotionMask
 			 | ButtonPressMask | ButtonReleaseMask);
 	Talk_map_window(true);
     }
@@ -354,19 +355,19 @@ bool Key_press_toggle_radar_score(keys_t key)
 	 * the user can close it with "close"
 	 */
 
-	XUnmapWindow(dpy, radar);
-	XUnmapWindow(dpy, players);
+	XUnmapWindow(dpy, radarWindow);
+	XUnmapWindow(dpy, playersWindow);
 	Widget_unmap(button_form);
 
 	/* Move the draw area */
-	XMoveWindow(dpy, draw, 0, 0);
+	XMoveWindow(dpy, drawWindow, 0, 0);
 
 	/* Set the global variable to show that */
 	/* the radar and score are now unmapped */
 	radar_score_mapped = false;
 
 	/* Generate resize event */
-	Resize(top, top_width, top_height);
+	Resize(topWindow, top_width, top_height);
 
     } else {
 
@@ -379,10 +380,10 @@ bool Key_press_toggle_radar_score(keys_t key)
 	draw_width = top_width - (258);
 	draw_height = top_height;
 
-	XMoveWindow(dpy, draw, 258, 0);
+	XMoveWindow(dpy, drawWindow, 258, 0);
 	Widget_map(button_form);
-	XMapWindow(dpy, radar);
-	XMapWindow(dpy, players);
+	XMapWindow(dpy, radarWindow);
+	XMapWindow(dpy, playersWindow);
 
 	/* reflect that we are remapped to the client */
 
@@ -581,7 +582,7 @@ void Key_event(XEvent *event)
     KeySym 		ks;
     keys_t		key;
     int			change = false;
-    bool		(*key_do)(keys_t key);
+    bool		(*key_do)(keys_t);
 
     switch(event->type) {
     case KeyPress:
@@ -735,7 +736,7 @@ void xevent_pointer(void)
 
 		 GetCursorPos(&point);
 		 movement = point.x - draw_width/2;
-		 XWarpPointer(dpy, None, draw,
+		 XWarpPointer(dpy, None, drawWindow,
 			      0, 0, 0, 0,
 			      draw_width/2, draw_height/2);
 	    }
@@ -753,11 +754,12 @@ void xevent_pointer(void)
 		    memset(&event, 0, sizeof(event));
 		    event.type = MotionNotify;
 		    event.xmotion.display = dpy;
-		    event.xmotion.window = draw;
+		    event.xmotion.window = drawWindow;
 		    event.xmotion.x = draw_width/2;
 		    event.xmotion.y = draw_height/2;
-		    XSendEvent(dpy, draw, False, PointerMotionMask, &event);
-		    XWarpPointer(dpy, None, draw,
+		    XSendEvent(dpy, drawWindow, False,
+			       PointerMotionMask, &event);
+		    XWarpPointer(dpy, None, drawWindow,
 				 0, 0, 0, 0,
 				 draw_width/2, draw_height/2);
 #endif

@@ -74,7 +74,7 @@ static void Talk_create_window(void)
      * Create talk window.
      */
     talk_w
-	= XCreateSimpleWindow(dpy, draw,
+	= XCreateSimpleWindow(dpy, drawWindow,
 			      TALK_WINDOW_X, TALK_WINDOW_Y,
 			      TALK_WINDOW_WIDTH, TALK_WINDOW_HEIGHT,
 			      TALK_OUTSIDE_BORDER, colors[WHITE].pixel,
@@ -1525,7 +1525,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	 * We get that event as we own the `primary' from now on.
 	 * draw the selection emphasized from now on
 	 */
-	XSetSelectionOwner(dpy, XA_PRIMARY, draw, CurrentTime);
+	XSetSelectionOwner(dpy, XA_PRIMARY, drawWindow, CurrentTime);
 	XStoreBytes(dpy, selection.txt, selection.len);
 	selection.draw.state = SEL_EMPHASIZED;
 	selection.talk.state = SEL_SELECTED;
