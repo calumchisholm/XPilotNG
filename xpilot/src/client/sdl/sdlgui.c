@@ -1693,7 +1693,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 
 	    /* Paint item count */
 	    sprintf(str, "%d", num);
-	    fb = printsize(&gamefont,str);
+	    fb = printsize(&gamefont,"%s",str);
 
 	    maxWidth = MAX(maxWidth, fb.width + BORDER + ITEM_SIZE);
 	    
@@ -1879,7 +1879,7 @@ void Paint_HUD(void)
 	for (i = 0, j = 0; i < MAX_SCORE_OBJECTS; i++) {
 	    score_object_t*	sobj = &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
 	    if (sobj->hud_msg_len > 0) {
-	    	dummy = printsize(&gamefont,sobj->hud_msg);
+	    	dummy = printsize(&gamefont,"%s",sobj->hud_msg);
 		if (sobj->hud_msg_width == -1)
 		    sobj->hud_msg_width = (int)dummy.width;
 		if (j == 0 &&
