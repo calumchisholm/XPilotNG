@@ -5,12 +5,41 @@ these tasks, ask that developer first, so you can agree on how to proceed.
 TASKS FOR XPILOT NG 4.7.0
 -------------------------
 
-Task: Make cannons fire if a player is "anywhere near" and not paused
-       (this could be a bit harder without breaking old behavior.)
-Developer: throat / kps
+Common:
 
-Task: Add support for cannons having individual id, score, smartness etc.
+Task: Rewrite INSTALL.txt for ng. Especially describe SDL client compiling.
+Maybe append INSTALL file to INSTALL.txt and rename the current INSTALL.txt
+to INSTALL.
+Developer: ?
+
+Task: Make it so that no defaultsFile is used in server by default.
+Developer: kps ?
+
+Task: Write a "getting started" / tutorial webpage for newbies.
+Developer: ?
+
+
+Clients:
+
+Task: Add a team menuto SDL client (maybe X client too) which allows a
+player to select/swap team. Keep only those teams in the menu that
+have bases on the map.
+Developer: virus / kps ?
+
+Task: Turn the item images on the hud in sdl client the right way
+(upside down atm)
+Developer: ?
+
+Task: Fix sdl client talk window bug. Now window closes some times that it
+shouldn't.
 Developer: kps
+
+Task: Support "internal" edges in SDL client.
+Developer: baron ?
+
+Task: Make hidden walls visible in SDL client if texturedwalls
+(and filledworld?) are off.
+Developer: baron ?
 
 Task: Remove X client radar bug (this appears e.g. on polygon version of
 newdarkhell).
@@ -18,29 +47,38 @@ Developer: ?
 
 Task: Create a useful set of newbie messages that are shown to players
 using the Add_newbie_message() function if client option 'newbie' is on.
+Examples: message that 'm' is used to talk, message when you pick up an
+item, what key one can use to use it e.g.
 Developer: kps
 
 Task: Add support for Add_alert_message() in X client.
+(that is infrastructure for the newbie message stuff and for other messages
+like the "really quit (y/n)?" message.
 Developer: kps
 
-Task: Make a newbie friendly default map where newbies can learn the very
-basics of the game. The current idea is to make a conversion of new dark hell,
-or a newbie version of the Dragon map.
+
+Server:
+
+Task: Make the new ndh.xp2 work ok.
+Developer: throat / baron / kps
+
+Task: Add back feature that cannons can get items from thin air.
+Developer: kps
+
+Task: Make cannons fire if a player is "anywhere near" and not paused
+       (this could be a bit harder without breaking old behavior.)
 Developer: throat / kps
 
-Task: Add support for "self" type wormholes in server. In xml they look like
+Task: Add support for "fixed" type wormholes in server. In xml they look like
 this:
-<Wormhole x="260960" y="148960" type="self">
+<Wormhole x="260960" y="148960" type="fixed">
 <Polygon ...></Polygon>
 </Wormhole>
-The x and y values in a self wormhole tell to what destination stuff will
+The x and y values in a fixed wormhole tell to what destination stuff will
 be warped.
-Developer: kps
+Developer: kps / throat
 
 Task: Make wormholes warp other objects than players.
-Developer: kps
-
-Task: Rewrite INSTALL.txt for ng. Especially describe SDL client compiling.
 Developer: kps
 
 Task: Make pause key unpause players also when baselesspausing option is on.
@@ -53,11 +91,6 @@ Task: Allow pausing and changing base for a slightly bigger area (maybe 3x3
 blocks) around a base.
 Developer: kps
 
-Task: Make it so that no defaultsFile is used in server by default.
-Developer: kps
-
-Task: Write a "getting started" webpage for newbies.
-Developer: kps
 
 
 SOME OTHER TASKS TODO FOR XPILOT NG
@@ -214,4 +247,7 @@ Developer: kps
 
 Task: Make it so that if a team has a treasure, players get bases first that
 are closer to the treasure.
+Developer: kps
+
+Task: Add support for cannons having individual id, score, smartness etc.
 Developer: kps
