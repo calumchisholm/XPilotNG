@@ -396,9 +396,8 @@ public class MapPolygon extends MapObject {
 
     private static int[] insert (int i, int a[], int p) {
 
-        if (p >= a.length || p < 0) 
-            throw new ArrayIndexOutOfBoundsException(p);
-
+        if (p > a.length || p < 0) throw new ArrayIndexOutOfBoundsException(p);
+        
         int rv[] = new int[a.length + 1];
         System.arraycopy(a, 0, rv, 0, p);
         rv[p] = i;
