@@ -53,8 +53,8 @@
 #define MAPUP(i)	map.data[MAPOFFUP(i)]
 #define MAPDOWN(i)	map.data[MAPOFFDOWN(i)]
 
-#ifndef MAX_MAP_SIZE
-#define MAX_MAP_SIZE	900
+#ifndef MAX_MAP_SIZE_IN_BLOCKS
+#define MAX_MAP_SIZE_IN_BLOCKS	900
 #endif
 
 #define BLOCK_SPACE		' '
@@ -149,8 +149,8 @@ static void Option_map(int argc, char **argv)
 	double		max;
     };
     static struct map_opt mapopts[] = {
-	{ "mapWidth", &map.width, 0, 0, 90, MAX_MAP_SIZE },
-	{ "mapHeight", &map.height, 0, 0, 90, MAX_MAP_SIZE },
+	{ "mapWidth", &map.width, 0, 0, 90, MAX_MAP_SIZE_IN_BLOCKS },
+	{ "mapHeight", &map.height, 0, 0, 90, MAX_MAP_SIZE_IN_BLOCKS },
 	{ "seed", 0, &map.seed, 0, 0, MAX_FUZZ },
 	{ "seedRatio", 0, 0, &map.seed_ratio, 0.02, 0.22 },
 	{ "fillRatio", 0, 0, &map.fill_ratio, 0.02, 0.80 },
