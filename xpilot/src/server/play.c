@@ -26,10 +26,9 @@
 char play_version[] = VERSION;
 
 
-int Punish_team(player *pl, int t_destroyed, int cx, int cy)
+int Punish_team(player *pl, treasure_t *td, int cx, int cy)
 {
     static char		msg[MSG_LEN];
-    treasure_t		*td = &World.treasures[t_destroyed];
     int			i;
     int			win_score = 0,lose_score = 0;
     int			win_team_members = 0, lose_team_members = 0;
@@ -264,19 +263,21 @@ void Ball_is_destroyed(ballobject *ball)
 void Ball_hits_goal(ballobject *ball, int group)
 {
     player *owner;
+    treasure_t *td;
 
     if (ball->owner == NO_ID) {	/* Probably the player quit */
 	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 	return;
     }
-    if (World.treasures[ball->treasure].team == groups[group].team) {
+    td = &World.treasures[ball->treasure];
+    if (td->team == groups[group].team) {
 	Ball_is_replaced(ball);
 	return;
     }
     owner = Player_by_id(ball->owner);
     if (groups[group].team == owner->team) {
 	Ball_is_destroyed(ball);
-	if (Punish_team(owner, ball->treasure,ball->pos.cx, ball->pos.cy))
+	if (Punish_team(owner, td, ball->pos.cx, ball->pos.cy))
 	    CLR_BIT(ball->status, RECREATE);
 	return;
     }

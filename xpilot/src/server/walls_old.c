@@ -932,6 +932,8 @@ static void Move_segment(move_state_t *ms)
 		}
 		if (BIT(World.rules->mode, TEAM_PLAY)
 		    && World.treasures[ms->treasure].team == owner->team) {
+		    treasure_t *td = &World.treasures[ball->treasure];
+
 		    Ball_is_destroyed(ball);
 		    if (captureTheFlag
 			&& !World.treasures[ms->treasure].have
@@ -939,7 +941,7 @@ static void Move_segment(move_state_t *ms)
 			strcpy(msg, "Your treasure must be safe before you "
 			       "can cash an opponent's!");
 			Set_player_message(owner, msg);
-		    } else if (Punish_team(owner, ball->treasure,
+		    } else if (Punish_team(owner, td,
 					   ball->pos.cx, ball->pos.cy))
 			CLR_BIT(ball->status, RECREATE);
 		}
