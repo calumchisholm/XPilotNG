@@ -368,6 +368,12 @@ static void Object_hits_wormhole(object *obj, int ind)
 
     SET_BIT(obj->status, WARPING);
     obj->wormHoleHit = ind;
+
+    if (BIT(obj->type, OBJ_PLAYER)) {
+	player *pl = (player *)obj;
+	warn("Player %s hits wormhole %d.", pl->name, ind);
+    }
+
 }
 
 

@@ -830,6 +830,10 @@ static void Traverse_wormhole(player *pl)
     world_t *world = &World;
     wormhole_t *wh_hit = Wormholes(world, pl->wormHoleHit);
 
+#if 0
+    warn("player %s is in Traverse_wormhole", pl->name);
+#endif
+
     if (wh_hit->countdown > 0)
 	wh_dest = wh_hit->lastdest;
     else if (rfrac() < 0.1) {
@@ -1135,6 +1139,8 @@ static void Update_players(void)
 	/*
 	 * Handle hyperjumps and wormholes.
 	 */
+	warn("Player %s update, warping = %d",
+	     pl->name, BIT(pl->status, WARPING));
 	if (BIT(pl->status, WARPING)) {
 	    if (pl->wormHoleHit == -1)
 		Hyperjump(pl);

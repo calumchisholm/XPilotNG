@@ -626,7 +626,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 	return true;
     }
 
-    if (BIT(obj->status, WARPED))
+    if (BIT(obj->status, WARPED|WARPING))
 	return false;
 
     return true;
