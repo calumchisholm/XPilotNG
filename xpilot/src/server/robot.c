@@ -976,7 +976,7 @@ static int Robot_check_leave(player_t *pl)
     if (options.robotsLeave
 	&& pl->pl_life > 0
 	&& !BIT(world->rules->mode, LIMITED_LIVES)
-	&& (BIT(pl->pl_status, PLAYING) || pl->recovery_count <= 0)) {
+	&& (BIT(pl->pl_status, FOO_PLAYING) || pl->recovery_count <= 0)) {
 
 	if (options.robotLeaveLife > 0
 	    && pl->pl_life >= options.robotLeaveLife) {
@@ -1128,7 +1128,7 @@ void Robot_update(world_t *world)
 	    /* Ignore non-robots. */
 	    continue;
 
-	if (BIT(pl->pl_status, PLAYING|GAME_OVER) != PLAYING) {
+	if (BIT(pl->pl_status, FOO_PLAYING|FOO_GAME_OVER) != FOO_PLAYING) {
 	    /* Only check for leave if not being transported to homebase. */
 	    if (pl->recovery_count <= 0) {
 		if (Robot_check_leave(pl))

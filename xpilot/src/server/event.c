@@ -40,7 +40,7 @@ bool team_dead(int team)
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Player_by_index(i);
 
-	if (pl->team == team && !BIT(pl->pl_status, PAUSE|GAME_OVER))
+	if (pl->team == team && !BIT(pl->pl_status, FOO_PAUSE|FOO_GAME_OVER))
 	    return false;
     }
     return true;
@@ -481,8 +481,8 @@ int Handle_keyboard(player_t *pl)
 	/*
 	 * Allow these functions while you're 'dead'.
 	 */
-	if (BIT(pl->pl_status, PLAYING|GAME_OVER|PAUSE|HOVERPAUSE)
-	    != PLAYING) {
+	if (BIT(pl->pl_status, FOO_PLAYING|FOO_GAME_OVER|FOO_PAUSE|HOVERPAUSE)
+	    != FOO_PLAYING) {
 	    switch (key) {
 	    case KEY_PAUSE:
 	    case KEY_LOCK_NEXT:
@@ -822,7 +822,7 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_PAUSE:
 		if (Player_is_paused(pl))
-		    i = PAUSE;
+		    i = FOO_PAUSE;
 		else if (Player_is_hoverpaused(pl))
 		    i = HOVERPAUSE;
 		else {
@@ -831,7 +831,7 @@ int Handle_keyboard(player_t *pl)
 		    dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
 			minv = 3.0;
-			i = PAUSE;
+			i = FOO_PAUSE;
 		    } else {
 			/*
 			 * Hover pause doesn't work within two squares of the
@@ -848,7 +848,7 @@ int Handle_keyboard(player_t *pl)
 		}
 
 		switch (i) {
-		case PAUSE:
+		case FOO_PAUSE:
 		    if (Player_is_hoverpaused(pl))
 			break;
 
@@ -857,7 +857,7 @@ int Handle_keyboard(player_t *pl)
 
 		    Pause_player(pl, !Player_is_paused(pl));
 
-		    if (BIT(pl->pl_status, PLAYING)) {
+		    if (BIT(pl->pl_status, FOO_PLAYING)) {
 			BITV_SET(pl->last_keyv, key);
 			BITV_SET(pl->prev_keyv, key);
 			return 1;

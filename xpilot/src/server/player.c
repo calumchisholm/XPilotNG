@@ -138,7 +138,7 @@ void Pick_startpos(player_t *pl)
 		if (pl_i->conn != NULL)
 		    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	    }
-	    if (BIT(pl->pl_status, PAUSE|GAME_OVER))
+	    if (BIT(pl->pl_status, FOO_PAUSE|FOO_GAME_OVER))
 		Go_home(pl);
 	}
     }
@@ -160,7 +160,7 @@ void Go_home(player_t *pl)
 
     if (BIT(world->rules->mode, TIMING)
 	&& pl->round
-	&& !BIT(pl->pl_status, GAME_OVER)) {
+	&& !BIT(pl->pl_status, FOO_GAME_OVER)) {
 	if (pl->check)
 	    check = pl->check - 1;
 	else
@@ -1030,7 +1030,7 @@ void Compute_game_status(world_t *world)
 		/* Ignore players with no treasure troves */
 		continue;
 #endif
-	    else if (BIT(pl_i->pl_status, GAME_OVER)) {
+	    else if (BIT(pl_i->pl_status, FOO_GAME_OVER)) {
 		if (team_state[pl_i->team] == TeamEmpty) {
 		    /* Assume all teammembers are dead. */
 		    num_dead_teams++;
@@ -1225,7 +1225,7 @@ void Compute_game_status(world_t *world)
 
 	    if (Player_is_paused(pl_i) || Player_is_tank(pl_i))
 		continue;
-	    if (!BIT(pl_i->pl_status, GAME_OVER)) {
+	    if (!BIT(pl_i->pl_status, FOO_GAME_OVER)) {
 		num_alive_players++;
 		if (Player_is_robot(pl_i))
 		    num_alive_robots++;
@@ -1487,7 +1487,7 @@ void Kill_player(player_t *pl, bool add_rank_death)
 {
     /* Don't create an explosion if the player is being transported back
      * to home base after being killed. */
-    if (BIT(pl->pl_status, PLAYING))
+    if (BIT(pl->pl_status, FOO_PLAYING))
 	Explode_fighter(pl);
     Player_death_reset(pl, add_rank_death);
 }
@@ -1516,7 +1516,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->acc.x		= pl->acc.y	= 0.0;
     pl->emptymass	= pl->mass	= options.shipMass;
     pl->obj_status	&= ~(KILL_OBJ_BITS);
-    /* remove KILLED and PLAYING */
+    /* remove FOO_KILLED and FOO_PLAYING */
     pl->pl_status	&= ~(KILL_PL_BITS);
 
     for (i = 0; i < NUM_ITEMS; i++) {
@@ -1617,16 +1617,16 @@ static char *status2str(int status)
 
     buf[0] = '\0';
 
-    if (status & PLAYING)
-	strlcat(buf, "PLAYING ", sizeof(buf));
-    if (status & PAUSE)
-	strlcat(buf, "PAUSE ", sizeof(buf));
-    if (status & GAME_OVER)
-	strlcat(buf, "GAME_OVER ", sizeof(buf));
+    if (status & FOO_PLAYING)
+	strlcat(buf, "FOO_PLAYING ", sizeof(buf));
+    if (status & FOO_PAUSE)
+	strlcat(buf, "FOO_PAUSE ", sizeof(buf));
+    if (status & FOO_GAME_OVER)
+	strlcat(buf, "FOO_GAME_OVER ", sizeof(buf));
     if (status & THRUSTING)
 	strlcat(buf, "THRUSTING ", sizeof(buf));
-    if (status & KILLED)
-	strlcat(buf, "KILLED ", sizeof(buf));
+    if (status & FOO_KILLED)
+	strlcat(buf, "FOO_KILLED ", sizeof(buf));
 
     return buf;
 }
@@ -1681,31 +1681,31 @@ void Player_set_state(player_t *pl, int state)
     case PL_STATE_WAITING:
 	Player_set_mychar(pl, 'W');
 	Player_set_life(pl, 0);
-	SET_BIT(pl->pl_status, GAME_OVER);
-	CLR_BIT(pl->pl_status, PAUSE|KILLED); /* what about PLAYING ? */
+	SET_BIT(pl->pl_status, FOO_GAME_OVER);
+	CLR_BIT(pl->pl_status, FOO_PAUSE|FOO_KILLED); /* what about FOO_PLAYING ? */
 	break;
     case PL_STATE_APPEARING:
 	Player_set_mychar(pl, pl->pl_type_mychar);
 	/*Player_set_mychar(pl, 'A');*/
-	CLR_BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED);
+	CLR_BIT(pl->pl_status, FOO_PLAYING|FOO_PAUSE|FOO_GAME_OVER|FOO_KILLED);
 	pl->recovery_count = RECOVERY_DELAY;
 	break;
     case PL_STATE_ALIVE:
 	Player_set_mychar(pl, pl->pl_type_mychar);
-	SET_BIT(pl->pl_status, PLAYING);
-	CLR_BIT(pl->pl_status, PAUSE|GAME_OVER|KILLED);
+	SET_BIT(pl->pl_status, FOO_PLAYING);
+	CLR_BIT(pl->pl_status, FOO_PAUSE|FOO_GAME_OVER|FOO_KILLED);
 	break;
     case PL_STATE_KILLED:
-	SET_BIT(pl->pl_status, KILLED);
+	SET_BIT(pl->pl_status, FOO_KILLED);
 	break;
     case PL_STATE_DEAD:
 	Player_set_mychar(pl, 'D');
-	SET_BIT(pl->pl_status, GAME_OVER);
+	SET_BIT(pl->pl_status, FOO_GAME_OVER);
 	break;
     case PL_STATE_PAUSED:
 	Player_set_mychar(pl, 'P');
-	SET_BIT(pl->pl_status, PAUSE);
-	CLR_BIT(pl->pl_status, PLAYING|GAME_OVER|KILLED);
+	SET_BIT(pl->pl_status, FOO_PAUSE);
+	CLR_BIT(pl->pl_status, FOO_PLAYING|FOO_GAME_OVER|FOO_KILLED);
 	break;
     default:
 	break;
