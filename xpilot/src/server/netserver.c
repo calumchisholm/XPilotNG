@@ -409,6 +409,7 @@ void Destroy_connection(connection_t *connp, const char *reason)
 
     if (connp->id != NO_ID) {
 	player_t *pl;
+
 	id = connp->id;
 	connp->id = NO_ID;
 	pl = Player_by_id(id);
@@ -418,16 +419,12 @@ void Destroy_connection(connection_t *connp, const char *reason)
 	else
 	    Delete_spectator(pl);
     }
-    if (connp->user != NULL)
-	free(connp->user);
-    if (connp->nick != NULL)
-	free(connp->nick);
-    if (connp->dpy != NULL)
-	free(connp->dpy);
-    if (connp->addr != NULL)
-	free(connp->addr);
-    if (connp->host != NULL)
-	free(connp->host);
+
+    XFREE(connp->user);
+    XFREE(connp->nick);
+    XFREE(connp->dpy);
+    XFREE(connp->addr);
+    XFREE(connp->host);
 
     Sockbuf_cleanup(&connp->w);
     Sockbuf_cleanup(&connp->r);
@@ -468,10 +465,12 @@ static void Create_client_socket(sock_t *sock, int *port)
 {
     int i;
 
-    if (options.clientPortStart && (!options.clientPortEnd || options.clientPortEnd > 65535))
+    if (options.clientPortStart
+	&& (!options.clientPortEnd || options.clientPortEnd > 65535))
 	options.clientPortEnd = 65535;
 
-    if (options.clientPortEnd && (!options.clientPortStart || options.clientPortStart < 1024))
+    if (options.clientPortEnd
+	&& (!options.clientPortStart || options.clientPortStart < 1024))
 	options.clientPortStart = 1024;
 
     if (!options.clientPortStart || !options.clientPortEnd ||
@@ -1015,7 +1014,7 @@ static void LegalizeHost(char *string)
 static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 {
     player_t		*pl;
-    int			i, war_on_id, conn_bit, nick_mod = 0;
+    int			i, war_on_id, conn_bit /*, nick_mod = 0*/;
     char		msg[MSG_LEN];
     char		old_nick[MAX_NAME_LEN] /*, *p */;
     const char		sender[] = "[*Server notice*]";
@@ -1149,9 +1148,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	return -1;
     }
 
+#if 0
     if (nick_mod)
 	xpprintf("%s Nick \"%s\" has been changed to \"%s\".\n",
 		 showtime(), old_nick, connp->nick);
+#endif
 
     if (!options.silent) {
 	if (pl->rectype < 2)
@@ -1240,6 +1241,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     if (pl->rectype < 2)
 	Set_message(msg);
 
+#if 0
     if (nick_mod) {
 	sprintf(msg,
 		"Your nick is password-protected and has been modified. %s",
@@ -1261,6 +1263,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		sender);
 	Set_player_message(pl, msg);
     }
+#endif
 
     if (options.greeting) {
 	snprintf(msg, sizeof(msg), "%s %s", options.greeting, sender);
@@ -1442,6 +1445,7 @@ static void Handle_input(int fd, void *arg)
 
     while (connp->r.ptr < connp->r.buf + connp->r.len) {
 	char *pkt = connp->r.ptr;
+
 	type = (connp->r.ptr[0] & 0xFF);
 	recSpecial = 0;
 	result = (*receive_tbl[type])(connp);
@@ -1455,6 +1459,7 @@ static void Handle_input(int fd, void *arg)
 	if (record && recOpt && recSpecial && playback_data == pbdcheck &&
 	    playback_shorts == pbscheck) {
 	    int len = connp->r.ptr - pkt;
+
 	    memmove(playback_data - (connp->r.buf + connp->r.len - pkt),
 		    playback_data
 		    - (connp->r.buf + connp->r.len - connp->r.ptr),
@@ -2727,11 +2732,11 @@ static int Receive_ack_target(connection_t *connp)
  */
 static void Handle_talk(connection_t *connp, char *str)
 {
-    player_t		*pl = Player_by_id(connp->id);
-    int			i, sent, team;
-    unsigned int	len;
-    char		*cp,
-			msg[MSG_LEN * 2];
+    player_t *pl = Player_by_id(connp->id);
+    int i, sent, team;
+    unsigned int len;
+    char *cp, msg[MSG_LEN * 2];
+    const char *sender = " [*Server reply*]";
 
     pl->flooding += FPS/3;
 
@@ -2745,6 +2750,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	else {
 	    for (sent = i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->home_base == NULL)
 		    Set_player_message (pl_i, msg);
 	    }
@@ -2762,6 +2768,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	if (!(mute_baseless && pl->home_base == NULL)) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->team == team) {
 		    sent++;
 		    Set_player_message(pl_i, msg);
@@ -2776,6 +2783,7 @@ static void Handle_talk(connection_t *connp, char *str)
 		sprintf(msg, "Message not sent, nobody in team %d!", team);
 	    else
 		sprintf(msg, "You may not send messages to active teams!");
+	    strlcat(msg, sender, sizeof(msg));
 	    Set_player_message(pl, msg);
 	}
     }
@@ -2788,7 +2796,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	if (!other_pl) {
 	    sprintf(msg, "Message not sent. ");
 	    strlcat(msg, errmsg, sizeof(msg));
-	    strlcat(msg, " [*Server reply*]", sizeof(msg));
+	    strlcat(msg, sender, sizeof(msg));
 	    Set_player_message(pl, msg);
 	    return;
 	}
@@ -2798,8 +2806,10 @@ static void Handle_talk(connection_t *connp, char *str)
 		  other_pl->home_base != NULL)) {
 		sprintf(msg + strlen(msg), ":[%s]", other_pl->name);
 		Set_player_message(other_pl, msg);
-	    } else
+	    } else {
 		sprintf(msg, "You may not send messages to active players!");
+		strlcat(msg, sender, sizeof(msg));
+	    }
 	    Set_player_message(pl, msg);
 	}
     }
