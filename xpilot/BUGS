@@ -1,3 +1,15 @@
+-----------------------------------------------------------------
+Problem : Joining a game with textures turned off (walls or objects)
+	  and then trying to turn them on in game, does not work!
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
+
+
 Problem : Items that form in target areas of the map that has been destroyed,
 	  remain after the targets reform.
 	  A player can also get trapped within a target area if they reform on
