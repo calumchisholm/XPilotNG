@@ -327,8 +327,7 @@ static bool Set_maxFPS(xp_option_t *opt, int val)
     (void)opt; (void)val;
     if (oldMaxFPS != maxFPS) {
 	oldMaxFPS = maxFPS;
-	if (Send_fps_request(maxFPS) < 0)
-	    return false;
+	Send_fps_request(maxFPS);
     }
     return true;
 }

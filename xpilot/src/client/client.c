@@ -135,7 +135,7 @@ bool	auto_shield = true;	/* shield drops for fire */
 char	modBankStr[NUM_MODBANKS][MAX_CHARS]; /* modifier banks */
 
 int	maxFPS;			/* Maximum FPS player wants from server */
-int	oldMaxFPS;
+int	oldMaxFPS = 0;
 int	clientFPS = 1;	        /* How many fps we actually get */
 time_t	currentTime;	        /* Current value of time() */
 bool	newSecond = false;      /* True if time() incremented this frame */
