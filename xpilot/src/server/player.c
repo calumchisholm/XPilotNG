@@ -489,7 +489,10 @@ int Init_player(int ind, shipobj *ship)
      * now, otherwise you will have to wait 'til everyone gets GAME OVER.
      */
     /* Indeed you have to! (Mara) */
-    if (BIT(World.rules->mode, LIMITED_LIVES))
+    /* At least don't make the player wait for a new round if he's the
+     * only one on the server. Mara's change (always too_late) meant
+     * there was a round reset when the first player joined. -uau */
+    if (BIT(World.rules->mode, LIMITED_LIVES) && NumPlayers > 0)
 	too_late = true;
 #if 0
     for (i = 0; i < NumPlayers; i++) {
