@@ -504,25 +504,8 @@ void Parse_options(int *argcp, char **argvp)
     char path[PATH_MAX + 1];
     char buf[BUFSIZ];
     FILE *fp;
-    int i;
+    int arg_ind, num_remaining_args, num_servers = 0;
 
-
-#if 0
-    /*
-     * Check for bad arguments.
-     */
-    for (i = 1; i < *argcp; i++) {
-	if (argvp[i][0] == '-' || argvp[i][0] == '+') {
-	    warn("Unknown or incomplete option '%s'", argvp[i]);
-	    warn("Type: %s -help to see a list of options", argvp[0]);
-	    exit(1);
-	}
-	/* The rest of the arguments are hostnames of servers. */
-    }
-
-    /*for (i = 0; i < argc; i++)
-      printf("arg %d: %s\n", i, argvp[i]);*/
-#endif
     /*
      * Read options from xpilotrc.
      */
@@ -544,6 +527,7 @@ void Parse_options(int *argcp, char **argvp)
 	fclose(fp);
     }
 
+#if 0
     /* evil and ugly argv parsing */
     for (i = 1; i < *argcp; i++) {
 	if (argvp[i][0] == '-') {
@@ -575,6 +559,59 @@ void Parse_options(int *argcp, char **argvp)
 	}
 	/*printf("arg %d: %s\n", i, argvp[i]);*/
     }
+#else
+    /*
+     * Here we step trough argc - 1 arguments, leaving
+     * only the arguments that might be server names.
+     */
+    arg_ind = 1;
+    num_remaining_args = *argcp - 1;
+
+    while (num_remaining_args > 0) {
+	if (argvp[arg_ind][0] == '-') {
+	    char *arg = &argvp[arg_ind][1];
+
+	    /* Add GNU style option support e.g. --wallcolor=1 ??? */
+	    if (is_noarg_option(arg)) {
+		int i;
+		Set_option(arg, "true");
+		num_remaining_args--;
+		for (i = 0; i < num_remaining_args; i++)
+		    argvp[arg_ind + i] = argvp[arg_ind + i + 1];
+	    } else {
+		bool ok = false;
+
+		if (num_remaining_args >= 2) {
+		    ok = Set_option(arg, argvp[arg_ind + 1]);
+		    if (ok) {
+			int i;
+			num_remaining_args -= 2;
+			for (i = 0; i < num_remaining_args; i++)
+			    argvp[arg_ind + i] = argvp[arg_ind + i + 2];
+		    }
+		}
+
+		if (!ok) {
+		    warn("Unknown or incomplete option '%s'", argvp[arg_ind]);
+		    warn("Type: %s -help to see a list of options", argvp[0]);
+		    exit(1);
+		}
+	    }
+	} else {
+	    /* assume this is a server name. */
+	    arg_ind++;
+	    num_remaining_args--;
+	    num_servers++;
+	}
+    }
+    
+    /*
+     * The remaining args are assumed to be names of servers to try to contact.
+     * + 1 is for the program name.
+     */
+    *argcp = num_servers + 1;
+
+#endif
 
     if (xpArgs.help)
 	Usage();

@@ -831,9 +831,7 @@ int Contact_servers(int count, char **servers,
 	    retries = 0;
 	    contacted = 0;
 	    do {
-		/* kps hack */
-		if (strlen(servers[i]) == 0)
-		    continue;
+		printf("Contacting server %s.\n", servers[i]);
 		IFWINDOWS( Progress("Contacting server %s", servers[i]) );
 		Sockbuf_clear(&sbuf);
 		Packet_printf(&sbuf, "%u%s%hu%c",
@@ -844,8 +842,8 @@ int Contact_servers(int count, char **servers,
 			      conpar->contact_port,
 			      sbuf.buf, sbuf.len) == -1) {
 		    if (sbuf.sock.error.call == SOCK_CALL_GETHOSTBYNAME) {
-			printf("Can't find the server '%s'\n", servers[i]);
-			IFWINDOWS( Progress("Can't find the server '%s'",
+			printf("Can't find the server '%s'.\n", servers[i]);
+			IFWINDOWS( Progress("Can't find the server '%s'.",
 					    servers[i]) );
 			break;
 		    }
