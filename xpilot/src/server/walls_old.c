@@ -1702,9 +1702,8 @@ static void Player_crash_old(move_state_t *ms, int pt)
 
 
 
-void Move_player_old(int ind)
+void Move_player_old(player *pl)
 {
-    player		*pl = Players(ind);
     int			nothing_done = 0;
     int			i;
     int			dist;
@@ -1936,7 +1935,7 @@ void Move_player_old(int ind)
 		    && BIT(pl->have, HAS_ARMOR)) {
 		    max_speed = maxShieldedWallBounceSpeed;
 		    max_angle = mp.max_shielded_angle;
-		    Player_hit_armor(ind);
+		    Player_hit_armor(pl);
 		}
 
 		if (speed > max_speed) {
@@ -1974,7 +1973,7 @@ void Move_player_old(int ind)
 		    && BIT(pl->have, HAS_ARMOR)) {
 		    max_speed = maxShieldedWallBounceSpeed;
 		    max_angle = mp.max_shielded_angle;
-		    Player_hit_armor(ind);
+		    Player_hit_armor(pl);
 		}
 		if (abs_delta_dir > max_angle) {
 		    crash = worst;
@@ -2003,7 +2002,7 @@ void Move_player_old(int ind)
 		    != (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 		    Add_fuel(&pl->fuel, (long)(-((cost << FUEL_SCALE_BITS)
 					  * wallBounceFuelDrainMult)));
-		    Item_damage(ind, wallBounceDestroyItemProb);
+		    Item_damage(pl, wallBounceDestroyItemProb);
 		}
 		if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
 		    crash = worst;
@@ -2096,9 +2095,8 @@ void Move_player_old(int ind)
     }
 }
 
-void Turn_player_old(int ind)
+void Turn_player_old(player *pl)
 {
-    player		*pl = Players(ind);
     int			i;
     move_info_t		mi;
     move_state_t	ms[RES];

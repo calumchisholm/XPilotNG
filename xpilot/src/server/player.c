@@ -233,7 +233,7 @@ void Go_home(int ind)
     memset(pl->last_keyv, 0, sizeof(pl->last_keyv));
     memset(pl->prev_keyv, 0, sizeof(pl->prev_keyv));
     Emergency_shield(ind, 0);
-    Player_used_kill(ind);
+    Player_used_kill(pl);
 
     if (playerStartsShielded != 0) {
 	SET_BIT(pl->used, HAS_SHIELD);
@@ -346,18 +346,17 @@ void Player_remove_tank(int ind, int which_tank)
     }
 }
 
-void Player_hit_armor(int ind)
+void Player_hit_armor(player *pl)
 {
-    player		*pl = Players(ind);
-
     if (--pl->item[ITEM_ARMOR] <= 0)
 	CLR_BIT(pl->have, HAS_ARMOR);
 }
 
-void Player_used_kill(int ind)
+/*
+ * Clear used bits.
+ */
+void Player_used_kill(player *pl)
 {
-    player		*pl = Players(ind);
-
     pl->used &= ~USED_KILL;
     if (!BIT(DEF_HAVE, HAS_SHIELD)) {
 	CLR_BIT(pl->have, HAS_SHIELD);

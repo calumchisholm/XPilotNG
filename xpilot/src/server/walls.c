@@ -71,13 +71,13 @@ static char msg[MSG_LEN];
 /* kps compatibility hacks - plz remove if you can */
 void Walls_init_old(void);
 void Move_object_old(object *obj);
-void Move_player_old(int ind);
-void Turn_player_old(int ind);
+void Move_player_old(player *pl);
+void Turn_player_old(player *pl);
 
 static void Walls_init_new(void);
 static void Move_object_new(object *obj);
-static void Move_player_new(int ind);
-static void Turn_player_new(int ind);
+static void Move_player_new(player *pl);
+static void Turn_player_new(player *pl);
 
 
 /* polygon map related stuff */
@@ -267,20 +267,20 @@ void Move_object(object *obj)
 	Move_object_old(obj);
 }
 
-void Move_player(int ind)
+void Move_player(player *pl)
 {
     if (is_polygon_map || !useOldCode)
-	Move_player_new(ind);
+	Move_player_new(pl);
     else
-	Move_player_old(ind);
+	Move_player_old(pl);
 }
 
-void Turn_player(int ind)
+void Turn_player(player *pl)
 {
     if (is_polygon_map || !useOldCode)
-	Turn_player_new(ind);
+	Turn_player_new(pl);
     else
-	Turn_player_old(ind);
+	Turn_player_old(pl);
 }
 
 
@@ -896,7 +896,6 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     DFLOAT fx, fy;
     DFLOAT c, s;
     int group, type, item_id;
-    int ind = GetInd(pl->id);
 
     if (line >= num_lines) {
 	DFLOAT x, y, l2;
@@ -955,7 +954,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	    && !BIT(pl->used, HAS_SHIELD)
 	    && BIT(pl->have, HAS_ARMOR)) {
 	    max_speed = maxShieldedWallBounceSpeed;
-	    Player_hit_armor(ind);
+	    Player_hit_armor(pl);
 	}
 
 	if (speed > max_speed) {
@@ -976,7 +975,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	    != (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 	    Add_fuel(&pl->fuel, (long)(-((cost << FUEL_SCALE_BITS)
 					 * wallBounceFuelDrainMult)));
-	    Item_damage(ind, wallBounceDestroyItemProb);
+	    Item_damage(pl, wallBounceDestroyItemProb);
 	}
 	if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
 	    if (type == TARGET) 
@@ -2807,9 +2806,8 @@ static void Move_object_new(object *obj)
 }
 
 
-static void Move_player_new(int ind)
+static void Move_player_new(player *pl)
 {
-    player *pl = Players(ind);
     clpos  pos;
     struct move mv;
     struct collans ans;
@@ -2915,9 +2913,8 @@ static void Move_player_new(int ind)
 }
 
 
-static void Turn_player_new(int ind)
+static void Turn_player_new(player *pl)
 {
-    player	*pl = Players(ind);
     int		new_dir = MOD2((int)(pl->float_dir + 0.5f), RES);
     int		next_dir, sign, hitmask;
 

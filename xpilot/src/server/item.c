@@ -104,10 +104,9 @@ static void Item_update_flags(player *pl)
  * The `prob' parameter gives the chance that items are lost
  * and, if they are lost, what percentage.
  */
-void Item_damage(int ind, DFLOAT prob)
+void Item_damage(player *pl, DFLOAT prob)
 {
     if (prob < 1.0f) {
-	player		*pl = Players(ind);
 	int		i;
 	DFLOAT		loss;
 

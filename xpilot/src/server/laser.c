@@ -177,7 +177,7 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 	}
 	if (!BIT(pl->used, HAS_SHIELD)
 	    && BIT(pl->have, HAS_ARMOR)) {
-	    Player_hit_armor(ind);
+	    Player_hit_armor(pl);
 	}
     }
 }

@@ -876,7 +876,7 @@ int Handle_keyboard(int ind)
 			 * tractor beams.  Other items are allowed (esp.
 			 * cloaking).
 			 */
-			Player_used_kill(ind);
+			Player_used_kill(pl);
 			if (BIT(pl->have, HAS_SHIELD))
 			    SET_BIT(pl->used, HAS_SHIELD);
 		    } else if (pl->count <= 0) {

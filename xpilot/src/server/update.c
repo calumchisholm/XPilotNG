@@ -704,7 +704,7 @@ static void Player_turns(void)
 	if (!pl->turnresistance)
 	    pl->turnvel = 0;
 
-	Turn_player(i);
+	Turn_player(pl);
     }
 }
 
@@ -929,7 +929,7 @@ void Update_objects(void)
 	    if (pl->count > 0) {
 		if (!BIT(pl->status, PLAYING)) {
 		    Transport_to_home(i);
-		    Move_player(i);
+		    Move_player(pl);
 		    continue;
 		}
 	    } else {
@@ -1297,7 +1297,7 @@ void Update_objects(void)
 	/* end of somewhat-supported warping stuff */
 
 	update_object_speed(pl);	    /* New position */
-	Move_player(i);
+	Move_player(pl);
 
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || cloakedExhaust)
 	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {

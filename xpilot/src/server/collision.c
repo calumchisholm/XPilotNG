@@ -362,13 +362,13 @@ static void PlayerCollision(void)
 		    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 			Add_fuel(&(pl->fuel), (long)ED_PL_CRASH);
-			Item_damage(i, destroyItemInCollisionProb);
+			Item_damage(pl, destroyItemInCollisionProb);
 		    }
 		    if (BIT(pl_j->used, (HAS_SHIELD|
 					       HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 			Add_fuel(&(pl_j->fuel), (long)ED_PL_CRASH);
-			Item_damage(j, destroyItemInCollisionProb);
+			Item_damage(pl_j, destroyItemInCollisionProb);
 		    }
 		    pl->forceVisible = 20;
 		    pl_j->forceVisible = 20;
@@ -392,11 +392,11 @@ static void PlayerCollision(void)
 
 		if (!BIT(pl->used, HAS_SHIELD)
 		    && BIT(pl->have, HAS_ARMOR)) {
-		    Player_hit_armor(i);
+		    Player_hit_armor(pl);
 		}
 		if (!BIT(pl_j->used, HAS_SHIELD)
 		    && BIT(pl_j->have, HAS_ARMOR)) {
-		    Player_hit_armor(j);
+		    Player_hit_armor(pl_j);
 		}
 
 		if (BIT(pl_j->status, KILLED)) {
@@ -949,7 +949,7 @@ static void Player_collides_with_ball(int ind, object *obj, int radius)
 	if (!treasureCollisionMayKill || BIT(pl->used, HAS_SHIELD))
 	    return;
 	if (!BIT(pl->used, HAS_SHIELD) && BIT(pl->have, HAS_ARMOR)) {
-	    Player_hit_armor(ind);
+	    Player_hit_armor(pl);
 	    return;
 	}
     }
@@ -1280,7 +1280,7 @@ static void Player_collides_with_debris(int ind, object *obj)
 	&& wreckageCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
 	&& BIT(pl->have, HAS_ARMOR)) {
-	Player_hit_armor(ind);
+	Player_hit_armor(pl);
     }
 }
 
@@ -1330,7 +1330,7 @@ static void Player_collides_with_asteroid(int ind, wireobject *ast)
     if (asteroidCollisionMayKill
 	&& !BIT(pl->used, HAS_SHIELD)
 	&& BIT(pl->have, HAS_ARMOR)) {
-	Player_hit_armor(ind);
+	Player_hit_armor(pl);
     }
 }
 
@@ -1425,7 +1425,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 	    CLR_BIT(pl->used, HAS_SHIELD);
 	}
 	if (!BIT(pl->used, HAS_SHIELD) && BIT(pl->have, HAS_ARMOR)) {
-	    Player_hit_armor(ind);
+	    Player_hit_armor(pl);
 	}
     } else {
 	DFLOAT factor;
