@@ -187,7 +187,7 @@ teamcup_status_thread(int readfd)
 	if (dowr && FD_ISSET(sockfd, &wfds)) {
 	    int ret;
 
-	    ret = write(sockfd, bufptr[wrbuf], len[wrbuf]);
+	    ret = write(sockfd, bufptr[wrbuf], (size_t)len[wrbuf]);
 	    if (ret < 0) ret = 0;
 	    len[wrbuf] -= ret;
 	    bufptr[wrbuf] += ret;
@@ -488,9 +488,8 @@ int Get_scorefileHeader(char *buf, int offset, int maxlen, int *size_ptr)
 	    return -1;
 	}
 	size = st.st_size;
-	if (size > MAX_MOTD_SIZE) {
+	if (size > MAX_MOTD_SIZE)
 	    size = MAX_MOTD_SIZE;
-	}
 	if (size != motd_size) {
 	    motd_mtime = 0;
 	    motd_size = size;
@@ -498,9 +497,9 @@ int Get_scorefileHeader(char *buf, int offset, int maxlen, int *size_ptr)
 		close(fd);
 		return 0;
 	    }
-	    if (motd_buf) {
+	    if (motd_buf)
 		free(motd_buf);
-	    }
+
 	    if ((motd_buf = (char *) malloc(size)) == NULL) {
 		close(fd);
 		return -1;
@@ -522,15 +521,15 @@ int Get_scorefileHeader(char *buf, int offset, int maxlen, int *size_ptr)
 
     motd_loops = main_loops;
 
-    if (size_ptr) {
+    if (size_ptr)
 	*size_ptr = motd_size;
-    }
-    if (offset + maxlen > motd_size) {
+
+    if (offset + maxlen > motd_size)
 	maxlen = motd_size - offset;
-    }
-    if (maxlen <= 0) {
+
+    if (maxlen <= 0)
 	return 0;
-    }
+
     memcpy(buf, motd_buf + offset, maxlen);
     return maxlen;
 }
