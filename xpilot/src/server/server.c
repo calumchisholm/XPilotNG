@@ -497,7 +497,6 @@ void Server_info(char *str, unsigned max_size)
 	    "\n"
 	    "EXPERIMENTAL SERVER, see\n"
 	    "http://xpilot.sourceforge.net/\n"
-	    "http://www.hut.fi/~ksoderbl/xpilot/xpilot-4.5.4X.txt\n"
 	    "\n",
 	    server_version,
 	    (game_lock && ShutdownServer == -1) ? "locked" :
@@ -509,8 +508,7 @@ void Server_info(char *str, unsigned max_size)
 	    NumPlayers, World.NumBases);
 
     if (strlen(str) >= max_size) {
-	errno = 0;
-	error("Server_info string overflow (%d)", max_size);
+	warn("Server_info string overflow (%d)", max_size);
 	str[max_size - 1] = '\0';
 	return;
     }
@@ -675,9 +673,8 @@ void Game_Over(void)
 	    int team;
 	    if (IS_HUMAN_PTR(pl)) {
 		team = pl->team;
-		if (teamscore[team] == 1234567) {
+		if (teamscore[team] == 1234567)
 		    teamscore[team] = 0;
-		}
 		teamscore[team] += pl->score;
 	    }
 	}
@@ -898,16 +895,16 @@ static void Check_server_versions(void)
     for (i = 0; i < NELEM(file_versions); i++) {
 	if (strcmp(VERSION, file_versions[i].versionstr)) {
 	    oops++;
-	    error("Source file %s.c (\"%s\") is not compiled "
-		  "for the current version (\"%s\")!",
-		  file_versions[i].filename,
-		  file_versions[i].versionstr,
-		  VERSION);
+	    warn("Source file %s.c (\"%s\") is not compiled "
+		 "for the current version (\"%s\")!",
+		 file_versions[i].filename,
+		 file_versions[i].versionstr,
+		 VERSION);
 	}
     }
     if (oops) {
-	error("%d version inconsistency errors, cannot continue.", oops);
-	error("Please recompile this program properly.");
+	warn("%d version inconsistency errors, cannot continue.", oops);
+	warn("Please recompile this program properly.");
 	exit(1);
     }
 }
