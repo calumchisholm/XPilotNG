@@ -839,7 +839,7 @@ static void Parse_xpilotrc_line(const char *line)
 
     if (!value) {
 	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
-	warn("No value given for option, ignoring.");
+	warn("No value given for option %s, ignoring.", name);
 	/* treat as comment */
 	t.comment = xp_safe_strdup(line);
 	goto out;
