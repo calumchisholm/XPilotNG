@@ -114,9 +114,13 @@ case "$target" in
         MATHLIB="-lm"
         SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
         ;;
+    *-*-freebsd*)
+        MATHLIB="-lm"
+        SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
+        ;;
     *)
         MATHLIB="-lm"
-        SYS_GL_LIBS="-lGL -LGLU"
+        SYS_GL_LIBS="-lGL -lGLU"
         ;;
 esac
 
