@@ -103,7 +103,7 @@ static void Clean_string(char *buf)
 }
 
 
-static bool Get_contact_message(sockbuf_t *sbuf,
+static int Get_contact_message(sockbuf_t *sbuf,
 				const char *contact_server,
 				Connect_param_t *conpar)
 {
@@ -111,7 +111,7 @@ static bool Get_contact_message(sockbuf_t *sbuf,
     int			version;
     unsigned		magic;
     unsigned char	reply_to, status;
-    bool		readable = false;
+    int			readable = 0;
 
     sock_set_timeout(&sbuf->sock, 2, 0);
     while (readable == false && sock_readable(&sbuf->sock) > 0) {
@@ -124,7 +124,7 @@ static bool Get_contact_message(sockbuf_t *sbuf,
 	    }
 	    error("sock_receive_any, contact message");
 	    /* exit(1);  no good since meta gui. */
-	    return false;
+	    return 0;
 	}
 	sbuf->len = len;
 
@@ -166,13 +166,14 @@ static bool Get_contact_message(sockbuf_t *sbuf,
 		if ((MY_VERSION >> 4) < (MAGIC2VERSION(magic) >> 4)) {
 		    printf("Time for us to upgrade?\n");
 		}
+		readable = 2;
 	    }
 	    else {
 		/*
 		 * Found one which we can talk to.
 		 */
 		conpar->server_version = version;
-		readable = true;
+		readable = 1;
 	    }
 	}
     }
@@ -812,6 +813,7 @@ int Contact_servers(int count, char **servers,
     sock_t	sock;
     int		retries;
     int		contacted;
+    int		compat_mode, ret;
     sockbuf_t	sbuf;			/* contact buffer */
 
 
@@ -875,10 +877,11 @@ int Contact_servers(int count, char **servers,
 	for (i = 0; i < count && !connected; i++) {
 	    retries = 0;
 	    contacted = 0;
+	    compat_mode = 0;
 	    do {
 		IFWINDOWS( Progress("Contacting server %s", servers[i]); )
 		Sockbuf_clear(&sbuf);
-		Packet_printf(&sbuf, "%u%s%hu%c", MAGIC,
+		Packet_printf(&sbuf, "%u%s%hu%c", compat_mode ? COMPATIBILITY_MAGIC : MAGIC,
 		   conpar->real_name, sock_get_port(&sbuf.sock), CONTACT_pack);
 		if (sock_send_dest(&sbuf.sock, servers[i],conpar->contact_port,
 				   sbuf.buf, sbuf.len) == -1) {
@@ -894,7 +897,14 @@ int Contact_servers(int count, char **servers,
 		    printf("Retrying %s...\n", servers[i]);
 		    IFWINDOWS( Progress("Retrying %s...", servers[i]); )
 		}
-		if (Get_contact_message(&sbuf, servers[i], conpar)) {
+		ret = Get_contact_message(&sbuf, servers[i], conpar);
+		if (ret == 2 && compat_mode == 0) {
+		    printf("Trying compatibility version\n");
+		    compat_mode = 1;
+		    retries--; /* a bit ugly, cancels the loop ++ */
+		    continue;
+		}
+		if (ret == 1) {
 		    contacted++;
 		    IFWINDOWS( Progress("Contacted %s", servers[i]); )
 		    connected = Connect_to_server(auto_connect, list_servers,

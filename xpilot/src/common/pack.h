@@ -121,6 +121,8 @@
  */
 #define MIN_OLD_SERVER_VERSION  0x3103
 #define MAX_OLD_SERVER_VERSION  0x4300
+/* Which old-style (non-polygon) protocol version we support. */
+#define COMPATIBILITY_MAGIC 0x4300F4ED
 
 #define	MAX_STR_LEN		4096
 #define	MAX_DISP_LEN		80
