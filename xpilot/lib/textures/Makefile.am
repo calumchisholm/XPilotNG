@@ -1,5 +1,4 @@
 
-#libdir = $(prefix)/lib/xpilot/textures
 xpilottexturesdir =  $(pkglibdir)/textures
 xpilottextures_DATA = \
 	allitems.ppm \

@@ -175,8 +175,10 @@ AC_CONFIG_FILES([ \
 	src/Makefile \
 	src/common/Makefile \
 	src/client/Makefile \
+	src/client/items/Makefile \
 	src/server/Makefile \
 	src/replay/Makefile \
+	src/replay/tools/Makefile \
 	])
 AC_OUTPUT
 

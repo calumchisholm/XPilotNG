@@ -80,7 +80,6 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
-#libdir = $(prefix)/lib/xpilot/maps
 xpilotmapdir = $(pkglibdir)/maps
 xpilotmap_DATA = \
 	CAMD.xp \

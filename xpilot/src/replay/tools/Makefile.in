@@ -36,7 +36,7 @@ oldincludedir = /usr/include
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ../..
+top_builddir = ../../..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -79,109 +79,38 @@ X_PRE_LIBS = @X_PRE_LIBS@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
+EXTRA_DIST = \
+	eject.xbm \
+	fastf.xbm \
+	grey.xbm \
+	pause.xbm \
+	play.xbm \
+	record.xbm \
+	revplay.xbm \
+	rewind.xbm \
+	stop.xbm
 
-xpilottexturesdir = $(pkglibdir)/textures
-xpilottextures_DATA = \
-	allitems.ppm \
-	asteroidconcentrator.ppm \
-	ball.ppm \
-	ball.xpm \
-	base_down.ppm \
-	base_left.ppm \
-	base_right.ppm \
-	base_up.ppm \
-	bullet.ppm \
-	bullet2.ppm \
-	bullet_blue.ppm \
-	bullet_green.ppm \
-	cannon_down.ppm \
-	cannon_left.ppm \
-	cannon_right.ppm \
-	cannon_up.ppm \
-	checkpoint.ppm \
-	clouds.ppm \
-	concentrator.ppm \
-	fuel2.ppm \
-	fuelcell.ppm \
-	holder1.ppm \
-	holder2.ppm \
-	logo.ppm \
-	metalite.xpm \
-	meter.ppm \
-	mine_other.ppm \
-	mine_team.ppm \
-	minus.ppm \
-	moon.xpm \
-	paused.ppm \
-	plus.ppm \
-	radar.ppm \
-	radar2.ppm \
-	radar3.ppm \
-	refuel.ppm \
-	rock4.xpm \
-	ship.ppm \
-	ship_blue.ppm \
-	ship_red.ppm \
-	ship_red2.ppm \
-	ship_red3.ppm \
-	sparks.ppm \
-	volcanic.xpm \
-	wall_bottom.ppm \
-	wall_dl.ppm \
-	wall_dr.ppm \
-	wall_fi.ppm \
-	wall_left.ppm \
-	wall_right.ppm \
-	wall_top.ppm \
-	wall_ul.ppm \
-	wall_ull.ppm \
-	wall_ur.ppm \
-	wall_url.ppm \
-	wormhole.ppm
-
-
-EXTRA_DIST = $(xpilottextures_DATA)
-subdir = lib/textures
+subdir = src/replay/tools
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 DIST_SOURCES =
-DATA = $(xpilottextures_DATA)
-
 DIST_COMMON = Makefile.am Makefile.in
 all: all-am
 
 .SUFFIXES:
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  lib/textures/Makefile
+	  $(AUTOMAKE) --gnu  src/replay/tools/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 uninstall-info-am:
-xpilottexturesDATA_INSTALL = $(INSTALL_DATA)
-install-xpilottexturesDATA: $(xpilottextures_DATA)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(xpilottexturesdir)
-	@list='$(xpilottextures_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(xpilottexturesDATA_INSTALL) $$d$$p $(DESTDIR)$(xpilottexturesdir)/$$f"; \
-	  $(xpilottexturesDATA_INSTALL) $$d$$p $(DESTDIR)$(xpilottexturesdir)/$$f; \
-	done
-
-uninstall-xpilottexturesDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(xpilottextures_DATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(xpilottexturesdir)/$$f"; \
-	  rm -f $(DESTDIR)$(xpilottexturesdir)/$$f; \
-	done
 tags: TAGS
 TAGS:
 
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
-top_distdir = ../..
+top_distdir = ../../..
 distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 
 distdir: $(DISTFILES)
@@ -207,10 +136,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(DATA)
+all-am: Makefile
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(xpilottexturesdir)
 
 install: install-am
 install-exec: install-exec-am
@@ -252,7 +180,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-xpilottexturesDATA
+install-data-am:
 
 install-exec-am:
 
@@ -270,17 +198,15 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-generic
 
-uninstall-am: uninstall-info-am uninstall-xpilottexturesDATA
+uninstall-am: uninstall-info-am
 
 .PHONY: all all-am check check-am clean clean-generic distclean \
 	distclean-generic distdir dvi dvi-am info info-am install \
 	install-am install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
-	install-strip install-xpilottexturesDATA installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	uninstall uninstall-am uninstall-info-am \
-	uninstall-xpilottexturesDATA
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic uninstall uninstall-am uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

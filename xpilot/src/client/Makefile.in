@@ -83,20 +83,34 @@ install_sh = @install_sh@
 bin_PROGRAMS = xpilot
 INCLUDES = -I$(top_srcdir)/src/common
 xpilot_SOURCES = \
-        about.c bitmaps.c \
-        caudio.c client.c clientrank.c colors.c configure.c \
-        datagram.c dbuff.c default.c \
-        gfx2d.c gfx3d.c guimap.c guiobjects.c \
-        ignore.c join.c mapdata.c messages.c netclient.c \
-        paint.c paintdata.c painthud.c paintmap.c \
-        paintobjects.c paintradar.c query.c record.c shipshape_c.c sim.c \
-        syslimit.c talk.c talkmacros.c textinterface.c texture.c \
-        usleep.c welcome.c widget.c xeventhandlers.c \
-        xevent.c xinit.c xpilot.c xpmread.c
+	about.c \
+	bitmaps.c bitmaps.h \
+	caudio.c caudio.h client.c client.h clientrank.c clientrank.h \
+	colors.c configure.c configure.h connectparam.h \
+	datagram.c datagram.h dbuff.c dbuff.h \
+	debugaudio.c default.c default.h \
+	gfx2d.c gfx2d.h gfx3d.c gfx3d.h \
+	guimap.c guimap.h guiobjects.c guiobjects.h \
+	icon.h ignore.c ignore.h \
+	join.c \
+	mapdata.c messages.c \
+	netclient.c netclient.h \
+	paint.c paint.h paintdata.c paintdata.h painthud.c \
+	paintmacros.h paintmap.c paintobjects.c paintradar.c protoclient.h \
+	query.c \
+	record.c record.h recordfmt.h \
+	shipshape_c.c sim.c simbloods.h syslimit.c \
+	talk.c talk.h talkmacros.c textinterface.c texture.c texture.h \
+	usleep.c \
+	welcome.c widget.c widget.h \
+	xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
+	xinit.c xinit.h xpclient.h xpilot.c xpmread.c xpmread.h
+
 
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
-EXTRA_xpilot_SOURCES = ncdaudio.c rplayaudio.c afaudio.c hpaudio.c debugaudio.c
+#EXTRA_xpilot_SOURCES = ncdaudio.c rplayaudio.c afaudio.c hpaudio.c debugaudio.c
+SUBDIRS = items
 subdir = src/client
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
@@ -107,17 +121,18 @@ PROGRAMS = $(bin_PROGRAMS)
 am_xpilot_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) caudio.$(OBJEXT) \
 	client.$(OBJEXT) clientrank.$(OBJEXT) colors.$(OBJEXT) \
 	configure.$(OBJEXT) datagram.$(OBJEXT) dbuff.$(OBJEXT) \
-	default.$(OBJEXT) gfx2d.$(OBJEXT) gfx3d.$(OBJEXT) \
-	guimap.$(OBJEXT) guiobjects.$(OBJEXT) ignore.$(OBJEXT) \
-	join.$(OBJEXT) mapdata.$(OBJEXT) messages.$(OBJEXT) \
-	netclient.$(OBJEXT) paint.$(OBJEXT) paintdata.$(OBJEXT) \
-	painthud.$(OBJEXT) paintmap.$(OBJEXT) paintobjects.$(OBJEXT) \
-	paintradar.$(OBJEXT) query.$(OBJEXT) record.$(OBJEXT) \
-	shipshape_c.$(OBJEXT) sim.$(OBJEXT) syslimit.$(OBJEXT) \
-	talk.$(OBJEXT) talkmacros.$(OBJEXT) textinterface.$(OBJEXT) \
-	texture.$(OBJEXT) usleep.$(OBJEXT) welcome.$(OBJEXT) \
-	widget.$(OBJEXT) xeventhandlers.$(OBJEXT) xevent.$(OBJEXT) \
-	xinit.$(OBJEXT) xpilot.$(OBJEXT) xpmread.$(OBJEXT)
+	debugaudio.$(OBJEXT) default.$(OBJEXT) gfx2d.$(OBJEXT) \
+	gfx3d.$(OBJEXT) guimap.$(OBJEXT) guiobjects.$(OBJEXT) \
+	ignore.$(OBJEXT) join.$(OBJEXT) mapdata.$(OBJEXT) \
+	messages.$(OBJEXT) netclient.$(OBJEXT) paint.$(OBJEXT) \
+	paintdata.$(OBJEXT) painthud.$(OBJEXT) paintmap.$(OBJEXT) \
+	paintobjects.$(OBJEXT) paintradar.$(OBJEXT) query.$(OBJEXT) \
+	record.$(OBJEXT) shipshape_c.$(OBJEXT) sim.$(OBJEXT) \
+	syslimit.$(OBJEXT) talk.$(OBJEXT) talkmacros.$(OBJEXT) \
+	textinterface.$(OBJEXT) texture.$(OBJEXT) usleep.$(OBJEXT) \
+	welcome.$(OBJEXT) widget.$(OBJEXT) xevent.$(OBJEXT) \
+	xeventhandlers.$(OBJEXT) xinit.$(OBJEXT) xpilot.$(OBJEXT) \
+	xpmread.$(OBJEXT)
 xpilot_OBJECTS = $(am_xpilot_OBJECTS)
 xpilot_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilot_LDFLAGS =
@@ -129,25 +144,23 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/about.Po ./$(DEPDIR)/afaudio.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/bitmaps.Po ./$(DEPDIR)/caudio.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/client.Po ./$(DEPDIR)/clientrank.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/colors.Po ./$(DEPDIR)/configure.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/datagram.Po ./$(DEPDIR)/dbuff.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/debugaudio.Po ./$(DEPDIR)/default.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/gfx2d.Po ./$(DEPDIR)/gfx3d.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/guimap.Po ./$(DEPDIR)/guiobjects.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/hpaudio.Po ./$(DEPDIR)/ignore.Po \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/about.Po ./$(DEPDIR)/bitmaps.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/caudio.Po ./$(DEPDIR)/client.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/clientrank.Po ./$(DEPDIR)/colors.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/configure.Po ./$(DEPDIR)/datagram.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/dbuff.Po ./$(DEPDIR)/debugaudio.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/default.Po ./$(DEPDIR)/gfx2d.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/gfx3d.Po ./$(DEPDIR)/guimap.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/guiobjects.Po ./$(DEPDIR)/ignore.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/join.Po ./$(DEPDIR)/mapdata.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/messages.Po ./$(DEPDIR)/ncdaudio.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/netclient.Po ./$(DEPDIR)/paint.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/paintdata.Po ./$(DEPDIR)/painthud.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/paintmap.Po ./$(DEPDIR)/paintobjects.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/messages.Po ./$(DEPDIR)/netclient.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/paint.Po ./$(DEPDIR)/paintdata.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/painthud.Po ./$(DEPDIR)/paintmap.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/paintobjects.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/paintradar.Po ./$(DEPDIR)/query.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/record.Po ./$(DEPDIR)/rplayaudio.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/shipshape_c.Po ./$(DEPDIR)/sim.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/syslimit.Po ./$(DEPDIR)/talk.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/talkmacros.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/record.Po ./$(DEPDIR)/shipshape_c.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sim.Po ./$(DEPDIR)/syslimit.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/talk.Po ./$(DEPDIR)/talkmacros.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/textinterface.Po ./$(DEPDIR)/texture.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/usleep.Po ./$(DEPDIR)/welcome.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/widget.Po ./$(DEPDIR)/xevent.Po \
@@ -158,11 +171,17 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CFLAGS = @CFLAGS@
-DIST_SOURCES = $(xpilot_SOURCES) $(EXTRA_xpilot_SOURCES)
-DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(xpilot_SOURCES) $(EXTRA_xpilot_SOURCES)
+DIST_SOURCES = $(xpilot_SOURCES)
 
-all: all-am
+RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
+	uninstall-info-recursive all-recursive install-data-recursive \
+	install-exec-recursive installdirs-recursive install-recursive \
+	uninstall-recursive check-recursive installcheck-recursive
+DIST_COMMON = Makefile.am Makefile.in
+DIST_SUBDIRS = $(SUBDIRS)
+SOURCES = $(xpilot_SOURCES)
+
+all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .o .obj
@@ -206,7 +225,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/about.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/afaudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmaps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/caudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
@@ -221,12 +239,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/guimap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/guiobjects.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hpaudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ignore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/join.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mapdata.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/messages.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ncdaudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netclient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paintdata.Po@am__quote@
@@ -236,7 +252,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paintradar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/record.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rplayaudio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shipshape_c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/syslimit.Po@am__quote@
@@ -270,6 +285,61 @@ distclean-depend:
 CCDEPMODE = @CCDEPMODE@
 uninstall-info-am:
 
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+$(RECURSIVE_TARGETS):
+	@set fnord $$MAKEFLAGS; amf=$$2; \
+	dot_seen=no; \
+	target=`echo $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
+
+mostlyclean-recursive clean-recursive distclean-recursive \
+maintainer-clean-recursive:
+	@set fnord $$MAKEFLAGS; amf=$$2; \
+	dot_seen=no; \
+	case "$@" in \
+	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
+	  *) list='$(SUBDIRS)' ;; \
+	esac; \
+	rev=''; for subdir in $$list; do \
+	  if test "$$subdir" = "."; then :; else \
+	    rev="$$subdir $$rev"; \
+	  fi; \
+	done; \
+	rev="$$rev ."; \
+	target=`echo $@ | sed s/-recursive//`; \
+	for subdir in $$rev; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done && test -z "$$fail"
+tags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
+	done
+
 ETAGS = etags
 ETAGSFLAGS =
 
@@ -284,10 +354,15 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	       END { for (i in files) print i; }'`; \
 	mkid -fID $$unique
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
+	  fi; \
+	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -331,22 +406,35 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test -d $(distdir)/$$subdir \
+	    || mkdir $(distdir)/$$subdir \
+	    || exit 1; \
+	    (cd $$subdir && \
+	      $(MAKE) $(AM_MAKEFLAGS) \
+	        top_distdir="$(top_distdir)" \
+	        distdir=../$(distdir)/$$subdir \
+	        distdir) \
+	      || exit 1; \
+	  fi; \
+	done
 check-am: all-am
-check: check-am
+check: check-recursive
 all-am: Makefile $(PROGRAMS)
-
-installdirs:
+installdirs: installdirs-recursive
+installdirs-am:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 
-install: install-am
-install-exec: install-exec-am
-install-data: install-data-am
-uninstall: uninstall-am
+install: install-recursive
+install-exec: install-exec-recursive
+install-data: install-data-recursive
+uninstall: uninstall-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-am
+installcheck: installcheck-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  INSTALL_STRIP_FLAG=-s \
@@ -362,20 +450,20 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-am
+clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
-distclean: distclean-am
+distclean: distclean-recursive
 
 distclean-am: clean-am distclean-compile distclean-depend \
 	distclean-generic distclean-tags
 
-dvi: dvi-am
+dvi: dvi-recursive
 
 dvi-am:
 
-info: info-am
+info: info-recursive
 
 info-am:
 
@@ -383,32 +471,40 @@ install-data-am:
 
 install-exec-am: install-binPROGRAMS
 
-install-info: install-info-am
+install-info: install-info-recursive
 
 install-man:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-am
+maintainer-clean: maintainer-clean-recursive
 
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-am
+mostlyclean: mostlyclean-recursive
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
 uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 
-.PHONY: GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic distclean distclean-compile distclean-depend \
-	distclean-generic distclean-tags distdir dvi dvi-am info \
-	info-am install install-am install-binPROGRAMS install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-info-am
+uninstall-info: uninstall-info-recursive
+
+.PHONY: $(RECURSIVE_TARGETS) GTAGS all all-am check check-am clean \
+	clean-binPROGRAMS clean-generic clean-recursive distclean \
+	distclean-compile distclean-depend distclean-generic \
+	distclean-recursive distclean-tags distdir dvi dvi-am \
+	dvi-recursive info info-am info-recursive install install-am \
+	install-binPROGRAMS install-data install-data-am \
+	install-data-recursive install-exec install-exec-am \
+	install-exec-recursive install-info install-info-am \
+	install-info-recursive install-man install-recursive \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am installdirs-recursive maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-recursive \
+	tags tags-recursive uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-info-recursive uninstall-recursive
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,5 +1,4 @@
 
-#libdir = $(prefix)/lib/xpilot/maps
 xpilotmapdir = $(pkglibdir)/maps
 xpilotmap_DATA = \
 	CAMD.xp \

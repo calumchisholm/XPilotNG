@@ -2,16 +2,30 @@
 bin_PROGRAMS = xpilot
 INCLUDES = -I$(top_srcdir)/src/common
 xpilot_SOURCES = \
-        about.c bitmaps.c \
-        caudio.c client.c clientrank.c colors.c configure.c \
-        datagram.c dbuff.c default.c \
-        gfx2d.c gfx3d.c guimap.c guiobjects.c \
-        ignore.c join.c mapdata.c messages.c netclient.c \
-        paint.c paintdata.c painthud.c paintmap.c \
-        paintobjects.c paintradar.c query.c record.c shipshape_c.c sim.c \
-        syslimit.c talk.c talkmacros.c textinterface.c texture.c \
-        usleep.c welcome.c widget.c xeventhandlers.c \
-        xevent.c xinit.c xpilot.c xpmread.c
+	about.c \
+	bitmaps.c bitmaps.h \
+	caudio.c caudio.h client.c client.h clientrank.c clientrank.h \
+	colors.c configure.c configure.h connectparam.h \
+	datagram.c datagram.h dbuff.c dbuff.h \
+	debugaudio.c default.c default.h \
+	gfx2d.c gfx2d.h gfx3d.c gfx3d.h \
+	guimap.c guimap.h guiobjects.c guiobjects.h \
+	icon.h ignore.c ignore.h \
+	join.c \
+	mapdata.c messages.c \
+	netclient.c netclient.h \
+	paint.c paint.h paintdata.c paintdata.h painthud.c \
+	paintmacros.h paintmap.c paintobjects.c paintradar.c protoclient.h \
+	query.c \
+	record.c record.h recordfmt.h \
+	shipshape_c.c sim.c simbloods.h syslimit.c \
+	talk.c talk.h talkmacros.c textinterface.c texture.c texture.h \
+	usleep.c \
+	welcome.c widget.c widget.h \
+	xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
+	xinit.c xinit.h xpclient.h xpilot.c xpmread.c xpmread.h
+
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
-EXTRA_xpilot_SOURCES = ncdaudio.c rplayaudio.c afaudio.c hpaudio.c debugaudio.c
+#EXTRA_xpilot_SOURCES = ncdaudio.c rplayaudio.c afaudio.c hpaudio.c debugaudio.c
+SUBDIRS = items

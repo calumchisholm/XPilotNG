@@ -7220,7 +7220,7 @@ fi
 done
 
 
-                                                                                          ac_config_files="$ac_config_files Makefile lib/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/client/Makefile src/server/Makefile src/replay/Makefile"
+                                                                                                              ac_config_files="$ac_config_files Makefile lib/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/client/Makefile src/client/items/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7770,8 +7770,10 @@ do
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/common/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/common/Makefile" ;;
   "src/client/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/client/Makefile" ;;
+  "src/client/items/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/client/items/Makefile" ;;
   "src/server/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/server/Makefile" ;;
   "src/replay/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/replay/Makefile" ;;
+  "src/replay/tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/replay/tools/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
