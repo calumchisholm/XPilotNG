@@ -125,17 +125,18 @@ static int Get_contact_message(sockbuf_t *sbuf,
 		   server_version <= MAX_SERVER_VERSION) ||
 		  (server_version >= MIN_OLD_SERVER_VERSION &&
 		   server_version <= MAX_OLD_SERVER_VERSION))) {
-		printf("Incompatible version with server %s.\n",
-		       conpar->server_name);
-		printf("We run version %04x, while server is running %04x.\n",
-		       MY_VERSION, server_version);
+		warn("Incompatible version with server %s.",
+		     conpar->server_name);
+		warn("We run version %04x, while server is running %04x.",
+		     MY_VERSION, server_version);
 		if ((MY_VERSION >> 4) < (server_version >> 4))
-		    printf("Time for us to upgrade?\n");
+		    warn("Time for us to upgrade?");
 		readable = 2;
 	    } else {
 		/*
 		 * Found one which we can talk to.
 		 */
+		warn("Using protocol version %04x.", server_version);
 		conpar->server_version = server_version;
 		readable = 1;
 	    }

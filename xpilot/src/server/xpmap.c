@@ -1129,7 +1129,8 @@ static void Xpmap_treasure_to_polygon(world_t *world, int treasure_ind)
 #undef N
 
 
-static void Xpmap_block_polygon(clpos_t bpos, int polystyle, int edgestyle)
+static void Xpmap_block_polygon(clpos_t bpos, int polystyle, int edgestyle,
+				int destroyed_style)
 {
     clpos_t pos[5];
     int i;
@@ -1148,6 +1149,8 @@ static void Xpmap_block_polygon(clpos_t bpos, int polystyle, int edgestyle)
     pos[4] = pos[0];
 
     P_start_polygon(pos[0], polystyle);
+    if (destroyed_style >= 0)
+	P_style("destroyed", destroyed_style);
     for (i = 1; i <= 4; i++)
 	P_vertex(pos[i], edgestyle);
     P_end_polygon();
@@ -1156,15 +1159,16 @@ static void Xpmap_block_polygon(clpos_t bpos, int polystyle, int edgestyle)
 
 static void Xpmap_target_to_polygon(world_t *world, int target_ind)
 {
-    int ps, es;
+    int ps, es, ds;
     target_t *targ = Target_by_index(world, target_ind);
 
     ps = P_get_poly_id("target_ps");
     es = P_get_edge_id("target_es");
+    ds = P_get_poly_id("destroyed_ps");
 
     /* create target polygon */
     P_start_target(target_ind);
-    Xpmap_block_polygon(targ->pos, ps, es);
+    Xpmap_block_polygon(targ->pos, ps, es, ds);
     P_end_target();
 }
 
@@ -1173,7 +1177,7 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
 				 int polystyle, int edgestyle)
 {
     clpos_t pos[4], cpos = cannon->pos;
-    int i;
+    int i, ds;
 
     pos[0] = cannon->pos;
 
@@ -1212,7 +1216,9 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
     }
     pos[3] = pos[0];
 
+    ds = P_get_poly_id("destroyed_ps");
     P_start_polygon(pos[0], polystyle);
+    P_style("destroyed", ds);
     for (i = 1; i <= 3; i++)
 	P_vertex(pos[i], edgestyle);
     P_end_polygon();
@@ -1274,7 +1280,7 @@ static void Xpmap_friction_area_to_polygon(world_t *world, int fa_ind)
     es = P_get_edge_id("fa_es");
 
     P_start_friction_area(fa_ind);
-    Xpmap_block_polygon(fa->pos, ps, es);
+    Xpmap_block_polygon(fa->pos, ps, es, -1);
     P_end_friction_area();
 }
 
@@ -1489,6 +1495,10 @@ void Xpmap_blocks_to_polygons(world_t *world)
 
     P_edgestyle("cannon_es", 3, 0xFFFFFF, 0);
     P_polystyle("cannon_ps", 0xFFFFFF, 2, P_get_edge_id("cannon_es"), 0);
+
+    P_edgestyle("destroyed_es", 3, 0xFF0000, 0);
+    P_polystyle("destroyed_ps", 0xFF0000, 2, P_get_edge_id("destroyed_es"),
+		STYLE_INVISIBLE|STYLE_INVISIBLE_RADAR);
 
     P_edgestyle("wormhole_es", -1, 0x00FFFF, 0);
     P_polystyle("wormhole_ps", 0x00FFFF, 2, P_get_edge_id("wormhole_es"), 0);

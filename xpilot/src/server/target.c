@@ -286,6 +286,7 @@ void Target_init(world_t *world)
 void World_restore_target(world_t *world, target_t *targ)
 {
     blkpos_t blk = Clpos_to_blkpos(targ->pos);
+    int i;
 
 #if 0
     object_t *obj, **obj_list;
@@ -302,6 +303,16 @@ void World_restore_target(world_t *world, target_t *targ)
 
     World_set_block(world, blk, TARGET);
 
+    for (i = 0; i < num_polys; i++) {
+	poly_t *poly = &pdata[i];
+
+	if (poly->group == targ->group) {
+	    poly->current_style = poly->style;
+	    poly->update_mask = (unsigned)-1;
+	    poly->last_change = frame_loops;
+	}
+    }
+
     targ->conn_mask = 0;
     targ->update_mask = (unsigned)-1;
     targ->last_change = frame_loops;
@@ -314,6 +325,7 @@ void World_restore_target(world_t *world, target_t *targ)
 void World_remove_target(world_t *world, target_t *targ)
 {
     blkpos_t blk = Clpos_to_blkpos(targ->pos);
+    int i;
 
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
@@ -326,6 +338,17 @@ void World_remove_target(world_t *world, target_t *targ)
      */
     World_set_block(world, blk, SPACE);
 
+    for (i = 0; i < num_polys; i++) {
+	poly_t *poly = &pdata[i];
+
+	if (poly->group == targ->group) {
+	    poly->current_style = poly->destroyed_style;
+	    poly->update_mask = (unsigned)-1;
+	    poly->last_change = frame_loops;
+	}
+    }
+
     /*P_set_hitmask(targ->group, ALL_BITS);*/
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
+

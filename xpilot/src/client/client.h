@@ -758,6 +758,7 @@ int Handle_debris(int type, u_byte *p, int n);
 int Handle_wreckage(int x, int y, int wrecktype, int size, int rotation);
 int Handle_asteroid(int x, int y, int type, int size, int rotation);
 int Handle_wormhole(int x, int y);
+int Handle_polystyle(int polyind, int newstyle);
 int Handle_ecm(int x, int y, int size);
 int Handle_trans(int x_1, int y_1, int x_2, int y_2);
 int Handle_paused(int x, int y, int count);

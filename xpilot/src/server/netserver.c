@@ -110,6 +110,7 @@ static int Receive_ack(connection_t *connp);
 static int Receive_ack_cannon(connection_t *connp);
 static int Receive_ack_fuel(connection_t *connp);
 static int Receive_ack_target(connection_t *connp);
+static int Receive_ack_polystyle(connection_t *connp);
 static int Receive_discard(connection_t *connp);
 static int Receive_undefined(connection_t *connp);
 static int Receive_talk(connection_t *connp);
@@ -180,6 +181,8 @@ static void Feature_init(connection_t *connp)
 	    SET_BIT(features, F_CUMULATIVETURN);
 	if (v >= 0x4F14)
 	    SET_BIT(features, F_BALLSTYLE);
+	if (v >= 0x4F15)
+	    SET_BIT(features, F_POLYSTYLE);
     }
     connp->features = features;
     return;
@@ -282,6 +285,7 @@ static void Init_receive(void)
     playing_receive[PKT_ACK_CANNON]		= Receive_ack_cannon;
     playing_receive[PKT_ACK_FUEL]		= Receive_ack_fuel;
     playing_receive[PKT_ACK_TARGET]		= Receive_ack_target;
+    playing_receive[PKT_ACK_POLYSTYLE]		= Receive_ack_polystyle;
     playing_receive[PKT_TALK]			= Receive_talk;
     playing_receive[PKT_DISPLAY]		= Receive_display;
     playing_receive[PKT_MODIFIERBANK]		= Receive_modifier_bank;
@@ -1240,6 +1244,18 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    SET_BIT(targ->update_mask, conn_bit);
 	}
     }
+    for (i = 0; i < num_polys; i++) {
+	poly_t *poly = &pdata[i];
+
+	/*
+	 * The client assumes at startup that all polygons have their original
+	 * style.
+	 */
+	if (poly->style == poly->current_style)
+	    CLR_BIT(poly->update_mask, conn_bit);
+	else
+	    SET_BIT(poly->update_mask, conn_bit);
+    }
 
     sound_player_init(pl);
 
@@ -1908,6 +1924,14 @@ int Send_target(connection_t *connp, int num, int dead_ticks, double damage)
 	return 0;
     return Packet_printf(&connp->w, "%c%hu%hu%hu", PKT_TARGET,
 			 num, dead_ticks, (int)(damage * 256.0));
+}
+
+int Send_polystyle(connection_t *connp, int polyind, int newstyle)
+{
+    if (!FEATURE(connp, F_POLYSTYLE))
+	return 0;
+    return Packet_printf(&connp->w, "%c%hu%hu", PKT_POLYSTYLE,
+			 polyind, newstyle);
 }
 
 int Send_wormhole(connection_t *connp, clpos_t pos)
@@ -2589,6 +2613,30 @@ static int Receive_ack_target(connection_t *connp)
 	SET_BIT(world->targets[num].conn_mask, 1 << connp->ind);
 	CLR_BIT(world->targets[num].update_mask, 1 << connp->ind);
     }
+    return 1;
+}
+
+static int Receive_ack_polystyle(connection_t *connp)
+{
+    long loops_ack;
+    unsigned char ch;
+    int n;
+    unsigned short num;
+    poly_t *poly;
+
+    if ((n = Packet_scanf(&connp->r, "%c%ld%hu",
+			  &ch, &loops_ack, &num)) <= 0) {
+	if (n == -1)
+	    Destroy_connection(connp, "read error");
+	return n;
+    }
+    if (num >= num_polys) {
+	Destroy_connection(connp, "bad polystyle ack");
+	return -1;
+    }
+    poly = &pdata[num];
+    if (loops_ack > poly->last_change)
+	CLR_BIT(poly->update_mask, 1 << connp->ind);
     return 1;
 }
 

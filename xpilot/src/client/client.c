@@ -883,6 +883,7 @@ static void parse_styles(char **callptr)
     for (i = 0; i < num_edge_styles; i++) {
 	edge_styles[i].width = *ptr++;
 	edge_styles[i].rgb = get_32bit(&ptr);
+	/* kps - what the **** is this ? */
 	edge_styles[i].style =
 	    (*ptr == 1) ? 1 :
 	    (*ptr == 2) ? 2 : 0;
@@ -1962,6 +1963,17 @@ int Handle_wormhole(int x, int y)
     t.x = x - BLOCK_SZ / 2;
     t.y = y - BLOCK_SZ / 2;
     STORE(wormhole_t, wormhole_ptr, num_wormholes, max_wormholes, t);
+    return 0;
+}
+
+int Handle_polystyle(int polyind, int newstyle)
+{
+    xp_polygon_t *poly;
+
+    poly = &polygons[polyind];
+    poly->style = newstyle;
+    /*warn("polygon %d style set to %d", polyind, newstyle);*/
+
     return 0;
 }
 

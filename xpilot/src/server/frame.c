@@ -465,12 +465,14 @@ static int Frame_status(connection_t *conn, player_t *pl)
     return 1;
 }
 
+
 static void Frame_map(connection_t *conn, player_t *pl)
 {
     int i, k, conn_bit = (1 << conn->ind);
     const int fuel_packet_size = 5;
     const int cannon_packet_size = 5;
     const int target_packet_size = 7;
+    const int polystyle_packet_size = 5;
     int bytes_left = 2000, max_packet, packet_count;
     world_t *world = pl->world;
 
@@ -535,6 +537,25 @@ static void Frame_map(connection_t *conn, player_t *pl)
 		if (++packet_count >= max_packet)
 		    break;
 	    }
+	}
+    }
+
+    packet_count = 0;
+    max_packet = MAX(5, bytes_left / polystyle_packet_size);
+    i = MAX(0, pl->last_polystyle_update);
+    for (k = 0; k < num_polys; k++) {
+	poly_t *poly;
+
+	if (++i >= num_polys)
+	    i = 0;
+
+	poly = &pdata[i];
+	if (BIT(poly->update_mask, conn_bit)) {
+	    Send_polystyle(conn, i, poly->current_style);
+	    pl->last_polystyle_update = i;
+	    bytes_left -= max_packet * polystyle_packet_size;
+	    if (++packet_count >= max_packet)
+		break;
 	}
     }
 }

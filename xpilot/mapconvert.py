@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, generators
 
-KEEP_MAPDATA = 1
+KEEP_MAPDATA = 0
 WALL_SHRINK_HACK = 0
 
 # Requires python 2.2 or newer
@@ -684,7 +684,7 @@ def convert(options):
 		l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
 
     print >> sys.stderr, "Writing converted map...",
-    print '<XPilotMap version="1.1">'
+    print '<XPilotMap version="1.2">'
 
     if not KEEP_MAPDATA:
         del options['mapdata']
@@ -704,10 +704,12 @@ def convert(options):
     print '<Edgestyle id="xpredhidden" width="-1" color="FF3A27" style="0"/>'
     print '<Edgestyle id="yellow" width="2" color="FFFF00" style="0"/>'
     print '<Edgestyle id="white" width="2" color="FFFFFF" style="0"/>'
+    print '<Edgestyle id="invisiedge" width="-1" color="0" style="0"/>'
     print '<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluehidden" flags="1"/>'
     print '<Polystyle id="xpred" color="FF3A27" defedge="xpredhidden" flags="1"/>'
     print '<Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>'
     print '<Polystyle id="emptywhite" color="FF" defedge="white" flags="0"/>'
+    print '<Polystyle id="invisible" color="0" defedge="invisiedge" flags="12"/>'
 
     def printedge(dx, dy, prevh, curh):
         if curh and not prevh:
@@ -789,8 +791,13 @@ def convert(options):
         text = '<Target x="%d" y="%d"' % (target.x, target.y)
         if target.team != -1:
             text += ' team="%d"' % target.team
-        text += '><Polygon> STUFF MISSING HERE </Polygon></Target>'
+        text += '>'
         print text
+	print '<Polygon x="%d" y="%d" style="xpred">' % (target.x - 1120, target.y - 1120)
+	print '<Style state="destroyed" id="invisible"/>'
+	print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
+	print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
+	print '</Polygon></Target>'
     for check in checks:
 	if not check:
 	    break
@@ -808,6 +815,7 @@ def convert(options):
 	    print (' team="%d"' % cannon.team),
 	print '>\n<Polygon x="%d" y="%d" style="emptywhite">' % \
               (cannon.x, cannon.y)
+	print '<Style state="destroyed" id="invisible"/>'
         for x, y in offsets[1:]:
             print '<Offset x="%d" y="%d"/>' % (x, y)
         print '</Polygon></Cannon>'

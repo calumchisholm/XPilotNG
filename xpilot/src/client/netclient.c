@@ -133,6 +133,7 @@ static void Receive_init(void)
     receive_tbl[PKT_WRECKAGE]	= Receive_wreckage;
     receive_tbl[PKT_ASTEROID]	= Receive_asteroid;
     receive_tbl[PKT_WORMHOLE]	= Receive_wormhole;
+    receive_tbl[PKT_POLYSTYLE]	= Receive_polystyle;
     for (i = 0; i < DEBRIS_TYPES; i++)
 	receive_tbl[PKT_DEBRIS + i] = Receive_debris;
 
@@ -2156,6 +2157,21 @@ int Receive_target(void)
 	return -1;
     if (wbuf.len < MAX_MAP_ACK_LEN)
 	Packet_printf(&wbuf, "%c%ld%hu", PKT_ACK_TARGET, last_loops, num);
+    return 1;
+}
+
+int Receive_polystyle(void)	/* since ng 4.7.0 */
+{
+    int			n;
+    unsigned short	num, newstyle;
+    u_byte		ch;
+
+    if ((n = Packet_scanf(&rbuf, "%c%hu%hu", &ch, &num, &newstyle)) <= 0)
+	return n;
+    if ((n = Handle_polystyle(num, newstyle)) == -1)
+	return -1;
+    if (wbuf.len < MAX_MAP_ACK_LEN)
+	Packet_printf(&wbuf, "%c%ld%hu", PKT_ACK_POLYSTYLE, last_loops, num);
     return 1;
 }
 

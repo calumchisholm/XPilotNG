@@ -85,6 +85,7 @@ int Receive_debris(void);
 int Receive_wreckage(void);
 int Receive_asteroid(void);
 int Receive_wormhole(void);
+int Receive_polystyle(void);
 int Receive_fastshot(void);
 int Receive_ecm(void);
 int Receive_trans(void);

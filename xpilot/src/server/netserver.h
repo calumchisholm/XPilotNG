@@ -72,6 +72,7 @@ int Send_ball(connection_t *connp, clpos_t pos, int id, int style);
 int Send_mine(connection_t *connp, clpos_t pos, int teammine, int id);
 int Send_target(connection_t *connp, int num, int dead_ticks, double damage);
 int Send_wormhole(connection_t *connp, clpos_t pos);
+int Send_polystyle(connection_t *connp, int polyind, int newstyle);
 int Send_audio(connection_t *connp, int type, int vol);
 int Send_item(connection_t *connp, clpos_t pos, int type);
 int Send_paused(connection_t *connp, clpos_t pos, int count);
@@ -112,5 +113,6 @@ int Check_max_clients_per_IP(char *host_addr);
 #define F_SENDTEAM		F_SHOW_APPEARING
 #define F_CUMULATIVETURN	(1 << 9)
 #define F_BALLSTYLE		(1 << 10)
+#define F_POLYSTYLE		(1 << 11)
 
 #endif

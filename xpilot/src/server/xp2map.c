@@ -54,7 +54,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	else if (version < 1)
 	    warn("Impossible version in map file");
-	else if (version > 1.1) {
+	else if (version > 1.2) {
 	    warn("Map file has newer version than this server recognizes.");
 	    warn("The map file might use unsupported features.");
 	}
@@ -176,6 +176,21 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	P_start_polygon(pos, style);
+	return;
+    }
+
+    if (!strcasecmp(el, "Style")) {
+	char state[100];
+	int style = -1;
+
+	while (*attr) {
+	    if (!strcasecmp(*attr, "state"))
+		strlcpy(state, *(attr + 1), sizeof(state));
+	    if (!strcasecmp(*attr, "id"))
+		style = P_get_poly_id(*(attr + 1));
+	    attr += 2;
+	}
+	P_style(state, style);
 	return;
     }
 

@@ -129,6 +129,8 @@ struct bmpstyle {
 
 typedef struct {
     int style;
+    int current_style;
+    int destroyed_style;
     int group;
     int edges;
     clpos_t pos;
@@ -136,6 +138,8 @@ typedef struct {
     int estyles_start;
     int num_echanges;
     int is_decor;
+    unsigned update_mask;
+    long last_change;
 } poly_t;
 
 typedef uint32_t hitmask_t;
@@ -173,6 +177,6 @@ static inline group_t *groupptr_by_id(int group)
     return NULL;
 }
 
-extern int num_pstyles, num_estyles, num_bstyles;
+extern int num_polys, num_pstyles, num_estyles, num_bstyles;
 
 #endif

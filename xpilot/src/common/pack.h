@@ -109,11 +109,12 @@
  * 4.F.1.2: Show ships about to appear on bases, new team change packet.
  * 4.F.1.3: cumulative turning
  * 4.F.1.4: balls use polygon styles
+ * 4.F.1.5: Possibility to change polygon styles.
  */
 #ifdef SERVER
-#define	MAGIC	(is_polygon_map ? 0x4F14F4ED : 0x4501F4ED)
+#define	MAGIC	(is_polygon_map ? 0x4F15F4ED : 0x4501F4ED)
 #else
-#define	MAGIC	(instruments.blockProtocol ? 0x4501F4ED : 0x4F14F4ED)
+#define	MAGIC	(instruments.blockProtocol ? 0x4501F4ED : 0x4F15F4ED)
 #endif
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)

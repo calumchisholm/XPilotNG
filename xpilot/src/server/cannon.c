@@ -810,8 +810,19 @@ void Cannon_set_hitmask(int group, cannon_t *cannon)
 void World_restore_cannon(world_t *world, cannon_t *cannon)
 {
     blkpos_t blk = Clpos_to_blkpos(cannon->pos);
+    int i;
 
     World_set_block(world, blk, CANNON);
+
+    for (i = 0; i < num_polys; i++) {
+	poly_t *poly = &pdata[i];
+
+	if (poly->group == cannon->group) {
+	    poly->current_style = poly->style;
+	    poly->update_mask = (unsigned)-1;
+	    poly->last_change = frame_loops;
+	}
+    }
 
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
@@ -823,11 +834,22 @@ void World_restore_cannon(world_t *world, cannon_t *cannon)
 void World_remove_cannon(world_t *world, cannon_t *cannon)
 {
     blkpos_t blk = Clpos_to_blkpos(cannon->pos);
+    int i;
 
     cannon->dead_ticks = options.cannonDeadTicks;
     cannon->conn_mask = 0;
 
     World_set_block(world, blk, SPACE);
+
+    for (i = 0; i < num_polys; i++) {
+	poly_t *poly = &pdata[i];
+
+	if (poly->group == cannon->group) {
+	    poly->current_style = poly->destroyed_style;
+	    poly->update_mask = (unsigned)-1;
+	    poly->last_change = frame_loops;
+	}
+    }
 
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
