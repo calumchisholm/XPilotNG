@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,9 +29,15 @@
 /* need player */
 #include "object.h"
 #endif
+
 #ifndef MAP_H
 /* need World_map */
 #include "map.h"
+#endif
+
+#ifndef LIST_H_INCLUDED
+/* need list_t */
+#include "list.h"
 #endif
 
 #ifndef MAX
@@ -41,15 +48,24 @@
 #define	STR80	(80)
 
 typedef struct {
-    char name[STR80];
-    char host[STR80];
+    char	owner[STR80]; /* ng wants this to be name */
+    char	host[STR80];
 } server;
+
+/* determine if a block is one of SPACE_BLOCKS */
+#define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
 
 /*
  * Global data.
  */
+
+extern DFLOAT		tbl_sin[];
+extern DFLOAT		tbl_cos[];
+
 #ifdef SERVER
-#define FPS			framesPerSecond
+#define FPS		framesPerSecond
+#define NumObjs		(ObjCount + 0)
+
 extern player		**Players;
 extern object		*Obj[];
 extern pulse_t		*Pulses[];
@@ -57,33 +73,41 @@ extern ecm_t		*Ecms[];
 extern trans_t		*Transporters[];
 extern long		frame_loops;
 extern unsigned long	frame_time;
-extern int              observerStart;
+extern int		observerStart;
 extern int		NumPlayers;
-extern int              NumObservers;
-extern int              NumOperators;
+extern int		NumObservers;
+extern int		NumOperators;
 extern int		NumPseudoPlayers;
 extern int		NumQueuedPlayers;
-extern int		NumObjs;
+extern int		ObjCount;
 extern int		NumPulses;
 extern int		NumEcms;
 extern int		NumTransporters;
+extern int		NumAlliances;
+extern int		NumRobots, maxRobots, minRobots;
 extern int		login_in_progress;
 
+extern char		*robotFile;
+extern int		robotsTalk, robotsLeave, robotLeaveLife;
+extern int		robotLeaveScore, robotLeaveRatio;
+extern int		robotTeam;
+extern bool		restrictRobots, reserveRobotTeam;
 extern World_map	World;
 extern server		Server;
+extern list_t		expandList;
 extern DFLOAT		ShotsMass, ShipMass, ShotsSpeed, Gravity;
+extern DFLOAT		ballMass;
 extern int		ShotsMax, ShotsLife;
 extern bool		ShotsGravity;
+extern bool		shotHitFuelDrainUsesKineticEnergy;
 extern int		fireRepeatRate;
+extern int		laserRepeatRate;
 extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
 extern int		GetInd[];
-#endif
-extern DFLOAT		tbl_sin[];
-extern DFLOAT		tbl_cos[];
-#ifdef SERVER
 extern int		ShutdownServer, ShutdownDelay;
 extern bool		RawMode;
 extern bool		NoQuit;
+extern bool		logRobots;
 extern int		framesPerSecond;
 extern long		main_loops;
 extern char		*mapFileName;
@@ -103,17 +127,23 @@ extern bool		playerShielding;
 extern bool		playerStartsShielded;
 extern bool		shotsWallBounce;
 extern bool		ballsWallBounce;
+extern bool		ballCollisions;
+extern bool		ballSparkCollisions;
 extern bool		minesWallBounce;
 extern bool		itemsWallBounce;
 extern bool		missilesWallBounce;
 extern bool		sparksWallBounce;
 extern bool		debrisWallBounce;
+extern bool		asteroidsWallBounce;
 extern bool		cloakedExhaust;
 extern bool		cloakedShield;
 extern bool		ecmsReprogramMines;
+extern bool		ecmsReprogramRobots;
 extern DFLOAT		maxObjectWallBounceSpeed;
 extern DFLOAT		maxShieldedWallBounceSpeed;
 extern DFLOAT		maxUnshieldedWallBounceSpeed;
+extern DFLOAT		maxShieldedWallBounceAngle;
+extern DFLOAT		maxUnshieldedWallBounceAngle;
 extern DFLOAT		playerWallBrakeFactor;
 extern DFLOAT		objectWallBrakeFactor;
 extern DFLOAT		objectWallBounceLifeFactor;
@@ -127,15 +157,26 @@ extern bool		limitedLives;
 extern int		worldLives;
 extern bool		endOfRoundReset;
 extern int		resetOnHuman;
+extern bool		allowAlliances;
+extern bool		announceAlliances;
 extern bool		teamPlay;
 extern bool		teamFuel;
 extern bool		teamCannons;
 extern int		cannonSmartness;
 extern bool		cannonsUseItems;
+extern bool		cannonsDefend;
+extern bool		cannonFlak;
+extern int		cannonDeadTime;
 extern bool		keepShots;
+extern bool		teamAssign;
 extern bool		teamImmunity;
+extern bool		teamShareScore;
 extern bool		timing;
+extern bool		ballrace;
+extern bool		ballrace_connect;
 extern bool		edgeWrap;
+extern bool		edgeBounce;
+extern bool		extraBorder;
 extern ipos		gravityPoint;
 extern DFLOAT		gravityAngle;
 extern bool		gravityPointSource;
@@ -144,14 +185,17 @@ extern bool		gravityAnticlockwise;
 extern bool		gravityVisible;
 extern bool		wormholeVisible;
 extern bool		itemConcentratorVisible;
+extern bool		asteroidConcentratorVisible;
 extern int		wormTime;
 extern int		nukeMinSmarts;
 extern int		nukeMinMines;
 extern DFLOAT		nukeClusterDamage;
 extern int		mineFuseTime;
 extern int		mineLife;
+extern DFLOAT		minMineSpeed;
 extern int		missileLife;
 extern int		baseMineRange;
+extern int		mineShotDetonateDistance;
 
 extern DFLOAT		shotKillScoreMult;
 extern DFLOAT		torpedoKillScoreMult;
@@ -166,6 +210,13 @@ extern DFLOAT		explosionKillScoreMult;
 extern DFLOAT		shoveKillScoreMult;
 extern DFLOAT		crashScoreMult;
 extern DFLOAT		mineScoreMult;
+extern DFLOAT		selfKillScoreMult;
+extern DFLOAT		selfDestructScoreMult;
+extern DFLOAT		unownedKillScoreMult;
+extern DFLOAT		asteroidPoints;
+extern DFLOAT		cannonPoints;
+extern DFLOAT		asteroidMaxScore;
+extern DFLOAT		cannonMaxScore;
 
 extern DFLOAT		destroyItemInCollisionProb;
 extern bool		updateScores;
@@ -184,8 +235,9 @@ extern bool		shieldedMining;
 extern bool		laserIsStunGun;
 extern bool		targetKillTeam;
 extern bool		targetSync;
+extern int		targetDeadTime;
 extern bool		reportToMetaServer;
-extern bool             searchDomainForXPilot;
+extern bool		searchDomainForXPilot;
 extern char		*denyHosts;
 
 extern bool		playersOnRadar;
@@ -193,64 +245,129 @@ extern bool		missilesOnRadar;
 extern bool		minesOnRadar;
 extern bool		nukesOnRadar;
 extern bool		treasuresOnRadar;
+extern bool		asteroidsOnRadar;
 extern bool 		identifyMines;
 extern bool		distinguishMissiles;
 extern int		maxMissilesPerPack;
 extern int		maxMinesPerPack;
 extern bool		targetTeamCollision;
 extern bool		treasureKillTeam;
+extern bool		captureTheFlag;
 extern bool		treasureCollisionDestroys;
 extern bool		treasureCollisionMayKill;
 extern bool		wreckageCollisionMayKill;
+extern bool		asteroidCollisionMayKill;
+
+extern DFLOAT		ballConnectorSpringConstant;
+extern DFLOAT		ballConnectorDamping;
+extern DFLOAT		maxBallConnectorRatio;
+extern DFLOAT		ballConnectorLength;
+extern bool		connectorIsString;
+extern bool		treatBallAsPoint;
 
 extern DFLOAT 		dropItemOnKillProb;
 extern DFLOAT		detonateItemOnKillProb;
 extern DFLOAT 		movingItemProb;
+extern DFLOAT		randomItemProb;
 extern DFLOAT            rogueHeatProb;
 extern DFLOAT            rogueMineProb;
 extern DFLOAT		itemProbMult;
 extern DFLOAT		cannonItemProbMult;
+extern DFLOAT		asteroidItemProb;
+extern int		asteroidMaxItems;
 extern DFLOAT		maxItemDensity;
+extern DFLOAT		maxAsteroidDensity;
 extern int		itemConcentratorRadius;
 extern DFLOAT		itemConcentratorProb;
+extern int		asteroidConcentratorRadius;
+extern DFLOAT		asteroidConcentratorProb;
 extern DFLOAT		gameDuration;
-extern bool		allowViewing;
+extern bool		fullFramerate;
+extern bool		fullZeroFramerate;
+extern bool		teamZeroPausing;
+extern int		game_lock;
+extern int		lock_zero;
+extern int		mute_zero;
+extern char		team_0[];
+
+extern char		*motdFileName;
+extern char	       	*scoreTableFileName;
+extern char		*adminMessageFileName;
+extern int		adminMessageFileSizeLimit;
 extern time_t		gameOverTime;
 
 extern DFLOAT		friction;
+extern DFLOAT		blockFriction;
+extern bool		blockFrictionVisible;
+extern int		coriolis;
 extern DFLOAT		checkpointRadius;
 extern int		raceLaps;
 extern bool		lockOtherTeam;
 extern bool 		loseItemDestroys;
+extern int		maxOffensiveItems;
+extern int		maxDefensiveItems;
 
+extern int		maxVisibleObject;
 extern bool		pLockServer;
+extern int		timerResolution;
 
-extern int		roundDelay;
-extern int		rdelay;
-extern int		rdelaySend;
+extern int		roundDelaySeconds;
+extern int		round_delay;
+extern int		round_delay_send;
 extern int		maxRoundTime;
 extern int		roundtime;
+extern int		roundsToPlay;
+/*extern int		roundsPlayed;*/
 
 extern bool		useWreckage;
-extern int              timerResolution;
-extern char             *password;
-extern int              numberOfRounds;
-extern int              playerLimit;
-extern int              recordMode;
+extern bool		ignore20MaxFPS;
+extern char		*password;
+
+extern char		*robotRealName;
+extern char		*robotHostName;
+
+extern char		*tankRealName;
+extern char		*tankHostName;
+extern int		tankScoreDecrement;
+
+extern bool		turnThrust;
+extern bool		selfImmunity;
+
+extern char		*defaultShipShape;
+extern char		*tankShipShape;
+
+extern int		clientPortStart;
+extern int		clientPortEnd;
+
+extern int		maxPauseTime;
+
+extern long		KILLING_SHOTS;
+extern unsigned		SPACE_BLOCKS;
+
+extern int		timerResolution;
+extern char		*password;
+extern int		numberOfRounds;
+extern int		playerLimit;
+extern int		recordMode;
 extern int		recordFlushInterval;
-extern int              constantScoring;
-extern int              eliminationRace;
-extern char             *dataURL;
-extern int	       	clientPortStart;
+extern int		constantScoring;
+extern int		eliminationRace;
+extern char		*dataURL;
+extern int		clientPortStart;
 extern int		clientPortEnd;
 extern char		*recordFileName;
-extern int		FPSMultiplier;
-extern int		framespeed;
-extern DFLOAT		framespeed2;
+extern DFLOAT		FPSMultiplier;
+extern DFLOAT		gameSpeed;
+extern int		timeStep;
+extern DFLOAT		timeStep2;
 extern char		*playerPasswordsFileName;
 extern int		playerPasswordsFileSizeLimit;
 
+/* kps hack */
+extern bool		useOldCode;
+extern bool		polygonMode;
 
-#endif
+#endif /* SERVER */
 
 #endif /* GLOBAL_H */
+

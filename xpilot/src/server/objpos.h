@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,13 +26,16 @@
 #define OBJPOS_H
 
 void Object_position_set_clicks(object *obj, int cx, int cy);
-void Player_position_set_clicks(player *pl, int cx, int cy);
-void Player_position_init_clicks(player *pl, int x, int y);
 void Object_position_init_clicks(object *obj, int cx, int cy);
+void Player_position_restore(player *pl);
+void Player_position_set_clicks(player *pl, int cx, int cy);
+void Player_position_init_clicks(player *pl, int cx, int cy);
+void Player_position_limit(player *pl);
+void Player_position_debug(player *pl, const char *msg);
 
 #define Object_position_remember(o_) \
-	((o_)->prevpos.x = (o_)->pos.cx, \
-	 (o_)->prevpos.y = (o_)->pos.cy)
+	((o_)->prevpos.cx = (o_)->pos.cx, \
+	 (o_)->prevpos.cy = (o_)->pos.cy)
 #define Player_position_remember(p_) Object_position_remember(p_)
 
 #endif

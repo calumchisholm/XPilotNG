@@ -1,11 +1,12 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
  *      Bert Gijsbers        <bert@xpilot.org>
  *      Dick Balaska         <dick@xpilot.org>
- *  	Guido Koopman        <guido@xpilot.org>
+ *  	Kimiko Koopman       <kimiko@xpilot.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,37 +26,41 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <errno.h>
 #include <math.h>
 #include <limits.h>
+#include <time.h>
 
 #ifdef _WINDOWS
-#include "NT/winServer.h"
+# include "NT/winServer.h"
 #endif
 
 #define SERVER
 #include "version.h"
 #include "config.h"
-#include "const.h"
+#include "serverconst.h"
 #include "global.h"
 #include "proto.h"
-#include "score.h"
-#include "saudio.h"
 #include "bit.h"
-#include "error.h"
 #include "objpos.h"
-#include "walls.h"
 #include "cannon.h"
-#include "netserver.h"
+#include "saudio.h"
 #include "commonproto.h"
 
 char cannon_version[] = VERSION;
+
 
 #ifdef	SOUND
 #define IFSOUND(__x)	__x
 #else
 #define IFSOUND(__x)
 #endif
+
+static int Cannon_select_weapon(int ind);
+static void Cannon_aim(int ind, int weapon, int *target, int *dir);
+static void Cannon_fire(int ind, int weapon, int target, int dir);
+static int Cannon_in_danger(int ind);
+static int Cannon_select_defense(int ind);
+static void Cannon_defend(int ind, int defense);
 
 /* the items that are useful to cannons.
    these are the items that cannon get 'for free' once in a while.
@@ -67,7 +72,8 @@ long CANNON_USE_ITEM = (ITEM_BIT_FUEL|ITEM_BIT_WIDEANGLE
 			|ITEM_BIT_TANK|ITEM_BIT_MINE
 			|ITEM_BIT_ECM|ITEM_BIT_LASER
 			|ITEM_BIT_EMERGENCY_THRUST|ITEM_BIT_ARMOR
-			|ITEM_BIT_TRACTOR_BEAM|ITEM_BIT_MISSILE);
+			|ITEM_BIT_TRACTOR_BEAM|ITEM_BIT_MISSILE
+			|ITEM_BIT_PHASING);
 
 /* adds the given amount of an item to the cannon's inventory. the number of
    tanks is taken to be 1. amount is then the amount of fuel in that tank.
@@ -98,7 +104,9 @@ void Cannon_add_item(int ind, int item, int amount)
 void Cannon_throw_items(int ind)
 {
     cannon_t	*c = World.cannon + ind;
-    int		i;
+    int		i, dir;
+    object	*obj;
+    DFLOAT	velocity;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (i == ITEM_FUEL)
@@ -110,33 +118,31 @@ void Cannon_throw_items(int ind)
 					    - World.items[i].min_per_pack));
 	    LIMIT(amount, 0, c->item[i]);
 	    if (rfrac() < (dropItemOnKillProb * CANNON_DROP_ITEM_PROB)
-		&& NumObjs <= MAX_TOTAL_SHOTS) {
-		int velocity = (int)(rfrac() * 6);
-		object *obj;
+		&& (obj = Object_allocate()) != NULL) {
 
-		obj = Obj[NumObjs++];
 		obj->type = OBJ_ITEM;
 		obj->info = i;
 		obj->color = RED;
 		obj->status = GRAVITY;
-		obj->dir = (int)(c->dir
+		dir = (int)(c->dir
 			   - (CANNON_SPREAD * 0.5)
 			   + (rfrac() * CANNON_SPREAD));
-		obj->dir = MOD2(obj->dir, RES);
-		obj->id = -1;
+		dir = MOD2(dir, RES);
+		obj->id = NO_ID;
 		obj->team = TEAM_NOT_SET;
-		obj->owner = -1;
-		Object_position_init_clicks(obj, c->clk_pos.x, c->clk_pos.y);
-		obj->vel.x = tcos(obj->dir) * velocity;
-		obj->vel.y = tsin(obj->dir) * velocity;
+		Object_position_init_clicks(obj, c->pos.cx, c->pos.cy);
+		velocity = rfrac() * 6;
+		obj->vel.x = tcos(dir) * velocity;
+		obj->vel.y = tsin(dir) * velocity;
 		obj->acc.x = 0;
 		obj->acc.y = 0;
 		obj->mass = 10;
-		obj->life = 1500 + (int)(rfrac() * 512);
+		obj->life = 1500*TIME_FACT + (int)(rfrac() * 512 * TIME_FACT);
 		obj->count = amount;
 		obj->pl_range = ITEM_SIZE / 2;
 		obj->pl_radius = ITEM_SIZE / 2;
 		World.items[i].num++;
+		Cell_add_object(obj);
 	    }
 	    c->item[i] -= amount;
 	}
@@ -147,7 +153,7 @@ void Cannon_throw_items(int ind)
    items. */
 void Cannon_init(int ind)
 {
-    cannon_t	*c = World.cannon + ind;
+    cannon_t	*c = &World.cannon[ind];
     int		i;
 
     c->last_change = frame_loops;
@@ -160,20 +166,135 @@ void Cannon_init(int ind)
     c->tractor_target = -1;
     c->tractor_count = 0;
     c->tractor_is_pressor = false;
+    c->used = 0;
+    c->emergency_shield_left = 0;
+    c->phasing_left = 0;
+}
+
+void Cannon_check_defense(int ind)
+{
+    int defense = Cannon_select_defense(ind);
+
+    if (defense >= 0
+	&& Cannon_in_danger(ind)) {
+	Cannon_defend(ind, defense);
+    }
 }
 
 void Cannon_check_fire(int ind)
 {
-    int		weapon, target = -1, dir = 0;
+    int	target = -1,
+    	dir = 0,
+	weapon = Cannon_select_weapon(ind);
 
-    weapon = Cannon_select_weapon(ind);
     Cannon_aim(ind, weapon, &target, &dir);
     if (target != -1)
 	Cannon_fire(ind, weapon, target, dir);
 }
 
+/* selects one of the available defenses. see cannon.h for descriptions. */
+static int Cannon_select_defense(int ind)
+{
+    cannon_t	*c = World.cannon + ind;
+
+    if (cannonSmartness == 0)
+	return -1;	/* mode 0 does not defend */
+    if (BIT(c->used, HAS_EMERGENCY_SHIELD)
+	|| BIT(c->used, HAS_PHASING_DEVICE))
+	return -1;	/* still protected */
+    if (c->item[ITEM_EMERGENCY_SHIELD])
+	return CD_EM_SHIELD;
+    if (c->item[ITEM_PHASING])
+	return CD_PHASING;
+    return -1;	/* no defense available */
+}
+
+/* checks if a cannon is about to be hit by a hazardous object.
+   mode 0 does not detect danger.
+   modes 1 - 3 use progressively more accurate detection. */
+static int Cannon_in_danger(int ind)
+{
+    cannon_t	*c = World.cannon + ind;
+    const int	range = 4 * BLOCK_SZ;
+    const long	kill_shots = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT
+	    			| OBJ_PULSE | OBJ_SMART_SHOT | OBJ_HEAT_SHOT
+				| OBJ_TORPEDO | OBJ_ASTEROID;
+    object	*shot, **obj_list;
+    const int	max_objs = 100;
+    int		obj_count, i, danger = false;
+    int		npx, npy, tdx, tdy;
+    int		cpx = CLICK_TO_PIXEL(c->pos.cx);
+    int		cpy = CLICK_TO_PIXEL(c->pos.cy);
+
+    if (cannonSmartness == 0)
+	return false;
+
+    Cell_get_objects(CLICK_TO_BLOCK(c->pos.cx),
+		     CLICK_TO_BLOCK(c->pos.cy), range, max_objs,
+		     &obj_list, &obj_count);
+
+    for (i = 0; (i < obj_count) && !danger; i++) {
+	shot = obj_list[i];
+
+	if (shot->life <= 0)
+	    continue;
+	if (!BIT(shot->type, kill_shots))
+	    continue;
+	if (BIT(shot->status, FROMCANNON))
+	    continue;
+	if (BIT(World.rules->mode, TEAM_PLAY)
+	    && teamImmunity
+	    && shot->team == c->team)
+	    continue;
+
+	npx = shot->pos.px;
+	npy = shot->pos.py;
+	if (cannonSmartness > 1) {
+	    npx += shot->vel.x;
+	    npy += shot->vel.y;
+	    if (cannonSmartness > 2) {
+		npx += shot->acc.x;
+		npy += shot->acc.y;
+	    }
+	}
+	tdx = WRAP_DX(npx - cpx);
+	tdy = WRAP_DY(npy - cpy);
+	if (LENGTH(tdx, tdy) <= ((4.5 - cannonSmartness) * BLOCK_SZ)) {
+	    danger = true;
+	    break;
+	}
+    }
+
+    return danger;
+}
+
+/* activates the selected defense. */
+static void Cannon_defend(int ind, int defense)
+{
+    cannon_t	*c = World.cannon + ind;
+    IFSOUND( int sound = -1 );
+
+    switch (defense) {
+    case CD_EM_SHIELD:
+      c->emergency_shield_left += 4 * 12 * TIME_FACT;
+	SET_BIT(c->used, HAS_EMERGENCY_SHIELD);
+	c->item[ITEM_EMERGENCY_SHIELD]--;
+	IFSOUND( sound = EMERGENCY_SHIELD_ON_SOUND );
+	break;
+    case CD_PHASING:
+	c->phasing_left += 4 * 12 * TIME_FACT;
+	SET_BIT(c->used, HAS_PHASING_DEVICE);
+	c->tractor_count = 0;
+	c->item[ITEM_PHASING]--;
+	IFSOUND( sound = PHASING_ON_SOUND );
+	break;
+    }
+    IFSOUND( if (sound != -1)
+	     sound_play_sensors(c->pos.cx, c->pos.cy, sound) );
+}
+
 /* selects one of the available weapons. see cannon.h for descriptions. */
-int Cannon_select_weapon(int ind)
+static int Cannon_select_weapon(int ind)
 {
     cannon_t	*c = World.cannon + ind;
 
@@ -206,23 +327,26 @@ int Cannon_select_weapon(int ind)
 }
 
 /* determines in which direction to fire.
-   mode 0 fires straight ahead; mode 1 in a random direction. mode 2 aims at
-   the current position of the closest player, then limits that to the sector
-   in front of the cannon, then adds a small error. mode 3 calculates where
-   the player will be when the shot reaches her, checks if that position is
-   within limits and selects the player who will be closest in this way.
+   mode 0 fires straight ahead.
+   mode 1 in a random direction.
+   mode 2 aims at the current position of the closest player,
+          then limits that to the sector in front of the cannon,
+          then adds a small error.
+   mode 3 calculates where the player will be when the shot reaches her,
+          checks if that position is within limits and selects the player
+          who will be closest in this way.
    the targeted player is also returned (for all modes).
-   mode 0 always fires if it sees a player; modes 1 and 2 only fire if a
-   player is within range of the selected weapon; mode 3 only fire if a player
-   will be in range when the shot is expected to hit.
+   mode 0 always fires if it sees a player.
+   modes 1 and 2 only fire if a player is within range of the selected weapon.
+   mode 3 only fires if a player will be in range when the shot is expected to hit.
  */
-void Cannon_aim(int ind, int weapon, int *target, int *dir)
+static void Cannon_aim(int ind, int weapon, int *target, int *dir)
 {
     cannon_t	*c = World.cannon + ind;
-    int		speed = (int)CANNON_SHOT_SPEED;
+    int		speed = ShotsSpeed;
     int		range = CANNON_SHOT_LIFE_MAX * speed;
-    int		cpx = c->clk_pos.x;
-    int		cpy = c->clk_pos.y;
+    int		cx = c->pos.cx;
+    int		cy = c->pos.cy;
     int		visualrange = (int)(CANNON_DISTANCE
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
     bool	found = false, ready = false;
@@ -236,7 +360,7 @@ void Cannon_aim(int ind, int weapon, int *target, int *dir)
 	break;
     case CW_LASER:
 	speed = CLICK_TO_PIXEL(PULSE_SPEED);
-	range = (int)(PULSE_LIFE(CANNON_PULSES) * speed);
+	range = (int)((PULSE_LIFE(CANNON_PULSES) / TIME_FACT) * speed);
 	break;
     case CW_ECM:
 	/* smarter cannons wait a little longer before firing an ECM */
@@ -270,10 +394,10 @@ void Cannon_aim(int ind, int weapon, int *target, int *dir)
 	player *pl = Players[i];
 	int tdist, tdx, tdy;
 
-	tdx = WRAP_XCLICK(pl->pos.cx - cpx) / CLICK;
+	tdx = WRAP_DCX(pl->pos.cx - cx) / CLICK;
 	if (ABS(tdx) >= visualrange)
 	    continue;
-	tdy = WRAP_YCLICK(pl->pos.cy - cpy) / CLICK;
+	tdy = WRAP_DCY(pl->pos.cy - cy) / CLICK;
 	if (ABS(tdy) >= visualrange)
 	    continue;
 	tdist = (int)LENGTH(tdx, tdy);
@@ -284,12 +408,12 @@ void Cannon_aim(int ind, int weapon, int *target, int *dir)
 	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE|KILLED) != PLAYING
 	    || (BIT(World.rules->mode, TEAM_PLAY)
 		&& pl->team == c->team)
-	    || (!pl->forceVisible
-		&& BIT(pl->used, OBJ_CLOAKING_DEVICE)
+	    || ((pl->forceVisible <= 0)
+		&& BIT(pl->used, HAS_CLOAKING_DEVICE)
 		&& (int)(rfrac() * (pl->item[ITEM_CLOAK] + 1))
 		   > (int)(rfrac() * (c->item[ITEM_SENSOR] + 1)))
 	    || (cannonSmartness > 2
-		&& BIT(pl->used, OBJ_PHASING_DEVICE)))
+		&& BIT(pl->used, HAS_PHASING_DEVICE)))
 	    continue;
 
 	switch (cannonSmartness) {
@@ -318,8 +442,8 @@ void Cannon_aim(int ind, int weapon, int *target, int *dir)
 				+ pl->acc.y * time * time * CLICK);
 		int tdir;
 
-		tdx = WRAP_XCLICK(npx - cpx) / CLICK;
-		tdy = WRAP_YCLICK(npy - cpy) / CLICK;
+		tdx = WRAP_DCX(npx - cx) / CLICK;
+		tdy = WRAP_DCY(npy - cy) / CLICK;
 		tdir = (int)findDir(tdx, tdy);
 		ddir = MOD2(tdir - c->dir, RES);
 		if ((ddir < (CANNON_SPREAD * 0.5)
@@ -368,16 +492,18 @@ void Cannon_aim(int ind, int weapon, int *target, int *dir)
 
 /* does the actual firing. also determines in which way to use weapons that
    have more than one possible use. */
-void Cannon_fire(int ind, int weapon, int target, int dir)
+static void Cannon_fire(int ind, int weapon, int target, int dir)
 {
     cannon_t	*c = World.cannon + ind;
     player	*pl = Players[target];
-    int		cpx = c->clk_pos.x;
-    int		cpy = c->clk_pos.y;
+    int		cx = c->pos.cx;
+    int		cy = c->pos.cy;
     modifiers	mods;
-    IFSOUND (int sound = CANNON_FIRE_SOUND;)
-	int		i;
-    int		speed = (int)CANNON_SHOT_SPEED;
+#ifdef SOUND
+    int		sound = CANNON_FIRE_SOUND;
+#endif
+    int		i;
+    int		speed = ShotsSpeed;
 
     CLEAR_MODS(mods);
     switch (weapon) {
@@ -391,18 +517,18 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
 	}
 	if (rfrac() < 0.5f) {	/* place mine in front of cannon */
-	    Place_general_mine(-1, c->team, FROMCANNON, cpx, cpy,
+	    Place_general_mine(-1, c->team, FROMCANNON, cx, cy,
 			       0, 0, mods);
-	    IFSOUND (sound = DROP_MINE_SOUND; )
+	    IFSOUND (sound = DROP_MINE_SOUND );
 	} else {		/* throw mine at player */
 	    if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
 		mods.mini = (int)(rfrac() * MODS_MINI_MAX) + 1;
 		mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
 	    }
 	    speed = (int)(speed * 0.5 + 0.1 * cannonSmartness);
-	    Place_general_mine(-1, c->team, GRAVITY|FROMCANNON, cpx, cpy,
+	    Place_general_mine(-1, c->team, GRAVITY|FROMCANNON, cx, cy,
 			       tcos(dir) * speed, tsin(dir) * speed, mods);
-	    IFSOUND(sound = DROP_MOVING_MINE_SOUND;)
+	    IFSOUND(sound = DROP_MOVING_MINE_SOUND);
 	}
 	c->item[ITEM_MINE]--;
 	break;
@@ -427,25 +553,25 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 	switch ((int)(rfrac() * (1 + cannonSmartness))) {
 	default:
 	    if (allowSmartMissiles) {
-		Fire_general_shot(-1, c->team, 1, cpx, cpy, OBJ_SMART_SHOT,
-				  dir, speed, mods, target);
-		IFSOUND(sound = FIRE_SMART_SHOT_SOUND;)
+		Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_SMART_SHOT,
+				  dir, mods, target);
+		IFSOUND(sound = FIRE_SMART_SHOT_SOUND);
 		break;
 	    }
 	    /* FALLTHROUGH */
 	case 1:
 	    if (allowHeatSeekers
 		&& BIT(Players[target]->status, THRUSTING)) {
-		Fire_general_shot(-1, c->team, 1, cpx, cpy, OBJ_HEAT_SHOT,
-				  dir, speed, mods, target);
-		IFSOUND(sound = FIRE_HEAT_SHOT_SOUND;)
+		Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_HEAT_SHOT,
+				  dir, mods, target);
+		IFSOUND(sound = FIRE_HEAT_SHOT_SOUND);
 		break;
 	    }
 	    /* FALLTHROUGH */
 	case 0:
-	    Fire_general_shot(-1, c->team, 1, cpx, cpy, OBJ_TORPEDO,
-			      dir, speed, mods, -1);
-	    IFSOUND(sound = FIRE_TORPEDO_SOUND;)
+	    Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_TORPEDO,
+			      dir, mods, -1);
+	    IFSOUND(sound = FIRE_TORPEDO_SOUND);
 	    break;
 	}
 	c->item[ITEM_MISSILE]--;
@@ -457,42 +583,44 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 	    && (rfrac() * (8 - cannonSmartness)) >= 1) {
 	    mods.laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
 	}
-	Fire_general_laser(-1, c->team, cpx, cpy, dir, mods);
-	IFSOUND(sound = FIRE_LASER_SOUND;)
+	Fire_general_laser(-1, c->team, cx, cy, dir, mods);
+	IFSOUND(sound = FIRE_LASER_SOUND);
 	break;
     case CW_ECM:
-	Fire_general_ecm(-1, c->team, cpx, cpy);
+	Fire_general_ecm(-1, c->team, cx, cy);
 	c->item[ITEM_ECM]--;
-	IFSOUND(sound = ECM_SOUND;)
+	IFSOUND(sound = ECM_SOUND);
 	break;
     case CW_TRACTORBEAM:
 	/* smarter cannons use tractors more often and also push/pull longer */
 	c->tractor_is_pressor = (rfrac() * (cannonSmartness + 1) >= 1);
 	c->tractor_target = pl->id;
-	c->tractor_count = 11 + (int)(rfrac() * ((3 * cannonSmartness) + 1));
-	IFSOUND(sound = -1;)
+	c->tractor_count =
+	    (11 * TIME_FACT
+	     + (int)(TIME_FACT * rfrac() * ((3 * cannonSmartness) + 1)));
+	IFSOUND(sound = -1);
 	break;
     case CW_TRANSPORTER:
 	c->item[ITEM_TRANSPORTER]--;
-	if (Wrap_length(pl->pos.cx - cpx, pl->pos.cy - cpy)
+	if (Wrap_length(pl->pos.cx - cx, pl->pos.cy - cy)
 	    < TRANSPORTER_DISTANCE * CLICK) {
 	    int item = -1;
 	    long amount = 0;
-	    Do_general_transporter(-1, cpx, cpy, target, &item, &amount);
+	    Do_general_transporter(-1, cx, cy, target, &item, &amount);
 	    if (item != -1)
 		Cannon_add_item(ind, item, amount);
-	    IFSOUND(sound = -1;)
+	    IFSOUND(sound = -1);
 	} else {
-	    IFSOUND(sound = TRANSPORTER_FAIL_SOUND;)
+	    IFSOUND(sound = TRANSPORTER_FAIL_SOUND);
 	}
 	break;
     case CW_GASJET:
 	/* use emergency thrusts to make extra big jets */
 	if ((rfrac() * (c->item[ITEM_EMERGENCY_THRUST] + 1)) >= 1) {
 	    Make_debris(
-		/* pos */	cpx, cpy,
+		/* pos */	cx, cy,
 		/* vel */	0, 0,
-		/* id */	-1,
+		/* id */	NO_ID,
 		/* team */	c->team,
 		/* type */	OBJ_SPARK,
 		/* mass */	THRUST_MASS,
@@ -507,9 +635,9 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 	    c->item[ITEM_EMERGENCY_THRUST]--;
 	} else {
 	    Make_debris(
-		/* pos */	cpx, cpy,
+		/* pos */	cx, cy,
 		/* vel */	0, 0,
-		/* id */	-1,
+		/* id */	NO_ID,
 		/* team */	c->team,
 		/* type */	OBJ_SPARK,
 		/* mass */	THRUST_MASS,
@@ -523,10 +651,12 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 		/* life */	3 * TIME_FACT, 20 * TIME_FACT);
 	}
 	c->item[ITEM_FUEL]--;
-	IFSOUND(sound = THRUST_SOUND;)
+	IFSOUND(sound = THRUST_SOUND);
 	break;
     case CW_SHOT:
     default:
+	if (cannonFlak)
+	    mods.warhead = CLUSTER;
 	/* smarter cannons fire more accurately and
 	   can therefore narrow their bullet streams */
 	for (i = 0; i < (1 + 2 * c->item[ITEM_WIDEANGLE]); i++) {
@@ -534,8 +664,8 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 			+ (4 - cannonSmartness)
 			* (-c->item[ITEM_WIDEANGLE] +  i);
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(-1, c->team, 1, cpx, cpy, OBJ_SHOT,
-			      a_dir, speed, mods, -1);
+	    Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
+			      a_dir, mods, -1);
 	}
 	/* I'm not sure cannons should use rearshots.
 	   After all, they are restricted to 60 degrees when picking their
@@ -545,12 +675,12 @@ void Cannon_fire(int ind, int weapon, int target, int dir)
 			+ (4 - cannonSmartness)
 			* (-((c->item[ITEM_REARSHOT] - 1) * 0.5) + i));
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(-1, c->team, 1, cpx, cpy, OBJ_SHOT,
-			      a_dir, speed, mods, -1);
+	    Fire_general_shot(-1, c->team, 1, cx, cy, OBJ_CANNON_SHOT,
+			      a_dir, mods, -1);
 	}
     }
 
     /* finally, play sound effect */
     IFSOUND(if (sound != -1)
-	            sound_play_sensors(cpx, cpy, sound);)
+	    sound_play_sensors(cx, cy, sound));
 }

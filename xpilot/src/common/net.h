@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,19 +25,16 @@
 #ifndef	NET_H
 #define	NET_H
 
+#ifndef SOCKLIB_H
 /* need sock_t */
 #include "socklib.h"
+#endif
 
 #define MIN_SOCKBUF_SIZE	1024
 #define MAX_SOCKBUF_SIZE	(50*1024)
 
 #define SERVER_RECV_SIZE	MIN_SOCKBUF_SIZE
-#if defined(LINUX0)
-/* bwahg, linux tcp/ip still has silly limitations in 0.99.15 */
-#define SERVER_SEND_SIZE	(3*512 + 3*128)
-#else
 #define SERVER_SEND_SIZE	(4*1024)
-#endif
 
 #define CLIENT_SEND_SIZE	SERVER_RECV_SIZE
 /* I added 1024 to this because the client can get 4 1035 byte packets
@@ -80,6 +77,8 @@ typedef struct {
     int		state;		/* read/write/locked/error status flags */
 } sockbuf_t;
 
+extern int last_packet_of_frame;
+
 int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, int size, int state);
 int Sockbuf_cleanup(sockbuf_t *sbuf);
 int Sockbuf_clear(sockbuf_t *sbuf);
@@ -106,3 +105,4 @@ int Sockbuf_copy(sockbuf_t *dest, sockbuf_t *src, int len);
 #endif
 
 #endif
+

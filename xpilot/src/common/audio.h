@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -111,6 +111,8 @@ enum {
     EMERGENCY_SHIELD_ON_SOUND,
     EMERGENCY_SHIELD_OFF_SOUND,
     CANNON_EXPLOSION_SOUND,
+    ASTEROID_HIT_SOUND,
+    ASTEROID_BREAK_SOUND,
     MAX_SOUNDS
 };
 
@@ -199,12 +201,18 @@ static char    *soundNames[] =
     "emergency_shield_on",
     "emergency_shield_off",
     "cannon_explosion",
+    "asteroid_hit",
+    "asteroid_break",
 };
 
 #endif						/* _CAUDIO_C_ */
 
 extern	void audioInit(char* display);
-extern	void audioCleanup();
+extern	void audioCleanup(void);
 extern	int	Handle_audio(int type, int volume);
+
+extern	int	audioDeviceInit(char *display);
+extern	void	audioDeviceEvents(void);
+extern	void	audioDevicePlay(char *filename, int type, int volume, void **private);
 
 #endif						/* _audio_h */

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -34,6 +34,8 @@
 
 #define	strncasecmp(__a, __b, __c)	strnicmp(__a, __b, __c)
 
+/* there are tons of "conversion from 'double ' to 'int '", stop warning us */
+#pragma warning (disable : 4244)
 
 #endif /* _WINDOWS */
 
@@ -67,14 +69,6 @@ extern int sigprocmask(int how, const sigset_t *set, sigset_t *oset);
 
 #endif
 
-#ifdef VMS
-/* blabla */
-#endif
-
-#ifdef SUNCMW
-#include "cmw.h"
-#endif /* SUNCMW */
-
 /*
  * In Windows, just exiting won't tell the user the reason.
  * So, try to gracefully shutdown just the server thread
@@ -101,6 +95,14 @@ extern	int ServerKilled;
 #define IFNWINDOWS(x)
 #endif
 
+
+#ifdef _WINDOWS
+#define PATHNAME_SEP    '\\'
+#else
+#define PATHNAME_SEP    '/'
+#endif
+
+
 /*
  * Prototypes for OS function wrappers in portability.c.
  */
@@ -115,6 +117,15 @@ extern void move_memory(void *dst, void *src, size_t len);
 /*
  * Prototypes for testing if we are running under a certain OS.
  */
-extern int is_this_windows();
+extern int is_this_windows(void);
+
+
+/*
+ * Round to nearest integer.
+ */
+#ifdef _WINDOWS
+double rint(double x);
+#endif
+
 
 #endif /* PORTABILITY_H_INCLUDED */

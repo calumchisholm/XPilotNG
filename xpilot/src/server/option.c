@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -27,888 +28,945 @@
 #include <ctype.h>
 #include <limits.h>
 #include <errno.h>
-#include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#else
-#include <windows.h>
-#include <io.h>
-#define read(__a, __b, __c)  _read(__a, __b, __c)
+# include <unistd.h>
 #endif
 
 #define SERVER
 #include "version.h"
 #include "config.h"
-#include "const.h"
+#include "serverconst.h"
 #include "global.h"
 #include "proto.h"
-#include "map.h"
 #include "defaults.h"
 #include "error.h"
-#include "click.h"
 #include "types.h"
 #include "commonproto.h"
 
+
 char option_version[] = VERSION;
 
-#ifndef PATH_MAX
-#define PATH_MAX	1023
-#endif
 
-#define	NHASH	199
+/*
+ * This module implements an in memory server option database.
+ * Each option is made up by its names (one or two) and its
+ * value.  The names are stored together with a pointer to
+ * their value representation in a hash table.
+ */
 
-static valPair    *hashArray[NHASH];
+
+/* size of the hash table.  must be prime. */
+#define	HASH_SIZE	317
+
+
+/*
+ * Define value representation structure which holds:
+ *	a pointer to the string representation of an option value.
+ *	a flag which is true if the value was set with override.
+ *	an enum which represents the origin of the option value:
+ *		where origins can be one of {map, defaultsfile, command line}.
+ *	a pointer to an option description structure.
+ *	a reference count which will be either zero, one or two.
+ * This structure is automatically deallocated when its reference count
+ * drops to zero.
+ * The option description pointer may be NULL for undefined options.
+ * The string value pointer is usually dynamically allocated, but
+ * in theory (not yet in practice) could also point to a static string
+ * if this option refers to a valString with a static default value.
+ */
+typedef struct _hash_value hash_value;
+struct _hash_value {
+    char	*value;
+    int		override;
+    optOrigin	origin;
+    option_desc	*desc;
+    int		refcount;
+};
+
+
+/*
+ * Define option name structure which holds a pointer
+ * to the value structure.  More than one (two) different
+ * name structures may point to the same value structure
+ * if the same option has two different names.
+ */
+typedef struct _hash_node hash_node;
+struct _hash_node {
+    hash_node	*next;
+    char	*name;
+    hash_value	*value;
+};
+
+
+/*
+ * Define memory for hash table along with some statistics.
+ */
+static int hash_nodes_allocated;
+static int hash_nodes_freed;
+static int hash_values_allocated;
+static int hash_values_freed;
+static hash_node* Option_hash_array[HASH_SIZE];
 
 
 /*
  * Compute a reasonable case-insensitive hash value across a character string.
  */
-static unsigned int hash(const char *name)
+static int Option_hash_string(const char *name)
 {
-    unsigned int hashVal = 0;
-    unsigned char *s = (unsigned char *)name;
+    unsigned int	hashVal = 0;
+    const unsigned char	*string = (const unsigned char *)name;
+    int			i;
 
-    while (*s) {
-	char        c = *s++;
+    for (i = 0; string[i] != '\0'; i++) {
+	unsigned char	c = string[i];
 
-	if (isascii(c) && isalpha(c) && islower(c))
+	if (isascii(c) && isalpha(c) && islower(c)) {
 	    c = toupper(c);
-	hashVal = (hashVal + c) << 1;
-	while (hashVal > NHASH)
-	    hashVal = (hashVal % NHASH) + (hashVal / NHASH);
+	}
+
+	hashVal = (((hashVal << 3) + c) ^ i);
+
+	while (hashVal > HASH_SIZE) {
+	    hashVal = (hashVal % HASH_SIZE) + (hashVal / HASH_SIZE);
+	}
     }
-    return hashVal % NHASH;
+
+    return (int)(hashVal % HASH_SIZE);
 }
 
 
 /*
- * Allocate a new bucket for the hash table and fill in its values.
+ * Free a hash value structure if its
+ * reference count drops to zero.
  */
-static valPair *newOption(const char *name, const char *value)
+static void Option_free_value(hash_value* val)
 {
-    valPair    *tmp = (valPair *)malloc(sizeof(valPair));
-
-    if (!tmp)
-	return (valPair *) 0;
-
-    tmp->name = (char *)malloc(strlen(name) + 1);
-    tmp->value = (char *)malloc(strlen(value) + 1);
-
-    if (!tmp->name || !tmp->value) {
-	if (tmp->name)
-	    free(tmp->name);
-	if (tmp->value)
-	    free(tmp->value);
-	free(tmp);
-	return (valPair *) 0;
+    if (val->refcount > 0) {
+	val->refcount--;
     }
-    strcpy(tmp->name, name);
-    strcpy(tmp->value, value);
+    if (val->refcount == 0) {
+	if (val->value) {
+	    if (!val->desc || val->value != val->desc->defaultValue) {
+		free(val->value);
+	    }
+	    val->value = NULL;
+	}
+	free(val);
+	hash_values_freed++;
+    }
+}
+
+
+/*
+ * Allocate a new option hash value and fill in its values.
+ * The option value string representation is either derived
+ * from the value parameter, or else from the option description
+ * default value pointer.
+ */
+static hash_value *Option_allocate_value(
+	const char	*value,
+	option_desc	*desc,
+	optOrigin	origin)
+{
+    hash_value	*tmp = (hash_value *)xp_safe_malloc(sizeof(hash_value));
+
+    tmp->desc = desc;
+    tmp->override = 0;
+    tmp->origin = origin;
+    tmp->refcount = 0;
+    if (value == NULL) {
+	if (desc != NULL && desc->defaultValue != NULL) {
+	    /* might also simply point to default value instead. */
+	    tmp->value = xp_safe_strdup(desc->defaultValue);
+	}
+	else {
+	    tmp->value = NULL;
+	}
+    }
+    else {
+	tmp->value = xp_safe_strdup(value);
+    }
+
+    if (tmp) {
+	hash_values_allocated++;
+    }
+
     return tmp;
 }
 
 
 /*
- * Scan through the hash table of option name-value pairs looking for an option
- * with the specified name; if found, and if override is true, change to the
- * new value; if found and override is not true, do nothing. If not found, add
- * to the hash table regardless of override.   Either way, if def is nonzero,
- * it is attached to the name-value pair - this will only happen once anyway.
+ * Free a hash node and its hash value.
  */
-void addOption(const char *name, const char *value, int override, void *def,
-	       int origin)
+static void Option_free_node(hash_node* node)
 {
-    valPair    *tmp;
-    int         ix = hash(name);
+    if (node->value) {
+	Option_free_value(node->value);
+	node->value = NULL;
+    }
+    if (node->name) {
+	free(node->name);
+	node->name = NULL;
+    }
+    node->next = NULL;
+    free(node);
+    hash_nodes_freed++;
+}
 
-    for (tmp = hashArray[ix]; tmp; tmp = tmp->next)
-	if (!strcasecmp(name, tmp->name)) {
-	    if (override && value) {
-		char *s = xp_malloc(strlen(value) + 1);
-		free(tmp->value);
-		strcpy(s, value);
-		tmp->value = s;
-		tmp->origin = origin;
+
+/*
+ * Allocate a new node for the hash table and fill in its values.
+ */
+static hash_node *Option_allocate_node(const char *name, hash_value *value)
+{
+    hash_node	*tmp = (hash_node *)xp_safe_malloc(sizeof(hash_node));
+
+    tmp->next = NULL;
+    tmp->value = value;
+    tmp->name = xp_safe_strdup(name);
+    if (tmp->value) {
+	tmp->value->refcount++;
+    }
+
+    if (tmp) {
+	hash_nodes_allocated++;
+    }
+
+    return tmp;
+}
+
+
+/*
+ * Add a hash node to the hash table.
+ */
+static void Option_add_node(hash_node *node)
+{
+    hash_node	*np;
+    int		ix = Option_hash_string(node->name);
+
+    for (np = Option_hash_array[ix]; np; np = np->next) {
+	if (!strcasecmp(node->name, np->name)) {
+	    fatal("Option_add_node node exists (%s, %s)\n",
+		    node->name, np->name);
+	}
+    }
+
+    node->next = Option_hash_array[ix];
+    Option_hash_array[ix] = node;
+}
+
+
+/*
+ * Return the hash table node of a named option,
+ * or NULL if there is no node for that option name.
+ */
+static hash_node *Get_hash_node_by_name(const char *name)
+{
+    hash_node	*np;
+    int		ix = Option_hash_string(name);
+
+    for (np = Option_hash_array[ix]; np; np = np->next) {
+	if (!strcasecmp(name, np->name)) {
+	    return np;
+	}
+    }
+
+    return (hash_node *)NULL;
+}
+
+
+/*
+ * Add an option description to the hash table.
+ */
+bool Option_add_desc(option_desc *desc)
+{
+    hash_value	*val = Option_allocate_value(NULL, desc, OPT_INIT);
+    hash_node	*node1, *node2;
+
+    if (!val) {
+	return FALSE;
+    }
+
+    node1 = Option_allocate_node(desc->name, val);
+    if (!node1) {
+	Option_free_value(val);
+	return FALSE;
+    }
+
+    node2 = NULL;
+    if (strcasecmp(desc->name, desc->commandLineOption)) {
+	node2 = Option_allocate_node(desc->commandLineOption, val);
+	if (!node2) {
+	    Option_free_node(node1);
+	    return FALSE;
+	}
+    }
+
+    Option_add_node(node1);
+    if (node2 != NULL) {
+	Option_add_node(node2);
+    }
+
+    return TRUE;
+}
+
+
+/*
+ * Convert an option origin enumerated constant
+ * to a character representation.
+ */
+static const char* Origin_name(optOrigin opt_origin)
+{
+    const char *source;
+
+    switch (opt_origin) {
+	case OPT_COMMAND: source = "command line"; break;
+	case OPT_PASSWORD: source = "password file"; break;
+	case OPT_DEFAULTS: source = "defaults file"; break;
+	case OPT_MAP: source = "map file"; break;
+	default: source = "unknown origin"; break;
+    }
+
+    return source;
+}
+
+
+/*
+ * Modify the value for a hash node if permissions allow us to do so.
+ */
+static void Option_change_node(
+	hash_node	*node,
+	const char	*value,
+	int		override,
+	optOrigin	opt_origin)
+{
+    bool	set_ok = FALSE;
+
+    if (node->value == NULL) {
+	/* permit if option has no default value. */
+	set_ok = TRUE;
+    }
+    else {
+
+	/* check option description permissions. */
+	if (node->value->desc != NULL) {
+	    option_desc	*desc = node->value->desc;
+	    if ((desc->flags & opt_origin) == 0) {
+		warn("Not allowed to change option '%s' from %s.",
+		      node->name, Origin_name(opt_origin));
+		return;
 	    }
-	    if (def)
-		tmp->def = def;
-	    return;
-	}
-    if (!value)
-	return;
-
-    tmp = newOption(name, value);
-    if (!tmp)
-	return;
-    tmp->def = def;
-    tmp->next = hashArray[ix];
-    tmp->origin = origin;
-    hashArray[ix] = tmp;
-}
-
-
-/*
- * Return the value of the specified option, or (char *)0 if there is no value
- * for that option.
- */
-char *getOption(const char *name)
-{
-    valPair    *tmp;
-    int         ix = hash(name);
-
-    for (tmp = hashArray[ix]; tmp; tmp = tmp->next)
-	if (!strcasecmp(name, tmp->name))
-	    return tmp->value;
-
-    return (char *)0;
-}
-
-
-static char *FileName;
-
-#include <expat.h>
-
-static int edg[5000 * 2]; /* !@# change pointers in poly_t when realloc poss.*/
-extern int polyc;
-extern int num_groups;
-
-int *edges = edg;
-int *estyleptr;
-int ptscount, ecount;
-char *mapd;
-
-struct polystyle pstyles[256];
-struct edgestyle estyles[256] =
-{{"internal", 0, 0, 0}};	/* Style 0 is always this special style */
-struct bmpstyle  bstyles[256];
-poly_t *pdata;
-
-int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
-int max_bases, max_balls, max_fuels, max_checks, max_polys,max_echanges; /* !@# make static after testing done */
-static int current_estyle, current_group, is_decor;
-
-static int get_bmp_id(const char *s)
-{
-    int i;
-
-    for (i = 0; i < num_bstyles; i++)
-	if (!strcmp(bstyles[i].id, s))
-	    return i;
-    warn("Undeclared bmpstyle %s", s);
-    return 0;
-}
-
-
-static int get_edge_id(const char *s)
-{
-    int i;
-
-    for (i = 0; i < num_estyles; i++)
-	if (!strcmp(estyles[i].id, s))
-	    return i;
-    warn("Undeclared edgestyle %s", s);
-    return -1;
-}
-
-
-static int get_poly_id(const char *s)
-{
-    int i;
-
-    for (i = 0; i < num_pstyles; i++)
-	if (!strcmp(pstyles[i].id, s))
-	    return i;
-    warn("Undeclared polystyle %s", s);
-    return 0;
-}
-
-
-#define STORE(T,P,N,M,V)						\
-    if (N >= M && ((M <= 0)						\
-	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
-	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
-	warn("No memory");						\
-	exit(1);							\
-    } else								\
-	(P[N++] = V)
-/* !@# add a final realloc later to free wasted memory */
-
-
-static void tagstart(void *data, const char *el, const char **attr)
-{
-    static double scale = 1;
-    static int xptag = 0;
-
-    if (!strcasecmp(el, "XPilotMap")) {
-	double version = 0;
-	while (*attr) {
-	    if (!strcasecmp(*attr, "version"))
-		version = atof(*(attr + 1));
-	    attr += 2;
-	}
-	if (version == 0) {
-	    warn("Old(?) map file with no version number");
-	    warn("Not guaranteed to work");
-	}
-	else if (version < 1)
-	    warn("Impossible version in map file");
-	else if (version > 1) {
-	    warn("Map file has newer version than this server recognizes.");
-	    warn("The map file might use unsupported features.");
-	}
-	xptag = 1;
-	return;
-    }
-
-    if (!xptag) {
-	fatal("This doesn't look like a map file "
-	      " (XPilotMap must be first tag).");
-	return; /* not reached */
-    }
-
-    if (!strcasecmp(el, "Polystyle")) {
-	pstyles[num_pstyles].id[sizeof(pstyles[0].id) - 1] = 0;
-	pstyles[num_pstyles].color = 0;
-	pstyles[num_pstyles].texture_id = 0;
-	pstyles[num_pstyles].defedge_id = 0;
-	pstyles[num_pstyles].flags = 0;
-
-	while (*attr) {
-	    if (!strcasecmp(*attr, "id"))
-		strncpy(pstyles[num_pstyles].id, *(attr + 1),
-			sizeof(pstyles[0].id) - 1);
-	    if (!strcasecmp(*attr, "color"))
-		pstyles[num_pstyles].color = strtol(*(attr + 1), NULL, 16);
-	    if (!strcasecmp(*attr, "texture"))
-		pstyles[num_pstyles].texture_id = get_bmp_id(*(attr + 1));
-	    if (!strcasecmp(*attr, "defedge"))
-		pstyles[num_pstyles].defedge_id = get_edge_id(*(attr + 1));
-	    if (!strcasecmp(*attr, "flags"))
-		pstyles[num_pstyles].flags = atoi(*(attr + 1)); /* names @!# */
-	    attr += 2;
-	}
-	if (pstyles[num_pstyles].defedge_id == 0) {
-	    warn("Polygon default edgestyle cannot be omitted or set "
-		  "to 'internal'!");
-	    exit(1);
-	}
-	num_pstyles++;
-	return;
-    }
-
-    if (!strcasecmp(el, "Edgestyle")) {
-	estyles[num_estyles].id[sizeof(estyles[0].id) - 1] = 0;
-	estyles[num_estyles].width = 0;
-	estyles[num_estyles].color = 0;
-	estyles[num_estyles].style = 0;
-	while (*attr) {
-	    if (!strcasecmp(*attr, "id"))
-		strncpy(estyles[num_estyles].id, *(attr + 1),
-			sizeof(estyles[0].id) - 1);
-	    if (!strcasecmp(*attr, "width"))
-		estyles[num_estyles].width = atoi(*(attr + 1));
-	    if (!strcasecmp(*attr, "color"))
-		estyles[num_estyles].color = strtol(*(attr + 1), NULL, 16);
-	    if (!strcasecmp(*attr, "style")) /* !@# names later */
-		estyles[num_estyles].style = atoi(*(attr + 1));
-	    attr += 2;
-	}
-	num_estyles++;
-	return;
-    }
-
-    if (!strcasecmp(el, "Bmpstyle")) {
-	bstyles[num_bstyles].flags = 0;
-	bstyles[num_bstyles].filename[sizeof(bstyles[0].filename) - 1] = 0;
-	bstyles[num_bstyles].id[sizeof(bstyles[0].id) - 1] = 0;
-/* add checks that these are filled !@# */
-
-	while (*attr) {
-	    if (!strcasecmp(*attr, "id"))
-		strncpy(bstyles[num_bstyles].id, *(attr + 1),
-			sizeof(bstyles[0].id) - 1);
-	    if (!strcasecmp(*attr, "filename"))
-		strncpy(bstyles[num_bstyles].filename, *(attr + 1),
-			sizeof(bstyles[0].filename) - 1);
-	    if (!strcasecmp(*attr, "scalable"))
-		if (!strcasecmp(*(attr + 1), "yes"))
-		    bstyles[num_bstyles].flags |= 1;
-	    attr += 2;
-	}
-	num_bstyles++;
-	return;
-    }
-
-    if (!strcasecmp(el, "Scale")) { /* "Undocumented feature" */
-	if (!*attr || strcasecmp(*attr, "value"))
-	    warn("Invalid Scale");
-	else
-	    scale = atof(*(attr + 1));
-	return;
-    }
-
-    if (!strcasecmp(el, "BallArea")) {
-	current_group = ++num_groups;
-	groups[current_group].type = TREASURE;
-	groups[current_group].team = TEAM_NOT_SET;
-	groups[current_group].hit_mask = BALL_BIT;
-	return;
-    }
-
-    if (!strcasecmp(el, "BallTarget")) {
-	int team;
-	while (*attr) {
-	    if (!strcasecmp(*attr, "team"))
-		team = atoi(*(attr + 1));
-	    attr += 2;
-	}
-	current_group = ++num_groups;
-	groups[current_group].type = TREASURE;
-	groups[current_group].team = team;
-	groups[current_group].hit_mask = NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));
-	return;
-    }
-
-    if (!strcasecmp(el, "Decor")) {
-	is_decor = 1;
-	return;
-    }
-
-    if (!strcasecmp(el, "Polygon")) {
-	int x, y, style = -1;
-	poly_t t;
-
-	while (*attr) {
-	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "style"))
-		style = get_poly_id(*(attr + 1));
-	    attr += 2;
-	}
-	if (x < 0 || x >= World.cwidth || y < 0 || y > World.cheight) {
-	    warn("Polygon start point (%d, %d) is not inside the map"
-		  "(0 <= x < %d, 0 <= y < %d)",
-		  x, y, World.cwidth, World.cheight);
-	    exit(1);
-	}
-	if (style == -1) {
-	    warn("Currently you must give polygon style, no default");
-	    exit(1);
-	}
-	ptscount = 0;
-	t.x = x;
-	t.y = y;
-	t.group = current_group;
-	t.edges = edges;
-	t.style = style;
-	t.estyles_start = ecount;
-	t.is_decor = is_decor;
-	current_estyle = pstyles[style].defedge_id;
-	STORE(poly_t, pdata, polyc, max_polys, t);
-	return;
-    }
-
-    if (!strcasecmp(el, "Check")) {
-	ipos t;
-	int x, y;
-
-	while (*attr) {
-	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1)) * scale;
-	    attr += 2;
-	}
-	t.x = x;
-	t.y = y;
-	STORE(ipos, World.check, World.NumChecks, max_checks, t);
-	return;
-    }
-
-    if (!strcasecmp(el, "Fuel")) {
-	fuel_t t;
-	int team, x, y;
-
-	team = TEAM_NOT_SET;
-	while (*attr) {
-	    if (!strcasecmp(*attr, "team"))
-		team = atoi(*(attr + 1));
-	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1)) * scale;
-	    attr += 2;
-	}
-	t.clk_pos.x = x;
-	t.clk_pos.y = y;
-	t.fuel = START_STATION_FUEL;
-	t.conn_mask = (unsigned)-1;
-	t.last_change = frame_loops;
-	t.team = team;
-	STORE(fuel_t, World.fuel, World.NumFuels, max_fuels, t);
-	return;
-    }
-
-    if (!strcasecmp(el, "Base")) {
-	base_t	t;
-	int	team, x, y, dir;
-
-	while (*attr) {
-	    if (!strcasecmp(*attr, "team"))
-		team = atoi(*(attr + 1));
-	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "dir"))
-		dir = atoi(*(attr + 1));
-	    attr += 2;
-	}
-	if (team < 0 || team >= MAX_TEAMS) {
-	    warn("Illegal team number in base tag.\n");
-	    exit(1);
 	}
 
-	t.pos.x = x;
-	t.pos.y = y;
-	t.dir = dir;
-	if (BIT(World.rules->mode, TEAM_PLAY)) {
-	    t.team = team;
-	    World.teams[team].NumBases++;
-	    if (World.teams[team].NumBases == 1)
-		World.NumTeamBases++;
-	} else {
-	    t.team = TEAM_NOT_SET;
-	}
-	STORE(base_t, World.base, World.NumBases, max_bases, t);
-	return;
-    }
+	switch (opt_origin) {
+	    case OPT_COMMAND:
+		/* command line always overrides */
+		set_ok = TRUE;
+		break;
 
-    if (!strcasecmp(el, "Ball")) {
-    	treasure_t t;
-	int team, x, y;
+	    case OPT_DEFAULTS:
+		switch (node->value->origin) {
+		    case OPT_COMMAND:
+			/* never modify command line arg. */
+			break;
 
-	while (*attr) {
-	    if (!strcasecmp(*attr, "team"))
-		team = atoi(*(attr + 1));
-	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1)) * scale;
-	    attr += 2;
-	}
-	t.pos.x = x;
-	t.pos.y = y;
-	t.have = false;
-	t.destroyed = 0;
-	t.team = team;
-	World.teams[team].NumTreasures++;
-	World.teams[team].TreasuresLeft++;
-	STORE(treasure_t, World.treasures, World.NumTreasures, max_balls, t);
-	return;
-    }
+		    case OPT_DEFAULTS:
+			/* can't change if previous value has override. */
+			if (!node->value->override) {
+			    set_ok = TRUE;
+			}
+			break;
 
-    if (!strcasecmp(el, "Option")) {
-	const char *name, *value;
-	while (*attr) {
-	    if (!strcasecmp(*attr, "name"))
-		name = *(attr + 1);
-	    if (!strcasecmp(*attr, "value"))
-		value = *(attr + 1);
-	    attr += 2;
-	}
-	addOption(name, value, 0, NULL, OPT_MAP);
-	return;
-    }
+		    case OPT_MAP:
+			/* defaults file override wins over map. */
+			if (override) {
+			    set_ok = TRUE;
+			}
+			break;
 
-    if (!strcasecmp(el, "Offset")) {
-	int x, y, edgestyle = -1;
-	while (*attr) {
-	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "style"))
-		edgestyle = get_edge_id(*(attr + 1));
-	    attr += 2;
-	}
-	if (ABS(x) > 30000 || ABS(y) > 30000) {
-	    warn("Offset component absolute value exceeds 30000 (x=%d, y=%d)",
-		  x, y);
-	    exit(1);
-	}
-	*edges++ = x;
-	*edges++ = y;
-	if (edgestyle != -1 && edgestyle != current_estyle) {
-	    STORE(int, estyleptr, ecount, max_echanges, ptscount);
-	    STORE(int, estyleptr, ecount, max_echanges, edgestyle);
-	    current_estyle = edgestyle;
-	}
-	ptscount++;
-	return;
-    }
+		    case OPT_PASSWORD:
+			/* never modify if set by password file. */
+			break;
 
-    if (!strcasecmp(el, "GeneralOptions"))
-	return;
+		    case OPT_INIT:
+			set_ok = TRUE;
+			break;
 
-    warn("Unknown map tag: \"%s\"", el);
-    return;
-}
+		    default:
+			fatal("unknown node->value origin in set value");
+		}
+		break;
 
+	    case OPT_MAP:
+		switch (node->value->origin) {
+		    case OPT_COMMAND:
+			/* never modify command line arg. */
+			break;
 
-static void tagend(void *data, const char *el)
-{
-    void cmdhack(void);
-    if (!strcasecmp(el, "Decor"))
-	is_decor = 0;
-    if (!strcasecmp(el, "BallArea") || !strcasecmp(el, "BallTarget"))
-	current_group = 0;
-    if (!strcasecmp(el, "Polygon")) {
-	pdata[polyc - 1].num_points = ptscount;
-	pdata[polyc - 1].num_echanges = ecount -pdata[polyc - 1].estyles_start;
-	STORE(int, estyleptr, ecount, max_echanges, INT_MAX);
-    }
-    if (!strcasecmp(el, "GeneralOptions")) {
-	cmdhack(); /* !@# */
-	parseOptions();
-	Grok_map();
-    }
-    return;
-}
+		    case OPT_DEFAULTS:
+			/* can't change if defaults value has override. */
+			if (!node->value->override) {
+			    set_ok = TRUE;
+			}
+			break;
 
+		    case OPT_MAP:
+			/* can't change if previous value has override. */
+			if (!node->value->override) {
+			    set_ok = TRUE;
+			}
+			break;
 
-int Load_lines(int fd)
-{
-    char buff[8192];
-    int len;
-    XML_Parser p = XML_ParserCreate(NULL);
+		    case OPT_PASSWORD:
+			/* never modify if set by password file. */
+			break;
 
-    if (!p) {
-	warn("Creating Expat instance for map parsing failed.\n");
-	exit(1);
-    }
-    XML_SetElementHandler(p, tagstart, tagend);
-    do {
-	len = read(fd, buff, 8192);
-	if (len < 0) {
-	    error("Error reading map!");
-	    return false;
-	}
-	if (!XML_Parse(p, buff, len, !len)) {
-	    warn("Parse error reading map at line %d:\n%s\n",
-		  XML_GetCurrentLineNumber(p),
-		  XML_ErrorString(XML_GetErrorCode(p)));
-	    exit(1);
-	}
-    } while (len);
-    return 1;
-}
+		    case OPT_INIT:
+			set_ok = TRUE;
+			break;
 
+		    default:
+			fatal("unknown node->value origin in set value");
+		}
+		break;
 
-/*
- * Parse a file containing defaults (and possibly a map).
- */
-static bool parseOpenFile(FILE *ifile)
-{
-    int		fd;
+	    case OPT_PASSWORD:
+		switch (node->value->origin) {
+		    case OPT_COMMAND:
+			/* never modify command line arg. */
+			break;
 
-    fd = fileno(ifile);
+		    case OPT_DEFAULTS:
+			/* password file always wins over defaults. */
+			set_ok = TRUE;
+			break;
 
-    return Load_lines(fd);
-}
+		    case OPT_MAP:
+			/* password file always wins over map. */
+			set_ok = TRUE;
+			break;
 
-static int copyFilename(const char *file)
-{
-    if (FileName) {
-	free(FileName);
-    }
-    FileName = strdup(file);
-    return (FileName != 0);
-}
+		    case OPT_PASSWORD:
+			/* can't change if previous value has override. */
+			if (!node->value->override) {
+			    set_ok = TRUE;
+			}
+			break;
 
+		    case OPT_INIT:
+			set_ok = TRUE;
+			break;
 
-static FILE *fileOpen(const char *file)
-{
-    FILE *fp = fopen(file, "r");
-    if (fp ) {
-	if (!copyFilename(file)) {
-	    fclose(fp);
-	    fp = NULL;
+		    default:
+			fatal("unknown node->value origin in set value");
+		}
+		break;
+
+	    default:
+		fatal("unknown opt_origin in set value");
 	}
     }
-    return fp;
-}
 
-
-static void fileClose(FILE *fp)
-{
-    fclose(fp);
-    if (FileName) {
-	free(FileName);
-	FileName = NULL;
-    }
-}
-
-
-/*
- * Test if filename has the XPilot map extension.
- */
-static int hasMapExtension(const char *filename)
-{
-    int fnlen = strlen(filename);
-    if (fnlen > 3 && !strcmp(&filename[fnlen - 4], ".xp2")) {
-	return 1;
-    }
-    if (fnlen > 4 && !strcmp(&filename[fnlen - 4], ".map")) {
-	return 1;
-    }
-    return 0;
-}
-
-
-/*
- * Test if filename has a directory component.
- */
-static int hasDirectoryPrefix(const char *filename)
-{
-    static const char	sep = '/';
-    return (strchr(filename, sep) != NULL);
-}
-
-
-/*
- * Combine a directory and a file.
- * Returns new path as dynamically allocated memory.
- */
-static char *fileJoin(const char *dir, const char *file)
-{
-    static const char	sep = '/';
-    char		*path;
-
-    path = (char *) malloc(strlen(dir) + 1 + strlen(file) + 1);
-    if (path) {
-	sprintf(path, "%s%c%s", dir, sep, file);
-    }
-    return path;
-}
-
-
-/*
- * Combine a file and a filename extension.
- * Returns new path as dynamically allocated memory.
- */
-static char *fileAddExtension(const char *file, const char *ext)
-{
-    char		*path;
-
-    path = (char *) malloc(strlen(file) + strlen(ext) + 1);
-    if (path) {
-	sprintf(path, "%s%s", file, ext);
-    }
-    return path;
-}
-
-
-#if defined(COMPRESSED_MAPS)
-static int	usePclose;
-
-
-static int isCompressed(const char *filename)
-{
-    int fnlen = strlen(filename);
-    int celen = strlen(Conf_zcat_ext());
-    if (fnlen > celen && !strcmp(&filename[fnlen - celen], Conf_zcat_ext())) {
-	return 1;
-    }
-    return 0;
-}
-
-
-static void closeCompressedFile(FILE *fp)
-{
-    if (usePclose) {
-	pclose(fp);
-	usePclose = 0;
-	if (FileName) {
-	    free(FileName);
-	    FileName = NULL;
+    if (set_ok == TRUE) {
+	if (node->value == NULL) {
+	    node->value = Option_allocate_value(value, NULL, opt_origin);
+	    if (node->value == NULL) {
+		fatal("Not enough memory.");
+	    }
+	    else {
+		node->value->refcount++;
+	    }
 	}
-    } else {
-	fileClose(fp);
-    }
-}
-
-
-static FILE *openCompressedFile(const char *filename)
-{
-    FILE		*fp = NULL;
-    char		*cmdline = NULL;
-    char		*newname = NULL;
-
-    usePclose = 0;
-    if (!isCompressed(filename)) {
-	if (access(filename, 4) == 0) {
-	    return fileOpen(filename);
-	}
-	newname = fileAddExtension(filename, Conf_zcat_ext());
-	if (!newname) {
-	    return NULL;
-	}
-	filename = newname;
-    }
-    if (access(filename, 4) == 0) {
-	cmdline = (char *) malloc(strlen(Conf_zcat_format()) + strlen(filename) + 1);
-	if (cmdline) {
-	    sprintf(cmdline, Conf_zcat_format(), filename);
-	    fp = popen(cmdline, "r");
-	    if (fp) {
-		usePclose = 1;
-		if (!copyFilename(filename)) {
-		    closeCompressedFile(fp);
-		    fp = NULL;
+	else {
+	    if (node->value->value != NULL) {
+		option_desc *desc = node->value->desc;
+		if (!desc || node->value->value != desc->defaultValue) {
+		    free(node->value->value);
 		}
 	    }
+	    if (value == NULL) {
+		node->value->value = NULL;
+	    }
+	    else {
+		node->value->value = xp_safe_strdup(value);
+	    }
 	}
+	node->value->override = override;
+	node->value->origin = opt_origin;
     }
-    if (newname) free(newname);
-    if (cmdline) free(cmdline);
-    return fp;
-}
-
-#else
-
-static int isCompressed(const char *filename)
-{
-    return 0;
-}
-
-static void closeCompressedFile(FILE *fp)
-{
-    fileClose(fp);
-}
-
-static FILE *openCompressedFile(const char *filename)
-{
-    return fileOpen(filename);
-}
+#if DEVELOPMENT
+    else {
+	const char *old_value_origin_name = Origin_name(node->value->origin);
+	const char *new_value_origin_name = Origin_name(opt_origin);
+	warn("Not modifying %s option '%s' from %s\n",
+	     old_value_origin_name,
+	     node->name,
+	     new_value_origin_name);
+    }
 #endif
-
-/*
- * Open a map file.
- * Filename argument need not contain map filename extension
- * or compress filename extension.
- * The search order should be:
- *      filename
- *      filename.gz              if COMPRESSED_MAPS is true
- *      filename.xp2
- *      filename.xp2.gz          if COMPRESSED_MAPS is true
- *      filename.map
- *      filename.map.gz          if COMPRESSED_MAPS is true
- *      MAPDIR filename
- *      MAPDIR filename.gz       if COMPRESSED_MAPS is true
- *      MAPDIR filename.xp2
- *      MAPDIR filename.xp2.gz   if COMPRESSED_MAPS is true
- *      MAPDIR filename.map
- *      MAPDIR filename.map.gz   if COMPRESSED_MAPS is true
- */
-static FILE *openMapFile(const char *filename)
-{
-    FILE		*fp = NULL;
-    char		*newname;
-    char		*newpath;
-
-    fp = openCompressedFile(filename);
-    if (fp) {
-	return fp;
-    }
-    if (!isCompressed(filename)) {
-	if (!hasMapExtension(filename)) {
-	    newname = fileAddExtension(filename, ".xp2");
-	    fp = openCompressedFile(newname);
-	    free(newname);
-	    if (fp) {
-		return fp;
-	    }
-	    newname = fileAddExtension(filename, ".map");
-	    fp = openCompressedFile(newname);
-	    free(newname);
-	    if (fp) {
-		return fp;
-	    }
-	}
-    }
-    if (!hasDirectoryPrefix(filename)) {
-	newpath = fileJoin(Conf_mapdir(), filename);
-	if (!newpath) {
-	    return NULL;
-	}
-	if (hasDirectoryPrefix(newpath)) {
-	    /* call recursively. */
-	    fp = openMapFile(newpath);
-	}
-	free(newpath);
-	if (fp) {
-	    return fp;
-	}
-    }
-    return NULL;
-}
-
-
-static void closeMapFile(FILE *fp)
-{
-    closeCompressedFile(fp);
-}
-
-
-static FILE *openDefaultsFile(const char *filename)
-{
-    return fileOpen(filename);
-}
-
-
-static void closeDefaultsFile(FILE *fp)
-{
-    fileClose(fp);
 }
 
 
 /*
- * Parse a file containing defaults.
+ * Scan through the hash table of option name-value pairs looking for
+ * an option with the specified name; if found call Option_change_node
+ * to set option to the new value if permissions allow us to do so.
  */
-bool parseDefaultsFile(const char *filename)
+void Option_set_value(
+	const char	*name,
+	const char	*value,
+	int		override,
+	optOrigin	opt_origin)
 {
-    FILE       *ifile;
+    hash_node	*np;
+    hash_value	*vp;
+    int		ix = Option_hash_string(name);
+
+    for (np = Option_hash_array[ix]; np; np = np->next) {
+	if (!strcasecmp(name, np->name)) {
+	    Option_change_node(np, value, override, opt_origin);
+	    return;
+	}
+    }
+
+    if (!value) {
+	return;
+    }
+
+    vp = Option_allocate_value(value, NULL, opt_origin);
+    if (!vp) {
+	exit(1);
+    }
+    vp->override = override;
+
+    np = Option_allocate_node(name, vp);
+    if (!np) {
+	exit(1);
+    }
+
+    np->next = Option_hash_array[ix];
+    Option_hash_array[ix] = np;
+}
+
+
+/*
+ * Return the value of the specified option,
+ * or NULL if there is no value for that option.
+ */
+char *Option_get_value(const char *name, optOrigin *origin_ptr)
+{
+    hash_node	*np = Get_hash_node_by_name(name);
+
+    if (np != NULL) {
+	if (origin_ptr != NULL) {
+	    *origin_ptr = np->value->origin;
+	}
+	return np->value->value;
+    }
+
+    return (char *)NULL;
+}
+
+
+/*
+ * Free all option hash table related dynamically allocated memory.
+ */
+static void Options_hash_free(void)
+{
+    int		i;
+    hash_node	*np;
+
+    for (i = 0; i < HASH_SIZE; i++) {
+	while ((np = Option_hash_array[i]) != NULL) {
+	    Option_hash_array[i] = np->next;
+	    Option_free_node(np);
+	}
+    }
+
+    if (hash_nodes_allocated != hash_nodes_freed) {
+	errno = 0;
+	error("hash nodes alloc = %d, hash nodes free = %d, delta = %d\n",
+		hash_nodes_allocated, hash_nodes_freed,
+		hash_nodes_allocated - hash_nodes_freed);
+    }
+
+    if (hash_values_allocated != hash_values_freed) {
+	errno = 0;
+	error("hash values alloc = %d, hash values free = %d, delta = %d\n",
+		hash_values_allocated, hash_values_freed,
+		hash_values_allocated - hash_values_freed);
+    }
+}
+
+
+/*
+ * Print info about our hashing function performance.
+ */
+static void Options_hash_performance(void)
+{
+#ifdef DEVELOPMENT
+    int			bucket_use_count;
+    int			i;
+    hash_node		*np;
+    unsigned char	histo[HASH_SIZE];
+    char		msg[MSG_LEN];
+
+    if (getenv("XPILOTSHASHPERF") == NULL) {
+	return;
+    }
+
+    memset(histo, 0, sizeof(histo));
+    for (i = 0; i < HASH_SIZE; i++) {
+	bucket_use_count = 0;
+	for (np = Option_hash_array[i]; np; np = np->next) {
+	    bucket_use_count++;
+	}
+	histo[bucket_use_count]++;
+    }
+
+    sprintf(msg, "hash perf histo:");
+    for (i = 0; i < NELEM(histo); i++) {
+	sprintf(msg + strlen(msg), " %d", histo[i]);
+	if (strlen(msg) > 75) {
+	    break;
+	}
+    }
+    printf("%s\n", msg);
+#endif
+}
+
+
+bool Convert_string_to_int(const char *value_str, int *int_ptr)
+{
+    char	*end_ptr = NULL;
+    long	value;
     bool	result;
 
-    if ((ifile = openDefaultsFile(filename)) == NULL) {
-	return false;
-    }
-    result = parseOpenFile(ifile);
-    closeDefaultsFile(ifile);
+    /* base 0 has special meaning. */
+    value = strtol(value_str, &end_ptr, 0);
 
-    return true;
+    /* store value regardless of error. */
+    *int_ptr = (int) value;
+
+    /* if at least one digit was found we're satisfied. */
+    if (end_ptr > value_str) {
+	result = TRUE;
+    } else {
+	result = FALSE;
+    }
+
+    return result;
+}
+
+
+bool Convert_string_to_float(const char *value_str, DFLOAT *float_ptr)
+{
+    char	*end_ptr = NULL;
+    double	value;
+    bool	result;
+
+    value = strtod(value_str, &end_ptr);
+
+    /* store value regardless of error. */
+    *float_ptr = (DFLOAT) value;
+
+    /* if at least one digit was found we're satisfied. */
+    if (end_ptr > value_str) {
+	result = TRUE;
+    } else {
+	result = FALSE;
+    }
+
+    return result;
+}
+
+
+bool Convert_string_to_bool(const char *value_str, bool *bool_ptr)
+{
+    bool	result;
+
+    if (!strcasecmp(value_str, "yes")
+	|| !strcasecmp(value_str, "on")
+	|| !strcasecmp(value_str, "true")) {
+	*bool_ptr = TRUE;
+	result = TRUE;
+    }
+    else if (!strcasecmp(value_str, "no")
+	     || !strcasecmp(value_str, "off")
+	     || !strcasecmp(value_str, "false")) {
+	*bool_ptr = FALSE;
+	result = TRUE;
+    }
+    else {
+	result = FALSE;
+    }
+
+    return result;
+}
+
+
+void Convert_list_to_string(list_t list, char **string)
+{
+    list_iter_t	iter;
+    size_t	size = 0;
+
+    for (iter = List_begin(list);
+	 iter != List_end(list);
+	 LI_FORWARD(iter)) {
+	size += 1 + strlen((const char *) LI_DATA(iter));
+    }
+    *string = (char *) xp_safe_malloc(size);
+    **string = '\0';
+    for (iter = List_begin(list);
+	 iter != List_end(list);
+	 LI_FORWARD(iter)) {
+	if (iter != List_begin(list)) {
+	    strlcat(*string, ",", size);
+	}
+	strlcat(*string, (const char *) LI_DATA(iter), size);
+    }
+}
+
+
+void Convert_string_to_list(const char *value, list_t *list_ptr)
+{
+    const char	*start, *end;
+    char	*str;
+
+    /* possibly allocate a new list. */
+    if (NULL == *list_ptr) {
+	*list_ptr = List_new();
+	if (NULL == *list_ptr) {
+	    fatal("Not enough memory for list");
+	}
+    }
+
+    /* make sure list is empty. */
+    List_clear(*list_ptr);
+
+    /* copy comma separated list elements from value to list. */
+    for (start = value; *start; start = end) {
+	/* skip comma separators. */
+	while (*start == ',') {
+	    start++;
+	}
+	/* search for end of list element. */
+	end = start;
+	while (*end && *end != ',') {
+	    end++;
+	}
+	/* copy non-zero results to list. */
+	if (start < end) {
+	    str = (char *) xp_safe_malloc((end - start) + 1);
+	    memcpy(str, start, (end - start));
+	    str[(end - start)] = '\0';
+	    if (NULL == List_push_back(*list_ptr, str)) {
+		fatal("Not enough memory for list element");
+	    }
+	}
+    }
 }
 
 
 /*
- * Parse a file containing a map.
+ * Set the option description variable.
  */
-bool parseMapFile(const char *filename)
+static void Option_parse_node(hash_node *np)
 {
-    FILE       *ifile;
-    bool	result;
+    option_desc	*desc;
+    const char	*value;
 
-    if ((ifile = openMapFile(filename)) == NULL) {
-	return false;
+    /* Does it have a description?   If so, get a pointer to it */
+    if ((desc = np->value->desc) == NULL) {
+	return;
     }
-    result = parseOpenFile(ifile);
-    closeMapFile(ifile);
 
-    return true;
+    /* get value from command line, defaults file or map file. */
+    value = np->value->value;
+    if (value == NULL) {
+	/* no value has been set, so get the option default value. */
+	value = desc->defaultValue;
+	if (value == NULL) {
+	    /* no value at all.  (mapData or serverHost.) */
+	    return;
+	}
+    }
+
+    if (!desc->variable) {
+	if (desc->type == valVoid) {
+	    return;
+	}
+	else {
+	    dumpcore("Hashed option %s has no value", np->name);
+	}
+    }
+
+    switch (desc->type) {
+
+    case valVoid:
+	break;
+
+    case valInt:
+	{
+	    int		*ptr = (int *)desc->variable;
+
+	    if (Convert_string_to_int(value, ptr) != TRUE) {
+		warn("%s value '%s' not an integral number.",
+			np->name, value);
+		Convert_string_to_int(desc->defaultValue, ptr);
+	    }
+	    break;
+	}
+
+    case valReal:
+	{
+	    DFLOAT	*ptr = (DFLOAT *)desc->variable;
+
+	    if (Convert_string_to_float(value, ptr) != TRUE) {
+		warn("%s value '%s' not a number.",
+			np->name, value);
+		Convert_string_to_float(desc->defaultValue, ptr);
+	    }
+	    break;
+	}
+
+    case valBool:
+	{
+	    bool	*ptr = (bool *)desc->variable;
+
+	    if (Convert_string_to_bool(value, ptr) != TRUE) {
+		warn("%s value '%s' not a boolean.",
+			np->name, value);
+		Convert_string_to_bool(desc->defaultValue, ptr);
+	    }
+	    break;
+	}
+
+    case valIPos:
+	{
+	    ipos	*ptr = (ipos *)desc->variable;
+	    char	*s;
+
+	    s = strchr(value, ',');
+	    if (!s) {
+		error("Invalid coordinate pair for %s - %s\n",
+		      desc->name, value);
+		break;
+	    }
+	    if (Convert_string_to_int(value, &(ptr->x)) != TRUE ||
+		Convert_string_to_int(s + 1, &(ptr->y)) != TRUE) {
+		warn("%s value '%s' not a valid position.",
+			np->name, value);
+		value = desc->defaultValue;
+		s = strchr(value, ',');
+		Convert_string_to_int(value, &(ptr->x));
+		Convert_string_to_int(s + 1, &(ptr->y));
+	    }
+	    break;
+	}
+
+    case valString:
+	{
+	    char	**ptr = (char **)desc->variable;
+
+	    *ptr = xp_safe_strdup(value);
+	    break;
+	}
+
+    case valSec:
+	{
+	    int		*ptr = (int *)desc->variable;
+	    DFLOAT	seconds;
+
+	    if (Convert_string_to_float(value, &seconds) != TRUE) {
+		warn("%s value '%s' not a number.",
+			np->name, value);
+		Convert_string_to_float(desc->defaultValue, &seconds);
+	    }
+	    *ptr = (int)(seconds * FPS);
+	    break;
+	}
+
+    case valPerSec:
+	{
+	    DFLOAT	*ptr = (DFLOAT *)desc->variable;
+	    DFLOAT	seconds;
+
+	    if (Convert_string_to_float(value, &seconds) != TRUE) {
+		warn("%s value '%s' not a number.",
+			np->name, value);
+		Convert_string_to_float(desc->defaultValue, &seconds);
+	    }
+
+	    *ptr = (DFLOAT)(seconds / FPS);
+	    break;
+	}
+
+    case valList:
+	{
+	    list_t	*list_ptr = (list_t *)desc->variable;
+
+	    Convert_string_to_list(value, list_ptr);
+	    break;
+	}
+    }
+}
+
+
+/*
+ * Expand any "expand" arguments.
+ */
+static void Options_parse_expand(void)
+{
+    hash_node	*np;
+
+    np = Get_hash_node_by_name("expand");
+    if (np == NULL) {
+	dumpcore("Could not find option hash node for option '%s'.",
+		 "expand");
+    }
+    else {
+	Option_parse_node(np);
+    }
+
+    if (expandList != NULL) {
+	char *name;
+	while ((name = (char *) List_pop_front(expandList)) != NULL) {
+	    expandKeyword(name);
+	}
+	List_delete(expandList);
+	expandList = NULL;
+    }
+}
+
+
+/*
+ * Parse the -FPS option.
+ */
+static void Options_parse_FPS(void)
+{
+    char	*fpsstr;
+    optOrigin	value_origin;
+
+    fpsstr = Option_get_value("framesPerSecond", &value_origin);
+    if (fpsstr != NULL) {
+	int		frames;
+
+	if (Convert_string_to_int(fpsstr, &frames) != TRUE) {
+	    warn("Invalid framesPerSecond specification '%s' in %s.",
+		fpsstr, Origin_name(value_origin));
+	}
+	else {
+	    framesPerSecond = frames;
+	}
+    }
+
+    if (FPS <= 0) {
+	fatal("Can't run with %d frames per second, should be positive\n",
+	    FPS);
+    }
+
 }
 
 
@@ -917,142 +975,46 @@ bool parseMapFile(const char *filename)
  * assigned to them.   Process the defaults and, if possible, set the
  * associated variables.
  */
-void parseOptions(void)
+void Options_parse(void)
 {
-    int         i;
-    valPair    *tmp, *next;
-    char       *fpsstr;
-    optionDesc *desc;
+    int		i;
+    hash_node	*np;
+    option_desc	*options;
+    int		option_count;
+
+    options = Get_option_descs(&option_count);
+
+    /*
+     * Expand a possible "-expand" option.
+     */
+    Options_parse_expand();
 
     /*
      * This must be done in order that FPS will return the eventual
      * frames per second for computing valSec and valPerSec.
      */
-    if ((fpsstr = getOption("framesPerSecond")) != NULL)
-	framesPerSecond = atoi(fpsstr);
-    if (FPS <= 0) {
-	warn("Can't run with %d frames per second, should be positive\n",
-	    FPS);
-	End_game();
-    }
+    Options_parse_FPS();
 
-    for (i = 0; i < NHASH; i++)
-	for (tmp = hashArray[i]; tmp; tmp = tmp->next) {
-	    /* Does it have a default?   (If so, get a pointer to it) */
-	    if ((desc = (optionDesc *)tmp->def) != NULL) {
-		if (tmp->origin != OPT_DEFAULT &&
-		    !(tmp->origin & desc->flags)) {
-		    warn("%s may not be set in map file", desc->name);
-		    exit(1); /* Can't continue since the default value was
-			      * lost. This could be fixed with some extra
-			      * tricks if needed. */
-		}
-		if (desc->variable) {
-		    switch (desc->type) {
-
-		    case valVoid:
-			break;
-
-		    case valInt:
-			{
-			    int        *ptr = (int *)desc->variable;
-
-			    *ptr = atoi(tmp->value);
-			    break;
-			}
-
-		    case valReal:
-			{
-			    DFLOAT     *ptr = (DFLOAT *)desc->variable;
-
-			    *ptr = atof(tmp->value);
-			    break;
-			}
-
-		    case valBool:
-			{
-			    bool	*ptr = (bool *)desc->variable;
-
-			    if (!strcasecmp(tmp->value, "yes")
-				|| !strcasecmp(tmp->value, "on")
-				|| !strcasecmp(tmp->value, "true"))
-				*ptr = true;
-			    else if (!strcasecmp(tmp->value, "no")
-				     || !strcasecmp(tmp->value, "off")
-				     || !strcasecmp(tmp->value, "false"))
-				*ptr = false;
-			    else {
-				warn("Invalid boolean value for %s - %s\n",
-				      desc->name, tmp->value);
-			    }
-			    break;
-			}
-
-		    case valIPos:
-			{
-			    ipos       *ptr = (ipos *)desc->variable;
-			    char       *s;
-
-			    s = strchr(tmp->value, ',');
-			    if (!s) {
-				warn("Invalid coordinate pair for %s - %s\n",
-				      desc->name, tmp->value);
-				break;
-			    }
-			    ptr->x = atoi(tmp->value);
-			    ptr->y = atoi(++s);
-			    break;
-			}
-
-		    case valString:
-			{
-			    char      **ptr = (char **)desc->variable;
-
-			    *ptr = tmp->value;
-			    break;
-			}
-
-		    case valSec:
-			{
-			    int		*ptr = (int *)desc->variable;
-
-			    *ptr = (int)(atof(tmp->value) * FPS);
-			    break;
-			}
-
-		    case valPerSec:
-			{
-			    DFLOAT	*ptr = (DFLOAT *)desc->variable;
-
-			    *ptr = (DFLOAT)(atof(tmp->value) / FPS);
-			    break;
-			}
-		    }
-		}
-	    }
+    for (i = 0; i < option_count; i++) {
+	np = Get_hash_node_by_name(options[i].name);
+	if (np == NULL) {
+	    dumpcore("Could not find option hash node for option '%s'.",
+		     options[i].name);
 	}
-
-    for (i = 0; i < NHASH; i++) {
-	for (tmp = hashArray[i]; tmp; tmp = next) {
-	    free(tmp->name);
-	    /* free(tmp->value); */
-	    next = tmp->next;
-	    memset((void *)tmp, 0, sizeof(*tmp));
-	    free(tmp);
+	else {
+	    Option_parse_node(np);
 	}
     }
 }
 
 
-#ifdef	_WINDOWS
-/* clear the hashArray in case we're restarted */
-void	FreeOptions()
+/*
+ * Free the option database memory.
+ */
+void Options_free(void)
 {
-	int		i;
-    /* valPair    *tmp, *next; */
-
-	for (i=0; i<NHASH; i++) {
-	}
-
+    Options_hash_performance();
+    Options_hash_free();
 }
-#endif
+
+

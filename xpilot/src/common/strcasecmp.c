@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,6 +25,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+
+
+/* prototypes to shut up strict compiler. */
+int strcasecmp(const char *str1, const char *str2);
+int strncasecmp(const char *str1, const char *str2, size_t n);
+
 
 /*
  * By Ian Malcom Brown.

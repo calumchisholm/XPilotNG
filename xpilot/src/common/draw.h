@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,15 +28,13 @@
 #ifndef TYPES_H
 /* need position */
 #include "types.h"
-#endif
-
 #include "const.h"
+#endif
 
 /*
  * Abstract (non-display system specific) drawing definitions.
  *
- * This file should not contain any X window stuff as VMS
- * does not accept this in the server.  Rightly so. :-)
+ * This file should not contain any X window stuff.
  */
 
 /*
@@ -59,7 +57,7 @@
 #define	MISSILECOLOR	18		/* wide white pen */
 #define	LASERCOLOR		19		/* wide red pen */
 #define	LASERTEAMCOLOR	20		/* wide blue pen */
-#define	FUNKCOLORS		6		/* 5 funky colors here (15-20) */
+#define	FUNKCOLORS		6		/* 6 funky colors here (15-20) */
 #endif
 
 /*
@@ -78,12 +76,8 @@
 
 #define DSIZE		    4	    /* Size of diamond (on radar) */
 
-#define MSG_DURATION	    1024
-#define MSG_FLASH	    892
-
-#define TITLE_DELAY	    500
-#define	UPDATE_SCORE_DELAY  (FPS)
-#define CONTROL_DELAY	    100
+#define	UPDATE_SCORE_DELAY	(FPS)
+#define CONTROL_DELAY		100
 
 /*
  * Polygon style flags
@@ -104,7 +98,9 @@
 #define MAX_RACK_PTS	    4
 
 #ifdef SERVER
-#define SHIPCOORD ipos
+/* kps - fix */
+#include "../server/click.h"
+#define SHIPCOORD clpos
 #else
 #define SHIPCOORD position
 #endif
@@ -129,20 +125,22 @@ typedef struct {			/* Defines wire-obj, i.e. ship */
     int		num_m_rack;		/* Number of missile racks */
     SHIPCOORD	*m_rack[MAX_RACK_PTS];
     int		shield_radius;		/* Radius of shield used by client. */
-#ifdef	_NAMEDSHIPS
-	char*	name;
-	char*	author;
-#endif
-} wireobj;
 
-extern wireobj *Default_ship(void);
-extern void Free_ship_shape(wireobj *w);
-extern wireobj *Parse_shape_str(char *str);
-extern wireobj *Convert_shape_str(char *str);
-extern void Calculate_shield_radius(wireobj *w);
+#ifdef	_NAMEDSHIPS
+    char*	name;
+    char*	author;
+#endif
+} shipobj;
+
+extern shipobj *Default_ship(void);
+extern void Free_ship_shape(shipobj *w);
+extern shipobj *Parse_shape_str(char *str);
+extern shipobj *Convert_shape_str(char *str);
+extern void Calculate_shield_radius(shipobj *w);
 extern int Validate_shape_str(char *str);
-extern void Convert_ship_2_string(wireobj *w, char *buf, char *ext,
+extern void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 				  unsigned shape_version);
+void Rotate_point(SHIPCOORD pt[RES]);
 
 extern DFLOAT rfrac(void);
 

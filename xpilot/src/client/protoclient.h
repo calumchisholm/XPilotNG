@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,10 +25,6 @@
 #ifndef	PROTOCLIENT_H
 #define	PROTOCLIENT_H
 
-#ifdef VMS
-#include "strcasecmp.h"
-#endif
-
 /*
  * about.c
  */
@@ -42,6 +38,7 @@ extern	void Keys_destroy();
 
 extern int motd_viewer;		/* so Windows can clean him up */
 extern int keys_viewer;
+
 
 /*
  * colors.c
@@ -81,6 +78,14 @@ extern int Join(char *server_addr, char *server_name, int port,
 extern int metaclient(int, char **);
 
 /*
+ * math.c
+ */
+#if 0
+extern int ON(char *optval);
+extern int OFF(char *optval);
+#endif
+
+/*
  * paintdata.c
  */
 extern void paintdataCleanup(void);		/* memory cleanup */
@@ -89,6 +94,7 @@ extern void paintdataCleanup(void);		/* memory cleanup */
  * paintobjects.c
  */
 extern int Init_wreckage(void);
+extern int Init_asteroids(void);
 
 
 /*
@@ -107,6 +113,11 @@ extern bool		Is_allowed(char *);
  */
 extern void Record_cleanup(void);
 extern void Record_init(char *filename);
+
+/*
+ * sim.c
+ */
+extern void Simulate(void);
 
 /*
  * textinterface.c
@@ -158,3 +169,5 @@ extern	void WinXCreateItemBitmaps();
 
 
 #endif	/* PROTOCLIENT_H */
+
+

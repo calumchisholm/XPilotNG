@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,53 +28,85 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#ifndef	_WINDOWS
-#include <unistd.h>
-#include <sys/param.h>
-#include <netdb.h>
-#else
-#include "NT/winNet.h"
-#include "NT/winClient.h"
+#ifndef _WINDOWS
+# include <unistd.h>
+# include <sys/param.h>
+# include <netdb.h>
 #endif
 
-#ifdef	_WINDOWS
-#include "NT/winNet.h"
-#include "NT/winClient.h"
-#else
-# include <netdb.h>
+#ifdef _WINDOWS
+# include "NT/winNet.h"
+# include "NT/winClient.h"
 #endif
 
 #include "version.h"
 #include "config.h"
 #include "error.h"
+#include "client.h"
 #include "socklib.h"
 #include "protoclient.h"
 #include "datagram.h"
 #include "portability.h"
 
+extern int	clientPortStart;	/* First UDP port for clients */
+extern int	clientPortEnd;		/* Last one (these are for firewalls) */
 
-int dgram_one_socket = 0;
+char datagram_version[] = VERSION;
+
+
+int			dgram_one_socket = 0;
 
 
 int create_dgram_addr_socket(sock_t *sock, char *dotaddr, int port)
 {
     static int		saved;
     static sock_t	save_sock;
-    int			status;
+    int			status = SOCK_IS_ERROR;
+    int			i;
 
     if (saved == 0) {
-	status = sock_open_udp(sock, dotaddr, port);
+	if (clientPortStart && (!clientPortEnd || clientPortEnd > 65535)) {
+	    clientPortEnd = 65535;
+	}
+	if (clientPortEnd && (!clientPortStart || clientPortStart < 1024)) {
+	    clientPortStart = 1024;
+	}
+
+	if (port || !clientPortStart || (clientPortStart > clientPortEnd)) {
+	    status = sock_open_udp(sock, dotaddr, port);
+	    if (status == SOCK_IS_ERROR) {
+		error("Cannot create datagram socket (%d)", sock->error.error);
+		return -1;
+	    }
+	}
+	else {
+	    int found_socket = 0;
+	    for (i = clientPortStart; i <= clientPortEnd; i++) {
+		status = sock_open_udp(sock, dotaddr, i);
+		if (status != SOCK_IS_ERROR) {
+		    found_socket = 1;
+		    break;
+		}
+	    }
+	    if (found_socket == 0) {
+		error("Could not find a usable port in port range [%d,%d]",
+		      clientPortStart, clientPortEnd);
+		return -1;
+	    }
+	}
+
 	if (status == SOCK_IS_OK) {
-	    if (dgram_one_socket)
+	    if (dgram_one_socket) {
 		save_sock = *sock;
+	    }
 	}
     } else {
 	*sock = save_sock;
 	status = SOCK_IS_OK;
     }
+
     return status;
 }
-
 
 int create_dgram_socket(sock_t *sock, int port)
 {
@@ -83,9 +115,10 @@ int create_dgram_socket(sock_t *sock, int port)
     return create_dgram_addr_socket(sock, any_addr, port);
 }
 
-
 void close_dgram_socket(sock_t *sock)
 {
-    if (!dgram_one_socket)
+    if (!dgram_one_socket) {
 	sock_close(sock);
+    }
 }
+

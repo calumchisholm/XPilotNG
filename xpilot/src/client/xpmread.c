@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
@@ -43,6 +43,7 @@
 #include "paint.h"
 #include "xinit.h"
 #include "error.h"
+#include "commonproto.h"
 
 #define XPM_READ_C
 #include "xpmread.h"
@@ -185,14 +186,14 @@ static char *xpm_next_string(XPM_read *xpmr)
 	/* point to next string. */
 	xpmr->static_data++;
 	/* static_data may point to read-only memory (Linux). */
-	xpmr->token = strdup(*xpmr->static_data);
+	xpmr->token = xp_strdup(*xpmr->static_data);
     }
     else {
 	/* skip any non-string tokens. */
 	while (xpm_next_token(xpmr)) {
 	    if (xpmr->token[0] == '"') {
 		/* strip the string double quotes. */
-		char *str = strdup(xpmr->token + 1);
+		char *str = xp_strdup(xpmr->token + 1);
 		free(xpmr->token);
 		xpmr->token = str;
 		if (str && (str = strchr(str, '"')) != NULL) {
@@ -263,7 +264,7 @@ static int xpm_parse_data(XPM_read *xpmr)
 			 /* key already defined for this color! */
 			 break;
 		     }
-		     xpmr->xpm->colors[i].keys[k] = strdup(str);
+		     xpmr->xpm->colors[i].keys[k] = xp_strdup(str);
 		     num_keys++;
 		     break;
 		 }
@@ -419,7 +420,7 @@ static int xpm_read_xpm_from_data(const char **data, XPM *xpm)
     memset(&xpmr, 0, sizeof(xpmr));
     xpmr.xpm = xpm;
     xpmr.static_data = data;
-    xpmr.token = strdup(*xpmr.static_data);
+    xpmr.token = xp_strdup(*xpmr.static_data);
 
     xpm_parse_data(&xpmr);
     xpm_free_xpmr(&xpmr);

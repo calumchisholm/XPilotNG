@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -24,6 +25,8 @@
 #ifndef PAINT_H
 #define PAINT_H
 
+
+/* includes begin */
 #ifndef TYPES_H
 /* need u_byte */
 #include "types.h"
@@ -32,7 +35,10 @@
 /* need other_t */
 #include "client.h"
 #endif
+/* includes end */
 
+
+/* constants begin */
 #define MAX_COLORS		16	/* Max. switched colors ever */
 #define MAX_COLOR_LEN		32	/* Max. length of a color name */
 
@@ -42,17 +48,31 @@
 #define NUM_CDASHES		2
 #define DASHES_LENGTH		12
 
-#define HUD_SIZE		90	/* Size/2 of HUD lines */
+#define MIN_HUD_SIZE		90	/* Size/2 of HUD lines */
 #define HUD_OFFSET		20	/* Hud line offset */
 #define FUEL_GAUGE_OFFSET	6
-#define HUD_FUEL_GAUGE_SIZE	(2*(HUD_SIZE-HUD_OFFSET-FUEL_GAUGE_OFFSET))
+#define HUD_FUEL_GAUGE_SIZE	(2*(MIN_HUD_SIZE-HUD_OFFSET-FUEL_GAUGE_OFFSET))
+/*#define FUEL_NOTIFY		(3*FPS)*/
 
+#define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
+
+#define MSG_LIFE_TIME		120.0	/* Seconds */
+#define MSG_FLASH_TIME		110.0	/* Old messages have life time less
+					   than this */
+
+#define TITLE_DELAY		500	/* Should probably change to seconds */
+/* constants end */
+
+
+/* typedefs begin */
 typedef struct {
     char		txt[MSG_LEN];
     short		len;
     short		pixelLen;
-    int			life;
+    DFLOAT		lifeTime;
 } message_t;
+/* typedefs end */
+
 
 /* which index a message actually has (consider SHOW_REVERSE_SCROLL) */
 #define TALK_MSG_SCREENPOS(_total,_pos) \
@@ -65,14 +85,14 @@ typedef struct {
  * Global objects.
  */
 
-/* Message scan hack for basewarnings on old servers */
-struct deathhack {
-    int id;
-    int deathtime;
-};
-extern struct deathhack deatharray[10];
-extern int deathpos;
-
+extern bool roundend;
+extern int killratio_kills;
+extern int killratio_deaths;
+extern int killratio_totalkills;
+extern int killratio_totaldeaths;
+extern homebase_t *bases;
+extern int num_bases;
+ 
 
 extern char	dashes[NUM_DASHES];
 extern char	cdashes[NUM_CDASHES];
@@ -87,6 +107,7 @@ extern XFontStruct* talkFont;
 extern XFontStruct* motdFont;
 
 /* The name of the fonts used in the game */
+#define FONT_LEN	256
 extern char gameFontName[FONT_LEN];
 extern char messageFontName[FONT_LEN];
 extern char scoreListFontName[FONT_LEN];
@@ -98,7 +119,7 @@ extern char motdFontName[FONT_LEN];
 extern Display	*dpy;			/* Display of player (pointer) */
 extern Display	*kdpy;			/* Keyboard display */
 extern short	about_page;		/* Which page is the player on? */
-extern u_short	team;			/* What team is the player on? */
+extern unsigned short	team;		/* What team is the player on? */
 extern bool	players_exposed;	/* Is score window exposed? */
 extern int	radar_exposures;	/* Is radar window exposed? */
 
@@ -118,31 +139,59 @@ extern Window	top, draw, keyboard, radar, players;
 #ifdef _WINDOWS				/* see paint.c for details */
 extern Window	textWindow, msgWindow, buttonWindow;
 #endif
-extern Pixmap	p_draw, p_radar, s_radar;
-extern long	dpl_1[2], dpl_2[2];	/* Used by radar hack */
-extern Window	about_w, about_close_b, about_next_b, about_prev_b, talk_w;
-extern XColor	colors[MAX_COLORS];		/* Colors */
+extern Pixmap	p_draw;			/* Drawing area pixmap */
+extern Pixmap	p_radar;		/* Radar drawing pixmap */
+extern Pixmap	s_radar;		/* Second radar drawing pixmap */
+extern long	dpl_1[2];		/* Used by radar hack */
+extern long	dpl_2[2];		/* Used by radar hack */
+extern Window	about_w;		/* The About window */
+extern Window	about_close_b;		/* About close button */
+extern Window	about_next_b;		/* About next page button */
+extern Window	about_prev_b;		/* About prev page button */
+extern Window	talk_w;			/* Talk window */
+extern XColor	colors[MAX_COLORS];	/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */
 extern int	hudColor;		/* Color index for HUD drawing */
 extern int	hrColor1;		/* Color index for hudradar-hack drawing */
 extern int	hrColor2;		/* Color index for hudradar-hack drawing */
-extern int	hrSize;		/* size for hudradar-hack drawing */
-extern float	hrScale;		/* scale for hudradar-hack drawing */
+extern int	hrSize;			/* size for hudradar-hack drawing */
+extern DFLOAT	hrScale;		/* scale for hudradar-hack drawing */
+extern DFLOAT	hrLimit;		/* limit for hudradar-hack drawing */
+extern int	hudSize;		/* size for hud-drawing */
+extern int	dirPtrColor;		/* Color index for dirptr-hack drawing */
+extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
+extern int	msgScanBallColor;	/* Color index for ball msg scan */
+extern int	msgScanCoverColor;	/* Color index for cover msg scan */
+extern int	selfLWColor;		/* Color index for selfLifeWarning */
+extern int	enemyLWColor;		/* Color index for enemyLifeWarning */
+extern int	teamLWColor;		/* Color index for teamLifeWarning */
+extern int	shipNameColor;		/* Color index for ship name drawing */
+extern int	baseNameColor;		/* Color index for base name drawing */
+extern int	mineNameColor;		/* Color index for mine name drawing */
+extern int	teamShotColor;		/* Color index for harmless shot drawing */
+extern int	ballColor;		/* Color index for ball drawing */
+extern int	connColor;		/* Color index for connector drawing */
 extern int	hudLockColor;           /* Color index for lock on HUD drawing */
+extern DFLOAT	scoreObjectTime;	/* how long score objects are flashed */
+extern int	baseWarningType;	/* Which type of base warning you prefer */
+extern int	baseWarningFrames;	/* Duration of base warning */
 extern int	wallColor;		/* Color index for wall drawing */
+extern int	fuelColor;		/* Color index for fuel box drawing */
 extern int	wallRadarColor;		/* Color index for walls on radar */
 extern int	targetRadarColor;	/* Color index for targets on radar */
 extern int	decorColor;		/* Color index for decoration drawing */
 extern int	decorRadarColor;	/* Color index for decorations on radar */
+extern int	messagesColor;		/* Color index for message strings */
 extern int	oldMessagesColor;	/* Color index for old message strings */
-extern bool	gotFocus;
-extern bool	talk_mapped;
-extern short	view_width, view_height;	/* Visible area from server */
-extern int	real_view_width;	/* Width of map area displayed. */
-extern int	real_view_height;	/* Height of map area displayed. */
-extern int	view_x_offset;		/* Offset of view_width */
-extern int	view_y_offset;		/* Offset of view_height */
+extern bool	gotFocus;		/* Do we have the mouse pointer */
+extern bool	talk_mapped;		/* Is talk window visible */
+extern short	ext_view_width;		/* Width of extended visible area */
+extern short	ext_view_height;	/* Height of extended visible area */
+extern int	active_view_width;	/* Width of active map area displayed. */
+extern int	active_view_height;	/* Height of active map area displayed. */
+extern int	ext_view_x_offset;	/* Offset of ext_view_width */
+extern int	ext_view_y_offset;	/* Offset of ext_view_height */
 extern u_byte	debris_colors;		/* Number of debris intensities */
 extern DFLOAT	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
@@ -152,6 +201,7 @@ extern char	modBankStr[][MAX_CHARS];	/* modifier banks strings */
 extern char	*texturePath;		/* Path list of texture directories */
 extern char	*wallTextureFile;	/* Filename of wall texture */
 extern char	*decorTextureFile;	/* Filename of decor texture */
+extern char	*ballTextureFile;	/* Filename of ball texture */
 
 extern int	(*radarDrawRectanglePtr)	/* Function to draw player on radar */
 		(Display *disp, Drawable d, GC gc,
@@ -159,6 +209,10 @@ extern int	(*radarDrawRectanglePtr)	/* Function to draw player on radar */
 
 extern int	maxKeyDefs;
 extern long	loops;
+extern unsigned long	loopsSlow;
+extern int	clientFPS;
+extern time_t	currentTime;
+extern DFLOAT	timePerFrame;
 extern int	maxMessages;
 extern int	messagesToStdout;
 extern bool	selectionAndHistory;
@@ -168,14 +222,22 @@ extern DFLOAT	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);
 #define	WINSCALE(__n)	((__n) >= 0 ? scaleArray[(__n)] : -scaleArray[-(__n)])
-#define SCALEX(co) ((int) (WINSCALE(co) - WINSCALE(world.x)))
-#define SCALEY(co) ((int) (WINSCALE(world.y + view_height) - WINSCALE(co)))
 
+/* macros begin */
+
+#define X(co)	((int) ((co) - world.x))
+#define Y(co)	((int) (world.y + ext_view_height - (co)))
+
+#define SCALEX(co) ((int) (WINSCALE(co) - WINSCALE(world.x)))
+#define SCALEY(co) ((int) (WINSCALE(world.y + ext_view_height) - WINSCALE(co)))
+
+/* macros end */
 
 /*
  * Prototypes from the paint*.c files.
  */
 
+void Init_paint(void);
 void Add_message(char *message);
 int Handle_start(long server_loops);
 int Handle_end(long server_loops);
@@ -205,6 +267,8 @@ int Handle_item(int x, int y, int type);
 int Handle_fastshot(int type, u_byte *p, int n);
 int Handle_debris(int type, u_byte *p, int n);
 int Handle_wreckage(int x, int y, int wrecktype, int size, int rotation);
+int Handle_asteroid(int x, int y, int type, int size, int rotation);
+int Handle_wormhole(int x, int y);
 int Handle_ecm(int x, int y, int size);
 int Handle_trans(int x1, int y1, int x2, int y2);
 int Handle_paused(int x, int y, int count);
@@ -229,14 +293,16 @@ void Paint_vbase(void);
 void Paint_vdecor(void);
 void Paint_objects(void);
 void Paint_world(void);
-void Paint_score_entry(int entry_num, other_t* other, bool best);
+void Paint_score_entry(int entry_num, other_t* other, bool is_team);
 void Paint_score_start(void);
 void Paint_score_objects(void);
 void Paint_meters(void);
 void Paint_HUD(void);
 int  Get_message(int* pos, char * message, int req_length, int key );
 void Paint_messages(void);
+void Add_pending_messages(void);
 void Paint_recording(void);
+void Paint_client_fps(void);
 void Paint_frame(void);
 int Handle_time_left(long sec);
 void Game_over_action(u_byte stat);

@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -21,33 +22,46 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* $NCDId: @(#)defaults.h,v 1.1 1992/09/10 03:26:12 mellon Exp $ */
-
 #ifndef DEFAULTS_H
 #define DEFAULTS_H
 
-typedef struct _valPair {
-    struct _valPair *next;
-    char *name;
-    char *value;
-    void *def;
-    int origin; /* Origin of the setting */
-} valPair;
-
-#include "types.h"
-
 enum valType {
-	valVoid,	/* variable is not a variable */
-	valInt,		/* variable is type int */
-	valReal,	/* variable is type float */
-	valBool,	/* variable is type bool */
-	valIPos,	/* variable is type ipos */
-	valString,	/* variable is type char* */
-	valSec,		/* variable is type int (converted to frames) */
-	valPerSec	/* variable is type float (converted to per-frame) */
+    valVoid,		/* variable is not a variable */
+    valInt,		/* variable is type int */
+    valReal,		/* variable is type float */
+    valBool,		/* variable is type bool */
+    valIPos,		/* variable is type ipos */
+    valString,		/* variable is type char* */
+    valSec,		/* variable is type int (converted to frames) */
+    valPerSec,		/* variable is type float (converted to per-frame) */
+    valList		/* variable is a list of elements of type char* */
 };
 
-typedef struct {
+
+/*
+ * bitflags for the origin of an option.
+ */
+enum _optOrigin {
+    OPT_INIT		= 0,
+    OPT_MAP		= 1,
+    OPT_DEFAULTS	= 2,
+    OPT_COMMAND		= 4,
+    OPT_PASSWORD	= 8
+};
+typedef enum _optOrigin optOrigin;
+
+
+/*
+ * extended bitflags for option origin.
+ */
+enum _optOriginAny {
+    OPT_NONE		= 0,	/* not settable */
+    OPT_ORIGIN_ANY	= 7,	/* allow any of {map,defaults,command} */
+    OPT_VISIBLE		= 16	/* can we query this option value? */
+};
+
+
+typedef struct _option_desc {
     const char		*name;
     const char		*commandLineOption;
     const char		*defaultValue;
@@ -55,16 +69,18 @@ typedef struct {
     enum valType	type;
     void		(*tuner)(void);
     const char		*helpLine;
-    const int		flags;	/* Where this can be set. */
-} optionDesc;
+    int			flags;		/* allowable option origins. */
+} option_desc;
 
-enum optFlags {
-    OPT_MAP = 1 << 0,
-    OPT_CMDLINE = 1 << 1,
-    OPT_DEFAULT = 1 << 2,
-    OPT_ANY = 3
-};
 
-optionDesc*	findOption(const char* name);
+option_desc*	Find_option_by_name(const char* name);
+option_desc*	Get_option_descs(int *count_ptr);
+bool		Option_add_desc(option_desc *desc);
+void		Option_set_value(
+			const char	*name,
+			const char	*value,
+			int		override,
+			optOrigin	opt_origin);
+char*		Option_get_value(const char *name, optOrigin *origin_ptr);
 
 #endif

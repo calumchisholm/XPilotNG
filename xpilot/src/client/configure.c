@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -61,15 +62,18 @@
 #include <limits.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <pwd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#include <X11/Xutil.h>
-#else
-#include "NT/winX.h"
-#include "NT/winClient.h"
-#include "NT/winXXPilot.h"
+# include <unistd.h>
+# include <pwd.h>
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+# include <X11/Xutil.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winClient.h"
+# include "NT/winXXPilot.h"
+# include "NT/winConfig.h"
 #endif
 
 #include "version.h"
@@ -86,6 +90,7 @@
 #include "error.h"
 #include "protoclient.h"
 #include "portability.h"
+#include "commonproto.h"
 #include "bitmaps.h"
 
 char configure_version[] = VERSION;
@@ -105,7 +110,14 @@ static int Config_create_altTurnSpeed(int widget_desc, int *height);
 static int Config_create_altTurnResistance(int widget_desc, int *height);
 static int Config_create_showMessages(int widget_desc, int *height);
 static int Config_create_showHUD(int widget_desc, int *height);
-static int Config_create_showHR(int widget_desc, int *height);
+static int Config_create_showHUDRadar(int widget_desc, int *height);
+static int Config_create_mapRadar(int widget_desc, int *height);
+static int Config_create_clientRanker(int widget_desc, int *height);
+static int Config_create_showShipShapes(int widget_desc, int *height);
+static int Config_create_showMyShipShape(int widget_desc, int *height);
+static int Config_create_ballMsgScan(int widget_desc, int *height);
+static int Config_create_showLivesByShip(int widget_desc, int *height);
+static int Config_create_treatZeroSpecial(int widget_desc, int *height);
 static int Config_create_horizontalHUDLine(int widget_desc, int *height);
 static int Config_create_verticalHUDLine(int widget_desc, int *height);
 static int Config_create_speedFactHUD(int widget_desc, int *height);
@@ -122,6 +134,7 @@ static int Config_create_fullColor(int widget_desc, int *height);
 static int Config_create_slidingRadar(int widget_desc, int *height);
 static int Config_create_showItems(int widget_desc, int *height);
 static int Config_create_showItemsTime(int widget_desc, int *height);
+static int Config_create_showScoreDecimals(int widget_desc, int *height);
 static int Config_create_backgroundPointDist(int widget_desc, int *height);
 static int Config_create_backgroundPointSize(int widget_desc, int *height);
 static int Config_create_sparkSize(int widget_desc, int *height);
@@ -131,14 +144,37 @@ static int Config_create_autoShield(int widget_desc, int *height);
 static int Config_create_sparkProb(int widget_desc, int *height);
 static int Config_create_shotSize(int widget_desc, int *height);
 static int Config_create_teamShotSize(int widget_desc, int *height);
+static int Config_create_teamShotColor(int widget_desc, int *height);
 static int Config_create_showNastyShots(int widget_desc, int *height);
 static int Config_create_hudColor(int widget_desc, int *height);
 static int Config_create_hrColor1(int widget_desc, int *height);
 static int Config_create_hrColor2(int widget_desc, int *height);
 static int Config_create_hrSize(int widget_desc, int *height);
 static int Config_create_hrScale(int widget_desc, int *height);
+static int Config_create_hrLimit(int widget_desc, int *height);
+static int Config_create_hudSize(int widget_desc, int *height);
 static int Config_create_hudLockColor(int widget_desc, int *height);
+static int Config_create_dirPtrColor(int widget_desc, int *height);
+static int Config_create_shipShapesHackColor(int widget_desc, int *height);
+static int Config_create_msgScanBallColor(int widget_desc, int *height);
+static int Config_create_msgScanCoverColor(int widget_desc, int *height);
+static int Config_create_selfLWColor(int widget_desc, int *height);
+static int Config_create_enemyLWColor(int widget_desc, int *height);
+static int Config_create_teamLWColor(int widget_desc, int *height);
+static int Config_create_ballColor(int widget_desc, int *height);
+static int Config_create_connColor(int widget_desc, int *height);
+static int Config_create_windowColor(int widget_desc, int *height);
+static int Config_create_buttonColor(int widget_desc, int *height);
+static int Config_create_borderColor(int widget_desc, int *height);
+static int Config_create_scoreColor(int widget_desc, int *height);
+static int Config_create_scoreSelfColor(int widget_desc, int *height);
+static int Config_create_scoreInactiveColor(int widget_desc, int *height);
+static int Config_create_scoreInactiveSelfColor(int widget_desc, int *height);
+static int Config_create_scoreZeroColor(int widget_desc, int *height);
+static int Config_create_scoreObjectTime(int widget_desc, int *height);
+static int Config_create_baseWarningType(int widget_desc, int *height);
 static int Config_create_wallColor(int widget_desc, int *height);
+static int Config_create_fuelColor(int widget_desc, int *height);
 static int Config_create_decorColor(int widget_desc, int *height);
 static int Config_create_showDecor(int widget_desc, int *height);
 static int Config_create_outlineDecor(int widget_desc, int *height);
@@ -148,18 +184,23 @@ static int Config_create_maxFPS(int widget_desc, int *height);
 static int Config_create_maxMessages(int widget_desc, int *height);
 static int Config_create_messagesToStdout(int widget_desc, int *height);
 static int Config_create_reverseScroll(int widget_desc, int *height);
+static int Config_create_messagesColor(int widget_desc, int *height);
 static int Config_create_oldMessagesColor(int widget_desc, int *height);
 #ifdef SOUND
 static int Config_create_maxVolume(int widget_desc, int *height);
 #endif
-static int Config_create_showShipName(int widget_desc, int *height);
-static int Config_create_showMineName(int widget_desc, int *height);
+
+static int Config_create_shipNameColor(int widget_desc, int *height);
+static int Config_create_baseNameColor(int widget_desc, int *height);
+static int Config_create_mineNameColor(int widget_desc, int *height);
+
 static int Config_create_fuelMeter(int widget_desc, int *height);
 static int Config_create_powerMeter(int widget_desc, int *height);
 static int Config_create_turnSpeedMeter(int widget_desc, int *height);
 static int Config_create_packetSizeMeter(int widget_desc, int *height);
 static int Config_create_packetLossMeter(int widget_desc, int *height);
 static int Config_create_packetDropMeter(int widget_desc, int *height);
+static int Config_create_packetLagMeter(int widget_desc, int *height);
 static int Config_create_clock(int widget_desc, int *height);
 static int Config_create_clockAMPM(int widget_desc, int *height);
 static int Config_create_markingLights(int widget_desc, int *height);
@@ -173,6 +214,7 @@ static int Config_create_save(int widget_desc, int *height);
 
 static int Config_update_bool(int widget_desc, void *data, bool *val);
 static int Config_update_instruments(int widget_desc, void *data, bool *val);
+static int Config_update_hackedInstruments(int widget_desc, void *data, bool *val);
 static int Config_update_dots(int widget_desc, void *data, int *val);
 static int Config_update_altPower(int widget_desc, void *data, DFLOAT *val);
 static int Config_update_altTurnResistance(int widget_desc, void *data,
@@ -190,6 +232,7 @@ static int Config_update_maxFPS(int widget_desc, void *data, int *val);
 static int Config_update_fullColor(int widget_desc, void *data, bool *val);
 static int Config_update_texturedObjects(int widget_desc, void *data, bool *val);
 static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val);
+
 static int Config_close(int widget_desc, void *data, const char **strptr);
 static int Config_next(int widget_desc, void *data, const char **strptr);
 static int Config_prev(int widget_desc, void *data, const char **strptr);
@@ -227,7 +270,7 @@ static int		config_page,
 			config_arrow_height;
 static int		*config_widget_desc,
 			config_save_confirm_desc = NO_WIDGET;
-static int		(*config_creator[])(int widget_desc, int *height) = {
+static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_power,
     Config_create_turnSpeed,
     Config_create_turnResistance,
@@ -238,9 +281,15 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_maxMessages,
     Config_create_messagesToStdout,
     Config_create_reverseScroll,
-    Config_create_oldMessagesColor,
     Config_create_showHUD,
-    Config_create_showHR,
+    Config_create_showHUDRadar,
+    Config_create_mapRadar,
+    Config_create_clientRanker,
+    Config_create_showShipShapes,
+    Config_create_showMyShipShape,
+    Config_create_ballMsgScan,
+    Config_create_showLivesByShip,
+    Config_create_treatZeroSpecial,
     Config_create_horizontalHUDLine,
     Config_create_verticalHUDLine,
     Config_create_speedFactHUD,
@@ -257,6 +306,7 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_slidingRadar,
     Config_create_showItems,
     Config_create_showItemsTime,
+    Config_create_showScoreDecimals,
     Config_create_backgroundPointDist,
     Config_create_backgroundPointSize,
     Config_create_sparkSize,
@@ -265,43 +315,95 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_markingLights,
     Config_create_toggleShield,
     Config_create_autoShield,
-	Config_create_showNastyShots,
+    Config_create_showNastyShots,
     Config_create_shotSize,
     Config_create_teamShotSize,
-    Config_create_hudColor,
-    Config_create_hrColor1,
-    Config_create_hrColor2,
     Config_create_hrSize,
     Config_create_hrScale,
-    Config_create_hudLockColor,
-    Config_create_wallColor,
-    Config_create_decorColor,
+    Config_create_hrLimit,
+    Config_create_hudSize,
+    Config_create_scoreObjectTime,
+    Config_create_baseWarningType,
     Config_create_showDecor,
     Config_create_outlineDecor,
     Config_create_filledDecor,
     Config_create_texturedDecor,
+    /*Config_create_texturedBalls,*/
     Config_create_maxFPS,
 #ifdef SOUND
     Config_create_maxVolume,
 #endif
-    Config_create_showShipName,
-    Config_create_showMineName,
     Config_create_fuelMeter,
     Config_create_powerMeter,
     Config_create_turnSpeedMeter,
     Config_create_packetSizeMeter,
     Config_create_packetLossMeter,
     Config_create_packetDropMeter,
+    Config_create_packetLagMeter,
     Config_create_clock,
     Config_create_clockAMPM,
 #ifdef _WINDOWS
-	Config_create_threadedDraw,
+    Config_create_threadedDraw,
 #endif
     Config_create_scaleFactor,
     Config_create_altScaleFactor,
     Config_create_save			/* must be last */
 };
-static int		config_widget_ids[NELEM(config_creator)];
+
+static int	(*config_creator_colors[])(int widget_desc, int *height) = {
+    Config_create_messagesColor,
+    Config_create_oldMessagesColor,
+    Config_create_teamShotColor,
+    Config_create_hudColor,
+    Config_create_hrColor1,
+    Config_create_hrColor2,
+    Config_create_hudLockColor,
+    Config_create_dirPtrColor,
+    Config_create_shipShapesHackColor,
+    Config_create_msgScanBallColor,
+    Config_create_msgScanCoverColor,
+    Config_create_selfLWColor,
+    Config_create_enemyLWColor,
+    Config_create_teamLWColor,
+    Config_create_shipNameColor,
+    Config_create_baseNameColor,
+    Config_create_mineNameColor,
+    Config_create_ballColor,
+    Config_create_connColor,
+    Config_create_windowColor,
+    Config_create_buttonColor,
+    Config_create_borderColor,
+    Config_create_scoreColor,
+    Config_create_scoreSelfColor,
+    Config_create_scoreInactiveColor,
+    Config_create_scoreInactiveSelfColor,
+    Config_create_scoreZeroColor,
+    Config_create_wallColor,
+    Config_create_fuelColor,
+    Config_create_decorColor,
+
+    Config_create_save			/* must be last */
+};
+
+static int (**config_creator)(int widget_desc, int *height);
+
+/* this must be updated if new config menu items are added */
+#define CONFIG_MAX_WIDGET_IDS \
+(MAX(NELEM(config_creator_default), \
+     NELEM(config_creator_colors)))
+
+static int config_widget_ids[CONFIG_MAX_WIDGET_IDS];
+
+/* this must be updated if new config menu items are added */
+static int Nelem_config_creator(void)
+{
+    if (config_creator == config_creator_colors)
+	return NELEM(config_creator_colors);
+    if (config_creator == config_creator_default)
+	return NELEM(config_creator_default);
+    return 0;
+}
+ 
 
 static void Create_config(void)
 {
@@ -358,7 +460,7 @@ static void Create_config(void)
     config_int_width = 4 + XTextWidth(buttonFont, "1000", 4);
     config_float_width = 4 + XTextWidth(buttonFont, "0.22", 4);
 
-    config_max = NELEM(config_creator);
+    config_max = Nelem_config_creator();
     config_widget_desc = (int *) malloc(config_max * sizeof(int));
     if (config_widget_desc == NULL) {
 	error("No memory for config");
@@ -367,7 +469,7 @@ static void Create_config(void)
 
     num = -1;
     full = true;
-    for (i = 0; i < NELEM(config_creator); i++) {
+    for (i = 0; i < Nelem_config_creator(); i++) {
 	if (full == true) {
 	    full = false;
 	    num++;
@@ -387,7 +489,8 @@ static void Create_config(void)
 		Widget_create_activate(config_widget_desc[num],
 				       offset, height,
 				       width, config_button_height,
-				       0, "PREV", Config_prev, (void *)num);
+				       0, "PREV", Config_prev,
+				       (void *)(long)num);
 	    if (widget_desc == 0) {
 		break;
 	    }
@@ -398,7 +501,8 @@ static void Create_config(void)
 		Widget_create_activate(config_widget_desc[num],
 				       offset, height,
 				       width, config_button_height,
-				       0, "NEXT", Config_next, (void *)num);
+				       0, "NEXT", Config_next,
+				       (void *)(long)num);
 	    if (widget_desc == 0) {
 		break;
 	    }
@@ -409,7 +513,8 @@ static void Create_config(void)
 		Widget_create_activate(config_widget_desc[num],
 				       offset, height,
 				       width, config_button_height,
-				       0, "CLOSE", Config_close, (void *)num);
+				       0, "CLOSE", Config_close,
+				       (void *)(long)num);
 	    if (widget_desc == 0) {
 		break;
 	    }
@@ -425,7 +530,7 @@ static void Create_config(void)
 	    continue;
 	}
     }
-    if (i < NELEM(config_creator)) {
+    if (i < Nelem_config_creator()) {
 	for (; num >= 0; num--) {
 	    if (config_widget_desc[num] != 0) {
 		Widget_destroy(config_widget_desc[num]);
@@ -683,8 +788,9 @@ static int Config_create_maxMessages(int widget_desc, int *height)
 
 static int Config_create_messagesToStdout(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height, "messagesToStdout",
-			     &messagesToStdout, 0, 2, NULL, NULL);
+    return Config_create_int(widget_desc, height,
+			   "messagesToStdout", &messagesToStdout, 0, 2,
+			   NULL, NULL);
 }
 
 static int Config_create_reverseScroll(int widget_desc, int *height)
@@ -696,14 +802,18 @@ static int Config_create_reverseScroll(int widget_desc, int *height)
 			    (void *) SHOW_REVERSE_SCROLL);
 }
 
-static int Config_create_oldMessagesColor(int widget_desc, int *height)
+#define CONFIG_CREATE_COLOR(c) \
+Config_create_int(widget_desc, height, #c , & c, 0, maxColors - 1, NULL, NULL)
+
+static int Config_create_messagesColor(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			     "oldMessagesColor", &oldMessagesColor,
-			     0, maxColors - 1,
-			     NULL, NULL);
+    return CONFIG_CREATE_COLOR(messagesColor);
 }
 
+static int Config_create_oldMessagesColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(oldMessagesColor);
+}
 
 static int Config_create_showHUD(int widget_desc, int *height)
 {
@@ -714,13 +824,76 @@ static int Config_create_showHUD(int widget_desc, int *height)
 			      (void *) SHOW_HUD_INSTRUMENTS);
 }
 
-static int Config_create_showHR(int widget_desc, int *height)
+static int Config_create_showHUDRadar(int widget_desc, int *height)
 {
-    return Config_create_bool(widget_desc, height, "showHR",
-			      BIT(instruments, SHOW_HR)
+    return Config_create_bool(widget_desc, height, "showHUDRadar",
+			      BIT(instruments, SHOW_HUD_RADAR)
 				  ? true : false,
 			      Config_update_instruments,
-			      (void *) SHOW_HR);
+			      (void *) SHOW_HUD_RADAR);
+}
+
+static int Config_create_mapRadar(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height,"mapRadar",
+			      BIT(hackedInstruments, MAP_RADAR)
+			      ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) MAP_RADAR);
+}
+
+static int Config_create_clientRanker(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "clientRanker",
+			      BIT(hackedInstruments, CLIENT_RANKER)
+			      ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) CLIENT_RANKER);
+}
+
+static int Config_create_showShipShapes(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height,"showShipShapes",
+			      BIT(hackedInstruments, SHOW_SHIP_SHAPES)
+			      ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) SHOW_SHIP_SHAPES);
+}
+
+static int Config_create_showMyShipShape(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height,"showMyShipShape",
+			      BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE)
+			      ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) SHOW_MY_SHIP_SHAPE);
+}
+
+static int Config_create_ballMsgScan(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height,"ballMsgScan",
+			      BIT(hackedInstruments, BALL_MSG_SCAN)
+			          ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) BALL_MSG_SCAN);
+}
+
+static int Config_create_showLivesByShip(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "showLivesByShip",
+			      BIT(hackedInstruments, SHOW_LIVES_BY_SHIP)
+			      ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) SHOW_LIVES_BY_SHIP);
+}
+
+static int Config_create_treatZeroSpecial(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "treatZeroSpecial",
+			      BIT(hackedInstruments, TREAT_ZERO_SPECIAL)
+			      ? true : false,
+			      Config_update_hackedInstruments,
+			      (void *) TREAT_ZERO_SPECIAL);
 }
 
 static int Config_create_horizontalHUDLine(int widget_desc, int *height)
@@ -815,7 +988,7 @@ static int Config_create_texturedWalls(int widget_desc, int *height)
 static int Config_create_texturedObjects(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height, "texturedObjects",
-			      (blockBitmaps) ? true : false,
+			      (texturedObjects) ? true : false,
 			      Config_update_texturedObjects,
 			      NULL);
 }
@@ -826,7 +999,6 @@ static int Config_create_fullColor(int widget_desc, int *height)
 			      (fullColor) ? true : false,
 			      Config_update_fullColor, NULL);
 }
-
 
 static int Config_create_slidingRadar(int widget_desc, int *height)
 {
@@ -862,6 +1034,15 @@ static int Config_create_showItemsTime(int widget_desc, int *height)
 			     "showItemsTime", &showItemsTime,
 			     MIN_SHOW_ITEMS_TIME,
 			     MAX_SHOW_ITEMS_TIME,
+			     NULL, NULL);
+}
+
+static int Config_create_showScoreDecimals(int widget_desc, int *height)
+{
+    return Config_create_int(widget_desc, height,
+			     "showScoreDecimals", &showScoreDecimals,
+			     0,
+			     2,
 			     NULL, NULL);
 }
 
@@ -927,6 +1108,11 @@ static int Config_create_teamShotSize(int widget_desc, int *height)
 			   NULL, NULL);
 }
 
+static int Config_create_teamShotColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(teamShotColor);
+}
+
 static int Config_create_showNastyShots(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height, "nastyShots",
@@ -936,34 +1122,25 @@ static int Config_create_showNastyShots(int widget_desc, int *height)
 
 static int Config_create_hudColor(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			   "hudColor", &hudColor,
-			   1, maxColors - 1,
-			   NULL, NULL);
+    return CONFIG_CREATE_COLOR(hudColor);
 }
 
 static int Config_create_hrColor1(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			   "hrColor1", &hrColor1,
-			   0, maxColors - 1,
-			   NULL, NULL);
+    return CONFIG_CREATE_COLOR(hrColor1);
 }
 
 static int Config_create_hrColor2(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			   "hrColor2", &hrColor2,
-			   0, maxColors - 1,
-			   NULL, NULL);
+    return CONFIG_CREATE_COLOR(hrColor2);
 }
 
 static int Config_create_hrSize(int widget_desc, int *height)
 {
     return Config_create_int(widget_desc, height,
-			   "hrSize", &hrSize,
-			   1, SHIP_SZ,
-			   NULL, NULL);
+			     "hrSize", &hrSize,
+			     1, SHIP_SZ,
+			     NULL, NULL);
 }
 
 static int Config_create_hrScale(int widget_desc, int *height)
@@ -973,32 +1150,159 @@ static int Config_create_hrScale(int widget_desc, int *height)
 			       NULL, NULL);
 }
 
-static int Config_create_hudLockColor(int widget_desc, int *height)
+static int Config_create_hrLimit(int widget_desc, int *height)
+{
+    return Config_create_float(widget_desc, height,
+			       "hrLimit", &hrLimit,
+			       0.0, 5.0,
+			       NULL, NULL);
+}
+
+static int Config_create_hudSize(int widget_desc, int *height)
 {
     return Config_create_int(widget_desc, height,
-			   "hudLockColor", &hudLockColor,
-			   0, maxColors - 1,
-			   NULL, NULL);
+			     "hudSize", &hudSize,
+			     MIN_HUD_SIZE, 6 * MIN_HUD_SIZE,
+			     NULL, NULL);
+}
+
+static int Config_create_hudLockColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(hudLockColor);
+}
+
+static int Config_create_dirPtrColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(dirPtrColor);
+}
+
+static int Config_create_shipShapesHackColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(shipShapesHackColor);
+}
+
+static int Config_create_msgScanBallColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(msgScanBallColor);
+}
+
+static int Config_create_msgScanCoverColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(msgScanCoverColor);
+}
+
+static int Config_create_selfLWColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(selfLWColor);
+}
+
+static int Config_create_enemyLWColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(enemyLWColor);
+}
+
+static int Config_create_teamLWColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(teamLWColor);
+}
+
+static int Config_create_shipNameColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(shipNameColor);
+}
+
+static int Config_create_baseNameColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(baseNameColor);
+}
+
+static int Config_create_mineNameColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(mineNameColor);
+}
+
+static int Config_create_ballColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(ballColor);
+}
+
+static int Config_create_connColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(connColor);
+}
+
+static int Config_create_windowColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(windowColor);
+}
+
+static int Config_create_buttonColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(buttonColor);
+}
+
+static int Config_create_borderColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(borderColor);
+}
+
+static int Config_create_scoreColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreColor);
+}
+
+static int Config_create_scoreSelfColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreSelfColor);
+}
+
+static int Config_create_scoreInactiveColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreInactiveColor);
+}
+
+static int Config_create_scoreInactiveSelfColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreInactiveSelfColor);
+}
+
+static int Config_create_scoreZeroColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(scoreZeroColor);
+}
+
+static int Config_create_scoreObjectTime(int widget_desc, int *height)
+{
+    return Config_create_float(widget_desc, height,
+			       "scoreObjectTime", &scoreObjectTime, 0.0, 10.0,
+			       NULL, NULL);
+}
+
+static int Config_create_baseWarningType(int widget_desc, int *height)
+{
+    return Config_create_int(widget_desc, height,
+			     "baseWarningType", &baseWarningType, 0, 3,
+			     NULL, NULL);
 }
 
 static int Config_create_wallColor(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			   "wallColor", &wallColor,
-			   1, maxColors - 1,
-			   NULL, NULL);
+    return CONFIG_CREATE_COLOR(wallColor);
+}
+
+static int Config_create_fuelColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(fuelColor);
 }
 
 static int Config_create_decorColor(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			   "decorColor", &decorColor,
-			   1, maxColors - 1,
-			   NULL, NULL);
+    return CONFIG_CREATE_COLOR(decorColor);
 }
 
 static int Config_create_showDecor(int widget_desc, int *height)
 {
+    /* kps - remove */
     return Config_create_bool(widget_desc, height, "showDecor",
 			      BIT(instruments, SHOW_DECOR)
 			      ? true : false,
@@ -1047,24 +1351,6 @@ static int Config_create_maxFPS(int widget_desc, int *height)
     return Config_create_int(widget_desc, height,
 			     "maxFPS", &maxFPS, 1, 200,
 			     Config_update_maxFPS, NULL);
-}
-
-static int Config_create_showShipName(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "showShipName",
-			      BIT(instruments, SHOW_SHIP_NAME)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_SHIP_NAME);
-}
-
-static int Config_create_showMineName(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "showMineName",
-			      BIT(instruments, SHOW_MINE_NAME)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_MINE_NAME);
 }
 
 static int Config_create_fuelMeter(int widget_desc, int *height)
@@ -1121,6 +1407,15 @@ static int Config_create_packetDropMeter(int widget_desc, int *height)
 			      (void *) SHOW_PACKET_DROP_METER);
 }
 
+static int Config_create_packetLagMeter(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "packetLagMeter",
+			      BIT(instruments, SHOW_PACKET_LAG_METER)
+				  ? true : false,
+			      Config_update_instruments,
+			      (void *) SHOW_PACKET_LAG_METER);
+}
+
 static int Config_create_clock(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height, "clock",
@@ -1154,6 +1449,7 @@ static int Config_create_scaleFactor(int widget_desc, int *height)
 			       MIN_SCALEFACTOR, MAX_SCALEFACTOR,
 			       Config_update_scaleFactor, NULL);
 }
+
 static int Config_create_altScaleFactor(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
@@ -1227,10 +1523,11 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 	Paint_sliding_radar();
     }
     else if (bit == SHOW_DECOR) {
-	if (oldServer) Map_dots();
+	if (oldServer)
+	    Map_dots();
 	Paint_world_radar();
     }
-
+    
     if (BIT(bit, outline_mask) && oldServer) {
 	/* only do the map recalculations if really needed. */
 	if (!BIT(old_instruments, outline_mask)
@@ -1242,20 +1539,39 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
     if (BIT(bit, SHOW_PACKET_DROP_METER | SHOW_PACKET_LOSS_METER)) {
 	Net_init_measurement();
     }
+    if (BIT(bit, SHOW_PACKET_LAG_METER)) {
+	Net_init_lag_measurement();
+    }
     if (BIT(bit, SHOW_REVERSE_SCROLL)) {
 	/* a callback for `reverseScroll' in the config menu */
-	IFNWINDOWS( Talk_reverse_cut(); )
+	IFNWINDOWS( Talk_reverse_cut() );
     }
 
     return 0;
 }
+
+static int Config_update_hackedInstruments(int widget_desc, void *data,
+					   bool *val)
+{
+    long		bit = (long) data;
+
+    if (*val == false) {
+	CLR_BIT(hackedInstruments, bit);
+    } else {
+	SET_BIT(hackedInstruments, bit);
+    }
+
+    return 0;
+}
+
 
 static int Config_update_dots(int widget_desc, void *data, int *val)
 {
     if (val == &map_point_size && map_point_size > 1) {
 	return 0;
     }
-    if (oldServer) Map_dots();
+    if (oldServer)
+	Map_dots();
     return 0;
 }
 
@@ -1306,7 +1622,6 @@ static int Config_update_sparkProb(int widget_desc, void *data, DFLOAT *val)
 
 static int Config_update_charsPerSecond(int widget_desc, void *data, int *val)
 {
-    charsPerTick = (DFLOAT)charsPerSecond / FPS;
     return 0;
 }
 
@@ -1345,7 +1660,7 @@ static int Config_update_fullColor(int widget_desc, void *data, bool *val)
 	else {
 	    Colors_free_block_bitmaps();
 	    fullColor = false;
-	    blockBitmaps = false;
+	    texturedObjects = false;
 	}
     }
     return 0;
@@ -1353,20 +1668,21 @@ static int Config_update_fullColor(int widget_desc, void *data, bool *val)
 
 static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
 {
-    if ((*val != false) != blockBitmaps) {
-	if (blockBitmaps == false) {
-	    /* Can't use blockBitmaps without fullColor */
-	    blockBitmaps = true;
+    if ((*val != false) != texturedObjects) {
+	if (texturedObjects == false) {
+	    /* Can't use texturedObjects without fullColor */
+	    texturedObjects = true;
 	    if (!fullColor) {
-		/* no we can't have blockBitmaps. */
-		blockBitmaps = false;
+		/* no we can't have texturedObjects. */
+		texturedObjects = false;
 		/* and redraw our widget as false. */
 		*val = false;
 		return 1;
 	    }
 	}
-	else
-	    blockBitmaps = false;
+	else {
+	    texturedObjects = false;
+	}
     }
     return 0;
 }
@@ -1426,7 +1742,7 @@ static int Xpilotrc_add(char *line)
 	    return -1;
 	}
     }
-    if ((str = strdup(line)) == NULL) {
+    if ((str = xp_strdup(line)) == NULL) {
 	return -1;
     }
     xpilotrc_ptr[num_xpilotrc].line = str;
@@ -1470,18 +1786,33 @@ static void Xpilotrc_use(char *line)
 }
 #endif
 
+
+#ifndef _WINDOWS
 static void Config_save_resource(FILE *fp, const char *resource, char *value)
 {
-#ifndef _WINDOWS
     char		buf[256];
+    int			len, numtabs, i;
 
+    sprintf(buf, "xpilot.%s:", resource);
+    len = (int) strlen(buf);
+#define TABSIZE 8
+    /* assume tabs are max size of TABSIZE */
+    numtabs = ((5 * TABSIZE - 1) - len) / TABSIZE;
+    for (i = 0; i < numtabs; i++)
+	strcat(buf, "\t");
+    sprintf(buf + strlen(buf), "%s\n", value);
+#if 0
     sprintf(buf, "xpilot.%s:\t\t%s\n", resource, value);
+#endif
     Xpilotrc_use(buf);
     fprintf(fp, "%s", buf);
-#else
-    WritePrivateProfileString("Settings", resource, value, Get_xpilotini_file(1));
+}
 #endif
 
+
+static void Config_save_comment(FILE *fp, const char *comment)
+{
+    fprintf(fp, "; %s\n", comment);
 }
 
 static void Config_save_float(FILE *fp, const char *resource, DFLOAT value)
@@ -1508,54 +1839,100 @@ static void Config_save_bool(FILE *fp, const char *resource, int value)
     Config_save_resource(fp, resource, buf);
 }
 
+
+/*
+ * Find a key in keyDefs[].
+ * On success set output pointer to index into keyDefs[] and return TRUE.
+ * On failure return FALSE.
+ */
+static int Config_find_key(keys_t key, int start, int end, int *key_index)
+{
+    int			i;
+
+    for (i = start; i < end; i++) {
+	if (keyDefs[i].key == key) {
+	    *key_index = i;
+	    return TRUE;
+	}
+    }
+
+    return FALSE;
+}
+
+static void Config_save_keys(FILE *fp)
+{
+    int			i, j;
+    KeySym		ks;
+    keys_t		key;
+    const char		*str,
+			*res;
+    char		buf[512];
+
+    buf[0] = '\0';
+    for (i = 0; i < maxKeyDefs; i++) {
+	ks = keyDefs[i].keysym;
+	key = keyDefs[i].key;
+
+	/* try and see if we have already saved this key. */
+	if (Config_find_key(key, 0, i, &j) == TRUE) {
+	    /* yes, saved this one before.  skip it now. */
+	    continue;
+	}
+
+	if ((str = XKeysymToString(ks)) == NULL) {
+	    continue;
+	}
+
+	if ((res = Get_keyResourceString(key)) != NULL) {
+	    strlcpy(buf, str, sizeof(buf));
+	    /* find all other keysyms which map to the same key. */
+	    j = i;
+	    while (Config_find_key(key, j + 1, maxKeyDefs, &j) == TRUE) {
+		ks = keyDefs[j].keysym;
+		if ((str = XKeysymToString(ks)) != NULL) {
+		    strcat(buf, " ");
+		    strcat(buf, str);
+		}
+	    }
+	    Config_save_resource(fp, res, buf);
+	}
+    }
+}
+
+
 static int Config_save(int widget_desc, void *button_str, const char **strptr)
 {
     int			i;
-    KeySym		ks;
-    keys_t		key, prev_key;
     FILE		*fp = NULL;
-    const char		*str,
-			*res;
-#ifdef VMS
-    static char	base[] = "DECW$USER_DEFAULTS:xpilot.dat";
-#elif defined(_WINDOWS)
-    static char	base[] = "XPilot.ini";
-#endif
-    char		buf[512],
-			oldfile[PATH_MAX + 1],
+    char		buf[512];
+#ifndef _WINDOWS	/* Windows does no file handling on its own. */
+	char	oldfile[PATH_MAX + 1],
 			newfile[PATH_MAX + 1];
 
     *strptr = "Saving...";
     Widget_draw(widget_desc);
     Client_flush();
 
-#ifndef _WINDOWS	/* Windows does no file handling on its own.  fp=undefined */
-#ifndef VMS
     Get_xpilotrc_file(oldfile, sizeof(oldfile));
     if (oldfile[0] == '\0') {
 	Config_save_failed("Can't find .xpilotrc file", strptr);
 	return 1;
     }
-#else
-    sprintf(oldfile, "%s", base);
-    sprintf(newfile, "%s", base);
-#endif
     if ((fp = fopen(oldfile, "r")) != NULL) {
 	while (fgets(buf, sizeof buf, fp)) {
-	    buf[sizeof buf - 1] = '\0';
 	    Xpilotrc_add(buf);
 	}
 	fclose(fp);
     }
-#ifndef VMS
     sprintf(newfile, "%s.new", oldfile);
     unlink(newfile);
-#endif
     if ((fp = fopen(newfile, "w")) == NULL) {
 	Config_save_failed("Can't open file to save to.", strptr);
 	return 1;
     }
-#endif		/* _WINDOWS */
+#endif
+
+    Config_save_comment(fp, "\n; Config\n;");
     Config_save_resource(fp, "name", name);
     Config_save_float(fp, "power", power);
     Config_save_float(fp, "turnSpeed", turnspeed);
@@ -1568,15 +1945,19 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_float(fp, "fuelNotify", (DFLOAT)fuelLevel3);
     Config_save_float(fp, "fuelWarning", (DFLOAT)fuelLevel2);
     Config_save_float(fp, "fuelCritical", (DFLOAT)fuelLevel1);
-    Config_save_bool(fp, "showShipName", BIT(instruments, SHOW_SHIP_NAME));
-    Config_save_bool(fp, "showMineName", BIT(instruments, SHOW_MINE_NAME));
     Config_save_bool(fp, "showMessages", BIT(instruments, SHOW_MESSAGES));
     Config_save_int(fp, "maxMessages", maxMessages);
     Config_save_int(fp, "messagesToStdout", messagesToStdout);
-    Config_save_int(fp, "oldMessagesColor", oldMessagesColor);
     Config_save_bool(fp, "reverseScroll", BIT(instruments, SHOW_REVERSE_SCROLL));
     Config_save_bool(fp, "showHUD", BIT(instruments, SHOW_HUD_INSTRUMENTS));
-    Config_save_bool(fp, "showHR", BIT(instruments, SHOW_HR));
+    Config_save_bool(fp, "showHUDRadar", BIT(instruments, SHOW_HUD_RADAR));
+    Config_save_bool(fp, "mapRadar", BIT(hackedInstruments, MAP_RADAR));
+    Config_save_bool(fp, "clientRanker", BIT(hackedInstruments, CLIENT_RANKER));
+    Config_save_bool(fp, "showLivesByShip", BIT(hackedInstruments, SHOW_LIVES_BY_SHIP));
+    Config_save_bool(fp, "treatZeroSpecial", BIT(hackedInstruments, TREAT_ZERO_SPECIAL));
+    Config_save_bool(fp, "showShipShapes", BIT(hackedInstruments, SHOW_SHIP_SHAPES));
+    Config_save_bool(fp, "showMyShipShape", BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE));
+    Config_save_bool(fp, "ballMsgScan", BIT(hackedInstruments, BALL_MSG_SCAN));
     Config_save_bool(fp, "verticalHUDLine", BIT(instruments, SHOW_HUD_VERTICAL));
     Config_save_bool(fp, "horizontalHUDLine", BIT(instruments, SHOW_HUD_HORIZONTAL));
     Config_save_bool(fp, "fuelMeter", BIT(instruments, SHOW_FUEL_METER));
@@ -1586,14 +1967,16 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "packetSizeMeter", BIT(instruments, SHOW_PACKET_SIZE_METER));
     Config_save_bool(fp, "packetLossMeter", BIT(instruments, SHOW_PACKET_LOSS_METER));
     Config_save_bool(fp, "packetDropMeter", BIT(instruments, SHOW_PACKET_DROP_METER));
+    Config_save_bool(fp, "packetLagMeter", BIT(instruments, SHOW_PACKET_LAG_METER));
     Config_save_bool(fp, "slidingRadar", BIT(instruments, SHOW_SLIDING_RADAR));
     Config_save_bool(fp, "showItems", BIT(instruments, SHOW_ITEMS));
     Config_save_float(fp, "showItemsTime", showItemsTime);
+    Config_save_int(fp, "showScoreDecimals", showScoreDecimals);
     Config_save_bool(fp, "outlineWorld", BIT(instruments, SHOW_OUTLINE_WORLD));
     Config_save_bool(fp, "filledWorld", BIT(instruments, SHOW_FILLED_WORLD));
     Config_save_bool(fp, "texturedWalls", BIT(instruments, SHOW_TEXTURED_WALLS));
     Config_save_bool(fp, "fullColor", fullColor);
-    Config_save_bool(fp, "texturedObjects", blockBitmaps);
+    Config_save_bool(fp, "texturedObjects", texturedObjects);
     Config_save_bool(fp, "clock", BIT(instruments, SHOW_CLOCK));
     Config_save_bool(fp, "clockAMPM", BIT(instruments, SHOW_CLOCK_AMPM_FORMAT));
     Config_save_int(fp, "backgroundPointDist", map_point_distance);
@@ -1603,14 +1986,12 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "shotSize", shot_size);
     Config_save_int(fp, "teamShotSize", teamshot_size);
     Config_save_bool(fp, "showNastyShots", showNastyShots);
-    Config_save_int(fp, "hudColor", hudColor);
-    Config_save_int(fp, "hrColor1", hrColor1);
-    Config_save_int(fp, "hrColor2", hrColor2);
     Config_save_int(fp, "hrSize", hrSize);
     Config_save_float(fp, "hrScale", hrScale);
-    Config_save_int(fp, "hudLockColor", hudLockColor);
-    Config_save_int(fp, "wallColor", wallColor);
-    Config_save_int(fp, "decorColor", decorColor);
+    Config_save_float(fp, "hrLimit", hrLimit);
+    Config_save_int(fp, "hudSize", hudSize);
+    Config_save_float(fp, "scoreObjectTime", scoreObjectTime);
+    Config_save_int(fp, "baseWarningType", baseWarningType);
     Config_save_bool(fp, "showDecor", BIT(instruments, SHOW_DECOR));
     Config_save_bool(fp, "outlineDecor", BIT(instruments, SHOW_OUTLINE_DECOR));
     Config_save_bool(fp, "filledDecor", BIT(instruments, SHOW_FILLED_DECOR));
@@ -1620,6 +2001,8 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "markingLights", markingLights);
     Config_save_bool(fp, "toggleShield", toggle_shield);
     Config_save_bool(fp, "autoShield", auto_shield);
+    Config_save_int(fp, "clientPortStart", clientPortStart);
+    Config_save_int(fp, "clientPortEnd", clientPortEnd);
 #if SOUND
     Config_save_int(fp, "maxVolume", maxVolume);
 #endif
@@ -1628,34 +2011,58 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 #endif
     Config_save_float(fp, "scaleFactor", scaleFactor);
     Config_save_float(fp, "altScaleFactor", scaleFactor_s);
-    /* don't save this one: Config_save_int(fp, "maxFPS", maxFPS); */
-    buf[0] = '\0';
-    for (i = 0, prev_key = KEY_DUMMY; i < maxKeyDefs; i++, prev_key = key) {
-	ks = keyDefs[i].keysym;
-	key = keyDefs[i].key;
-	if ((str = XKeysymToString(ks)) == NULL) {
-	    continue;
-	}
-	if (key != prev_key && buf[0] != '\0') {
-	    if ((res = Get_keyResourceString(prev_key)) != NULL) {
-		Config_save_resource(fp, res, buf);
-	    }
-	    buf[0] = '\0';
-	}
-	if (buf[0] != '\0') {
-	    strcat(buf, " ");
-	}
-	strcat(buf, str);
-    }
+    /* don't save maxFPS */
+
+    /* colors */
+    Config_save_comment(fp, "\n; Colors\n;");
+    Config_save_int(fp, "maxColors", maxColors);
+    Config_save_int(fp, "messagesColor", messagesColor);
+    Config_save_int(fp, "oldMessagesColor", oldMessagesColor);
+    Config_save_int(fp, "teamShotColor", teamShotColor);
+    Config_save_int(fp, "hudColor", hudColor);
+    Config_save_int(fp, "hrColor1", hrColor1);
+    Config_save_int(fp, "hrColor2", hrColor2);
+    Config_save_int(fp, "hudLockColor", hudLockColor);
+    Config_save_int(fp, "dirPtrColor", dirPtrColor);
+    Config_save_int(fp, "shipShapesHackColor", shipShapesHackColor);
+    Config_save_int(fp, "msgScanBallColor", msgScanBallColor);
+    Config_save_int(fp, "msgScanCoverColor", msgScanCoverColor);
+    Config_save_int(fp, "selfLWColor", selfLWColor);
+    Config_save_int(fp, "enemyLWColor", enemyLWColor);
+    Config_save_int(fp, "teamLWColor", teamLWColor);
+    Config_save_int(fp, "shipNameColor", shipNameColor);
+    Config_save_int(fp, "baseNameColor", baseNameColor);
+    Config_save_int(fp, "mineNameColor", mineNameColor);
+    Config_save_int(fp, "ballColor", ballColor);
+    Config_save_int(fp, "connColor", connColor);
+    Config_save_int(fp, "windowColor", windowColor);
+    Config_save_int(fp, "buttonColor", buttonColor);
+    Config_save_int(fp, "borderColor", borderColor);
+    Config_save_int(fp, "scoreColor", scoreColor);
+    Config_save_int(fp, "scoreSelfColor", scoreSelfColor);
+    Config_save_int(fp, "scoreInactiveColor", scoreInactiveColor);
+    Config_save_int(fp, "scoreInactiveSelfColor", scoreInactiveSelfColor);
+    Config_save_int(fp, "scoreZeroColor", scoreZeroColor);
+    Config_save_int(fp, "wallColor", wallColor);
+    Config_save_int(fp, "fuelColor", fuelColor);
+    Config_save_int(fp, "decorColor", decorColor);
+
+    Config_save_comment(fp, "\n; Keys\n;");
+    Config_save_keys(fp);
+
+    Config_save_comment(fp, "\n; Modifiers\n;");
     for (i = 0; i < NUM_MODBANKS; i++) {
 	sprintf(buf, "modifierBank%d", i + 1);
 	Config_save_resource(fp, buf, modBankStr[i]);
     }
+
+    IFWINDOWS( Config_save_window_positions() );
+
+    Config_save_comment(fp, "\n; Other\n;");
+
 #ifndef _WINDOWS
     Xpilotrc_end(fp);
     fclose(fp);
-#endif
-#ifndef VMS
     sprintf(newfile, "%s.bak", oldfile);
     rename(oldfile, newfile);
     unlink(oldfile);
@@ -1663,31 +2070,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     rename(newfile, oldfile);
 #endif
 
-#ifdef _WINDOWS
-    /* save our window's position */
-    {
-	WINDOWPLACEMENT	wp;
-	Window w;
-	RECT rect;
-	char	s[50];
-	w = WinXGetParent(top);
-	WinXGetWindowRect(w, &rect);
-	WinXGetWindowPlacement(w, &wp);
-	if (wp.showCmd != SW_SHOWMINIMIZED)
-	{
-	    extern	const char* s_WindowMet;
-	    extern	const char* s_L;
-	    extern	const char* s_T;
-	    extern	const char* s_R;
-	    extern	const char* s_B;
-	    itoa(rect.left, s, 10);
-	    WritePrivateProfileString(s_WindowMet, s_L, itoa(rect.left, s, 10), Get_xpilotini_file(1));
-	    WritePrivateProfileString(s_WindowMet, s_T, itoa(rect.top, s, 10), Get_xpilotini_file(1));
-	    WritePrivateProfileString(s_WindowMet, s_R, itoa(rect.right, s, 10), Get_xpilotini_file(1));
-	    WritePrivateProfileString(s_WindowMet, s_B, itoa(rect.bottom, s, 10), Get_xpilotini_file(1));
-	}
-    }
-#endif
     if (config_save_confirm_desc != NO_WIDGET) {
 	Widget_destroy(config_save_confirm_desc);
 	config_save_confirm_desc = NO_WIDGET;
@@ -1700,36 +2082,33 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 static int Config_save_confirm_callback(int widget_desc, void *popup_desc, const char **strptr)
 {
     if (config_save_confirm_desc != NO_WIDGET) {
-	Widget_destroy((int)popup_desc);
+	Widget_destroy((int)(long int)popup_desc);
 	config_save_confirm_desc = NO_WIDGET;
     }
     return 0;
 }
 
-int Config(bool doit)
+int Config(bool doit, int what)
 {
-    IFWINDOWS( Trace("***Config %d\n", doit); )
-    if (config_created == false) {
-	if (doit == false) {
-	    return 0;
-	}
-	Create_config();
-	if (config_created == false) {
-	    return false;
-	}
-    }
-    if (config_mapped == false) {
-	if (doit == true) {
-	    Widget_raise(config_widget_desc[config_page]);
-	    config_mapped = true;
-	}
-    } else {
-	if (doit == false) {
-	    Widget_unmap(config_widget_desc[config_page]);
-	    config_mapped = false;
-	}
-    }
-    return (config_mapped == true);
+    IFWINDOWS( Trace("***Config %d\n", doit) );
+
+    /* kps - get rid of the old widgets, it's the most easy way */
+    Config_destroy();
+    if (doit == false)
+	return false;
+
+    if (what == CONFIG_DEFAULT)
+	config_creator = config_creator_default;
+    else if (what == CONFIG_COLORS)
+	config_creator = config_creator_colors;
+
+    Create_config();
+    if (config_created == false)
+	return false;
+
+    Widget_raise(config_widget_desc[config_page]);
+    config_mapped = true;
+    return true;
 }
 
 void Config_destroy(void)
@@ -1759,7 +2138,7 @@ void Config_resize(void)
     if (config_created == true) {
 	Config_destroy();
 	if (mapped == true) {
-	    Config(mapped);
+	  Config(mapped, CONFIG_NONE /* kps ??? */);
 	}
     }
 }
@@ -1771,7 +2150,7 @@ void Config_redraw(void)
     if (!config_mapped)
 	return;
 
-    for (i = 0; i < NELEM(config_creator); i++) {
+    for (i = 0; i < Nelem_config_creator(); i++) {
 	Widget_draw(config_widget_ids[i]);
     }
 }

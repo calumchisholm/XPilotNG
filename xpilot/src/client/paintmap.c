@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -29,11 +29,13 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#else
-#include "NT/winX.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
 #endif
 
 #include "version.h"
@@ -48,18 +50,18 @@
 #include "texture.h"
 #include "paint.h"
 #include "paintdata.h"
+#include "paintmacros.h"
 #include "record.h"
 #include "xinit.h"
 #include "protoclient.h"
 #include "guimap.h"
 
-char paintmap_version[] = VERSION;
 
-#define X(co)  ((int) ((co) - world.x))
-#define Y(co)  ((int) (world.y + view_height - (co)))
+char paintmap_version[] = VERSION;
 
 
 int	wallColor;		/* Color index for wall drawing */
+int	fuelColor;		/* Color index for fuel station drawing */
 int	decorColor;		/* Color index for decoration drawing */
 char	*wallTextureFile;	/* Filename of wall texture */
 char	*decorTextureFile;	/* Filename of decor texture */
@@ -86,28 +88,33 @@ void Paint_vfuel(void)
 {
     int	i;
     if (num_vfuel > 0) {
-        for (i = 0; i < num_vfuel; i++) {
-            Gui_paint_fuel(vfuel_ptr[i].x, vfuel_ptr[i].y, vfuel_ptr[i].fuel);
-        }
-        RELEASE(vfuel_ptr, num_vfuel, max_vfuel);
+	for (i = 0; i < num_vfuel; i++) {
+	    Gui_paint_fuel(vfuel_ptr[i].x, vfuel_ptr[i].y, vfuel_ptr[i].fuel);
+	}
+	RELEASE(vfuel_ptr, num_vfuel, max_vfuel);
     }
 }
 
 /* Easier to paint appearing ships from here for old servers, therefore
  * this declaration of a function from guiobjects.c */
 extern void Gui_paint_appearing(int x, int y, int id, int count);
+
 void Paint_vbase(void)
 {
-    int	i, j, id, team;
+    int	i, j, id, team;;
     if (num_vbase > 0) {
 	for (i = 0; i < num_vbase; i++) {
-            Base_info_by_pos(vbase_ptr[i].xi, vbase_ptr[i].yi, &id, &team);
-	    Gui_paint_base(vbase_ptr[i].x, vbase_ptr[i].y, id, team, vbase_ptr[i].type);
-	    for (j = 0; j < 10; j++) {
-		if (deatharray[j].id == id &&
-				deatharray[j].deathtime > loops - 3 * FPS)
-		    Gui_paint_appearing(vbase_ptr[i].x + BLOCK_SZ / 2,
-					vbase_ptr[i].y + BLOCK_SZ / 2, id, 1);
+	    Base_info_by_pos(vbase_ptr[i].xi, vbase_ptr[i].yi, &id, &team);
+	    Gui_paint_base(vbase_ptr[i].x, vbase_ptr[i].y, id, team,
+			   vbase_ptr[i].type);
+	    if (baseWarningType & 1) {
+		for (j = 0; j < num_bases; j++) {
+		    if (bases[j].id == id &&
+			bases[j].deathtime > loops - baseWarningFrames)
+			Gui_paint_appearing(vbase_ptr[i].x + BLOCK_SZ / 2,
+					    vbase_ptr[i].y + BLOCK_SZ / 2, id,
+					    1);
+		}
 	    }
 	}
 	RELEASE(vbase_ptr, num_vbase, max_vbase);
@@ -118,19 +125,18 @@ void Paint_vdecor(void)
 {
     int	i;
     bool last, more_y;
-
+    
     if (num_vdecor > 0) {
 	for (i = 0; i < num_vdecor; i++) {
 	    last = (i + 1 == num_vdecor);
 	    more_y = (vdecor_ptr[i].yi != vdecor_ptr[i + 1].yi);
-	    Gui_paint_decor(vdecor_ptr[i].x, vdecor_ptr[i].y,
+	    Gui_paint_decor(vdecor_ptr[i].x, vdecor_ptr[i].y, 
 			    vdecor_ptr[i].xi, vdecor_ptr[i].yi,
 			    vdecor_ptr[i].type, last, more_y);
 	}
 	RELEASE(vdecor_ptr, num_vdecor, max_vdecor);
     }
 }
-
 
 static void Paint_background_dots(void)
 {
@@ -151,8 +157,8 @@ static void Paint_background_dots(void)
     min.y = world.y / dy;
     if (world.y > 0) min.y++;
 
-    max.x = (world.x + view_width) / dx;
-    max.y = (world.y + view_height) / dy;
+    max.x = (world.x + ext_view_width) / dx;
+    max.y = (world.y + ext_view_height) / dy;
 
     for (yi = min.y; yi <= max.y; yi++) {
         for (xi = min.x; xi <= max.x; xi++) {
@@ -171,12 +177,12 @@ static void Compute_bounds(ipos *min, ipos *max, const irec *b)
 {
     min->x = (world.x - (b->x + b->w)) / Setup->width;
     if (world.x > b->x + b->w) min->x++;
-    max->x = (world.x + view_width - b->x) / Setup->width;
-    if (world.x + view_width < b->x) max->x--;
+    max->x = (world.x + ext_view_width - b->x) / Setup->width;
+    if (world.x + ext_view_width < b->x) max->x--;
     min->y = (world.y - (b->y + b->h)) / Setup->height;
     if (world.y > b->y + b->h) min->y++;
-    max->y = (world.y + view_height - b->y) / Setup->height;
-    if (world.y + view_height < b->y) max->y--;
+    max->y = (world.y + ext_view_height - b->y) / Setup->height;
+    if (world.y + ext_view_height < b->y) max->y--;
 
 }
 
@@ -222,6 +228,14 @@ void Paint_objects(void)
                      bases[i].bounds.y + yoff * Setup->height,
                      bases[i].id, bases[i].team,
                      bases[i].type);
+
+		if ((baseWarningType & 1)
+		    && bases[i].deathtime > loops - baseWarningFrames) {
+		    Gui_paint_appearing(
+			bases[i].bounds.x + xoff * Setup->width + BLOCK_SZ / 2,
+			bases[i].bounds.y + yoff * Setup->height+ BLOCK_SZ / 2,
+			bases[i].id, 1);
+		}
             }
         }
     }
@@ -241,6 +255,7 @@ void Paint_objects(void)
     }
 }
 
+
 /*
  * Draw the current player view of the map in the large viewing area.
  * This includes drawing walls, fuelstations, targets and cannons.
@@ -256,12 +271,12 @@ void Paint_objects(void)
  *     How does filled mode work?
  *     It's cunning.  It scans from left to right across an area 1 block deep.
  *     Say the map is :
- *
+ *     
  *     space       wall    space  w  s w
  *             /        |        / \  | |
  *            /         |        |  \ | |     <- Scanning this line
  *           /          |        |   \| |
- *
+ *     
  *     It starts from the left and determines if it's in wall or outside wall.
  *     If it is it sets tl and bl (top left and bottom left) to the left hand
  *     side of the window.
@@ -274,6 +289,8 @@ void Paint_objects(void)
  *     Hence the line indicated above would be drawn with 3 filled polygons.
  *
  */
+
+
 void Paint_world(void)
 {
     int			xi, yi, xb, yb, xe, ye, fuel;
@@ -289,9 +306,9 @@ void Paint_world(void)
     unsigned char	*mapptr, *mapbase;
     static int		wallTileReady = 0;
     static Pixmap	wallTile = None;
-    int			wallTileDoit = false;
+    static int		wallTileDoit = false;
     XPoint		points[5];
-
+    static DFLOAT	oldHRLimit = -1.0;
 
     wormDrawCount = (wormDrawCount + 1) & 7;
 
@@ -299,21 +316,33 @@ void Paint_world(void)
 	if (world.x <= 0) {
 	    Gui_paint_border(0, 0, 0, Setup->height);
 	}
-	if (world.x + view_width >= Setup->width) {
+	if (world.x + ext_view_width >= Setup->width) {
 	    Gui_paint_border(Setup->width, 0, Setup->width, Setup->height);
 	}
 	if (world.y <= 0) {
 	    Gui_paint_border(0, 0, Setup->width, 0);
 	}
-	if (world.y + view_height >= Setup->height) {
+	if (world.y + ext_view_height >= Setup->height) {
 	    Gui_paint_border(0, Setup->height, Setup->width, Setup->height);
 	}
     }
 
-    Gui_paint_visible_border(world.x + view_width/2 - MAX_VIEW_SIZE/2,
-			     world.y + view_height/2 - MAX_VIEW_SIZE/2,
-			     world.x + view_width/2 + MAX_VIEW_SIZE/2,
-			     world.y + view_height/2 + MAX_VIEW_SIZE/2);
+    if (ext_view_width > MAX_VIEW_SIZE || ext_view_height > MAX_VIEW_SIZE) {
+	Gui_paint_visible_border(world.x + ext_view_width/2 - MAX_VIEW_SIZE/2,
+				 world.y + ext_view_height/2 - MAX_VIEW_SIZE/2,
+				 world.x + ext_view_width/2 + MAX_VIEW_SIZE/2,
+				 world.y + ext_view_height/2 + MAX_VIEW_SIZE/2);
+    }
+
+    /* kps - this should be drawn more than one frame if fps is high */
+    if (oldHRLimit != hrLimit) {
+	Gui_paint_visible_border(
+	    (int)(world.x + ext_view_width/2  - hrLimit * MAX_VIEW_SIZE/2),
+	    (int)(world.y + ext_view_height/2 - hrLimit * MAX_VIEW_SIZE/2),
+	    (int)(world.x + ext_view_width/2  + hrLimit * MAX_VIEW_SIZE/2),
+	    (int)(world.y + ext_view_height/2 + hrLimit * MAX_VIEW_SIZE/2));
+	oldHRLimit = hrLimit;
+    }
 
     if (!oldServer) {
         Paint_background_dots();
@@ -322,8 +351,8 @@ void Paint_world(void)
 
     xb = ((world.x < 0) ? (world.x - (BLOCK_SZ - 1)) : world.x) / BLOCK_SZ;
     yb = ((world.y < 0) ? (world.y - (BLOCK_SZ - 1)) : world.y) / BLOCK_SZ;
-    xe = (world.x + view_width) / BLOCK_SZ;
-    ye = (world.y + view_height) / BLOCK_SZ;
+    xe = (world.x + ext_view_width) / BLOCK_SZ;
+    ye = (world.y + ext_view_height) / BLOCK_SZ;
     if (!BIT(Setup->mode, WRAP_PLAY)) {
 	if (xb < 0)
 	    xb = 0;
@@ -434,6 +463,10 @@ void Paint_world(void)
 		    Gui_paint_setup_item_concentrator(x, y);
 		    break;
 
+		case SETUP_ASTEROID_CONCENTRATOR:
+		    Gui_paint_setup_asteroid_concentrator(x, y);
+		    break;
+
 		case SETUP_CANNON_UP:
 		case SETUP_CANNON_DOWN:
 		case SETUP_CANNON_RIGHT:
@@ -489,7 +522,7 @@ void Paint_world(void)
 			    break;
 
 			target = type - SETUP_TARGET;
-			own = (self && (self->team == target));
+			own = (eyeTeam == target);
 
 			Gui_paint_setup_target(x, y, target, damage, own);
 
@@ -511,7 +544,7 @@ void Paint_world(void)
 			bool	own;
 
 			treasure = type - SETUP_TREASURE;
-			own = (self && self->team == treasure);
+			own = (eyeTeam == treasure);
 
 			Gui_paint_setup_treasure(x, y, treasure, own);
 		    }

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -37,6 +37,8 @@
 
 char math_version[] = VERSION;
 
+
+
 DFLOAT		tbl_sin[TABLE_SIZE];
 DFLOAT		tbl_cos[TABLE_SIZE];
 
@@ -72,7 +74,6 @@ int mod(int x, int y)
     return x;
 }
 
-
 DFLOAT findDir(DFLOAT x, DFLOAT y)
 {
     DFLOAT angle;
@@ -107,3 +108,4 @@ void Make_table(void)
 	tbl_cos[i] = cos(i * (2.0 * PI / TABLE_SIZE));
     }
 }
+

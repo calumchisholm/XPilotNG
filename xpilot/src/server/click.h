@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -42,24 +43,53 @@
 #define CLICK_TO_FLOAT(C)	((DFLOAT)(C) * (1.0f / CLICK))
 #define PIXEL_TO_CLICK(I)	((click_t)(I) << CLICK_SHIFT)
 #define FLOAT_TO_CLICK(F)	((int)((F) * CLICK))
+/* calculate the click coordinate of the center of a block */
+#define BLOCK_CENTER(B)		((int)((B) * BLOCK_CLICKS) + BLOCK_CLICKS / 2)
 
 /*
- * Two acros for edge wrap of x and y coordinates measured in clicks.
+ * Two macros for edge wrap of x and y coordinates measured in clicks.
  * Note that the correction needed should never be bigger than the size of the map.
  */
 #define WRAP_XCLICK(x_)	\
-             ((x_) < 0 \
+	(BIT(World.rules->mode, WRAP_PLAY) \
+	    ? ((x_) < 0 \
 		? (x_) + World.cwidth \
 		: ((x_) >= World.cwidth \
 		    ? (x_) - World.cwidth \
-		    : (x_)))
+		    : (x_))) \
+	    : (x_))
 
 #define WRAP_YCLICK(y_)	\
-	      ((y_) < 0 \
+	(BIT(World.rules->mode, WRAP_PLAY) \
+	    ? ((y_) < 0 \
 		? (y_) + World.cheight \
 		: ((y_) >= World.cheight \
 		    ? (y_) - World.cheight \
-		    : (y_)))
+		    : (y_))) \
+	    : (y_))
+
+/*
+ * Two macros for edge wrap of differences in position.
+ * If the absolute value of a difference is bigger than
+ * half the map size then it is wrapped.
+ */
+#define WRAP_DCX(dcx)	\
+	(BIT(World.rules->mode, WRAP_PLAY) \
+	    ? ((dcx) < - (World.cwidth >> 1) \
+		? (dcx) + World.cwidth \
+		: ((dcx) > (World.cwidth >> 1) \
+		    ? (dcx) - World.cwidth \
+		    : (dcx))) \
+	    : (dcx))
+
+#define WRAP_DCY(dcy)	\
+	(BIT(World.rules->mode, WRAP_PLAY) \
+	    ? ((dcy) < - (World.cheight >> 1) \
+		? (dcy) + World.cheight \
+		: ((dcy) > (World.cheight >> 1) \
+		    ? (dcy) - World.cheight \
+		    : (dcy))) \
+	    : (dcy))
 
 #define TWRAP_XCLICK(x_) \
      ((x_) > 0 ? (x_) % World.cwidth : \
@@ -70,7 +100,12 @@
       ((y_) % World.cheight + World.cheight))
 
 
-#define CENTER_XCLICK(X) (((X) < -(World.cwidth >> 1)) ? (X) + World.cwidth : (((X) >= (World.cwidth >> 1)) ? (X) - World.cwidth : (X)))
+#define CENTER_XCLICK(X) \
+        (((X) < -(World.cwidth >> 1)) ? \
+             (X) + World.cwidth : \
+             (((X) >= (World.cwidth >> 1)) ? \
+                 (X) - World.cwidth : \
+                 (X)))
 
 #define CENTER_YCLICK(X) \
         (((X) < -(World.cheight >> 1)) ? \
@@ -82,11 +117,11 @@
 typedef int click_t;
 
 typedef struct {
-    click_t		x, y;
+    click_t		cx, cy;
 } clpos;
 
 typedef struct {
-    click_t		x, y;
+    click_t		cx, cy;
 } clvec;
 
 #endif

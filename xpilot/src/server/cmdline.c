@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -26,46 +27,69 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
-#ifdef	_WINDOWS
-#include "NT/winServer.h"
+#ifdef _WINDOWS
+# include "NT/winServer.h"
 #endif
 
 #define SERVER
 #include "version.h"
 #include "config.h"
-#include "const.h"
+#include "serverconst.h"
 #include "global.h"
 #include "proto.h"
 #include "defaults.h"
 #include "error.h"
 #include "portability.h"
+#include "checknames.h"
 #include "commonproto.h"
+#include "tuner.h"
 
 char cmdline_version[] = VERSION;
 
+
+list_t		expandList;		/* List of predefined settings. */
 DFLOAT		Gravity;		/* Power of gravity */
 DFLOAT		ShipMass;		/* Default mass of ship */
+DFLOAT		ballMass;		/* Default mass of balls */
 DFLOAT		ShotsMass;		/* Default mass of shots */
 DFLOAT		ShotsSpeed;		/* Default speed of shots */
 int		ShotsLife;		/* Default number of ticks */
 					/* each shot will live */
 static DFLOAT	ShotsLifeSetting;	/* Above is set through this */
+bool		shotHitFuelDrainUsesKineticEnergy;	/* see option name */
+int		maxRobots;		/* How many robots should enter */
+int		minRobots;		/* the game? */
+char		*robotFile;		/* Filename for robot parameters */
+int		robotsTalk;		/* Do robots talk? */
+int		robotsLeave;		/* Do robots leave at all? */
+int		robotLeaveLife;		/* Max life per robot (0=off)*/
+int		robotLeaveScore;	/* Min score for robot to live (0=off)*/
+int		robotLeaveRatio;	/* Min ratio for robot to live (0=off)*/
+int		robotTeam;		/* Team for robots */
+bool		restrictRobots;		/* Restrict robots to robotTeam? */
+bool		reserveRobotTeam;	/* Allow only robots in robotTeam? */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
-int		fireRepeatRate;		/* Frames per autorepeat fire (0=off)*/
+int		fireRepeatRate;		/* Frames per autorepeat fire (0=off) */
 static DFLOAT	fireRepeatRateSetting;	/* Above is set through this */
+int		laserRepeatRate;	/* Frames per autorepeat laser (0=off) */
+static DFLOAT	laserRepeatRateSetting;	/* Above is set through this */
 
-bool		RawMode;		/* Calculate frames even if there */
-					/* are no players logged in */
+bool		RawMode;		/* Let robots live and calculate
+					   frames even if there are n
+					   players logged in */
 bool		NoQuit;			/* Don't quit even if there are */
 					/* no human players playing */
+bool		logRobots;		/* log robots coming and going */
 char		*mapFileName;		/* Name of mapfile... */
+char		*mapData;		/* Raw map data... */
 int		mapWidth;		/* Width of the universe */
 int		mapHeight;		/* Height of the universe */
 char		*mapName;		/* Name of the universe */
 char		*mapAuthor;		/* Name of the creator */
-char            *dataURL;               /* URL to client for extra data */
+char		*dataURL;		/* URL to client for extra data */
 int		contactPort;		/* Contact port number */
 char		*serverHost;		/* Host name (for multihomed hosts) */
 
@@ -81,12 +105,18 @@ bool		missilesWallBounce;	/* Do missiles bounce off walls? */
 bool		sparksWallBounce;	/* Do sparks bounce off walls? */
 bool		debrisWallBounce;	/* Do sparks bounce off walls? */
 bool		ballsWallBounce;	/* Do balls bounce off walls? */
+bool		ballCollisions;		/* Do balls participate in colls.? */
+bool		ballSparkCollisions;	/* Do sparks push balls around? */
+bool		asteroidsWallBounce;	/* Do asteroids bounce off walls? */
 bool		cloakedExhaust;		/* Generate exhaust when cloaked? */
 bool		cloakedShield;		/* Allowed to use shields when cloaked? */
 bool		ecmsReprogramMines;	/* Do ecms reprogram mines? */
+bool		ecmsReprogramRobots;	/* Do ecms reprogram robots? */
 DFLOAT		maxObjectWallBounceSpeed;	/* max object bounce speed */
 DFLOAT		maxShieldedWallBounceSpeed;	/* max shielded bounce speed */
 DFLOAT		maxUnshieldedWallBounceSpeed; /* max unshielded bounce speed */
+DFLOAT		maxShieldedWallBounceAngle;	/* max angle for landing */
+DFLOAT		maxUnshieldedWallBounceAngle;	/* max angle for landing */
 DFLOAT		playerWallBrakeFactor;	/* wall lowers speed if less than 1 */
 DFLOAT		objectWallBrakeFactor;	/* wall lowers speed if less than 1 */
 DFLOAT		objectWallBounceLifeFactor;	/* reduce object life */
@@ -98,16 +128,27 @@ DFLOAT		maxVisibilityDistance;	/* Maximum visibility */
 bool		limitedLives;		/* Are lives limited? */
 int		worldLives;		/* If so, what's the max? */
 bool		endOfRoundReset;	/* Reset the world when round ends? */
-int		resetOnHuman;		/* Restart when human enters? */
+int		resetOnHuman;		/* Last human to reset round for */
+bool		allowAlliances;		/* Are alliances allowed? */
+bool		announceAlliances;	/* Are changes in alliances broadcast? */
 bool		teamPlay;		/* Are teams allowed? */
 bool		teamFuel;		/* Do fuelstations belong to teams? */
 bool		teamCannons;		/* Do cannons belong to teams? */
 int		cannonSmartness;	/* Accuracy of cannonfire */
 bool		cannonsUseItems;	/* Do cannons use items? */
+bool		cannonsDefend;		/* Do cannons defend themselves? */
+bool		cannonFlak;		/* Do cannons fire flak? */
+int		cannonDeadTime;		/* How long do cannons stay dead? */
 bool		keepShots;		/* Keep shots when player leaves? */
 bool		timing;			/* Is this a race? */
+bool		ballrace;		/* Do we race with balls? */
+bool		ballrace_connect;	/* Need to be connected to ball to pass
+					   checkpoints? */
 bool		edgeWrap;		/* Do objects wrap when they cross
 					   the edge of the Universe? */
+bool		edgeBounce;		/* Do objects bounce when they hit
+					   the edge of the Universe? */
+bool		extraBorder;		/* Give map an extra border? */
 ipos		gravityPoint;		/* Where does gravity originate? */
 DFLOAT		gravityAngle;		/* If gravity is along a uniform line,
 					   at what angle is that line? */
@@ -117,10 +158,16 @@ bool		gravityAnticlockwise;	/* If not clockwise, anticlockwise? */
 bool		gravityVisible;		/* Is gravity visible? */
 bool		wormholeVisible;	/* Are wormholes visible? */
 bool		itemConcentratorVisible;/* Are itemconcentrators visible? */
+bool		asteroidConcentratorVisible;	/* Are asteroid concentrators visible? */
 int		wormTime;
 char		*defaultsFileName;	/* Name of defaults file... */
-char		*playerPasswordsFileName;/* Name of player passwords file... */
-int		playerPasswordsFileSizeLimit;/* Limit on player passwords file size */
+char		*passwordFileName;	/* Name of password file... */
+char		*playerPasswordsFileName;	/* Name of player passwords file... */
+int		playerPasswordsFileSizeLimit;	/* Limit on player passwords file size */
+char		*motdFileName;		/* Name of motd file */
+char		*scoreTableFileName;	/* Name of score table file */
+char		*adminMessageFileName;	/* Name of admin message file */
+int		adminMessageFileSizeLimit;/* Limit on admin message file size */
 
 int		nukeMinSmarts;		/* minimum smarts for a nuke */
 int		nukeMinMines;		/* minimum number of mines for nuke */
@@ -129,8 +176,10 @@ DFLOAT		nukeClusterDamage;	/* multiplier for damage from nuke */
 					/* of particles by similar amount */
 int		mineFuseTime;		/* Length of time mine is fused */
 int		mineLife;		/* lifetime of mines */
+DFLOAT		minMineSpeed;		/* minimum speed of mines */
 int		missileLife;		/* lifetime of missiles */
 int		baseMineRange;		/* Distance from base mines may be used */
+int		mineShotDetonateDistance; /* When does a shot trigger a mine? */
 
 DFLOAT		shotKillScoreMult;
 DFLOAT		torpedoKillScoreMult;
@@ -145,20 +194,33 @@ DFLOAT		explosionKillScoreMult;
 DFLOAT		shoveKillScoreMult;
 DFLOAT		crashScoreMult;
 DFLOAT		mineScoreMult;
+DFLOAT		selfKillScoreMult;
+DFLOAT		selfDestructScoreMult;
+DFLOAT		unownedKillScoreMult;
+DFLOAT		asteroidPoints;
+DFLOAT		cannonPoints;
+DFLOAT		asteroidMaxScore;
+DFLOAT		cannonMaxScore;
 
 DFLOAT 		movingItemProb;		/* Probability for moving items */
+DFLOAT		randomItemProb;		/* Probability for random-appearing items */
 DFLOAT		dropItemOnKillProb;	/* Probability for players items to */
 					/* drop when player is killed */
 DFLOAT		detonateItemOnKillProb;	/* Probaility for remaining items to */
 					/* detonate when player is killed */
 DFLOAT		destroyItemInCollisionProb;
-DFLOAT           rogueHeatProb;          /* prob. that unclaimed rocketpack */
-DFLOAT           rogueMineProb;          /* or minepack will "activate" */
+DFLOAT		asteroidItemProb;	/* prob. that a broken asteroid will */
+int		asteroidMaxItems;	/* have one or more items */
+DFLOAT		rogueHeatProb;          /* prob. that unclaimed rocketpack */
+DFLOAT		rogueMineProb;          /* or minepack will "activate" */
 DFLOAT		itemProbMult;
 DFLOAT		cannonItemProbMult;
 DFLOAT		maxItemDensity;
+DFLOAT		maxAsteroidDensity;
 int		itemConcentratorRadius;
 DFLOAT		itemConcentratorProb;
+int		asteroidConcentratorRadius;
+DFLOAT		asteroidConcentratorProb;
 
 bool		allowSmartMissiles;
 bool		allowHeatSeekers;
@@ -175,6 +237,7 @@ bool		missilesOnRadar;	/* Are missiles visible on radar? */
 bool		minesOnRadar;		/* Are mines visible on radar? */
 bool		nukesOnRadar;		/* Are nuke weapons radar visible? */
 bool		treasuresOnRadar;	/* Are treasure balls radar visible? */
+bool		asteroidsOnRadar;	/* Are asteroids radar visible? */
 bool		distinguishMissiles;	/* Smarts, heats & torps look diff.? */
 int		maxMissilesPerPack;	/* Number of missiles per item. */
 int		maxMinesPerPack;	/* Number of mines per item. */
@@ -183,67 +246,126 @@ bool		shieldedItemPickup;	/* Pickup items with shields up? */
 bool		shieldedMining;		/* Detach mines with shields up? */
 bool		laserIsStunGun;		/* Is the laser a stun gun? */
 bool		reportToMetaServer;	/* Send status to meta-server? */
-bool            searchDomainForXPilot;  /* Do a DNS lookup for XPilot.domain?*/
+bool		searchDomainForXPilot;	/* Do a DNS lookup for XPilot.domain? */
 char		*denyHosts;		/* Computers which are denied service */
 DFLOAT		gameDuration;		/* total duration of game in minutes */
-bool		allowViewing;		/* Full framerate paused/waiting? */
-
+bool		fullFramerate;		/* Are players allowed to watch
+					   others with full framerate? */
+bool		fullZeroFramerate;	/* Are team zero pausers allowed to
+					   watch others with full framerate? */
 bool		teamAssign;		/* Assign player to team if not set? */
 bool		teamImmunity;		/* Is team immune from player action */
+bool		teamShareScore;		/* Are scores shared between members? */
 
 bool		targetKillTeam;		/* if your target explodes, you die? */
 bool		targetTeamCollision;	/* Does team collide with target? */
 bool		targetSync;		/* all targets reappear together */
+int		targetDeadTime;		/* How long do targgets stay dead? */
 bool		treasureKillTeam;	/* die if treasure is destroyed? */
+bool		captureTheFlag;		/* must treasure be safe to cash balls? */
 bool		treasureCollisionDestroys;
 bool		treasureCollisionMayKill;
 bool		wreckageCollisionMayKill;
+bool		asteroidCollisionMayKill;
+
+DFLOAT		ballConnectorSpringConstant;
+DFLOAT		ballConnectorDamping;
+DFLOAT		maxBallConnectorRatio;
+DFLOAT		ballConnectorLength;
+bool		connectorIsString;	/* can the connector get shorter? */
+bool		treatBallAsPoint;	/* ball is treated as a single point */
 
 DFLOAT		friction;		/* friction only affects ships */
 static DFLOAT	frictionSetting;	/* Above set through this */
+DFLOAT		blockFriction;		/* friction in friction blocks */
+bool		blockFrictionVisible;	/* if yes, friction blocks are decor; */
+					/* if no, friction blocks are space */
+int		coriolis;		/* angle velocity turns each frame */
 DFLOAT		checkpointRadius;      	/* in blocks */
 int		raceLaps;		/* how many laps per race */
 bool		lockOtherTeam;		/* lock ply from other teams when dead? */
-bool		loseItemDestroys; 	/* destroy or drop when player */
-					/* uses loseItem */
-int		roundDelay;		/* delay before start of each round */
+bool		loseItemDestroys; 	/* destroy item on loseItem? */
+bool		useWreckage;		/* destroyed ships leave wreckage? */
+
+int		maxOffensiveItems;	/* how many offensive and defensive */
+int		maxDefensiveItems;	/* items can player carry */
+
+int		roundDelaySeconds;	/* delay before start of each round */
 int		maxRoundTime;		/* max. duration of each round */
-
+#if 0
+int		roundsToPlay;		/* # of rounds to play. */
+int		roundsPlayed;		/* # of rounds played sofar. */
+#endif
+int		maxVisibleObject;	/* how many objects a player can see */
 bool		pLockServer;		/* Is server swappable out of memory?  */
-
-int             timerResolution;        /* OS timer resolution (ticks/s) */
-char            *password;              /* password for operator status */
-int             numberOfRounds;         /* how many rounds to play */
-int             playerLimit;            /* allow less players than bases */
-int             recordMode;             /* 0=off, 1=record, 2=playback */
-int		recordFlushInterval;	/* Max seconds between storing data */
-int             constantScoring;        /* Fixed points for kills etc? */
-int             eliminationRace;        /* Last player drops each lap? */
+bool		ignore20MaxFPS;		/* ignore client maxFPS request if 20 */
+int		timerResolution;	/* OS timer resolution (times/sec) */
+char		*password;		/* password for operator status */
 int		clientPortStart;	/* First UDP port for clients */
-int             clientPortEnd;          /* Last one (these are for firewalls)*/
+int		clientPortEnd;		/* Last one (these are for firewalls) */
+
+char		*robotRealName;		/* Real name for robot */
+char		*robotHostName;		/* Host name for robot */
+
+char		*tankRealName;		/* Real name for tank */
+char		*tankHostName;		/* Host name for tank */
+int		tankScoreDecrement;	/* Amount by which the tank's score */
+					/* is decreased from the player's */
+
+bool		turnThrust;		/* Does turning use fuel and shoot sparks? */
+bool		selfImmunity;		/* Are players immune to their own weapons? */
+
+char		*defaultShipShape;	/* What ship shape is used for players */
+					/* who do not define their own? */
+char		*tankShipShape;		/* What ship shape is used for tanks? */
+int		maxPauseTime;		/* Max. time you can stay paused for */
+
+
+extern char	conf_logfile_string[];	/* Default name of log file */
+
+int		roundsToPlay;		/* how many rounds to play */
+int		playerLimit;		/* allow less players than bases */
+
+int		constantScoring;	/* Fixed points for kills etc? */
+int		eliminationRace;	/* Last player drops each lap? */
+
+DFLOAT		FPSMultiplier;		/* Slow everything by this factor */
+DFLOAT		gameSpeed;		/* FPS/FPSMultiplier */
+int		timeStep;		/* Game time step per frame */
+DFLOAT		timeStep2;		/* timeStep /TIME_FACT */
+					/* before: framespeed, framespeed2 */
+
+
+int		recordMode;		/* 0=off, 1=record, 2=playback */
+int		recordFlushInterval;	/* Max seconds between storing data */
 char		*recordFileName;
-int		FPSMultiplier;		/* Slow everything by this factor */
-int		framespeed;
-DFLOAT		framespeed2;
 
-
-extern char	conf_default_map_string[];	/* from common/config.c */
+bool		useOldCode;		/* Choice of new and old code */
+bool		polygonMode;		/* Run server in polygon mode even
+					   with block based (.xp) mapfile */
 
 /*
- * Two functions which can be used if an option
- * does not have its own function which should
- * be called after the option value has been
- * changed during runtime.  The tuner_none
- * function should be specified when an option
- * cannot be changed at all during runtime.
- * The tuner_dummy can be specified if it
- * is OK to modify the option during runtime
- * and no follow up action is needed.
- */
-static void tuner_none(void)  {}
-static void tuner_dummy(void) {}
+** Two functions which can be used if an option
+** does not have its own function which should
+** be called after the option value has been
+** changed during runtime.  The tuner_none
+** function should be specified when an option
+** cannot be changed at all during runtime.
+** The tuner_dummy can be specified if it
+** is OK to modify the option during runtime
+** and no follow up action is needed.
+*/
+void tuner_none(void)  {}
+void tuner_dummy(void) {}
 
-static optionDesc options[] = {
+
+static void Tune_robot_real_name(void) { Fix_real_name(robotRealName); }
+static void Tune_robot_host_name(void) { Fix_host_name(robotHostName); }
+static void Tune_tank_real_name(void)  { Fix_real_name(tankRealName); }
+static void Tune_tank_host_name(void)  { Fix_host_name(tankHostName); }
+
+
+static option_desc options[] = {
     {
 	"help",
 	"help",
@@ -252,7 +374,7 @@ static optionDesc options[] = {
 	valVoid,
 	tuner_none,
 	"Print out this help message.\n",
-	OPT_ANY
+	OPT_NONE
     },
     {
 	"version",
@@ -262,7 +384,7 @@ static optionDesc options[] = {
 	valVoid,
 	tuner_none,
 	"Print version information.\n",
-	OPT_ANY
+	OPT_NONE
     },
     {
 	"dump",
@@ -272,7 +394,19 @@ static optionDesc options[] = {
 	valVoid,
 	tuner_none,
 	"Print all options with their default values in defaultsfile format.\n",
-	OPT_ANY
+	OPT_NONE
+    },
+    {
+	"expand",
+	"expand",
+	"",
+	&expandList,
+	valList,
+	tuner_none,
+	"Expand a comma separated list of predefined settings.\n"
+	"These settings can be defined in either the defaults file\n"
+	"or in a map file using the \"define:\" operator.\n",
+	OPT_COMMAND
     },
     {
 	"gravity",
@@ -280,9 +414,9 @@ static optionDesc options[] = {
 	"-0.14",
 	&Gravity,
 	valReal,
-	tuner_none,
+	Compute_gravity,
 	"Gravity strength.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shipMass",
@@ -290,9 +424,19 @@ static optionDesc options[] = {
 	"20.0",
 	&ShipMass,
 	valReal,
-	tuner_none,
+	tuner_shipmass,
 	"Mass of fighters.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballMass",
+	"ballMass",
+	"50.0",
+	&ballMass,
+	valReal,
+	tuner_ballmass,
+	"Mass of balls.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shotMass",
@@ -302,7 +446,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"Mass of bullets.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shotSpeed",
@@ -312,27 +456,259 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"Maximum speed of bullets.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shotLife",
 	"shotLife",
-	"60",
+	"60.0",
 	&ShotsLifeSetting,
 	valReal,
 	Timing_setup,
 	"Life of bullets in ticks.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"shotHitFuelDrainUsesKineticEnergy",
+	"shotHitFuelDrainUsesKineticEnergy",
+	"yes",
+	&shotHitFuelDrainUsesKineticEnergy,
+	valBool,
+	tuner_dummy,
+	"Does the fuel drain from shot hits depend on their mass and speed?\n"
+	"This is a temporary option that will be removed in March 2002.\n",
+	/* we don't allow this option to be set from map files to discourage
+	   long term use of it */
+	OPT_DEFAULTS | OPT_COMMAND | OPT_VISIBLE
     },
     {
 	"fireRepeatRate",
 	"fireRepeat",
-	"2",
+	"2.0",
 	&fireRepeatRateSetting,
 	valReal,
 	Timing_setup,
 	"Number of frames per automatic fire (0=off).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"laserRepeatRate",
+	"laserRepeat",
+	"2.0",
+	&laserRepeatRateSetting,
+	valReal,
+	Timing_setup,
+	"Number of frames per automatic laser pulse (0=off).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxRobots",
+	"robots",
+	"4",
+	&maxRobots,
+	valInt,
+	tuner_maxrobots,
+	"The maximum number of robots wanted.\n"
+	"Adds robots if there are less than maxRobots players.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"minRobots",
+	"minRobots",
+	"-1",
+	&minRobots,
+	valInt,
+	tuner_minrobots,
+	"The minimum number of robots wanted.\n"
+	"At least minRobots robots will be in the game, if there is room.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotFile",
+	"robotFile",
+	NULL,
+	&robotFile,
+	valString,
+	tuner_none,
+	"The file containing parameters for robot details.\n",
+	OPT_COMMAND | OPT_DEFAULTS
+    },
+    {
+	"robotsTalk",
+	"robotsTalk",
+	"false",
+	&robotsTalk,
+	valBool,
+	tuner_dummy,
+	"Do robots talk when they kill, die etc.?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotsLeave",
+	"robotsLeave",
+	"true",
+	&robotsLeave,
+	valBool,
+	tuner_dummy,
+	"Do robots leave the game?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotLeaveLife",
+	"robotLeaveLife",
+	"50",
+	&robotLeaveLife,
+	valInt,
+	tuner_dummy,
+	"Max life per robot (0=off).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotLeaveScore",
+	"robotLeaveScore",
+	"-90",
+	&robotLeaveScore,
+	valInt,
+	tuner_dummy,
+	"Min score for robot to play (0=off).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotLeaveRatio",
+	"robotLeaveRatio",
+	"-5",
+	&robotLeaveRatio,
+	valInt,
+	tuner_dummy,
+	"Min ratio for robot to play (0=off).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotTeam",
+	"robotTeam",
+	"0",
+	&robotTeam,
+	valInt,
+	tuner_dummy,
+	"Team to use for robots.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"restrictRobots",
+	"restrictRobots",
+	"true",
+	&restrictRobots,
+	valBool,
+	tuner_dummy,
+	"Are robots restricted to their own team?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"reserveRobotTeam",
+	"reserveRobotTeam",
+	"true",
+	&reserveRobotTeam,
+	valBool,
+	tuner_dummy,
+	"Is the robot team only for robots?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotRealName",
+	"robotRealName",
+	"robot",
+	&robotRealName,
+	valString,
+	Tune_robot_real_name,
+	"What is the robots' apparent real name?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"robotHostName",
+	"robotHostName",
+	"xpilot.org",
+	&robotHostName,
+	valString,
+	Tune_robot_host_name,
+	"What is the robots' apparent host name?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"tankRealName",
+	"tankRealName",
+	"tank",
+	&tankRealName,
+	valString,
+	Tune_tank_real_name,
+	"What is the tanks' apparent real name?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"tankHostName",
+	"tankHostName",
+	"tanks.org",
+	&tankHostName,
+	valString,
+	Tune_tank_host_name,
+	"What is the tanks' apparent host name?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"tankScoreDecrement",
+	"tankDecrement",
+	"500",
+	&tankScoreDecrement,
+	valInt,
+	tuner_dummy,
+	"How much lower is the tank's score than the player's?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"turnThrust",
+	"turnFuel",
+	"false",
+	&turnThrust,
+	valBool,
+	tuner_dummy,
+	"Does turning use fuel and create sparks?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"selfImmunity",
+	"selfImmunity",
+	"false",
+	&selfImmunity,
+	valBool,
+	tuner_dummy,
+	"Are players immune to their own weapons?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"defaultShipShape",
+	"defaultShipShape",
+	"(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)"
+	"(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)"
+	"(MR: 15,0)",
+	&defaultShipShape,
+	valString,
+	tuner_none,
+	"What is the default ship shape for people who do not have a ship\n"
+	"shape defined?",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"tankShipShape",
+	"tankShipShape",
+	"(NM:fueltank)(AU:John E. Norlin)"
+	"(SH: 15,0 14,-5 9,-8 -5,-8 -3,-8 -3,0 "
+	"2,0 2,2 -3,2 -3,6 5,6 5,8 -5,8 -5,-8 "
+	"-9,-8 -14,-5 -15,0 -14,5 -9,8 9,8 14,5)"
+	"(EN: -15,0)(MG: 15,0)",
+	&tankShipShape,
+	valString,
+	tuner_none,
+	"What is the ship shape used for tanks?",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxPlayerShots",
@@ -340,9 +716,9 @@ static optionDesc options[] = {
 	"256",
 	&ShotsMax,
 	valInt,
-	tuner_dummy,
+	tuner_shotsmax,
 	"Maximum allowed bullets per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shotsGravity",
@@ -352,7 +728,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are bullets afflicted by gravity.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"idleRun",
@@ -361,8 +737,9 @@ static optionDesc options[] = {
 	&RawMode,
 	valBool,
 	tuner_dummy,
-	"Does server calculate frames even if all human players quit?\n",
-	OPT_ANY
+	"Does server calculate frames and do robots keep on playing even\n"
+	"if all human players quit?\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
 	"noQuit",
@@ -377,7 +754,17 @@ static optionDesc options[] = {
 	tuner_dummy,
 	"Does the server wait for new human players to show up\n"
 	"after all players have left.\n",
-	OPT_CMDLINE
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
+    },
+    {
+	"logRobots",
+	"logRobots",
+	"true",
+	&logRobots,
+	valBool,
+	tuner_dummy,
+	"Log the comings and goings of robots.\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
 	"mapWidth",
@@ -387,7 +774,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Width of the world in pixels.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"mapHeight",
@@ -397,17 +784,20 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"Height of the world in pixels.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"mapFileName",
 	"map",
-	conf_default_map_string,
+	NULL,
 	&mapFileName,
 	valString,
 	tuner_none,
-	"The filename of the map to use.\n",
-	OPT_ANY
+	"The filename of the map to use.\n"
+	"Or \"wild\" if you want a map by The Wild Map Generator.\n"
+	"The geometry of a \"wild\" map is given by the -mapWidth\n"
+	"and the -mapHeight options.\n",
+	OPT_COMMAND | OPT_DEFAULTS
     },
     {
 	"mapName",
@@ -417,7 +807,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_none,
 	"The title of the map.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"mapAuthor",
@@ -427,7 +817,7 @@ static optionDesc options[] = {
 	valString,
 	tuner_none,
 	"The name of the map author.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"contactPort",
@@ -437,7 +827,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_none,
 	"The server contact port number.\n",
-	OPT_ANY
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
 	"serverHost",
@@ -446,8 +836,18 @@ static optionDesc options[] = {
 	&serverHost,
 	valString,
 	tuner_none,
-	"The fully qualified domain name (for multihomed hosts).\n",
-	OPT_ANY
+	"The server's fully qualified domain name (for multihomed hosts).\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
+    },
+    { /* kps - ng does not want mapdata */
+	"mapData",
+	"mapData",
+	NULL,
+	&mapData,
+	valString,
+	tuner_none,
+	"The map's topology.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowPlayerCrashes",
@@ -457,7 +857,7 @@ static optionDesc options[] = {
 	valBool,
 	Set_world_rules,
 	"Can players overrun other players?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowPlayerBounces",
@@ -467,7 +867,7 @@ static optionDesc options[] = {
 	valBool,
 	Set_world_rules,
 	"Can players bounce with other players?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowPlayerKilling",
@@ -475,9 +875,9 @@ static optionDesc options[] = {
 	"yes",
 	&playerKillings,
 	valBool,
-	tuner_none,
+	Set_world_rules,
 	"Should players be allowed to kill one other?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowShields",
@@ -485,9 +885,9 @@ static optionDesc options[] = {
 	"yes",
 	&playerShielding,
 	valBool,
-	tuner_none,
+	tuner_playershielding,
 	"Are shields allowed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"playerStartsShielded",
@@ -495,9 +895,9 @@ static optionDesc options[] = {
 	"yes",
 	&playerStartsShielded,
 	valBool,
-	tuner_none,
+	tuner_playerstartsshielded,
 	"Do players start with shields up?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shotsWallBounce",
@@ -507,7 +907,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do shots bounce off walls?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"ballsWallBounce",
@@ -517,7 +917,27 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do balls bounce off walls?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballCollisions",
+	"ballCollisions",
+	"no",
+	&ballCollisions,
+	valBool,
+	tuner_dummy,
+	"Can balls collide with other objects?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballSparkCollisions",
+	"ballSparkCollisions",
+	"yes",
+	&ballSparkCollisions,
+	valBool,
+	tuner_dummy,
+	"Can balls be blown around by exhaust? (Needs ballCollisions too)\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE	
     },
     {
 	"minesWallBounce",
@@ -527,7 +947,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do mines bounce off walls?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemsWallBounce",
@@ -537,7 +957,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do items bounce off walls?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"missilesWallBounce",
@@ -547,7 +967,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do missiles bounce off walls?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"sparksWallBounce",
@@ -557,7 +977,7 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do thrust spark particles bounce off walls to give reactive thrust?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"debrisWallBounce",
@@ -567,7 +987,17 @@ static optionDesc options[] = {
 	valBool,
 	Move_init,
 	"Do explosion debris particles bounce off walls?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidsWallBounce",
+	"asteroidsWallBounce",
+	"yes",
+	&asteroidsWallBounce,
+	valBool,
+	Move_init,
+	"Do asteroids bounce off walls?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"cloakedExhaust",
@@ -575,9 +1005,9 @@ static optionDesc options[] = {
 	"yes",
 	&cloakedExhaust,
 	valBool,
-	tuner_none,
+	tuner_dummy,
 	"Do engines of cloaked ships generate exhaust?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"cloakedShield",
@@ -585,9 +1015,9 @@ static optionDesc options[] = {
 	"yes",
 	&cloakedShield,
 	valBool,
-	tuner_none,
+	tuner_dummy,
 	"Can players use shields when cloaked?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxObjectWallBounceSpeed",
@@ -597,9 +1027,9 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"The maximum allowed speed for objects to bounce off walls.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    {
+    { /* kps - ng does not want these 2 */
 	"maxShieldedWallBounceSpeed",
 	"maxShieldedBounceSpeed",
 	"50",
@@ -607,7 +1037,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"The maximum allowed speed for a shielded player to bounce off walls.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxUnshieldedWallBounceSpeed",
@@ -617,7 +1047,27 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Maximum allowed speed for an unshielded player to bounce off walls.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxShieldedPlayerWallBounceAngle",
+	"maxShieldedBounceAngle",
+	"90",
+	&maxShieldedWallBounceAngle,
+	valReal,
+	Move_init,
+	"Maximum allowed angle for a shielded player to bounce off walls.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxUnshieldedPlayerWallBounceAngle",
+	"maxUnshieldedBounceAngle",
+	"30",
+	&maxUnshieldedWallBounceAngle,
+	valReal,
+	Move_init,
+	"Maximum allowed angle for an unshielded player to bounce off walls.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"playerWallBounceBrakeFactor",
@@ -627,7 +1077,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Factor to slow down players when they hit the wall (between 0 and 1).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"objectWallBounceBrakeFactor",
@@ -637,7 +1087,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Factor to slow down objects when they hit the wall (between 0 and 1).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"objectWallBounceLifeFactor",
@@ -647,7 +1097,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Factor to reduce the life of objects after bouncing (between 0 and 1).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"wallBounceFuelDrainMult",
@@ -657,7 +1107,7 @@ static optionDesc options[] = {
 	valReal,
 	Move_init,
 	"Multiplication factor for player wall bounce fuel cost.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"wallBounceDestroyItemProb",
@@ -668,7 +1118,7 @@ static optionDesc options[] = {
 	Move_init,
 	"The probability for each item a player owns to get destroyed\n"
 	"when the player bounces against a wall.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"reportToMetaServer",
@@ -678,17 +1128,17 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Keep the meta server informed about our game?\n",
-	OPT_ANY
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
-        "searchDomainForXPilot",
+	"searchDomainForXPilot",
 	"searchDomainForXPilot",
 	"no",
 	&searchDomainForXPilot,
 	valBool,
 	tuner_none,
 	"Search the local domain for the existence of xpilot.domain?\n",
-	OPT_ANY
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
 	"denyHosts",
@@ -699,7 +1149,7 @@ static optionDesc options[] = {
 	Set_deny_hosts,
 	"List of network addresses of computers which are denied service.\n"
 	"Each address may optionally be followed by a slash and a network mask.\n",
-	OPT_ANY
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
 	"limitedVisibility",
@@ -709,7 +1159,7 @@ static optionDesc options[] = {
 	valBool,
 	Set_world_rules,
 	"Should the players have a limited visibility?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"minVisibilityDistance",
@@ -717,9 +1167,9 @@ static optionDesc options[] = {
 	"0.0",
 	&minVisibilityDistance,
 	valReal,
-	tuner_none,
+	tuner_dummy,
 	"Minimum block distance for limited visibility, 0 for default.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxVisibilityDistance",
@@ -727,9 +1177,9 @@ static optionDesc options[] = {
 	"0.0",
 	&maxVisibilityDistance,
 	valReal,
-	tuner_none,
+	tuner_dummy,
 	"Maximum block distance for limited visibility, 0 for default.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"limitedLives",
@@ -740,7 +1190,7 @@ static optionDesc options[] = {
 	tuner_none,
 	"Should players have limited lives?\n"
 	"See also worldLives.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"worldLives",
@@ -748,9 +1198,9 @@ static optionDesc options[] = {
 	"0",
 	&worldLives,
 	valInt,
-	tuner_none,
+	tuner_worldlives,
 	"Number of lives each player has (no sense without limitedLives).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"reset",
@@ -764,7 +1214,7 @@ static optionDesc options[] = {
 	"removed from the world and all players including the winner(s)\n"
 	"will be transported back to their homebases.\n"
 	"This option is only effective when limitedLives is turned on.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"resetOnHuman",
@@ -773,9 +1223,59 @@ static optionDesc options[] = {
 	&resetOnHuman,
 	valInt,
 	tuner_dummy,
-	"Is the game restarted when there are less than resetOnHuman\n"
-	"humans present and a new human logs in?\n",
-	OPT_ANY
+	"Normally, new players have to wait until a round is finished\n"
+	"before they can start playing. With this option, the first N\n"
+	"human players to enter will cause the round to be restarted.\n"
+	"In other words, if this option is set to 0, nothing special\n"
+	"happens and you have to wait as usual until the round ends (if\n"
+	"there are rounds at all, otherwise this option doesn't do\n"
+	"anything). If it is set to 1, the round is ended when the first\n"
+	"human player enters. This is useful if the robots have already\n"
+	"started a round and you don't want to wait for them to finish.\n"
+	"If it is set to 2, this also happens for the second human player.\n"
+	"This is useful when you got bored waiting for another player to\n"
+	"show up and have started playing against the robots. When someone\n"
+	"finally joins you, they won't have to wait for you to finish the\n"
+	"round before they can play too. For higher numbers it works the\n"
+	"same. So this option gives the last human player for whom the\n"
+	"round is restarted. Anyone who enters after that does have to\n"
+	"wait until the round is over.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"allowAlliances",
+	"alliances",
+	"yes",
+	&allowAlliances,
+	valBool,
+	tuner_allowalliances,
+	"Are alliances between players allowed?\n"
+	"Alliances are like teams, except they can be formed and dissolved\n"
+	"at any time. Notably, teamImmunity and teamShareScore work for\n"
+	"alliances too. To manage alliances, use the '/ally' talk command:\n"
+	"'/ally invite <player name>' to invite another player to join you.\n"
+	"'/ally cancel' to cancel such an invitation.\n"
+	"'/ally refuse <player name>' to decline an invitation from a player.\n"
+	"'/ally refuse' to decline all the invitations you received.\n"
+	"'/ally accept <player name>' to join the other player.\n"
+	"'/ally accept' to accept all the invitations you received.\n"
+	"'/ally leave' to leave the alliance you are currently in.\n"
+	"'/ally list' lists the members of your current alliance.\n"
+	"If members from different alliances join, all their allies do so.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"announceAlliances",
+	"announceAlliances",
+	"no",
+	&announceAlliances,
+	valBool,
+	tuner_announcealliances,
+	"Are changes in alliances made public?\n"
+	"If this option is on, changes in alliances are sent to all players\n"
+	"and all alliances are shown in the score list. Invitations for\n"
+	"alliances are never sent to anyone but the invited players.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"teamPlay",
@@ -785,7 +1285,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Is the map a team play map?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"teamFuel",
@@ -793,9 +1293,9 @@ static optionDesc options[] = {
 	"no",
 	&teamFuel,
 	valBool,
-	tuner_none,
+	tuner_dummy,
 	"Are fuelstations only available to team members?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"teamCannons",
@@ -803,9 +1303,9 @@ static optionDesc options[] = {
 	"no",
 	&teamCannons,
 	valBool,
-	tuner_none,
+	tuner_teamcannons,
 	"Do cannons choose sides in teamPlay?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"cannonSmartness",
@@ -813,13 +1313,13 @@ static optionDesc options[] = {
 	"1",
 	&cannonSmartness,
 	valInt,
-	tuner_none,
+	tuner_cannonsmartness,
 	"0: dumb (straight ahead),\n"
 	"1: default (random direction),\n"
 	"2: good (small error),\n"
 	"3: accurate (aims at predicted player position).\n"
 	"Also influences use of weapons if cannonsUseItems is on.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"cannonsUseItems",
@@ -827,9 +1327,41 @@ static optionDesc options[] = {
 	"no",
 	&cannonsUseItems,
 	valBool,
-	tuner_none,
+	tuner_cannonsuseitems,
 	"Do cannons use items?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonsDefend",
+	"cannonsDefend",
+	"yes",
+	&cannonsDefend,
+	valBool,
+	tuner_none,
+	"Do cannons actively use defensive items like emergency shields and\n"
+	"phasing devices?\n"
+	"This only works if cannons are actually allowed to use items.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonFlak",
+	"cannonAAA",
+	"yes",
+	&cannonFlak,
+	valBool,
+	tuner_dummy,
+	"Do cannons fire flak or normal bullets?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonDeadTime",
+	"cannonDeadTime",
+	"72",
+	&cannonDeadTime,
+	valSec,
+	tuner_dummy,
+	"How many seconds do cannons stay dead?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"keepShots",
@@ -839,7 +1371,18 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do shots, mines and missiles remain after their owner leaves?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    { /* kps - ng does not want this  */
+	"teamAssign",
+	"teamAssign",
+	"yes",
+	&teamAssign,
+	valBool,
+	tuner_dummy,
+	"If players have not specified which team they like to join\n"
+	"should the server choose a team for them automatically?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"teamImmunity",
@@ -848,8 +1391,20 @@ static optionDesc options[] = {
 	&teamImmunity,
 	valBool,
 	tuner_dummy,
-	"Should other team members be immune to various shots thrust etc.?\n",
-	OPT_ANY
+	"Should other team members be immune to various shots thrust etc.?\n"
+	"This works for alliances too.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"teamShareScore",
+	"teamShareScore",
+	"no",
+	&teamShareScore,
+	valBool,
+	tuner_dummy,
+	"Are points gained or lost divided equally over all team members?\n"
+	"This works for alliances too.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"ecmsReprogramMines",
@@ -859,7 +1414,17 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Is it possible to reprogram mines with ECMs?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ecmsReprogramRobots",
+	"ecmsReprogramRobots",
+	"yes",
+	&ecmsReprogramRobots,
+	valBool,
+	tuner_dummy,
+	"Are robots reprogrammed by ECMs instead of blinded?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"targetKillTeam",
@@ -869,7 +1434,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do team members die when their last target explodes?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"targetTeamCollision",
@@ -879,7 +1444,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do team members collide with their own target or not.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"targetSync",
@@ -889,7 +1454,17 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do all the targets of a team reappear/repair at the same time?",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"targetDeadTime",
+	"targetDeadTime",
+	"60",
+	&targetDeadTime,
+	valSec,
+	tuner_dummy,
+	"How man seconds do targets stay destroyed?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"treasureKillTeam",
@@ -899,7 +1474,18 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Do team members die when their treasure is destroyed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"captureTheFlag",
+	"ctf",
+	"no",
+	&captureTheFlag,
+	valBool,
+	tuner_dummy,
+	"Does a team's treasure have to be safe before enemy balls can be\n"
+	"cashed?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"treasureCollisionDestroys",
@@ -909,7 +1495,67 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are balls destroyed when a player touches it?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballConnectorSpringConstant",
+	"ballConnectorSpringConstant",
+	"1500.0",
+	&ballConnectorSpringConstant,
+	valReal,
+	tuner_dummy,
+	"What is the spring constant for connectors?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballConnectorDamping",
+	"ballConnectorDamping",
+	"2.0",
+	&ballConnectorDamping,
+	valReal,
+	tuner_dummy,
+	"What is the damping force on connectors?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxBallConnectorRatio",
+	"maxBallConnectorRatio",
+	"0.30",
+	&maxBallConnectorRatio,
+	valReal,
+	tuner_dummy,
+	"How much longer or shorter can a connecter get before it breaks?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballConnectorLength",
+	"ballConnectorLength",
+	"120",
+	&ballConnectorLength,
+	valReal,
+	tuner_dummy,
+	"How long is a normal connector string?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"connectorIsString",
+	"connectorIsString",
+	"no",
+	&connectorIsString,
+	valBool,
+	tuner_dummy,
+	"Is the ball connector made of string?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"treatBallAsPoint",
+	"treatBallAsPoint",
+	"no",
+	&treatBallAsPoint,
+	valBool,
+	Ball_line_init,
+	"Is the ball treated as single point?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"treasureCollisionMayKill",
@@ -919,7 +1565,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Does a ball kill a player when the player touches it unshielded?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"wreckageCollisionMayKill",
@@ -929,7 +1575,26 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can ships be destroyed when hit by wreckage?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidCollisionMayKill",
+	"asteroidUnshieldedCollisionKills",
+	"yes",
+	&asteroidCollisionMayKill,
+	valBool,
+	tuner_dummy,
+	"Can ships be destroyed when hit by an asteroid?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {   "ignore20MaxFPS", /* kps - ng does not want this */
+	"ignore20MaxFPS",
+	"true",
+	&ignore20MaxFPS,
+	valBool,
+	tuner_dummy,
+	"Ignore client maxFPS request if it is 20 (the default setting).\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
 	"timing",
@@ -939,7 +1604,29 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Is the map a race mode map?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballrace",
+	"ballrace",
+	"false",
+	&ballrace,
+	valBool,
+	tuner_dummy,
+	"Is timing done for balls (on) or players (off)?\n"
+	"Only used if timing is on.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ballraceConnected",
+	"ballraceConnected",
+	"false",
+	&ballrace_connect,
+	valBool,
+	tuner_dummy,
+	"Should a player be connected to a ball to pass a checkpoint?\n"
+	"Only used if timing and ballrace are both on.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"edgeWrap",
@@ -949,7 +1636,27 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Wrap around edges.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    { /* kps - ng does not want edgebounce and extraborder */
+	"edgeBounce",
+	"edgeBounce",
+	"yes",
+	&edgeBounce,
+	valBool,
+	tuner_dummy,
+	"Players and bullets bounce when they hit the (non-wrapping) edge.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"extraBorder",
+	"extraBorder",
+	"no",
+	&extraBorder,
+	valBool,
+	tuner_none,
+	"Give map an extra border of solid rock.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"gravityPoint",
@@ -957,10 +1664,10 @@ static optionDesc options[] = {
 	"0,0",
 	&gravityPoint,
 	valIPos,
-	tuner_none,
+	Compute_gravity,
 	"If the gravity is a point source where does that gravity originate?\n"
 	"Specify the point int the form: x,y.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"gravityAngle",
@@ -968,9 +1675,9 @@ static optionDesc options[] = {
 	"90",
 	&gravityAngle,
 	valReal,
-	tuner_none,
+	Compute_gravity,
 	"If gravity is along a uniform line, at what angle is that line?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"gravityPointSource",
@@ -978,9 +1685,9 @@ static optionDesc options[] = {
 	"false",
 	&gravityPointSource,
 	valBool,
-	tuner_none,
+	Compute_gravity,
 	"Is gravity originating from a single point?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"gravityClockwise",
@@ -988,9 +1695,9 @@ static optionDesc options[] = {
 	"false",
 	&gravityClockwise,
 	valBool,
-	tuner_none,
+	Compute_gravity,
 	"If the gravity is a point source, is it clockwise?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"gravityAnticlockwise",
@@ -998,9 +1705,9 @@ static optionDesc options[] = {
 	"false",
 	&gravityAnticlockwise,
 	valBool,
-	tuner_none,
+	Compute_gravity,
 	"If the gravity is a point source, is it anticlockwise?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"gravityVisible",
@@ -1010,7 +1717,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are gravity mapsymbols visible to players?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"wormholeVisible",
@@ -1020,7 +1727,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are wormhole mapsymbols visible to players?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemConcentratorVisible",
@@ -1030,7 +1737,17 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are itemconcentrator mapsymbols visible to players?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidConcentratorVisible",
+	"asteroidConcentratorVisible",
+	"true",
+	&asteroidConcentratorVisible,
+	valBool,
+	tuner_none,
+	"Are asteroidconcentrator mapsymbols visible to players?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"wormTime",
@@ -1038,50 +1755,83 @@ static optionDesc options[] = {
 	"0",
 	&wormTime,
 	valSec,
-	tuner_none,
+	tuner_wormtime,
 	"Number of seconds wormholes will remain stable.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"defaultsFileName",
 	"defaults",
-	"",
+	NULL,
 	&defaultsFileName,
 	valString,
 	tuner_none,
 	"The filename of the defaults file to read on startup.\n",
-	OPT_ANY
+	OPT_COMMAND,
     },
     {
-	"playerPasswordsFileName",
-	"playerPasswordsFile",
+	"passwordFileName",
+	"passwordFileName",
 	NULL,
-	&playerPasswordsFileName,
+	&passwordFileName,
 	valString,
-	tuner_dummy,
-	"The filename of the player passwords file to read when authenticating.\n",
-	OPT_ANY
+	tuner_none,
+	"The filename of the password file to read on startup.\n",
+	OPT_COMMAND | OPT_DEFAULTS,
     },
     {
-	"playerPasswordsFileSizeLimit",
-	"playerPasswordsLimit",
-	"1000000",
-	&playerPasswordsFileSizeLimit,
+	"motdFileName",
+	"motd",
+	NULL,
+	&motdFileName,
+	valString,
+	tuner_none,
+	"The filename of the MOTD file to show to clients when they join.\n",
+	OPT_COMMAND | OPT_DEFAULTS,
+    },
+    {
+	"scoreTableFileName",
+	"scoretable",
+	NULL,
+	&scoreTableFileName,
+	valString,
+	tuner_none,
+	"The filename for the score table to be dumped to.\n"
+	"This is a placeholder option which doesn't do anything.\n",
+	OPT_COMMAND | OPT_DEFAULTS
+    },
+    {
+	"adminMessageFileName",
+	"adminMessage",
+	conf_logfile_string,
+	&adminMessageFileName,
+	valString,
+	tuner_none,
+	"The name of the file where player messages for the\n"
+	"server administrator will be saved.  For the messages\n"
+	"to be saved the file must already exist.  Players can\n"
+	"send these messages by writing to god.",
+	OPT_COMMAND | OPT_DEFAULTS
+    },
+    {
+	"adminMessageFileSizeLimit",
+	"adminMessageLimit",
+	"20202",
+	&adminMessageFileSizeLimit,
 	valInt,
 	tuner_none,
-	"Maximum size of player passwords file in bytes (may become a little "
-	"bigger!).\n",
-	OPT_ANY
+	"The maximum size in bytes of the admin message file.\n",
+	OPT_COMMAND | OPT_DEFAULTS
     },
     {
 	"framesPerSecond",
 	"FPS",
-	"14",
+	"12",
 	&framesPerSecond,
 	valInt,
 	tuner_none,
 	"The number of frames per second the server should strive for.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowSmartMissiles",
@@ -1091,7 +1841,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Should smart missiles be allowed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowHeatSeekers",
@@ -1101,7 +1851,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Should heatseekers be allowed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowTorpedoes",
@@ -1111,7 +1861,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Should torpedoes be allowed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowNukes",
@@ -1119,9 +1869,9 @@ static optionDesc options[] = {
 	"False",
 	&allowNukes,
 	valBool,
-	tuner_none,
+	tuner_modifiers,
 	"Should nuclear weapons be allowed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowClusters",
@@ -1129,9 +1879,9 @@ static optionDesc options[] = {
 	"False",
 	&allowClusters,
 	valBool,
-	tuner_none,
+	tuner_modifiers,
 	"Should cluster weapons be allowed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowModifiers",
@@ -1139,9 +1889,9 @@ static optionDesc options[] = {
 	"False",
 	&allowModifiers,
 	valBool,
-	tuner_none,
+	tuner_modifiers,
 	"Should the weapon modifiers be allowed?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowLaserModifiers",
@@ -1149,9 +1899,9 @@ static optionDesc options[] = {
 	"False",
 	&allowLaserModifiers,
 	valBool,
-	tuner_none,
+	tuner_modifiers,
 	"Can lasers be modified to be a different weapon?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"allowShipShapes",
@@ -1161,17 +1911,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_none,
 	"Are players allowed to define their own ship shape?\n",
-	OPT_ANY
-    },
-    {
-	"allowPlayerPasswords",
-	"PlayerPasswords",
-	"False",
-	&allowPlayerPasswords,
-	valBool,
-	tuner_dummy,
-	"May players protect their nicks with a password?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"playersOnRadar",
@@ -1181,7 +1921,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are players visible on the radar.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"missilesOnRadar",
@@ -1191,7 +1931,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are missiles visible on the radar.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"minesOnRadar",
@@ -1201,7 +1941,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are mines visible on the radar.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"nukesOnRadar",
@@ -1211,7 +1951,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are nukes visible or highlighted on the radar.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"treasuresOnRadar",
@@ -1221,7 +1961,17 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are treasure balls visible or highlighted on the radar.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidsOnRadar",
+	"asteroidsRadar",
+	"False",
+	&asteroidsOnRadar,
+	valBool,
+	tuner_dummy,
+	"Are asteroids visible on the radar.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"distinguishMissiles",
@@ -1231,7 +1981,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are different types of missiles distinguished (by length).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxMissilesPerPack",
@@ -1241,7 +1991,7 @@ static optionDesc options[] = {
 	valInt,
 	Tune_item_packs,
 	"The number of missiles gotten by picking up one missile item.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxMinesPerPack",
@@ -1251,7 +2001,7 @@ static optionDesc options[] = {
 	valInt,
 	Tune_item_packs,
 	"The number of mines gotten by picking up one mine item.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"identifyMines",
@@ -1261,7 +2011,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Are mine owner's names displayed.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shieldedItemPickup",
@@ -1271,7 +2021,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can items be picked up while shields are up?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shieldedMining",
@@ -1281,7 +2031,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can mines be thrown and placed while shields are up?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"laserIsStunGun",
@@ -1291,7 +2041,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Is the laser weapon a stun gun weapon?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"nukeMinSmarts",
@@ -1301,7 +2051,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The minimum number of missiles needed to fire one nuclear missile.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"nukeMinMines",
@@ -1311,7 +2061,7 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The minimum number of mines needed to make a nuclear mine.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"nukeClusterDamage",
@@ -1323,7 +2073,7 @@ static optionDesc options[] = {
 	"How much each cluster debris does damage wise from a nuke mine.\n"
 	"This helps to reduce the number of particles caused by nuclear mine\n"
 	"explosions, which improves server response time for such explosions.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"mineFuseTime",
@@ -1332,8 +2082,8 @@ static optionDesc options[] = {
 	&mineFuseTime,
 	valSec,
 	tuner_dummy,
-	"Time after which owned mines become deadly, zero means never.\n",
-	OPT_ANY
+	"Number of seconds after which owned mines become deadly, zero means never.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"mineLife",
@@ -1341,9 +2091,19 @@ static optionDesc options[] = {
 	"0",
 	&mineLife,
 	valInt,
-	tuner_none,
+	tuner_minelife,
 	"Life of mines in ticks, zero means use default.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"minMineSpeed",
+	"minMineSpeed",
+	"0",
+	&minMineSpeed,
+	valReal,
+	tuner_dummy,
+	"Minimum speed of mines.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"missileLife",
@@ -1351,9 +2111,9 @@ static optionDesc options[] = {
 	"0",
 	&missileLife,
 	valInt,
-	tuner_none,
+	tuner_missilelife,
 	"Life of missiles in ticks, zero means use default.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"baseMineRange",
@@ -1363,7 +2123,18 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"Range within which mines/bombs are not allowed.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"mineShotDetonateDistance",
+	"mineShotDetonateDistance",
+	"0",
+	&mineShotDetonateDistance,
+	valInt,
+	tuner_dummy,
+	"How close must a shot be to detonate a mine?\n"
+	"Set this to 0 to turn it off.",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"shotKillScoreMult",
@@ -1371,9 +2142,9 @@ static optionDesc options[] = {
 	"1.0",
 	&shotKillScoreMult,
 	valReal,
-	tuner_none,
+	tuner_dummy,
 	"Multiplication factor to scale score for shot kills.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "torpedoKillScoreMult",
@@ -1381,9 +2152,9 @@ static optionDesc options[] = {
         "1.0",
         &torpedoKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for torpedo kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "smartKillScoreMult",
@@ -1391,9 +2162,9 @@ static optionDesc options[] = {
         "1.0",
         &smartKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for smart missile kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "heatKillScoreMult",
@@ -1401,9 +2172,9 @@ static optionDesc options[] = {
         "1.0",
         &heatKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for heatseeker kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "clusterKillScoreMult",
@@ -1411,9 +2182,9 @@ static optionDesc options[] = {
         "1.0",
         &clusterKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for cluster debris kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "laserKillScoreMult",
@@ -1421,9 +2192,9 @@ static optionDesc options[] = {
         "1.0",
         &laserKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for laser kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "tankKillScoreMult",
@@ -1431,9 +2202,9 @@ static optionDesc options[] = {
         "0.44",
         &tankKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for tank kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "runoverKillScoreMult",
@@ -1441,9 +2212,9 @@ static optionDesc options[] = {
         "0.33",
         &runoverKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for player runovers.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "ballKillScoreMult",
@@ -1451,9 +2222,9 @@ static optionDesc options[] = {
         "1.0",
         &ballKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for ball kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "explosionKillScoreMult",
@@ -1461,9 +2232,9 @@ static optionDesc options[] = {
         "0.33",
         &explosionKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for explosion kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "shoveKillScoreMult",
@@ -1471,9 +2242,9 @@ static optionDesc options[] = {
         "0.5",
         &shoveKillScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for shove kills.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "crashScoreMult",
@@ -1481,9 +2252,9 @@ static optionDesc options[] = {
         "0.33",
         &crashScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for player crashes.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
         "mineScoreMult",
@@ -1491,9 +2262,80 @@ static optionDesc options[] = {
         "0.17",
         &mineScoreMult,
         valReal,
-        tuner_none,
+        tuner_dummy,
         "Multiplication factor to scale score for mine hits.\n",
-		OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"selfKillScoreMult",
+	"selfKillScoreMult",
+	"0.5",
+	&selfKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for killing yourself.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"selfDestructScoreMult",
+	"selfDestructScoreMult",
+	"0",
+	&selfDestructScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for self-destructing.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"unownedKillScoreMult",
+	"unownedKillScoreMult",
+	"0.5",
+	&unownedKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for being killed by asteroids\n"
+	"or other objects without an owner.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidPoints",
+	"asteroidPoints",
+	"1.0",
+	&asteroidPoints,
+	valReal,
+	tuner_dummy,
+	"Points awarded for breaking an asteroid.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonPoints",
+	"cannonPoints",
+	"1.0",
+	&cannonPoints,
+	valReal,
+	tuner_dummy,
+	"Points awarded for killing a cannon.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidMaxScore",
+	"asteroidMaxScore",
+	"100.0",
+	&asteroidMaxScore,
+	valReal,
+	tuner_dummy,
+	"Maximum score to receive points for breaking an asteroid.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonMaxScore",
+	"cannonMaxScore",
+	"100.0",
+	&cannonMaxScore,
+	valReal,
+	tuner_dummy,
+	"Maximum score to receive points for killing a cannon.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"movingItemProb",
@@ -1503,7 +2345,19 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for an item to appear as moving.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"randomItemProb",
+	"randomItemProb",
+	"0.0",
+	&randomItemProb,
+	valReal,
+	Set_misc_item_limits,
+	"Probability for an item to appear random.\n"
+	"Random items change their appearance every frame, so players\n"
+	"cannot tell what item they have until they get it.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"dropItemOnKillProb",
@@ -1513,7 +2367,7 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for dropping an item (each item) when you are killed.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"detonateItemOnKillProb",
@@ -1523,7 +2377,7 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for undropped items to detonate when you are killed.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"destroyItemInCollisionProb",
@@ -1533,7 +2387,27 @@ static optionDesc options[] = {
 	valReal,
 	Set_misc_item_limits,
 	"Probability for items (some items) to be destroyed in a collision.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidItemProb",
+	"asteroidItemProb",
+	"0.0",
+	&asteroidItemProb,
+	valReal,
+	Set_misc_item_limits,
+	"Probability for an asteroid to release items when it breaks.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidMaxItems",
+	"asteroidMaxItems",
+	"0",
+	&asteroidMaxItems,
+	valInt,
+	Set_misc_item_limits,
+	"The maximum number of items a broken asteroid can release.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemProbMult",
@@ -1543,7 +2417,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Item Probability Multiplication Factor scales all item probabilities.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"cannonItemProbMult",
@@ -1551,9 +2425,9 @@ static optionDesc options[] = {
 	"1.0",
 	&cannonItemProbMult,
 	valReal,
-	tuner_none,
+	tuner_dummy,
 	"Average number of items a cannon gets per minute.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxItemDensity",
@@ -1563,7 +2437,27 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Maximum density [0.0-1.0] for items (max items per block).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidProb",
+	"asteroidProb",
+	"5e-7",
+	&World.asteroids.prob,
+	valReal,
+	Tune_asteroid_prob,
+	"Probability for an asteroid to appear.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxAsteroidDensity",
+	"maxAsteroidDensity",
+	"0",
+	&maxAsteroidDensity,
+	valReal,
+	Tune_asteroid_prob,
+	"Maximum density [0.0-1.0] for asteroids (max asteroids per block.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemConcentratorRadius",
@@ -1579,7 +2473,7 @@ static optionDesc options[] = {
 	"with probability itemConcentratorProb and anywhere the remainder of the time.\n"
 	"An item concentrator is drawn on screen as three rotating triangles.\n"
 	"The map symbol is the percentage symbol '%'.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemConcentratorProb",
@@ -1591,7 +2485,36 @@ static optionDesc options[] = {
 	"The probability, if any item concentrators are present, that they will be\n"
 	"used.  This proportion of items will be placed near item concentrators,\n"
 	"within itemConcentratorRadius.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidConcentratorRadius",
+	"asteroidConcentratorRange",
+	"10",
+	&asteroidConcentratorRadius,
+	valInt,
+	Tune_asteroid_prob,
+	"The maximum distance from an asteroid concentrator for asteroids to\n"
+	"appear in.  Sensible values are in the range 1 to 20.\n"
+	"If no asteroid concentrators are defined in a map then asteroids can\n"
+	"popup anywhere.  If any are then asteroids popup in the vicinity of an\n"
+	"asteroid concentrator with probability asteroidConcentratorProb and anywhere\n"
+	"the remainder of the time.  An asteroid concentrator is drawn on the\n"
+	"screen as three rotating squares.  The map symbol is the ampersand\n"
+	"'&'.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"asteroidConcentratorProb",
+	"asteroidConcentratorProb",
+	"1.0",
+	&asteroidConcentratorProb,
+	valReal,
+	Tune_asteroid_prob,
+	"The probability, if any asteroid concentrators are present, that they will\n"
+	"be used.  This proportion of asteroids will be placed near asteroid\n"
+	"concentrators, within asteroidConcentratorRadius.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"rogueHeatProb",
@@ -1601,7 +2524,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"Probability that unclaimed missile packs will go rogue.",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"rogueMineProb",
@@ -1611,7 +2534,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"Probability that unclaimed mine items will activate.",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemEnergyPackProb",
@@ -1621,7 +2544,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an energy pack to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemTankProb",
@@ -1631,7 +2554,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an extra tank to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemECMProb",
@@ -1641,7 +2564,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an ECM item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemArmorProb",
@@ -1651,7 +2574,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an armor item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemMineProb",
@@ -1661,7 +2584,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a mine item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemMissileProb",
@@ -1671,7 +2594,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a missile item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemCloakProb",
@@ -1681,7 +2604,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a cloak item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemSensorProb",
@@ -1691,7 +2614,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a sensor item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemWideangleProb",
@@ -1701,7 +2624,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a wideangle item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemRearshotProb",
@@ -1711,7 +2634,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a rearshot item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemAfterburnerProb",
@@ -1721,7 +2644,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an afterburner item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemTransporterProb",
@@ -1731,7 +2654,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a transporter item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemMirrorProb",
@@ -1741,7 +2664,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a mirror item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemDeflectorProb",
@@ -1751,7 +2674,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a deflector item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemHyperJumpProb",
@@ -1761,7 +2684,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a hyperjump item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemPhasingProb",
@@ -1771,7 +2694,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a phasing item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemLaserProb",
@@ -1781,7 +2704,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a Laser item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemEmergencyThrustProb",
@@ -1791,7 +2714,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an Emergency Thrust item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemTractorBeamProb",
@@ -1801,7 +2724,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for a Tractor Beam item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemAutopilotProb",
@@ -1811,7 +2734,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an Autopilot item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"itemEmergencyShieldProb",
@@ -1821,7 +2744,7 @@ static optionDesc options[] = {
 	valReal,
 	Tune_item_probs,
 	"Probability for an Emergency Shield item to appear.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialFuel",
@@ -1831,7 +2754,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How much fuel players start with, or the minimum after being killed.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialTanks",
@@ -1841,7 +2764,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many tanks players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialECMs",
@@ -1851,7 +2774,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many ECMs players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialArmor",
@@ -1861,7 +2784,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How much armor players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialMines",
@@ -1871,7 +2794,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many mines players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialMissiles",
@@ -1881,7 +2804,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many missiles players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialCloaks",
@@ -1891,7 +2814,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many cloaks players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialSensors",
@@ -1901,7 +2824,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many sensors players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialWideangles",
@@ -1911,7 +2834,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many wideangles players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialRearshots",
@@ -1921,7 +2844,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many rearshots players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialAfterburners",
@@ -1931,7 +2854,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many afterburners players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialTransporters",
@@ -1941,7 +2864,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many transporters players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialMirrors",
@@ -1951,17 +2874,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many mirrors players start with.\n",
-	OPT_ANY
-    },
-    {
-	"maxArmor",
-	"maxArmors",
-	"10",
-	&World.items[ITEM_ARMOR].limit,
-	valInt,
-	Set_initial_resources,
-	"Upper limit on the amount of armor per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialDeflectors",
@@ -1971,7 +2884,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many deflectors players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialHyperJumps",
@@ -1981,7 +2894,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many hyperjumps players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialPhasings",
@@ -1991,7 +2904,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many phasing devices players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialLasers",
@@ -2001,7 +2914,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many lasers players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialEmergencyThrusts",
@@ -2011,7 +2924,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many emergency thrusts players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialTractorBeams",
@@ -2021,7 +2934,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many tractor/pressor beams players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialAutopilots",
@@ -2031,7 +2944,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many autopilots players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"initialEmergencyShields",
@@ -2041,7 +2954,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"How many emergency shields players start with.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxFuel",
@@ -2051,7 +2964,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the amount of fuel per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxTanks",
@@ -2061,7 +2974,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of tanks per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxECMs",
@@ -2071,7 +2984,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of ECMs per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxMines",
@@ -2081,7 +2994,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of mines per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxMissiles",
@@ -2091,7 +3004,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of missiles per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxCloaks",
@@ -2101,7 +3014,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of cloaks per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxSensors",
@@ -2111,7 +3024,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of sensors per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxWideangles",
@@ -2121,7 +3034,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of wides per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxRearshots",
@@ -2131,7 +3044,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of rearshots per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxAfterburners",
@@ -2141,7 +3054,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of afterburners per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxTransporters",
@@ -2151,7 +3064,17 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of transporters per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxArmor",
+	"maxArmors",
+	"10",
+	&World.items[ITEM_ARMOR].limit,
+	valInt,
+	Set_initial_resources,
+	"Upper limit on the amount of armor per player.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxMirrors",
@@ -2161,7 +3084,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of mirrors per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxDeflectors",
@@ -2171,7 +3094,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of deflectors per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxPhasings",
@@ -2181,7 +3104,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of phasing devices per players.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxHyperJumps",
@@ -2191,7 +3114,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of hyperjumps per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxEmergencyThrusts",
@@ -2201,7 +3124,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of emergency thrusts per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxLasers",
@@ -2211,7 +3134,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of lasers per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxTractorBeams",
@@ -2221,7 +3144,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of tractorbeams per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxAutopilots",
@@ -2231,7 +3154,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of autopilots per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxEmergencyShields",
@@ -2241,7 +3164,7 @@ static optionDesc options[] = {
 	valInt,
 	Set_initial_resources,
 	"Upper limit on the number of emergency shields per player.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"gameDuration",
@@ -2249,19 +3172,41 @@ static optionDesc options[] = {
 	"0.0",
 	&gameDuration,
 	valReal,
-	tuner_none,
+	tuner_gameduration,
 	"The duration of the game in minutes (aka. pizza mode).\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"allowViewing",
-	"allowViewing",
-	"false",
-	&allowViewing,
+	"fullFramerate",
+	"fullFramerate",
+	"true",
+	&fullFramerate,
 	valBool,
 	tuner_dummy,
-	"Do players get a full framerate while they're paused or waiting?\n",
-	OPT_ANY
+	"Are active players allowed to watch other players with full "
+	"framerate?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"fullZeroFramerate",
+	"fullZeroFramerate",
+	"false",
+	&fullZeroFramerate,
+	valBool,
+	tuner_dummy,
+	"Are teamzero pausers allowed to watch other players with full "
+	"framerate?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"teamZeroPausing",
+	"teamZeroPausing",
+	"false",
+	&teamZeroPausing,
+	valBool,
+	tuner_dummy, /* kps - changed from tuner_none */
+	"Should team zero be considered a pause only team?\n",
+ 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"friction",
@@ -2271,7 +3216,38 @@ static optionDesc options[] = {
 	valReal,
 	Timing_setup,
 	"Fraction of velocity ship loses each frame.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"blockFriction",
+	"blockFriction",
+	"0.0",
+	&blockFriction,
+	valReal,
+	tuner_dummy,
+	"Fraction of velocity ship loses each frame when it is in friction blocks.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"blockFrictionVisible",
+	"blockFrictionVisible",
+	"true",
+	&blockFrictionVisible,
+	valBool,
+	tuner_none,
+	"Are friction blocks visible?\n"
+	"If true, friction blocks show up as decor; if false, they don't show up at all.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"coriolis",
+	"coriolis",
+	"0",
+	&coriolis,
+	valInt,
+	tuner_dummy,
+	"The clockwise angle (in degrees) a ship's velocity turns each frame.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"checkpointRadius",
@@ -2281,7 +3257,7 @@ static optionDesc options[] = {
 	valReal,
 	tuner_dummy,
 	"How close you have to be to a checkpoint to register - in blocks.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"raceLaps",
@@ -2289,19 +3265,19 @@ static optionDesc options[] = {
 	"3",
 	&raceLaps,
 	valInt,
-	tuner_none,
+	tuner_racelaps,
 	"How many laps a race is run over.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"lockOtherTeam",
 	"lockOtherTeam",
-	"false",
+	"true", /* kps - ng wants false */
 	&lockOtherTeam,
 	valBool,
 	tuner_dummy,
 	"Can you watch opposing players when rest of your team is still alive?\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"loseItemDestroys",
@@ -2309,19 +3285,49 @@ static optionDesc options[] = {
 	"false",
 	&loseItemDestroys,
 	valBool,
-	tuner_none,
+	tuner_dummy,
 	"Destroy item that player drops. Otherwise drop it.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    { /* kps - ng does not want usewreckage, max*siveitems */
+	"useWreckage",
+	"useWreckage",
+	"true",
+	&useWreckage,
+	valBool,
+	tuner_dummy,
+	"Do destroyed ships leave wreckage?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxOffensiveItems",
+	"maxOffensiveItems",
+	"100",
+	&maxOffensiveItems,
+	valInt,
+	tuner_dummy,
+	"How many offensive items a player can carry.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxDefensiveItems",
+	"maxDefensiveItems",
+	"100",
+	&maxDefensiveItems,
+	valInt,
+	tuner_dummy,
+	"How many defensive items a player can carry.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"roundDelay",
-	"roundDelay",
+	"roundDelaySeconds",
 	"0",
-	&roundDelay,
+	&roundDelaySeconds,
 	valInt,
 	tuner_dummy,
 	"Delay before start of each round, in seconds.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"maxRoundTime",
@@ -2331,7 +3337,27 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The maximum duration of each round, in seconds.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"roundsToPlay",
+	"roundsToPlay",
+	"0",
+	&roundsToPlay,
+	valInt,
+	tuner_dummy,
+	"The number of rounds to play.  Unlimited if 0.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxVisibleObject",
+	"maxVisibleObjects",
+	"1000",
+	&maxVisibleObject,
+	valInt,
+	tuner_dummy,
+	"What is the maximum number of objects a player can see.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"pLockServer",
@@ -2345,8 +3371,9 @@ static optionDesc options[] = {
 	valBool,
 	tuner_plock,
 	"Whether the server is prevented from being swapped out of memory.\n",
-	OPT_CMDLINE
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
+    /* kps - what to do about this ? */
     {
 	"timerResolution",
 	"timerResolution",
@@ -2354,10 +3381,10 @@ static optionDesc options[] = {
 	&timerResolution,
 	valInt,
 	tuner_dummy,
-	"If set to nonzero, xpilots requests signals from the OS at\n"
-	"1/timerResolution second intervals. Server will then compute a new\n"
-	"frame FPS times out of every timerResolution signals.\n",
-	OPT_CMDLINE
+	"If set to nonzero xpilots will requests signals from the OS at\n"
+	"1/timerResolution second intervals.  The server will then compute\n"
+	"a new frame FPS times out of every timerResolution signals.\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
 	"password",
@@ -2366,9 +3393,76 @@ static optionDesc options[] = {
 	&password,
 	valString,
 	tuner_dummy,
-	"The password neded to get operator privileges.\n",
-	OPT_ANY
+	"The password needed to obtain operator privileges.\n"
+        "If specified on the command line, on many systems other\n"
+	"users will be able to see the password.  Therefore, using\n"
+	"the password file instead is recommended.",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_PASSWORD
     },
+    {
+	"clientPortStart",
+	"clientPortStart",
+	"0",
+	&clientPortStart,
+	valInt,
+	tuner_dummy,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
+    },
+    {
+	"clientPortEnd",
+	"clientPortEnd",
+	"0",
+	&clientPortEnd,
+	valInt,
+	tuner_dummy,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
+    },
+    {
+	"maxPauseTime",
+	"maxPauseTime",
+	"3600",		/* can pause 1 hour by default */
+	&maxPauseTime,
+	valSec,
+	tuner_dummy,
+	"The maximum time a player can stay paused for, in seconds.\n"
+	"After being paused this long, the player will be kicked off.\n"
+	"Setting this option to 0 disables the feature.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"playerPasswordsFileName",
+	"playerPasswordsFile",
+	NULL,
+	&playerPasswordsFileName,
+	valString,
+	tuner_none,
+	"The filename of the player passwords file to read when authenticating.\n",
+	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+    },
+    {
+	"playerPasswordsFileSizeLimit",
+	"playerPasswordsLimit",
+	"1000000",
+	&playerPasswordsFileSizeLimit,
+	valInt,
+	tuner_none,
+	"Maximum size of player passwords file in bytes (may become bigger\n"
+	"if players change passwords!).\n",
+	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+    },
+    {
+	"allowPlayerPasswords",
+	"PlayerPasswords",
+	"False",
+	&allowPlayerPasswords,
+	valBool,
+	tuner_dummy,
+	"May players protect their nicks with a password?\n",
+	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+    },
+#if 0
     {
 	"numberOfRounds",
 	"numRounds",
@@ -2377,8 +3471,9 @@ static optionDesc options[] = {
 	valInt,
 	tuner_dummy,
 	"The number of rounds to play. If 0, unlimited.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+#endif
     {
 	"playerLimit",
 	"playerLimit",
@@ -2388,7 +3483,7 @@ static optionDesc options[] = {
 	tuner_dummy,
 	"Allow only (number of bases)-playerLimit players to enter.\n"
 	"This option will probably change in future versions.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE  /* kps - was OPT_ANY */
     },
     {
 	"recordMode",
@@ -2403,7 +3498,17 @@ static optionDesc options[] = {
 	"spectators who can watch the recorded game from anyone's\n"
 	"viewpoint. Can be set to 0 in the middle of a game to stop"
 	"recording.\n",
-	OPT_CMDLINE
+	OPT_COMMAND | OPT_DEFAULTS /* kps - was OPT_CMDLINE */
+    },
+    {
+	"recordFileName",
+	"recordFile",
+	NULL,
+	&recordFileName,
+	valString,
+	tuner_none,
+	"Name of the file where server recordings are saved.\n",
+	OPT_COMMAND | OPT_DEFAULTS /* kps - was OPT_CMDLINE */
     },
     {
 	"recordFlushInterval",
@@ -2417,7 +3522,7 @@ static optionDesc options[] = {
 	"This is useful if you want to replay the game on another server\n"
 	"while it is still being played. There is a small overhead\n"
 	"(some dozens of bytes extra recording file size) for each flush.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_VISIBLE /* kps - was OPT_ANY */
     },
     {
 	"constantScoring",
@@ -2427,7 +3532,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Whether the scores given from various things are fixed.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
     },
     {
 	"elimination",
@@ -2437,7 +3542,7 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Race mode where the last player drops out each lap.\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
     },
     {
 	"dataURL",
@@ -2447,354 +3552,228 @@ static optionDesc options[] = {
 	valString,
 	tuner_dummy,
 	"URL where the client can get extra data for this map\n",
-	OPT_ANY
+	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
     },
-    {
-	"clientPortStart",
-	"clientPortStart",
-	"0",
-	&clientPortStart,
-	valInt,
-	tuner_dummy,
-	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
-	OPT_ANY
-    },
-    {
-	"clientPortEnd",
-	"clientPortEnd",
-	"0",
-	&clientPortEnd,
-	valInt,
-	tuner_dummy,
-	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
-	OPT_ANY
-    },
-    {
-	"recordFileName",
-	"recordFile",
-	NULL,
-	&recordFileName,
-	valString,
-	tuner_none,
-	"Name of the file where server recordings are saved.\n",
-	OPT_CMDLINE
-    },
+#if 0
     {
 	"FPSMultiplier",
 	"FPSMultiplier",
-	"1",
+	"1.0",
 	&FPSMultiplier,
-	valInt,
+	valReal,
 	Timing_setup,
-	"Everything is slowed by this (integer) factor. Allows using higher\n"
+	"Everything is slowed by this factor. Allows using higher\n"
 	"FPS without making the game too fast.\n",
-	OPT_ANY
-    }
+	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+    },
+#endif
+    {
+	"gameSpeed",
+	"gameSpeed",
+	"0.0",
+	&gameSpeed,
+	valReal,
+	Timing_setup,
+	"Rate at which game events happen. Allows using higher\n"
+	"FPS without making the game too fast.\n"
+	"A value of 0 means the game speed is the same as FPS.\n",
+	OPT_ORIGIN_ANY | OPT_DEFAULTS
+    },
+    /* useOldCode - kps tmp hack */
+    {
+	"useOldCode",
+	"useOldCode",
+	"false",
+	&useOldCode,
+	valBool,
+	tuner_dummy,
+	"Use old code in some places when playing on a block based map?\n",
+	OPT_ORIGIN_ANY | OPT_DEFAULTS
+    },
+    {
+	"polygonMode",
+	"polygonMode",
+	"false",
+	&polygonMode,
+	valBool,
+	tuner_dummy,
+	"Force use of polygon protocol when communicating with clients?\n"
+	"(useful for debugging if you want to see the polygons created\n"
+	"in the blocks to polygons conversion function).\n",
+	OPT_ORIGIN_ANY | OPT_DEFAULTS
+    },
 };
+
+
+static bool options_inited = FALSE;
+
+
+option_desc* Get_option_descs(int *count_ptr)
+{
+    if (options_inited != TRUE) {
+	dumpcore("options not initialized");
+    }
+
+    *count_ptr = NELEM(options);
+    return &options[0];
+}
+
+
+static void Init_default_options(void)
+{
+    option_desc*	desc;
+
+    if ((desc = Find_option_by_name("mapFileName")) == NULL) {
+	dumpcore("Could not find map file option");
+    }
+    desc->defaultValue = Conf_default_map();
+
+    if ((desc = Find_option_by_name("motdFileName")) == NULL) {
+	dumpcore("Could not find motd file option");
+    }
+    desc->defaultValue = Conf_servermotdfile();
+
+    if ((desc = Find_option_by_name("robotFile")) == NULL) {
+	dumpcore("Could not find robot file option");
+    }
+    desc->defaultValue = Conf_robotfile();
+
+    if ((desc = Find_option_by_name("defaultsFileName")) == NULL) {
+	dumpcore("Could not find defaults file option");
+    }
+    desc->defaultValue = Conf_defaults_file_name();
+
+    if ((desc = Find_option_by_name("passwordFileName")) == NULL) {
+	dumpcore("Could not find password file option");
+    }
+    desc->defaultValue = Conf_password_file_name();
+}
+
+
+bool Init_options(void)
+{
+    int			i;
+    int			option_count = NELEM(options);
+
+    if (options_inited != FALSE) {
+	dumpcore("Can't init options twice.");
+    }
+
+    Init_default_options();
+
+    for (i = 0; i < option_count; i++) {
+	if (Option_add_desc(&options[i]) == FALSE) {
+	    return FALSE;
+	}
+    }
+
+    options_inited = TRUE;
+
+    return TRUE;
+}
+
+
+void Free_options(void)
+{
+    int			i;
+    int			option_count = NELEM(options);
+
+    if (options_inited == TRUE) {
+	options_inited = FALSE;
+	for (i = 0; i < option_count; i++) {
+	    if (options[i].type == valString) {
+		char **str_ptr = (char **)options[i].variable;
+		char *str = *str_ptr;
+		if (str != NULL && str != options[i].defaultValue) {
+		    free(str);
+		    *str_ptr = NULL;
+		}
+	    }
+	}
+    }
+}
+
+
+option_desc* Find_option_by_name(const char* name)
+{
+    int			j;
+    int			option_count = NELEM(options);
+
+    for (j = 0; j < option_count; j++) {
+	if (!strcasecmp(options[j].commandLineOption, name)
+	    || !strcasecmp(options[j].name, name))
+	{
+	    return(&options[j]);
+	}
+    }
+    return NULL;
+}
+
+
+
 
 
 void Timing_setup(void)
 {
-    if (FPSMultiplier < 1)
-	FPSMultiplier = 1;
-    if (FPSMultiplier > 64)
-	FPSMultiplier = 64;
-    framespeed = TIME_FACT / FPSMultiplier;
-    framespeed2 = 1. / FPSMultiplier;
+#if 0
+    FPSMultiplier = FPS / gameSpeed;
+#else
+    if (gameSpeed > FPS)
+	gameSpeed = FPS;
+    if (gameSpeed < 0.0)
+	gameSpeed = 0.0;
+
+    if (gameSpeed == 0.0)
+	gameSpeed = FPS;
+
+    FPSMultiplier = FPS / gameSpeed;
+
+    /* this can't happen */
+    if (FPSMultiplier < 1.0) {
+	printf("BUG - FPSMultiplier < 1.0\n");
+	FPSMultiplier = 1.0;
+    }
+
+    /* we want timeStep >= 1 */
+    if (FPSMultiplier > 64.0)
+	FPSMultiplier = 64.0;
+
+    gameSpeed = FPS / FPSMultiplier;
+#endif
+
+    /*
+     * Calculate amount of game time that elapses per frame.
+     */
+    timeStep = (int)(TIME_FACT / FPSMultiplier);
+    timeStep2 = 1. / FPSMultiplier;
+
     ShotsLife = ShotsLifeSetting * TIME_FACT;
     fireRepeatRate = fireRepeatRateSetting * TIME_FACT;
+    laserRepeatRate = laserRepeatRateSetting * TIME_FACT;
+
+    friction = frictionSetting;
+
+#if 0 
+    /* kps - changed ng code so the above works */
+    /* ng wants this - requires other changes elsewhere */
     friction = 1 - frictionSetting;
+
+
     /* If friction < 0, the result is silly - allow such settings but
      * don't bother making it "FPSMultiplier independent" */
     if (friction > 0)
 	friction = pow(friction, 1. / FPSMultiplier);
-}
-
-
-static void Parse_help(char *progname)
-{
-    int			j;
-    const char		*str;
-
-    xpprintf("Usage: %s [ options ]\n"
-	   "Where options include:\n"
-	   "\n",
-	   progname);
-    for (j = 0; j < NELEM(options); j++) {
-	xpprintf("    %s%s",
-	       options[j].type == valBool ? "-/+" : "-",
-	       options[j].name);
-	if (strcasecmp(options[j].commandLineOption, options[j].name))
-	    xpprintf(" or %s", options[j].commandLineOption);
-	xpprintf(" %s\n",
-	       options[j].type == valInt ? "<integer>" :
-	       options[j].type == valReal ? "<real>" :
-	       options[j].type == valString ? "<string>" :
-	       options[j].type == valIPos ? "<position>" :
-	       options[j].type == valSec ? "<seconds>" :
-	       options[j].type == valPerSec ? "<per-second>" :
-	       "");
-	for (str = options[j].helpLine; *str; str++) {
-	    if (str == options[j].helpLine || str[-1] == '\n') {
-		putchar('\t');
-	    }
-	    putchar(*str);
-	}
-	if (str > options[j].helpLine && str[-1] != '\n') {
-	    putchar('\n');
-	}
-	putchar('\n');
-    }
-    xpprintf(
-"    \n"
-"    The probabilities are in the range [0.0-1.0] and they refer to the\n"
-"    probability that an event will occur in a block per second.\n"
-"    Boolean options are turned off by using +<option>.\n"
-"    \n"
-"    Please refer to the manual pages, xpilots(6) and xpilot(6),\n"
-"    for more specific help.\n"
-	  );
-}
-
-static void Parse_dump(char *progname)
-{
-    int			j;
-
-    xpprintf("\n");
-    xpprintf("# %s option dump\n", progname);
-    xpprintf("# \n");
-    xpprintf("# LIBDIR = %s\n", Conf_libdir());
-    xpprintf("# DEFAULTS_FILE_NAME = %s\n", Conf_defaults_file_name());
-    xpprintf("# PLAYER_PASSWORDS_FILE_NAME = %s\n", Conf_player_passwords_file_name());
-    xpprintf("# MAPDIR = %s\n", Conf_mapdir());
-    xpprintf("# DEFAULT_MAP = %s\n", Conf_default_map());
-    xpprintf("# SERVERMOTDFILE = %s\n", Conf_servermotdfile());
-    xpprintf("# \n");
-    for (j = 0; j < NELEM(options); j++) {
-	if (options[j].type != valVoid) {
-	    int len = strlen(options[j].name);
-	    xpprintf("%s:%*s%s\n", options[j].name,
-		   (len < 40) ? (40 - len) : 1, "",
-		   (options[j].defaultValue != NULL)
-		       ? options[j].defaultValue
-		       : "");
-	}
-    }
-    xpprintf("\n");
-}
-
-int Parse_list(int *index, char *buf)
-{
-    int			i = *index;
-
-    if (i < 0 || i >= NELEM(options)) {
-	return -1;
-    }
-    if (options[i].defaultValue == NULL) {
-	return 0;
-    }
-    switch (options[i].type) {
-    case valInt:
-    case valSec:
-	sprintf(buf, "%s:%d", options[i].name,
-		*(int *)options[i].variable);
-	break;
-    case valReal:
-    case valPerSec:
-	sprintf(buf, "%s:%g", options[i].name,
-		*(DFLOAT *)options[i].variable);
-	break;
-    case valBool:
-	sprintf(buf, "%s:%s", options[i].name,
-		*(bool *)options[i].variable ? "yes" : "no");
-	break;
-    case valIPos:
-	sprintf(buf, "%s:%d,%d", options[i].name,
-		((ipos *)options[i].variable)->x,
-		((ipos *)options[i].variable)->y);
-	break;
-    case valString:
-	sprintf(buf, "%s:%s", options[i].name,
-		*(char **)options[i].variable);
-	break;
-    default:
-	return 0;
-    }
-    return 1;
-}
-
-int Parser(int argc, char **argv)
-{
-    int			i, j;
-    char		*fname;
-
-
-    for (i=1; i<argc; i++) {
-	if (strcmp("-help", argv[i]) == 0
-	    || strcmp("-h", argv[i]) == 0) {
-	    Parse_help(*argv);
-		return(FALSE);
-	}
-	if (strcmp("-dump", argv[i]) == 0) {
-	    Parse_dump(*argv);
-		return(FALSE);
-	}
-	if (strcmp("-version", argv[i]) == 0 || strcmp("-v", argv[i]) == 0) {
-	    puts(TITLE);
-		return(FALSE);
-	}
-
-	if (argv[i][0] == '-' || argv[i][0] == '+') {
-	    for (j = 0; j < NELEM(options); j++) {
-		if (!strcasecmp(options[j].commandLineOption, argv[i] + 1)
-		    || !strcasecmp(options[j].name, argv[i] + 1)) {
-		    if (options[j].type == valBool) {
-			if (argv[i][0] == '-')
-			    addOption(options[j].name, "true", 1, NULL,
-				      OPT_CMDLINE);
-			else
-			    addOption(options[j].name, "false", 1, NULL,
-				      OPT_CMDLINE);
-		    } else if (options[j].type == valVoid) {
-				break;
-			} else {
-			if (i + 1 == argc) {
-			    warn("Option '%s' needs an argument",
-				  options[j].commandLineOption);
-			} else
-			    addOption(options[j].name,
-				      argv[++i], 1, NULL, OPT_CMDLINE);
-		    }
-		    break;
-		}
-	    }
-	    if (j < NELEM(options)) {
-		continue;
-	    }
-	}
-	warn("Unknown option '%s'", argv[i]);
-    }
-
-    /*
-     * Read map file if map data not found yet.
-     */
-    if ((fname = getOption("mapFileName")) != NULL) {
-	if (!parseMapFile(fname)) {
-	    xpprintf("Unable to read %s, trying to open %s\n", fname, Conf_default_map());
-	    if (!parseMapFile(Conf_default_map())) {
-		xpprintf("Unable to read %s\n", Conf_default_map());
-		warn("Unable to read any map. Exiting.");
-		exit(1);
-	    }
-	}
-    } else {
-	xpprintf("Map not specified, trying to open %s\n", Conf_default_map());
-	if (!parseMapFile(Conf_default_map())) {
-	    xpprintf("Unable to read %s\n", Conf_default_map());
-	    warn("Unable to read any map. Exiting.");
-	    exit(1);
-	}
-    }
-
-#if 0
-    /*
-     * Read local defaults file
-     */
-/* Wouldn't work now */
-    if ((fname = getOption("defaultsFileName")) != NULL)
-	parseDefaultsFile(fname);
-    else
-	parseDefaultsFile(Conf_defaults_file_name());
 #endif
 
-    return(TRUE);
+#if 0
+    xpprintf(__FILE__ ": gameSpeed         = %f\n", gameSpeed);
+    xpprintf(__FILE__ ": FPSMultiplier     = %f\n", FPSMultiplier);
+    xpprintf(__FILE__ ": timeStep          = %d\n", timeStep);
+    xpprintf(__FILE__ ": timeStep2         = %f\n", timeStep2);
+    xpprintf(__FILE__ ": ShotsLife         = %d\n", ShotsLife);
+    xpprintf(__FILE__ ": fireRepeatRate    = %d\n", fireRepeatRate);
+    xpprintf(__FILE__ ": friction          = %f\n", friction);
+#endif
 }
 
-void cmdhack(void)
-{
-    int j;
-    for (j = 0; j < NELEM(options); j++)
-	addOption(options[j].name, options[j].defaultValue, 0, &options[j],
-		  OPT_DEFAULT);
-}
 
-/*
- * Some options can be modified during the game.
- * Options which can be modified have a so called tuner function,
- * which checks the validity of the new option value, and possibly
- * does something extra depending upon the option in question.
- * Options which don't need such a tuner function set it to `tuner_dummy'.
- * Options which cannot be modified have the tuner set to `tuner_none'.
- */
-int Tune_option(char *opt, char *val)
-{
-    int			ival;
-    DFLOAT		fval;
-    int			j;
-
-    for (j = 0; j < NELEM(options); j++) {
-	if (strcasecmp(options[j].commandLineOption, opt)
-	    && strcasecmp(options[j].name, opt)) {
-	    continue;
-	}
-	if (options[j].tuner == tuner_none) {
-	    return -1;	/* Operation undefined */
-	}
-	switch (options[j].type) {
-	case valInt:
-	    if (sscanf(val, "%d", &ival) != 1) {
-		return 0;
-	    }
-	    *(int *)options[j].variable = ival;
-	    (*options[j].tuner)();
-	    return 1;
-	case valBool:
-	    if (ON(val)) {
-		*(bool *)options[j].variable = true;
-	    }
-	    else if (OFF(val)) {
-		*(bool *)options[j].variable = false;
-	    }
-	    else {
-		return 0;
-	    }
-	    (*options[j].tuner)();
-	    return 1;
-	case valReal:
-	    if (sscanf(val, "%f", &fval) != 1) {
-		return 0;
-	    }
-	    *(DFLOAT *)options[j].variable = fval;
-	    (*options[j].tuner)();
-	    return 1;
-	case valString:
-	    /* this is dubious and results in unfreed memory: */
-	    {
-		char *s = strdup(val);
-		if (!s) {
-		    return 0;
-		}
-		*(char **)options[j].variable = s;
-		(*options[j].tuner)();
-		return 1;
-	    }
-	default:
-	    return -1;	/* Operation undefined */
-	}
-    }
-    return -2;	/* Can't find variable */
-}
-
-optionDesc*	findOption(const char* name)
-{
-	int	j;
-    for (j = 0; j < NELEM(options); j++)
-	{
-		if (!strcasecmp(options[j].commandLineOption, name)
-			|| !strcasecmp(options[j].name, name))
-		{
-			return(&options[j]);
-		}
-	}
-	return(NULL);
-}

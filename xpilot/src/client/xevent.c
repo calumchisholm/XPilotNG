@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,17 +28,22 @@
 #include <math.h>
 
 #ifndef _WINDOWS
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/Xmd.h>
-#else
-#include "NT/winX.h"
-#include "NT/winAudio.h"
-#include "NT/winClient.h"
-#include "NT/winXKey.h"
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+# include <X11/Xutil.h>
+# include <X11/keysym.h>
+# include <X11/Xatom.h>
+# include <X11/Xmd.h>
+# ifdef	__apollo
+#  include <X11/ap_keysym.h>
+# endif
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winAudio.h"
+# include "NT/winClient.h"
+# include "NT/winXKey.h"
 #endif
 
 #include "version.h"
@@ -59,6 +64,7 @@
 #include "talk.h"
 #include "configure.h"
 #include "xeventhandlers.h"
+#include "xevent.h"
 #include "bitmaps.h"
 
 char xevent_version[] = VERSION;
@@ -71,7 +77,6 @@ static BITV_DECL(keyv, NUM_KEYS);
 
 int		initialPointerControl = false;
 bool		pointerControl = false;
-extern keys_t	buttonDefs[MAX_POINTER_BUTTONS];
 extern Cursor	pointerControlCursor;
 
 #if defined(JOYSTICK) && defined(__linux__)
@@ -183,7 +188,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	}
     }
 
-    IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret); )
+    IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
 
 #ifdef DEVELOPMENT
     if (reset && ret == KEY_DUMMY) {
@@ -278,6 +283,8 @@ static void Talk_set_state(bool onoff)
 	initialPointerControl = false;
 	Pointer_control_set_state(true);
     }
+
+    scoresChanged = 1;
 }
 #endif
 
@@ -358,7 +365,7 @@ bool Key_press_swap_settings(keys_t key)
 {
     DFLOAT _tmp;
 #define SWAP(a, b) (_tmp = (a), (a) = (b), (b) = _tmp)
-
+	
     SWAP(power, power_s);
     SWAP(turnspeed, turnspeed_s);
     SWAP(turnresistance, turnresistance_s);
@@ -505,12 +512,12 @@ bool Key_press(keys_t key)
     case KEY_FIRE_HEAT:
     case KEY_DROP_MINE:
     case KEY_DETACH_MINE:
-	Key_press_autoshield_hack(key);
+	Key_press_autoshield_hack(key);    
 	break;
 
     case KEY_SHIELD:
 	if (Key_press_shield(key))
-	    return true;
+	    return true; 
 	break;
 
     case KEY_REFUEL:
@@ -562,7 +569,7 @@ bool Key_press(keys_t key)
 #endif
     case KEY_SELECT_ITEM:
     case KEY_LOSE_ITEM:
-	if (!Key_press_select_lose_item(key))
+	if (!Key_press_select_lose_item(key)) 
 	    return false;
     default:
 	break;
@@ -787,8 +794,8 @@ ipos	mouse;		/* position of mouse pointer. */
 int	movement;	/* horizontal mouse movement. */
 
 
-void xevent_pointer()
-{
+void xevent_pointer(void)
+{ 
 #ifndef _WINDOWS
     XEvent		event;
 #endif
@@ -802,13 +809,13 @@ void xevent_pointer()
 		 POINT point;
 
 		 GetCursorPos(&point);
-		 movement = point.x - draw_width/2;
+		 movement = point.x - draw_width/2; 
 		 XWarpPointer(dpy, None, draw,
 			      0, 0, 0, 0,
 			      draw_width/2, draw_height/2);
 	    }
 		/* fix end */
-#endif
+#endif 
 
 	    if (movement != 0) {
 		Send_pointer_move(movement);
@@ -837,9 +844,9 @@ void xevent_pointer()
 }
 
 #ifndef _WINDOWS
-int xevent(int new_input)
+int x_event(int new_input)
 #else
-int xevent(XEvent event)
+int win_xevent(XEvent event)
 #endif
 {
     int			queued = 0;
@@ -880,7 +887,7 @@ int xevent(XEvent event)
 	     * can access it.
 	     */
 	case SelectionNotify:
-	    SelectionNotify_event(&event);
+	    SelectionNotify_event(&event);    
 	    break;
 	    /*
 	     * we are requested to provide a selection.
@@ -914,7 +921,7 @@ int xevent(XEvent event)
 	case UnmapNotify:
 	    UnmapNotify_event(&event);
 	    break;
-
+	    
 	case MappingNotify:
 	    XRefreshKeyboardMapping(&event.xmapping);
 	    break;
@@ -941,7 +948,7 @@ int xevent(XEvent event)
 	    break;
 
 	case ButtonRelease:
-	    if (ButtonRelease_event(&event) == -1)
+	    if (ButtonRelease_event(&event) == -1) 
 	        return -1;
 	    break;
 
@@ -961,7 +968,9 @@ int xevent(XEvent event)
     }
 #endif
 
-    xevent_keyboard(queued);
+    xevent_keyboard(queued);	
     xevent_pointer();
     return 0;
 }
+
+

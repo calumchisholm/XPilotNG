@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -59,9 +59,11 @@ typedef struct {
     int		width, height;
     int		count;
     RGB_COLOR	**data;
+
     bbox_t	*bbox;
 } xp_picture_t;
 
+/*int Picture_init(xp_picture_t *picture, int height, int width, int images);*/
 int Picture_init(xp_picture_t *picture, const char *filename, int count);
 int Picture_load( xp_picture_t *picture, const char *path);
 int Picture_rotate(xp_picture_t *picture);

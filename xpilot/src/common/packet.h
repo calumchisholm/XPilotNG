@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -64,7 +64,7 @@
 #define PKT_KEYBOARD		24
 #define PKT_SEEK		25
 #define PKT_SELF_ITEMS		26	/* still under development */
-#define PKT_NOT_USED_27		27	/* was PKT_SEND_BUFSIZE */
+#define PKT_TEAM_SCORE		27	/* was PKT_SEND_BUFSIZE */
 #define PKT_PLAYER		28
 #define PKT_SCORE		29
 
@@ -85,7 +85,7 @@
 #define PKT_MAGIC		41
 #define PKT_RELIABLE		42
 #define PKT_ACK			43
-#define PKT_NOT_USED_44		44
+#define PKT_FASTRADAR		44
 #define PKT_TRANS		45
 #define PKT_ACK_CANNON		46
 #define PKT_ACK_FUEL		47
@@ -129,8 +129,8 @@
 #define PKT_WRECKAGE		79
 
 /* packet types: 80 - 89 */
-#define PKT_NOT_USED_80		80
-#define PKT_NOT_USED_81		81
+#define PKT_ASTEROID		80
+#define PKT_WORMHOLE		81
 #define PKT_NOT_USED_82		82
 #define PKT_NOT_USED_83		83
 #define PKT_NOT_USED_84		84

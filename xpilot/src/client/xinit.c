@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,14 +29,16 @@
 #include <errno.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#include <X11/Xutil.h>
-#else
-#include "../common/NT/winX.h"
-#include "NT/winclient.h"
-#include "NT/winXXPilot.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+# include <X11/Xutil.h>
+#endif
+
+#ifdef _WINDOWS
+# include "../common/NT/winX.h"
+# include "NT/winclient.h"
+# include "NT/winXXPilot.h"
 #endif
 
 #include "version.h"
@@ -87,6 +90,7 @@
 
 char xinit_version[] = VERSION;
 
+
 /* How far away objects should be placed from each other etc... */
 #define BORDER			10
 #define BTN_BORDER		4
@@ -106,6 +110,8 @@ extern int		RadarHeight;
 int			ButtonHeight;
 Atom			ProtocolAtom, KillAtom;
 int			buttonColor, windowColor, borderColor;
+int			scoreColor, scoreSelfColor, scoreInactiveColor;
+int			scoreInactiveSelfColor, scoreZeroColor;
 int			quitting = false;
 int			top_width, top_height, top_x, top_y, top_posmask;
 int			draw_width, draw_height;
@@ -251,6 +257,7 @@ char cdashes[NUM_CDASHES];
 
 static int Quit_callback(int, void *, const char **);
 static int Config_callback(int, void *, const char **);
+static int Colors_callback(int, void *, const char **);
 static int Score_callback(int, void *, const char **);
 static int Player_callback(int, void *, const char **);
 
@@ -306,7 +313,7 @@ static void Init_spark_colors(void)
      * any possible separator.  Only look at numbers.
      */
 
-     /* hack but protocol will allow max 9 (MM) */
+     /* hack but protocol will allow max 9 (MM) */ 
     for (src = sparkColors; *src && (num_spark_colors < 9); src++) {
 	if (isascii(*src) && isdigit(*src)) {
 	    dst = &buf[0];
@@ -350,17 +357,18 @@ static void Init_spark_colors(void)
  * Initialize miscellaneous window hints and properties.
  */
 #ifndef _WINDOWS
+extern char		**Argv;
+extern int		Argc;
+extern char		myClass[];
+
 static void Init_disp_prop(Display *d, Window win,
 			   int w, int h, int x, int y,
 			   int flags)
 {
-    extern char		**Argv;
-    extern int		Argc;
     XClassHint		xclh;
     XWMHints		xwmh;
     XSizeHints		xsh;
     char		msg[256];
-    extern char		myClass[];
 
     xwmh.flags	   = InputHint|StateHint|IconPixmapHint;
     xwmh.input	   = True;
@@ -470,29 +478,63 @@ int Init_top(void)
     }
 #endif
 
-    if (hudColor >= maxColors || hudColor <= 0) {
-	hudColor = BLUE;
-    }
-    if (hudColor >= maxColors || hudColor <= 0) {
-	hudColor = BLUE;
-    }
-    if (hrColor1 >= maxColors || hrColor1 < 0) {
-	hrColor1 = RED;
-    }
-    if (hrColor2 >= maxColors || hrColor2 < 0) {
-	hrColor2 = BLUE;
-    }
+    /* check that colors have sane values, if not, set a default */
+#define COLORCHECK(c, d) if (c >= maxColors || c < 0) { \
+      xpprintf("Value of option \"" #c "\" (%d) is out of range, " \
+               "setting default value " #d ".\n", c); c = d ; }
+
+    COLORCHECK(hudColor, BLUE);
+    COLORCHECK(hudLockColor, hudColor);
+    COLORCHECK(hrColor1, RED);
+    COLORCHECK(hrColor2, BLUE);
+    COLORCHECK(shipShapesHackColor, BLACK);
+    COLORCHECK(dirPtrColor, BLACK);
+    COLORCHECK(msgScanBallColor, RED);
+    COLORCHECK(msgScanCoverColor, BLUE);
+    COLORCHECK(selfLWColor, RED);
+    COLORCHECK(enemyLWColor, RED);
+    COLORCHECK(teamLWColor, 4);
+    COLORCHECK(teamShotColor, BLUE);
+    COLORCHECK(shipNameColor, BLUE);
+    COLORCHECK(baseNameColor, BLUE);
+    COLORCHECK(mineNameColor, BLUE);
+    COLORCHECK(ballColor, WHITE);
+    COLORCHECK(connColor, WHITE);
+    COLORCHECK(windowColor, BLUE);
+    COLORCHECK(buttonColor, RED);
+    COLORCHECK(borderColor, WHITE);
+    COLORCHECK(scoreColor, WHITE);
+    COLORCHECK(scoreSelfColor, RED);
+    COLORCHECK(scoreInactiveColor, 12);
+    COLORCHECK(scoreInactiveSelfColor, 12);
+    /* kps - add scoreObjectColor */
+    COLORCHECK(scoreZeroColor, 4);
+    COLORCHECK(wallColor, BLUE);
+    COLORCHECK(fuelColor, RED);
+    COLORCHECK(messagesColor, RED);
+    COLORCHECK(oldMessagesColor, BLUE);
+    COLORCHECK(decorColor, RED);
+#undef COLORCHECK
+
     if (hrSize >= SHIP_SZ || hrSize <= 0) {
-	hrSize = 2;
+	hrSize = 6;
     }
     if (hrScale >= 4.0 || hrScale <= 0.5) {
 	hrScale = 1.5;
     }
-    if (hudLockColor >= maxColors || hudLockColor < 0) {
-	hudLockColor = hudColor;
+    if (hrLimit > 5.0 || hrLimit < 0.0) {
+	hrLimit = 0.05;
     }
-    if (wallColor >= maxColors || wallColor <= 0) {
-	wallColor = BLUE;
+    if (hudSize >= 6 * MIN_HUD_SIZE || hudSize < MIN_HUD_SIZE) {
+	hudSize = MIN_HUD_SIZE;
+    }
+
+
+    if (scoreObjectTime > 10.0 || scoreObjectTime < 0.0) {
+	scoreObjectTime = 2.0;
+    }
+    if (baseWarningType > 3 || baseWarningType < 0) {
+	baseWarningType = 1;
     }
     if (wallRadarColor >= maxColors
 	|| ((wallRadarColor & 5) && colorSwitch)) {
@@ -503,12 +545,11 @@ int Init_top(void)
 	/* should be & 5? !@# */
 	targetRadarColor = BLUE;
     }
-    if (oldMessagesColor >= maxColors || oldMessagesColor < 0) {
-	oldMessagesColor = WHITE;
+
+    if (charsPerSecond > 255 || charsPerSecond < 10) {
+	charsPerSecond = 50;
     }
-    if (decorColor >= maxColors || decorColor <= 0) {
-	decorColor = RED;
-    }
+
     if (decorRadarColor >= maxColors
 	|| ((decorRadarColor & 5) && colorSwitch)) {
 	decorRadarColor = 2;
@@ -574,7 +615,8 @@ int Init_top(void)
      * Create toplevel window (we need this first so that we can create GCs)
      */
     mask = 0;
-    sattr.background_pixel = colors[WHITE].pixel;
+    /*old debug: sattr.background_pixel = colors[WHITE].pixel;*/
+    sattr.background_pixel = colors[BLACK].pixel;
     mask |= CWBackPixel;
     sattr.border_pixel = colors[WHITE].pixel;
     mask |= CWBorderPixel;
@@ -631,7 +673,6 @@ int Init_top(void)
 				    (char *)itemBitmapData[i].data,
 				    ITEM_SIZE, ITEM_SIZE);
     }
-
 
     /*
      * Creates and initializes the graphic contexts.
@@ -705,16 +746,11 @@ int Init_top(void)
 	XSetPlaneMask(dpy, gc, dbuf_state->drawing_planes);
     }
 
-
 #endif
 
     if (mono) {
 	buttonColor = BLACK;
 	windowColor = BLACK;
-	borderColor = WHITE;
-    } else {
-	windowColor = BLUE;
-	buttonColor = RED;
 	borderColor = WHITE;
     }
 
@@ -757,7 +793,7 @@ int Init_playing_windows(void)
     draw = XCreateSimpleWindow(dpy, top, 258, 0,
 			       draw_width, draw_height,
 			       0, 0, colors[BLACK].pixel);
-    IFWINDOWS( if (draw != 1) error("draw != 1"); )
+    IFWINDOWS( if (draw != 1) error("draw != 1") );
     radar = XCreateSimpleWindow(dpy, top, 0, 0,
 				256, RadarHeight, 0, 0,
 				colors[BLACK].pixel);
@@ -835,6 +871,8 @@ int Init_playing_windows(void)
 			      "KEYS", Keys_callback, NULL);
     Widget_add_pulldown_entry(menu_button,
 			      "CONFIG", Config_callback, NULL);
+    Widget_add_pulldown_entry(menu_button,
+			      "COLORS", Colors_callback, NULL);
     Widget_add_pulldown_entry(menu_button,
 			      "SCORE", Score_callback, NULL);
     Widget_add_pulldown_entry(menu_button,
@@ -956,7 +994,7 @@ void WinXCreateItemBitmaps()
 				       ITEM_SIZE, ITEM_SIZE, colors[RED].pixel);
     }
     Colors_init_block_bitmaps();
-
+    
 }
 #endif
 
@@ -987,21 +1025,21 @@ int Alloc_msgs(void)
     for (i = 0; i < 2 * MAX_MSGS; i++) {
 	if (i < MAX_MSGS) {
 	    TalkMsg[i] = x;
-	    IFNWINDOWS( if (selectionAndHistory) TalkMsg_pending[i] = x2; )
+	    IFNWINDOWS( if (selectionAndHistory) TalkMsg_pending[i] = x2 );
 	} else {
 	    GameMsg[i - MAX_MSGS] = x;
-	    IFNWINDOWS( if (selectionAndHistory) GameMsg_pending[i - MAX_MSGS] = x2; )
+	    IFNWINDOWS( if (selectionAndHistory) GameMsg_pending[i - MAX_MSGS] = x2 );
 	}
 	x->txt[0] = '\0';
 	x->len = 0;
-	x->life = 0;
+	x->lifeTime = 0.0;
 	x++;
 
 #ifndef _WINDOWS
 	if (selectionAndHistory) {
 	    x2->txt[0] = '\0';
 	    x2->len = 0;
-	    x2->life = 0;
+	    x2->lifeTime = 0.0;
 	    x2++;
 	}
 #endif
@@ -1027,14 +1065,19 @@ void Free_msgs(void)
 
 static int Config_callback(int widget_desc, void *data, const char **str)
 {
-    Config(true);
+    Config(true, CONFIG_DEFAULT);
     return 0;
 }
 
+static int Colors_callback(int widget_desc, void *data, const char **str)
+{
+    Config(true, CONFIG_COLORS);
+    return 0;
+}
 
 static int Score_callback(int widget_desc, void *data, const char **str)
 {
-    Config(false);
+    Config(false, CONFIG_NONE);
     if (showRealName != false) {
 	showRealName = false;
 	scoresChanged = 1;
@@ -1042,17 +1085,15 @@ static int Score_callback(int widget_desc, void *data, const char **str)
     return 0;
 }
 
-
 static int Player_callback(int widget_desc, void *data, const char **str)
 {
-    Config(false);
+    Config(false, CONFIG_NONE);
     if (showRealName != true) {
 	showRealName = true;
 	scoresChanged = 1;
     }
     return 0;
 }
-
 
 static int Quit_callback(int widget_desc, void *data, const char **str)
 {

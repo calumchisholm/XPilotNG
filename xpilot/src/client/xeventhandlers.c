@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,17 +28,22 @@
 #include <math.h>
 
 #ifndef _WINDOWS
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/Xmd.h>
-#else
-#include "NT/winX.h"
-#include "NT/winAudio.h"
-#include "NT/winClient.h"
-#include "NT/winXKey.h"
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+# include <X11/Xutil.h>
+# include <X11/keysym.h>
+# include <X11/Xatom.h>
+# include <X11/Xmd.h>
+# ifdef	__apollo
+#  include <X11/ap_keysym.h>
+# endif
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winAudio.h"
+# include "NT/winClient.h"
+# include "NT/winXKey.h"
 #endif
 
 #include "version.h"
@@ -58,6 +63,11 @@
 #include "paintdata.h"
 #include "talk.h"
 #include "configure.h"
+#include "xeventhandlers.h"
+
+
+char xeventhandlers_version[] = VERSION;
+
 
 extern int	talk_key_repeat_count;  /* xevent.c */
 extern XEvent	talk_key_repeat_event;  /* xevent.c */
@@ -71,7 +81,7 @@ extern void Pointer_control_set_state(int onoff); /* xevent.c */
 
 extern int	initialPointerControl;
 extern bool	pointerControl;
-extern keys_t	buttonDefs[MAX_POINTER_BUTTONS];
+extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 extern ipos	mouse;		/* position of mouse pointer. */
 extern int	movement;	/* horizontal mouse movement. */
 
@@ -104,7 +114,7 @@ static void Selection_paste(Window win, unsigned prop, int Delete)
     unsigned char  *data;
     Atom            actual_type;
     int             actual_fmt;
-
+ 
     if (prop == None)
         return;
 
@@ -132,15 +142,15 @@ static void Selection_paste(Window win, unsigned prop, int Delete)
 static void Selection_request(void)
 {
     Atom prop;
-
+ 
     if (selection.txt != NULL) {
 	/* internal selection */
 	if (Talk_paste(selection.txt, selection.len, False) > 0)
 	    save_talk_str = true;
-    }
+    } 
     else if (XGetSelectionOwner(dpy, XA_PRIMARY) == None) {
 	Selection_paste(DefaultRootWindow(dpy), XA_CUT_BUFFER0, False);
-    }
+    } 
     else {
 	prop = XInternAtom(dpy, "VT_SELECTION", False);
 	XConvertSelection(dpy, XA_PRIMARY, XA_STRING, prop, talk_w,
@@ -157,10 +167,10 @@ static void Selection_send(const XSelectionRequestEvent *rq)
     XEvent          ev;
     Atom32          target_list[2];
     static Atom     xa_targets = None;
-
+ 
     if (xa_targets == None)
         xa_targets = XInternAtom(dpy, "TARGETS", False);
-
+ 
     ev.xselection.type = SelectionNotify;
     ev.xselection.property = None;
     ev.xselection.display = rq->display;
@@ -168,7 +178,7 @@ static void Selection_send(const XSelectionRequestEvent *rq)
     ev.xselection.selection = rq->selection;
     ev.xselection.target = rq->target;
     ev.xselection.time = rq->time;
-
+ 
     if (rq->target == xa_targets) {
         target_list[0] = (Atom32) xa_targets;
         target_list[1] = (Atom32) XA_STRING;
@@ -177,7 +187,7 @@ static void Selection_send(const XSelectionRequestEvent *rq)
                         (unsigned char *)target_list,
                         (sizeof(target_list) / sizeof(target_list[0])));
         ev.xselection.property = rq->property;
-    }
+    } 
     else if (rq->target == XA_STRING) {
 	XChangeProperty(dpy, rq->requestor, rq->property,
 			rq->target, 8, PropModeReplace,
@@ -203,7 +213,7 @@ void SelectionRequest_event(XEvent *event)
 void MapNotify_event(XEvent *event)
 {
     if (ignoreWindowManager == 1) {
-        XSetInputFocus(dpy, top, RevertToParent, CurrentTime);
+        XSetInputFocus(dpy, top, RevertToParent, CurrentTime); 
         ignoreWindowManager = 2;
     }
 }
@@ -267,7 +277,7 @@ void ConfigureNotify_event(XEvent *event)
     conf = &(event->xconfigure);
     if (conf->window == top) {
 	Resize(conf->window, conf->width, conf->height);
-    }
+    } 
     else {
         Widget_event(event);
     }
@@ -289,12 +299,12 @@ void KeyChanged_event(XEvent *event)
 #endif
     if (event->xkey.window == top) {
         Key_event(event);
-    }
+    } 
     else if (event->xkey.window == talk_w) {
         if (event->type == KeyPress) {
 	    talk_key_repeat_count = 1;
 	    talk_key_repeat_event = *event;
-	}
+	} 
 	else if (talk_key_repeat_count > 0
 		   && event->xkey.keycode
 		   == talk_key_repeat_event.xkey.keycode) {
@@ -314,28 +324,31 @@ void ButtonPress_event(XEvent *event)
         if (pointerControl
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
-	    if (Key_press(buttonDefs[event->xbutton.button-1])) {
-	        Net_key_change();
+	    int i;
+	    for (i = 0; i < NUM_BUTTON_DEFS(event->xbutton.button-1); ++i) {
+	    	if (Key_press(buttonDefs[event->xbutton.button-1][i])) {
+		    Net_key_change();
+		}
 	    }
+	} 
 #ifndef _WINDOWS
-	}
 	else if (selectionAndHistory) {
 	    switch (event->xbutton.button) {
 	    case Button1:
 	        if (!talk_mapped) {
 		  /* start cutting from the talk messages */
 		  Talk_cut_from_messages(&(event->xbutton));
-		}
+		} 
 		else {
 		    /* start cutting from ... */
 		    if (event->xbutton.window == draw) {
 		        /* ...the talk messages */
 		        Talk_cut_from_messages(&(event->xbutton));
-		    }
+		    } 
 		    else {
 		        /* ...the talk window */
 		        Talk_window_cut(&(event->xbutton));
-		    }
+		    } 
 		}
 		break;
 
@@ -352,8 +365,8 @@ void ButtonPress_event(XEvent *event)
 	        break;
 	    } /* switch */
 	      /* end of selectionAndHistory */
-#endif /* not _WINDOWS */
 	}
+#endif /* not _WINDOWS */
 	return;
     }
     if (Widget_event(event) != 0) {
@@ -374,7 +387,7 @@ void MotionNotify_event(XEvent *event)
 	    mouse.x = event->xmotion.x;
 	    mouse.y = event->xmotion.y;
 	}
-    }
+    } 
     else {
         Widget_event(event);
     }
@@ -384,14 +397,17 @@ int ButtonRelease_event(XEvent *event)
 {
     if (event->xbutton.window == draw
 	|| event->xbutton.window == talk_w) {
-
+      
         if (pointerControl
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
-	    if (Key_release(buttonDefs[event->xbutton.button-1])) {
-	        Net_key_change();
+	    int i;
+	    for (i = 0; i < NUM_BUTTON_DEFS(event->xbutton.button-1); ++i) {
+	    	if (Key_release(buttonDefs[event->xbutton.button-1][i])) {
+		    Net_key_change();
+		}
 	    }
-	}
+	} 
 #ifndef _WINDOWS
 	else if (!selectionAndHistory) {
 	    return 0;
@@ -401,7 +417,7 @@ int ButtonRelease_event(XEvent *event)
 		 * finish a cut from the talk messages
 		 */
 	    Talk_cut_from_messages(&(event->xbutton));
-	}
+	} 
 	else if (talk_mapped && event->xbutton.button == 1){
 		/*
 		 * finish a cut from ...
@@ -409,7 +425,7 @@ int ButtonRelease_event(XEvent *event)
 	    if (event->xbutton.window == draw
 		&& selection.draw.state == SEL_PENDING) {
 	        Talk_cut_from_messages(&(event->xbutton));
-	    }
+	    } 
 	    else if (selection.talk.state == SEL_PENDING) {
 	        Talk_window_cut(&(event->xbutton));
 	    }
@@ -418,7 +434,6 @@ int ButtonRelease_event(XEvent *event)
 	return 0;
     }
     if (Widget_event(event) != 0) {
-	extern int quitting;
 	if (quitting == true) {
 	    quitting = false;
 	    printf("Quit\n");
@@ -443,16 +458,16 @@ void Expose_event(XEvent *event)
 	    players_exposed = true;
 	    scoresChanged++;
 	}
-    }
+    } 
     else if (event->xexpose.window == about_w) {
 	  if (event->xexpose.count == 0) {
 	      Expose_about_window();
 	  }
-    }
+    } 
     else if (event->xexpose.window == radar) {
 	  if (event->xexpose.count <= 1) {
 	      radar_exposures = 1;
-	  }
+	  } 
 	  else {
 	      radar_exposures++;
 	  }

@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -24,16 +25,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #ifdef _WINDOWS
-#include <windows.h>
-#else
+# include <windows.h>
 #endif
 
 #define SERVER
 #include "version.h"
 #include "config.h"
-#include "const.h"
+#include "serverconst.h"
 #include "global.h"
 #include "proto.h"
 #include "netserver.h"
@@ -148,17 +149,17 @@ void sound_play_all(int index)
  * is what the player can see on the screen. A volume is assigned to the
  * sound depending on the location within the sound range.
  */
-void sound_play_sensors(int x, int y, int index)
+void sound_play_sensors(int cx, int cy, int index)
 {
     int             i,
 		    volume;
-    DFLOAT           dx,
+    DFLOAT          dx,
 		    dy,
 		    range,
 		    factor;
     player         *pl;
 
-    SDBG(printf("sound_play_sensors %g, %g, %d\n", x, y, index);)
+    SDBG(printf("sound_play_sensors %d, %d, %d\n", cx, cy, index);)
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players[i];
@@ -166,8 +167,8 @@ void sound_play_sensors(int x, int y, int index)
 	if (!BIT(pl->status, WANT_AUDIO))
 	    continue;
 
-	dx = ABS(pl->pos.cx - x);
-	dy = ABS(pl->pos.cy - y);
+	dx = ABS(pl->pos.cx - cx);
+	dy = ABS(pl->pos.cy - cy);
 	range = sound_range(pl);
 
 	if (dx >= 0 && dx <= range && dy >= 0 && dy <= range) {

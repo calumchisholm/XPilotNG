@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
@@ -37,10 +37,14 @@
 #include "gfx2d.h"
 #include "xpmread.h"
 
+#include "version.h"
 #include "error.h"
 #include "const.h"
 #include "paint.h"
 #include "paintdata.h"
+#include "commonproto.h"
+
+char bitmaps_version[] = VERSION;
 
 
 xp_pixmap_t object_pixmaps[] = {
@@ -87,6 +91,7 @@ xp_pixmap_t object_pixmaps[] = {
     { "minus.ppm"	    , 1},
     { "checkpoint.ppm"	    , -2},
     { "meter.ppm"	    , -2},
+    { "asteroidconcentrator.ppm"    , 32},
 };
 
 xp_pixmap_t *pixmaps = 0;
@@ -152,7 +157,7 @@ int Bitmap_add_std_textures (void)
 int Bitmap_add (char *filename, int count, bool scalable)
 {
     xp_pixmap_t pixmap;
-    pixmap.filename = strdup(filename);
+    pixmap.filename = xp_strdup(filename);
     pixmap.count = count;
     pixmap.scalable = scalable;
     pixmap.state = BMS_UNINITIALIZED;
@@ -207,8 +212,8 @@ int Bitmap_create (Drawable d, int img)
  * Causes all scalable bitmaps to be rescaled (recreated actually)
  * next time needed.
  */
-void Bitmap_update_scale () {
-
+void Bitmap_update_scale (void)
+{
     /* This should do the trick.
      * All "good" scalable bitmaps are marked as initialized
      * causing the next Bitmap_get to recreate the bitmap using
@@ -228,11 +233,16 @@ void Bitmap_update_scale () {
  * properly. Returns NULL if the specified bitmap is not in appropriate
  * state.
  */
-xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp) {
+xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp)
+{
     extern bool fullColor; /* i don't like this variable at all :( */
-    if (!fullColor || img < 0 || img >= num_pixmaps) return NULL;
+
+    if (!fullColor || img < 0 || img >= num_pixmaps)
+	return NULL;
+
     if (pixmaps[img].state != BMS_READY) {
-	if (Bitmap_create(d, img) == -1) return NULL;
+	if (Bitmap_create(d, img) == -1)
+	    return NULL;
     }
 
     return &pixmaps[img].bitmaps[bmp];

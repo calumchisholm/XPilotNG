@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * Adapted from 'The UNIX Programming Environment' by Kernighan & Pike
  * and an example from the manualpage for vprintf by
@@ -282,8 +282,10 @@ va_dcl
 #ifdef _WINDOWS
 static void Win_show_error(char *s)
 {
-    IFWINDOWS( Trace("Error: %s\n", s); )
-/*  inerror = TRUE; */
+    static int inerror = FALSE;
+    IFWINDOWS( Trace("Error: %s\n", s) );
+    if (inerror) return;
+    inerror = TRUE;
     {
 #       ifdef   _XPILOTNTSERVER_
 	/* putting up a message box on the server is a bad thing.
@@ -299,6 +301,7 @@ static void Win_show_error(char *s)
 #           endif
 	    ExitProcess(1);
 	}
+	inerror = FALSE;
 #       endif
     }
 }

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -29,24 +29,25 @@
 #include <sys/types.h>
 #include <time.h>
 
-#ifndef	_WINDOWS
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+#ifndef _WINDOWS
+# include <unistd.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netdb.h>
 #endif
 
 #ifdef __sgi
-#include <bstring.h>
+# include <bstring.h>
 #endif
 
 #ifdef _WINDOWS
-#include "../client/NT/winClient.h"
-#include "NT/winNet.h"
-#undef	va_start	/* there are bad versions in windows.h's "stdarg.h" */
-#undef	va_end
-#include <varargs.h>
+# include "NT/winNet.h"
+# undef	va_start		/* there are bad versions in windows.h's "stdarg.h" */
+# undef	va_end
+# include <varargs.h>
 #endif
 
 #include "version.h"
@@ -67,10 +68,11 @@ int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, int size, int state)
     if ((sbuf->buf = sbuf->ptr = (char *) malloc(size)) == NULL) {
 	return -1;
     }
-    if (sock != NULL)
+    if (sock != (sock_t *) NULL) {
 	sbuf->sock = *sock;
-    else
+    } else {
 	sock_init(&sbuf->sock);
+    }
     sbuf->state = state;
     sbuf->len = 0;
     sbuf->size = size;
@@ -136,7 +138,7 @@ int Sockbuf_advance(sockbuf_t *sbuf, int len)
 	sbuf->len = 0;
 	sbuf->ptr = sbuf->buf;
     } else {
-#if defined(__hpux) || defined(VMS) || defined(__apollo) || defined(SVR4) || defined(_SEQUENT_) || defined(SYSV) || defined(_WINDOWS)
+#if defined(__hpux) || defined(SVR4) || defined(_SEQUENT_) || defined(SYSV) || defined(_WINDOWS)
 	memmove(sbuf->buf, sbuf->buf + len, sbuf->len - len);
 #else
 	bcopy(sbuf->buf + len, sbuf->buf, sbuf->len - len);
@@ -203,7 +205,7 @@ int Sockbuf_flush(sockbuf_t *sbuf)
 	errno = 0;
 	i = 0;
 #if 0
-	if (rand() % 12 == 0)	/* artificial packet loss */
+	if (randomMT() % 12 == 0)	/* artificial packet loss */
 	    len = sbuf->len;
 	else
 #endif
@@ -236,7 +238,7 @@ int Sockbuf_flush(sockbuf_t *sbuf)
 		}
 	    }
 	    if (sock_get_error(&sbuf->sock) == -1) {
-		error("GetSocketError send");
+		error("sock_get_error send");
 		return -1;
 	    }
 	    errno = 0;
@@ -322,11 +324,11 @@ int Sockbuf_read(sockbuf_t *sbuf)
 	errno = 0;
 	i = 0;
 #if 0
-	if (rand() % 12 == 0)		/* artificial packet loss */
+	if (randomMT() % 12 == 0)		/* artificial packet loss */
 	    len = sbuf->len;
 	else
 #endif
-	while ((len = sock_read(&sbuf->sock, sbuf->buf + sbuf->len, max))<= 0){
+	while ((len = sock_read(&sbuf->sock, sbuf->buf + sbuf->len, max)) <= 0) {
 	    if (len == 0) {
 		return 0;
 	    }
@@ -348,9 +350,9 @@ int Sockbuf_read(sockbuf_t *sbuf)
 	    }
 #endif
 /*
-		Trace("errno=%d (%s) len = %d during sock_read\n",
+		Trace("errno=%d (%s) len = %d during sock_read\n", 
 			errno, _GetWSockErrText(errno), len);
-*/
+*/			
 	    if (++i > MAX_SOCKBUF_RETRIES) {
 		error("Can't recv on socket");
 		return -1;
@@ -369,7 +371,7 @@ int Sockbuf_read(sockbuf_t *sbuf)
 	sbuf->len += len;
     } else {
 	errno = 0;
-	while ((len = sock_read(&sbuf->sock, sbuf->buf + sbuf->len, max))<= 0){
+	while ((len = sock_read(&sbuf->sock, sbuf->buf + sbuf->len, max)) <= 0) {
 	    if (len == 0) {
 		return 0;
 	    }
@@ -384,7 +386,7 @@ int Sockbuf_read(sockbuf_t *sbuf)
 	    }
 	    return 0;
 	}
-/*	IFWINDOWS( Trace("Read stream %d bytes from %d\n", len, sbuf->sock); )*/
+/*	IFWINDOWS( Trace("Read stream %d bytes from %d\n", len, sbuf->sock) );*/
 	sbuf->len += len;
     }
 
@@ -842,3 +844,4 @@ int Packet_scanf(va_alist)
 
     return (failure) ? -1 : count;
 }
+

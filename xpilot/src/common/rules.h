@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -33,7 +33,6 @@
 #define PLAYER_KILLINGS		(1<<2)
 #define LIMITED_LIVES		(1<<3)
 #define TIMING			(1<<4)
-/* 5 is FREE */
 #define PLAYER_SHIELDING	(1<<6)
 #define LIMITED_VISIBILITY	(1<<7)
 #define TEAM_PLAY		(1<<8)
@@ -42,10 +41,13 @@
 #define ALLOW_CLUSTERS		(1<<11)
 #define ALLOW_MODIFIERS		(1<<12)
 #define ALLOW_LASER_MODIFIERS	(1<<13)
+#define ALLIANCES		(1<<14)
+
 /*
  * Client uses only a subset of them:
  */
-#define CLIENT_RULES_MASK	(WRAP_PLAY|TEAM_PLAY|TIMING|LIMITED_LIVES)
+#define CLIENT_RULES_MASK	(WRAP_PLAY|TEAM_PLAY|TIMING|LIMITED_LIVES|\
+				 ALLIANCES)
 
 /*
  * Possible object and player status bits.
@@ -75,6 +77,7 @@
 #define COLLISIONSHOVE		(1L<<22)	/* Collision counts as shove */
 #define FINISH			(1L<<23)	/* Finished a lap this frame */
 #define RACE_OVER		(1L<<24)	/* After finished and score. */
+#define RANDOM_ITEM		(1L<<25)	/* If an item shows up as random */
 
 typedef struct {
     int		lives;

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,10 +30,13 @@
  * The problem is that sounds are lagging behind all the time.
  */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#ifndef _WINDOWS
+# include <unistd.h>
+#endif
 
 #include "version.h"
 
@@ -151,7 +154,7 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
     play_bucket = *bucket_ptr;
 }
 
-void audioDeviceEvents()
+void audioDeviceEvents(void)
 {
     long		status;
     static int		pending;

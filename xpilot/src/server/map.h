@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -64,6 +65,8 @@
 #define DOWN_GRAV		24
 #define RIGHT_GRAV		25
 #define LEFT_GRAV		26
+#define FRICTION		27
+#define ASTEROID_CONCENTRATOR		28
 #define BASE_ATTRACTOR		127
 
 #define SPACE_BIT		(1 << SPACE)
@@ -93,6 +96,8 @@
 #define DOWN_GRAV_BIT           (1 << DOWN_GRAV)
 #define RIGHT_GRAV_BIT          (1 << RIGHT_GRAV)
 #define LEFT_GRAV_BIT           (1 << LEFT_GRAV)
+#define FRICTION_BIT		(1 << FRICTION)
+#define ASTEROID_CONCENTRATOR_BIT	(1 << ASTEROID_CONCENTRATOR)
 
 #define DIR_RIGHT		0
 #define DIR_UP			(RES/4)
@@ -100,7 +105,7 @@
 #define DIR_DOWN		(3*RES/4)
 
 typedef struct {
-    ipos	clk_pos;
+    clpos	pos;
     long	fuel;
     unsigned	conn_mask;
     long	last_change;
@@ -108,29 +113,38 @@ typedef struct {
 } fuel_t;
 
 typedef struct {
-    ipos	pos;
+    clpos	pos;
     DFLOAT	force;
+    int		type;
 } grav_t;
 
 typedef struct {
-    ipos	pos;
-    int		dir;
-    u_short	team;
+    clpos		pos;
+    int			dir;
+    unsigned short	team;
 } base_t;
 
+/* kps - ng does not want this */
 typedef struct {
-    ipos	blk_pos;
-    ipos	clk_pos;
-    int		dir;
-    int		dead_time;
-    unsigned	conn_mask;
-    long	last_change;
-    int		item[NUM_ITEMS];
-    int		damaged;
-    int		tractor_target;
-    int		tractor_count;
-    bool	tractor_is_pressor;
-    u_short	team;
+    int		base_idx;	/* Index in World.base[] */
+    DFLOAT	dist;		/* Distance to first checkpoint */
+} baseorder_t;
+
+typedef struct {
+    clpos		pos;
+    int			dir;
+    int			dead_time;
+    unsigned		conn_mask;
+    long		last_change;
+    int			item[NUM_ITEMS];
+    int			damaged;
+    int			tractor_target;
+    int			tractor_count;
+    bool		tractor_is_pressor;
+    unsigned short	team;
+    long		used;
+    int			emergency_shield_left;
+    int			phasing_left;
 } cannon_t;
 
 typedef struct {
@@ -145,85 +159,113 @@ typedef struct {
     int		limit;		/* max number of elements per player/cannon. */
 } item_t;
 
+typedef struct {
+    DFLOAT	prob;		/* Probability [0..1] for asteroid to appear */
+    int		max;		/* Max on world at a given time */
+    int		num;		/* Number active right now */
+    int		chance;		/* Chance [0..127] for asteroid to appear */
+} asteroid_t;
+
 typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
 
 typedef struct {
-    ipos	pos;
-    int		lastdest,	/* last destination wormhole */
-		countdown,	/* if >0 warp to lastdest else random */
-		lastplayer;	/* last player to pass through */
-    bool	temporary;	/* wormhole was left by hyperjump */
-    wormType	type;
+    clpos		pos;
+    int			lastdest,	/* last destination wormhole */
+			countdown;	/* if >0 warp to lastdest else random */
+    bool		temporary;	/* wormhole was left by hyperjump */
+    wormType		type;
+    u_byte		lastblock;	/* block it occluded */
+    unsigned short	lastID;
 } wormhole_t;
 
 typedef struct {
-    ipos	pos;
-    bool	have;		/* true if this treasure has ball in it */
-    u_short	team;		/* team of this treasure */
-    int 	destroyed;	/* number of times this treasure destroyed */
+    clpos		pos;
+    bool		have;	/* true if this treasure has ball in it */
+    unsigned short	team;	/* team of this treasure */
+    int 		destroyed;	/* how often this treasure destroyed */
+    bool		empty;	/* true if this treasure never had a ball in it */
 } treasure_t;
 
 typedef struct {
-    ipos	pos;
-    u_short	team;
-    int		dead_time;
-    int		damage;
-    unsigned	conn_mask;
-    unsigned 	update_mask;
-    long	last_change;
+    clpos		pos;
+    unsigned short	team;
+    int			dead_time;
+    int			damage;
+    unsigned		conn_mask;
+    unsigned 		update_mask;
+    long		last_change;
 } target_t;
 
 typedef struct {
     int		NumMembers;		/* Number of current members */
+    int		NumRobots;		/* Number of robot players */
     int		NumBases;		/* Number of bases owned */
     int		NumTreasures;		/* Number of treasures owned */
+    int		NumEmptyTreasures;	/* Number of empty treasures owned */
     int		TreasuresDestroyed;	/* Number of destroyed treasures */
     int		TreasuresLeft;		/* Number of treasures left */
-    int         SwapperId;              /* Player swapping to this full team */
+    int		SwapperId;		/* Player swapping to this full team */
+    DFLOAT	score;
+    DFLOAT	prev_score;
 } team_t;
 
 typedef struct {
-    ipos	pos;
-} item_concentrator_t;
+    clpos	pos;
+} item_concentrator_t, asteroid_concentrator_t;
+
+extern bool is_polygon_map;
 
 typedef struct {
-    int		x, y;		/* Size of world in blocks */
-    int		diagonal;	/* Diagonal length in blocks */
-    int		width, height;	/* Size of world in pixels (optimization) */
-    int         cwidth, cheight;/* Size of world in clicks */
-    int		hypotenuse;	/* Diagonal length in pixels (optimization) */
-    rules_t	*rules;
-    char	name[MAX_CHARS];
-    char	author[MAX_CHARS];
-    char        dataURL[MAX_CHARS];
+    int			x, y;		/* Size of world in blocks */
+    int			diagonal;	/* Diagonal length in blocks */
+    int			width, height;	/* Size of world in pixels (optimization) */
+    int			cwidth, cheight;/* Size of world in clicks */
+    int			hypotenuse;	/* Diagonal length in pixels (optimization) */
+    rules_t		*rules;
+    char		name[MAX_CHARS];
+    char		author[MAX_CHARS];
+    char		dataURL[MAX_CHARS];
 
-    vector	**gravity;
+    /* kps - ng does not want **block and **itemID */
+    u_byte		**block;        /* type of item in each block */
 
-    item_t	items[NUM_ITEMS];
+			/* index into mapobject depending on value of corresponding block,
+			** -1 for space, walls, etc */
+    unsigned short	**itemID;
 
-    team_t	teams[MAX_TEAMS];
+    vector		**gravity;
 
-    int		NumTeamBases;      /* How many 'different' teams are allowed */
-    int		NumBases;
-    base_t	*base;
-    int		NumFuels;
-    fuel_t	*fuel;
-    int		NumGravs;
-    grav_t	*grav;
-    int		NumCannons;
-    cannon_t	*cannon;
-    int		NumChecks;
-    ipos	*check;
-    int		NumWormholes;
-    wormhole_t	*wormHoles;
-    int		NumTreasures;
-    treasure_t	*treasures;
-    int         NumTargets;
-    target_t    *targets;
-    int		NumItemConcentrators;
+    item_t		items[NUM_ITEMS];
+
+    asteroid_t		asteroids;
+
+    team_t		teams[MAX_TEAMS];
+
+    int			NumTeamBases;      /* How many 'different' teams are allowed */
+    int			NumBases;
+    base_t		*base;
+    baseorder_t		*baseorder; /* kps - ng does not want this */
+    int			NumFuels;
+    fuel_t		*fuel;
+    int			NumGravs;
+    grav_t		*grav;
+    int			NumCannons;
+    cannon_t		*cannon;
+    int			NumChecks;
+    clpos		*check;
+    int			NumWormholes;
+    wormhole_t		*wormHoles;
+    int			NumTreasures;
+    treasure_t		*treasures;
+    int			NumTargets;
+    target_t		*targets;
+    int			NumItemConcentrators;
     item_concentrator_t	*itemConcentrators;
+    int			NumAsteroidConcs;
+    asteroid_concentrator_t	*asteroidConcs;
 } World_map;
 
+/* kps change 100, 30 etc to something sane */
 struct polystyle {
     char id[100];
     int color;
@@ -256,10 +298,19 @@ typedef struct {
     int is_decor;
 } poly_t;
 
+struct move {
+    clvec start;
+    clvec delta;
+    int hit_mask;
+    object *obj;
+};
+
 struct group {
     int type;
-    unsigned int hit_mask;
     int team;
+    int item_id;
+    unsigned int hit_mask;
+    bool (*hit_func)(struct group *group, struct move *move);
 };
 
 extern struct polystyle pstyles[256];
@@ -271,4 +322,6 @@ extern struct group groups[];
 #define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1 << (team))
 
 extern int num_pstyles, num_estyles, num_bstyles;
+
 #endif
+

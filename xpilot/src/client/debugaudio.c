@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,10 +28,13 @@
  * Hence this file to monitor what's going on.
  */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#ifndef _WINDOWS
+# include <unistd.h>
+#endif
 
 #include "version.h"
 #include "audio.h"
@@ -51,7 +54,7 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
 	    filename, type, volume, private);
 }
 
-void audioDeviceEvents()
+void audioDeviceEvents(void)
 {
     /* printf("debug audio: events\n"); */
 }

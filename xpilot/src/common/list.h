@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -94,7 +94,7 @@ list_iter_t	List_find(list_t list, void *data);
 list_iter_t	List_find_range(list_iter_t first, list_iter_t last, void *data);
 
 /*
- * Remove all element from the list which are equal to data.
+ * Remove all elements from the list which are equal to data.
  * Note that this is very slow because it traverses the entire list.
  * The return value is the number of successful removals.
  */

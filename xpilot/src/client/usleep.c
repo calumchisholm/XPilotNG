@@ -1,8 +1,3 @@
-/*
-#ifndef lint
-static char sccsid[] = "@(#)usleep.c	1.3 91/05/24 XLOCK";
-#endif
-*/
 /*-
  * usleep.c - OS dependant implementation of usleep().
  *
@@ -21,13 +16,18 @@ static char sccsid[] = "@(#)usleep.c	1.3 91/05/24 XLOCK";
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <sys/time.h>
-#else
-#include "NT/winNet.h"
+# include <unistd.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winNet.h"
 #endif
 
 #include "types.h"
+
 
 int micro_delay(unsigned usec);
 
@@ -36,17 +36,10 @@ int micro_delay(unsigned usec)
 #if 0 /* SYSV */
     poll((struct poll *) 0, (size_t) 0, usec / 1000);	/* ms RES */
 #endif
-#ifdef VMS
-    float timeout;
-
-    timeout = usec/1000000.0;
-    LIB$WAIT(&timeout);
-#else
     struct timeval timeout;
     timeout.tv_usec = usec % (unsigned long) 1000000;
     timeout.tv_sec = usec / (unsigned long) 1000000;
     (void) select(0, NULL, NULL, NULL, &timeout);
-#endif
 
     return 0;
 }

@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -26,15 +27,16 @@
 #include <stdio.h>
 #include <limits.h>
 #include <math.h>
+#include <time.h>
 
 #ifdef _WINDOWS
-#include "NT/winServer.h"
+# include "NT/winServer.h"
 #endif
 
 #define SERVER
 #include "version.h"
 #include "config.h"
-#include "const.h"
+#include "serverconst.h"
 #include "global.h"
 #include "proto.h"
 #include "saudio.h"
@@ -45,9 +47,8 @@
 
 char play_version[] = VERSION;
 
-extern int Rate(int winner, int loser);
 
-static int Punish_team(int ind, int t_destroyed, int posx, int posy)
+int Punish_team(int ind, int t_destroyed, int cx, int cy)
 {
     static char		msg[MSG_LEN];
     treasure_t		*td = &World.treasures[t_destroyed];
@@ -56,7 +57,7 @@ static int Punish_team(int ind, int t_destroyed, int posx, int posy)
     int			win_score = 0,lose_score = 0;
     int			win_team_members = 0, lose_team_members = 0;
     int			somebody_flag = 0;
-    int			sc, por;
+    DFLOAT		sc, por;
 
     Check_team_members (td->team);
     if (td->team == pl->team)
@@ -68,7 +69,8 @@ static int Punish_team(int ind, int t_destroyed, int posx, int posy)
 		|| (BIT(Players[i]->status, PAUSE)
 		    && Players[i]->count <= 0)
 		|| (BIT(Players[i]->status, GAME_OVER)
-		    && Players[i]->mychar == 'W')) {
+		    && Players[i]->mychar == 'W'
+		    && Players[i]->score == 0)) {
 		continue;
 	    }
 	    if (Players[i]->team == td->team) {
@@ -91,8 +93,7 @@ static int Punish_team(int ind, int t_destroyed, int posx, int posy)
     Set_message(msg);
 
     if (!somebody_flag) {
-	SCORE(ind, Rate(pl->score, CANNON_SCORE)/2,
-	      posx, posy, "Treasure:");
+	SCORE(ind, Rate(pl->score, CANNON_SCORE)/2, cx, cy, "Treasure:");
 	return 0;
     }
 
@@ -114,69 +115,30 @@ static int Punish_team(int ind, int t_destroyed, int posx, int posy)
 	    continue;
 	}
 	if (Players[i]->team == td->team) {
-	    SCORE(i, -sc, posx, posy,
-		  "Treasure: ");
-	    Rank_lost_ball(Players[i]);
+	    SCORE(i, -sc, cx, cy, "Treasure: ");
+	    Rank_LostBall(Players[i]);
 	    if (treasureKillTeam)
 		SET_BIT(Players[i]->status, KILLED);
 	}
 	else if (Players[i]->team == pl->team &&
 		 (Players[i]->team != TEAM_NOT_SET || i == ind)) {
-	    if (i == ind && lose_team_members > 0)
-		Rank_cashed_ball(Players[i]);
-	    Rank_won_ball(Players[i]);
-	    SCORE(i, (i == ind ? 3*por : 2*por), posx, posy,
-		  "Treasure: ");
+	    if (lose_team_members > 0) {
+		if (i == ind) {
+		    Rank_CashedBall(Players[i]);
+		}
+		Rank_WonBall(Players[i]);
+	    }
+	    SCORE(i, (i == ind ? 3*por : 2*por), cx, cy, "Treasure: ");
 	}
     }
 
-    if (treasureKillTeam)
-	Rank_kill(Players[ind]);
+    if (treasureKillTeam) {
+	Rank_AddKill(Players[ind]);
+    }
 
     updateScores = true;
 
     return 1;
-}
-
-
-void Ball_hits_goal(object *ball, int group)
-{
-    char msg[MSG_LEN];
-    if (ball->owner == -1) {	/* Probably the player quit */
-	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
-	return;
-    }
-    if (World.treasures[ball->treasure].team == groups[group].team) {
-	/*
-	 * Ball has been replaced back in the hoop from whence
-	 * it came. The player must be from the same team as the ball,
-	 * otherwise Bounce_object() wouldn't have been called. It
-	 * should be replaced into the hoop without exploding and
-	 * the player gets some points.
-	 */
-	treasure_t	*tt = &World.treasures[ball->treasure];
-	player	*pl = Players[GetInd[ball->owner]];
-
-	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
-
-	SCORE(GetInd[pl->id], 5,
-	      tt->pos.x, tt->pos.y, "Treasure: ");
-	sprintf(msg, " < %s (team %d) has replaced the treasure >",
-		pl->name, pl->team);
-	Set_message(msg);
-	Rank_saved_ball(pl);
-	return;
-    }
-    /*
-     * Ball has been brought back to home treasure.
-     * The team should be punished.
-     */
-    sprintf(msg," < The ball was loose for %ld frames >",
-	    (LONG_MAX - ball->life) / framespeed);
-    Set_message(msg);
-    if (Punish_team(GetInd[ball->owner], ball->treasure,
-		    ball->pos.cx, ball->pos.cy))
-	CLR_BIT(ball->status, RECREATE);
 }
 
 
@@ -186,16 +148,16 @@ void Ball_hits_goal(object *ball, int group)
 
 /* Create debris particles */
 void Make_debris(
-    /* pos.x, pos.y   */ int  x, int y,
+    /* pos.x, pos.y   */ int    cx,          int   cy,
     /* vel.x, vel.y   */ DFLOAT  velx,       DFLOAT vely,
     /* owner id       */ int    id,
-    /* owner team     */ u_short team,
+    /* owner team     */ unsigned short team,
     /* type           */ int    type,
     /* mass           */ DFLOAT  mass,
     /* status         */ long   status,
     /* color          */ int    color,
     /* radius         */ int    radius,
-    /* how many	      */ int	num_debris,
+    /* num debris     */ int    num_debris,
     /* min,max dir    */ int    min_dir,    int    max_dir,
     /* min,max speed  */ DFLOAT  min_speed,  DFLOAT  max_speed,
     /* min,max life   */ int    min_life,   int    max_life
@@ -205,11 +167,16 @@ void Make_debris(
     int			i, life;
     modifiers		mods;
 
-    x = WRAP_XCLICK(x);
-    y = WRAP_YCLICK(y);
+    cx = WRAP_XCLICK(cx);
+    cy = WRAP_YCLICK(cy);
+    if (cx < 0 || cx >= World.cwidth || cy < 0 || cy >= World.cheight) {
+	printf(__FILE__ ": bug\n"); /* kps - remove */
+	return;
+    }
 
     if (max_life < min_life)
 	max_life = min_life;
+
     if (max_speed < min_speed)
 	max_speed = min_speed;
 
@@ -225,16 +192,18 @@ void Make_debris(
     if (num_debris > MAX_TOTAL_SHOTS - NumObjs) {
 	num_debris = MAX_TOTAL_SHOTS - NumObjs;
     }
-    for (i = 0; i < num_debris; i++, NumObjs++) {
+    for (i = 0; i < num_debris; i++) {
 	DFLOAT		speed, dx, dy, diroff;
 	int		dir, dirplus;
 
-	debris = Obj[NumObjs];
+	if ((debris = Object_allocate()) == NULL) {
+	    break;
+	}
+
 	debris->color = color;
 	debris->id = id;
 	debris->team = team;
-	debris->owner = -1;
-	Object_position_init_clicks(debris, x, y);
+	Object_position_init_clicks(debris, cx, cy);
 	dir = MOD2(min_dir + (int)(rfrac() * (max_dir - min_dir)), RES);
 	dirplus = MOD2(dir + 1, RES);
 	diroff = rfrac();
@@ -245,16 +214,143 @@ void Make_debris(
 	debris->vel.y = vely + dy * speed;
 	debris->acc.x = 0;
 	debris->acc.y = 0;
-	debris->dir = dir;
-	debris->mass = mass;
+	if (shotHitFuelDrainUsesKineticEnergy
+	    && type == OBJ_SHOT) {
+	    /* compensate so that m*v^2 is constant */
+	    DFLOAT sp_shotsp = speed / ShotsSpeed;
+	    debris->mass = mass / (sp_shotsp * sp_shotsp);
+	} else {
+	    debris->mass = mass;
+	}
 	debris->type = type;
 	life = (int)(min_life + rfrac() * (max_life - min_life) + 1);
 	debris->life = life;
+	/*debris->fuselife = life;*/
 	debris->fuseframe = 0;
-	debris->spread_left = 0;
 	debris->pl_range = radius;
 	debris->pl_radius = radius;
 	debris->status = status;
 	debris->mods = mods;
+	Cell_add_object(debris);
     }
 }
+
+
+/*
+ * Ball has been replaced back in the hoop from whence
+ * it came. The player must be from the same team as the ball,
+ * otherwise Bounce_object() wouldn't have been called. It
+ * should be replaced into the hoop without exploding and
+ * the player gets some points.
+ */
+void Ball_is_replaced(ballobject *ball)
+{
+    char msg[MSG_LEN];
+    player *pl = Players[GetInd[ball->owner]];
+
+    ball->life = 0;
+    SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
+    
+    SCORE(GetInd[pl->id], 5, ball->pos.cx, ball->pos.cy, "Treasure: ");
+    sprintf(msg, " < %s (team %d) has replaced the treasure >",
+	    pl->name, pl->team);
+    Set_message(msg);
+    Rank_SavedBall(pl);
+}
+
+
+/*
+ * Ball has been brought back to home treasure.
+ * The team should be punished.
+ */
+void Ball_is_destroyed(ballobject *ball)
+{
+    char msg[MSG_LEN];
+    long frames = (LONG_MAX - ball->life) / timeStep;
+    int ind = GetInd[ball->owner];
+    DFLOAT seconds = ((DFLOAT)frames) / framesPerSecond;
+
+    if (FPSMultiplier != 1.0) {
+	DFLOAT frames12 = ((DFLOAT)frames) / FPSMultiplier;
+
+	sprintf(msg," < The ball was loose for %ld frames (best %d) "
+		"/ %.2f frames @ 12fps / %.2fs >",
+		frames, Rank_GetBestBall(Players[ind]), frames12, seconds);
+    } else {
+	sprintf(msg," < The ball was loose for %ld frames (best %d) / %.2fs >",
+		frames, Rank_GetBestBall(Players[ind]), seconds);
+    }
+    Set_message(msg);
+    Rank_BallRun(Players[ind], frames);
+}
+
+
+
+void Ball_hits_goal(ballobject *ball, int group)
+{
+    if (ball->owner == NO_ID) {	/* Probably the player quit */
+	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
+	return;
+    }
+    if (World.treasures[ball->treasure].team == groups[group].team) {
+	Ball_is_replaced(ball);
+	return;
+    }
+    if (groups[group].team == Players[GetInd[ball->owner]]->team) {
+	Ball_is_destroyed(ball);
+	if (Punish_team(GetInd[ball->owner], ball->treasure,
+			ball->pos.cx, ball->pos.cy))
+	    CLR_BIT(ball->status, RECREATE);
+	return;
+    }
+}
+
+
+/*
+ * This function is called when something would hit a balltarget.
+ * The function determines if it hits or not.
+ */
+bool Balltarget_hit_func(struct group *group, struct move *move)
+{
+    ballobject *ball = NULL;
+
+    /* this can happen if is_inside is called for a balltarget with
+       a NULL obj */
+    if (move->obj == NULL)
+	return true;
+
+    /* can this happen ? */
+    if (move->obj->type != OBJ_BALL) {
+	printf("Balltarget_hit_func: hit by a %s.\n",
+	       Object_typename(move->obj));
+	return true;
+    }
+
+    ball = BALL_PTR(move->obj);
+
+    if (ball->owner == NO_ID)
+	return true;
+
+    if (BIT(World.rules->mode, TEAM_PLAY)) {
+	/*
+	 * The only case a ball does not hit a balltarget is when
+	 * the ball and the target are of the same team, but the
+	 * owner is not.
+	 */
+	if (World.treasures[ball->treasure].team == group->team
+	    && Players[GetInd[ball->owner]]->team != group->team)
+	    return false;
+	return true;
+    }
+
+    /* not teamplay */
+
+    /* kps - fix this */
+
+    return true;
+}
+
+
+
+
+

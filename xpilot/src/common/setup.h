@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -91,6 +91,7 @@
 #define SETUP_DOWN_GRAV		122
 #define SETUP_RIGHT_GRAV	123
 #define SETUP_LEFT_GRAV		124
+#define SETUP_ASTEROID_CONCENTRATOR	125
 
 #define BLUE_UP			0x01
 #define BLUE_RIGHT		0x02
@@ -118,16 +119,18 @@ typedef struct {
     long		map_data_len;		/* num. compressed map bytes */
     long		mode;			/* playing mode */
     short		lives;			/* max. number of lives */
-    short		x;			/*OLD  width in blocks */
-    short		y;			/*OLD  height in blocks */
+    short		x;			/* OLD width in blocks */
+    short		y;			/* OLD height in blocks */
     short		width;			/* width in pixels */
     short		height;			/* height in pixels */
     short		frames_per_second;	/* FPS */
-    short		map_order;		/*OLD  row major or col major*/
+    short		map_order;		/* OLD row major or col major */
     char		name[MAX_CHARS];	/* name of map */
     char		author[MAX_CHARS];	/* name of author of map */
-    char		data_url[MSG_LEN];      /* location where client
-	can load additional data like bitmaps; MSG_LEN to allow >80 chars */
+    char		data_url[MSG_LEN];	/* location where client
+						   can load additional data
+						   like bitmaps; MSG_LEN to
+						   allow >80 chars */
     unsigned char	map_data[4];		/* compressed map data */
     /* plus more mapdata here (HACK) */
 } setup_t;

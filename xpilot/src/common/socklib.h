@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -50,7 +50,7 @@ typedef enum sock_call_e {
     SOCK_CALL_GETSOCKNAME,
     SOCK_CALL_GETSOCKOPT,
     SOCK_CALL_SETSOCKOPT,
-    SOCK_CALL_SELECT,
+    SOCK_CALL_SELECT
 } sock_call_t;
 
 typedef struct sock_timeout_s {
@@ -81,7 +81,7 @@ typedef struct sock_s {
 int sock_init(sock_t *sock);
 int sock_close(sock_t *sock);
 int sock_set_non_blocking(sock_t *sock, int flag);
-int sock_open_tcp(sock_t *sock);
+int sock_open_tcp(sock_t * sock);
 int sock_open_tcp_connected_non_blocking(sock_t *sock, char *host, int port);
 int sock_open_udp(sock_t *sock, char *dotaddr, int port);
 int sock_connect(sock_t *sock, char *host, int port);

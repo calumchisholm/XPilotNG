@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -21,7 +22,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -30,12 +30,14 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#else
-#include "NT/winX.h"
-#include "NT/winClient.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -50,15 +52,15 @@
 #include "texture.h"
 #include "paint.h"
 #include "paintdata.h"
+#include "paintmacros.h"
 #include "record.h"
 #include "xinit.h"
 #include "protoclient.h"
 #include "bitmaps.h"
+#include "commonproto.h"
+#include "clientrank.h"
 
 char painthud_version[] = VERSION;
-
-#define X(co)  ((int) ((co) - world.x))
-#define Y(co)  ((int) (world.y + view_height - (co)))
 
 
 extern setup_t		*Setup;
@@ -70,11 +72,33 @@ extern XGCValues	gcv;
 int	hudColor;		/* Color index for HUD drawing */
 int	hrColor1;		/* Color index for hudradar drawing */
 int	hrColor2;		/* Color index for hudradar drawing */
-int	hrSize;		/* Size for hudradar drawing */
-float	hrScale;		/* Scale for hudradar drawing */
+int	hrSize;			/* Size for hudradar drawing */
+DFLOAT	hrScale;		/* Scale for hudradar drawing */
+DFLOAT	hrMapScale;		/* Scale for mapradar drawing */
+DFLOAT	hrLimit;		/* Hudradar dots are not drawn if closer to
+				   your ship than this factor of visible
+				   range */
+int	hudSize;		/* Size for HUD drawing */
 int	hudLockColor;		/* Color index for lock on HUD drawing */
+int	dirPtrColor;		/* Color index for dirptr drawing */
+int	msgScanBallColor;	/* Color index for ball message scan drawing */
+int	msgScanCoverColor;	/* Color index for ball message scan drawing */
+int	messagesColor;		/* Color index for messages */
 int	oldMessagesColor;	/* Color index for old messages */
-DFLOAT	charsPerTick = 0.0;	/* Output speed of messages */
+DFLOAT	scoreObjectTime;	/* How long to flash score objects */
+int	baseWarningType;	/* Which type of base warning you prefer */
+int	baseWarningFrames;	/* Duration of base warning */
+
+radar_t	*old_radar_ptr;
+int	old_num_radar, old_max_radar;
+
+static const int meterColor1 = RED;  /* Color index for meter drawing */
+static const int meterColor2 = BLUE; /* Color index for meter border drawing */
+static const int meterWidth = 60;
+static const int meterHeight = 10;
+
+bool ball_shout = false;
+bool need_cover = false;
 
 message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
 /* store incoming messages while a cut is pending */
@@ -89,6 +113,7 @@ extern void Delete_pending_messages(void);
 #endif
 
 
+
 /*
  * Draw a meter of some kind on screen.
  * When the x-offset is specified as a negative value then
@@ -97,57 +122,53 @@ extern void Delete_pending_messages(void);
  */
 static void Paint_meter(int xoff, int y, const char *title, int val, int max)
 {
-#define METER_WIDTH		200
-#define METER_HEIGHT		8
-
-    const int	mw1_4 = METER_WIDTH/4,
-		mw2_4 = METER_WIDTH/2,
-		mw3_4 = 3*METER_WIDTH/4,
-		mw4_4 = METER_WIDTH,
+    const int	mw1_4 = meterWidth/4,
+		mw2_4 = meterWidth/2,
+		mw3_4 = 3*meterWidth/4,
+		mw4_4 = meterWidth,
 		BORDER = 5;
     int		x, xstr;
 
     if (xoff >= 0) {
 	x = xoff;
-        xstr = WINSCALE(x + METER_WIDTH) + BORDER;
+        xstr = WINSCALE(x + meterWidth) + BORDER;
     } else {
-	x = view_width - (METER_WIDTH - xoff);
+	x = ext_view_width - (meterWidth - xoff);
         xstr = WINSCALE(x) - (BORDER + XTextWidth(gameFont, title, strlen(title)));
     }
-    if (1 || !blockBitmaps) {
-	Rectangle_add(RED,
+    if (1 || !texturedObjects) {
+	Rectangle_add(meterColor1,
 		      x+2, y+2,
-		      (int)(((METER_WIDTH-3)*val)/(max?max:1)), METER_HEIGHT-3);
-	SET_FG(colors[WHITE].pixel);
+		      (int)(((meterWidth-3)*val)/(max?max:1)), meterHeight-3);
+	SET_FG(colors[meterColor2].pixel);
 	rd.drawRectangle(dpy, p_draw, gc,
 		       WINSCALE(x), WINSCALE(y),
-		       WINSCALE(METER_WIDTH), WINSCALE(METER_HEIGHT));
+		       WINSCALE(meterWidth), WINSCALE(meterHeight));
 	Erase_4point(WINSCALE(x), WINSCALE(y),
-		     WINSCALE(METER_WIDTH), WINSCALE(METER_HEIGHT));
+		     WINSCALE(meterWidth), WINSCALE(meterHeight));
 
 	/* Paint scale levels(?) */
-	Segment_add(WHITE, x,       y-4,	x,       y+METER_HEIGHT+4);
-	Segment_add(WHITE, x+mw4_4, y-4,	x+mw4_4, y+METER_HEIGHT+4);
-	Segment_add(WHITE, x+mw2_4, y-3,	x+mw2_4, y+METER_HEIGHT+3);
-	Segment_add(WHITE, x+mw1_4, y-1,	x+mw1_4, y+METER_HEIGHT+1);
-	Segment_add(WHITE, x+mw3_4, y-1,	x+mw3_4, y+METER_HEIGHT+1);
+	Segment_add(meterColor2, x,       y-4,	x,       y+meterHeight+4);
+	Segment_add(meterColor2, x+mw4_4, y-4,	x+mw4_4, y+meterHeight+4);
+	Segment_add(meterColor2, x+mw2_4, y-3,	x+mw2_4, y+meterHeight+3);
+	Segment_add(meterColor2, x+mw1_4, y-1,	x+mw1_4, y+meterHeight+1);
+	Segment_add(meterColor2, x+mw3_4, y-1,	x+mw3_4, y+meterHeight+1);
     } else {
-	int width = WINSCALE((int)(((METER_WIDTH-3)*val)/(max?max:1)));
+	/*int width = WINSCALE((int)(((meterWidth-3)*val)/(max?max:1)));*/
+	
 	printf("TODO: implement paint meter\n");
-        /*
-	PaintMeter(p_draw, BM_METER,
-		   WINSCALE(x), WINSCALE(y),
-		   WINSCALE(METER_WIDTH), WINSCALE(11),
-		   width);
-        */
-        SET_FG(colors[WHITE].pixel);
+	/*PaintMeter(p_draw, BM_METER,
+	  WINSCALE(x), WINSCALE(y),
+	  WINSCALE(meterWidth), WINSCALE(11),
+	  width);*/
+        SET_FG(colors[meterColor2].pixel);
     }
 
     rd.drawString(dpy, p_draw, gc,
-                  (xstr), WINSCALE(y)+(gameFont->ascent+METER_HEIGHT)/2,
+                  (xstr), WINSCALE(y)+(gameFont->ascent+meterHeight)/2,
 		  title, strlen(title));
     Erase_rectangle(xstr,
-                    WINSCALE(y)+(gameFont->ascent+METER_HEIGHT)/2
+                    WINSCALE(y)+(gameFont->ascent+meterHeight)/2
                          - gameFont->ascent - 1,
 		    XTextWidth(gameFont, title, strlen(title)) + 2,
 		    gameFont->ascent + gameFont->descent + 1);
@@ -158,14 +179,14 @@ static int wrap(int *xp, int *yp)
 {
     int			x = *xp, y = *yp;
 
-    if (x < world.x || x > world.x + view_width) {
-	if (x < realWorld.x || x > realWorld.x + view_width) {
+    if (x < world.x || x > world.x + ext_view_width) {
+	if (x < realWorld.x || x > realWorld.x + ext_view_width) {
 	    return 0;
 	}
 	*xp += world.x - realWorld.x;
     }
-    if (y < world.y || y > world.y + view_height) {
-	if (y < realWorld.y || y > realWorld.y + view_height) {
+    if (y < world.y || y > world.y + ext_view_height) {
+	if (y < realWorld.y || y > realWorld.y + ext_view_height) {
 	    return 0;
 	}
 	*yp += world.y - realWorld.y;
@@ -178,16 +199,21 @@ void Paint_score_objects(void)
 {
     int		i, x, y;
 
-    for (i=0; i < MAX_SCORE_OBJECTS; i++) {
+    if (!shipNameColor)
+	return;
+
+    /* kps - move SET_FG here ? */
+
+    for (i = 0; i < MAX_SCORE_OBJECTS; i++) {
 	score_object_t*	sobj = &score_objects[i];
-	if (sobj->count > 0) {
-	    if (sobj->count%3) {
+	if (sobj->hud_msg_len > 0) {
+	    if (loopsSlow % 3) {
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
 		if (wrap(&x, &y)) {
-		    SET_FG(colors[hudColor].pixel);
+		    SET_FG(colors[shipNameColor].pixel);
 		    x = WINSCALE(X(x)) - sobj->msg_width / 2,
-		    y = WINSCALE(Y(y)) - gameFont->ascent / 2,
+		    y = WINSCALE(Y(y)) + gameFont->ascent / 2,
 		    rd.drawString(dpy, p_draw, gc,
 				x, y,
 				sobj->msg,
@@ -197,9 +223,9 @@ void Paint_score_objects(void)
 				    gameFont->ascent + gameFont->descent);
 		}
 	    }
-	    sobj->count++;
-	    if (sobj->count > SCORE_OBJECT_COUNT) {
-		sobj->count = 0;
+	    sobj->life_time -= timePerFrame;
+	    if (sobj->life_time <= 0.0) {
+		sobj->life_time = 0.0;
 		sobj->hud_msg_len = 0;
 	    }
 	}
@@ -209,47 +235,51 @@ void Paint_score_objects(void)
 
 void Paint_meters(void)
 {
+    int y = 20;
+
     if (BIT(instruments, SHOW_FUEL_METER))
-	Paint_meter(-10, 20, "Fuel", (int)fuelSum, (int)fuelMax);
+	Paint_meter(-10, y += 20, "Fuel", (int)fuelSum, (int)fuelMax);
     if (BIT(instruments, SHOW_POWER_METER) || control_count)
-	Paint_meter(-10, 40, "Power", (int)displayedPower, (int)MAX_PLAYER_POWER);
+	Paint_meter(-10, y += 20, "Power", (int)displayedPower, (int)MAX_PLAYER_POWER);
     if (BIT(instruments, SHOW_TURNSPEED_METER) || control_count)
-	Paint_meter(-10, 60, "Turnspeed",
+	Paint_meter(-10, y += 20, "Turnspeed",
 		    (int)displayedTurnspeed, (int)MAX_PLAYER_TURNSPEED);
     if (control_count > 0)
 	control_count--;
     if (BIT(instruments, SHOW_PACKET_SIZE_METER))
-	Paint_meter(-10, 80, "Packet",
+	Paint_meter(-10, y += 20, "Packet",
 		   (packet_size >= 4096) ? 4096 : packet_size, 4096);
     if (BIT(instruments, SHOW_PACKET_LOSS_METER))
-	Paint_meter(-10, 100, "Loss", packet_loss, FPS);
+	Paint_meter(-10, y += 20, "Loss", packet_loss, FPS);
     if (BIT(instruments, SHOW_PACKET_DROP_METER))
-	Paint_meter(-10, 120, "Drop", packet_drop, FPS);
+	Paint_meter(-10, y += 20, "Drop", packet_drop, FPS);
+    if (BIT(instruments, SHOW_PACKET_LAG_METER))
+	Paint_meter(-10, y += 20, "Lag", MIN(packet_lag, 1 * FPS), 1 * FPS);
 
     if (thrusttime >= 0 && thrusttimemax > 0)
-	Paint_meter((view_width-300)/2 -32, 2*view_height/3,
+	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3,
 		    "Thrust Left",
 		    (thrusttime >= thrusttimemax ? thrusttimemax : thrusttime),
 		    thrusttimemax);
 
     if (shieldtime >= 0 && shieldtimemax > 0)
-	Paint_meter((view_width-300)/2 -32, 2*view_height/3 + 20,
+	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 20,
 		    "Shields Left",
 		    (shieldtime >= shieldtimemax ? shieldtimemax : shieldtime),
 		    shieldtimemax);
 
     if (phasingtime >= 0 && phasingtimemax > 0)
-	Paint_meter((view_width-300)/2 -32, 2*view_height/3 + 40,
+	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 40,
 		    "Phasing left",
 		    (phasingtime >= phasingtimemax ? phasingtimemax : phasingtime),
 		    phasingtimemax);
 
     if (destruct > 0)
-	Paint_meter((view_width-300)/2 -32, 2*view_height/3 + 60,
+	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 60,
 		   "Self destructing", destruct, 150);
 
     if (shutdown_count >= 0)
-	Paint_meter((view_width-300)/2 -32, 2*view_height/3 + 80,
+	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 80,
 		   "SHUTDOWN", shutdown_count, shutdown_delay);
 }
 
@@ -258,14 +288,10 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 {
     const int	BORDER = 2;
     int		x, y;
-    int		i, dir = 96;
-    int		hudShipColor = hudColor;
     other_t	*target;
-    wireobj	*ship;
-    char	str[50];
     static int	warningCount;
+    char	str[50];
     static int	mapdiag = 0;
-    XPoint	points[64];
 
     if (mapdiag == 0) {
 	mapdiag = (int)LENGTH(Setup->width, Setup->height);
@@ -280,65 +306,45 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     FIND_NAME_WIDTH(target);
     rd.drawString(dpy, p_draw, gc,
 		WINSCALE(hud_pos_x) - target->name_width / 2,
-		WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER )
+		WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
 			- gameFont->descent ,
 		target->id_string, target->name_len);
     Erase_rectangle(WINSCALE(hud_pos_x) - target->name_width / 2 - 1,
-		    WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER )
+		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
 			- gameFont->descent - gameFont->ascent ,
 		    target->name_width + 2,
 		    gameFont->ascent + gameFont->descent);
 
-    /* Only show the mini-ship for the locked player if it will be big enough
-     * to even tell what the heck it is!  I choose the arbitrary size of
-     * 10 pixels wide, which in practice is a scaleFactor <= 1.5.
-     */
-    if (scaleFactor <= 1.5) {
-	ship = Ship_by_id(lock_id);
-	for (i = 0; i < ship->num_points; i++) {
-	    points[i].x = WINSCALE((int)(hud_pos_x + ship->pts[i][dir].x / 2 + 60));
-	    points[i].y = WINSCALE((int)(hud_pos_y + ship->pts[i][dir].y / 2 - 80));
-	}
-	points[i++] = points[0];
-	SET_FG(colors[hudShipColor].pixel);
-	if (useErase){
-	    rd.drawLines(dpy, p_draw, gc, points, i, 0);
-	    Erase_points(0, points, i);
-	} else {
-	    rd.fillPolygon(dpy, p_draw, gc,
-		   points, i,
-		   Complex, CoordModeOrigin);
-	}
-    }
-
-    if (BIT(Setup->mode, LIMITED_LIVES)) { /* lives left is a better info than distance in team games MM */
-	sprintf(str, "%03d", target->life);
+    /* lives left is a better info than distance in team games MM */
+    if (BIT(Setup->mode, LIMITED_LIVES)) {
+	sprintf(str, "%03d", target->life); 
     } else {
 	sprintf(str, "%03d", lock_dist / BLOCK_SZ);
     }
 
     if (BIT(Setup->mode, LIMITED_LIVES) || lock_dist !=0) {
 
- 	if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0)
+ 	if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0) 
 	    SET_FG(colors[RED].pixel);
 	else
 	    SET_FG(colors[hudColor].pixel);
 
 	rd.drawString(dpy, p_draw, gc,
-		    WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET + BORDER),
-		    WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER)
+		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET + BORDER),
+		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER)
 					 - gameFont->descent,
 		    str, 3);
-	Erase_rectangle(WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
+	Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 			 + BORDER) - 1,
-			WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER )
+			WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
 			 - gameFont->descent - gameFont->ascent ,
 			XTextWidth(gameFont, str, 3) + 2,
 			gameFont->ascent + gameFont->descent);
     }
     SET_FG(colors[hudColor].pixel);
 
-    if (lock_dist != 0 && hudLockColor != 0) {
+    if (!BIT(instruments, SHOW_HUD_RADAR) &&
+	lock_dist != 0 && hudLockColor != 0) {
 
 	if (lock_dist > WARNING_DISTANCE || warningCount++ % 2 == 0) {
 	    int size = MIN(mapdiag / lock_dist, 10);
@@ -347,74 +353,72 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 		size = 1;
 	    }
 	    if (self != NULL
-		&& self->team == target->team
-		&& BIT(Setup->mode, TEAM_PLAY)) {
+		&& ((self->team == target->team && BIT(Setup->mode, TEAM_PLAY))
+		|| (self->alliance != ' ' && self->alliance == target->alliance))) {
 		Arc_add(hudColor,
-			(int)(hud_pos_x + HUD_SIZE * 0.6 * tcos(lock_dir)
+			(int)(hud_pos_x + MIN_HUD_SIZE * 0.6 * tcos(lock_dir)
 			      - size * 0.5),
-			(int)(hud_pos_y - HUD_SIZE * 0.6 * tsin(lock_dir)
+			(int)(hud_pos_y - MIN_HUD_SIZE * 0.6 * tsin(lock_dir)
 			      - size * 0.5),
 			size, size, 0, 64*360);
 	    } else {
 		SET_FG(colors[hudLockColor].pixel);
-		x = (int)(hud_pos_x + HUD_SIZE * 0.6 * tcos(lock_dir)
+		x = (int)(hud_pos_x + MIN_HUD_SIZE * 0.6 * tcos(lock_dir)
 			  - size * 0.5),
-		y = (int)(hud_pos_y - HUD_SIZE * 0.6 * tsin(lock_dir)
+		y = (int)(hud_pos_y - MIN_HUD_SIZE * 0.6 * tsin(lock_dir)
 			  - size * 0.5),
 		rd.fillArc(dpy, p_draw, gc,
 			 WINSCALE(x), WINSCALE(y),
 			 WINSCALE(size), WINSCALE(size), 0, 64*360);
 		Erase_rectangle(WINSCALE(x), WINSCALE(y),
 				 WINSCALE(size), WINSCALE(size));
-		SET_FG(colors[hudColor].pixel);
+		SET_FG(colors[hudColor].pixel);       
 	    }
 	}
     }
 }
 
-void Paint_hudradar(void) {
-
-    int i;
-    float hrscale = hrScale;
+void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit, int sz)
+{
+    int i, x, y;
     int hrw = hrscale * 256;
     int hrh = hrscale * RadarHeight;
-    int sz = hrSize;
-    float xf = (float)hrw / (float)Setup->width;
-    float yf = (float)hrh / (float)Setup->height;
+    DFLOAT xf = (DFLOAT) hrw / (DFLOAT) Setup->width;
+    DFLOAT yf = (DFLOAT) hrh / (DFLOAT) Setup->height;
 
     for (i = 0; i < num_radar; i++) {
+	x = radar_ptr[i].x * hrscale
+	    - (world.x + ext_view_width / 2) * xf;
+	y = radar_ptr[i].y * hrscale
+	    - (world.y + ext_view_height / 2) * yf;
 
-        int x = radar_ptr[i].x * xf - (world.x + view_width / 2) * xf;
-
-        int y = radar_ptr[i].y * yf - (world.y + view_height / 2) * yf;
-
-
-        if (x < 0) {
-            if (-x > hrw/2) x += hrw;
-        } else {
-            if (x > hrw/2) x -= hrw;
-        }
-
-        if (y < 0) {
-            if (-y > hrh/2) y += hrh;
-        } else {
-            if (y > hrh/2) y -= hrh;
-        }
-
-        if (!(x <= SHIP_SZ && x >= -SHIP_SZ && y <= SHIP_SZ && y >= -SHIP_SZ)){
-            x = x + view_width / 2 - sz / 2;
-            y = -y + view_height / 2 - sz / 2;
-
-            if (radar_ptr[i].color != 4) {
-		if (hrColor1 != 0)
-		    Arc_add(hrColor1, x, y, sz, sz, 0, 64*360);
-            } else {
-		if (hrColor2 != 0)
-		    Arc_add(hrColor2, x, y, sz, sz, 0, 64*360);
-            }
-        }
+	if (x < -hrw / 2)
+	    x += hrw;
+	else if (x > hrw / 2)
+	    x -= hrw;
+	
+	if (y < -hrh / 2)
+	    y += hrh;
+	else if (y > hrh / 2)
+	    y -= hrh;
+	
+	if (!((x <= xlimit) && (x >= -xlimit)
+	      && (y <= ylimit) && (y >= -ylimit))) {
+	    
+ 	    x = x + ext_view_width / 2 - sz / 2;
+ 	    y = -y + ext_view_height / 2 - sz / 2;
+	    
+	    if (radar_ptr[i].color == WHITE) {
+		if (hrColor1 >= 1)
+		    Arc_add(hrColor1, x, y, sz, sz, 0, 64 * 360);
+	    } else {
+		if (hrColor2 >= 1)
+		    Arc_add(hrColor2, x, y, sz, sz, 0, 64 * 360);
+	    }
+	}
     }
 }
+
 
 void Paint_HUD(void)
 {
@@ -438,13 +442,47 @@ void Paint_HUD(void)
 	&& selfVisible != 0
 	&& (vel.x != 0 || vel.y != 0)) {
 	Segment_add(hudColor,
-		    view_width / 2,
-		    view_height / 2,
-		    (int)(view_width / 2 - ptr_move_fact*vel.x),
-		    (int)(view_height / 2 + ptr_move_fact*vel.y));
+		    ext_view_width / 2,
+		    ext_view_height / 2,
+		    (int)(ext_view_width / 2 - ptr_move_fact*vel.x),
+		    (int)(ext_view_height / 2 + ptr_move_fact*vel.y));
     }
 
-    if (BIT(instruments, SHOW_HR)) Paint_hudradar();
+    if (dirPtrColor >= 1) {
+	Segment_add(dirPtrColor,
+		    (int) (ext_view_width / 2 +
+			   (100 - 15) * tcos(heading)),
+		    (int) (ext_view_height / 2 -
+			   (100 - 15) * tsin(heading)),
+		    (int) (ext_view_width / 2 + 100 * tcos(heading)),
+		    (int) (ext_view_height / 2 - 100 * tsin(heading)));
+    }
+
+    hrMapScale = (DFLOAT) Setup->width / (DFLOAT) 256;
+    if (BIT(instruments, SHOW_HUD_RADAR))
+	Paint_hudradar(
+	    hrScale,
+	    (int)(hrLimit * (active_view_width / 2) * hrScale / hrMapScale),
+	    (int)(hrLimit * (active_view_width / 2) * hrScale / hrMapScale),
+	    hrSize);
+
+    if (BIT(hackedInstruments, MAP_RADAR))
+	Paint_hudradar(hrMapScale,
+		       active_view_width / 2,
+		       active_view_height / 2,
+		       SHIP_SZ);
+
+    /* message scan hack by mara*/
+    if (BIT(hackedInstruments, BALL_MSG_SCAN)) {
+	if (ball_shout) {
+	    Arc_add(msgScanBallColor, ext_view_width / 2 - 5,
+		    ext_view_height / 2 - 5, 10, 10, 0, 64 * 360);
+	}
+	if (need_cover) {
+	    Arc_add(msgScanCoverColor, ext_view_width / 2 - 4,
+		    ext_view_height / 2 - 4, 8, 8, 0, 64 * 360);
+	}
+    }
 
     if (!BIT(instruments, SHOW_HUD_INSTRUMENTS)) {
 	return;
@@ -455,8 +493,8 @@ void Paint_HUD(void)
      */
     SET_FG(colors[hudColor].pixel);
 
-    hud_pos_x = (int)(view_width / 2 - hud_move_fact*vel.x);
-    hud_pos_y = (int)(view_height / 2 + hud_move_fact*vel.y);
+    hud_pos_x = (int)(ext_view_width / 2 - hud_move_fact*vel.x);
+    hud_pos_y = (int)(ext_view_height / 2 + hud_move_fact*vel.y);
 
     /* HUD frame */
     gcv.line_style = LineOnOffDash;
@@ -464,39 +502,47 @@ void Paint_HUD(void)
 
     if (BIT(instruments, SHOW_HUD_HORIZONTAL)) {
 	rd.drawLine(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x-HUD_SIZE), WINSCALE(hud_pos_y-HUD_SIZE+HUD_OFFSET),
-		  WINSCALE(hud_pos_x+HUD_SIZE), WINSCALE(hud_pos_y-HUD_SIZE+HUD_OFFSET));
+		    WINSCALE(hud_pos_x - hudSize),
+		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET),
+		    WINSCALE(hud_pos_x + hudSize),
+		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET));
 	Erase_segment(0,
-		WINSCALE(hud_pos_x-HUD_SIZE),
-		WINSCALE(hud_pos_y-HUD_SIZE+HUD_OFFSET),
-		WINSCALE(hud_pos_x+HUD_SIZE),
-		WINSCALE(hud_pos_y-HUD_SIZE+HUD_OFFSET));
+		      WINSCALE(hud_pos_x - hudSize),
+		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET),
+		      WINSCALE(hud_pos_x + hudSize),
+		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET));
 	rd.drawLine(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x-HUD_SIZE), WINSCALE(hud_pos_y+HUD_SIZE-HUD_OFFSET),
-		  WINSCALE(hud_pos_x+HUD_SIZE), WINSCALE(hud_pos_y+HUD_SIZE-HUD_OFFSET));
+		    WINSCALE(hud_pos_x - hudSize),
+		    WINSCALE(hud_pos_y + hudSize - HUD_OFFSET),
+		    WINSCALE(hud_pos_x + hudSize),
+		    WINSCALE(hud_pos_y + hudSize - HUD_OFFSET));
 	Erase_segment(0,
-		WINSCALE(hud_pos_x-HUD_SIZE),
-		WINSCALE(hud_pos_y+HUD_SIZE-HUD_OFFSET),
-		WINSCALE(hud_pos_x+HUD_SIZE),
-		WINSCALE(hud_pos_y+HUD_SIZE-HUD_OFFSET));
+		      WINSCALE(hud_pos_x - hudSize),
+		      WINSCALE(hud_pos_y + hudSize - HUD_OFFSET),
+		      WINSCALE(hud_pos_x + hudSize),
+		      WINSCALE(hud_pos_y + hudSize - HUD_OFFSET));
     }
     if (BIT(instruments, SHOW_HUD_VERTICAL)) {
 	rd.drawLine(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x-HUD_SIZE+HUD_OFFSET), WINSCALE(hud_pos_y-HUD_SIZE),
-		  WINSCALE(hud_pos_x-HUD_SIZE+HUD_OFFSET), WINSCALE(hud_pos_y+HUD_SIZE));
+		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
+		    WINSCALE(hud_pos_y -hudSize),
+		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
+		    WINSCALE(hud_pos_y +hudSize));
 	Erase_segment(0,
-		WINSCALE(hud_pos_x-HUD_SIZE+HUD_OFFSET),
-		WINSCALE(hud_pos_y-HUD_SIZE),
-		WINSCALE(hud_pos_x-HUD_SIZE+HUD_OFFSET),
-		WINSCALE(hud_pos_y+HUD_SIZE));
+		      WINSCALE(hud_pos_x - hudSize + HUD_OFFSET),
+		      WINSCALE(hud_pos_y - hudSize),
+		      WINSCALE(hud_pos_x - hudSize + HUD_OFFSET),
+		      WINSCALE(hud_pos_y + hudSize));
 	rd.drawLine(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x+HUD_SIZE-HUD_OFFSET), WINSCALE(hud_pos_y-HUD_SIZE),
-		  WINSCALE(hud_pos_x+HUD_SIZE-HUD_OFFSET), WINSCALE(hud_pos_y+HUD_SIZE));
+		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
+		    WINSCALE(hud_pos_y - hudSize),
+		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
+		    WINSCALE(hud_pos_y + hudSize));
 	Erase_segment(0,
-		WINSCALE(hud_pos_x+HUD_SIZE-HUD_OFFSET),
-		WINSCALE(hud_pos_y-HUD_SIZE),
-		WINSCALE(hud_pos_x+HUD_SIZE-HUD_OFFSET),
-		WINSCALE(hud_pos_y+HUD_SIZE));
+		      WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
+		      WINSCALE(hud_pos_y - hudSize),
+		      WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
+		      WINSCALE(hud_pos_y + hudSize));
     }
     gcv.line_style = LineSolid;
     XChangeGC(dpy, gc, GCLineStyle, &gcv);
@@ -506,14 +552,14 @@ void Paint_HUD(void)
     if (vertSpacing < 0)
 	vertSpacing = MAX(ITEM_SIZE, gameFont->ascent + gameFont->descent) + 1;
     /* find the scaled location, then work in pixels */
-    vert_pos = WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET + BORDER);
-    horiz_pos = WINSCALE(hud_pos_x - HUD_SIZE+HUD_OFFSET - BORDER);
+    vert_pos = WINSCALE(hud_pos_y - hudSize+HUD_OFFSET + BORDER);
+    horiz_pos = WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER);
     rect_width = 0;
     rect_height = 0;
     rect_x = horiz_pos;
     rect_y = vert_pos;
 
-    for (i=0; i<NUM_ITEMS; i++) {
+    for (i = 0; i < NUM_ITEMS; i++) {
 	int num = numItems[i];
 
 	if (i == ITEM_FUEL)
@@ -538,9 +584,9 @@ void Paint_HUD(void)
 	    int len, width;
 
 	    /* Paint item symbol */
-	    Paint_item_symbol((u_byte)i, p_draw, gc,
+	    Paint_item_symbol((u_byte)i, p_draw, gc, 
 			horiz_pos - ITEM_SIZE,
-			vert_pos,
+			vert_pos, 
 			ITEM_HUD);
 
 	    if (i == lose_item) {
@@ -548,7 +594,7 @@ void Paint_HUD(void)
 		    if (lose_item_active < 0) {
 			lose_item_active++;
 		    }
-		    rd.drawRectangle(dpy, p_draw, gc,
+		    rd.drawRectangle(dpy, p_draw, gc, 
 				horiz_pos-ITEM_SIZE-2,
 				vert_pos-2, ITEM_SIZE+2, ITEM_SIZE+2);
 		}
@@ -566,11 +612,11 @@ void Paint_HUD(void)
 	    maxWidth = MAX(maxWidth, width + BORDER + ITEM_SIZE);
 	    vert_pos += vertSpacing;
 
-	    if (vert_pos+vertSpacing > WINSCALE(hud_pos_y+HUD_SIZE-HUD_OFFSET-BORDER)) {
+	    if (vert_pos+vertSpacing > WINSCALE(hud_pos_y+hudSize-HUD_OFFSET-BORDER)) {
 		rect_width += maxWidth + 2*BORDER;
 		rect_height = MAX(rect_height, vert_pos - rect_y);
 		horiz_pos -= maxWidth + 2*BORDER;
-		vert_pos = WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET + BORDER);
+		vert_pos = WINSCALE(hud_pos_y - hudSize+HUD_OFFSET + BORDER);
 		maxWidth = -1;
 	    }
 	}
@@ -592,12 +638,12 @@ void Paint_HUD(void)
 	did_fuel = 1;
 	sprintf(str, "%04d", (int)fuelSum);
 	rd.drawString(dpy, p_draw, gc,
-		    WINSCALE(hud_pos_x + HUD_SIZE-HUD_OFFSET+BORDER),
-		    WINSCALE(hud_pos_y + HUD_SIZE-HUD_OFFSET+BORDER)
+		    WINSCALE(hud_pos_x + hudSize-HUD_OFFSET+BORDER),
+		    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
 				+ gameFont->ascent,
 		    str, strlen(str));
-	Erase_rectangle(WINSCALE(hud_pos_x + HUD_SIZE-HUD_OFFSET+BORDER) - 1,
-			WINSCALE(hud_pos_y + HUD_SIZE-HUD_OFFSET+BORDER) ,
+	Erase_rectangle(WINSCALE(hud_pos_x + hudSize-HUD_OFFSET+BORDER) - 1,
+			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER) ,
 			XTextWidth(gameFont, str, strlen(str)) + 2,
 			gameFont->ascent + gameFont->descent);
 	if (numItems[ITEM_TANK]) {
@@ -606,13 +652,13 @@ void Paint_HUD(void)
 	    else
 		sprintf(str, "T%d", fuelCurrent);
 	    rd.drawString(dpy, p_draw, gc,
-			WINSCALE(hud_pos_x + HUD_SIZE-HUD_OFFSET + BORDER),
-			WINSCALE(hud_pos_y + HUD_SIZE-HUD_OFFSET + BORDER)
+			WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER),
+			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 			+ gameFont->descent + 2*gameFont->ascent,
 			str, strlen(str));
-	    Erase_rectangle(WINSCALE(hud_pos_x + HUD_SIZE-HUD_OFFSET + BORDER)
+	    Erase_rectangle(WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER)
 				 - 1,
-			    WINSCALE(hud_pos_y + HUD_SIZE-HUD_OFFSET + BORDER)
+			    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 				+ gameFont->descent + gameFont->ascent,
 			    XTextWidth(gameFont, str, strlen(str)) + 2,
 			    gameFont->ascent + gameFont->descent);
@@ -628,17 +674,17 @@ void Paint_HUD(void)
 	    = &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
 	if (sobj->hud_msg_len > 0) {
 	    if (j == 0 &&
-		sobj->hud_msg_width > WINSCALE(2*HUD_SIZE-HUD_OFFSET*2) &&
+		sobj->hud_msg_width > WINSCALE(2*hudSize-HUD_OFFSET*2) &&
 	        (did_fuel || BIT(instruments, SHOW_HUD_VERTICAL)))
 			++j;
 	    rd.drawString(dpy, p_draw, gc,
 			WINSCALE(hud_pos_x) - sobj->hud_msg_width/2,
-			WINSCALE(hud_pos_y + HUD_SIZE-HUD_OFFSET + BORDER)
+			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 			+ gameFont->ascent
 			+ j * (gameFont->ascent + gameFont->descent),
 			sobj->hud_msg, sobj->hud_msg_len);
 	    Erase_rectangle(WINSCALE(hud_pos_x) - sobj->hud_msg_width/2 - 1,
-			    WINSCALE(hud_pos_y + HUD_SIZE-HUD_OFFSET + BORDER)
+			    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 				+ j * (gameFont->ascent + gameFont->descent),
 			    sobj->hud_msg_width + 2,
 			    gameFont->ascent + gameFont->descent);
@@ -646,17 +692,17 @@ void Paint_HUD(void)
 	}
     }
 
-    if (time_left >= 0) {
+    if (time_left > 0) {
 	sprintf(str, "%3d:%02d", (int)(time_left / 60), (int)(time_left % 60));
 	size = XTextWidth(gameFont, str, strlen(str));
 	rd.drawString(dpy, p_draw, gc,
-		    WINSCALE(hud_pos_x - HUD_SIZE+HUD_OFFSET - BORDER) - size,
-		    WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER)
+		    WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER) - size,
+		    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			- gameFont->descent,
 		    str, strlen(str));
-	Erase_rectangle(WINSCALE(hud_pos_x - HUD_SIZE+HUD_OFFSET - BORDER)
+	Erase_rectangle(WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER)
 			    - size - 1,
-			WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER)
+			WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			    - gameFont->ascent - gameFont->descent,
 			size + 2,
 			gameFont->ascent + gameFont->descent);
@@ -665,15 +711,15 @@ void Paint_HUD(void)
     /* Update the modifiers */
     modlen = strlen(mods);
     rd.drawString(dpy, p_draw, gc,
-		WINSCALE(hud_pos_x - HUD_SIZE+HUD_OFFSET-BORDER)
+		WINSCALE(hud_pos_x - hudSize+HUD_OFFSET-BORDER)
 		    - XTextWidth(gameFont, mods, modlen),
-		WINSCALE(hud_pos_y + HUD_SIZE-HUD_OFFSET+BORDER)
+		WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
 		    + gameFont->ascent,
 		mods, strlen(mods));
 
-    Erase_rectangle(WINSCALE(hud_pos_x - HUD_SIZE + HUD_OFFSET - BORDER)
+    Erase_rectangle(WINSCALE(hud_pos_x - hudSize + HUD_OFFSET - BORDER)
 			- XTextWidth(gameFont, mods, modlen) - 1,
-		    WINSCALE(hud_pos_y + HUD_SIZE - HUD_OFFSET + BORDER) ,
+		    WINSCALE(hud_pos_y + hudSize - HUD_OFFSET + BORDER) ,
 			XTextWidth(gameFont, mods, modlen) + 1,
 		    gameFont->ascent + gameFont->descent);
 
@@ -681,12 +727,12 @@ void Paint_HUD(void)
 	int text_width = XTextWidth(gameFont, autopilot, sizeof(autopilot)-1);
 	rd.drawString(dpy, p_draw, gc,
 		    WINSCALE(hud_pos_x) - text_width/2,
-		    WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER)
+		    WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 				 - gameFont->descent * 2 - gameFont->ascent,
 		    autopilot, sizeof(autopilot)-1);
 
 	Erase_rectangle(WINSCALE(hud_pos_x) - text_width/2,
-			WINSCALE(hud_pos_y - HUD_SIZE+HUD_OFFSET - BORDER)
+			WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			    - gameFont->descent * 2 - gameFont->ascent * 2,
 			text_width + 2,
 			gameFont->ascent + gameFont->descent);
@@ -700,38 +746,38 @@ void Paint_HUD(void)
     if (BIT(instruments, SHOW_FUEL_GAUGE) == 0
 	|| !((fuelCount)
 	   || (fuelSum < fuelLevel3
-	      && ((fuelSum < fuelLevel1 && (loops%4) < 2)
+	      && ((fuelSum < fuelLevel1 && (loopsSlow % 4) < 2)
 		  || (fuelSum < fuelLevel2
 		      && fuelSum > fuelLevel1
-		      && (loops%8) < 4)
+		      && (loopsSlow % 8) < 4)
 		  || (fuelSum > fuelLevel2)))))
 	return;
 
     rd.drawRectangle(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
+		  WINSCALE(hud_pos_x + hudSize - HUD_OFFSET 
 			+ FUEL_GAUGE_OFFSET) - 1,
-		  WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET
+		  WINSCALE(hud_pos_y - hudSize + HUD_OFFSET 
 			+ FUEL_GAUGE_OFFSET) - 1,
 		  WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
 		  WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
-    Erase_4point(WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
+    Erase_4point(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 		   + FUEL_GAUGE_OFFSET) - 1,
-		 WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET
+		 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
 		   + FUEL_GAUGE_OFFSET) - 1,
 		 WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
 		 WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
 
     size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
     rd.fillRectangle(dpy, p_draw, gc,
-                   WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
+                   WINSCALE(hud_pos_x + hudSize - HUD_OFFSET 
 			+ FUEL_GAUGE_OFFSET) + 1,
-                   WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET
+                   WINSCALE(hud_pos_y - hudSize + HUD_OFFSET 
 			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size) + 1,
 		   WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
 		   WINSCALE(size));
-    Erase_rectangle(WINSCALE(hud_pos_x + HUD_SIZE - HUD_OFFSET
+    Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET 
 			+ FUEL_GAUGE_OFFSET),
-                    WINSCALE(hud_pos_y - HUD_SIZE + HUD_OFFSET
+                    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET 
 			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size),
                     HUD_OFFSET - (2*FUEL_GAUGE_OFFSET) + 1, size + 1);
 
@@ -747,11 +793,11 @@ void Paint_messages(void)
     int		msg_color;
     int		last_msg_index = 0;
 
-    if (charsPerTick <= 0.0)
-	charsPerTick = (float)charsPerSecond / FPS;
+    if (charsPerSecond <= 10 || charsPerSecond > 255)
+	charsPerSecond = 50;
 
     top_y = BORDER + messageFont->ascent;
-    bot_y = WINSCALE(view_height) - messageFont->descent - BORDER;
+    bot_y = WINSCALE(ext_view_height) - messageFont->descent - BORDER;
 
     /* get number of player messages */
     if (selectionAndHistory) {
@@ -778,7 +824,7 @@ void Paint_messages(void)
 	 * of a message if it is not drawn `flashed' (red) anymore
 	 */
 	if (
-	    msg->life > MSG_FLASH
+	    msg->lifeTime > MSG_FLASH_TIME
 #ifndef _WINDOWS
 	    || !selectionAndHistory
 	    || (selection.draw.state != SEL_PENDING
@@ -786,22 +832,22 @@ void Paint_messages(void)
 #endif
 	    ) {
 
-	    if (msg->life-- <= 0) {
+	    if ((msg->lifeTime -= timePerFrame) <= 0.0) {
 		msg->txt[0] = '\0';
 		msg->len = 0;
-		msg->life = 0;
+		msg->lifeTime = 0.0;
 		continue;
 	    }
-	}
+	} 
 #ifdef _WINDOWS
-	else if (msg->life-- <= 0) {
+	else if ((msg->lifeTime -= timePerFrame) <= 0.0) {
 		msg->txt[0] = '\0';
 		msg->len = 0;
-		msg->life = 0;
+		msg->lifeTime = 0.0;
 		continue;
 	    }
 #endif
-
+	
 	if (i < maxMessages) {
 	    x = BORDER;
 	    y = top_y;
@@ -814,16 +860,18 @@ void Paint_messages(void)
 	    y = bot_y;
 	    bot_y -= SPACING;
 	}
-	len = (int)(charsPerTick * (MSG_DURATION - msg->life));
+	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
 	len = MIN(msg->len, len);
-	if (msg->life > MSG_FLASH)
-	    msg_color = RED;
-	else
+	if (msg->lifeTime > MSG_FLASH_TIME) {
+	    msg_color = messagesColor;
+	}
+	else {
 	    msg_color = oldMessagesColor;
+	}
 
 #ifndef _WINDOWS
 	/*
-	 * it's an emphasized talk message
+	 * it's an emphasized talk message 
 	 */
 	if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED
 	    && i < maxMessages
@@ -911,6 +959,7 @@ void Paint_messages(void)
 		    l3 = len - selection.draw.x2 - 1;
 		}
 	    } /* last line */
+		
 
 	    if (ptr) {
 		XSetForeground(dpy, messageGC, colors[msg_color].pixel);
@@ -945,102 +994,440 @@ void Paint_messages(void)
 }
 
 
+/* Little less ugly message scan hack for basewarnings on old servers */
 
-/* Ugly message scan hack for basewarnings on old servers */
+/*
+ * START of message parser by Samaseon (ksoderbl@cc.hut.fi)
+ *
+ * used for:
+ * - Kill/Death ratio counter, based on the original
+ *   "e94_msu eKthHacks (killratio)"
+ * - Mara's client ranking and base warning hacks
+ */
 
-static char was_shot[]= " was killed by a shot from ";
-static int was_shot_len= 27;
-static char smashed[]= " smashed";
-static int smashed_len = 8;
-static char smacked []= " smacked";
-static int smacked_len = 8;
-static char and[]= " and ";
-static int and_len= 5;
-static char crashed[]= " crashed.";
-static int crashed_len= 9;
-static char ran_over[]= " ran over ";
-static int ran_over_len = 10;
-static char suicide[]= " has committed suicide.";
-static int suicide_len = 23;
-/*static char deadly_players[]=  " Deadly Players";
-static char deadly_player[]:=  " Deadly Player.";
-static char deadliest_player[]=" Deadliest Player";*/
-static char victim[MSG_LEN];
-static char victim2[MSG_LEN];
+/* if you want debug messages, use the upper one */
+/*#define DP(x) x*/
+#define DP(x)
 
-struct deathhack deatharray[10];
-int deathpos;
+static char *shottypes[] = { "a shot", NULL };
+static char head_first[] = " head first";
+static char *crashes[] = { "crashed", "smashed", "smacked", "was trashed",
+    NULL
+};
+static char *obstacles[] =
+    { "wall", "target", "treasure", "cannon", NULL };
 
-static void Message_scan_hack_death(char *name)
+
+/* increase if you want to look for messages with more player names. */
+#define MSG_MAX_NAMES 3
+
+/* structure to store names found in a message */
+typedef struct {
+    int index;
+    char name[MSG_MAX_NAMES][MAX_CHARS];
+} msgnames_t;
+
+/* recursive descent parser for messages */
+static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
+{
+    char *fp;
+    int i;
+    size_t len;
+
+    DP(printf("Msg_match_fmt - fmt = '%s'\n", fmt));
+    DP(printf("Msg_match_fmt - msg = '%s'\n", msg));
+
+    /* check that msg and fmt match to % */
+    fp = strstr(fmt, "%");
+    if (fp == NULL) {
+	/* NOTE: if msg contains stuff beyond fmt, don't care */
+	if (strncmp(msg, fmt, strlen(fmt)) == 0)
+	    return true;
+	else
+	    return false;
+    }
+    len = (size_t) (fp - fmt);
+    if (strncmp(msg, fmt, len) != 0)
+	return false;
+    fmt = fp + 2;
+    msg += len;
+
+    switch (*(fp + 1)) {
+	char *name;
+    case 'n':			/* name */
+	for (i = 0; i < num_others; i++) {
+	    name = Others[i].name;
+	    len = strlen(name);
+	    if ((strncmp(msg, name, len) == 0)
+		&& Msg_match_fmt(msg + len, fmt, nm)) {
+		strncpy(nm->name[nm->index++], name, len + 1);
+		return true;
+	    }
+	}
+	break;
+    case 's':			/* shot type */
+	for (i = 0; shottypes[i] != NULL; i++) {
+	    if (strncmp(msg, shottypes[i], strlen(shottypes[i])) == 0) {
+		msg += strlen(shottypes[i]);
+		return Msg_match_fmt(msg, fmt, nm);
+	    }
+	}
+	break;
+    case 'h':			/* head first or nothing */
+	if (strncmp(msg, head_first, strlen(head_first)) == 0)
+	    msg += strlen(head_first);
+	return Msg_match_fmt(msg, fmt, nm);
+    case 'o':			/* obstacle */
+	for (i = 0; obstacles[i] != NULL; i++) {
+	    if (strncmp(msg, obstacles[i], strlen(obstacles[i])) == 0) {
+		msg += strlen(obstacles[i]);
+		return Msg_match_fmt(msg, fmt, nm);
+	    }
+	}
+	break;
+    case 'c':			/* some sort of crash */
+	for (i = 0; crashes[i] != NULL; i++) {
+	    if (strncmp(msg, crashes[i], strlen(crashes[i])) == 0) {
+		msg += strlen(crashes[i]);
+		return Msg_match_fmt(msg, fmt, nm);
+	    }
+	}
+	break;
+    default:
+	break;
+    }
+
+    return false;
+}
+
+
+
+/* Needed by base warning hack */
+void Msg_scan_death(int id)
 {
     int i;
-    other_t *victim;
 
-    victim = Other_by_name(name);
-    if (victim == NULL) {
-	warn("Message scan hack failing");
+    for (i = 0; i < num_bases; i++) {
+	if (bases[i].id == id)
+	    bases[i].deathtime = loops;
+    }
+}
+
+static void Msg_parse(char *message, size_t len)
+{
+    msgnames_t mn;
+    char *killer = NULL, *victim = NULL, *victim2 = NULL;
+    bool i_am_killer = false;
+    bool i_am_victim = false;
+    bool i_am_victim2 = false;
+    other_t *other = NULL;
+
+    DP(printf("MESSAGE: \"%s\"\n", message));
+
+    if (message[len - 1] == ']' || strncmp(message, " <", 2) == 0) {
+	DP(printf("-> not going to parser.\n"));
 	return;
     }
-    for (i = 0; i < 10; i++)
-	if (deatharray[i].id == victim->id)
-	    deatharray[i].id = -1;
-    deatharray[deathpos].id = victim->id;
-    deatharray[deathpos].deathtime = loops;   \
-    deathpos = (deathpos + 1) % 10;
+    memset(&mn, 0, sizeof(mn));
+    /*
+     * note: matched names will be in reverse order in the message names
+     * struct, because the deepest recursion level knows first if the
+     * parsing succeeded.
+     */
+
+    if (Msg_match_fmt(message, "%n was killed by %s from %n.", &mn)) {
+	DP(printf("shot:\n"));
+	killer = mn.name[0];
+	victim = mn.name[1];
+
+    } else if (Msg_match_fmt(message, "%n %c%h against a %o.", &mn)) {
+	DP(printf("crashed into obstacle:\n"));
+	victim = mn.name[0];
+
+    } else if (Msg_match_fmt(message, "%n and %n crashed.", &mn)) {
+	DP(printf("crash:\n"));
+	victim = mn.name[1];
+	victim2 = mn.name[0];
+
+    } else if (Msg_match_fmt(message, "%n ran over %n.", &mn)) {
+	DP(printf("overrun:\n"));
+	killer = mn.name[1];
+	victim = mn.name[0];
+
+    } else if (Msg_match_fmt
+	       (message, "%n %c%h against a %o with help from %n", &mn)) {
+	DP(printf("crashed into obstacle:\n"));
+	/*
+	 * please fix this if you like, all helpers should get a kill
+	 * (look at server/walls.c)
+	 */
+	killer = mn.name[0];
+	victim = mn.name[1];
+
+    } else if (Msg_match_fmt(message, "%n has committed suicide.", &mn)) {
+	DP(printf("suicide:\n"));
+	victim = mn.name[0];
+
+    } else if (Msg_match_fmt(message, "%n was killed by a ball.", &mn)) {
+	DP(printf("killed by ball:\n"));
+	victim = mn.name[0];
+
+    } else if (Msg_match_fmt
+	       (message, "%n was killed by a ball owned by %n.", &mn)) {
+	DP(printf("killed by ball:\n"));
+	killer = mn.name[0];
+	victim = mn.name[1];
+
+    } else
+	if (Msg_match_fmt(message, "%n succumbed to an explosion.", &mn)) {
+	DP(printf("killed by explosion:\n"));
+	victim = mn.name[0];
+
+    } else
+	if (Msg_match_fmt
+	    (message, "%n succumbed to an explosion from %n.", &mn)) {
+	DP(printf("killed by explosion:\n"));
+	killer = mn.name[0];
+	victim = mn.name[1];
+
+    } else if (Msg_match_fmt
+	       (message, "%n got roasted alive by %n's laser.", &mn)) {
+	DP(printf("roasted alive:\n"));
+	killer = mn.name[0];
+	victim = mn.name[1];
+
+    } else {
+	/* none of the above, nothing to do */
+	return;
+    }
+
+
+    if (killer != NULL) {
+	DP(printf("Killer is %s.\n", killer));
+	if (strcmp(killer, self->name) == 0)
+	    i_am_killer = true;
+    }
+
+    if (victim != NULL) {
+	DP(printf("Victim is %s.\n", victim));
+	if (strcmp(victim, self->name) == 0)
+	    i_am_victim = true;
+    }
+
+    if (victim2 != NULL) {
+	DP(printf("Second victim is %s.\n", victim2));
+	if (strcmp(victim2, self->name) == 0)
+	    i_am_victim2 = true;
+    }
+
+    /* handle death array */
+    if (victim != NULL) {
+	other = Other_by_name(victim);
+	
+	/*for safety... could possibly happen with
+	  loss or parser bugs =) */
+	if (other != NULL)
+	    Msg_scan_death(other->id);
+    } else {
+	DP(printf("*** [%s] was not found in the players array! ***\n",
+		  victim));
+    }
+    
+    if (victim2 != NULL) {
+	other = Other_by_name(victim);
+	if (other != NULL)
+	    Msg_scan_death(other->id);
+    } else {
+	DP(printf("*** [%s] was not found in the players array! ***\n",
+		  victim));
+    }
+
+    /* handle killratio */
+    if (i_am_killer && !i_am_victim)
+	killratio_kills++;
+
+    if (i_am_victim || i_am_victim2)
+	killratio_deaths++;
+
+    if (BIT(hackedInstruments, CLIENT_RANKER)) {
+	/*static char tauntstr[MAX_CHARS];
+	  int kills, deaths; */
+	
+	/* handle case where there is a victim and a killer */
+	if (killer != NULL && victim != NULL) {
+	    if (i_am_killer && !i_am_victim) {
+		Add_rank_Death(victim);
+		/*if (BIT(instruments, TAUNT)) {
+		  kills = Get_kills(victim);
+		  deaths = Get_deaths(victim);
+		  if (deaths > kills) {
+		  sprintf(tauntstr, "%s: %i-%i HEHEHEHE\0",
+		  victim, deaths, kills);
+		  Net_talk(tauntstr);
+		  }
+		  } */
+	    }
+	    if (!i_am_killer && i_am_victim)
+		Add_rank_Kill(killer);
+	}
+    }
 }
 
-static void Message_scan_hack(char *message, int len)
+/*
+ * END of message parser
+ */
+
+/* reset scan */
+static void Msg_scan_for_total_reset(char *message)
 {
-    int i;
-    int andi = 0, kill = 0, was_crash = 0;
+    static char total_reset[] = "Total reset";
 
-    for (i = 0; i < len - 3; i++) {
-	if (message[i]== and[0] && !strncmp(&message[i], and, and_len)) {
-	    andi = i;
-	}
-	else if (!strncmp(&message[i], was_shot, was_shot_len)) {
-	    strncpy(victim, &message[0], i); /*who was shot?*/
-	    victim[i] = '\0';
-	    kill = true;
-	    break;
-        }
-	else if (!strncmp(&message[i], crashed, crashed_len) && andi > 0) {
-	    was_crash = true;
-	    strncpy(victim, &message[0], andi);
-	    victim[andi] = '\0';
-	    kill = true;
-	    strncpy(victim2, &message[andi+and_len], i - andi - and_len);
-	    victim2[i - andi - and_len] = '\0';
-	    break;
-	}
-	else if (!strncmp(&message[i], ran_over, ran_over_len)) {
-	    kill = true;
-	    strncpy(victim, &message[i + ran_over_len], strlen(&message[i + ran_over_len])-1 );/*who did he run over?*/
-	    victim[strlen(&message[i + ran_over_len]) - 1] = '\0';
-	    break;
- 	}
-	else if (!strncmp(&message[i], smashed, smashed_len)) {
-	    strncpy(victim, &message[0],i);
-	    victim[i] = '\0';
-	    kill = true;
-	    break;
- 	}
-	else if (!strncmp(&message[i], smacked, smacked_len)) {
-	    strncpy(victim, &message[0], i);
-	    victim[i] = '\0';
-	    kill = true;
-	    break;
-	}
-    }
-    if (kill == true) {
-	Message_scan_hack_death(victim);
-	if (was_crash)
-	    Message_scan_hack_death(victim2);
+    /*check for 'Total reset' and clear killratio */
+    if (strstr(message, total_reset)) {
+	killratio_kills = 0;
+	killratio_deaths = 0;
+	killratio_totalkills = 0;
+	killratio_totaldeaths = 0;
     }
 }
 
+static void Msg_scan_for_replace_treasure(char *message)
+{
+    char replace[40];
+
+    if (self == NULL)
+	return;
+
+    sprintf(replace, "(team %d) has replaced the treasure", self->team);
+    if (strstr(message, replace)) {
+	ball_shout = false;
+	return;
+    }
+
+    /*
+     * Ok, at this point we know that it was not someone in our team
+     * that replaced the treasure.
+     *
+     * If there are 2 teams playing only and the ball was replace and
+     * it was not our team that replaced the ball, it was the other team.
+     * In this case, we can clear the cover flag.
+     */
+    if (num_playing_teams == 2
+	&& strstr(message, "has replaced the treasure")) {
+	need_cover = false;
+    }
+}
+
+/* Mara's ball message scan */
+void Msg_do_bms(char *message)
+{
+    static char ball_text1[] = "BALL";
+    static char ball_text2[] = "Ball";
+    static char ball_text3[] = "VAKK";
+    static char ball_text4[] = "B A L L";
+    static char ball_text5[] = "ball";
+    static char safe_text1[] = "SAFE";
+    static char safe_text2[] = "Safe";
+    static char safe_text3[] = "safe";
+    static char safe_text4[] = "S A F E";
+    static char cover_text1[] = "COVER";
+    static char cover_text2[] = "Cover";
+    static char cover_text3[] = "cover";
+    static char pop_text1[] = "POP";
+    static char pop_text2[] = "Pop";
+    static char pop_text3[] = "pop";
+    bool ball = false, safe = false, cover = false, pop = false;
+    char *bracket = NULL;
+    int len, i, n = 0;
+
+    /*xpprintf("Msg_do_bms: message = \"%s\"\n", message);*/
+
+    /* find second last '[' - always succeeds for a team message */
+    len = (int)strlen(message);
+    for (i = len; i >= 0; i--) {
+	if (message[i] == '[')
+	    n++;
+	if (n == 2) {
+	    bracket = &message[i];
+	    break;
+	}
+    }
+    /* for safety */
+    if (bracket == NULL)
+	return;
+
+    /* ugly hack */
+    *bracket = '\0';
+
+    /*check safe b4 ball */
+    if (strstr(message, safe_text1) ||
+	strstr(message, safe_text2) ||
+	strstr(message, safe_text3) ||
+	strstr(message, safe_text4))
+	safe = true;
+
+    if (strstr(message, cover_text1) ||
+	strstr(message, cover_text2) ||
+	strstr(message, cover_text3))
+	cover = true;
+
+    if (!safe
+	&& (strstr(message, pop_text1) ||
+	    strstr(message, pop_text2) ||
+	    strstr(message, pop_text3)))
+	pop = true;
+    
+    if (!safe && !cover && !pop
+	&& (strstr(message, ball_text1) ||
+	    strstr(message, ball_text2) ||
+	    strstr(message, ball_text3) ||
+	    strstr(message, ball_text4) ||
+	    strstr(message, ball_text5)))
+	ball = true;
+
+    *bracket = '[';
+    
+    /*check first 'ball popped' etc. */
+    if (cover || pop)
+	need_cover = cover;
+    else if (safe || ball)
+	ball_shout = !safe;
+}
 
 
+/* checks if the message is for your team */
+static bool Msg_is_team_msg(char *message)
+{
+    char end[8];
+    size_t endlen, len;
+
+    if (self == NULL)
+	return false;
+ 
+    sprintf(end, "]:[%i]", self->team);
+    endlen = strlen(end);
+    len = strlen(message);
+    
+    if (len < endlen)
+	return false;
+    if (!strcmp(&message[len - endlen], end))
+	return true;
+    return false;
+}
+
+
+/*
+ * Checks if the message is in angle brackets, that is,
+ * starts with " < " and ends with ">"
+ */
+static bool Msg_is_in_angle_brackets(char *message)
+{
+    if (strncmp(message, " < ", 3))
+	return false;
+    if (message[strlen(message) - 1] != '>')
+	return false;
+    return true;
+}
 
 
 /*
@@ -1052,6 +1439,7 @@ void Add_message(char *message)
 {
     int			i, len;
     message_t		*tmp, **msg_set;
+    bool		is_game_msg = false;
 
 #ifndef _WINDOWS
     bool		is_drawn_talk_message	= false; /* not pending */
@@ -1064,6 +1452,7 @@ void Add_message(char *message)
 
     len = strlen(message);
     if (message[len - 1] == ']' || strncmp(message, " <", 2) == 0) {
+	is_game_msg = false;
 #ifndef _WINDOWS
 	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
 	    /* the buffer for the pending messages */
@@ -1077,8 +1466,7 @@ void Add_message(char *message)
 #endif
 	}
     } else {
-	if (oldServer)
-	    Message_scan_hack(message, len);
+	is_game_msg = true;
 #ifndef _WINDOWS
 	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
 	    msg_set = GameMsg_pending;
@@ -1087,6 +1475,34 @@ void Add_message(char *message)
 	{
 	    msg_set = GameMsg;
 	}
+    }
+
+    if (is_game_msg /* && oldServer)*/)
+	Msg_parse(message, len);
+
+    if (is_game_msg &&
+	(strstr(message, "There is no Deadly Player") ||
+	 strstr(message, "is the Deadliest Player with") ||
+	 strstr(message, "are the Deadly Players with"))) {
+
+	/* Mara bmsg scan - clear flags at end of round. */
+	ball_shout = false;
+	need_cover = false;
+
+	roundend = true;
+	killratio_totalkills += killratio_kills;
+	killratio_totaldeaths += killratio_deaths;
+    }
+
+    if (BIT(hackedInstruments, BALL_MSG_SCAN)
+	&& !is_game_msg
+	&& BIT(Setup->mode, TEAM_PLAY)
+	&& Msg_is_team_msg(message))
+	Msg_do_bms(message);
+
+    if (Msg_is_in_angle_brackets(message)) {
+	Msg_scan_for_total_reset(message);
+	Msg_scan_for_replace_treasure(message);
     }
 
 #ifndef _WINDOWS
@@ -1106,7 +1522,7 @@ void Add_message(char *message)
 	if (show_reverse_scroll && last_msg_index == maxMessages - 1) {
 	    scrolling = true;
 	}
-
+	
 	/*
 	 * keep the emphasizing (`jumping' from talk window to talk messages)
 	 */
@@ -1131,8 +1547,8 @@ void Add_message(char *message)
     }
     msg_set[0] = tmp;
 
-    msg_set[0]->life = MSG_DURATION;
-    strcpy(msg_set[0]->txt, message);
+    msg_set[0]->lifeTime = MSG_LIFE_TIME;
+    strlcpy(msg_set[0]->txt, message, MSG_LEN);
     msg_set[0]->len = len;
 
 #ifndef _WINDOWS
@@ -1148,7 +1564,7 @@ void Add_message(char *message)
 	     * the emphasizing vanishes, as it's `last' line
 	     * is `scrolled away'
 	     */
-	    selection.draw.state = SEL_SELECTED;
+	    selection.draw.state = SEL_SELECTED;	
 	} else {
 	    if (scrolling) {
 		selection.draw.y2--;
@@ -1169,29 +1585,17 @@ void Add_message(char *message)
     }
 #endif
 
-#ifdef DEVELOPMENT
-    /* anti-censor hack */
-    for (i = 0; i < len - 3; i++) {
-	static char censor_text[] = "@&$*";
-	static char rough_text[][5] = { "fuck", "shit", "damn" };
-	static int rough_index = 0;
-	if (msg_set[0]->txt[i] == censor_text[0]
-	    && !strncmp(&msg_set[0]->txt[i], censor_text, 4)) {
-	    if (++rough_index >= 3) {
-		rough_index = 0;
-	    }
-	    strncpy(&msg_set[0]->txt[i], rough_text[rough_index], 4);
-	}
-    }
-#endif
-
     msg_set[0]->pixelLen = XTextWidth(messageFont, msg_set[0]->txt, msg_set[0]->len);
 
-    /* Print message to standard output. */
-    if (messagesToStdout == 2 || (messagesToStdout == 1 && *message &&
-	message[strlen(message) - 1] == ']'))
+    /* Print messages to standard output.
+     */
+    if (messagesToStdout == 2 ||
+	(messagesToStdout == 1 &&
+	 message[0] &&
+	 message[strlen(message)-1] == ']')) {
 
 	xpprintf("%s\n", message);
+    }
 }
 
 
@@ -1250,22 +1654,45 @@ void Paint_recording(void)
     int			w = -1;
     int			x, y;
     char		buf[32];
-    int			mb, ck, len;
-    long		size;
+    int			len;
+    DFLOAT		mb;
 
-    if (!recording || (loops % 16) < 8)
+    if (!recording || (loopsSlow % 16) < 8)
 	return;
 
     SET_FG(colors[RED].pixel);
-    size = Record_size();
-    mb = size >> 20;
-    ck = (10 * (size - ((long)mb << 20))) >> 20;
-    sprintf(buf, "REC %d.%d", mb, ck);
+    mb = ((DFLOAT)Record_size()) / 1e6;
+    sprintf(buf, "REC %.1f MB", mb);
     len = strlen(buf);
     w = XTextWidth(gameFont, buf, len);
-    x = WINSCALE(view_width) - 10 - w;
+    x = WINSCALE(ext_view_width) - 10 - w;
     y = 10 + gameFont->ascent;
     XDrawString(dpy, p_draw, gc, x, y, buf, len);
     Erase_rectangle( x - 1, WINSCALE(10),
 			 w+2, gameFont->ascent + gameFont->descent);
 }
+
+
+void Paint_client_fps(void)
+{
+    int			w = -1;
+    int			x, y;
+    char		buf[32];
+    int			len;
+
+    /*if (!showFPS)
+     * return;
+     */
+
+    SET_FG(colors[BLUE].pixel);
+    sprintf(buf, "FPS: %d", clientFPS);
+    len = strlen(buf);
+    w = XTextWidth(gameFont, buf, len);
+    x = WINSCALE(ext_view_width) - 10 - w;
+    y = 200 + gameFont->ascent;
+    rd.drawString(dpy, p_draw, gc, x, y, buf, len);
+    Erase_rectangle( x - 1,  WINSCALE(200),
+			 w+2, gameFont->ascent + gameFont->descent);
+}
+
+

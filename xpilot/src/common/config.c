@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -48,17 +48,14 @@
 #    ifdef _WINDOWS
 #         define DEFAULT_MAP		"default.xp"
 #    else
-#         define DEFAULT_MAP		"globe.xp"
+#         define DEFAULT_MAP		"marahacked_teamcup2001.xp"
 #    endif
 #endif
 
 #ifndef LIBDIR
-#    ifdef VMS
-#        define LIBPREFIX	"lib_disk:[lib.xgames.xpilot341.lib"
-#        define LIBDIR		LIBPREFIX "]"
-#    elif defined(_WINDOWS)
+#    if defined(_WINDOWS)
 #        define LIBDIR		"lib/"
-#	 else
+#    else
 #        define LIBDIR		"/usr/local/lib/xpilot/"
 #    endif
 #endif
@@ -70,11 +67,20 @@
 #        define DEFAULTS_FILE_NAME	LIBDIR "defaults"
 #    endif
 #endif
+
 #ifndef PLAYER_PASSWORDS_FILE_NAME
 #    if defined(_WINDOWS)
 #        define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords.txt"
 #    else
 #        define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords"
+#    endif
+#endif
+
+#ifndef PASSWORD_FILE_NAME
+#    if defined(_WINDOWS)
+#        define PASSWORD_FILE_NAME	LIBDIR "password.txt"
+#    else
+#        define PASSWORD_FILE_NAME	LIBDIR "password"
 #    endif
 #endif
 #ifndef ROBOTFILE
@@ -106,34 +112,20 @@
 #    endif
 #endif
 #ifndef MAPDIR
-#    ifdef VMS
-#        define MAPDIR		LIBPREFIX ".maps]"
-#    else
-#        define MAPDIR		LIBDIR "maps/"
-#    endif
+#    define MAPDIR		LIBDIR "maps/"
 #endif
 #ifndef SHIP_FILE
-#    ifdef VMS
-#        define SHIP_FILE       LIBDIR "tkxpi.shp"
-#    elif defined(_WINDOWS)
+#    if defined(_WINDOWS)
 #	 define SHIP_FILE	"XPilot.shp"
 #    else
 #        define SHIP_FILE       ""
 #    endif
 #endif
 #ifndef TEXTUREDIR
-#    ifdef VMS
-#        define TEXTUREDIR	LIBPREFIX ".textures]"
-#    else
-#        define TEXTUREDIR	LIBDIR "textures/"
-#    endif
+#    define TEXTUREDIR	LIBDIR "textures/"
 #endif
 #ifndef	SOUNDDIR
-#    ifdef VMS
-#        define SOUNDDIR	LIBPREFIX ".sound]"
-#    else
-#        define SOUNDDIR	LIBDIR "sound/"
-#    endif
+#    define SOUNDDIR	LIBDIR "sound/"
 #endif
 
 #ifndef SOUNDFILE
@@ -142,10 +134,6 @@
 #    else
 #        define SOUNDFILE	SOUNDDIR "sounds"
 #    endif
-#endif
-
-#ifndef SOUNDDIR
-#    define SOUNDDIR	LIBDIR "sound/"
 #endif
 
 #ifndef ZCAT_EXT
@@ -167,6 +155,8 @@
 char config_version[] = VERSION;
 
 
+
+
 char *Conf_libdir(void)
 {
     static char conf[] = LIBDIR;
@@ -181,6 +171,21 @@ char *Conf_defaults_file_name(void)
     return conf;
 }
 
+char *Conf_password_file_name(void)
+{
+    static char conf[] = PASSWORD_FILE_NAME;
+
+    return conf;
+}
+
+char *Conf_player_passwords_file_name(void)
+{
+    static char conf[] = PLAYER_PASSWORDS_FILE_NAME;
+
+    return conf;
+}
+
+
 char *Conf_mapdir(void)
 {
     static char conf[] = MAPDIR;
@@ -188,28 +193,23 @@ char *Conf_mapdir(void)
     return conf;
 }
 
-/* needed by server/cmdline.c */
-char conf_default_map_string[] = DEFAULT_MAP;
+static char conf_default_map_string[] = DEFAULT_MAP;
 
 char *Conf_default_map(void)
 {
     return conf_default_map_string;
 }
 
-char *Conf_player_passwords_file_name(void)
-{
-    static char conf[] = PLAYER_PASSWORDS_FILE_NAME;
-    return conf;
-}
-
 char *Conf_servermotdfile(void)
 {
     static char conf[] = SERVERMOTDFILE;
+    static char env[] = "XPILOTSERVERMOTD";
     char *filename;
 
-    filename = getenv("XPILOTSERVERMOTD");
-    if (filename == NULL)
+    filename = getenv(env);
+    if (filename == NULL) {
 	filename = conf;
+    }
 
     return filename;
 }
@@ -221,11 +221,11 @@ char *Conf_localmotdfile(void)
     return conf;
 }
 
+char conf_logfile_string[] = LOGFILE;
+
 char *Conf_logfile(void)
 {
-    static char conf[] = LOGFILE;
-
-    return conf;
+    return conf_logfile_string;
 }
 
 /* needed by client/default.c */
@@ -266,8 +266,7 @@ char *Conf_contactaddress(void)
     return conf;
 }
 
-/* needed by server/cmdline.c */
-char conf_robotfile_string[] = ROBOTFILE;
+static char conf_robotfile_string[] = ROBOTFILE;
 
 char *Conf_robotfile(void)
 {
@@ -294,3 +293,4 @@ char *Conf_sounddir(void)
 
     return conf;
 }
+

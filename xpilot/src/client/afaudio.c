@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -71,8 +71,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef	_WINDOWS
-#include <sys/file.h>
+#ifndef _WINDOWS
+# include <sys/file.h>
 #endif
 #include <AF/AFlib.h>
 
@@ -174,7 +174,7 @@ int audioDeviceInit(char *display)
     return 0;
 }
 
-tossOldestCacheEntry()
+tossOldestCacheEntry(void)
 {
   struct timeval t;
   struct SoundCache *ce, *oldest;
@@ -295,6 +295,6 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
     t = AFPlaySamples(ac, t, ce->length, ce->sound);
 }
 
-void audioDeviceEvents()
+void audioDeviceEvents(void)
 {
 }

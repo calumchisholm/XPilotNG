@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -132,6 +132,14 @@ typedef struct {
     u_byte		wrecktype, size, rotation;
 } wreckage_t;
 
+typedef struct {
+    short		x, y;
+    u_byte		type, size, rotation;
+} asteroid_t;
+
+typedef struct {
+    short		x, y;
+} wormhole_t;
 
 extern refuel_t		*refuel_ptr;
 extern int		 num_refuel, max_refuel;
@@ -173,6 +181,10 @@ extern vdecor_t		*vdecor_ptr;
 extern int		 num_vdecor, max_vdecor;
 extern wreckage_t	*wreckage_ptr;
 extern int		 num_wreckage, max_wreckage;
+extern asteroid_t	*asteroid_ptr;
+extern int		 num_asteroids, max_asteroids;
+extern wormhole_t	*wormhole_ptr;
+extern int		 num_wormholes, max_wormholes;
 
 extern long		start_loops, end_loops;
 extern long		time_left;
@@ -256,7 +268,9 @@ extern XSegment		*seg_ptr[MAX_COLORS];
 extern int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
 
 extern int		eyesId;		/* Player we get frame updates for */
+extern other_t		*eyes;		/* Player we get frame updates for */
 extern short		snooping;	/* are we snooping on someone else? */
+extern int		eyeTeam;	/* Team of player we get updates for */
 
 extern void Erase_do_start(void);
 extern void Erase_do_end(void);

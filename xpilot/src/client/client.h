@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,18 +26,18 @@
 #define CLIENT_H
 
 #ifdef _WINDOWS
-#ifndef _WINSOCKAPI_
+#ifndef	_WINSOCKAPI_
 #include <winsock.h>
 #endif
 
-#ifndef _WINX_H_
+#ifndef	_WINX_H_
 #include "NT/winX.h"
 #endif
 #endif
 
 
 #ifndef DRAW_H
-/* need wireobj */
+/* need shipobj */
 #include "draw.h"
 #endif
 #ifndef ITEM_H
@@ -51,7 +52,7 @@
 #define SHOW_FUEL_GAUGE		(1L << 4)
 #define SHOW_TURNSPEED_METER	(1L << 5)
 #define SHOW_POWER_METER	(1L << 6)
-#define SHOW_SHIP_NAME		(1L << 7)
+/*#define SHOW_SHIP_NAME		(1L << 7)*/
 #define SHOW_SLIDING_RADAR	(1L << 8)
 #define SHOW_PACKET_SIZE_METER	(1L << 10)
 #define SHOW_PACKET_LOSS_METER	(1L << 11)
@@ -59,7 +60,7 @@
 #define SHOW_CLOCK		(1L << 13)
 #define SHOW_ITEMS		(1L << 14)
 #define SHOW_MESSAGES		(1L << 15)
-#define SHOW_MINE_NAME		(1L << 16)
+/*#define SHOW_MINE_NAME		(1L << 16)*/
 #define SHOW_OUTLINE_WORLD	(1L << 17)
 #define SHOW_FILLED_WORLD	(1L << 18)
 #define SHOW_TEXTURED_WALLS	(1L << 19)
@@ -68,10 +69,28 @@
 #define SHOW_FILLED_DECOR	(1L << 22)
 #define SHOW_TEXTURED_DECOR	(1L << 23)
 #define SHOW_CLOCK_AMPM_FORMAT	(1L << 24)
-/*			Removed SHOW_TEXTURED_BALLS */
+/*#define SHOW_TEXTURED_BALLS - not used */
 #define SHOW_REVERSE_SCROLL	(1L << 26)
-#define SHOW_SHIP_ID            (1L << 27)
-#define SHOW_HR	                (1L << 28)
+#define SHOW_HUD_RADAR          (1L << 27)
+#define SHOW_PACKET_LAG_METER	(1L << 28)
+#define SHOW_SHIP_ID            (1L << 29)
+
+/* hacked instruments */
+#define SHOW_SSH		(1L << 1)
+#define SHOW_SHIP_SHAPES	(1L << 2)
+#define SHOW_MY_SHIP_SHAPE	(1L << 3)
+
+/*#define SHOW_BASE_NAME		(1L << 5)*/
+#define BALL_MSG_SCAN		(1L << 6)
+#define CLIENT_RANKER		(1L << 7)
+/*#define BASE_WARNING		(1L << 8)
+  #define SELF_LIFE_WARNING	(1L << 9)
+  #define ENEMY_LIFE_WARNING	(1L << 10)
+  #define TEAM_LIFE_WARNING	(1L << 11) - always active */
+#define MAP_RADAR		(1L << 12)
+#define SHOW_LIVES_BY_SHIP	(1L << 13)
+#define TREAT_ZERO_SPECIAL	(1L << 14)
+
 
 #define PACKET_LOSS		0
 #define PACKET_DROP		1
@@ -94,14 +113,14 @@
 #define MIN_SCALEFACTOR		0.2
 #define MAX_SCALEFACTOR		8.0
 
-#if 0 /* !@# */
+#if 0
 #define FIND_NAME_WIDTH(other)						\
     if ((other)->name_width == 0) {					\
 	(other)->name_len = strlen((other)->name);			\
 	(other)->name_width = 2 + XTextWidth(gameFont, (other)->name,	\
 					 (other)->name_len);		\
     }
-#endif
+#endif /* 0 */
 
 #define FIND_NAME_WIDTH(other)						\
     if ((other)->name_width == 0) {					\
@@ -115,36 +134,38 @@ typedef struct {
     DFLOAT	ratio;
     short	id;
     short	team;
-    short	score;
+    DFLOAT	score;
     short	check;
     short	round;
     short	timing;
     long	timing_loops;
     short	life;
     short	mychar;
+    short	alliance;
     short	war_id;
     short	name_width;	/* In pixels */
     short	name_len;	/* In bytes */
-    wireobj	*ship;
+    shipobj	*ship;
     char	name[MAX_CHARS];
     char	real[MAX_CHARS];
     char	host[MAX_CHARS];
-    char        id_string[MAX_CHARS];
+    char	id_string[MAX_CHARS];
+    short	ignorelevel;
 } other_t;
 
 typedef struct {
-    int         pos;		/* Block index */
-    long        fuel;		/* Amount of fuel available */
-    irec        bounds;         /* Location in map */
-
+    int		pos;		/* Block index */
+    long	fuel;		/* Amount of fuel available */
+    irec	bounds;		/* Location on map */
 } fuelstation_t;
 
 typedef struct {
-    int         pos;		/* Block index */
+    int		pos;		/* Block index */
     short	id,		/* Id of owner or -1 */
 		team;		/* Team this base belongs to */
-    irec        bounds;         /* Location in map */
-    int         type;           /* orientation */
+    irec	bounds;		/* Location on map */
+    int		type;		/* orientation */
+    int		deathtime;	/* For base warning */
 } homebase_t;
 
 typedef struct {
@@ -156,47 +177,47 @@ typedef struct {
 typedef struct {
     int		pos;		/* Block index */
     short	dead_time;	/* Frames inactive */
-    u_short	damage;		/* Damage to target */
+    unsigned short	damage;		/* Damage to target */
 } target_t;
 
 typedef struct {
     int		pos;		/* Block index */
-    irec        bounds;         /* Location in map */
+    irec	bounds;		/* Location on map */
 } checkpoint_t;
 
 
+
 typedef struct {
-    int        width;           /* Line width, -1 means no line */
-    int        color;           /* Line color */
-    int        rgb;             /* RGB values corresponding to color */
-    int        style;           /* LineSolid, LineOnOffDash, LineDoubleDash */
+    int width;			/* Line width, -1 means no line */
+    int color;			/* Line color */
+    int rgb;			/* RGB values corresponding to color */
+    int style;			/* LineSolid, LineOnOffDash, LineDoubleDash */
 } edge_style_t;
 
-
 typedef struct {
-    int          color;           /* The color if drawn in filled mode */
-    int          rgb;             /* RGB values corresponding to color */
-    int          texture;         /* The texture if drawn in texture mode */
-    int          flags;           /* Flags about this style (see draw.h) */
-    int          def_edge_style;  /* The default style for edges */
+    int color;			/* The color if drawn in filled mode */
+    int rgb;			/* RGB values corresponding to color */
+    int texture;		/* The texture if drawn in texture mode */
+    int flags;			/* Flags about this style (see draw.h) */
+    int def_edge_style;		/* The default style for edges */
 } polygon_style_t;
 
-
 typedef struct {
-    ipos        *points;        /* points[0] is absolute, rest are relative */
-    int         num_points;     /* number of points */
-    irec        bounds;         /* bounding box for the polygon */
-    int         *edge_styles;   /* optional array of indexes to edge_styles */
-    int         style;          /* index to polygon_styles array */
+    ipos *points;		/* points[0] is absolute, rest are relative */
+    int num_points;		/* number of points */
+    irec bounds;		/* bounding box for the polygon */
+    int *edge_styles;		/* optional array of indexes to edge_styles */
+    int style;			/* index to polygon_styles array */
 } xp_polygon_t;
 
 
-#define SCORE_OBJECT_COUNT	100
+
+/*#define SCORE_OBJECT_COUNT	100*/
 typedef struct {
-    int		score,
-		x,
+    DFLOAT	score,
+		life_time;
+    int		x,
 		y,
-		count,
 		hud_msg_len,
 		hud_msg_width,
 		msg_width,
@@ -234,6 +255,7 @@ typedef struct {
         int     y2;
     } draw;
     char	*txt;   /* allocated when needed */
+    int		txt_size;	/* size of txt buffer */
     int		len;
     /* when a message `jumps' from talk window to the player messages: */
     bool	keep_emphasizing;
@@ -252,6 +274,7 @@ extern u_byte	lastNumItems[NUM_ITEMS];
 extern int	numItemsTime[NUM_ITEMS];
 extern DFLOAT	showItemsTime;
 extern short	autopilotLight;
+extern int	showScoreDecimals;
 
 
 extern short	lock_id;		/* Id of player locked onto */
@@ -312,9 +335,11 @@ extern DFLOAT	hud_move_fact;		/* scale the hud-movement (speed) */
 extern DFLOAT	ptr_move_fact;		/* scale the speed pointer length */
 extern char	mods[MAX_CHARS];	/* Current modifiers in effect */
 extern long	instruments;		/* Instruments on screen (bitmask) */
+extern long	hackedInstruments;	/* Hacked instruments on screen (bitmask) */
 extern int	packet_size;		/* Current frame update packet size */
 extern int	packet_loss;		/* lost packets per second */
 extern int	packet_drop;		/* dropped packets per second */
+extern int	packet_lag;		/* approximate lag in frames */
 extern char	*packet_measure;	/* packet measurement in a second */
 extern long	packet_loop;		/* start of measurement */
 
@@ -334,6 +359,9 @@ extern bool	useErase;		/* use the Erase hack for slow X */
 extern int	maxFPS;			/* Client's own FPS */
 extern int 	oldMaxFPS;
 
+extern int	clientPortStart;	/* First UDP port for clients */
+extern int	clientPortEnd;		/* Last one (these are for firewalls) */
+
 extern byte	lose_item;		/* flag and index to drop item */
 extern int	lose_item_active;	/* one of the lose keys is pressed */
 
@@ -346,27 +374,30 @@ extern int 	maxVolume;		/* maximum volume (in percent) */
 extern int	maxLinesInHistory;	/* number of lines to save in history */
 #define MAX_HIST_MSGS	128		/* maximum */
 
-
 /* mapdata accessible to outside world */
 
-extern fuelstation_t	*fuels;
-extern int		num_fuels;
+extern fuelstation_t *fuels;
+extern int num_fuels;
 
-extern homebase_t	*bases;
-extern int		num_bases;
+extern homebase_t *bases;
+extern int num_bases;
 
-extern checkpoint_t     *checks;
-extern int              num_checks;
+extern checkpoint_t *checks;
+extern int num_checks;
 
-extern xp_polygon_t     *polygons;
-extern int               num_polygons, max_polygons;
+extern xp_polygon_t *polygons;
+extern int num_polygons, max_polygons;
 
-extern edge_style_t     *edge_styles;
-extern int               num_edge_styles, max_edge_styles;
+extern edge_style_t *edge_styles;
+extern int num_edge_styles, max_edge_styles;
 
-extern polygon_style_t  *polygon_styles;
-extern int               num_polygon_styles, max_polygon_styles;
+extern polygon_style_t *polygon_styles;
+extern int num_polygon_styles, max_polygon_styles;
 
+extern other_t *Others;
+extern int	num_others, max_others;
+
+extern int num_playing_teams;
 
 int Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);
@@ -381,18 +412,21 @@ int Check_pos_by_index(int ind, int *xp, int *yp);
 int Check_index_by_pos(int x, int y);
 other_t *Other_by_id(int id);
 other_t *Other_by_name(char *name); /* Only used by message scan hack */
-wireobj *Ship_by_id(int id);
+shipobj *Ship_by_id(int id);
 int Handle_leave(int id);
 int Handle_player(int id, int team, int mychar, char *player_name,
-		  char *real_name, char *host_name, char *shape, int myself);
-int Handle_score(int id, int score, int life, int mychar);
-int Handle_score_object(int score, int x, int y, char *msg);
+		  char *real_name, char *host_name, char *shape,
+		  int myself);
+int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance);
+int Handle_score_object(DFLOAT score, int x, int y, char *msg);
+int Handle_team_score(int team, DFLOAT score);
 int Handle_timing(int id, int check, int round);
 int Handle_war(int robot_id, int killer_id);
 int Handle_seek(int programmer_id, int robot_id, int sought_id);
 void Map_dots(void);
 void Map_restore(int startx, int starty, int width, int height);
 void Map_blue(int startx, int starty, int width, int height);
+bool Using_score_decimals(void);
 void Client_score_table(void);
 int Client_init(char *server, unsigned server_version);
 int Client_setup(void);
@@ -412,10 +446,10 @@ void Set_auto_shield(int onoff);
 #ifdef XlibSpecificationRelease
 void Key_event(XEvent *event);
 #endif
-#ifndef	_WINDOWS
-int xevent(int);
+#ifndef _WINDOWS
+int x_event(int);
 #else
-int xevent(XEvent event);
+int win_xevent(XEvent event);
 void MarkPlayersForRedraw(void);
 #endif
 
@@ -428,3 +462,4 @@ extern	void audioEvents();
 #endif
 
 #endif
+

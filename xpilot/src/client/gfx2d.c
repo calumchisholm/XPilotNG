@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -22,12 +22,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef _WINDOWS
-#include <io.h>
-#endif
-#ifndef _WINDOWS
-#include <unistd.h>
-#endif
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -36,12 +30,25 @@
 #include <limits.h>
 #include <ctype.h>
 
+#ifndef _WINDOWS
+# include <unistd.h>
+#endif
+
+#ifdef _WINDOWS
+# include <io.h>
+#endif
+
 #include "version.h"
 #include "config.h"
 #include "gfx2d.h"
 #include "error.h"
 #include "const.h"
 #include "portability.h"
+#include "commonproto.h"
+
+
+char gfx2d_version[] = VERSION;
+
 
 #ifndef PATH_MAX
 #define PATH_MAX	1023
@@ -52,7 +59,7 @@ extern char	*texturePath;		/* Path list of texture directories */
 
 #ifndef _WINDOWS
 /* from xpmread.c */
-extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
+extern int xpm_picture_from_file(xp_picture_t * pic, char *filename);
 #endif
 
 /*
@@ -65,6 +72,8 @@ extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
 
 int Picture_init (xp_picture_t *picture, const char *filename, int count)
 {
+    /*xpprintf("Picture_init: count is %d for %s\n", count, filename);*/
+
     picture->count = count;
     picture->data = (RGB_COLOR **) malloc(ABS(count) * sizeof(RGB_COLOR*));
     if (!picture->data) {
@@ -86,10 +95,11 @@ int Picture_init (xp_picture_t *picture, const char *filename, int count)
     return 0;
 }
 
+
 /*
  * Find full path for a picture filename.
  */
-static int Picture_find_path(const char *filename, char *path)
+static int Picture_find_path(const char *filename, char *path, size_t path_size)
 {
     char		*dir, *colon;
     int			len;
@@ -103,42 +113,38 @@ static int Picture_find_path(const char *filename, char *path)
      * without using the texturePath.
      */
     if (access(filename, 4) == 0) {
-		strcpy(path, filename);
-		return TRUE;
+	strlcpy(path, filename, path_size);
+	return TRUE;
     }
 
     /*
      * If filename doesn't contain a slash
      * then we also try the texturePath, if it exists.
      */
-    if (!strchr(filename, '/') && texturePath != NULL) {
-		for (dir = texturePath; *dir; dir = colon) {
-			if (!(colon = strchr(dir, ':'))) {
-				len = strlen(dir);
-				colon = &dir[len];
-			} else {
-				len = colon - dir;
-				colon++;
-			}
-			if (len > 0 && len + strlen(filename) + 1 < PATH_MAX) {
-				memcpy(path, dir, len);
-				if (path[len - 1] != '/') {
-					path[len++] = '/';
-				}
-				strcpy(&path[len], filename);
-				if (access(path, 4) == 0) {
-					return TRUE;
-				}
-			}
+    if (!strchr(filename, PATHNAME_SEP) && texturePath != NULL) {
+	for (dir = texturePath; *dir; dir = colon) {
+	    if (!(colon = strchr(dir, ':'))) {
+		len = strlen(dir);
+		colon = &dir[len];
+	    } else {
+		len = colon - dir;
+		colon++;
+	    }
+	    if (len > 0 && len + strlen(filename) + 1 < path_size) {
+		memcpy(path, dir, len);
+		if (path[len - 1] != PATHNAME_SEP) {
+		    path[len++] = PATHNAME_SEP;
 		}
+		strlcpy(&path[len], filename, path_size - len);
+		if (access(path, 4) == 0) {
+		    return TRUE;
+		}
+	    }
+	}
     }
-#ifdef _WINDOWS
-	Trace("Can't find PPM file \"%s\"\n", filename);
-#else
-    error("Can't find PPM file \"%s\"", filename);
-#endif
 
-	return FALSE;
+    error("Can't find PPM file \"%s\"", filename);
+    return(FALSE);
 }
 
 /*
@@ -191,10 +197,10 @@ static int Picture_get_decimal(FILE *f, int c, int *dec)
     return c;
 }
 
-/*
+/* 
     Purpose: load images in to the xp_picture structure.
-    format is only binary PPM's at the moment.
-    More error handling and a better understanding of the PPM standard
+    format is only binary PPM's at the moment. 
+    More error handling and a better understanding of the PPM standard 
     would be good. But suffices for a proof of concept.
 
     return 0 on success.
@@ -210,16 +216,20 @@ int Picture_load(xp_picture_t *picture, const char *filename)
     int			width, height, maxval, count;
     char		path[PATH_MAX + 1];
 
-    if (!Picture_find_path(filename, path)) return -1;
+
+    if (!Picture_find_path(filename, path, sizeof(path))) {
+	error("Cannot find picture file \"%s\"", filename);
+	return -1;
+    }
 
 #ifndef _WINDOWS
     if (strcmp("xpm", filename + strlen(filename) - 3) == 0) {
-        if (!xpm_picture_from_file(picture, path)) {
-            error("Failed to load XPM bitmap \"%s\"", path);
-            return -1;
-        }
-        return 0;
-    } 
+	if (!xpm_picture_from_file(picture, path)) {
+	    error("Failed to load XPM bitmap \"%s\"", path);
+	    return -1;
+	}
+	return 0;
+    }
 #endif
 
     if ((f = fopen(path, "rb")) == NULL) {
@@ -252,39 +262,41 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 
     picture->height = height;
     if (picture->count > 0) {
-        count = 1;
-        picture->width = width;
-    } else {
-        count = -picture->count;
-        picture->width = width / count;
+	count = 1;
+	picture->width = width;
+    } else  {
+	/*xpprintf("picture count negative for pic %s\n", filename);*/
+	count = -picture->count;
+	picture->width = width / count;
     }
 
     for (p = 0; p < count; p++) {
-        if (!(picture->data[p] =
-              malloc(picture->width * picture->height * sizeof(RGB_COLOR)))) {
-            error("Not enough memory.");
-            return -1;
-        }
+	if (!(picture->data[p] =
+	      malloc(picture->width * picture->height *
+		     sizeof(RGB_COLOR)))) {
+	    error("Not enough memory.");
+	    return -1;
+	}
     }
 
     for (y = 0 ; y < picture->height ; y++) {
-        for (p = 0; p < count ; p++) {
-            for (x = 0; x < picture->width ; x++) {
-                r = getc(f);
-                g = getc(f);
-                b = getc(f);
-                Picture_set_pixel(picture, p, x, y, RGB24(r, g, b));
-            }
-        }
-        /* skip the rest */
-        for (p = width % count * 3; p > 0; p--) getc(f);
+	for (p = 0; p < count ; p++) {
+	    for (x = 0; x < picture->width ; x++) {
+		r = getc(f);
+		g = getc(f);
+		b = getc(f);
+		Picture_set_pixel(picture, p, x, y, RGB24(r, g, b));
+	    }
+	}
+	/* skip the rest */
+	for (p = width % count * 3; p > 0; p--)
+	    getc(f);
     }
 
     fclose(f);
 
     return 0;
 }
-
 
 /*
     Purpose: We want to provide rotation, a picture which is rotated has
@@ -300,6 +312,9 @@ int Picture_rotate(xp_picture_t *picture)
     int size, x, y, image;
     int color;
     size = picture->height;
+
+    /*if (picture->count <= 0)
+      xpprintf("Picture_rotate: picture->count = %d\n", picture->count);*/
 
     for (image = 1; image < picture->count; image++) {
 
@@ -320,10 +335,10 @@ int Picture_rotate(xp_picture_t *picture)
 }
 
 /*
-    Purpose: set the color value of a 1x1 pixel,
+    Purpose: set the color value of a 1x1 pixel, 
     This is a convenient wrapper for the data array.
 */
-void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y,
+void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y, 
 		       RGB_COLOR color)
 {
     if (x < 0 || y < 0 || x>= picture->width || y>= picture->height) {
@@ -336,7 +351,7 @@ void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y,
 }
 
 /*
-    Purpose: get the color value of a 1x1 pixel,
+    Purpose: get the color value of a 1x1 pixel, 
     This is a wrapper for looking up in the data array.
 */
 RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
@@ -348,7 +363,7 @@ RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
 	function to be called with indexes out of range, so i won't introduce
 	error handling here. Return value is defaulted to black.
 	There is already code that relies on this behavior */
-
+	
     } else {
 	return picture->data[image][x + y * picture->width];
     }
@@ -358,9 +373,12 @@ RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
     Purpose: Find the color value of the 1x1 pixel with upperleft corner x,y.
     Note that x and y is doubles.
 */
-RGB_COLOR Picture_get_pixel_avg(const xp_picture_t *picture, int image,
-				double x, double y)
-{
+static RGB_COLOR Picture_get_pixel_avg(
+	const xp_picture_t	*picture,
+	int			image, 
+	double			x,
+	double			y)
+{    
     int		r_x, r_y;
     double	frac_x, frac_y;
     int		i;
@@ -378,16 +396,16 @@ RGB_COLOR Picture_get_pixel_avg(const xp_picture_t *picture, int image,
     c[1] = Picture_get_pixel(picture, image, r_x + 1, r_y);
     c[2] = Picture_get_pixel(picture, image, r_x, r_y + 1);
     c[3] = Picture_get_pixel(picture, image, r_x + 1, r_y + 1);
-
+    
     p[0] = (1 - frac_x) * (1 - frac_y);
     p[1] = (frac_x) * (1 - frac_y);
     p[2] = (1 - frac_x) * frac_y;
     p[3] = frac_x * frac_y;
-
+    
     r = 0;
     g = 0;
     b = 0;
-
+    
     for (i = 0; i < 4; i++) {
 	r += RED_VALUE(c[i]) * p[i];
 	g += GREEN_VALUE(c[i]) * p[i];
@@ -396,21 +414,25 @@ RGB_COLOR Picture_get_pixel_avg(const xp_picture_t *picture, int image,
     return RGB24((unsigned char)r, (unsigned char)g, (unsigned char)b);
 }
 
-/*
-    Purpose: Rotate a point around the center of an image
+/* 
+    Purpose: Rotate a point around the center of an image  
     and return the matching color in the base image.
-    A picture that contains a rotated image uses all it images to make
+    A picture that contains a rotated image uses all it images to make 
     a full 360 degree rotation, which is reflected in the angle calculation.
     (first image is ang=0 and is used to index the texture for the color value)
-    Note: this function is used by the rotation code,
+    Note: this function is used by the rotation code, 
     and that is why the it's rotating the "wrong" direction.
 */
-RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture,
+RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture, 
 				    int x, int y, int image)
 {
-
+    
     int		angle;
     double	rot_x, rot_y;
+
+    /*if (picture->count <= 0)
+      xpprintf("Picture_get_rotated_pixel: picture->count = %d\n",
+      picture->count);*/
 
     angle = ((image  * RES) / picture->count) % 128;
 
@@ -419,7 +441,7 @@ RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture,
 
     rot_x = (tcos(angle) * x - tsin(angle) * y) + picture->width / 2;
     rot_y = (tsin(angle) * x + tcos(angle) * y) + picture->height / 2;
-
+ 
     return (Picture_get_pixel_avg(picture, 0, rot_x, rot_y));
 }
 
@@ -456,14 +478,14 @@ static void Picture_scale_x_slice(const xp_picture_t * picture, int image, int *
     double weight;
     RGB_COLOR col;
     RGB_COLOR *image_data = picture->data[image] + x + y * picture->width ;
-
+    
     if (xscale > xfrac) {
 	col = *image_data;
 	weight = xfrac * yfrac;
 	*r += (int)(RED_VALUE(col) * weight);
         *g += (int)(GREEN_VALUE(col) * weight);
 	*b += (int)(BLUE_VALUE(col) * weight);
-
+	    
 	xscale -= xfrac;
 	image_data++;
 
@@ -487,7 +509,7 @@ static void Picture_scale_x_slice(const xp_picture_t * picture, int image, int *
 		xscale -=1.0;
 	    }
 	}
-    }
+    } 
     if (xscale > 0) {
 	col = *image_data;
 	weight = yfrac * xscale;
@@ -498,19 +520,19 @@ static void Picture_scale_x_slice(const xp_picture_t * picture, int image, int *
 }
 
 /*
-    Purpose: Calculate the average color of a rectangle in an image,
+    Purpose: Calculate the average color of a rectangle in an image, 
     This is used by the scaling algorithm.
 */
 
-RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image,
+RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image, 
 				 double x1, double y1, double dx, double dy)
 {
     int r ,g, b;
     double area;
 
     int x,y;
-    double xfrac, yfrac;
-
+    double xfrac, yfrac; 
+    
     r = 0;
     g = 0;
     b = 0;
@@ -535,7 +557,7 @@ RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image,
     }
     if (dy > 0)
 	Picture_scale_x_slice(picture, image, &r, &g, &b, x, y, dx, xfrac, dy);
-
+ 
     return RGB24((unsigned char)(r/area), (unsigned char)(g/area), (unsigned char)(b/area));
 }
 
@@ -570,3 +592,4 @@ void Picture_get_bounding_box(xp_picture_t *picture)
 	}
     }
 }
+

@@ -1,32 +1,56 @@
-/*
- * strdup.c
+/* 
  *
- * Simple version of strdup for machines without it (ie DEC Ultrix 4.2)
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
- * By David Chatterton
- * 29 July 1993
+ *      Bjørn Stabell        <bjoern@xpilot.org>
+ *      Ken Ronny Schouten   <ken@xpilot.org>
+ *      Bert Gijsbers        <bert@xpilot.org>
+ *      Dick Balaska         <dick@xpilot.org>
  *
- * You can do anything you like to this... :)
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * $Id$
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 #include <stdlib.h>
 #include <string.h>
 
-/* BG 99-10-4: some version of glibs defines strdup.  kill that nonsense. */
-#ifdef strdup
-#undef strdup
-#endif
+#include "error.h"
+#include "commonproto.h"
 
-char* strdup (const char* s1)
+char *xp_strdup(const char *old_string)
 {
-	char* s2;
+    char	*new_string;
+    size_t	string_length;
 
-	s2 = (char*)malloc(strlen(s1)+1);
-	if (s2)
-		strcpy(s2,s1);
+    string_length = strlen(old_string);
+    new_string = (char *)malloc(string_length + 1);
+    if (new_string) {
+	memcpy(new_string, old_string, string_length + 1);
+    }
 
-	return s2;
+    return new_string;
+}
+
+char *xp_safe_strdup(const char *old_string)
+{
+    char	*new_string;
+
+    new_string = xp_strdup(old_string);
+    if (new_string == NULL) {
+	fatal("Not enough memory.");
+    }
+
+    return new_string;
 }
 

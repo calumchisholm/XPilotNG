@@ -25,11 +25,12 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include <crypt.h>
+/*#include <crypt.h>*/
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
 #include <sys/file.h>
+#include <unistd.h>
 
 #define SERVER
 #include "version.h"
@@ -155,8 +156,8 @@ static int Write_player_passwords_file(const char *data)
 
 int Check_player_password(const char *nick, const char *password)
 {
-    char *fcont, salt[3], nick_l[MAX_NAME_LEN], *p, *p2, *line_start, *colon,
-	 *fcont_new = NULL;
+    char *fcont, salt[3], nick_l[MAX_NAME_LEN], *p, *p2, *line_start = NULL,
+	*colon = NULL, *fcont_new = NULL;
     int r, found_entry = 0, fsize, err = 0;
 
     if (!*nick) {
@@ -180,7 +181,7 @@ int Check_player_password(const char *nick, const char *password)
     salt[2] = 0;
     r = PASSWD_NONE;
     p = fcont;
-    while (p = strstr(p, nick_l)) {
+    while ((p = strstr(p, nick_l)) != NULL) {
 	/* Are we at the beginning of a line? */
 	if (p > fcont && *(p-1) != '\n' && *(p-1) != '\r') {
 	    /* We're NOT at the beginning of a line. */
@@ -247,7 +248,7 @@ int Check_player_password(const char *nick, const char *password)
 	 */
 
 	int okay = 0;
-	char *lastaccess_start, newline[3];
+	char *lastaccess_start = NULL, newline[3];
 
 	p = colon + 1;
 
@@ -374,7 +375,7 @@ int Remove_player_password(const char *nick)
 
     r = 0;
     p = fcont;
-    while (p = strstr(p, nick_l)) {
+    while ((p = strstr(p, nick_l)) != NULL) {
 	/* Are we at the beginning of a line? */
 	if (p > fcont && *(p-1) != '\n' && *(p-1) != '\r') {
 	    /* We're NOT at the beginning of a line. */

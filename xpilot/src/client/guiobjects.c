@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -32,13 +33,15 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#else
-#include "NT/winX.h"
-#include "NT/winBitmap.h"
-#include "NT/winClient.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winBitmap.h"
+# include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -50,48 +53,57 @@
 #include "keys.h"
 #include "rules.h"
 #include "setup.h"
+#include "texture.h"
 #include "paint.h"
 #include "paintdata.h"
+#include "paintmacros.h"
 #include "record.h"
 #include "xinit.h"
 #include "protoclient.h"
 #include "portability.h"
 #include "bitmaps.h"
+#include "wreckshape.h"
+#include "astershape.h"
+#include "guiobjects.h"
+#include "pack.h"
+#include "commonproto.h"
 
 
 char guiobjects_version[] = VERSION;
 
 
-#define X(co)  ((int) ((co) - world.x))
-#define Y(co)  ((int) (world.y + view_height - (co)))
-
-#define NUM_WRECKAGE_SHAPES	3
-#define NUM_WRECKAGE_POINTS	12
-
-
 extern setup_t		*Setup;
 
-extern position *wreckageShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS];
 
 extern XGCValues	gcv;
 
-static int blockBitmapShips = 0; /* Turned this off because the images drawn
+static int texturedShips = 0; /* Turned this off because the images drawn
 				  * don't match the actual shipshape used
 				  * for wall collisions by the server. */
 
+int selfLWColor;
+int enemyLWColor;
+int teamLWColor;
+int shipNameColor;
+int baseNameColor;
+int mineNameColor;
+int ballColor;
+int connColor;
+int teamShotColor;
+int shipShapesHackColor;
+
 void Gui_paint_ball(int x, int y)
 {
-    if (!blockBitmaps) {
-	x = X(x);
-	y = Y(y);
-	Arc_add(WHITE, x - BALL_RADIUS, y - BALL_RADIUS,
-		    2*BALL_RADIUS, 2*BALL_RADIUS, 0, 64*360);
+    x = X(x);
+    y = Y(y);
+
+    if (!texturedObjects) {
+	Arc_add(ballColor, x - BALL_RADIUS, y - BALL_RADIUS,
+		2 * BALL_RADIUS, 2 * BALL_RADIUS, 0, 64 * 360);
     }
     else {
-	x = SCALEX(x);
-	y = SCALEY(y);
-	Bitmap_paint(p_draw, BM_BALL, x - WINSCALE(BALL_RADIUS),
-                     y - WINSCALE(BALL_RADIUS), 0);
+	Bitmap_paint(p_draw, BM_BALL, WINSCALE(x - BALL_RADIUS),
+		     WINSCALE(y - BALL_RADIUS), 0);
     }
 }
 
@@ -100,20 +112,26 @@ void Gui_paint_ball_connecter(int x1, int y1, int x2, int y2)
 {
     x2 = X(x2);
     y2 = Y(y2);
-    x1  = X(x1);
-    y1  = Y(y1);
-    Segment_add(WHITE, x1, y1, x2, y2);
+    x1 = X(x1);
+    y1 = Y(y1);
+    Segment_add(connColor, x1, y1, x2, y2);
 }
 
 /* used by Paint_mine */
-static void Gui_paint_mine_name(int x, int y, char *name)
+static void Gui_paint_mine_name(int x, int y, char *name) 
 {
-    int name_len, name_width;
+    int		name_len, name_width;
+
+    if (!name) {
+	return;
+    }
+
+    SET_FG(colors[mineNameColor].pixel);
 
     name_len = strlen(name);
     name_width = XTextWidth(gameFont, name, name_len);
 
-    if (name!=NULL) {
+    if (name != NULL) {
 	rd.drawString(dpy, p_draw, gc,
 		    WINSCALE(x) - name_width / 2,
 		    WINSCALE(y + 4) + gameFont->ascent + 1,
@@ -128,8 +146,7 @@ static void Gui_paint_mine_name(int x, int y, char *name)
 
 void Gui_paint_mine(int x, int y, int teammine, char *name)
 {
-    if (!blockBitmaps) {
-	int			i;
+    if (!texturedObjects) {
 	static DFLOAT	lastScaleFactor;
 	static XPoint	mine_points[21];
 	static XPoint	world_mine_points[21] = {
@@ -157,6 +174,7 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 	};
 
 	if (lastScaleFactor != scaleFactor) {
+	    int			i;
 	    lastScaleFactor = scaleFactor;
 	    for (i = 1; i < 21; ++i) {
 		mine_points[i].x = WINSCALE(world_mine_points[i].x);
@@ -171,14 +189,14 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 	if (teammine == 0) {
 	    SET_FG(colors[BLUE].pixel);
 	    rd.fillRectangle(dpy, p_draw, gc,
-			WINSCALE(x - 7), WINSCALE(y - 2),
+			WINSCALE(x - 7), WINSCALE(y - 2), 
 			WINSCALE(15), WINSCALE(5));
 	}
 
 	SET_FG(colors[WHITE].pixel);
 	rd.drawLines(dpy, p_draw, gc,
 		   mine_points, 21, CoordModePrevious);
-	Erase_rectangle( WINSCALE(x - 8) - 1, WINSCALE(y - 4) - 1,
+	Erase_rectangle( WINSCALE(x - 8) - 1, WINSCALE(y - 4) - 1, 
 			WINSCALE(17)+2, WINSCALE(9)+2);
 
 	if (name) {
@@ -191,16 +209,17 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 	if (teammine == 0) {
 	    SET_FG(colors[BLUE].pixel);
 	    Bitmap_paint(p_draw, BM_MINE_OTHER, WINSCALE(x - 10),
-                         WINSCALE(y - 7), 0);
+			 WINSCALE(y - 7), 0);
 	}
 	else {
 	    SET_FG(colors[WHITE].pixel);
 	    Bitmap_paint(p_draw, BM_MINE_TEAM, WINSCALE(x - 10),
-                         WINSCALE(y - 7), 0);
+			 WINSCALE(y - 7), 0);
 	}
 
-	if (name)
+	if (name) {
 	    Gui_paint_mine_name(x, y, name);
+	}
     }
 }
 
@@ -209,7 +228,7 @@ void Gui_paint_spark(int color, int x, int y)
 {
     color = spark_color[color];
 
-    Rectangle_add(color,
+    Rectangle_add(color, 
 		x - spark_size/2,
 		y - spark_size/2,
 		spark_size, spark_size);
@@ -217,20 +236,14 @@ void Gui_paint_spark(int color, int x, int y)
 }
 
 
-void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
+void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size) 
 {
     int color, cnt, tx, ty;
     static XPoint points[NUM_WRECKAGE_POINTS+2];
 
-    color = (deadly) ? WHITE: RED;
-
-
     for (cnt = 0; cnt < NUM_WRECKAGE_POINTS; cnt++) {
-	tx = (int)wreckageShapes[wtype][cnt][rot].x;
-	ty = (int)wreckageShapes[wtype][cnt][rot].y;
-
-	tx = tx * size / 256;
-	ty = ty * size / 256;
+	tx = (int)(wreckageShapes[wtype][cnt][rot].x * size) >> 8;
+	ty = (int)(wreckageShapes[wtype][cnt][rot].y * size) >> 8;
 
 	points[cnt].x = WINSCALE(X(x + tx));
 	points[cnt].y = WINSCALE(Y(y + ty));
@@ -238,6 +251,7 @@ void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
     }
     points[cnt++] = points[0];
 
+    color = (deadly) ? WHITE: RED;
     SET_FG(colors[color].pixel);
     rd.drawLines(dpy, p_draw, gc, points, cnt, 0);
     Erase_points(0, points, cnt);
@@ -245,13 +259,35 @@ void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
 }
 
 
-static void Gui_paint_nastyshot(int color, int x, int y)
+void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
 {
-    int z = teamshot_size/2;
+    int cnt, tx, ty;
+    static XPoint points[NUM_ASTEROID_POINTS+2];
+
+    for (cnt = 0; cnt < NUM_ASTEROID_POINTS; cnt++) {
+	tx = (int)(asteroidShapes[type][cnt][rot].x * size * 1.4);
+	ty = (int)(asteroidShapes[type][cnt][rot].y * size * 1.4);
+
+	points[cnt].x = WINSCALE(X(x + tx));
+	points[cnt].y = WINSCALE(Y(y + ty));
+
+    }
+    points[cnt++] = points[0];
+
+    SET_FG(colors[WHITE].pixel);
+    rd.drawLines(dpy, p_draw, gc, points, cnt, 0);
+    Erase_points(0, points, cnt);
+
+}
+
+
+static void Gui_paint_nastyshot(int color, int x, int y, int size)
+{
+	int z = size;
 
     if (rfrac() < 0.5f) {
-	Segment_add(color,
-		    x - z, y - z,
+	Segment_add(color, 
+		    x - z, y - z, 
 		    x + z, y + z);
 	Segment_add(color,
 		    x + z, y - z,
@@ -269,11 +305,15 @@ static void Gui_paint_nastyshot(int color, int x, int y)
 
 void Gui_paint_fastshot(int color, int x, int y)
 {
-    if (!blockBitmaps) {
+    /* this is for those pesky invisible shots */
+    if (color == 0)
+	return;
+
+    if (!texturedObjects) {
         int z = shot_size/2;
 
 	if (showNastyShots) {
-	    Gui_paint_nastyshot(color, x, y);
+	    Gui_paint_nastyshot(color, x, y, z);
 	} else {
 	    Rectangle_add(color,
 			  x - z,
@@ -285,20 +325,20 @@ void Gui_paint_fastshot(int color, int x, int y)
 	int s_size = (shot_size > 8) ? 8 : shot_size ;
 	int z = s_size / 2;
 	Bitmap_paint(p_draw, BM_BULLET, WINSCALE(x) - z,
-                     WINSCALE(y) - z, s_size - 1);
+		     WINSCALE(y) - z, s_size - 1);
     }
 }
 
 void Gui_paint_teamshot(int color, int x, int y)
 {
-    if (!blockBitmaps) {
-	Gui_paint_nastyshot(color, x, y);
+    if (!texturedObjects) {
+	Gui_paint_nastyshot(teamShotColor, x, y, shot_size/2);
     }
     else {
 	int s_size = (teamshot_size > 8) ? 8 : shot_size ;
 	int z = s_size / 2;
 	Bitmap_paint(p_draw, BM_BULLET_OWN, WINSCALE(x) - z,
-                     WINSCALE(y) - z, s_size - 1);
+		     WINSCALE(y) - z, s_size - 1);
     }
 }
 
@@ -327,7 +367,7 @@ void Gui_paint_missile(int x, int y, int len, int dir)
     y1 = Y(y);
     x2 = (int)(x1 - tcos(dir) * len);
     y2 = (int)(y1 + tsin(dir) * len);
-    rd.drawLine(dpy, p_draw, gc,
+    rd.drawLine(dpy, p_draw, gc, 
 	    WINSCALE(x1), WINSCALE(y1), WINSCALE(x2), WINSCALE(y2));
     Erase_segment(4, WINSCALE(x1) , WINSCALE(y1),
 		  WINSCALE(x2) , WINSCALE(y2));
@@ -369,7 +409,7 @@ void Gui_paint_laser(int color, int x1, int y1, int len, int dir)
 
 void Gui_paint_paused(int x, int y, int count)
 {
-    if (!blockBitmaps) {
+    if (!texturedObjects) {
 
 	int		x0, y0;
 	static int	pauseCharWidth = -1;
@@ -385,7 +425,7 @@ void Gui_paint_paused(int x, int y, int count)
 	rd.fillRectangle(dpy, p_draw, gc,
 		       WINSCALE(x0), WINSCALE(y0),
 		       WINSCALE(2*half_pause_size+1), WINSCALE(2*half_pause_size+1));
-	if (count <= 0 || loops % 10 >= 5) {
+	if (count <= 0 || loopsSlow % 10 >= 5) {
 	    SET_FG(colors[mono?BLACK:WHITE].pixel);
 	    rd.drawRectangle(dpy, p_draw, gc,
 			   WINSCALE(x0 - 1),
@@ -404,8 +444,8 @@ void Gui_paint_paused(int x, int y, int count)
     }
     else {
 	Bitmap_paint(p_draw, BM_PAUSED, WINSCALE(X(x - BLOCK_SZ / 2)),
-                     WINSCALE(Y(y + BLOCK_SZ / 2)),
-                     (count <= 0 || loops % 10 >= 5) ? 1 : 0);
+		     WINSCALE(Y(y + BLOCK_SZ / 2)),
+		     (count <= 0 || loopsSlow % 10 >= 5) ? 1 : 0);
     }
 }
 
@@ -430,8 +470,7 @@ void Gui_paint_ecm(int x, int y, int size)
 
 void Gui_paint_refuel(int x0, int y0, int x1, int y1)
 {
-    if (!blockBitmaps) {
-
+    if (!texturedObjects) {
 	rd.drawLine(dpy, p_draw, gc,
 		    WINSCALE(X(x0)), WINSCALE(Y(y0)),
 		    WINSCALE(X(x1)), WINSCALE(Y(y1)));
@@ -452,8 +491,8 @@ void Gui_paint_refuel(int x0, int y0, int x1, int y1)
 	dy = (double)(y1 - y0) / 16;
 	for (i = 0; i < 16; i++) {
 	    Bitmap_paint(p_draw, BM_REFUEL, (int)(x0 + (dx * i) - size / 2),
-                         (int)(y0 + (dy * i) - size / 2),
-                         fuel[(loops + 16 - i) % 16]);
+			 (int)(y0 + (dy * i) - size / 2),
+			 fuel[(loops + 16 - i) % 16]);
 	}
     }
 }
@@ -462,9 +501,9 @@ void Gui_paint_refuel(int x0, int y0, int x1, int y1)
 void Gui_paint_connector(int x0, int y0, int x1, int y1, int tractor)
 {
     if (tractor) {
-		rd.setDashes(dpy, gc, 0, cdashes, NUM_CDASHES);
+	rd.setDashes(dpy, gc, 0, cdashes, NUM_CDASHES);
     } else {
-		rd.setDashes(dpy, gc, 0, dashes, NUM_DASHES);
+	rd.setDashes(dpy, gc, 0, dashes, NUM_DASHES);
     }
     rd.drawLine(dpy, p_draw, gc,
 	      WINSCALE(X(x0)), WINSCALE(Y(y0)),
@@ -480,7 +519,7 @@ void Gui_paint_connector(int x0, int y0, int x1, int y1, int tractor)
 void Gui_paint_transporter(int x0, int y0, int x1, int y1)
 {
     rd.drawLine(dpy, p_draw, gc,
-	      WINSCALE(X(x0)), WINSCALE(Y(y0)),
+	      WINSCALE(X(x0)), WINSCALE(Y(y0)), 
 		  WINSCALE(X(x1)), WINSCALE(Y(y1)));
     Erase_segment(1, WINSCALE(X(x0)), WINSCALE(Y(y0)),
 		  WINSCALE(X(x1)), WINSCALE(Y(y1)));
@@ -491,7 +530,7 @@ void Gui_paint_all_connectors_begin()
 {
     unsigned long	mask;
 
-    SET_FG(colors[WHITE].pixel);
+    SET_FG(colors[connColor].pixel);
     if (gcv.line_style != LineOnOffDash) {
 	gcv.line_style = LineOnOffDash;
 	mask = GCLineStyle;
@@ -522,7 +561,7 @@ void Gui_paint_ships_end()
 }
 
 
-void Gui_paint_rounddelay(int x, int y)
+static void Gui_paint_rounddelay(int x, int y)
 {
     char s[12];
     int	 t, text_width;
@@ -539,25 +578,69 @@ void Gui_paint_rounddelay(int x, int y)
 
 
 /*  Here starts the paint functions for ships  (MM) */
-void Gui_paint_ship_name(int x , int y, other_t *other)
+static void Gui_paint_ship_name(int x , int y, other_t *other)
 {
     FIND_NAME_WIDTH(other);
-    SET_FG(colors[WHITE].pixel);
-    rd.drawString(dpy, p_draw, gc,
-		WINSCALE(X(x)) - other->name_width / 2,
-		WINSCALE(Y(y) + 16) + gameFont->ascent,
-		other->id_string, other->name_len);
-    Erase_rectangle(WINSCALE(X(x)) - other->name_width / 2 - 1,
-		    WINSCALE(Y(y) + 16) + gameFont->ascent
-		     - gameFont->ascent, other->name_width + 4,
-		    gameFont->ascent + gameFont->descent + 5);
+    SET_FG(colors[shipNameColor].pixel);
+    if (shipNameColor) {
+	rd.drawString(dpy, p_draw, gc,
+		      WINSCALE(X(x)) - other->name_width / 2,
+		      WINSCALE(Y(y) + 16) + gameFont->ascent,
+		      other->id_string, other->name_len);
+	Erase_rectangle(WINSCALE(X(x)) - other->name_width / 2 - 1,
+			WINSCALE(Y(y) + 16) + gameFont->ascent
+			- gameFont->ascent, other->name_width + 4,
+			gameFont->ascent + gameFont->descent + 5);
+    }
+    if (BIT(hackedInstruments, SHOW_LIVES_BY_SHIP)
+	&& BIT(Setup->mode, LIMITED_LIVES)) {
+	char keff[4] = "";
+
+	sprintf(keff, "%03d", other->life);
+	if (other->life < 1) {
+	    SET_FG(colors[WHITE].pixel);
+	}
+	rd.drawString(dpy, p_draw, gc,
+		      WINSCALE(X(x) + SHIP_SZ),
+		      WINSCALE(Y(y) - SHIP_SZ) + gameFont->ascent,
+		      &keff[2], 1);
+	Erase_rectangle(WINSCALE(X(x)) + SHIP_SZ - 1,
+			WINSCALE(Y(y) + SHIP_SZ),
+			SHIP_SZ + 4,
+			gameFont->ascent + gameFont->descent + 5);
+    }
 }
 
 
-int Gui_calculate_ship_color(int id, other_t *other)
+static int Gui_is_my_tank(other_t *other)
+{
+    char	tank_name[MAX_NAME_LEN];
+
+    if (self == NULL
+	|| other == NULL
+	|| other->mychar != 'T'
+	|| (BIT(Setup->mode, TEAM_PLAY)
+	&& self->team != other->team)) {
+	    return 0;
+    }
+
+    if (strlcpy(tank_name, self->name, MAX_NAME_LEN) < MAX_NAME_LEN) {
+	strlcat(tank_name, "'s tank", MAX_NAME_LEN);
+    }
+
+    if (strcmp(tank_name, other->name)) {
+	return 0;
+    }
+
+    return 1;
+}
+
+
+static int Gui_calculate_ship_color(int id, other_t *other)
 {
     int ship_color = WHITE;
 
+#if 0 /* Mara - let's not! it's ugly */
     if (useErase){
 	/*
 	 * Outline the locked ship in a different color,
@@ -567,28 +650,71 @@ int Gui_calculate_ship_color(int id, other_t *other)
 	    ship_color = RED;
 	}
     }
+#endif
 
 #ifndef NO_BLUE_TEAM
     if (BIT(Setup->mode, TEAM_PLAY)
-	&& self != NULL
-	&& self->id != id
+	&& eyesId != id
 	&& other != NULL
-	&& self->team == other->team) {
+	&& eyeTeam == other->team) {
+	/* Paint teammates and allies ships with last life in teamLWColor */
+	if (BIT(Setup->mode, LIMITED_LIVES)
+	    && (other->life == 0))
+	    ship_color = teamLWColor;
+	else
 	    ship_color = BLUE;
+    }
+
+    if (eyes != NULL
+	&& eyesId != id
+	&& other != NULL
+	&& eyes->alliance != ' '
+	&& eyes->alliance == other->alliance) {
+	/* Paint teammates and allies ships with last life in teamLWColor */
+	if (BIT(Setup->mode, LIMITED_LIVES)
+	    && (other->life == 0))
+	    ship_color = teamLWColor;
+	else
+	    ship_color = BLUE;
+    }
+
+    if (Gui_is_my_tank(other)) {
+	ship_color = BLUE;
     }
 #endif
     if (roundDelay > 0 && ship_color == WHITE) {
 	ship_color = RED;
     }
+
+    /* Vato color hack start, edited by mara & kps */
+    if (BIT(Setup->mode, LIMITED_LIVES)) {
+	/* Paint your ship in selfLWColor when on last life */
+	if (eyes != NULL
+	    && eyes->id == id
+	    && eyes->life == 0) {
+	    ship_color = selfLWColor;
+	}
+	
+	/* Paint enemy ships with last life in enemyLWColor */
+	if (eyes != NULL
+	    && eyes->id != id
+	    && other != NULL
+	    && eyeTeam != other->team
+	    && other->life == 0) {
+	    ship_color = enemyLWColor;
+	}
+    }
+    /* Vato color hack end */
+
     return ship_color;
 }
 
 
-void Gui_paint_marking_lights(int id, int x, int y, wireobj *ship, int dir)
+static void Gui_paint_marking_lights(int id, int x, int y, shipobj *ship, int dir)
 {
     int lcnt;
 
-    if (((loops + id) & 0xF) == 0) {
+    if (((loopsSlow + id) & 0xF) == 0) {
 	for (lcnt = 0; lcnt < ship->num_l_light; lcnt++) {
 	    Rectangle_add(RED,
 			  X(x + ship->l_light[lcnt][dir].x) - 2,
@@ -605,7 +731,7 @@ void Gui_paint_marking_lights(int id, int x, int y, wireobj *ship, int dir)
 			X(x + ship->l_light[lcnt][dir].x),
 			Y(y + ship->l_light[lcnt][dir].y)+8);
 	}
-    } else if (((loops + id) & 0xF) == 2) {
+    } else if (((loopsSlow + id) & 0xF) == 2) {
 	for (lcnt = 0; lcnt < ship->num_r_light; lcnt++) {
 	    int rightLightColor = maxColors > 4 ? 4 : BLUE;
 	    Rectangle_add(rightLightColor,
@@ -627,7 +753,7 @@ void Gui_paint_marking_lights(int id, int x, int y, wireobj *ship, int dir)
 }
 
 
-void Gui_paint_shields_deflectors(int x, int y, int radius, int shield,
+static void Gui_paint_shields_deflectors(int x, int y, int radius, int shield,
 				  int deflector, int eshield, int ship_color)
 {
     int		e_radius = radius + 4;
@@ -636,12 +762,13 @@ void Gui_paint_shields_deflectors(int x, int y, int radius, int shield,
     int		scolor = -1;
     int		ecolor = -1;
 
-    IFWINDOWS(Trace("shield=%d deflector=%d eshield=%d\n",
-	shield, deflector, eshield);)
-    if (shield)
+/*    IFWINDOWS(Trace("shield=%d deflector=%d eshield=%d\n",
+	shield, deflector, eshield));
+*/
+    if (shield) 
 	scolor = ship_color;
     if (deflector)
-	ecolor = loops & 0x02 ? RED : BLUE;
+	ecolor = loopsSlow & 0x02 ? RED : BLUE;
     if (eshield && shield) {
 	if (ecolor != -1) {
 	    scolor = ecolor;
@@ -653,8 +780,8 @@ void Gui_paint_shields_deflectors(int x, int y, int radius, int shield,
 
     if (ecolor != -1) {		/* outer shield */
 	    SET_FG(colors[ecolor].pixel);
-	rd.drawArc(dpy, p_draw, gc,
-		   WINSCALE(X(x - half_e_radius)),
+	rd.drawArc(dpy, p_draw, gc, 
+		   WINSCALE(X(x - half_e_radius)), 
 		   WINSCALE(Y(y + half_e_radius)),
 		   WINSCALE(e_radius), WINSCALE(e_radius),
 		   0, 64 * 360);
@@ -665,8 +792,8 @@ void Gui_paint_shields_deflectors(int x, int y, int radius, int shield,
     }
     if (scolor != -1) {
 	    SET_FG(colors[scolor].pixel);
-	    rd.drawArc(dpy, p_draw, gc,
-		       WINSCALE(X(x - half_radius)),
+	    rd.drawArc(dpy, p_draw, gc, 
+		       WINSCALE(X(x - half_radius)), 
 		       WINSCALE(Y(y + half_radius)),
 		       WINSCALE(radius), WINSCALE(radius),
 		       0, 64 * 360);
@@ -677,27 +804,27 @@ void Gui_paint_shields_deflectors(int x, int y, int radius, int shield,
     }
 }
 
-void Set_drawstyle_dashed();
+static void Set_drawstyle_dashed(int ship_color, int cloak);
 
-void Gui_paint_ship_cloaked(int ship_color, XPoint *points, int point_count)
+static void Gui_paint_ship_cloaked(int ship_color, XPoint *points, int point_count)
 {
     Set_drawstyle_dashed(ship_color, 1);
     rd.drawLines(dpy, p_draw, gc, points, point_count, 0);
     Erase_points(1, points, point_count);
 }
 
-void Gui_paint_ship_phased(int ship_color, XPoint *points, int point_count)
+static void Gui_paint_ship_phased(int ship_color, XPoint *points, int point_count)
 {
     Gui_paint_ship_cloaked(ship_color, points, point_count);
 }
 
-void generic_paint_ship(int x, int y, int ang, int ship)
+static void generic_paint_ship(int x, int y, int ang, int ship)
 {
     Bitmap_paint(p_draw, ship, WINSCALE(X(x) - 16), WINSCALE(Y(y) - 16), ang);
 }
 
 
-void Gui_paint_ship_uncloaked(int id, XPoint *points,
+static void Gui_paint_ship_uncloaked(int id, XPoint *points,
 			      int ship_color, int point_count)
 {
     if (gcv.line_style != LineSolid) {
@@ -721,7 +848,7 @@ void Gui_paint_ship_uncloaked(int id, XPoint *points,
 }
 
 
-void Set_drawstyle_dashed(int ship_color, int cloak)
+static void Set_drawstyle_dashed(int ship_color, int cloak)
 {
     int mask;
     if (gcv.line_style != LineOnOffDash) {
@@ -736,12 +863,22 @@ void Set_drawstyle_dashed(int ship_color, int cloak)
 }
 
 
-int set_shipshape(int x, int y, int dir, wireobj *ship, XPoint *points)
+static int set_shipshape(int world_x, int world_y,
+		  int dir, shipobj *ship, XPoint *points)
 {
-    int cnt;
+    int			cnt;
+    register position	*ship_point_pos;
+    register XPoint	*xpts = points;
+    int			window_x;
+    int			window_y;
+
     for (cnt = 0; cnt < ship->num_points; cnt++) {
-	points[cnt].x = WINSCALE(X(x + ship->pts[cnt][dir].x));
-	points[cnt].y = WINSCALE(Y(y + ship->pts[cnt][dir].y));
+	ship_point_pos = &(ship->pts[cnt][dir]);
+	window_x = X(world_x + ship_point_pos->x);
+	window_y = Y(world_y + ship_point_pos->y);
+	xpts->x = WINSCALE(window_x);
+	xpts->y = WINSCALE(window_y);
+	xpts++;
     }
     points[cnt++] = points[0];
 
@@ -754,23 +891,33 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 {
     int			cnt, ship_color;
     other_t		*other;
-    wireobj		*ship;
+    shipobj		*ship;
     XPoint		points[64];
     int			ship_shape;
 
     ship = Ship_by_id(id);
     other = Other_by_id(id);
-
-
     ship_color = WHITE;
-    cnt = set_shipshape(x, y, dir, ship, points);
 
+    /* mara attempts similar behaviour to the kth ss hack */
+    if ((!BIT(hackedInstruments, SHOW_SHIP_SHAPES))
+	&& (self != NULL)
+	&& (self->id != id)) {
+	cnt = set_shipshape(x, y, dir, Default_ship(), points);
+    } else if ((!BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE))
+	       && (self != NULL)
+	       && (self->id == id)) {
+	cnt = set_shipshape(x, y, dir, Default_ship(), points);
+    } else {
+	cnt = set_shipshape(x, y, dir, ship, points);
+    }
+    /* mara end */
 
     /*
      * Determine if the name of the player should be drawn below
      * his/her ship.
      */
-    if (BIT(instruments, SHOW_SHIP_NAME)
+    if (shipNameColor
 	&& self != NULL
 	&& self->id != id
 	&& other != NULL) {
@@ -786,19 +933,32 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     ship_color = Gui_calculate_ship_color(id, other);
 
     if (cloak == 0 && phased == 0) {
-        if (!blockBitmaps || !blockBitmapShips) {
+	if (!texturedObjects || !texturedShips) {
 	    Gui_paint_ship_uncloaked(id, points, ship_color, cnt);
-        }
-        else {
+	    /* shipshapeshack - Mara */
+	    if (shipShapesHackColor >= 1) {
+		Segment_add(shipShapesHackColor,
+			    (X(x + SHIP_SZ * tcos(dir))),
+			    (Y(y + SHIP_SZ * tsin(dir))),
+			    (X(x + (SHIP_SZ + 12) * tcos(dir))),
+			    (Y(y + (SHIP_SZ + 12) * tsin(dir))));
+		Arc_add(shipShapesHackColor,
+			X(x - SHIP_SZ), Y(y + SHIP_SZ),
+			2 * SHIP_SZ - 1, 2 * SHIP_SZ - 1,
+			0, 64 * 360);
+	    };
+	    /* shipshapeshack - Mara */
+	}
+	else {
 	    if (ship_color == BLUE)
 		ship_shape = BM_SHIP_FRIEND;
-	    else if (self != NULL && self->id != id)
+	    else if (self != NULL && self->id != id) 
 		ship_shape = BM_SHIP_ENEMY;
-	    else
+	    else 
 		ship_shape = BM_SHIP_SELF;
 
 	    generic_paint_ship(x, y, dir, ship_shape);
-        }
+	}
 
     }
 
@@ -812,8 +972,9 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     }
     if (shield || deflector) {
         Set_drawstyle_dashed(ship_color, cloak);
-	Gui_paint_shields_deflectors(x, y, ship->shield_radius,
-				    shield, deflector,
+	Gui_paint_shields_deflectors(x, y, ship->shield_radius, 
+				    shield, deflector, 
 				    eshield, ship_color);
-    }
+    }	
 }
+

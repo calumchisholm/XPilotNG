@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,23 +28,27 @@
 #define MAX_VISUAL_NAME	12
 
 #define MIN_TOP_WIDTH	(640 + 2)
-#define MAX_TOP_WIDTH	(1280 + 2)
-#define DEF_TOP_WIDTH	(1024 + 2)
+#define MAX_TOP_WIDTH	(1920 + 2)
+#define DEF_TOP_WIDTH	(1280 + 2)
 #define MIN_TOP_HEIGHT	480
-#define MAX_TOP_HEIGHT	1024
-#define DEF_TOP_HEIGHT	768
+#define MAX_TOP_HEIGHT	1440
+#define DEF_TOP_HEIGHT	1024
 
-#define MAX_POINTER_BUTTONS 5
+#define MAX_POINTER_BUTTONS	5
+#define MAX_BUTTON_DEFS		3
+#define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
 
 extern Atom		ProtocolAtom, KillAtom;
 extern int		buttonColor, windowColor, borderColor;
+extern int		scoreColor, scoreSelfColor, scoreInactiveColor;
+extern int		scoreInactiveSelfColor, scoreZeroColor;
 extern int		ButtonHeight;
 extern char		visualName[MAX_VISUAL_NAME];
 extern Visual		*visual;
 extern int		dispDepth;
 extern bool		mono;
 extern bool		useErase;
-extern bool		blockBitmaps;
+extern bool		texturedObjects;
 extern bool		fullColor;
 extern bool		colorSwitch;
 extern bool		multibuffer;
@@ -59,6 +63,7 @@ extern char		sparkColors[MSG_LEN];
 extern int		spark_color[MAX_COLORS];
 extern int		num_spark_colors;
 extern int		ignoreWindowManager;
+extern int		quitting;
 
 /*
  * Prototypes for xinit.c
@@ -110,3 +115,4 @@ extern int Credits_callback(int, void *, const char **);
 extern int Startup_server_motd(void);
 
 #endif
+

@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -31,6 +32,7 @@
 #define ED_TRANSPORTER		(-60*FUEL_SCALE_FACT)
 #define ED_HYPERJUMP		(-60*FUEL_SCALE_FACT)
 #define ED_SHIELD		(-0.20*FUEL_SCALE_FACT)
+#define ED_PHASING_DEVICE	(-0.40*FUEL_SCALE_FACT)
 #define ED_CLOAKING_DEVICE	(-0.07*FUEL_SCALE_FACT)
 #define ED_DEFLECTOR		(-0.15*FUEL_SCALE_FACT)
 #define ED_SHOT_HIT		(-25.0*FUEL_SCALE_FACT)
@@ -42,12 +44,35 @@
 #define ED_LASER_HIT		(-100.0*FUEL_SCALE_FACT)
 /* was 120 -> 80 -> 40 -> 50 -> 60 -> 100 */
 
-#define PTS_PR_PL_SHOT	    	-5    	/* Points if you get shot by a player */
-
 #define CANNON_SCORE	    	-1436
 #define WALL_SCORE	    	2000
 
 #define RATE_SIZE	    	20
 #define RATE_RANGE	    	1024
+
+/* score.c */
+
+void SCORE(int ind, DFLOAT points, int cx, int cy, const char *msg);
+void TEAM_SCORE(int team, DFLOAT points);
+void Alliance_score(int id, DFLOAT points);
+DFLOAT Rate(DFLOAT winner, DFLOAT loser);
+
+/*
+ * Cause `winner' to get `winner_score' points added with message
+ * `winner_msg', and similarly with the `loser' and equivalent
+ * variables.
+ *
+ * In general the winner_score should be positive, and the loser_score
+ * negative, but this need not be true.
+ *
+ * If the winner and loser players are on the same team, the scores are
+ * made negative, since you shouldn't gain points by killing team members,
+ * or being killed by a team member (it is both players faults).
+ *
+ * KK 28-4-98: Same for killing your own tank.
+ * KK 7-11-1: And for killing a member of your alliance
+ */
+void Score_players(int winner, DFLOAT winner_score, char *winner_msg,
+		   int loser, DFLOAT loser_score, char *loser_msg);
 
 #endif

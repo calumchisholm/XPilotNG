@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,8 +25,6 @@
 #ifndef	TYPES_H
 #define	TYPES_H
 
-#include <sys/types.h>
-
 #ifndef	_WINDOWS
 typedef signed char	byte;
 #endif
@@ -40,7 +38,7 @@ typedef unsigned char	u_byte;
 #define false	0
 #define true	1
 
-#ifndef _XPMONNT_
+#ifndef	_XPMONNT_
 #define bool	int
 #endif
 
@@ -61,7 +59,8 @@ typedef ivec			ipos;
 typedef struct { int x, y, w, h;} irec;
 
 #ifdef _WINDOWS
-#define	strncasecmp(__s, __t, __l)	strnicmp(__s, __t, __l)
-#define	strcasecmp(__s, __t)	stricmp(__s, __t)
+# define strncasecmp(__s, __t, __l)	strnicmp(__s, __t, __l)
+# define strcasecmp(__s, __t)	stricmp(__s, __t)
 #endif
+
 #endif

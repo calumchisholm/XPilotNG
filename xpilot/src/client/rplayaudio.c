@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -31,8 +31,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
-#include <netdb.h>
+
+#if !defined(_WINDOWS)
+# include <netdb.h>
+# include <sys/param.h>
+#endif
 
 #include "version.h"
 #include "rplay.h"
@@ -51,7 +54,7 @@ int audioDeviceInit(char *display)
 
     strlcpy(host, display, sizeof(host));
 
-    if (p = strrchr(host, ':'))
+    if ((p = strrchr(host, ':')) != NULL)
 	*p = 0;
 
     if (!*host)
@@ -79,13 +82,13 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
 	    name = filename;
 	}
 	*p = rplay_create(RPLAY_PLAY);
-	rplay_set(*p, RPLAY_INSERT, 0, RPLAY_SOUND, strdup(name), NULL);
+	rplay_set(*p, RPLAY_INSERT, 0, RPLAY_SOUND, xp_strdup(name), NULL);
     }
 
     rplay_set(*p, RPLAY_CHANGE, 0, RPLAY_VOLUME, volume, NULL);
     rplay(fd, *p);
 }
 
-void audioDeviceEvents()
+void audioDeviceEvents(void)
 {
 }

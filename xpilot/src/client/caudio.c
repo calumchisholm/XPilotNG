@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -35,6 +35,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/types.h>
 
 #include "version.h"
 #include "config.h"
@@ -43,6 +45,7 @@
 #include "audio.h"
 #include "client.h"
 #include "error.h"
+#include "commonproto.h"
 
 char caudio_version[] = VERSION;
 
@@ -58,7 +61,7 @@ static struct {
 void audioInit(char *display)
 {
     FILE           *fp;
-    char            buf[512], *file, *sound, *ifile, *p;
+    char            buf[512], *file, *sound, *ifile;
     int             i, j;
 
     if (!maxVolume) {
@@ -80,18 +83,24 @@ void audioInit(char *display)
 
 	for (i = 0; i < MAX_SOUNDS; i++)
 	    if (!strcmp(sound, soundNames[i])) {
-		table[i].filenames = (char **)malloc(sizeof(char *) * MAX_RANDOM_SOUNDS);
-		table[i].private = (void **)malloc(sizeof(void *) * MAX_RANDOM_SOUNDS);
-		memset((char *) table[i].private, 0, sizeof(void *) * MAX_RANDOM_SOUNDS);
+		size_t filename_ptrs_size = sizeof(char *) * MAX_RANDOM_SOUNDS;
+		size_t private_ptrs_size = sizeof(void *) * MAX_RANDOM_SOUNDS;
+		table[i].filenames = (char **)malloc(filename_ptrs_size);
+		table[i].private = (void **)malloc(private_ptrs_size);
+		memset(table[i].private, 0, private_ptrs_size);
 		ifile = strtok(file, " \t\n|");
 		j = 0;
 		while (ifile && j < MAX_RANDOM_SOUNDS) {
 		    if (*ifile == '/')
-			table[i].filenames[j] = strdup(ifile);
-		    else if (table[i].filenames[j] =
-			     (char *)malloc(strlen(Conf_sounddir()) + strlen(ifile) + 1)) {
-			strcpy(table[i].filenames[j], Conf_sounddir());
-			strcat(table[i].filenames[j], ifile);
+			table[i].filenames[j] = xp_strdup(ifile);
+		    else {
+			size_t filename_size = strlen(Conf_sounddir())
+					     + strlen(ifile) + 1;
+			table[i].filenames[j] = (char *)malloc(filename_size);
+			if (table[i].filenames[j] != NULL) {
+			    strcpy(table[i].filenames[j], Conf_sounddir());
+			    strcat(table[i].filenames[j], ifile);
+			}
 		    }
 		    j++;
 		    ifile = strtok(NULL, " \t\n|");
@@ -110,7 +119,7 @@ void audioInit(char *display)
     audioEnabled = !audioDeviceInit(audioServer[0] ? audioServer : display);
 }
 
-void audioCleanup()
+void audioCleanup(void)
 {
     /* release malloc'ed memory here */
     int			i;
@@ -127,7 +136,7 @@ void audioCleanup()
     }
 }
 
-void audioEvents()
+void audioEvents(void)
 {
     if (audioEnabled)
 	audioDeviceEvents();
@@ -145,7 +154,7 @@ int Handle_audio(int type, int volume)
 	/*
 	 * Multiple sounds were specified.  Pick one at random.
 	 */
-	pick = rand() % table[type].nsounds;
+	pick = randomMT() % table[type].nsounds;
     }
 
     if (!table[type].private[pick]) {

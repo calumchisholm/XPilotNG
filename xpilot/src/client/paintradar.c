@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,12 +28,14 @@
 #include <errno.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#else
-#include "NT/winX.h"
-#include "NT/winXXPilot.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX_.h"
+# include "NT/winXXPilot.h"
 #endif
 
 #include "version.h"
@@ -47,6 +49,7 @@
 #include "paint.h"
 #include "paintdata.h"
 #include "xinit.h"
+#include "portability.h"
 
 char paintradar_version[] = VERSION;
 
@@ -122,8 +125,6 @@ static void Windows_copy_sliding_radar(float xf, float yf)
 		    slidingradar_x, slidingradar_y,
 		    256-slidingradar_x, RadarHeight-slidingradar_y);
     p_radar = radar;
-
-    XSetForeground(dpy, radarGC, colors[WHITE].pixel);
 }
 #endif
 
@@ -134,21 +135,21 @@ static void Paint_checkpoint_radar(float xf, float yf)
     XPoint		points[5];
 
     if (BIT(Setup->mode, TIMING)) {
-        if (oldServer) {
-            Check_pos_by_index(nextCheckPoint, &x, &y);
-            x = ((int)(x * BLOCK_SZ * xf + 0.5) ) - slidingradar_x;
-            y = (RadarHeight - (int)(y * BLOCK_SZ * yf + 0.5) + DSIZE - 1) -
-                slidingradar_y;
-        } else {
-            irec b = checks[nextCheckPoint].bounds;
-            x = (int)(b.x * xf + 0.5) - slidingradar_x;
-            y = (RadarHeight - (int)(b.y * yf + 0.5) + DSIZE - 1) -
-                slidingradar_y;
-        }
-        if (x <= 0) {
-            x += 256;
-        }
-        if (y <= 0) {
+	if (oldServer) {
+	    Check_pos_by_index(nextCheckPoint, &x, &y);
+	    x = ((int) (x * BLOCK_SZ * xf + 0.5)) - slidingradar_x;
+	    y = (RadarHeight - (int) (y * BLOCK_SZ * yf + 0.5) + DSIZE -
+		 1) - slidingradar_y;
+	} else {
+	    irec b = checks[nextCheckPoint].bounds;
+	    x = (int) (b.x * xf + 0.5) - slidingradar_x;
+	    y = (RadarHeight - (int) (b.y * yf + 0.5) + DSIZE - 1) -
+		slidingradar_y;
+	}
+	if (x <= 0) {
+	    x += 256;
+	}
+	if (y <= 0) {
 	    y += RadarHeight;
 	}
 	/* top */
@@ -208,18 +209,19 @@ static void Paint_self_radar(float xf, float yf)
     }
 }
 
-static void Paint_objects_radar(float xf, float yf)
+static void Paint_objects_radar(void)
 {
     int			i, x, y, xw, yw;
 
     for (i = 0; i < num_radar; i++) {
 	int s = radar_ptr[i].size;
 
-	if (s <= 0)
+	if (s <= 0) {
 	    s = 1;
+	}
 	XSetForeground(dpy, radarGC, colors[radar_ptr[i].color].pixel);
-	x = (int)(radar_ptr[i].x * xf + 0.5) - s / 2 - slidingradar_x;
-	y = RadarHeight - (int)(radar_ptr[i].y * yf + 0.5) - 1 - s / 2 - slidingradar_y;
+	x = radar_ptr[i].x - s / 2 - slidingradar_x;
+	y = RadarHeight - radar_ptr[i].y - 1 - s / 2 - slidingradar_y;
 	if (x <= 0) {
 	    x += 256;
 	}
@@ -246,6 +248,7 @@ static void Paint_objects_radar(float xf, float yf)
 		}
 	    }
 	}
+	/*XSetForeground(dpy, radarGC, colors[WHITE].pixel);*/
     }
     if (num_radar) {
 	RELEASE(radar_ptr, num_radar, max_radar);
@@ -282,7 +285,7 @@ void Paint_radar(void)
     Paint_checkpoint_radar(xf, yf);
 
     Paint_self_radar(xf, yf);
-    Paint_objects_radar(xf, yf);
+    Paint_objects_radar();
 }
 
 
@@ -318,8 +321,7 @@ void Paint_sliding_radar(void)
     }
 }
 
-
-void Paint_world_radar_old(void)
+static void Paint_world_radar_old(void)
 {
     int			i, xi, yi, xm, ym, xp, yp = 0;
     int			xmoff, xioff;
@@ -336,10 +338,6 @@ void Paint_world_radar_old(void)
 
     radar_exposures = 2;
 
-#ifdef _WINDOWS
-	XSetForeground(dpy, s_radar, colors[BLACK].pixel);
-    XFillRectangle(dpy, s_radar, radarGC, 0, 0, 256, RadarHeight);
-#else
     if (s_radar == p_radar) {
 	XSetPlaneMask(dpy, radarGC,
 		      AllPlanes & ~(dpl_1[0] | dpl_1[1]));
@@ -351,7 +349,6 @@ void Paint_world_radar_old(void)
     } else {
 	XClearWindow(dpy, radar);
     }
-#endif
 
     /*
      * Calculate an array which is later going to be indexed
@@ -452,11 +449,7 @@ void Paint_world_radar_old(void)
 			}
 			start = end = yp;
 			currColor = visibleColor[type];
-#ifdef _WINDOWS
-			XSetForeground(dpy, s_radar, currColor);
-#else
 			XSetForeground(dpy, radarGC, colors[currColor].pixel);
-#endif
 		    } else {
 			end = yp;
 			visibleColorChange = (visibleColor[type] != currColor);
@@ -541,11 +534,7 @@ void Paint_world_radar_old(void)
 			}
 			start = end = yp;
 			currColor = visibleColor[type];
-#ifdef _WINDOWS
-			XSetForeground(dpy, s_radar, currColor);
-#else
 			XSetForeground(dpy, radarGC, colors[currColor].pixel);
-#endif
 		    } else {
 			end = yp;
 			visibleColorChange = visibleColor[type] != currColor;
@@ -591,11 +580,7 @@ void Paint_world_radar_old(void)
 		    }
 		    start = end = yp;
 		    currColor = visibleColor[type];
-#ifdef _WINDOWS
-		    XSetForeground(dpy, s_radar, currColor);
-#else
 		    XSetForeground(dpy, radarGC, colors[currColor].pixel);
-#endif
 		}
 	    }
 	}
@@ -626,6 +611,7 @@ void Paint_world_radar_old(void)
     }
 }
 
+
 static void Compute_radar_bounds(ipos *min, ipos *max, const irec *b)
 {
     min->x = (0 - (b->x + b->w)) / Setup->width;
@@ -636,28 +622,21 @@ static void Compute_radar_bounds(ipos *min, ipos *max, const irec *b)
     if (0 > b->y + b->h) min->y++;
     max->y = (0 + Setup->height - b->y) / Setup->height;
     if (0 + Setup->height < b->y) max->y--;
-
 }
 
-void Paint_world_radar(void)
+static void Paint_world_radar_new(void)
 {
     int i, j, xoff, yoff;
     ipos min, max;
     static XPoint poly[10000];
-
+    
 #define DBG if(0) printf
-
-    if (oldServer) {
-	Paint_world_radar_old();
-	return;
-    }
-
+	   
     /* what the heck is this? */
     radar_exposures = 2;
-
+    
     if (s_radar == p_radar)
-	XSetPlaneMask(dpy, radarGC,
-		      AllPlanes&(~(dpl_1[0]|dpl_1[1])));
+	XSetPlaneMask(dpy, radarGC, AllPlanes & (~(dpl_1[0] | dpl_1[1])));
     if (s_radar != radar) {
 	/* Clear radar */
 	XSetForeground(dpy, radarGC, colors[BLACK].pixel);
@@ -665,37 +644,32 @@ void Paint_world_radar(void)
     } else {
 	XClearWindow(dpy, radar);
     }
-
-
-#ifdef _WINDOWS
-    XSetForeground(dpy, s_radar, wallRadarColor);
-#else
+        
     XSetForeground(dpy, radarGC, colors[wallRadarColor].pixel);
-#endif
-
+    
     /* loop through all the polygons */
     for (i = 0; i < num_polygons; i++) {
 	Compute_radar_bounds(&min, &max, &polygons[i].bounds);
 	for (xoff = min.x; xoff <= max.x; xoff++) {
 	    for (yoff = min.y; yoff <= max.y; yoff++) {
-		DBG("%d %d %d\n", i, xoff, yoff);
-
+		/*DBG("%d %d %d\n", i, xoff, yoff);*/
+		
 		/* location of current polygon */
 		int x = polygons[i].points[0].x + xoff * Setup->width;
 		int y = - polygons[i].points[0].y + (1-yoff) * Setup->height;
-
+		
 		if (BIT(polygon_styles[polygons[i].style].flags,
 			STYLE_INVISIBLE_RADAR)) continue;
-
+		
 		poly[0].x = (x * 256) / Setup->width;
 		poly[0].y = (y * RadarHeight) / Setup->height;
-
+		
 		/* loop through the points in the current polygon */
 		for (j = 1; j < polygons[i].num_points; j++) {
-
+		    
 		    x += polygons[i].points[j].x;
 		    y -= polygons[i].points[j].y;
-
+		    
 		    poly[j].x = (x * 256) / Setup->width;
 		    poly[j].y = (y * RadarHeight) / Setup->height;
 		}
@@ -708,14 +682,25 @@ void Paint_world_radar(void)
 	    }
 	}
     }
-
+    
 #undef DBG
-
+    
     if (s_radar == p_radar)
-	XSetPlaneMask(dpy, radarGC,
-		      AllPlanes&(~(dpl_2[0]|dpl_2[1])));
+	XSetPlaneMask(dpy, radarGC, AllPlanes & (~(dpl_2[0] | dpl_2[1])));
 }
 
+void Paint_world_radar(void)
+{
+    IFWINDOWS(xid[radarGC].hgc.xidhwnd = s_radar);
+    
+    if (oldServer) {
+	Paint_world_radar_old();
+    } else {
+	Paint_world_radar_new();
+    }
+	
+    IFWINDOWS(xid[radarGC].hgc.xidhwnd = radar;)
+}
 
 
 /*
@@ -763,3 +748,4 @@ void Paint_radar_block(int xi, int yi, int color)
 		      AllPlanes & ~(dpl_2[0] | dpl_2[1]));
     }
 }
+

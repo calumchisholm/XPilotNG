@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,16 +31,20 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <sys/time.h>
-#else
-#include "NT/winServer.h"
+# include <unistd.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winServer.h"
 #endif
 
 #define SERVER
 #include "config.h"
 #include "version.h"
-#include "const.h"
+#include "serverconst.h"
 #include "types.h"
 #include "global.h"
 #include "proto.h"
@@ -50,16 +55,16 @@
 #include "saudio.h"
 #include "error.h"
 #include "netserver.h"
+#include "commonproto.h"
 
-#ifdef VMS
-#define META_VERSION	VERSION "-VMS"
-#elif defined(_WINDOWS)
+#if defined(_WINDOWS)
 #define	META_VERSION	TITLE
 #else
 #define META_VERSION	VERSION
 #endif
 
 char metaserver_version[] = VERSION;
+
 
 struct MetaServer {
     char		name[64];
@@ -76,10 +81,10 @@ struct MetaServer	meta_servers[2] = {
     },
 };
 
-extern		sock_t contactSocket;
+extern sock_t	contactSocket;
 static char	msg[MSG_LEN];
 
-extern int	NumPlayers, NumPseudoPlayers, NumQueuedPlayers;
+extern int	NumPlayers, NumRobots, NumPseudoPlayers, NumQueuedPlayers;
 extern int	login_in_progress;
 extern int	game_lock;
 extern time_t	serverTime;
@@ -93,11 +98,9 @@ void Meta_send(char *mesg, int len)
     }
 
     for (i = 0; i < NELEM(meta_servers); i++) {
-	if (sock_send_dest(&contactSocket, meta_servers[i].addr, META_PORT,
-			   mesg, len) != len) {
+	if (sock_send_dest(&contactSocket, meta_servers[i].addr, META_PORT, mesg, len) != len) {
 	    sock_get_error(&contactSocket);
-	    sock_send_dest(&contactSocket, meta_servers[i].addr, META_PORT,
-			   mesg, len);
+	    sock_send_dest(&contactSocket, meta_servers[i].addr, META_PORT, mesg, len);
 	}
     }
 }
@@ -137,9 +140,8 @@ void Meta_init(void)
     for (i = 0; i < NELEM(meta_servers); i++) {
 	addr = sock_get_addr_by_name(meta_servers[i].name);
 	if (addr) {
-	    strncpy(meta_servers[i].addr, addr,
+	    strlcpy(meta_servers[i].addr, addr,
 		    sizeof(meta_servers[i].addr));
-	    meta_servers[i].addr[sizeof(meta_servers[i].addr) - 1] = '\0';
 	}
 #ifndef SILENT
 	if (addr) {
@@ -167,8 +169,7 @@ void Meta_update(int change)
 #define GIVE_META_SERVER_A_HINT	180
 
     char 		string[MAX_STR_LEN];
-    char 		status[MAX_STR_LEN];
-    int			i, j;
+    int			i, j, len;
     int			num_active_players;
     bool		first = true;
     time_t		currentTime;
@@ -194,8 +195,6 @@ void Meta_update(int change)
     lastMetaSendTime = currentTime;
     queue_length = NumQueuedPlayers;
 
-    Server_info(status, sizeof(status));
-
     /* Find out the number of active players. */
     num_active_players = 0;
     memset(active_per_team, 0, sizeof active_per_team);
@@ -218,6 +217,9 @@ void Meta_update(int change)
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	j = 0;
 	for (i = 0; i < MAX_TEAMS; i++) {
+	    if (i == robotTeam && reserveRobotTeam) {
+		continue;
+	    }
 	    if (World.teams[i].NumBases > 0) {
 		sprintf(&freebases[j], "%d=%d,", i,
 			World.teams[i].NumBases - active_per_team[i]);
@@ -225,10 +227,13 @@ void Meta_update(int change)
 	    }
 	}
 	/* strip trailing comma. */
-	if (j) { freebases[j-1] = '\0'; }
+	if (j) {
+	    freebases[j-1] = '\0';
+	}
     }
     else {
-	sprintf(freebases, "=%d", World.NumBases - num_active_players - login_in_progress);
+	sprintf(freebases, "=%d",
+		World.NumBases - num_active_players - login_in_progress);
     }
 
     sprintf(string,
@@ -257,29 +262,45 @@ void Meta_update(int change)
 	    queue_length);
 
 
-    for (i=0; i < NumPlayers; i++) {
-	if (IS_HUMAN_IND(i) && !BIT(Players[i]->status, PAUSE)) {
-	    sprintf(string + strlen(string),
-		    "%s%s=%s@%s",
-		    (first) ? "add players " : ",",
-		    Players[i]->name,
-		    Players[i]->realname,
-		    Players[i]->hostname);
-	    if (BIT(World.rules->mode, TEAM_PLAY)) {
-		sprintf(status,"{%d}",Players[i]->team);
-		strcat(string,status);
-	    }
+    /*
+     * 'len' must always hold the exact number of
+     * non-zero bytes which are in string[].
+     */
+    len = strlen(string);
 
-	    first = false;
+    for (i = 0; i < NumPlayers; i++) {
+	if (IS_HUMAN_IND(i) && !BIT(Players[i]->status, PAUSE)) {
+	    if ((len + (4 * MAX_CHARS)) < sizeof(string)) {
+		sprintf(string + len,
+			"%s%s=%s@%s",
+			(first) ? "add players " : ",",
+			Players[i]->name,
+			Players[i]->realname,
+			Players[i]->hostname);
+		len += strlen(&string[len]);
+
+		if (BIT(World.rules->mode, TEAM_PLAY)) {
+		    sprintf(string + len,"{%d}",Players[i]->team);
+		    len += strlen(&string[len]);
+		}
+
+		first = false;
+	    }
 	}
     }
 
-    strcat(string,"\nadd status ");
-    if (strlen(string) + strlen(status) >= sizeof(string)) {
-	/* Prevent array overflow */
-	strcpy(&status[sizeof(string) - (strlen(string) + 2)], "\n");
-    }
-    strcat(string, status);
+    if (len + MSG_LEN < sizeof(string)) {
+	char status[MAX_STR_LEN];
 
-    Meta_send(string, strlen(string) + 1);
+	strlcpy(&string[len], "\nadd status ", sizeof(string) - len);
+	len += strlen(&string[len]);
+
+	Server_info(status, sizeof(status));
+
+	strlcpy(&string[len], status, sizeof(string) - len);
+	len += strlen(&string[len]);
+    }
+
+    Meta_send(string, len + 1);
 }
+

@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,14 +31,15 @@
 #include <time.h>
 #include <limits.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <pwd.h>
-#include <sys/param.h>
-#else
-#include "NT/winServer.h"
-#include "NT/winSvrThread.h"
+# include <unistd.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# include <pwd.h>
+# include <sys/param.h>
 #endif
 
 #ifdef PLOCKSERVER
@@ -48,11 +50,17 @@
 # endif
 #endif
 
+#ifdef _WINDOWS
+# include <io.h>
+# include "NT/winServer.h"
+# include "NT/winSvrThread.h"
+#endif
+
 #define	SERVER
 #include "version.h"
 #include "config.h"
 #include "types.h"
-#include "const.h"
+#include "serverconst.h"
 #include "global.h"
 #include "proto.h"
 #include "socklib.h"
@@ -62,32 +70,27 @@
 #include "netserver.h"
 #include "error.h"
 #include "portability.h"
-#include "srecord.h"
+#include "server.h"
 #include "commonproto.h"
+#include "srecord.h"
+#include "rank.h"
 
 char server_version[] = VERSION;
 
 #ifndef	lint
-static char versionid[] = "@(#)$" TITLE " $";
+char xpilots_versionid[] = "@(#)$" TITLE " $";
 #endif
 
 /*
  * Global variables
  */
 int			NumPlayers = 0;
-int                     NumObservers = 0;
-int                     NumOperators = 0;
-int			NumObjs = 0;
-int			NumPulses = 0;
-int			NumEcms = 0;
-int			NumTransporters = 0;
-int                     observerStart;
+int			NumAlliances = 0;
+int			NumObservers = 0;
+int			NumOperators = 0;
+int			observerStart;
 player			**Players;
-object			*Obj[MAX_TOTAL_SHOTS];
-pulse_t			*Pulses[MAX_TOTAL_PULSES];
-ecm_t			*Ecms[MAX_TOTAL_ECMS];
-trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
-int			GetInd[NUM_IDS + 1 + MAX_OBSERVERS];
+int			GetInd[NUM_IDS + MAX_OBSERVERS + 1];
 server			Server;
 char			*serverAddr;
 int			ShutdownServer = -1;
@@ -95,13 +98,18 @@ int			ShutdownDelay = 1000;
 char			ShutdownReason[MAX_CHARS];
 int 			framesPerSecond = 18;
 long			main_loops = 0;		/* needed in events.c */
-int                     roundCounter = 1;
+int 			roundCounter = 1;
 
 #ifdef LOG
 static bool		Log = true;
 #endif
 static bool		NoPlayersEnteredYet = true;
 int			game_lock = false;
+int			lock_zero = false;
+int			mute_zero = false;
+bool			teamZeroPausing;
+char			team_0[] = "team 0";
+
 time_t			gameOverTime = 0;
 time_t			serverTime = 0;
 
@@ -114,6 +122,9 @@ static void Handle_signal(int sig_no);
 
 int main(int argc, char **argv)
 {
+    int			timer_tick_rate;
+    char		*addr;
+
     /*
      * Make output always linebuffered.  By default pipes
      * and remote shells cause stdout to be fully buffered.
@@ -130,22 +141,22 @@ int main(int argc, char **argv)
 	      "for details see the\n"
 	   "  provided LICENSE file.\n\n");
 
-#ifdef SUNCMW
-    cmw_priv_init();
-#endif /* SUNCMW */
     init_error(argv[0]);
-    /* Removed seeding random number generator because of server recordings. */
     Check_server_versions();
-    if (!Parser(argc, argv))
-#ifndef _WINDOWS
-	exit(0);
-#else
-        return(0);
-#endif
+
+    /*seedMT((unsigned)time((time_t *)0) * Get_process_id());*/
+    /* Removed seeding random number generator because of server recordings. */
+
+    if (Parser(argc, argv) == FALSE) {
+	exit(1);
+    }
+
     Init_recording();
     plock_server(pLockServer);           /* Lock the server into memory */
     Make_table();			/* Make trigonometric tables */
     Compute_gravity();
+    Find_base_direction();
+
     Walls_init();
 
     /* Allocate memory for players, shots and messages */
@@ -156,45 +167,44 @@ int main(int argc, char **argv)
 
     Move_init();
 
-    Rank_init_saved_scores();
+    Robot_init();
 
-    if (BIT(World.rules->mode, TEAM_PLAY)) {
-	int i;
-	for (i=0; i < World.NumTreasures; i++)
-	    if (World.treasures[i].team != TEAM_NOT_SET)
-		Make_treasure_ball(i);
-    }
+    /* kps - remove ??? */
+    Treasure_init();
+
+    Rank_init_saved_scores();
 
     /*
      * Get server's official name.
      */
     if (serverHost) {
-	char *addr;
-
 	addr = sock_get_addr_by_name(serverHost);
 	if (addr == NULL) {
-	    warn("Failed name lookup on serverHost:%s", serverHost);
+	    errno = 0;
+	    error("Failed name lookup on: %s", serverHost);
 #ifndef _WINDOWS
 	    exit(1);
 #else
 	    return(1);
 #endif
 	}
-	serverAddr = strdup(addr);
-	strncpy(Server.host, serverHost, sizeof(Server.host) - 1);
-    }
-    else {
+	serverAddr = xp_strdup(addr);
+	strlcpy(Server.host, serverHost, sizeof(Server.host));
+    } else {
 	sock_get_local_hostname(Server.host, sizeof Server.host,
-		      (reportToMetaServer != 0 && searchDomainForXPilot != 0));
+				(reportToMetaServer != 0 &&
+				 searchDomainForXPilot != 0));
     }
-    Get_login_name(Server.name, sizeof Server.name);
+
+    Get_login_name(Server.owner, sizeof Server.owner);
 
     /*
      * Log, if enabled.
      */
     Log_game("START");
 
-    Contact_init();
+    if (!Contact_init())
+		return(FALSE);
 
     Meta_init();
 
@@ -222,14 +232,21 @@ int main(int argc, char **argv)
     serverTime = time(NULL);
 
 #ifndef SILENT
-    xpprintf("%s Server runs at %d frames per second\n", showtime(), framesPerSecond);
+    xpprintf("%s Server runs at %d frames per second\n",
+	     showtime(), framesPerSecond);
 #endif
 
+    if (timerResolution > 0) {
+	timer_tick_rate = timerResolution;
+    }
+    else {
+	timer_tick_rate = FPS;
+    }
 #ifdef _WINDOWS
     /* Windows returns here, we let the worker thread call sched() */
-    install_timer_tick(ServerThreadTimerProc, timerResolution ? timerResolution : FPS);
+    install_timer_tick(ServerThreadTimerProc, timer_tick_rate);
 #else
-    install_timer_tick(Main_loop, timerResolution ? timerResolution : FPS);
+    install_timer_tick(Main_loop, timer_tick_rate);
 
     sched();
     xpprintf("sched returned!?");
@@ -243,6 +260,7 @@ void Main_loop(void)
 {
     main_loops++;
 
+    /* kps - xxx */
     if ((main_loops & 0x3F) == 0) {
 	Meta_update(0);
     }
@@ -263,9 +281,10 @@ void Main_loop(void)
 
     Input();
 
-    if (NumPlayers > NumPseudoPlayers || RawMode) {
+    if (NumPlayers > NumRobots + NumPseudoPlayers || RawMode) {
+
 	if (NoPlayersEnteredYet) {
-	    if (NumPlayers > NumPseudoPlayers) {
+	    if (NumPlayers > NumRobots + NumPseudoPlayers) {
 		NoPlayersEnteredYet = false;
 		if (gameDuration > 0.0) {
 		    xpprintf("%s Server will stop in %g minutes.\n", showtime(), gameDuration);
@@ -282,7 +301,7 @@ void Main_loop(void)
     }
 
     if (!NoQuit
-	&& NumPlayers == NumPseudoPlayers
+	&& NumPlayers == NumRobots + NumPseudoPlayers
 	&& !login_in_progress
 	&& !NumQueuedPlayers) {
 
@@ -290,7 +309,7 @@ void Main_loop(void)
 	    End_game();
 	}
 	if (serverTime + 5*60 < time(NULL)) {
-	    warn("First player has yet to show his butt, I'm bored... Bye!");
+	    error("First player has yet to show his butt, I'm bored... Bye!");
 	    Log_game("NOSHOW");
 	    End_game();
 	}
@@ -325,7 +344,7 @@ void Main_loop(void)
 /*
  *  Last function, exit with grace.
  */
-void End_game(void)
+int End_game(void)
 {
     player		*pl;
     char		msg[MSG_LEN];
@@ -333,7 +352,8 @@ void End_game(void)
     record = rrecord;
     playback = rplayback; /* Could be called from signal handler */
     if (ShutdownServer == 0) {
-	warn("Shutting down...");
+	errno = 0;
+	error("Shutting down...");
 	sprintf(msg, "shutting down: %s", ShutdownReason);
     } else {
 	sprintf(msg, "server exiting");
@@ -355,7 +375,7 @@ void End_game(void)
     }
     record = rrecord;
     playback = rplayback;
-
+    
     if (recordMode != 0) {
 	recordMode = 0;
 	Init_recording();
@@ -366,18 +386,21 @@ void End_game(void)
 
     Contact_cleanup();
 
-    Rank_web_scores();
-    Rank_save_data();
+    /* Ranking. */
+    Rank_write_webpage();     /* "Rank_score" */
+    Rank_write_score_file();
 
     Free_players();
     Free_shots();
     Free_map();
     Free_cells();
+    Free_options();
     Log_game("END");			    /* Log end */
 
 #ifndef _WINDOWS
     exit (0);
 #endif
+    return(FALSE); /* return FALSE so windows bubbles out of the main loop */
 }
 
 /*
@@ -395,8 +418,10 @@ void End_game(void)
  *
  * If all non-empty teams are full, the player is assigned
  * to a randomly chosen available team.
+ *
+ * Prefer not to place players in the robotTeam if possible.
  */
-int Pick_team(void)
+int Pick_team(int pick_for_type)
 {
     int			i,
 			least_players,
@@ -416,6 +441,20 @@ int Pick_team(void)
 	team_score[i] = 0;
 	available_teams[i] = 0;
     }
+    if (restrictRobots) {
+	if (pick_for_type == PickForRobot) {
+	    if (free_bases[robotTeam] > 0) {
+		return robotTeam;
+	    } else {
+		return TEAM_NOT_SET;
+	    }
+	}
+    }
+    if (reserveRobotTeam) {
+	if (pick_for_type != PickForRobot) {
+	    free_bases[robotTeam] = 0;
+	}
+    }
 
     /*
      * Find out which teams have actively playing members.
@@ -433,7 +472,7 @@ int Pick_team(void)
 	if (!playing[pl->team]++) {
 	    playing_teams++;
 	}
-	if (IS_HUMAN_PTR(pl)) {
+	if (IS_HUMAN_PTR(pl) || IS_ROBOT_PTR(pl)) {
 	    team_score[pl->team] += pl->score;
 	}
     }
@@ -472,20 +511,26 @@ int Pick_team(void)
 	}
     }
 
-    if (num_available_teams == 1) {
-	return available_teams[0];
-    }
-
-    if (num_available_teams > 1) {
-	losing_team = -1;
-	losing_score = LONG_MAX;
-	for (i = 0; i < num_available_teams; i++) {
-	    if (team_score[available_teams[i]] < losing_score) {
-		losing_team = available_teams[i];
-		losing_score = team_score[losing_team];
-	    }
+    /* kps - why check game lock here ??? */
+    if (!teamZeroPausing || !game_lock) {
+	if (num_available_teams == 1) {
+	    return available_teams[0];
 	}
-	return losing_team;
+
+	if (num_available_teams > 1) {
+	    losing_team = -1;
+	    losing_score = LONG_MAX;
+	    for (i = 0; i < num_available_teams; i++) {
+		if (team_score[available_teams[i]] < losing_score
+		    && available_teams[i] != robotTeam) {
+		    losing_team = available_teams[i];
+		    losing_score = team_score[losing_team];
+		}
+	    }
+	    return losing_team;
+	}
+    } else if (Team_zero_pausing_available()) {
+	return 0;
     }
 
     /*NOTREACHED*/
@@ -495,6 +540,8 @@ int Pick_team(void)
 
 /*
  * Return status for server
+ *
+ * TODO
 */
 void Server_info(char *str, unsigned max_size)
 {
@@ -506,24 +553,29 @@ void Server_info(char *str, unsigned max_size)
     char		msg[MSG_LEN];
 
     sprintf(str,
-	    "SERVER VERSION...: %s\n"
-	    "STATUS...........: %s\n"
-	    "MAX SPEED........: %d fps\n"
-	    "WORLD (%3dx%3d)..: %s\n"
-	    "      AUTHOR.....: %s\n"
-	    "PLAYERS (%2d/%2d)..:\n"
+	    "SERVER VERSION..: %s\n"
+	    "STATUS..........: %s\n"
+	    "MAX SPEED.......: %d fps\n"
+	    "WORLD...........: %s\n"
+	    "      AUTHOR....: %s\n"
+	    "      SIZE......: %dx%d pixels\n"
+	    "PLAYERS.........: %2d/%2d\n"
 	    "\n"
-	    "EXPERIMENTAL SERVER, see http://xpilot.sourceforge.net/\n",
+	    "EXPERIMENTAL SERVER, see\n"
+	    "http://xpilot.sourceforge.net/\n"
+	    "http://www.hut.fi/~ksoderbl/xpilot/xpilot-4.5.4X.txt\n"
+	    "\n",
 	    server_version,
 	    (game_lock && ShutdownServer == -1) ? "locked" :
 	    (!game_lock && ShutdownServer != -1) ? "shutting down" :
 	    (game_lock && ShutdownServer != -1) ? "locked and shutting down" : "ok",
 	    FPS,
-	    World.x, World.y, World.name, World.author,
+	    World.name, World.author, World.width, World.height,
 	    NumPlayers, World.NumBases);
 
     if (strlen(str) >= max_size) {
-	warn("Server_info string overflow (%d)", max_size);
+	errno = 0;
+	error("Server_info string overflow (%d)", max_size);
 	str[max_size - 1] = '\0';
 	return;
     }
@@ -532,23 +584,24 @@ void Server_info(char *str, unsigned max_size)
     }
 
     sprintf(msg, "\n"
-	    "NO:  TM: NAME:             LIFE:   SC:    PLAYER:\n"
-	    "-------------------------------------------------\n");
+	   "NO:  TM: NAME:             LIFE:   SC:    PLAYER:\n"
+	   "-------------------------------------------------\n");
     if (strlen(msg) + strlen(str) >= max_size) {
 	return;
     }
-    strcat(str, msg);
+    strlcat(str, msg, max_size);
 
     if ((order = (player **) malloc(NumPlayers * sizeof(player *))) == NULL) {
-	warn("No memory for order");
+	error("No memory for order");
 	return;
     }
-    for (i=0; i<NumPlayers; i++) {
+    for (i = 0; i < NumPlayers; i++) {
 	pl = Players[i];
-	if (BIT(World.rules->mode, LIMITED_LIVES))
+	if (BIT(World.rules->mode, LIMITED_LIVES)) {
 	    ratio = (DFLOAT) pl->score;
-	else
+	} else {
 	    ratio = (DFLOAT) pl->score / (pl->life + 1);
+	}
 	if ((best == NULL
 		|| ratio > best_ratio)
 	    && !BIT(pl->status, PAUSE)) {
@@ -565,13 +618,21 @@ void Server_info(char *str, unsigned max_size)
 	}
 	order[j] = pl;
     }
-    for (i=0; i<NumPlayers; i++) {
+    for (i = 0; i < NumPlayers; i++) {
 	pl = order[i];
-	strcpy(name, pl->name);
+	strlcpy(name, pl->name, MAX_CHARS);
+	if (IS_ROBOT_PTR(pl)) {
+	    if ((k = Robot_war_on_player(GetInd[pl->id])) != NO_ID) {
+		sprintf(name + strlen(name), " (%s)", Players[GetInd[k]]->name);
+		if (strlen(name) >= 19) {
+		    strcpy(&name[17], ")");
+		}
+	    }
+	}
 	sprintf(lblstr, "%c%c %-19s%03d%6d",
 		(pl == best) ? '*' : pl->mychar,
-		(pl->team == TEAM_NOT_SET) ? ' ' : pl->team+'0',
-		name, pl->life, (int)pl->score);
+		(pl->team == TEAM_NOT_SET) ? ' ' : (pl->team + '0'),
+		name, (int)pl->life, (int)pl->score);
 	sprintf(msg, "%2d... %-36s%s@%s\n",
 		i+1, lblstr, pl->realname,
 		IS_HUMAN_PTR(pl)
@@ -579,7 +640,7 @@ void Server_info(char *str, unsigned max_size)
 		: "xpilot.org");
 	if (strlen(msg) + strlen(str) >= max_size)
 	    break;
-	strcat(str, msg);
+	strlcat(str, msg, max_size);
     }
     free(order);
 }
@@ -587,6 +648,8 @@ void Server_info(char *str, unsigned max_size)
 
 static void Handle_signal(int sig_no)
 {
+    errno = 0;
+
 #ifndef _WINDOWS
     switch (sig_no) {
 
@@ -595,20 +658,20 @@ static void Handle_signal(int sig_no)
 	    signal(SIGHUP, SIG_IGN);
 	    return;
 	}
-	warn("Caught SIGHUP, terminating.");
+	error("Caught SIGHUP, terminating.");
 	End_game();
 	break;
     case SIGINT:
-	warn("Caught SIGINT, terminating.");
+	error("Caught SIGINT, terminating.");
 	End_game();
 	break;
     case SIGTERM:
-	warn("Caught SIGTERM, terminating.");
+	error("Caught SIGTERM, terminating.");
 	End_game();
 	break;
 
     default:
-	warn("Caught unkown signal: %d", sig_no);
+	error("Caught unkown signal: %d", sig_no);
 	End_game();
 	break;
     }
@@ -635,12 +698,12 @@ void Log_game(const char *heading)
 
     sprintf(str,"%-50.50s\t%10.10s@%-15.15s\tWorld: %-25.25s\t%10.10s\n",
 	    timenow,
-	    Server.name,
+	    Server.owner,
 	    Server.host,
 	    World.name,
 	    heading);
 
-    if ((fp = fopen(Conf_logfile(), "a")) == NULL) {   /* Couldn't open file */
+    if ((fp = fopen(Conf_logfile(), "a")) == NULL) {	/* Couldn't open file */
 	error("Couldn't open log file, contact %s", Conf_localguru());
 	return;
     }
@@ -739,71 +802,149 @@ void Game_Over(void)
 }
 
 
+void Server_log_admin_message(int ind, const char *str)
+{
+    /*
+     * Only log the message if logfile already exists,
+     * is writable and less than some KBs in size.
+     */
+    const char		*logfilename = adminMessageFileName;
+    const int		logfile_size_limit = adminMessageFileSizeLimit;
+    FILE		*fp;
+    struct stat		st;
+    player		*pl = Players[ind];
+    char		msg[MSG_LEN * 2];
+
+    if ((logfilename != NULL) &&
+	(logfilename[0] != '\0') &&
+	(logfile_size_limit > 0) &&
+	(access(logfilename, 2) == 0) &&
+	(stat(logfilename, &st) == 0) &&
+	(st.st_size + 80 < logfile_size_limit) &&
+	((size_t)(logfile_size_limit - st.st_size - 80) > strlen(str)) &&
+	((fp = fopen(logfilename, "a")) != NULL))
+    {
+	fprintf(fp,
+		"%s[%s]{%s@%s(%s)|%s}:\n"
+		"\t%s\n",
+		showtime(),
+		pl->name,
+		pl->realname, pl->hostname,
+		Get_player_addr(ind),
+		Get_player_dpy(ind),
+		str);
+	fclose(fp);
+	sprintf(msg, "%s [%s]:[%s]", str, pl->name, "GOD");
+	Set_player_message(pl, msg);
+    }
+    else {
+	Set_player_message(pl, " < GOD doesn't seem to be listening>");
+    }
+}
+
+
 /*
  * Verify that all source files making up this program have been
  * compiled for the same version.  Too often bugs have been reported
  * for incorrectly compiled programs.
  */
+extern char asteroid_version[];
+extern char auth_version[];
+extern char cannon_version[];
+extern char cell_version[];
+extern char checknames_version[];
+extern char cmdline_version[];
+extern char collision_version[];
+extern char command_version[];
+extern char config_version[];
+extern char contact_version[];
+extern char error_version[];
+extern char event_version[];
+extern char fileparser_version[];
+extern char frame_version[];
+extern char id_version[];
+extern char item_version[];
+extern char laser_version[];
+extern char map_version[];
+extern char math_version[];
+extern char metaserver_version[];
+extern char net_version[];
+extern char netserver_version[];
+extern char objpos_version[];
+extern char option_version[];
+extern char parser_version[];
+extern char play_version[];
+extern char player_version[];
+extern char polygon_version[];
+extern char portability_version[];
+extern char robot_version[];
+extern char robotdef_version[];
+extern char rules_version[];
+extern char saudio_version[];
+extern char sched_version[];
+extern char score_version[];
+extern char server_version[];
+extern char ship_version[];
+extern char shipshape_s_version[];
+extern char shot_version[];
+extern char socklib_version[];
+extern char update_version[];
+extern char walls_version[];
+extern char wildmap_version[];
+extern char xpmap_version[];
+extern char xp2map_version[];
+
 static void Check_server_versions(void)
 {
-    extern char		auth_version[],
-			cannon_version[],
-			cmdline_version[],
-			collision_version[],
-			error_version[],
-			event_version[],
-			frame_version[],
-			id_version[],
-			item_version[],
-			map_version[],
-			math_version[],
-			metaserver_version[],
-			net_version[],
-			netserver_version[],
-			option_version[],
-			play_version[],
-			player_version[],
-			portability_version[],
-			rules_version[],
-			saudio_version[],
-			server_version[],
-			socklib_version[],
-			sched_version[],
-			ship_version[],
-			shot_version[],
-			update_version[],
-			walls_version[];
     static struct file_version {
 	char		filename[16];
 	char		*versionstr;
     } file_versions[] = {
+	{ "asteroid", asteroid_version },
 	{ "auth", auth_version },
 	{ "cannon", cannon_version },
+	{ "cell", cell_version },
+	{ "checknames", checknames_version },
 	{ "cmdline", cmdline_version },
 	{ "collision", collision_version },
+	{ "command", command_version },
+	{ "config", config_version },
+	{ "contact", contact_version },
 	{ "error", error_version },
 	{ "event", event_version },
+	{ "fileparser", fileparser_version },
 	{ "frame", frame_version },
 	{ "id", id_version },
 	{ "item", item_version },
+	{ "laser", laser_version },
 	{ "map", map_version },
 	{ "math", math_version },
 	{ "metaserver", metaserver_version },
 	{ "net", net_version },
 	{ "netserver", netserver_version },
+	{ "objpos", objpos_version },
 	{ "option", option_version },
+	{ "parser", parser_version },
 	{ "play", play_version },
 	{ "player", player_version },
+	{ "polygon", polygon_version },
 	{ "portability", portability_version },
+	{ "robot", robot_version },
+	{ "robotdef", robotdef_version },
 	{ "rules", rules_version },
 	{ "saudio", saudio_version },
-	{ "server", server_version },
-	{ "socklib", socklib_version },
 	{ "sched", sched_version },
+	{ "score", score_version },
+	{ "server", server_version },
 	{ "ship", ship_version },
+	{ "shipshape_s", shipshape_s_version },
 	{ "shot", shot_version },
+	{ "socklib", socklib_version },
 	{ "update", update_version },
 	{ "walls", walls_version },
+	{ "wildmap", wildmap_version },
+	{ "xpmap", xpmap_version },
+	{ "xp2map", xp2map_version },
     };
     int			i;
     int			oops = 0;
@@ -811,7 +952,7 @@ static void Check_server_versions(void)
     for (i = 0; i < NELEM(file_versions); i++) {
 	if (strcmp(VERSION, file_versions[i].versionstr)) {
 	    oops++;
-	    warn("Source file %s.c (\"%s\") is not compiled "
+	    error("Source file %s.c (\"%s\") is not compiled "
 		  "for the current version (\"%s\")!",
 		  file_versions[i].filename,
 		  file_versions[i].versionstr,
@@ -819,8 +960,8 @@ static void Check_server_versions(void)
 	}
     }
     if (oops) {
-	warn("%d version inconsistency errors, cannot continue.", oops);
-	warn("Please recompile this program properly.");
+	error("%d version inconsistency errors, cannot continue.", oops);
+	error("Please recompile this program properly.");
 	exit(1);
     }
 }
@@ -876,9 +1017,4 @@ int plock_server(int onoff)
     }
     return 0;
 #endif
-}
-
-void tuner_plock(void)
-{
-    pLockServer = (plock_server(pLockServer) == 1) ? true : false;
 }

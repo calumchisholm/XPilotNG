@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -33,6 +33,7 @@
 #define MIN_RECEIVE_WINDOW_SIZE		1
 #define MAX_RECEIVE_WINDOW_SIZE		4
 
+extern int	simulating;
 extern int	receive_window_size;
 extern long	last_loops;
 
@@ -45,6 +46,7 @@ int Net_flush(void);
 int Net_fd(void);
 int Net_start(void);
 void Net_init_measurement(void);
+void Net_init_lag_measurement(void);
 int Net_input(void);
 /* void Net_measurement(long loop, int status);*/
 int Receive_start(void);
@@ -69,11 +71,14 @@ int Receive_phasingtime(void);
 int Receive_rounddelay(void);
 int Receive_debris(void);
 int Receive_wreckage(void);
+int Receive_asteroid(void);
+int Receive_wormhole(void);
 int Receive_fastshot(void);
 int Receive_ecm(void);
 int Receive_trans(void);
 int Receive_paused(void);
 int Receive_radar(void);
+int Receive_fastradar(void);
 int Receive_damaged(void);
 int Receive_leave(void);
 int Receive_war(void);
@@ -81,6 +86,7 @@ int Receive_seek(void);
 int Receive_player(void);
 int Receive_score(void);
 int Receive_score_object(void);
+int Receive_team_score(void);
 int Receive_timing(void);
 int Receive_fuel(void);
 int Receive_cannon(void);

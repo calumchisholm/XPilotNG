@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -26,19 +27,22 @@
 #include <errno.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#else
-#include "NT/winServer.h"
+# include <unistd.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winServer.h"
 #endif
 
 #define SERVER
 #include "version.h"
-#include "const.h"
+#include "serverconst.h"
 #include "global.h"
 #include "proto.h"
 #include "error.h"
 
 char id_version[] = VERSION;
+
 
 static int		ID_queue[NUM_IDS];
 static int		ID_inuse[NUM_IDS + 1];
@@ -103,3 +107,4 @@ void release_ID(int id)
     ID_queue[put_ID++ % NUM_IDS] = id;
     ID_inuse[id] = 0;
 }
+

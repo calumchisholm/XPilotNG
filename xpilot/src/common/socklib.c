@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -22,6 +22,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,37 +33,49 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <sys/param.h>
-#include <sys/ioctl.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+# include <unistd.h>
+# ifdef _AIX
+#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
+# endif
+# include <sys/param.h>
+# include <sys/ioctl.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netinet/tcp.h>
+# include <arpa/inet.h>
+# include <netdb.h>
 #endif
 
 #ifdef SVR4
-#include <sys/filio.h>
+# include <sys/filio.h>
+#endif
+
+#ifdef _SEQUENT_
+# include <sys/fcntl.h>
+#else
+# include <fcntl.h>
 #endif
 
 #ifdef __sun__
-#include <arpa/nameserver.h>
-#include <resolv.h>
+# include <arpa/nameser.h>
+# include <resolv.h>
 #endif
 
 #ifdef _WINDOWS
-#include "NT/winNet.h"
-/* Windows needs specific system calls for sockets: */
-#undef close
-#define close(x__) closesocket(x__)
-#undef ioctl
-#define ioctl(x__, y__, z__) ioctlsocket(x__, y__, z__)
-#undef read
-#define read(x__, y__, z__) recv(x__, y__, z__,0)
-#undef write
-#define write(x__, y__, z__) send(x__, y__, z__,0)
+# include "NT/winNet.h"
+#include "../server/NT/winServer.h"
+  /* Windows needs specific system calls for sockets: */
+# undef close
+# define close(x__) closesocket(x__)
+# undef ioctl
+# define ioctl(x__, y__, z__) ioctlsocket(x__, y__, z__)
+# undef read
+# define read(x__, y__, z__) recv(x__, y__, z__,0)
+# undef write
+# define write(x__, y__, z__) send(x__, y__, z__,0)
 #endif
 
 #ifdef TERMNET
@@ -73,17 +86,20 @@
 /* Socklib Includes And Definitions */
 #include "version.h"
 #include "socklib.h"
+#include "commonproto.h"
 
 /* Debug macro */
 #ifdef DEBUG
-#define DEB(x) x
+# define DEB(x) x
 #else
-#define DEB(x)
+# define DEB(x)
 #endif
 
 #ifndef timerclear
-#define timerclear(tvp)   ((tvp)->tv_sec = (tvp)->tv_usec = 0)
+# define timerclear(tvp)   ((tvp)->tv_sec = (tvp)->tv_usec = 0)
 #endif
+
+
 
 #define SOCK_GETHOST_TIMEOUT	6
 
@@ -98,27 +114,27 @@ static struct hostent *sock_get_host_by_name(const char *name);
 static struct hostent *sock_get_host_by_addr(const char *addr, int len, int type);
 
 
-static void sock_flags_add(sock_t *sock, int bits)
+static void sock_flags_add(sock_t *sock, unsigned bits)
 {
     sock->flags |= bits;
 }
 
-static void sock_flags_set(sock_t *sock, int bits)
+static void sock_flags_set(sock_t *sock, unsigned bits)
 {
     sock->flags = bits;
 }
 
-static void sock_flags_remove(sock_t *sock, int bits)
+static void sock_flags_remove(sock_t *sock, unsigned bits)
 {
     sock->flags &= ~bits;
 }
 
-static int sock_flags_test_all(sock_t *sock, int bits)
+static int sock_flags_test_all(sock_t *sock, unsigned bits)
 {
-    return (sock->flags & bits) == bits;
+    return (sock->flags & bits) == (unsigned)bits;
 }
 
-static int sock_flags_test_any(sock_t *sock, int bits)
+static int sock_flags_test_any(sock_t *sock, unsigned bits)
 {
     return (sock->flags & bits) != 0;
 }
@@ -475,7 +491,7 @@ char * sock_get_last_addr(sock_t *sock)
 	if (sock_alloc_hostname(sock)) {
 	    return str;
 	}
-	strcpy(sock->hostname, str);
+	strlcpy(sock->hostname, str, SOCK_HOSTNAME_LENGTH);
 	return sock->hostname;
     }
 
@@ -503,7 +519,7 @@ char * sock_get_last_name(sock_t *sock)
 	if (sock_alloc_hostname(sock)) {
 	    return str;
 	}
-	strcpy(sock->hostname, str);
+	strlcpy(sock->hostname, str, SOCK_HOSTNAME_LENGTH);
 	return sock->hostname;
     }
 
@@ -614,8 +630,7 @@ void sock_get_local_hostname(char *name, unsigned size,
     if ((he = sock_get_host_by_name(name)) == NULL) {
 	return;
     }
-    strncpy(name, he->h_name, size);
-    name[size - 1] = '\0';
+    strlcpy(name, he->h_name, size);
 
     /*
      * If there are no dots in the name then we don't have the FQDN,
@@ -629,8 +644,7 @@ void sock_get_local_hostname(char *name, unsigned size,
 	memcpy((void *)&in, he->h_addr_list[0], sizeof(in));
 	if ((he = sock_get_host_by_addr((char *)&in, sizeof(in), AF_INET)) != NULL
 	    && strchr(he->h_name, '.') != NULL) {
-	    strncpy(name, he->h_name, size);
-	    name[size - 1] = '\0';
+	    strlcpy(name, he->h_name, size);
 	}
 	else {
 	    /* Let's try to find the domain from /etc/resolv.conf. */
@@ -672,8 +686,8 @@ void sock_get_local_hostname(char *name, unsigned size,
     dot = name;
     while ((dot = strchr(dot, '.')) != NULL) {
 	if (xpilot_len + strlen(dot) < sizeof(xpilot_hostname)) {
-	    strcpy(xpilot_hostname, xpilot);
-	    strcat(xpilot_hostname, dot);
+	    strlcpy(xpilot_hostname, xpilot, SOCK_HOSTNAME_LENGTH);
+	    strlcat(xpilot_hostname, dot, SOCK_HOSTNAME_LENGTH);
 	    /*
 	     * If there is a CNAME the h_name must be identical to the
 	     * FQDN we guessed above.  It is hard to know our IP to know
@@ -687,8 +701,7 @@ void sock_get_local_hostname(char *name, unsigned size,
 	++dot;
     }
     if (xpilot_he != NULL) {
-	strncpy(name, xpilot_hostname, size - 1);
-	name[size - 1] = 0;
+	strlcpy(name, xpilot_hostname, size);
     }
 
 #endif
@@ -820,24 +833,24 @@ static struct hostent *sock_get_host_by_name(const char *name)
     return hp;
 
 #else
+    
     /*
      * If you aren't connected to the net, then gethostbyname()
      * can take many minutes to time out.  WSACancelBlockingCall()
      * doesn't affect it.
      */
-
+    
     static char     chp[MAXGETHOSTSTRUCT+1];
     struct hostent* hp = (struct hostent*)&chp;
     HANDLE h;
     MSG msg;
     int i;
-
-    h = WSAAsyncGetHostByName(notifyWnd, WM_GETHOSTNAME, name,
-                              chp, MAXGETHOSTSTRUCT);
-
-    for (i = 0; i < SOCK_GETHOST_TIMEOUT; i++) {
-        if (PeekMessage(&msg, NULL, WM_GETHOSTNAME,
-                        WM_GETHOSTNAME, PM_REMOVE)) {
+    
+    h = WSAAsyncGetHostByName(notifyWnd, WM_GETHOSTNAME, name, 
+        chp, MAXGETHOSTSTRUCT);
+    
+    for(i = 0; i < SOCK_GETHOST_TIMEOUT; i++) {
+        if (PeekMessage(&msg, NULL, WM_GETHOSTNAME, WM_GETHOSTNAME, PM_REMOVE)) {
             return (WSAGETASYNCERROR(msg.lParam)) ? NULL : hp;
         }
         Sleep(1000);
@@ -880,3 +893,4 @@ static struct hostent *sock_get_host_by_addr(const char *addr, int len, int type
 
 #endif
 }
+

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -31,21 +31,31 @@
 #include <time.h>
 #include <sys/types.h>
 
-#ifndef _WINDOWS
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <sys/param.h>
-#include <sys/time.h>
-#include <X11/Xlib.h>
-#else
-#include "NT/winClient.h"
-#include "NT/winNet.h"
-#include "NT/winAudio.h"
-#include "NT/winX.h"
-#include "NT/winXThread.h"
-#include "NT/winXXPilot.h"
+#if !defined(_WINDOWS)
+# include <unistd.h>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netdb.h>
+# include <sys/param.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# include <X11/Xlib.h>
+#endif
+
+#ifdef _WINDOWS
+# include <limits.h>
+# include "NT/winclient.h"
+# include "NT/winNet.h"
+# include "NT/winAudio.h"
+# include "NT/winX.h"
+# include "NT/winXThread.h"
+# include "NT/winXXPilot.h"
+#endif
+
+#ifdef VMS
+# include <socket.h>
+# include <in.h>
 #endif
 
 #include "version.h"
@@ -67,15 +77,18 @@
 #include "portability.h"
 #include "talk.h"
 #include "bitmaps.h"
+#include "commonproto.h"
+#include "ignore.h"
 
-#ifdef SOUND
-#include "audio.h"
+#ifdef	SOUND
+# include "audio.h"
 #endif
 
 char netclient_version[] = VERSION;
 
 #define TALK_RETRY	2
 #define MAX_MAP_ACK_LEN	500
+#define KEYBOARD_STORE	20
 
 /*
  * Type definitions.
@@ -103,6 +116,7 @@ static sockbuf_t	rbuf,
 static frame_buf_t	*Frames;
 static int		(*receive_tbl[256])(void),
 			(*reliable_tbl[256])(void);
+static int		keyboard_delta;
 static unsigned		magic;
 static long		last_keyboard_change,
 			last_keyboard_ack,
@@ -112,11 +126,14 @@ static long		last_keyboard_change,
 			talk_pending,
 			talk_sequence_num,
 			talk_last_send;
+static long		keyboard_change[KEYBOARD_STORE],
+			keyboard_update[KEYBOARD_STORE],
+			keyboard_acktime[KEYBOARD_STORE];
 static char		talk_str[MAX_CHARS];
 
 
 extern void Colors_init_style_colors(void);
-extern void Mapdata_setup(const char*);
+extern void Mapdata_setup(const char *);
 
 
 /*
@@ -160,6 +177,7 @@ static void Receive_init(void)
     receive_tbl[PKT_CANNON]	= Receive_cannon;
     receive_tbl[PKT_TARGET]	= Receive_target;
     receive_tbl[PKT_RADAR]	= Receive_radar;
+    receive_tbl[PKT_FASTRADAR]	= Receive_fastradar;
     receive_tbl[PKT_RELIABLE]	= Receive_reliable;
     receive_tbl[PKT_QUIT]	= Receive_quit;
     receive_tbl[PKT_MODIFIERS]  = Receive_modifiers;
@@ -170,12 +188,15 @@ static void Receive_init(void)
     receive_tbl[PKT_ROUNDDELAY] = Receive_rounddelay;
     receive_tbl[PKT_LOSEITEM]	= Receive_loseitem;
     receive_tbl[PKT_WRECKAGE]	= Receive_wreckage;
+    receive_tbl[PKT_ASTEROID]	= Receive_asteroid;
+    receive_tbl[PKT_WORMHOLE]	= Receive_wormhole;
     for (i = 0; i < DEBRIS_TYPES; i++) {
 	receive_tbl[PKT_DEBRIS + i] = Receive_debris;
     }
 
     reliable_tbl[PKT_MOTD]	= Receive_motd;
     reliable_tbl[PKT_MESSAGE]	= Receive_message;
+    reliable_tbl[PKT_TEAM_SCORE] = Receive_team_score;
     reliable_tbl[PKT_PLAYER]	= Receive_player;
     reliable_tbl[PKT_SCORE]	= Receive_score;
     reliable_tbl[PKT_TIMING]	= Receive_timing;
@@ -265,18 +286,21 @@ static int Uncompress_map(void)
 }
 
 
+
 /* Get signed short and advance ptr */
 static int get_short(char **ptr)
 {
     *ptr += 2;
-    return ((signed char)*(*ptr - 2) << 8) + (unsigned char)(*(*ptr - 1));
+    return ((signed char) *(*ptr - 2) << 8) +
+	(unsigned char) (*(*ptr - 1));
 }
 
 /* Unsigned version */
 static unsigned int get_ushort(char **ptr)
 {
     *ptr += 2;
-    return ((unsigned char)*(*ptr - 2) << 8) + (unsigned char)*(*ptr - 1);
+    return ((unsigned char) *(*ptr - 2) << 8) + (unsigned char) *(*ptr -
+								  1);
 }
 
 static int get_32bit(char **ptr)
@@ -314,14 +338,14 @@ static void parse_styles(char **callptr)
     for (i = 0; i < num_polygon_styles; i++) {
 	polygon_styles[i].color = wallColor;
 	polygon_styles[i].rgb = get_32bit(&ptr);
-	polygon_styles[i].texture = 46 + (*ptr++);
+	polygon_styles[i].texture = NUM_BITMAPS + (*ptr++);
 	polygon_styles[i].def_edge_style = *ptr++;
 	polygon_styles[i].flags = *ptr++;
     }
 
     if (num_polygon_styles == 0) {
 	/* default polygon style */
-        polygon_styles[0].flags = 0;
+	polygon_styles[0].flags = 0;
 	polygon_styles[0].def_edge_style = 0;
 	num_polygon_styles = 1;
     }
@@ -330,11 +354,10 @@ static void parse_styles(char **callptr)
 	edge_styles[i].width = *ptr++;
 	edge_styles[i].color = wallColor;
 	edge_styles[i].rgb = get_32bit(&ptr);
-        edge_styles[i].style =
-            (*ptr == 1) ? LineOnOffDash :
-            (*ptr == 2) ? LineDoubleDash :
-            LineSolid;
-        ptr++;
+	edge_styles[i].style =
+	    (*ptr == 1) ? LineOnOffDash :
+	    (*ptr == 2) ? LineDoubleDash : LineSolid;
+	ptr++;
     }
 
     for (i = 0; i < num_bmaps; i++) {
@@ -360,7 +383,7 @@ static void parse_new(void)
     char *ptr, *edgeptr;
 
     oldServer = 0;
-    ptr = Setup->map_data;
+    ptr = (char *)Setup->map_data;
 
     parse_styles(&ptr);
 
@@ -375,8 +398,7 @@ static void parse_new(void)
 	edgeptr = ptr;
 	if (ecount) {
 	    edgechange = get_ushort(&edgeptr);
-	}
-	else
+	} else
 	    edgechange = INT_MAX;
 	ptr += ecount * 2;
 	pc = get_ushort(&ptr);
@@ -412,10 +434,14 @@ static void parse_new(void)
 	    dy = get_short(&ptr);
 	    cx += dx;
 	    cy += dy;
-	    if (min.x > cx) min.x = cx;
-	    if (min.y > cy) min.y = cy;
-	    if (max.x < cx) max.x = cx;
-	    if (max.y < cy) max.y = cy;
+	    if (min.x > cx)
+		min.x = cx;
+	    if (min.y > cy)
+		min.y = cy;
+	    if (max.x < cx)
+		max.x = cx;
+	    if (max.y < cy)
+		max.y = cy;
 	    points[j].x = dx;
 	    points[j].y = dy;
 
@@ -464,11 +490,13 @@ static void parse_new(void)
 	    bases[i].type = SETUP_BASE_DOWN;
 	else
 	    bases[i].type = SETUP_BASE_RIGHT;
+	bases[i].deathtime = -10000; /* kps hack */
 	ptr++;
     }
     num_fuels = get_ushort(&ptr);
     if (num_fuels != 0) {
-	fuels = (fuelstation_t *)malloc(num_fuels * sizeof(fuelstation_t));
+	fuels =
+	    (fuelstation_t *) malloc(num_fuels * sizeof(fuelstation_t));
 	if (fuels == NULL) {
 	    error("No memory for Map fuels (%d)", num_fuels);
 	    exit(1);
@@ -501,9 +529,11 @@ static void parse_new(void)
 	checks[i].bounds.h = BLOCK_SZ;
     }
 
-    if (Setup->data_url[0]) Mapdata_setup(Setup->data_url);
-	Colors_init_style_colors();
+    if (Setup->data_url[0])
+	Mapdata_setup(Setup->data_url);
+    Colors_init_style_colors();
 }
+
 
 
 /*
@@ -537,23 +567,24 @@ int Net_setup(void)
 	    if (done == 0) {
 		if (oldServer) {
 		    n = Packet_scanf(&cbuf,
-				 "%ld" "%ld%hd" "%hd%hd" "%hd%hd" "%s%s",
-				 &Setup->map_data_len,
-				 &Setup->mode, &Setup->lives,
-				 &Setup->x, &Setup->y,
-				 &Setup->frames_per_second, &Setup->map_order,
-				 Setup->name, Setup->author);
+				     "%ld" "%ld%hd" "%hd%hd" "%hd%hd" "%s%s",
+				     &Setup->map_data_len,
+				     &Setup->mode, &Setup->lives,
+				     &Setup->x, &Setup->y,
+				     &Setup->frames_per_second,
+				     &Setup->map_order, Setup->name,
+				     Setup->author);
 		    Setup->width = Setup->x * BLOCK_SZ;
 		    Setup->height = Setup->y * BLOCK_SZ;
-		}
-		else {
+		} else {
 		    n = Packet_scanf(&cbuf,
-				 "%ld" "%ld%hd" "%hd%hd" "%hd%s" "%s%S",
-				 &Setup->map_data_len,
-				 &Setup->mode, &Setup->lives,
-				 &Setup->width, &Setup->height,
-				 &Setup->frames_per_second, Setup->name,
-				 Setup->author, Setup->data_url);
+				     "%ld" "%ld%hd" "%hd%hd" "%hd%s" "%s%S",
+				     &Setup->map_data_len,
+				     &Setup->mode, &Setup->lives,
+				     &Setup->width, &Setup->height,
+				     &Setup->frames_per_second,
+				     Setup->name, Setup->author,
+				     Setup->data_url);
 		}
 		if (n <= 0) {
 		    errno = 0;
@@ -569,7 +600,7 @@ int Net_setup(void)
 		    || Setup->height <= 0
 		    || (oldServer && Setup->map_data_len >
 			Setup->x * Setup->y)) {
-		    errno = 0;
+			  errno = 0;
 		    error("Got bad map specs from server (%d,%d,%d)",
 			Setup->map_data_len, Setup->width, Setup->height);
 		    return -1;
@@ -655,18 +686,17 @@ int Net_setup(void)
     }
 
     if (oldServer) {
-	num_checks = 26; /* even if there really aren't any */
+	num_checks = OLD_MAX_CHECKS;	/* even if there really aren't any */
 	checks = malloc(num_checks * sizeof(checkpoint_t));
 	if (Setup->map_order != SETUP_MAP_UNCOMPRESSED) {
 	    if (Uncompress_map() == -1)
 		return -1;
-	}
+ 	}
 	return 0;
     }
     parse_new();
     return 0;
 }
-
 
 /*
  * Send the first packet to the server with our name,
@@ -711,8 +741,9 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 #endif
 	}
 	sock_set_timeout(&rbuf.sock, 1, 0);
-	if (sock_readable(&rbuf.sock) == 0)
+	if (sock_readable(&rbuf.sock) == 0) {
 	    continue;
+	}
 	Sockbuf_clear(&rbuf);
 	if (Sockbuf_read(&rbuf) == -1) {
 	    error("Can't read verify reply packet");
@@ -779,25 +810,49 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
  * 2) rbuf is used for receiving packets in (read/scanf).
  * 3) cbuf is used to copy the reliable data stream
  *    into from the raw and unreliable rbuf packets.
+ *
+ * kps - ng does not want this
+ * server == NULL sets up for internal simulation
  */
 int Net_init(char *server, int port)
 {
-    int		i,
-		status;
-    unsigned	size;
-    sock_t	sock;
+    int			i;
+    unsigned		size;
+    sock_t		sock;
 
 #ifndef _WINDOWS
     signal(SIGPIPE, SIG_IGN);
 #endif
 
     Receive_init();
-
-    if ((status = sock_open_udp(&sock, NULL, 0)) == -1) {
-	error("Can't create datagram socket");
-	return -1;
+    if (!clientPortStart || !clientPortEnd || (clientPortStart > clientPortEnd))
+    {
+	if (sock_open_udp(&sock, NULL, 0) == SOCK_IS_ERROR)
+	{
+	    error("Cannot create datagram socket (%d)", sock.error.error);
+	    return -1;
+	}
     }
-    if (sock_connect(&sock, server, port) == -1) {
+    else
+    {
+	int found_socket = 0;
+	for (i = clientPortStart; i <= clientPortEnd; i++)
+	{
+	    if (sock_open_udp(&sock, NULL, i) != SOCK_IS_ERROR)
+	    {
+		found_socket = 1;
+		break;
+	    }
+	}
+	if (found_socket == 0) 
+	{
+	    error("Could not find a usable port in given port range");
+	    return -1;
+	}
+    }
+    
+    
+    if (server && sock_connect(&sock, server, port) == -1) {
 	error("Can't connect to server %s on port %d", server, port);
 	sock_close(&sock);
 	return -1;
@@ -1077,6 +1132,7 @@ int Net_start(void)
     }
     packet_measure = NULL;
     Net_init_measurement();
+    Net_init_lag_measurement();
     errno = 0;
     return 0;
 }
@@ -1103,6 +1159,19 @@ void Net_init_measurement(void)
     }
 }
 
+void Net_init_lag_measurement(void)
+{
+    int i;
+
+    packet_lag = 0;
+    keyboard_delta = 0;
+    for (i = 0; i < KEYBOARD_STORE; i++) {
+	keyboard_change[i] = -1;
+	keyboard_update[i] = -1;
+	keyboard_acktime[i] = -1;
+    }
+}
+
 /*
  * Process a packet which most likely is a frame update,
  * perhaps with some reliable data in it.
@@ -1120,7 +1189,7 @@ static int Net_packet(void)
 
 	if (receive_tbl[type] == NULL) {
 	    errno = 0;
-	    IFNWINDOWS(error("Received unknown packet type (%d, %d), dropping frame.",
+	    IFNWINDOWS(error("Received unknown packet type (%d, %d), dropping frame.", 
 			type, prev_type);)
 	    Sockbuf_clear(&rbuf);
 	    break;
@@ -1180,6 +1249,51 @@ static int Net_packet(void)
     return 0;
 }
 
+static void Net_keyboard_track() {
+    int i, ind = -1;
+    long maxtime = 0;
+
+    /* look for a match for the keyboard change */
+    for (i = 0; i < KEYBOARD_STORE; i++) {
+	if (keyboard_change[i] == last_keyboard_change) {
+	    return;
+	}
+    }
+
+    /* look for a keyboard_change of -1 or an acknowledged change */
+    if (ind == -1) {
+	for (i = 0; i < KEYBOARD_STORE; i++) {
+	    if (keyboard_change[i] == -1
+		|| keyboard_acktime[i] != -1) {
+		ind = i;
+		break;
+	    }
+	}
+    }
+
+    /* next, look for the oldest update */
+    if (ind == -1) {
+	for (i = 0; i < KEYBOARD_STORE; i++) {
+	    if (keyboard_update[i] > maxtime) {
+		ind = i;
+		maxtime = keyboard_update[i];
+	    }
+	}
+    }
+
+    if (ind == -1) {
+	return;
+    }
+
+    keyboard_change[ind] = last_keyboard_change;
+    keyboard_update[ind] = last_keyboard_update;
+    keyboard_acktime[ind] = -1;
+
+#if 0
+    printf("T;%d;%ld;%ld ", ind, last_keyboard_change, last_keyboard_update);
+#endif
+}
+
 /*
  * Do some (simple) packet loss/drop measurement
  * the results of which can be drawn on the display.
@@ -1219,10 +1333,50 @@ static void Net_measurement(long loop, int status)
 	    packet_measure[i] = PACKET_LOSS;
 	}
 	delta = loop - packet_loop;
-    }
+   }
    if (packet_measure[(int)delta] != PACKET_DRAW) {
        packet_measure[(int)delta] = status;
    }
+}
+
+/* Do some lag measurement the results of which can
+ * be drawn on the display.  This is mainly for
+ * debugging and analysis.
+ */
+static void Net_lag_measurement(long key_ack)
+{
+    int		i, num;
+    long	sum;
+
+    for (i = 0; i < KEYBOARD_STORE; i++) {
+	if (keyboard_change[i] == key_ack
+	    && keyboard_acktime[i] == -1) {
+	    keyboard_acktime[i] = loops;
+#if 0
+	    printf("A;%d;%ld;%ld ", i, keyboard_change[i], keyboard_acktime[i]);
+#endif
+	    break;
+	}
+    }
+
+#if 0
+    if (i == KEYBOARD_STORE) {
+	printf("N ");
+    }
+#endif
+    
+    num = 0;
+    sum = 0;
+    for (i = 0; i < KEYBOARD_STORE; i++) {
+	if (keyboard_acktime[i] != -1L) {
+	    num++;
+	    sum += keyboard_acktime[i] - keyboard_update[i];
+	}
+    }
+
+    if (num != 0) {
+	packet_lag = (int) (sum / num);
+    }
 }
 
 /*
@@ -1250,7 +1404,7 @@ static int Net_read(frame_buf_t *frame)
 	    Sockbuf_clear(&frame->sbuf);
 	    return 0;
 	}
-	/* IFWINDOWS( Trace("Net_read: read %d bytes type=%d\n", frame->sbuf.len, frame->sbuf.ptr[0]); ) */
+	/*IFWINDOWS( Trace("Net_read: read %d bytes type=%d\n", frame->sbuf.len, frame->sbuf.ptr[0]); ) */
 	if (frame->sbuf.ptr[0] != PKT_START) {
 	    /*
 	     * Don't know which type of packet this is
@@ -1261,7 +1415,7 @@ static int Net_read(frame_buf_t *frame)
 	}
 	/* Peek at the frame loop number. */
 	n = Packet_scanf(&frame->sbuf, "%c%ld", &ch, &loop);
-	/* IFWINDOWS( Trace("Net_read: frame # %d\n", loop); ) */
+	/*IFWINDOWS( Trace("Net_read: frame # %d\n", loop); )*/
 	frame->sbuf.ptr = frame->sbuf.buf;
 	if (n <= 0) {
 	    if (n == -1) {
@@ -1282,7 +1436,7 @@ static int Net_read(frame_buf_t *frame)
 	     */
 	}
     }
-    /* IFWINDOWS( Trace("Net_read: wbuf->len=%d\n", wbuf.len); ) */
+	/*IFWINDOWS( Trace("Net_read: wbuf->len=%d\n", wbuf.len); )*/
 }
 
 /*
@@ -1375,7 +1529,7 @@ int Net_input(void)
 	if ((i == receive_window_size - 1 && i > 0)
 #ifdef _WINDOWS
 		|| drawPending
-		|| (ThreadedDraw &&
+		|| (ThreadedDraw && 
 				!WaitForSingleObject(dinfo.eventNotDrawing, 0) == WAIT_OBJECT_0)
 #endif
 		) {
@@ -1479,6 +1633,13 @@ int Net_input(void)
 	|| last_loops - last_send_anything > 5 * Setup->frames_per_second) {
 	Key_update();
 	last_send_anything = last_loops;
+    } else {
+	/*
+	 * 4.5.4a2: flush if non-empty
+	 * This should help speedup the map update speed
+	 * for maps with large number of targets or cannons.
+	 */
+	Net_flush();
     }
 
     return 1 + (last_frame > oldest_frame);
@@ -1523,6 +1684,7 @@ int Receive_start(void)
 	    last_keyboard_ack = key_ack;
 	}
     }
+    Net_lag_measurement(key_ack);
     if ((n = Handle_start(loops)) == -1) {
 	return -1;
     }
@@ -1666,25 +1828,25 @@ static void Check_view_dimensions(void)
     srv_height = height_wanted;
     LIMIT(srv_height, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
     LIMIT(srv_width, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
-    if (view_width != srv_width ||
-	view_height != srv_height) {
+    if (ext_view_width != srv_width ||
+	ext_view_height != srv_height) {
 	Send_display();
     }
 
-    real_view_width = view_width;
-    real_view_height = view_height;
-    view_x_offset = 0;
-    view_y_offset = 0;
-    if (width_wanted > view_width) {
-	view_width = width_wanted;
-	view_x_offset = (width_wanted - real_view_width) / 2;
+    active_view_width = ext_view_width;
+    active_view_height = ext_view_height;
+    ext_view_x_offset = 0;
+    ext_view_y_offset = 0;
+    if (width_wanted > ext_view_width) {
+	ext_view_width = width_wanted;
+	ext_view_x_offset = (width_wanted - active_view_width) / 2;
     }
-    if (height_wanted > view_height) {
-	view_height = height_wanted;
-	view_y_offset = (height_wanted - real_view_height) / 2;
+    if (height_wanted > ext_view_height) {
+	ext_view_height = height_wanted;
+	ext_view_y_offset = (height_wanted - active_view_height) / 2;
     }
 }
-
+  
 
 /*
  * Receive the packet with counts for all the items.
@@ -1783,7 +1945,7 @@ int Receive_self(void)
 		     "%c%c"
 		     ,
 		     &currentTank, &fuelSum, &fuelMax,
-		     &view_width, &view_height, &debris_colors,
+		     &ext_view_width, &ext_view_height, &debris_colors,
 		     &stat, &autopilotLight
 		     );
     if (n <= 0) {
@@ -2158,6 +2320,42 @@ int Receive_wreckage(void)	/* since 3.8.0 */
     return 1;
 }
 
+int Receive_asteroid(void)	/* since 4.4.0 */
+{
+    int			n;
+    short		x, y;
+    u_byte		ch, type_size, type, size, rot;
+
+    if ((n = Packet_scanf(&rbuf, "%c%hd%hd%c%c", &ch, &x, &y,
+			  &type_size, &rot)) <= 0) {
+	return n;
+    }
+
+    type = ((type_size >> 4) & 0x0F);
+    size = (type_size & 0x0F);
+
+    if ((n = Handle_asteroid(x, y, type, size, rot)) == -1) {
+	return -1;
+    }
+    return 1;
+}
+
+int Receive_wormhole(void)	/* since 4.5.0 */
+{
+    int			n;
+    short		x, y;
+    u_byte		ch;
+
+    if ((n = Packet_scanf(&rbuf, "%c%hd%hd", &ch, &x, &y)) <= 0) {
+	return n;
+    }
+
+    if ((n = Handle_wormhole(x, y)) == -1) {
+	return -1;
+    }
+    return 1;
+}
+
 int Receive_ecm(void)
 {
     int			n;
@@ -2214,10 +2412,48 @@ int Receive_radar(void)
 	return n;
     }
 
+    x = (int)((double)(x * 256) / Setup->width + 0.5);
+    y = (int)((double)(y * RadarHeight) / Setup->height + 0.5);
+
     if ((n = Handle_radar(x, y, size)) == -1) {
-		    return -1;
+	return -1;
     }
     return 1;
+}
+
+int Receive_fastradar(void)
+{
+    int			n, i, r = 1;
+    int			x, y, size;
+    unsigned char	*ptr;
+
+    rbuf.ptr++;	/* skip PKT_FASTRADAR packet id */
+
+    if (rbuf.ptr - rbuf.buf >= rbuf.len) {
+	return 0;
+    }
+    n = (*rbuf.ptr++ & 0xFF);
+    if (rbuf.ptr - rbuf.buf + (n * 3) > rbuf.len) {
+	return 0;
+    }
+    ptr = (unsigned char *) rbuf.ptr;
+    for (i = 0; i < n; i++) {
+	x = *ptr++;
+	y = *ptr++;
+	y |= (*ptr & 0xC0) << 2;
+	size = (*ptr & 0x07);
+	if (*ptr & 0x20) {
+	    size |= 0x80;
+	}
+	ptr++;
+	r = Handle_radar(x, y, size);
+	if (r == -1) {
+	    break;
+	}
+    }
+    rbuf.ptr += n * 3;
+
+    return (r == -1) ? -1 : 1;
 }
 
 int Receive_damaged(void)
@@ -2306,13 +2542,15 @@ int Receive_player(void)
 	if (version < 0x4F10)
 	    n = Packet_scanf(&cbuf, "%S", &shape[strlen(shape)]);
 	else
-	    n = Packet_scanf(&cbuf, "%S%c", &shape[strlen(shape)], &myself);
+	    n = Packet_scanf(&cbuf, "%S%c", &shape[strlen(shape)],
+			     &myself);
 	if (n <= 0) {
 	    cbuf.ptr = cbuf_ptr;
 	    return n;
 	}
     }
-    if ((n = Handle_player(id, myteam, mychar, name, real, host, shape, myself)) == -1) {
+    if ((n = Handle_player(id, myteam, mychar, name, real, host,
+			   shape, myself)) == -1) {
 	return -1;
     }
     return 1;
@@ -2322,14 +2560,24 @@ int Receive_score_object(void)
 {
     int			n;
     unsigned short	x, y;
-    short		score;
+    DFLOAT		score = 0;
     char		msg[MAX_CHARS];
     u_byte		ch;
 
-    if ((n = Packet_scanf(&cbuf, "%c%hd%hu%hu%s",
-			  &ch, &score, &x, &y, msg)) <= 0) {
-	return n;
+    if (version < 0x4500 || (version >= 0x4F09 && version < 0x4F11)) {
+	short	rcv_score;
+	n = Packet_scanf(&cbuf, "%c%hd%hu%hu%s",
+			 &ch, &rcv_score, &x, &y, msg);
+	score = rcv_score;
+    } else {
+	/* newer servers send scores with two decimals */
+	int	rcv_score;
+	n = Packet_scanf(&cbuf, "%c%d%hu%hu%s",
+			 &ch, &rcv_score, &x, &y, msg);
+	score = (DFLOAT)rcv_score / 100;
     }
+    if (n <= 0)
+	return n;
     if ((n = Handle_score_object(score, x, y, msg)) == -1) {
 	return -1;
     }
@@ -2340,15 +2588,45 @@ int Receive_score_object(void)
 int Receive_score(void)
 {
     int			n;
-    short		id, score, life;
-    u_byte		ch, mychar;
+    short		id, life;
+    DFLOAT		score = 0;
+    u_byte		ch, mychar, alliance = ' ';
 
-    n = Packet_scanf(&cbuf, "%c%hd%hd%hd%c", &ch,
-		     &id, &score, &life, &mychar);
+    if (version < 0x4500 || (version >= 0x4F09 && version < 0x4F11)) {
+	short	rcv_score;
+	n = Packet_scanf(&cbuf, "%c%hd%hd%hd%c", &ch,
+			 &id, &rcv_score, &life, &mychar);
+	score = rcv_score;
+	alliance = ' ';
+    } else {
+	/* newer servers send scores with two decimals */
+	int	rcv_score;
+	n = Packet_scanf(&cbuf, "%c%hd%d%hd%c%c", &ch,
+			 &id, &rcv_score, &life, &mychar, &alliance);
+	score = (DFLOAT)rcv_score / 100;
+    }
     if (n <= 0) {
 	return n;
     }
-    if ((n = Handle_score(id, score, life, mychar)) == -1) {
+    if ((n = Handle_score(id, score, life, mychar, alliance)) == -1) {
+	return -1;
+    }
+    return 1;
+}
+
+int Receive_team_score(void)
+{
+    int			n;
+    u_byte		ch;
+    short		team;
+    int			rcv_score;
+    DFLOAT		score;
+
+    if ((n = Packet_scanf(&cbuf, "%c%hd%d", &ch, &team, &rcv_score)) <= 0) {
+	return n;
+    }
+    score = (DFLOAT)rcv_score / 100;
+    if ((n = Handle_team_score(team, score)) == -1) {
 	return -1;
     }
     return 1;
@@ -2624,6 +2902,7 @@ int Send_keyboard(u_byte *keyboard_vector)
     memcpy(&wbuf.buf[wbuf.len], keyboard_vector, size);
     wbuf.len += size;
     last_keyboard_update = last_loops;
+    Net_keyboard_track();
     Send_talk();
     if (Sockbuf_flush(&wbuf) == -1) {
 	error("Can't send keyboard update");
@@ -2635,7 +2914,7 @@ int Send_keyboard(u_byte *keyboard_vector)
 
 int Send_shape(char *str)
 {
-    wireobj		*w;
+    shipobj		*w;
     char		buf[MSG_LEN], ext[MSG_LEN];
 
     w = Convert_shape_str(str);
@@ -2722,7 +3001,7 @@ int Receive_quit(void)
 	error("Can't read quit packet");
     } else {
 	if (Packet_scanf(sbuf, "%s", reason) <= 0) {
-	    strcpy(reason, "unknown reason");
+	    strlcpy(reason, "unknown reason", MAX_CHARS);
 	}
 	errno = 0;
 	error("Got quit packet: \"%s\"", reason);
@@ -2766,9 +3045,13 @@ int Receive_talk_ack(void)
 
 int Net_talk(char *str)
 {
-    strncpy(talk_str, str, sizeof talk_str - 1);
-    talk_pending = ++talk_sequence_num;
-    talk_last_send = last_loops - TALK_RETRY;
+    strlcpy(talk_str, str, sizeof talk_str);
+    if (talk_str[0] == '\\') {	/* it's a clientcommand! */
+	executeCommand(talk_str);
+    } else {
+	talk_pending = ++talk_sequence_num;
+	talk_last_send = last_loops - TALK_RETRY;
+    }
     return 0;
 }
 
@@ -2801,17 +3084,22 @@ int Send_display(void)
     LIMIT(width_wanted, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
     LIMIT(height_wanted, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
 
-    if (width_wanted == view_width &&
-	height_wanted == view_height &&
+    if (width_wanted == ext_view_width &&
+	height_wanted == ext_view_height &&
 	debris_colors == num_spark_colors &&
 	spark_rand == old_spark_rand &&
 	last_loops != 0) {
 	return 0;
     }
 
-    if (Packet_printf(&wbuf, "%c%hd%hd%c%c", PKT_DISPLAY,
-		      width_wanted, height_wanted,
-		      num_spark_colors, spark_rand) == -1) {
+    if (simulating) {
+	ext_view_width = width_wanted;
+	ext_view_height = height_wanted;
+	Check_view_dimensions();
+    }
+    else if (Packet_printf(&wbuf, "%c%hd%hd%c%c", PKT_DISPLAY,
+			   width_wanted, height_wanted,
+			   num_spark_colors, spark_rand) == -1) {
 	return -1;
     }
 
@@ -2870,3 +3158,4 @@ int Send_fps_request(int fps)
     }
     return 0;
 }
+

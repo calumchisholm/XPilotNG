@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -87,11 +87,8 @@ size_t strlcat(char *dest, const char *src, size_t size)
     size_t		dlen = 0;
 
     if (size > 0) {
-	while (*d) {
+	while (*d && d < maxd) {
 	    d++;
-	}
-	if (d > maxd) {
-	    d = maxd;
 	}
 	dlen = (d - dest);
 	while (*s && d < maxd) {
@@ -106,3 +103,4 @@ size_t strlcat(char *dest, const char *src, size_t size)
     }
     return dlen + (s - src);
 }
+

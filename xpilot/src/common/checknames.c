@@ -33,6 +33,7 @@
 
 #include "version.h"
 #include "config.h"
+#include "commonproto.h"
 #include "const.h"
 #include "error.h"
 #include "pack.h"
@@ -44,7 +45,7 @@ int Check_real_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_NAME_LEN-1)
+    if (strlen(name) > MAX_NAME_LEN - 1)
 	return NAME_ERROR;
     if (!*name) {
 	return NAME_ERROR;
@@ -63,10 +64,10 @@ void Fix_real_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_NAME_LEN-1)
-	name[MAX_NAME_LEN-1] = 0;
+    if (strlen(name) > MAX_NAME_LEN - 1)
+	name[MAX_NAME_LEN - 1] = 0;
     if (!*name) {
-	strcpy(name, "X");
+	strlcpy(name, "X", sizeof(name));
 	return;
     }
     str = (unsigned char *) name;
@@ -81,7 +82,7 @@ int Check_nick_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_NAME_LEN-1)
+    if (strlen(name) > MAX_NAME_LEN - 1)
 	return NAME_ERROR;
     if (!*name) {
 	return NAME_ERROR;
@@ -107,8 +108,8 @@ void Fix_nick_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_NAME_LEN-1)
-	name[MAX_NAME_LEN-1] = 0;
+    if (strlen(name) > MAX_NAME_LEN - 1)
+	name[MAX_NAME_LEN - 1] = 0;
     if (!*name) {
 	static int n;
 	sprintf(name, "X%d", n++);
@@ -136,9 +137,12 @@ void Fix_nick_name(char *name)
 /* isalnum() depends on locale. */
 static int is_alpha_numeric(unsigned char c)
 {
-    if (c >= 'A' && c <= 'Z') return 1;
-    if (c >= 'a' && c <= 'z') return 1;
-    if (c >= '0' && c <= '9') return 1;
+    if (c >= 'A' && c <= 'Z')
+	return 1;
+    if (c >= 'a' && c <= 'z')
+	return 1;
+    if (c >= '0' && c <= '9')
+	return 1;
     return 0;
 }
 
@@ -146,7 +150,7 @@ int Check_host_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_HOST_LEN-1)
+    if (strlen(name) > MAX_HOST_LEN - 1)
 	return NAME_ERROR;
     str = (unsigned char *) name;
     if (!is_alpha_numeric(*str)) {
@@ -158,8 +162,7 @@ int Check_host_name(char *name)
 		if (str[1] == '.' || str[1] == '-' || !str[1]) {
 		    return NAME_ERROR;
 		}
-	    }
-	    else {
+	    } else {
 		return NAME_ERROR;
 	    }
 	}
@@ -171,11 +174,11 @@ void Fix_host_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_HOST_LEN-1)
-	name[MAX_HOST_LEN-1] = 0;
+    if (strlen(name) > MAX_HOST_LEN - 1)
+	name[MAX_HOST_LEN - 1] = 0;
     str = (unsigned char *) name;
     if (!is_alpha_numeric(*str)) {
-	strcpy(name, "xxx.xxx");
+	strlcpy(name, "xxx.xxx", sizeof(name));
 	return;
     }
     for (; *str; str++) {
@@ -184,8 +187,7 @@ void Fix_host_name(char *name)
 		if (str[1] == '.' || str[1] == '-' || !str[1]) {
 		    *str = 'x';
 		}
-	    }
-	    else {
+	    } else {
 		*str = 'x';
 	    }
 	}
@@ -198,7 +200,7 @@ int Check_disp_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_DISP_LEN-1)
+    if (strlen(name) > MAX_DISP_LEN - 1)
 	return NAME_ERROR;
     str = (unsigned char *) name;
     for (; *str; str++) {
@@ -213,8 +215,8 @@ void Fix_disp_name(char *name)
 {
     unsigned char *str;
 
-    if (strlen(name) > MAX_DISP_LEN-1)
-	name[MAX_DISP_LEN-1] = 0;
+    if (strlen(name) > MAX_DISP_LEN - 1)
+	name[MAX_DISP_LEN - 1] = 0;
     str = (unsigned char *) name;
     for (; *str; str++) {
 	if (!isgraph(*str)) {

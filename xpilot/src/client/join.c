@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -31,14 +31,21 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#else
-#include <winsock.h>
-#include "NT/winClient.h"
+# include <unistd.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# ifdef _AIX
+#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
+# endif
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netdb.h>
+#endif
+
+#ifdef _WINDOWS
+# include <winsock.h>
+# include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -209,35 +216,35 @@ int Join(char *server_addr, char *server_name, int port, char *real,
     signal(SIGPIPE, SIG_IGN);
 #endif
 
-    IFWINDOWS( received_self = FALSE; )
-    IFWINDOWS( Progress("Client_init"); )
+    IFWINDOWS( received_self = FALSE );
+    IFWINDOWS( Progress("Client_init") );
     if (Client_init(server_name, version) == -1) {
 	return -1;
     }
-    IFWINDOWS( Progress("Net_init %s", server_addr); )
+    IFWINDOWS( Progress("Net_init %s", server_addr) );
     if (Net_init(server_addr, port) == -1) {
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Net_verify '%s'= '%s'", nick, real); )
+    IFWINDOWS( Progress("Net_verify '%s'= '%s'", nick, real) );
     if (Net_verify(real, nick, display, my_team) == -1) {
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Net_setup"); )
+    IFWINDOWS( Progress("Net_setup") );
     if (Net_setup() == -1) {
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Client_setup"); )
+    IFWINDOWS( Progress("Client_setup") );
     if (Client_setup() == -1) {
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Net_start"); )
+    IFWINDOWS( Progress("Net_start") );
     if (Net_start() == -1) {
 	errno = 0;
 	error("Network start failed");
@@ -245,7 +252,7 @@ int Join(char *server_addr, char *server_name, int port, char *real,
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Client_start"); )
+    IFWINDOWS( Progress("Client_start") );
     if (Client_start() == -1) {
 	errno = 0;
 	error("Window init failed");
@@ -261,3 +268,4 @@ int Join(char *server_addr, char *server_name, int port, char *real,
 
     return 0;
 }
+

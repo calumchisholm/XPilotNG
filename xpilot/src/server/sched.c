@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,8 +31,13 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <sys/time.h>
+# include <unistd.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# ifdef _AIX
+#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
+# endif
 #endif
 
 #ifdef _OS2_
@@ -42,14 +48,14 @@
 #endif
 
 #ifdef _WINDOWS
-#include "NT/winServer.h"
-#include "NT/winSvrThread.h"
+# include "NT/winServer.h"
+# include "NT/winSvrThread.h"
 #endif
 
 #define	SERVER
 #include "version.h"
 #include "config.h"
-#include "const.h"
+#include "serverconst.h"
 #include "error.h"
 #include "types.h"
 #include "sched.h"
@@ -119,15 +125,15 @@ void allow_timer(void)
 #endif
 }
 
+
 /*
  * Catch SIGALRM.
  */
 static void catch_timer(int signum)
 {
-    static unsigned int count;
+    static unsigned int		timer_count = 0;
 #ifdef OS2DEBUG
     static int counter = 0;
-
     /*  Should get one dot per second for 14 FPS  */
     if( (++counter) > 13 )
     {
@@ -136,12 +142,13 @@ static void catch_timer(int signum)
 	fflush( stdout );
     }
 #endif
-    count += FPS;
-    if (count >= timerResolution) {
-	count -= timerResolution;
+    timer_count += FPS;
+    if (timer_count >= (unsigned)timerResolution) {
+	timer_count -= timerResolution;
 	timer_ticks++;
     }
 }
+
 
 #ifdef _OS2_
 /*
@@ -175,7 +182,7 @@ void timerThread( void *arg )
 	 */
 	if( rc = DosGetInfoBlocks( &ptib, &ppib ) )
 	{
-		error( "Error getting process information.  rc = %d", rc );
+		error("Error getting process information.  rc = %d", rc );
 		exit( 1 );
 	}
 
@@ -187,14 +194,14 @@ void timerThread( void *arg )
 	 */
 	if( rc = DosSetPriority(  PRTYS_THREAD, PRTYC_TIMECRITICAL, 0L, 0L ) )
 	{
-		error( "Error setting timer thread priority.  rc = %d", rc );
+		error("Error setting timer thread priority.  rc = %d", rc );
 		exit(1);
 	}
 
 	/*  Create the event semaphore that will be posted by the timer.  */
 	if( rc = DosCreateEventSem( NULL, &hev, DC_SEM_SHARED, FALSE ) )
 	{
-		error( "DosCreateEventSem - error creating timer semaphore.  rc = %d", rc );
+		error("DosCreateEventSem - error creating timer semaphore.  rc = %d", rc );
 		exit( 1 );
 	}
 
@@ -203,7 +210,7 @@ void timerThread( void *arg )
 	 */
 	if( rc = DosStartTimer( 1000/timer_freq, (HSEM)hev, &htimer ) )
 	{
-		error( "DosStartTimer - error starting timer.  rc = %d", rc );
+		error("DosStartTimer - error starting timer.  rc = %d", rc );
 		exit( 1 );
 	}
 
@@ -229,6 +236,7 @@ void timerThread( void *arg )
 }
 
 #endif
+
 
 /*
  * Setup the handling of the SIGALRM signal
@@ -264,7 +272,7 @@ static void setup_timer(void)
      * Install a real-time timer.
      */
     if (timer_freq <= 0 || timer_freq > 100) {
-	warn("illegal timer frequency: %ld", timer_freq);
+	error("illegal timer frequency: %ld", timer_freq);
 	exit(1);
     }
 
@@ -289,7 +297,7 @@ static void setup_timer(void)
      */
 
     if( _beginthread( timerThread, NULL, 8192L, NULL ) == -1 ) {
-	error( "_beginthread - error starting timer thread" );
+	error("_beginthread - error starting timer thread");
 	exit( 1 );
     }
 
@@ -300,10 +308,10 @@ static void setup_timer(void)
     ticks_till_second = timer_freq;
 #else
 /*
-	UINT cr = SetTimer(NULL, 0, 1000/timer_freq, timer_handler);
-	UINT cr = SetTimer(NULL, 0, 20, (TIMERPROC)ServerThreadTimerProc);
-	if (!cr)
-		error("Can't create timer");
+    UINT cr = SetTimer(NULL, 0, 1000/timer_freq, timer_handler);
+    UINT cr = SetTimer(NULL, 0, 20, (TIMERPROC)ServerThreadTimerProc);
+    if (!cr)
+	error("Can't create timer");
 */
 #endif
     /*
@@ -321,15 +329,19 @@ void install_timer_tick(void (*func)(void), int freq)
     timer_handler = func;
     timer_freq = freq;
     setup_timer();
-}
+} 
 #else
-void install_timer_tick(void (__stdcall *func)(void *,unsigned int ,unsigned int ,unsigned long ), int freq)
+
+typedef void (__stdcall *windows_timer_t)(void *, unsigned int, unsigned int, unsigned long);
+
+void install_timer_tick(windows_timer_t func, int freq)
 {
     timer_handler = (TIMERPROC)func;
     timer_freq = freq;
     setup_timer();
 }
 #endif
+
 
 /*
  * Linked list of timeout callbacks.
@@ -368,7 +380,7 @@ static struct to_handler *to_alloc(void)
 
     to_fill();
     if (!to_free_list) {
-	warn("Not enough memory for timeouts");
+	error("Not enough memory for timeouts");
 	exit(1);
     }
 
@@ -455,14 +467,15 @@ static void timeout_chime(void)
 #define NUM_SELECT_FD		((int)sizeof(int) * 8)
 #else
 /*
-	Windoze:
-	The first call to socket() returns 560ish.  Successive calls keep bumping
-	up the SOCKET returned until about 880 when it wraps back to 8.
-	(It seems to increment by 8 with each connect - but that's not important)
-	I can't find a manifest constant to tell me what the upper limit will be *sigh*
+    Windoze:
+    The first call to socket() returns 560ish.  Successive calls keep bumping
+    up the SOCKET returned until about 880 when it wraps back to 8.
+    (It seems to increment by 8 with each connect - but that's not important)
+    I can't find a manifest constant to tell me what the upper limit will be
+    *sigh*
 
-	--- Now, the Windoze gurus tell me that SOCKET is an opaque data type.  So i need
-	to make a lookup array for the lookup array :(
+    --- Now, the Windoze gurus tell me that SOCKET is an opaque data type.
+    So i need to make a lookup array for the lookup array :(
 */
 #define	NUM_SELECT_FD		2000
 #endif
@@ -474,9 +487,9 @@ struct io_handler {
 };
 
 static struct io_handler	input_handlers[NUM_SELECT_FD];
-static struct io_handler        record_handlers[NUM_SELECT_FD];
+static struct io_handler	record_handlers[NUM_SELECT_FD];
 static fd_set			input_mask;
-int			        max_fd, min_fd;
+int				max_fd, min_fd;
 static int			input_inited = false;
 
 static void io_dummy(int fd, void *arg)
@@ -511,15 +524,13 @@ void install_input(void (*func)(int, void *), int fd, void *arg)
 	    input_handlers[i].arg = 0;
 	}
     }
-#ifdef _WINDOWS
-	xpprintf("install_input: fd %d min_fd=%d\n", fd, min_fd);
-#endif
+    /* IFWINDOWS(xpprintf("install_input: fd %d min_fd=%d\n", fd, min_fd)); */
     if (!playback && (fd < min_fd || fd >= min_fd + NUM_SELECT_FD)) {
-	warn("install illegal input handler fd %d (%d)", fd, min_fd);
+	error("install illegal input handler fd %d (%d)", fd, min_fd);
 	ServerExit();
     }
     if (!playback && FD_ISSET(fd, &input_mask)) {
-	warn("input handler %d busy", fd);
+	error("input handler %d busy", fd);
 	ServerExit();
     }
     handlers[fd - min_fd].fd = fd;
@@ -537,7 +548,7 @@ void remove_input(int fd)
 {
     if (!playback) {
 	if (fd < min_fd || fd >= min_fd + NUM_SELECT_FD) {
-	    warn("remove illegal input handler fd %d (%d)", fd, min_fd);
+	    error("remove illegal input handler fd %d (%d)", fd, min_fd);
 	    ServerExit();
 	}
 	if (FD_ISSET(fd, &input_mask) || playback) {
@@ -564,19 +575,34 @@ void remove_input(int fd)
     }
 }
 
-#ifdef VMS
-extern int NumPlayers, NumPseudoPlayers, NumQueuedPlayers;
-extern int login_in_progress;
-#endif
-
 void stop_sched(void)
 {
     sched_running = 0;
 }
 
+
+extern int End_game(void);
+
+
+static void sched_select_error(void)
+{
+#ifndef _WINDOWS
+    error("sched select error");
+#else
+    char	msg[MSG_LEN];
+
+    sprintf(msg, "sched select error e=%d (%s)",
+	    errno, _GetWSockErrText(errno));
+    error("%s", msg);
+#endif
+
+    End_game();
+}
+
+
 /*
  * I/O + timer dispatcher.
- * Windows pumps this one time
+ * Windows pumps this one time 
  */
 
 unsigned long skip_to = 0;
@@ -590,16 +616,20 @@ void sched(void)
 
 #ifndef _WINDOWS
     if (sched_running) {
-	warn("sched already running");
+	error("sched already running");
 	exit(1);
     }
 
     sched_running = 1;
 
     while (sched_running) {
-#endif
-#if defined(VMS) || defined(_WINDOWS)
-	if (NumPlayers > NumPseudoPlayers
+
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+
+#else
+
+	if (NumPlayers > NumRobots + NumPseudoPlayers
 	    || login_in_progress != 0
 	    || NumQueuedPlayers > 0) {
 
@@ -607,18 +637,15 @@ void sched(void)
 	    tv.tv_sec = 0;
 	    /* KOERBER */
 	    /*	tv.tv_usec = 1000000 / (3 * timer_freq + 1); */
-	    tv.tv_usec = 1000000 / (10 * timer_freq + 1);
+	    tv.tv_usec = 1000000 / (10 * timer_freq + 1); 
 	}
 	else {
-	    /* slow I/O checks are possible here... (2 times per second) */
+	    /* slow I/O checks are possible here... (2 times per second) */ ; 
 	    tv.tv_sec = 0;
 	    tv.tv_usec = 500000;
 	}
-#else
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;
-#endif
 
+#endif
 	if (main_loops < skip_to && timers_used >= timer_ticks)
 	    timer_ticks++;
 	if (io_todo == 0 && timers_used < timer_ticks) {
@@ -645,6 +672,7 @@ void sched(void)
 		(*timer_handler)();
 	    }
 #endif
+
 	    do {
 		++timers_used;
 		if (--ticks_till_second <= 0) {
@@ -661,14 +689,7 @@ void sched(void)
 	    n = select(max_fd + 1, &readmask, 0, 0, tvp);
 	    if (n <= 0) {
 		if (n == -1 && errno != EINTR) {
-#ifndef _WINDOWS
-		    error("sched select error");
-#else
-			char	s[80];
-			sprintf(s, "sched select error n=%d e=%d (%s)", n, errno, _GetWSockErrText(errno));
-			error(s);
-#endif
-		    exit(1);
+		    sched_select_error();
 		}
 		io_todo = 0;
 	    }
@@ -699,13 +720,12 @@ void sched(void)
 		    io_todo--;
 		}
 	    }
-#ifndef VMS
 	    if (io_todo == 0) {
 		tvp = NULL;
 	    }
-#endif
 	}
 #ifndef _WINDOWS
     }
 #endif
 }
+

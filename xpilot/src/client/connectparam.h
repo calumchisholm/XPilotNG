@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -44,6 +44,11 @@ typedef struct Connect_param {
     unsigned		server_version;
     int			team;
 } Connect_param_t;
+
+
+#ifdef PROTOCLIENT_H
+#error "protoclient.h was included before connectparam.h"
+#endif
 
 #endif
 

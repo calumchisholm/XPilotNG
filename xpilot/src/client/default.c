@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -21,7 +22,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,15 +31,21 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xos.h>
-#include <X11/keysym.h>
-#include <X11/Xlib.h>
-#include <X11/Xresource.h>
-#include <sys/param.h>
-#else
-#include "NT/winX.h"
-#include "NT/winXXPilot.h"
+# include <unistd.h>
+# include <X11/Xos.h>
+# include <X11/keysym.h>
+# include <X11/Xlib.h>
+# include <X11/Xresource.h>
+# ifdef	__apollo
+#  include <X11/ap_keysym.h>
+# endif
+# include <sys/param.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winXXPilot.h"
+# include "NT/winConfig.h"
 #endif
 
 #include "version.h"
@@ -55,30 +61,21 @@
 #include "types.h"
 #include "protoclient.h"
 #include "audio.h"
-#include "talk.h"
 #include "commonproto.h"
+#include "portability.h"
+#include "talk.h"
+#include "default.h"
 #include "checknames.h"
+#include "clientrank.h"
 
-#ifdef _WINDOWS
-extern char **Argv;
-extern int Argc;
-#endif
 
 char default_version[] = VERSION;
 
-extern char *talk_fast_msgs[];	/* talk macros */
-char talk_fast_temp_buf[7];		/* can handle up to 999 fast msgs */
-char *talk_fast_temp_buf_big;
 
-#ifdef VMS
-#define DISPLAY_ENV	"DECW$DISPLAY"
-#define DISPLAY_DEF	"::0.0"
-#define KEYBOARD_ENV	"DECW$KEYBOARD"
-#else
+
 #define DISPLAY_ENV	"DISPLAY"
 #define DISPLAY_DEF	":0.0"
 #define KEYBOARD_ENV	"KEYBOARD"
-#endif
 
 #ifndef PATH_MAX
 #define PATH_MAX	1023
@@ -87,32 +84,35 @@ char *talk_fast_temp_buf_big;
 /*
  * Default fonts
  */
-#define GAME_FONT	"-*-times-*-*-*-*-18-*-*-*-*-*-iso8859-1"
-#define MESSAGE_FONT	"-*-times-*-*-*-*-14-*-*-*-*-*-iso8859-1"
-#define SCORE_LIST_FONT	"-*-fixed-bold-*-*-*-15-*-*-*-c-*-iso8859-1"
-#define BUTTON_FONT	"-*-*-bold-o-*-*-14-*-*-*-*-*-iso8859-1"
-#define TEXT_FONT	"-*-*-bold-i-*-*-14-*-*-*-p-*-iso8859-1"
-#define TALK_FONT	"-*-fixed-bold-*-*-*-15-*-*-*-c-*-iso8859-1"
-#define KEY_LIST_FONT	"-*-fixed-medium-r-*-*-10-*-*-*-c-*-iso8859-1"
-
-#ifndef _WINDOWS
+#define GAME_FONT	"-*-times-*-*-*--18-*-*-*-*-*-iso8859-1"
+#define MESSAGE_FONT	"-*-times-*-*-*--14-*-*-*-*-*-iso8859-1"
+#define SCORE_LIST_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
+#define BUTTON_FONT	"-*-*-bold-o-*--14-*-*-*-*-*-iso8859-1"
+#define TEXT_FONT	"-*-*-bold-i-*--14-*-*-*-p-*-iso8859-1"
+#define TALK_FONT	"-*-fixed-bold-*-*--15-*-*-*-c-*-iso8859-1"
+#define KEY_LIST_FONT	"-*-fixed-medium-r-*--10-*-*-*-c-*-iso8859-1"
 #define MOTD_FONT	"-*-courier-bold-r-*--14-*-*-*-*-*-iso8859-1"
-#else
-#define MOTD_FONT	"-*-courier-bold-r-*-*-14-*-*-*-*-*-iso8859-1"
-#endif
+
 
 char			myName[] = "xpilot";
 char			myClass[] = "XPilot";
+
 
 #ifdef SPARC_CMAP_HACK
 char  frameBuffer[MAX_CHARS]; /* frame buffer */
 #endif
 
-#ifdef _WINDOWS
-const char*	winHelpFile;
-#endif
 
-keys_t buttonDefs[MAX_POINTER_BUTTONS];
+
+extern char *talk_fast_msgs[];	/* talk macros */
+char talk_fast_temp_buf[7];		/* can handle up to 999 fast msgs */
+char *talk_fast_temp_buf_big;
+
+
+static void Get_test_resources(XrmDatabase rDB);
+
+
+keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 /* from common/config.c */
 extern char conf_ship_file_string[];
@@ -127,14 +127,7 @@ extern char conf_soundfile_string[];
  * Help lines can span multiple lines, but for
  * the key help window only the first line is used.
  */
-struct option {
-    const char		*name;		/* option name */
-    const char		*noArg;		/* value for non-argument options */
-    const char		*fallback;	/* default value */
-    keys_t		key;		/* key if not KEY_DUMMY */
-    const char		*help;		/* user help (multiline) */
-    unsigned		hash;		/* option name hashed. */
-} options[] = {
+option options[] = {
     {
 	"help",
 	"Yes",
@@ -243,10 +236,10 @@ struct option {
     {
 	"geometry",
 	NULL,
-	"",
+	"1024x768",
 	KEY_DUMMY,
 	"Set the window size and position in standard X geometry format.\n"
-	"The maximum allowed window size is 1282x1024.\n"
+	"The maximum allowed window size is 1922x1440.\n"
     },
     {
 	"ignoreWindowManager",
@@ -319,7 +312,7 @@ struct option {
     {
 	"turnSpeed",
 	NULL,
-	"15.0",
+	"35.0",
 	KEY_DUMMY,
 	"Set the ship's turn speed.\n"
 	"Valid values are in the range 4-64.\n"
@@ -328,7 +321,7 @@ struct option {
     {
 	"turnResistance",
 	NULL,
-	"0",
+	"0.12",
 	KEY_DUMMY,
 	"Set the ship's turn resistance.\n"
 	"This determines the speed at which a ship stops turning\n"
@@ -356,7 +349,7 @@ struct option {
     {
 	"altTurnResistance",
 	NULL,
-	"0",
+	"0.12",
 	KEY_DUMMY,
 	"Set the alternate ship's turn resistance.\n"
 	"See also the keySwapSettings option.\n"
@@ -369,11 +362,57 @@ struct option {
 	"Should the HUD be displayed or not.\n"
     },
     {
-	"showHR",
+	"showHUDRadar",
 	NULL,
 	"Yes",
 	KEY_DUMMY,
-	"Should the hudradar be displayed or not.\n"
+	"Should the HUD radar be displayed or not.\n"
+	"Old name: showHR\n"
+    },
+    {   
+	"mapRadar",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Paint radar dots' position on the map \n"
+    },
+    {
+	"showShipShapes",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should others' shipshapes be displayed or not.\n"
+	"Old name: showSS\n"
+    },
+    {
+	"showMyShipShape",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should your own shipshape be displayed or not.\n"
+	"Old name: showMSS\n"
+    },
+    {   
+	"ballMsgScan",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Scan messages for BALL,SAFE,COVER,POP and paint \n"
+	"warning circles inside ship.\n"
+    },
+    {
+	"showLivesByShip",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Paint remaining lives next to ships \n"
+    },
+    {
+	"treatZeroSpecial",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Do special tricks for team zero pausing in scorelist. \n"
     },
     {
 	"fuelNotify",
@@ -477,9 +516,17 @@ struct option {
 	"This gives the percentage of dropped frames due to display slowness.\n"
     },
     {
-	"slidingRadar",
+	"packetLagMeter",
 	NULL,
 	"No",
+	KEY_DUMMY,
+	"Should the packet lag meter be visible.\n"
+	"This gives the amount of lag in frames over the past one second.\n"
+    },
+    {
+	"slidingRadar",
+	NULL,
+	"Yes",
 	KEY_DUMMY,
 	"If the game is in edgewrap mode then the radar will keep your\n"
 	"position on the radar in the center and raw the rest of the radar\n"
@@ -495,7 +542,7 @@ struct option {
     {
 	"filledWorld",
 	NULL,
-	"Yes",
+	"No",
 	KEY_DUMMY,
 	"Draws the walls solid, filled with one color,\n"
 	"unless overridden by texture.\n"
@@ -504,7 +551,7 @@ struct option {
     {
 	"texturedWalls",
 	NULL,
-	"yes",
+	"Yes",
 	KEY_DUMMY,
 	"Allows drawing polygon bitmaps specified by the (new-style) map\n"
 	"See also the wallTextureFile option.\n"
@@ -555,14 +602,14 @@ struct option {
     {
 	"markingLights",
 	NULL,
-	"Yes",
+	"No",
 	KEY_DUMMY,
 	"Should the fighters have marking lights, just like airplanes?\n"
     },
     {
 	"sparkProb",
 	NULL,
-	"0.50",
+	"0.25",
 	KEY_DUMMY,
 	"The chance that sparks are drawn or not.\n"
 	"This gives a sparkling effect.\n"
@@ -710,7 +757,14 @@ struct option {
 	"2",
 	KEY_DUMMY,
 	"The size of team shots in pixels.\n"
-	"Note that team shots are drawn in blue.\n"
+	"Note that team shots are drawn in teamShotColor.\n"
+    },
+    {
+	"teamShotColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing harmless shots.\n"
     },
     {
 	"showNastyShots",
@@ -776,6 +830,13 @@ struct option {
 	"Should all ships have the name of the player drawn below them.\n"
     },
     {
+	"showBaseName",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should all bases have the name of the player drawn below them.\n"
+    },
+    {
 	"showMineName",
 	NULL,
 	"Yes",
@@ -804,6 +865,13 @@ struct option {
 	KEY_DUMMY,
 	"The time in seconds to display item information when\n"
 	"it has changed and the showItems option is turned on.\n"
+    },
+    {
+	"showScoreDecimals",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"The number of decimals to use when displaying scores.\n"
     },
     {
 	"receiveWindowSize",
@@ -853,7 +921,7 @@ struct option {
     {
 	"maxColors",
 	NULL,
-	"8",
+	"16",
 	KEY_DUMMY,
 	"The number of colors to use.  Valid values are 4, 8 and 16.\n"
     },
@@ -1021,28 +1089,62 @@ struct option {
 	NULL,
 	"3",
 	KEY_DUMMY,
-	"Which color number to use for drawing the hudradar hack.\n"
+	"Which color number to use for drawing hudradar dots\n"
+	"that represent enemy ships.\n"
     },
     {
 	"hrColor2",
 	NULL,
-	"4",
+	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing the hudradar hack.\n"
+	"Which color number to use for drawing hudradar dots\n"
+	"that represent friendly ships.\n"
     },
     {
 	"hrSize",
 	NULL,
-	"4",
+	"6",
 	KEY_DUMMY,
-	"Which size to use for drawing the hudradar hack dots.\n"
+	"Which size to use for drawing the hudradar dots.\n"
     },
     {
 	"hrScale",
 	NULL,
-	"1.5",
+	"2.0",
 	KEY_DUMMY,
 	"Scales radar to hud filtering out everything but enemies.\n"
+    },
+    {
+	"hrLimit",
+	NULL,
+	"0.05",
+	KEY_DUMMY,
+	"Hudradar dots closer than this to your ship are not drawn.\n"
+	"A value of 1.0 means that the dots are not drawn for ships in\n"
+	"your active view area.\n"
+    },
+    {
+	"hudSize",
+	NULL,
+	"90",
+	KEY_DUMMY,
+	"Which size to use for drawing the hud.\n"
+    },
+    {
+	"dirPtrColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the direction pointer hack.\n"
+	"Old name: dpColor\n"
+    },
+    {
+	"shipShapesHackColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the shipshapes hack.\n"
+	"Old name: sshColor\n"
     },
     {
 	"hudLockColor",
@@ -1052,6 +1154,152 @@ struct option {
 	"Which color number to use for drawing the lock on the HUD.\n"
     },
     {
+	"msgScanBallColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing ball message scan\n"
+	"warning"
+    },
+    {
+	"msgScanCoverColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing cover message scan\n"
+	"warning"
+    },
+    {
+	"selfLWColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color to use to paint your ship in when on last life.\n"
+    },
+    {
+	"enemyLWColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color to use to paint enemy ships in when on last life.\n"
+    },
+    {
+	"teamLWColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color to use to paint teammate ships in when on last life.\n"
+    },
+    {
+	"shipNameColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing names of ships.\n"
+    },
+    {
+	"baseNameColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing names of bases.\n"
+    },
+    {
+	"mineNameColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing names of mines.\n"
+    },
+    {
+	"ballColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing balls.\n"
+    },
+    {
+	"connColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing connectors.\n"
+    },
+    {
+	"windowColor",
+	NULL,
+	"8",
+	KEY_DUMMY,
+	"Which color number to use for drawing windows.\n"
+    },
+    {
+	"buttonColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing buttons.\n"
+    },
+    {
+	"borderColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing borders.\n"
+    },
+    {
+	"scoreColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing Score entries.\n"
+    },
+    {
+	"scoreSelfColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing your own score.\n"
+    },
+    {
+	"scoreInactiveColor",
+	NULL,
+	"12",
+	KEY_DUMMY,
+	"Which color number to use for drawing inactive players's scores.\n"
+    },
+    {
+	"scoreInactiveSelfColor",
+	NULL,
+	"12",
+	KEY_DUMMY,
+	"Which color number to use for drawing your score when inactive.\n"
+    },
+    {
+	"scoreZeroColor",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing team zero scores (when special).\n"
+    },
+    {
+	"scoreObjectTime",
+	NULL,
+	"2.0",
+	KEY_DUMMY,
+	"How many seconds score objects remain visible on the map.\n"
+    },
+    {
+	"baseWarningType",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which type of base warning you prefer.\n"
+	"A value of 0 disables base warning.\n"
+	"A value of 1 draws a red box on a base when someone has died.\n"
+	"A value of 2 makes the base name flash when someone has died.\n"
+	"A value of 3 combines the effects of values 1 and 2.\n"
+    },
+    {
 	"wallColor",
 	NULL,
 	"2",
@@ -1059,9 +1307,16 @@ struct option {
 	"Which color number to use for drawing walls.\n"
     },
     {
+	"fuelColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing fuel stations.\n"
+    },
+    {
 	"wallRadarColor",
 	NULL,
-	"2",
+	"8",
 	KEY_DUMMY,
 	"Which color number to use for drawing walls on the radar.\n"
 	"Valid values all even numbers smaller than maxColors.\n"
@@ -1088,12 +1343,26 @@ struct option {
 	"Which color number to use for drawing decorations on the radar.\n"
 	"Valid values are all even numbers smaller than maxColors.\n"
     },
-    {
+    {   
+	"messagesColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing messages.\n"
+    },
+    {   
 	"oldMessagesColor",
 	NULL,
-	"4",
+	"2",
 	KEY_DUMMY,
 	"Which color number to use for drawing old messages.\n"
+    },
+    {
+	"clientRanker",
+	NULL,
+	"No",
+	KEY_DUMMY,
+	"Scan messages killmsgs and make personal kill/death ranking.\n"
     },
     {
 	"outlineDecor",
@@ -1716,7 +1985,7 @@ struct option {
     {
 	"pointerButton3",
 	NULL,
-	"keyShield",
+	"keyDropBall",
 	KEY_DUMMY,
 	"The key to activate when pressing the third mouse button.\n"
     },
@@ -1748,6 +2017,43 @@ struct option {
 	KEY_DUMMY,
 	"An optional file where a recording of a game can be made.\n"
 	"If this file is undefined then recording isn't possible.\n"
+    },
+    {
+	"clientRankFile",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"An optional file where clientside kill/death rank is stored.\n"
+    },
+    {
+	"clientRankHTMLFile",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"An optional file where clientside kill/death rank is\n"
+	"published in HTML format. \n"
+    },
+    {
+	"clientRankHTMLNOJSFile",
+	NULL,
+	"",
+	KEY_DUMMY,
+	"An optional file where clientside kill/death rank is\n"
+	"published in HTML format, w/o JavaScript. \n"
+    },
+    {
+	"clientPortStart",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"
+    },
+    {
+	"clientPortEnd",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"
     },
 #ifdef _WINDOWS
     {
@@ -1810,7 +2116,7 @@ struct option {
 	KEY_DUMMY,
 	"Specifies the device name of the frame buffer.\n"
     },
-#endif
+#endif    
 #ifdef DEVELOPMENT
     {
         "test",
@@ -2103,8 +2409,9 @@ struct option {
     },
 };
 
+int optionsCount = NELEM(options);
 
-static unsigned String_hash(const char *s)
+unsigned String_hash(const char *s)
 {
     unsigned		hash = 0;
 
@@ -2123,8 +2430,7 @@ char* Get_keyHelpString(keys_t key)
 
     for (i = 0; i < NELEM(options); i++) {
 	if (options[i].key == key) {
-	    strncpy(buf, options[i].help, sizeof buf);
-	    buf[sizeof buf - 1] = '\0';
+	    strlcpy(buf, options[i].help, sizeof buf);
 	    if ((nl = strchr(buf, '\n')) != NULL) {
 		*nl = '\0';
 	    }
@@ -2199,28 +2505,12 @@ static void Usage(void)
     exit(1);
 }
 
-#ifdef _WINDOWS
-void	GetWindowsProfileString(const char* section, const char* key,
-								const char* def, char* result, int size)
-{
-	int		i;
-
-	for (i=0; i<3; i++)
-	{
-		GetPrivateProfileString("Settings", key, "", result, size,
-			Get_xpilotini_file(i));
-		if (result[0] != '\0')
-			return;
-	}
-	strncpy(result, def, size);
-}
-#endif
 
 static int Find_resource(XrmDatabase db, const char *resource,
 			 char *result, unsigned size, int *index)
 {
-    int			i;
 #ifndef _WINDOWS
+    int			i;
     int			len;
     char		str_name[80],
 			str_class[80],
@@ -2247,7 +2537,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
 	    len = 0;
 	} else {
 	    len = MIN(rmValue.size, size - 1);
-	    strncpy(result, rmValue.addr, len);
+	    memcpy(result, rmValue.addr, len);
 	}
 	result[len] = '\0';
 	return 1;
@@ -2257,33 +2547,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
     return 0;
 
 #else	/* _WINDOWS */
-
-    unsigned		hash = String_hash(resource);
-
-    for (i = 0;;) {
-	if (!strcmp(resource, options[i].name)) {
-	    *index = i;
-	    break;
-	}
-	if (++i >= NELEM(options)) {
-	    errno = 0;
-	    error("BUG: Can't find option \"%s\"", resource);
-	    exit(1);
-	}
-    }
-    GetWindowsProfileString("Settings", resource, options[*index].fallback, result, size);
-
-#if 0
-    GetPrivateProfileString("Settings", resource, "", result, size,
-			    Get_xpilotini_file(1));
-    if (result[0] == '\0') {
-	GetPrivateProfileString("Settings", resource, "", result, size,
-				Get_xpilotini_file(2));
-	if (result[0] == '\0') {
-	    strncpy(result, options[*index].fallback, size);
-	}
-    }
-#endif
+    Config_get_resource(resource, result, size, index);
 
     return 1;
 #endif
@@ -2339,23 +2603,18 @@ static void Get_float_resource(XrmDatabase db,
 			       const char *resource, DFLOAT *result)
 {
     int			index;
+    double		temp_result;
     char		resValue[MAX_CHARS];
 
+    temp_result = 0.0;
     Find_resource(db, resource, resValue, sizeof resValue, &index);
-#ifndef _WINDOWS
-    if (sscanf(resValue, "%f", result) <= 0) {
-#else
-    if (sscanf(resValue, "%lf", result) <= 0) {
-#endif
+    if (sscanf(resValue, "%lf", &temp_result) <= 0) {
 	errno = 0;
 	error("Bad value \"%s\" for option \"%s\", using default...",
 	      resValue, resource);
-#ifndef _WINDOWS
-	sscanf(options[index].fallback, "%f", result);
-#else
-	sscanf(options[index].fallback, "%lf", result);
-#endif
+	sscanf(options[index].fallback, "%lf", &temp_result);
     }
+    *result = (DFLOAT) temp_result;
 }
 
 
@@ -2381,6 +2640,49 @@ static void Get_bit_resource(XrmDatabase db, const char *resource,
     }
 }
 
+static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
+{
+    char		resValue[MAX(2*MSG_LEN, PATH_MAX + 1)];
+
+    Get_resource(db, "shipShape", resValue, sizeof resValue);
+    *ship_shape = xp_strdup(resValue);
+    if (*ship_shape && **ship_shape && !strchr(*ship_shape, '(' )) {
+	/* so it must be the name of shipshape defined in the shipshapefile. */
+	Get_resource(db, "shipShapeFile", resValue, sizeof resValue);
+	if (resValue[0] != '\0') {
+	    FILE *fp = fopen(resValue, "r");
+	    if (!fp) {
+		perror(resValue);
+	    } else {
+		char *ptr;
+		char *str;
+		char line[1024];
+		while (fgets(line, sizeof line, fp)) {
+		    if ((str = strstr(line, "(name:" )) != NULL
+			|| (str = strstr(line, "(NM:" )) != NULL) {
+			str = strchr(str, ':');
+			while (*++str == ' ');
+			if ((ptr = strchr(str, ')' )) != NULL) {
+			    *ptr = '\0';
+			}
+			if (!strcmp(str, *ship_shape)) {
+			    /* Gotcha */
+			    free(*ship_shape);
+			    if (ptr != NULL) {
+				*ptr = ')';
+			    }
+			    *ship_shape = xp_strdup(line);
+			    break;
+			}
+		    }
+		}
+		fclose(fp);
+	    }
+	}
+    }
+}
+
+
 #ifndef _WINDOWS
 void Get_xpilotrc_file(char *path, unsigned size)
 {
@@ -2389,89 +2691,21 @@ void Get_xpilotrc_file(char *path, unsigned size)
     const char		*optionalFile = getenv("XPILOTRC");
 
     if (optionalFile != NULL) {
-	strncpy(path, optionalFile, size);
+	strlcpy(path, optionalFile, size);
     }
     else if (home != NULL) {
-	strncpy(path, home, size);
-	strncat(path, "/", size);
-	strncat(path, defaultFile, size);
+	strlcpy(path, home, size);
+	strlcat(path, "/", size);
+	strlcat(path, defaultFile, size);
     }
     else {
-	strncpy(path, "", size);
+	strlcpy(path, "", size);
     }
-    if (size > 0) {
-	path[size - 1] = '\0';
-    }
-}
-#else
-/* Get the name for XPilot.ini .  Hopefully, this will be the fully qualified
-path to where XPilot.exe started from.  Right now, we guess that is the location
-of the default help file.
-the parameter level is used to determine which ini file to use.  This allows us
-to cascade through a series of default ini files.
-level = -1 = free private memory.
-level =  0 = current directory, XPilot.host.ini  (currently returns defini)
-level =  1 = current directory, XPilot.ini
-level =  2 = Windows directory, XPilot.ini
-*/
-char* Get_xpilotini_file(int level)
-{
-	static	char*	xpini = NULL;
-	static	char*	winxpini = NULL;
-	static	char*	defini = "XPilot.ini";
-
-	char*	end;
-	int		size;
-
-	switch(level)
-	{
-	case 0:
-	case 1:
-		if (xpini)
-			return(xpini);
-		if (!winHelpFile)			/* do we have the help default to build from? */
-			return(defini);			/* no, return generic name (wherever that is) */
-
-		end = strrchr(winHelpFile, '\\');
-		if (!end)
-			return(defini);			/* no backslash? bail out */
-		size = (end-winHelpFile) + 13;
-		xpini = malloc(size+1);
-		memset(xpini, 0, size);
-		strncpy(xpini, winHelpFile, end-winHelpFile);
-		strcat(xpini, "\\");
-		strcat(xpini, defini);
-		return(xpini);
-	case 2:
-		if (winxpini)
-			return(winxpini);
-		size = GetWindowsDirectory(winxpini, 0);	/* returns size needed */
-		winxpini = malloc(size+15);
-		GetWindowsDirectory(winxpini, size+13);
-		if (winxpini[strlen(winxpini)] != '\\')
-			strcat(winxpini, "\\");
-		strcat(winxpini, defini);
-		return(winxpini);
-	case -1:
-		if (xpini)
-		{
-			free(xpini);
-			xpini = NULL;
-		}
-		if (winxpini)
-		{
-			free(winxpini);
-			winxpini = NULL;
-		}
-		return(NULL);
-	}
-	error("BUG: bad level in Get_xpilotini_file");
-	return(defini);
 }
 #endif
 
-#ifndef _WINDOWS
 
+#ifndef _WINDOWS
 static void Get_file_defaults(XrmDatabase *rDBptr)
 {
     int			len;
@@ -2484,15 +2718,6 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
     sprintf(path, "%s%s", Conf_libdir(), myClass);
     *rDBptr = XrmGetFileDatabase(path);
 
-#ifdef VMS
-    /*
-     * None of the paths generated will be valid VMS file names.
-     */
-    tmpDB = XrmGetFileDatabase("SYS$LOGIN:decw$xdefaults.dat");
-    XrmMergeDatabases(tmpDB, rDBptr);
-    tmpDB = XrmGetFileDatabase("DECW$USER_DEFAULTS:xpilot.dat");
-    XrmMergeDatabases(tmpDB, rDBptr);
-#else
     if (lang != NULL) {
 	sprintf(path, "/usr/lib/X11/%s/app-defaults/%s", lang, myClass);
 	if (access(path, 0) == -1) {
@@ -2562,7 +2787,6 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 	tmpDB = XrmGetFileDatabase(path);
 	XrmMergeDatabases(tmpDB, rDBptr);
     }
-#endif
 }
 #endif	/* _WINDOWS*/
 
@@ -2581,17 +2805,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     int			firstKeyDef;
     keys_t		key;
     KeySym		ks;
-#ifndef _WINDOWS
-#endif
 
-#ifdef VMS
-    char		resValue[PATH_MAX + 1];
-#else
     char		resValue[MAX(2*MSG_LEN, PATH_MAX + 1)];
-#endif
     XrmDatabase		argDB = 0, rDB = 0;
 
-    extern void		Record_init(char *filename);
 #ifndef _WINDOWS
     XrmOptionDescRec	*xopt;
     int			size;
@@ -2664,7 +2881,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	if ((ptr = getenv(DISPLAY_ENV)) != NULL) {
 	    strlcpy(dispName, ptr, MAX_DISP_LEN);
 	} else {
-	    strcpy(dispName, DISPLAY_DEF);
+	    strlcpy(dispName, DISPLAY_DEF, MAX_DISP_LEN);
 	}
     }
     if ((dpy = XOpenDisplay(dispName)) == NULL) {
@@ -2672,9 +2889,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	if (strcmp(dispName, "NO_X") == 0) {
 	    /* user does not want X stuff.  experimental.  use at own risk. */
 	    if (*realName)
-	        strcpy(nickName, realName);
+		strlcpy(nickName, realName, MAX_NAME_LEN);
 	    else
-		strcpy(nickName, "X");
+		strlcpy(nickName, "X", MAX_NAME_LEN);
 	    *my_team = TEAM_NOT_SET;
 	    Get_int_resource(argDB, "port", port);
 	    Get_bool_resource(argDB, "list", list);
@@ -2690,8 +2907,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     if (Get_string_resource(argDB, "keyboard", resValue, MAX_DISP_LEN) == 0
 	|| resValue[0] == '\0') {
-	if ((ptr = getenv(KEYBOARD_ENV)) != NULL)
+	if ((ptr = getenv(KEYBOARD_ENV)) != NULL) {
 	    strlcpy(resValue, ptr, MAX_DISP_LEN);
+	}
     }
     if (resValue[0] == '\0') {
 	kdpy = NULL;
@@ -2711,16 +2929,14 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     XrmMergeDatabases(argDB, &rDB);
 
     Get_string_resource(rDB, "geometry", resValue, sizeof resValue);
-    geometry = strdup(resValue);
-#else	/* _WINDOWS */
-    /* Windows needs to know about -serverIni first */
-#endif	/* _WINDOWS */
+    geometry = xp_strdup(resValue);
+#endif
 
     if ((talk_fast_temp_buf_big = (char *)malloc(TALK_FAST_MSG_SIZE)) != NULL) {
         for (i = 0; i < TALK_FAST_NR_OF_MSGS; ++i) {
             sprintf (talk_fast_temp_buf, "msg%d", i + 1);
             Get_resource(rDB, talk_fast_temp_buf, talk_fast_temp_buf_big, TALK_FAST_MSG_SIZE);
-            talk_fast_msgs[i] = strdup (talk_fast_temp_buf_big);
+            talk_fast_msgs[i] = xp_strdup (talk_fast_temp_buf_big);
         }
         free (talk_fast_temp_buf_big);
     }
@@ -2752,9 +2968,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	xpprintf("to \"%s\".\n", hostName);
     }
 
+
     Get_resource(rDB, "name", nickName, MAX_NAME_LEN);
     if (!nickName[0]) {
-	strcpy(nickName, realName);
+	strlcpy(nickName, realName, MAX_NAME_LEN);
     }
     CAP_LETTER(nickName[0]);
     if (nickName[0] < 'A' || nickName[0] > 'Z') {
@@ -2768,27 +2985,15 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	Fix_nick_name(nickName);
 	xpprintf("to \"%s\".\n", nickName);
     }
+
     strlcpy(realname, realName, sizeof(realname));
     strlcpy(name, nickName, sizeof(name));
 
-#ifdef _WINDOWS
-    if (*name == '\0') {
-	/* Windows can have no default name */
-	strcpy(name, "NoName");
-    }
-    if (Argc > 2) {
-	/* oh, it's those fixed pos variables again! */
-	if (Argv[2] && !strncmp(Argv[2], "-team", 5)) {
-	    /* i've really got to fix that... */
-	    *my_team = Argv[2][6] & 0x0f;
-	}
-	else {
-	    Get_int_resource(rDB, "team", my_team);
-	}
-    }
-#else
     Get_int_resource(rDB, "team", my_team);
-#endif
+
+    IFWINDOWS( Config_get_name(name) );
+    IFWINDOWS( Config_get_team(my_team) );
+
     if (*my_team < 0 || *my_team > 9) {
 	*my_team = TEAM_NOT_SET;
     }
@@ -2804,42 +3009,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bool_resource(rDB, "refreshMotd", &i);
     refreshMotd = (i != 0) ? true : false;
 
-    Get_resource(rDB, "shipShape", resValue, sizeof resValue);
-    shipShape = strdup(resValue);
-    if (shipShape && *shipShape && !strchr(shipShape, '(' )) {
-	/* so it must be the name of shipshape defined in the shipshapefile. */
-	Get_resource(rDB, "shipShapeFile", resValue, sizeof resValue);
-	if (resValue[0] != '\0') {
-	    FILE *fp = fopen(resValue, "r");
-	    if (!fp) {
-		perror(resValue);
-	    } else {
-		char line[1024];
-		while (fgets(line, sizeof line, fp)) {
-		    if ((str = strstr(line, "(name:" )) != NULL
-			|| (str = strstr(line, "(NM:" )) != NULL) {
-			str = strchr(str, ':');
-			while (*++str == ' ');
-			if ((ptr = strchr(str, ')' )) != NULL) {
-			    *ptr = '\0';
-			}
-			if (!strcmp(str, shipShape)) {
-			    /* Gotcha */
-			    free(shipShape);
-			    if (ptr != NULL) {
-				*ptr = ')';
-			    }
-			    shipShape = strdup(line);
-			    break;
-			}
-		    }
-		}
-	    }
-#ifndef _WINDOWS
-	    fclose(fp);
-#endif
-	}
-    }
+    Get_shipshape_resource(rDB, &shipShape);
     Validate_shape_str(shipShape);
 
     Get_float_resource(rDB, "power", &power);
@@ -2864,6 +3034,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     LIMIT(shot_size, MIN_SHOT_SIZE, MAX_SHOT_SIZE);
     Get_int_resource(rDB, "teamShotSize", &teamshot_size);
     LIMIT(teamshot_size, MIN_TEAMSHOT_SIZE, MAX_TEAMSHOT_SIZE);
+    Get_int_resource(rDB, "teamShotColor", &teamShotColor);
     Get_bool_resource(rDB, "showNastyShots", &showNastyShots);
     Get_bool_resource(rDB, "titleFlip", &titleFlip);
     /*
@@ -2878,6 +3049,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bool_resource(rDB, "toggleShield", &toggle_shield);
     Get_bool_resource(rDB, "autoShield", &auto_shield);
 
+    Get_int_resource(rDB, "clientPortStart", &clientPortStart);
+    Get_int_resource(rDB, "clientPortEnd", &clientPortEnd);
+
+
     Get_resource(rDB, "modifierBank1", modBankStr[0], sizeof modBankStr[0]);
     Get_resource(rDB, "modifierBank2", modBankStr[1], sizeof modBankStr[1]);
     Get_resource(rDB, "modifierBank3", modBankStr[2], sizeof modBankStr[2]);
@@ -2890,10 +3065,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     colorSwitch = (i != 0) ? true : false;
     Get_bool_resource(rDB, "multibuffer", &i);
     multibuffer = (i != 0) ? true : false;
-#ifndef _WINDOWS
-	/* Windows already derived maxColors in InitWinX */
-    Get_int_resource(rDB, "maxColors", &maxColors);
-#endif
+
+    /* Windows already derived maxColors in InitWinX */
+    IFNWINDOWS( Get_int_resource(rDB, "maxColors", &maxColors) );
+
     Get_string_resource(rDB, "black", color_names[0], sizeof(color_names[0]));
     Get_string_resource(rDB, "white", color_names[1], sizeof(color_names[1]));
     Get_string_resource(rDB, "blue", color_names[2], sizeof(color_names[2]));
@@ -2903,31 +3078,68 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	sprintf(buf, "color%d", i);
 	if (!Get_string_resource(rDB, buf, resValue, MAX_COLOR_LEN)) {
 	    if (i < NUM_COLORS) {
-		strcpy(resValue, color_names[i]);
+		strlcpy(resValue, color_names[i], MAX_COLOR_LEN);
 	    }
 	}
-	strcpy(color_names[i], resValue);
+	strlcpy(color_names[i], resValue, MAX_COLOR_LEN);
     }
     Get_int_resource(rDB, "hudColor", &hudColor);
     Get_int_resource(rDB, "hrColor1", &hrColor1);
     Get_int_resource(rDB, "hrColor2", &hrColor2);
     Get_int_resource(rDB, "hrSize", &hrSize);
     Get_float_resource(rDB, "hrScale", &hrScale);
+    Get_float_resource(rDB, "hrLimit", &hrLimit);
+    Get_int_resource(rDB, "hudSize", &hudSize);
+    Get_int_resource(rDB, "dirPtrColor", &dirPtrColor);
+    Get_int_resource(rDB, "shipShapesHackColor", &shipShapesHackColor);
     Get_int_resource(rDB, "hudLockColor", &hudLockColor);
+    Get_int_resource(rDB, "msgScanBallColor", &msgScanBallColor);
+    Get_int_resource(rDB, "msgScanCoverColor", &msgScanCoverColor);
+    Get_int_resource(rDB, "selfLWColor", &selfLWColor);
+    Get_int_resource(rDB, "enemyLWColor", &enemyLWColor);
+    Get_int_resource(rDB, "teamLWColor", &teamLWColor);
+    Get_int_resource(rDB, "shipNameColor", &shipNameColor);
+    Get_int_resource(rDB, "baseNameColor", &baseNameColor);
+    Get_int_resource(rDB, "mineNameColor", &mineNameColor);
+    Get_int_resource(rDB, "ballColor", &ballColor);
+    Get_int_resource(rDB, "connColor", &connColor);
+    Get_int_resource(rDB, "windowColor", &windowColor);
+    Get_int_resource(rDB, "buttonColor", &buttonColor);
+    Get_int_resource(rDB, "borderColor", &borderColor);
+    Get_int_resource(rDB, "scoreColor", &scoreColor);
+    Get_int_resource(rDB, "scoreSelfColor", &scoreSelfColor);
+    Get_int_resource(rDB, "scoreInactiveColor", &scoreInactiveColor);
+    Get_int_resource(rDB, "scoreInactiveSelfColor",
+		     &scoreInactiveSelfColor);
+    Get_int_resource(rDB, "scoreZeroColor", &scoreZeroColor);
+    Get_float_resource(rDB, "scoreObjectTime", &scoreObjectTime);
+    Get_int_resource(rDB, "baseWarningType", &baseWarningType);
     Get_int_resource(rDB, "wallColor", &wallColor);
+    Get_int_resource(rDB, "fuelColor", &fuelColor);
     Get_int_resource(rDB, "wallRadarColor", &wallRadarColor);
     Get_int_resource(rDB, "decorColor", &decorColor);
     Get_int_resource(rDB, "decorRadarColor", &decorRadarColor);
     Get_int_resource(rDB, "targetRadarColor", &targetRadarColor);
+    Get_int_resource(rDB, "messagesColor", &messagesColor);
     Get_int_resource(rDB, "oldMessagesColor", &oldMessagesColor);
     Get_resource(rDB, "sparkColors", sparkColors, MSG_LEN);
 
     instruments = 0;
-    Get_bit_resource(rDB, "showShipName", &instruments, SHOW_SHIP_NAME);
-    Get_bit_resource(rDB, "showMineName", &instruments, SHOW_MINE_NAME);
+    hackedInstruments = 0;
+
     Get_bit_resource(rDB, "showMessages", &instruments, SHOW_MESSAGES);
     Get_bit_resource(rDB, "showHUD", &instruments, SHOW_HUD_INSTRUMENTS);
-    Get_bit_resource(rDB, "showHR", &instruments, SHOW_HR);
+    Get_bit_resource(rDB, "showHUDRadar", &instruments, SHOW_HUD_RADAR);
+
+    Get_bit_resource(rDB, "mapRadar", &hackedInstruments, MAP_RADAR);
+    Get_bit_resource(rDB, "clientRanker", &hackedInstruments, CLIENT_RANKER);
+    Get_bit_resource(rDB, "showShipShapes", &hackedInstruments, SHOW_SHIP_SHAPES);
+    Get_bit_resource(rDB, "showMyShipShape", &hackedInstruments, SHOW_MY_SHIP_SHAPE);
+    Get_bit_resource(rDB, "ballMsgScan", &hackedInstruments, BALL_MSG_SCAN);
+    Get_bit_resource(rDB, "showLivesByShip", &hackedInstruments,
+		     SHOW_LIVES_BY_SHIP);
+    Get_bit_resource(rDB, "treatZeroSpecial", &hackedInstruments,
+		     TREAT_ZERO_SPECIAL);
     Get_bit_resource(rDB, "verticalHUDLine", &instruments, SHOW_HUD_VERTICAL);
     Get_bit_resource(rDB, "horizontalHUDLine", &instruments, SHOW_HUD_HORIZONTAL);
     Get_bit_resource(rDB, "fuelMeter", &instruments, SHOW_FUEL_METER);
@@ -2937,6 +3149,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "packetSizeMeter", &instruments, SHOW_PACKET_SIZE_METER);
     Get_bit_resource(rDB, "packetLossMeter", &instruments, SHOW_PACKET_LOSS_METER);
     Get_bit_resource(rDB, "packetDropMeter", &instruments, SHOW_PACKET_DROP_METER);
+    Get_bit_resource(rDB, "packetLagMeter", &instruments, SHOW_PACKET_LAG_METER);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
     Get_bit_resource(rDB, "showItems", &instruments, SHOW_ITEMS);
     Get_bit_resource(rDB, "clock", &instruments, SHOW_CLOCK);
@@ -2952,13 +3165,18 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "showID", &instruments, SHOW_SHIP_ID);
 
     Get_bool_resource(rDB, "fullColor", &fullColor);
-    Get_bool_resource(rDB, "texturedObjects", &blockBitmaps);
-    if (!fullColor)
-	blockBitmaps = 0;
+    Get_bool_resource(rDB, "texturedObjects", &texturedObjects);
+    if (!fullColor) {
+	texturedObjects = false;
+	CLR_BIT(instruments, SHOW_TEXTURED_WALLS);
+    }
     Get_bool_resource(rDB, "pointerControl", &initialPointerControl);
     Get_bool_resource(rDB, "erase", &useErase);
     Get_float_resource(rDB, "showItemsTime", &showItemsTime);
     LIMIT(showItemsTime, MIN_SHOW_ITEMS_TIME, MAX_SHOW_ITEMS_TIME);
+
+    Get_int_resource(rDB, "showScoreDecimals", &showScoreDecimals);
+    LIMIT(showScoreDecimals, 0, 2);
 
     Get_float_resource(rDB, "speedFactHUD", &hud_move_fact);
     Get_float_resource(rDB, "speedFactPTR", &ptr_move_fact);
@@ -2987,25 +3205,25 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     Get_resource(rDB, "recordFile", resValue, sizeof resValue);
     Record_init(resValue);
+    Get_resource(rDB, "clientRankFile", resValue, sizeof resValue);
+    clientRankFile = xp_strdup(resValue);
+    Get_resource(rDB, "clientRankHTMLFile", resValue, sizeof resValue);
+    clientRankHTMLFile = xp_strdup(resValue);
+    Get_resource(rDB, "clientRankHTMLNOJSFile", resValue, sizeof resValue);
+    clientRankHTMLNOJSFile = xp_strdup(resValue);
     Get_resource(rDB, "texturePath", resValue, sizeof resValue);
-    texturePath = strdup(resValue);
+    texturePath = xp_strdup(resValue);
     Get_resource(rDB, "wallTextureFile", resValue, sizeof resValue);
-    wallTextureFile = strdup(resValue);
+    wallTextureFile = xp_strdup(resValue);
     Get_resource(rDB, "decorTextureFile", resValue, sizeof resValue);
-    decorTextureFile = strdup(resValue);
+    decorTextureFile = xp_strdup(resValue);
 
     Get_int_resource(rDB, "maxFPS", &maxFPS);
     oldMaxFPS = maxFPS;
 
-#ifdef _WINDOWS
-    /*
-     * Windows specific things
-     */
-    {
-	Get_int_resource(rDB, "radarDivisor", &RadarDivisor);
-	Get_bool_resource(rDB, "threadedDraw", &ThreadedDraw);
-    }
-#endif
+    IFWINDOWS( Get_int_resource(rDB, "radarDivisor", &RadarDivisor) );
+    IFWINDOWS( Get_bool_resource(rDB, "threadedDraw", &ThreadedDraw) );
+
     Get_float_resource(rDB, "scaleFactor", &scaleFactor);
     if (scaleFactor == 0.0) {
 	scaleFactor = 1.0;
@@ -3016,6 +3234,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
         scaleFactor_s = 2.0;
     }
     LIMIT(scaleFactor_s, MIN_SCALEFACTOR, MAX_SCALEFACTOR);
+
 #ifdef SOUND
     Get_string_resource(rDB, "sounds", sounds, sizeof sounds);
     Get_int_resource(rDB, "maxVolume", &maxVolume);
@@ -3026,15 +3245,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_string_resource(rDB, "frameBuffer", frameBuffer, sizeof frameBuffer);
 #endif
 
-#ifdef DEVELOPMENT
-    {
-	static void Start_testing(char testBuffer[]);
-	char testBuffer[256];
-	Get_string_resource(rDB, "test", testBuffer, sizeof testBuffer);
-	Start_testing(testBuffer);
-    }
-#endif
-
+    Get_test_resources(rDB);
 
     /*
      * Key bindings
@@ -3112,19 +3323,31 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	Get_resource(rDB, resValue, resValue, sizeof resValue);
 	ptr = resValue;
 	if (*ptr != '\0') {
-	    if (!strncasecmp(ptr, "key", 3))
-		ptr += 3;
-	    for (j = 0; j < NELEM(options); j++) {
-		if (options[j].key != KEY_DUMMY) {
-		    if (!strcasecmp(ptr, options[j].name + 3)) {
-			buttonDefs[i] = options[j].key;
-			break;
+	    for (ptr = strtok(resValue, " \t\r\n");
+		 ptr != NULL;
+		 ptr = strtok(NULL, " \t\r\n")) {
+		if (!strncasecmp(ptr, "key", 3))
+		    ptr += 3;
+		for (j = 0; j < NELEM(options); j++) {
+		    if (options[j].key != KEY_DUMMY) {
+			if (!strcasecmp(ptr, options[j].name + 3)) {
+			    if (NUM_BUTTON_DEFS(i) == MAX_BUTTON_DEFS) {
+				errno = 0;
+				error("Can only have %d keys bound to"
+				      " pointer button %d",
+				      MAX_BUTTON_DEFS, i);
+				break;
+			    }
+			    buttonDefs[i][NUM_BUTTON_DEFS(i)++]
+				= options[j].key;
+			    break;
+			}
 		    }
 		}
-	    }
-	    if (j == NELEM(options)) {
-		errno = 0;
-		error("Unknown key \"%s\" for pointer button %d", resValue, i);
+		if (j == NELEM(options)) {
+		    errno = 0;
+		    error("Unknown key \"%s\" for pointer button %d", ptr, i);
+		}
 	    }
 	}
     }
@@ -3142,9 +3365,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 void	defaultCleanup(void)
 {
-#ifdef _WINDOWS
-    Get_xpilotini_file(-1);
-#endif
+    IFWINDOWS( Get_xpilotini_file(-1) );
 
     if (keyDefs) {
 	free(keyDefs);
@@ -3154,6 +3375,18 @@ void	defaultCleanup(void)
 	free(texturePath);
 	texturePath = NULL;
     }
+/*    if (clientRankFile) {
++	free(clientRankFile);
++	clientRankFile = NULL;
++    }
++    if (clientRankHTMLFile) {
++	free(clientRankHTMLFile);
++	clientRankHTMLFile = NULL;
++    }
++    if (clientRankHTMLNOJSFile) {
++	free(clientRankHTMLNOJSFile);
++	clientRankHTMLNOJSFile = NULL;
++    }*/
     if (wallTextureFile) {
 	free(wallTextureFile);
 	wallTextureFile = NULL;
@@ -3198,9 +3431,12 @@ static void X_after(Display *display)
     }
 }
 
-static void Start_testing(char testBuffer[])
+static void Get_test_resources(XrmDatabase rDB)
 {
     char	*s;
+    char testBuffer[256];
+
+    Get_string_resource(rDB, "test", testBuffer, sizeof testBuffer);
 
     for (s = strtok(testBuffer, ":"); s != NULL; s = strtok(NULL, ":")) {
 	if (!strncasecmp(s, "xsync", 3)) {
@@ -3211,10 +3447,13 @@ static void Start_testing(char testBuffer[])
 	    XSetErrorHandler(X_error_handler);
 	}
 	else if (!strncasecmp(s, "after", 5)) {
-	    XSetAfterFunction(dpy, (int (*)()) X_after);
+	    XSetAfterFunction(dpy, (int (*)(
+#if NeedNestedPrototypes
+					    Display *
+#endif
+					    )) X_after);
 	}
 	else if (!strncasecmp(s, "color", 3)) {
-	    extern void Colors_debug(void);
 	    Colors_debug();
 	}
 	else {
@@ -3223,4 +3462,9 @@ static void Start_testing(char testBuffer[])
 	}
     }
 }
+#else
+static void Get_test_resources(XrmDatabase rDB)
+{
+}
 #endif
+

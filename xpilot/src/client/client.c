@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -26,16 +27,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 #include <time.h>
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#else
-#include "NT/winClient.h"
+# include <unistd.h>
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# include <X11/Xlib.h>
 #endif
 
+#ifdef _WINDOWS
+# include "NT/winClient.h"
+#endif
 
 #include "version.h"
 #include "config.h"
@@ -50,9 +56,12 @@
 #include "protoclient.h"
 #include "portability.h"
 #include "talk.h"
+#include "commonproto.h"
 #include "bitmaps.h"
 
 char client_version[] = VERSION;
+
+/*#define MAX_CHECKPOINT	26*/
 
 char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
@@ -74,6 +83,8 @@ int	numItemsTime[NUM_ITEMS];/* Number of frames to show this item count */
 DFLOAT	showItemsTime;		/* How long to show changed item count for */
 
 short	autopilotLight;
+
+int	showScoreDecimals;
 
 short	lock_id;		/* Id of player locked onto */
 short	lock_dir;		/* Direction of lock */
@@ -129,10 +140,12 @@ int     charsPerSecond;         /* Message output speed (configurable) */
 DFLOAT	hud_move_fact;		/* scale the hud-movement (speed) */
 DFLOAT	ptr_move_fact;		/* scale the speed pointer length */
 long	instruments;		/* Instruments on screen (bitmask) */
+long	hackedInstruments;	/* Hacked instruments on screen (bitmask) */
 char	mods[MAX_CHARS];	/* Current modifiers in effect */
 int	packet_size;		/* Current frame update packet size */
 int	packet_loss;		/* lost packets per second */
 int	packet_drop;		/* dropped packets per second */
+int	packet_lag;		/* approximate lag in frames */
 char	*packet_measure;	/* packet measurement in a second */
 long	packet_loop;		/* start of measurement */
 
@@ -149,6 +162,9 @@ int     auto_shield = 1;        /* shield drops for fire */
 int	maxFPS;			/* Client's own FPS */
 int	oldMaxFPS;
 
+int	clientPortStart = 0;	/* First UDP port for clients */
+int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
+
 byte	lose_item;		/* index for dropping owned item */
 int	lose_item_active;	/* one of the lose keys is pressed */
 
@@ -161,29 +177,29 @@ char 	audioServer[MAX_CHARS];	/* audio server */
 int 	maxVolume;		/* maximum volume (in percent) */
 #endif /* SOUND */
 
-static other_t		*Others = 0;
-static int		num_others = 0,
-			max_others = 0;
+other_t		*Others = 0;
+int		num_others = 0,
+		max_others = 0;
 
-fuelstation_t *fuels = 0;
-int	      num_fuels = 0;
+static DFLOAT		teamscores[MAX_TEAMS];
 
-homebase_t    *bases = 0;
-int	      num_bases = 0;
+fuelstation_t	*fuels = 0;
+int		num_fuels = 0;
 
-checkpoint_t  *checks = 0;
-int           num_checks = 0;
+homebase_t	*bases = 0;
+int		num_bases = 0;
 
-xp_polygon_t  *polygons = 0;
-int           num_polygons = 0, max_polygons = 0;
+checkpoint_t	*checks = 0;
+int		num_checks = 0;
 
+xp_polygon_t	*polygons = 0;
+int		num_polygons = 0, max_polygons = 0;
 
-edge_style_t     *edge_styles = 0;
-int              num_edge_styles = 0, max_edge_styles = 0;
+edge_style_t	*edge_styles = 0;
+int		num_edge_styles = 0, max_edge_styles = 0;
 
-polygon_style_t  *polygon_styles = 0;
-int              num_polygon_styles = 0, max_polygon_styles = 0;
-
+polygon_style_t	*polygon_styles = 0;
+int		num_polygon_styles = 0, max_polygon_styles = 0;
 
 static cannontime_t	*cannons = 0;
 static int		num_cannons = 0;
@@ -191,8 +207,12 @@ static int		num_cannons = 0;
 static target_t		*targets = 0;
 static int		num_targets = 0;
 
+/*static checkpoint_t	checks[MAX_CHECKPOINT];*/
+
 score_object_t		score_objects[MAX_SCORE_OBJECTS];
 int			score_object = 0;
+
+int		num_playing_teams = 0;
 
 #ifndef  _WINDOWS
 /* provide cut&paste and message history */
@@ -279,9 +299,7 @@ int Handle_fuel(int ind, int fuel)
 	error("Bad fuelstation index (%d)", ind);
 	return -1;
     }
-
     fuels[ind].fuel = fuel;
-
     return 0;
 }
 
@@ -394,18 +412,17 @@ int Base_info_by_pos(int x, int y, int *idp, int *teamp)
 
 int Handle_base(int id, int ind)
 {
-    int i;
+    int		i;
 
     if (ind < 0 || ind >= num_bases) {
-        errno = 0;
-        error("Bad homebase index (%d)", ind);
-        return -1;
+	errno = 0;
+	error("Bad homebase index (%d)", ind);
+	return -1;
     }
-
     for (i = 0; i < num_bases; i++) {
-        if (bases[i].id == id) {
-            bases[i].id = -1;
-        }
+	if (bases[i].id == id) {
+	    bases[i].id = -1;
+	}
     }
     bases[ind].id = id;
 
@@ -932,7 +949,8 @@ static int Map_init(void)
 	    bases[num_bases].pos = i;
 	    bases[num_bases].id = -1;
 	    bases[num_bases].team = type % 10;
-            bases[num_bases].type = type - (type % 10);
+	    bases[num_bases].type = type - (type % 10);
+	    bases[num_bases].deathtime = -10000; /* kps hack */
 	    num_bases++;
 	    Setup->map_data[i] = type - (type % 10);
 	    break;
@@ -997,6 +1015,9 @@ other_t *Other_by_name(char *name)
 {
     int i;
 
+    if (name == NULL)
+	return NULL;
+
     for (i = 0; i < num_others; i++) {
 	if (!strcmp(name, Others[i].name))
 	    return &Others[i];
@@ -1004,7 +1025,7 @@ other_t *Other_by_name(char *name)
     return NULL;
 }
 
-wireobj *Ship_by_id(int id)
+shipobj *Ship_by_id(int id)
 {
     other_t		*other;
 
@@ -1054,7 +1075,8 @@ int Handle_leave(int id)
 }
 
 int Handle_player(int id, int player_team, int mychar, char *player_name,
-		  char *real_name, char *host_name, char *shape, int myself)
+		  char *real_name, char *host_name, char *shape,
+		  int myself)
 {
     other_t		*other;
 
@@ -1083,7 +1105,8 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 	other = &Others[num_others++];
     }
     if (self == NULL
-	&& (myself || (version < 0x4F10 && strcmp(name, player_name) == 0))) {
+	&& (myself
+	    || (version < 0x4F10 && strcmp(name, player_name) == 0))) {
 	if (other != &Others[0]) {
 	    /*
 	     * Make `self' the first member of Others[].
@@ -1104,18 +1127,16 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
     other->mychar = mychar;
     other->war_id = -1;
     other->name_width = 0;
-    strncpy(other->name, player_name, sizeof(other->name));
+    strlcpy(other->name, player_name, sizeof(other->name));
     if (BIT(instruments, SHOW_SHIP_ID))
 	sprintf(other->id_string, "%d", id);
     else
-	strncpy(other->id_string, player_name, sizeof(other->id_string));
-    other->name[sizeof(other->name) - 1] = '\0';
-    strncpy(other->real, real_name, sizeof(other->real));
-    other->real[sizeof(other->real) - 1] = '\0';
-    strncpy(other->host, host_name, sizeof(other->host));
-    other->host[sizeof(other->host) - 1] = '\0';
+	strlcpy(other->id_string, player_name, sizeof(other->id_string));
+    strlcpy(other->real, real_name, sizeof(other->real));
+    strlcpy(other->host, host_name, sizeof(other->host));
     scoresChanged = 1;
     other->ship = Convert_shape_str(shape);
+    other->ignorelevel = 0;
     Calculate_shield_radius(other->ship);
 
     return 0;
@@ -1142,7 +1163,8 @@ int Handle_war(int robot_id, int killer_id)
     }
     if ((killer = Other_by_id(killer_id)) == NULL) {
 	errno = 0;
-	IFNWINDOWS(error("Can't update war against non-existing player (%d,%d)", robot_id, killer_id);)
+	error("Can't update war against non-existing player (%d,%d)",
+	      robot_id, killer_id);
 	return 0;
     }
     robot->war_id = killer_id;
@@ -1178,23 +1200,36 @@ int Handle_seek(int programmer_id, int robot_id, int sought_id)
     return 0;
 }
 
-int Handle_score(int id, int score, int life, int mychar)
+int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance)
 {
     other_t		*other;
 
     if ((other = Other_by_id(id)) == NULL) {
+#ifndef _WINDOWS
 	errno = 0;
-#ifndef	_WINDOWS
-	error("Can't update score for non-existing player %d,%d,%d", id, score, life);
+	error("Can't update score for non-existing player %d,%.2f,%d",
+	      id, score, life);
 #endif
 	return 0;
     }
     else if (other->score != score
 	|| other->life != life
-	|| other->mychar != mychar) {
+	|| other->mychar != mychar
+	|| other->alliance != alliance) {
 	other->score = score;
 	other->life = life;
 	other->mychar = mychar;
+	other->alliance = alliance;
+	scoresChanged = 1;
+    }
+
+    return 0;
+}
+
+int Handle_team_score(int team, DFLOAT score)
+{
+    if (teamscores[team] != score) {
+	teamscores[team] = score;
 	scoresChanged = 1;
     }
 
@@ -1222,18 +1257,22 @@ int Handle_timing(int id, int check, int round)
     return 0;
 }
 
-int Handle_score_object(int score, int x, int y, char *msg)
+int Handle_score_object(DFLOAT score, int x, int y, char *msg)
 {
     score_object_t*	sobj = &score_objects[score_object];
 
     sobj->score = score;
     sobj->x = x;
     sobj->y = y;
-    sobj->count = 1;
+    sobj->life_time = scoreObjectTime;
 
     /* Initialize sobj->hud_msg (is shown on the HUD) */
     if (msg[0] != '\0') {
-	sprintf(sobj->hud_msg, "%s %d", msg, score);
+	if (Using_score_decimals()) {
+	    sprintf(sobj->hud_msg, "%s %.*f", msg, showScoreDecimals, score);
+	} else {
+	    sprintf(sobj->hud_msg, "%s %d", msg, (int) rint(score));
+	}
 	sobj->hud_msg_len = strlen(sobj->hud_msg);
 	sobj->hud_msg_width = XTextWidth(gameFont,
 					 sobj->hud_msg, sobj->hud_msg_len);
@@ -1241,7 +1280,11 @@ int Handle_score_object(int score, int x, int y, char *msg)
 	sobj->hud_msg_len = 0;
 
     /* Initialize sobj->msg data (is shown on game area) */
-    sprintf(sobj->msg, "%d", score);
+    if (Using_score_decimals()) {
+	sprintf(sobj->msg, "%.*f", showScoreDecimals, score);
+    } else {
+	sprintf(sobj->msg, "%d", (int) rint(score));
+    }
     sobj->msg_len = strlen(sobj->msg);
     sobj->msg_width = XTextWidth(gameFont, sobj->msg, sobj->msg_len);
 
@@ -1251,41 +1294,103 @@ int Handle_score_object(int score, int x, int y, char *msg)
     return 0;
 }
 
-void Client_score_table(void)
+static void Print_roundend_messages(other_t **order)
 {
-    struct team_score {
-	int		score;
-	int		life;
-	int		playing;
-    };
-    struct team_score	team[MAX_TEAMS],
-			*team_order[MAX_TEAMS];
-    other_t		*other,
-			**order;
-    int			i, j, k, best = -1;
-    DFLOAT		ratio, best_ratio = -1e7;
+    static char		hackbuf[MSG_LEN];
+    static char		hackbuf2[MSG_LEN];
+    char		*s;
+    int			i;
+    other_t		*other;
 
-    if (scoresChanged == 0) {
-	return;
-    }
+    roundend = false;
+		
+    sprintf(hackbuf, "Kill ratio - Round: %d/%d, Total: %d/%d",
+	    killratio_kills, killratio_deaths,
+	    killratio_totalkills, killratio_totaldeaths);
 
-    if (players_exposed == false) {
-	return;
-    }
+    killratio_kills = 0;
+    killratio_deaths = 0;
+	
+    Add_message(hackbuf);
+    s = hackbuf;
+    s += sprintf(s, "Points - ");
 
-    if (num_others < 1) {
-	Paint_score_start();
-	scoresChanged = 0;
-	return;
-    }
+    /*
+     * Scores are nice to see e.g. in cup recordings.
+     */
+    for (i = 0; i < num_others; i++) {
+	other = order[i];
+	if (other->team == 0
+	    && BIT(hackedInstruments, TREAT_ZERO_SPECIAL))
+	    continue;
 
-    if ((order = (other_t **)malloc(num_others * sizeof(other_t *))) == NULL) {
-	error("No memory for score");
-	return;
+	if (Using_score_decimals()) {
+	    sprintf(hackbuf2, "%s: %.*f  ", other->name,
+		    showScoreDecimals, other->score);
+	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
+		Add_message(hackbuf);
+		s = hackbuf;
+	    }
+	    s += sprintf(s, "%s", hackbuf2);
+	} else {
+	    sprintf(hackbuf2, "%s: %d  ", other->name,
+		    (int) rint(other->score));
+	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
+		Add_message(hackbuf);
+		s = hackbuf;
+	    }
+	    s += sprintf(s,"%s",hackbuf2);
+	}
     }
-    if (BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY) {
-	memset(&team[0], 0, sizeof team);
+    Add_message(hackbuf);
+}
+
+bool Using_score_decimals(void)
+{
+    if (showScoreDecimals > 0 && version >= 0x4500
+	&& (version < 0x4F09 || version >= 0x4F11))
+	return true;
+    return false;
+}
+
+struct team_score {
+    DFLOAT	score;
+    int		life;
+    int		playing;
+};
+
+
+static void Determine_team_order(struct team_score *team_order[],
+				 struct team_score team[])
+{
+    int i, j, k;
+
+    num_playing_teams = 0;
+    for (i = 0; i < MAX_TEAMS; i++) {
+	if (team[i].playing) {
+	    for (j = 0; j < num_playing_teams; j++) {
+		if (team[i].score > team_order[j]->score
+		    || (team[i].score == team_order[j]->score
+			&& ((BIT(Setup->mode, LIMITED_LIVES))
+			    ? (team[i].life > team_order[j]->life)
+			    : (team[i].life < team_order[j]->life)))) {
+		    for (k = i; k > j; k--) {
+			team_order[k] = team_order[k - 1];
+		    }
+		    break;
+		}
+	    }
+	    team_order[j] = &team[i];
+	    num_playing_teams++;
+	}
     }
+}
+
+static void Determine_order(other_t **order, struct team_score team[])
+{
+    other_t		*other;
+    int			i, j, k;
+
     for (i = 0; i < num_others; i++) {
 	other = &Others[i];
 	if (BIT(Setup->mode, TIMING)) {
@@ -1313,16 +1418,6 @@ void Client_score_table(void)
 	    }
 	}
 	else {
-	    if (BIT(Setup->mode, LIMITED_LIVES)) {
-		ratio = (float) other->score;
-	    } else {
-		ratio = (float) other->score / (other->life + 1);
-	    }
-	    if (best == -1
-		|| ratio > best_ratio) {
-		best_ratio = ratio;
-		best = i;
-	    }
 	    for (j = 0; j < i; j++) {
 		if (order[j]->score < other->score) {
 		    break;
@@ -1353,63 +1448,133 @@ void Client_score_table(void)
 		team[other->team].score += other->score;
 		break;
 	    }
+	    /*if (version >= 0x4500) {
+	      team[other->team].score = teamscores[other->team];
+	      }*/
+
 	}
     }
-    Paint_score_start();
-    if (BIT(Setup->mode, TIMING)) {
-	best = order[0] - Others;
+    return;
+}
+
+static int Team_heading(int entrynum, int teamnum,
+			int teamlives, DFLOAT teamscore)
+{
+    other_t tmp;
+    tmp.id = -1;
+    tmp.team = teamnum;
+    tmp.war_id = -1;
+    tmp.name_width = 0;
+    tmp.ship = NULL;
+    sprintf(tmp.name, "TEAM %d", tmp.team);
+    strcpy(tmp.real, tmp.name);
+    strcpy(tmp.host, "");
+#if 1
+    if (BIT(Setup->mode, LIMITED_LIVES) && teamlives == 0) {
+	tmp.mychar = 'D';
+    } else {
+	tmp.mychar = ' ';
     }
+#else
+    tmp.mychar = ' ';
+#endif
+    tmp.score = teamscore;
+    tmp.life = teamlives;
+
+    if (teamnum != 0 || !BIT(hackedInstruments, TREAT_ZERO_SPECIAL))
+	Paint_score_entry(entrynum++, &tmp, true);
+    return entrynum;
+}
+
+static int Team_score_table(int entrynum, int teamnum,
+			    struct team_score team, other_t **order)
+{
+    other_t *other;
+    int i, j;
+    bool drawn = false;
+
     for (i = 0; i < num_others; i++) {
 	other = order[i];
+	if (other->team != teamnum)
+	    continue;
+	if (!drawn)
+	    entrynum = Team_heading(entrynum, teamnum, team.life, team.score);
 	j = other - Others;
-	Paint_score_entry(i, other, (j == best) ? true : false);
-    }
-    if (BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY) {
-	int pos = num_others + 1;
-	int num_playing_teams = 0;
-	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (team[i].playing) {
-		for (j = 0; j < num_playing_teams; j++) {
-		    if (team[i].score > team_order[j]->score
-			|| (team[i].score == team_order[j]->score
-			    && ((BIT(Setup->mode, LIMITED_LIVES))
-				? (team[i].life > team_order[j]->life)
-				: (team[i].life < team_order[j]->life)))) {
-			for (k = i; k > j; k--) {
-			    team_order[k] = team_order[k - 1];
-			}
-			break;
-		    }
-		}
-		team_order[j] = &team[i];
-		num_playing_teams++;
-	    }
-	}
-	for (i = 0; i < num_playing_teams; i++) {
-	    other_t tmp;
-	    tmp.id = -1;
-	    tmp.team = team_order[i] - &team[0];
-	    tmp.war_id = -1;
-	    tmp.name_width = 0;
-	    tmp.ship = NULL;
-	    sprintf(tmp.name, "Team %d", tmp.team);
-	    strcpy(tmp.real, tmp.name);
-	    strcpy(tmp.host, "");
-	    if (BIT(Setup->mode, LIMITED_LIVES) && team_order[i]->life == 0) {
-		tmp.mychar = 'D';
-	    } else {
-		tmp.mychar = ' ';
-	    }
-	    tmp.score = team_order[i]->score;
-	    tmp.life = team_order[i]->life;
-	    Paint_score_entry(pos++, &tmp, false);
-	}
+	Paint_score_entry(entrynum++, other, false);
+	drawn = true;
     }
 
-    free(order);
-#ifdef _WINDOWS
-	MarkPlayersForRedraw();
+    if (drawn)
+	entrynum++;
+    return entrynum;
+}
+
+
+void Client_score_table(void)
+{
+    struct team_score	team[MAX_TEAMS],
+			*team_order[MAX_TEAMS];
+    other_t		*other,
+			**order;
+    int			i, j, entrynum = 0;
+
+    if (scoresChanged == 0) {
+	return;
+    }
+
+    if (players_exposed == false) {
+	return;
+    }
+
+    if (num_others < 1) {
+	Paint_score_start();
+	scoresChanged = 0;
+	return;
+    }
+
+    if ((order = (other_t **)malloc(num_others * sizeof(other_t *))) == NULL) {
+	error("No memory for score");
+	return;
+    }
+    if (BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY) {
+	memset(&team[0], 0, sizeof team);
+    }
+    Determine_order(order, team);
+    Paint_score_start();
+    if (!(BIT(Setup->mode, TEAM_PLAY|TIMING) == TEAM_PLAY)) {
+	for (i = 0; i < num_others; i++) {
+	    other = order[i];
+	    j = other - Others;
+	    Paint_score_entry(i, other, false);
+	}
+    } else {
+	Determine_team_order(team_order, team);
+
+	for (i = (BIT(hackedInstruments, TREAT_ZERO_SPECIAL) ? 1 : 0);
+	     i < MAX_TEAMS;
+	     i++) {
+	    entrynum = Team_score_table(entrynum, i, team[i], order);
+	}
+	if (BIT(hackedInstruments, TREAT_ZERO_SPECIAL)) {
+	    entrynum = Team_score_table(entrynum, 0, team[0], order);
+	}
+#if 0
+	for (i = 0; i < num_playing_teams; i++) {
+	    entrynum = Team_heading(entrynum,
+				    team_order[i] - &team[0],
+				    team_order[i]->life,
+				    team_order[i]->score);
+	}
 #endif
+    }
+
+    if (roundend)
+	Print_roundend_messages(order);
+
+    free(order);
+
+    IFWINDOWS( MarkPlayersForRedraw() );
+
     scoresChanged = 0;
 }
 
@@ -1458,10 +1623,8 @@ static void Free_selectionAndHistory(void)
 
 int Client_init(char *server, unsigned server_version)
 {
-    extern void Make_table(void);
-
     version = server_version;
-    if (server_version < 0x4F00)
+    if (server_version < 0x4F09)
 	oldServer = 1;
     else
 	oldServer = 0;
@@ -1473,15 +1636,19 @@ int Client_init(char *server, unsigned server_version)
 	return -1;
     }
 
+    if (Init_asteroids() == -1) {
+	return -1;
+    }
+
     if (Bitmap_add_std_objects() == -1) {
-        return -1;
+	return -1;
     }
 
     if (Bitmap_add_std_textures() == -1) {
-        return -1;
+	return -1;
     }
 
-    strncpy(servername, server, sizeof(servername) - 1);
+    strlcpy(servername, server, sizeof(servername));
 
     return 0;
 }
@@ -1489,11 +1656,14 @@ int Client_init(char *server, unsigned server_version)
 int Client_setup(void)
 {
     if (oldServer) {
-        if (Map_init() == -1) return -1;
-        Map_dots();
-        Map_restore(0, 0, Setup->x, Setup->y);
-        Map_blue(0, 0, Setup->x, Setup->y);
+	if (Map_init() == -1) {
+	    return -1;
+	}
+	Map_dots();
+	Map_restore(0, 0, Setup->x, Setup->y);
+	Map_blue(0, 0, Setup->x, Setup->y);
 	/* No one wants this on old-style maps anyway, so turn it off.
+	 * I do, so turn it on.
 	 * This allows people to turn it on in their .xpilotrc for new maps
 	 * without affecting old ones. It's still possible to turn in on
 	 * from the config menu during play for old maps.
@@ -1501,6 +1671,8 @@ int Client_setup(void)
 	CLR_BIT(instruments, SHOW_TEXTURED_WALLS);
     }
 
+    /* kps - the above one is used in the standard code  */
+    /*RadarHeight = (RadarWidth * Setup->y) / Setup->x;*/
     RadarHeight = (RadarWidth * Setup->height) / Setup->width;
 
     if (Init_playing_windows() == -1) {
@@ -1512,6 +1684,24 @@ int Client_setup(void)
     if (Alloc_history() == -1) {
 	return -1;
     }
+
+    /* Old servers can't deal with 0.0 turnresistance, so swap to
+     * the alternate bank, and hope there's something better there. */
+    /* HACK: Hanging Gardens runs an old server (version code 0x4101)
+     * which happens to have the turnresistance patch. */
+    if (turnresistance == 0.0 && version < 0x4200 && version != 0x4101)
+    {
+	DFLOAT tmp;
+#define SWAP(a,b) (tmp = (a), (a) = (b), (b) = tmp)
+	SWAP(power, power_s);
+	SWAP(turnspeed, turnspeed_s);
+	SWAP(turnresistance, turnresistance_s);
+#undef SWAP
+	control_count = CONTROL_DELAY;
+	Add_message("Old server can't handle turnResistance=0.0; "
+		    "swapping to alternate settings [*Client message*]");
+    }
+
     return 0;
 }
 
@@ -1572,33 +1762,25 @@ void Client_cleanup(void)
 
 int Client_fd(void)
 {
-#ifndef _WINDOWS
     return ConnectionNumber(dpy);
-#else
-    return 0;
-#endif
 }
 
 int Client_input(int new_input)
 {
 #ifndef _WINDOWS
-    return xevent(new_input);
+    return x_event(new_input);
 #else
     return 0;
 #endif
 }
 void Client_flush(void)
 {
-#ifndef _WINDOWS
     XFlush(dpy);
-#endif
 }
 
 void Client_sync(void)
 {
-#ifndef _WINDOWS
     XSync(dpy, False);
-#endif
 }
 
 int Client_wrap_mode(void)
@@ -1606,7 +1788,7 @@ int Client_wrap_mode(void)
     return (BIT(Setup->mode, WRAP_PLAY) != 0);
 }
 
-int Check_client_fps(void)
+int Check_client_fps(void) 
 {
     if (oldMaxFPS != maxFPS) {
 	LIMIT(maxFPS, 1, 200);
@@ -1615,3 +1797,4 @@ int Check_client_fps(void)
     }
     return 0;
 }
+

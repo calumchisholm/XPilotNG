@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,11 +29,13 @@
 #include <limits.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#else
-#include "NT/winX.h"
-#include <io.h>
+# include <unistd.h>
+# include <X11/Xlib.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include <io.h>
 #endif
 
 #include "version.h"
@@ -44,7 +47,7 @@
 #include "xpmread.h"
 #include "texture.h"
 #include "portability.h"
-
+#include "bitmaps.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX        1023
@@ -52,7 +55,7 @@
 
 char texture_version[] = VERSION;
 
-#if 0
+#if 0 /* kps 0 == ng, 1 == old version */
 
 enum TextureStatus {
     TextureUnloaded = 0,
@@ -73,6 +76,7 @@ typedef struct texture_info {
  */
 #define static const
 #include "../../lib/textures/rock4.xpm"
+#include "../../lib/textures/ball.xpm"
 #undef static
 
 static texture_info_t wall_texture_info = {
@@ -183,6 +187,7 @@ Pixmap Texture_decor(void)
     return Texture_load(&decor_texture_info);
 }
 
+#if 0
 /*
  * Load a texture for ball drawing.
  */
@@ -190,23 +195,30 @@ Pixmap Texture_ball(void)
 {
     return Texture_load(&ball_texture_info);
 }
-
 #endif
 
-#include "bitmaps.h"
+#else
 
 Pixmap Texture_wall(void)
 {
     xp_bitmap_t *bmp;
-    if (!blockBitmaps) return None;
-    if ((bmp = Bitmap_get(top, BM_WALL_TEXTURE, 0)) == NULL) return None;
+    if (!texturedObjects)
+	return None;
+    if ((bmp = Bitmap_get(top, BM_WALL_TEXTURE, 0)) == NULL)
+	return None;
     return bmp->bitmap;
 }
 
 Pixmap Texture_decor(void)
 {
     xp_bitmap_t *bmp;
-    if (!blockBitmaps) return None;
-    if ((bmp = Bitmap_get(top, BM_DECOR_TEXTURE, 0)) == NULL) return None;
+    if (!texturedObjects)
+	return None;
+    if ((bmp = Bitmap_get(top, BM_DECOR_TEXTURE, 0)) == NULL)
+	return None;
     return bmp->bitmap;
 }
+
+
+#endif
+

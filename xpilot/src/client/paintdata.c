@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -29,10 +29,12 @@
 #include <math.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#else
-#include "NT/winX.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
 #endif
 
 #include "version.h"
@@ -49,6 +51,8 @@
 #include "xinit.h"
 #include "protoclient.h"
 #include "dbuff.h"
+#include "commonproto.h"
+#include "ignore.h"
 
 char paintdata_version[] = VERSION;
 
@@ -92,6 +96,10 @@ vdecor_t	*vdecor_ptr;
 int		 num_vdecor, max_vdecor;
 wreckage_t	*wreckage_ptr;
 int		 num_wreckage, max_wreckage;
+asteroid_t	*asteroid_ptr;
+int		 num_asteroids, max_asteroids;
+wormhole_t	*wormhole_ptr;
+int		 num_wormholes, max_wormholes;
 
 long		time_left = -1;
 long		start_loops, end_loops;
@@ -104,7 +112,9 @@ XSegment	*seg_ptr[MAX_COLORS];
 int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
 
 int		eyesId;		/* Player we get frame updates for */
+other_t		*eyes;		/* Player we get frame updates for */
 short		snooping;	/* are we snooping on someone else? */
+int		eyeTeam = TEAM_NOT_SET;
 
 unsigned long	current_foreground;
 
@@ -360,6 +370,7 @@ int Arc_add(int color,
     t.y = WINSCALE(y);
     t.width = WINSCALE(width+x) - t.x;
     t.height = WINSCALE(height+y) - t.y;
+
     t.angle1 = angle1;
     t.angle2 = angle2;
     STORE(XArc, arc_ptr[color], num_arc[color], max_arc[color], t);
@@ -432,6 +443,7 @@ int Handle_start(long server_loops)
     shutdown_delay = 0;
     shutdown_count = -1;
     eyesId = (self != NULL) ? self->id : 0;
+    eyes = Other_by_id(eyesId);
     thrusttime = -1;
     shieldtime = -1;
     phasingtime = -1;
@@ -486,20 +498,20 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 	packet_size = newPacketSize;
     }
 
-    world.x = pos.x - (view_width / 2);
-    world.y = pos.y - (view_height / 2);
+    world.x = pos.x - (ext_view_width / 2);
+    world.y = pos.y - (ext_view_height / 2);
     realWorld = world;
     if (BIT(Setup->mode, WRAP_PLAY)) {
-	if (world.x < 0 && world.x + view_width < Setup->width) {
+	if (world.x < 0 && world.x + ext_view_width < Setup->width) {
 	    world.x += Setup->width;
 	}
-	else if (world.x > 0 && world.x + view_width >= Setup->width) {
+	else if (world.x > 0 && world.x + ext_view_width >= Setup->width) {
 	    realWorld.x -= Setup->width;
 	}
-	if (world.y < 0 && world.y + view_height < Setup->height) {
+	if (world.y < 0 && world.y + ext_view_height < Setup->height) {
 	    world.y += Setup->height;
 	}
-	else if (world.y > 0 && world.y + view_height >= Setup->height) {
+	else if (world.y > 0 && world.y + ext_view_height >= Setup->height) {
 	    realWorld.y -= Setup->height;
 	}
     }
@@ -510,6 +522,7 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 int Handle_eyes(int id)
 {
     eyesId = id;
+    eyes = Other_by_id(eyesId);
     return 0;
 }
 
@@ -521,8 +534,7 @@ int Handle_damaged(int dam)
 
 int Handle_modifiers(char *m)
 {
-    strncpy(mods, m, MAX_CHARS);
-    mods[MAX_CHARS-1] = '\0';
+    strlcpy(mods, m, MAX_CHARS);
     return 0;
 }
 
@@ -629,7 +641,7 @@ int Handle_ball(int x, int y, int id)
     return 0;
 }
 
-int Handle_ship(int x, int y, int id, int dir, int shield, int cloak, int eshield,
+int Handle_ship(int x, int y, int id, int dir, int shield, int cloak, int eshield, 
 				int phased, int deflector)
 {
     ship_t	t;
@@ -652,9 +664,15 @@ int Handle_ship(int x, int y, int id, int dir, int shield, int cloak, int eshiel
      * while self could be NULL here.
      */
     if (!selfVisible && ((x == pos.x && y == pos.y) || (self && id == self->id))) {
+	int radarx, radary;
         eyesId = id;
+	eyes = Other_by_id(eyesId);
+	if (eyes != NULL)
+	    eyeTeam = eyes->team;
 	selfVisible = (self && (id == self->id));
-	return Handle_radar(x, y, 3);
+	radarx = (int)((double)(x * RadarWidth) / Setup->width + 0.5);
+	radary = (int)((double)(y * RadarHeight) / Setup->height + 0.5);
+	return Handle_radar(radarx, radary, 3);
     }
 
     return 0;
@@ -741,6 +759,29 @@ int Handle_wreckage(int x, int y, int wrecktype, int size, int rotation)
     return 0;
 }
 
+int Handle_asteroid(int x, int y, int type, int size, int rotation)
+{
+    asteroid_t	t;
+
+    t.x = x;
+    t.y = y;
+    t.type = type;
+    t.size = size;
+    t.rotation = rotation;
+    STORE(asteroid_t, asteroid_ptr, num_asteroids, max_asteroids, t);
+    return 0;
+}
+
+int Handle_wormhole(int x, int y)
+{
+    wormhole_t	t;
+
+    t.x = x - BLOCK_SZ / 2;
+    t.y = y - BLOCK_SZ / 2;
+    STORE(wormhole_t, wormhole_ptr, num_wormholes, max_wormholes, t);
+    return 0;
+}
+
 int Handle_ecm(int x, int y, int size)
 {
     ecm_t	t;
@@ -781,17 +822,19 @@ int Handle_radar(int x, int y, int size)
 
     t.x = x;
     t.y = y;
-    if (size >= 0x80) {    /* friendly target */
-	size -= 0x80;
+    t.color = WHITE;
+    
+    if ((size & 0x80) != 0) {
+	/* friendly target */
 	if (maxColors > 4)
 	    t.color = 4;
 	else if (!colorSwitch)
 	    t.color = RED;
 	else
-	    t.color = WHITE; /* only 1 plane for moving radar objects */
+	    t.color = WHITE; 	/* only 1 plane for moving radar objects */
+	size &= ~0x80;
     }
-    else
-	t.color = WHITE;
+
     t.size = size;
     STORE(radar_t, radar_ptr, num_radar, max_radar, t);
     return 0;
@@ -799,7 +842,50 @@ int Handle_radar(int x, int y, int size)
 
 int Handle_message(char *msg)
 {
-    Add_message(msg);
+    int i;
+    char ignoree[MAX_CHARS];
+    other_t *other;
+
+    if (msg[strlen(msg) - 1] == ']') {
+	for (i = strlen(msg) - 1; i > 0; i--) {
+	    if (msg[i - 1] == ' ' && msg[i] == '[')
+		break;
+	}
+
+	if (i == 0) {		/* Odd, but let it pass */
+	    Add_message(msg);
+	    return 0;
+	}
+
+	strcpy(ignoree, &msg[i + 1]);
+
+	for (i = 0; i < (int) strlen(ignoree); i++) {
+	    if (ignoree[i] == ']')
+		break;
+	}
+	ignoree[i] = '\0';
+
+	other = Other_by_name(ignoree);
+
+	if (other == NULL) {	/* Not in list, probably servermessage */
+	    Add_message(msg);
+	    return 0;
+	}
+
+	if (other->ignorelevel <= 0) {
+	    Add_message(msg);
+	    return 0;
+	}
+
+	if (other->ignorelevel >= 2)
+	    return 0;
+
+	/* ignorelevel must be 1 */
+
+	crippleTalk(msg);
+	Add_message(msg);
+    } else
+	Add_message(msg);
     return 0;
 }
 
@@ -964,9 +1050,20 @@ void paintdataCleanup(void)
 	free(wreckage_ptr);
 	wreckage_ptr = 0;
     }
+    if (max_asteroids > 0 && asteroid_ptr) {
+	max_asteroids = 0;
+	free(asteroid_ptr);
+	asteroid_ptr = 0;
+    }
+    if (max_wormholes > 0 && wormhole_ptr) {
+	max_wormholes = 0;
+	free(wormhole_ptr);
+	wormhole_ptr = 0;
+    }
 }
 
-short	scaleArray[32768];
+#define SCALE_ARRAY_SIZE	32768
+short	scaleArray[SCALE_ARRAY_SIZE];
 
 void Init_scale_array(void)
 {
@@ -1009,4 +1106,21 @@ void Init_scale_array(void)
 	scaleArray[i] = (int)floor(i * scaleMultFactor + 0.5);
     }
 
+    /* verify correct calculations, because of reported gcc optimization bugs. */
+    for (i = 1; i < NELEM(scaleArray); i++) {
+	if (scaleArray[i] < 1) {
+	    break;
+	}
+    }
+
+    if (i != SCALE_ARRAY_SIZE) {
+	fprintf(stderr,
+		"Error: Illegal value %d in scaleArray[%d].\n"
+		"\tThis error may be due to a bug in your compiler.\n"
+		"\tEither try a lower optimization level,\n"
+		"\tor a different compiler version or vendor.\n",
+		scaleArray[i], i);
+	exit(1);
+    }
 }
+

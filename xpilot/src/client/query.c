@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -29,23 +29,26 @@
 #include <time.h>
 #include <sys/types.h>
 
-#ifndef _WINDOWS
-#include <unistd.h>
-#include <sys/param.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#if defined(SVR4) || defined(__svr4__)
-#include <sys/sockio.h>
+#if !defined(_WINDOWS)
+# include <unistd.h>
+# include <sys/param.h>
+# include <sys/socket.h>
+# include <sys/ioctl.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+# if defined(SVR4) || defined(__svr4__)
+#  include <sys/sockio.h>
+# endif
+# ifndef __hpux
+#  include <sys/time.h>
+# endif
+# include <net/if.h>
 #endif
-#include <sys/time.h>
-#include <net/if.h>
-#else
-#include "NT/winClient.h"
-#include "NT/winNet.h"
-#define	QUERY_FUDGED
+
+#ifdef _WINDOWS
+# include "NT/winClient.h"
+# include "NT/winNet.h"
 #endif
 
 #include "version.h"
@@ -55,6 +58,16 @@
 #include "protoclient.h"
 
 char query_version[] = VERSION;
+
+
+#if defined(_WINDOWS)
+# ifndef QUERY_FUDGED
+#  define QUERY_FUDGED
+# endif
+#endif
+#ifdef _IBMESA
+# define _SOCKADDR_LEN
+#endif
 
 #ifndef MAX_INTERFACE
 #define MAX_INTERFACE    16	/* Max. number of network interfaces. */
@@ -76,7 +89,8 @@ char query_version[] = VERSION;
 static int Query_subnet(sock_t *sock,
 			struct sockaddr_in *host_addr,
 			struct sockaddr_in *mask_addr,
-			char *msg, int msglen)
+			char *msg,
+			int msglen)
 {
     int i, nbits, max;
     unsigned long bit, mask, dest, host, hostmask, hostbits[256];
@@ -162,7 +176,7 @@ static int Query_fudged(sock_t *sock, int port, char *msg, int msglen)
     for (i = 0; h->h_addr_list[i]; i++) {
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_port = (u_short)htons((u_short)port);
+	addr.sin_port = (unsigned short)htons((unsigned short)port);
 	p = (unsigned char *) h->h_addr_list[i];
 	addrmask = p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3];
 	addr.sin_addr.s_addr = htonl(addrmask);
@@ -203,7 +217,9 @@ int Query_all(sock_t *sock, int port, char *msg, int msglen)
     return Query_fudged(sock, port, msg, msglen);
 #else
 
-    int         	fd, len, ifflags, count = 0, broadcasts = 0, haslb = 0;
+    int         	fd, len, ifflags, count = 0;
+    /* int			broadcasts = 0; */
+    int			haslb = 0;
     struct sockaddr_in	addr, mask, loopback;
     struct ifconf	ifconf;
     struct ifreq	*ifreqp, ifreq, ifbuf[MAX_INTERFACE];
@@ -329,10 +345,10 @@ int Query_all(sock_t *sock, int port, char *msg, int msglen)
 		 * Success!
 		 */
 		count++;
-		if ((ifflags & (IFF_LOOPBACK|IFF_POINTOPOINT|IFF_BROADCAST))
+		/* if ((ifflags & (IFF_LOOPBACK|IFF_POINTOPOINT|IFF_BROADCAST))
 		    == IFF_BROADCAST) {
 		    broadcasts++;
-		}
+		} */
 		continue;
 	    }
 
@@ -369,13 +385,24 @@ int Query_all(sock_t *sock, int port, char *msg, int msglen)
 	addr.sin_port = htons(port);
 	if (Query_subnet(sock, &addr, &mask, msg, msglen) != -1) {
 	    count++;
-	    broadcasts++;
+	    /* broadcasts++; */
 	}
     }
 
-    if (broadcasts == 0 && haslb) {
+    /*
+     * Normally we wouldn't send a query over the loopback interface
+     * if we successfully have sent one or more broadcast queries,
+     * but it happens that some Linux machines which have firewalling
+     * packet filters installed don't copy outgoing broadcast packets
+     * to their local sockets.  Therefore we now always also send
+     * one query to the loopback address just to be sure we reach
+     * our own server.  That we now may receive two or more replies
+     * from the same server is not as serious as not receiving any
+     * reply would be.
+     */
+    if (haslb /* && broadcasts == 0 */) {
 	/*
-	 * We didn't reach the localhost yet.
+	 * We may not have reached the localhost yet.
 	 */
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_addr = loopback.sin_addr;
@@ -400,3 +427,4 @@ int Query_all(sock_t *sock, int port, char *msg, int msglen)
 
 #endif	/* QUERY_FUDGED */
 }
+

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,13 +30,19 @@
 #include <time.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xos.h>
+# include <unistd.h>
+# include <X11/X.h>
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# include <X11/Xos.h>
 #else
-#include "winX.h"
+# include <fcntl.h>
+#endif
+
+#ifdef _WINDOWS
+# include "winX.h"
+# include "winX_.h"
+# include <io.h>
 #endif
 
 #include "version.h"
@@ -49,6 +55,8 @@
 #include "record.h"
 #include "recordfmt.h"
 #include "xpmread.h"
+#include "commonproto.h"
+#include "xinit.h"
 
 char record_version[] = VERSION;
 
@@ -84,8 +92,16 @@ static int		record_dash_dirty = 0;	/* Has dashes list changed? */
  */
 static void Dummy_newFrame(void) {}
 static void Dummy_endFrame(void) {}
+
+#ifdef _WINDOWS
+extern void paintItemSymbol(unsigned char type, Drawable drawable, GC mygc, int x, int y, int color);
+#else
 static void Dummy_paintItemSymbol(unsigned char type, Drawable drawable,
 				  GC mygc, int x, int y, int color) {}
+#endif
+
+extern char	hostname[];
+
 
 /*
  * Miscellaneous recording functions.
@@ -149,7 +165,6 @@ static void RWriteString(char *str)
  */
 static void RWriteHeader(void)
 {
-    extern char			hostname[];
     time_t			t;
     char			buf[256];
     char			*ptr;
@@ -176,7 +191,7 @@ static void RWriteHeader(void)
     RWriteString(servername);
     RWriteByte(FPS);
     time(&t);
-    strcpy(buf, ctime(&t));
+    strlcpy(buf, ctime(&t), sizeof(buf));
     if ((ptr = strchr(buf, '\n')) != NULL) {
 	*ptr = '\0';
     }
@@ -186,15 +201,24 @@ static void RWriteHeader(void)
     putc(maxColors, recordFP);
     for (i = 0; i < maxColors; i++) {
 	RWriteULong(colors[i].pixel);
+#ifdef _WINDOWS
+	{
+		COLORREF col = WinXPColour(colors[i].pixel);
+		RWriteUShort(256*GetRValue(col));
+		RWriteUShort(256*GetGValue(col));
+		RWriteUShort(256*GetBValue(col));
+	}
+#else
 	RWriteUShort(colors[i].red);
 	RWriteUShort(colors[i].green);
 	RWriteUShort(colors[i].blue);
+#endif
     }
     RWriteString(gameFontName);
     RWriteString(messageFontName);
 
-    RWriteUShort(view_width);
-    RWriteUShort(view_height);
+    RWriteUShort(draw_width);
+    RWriteUShort(draw_height);
 
     record_dashes = dashes;
     record_num_dashes = NUM_DASHES;
@@ -221,6 +245,7 @@ static int RGetPixelIndex(unsigned long pixel)
 
 static void RWriteTile(Pixmap tile)
 {
+#ifndef _WINDOWS
     typedef struct tile_list {
 	struct tile_list	*next;
 	Pixmap			tile;
@@ -280,6 +305,7 @@ static void RWriteTile(Pixmap tile)
     XDestroyImage(img);
 
     next_tile_id++;
+#endif
 }
 
 static void RWriteGC(GC gc, unsigned long req_mask)
@@ -480,8 +506,8 @@ static void RNewFrame(void)
     recording = True;
 
     putc(RC_NEWFRAME, recordFP);
-    RWriteUShort(view_width);
-    RWriteUShort(view_height);
+    RWriteUShort(draw_width);
+    RWriteUShort(draw_height);
 }
 
 static void REndFrame(void)
@@ -604,7 +630,7 @@ static int RDrawString(Display *display, Drawable drawable, GC gc,
     }
     return 0;
 }
-
+   
 static int RFillArc(Display *display, Drawable drawable, GC gc,
 		    int x, int y,
 		    unsigned height, unsigned width,
@@ -649,6 +675,9 @@ static int RFillPolygon(Display *display, Drawable drawable, GC gc,
 static void RPaintItemSymbol(unsigned char type, Drawable drawable, GC mygc,
 			     int x, int y, int color)
 {
+#ifdef _WINDOWS
+	paintItemSymbol(type, drawable, mygc, x, y, color);
+#endif
     if (drawable == p_draw) {
 	putc(RC_PAINTITEMSYMBOL, recordFP);
 	RWriteGC(gc, GCForeground | GCBackground);
@@ -770,7 +799,11 @@ static struct recordable_drawing Xdrawing = {
     (draw_string_proto_t)XDrawString,
     XFillArc,
     XFillPolygon,
+#ifdef _WINDOWS
+    paintItemSymbol,
+#else
     Dummy_paintItemSymbol,
+#endif
     XFillRectangle,
     XFillRectangles,
     XDrawArcs,
@@ -824,6 +857,9 @@ long Record_size(void)
  */
 void Record_toggle(void)
 {
+#if !(defined(_WINDOWS) && defined(PENS_OF_PLENTY))
+/* No recording available with PEN_OF_PLENTY under Windows.
+*/
     if (record_filename != NULL) {
 	if (!record_start) {
 	    record_start = True;
@@ -835,6 +871,9 @@ void Record_toggle(void)
 		    record_start = False;
 		} else {
 		    setvbuf(recordFP, NULL, _IOFBF, (size_t)(8 * 1024));
+# ifdef _WINDOWS
+			setmode(fileno(recordFP), O_BINARY);
+# endif
 		}
 	    }
 	} else {
@@ -847,6 +886,7 @@ void Record_toggle(void)
 	    recording = False;
 	}
     }
+#endif
 }
 
 /*
@@ -870,6 +910,7 @@ void Record_init(char *filename)
 {
     rd = Xdrawing;
     if (filename != NULL && filename[0] != '\0') {
-	record_filename = strdup(filename);
+	record_filename = xp_strdup(filename);
     }
 }
+

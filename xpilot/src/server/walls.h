@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -29,8 +30,6 @@
 #endif
 
 extern char walls_version[];
-extern long KILLING_SHOTS;
-int Rate(int winner, int loser);
 
 /*
  * Wall collision detection and bouncing.
@@ -114,5 +113,7 @@ struct move_parameters {
     unsigned long	obj_target_mask;	/* object target hit? */
     unsigned long	obj_treasure_mask;	/* objects treasure crash? */
 };
+
+/*void Move_segment(move_state_t *ms);*/
 
 #endif

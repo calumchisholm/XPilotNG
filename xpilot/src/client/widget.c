@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,13 +30,15 @@
 #include <limits.h>
 
 #ifndef _WINDOWS
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#include <X11/Xutil.h>
-#else
-#include "NT/winX.h"
-#include "NT/winClient.h"
-#include "NT/winXXPilot.h"
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+# include <X11/Xutil.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winClient.h"
+# include "NT/winXXPilot.h"
 #endif
 
 #include "version.h"
@@ -358,11 +360,11 @@ static void Widget_draw_button(widget_t *widget, bool inverse, const char *label
 	}
     } else {
 	if (inverse) {
-	    fg = colors[RED].pixel;
+	    fg = colors[buttonColor].pixel;
 	    bg = colors[BLACK].pixel;
 	} else {
 	    fg = colors[BLACK].pixel;
-	    bg = colors[RED].pixel;
+	    bg = colors[buttonColor].pixel;
 	}
     }
     XSetForeground(dpy, buttonGC, bg);
@@ -397,7 +399,7 @@ static void Widget_draw_button(widget_t *widget, bool inverse, const char *label
 static void Widget_draw_input(widget_t *widget, const char *str)
 {
     XClearWindow(dpy, widget->window);
-	IFWINDOWS( Trace("Widget_draw_input: w=%d <%s>\n", widget->window, str); )
+    IFWINDOWS( Trace("Widget_draw_input: w=%d <%s>\n", widget->window, str) );
     XDrawString(dpy, widget->window, textGC,
 		(widget->width
 		 - XTextWidth(textFont, str, strlen(str))) / 2,
@@ -428,9 +430,9 @@ static void Widget_draw_arrow(widget_t *widget)
     }
     if (arroww->pressed == true && arroww->inside == true) {
 	fg = BLACK;
-	bg = RED;
+	bg = buttonColor;
     } else {
-	fg = RED;
+	fg = buttonColor;
 	bg = BLACK;
     }
     XSetForeground(dpy, buttonGC, colors[bg].pixel);
@@ -464,7 +466,7 @@ static void Widget_draw_slider(widget_t *widget)
     widget_t		*viewer_widget = Widget_pointer(sliderw->viewer_desc);
     widget_viewer_t	*viewerw = (widget_viewer_t *)viewer_widget->sub;
 
-    XSetForeground(dpy, buttonGC, colors[RED].pixel);
+    XSetForeground(dpy, buttonGC, colors[buttonColor].pixel);
     if (widget->type == WIDGET_SLIDER_HORI) {
 	unit = widget->height;
 	pts[0].x = unit / 4;
@@ -1887,7 +1889,7 @@ int Widget_create_confirm(const char *confirm_str,
 					 button_width, button_height,
 					 0, button_str,
 					 callback,
-					 (void *)popup_desc);
+					 (void *)(long)popup_desc);
     if (button_desc == NO_WIDGET) {
 	Widget_destroy(popup_desc);
 	Widget_destroy(label_desc);
@@ -2037,7 +2039,7 @@ static int Widget_create_slider(int parent_desc, widget_type_t slider_type,
 static int Widget_viewer_save_callback(int widget_desc, void *data,
 				       const char **strptr)
 {
-    int			popup_desc = (int) data;
+    int			popup_desc = (int)(long)data;
     widget_t		*popup = Widget_pointer(popup_desc);
     widget_form_t	*formw;
     int			viewer_desc;
@@ -2060,7 +2062,7 @@ static int Widget_viewer_save_callback(int widget_desc, void *data,
 static int Widget_viewer_close_callback(int widget_desc, void *data,
 					const char **strptr)
 {
-    Widget_unmap((int) data);
+    Widget_unmap((int)(long)data);
     return 0;
 }
 
@@ -2346,7 +2348,7 @@ int Widget_create_viewer(const char *buf, int len,
 						       0,
 						       "SAVE",
 						       Widget_viewer_save_callback,
-						       (void *)popup_desc);
+						       (void *)(long)popup_desc);
     if (viewerw->save_button_desc == NO_WIDGET) {
 	Widget_destroy(popup_desc);
 	return NO_WIDGET;
@@ -2361,7 +2363,7 @@ int Widget_create_viewer(const char *buf, int len,
 							0,
 							"CLOSE",
 							Widget_viewer_close_callback,
-							(void *)popup_desc);
+							(void *)(long)popup_desc);
     if (viewerw->close_button_desc == NO_WIDGET) {
 	Widget_destroy(popup_desc);
 	return NO_WIDGET;
@@ -2427,3 +2429,4 @@ void Widget_cleanup(void)
 	widgets = NULL;
     }
 }
+

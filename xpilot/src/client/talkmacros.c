@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -23,19 +23,19 @@
  */
 
 
-#ifdef _WINDOWS
-#include "NT/winclient.h"
-#include "NT/winNet.h"
-#include "NT/winAudio.h"
-#include "NT/winX.h"
-#include "NT/winXThread.h"
-#include "NT/winXXPilot.h"
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#ifdef _WINDOWS
+# include "NT/winclient.h"
+# include "NT/winNet.h"
+# include "NT/winAudio.h"
+# include "NT/winX.h"
+# include "NT/winXThread.h"
+# include "NT/winXXPilot.h"
+#endif
 
 #include "version.h"
 #include "config.h"
@@ -49,6 +49,7 @@
 #include "portability.h"
 #include "talk.h"
 #include "rules.h"		/* TEAM_PLAY, LIMITED_LIVES */
+#include "commonproto.h"
 
 
 char talkmacros_version[] = VERSION;
@@ -61,6 +62,7 @@ char talkmacros_version[] = VERSION;
 static char	final_str[MAX_CHARS];
 
 extern int	eyesId;		/* Player we get frame updates for */
+extern other_t	*eyes;		/* Player we get frame updates for */
 extern short	snooping;	/* Are we snooping on someone else? */
 
 /* exported (to xevent.c) */
@@ -105,6 +107,7 @@ static char *Talk_macro_fields_info (char *buf, int *n_fields)
     }
     return buf;
 }
+
 
 /* Returns a string pointer to the wanted_field
  * This pointer must be freed after using it
@@ -170,31 +173,41 @@ static char *Talk_macro_get_field (char *buf, int wanted_field)
     return field_ptr;
 }
 
+
 static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 {
-    FILE *fp;
-    char c;
-    long fsize;
-    int i, n_fields;
-    char *tmpptr, *tmpptr1, *tmpptr2, *tmpptr3 = 0, *nextpos, *filename;
-    other_t *player=NULL;
+    FILE	*fp;
+    char	c;
+    long	fsize;
+    int		i;
+    int		done = 0;
+    int		n_fields;
+    char	*tmpptr;
+    char	*tmpptr1;
+    char	*tmpptr2;
+    char	*tmpptr3 = 0;
+    char	*nextpos;
+    char	*filename;
+    other_t	*player = NULL;
 
 
-    while ((c = *inbuf++) != '\0')
+    while (!done && (c = *inbuf++) != '\0')
     {
 	if (pos >= max - 2)
 	{
 	    if (outbuf == final_str) /* parsing to the talk buffer */
 	    {
 		outbuf[pos] = '\0';
-		if ( Net_talk(outbuf) == -1 ) {
+		if (Net_talk(outbuf) == -1) {
                     return -1;
 		}
 		pos = 0;
 	    }
-	    else
-		goto done;	/* XXX remove goto please. */
+	    else {
+		break;
+	    }
 	}
+
 	if (player != NULL) {
 	    switch (c)
 	    {
@@ -209,7 +222,7 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 		break;
 	    case 's':
 		if (pos < max - 1 - 6) /* short - "-16535" max no of chars */
-		    pos += sprintf (outbuf+pos, "%d", player->score);
+		    pos += sprintf (outbuf+pos, "%.2f", player->score);
 		break;
 	    case 't':
 		if (BIT(Setup->mode, TEAM_PLAY))
@@ -222,8 +235,10 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 	} else {
 	    switch (c) {
 	    case TALK_FAST_SPECIAL_TALK_CHAR:
-		if ((c = *inbuf++) == '\0')
-		    goto done;	/* XXX remove goto please. */
+		if ((c = *inbuf++) == '\0') {
+		    done = 1;
+		    break;
+		}
 		switch (c) {
 		case '=':  /* String comparison */
 		    nextpos = Talk_macro_fields_info (inbuf, &n_fields);
@@ -327,15 +342,18 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 		    break;
 		case 'h':
 		    tmpptr = getenv ("HOME");
-		    while (*tmpptr != '\0' && pos < max - 2)
-		      outbuf[pos++] = *tmpptr++;
+		    if (tmpptr != NULL) {
+			while (*tmpptr != '\0' && pos < max - 2) {
+			    outbuf[pos++] = *tmpptr++;
+			}
+		    }
 		    break;
 		case 'r':
 		    nextpos = Talk_macro_fields_info (inbuf, &n_fields);
 		    if (n_fields <= 0 || nextpos == NULL)
 		      break;
 		    if ((tmpptr = Talk_macro_get_field (inbuf,
-							rand() % n_fields + 1))
+						    randomMT() % n_fields + 1))
 			  == NULL) {
 			error ("Talk_macro_get_field error (random)");
 			break;
@@ -356,12 +374,14 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
                     if ( !snooping ) {
                         if ((player = Other_by_id(lock_id)) == NULL) {
                           pos = 0;
-                          goto done;	/* XXX remove goto please. */
+                          done = 1;
+			  break;
                         }
                     } else {
                         if ((player = Other_by_id(eyesId)) == NULL) {
                           pos = 0;
-                          goto done;	/* XXX remove goto please. */
+                          done = 1;
+			  break;
                         }
 		    }
                     break;
@@ -379,6 +399,7 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 		default:
 		    break;
 		} /* case TALK_FAST_SPECIAL_TALK_CHAR: switch (c) */
+		break;
 	    case '\n':
 		break;
 	    default:
@@ -388,12 +409,14 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 	}
     }
 
-    done:
     outbuf[pos] = '\0';
+
     return pos;
 }
 
-int Talk_macro(char *str) {
+
+int Talk_macro(char *str)
+{
     /* Comment: sizeof str === MAX_CHARS */
     if (str == NULL) {
 	return 1;
@@ -404,3 +427,5 @@ int Talk_macro(char *str) {
     }
     return 0;
 }
+
+

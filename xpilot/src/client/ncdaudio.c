@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -107,7 +107,7 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
     }
 }
 
-void audioDeviceEvents()
+void audioDeviceEvents(void)
 {
     if (aud)
 	AuHandleEvents(aud);

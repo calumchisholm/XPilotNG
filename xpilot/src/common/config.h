@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -24,6 +24,10 @@
 
 #ifndef CONFIG_H
 #define CONFIG_H
+
+#ifndef LOCALGURU
+#define LOCALGURU "xpilot@xpilot.org"
+#endif
 
 #ifdef MOD2
 #error "MOD2 already defined - config.h should be included before const.h"
@@ -51,7 +55,7 @@
  * ZCAT_EXT should define the proper compressed file extension.
  */
 
-#if defined(VMS) || defined(_WINDOWS)
+#if defined(_WINDOWS)
 #    ifdef COMPRESSED_MAPS
 	/*
 	 * Couldn't find a popen(), also compress and gzip don't exist.
@@ -63,15 +67,15 @@
 #endif
 
 #ifdef _WINDOWS
-#	ifdef _DEBUG
+#	ifdef	_DEBUG
 #		define	DEBUG	1
-#		define	D(x)	{x;}
+#		define	D(x)	x
 #	else
 #		define	D(x)
 #	endif
 #else
 #	ifdef	DEBUG
-#		define D(x)	{ {x}; fflush(stdout); }
+#		define D(x)	x ;  fflush(stdout);
 #	else
 #		define D(x)
 #	endif
@@ -81,18 +85,29 @@
 /* So for the client i route the "debug" printfs to the debug stream */
 /* The server gets 'real' messages routed to the messages window */
 #ifdef _WINDOWS
-#	ifdef _XPILOTNTSERVER_
-#	define	xpprintf xpprintfW
-/*#	define	xpprintf _Trace */
+#	ifdef	_XPILOTNTSERVER_
+#	define	xpprintf	xpprintfW
+/*#	define	xpprintf	_Trace */
 #	else
-#	define	xpprintf _Trace
+#	define	xpprintf	_Trace
 #	endif
 #else
-#	define	xpprintf printf
+#	define	xpprintf	printf
+#endif
+
+/*
+ XPilot on Windows does lots of double to int conversions. So we have:
+warning C4244: 'initializing' : conversion from 'double ' to 'int ', possible loss of data
+a million times.  I used to fix each warning added by the Unix people, but
+this makes for harder to read code (and was tiring with each patch)
+*/
+#ifdef	_WINDOWS
+#pragma warning (disable : 4244 4761)
 #endif
 
 char *Conf_libdir(void);
 char *Conf_defaults_file_name(void);
+char *Conf_password_file_name(void);
 char *Conf_player_passwords_file_name(void);
 char *Conf_mapdir(void);
 char *Conf_default_map(void);

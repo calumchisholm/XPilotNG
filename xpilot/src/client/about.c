@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -29,11 +29,14 @@
 #include <errno.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#else
-#include "NT/winX.h"
-#include "NT/winXXpilot.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winXXPilot.h"
+# include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -50,6 +53,7 @@
 #include "protoclient.h"
 
 char about_version[] = VERSION;
+
 
 /* How far away objects should be placed from each other etc... */
 #define BORDER			10
@@ -458,6 +462,7 @@ int About_callback(int widget_desc, void *data, const char **str)
     return 0;
 }
 
+/*****************************************************************************/
 	   int		keys_viewer = NO_WIDGET;
 static bool		keys_created = false;
 
@@ -473,7 +478,6 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
 	int		i,
 			len,
 			maxkeylen = 0;
-	extern char* Get_keyHelpString(keys_t key);
 
 	for (i = 0; i < maxKeyDefs; i++) {
 	    if ((str = XKeysymToString(keyDefs[i].keysym)) != NULL
@@ -488,6 +492,7 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
 	    }
 	    if ((end - buf) + (maxkeylen + strlen(help) + 4) >= bufsize) {
 		bufsize += 4096;
+		xpprintf("realloc: %d\n", bufsize);
 		if (!(buf = (char *)realloc(buf, bufsize))) {
 		    error("No memory for key list");
 		    return 0;

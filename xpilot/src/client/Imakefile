@@ -1,4 +1,4 @@
-/* $Id$ */
+/*  */
 
 TOPDIR=../..
 COMMON = ../common/
@@ -85,42 +85,43 @@ DEFS_DEBUG = -DDEVELOPMENT
  */
 DEFINES = \
        $(DEFS_ERASE) $(DEFS_SPARC_CMAP_HACK) $(DEFS_MBX) $(DEFS_DBE) \
-       $(DEFS_JOYSTICK) $(AUDIODEF) $(DEFS_OTHER) $(DEFS_DEBUG)
+       $(DEFS_JOYSTICK) $(AUDIODEF) $(DEFS_SCALING) \
+       $(DEFS_OTHER) $(DEFS_DEBUG)
 INCLUDES = $(AUDIOINC) -I$(COMMON) -I../../lib/ $(ZLIBINC)
 LOCAL_LDFLAGS = $(ZLIBD)
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 SRCS = \
 	about.c bitmaps.c \
-	caudio.c client.c colors.c configure.c \
+	caudio.c client.c clientrank.c colors.c configure.c \
 	datagram.c dbuff.c default.c \
 	gfx2d.c gfx3d.c guimap.c guiobjects.c \
-	join.c netclient.c \
+	ignore.c join.c mapdata.c netclient.c \
 	paint.c paintdata.c painthud.c paintmap.c \
-	paintobjects.c paintradar.c query.c record.c \
+	paintobjects.c paintradar.c query.c record.c shipshape_c.c sim.c \
 	syslimit.c talk.c talkmacros.c textinterface.c texture.c \
 	usleep.c welcome.c widget.c xeventhandlers.c \
-	xevent.c xinit.c xpilot.c xpmread.c shipshape.c mapdata.c \
+	xevent.c xinit.c xpilot.c xpmread.c \
 	$(AUDIOSRC)
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 OBJS = \
 	about.o bitmaps.o \
-	caudio.o client.o colors.o configure.o \
+	caudio.o client.o clientrank.o colors.o configure.o \
 	datagram.o dbuff.o default.o \
 	gfx2d.o gfx3d.o guimap.o guiobjects.o \
-	join.o netclient.o \
+	ignore.o join.o mapdata.o netclient.o \
 	paint.o paintdata.o painthud.o paintmap.o \
-	paintobjects.o paintradar.o query.o record.o \
+	paintobjects.o paintradar.o query.o record.o shipshape_c.o sim.o \
 	syslimit.o talk.o talkmacros.o textinterface.o texture.o \
 	usleep.o welcome.o widget.o xeventhandlers.o \
-	xevent.o xinit.o xpilot.o xpmread.o shipshape.o mapdata.o \
+	xevent.o xinit.o xpilot.o xpmread.o \
 	$(AUDIOOBJ)
 
 DEPLIBS = $(COMMON)libxpcommon.a $(DEPXLIB)
 
 #if !defined(sgiCCoptions)		/* A hack that should mack everyone */
-					/* that doesn't have XLIBONLY. */
+					/* that does not have XLIBONLY. */
 #if !defined(MultibufferExtension)	/* On the other hand you need the */
 					/* EXTENSIONLIB sometimes, though ;) */
 #if !defined(DoublebufferExtension)

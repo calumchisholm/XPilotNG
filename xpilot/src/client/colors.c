@@ -1,4 +1,4 @@
-/* $Id$
+/* 
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
@@ -72,7 +72,7 @@ char			color_names[MAX_COLORS][MAX_COLOR_LEN];
 static const char	*color_defaults[MAX_COLORS] = {
     "#000000", "#FFFFFF", "#4E7CFF", "#FF3A27",
     "#33BB44", "#992200", "#BB7700", "#EE9900",
-    "#770000", "#CC4400", "#DD8800", "#FFBB11",
+    "#002299", "#CC4400", "#DD8800", "#FFBB11",
     "#9f9f9f", "#5f5f5f", "#dfdfdf", "#202020"
 };
 static const char	*gray_defaults[MAX_COLORS] = {
@@ -91,9 +91,9 @@ bool		multibuffer;
 bool		fullColor;	/* Whether to try using colors as close to
 				 * the specified ones as possible, or just
 				 * use a few standard colors for everything. */
-bool		blockBitmaps; /* Whether to draw bitmaps for some objects.
-			       * Previously this variable determined
-			       * fullColor too. */
+bool		texturedObjects; /* Whether to draw bitmaps for some objects.
+				  * Previously this variable determined
+				  * fullColor too. */
 
 #ifndef _WINDOWS
 
@@ -663,7 +663,7 @@ static int Colors_init_block_bitmap_colors(void)
 	printf("fullColor not implemented for visual \"%s\"\n",
 		Visual_class_name(visual->class));
 	fullColor = false;
-	blockBitmaps = false;
+	texturedObjects = false;
 	break;
     }
 
@@ -701,17 +701,30 @@ int Colors_init_block_bitmaps(void)
 {
     if (dbuf_state->type == COLOR_SWITCH) {
 	if (fullColor) {
-	    printf("Can't do blockBitmaps if colorSwitch\n");
+	    printf("Can't do texturedObjects if colorSwitch\n");
 	    fullColor = false;
-	    blockBitmaps = false;
+	    texturedObjects = false;
 	}
     }
     if (fullColor) {
 	if (Colors_init_block_bitmap_colors() == -1) {
 	    fullColor = false;
-	    blockBitmaps = false;
+	    texturedObjects = false;
 	}
     }
+
+#if 0
+    /* kps - remove this in ng */
+    if (texturedObjects) {
+	if (Block_bitmaps_create() == -1) {
+	    /*
+	    ** not sure if this is possible after
+	    ** blockbitmap colors have been created.
+	    */
+	    texturedObjects = false;
+	}
+    } 
+#endif
 
     Colors_init_style_colors();
 
@@ -976,7 +989,7 @@ void Colors_free_block_bitmaps(void)
     Colors_free_true_color();
 
     fullColor = false;
-    blockBitmaps = false;
+    texturedObjects = false;
 }
 
 

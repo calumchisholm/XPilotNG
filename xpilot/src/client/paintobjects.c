@@ -1,5 +1,6 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -31,12 +32,14 @@
 #include <sys/types.h>
 
 #ifndef _WINDOWS
-#include <unistd.h>
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#else
-#include "NT/winX.h"
-#include "NT/winClient.h"
+# include <unistd.h>
+# include <X11/Xlib.h>
+# include <X11/Xos.h>
+#endif
+
+#ifdef _WINDOWS
+# include "NT/winX.h"
+# include "NT/winClient.h"
 #endif
 
 #include "version.h"
@@ -51,43 +54,49 @@
 #include "texture.h"
 #include "paint.h"
 #include "paintdata.h"
+#include "paintmacros.h"
 #include "record.h"
 #include "xinit.h"
 #include "protoclient.h"
 #include "portability.h"
 #include "guiobjects.h"
+#include "guimap.h"
 #include "gfx3d.h"
 #include "bitmaps.h" /* can go away if Paint_item_symbol is moved to gui_objects.c */
+#include "wreckshape.h"
+#include "astershape.h"
+#include "gfx3d.h"
 
 char paintobjects_version[] = VERSION;
 
-#define X(co)  ((int) ((co) - world.x))
-#define Y(co)  ((int) (world.y + view_height - (co)))
 
 #define COLOR(i)	(i / areas)
-#define BASE_X(i)	(((i % x_areas) << 8) + view_x_offset)
-#define BASE_Y(i)	((view_height - 1 - (((i / x_areas) % y_areas) << 8)) - view_y_offset)
-
-
-#define NUM_WRECKAGE_SHAPES 3
-#define NUM_WRECKAGE_POINTS 12
+#define BASE_X(i)	(((i % x_areas) << 8) + ext_view_x_offset)
+#define BASE_Y(i)	((ext_view_height - 1 - (((i / x_areas) % y_areas) << 8)) - ext_view_y_offset)
 
 
 static int wreckageRawShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS][2] = {
-    { {-9, 6}, {-2, 8}, { 5, 2}, { 9, 3}, {10, 0}, { 5,-1},
-      { 3, 0}, {-2,-9}, {-5,-6}, {-3,-2}, {-7,-1}, {-5, 2} },
-    { {-8,-9}, {-9,-3}, {-7, 3}, {-1, 7}, { 8, 9}, { 9, 6},
-      { 2, 5}, {-2, 2}, { 4,-1}, { 2,-5}, { 0,-2}, {-5,-2} },
-    { {-9,-2}, {-7, 2}, {-2,-3}, { 2,-3}, { 0, 1}, { 1,10},
-      { 4, 9}, { 4, 2}, { 7,-2}, { 7,-5}, { 2,-8}, {-4,-7} },
+    { WRECKAGE_SHAPE_0 },
+    { WRECKAGE_SHAPE_1 },
+    { WRECKAGE_SHAPE_2 },
 };
 
 
 position *wreckageShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS];
 
 
+static int asteroidRawShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS][2] = {
+    { ASTEROID_SHAPE_0 },
+    { ASTEROID_SHAPE_1 },
+};
+
+
+position *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
+
+
 u_byte	debris_colors;		/* Number of debris intensities from server */
 bool	markingLights;
+
 
 extern XGCValues	gcv;
 extern setup_t		*Setup;
@@ -97,14 +106,14 @@ static int wrap(int *xp, int *yp)
 {
     int			x = *xp, y = *yp;
 
-    if (x < world.x || x > world.x + view_width) {
-	if (x < realWorld.x || x > realWorld.x + view_width) {
+    if (x < world.x || x > world.x + ext_view_width) {
+	if (x < realWorld.x || x > realWorld.x + ext_view_width) {
 	    return 0;
 	}
 	*xp += world.x - realWorld.x;
     }
-    if (y < world.y || y > world.y + view_height) {
-	if (y < realWorld.y || y > realWorld.y + view_height) {
+    if (y < world.y || y > world.y + ext_view_height) {
+	if (y < realWorld.y || y > realWorld.y + ext_view_height) {
 	    return 0;
 	}
 	*yp += world.y - realWorld.y;
@@ -118,7 +127,7 @@ static int wrap(int *xp, int *yp)
          bitmap based on the color. Unix ignores this parameter*/
 void Paint_item_symbol(u_byte type, Drawable d, GC mygc, int x, int y, int color)
 {
-    if (!blockBitmaps) {
+    if (!texturedObjects) {
 #ifdef _WINDOWS
     rd.paintItemSymbol(type, d, mygc, x, y, color);
 #else
@@ -135,7 +144,7 @@ void Paint_item_symbol(u_byte type, Drawable d, GC mygc, int x, int y, int color
     XChangeGC(dpy, mygc, GCFillStyle, &gcv);
 #endif
     } else {
-	  Bitmap_paint(d, BM_ALL_ITEMS, x, y, type);
+	Bitmap_paint(d, BM_ALL_ITEMS, x, y, type);
     }
 }
 
@@ -166,8 +175,8 @@ void Paint_item(u_byte type, Drawable d, GC mygc, int x, int y)
 		y + SIZE - 1,
 		str, 1);
 #endif
-    Paint_item_symbol(type, d, mygc,
-		x - ITEM_SIZE/2,
+    Paint_item_symbol(type, d, mygc, 
+		x - ITEM_SIZE/2, 
 		y - SIZE + 2, ITEM_PLAYFIELD);
 }
 
@@ -183,7 +192,7 @@ static void Paint_items(void)
 	    x = itemtype_ptr[i].x;
 	    y = itemtype_ptr[i].y;
 	    if (wrap(&x, &y)) {
-		Paint_item((u_byte)itemtype_ptr[i].type, p_draw, gc,
+		Paint_item((u_byte)itemtype_ptr[i].type, p_draw, gc, 
 			    WINSCALE(X(x)), WINSCALE(Y(y)));
 		Erase_rectangle(WINSCALE(X(x)) - ITEM_TRIANGLE_SIZE,
 				WINSCALE(Y(y)) - ITEM_TRIANGLE_SIZE,
@@ -247,7 +256,7 @@ static void Paint_mines(void)
 	for (i = 0; i < num_mine; i++) {
 	    x = mine_ptr[i].x;
 	    y = mine_ptr[i].y;
-
+	    
 	    if (wrap(&x, &y)) {
 
 		/*
@@ -257,13 +266,13 @@ static void Paint_mines(void)
 		 * We do not know who is safe for mines sent with id==0
 		 */
 		name = NULL;
-		if (BIT(instruments, SHOW_MINE_NAME)) {
+		if (mineNameColor) {
 		    if (mine_ptr[i].id != 0) {
 			other_t *other;
 			if (mine_ptr[i].id == EXPIRED_MINE_ID) {
 			    static char expired_name[] = "Expired";
 			    name = expired_name;
-			} else if ((other=Other_by_id(mine_ptr[i].id))!=NULL) {
+			} else if ((other = Other_by_id(mine_ptr[i].id)) != NULL) {
 			    name = other->id_string;
 			} else {
 			    static char unknown_name[] = "Not of this world!";
@@ -313,7 +322,7 @@ static void Paint_debris(int x_areas, int y_areas, int areas, int max_)
 }
 
 
-static void Paint_wreckages()
+static void Paint_wreckages(void)
 {
     int		i, x, y;
     int		wtype, size, rot;
@@ -333,14 +342,54 @@ static void Paint_wreckages()
 
 		Gui_paint_wreck(x, y, deadly, wtype, rot, size);
 	    }
-
+	
 	}
 	RELEASE(wreckage_ptr, num_wreckage, max_wreckage);
     }
 }
 
 
-static void Paint_missiles()
+static void Paint_asteroids(void)
+{
+    int		i, x, y;
+    int		type, size, rot;
+
+    if ( num_asteroids > 0 ) {
+	for (i = 0; i < num_asteroids; i++) {
+	    x = asteroid_ptr[i].x;
+	    y = asteroid_ptr[i].y;
+	    if (wrap(&x, &y)) {
+		type = (asteroid_ptr[i].type) % NUM_ASTEROID_SHAPES;
+		rot = asteroid_ptr[i].rotation;
+		size = asteroid_ptr[i].size;
+
+		Gui_paint_asteroid(x, y, type, rot, size);
+	    }
+
+	}
+	RELEASE(asteroid_ptr, num_asteroids, max_asteroids);
+    }
+}
+
+
+static void Paint_wormholes(void)
+{
+    int		i, x, y;
+
+    if ( num_wormholes > 0) {
+	for (i = 0; i < num_wormholes; i++) {
+	    x = wormhole_ptr[i].x;
+	    y = wormhole_ptr[i].y;
+	    if (wrap(&x, &y)) {
+		Gui_paint_setup_worm(x, y, loops & 7);
+	    }
+	}
+	RELEASE(wormhole_ptr, num_wormholes, max_wormholes);
+    }
+}
+
+
+static void Paint_missiles(void)
 {
     int		i, x, y;
     int		len, dir;
@@ -420,7 +469,7 @@ static void Paint_teamshots(int i, int t_, int x_areas, int y_areas, int areas)
     /*
      * Teamshots are in range DEBRIS_TYPES to DEBRIS_TYPES*2-1 in fastshot.
      */
-    /* IFWINDOWS( Trace("t_=%d\n", t_); )*/
+    /* IFWINDOWS( Trace("t_=%d\n", t_) );*/
     if (num_fastshot[t_] > 0) {
 
 	x = BASE_X(i);
@@ -443,14 +492,16 @@ void Paint_shots(void)
     Paint_balls();
     Paint_mines();
 
-    x_areas = (real_view_width + 255) >> 8;
-    y_areas = (real_view_height + 255) >> 8;
+    x_areas = (active_view_width + 255) >> 8;
+    y_areas = (active_view_height + 255) >> 8;
     areas = x_areas * y_areas;
     max_ = areas * (debris_colors >= 3 ? debris_colors : 4);
 
     Paint_debris(x_areas, y_areas, areas, max_);
 
     Paint_wreckages();
+    Paint_asteroids();
+    Paint_wormholes();
 
     for (i = 0; i < max_; i++) {
 	t_ = i + DEBRIS_TYPES;
@@ -465,7 +516,7 @@ void Paint_shots(void)
 
 static void Paint_paused(void)
 {
-    int i, x, y;
+    int i, x, y;    
 
     if (num_paused > 0) {
 
@@ -518,13 +569,16 @@ static void Paint_all_ships(void)
             /*
              * ship in the center? (svenska-hack)
              */
-	    if ( abs(X(x)-view_width/2) <= 1
-		&& abs(Y(y)-view_height/2) <= 1
+	    if ( abs(X(x)-ext_view_width/2) <= 1
+		&& abs(Y(y)-ext_view_height/2) <= 1
 		&& Other_by_id(ship_ptr[i].id) != NULL ) {
 		  eyesId = ship_ptr[i].id;
+		  eyes = Other_by_id(eyesId);
+		  if (eyes != NULL)
+		      eyeTeam = eyes->team;
 	    }
 
-	    Gui_paint_ship(x, y,
+	    Gui_paint_ship(x, y, 
 			   ship_ptr[i].dir, ship_ptr[i].id,
 			   ship_ptr[i].cloak, ship_ptr[i].phased,
 			   ship_ptr[i].shield,
@@ -620,18 +674,19 @@ void Paint_ships(void)
     Paint_ecm();
     Paint_all_ships();
     Paint_all_connectors();
-
+    
     Gui_paint_ships_end();
+ 
 }
+ 
 
-
-int Init_wreckage()
+int Init_wreckage(void)
 {
     int		shp, i;
     size_t	point_size;
     size_t	total_size;
     char	*dynmem;
-
+ 
     /*
      * Allocate memory for all the wreckage points.
      */
@@ -647,13 +702,45 @@ int Init_wreckage()
      */
     for ( shp = 0; shp < NUM_WRECKAGE_SHAPES; shp++ ) {
 	for ( i = 0; i < NUM_WRECKAGE_POINTS; i++ ) {
-	    extern void Rotate_point(position pt[RES]);
-
 	    wreckageShapes[shp][i] = (position *) dynmem;
 	    dynmem += point_size;
 	    wreckageShapes[shp][i][0].x = wreckageRawShapes[shp][i][0];
 	    wreckageShapes[shp][i][0].y = wreckageRawShapes[shp][i][1];
 	    Rotate_point( &wreckageShapes[shp][i][0] );
+	}
+    }
+
+    return 0;
+}
+
+
+int Init_asteroids(void)
+{
+    int		shp, i;
+    size_t	point_size;
+    size_t	total_size;
+    char	*dynmem;
+
+    /*
+     * Allocate memory for all the asteroid points.
+     */
+    point_size = sizeof(position) * RES;
+    total_size = point_size * NUM_ASTEROID_POINTS * NUM_ASTEROID_SHAPES;
+    if ((dynmem = (char *) malloc(total_size)) == NULL) {
+	error("Not enough memory for asteroid shapes");
+	return -1;
+    }
+
+    /*
+     * For each asteroid-shape rotate all points.
+     */
+    for ( shp = 0; shp < NUM_ASTEROID_SHAPES; shp++ ) {
+	for ( i = 0; i < NUM_ASTEROID_POINTS; i++ ) {
+	    asteroidShapes[shp][i] = (position *) dynmem;
+	    dynmem += point_size;
+	    asteroidShapes[shp][i][0].x = asteroidRawShapes[shp][i][0];
+	    asteroidShapes[shp][i][0].y = asteroidRawShapes[shp][i][1];
+	    Rotate_point( &asteroidShapes[shp][i][0] );
 	}
     }
 

@@ -1,11 +1,12 @@
-/*
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+/* 
+ *
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
  *      Bert Gijsbers        <bert@xpilot.org>
  *      Dick Balaska         <dick@xpilot.org>
- *  	Guido Koopman        <guido@xpilot.org>
+ *  	Kimiko Koopman       <kimiko@xpilot.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
+ 
 #ifndef CANNON_H
 #define CANNON_H
 
@@ -49,20 +50,25 @@ extern long CANNON_USE_ITEM;
    only increase probability of use */
 #define CW_GASJET	7
 
+/* the different defenses a cannon can use.
+   used in communication between parts of defending code */
+/* for four seconds, absorbs any shot. uses one emergency shield */
+#define CD_EM_SHIELD	0
+/* for four seconds, lets any shot pass through. uses one phasing device */
+#define CD_PHASING	1
+
 /* base visibility distance (modified by sensors) */
 #define CANNON_DISTANCE		(VISIBILITY_DISTANCE * 0.5)
 
 /* chance of throwing an item upon death (multiplied by dropItemOnKillProb) */
 #define CANNON_DROP_ITEM_PROB	0.7
 
-/* speed used for missiles and shots. mines are thrown at half this speed */
-#define CANNON_SHOT_SPEED	ShotsSpeed
-#define CANNON_SHOT_MASS	0.4
 #define CANNON_MINE_MASS	(MINE_MASS * 0.6)
+#define CANNON_SHOT_MASS	0.4
 /* lifetime in ticks (frames) of shots, missiles and mines */
-#define CANNON_SHOT_LIFE	(25 + (randomMT() & 0x17))
+#define CANNON_SHOT_LIFE	((8 + (randomMT() % 24)) * TIME_FACT)
 /* maximum lifetime (only used in aiming) */
-#define CANNON_SHOT_LIFE_MAX	(25 + 0x17)
+#define CANNON_SHOT_LIFE_MAX	((8 + 24) * TIME_FACT)
 /* number of laser pulses used in calculation of pulse lifetime */
 #define CANNON_PULSES		1
 

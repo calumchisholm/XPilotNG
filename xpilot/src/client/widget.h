@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -123,7 +123,7 @@ typedef struct widget_string {
     const char			*str;		/* Current input string */
 } widget_string_t;
 
-typedef struct view_line {
+typedef struct viewer_line {
     const char			*txt;
     int				len;
     int				txt_width;
