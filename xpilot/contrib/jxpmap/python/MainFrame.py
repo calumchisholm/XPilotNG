@@ -130,12 +130,9 @@ class MainFrame:
 
     def updateScale(self):
         df = self.canvas.getModel().getDefaultScale()
-        if self.zoom >= 0:
-            z = df * (self.zoom + 1)
-        else:
-            z = df / (1 - self.zoom)
+        z = df * 1.3**self.zoom
         self.canvas.setScale(z)
-        self.canvas.paint(None)
+        self.canvas.repaint()
 
     def setModel(self, model):
         self.canvas.setModel(model)
