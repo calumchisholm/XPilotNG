@@ -332,10 +332,6 @@ SOURCE=..\sim.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\syslimit.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\talk.h
 # End Source File
 # Begin Source File
