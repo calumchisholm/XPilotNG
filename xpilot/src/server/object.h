@@ -295,7 +295,6 @@ struct xp_ballobject {
 
     OBJECT_EXTEND
 
-    float		ball_count;	/* Misc snafus */
     treasure_t		*ball_treasure;	/* treasure for ball */
     short 		ball_owner;	/* Who's object is this ? */
     short		ball_style;	/* What polystyle to use */

@@ -58,7 +58,6 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->team = t->team;
     ball->type = OBJ_BALL;
     ball->color = WHITE;
-    ball->ball_count = 0;
     ball->pl_range = BALL_RADIUS;
     ball->pl_radius = BALL_RADIUS;
     CLEAR_MODS(ball->mods);
