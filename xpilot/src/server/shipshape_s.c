@@ -27,26 +27,3 @@ char shipshape_s_version[] = VERSION;
 
 extern void	Make_table(void);
 
-void Rotate_point(shapepos pt[RES])
-{
-    int			i;
-
-    /*pt[0].clk.cx *= CLICK;
-      pt[0].clk.cy *= CLICK;*/
-    for (i = 1; i < RES; i++) {
-	pt[i].clk.cx = (tcos(i) * pt[0].clk.cx - tsin(i) * pt[0].clk.cy) + .5;
-	pt[i].clk.cy = (tsin(i) * pt[0].clk.cx + tcos(i) * pt[0].clk.cy) + .5;
-    }
-}
-
-/* kps - tmp hack */
-shapepos *Shape_get_points(shape *s, int dir)
-{
-    int i;
-
-    /* kps - optimize if cashed_dir == dir */
-    for (i = 0; i < s->num_points; i++)
-	s->cashed_pts[i] = s->pts[i][dir];
-
-    return s->cashed_pts;
-}

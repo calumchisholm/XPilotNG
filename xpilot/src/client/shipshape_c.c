@@ -28,13 +28,3 @@ char shipshape_c_version[] = VERSION;
 extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
 
-void Rotate_point(shapepos pt[RES])
-{
-    int			i;
-
-    for (i = 1; i < RES; i++) {
-	pt[i].pxl.x = (tcos(i) * pt[0].pxl.x - tsin(i) * pt[0].pxl.y) + .5;
-	pt[i].pxl.y = (tsin(i) * pt[0].pxl.x + tcos(i) * pt[0].pxl.y) + .5;
-    }
-}
-

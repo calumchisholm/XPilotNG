@@ -34,6 +34,37 @@ extern bool is_server;
 
 extern void	Make_table(void);
 
+/* kps - tmp hack */
+shapepos *Shape_get_points(shape *s, int dir)
+{
+    int i;
+
+    /* kps - optimize if cashed_dir == dir */
+    for (i = 0; i < s->num_points; i++)
+	s->cashed_pts[i] = s->pts[i][dir];
+
+    return s->cashed_pts;
+}
+
+void Rotate_point(shapepos pt[RES])
+{
+    int			i;
+
+    if (is_server) {
+	for (i = 1; i < RES; i++) {
+	    pt[i].clk.cx
+		= (tcos(i) * pt[0].clk.cx - tsin(i) * pt[0].clk.cy) + .5;
+	    pt[i].clk.cy
+		= (tsin(i) * pt[0].clk.cx + tcos(i) * pt[0].clk.cy) + .5;
+	}
+    } else {
+	for (i = 1; i < RES; i++) {
+	    pt[i].pxl.x = (tcos(i) * pt[0].pxl.x - tsin(i) * pt[0].pxl.y) + .5;
+	    pt[i].pxl.y = (tsin(i) * pt[0].pxl.x + tcos(i) * pt[0].pxl.y) + .5;
+	}
+    }
+}
+
 void Rotate_position(position pt[RES])
 {
     int			i;
