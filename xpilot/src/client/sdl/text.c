@@ -495,8 +495,10 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
 
     	SDL_FreeSurface(glyph);
     
-    } else return false;
-    
+    } else {
+    	printf("TTF_RenderText_Blended failed for [%s]\n",text);
+	return false;
+    }
     return true;
 }
 

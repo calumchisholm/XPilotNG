@@ -123,6 +123,7 @@ widget_list_t *AppendListItem( widget_list_t *list,
     return (*curr) = MakeWidgetList(Draw,DrawData,GuiReg,GuiRegData,GuiUnReg,GuiUnRegData);
 }
 
+/* do we want theese following two functions to call GuiUnReg() ? */
 int DelListItem( widget_list_t *list, widget_list_t *item )
 {
     if (!list) return 0;
@@ -164,6 +165,7 @@ void AddListGuiAreas( widget_list_t *list )
     }
 }
 
+/* Might want this to call the last object first instead */
 void DelListGuiAreas( widget_list_t *list )
 {
     if (!list) return;

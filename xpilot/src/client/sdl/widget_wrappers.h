@@ -5,11 +5,11 @@
 
 typedef struct {
     SDL_Rect bounds;
-    void (*button)(/*button*/Uint8,/*state*/Uint8,/*x*/Uint16,/*y*/Uint16, void *data);
+    void (*button)( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data);
     void *buttondata;
-    void (*motion)(/*xrel*/Sint16,/*yrel*/Sint16,/*x*/Uint16,/*y*/Uint16, void *data);
+    void (*motion)( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data);
     void *motiondata;
-    void (*hover)(int over,/*x*/Uint16,/*y*/Uint16, void *data);
+    void (*hover)( int over, Uint16 x , Uint16 y , void *data);
     void *hoverdata;
     void *next;
 } guiarea_t;
@@ -17,11 +17,11 @@ typedef struct {
 static guiarea_t *guiarea_list = NULL;
 
 guiarea_t *register_guiarea(	SDL_Rect bounds,
-    	    	    	    	void (*button)(/*button*/Uint8,/*state*/Uint8,/*x*/Uint16,/*y*/Uint16, void *data),
+    	    	    	    	void (*button)( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data),
 				void *buttondata,
-			    	void (*motion)(/*xrel*/Sint16,/*yrel*/Sint16,/*x*/Uint16,/*y*/Uint16, void *data),
+			    	void (*motion)( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data),
 				void *motiondata,
-			    	void (*hover)(int over,/*x*/Uint16,/*y*/Uint16, void *data),
+			    	void (*hover)( int over, Uint16 x , Uint16 y , void *data),
 				void *hoverdata
 				);
 int unregister_guiarea(guiarea_t *guiarea);

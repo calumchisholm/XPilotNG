@@ -34,7 +34,7 @@ int Init_playing_windows(void)
     int mapfontsize = 12;
     int value;
     /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
-    
+
     Conf_print();
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -117,10 +117,6 @@ int Init_playing_windows(void)
     sdl_init_colors();
     Init_spark_colors();
     */
-    if (!(MainList=MakeWidgetList(NULL,NULL,NULL,NULL,NULL,NULL))) {
-	error("Main widget-list initialization failed");
-	return -1;
-    }
     if (Radar_init(10,10,200,200)) {
 	error("radar initialization failed");
 	return -1;
@@ -134,6 +130,7 @@ int Init_playing_windows(void)
 	return -1;
     }
     AddListGuiAreas(MainList);
+
     return 0;
 }
 

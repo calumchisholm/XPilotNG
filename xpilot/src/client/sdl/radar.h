@@ -3,6 +3,6 @@
 
 int Radar_init(int x, int y, int w, int h);
 void Radar_cleanup(void);
-void Radar_paint(void *LI);
+static void Radar_paint(void *LI);
 
 #endif

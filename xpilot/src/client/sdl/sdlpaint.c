@@ -34,6 +34,7 @@
 #include "radar.h"
 #include "sdlwindow.h"
 #include "text.h"
+#include "glwidgets.h"
 
 #define SCORE_BORDER 5
 
@@ -51,7 +52,12 @@ static sdl_window_t scoreListWin;
 static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
 static guiarea_t    *scoreListArea;
 static bool         scoreListMoving;
+static widget_list_t *ScoreList_widgetItem;
 static guiarea_t    *window_guiarea;
+
+static widget_list_t *ConfMenu;
+static GLWidget *testWidget;
+static int testValue;
 
 void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y, void *data)
 {
@@ -143,29 +149,19 @@ static void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *d
 }
 
 
-static int Scorelist_init(void)
-{
-    SDL_Rect r = { 10, 240, 200, 100 };
-    scoreListFont = TTF_OpenFont(scoreListFontName, 12);
-    if (scoreListFont == NULL) {
-	error("opening font %s failed", scoreListFontName);
-	return -1;
-    }
-    if (sdl_window_init(&scoreListWin, r.x, r.y, r.w, r.h)) {
-	error("failed to init scorelist window");
-	return -1;
-    }
-    scoreListArea = register_guiarea(r, Scorelist_button, NULL, Scorelist_move, NULL, NULL, NULL);
-    return 0;
-}
-
 static void Scorelist_cleanup(void)
 {
     TTF_CloseFont(scoreListFont);
     sdl_window_destroy(&scoreListWin);
+    unregister_guiarea(scoreListArea);
 }
 
-static void Scorelist_paint(void)
+static void Scorelist_reg(void *LI)
+{
+    scoreListArea = register_guiarea(*(SDL_Rect *)(((widget_list_t *)LI)->GuiRegData), Scorelist_button, NULL, Scorelist_move, NULL, NULL, NULL);
+}
+
+static void Scorelist_paint(void *data)
 {
     if (scoresChanged) {
 	/* This is the easiest way to track if
@@ -208,15 +204,59 @@ static void Scorelist_paint(void)
     glEnd();
 }
 
+static int Scorelist_init(void)
+{
+    static SDL_Rect r = { 10, 240, 200, 100 };
+    scoreListFont = TTF_OpenFont(scoreListFontName, 12);
+    if (scoreListFont == NULL) {
+	error("opening font %s failed", scoreListFontName);
+	return -1;
+    }
+    if (sdl_window_init(&scoreListWin, r.x, r.y, r.w, r.h)) {
+	error("failed to init scorelist window");
+	return -1;
+    }
+    ScoreList_widgetItem = AppendListItem(MainList,Scorelist_paint,NULL,Scorelist_reg,&r,NULL,NULL);
+    return 0;
+}
+
+int InitConfMenu(void)
+{
+    SDL_Rect bounds;
+    if (!(ConfMenu=MakeWidgetList(NULL,NULL,NULL,NULL,NULL,NULL))) {
+	error("ConfMenu widget-list initialization failed");
+	return 1;
+    }
+    testValue = 999;
+    testWidget = Init_IntChooserWidget(ConfMenu, "testValue", &gamefont, &testValue, 0, 999);
+    bounds.x = 500;
+    bounds.y = 0;
+    bounds.w = testWidget->bounds.w;
+    bounds.h = testWidget->bounds.h;
+    SetBounds_GLWidget(testWidget,&bounds);
+    
+    AddListGuiAreas(ConfMenu);
+    return 0;
+}
+
+void CloseConfMenu(void)
+{
+    if (!ConfMenu) return;
+    DelListGuiAreas(ConfMenu);
+    CleanList(ConfMenu);
+    Close_Widget(testWidget);
+}
+
 int Paint_init(void)
 {
     extern bool players_exposed; /* paint.c */
     int i;
- 
+
     if (TTF_Init()) {
 	error("SDL_ttf initialization failed: %s", SDL_GetError());
 	return -1;
     }
+    xpprintf("SDL_ttf initialized\n");
 
     if (Init_wreckage() == -1)
 	return -1;
@@ -238,6 +278,10 @@ int Paint_init(void)
     for (i=0;i<2*MAX_MSGS;++i)
     	message_texs[i].texture = 0;
     
+    if (!(MainList=MakeWidgetList(NULL,NULL,NULL,NULL,NULL,NULL))) {
+	error("Main widget-list initialization failed");
+	return -1;
+    }
     if (Scorelist_init() == -1)
 	return -1;
 
@@ -254,6 +298,7 @@ int Paint_init(void)
 void Paint_cleanup(void)
 {
     int i;
+    /*CloseConfMenu();*/
     Scorelist_cleanup();
     Images_cleanup();
     TTF_Quit();
@@ -466,15 +511,17 @@ void Paint_frame(void)
 
 	Paint_messages();       
 	if (timing) gettimeofday(&timed[11][1],NULL);
-	//Radar_paint();
-	if (timing) gettimeofday(&timed[12][1],NULL);
 	Console_paint();
-	if (timing) gettimeofday(&timed[13][1],NULL);
-	Scorelist_paint();
-	if (timing) gettimeofday(&timed[14][1],NULL);
+	if (timing) gettimeofday(&timed[12][1],NULL);
 	Paint_select();
+	if (timing) gettimeofday(&timed[13][1],NULL);
 	if (MainList)
 	    DrawWidgetList(MainList);
+	if (timing) gettimeofday(&timed[14][1],NULL);
+	/*if (ConfMenu)
+	    DrawWidgetList(ConfMenu);
+    	else if (InitConfMenu()) error("ConfMenu initialization failed");*/
+    
     	if (timing) gettimeofday(&timed[15][1],NULL);
 	
 	

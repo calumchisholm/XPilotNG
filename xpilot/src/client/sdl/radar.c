@@ -298,7 +298,7 @@ int Radar_init(int x, int y, int w, int h)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST);
 		    
-    AppendListItem(MainList,Radar_paint,bounds,Radar_guiReg,bounds,Radar_guiUnReg,NULL);
+    AppendListItem(MainList,Radar_paint,bounds,Radar_guiReg,bounds,NULL,NULL);
     
     return 0;
 }
@@ -338,6 +338,7 @@ static void Radar_blit_world(SDL_Rect *sr, SDL_Rect *dr)
 void Radar_guiReg(void *LI)
 {
     ((widget_list_t *)LI)->GuiUnRegData = register_guiarea(*(SDL_Rect *)(((widget_list_t *)LI)->GuiRegData),NULL,NULL,move,(widget_list_t *)LI,NULL,NULL);
+    ((widget_list_t *)LI)->GuiUnReg = Radar_guiUnReg;
 }
 
 void Radar_guiUnReg(void *LI)
@@ -351,7 +352,7 @@ void Radar_guiUnReg(void *LI)
 /*
  * Paints the radar surface and objects to the screen.
  */
-void Radar_paint(void *LI)
+static void Radar_paint(void *LI)
 {
     radar_bounds.x = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->x;
     radar_bounds.y = ((SDL_Rect *)((widget_list_t *)LI)->DrawData)->y;
