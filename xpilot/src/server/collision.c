@@ -1814,7 +1814,6 @@ static void BallCollision(void)
 	    }
 	}
 
-	/* kps - use new acd here too, as in PlayerObjectCollision */
 	/* Ball - object */
 	if (!ballCollisions)
 	    continue;
@@ -1824,25 +1823,61 @@ static void BallCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
+	    int r, hit;
+
 	    obj = obj_list[j];
 
 	    if (BIT(obj->type, ignored_object_types))
 		continue;
 
-	    if (obj->life <= 0)
-		continue;
+	    if (is_polygon_map || !useOldCode) {
+		;
+	    } else {
+		if (obj->life <= 0)
+		    continue;
+	    }
 
 	    /* have we already done this ball pair? */
 	    if (obj->type == OBJ_BALL && obj <= OBJ_PTR(ball)) {
 		continue;
 	    }
 
-	    if (!in_range_acd_old(ball->prevpos.cx, ball->prevpos.cy,
-				  ball->pos.cx, ball->pos.cy,
-				  obj->prevpos.cx, obj->prevpos.cy,
-				  obj->pos.cx, obj->pos.cy,
-				  (ball->pl_radius + obj->pl_radius)*CLICK)) {
-		continue;
+	    r = (ball->pl_radius + obj->pl_radius) * CLICK;
+	    if (is_polygon_map || !useOldCode) {
+		switch (obj->collmode) {
+		case 0:
+		    hit = in_range_simple(ball->pos.cx, ball->pos.cy,
+					  obj->pos.cx, obj->pos.cy,
+					  r);
+		    break;
+		case 1:
+		    hit = in_range_acd(ball->prevpos.cx - obj->prevpos.cx,
+				       ball->prevpos.cy - obj->prevpos.cy,
+				       ball->extmove.cx - obj->extmove.cx,
+				       ball->extmove.cy - obj->extmove.cy,
+				       r);
+		    break;
+		case 2:
+		    hit = in_range_partial(ball->prevpos.cx - obj->prevpos.cx,
+					   ball->prevpos.cy - obj->prevpos.cy,
+					   ball->extmove.cx - obj->extmove.cx,
+					   ball->extmove.cy - obj->extmove.cy,
+					   r, obj->wall_time);
+		    break;
+		default:
+		    warn("Unimplemented collision mode %d", obj->collmode);
+		    continue;
+		}
+		if (!hit)
+		    continue;
+	    } else {
+		if (!in_range_acd_old(ball->prevpos.cx, ball->prevpos.cy,
+				      ball->pos.cx, ball->pos.cy,
+				      obj->prevpos.cx, obj->prevpos.cy,
+				      obj->pos.cx, obj->pos.cy,
+				      r)) {
+		    continue;
+		}
 	    }
 
 	    /* bang! */
