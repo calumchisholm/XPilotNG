@@ -133,3 +133,6 @@ Developer: kps
 Task: Client side prediction, which could be used to reduce lag a bit, possibly
 even allowing local style ship control.
 Developer: kps
+
+Task: Turn the item images on the hud in sdl client the right way (upside down
+atm)
