@@ -325,9 +325,20 @@ int Net_setup(void)
 				 "%ld" "%ld%hd" "%hd%hd" "%hd%hd" "%s%s",
 				 &Setup->map_data_len,
 				 &Setup->mode, &Setup->lives,
-				 &Setup->x, &Setup->y,
+				 &Setup->width, &Setup->height,
 				 &Setup->frames_per_second, &Setup->map_order,
 				 Setup->name, Setup->author);
+		if (Setup->map_order != SETUP_MAP_XY_WITH_LINES) {
+		    oldServer = 1;
+		    Setup->x = Setup->width;
+		    Setup->width *= BLOCK_SZ;
+		    Setup->y = Setup->height;
+		    Setup->height *= BLOCK_SZ;
+		}
+		else {     /* TO BE REMOVED */
+		    Setup->x = Setup->width / BLOCK_SZ;
+		    Setup->y = Setup->height / BLOCK_SZ;
+		}
 		if (n <= 0) {
 		    errno = 0;
 		    error("Can't read setup info from reliable data buffer");
@@ -337,8 +348,8 @@ int Net_setup(void)
 		 * Do some consistency checks on the server setup structure.
 		 */
 		if (Setup->map_data_len <= 0
-		    || Setup->x <= 0
-		    || Setup->y <= 0
+		    || Setup->width <= 0
+		    || Setup->height <= 0
 		    || Setup->map_data_len > Setup->x * Setup->y
 		    && Setup->map_order != SETUP_MAP_XY_WITH_LINES) {
 		    errno = 0;
@@ -346,11 +357,8 @@ int Net_setup(void)
 			Setup->map_data_len, Setup->x, Setup->y);
 		    return -1;
 		}
-		Setup->width = Setup->x * BLOCK_SZ;
-		Setup->height = Setup->y * BLOCK_SZ;
-		if (Setup->map_order != SETUP_MAP_ORDER_XY
-		    && Setup->map_order != SETUP_MAP_UNCOMPRESSED
-		    && Setup->map_order != SETUP_MAP_XY_WITH_LINES) {
+		if (oldServer && Setup->map_order != SETUP_MAP_ORDER_XY
+		    && Setup->map_order != SETUP_MAP_UNCOMPRESSED) {
 		    errno = 0;
 		    error("Unknown map order type (%d)", Setup->map_order);
 		    return -1;
@@ -430,8 +438,7 @@ int Net_setup(void)
 	}
     }
 
-    if (Setup->map_order != SETUP_MAP_XY_WITH_LINES) {
-	oldServer = 1;
+    if (oldServer) {
 	num_checks = 26; /* even if there really aren't any */
 	checks = malloc(num_checks * sizeof(checkpoint_t));
     }

@@ -365,8 +365,8 @@ static int Init_setup(void)
     Setup->frames_per_second = FPS;
     Setup->lives = World.rules->lives;
     Setup->mode = World.rules->mode;
-    Setup->x = World.x;
-    Setup->y = World.y;
+    Setup->width = World.width;
+    Setup->height = World.height;
     strncpy(Setup->name, World.name, sizeof(Setup->name) - 1);
     Setup->name[sizeof(Setup->name) - 1] = '\0';
     strncpy(Setup->author, World.author, sizeof(Setup->author) - 1);
@@ -905,7 +905,7 @@ static int Handle_setup(int ind)
 			  "%ld" "%ld%hd" "%hd%hd" "%hd%hd" "%s%s",
 			  Setup->map_data_len,
 			  Setup->mode, Setup->lives,
-			  Setup->x, Setup->y,
+			  Setup->height, Setup->width,
 			  Setup->frames_per_second, Setup->map_order,
 			  Setup->name, Setup->author);
 	if (n <= 0) {
