@@ -232,24 +232,8 @@ xp_option_t default_options[] = {
 	"Set the team to join.\n",
 	0
     },
-    {
-	"display",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Set the X display.\n",
-	0
-    },
-    {
-	"keyboard",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Set the X keyboard input if you want keyboard input from\n"
-	"another display.  The default is to use the keyboard input from\n"
-	"the X display.\n",
-	0
-    },
+
+
     {
 	"geometry",
 	NULL,

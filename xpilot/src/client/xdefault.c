@@ -44,22 +44,99 @@ char xdefault_version[] = VERSION;
 #define KEY_LIST_FONT	"-*-fixed-medium-r-*--10-*-*-*-c-*-iso8859-1"
 #define MOTD_FONT	"-*-courier-bold-r-*--14-*-*-*-*-*-iso8859-1"
 
-char xdisplay[MAX_DISP_LEN];
+static char displayName[MAX_DISP_LEN];
+static char keyboardName[MAX_DISP_LEN];
 
 xp_option_t xdefault_options[] = {
     XP_STRING_OPTION(
 	"display",
 	"",
-	xdisplay,
-	sizeof xdisplay,
-	NULL,
-	NULL,
+	displayName,
+	sizeof displayName,
+	NULL, NULL,
 	"Set the X display.\n"),
+
+    XP_STRING_OPTION(
+	"keyboard",
+	"",
+	keyboardName,
+	sizeof keyboardName,
+	NULL, NULL,
+	"Set the X keyboard input if you want keyboard input from\n"
+	"another display.  The default is to use the keyboard input from\n"
+	"the X display.\n"),
+
+    XP_STRING_OPTION(
+	"visual",
+	"",
+	visualName,
+	sizeof visualName,
+	NULL, NULL,
+	"Specify which visual to use for allocating colors.\n"
+	"To get a listing of all possible visuals on your dislay\n"
+	"set the argument for this option to list.\n"),
+
+    XP_BOOL_OPTION(
+	"colorSwitch",
+	true,
+	&colorSwitch,
+	NULL,
+	"Use color buffering or not.\n"
+	"Usually color buffering is faster, especially on 8-bit\n"
+	"PseudoColor displays.\n"),
+
+    XP_BOOL_OPTION(
+	"multibuffer",
+	false,
+	&multibuffer,
+	NULL,
+	"Use the X windows multibuffer extension if present.\n"),
+
 };
 
 void Store_x_options(void)
 {
     STORE_OPTIONS(xdefault_options);
+}
+
+void Handle_x_options(void)
+{
+    char *ptr;
+
+    /* handle display */
+    assert(displayName);
+    if (strlen(displayName) == 0) {
+	if ((ptr = getenv(DISPLAY_ENV)) != NULL)
+	    Set_option("display", ptr);
+	else
+	    Set_option("display", DISPLAY_DEF);
+    }
+
+    if ((dpy = XOpenDisplay(displayName)) == NULL)
+	fatal("Can't open display '%s'.", displayName);
+
+    /* handle keyboard */
+    assert(keyboardName);
+    if (strlen(keyboardName) == 0) {
+	if ((ptr = getenv(KEYBOARD_ENV)) != NULL)
+	    Set_option("keyboard", ptr);
+    }
+
+    if (strlen(keyboardName) == 0)
+	kdpy = NULL;
+    else if ((kdpy = XOpenDisplay(keyboardName)) == NULL)
+	fatal("Can't open keyboard '%s'.", keyboardName);
+
+    /* handle visual */
+    assert(visualName);
+    if (strncasecmp(visualName, "list", 4) == 0) {
+	List_visuals();
+	exit(0);
+    }
+
+
+    
+
 }
 
 #endif

@@ -90,11 +90,11 @@ int main(int argc, char *argv[])
      */
     init_error(argv[0]);
 
-    seedMT( (unsigned)time((time_t *)0) ^ Get_process_id());
+    seedMT( (unsigned)time(NULL) ^ Get_process_id());
 
     Check_client_versions();
 
-    conpar = (Connect_param_t *) calloc(1, sizeof(Connect_param_t));
+    conpar = calloc(1, sizeof(Connect_param_t));
     if (!conpar) {
 	error("Not enough memory");
 	exit(1);
@@ -139,6 +139,8 @@ int main(int argc, char *argv[])
 
 #ifdef OPTIONHACK
     /*Usage();*/
+extern void Handle_x_options(void);
+    Handle_x_options();
 #endif
     
     /* CLIENTRANK */
@@ -172,12 +174,11 @@ int main(int argc, char *argv[])
 	IFNWINDOWS(result = Welcome_screen(conpar));
     }
 
-    if (result == 1) {
+    if (result == 1)
 	retval =
 	  Join(conpar->server_addr, conpar->server_name,
 	       conpar->login_port, conpar->real_name, conpar->nick_name,
 	       conpar->team, conpar->disp_name, conpar->server_version);
-    }
     
     if (instruments.useClientRanker)
 	Print_saved_scores();
