@@ -56,6 +56,8 @@ double Handle_tag(double sc, player *victim_pl, player *killer_pl)
 
 static inline bool Player_can_be_tagged(player *pl)
 {
+    if (Player_is_tank(pl))
+	return false;
     if (BIT(pl->status, PAUSE))
 	return false;
     return true;
