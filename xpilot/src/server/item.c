@@ -40,8 +40,6 @@ static void Item_update_flags(player_t *pl)
 	CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
     }
-    if (pl->item[ITEM_MIRROR] <= 0)
-	CLR_BIT(pl->have, HAS_MIRROR);
     if (pl->item[ITEM_DEFLECTOR] <= 0)
 	CLR_BIT(pl->have, HAS_DEFLECTOR);
     if (pl->item[ITEM_PHASING] <= 0
@@ -705,8 +703,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
         break;
     case ITEM_MIRROR:
 	what = "a mirror";
-	if (!victim->item[item])
-	    CLR_BIT(victim->have, HAS_MIRROR);
 	break;
     case ITEM_DEFLECTOR:
 	what = "a deflector";
@@ -816,7 +812,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	pl->updateVisibility = true;
 	break;
     case ITEM_MIRROR:
-	SET_BIT(pl->have, HAS_MIRROR);
 	break;
     case ITEM_ARMOR:
 	break;

@@ -100,7 +100,6 @@ extern bool		updateScores;
 #define HAS_EMERGENCY_SHIELD	(1U<<19)
 #define HAS_DEFLECTOR		(1U<<18)
 #define HAS_PHASING_DEVICE	(1U<<17)
-#define HAS_MIRROR		(1U<<16)
 #define HAS_SHOT		(1U<<4)
 #define HAS_BALL		(1U<<3)
 

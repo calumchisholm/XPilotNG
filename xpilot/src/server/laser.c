@@ -131,7 +131,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	cannon = Cannon_by_id(pl->world, pulse->id);
 
     pl->forceVisible += 1;
-    if (BIT(pl->have, HAS_MIRROR)
+    if (pl->item[ITEM_MIRROR] > 0
 	&& (rfrac() * (2 * pl->item[ITEM_MIRROR])) >= 1) {
 	pulse->pulse_dir = (int)(Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
 					       pl->pos.cy - pulse->pos.cy)
