@@ -203,12 +203,26 @@ void UnmapNotify_event(XEvent *event)
 void ConfigureNotify_event(XEvent *event)
 {
     XConfigureEvent	*conf;
-
+    static unsigned int conf_width = 0;
+    static unsigned int conf_height = 0;
+   
+    /* Changed to check if this is a window move or a 
+       window resize event , sadly ConfigureNotify and
+       Expose are used to resize windows, if the window
+       size has not changed then we do not need to destroy
+       and resize widgets */
+    
     conf = &(event->xconfigure);
-    if (conf->window == topWindow)
-	Resize(conf->window, (unsigned)conf->width, (unsigned)conf->height);
-    else
-        Widget_event(event);
+    
+    if (((unsigned) conf->width != conf_width) || 
+	((unsigned) conf->height != conf_height))
+
+      Resize(conf->window, (unsigned)conf->width, (unsigned)conf->height);   
+    else      
+      Widget_event(event); 
+      
+      conf_height = (unsigned)conf->height;
+      conf_width = (unsigned)conf->width;
 }
 #endif
 
