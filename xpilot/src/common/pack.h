@@ -99,9 +99,11 @@
  * 4.4.0.1: fast radar packet
  * 4.5.0.0: new team score packet; score packet made larger to send decimals
  * 4.5.0.1: temporary wormholes
- *
+
+ * Polygon branch
+ * 4.F.0.9: 4.3.0.0 + xp2 map format
  * 4.F.1.0: Send_player(): Additional %c (is 1 when we tell a player about himself).
- * 4.F.1.1: same as 4.5.0.1, but adds the 4.F.1.0 Send_player() change
+ * 4.F.1.1: support for everything in 4.5.0.1
  */
 #ifdef SERVER
 #define	MAGIC		(is_polygon_map ? 0x4F11F4ED : 0x4501F4ED)
@@ -124,7 +126,7 @@
 /*
  * Which server versions can this client join.
  */
-#define MIN_SERVER_VERSION	0x3103
+#define MIN_SERVER_VERSION	0x4F09
 #define MAX_SERVER_VERSION	MY_VERSION
 
 /*
