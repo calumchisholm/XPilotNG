@@ -352,7 +352,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	    if (shove->pusher_id == NO_ID)
 		continue;
 
-	    if (shove->time < frame_loops - 20)
+	    if (shove->time < frame_loops - (int)((20 / timeStep) + 0.5))
 		continue;
 
 	    for (j = 0; j < num_pushers; j++) {
