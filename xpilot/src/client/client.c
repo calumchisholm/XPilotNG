@@ -1412,10 +1412,7 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
     other->war_id = -1;
     other->name_width = 0;
     strlcpy(other->name, player_name, sizeof(other->name));
-    if (instruments.showShipId)
-	sprintf(other->id_string, "%d", id);
-    else
-	strlcpy(other->id_string, player_name, sizeof(other->id_string));
+    strlcpy(other->id_string, player_name, sizeof(other->id_string));
     strlcpy(other->real, real_name, sizeof(other->real));
     strlcpy(other->host, host_name, sizeof(other->host));
     scoresChanged = true;

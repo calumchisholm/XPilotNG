@@ -56,7 +56,6 @@ typedef struct {
     bool showOutlineDecor;
     bool showFilledDecor;
     bool showTexturedDecor;
-    bool showShipId;
     bool showMessages;
     bool showMapRadar;
     bool showSlidingRadar;

@@ -276,6 +276,59 @@ xp_option_t default_options[] = {
 	"This gives a sparkling effect.\n"
 	"Valid values are in the range [0.0-1.0]\n"),
 
+
+    /* hud stuff */
+    XP_INT_OPTION(
+	"hudRadarDotSize",
+	8,
+	1,
+	SHIP_SZ,
+	&hudRadarDotSize,
+	NULL,
+	"Which size to use for drawing the hudradar dots.\n"),
+
+    XP_DOUBLE_OPTION(
+	"hudRadarScale",
+	1.5,
+	0.5,
+	4.0,
+	&hudRadarScale,
+	NULL,
+	"The relative size of the hudradar.\n"),
+	
+    XP_DOUBLE_OPTION(
+	"hudRadarLimit",
+	0.05,
+	0.0,
+	5.0,
+	&hudRadarLimit,
+	NULL,
+	"Hudradar dots closer than this to your ship are not drawn.\n"
+	"A value of 1.0 means that the dots are not drawn for ships in\n"
+	"your active view area.\n"),
+
+    XP_INT_OPTION(
+	"hudSize",
+	MIN_HUD_SIZE * 2,
+	MIN_HUD_SIZE,
+	MIN_HUD_SIZE * 6,
+	&hudSize,
+	NULL,
+	"Which size to use for drawing the hud.\n"),
+
+    XP_INT_OPTION(
+	"baseWarningType",
+	3,
+	0,
+	3,
+	&baseWarningType,
+	NULL,
+	"Which type of base warning you prefer.\n"
+	"A value of 0 disables base warning.\n"
+	"A value of 1 draws a red box on a base when someone has died.\n"
+	"A value of 2 makes the base name flash when someone has died.\n"
+	"A value of 3 combines the effects of values 1 and 2.\n"),
+
     /* instruments */
     
     XP_BOOL_OPTION(
@@ -324,13 +377,6 @@ xp_option_t default_options[] = {
 	"Paint remaining lives next to ships.\n"),
 
     XP_BOOL_OPTION(
-	"showID",
-	false,
-	&instruments.showShipId,
-	NULL,
-	"Show ID numbers instead of ship names on the playfield?\n"),
-
-    XP_BOOL_OPTION(
 	"filledWorld",
 	false,
 	&instruments.showFilledWorld,
@@ -354,6 +400,8 @@ xp_option_t default_options[] = {
 	NULL,
 	"Draws only the outline of all the wall blocks\n"
 	"on block based maps.\n"),
+
+    /* stuff drawn on map */
 
     XP_INT_OPTION(
 	"shotSize",
@@ -403,6 +451,17 @@ xp_option_t default_options[] = {
 	NULL,
 	"Specifies the size of the background points.  0 means no points.\n"),
 
+    XP_DOUBLE_OPTION(
+	"scoreObjectTime",
+	4.0,
+	0.0,
+	10.0,
+	&scoreObjectTime,
+	NULL,
+	"How many seconds score objects remain visible on the map.\n"),
+
+    /* message stuff */
+
     XP_INT_OPTION(
 	"charsPerSecond",
 	100,
@@ -433,8 +492,7 @@ xp_option_t default_options[] = {
 	"1: Only player messages.\n"
 	"2: Player and status messages.\n"),
 
-
-    /* fuel warning limits */
+    /* stuff you should not have to touch */
 
     XP_DOUBLE_OPTION(
 	"fuelNotify",
@@ -481,6 +539,8 @@ xp_option_t default_options[] = {
     	NULL,
 	"Uses a red line to indicate the current velocity and direction.\n"),
 
+
+
     /* modbanks */
     XP_STRING_OPTION(
 	"modifierBank1",
@@ -519,6 +579,7 @@ xp_option_t default_options[] = {
 	getTexturePath,
 	"Search path for texture files.\n"
 	"This is a list of one or more directories separated by colons.\n"),
+
 
 
 
@@ -734,61 +795,6 @@ xp_option_t default_options[] = {
 	"3",
 	KEY_DUMMY,
 	"Too complicated.  Keep it on 3.\n",
-	0
-    },
-   {
-	"hudRadarDotSize",
-	NULL,
-	"8",
-	KEY_DUMMY,
-	"Which size to use for drawing the hudradar dots.\n",
-	0
-    },
-    {
-	"hudRadarScale",
-	NULL,
-	"1.5",
-	KEY_DUMMY,
-	"The relative size of the hudradar.\n",
-	0
-    },
-    {
-	"hudRadarLimit",
-	NULL,
-	"0.05",
-	KEY_DUMMY,
-	"Hudradar dots closer than this to your ship are not drawn.\n"
-	"A value of 1.0 means that the dots are not drawn for ships in\n"
-	"your active view area.\n",
-	0
-    },
-    {
-	"hudSize",
-	NULL,
-	"90",
-	KEY_DUMMY,
-	"Which size to use for drawing the hud.\n",
-	0
-    },
-
-    {
-	"scoreObjectTime",
-	NULL,
-	"3.0",
-	KEY_DUMMY,
-	"How many seconds score objects remain visible on the map.\n",
-	0
-    },
-    {
-	"baseWarningType",
-	NULL,
-	"3",
-	KEY_DUMMY,
-	"Which type of base warning you prefer.\n"
-	"A value of 0 disables base warning.\n"
-	"A value of 1 draws a red box on a base when someone has died.\n"
-	"A value of 2 makes the base name flash when someone has died.\n"
-	"A value of 3 combines the effects of values 1 and 2.\n",
 	0
     },
 
@@ -1494,14 +1500,6 @@ cl_option_t options[] = {
 	"Be warned that this requires more graphics speed.\n"
 	"fullColor must be on for this to work.\n"
 	"You may also need to enable multibuffering or double-buffering.\n",
-	0
-    },
-    {
-	"showID",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should ID numbers be shown instead of ship names on the playfield?\n",
 	0
     },
     {
@@ -4448,7 +4446,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bool_resource(rDB, "filledDecor", &instruments.showFilledDecor);
     Get_bool_resource(rDB, "texturedDecor", &instruments.showTexturedDecor);
     Get_bool_resource(rDB, "reverseScroll", &instruments.showReverseScroll);
-    Get_bool_resource(rDB, "showID", &instruments.showShipId);
 
     Get_bool_resource(rDB, "fullColor", &fullColor);
     Get_bool_resource(rDB, "texturedObjects", &texturedObjects);
