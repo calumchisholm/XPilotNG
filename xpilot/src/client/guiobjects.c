@@ -420,6 +420,13 @@ void Gui_paint_appearing(int x, int y, int id, int count)
     SET_FG(colors[RED].pixel);
     rd.fillRectangle(dpy, p_draw, gc, SCALEX(x - hsize), SCALEY(y + hsize),
 		     WINSCALE(2 * hsize + 1), WINSCALE(2 * hsize + 1));
+    SET_FG(colors[WHITE].pixel);
+    count = 360 - count;
+    if (count < 0)
+	count = 0;
+    rd.fillRectangle(dpy, p_draw, gc, SCALEX(x - hsize), SCALEY(y + hsize),
+		     WINSCALE(2 * hsize + 1),
+		     WINSCALE((int)(count / 180. * hsize + 1)));
 }
 
 

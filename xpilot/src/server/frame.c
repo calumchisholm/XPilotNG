@@ -938,7 +938,7 @@ static void Frame_ships(connection_t *conn, player *pl)
 			    pl_i->home_base->pos.cy, (int)pl_i->count);
 	    else
 		Send_appearing(conn, pl_i->home_base->pos.cx,
-			pl_i->home_base->pos.cy, pl_i->id, (int)pl_i->count);
+		  pl_i->home_base->pos.cy, pl_i->id, (int)(pl_i->count * 10));
 	    continue;
 	}
 	if (!click_inview(&cv, pl_i->pos.cx, pl_i->pos.cy))
