@@ -56,7 +56,7 @@ am_xpilot_sdl_OBJECTS = DT_drawtext.$(OBJEXT) SDL_console.$(OBJEXT) \
 	main.$(OBJEXT) radar.$(OBJEXT) sdlevent.$(OBJEXT) \
 	sdlgui.$(OBJEXT) sdlinit.$(OBJEXT) sdlkeys.$(OBJEXT) \
 	sdlpaint.$(OBJEXT) sdlwindow.$(OBJEXT) text.$(OBJEXT) \
-	todo.$(OBJEXT)
+	todo.$(OBJEXT) sdlmeta.$(OBJEXT)
 xpilot_sdl_OBJECTS = $(am_xpilot_sdl_OBJECTS)
 xpilot_sdl_DEPENDENCIES = $(top_builddir)/src/client/libxpclient.a \
 	$(top_builddir)/src/common/libxpcommon.a
@@ -71,8 +71,9 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/main.Po ./$(DEPDIR)/radar.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/sdlevent.Po ./$(DEPDIR)/sdlgui.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/sdlinit.Po ./$(DEPDIR)/sdlkeys.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sdlpaint.Po ./$(DEPDIR)/sdlwindow.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/text.Po ./$(DEPDIR)/todo.Po
+@AMDEP_TRUE@	./$(DEPDIR)/sdlmeta.Po ./$(DEPDIR)/sdlpaint.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sdlwindow.Po ./$(DEPDIR)/text.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/todo.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -196,7 +197,8 @@ xpilot_sdl_SOURCES = \
 	SDL_gfxPrimitives_font.h console.c console.h gameloop_x.c \
 	glwidgets.c glwidgets.h images.c images.h main.c radar.c radar.h \
 	sdlevent.c sdlgui.c sdlinit.c sdlkeys.c sdlkeys.h sdlpaint.c \
-	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c
+	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c \
+	sdlmeta.h sdlmeta.c sdlinit.h
 
 xpilot_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
 all: all-am
@@ -278,6 +280,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlgui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlinit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlkeys.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlmeta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlpaint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdlwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/text.Po@am__quote@
