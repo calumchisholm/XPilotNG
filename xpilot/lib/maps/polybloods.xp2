@@ -13,7 +13,7 @@
 <Option name="shotsgravity" value="yes"/>
 <Option name="maxunshieldedwallbouncespeed" value="90"/>
 <Option name="playersonradar" value="yes"/>
-<Option name="allownukes" value="yes"/>
+<Option name="allownukes" value="no"/>
 <Option name="teamplay" value="yes"/>
 <Option name="itemmineprob" value="0.8"/>
 <Option name="identifymines" value="yes"/>
