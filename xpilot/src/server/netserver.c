@@ -539,7 +539,7 @@ void Destroy_connection(int ind, const char *reason)
 
 	    Free_ship_shape(pl->ship);
 	    for (i = NumObservers - 1; i >= 0; i--)
-		Send_leave(Players[i + World.NumBases]->conn, id);
+		Send_leave(Players[i + observerStart]->conn, id);
 	}
     }
     if (connp->real != NULL) {
