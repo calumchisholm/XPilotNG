@@ -1192,17 +1192,14 @@ void Update_objects(world_t *world)
 		Destroy_connection(pl->conn, "auto-kicked: paused too long");
 	    }
 	}
-	else
-	    pl->pauseTime = 0;
 
-	if (Player_is_alive(pl) && pl->recovery_count <= 0) {
+	if (Player_is_alive(pl)) {
 	    pl->idleTime += timePerFrame;
 	    if (Player_is_human(pl)
 		&& options.maxIdleTime > 0
-		&& pl->idleTime > options.maxIdleTime
-		/*&& (NumPlayers - NumRobots - NumPseudoPlayers) > 1*/) {
-		Set_message_f("%s was paused for idling. "
-			      "[*Server notice*]", pl->name);
+		&& pl->idleTime > options.maxIdleTime) {
+		Set_message_f("%s was paused for idling. [*Server notice*]",
+			      pl->name);
 		Pause_player(pl, true);
 	    }
 	}
