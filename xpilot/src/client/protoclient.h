@@ -41,18 +41,7 @@ extern int motd_viewer;		/* so Windows can clean him up */
 extern int keys_viewer;
 
 
-/*
- * colors.c
- */
-void List_visuals(void);
-int Colors_init(void);
-int Colors_init_bitmaps(void);
-void Colors_free_bitmaps(void);
-void Colors_init_style_colors(void);
-void Colors_cleanup(void);
-void Colors_debug(void);
-void Init_spark_colors(void);
-void Store_color_options(void);
+extern void Colors_init_style_colors(void);
 
 /*
  * default.c
@@ -104,22 +93,19 @@ extern int Init_asteroids(void);
 extern int Query_all(sock_t *sockfd, int port, char *msg, int msglen);
 
 
-#ifdef	LIMIT_ACCESS
-extern bool		Is_allowed(char *);
-#endif
 
 /*
  * textinterface.c
  */
-int Connect_to_server(int auto_connect, int list_servers,
-		      int auto_shutdown, char *shutdown_reason,
-		      Connect_param_t *conpar);
-int Contact_servers(int count, char **servers,
-                    int auto_connect, int list_servers,
-                    int auto_shutdown, char *shutdown_message,
-                    int find_max, int *num_found,
-                    char **server_addresses, char **server_names,
-                    Connect_param_t *conpar);
+extern int Connect_to_server(int auto_connect, int list_servers,
+			     int auto_shutdown, char *shutdown_reason,
+			     Connect_param_t *conpar);
+extern int Contact_servers(int count, char **servers,
+			   int auto_connect, int list_servers,
+			   int auto_shutdown, char *shutdown_message,
+			   int find_max, int *num_found,
+			   char **server_addresses, char **server_names,
+			   Connect_param_t *conpar);
 
 /*
  * usleep.c
@@ -129,12 +115,12 @@ extern int micro_delay(unsigned usec);
 /*
  * welcome.c
  */
-int Welcome_screen(Connect_param_t *conpar);
+extern int Welcome_screen(Connect_param_t *conpar);
 
 /*
  * widget.c
  */
-void Widget_cleanup(void);
+extern void Widget_cleanup(void);
 
 /*
  * xinit.c

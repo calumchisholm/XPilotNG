@@ -113,10 +113,23 @@ static inline void SET_FG(unsigned long fg)
 	XSetForeground(dpy, gameGC, current_foreground = fg);
 }
 
-void Paint_item_symbol(int type, Drawable d, GC mygc,
-		       int x, int y, int color);
-void Paint_item(int type, Drawable d, GC mygc, int x, int y);
-void Gui_paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int c);
-void Gui_paint_item(int type, Drawable d, GC mygc, int x, int y);
+extern void Paint_item_symbol(int type, Drawable d, GC mygc,
+			      int x, int y, int color);
+extern void Paint_item(int type, Drawable d, GC mygc, int x, int y);
+extern void Gui_paint_item_symbol(int type, Drawable d, GC mygc,
+				  int x, int y, int c);
+extern void Gui_paint_item(int type, Drawable d, GC mygc, int x, int y);
+
+/*
+ * colors.c
+ */
+extern void List_visuals(void);
+extern int Colors_init(void);
+extern int Colors_init_bitmaps(void);
+extern void Colors_free_bitmaps(void);
+extern void Colors_cleanup(void);
+extern void Colors_debug(void);
+extern void Init_spark_colors(void);
+extern void Store_color_options(void);
 
 #endif
