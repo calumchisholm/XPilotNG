@@ -24,10 +24,6 @@ Task:
   should be minimized.
 Developer:
 
-Task:
-  Windows support. The biggest thing here is to implement options.c and 
-  Game_loop without using X.
-Developer:
 
 
 Task:
