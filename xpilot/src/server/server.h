@@ -254,21 +254,20 @@ void Update_tanks(pl_fuel_t *);
 void Place_item(world_t *world, player_t *pl, int type);
 int Choose_random_item(world_t *world);
 void Tractor_beam(player_t *pl);
-void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
+void General_tractor_beam(world_t *world, int id, clpos_t pos,
 			  int items, player_t *victim, bool pressor);
 void Place_mine(player_t *pl);
 void Place_moving_mine(player_t *pl);
-void Place_general_mine(world_t *world, player_t *pl, cannon_t *cannon,
-			int team, int status, clpos_t pos, vector_t vel,
-			modifiers_t mods);
+void Place_general_mine(world_t *world, int id, int team, int status,
+			clpos_t pos, vector_t vel, modifiers_t mods);
 void Detonate_mines(player_t *pl);
 char *Describe_shot(int type, int status, modifiers_t mods, int hit);
 void Fire_ecm(player_t *pl);
-void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos);
+void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos);
 void Update_connector_force(world_t *world, ballobject_t *ball);
 void Fire_shot(player_t *pl, int type, int dir);
-void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
-		       int team, clpos_t pos, int type, int dir,
+void Fire_general_shot(world_t *world, int id, int team,
+		       clpos_t pos, int type, int dir,
 		       modifiers_t mods, int target_id);
 void Fire_normal_shots(player_t *pl);
 void Fire_main_shot(player_t *pl, int type, int dir);
@@ -282,15 +281,15 @@ bool Friction_area_hitfunc(group_t *groupptr, move_t *move);
 void Team_immunity_init(world_t *world);
 void Hitmasks_init(world_t *world);
 void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl);
-/*double Handle_tag(double score, player_t *victim_pl, player_t* killer_pl);*/
+
 void Check_tag(void);
 void Delete_shot(world_t *world, int ind);
 void Fire_laser(player_t *pl);
-void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
+void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
 			int dir, modifiers_t mods);
 void Do_deflector(player_t *pl);
 void Do_transporter(player_t *pl);
-void Do_general_transporter(world_t *world, player_t *pl, clpos_t pos,
+void Do_general_transporter(world_t *world, int id, clpos_t pos,
 			    player_t *victim, int *item, double *amount);
 bool Initiate_hyperjump(player_t *pl);
 void do_lose_item(player_t *pl);

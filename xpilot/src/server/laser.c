@@ -54,17 +54,19 @@ void Fire_laser(player_t *pl)
 	    if (is_inside(pos.cx, pos.cy, NONBALL_BIT | NOTEAM_BIT, NULL)
 		!= NO_GROUP)
 		return;
-	    Fire_general_laser(pl->world, pl, pl->team, pos,
+	    Fire_general_laser(pl->world, pl->id, pl->team, pos,
 			       pl->dir, pl->mods);
 	}
     }
 }
 
-void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
+void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
 			int dir, modifiers_t mods)
 {
     double life;
     pulseobject_t *pulse;
+    player_t *pl = Player_by_id(id);
+    cannon_t *cannon = Cannon_by_id(world, id);
 
     if (!World_contains_clpos(world, pos)) {
 	warn("Fire_general_laser: outside world.\n");

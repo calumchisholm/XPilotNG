@@ -103,7 +103,7 @@ void Cannon_update(world_t *world, bool tick)
 			     tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
 		&& Player_is_alive(tpl)) {
-		General_tractor_beam(world, NULL, c->pos,
+		General_tractor_beam(world, c->id, c->pos,
 				     c->item[ITEM_TRACTOR_BEAM],
 				     tpl, c->tractor_is_pressor);
 		if ((c->tractor_count -= timeStep) <= 0)
@@ -582,7 +582,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
 	}
 	if (rfrac() < 0.5) {	/* place mine in front of cannon */
-	    Place_general_mine(world, NULL, c, c->team, FROMCANNON,
+	    Place_general_mine(world, c->id, c->team, FROMCANNON,
 			       c->pos, zero_vel, mods);
 	    sound_play_sensors(c->pos, DROP_MINE_SOUND);
 	    played = true;
@@ -596,7 +596,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    speed = speed * 0.5 + 0.1 * smartness;
 	    vel.x = tcos(dir) * speed;
 	    vel.y = tsin(dir) * speed;
-	    Place_general_mine(world, NULL, c, c->team, GRAVITY|FROMCANNON,
+	    Place_general_mine(world, c->id, c->team, GRAVITY|FROMCANNON,
 			       c->pos, vel, mods);
 	    sound_play_sensors(c->pos, DROP_MOVING_MINE_SOUND);
 	    played = true;
@@ -624,7 +624,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	switch ((int)(rfrac() * (1 + smartness))) {
 	default:
 	    if (options.allowSmartMissiles) {
-		Fire_general_shot(world, NULL, c, c->team, c->pos,
+		Fire_general_shot(world, c->id, c->team, c->pos,
 				  OBJ_SMART_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_SMART_SHOT_SOUND);
 		played = true;
@@ -634,7 +634,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	case 1:
 	    if (options.allowHeatSeekers
 		&& Player_is_thrusting(pl)) {
-		Fire_general_shot(world, NULL, c, c->team, c->pos,
+		Fire_general_shot(world, c->id, c->team, c->pos,
 				  OBJ_HEAT_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_HEAT_SHOT_SOUND);
 		played = true;
@@ -642,7 +642,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    }
 	    /* FALLTHROUGH */
 	case 0:
-	    Fire_general_shot(world, NULL, c, c->team, c->pos,
+	    Fire_general_shot(world, c->id, c->team, c->pos,
 			      OBJ_TORPEDO, dir, mods, NO_ID);
 	    sound_play_sensors(c->pos, FIRE_TORPEDO_SOUND);
 	    played = true;
@@ -656,12 +656,12 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	if (BIT(world->rules->mode, ALLOW_LASER_MODIFIERS)
 	    && (rfrac() * (8 - smartness)) >= 1)
 	    mods.laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
-	Fire_general_laser(world, NULL, c->team, c->pos, dir, mods);
+	Fire_general_laser(world, c->id, c->team, c->pos, dir, mods);
 	sound_play_sensors(c->pos, FIRE_LASER_SOUND);
 	played = true;
 	break;
     case CW_ECM:
-	Fire_general_ecm(world, NULL, c->team, c->pos);
+	Fire_general_ecm(world, c->id, c->team, c->pos);
 	c->item[ITEM_ECM]--;
 	sound_play_sensors(c->pos, ECM_SOUND);
 	played = true;
@@ -679,7 +679,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    int item = -1;
 	    double amount = 0.0;
 
-	    Do_general_transporter(world, NULL, c->pos, pl, &item, &amount);
+	    Do_general_transporter(world, c->id, c->pos, pl, &item, &amount);
 	    if (item != -1)
 		Cannon_add_item(c, item, amount);
 	} else {
@@ -738,7 +738,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			+ (4 - smartness)
 			* (-c->item[ITEM_WIDEANGLE] +  i);
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(world, NULL, c, c->team, c->pos,
+	    Fire_general_shot(world, c->id, c->team, c->pos,
 			      OBJ_CANNON_SHOT, a_dir, mods, NO_ID);
 	}
 	/* I'm not sure cannons should use rearshots.
@@ -749,7 +749,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			+ (4 - smartness)
 			* (-((c->item[ITEM_REARSHOT] - 1) * 0.5) + i));
 	    a_dir = MOD2(a_dir, RES);
-	    Fire_general_shot(world, NULL, c, c->team, c->pos,
+	    Fire_general_shot(world, c->id, c->team, c->pos,
 			      OBJ_CANNON_SHOT, a_dir, mods, NO_ID);
 	}
     }

@@ -401,7 +401,7 @@ void Detonate_items(player_t *pl)
 
 	    vel.x = pl->vel.x + speed * tcos(dir);
 	    vel.y = pl->vel.y + speed * tsin(dir);
-	    Place_general_mine(world, owner_pl, NULL, pl->team, GRAVITY,
+	    Place_general_mine(world, owner_pl->id, pl->team, GRAVITY,
 			       pl->pos, vel, mods);
 	}
     }
@@ -430,7 +430,7 @@ void Detonate_items(player_t *pl)
 		&& pl->item[ITEM_MISSILE] < options.nukeMinSmarts)
 		CLR_BIT(mods.nuclear, NUCLEAR);
 
-	    Fire_general_shot(world, owner_pl, 0, pl->team, pl->pos,
+	    Fire_general_shot(world, owner_pl->id, pl->team, pl->pos,
 			      type, (int)(rfrac() * RES), mods, NO_ID);
 	}
     }
@@ -457,19 +457,20 @@ void Tractor_beam(player_t *pl)
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
     }
-    General_tractor_beam(pl->world, pl, pl->pos, pl->item[ITEM_TRACTOR_BEAM],
-			 locked_pl, pl->tractor_is_pressor);
+    General_tractor_beam(pl->world, pl->id, pl->pos,
+			 pl->item[ITEM_TRACTOR_BEAM], locked_pl,
+			 pl->tractor_is_pressor);
 }
 
-void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
+void General_tractor_beam(world_t *world, int id, clpos_t pos,
 			  int items, player_t *victim, bool pressor)
 {
-    double maxdist = TRACTOR_MAX_RANGE(items),
-	maxforce = TRACTOR_MAX_FORCE(items),
-	percent, force, dist, cost, a;
+    double maxdist = TRACTOR_MAX_RANGE(items);
+    double maxforce = TRACTOR_MAX_FORCE(items), percent, force, dist, cost, a;
     int theta;
+    player_t *pl = Player_by_id(id);
+    cannon_t *cannon = Cannon_by_id(world, id);
 
-    UNUSED_PARAM(world);
     dist = Wrap_length(pos.cx - victim->pos.cx,
 		       pos.cy - victim->pos.cy) / CLICK;
     if (dist > maxdist)
@@ -612,16 +613,18 @@ void Do_transporter(player_t *pl)
     }
 
     /* victim found */
-    Do_general_transporter(pl->world, pl, pl->pos, victim, NULL, NULL);
+    Do_general_transporter(pl->world, pl->id, pl->pos, victim, NULL, NULL);
 }
 
-void Do_general_transporter(world_t *world, player_t *pl, clpos_t pos,
+void Do_general_transporter(world_t *world, int id, clpos_t pos,
 			    player_t *victim, int *itemp, double *amountp)
 {
     char msg[MSG_LEN];
     const char *what = NULL;
     int i, item = ITEM_FUEL;
     double amount;
+    player_t *pl = Player_by_id(id);
+    cannon_t *cannon = Cannon_by_id(world, id);
 
     /* choose item type to steal */
     for (i = 0; i < 50; i++) {
@@ -904,7 +907,7 @@ void do_lose_item(player_t *pl)
 }
 
 
-void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
+void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 {
     object_t *shot;
     mineobject_t *closest_mine = NULL;
@@ -915,6 +918,8 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
     double range, perim, damage;
     player_t *p;
     ecm_t *ecm;
+    player_t *pl = Player_by_id(id);
+    cannon_t *cannon = Cannon_by_id(world, id);
 
     if (NumEcms >= MAX_TOTAL_ECMS)
 	return;
@@ -1176,5 +1181,5 @@ void Fire_ecm(player_t *pl)
 	|| BIT(pl->used, HAS_PHASING_DEVICE))
 	return;
 
-    Fire_general_ecm(pl->world, pl, pl->team, pl->pos);
+    Fire_general_ecm(pl->world, pl->id, pl->team, pl->pos);
 }
