@@ -10,12 +10,9 @@ KEEP_MAPDATA = 0
 # several seconds).
 
 removedopts = """
-analyticalcollisiondetection ecmsreprogramrobots edgebounce
-extraborder maxdefensiveitems maxoffensiveitems maxrobots
+analyticalcollisiondetection edgebounce extraborder
 maxshieldedplayerwallbounceangle maxunshieldedplayerwallbounceangle
-minrobots oneplayeronly reserverobotteam restrictrobots robotfile
-robotleavelife robotleaveratio robotleavescore robotteam robots
-robotsleave robotstalk scoretablefilename teamassign usewreckage
+oneplayeronly scoretablefilename teamassign
 """.split()
 
 # 'mapdata' has been removed too, but isn't ignored by this script.
@@ -78,6 +75,11 @@ treasuresonradar version wallbouncedestroyitemprob
 wallbouncefueldrainmult worldlives wormholevisible wormtime
 wreckagecollisionmaykill mapdata
 teamzeropausing fullframerate fullzeroframerate
+robots maxrobots minrobots robotfile robotstalk robotsleave robotleavelife
+robotleavescore robotleaveratio robotteam restrictrobots reserverobotteam
+robotrealname robothostname ecmsreprogramrobots
+maxdefensiveitems maxoffensiveitems usewreckage
+teamcup
 """.split()
 
 def checkopts(options):
