@@ -1484,8 +1484,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
 }
 
 
-/* kps - this function is named Connector_force in ng */
-void Move_ball(int ind)
+void Connector_force(int ind)
 {
     /*
      * The new ball movement code since XPilot version 3.4.0 as made

@@ -601,7 +601,7 @@ void Update_objects(void)
 
 	else if (BIT(obj->type, OBJ_BALL)) {
 	    if (obj->id != NO_ID)
-		Move_ball(i);
+		Connector_force(i);
 	}
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {

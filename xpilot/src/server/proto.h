@@ -207,7 +207,6 @@ void Detonate_mines(int ind);
 char *Describe_shot(int type, long status, modifiers mods, int hit);
 void Fire_ecm(int ind);
 void Fire_general_ecm(int ind, unsigned short team, int cx, int cy);
-void Move_ball(int ind); /* kps - ng does not want this */
 void Connector_force(int ind);
 void Fire_shot(int ind, int type, int dir);
 void Fire_general_shot(int ind, unsigned short team, bool cannon,
