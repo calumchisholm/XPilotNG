@@ -332,6 +332,7 @@ extern bool	initialPointerControl;	/* Start by using mouse for control? */
 extern bool	pointerControl;		/* current state of mouse ship flying */
 extern int	maxFPS;			/* Client's own FPS */
 extern int 	oldMaxFPS;
+extern int 	FPSDivisor;
 
 extern int	clientPortStart;	/* First UDP port for clients */
 extern int	clientPortEnd;		/* Last one (these are for firewalls) */

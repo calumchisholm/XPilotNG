@@ -125,6 +125,7 @@ bool	auto_shield = true;	/* shield drops for fire */
 
 int	maxFPS;			/* Maximum FPS player wants from server */
 int	oldMaxFPS;
+int	FPSDivisor = 1; /* default just in case, this is calced from FPS and maxFPS */
 
 int	clientPortStart = 0;	/* First UDP port for clients */
 int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
@@ -1697,6 +1698,10 @@ int Client_fps_request(void)
 {
     LIMIT(maxFPS, 1, 200);
     oldMaxFPS = maxFPS;
+	if (maxFPS < FPS)
+		FPSDivisor = (int)ceil(((float)FPS)/(float)(maxFPS));
+	else
+		FPSDivisor = 1;
     return Send_fps_request(maxFPS);
 }
 
@@ -1780,6 +1785,10 @@ int Check_client_fps(void)
     if (oldMaxFPS != maxFPS) {
 	LIMIT(maxFPS, 1, 200);
 	oldMaxFPS = maxFPS;
+	if (maxFPS < FPS)
+		FPSDivisor = (int)ceil(((float)FPS)/(float)(maxFPS));
+	else
+		FPSDivisor = 1;
 	return Send_fps_request(maxFPS);
     }
     return 0;

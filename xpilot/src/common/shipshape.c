@@ -116,43 +116,43 @@ shipshape_t *Default_ship(void)
 	sh.num_points = 3;
 
 	sh.pts[0] = &pts[0][0];
-	pos.x = 15;
+	pos.x = 14;
 	pos.y = 0;
 	Ship_set_point(&sh, 0, pos);
 
 	sh.pts[1] = &pts[1][0];
-	pos.x = -9;
+	pos.x = -8;
 	pos.y = 8;
 	Ship_set_point(&sh, 1, pos);
 
 	sh.pts[2] = &pts[2][0];
-	pos.x = -9;
+	pos.x = -8;
 	pos.y = -8;
 	Ship_set_point(&sh, 2, pos);
 
-	pos.x = -9;
+	pos.x = -8;
 	pos.y = 0;
 	Ship_set_engine(&sh, pos);
 
-	pos.x = 15;
+	pos.x = 14;
 	pos.y = 0;
 	Ship_set_m_gun(&sh, pos);
 
 	sh.num_l_light = 1;
 	sh.l_light[0] = &pts[3][0];
-	pos.x = -9;
+	pos.x = -8;
 	pos.y = 8;
 	Ship_set_l_light(&sh, 0, pos);
 
 	sh.num_r_light = 1;
 	sh.r_light[0] = &pts[4][0];
-	pos.x = -9;
+	pos.x = -8;
 	pos.y = -8;
 	Ship_set_r_light(&sh, 0, pos);
 
 	sh.num_m_rack = 1;
 	sh.m_rack[0] = &pts[5][0];
-	pos.x = 15;
+	pos.x = 14;
 	pos.y = 0;
 	Ship_set_m_rack(&sh, 0, pos);
 

@@ -279,6 +279,8 @@ void Gui_paint_fuel(int x, int y, int fuel)
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     int color = 0;
+	int lifeColor = 0;
+	int previousLifeColor = 0;
     const int BORDER = 4;		/* in pixels */
     int size = 0, size2 = 0;
     other_t *other;
@@ -289,24 +291,32 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     other = Other_by_id(id);
     base = Homebase_by_id(id);
+	if (lifeColor = Life_color(other)) /* If life coloring is valid we get something here (Mara)*/
+		previousLifeColor = Life_color_by_life((other->life)+1); /* otherwise we skip this */
 
     if (baseNameColor) {
-	color = Life_color(other);
-	if (!color)
-	    color = baseNameColor;
+		if (!(color = lifeColor)) /* if lifeColor == 0 lets use baseNameColor instead */
+	    	color = baseNameColor;
     } else
-	color = WHITE;
+		color = WHITE;
 
     if (base != NULL) {
 	/*
 	 * Hacks to support Mara's base warning on new servers and
 	 * the red "meter" basewarning on old servers.
 	 */
+	/*
+	 * Is it just me, or is basewarning broken on old servers?
+	 * Seems all message scanning is gone...(Mara)
+	 */
 	if (version >= 0x4F12) {
-	    if (loops <= base->deathtime + 1)
+		/*
+		 * Since this is the next (displayed) frame add FPSDivisor
+		 */
+	    if (loops <= base->deathtime + FPSDivisor)
 		do_basewarning = true;
 	} else {
-	    if (base->deathtime > loops - 3 * clientFPS) {
+	    if (base->deathtime > loops - 3 * clientFPS) {/* This test always fails */
 		do_basewarning = true;
 		if (baseWarningType & 1) {
 		    int count = (360
@@ -325,10 +335,18 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     /* Mara's flashy basewarning */
     if (do_basewarning && (baseWarningType & 2)) {
-	if (loopsSlow & 1)
-	    color = WHITE;
-	else
-	    color = RED;
+		if (lifeColor == previousLifeColor) {/* If this is the case it won't flash properly */
+			lifeColor = WHITE;
+			previousLifeColor = RED;
+		}	
+		if (loopsSlow & 1) {
+			if (!(color = lifeColor))
+	    		color = baseNameColor;
+			if (!color)
+				color = WHITE;
+		} else
+			if (!(color = previousLifeColor))
+		    	color = RED;
     }
 
     SET_FG(colors[color].pixel);

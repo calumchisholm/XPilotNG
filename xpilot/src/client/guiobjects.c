@@ -406,7 +406,7 @@ void Gui_paint_appearing(int x, int y, int id, int count)
 	homebase_t *base = Homebase_by_id(id);
 	/* hack */
 	if (base != NULL)
-	    base->deathtime = loops;
+	    base->deathtime = loops + count;
     }
 
 #if 1
@@ -633,21 +633,29 @@ int Team_color(int team)
 
 int Life_color(other_t *other)
 {
-    int color = 0;
+    int color = 0;/* default is 'no special color' */
 
     if (other
 	&& (other->mychar == ' ' || other->mychar == 'R')
 	&& BIT(Setup->mode, LIMITED_LIVES)) {
-	if (other->life > 2)
-	    color = manyLivesColor;
-	else if (other->life == 2)
-	    color = twoLivesColor;
-	else if (other->life == 1)
-	    color = oneLifeColor;
-	else
-	    color = zeroLivesColor;
+		color = Life_color_by_life(other->life);
     }
     return color;
+}
+
+int Life_color_by_life(int life) /* This function doesn't check stuff */
+{
+  int color;
+	
+	if (life > 2)
+	    color = manyLivesColor;
+	else if (life == 2)
+	    color = twoLivesColor;
+	else if (life == 1)
+	    color = oneLifeColor;
+	else /* we catch all */
+	    color = zeroLivesColor;
+  return color;
 }
 
 static int Gui_calculate_ship_color(int id, other_t *other)

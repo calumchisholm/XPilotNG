@@ -352,5 +352,6 @@ int Handle_time_left(long sec);
 void Game_over_action(u_byte status);
 int Team_color(int);
 int Life_color(other_t *other);
+int Life_color_by_life(int life);
 
 #endif
