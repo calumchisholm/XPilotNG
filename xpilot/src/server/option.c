@@ -478,6 +478,17 @@ void Option_set_value(
     hash_value	*vp;
     int		ix = Option_hash_string(name);
 
+    /* Warn about deprecated behaviour. */
+    if (opt_origin == OPT_MAP && value) {
+	if ((!strcasecmp(name, "mineLife")
+	     || (!strcasecmp(name, "missileLife")))
+	    && atoi(value) == 0) {
+	    warn("WARNING: '%s: %s' in map.", name, value);
+	    warn("This is a deprecated way to set the default value.");
+	    warn("To fix, remove the option from the map file.");
+	}
+    }
+
     for (np = Option_hash_array[ix]; np; np = np->next) {
 	if (!strcasecmp(name, np->name)) {
 	    Option_change_node(np, value, override, opt_origin);

@@ -73,31 +73,6 @@ static void Tune_tagGame(void)
     if (!options.tagGame)
 	tagItPlayerId = NO_ID;
 }
-static void Tune_shotLife(void)
-{
-    if (options.shotLife == 0.0)
-	options.shotLife = SHOT_DEFAULT_LIFE;
-}
-static void Tune_pulseLife(void)
-{
-    if (options.pulseLife == 0.0)
-	options.pulseLife = PULSE_DEFAULT_LIFE;
-}
-static void Tune_nukeDebrisLife(void)
-{
-    if (options.nukeDebrisLife == 0.0)
-	options.nukeDebrisLife = NUKE_DEFAULT_DEBRIS_LIFE;
-}
-static void Tune_mineLife(void)
-{
-    if (options.mineLife == 0.0)
-	options.mineLife = MINE_DEFAULT_LIFE;
-}
-static void Tune_missileLife(void)
-{
-    if (options.missileLife == 0.0)
-	options.missileLife = MISSILE_DEFAULT_LIFE;
-}
 
 
 static void Check_baseless(void);
@@ -215,8 +190,8 @@ static option_desc opts[] = {
 	"60.0",
 	&options.shotLife,
 	valReal,
-	Tune_shotLife,
-	"Life of bullets in ticks, zero means use default.\n",
+	tuner_dummy,
+	"Life of bullets in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -256,8 +231,8 @@ static option_desc opts[] = {
 	"6.0",
 	&options.pulseLife,
 	valReal,
-	Tune_pulseLife,
-	"Life of laser pulses shot by ships, in ticks, zero means use default.\n",
+	tuner_dummy,
+	"Life of laser pulses shot by ships, in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -841,7 +816,7 @@ static option_desc opts[] = {
     {
 	"maxObjectWallBounceSpeed",
 	"maxObjectBounceSpeed",
-	"40",
+	"40.0",
 	&options.maxObjectWallBounceSpeed,
 	valReal,
 	Move_init,
@@ -851,7 +826,7 @@ static option_desc opts[] = {
     {
 	"maxShieldedWallBounceSpeed",
 	"maxShieldedBounceSpeed",
-	"50",
+	"50.0",
 	&options.maxShieldedWallBounceSpeed,
 	valReal,
 	Move_init,
@@ -861,7 +836,7 @@ static option_desc opts[] = {
     {
 	"maxUnshieldedWallBounceSpeed",
 	"maxUnshieldedBounceSpeed",
-	"20",
+	"20.0",
 	&options.maxUnshieldedWallBounceSpeed,
 	valReal,
 	Move_init,
@@ -1329,7 +1304,7 @@ static option_desc opts[] = {
     {
 	"ballConnectorLength",
 	"ballConnectorLength",
-	"120",
+	"120.0",
 	&options.ballConnectorLength,
 	valReal,
 	tuner_dummy,
@@ -1349,7 +1324,7 @@ static option_desc opts[] = {
     {
 	"ballRadius",
 	"ballRadius",
-	"10",
+	"10.0",
 	&options.ballRadius,
 	valReal,
 	Ball_line_init,
@@ -1509,7 +1484,7 @@ static option_desc opts[] = {
     {
 	"gravityAngle",
 	"gravityAngle",
-	"90",
+	"90.0",
 	&options.gravityAngle,
 	valReal,
 	Compute_gravity,
@@ -1932,8 +1907,8 @@ static option_desc opts[] = {
 	"120.0",
 	&options.nukeDebrisLife,
 	valReal,
-	Tune_nukeDebrisLife,
-	"Life of nuke debris, zero means use default.\n",
+	tuner_dummy,
+	"Life of nuke debris, in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1952,8 +1927,8 @@ static option_desc opts[] = {
 	"7200.0",
 	&options.mineLife,
 	valReal,
-	Tune_mineLife,
-	"Life of mines in ticks, zero means use default.\n",
+	tuner_dummy,
+	"Life of mines in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1972,8 +1947,8 @@ static option_desc opts[] = {
 	"2400.0",
 	&options.missileLife,
 	valReal,
-	Tune_missileLife,
-	"Life of missiles in ticks, zero means use default.\n",
+	tuner_dummy,
+	"Life of missiles in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2140,7 +2115,7 @@ static option_desc opts[] = {
     {
 	"selfDestructScoreMult",
 	"selfDestructScoreMult",
-	"0",
+	"0.0",
 	&options.selfDestructScoreMult,
 	valReal,
 	tuner_dummy,
@@ -2313,7 +2288,7 @@ static option_desc opts[] = {
     {
 	"maxAsteroidDensity",
 	"maxAsteroidDensity",
-	"0",
+	"0.0",
 	&options.maxAsteroidDensity,
 	valReal,
 	Tune_asteroid_prob,
@@ -3094,7 +3069,7 @@ static option_desc opts[] = {
     {
 	"coriolis",
 	"coriolis",
-	"0",
+	"0.0",
 	&options.coriolis,
 	valReal,
 	Timing_setup,
