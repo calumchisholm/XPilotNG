@@ -208,11 +208,12 @@ static int wrap(int *xp, int *yp)
 #ifndef CALLBACK
 #define CALLBACK
 #endif
-static void CALLBACK vertex_callback(ipos_t *p, image_t *texture)
+
+static void CALLBACK vertex_callback(ipos_t *p, irec_t *trec)
 {
-    if (texture != NULL) {
-	glTexCoord2f(p->x / (GLfloat)texture->frame_width,
-		     p->y / (GLfloat)texture->height);
+    if (trec != NULL) {
+	glTexCoord2f((p->x + trec->x) / (GLfloat)trec->w,
+		     (p->y + trec->y) / (GLfloat)trec->h);
     }
     glVertex2i(p->x, p->y);
 }
@@ -220,22 +221,37 @@ static void CALLBACK vertex_callback(ipos_t *p, image_t *texture)
 static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
 {
     int j;
-    int x,y;
+    int x, y, minx, miny;
 
     xp_polygon_t polygon;
     polygon_style_t p_style;
     image_t *texture = NULL;
+    irec_t trec;
     GLdouble v[3] = { 0, 0, 0 };
     ipos_t p[MAX_VERTICES];
 
     polygon = polygons[i];
     p_style = polygon_styles[polygon.style];
+    
     p[0].x = p[0].y = 0;
-
-    if (BIT(p_style.flags, STYLE_TEXTURED))
+    if (BIT(p_style.flags, STYLE_TEXTURED)) {
 	texture = Image_get_texture(p_style.texture);
+	if (texture != NULL) {
+	    x = y = minx = miny = 0;
+	    for (j = 1; j < polygon.num_points; j++) {
+		x += polygon.points[j].x;
+		y += polygon.points[j].y;
+		if (x < minx) minx = x;
+		if (y < miny) miny = y;
+	    }
+	    trec.x = -minx;
+	    trec.y = -miny - (polygon.bounds.h % texture->height);
+	    trec.w = texture->frame_width;
+	    trec.h = texture->height;
+	}
+    }
     glNewList(polyListBase + i,  GL_COMPILE);
-    gluTessBeginPolygon(tess, texture);
+    gluTessBeginPolygon(tess, texture ? &trec : NULL);
     gluTessVertex(tess, v, &p[0]);
     for (j = 1; j < polygon.num_points; j++) {
 	v[0] = p[j].x = p[j-1].x + polygon.points[j].x;
