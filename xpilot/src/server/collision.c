@@ -401,7 +401,7 @@ static void PlayerCollision(world_t *world)
 		     * found through the ball's treasure */
 		    ball->team = pl->team;
 		    if (ball->ball_treasure->have)
-			ball->life = 1e6;  /* for frame counter */
+			ball->ball_loose_ticks = 0;
 		    ball->ball_owner = pl->id;
 		    SET_BIT(ball->obj_status, GRAVITY);
 		    ball->ball_treasure->have = false;

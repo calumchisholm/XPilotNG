@@ -46,7 +46,7 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     if ((ball = BALL_PTR(Object_allocate())) == NULL)
 	return;
 
-    ball->life = 1e6;
+    ball->life = 1;  	  	/* doesn't matter, as long as it is > 0 */
     ball->mass = options.ballMass;
     ball->vel.x = 0;	  	/* make the ball stuck a little */
     ball->vel.y = 0;		/* longer to the ground */
@@ -63,6 +63,7 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     CLEAR_MODS(ball->mods);
     ball->obj_status = RECREATE;
     ball->ball_treasure = t;
+    ball->ball_loose_ticks = 0;
     ball->ball_style = t->ball_style;
     Cell_add_object(world, OBJ_PTR(ball));
 
@@ -105,7 +106,7 @@ void Ball_is_replaced(ballobject_t *ball)
 void Ball_is_destroyed(ballobject_t *ball)
 {
     player_t *pl = Player_by_id(ball->ball_owner);
-    double ticks = 1e6 - ball->life;
+    double ticks = ball->ball_loose_ticks;
     int frames = (int)(ticks / timeStep + .5);
     double seconds = ticks / options.gameSpeed;
 
@@ -117,10 +118,8 @@ void Ball_is_destroyed(ballobject_t *ball)
 
 static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 {
-    int i;
-    double win_score = 0.0,lose_score = 0.0;
-    int win_team_members = 0, lose_team_members = 0;
-    double sc, por;
+    double win_score = 0.0, lose_score = 0.0, sc, por;
+    int i, win_team_members = 0, lose_team_members = 0;
     world_t *world = pl->world;
     bool somebody = false;
 

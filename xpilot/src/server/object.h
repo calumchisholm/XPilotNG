@@ -116,7 +116,7 @@ struct cell_node {
     vector_t		vel;		/* speed in x,y */		\
     vector_t		acc;		/* acceleration in x,y */	\
     float		mass;		/* mass in unigrams */		\
-    double		life;		/* No of ticks left to live */	\
+    float		life;		/* No of ticks left to live */	\
     modifiers_t		mods;		/* Modifiers to this object */	\
     uint8_t		type;		/* one of OBJ_XXX */		\
     uint8_t		color;		/* Color of object */		\
@@ -267,6 +267,7 @@ struct xp_ballobject {
 
     OBJECT_EXTEND
 
+    double		ball_loose_ticks;
     treasure_t		*ball_treasure;	/* treasure for ball */
     short 		ball_owner;	/* Who's object is this ? */
     short		ball_style;	/* What polystyle to use */

@@ -470,8 +470,13 @@ static void Misc_object_update(world_t *world)
 		 || obj->type == OBJ_HEAT_SHOT)
 	    Update_missile(world, MISSILE_PTR(obj));
 
-	else if (obj->type == OBJ_BALL)
-	    Update_connector_force(world, BALL_PTR(obj));
+	else if (obj->type == OBJ_BALL) {
+	    ballobject_t *ball = BALL_PTR(obj);
+	    
+	    ball->ball_loose_ticks += timeStep;
+
+	    Update_connector_force(world, ball);
+	}
 
 	else if (obj->type == OBJ_WRECKAGE) {
 	    wireobject_t *wireobj = WIRE_PTR(obj);
@@ -1228,9 +1233,19 @@ void Update_objects(world_t *world)
     /*
      * Kill shots that ought to be dead.
      */
-    for (i = NumObjs - 1; i >= 0; i--)
-	if ((Obj[i]->life -= timeStep) <= 0)
+    for (i = NumObjs - 1; i >= 0; i--) {
+	object_t *obj = Obj[i];
+
+	/* Balls never die of old age. */
+	if (obj->type == OBJ_BALL) {
+	    if (obj->life <= 0)
+		Delete_shot(world, i);
+	    continue;
+	}
+
+	if ((obj->life -= timeStep) <= 0)
 	    Delete_shot(world, i);
+    }
 
      /*
       * In tag games, check if anyone is tagged. otherwise, tag someone.
