@@ -81,10 +81,14 @@ void Cannon_update(world_t *world, bool tick)
 	if ((c->damaged -= timeStep) <= 0)
 	    c->damaged = 0;
 	if (c->tractor_count > 0) {
-	    player_t *tpl = c->tractor_target_pl;
+	    player_t *tpl = Player_by_id(c->tractor_target_id);
 
-	    if ((Wrap_length(tpl->pos.cx - c->pos.cx,
-			     tpl->pos.cy - c->pos.cy)
+	    if (tpl == NULL) {
+		c->tractor_target_id = NO_ID;
+		c->tractor_count = 0;
+	    }
+	    else if ((Wrap_length(tpl->pos.cx - c->pos.cx,
+				  tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
 		&& Player_is_alive(tpl)) {
 		General_tractor_beam(world, c->id, c->pos,
@@ -195,7 +199,7 @@ void Cannon_init(cannon_t *c)
     Cannon_init_items(c);
     c->last_change = frame_loops;
     c->damaged = 0;
-    c->tractor_target_pl = NULL;
+    c->tractor_target_id = NO_ID;
     c->tractor_count = 0;
     c->tractor_is_pressor = false;
     c->used = 0;
@@ -670,7 +674,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     case CW_TRACTORBEAM:
 	/* smarter cannons use tractors more often and also push/pull longer */
 	c->tractor_is_pressor = (rfrac() * (smartness + 1) >= 1);
-	c->tractor_target_pl = pl;
+	c->tractor_target_id = pl->id;
 	c->tractor_count = 11 + rfrac() * (3 * smartness + 1);
 	break;
     case CW_TRANSPORTER:

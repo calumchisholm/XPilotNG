@@ -812,10 +812,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	player_t *tpl = Player_by_id(trans->id);
 	clpos_t	pos = (tpl ? tpl->pos : trans->pos);
 
-	/*
-	 * kps - If players quite, transporters are not currently cleaned up
-	 * (I think).
-	 */
+	/* Player_by_id() can return NULL if the player quit the game. */
 	if (victim == NULL || tpl == NULL)
 	    continue;
 
@@ -828,7 +825,11 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	cannon_t *cannon = Cannon_by_index(world, i);
 
 	if (cannon->tractor_count > 0) {
-	    player_t *t = cannon->tractor_target_pl;
+	    player_t *t = Player_by_id(cannon->tractor_target_id);
+
+	    /* Player_by_id() can return NULL if the player quit the game. */
+	    if (t == NULL)
+		continue;
 
 	    if (clpos_inview(&cv, t->pos)) {
 		int j;

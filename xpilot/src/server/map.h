@@ -108,7 +108,7 @@ typedef struct cannon {
     unsigned	conn_mask;
     long	last_change;
     int		item[NUM_ITEMS];
-    struct player	*tractor_target_pl;
+    int		tractor_target_id;
     bool	tractor_is_pressor;
     int		team;
     long	used;
