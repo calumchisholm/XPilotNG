@@ -1566,9 +1566,8 @@ void Connector_force(int ind)
 }
 
 
-void Move_smart_shot(int ind)
+void Update_missile(missileobject *shot)
 {
-    missileobject	*shot = MISSILE_IND(ind);
     player		*pl;
     int			angle, theta;
     DFLOAT		range = 0.0;
@@ -1877,10 +1876,8 @@ void Move_smart_shot(int ind)
     shot->vel.y = tsin(shot->missile_dir) * shot_speed;
 }
 
-void Move_mine(int ind)
+void Update_mine(mineobject *mine)
 {
-    mineobject	*mine = MINE_IND(ind);
-
     if (BIT(mine->status, CONFUSED)) {
 	if ((mine->count -= timeStep) <= 0) {
 	    CLR_BIT(mine->status, CONFUSED);

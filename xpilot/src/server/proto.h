@@ -243,8 +243,8 @@ void Do_general_transporter(player *pl, int cx, int cy, int target,
 			    int *item, long *amount);
 void do_hyperjump(player *pl);
 void do_lose_item(player *pl);
-void Move_smart_shot(int ind);
-void Move_mine(int ind);
+void Update_missile(missileobject *shot);
+void Update_mine(mineobject *mine);
 void Make_debris(
 	    /* pos.x, pos.y   */ int    cx,          int   cy,
 	    /* vel.x, vel.y   */ DFLOAT  velx,       DFLOAT vely,

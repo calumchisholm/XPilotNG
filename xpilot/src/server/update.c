@@ -491,10 +491,10 @@ static void Misc_object_update(void)
 	obj = Obj[i];
 
 	if (BIT(obj->type, OBJ_MINE))
-	    Move_mine(i);
+	    Update_mine(MINE_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT|OBJ_TORPEDO))
-	    Move_smart_shot(i);
+	    Update_missile(MISSILE_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID)
 	    Connector_force(i);
