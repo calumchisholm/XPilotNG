@@ -1231,22 +1231,26 @@ void Frame_update(void)
     Frame_radar_buffer_free();
 }
 
-void Set_message(const char *message)
+void Set_message(const char *fmt, ...)
 {
-    player_t		*pl;
-    int			i;
-    const char		*msg;
-    char		tmp[MSG_LEN];
+    player_t *pl;
+    int i;
+    size_t len;
+    char msg[2 * MSG_LEN];
+    va_list ap;
 
-    if ((i = strlen(message)) >= MSG_LEN) {
+    va_start(ap, fmt);
+    vsnprintf(msg, sizeof(msg), fmt, ap);
+    va_end(ap);
+
+    if ((len = strlen(msg)) >= MSG_LEN) {
 	if (!options.silent)
-	    warn("Max message len exceed (%d,%s)", i, message);
-	strlcpy(tmp, message, MSG_LEN);
-	msg = tmp;
-    } else
-	msg = message;
+	    warn("Set_message: Max len exceeded (%d,\"%s\")", len, msg);
+	msg[MSG_LEN - 1] = '\0';
+	assert(strlen(msg) < MSG_LEN);
+    }
 
-    teamcup_log("    %s\n", message);
+    teamcup_log("    %s\n", msg);
 
     if (!rplayback || playback)
 	for (i = 0; i < NumPlayers; i++) {
@@ -1260,22 +1264,26 @@ void Set_message(const char *message)
     }
 }
 
-void Set_player_message(player_t *pl, const char *message)
+void Set_player_message(player_t *pl, const char *fmt, ...)
 {
-    int			i;
-    const char		*msg;
-    char		tmp[MSG_LEN];
+    size_t len;
+    char msg[2 * MSG_LEN];
+    va_list ap;
 
     if (rplayback && !playback && pl->rectype != 2)
 	return;
 
-    if ((i = strlen(message)) >= MSG_LEN) {
+    va_start(ap, fmt);
+    vsnprintf(msg, sizeof(msg), fmt, ap);
+    va_end(ap);
+
+    if ((len = strlen(msg)) >= MSG_LEN) {
 	if (!options.silent)
-	    warn("Max message len exceed (%d,%s)", i, message);
-	strlcpy(tmp, message, MSG_LEN);
-	msg = tmp;
-    } else
-	msg = message;
+	    warn("Set_player_message: Max len exceeded (%d,\"%s\")", len, msg);
+	msg[MSG_LEN - 1] = '\0';
+	assert(strlen(msg) < MSG_LEN);
+    }
+
     if (pl->conn != NULL)
 	Send_message(pl->conn, msg);
     else if (Player_is_robot(pl))
