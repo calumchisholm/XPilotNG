@@ -1397,23 +1397,25 @@ static bool Ball_handler(int ind)
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
 
     for (i = 0; i < World.NumTreasures; i++) {
+	treasure_t *treasure = &World.treasures[i];
+
 	if ((BIT(pl->have, HAS_BALL) || pl->ball)
-	    && World.treasures[i].team == pl->team) {
+	    && treasure->team == pl->team) {
 	    dist = (int)Wrap_length(
-		World.treasures[i].pos.cx - pl->pos.cx,
-		World.treasures[i].pos.cy - pl->pos.cy) / CLICK;
+		treasure->pos.cx - pl->pos.cx,
+		treasure->pos.cy - pl->pos.cy) / CLICK;
 	    if (dist < closest_t_dist) {
 		closest_t = i;
 		closest_t_dist = dist;
 	    }
-	} else if (World.treasures[i].team != pl->team
-		   && World.teams[World.treasures[i].team].NumMembers > 0
+	} else if (treasure->team != pl->team
+		   && World.teams[treasure->team].NumMembers > 0
 		   && !BIT(pl->have, HAS_BALL)
 		   && !pl->ball
-		   && World.treasures[i].have) {
+		   && treasure->have) {
 	    dist = (int)Wrap_length(
-		World.treasures[i].pos.cx - pl->pos.cx,
-		World.treasures[i].pos.cy - pl->pos.cy) / CLICK;
+		treasure->pos.cx - pl->pos.cx,
+		treasure->pos.cy - pl->pos.cy) / CLICK;
 	    if (dist < closest_nt_dist) {
 		closest_nt = i;
 		closest_nt_dist = dist;
@@ -1543,22 +1545,23 @@ static int Robot_default_play_check_map(int ind)
     target_dist = Visibility_distance;
 
     for (j = 0; j < World.NumFuels; j++) {
+	fuel_t *fs = &World.fuel[j];
 
-	if (World.fuel[j].fuel < 100 * FUEL_SCALE_FACT)
+	if (fs->fuel < 100 * FUEL_SCALE_FACT)
 	    continue;
 
 	if (BIT(World.rules->mode, TEAM_PLAY)
 	    && teamFuel
-	    && World.fuel[j].team != pl->team)
+	    && fs->team != pl->team)
 	    continue;
 
-	if ((dx = (CLICK_TO_PIXEL(World.fuel[j].pos.cx - pl->pos.cx)),
+	if ((dx = (CLICK_TO_PIXEL(fs->pos.cx - pl->pos.cx)),
 		dx = WRAP_DX(dx), ABS(dx)) < fuel_dist
-	    && (dy = (CLICK_TO_PIXEL(World.fuel[j].pos.cy - pl->pos.cy)),
+	    && (dy = (CLICK_TO_PIXEL(fs->pos.cy - pl->pos.cy)),
 		dy = WRAP_DY(dy), ABS(dy)) < fuel_dist
 	    && (distance = (int)LENGTH(dx, dy)) < fuel_dist) {
-	    int bx = CLICK_TO_BLOCK(World.fuel[j].pos.cx);
-	    int by = CLICK_TO_BLOCK(World.fuel[j].pos.cy);
+	    int bx = CLICK_TO_BLOCK(fs->pos.cx);
+	    int by = CLICK_TO_BLOCK(fs->pos.cy);
 	    if (World.block[bx][by] == FUEL) {
 		fuel_i = j;
 		fuel_dist = distance;
@@ -1567,16 +1570,17 @@ static int Robot_default_play_check_map(int ind)
     }
 
     for (j = 0; j < World.NumTargets; j++) {
+	target_t *targ = &World.targets[j];
 
 	/* Ignore dead or owned targets */
-	if (World.targets[j].dead_time > 0
-	    || pl->team == World.targets[j].team
-	    || World.teams[World.targets[j].team].NumMembers == 0)
+	if (targ->dead_time > 0
+	    || pl->team == targ->team
+	    || World.teams[targ->team].NumMembers == 0)
 	    continue;
 
-	if ((dx = CLICK_TO_PIXEL(World.targets[j].pos.cx - pl->pos.cx),
+	if ((dx = CLICK_TO_PIXEL(targ->pos.cx - pl->pos.cx),
 		dx = WRAP_DX(dx), ABS(dx)) < target_dist
-	    && (dy = CLICK_TO_PIXEL(World.targets[j].pos.cy - pl->pos.cy),
+	    && (dy = CLICK_TO_PIXEL(targ->pos.cy - pl->pos.cy),
 		dy = WRAP_DY(dy), ABS(dy)) < target_dist
 	    && (distance = (int)LENGTH(dx, dy)) < target_dist) {
 	    target_i = j;
@@ -1612,17 +1616,18 @@ static int Robot_default_play_check_map(int ind)
     }
 
     for (j = 0; j < World.NumCannons; j++) {
+	cannon_t *cannon = &World.cannon[j];
 
-	if (World.cannon[j].dead_time > 0)
+	if (cannon->dead_time > 0)
 	    continue;
 
 	if (BIT(World.rules->mode, TEAM_PLAY)
-	    && World.cannon[j].team == pl->team)
+	    && cannon->team == pl->team)
 	    continue;
 
-	if ((dx = CLICK_TO_PIXEL(World.cannon[j].pos.cx - pl->pos.cx),
+	if ((dx = CLICK_TO_PIXEL(cannon->pos.cx - pl->pos.cx),
 		dx = WRAP_DX(dx), ABS(dx)) < cannon_dist
-	    && (dy = CLICK_TO_PIXEL(World.cannon[j].pos.cy - pl->pos.cy),
+	    && (dy = CLICK_TO_PIXEL(cannon->pos.cy - pl->pos.cy),
 		dy = WRAP_DY(dy), ABS(dy)) < cannon_dist
 	    && (distance = (int)LENGTH(dx, dy)) < cannon_dist) {
 	    cannon_i = j;
@@ -1631,11 +1636,12 @@ static int Robot_default_play_check_map(int ind)
     }
 
     if (cannon_i >= 0) {
+	cannon_t *cannon = &World.cannon[cannon_i];
 
-	dx = World.cannon[cannon_i].pos.cx;
-	dx += (BLOCK_CLICKS * 0.1 * tcos(World.cannon[cannon_i].dir));
-	dy = World.cannon[cannon_i].pos.cy;
-	dy += (BLOCK_CLICKS * 0.1 * tsin(World.cannon[cannon_i].dir));
+	dx = cannon->pos.cx;
+	dx += (BLOCK_CLICKS * 0.1 * tcos(cannon->dir));
+	dy = cannon->pos.cy;
+	dy += (BLOCK_CLICKS * 0.1 * tsin(cannon->dir));
 
 	if (Check_robot_target(ind, dx, dy, RM_CANNON_KILL)) {
 	    return 1;
@@ -1982,17 +1988,19 @@ static void Robot_default_play(int ind)
     if (pl->fuel.sum < pl->fuel.max * 0.80)
 	for (j = 0; j < World.NumFuels; j++) {
 	    int dx, dy;
+	    fuel_t *fs = &World.fuel[j];
+
 	    if (BIT(World.rules->mode, TEAM_PLAY)
 		&& teamFuel
-		&& World.fuel[j].team != pl->team) {
+		&& fs->team != pl->team) {
 		continue;
 	    }
-	    dx = CLICK_TO_PIXEL(World.fuel[j].pos.cx - pl->pos.cx);
-	    dy = CLICK_TO_PIXEL(World.fuel[j].pos.cy - pl->pos.cy);
+	    dx = CLICK_TO_PIXEL(fs->pos.cx - pl->pos.cx);
+	    dy = CLICK_TO_PIXEL(fs->pos.cy - pl->pos.cy);
 	    /* dx = WRAP_DX(dx);
 	       dy = WRAP_DY(dy); */
 	    if (sqr(dx) + sqr(dy) <= sqr(90)
-		&& World.fuel[j].fuel > REFUEL_RATE * timeStep) {
+		&& fs->fuel > REFUEL_RATE * timeStep) {
 		pl->fs = j;
 		SET_BIT(pl->used, HAS_REFUEL);
 		break;
@@ -2010,12 +2018,14 @@ static void Robot_default_play(int ind)
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < World.NumTargets; j++) {
-	    if (World.targets[j].team == pl->team
-		&& World.targets[j].damage < TARGET_DAMAGE
-		&& World.targets[j].dead_time >= 0) {
+	    target_t *targ = &World.targets[j];
+
+	    if (targ->team == pl->team
+		&& targ->damage < TARGET_DAMAGE
+		&& targ->dead_time >= 0) {
 		/* kps - this can overflow ?? */
-		int dx = CLICK_TO_PIXEL(World.targets[j].pos.cx - pl->pos.cx);
-		int dy = CLICK_TO_PIXEL(World.targets[j].pos.cy - pl->pos.cy);
+		int dx = CLICK_TO_PIXEL(targ->pos.cx - pl->pos.cx);
+		int dy = CLICK_TO_PIXEL(targ->pos.cy - pl->pos.cy);
 		/* dx = WRAP_DX(dx);
 		   dy = WRAP_DY(dy); */
 		if (sqr(dx) + sqr(dy) <= sqr(90)) {
