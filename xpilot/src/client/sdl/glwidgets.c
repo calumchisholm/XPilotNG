@@ -82,6 +82,8 @@ void Close_WidgetTree ( GLWidget **widget )
 
 void Close_Widget (GLWidget **widget)
 {
+    GLWidget *tmp;
+
     if (!widget) {
     	error("NULL passed to Close_Widget!");
 	return;
@@ -96,7 +98,7 @@ void Close_Widget (GLWidget **widget)
     if ((*widget)->Close) (*widget)->Close(*widget);
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
-    GLWidget *tmp = *widget;
+    tmp = *widget;
     *widget = (*widget)->next;
     free(tmp);
 }
@@ -146,6 +148,7 @@ GLWidget *Init_OptionWidget(font_data *font, xp_option_t *opt)
 bool AppendGLWidgetList( GLWidget **list, GLWidget *item )
 {
     GLWidget **curr;
+
     if (!list) {
     	error("No list holder for Append2List %i");
     	return false;
@@ -168,6 +171,7 @@ bool AppendGLWidgetList( GLWidget **list, GLWidget *item )
 void PrependGLWidgetList( GLWidget **list, GLWidget *item )
 {
     GLWidget **curr;
+
     if (!list) {
     	error("No list holder for PrependGLWidgetList");
     	return;
@@ -190,6 +194,7 @@ void PrependGLWidgetList( GLWidget **list, GLWidget *item )
 bool DelGLWidgetListItem( GLWidget **list, GLWidget *widget )
 {
     GLWidget **curr;
+
     if (!list) {
     	error("No list holder for DelGLWidgetListItem");
     	return false;
@@ -223,9 +228,10 @@ bool DelGLWidgetListItem( GLWidget **list, GLWidget *widget )
  */
 void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h)
 {
-    GLWidget *curr;
-    curr = list;
     int x2,y2,w2,h2;
+    GLWidget *curr;
+    
+    curr = list;
     
     while (curr) {
     	x2 = MAX(x,curr->bounds.x);
@@ -265,9 +271,10 @@ void DrawGLWidgets( void )
  */
 GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y )
 {
+    GLWidget *tmp;
+    
     if ( !widget ) return NULL;
     
-    GLWidget *tmp;
     if ( (tmp = FindGLWidgeti( widget->next, x, y )) ) {
     	return tmp;
     }
@@ -299,8 +306,10 @@ void Paint_ArrowWidget(GLWidget *widget);
 
 void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data)
 {
+    ArrowWidget *tmp;
+    
     if (!data) return;
-    ArrowWidget *tmp = (ArrowWidget *)(((GLWidget *)data)->wid_info);
+    tmp = (ArrowWidget *)(((GLWidget *)data)->wid_info);
     if (state == SDL_PRESSED && !(tmp->locked)) {
 	if (button == 1) {
     	    tmp->press = true;
@@ -319,15 +328,19 @@ void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *
 
 void Paint_ArrowWidget(GLWidget *widget)
 {
+    GLWidget *tmp;
+    SDL_Rect *b;
+    ArrowWidget *wid_info;
+    
     if (!widget) return;
     static int normalcolor  = 0xff0000ff;
     static int presscolor   = 0x00ff00ff;
     static int tapcolor     = 0xffffffff;
     static int lockcolor    = 0x88000088;
      
-    GLWidget *tmp = widget;
-    SDL_Rect *b = &(tmp->bounds);
-    ArrowWidget *wid_info = (ArrowWidget *)(tmp->wid_info);
+    tmp = widget;
+    b = &(tmp->bounds);
+    wid_info = (ArrowWidget *)(tmp->wid_info);
     
     if (wid_info->locked) {
     	set_alphacolor( lockcolor );
@@ -414,9 +427,11 @@ void Paint_SlideWidget( GLWidget *widget );
 
 void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
 {
+    SlideWidget *tmp;
+    
     if (!data) return;
 
-    SlideWidget *tmp = (SlideWidget *)(((GLWidget *)data)->wid_info);
+    tmp = (SlideWidget *)(((GLWidget *)data)->wid_info);
     if (state == SDL_PRESSED && !(tmp->sliding)) {
 	if (button == 1) {
     	    tmp->sliding = true;
@@ -432,15 +447,19 @@ void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *da
 
 void Paint_SlideWidget(GLWidget *widget)
 {
+    GLWidget *tmp;
+    SDL_Rect *b;
+    SlideWidget *wid_info;
+
     if (!widget) return;
     static int normalcolor  = 0xff0000ff;
     static int presscolor   = 0x00ff00ff;
     static int lockcolor  = 0x333333ff;
     int color;
      
-    GLWidget *tmp = widget;
-    SDL_Rect *b = &(tmp->bounds);
-    SlideWidget *wid_info = (SlideWidget *)(tmp->wid_info);
+    tmp = widget;
+    b = &(tmp->bounds);
+    wid_info = (SlideWidget *)(tmp->wid_info);
     
     if (wid_info->locked) {
     	color = lockcolor;
@@ -517,6 +536,9 @@ void Close_ScrollbarWidget (GLWidget *widget)
 
 void SetBounds_ScrollbarWidget(GLWidget *widget, SDL_Rect *b)
 {
+    ScrollbarWidget *tmp;
+    SDL_Rect sb;
+
     if (!widget) return;
     if (!b) return;
     if (widget->WIDGET !=SCROLLBARWIDGET) {
@@ -529,9 +551,8 @@ void SetBounds_ScrollbarWidget(GLWidget *widget, SDL_Rect *b)
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
 
-    ScrollbarWidget *tmp = (ScrollbarWidget *)(widget->wid_info);
+    tmp = (ScrollbarWidget *)(widget->wid_info);
 
-    SDL_Rect sb;
     switch (tmp->dir) {
     	case SB_VERTICAL:
     	    sb.x = b->x;
@@ -556,7 +577,6 @@ void SetBounds_ScrollbarWidget(GLWidget *widget, SDL_Rect *b)
 void Paint_ScrollbarWidget(GLWidget *widget)
 {
     static int bgcolor  = 0x00000044;
-     
     SDL_Rect *b = &(widget->bounds);
     
     set_alphacolor( bgcolor );
@@ -571,13 +591,18 @@ void Paint_ScrollbarWidget(GLWidget *widget)
 
 void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
 {
+    GLWidget *tmp;
+    ScrollbarWidget *wid_info;
+    GLWidget *slide;
+    Sint16 *coord1, coord2, min, max, size, move;
+    GLfloat oldpos;
+
     if (!data) return;
 
-    GLWidget *tmp = (GLWidget *)data;
-    ScrollbarWidget *wid_info = (ScrollbarWidget *)tmp->wid_info;
-    GLWidget *slide = wid_info->slide;
+    tmp = (GLWidget *)data;
+    wid_info = (ScrollbarWidget *)tmp->wid_info;
+    slide = wid_info->slide;
     
-    Sint16 *coord1, coord2, min, max, size, move;
    
     switch (wid_info->dir) {
     	case SB_VERTICAL:
@@ -609,7 +634,7 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
     wid_info->oldmoves -= coord2 - *coord1;
     *coord1 = coord2;
 
-    GLfloat oldpos = wid_info->pos;
+    oldpos = wid_info->pos;
     wid_info->pos = ((GLfloat)(*coord1 - min))/((GLfloat)(max - min));
     
     if ( (oldpos != wid_info->pos) && wid_info->poschange )
@@ -617,9 +642,11 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
 }
 
 void release_ScrollbarWidget( void *releasedata ) {
+    GLWidget *tmp;
+    
     if (!releasedata) return;
 
-    GLWidget *tmp = (GLWidget *)releasedata;
+    tmp = (GLWidget *)releasedata;
     ScrollbarWidget *wid_info = (ScrollbarWidget *)tmp->wid_info;
     
     wid_info->oldmoves = 0;
@@ -675,8 +702,9 @@ void Paint_LabeledRadiobuttonWidget( GLWidget *widget );
 
 void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data)
 {
+    LabeledRadiobuttonWidget *tmp;
     if (!data) return;
-    LabeledRadiobuttonWidget *tmp = (LabeledRadiobuttonWidget *)(((GLWidget *)data)->wid_info);
+    tmp = (LabeledRadiobuttonWidget *)(((GLWidget *)data)->wid_info);
     if (state == SDL_PRESSED) {
 	if (button == 1) {
 	    /* Toggle state, and call (*action)*/
@@ -690,15 +718,19 @@ void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uin
 
 void Paint_LabeledRadiobuttonWidget(GLWidget *widget)
 {
-    if (!widget) return;
+    GLWidget *tmp;
+    SDL_Rect *b;
+    LabeledRadiobuttonWidget *wid_info;
     static int false_bg_color	= 0x00000044;
     static int true_bg_color	= 0x00000044;
     static int false_text_color	= 0xff0000ff;
     static int true_text_color	= 0x00ff00ff;
+
+    if (!widget) return;
      
-    GLWidget *tmp = widget;
-    SDL_Rect *b = &(tmp->bounds);
-    LabeledRadiobuttonWidget *wid_info = (LabeledRadiobuttonWidget *)(tmp->wid_info);
+    tmp = widget;
+    b = &(tmp->bounds);
+    wid_info = (LabeledRadiobuttonWidget *)(tmp->wid_info);
     
     if (wid_info->state)
     	set_alphacolor(true_bg_color);
@@ -722,12 +754,13 @@ void Paint_LabeledRadiobuttonWidget(GLWidget *widget)
 GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offtex,
     	    	    	 void (*action)(bool state, void *actiondata), void *actiondata, bool start_state)
 {
+    GLWidget *tmp;
 
     if (!ontex || !(ontex->texture) || !offtex || !(offtex->texture) ) {
     	error("texure(s) missing for Init_LabeledRadiobuttonWidget.");
 	return NULL;
     }
-    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc in Init_LabeledRadiobuttonWidget");
 	return NULL;
@@ -789,6 +822,9 @@ void Close_BoolChooserWidget(GLWidget *widget)
 
 void SetBounds_BoolChooserWidget(GLWidget *widget, SDL_Rect *b)
 {
+    GLWidget *tmp;
+    SDL_Rect b2;
+    
     if (!widget) return;
     if (!b) return;
     if (widget->WIDGET !=BOOLCHOOSERWIDGET) {
@@ -801,8 +837,7 @@ void SetBounds_BoolChooserWidget(GLWidget *widget, SDL_Rect *b)
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
 
-    GLWidget *tmp = ((BoolChooserWidget *)(widget->wid_info))->buttonwidget;
-    SDL_Rect b2;
+    tmp = ((BoolChooserWidget *)(widget->wid_info))->buttonwidget;
     
     b2.h = tmp->bounds.h;
     b2.w = tmp->bounds.w;
@@ -819,11 +854,13 @@ void BoolChooserWidget_SetValue(bool state, void *data)
 
 void Paint_BoolChooserWidget(GLWidget *widget)
 {
-    if (!widget) return;
     //static int bg_color     = 0x0000ff88;
     static int name_color   = 0xffff66ff;
+    BoolChooserWidget *wid_info;
+
+    if (!widget) return;
     
-    BoolChooserWidget *wid_info = (BoolChooserWidget *)(widget->wid_info);
+    wid_info = (BoolChooserWidget *)(widget->wid_info);
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -839,6 +876,9 @@ void Paint_BoolChooserWidget(GLWidget *widget)
 
 GLWidget *Init_BoolChooserWidget(font_data *font, xp_option_t *opt)
 {
+    GLWidget *tmp;
+    BoolChooserWidget *wid_info;
+    
     if (!opt) {
     	error("Faulty parameter to Init_BoolChooserWidget: opt is a NULL pointer!");
 	return NULL;
@@ -889,7 +929,7 @@ GLWidget *Init_BoolChooserWidget(font_data *font, xp_option_t *opt)
 	}
     }
     
-    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc tmp in Init_BoolChooserWidget");
 	return NULL;
@@ -901,7 +941,7 @@ GLWidget *Init_BoolChooserWidget(font_data *font, xp_option_t *opt)
 	return NULL;
     }
     
-    BoolChooserWidget *wid_info = (BoolChooserWidget *)(tmp->wid_info);
+    wid_info = (BoolChooserWidget *)(tmp->wid_info);
     
     if ( !render_text(font,opt->name,&(wid_info->nametex)) ) {
     	error("Failed to render '%s' in Init_BoolChooserWidget",opt->name);
@@ -960,6 +1000,9 @@ void Close_IntChooserWidget (GLWidget *widget)
 
 void SetBounds_IntChooserWidget(GLWidget *widget, SDL_Rect *b)
 {
+    IntChooserWidget *tmp;
+    SDL_Rect rab,lab;
+
     if (!widget) return;
     if (!b) return;
     if (widget->WIDGET !=INTCHOOSERWIDGET) {
@@ -972,9 +1015,7 @@ void SetBounds_IntChooserWidget(GLWidget *widget, SDL_Rect *b)
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
 
-    IntChooserWidget *tmp = (IntChooserWidget *)(widget->wid_info);
-    SDL_Rect rab;
-    SDL_Rect lab;
+    tmp = (IntChooserWidget *)(widget->wid_info);
     
     lab.h = rab.h = tmp->valuetex.height-4;
     lab.w = rab.w = rab.h;
@@ -988,10 +1029,13 @@ void SetBounds_IntChooserWidget(GLWidget *widget, SDL_Rect *b)
 
 void IntChooserWidget_Add( void *data )
 {
-    if (!data) return;
-    IntChooserWidget *tmp = ((IntChooserWidget *)((GLWidget *)data)->wid_info);
-
+    IntChooserWidget *tmp;
+    char valuetext[16];
     int step;
+    
+    if (!data) return;
+    tmp = ((IntChooserWidget *)((GLWidget *)data)->wid_info);
+
     if (tmp->direction > 0)
     	step = 100/clientFPS;
     else
@@ -1004,7 +1048,6 @@ void IntChooserWidget_Add( void *data )
     	if ( (*(tmp->opt->int_ptr)) == tmp->opt->int_maxval)
 	    ((ArrowWidget *)tmp->rightarrow->wid_info)->locked = true;
 	tmp->direction = 2;
-    	char valuetext[16];
 	snprintf(valuetext,15,"%i",*(tmp->opt->int_ptr));
 	free_string_texture(&(tmp->valuetex));
 	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
@@ -1016,10 +1059,13 @@ void IntChooserWidget_Add( void *data )
 
 void IntChooserWidget_Subtract( void *data )
 {
-    if (!data) return;
-    IntChooserWidget *tmp = ((IntChooserWidget *)((GLWidget *)data)->wid_info);
-
+    IntChooserWidget *tmp;
     int step;
+    char valuetext[16];
+    
+    if (!data) return;
+    tmp = ((IntChooserWidget *)((GLWidget *)data)->wid_info);
+
     if (tmp->direction < 0)
     	step = 100/clientFPS;
     else
@@ -1032,7 +1078,6 @@ void IntChooserWidget_Subtract( void *data )
     	if ( (*(tmp->opt->int_ptr)) == tmp->opt->int_minval)
 	    ((ArrowWidget *)tmp->leftarrow->wid_info)->locked = true;
 	tmp->direction = -2;
-    	char valuetext[16];
 	snprintf(valuetext,15,"%i",*(tmp->opt->int_ptr));
 	free_string_texture(&(tmp->valuetex));
 	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
@@ -1044,15 +1089,17 @@ void IntChooserWidget_Subtract( void *data )
 
 void Paint_IntChooserWidget(GLWidget *widget)
 {
+    //static int bg_color     = 0x0000ff88;
+    static int name_color   = 0xffff66ff;
+    static int value_color  = 0x00ff00ff;
+    IntChooserWidget *wid_info;
+
     if (!widget) {
     	error("Paint_IntChooserWidget: argument is NULL!");
 	return;
     }
-    //static int bg_color     = 0x0000ff88;
-    static int name_color   = 0xffff66ff;
-    static int value_color  = 0x00ff00ff;
     
-    IntChooserWidget *wid_info = (IntChooserWidget *)(widget->wid_info);
+    wid_info = (IntChooserWidget *)(widget->wid_info);
 
     if (!wid_info) {
     	error("Paint_IntChooserWidget: wid_info missing");
@@ -1077,6 +1124,12 @@ void Paint_IntChooserWidget(GLWidget *widget)
 
 GLWidget *Init_IntChooserWidget(font_data *font, xp_option_t *opt)
 {
+    int valuespace;
+    GLWidget *tmp;
+    IntChooserWidget *wid_info;
+    char valuetext[16];
+    string_tex_t tmp_tex;
+
     if (!opt) {
     	error("Faulty parameter to Init_IntChooserWidget: opt is a NULL pointer!");
 	return NULL;
@@ -1094,8 +1147,7 @@ GLWidget *Init_IntChooserWidget(font_data *font, xp_option_t *opt)
 	return NULL;
     }
 
-    int valuespace;
-    GLWidget *tmp = Init_EmptyBaseGLWidget();
+    tmp = Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc in Init_IntChooserWidget");
 	return NULL;
@@ -1110,7 +1162,6 @@ GLWidget *Init_IntChooserWidget(font_data *font, xp_option_t *opt)
     /* hehe ugly hack to guess max size of value strings
      * monospace font is preferred
      */
-    string_tex_t tmp_tex;
     if (render_text(font,"555.55",&tmp_tex)) {
     	free_string_texture(&tmp_tex);
 	valuespace = tmp_tex.width+4;
@@ -1118,10 +1169,9 @@ GLWidget *Init_IntChooserWidget(font_data *font, xp_option_t *opt)
     	valuespace = 50;
     }
 
-    IntChooserWidget *wid_info = tmp->wid_info;
+    wid_info = tmp->wid_info;
     tmp->WIDGET     = INTCHOOSERWIDGET;
     if (render_text(font,opt->name,&(wid_info->nametex))) {
-    	char valuetext[16];
 	snprintf(valuetext,15,"%i",*(opt->int_ptr));
     	if(render_text(font,valuetext,&(wid_info->valuetex))) {
     	    wid_info->font  	= font;
@@ -1193,6 +1243,9 @@ void Close_DoubleChooserWidget (GLWidget *widget)
 
 void SetBounds_DoubleChooserWidget(GLWidget *widget, SDL_Rect *b)
 {
+    DoubleChooserWidget *tmp;
+    SDL_Rect rab,lab;
+    
     if (!widget) return;
     if (!b) return;
     if (widget->WIDGET !=DOUBLECHOOSERWIDGET) {
@@ -1205,9 +1258,7 @@ void SetBounds_DoubleChooserWidget(GLWidget *widget, SDL_Rect *b)
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
 
-    DoubleChooserWidget *tmp = (DoubleChooserWidget *)(widget->wid_info);
-    SDL_Rect rab;
-    SDL_Rect lab;
+    tmp = (DoubleChooserWidget *)(widget->wid_info);
     
     lab.h = rab.h = tmp->valuetex.height-4;
     lab.w = rab.w = rab.h;
@@ -1221,10 +1272,13 @@ void SetBounds_DoubleChooserWidget(GLWidget *widget, SDL_Rect *b)
 
 void DoubleChooserWidget_Add( void *data )
 {
-    if (!data) return;
-    DoubleChooserWidget *tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
-
+    DoubleChooserWidget *tmp;
     double step;
+    char valuetext[16];
+    
+    if (!data) return;
+    tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
+
     if (tmp->direction > 0)
     	step = ((double)clientFPS)*10.0;
     else
@@ -1237,7 +1291,6 @@ void DoubleChooserWidget_Add( void *data )
     	if ( (*(tmp->opt->dbl_ptr)) >= tmp->opt->dbl_maxval )
 	    ((ArrowWidget *)tmp->rightarrow->wid_info)->locked = true;
 	tmp->direction = 2;
-    	char valuetext[16];
 	snprintf(valuetext,15,"%1.2f",*(tmp->opt->dbl_ptr));
 	free_string_texture(&(tmp->valuetex));
 	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
@@ -1249,10 +1302,13 @@ void DoubleChooserWidget_Add( void *data )
 
 void DoubleChooserWidget_Subtract( void *data )
 {
-    if (!data) return;
-    DoubleChooserWidget *tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
-
+    DoubleChooserWidget *tmp;
     double step;
+    char valuetext[16];
+    
+    if (!data) return;
+    tmp = ((DoubleChooserWidget *)((GLWidget *)data)->wid_info);
+
     if (tmp->direction < 0)
     	step = ((double)clientFPS)*10.0;
     else
@@ -1265,7 +1321,6 @@ void DoubleChooserWidget_Subtract( void *data )
     	if ( (*(tmp->opt->dbl_ptr)) <= tmp->opt->dbl_minval )
 	    ((ArrowWidget *)tmp->leftarrow->wid_info)->locked = true;
 	tmp->direction = -2;
-    	char valuetext[16];
 	snprintf(valuetext,15,"%1.2f",*(tmp->opt->dbl_ptr));
 	free_string_texture(&(tmp->valuetex));
 	if(!render_text(tmp->font,valuetext,&(tmp->valuetex)))
@@ -1277,12 +1332,14 @@ void DoubleChooserWidget_Subtract( void *data )
 
 void Paint_DoubleChooserWidget(GLWidget *widget)
 {
-    if (!widget) return;
     //static int bg_color     = 0x0000ff88;
     static int name_color   = 0xffff66ff;
     static int value_color  = 0x00ff00ff;
+    DoubleChooserWidget *wid_info;
+
+    if (!widget) return;
     
-    DoubleChooserWidget *wid_info = (DoubleChooserWidget *)(widget->wid_info);
+    wid_info = (DoubleChooserWidget *)(widget->wid_info);
 
     if (wid_info->direction > 0) --(wid_info->direction);
     else if (wid_info->direction < 0) ++(wid_info->direction);
@@ -1302,6 +1359,12 @@ void Paint_DoubleChooserWidget(GLWidget *widget)
 
 GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt)
 {
+    int valuespace;
+    GLWidget *tmp;
+    string_tex_t tmp_tex;
+    DoubleChooserWidget *wid_info;
+    char valuetext[16];
+    
     if (!opt) {
     	error("Faulty parameter to Init_DoubleChooserWidget: opt is a NULL pointer!");
 	return NULL;
@@ -1319,8 +1382,7 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt)
 	return NULL;
     }
 
-    int valuespace;
-    GLWidget *tmp = Init_EmptyBaseGLWidget();
+    tmp = Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc in Init_DoubleChooserWidget");
 	return NULL;
@@ -1335,7 +1397,6 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt)
     /* hehe ugly hack to guess max size of value strings
      * monospace font is preferred
      */
-    string_tex_t tmp_tex;
     if (render_text(font,"555.55",&tmp_tex)) {
     	free_string_texture(&tmp_tex);
 	valuespace = tmp_tex.width+4;
@@ -1343,10 +1404,9 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt)
     	valuespace = 50;
     }
     
-    DoubleChooserWidget *wid_info = tmp->wid_info;
+    wid_info = tmp->wid_info;
     tmp->WIDGET     = DOUBLECHOOSERWIDGET;
     if (render_text(font,opt->name,&(wid_info->nametex))) {
-    	char valuetext[16];
 	snprintf(valuetext,15,"%1.2f",*(opt->dbl_ptr));
     	if(render_text(font,valuetext,&(wid_info->valuetex))) {
     	    wid_info->font  	= font;
@@ -1403,8 +1463,10 @@ void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *d
 void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     GLWidget *widget;
+    WrapperWidget *wid_info;
+    
     widget = (GLWidget *)data;
-    WrapperWidget *wid_info = ((WrapperWidget *)widget->wid_info);
+    wid_info = ((WrapperWidget *)widget->wid_info);
     if (state == SDL_PRESSED) {
     	if (button == 2) {
 	    if (!wid_info->confmenu) {
@@ -1424,7 +1486,10 @@ void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *d
 
 GLWidget *Init_MainWidget( font_data *font )
 {
-    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    GLWidget *tmp;
+    WrapperWidget *wid_info;
+    
+    tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc GLWidget in Init_MainWidget");
 	return NULL;
@@ -1435,7 +1500,7 @@ GLWidget *Init_MainWidget( font_data *font )
         error("Failed to malloc MainWidget in Init_MainWidget");
 	return NULL;
     }
-    WrapperWidget *wid_info = ((WrapperWidget *)tmp->wid_info);
+    wid_info = ((WrapperWidget *)tmp->wid_info);
     wid_info->confmenu	= NULL;
     wid_info->font	= font;
     
@@ -1470,17 +1535,21 @@ void ConfMenu_poschange( GLfloat pos , void *data);
 void Paint_ConfMenuWidget( GLWidget *widget );
 void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b );
 
-void ConfMenu_poschange( GLfloat pos , void *data) {
+void ConfMenu_poschange( GLfloat pos , void *data)
+{
+    GLWidget *widget;
+    ConfMenuWidget *wid_info;
+    SDL_Rect bounds;
+    GLWidget *curr;
+    
     if ( !data ) {
         error("NULL data to ConfMenu_poschange!");
 	return;
     }
-    GLWidget *widget = (GLWidget *)data;
-    ConfMenuWidget *wid_info = ((ConfMenuWidget *)(widget->wid_info));
+    widget = (GLWidget *)data;
+    wid_info = ((ConfMenuWidget *)(widget->wid_info));
 
-    SDL_Rect bounds;
-    
-    GLWidget *curr = widget->children->children;
+    curr = widget->children->children;
     bounds.y = widget->bounds.y+5 - pos*(wid_info->list_height);
     while (curr) {
     	if (curr != wid_info->scrollbar) {
@@ -1511,12 +1580,13 @@ void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
 }
 void Paint_ConfMenuWidget( GLWidget *widget )
 {
+    int edgeColor = 0xff0000ff;
+    int bgColor = 0x0000ff88;
+
     if (!widget ) {
     	error("tried to paint NULL ConfMenuWidget!");
 	return;
     }
-    int edgeColor = 0xff0000ff;
-    int bgColor = 0x0000ff88;
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     set_alphacolor(bgColor);
@@ -1540,7 +1610,15 @@ void Paint_ConfMenuWidget( GLWidget *widget )
 
 GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
 {
-    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    GLWidget *tmp;
+    ConfMenuWidget *wid_info;
+    SDL_Rect bounds;
+    int i, itemwidth = 0;
+    xp_option_t *opt;
+    GLWidget *item;
+    GLWidget *curr;
+
+    tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc in Init_ConfMenu");
 	return NULL;
@@ -1551,17 +1629,13 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
         error("Failed to malloc in Init_ConfMenu");
 	return NULL;
     }
-    ConfMenuWidget *wid_info = ((ConfMenuWidget *)(tmp->wid_info));
+    wid_info = ((ConfMenuWidget *)(tmp->wid_info));
     
     tmp->WIDGET     	= CONFMENUWIDGET;
     tmp->bounds.x   	= x;
     tmp->bounds.y   	= y;
     tmp->Draw	    	= Paint_ConfMenuWidget;
     tmp->SetBounds  	= SetBounds_ConfMenuWidget;
-    SDL_Rect bounds;
-    int i, itemwidth = 0;
-    xp_option_t *opt;
-    GLWidget *item;
     
     /* Lets make an empty widget to hold the kids */
     tmp->children	= Init_EmptyBaseGLWidget();
@@ -1584,7 +1658,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
     tmp->children->bounds.x = bounds.x = tmp->bounds.x+5;
     tmp->children->bounds.y = bounds.y = tmp->bounds.y+5;
     bounds.w = itemwidth;
-    GLWidget *curr = tmp->children->children;
+    curr = tmp->children->children;
     while (curr) {
     	bounds.h = curr->bounds.h;
     	SetBounds_GLWidget(curr,&bounds);
