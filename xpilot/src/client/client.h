@@ -687,6 +687,8 @@ int Alloc_history(void);
 void Free_selectionAndHistory(void);
 void Add_message(const char *message);
 void Add_newbie_message(const char *message);
+extern void Add_alert_message(const char *message, double timeout);
+extern void Clear_alert_messages(void);
 void Add_pending_messages(void);
 void Add_roundend_messages(other_t **order);
 void Print_messages_to_stdout(void);

@@ -251,7 +251,7 @@ static bool Key_press_yes(void)
 static bool Key_press_no(void)
 {
     if (quit_mode) {
-	Add_message("Phew. [*Client reply*]");
+	Clear_alert_messages();
 	quit_mode = false;
     }
     return false;	/* server doesn't need to know */
@@ -270,7 +270,7 @@ static bool Key_press_exit(void)
 	Key_press_no();
     else {
 	quit_mode = true;
-	Add_message("Really Quit (y/n) ? []");
+    	Add_alert_message("Really Quit (y/n) ?",0.0);
     }
 
     return false;	/* server doesn't need to know */

@@ -861,7 +861,7 @@ void Add_newbie_message(const char *message)
 
     snprintf(msg, sizeof(msg), "%s [*Newbie help*]", message);
 
-    Add_message(msg);
+    Add_alert_message(msg,10.0);
 }
 
 /*

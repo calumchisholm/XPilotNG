@@ -32,6 +32,13 @@ char xeventhandlers_version[] = VERSION;
 time_t	back_in_play_since;
 #endif
 
+void Add_alert_message(const char *message, double timeout)
+{
+    Add_message(message);
+}
+void Clear_alert_messages(void)
+{
+}
 /*
  * code for the following three functions and the selectionEvents
  * happily and with benediction taken from the terminal emulator

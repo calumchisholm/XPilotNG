@@ -2734,8 +2734,14 @@ static void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b )
     if (tmp->v_dir == LW_UP) {
     	bounds.y += b->h - bounds.h;
     }
+    if (tmp->v_dir == LW_VCENTER) {
+    	bounds.y += (b->h - bounds.h)/2;
+    }
     if (tmp->h_dir == LW_LEFT) {
     	bounds.x += b->w - bounds.w;
+    }
+    if (tmp->h_dir == LW_HCENTER) {
+    	bounds.x += (b->w - bounds.w)/2;
     }
     
     widget->bounds.y = bounds.y;
@@ -3117,6 +3123,14 @@ GLWidget *Init_MainWidget( font_data *font )
 	    &nullRGBA,&nullRGBA,&greenRGBA,LW_UP,LW_RIGHT,true)))
 	) {
 	error("Failed to initialize game msg list");
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    if ( !AppendGLWidgetList(&(tmp->children),
+    	    (wid_info->alert_msgs = Init_ListWidget(tmp->bounds.w/2,tmp->bounds.h/2,
+	    &nullRGBA,&nullRGBA,&greenRGBA,LW_HCENTER,LW_VCENTER,false)))
+	) {
+	error("Failed to initialize alert msg list");
 	Close_Widget(&tmp);
 	return NULL;
     }

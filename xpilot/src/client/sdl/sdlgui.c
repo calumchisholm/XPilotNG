@@ -1996,6 +1996,54 @@ void Paint_HUD(void)
     glDisable(GL_BLEND);
 }
 
+typedef struct alert_timeout_struct alert_timeout;
+struct alert_timeout_struct {
+    GLWidget	    *msg;   /* use to build widget lists */
+    double     	    timeout;
+    alert_timeout   *next;
+};
+static alert_timeout *alert_timeout_list = NULL;
+
+void Add_alert_message(const char *message, double timeout)
+{
+    GLWidget *tmp = NULL;
+    alert_timeout *tol;
+    
+    tmp = Init_LabelWidget(message,&whiteRGBA,&nullRGBA,CENTER,CENTER);
+    if (tmp) {
+    	ListWidget_Prepend(((WrapperWidget *)(MainWidget->wid_info))->alert_msgs,tmp);
+    } else {
+    	error("Add_alert_message: Failed to create LabelWidget");
+	return;
+    }
+    
+    tol = alert_timeout_list;
+    alert_timeout_list = (alert_timeout *)malloc(sizeof(alert_timeout));
+    alert_timeout_list->next = tol;
+    alert_timeout_list->timeout = timeout;
+    alert_timeout_list->msg = tmp;
+}
+
+void Clear_alert_messages(void)
+{
+    GLWidget *tmp,*list;
+    bool dummy;
+    alert_timeout *tol;
+    
+    while ((tol = alert_timeout_list)) {
+    	alert_timeout_list = alert_timeout_list->next;
+	free(tol);
+    }
+    
+    list = ((WrapperWidget *)(MainWidget->wid_info))->alert_msgs;
+    dummy = true;
+    while (dummy) {
+    	tmp = ListWidget_GetItemByIndex( list, 0 );
+	if (tmp == NULL) break;
+    	dummy = ListWidget_Remove( list, tmp );
+    }
+}
+
 void Paint_messages(void)
 {
     static int old_maxMessages = 0;
@@ -2009,6 +2057,9 @@ void Paint_messages(void)
     GLWidget *tmp = NULL,*tmp2 = NULL;
     LabelWidget *wi;
     message_t	*msg;
+
+    alert_timeout *garbage, **tol = &alert_timeout_list;
+    static int lastloops;
     
     msgs[0] = TalkMsg;
     msgs[1] = GameMsg;
@@ -2032,6 +2083,22 @@ void Paint_messages(void)
 	    	Close_Widget(&tmp);
     	    }
     }
+    
+    /* Check if any alert message has timed out, if so remove it */
+    while ((*tol)) {
+	if ((*tol)->timeout != 0.0) {
+	    (*tol)->timeout -= (loops - lastloops)/clientFPS;
+	    if ((*tol)->timeout <= 0.0) {
+	    	garbage = (*tol);
+		*tol = (*tol)->next;
+    	    	ListWidget_Remove( ((WrapperWidget *)(MainWidget->wid_info))->alert_msgs, garbage->msg );
+	    	free(garbage);
+		continue;
+	    }
+	}
+    	tol = &((*tol)->next);
+    }
+    lastloops = loops;
     
     /* TODO: check whether there is a more efficient way to do this!
      * i.e. add labelwidgets as messages are added/removed

@@ -346,8 +346,8 @@ GLWidget *Init_ColorModWidget( Uint32 *value, Uint32 *fgcolor, Uint32 *bgcolor,
 /**********************/
 /* Begin: ListWidget  */
 /**********************/
-typedef enum {LW_DOWN, LW_UP} ListWidget_ver_dir_t;
-typedef enum {LW_RIGHT, LW_LEFT} ListWidget_hor_dir_t;
+typedef enum {LW_DOWN, LW_VCENTER, LW_UP} ListWidget_ver_dir_t;
+typedef enum {LW_RIGHT, LW_HCENTER, LW_LEFT} ListWidget_hor_dir_t;
 #define LISTWIDGET 11
 typedef struct {
      int num_elements;
@@ -431,6 +431,7 @@ typedef struct {
     GLWidget	*scorelist;
     GLWidget	*chat_msgs;
     GLWidget	*game_msgs;
+    GLWidget	*alert_msgs;
     int	    	BORDER;
     font_data	*font;
 } WrapperWidget;
