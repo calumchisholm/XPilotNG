@@ -330,6 +330,10 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     int baseColor = baseNameColor;
     int i;
+    const int BORDER = 4;		/* in pixels */
+    int size;
+    other_t *other;
+    char s[3];
 
     /* Mara's flashy basewarning */
     if ((baseWarningType & 2) && id != -1) {
@@ -346,11 +350,6 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     }
 
     if (!texturedObjects) {
-	const int BORDER = 4;		/* in pixels */
-	int size;
-	other_t *other;
-	char s[3];
-
 	SET_FG(colors[baseColor].pixel);
 
 	switch (type) {
@@ -379,75 +378,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	    error("Bad base dir.");
 	    return;
 	}
-	/* only draw base teams if base naming is on, Mara 01/12/14  */
-	if (!baseNameColor)
-	    return;
-
-	/* operate in pixels from here out */
-	x = SCALEX(x);
-	y = SCALEY(y);
-
-	if ((other = Other_by_id(id)) != NULL) {
-	    if (other->name_width == 0) {
-		other->name_len = strlen(other->id_string);
-		other->name_width =
-		    2 + XTextWidth(gameFont, other->id_string,
-				   other->name_len);
-	    }
-	}
-	if (BIT(Setup->mode, TEAM_PLAY)) {
-	    s[0] = '0' + team;
-	    if (other) {
-		s[1] = ' ';
-		s[2] = '\0';
-	    } else
-		s[1] = '\0';
-		size = XTextWidth(gameFont, s, other ? 2 : 1);
-	} else
-	    size = 0;
-
-	switch (type) {
-	case SETUP_BASE_UP:
-	    y += BORDER + gameFont->ascent;
-	    x += WINSCALE(BLOCK_SZ/2);
-	    x -= size / 2 + (other ? other->name_width/2 : 0);
-	    break;
-	case SETUP_BASE_DOWN:
-	    y -= WINSCALE(BLOCK_SZ) + BORDER + gameFont->descent;
-	    x += WINSCALE(BLOCK_SZ/2);
-	    x -= size / 2 + (other ? other->name_width/2 : 0);
-	    break;
-	case SETUP_BASE_LEFT:
-	    x += WINSCALE(BLOCK_SZ) + BORDER;
-	    y += -WINSCALE(BLOCK_SZ/2) + gameFont->ascent/2;
-	    break;
-	case SETUP_BASE_RIGHT:
-	    x -= BORDER + (other ? other->name_width : 0) + size;
-	    y += -WINSCALE(BLOCK_SZ/2) + gameFont->ascent/2;
-	    break;
-	}
-	if (size) {
-	    rd.drawString(dpy, p_draw, gc, x, y, s, other ? 2 : 1);
-	     Erase_rectangle(x - 1, y - gameFont->ascent - 1,
-			     size + 2,
-			     gameFont->ascent + gameFont->descent+2);
-	     x += size;
-	}
-	if (other) {
-	     rd.drawString(dpy, p_draw, gc, x, y,
-			   other->name, other->name_len);
-	     Erase_rectangle(x - 1,
-			     y - gameFont->ascent - 1,
-			     other->name_width + 2,
-			     gameFont->ascent+gameFont->descent + 2);
-	}
     }
     else {
-	const int BORDER = 4;	/* in pixels */
-	int size;
-	other_t *other;
-	char s[3];
-
 	SET_FG(colors[baseColor].pixel);
 
 	switch (type) {
@@ -472,68 +404,69 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	    error("Bad base dir.");
 	    return;
 	}
-	/* only draw base teams if base naming is on, Mara 01/12/14  */
-	if (!baseNameColor)
-	    return;
+    }
 
-	/* operate in pixels from here out */
-	x = SCALEX(x);
-	y = SCALEY(y);
+    /* only draw base teams if base naming is on, Mara 01/12/14  */
+    if (!baseNameColor)
+	return;
 
-	if ((other = Other_by_id(id)) != NULL) {
-	    if (other->name_width == 0) {
-		other->name_len = strlen(other->id_string);
-		other->name_width =
-		    2 + XTextWidth(gameFont, other->id_string,
-				   other->name_len);
-	    }
-	}
-	if (BIT(Setup->mode, TEAM_PLAY)) {
-	    s[0] = '0' + team;
-	    if (other) {
-		s[1] = ' ';
-		s[2] = '\0';
-	    }
-	    else
-		s[1] = '\0';
-	    size = XTextWidth(gameFont, s, other ? 2 : 1);
-	}
-	else
-	    size = 0;
+    /* operate in pixels from here out */
+    x = SCALEX(x);
+    y = SCALEY(y);
 
-	switch (type) {
-	case SETUP_BASE_UP:
-	    y += BORDER + gameFont->ascent;
-	    x += WINSCALE(BLOCK_SZ / 2);
-	    x -= size / 2 + (other ? other->name_width / 2 : 0);
-	    break;
-	case SETUP_BASE_DOWN:
-	    y -= WINSCALE(BLOCK_SZ) + BORDER + gameFont->descent;
-	    x += WINSCALE(BLOCK_SZ / 2);
-	    x -= size / 2 + (other ? other->name_width / 2 : 0);
-	    break;
-	case SETUP_BASE_LEFT:
-	    x += WINSCALE(BLOCK_SZ) + BORDER;
-	    y += -WINSCALE(BLOCK_SZ / 2) + gameFont->ascent / 2;
-	    break;
-	case SETUP_BASE_RIGHT:
-	    x -= BORDER + (other ? other->name_width : 0) + size;
-	    y += -WINSCALE(BLOCK_SZ / 2) + gameFont->ascent / 2;
-	    break;
+    if ((other = Other_by_id(id)) != NULL) {
+	if (other->name_width == 0) {
+	    other->name_len = strlen(other->id_string);
+	    other->name_width =
+		2 + XTextWidth(gameFont, other->id_string,
+			       other->name_len);
 	}
-	if (size) {
-	    rd.drawString(dpy, p_draw, gc, x, y, s, other ? 2 : 1);
-	    Erase_rectangle(x - 1, y - gameFont->ascent - 1,
-			    size + 2, gameFont->ascent + gameFont->descent + 2);
-	    x += size;
-	}
+    }
+    if (BIT(Setup->mode, TEAM_PLAY)) {
+	s[0] = '0' + team;
 	if (other) {
-	    rd.drawString(dpy, p_draw, gc, x, y, other->name, other->name_len);
-	    Erase_rectangle(x - 1,
-			    y - gameFont->ascent - 1,
-			    other->name_width + 2,
-			    gameFont->ascent + gameFont->descent + 2);
-	}
+	    s[1] = ' ';
+	    s[2] = '\0';
+	} else
+	    s[1] = '\0';
+	size = XTextWidth(gameFont, s, other ? 2 : 1);
+    } else
+	size = 0;
+
+    switch (type) {
+    case SETUP_BASE_UP:
+	y += BORDER + gameFont->ascent;
+	x += WINSCALE(BLOCK_SZ / 2);
+	x -= size / 2 + (other ? other->name_width / 2 : 0);
+	break;
+    case SETUP_BASE_DOWN:
+	y -= WINSCALE(BLOCK_SZ) + BORDER + gameFont->descent;
+	x += WINSCALE(BLOCK_SZ / 2);
+	x -= size / 2 + (other ? other->name_width / 2 : 0);
+	break;
+    case SETUP_BASE_LEFT:
+	x += WINSCALE(BLOCK_SZ) + BORDER;
+	y += -WINSCALE(BLOCK_SZ / 2) + gameFont->ascent / 2;
+	break;
+    case SETUP_BASE_RIGHT:
+	x -= BORDER + (other ? other->name_width : 0) + size;
+	y += -WINSCALE(BLOCK_SZ / 2) + gameFont->ascent / 2;
+	break;
+    }
+    if (size) {
+	rd.drawString(dpy, p_draw, gc, x, y, s, other ? 2 : 1);
+	Erase_rectangle(x - 1, y - gameFont->ascent - 1,
+			size + 2,
+			gameFont->ascent + gameFont->descent + 2);
+	x += size;
+    }
+    if (other) {
+	rd.drawString(dpy, p_draw, gc, x, y,
+		      other->name, other->name_len);
+	Erase_rectangle(x - 1,
+			y - gameFont->ascent - 1,
+			other->name_width + 2,
+			gameFont->ascent + gameFont->descent + 2);
     }
 }
 
