@@ -49,7 +49,7 @@ struct MetaServer	meta_servers[2] = {
 
 static char	msg[MSG_LEN];
 
-void Meta_send(char *mesg, int len)
+void Meta_send(char *mesg, size_t len)
 {
     int			i;
 
@@ -58,10 +58,10 @@ void Meta_send(char *mesg, int len)
 
     for (i = 0; i < NELEM(meta_servers); i++) {
 	if (sock_send_dest(&contactSocket, meta_servers[i].addr,
-			   META_PORT, mesg, len) != len) {
+			   META_PORT, mesg, (int)len) != (int)len) {
 	    sock_get_error(&contactSocket);
 	    sock_send_dest(&contactSocket, meta_servers[i].addr,
-			   META_PORT, mesg, len);
+			   META_PORT, mesg, (int)len);
 	}
     }
 }
