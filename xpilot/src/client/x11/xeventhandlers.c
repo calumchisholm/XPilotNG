@@ -270,41 +270,41 @@ void ButtonPress_event(XEvent *event)
 {
     XButtonEvent *xbutton = &(event->xbutton);
 
+    if (pointerControl) {
+	assert(!talk_mapped);
+	Pointer_button_pressed((int)xbutton->button);
+	return;
+    }
+
     if (xbutton->window == drawWindow
 	|| xbutton->window == talkWindow) {
-	if (pointerControl
-	    && !talk_mapped
-	    && xbutton->button <= MAX_POINTER_BUTTONS)
-	    Pointer_button_pressed((int)xbutton->button);
-	else {
-	    switch (xbutton->button) {
-	    case Button1:
-		if (!talk_mapped)
-		    /* start cutting from the talk messages */
+	switch (xbutton->button) {
+	case Button1:
+	    if (!talk_mapped)
+		/* start cutting from the talk messages */
+		Talk_cut_from_messages(xbutton);
+	    else {
+		/* start cutting from ... */
+		if (xbutton->window == drawWindow)
+		    /* ...the talk messages */
 		    Talk_cut_from_messages(xbutton);
-		else {
-		    /* start cutting from ... */
-		    if (xbutton->window == drawWindow)
-			/* ...the talk messages */
-			Talk_cut_from_messages(xbutton);
-		    else
-			/* ...the talk window */
-			Talk_window_cut(xbutton);
-		}
-		break;
+		else
+		    /* ...the talk window */
+		    Talk_window_cut(xbutton);
+	    }
+	    break;
 
-	    case Button2:
-		if (talk_mapped) {
-		    if (xbutton->window == talkWindow)
-			Talk_place_cursor(xbutton, false);
-		    Selection_request();
-		}
-		break;
+	case Button2:
+	    if (talk_mapped) {
+		if (xbutton->window == talkWindow)
+		    Talk_place_cursor(xbutton, false);
+		Selection_request();
+	    }
+	    break;
 
-	    default:
-		break;
-	    } /* switch */
-	}
+	default:
+	    break;
+	} /* switch */
 	return;
     }
     if (Widget_event(event) != 0)
@@ -331,13 +331,13 @@ int ButtonRelease_event(XEvent *event)
 {
     XButtonEvent *xbutton = &(event->xbutton);
 
+    if (pointerControl) {
+	assert(!talk_mapped);
+	Pointer_button_released((int)xbutton->button);
+    }
+
     if (xbutton->window == drawWindow
 	|| xbutton->window == talkWindow) {
-
-	if (pointerControl
-	    && !talk_mapped
-	    && xbutton->button <= MAX_POINTER_BUTTONS)
-	    Pointer_button_released((int)xbutton->button);
 
 	if (!talk_mapped && xbutton->button == 1)
 	    /*
