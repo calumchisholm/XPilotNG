@@ -128,6 +128,31 @@
 #define HAS_SHOT		(1U<<4)
 #define HAS_BALL		(1U<<3)
 
+/*
+ * Possible object and player status bits.
+ * The bits that the client needs must fit into a byte,
+ * so the first 8 bitvalues are reserved for that purpose,
+ * those are defined in common/rules.h.
+ */
+
+#define THRUSTING		(1L<<3)		/* not used by client? */
+#define KILLED			(1L<<10)
+#define GRAVITY			(1L<<11)
+#define WARPING			(1L<<12)
+#define WARPED			(1L<<13)
+#define CONFUSED		(1L<<14)
+#define FROMCANNON		(1L<<15)	/* Object from cannon */
+#define HOVERPAUSE		(1L<<16)	/* Hovering pause */
+#define RECREATE		(1L<<17)	/* Recreate ball */
+#define FROMBOUNCE		(1L<<18)	/* Spark from wall bounce */
+#define OWNERIMMUNE		(1L<<19)	/* Owner is immune to object */
+#define REPROGRAM		(1L<<20)	/* Player reprogramming */
+#define NOEXPLOSION		(1L<<21)	/* No ball recreate explosion */
+#define COLLISIONSHOVE		(1L<<22)	/* Collision counts as shove */
+#define FINISH			(1L<<23)	/* Finished a lap this frame */
+#define RACE_OVER		(1L<<24)	/* After finished and score. */
+#define RANDOM_ITEM		(1L<<25)	/* item shows up as random */
+
 
 /*
  * Weapons modifiers.
