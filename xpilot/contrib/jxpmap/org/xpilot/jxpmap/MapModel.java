@@ -237,7 +237,8 @@ public class MapModel {
                     
                     String id = atts.getValue("id");
                     Color color = 
-                        new Color(Integer.parseInt(atts.getValue("color")));
+                        new Color(Integer.parseInt
+                                  (atts.getValue("color"), 16));
                     int width = Integer.parseInt(atts.getValue("width"));
                     int style = Integer.parseInt(atts.getValue("style"));
                     if (width == -1) {
@@ -255,7 +256,7 @@ public class MapModel {
                     Color col = null;
                     String cstr = atts.getValue("color");
                     if (cstr != null) {
-                        col = new Color(Integer.parseInt(cstr));
+                        col = new Color(Integer.parseInt(cstr, 16));
                     }
                     
                     pstyles.put(id, new PolyStyle

@@ -101,7 +101,7 @@ public class LineStyle {
         if (style == STYLE_HIDDEN) out.print(-1);
         else out.print(width);
         out.print("\" color=\"");
-        out.print(color.getRGB());
+        out.print(PolygonStyle.toRgb(color));
         out.print("\" style=\"");
         if (style == STYLE_HIDDEN) out.print(STYLE_SOLID);
         else out.print(style);

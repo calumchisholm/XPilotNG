@@ -96,7 +96,7 @@ public class PolygonStyle {
 
         if (fillStyle == FILL_COLOR && color != null) {
             out.print("\" color=\"");
-            out.print(color.getRGB());
+            out.print(toRgb(color));
         } else if (fillStyle == FILL_TEXTURED && texture != null) {
             out.print("\" texture=\"");
             out.print(texture.getFileName());
@@ -112,5 +112,14 @@ public class PolygonStyle {
     private int computeFlags () {
         /* TODO: implement */
         return 1;
+    }
+
+    
+    public static String toRgb (Color c) {
+        String s = Integer.toHexString(c.getRGB() & 0xffffff).toUpperCase();
+        if (s.length() == 6) return s;
+        StringBuffer sb = new StringBuffer(6);
+        for (int i = 0; i < 6 - s.length(); i++) sb.append('0');
+        return sb.append(s).toString();
     }
 }
