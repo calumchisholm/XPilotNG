@@ -407,12 +407,12 @@ int Init_player(int ind, shipobj *ship)
     pl->ship = Default_ship();
 #endif
 
-    pl->power			= 45.0;
-    pl->turnspeed		= 30.0;
-    pl->turnresistance		= 0.12;
-    pl->power_s			= 35.0;
-    pl->turnspeed_s		= 25.0;
-    pl->turnresistance_s	= 0.12;
+    pl->power			= 55.0;
+    pl->turnspeed		= 10.0;
+    pl->turnresistance		= 0.0;
+    pl->power_s			= 25.0;
+    pl->turnspeed_s		= 7;
+    pl->turnresistance_s	= 0;
 
     pl->check		= 0;
     pl->round		= 0;
