@@ -1566,6 +1566,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 		Player_set_state(pl, PL_STATE_DEAD);
 	    Player_lock_closest(pl, false);
 	}
+	else
+	    Player_set_state(pl, PL_STATE_APPEARING);
     }
     else {
 	Player_set_life(pl, pl->pl_life + 1);
