@@ -122,7 +122,6 @@ static int Config_create_speedFactPTR(int widget_desc, int *height);
 static int Config_create_fuelNotify(int widget_desc, int *height);
 static int Config_create_fuelWarning(int widget_desc, int *height);
 static int Config_create_fuelCritical(int widget_desc, int *height);
-static int Config_create_fuelGauge(int widget_desc, int *height);
 static int Config_create_outlineWorld(int widget_desc, int *height);
 static int Config_create_filledWorld(int widget_desc, int *height);
 static int Config_create_texturedWalls(int widget_desc, int *height);
@@ -153,6 +152,7 @@ static int Config_create_hudRadarScale(int widget_desc, int *height);
 static int Config_create_hudRadarLimit(int widget_desc, int *height);
 static int Config_create_hudSize(int widget_desc, int *height);
 static int Config_create_hudLockColor(int widget_desc, int *height);
+static int Config_create_fuelGaugeColor(int widget_desc, int *height);
 static int Config_create_dirPtrColor(int widget_desc, int *height);
 static int Config_create_shipShapesHackColor(int widget_desc, int *height);
 static int Config_create_msgScanBallColor(int widget_desc, int *height);
@@ -294,7 +294,6 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_fuelNotify,
     Config_create_fuelWarning,
     Config_create_fuelCritical,
-    Config_create_fuelGauge,
     Config_create_outlineWorld,
     Config_create_filledWorld,
     Config_create_texturedWalls,
@@ -357,6 +356,7 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_hudRadarEnemyColor,
     Config_create_hudRadarOtherColor,
     Config_create_hudLockColor,
+    Config_create_fuelGaugeColor,
     Config_create_dirPtrColor,
     Config_create_shipShapesHackColor,
     Config_create_msgScanBallColor,
@@ -922,15 +922,6 @@ static int Config_create_fuelCritical(int widget_desc, int *height)
 			     NULL, NULL);
 }
 
-static int Config_create_fuelGauge(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "fuelGauge",
-			      BIT(instruments, SHOW_FUEL_GAUGE)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_FUEL_GAUGE);
-}
-
 static int Config_create_outlineWorld(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height, "outlineWorld",
@@ -1152,6 +1143,11 @@ static int Config_create_hudSize(int widget_desc, int *height)
 static int Config_create_hudLockColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(hudLockColor);
+}
+
+static int Config_create_fuelGaugeColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(fuelGaugeColor);
 }
 
 static int Config_create_dirPtrColor(int widget_desc, int *height)
@@ -1953,7 +1949,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "showMyShipShape", BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE));
     Config_save_bool(fp, "ballMsgScan", BIT(hackedInstruments, BALL_MSG_SCAN));
     Config_save_bool(fp, "fuelMeter", BIT(instruments, SHOW_FUEL_METER));
-    Config_save_bool(fp, "fuelGauge", BIT(instruments, SHOW_FUEL_GAUGE));
     Config_save_bool(fp, "turnSpeedMeter", BIT(instruments, SHOW_TURNSPEED_METER));
     Config_save_bool(fp, "powerMeter", BIT(instruments, SHOW_POWER_METER));
     Config_save_bool(fp, "packetSizeMeter", BIT(instruments, SHOW_PACKET_SIZE_METER));
@@ -2023,6 +2018,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "hudRadarEnemyColor", hudRadarEnemyColor);
     Config_save_int(fp, "hudRadarOtherColor", hudRadarOtherColor);
     Config_save_int(fp, "hudLockColor", hudLockColor);
+    Config_save_int(fp, "fuelGaugeColor", fuelGaugeColor);
     Config_save_int(fp, "dirPtrColor", dirPtrColor);
     Config_save_int(fp, "shipShapesHackColor", shipShapesHackColor);
     Config_save_int(fp, "msgScanBallColor", msgScanBallColor);

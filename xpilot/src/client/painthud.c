@@ -82,6 +82,7 @@ DFLOAT	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
 				   range */
 int	hudSize;		/* Size for HUD drawing */
 int	hudLockColor;		/* Color index for lock on HUD drawing */
+int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 int	dirPtrColor;		/* Color index for dirptr drawing */
 int	msgScanBallColor;	/* Color index for ball message scan drawing */
 int	msgScanCoverColor;	/* Color index for ball message scan drawing */
@@ -744,9 +745,13 @@ void Paint_HUD(void)
     }
 
     /* Fuel gauge, must be last */
-    if (BIT(instruments, SHOW_FUEL_GAUGE) == 0
-	|| !((fuelCount)
-	   || (fuelSum < fuelLevel3
+    if (!fuelGaugeColor)
+	return;
+
+    SET_FG(colors[fuelGaugeColor].pixel);
+
+    if (!((fuelCount)
+	  || (fuelSum < fuelLevel3
 	      && ((fuelSum < fuelLevel1 && (loopsSlow % 4) < 2)
 		  || (fuelSum < fuelLevel2
 		      && fuelSum > fuelLevel1

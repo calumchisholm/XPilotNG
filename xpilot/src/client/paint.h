@@ -180,7 +180,8 @@ extern int	mineNameColor;		/* Color index for mine name drawing */
 extern int	teamShotColor;		/* Color index for harmless shot drawing */
 extern int	ballColor;		/* Color index for ball drawing */
 extern int	connColor;		/* Color index for connector drawing */
-extern int	hudLockColor;           /* Color index for lock on HUD drawing */
+extern int	hudLockColor;		/* Color index for lock on HUD drawing */
+extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 extern DFLOAT	scoreObjectTime;	/* how long score objects are flashed */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	baseWarningFrames;	/* Duration of base warning */

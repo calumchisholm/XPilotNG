@@ -49,7 +49,7 @@
 /*#define SHOW_HUD_VERTICAL	(1L << 1)
   #define SHOW_HUD_HORIZONTAL	(1L << 2)*/
 #define SHOW_FUEL_METER		(1L << 3)
-#define SHOW_FUEL_GAUGE		(1L << 4)
+/*#define SHOW_FUEL_GAUGE		(1L << 4)*/
 #define SHOW_TURNSPEED_METER	(1L << 5)
 #define SHOW_POWER_METER	(1L << 6)
 

@@ -488,9 +488,10 @@ int Init_top(void)
     COLORCHECK(hudColor, 2);
     COLORCHECK(hudHLineColor, 2);
     COLORCHECK(hudVLineColor, 0);
-    COLORCHECK(hudLockColor, hudColor);
+    COLORCHECK(hudLockColor, 2);
     COLORCHECK(hudRadarEnemyColor, 3);
     COLORCHECK(hudRadarOtherColor, 2);
+    COLORCHECK(fuelGaugeColor, 2);
     COLORCHECK(shipShapesHackColor, 0);
     COLORCHECK(dirPtrColor, 0);
     COLORCHECK(msgScanBallColor, 3);

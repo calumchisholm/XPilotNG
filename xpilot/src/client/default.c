@@ -446,13 +446,6 @@ option options[] = {
 	"Determines if the fuel meter should be visible.\n"
     },
     {
-	"fuelGauge",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Determines if the fuel gauge should be visible.\n"
-    },
-    {
 	"turnSpeedMeter",
 	NULL,
 	"No",
@@ -1120,6 +1113,13 @@ option options[] = {
 	"4",
 	KEY_DUMMY,
 	"Which color number to use for drawing the lock on the HUD.\n"
+    },
+    {
+	"fuelGaugeColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing the fuel gauge.\n"
     },
     {
 	"msgScanBallColor",
@@ -3076,6 +3076,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "dirPtrColor", &dirPtrColor);
     Get_int_resource(rDB, "shipShapesHackColor", &shipShapesHackColor);
     Get_int_resource(rDB, "hudLockColor", &hudLockColor);
+    Get_int_resource(rDB, "fuelGaugeColor", &fuelGaugeColor);
     Get_int_resource(rDB, "msgScanBallColor", &msgScanBallColor);
     Get_int_resource(rDB, "msgScanCoverColor", &msgScanCoverColor);
     Get_int_resource(rDB, "selfLWColor", &selfLWColor);
@@ -3124,7 +3125,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "treatZeroSpecial", &hackedInstruments,
 		     TREAT_ZERO_SPECIAL);
     Get_bit_resource(rDB, "fuelMeter", &instruments, SHOW_FUEL_METER);
-    Get_bit_resource(rDB, "fuelGauge", &instruments, SHOW_FUEL_GAUGE);
     Get_bit_resource(rDB, "turnSpeedMeter", &instruments, SHOW_TURNSPEED_METER);
     Get_bit_resource(rDB, "powerMeter", &instruments, SHOW_POWER_METER);
     Get_bit_resource(rDB, "packetSizeMeter", &instruments, SHOW_PACKET_SIZE_METER);
