@@ -50,7 +50,6 @@
 #include "xinit.h"
 #include "protoclient.h"
 #include "guimap.h"
-#include "mapdata.h"
 char paintmap_version[] = VERSION;
 
 #define X(co)  ((int) ((co) - world.x))
