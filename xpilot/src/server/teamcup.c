@@ -21,48 +21,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef XPSERVER_H
-#define XPSERVER_H
+#include "xpserver.h"
 
-#define SERVER
-#include "xpcommon.h"
-
-/*#include <crypt.h>*/
-#include <expat.h>
-
-#ifdef PLOCKSERVER
-# if defined(__linux__)
-#  include <sys/mman.h>
-# else
-#  include <sys/lock.h>
-# endif
-#endif
-
-#include "asteroid.h"
-#include "auth.h"
-#include "cannon.h"
-#include "click.h"
-#include "connection.h"
-#include "defaults.h"
-#include "global.h"
-#include "map.h"
-#include "metaserver.h"
-#include "netserver.h"
-#include "objpos.h"
-#include "packet.h"
-#include "proto.h"
-#include "rank.h"
-#include "recwrap.h"
-#include "robot.h"
-#include "saudio.h"
-#include "sched.h"
-#include "setup.h"
-#include "score.h"
-#include "server.h"
-#include "serverconst.h"
-#include "srecord.h"
-#include "teamcup.h"
-#include "tuner.h"
-#include "walls.h"
-
-#endif /* XPSERVER_H */
+char teamcup_version[] = VERSION;

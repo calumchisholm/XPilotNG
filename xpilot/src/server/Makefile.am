@@ -20,7 +20,7 @@ xpilots_SOURCES = \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
-	tuner.c tuner.h \
+	teamcup.h teamcup.c tuner.c tuner.h \
 	update.c \
 	walls.c walls.h wildmap.c \
 	xp2map.c xpmap.c xpserver.h

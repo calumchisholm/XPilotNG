@@ -132,7 +132,7 @@ xpilots_SOURCES = \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
-	tuner.c tuner.h \
+	teamcup.h teamcup.c tuner.c tuner.h \
 	update.c \
 	walls.c walls.h wildmap.c \
 	xp2map.c xpmap.c xpserver.h
@@ -159,9 +159,9 @@ am_xpilots_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	robot.$(OBJEXT) robotdef.$(OBJEXT) rules.$(OBJEXT) \
 	saudio.$(OBJEXT) sched.$(OBJEXT) score.$(OBJEXT) \
 	server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
-	showtime.$(OBJEXT) srecord.$(OBJEXT) tuner.$(OBJEXT) \
-	update.$(OBJEXT) walls.$(OBJEXT) wildmap.$(OBJEXT) \
-	xp2map.$(OBJEXT) xpmap.$(OBJEXT)
+	showtime.$(OBJEXT) srecord.$(OBJEXT) teamcup.$(OBJEXT) \
+	tuner.$(OBJEXT) update.$(OBJEXT) walls.$(OBJEXT) \
+	wildmap.$(OBJEXT) xp2map.$(OBJEXT) xpmap.$(OBJEXT)
 xpilots_OBJECTS = $(am_xpilots_OBJECTS)
 xpilots_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilots_LDFLAGS =
@@ -188,9 +188,10 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/score.Po ./$(DEPDIR)/server.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/ship.Po ./$(DEPDIR)/shot.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/showtime.Po ./$(DEPDIR)/srecord.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/tuner.Po ./$(DEPDIR)/update.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/walls.Po ./$(DEPDIR)/wildmap.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xp2map.Po ./$(DEPDIR)/xpmap.Po
+@AMDEP_TRUE@	./$(DEPDIR)/teamcup.Po ./$(DEPDIR)/tuner.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/update.Po ./$(DEPDIR)/walls.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/wildmap.Po ./$(DEPDIR)/xp2map.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/xpmap.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -280,6 +281,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/showtime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srecord.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/teamcup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tuner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/update.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/walls.Po@am__quote@

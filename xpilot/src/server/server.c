@@ -819,6 +819,7 @@ extern char shipshape_version[];
 extern char shot_version[];
 extern char socklib_version[];
 extern char srecord_version[];
+extern char teamcup_version[];
 extern char tuner_version[];
 extern char update_version[];
 extern char walls_version[];
@@ -875,6 +876,7 @@ static void Check_server_versions(void)
 	{ "shot", shot_version },
 	{ "socklib", socklib_version },
 	{ "srecord", srecord_version },
+	{ "teamcup", teamcup_version },
 	{ "tuner", tuner_version },
 	{ "update", update_version },
 	{ "walls", walls_version },

@@ -3593,6 +3593,48 @@ static option_desc options[] = {
 	"0 means full framerate. Can be used to limit bandwidth used.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+    /* teamcup related options */
+    {
+	"teamcup",
+	"teamcup",
+	false,
+	&teamcup,
+	valBool,
+	tuner_dummy,
+	"Is this a teamcup match?.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"teamcupStatServer",
+	"statServer",
+	"shell.e.kth.se",
+	&teamcupStatServer,
+	valString,
+	tuner_dummy,
+	"Teamcup status server to report to.\n",
+	OPT_COMMAND | OPT_VISIBLE
+    },
+    {
+	"teamcupStatPort",
+	"statPort",
+	TEAMCUP_STATUS_PORTSTR,
+	&teamcupStatPort,
+	valInt,
+	tuner_dummy,
+	"Port of the teamcup status server.\n",
+	OPT_COMMAND | OPT_VISIBLE
+    },
+    { 
+	"teamcupMatchNumber",
+	"match",
+	"0",
+	&teamcupMatchNumber,
+	valInt,
+	tuner_dummy,
+	"The number of the teamcup match.\n",
+	OPT_COMMAND | OPT_VISIBLE
+    }
+    /* end of teamcup related options */
 };
 
 
