@@ -1490,9 +1490,7 @@ void Detach_ball(player_t *pl, ballobject_t *ball)
 
 void Kill_player(player_t *pl, bool add_rank_death)
 {
-    /* Don't create an explosion if the player is being transported back
-     * to home base after being killed. */
-    if (BIT(pl->pl_status, FOO_PLAYING))
+    if (Player_is_killed(pl))
 	Explode_fighter(pl);
     Player_death_reset(pl, add_rank_death);
 }
