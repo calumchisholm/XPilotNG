@@ -1,0 +1,13 @@
+/* $Id$ */
+
+#include "Local.config"
+
+MsubTarget(xpilot.man,xpilot.man.msub)
+MsubTarget(xpilots.man,xpilots.man.msub)
+MsubTarget(xp-replay.man,xp-replay.man.msub)
+MsubDepend
+
+InstallManPage(xpilot,$(INSTMANDIR))
+InstallManPage(xpilots,$(INSTMANDIR))
+InstallManPage(xp-replay,$(INSTMANDIR))
+

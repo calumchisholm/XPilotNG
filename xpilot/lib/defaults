@@ -1,0 +1,39 @@
+# Set maximum density of any given item type to 1 every 12000 blocks.
+# For instance, no more than 3 items may exist in Continent (the default map).
+maxItemDensity:         3.46021e-04
+
+# Set probability of for each item to appear at a tick in a block
+itemEnergyPackProb:     4.01323e-09
+itemTankProb:           2.40292e-09
+itemECMProb:            1.92426e-09
+itemMineProb:           6.40779e-09
+itemMissileProb:        1.92426e-09
+itemCloakProb:          1.60596e-09
+itemSensorProb:         1.60596e-09
+itemWideangleProb:      2.70371e-09
+itemRearshotProb:       2.94386e-09
+itemAfterburnerProb:    2.74620e-09
+itemTransporterProb:    1.60596e-09
+itemLaserProb:	        1.60596e-09
+itemEmergencyThrustProb:1.60596e-09
+itemTractorBeamProb:    2.74620e-09
+itemAutoPilotProb:      1.60596e-09
+itemEmergencyShieldProb:1.60596e-09
+
+# A few items appear moving.  It is fun to chase them
+# when they are bouncing.
+movingItemProb:		0.3
+
+# We like stronger gravity
+gravity:		-0.25
+
+# Nukes and clusters are rather heavy.
+allowNukes:             no
+allowClusters:          no
+allowModifiers:         yes
+
+# Set the frames per second
+framesPerSecond:	14
+
+#
+password:	not

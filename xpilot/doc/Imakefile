@@ -1,0 +1,12 @@
+/* $Id$ */
+
+#include "Local.config"
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+SUBDIRS = man/
+
+MakeSubdirs($(SUBDIRS))
+CleanSubdirs($(SUBDIRS))
+MakefileSubdirs($(SUBDIRS))
+InstallManSubdirs($(SUBDIRS))

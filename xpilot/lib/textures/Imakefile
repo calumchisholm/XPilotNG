@@ -1,0 +1,7 @@
+/* $Id$ */
+
+#include "Local.config"
+
+TEXTURES = *.xpm *.ppm
+
+InstallMultiple($(TEXTURES),$(INSTLIBDIR)/textures/)
