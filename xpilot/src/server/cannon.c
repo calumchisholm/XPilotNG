@@ -154,7 +154,7 @@ void Cannon_add_item(cannon_t *c, int item, double amount)
 void Cannon_throw_items(cannon_t *c)
 {
     int i, dir;
-    object_t *obj;
+    itemobject_t *item;
     double velocity;
     world_t *world = c->world;
 
@@ -168,31 +168,31 @@ void Cannon_throw_items(cannon_t *c)
 					    - world->items[i].min_per_pack));
 	    LIMIT(amount, 0, c->item[i]);
 	    if (rfrac() < (options.dropItemOnKillProb * CANNON_DROP_ITEM_PROB)
-		&& (obj = Object_allocate()) != NULL) {
+		&& (item = ITEM_PTR(Object_allocate())) != NULL) {
 
-		obj->type = OBJ_ITEM;
-		obj->info = i;
-		obj->color = RED;
-		obj->obj_status = GRAVITY;
+		item->type = OBJ_ITEM;
+		item->item_info = i;
+		item->color = RED;
+		item->obj_status = GRAVITY;
 		dir = (int)(c->dir
 			   - (CANNON_SPREAD * 0.5)
 			   + (rfrac() * CANNON_SPREAD));
 		dir = MOD2(dir, RES);
-		obj->id = NO_ID;
-		obj->team = TEAM_NOT_SET;
-		Object_position_init_clpos(world, obj, c->pos);
+		item->id = NO_ID;
+		item->team = TEAM_NOT_SET;
+		Object_position_init_clpos(world, OBJ_PTR(item), c->pos);
 		velocity = rfrac() * 6;
-		obj->vel.x = tcos(dir) * velocity;
-		obj->vel.y = tsin(dir) * velocity;
-		obj->acc.x = 0;
-		obj->acc.y = 0;
-		obj->mass = 10;
-		obj->life = 1500 + rfrac() * 512;
-		obj->count = amount;
-		obj->pl_range = ITEM_SIZE / 2;
-		obj->pl_radius = ITEM_SIZE / 2;
+		item->vel.x = tcos(dir) * velocity;
+		item->vel.y = tsin(dir) * velocity;
+		item->acc.x = 0;
+		item->acc.y = 0;
+		item->mass = 10;
+		item->life = 1500 + rfrac() * 512;
+		item->item_count = amount;
+		item->pl_range = ITEM_SIZE / 2;
+		item->pl_radius = ITEM_SIZE / 2;
 		world->items[i].num++;
-		Cell_add_object(world, obj);
+		Cell_add_object(world, OBJ_PTR(item));
 	    }
 	    c->item[i] -= amount;
 	}

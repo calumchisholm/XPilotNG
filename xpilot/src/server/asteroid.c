@@ -280,7 +280,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
     asteroid->turnspeed = 0.02 + rfrac() * 0.05;
     asteroid->rotation = (int)(rfrac() * RES);
     asteroid->size = size;
-    asteroid->info = (int)(rfrac() * 256);
+    asteroid->wire_info = (int)(rfrac() * 256);
     radius = ASTEROID_RADIUS(size) / CLICK;
     asteroid->pl_range = (int)radius;
     asteroid->pl_radius = (int)radius;

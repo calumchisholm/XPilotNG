@@ -215,8 +215,11 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 	    cannon_t *c = Cannon_by_index(world, mapobj_ind);
 
 	    obj->life = 0;
-	    if (obj->type == OBJ_ITEM)
-		Cannon_add_item(c, obj->info, obj->count);
+	    if (obj->type == OBJ_ITEM) {
+		itemobject_t *item = ITEM_PTR(obj);
+
+		Cannon_add_item(c, item->item_info, item->item_count);
+	    }
 	    else {
 		player_t *pl = Player_by_id(obj->id);
 

@@ -726,7 +726,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	case OBJ_WRECKAGE:
 	    if (spark_rand != 0 || options.wreckageCollisionMayKill) {
 		wireobject_t *wreck = WIRE_PTR(shot);
-		Send_wreckage(conn, pos, (u_byte)wreck->info,
+		Send_wreckage(conn, pos, (u_byte)wreck->wire_info,
 			      wreck->size, wreck->rotation);
 	    }
 	    break;
@@ -734,7 +734,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	case OBJ_ASTEROID: {
 		wireobject_t *ast = WIRE_PTR(shot);
 		Send_asteroid(conn, pos,
-			      (u_byte)ast->info, ast->size, ast->rotation);
+			      (u_byte)ast->wire_info, ast->size, ast->rotation);
 	    }
 	    break;
 
@@ -822,7 +822,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 
 	case OBJ_ITEM:
 	    {
-		int item_type = shot->info;
+		int item_type = ITEM_PTR(shot)->item_info;
 
 		if (BIT(shot->obj_status, RANDOM_ITEM))
 		    item_type = Choose_random_item(world);

@@ -111,8 +111,10 @@ void Alloc_shots(world_t *world, int number)
     SHOWTYPESIZE(missileobject_t);
     SHOWTYPESIZE(smartobject_t);
     SHOWTYPESIZE(torpobject_t);
+    SHOWTYPESIZE(heatobject_t);
     SHOWTYPESIZE(wireobject_t);
     SHOWTYPESIZE(pulseobject_t);
+    SHOWTYPESIZE(itemobject_t);
     SHOWTYPESIZE(anyobject_t);
     SHOWTYPESIZE(player_t);
 #endif

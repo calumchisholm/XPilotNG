@@ -1009,7 +1009,7 @@ static void Update_players(world_t *world)
 		if (dist > 0.0) {
 		    double delta = dist - olddist;
 
-		    pl->count += timeStep;
+		    pl->snafu_count += timeStep;
 		    if (olddist == 0)
 			printf("\t0.000 %% 0.00\n");
 		    printf("\t%.3f\n"
@@ -1020,29 +1020,29 @@ static void Update_players(world_t *world)
 			   olddist + 0.50 * delta,
 			   olddist + 0.75 * delta,
 			   dist,
-			   pl->count);
+			   pl->snafu_count);
 		    
 		    olddist = dist;
 		} else
-		    pl->count = 0;
+		    pl->snafu_count = 0;
 	    } else {
 		assert(timeStep == 0.25);
 		if (dist > 0.0) {
 		    int foo;
 		    double bar;
-		    pl->count += timeStep;
+		    pl->snafu_count += timeStep;
 		    if (olddist == 0)
 			printf("\t0.000 %% 0.00\n");
-		    foo = (int)pl->count;
-		    bar = pl->count - ((float)foo);
+		    foo = (int)pl->snafu_count;
+		    bar = pl->snafu_count - ((float)foo);
 		    bar = ABS(bar);
 		    if (bar < 0.01)
-			printf("\t%.3f %% %.2f\n", dist, pl->count);
+			printf("\t%.3f %% %.2f\n", dist, pl->snafu_count);
 		    else
 			printf("\t%.3f\n", dist);
 		    olddist = dist;
 		} else
-		    pl->count = 0;
+		    pl->snafu_count = 0;
 	    }
 	}
 

@@ -323,6 +323,8 @@ typedef struct player {
 
     world_t	*world;			/* World player is in */
 
+    double	snafu_count;		/* Misc. snafus */
+
 } player_t;
 
 #define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */

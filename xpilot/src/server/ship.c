@@ -423,10 +423,14 @@ void Tank_handle_detach(player_t *pl)
     for (i = 0; i < NumObjs; i++) {
 	object_t *obj = Obj[i];
 
-	if (obj->type == OBJ_HEAT_SHOT
-	    && obj->info > 0
-	    && Player_by_id(obj->info) == pl)
-	    obj->info = NumPlayers - 1; 	/* kps - is this right ? */
+	if (obj->type == OBJ_HEAT_SHOT) {
+	    heatobject_t *heat = HEAT_PTR(obj);
+
+	    if (heat->heat_info > 0
+		&& Player_by_id(heat->heat_info) == pl)
+		/* kps - is this right ? */
+		heat->heat_info = NumPlayers - 1;
+	}
     }
 
     /* Remove tank, fuel and mass from myself */
@@ -544,7 +548,7 @@ void Make_wreckage(world_t *world,
 	if (size > 255)
 	    size = 255;
 	wreckage->size = size;
-	wreckage->info = (int)(rfrac() * 256);
+	wreckage->wire_info = (int)(rfrac() * 256);
 
 	radius = wreckage->size * 16 / 256;
 	if (radius < 8)

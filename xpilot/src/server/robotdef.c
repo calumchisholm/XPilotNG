@@ -1675,15 +1675,17 @@ static void Robot_default_play_check_objects(player_t *pl,
 
 	    /* Find closest item */
 	    if (shot->type == OBJ_ITEM) {
+		itemobject_t *item = ITEM_PTR(shot);
+
 		if (ABS(dx) < *item_dist
 		    && ABS(dy) < *item_dist) {
 		    int imp;
 
-		    if (BIT(shot->obj_status, RANDOM_ITEM))
+		    if (BIT(item->obj_status, RANDOM_ITEM))
 			/* It doesn't know what it is, so get it if it can */
 			imp = ROBOT_HANDY_ITEM;
 		    else
-			imp = Rank_item_value(pl, obj_list[j]->info);
+			imp = Rank_item_value(pl, item->item_info);
 
 		    if (imp > ROBOT_IGNORE_ITEM && imp >= *item_imp) {
 			*item_imp = imp;
@@ -1827,6 +1829,7 @@ static void Robot_default_play(player_t *pl)
     bool harvest_checked, evade_checked, navigate_checked;
     robot_default_data_t *my_data = Robot_default_get_data(pl);
     world_t *world = pl->world;
+    itemobject_t *item = NULL;
 
     if (my_data->robot_count <= 0)
 	my_data->robot_count = 1000 + (int)(rfrac() * 32);
@@ -1919,6 +1922,9 @@ static void Robot_default_play(player_t *pl)
     Robot_default_play_check_objects(pl,
 				     &item_i, &item_dist, &item_imp,
 				     &mine_i, &mine_dist);
+
+    if (item_i >= 0)
+	item = ITEM_PTR(Obj[item_i]);
 
     /* make sure robots take off from their bases */
     if (QUICK_LENGTH(pl->pos.cx - pl->home_base->pos.cx,
@@ -2060,11 +2066,11 @@ static void Robot_default_play(player_t *pl)
     if (BIT(world->rules->mode, TIMING) && !navigate_checked) {
 	int delta_dir;
 
-	if (item_i >= 0) {
+	if (item != NULL) {
 	    delta_dir =
 		(int)(pl->dir
-		      - Wrap_cfindDir(Obj[item_i]->pos.cx - pl->pos.cx,
-				      Obj[item_i]->pos.cy - pl->pos.cy));
+		      - Wrap_cfindDir(item->pos.cx - pl->pos.cx,
+				      item->pos.cy - pl->pos.cy));
 	    delta_dir = MOD2(delta_dir, RES);
 	} else {
 	    delta_dir = RES;
@@ -2080,22 +2086,22 @@ static void Robot_default_play(player_t *pl)
 		return;
 	}
     }
-    if (item_i >= 0
+    if (item != NULL
 	&& 3*enemy_dist > 2*item_dist
 	&& item_dist < 12*BLOCK_SZ
 	&& !BIT(my_data->longterm_mode, FETCH_TREASURE)
 	&& (!BIT(my_data->longterm_mode, NEED_FUEL)
-	    || Obj[item_i]->info == ITEM_FUEL
-	    || Obj[item_i]->info == ITEM_TANK)) {
+	    || item->item_info == ITEM_FUEL
+	    || item->item_info == ITEM_TANK)) {
 
 	if (item_imp != ROBOT_IGNORE_ITEM) {
-	    clpos_t d = Obj[item_i]->pos;
+	    clpos_t d = item->pos;
 
 	    harvest_checked = true;
-	    d.cx += (int)(Obj[item_i]->vel.x
+	    d.cx += (int)(item->vel.x
 			   * (ABS(d.cx - pl->pos.cx) /
 			      my_data->robot_normal_speed));
-	    d.cy += (int)(Obj[item_i]->vel.y
+	    d.cy += (int)(item->vel.y
 			   * (ABS(d.cy - pl->pos.cy) /
 			      my_data->robot_normal_speed));
 	    if (Check_robot_target(pl, d, RM_HARVEST))

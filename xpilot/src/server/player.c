@@ -386,7 +386,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     /*
      * Make sure floats, doubles and pointers are correctly zeroed.
      */
-    assert(pl->count == 0);
+    assert(pl->wall_time == 0);
     assert(pl->turnspeed == 0);
     assert(pl->conn  == NULL);
 

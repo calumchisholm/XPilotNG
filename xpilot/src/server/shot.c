@@ -203,6 +203,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, int status,
 	mine->id = (pl ? pl->id : NO_ID);
 	mine->team = team;
 	mine->owner = mine->id;
+	mine->mine_count = 0.0;
 	Object_position_init_clpos(world, OBJ_PTR(mine), pos);
 	if (minis > 1) {
 	    int		space = RES/minis;
@@ -241,7 +242,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, int status,
 	mine->mods = mods;
 	mine->pl_range = (int)(MINE_RANGE / minis);
 	mine->pl_radius = MINE_RADIUS;
-	Cell_add_object(world, (object_t *) mine);
+	Cell_add_object(world, OBJ_PTR(mine));
     }
 }
 
@@ -850,12 +851,28 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 	shot->life 	= life / minis;
 	shot->fusetime 	= frame_time + fuse;
 	shot->mass	= mass / minis;
-	shot->count 	= 0;
-	shot->info 	= lock;
 	shot->type	= type;
 	shot->id	= (pl ? pl->id : NO_ID);
 	shot->team	= team;
 	shot->color	= (pl ? pl->color : WHITE);
+
+	/* shot->count = 0;
+	   shot->info 	= lock; */
+	switch (shot->type) {
+	case OBJ_TORPEDO:
+	    TORP_PTR(shot)->torp_count = 0;
+	    break;
+	case OBJ_HEAT_SHOT:
+	    HEAT_PTR(shot)->heat_count = 0;
+	    HEAT_PTR(shot)->heat_info = lock;
+	    break;
+	case OBJ_SMART_SHOT:
+	    SMART_PTR(shot)->smart_count = 0;
+	    SMART_PTR(shot)->smart_info = lock;
+	    break;
+	default:
+	    break;
+	}
 
 	if (shot->type == OBJ_TORPEDO
 	    || shot->type == OBJ_HEAT_SHOT
@@ -1063,6 +1080,7 @@ void Delete_shot(world_t *world, int ind)
 {
     object_t *shot = Obj[ind];	/* Used when swapping places */
     ballobject_t *ball;
+    itemobject_t *item;
     player_t *pl;
     bool addMine = false, addHeat = false, addBall = false;
     modifiers_t mods;
@@ -1260,17 +1278,18 @@ void Delete_shot(world_t *world, int ind)
 
 	/* Special items. */
     case OBJ_ITEM:
+	item = ITEM_PTR(shot);
 
-	switch (shot->info) {
+	switch (item->item_info) {
 
 	case ITEM_MISSILE:
-	    /* If -timeStep < shot->life <= 0, then it died of old age. */
+	    /* If -timeStep < item->life <= 0, then it died of old age. */
 	    /* If it was picked up, then life was set to 0 and it is now
 	     * -timeStep after the substract in update.c. */
-	    if (-timeStep < shot->life && shot->life <= 0) {
-		if (shot->color != WHITE) {
-		    shot->color = WHITE;
-		    shot->life  = WARN_TIME;
+	    if (-timeStep < item->life && item->life <= 0) {
+		if (item->color != WHITE) {
+		    item->color = WHITE;
+		    item->life  = WARN_TIME;
 		    return;
 		}
 		if (rfrac() < options.rogueHeatProb)
@@ -1280,10 +1299,10 @@ void Delete_shot(world_t *world, int ind)
 
 	case ITEM_MINE:
 	    /* See comment for ITEM_MISSILE above */
-	    if (-timeStep < shot->life && shot->life <= 0) {
-		if (shot->color != WHITE) {
-		    shot->color = WHITE;
-		    shot->life  = WARN_TIME;
+	    if (-timeStep < item->life && item->life <= 0) {
+		if (item->color != WHITE) {
+		    item->color = WHITE;
+		    item->life  = WARN_TIME;
 		    return;
 		}
 		if (rfrac() < options.rogueMineProb)
@@ -1295,7 +1314,7 @@ void Delete_shot(world_t *world, int ind)
 	    break;
 	}
 
-	world->items[shot->info].num--;
+	world->items[item->item_info].num--;
 
 	break;
 
@@ -1406,11 +1425,11 @@ void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
     pulse->life 	= life;
     pulse->obj_status 	= (pl ? 0 : FROMCANNON);
     pulse->type 	= OBJ_PULSE;
-    pulse->count 	= 0;
+    pulse->pulse_count 	= 0;
     pulse->mods 	= mods;
     pulse->color	= (pl ? pl->color : WHITE);
 
-    pulse->info 	= 0;
+    pulse->pulse_info 	= 0;
     pulse->fusetime	= frame_time;
     pulse->pl_range 	= 0;
     pulse->pl_radius 	= 0;
@@ -1532,10 +1551,10 @@ void Update_torpedo(world_t *world, torpobject_t *torp)
 
     UNUSED_PARAM(world);
     if (BIT(torp->mods.nuclear, NUCLEAR))
-	acc = (torp->count < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
+	acc = (torp->torp_count < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
     else
-	acc = (torp->count < TORPEDO_SPEED_TIME) ? TORPEDO_ACC : 0.0;
-    torp->count += timeStep;
+	acc = (torp->torp_count < TORPEDO_SPEED_TIME) ? TORPEDO_ACC : 0.0;
+    torp->torp_count += timeStep;
     acc *= (1 + (torp->mods.power * MISSILE_POWER_SPEED_FACT));
     if ((torp->spread_left -= timeStep) <= 0) {
 	torp->acc.x = 0;
@@ -1554,23 +1573,25 @@ void Update_missile(world_t *world, missileobject_t *shot)
     double x_dif = 0.0, y_dif = 0.0, shot_speed, a;
 
     if (shot->type == OBJ_HEAT_SHOT) {
+	heatobject_t *heat = HEAT_PTR(shot);
+
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;
-	if (shot->info >= 0) {
+	if (heat->heat_info >= 0) {
 	    clpos_t engine;
 
 	    /* Get player and set min to distance */
-	    pl = Player_by_id(shot->info);
+	    pl = Player_by_id(heat->heat_info);
 	    /* kps - bandaid since Player_by_id can return NULL. */
 	    if (!pl)
 		return;
 	    engine = Ship_get_engine_clpos(pl->ship, pl->dir);
-	    range = Wrap_length(pl->pos.cx + engine.cx - shot->pos.cx,
-				pl->pos.cy + engine.cy - shot->pos.cy)
+	    range = Wrap_length(pl->pos.cx + engine.cx - heat->pos.cx,
+				pl->pos.cy + engine.cy - heat->pos.cy)
 		/ CLICK;
 	} else {
 	    /* No player. Number of moves so that new target is searched */
 	    pl = NULL;
-	    shot->count = HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR;
+	    heat->heat_count = HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR;
 	}
 	if (pl && Player_is_thrusting(pl)) {
 	    /*
@@ -1578,23 +1599,23 @@ void Update_missile(world_t *world, missileobject_t *shot)
 	     * set number to moves to correct error value
 	     */
 	    if (range < HEAT_CLOSE_RANGE)
-		shot->count = HEAT_CLOSE_ERROR;
+		heat->heat_count = HEAT_CLOSE_ERROR;
 	    else if (range < HEAT_MID_RANGE)
-		shot->count = HEAT_MID_ERROR;
+		heat->heat_count = HEAT_MID_ERROR;
 	    else
-		shot->count = HEAT_WIDE_ERROR;
+		heat->heat_count = HEAT_WIDE_ERROR;
 	} else {
-	    shot->count += timeStep;
+	    heat->heat_count += timeStep;
 	    /* Look for new target */
 	    if ((range < HEAT_CLOSE_RANGE
-		 && shot->count > HEAT_CLOSE_TIMEOUT + HEAT_CLOSE_ERROR)
+		 && heat->heat_count > HEAT_CLOSE_TIMEOUT + HEAT_CLOSE_ERROR)
 		|| (range < HEAT_MID_RANGE
-		    && shot->count > HEAT_MID_TIMEOUT + HEAT_MID_ERROR)
-		|| shot->count > HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR) {
+		    && heat->heat_count > HEAT_MID_TIMEOUT + HEAT_MID_ERROR)
+		|| heat->heat_count > HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR) {
 		double l;
 		int i;
 
-		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
+		range = HEAT_RANGE * (heat->heat_count / HEAT_CLOSE_TIMEOUT);
 		for (i = 0; i < NumPlayers; i++) {
 		    player_t *pl_i = Player_by_index(i);
 		    clpos_t engine;
@@ -1603,8 +1624,8 @@ void Update_missile(world_t *world, missileobject_t *shot)
 			continue;
 
 		    engine = Ship_get_engine_clpos(pl_i->ship, pl_i->dir);
-		    l = Wrap_length(pl_i->pos.cx + engine.cx - shot->pos.cx,
-				    pl_i->pos.cy + engine.cy - shot->pos.cy)
+		    l = Wrap_length(pl_i->pos.cx + engine.cx - heat->pos.cx,
+				    pl_i->pos.cy + engine.cy - heat->pos.cy)
 			/ CLICK;
 		    /*
 		     * After burners can be detected easier;
@@ -1615,9 +1636,9 @@ void Update_missile(world_t *world, missileobject_t *shot)
 		    if (BIT(pl_i->have, HAS_AFTERBURNER))
 			l *= 16 - pl_i->item[ITEM_AFTERBURNER];
 		    if (l < range) {
-			shot->info = pl_i->id;
+			heat->heat_info = pl_i->id;
 			range = l;
-			shot->count =
+			heat->heat_count =
 			    l < HEAT_CLOSE_RANGE ?
 				HEAT_CLOSE_ERROR : l < HEAT_MID_RANGE ?
 				    HEAT_MID_ERROR : HEAT_WIDE_ERROR;
@@ -1626,14 +1647,14 @@ void Update_missile(world_t *world, missileobject_t *shot)
 		}
 	    }
 	}
-	if (shot->info < 0)
+	if (heat->heat_info < 0)
 	    return;
 	/*
 	 * Heat seekers cannot fly exactly, if target is far away or thrust
 	 * isn't active.  So simulate the error:
 	 */
-	x_dif = rfrac() * 4 * shot->count;
-	y_dif = rfrac() * 4 * shot->count;
+	x_dif = rfrac() * 4 * heat->heat_count;
+	y_dif = rfrac() * 4 * heat->heat_count;
 
     }
     else if (shot->type == OBJ_SMART_SHOT) {
@@ -1648,18 +1669,19 @@ void Update_missile(world_t *world, missileobject_t *shot)
 	/*if (BIT(smart->obj_status, CONFUSED)
 	  && (!(frame_loops
 	  % (int)(CONFUSED_UPDATE_GRANULARITY / options.gameSpeed)
-	  || smart->count == CONFUSED_TIME))) {*/
+	  || smart->smart_count == CONFUSED_TIME))) {*/
 	/* not going to fix now, I'll just remove the '/ gamespeed' part */
 
 	if (BIT(smart->obj_status, CONFUSED)
 	    && (!(frame_loops % CONFUSED_UPDATE_GRANULARITY)
-		|| smart->count == CONFUSED_TIME)) {
+		|| smart->smart_count == CONFUSED_TIME)) {
 
-	    if (smart->count > 0) {
-		smart->info = Player_by_index((int)(rfrac() * NumPlayers))->id;
-		smart->count -= timeStep;
+	    if (smart->smart_count > 0) {
+		smart->smart_info
+		    = Player_by_index((int)(rfrac() * NumPlayers))->id;
+		smart->smart_count -= timeStep;
 	    } else {
-		smart->count = 0;
+		smart->smart_count = 0;
 		CLR_BIT(smart->obj_status, CONFUSED);
 
 		/* range is percentage from center to periphery of ecm burst */
@@ -1673,10 +1695,10 @@ void Update_missile(world_t *world, missileobject_t *shot)
 		 *   0		50
 		 */
 		if ((int)(rfrac() * 100) <= ((int)(range/2)+50))
-		    smart->info = smart->new_info;
+		    smart->smart_info = smart->new_info;
 	    }
 	}
-	pl = Player_by_id(shot->info);
+	pl = Player_by_id(smart->smart_info);
     }
     else
 	/*NOTREACHED*/
@@ -1854,9 +1876,9 @@ void Update_mine(world_t *world, mineobject_t *mine)
     UNUSED_PARAM(world);
 
     if (BIT(mine->obj_status, CONFUSED)) {
-	if ((mine->count -= timeStep) <= 0) {
+	if ((mine->mine_count -= timeStep) <= 0) {
 	    CLR_BIT(mine->obj_status, CONFUSED);
-	    mine->count = 0;
+	    mine->mine_count = 0;
 	}
     }
 

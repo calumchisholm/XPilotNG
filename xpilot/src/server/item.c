@@ -293,37 +293,37 @@ void Place_item(world_t *world, player_t *pl, int item)
 }
 
 void Make_item(world_t *world, clpos_t pos, vector_t vel,
-	       int item, int num_per_pack, int status)
+	       int type, int num_per_pack, int status)
 {
-    object_t *obj;
+    itemobject_t *item;
 
     if (!World_contains_clpos(world, pos))
 	return;
 
-    if (world->items[item].num >= world->items[item].max)
+    if (world->items[type].num >= world->items[type].max)
 	return;
 
-    if ((obj = Object_allocate()) == NULL)
+    if ((item = ITEM_PTR(Object_allocate())) == NULL)
 	return;
 
-    obj->type = OBJ_ITEM;
-    obj->info = item;
-    obj->color = RED;
-    obj->obj_status = status;
-    obj->id = NO_ID;
-    obj->team = TEAM_NOT_SET;
-    Object_position_init_clpos(world, obj, pos);
-    obj->vel = vel;
-    obj->acc.x =
-    obj->acc.y = 0.0;
-    obj->mass = 10.0;
-    obj->life = 1500 + rfrac() * 512;
-    obj->count = num_per_pack;
-    obj->pl_range = ITEM_SIZE/2;
-    obj->pl_radius = ITEM_SIZE/2;
+    item->type = OBJ_ITEM;
+    item->item_info = type;
+    item->color = RED;
+    item->obj_status = status;
+    item->id = NO_ID;
+    item->team = TEAM_NOT_SET;
+    Object_position_init_clpos(world, OBJ_PTR(item), pos);
+    item->vel = vel;
+    item->acc.x =
+    item->acc.y = 0.0;
+    item->mass = 10.0;
+    item->life = 1500 + rfrac() * 512;
+    item->item_count = num_per_pack;
+    item->pl_range = ITEM_SIZE/2;
+    item->pl_radius = ITEM_SIZE/2;
 
-    world->items[item].num++;
-    Cell_add_object(world, obj);
+    world->items[type].num++;
+    Cell_add_object(world, OBJ_PTR(item));
 }
 
 void Throw_items(player_t *pl)
@@ -962,7 +962,8 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 			continue;
 		}
 		if (shot->type == OBJ_SMART_SHOT) {
-		    if (shot->info != owner_pl->id)
+		    smart = SMART_PTR(shot);
+		    if (smart->smart_info != owner_pl->id)
 			continue;
 		}
 	    } else if ((pl && Team_immune(pl->id, owner_pl->id))
@@ -980,7 +981,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 	    smart = SMART_PTR(shot);
 	    SET_BIT(smart->obj_status, CONFUSED);
 	    smart->ecm_range = range;
-	    smart->count = CONFUSED_TIME;
+	    smart->smart_count = CONFUSED_TIME;
 	    if (pl
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
 		&& (pl->lock.distance <= pl->sensor_range
@@ -1027,14 +1028,14 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 		mine->life = 0;
 		break;
 	    }
-	    mine->count = ((8 * (1 - range)) + 2) * 12;
+	    mine->mine_count = ((8 * (1 - range)) + 2) * 12;
 	    if (!BIT(mine->obj_status, CONFUSED)
 		&& (closest_mine == NULL || range < closest_mine_range)) {
 		closest_mine = mine;
 		closest_mine_range = range;
 	    }
 	    SET_BIT(mine->obj_status, CONFUSED);
-	    if (mine->count <= 0)
+	    if (mine->mine_count <= 0)
 		CLR_BIT(mine->obj_status, CONFUSED);
 	    break;
 	default:
