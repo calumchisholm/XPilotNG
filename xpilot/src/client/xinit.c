@@ -82,8 +82,6 @@ bool			refreshMotd;
 Cursor			pointerControlCursor;
 bool			ignoreWindowManager;
 
-void Raise_window(void);
-
 /*
  * NB!  Is dependent on the order of the items in item.h!
  */
