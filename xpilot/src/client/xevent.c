@@ -27,9 +27,6 @@ char xevent_version[] = VERSION;
 
 
 extern char *talk_fast_msgs[];	/* talk macros */
-#if 0
-extern setup_t		*Setup;
-#endif
 
 static BITV_DECL(keyv, NUM_KEYS);
 
@@ -48,16 +45,14 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	int lo = 0, hi = maxKeyDefs - 1;
 	while (lo < hi) {
 	    i = (lo + hi) >> 1;
-	    if (ks > keyDefs[i].keysym) {
+	    if (ks > keyDefs[i].keysym)
 		lo = i + 1;
-	    } else {
+	    else
 		hi = i;
-	    }
 	}
 	if (lo == hi && ks == keyDefs[lo].keysym) {
-	    while (lo > 0 && ks == keyDefs[lo - 1].keysym) {
+	    while (lo > 0 && ks == keyDefs[lo - 1].keysym)
 		lo--;
-	    }
 	    i = lo;
 	    ret = keyDefs[i].key;
 	    i++;
@@ -80,14 +75,12 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 
 	memset(str, 0, sizeof str);
 	count = XLookupString(&event->xkey, str, 1, &ks, &compose);
-	if (count == NoSymbol) {
+	if (count == NoSymbol)
 	    printf("Unknown keysym: 0x%03lx", ks);
-	}
 	else {
 	    printf("No action bound to keysym 0x%03lx", ks);
-	    if (*str) {
+	    if (*str)
 		printf(", which is key \"%s\"", str);
-	    }
 	}
 	printf("\n");
     }
@@ -131,10 +124,9 @@ static void Talk_set_state(bool on)
 	    initialPointerControl = true;
 	    Pointer_control_set_state(false);
 	}
-	if (selectionAndHistory) {
-	    XSelectInput(dpy, draw, PointerMotionMask | ButtonPressMask
-				    | ButtonReleaseMask);
-	}
+	if (selectionAndHistory)
+	    XSelectInput(dpy, draw, PointerMotionMask
+			 | ButtonPressMask | ButtonReleaseMask);
 	Talk_map_window(true);
     }
     else {
@@ -157,16 +149,17 @@ static void Talk_set_state(bool on)
 	initialPointerControl = true;
 	Pointer_control_set_state(false);
     }
-	wintalkstr = (char*)mfcDoTalkWindow();
-	if (*wintalkstr)
-	    Net_talk(wintalkstr);
+
+    wintalkstr = (char*)mfcDoTalkWindow();
+    if (*wintalkstr)
+	Net_talk(wintalkstr);
 
     if (initialPointerControl) {
 	initialPointerControl = false;
 	Pointer_control_set_state(true);
     }
 
-    scoresChanged = 1;
+    scoresChanged = true;
 }
 #endif
 
@@ -174,9 +167,9 @@ static void Talk_set_state(bool on)
 int Key_init(void)
 {
     if (sizeof(keyv) != KEYBOARD_SIZE) {
-	error ("%s, %d: keyv size %d, KEYBOARD_SIZE is %d",
-	       __FILE__, __LINE__,
-	       sizeof(keyv), KEYBOARD_SIZE);
+	warn("%s, %d: keyv size %d, KEYBOARD_SIZE is %d",
+	     __FILE__, __LINE__,
+	     sizeof(keyv), KEYBOARD_SIZE);
 	exit(1);
     }
     memset(keyv, 0, sizeof keyv);
@@ -192,10 +185,8 @@ int Key_update(void)
 
 bool Key_check_talk_macro(keys_t key)
 {
-    if (key >= KEY_MSG_1 && key < KEY_MSG_1 + TALK_FAST_NR_OF_MSGS) {
-    /* talk macros */
+    if (key >= KEY_MSG_1 && key < KEY_MSG_1 + TALK_FAST_NR_OF_MSGS)
 	Talk_macro(talk_fast_msgs[key - KEY_MSG_1]);
-    }
     return true;
 }
 
@@ -209,9 +200,8 @@ bool Key_press_id_mode(keys_t key)
 
 bool Key_press_autoshield_hack(keys_t key)
 {
-    if (auto_shield && BITV_ISSET(keyv, KEY_SHIELD)) {
+    if (auto_shield && BITV_ISSET(keyv, KEY_SHIELD))
 	BITV_CLR(keyv, KEY_SHIELD);
-    }
     return false;
 }
 
@@ -219,17 +209,16 @@ bool Key_press_shield(keys_t key)
 {
     if (toggle_shield) {
 	shields = !shields;
-	if (shields) {
+	if (shields)
 	    BITV_SET(keyv, key);
-	} else {
+	else
 	    BITV_CLR(keyv, key);
-	}
 	return true;
     }
     else if (auto_shield) {
-	shields = 1;
+	shields = true;
 #if 0
-	shields = 0;
+	shields = false;
 	BITV_CLR(keyv, key);
 	return true;
 #endif
@@ -337,11 +326,10 @@ bool Key_press_show_messages(keys_t key)
 
 bool Key_press_pointer_control(keys_t key)
 {
-    if (version < 0x3202) {
-	error("Cannot use pointer control below version 3.2.3");
-    } else  {
+    if (version < 0x3202)
+	warn("Cannot use pointer control below version 3.2.3");
+    else
         Pointer_control_set_state(!pointerControl);
-    }
     return false;	/* server doesn't need to know */
 }
 
@@ -418,17 +406,14 @@ bool Key_press_select_lose_item(keys_t key)
 {
     if (version < 0x3400) {
         static int before;
-        if (!before++) {
-	    errno = 0;
-	    error("Servers less than 3.4.0 dont know how to drop items");
-	}
+        if (!before++)
+	    warn("Servers less than 3.4.0 dont know how to drop items");
 	return false;
     }
-    if (lose_item_active == 1) {
+    if (lose_item_active == 1)
         lose_item_active = 2;
-    } else {
+    else
 	lose_item_active = 1;
-    }
     return true;
 }
 
@@ -515,9 +500,8 @@ bool Key_press(keys_t key)
 	break;
     }
 
-    if (key < NUM_KEYS) {
+    if (key < NUM_KEYS)
 	BITV_SET(keyv, key);
-    }
 
     return true;
 }
@@ -550,21 +534,18 @@ bool Key_release(keys_t key)
 		!BITV_ISSET(keyv, KEY_FIRE_TORPEDO) &&
 		!BITV_ISSET(keyv, KEY_FIRE_HEAT) &&
 		!BITV_ISSET(keyv, KEY_DROP_MINE) &&
-		!BITV_ISSET(keyv, KEY_DETACH_MINE)
-	    ) {
+		!BITV_ISSET(keyv, KEY_DETACH_MINE))
 		BITV_SET(keyv, KEY_SHIELD);
-	    }
 	}
 	break;
 
     case KEY_SHIELD:
-	if (toggle_shield) {
+	if (toggle_shield)
 	    return false;
-	}
 	else if (auto_shield) {
-	    shields = 0;
+	    shields = false;
 #if 0
-	    shields = 1;
+	    shields = true;
 	    BITV_SET(keyv, key);
 	    return true;
 #endif
@@ -578,22 +559,19 @@ bool Key_release(keys_t key)
 
     case KEY_SELECT_ITEM:
     case KEY_LOSE_ITEM:
-	if (version < 0x3400) {
+	if (version < 0x3400)
 	    return false;
-	}
-	if (lose_item_active == 2) {
+	if (lose_item_active == 2)
 	    lose_item_active = 1;
-	} else {
+	else
 	    lose_item_active = -clientFPS;
-	}
         break;
 
     default:
 	break;
     }
-    if (key < NUM_KEYS) {
+    if (key < NUM_KEYS)
 	BITV_CLR(keyv, key);
-    }
 
     return true;
 }
@@ -616,26 +594,23 @@ void Key_event(XEvent *event)
 	return;
     }
 
-    if ((ks = XLookupKeysym(&event->xkey, 0)) == NoSymbol) {
+    if ((ks = XLookupKeysym(&event->xkey, 0)) == NoSymbol)
 	return;
-    }
 
     for (key = Lookup_key(event, ks, true);
 	 key != KEY_DUMMY;
-	 key = Lookup_key(event, ks, false)) {
-
+	 key = Lookup_key(event, ks, false))
 	change |= (*key_do)(key);
-    }
-    if (change) {
+
+    if (change)
 	Net_key_change();
-    }
 }
 
 void Reset_shields(void)
 {
     if (toggle_shield || auto_shield) {
 	BITV_SET(keyv, KEY_SHIELD);
-	shields = 1;
+	shields = true;
 	if (auto_shield) {
 	    if (BITV_ISSET(keyv, KEY_FIRE_SHOT) ||
 		BITV_ISSET(keyv, KEY_FIRE_LASER) ||
@@ -643,29 +618,26 @@ void Reset_shields(void)
 		BITV_ISSET(keyv, KEY_FIRE_TORPEDO) ||
 		BITV_ISSET(keyv, KEY_FIRE_HEAT) ||
 		BITV_ISSET(keyv, KEY_DROP_MINE) ||
-		BITV_ISSET(keyv, KEY_DETACH_MINE)) {
+		BITV_ISSET(keyv, KEY_DETACH_MINE))
 		BITV_CLR(keyv, KEY_SHIELD);
-	    }
 	}
 	Net_key_change();
     }
 }
 
-void Set_auto_shield(int on)
+void Set_auto_shield(bool on)
 {
     auto_shield = on;
 }
 
-void Set_toggle_shield(int on)
+void Set_toggle_shield(bool on)
 {
     toggle_shield = on;
     if (toggle_shield) {
-	if (auto_shield) {
-	    shields = 1;
-	}
-	else {
-	    shields = (BITV_ISSET(keyv, KEY_SHIELD) != 0);
-	}
+	if (auto_shield)
+	    shields = true;
+	else
+	    shields = (BITV_ISSET(keyv, KEY_SHIELD)) ? true : false;
     }
 }
 
@@ -815,8 +787,7 @@ int win_xevent(XEvent event)
     case 1: queued = QueuedAfterReading; break;
     case 2: queued = QueuedAfterFlush; break;
     default:
-	errno = 0;
-	error("Bad input queue type (%d)", new_input);
+	warn("Bad input queue type (%d)", new_input);
 	return -1;
     }
     n = XEventsQueued(dpy, queued);

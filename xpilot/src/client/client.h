@@ -421,9 +421,6 @@ int Client_input(int);
 void Client_flush(void);
 void Client_sync(void);
 int Client_wrap_mode(void);
-void Reset_shields(void);
-void Set_toggle_shield(int on);
-void Set_auto_shield(int on);
 
 #ifdef XlibSpecificationRelease
 void Key_event(XEvent *event);
