@@ -328,10 +328,6 @@ SOURCE=..\recordfmt.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\shipshape_c.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\sim.c
 # End Source File
 # Begin Source File
@@ -398,6 +394,10 @@ SOURCE=..\xinit.c
 # Begin Source File
 
 SOURCE=..\xinit.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\xpclient.h
 # End Source File
 # Begin Source File
 
@@ -578,10 +578,6 @@ SOURCE=..\..\common\config.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\common\xpconfig.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\common\const.h
 # End Source File
 # Begin Source File
@@ -642,6 +638,10 @@ SOURCE=..\..\common\setup.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\common\shipshape.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\common\socklib.c
 # End Source File
 # Begin Source File
@@ -659,6 +659,10 @@ SOURCE=..\..\common\strlcpy.c
 # Begin Source File
 
 SOURCE=..\..\common\wreckshape.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\common\xpconfig.h
 # End Source File
 # Begin Source File
 
