@@ -765,7 +765,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyDropBall",
-	"d Delete BackSpace",
+	"d Shift_R",
 	KEY_DROP_BALL,
 	"Drop a ball.\n"),
 
@@ -1005,7 +1005,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
         "keyToggleRadarScore",
-        "",
+        "F11",
         KEY_TOGGLE_RADAR_SCORE,
         "Toggles the radar and score windows on and off.\n"),
 
