@@ -560,7 +560,6 @@ struct player {
     DFLOAT	auto_turnresistance_s;	/* when autopilot turned off */
     modifiers	modbank[NUM_MODBANKS];	/* useful modifier settings */
     bool	tractor_is_pressor;	/* on if tractor is pressor */
-/* kps -ng does not want this */    int		shot_max;		/* Maximum number of shots active */
     double	shot_time;		/* Time of last shot fired by player */
     double	laser_time;		/* Time of last laser pulse fired by player */
     bool	did_shoot;		/* Pressed fire during this frame */

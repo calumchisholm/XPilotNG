@@ -735,7 +735,7 @@ static option_desc options[] = {
 	"256",
 	&ShotsMax,
 	valInt,
-	tuner_shotsmax,
+	tuner_dummy,
 	"Maximum allowed bullets per player.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },

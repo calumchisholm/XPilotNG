@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -26,7 +26,6 @@
 #define	TUNER_H
 
 void tuner_plock(void);
-void tuner_shotsmax(void);
 void tuner_shipmass(void);
 void tuner_ballmass(void);
 void tuner_maxrobots(void);

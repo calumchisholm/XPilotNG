@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -38,15 +38,6 @@ extern time_t gameOverTime;
 void tuner_plock(void)
 {
     pLockServer = (plock_server(pLockServer) == 1) ? true : false;
-}
-
-void tuner_shotsmax(void)
-{
-    int i;
-
-    for (i = 0; i < NumPlayers; i++) {
-	Players[i]->shot_max = ShotsMax;
-    }
 }
 
 void tuner_shipmass(void)
