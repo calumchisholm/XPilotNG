@@ -824,14 +824,78 @@ static void Warp_balls(player *pl, clpos dest)
     }
 }
 
+
+static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player *pl)
+{
+    int wh_dest, wcx, wcy, nearestFront, nearestRear;
+    double proximity, proxFront, proxRear;
+
+    if (wh_hit->countdown > 0)
+	return wh_hit->lastdest;
+
+    if (rfrac() < 0.1) {
+	do
+	    wh_dest = (int)(rfrac() * world->NumWormholes);
+	while (world->wormholes[wh_dest].type == WORM_IN
+	       || pl->wormHoleHit == wh_dest
+	       || world->wormholes[wh_dest].temporary);
+	return wh_dest;
+    }
+
+    nearestFront = nearestRear = -1;
+    proxFront = proxRear = 1e20;
+
+    for (wh_dest = 0; wh_dest < world->NumWormholes; wh_dest++) {
+	wormhole_t *wh = Wormholes(world, wh_dest);
+
+	if (wh_dest == pl->wormHoleHit
+	    || wh->type == WORM_IN
+	    || wh->temporary)
+	    continue;
+
+	wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
+	wcy = WRAP_DCY(wh->pos.cy - wh_hit->pos.cy);
+
+	proximity = (pl->vel.y * wcx + pl->vel.x * wcy);
+	proximity = ABS(proximity);
+
+	if (pl->vel.x * wcx + pl->vel.y * wcy < 0) {
+	    if (proximity < proxRear) {
+		nearestRear = wh_dest;
+		proxRear = proximity;
+	    }
+	} else if (proximity < proxFront) {
+	    nearestFront = wh_dest;
+	    proxFront = proximity;
+	}
+    }
+
+#define RANDOM_REAR_WORM 1
+
+    if (! RANDOM_REAR_WORM)
+	wh_dest = nearestFront < 0 ? nearestRear : nearestFront;
+    else {
+	if (nearestFront >= 0)
+	    wh_dest = nearestFront;
+	else {
+	    do
+		wh_dest = (int)(rfrac() * world->NumWormholes);
+	    while (world->wormholes[wh_dest].type == WORM_IN
+		   || wh_dest == pl->wormHoleHit);
+	}
+    }
+
+    return wh_dest;
+}
+
+
 /*
  * Move player trough wormhole.
  */
 static void Traverse_wormhole(player *pl)
 {
     clpos dest;
-    int wh_dest, wcx, wcy, nearestFront, nearestRear;
-    double proximity, proxFront, proxRear;
+    int wh_dest;
     world_t *world = &World;
     wormhole_t *wh_hit = Wormholes(world, pl->wormHoleHit);
 
@@ -839,58 +903,7 @@ static void Traverse_wormhole(player *pl)
     warn("player %s is in Traverse_wormhole", pl->name);
 #endif
 
-    if (wh_hit->countdown > 0)
-	wh_dest = wh_hit->lastdest;
-    else if (rfrac() < 0.1) {
-	do
-	    wh_dest = (int)(rfrac() * world->NumWormholes);
-	while (world->wormholes[wh_dest].type == WORM_IN
-	       || pl->wormHoleHit == wh_dest
-	       || world->wormholes[wh_dest].temporary);
-    } else {
-	nearestFront = nearestRear = -1;
-	proxFront = proxRear = 1e20;
-
-	for (wh_dest = 0; wh_dest < world->NumWormholes; wh_dest++) {
-	    wormhole_t *wh = Wormholes(world, wh_dest);
-
-	    if (wh_dest == pl->wormHoleHit
-		|| wh->type == WORM_IN
-		|| wh->temporary)
-		continue;
-
-	    wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
-	    wcy = WRAP_DCY(wh->pos.cy - wh_hit->pos.cy);
-
-	    proximity = (pl->vel.y * wcx + pl->vel.x * wcy);
-	    proximity = ABS(proximity);
-
-	    if (pl->vel.x * wcx + pl->vel.y * wcy < 0) {
-		if (proximity < proxRear) {
-		    nearestRear = wh_dest;
-		    proxRear = proximity;
-		}
-	    } else if (proximity < proxFront) {
-		nearestFront = wh_dest;
-		proxFront = proximity;
-	    }
-	}
-
-#define RANDOM_REAR_WORM 1
-
-	if (! RANDOM_REAR_WORM)
-	    wh_dest = nearestFront < 0 ? nearestRear : nearestFront;
-	else {
-	    if (nearestFront >= 0)
-		wh_dest = nearestFront;
-	    else {
-		do
-		    wh_dest = (int)(rfrac() * world->NumWormholes);
-		while (world->wormholes[wh_dest].type == WORM_IN
-		       || wh_dest == pl->wormHoleHit);
-	    }
-	}
-    }
+    wh_dest = Find_wormhole_dest(world, wh_hit, pl);
 
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
     dest = world->wormholes[wh_dest].pos;
@@ -919,7 +932,7 @@ static void Traverse_wormhole(player *pl)
 }
 
 /*
- * Hyperjump player after usage of hyperjump.
+ * Player has used hyperjump item.
  */
 static void Hyperjump(player *pl)
 {
@@ -947,7 +960,7 @@ static void Hyperjump(player *pl)
 	return;
     }
 
-    if (counter && options.wormTime)
+    if (options.wormTime)
 	World_add_temporary_wormholes(world, pl->pos, dest);
 
     sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
@@ -955,7 +968,6 @@ static void Hyperjump(player *pl)
     Warp_balls(pl, dest);
 
     Player_position_init_clpos(pl, dest);
-    /* kps - do we want these for hyperjumps ? */
     pl->vel.x *= WORM_BRAKE_FACTOR;
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
