@@ -57,6 +57,8 @@
 #include "datagram.h"
 #include "gfx2d.h"
 #include "gfx3d.h"
+#include "guimap.h"      /* guimap.c depends on X11 */
+#include "guiobjects.h"
 #include "ignore.h"
 #include "netclient.h"
 #include "protoclient.h" /* misc. hacks */

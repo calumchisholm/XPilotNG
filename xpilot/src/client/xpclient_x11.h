@@ -57,8 +57,6 @@
 #include "configure.h"
 #include "dbuff.h"
 #include "default.h"
-#include "guimap.h"
-#include "guiobjects.h"
 #include "paint.h"
 #include "paintdata.h"
 #include "paintmacros.h"
