@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB W32_LIBS SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_WINDOWS_TRUE COND_WINDOWS_FALSE COND_SERVER_ONLY_TRUE COND_SERVER_ONLY_FALSE COND_REPLAY_TRUE COND_REPLAY_FALSE COND_X11_CLIENT_TRUE COND_X11_CLIENT_FALSE COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE SOUND_LIBS COND_SOUND_TRUE COND_SOUND_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB W32_LIBS CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_WINDOWS_TRUE COND_WINDOWS_FALSE COND_SERVER_ONLY_TRUE COND_SERVER_ONLY_FALSE COND_REPLAY_TRUE COND_REPLAY_FALSE COND_X11_CLIENT_TRUE COND_X11_CLIENT_FALSE COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE SOUND_LIBS COND_SOUND_TRUE COND_SOUND_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3538,7 +3538,47 @@ echo "$as_me: error: *** Required library Expat not found!" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-ac_ext=c
+case "$target" in
+    *-*-mingw32*)
+	MATHLIB=""
+	SYS_GL_LIBS="-lopengl32 -lglu32"
+	windows_target=yes
+	;;
+    *-*-beos*)
+	MATHLIB=""
+	SYS_GL_LIBS="-lGL"
+	;;
+    *-*-linux*)
+	MATHLIB="-lm"
+	SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
+	;;
+    *-*-freebsd*)
+	MATHLIB="-lm"
+	SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
+	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include -I/usr/local/include"
+	LDFLAGS="$LDFLAGS -L/usr/local/lib"
+	;;
+    *)
+	MATHLIB="-lm"
+	SYS_GL_LIBS="-lGL -lGLU"
+	;;
+esac
+
+if test x$windows_target = xyes; then
+	W32_LIBS="-lmingw32 -lwsock32"
+
+
+cat >>confdefs.h <<\_ACEOF
+#define _WINDOWS 1
+_ACEOF
+
+
+	enable_newsched=yes
+	enable_sdl_gameloop=yes
+	enable_replay=no
+	enable_x11_client=no
+else
+		ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -4007,7 +4047,7 @@ else
 echo "${ECHO_T}libraries $x_libraries, headers $x_includes" >&6
 fi
 
-if test "$no_x" = yes; then
+	if test "$no_x" = yes; then
   # Not all programs may use this symbol, but it does not hurt to define it.
 
 cat >>confdefs.h <<\_ACEOF
@@ -5161,58 +5201,18 @@ fi
 
 fi
 
-if test x$no_x == xyes; then
-	{ { echo "$as_me:$LINENO: error: *** Couldn't find X headers or libraries!" >&5
+	if test x$no_x == xyes; then
+		{ { echo "$as_me:$LINENO: error: *** Couldn't find X headers or libraries!" >&5
 echo "$as_me: error: *** Couldn't find X headers or libraries!" >&2;}
    { (exit 1); exit 1; }; }
-fi
+	fi
 
-if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then
-	X_EXTENSIONS_LIB="-lXext"
-else
-	X_EXTENSIONS_LIB=
-fi
+		if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then
+		X_EXTENSIONS_LIB="-lXext"
+	else
+		X_EXTENSIONS_LIB=
+	fi
 
-
-case "$target" in
-    *-*-mingw32*)
-	MATHLIB=""
-	SYS_GL_LIBS="-lopengl32 -lglu32"
-	windows_target=yes
-	;;
-    *-*-beos*)
-	MATHLIB=""
-	SYS_GL_LIBS="-lGL"
-	;;
-    *-*-linux*)
-	MATHLIB="-lm"
-	SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
-	;;
-    *-*-freebsd*)
-	MATHLIB="-lm"
-	SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
-	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include -I/usr/local/include"
-	LDFLAGS="$LDFLAGS -L/usr/local/lib"
-	;;
-    *)
-	MATHLIB="-lm"
-	SYS_GL_LIBS="-lGL -lGLU"
-	;;
-esac
-
-if test x$windows_target = xyes; then
-	W32_LIBS="-lmingw32 -lwsock32"
-
-
-cat >>confdefs.h <<\_ACEOF
-#define _WINDOWS 1
-_ACEOF
-
-
-	enable_newsched=yes
-	enable_sdl_gameloop=yes
-	enable_replay=no
-	enable_x11_client=no
 fi
 
 if test x$enable_sdl_gameloop = xyes; then
@@ -9268,13 +9268,13 @@ s,@am__fastdepCC_TRUE@,$am__fastdepCC_TRUE,;t t
 s,@am__fastdepCC_FALSE@,$am__fastdepCC_FALSE,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+s,@W32_LIBS@,$W32_LIBS,;t t
 s,@CPP@,$CPP,;t t
 s,@X_CFLAGS@,$X_CFLAGS,;t t
 s,@X_PRE_LIBS@,$X_PRE_LIBS,;t t
 s,@X_LIBS@,$X_LIBS,;t t
 s,@X_EXTRA_LIBS@,$X_EXTRA_LIBS,;t t
 s,@X_EXTENSIONS_LIB@,$X_EXTENSIONS_LIB,;t t
-s,@W32_LIBS@,$W32_LIBS,;t t
 s,@SDL_CONFIG@,$SDL_CONFIG,;t t
 s,@SDL_CFLAGS@,$SDL_CFLAGS,;t t
 s,@SDL_LIBS@,$SDL_LIBS,;t t

@@ -41,6 +41,7 @@ bin_PROGRAMS = xpilot-ng-sdl$(EXEEXT)
 @COND_SDL_GAMELOOP_TRUE@am__append_1 = gameloop.c
 @COND_SDL_GAMELOOP_FALSE@am__append_2 = gameloop_x.c
 @COND_WINDOWS_TRUE@am__append_3 = win32hacks.c
+@COND_WINDOWS_FALSE@am__append_4 = -lX11
 subdir = src/client/sdl
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in TODO
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -73,8 +74,9 @@ am_xpilot_ng_sdl_OBJECTS = DT_drawtext.$(OBJEXT) SDL_console.$(OBJEXT) \
 	sdlmeta.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3)
 xpilot_ng_sdl_OBJECTS = $(am_xpilot_ng_sdl_OBJECTS)
+am__DEPENDENCIES_1 =
 xpilot_ng_sdl_DEPENDENCIES = $(top_builddir)/src/client/libxpclient.a \
-	$(top_builddir)/src/common/libxpcommon.a
+	$(top_builddir)/src/common/libxpcommon.a $(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -229,7 +231,7 @@ xpilot_ng_sdl_SOURCES = \
 	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c \
 	sdlmeta.h sdlmeta.c sdlinit.h xpclient_sdl.h\
 $(am__append_1) $(am__append_2) $(am__append_3)
-xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11 @SOUND_LIBS@ @W32_LIBS@
+xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ @SOUND_LIBS@ @W32_LIBS@ $(am__append_4)
 EXTRA_DIST = xpilot.rc xpilot_sdl.dsp xpilot_sdl.dsw
 all: all-am
 

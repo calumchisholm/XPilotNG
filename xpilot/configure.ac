@@ -127,20 +127,6 @@ if test x$ac_cv_lib_expat_XML_ParserCreate != xyes; then
 	AC_MSG_ERROR([*** Required library Expat not found!])
 fi
 
-AC_PATH_X
-AC_PATH_XTRA
-if test x$no_x == xyes; then
-	AC_MSG_ERROR([*** Couldn't find X headers or libraries!])
-fi
-
-dnl kps - Hack to link with libXext if DBE or MBX is configured
-if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then
-	X_EXTENSIONS_LIB="-lXext"
-else
-	X_EXTENSIONS_LIB=
-fi
-AC_SUBST(X_EXTENSIONS_LIB)
-
 dnl Figure out which math library to use
 dnl (borrowed from from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz)
 case "$target" in
@@ -178,6 +164,21 @@ if test x$windows_target = xyes; then
 	enable_sdl_gameloop=yes
 	enable_replay=no
 	enable_x11_client=no
+else
+	dnl marvin - Don't check for X11 headers and libraries if compiling for windows
+	AC_PATH_X
+	AC_PATH_XTRA
+	if test x$no_x == xyes; then
+		AC_MSG_ERROR([*** Couldn't find X headers or libraries!])
+	fi
+
+	dnl kps - Hack to link with libXext if DBE or MBX is configured
+	if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then
+		X_EXTENSIONS_LIB="-lXext"
+	else
+		X_EXTENSIONS_LIB=
+	fi
+	AC_SUBST(X_EXTENSIONS_LIB)
 fi
 
 if test x$enable_sdl_gameloop = xyes; then
