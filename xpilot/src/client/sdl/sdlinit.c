@@ -73,14 +73,11 @@ int Init_playing_windows(void)
 
 int Init_window(void)
 {
-    char defaultfont[] = CONF_FONTDIR "defaultfont.bmp"; /* TODO make bmp fonts work */
-    char testfont[] = CONF_FONTDIR "Test.ttf";
+    char gamefontname[] = CONF_FONTDIR "Test.ttf";
     int gamefontsize = 12;
     int messagefontsize = 16;
     int mapfontsize = 12;
     int value;
-    /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
-
 
     if (TTF_Init()) {
     	error("SDL_ttf initialization failed: %s", SDL_GetError());
@@ -153,20 +150,17 @@ int Init_window(void)
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
 
-    if (fontinit(&gamefont,testfont,gamefontsize)) {
-    	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
-	if (fontinit(&gamefont,defaultfont,gamefontsize))
-	    error("Default font failed! gamefont not available!");
+    if (fontinit(&gamefont,gamefontname,gamefontsize)) {
+    	error("Font initialization failed with %s", gamefontname);
+	return -1;
     }
-    if (fontinit(&messagefont,testfont,messagefontsize)) {
-    	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
-	if (fontinit(&gamefont,defaultfont,messagefontsize))
-	    error("Default font failed! messagefont not available!");
+    if (fontinit(&messagefont,gamefontname,messagefontsize)) {
+    	error("Font initialization failed with %s", gamefontname);
+	return -1;
     }
-    if (fontinit(&mapfont,testfont,mapfontsize)) {
-    	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
-	if (fontinit(&mapfont,defaultfont,mapfontsize))
-	    error("Default font failed! messagefont not available!");
+    if (fontinit(&mapfont,gamefontname,mapfontsize)) {
+    	error("Font initialization failed with %s", gamefontname);
+	return -1;
     }
     return 0;
 }
