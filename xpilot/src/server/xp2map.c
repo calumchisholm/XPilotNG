@@ -253,7 +253,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	cannon = Map_place_cannon(cx, cy, dir, team);
-	P_start_cannon(team, cannon);
+	P_start_cannon(cannon);
 	return;
     }
 
@@ -271,7 +271,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	targ = Map_place_target(cx, cy, team);
-	P_start_target(team, targ);
+	P_start_target(targ);
 	return;
     }
 

@@ -233,12 +233,12 @@ void P_end_balltarget(void)
     current_group = 0;
 }
 
-int P_start_target(int team, target_t *targ)
+int P_start_target(target_t *targ)
 {
     current_group = ++num_groups;
     Check_groupcount();
     groups[current_group].type = TARGET;
-    groups[current_group].team = team;
+    groups[current_group].team = targ->team;
     groups[current_group].hitmask = Target_hitmask(targ);
     groups[current_group].hitfunc = NULL;
     groups[current_group].mapobj = targ;
@@ -251,12 +251,12 @@ void P_end_target(void)
     current_group = 0;
 }
 
-int P_start_cannon(int team, cannon_t *cannon)
+int P_start_cannon(cannon_t *cannon)
 {
     current_group = ++num_groups;
     Check_groupcount();
     groups[current_group].type = CANNON;
-    groups[current_group].team = team;
+    groups[current_group].team = cannon->team;
     groups[current_group].hitmask = Cannon_hitmask(cannon);
     groups[current_group].hitfunc = Cannon_hitfunc;
     groups[current_group].mapobj = cannon;
@@ -369,9 +369,8 @@ void P_grouphack(int type, void (*f)(void *))
 
 void P_set_hitmask(int group, int hitmask)
 {
-    if (group < 0 || group > num_groups) {
-	xpprintf("P_set_hitmask: BUG: group out of range.\n");
-	return;
-    }
+    /*warn("group = %d", group);*/
+    assert(group >= 0);
+    assert(group <= num_groups);
     groups[group].hitmask = hitmask;
 }

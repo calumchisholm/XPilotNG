@@ -698,7 +698,7 @@ static void Xpmap_target_to_polygon(target_t *targ)
     cy = targ->pos.cy;
 
     /* create target polygon */
-    P_start_target(targ->team, targ);
+    P_start_target(targ);
     Xpmap_block_polygon(cx, cy, ps, es);
     P_end_target();
 }
@@ -760,7 +760,7 @@ static void Xpmap_cannon_to_polygon(cannon_t *cannon)
     ps = P_get_poly_id("cannon_ps");
     es = P_get_edge_id("cannon_es");
 
-    P_start_cannon(cannon->team, cannon);
+    P_start_cannon(cannon);
     Xpmap_cannon_polygon(cannon, ps, es);
     P_end_cannon();
 }
