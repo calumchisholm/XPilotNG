@@ -1500,7 +1500,6 @@ void Paint_messages(void)
 	}
 	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
 	len = MIN(msg->len, len);
-	xpprintf("%s %i\n",msg->txt,len);
 	/*
 	 * it's an emphasized talk message
 	 */
