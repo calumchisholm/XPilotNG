@@ -1292,6 +1292,13 @@ static void store_short(char **ptr, int i)
 }
 
 
+static void store_32bit(char **ptr, int i)
+{
+    store_short(ptr, i >> 16);
+    store_short(ptr, i & 0xffff);
+}
+
+
 int Polys_to_client(char *ptr)
 {
     int i, j, startx, starty, dx, dy, group, hid;
@@ -1355,6 +1362,30 @@ int Polys_to_client(char *ptr)
 	if (hackused)
 	    for (i = 0; i < polyc; i++)
 		*ptr++ = hack[i];
+    }
+    {
+	*ptr++ = num_pstyles;
+	*ptr++ = num_estyles;
+	*ptr++ = num_bstyles;
+	for (i = 0; i < num_pstyles; i++) {
+	    store_32bit(&ptr, pstyles[i].color);
+	    *ptr++ = pstyles[i].texture_id;
+	    *ptr++ = pstyles[i].defedge_id;
+	    *ptr++ = pstyles[i].flags;
+	}
+	for (i = 0; i < num_estyles; i++) {
+	    *ptr++ = estyles[i].width;
+	    store_32bit(&ptr, estyles[i].color);
+	    *ptr++ = estyles[i].style;
+	}
+	for (i = 0; i < num_bstyles; i++) {
+	    strcpy(ptr, bstyles[i].filename);
+	    ptr += strlen(ptr) + 1;
+	    *ptr++ = bstyles[i].flags;
+	}
+	for (i = 0; i < polyc; i++) {
+	    *ptr++ = pdata[i].style;
+	}
     }
     return ptr - start;
 }

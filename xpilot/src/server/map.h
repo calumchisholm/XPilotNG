@@ -225,4 +225,35 @@ typedef struct {
     item_concentrator_t	*itemConcentrators;
 } World_map;
 
+struct polystyle {
+    char id[100];
+    int color;
+    int texture_id;
+    int defedge_id;
+    int flags;
+};
+
+struct edgestyle {
+    char id[100];
+    int width;
+    int color;
+    int style;
+};
+
+struct bmpstyle {
+    char id[100];
+    char filename[30];
+    int flags;
+};
+
+struct polydata {
+    int style;
+};
+
+extern struct polystyle pstyles[256];
+extern struct edgestyle estyles[256];
+extern struct bmpstyle  bstyles[256];
+extern struct polydata  pdata[1000];
+
+extern int num_pstyles, num_estyles, num_bstyles;
 #endif

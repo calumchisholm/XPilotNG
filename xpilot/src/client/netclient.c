@@ -292,6 +292,14 @@ static unsigned int get_ushort(char **ptr)
     return ((unsigned char)*(*ptr - 2) << 8) + (unsigned char)*(*ptr - 1);
 }
 
+static int get_32bit(char **ptr)
+{
+    int res;
+
+    res = get_ushort(ptr) << 16;
+    return res + get_ushort(ptr);
+}
+
 
 static void Create_polygon_styles_for_testing ()
 {
@@ -316,7 +324,7 @@ static void Create_polygon_styles_for_testing ()
         polygon_styles[2 + i].visible_in_radar = true;
         polygon_styles[2 + i].method = TEXTURED;
         polygon_styles[2 + i].def_edge_style = (i < 6) ? 0 : 1;
-        polygon_styles[2 + i].texture = 
+        polygon_styles[2 + i].texture =
             Bitmap_add(textureNames[i], 1, true);
     }
 }
@@ -508,9 +516,9 @@ int Net_setup(void)
         polygon_styles[0].visible_in_radar = true;
         polygon_styles[0].method = NOFILL;
         polygon_styles[0].def_edge_style = 0;
-        
+
         /* hidden polygon style */
-        polygon_styles[1].visible = false;        
+        polygon_styles[1].visible = false;
 
 	polyc = get_ushort(&ptr);
 	for (i = 0; i < polyc; i++) {
@@ -662,6 +670,61 @@ int Net_setup(void)
                     polygons[i].style = sid;
                 }
             }
+	}
+	{
+	    struct polystyle {
+		int color;
+		int texture_id;
+		int defedge_id;
+		int flags;
+	    };
+
+	    struct edgestyle {
+		int width;
+		int color;
+		int style;
+	    };
+
+	    struct bmpstyle {
+		char filename[30];
+		int flags;
+	    };
+
+	    struct polydata {
+		int style;
+	    };
+
+	    struct polystyle pstyles[256];
+	    struct edgestyle estyles[256];
+	    struct bmpstyle  bstyles[256];
+	    struct polydata  pdata[1000];
+
+	    int num_pstyles, num_estyles, num_bstyles;
+
+	    num_pstyles = *ptr++;
+	    num_estyles = *ptr++;
+	    num_bstyles = *ptr++;
+	    for (i = 0; i < num_pstyles; i++) {
+		pstyles[i].color = get_32bit(&ptr);
+		pstyles[i].texture_id = *ptr++;
+		pstyles[i].defedge_id = *ptr++;
+		pstyles[i].flags = *ptr++;
+	    }
+	    for (i = 0; i < num_estyles; i++) {
+		estyles[i].width = *ptr++;
+		estyles[i].color = get_32bit(&ptr);
+		estyles[i].style = *ptr++;
+	    }
+	    for (i = 0; i < num_bstyles; i++) {
+		strncpy(bstyles[i].filename, ptr,
+			sizeof(bstyles[0].filename - 1));
+		bstyles[i].filename[sizeof(bstyles[0].filename) - 1] = 0;
+		ptr += strlen(bstyles[i].filename) + 1;
+		bstyles[i].flags = *ptr++;
+	    }
+	    for (i = 0; i < polyc; i++) {
+		pdata[i].style = *ptr++;
+	    }
 	}
     }
 

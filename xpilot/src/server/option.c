@@ -187,9 +187,118 @@ char *mapd;
 int hack[1000];
 int hackused;
 
+struct polystyle pstyles[256];
+struct edgestyle estyles[256];
+struct bmpstyle  bstyles[256];
+struct polydata  pdata[1000];
+
+int num_pstyles, num_estyles, num_bstyles;
+
+
+static int get_bmp_id(const char *s)
+{
+    int i;
+
+    for (i = 0; i < num_bstyles; i++)
+	if (!strcmp(bstyles[i].id, s))
+	    return i;
+    error("Undeclared bmpstyle %s", s);
+    return 0;
+}
+
+
+static int get_edge_id(const char *s)
+{
+    int i;
+
+    for (i = 0; i < num_estyles; i++)
+	if (!strcmp(estyles[i].id, s))
+	    return i;
+    error("Undeclared edgestyle %s", s);
+    return 0;
+}
+
+
+static int get_poly_id(const char *s)
+{
+    int i;
+
+    for (i = 0; i < num_pstyles; i++)
+	if (!strcmp(estyles[i].id, s))
+	    return i;
+    error("Undeclared polystyle %s", s);
+    return 0;
+}
+
+
 static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
+
+    if (!strcasecmp(el, "polystyle")) {
+	pstyles[num_pstyles].id[sizeof(pstyles[0].id) - 1] = 0;
+	pstyles[num_pstyles].color = 0;
+	pstyles[num_pstyles].texture_id = 0;
+	pstyles[num_pstyles].defedge_id = 0;
+	pstyles[num_pstyles].flags = 0;
+
+	while (*attr) {
+	    if (!strcasecmp(*attr, "id"))
+		strncpy(pstyles[num_pstyles].id, *(attr + 1),
+			sizeof(pstyles[0].id - 1));
+	    if (!strcasecmp(*attr, "color"))
+		pstyles[num_pstyles].color = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "texture"))
+		pstyles[num_pstyles].texture_id = get_bmp_id(*(attr + 1));
+	    if (!strcasecmp(*attr, "defedge"))
+		pstyles[num_pstyles].defedge_id = get_edge_id(*(attr + 1));
+	    if (!strcasecmp(*attr, "flags"))
+		pstyles[num_pstyles].flags = atoi(*(attr + 1)); /* names @!# */
+	    attr += 2;
+	}
+	num_pstyles++;
+    }
+
+    if (!strcasecmp(el, "edgestyle")) {
+	estyles[num_estyles].id[sizeof(estyles[0].id) - 1] = 0;
+	estyles[num_estyles].width = 0;
+	estyles[num_estyles].color = 0;
+	estyles[num_estyles].style = 0;
+	while (*attr) {
+	    if (!strcasecmp(*attr, "id"))
+		strncpy(estyles[num_estyles].id, *(attr + 1),
+			sizeof(estyles[0].id) - 1);
+	    if (!strcasecmp(*attr, "width"))
+		estyles[num_estyles].width = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "color"))
+		estyles[num_estyles].width = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "style")) /* !@# names later */
+		estyles[num_estyles].width = atoi(*(attr + 1));
+	    attr += 2;
+	}
+	num_estyles++;
+    }
+
+    if (!strcasecmp(el, "bmpstyle")) {
+	bstyles[num_bstyles].flags = 0;
+	bstyles[num_bstyles].filename[sizeof(bstyles[0].filename) - 1] = 0;
+	bstyles[num_bstyles].id[sizeof(bstyles[0].id) - 1] = 0;
+/* add checks that these are filled !@# */
+
+	while (*attr) {
+	    if (!strcasecmp(*attr, "id"))
+		strncpy(bstyles[num_bstyles].id, *(attr + 1),
+			sizeof(bstyles[0].id) - 1);
+	    if (!strcasecmp(*attr, "filename"))
+		strncpy(bstyles[num_bstyles].id, *(attr + 1),
+			sizeof(bstyles[0].filename) - 1);
+	    if (!strcasecmp(*attr, "scalable"))
+		if (!strcasecmp(*(attr + 1), "yes"))
+		    bstyles[num_bstyles].flags |= 1;
+	    attr += 2;
+	}
+	num_bstyles++;
+    }
 
     if (!strcasecmp(el, "XXX")) {/* temporary !@# */
 	hack[polyc - 1] = atoi(*(attr + 1));
@@ -202,6 +311,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	else
 	    scale = atof(*(attr + 1));
     }
+
     if (!strcasecmp(el, "BallArea")) {
 	int team;
 	groupc++;
@@ -209,6 +319,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	groups[groupc].team = team;
 	groups[groupc].hit_mask = BALL_BIT;
     }
+
     if (!strcasecmp(el, "BallTarget")) {
 	int team;
 	while (*attr) {
@@ -232,6 +343,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 		y = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "hidedges"))
 		hidcount = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "style"))
+		pdata[polyc].style = get_poly_id(*(attr + 1));
 	    attr += 2;
 	}
 	polyc++;
@@ -426,6 +539,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	addOption(name, value, 0, NULL);
 	return;
     }
+
     if (!strcmp(el, "Offset")) {
 	int x, y, hidden = 0;
 	while (*attr) {
