@@ -171,7 +171,7 @@ target_vendor = @target_vendor@
 @COND_SOUND_FALSE@MAYBE_SOUND = 
 @COND_SOUND_TRUE@MAYBE_SOUND = sound
 SUBDIRS = fonts maps textures $(MAYBE_SOUND)
-pkgdata_DATA = defaults.txt password.txt robots.txt
+pkgdata_DATA = defaults.txt password.txt robots.txt shipshapes.txt
 EXTRA_DIST = $(pkgdata_DATA)
 all: all-recursive
 

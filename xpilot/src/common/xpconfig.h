@@ -92,12 +92,13 @@
 #  define CONF_SOUNDFILE	  	CONF_SOUNDDIR "sounds.txt"
 #endif
 
+#ifndef CONF_SHIP_FILE
+#  define CONF_SHIP_FILE		CONF_DATADIR "shipshapes.txt"
+#endif
+
+
 
 #ifndef _WINDOWS
-
-#  ifndef CONF_SHIP_FILE
-#    define CONF_SHIP_FILE       	""
-#  endif
 
 #  ifdef DEBUG
 #    define D(x)	x ;  fflush(stdout);
@@ -106,10 +107,6 @@
 #  endif
 
 #else /* _WINDOWS */
-
-#  ifndef CONF_SHIP_FILE
-#    define CONF_SHIP_FILE		"XPilot.shp"
-#  endif
 
 #  ifdef _DEBUG
 #    define DEBUG	1
