@@ -163,9 +163,14 @@ typedef struct {
 
 #define NOT_CONNECTED		(-1)
 
+/*
+ * Hitmasks are 32 bits.
+ */
+#define ALL_BITS		0xffffffff
 #define BALL_BIT		(1 << 11)
 #define NONBALL_BIT		(1 << 12)
 #define NOTEAM_BIT		(1 << 10)
+#define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1 << (team))
 
 /*
  * Object position is non-modifiable, except at one place.

@@ -319,8 +319,6 @@ extern struct bmpstyle  bstyles[256];
 extern poly_t *pdata;
 extern int *estyleptr;
 extern struct group groups[];
-#define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1 << (team))
-
 extern int num_pstyles, num_estyles, num_bstyles;
 
 #endif
