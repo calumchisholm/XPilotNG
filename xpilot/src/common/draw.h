@@ -183,16 +183,47 @@ position Ship_get_m_rack_position(shipshape_t *ship, int rack, int dir);
 
 #ifdef SERVER
 
-#define Ship_get_point_clpos(s, i, d)   (Ship_get_point(s, i, d).clk)
-#define Ship_get_engine_clpos(s, d)     (Ship_get_engine(s, d).clk)
-#define Ship_get_m_gun_clpos(s, d)      (Ship_get_m_gun(s, d).clk)
-#define Ship_get_l_gun_clpos(s, g, d)   (Ship_get_l_gun(s, g, d).clk)
-#define Ship_get_r_gun_clpos(s, g, d)   (Ship_get_r_gun(s, g, d).clk)
-#define Ship_get_l_rgun_clpos(s, g, d)  (Ship_get_l_rgun(s, g, d).clk)
-#define Ship_get_r_rgun_clpos(s, g, d)  (Ship_get_r_rgun(s, g, d).clk)
-#define Ship_get_l_light_clpos(s, l, d) (Ship_get_l_light(s, l, d).clk)
-#define Ship_get_r_light_clpos(s, l, d) (Ship_get_r_light(s, l, d).clk)
-#define Ship_get_m_rack_clpos(s, r, d)  (Ship_get_m_rack(s, r, d).clk)
+static inline clpos Ship_get_point_clpos(shipshape_t *ship, int i, int dir)
+{
+    return Ship_get_point(ship, i, dir).clk;
+}
+
+static inline clpos Ship_get_engine_clpos(shipshape_t *ship, int dir)
+{
+    return Ship_get_engine(ship, dir).clk;
+}
+static inline clpos Ship_get_m_gun_clpos(shipshape_t *ship, int dir)
+{
+    return Ship_get_m_gun(ship, dir).clk;
+}
+static inline clpos Ship_get_l_gun_clpos(shipshape_t *ship, int gun, int dir)
+{
+    return Ship_get_l_gun(ship, gun, dir).clk;
+}
+static inline clpos Ship_get_r_gun_clpos(shipshape_t *ship, int gun, int dir)
+{
+    return Ship_get_r_gun(ship, gun, dir).clk;
+}
+static inline clpos Ship_get_l_rgun_clpos(shipshape_t *ship, int gun, int dir)
+{
+    return Ship_get_l_rgun(ship, gun, dir).clk;
+}
+static inline clpos Ship_get_r_rgun_clpos(shipshape_t *ship, int gun, int dir)
+{
+    return Ship_get_r_rgun(ship, gun, dir).clk;
+}
+static inline clpos Ship_get_l_light_clpos(shipshape_t *ship, int l, int dir)
+{
+    return Ship_get_l_light(ship, l, dir).clk;
+}
+static inline clpos Ship_get_r_light_clpos(shipshape_t *ship, int l, int dir)
+{
+    return Ship_get_r_light(ship, l, dir).clk;
+}
+static inline clpos Ship_get_m_rack_clpos(shipshape_t *ship, int rack, int dir)
+{
+    return Ship_get_m_rack(ship, rack, dir).clk;
+}
 
 #endif
 
