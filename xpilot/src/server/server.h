@@ -298,6 +298,7 @@ extern struct options {
     bool	targetTeamCollision;
     bool	treasureKillTeam;
     bool	captureTheFlag;
+    int		specialBallTeam;
     bool	treasureCollisionDestroys;
     bool	treasureCollisionMayKill;
     bool	wreckageCollisionMayKill;

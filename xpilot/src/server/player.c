@@ -262,10 +262,8 @@ void Compute_sensor_range(player_t *pl)
 
     pl->sensor_range = pl->fuel.sum * EnergyRangeFactor;
     pl->sensor_range *= (1.0 + ((double)pl->item[ITEM_SENSOR] * 0.25));
-    if (pl->sensor_range < options.minVisibilityDistance)
-	pl->sensor_range = options.minVisibilityDistance;
-    if (pl->sensor_range > options.maxVisibilityDistance)
-	pl->sensor_range = options.maxVisibilityDistance;
+    LIMIT(pl->sensor_range,
+	  options.minVisibilityDistance, options.maxVisibilityDistance);
 }
 
 /*
@@ -1460,8 +1458,8 @@ void Compute_game_status(world_t *world)
 	    int teams_with_treasure = 0, team_win[MAX_TEAMS];
 	    double team_score[MAX_TEAMS], max_score = 0;
 	    int winners, max_destroyed = 0, max_left = 0;
-	    team_t *team_ptr;
-
+	    team_t *team_ptr, *specialballteam_ptr;
+	    bool no_special_balls_present = false;
 	    /*
 	     * Game is not over if more than one team which have treasures
 	     * still have one remaining in play.  Note that it is possible
@@ -1471,17 +1469,25 @@ void Compute_game_status(world_t *world)
 	     */
 	    for (i = 0; i < MAX_TEAMS; i++) {
 		team_score[i] = 0;
-		if (team_state[i] != TeamAlive) {
+		if ((team_state[i] != TeamAlive) && (i != options.specialBallTeam)) {
 		    team_win[i] = 0;
 		    continue;
 		}
+
 		team_win[i] = 1;
 		team_ptr = &(world->teams[i]);
+		specialballteam_ptr = Teams(world, options.specialBallTeam);
+		
+		if (options.specialBallTeam < 0 || options.specialBallTeam >=MAX_TEAMS ||
+		    specialballteam_ptr->NumTreasures == 0)
+		  no_special_balls_present = true;
+		
 		if (team_ptr->TreasuresDestroyed > max_destroyed)
-		    max_destroyed = team_ptr->TreasuresDestroyed;
+		  max_destroyed = team_ptr->TreasuresDestroyed;
 		if ((team_ptr->TreasuresLeft > 0) ||
-		    (team_ptr->NumTreasures == team_ptr->NumEmptyTreasures))
-		    teams_with_treasure++;
+		    ((team_ptr->NumTreasures == team_ptr->NumEmptyTreasures) &&
+		     no_special_balls_present))
+		  teams_with_treasure++;
 	    }
 
 	    /*

@@ -1299,6 +1299,17 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"specialBallTeam",
+	"specialBall",
+	"-1",
+	&options.specialBallTeam,
+	valInt,
+	tuner_dummy,
+	"Balls that belong to this team are 'special' balls that score\n"
+	"against all other teams.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"treasureCollisionDestroys",
 	"treasureCollisionDestroy",
 	"yes",

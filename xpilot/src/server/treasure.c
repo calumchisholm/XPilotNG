@@ -197,6 +197,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
     player_t *owner;
     treasure_t *td;
     world_t *world = &World;
+    int i;
 
     /*
      * Player already quit ?
@@ -212,11 +213,11 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 	return;
 
     td = ball->treasure;
-    if (td->team == gp->team) {
+    owner = Player_by_id(ball->owner);
+    if (td->team == gp->team && td->team == owner->team) {
 	Ball_is_replaced(ball);
 	return;
     }
-    owner = Player_by_id(ball->owner);
     if (gp->team == owner->team) {
 	treasure_t *tt = Treasures(world, gp->mapobj_ind);
 
@@ -229,6 +230,49 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 	    CLR_BIT(ball->status, RECREATE);
 	return;
     }
+
+    /* {KS} mods for team 'options.specialBallTeam' treasures start here*/
+    /* Ball and box have to be in 'specialBallTeam'. If such a ball     */
+    /* is scored by any player, it counts as if he had scored one ball */
+    /* against every single opponent team */
+    /* This means that (nonlinear scoring) the first team is punished */
+    /* slightly more then the last team in the loop - fix for that?*/
+
+    /* gp->team: team of treasure box     td->team: team of ball */
+    if (gp->team == options.specialBallTeam  && 
+	td->team == options.specialBallTeam ) {
+      int opponent_teams = 0; 
+      Ball_is_destroyed(ball);
+      
+      for (i = 0; i < MAX_TEAMS; i++) {
+
+	if(world->teams[i].NumMembers == 0 || i == owner->team)
+	  continue;
+	opponent_teams++;
+	td->team=i; /* give ball to team that has to be punished*/
+	if (Punish_team(owner, td, ball->pos)) 
+	  {
+	    CLR_BIT(ball->status, RECREATE);
+	    /*undo treasure counts from Punish_team so we don't 
+	      have to touch that function and possibly break it*/
+	    world->teams[owner->team].TreasuresDestroyed--;
+	    world->teams[td->team].TreasuresLeft++;
+	  }
+      }
+      td->team=options.specialBallTeam;
+      world->teams[options.specialBallTeam].TreasuresLeft--;
+      world->teams[owner->team].TreasuresDestroyed++;
+      world->teams[options.specialBallTeam].TreasuresDestroyed++;
+
+      if(!opponent_teams){
+	SET_BIT(ball->status, RECREATE);
+	world->teams[options.specialBallTeam].TreasuresLeft++;
+	if (Punish_team(owner, td, ball->pos));
+      }
+      return;
+    }
+
+   /* {KS} mods for special treasures stop here*/
 }
 
 /*
@@ -273,7 +317,8 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 	 * the ball and the target are of the same team, but the
 	 * owner is not.
 	 */
-	if (ball->treasure->team == gp->team
+	if (ball->treasure->team != options.specialBallTeam 
+	    && ball->treasure->team == gp->team
 	    && Player_by_id(ball->owner)->team != gp->team)
 	    return false;
 	return true;
