@@ -1236,7 +1236,7 @@ void Set_message(const char *fmt, ...)
     player_t *pl;
     int i;
     size_t len;
-    char msg[2 * MSG_LEN];
+    static char msg[2 * MSG_LEN];
     va_list ap;
 
     va_start(ap, fmt);
@@ -1267,7 +1267,7 @@ void Set_message(const char *fmt, ...)
 void Set_player_message(player_t *pl, const char *fmt, ...)
 {
     size_t len;
-    char msg[2 * MSG_LEN];
+    static char msg[2 * MSG_LEN];
     va_list ap;
 
     if (rplayback && !playback && pl->rectype != 2)

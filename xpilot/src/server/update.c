@@ -38,8 +38,6 @@ int	roundtime = -1;		/* time left this round */
 static double time_to_update = 1;	/* time before less frequent updates */
 static bool do_update_this_frame = false; /* less frequent update this frame */
 
-static char msg[MSG_LEN];
-
 static inline void update_object_speed(world_t *world, object_t *obj)
 {
     if (BIT(obj->status, GRAVITY)) {
@@ -798,7 +796,8 @@ static void Update_players(world_t *world)
 	    pl->damaged = 0;
 
 	if (pl->flooding > FPS + 2) {
-	    sprintf(msg, "%s was kicked out because of flooding.", pl->name);
+	    Set_message("%s was kicked out because of flooding. "
+			"[*Server notice*]", pl->name);
 	    Destroy_connection(pl->conn, "flooding");
 	    i--;
 	    continue;
@@ -851,8 +850,7 @@ static void Update_players(world_t *world)
 		    Score(pl, -sc, pl->pos, "Self-Destruct");
 		}
 		SET_BIT(pl->status, KILLED);
-		sprintf(msg, "%s has committed suicide.", pl->name);
-		Set_message(msg);
+		Set_message("%s has committed suicide.", pl->name);
 		Throw_items(pl);
 		Kill_player(pl, true);
 		updateScores = true;
@@ -1078,9 +1076,8 @@ void Update_objects(world_t *world)
 	    if (Player_is_human(pl)
 		&& options.maxPauseTime > 0
 		&& pl->pauseTime > options.maxPauseTime) {
-		sprintf(msg, "%s was auto-kicked for pausing too long "
-			"[*Server notice*]", pl->name);
-		Set_message(msg);
+		Set_message("%s was auto-kicked for pausing too long. "
+			    "[*Server notice*]", pl->name);
 		Destroy_connection(pl->conn, "auto-kicked: paused too long");
 	    }
 	}
@@ -1093,8 +1090,8 @@ void Update_objects(world_t *world)
 		&& options.maxIdleTime > 0
 		&& pl->idleTime > options.maxIdleTime
 		&& (NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
-		sprintf(msg, "%s was paused for idling.", pl->name);
-		Set_message(msg);
+		Set_message("%s was paused for idling. "
+			    "[*Server notice*]", pl->name);
 		Pause_player(pl, true);
 	    }
 	}
@@ -1122,11 +1119,9 @@ void Update_objects(world_t *world)
 	int oldtag = tagItPlayerId;
 
 	Check_tag();
-	if (tagItPlayerId != oldtag && tagItPlayerId != NO_ID) {
-	    sprintf(msg, " < %s is 'it' now. >",
-		    Player_by_id(tagItPlayerId)->name);
-	    Set_message(msg);
-	}
+	if (tagItPlayerId != oldtag && tagItPlayerId != NO_ID)
+	    Set_message(" < %s is 'it' now. >",
+			Player_by_id(tagItPlayerId)->name);
     }
 
     /*
