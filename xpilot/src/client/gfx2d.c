@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -109,13 +109,11 @@ static int Picture_find_path(const char *filename, char *path, size_t path_size)
 	    }
 	    if (len > 0 && len + strlen(filename) + 1 < path_size) {
 		memcpy(path, dir, len);
-		if (path[len - 1] != PATHNAME_SEP) {
+		if (path[len - 1] != PATHNAME_SEP)
 		    path[len++] = PATHNAME_SEP;
-		}
 		strlcpy(&path[len], filename, path_size - len);
-		if (access(path, 4) == 0) {
+		if (access(path, 4) == 0)
 		    return true;
-		}
 	    }
 	}
     }
@@ -150,9 +148,8 @@ static int Picture_getc(FILE *f)
  */
 static int Picture_skip_whitespace(FILE *f, int c)
 {
-    if (!isspace(c)) {
+    if (!isspace(c))
 	return EOF;
-    }
     do {
 	c = Picture_getc(f);
     } while (isspace(c));
@@ -168,16 +165,15 @@ static int Picture_skip_whitespace(FILE *f, int c)
 static int Picture_get_decimal(FILE *f, int c, int *dec)
 {
     *dec = 0;
-    for (; isdigit(c); c = Picture_getc(f)) {
+    for (; isdigit(c); c = Picture_getc(f))
 	*dec = (10 * *dec) + (c - '0');
-    }
     return c;
 }
 
-/* 
+/*
     Purpose: load images in to the xp_picture structure.
-    format is only binary PPM's at the moment. 
-    More error handling and a better understanding of the PPM standard 
+    format is only binary PPM's at the moment.
+    More error handling and a better understanding of the PPM standard
     would be good. But suffices for a proof of concept.
 
     return 0 on success.
@@ -312,23 +308,22 @@ int Picture_rotate(xp_picture_t *picture)
 }
 
 /*
-    Purpose: set the color value of a 1x1 pixel, 
+    Purpose: set the color value of a 1x1 pixel,
     This is a convenient wrapper for the data array.
 */
-void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y, 
+void Picture_set_pixel(xp_picture_t *picture, int image, int x, int y,
 		       RGB_COLOR color)
 {
     if (x < 0 || y < 0 || x>= picture->width || y>= picture->height) {
 	/* this might be an error, but it can be a convenience to allow the
 	function to be called with indexes out of range, so i won't introduce
 	error handling here */
-    } else {
+    } else
 	picture->data[image][x + y * picture->width] = color;
-    }
 }
 
 /*
-    Purpose: get the color value of a 1x1 pixel, 
+    Purpose: get the color value of a 1x1 pixel,
     This is a wrapper for looking up in the data array.
 */
 RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
@@ -340,10 +335,9 @@ RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
 	function to be called with indexes out of range, so i won't introduce
 	error handling here. Return value is defaulted to black.
 	There is already code that relies on this behavior */
-	
-    } else {
+
+    } else
 	return picture->data[image][x + y * picture->width];
-    }
 }
 
 /*
@@ -352,10 +346,10 @@ RGB_COLOR Picture_get_pixel(const xp_picture_t *picture, int image,
 */
 static RGB_COLOR Picture_get_pixel_avg(
 	const xp_picture_t	*picture,
-	int			image, 
+	int			image,
 	double			x,
 	double			y)
-{    
+{
     int		r_x, r_y;
     double	frac_x, frac_y;
     int		i;
@@ -373,16 +367,16 @@ static RGB_COLOR Picture_get_pixel_avg(
     c[1] = Picture_get_pixel(picture, image, r_x + 1, r_y);
     c[2] = Picture_get_pixel(picture, image, r_x, r_y + 1);
     c[3] = Picture_get_pixel(picture, image, r_x + 1, r_y + 1);
-    
+
     p[0] = (1 - frac_x) * (1 - frac_y);
     p[1] = (frac_x) * (1 - frac_y);
     p[2] = (1 - frac_x) * frac_y;
     p[3] = frac_x * frac_y;
-    
+
     r = 0;
     g = 0;
     b = 0;
-    
+
     for (i = 0; i < 4; i++) {
 	r += RED_VALUE(c[i]) * p[i];
 	g += GREEN_VALUE(c[i]) * p[i];
@@ -391,19 +385,19 @@ static RGB_COLOR Picture_get_pixel_avg(
     return RGB24((unsigned char)r, (unsigned char)g, (unsigned char)b);
 }
 
-/* 
-    Purpose: Rotate a point around the center of an image  
+/*
+    Purpose: Rotate a point around the center of an image
     and return the matching color in the base image.
-    A picture that contains a rotated image uses all it images to make 
+    A picture that contains a rotated image uses all it images to make
     a full 360 degree rotation, which is reflected in the angle calculation.
     (first image is ang=0 and is used to index the texture for the color value)
-    Note: this function is used by the rotation code, 
+    Note: this function is used by the rotation code,
     and that is why the it's rotating the "wrong" direction.
 */
-RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture, 
+RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture,
 				    int x, int y, int image)
 {
-    
+
     int		angle;
     double	rot_x, rot_y;
 
@@ -418,7 +412,7 @@ RGB_COLOR Picture_get_rotated_pixel(const xp_picture_t *picture,
 
     rot_x = (tcos(angle) * x - tsin(angle) * y) + picture->width / 2;
     rot_y = (tsin(angle) * x + tcos(angle) * y) + picture->height / 2;
- 
+
     return (Picture_get_pixel_avg(picture, 0, rot_x, rot_y));
 }
 
@@ -455,14 +449,14 @@ static void Picture_scale_x_slice(const xp_picture_t * picture, int image, int *
     double weight;
     RGB_COLOR col;
     RGB_COLOR *image_data = picture->data[image] + x + y * picture->width ;
-    
+
     if (xscale > xfrac) {
 	col = *image_data;
 	weight = xfrac * yfrac;
 	*r += (int)(RED_VALUE(col) * weight);
         *g += (int)(GREEN_VALUE(col) * weight);
 	*b += (int)(BLUE_VALUE(col) * weight);
-	    
+
 	xscale -= xfrac;
 	image_data++;
 
@@ -486,8 +480,8 @@ static void Picture_scale_x_slice(const xp_picture_t * picture, int image, int *
 		xscale -=1.0;
 	    }
 	}
-    } 
-    if (xscale > 0) {
+    }
+    if (xscale > .00001) {
 	col = *image_data;
 	weight = yfrac * xscale;
 	*r += (int)(RED_VALUE(col) * weight);
@@ -497,19 +491,19 @@ static void Picture_scale_x_slice(const xp_picture_t * picture, int image, int *
 }
 
 /*
-    Purpose: Calculate the average color of a rectangle in an image, 
+    Purpose: Calculate the average color of a rectangle in an image,
     This is used by the scaling algorithm.
 */
 
-RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image, 
+RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image,
 				 double x1, double y1, double dx, double dy)
 {
     int r ,g, b;
     double area;
 
     int x,y;
-    double xfrac, yfrac; 
-    
+    double xfrac, yfrac;
+
     r = 0;
     g = 0;
     b = 0;
@@ -532,9 +526,9 @@ RGB_COLOR Picture_get_pixel_area(const xp_picture_t *picture, int image,
 	    dy -=1.0;
 	}
     }
-    if (dy > 0)
+    if (dy > .00001)
 	Picture_scale_x_slice(picture, image, &r, &g, &b, x, y, dx, xfrac, dy);
- 
+
     return RGB24((unsigned char)(r/area), (unsigned char)(g/area), (unsigned char)(b/area));
 }
 
@@ -569,4 +563,3 @@ void Picture_get_bounding_box(xp_picture_t *picture)
 	}
     }
 }
-
