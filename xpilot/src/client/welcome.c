@@ -739,7 +739,13 @@ static int Internet_server_show_cb(int widget, void *user_data,
 	eqptr = strchr(p, '=');
 	if (eqptr != NULL) {
 	    *eqptr = '\0';
+	} else {
+	  /* currently xpilot allows "," in nicks quit here */
+	  /* until they fix their protocol problem */
+	  continue;
 	}
+	  
+	
 
 
 	(void) Widget_create_colored_label(subform_widget,
