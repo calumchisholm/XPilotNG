@@ -192,19 +192,14 @@ void Paint_frame(void)
 	 * I've changed some places that used FPS (from setup) in client
 	 * to use clientFPS, to allow client to adapt to server changing
 	 * FPS dynamically ("/set fps 100" command on server).
-	 *
-	 * NOTE: we must force clientFPS to be > 0 always, for example in
-	 * xevent_keyboard() clientFPS == 0 would result in calculating
-	 * something % 0, which is bad.
 	 */
 	if (clientFPS <= 0)
 	    clientFPS = 1;
 	timePerFrame = 1.0 / clientFPS;
 
-	/* kps hack - check once per second if we are playing */
-	if (self && !strchr("PTW", self->mychar))
+	/* check once per second if we are playing */
+	if (self && !strchr("PW", self->mychar))
 	    played_this_round = true;
-	/*xpprintf("clientFPS = %d\n", clientFPS);*/
     }
 
     /*
@@ -598,9 +593,7 @@ void Paint_score_entry(int entry_num,
      * Draw the line
      * e94_msu eKthHacks
      */
-    if ((other->mychar == 'D'
-	|| other->mychar == 'P'
-	|| other->mychar == 'W')
+    if (strchr("DPW", other->mychar)
 	&& !mono) {
 
 	if (other->id == self->id)
