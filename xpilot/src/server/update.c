@@ -469,7 +469,7 @@ void Update_objects(void)
      * Let the fuel stations regenerate some fuel.
      */
     if (NumPlayers > 0) {
-	int fuel = (int)(NumPlayers * framespeed * STATION_REGENERATION);
+	DFLOAT fuel = (NumPlayers * framespeed * STATION_REGENERATION);
 	int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
 	for (i=0; i<World.NumFuels; i++) {
 	    if (World.fuel[i].fuel == MAX_STATION_FUEL) {

@@ -59,24 +59,21 @@ void Thrust(int ind)
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);
     const int		max_life = 3 * TIME_FACT + (int)(pl->power * 0.35 *
 							TIME_FACT);
-    static int		keep_rand;
-    int			this_rand = (((keep_rand >>= 2)
-					? (keep_rand)
-					: (keep_rand = randomMT())) & 0x03);
-    int			tot_sparks = (int)((pl->power * 0.15) + this_rand + 1);
+    DFLOAT		tot_sparks = (pl->power * 0.15 + 2.5) * framespeed2;
+    DFLOAT		alt_sparks;
     int 		x = pl->pos.cx + pl->ship->engine[pl->dir].x;
     int                 y = pl->pos.cy + pl->ship->engine[pl->dir].y;
-    int			afterburners, alt_sparks;
+    int			afterburners;
 
     sound_play_sensors(pl->pos.cx, pl->pos.cy, THRUST_SOUND);
 
     afterburners = (BIT(pl->used, OBJ_EMERGENCY_THRUST)
 		    ? MAX_AFTERBURNER
 		    : pl->item[ITEM_AFTERBURNER]);
-    alt_sparks = afterburners
-		    ? AFTER_BURN_SPARKS(tot_sparks-1, afterburners) + 1
-		    : 0;
+    alt_sparks = tot_sparks  * afterburners * (1. / (MAX_AFTERBURNER + 1));
 
+    /* floor(tot_sparks + rfrac()) randomly rounds up or down to an integer,
+     * so that the expectation value of the result is tot_sparks */
     Make_debris(
 	/* pos.x, pos.y   */ x, y,
 	/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
@@ -87,7 +84,7 @@ void Thrust(int ind)
 	/* status         */ GRAVITY | OWNERIMMUNE,
 	/* color          */ RED,
 	/* radius         */ 8,
-	/* min,max debris */ tot_sparks-alt_sparks, tot_sparks-alt_sparks,
+	/* no. of debris  */ (tot_sparks-alt_sparks) + rfrac(),
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
 	/* min,max life   */ 3 * TIME_FACT, max_life
@@ -103,7 +100,7 @@ void Thrust(int ind)
 	/* status         */ GRAVITY | OWNERIMMUNE,
 	/* color          */ BLUE,
 	/* radius         */ 8,
-	/* min,max debris */ alt_sparks, alt_sparks,
+	/* no. of debris  */ alt_sparks + rfrac(),
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
 	/* min,max life   */ 3 * TIME_FACT, max_life
@@ -560,15 +557,15 @@ void Make_wreckage(
 void Explode_fighter(int ind)
 {
     player *pl = Players[ind];
-    int min_debris, max_debris;
+    int		min_debris;
+    DFLOAT	debris_range;
 
     sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_EXPLOSION_SOUND);
 
     min_debris = (int)(1 + (pl->fuel.sum / (8.0 * FUEL_SCALE_FACT)));
-    max_debris = (int)(min_debris + (pl->mass * 2.0));
+    debris_range = pl->mass;
     /* reduce debris since we also create wreckage objects */
-    min_debris >>= 1;
-    max_debris >>= 1;
+    min_debris >>= 1; /* Removed *2.0 from range */
 
     Make_debris(
 	/* pos.x, pos.y   */ pl->pos.cx, pl->pos.cy,
@@ -580,7 +577,7 @@ void Explode_fighter(int ind)
 	/* status         */ GRAVITY,
 	/* color          */ RED,
 	/* radius         */ 8,
-	/* min,max debris */ min_debris, max_debris,
+	/* no. of debris  */ min_debris + debris_range * rfrac(),
 	/* min,max dir    */ 0, RES-1,
 	/* min,max speed  */ 20.0, 20 + (((int)(pl->mass))>>1),
 	/* min,max life   */ 5 * TIME_FACT, (int)(5 +

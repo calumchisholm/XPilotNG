@@ -3098,7 +3098,7 @@ static void Cannon_dies(move_state_t *ms)
 	/* status         */ GRAVITY,
 	/* color          */ RED,
 	/* radius         */ 6,
-	/* min,max debris */ 20, 40,
+	/* no. of debris  */ 20 + 20 * rfrac(),
 	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
 	/* min,max speed  */ 20, 50,
 	/* min,max life   */ 8 * TIME_FACT, 68 * TIME_FACT
@@ -3241,7 +3241,7 @@ static void Object_hits_target(move_state_t *ms, long player_cost)
 	/* status         */ GRAVITY,
 	/* color          */ RED,
 	/* radius         */ 6,
-	/* min,max debris */ 75, 150,
+	/* no. of debris  */ 75 + 75 * rfrac(),
 	/* min,max dir    */ 0, RES-1,
 	/* min,max speed  */ 20, 70,
 	/* min,max life   */ 10 * TIME_FACT, 100 * TIME_FACT

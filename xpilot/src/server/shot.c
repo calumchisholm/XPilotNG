@@ -1150,7 +1150,7 @@ void Delete_shot(int ind)
 	    Make_debris(
 		shot->prevpos.x, shot->prevpos.y, shot->vel.x, shot->vel.y,
 		shot->id, shot->team, OBJ_DEBRIS, DEBRIS_MASS, GRAVITY,
-		RED, 8, 10, 20, 0, RES-1, 10, 50, 10 * TIME_FACT,
+		RED, 8, 10 + 10 * rfrac(), 0, RES-1, 10, 50, 10 * TIME_FACT,
 		54 * TIME_FACT);
 	}
 	break;
@@ -1252,8 +1252,8 @@ void Delete_shot(int ind)
 	    /* status         */ status,
 	    /* color          */ color,
 	    /* radius         */ 6,
-	    /* min,max debris */ (int)(0.20f * intensity * num_modv),
-				 (int)(0.30f * intensity * num_modv),
+	    /* no. of debris  */ (0.20f * intensity * num_modv) + rfrac() *
+				    (0.10f * intensity * num_modv),
 	    /* min,max dir    */ 0, RES-1,
 #ifdef DRAINFACTOR
 	    /* min,max speed  */ ShotsSpeed * speed_modv,

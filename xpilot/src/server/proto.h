@@ -144,7 +144,7 @@ void Make_debris(
 	    /* status         */ long   status,
 	    /* color          */ int    color,
 	    /* radius         */ int    radius,
-	    /* min,max debris */ int    min_debris, int    max_debris,
+	    /* no. of debris  */ int    num_debris,
 	    /* min,max dir    */ int    min_dir,    int    max_dir,
 	    /* min,max speed  */ DFLOAT  min_speed,  DFLOAT  max_speed,
 	    /* min,max life   */ int    min_life,   int    max_life

@@ -195,14 +195,14 @@ void Make_debris(
     /* status         */ long   status,
     /* color          */ int    color,
     /* radius         */ int    radius,
-    /* min,max debris */ int    min_debris, int    max_debris,
+    /* how many	      */ int	num_debris,
     /* min,max dir    */ int    min_dir,    int    max_dir,
     /* min,max speed  */ DFLOAT  min_speed,  DFLOAT  max_speed,
     /* min,max life   */ int    min_life,   int    max_life
 )
 {
     object		*debris;
-    int			i, num_debris, life;
+    int			i, life;
     modifiers		mods;
 
     x = WRAP_XCLICK(x);
@@ -226,7 +226,6 @@ void Make_debris(
 	}
     }
 
-    num_debris = min_debris + (int)(rfrac() * (max_debris - min_debris));
     if (num_debris > MAX_TOTAL_SHOTS - NumObjs) {
 	num_debris = MAX_TOTAL_SHOTS - NumObjs;
     }
