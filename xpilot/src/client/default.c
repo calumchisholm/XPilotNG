@@ -700,14 +700,6 @@ xp_option_t default_options[] = {
 	"Set maximum number of mouse turns sent per second\n"
 	"Set to 0 to disable this feature (its mostly useful on modem)\n"),
 
-    XP_BOOL_OPTION(
-	"blockProtocol",
-	false,
-	&instruments.useBlockProtocol,
-	NULL,
-	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Prefer (old) block protocol when joining servers.\n"),
-
     XP_INT_OPTION(
 	"sparkSize",
 	2,
@@ -883,6 +875,14 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Allows drawing polygon bitmaps specified by the (new-style) map.\n"
 	"Be warned that this needs a reasonably fast graphics system.\n"),
+
+    XP_BOOL_OPTION(
+	"blockProtocol",
+	false,
+	&instruments.useBlockProtocol,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Prefer (old) block protocol when joining servers.\n"),
 
     XP_BOOL_OPTION(
 	"outlineWorld",
