@@ -389,10 +389,9 @@ static int num2str(int num, char *str, int i)
     return i + digits;
 }
 
-static int Frame_status(int conn, int ind)
+static int Frame_status(int conn, player *pl)
 {
     static char		mods[MAX_CHARS];
-    player		*pl = Players(ind);
     int			n,
 			lock_ind,
 			lock_id = NO_ID,
@@ -521,9 +520,8 @@ static int Frame_status(int conn, int ind)
     return 1;
 }
 
-static void Frame_map(int conn, int ind)
+static void Frame_map(int conn, player *pl)
 {
-    player		*pl = Players(ind);
     int			i,
 			k,
 			conn_bit = (1 << conn);
@@ -729,9 +727,8 @@ static void Frame_shuffle(void)
     }
 }
 
-static void Frame_shots(int conn, int ind)
+static void Frame_shots(int conn, player *pl)
 {
-    player			*pl = Players(ind);
     int				cx, cy;
     int				lcx = -1, lcy = -1, ldir = 0;
     int				i, k, color;
@@ -952,10 +949,9 @@ static void Frame_shots(int conn, int ind)
     }
 }
 
-static void Frame_ships(int conn, int ind)
+static void Frame_ships(int conn, player *pl)
 {
-    player			*pl = Players(ind),
-				*pl_i;
+    player			*pl_i;
     int				i, k;
 
     for (i = 0; i < NumEcms; i++) {
@@ -1073,10 +1069,9 @@ static void Frame_ships(int conn, int ind)
     }
 }
 
-static void Frame_radar(int conn, int ind)
+static void Frame_radar(int conn, player *pl)
 {
     int			i, k, mask, shownuke, size;
-    player		*pl = Players(ind);
     object		*shot;
     int			cx, cy;
 
@@ -1182,10 +1177,8 @@ static void Frame_radar(int conn, int ind)
     Frame_radar_buffer_send(conn);
 }
 
-static void Frame_lose_item_state(int ind)
+static void Frame_lose_item_state(player *pl)
 {
-    player		*pl = Players(ind);
-
     if (pl->lose_item_state != 0) {
 	Send_loseitem(pl->lose_item, pl->conn);
 	if (pl->lose_item_state == 1)
@@ -1195,10 +1188,8 @@ static void Frame_lose_item_state(int ind)
     }
 }
 
-static void Frame_parameters(int conn, int ind)
+static void Frame_parameters(int conn, player *pl)
 {
-    player		*pl = Players(ind);
-
     Get_display_parameters(conn, &view_width, &view_height,
 			   &debris_colors, &spark_rand);
     debris_x_areas = (view_width + 255) >> 8;
@@ -1233,7 +1224,7 @@ void Frame_update(void)
     int			i,
 			conn,
 			ind;
-    player		*pl;
+    player		*pl, *pl2;
     time_t		newTimeLeft = 0;
     static time_t	oldTimeLeft;
     static bool		game_over_called = false;
@@ -1336,22 +1327,23 @@ void Frame_update(void)
 		ind = 0;
 	}
 
-	if (Players(ind)->damaged > 0)
-	    Send_damaged(conn, (int)Players(ind)->damaged);
+	pl2 = Players(ind);
+	if (pl2->damaged > 0)
+	    Send_damaged(conn, (int)pl2->damaged);
 	else {
-	    Frame_parameters(conn, ind);
-	    if (Frame_status(conn, ind) <= 0) {
+	    Frame_parameters(conn, pl2);
+	    if (Frame_status(conn, pl2) <= 0) {
 		continue;
 	    }
-	    Frame_map(conn, ind);
-	    Frame_shots(conn, ind);
-	    Frame_ships(conn, ind);
-	    Frame_radar(conn, ind);
-	    Frame_lose_item_state(i);
+	    Frame_map(conn, pl2);
+	    Frame_shots(conn, pl2);
+	    Frame_ships(conn, pl2);
+	    Frame_radar(conn, pl2);
+	    Frame_lose_item_state(pl);
 	    debris_end(conn);
 	    fastshot_end(conn);
 	}
-	sound_play_queued(Players(ind));
+	sound_play_queued(pl2);
 	Send_end_of_frame(conn);
     }
     playback = rplayback;
