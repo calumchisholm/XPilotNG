@@ -147,11 +147,7 @@ static option_desc opts[] = {
     {
 	"shipMass",
 	"shipMass",
-	"18.0",		/*
-			 * kps - "optimal" value for fps=50 and gs=12.5.
-			 * Should be changed back to 20.0 when high fps
-			 * "inertia" issue is sorted out.
-			 */
+	"20.0",
 	&options.shipMass,
 	valReal,
 	tuner_shipmass,
