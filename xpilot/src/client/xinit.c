@@ -400,7 +400,7 @@ int Init_top(void)
     int					top_x, top_y;
     int					x, y;
     unsigned				w, h;
-    int					values;
+    unsigned long			values;
     int					top_flags;
     XGCValues				xgc;
     XSetWindowAttributes		sattr;
@@ -630,7 +630,7 @@ int Init_top(void)
 			      DefaultRootWindow(dpy),
 			      top_x, top_y,
 			      top_width, top_height,
-			      0, dispDepth,
+			      0, (int)dispDepth,
 			      InputOutput, visual,
 			      mask, &sattr);
     XSelectInput(dpy, topWindow,
