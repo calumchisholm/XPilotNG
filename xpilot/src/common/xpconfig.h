@@ -32,45 +32,87 @@
 #  endif
 #endif
 
-#define CONF_LOCALGURU			"kps@users.sourceforge.net"
-#define CONF_DEFAULT_MAP		"polybloods.xp2"
-#define CONF_MAPDIR			CONF_LIBDIR "maps/"
-#define CONF_TEXTUREDIR			CONF_LIBDIR "textures/"
-#define CONF_SOUNDDIR			CONF_LIBDIR "sound/"
+#ifndef CONF_LOCALGURU
+#  define CONF_LOCALGURU		"kps@users.sourceforge.net"
+#endif
+
+#ifndef CONF_DEFAULT_MAP
+#  define CONF_DEFAULT_MAP		"polybloods.xp2"
+#endif
+
+#ifndef CONF_MAPDIR
+#  define CONF_MAPDIR			CONF_LIBDIR "maps/"
+#endif
+
+#ifndef CONF_TEXTUREDIR
+#  define CONF_TEXTUREDIR		CONF_LIBDIR "textures/"
+#endif
+
+#ifndef CONF_SOUNDDIR
+#  define CONF_SOUNDDIR			CONF_LIBDIR "sound/"
+#endif
 
 #ifndef _WINDOWS
-
-#  define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults"
-#  define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password"
-#  define CONF_ROBOTFILE		CONF_LIBDIR "robots"
-#  define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd"
-#  define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd"
-#  define CONF_LOGFILE			CONF_LIBDIR "log"
-#  define CONF_SHIP_FILE       		""
-#  define CONF_SOUNDFILE	  	CONF_SOUNDDIR "sounds"
+#  ifndef CONF_DEFAULTS_FILE_NAME
+#    define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults"
+#  endif
+#  ifndef CONF_PASSWORD_FILE_NAME
+#    define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password"
+#  endif
+#  ifndef CONF_ROBOTFILE
+#    define CONF_ROBOTFILE		CONF_LIBDIR "robots"
+#  endif
+#  ifndef CONF_SERVERMOTDFILE
+#    define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd"
+#  endif
+#  ifndef CONF_LOCALMOTDFILE
+#    define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd"
+#  endif
+#  ifndef CONF_LOGFILE
+#    define CONF_LOGFILE		CONF_LIBDIR "log"
+#  endif
+#  ifndef CONF_SHIP_FILE
+#    define CONF_SHIP_FILE       	""
+#  endif
+#  ifndef CONF_SOUNDFILE
+#    define CONF_SOUNDFILE	  	CONF_SOUNDDIR "sounds"
+#  endif
 #  ifdef DEBUG
 #    define D(x)	x ;  fflush(stdout);
 #  else
 #    define D(x)
 #  endif
-
 #else /* _WINDOWS */
-
-#  define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults.txt"
-#  define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password.txt"
-#  define CONF_ROBOTFILE		CONF_LIBDIR "robots.txt"
-#  define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd.txt"
-#  define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd.txt"
-#  define CONF_LOGFILE			CONF_LIBDIR "log.txt"
-#  define CONF_SHIP_FILE		"XPilot.shp"
-#  define CONF_SOUNDFILE		CONF_SOUNDDIR "sounds.txt"
+#  ifndef CONF_DEFAULTS_FILE_NAME
+#    define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults.txt"
+#  endif
+#  ifndef CONF_PASSWORD_FILE_NAME
+#    define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password.txt"
+#  endif
+#  ifndef CONF_ROBOTFILE
+#    define CONF_ROBOTFILE		CONF_LIBDIR "robots.txt"
+#  endif
+#  ifndef CONF_SERVERMOTDFILE
+#    define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd.txt"
+#  endif
+#  ifndef CONF_LOCALMOTDFILE
+#    define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd.txt"
+#  endif
+#  ifndef CONF_LOGFILE
+#    define CONF_LOGFILE		CONF_LIBDIR "log.txt"
+#  endif
+#  ifndef CONF_SHIP_FILE
+#    define CONF_SHIP_FILE		"XPilot.shp"
+#  endif
+#  ifndef CONF_SOUNDFILE
+#    define CONF_SOUNDFILE		CONF_SOUNDDIR "sounds.txt"
+#  endif
 #  ifdef _DEBUG
 #    define DEBUG	1
 #    define D(x)	x
 #  else
 #    define D(x)
 #  endif
-
 #endif /* _WINDOWS */
 
 #if 0 /* currently unused */
@@ -103,7 +145,6 @@
  * a command that will unpack the given .gz file to stdout (for use in popen).
  * CONF_ZCAT_EXT should define the proper compressed file extension.
  */
-
 #ifndef _WINDOWS
 #  define CONF_COMPRESSED_MAPS
 #else
