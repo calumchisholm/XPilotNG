@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB W32_LIBS CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_WINDOWS_TRUE COND_WINDOWS_FALSE COND_SERVER_ONLY_TRUE COND_SERVER_ONLY_FALSE COND_REPLAY_TRUE COND_REPLAY_FALSE COND_X11_CLIENT_TRUE COND_X11_CLIENT_FALSE COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE SOUND_LIBS COND_SOUND_TRUE COND_SOUND_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB W32_LIBS CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_WINDOWS_TRUE COND_WINDOWS_FALSE COND_SERVER_ONLY_TRUE COND_SERVER_ONLY_FALSE COND_REPLAY_TRUE COND_REPLAY_FALSE COND_XP_MAPEDIT_TRUE COND_XP_MAPEDIT_FALSE COND_X11_CLIENT_TRUE COND_X11_CLIENT_FALSE COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE SOUND_LIBS COND_SOUND_TRUE COND_SOUND_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -867,6 +867,7 @@ Optional Features:
   --enable-select-sched   enable new server scheduling most useful on Linux
                           2.6
   --disable-replay        disable building of replay program
+  --enable-xp-mapedit     disable building of xp-mapedit program
   --disable-x11-client    disable X11 client
   --disable-sdl-client    disable SDL/OpenGL client
   --enable-sdl-gameloop   enable sdl gameloop in sdl client (otherwise use
@@ -1965,6 +1966,14 @@ if test "${enable_replay+set}" = set; then
 
 else
   enable_replay=yes; need_x=yes
+fi;
+
+# Check whether --enable-xp_mapedit or --disable-xp_mapedit was given.
+if test "${enable_xp_mapedit+set}" = set; then
+  enableval="$enable_xp_mapedit"
+
+else
+  enable_xp_mapedit=yes; need_x=yes
 fi;
 
 # Check whether --enable-x11_client or --disable-x11_client was given.
@@ -3578,6 +3587,7 @@ _ACEOF
 	enable_select_sched=yes
 	enable_sdl_gameloop=yes
 	enable_replay=no
+	enable_xp_mapedit=no
 	enable_x11_client=no
 	need_x=no
 fi
@@ -5483,6 +5493,14 @@ _ACEOF
 
 fi
 
+if test x$enable_xp_mapedit = xyes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define XP_MAPEDIT 1
+_ACEOF
+
+fi
+
 if test x$enable_sdl_client = xyes; then
 
 			SDL_VERSION=1.2.0
@@ -5986,6 +6004,16 @@ if test x$enable_replay = xyes; then
 else
   COND_REPLAY_TRUE='#'
   COND_REPLAY_FALSE=
+fi
+
+
+
+if test x$enable_xp_mapedit = xyes; then
+  COND_XP_MAPEDIT_TRUE=
+  COND_XP_MAPEDIT_FALSE='#'
+else
+  COND_XP_MAPEDIT_TRUE='#'
+  COND_XP_MAPEDIT_FALSE=
 fi
 
 
@@ -8700,7 +8728,7 @@ fi
 done
 
 
-                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile lib/sound/Makefile src/Makefile src/common/Makefile src/common/version.h src/common/NT/Makefile src/common/NT/bindist/Makefile src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/client/x11/Makefile src/client/NT/Makefile src/client/NT/res/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
+                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile lib/sound/Makefile src/Makefile src/common/Makefile src/common/version.h src/common/NT/Makefile src/common/NT/bindist/Makefile src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/client/x11/Makefile src/client/NT/Makefile src/client/NT/res/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile src/mapedit/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8832,6 +8860,13 @@ if test -z "${COND_REPLAY_TRUE}" && test -z "${COND_REPLAY_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COND_REPLAY\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COND_REPLAY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COND_XP_MAPEDIT_TRUE}" && test -z "${COND_XP_MAPEDIT_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COND_XP_MAPEDIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COND_XP_MAPEDIT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -9330,6 +9365,7 @@ do
   "src/server/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/server/Makefile" ;;
   "src/replay/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/replay/Makefile" ;;
   "src/replay/tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/replay/tools/Makefile" ;;
+  "src/mapedit/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/mapedit/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -9495,6 +9531,8 @@ s,@COND_SERVER_ONLY_TRUE@,$COND_SERVER_ONLY_TRUE,;t t
 s,@COND_SERVER_ONLY_FALSE@,$COND_SERVER_ONLY_FALSE,;t t
 s,@COND_REPLAY_TRUE@,$COND_REPLAY_TRUE,;t t
 s,@COND_REPLAY_FALSE@,$COND_REPLAY_FALSE,;t t
+s,@COND_XP_MAPEDIT_TRUE@,$COND_XP_MAPEDIT_TRUE,;t t
+s,@COND_XP_MAPEDIT_FALSE@,$COND_XP_MAPEDIT_FALSE,;t t
 s,@COND_X11_CLIENT_TRUE@,$COND_X11_CLIENT_TRUE,;t t
 s,@COND_X11_CLIENT_FALSE@,$COND_X11_CLIENT_FALSE,;t t
 s,@COND_SDL_CLIENT_TRUE@,$COND_SDL_CLIENT_TRUE,;t t

@@ -65,6 +65,11 @@ AC_ARG_ENABLE(replay,
 			[disable building of replay program]),
 [], [enable_replay=yes; need_x=yes])
 
+AC_ARG_ENABLE(xp_mapedit,
+	AC_HELP_STRING([--enable-xp-mapedit],
+			[disable building of xp-mapedit program]),
+[], [enable_xp_mapedit=yes; need_x=yes])
+
 AC_ARG_ENABLE(x11_client,
 	AC_HELP_STRING([--disable-x11-client],
 			[disable X11 client]),
@@ -162,6 +167,7 @@ if test x$windows_target = xyes; then
 	enable_select_sched=yes
 	enable_sdl_gameloop=yes
 	enable_replay=no
+	enable_xp_mapedit=no
 	enable_x11_client=no
 	need_x=no
 fi
@@ -198,6 +204,10 @@ fi
 
 if test x$enable_replay = xyes; then
 	AC_DEFINE([REPLAY], 1, [enable replay program])
+fi
+
+if test x$enable_xp_mapedit = xyes; then
+	AC_DEFINE([XP_MAPEDIT], 1, [enable xp-mapedit program])
 fi
 
 dnl Stuff needed by SDL client.
@@ -286,6 +296,7 @@ fi
 AM_CONDITIONAL([COND_WINDOWS], [test x$windows_target = xyes])
 AM_CONDITIONAL([COND_SERVER_ONLY], [test x$enable_server_only = xyes])
 AM_CONDITIONAL([COND_REPLAY], [test x$enable_replay = xyes])
+AM_CONDITIONAL([COND_XP_MAPEDIT], [test x$enable_xp_mapedit = xyes])
 AM_CONDITIONAL([COND_X11_CLIENT], [test x$enable_x11_client = xyes])
 AM_CONDITIONAL([COND_SDL_CLIENT], [test x$enable_sdl_client = xyes])
 AM_CONDITIONAL([COND_SDL_GAMELOOP], [test x$enable_sdl_gameloop = xyes])
@@ -462,6 +473,7 @@ AC_CONFIG_FILES([ \
 	src/server/Makefile \
 	src/replay/Makefile \
 	src/replay/tools/Makefile \
+	src/mapedit/Makefile \
 	])
 AC_OUTPUT
 

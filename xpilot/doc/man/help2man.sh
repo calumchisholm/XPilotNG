@@ -21,3 +21,7 @@ help2man --name="server for multiplayer space war game." --section=6 --manual=Ga
 test ! -z "$(which xpilot-ng-replay)" && \
 echo "Making manpage for xpilot-ng-replay ..." && \
 help2man --name="Playback an XPilot session." --section=6 --manual=Games --source=xpilot.sourceforge.net xpilot-ng-replay > xpilot-ng-replay.man
+
+test ! -z "$(which xpilot-ng-xp-mapedit)" && \
+echo "Making manpage for xpilot-ng-xp-mapedit ..." && \
+help2man --name="Edit block based XPilot maps." --section=6 --manual=Games --source=xpilot.sourceforge.net xpilot-ng-xp-mapedit > xpilot-ng-xp-mapedit.man

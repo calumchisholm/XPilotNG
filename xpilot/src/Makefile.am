@@ -2,12 +2,18 @@ if COND_REPLAY
   MAYBE_REPLAY = replay
 else
   MAYBE_REPLAY =
-endif  
-
-if COND_SERVER_ONLY
-  MAYBE_CLIENT_REPLAY =
-else
-  MAYBE_CLIENT_REPLAY = client $(MAYBE_REPLAY)
 endif
 
-SUBDIRS = common server $(MAYBE_CLIENT_REPLAY)
+if COND_XP_MAPEDIT
+  MAYBE_XP_MAPEDIT = mapedit
+else
+  MAYBE_XP_MAPEDIT =
+endif
+
+if COND_SERVER_ONLY
+  MAYBE_STUFF =
+else
+  MAYBE_STUFF = client $(MAYBE_REPLAY) $(MAYBE_XP_MAPEDIT)
+endif
+
+SUBDIRS = common server $(MAYBE_STUFF)
