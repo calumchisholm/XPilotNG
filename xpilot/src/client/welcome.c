@@ -118,21 +118,22 @@ struct Label {
 };
     
 struct Label labels[] = {
-	/*  0 */ {"server", 0, 0, 0},
-	/*  1 */ {"version", 0, 0, 0},
-	/*  2 */ {"users", 0, 0, 0},
-	/*  3 */ {"map name", 0, 0, 0},
-	/*  4 */ {"map size", 0, 0, 0},
-	/*  5 */ {"map author", 0, 0, 0},
-	/*  6 */ {"status", 0, 0, 0},
-	/*  7 */ {"bases", 0, 0, 0},
-	/*  8 */ {"teambases", 0, 0, 0},
-	/*  9 */ {"free bases", 0, 0, 0},
-	/* 10 */ {"queued players", 0, 0, 0},
-	/* 11 */ {"FPS", 0, 0, 0},
-	/* 12 */ {"sound", 0, 0, 0},
-	/* 13 */ {"timing", 0, 0, 0},
-	/* 14 */ {"playlist", 1, 0, 0}
+	{"Server", 0, 0, 0},
+	{"IP:Port", 0, 0, 0},
+	{"Version", 0, 0, 0},
+	{"Users", 0, 0, 0},
+	{"Map name", 0, 0, 0},
+	{"Map size", 0, 0, 0},
+	{"Map author", 0, 0, 0},
+	{"Status", 0, 0, 0},
+	{"Bases", 0, 0, 0},
+	{"Teambases", 0, 0, 0},
+	{"Free bases", 0, 0, 0},
+	{"Queued players", 0, 0, 0},
+	{"FPS", 0, 0, 0},
+	{"Sound", 0, 0, 0},
+	{"Timing", 0, 0, 0},
+	{"Playlist", 1, 0, 0}
     };
 
 /*
@@ -1323,6 +1324,9 @@ static int Internet_server_show_cb(int widget, void *user_data,
     int data_label_width;
     int player_label_width = 200;	/* fixed length */
     int host_label_width = 400;
+    /* large enough for ipv6 static, as the data is rendered after the closure
+       of this routine, so memory has to be persistant */
+    static char ipport[MAX_HOST_LEN];
     static char *p = NULL;
     char *eqptr = NULL;
     char *playslist = xp_strdup(sip->playlist);
@@ -1398,10 +1402,10 @@ static int Internet_server_show_cb(int widget, void *user_data,
 
 
     (void) Widget_create_colored_label(subform_widget,
-				label_x + label_width, labels[i].yoff,
-				data_label_width, labels[i].height, true,
-				label_border, BLACK, WHITE, sip->hostname);
-    
+			label_x + label_width, labels[i].yoff,
+			data_label_width, labels[i].height, true,
+			label_border, BLACK, WHITE, sip->hostname);
+
     /* Create a join button to join this server */
 
     (void) Widget_create_activate(subform_widget,
@@ -1413,15 +1417,18 @@ static int Internet_server_show_cb(int widget, void *user_data,
 			   Internet_server_join_cb,(void *) sip);
     i++;
 
-    /* Version label */
+    
+    /* Port and IP address */
+
+    sprintf(ipport,"%s:%d",sip->ip_str,sip->port);
 
     (void) Widget_create_colored_label(subform_widget,
-			label_x + label_width, labels[i].yoff,
-			data_label_width, labels[i].height, true,
-			label_border,  BLACK, WHITE,sip->version);
-
-    /* back to list button */
-
+			       label_x + label_width, labels[i].yoff,
+			       data_label_width, labels[i].height, true,
+			       label_border, BLACK, WHITE, ipport);
+    
+    /* Back to list button */
+    
     (void) Widget_create_activate(subform_widget,
 			   label_x + label_width + data_label_width +
 			   label_space,
@@ -1429,6 +1436,16 @@ static int Internet_server_show_cb(int widget, void *user_data,
 			   data_label_width, labels[i].height,
 			   label_border, "Back to List",
 			   Internet_cb, (void *) global_conpar);
+
+
+    i++;
+
+    /* Version label */
+
+    (void) Widget_create_colored_label(subform_widget,
+			label_x + label_width, labels[i].yoff,
+			data_label_width, labels[i].height, true,
+			label_border,  BLACK, WHITE,sip->version);
 
     i++;
 
