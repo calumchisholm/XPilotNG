@@ -1546,3 +1546,56 @@ shapepos ipos2shapepos(ipos pos)
 
     return pt;
 }
+
+position shapepos2position(shapepos pt)
+{
+    if (is_server) {
+	position pos;
+	pos.x = CLICK_TO_FLOAT(pt.clk.cx);
+	pos.y = CLICK_TO_FLOAT(pt.clk.cy);
+	return pos;
+    }
+    /* client */
+    return pt.pxl;
+}
+
+position Ship_get_point_position(shipobj *ship, int i, int dir)
+{
+    return shapepos2position(Ship_get_point(ship, i, dir));
+}
+position Ship_get_engine_position(shipobj *ship, int dir)
+{
+    return shapepos2position(Ship_get_engine(ship, dir));
+}
+position Ship_get_m_gun_position(shipobj *ship, int dir)
+{
+    return shapepos2position(Ship_get_m_gun(ship, dir));
+}
+position Ship_get_l_gun_position(shipobj *ship, int gun, int dir)
+{
+    return shapepos2position(Ship_get_l_gun(ship, gun, dir));
+}
+position Ship_get_r_gun_position(shipobj *ship, int gun, int dir)
+{
+    return shapepos2position(Ship_get_r_gun(ship, gun, dir));
+}
+position Ship_get_l_rgun_position(shipobj *ship, int gun, int dir)
+{
+    return shapepos2position(Ship_get_l_rgun(ship, gun, dir));
+}
+position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir)
+{
+    return shapepos2position(Ship_get_r_rgun(ship, gun, dir));
+}
+position Ship_get_l_light_position(shipobj *ship, int l, int dir)
+{
+    return shapepos2position(Ship_get_l_light(ship, l, dir));
+}
+position Ship_get_r_light_position(shipobj *ship, int l, int dir)
+{
+    return shapepos2position(Ship_get_r_light(ship, l, dir));
+}
+position Ship_get_m_rack_position(shipobj *ship, int rack, int dir)
+{
+    return shapepos2position(Ship_get_m_rack(ship, rack, dir));
+}

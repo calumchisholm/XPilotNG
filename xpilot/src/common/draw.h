@@ -158,6 +158,7 @@ extern void Rotate_point(shapepos pt[RES]);
 extern void Rotate_position(position pt[RES]);
 extern void Rotate_ship(shipobj *w);
 extern shapepos ipos2shapepos(ipos pos);
+extern position shapepos2position(shapepos pt);
 extern shapepos *Shape_get_points(shape *s, int dir);
 
 shapepos Ship_get_point(shipobj *ship, int i, int dir);
