@@ -995,14 +995,14 @@ static void Player_collides_with_debris(player *pl, object *obj)
 {
     player		*kp;
     double		v = VECTOR_LENGTH(obj->vel);
-    double		tmp = 2 * obj->mass * v;
+    double		tmp = obj->mass * v / 128.0;
     double		cost = ABS(tmp);
     double		sc;
 
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	Player_add_fuel(pl, -cost);
-    if (pl->fuel.sum == 0
+    if (pl->fuel.sum == 0.0
 	|| (obj->type == OBJ_WRECKAGE
 	    && wreckageCollisionMayKill
 	    && !BIT(pl->used, HAS_SHIELD)
@@ -1024,11 +1024,10 @@ static void Player_collides_with_debris(player *pl, object *obj)
 	    Score(pl, -sc, pl->pos, (kp == NULL) ? "[Explosion]" : pl->name);
 	} else {
 	    Rank_AddKill(kp);
-	    sc = Rate(kp->score, pl->score)
-		* explosionKillScoreMult;
+	    sc = Rate(kp->score, pl->score) * explosionKillScoreMult;
 	    Score_players(kp, sc, pl->name, pl, -sc, kp->name);
 	}
-	obj->life = 0;
+	obj->life = 0.0;
 	return;
     }
     if (obj->type == OBJ_WRECKAGE
@@ -1042,14 +1041,14 @@ static void Player_collides_with_debris(player *pl, object *obj)
 static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 {
     double	v = VECTOR_LENGTH(ast->vel);
-    double	tmp = 2 * ast->mass * v;
+    double	tmp = ast->mass * v / 128.0;
     double	cost = ABS(tmp);
 
     ast->life += ASTEROID_FUEL_HIT(ED_PL_CRASH, ast->size);
-    if (ast->life < 0)
-	ast->life = 0;
-    if (ast->life == 0
-	&& asteroidPoints > 0
+    if (ast->life < 0.0)
+	ast->life = 0.0;
+    if (ast->life == 0.0
+	&& asteroidPoints > 0.0
 	&& pl->score <= asteroidMaxScore) {
 	Score(pl, asteroidPoints, ast->pos, "");
     }

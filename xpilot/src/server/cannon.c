@@ -59,10 +59,9 @@ void Cannon_add_item(cannon_t *c, int item, double amount)
 	LIMIT(c->item[ITEM_TANK], 0, World.items[ITEM_TANK].limit);
 	/* FALLTHROUGH */
     case ITEM_FUEL:
-	c->item[ITEM_FUEL]
-	    += (int)(amount / (ENERGY_PACK_FUEL / FUEL_SCALE_FACT) + 0.5);
-	LIMIT(c->item[ITEM_FUEL], 0, (int)(World.items[ITEM_FUEL].limit
-			/ (ENERGY_PACK_FUEL / FUEL_SCALE_FACT) + 0.5));
+	c->item[ITEM_FUEL] += (int)(amount / ENERGY_PACK_FUEL + 0.5);
+	LIMIT(c->item[ITEM_FUEL],
+	      0, (int)(World.items[ITEM_FUEL].limit / ENERGY_PACK_FUEL + 0.5));
 	break;
     default:
 	c->item[item] += (int)amount;

@@ -253,7 +253,6 @@ void Compute_sensor_range(player *pl)
 	    EnergyRangeFactor = minVisibilityDistance /
 		(World.items[ITEM_FUEL].initial
 		 * (1.0 + ((double)World.items[ITEM_SENSOR].initial * 0.25)));
-	    EnergyRangeFactor /= FUEL_SCALE_FACT;
 	} else
 	    EnergyRangeFactor = ENERGY_RANGE_FACTOR;
 	init = 1;
@@ -378,7 +377,7 @@ int Init_player(int ind, shipshape_t *ship)
 	    pl->item[i] = World.items[i].initial;
     }
 
-    pl->fuel.sum = World.items[ITEM_FUEL].initial << FUEL_SCALE_BITS;
+    pl->fuel.sum = World.items[ITEM_FUEL].initial;
     Player_init_fuel(pl, pl->fuel.sum);
 
     /*
@@ -1966,8 +1965,8 @@ void Player_death_reset(player *pl, bool add_rank_death)
     pl->lock.distance	= 0;
 
     pl->fuel.sum       	= pl->fuel.sum * 0.90;	/* Loose 10% of fuel */
-    minfuel		= (World.items[ITEM_FUEL].initial * FUEL_SCALE_FACT);
-    minfuel		+= (int)(rfrac() * (1 + minfuel) * 0.2f);
+    minfuel		= World.items[ITEM_FUEL].initial;
+    minfuel		+= rfrac() * (1.0 + minfuel) * 0.2;
     pl->fuel.sum	= MAX(pl->fuel.sum, minfuel);
     Player_init_fuel(pl, pl->fuel.sum);
 

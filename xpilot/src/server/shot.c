@@ -139,8 +139,7 @@ void Place_general_mine(player *pl, int team, long status,
 	    drain += CLUSTER_MASS_DRAIN(mass);
 	if (pl->fuel.sum < -drain) {
 	    sprintf(msg, "You need at least %.1f fuel units to %s %s!",
-		    (-drain) / FUEL_SCALE_FACT,
-		    (BIT(status, GRAVITY) ? "throw" : "drop"),
+		    -drain, (BIT(status, GRAVITY) ? "throw" : "drop"),
 		    Describe_shot(OBJ_MINE, status, mods, 0));
 	    Set_player_message (pl, msg);
 	    return;
@@ -638,8 +637,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	if (pl) {
 	    if (pl->fuel.sum < -drain) {
 		sprintf(msg, "You need at least %.1f fuel units to fire %s!",
-			(-drain) / FUEL_SCALE_FACT,
-			Describe_shot(type, status, mods, 0));
+			-drain, Describe_shot(type, status, mods, 0));
 		Set_player_message (pl, msg);
 		return;
 	    }

@@ -542,10 +542,8 @@ static void Cannon_update(void)
 		    && cannonItemProbMult > 0
 		    && (int)(rfrac() * (60 * 12))
 		    < (cannonItemProbMult * World.items[item].cannonprob))
-		    Cannon_add_item(c, item,
-				    (item == ITEM_FUEL ?
-				     ENERGY_PACK_FUEL >> FUEL_SCALE_BITS
-				     : 1));
+		    Cannon_add_item(c, item, (item == ITEM_FUEL
+					      ?  ENERGY_PACK_FUEL : 1));
 	    }
 	}
 	if ((c->damaged -= timeStep) <= 0)
@@ -606,8 +604,7 @@ static void Target_update(void)
 	targ->damage += TARGET_REPAIR_PER_FRAME * timeStep;
 	if (targ->damage >= TARGET_DAMAGE)
 	    targ->damage = TARGET_DAMAGE;
-	else if (targ->last_change + TARGET_UPDATE_DELAY
-		 < frame_loops)
+	else if (targ->last_change + TARGET_UPDATE_DELAY < frame_loops)
 	    /*
 	     * We don't send target info to the clients every frame
 	     * if the latest repair wouldn't change their display.
@@ -1224,7 +1221,7 @@ void Update_objects(void)
 	    pl->acc.y = power * tsin(pl->dir) / inert;
 	    /* Decrement fuel */
 	    if (do_update_this_frame)
-		Player_add_fuel(pl, -f * FUEL_SCALE_FACT);
+		Player_add_fuel(pl, -f);
 	} else
 	    pl->acc.x = pl->acc.y = 0.0;
 

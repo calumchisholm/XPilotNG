@@ -24,24 +24,22 @@
 #ifndef SCORE_H
 #define SCORE_H
 
-#define ED_SHOT			(-0.2*FUEL_SCALE_FACT)
-#define ED_SMART_SHOT		(-30*FUEL_SCALE_FACT)
-#define ED_MINE			(-60*FUEL_SCALE_FACT)
-#define ED_ECM			(-60*FUEL_SCALE_FACT)
-#define ED_TRANSPORTER		(-60*FUEL_SCALE_FACT)
-#define ED_HYPERJUMP		(-60*FUEL_SCALE_FACT)
-#define ED_SHIELD		(-0.20*FUEL_SCALE_FACT)
-#define ED_PHASING_DEVICE	(-0.40*FUEL_SCALE_FACT)
-#define ED_CLOAKING_DEVICE	(-0.07*FUEL_SCALE_FACT)
-#define ED_DEFLECTOR		(-0.15*FUEL_SCALE_FACT)
-#define ED_SHOT_HIT		(-25.0*FUEL_SCALE_FACT)
-#define ED_SMART_SHOT_HIT	(-120.0*FUEL_SCALE_FACT)
-#define ED_PL_CRASH		(-100.0*FUEL_SCALE_FACT)
-#define ED_BALL_HIT		(-50.0*FUEL_SCALE_FACT)
-#define ED_LASER		(-10.0*FUEL_SCALE_FACT)
-/* was 90 -> 2 -> 40 -> 20 -> 10 */
-#define ED_LASER_HIT		(-100.0*FUEL_SCALE_FACT)
-/* was 120 -> 80 -> 40 -> 50 -> 60 -> 100 */
+#define ED_SHOT			(-0.2)
+#define ED_SMART_SHOT		(-30.0)
+#define ED_MINE			(-60.0)
+#define ED_ECM			(-60.0)
+#define ED_TRANSPORTER		(-60.0)
+#define ED_HYPERJUMP		(-60.0)
+#define ED_SHIELD		(-0.20)
+#define ED_PHASING_DEVICE	(-0.40)
+#define ED_CLOAKING_DEVICE	(-0.07)
+#define ED_DEFLECTOR		(-0.15)
+#define ED_SHOT_HIT		(-25.0)
+#define ED_SMART_SHOT_HIT	(-120.0)
+#define ED_PL_CRASH		(-100.0)
+#define ED_BALL_HIT		(-50.0)
+#define ED_LASER		(-10.0)
+#define ED_LASER_HIT		(-100.0)
 
 #define CANNON_SCORE	    	-1436.0
 #define WALL_SCORE	    	2000.0

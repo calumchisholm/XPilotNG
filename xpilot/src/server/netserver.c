@@ -1901,8 +1901,8 @@ int Send_self(connection_t *connp,
 		      pl->check,
 
 		      pl->fuel.current,
-		      (int)(pl->fuel.sum / FUEL_SCALE_FACT),
-		      (int)(pl->fuel.max / FUEL_SCALE_FACT),
+		      (int)(pl->fuel.sum + 0.5),
+		      (int)(pl->fuel.max + 0.5),
 
 		      connp->view_width, connp->view_height,
 		      connp->debris_colors,
@@ -2096,7 +2096,7 @@ int Send_base(connection_t *connp, int id, int num)
 int Send_fuel(connection_t *connp, int num, double fuel)
 {
     return Packet_printf(&connp->w, "%c%hu%hu", PKT_FUEL,
-			 num, (int)(fuel / FUEL_SCALE_FACT));
+			 num, (int)(fuel + 0.5));
 }
 
 int Send_score_object(connection_t *connp, double score, int cx, int cy,
@@ -2114,11 +2114,11 @@ int Send_score_object(connection_t *connp, double score, int cx, int cy,
     by = CLICK_TO_BLOCK(cy);
 
     if (!FEATURE(connp, F_FLOATSCORE))
-	return Packet_printf(&connp->c, "%c%hd%hu%hu%s",PKT_SCORE_OBJECT,
+	return Packet_printf(&connp->c, "%c%hd%hu%hu%s", PKT_SCORE_OBJECT,
 			     (int)(score + (score > 0 ? 0.5 : -0.5)),
 			     bx, by, string);
     else
-	return Packet_printf(&connp->c, "%c%d%hu%hu%s",PKT_SCORE_OBJECT,
+	return Packet_printf(&connp->c, "%c%d%hu%hu%s", PKT_SCORE_OBJECT,
 			     (int)(score * 100 + (score > 0 ? 0.5 : -0.5)),
 			     bx, by, string);
 }
@@ -2261,7 +2261,7 @@ int Send_mine(connection_t *connp, int cx, int cy, int teammine, int id)
 int Send_target(connection_t *connp, int num, int dead_time, double damage)
 {
     return Packet_printf(&connp->w, "%c%hu%hu%hu", PKT_TARGET,
-			 num, dead_time, (int)damage);
+			 num, dead_time, (int)(damage * 256.0));
 }
 
 int Send_wormhole(connection_t *connp, int cx, int cy)

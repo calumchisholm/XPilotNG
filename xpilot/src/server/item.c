@@ -433,8 +433,7 @@ void Detonate_items(player *pl)
 
 void Tractor_beam(player *pl)
 {
-    double	maxdist, percent;
-    long	cost;
+    double	maxdist, percent, cost;
     player	*locked_pl = Player_by_id(pl->lock.pl_id);
 
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
@@ -448,7 +447,7 @@ void Tractor_beam(player *pl)
 	return;
     }
     percent = TRACTOR_PERCENT(pl->lock.distance, maxdist);
-    cost = (long)TRACTOR_COST(percent);
+    cost = TRACTOR_COST(percent);
     if (pl->fuel.sum < -cost) {
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
@@ -763,11 +762,9 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	    /* choose percantage between 10 and 50. */
 	    double percent = 10.0 + 40.0 * rfrac();
 	    amount = victim->fuel.sum * percent / 100.0;
-	    sprintf(msg, "%s stole %.1f units (%d%%) of fuel from %s.",
+	    sprintf(msg, "%s stole %.1f units (%.1f%%) of fuel from %s.",
 		    (pl ? pl->name : "A cannon"),
-		    amount / FUEL_SCALE_FACT,
-		    (int)(percent + 0.5),
-		    victim->name);
+		    amount, percent, victim->name);
 	}
 	Player_add_fuel(victim, -amount);
         break;
@@ -786,8 +783,6 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
     if (!pl) {
 	*itemp = item;
 	*amountp = amount;
-	if (item == ITEM_FUEL || item == ITEM_TANK)
-	    *amountp /= FUEL_SCALE_FACT;
 	return;
     }
 

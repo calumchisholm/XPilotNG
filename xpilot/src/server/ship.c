@@ -214,7 +214,7 @@ void Add_fuel(pl_fuel_t *ft, double fuel)
 {
     if (ft->sum + fuel > ft->max)
 	fuel = ft->max - ft->sum;
-    else if (ft->sum + fuel < 0)
+    else if (ft->sum + fuel < 0.0)
 	fuel = -ft->sum;
     ft->sum += fuel;
     ft->tank[ft->current] += fuel;
@@ -562,7 +562,7 @@ void Explode_fighter(player *pl)
 
     sound_play_sensors(pl->pos, PLAYER_EXPLOSION_SOUND);
 
-    min_debris = (int)(1 + (pl->fuel.sum / (8.0 * FUEL_SCALE_FACT)));
+    min_debris = (int)(1 + (pl->fuel.sum / 8.0));
     debris_range = pl->mass;
     /* reduce debris since we also create wreckage objects */
     min_debris >>= 1; /* Removed *2.0 from range */

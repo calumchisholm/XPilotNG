@@ -157,10 +157,8 @@
 #define MAX_TOTAL_ECMS		64
 #define MAX_TOTAL_TRANSPORTERS	(2 * 64)
 
-#define MAX_PLAYER_FUEL		(2600<<FUEL_SCALE_BITS)
-#define MIN_PLAYER_FUEL		(350<<FUEL_SCALE_BITS)
-#define ENERGY_PACK_FUEL        ((long)((500+(randomMT()&511)) \
-				    <<FUEL_SCALE_BITS))
+#define MAX_PLAYER_FUEL		2600.0
+#define ENERGY_PACK_FUEL        (500.0 + rfrac() * 511.0)
 
 #define LG2_MAX_AFTERBURNER     4
 #define ALT_SPARK_MASS_FACT     4.2
@@ -181,7 +179,7 @@
 #define TANK_MASS               (ShipMass/10)
 #define TANK_CAP(n)             (!(n)?MAX_PLAYER_FUEL:(MAX_PLAYER_FUEL/3))
 #define TANK_FUEL(n)            ((TANK_CAP(n)*(5+(randomMT()&3)))/32)
-#define TANK_REFILL_LIMIT       (MIN_PLAYER_FUEL/8)
+#define TANK_REFILL_LIMIT       (350.0/8.0)
 #define TANK_THRUST_FACT        0.7
 #define TANK_NOTHRUST_TIME      (HEAT_CLOSE_TIMEOUT/2+2)
 #define TANK_THRUST_TIME        (TANK_NOTHRUST_TIME/2+1)
@@ -259,30 +257,30 @@
 #define TRACTOR_MAX_FORCE(items)  (-40 + (items) * -20)
 #define TRACTOR_PERCENT(dist, maxdist) \
 	(1.0 - (0.5 * (dist) / (maxdist)))
-#define TRACTOR_COST(percent) (-1.5 * FUEL_SCALE_FACT * (percent))
+#define TRACTOR_COST(percent) (-1.5 * (percent))
 #define TRACTOR_FORCE(tr_pr, percent, maxforce) \
 	((percent) * (maxforce) * ((tr_pr) ? -1 : 1))
 
 #define WARN_TIME		(2 * 12)
 #define EMERGENCY_SHIELD_TIME	(4 * 12)
 #define SHIELD_TIME		(2 * 12)
-#define PHASING_TIME		(4*12)
-#define EMERGENCY_THRUST_TIME	(4*12)
+#define PHASING_TIME		(4 * 12)
+#define EMERGENCY_THRUST_TIME	(4 * 12)
 
-#define FUEL_MASS(f)            ((f)*0.005/FUEL_SCALE_FACT)
-/* changed the default to max to avoid sending lots of fuel ACKs */
-/*#define START_STATION_FUEL	(20<<FUEL_SCALE_BITS)*/
+#define FUEL_MASS(f)            ((f) * 0.005)
 #define START_STATION_FUEL	MAX_STATION_FUEL
-#define STATION_REGENERATION	(0.06*FUEL_SCALE_FACT)
-#define REFUEL_RATE		(5<<FUEL_SCALE_BITS)
+#define STATION_REGENERATION	0.06
+#define REFUEL_RATE		5.0
 #define TARGET_FUEL_REPAIR_PER_FRAME (TARGET_DAMAGE / (12 * 10))
-
 #define TARGET_REPAIR_PER_FRAME	(TARGET_DAMAGE / (12 * 600))
+#define TARGET_UPDATE_DELAY	(TARGET_DAMAGE / (TARGET_REPAIR_PER_FRAME \
+				    * BLOCK_SZ))
+
 #define ALLIANCE_NOT_SET	(-1)
 
 #define DEBRIS_MASS             4.5
 
-#define ENERGY_RANGE_FACTOR	(2.5/FUEL_SCALE_FACT)
+#define ENERGY_RANGE_FACTOR	2.5
 
 /* Wall code only considers one way of wrapping around the map, and
  * assumes that after moving the length of one line or one unit of object

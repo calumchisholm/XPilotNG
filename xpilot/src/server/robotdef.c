@@ -1459,7 +1459,7 @@ static int Robot_default_play_check_map(player *pl)
     for (j = 0; j < World.NumFuels; j++) {
 	fuel_t *fs = Fuels(j);
 
-	if (fs->fuel < 100 * FUEL_SCALE_FACT)
+	if (fs->fuel < 100.0)
 	    continue;
 
 	if (BIT(World.rules->mode, TEAM_PLAY)

@@ -123,19 +123,8 @@ extern double		tbl_cos[];
 #define MAX_PLAYER_TURNRESISTANCE	1.0
 #define MIN_PLAYER_TURNRESISTANCE	0.0
 
-/* kps - tmp hacks */
-#ifdef SERVER
-#define FUEL_SCALE_BITS         8
-#define FUEL_SCALE_FACT         (1<<FUEL_SCALE_BITS)
-#define MAX_STATION_FUEL	(500<<FUEL_SCALE_BITS)
-
-#define TARGET_DAMAGE		(250<<FUEL_SCALE_BITS)
-#define TARGET_UPDATE_DELAY	(TARGET_DAMAGE / (TARGET_REPAIR_PER_FRAME \
-				    * BLOCK_SZ))
-#else
 #define MAX_STATION_FUEL	500.0
 #define TARGET_DAMAGE		250.0
-#endif
 
 /*
  * Size (pixels) of radius for legal HIT!

@@ -191,8 +191,8 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     int			j;
     player		*kp;
     double		sc, por,
-			win_score = 0,
-			lose_score = 0;
+			win_score = 0.0,
+			lose_score = 0.0;
     int			win_team_members = 0,
 			lose_team_members = 0,
 			somebody_flag = 0,
@@ -850,11 +850,10 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	cost *= 0.9; /* used to depend on bounce angle, .5 .. 1.0 */
 	if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	    != (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-	    Player_add_fuel(pl, (-((cost * FUEL_SCALE_FACT)
-					 * wallBounceFuelDrainMult)));
+	    Player_add_fuel(pl, -cost * wallBounceFuelDrainMult);
 	    Item_damage(pl, wallBounceDestroyItemProb);
 	}
-	if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
+	if (pl->fuel.sum == 0.0 && wallBounceFuelDrainMult != 0.0) {
 	    if (type == TARGET)
 		Player_crash(pl, CrashTarget, mapobj_ind, 1);
 	    else
@@ -884,8 +883,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 #endif
 	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
-		cost *= FUEL_SCALE_FACT;
-		cost *= (wallBounceFuelDrainMult / 4.0);
+		cost *= wallBounceFuelDrainMult / 4.0;
 		Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), cost);
 	    }
 	}
