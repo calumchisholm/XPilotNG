@@ -71,6 +71,7 @@ extern object		*Obj[];
 extern ecm_t		*Ecms[];
 extern trans_t		*Transporters[];
 extern long		frame_loops;
+extern long		frame_loops_slow;
 extern double		frame_time;
 extern int		observerStart;
 extern int		NumPlayers;

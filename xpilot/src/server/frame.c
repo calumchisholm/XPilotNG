@@ -78,16 +78,6 @@ typedef struct {
 					   coordinates before adjustment... */
 } click_visibility_t;
 
-/*
- * Structure with player position info measured in blocks instead of pixels.
- * Used for map state info updating.
- */
-/* kps - ng does not want this */
-typedef struct {
-    ipos		world;
-    ipos		realWorld;
-} block_visibility_t;
-
 typedef struct {
     unsigned char	x, y;
 } debris_t;
@@ -99,6 +89,7 @@ typedef struct {
 
 extern time_t		gameOverTime;
 long			frame_loops = 1;
+long			frame_loops_slow = 1;
 double			frame_time = 0;
 static long		last_frame_shuffle;
 static shuffle_t	*object_shuffle_ptr;
@@ -445,9 +436,9 @@ static int Frame_status(int conn, int ind)
     }
 
     if (BIT(pl->status, HOVERPAUSE))
-	showautopilot = (pl->count <= 0 || (frame_loops % 8) < 4);
+	showautopilot = (pl->count <= 0 || (frame_loops_slow % 8) < 4);
     else if (BIT(pl->used, HAS_AUTOPILOT))
-	showautopilot = (frame_loops % 8) < 4;
+	showautopilot = (frame_loops_slow % 8) < 4;
     else
 	showautopilot = 0;
 
@@ -862,7 +853,7 @@ static void Frame_shots(int conn, int ind)
 		&& selfImmunity) {
 		color = BLUE;
 		teamshot = DEBRIS_TYPES;
-	    } else if (shot->mods.nuclear && (frame_loops & 2)) {
+	    } else if (shot->mods.nuclear && (frame_loops_slow & 2)) {
 		color = RED;
 		teamshot = DEBRIS_TYPES;
 	    } else {
@@ -1108,7 +1099,7 @@ static void Frame_radar(int conn, int ind)
 		continue;
 
 	    shownuke = (nukesOnRadar && (shot)->mods.nuclear);
-	    if (shownuke && (frame_loops & 2)) {
+	    if (shownuke && (frame_loops_slow & 2)) {
 		size = 3;
 	    } else {
 		size = 0;
@@ -1117,7 +1108,7 @@ static void Frame_radar(int conn, int ind)
 	    if (BIT(shot->type, OBJ_MINE)) {
 		if (!minesOnRadar && !shownuke)
 		    continue;
-		if (frame_loops % 8 >= 6)
+		if (frame_loops_slow % 8 >= 6)
 		    continue;
 	    } else if (BIT(shot->type, OBJ_BALL)) {
 		size = 2;
@@ -1127,7 +1118,7 @@ static void Frame_radar(int conn, int ind)
 	    } else {
 		if (!missilesOnRadar && !shownuke)
 		    continue;
-		if (frame_loops & 1)
+		if (frame_loops_slow & 1)
 		    continue;
 	    }
 
@@ -1172,7 +1163,7 @@ static void Frame_radar(int conn, int ind)
 	    if (BIT(pl->used, HAS_COMPASS)
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
 		&& GetInd[pl->lock.pl_id] == i
-		&& frame_loops % 5 >= 3) {
+		&& frame_loops_slow % 5 >= 3) {
 		continue;
 	    }
 	    size = 3;
@@ -1241,9 +1232,15 @@ void Frame_update(void)
     time_t		newTimeLeft = 0;
     static time_t	oldTimeLeft;
     static bool		game_over_called = false;
+    static double	frame_time2 = 0.0;
 
     frame_loops++;
     frame_time += timeStep;
+    frame_time2 += timeStep;
+    if (frame_time2 >= 1.0) {
+	frame_time2 -= 1.0;
+	frame_loops_slow++;
+    }
 
     Frame_shuffle();
 
