@@ -1520,7 +1520,7 @@ GLWidget *Init_MainWidget( font_data *font )
     tmp->button     	= button_MainWidget;
     tmp->buttondata 	= tmp;
 
-    if ( !AppendGLWidgetList(&(tmp->children),Init_RadarWidget(10,10,200,200)) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),Init_RadarWidget()) ) {
 	error("radar initialization failed");
 	free(tmp);
 	return NULL;

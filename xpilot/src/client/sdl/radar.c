@@ -15,6 +15,8 @@ color_t bgRadarColorValue = 0xa00000ff;
 
 static SDL_Surface *radar_surface;     /* offscreen image with walls */
 static GLuint      radar_texture;     /* above as an OpenGL texture */
+static SDL_Rect    radar_bounds;
+static GLWidget    *radar_widget;
 
 void Radar_cleanup( GLWidget *widget );
 static void Radar_paint( GLWidget *widget );
@@ -321,38 +323,20 @@ void button( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
     }
 }
 
-/*
- * The radar is drawn so that first the walls are painted to an offscreen
- * SDL surface. This surface is then converted into an OpenGL texture.
- * For each frame OpenGL is used to paint rectangles with this walls
- * texture and on top of that the radar objects.
- */
-GLWidget *Init_RadarWidget(int x, int y, int w, int h)
+static int Radar_init(GLWidget *widget)
 {
-    GLWidget *tmp	= Init_EmptyBaseGLWidget();
-    if ( !tmp ) {
-        error("Failed to malloc in Init_RadarWidget");
-	return NULL;
-    }
-    tmp->WIDGET     	= RADARWIDGET;
-    tmp->bounds.x   	= x;
-    tmp->bounds.y   	= y;
-    tmp->bounds.w   	= w+1;
-    tmp->bounds.h   	= h * RadarHeight / RadarWidth+1;
-		    
     radar_surface =
 	SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA,
-                             pow2_ceil(tmp->bounds.w-1),
-			     pow2_ceil(tmp->bounds.h-1), 32,
+                             pow2_ceil(widget->bounds.w-1),
+			     pow2_ceil(widget->bounds.h-1), 32,
                              RMASK, GMASK, BMASK, AMASK);
     if (!radar_surface) {
         error("Could not create radar surface: %s", SDL_GetError());
-	free(tmp);
-        return NULL;
+        return -1;
     }
 
-    if (oldServer) Radar_paint_world_blocks(tmp, radar_surface);
-    else Radar_paint_world_polygons(tmp, radar_surface);
+    if (oldServer) Radar_paint_world_blocks(widget, radar_surface);
+    else Radar_paint_world_polygons(widget, radar_surface);
 
     glGenTextures(1, &radar_texture);
     glBindTexture(GL_TEXTURE_2D, radar_texture);
@@ -364,7 +348,27 @@ GLWidget *Init_RadarWidget(int x, int y, int w, int h)
                     GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST);
+    return 0;
+}
 
+/*
+ * The radar is drawn so that first the walls are painted to an offscreen
+ * SDL surface. This surface is then converted into an OpenGL texture.
+ * For each frame OpenGL is used to paint rectangles with this walls
+ * texture and on top of that the radar objects.
+ */
+GLWidget *Init_RadarWidget(void)
+{
+    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    if ( !tmp ) {
+        error("Failed to malloc in Init_RadarWidget");
+	return NULL;
+    }
+    tmp->WIDGET     	= RADARWIDGET;
+    tmp->bounds.x   	= radar_bounds.x;
+    tmp->bounds.y   	= radar_bounds.y;
+    tmp->bounds.w   	= radar_bounds.w+1;
+    tmp->bounds.h   	= radar_bounds.h * RadarHeight / RadarWidth+1;
     tmp->Draw	    	= Radar_paint;
     tmp->Close	    	= Radar_cleanup;
     tmp->button     	= button;
@@ -372,6 +376,12 @@ GLWidget *Init_RadarWidget(int x, int y, int w, int h)
     tmp->motion     	= move;
     tmp->motiondata 	= tmp;
     
+    if (Radar_init(tmp) != 0) {
+	free(tmp);
+	return NULL;
+    }
+
+    radar_widget = tmp;
     return tmp;
 }
 
@@ -379,6 +389,22 @@ void Radar_cleanup( GLWidget *widget )
 {
     glDeleteTextures(1, &radar_texture);
     SDL_FreeSurface(radar_surface);
+}
+
+static void Radar_set_bounds(GLWidget *widget, int x, int y, int w, int h)
+{
+    radar_bounds.x = x;
+    radar_bounds.y = y;
+    radar_bounds.w = w;
+    radar_bounds.h = h;
+    if (widget != NULL) {
+	widget->bounds.x = x;
+	widget->bounds.y = y;
+	widget->bounds.w = w + 1;
+	widget->bounds.h = h * RadarHeight / RadarWidth + 1;
+	Radar_cleanup(widget);
+	Radar_init(widget);
+    }
 }
 
 static void Radar_blit_world(SDL_Rect *sr, SDL_Rect *dr)
@@ -494,3 +520,44 @@ void Radar_show_target(int x, int y) {}
 
 void Radar_hide_target(int x, int y) {}
 
+static bool Set_geometry(xp_option_t *opt, const char *s)
+{
+    int x = 0, y = 0, w = 0, h = 0;
+
+    if (s[0] == '=') {
+	sscanf(s, "%*c%d%*c%d%*c%d%*c%d", &w, &h, &x, &y);
+    } else {
+	sscanf(s, "%d%*c%d%*c%d%*c%d", &w, &h, &x, &y);
+    }
+    if (w == 0 || h == 0) return false;
+    Radar_set_bounds(radar_widget, x, y, w, h);
+    return true;
+}
+
+static const char* Get_geometry(xp_option_t *opt)
+{
+    static char buf[40];
+    sprintf(buf, "%dx%d+%d+%d", 
+	    radar_bounds.w, 
+	    radar_bounds.h,
+	    radar_bounds.x,
+	    radar_bounds.y);
+    return buf;
+}
+
+
+static xp_option_t radar_options[] = {
+    XP_STRING_OPTION(
+	"radarGeometry",
+	"200x200+10+10",
+	NULL,
+	0,
+	Set_geometry, NULL, Get_geometry,
+	XP_OPTFLAG_DEFAULT,
+	"Set the radar geometry.\n")
+};
+
+void Store_radar_options(void)
+{
+    STORE_OPTIONS(radar_options);
+}

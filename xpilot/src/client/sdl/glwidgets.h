@@ -218,7 +218,7 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt);
 /**********************/
 #define RADARWIDGET 7
 
-extern GLWidget *Init_RadarWidget( int x, int y, int w, int h );
+extern GLWidget *Init_RadarWidget(void);
 /********************/
 /* End: RadarWidget */
 /********************/
