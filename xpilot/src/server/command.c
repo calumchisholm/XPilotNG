@@ -52,7 +52,9 @@ player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 	    return pl_i;
     }
 
-    /* Check if 'str' is a substring of any player's name. */
+    /*
+     * Check what players' name 'str' is a substring of (case insensitively).
+     */
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
 	char *name_i = pl_i->name;
@@ -625,7 +627,26 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	    result = CMD_RESULT_ERROR;
 	}
 	else if (arg) {
+	    char		*errorstr;
 	    /* a name is specified */
+#if 1
+	    player *pl2 = Get_player_by_name(arg, NULL, &errorstr);
+	    if (pl2) {
+		if (cmd == AllyInvite)
+		    Invite_player(pl, pl2);
+		else if (cmd == AllyRefuse)
+		    Refuse_alliance(pl, pl2);
+		else if (cmd == AllyAccept)
+		    Accept_alliance(pl, pl2);
+		else {
+		    strlcpy(msg, usage, MSG_LEN);
+		    result = CMD_RESULT_ERROR;
+		}
+	    } else {
+		strcpy(msg, errorstr);
+		result = CMD_RESULT_ERROR;
+	    }
+#else
 	    int i = Get_player_index_by_name(arg);
 	    if (i >= 0) {
 		player *pl2 = Players(i);
@@ -655,6 +676,7 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 		}
 		result = CMD_RESULT_ERROR;
 	    }
+#endif
 	} else {
 	    /* no player name is specified */
 	    if (cmd == AllyCancel) {
