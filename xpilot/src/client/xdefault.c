@@ -136,62 +136,68 @@ static bool Set_texturedObjects(xp_option_t *opt, bool val)
     return true;
 }
 
-bool Set_acc(xp_option_t *opt, int value)
+static bool Set_mouseAccelNum(xp_option_t *opt, int value)
 {
-  if (value < 0) {
-    new_acc_num = 0;
-    return false;
-  } else {
-    new_acc_num = value;
-    if (dpy) {
+    UNUSED_PARAM(opt);
+
+    if (value < 0) {
+	new_acc_num = 0;
+	return false;
+    } else {
+	new_acc_num = value;
+	if (dpy) {
 #ifndef _WINDOWS
-      if (mouseAccelInClient) {
-	XChangePointerControl(dpy, True, True, value,
-			      new_acc_denom, new_threshold);
-      }
+	    if (mouseAccelInClient) {
+		XChangePointerControl(dpy, True, True, value,
+				      new_acc_denom, new_threshold);
+	    }
 #endif
+	}
+	return true;
     }
-    return true;
-  }
   
 }
 
-bool Set_accdenom(xp_option_t *opt, int value)
+static bool Set_mouseAccelDenom(xp_option_t *opt, int value)
 {
-  if (value < 0) {
-    new_acc_denom = 1;
-    return false;
-  } else {
-    new_acc_denom = value;
-    if (dpy) {
+    UNUSED_PARAM(opt);
+
+    if (value < 0) {
+	new_acc_denom = 1;
+	return false;
+    } else {
+	new_acc_denom = value;
+	if (dpy) {
 #ifndef _WINDOWS
-      if (mouseAccelInClient) {
-	XChangePointerControl(dpy, True, True, new_acc_num,
-			      value, new_threshold);
-      }
+	    if (mouseAccelInClient) {
+		XChangePointerControl(dpy, True, True, new_acc_num,
+				      value, new_threshold);
+	    }
 #endif
-    }
-    return true;
-  }  
+	}
+	return true;
+    }  
 }     
 
-bool Set_accthresh(xp_option_t *opt, int value)
+static bool Set_mouseAccelThresh(xp_option_t *opt, int value)
 {
-  if (value < 0) {
-    new_threshold = 0;
-    return false;
-  } else {    
-    new_threshold = value;
-    if (dpy) {
+    UNUSED_PARAM(opt);
+
+    if (value < 0) {
+	new_threshold = 0;
+	return false;
+    } else {    
+	new_threshold = value;
+	if (dpy) {
 #ifndef _WINDOWS
-      if (mouseAccelInClient) {
-	XChangePointerControl(dpy, True, True, new_acc_num,
-			      new_acc_denom, value);
-      }
+	    if (mouseAccelInClient) {
+		XChangePointerControl(dpy, True, True, new_acc_num,
+				      new_acc_denom, value);
+	    }
 #endif
+	}
+	return true;
     }
-    return true;
-  }
 }
 
 xp_option_t xdefault_options[] = {
@@ -384,7 +390,7 @@ xp_option_t xdefault_options[] = {
 	0,
 	10,
 	&new_acc_num,
-	Set_acc,
+	Set_mouseAccelNum,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Fine tune the mouse acceleration\n"),
 
@@ -394,7 +400,7 @@ xp_option_t xdefault_options[] = {
 	1,
 	10,
 	&new_acc_denom,
-	Set_accdenom,
+	Set_mouseAccelDenom,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the mouse acceleration denominator\n"),
 
@@ -404,7 +410,7 @@ xp_option_t xdefault_options[] = {
 	0,
 	10,
 	&new_threshold,
-	Set_accthresh,
+	Set_mouseAccelThresh,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the mouse acceleration threshold\n"),
 
