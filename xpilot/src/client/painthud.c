@@ -447,7 +447,7 @@ void Paint_HUD(void)
 		    (int)(ext_view_height / 2 + ptr_move_fact*vel.y));
     }
 
-    if (dirPtrColor >= 1) {
+    if (selfVisible && dirPtrColor) {
 	Segment_add(dirPtrColor,
 		    (int) (ext_view_width / 2 +
 			   (100 - 15) * tcos(heading)),
