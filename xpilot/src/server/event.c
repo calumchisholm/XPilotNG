@@ -205,7 +205,7 @@ void Pause_player(player *pl, int on)
 	updateScores = true;
 	strcpy(pl->rank->entry.logout, "paused");
 	if (BIT(pl->have, HAS_BALL))
-	    Detach_ball(pl, -1);
+	    Detach_ball(pl, NULL);
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (World.teams[i].SwapperId == pl->id)
 		World.teams[i].SwapperId = -1;
@@ -539,7 +539,7 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_DROP_BALL:
-		Detach_ball(pl, -1);
+		Detach_ball(pl, NULL);
 		break;
 
 	    case KEY_FIRE_SHOT:

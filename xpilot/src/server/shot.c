@@ -1126,7 +1126,7 @@ void Delete_shot(int ind)
     case OBJ_BALL:
 	ball = BALL_PTR(shot);
 	if (ball->id != NO_ID)
-	    Detach_ball(Player_by_id(ball->id), ind);
+	    Detach_ball(Player_by_id(ball->id), ball);
 	else {
 	    /*
 	     * Maybe some player is still busy trying to connect to this ball.
@@ -1547,7 +1547,7 @@ void Connector_force(int ind)
 
     /* if the tether is too long or too short, release it */
     if (ABS(ratio) > maxBallConnectorRatio) {
-	Detach_ball(pl, ind);
+	Detach_ball(pl, ball);
 	return;
     }
 

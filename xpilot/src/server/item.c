@@ -1130,7 +1130,7 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
 			ballobject *ball = BALL_PTR(shot);
 			if (ball->owner == p->id) {
 			    if ((int)(rfrac() * 100.0f) < ((int)(20*range)+5)) {
-				Detach_ball(p, j);
+				Detach_ball(p, ball);
 			    }
 			}
 		    }

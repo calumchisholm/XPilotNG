@@ -1421,7 +1421,7 @@ static bool Ball_handler(player *pl)
 	    && dist_np > closest_t_dist
 	    && clear_path
 	    && sqr(ball->vel.x) + sqr(ball->vel.y) > 60) {
-	    Detach_ball(pl, -1);
+	    Detach_ball(pl, NULL);
 	    CLR_BIT(pl->used, HAS_CONNECTOR);
 	    my_data->last_thrown_ball = my_data->robot_count;
 	    CLR_BIT(my_data->longterm_mode, FETCH_TREASURE);

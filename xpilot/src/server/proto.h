@@ -332,7 +332,7 @@ void Reset_all_players(void);
 void Check_team_members(int);
 void Compute_game_status(void);
 void Delete_player(player *pl);
-void Detach_ball(player *pl, int ball);
+void Detach_ball(player *pl, ballobject *ball);
 void Kill_player(player *pl, bool add_rank_death);
 void Player_death_reset(player *pl, bool add_rank_death);
 void Team_game_over(int winning_team, const char *reason);

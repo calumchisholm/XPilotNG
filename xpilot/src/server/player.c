@@ -1913,20 +1913,22 @@ void Delete_player(player *pl)
     release_ID(id);
 }
 
-void Detach_ball(player *pl, int obj)
+void Detach_ball(player *pl, ballobject *ball)
 {
     int			i, cnt;
 
-    if (obj == -1 || BALL_PTR(Obj[obj]) == pl->ball) {
+    if (ball == NULL || ball == pl->ball) {
 	pl->ball = NULL;
 	CLR_BIT(pl->used, HAS_CONNECTOR);
     }
 
     if (BIT(pl->have, HAS_BALL)) {
 	for (cnt = i = 0; i < NumObjs; i++) {
-	    if (Obj[i]->type == OBJ_BALL && Obj[i]->id == pl->id) {
-		if (obj == -1 || obj == i) {
-		    Obj[i]->id = NO_ID;
+	    object *obj = Obj[i];
+
+	    if (obj->type == OBJ_BALL && obj->id == pl->id) {
+		if (ball == NULL || ball == BALL_PTR(obj)) {
+		    obj->id = NO_ID;
 		    /* Don't reset owner so you can throw balls */
 		} else
 		    cnt++;
@@ -1959,7 +1961,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 	return;
     }
 
-    Detach_ball(pl, -1);
+    Detach_ball(pl, NULL);
     if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->status, HOVERPAUSE)) {
 	CLR_BIT(pl->status, HOVERPAUSE);
 	Autopilot(pl, false);

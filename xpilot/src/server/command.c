@@ -125,7 +125,7 @@ static void Send_info_about_player(player * pl)
 static void Set_swapper_state(player * pl)
 {
     if (BIT(pl->have, HAS_BALL))
-	Detach_ball(pl, -1);
+	Detach_ball(pl, NULL);
     if (BIT(World.rules->mode, LIMITED_LIVES)) {
 	int i;
 
