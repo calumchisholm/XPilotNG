@@ -1624,12 +1624,11 @@ void Move_smart_shot(int ind)
 
     if (shot->type == OBJ_TORPEDO) {
 	torpobject *torp = TORP_PTR(shot);
-	if (BIT(torp->mods.nuclear, NUCLEAR)) {
-	    acc = (torp->info < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
-	} else {
-	    acc = (torp->info < TORPEDO_SPEED_TIME) ? TORPEDO_ACC : 0.0;
-	}
-	torp->info += timeStep;
+	if (BIT(torp->mods.nuclear, NUCLEAR))
+	    acc = (torp->count < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
+	else
+	    acc = (torp->count < TORPEDO_SPEED_TIME) ? TORPEDO_ACC : 0.0;
+	torp->count += timeStep2;
 	acc *= (1 + (torp->mods.power * MISSILE_POWER_SPEED_FACT));
 	if ((torp->spread_left -= timeStep2) <= 0) {
 	    torp->acc.x = 0;
@@ -1670,7 +1669,7 @@ void Move_smart_shot(int ind)
 		shot->count = HEAT_WIDE_ERROR;
 	    }
 	} else {
-	    shot->count += timeStep;
+	    shot->count += timeStep2;
 	    /* Look for new target */
 	    if ((range < HEAT_CLOSE_RANGE
 		 && shot->count > HEAT_CLOSE_TIMEOUT + HEAT_CLOSE_ERROR)
@@ -1680,7 +1679,7 @@ void Move_smart_shot(int ind)
 		DFLOAT l;
 		int i;
 
-		range = HEAT_RANGE * (shot->count/HEAT_CLOSE_TIMEOUT);
+		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
 		for (i=0; i<NumPlayers; i++) {
 		    player *p = Players[i];
 
@@ -1717,20 +1716,20 @@ void Move_smart_shot(int ind)
 	 * Heat seekers cannot fly exactly, if target is far away or thrust
 	 * isn't active.  So simulate the error:
 	 */
-	x_dif = (int)(rfrac() * 4 * shot->count / TIME_FACT);
-	y_dif = (int)(rfrac() * 4 * shot->count / TIME_FACT);
+	x_dif = rfrac() * 4 * shot->count;
+	y_dif = rfrac() * 4 * shot->count;
 
     }
     else if (shot->type == OBJ_SMART_SHOT) {
 	smartobject *smart = SMART_PTR(shot);
 
 	if (BIT(smart->status, CONFUSED)
-	    && (!(frame_loops % CONFUSED_UPDATE_GRANULARITY)
-		|| smart->count == CONFUSED_TIME)) {
+	    && (!(frame_loops % (int)(CONFUSED_UPDATE_GRANULARITY * FPSMultiplier)
+		|| smart->count == CONFUSED_TIME))) {
 
 	    if (smart->count > 0) {
 		smart->info = Players[(int)(rfrac() * NumPlayers)]->id;
-		smart->count -= timeStep;
+		smart->count -= timeStep2;
 	    } else {
 		smart->count = 0;
 		CLR_BIT(smart->status, CONFUSED);
@@ -1916,7 +1915,7 @@ void Move_mine(int ind)
     mineobject	*mine = MINE_IND(ind);
 
     if (BIT(mine->status, CONFUSED)) {
-	if ((mine->count -= timeStep) <= 0) {
+	if ((mine->count -= timeStep2) <= 0) {
 	    CLR_BIT(mine->status, CONFUSED);
 	    mine->count = 0;
 	}

@@ -133,18 +133,18 @@ typedef struct {
 typedef struct {
     clpos		pos;
     int			dir;
-    int			dead_time;
     unsigned		conn_mask;
     long		last_change;
     int			item[NUM_ITEMS];
-    int			damaged;
     int			tractor_target;
-    int			tractor_count;
     bool		tractor_is_pressor;
     unsigned short	team;
     long		used;
-    int			emergency_shield_left;
-    int			phasing_left;
+    DFLOAT		dead_time;
+    DFLOAT		damaged;
+    DFLOAT		tractor_count;
+    DFLOAT		emergency_shield_left;
+    DFLOAT		phasing_left;
     int			group;
 } cannon_t;
 
@@ -190,7 +190,7 @@ typedef struct {
 typedef struct {
     clpos		pos;
     unsigned short	team;
-    int			dead_time;
+    DFLOAT		dead_time;
     int			damage;
     unsigned		conn_mask;
     unsigned 		update_mask;

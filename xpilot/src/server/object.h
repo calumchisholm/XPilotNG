@@ -211,7 +211,8 @@ struct _cell_node {
     DFLOAT		life;		/* No of ticks left to live */	\
     long		status;		/* gravity, etc. */		\
     int			type;		/* one bit of OBJ_XXX */	\
-    int			count;		/* Misc timings */		\
+/* Item pack count is kept in the 'count' field, DFLOAT now, change !@# */ \
+    DFLOAT		count;		/* Misc timings */		\
     modifiers		mods;		/* Modifiers to this object */	\
     u_byte		color;		/* Color of object */		\
     u_byte		missile_dir;	/* missile direction */	\
@@ -219,10 +220,10 @@ struct _cell_node {
 
 #define OBJECT_EXTEND	\
     cell_node		cell;		/* node in cell linked list */	\
-    long		info;		/* Miscellaneous info */	\
-    double		fusetime;	/* Frame when considered fused */ \
     int			pl_range;	/* distance for collision */	\
     int			pl_radius;	/* distance for hit */		\
+    long		info;		/* Miscellaneous info */	\
+    double		fusetime;	/* Frame when considered fused */ \
 /* up to here all object types are the same. */
 
 
@@ -459,7 +460,7 @@ typedef struct {
     clpos	pos;
     int		target;
     int		id;
-    int		count;
+    DFLOAT	count;
 } trans_t;
 
 /*
@@ -521,7 +522,7 @@ struct player {
     long	used;			/** Items you use **/
     long	have;			/** Items you have **/
 
-    int		shield_time;		/* Shields if no playerShielding */
+    DFLOAT	shield_time;		/* Shields if no playerShielding */
     pl_fuel_t	fuel;			/* ship tanks and the stored fuel */
     DFLOAT	emptymass;		/* Mass of empty ship */
     DFLOAT	float_dir;		/* Direction, in float var */
@@ -544,7 +545,7 @@ struct player {
     int		num_pulses;		/* Number of laser pulses in the air. */
 
     DFLOAT	emergency_thrust_left;	/* how much emergency thrust left */
-    int		emergency_shield_left;	/* how much emergency shield left */
+    DFLOAT	emergency_shield_left;	/* how much emergency shield left */
 
     DFLOAT	phasing_left;		/* how much time left */
 
@@ -611,9 +612,11 @@ struct player {
 
     struct _visibility *visibility;
 
-    int		updateVisibility, forceVisible, damaged;
+    DFLOAT	forceVisible;
+    DFLOAT	damaged;
+    DFLOAT	stunned;
+    int		updateVisibility;
     int		wormDrawCount, wormHoleHit, wormHoleDest;
-    int		stunned;
 
     int		last_target_update;	/* index of last updated target */
     int		last_cannon_update;	/* index of last updated cannon */

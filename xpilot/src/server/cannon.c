@@ -270,13 +270,13 @@ static void Cannon_defend(int ind, int defense)
 
     switch (defense) {
     case CD_EM_SHIELD:
-      c->emergency_shield_left += 4 * 12 * TIME_FACT;
+	c->emergency_shield_left += 4 * 12;
 	SET_BIT(c->used, HAS_EMERGENCY_SHIELD);
 	c->item[ITEM_EMERGENCY_SHIELD]--;
 	sound_play_sensors(c->pos.cx, c->pos.cy, EMERGENCY_SHIELD_ON_SOUND);
 	break;
     case CD_PHASING:
-	c->phasing_left += 4 * 12 * TIME_FACT;
+	c->phasing_left += 4 * 12;
 	SET_BIT(c->used, HAS_PHASING_DEVICE);
 	c->tractor_count = 0;
 	c->item[ITEM_PHASING]--;
@@ -592,9 +592,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	/* smarter cannons use tractors more often and also push/pull longer */
 	c->tractor_is_pressor = (rfrac() * (cannonSmartness + 1) >= 1);
 	c->tractor_target = pl->id;
-	c->tractor_count =
-	    (11 * TIME_FACT
-	     + (int)(TIME_FACT * rfrac() * ((3 * cannonSmartness) + 1)));
+	c->tractor_count = 11 + rfrac() * (3 * cannonSmartness + 1);
 	break;
     case CW_TRANSPORTER:
 	c->item[ITEM_TRANSPORTER]--;

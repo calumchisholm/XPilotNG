@@ -139,8 +139,8 @@
 #define TIME_BITS		6
 #define TIME_FACT 		(1 << TIME_BITS)
 
-#define RECOVERY_DELAY		(12*3*TIME_FACT)
-#define ROBOT_CREATE_DELAY	(12*2*TIME_FACT)
+#define RECOVERY_DELAY		(12 * 3)
+#define ROBOT_CREATE_DELAY	(12 * 2)
 
 #define NO_ID			(-1)
 #define NUM_IDS			256
@@ -212,13 +212,13 @@
 #define SMART_TURNSPEED         2.6
 #define SMART_SHOT_MAX_SPEED	22.0
 #define SMART_SHOT_LOOK_AH      4
-#define CONFUSED_TIME		(3*TIME_FACT)
-#define TORPEDO_SPEED_TIME      (2*12*TIME_FACT)
-#define TORPEDO_ACC		((18.0*SMART_SHOT_MAX_SPEED*TIME_FACT)/\
-				 (12*TORPEDO_SPEED_TIME))
+#define CONFUSED_TIME		3
+#define TORPEDO_SPEED_TIME      (2 * 12)
+#define TORPEDO_ACC		((18.0*SMART_SHOT_MAX_SPEED)/\
+				(12*TORPEDO_SPEED_TIME))
 #define TORPEDO_RANGE		(MINE_RANGE*0.45)
 
-#define NUKE_SPEED_TIME		(2*12*TIME_FACT)
+#define NUKE_SPEED_TIME		(2 * 12)
 #define NUKE_ACC 		(5*TORPEDO_ACC)
 #define NUKE_RANGE		(MINE_RANGE*1.5)
 #define NUKE_MASS_MULT		1
@@ -227,14 +227,14 @@
 
 #define HEAT_RANGE              (VISIBILITY_DISTANCE/2)
 #define HEAT_SPEED_FACT         1.7
-#define HEAT_CLOSE_TIMEOUT      (2*12*TIME_FACT)
+#define HEAT_CLOSE_TIMEOUT      (2 * 12)
 #define HEAT_CLOSE_RANGE        HEAT_RANGE
-#define HEAT_CLOSE_ERROR        (0*TIME_FACT)
-#define HEAT_MID_TIMEOUT        (4*12*TIME_FACT)
-#define HEAT_MID_RANGE          (2*HEAT_RANGE)
-#define HEAT_MID_ERROR          (8*TIME_FACT)
-#define HEAT_WIDE_TIMEOUT       (8*12*TIME_FACT)
-#define HEAT_WIDE_ERROR         (16*TIME_FACT)
+#define HEAT_CLOSE_ERROR        0
+#define HEAT_MID_TIMEOUT        (4 * 12)
+#define HEAT_MID_RANGE          (2 * HEAT_RANGE)
+#define HEAT_MID_ERROR          8
+#define HEAT_WIDE_TIMEOUT       (8 * 12)
+#define HEAT_WIDE_ERROR         16
 
 #define CLUSTER_MASS_SHOTS(mass) ((mass) * 0.9 / ShotsMass)
 #define CLUSTER_MASS_DRAIN(mass) (CLUSTER_MASS_SHOTS(mass)*ED_SHOT)
@@ -261,8 +261,8 @@
 	((percent) * (maxforce) * ((tr_pr) ? -1 : 1))
 
 #define WARN_TIME		(2 * 12)
-#define EMERGENCY_SHIELD_TIME	(4*12*TIME_FACT)
-#define SHIELD_TIME		(2*12*TIME_FACT)
+#define EMERGENCY_SHIELD_TIME	(4 * 12)
+#define SHIELD_TIME		(2 * 12)
 #define PHASING_TIME		(4*12)
 #define EMERGENCY_THRUST_TIME	(4*12)
 

@@ -73,7 +73,7 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 	pl = NULL;
     }
 
-    vicpl->forceVisible += TIME_FACT;
+    vicpl->forceVisible += 1;
     if (BIT(vicpl->have, HAS_MIRROR)
 	&& (rfrac() * (2 * vicpl->item[ITEM_MIRROR])) >= 1) {
 	/*pulse->pos.cx = cx - tcos(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;
@@ -131,11 +131,11 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 	    CLR_BIT(vicpl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
 	    CLR_BIT(vicpl->status, THRUSTING);
-	    vicpl->stunned += 5 * TIME_FACT;
+	    vicpl->stunned += 5;
 	}
     } else if (BIT(pulse->mods.laser, BLIND)) {
-	vicpl->damaged += (12 + 6) * TIME_FACT;
-	vicpl->forceVisible += (12 + 6) * TIME_FACT;
+	vicpl->damaged += (12 + 6);
+	vicpl->forceVisible += (12 + 6);
 	if (pl)
 	    Record_shove(vicpl, pl, frame_loops + 12 + 6);
     } else {

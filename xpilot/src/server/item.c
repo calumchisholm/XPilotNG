@@ -708,7 +708,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
 		Transporters[NumTransporters]->pos.cy = cy;
 		Transporters[NumTransporters]->target = victim->id;
 		Transporters[NumTransporters]->id = (pl ? pl->id : NO_ID);
-		Transporters[NumTransporters]->count = 5 * TIME_FACT;
+		Transporters[NumTransporters]->count = 5;
 		NumTransporters++;
 	    }
 	}
@@ -1084,8 +1084,8 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 		mine->life = 0;
 		break;
 	    }
-	    mine->count = (int)(((8 * (1 - range)) + 2) * 12 * TIME_FACT);
-	    if (   !BIT(mine->status, CONFUSED)
+	    mine->count = ((8 * (1 - range)) + 2) * 12;
+	    if (!BIT(mine->status, CONFUSED)
 		&& (closest_mine == NULL || range < closest_mine_range)) {
 		closest_mine = mine;
 		closest_mine_range = range;
@@ -1126,8 +1126,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 		c->item[ITEM_LASER] -= (int)(damage
 					     * c->item[ITEM_LASER] + 0.5);
 	    }
-	    c->damaged += (int)(24 * TIME_FACT * range
-				* pow(0.75, c->item[ITEM_SENSOR]));
+	    c->damaged += 24 * range * pow(0.75, c->item[ITEM_SENSOR]);
 	}
     }
 
@@ -1171,12 +1170,10 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 	     */
 	    damage = 24.0f * range;
 
-	    if (p->item[ITEM_CLOAK] <= 1) {
-		p->forceVisible += (int)(damage * TIME_FACT);
-	    } else {
-		p->forceVisible += (int)(damage * TIME_FACT
-					 * pow(0.75, (p->item[ITEM_CLOAK]-1)));
-	    }
+	    if (p->item[ITEM_CLOAK] <= 1)
+		p->forceVisible += damage;
+	    else
+		p->forceVisible += damage * pow(0.75, (p->item[ITEM_CLOAK]-1));
 
 	    /* ECM may cause balls to detach. */
 	    if (BIT(p->have, HAS_BALL)) {
@@ -1201,7 +1198,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 	    if (!IS_ROBOT_PTR(p) || !ecmsReprogramRobots || !pl) {
 		/* player is blinded by light flashes. */
 		long duration = (int)(damage * pow(0.75, p->item[ITEM_SENSOR]));
-		p->damaged += duration * TIME_FACT;
+		p->damaged += duration;
 		if (pl)
 		    Record_shove(p, pl, frame_loops + duration);
 	    } else {

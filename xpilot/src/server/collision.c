@@ -370,8 +370,8 @@ static void PlayerCollision(void)
 			Add_fuel(&(Players[j]->fuel), (long)ED_PL_CRASH);
 			Item_damage(j, destroyItemInCollisionProb);
 		    }
-		    pl->forceVisible = 20 * TIME_FACT;
-		    Players[j]->forceVisible = 20 * TIME_FACT;
+		    pl->forceVisible = 20;
+		    Players[j]->forceVisible = 20;
 		    Obj_repel((object *)pl, (object *)Players[j],
 			      PIXEL_TO_CLICK(2*SHIP_SZ));
 		}
@@ -1394,7 +1394,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 	    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 		Add_fuel(&(pl->fuel), drain);
-	    pl->forceVisible += 2 * TIME_FACT;
+	    pl->forceVisible += 2;
 	    Set_message(msg);
 	    break;
 
@@ -1415,7 +1415,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 		drain = (long)(ED_SHOT_HIT * drainfactor * SHOT_MULT(obj));
 		Add_fuel(&(pl->fuel), drain);
 	    }
-	    pl->forceVisible += (int)(SHOT_MULT(obj) * TIME_FACT);
+	    pl->forceVisible += SHOT_MULT(obj);
 	    break;
 
 	default:

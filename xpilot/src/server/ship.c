@@ -438,7 +438,7 @@ void Tank_handle_detach(player *pl)
     dummy->have = DEF_HAVE;
     dummy->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
     if (playerShielding == 0) {
-	dummy->shield_time = 30 * 12 * TIME_FACT;
+	dummy->shield_time = 30 * 12;
 	dummy->have |= HAS_SHIELD;
     }
 

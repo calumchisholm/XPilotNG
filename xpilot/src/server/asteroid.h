@@ -40,7 +40,7 @@
 /* maximum angle between asteroids produced by breaking */
 #define ASTEROID_DELTA_DIR	(RES / 8)
 /* lifetime of asteroid before breaking */
-#define ASTEROID_LIFE		(1000 * TIME_FACT)
+#define ASTEROID_LIFE		1000
 /* number of hits asteroid can take before breaking */
 #define ASTEROID_HITS(size)	(1 << ((size) - 1))
 /* fuel cost to lifetime reduction conversion */

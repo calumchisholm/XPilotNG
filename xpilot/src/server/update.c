@@ -103,13 +103,12 @@ static void Transport_to_home(int ind)
     dx = WRAP_DCX(cx - pl->pos.cx);
     dy = WRAP_DCY(cy - pl->pos.cy);
     t = pl->count + 0.5f;
-    if (2 * t <= T) {
+    if (2 * t <= T)
 	m = 2 / t;
-    } else {
+    else {
 	t = T - t;
 	m = (4 * t) / (T * T - 2 * t * t);
     }
-    m *= TIME_FACT;
     pl->vel.x = dx * m / CLICK;
     pl->vel.y = dy * m / CLICK;
 }
@@ -544,7 +543,7 @@ static void Cannon_update(int do_update_this_frame)
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->dead_time > 0) {
-	    if ((cannon->dead_time -= timeStep) <= 0)
+	    if ((cannon->dead_time -= timeStep2) <= 0)
 		Cannon_restore_on_map(i);
 	    continue;
 	} else {
@@ -580,9 +579,8 @@ static void Cannon_update(int do_update_this_frame)
 		}
 	    }
 	}
-	if ((cannon->damaged -= timeStep) <= 0) {
+	if ((cannon->damaged -= timeStep2) <= 0)
 	    cannon->damaged = 0;
-	}
 	if (cannon->tractor_count > 0) {
 	    int ind = GetInd[cannon->tractor_target];
 	    if (Wrap_length(Players[ind]->pos.cx - cannon->pos.cx,
@@ -593,21 +591,21 @@ static void Cannon_update(int do_update_this_frame)
 		General_tractor_beam(-1, cannon->pos.cx, cannon->pos.cy,
 				     cannon->item[ITEM_TRACTOR_BEAM], ind,
 				     cannon->tractor_is_pressor);
-		if ((cannon->tractor_count -= timeStep) <= 0)
+		if ((cannon->tractor_count -= timeStep2) <= 0)
 		    cannon->tractor_count = 0;
 	    } else {
 		cannon->tractor_count = 0;
 	    }
 	}
 	if (cannon->emergency_shield_left > 0) {
-	    if ((cannon->emergency_shield_left -= timeStep) <= 0) {
+	    if ((cannon->emergency_shield_left -= timeStep2) <= 0) {
 		CLR_BIT(cannon->used, HAS_EMERGENCY_SHIELD);
 		sound_play_sensors(cannon->pos.cx, cannon->pos.cy,
 				   EMERGENCY_SHIELD_OFF_SOUND);
 	    }
 	}
 	if (cannon->phasing_left > 0) {
-	    if ((cannon->phasing_left -= timeStep) <= 0) {
+	    if ((cannon->phasing_left -= timeStep2) <= 0) {
 		CLR_BIT(cannon->used, HAS_PHASING_DEVICE);
 	        sound_play_sensors(cannon->pos.cx, cannon->pos.cy,
 				   PHASING_OFF_SOUND);
@@ -622,7 +620,7 @@ static void Target_update(void)
 
     for (i = 0; i < World.NumTargets; i++) {
 	if (World.targets[i].dead_time > 0) {
-	    if ((World.targets[i].dead_time -= timeStep) <= 0) {
+	    if ((World.targets[i].dead_time -= timeStep2) <= 0) {
 		Target_restore_on_map(i);
 
 		if (targetSync) {
@@ -703,7 +701,7 @@ static void Use_items(int i)
     player *pl = Players[i];
 
     if (pl->shield_time > 0) {
-	if ((pl->shield_time -= timeStep) <= 0) {
+	if ((pl->shield_time -= timeStep2) <= 0) {
 	    pl->shield_time = 0;
 	    if (!BIT(pl->used, HAS_EMERGENCY_SHIELD))
 		CLR_BIT(pl->used, HAS_SHIELD);
@@ -738,7 +736,7 @@ static void Use_items(int i)
     if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
 	if (pl->fuel.sum > 0
 	    && BIT(pl->used, HAS_SHIELD)
-	    && ((pl->emergency_shield_left -= timeStep) <= 0)) {
+	    && ((pl->emergency_shield_left -= timeStep2) <= 0)) {
 	    if (pl->item[ITEM_EMERGENCY_SHIELD])
 		Emergency_shield(i, true);
 	    else
@@ -807,7 +805,7 @@ void Update_objects(void)
 	pl = Players[i];
 
 	if (pl->stunned > 0) {
-	    pl->stunned -= timeStep;
+	    pl->stunned -= timeStep2;
 	    if (pl->stunned <= 0)
 		pl->stunned = 0;
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
@@ -858,7 +856,7 @@ void Update_objects(void)
      * Update transporters
      */
     for (i = 0; i < NumTransporters; i++) {
-	if ((Transporters[i]->count -= timeStep) <= 0) {
+	if ((Transporters[i]->count -= timeStep2) <= 0) {
 	    free(Transporters[i]);
 	    --NumTransporters;
 	    Transporters[i] = Transporters[NumTransporters];
@@ -880,7 +878,7 @@ void Update_objects(void)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players[i];
 
-	if ((pl->damaged -= timeStep) <= 0)
+	if ((pl->damaged -= timeStep2) <= 0)
 	    pl->damaged = 0;
 
 	/* kps - fix these */
@@ -911,7 +909,7 @@ void Update_objects(void)
 	}
 
 	if (pl->count >= 0) {
-	    pl->count -= timeStep;
+	    pl->count -= timeStep2;
 	    if (pl->count > 0) {
 		if (!BIT(pl->status, PLAYING)) {
 		    Transport_to_home(i);
@@ -1251,7 +1249,7 @@ void Update_objects(void)
 					PIXEL_TO_CLICK(w.y));
 	    pl->vel.x *= WORM_BRAKE_FACTOR;
 	    pl->vel.y *= WORM_BRAKE_FACTOR;
-	    pl->forceVisible += 15 * TIME_FACT;
+	    pl->forceVisible += 15;
 
 	    if ((j != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
 		World.wormHoles[pl->wormHoleHit].lastdest = j;
@@ -1301,7 +1299,7 @@ void Update_objects(void)
 	pl->updateVisibility = 0;
 
 	if (pl->forceVisible > 0) {
-	    if ((pl->forceVisible -= timeStep) <= 0)
+	    if ((pl->forceVisible -= timeStep2) <= 0)
 		pl->forceVisible = 0;
 
 	    if (!pl->forceVisible)

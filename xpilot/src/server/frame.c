@@ -507,10 +507,10 @@ static int Frame_status(int conn, int ind)
 			EMERGENCY_THRUST_TIME);
     if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
 	Send_shieldtime(conn,
-			pl->emergency_shield_left >> TIME_BITS,
-			EMERGENCY_SHIELD_TIME >> TIME_BITS);
+			(int) pl->emergency_shield_left,
+			EMERGENCY_SHIELD_TIME);
     if (BIT(pl->status, SELF_DESTRUCT) && pl->count > 0) {
-	Send_destruct(conn, pl->count >> TIME_BITS);
+	Send_destruct(conn, (int)pl->count);
     }
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	Send_phasingtime(conn,
@@ -553,7 +553,7 @@ static void Frame_map(int conn, int ind)
 	if (BIT(targ->update_mask, conn_bit)
 	    || (BIT(targ->conn_mask, conn_bit) == 0
 		&& click_inview(&cv, targ->pos.cx, targ->pos.cy))) {
-	    Send_target(conn, i, targ->dead_time >> TIME_BITS, targ->damage);
+	    Send_target(conn, i, (int)targ->dead_time, targ->damage);
 	    pl->last_target_update = i;
 	    bytes_left -= target_packet_size;
 	    if (++packet_count >= max_packet) {
@@ -571,7 +571,7 @@ static void Frame_map(int conn, int ind)
 	}
 	if (click_inview(&cv, World.cannon[i].pos.cx, World.cannon[i].pos.cy)) {
 	    if (BIT(World.cannon[i].conn_mask, conn_bit) == 0) {
-		Send_cannon(conn, i, World.cannon[i].dead_time >> TIME_BITS);
+		Send_cannon(conn, i, (int)World.cannon[i].dead_time);
 		pl->last_cannon_update = i;
 		bytes_left -= max_packet * cannon_packet_size;
 		if (++packet_count >= max_packet) {
@@ -996,20 +996,14 @@ static void Frame_ships(int conn, int ind)
     for (k = 0; k < num_player_shuffle; k++) {
 	i = player_shuffle_ptr[k];
 	pl_i = Players[i];
-	if (!BIT(pl_i->status, PLAYING|PAUSE)) {
+	if (!BIT(pl_i->status, PLAYING|PAUSE))
 	    continue;
-	}
-	if (BIT(pl_i->status, GAME_OVER)) {
+	if (BIT(pl_i->status, GAME_OVER))
 	    continue;
-	}
-	if (!click_inview(&cv, pl_i->pos.cx, pl_i->pos.cy)) {
+	if (!click_inview(&cv, pl_i->pos.cx, pl_i->pos.cy))
 	    continue;
-	}
 	if (BIT(pl_i->status, PAUSE)) {
-	    Send_paused(conn,
-			pl_i->pos.cx,
-			pl_i->pos.cy,
-			pl_i->count >> TIME_BITS);
+	    Send_paused(conn, pl_i->pos.cx, pl_i->pos.cy, (int)pl_i->count);
 	    continue;
 	}
 
@@ -1329,9 +1323,8 @@ void Frame_update(void)
 	    && (BIT(pl->status, (GAME_OVER|PLAYING)) == (GAME_OVER|PLAYING)
 		|| BIT(pl->status, PAUSE))) {
 	    ind = GetInd[pl->lock.pl_id];
-	} else {
+	} else
 	    ind = i;
-	}
 	if (pl->rectype == 2) {
 	    if (BIT(pl->lock.tagged, LOCK_PLAYER))
 		ind = GetInd[pl->lock.pl_id];
@@ -1339,9 +1332,9 @@ void Frame_update(void)
 		ind = 0;
 	}
 
-	if (Players[ind]->damaged > 0) {
-	    Send_damaged(conn, Players[ind]->damaged >> TIME_BITS);
-	} else {
+	if (Players[ind]->damaged > 0)
+	    Send_damaged(conn, (int)Players[ind]->damaged);
+	else {
 	    Frame_parameters(conn, ind);
 	    if (Frame_status(conn, ind) <= 0) {
 		continue;

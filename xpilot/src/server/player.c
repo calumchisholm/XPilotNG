@@ -765,7 +765,7 @@ void Reset_all_players(void)
 	    /* Reset the targets */
 	    for (i = 0; i < World.NumTargets; i++) {
 		if (World.targets[i].damage != TARGET_DAMAGE
-		    || World.targets[i].dead_time != 0) {
+		    || World.targets[i].dead_time > 0) {
 		    Target_restore_on_map(i);
 		}
 	    }
@@ -2037,7 +2037,7 @@ void Player_death_reset(int ind)
 
     pl->forceVisible	= 0;
     if (BIT(pl->status, PAUSE))
-	pl->count		= MAX(RECOVERY_DELAY, pl->count);
+	pl->count	= MAX(RECOVERY_DELAY, pl->count);
     else
 	pl->count = RECOVERY_DELAY;
     pl->ecmcount	= 0;

@@ -1940,7 +1940,7 @@ static void Robot_default_play(int ind)
     if (pl->fuel.sum <= (BIT(World.rules->mode, TIMING) ? 0 : pl->fuel.l1)) {
 	if (!BIT(pl->status, SELF_DESTRUCT)) {
 	    SET_BIT(pl->status, SELF_DESTRUCT);
-	    pl->count = 150 * TIME_FACT;
+	    pl->count = 150;
 	}
     } else {
 	CLR_BIT(pl->status, SELF_DESTRUCT);

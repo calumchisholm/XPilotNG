@@ -411,9 +411,8 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	for (j = 0; j < World.NumTargets; j++) {
 	    if (World.targets[j].team == targ->team) {
 		targets_total++;
-		if (World.targets[j].dead_time == 0) {
+		if (World.targets[j].dead_time <= 0)
 		    targets_remaining++;
-		}
 	    }
 	}
     }

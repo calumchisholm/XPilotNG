@@ -1120,7 +1120,7 @@ void Robot_update(void)
 	     && World.teams[robotTeam].NumMembers >=
 		World.teams[robotTeam].NumBases)) {
 
-	new_robot_delay += timeStep;
+	new_robot_delay += timeStep2;
 	if (new_robot_delay >= ROBOT_CREATE_DELAY) {
 	    Robot_create();
 	    new_robot_delay = 0;
@@ -1158,10 +1158,9 @@ void Robot_update(void)
 
 	if (BIT(pl->status, PLAYING|GAME_OVER) != PLAYING) {
 	    /* Only check for leave if not being transported to homebase. */
-	    if (!pl->count) {
-		if (Robot_check_leave(i)) {
+	    if (!pl->count > 0) {
+		if (Robot_check_leave(i))
 		    i--;
-		}
 	    }
 	    continue;
 	}

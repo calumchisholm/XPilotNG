@@ -348,7 +348,7 @@ bool Balltarget_hit_func(struct group *group, struct move *move)
 
 int Cannon_hitmask(cannon_t *cannon)
 {
-    if (cannon->dead_time)
+    if (cannon->dead_time > 0)
 	return ALL_BITS;
     if (BIT(World.rules->mode, TEAM_PLAY) && teamImmunity)
 	return HITMASK(cannon->team);
@@ -384,7 +384,7 @@ void Cannon_remove_from_map(int ind)
     cannon_t		*cannon = &World.cannon[ind];
     int			bx, by;
 
-    cannon->dead_time = cannonDeadTime * TIME_FACT;
+    cannon->dead_time = cannonDeadTime;
     cannon->conn_mask = 0;
 
     bx = CLICK_TO_BLOCK(cannon->pos.cx);
@@ -409,7 +409,7 @@ bool Cannon_hit_func(struct group *group, struct move *move)
     unsigned long cannon_mask;
 
     /* cannon is dead ? */
-    if (cannon->dead_time != 0) {
+    if (cannon->dead_time > 0) {
 	warn("BUG: Cannon_hit_func called for dead cannon.\n");
 	return false;
     }
@@ -505,7 +505,7 @@ void Target_remove_from_map(int ind)
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
     targ->damage = TARGET_DAMAGE;
-    targ->dead_time = targetDeadTime * TIME_FACT;
+    targ->dead_time = targetDeadTime;
 
     /*
      * Destroy target.
@@ -528,7 +528,7 @@ bool Target_hit_func(struct group *group, struct move *move)
     unsigned long target_mask;
 
     /* target is dead ? */
-    if (targ->dead_time != 0) {
+    if (targ->dead_time > 0) {
 	xpprintf("BUG: Target_hit_func called for dead target.\n");
 	return false;
     }
