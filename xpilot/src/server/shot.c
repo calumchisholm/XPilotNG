@@ -45,14 +45,23 @@ char shot_version[] = VERSION;
  * Functions for shots.
  */
 
+static inline bool Player_can_place_mine(player_t *pl)
+{
+    if (pl->item[ITEM_MINE] <= 0)
+	return false;
+    if (BIT(pl->used, HAS_PHASING_DEVICE))
+	return false;
+    if (BIT(pl->used, HAS_SHIELD)
+	&& !options.shieldedMining)
+	return false;
+    return true;
+}
 
 void Place_mine(player_t *pl)
 {
     vector_t zero_vel = { 0.0, 0.0 };
 
-    if (pl->item[ITEM_MINE] <= 0
-	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
-	    && !options.shieldedMining))
+    if (!Player_can_place_mine(pl))
 	return;
 
     if (options.minMineSpeed > 0) {
@@ -69,9 +78,7 @@ void Place_moving_mine(player_t *pl)
 {
     vector_t vel = pl->vel;
 
-    if (pl->item[ITEM_MINE] <= 0
-	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
-	    && !options.shieldedMining))
+    if (!Player_can_place_mine(pl))
 	return;
 
     if (options.minMineSpeed > 0) {
