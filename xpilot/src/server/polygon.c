@@ -246,6 +246,7 @@ int P_start_target(int team, int ind)
     groups[current_group].hit_mask = HITMASK(team);
     groups[current_group].hit_func = Target_hit_func;
     groups[current_group].item_id = ind;
+    World.targets[ind].group_id = current_group;
     return current_group;
 }
 
@@ -262,6 +263,7 @@ int P_start_cannon(int team, int ind)
     groups[current_group].hit_mask = 0 /*HITMASK(team)*/;
     groups[current_group].hit_func = Cannon_hit_func;
     groups[current_group].item_id = ind;
+    World.cannon[ind].group_id = current_group;
     return current_group;
 }
 

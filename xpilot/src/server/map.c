@@ -178,6 +178,7 @@ int Map_place_cannon(int cx, int cy, int dir, int team)
     t.team = team;
     t.dead_time = 0;
     t.conn_mask = (unsigned)-1;
+    t.group_id = -1;
     STORE(cannon_t, World.cannon, World.NumCannons, max_cannons, t);
     Cannon_init(ind);
     Map_set_itemid(CLICK_TO_BLOCK(cx), CLICK_TO_BLOCK(cy), ind);
@@ -266,6 +267,7 @@ int Map_place_target(int cx, int cy, int team)
     t.conn_mask = (unsigned)-1;
     t.update_mask = 0;
     t.last_change = frame_loops;
+    t.group_id = -1;
     STORE(target_t, World.targets, World.NumTargets, max_targets, t);
     Map_set_itemid(CLICK_TO_BLOCK(cx), CLICK_TO_BLOCK(cy), ind);
     return ind;
