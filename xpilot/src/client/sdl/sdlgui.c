@@ -813,19 +813,21 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	}
     }
 
-    set_alphacolor((e_style.rgb << 8) | 0xff);
-    glLineWidth(e_style.width * scale);
-    if (smoothLines) {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_LINE_SMOOTH);
+    if (e_style.width != -1) {
+	set_alphacolor((e_style.rgb << 8) | 0xff);
+	glLineWidth(e_style.width * scale);
+	if (smoothLines) {
+	    glEnable(GL_BLEND);
+	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	    glEnable(GL_LINE_SMOOTH);
+	}
+	glCallList(polyEdgeListBase + i);
+	if (smoothLines) {
+	    glDisable(GL_LINE_SMOOTH);
+	    glDisable(GL_BLEND);
+	}
+	glLineWidth(1);
     }
-    glCallList(polyEdgeListBase + i);
-    if (smoothLines) {
-	glDisable(GL_LINE_SMOOTH);
-	glDisable(GL_BLEND);
-    }
-    glLineWidth(1);
     glPopMatrix();
 }
 
