@@ -134,6 +134,12 @@
 	&& (Players(j)->lock.pl_id != -1) \
 	&& (GetInd(Players(j)->lock.pl_id) == (i)))
 
+#define Player_is_playing(pl) \
+((BIT((pl)->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING) ? true : false)
+
+#define Player_is_active(pl) \
+((BIT((pl)->status, PLAYING|PAUSE|GAME_OVER) == PLAYING) ? true : false)
+
 
 #define RECOVERY_DELAY		(12 * 3)
 #define ROBOT_CREATE_DELAY	(12 * 2)
