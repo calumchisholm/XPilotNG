@@ -33,9 +33,6 @@ extern keydefs_t	*keydefs;
 extern int		num_keydefs;
 extern int		max_keydefs;
 
-extern char* Get_keyHelpString(keys_t key);
-extern const char *Get_keyResourceString(keys_t key);
-
 bool Key_binding_callback(keys_t key, const char *str);
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset);
 void Key_event(XEvent *event);

@@ -445,8 +445,8 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
 	unsigned	bufsize = (num_keydefs * 64);
 	char		*buf = calloc(bufsize, 1),
 			*end = buf,
-			*help,
 			*str;
+	const char	*help;
 	int		i,
 			len,
 			maxkeylen = 0;

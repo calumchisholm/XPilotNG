@@ -31,6 +31,10 @@ extern void Get_xpilotrc_file(char *, unsigned);
 extern bool Set_option(const char *name, const char *value);
 extern void Set_command(const char *command);
 
+extern void Usage(void);
+extern const char *Get_keyHelpString(keys_t key);
+extern const char *Get_keyResourceString(keys_t key);
+
 typedef enum {
     xp_noarg_option,
     xp_bool_option,

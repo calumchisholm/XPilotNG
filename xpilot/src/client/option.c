@@ -575,12 +575,20 @@ void Parse_options(int *argcp, char **argvp)
 	}
 	/*printf("arg %d: %s\n", i, argvp[i]);*/
     }
-    
+
+    if (xpArgs.help)
+	Usage();
+
+    if (xpArgs.version) {
+	puts(TITLE);
+	exit(0);
+    }
+
 }
 
 
 
-char *Get_keyHelpString(keys_t key)
+const char *Get_keyHelpString(keys_t key)
 {
     int			i;
     char		*nl;
