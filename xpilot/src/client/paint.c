@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -341,7 +340,7 @@ void Paint_frame(void)
 #ifndef _WINDOWS
     if (dbuf_state->type == PIXMAP_COPY) {
 	XCopyArea(dpy, p_draw, draw, gc,
-		  0, 0, view_width, view_height, 0, 0);
+		  0, 0, draw_width, draw_height, 0, 0);
     }
 
     dbuff_switch(dbuf_state);
