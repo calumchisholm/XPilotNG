@@ -22,7 +22,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #include "../../common/NT/winX.h"
-#include "../blockbitmaps.h"
+#include "../bitmaps.h"
 #include "winbitmap.h"
 
 #include "../gfx2d.h"
@@ -48,13 +48,7 @@ xp_picture_t radar_colors;
 extern int blockBitmaps;
 int Colors_init_block_bitmaps(void)
 {
-//    blockBitmaps = false;
-    if (blockBitmaps) {
-	Block_bitmaps_create();
-    }
-
-    return (blockBitmaps == true) ? 0 : -1;
-
+	return 0;
 }
 void Colors_free_block_bitmaps(void)
 {
@@ -64,29 +58,28 @@ void delete_bitmaps()
 {
     int i,j;
     SelectObject(itemsDC, GetStockObject(BLACK_PEN));
-	    
-    for (i = 0; i < NUM_BITMAPS; i++) {	
-	for (j = 0; j < xp_pixmaps[i].picture.images; j++) {
-	    if (xp_pixmaps[i].bitmaps[j].bitmap) {
-		DeleteObject((HBITMAP)xp_pixmaps[i].bitmaps[j].bitmap);
-	    }
-	}
+	
+    for (i = 0; i < num_pixmaps; i++) {	
+		for (j = 0; j < pixmaps[i].picture.count; j++) {
+			if (pixmaps[i].bitmaps[j].bitmap) {
+				DeleteObject((HBITMAP)pixmaps[i].bitmaps[j].bitmap);
+			}
+		}
     }
 }
-void Block_bitmap_create_begin(Drawable d,xp_pixmap_t *xp_pixmap, int image,
-			 int width, int height)
+
+int Bitmap_create_begin(Drawable d,xp_pixmap_t *pm, int bmp)
 {
     HBITMAP hbm;
     hDC = GetDC(xid[d].hwnd.hWnd);
     hDCb = CreateCompatibleDC(hDC);
 
-    if (xp_pixmap->bitmaps[image].bitmap) {
+    if (pm->bitmaps[bmp].bitmap) {
         SelectObject(itemsDC, GetStockObject(BLACK_PEN));
-	DeleteObject((HBITMAP)xp_pixmap->bitmaps[image].bitmap);
+		DeleteObject((HBITMAP)pm->bitmaps[bmp].bitmap);
     }
     
-    hbm = CreateCompatibleBitmap(hDC, width, 
-				 height);
+    hbm = CreateCompatibleBitmap(hDC, pm->width, pm->height);
     SelectObject(hDCb, hbm);
     if (bHasPal)
     {
@@ -94,40 +87,42 @@ void Block_bitmap_create_begin(Drawable d,xp_pixmap_t *xp_pixmap, int image,
         RealizePalette(hDCb);
     }
     
-    if (!hbm)
-        error("Can't create item bitmaps");
-    xp_pixmap->bitmaps[image].bitmap = (Pixmap)hbm;
+    if (!hbm) {
+		error("Can't create item bitmaps");
+		return -1;
+	}
+    pm->bitmaps[bmp].bitmap = (Pixmap)hbm;
+	return 0;
 }
 
-void Block_bitmap_create_end(Drawable d)
+int Bitmap_create_end(Drawable d)
 {
     DeleteDC(hDCb);
     ReleaseDC(xid[d].hwnd.hWnd, hDC);
+	return 0;
 }
 
-void Block_bitmap_set_pixel(xp_pixmap_t *xp_pixmap, int image, int x, int y, RGB_COLOR color)
+void Bitmap_set_pixel(xp_pixmap_t *xp_pixmap, int image, int x, int y, RGB_COLOR color)
 {
     SetPixelV(hDCb, x, y, color);
 }
 
-void Block_bitmap_paint(Drawable d, int type, int x, int y, int width, int height,
-		 int number) 
+void Bitmap_paint_area(Drawable d, xp_bitmap_t *bit, int x, int y, irec *r) 
 {
     HDC		hDC = xid[d].hwnd.hBmpDC;
 
-    SelectObject(itemsDC, (HBITMAP)xp_pixmaps[type].bitmaps[number].bitmap);
+    SelectObject(itemsDC, (HBITMAP)bit->bitmap);
     
-    if (bHasPal)
-    {
-	SelectPalette(itemsDC, myPal, FALSE);
-	RealizePalette(itemsDC);
+    if (bHasPal) {
+		SelectPalette(itemsDC, myPal, FALSE);
+		RealizePalette(itemsDC);
     }
-    BitBlt(hDC, x, y, width, height, itemsDC, 0, 0, SRCPAINT);
+    BitBlt(hDC, x, y, r->w, r->h, itemsDC, r->x, r->y, SRCPAINT);
 }
 
 
 /****************************IRRELEVANT STUFF HERE ***************************/
-
+#if 0
 
 int radar_light(int *radar, int x, int y)
 {
@@ -272,53 +267,4 @@ void Winpaint_world_radar()
     }
 }
 
-void Block_bitmap_paint_fuel_slice(Drawable d, int type, int x, int y, int width, int height, int image, int size) 
-{
-
-    HDC		hDC = xid[d].hwnd.hBmpDC;
-
-    SelectObject(itemsDC, (HBITMAP)xp_pixmaps[type].bitmaps[image].bitmap);
-    
-    if (bHasPal)
-    {
-	SelectPalette(itemsDC, myPal, FALSE);
-	RealizePalette(itemsDC);
-    }
-    
-    BitBlt(hDC, x, y, width, size, itemsDC, 0, 0, SRCPAINT);
-    
-}
-
-
-void Block_bitmap_paint_meter(Drawable d, int type, int x, int y, int width, int height, int size) 
-{
-    HDC		hDC = xid[d].hwnd.hBmpDC;
-
-    SelectObject(itemsDC, (HBITMAP)xp_pixmaps[type].bitmaps[1].bitmap);
-
-    if (bHasPal)
-    {
-	SelectPalette(itemsDC, myPal, FALSE);
-	RealizePalette(itemsDC);
-    }
-    
-    BitBlt(hDC, x, y, size, height, itemsDC, 0, 0, SRCPAINT);
-
-    SelectObject(itemsDC, (HBITMAP)xp_pixmaps[type].bitmaps[0].bitmap);
-
-    if (bHasPal)
-    {
-	SelectPalette(itemsDC, myPal, FALSE);
-	RealizePalette(itemsDC);
-    }
-
-    BitBlt(hDC, x + size, y, width - size, height, itemsDC, size, 0, SRCPAINT);
-
-}
-/*
-void paintItemSymbol(unsigned char type, Drawable d, GC gc, int x, int y, int color)
-{
-    PaintBitmap(d, BM_ALL_ITEMS, x, y, WINSCALE(16), WINSCALE(16), type); 
-//    PaintBitmap(d, BM_ALL_ITEMS, x, y, 16, 16, type); 
-}
-*/
+#endif

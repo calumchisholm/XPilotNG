@@ -403,15 +403,16 @@ void Paint_score_background(int thisLine)
 	
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
 	
-	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
-				  0, 0,
-				  players_width, BG_IMAGE_HEIGHT); )
-	    
-	Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
+	Bitmap_get(players, BM_SCORE_BG, 0);
 	Bitmap_get(players, BM_LOGO, 0);
 	bgh = pixmaps[BM_SCORE_BG].height;
 	lh  = pixmaps[BM_LOGO].height;
 	
+	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
+				  0, 0,
+				  players_width, bgh); )
+	    
+	Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
 	if (players_height > bgh + lh) {
 	    XFillRectangle(dpy, players, scoreListGC,
 			   0, bgh,

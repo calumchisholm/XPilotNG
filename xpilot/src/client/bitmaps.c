@@ -95,9 +95,10 @@ int num_pixmaps = 0, max_pixmaps = 0;
 static int  Bitmap_init (int img);
 static void Bitmap_picture_copy (xp_pixmap_t *xp_pixmap, int image);
 static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image);
-static int  Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp);
-static int  Bitmap_create_end (Drawable d);
-static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
+
+int  Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp);
+int  Bitmap_create_end (Drawable d);
+void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
 
 
 /**
@@ -330,6 +331,29 @@ static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image)
 }
 
 
+/*
+ * Purpose: Paint a the bitmap specified with img and bmp
+ * so that only the pixels inside the bounding box are
+ * painted.
+ */
+void Bitmap_paint(Drawable d, int img, int x, int y, int bmp)
+{
+    xp_bitmap_t *bit;
+    bbox_t *box;
+    irec   area;
+
+    if ((bit = Bitmap_get(d, img, bmp)) == NULL) return;
+    box = &bit->bbox;
+
+    area.x = box->xmin;
+    area.y = box->ymin;
+    area.w = box->xmax + 1 - box->xmin;
+    area.h = box->ymax + 1 - box->ymin;
+
+    Bitmap_paint_area(d, bit, x + area.x, y + area.y, &area);
+}
+
+
 #ifndef _WINDOWS
 /*
  * Maybe move this part to a sperate file.
@@ -346,7 +370,7 @@ static GC maskGC;
  * Allocates and prepares a pixmap for drawing in a platform
  * dependent (UNIX) way. 
  */
-static int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
+int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 {
     Drawable pixmap;
 
@@ -390,7 +414,7 @@ static int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 /**
  * Deallocates resources needed when creating and drawing a pixmap.
  */
-static int Bitmap_create_end (Drawable d)
+int Bitmap_create_end (Drawable d)
 {
     return 0;
 }
@@ -399,7 +423,7 @@ static int Bitmap_create_end (Drawable d)
 /*
  * Purpose: set 1 pixel in the device/OS dependent bitmap.
  */
-static void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
+void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
 			    int bmp, int x, int y,
 			    RGB_COLOR color)
 {
@@ -416,29 +440,6 @@ static void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
     pixel = (color) ? 1 : 0;
     XSetForeground(dpy, maskGC, pixel);
     XDrawPoint(dpy, xp_pixmap->bitmaps[bmp].mask, maskGC, x, y);
-}
-
-
-/*
- * Purpose: Paint a the bitmap specified with img and bmp
- * so that only the pixels inside the bounding box are
- * painted.
- */
-void Bitmap_paint(Drawable d, int img, int x, int y, int bmp)
-{
-    xp_bitmap_t *bit;
-    bbox_t *box;
-    irec   area;
-
-    if ((bit = Bitmap_get(d, img, bmp)) == NULL) return;
-    box = &bit->bbox;
-
-    area.x = box->xmin;
-    area.y = box->ymin;
-    area.w = box->xmax + 1 - box->xmin;
-    area.h = box->ymax + 1 - box->ymin;
-
-    Bitmap_paint_area(d, bit, x + area.x, y + area.y, &area);
 }
 
 

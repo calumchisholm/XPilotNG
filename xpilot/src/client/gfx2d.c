@@ -49,9 +49,10 @@
 
 extern char	*texturePath;		/* Path list of texture directories */
 
+#ifndef _WINDOWS
 /* from xpmread.c */
 extern int xpm_picture_from_file(xp_picture_t *pic, char *filename);
-
+#endif
 
 /*
     Purpose: initialize xp_picture structure and load it from file.
@@ -137,9 +138,15 @@ static int Picture_find_path(const char *filename, char *path)
 	    }
 	}
     }
-
-    error("Can't find PPM file \"%s\"", filename);
+#ifdef _WINDOWS
+	/* 
+	 * This should be fixed by someone who understands how 
+	 * Windows client works 
+	 */
     exit(1);
+#endif
+    error("Can't find PPM file \"%s\"", filename);
+	return FALSE;
 }
 
 /*
@@ -217,11 +224,16 @@ int Picture_load(xp_picture_t *picture, const char *filename)
     }
 
     if (strcmp("xpm", filename + strlen(filename) - 3) == 0) {
+#ifndef _WINDOWS
         if (!xpm_picture_from_file(picture, path)) {
             error("Failed to load XPM bitmap \"%s\"", path);
             return -1;
         }
         return 0;
+#else
+		return -1;
+#endif
+
     } 
 
 

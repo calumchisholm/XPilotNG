@@ -32,6 +32,10 @@
 #include "NT/winXXPilot.h"
 #endif
 
+#ifndef INT_MAX
+#define INT_MAX 4294967295
+#endif
+
 #include "types.h"
 
 #ifndef	_WINDOWS

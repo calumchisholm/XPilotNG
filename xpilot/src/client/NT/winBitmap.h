@@ -24,7 +24,7 @@
 #ifndef WINBITMAP_H
 #define WINBITMAP_H
 #include "../gfx2d.h"
-#include "../blockbitmaps.h"
+#include "../bitmaps.h"
 extern void PaintBitmap(Drawable d, int type, int x, int y, 
 			int width, int height, int number);
 

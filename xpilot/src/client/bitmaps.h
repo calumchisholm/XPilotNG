@@ -22,8 +22,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	BLOCKBITMAPS_H
-#define	BLOCKBITMAPS_H
+#ifndef	BITMAPS_H
+#define	BITMAPS_H
 
 #include "gfx2d.h"
 #include "types.h"

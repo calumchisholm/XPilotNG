@@ -1,18 +1,14 @@
-# Microsoft Developer Studio Generated NMAKE File, Format Version 4.10
-# ** DO NOT EDIT **
-
-# TARGTYPE "Win32 (x86) Application" 0x0101
-
+# Microsoft Developer Studio Generated NMAKE File, Based on xpilot.dsp
 !IF "$(CFG)" == ""
 CFG=xpilot - Win32 Release
-!MESSAGE No configuration specified.  Defaulting to xpilot - Win32 Release.
+!MESSAGE No configuration specified. Defaulting to xpilot - Win32 Release.
 !ENDIF 
 
 !IF "$(CFG)" != "xpilot - Win32 Release" && "$(CFG)" != "xpilot - Win32 Debug"\
  && "$(CFG)" != "xpilot - Win32 ReleasePentium"
 !MESSAGE Invalid configuration "$(CFG)" specified.
-!MESSAGE You can specify a configuration when running NMAKE on this makefile
-!MESSAGE by defining the macro CFG on the command line.  For example:
+!MESSAGE You can specify a configuration when running NMAKE
+!MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
 !MESSAGE NMAKE /f "xpilot.mak" CFG="xpilot - Win32 Release"
 !MESSAGE 
@@ -30,33 +26,30 @@ NULL=
 !ELSE 
 NULL=nul
 !ENDIF 
-################################################################################
-# Begin Project
-# PROP Target_Last_Scanned "xpilot - Win32 ReleasePentium"
-MTL=mktyplib.exe
-CPP=cl.exe
-RSC=rc.exe
 
 !IF  "$(CFG)" == "xpilot - Win32 Release"
 
-# PROP BASE Use_MFC 6
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 6
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
-# PROP Target_Dir ""
 OUTDIR=.\Release
 INTDIR=.\Release
+# Begin Custom Macros
+OutDir=.\.\Release
+# End Custom Macros
+
+!IF "$(RECURSE)" == "0" 
 
 ALL : "$(OUTDIR)\xpilot.exe" "$(OUTDIR)\xpilot.bsc"
 
-CLEAN : 
+!ELSE 
+
+ALL : "$(OUTDIR)\xpilot.exe" "$(OUTDIR)\xpilot.bsc"
+
+!ENDIF 
+
+CLEAN :
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\about.sbr"
+	-@erase "$(INTDIR)\bitmaps.obj"
+	-@erase "$(INTDIR)\bitmaps.sbr"
 	-@erase "$(INTDIR)\BSString.obj"
 	-@erase "$(INTDIR)\BSString.sbr"
 	-@erase "$(INTDIR)\caudio.obj"
@@ -77,8 +70,8 @@ CLEAN :
 	-@erase "$(INTDIR)\default.sbr"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\error.sbr"
-	-@erase "$(INTDIR)\gfx3d.obj"
-	-@erase "$(INTDIR)\gfx3d.sbr"
+	-@erase "$(INTDIR)\gfx2d.obj"
+	-@erase "$(INTDIR)\gfx2d.sbr"
 	-@erase "$(INTDIR)\guimap.obj"
 	-@erase "$(INTDIR)\guimap.sbr"
 	-@erase "$(INTDIR)\guiobjects.obj"
@@ -109,6 +102,8 @@ CLEAN :
 	-@erase "$(INTDIR)\portability.sbr"
 	-@erase "$(INTDIR)\query.obj"
 	-@erase "$(INTDIR)\query.sbr"
+	-@erase "$(INTDIR)\randommt.obj"
+	-@erase "$(INTDIR)\randommt.sbr"
 	-@erase "$(INTDIR)\RecordDummy.obj"
 	-@erase "$(INTDIR)\RecordDummy.sbr"
 	-@erase "$(INTDIR)\shipshape.obj"
@@ -129,12 +124,15 @@ CLEAN :
 	-@erase "$(INTDIR)\texture.sbr"
 	-@erase "$(INTDIR)\usleep.obj"
 	-@erase "$(INTDIR)\usleep.sbr"
+	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\widget.obj"
 	-@erase "$(INTDIR)\widget.sbr"
 	-@erase "$(INTDIR)\winAbout.obj"
 	-@erase "$(INTDIR)\winAbout.sbr"
 	-@erase "$(INTDIR)\winAudio.obj"
 	-@erase "$(INTDIR)\winAudio.sbr"
+	-@erase "$(INTDIR)\winBitmap.obj"
+	-@erase "$(INTDIR)\winBitmap.sbr"
 	-@erase "$(INTDIR)\winNet.obj"
 	-@erase "$(INTDIR)\winNet.sbr"
 	-@erase "$(INTDIR)\winX.obj"
@@ -169,44 +167,52 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-"$(OUTDIR)" :
-
-"$(OUTDIR)\xpilot.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
-
-"$(OUTDIR)\xpilot.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-
-.c{$(CPP_OBJS)}.obj:
-
-.c{$(CPP_SBRS)}.sbr:
-
-.cpp{$(CPP_OBJS)}.obj:
-
-.cpp{$(CPP_SBRS)}.sbr:
-
-.cxx{$(CPP_OBJS)}.obj:
-
-.cxx{$(CPP_SBRS)}.sbr:
-
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Yu"stdafx.h" /c
-# ADD CPP /nologo /MD /W3 /GX /I "..\..\common" /D "NDEBUG" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D "WINDOWSCALING" /D PAINT_FREE=0 /FR /c
-# SUBTRACT CPP /YX /Yc /Yu
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /I "..\..\common" /D "NDEBUG" /D "_MBCS" /D\
  "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D "WINDOWSCALING" /D\
- PAINT_FREE=0 /FR"$(INTDIR)/" /Fo"$(INTDIR)/" /c 
+ PAINT_FREE=0 /FR"$(INTDIR)\\" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.\Release/
-# ADD BASE MTL /nologo /D "NDEBUG" /win32
-# ADD MTL /nologo /D "NDEBUG" /win32
-MTL_PROJ=/nologo /D "NDEBUG" /win32 
-# ADD BASE RSC /l 0x409 /d "NDEBUG" /d "_AFXDLL"
-# ADD RSC /l 0x409 /d "NDEBUG" /d "_AFXDLL"
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)/xpilot.res" /d "NDEBUG" /d "_AFXDLL" 
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
+MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
+RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xpilot.res" /d "NDEBUG" /d "_AFXDLL" 
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/xpilot.bsc" 
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\xpilot.bsc" 
 BSC32_SBRS= \
 	"$(INTDIR)\about.sbr" \
+	"$(INTDIR)\bitmaps.sbr" \
 	"$(INTDIR)\BSString.sbr" \
 	"$(INTDIR)\caudio.sbr" \
 	"$(INTDIR)\checknames.sbr" \
@@ -217,7 +223,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\datagram.sbr" \
 	"$(INTDIR)\default.sbr" \
 	"$(INTDIR)\error.sbr" \
-	"$(INTDIR)\gfx3d.sbr" \
+	"$(INTDIR)\gfx2d.sbr" \
 	"$(INTDIR)\guimap.sbr" \
 	"$(INTDIR)\guiobjects.sbr" \
 	"$(INTDIR)\join.sbr" \
@@ -233,6 +239,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\paintradar.sbr" \
 	"$(INTDIR)\portability.sbr" \
 	"$(INTDIR)\query.sbr" \
+	"$(INTDIR)\randommt.sbr" \
 	"$(INTDIR)\RecordDummy.sbr" \
 	"$(INTDIR)\shipshape.sbr" \
 	"$(INTDIR)\socklib.sbr" \
@@ -246,6 +253,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\widget.sbr" \
 	"$(INTDIR)\winAbout.sbr" \
 	"$(INTDIR)\winAudio.sbr" \
+	"$(INTDIR)\winBitmap.sbr" \
 	"$(INTDIR)\winNet.sbr" \
 	"$(INTDIR)\winX.sbr" \
 	"$(INTDIR)\winX11.sbr" \
@@ -266,13 +274,12 @@ BSC32_SBRS= \
 <<
 
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:windows /machine:I386
-# ADD LINK32 winmm.lib /nologo /subsystem:windows /map /machine:I386
 LINK32_FLAGS=winmm.lib /nologo /subsystem:windows /incremental:no\
- /pdb:"$(OUTDIR)/xpilot.pdb" /map:"$(INTDIR)/xpilot.map" /machine:I386\
- /out:"$(OUTDIR)/xpilot.exe" 
+ /pdb:"$(OUTDIR)\xpilot.pdb" /map:"$(INTDIR)\xpilot.map" /machine:I386\
+ /out:"$(OUTDIR)\xpilot.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\about.obj" \
+	"$(INTDIR)\bitmaps.obj" \
 	"$(INTDIR)\BSString.obj" \
 	"$(INTDIR)\caudio.obj" \
 	"$(INTDIR)\checknames.obj" \
@@ -283,7 +290,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\datagram.obj" \
 	"$(INTDIR)\default.obj" \
 	"$(INTDIR)\error.obj" \
-	"$(INTDIR)\gfx3d.obj" \
+	"$(INTDIR)\gfx2d.obj" \
 	"$(INTDIR)\guimap.obj" \
 	"$(INTDIR)\guiobjects.obj" \
 	"$(INTDIR)\join.obj" \
@@ -299,6 +306,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\paintradar.obj" \
 	"$(INTDIR)\portability.obj" \
 	"$(INTDIR)\query.obj" \
+	"$(INTDIR)\randommt.obj" \
 	"$(INTDIR)\RecordDummy.obj" \
 	"$(INTDIR)\shipshape.obj" \
 	"$(INTDIR)\socklib.obj" \
@@ -312,6 +320,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\widget.obj" \
 	"$(INTDIR)\winAbout.obj" \
 	"$(INTDIR)\winAudio.obj" \
+	"$(INTDIR)\winBitmap.obj" \
 	"$(INTDIR)\winNet.obj" \
 	"$(INTDIR)\winX.obj" \
 	"$(INTDIR)\winX11.obj" \
@@ -334,24 +343,27 @@ LINK32_OBJS= \
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-# PROP BASE Use_MFC 6
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 6
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Target_Dir ""
 OUTDIR=.\Debug
 INTDIR=.\Debug
+# Begin Custom Macros
+OutDir=.\.\Debug
+# End Custom Macros
+
+!IF "$(RECURSE)" == "0" 
 
 ALL : "$(OUTDIR)\xpilot.exe" "$(OUTDIR)\xpilot.bsc"
 
-CLEAN : 
+!ELSE 
+
+ALL : "$(OUTDIR)\xpilot.exe" "$(OUTDIR)\xpilot.bsc"
+
+!ENDIF 
+
+CLEAN :
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\about.sbr"
+	-@erase "$(INTDIR)\bitmaps.obj"
+	-@erase "$(INTDIR)\bitmaps.sbr"
 	-@erase "$(INTDIR)\BSString.obj"
 	-@erase "$(INTDIR)\BSString.sbr"
 	-@erase "$(INTDIR)\caudio.obj"
@@ -372,8 +384,8 @@ CLEAN :
 	-@erase "$(INTDIR)\default.sbr"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\error.sbr"
-	-@erase "$(INTDIR)\gfx3d.obj"
-	-@erase "$(INTDIR)\gfx3d.sbr"
+	-@erase "$(INTDIR)\gfx2d.obj"
+	-@erase "$(INTDIR)\gfx2d.sbr"
 	-@erase "$(INTDIR)\guimap.obj"
 	-@erase "$(INTDIR)\guimap.sbr"
 	-@erase "$(INTDIR)\guiobjects.obj"
@@ -404,6 +416,8 @@ CLEAN :
 	-@erase "$(INTDIR)\portability.sbr"
 	-@erase "$(INTDIR)\query.obj"
 	-@erase "$(INTDIR)\query.sbr"
+	-@erase "$(INTDIR)\randommt.obj"
+	-@erase "$(INTDIR)\randommt.sbr"
 	-@erase "$(INTDIR)\RecordDummy.obj"
 	-@erase "$(INTDIR)\RecordDummy.sbr"
 	-@erase "$(INTDIR)\shipshape.obj"
@@ -424,14 +438,16 @@ CLEAN :
 	-@erase "$(INTDIR)\texture.sbr"
 	-@erase "$(INTDIR)\usleep.obj"
 	-@erase "$(INTDIR)\usleep.sbr"
-	-@erase "$(INTDIR)\vc40.idb"
-	-@erase "$(INTDIR)\vc40.pdb"
+	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\widget.obj"
 	-@erase "$(INTDIR)\widget.sbr"
 	-@erase "$(INTDIR)\winAbout.obj"
 	-@erase "$(INTDIR)\winAbout.sbr"
 	-@erase "$(INTDIR)\winAudio.obj"
 	-@erase "$(INTDIR)\winAudio.sbr"
+	-@erase "$(INTDIR)\winBitmap.obj"
+	-@erase "$(INTDIR)\winBitmap.sbr"
 	-@erase "$(INTDIR)\winNet.obj"
 	-@erase "$(INTDIR)\winNet.sbr"
 	-@erase "$(INTDIR)\winX.obj"
@@ -467,44 +483,52 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-"$(OUTDIR)" :
-
-"$(OUTDIR)\xpilot.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
-
-"$(OUTDIR)\xpilot.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-
-.c{$(CPP_OBJS)}.obj:
-
-.c{$(CPP_SBRS)}.sbr:
-
-.cpp{$(CPP_OBJS)}.obj:
-
-.cpp{$(CPP_SBRS)}.sbr:
-
-.cxx{$(CPP_OBJS)}.obj:
-
-.cxx{$(CPP_SBRS)}.sbr:
-
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Yu"stdafx.h" /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\common" /D "_DEBUG" /D "_MEMPOD" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D "WINDOWSCALING" /D PAINT_FREE=0 /FR /c
-# SUBTRACT CPP /YX /Yc /Yu
+CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\common" /D "_DEBUG" /D\
  "_MEMPOD" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D "WINDOWSCALING"\
- /D PAINT_FREE=0 /FR"$(INTDIR)/" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+ /D PAINT_FREE=0 /FR"$(INTDIR)\\" /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.\Debug/
-# ADD BASE MTL /nologo /D "_DEBUG" /win32
-# ADD MTL /nologo /D "_DEBUG" /win32
-MTL_PROJ=/nologo /D "_DEBUG" /win32 
-# ADD BASE RSC /l 0x409 /d "_DEBUG" /d "_AFXDLL"
-# ADD RSC /l 0x409 /d "_DEBUG" /d "_AFXDLL"
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)/xpilot.res" /d "_DEBUG" /d "_AFXDLL" 
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
+MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
+RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xpilot.res" /d "_DEBUG" /d "_AFXDLL" 
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/xpilot.bsc" 
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\xpilot.bsc" 
 BSC32_SBRS= \
 	"$(INTDIR)\about.sbr" \
+	"$(INTDIR)\bitmaps.sbr" \
 	"$(INTDIR)\BSString.sbr" \
 	"$(INTDIR)\caudio.sbr" \
 	"$(INTDIR)\checknames.sbr" \
@@ -515,7 +539,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\datagram.sbr" \
 	"$(INTDIR)\default.sbr" \
 	"$(INTDIR)\error.sbr" \
-	"$(INTDIR)\gfx3d.sbr" \
+	"$(INTDIR)\gfx2d.sbr" \
 	"$(INTDIR)\guimap.sbr" \
 	"$(INTDIR)\guiobjects.sbr" \
 	"$(INTDIR)\join.sbr" \
@@ -531,6 +555,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\paintradar.sbr" \
 	"$(INTDIR)\portability.sbr" \
 	"$(INTDIR)\query.sbr" \
+	"$(INTDIR)\randommt.sbr" \
 	"$(INTDIR)\RecordDummy.sbr" \
 	"$(INTDIR)\shipshape.sbr" \
 	"$(INTDIR)\socklib.sbr" \
@@ -544,6 +569,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\widget.sbr" \
 	"$(INTDIR)\winAbout.sbr" \
 	"$(INTDIR)\winAudio.sbr" \
+	"$(INTDIR)\winBitmap.sbr" \
 	"$(INTDIR)\winNet.sbr" \
 	"$(INTDIR)\winX.sbr" \
 	"$(INTDIR)\winX11.sbr" \
@@ -564,13 +590,11 @@ BSC32_SBRS= \
 <<
 
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:windows /debug /machine:I386
-# ADD LINK32 winmm.lib /nologo /subsystem:windows /debug /machine:I386
-# SUBTRACT LINK32 /map
 LINK32_FLAGS=winmm.lib /nologo /subsystem:windows /incremental:yes\
- /pdb:"$(OUTDIR)/xpilot.pdb" /debug /machine:I386 /out:"$(OUTDIR)/xpilot.exe" 
+ /pdb:"$(OUTDIR)\xpilot.pdb" /debug /machine:I386 /out:"$(OUTDIR)\xpilot.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\about.obj" \
+	"$(INTDIR)\bitmaps.obj" \
 	"$(INTDIR)\BSString.obj" \
 	"$(INTDIR)\caudio.obj" \
 	"$(INTDIR)\checknames.obj" \
@@ -581,7 +605,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\datagram.obj" \
 	"$(INTDIR)\default.obj" \
 	"$(INTDIR)\error.obj" \
-	"$(INTDIR)\gfx3d.obj" \
+	"$(INTDIR)\gfx2d.obj" \
 	"$(INTDIR)\guimap.obj" \
 	"$(INTDIR)\guiobjects.obj" \
 	"$(INTDIR)\join.obj" \
@@ -597,6 +621,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\paintradar.obj" \
 	"$(INTDIR)\portability.obj" \
 	"$(INTDIR)\query.obj" \
+	"$(INTDIR)\randommt.obj" \
 	"$(INTDIR)\RecordDummy.obj" \
 	"$(INTDIR)\shipshape.obj" \
 	"$(INTDIR)\socklib.obj" \
@@ -610,6 +635,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\widget.obj" \
 	"$(INTDIR)\winAbout.obj" \
 	"$(INTDIR)\winAudio.obj" \
+	"$(INTDIR)\winBitmap.obj" \
 	"$(INTDIR)\winNet.obj" \
 	"$(INTDIR)\winX.obj" \
 	"$(INTDIR)\winX11.obj" \
@@ -632,24 +658,27 @@ LINK32_OBJS= \
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-# PROP BASE Use_MFC 6
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "xpilot__"
-# PROP BASE Intermediate_Dir "xpilot__"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 6
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "xpilot__"
-# PROP Intermediate_Dir "xpilot__"
-# PROP Target_Dir ""
 OUTDIR=.\xpilot__
 INTDIR=.\xpilot__
+# Begin Custom Macros
+OutDir=.\.\xpilot__
+# End Custom Macros
+
+!IF "$(RECURSE)" == "0" 
 
 ALL : ".\Release\xpilot.exe" "$(OUTDIR)\xpilot.bsc"
 
-CLEAN : 
+!ELSE 
+
+ALL : ".\Release\xpilot.exe" "$(OUTDIR)\xpilot.bsc"
+
+!ENDIF 
+
+CLEAN :
 	-@erase "$(INTDIR)\about.obj"
 	-@erase "$(INTDIR)\about.sbr"
+	-@erase "$(INTDIR)\bitmaps.obj"
+	-@erase "$(INTDIR)\bitmaps.sbr"
 	-@erase "$(INTDIR)\BSString.obj"
 	-@erase "$(INTDIR)\BSString.sbr"
 	-@erase "$(INTDIR)\caudio.obj"
@@ -670,8 +699,8 @@ CLEAN :
 	-@erase "$(INTDIR)\default.sbr"
 	-@erase "$(INTDIR)\error.obj"
 	-@erase "$(INTDIR)\error.sbr"
-	-@erase "$(INTDIR)\gfx3d.obj"
-	-@erase "$(INTDIR)\gfx3d.sbr"
+	-@erase "$(INTDIR)\gfx2d.obj"
+	-@erase "$(INTDIR)\gfx2d.sbr"
 	-@erase "$(INTDIR)\guimap.obj"
 	-@erase "$(INTDIR)\guimap.sbr"
 	-@erase "$(INTDIR)\guiobjects.obj"
@@ -702,6 +731,8 @@ CLEAN :
 	-@erase "$(INTDIR)\portability.sbr"
 	-@erase "$(INTDIR)\query.obj"
 	-@erase "$(INTDIR)\query.sbr"
+	-@erase "$(INTDIR)\randommt.obj"
+	-@erase "$(INTDIR)\randommt.sbr"
 	-@erase "$(INTDIR)\RecordDummy.obj"
 	-@erase "$(INTDIR)\RecordDummy.sbr"
 	-@erase "$(INTDIR)\shipshape.obj"
@@ -722,12 +753,15 @@ CLEAN :
 	-@erase "$(INTDIR)\texture.sbr"
 	-@erase "$(INTDIR)\usleep.obj"
 	-@erase "$(INTDIR)\usleep.sbr"
+	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\widget.obj"
 	-@erase "$(INTDIR)\widget.sbr"
 	-@erase "$(INTDIR)\winAbout.obj"
 	-@erase "$(INTDIR)\winAbout.sbr"
 	-@erase "$(INTDIR)\winAudio.obj"
 	-@erase "$(INTDIR)\winAudio.sbr"
+	-@erase "$(INTDIR)\winBitmap.obj"
+	-@erase "$(INTDIR)\winBitmap.sbr"
 	-@erase "$(INTDIR)\winNet.obj"
 	-@erase "$(INTDIR)\winNet.sbr"
 	-@erase "$(INTDIR)\winX.obj"
@@ -762,45 +796,53 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-"$(OUTDIR)" :
-
-"$(OUTDIR)\xpilot.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
-
-".\Release\xpilot.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-
-.c{$(CPP_OBJS)}.obj:
-
-.c{$(CPP_SBRS)}.sbr:
-
-.cpp{$(CPP_OBJS)}.obj:
-
-.cpp{$(CPP_SBRS)}.sbr:
-
-.cxx{$(CPP_OBJS)}.obj:
-
-.cxx{$(CPP_SBRS)}.sbr:
-
-# ADD BASE CPP /nologo /MD /W3 /GX /Zd /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /D "x_BETAEXPIRE" /FR /c
-# SUBTRACT BASE CPP /YX /Yc /Yu
-# ADD CPP /nologo /G5 /MD /W3 /GX /Zd /O2 /I "..\..\common" /D "NDEBUG" /D "_MBCS" /D "x_BETAEXPIRE" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D "WINDOWSCALING" /D PAINT_FREE=0 /FR /c
-# SUBTRACT CPP /YX /Yc /Yu
+CPP=cl.exe
 CPP_PROJ=/nologo /G5 /MD /W3 /GX /Zd /O2 /I "..\..\common" /D "NDEBUG" /D\
  "_MBCS" /D "x_BETAEXPIRE" /D "WIN32" /D "_WINDOWS" /D "_AFXDLL" /D "X_SOUND" /D\
- "WINDOWSCALING" /D PAINT_FREE=0 /FR"$(INTDIR)/" /Fo"$(INTDIR)/" /c 
+ "WINDOWSCALING" /D PAINT_FREE=0 /FR"$(INTDIR)\\" /Fo"$(INTDIR)\\"\
+ /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\xpilot__/
 CPP_SBRS=.\xpilot__/
-# ADD BASE MTL /nologo /D "NDEBUG" /win32
-# ADD MTL /nologo /D "NDEBUG" /win32
-MTL_PROJ=/nologo /D "NDEBUG" /win32 
-# ADD BASE RSC /l 0x409 /d "NDEBUG" /d "_AFXDLL"
-# ADD RSC /l 0x409 /d "NDEBUG" /d "_AFXDLL"
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)/xpilot.res" /d "NDEBUG" /d "_AFXDLL" 
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
+MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
+RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xpilot.res" /d "NDEBUG" /d "_AFXDLL" 
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/xpilot.bsc" 
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\xpilot.bsc" 
 BSC32_SBRS= \
 	"$(INTDIR)\about.sbr" \
+	"$(INTDIR)\bitmaps.sbr" \
 	"$(INTDIR)\BSString.sbr" \
 	"$(INTDIR)\caudio.sbr" \
 	"$(INTDIR)\checknames.sbr" \
@@ -811,7 +853,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\datagram.sbr" \
 	"$(INTDIR)\default.sbr" \
 	"$(INTDIR)\error.sbr" \
-	"$(INTDIR)\gfx3d.sbr" \
+	"$(INTDIR)\gfx2d.sbr" \
 	"$(INTDIR)\guimap.sbr" \
 	"$(INTDIR)\guiobjects.sbr" \
 	"$(INTDIR)\join.sbr" \
@@ -827,6 +869,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\paintradar.sbr" \
 	"$(INTDIR)\portability.sbr" \
 	"$(INTDIR)\query.sbr" \
+	"$(INTDIR)\randommt.sbr" \
 	"$(INTDIR)\RecordDummy.sbr" \
 	"$(INTDIR)\shipshape.sbr" \
 	"$(INTDIR)\socklib.sbr" \
@@ -840,6 +883,7 @@ BSC32_SBRS= \
 	"$(INTDIR)\widget.sbr" \
 	"$(INTDIR)\winAbout.sbr" \
 	"$(INTDIR)\winAudio.sbr" \
+	"$(INTDIR)\winBitmap.sbr" \
 	"$(INTDIR)\winNet.sbr" \
 	"$(INTDIR)\winX.sbr" \
 	"$(INTDIR)\winX11.sbr" \
@@ -860,13 +904,12 @@ BSC32_SBRS= \
 <<
 
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:windows /map /machine:I386 /out:"Release/XPilotNT.exe"
-# ADD LINK32 winmm.lib /nologo /subsystem:windows /map /machine:I386 /out:"Release/XPilot.exe"
 LINK32_FLAGS=winmm.lib /nologo /subsystem:windows /incremental:no\
- /pdb:"$(OUTDIR)/XPilot.pdb" /map:"$(INTDIR)/XPilot.map" /machine:I386\
- /out:"Release/XPilot.exe" 
+ /pdb:"$(OUTDIR)\XPilot.pdb" /map:"$(INTDIR)\XPilot.map" /machine:I386\
+ /out:".\Release\XPilot.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\about.obj" \
+	"$(INTDIR)\bitmaps.obj" \
 	"$(INTDIR)\BSString.obj" \
 	"$(INTDIR)\caudio.obj" \
 	"$(INTDIR)\checknames.obj" \
@@ -877,7 +920,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\datagram.obj" \
 	"$(INTDIR)\default.obj" \
 	"$(INTDIR)\error.obj" \
-	"$(INTDIR)\gfx3d.obj" \
+	"$(INTDIR)\gfx2d.obj" \
 	"$(INTDIR)\guimap.obj" \
 	"$(INTDIR)\guiobjects.obj" \
 	"$(INTDIR)\join.obj" \
@@ -893,6 +936,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\paintradar.obj" \
 	"$(INTDIR)\portability.obj" \
 	"$(INTDIR)\query.obj" \
+	"$(INTDIR)\randommt.obj" \
 	"$(INTDIR)\RecordDummy.obj" \
 	"$(INTDIR)\shipshape.obj" \
 	"$(INTDIR)\socklib.obj" \
@@ -906,6 +950,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\widget.obj" \
 	"$(INTDIR)\winAbout.obj" \
 	"$(INTDIR)\winAudio.obj" \
+	"$(INTDIR)\winBitmap.obj" \
 	"$(INTDIR)\winNet.obj" \
 	"$(INTDIR)\winX.obj" \
 	"$(INTDIR)\winX11.obj" \
@@ -928,464 +973,46 @@ LINK32_OBJS= \
 
 !ENDIF 
 
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
 
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-################################################################################
-# Begin Target
-
-# Name "xpilot - Win32 Release"
-# Name "xpilot - Win32 Debug"
-# Name "xpilot - Win32 ReleasePentium"
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-!ENDIF 
-
-################################################################################
-# Begin Source File
-
-SOURCE=.\xpilotView.cpp
-DEP_CPP_XPILO=\
-	"..\..\common\NT/winX.h"\
-	".\BSString.h"\
-	".\stdafx.h"\
-	".\winClient.h"\
-	".\winXXPilot.h"\
-	".\xpilotDoc.h"\
-	".\XPilotNT.h"\
-	".\xpilotView.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\xpilotView.obj" : $(SOURCE) $(DEP_CPP_XPILO) "$(INTDIR)"
-
-"$(INTDIR)\xpilotView.sbr" : $(SOURCE) $(DEP_CPP_XPILO) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\xpilotView.obj" : $(SOURCE) $(DEP_CPP_XPILO) "$(INTDIR)"
-
-"$(INTDIR)\xpilotView.sbr" : $(SOURCE) $(DEP_CPP_XPILO) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\xpilotView.obj" : $(SOURCE) $(DEP_CPP_XPILO) "$(INTDIR)"
-
-"$(INTDIR)\xpilotView.sbr" : $(SOURCE) $(DEP_CPP_XPILO) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\xpilotDoc.cpp
-DEP_CPP_XPILOT=\
-	".\stdafx.h"\
-	".\xpilotDoc.h"\
-	".\XPilotNT.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\xpilotDoc.obj" : $(SOURCE) $(DEP_CPP_XPILOT) "$(INTDIR)"
-
-"$(INTDIR)\xpilotDoc.sbr" : $(SOURCE) $(DEP_CPP_XPILOT) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\xpilotDoc.obj" : $(SOURCE) $(DEP_CPP_XPILOT) "$(INTDIR)"
-
-"$(INTDIR)\xpilotDoc.sbr" : $(SOURCE) $(DEP_CPP_XPILOT) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\xpilotDoc.obj" : $(SOURCE) $(DEP_CPP_XPILOT) "$(INTDIR)"
-
-"$(INTDIR)\xpilotDoc.sbr" : $(SOURCE) $(DEP_CPP_XPILOT) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\MainFrm.cpp
-DEP_CPP_MAINF=\
-	"..\..\common\NT/winX.h"\
-	".\MainFrm.h"\
-	".\Splash.h"\
-	".\stdafx.h"\
-	".\winXXPilot.h"\
-	".\XPilotNT.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\MainFrm.obj" : $(SOURCE) $(DEP_CPP_MAINF) "$(INTDIR)"
-
-"$(INTDIR)\MainFrm.sbr" : $(SOURCE) $(DEP_CPP_MAINF) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\MainFrm.obj" : $(SOURCE) $(DEP_CPP_MAINF) "$(INTDIR)"
-
-"$(INTDIR)\MainFrm.sbr" : $(SOURCE) $(DEP_CPP_MAINF) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\MainFrm.obj" : $(SOURCE) $(DEP_CPP_MAINF) "$(INTDIR)"
-
-"$(INTDIR)\MainFrm.sbr" : $(SOURCE) $(DEP_CPP_MAINF) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\xpilot.rc
-DEP_RSC_XPILOT_=\
-	"..\..\server\NT\res\xpilots.ico"\
-	".\res\Splsh16.bmp"\
-	".\res\xpilot.ico"\
-	".\res\xpilot.rc2"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\xpilot.res" : $(SOURCE) $(DEP_RSC_XPILOT_) "$(INTDIR)"
-   $(RSC) $(RSC_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\xpilot.res" : $(SOURCE) $(DEP_RSC_XPILOT_) "$(INTDIR)"
-   $(RSC) $(RSC_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\xpilot.res" : $(SOURCE) $(DEP_RSC_XPILOT_) "$(INTDIR)"
-   $(RSC) $(RSC_PROJ) $(SOURCE)
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\TalkWindow.cpp
-DEP_CPP_TALKW=\
-	".\stdafx.h"\
-	".\TalkWindow.h"\
-	".\XPilotNT.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\TalkWindow.obj" : $(SOURCE) $(DEP_CPP_TALKW) "$(INTDIR)"
-
-"$(INTDIR)\TalkWindow.sbr" : $(SOURCE) $(DEP_CPP_TALKW) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\TalkWindow.obj" : $(SOURCE) $(DEP_CPP_TALKW) "$(INTDIR)"
-
-"$(INTDIR)\TalkWindow.sbr" : $(SOURCE) $(DEP_CPP_TALKW) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\TalkWindow.obj" : $(SOURCE) $(DEP_CPP_TALKW) "$(INTDIR)"
-
-"$(INTDIR)\TalkWindow.sbr" : $(SOURCE) $(DEP_CPP_TALKW) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\XPilotNT.cpp
-DEP_CPP_XPILOTN=\
-	".\MainFrm.h"\
-	".\Splash.h"\
-	".\stdafx.h"\
-	".\TalkWindow.h"\
-	".\winAbout.h"\
-	".\xpilotDoc.h"\
-	".\XPilotNT.h"\
-	".\xpilotView.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\XPilotNT.obj" : $(SOURCE) $(DEP_CPP_XPILOTN) "$(INTDIR)"
-
-"$(INTDIR)\XPilotNT.sbr" : $(SOURCE) $(DEP_CPP_XPILOTN) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\XPilotNT.obj" : $(SOURCE) $(DEP_CPP_XPILOTN) "$(INTDIR)"
-
-"$(INTDIR)\XPilotNT.sbr" : $(SOURCE) $(DEP_CPP_XPILOTN) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\XPilotNT.obj" : $(SOURCE) $(DEP_CPP_XPILOTN) "$(INTDIR)"
-
-"$(INTDIR)\XPilotNT.sbr" : $(SOURCE) $(DEP_CPP_XPILOTN) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\Splash.cpp
-DEP_CPP_SPLAS=\
-	"..\..\common\version.h"\
-	".\Splash.h"\
-	".\stdafx.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\Splash.obj" : $(SOURCE) $(DEP_CPP_SPLAS) "$(INTDIR)"
-
-"$(INTDIR)\Splash.sbr" : $(SOURCE) $(DEP_CPP_SPLAS) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\Splash.obj" : $(SOURCE) $(DEP_CPP_SPLAS) "$(INTDIR)"
-
-"$(INTDIR)\Splash.sbr" : $(SOURCE) $(DEP_CPP_SPLAS) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\Splash.obj" : $(SOURCE) $(DEP_CPP_SPLAS) "$(INTDIR)"
-
-"$(INTDIR)\Splash.sbr" : $(SOURCE) $(DEP_CPP_SPLAS) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\BSString.cpp
-DEP_CPP_BSSTR=\
-	".\BSString.h"\
-	".\stdafx.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\BSString.obj" : $(SOURCE) $(DEP_CPP_BSSTR) "$(INTDIR)"
-
-"$(INTDIR)\BSString.sbr" : $(SOURCE) $(DEP_CPP_BSSTR) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\BSString.obj" : $(SOURCE) $(DEP_CPP_BSSTR) "$(INTDIR)"
-
-"$(INTDIR)\BSString.sbr" : $(SOURCE) $(DEP_CPP_BSSTR) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\BSString.obj" : $(SOURCE) $(DEP_CPP_BSSTR) "$(INTDIR)"
-
-"$(INTDIR)\BSString.sbr" : $(SOURCE) $(DEP_CPP_BSSTR) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\winAudio.c
-DEP_CPP_WINAU=\
-	".\winAudio.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\winAudio.obj" : $(SOURCE) $(DEP_CPP_WINAU) "$(INTDIR)"
-
-"$(INTDIR)\winAudio.sbr" : $(SOURCE) $(DEP_CPP_WINAU) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\winAudio.obj" : $(SOURCE) $(DEP_CPP_WINAU) "$(INTDIR)"
-
-"$(INTDIR)\winAudio.sbr" : $(SOURCE) $(DEP_CPP_WINAU) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\winAudio.obj" : $(SOURCE) $(DEP_CPP_WINAU) "$(INTDIR)"
-
-"$(INTDIR)\winAudio.sbr" : $(SOURCE) $(DEP_CPP_WINAU) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\RecordDummy.c
-DEP_CPP_RECOR=\
-	"..\..\common\NT/winX.h"\
-	"..\record.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\RecordDummy.obj" : $(SOURCE) $(DEP_CPP_RECOR) "$(INTDIR)"
-
-"$(INTDIR)\RecordDummy.sbr" : $(SOURCE) $(DEP_CPP_RECOR) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\RecordDummy.obj" : $(SOURCE) $(DEP_CPP_RECOR) "$(INTDIR)"
-
-"$(INTDIR)\RecordDummy.sbr" : $(SOURCE) $(DEP_CPP_RECOR) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\RecordDummy.obj" : $(SOURCE) $(DEP_CPP_RECOR) "$(INTDIR)"
-
-"$(INTDIR)\RecordDummy.sbr" : $(SOURCE) $(DEP_CPP_RECOR) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\winAbout.cpp
-DEP_CPP_WINAB=\
-	"..\..\common\version.h"\
-	".\stdafx.h"\
-	".\winAbout.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\winAbout.obj" : $(SOURCE) $(DEP_CPP_WINAB) "$(INTDIR)"
-
-"$(INTDIR)\winAbout.sbr" : $(SOURCE) $(DEP_CPP_WINAB) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\winAbout.obj" : $(SOURCE) $(DEP_CPP_WINAB) "$(INTDIR)"
-
-"$(INTDIR)\winAbout.sbr" : $(SOURCE) $(DEP_CPP_WINAB) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-"$(INTDIR)\winAbout.obj" : $(SOURCE) $(DEP_CPP_WINAB) "$(INTDIR)"
-
-"$(INTDIR)\winAbout.sbr" : $(SOURCE) $(DEP_CPP_WINAB) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
+!IF "$(CFG)" == "xpilot - Win32 Release" || "$(CFG)" == "xpilot - Win32 Debug"\
+ || "$(CFG)" == "xpilot - Win32 ReleasePentium"
 SOURCE=..\about.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_ABOUT=\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\configure.h"\
+	"..\dbuff.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\about.obj"	"$(INTDIR)\about.sbr" : $(SOURCE) $(DEP_CPP_ABOUT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_ABOUT=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\version.h"\
 	"..\client.h"\
 	"..\configure.h"\
@@ -1401,109 +1028,255 @@ NODEP_CPP_ABOUT=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\about.obj"	"$(INTDIR)\about.sbr" : $(SOURCE) $(DEP_CPP_ABOUT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\about.obj" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\about.sbr" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\about.obj" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\about.sbr" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_ABOUT=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\configure.h"\
+	"..\dbuff.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_ABOUT=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\about.obj" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\about.obj"	"$(INTDIR)\about.sbr" : $(SOURCE) $(DEP_CPP_ABOUT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\about.sbr" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\bitmaps.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_BITMA=\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\xpmread.h"\
+	".\winBitmap.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\bitmaps.obj"	"$(INTDIR)\bitmaps.sbr" : $(SOURCE) $(DEP_CPP_BITMA)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_BITMA=\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\xpmread.h"\
+	".\winBitmap.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\bitmaps.obj"	"$(INTDIR)\bitmaps.sbr" : $(SOURCE) $(DEP_CPP_BITMA)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_BITMA=\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\xpmread.h"\
+	".\winBitmap.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\bitmaps.obj"	"$(INTDIR)\bitmaps.sbr" : $(SOURCE) $(DEP_CPP_BITMA)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=.\BSString.cpp
+DEP_CPP_BSSTR=\
+	".\BSString.h"\
+	".\stdafx.h"\
+	
+
+"$(INTDIR)\BSString.obj"	"$(INTDIR)\BSString.sbr" : $(SOURCE) $(DEP_CPP_BSSTR)\
+ "$(INTDIR)"
+
 
 SOURCE=..\caudio.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_CAUDI=\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\caudio.obj"	"$(INTDIR)\caudio.sbr" : $(SOURCE) $(DEP_CPP_CAUDI)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_CAUDI=\
 	"..\..\common\audio.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\version.h"\
 	"..\client.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\caudio.obj"	"$(INTDIR)\caudio.sbr" : $(SOURCE) $(DEP_CPP_CAUDI)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\caudio.obj" : $(SOURCE) $(DEP_CPP_CAUDI) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\caudio.sbr" : $(SOURCE) $(DEP_CPP_CAUDI) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\caudio.obj" : $(SOURCE) $(DEP_CPP_CAUDI) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\caudio.sbr" : $(SOURCE) $(DEP_CPP_CAUDI) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_CAUDI=\
+	"..\..\common\audio.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
 	
 
-"$(INTDIR)\caudio.obj" : $(SOURCE) $(DEP_CPP_CAUDI) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\caudio.obj"	"$(INTDIR)\caudio.sbr" : $(SOURCE) $(DEP_CPP_CAUDI)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\caudio.sbr" : $(SOURCE) $(DEP_CPP_CAUDI) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\..\common\checknames.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_CHECK=\
+	"..\..\common\checknames.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\checknames.obj"	"$(INTDIR)\checknames.sbr" : $(SOURCE)\
+ $(DEP_CPP_CHECK) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_CHECK=\
+	"..\..\common\checknames.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\checknames.obj"	"$(INTDIR)\checknames.sbr" : $(SOURCE)\
+ $(DEP_CPP_CHECK) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_CHECK=\
+	"..\..\common\checknames.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\checknames.obj"	"$(INTDIR)\checknames.sbr" : $(SOURCE)\
+ $(DEP_CPP_CHECK) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\client.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_CLIEN=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\client.obj"	"$(INTDIR)\client.sbr" : $(SOURCE) $(DEP_CPP_CLIEN)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_CLIEN=\
 	"..\..\common\bit.h"\
 	"..\..\common\cmw.h"\
@@ -1511,79 +1284,105 @@ DEP_CPP_CLIEN=\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\rules.h"\
 	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
+	"..\bitmaps.h"\
 	"..\client.h"\
+	"..\gfx2d.h"\
 	"..\netclient.h"\
 	"..\paint.h"\
 	"..\protoclient.h"\
 	"..\talk.h"\
 	"..\xinit.h"\
 	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 NODEP_CPP_CLIEN=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\client.obj"	"$(INTDIR)\client.sbr" : $(SOURCE) $(DEP_CPP_CLIEN)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\client.obj" : $(SOURCE) $(DEP_CPP_CLIEN) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\client.sbr" : $(SOURCE) $(DEP_CPP_CLIEN) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\client.obj" : $(SOURCE) $(DEP_CPP_CLIEN) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\client.sbr" : $(SOURCE) $(DEP_CPP_CLIEN) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_CLIEN=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_CLIEN=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\client.obj" : $(SOURCE) $(DEP_CPP_CLIEN) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\client.obj"	"$(INTDIR)\client.sbr" : $(SOURCE) $(DEP_CPP_CLIEN)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\client.sbr" : $(SOURCE) $(DEP_CPP_CLIEN) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
-
 SOURCE=..\colors.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_COLOR=\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\version.h"\
+	"..\bitmaps.h"\
 	"..\client.h"\
 	"..\dbuff.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\xinit.h"\
+	
+
+"$(INTDIR)\colors.obj"	"$(INTDIR)\colors.sbr" : $(SOURCE) $(DEP_CPP_COLOR)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_COLOR=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\dbuff.h"\
+	"..\gfx2d.h"\
 	"..\paint.h"\
 	"..\protoclient.h"\
 	"..\xinit.h"\
@@ -1592,66 +1391,98 @@ NODEP_CPP_COLOR=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\colors.obj"	"$(INTDIR)\colors.sbr" : $(SOURCE) $(DEP_CPP_COLOR)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\colors.obj" : $(SOURCE) $(DEP_CPP_COLOR) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\colors.sbr" : $(SOURCE) $(DEP_CPP_COLOR) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\colors.obj" : $(SOURCE) $(DEP_CPP_COLOR) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\colors.sbr" : $(SOURCE) $(DEP_CPP_COLOR) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_COLOR=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\dbuff.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\xinit.h"\
+	
+NODEP_CPP_COLOR=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\colors.obj" : $(SOURCE) $(DEP_CPP_COLOR) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\colors.obj"	"$(INTDIR)\colors.sbr" : $(SOURCE) $(DEP_CPP_COLOR)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\colors.sbr" : $(SOURCE) $(DEP_CPP_COLOR) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\..\common\config.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_CONFI=\
+	"..\..\common\config.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\config.obj"	"$(INTDIR)\config.sbr" : $(SOURCE) $(DEP_CPP_CONFI)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_CONFI=\
+	"..\..\common\config.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\config.obj"	"$(INTDIR)\config.sbr" : $(SOURCE) $(DEP_CPP_CONFI)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_CONFI=\
+	"..\..\common\config.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\config.obj"	"$(INTDIR)\config.sbr" : $(SOURCE) $(DEP_CPP_CONFI)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\configure.c
-DEP_CPP_CONFI=\
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_CONFIG=\
 	"..\..\common\bit.h"\
-	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
+	"..\bitmaps.h"\
 	"..\client.h"\
 	"..\configure.h"\
+	"..\gfx2d.h"\
 	"..\netclient.h"\
 	"..\paint.h"\
 	"..\protoclient.h"\
@@ -1660,56 +1491,153 @@ DEP_CPP_CONFI=\
 	".\winClient.h"\
 	".\winXXPilot.h"\
 	
-NODEP_CPP_CONFI=\
-	"..\strcasecmp.h"\
-	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\configure.obj"	"$(INTDIR)\configure.sbr" : $(SOURCE)\
+ $(DEP_CPP_CONFIG) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\configure.obj" : $(SOURCE) $(DEP_CPP_CONFI) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\configure.sbr" : $(SOURCE) $(DEP_CPP_CONFI) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_CONFIG=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\configure.h"\
+	"..\gfx2d.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_CONFIG=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\configure.obj" : $(SOURCE) $(DEP_CPP_CONFI) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\configure.obj"	"$(INTDIR)\configure.sbr" : $(SOURCE)\
+ $(DEP_CPP_CONFIG) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\configure.sbr" : $(SOURCE) $(DEP_CPP_CONFI) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_CONFIG=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\configure.h"\
+	"..\gfx2d.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_CONFIG=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\configure.obj" : $(SOURCE) $(DEP_CPP_CONFI) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\configure.obj"	"$(INTDIR)\configure.sbr" : $(SOURCE)\
+ $(DEP_CPP_CONFIG) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\configure.sbr" : $(SOURCE) $(DEP_CPP_CONFI) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\datagram.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_DATAG=\
+	"..\..\common\config.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\datagram.obj"	"$(INTDIR)\datagram.sbr" : $(SOURCE) $(DEP_CPP_DATAG)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_DATAG=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_DATAG=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\datagram.obj"	"$(INTDIR)\datagram.sbr" : $(SOURCE) $(DEP_CPP_DATAG)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_DATAG=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_DATAG=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\datagram.obj"	"$(INTDIR)\datagram.sbr" : $(SOURCE) $(DEP_CPP_DATAG)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\default.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_DEFAU=\
 	"..\..\common\audio.h"\
 	"..\..\common\bit.h"\
@@ -1718,7 +1646,7 @@ DEP_CPP_DEFAU=\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\pack.h"\
 	"..\..\common\version.h"\
 	"..\client.h"\
@@ -1728,122 +1656,424 @@ DEP_CPP_DEFAU=\
 	"..\talk.h"\
 	"..\xinit.h"\
 	".\winXXPilot.h"\
-	{$(INCLUDE)}"\sys\types.h"\
+	
+
+"$(INTDIR)\default.obj"	"$(INTDIR)\default.sbr" : $(SOURCE) $(DEP_CPP_DEFAU)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_DEFAU=\
+	"..\..\common\audio.h"\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	"..\xinit.h"\
+	".\winXXPilot.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 NODEP_CPP_DEFAU=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\default.obj"	"$(INTDIR)\default.sbr" : $(SOURCE) $(DEP_CPP_DEFAU)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\default.obj" : $(SOURCE) $(DEP_CPP_DEFAU) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\default.sbr" : $(SOURCE) $(DEP_CPP_DEFAU) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\default.obj" : $(SOURCE) $(DEP_CPP_DEFAU) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\default.sbr" : $(SOURCE) $(DEP_CPP_DEFAU) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_DEFAU=\
+	"..\..\common\audio.h"\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	"..\xinit.h"\
+	".\winXXPilot.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_DEFAU=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\default.obj" : $(SOURCE) $(DEP_CPP_DEFAU) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\default.obj"	"$(INTDIR)\default.sbr" : $(SOURCE) $(DEP_CPP_DEFAU)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\default.sbr" : $(SOURCE) $(DEP_CPP_DEFAU) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
-
 SOURCE=..\..\common\error.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_ERROR=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\error.obj"	"$(INTDIR)\error.sbr" : $(SOURCE) $(DEP_CPP_ERROR)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_ERROR=\
 	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\version.h"\
 	"..\..\server\NT\winServer.h"\
 	".\winClient.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\error.obj"	"$(INTDIR)\error.sbr" : $(SOURCE) $(DEP_CPP_ERROR)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\error.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\error.sbr" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\error.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\error.sbr" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_ERROR=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\..\server\NT\winServer.h"\
+	".\winClient.h"\
 	
 
-"$(INTDIR)\error.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\error.obj"	"$(INTDIR)\error.sbr" : $(SOURCE) $(DEP_CPP_ERROR)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\error.sbr" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\gfx2d.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_GFX2D=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\gfx2d.h"\
+	
+
+"$(INTDIR)\gfx2d.obj"	"$(INTDIR)\gfx2d.sbr" : $(SOURCE) $(DEP_CPP_GFX2D)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_GFX2D=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\gfx2d.h"\
+	
+
+"$(INTDIR)\gfx2d.obj"	"$(INTDIR)\gfx2d.sbr" : $(SOURCE) $(DEP_CPP_GFX2D)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_GFX2D=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\gfx2d.h"\
+	
+
+"$(INTDIR)\gfx2d.obj"	"$(INTDIR)\gfx2d.sbr" : $(SOURCE) $(DEP_CPP_GFX2D)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\guimap.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_GUIMA=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winBitmap.h"\
+	
+
+"$(INTDIR)\guimap.obj"	"$(INTDIR)\guimap.sbr" : $(SOURCE) $(DEP_CPP_GUIMA)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_GUIMA=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winBitmap.h"\
+	
+NODEP_CPP_GUIMA=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\guimap.obj"	"$(INTDIR)\guimap.sbr" : $(SOURCE) $(DEP_CPP_GUIMA)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_GUIMA=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winBitmap.h"\
+	
+NODEP_CPP_GUIMA=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\guimap.obj"	"$(INTDIR)\guimap.sbr" : $(SOURCE) $(DEP_CPP_GUIMA)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\guiobjects.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_GUIOB=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winBitmap.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\guiobjects.obj"	"$(INTDIR)\guiobjects.sbr" : $(SOURCE)\
+ $(DEP_CPP_GUIOB) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_GUIOB=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winBitmap.h"\
+	".\winClient.h"\
+	
+NODEP_CPP_GUIOB=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\guiobjects.obj"	"$(INTDIR)\guiobjects.sbr" : $(SOURCE)\
+ $(DEP_CPP_GUIOB) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_GUIOB=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winBitmap.h"\
+	".\winClient.h"\
+	
+NODEP_CPP_GUIOB=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\guiobjects.obj"	"$(INTDIR)\guiobjects.sbr" : $(SOURCE)\
+ $(DEP_CPP_GUIOB) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\join.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_JOIN_=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\join.obj"	"$(INTDIR)\join.sbr" : $(SOURCE) $(DEP_CPP_JOIN_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_JOIN_=\
 	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\version.h"\
 	"..\client.h"\
@@ -1855,174 +2085,209 @@ NODEP_CPP_JOIN_=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\join.obj"	"$(INTDIR)\join.sbr" : $(SOURCE) $(DEP_CPP_JOIN_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\join.obj" : $(SOURCE) $(DEP_CPP_JOIN_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\join.sbr" : $(SOURCE) $(DEP_CPP_JOIN_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\join.obj" : $(SOURCE) $(DEP_CPP_JOIN_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\join.sbr" : $(SOURCE) $(DEP_CPP_JOIN_) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\join.obj" : $(SOURCE) $(DEP_CPP_JOIN_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\join.sbr" : $(SOURCE) $(DEP_CPP_JOIN_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\math.c
-DEP_CPP_MATH_=\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\version.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\math.obj" : $(SOURCE) $(DEP_CPP_MATH_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\math.sbr" : $(SOURCE) $(DEP_CPP_MATH_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\math.obj" : $(SOURCE) $(DEP_CPP_MATH_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\math.sbr" : $(SOURCE) $(DEP_CPP_MATH_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\math.obj" : $(SOURCE) $(DEP_CPP_MATH_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\math.sbr" : $(SOURCE) $(DEP_CPP_MATH_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\net.c
-DEP_CPP_NET_C=\
-	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\net.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\packet.h"\
-	"..\..\common\socklib.h"\
-	"..\..\common\version.h"\
-	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\net.obj" : $(SOURCE) $(DEP_CPP_NET_C) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\net.sbr" : $(SOURCE) $(DEP_CPP_NET_C) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\net.obj" : $(SOURCE) $(DEP_CPP_NET_C) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\net.sbr" : $(SOURCE) $(DEP_CPP_NET_C) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\net.obj" : $(SOURCE) $(DEP_CPP_NET_C) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\net.sbr" : $(SOURCE) $(DEP_CPP_NET_C) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\netclient.c
-DEP_CPP_NETCL=\
-	"..\..\common\audio.h"\
-	"..\..\common\bit.h"\
+DEP_CPP_JOIN_=\
 	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	
+NODEP_CPP_JOIN_=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\join.obj"	"$(INTDIR)\join.sbr" : $(SOURCE) $(DEP_CPP_JOIN_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=.\MainFrm.cpp
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_MAINF=\
+	"..\..\common\NT\winX.h"\
+	".\MainFrm.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
+	".\winXXPilot.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\MainFrm.obj"	"$(INTDIR)\MainFrm.sbr" : $(SOURCE) $(DEP_CPP_MAINF)\
+ "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_MAINF=\
+	"..\..\common\NT\winX.h"\
+	".\MainFrm.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
+	".\winXXPilot.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\MainFrm.obj"	"$(INTDIR)\MainFrm.sbr" : $(SOURCE) $(DEP_CPP_MAINF)\
+ "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_MAINF=\
+	"..\..\common\NT\winX.h"\
+	".\MainFrm.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
+	".\winXXPilot.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\MainFrm.obj"	"$(INTDIR)\MainFrm.sbr" : $(SOURCE) $(DEP_CPP_MAINF)\
+ "$(INTDIR)"
+
+
+!ENDIF 
+
+SOURCE=..\..\common\math.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_MATH_=\
+	"..\..\common\commonproto.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\math.obj"	"$(INTDIR)\math.sbr" : $(SOURCE) $(DEP_CPP_MATH_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_MATH_=\
+	"..\..\common\commonproto.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\math.obj"	"$(INTDIR)\math.sbr" : $(SOURCE) $(DEP_CPP_MATH_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_MATH_=\
+	"..\..\common\commonproto.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\math.obj"	"$(INTDIR)\math.sbr" : $(SOURCE) $(DEP_CPP_MATH_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\..\common\net.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_NET_C=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
 	"..\..\common\net.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\packet.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\net.obj"	"$(INTDIR)\net.sbr" : $(SOURCE) $(DEP_CPP_NET_C)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_NET_C=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\packet.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\net.obj"	"$(INTDIR)\net.sbr" : $(SOURCE) $(DEP_CPP_NET_C)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_NET_C=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\packet.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\net.obj"	"$(INTDIR)\net.sbr" : $(SOURCE) $(DEP_CPP_NET_C)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\netclient.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_NETCL=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\pack.h"\
 	"..\..\common\packet.h"\
 	"..\..\common\portability.h"\
@@ -2032,6 +2297,44 @@ DEP_CPP_NETCL=\
 	"..\client.h"\
 	"..\netclient.h"\
 	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	"..\xinit.h"\
+	".\winAudio.h"\
+	".\winClient.h"\
+	".\winXThread.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\netclient.obj"	"$(INTDIR)\netclient.sbr" : $(SOURCE)\
+ $(DEP_CPP_NETCL) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_NETCL=\
+	"..\..\common\audio.h"\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\packet.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
 	"..\protoclient.h"\
 	"..\talk.h"\
 	"..\xinit.h"\
@@ -2044,52 +2347,57 @@ NODEP_CPP_NETCL=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\netclient.obj"	"$(INTDIR)\netclient.sbr" : $(SOURCE)\
+ $(DEP_CPP_NETCL) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\netclient.obj" : $(SOURCE) $(DEP_CPP_NETCL) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\netclient.sbr" : $(SOURCE) $(DEP_CPP_NETCL) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\netclient.obj" : $(SOURCE) $(DEP_CPP_NETCL) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\netclient.sbr" : $(SOURCE) $(DEP_CPP_NETCL) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_NETCL=\
+	"..\..\common\audio.h"\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\packet.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	"..\xinit.h"\
+	".\winAudio.h"\
+	".\winClient.h"\
+	".\winXThread.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_NETCL=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\netclient.obj" : $(SOURCE) $(DEP_CPP_NETCL) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\netclient.obj"	"$(INTDIR)\netclient.sbr" : $(SOURCE)\
+ $(DEP_CPP_NETCL) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\netclient.sbr" : $(SOURCE) $(DEP_CPP_NETCL) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\paint.c
 
-SOURCE=..\painthud.c
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_PAINT=\
 	"..\..\common\bit.h"\
 	"..\..\common\config.h"\
@@ -2097,149 +2405,15 @@ DEP_CPP_PAINT=\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
 	"..\..\common\rules.h"\
 	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
-	"..\client.h"\
-	"..\paint.h"\
-	"..\paintdata.h"\
-	"..\protoclient.h"\
-	"..\record.h"\
-	"..\texture.h"\
-	"..\xinit.h"\
-	".\winClient.h"\
-	
-NODEP_CPP_PAINT=\
-	"..\strcasecmp.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\painthud.obj" : $(SOURCE) $(DEP_CPP_PAINT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\painthud.sbr" : $(SOURCE) $(DEP_CPP_PAINT) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\painthud.obj" : $(SOURCE) $(DEP_CPP_PAINT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\painthud.sbr" : $(SOURCE) $(DEP_CPP_PAINT) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\painthud.obj" : $(SOURCE) $(DEP_CPP_PAINT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\painthud.sbr" : $(SOURCE) $(DEP_CPP_PAINT) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\paintdata.c
-DEP_CPP_PAINTD=\
-	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\draw.h"\
-	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\rules.h"\
-	"..\..\common\setup.h"\
-	"..\..\common\version.h"\
-	"..\client.h"\
-	"..\paint.h"\
-	"..\paintdata.h"\
-	"..\protoclient.h"\
-	"..\record.h"\
-	"..\xinit.h"\
-	
-NODEP_CPP_PAINTD=\
-	"..\strcasecmp.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintdata.obj" : $(SOURCE) $(DEP_CPP_PAINTD) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintdata.sbr" : $(SOURCE) $(DEP_CPP_PAINTD) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintdata.obj" : $(SOURCE) $(DEP_CPP_PAINTD) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintdata.sbr" : $(SOURCE) $(DEP_CPP_PAINTD) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintdata.obj" : $(SOURCE) $(DEP_CPP_PAINTD) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintdata.sbr" : $(SOURCE) $(DEP_CPP_PAINTD) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\paint.c
-DEP_CPP_PAINT_=\
-	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\draw.h"\
-	"..\..\common\item.h"\
-	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\rules.h"\
-	"..\..\common\setup.h"\
-	"..\..\common\version.h"\
+	"..\bitmaps.h"\
 	"..\client.h"\
 	"..\dbuff.h"\
+	"..\gfx2d.h"\
 	"..\netclient.h"\
 	"..\paint.h"\
 	"..\paintdata.h"\
@@ -2250,117 +2424,14 @@ DEP_CPP_PAINT_=\
 	".\winXXPilot.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\paint.obj"	"$(INTDIR)\paint.sbr" : $(SOURCE) $(DEP_CPP_PAINT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paint.obj" : $(SOURCE) $(DEP_CPP_PAINT_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paint.sbr" : $(SOURCE) $(DEP_CPP_PAINT_) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paint.obj" : $(SOURCE) $(DEP_CPP_PAINT_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paint.sbr" : $(SOURCE) $(DEP_CPP_PAINT_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paint.obj" : $(SOURCE) $(DEP_CPP_PAINT_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paint.sbr" : $(SOURCE) $(DEP_CPP_PAINT_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\paintradar.c
-DEP_CPP_PAINTR=\
-	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\draw.h"\
-	"..\..\common\item.h"\
-	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\rules.h"\
-	"..\..\common\setup.h"\
-	"..\..\common\version.h"\
-	"..\client.h"\
-	"..\paint.h"\
-	"..\paintdata.h"\
-	"..\xinit.h"\
-	".\winXXPilot.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintradar.obj" : $(SOURCE) $(DEP_CPP_PAINTR) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintradar.sbr" : $(SOURCE) $(DEP_CPP_PAINTR) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintradar.obj" : $(SOURCE) $(DEP_CPP_PAINTR) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintradar.sbr" : $(SOURCE) $(DEP_CPP_PAINTR) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintradar.obj" : $(SOURCE) $(DEP_CPP_PAINTR) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintradar.sbr" : $(SOURCE) $(DEP_CPP_PAINTR) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\paintobjects.c
-DEP_CPP_PAINTO=\
+DEP_CPP_PAINT=\
 	"..\..\common\bit.h"\
 	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
@@ -2368,14 +2439,172 @@ DEP_CPP_PAINTO=\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\rules.h"\
 	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
+	"..\bitmaps.h"\
 	"..\client.h"\
-	"..\gfx3d.h"\
-	"..\guiobjects.h"\
+	"..\dbuff.h"\
+	"..\gfx2d.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\paint.obj"	"$(INTDIR)\paint.sbr" : $(SOURCE) $(DEP_CPP_PAINT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_PAINT=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\dbuff.h"\
+	"..\gfx2d.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\paint.obj"	"$(INTDIR)\paint.sbr" : $(SOURCE) $(DEP_CPP_PAINT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\paintdata.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_PAINTD=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\dbuff.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\xinit.h"\
+	
+
+"$(INTDIR)\paintdata.obj"	"$(INTDIR)\paintdata.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTD) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_PAINTD=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\dbuff.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\xinit.h"\
+	
+NODEP_CPP_PAINTD=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\paintdata.obj"	"$(INTDIR)\paintdata.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTD) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_PAINTD=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\dbuff.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\xinit.h"\
+	
+NODEP_CPP_PAINTD=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\paintdata.obj"	"$(INTDIR)\paintdata.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTD) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\painthud.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_PAINTH=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
 	"..\paint.h"\
 	"..\paintdata.h"\
 	"..\protoclient.h"\
@@ -2384,56 +2613,84 @@ DEP_CPP_PAINTO=\
 	"..\xinit.h"\
 	".\winClient.h"\
 	
-NODEP_CPP_PAINTO=\
-	"..\strcasecmp.h"\
-	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\painthud.obj"	"$(INTDIR)\painthud.sbr" : $(SOURCE) $(DEP_CPP_PAINTH)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintobjects.obj" : $(SOURCE) $(DEP_CPP_PAINTO) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintobjects.sbr" : $(SOURCE) $(DEP_CPP_PAINTO) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_PAINTH=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	
+NODEP_CPP_PAINTH=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\paintobjects.obj" : $(SOURCE) $(DEP_CPP_PAINTO) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\painthud.obj"	"$(INTDIR)\painthud.sbr" : $(SOURCE) $(DEP_CPP_PAINTH)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\paintobjects.sbr" : $(SOURCE) $(DEP_CPP_PAINTO) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_PAINTH=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	
+NODEP_CPP_PAINTH=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\paintobjects.obj" : $(SOURCE) $(DEP_CPP_PAINTO) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\painthud.obj"	"$(INTDIR)\painthud.sbr" : $(SOURCE) $(DEP_CPP_PAINTH)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\paintobjects.sbr" : $(SOURCE) $(DEP_CPP_PAINTO) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
-
 SOURCE=..\paintmap.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_PAINTM=\
 	"..\..\common\bit.h"\
 	"..\..\common\config.h"\
@@ -2441,7 +2698,35 @@ DEP_CPP_PAINTM=\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\guimap.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	
+
+"$(INTDIR)\paintmap.obj"	"$(INTDIR)\paintmap.sbr" : $(SOURCE) $(DEP_CPP_PAINTM)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_PAINTM=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\rules.h"\
 	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
@@ -2458,52 +2743,251 @@ NODEP_CPP_PAINTM=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\paintmap.obj"	"$(INTDIR)\paintmap.sbr" : $(SOURCE) $(DEP_CPP_PAINTM)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintmap.obj" : $(SOURCE) $(DEP_CPP_PAINTM) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintmap.sbr" : $(SOURCE) $(DEP_CPP_PAINTM) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\paintmap.obj" : $(SOURCE) $(DEP_CPP_PAINTM) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\paintmap.sbr" : $(SOURCE) $(DEP_CPP_PAINTM) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_PAINTM=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\guimap.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	
+NODEP_CPP_PAINTM=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\paintmap.obj" : $(SOURCE) $(DEP_CPP_PAINTM) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\paintmap.obj"	"$(INTDIR)\paintmap.sbr" : $(SOURCE) $(DEP_CPP_PAINTM)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\paintmap.sbr" : $(SOURCE) $(DEP_CPP_PAINTM) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\paintobjects.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_PAINTO=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\gfx3d.h"\
+	"..\guiobjects.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\paintobjects.obj"	"$(INTDIR)\paintobjects.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTO) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_PAINTO=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\gfx3d.h"\
+	"..\guiobjects.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	
+NODEP_CPP_PAINTO=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\paintobjects.obj"	"$(INTDIR)\paintobjects.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTO) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_PAINTO=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\gfx3d.h"\
+	"..\guiobjects.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\record.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	
+NODEP_CPP_PAINTO=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\paintobjects.obj"	"$(INTDIR)\paintobjects.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTO) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\paintradar.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_PAINTR=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\xinit.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\paintradar.obj"	"$(INTDIR)\paintradar.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTR) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_PAINTR=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\xinit.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\paintradar.obj"	"$(INTDIR)\paintradar.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTR) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_PAINTR=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\xinit.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\paintradar.obj"	"$(INTDIR)\paintradar.sbr" : $(SOURCE)\
+ $(DEP_CPP_PAINTR) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\common\portability.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_PORTA=\
+	"..\..\common\config.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	
+
+"$(INTDIR)\portability.obj"	"$(INTDIR)\portability.sbr" : $(SOURCE)\
+ $(DEP_CPP_PORTA) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_PORTA=\
 	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
@@ -2514,282 +2998,634 @@ NODEP_CPP_PORTA=\
 	"..\..\common\username.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\portability.obj"	"$(INTDIR)\portability.sbr" : $(SOURCE)\
+ $(DEP_CPP_PORTA) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\portability.obj" : $(SOURCE) $(DEP_CPP_PORTA) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\portability.sbr" : $(SOURCE) $(DEP_CPP_PORTA) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\portability.obj" : $(SOURCE) $(DEP_CPP_PORTA) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\portability.sbr" : $(SOURCE) $(DEP_CPP_PORTA) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_PORTA=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	
+NODEP_CPP_PORTA=\
+	"..\..\common\username.h"\
 	
 
-"$(INTDIR)\portability.obj" : $(SOURCE) $(DEP_CPP_PORTA) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\portability.obj"	"$(INTDIR)\portability.sbr" : $(SOURCE)\
+ $(DEP_CPP_PORTA) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\portability.sbr" : $(SOURCE) $(DEP_CPP_PORTA) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
-
 SOURCE=..\query.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_QUERY=\
 	"..\..\common\config.h"\
-	"..\..\common\NT/winNet.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\query.obj"	"$(INTDIR)\query.sbr" : $(SOURCE) $(DEP_CPP_QUERY)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_QUERY=\
+	"..\..\common\config.h"\
+	"..\..\common\NT\winNet.h"\
 	"..\..\common\pack.h"\
 	"..\..\common\socklib.h"\
 	"..\..\common\version.h"\
 	"..\protoclient.h"\
 	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 NODEP_CPP_QUERY=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\query.obj"	"$(INTDIR)\query.sbr" : $(SOURCE) $(DEP_CPP_QUERY)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\query.obj" : $(SOURCE) $(DEP_CPP_QUERY) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\query.sbr" : $(SOURCE) $(DEP_CPP_QUERY) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\query.obj" : $(SOURCE) $(DEP_CPP_QUERY) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\query.sbr" : $(SOURCE) $(DEP_CPP_QUERY) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_QUERY=\
+	"..\..\common\config.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_QUERY=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\query.obj" : $(SOURCE) $(DEP_CPP_QUERY) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\query.obj"	"$(INTDIR)\query.sbr" : $(SOURCE) $(DEP_CPP_QUERY)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\query.sbr" : $(SOURCE) $(DEP_CPP_QUERY) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\..\common\randommt.c
+
+"$(INTDIR)\randommt.obj"	"$(INTDIR)\randommt.sbr" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\RecordDummy.c
+DEP_CPP_RECOR=\
+	"..\..\common\NT\winX.h"\
+	"..\record.h"\
+	
+
+"$(INTDIR)\RecordDummy.obj"	"$(INTDIR)\RecordDummy.sbr" : $(SOURCE)\
+ $(DEP_CPP_RECOR) "$(INTDIR)"
+
+
+SOURCE=..\..\common\shipshape.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_SHIPS=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\shipshape.obj"	"$(INTDIR)\shipshape.sbr" : $(SOURCE)\
+ $(DEP_CPP_SHIPS) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_SHIPS=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	"..\..\server\NT\winServer.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\shipshape.obj"	"$(INTDIR)\shipshape.sbr" : $(SOURCE)\
+ $(DEP_CPP_SHIPS) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_SHIPS=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\version.h"\
+	"..\..\server\NT\winServer.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\shipshape.obj"	"$(INTDIR)\shipshape.sbr" : $(SOURCE)\
+ $(DEP_CPP_SHIPS) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\common\socklib.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_SOCKL=\
-	"..\..\common\cmw.h"\
-	"..\..\common\NT/winNet.h"\
+	"..\..\common\NT\winNet.h"\
 	"..\..\common\socklib.h"\
 	"..\..\common\version.h"\
-	{$(INCLUDE)}"\sys\types.h"\
+	
+
+"$(INTDIR)\socklib.obj"	"$(INTDIR)\socklib.sbr" : $(SOURCE) $(DEP_CPP_SOCKL)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_SOCKL=\
+	"..\..\common\cmw.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 NODEP_CPP_SOCKL=\
 	"..\..\common\termnet.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\socklib.obj"	"$(INTDIR)\socklib.sbr" : $(SOURCE) $(DEP_CPP_SOCKL)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\socklib.obj" : $(SOURCE) $(DEP_CPP_SOCKL) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\socklib.sbr" : $(SOURCE) $(DEP_CPP_SOCKL) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\socklib.obj" : $(SOURCE) $(DEP_CPP_SOCKL) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\socklib.sbr" : $(SOURCE) $(DEP_CPP_SOCKL) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_SOCKL=\
+	"..\..\common\cmw.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_SOCKL=\
+	"..\..\common\termnet.h"\
 	
 
-"$(INTDIR)\socklib.obj" : $(SOURCE) $(DEP_CPP_SOCKL) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\socklib.obj"	"$(INTDIR)\socklib.sbr" : $(SOURCE) $(DEP_CPP_SOCKL)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\socklib.sbr" : $(SOURCE) $(DEP_CPP_SOCKL) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\usleep.c
-DEP_CPP_USLEE=\
-	"..\..\common\NT/winNet.h"\
-	{$(INCLUDE)}"\sys\types.h"\
-	
+SOURCE=.\Splash.cpp
 
 !IF  "$(CFG)" == "xpilot - Win32 Release"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_SPLAS=\
+	"..\..\common\version.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
 	
 
-"$(INTDIR)\usleep.obj" : $(SOURCE) $(DEP_CPP_USLEE) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\Splash.obj"	"$(INTDIR)\Splash.sbr" : $(SOURCE) $(DEP_CPP_SPLAS)\
+ "$(INTDIR)"
 
-"$(INTDIR)\usleep.sbr" : $(SOURCE) $(DEP_CPP_USLEE) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_SPLAS=\
+	"..\..\common\version.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
 	
 
-"$(INTDIR)\usleep.obj" : $(SOURCE) $(DEP_CPP_USLEE) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\Splash.obj"	"$(INTDIR)\Splash.sbr" : $(SOURCE) $(DEP_CPP_SPLAS)\
+ "$(INTDIR)"
 
-"$(INTDIR)\usleep.sbr" : $(SOURCE) $(DEP_CPP_USLEE) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_SPLAS=\
+	"..\..\common\version.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
 	
 
-"$(INTDIR)\usleep.obj" : $(SOURCE) $(DEP_CPP_USLEE) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\Splash.obj"	"$(INTDIR)\Splash.sbr" : $(SOURCE) $(DEP_CPP_SPLAS)\
+ "$(INTDIR)"
 
-"$(INTDIR)\usleep.sbr" : $(SOURCE) $(DEP_CPP_USLEE) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\syslimit.c
 
-SOURCE=..\texture.c
-DEP_CPP_TEXTU=\
-	"..\..\..\lib\textures\ball.xpm"\
-	"..\..\..\lib\textures\rock4.xpm"\
+"$(INTDIR)\syslimit.obj"	"$(INTDIR)\syslimit.sbr" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\talkmacros.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_TALKM=\
+	"..\..\common\bit.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
 	"..\client.h"\
+	"..\netclient.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	".\winAudio.h"\
+	".\winClient.h"\
+	".\winXThread.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\talkmacros.obj"	"$(INTDIR)\talkmacros.sbr" : $(SOURCE)\
+ $(DEP_CPP_TALKM) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_TALKM=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	".\winAudio.h"\
+	".\winClient.h"\
+	".\winXThread.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_TALKM=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\talkmacros.obj"	"$(INTDIR)\talkmacros.sbr" : $(SOURCE)\
+ $(DEP_CPP_TALKM) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_TALKM=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\rules.h"\
+	"..\..\common\setup.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\netclient.h"\
+	"..\protoclient.h"\
+	"..\talk.h"\
+	".\winAudio.h"\
+	".\winClient.h"\
+	".\winXThread.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_TALKM=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\talkmacros.obj"	"$(INTDIR)\talkmacros.sbr" : $(SOURCE)\
+ $(DEP_CPP_TALKM) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=.\TalkWindow.cpp
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_TALKW=\
+	".\stdafx.h"\
+	".\TalkWindow.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\TalkWindow.obj"	"$(INTDIR)\TalkWindow.sbr" : $(SOURCE)\
+ $(DEP_CPP_TALKW) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_TALKW=\
+	".\stdafx.h"\
+	".\TalkWindow.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\TalkWindow.obj"	"$(INTDIR)\TalkWindow.sbr" : $(SOURCE)\
+ $(DEP_CPP_TALKW) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_TALKW=\
+	".\stdafx.h"\
+	".\TalkWindow.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\TalkWindow.obj"	"$(INTDIR)\TalkWindow.sbr" : $(SOURCE)\
+ $(DEP_CPP_TALKW) "$(INTDIR)"
+
+
+!ENDIF 
+
+SOURCE=..\textinterface.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_TEXTI=\
+	"..\..\common\bit.h"\
+	"..\..\common\checknames.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\connectparam.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\textinterface.obj"	"$(INTDIR)\textinterface.sbr" : $(SOURCE)\
+ $(DEP_CPP_TEXTI) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_TEXTI=\
+	"..\..\common\bit.h"\
+	"..\..\common\checknames.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\connectparam.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_TEXTI=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\textinterface.obj"	"$(INTDIR)\textinterface.sbr" : $(SOURCE)\
+ $(DEP_CPP_TEXTI) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_TEXTI=\
+	"..\..\common\bit.h"\
+	"..\..\common\checknames.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\connectparam.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_TEXTI=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\textinterface.obj"	"$(INTDIR)\textinterface.sbr" : $(SOURCE)\
+ $(DEP_CPP_TEXTI) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\texture.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_TEXTU=\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
 	"..\paint.h"\
 	"..\texture.h"\
 	"..\xinit.h"\
 	"..\xpmread.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\texture.obj"	"$(INTDIR)\texture.sbr" : $(SOURCE) $(DEP_CPP_TEXTU)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\texture.obj" : $(SOURCE) $(DEP_CPP_TEXTU) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\texture.sbr" : $(SOURCE) $(DEP_CPP_TEXTU) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_TEXTU=\
+	"..\..\..\lib\textures\ball.xpm"\
+	"..\..\..\lib\textures\rock4.xpm"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	"..\xpmread.h"\
 	
 
-"$(INTDIR)\texture.obj" : $(SOURCE) $(DEP_CPP_TEXTU) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\texture.obj"	"$(INTDIR)\texture.sbr" : $(SOURCE) $(DEP_CPP_TEXTU)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\texture.sbr" : $(SOURCE) $(DEP_CPP_TEXTU) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_TEXTU=\
+	"..\..\..\lib\textures\ball.xpm"\
+	"..\..\..\lib\textures\rock4.xpm"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\texture.h"\
+	"..\xinit.h"\
+	"..\xpmread.h"\
 	
 
-"$(INTDIR)\texture.obj" : $(SOURCE) $(DEP_CPP_TEXTU) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\texture.obj"	"$(INTDIR)\texture.sbr" : $(SOURCE) $(DEP_CPP_TEXTU)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\texture.sbr" : $(SOURCE) $(DEP_CPP_TEXTU) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\usleep.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_USLEE=\
+	"..\..\common\NT\winNet.h"\
+	
+
+"$(INTDIR)\usleep.obj"	"$(INTDIR)\usleep.sbr" : $(SOURCE) $(DEP_CPP_USLEE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_USLEE=\
+	"..\..\common\NT\winNet.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\usleep.obj"	"$(INTDIR)\usleep.sbr" : $(SOURCE) $(DEP_CPP_USLEE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_USLEE=\
+	"..\..\common\NT\winNet.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\usleep.obj"	"$(INTDIR)\usleep.sbr" : $(SOURCE) $(DEP_CPP_USLEE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\widget.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_WIDGE=\
+	"..\..\common\bit.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+
+"$(INTDIR)\widget.obj"	"$(INTDIR)\widget.sbr" : $(SOURCE) $(DEP_CPP_WIDGE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_WIDGE=\
 	"..\..\common\bit.h"\
 	"..\..\common\cmw.h"\
@@ -2797,7 +3633,7 @@ DEP_CPP_WIDGE=\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\version.h"\
 	"..\client.h"\
@@ -2813,109 +3649,257 @@ NODEP_CPP_WIDGE=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\widget.obj"	"$(INTDIR)\widget.sbr" : $(SOURCE) $(DEP_CPP_WIDGE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\widget.obj" : $(SOURCE) $(DEP_CPP_WIDGE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\widget.sbr" : $(SOURCE) $(DEP_CPP_WIDGE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\widget.obj" : $(SOURCE) $(DEP_CPP_WIDGE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\widget.sbr" : $(SOURCE) $(DEP_CPP_WIDGE) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_WIDGE=\
+	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\client.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_WIDGE=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\widget.obj" : $(SOURCE) $(DEP_CPP_WIDGE) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\widget.obj"	"$(INTDIR)\widget.sbr" : $(SOURCE) $(DEP_CPP_WIDGE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\widget.sbr" : $(SOURCE) $(DEP_CPP_WIDGE) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=.\winAbout.cpp
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_WINAB=\
+	"..\..\common\version.h"\
+	".\stdafx.h"\
+	".\winAbout.h"\
+	
+
+"$(INTDIR)\winAbout.obj"	"$(INTDIR)\winAbout.sbr" : $(SOURCE) $(DEP_CPP_WINAB)\
+ "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_WINAB=\
+	"..\..\common\version.h"\
+	".\stdafx.h"\
+	".\winAbout.h"\
+	
+
+"$(INTDIR)\winAbout.obj"	"$(INTDIR)\winAbout.sbr" : $(SOURCE) $(DEP_CPP_WINAB)\
+ "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_WINAB=\
+	"..\..\common\version.h"\
+	".\stdafx.h"\
+	".\winAbout.h"\
+	
+
+"$(INTDIR)\winAbout.obj"	"$(INTDIR)\winAbout.sbr" : $(SOURCE) $(DEP_CPP_WINAB)\
+ "$(INTDIR)"
+
+
+!ENDIF 
+
+SOURCE=.\winAudio.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+
+"$(INTDIR)\winAudio.obj"	"$(INTDIR)\winAudio.sbr" : $(SOURCE) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_WINAU=\
+	".\winAudio.h"\
+	
+
+"$(INTDIR)\winAudio.obj"	"$(INTDIR)\winAudio.sbr" : $(SOURCE) $(DEP_CPP_WINAU)\
+ "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_WINAU=\
+	".\winAudio.h"\
+	
+
+"$(INTDIR)\winAudio.obj"	"$(INTDIR)\winAudio.sbr" : $(SOURCE) $(DEP_CPP_WINAU)\
+ "$(INTDIR)"
+
+
+!ENDIF 
+
+SOURCE=.\winBitmap.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_WINBI=\
+	"..\..\common\bit.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	"..\..\common\setup.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	".\winBitmap.h"\
+	
+
+"$(INTDIR)\winBitmap.obj"	"$(INTDIR)\winBitmap.sbr" : $(SOURCE)\
+ $(DEP_CPP_WINBI) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_WINBI=\
+	"..\..\common\bit.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\error.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	"..\..\common\setup.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	".\winBitmap.h"\
+	
+NODEP_CPP_WINBI=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\winBitmap.obj"	"$(INTDIR)\winBitmap.sbr" : $(SOURCE)\
+ $(DEP_CPP_WINBI) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_WINBI=\
+	"..\..\common\bit.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\error.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	"..\..\common\setup.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\gfx2d.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	".\winBitmap.h"\
+	
+NODEP_CPP_WINBI=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\winBitmap.obj"	"$(INTDIR)\winBitmap.sbr" : $(SOURCE)\
+ $(DEP_CPP_WINBI) "$(INTDIR)"
+
+
+!ENDIF 
 
 SOURCE=..\..\common\NT\winNet.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+
+"$(INTDIR)\winNet.obj"	"$(INTDIR)\winNet.sbr" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_WINNE=\
 	"..\..\common\error.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\winNet.obj"	"$(INTDIR)\winNet.sbr" : $(SOURCE) $(DEP_CPP_WINNE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winNet.obj" : $(SOURCE) $(DEP_CPP_WINNE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winNet.sbr" : $(SOURCE) $(DEP_CPP_WINNE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winNet.obj" : $(SOURCE) $(DEP_CPP_WINNE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winNet.sbr" : $(SOURCE) $(DEP_CPP_WINNE) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_WINNE=\
+	"..\..\common\error.h"\
 	
 
-"$(INTDIR)\winNet.obj" : $(SOURCE) $(DEP_CPP_WINNE) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\winNet.obj"	"$(INTDIR)\winNet.sbr" : $(SOURCE) $(DEP_CPP_WINNE)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\winNet.sbr" : $(SOURCE) $(DEP_CPP_WINNE) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
-
 SOURCE=..\..\common\NT\winX.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_WINX_=\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	"..\client.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXThread.h"\
+	
+
+"$(INTDIR)\winX.obj"	"$(INTDIR)\winX.sbr" : $(SOURCE) $(DEP_CPP_WINX_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
 DEP_CPP_WINX_=\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\error.h"\
 	"..\..\common\item.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\NT\winX_.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
 	"..\client.h"\
 	"..\paint.h"\
 	"..\protoclient.h"\
@@ -2928,343 +3912,155 @@ NODEP_CPP_WINX_=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winX.obj" : $(SOURCE) $(DEP_CPP_WINX_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winX.sbr" : $(SOURCE) $(DEP_CPP_WINX_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winX.obj" : $(SOURCE) $(DEP_CPP_WINX_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winX.sbr" : $(SOURCE) $(DEP_CPP_WINX_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winX.obj" : $(SOURCE) $(DEP_CPP_WINX_) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winX.sbr" : $(SOURCE) $(DEP_CPP_WINX_) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\NT\winX11.c
-DEP_CPP_WINX1=\
-	"..\..\common\error.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\NT\winX_.h"\
-	".\winClient.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winX11.obj" : $(SOURCE) $(DEP_CPP_WINX1) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winX11.sbr" : $(SOURCE) $(DEP_CPP_WINX1) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winX11.obj" : $(SOURCE) $(DEP_CPP_WINX1) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winX11.sbr" : $(SOURCE) $(DEP_CPP_WINX1) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winX11.obj" : $(SOURCE) $(DEP_CPP_WINX1) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winX11.sbr" : $(SOURCE) $(DEP_CPP_WINX1) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\NT\winXKey.c
-DEP_CPP_WINXK=\
-	"..\..\common\NT/winX.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winXKey.obj" : $(SOURCE) $(DEP_CPP_WINXK) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winXKey.sbr" : $(SOURCE) $(DEP_CPP_WINXK) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winXKey.obj" : $(SOURCE) $(DEP_CPP_WINXK) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winXKey.sbr" : $(SOURCE) $(DEP_CPP_WINXK) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\winXKey.obj" : $(SOURCE) $(DEP_CPP_WINXK) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\winXKey.sbr" : $(SOURCE) $(DEP_CPP_WINXK) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=.\winXThread.c
-DEP_CPP_WINXT=\
-	"..\..\common\error.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\NT\winX_.h"\
-	".\winXThread.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-"$(INTDIR)\winXThread.obj" : $(SOURCE) $(DEP_CPP_WINXT) "$(INTDIR)"
-
-"$(INTDIR)\winXThread.sbr" : $(SOURCE) $(DEP_CPP_WINXT) "$(INTDIR)"
-
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-"$(INTDIR)\winXThread.obj" : $(SOURCE) $(DEP_CPP_WINXT) "$(INTDIR)"
-
-"$(INTDIR)\winXThread.sbr" : $(SOURCE) $(DEP_CPP_WINXT) "$(INTDIR)"
+"$(INTDIR)\winX.obj"	"$(INTDIR)\winX.sbr" : $(SOURCE) $(DEP_CPP_WINX_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-"$(INTDIR)\winXThread.obj" : $(SOURCE) $(DEP_CPP_WINXT) "$(INTDIR)"
-
-"$(INTDIR)\winXThread.sbr" : $(SOURCE) $(DEP_CPP_WINXT) "$(INTDIR)"
-
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\NT\wsockerrs.c
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\wsockerrs.obj" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\wsockerrs.sbr" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\wsockerrs.obj" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\wsockerrs.sbr" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\wsockerrs.obj" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\wsockerrs.sbr" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\xinit.c
-DEP_CPP_XINIT=\
-	"..\..\common\cmw.h"\
-	"..\..\common\config.h"\
+DEP_CPP_WINX_=\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
+	"..\..\common\error.h"\
 	"..\..\common\item.h"\
-	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\portability.h"\
-	"..\..\common\version.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
 	"..\client.h"\
-	"..\configure.h"\
-	"..\dbuff.h"\
-	"..\icon.h"\
-	"..\items\itemAfterburner.xbm"\
-	"..\items\itemArmor.xbm"\
-	"..\items\itemAutopilot.xbm"\
-	"..\items\itemCloakingDevice.xbm"\
-	"..\items\itemDeflector.xbm"\
-	"..\items\itemEcm.xbm"\
-	"..\items\itemEmergencyShield.xbm"\
-	"..\items\itemEmergencyThrust.xbm"\
-	"..\items\itemEnergyPack.xbm"\
-	"..\items\itemHyperJump.xbm"\
-	"..\items\itemLaser.xbm"\
-	"..\items\itemMinePack.xbm"\
-	"..\items\itemMirror.xbm"\
-	"..\items\itemPhasingDevice.xbm"\
-	"..\items\itemRearShot.xbm"\
-	"..\items\itemRocketPack.xbm"\
-	"..\items\itemSensorPack.xbm"\
-	"..\items\itemTank.xbm"\
-	"..\items\itemTractorBeam.xbm"\
-	"..\items\itemTransporter.xbm"\
-	"..\items\itemWideangleShot.xbm"\
-	"..\netclient.h"\
 	"..\paint.h"\
 	"..\protoclient.h"\
 	"..\widget.h"\
 	"..\xinit.h"\
 	".\winClient.h"\
-	".\winXXPilot.h"\
+	".\winXThread.h"\
 	
-NODEP_CPP_XINIT=\
+NODEP_CPP_WINX_=\
 	"..\strcasecmp.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\winX.obj"	"$(INTDIR)\winX.sbr" : $(SOURCE) $(DEP_CPP_WINX_)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xinit.obj" : $(SOURCE) $(DEP_CPP_XINIT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xinit.sbr" : $(SOURCE) $(DEP_CPP_XINIT) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xinit.obj" : $(SOURCE) $(DEP_CPP_XINIT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xinit.sbr" : $(SOURCE) $(DEP_CPP_XINIT) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xinit.obj" : $(SOURCE) $(DEP_CPP_XINIT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xinit.sbr" : $(SOURCE) $(DEP_CPP_XINIT) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
+SOURCE=..\..\common\NT\winX11.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_WINX1=\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\winX11.obj"	"$(INTDIR)\winX11.sbr" : $(SOURCE) $(DEP_CPP_WINX1)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_WINX1=\
+	"..\..\common\error.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\winX11.obj"	"$(INTDIR)\winX11.sbr" : $(SOURCE) $(DEP_CPP_WINX1)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_WINX1=\
+	"..\..\common\error.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\winX11.obj"	"$(INTDIR)\winX11.sbr" : $(SOURCE) $(DEP_CPP_WINX1)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\..\common\NT\winXKey.c
+DEP_CPP_WINXK=\
+	"..\..\common\NT\winX.h"\
+	
+
+"$(INTDIR)\winXKey.obj"	"$(INTDIR)\winXKey.sbr" : $(SOURCE) $(DEP_CPP_WINXK)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=.\winXThread.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_WINXT=\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	".\winXThread.h"\
+	
+
+"$(INTDIR)\winXThread.obj"	"$(INTDIR)\winXThread.sbr" : $(SOURCE)\
+ $(DEP_CPP_WINXT) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_WINXT=\
+	"..\..\common\error.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	".\winXThread.h"\
+	
+
+"$(INTDIR)\winXThread.obj"	"$(INTDIR)\winXThread.sbr" : $(SOURCE)\
+ $(DEP_CPP_WINXT) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_WINXT=\
+	"..\..\common\error.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\nt\winx_.h"\
+	".\winXThread.h"\
+	
+
+"$(INTDIR)\winXThread.obj"	"$(INTDIR)\winXThread.sbr" : $(SOURCE)\
+ $(DEP_CPP_WINXT) "$(INTDIR)"
+
+
+!ENDIF 
+
+SOURCE=..\..\common\NT\wsockerrs.c
+
+"$(INTDIR)\wsockerrs.obj"	"$(INTDIR)\wsockerrs.sbr" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
 
 SOURCE=..\xevent.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
 DEP_CPP_XEVEN=\
 	"..\..\common\bit.h"\
-	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\NT/winXKey.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\NT\winXKey.h"\
 	"..\..\common\packet.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\setup.h"\
@@ -3283,387 +4079,82 @@ DEP_CPP_XEVEN=\
 	".\winClient.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\xevent.obj"	"$(INTDIR)\xevent.sbr" : $(SOURCE) $(DEP_CPP_XEVEN)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xevent.obj" : $(SOURCE) $(DEP_CPP_XEVEN) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xevent.sbr" : $(SOURCE) $(DEP_CPP_XEVEN) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xevent.obj" : $(SOURCE) $(DEP_CPP_XEVEN) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xevent.sbr" : $(SOURCE) $(DEP_CPP_XEVEN) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xevent.obj" : $(SOURCE) $(DEP_CPP_XEVEN) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xevent.sbr" : $(SOURCE) $(DEP_CPP_XEVEN) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\xpilot.c
-DEP_CPP_XPILOT_C=\
+DEP_CPP_XEVEN=\
 	"..\..\common\bit.h"\
-	"..\..\common\checknames.h"\
 	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
-	"..\..\common\net.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\pack.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\NT\winXKey.h"\
+	"..\..\common\packet.h"\
 	"..\..\common\portability.h"\
-	"..\..\common\socklib.h"\
+	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
-	"..\connectparam.h"\
-	"..\protoclient.h"\
-	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
-	
-NODEP_CPP_XPILOT_C=\
-	"..\strcasecmp.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xpilot.obj" : $(SOURCE) $(DEP_CPP_XPILOT_C) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xpilot.sbr" : $(SOURCE) $(DEP_CPP_XPILOT_C) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xpilot.obj" : $(SOURCE) $(DEP_CPP_XPILOT_C) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xpilot.sbr" : $(SOURCE) $(DEP_CPP_XPILOT_C) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\xpilot.obj" : $(SOURCE) $(DEP_CPP_XPILOT_C) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xpilot.sbr" : $(SOURCE) $(DEP_CPP_XPILOT_C) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\shipshape.c
-DEP_CPP_SHIPS=\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\draw.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\version.h"\
-	"..\..\server\NT\winServer.h"\
+	"..\client.h"\
+	"..\configure.h"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\paintdata.h"\
+	"..\record.h"\
+	"..\talk.h"\
+	"..\widget.h"\
+	"..\xeventhandlers.h"\
+	"..\xinit.h"\
+	".\winAudio.h"\
 	".\winClient.h"\
 	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\xevent.obj"	"$(INTDIR)\xevent.sbr" : $(SOURCE) $(DEP_CPP_XEVEN)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\shipshape.obj" : $(SOURCE) $(DEP_CPP_SHIPS) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\shipshape.sbr" : $(SOURCE) $(DEP_CPP_SHIPS) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\shipshape.obj" : $(SOURCE) $(DEP_CPP_SHIPS) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\shipshape.sbr" : $(SOURCE) $(DEP_CPP_SHIPS) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\shipshape.obj" : $(SOURCE) $(DEP_CPP_SHIPS) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\shipshape.sbr" : $(SOURCE) $(DEP_CPP_SHIPS) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\checknames.c
-DEP_CPP_CHECK=\
-	"..\..\common\checknames.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\pack.h"\
-	"..\..\common\version.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\checknames.obj" : $(SOURCE) $(DEP_CPP_CHECK) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\checknames.sbr" : $(SOURCE) $(DEP_CPP_CHECK) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\checknames.obj" : $(SOURCE) $(DEP_CPP_CHECK) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\checknames.sbr" : $(SOURCE) $(DEP_CPP_CHECK) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\checknames.obj" : $(SOURCE) $(DEP_CPP_CHECK) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\checknames.sbr" : $(SOURCE) $(DEP_CPP_CHECK) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\guimap.c
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-DEP_CPP_GUIMA=\
+DEP_CPP_XEVEN=\
 	"..\..\common\bit.h"\
+	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\rules.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\NT\winXKey.h"\
+	"..\..\common\packet.h"\
+	"..\..\common\portability.h"\
 	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
 	"..\client.h"\
+	"..\configure.h"\
+	"..\netclient.h"\
 	"..\paint.h"\
 	"..\paintdata.h"\
-	"..\protoclient.h"\
 	"..\record.h"\
-	"..\texture.h"\
+	"..\talk.h"\
+	"..\widget.h"\
+	"..\xeventhandlers.h"\
 	"..\xinit.h"\
-	
-NODEP_CPP_GUIMA=\
-	"..\strcasecmp.h"\
-	
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+	".\winAudio.h"\
+	".\winClient.h"\
 	
 
-"$(INTDIR)\guimap.obj" : $(SOURCE) $(DEP_CPP_GUIMA) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\xevent.obj"	"$(INTDIR)\xevent.sbr" : $(SOURCE) $(DEP_CPP_XEVEN)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\guimap.sbr" : $(SOURCE) $(DEP_CPP_GUIMA) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-DEP_CPP_GUIMA=\
-	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\draw.h"\
-	"..\..\common\item.h"\
-	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\rules.h"\
-	"..\..\common\setup.h"\
-	"..\..\common\version.h"\
-	"..\client.h"\
-	"..\paint.h"\
-	"..\paintdata.h"\
-	"..\protoclient.h"\
-	"..\record.h"\
-	"..\texture.h"\
-	"..\xinit.h"\
-	
-NODEP_CPP_GUIMA=\
-	"..\strcasecmp.h"\
-	
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\guimap.obj" : $(SOURCE) $(DEP_CPP_GUIMA) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\guimap.sbr" : $(SOURCE) $(DEP_CPP_GUIMA) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-DEP_CPP_GUIMA=\
-	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\draw.h"\
-	"..\..\common\item.h"\
-	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\rules.h"\
-	"..\..\common\setup.h"\
-	"..\..\common\version.h"\
-	"..\client.h"\
-	"..\paint.h"\
-	"..\paintdata.h"\
-	"..\protoclient.h"\
-	"..\record.h"\
-	"..\texture.h"\
-	"..\xinit.h"\
-	
-NODEP_CPP_GUIMA=\
-	"..\strcasecmp.h"\
-	
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\guimap.obj" : $(SOURCE) $(DEP_CPP_GUIMA) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\guimap.sbr" : $(SOURCE) $(DEP_CPP_GUIMA) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\syslimit.c
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\syslimit.obj" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\syslimit.sbr" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\syslimit.obj" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\syslimit.sbr" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\syslimit.obj" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\syslimit.sbr" : $(SOURCE) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
 
 SOURCE=..\xeventhandlers.c
 
@@ -3671,14 +4162,13 @@ SOURCE=..\xeventhandlers.c
 
 DEP_CPP_XEVENT=\
 	"..\..\common\bit.h"\
-	"..\..\common\cmw.h"\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\NT/winXKey.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\NT\winXKey.h"\
 	"..\..\common\packet.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\setup.h"\
@@ -3696,15 +4186,10 @@ DEP_CPP_XEVENT=\
 	".\winClient.h"\
 	
 
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
+"$(INTDIR)\xeventhandlers.obj"	"$(INTDIR)\xeventhandlers.sbr" : $(SOURCE)\
+ $(DEP_CPP_XEVENT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\xeventhandlers.obj" : $(SOURCE) $(DEP_CPP_XEVENT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xeventhandlers.sbr" : $(SOURCE) $(DEP_CPP_XEVENT) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
@@ -3716,8 +4201,8 @@ DEP_CPP_XEVENT=\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\NT/winXKey.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\NT\winXKey.h"\
 	"..\..\common\packet.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\setup.h"\
@@ -3735,15 +4220,10 @@ DEP_CPP_XEVENT=\
 	".\winClient.h"\
 	
 
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
+"$(INTDIR)\xeventhandlers.obj"	"$(INTDIR)\xeventhandlers.sbr" : $(SOURCE)\
+ $(DEP_CPP_XEVENT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\xeventhandlers.obj" : $(SOURCE) $(DEP_CPP_XEVENT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xeventhandlers.sbr" : $(SOURCE) $(DEP_CPP_XEVENT) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
@@ -3755,8 +4235,8 @@ DEP_CPP_XEVENT=\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\NT/winXKey.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\NT\winXKey.h"\
 	"..\..\common\packet.h"\
 	"..\..\common\portability.h"\
 	"..\..\common\setup.h"\
@@ -3774,448 +4254,425 @@ DEP_CPP_XEVENT=\
 	".\winClient.h"\
 	
 
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
+"$(INTDIR)\xeventhandlers.obj"	"$(INTDIR)\xeventhandlers.sbr" : $(SOURCE)\
+ $(DEP_CPP_XEVENT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\xeventhandlers.obj" : $(SOURCE) $(DEP_CPP_XEVENT) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\xeventhandlers.sbr" : $(SOURCE) $(DEP_CPP_XEVENT) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\datagram.c
-DEP_CPP_DATAG=\
-	"..\..\common\cmw.h"\
-	"..\..\common\config.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\portability.h"\
-	"..\..\common\socklib.h"\
-	"..\..\common\version.h"\
-	"..\protoclient.h"\
-	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
-	
-NODEP_CPP_DATAG=\
-	"..\strcasecmp.h"\
-	
+SOURCE=..\xinit.c
 
 !IF  "$(CFG)" == "xpilot - Win32 Release"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\datagram.obj" : $(SOURCE) $(DEP_CPP_DATAG) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\datagram.sbr" : $(SOURCE) $(DEP_CPP_DATAG) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\datagram.obj" : $(SOURCE) $(DEP_CPP_DATAG) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\datagram.sbr" : $(SOURCE) $(DEP_CPP_DATAG) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\datagram.obj" : $(SOURCE) $(DEP_CPP_DATAG) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\datagram.sbr" : $(SOURCE) $(DEP_CPP_DATAG) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\textinterface.c
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-DEP_CPP_TEXTI=\
-	"..\..\common\bit.h"\
-	"..\..\common\checknames.h"\
-	"..\..\common\cmw.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\net.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\pack.h"\
-	"..\..\common\portability.h"\
-	"..\..\common\socklib.h"\
-	"..\..\common\version.h"\
-	"..\connectparam.h"\
-	"..\protoclient.h"\
-	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
-	
-NODEP_CPP_TEXTI=\
-	"..\strcasecmp.h"\
-	
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\textinterface.obj" : $(SOURCE) $(DEP_CPP_TEXTI) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\textinterface.sbr" : $(SOURCE) $(DEP_CPP_TEXTI) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-DEP_CPP_TEXTI=\
-	"..\..\common\bit.h"\
-	"..\..\common\checknames.h"\
-	"..\..\common\cmw.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\net.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\pack.h"\
-	"..\..\common\portability.h"\
-	"..\..\common\socklib.h"\
-	"..\..\common\version.h"\
-	"..\connectparam.h"\
-	"..\protoclient.h"\
-	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
-	
-NODEP_CPP_TEXTI=\
-	"..\strcasecmp.h"\
-	
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\textinterface.obj" : $(SOURCE) $(DEP_CPP_TEXTI) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\textinterface.sbr" : $(SOURCE) $(DEP_CPP_TEXTI) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-DEP_CPP_TEXTI=\
-	"..\..\common\bit.h"\
-	"..\..\common\checknames.h"\
-	"..\..\common\cmw.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\net.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\pack.h"\
-	"..\..\common\portability.h"\
-	"..\..\common\socklib.h"\
-	"..\..\common\version.h"\
-	"..\connectparam.h"\
-	"..\protoclient.h"\
-	".\winClient.h"\
-	{$(INCLUDE)}"\sys\types.h"\
-	
-NODEP_CPP_TEXTI=\
-	"..\strcasecmp.h"\
-	
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\textinterface.obj" : $(SOURCE) $(DEP_CPP_TEXTI) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\textinterface.sbr" : $(SOURCE) $(DEP_CPP_TEXTI) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\..\common\config.c
-DEP_CPP_CONFIG=\
-	"..\..\common\config.h"\
-	"..\..\common\version.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\config.obj" : $(SOURCE) $(DEP_CPP_CONFIG) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\config.sbr" : $(SOURCE) $(DEP_CPP_CONFIG) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\config.obj" : $(SOURCE) $(DEP_CPP_CONFIG) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\config.sbr" : $(SOURCE) $(DEP_CPP_CONFIG) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\config.obj" : $(SOURCE) $(DEP_CPP_CONFIG) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\config.sbr" : $(SOURCE) $(DEP_CPP_CONFIG) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\gfx3d.c
-DEP_CPP_GFX3D=\
-	"..\..\common\const.h"\
-	"..\gfx3d.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\gfx3d.obj" : $(SOURCE) $(DEP_CPP_GFX3D) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\gfx3d.sbr" : $(SOURCE) $(DEP_CPP_GFX3D) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\gfx3d.obj" : $(SOURCE) $(DEP_CPP_GFX3D) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\gfx3d.sbr" : $(SOURCE) $(DEP_CPP_GFX3D) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\gfx3d.obj" : $(SOURCE) $(DEP_CPP_GFX3D) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\gfx3d.sbr" : $(SOURCE) $(DEP_CPP_GFX3D) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\guiobjects.c
-DEP_CPP_GUIOB=\
-	"..\..\common\bit.h"\
-	"..\..\common\cmw.h"\
+DEP_CPP_XINIT=\
 	"..\..\common\config.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
 	"..\..\common\keys.h"\
-	"..\..\common\NT/winX.h"\
+	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
-	"..\..\common\rules.h"\
-	"..\..\common\setup.h"\
 	"..\..\common\version.h"\
+	"..\bitmaps.h"\
 	"..\client.h"\
+	"..\configure.h"\
+	"..\dbuff.h"\
+	"..\gfx2d.h"\
+	"..\icon.h"\
+	"..\items\itemafterburner.xbm"\
+	"..\items\itemarmor.xbm"\
+	"..\items\itemautopilot.xbm"\
+	"..\items\itemcloakingdevice.xbm"\
+	"..\items\itemdeflector.xbm"\
+	"..\items\itemecm.xbm"\
+	"..\items\itememergencyshield.xbm"\
+	"..\items\itememergencythrust.xbm"\
+	"..\items\itemenergypack.xbm"\
+	"..\items\itemhyperjump.xbm"\
+	"..\items\itemlaser.xbm"\
+	"..\items\itemminepack.xbm"\
+	"..\items\itemmirror.xbm"\
+	"..\items\itemphasingdevice.xbm"\
+	"..\items\itemrearshot.xbm"\
+	"..\items\itemrocketpack.xbm"\
+	"..\items\itemsensorpack.xbm"\
+	"..\items\itemtank.xbm"\
+	"..\items\itemtractorbeam.xbm"\
+	"..\items\itemtransporter.xbm"\
+	"..\items\itemwideangleshot.xbm"\
+	"..\netclient.h"\
 	"..\paint.h"\
-	"..\paintdata.h"\
 	"..\protoclient.h"\
-	"..\record.h"\
-	"..\texture.h"\
+	"..\widget.h"\
 	"..\xinit.h"\
 	".\winClient.h"\
-	
-NODEP_CPP_GUIOB=\
-	"..\strcasecmp.h"\
-	
-
-!IF  "$(CFG)" == "xpilot - Win32 Release"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\guiobjects.obj" : $(SOURCE) $(DEP_CPP_GUIOB) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\guiobjects.sbr" : $(SOURCE) $(DEP_CPP_GUIOB) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\guiobjects.obj" : $(SOURCE) $(DEP_CPP_GUIOB) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\guiobjects.sbr" : $(SOURCE) $(DEP_CPP_GUIOB) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
-
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\guiobjects.obj" : $(SOURCE) $(DEP_CPP_GUIOB) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\guiobjects.sbr" : $(SOURCE) $(DEP_CPP_GUIOB) "$(INTDIR)"
-   $(BuildCmds)
-
-!ENDIF 
-
-# End Source File
-################################################################################
-# Begin Source File
-
-SOURCE=..\talkmacros.c
-DEP_CPP_TALKM=\
-	"..\..\common\bit.h"\
-	"..\..\common\cmw.h"\
-	"..\..\common\config.h"\
-	"..\..\common\const.h"\
-	"..\..\common\draw.h"\
-	"..\..\common\item.h"\
-	"..\..\common\NT/winNet.h"\
-	"..\..\common\NT/winX.h"\
-	"..\..\common\portability.h"\
-	"..\..\common\rules.h"\
-	"..\..\common\setup.h"\
-	"..\..\common\version.h"\
-	"..\client.h"\
-	"..\netclient.h"\
-	"..\protoclient.h"\
-	"..\talk.h"\
-	".\winAudio.h"\
-	".\winClient.h"\
-	".\winXThread.h"\
 	".\winXXPilot.h"\
 	
-NODEP_CPP_TALKM=\
-	"..\strcasecmp.h"\
-	
 
-!IF  "$(CFG)" == "xpilot - Win32 Release"
+"$(INTDIR)\xinit.obj"	"$(INTDIR)\xinit.sbr" : $(SOURCE) $(DEP_CPP_XINIT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
-	
-
-"$(INTDIR)\talkmacros.obj" : $(SOURCE) $(DEP_CPP_TALKM) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\talkmacros.sbr" : $(SOURCE) $(DEP_CPP_TALKM) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_XINIT=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\configure.h"\
+	"..\dbuff.h"\
+	"..\gfx2d.h"\
+	"..\icon.h"\
+	"..\items\itemafterburner.xbm"\
+	"..\items\itemarmor.xbm"\
+	"..\items\itemautopilot.xbm"\
+	"..\items\itemcloakingdevice.xbm"\
+	"..\items\itemdeflector.xbm"\
+	"..\items\itemecm.xbm"\
+	"..\items\itememergencyshield.xbm"\
+	"..\items\itememergencythrust.xbm"\
+	"..\items\itemenergypack.xbm"\
+	"..\items\itemhyperjump.xbm"\
+	"..\items\itemlaser.xbm"\
+	"..\items\itemminepack.xbm"\
+	"..\items\itemmirror.xbm"\
+	"..\items\itemphasingdevice.xbm"\
+	"..\items\itemrearshot.xbm"\
+	"..\items\itemrocketpack.xbm"\
+	"..\items\itemsensorpack.xbm"\
+	"..\items\itemtank.xbm"\
+	"..\items\itemtractorbeam.xbm"\
+	"..\items\itemtransporter.xbm"\
+	"..\items\itemwideangleshot.xbm"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_XINIT=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\talkmacros.obj" : $(SOURCE) $(DEP_CPP_TALKM) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\xinit.obj"	"$(INTDIR)\xinit.sbr" : $(SOURCE) $(DEP_CPP_XINIT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\talkmacros.sbr" : $(SOURCE) $(DEP_CPP_TALKM) "$(INTDIR)"
-   $(BuildCmds)
 
 !ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
 
-
-BuildCmds= \
-	$(CPP) $(CPP_PROJ) $(SOURCE) \
+DEP_CPP_XINIT=\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\draw.h"\
+	"..\..\common\item.h"\
+	"..\..\common\keys.h"\
+	"..\..\common\NT\winX.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\version.h"\
+	"..\bitmaps.h"\
+	"..\client.h"\
+	"..\configure.h"\
+	"..\dbuff.h"\
+	"..\gfx2d.h"\
+	"..\icon.h"\
+	"..\items\itemafterburner.xbm"\
+	"..\items\itemarmor.xbm"\
+	"..\items\itemautopilot.xbm"\
+	"..\items\itemcloakingdevice.xbm"\
+	"..\items\itemdeflector.xbm"\
+	"..\items\itemecm.xbm"\
+	"..\items\itememergencyshield.xbm"\
+	"..\items\itememergencythrust.xbm"\
+	"..\items\itemenergypack.xbm"\
+	"..\items\itemhyperjump.xbm"\
+	"..\items\itemlaser.xbm"\
+	"..\items\itemminepack.xbm"\
+	"..\items\itemmirror.xbm"\
+	"..\items\itemphasingdevice.xbm"\
+	"..\items\itemrearshot.xbm"\
+	"..\items\itemrocketpack.xbm"\
+	"..\items\itemsensorpack.xbm"\
+	"..\items\itemtank.xbm"\
+	"..\items\itemtractorbeam.xbm"\
+	"..\items\itemtransporter.xbm"\
+	"..\items\itemwideangleshot.xbm"\
+	"..\netclient.h"\
+	"..\paint.h"\
+	"..\protoclient.h"\
+	"..\widget.h"\
+	"..\xinit.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	
+NODEP_CPP_XINIT=\
+	"..\strcasecmp.h"\
 	
 
-"$(INTDIR)\talkmacros.obj" : $(SOURCE) $(DEP_CPP_TALKM) "$(INTDIR)"
-   $(BuildCmds)
+"$(INTDIR)\xinit.obj"	"$(INTDIR)\xinit.sbr" : $(SOURCE) $(DEP_CPP_XINIT)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-"$(INTDIR)\talkmacros.sbr" : $(SOURCE) $(DEP_CPP_TALKM) "$(INTDIR)"
-   $(BuildCmds)
 
 !ENDIF 
 
-# End Source File
-# End Target
-# End Project
-################################################################################
-################################################################################
-# Section xpilot : {0FEA6ED2-A2FE-11CF-80DA-00A02423A46C}
-# 	0:8:Splash.h:D:\users\dick\buckosof\xpilot\contrib\NT\xpilot\Splash.h
-# 	0:10:Splash.cpp:D:\users\dick\buckosof\xpilot\contrib\NT\xpilot\Splash.cpp
-# 	1:10:IDB_SPLASH:102
-# 	2:10:ResHdrName:resource.h
-# 	2:11:ProjHdrName:stdafx.h
-# 	2:10:WrapperDef:_SPLASH_SCRN_
-# 	2:12:SplClassName:CSplashWnd
-# 	2:21:SplashScreenInsertKey:4.0
-# 	2:10:HeaderName:Splash.h
-# 	2:10:ImplemName:Splash.cpp
-# 	2:7:BmpID16:IDB_SPLASH
-# End Section
-################################################################################
+SOURCE=..\xpilot.c
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_XPILO=\
+	"..\..\common\bit.h"\
+	"..\..\common\checknames.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\connectparam.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	
+
+"$(INTDIR)\xpilot.obj"	"$(INTDIR)\xpilot.sbr" : $(SOURCE) $(DEP_CPP_XPILO)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_XPILO=\
+	"..\..\common\bit.h"\
+	"..\..\common\checknames.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\connectparam.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_XPILO=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\xpilot.obj"	"$(INTDIR)\xpilot.sbr" : $(SOURCE) $(DEP_CPP_XPILO)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_XPILO=\
+	"..\..\common\bit.h"\
+	"..\..\common\checknames.h"\
+	"..\..\common\cmw.h"\
+	"..\..\common\config.h"\
+	"..\..\common\const.h"\
+	"..\..\common\net.h"\
+	"..\..\common\NT\winNet.h"\
+	"..\..\common\pack.h"\
+	"..\..\common\portability.h"\
+	"..\..\common\socklib.h"\
+	"..\..\common\version.h"\
+	"..\connectparam.h"\
+	"..\protoclient.h"\
+	".\winClient.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_XPILO=\
+	"..\strcasecmp.h"\
+	
+
+"$(INTDIR)\xpilot.obj"	"$(INTDIR)\xpilot.sbr" : $(SOURCE) $(DEP_CPP_XPILO)\
+ "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=.\xpilot.rc
+DEP_RSC_XPILOT=\
+	".\res\Splsh16.bmp"\
+	".\res\xpilot.ico"\
+	".\res\xpilot.rc2"\
+	
+
+"$(INTDIR)\xpilot.res" : $(SOURCE) $(DEP_RSC_XPILOT) "$(INTDIR)"
+	$(RSC) $(RSC_PROJ) $(SOURCE)
+
+
+SOURCE=.\xpilotDoc.cpp
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_XPILOTD=\
+	".\stdafx.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\xpilotDoc.obj"	"$(INTDIR)\xpilotDoc.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTD) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_XPILOTD=\
+	".\stdafx.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\xpilotDoc.obj"	"$(INTDIR)\xpilotDoc.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTD) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_XPILOTD=\
+	".\stdafx.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	
+
+"$(INTDIR)\xpilotDoc.obj"	"$(INTDIR)\xpilotDoc.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTD) "$(INTDIR)"
+
+
+!ENDIF 
+
+SOURCE=.\XPilotNT.cpp
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_XPILOTN=\
+	".\MainFrm.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
+	".\TalkWindow.h"\
+	".\winAbout.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	".\xpilotView.h"\
+	
+
+"$(INTDIR)\XPilotNT.obj"	"$(INTDIR)\XPilotNT.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTN) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_XPILOTN=\
+	".\MainFrm.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
+	".\TalkWindow.h"\
+	".\winAbout.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	".\xpilotView.h"\
+	
+
+"$(INTDIR)\XPilotNT.obj"	"$(INTDIR)\XPilotNT.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTN) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_XPILOTN=\
+	".\MainFrm.h"\
+	".\Splash.h"\
+	".\stdafx.h"\
+	".\TalkWindow.h"\
+	".\winAbout.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	".\xpilotView.h"\
+	
+
+"$(INTDIR)\XPilotNT.obj"	"$(INTDIR)\XPilotNT.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTN) "$(INTDIR)"
+
+
+!ENDIF 
+
+SOURCE=.\xpilotView.cpp
+
+!IF  "$(CFG)" == "xpilot - Win32 Release"
+
+DEP_CPP_XPILOTV=\
+	"..\..\common\NT\winX.h"\
+	".\BSString.h"\
+	".\stdafx.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	".\xpilotView.h"\
+	
+
+"$(INTDIR)\xpilotView.obj"	"$(INTDIR)\xpilotView.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTV) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 Debug"
+
+DEP_CPP_XPILOTV=\
+	"..\..\common\NT\winX.h"\
+	".\BSString.h"\
+	".\stdafx.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	".\xpilotView.h"\
+	
+
+"$(INTDIR)\xpilotView.obj"	"$(INTDIR)\xpilotView.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTV) "$(INTDIR)"
+
+
+!ELSEIF  "$(CFG)" == "xpilot - Win32 ReleasePentium"
+
+DEP_CPP_XPILOTV=\
+	"..\..\common\NT\winX.h"\
+	".\BSString.h"\
+	".\stdafx.h"\
+	".\winClient.h"\
+	".\winXXPilot.h"\
+	".\xpilotDoc.h"\
+	".\XPilotNT.h"\
+	".\xpilotView.h"\
+	
+
+"$(INTDIR)\xpilotView.obj"	"$(INTDIR)\xpilotView.sbr" : $(SOURCE)\
+ $(DEP_CPP_XPILOTV) "$(INTDIR)"
+
+
+!ENDIF 
+
+
+!ENDIF 
+
