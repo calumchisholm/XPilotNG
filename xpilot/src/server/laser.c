@@ -74,7 +74,7 @@ typedef struct vicbuf {
     victim_t		*vic_ptr;	/* pointer to buffer for victims */
 } vicbuf_t;
 
-
+#if 0
 /*
  * Destroy one laser pulse.
  */
@@ -97,8 +97,9 @@ static void Laser_pulse_destroy_one(int pulse_index)
 	Pulses[pulse_index] = Pulses[NumPulses];
     }
 }
+#endif
 
-
+#if 0
 /*
  * Destroy all laser pulses.
  */
@@ -110,8 +111,9 @@ static void Laser_pulse_destroy_all(void)
 	Laser_pulse_destroy_one(p);
     }
 }
+#endif
 
-
+#if 0 /* laserhack */
 /*
  * Loop over all players and put the
  * ones which are close the pulse midpoint
@@ -179,8 +181,9 @@ static void Laser_pulse_find_victims(
 	vicbuf->num_vic++;
     }
 }
+#endif
 
-
+#if 0 /* laserhack */
 /*
  * Do what needs to be done when a laser pulse
  * actually hits a player.
@@ -309,8 +312,10 @@ static void Laser_pulse_hits_player(
 	}
     }
 }
+#endif
 
 
+#if 0 /* laserhack */
 /*
  * Check a given pulse position against a list of players.
  * Do what needs to be done when on any pulse hits player event.
@@ -414,8 +419,9 @@ static list_t Laser_pulse_get_object_list(
 
     return output_obj_list;
 }
+#endif
 
-
+#if 0 /* laserhack */
 /*
  * For all existing laser pulse check
  * if they collide with ships or asteroids.
@@ -657,6 +663,8 @@ void Laser_pulse_collision(void)
 	List_delete(obj_list);
     }
 }
+#endif
+
 
 #if 0
 /* kps - take stuff from poly version and move into the above */

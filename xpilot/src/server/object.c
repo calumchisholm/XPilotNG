@@ -60,7 +60,9 @@ int			NumPulses = 0;
 int			NumEcms = 0;
 int			NumTransporters = 0;
 object			*Obj[MAX_TOTAL_SHOTS];
+#if 0
 pulse_t			*Pulses[MAX_TOTAL_PULSES];
+#endif
 ecm_t			*Ecms[MAX_TOTAL_ECMS];
 trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
 

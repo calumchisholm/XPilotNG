@@ -281,7 +281,9 @@ void Check_collision(void)
 	PlayerCollision();
     }
 
+#if 0
     Laser_pulse_collision();
+#endif
     AsteroidCollision();
 }
 

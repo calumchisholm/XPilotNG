@@ -932,9 +932,12 @@ static void Frame_ships(int conn, int ind)
 {
     player			*pl = Players[ind],
 				*pl_i;
+#if 0
     pulse_t			*pulse;
+#endif
     int				i, j, k, color, dir, cx = -1, cy = -1;
 
+#if 0 /* laserhack */
     for (j = 0; j < NumPulses; j++) {
 	pulse = Pulses[j];
 	if (pulse->len <= 0) {
@@ -968,6 +971,7 @@ static void Frame_ships(int conn, int ind)
 	}
 	Send_laser(conn, color, cx, cy, pulse->len, dir);
     }
+#endif
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];
 	Send_ecm(conn, ecm->pos.cx, ecm->pos.cy, (int)ecm->size);

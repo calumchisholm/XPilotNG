@@ -1876,8 +1876,10 @@ static void Robot_default_play_check_objects(int ind,
 
 }
 
+
 static void Robot_default_play_check_lasers(int ind)
 {
+#if 0 /* laserhack */
     player			*pl = Players[ind];
     int				j;
     int				dx, dy;
@@ -1917,7 +1919,9 @@ static void Robot_default_play_check_lasers(int ind)
 	    }
 	}
     }
+#endif
 }
+
 
 static void Robot_default_play(int ind)
 {

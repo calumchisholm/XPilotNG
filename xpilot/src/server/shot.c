@@ -1445,6 +1445,8 @@ void Fire_laser(int ind)
 void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
 			int dir, modifiers mods)
 {
+
+#if 0 /* laserhack */
     player		*pl = ((ind == -1) ? NULL : Players[ind]);
     pulse_t		*pulse;
     int			life;
@@ -1478,6 +1480,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     NumPulses++;
     if (pl)
 	pl->num_pulses++;
+#endif
 }
 
 
