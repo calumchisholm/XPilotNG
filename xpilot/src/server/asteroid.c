@@ -451,47 +451,39 @@ shape_t asteroid_wire4;
 void Asteroid_line_init(world_t *world)
 {
     int i;
-    static shapepos_t coords1[MAX_SHIP_PTS];
-    static shapepos_t coords2[MAX_SHIP_PTS];
-    static shapepos_t coords3[MAX_SHIP_PTS];
-    static shapepos_t coords4[MAX_SHIP_PTS];
+    static clpos_t coords1[MAX_SHIP_PTS];
+    static clpos_t coords2[MAX_SHIP_PTS];
+    static clpos_t coords3[MAX_SHIP_PTS];
+    static clpos_t coords4[MAX_SHIP_PTS];
 
     UNUSED_PARAM(world);
 
     asteroid_wire1.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	asteroid_wire1.pts[i] = coords1 + i;
-	coords1[i].clk.cx
-	    = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(1);
-	coords1[i].clk.cy
-	    = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(1);
+	coords1[i].cx = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(1);
+	coords1[i].cy = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(1);
     }
 
     asteroid_wire2.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	asteroid_wire2.pts[i] = coords2 + i;
-	coords2[i].clk.cx
-	    = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(2);
-	coords2[i].clk.cy
-	    = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(2);
+	coords2[i].cx = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(2);
+	coords2[i].cy = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(2);
     }
 
     asteroid_wire3.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	asteroid_wire3.pts[i] = coords3 + i;
-	coords3[i].clk.cx
-	    = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(3);
-	coords3[i].clk.cy
-	    = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(3);
+	coords3[i].cx = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(3);
+	coords3[i].cy = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(3);
     }
 
     asteroid_wire4.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	asteroid_wire4.pts[i] = coords4 + i;
-	coords4[i].clk.cx
-	    = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(4);
-	coords4[i].clk.cy
-	    = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(4);
+	coords4[i].cx = cos(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(4);
+	coords4[i].cy = sin(i * 2 * PI / MAX_SHIP_PTS) * ASTEROID_RADIUS(4);
     }
 
     return;

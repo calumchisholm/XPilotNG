@@ -453,7 +453,7 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
     static const shape_t *lastshape;
     static int lastdir;
     const int os = num_lines;
-    shapepos_t *pts;
+    clpos_t *pts;
 
     /* linet[i].group MUST BE INITIALIZED TO 0 */
 
@@ -465,7 +465,7 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
 
     pts = Shape_get_points((shape_t *)s, dir);
     for (i = 0; i < s->num_points; i++) {
-	clpos_t pt = pts[i].clk;
+	clpos_t pt = pts[i];
 
 	linet[i + os].start.cx = -pt.cx;
 	linet[i + os].start.cy = -pt.cy;
@@ -1091,7 +1091,7 @@ static void Shape_move(const move_t *move, const shape_t *s,
     int x, temp;
     unsigned short *lines;
     unsigned short *points;
-    shapepos_t *pts;
+    clpos_t *pts;
 
     if (mdx < 0) {
 	mdx = -mdx;
@@ -1125,7 +1125,7 @@ static void Shape_move(const move_t *move, const shape_t *s,
 
     pts = Shape_get_points((shape_t *)s, dir);
     for (i = 0; i < s->num_points; i++) {
-	clpos_t pt = pts[i].clk;
+	clpos_t pt = pts[i];
 
 	msx = WRAP_XCLICK(move->start.cx + pt.cx);
 	msy = WRAP_YCLICK(move->start.cy + pt.cy);
@@ -1223,7 +1223,7 @@ static int Shape_morph(const shape_t *shape1, int dir1,
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
     unsigned short *points;
     move_t mv;
-    /*shapepos_t *pts1, *pts2;*/
+    /*clpos_t *pts1, *pts2;*/
     int num_points;
 
     mv.hitmask = hitmask;
@@ -1241,8 +1241,8 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	clpos_t pt1, pt2;
 	/*clpos_t ptx1, ptx2;
 
-	  ptx1 = pts1[i].clk;
-	  ptx2 = pts2[i].clk;*/
+	  ptx1 = pts1[i];
+	  ptx2 = pts2[i];*/
 	pt1 = Ship_get_point_clpos((shipshape_t *)shape1, i, dir1);
 	pt2 = Ship_get_point_clpos((shipshape_t *)shape2, i, dir2);
 
@@ -1279,8 +1279,8 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	xp = CENTER_XCLICK(linet[p].start.cx - x);
 	yp = CENTER_YCLICK(linet[p].start.cy - y);
 
-	/*pto1 = pts1[num_points - 1].clk;
-	  ptn1 = pts2[num_points - 1].clk;*/
+	/*pto1 = pts1[num_points - 1];
+	  ptn1 = pts2[num_points - 1];*/
 	pto1 = Ship_get_point_clpos(
 	    (shipshape_t *)shape1, num_points - 1, dir1);
 	ptn1 = Ship_get_point_clpos(
@@ -1295,8 +1295,8 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	for (i = 0; i < num_points; i++) {
 	    clpos_t pto2, ptn2;
 
-	    /*pto2 = pts1[i].clk;
-	      ptn2 = pts2[i].clk;*/
+	    /*pto2 = pts1[i];
+	      ptn2 = pts2[i];*/
 	    pto2 = Ship_get_point_clpos((shipshape_t *)shape1, i, dir1);
 	    ptn2 = Ship_get_point_clpos((shipshape_t *)shape2, i, dir2);
 
@@ -1758,7 +1758,7 @@ int is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj)
 int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
 		    const shape_t *s, int dir)
 {
-    static shapepos_t zeropos;
+    static clpos_t zeropos;
     static shape_t zeroshape;
     int i, group;
 
@@ -2354,16 +2354,16 @@ static void Corner_init(void)
 void Ball_line_init(world_t *world)
 {
     int i;
-    static shapepos_t coords[MAX_SHIP_PTS];
+    static clpos_t coords[MAX_SHIP_PTS];
 
     UNUSED_PARAM(world);
     LIMIT(options.ballRadius, 0, BALL_RADIUS);
     ball_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	ball_wire.pts[i] = coords + i;
-	coords[i].clk.cx
+	coords[i].cx
 	    = cos(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
-	coords[i].clk.cy
+	coords[i].cy
 	    = sin(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
     }
 

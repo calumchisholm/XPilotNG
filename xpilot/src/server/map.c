@@ -337,7 +337,7 @@ int World_place_friction_area(world_t *world, clpos_t pos, double fric)
 }
 
 shape_t filled_wire;
-shapepos_t filled_coords[4];
+clpos_t filled_coords[4];
 
 static void Filled_wire_init(void)
 {
@@ -351,14 +351,14 @@ static void Filled_wire_init(void)
     h = BLOCK_CLICKS / 2;
 
     /* whole (filled) block */
-    filled_coords[0].clk.cx = -h;
-    filled_coords[0].clk.cy = -h;
-    filled_coords[1].clk.cx = h - 1;
-    filled_coords[1].clk.cy = -h;
-    filled_coords[2].clk.cx = h - 1;
-    filled_coords[2].clk.cy = h - 1;
-    filled_coords[3].clk.cx = -h;
-    filled_coords[3].clk.cy = h - 1;
+    filled_coords[0].cx = -h;
+    filled_coords[0].cy = -h;
+    filled_coords[1].cx = h - 1;
+    filled_coords[1].cy = -h;
+    filled_coords[2].cx = h - 1;
+    filled_coords[2].cy = h - 1;
+    filled_coords[3].cx = -h;
+    filled_coords[3].cy = h - 1;
 }
 
 void World_init(world_t *world)
@@ -860,14 +860,14 @@ shape_t		wormhole_wire;
 void Wormhole_line_init(world_t *world)
 {
     int i;
-    static shapepos_t coords[MAX_SHIP_PTS];
+    static clpos_t coords[MAX_SHIP_PTS];
 
     UNUSED_PARAM(world);
     wormhole_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	wormhole_wire.pts[i] = coords + i;
-	coords[i].clk.cx = cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
-	coords[i].clk.cy = sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
+	coords[i].cx = cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
+	coords[i].cy = sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
     }
 
     return;

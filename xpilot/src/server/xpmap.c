@@ -108,7 +108,7 @@ static void Create_blockmap_from_polygons(world_t *world)
     blkpos_t blk;
     clpos_t pos;
     shape_t r_wire, u_wire, l_wire, d_wire;
-    shapepos_t r_coords[3], u_coords[3], l_coords[3], d_coords[3];
+    clpos_t r_coords[3], u_coords[3], l_coords[3], d_coords[3];
 
     r_wire.num_points = 3;
     u_wire.num_points = 3;
@@ -140,36 +140,36 @@ static void Create_blockmap_from_polygons(world_t *world)
     h = BLOCK_CLICKS / 2;
 
     /* right part of block */
-    r_coords[0].clk.cx = 0;
-    r_coords[0].clk.cy = 0; /* this is the R position in the block */
-    r_coords[1].clk.cx = h - 1; 
-    r_coords[1].clk.cy = 1 - h;
-    r_coords[2].clk.cx = h - 1;
-    r_coords[2].clk.cy = h - 1;
+    r_coords[0].cx = 0;
+    r_coords[0].cy = 0; /* this is the R position in the block */
+    r_coords[1].cx = h - 1; 
+    r_coords[1].cy = 1 - h;
+    r_coords[2].cx = h - 1;
+    r_coords[2].cy = h - 1;
 
     /* up part of block */
-    u_coords[0].clk.cx = -1;
-    u_coords[0].clk.cy = 0;
-    u_coords[1].clk.cx = h - 2;
-    u_coords[1].clk.cy = h - 1;
-    u_coords[2].clk.cx = -h;
-    u_coords[2].clk.cy = h - 1;
+    u_coords[0].cx = -1;
+    u_coords[0].cy = 0;
+    u_coords[1].cx = h - 2;
+    u_coords[1].cy = h - 1;
+    u_coords[2].cx = -h;
+    u_coords[2].cy = h - 1;
 
     /* left part of block */
-    l_coords[0].clk.cx = -1;
-    l_coords[0].clk.cy = -1;
-    l_coords[1].clk.cx = -h;
-    l_coords[1].clk.cy = h - 2;
-    l_coords[2].clk.cx = -h;
-    l_coords[2].clk.cy = -h;
+    l_coords[0].cx = -1;
+    l_coords[0].cy = -1;
+    l_coords[1].cx = -h;
+    l_coords[1].cy = h - 2;
+    l_coords[2].cx = -h;
+    l_coords[2].cy = -h;
 
     /* down part of block */
-    d_coords[0].clk.cx = 0;
-    d_coords[0].clk.cy = -1;
-    d_coords[1].clk.cx = 1 - h;
-    d_coords[1].clk.cy = -h;
-    d_coords[2].clk.cx = h - 1;
-    d_coords[2].clk.cy = -h;
+    d_coords[0].cx = 0;
+    d_coords[0].cy = -1;
+    d_coords[1].cx = 1 - h;
+    d_coords[1].cy = -h;
+    d_coords[2].cx = h - 1;
+    d_coords[2].cy = -h;
 
     /*
      * Create blocks out of polygons.

@@ -1231,8 +1231,8 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 {
     int i, color;
     shipshape_t *ship;
-    shapepos_t    point;
-    other_t 	*other;
+    position_t point;
+    other_t *other;
 
     ship = Ship_by_id(id);
     if (!(other = Other_by_id(id))) return;
@@ -1251,8 +1251,8 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 
     glBegin(GL_LINE_LOOP);
     for (i = 0; i < ship->num_points; i++) {
-	point = Ship_get_point(ship, i, dir);
-	glVertex2i(x + point.pxl.x, y + point.pxl.y);
+	point = Ship_get_point_position(ship, i, dir);
+	glVertex2d(x + point.x, y + point.y);
     }
     glEnd();
 
