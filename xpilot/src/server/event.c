@@ -411,7 +411,7 @@ int Handle_keyboard(player *pl)
 		    break;
 		j = i = GetInd(pl->lock.pl_id);
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER))
-		    i = j = ind;
+		    i = j = 0;
 		if (j < 0 || j >= NumPlayers)
 		    fatal("Illegal player lock target");
 		do {
