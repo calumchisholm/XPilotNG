@@ -613,7 +613,8 @@ static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg, size_t size)
 static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size)
 {
     char value[MAX_CHARS];
-    int i;
+    char *valcpy, *name;
+    int i, retval = CMD_RESULT_ERROR;
 
     UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
@@ -622,27 +623,32 @@ static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	return CMD_RESULT_ERROR;
     }
 
-    i = Get_option_value(arg, value, sizeof(value));
+    valcpy = xp_safe_strdup(arg);
+    name = strtok(valcpy, " \t\r\n");
+    i = Get_option_value(name, value, sizeof(value));
 
     switch (i) {
     case 1:
-	snprintf(msg, size, "The value of %s is %s.", arg, value);
-	return CMD_RESULT_SUCCESS;
+	snprintf(msg, size, "The value of %s is %s.", name, value);
+	retval = CMD_RESULT_SUCCESS;
+	break;
     case -2:
-	snprintf(msg, size, "No option named %s.", arg);
+	snprintf(msg, size, "No option named %s.", name);
 	break;
     case -3:
 	snprintf(msg, size, "Cannot show the value of this option.");
 	break;
     case -4:
-	snprintf(msg, size, "No value has been set for option %s.", arg);
+	snprintf(msg, size, "No value has been set for option %s.", name);
 	break;
     default:
 	strlcpy(msg, "Generic error.", size);
 	break;
     }
 
-    return CMD_RESULT_ERROR;
+    xp_free(valcpy);
+
+    return retval;
 }
 
 
