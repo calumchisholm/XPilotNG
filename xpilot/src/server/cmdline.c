@@ -50,11 +50,11 @@ DFLOAT		ShotsMass;		/* Default mass of shots */
 DFLOAT		ShotsSpeed;		/* Default speed of shots */
 int		ShotsLife;		/* Default number of ticks */
 					/* each shot will live */
-DFLOAT		ShotsLifeSetting;	/* Above is set through this */
+static DFLOAT	ShotsLifeSetting;	/* Above is set through this */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
 int		fireRepeatRate;		/* Frames per autorepeat fire (0=off)*/
-DFLOAT		fireRepeatRateSetting;	/* Above is set through this */
+static DFLOAT	fireRepeatRateSetting;	/* Above is set through this */
 
 bool		RawMode;		/* Calculate frames even if there */
 					/* are no players logged in */
@@ -197,6 +197,7 @@ bool		treasureCollisionMayKill;
 bool		wreckageCollisionMayKill;
 
 DFLOAT		friction;		/* friction only affects ships */
+static DFLOAT	frictionSetting;	/* Above set through this */
 DFLOAT		checkpointRadius;      	/* in blocks */
 int		raceLaps;		/* how many laps per race */
 bool		lockOtherTeam;		/* lock ply from other teams when dead? */
@@ -2232,9 +2233,9 @@ static optionDesc options[] = {
 	"friction",
 	"friction",
 	"0.0",
-	&friction,
+	&frictionSetting,
 	valReal,
-	tuner_dummy,
+	Timing_setup,
 	"Fraction of velocity ship loses each frame.\n",
 	OPT_ANY
     },
@@ -2468,6 +2469,11 @@ void Timing_setup(void)
     framespeed2 = 1. / FPSMultiplier;
     ShotsLife = ShotsLifeSetting * TIME_FACT;
     fireRepeatRate = fireRepeatRateSetting * TIME_FACT;
+    friction = 1 - frictionSetting;
+    /* If friction < 0, the result is silly - allow such settings but
+     * don't bother making it "FPSMultiplier independent" */
+    if (friction > 0)
+	friction = pow(friction, 1. / FPSMultiplier);
 }
 
 

@@ -3557,8 +3557,8 @@ void Move_player(int ind)
 	return;
     }
 
-    pl->vel.x *= (1.0f - friction);
-    pl->vel.y *= (1.0f - friction);
+    pl->vel.x *= friction;
+    pl->vel.y *= friction;
 
     Player_position_remember(pl);
 
