@@ -70,7 +70,7 @@ static void print_ignorelist(void)
 	Add_message("Ignorelist is empty [*Client reply*]");
 }
 
-void print_help(char *arg)
+static void print_help(char *arg)
 {
     int i;
     char message[MAX_CHARS] = "";
@@ -122,7 +122,7 @@ void print_help(char *arg)
     }
 }
 
-void ignorePlayer(char *name, short level)
+static void ignorePlayer(char *name, short level)
 {
     other_t *other = Other_by_name(name);
     char buf[64 + MAX_NAME_LEN];
@@ -142,7 +142,7 @@ void ignorePlayer(char *name, short level)
     }
 }
 
-void unignorePlayer(char *name)
+static void unignorePlayer(char *name)
 {
     other_t *other = Other_by_name(name);
     char buf[64 + MAX_NAME_LEN];
