@@ -207,6 +207,11 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
     world_t *world = &World;
     int i;
 
+    if (gp->type != TREASURE) {
+	warn("Ball_hits_goal: not a treasure! Possible map bug.");
+	return;
+    }
+
     /*
      * Player already quit ?
      */
@@ -226,7 +231,8 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 	Ball_is_replaced(ball);
 	return;
     }
-    if (gp->team == owner->team) {
+    if (gp->team == owner->team &&
+        td->team != options.specialBallTeam) {
 	treasure_t *tt = Treasure_by_index(world, gp->mapobj_ind);
 
 	Ball_is_destroyed(ball);
@@ -274,12 +280,27 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 
       if(!opponent_teams){
 	SET_BIT(ball->obj_status, RECREATE);
-	world->teams[options.specialBallTeam].TreasuresLeft++;
-	if (Punish_team(owner, td, ball->pos));
+	if(Punish_team(owner, td, ball->pos))
+	    world->teams[options.specialBallTeam].TreasuresLeft++;
       }
       return;
     }
-
+    
+    if (td->team == options.specialBallTeam) {
+	Ball_is_destroyed(ball);
+	td->team=gp->team; /* give ball to team that has to be punished*/
+	if (Punish_team(owner, td, ball->pos)) {
+	    CLR_BIT(ball->obj_status, RECREATE);
+	    /*undo treasure counts from Punish_team so we don't 
+	      have to touch that function and possibly break it*/
+	    world->teams[td->team].TreasuresLeft++;
+	}
+	    world->teams[options.specialBallTeam].TreasuresLeft--;
+	
+	td->team=options.specialBallTeam;
+	return;
+	
+    }
    /* {KS} mods for special treasures stop here*/
 }
 
