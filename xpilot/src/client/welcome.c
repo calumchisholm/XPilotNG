@@ -1316,7 +1316,8 @@ static int Internet_server_show_cb(int widget, void *user_data,
     label_border = 1;
     label_space = 5;
     label_height = textFont->ascent + textFont->descent + 5;
-    data_label_width = 250;
+    static char longest_text[] = "                              ";
+    data_label_width =  XTextWidth(buttonFont,longest_text,strlen(longest_text));
     player_label_width = 500;
     max_label_width = 0;
 
@@ -1350,7 +1351,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
 
     i = 0;
 
-
+    
     Widget_create_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height,
@@ -1359,7 +1360,8 @@ static int Internet_server_show_cb(int widget, void *user_data,
     /* Create a join button to join this server */
 
     Widget_create_activate(subform_widget,
-			   label_x + label_width + 2 *(data_label_width), 
+			   label_x + label_width + data_label_width +
+			   label_space, 
 			   labels[i].yoff,
 			   data_label_width, labels[i].height,
 			   label_border, "Join This Server",
@@ -1373,7 +1375,8 @@ static int Internet_server_show_cb(int widget, void *user_data,
 			label_border, sip->version);
 
     Widget_create_activate(subform_widget,
-			   label_x + label_width + 2 *(data_label_width), 
+			   label_x + label_width + data_label_width +
+			   label_space, 
 			   labels[i].yoff,
 			   data_label_width, labels[i].height,
 			   label_border, "Back to List",
@@ -1540,9 +1543,9 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     const int extra_height = 4;
     const int space_width = 0 + 2 * border;
     const int space_height = 4 + 2 * border;
-    const int max_map_length = 50;
+    const int max_map_length = 30;
     const int max_version_length = 11;
-    const int max_server_length = 50;
+    const int max_server_length = 37;
 
     int player_width = XTextWidth(textFont, "Pl", 2)
 	+ extra_width + 2 * border;
@@ -1566,7 +1569,7 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 				  max_server_length);
     int server_border_width = 2 * (border ? border : 1);
     int ping_width = XTextWidth(textFont, ping_header, 5);
-    int stat_width = XTextWidth(textFont, "Status", 8)
+    int stat_width = XTextWidth(textFont, "Stat", 8)
 	+ extra_width + 2 * border;
     int xoff = space_width;
     int yoff = space_height;
@@ -1585,23 +1588,21 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     int server_offset = map_offset + map_width + space_width;
     int ping_offset =
 	server_offset + server_width + server_border_width + space_width;
-    int stat_offset;		/* set later */
+    int stat_offset = ping_offset + ping_width + space_width;
     int w;
     int subform_width = 0;
     int subform_height = 0;
+    int all_offset = 0;
     server_info_t *sip;
     list_iter_t start_server_it = server_it;
 
 
     Widget_get_dimensions(subform_widget, &subform_width, &subform_height);
 
-    server_width =
-	MIN(server_width,
-	    subform_width - server_offset - space_width - stat_width -
-	    space_width - server_border_width);
+    all_offset =  player_width + queue_width + bases_width 
+    + team_width + fps_width + stat_width + version_width + 
+      server_width + map_width + ping_width + status_width;
 
-    stat_offset = ping_offset + ping_width + space_width;
-    
     Widget_destroy_children(subform_widget);
 
 
@@ -1613,31 +1614,47 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 			    border, player_header);
     if (!w)
 	return -1;
+    
+    
+    w = Widget_create_label(subform_widget,
+			    queue_offset, yoff,
+			    queue_width, label_height, border, queue_header);
+    
+    if (!w)
+      return -1;
+ 
+    if (all_offset < subform_width ) {
 
-    Widget_create_label(subform_widget,
-			queue_offset, yoff,
-			queue_width, label_height, border, queue_header);
-
-    Widget_create_label(subform_widget,
-			bases_offset, yoff,
-			bases_width, label_height, border, bases_header);
-
-    Widget_create_label(subform_widget,
-			team_offset, yoff,
-			team_width, label_height, border, team_header);
-
-    Widget_create_label(subform_widget,
-			fps_offset, yoff,
-			fps_width, label_height, border, fps_header);
-
-    Widget_create_label(subform_widget,
-			status_offset, yoff,
-			status_width, label_height, border, status_header);
+      Widget_create_label(subform_widget,
+			  bases_offset, yoff,
+			  bases_width, label_height, border, bases_header);
+      
+      Widget_create_label(subform_widget,
+			  team_offset, yoff,
+			  team_width, label_height, border, team_header);
+      
+      Widget_create_label(subform_widget,
+			  fps_offset, yoff,
+			  fps_width, label_height, border, fps_header);
+            
+      Widget_create_label(subform_widget,
+			  status_offset, yoff,
+			  status_width, label_height, border, status_header);
+    } else {
+      
+      version_offset = queue_offset + queue_width + space_width;
+      map_offset = version_offset + version_width + space_width;
+      server_offset = map_offset + map_width + space_width;
+      ping_offset =
+	server_offset + server_width + server_border_width + space_width;
+      stat_offset = ping_offset + ping_width + space_width;
+    }
 
     Widget_create_label(subform_widget,
 			version_offset, yoff,
 			version_width, label_height,
 			border, version_header);
+
 
     Widget_create_label(subform_widget,
 			map_offset, yoff,
@@ -1669,26 +1686,31 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 			    queue_offset, yoff,
 			    queue_width, label_height,
 			    border, sip->queue ? sip->queue_str : "");
-	Widget_create_label(subform_widget,
-			    bases_offset, yoff,
-			    bases_width, label_height,
-			    border, sip->bases_str);
-	Widget_create_label(subform_widget,
-			    team_offset, yoff,
-			    team_width, label_height,
-			    border,
-			    (sip->teambases >
-			     0) ? sip->teambases_str : "");
-	Widget_create_label(subform_widget, fps_offset, yoff, fps_width,
-			    label_height, border, sip->fps_str);
-	if (strlen(sip->status) > 4)
+	 if (all_offset < subform_width ) {
+	  
+	  Widget_create_label(subform_widget,
+			      bases_offset, yoff,
+			      bases_width, label_height,
+			      border, sip->bases_str);
+	  Widget_create_label(subform_widget,
+			      team_offset, yoff,
+			      team_width, label_height,
+			      border,
+			      (sip->teambases >
+			       0) ? sip->teambases_str : "");
+	  Widget_create_label(subform_widget, fps_offset, yoff, fps_width,
+			      label_height, border, sip->fps_str);
+	  if (strlen(sip->status) > 4)
 	    sip->status[4] = '\0';
+	  
+	  Widget_create_label(subform_widget,
+			      status_offset, yoff,
+			      status_width, label_height,
+			      border,
+			      strcmp(sip->status, "ok") ? sip->status : "");
+	  
+	}
 
-	Widget_create_label(subform_widget,
-			    status_offset, yoff,
-			    status_width, label_height,
-			    border,
-			    strcmp(sip->status, "ok") ? sip->status : "");
 	if (strlen(sip->version) > max_version_length)
 	    sip->version[max_version_length] = '\0';
 
@@ -1711,8 +1733,8 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
 			    ping_offset, yoff,
 			    ping_width, label_height,
 			    border, (sip->pingtime == PING_NORESP)
-			    ? "none" : ((sip->pingtime == PING_SLOW)
-					? "slow"
+			    ? "None" : ((sip->pingtime == PING_SLOW)
+					? "Slow"
 					: ((sip->pingtime == PING_UNKNOWN)
 					   ? "" : sip->pingtime_str)));
 
@@ -1750,27 +1772,30 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     
     
     if (!next_page_widget)
-      next_page_widget = Widget_create_activate(form_widget,
-						(int) (2*(top_width / 4)+next_width),
-						top_height - (next_height) - space_height,
-						next_width, next_height,
-						next_border, next_text,
-						Internet_next_page_cb, (void *) conpar);   
+      next_page_widget = 
+	Widget_create_activate(form_widget,
+			       (int) (2*(top_width / 4)+next_width),
+			       top_height - (next_height) - space_height,
+			       next_width, next_height,
+			       next_border, next_text,
+			       Internet_next_page_cb, (void *) conpar);   
     if (!first_page_widget)
-      first_page_widget = Widget_create_activate(form_widget,
-						 (int) (2*(top_width / 4)),
-						 top_height - (first_height) - space_height ,
-						 first_width, first_height,
-						 first_border, first_text,
-						 Internet_first_page_cb,
-						 (void *) conpar);
+      first_page_widget = 
+	Widget_create_activate(form_widget,
+			       (int) (2*(top_width / 4)),
+			       top_height - (first_height) - space_height ,
+			       first_width, first_height,
+			       first_border, first_text,
+			       Internet_first_page_cb,
+			       (void *) conpar);
     if (!ping_servers_widget)
-      ping_servers_widget = Widget_create_activate(form_widget,
-						   next_height,
-						   top_height - (next_height) - space_height,
-						   pingw_width, first_height,
-						   first_border, ping_text,
-						   Internet_ping_cb, (void *) conpar);
+      ping_servers_widget = 
+	Widget_create_activate(form_widget,
+			       next_height,
+			       top_height - (next_height) - space_height,
+			       pingw_width, first_height,
+			       first_border, ping_text,
+			       Internet_ping_cb, (void *) conpar);
     
     
     if (server_it != List_end(server_list)) {
