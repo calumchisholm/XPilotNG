@@ -169,13 +169,13 @@ typedef struct {
 
 typedef struct {
     int width;			/* Line width, -1 means no line */
-    int color;			/* Line color */
+    unsigned long color;	/* Line color */
     int rgb;			/* RGB values corresponding to color */
     int style;			/* LineSolid, LineOnOffDash, LineDoubleDash */
 } edge_style_t;
 
 typedef struct {
-    int color;			/* The color if drawn in filled mode */
+    unsigned long color;	/* The color if drawn in filled mode */
     int rgb;			/* RGB values corresponding to color */
     int texture;		/* The texture if drawn in texture mode */
     int flags;			/* Flags about this style (see draw.h) */
