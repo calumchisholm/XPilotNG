@@ -898,6 +898,8 @@ void Close_BoolChooserWidget( GLWidget *widget )
 	return;
     }
     
+    free_string_texture( &(((BoolChooserWidget *)(widget->wid_info))->nametex) );
+    
     --num_BoolChooserWidget;
     if (!num_BoolChooserWidget) {
     	free_string_texture(BoolChooserWidget_ontex);

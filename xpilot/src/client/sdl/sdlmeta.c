@@ -64,6 +64,7 @@ void Meta_window(char *servername)
     Delete_server_list();
     if ((num_serv = Get_meta_data(err)) <= 0) {
       fprintf(stderr, "Error: couldnt get meta list\n");
+      return;
     } else {
       printf("xpilot_sdl: Got %d servers\n",num_serv);
     }

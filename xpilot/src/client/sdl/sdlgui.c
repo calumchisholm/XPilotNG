@@ -1671,17 +1671,19 @@ bool newcode = true;
 	    	free_string_texture(&HUD_texs[tex_index]);
     	    strlcpy(hud_texts[tex_index],mods,50);
 	}
-	if (!HUD_texs[tex_index].texture)
-	    render_text(&gamefont, mods, &HUD_texs[tex_index]);
-	disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,UP
-		,hud_pos_x - hudSize+HUD_OFFSET-BORDER
-	    	,hud_pos_y - hudSize+HUD_OFFSET-BORDER
-	    	,true	);
-	} else
-	    HUDprint(&gamefont,hudColorRGBA,RIGHT,UP,
-		hud_pos_x - hudSize+HUD_OFFSET-BORDER,
-		hud_pos_y - hudSize+HUD_OFFSET-BORDER,
-		mods);
+	if(strlen(mods)) {
+	    if (!HUD_texs[tex_index].texture)
+	    	render_text(&gamefont, mods, &HUD_texs[tex_index]);
+	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,UP
+		    	,hud_pos_x - hudSize+HUD_OFFSET-BORDER
+	    	    	,hud_pos_y - hudSize+HUD_OFFSET-BORDER
+	    	    	,true	);    
+	    } else
+    	    	HUDprint(&gamefont,hudColorRGBA,RIGHT,UP,
+		    	hud_pos_x - hudSize+HUD_OFFSET-BORDER,
+		    	hud_pos_y - hudSize+HUD_OFFSET-BORDER,
+		    	mods);
+	}
 
 	if (autopilotLight) {
     	    if (newcode) {
@@ -1778,16 +1780,20 @@ if (newcode) {
     for (j = maxMessages-1 ; j >= 0 ; --j) {
     	if (!strlen(TalkMsg[j]->txt)) {
 	    strlcpy(talk_texts[j],"\0",MSG_LEN);
-	    if (message_texs[j].texture)
+	    if (message_texs[j].texture) {
+	    	//xpprintf("Freeing texture %i for empty string %\n",message_texs[j].texture,j);
 	    	free_string_texture(&message_texs[j]);
+	    }
 	} else {
 	    bool found_it = false;
 	    for (i = offset; i <= j; ++i) {
 		if ( (found_it = (strcmp(TalkMsg[j]->txt,talk_texts[j-i])==0))) {
 		    if (!i) break;
 		    if (j + i >= maxMessages)
-			if (message_texs[j].texture)
+			if (message_texs[j].texture) {
+			    //xpprintf("Freeing texture %i for msgs text %i: %s\n",message_texs[j].texture,j,TalkMsg[j]->txt);   
 	    	    	    free_string_texture(&message_texs[j]);
+			}
 		    strlcpy(talk_texts[j],talk_texts[j-i],MSG_LEN);
 		    message_texs[j]=message_texs[j-i];
 		    break;
@@ -1802,6 +1808,11 @@ if (newcode) {
 	    }
 	}
     }
+
+   /* for (j = maxMessages-1 ; j >= 0 ; --j) {
+    	xpprintf("[%i] %i %s\n",j,message_texs[j].texture,TalkMsg[j]->txt);
+    }
+    xpprintf("-------------------------\n");*/
 
     offset = 0;
     for (j = maxMessages-1 ; j >= 0 ; --j) {
