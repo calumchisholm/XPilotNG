@@ -34,6 +34,7 @@ bool            initialPointerControl = false;
 bool            pointerControl = false;
 
 static int	movement;	/* horizontal mouse movement. */
+static guiarea_t *target[NUM_MOUSE_BUTTONS];
 
 int Process_event(SDL_Event *evt);
 
@@ -87,7 +88,8 @@ int Process_event(SDL_Event *evt)
     int key_change = 0;
     movement = 0;
     keylist *temp;
-
+    int button,i=0;
+    
     if (Console_process(evt)) return 1;
     
     switch (evt->type) {
@@ -115,28 +117,52 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_MOUSEBUTTONDOWN:
 	if (!pointerControl) {
-	    break;
+	    button = evt->button.button;
+	    if ( (target[button-1] = find_guiarea(evt->button.x,evt->button.y)) ) {
+	    	if (target[button-1]->button) {
+		    target[button-1]->button(button,evt->button.state,evt->button.x,evt->button.y);
+		}
+	    }
+	    
 	} else {
     	    temp = buttonMap[evt->button.button - 1];
     	    while (temp) {
     	    	key_change |= Key_press(temp->key);
 	    	temp = (keylist *)temp->next;
     	    }
-	    break;
 	}
+	break;
 	
     case SDL_MOUSEMOTION:
-	if (!pointerControl) break;
-	movement += evt->motion.xrel;
+	if (pointerControl)
+	    movement += evt->motion.xrel;
+	else {
+	    /*xpprintf("mouse motion xrel=%i yrel=%i\n",evt->motion.xrel,evt->motion.yrel);*/
+	    /*for (i = 0;i<NUM_MOUSE_BUTTONS;++i)*/ /* dragdrop for all mouse buttons*/
+	    if (target[i]) { /*is button one pressed?*/
+	    	/*xpprintf("SDL_MOUSEBUTTONDOWN drag: area found!\n");*/
+	    	if (target[i]->motion)
+		    target[i]->motion(evt->motion.xrel,evt->motion.yrel,evt->button.x,evt->button.y);
+	    }
+	}
 	break;
 	
     case SDL_MOUSEBUTTONUP:
-	if (!pointerControl) break;
-    	temp = buttonMap[evt->button.button - 1];
-    	while (temp) {
-    	    key_change |= Key_release(temp->key);
-    	    temp = (keylist *)temp->next;
-    	}
+	if (pointerControl) {
+    	    temp = buttonMap[evt->button.button - 1];
+    	    while (temp) {
+    	    	key_change |= Key_release(temp->key);
+    	    	temp = (keylist *)temp->next;
+    	    }
+	} else {
+	    button = evt->button.button;
+	    if ( target[button-1] ) {
+	    	if (target[button-1]->button) {
+		    target[button-1]->button(button,evt->button.state,evt->button.x,evt->button.y);
+		    target[button-1] = NULL;
+		}
+	    }
+	}
 	break;
 
     case SDL_VIDEORESIZE:     

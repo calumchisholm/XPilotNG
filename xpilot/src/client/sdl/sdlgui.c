@@ -93,6 +93,8 @@ int scoreColorRGBA	    	= 0x888800ff;
 int scoreOwnTeamColorRGBA	= 0x00ff00ff;
 int scoreEnemyTeamColorRGBA	= 0xff0000ff;
 
+int selectionColorRGBA	    	= 0xff0000ff;
+
 int hudSize 	    	= 250;
 static int meterWidth	= 60;
 static int meterHeight	= 10;
@@ -1022,6 +1024,18 @@ void Paint_score_objects(void)
 	    }
 	}
     }
+}
+
+void Paint_select(void)
+{
+    if(!select_bounds) return;
+    set_alphacolor(selectionColorRGBA);
+    glBegin(GL_LINE_LOOP);
+    	glVertex2i(select_bounds->x 	    	    	,select_bounds->y);
+    	glVertex2i(select_bounds->x + select_bounds->w	,select_bounds->y);
+    	glVertex2i(select_bounds->x + select_bounds->w	,select_bounds->y + select_bounds->h);
+    	glVertex2i(select_bounds->x 	    	    	,select_bounds->y + select_bounds->h);
+    glEnd();
 }
 
 void Paint_client_fps(void)

@@ -45,6 +45,94 @@ static double       time_counter = 0.0;
 static TTF_Font     *scoreListFont;
 static char         *scoreListFontName = "VeraMoBd.ttf";
 static sdl_window_t scoreListWin;
+static guiarea_t    *window_guiarea;
+
+guiarea_t *register_guiarea(	SDL_Rect bounds,
+    	    	    	    	void (*button)(/*button*/Uint8,/*state*/Uint8,/*x*/Uint16,/*y*/Uint16),
+			    	void (*motion)(/*xrel*/Sint16,/*yrel*/Sint16,/*x*/Uint16,/*y*/Uint16)	)
+{
+    guiarea_t *tmp = (guiarea_t *)malloc(sizeof(guiarea_t));
+    tmp->bounds.x = bounds.x;
+    tmp->bounds.y = bounds.y;
+    tmp->bounds.w = bounds.w;
+    tmp->bounds.h = bounds.h;
+    tmp->button = button;
+    tmp->motion = motion;
+    tmp->next = guiarea_list;
+    guiarea_list = tmp;
+
+    return tmp;
+}
+
+bool unregister_guiarea(guiarea_t *guiarea)
+{
+    guiarea_t **tmp = &guiarea_list;
+    bool failure = true;
+    while(*tmp) {
+    	if (*tmp == guiarea) {
+	    failure = false;
+	    *tmp = (*tmp)->next;
+	    free(*tmp);
+	    *tmp = NULL;
+	    break;
+	}
+	tmp = (guiarea_t **)&((*tmp)->next);
+    }
+    
+    return failure;
+}
+
+guiarea_t *find_guiarea(Uint16 x,Uint16 y)
+{
+    guiarea_t *tmp = guiarea_list;
+    while(tmp) {
+    	if( 	(x > tmp->bounds.x) && (x < (tmp->bounds.x + tmp->bounds.w))
+	    &&	(y > tmp->bounds.y) && (y < (tmp->bounds.y + tmp->bounds.h))
+	    ) break;
+	tmp = tmp->next;
+    }
+    return tmp;
+}
+
+void clean_guiarea_list(void) {
+    guiarea_t *tmp = guiarea_list;
+    while(guiarea_list) {
+    	tmp = guiarea_list->next;
+	free(guiarea_list);
+	guiarea_list = tmp;
+    }
+}
+
+void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y)
+{
+    if (state == SDL_PRESSED) {
+
+	select_bounds = malloc(sizeof(irec));
+	if ( !select_bounds )
+	    error("Can't malloc select_bounds!");
+	if (button == 1) {
+	    select_bounds->x = x;
+	    select_bounds->y = y;
+	    select_bounds->w = 0;
+	    select_bounds->h = 0;
+	}
+    }
+    
+    if (state == SDL_RELEASED) {
+	if ((button == 1) && select_bounds) {
+	    free(select_bounds);
+	    select_bounds = NULL;
+	}
+    }
+}
+
+void select_move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y)
+{
+    if(select_bounds) {
+    	select_bounds->w += xrel;
+    	select_bounds->h += yrel;
+    }
+}
 
 /* function to reset our viewport after a window resize */
 int Resize_Window( int width, int height )
@@ -53,6 +141,8 @@ int Resize_Window( int width, int height )
     
     draw_width = width;
     draw_height = height;
+    window_guiarea->bounds.w = width;
+    window_guiarea->bounds.h = height;
     
     SDL_SetVideoMode( width,
  		      height,
@@ -75,7 +165,6 @@ int Resize_Window( int width, int height )
 
     /* Setup our viewport. */
     glViewport( 0, 0, ( GLint )draw_width, ( GLint )draw_height );
-    
     return 0;
 }
 
@@ -126,7 +215,11 @@ int Paint_init(void)
     scaleFactor_s = 1.0;
     scoresChanged = true;
     players_exposed = true;
-
+    
+    select_bounds = NULL;
+    SDL_Rect bounds = {0,0,draw_width,draw_height};
+    window_guiarea = register_guiarea(bounds,select_button,select_move);
+    
     return 0;
 }
 
@@ -135,6 +228,7 @@ void Paint_cleanup(void)
     Scorelist_cleanup();
     Images_cleanup();
     TTF_Quit();
+    clean_guiarea_list();
 }
 
 /* kps - can we rather use Check_view_dimensions in paint.c ? */
@@ -317,6 +411,7 @@ void Paint_frame(void)
 	    sdl_window_refresh(&scoreListWin);
 	}
 	sdl_window_paint(&scoreListWin);
+	Paint_select();
 	glPopMatrix();
     }
 

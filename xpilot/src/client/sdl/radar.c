@@ -15,6 +15,8 @@ color_t bgRadarColorValue = 0xa00000ff;
 static SDL_Rect    radar_bounds;      /* radar position and dimensions */
 static SDL_Surface *radar_surface;     /* offscreen image with walls */
 static GLuint      radar_texture;     /* above as an OpenGL texture */
+static guiarea_t *guiarea;
+bool moving;
 
 #define RGBA(RGB) \
     ((RGB) & 0xff000000 ? (RGB) & 0xff000000 : 0xff000000 \
@@ -245,6 +247,29 @@ static void Radar_paint_checkpoints(float xf, float yf)
 {
 }
 
+void button(Uint8 button,Uint8 state,Uint16 x,Uint16 y)
+{
+    if (state == SDL_PRESSED) {
+    	if (button == 1)
+	    moving = true;
+    }
+    
+    if (state == SDL_RELEASED) {
+    	if (button == 1)
+	    moving = false;
+    }
+}
+
+void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y)
+{
+    if (moving) {
+    	radar_bounds.x += xrel;
+    	radar_bounds.y += yrel;
+	guiarea->bounds.x = radar_bounds.x;
+	guiarea->bounds.y = radar_bounds.y;
+    }
+}
+
 /*
  * The radar is drawn so that first the walls are painted to an offscreen
  * SDL surface. This surface is then converted into an OpenGL texture.
@@ -281,6 +306,9 @@ int Radar_init(void)
                     GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST);
+		    
+    guiarea = register_guiarea(radar_bounds,button,move);
+    
     return 0;
 }
 
