@@ -702,6 +702,12 @@ xp_option_t default_options[] = {
 	"`history' is accessible with `keyTalkCursorUp/Down'.\n"),
 
     /* stuff you should not have to touch */
+    XP_BOOL_OPTION(
+	"autoServerMotdPopup",
+	false,
+	&autoServerMotdPopup,
+	NULL,
+	"Automatically popup the MOTD of the server on startup.\n"),
 
     XP_DOUBLE_OPTION(
 	"fuelNotify",
@@ -814,25 +820,26 @@ xp_option_t default_options[] = {
 	"Search path for texture files.\n"
 	"This is a list of one or more directories separated by colons.\n"),
 
+#ifdef _WINDOWS
+    XP_BOOL_OPTION(
+	"threadedDraw",
+	false,
+	&threadedDraw,
+	NULL,
+	"Tell Windows to do the heavy BitBlt in another thread\n"),
 
-
+    XP_INT_OPTION(
+	"radarDivisor",
+	1,
+	1,
+	100,
+	&RadarDivisor,
+	NULL,
+	"Specifies how many frames between radar window updates.\n"),
+#endif
 
 #if 0
 
-
-
-    {
-	"autoServerMotdPopup",
-	NULL,
-#ifdef _WINDOWS
-	"No",	/* temporary till i straighten out the motd woes. */
-#else
-	"Yes",
-#endif
-	KEY_DUMMY,
-	"Automatically popup the MOTD of the server on startup.\n",
-	0
-    },
 
 
 
@@ -895,21 +902,7 @@ xp_option_t default_options[] = {
 	"Reverse scroll direction of messages.\n",
 	0
     },
-#ifndef _WINDOWS
 
-#endif
-
-
-    {
-	"titleFlip",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should the title bar change or not.\n"
-	"Some window managers like twm may have problems with\n"
-	"flipping title bars.  Hence this option to turn it off.\n",
-	0
-    },
     {
 	"toggleShield",
 	NULL,
@@ -985,24 +978,6 @@ xp_option_t default_options[] = {
 	0
     },
 
-#ifdef _WINDOWS
-    {
-	"threadedDraw",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Tell Windows to do the heavy BitBlt in another thread\n",
-	0
-	},
-    {
-	"radarDivisor",
-	NULL,
-	"1",
-	KEY_DUMMY,
-	"Specifies how many frames between radar window updates.\n",
-	0
-	},
-#endif
 
 #ifdef SOUND
     {

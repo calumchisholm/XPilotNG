@@ -139,9 +139,7 @@ extern int	active_view_width;	/* Width of active map area displayed. */
 extern int	active_view_height;	/* Height of active map area displayed. */
 extern int	ext_view_x_offset;	/* Offset of ext_view_width */
 extern int	ext_view_y_offset;	/* Offset of ext_view_height */
-extern double	charsPerTick;		/* Output speed of messages */
 extern bool	markingLights;		/* Marking lights on ships */
-extern bool	titleFlip;		/* Do special titlebar flipping? */
 extern int	shieldDrawMode;		/* How to draw players shield */
 
 extern char	sparkColors[MSG_LEN];

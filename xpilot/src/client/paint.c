@@ -40,8 +40,6 @@ int	active_view_height;	/* Height of active map area displayed. */
 int	ext_view_x_offset;	/* Offset ext_view_width */
 int	ext_view_y_offset;	/* Offset ext_view_height */
 
-bool	titleFlip;		/* Do special title bar flipping? */
-
 long	loops = 0;
 long	loopsSlow = 0;	/* Proceeds slower than loops */
 double	timePerFrame = 0.0;

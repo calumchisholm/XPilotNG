@@ -25,8 +25,10 @@
 
 char xdefault_version[] = VERSION;
 
+bool	titleFlip;		/* Do special title bar flipping? */
 bool	showNastyShots = false;	/* show original flavor shots or the new 
 				   "nasty shots" */
+
 
 #ifdef OPTIONHACK
 
@@ -124,6 +126,15 @@ xp_option_t xdefault_options[] = {
 	"preferred position without window manager borders.\n"
 	"Also sometimes window managers may interfere when switching\n"
 	"colormaps. This option may prevent that.\n"),
+
+    XP_BOOL_OPTION(
+	"titleFlip",
+	true,
+	&titleFlip,
+	NULL,
+	"Should the title bar change or not.\n"
+	"Some window managers like twm may have problems with\n"
+	"flipping title bars.  Hence this option to turn it off.\n"),
 
     XP_STRING_OPTION(
 	"gameFont",
