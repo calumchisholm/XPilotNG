@@ -475,17 +475,21 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
 	}
 	if (rfrac() < 0.5f) {	/* place mine in front of cannon */
-	    Place_general_mine(NULL, c->team, FROMCANNON, c->pos, 0, 0, mods);
+	    Place_general_mine(NULL, c->team, FROMCANNON,
+			       c->pos, zero_vel, mods);
 	    sound_play_sensors(c->pos, DROP_MINE_SOUND);
 	    played = true;
 	} else {		/* throw mine at player */
+	    vector vel;
 	    if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
 		mods.mini = (int)(rfrac() * MODS_MINI_MAX) + 1;
 		mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
 	    }
 	    speed = (int)(speed * 0.5 + 0.1 * cannonSmartness);
+	    vel.x = tcos(dir) * speed;
+	    vel.y = tsin(dir) * speed;
 	    Place_general_mine(NULL, c->team, GRAVITY|FROMCANNON, c->pos,
-			       tcos(dir) * speed, tsin(dir) * speed, mods);
+			       vel, mods);
 	    sound_play_sensors(c->pos, DROP_MOVING_MINE_SOUND);
 	    played = true;
 	}

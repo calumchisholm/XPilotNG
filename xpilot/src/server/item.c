@@ -131,7 +131,7 @@ void Place_item(player *pl, int item)
 			dir, dist;
     long		grav, rand;
     clpos		pos;
-    DFLOAT		vx, vy;
+    vector		vel;
     item_concentrator_t	*con;
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
@@ -254,46 +254,48 @@ void Place_item(player *pl, int item)
 		break;
 	}
     }
-    vx = vy = 0;
+    vel.x = vel.y = 0;
     if (grav) {
 	if (pl) {
-	    vx += pl->vel.x;
-	    vy += pl->vel.y;
+	    vel.x += pl->vel.x;
+	    vel.y += pl->vel.y;
 	    if (!BIT(pl->status, KILLED)) {
-		DFLOAT vl = LENGTH(vx, vy);
+		DFLOAT vl = LENGTH(vel.x, vel.y);
 		int dvx = (int)(rfrac() * 8);
 		int dvy = (int)(rfrac() * 8);
 		const float drop_speed_factor = 0.75f;
-		vx *= drop_speed_factor;
-		vy *= drop_speed_factor;
+
+		vel.x *= drop_speed_factor;
+		vel.y *= drop_speed_factor;
 		if (vl < 1.0f) {
-		    vx -= (pl->vel.x >= 0) ? dvx : -dvx;
-		    vy -= (pl->vel.y >= 0) ? dvy : -dvy;
+		    vel.x -= (pl->vel.x >= 0) ? dvx : -dvx;
+		    vel.y -= (pl->vel.y >= 0) ? dvy : -dvy;
 		} else {
-		    vx -= dvx * (vx / vl);
-		    vy -= dvy * (vy / vl);
+		    vel.x -= dvx * (vel.x / vl);
+		    vel.y -= dvy * (vel.y / vl);
 		}
 	    } else {
-		DFLOAT vel = rfrac() * 6;
+		DFLOAT v = rfrac() * 6;
 		int dir = (int)(rfrac() * RES);
-		vx += tcos(dir) * vel;
-		vy += tsin(dir) * vel;
+
+		vel.x += tcos(dir) * v;
+		vel.y += tsin(dir) * v;
 	    }
 	} else {
 	    int bx = CLICK_TO_BLOCK(pos.cx),
 		by = CLICK_TO_BLOCK(pos.cy);
-	    vx -= Gravity * World.gravity[bx][by].x;
-	    vy -= Gravity * World.gravity[bx][by].y;
-	    vx += (int)(rfrac() * 8)-3;
-	    vy += (int)(rfrac() * 8)-3;
+
+	    vel.x -= Gravity * World.gravity[bx][by].x;
+	    vel.y -= Gravity * World.gravity[bx][by].y;
+	    vel.x += (int)(rfrac() * 8) - 3;
+	    vel.y += (int)(rfrac() * 8) - 3;
 	}
     }
 
-    Make_item(pos, vx, vy, item, num_per_pack, grav | rand);
+    Make_item(pos, vel, item, num_per_pack, grav | rand);
 }
 
-void Make_item(clpos pos,
-	       int vx, int vy,
+void Make_item(clpos pos, vector vel,
 	       int item, int num_per_pack,
 	       long status)
 {
@@ -315,8 +317,7 @@ void Make_item(clpos pos,
     obj->id = NO_ID;
     obj->team = TEAM_NOT_SET;
     Object_position_init_clicks(obj, pos.cx, pos.cy);
-    obj->vel.x = vx;
-    obj->vel.y = vy;
+    obj->vel = vel;
     obj->acc.x =
     obj->acc.y = 0.0;
     obj->mass = 10.0;
@@ -393,17 +394,18 @@ void Detonate_items(player *pl)
     for (i = 0; i < pl->item[ITEM_MINE]; i++) {
 	if (rfrac() < detonateItemOnKillProb) {
 	    int dir = (int)(rfrac() * RES);
-	    DFLOAT vel = rfrac() * 4.0f;
+	    DFLOAT speed = rfrac() * 4.0f;
+	    vector vel;
 
 	    mods = pl->mods;
 	    if (BIT(mods.nuclear, NUCLEAR)
-		&& pl->item[ITEM_MINE] < nukeMinMines) {
+		&& pl->item[ITEM_MINE] < nukeMinMines)
 		CLR_BIT(mods.nuclear, NUCLEAR);
-	    }
-	    Place_general_mine(owner_pl, pl->team, GRAVITY, pl->pos,
-			       pl->vel.x + vel * tcos(dir),
-			       pl->vel.y + vel * tsin(dir),
-			       mods);
+
+	    vel.x = pl->vel.x + speed * tcos(dir);
+	    vel.y = pl->vel.y + speed * tsin(dir);
+	    Place_general_mine(owner_pl, pl->team, GRAVITY,
+			       pl->pos, vel, mods);
 	}
     }
     for (i = 0; i < pl->item[ITEM_MISSILE]; i++) {

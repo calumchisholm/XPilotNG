@@ -33,10 +33,8 @@ static list_t	Asteroid_list = NULL;
 
 /*
  * Prototypes.
-*/
-static void Make_asteroid(int cx, int cy,
-			  int size, int dir,
-			  DFLOAT speed);
+ */
+static void Make_asteroid(clpos pos, int size, int dir, DFLOAT speed);
 
 
 /*
@@ -98,7 +96,7 @@ void Break_asteroid(wireobject *asteroid)
     DFLOAT	speed, speed1, speed2, radius;
     DFLOAT	velx1, vely1, velx2, vely2;
     int		dir, dir1, dir2, split_dir;
-    int		cx1, cy1, cx2, cy2;
+    clpos	pos1, pos2;
 
     if (asteroid->size == 1) {
 	mass = asteroid->mass / 2;
@@ -150,12 +148,12 @@ void Break_asteroid(wireobject *asteroid)
 	vely2 = tsin(dir2) * speed2;
 	split_dir = MOD2(dir - RES/4, RES);
 	radius = ASTEROID_RADIUS(asteroid->size - 1);
-	cx1 = WRAP_XCLICK(asteroid->pos.cx + tcos(split_dir) * radius);
-	cy1 = WRAP_YCLICK(asteroid->pos.cy + tsin(split_dir) * radius);
-	cx2 = WRAP_XCLICK(asteroid->pos.cx - tcos(split_dir) * radius);
-	cy2 = WRAP_YCLICK(asteroid->pos.cy - tsin(split_dir) * radius);
-	Make_asteroid(cx1, cy1, asteroid->size - 1, dir1, speed1);
-	Make_asteroid(cx2, cy2, asteroid->size - 1, dir2, speed2);
+	pos1.cx = WRAP_XCLICK(asteroid->pos.cx + tcos(split_dir) * radius);
+	pos1.cy = WRAP_YCLICK(asteroid->pos.cy + tsin(split_dir) * radius);
+	pos2.cx = WRAP_XCLICK(asteroid->pos.cx - tcos(split_dir) * radius);
+	pos2.cy = WRAP_YCLICK(asteroid->pos.cy - tsin(split_dir) * radius);
+	Make_asteroid(pos1, asteroid->size - 1, dir1, speed1);
+	Make_asteroid(pos2, asteroid->size - 1, dir2, speed2);
 	Make_wreckage(asteroid->pos,
 		      asteroid->vel,
 		      NO_ID,
@@ -186,7 +184,7 @@ void Break_asteroid(wireobject *asteroid)
     if ((asteroidMaxItems > 0) && (rfrac() < asteroidItemProb)) {
 	int	nitems = (int)(rfrac() * asteroidMaxItems) + 1;
 	int	i;
-	int	vx, vy;
+	vector	vel;
 	int	item, item_dir, num_per_pack;
 	DFLOAT	item_speed;
 	long	status;
@@ -195,22 +193,20 @@ void Break_asteroid(wireobject *asteroid)
 	    item = Choose_random_item();
 	    item_dir = (int)(rfrac() * RES);
 	    item_speed = rfrac() * 10;
-	    vx = asteroid->vel.x + item_speed * tcos(item_dir);
-	    vy = asteroid->vel.y + item_speed * tsin(item_dir);
+	    vel.x = asteroid->vel.x + item_speed * tcos(item_dir);
+	    vel.y = asteroid->vel.y + item_speed * tsin(item_dir);
 	    status = GRAVITY;
 	    if (rfrac() < randomItemProb)
 		status |= RANDOM_ITEM;
 	    if (World.items[item].min_per_pack
-		== World.items[item].max_per_pack) {
+		== World.items[item].max_per_pack)
 		num_per_pack = World.items[item].max_per_pack;
-	    } else {
+	    else
 		num_per_pack = World.items[item].min_per_pack
 		    + (int)(rfrac() * (1 + World.items[item].max_per_pack
 				       - World.items[item].min_per_pack));
-	    }
 
-	    Make_item(asteroid->pos,
-		      vx, vy,
+	    Make_item(asteroid->pos, vel,
 		      item, num_per_pack,
 		      status);
 	}
@@ -227,9 +223,7 @@ void Break_asteroid(wireobject *asteroid)
 /*
  * Creates an asteroid with the given characteristics.
  */
-static void Make_asteroid(int cx, int cy,
-			  int size, int dir,
-			  DFLOAT speed)
+static void Make_asteroid(clpos pos, int size, int dir, DFLOAT speed)
 {
     wireobject	*asteroid;
     DFLOAT	radius;
@@ -240,16 +234,16 @@ static void Make_asteroid(int cx, int cy,
     if (size < 1 || size > ASTEROID_MAX_SIZE)
 	return;
 
-    cx = WRAP_XCLICK(cx);
-    cy = WRAP_YCLICK(cy);
-    if (!INSIDE_MAP(cx, cy))
+    pos.cx = WRAP_XCLICK(pos.cx);
+    pos.cy = WRAP_YCLICK(pos.cy);
+    if (!INSIDE_MAP(pos.cx, pos.cy))
 	return;
 
     /*
      * kps - here we should check that the asteroid shape is not inside
      * a polygon (or on top of an object?)
      */
-    if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) != NO_GROUP)
+    if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL) != NO_GROUP)
 	return;
 
     asteroid = WIRE_PTR(Object_allocate());
@@ -262,7 +256,7 @@ static void Make_asteroid(int cx, int cy,
     asteroid->type = OBJ_ASTEROID;
 
     /* Position */
-    Object_position_init_clicks(OBJ_PTR(asteroid), cx, cy);
+    Object_position_init_clicks(OBJ_PTR(asteroid), pos.cx, pos.cy);
 
     asteroid->vel.x = tcos(dir) * speed;
     asteroid->vel.y = tsin(dir) * speed;
@@ -298,11 +292,11 @@ static void Place_asteroid(void)
 {
     int			place_count;
     int			bx, by;
-    int			cx, cy;
     int			dir, dist;
     unsigned		space;
     int			okay;
     asteroid_concentrator_t	*con;
+    clpos		pos;
 
     space = SPACE_BLOCKS;
     space &= ~(BASE_BIT | WORMHOLE_BIT);
@@ -327,32 +321,30 @@ static void Place_asteroid(void)
 	    dir = (int)(rfrac() * RES);
 	    dist = (int)(rfrac() * ((asteroidConcentratorRadius
 				     * BLOCK_CLICKS) + 1));
-	    cx = con->pos.cx + dist * tcos(dir);
-	    cy = con->pos.cy + dist * tsin(dir);
-	    cx = WRAP_XCLICK(cx);
-	    cy = WRAP_YCLICK(cy);
-	    if (!INSIDE_MAP(cx, cy))
+	    pos.cx = con->pos.cx + dist * tcos(dir);
+	    pos.cy = con->pos.cy + dist * tsin(dir);
+	    pos.cx = WRAP_XCLICK(pos.cx);
+	    pos.cy = WRAP_YCLICK(pos.cy);
+	    if (!INSIDE_MAP(pos.cx, pos.cy))
 		continue;
 	} else {
-	    cx = (int)(rfrac() * World.cwidth);
-	    cy = (int)(rfrac() * World.cheight);
+	    pos.cx = (int)(rfrac() * World.cwidth);
+	    pos.cy = (int)(rfrac() * World.cheight);
 	}
-	bx = CLICK_TO_BLOCK(cx);
-	by = CLICK_TO_BLOCK(cy);
+	bx = CLICK_TO_BLOCK(pos.cx);
+	by = CLICK_TO_BLOCK(pos.cy);
 
 	/* kps - World.block must be removed */
 	if (BIT(1U << World.block[bx][by], space)) {
-	    int i, dpx, dpy, ox, oy;
+	    int i, dpx, dpy;
 
 	    okay = true;
 
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl = Players(i);
 		if (IS_HUMAN_PTR(pl)) {
-		    ox = pl->pos.cx;
-		    oy = pl->pos.cy;
-		    dpx = WRAP_DCX(cx - ox);
-		    dpy = WRAP_DCY(cy - oy);
+		    dpx = WRAP_DCX(pos.cx - pl->pos.cx);
+		    dpy = WRAP_DCY(pos.cy - pl->pos.cy);
 		    if (QUICK_LENGTH(dpx, dpy) < 2 * ASTEROID_MIN_DIST
 			&& sqr(dpx) + sqr(dpy) < sqr(ASTEROID_MIN_DIST)) {
 			/* too close to player */
@@ -364,7 +356,7 @@ static void Place_asteroid(void)
 	}
     }
     if (okay == true) {
-	Make_asteroid(cx, cy,
+	Make_asteroid(pos,
 		      (int)(1 + rfrac() * ASTEROID_MAX_SIZE),
 		      (int)(rfrac() * RES),
 		      (DFLOAT)ASTEROID_START_SPEED);

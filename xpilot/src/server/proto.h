@@ -180,7 +180,7 @@ void General_tractor_beam(player *pl, clpos pos,
 void Place_mine(player *pl);
 void Place_moving_mine(player *pl);
 void Place_general_mine(player *pl, int team, long status,
-			clpos pos, DFLOAT vx, DFLOAT vy, modifiers mods);
+			clpos pos, vector vel, modifiers mods);
 void Detonate_mines(player *pl);
 char *Describe_shot(int type, long status, modifiers mods, int hit);
 void Fire_ecm(player *pl);
@@ -265,7 +265,7 @@ void Make_wreckage(
     /* min,max life   */ DFLOAT min_life,   DFLOAT max_life
     );
 void Make_item(clpos pos,
-	       int vx, int vy,
+	       vector vel,
 	       int item, int num_per_pack,
 	       long status);
 void Explode_fighter(player *pl);

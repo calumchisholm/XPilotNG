@@ -45,6 +45,8 @@ char shot_version[] = VERSION;
 
 void Place_mine(player *pl)
 {
+    vector	zero_vel = { 0.0, 0.0 };
+
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining))
 	return;
@@ -54,14 +56,13 @@ void Place_mine(player *pl)
 	return;
     }
 
-    Place_general_mine(pl, pl->team, 0, pl->pos, 0.0, 0.0, pl->mods);
+    Place_general_mine(pl, pl->team, 0, pl->pos, zero_vel, pl->mods);
 }
 
 
 void Place_moving_mine(player *pl)
 {
-    DFLOAT	vx = pl->vel.x;
-    DFLOAT	vy = pl->vel.y;
+    vector	vel = pl->vel;
 
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE) && !shieldedMining))
@@ -70,20 +71,20 @@ void Place_moving_mine(player *pl)
     if (minMineSpeed > 0) {
 	if (pl->velocity < minMineSpeed) {
 	    if (pl->velocity >= 1) {
-		vx *= (minMineSpeed / pl->velocity);
-		vy *= (minMineSpeed / pl->velocity);
+		vel.x *= (minMineSpeed / pl->velocity);
+		vel.y *= (minMineSpeed / pl->velocity);
 	    } else {
-		vx = minMineSpeed * tcos(pl->dir);
-		vy = minMineSpeed * tsin(pl->dir);
+		vel.x = minMineSpeed * tcos(pl->dir);
+		vel.y = minMineSpeed * tsin(pl->dir);
 	    }
 	}
     }
 
-    Place_general_mine(pl, pl->team, GRAVITY, pl->pos, vx, vy, pl->mods);
+    Place_general_mine(pl, pl->team, GRAVITY, pl->pos, vel, pl->mods);
 }
 
 void Place_general_mine(player *pl, int team, long status,
-			clpos pos, DFLOAT vx, DFLOAT vy, modifiers mods)
+			clpos pos, vector vel, modifiers mods)
 {
     char		msg[MSG_LEN];
     int			used;
@@ -225,8 +226,8 @@ void Place_general_mine(player *pl, int team, long status,
 	    mine->spread_left = 0;
 	}
 	mine->vel = mv;
-	mine->vel.x += vx * MINE_SPEED_FACT;
-	mine->vel.y += vy * MINE_SPEED_FACT;
+	mine->vel.x += vel.x * MINE_SPEED_FACT;
+	mine->vel.y += vel.y * MINE_SPEED_FACT;
 	mine->mass = mass / minis;
 	mine->life = life / minis;
 	mine->mods = mods;
@@ -1075,16 +1076,12 @@ void Delete_shot(int ind)
     object		*shot = Obj[ind];	/* Used when swapping places */
     ballobject		*ball;
     player		*pl;
-    int			addMine = 0;
-    int			addHeat = 0;
-    int			addBall = 0;
+    int			addMine = 0, addHeat = 0, addBall = 0;
     modifiers		mods;
     long		status;
     int			i;
-    int			intensity;
-    int			type, color;
-    DFLOAT		modv, speed_modv, life_modv, num_modv;
-    DFLOAT		mass;
+    int			intensity, type, color;
+    DFLOAT		modv, speed_modv, life_modv, num_modv, mass;
 
     switch (shot->type) {
 
@@ -1107,9 +1104,8 @@ void Delete_shot(int ind)
 	     */
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->ball == ball) {
+		if (pl_i->ball == ball)
 		    pl_i->ball = NULL;
-		}
 	    }
 	}
 	if (ball->owner == NO_ID) {
@@ -1336,8 +1332,10 @@ void Delete_shot(int ind)
 	    mods.power = (int)(rfrac() * (MODS_POWER_MAX + 1));
 	if (addMine) {
 	    long gravity_status = ((rfrac() < 0.5f) ? GRAVITY : 0);
+	    vector zero_vel = { 0.0, 0.0 };
+
 	    Place_general_mine(NULL, TEAM_NOT_SET, gravity_status,
-			       shot->pos, 0.0, 0.0, mods);
+			       shot->pos, zero_vel, mods);
 	}
 	else if (addHeat)
 	    Fire_general_shot(NULL, TEAM_NOT_SET, 0, shot->pos,
