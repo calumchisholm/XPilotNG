@@ -170,6 +170,18 @@ shipshape_t *Default_ship(void)
 
 static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 {
+#ifndef USE_BUGGY_SHIPSHAPES
+    static bool warned = false;
+
+    UNUSED_PARAM(ship_shape_str);
+    UNUSED_PARAM(ship);
+    if (!warned) {
+	warn("Shipshapes are disabled due to bugs.");
+	warned = true;
+    }
+    return -1;
+#else
+
 /*
  * Macros to simplify limit-checking for ship points.
  * Until XPilot goes C++.
@@ -920,6 +932,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     Rotate_ship(ship);
 
     return 0;
+#endif
 }
 
 static shipshape_t *do_parse_shape(char *str)
@@ -1176,6 +1189,7 @@ void Convert_ship_2_string(shipshape_t *ship, char *buf, char *ext,
 }
 
 
+#ifdef USE_BUGGY_SHIPSHAPES
 static int Get_shape_keyword(char *keyw)
 {
 #define NUM_SHAPE_KEYS	12
@@ -1230,6 +1244,7 @@ static int Get_shape_keyword(char *keyw)
 
     return(i);
 }
+#endif
 
 void Calculate_shield_radius(shipshape_t *ship)
 {
