@@ -30,7 +30,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
 {
     static char		msg[MSG_LEN];
     int			i;
-    int			win_score = 0,lose_score = 0;
+    double		win_score = 0.0,lose_score = 0.0;
     int			win_team_members = 0, lose_team_members = 0;
     int			somebody_flag = 0;
     double		sc, por;
@@ -218,7 +218,7 @@ void Ball_is_replaced(ballobject *ball)
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 
-    Score(pl, 5, ball->pos, "Treasure: ");
+    Score(pl, 5.0, ball->pos, "Treasure: ");
     sprintf(msg, " < %s (team %d) has replaced the treasure >",
 	    pl->name, pl->team);
     Set_message(msg);
