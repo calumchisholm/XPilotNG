@@ -442,10 +442,10 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	player *pl = Players(i);
 	double tdist, tdx, tdy;
 
-	tdx = WRAP_DCX(pl->pos.cx - c->pos.cx) / CLICK;
+	tdx = WRAP_DCX(world, pl->pos.cx - c->pos.cx) / CLICK;
 	if (ABS(tdx) >= visualrange)
 	    continue;
-	tdy = WRAP_DCY(pl->pos.cy - c->pos.cy) / CLICK;
+	tdy = WRAP_DCY(world, pl->pos.cy - c->pos.cy) / CLICK;
 	if (ABS(tdy) >= visualrange)
 	    continue;
 	tdist = LENGTH(tdx, tdy);
@@ -490,8 +490,8 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 				+ pl->acc.y * t * t * CLICK);
 		int tdir;
 
-		tdx = WRAP_DCX(npx - c->pos.cx) / CLICK;
-		tdy = WRAP_DCY(npy - c->pos.cy) / CLICK;
+		tdx = WRAP_DCX(world, npx - c->pos.cx) / CLICK;
+		tdy = WRAP_DCY(world, npy - c->pos.cy) / CLICK;
 		tdir = findDir(tdx, tdy);
 		ddir = MOD2(tdir - c->dir, RES);
 		if ((ddir < (CANNON_SPREAD * 0.5)

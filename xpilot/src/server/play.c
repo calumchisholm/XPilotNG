@@ -225,8 +225,7 @@ void Make_debris(
     modifiers		mods;
     world_t *world = &World;
 
-    pos.cx = WRAP_XCLICK(pos.cx);
-    pos.cy = WRAP_YCLICK(pos.cy);
+    pos = World_wrap_clpos(world, pos);
     if (!World_contains_clpos(world, pos))
 	return;
 

@@ -90,7 +90,7 @@ static bool Asteroid_remove_from_list(wireobject *ast)
  * the wreckage and the debris should be about equal to the mass
  * of the original asteroid.
  */
-void Break_asteroid(wireobject *asteroid)
+void Break_asteroid(wireobject *ast)
 {
     double	mass, mass3;
     double	speed, speed1, speed2, radius;
@@ -99,10 +99,10 @@ void Break_asteroid(wireobject *asteroid)
     clpos	pos1, pos2;
     world_t *world = &World;
 
-    if (asteroid->size == 1) {
-	mass = asteroid->mass / 2;
-	Make_wreckage(asteroid->pos,
-		      asteroid->vel,
+    if (ast->size == 1) {
+	mass = ast->mass / 2;
+	Make_wreckage(ast->pos,
+		      ast->vel,
 		      NO_ID,
 		      TEAM_NOT_SET,
 		      mass / 20, mass / 3,
@@ -113,8 +113,8 @@ void Break_asteroid(wireobject *asteroid)
 		      0, RES-1,
 		      5.0, 10.0,
 		      3.0, 10.0);
-	Make_debris(asteroid->pos,
-		    asteroid->vel,
+	Make_debris(ast->pos,
+		    ast->vel,
 		    NO_ID,
 		    TEAM_NOT_SET,
 		    OBJ_DEBRIS,
@@ -129,10 +129,10 @@ void Break_asteroid(wireobject *asteroid)
     } else {
 	/* foo[12] refer to the mini-asteroids
 	   foo3 refers to the wreckage and debris */
-	speed = VECTOR_LENGTH(asteroid->vel);
-	dir = findDir(asteroid->vel.x, asteroid->vel.y);
-	mass3 = asteroid->mass * ASTEROID_DUST_FACT;
-	mass = ASTEROID_MASS(asteroid->size - 1);
+	speed = VECTOR_LENGTH(ast->vel);
+	dir = findDir(ast->vel.x, ast->vel.y);
+	mass3 = ast->mass * ASTEROID_DUST_FACT;
+	mass = ASTEROID_MASS(ast->size - 1);
 	dir1 = MOD2((int)(dir
 			  - ASTEROID_DELTA_DIR / 4
 			  - (rfrac() * ASTEROID_DELTA_DIR / 4)), RES);
@@ -148,15 +148,15 @@ void Break_asteroid(wireobject *asteroid)
 	velx2 = tcos(dir2) * speed2;
 	vely2 = tsin(dir2) * speed2;
 	split_dir = MOD2((int)dir - RES/4, RES);
-	radius = ASTEROID_RADIUS(asteroid->size - 1);
-	pos1.cx = WRAP_XCLICK(asteroid->pos.cx + tcos(split_dir) * radius);
-	pos1.cy = WRAP_YCLICK(asteroid->pos.cy + tsin(split_dir) * radius);
-	pos2.cx = WRAP_XCLICK(asteroid->pos.cx - tcos(split_dir) * radius);
-	pos2.cy = WRAP_YCLICK(asteroid->pos.cy - tsin(split_dir) * radius);
-	Make_asteroid(pos1, asteroid->size - 1, dir1, speed1);
-	Make_asteroid(pos2, asteroid->size - 1, dir2, speed2);
-	Make_wreckage(asteroid->pos,
-		      asteroid->vel,
+	radius = ASTEROID_RADIUS(ast->size - 1);
+	pos1.cx = WRAP_XCLICK(world, ast->pos.cx + tcos(split_dir) * radius);
+	pos1.cy = WRAP_YCLICK(world, ast->pos.cy + tsin(split_dir) * radius);
+	pos2.cx = WRAP_XCLICK(world, ast->pos.cx - tcos(split_dir) * radius);
+	pos2.cy = WRAP_YCLICK(world, ast->pos.cy - tsin(split_dir) * radius);
+	Make_asteroid(pos1, ast->size - 1, dir1, speed1);
+	Make_asteroid(pos2, ast->size - 1, dir2, speed2);
+	Make_wreckage(ast->pos,
+		      ast->vel,
 		      NO_ID,
 		      TEAM_NOT_SET,
 		      mass3 / 20, mass3 / 3,
@@ -167,8 +167,8 @@ void Break_asteroid(wireobject *asteroid)
 		      0, RES-1,
 		      5.0, 10.0,
 		      3.0, 10.0);
-	Make_debris(asteroid->pos,
-		    asteroid->vel,
+	Make_debris(ast->pos,
+		    ast->vel,
 		    NO_ID,
 		    TEAM_NOT_SET,
 		    OBJ_DEBRIS,
@@ -194,8 +194,8 @@ void Break_asteroid(wireobject *asteroid)
 	    item = Choose_random_item();
 	    item_dir = (int)(rfrac() * RES);
 	    item_speed = rfrac() * 10;
-	    vel.x = asteroid->vel.x + item_speed * tcos(item_dir);
-	    vel.y = asteroid->vel.y + item_speed * tsin(item_dir);
+	    vel.x = ast->vel.x + item_speed * tcos(item_dir);
+	    vel.y = ast->vel.y + item_speed * tsin(item_dir);
 	    status = GRAVITY;
 	    if (rfrac() < randomItemProb)
 		status |= RANDOM_ITEM;
@@ -207,17 +207,17 @@ void Break_asteroid(wireobject *asteroid)
 		    + (int)(rfrac() * (1 + world->items[item].max_per_pack
 				       - world->items[item].min_per_pack));
 
-	    Make_item(asteroid->pos, vel,
+	    Make_item(ast->pos, vel,
 		      item, num_per_pack,
 		      status);
 	}
     }
 
-    sound_play_sensors(asteroid->pos, ASTEROID_BREAK_SOUND);
+    sound_play_sensors(ast->pos, ASTEROID_BREAK_SOUND);
 
-    world->asteroids.num -= 1 << (asteroid->size - 1);
+    world->asteroids.num -= 1 << (ast->size - 1);
 
-    Asteroid_remove_from_list(asteroid);
+    Asteroid_remove_from_list(ast);
 }
 
 
@@ -236,8 +236,7 @@ static void Make_asteroid(clpos pos, int size, int dir, double speed)
     if (size < 1 || size > ASTEROID_MAX_SIZE)
 	return;
 
-    pos.cx = WRAP_XCLICK(pos.cx);
-    pos.cy = WRAP_YCLICK(pos.cy);
+    pos = World_wrap_clpos(world, pos);
     if (!World_contains_clpos(world, pos))
 	return;
 
@@ -326,8 +325,7 @@ static void Place_asteroid(void)
 				     * BLOCK_CLICKS) + 1));
 	    pos.cx = con->pos.cx + dist * tcos(dir);
 	    pos.cy = con->pos.cy + dist * tsin(dir);
-	    pos.cx = WRAP_XCLICK(pos.cx);
-	    pos.cy = WRAP_YCLICK(pos.cy);
+	    pos = World_wrap_clpos(world, pos);
 	    if (!World_contains_clpos(world, pos))
 		continue;
 	} else {
@@ -345,8 +343,8 @@ static void Place_asteroid(void)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl = Players(i);
 		if (Player_is_human(pl)) {
-		    dpx = WRAP_DCX(pos.cx - pl->pos.cx);
-		    dpy = WRAP_DCY(pos.cy - pl->pos.cy);
+		    dpx = WRAP_DCX(world, pos.cx - pl->pos.cx);
+		    dpy = WRAP_DCY(world, pos.cy - pl->pos.cy);
 		    if (QUICK_LENGTH(dpx, dpy) < 2 * ASTEROID_MIN_DIST
 			&& sqr(dpx) + sqr(dpy) < sqr(ASTEROID_MIN_DIST)) {
 			/* too close to player */

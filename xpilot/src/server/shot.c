@@ -90,12 +90,14 @@ void Place_general_mine(player *pl, int team, long status,
     double		life, drain, mass;
     int			i, minis;
     vector		mv;
+    world_t *world = &World;
 
     if (NumObjs + mods.mini >= MAX_TOTAL_SHOTS)
 	return;
 
-    pos.cx = WRAP_XCLICK(pos.cx);
-    pos.cy = WRAP_YCLICK(pos.cy);
+    pos = World_wrap_clpos(world, pos);
+    if (!World_contains_clpos(world, pos))
+	return;
 
     if (pl && BIT(pl->status, KILLED))
 	life = rfrac() * 12;
@@ -920,8 +922,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    side = CLICK_TO_PIXEL(
 		Ship_get_m_rack_clpos(pl->ship, rack_no, 0).cy);
 	}
-	shotpos.cx = WRAP_XCLICK(shotpos.cx);
-	shotpos.cy = WRAP_YCLICK(shotpos.cy);
+	shotpos = World_wrap_clpos(world, shotpos);
 	Object_position_init_clpos(shot, shotpos);
 
 	if (type == OBJ_SHOT || !pl)
@@ -1359,6 +1360,7 @@ void Delete_shot(int ind)
 void Fire_laser(player *pl)
 {
     clpos	m_gun, pos;
+    world_t *world = &World;
 
     if (frame_time <= pl->laser_time + laserRepeatRate - timeStep + 1e-3)
  	return;
@@ -1374,8 +1376,7 @@ void Fire_laser(player *pl)
 		+ FLOAT_TO_CLICK(pl->vel.x * timeStep);
 	    pos.cy = pl->pos.cy + m_gun.cy
 		+ FLOAT_TO_CLICK(pl->vel.y * timeStep);
-	    pos.cx = WRAP_XCLICK(pos.cx);
-	    pos.cy = WRAP_YCLICK(pos.cy);
+	    pos = World_wrap_clpos(world, pos);
 	    if (is_inside(pos.cx, pos.cy, NONBALL_BIT | NOTEAM_BIT, NULL)
 		!= NO_GROUP)
 		return;
@@ -1495,14 +1496,15 @@ void Update_connector_force(ballobject *ball)
     double		length, force, ratio, accell, damping;
     /* const double		k = 1500.0, b = 2.0; */
     /* const double		max_spring_ratio = 0.30; */
+    world_t *world = &World;
 
     /* no player connected ? */
     if (!pl)
 	return;
 
     /* compute the normalized vector between the ball and the player */
-    D.x = WRAP_DCX(pl->pos.cx - ball->pos.cx);
-    D.y = WRAP_DCY(pl->pos.cy - ball->pos.cy);
+    D.x = WRAP_DCX(world, pl->pos.cx - ball->pos.cx);
+    D.y = WRAP_DCY(world, pl->pos.cy - ball->pos.cy);
     length = VECTOR_LENGTH(D);
     if (length > 0.0) {
 	D.x /= length;

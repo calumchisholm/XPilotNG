@@ -191,8 +191,7 @@ void Place_item(player *pl, int item)
 	    else
 		pos.cy += (BLOCK_CLICKS + (int)(rfrac() * 8 * CLICK));
 	}
-	pos.cx = WRAP_XCLICK(pos.cx);
-	pos.cy = WRAP_YCLICK(pos.cy);
+	pos = World_wrap_clpos(world, pos);
 	if (!World_contains_clpos(world, pos))
 	    return;
 	/*if (!BIT(1U << world->block[bx][by], SPACE_BLOCKS))*/
@@ -235,8 +234,7 @@ void Place_item(player *pl, int item)
 					 * BLOCK_CLICKS) + 1));
 		pos.cx = con->pos.cx + dist * tcos(dir);
 		pos.cy = con->pos.cy + dist * tsin(dir);
-		pos.cx = WRAP_XCLICK(pos.cx);
-		pos.cy = WRAP_YCLICK(pos.cy);
+		pos = World_wrap_clpos(world, pos);
 		if (!World_contains_clpos(world, pos))
 		    continue;
 	    } else {
@@ -502,6 +500,7 @@ void Do_deflector(player *pl)
     object	*obj, **obj_list;
     int		i, obj_count;
     double	dx, dy, dist;
+    world_t *world = &World;
 
     if (pl->fuel.sum < -ED_DEFLECTOR) {
 	if (BIT(pl->used, HAS_DEFLECTOR))
@@ -535,8 +534,8 @@ void Do_deflector(player *pl)
 	    && !BIT(obj->status, GRAVITY))
 	    continue;
 
-	dx = WRAP_DCX(obj->pos.cx - pl->pos.cx);
-	dy = WRAP_DCY(obj->pos.cy - pl->pos.cy);
+	dx = WRAP_DCX(world, obj->pos.cx - pl->pos.cx);
+	dy = WRAP_DCY(world, obj->pos.cy - pl->pos.cy);
 
 	/* kps - 4.3.1X had some nice code here, consider using it ? */
 	dist = (double)(LENGTH(dx, dy) - PIXEL_TO_CLICK(SHIP_SZ));

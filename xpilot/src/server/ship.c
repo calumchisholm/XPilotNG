@@ -165,9 +165,10 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
 			dvx1, dvy1,
 			dvx2, dvy2;
     int			obj_theta;
+    world_t *world = &World;
 
-    xd = WRAP_DCX(obj2->pos.cx - obj1->pos.cx);
-    yd = WRAP_DCY(obj2->pos.cy - obj1->pos.cy);
+    xd = WRAP_DCX(world, obj2->pos.cx - obj1->pos.cx);
+    yd = WRAP_DCY(world, obj2->pos.cy - obj1->pos.cy);
     force = CLICK_TO_PIXEL((int)(repel_dist - LENGTH(xd, yd)));
 
     if (force <= 0)
@@ -471,8 +472,7 @@ void Make_wreckage(
     if (!useWreckage)
 	return;
 
-    pos.cx = WRAP_XCLICK(pos.cx);
-    pos.cy = WRAP_YCLICK(pos.cy);
+    pos = World_wrap_clpos(world, pos);
     if (!World_contains_clpos(world, pos))
 	return;
 

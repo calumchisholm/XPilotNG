@@ -45,21 +45,21 @@
  * Two macros for edge wrap of x and y coordinates measured in clicks.
  * Note that the correction needed should never be bigger than the size of the map.
  */
-#define WRAP_XCLICK(x_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
+#define WRAP_XCLICK(world_, x_)	\
+	(BIT((world_)->rules->mode, WRAP_PLAY) \
 	    ? ((x_) < 0 \
-		? (x_) + World.cwidth \
-		: ((x_) >= World.cwidth \
-		    ? (x_) - World.cwidth \
+		? (x_) + (world_)->cwidth \
+		: ((x_) >= (world_)->cwidth \
+		    ? (x_) - (world_)->cwidth \
 		    : (x_))) \
 	    : (x_))
 
-#define WRAP_YCLICK(y_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
+#define WRAP_YCLICK(world_, y_)	\
+	(BIT((world_)->rules->mode, WRAP_PLAY) \
 	    ? ((y_) < 0 \
-		? (y_) + World.cheight \
-		: ((y_) >= World.cheight \
-		    ? (y_) - World.cheight \
+		? (y_) + (world_)->cheight \
+		: ((y_) >= (world_)->cheight \
+		    ? (y_) - (world_)->cheight \
 		    : (y_))) \
 	    : (y_))
 
@@ -68,45 +68,45 @@
  * If the absolute value of a difference is bigger than
  * half the map size then it is wrapped.
  */
-#define WRAP_DCX(dcx)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((dcx) < - (World.cwidth >> 1) \
-		? (dcx) + World.cwidth \
-		: ((dcx) > (World.cwidth >> 1) \
-		    ? (dcx) - World.cwidth \
+#define WRAP_DCX(world_, dcx)	\
+	(BIT((world_)->rules->mode, WRAP_PLAY) \
+	    ? ((dcx) < - ((world_)->cwidth >> 1) \
+		? (dcx) + (world_)->cwidth \
+		: ((dcx) > ((world_)->cwidth >> 1) \
+		    ? (dcx) - (world_)->cwidth \
 		    : (dcx))) \
 	    : (dcx))
 
-#define WRAP_DCY(dcy)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((dcy) < - (World.cheight >> 1) \
-		? (dcy) + World.cheight \
-		: ((dcy) > (World.cheight >> 1) \
-		    ? (dcy) - World.cheight \
+#define WRAP_DCY(world_, dcy)	\
+	(BIT((world_)->rules->mode, WRAP_PLAY) \
+	    ? ((dcy) < - ((world_)->cheight >> 1) \
+		? (dcy) + (world_)->cheight \
+		: ((dcy) > ((world_)->cheight >> 1) \
+		    ? (dcy) - (world_)->cheight \
 		    : (dcy))) \
 	    : (dcy))
 
-#define TWRAP_XCLICK(x_) \
-     ((x_) > 0 ? (x_) % World.cwidth : \
-      ((x_) % World.cwidth + World.cwidth))
+#define TWRAP_XCLICK(world_, x_) \
+     ((x_) > 0 ? (x_) % (world_)->cwidth : \
+      ((x_) % (world_)->cwidth + (world_)->cwidth))
 
-#define TWRAP_YCLICK(y_) \
-     ((y_) > 0 ? (y_) % World.cheight : \
-      ((y_) % World.cheight + World.cheight))
+#define TWRAP_YCLICK(world_, y_) \
+     ((y_) > 0 ? (y_) % (world_)->cheight : \
+      ((y_) % (world_)->cheight + (world_)->cheight))
 
 
-#define CENTER_XCLICK(X) \
-        (((X) < -(World.cwidth >> 1)) ? \
-             (X) + World.cwidth : \
-             (((X) >= (World.cwidth >> 1)) ? \
-                 (X) - World.cwidth : \
+#define CENTER_XCLICK(world_, X) \
+        (((X) < -((world_)->cwidth >> 1)) ? \
+             (X) + (world_)->cwidth : \
+             (((X) >= ((world_)->cwidth >> 1)) ? \
+                 (X) - (world_)->cwidth : \
                  (X)))
 
-#define CENTER_YCLICK(X) \
-        (((X) < -(World.cheight >> 1)) ? \
-	     (X) + World.cheight : \
-	     (((X) >= (World.cheight >> 1)) ? \
-	         (X) - World.cheight : \
+#define CENTER_YCLICK(world_, X) \
+        (((X) < -((world_)->cheight >> 1)) ? \
+	     (X) + (world_)->cheight : \
+	     (((X) >= ((world_)->cheight >> 1)) ? \
+	         (X) - (world_)->cheight : \
 	         (X)))
 
 #if 0 /* kps -moved to common/draw.h because shipshapes needs this */

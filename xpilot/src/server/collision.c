@@ -32,9 +32,10 @@ static bool in_range_acd(double dx, double dy, double dvx, double dvy,
 {
     double	tmin, fminx, fminy;
     double	top, bot;
+    world_t *world = &World;
 
-    dx = CENTER_XCLICK(dx);
-    dy = CENTER_YCLICK(dy);
+    dx = CENTER_XCLICK(world, dx);
+    dy = CENTER_YCLICK(world, dy);
 
     if (dx * dx + dy * dy < r * r)
 	return true;
@@ -54,9 +55,10 @@ static bool in_range_acd(double dx, double dy, double dvx, double dvy,
 static bool in_range_simple(int px, int py, int qx, int qy, double r)
 {
     int dx = px - qx, dy = py - qy;
+    world_t *world = &World;
 
-    dx = CENTER_XCLICK(dx);
-    dy = CENTER_YCLICK(dy);
+    dx = CENTER_XCLICK(world, dx);
+    dy = CENTER_YCLICK(world, dy);
 
     if ((double)dx * dx + (double)dy * dy < r * r)
 	return true;
@@ -69,9 +71,10 @@ static bool in_range_partial(double dx, double dy, double dvx, double dvy,
 {
     double	tmin, fminx, fminy;
     double	top, bot;
+    world_t *world = &World;
 
-    dx = CENTER_XCLICK(dx);
-    dy = CENTER_YCLICK(dy);
+    dx = CENTER_XCLICK(world, dx);
+    dy = CENTER_YCLICK(world, dy);
 
     top = -(dvx * dx + dvy * dy);
     bot = dvx * dvx + dvy * dvy;

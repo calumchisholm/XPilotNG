@@ -287,4 +287,11 @@ static inline bool World_contains_clpos(world_t *world, clpos pos)
     return true;
 }
 
+static inline clpos World_wrap_clpos(world_t *world, clpos pos)
+{
+    pos.cx = WRAP_XCLICK(world, pos.cx);
+    pos.cy = WRAP_YCLICK(world, pos.cy);
+
+    return pos;
+}
 #endif

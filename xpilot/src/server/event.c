@@ -494,8 +494,8 @@ int Handle_keyboard(player *pl)
 		msg[0] = '\0';
 		for (i = 0; i < world->NumBases; i++) {
 		    base_t *base = Bases(world, i);
-		    dx = ABS(CENTER_XCLICK(base->pos.cx - pl->pos.cx));
-		    dy = ABS(CENTER_YCLICK(base->pos.cy - pl->pos.cy));
+		    dx = ABS(CENTER_XCLICK(world, base->pos.cx - pl->pos.cx));
+		    dy = ABS(CENTER_YCLICK(world, base->pos.cy - pl->pos.cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
 			if (base == pl->home_base)
 			    break;
@@ -750,8 +750,8 @@ int Handle_keyboard(player *pl)
 		    i = HOVERPAUSE;
 		else {
 		    pos = pl->home_base->pos;
-		    dx = ABS(CENTER_XCLICK(pl->pos.cx - pos.cx));
-		    dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
+		    dx = ABS(CENTER_XCLICK(world, pl->pos.cx - pos.cx));
+		    dy = ABS(CENTER_YCLICK(world, pl->pos.cy - pos.cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
 			minv = 3.0;
 			i = PAUSE;

@@ -80,8 +80,8 @@ static void Transport_to_home(player *pl)
     } else
 	startpos = pl->home_base->pos;
 
-    dx = WRAP_DCX(startpos.cx - pl->pos.cx);
-    dy = WRAP_DCY(startpos.cy - pl->pos.cy);
+    dx = WRAP_DCX(world, startpos.cx - pl->pos.cx);
+    dy = WRAP_DCY(world, startpos.cy - pl->pos.cy);
     t = pl->count + 0.5;
     if (2 * t <= T)
 	m = 2 / t;
@@ -811,8 +811,8 @@ static void Do_warping(player *pl)
 		    || wh->temporary)
 		    continue;
 
-		wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
-		wcy = WRAP_DCY(wh->pos.cy - wh_hit->pos.cy);
+		wcx = WRAP_DCX(world, wh->pos.cx - wh_hit->pos.cx);
+		wcy = WRAP_DCY(world, wh->pos.cy - wh_hit->pos.cy);
 
 		proximity = (pl->vel.y * wcx + pl->vel.x * wcy);
 		proximity = ABS(proximity);
@@ -906,8 +906,7 @@ static void Do_warping(player *pl)
 
 		ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
 		ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
-		ballpos.cx = WRAP_XCLICK(ballpos.cx);
-		ballpos.cy = WRAP_YCLICK(ballpos.cy);
+		ballpos = World_wrap_clpos(world, ballpos);
 		if (!World_contains_clpos(world, ballpos)) {
 		    b->life = 0.0;
 		    continue;
