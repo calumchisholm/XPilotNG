@@ -1565,36 +1565,34 @@ void Connector_force(int ind)
     ball->vel.y += -D.y * accell * timeStep;
 }
 
+void Update_torpedo(torpobject *torp)
+{
+    DFLOAT		acc;
+
+    if (BIT(torp->mods.nuclear, NUCLEAR))
+	acc = (torp->count < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
+    else
+	acc = (torp->count < TORPEDO_SPEED_TIME) ? TORPEDO_ACC : 0.0;
+    torp->count += timeStep;
+    acc *= (1 + (torp->mods.power * MISSILE_POWER_SPEED_FACT));
+    if ((torp->spread_left -= timeStep) <= 0) {
+	torp->acc.x = 0;
+	torp->acc.y = 0;
+	torp->spread_left = 0;
+    }
+    torp->vel.x += acc * tcos(torp->missile_dir);
+    torp->vel.y += acc * tsin(torp->missile_dir);
+}
 
 void Update_missile(missileobject *shot)
 {
     player		*pl;
     int			angle, theta;
     DFLOAT		range = 0.0;
-    DFLOAT		acc;
+    DFLOAT		acc = SMART_SHOT_ACC;
     DFLOAT		x_dif = 0.0;
     DFLOAT		y_dif = 0.0;
     DFLOAT		shot_speed;
-
-    if (shot->type == OBJ_TORPEDO) {
-	torpobject *torp = TORP_PTR(shot);
-	if (BIT(torp->mods.nuclear, NUCLEAR))
-	    acc = (torp->count < NUKE_SPEED_TIME) ? NUKE_ACC : 0.0;
-	else
-	    acc = (torp->count < TORPEDO_SPEED_TIME) ? TORPEDO_ACC : 0.0;
-	torp->count += timeStep;
-	acc *= (1 + (torp->mods.power * MISSILE_POWER_SPEED_FACT));
-	if ((torp->spread_left -= timeStep) <= 0) {
-	    torp->acc.x = 0;
-	    torp->acc.y = 0;
-	    torp->spread_left = 0;
-	}
-	torp->vel.x += acc * tcos(torp->missile_dir);
-	torp->vel.y += acc * tsin(torp->missile_dir);
-	return;
-    }
-
-    acc = SMART_SHOT_ACC;
 
     if (shot->type == OBJ_HEAT_SHOT) {
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;

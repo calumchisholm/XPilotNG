@@ -493,7 +493,10 @@ static void Misc_object_update(void)
 	if (BIT(obj->type, OBJ_MINE))
 	    Update_mine(MINE_PTR(obj));
 
-	else if (BIT(obj->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT|OBJ_TORPEDO))
+	else if (BIT(obj->type, OBJ_TORPEDO))
+	    Update_torpedo(TORP_PTR(obj));
+
+	else if (BIT(obj->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT))
 	    Update_missile(MISSILE_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID)
