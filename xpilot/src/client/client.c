@@ -63,6 +63,7 @@ int			scoresChanged = 0;
 int			RadarHeight = 0;
 int			RadarWidth = 256;	/* must always be 256! */
 
+int     oldServer;
 ipos	pos;
 ipos	vel;
 ipos	world;
@@ -387,13 +388,13 @@ int Base_info_by_pos(int x, int y, int *idp, int *teamp)
 int Handle_base(int id, int ind)
 {
     int i;
-    
+
     if (ind < 0 || ind >= num_bases) {
         errno = 0;
         error("Bad homebase index (%d)", ind);
         return -1;
     }
-    
+
     for (i = 0; i < num_bases; i++) {
         if (bases[i].id == id) {
             bases[i].id = -1;
@@ -928,10 +929,6 @@ static int Map_init(void)
 	    bases[num_bases].pos = i;
 	    bases[num_bases].id = -1;
 	    bases[num_bases].team = type % 10;
-            bases[num_bases].bounds.x = (i / Setup->y) * BLOCK_SZ;
-            bases[num_bases].bounds.y = (i % Setup->y) * BLOCK_SZ;
-            bases[num_bases].bounds.w = BLOCK_SZ;
-            bases[num_bases].bounds.h = BLOCK_SZ;
             bases[num_bases].type = type - (type % 10);
 	    num_bases++;
 	    Setup->map_data[i] = type - (type % 10);
@@ -1462,9 +1459,10 @@ int Client_init(char *server, unsigned server_version)
 
 int Client_setup(void)
 {
-    if (Map_init() == -1) {
-	return -1;
-    }
+    if (oldServer)
+	if (Map_init() == -1) {
+	    return -1;
+	}
     Map_dots();
     Map_restore(0, 0, Setup->x, Setup->y);
     Map_blue(0, 0, Setup->x, Setup->y);
@@ -1574,7 +1572,7 @@ int Client_wrap_mode(void)
     return (BIT(Setup->mode, WRAP_PLAY) != 0);
 }
 
-int Check_client_fps(void) 
+int Check_client_fps(void)
 {
     if (oldMaxFPS != maxFPS) {
 	LIMIT(maxFPS, FPS / 2, FPS);

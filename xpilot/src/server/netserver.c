@@ -201,58 +201,25 @@ char *showtime(void)
 }
 
 /*
- * Compress the map data using a simple Run Length Encoding algorithm.
- * If there is more than one consecutive byte with the same type
- * then we set the high bit of the byte and then the next byte
- * gives the number of repetitions.
- * This works well for most maps which have lots of series of the
- * same map object and is simple enough to got implemented quickly.
- */
-static int Compress_map(unsigned char *map, int size)
-{
-    int			i, j, k;
-
-    for (i = j = 0; i < size; i++, j++) {
-	if (i + 1 < size
-	    && map[i] == map[i + 1]) {
-	    for (k = 2; i + k < size; k++) {
-		if (map[i] != map[i + k]) {
-		    break;
-		}
-		if (k == 255) {
-		    break;
-		}
-	    }
-	    map[j] = (map[i] | SETUP_COMPRESSED);
-	    map[++j] = k;
-	    i += k - 1;
-	} else {
-	    map[j] = map[i];
-	}
-    }
-    return j;
-}
-
-/*
  * Initialize the structure that gives the client information
  * about our setup.  Like the map and playing rules.
  * We only setup this structure once to save time when new
  * players log in during play.
  */
+int Polys_to_client(int *);
 static int Init_setup(void)
 {
-    int			i, x, y, team, type, size,
+    int			size;
+    unsigned char	*mapdata;
+# if 0
+    int                 i, x, y, team, type,
 			wormhole = 0,
 			treasure = 0,
 			target = 0,
 			base = 0,
 			cannon = 0;
-    unsigned char	*mapdata, *mapptr;
+    unsigned char	*mapptr;
 
-    if ((mapdata = (unsigned char *) malloc(World.x * World.y)) == NULL) {
-	error("No memory for mapdata");
-	return -1;
-    }
     memset(mapdata, SETUP_SPACE, World.x * World.y);
     mapptr = mapdata;
     errno = 0;
@@ -372,36 +339,17 @@ static int Init_setup(void)
 	    }
 	}
     }
-    if (compress_maps == 0) {
-	type = SETUP_MAP_UNCOMPRESSED;
-	size = World.x * World.y;
-    } else {
-	void Polys_to_client(int *ptr);
-	type = SETUP_MAP_ORDER_XY;
-	size = Compress_map(mapdata, World.x * World.y);
-	if (size <= 0 || size > World.x * World.y) {
-	    errno = 0;
-	    error("Map compression error (%d)", size);
-	    free(mapdata);
-	    return -1;
-	}
-	type = SETUP_MAP_XY_WITH_LINES;
-	size += 20000;
-	if ((mapdata = (unsigned char *)realloc(mapdata, size)) == NULL) {
-	    error("Cannot reallocate mapdata");
-	    return -1;
-	}
-	{
-	    int size2 = size / 4 * 4;
-	    Polys_to_client(mapdata + size2 - 19996);
-	}
+#endif
+    /* This could be sized dynamically !@# */
+    if ( (mapdata = (unsigned char *) malloc(1000000)) == NULL) {
+	error("No memory for mapdata");
+	return -1;
     }
 
+    size = Polys_to_client(mapdata);
+
 #ifndef SILENT
-    if (type != SETUP_MAP_UNCOMPRESSED) {
-	xpprintf("%s Map compression ratio is %-4.2f%%\n", showtime(),
-	    100.0 * size / (World.x * World.y));
-    }
+    xpprintf("%s Server->client map transfer size is %d bytes.\n", showtime(), size);
 #endif
     if ((Setup = (setup_t *) malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold setup");
@@ -413,7 +361,7 @@ static int Init_setup(void)
     free(mapdata);
     Setup->setup_size = ((char *) &Setup->map_data[0] - (char *) Setup) + size;
     Setup->map_data_len = size;
-    Setup->map_order = type;
+    Setup->map_order = SETUP_MAP_XY_WITH_LINES;
     Setup->frames_per_second = FPS;
     Setup->lives = World.rules->lives;
     Setup->mode = World.rules->mode;
@@ -1029,7 +977,7 @@ static int Handle_login(int ind)
 	}
 	else {
 	    Check_team_members(connp->team);
-	    if (World.teams[connp->team].NumMembers		
+	    if (World.teams[connp->team].NumMembers
 		>= World.teams[connp->team].NumBases) {
 		connp->team = TEAM_NOT_SET;
 	    }

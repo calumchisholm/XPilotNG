@@ -339,7 +339,8 @@ int Net_setup(void)
 		}
 		size = sizeof(setup_t) + Setup->x * Setup->y;
 		if (Setup->map_order == SETUP_MAP_XY_WITH_LINES)
-		    size += 20000;
+		    if (Setup->map_data_len > size)
+			size = Setup->map_data_len;
 		if ((Setup = (setup_t *) realloc(ptr, size)) == NULL) {
 		    error("No memory for setup and map");
 		    return -1;
@@ -411,19 +412,20 @@ int Net_setup(void)
 	}
     }
 
-    if (Setup->map_order == SETUP_MAP_XY_WITH_LINES) {
+    if (Setup->map_order != SETUP_MAP_XY_WITH_LINES)
+	oldServer = 1;
+    else {
 	int i, j, startx, starty;
 	int polyc;
 	int dx, dy, cx, cy, pc;
 	xp_polygon_t poly;
 	ipos *points, min, max;
-	int size2 = Setup->map_data_len / 4 * 4;
 	signed char *ptr;
 
-	size2 = size2 / 4 * 4;
-	ptr = Setup->map_data + size2 - 19996;
+	oldServer = 0;
+	ptr = Setup->map_data;
 	Setup->map_data_len -= 20000;
-	Setup->map_order = SETUP_MAP_ORDER_XY;
+	Setup->map_order = SETUP_MAP_UNCOMPRESSED;
 
 	polyc = (unsigned char)*ptr++ << 8;
 	polyc += (unsigned char)*ptr++;
@@ -458,13 +460,43 @@ int Net_setup(void)
 		points[j].x = dx;
 		points[j].y = dy;
 	    }
-	      poly.point_ptr = points;
-	      poly.num_point = pc;
-	      poly.bounds.x = min.x;
-	      poly.bounds.y = max.y;
-	      poly.bounds.w = max.x - min.x;
-	      poly.bounds.h = max.y - min.y;
-	      STORE(xp_polygon_t, polygon_ptr, num_polygon, max_polygon, poly);
+	    poly.point_ptr = points;
+	    poly.num_point = pc;
+	    poly.bounds.x = min.x;
+	    poly.bounds.y = max.y;
+	    poly.bounds.w = max.x - min.x;
+	    poly.bounds.h = max.y - min.y;
+	    STORE(xp_polygon_t, polygon_ptr, num_polygon, max_polygon, poly);
+	}
+	num_bases = *ptr++;
+	bases = (homebase_t *) malloc(num_bases * sizeof(homebase_t));
+	if (bases == NULL) {
+	    error("No memory for Map bases (%d)", num_bases);
+	    exit(1);
+	}
+	for (i = 0; i < num_bases; i++) {
+	    /* base.pos is not used */
+	    bases[i].id = -1;
+	    bases[i].team = *ptr++;
+	    cx = *ptr++ << 8;
+	    cx += (unsigned char)*ptr++;
+	    cy = *ptr++ << 8;
+	    cy += (unsigned char)*ptr++;
+            bases[i].bounds.x = cx - BLOCK_SZ / 2;
+            bases[i].bounds.y = cy - BLOCK_SZ / 2;
+            bases[i].bounds.w = BLOCK_SZ;
+            bases[i].bounds.h = BLOCK_SZ;
+	    if (*ptr < 16)
+		bases[i].type = SETUP_BASE_RIGHT;
+	    else if (*ptr < 48)
+		bases[i].type = SETUP_BASE_UP;
+	    else if (*ptr < 80)
+		bases[i].type = SETUP_BASE_LEFT;
+	    else if (*ptr < 112)
+		bases[i].type = SETUP_BASE_DOWN;
+	    else
+		bases[i].type = SETUP_BASE_RIGHT;
+	    ptr++;
 	}
     }
 
@@ -928,7 +960,7 @@ static int Net_packet(void)
 
 	if (receive_tbl[type] == NULL) {
 	    errno = 0;
-	    IFNWINDOWS(error("Received unknown packet type (%d, %d), dropping frame.", 
+	    IFNWINDOWS(error("Received unknown packet type (%d, %d), dropping frame.",
 			type, prev_type);)
 	    Sockbuf_clear(&rbuf);
 	    break;
@@ -1183,7 +1215,7 @@ int Net_input(void)
 	if ((i == receive_window_size - 1 && i > 0)
 #ifdef	_WINDOWS
 		|| drawPending
-		|| (ThreadedDraw && 
+		|| (ThreadedDraw &&
 				!WaitForSingleObject(dinfo.eventNotDrawing, 0) == WAIT_OBJECT_0)
 #endif
 		) {
@@ -1494,7 +1526,7 @@ static void Check_view_dimensions(void)
 	view_y_offset = (height_wanted - real_view_height) / 2;
     }
 }
-  
+
 
 /*
  * Receive the packet with counts for all the items.

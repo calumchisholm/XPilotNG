@@ -190,7 +190,8 @@ static unsigned short *Shape_lines(const wireobj *shape, int dir)
     foo[p] = 65535;
     return foo;
 }
-	
+
+
 static int Bounce_object(object *obj, struct move *move, int line, int point)
 {
     DFLOAT fx, fy;
@@ -200,7 +201,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
     group = linet[line >= linec ? point : line].group;
     type = groups[group].type;
 
-    if (obj->collmode == 1) { 
+    if (obj->collmode == 1) {
 	fx = ABS(obj->vel.x) + ABS(obj->vel.y);
 	/* If fx<1, there is practically no movement. Object
 	   collision detection can ignore the bounce. */
@@ -221,7 +222,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 	     * Ball has been replaced back in the hoop from whence
 	     * it came. The player must be from the same team as the ball,
 	     * otherwise Bounce_object() wouldn't have been called. It
-	     * should be replaced into the hoop without exploding and 
+	     * should be replaced into the hoop without exploding and
 	     * the player gets some points.
 	     */
 	    player	*pl = NULL;
@@ -800,7 +801,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone, const u
 	    continue;
 	if (0 > lsy + (ldy < 0 ? 0 : ldy))
 	    continue;
-	
+
 	lsx = CENTER_XCLICK(lsx);
 
 	if (ldx < 0) {
@@ -1172,7 +1173,7 @@ static int Shape_turn1(const wireobj *shape, int hitmask, int x, int y, int dir,
     }
     return 1;
 }
-	    
+
 
 /* This function should get called only rarely, so it doesn't need to
    be too efficient. */
@@ -1282,10 +1283,11 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 #include <netinet/in.h>
 #endif
 
-void Polys_to_client(char *ptr)
+int Polys_to_client(char *ptr)
 {
     int i, j, startx, starty, dx, dy, group;
     int *p = polygons;
+    char *start = ptr;
 
     *ptr++ = polyc >> 8;
     *ptr++ = polyc & 0xff;
@@ -1317,7 +1319,19 @@ void Polys_to_client(char *ptr)
 	    starty = dy >> CLICK_SHIFT;
 	}
     }
-    return;
+    *ptr++ = World.NumBases;
+    for (i = 0; i < World.NumBases; i++) {
+	if (World.base[i].team == TEAM_NOT_SET)
+	    *ptr++ = 0;
+	else
+	    *ptr++ = World.base[i].team;
+	*ptr++ = World.base[i].pos.x >> CLICK_SHIFT + 8;
+	*ptr++ = World.base[i].pos.x >> CLICK_SHIFT & 0xff;
+	*ptr++ = World.base[i].pos.y >> CLICK_SHIFT + 8;
+	*ptr++ = World.base[i].pos.y >> CLICK_SHIFT & 0xff;
+	*ptr++ = World.base[i].dir;
+    }
+    return ptr - start;
 }
 
 void Line_to_client(int *ptr)
@@ -1397,7 +1411,7 @@ static void Perturb(void)
 {
     int i, x, y, x2, y2;
 
-    for (i = 0; i < linec; i++) {	
+    for (i = 0; i < linec; i++) {
 	x = linet[i].start.x;
 	y = linet[i].start.y;
 	x2 = WRAP_XCLICK(linet[i].start.x + linet[i].delta.x);

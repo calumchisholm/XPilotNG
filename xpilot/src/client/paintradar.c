@@ -622,7 +622,7 @@ void Paint_world_radar(void)
 
 #define DBG if(0) printf
 
-  if (!num_polygon) {
+  if (oldServer) {
     Paint_world_radar_old();
     return;
   }
@@ -644,7 +644,7 @@ void Paint_world_radar(void)
 
   XSetForeground(dpy, radarGC, colors[wallRadarColor].pixel);
 
-  /* 
+  /*
    * The radar is drawn 9 times into different locations
    * so that polygons going over the world edge seem to
    * appear on the other side. The locations are like
@@ -687,7 +687,7 @@ void Paint_world_radar(void)
       }
 
       DBG("\n");
-      XFillPolygon(dpy, s_radar, radarGC, poly, polygon_ptr[i].num_point, 
+      XFillPolygon(dpy, s_radar, radarGC, poly, polygon_ptr[i].num_point,
                    Nonconvex, CoordModeOrigin);
     }
   }
@@ -697,7 +697,7 @@ void Paint_world_radar(void)
   if (s_radar == p_radar)
     XSetPlaneMask(dpy, radarGC,
                   AllPlanes&(~(dpl_2[0]|dpl_2[1])));
-  
+
   for (i = 0;; i++) {
     int dead_time, damage, xi, yi;
     if (Target_by_index(i, &xi, &yi, &dead_time, &damage) == -1) {

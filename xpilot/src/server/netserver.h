@@ -115,7 +115,6 @@ typedef struct {
     int                 rectype;                /* normal, saved or spectator */
 } connection_t;
 
-static int Compress_map(unsigned char *map, int size);
 static int Init_setup(void);
 static int Handle_listening(int ind);
 static int Handle_setup(int ind);

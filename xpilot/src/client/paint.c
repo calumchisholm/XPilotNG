@@ -232,7 +232,7 @@ void Paint_frame(void)
 	Rectangle_start();
 	Segment_start();
 
-        if (!num_polygon) {
+        if (oldServer) {
             Paint_vfuel();
             Paint_vdecor();
             Paint_vcannon();
@@ -319,7 +319,7 @@ void Paint_frame(void)
 	    w = 256 - x;
 	    h = RadarHeight - y;
 
-#ifndef	_WINDOWS	
+#ifndef	_WINDOWS
 	    XCopyArea(dpy, p_radar, radar, gc,
 		      0, 0, x, y, w, h);
 	    XCopyArea(dpy, p_radar, radar, gc,
@@ -329,7 +329,7 @@ void Paint_frame(void)
 	    XCopyArea(dpy, p_radar, radar, gc,
 		      x, y, w, h, 0, 0);
 #else
-	    Paint_world_radar();			  
+	    Paint_world_radar();
 #endif
 	}
     }
@@ -404,8 +404,8 @@ void Paint_score_background(int thisLine)
     } else {
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
 
-	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC, 
-				  0, 0, 
+	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
+				  0, 0,
 				  players_width, BG_IMAGE_HEIGHT); )
 
 	PaintBitmap(players, BM_SCORE_BG,
@@ -414,13 +414,13 @@ void Paint_score_background(int thisLine)
 		    0);
 
 	if (players_height > BG_IMAGE_HEIGHT + LOGO_HEIGHT) {
-	    XFillRectangle(dpy, players, scoreListGC, 
-			   0, BG_IMAGE_HEIGHT, 
+	    XFillRectangle(dpy, players, scoreListGC,
+			   0, BG_IMAGE_HEIGHT,
 			   players_width,
 			   players_height - (BG_IMAGE_HEIGHT + LOGO_HEIGHT));
 	}
-	PaintBitmap(players, BM_LOGO, 
-		    0, players_height - LOGO_HEIGHT, 
+	PaintBitmap(players, BM_LOGO,
+		    0, players_height - LOGO_HEIGHT,
 		    players_width, LOGO_HEIGHT,
 		    0);
 
@@ -475,9 +475,7 @@ void Paint_score_start(void)
 }
 
 
-void Paint_score_entry(int entry_num,
-		       other_t* other,
-		       bool best)
+void Paint_score_entry(int entry_num, other_t* other, bool best)
 {
     static char		raceStr[8], teamStr[4], lifeStr[8], label[MSG_LEN];
     static int		lineSpacing = -1, firstLine;
@@ -553,13 +551,13 @@ void Paint_score_entry(int entry_num,
 
 	if (!blockBitmaps) {
 	    XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
-	} else { 
+	} else {
 	    /*
-	    ** hm, this grey color is pretty, but am i guaranteed that there is 
+	    ** hm, this grey color is pretty, but am i guaranteed that there is
 	    ** 16 standard colors just because blockBitmaps = true?
 	    */
 	    XSetForeground(dpy, scoreListGC, colors[12].pixel);
-	}	
+	}
 	XDrawString(dpy, players, scoreListGC,
 		    SCORE_BORDER, thisLine,
 		    label, strlen(label));

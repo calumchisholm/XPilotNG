@@ -107,12 +107,12 @@ void Paint_vdecor(void)
 {
     int	i;
     bool last, more_y;
-    
+
     if (num_vdecor > 0) {
 	for (i = 0; i < num_vdecor; i++) {
 	    last = (i + 1 == num_vdecor);
 	    more_y = (vdecor_ptr[i].yi != vdecor_ptr[i + 1].yi);
-	    Gui_paint_decor(vdecor_ptr[i].x, vdecor_ptr[i].y, 
+	    Gui_paint_decor(vdecor_ptr[i].x, vdecor_ptr[i].y,
 			    vdecor_ptr[i].xi, vdecor_ptr[i].yi,
 			    vdecor_ptr[i].type, last, more_y);
 	}
@@ -126,7 +126,7 @@ static void Paint_background_dots(void)
     float dx, dy;
     int xi, yi;
     ipos min, max, count;
-    
+
     if (map_point_distance == 0) return;
 
     count.x = Setup->x / map_point_distance;
@@ -142,15 +142,15 @@ static void Paint_background_dots(void)
 
     max.x = (world.x + view_width) / dx;
     max.y = (world.y + view_height) / dy;
-    
+
     for (yi = min.y; yi <= max.y; yi++) {
         /*if (yi % count.y == 0) continue;*/
         for (xi = min.x; xi <= max.x; xi++) {
             /*if (xi % count.x == 0) continue;*/
 
             Gui_paint_decor_dot
-                (xi * dx - BLOCK_SZ / 2, 
-                 yi * dy - BLOCK_SZ / 2, 
+                (xi * dx - BLOCK_SZ / 2,
+                 yi * dy - BLOCK_SZ / 2,
                  map_point_size);
         }
     }
@@ -168,11 +168,11 @@ static void Compute_bounds(ipos *min, ipos *max, const irec *b)
     if (world.y > b->y + b->h) min->y++;
     max->y = (world.y + view_height - b->y) / Setup->height;
     if (world.y + view_height < b->y) max->y--;
-    
+
 }
 
 
-void Paint_objects(void) 
+void Paint_objects(void)
 {
     int i, xoff, yoff;
     ipos min, max;
@@ -190,17 +190,16 @@ void Paint_objects(void)
         }
     }
 
-    
     for (i = 0; i < num_bases; i++) {
 
         Compute_bounds(&min, &max, &bases[i].bounds);
-        
+
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {
                 Gui_paint_base
-                    (bases[i].bounds.x + xoff * Setup->width, 
-                     bases[i].bounds.y + yoff * Setup->height, 
-                     bases[i].id, bases[i].team, 
+                    (bases[i].bounds.x + xoff * Setup->width,
+                     bases[i].bounds.y + yoff * Setup->height,
+                     bases[i].id, bases[i].team,
                      bases[i].type);
             }
         }
@@ -209,12 +208,12 @@ void Paint_objects(void)
     for (i = 0; i < num_fuels; i++) {
 
         Compute_bounds(&min, &max, &fuels[i].bounds);
-        
+
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {
                 Gui_paint_fuel
-                    (fuels[i].bounds.x + xoff * Setup->width, 
-                     fuels[i].bounds.y + yoff * Setup->height, 
+                    (fuels[i].bounds.x + xoff * Setup->width,
+                     fuels[i].bounds.y + yoff * Setup->height,
                      fuels[i].fuel);
             }
         }
@@ -236,12 +235,12 @@ void Paint_objects(void)
  *     How does filled mode work?
  *     It's cunning.  It scans from left to right across an area 1 block deep.
  *     Say the map is :
- *     
+ *
  *     space       wall    space  w  s w
  *             /        |        / \  | |
  *            /         |        |  \ | |     <- Scanning this line
  *           /          |        |   \| |
- *     
+ *
  *     It starts from the left and determines if it's in wall or outside wall.
  *     If it is it sets tl and bl (top left and bottom left) to the left hand
  *     side of the window.
@@ -310,7 +309,7 @@ void Paint_world(void)
 			     world.x + view_width/2 + MAX_VIEW_SIZE/2,
 			     world.y + view_height/2 + MAX_VIEW_SIZE/2);
 
-    if (num_polygon) {
+    if (!oldServer) {
         Paint_background_dots();
         return;
     }
@@ -324,7 +323,7 @@ void Paint_world(void)
 	if (wallTileReady == 1) {
 	    wallTileDoit = true;
 	    XSetTile(dpy, gc, wallTile);
-	    XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), 
+	    XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x),
                          WINSCALE(realWorld.y));
 	}
     }
@@ -361,7 +360,7 @@ void Paint_world(void)
 
 		case SETUP_FILLED_NO_DRAW:
 		    if (BIT(instruments, SHOW_FILLED_WORLD|SHOW_TEXTURED_WALLS)
-			&& fill_top_left == -1 && !num_polygon) {
+			&& fill_top_left == -1 && oldServer) {
 			fill_top_left = fill_bottom_left = x;
 		    }
 		    break;
@@ -447,7 +446,7 @@ void Paint_world(void)
 		    if (BIT(instruments, SHOW_DECOR))
 			Handle_vdecor(x, y, xi, yi, type);
 		    break;
-		    
+
 		case SETUP_TARGET+0:
 		case SETUP_TARGET+1:
 		case SETUP_TARGET+2:
@@ -457,13 +456,13 @@ void Paint_world(void)
 		case SETUP_TARGET+6:
 		case SETUP_TARGET+7:
 		case SETUP_TARGET+8:
-		case SETUP_TARGET+9: 
+		case SETUP_TARGET+9:
 		    {
 			int damage, target, own;
-    			
+
 			if (Target_alive(xi, yi, &damage) != 0)
 			    break;
-			
+
 			target = type - SETUP_TARGET;
 			own = (self && (self->team == target));
 
@@ -485,10 +484,10 @@ void Paint_world(void)
 		    {
 			int	treasure;
 			bool	own;
-			
+
 			treasure = type - SETUP_TREASURE;
 			own = (self && self->team == treasure);
-			
+
 			Gui_paint_setup_treasure(x, y, treasure, own);
 		    }
 		    break;
@@ -497,7 +496,7 @@ void Paint_world(void)
 		    break;
 		}
 	    }
-	    else if (!num_polygon) {
+	    else if (oldServer) {
 		if (!BIT(instruments, SHOW_FILLED_WORLD|SHOW_TEXTURED_WALLS)) {
 		    Gui_paint_walls(x, y, type, xi, yi);
 

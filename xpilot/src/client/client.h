@@ -212,6 +212,7 @@ typedef struct {
 } selection_t;
 
 
+extern int      oldServer; /* Compatibility mode for old block-based servers */
 extern ipos	pos;
 extern ipos	vel;
 extern ipos	world;
