@@ -30,7 +30,7 @@
 #ifndef	VERSION_H
 #define	VERSION_H
 
-#define TITLE			"@XP_TITLE@"
+#define TITLE			"@PACKAGE_STRING@"
 #ifndef VERSION
 #  define VERSION		"@VERSION@"
 #endif
