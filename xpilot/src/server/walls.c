@@ -2780,13 +2780,11 @@ void Move_object_new(object *obj)
     obj->extmove.cy = mv.delta.cy;
     while (mv.delta.cx || mv.delta.cy) {
 	if (!trycount--) {
-#if 0
 	    sprintf(msg, "COULDN'T MOVE OBJECT!!!! Type = %s, x = %d, y = %d. "
 		    "Object was DELETED. [*DEBUG*]",
 		    Object_typename(obj), mv.start.cx, mv.start.cy);
 	    warn(msg);
 	    Set_message(msg);
-#endif
 	    obj->life = 0;
 	    return;
 	}
