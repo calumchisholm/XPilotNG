@@ -552,6 +552,19 @@ bool Target_hit_func(struct group *group, struct move *move)
 }
 #endif
 
+
+void Wormhole_remove_from_map(int ind)
+{
+    wormhole_t		*wormhole = &World.wormHoles[ind];
+    int			bx, by;
+
+    bx = CLICK_TO_BLOCK(wormhole->pos.cx);
+    by = CLICK_TO_BLOCK(wormhole->pos.cy);
+    World.block[bx][by] = SPACE;
+    Map_set_itemid(bx, by, -1);
+}
+
+
 void Team_immunity_init(void)
 {
     P_grouphack(CANNON, Cannon_set_hitmask);
@@ -564,3 +577,4 @@ void Groups_init(void)
     Target_init();
     Team_immunity_init();
 }
+

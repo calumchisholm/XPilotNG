@@ -151,7 +151,7 @@ void hexdump(void *p, size_t size)
 }
 
 /* kps - tmp hacks to get rid of explicit refrences to World.itemID */
-static void Map_set_itemid(int x, int y, int ind)
+void Map_set_itemid(int x, int y, int ind)
 {
     if (x < 0 || x >= World.x || y < 0 || y >= World.y)
 	return;
@@ -538,14 +538,8 @@ static void Verify_wormhole_consistency(void)
 	int i;
 	
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
-	for (i = 0; i < World.NumWormholes; i++) {
-	    int bx, by;
-	    
-	    bx = CLICK_TO_BLOCK(World.wormHoles[i].pos.cx);
-	    by = CLICK_TO_BLOCK(World.wormHoles[i].pos.cy);
-	    World.block[bx][by] = SPACE;
-	    Map_set_itemid(bx, by, -1);
-	}
+	for (i = 0; i < World.NumWormholes; i++)
+	    Wormhole_remove_from_map(i);
 	World.NumWormholes = 0;
     }
     

@@ -114,6 +114,7 @@ bool Grok_map(void);
 bool Grok_map_options(void);
 
 int Map_get_itemid(int x, int y);
+void Map_set_itemid(int x, int y, int ind);
 int Map_place_cannon(int cx, int cy, int dir, int team);
 int Map_place_base(int cx, int cy, int dir, int team);
 int Map_place_fuel(int cx, int cy, int team);
@@ -236,6 +237,7 @@ void Target_init(void);
 void Target_restore_on_map(int ind);
 void Target_remove_from_map(int ind);
 bool Target_hit_func(struct group *group, struct move *move);
+void Wormhole_remove_from_map(int ind);
 void Team_immunity_init(void);
 void Groups_init(void);
 void Delete_shot(int ind);
