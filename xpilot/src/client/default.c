@@ -321,7 +321,7 @@ option options[] = {
     {
 	"turnResistance",
 	NULL,
-	"0.12",
+	"0",
 	KEY_DUMMY,
 	"Set the ship's turn resistance.\n"
 	"This determines the speed at which a ship stops turning\n"
@@ -349,7 +349,7 @@ option options[] = {
     {
 	"altTurnResistance",
 	NULL,
-	"0.12",
+	"0",
 	KEY_DUMMY,
 	"Set the alternate ship's turn resistance.\n"
 	"See also the keySwapSettings option.\n"
