@@ -26,9 +26,9 @@
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
-#else
-/* If we are not using autoconf, we do the best we can. */
-# define STDC_HEADERS 1
+#endif
+
+#ifdef _WINDOWS
 # define HAVE_ASSERT_H 1
 # define HAVE_CTYPE_H 1
 # define HAVE_ERRNO_H 1
@@ -41,53 +41,6 @@
 # define HAVE_STRING_H 1
 # define HAVE_SYS_STAT_H 1
 # define HAVE_SYS_TYPES_H 1
-# ifndef _WINDOWS
-#  define HAVE_PWD_H 1
-#  define HAVE_UNISTD_H 1
-#  define HAVE_ARPA_INET_H 1
-#  define HAVE_NETINET_IN_H 1
-#  define HAVE_NETINET_TCP_H 1
-#  define HAVE_NET_IF_H 1
-#  define HAVE_NETDB_H 1
-#  define HAVE_SYS_FILE_H 1
-#  define HAVE_SYS_IOCTL_H 1
-#  define HAVE_SYS_PARAM_H 1
-#  define HAVE_SYS_SELECT_H 1
-#  define HAVE_SYS_SOCKET_H 1
-#  ifdef _AIX
-#   ifndef _BSD_INCLUDES
-#    define _BSD_INCLUDES 1
-#   endif
-#  endif
-#  ifndef __hpux
-#   define TIME_WITH_SYS_TIME 1
-#  endif
-#  ifdef __linux__
-#   define HAVE_INTTYPES_H 1
-#  endif
-#  ifdef __FreeBSD__
-#   define HAVE_FLOAT_H 1
-#   define HAVE_SYS_INTTYPES_H 1    
-#  endif
-#  ifndef _SEQUENT_
-#   define HAVE_FCNTL_H 1
-#  else
-#   define HAVE_SYS_FCNTL_H 1
-#  endif
-#  ifdef __sgi
-#   define HAVE_BSTRING_H 1
-#   define HAVE_FLOAT_H 1
-#  endif
-#  ifdef __sun__
-#   define HAVE_ARPA_NAMESER_H 1
-#   define HAVE_RESOLV_H 1
-#   define HAVE_VALUES_H 1
-#  endif
-#  if defined(SVR4) || defined(__svr4__)
-#   define HAVE_SYS_FILIO_H 1
-#   define HAVE_SYS_SOCKIO_H 1
-#  endif
-# endif /* _WINDOWS */
 #endif
 
 #include <stdio.h>
