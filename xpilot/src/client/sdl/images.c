@@ -85,12 +85,12 @@ static void Image_free(image_t *img) {
     img->state = IMG_STATE_UNINITIALIZED;
 }
 
-image_t *Image_get(int index) {
+image_t *Image_get(int ind) {
 
     image_t *img;
 
-    if (index >= num_images) return NULL;
-    img = &images[index];
+    if (ind >= num_images) return NULL;
+    img = &images[ind];
     if (img == NULL) return NULL;
     if (img->state == IMG_STATE_UNINITIALIZED)
 	Image_init(img);
@@ -100,19 +100,19 @@ image_t *Image_get(int index) {
 }
 
 
-void Image_paint(int index, int x, int y, int frame)
+void Image_paint(int ind, int x, int y, int frame)
 {
-    Image_paint_area(index, x, y, frame, NULL);
+    Image_paint_area(ind, x, y, frame, NULL);
 }
 
 
-void Image_paint_area(int index, int x, int y, int frame, irec *r)
+void Image_paint_area(int ind, int x, int y, int frame, irec *r)
 {
     image_t *img;
     irec    whole;
     float   tx1, ty1, tx2, ty2;
 
-    img = Image_get(index);
+    img = Image_get(ind);
     if (img == NULL) return;
     if (r == NULL) {
 	whole.x = 0;
