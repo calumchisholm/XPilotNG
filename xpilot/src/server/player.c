@@ -1663,3 +1663,55 @@ bool Team_immune(int id1, int id2)
 
     return false;
 }
+
+static char *status2str(int status)
+{
+    static char buf[256];
+
+    buf[0] = '\0';
+
+    if (status & PLAYING)
+	strlcat(buf, "PLAYING ", sizeof(buf));
+    if (status & PAUSE)
+	strlcat(buf, "PAUSE ", sizeof(buf));
+    if (status & GAME_OVER)
+	strlcat(buf, "GAME_OVER ", sizeof(buf));
+    if (status & THRUSTING)
+	strlcat(buf, "THRUSTING ", sizeof(buf));
+    if (status & KILLED)
+	strlcat(buf, "KILLED ", sizeof(buf));
+
+    return buf;
+}
+
+static char *state2str(int state)
+{
+    static char buf[256];
+
+    buf[0] = '\0';
+
+    if (state == PL_STATE_UNDEFINED)
+	strlcat(buf, "PL_STATE_UNDEFINED", sizeof(buf));
+    if (state == PL_STATE_WAITING)
+	strlcat(buf, "PL_STATE_WAITING", sizeof(buf));
+    if (state == PL_STATE_APPEARING)
+	strlcat(buf, "PL_STATE_APPEARING", sizeof(buf));
+    if (state == PL_STATE_ALIVE)
+	strlcat(buf, "PL_STATE_ALIVE", sizeof(buf));
+    if (state == PL_STATE_KILLED)
+	strlcat(buf, "PL_STATE_KILLED", sizeof(buf));
+    if (state == PL_STATE_DEAD)
+	strlcat(buf, "PL_STATE_DEAD", sizeof(buf));
+    if (state == PL_STATE_PAUSED)
+	strlcat(buf, "PL_STATE_PAUSED", sizeof(buf));
+    if (state == PL_STATE_GAME_OVER)
+	strlcat(buf, "PL_STATE_GAME_OVER", sizeof(buf));
+
+    return buf;
+}
+
+void Player_print_state(player_t *pl, const char *funcname)
+{
+    warn("%-20s: %-16s (%c): %-20s %s ", funcname, pl->name, pl->mychar,
+	 state2str(pl->pl_state), status2str(pl->pl_status));
+}

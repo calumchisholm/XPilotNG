@@ -73,22 +73,23 @@
 /*
  * These values are set in the player->pl_state field.
  */
+#define PL_STATE_UNDEFINED	0
 /* pl_status = {GAME_OVER, [PLAYING]},    mychar = 'W' */
-#define PL_STATE_WAITING	0
+#define PL_STATE_WAITING	1
 /* pl_status = {},                        mychar = ' ' */
-#define PL_STATE_APPEARING	1
+#define PL_STATE_APPEARING	2
 /* pl_status = {PLAYING},                 mychar = ' ' */
-#define PL_STATE_PLAYING	2
+#define PL_STATE_ALIVE		3
 /* pl_status = {KILLED, ...},             mychar = ... */
 /* killed this frame */
-#define PL_STATE_KILLED		3
+#define PL_STATE_KILLED		4
 /* pl_status = {GAME_OVER, [PLAYING]},    mychar = 'D' */
 /* dead, waiting for next round */
-#define PL_STATE_DEAD 		4
+#define PL_STATE_DEAD 		5
 /* pl_status = {PAUSE},                   mychar = 'P' */
-#define PL_STATE_PAUSED 	5
+#define PL_STATE_PAUSED 	6
 /* pl_status = {GAME_OVER, [PLAYING]},    mychar = ' ' */
-#define PL_STATE_GAME_OVER	6
+#define PL_STATE_GAME_OVER	7
 
 /*
  * Different types of attributes a player can have.
@@ -425,7 +426,7 @@ static inline void Player_set_state(player_t *pl, int state)
 	break;
 
     case PL_STATE_APPEARING:
-    case PL_STATE_PLAYING:
+    case PL_STATE_ALIVE:
     case PL_STATE_GAME_OVER:
     default:
 	break;
@@ -583,5 +584,7 @@ static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
     } else
 	pl->float_dir = new_float_dir;
 }
+
+void Player_print_state(player_t *pl, const char *funcname);
 
 #endif
