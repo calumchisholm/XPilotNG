@@ -1253,7 +1253,7 @@ void Compute_game_status(void)
 			num_finished_players = 0,
 			num_race_over_players = 0,
 			num_waiting_players = 0,
-			position = 1,
+			pos = 1,
 			total_pts;
 	DFLOAT		pts;
 
@@ -1367,7 +1367,7 @@ void Compute_game_status(void)
 
 	    if (BIT(pl->status, RACE_OVER)) {
 		num_race_over_players++;
-		position++;
+		pos++;
 	    }
 	    else if (BIT(pl->status, FINISH)) {
 		if (pl->round > raceLaps)
@@ -1399,13 +1399,13 @@ void Compute_game_status(void)
 	     */
 
 	    /* Only play the sound for the first person to cross the finish */
-	    if (position == 1)
+	    if (pos == 1)
 		sound_play_all(PLAYER_WIN_SOUND);
 
 	    total_pts = 0;
 	    for (i = 0; i < num_finished_players; i++)
 		total_pts
-		    += (10 + 2 * num_active_players) >> (position - 1 + i);
+		    += (10 + 2 * num_active_players) >> (pos - 1 + i);
 	    pts = total_pts / num_finished_players;
 
 	    for (i = 0; i < NumPlayers; i++)  {
@@ -1424,10 +1424,10 @@ void Compute_game_status(void)
 				"scoring %.2f point%s.",
 				pl->name,
 				(num_finished_players == 1) ? "" : "jointly ",
-				position, pts,
+				pos, pts,
 				(pts == 1) ? "" : "s");
 			Set_message(msg);
-			sprintf(msg, "[Position %d%s]", position,
+			sprintf(msg, "[Position %d%s]", pos,
 				(num_finished_players == 1) ? "" : " (jointly)");
 			Score(pl, pts, pl->pos, msg);
 		    }
@@ -1436,7 +1436,7 @@ void Compute_game_status(void)
 				"%s finishes %sin position %d.",
 				pl->name,
 				(num_finished_players == 1) ? "" : "jointly ",
-				position);
+				pos);
 			Set_message(msg);
 		    }
 		}
@@ -1667,12 +1667,12 @@ void Compute_game_status(void)
 	     * must count how many treasures are missing, if there are any
 	     * the playing team (if any) wins.
 	     */
-	    int	i, treasures_destroyed;
+	    int	j, treasures_destroyed;
 
-	    for (treasures_destroyed = i = 0; i < MAX_TEAMS; i++)
-		treasures_destroyed += (World.teams[i].NumTreasures
-					- World.teams[i].NumEmptyTreasures
-					- World.teams[i].TreasuresLeft);
+	    for (treasures_destroyed = j = 0; j < MAX_TEAMS; j++)
+		treasures_destroyed += (World.teams[j].NumTreasures
+					- World.teams[j].NumEmptyTreasures
+					- World.teams[j].TreasuresLeft);
 	    if (treasures_destroyed)
 		Team_game_over(winning_team, " by staying in the game");
 	}

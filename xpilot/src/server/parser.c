@@ -219,9 +219,9 @@ static void Parser_dump_all(char *progname)
  * This is called when a client requests
  * to see the current server parameter list.
  */
-int Parser_list_option(int *index, char *buf)
+int Parser_list_option(int *ind, char *buf)
 {
-    int			i = *index;
+    int			i = *ind;
     option_desc		*options;
     int			option_count;
 

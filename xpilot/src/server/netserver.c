@@ -1624,8 +1624,8 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
  * Some functions may process requests from clients being
  * in different states.
  */
-int bytes[256];
-int bytes2;
+static int bytes[256];
+static int bytes2;
 int recSpecial;
 
 static void Handle_input(int fd, void *arg)
@@ -3254,17 +3254,17 @@ static int Receive_motd(connection_t *connp)
     unsigned char	ch;
     long		offset;
     int			n;
-    long		bytes;
+    long		nbytes;
 
     if ((n = Packet_scanf(&connp->r,
 			  "%c%ld%ld",
-			  &ch, &offset, &bytes)) <= 0) {
+			  &ch, &offset, &nbytes)) <= 0) {
 	if (n == -1)
 	    Destroy_connection(connp, "read error");
 	return n;
     }
     connp->motd_offset = offset;
-    connp->motd_stop = offset + bytes;
+    connp->motd_stop = offset + nbytes;
 
     return 1;
 }
