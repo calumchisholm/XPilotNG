@@ -203,21 +203,19 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
  */
 
 /* Create debris particles */
-void Make_debris(
-    /* pos            */ clpos  pos,
-    /* vel            */ vector vel,
-    /* owner id       */ int    id,
-    /* owner team     */ int    team,
-    /* type           */ int    type,
-    /* mass           */ double  mass,
-    /* status         */ long   status,
-    /* color          */ int    color,
-    /* radius         */ int    radius,
-    /* num debris     */ int    num_debris,
-    /* min,max dir    */ int    min_dir,    int    max_dir,
-    /* min,max speed  */ double min_speed,  double max_speed,
-    /* min,max life   */ double min_life,   double max_life
-)
+void Make_debris(clpos pos,
+		 vector vel,
+		 int owner_id,
+		 int owner_team,
+		 int type,
+		 double mass,
+		 long status,
+		 int color,
+		 int radius,
+		 int num_debris,
+		 int min_dir, int max_dir,
+		 double min_speed, double max_speed,
+		 double min_life, double max_life)
 {
     object		*debris;
     int			i;
@@ -254,8 +252,8 @@ void Make_debris(
 	    break;
 
 	debris->color = color;
-	debris->id = id;
-	debris->team = team;
+	debris->id = owner_id;
+	debris->team = owner_team;
 	Object_position_init_clpos(debris, pos);
 	dir = MOD2(min_dir + (int)(rfrac() * (max_dir - min_dir)), RES);
 	dirplus = MOD2(dir + 1, RES);

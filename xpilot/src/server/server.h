@@ -603,35 +603,31 @@ void do_lose_item(player *pl);
 void Update_torpedo(torpobject *torp);
 void Update_missile(missileobject *shot);
 void Update_mine(mineobject *mine);
-void Make_debris(
-    /* pos            */ clpos  pos,
-    /* vel            */ vector vel,
-    /* owner id       */ int    id,
-    /* owner team     */ int    team,
-    /* type           */ int    type,
-    /* mass           */ double mass,
-    /* status         */ long   status,
-    /* color          */ int    color,
-    /* radius         */ int    radius,
-    /* num debris     */ int    num_debris,
-    /* min,max dir    */ int    min_dir,    int    max_dir,
-    /* min,max speed  */ double min_speed,  double max_speed,
-    /* min,max life   */ double min_life,   double max_life
-    );
-void Make_wreckage(
-    /* pos            */ clpos  pos,
-    /* vel            */ vector vel,
-    /* owner id       */ int    id,
-    /* owner team     */ int    team,
-    /* min,max mass   */ double min_mass,   double max_mass,
-    /* total mass     */ double total_mass,
-    /* status         */ long   status,
-    /* color          */ int    color,
-    /* max wreckage   */ int    max_wreckage,
-    /* min,max dir    */ int    min_dir,    int    max_dir,
-    /* min,max speed  */ double min_speed,  double max_speed,
-    /* min,max life   */ double min_life,   double max_life
-    );
+void Make_debris(clpos  pos,
+		 vector vel,
+		 int    owner_id,
+		 int    owner_team,
+		 int    type,
+		 double mass,
+		 long   status,
+		 int    color,
+		 int    radius,
+		 int    num_debris,
+		 int    min_dir,    int    max_dir,
+		 double min_speed,  double max_speed,
+		 double min_life,   double max_life);
+void Make_wreckage(clpos  pos,
+		   vector vel,
+		   int    owner_id,
+		   int    owner_team,
+		   double min_mass,   double max_mass,
+		   double total_mass,
+		   long   status,
+		   int    color,
+		   int    max_wreckage,
+		   int    min_dir,    int    max_dir,
+		   double min_speed,  double max_speed,
+		   double min_life,   double max_life);
 void Make_item(clpos pos,
 	       vector vel,
 	       int item, int num_per_pack,

@@ -258,21 +258,19 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 
     World_remove_target(world, targ);
 
-    Make_debris(
-	/* pos            */ targ->pos,
-	/* vel            */ zero_vel,
-	/* owner id       */ NO_ID,
-	/* owner team	  */ targ->team,
-	/* kind           */ OBJ_DEBRIS,
-	/* mass           */ 4.5,
-	/* status         */ GRAVITY,
-	/* color          */ RED,
-	/* radius         */ 6,
-	/* num debris     */ (int)(75 + 75 * rfrac()),
-	/* min,max dir    */ 0, RES-1,
-	/* min,max speed  */ 20.0, 70.0,
-	/* min,max life   */ 10.0, 100.0
-	);
+    Make_debris(targ->pos,
+		zero_vel,
+		NO_ID,
+		targ->team,
+		OBJ_DEBRIS,
+		4.5,
+		GRAVITY,
+		RED,
+		6,
+		(int)(75 + 75 * rfrac()),
+		0, RES-1,
+		20.0, 70.0,
+		10.0, 100.0);
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < NumPlayers; j++) {
@@ -897,21 +895,19 @@ static void Bounce_player(player *pl, move_t *move, int line, int point)
 	if (cost) {
 #if 0
 	    int intensity = (int)(cost * wallBounceExplosionMult);
-	    Make_debris(
-		/* pos            */ pl->pos,
-		/* vel.x, vel.y   */ pl->vel,
-		/* owner id       */ pl->id,
-		/* owner team	  */ pl->team,
-		/* kind           */ OBJ_SPARK,
-		/* mass           */ 3.5,
-		/* status         */ GRAVITY | OWNERIMMUNE | FROMBOUNCE,
-		/* color          */ RED,
-		/* radius         */ 1,
-		/* num max debris */ (intensity>>1) + (intensity>>1) * rfrac(),
-		/* min,max dir    */ wall_dir - (RES/4), wall_dir + (RES/4),
-		/* min,max speed  */ 20, 20 + (intensity >> 2),
-		/* min,max life   */ 10, 10 + (intensity >> 1)
-		);
+	    Make_debris(pl->pos,
+			pl->vel,
+			pl->id,
+			pl->team,
+			OBJ_SPARK,
+			3.5,
+			GRAVITY | OWNERIMMUNE | FROMBOUNCE,
+			RED,
+			1,
+			(intensity>>1) + (intensity>>1) * rfrac(),
+			wall_dir - (RES/4), wall_dir + (RES/4),
+			20, 20 + (intensity >> 2),
+			10, 10 + (intensity >> 1));
 #endif
 	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {

@@ -55,37 +55,33 @@ void Thrust(player *pl)
 
     /* floor(tot_sparks + rfrac()) randomly rounds up or down to an integer,
      * so that the expectation value of the result is tot_sparks */
-    Make_debris(
-	/* pos.x, pos.y   */ pos,
-	/* vel.x, vel.y   */ pl->vel,
-	/* owner id       */ pl->id,
-	/* owner team	  */ pl->team,
-	/* kind           */ OBJ_SPARK,
-	/* mass           */ THRUST_MASS,
-	/* status         */ GRAVITY | OWNERIMMUNE,
-	/* color          */ RED,
-	/* radius         */ 8,
-	/* num debris     */ (int)((tot_sparks-alt_sparks) + rfrac()),
-	/* min,max dir    */ min_dir, max_dir,
-	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3.0, max_life
-	);
+    Make_debris(pos,
+		pl->vel,
+		pl->id,
+		pl->team,
+		OBJ_SPARK,
+		THRUST_MASS,
+		GRAVITY | OWNERIMMUNE,
+		RED,
+		8,
+		(int)((tot_sparks-alt_sparks) + rfrac()),
+		min_dir, max_dir,
+		1.0, max_speed,
+		3.0, max_life);
 
-    Make_debris(
-	/* pos.x, pos.y   */ pos,
-	/* vel.x, vel.y   */ pl->vel,
-	/* owner id       */ pl->id,
-	/* owner team	  */ pl->team,
-	/* kind           */ OBJ_SPARK,
-	/* mass           */ THRUST_MASS * ALT_SPARK_MASS_FACT,
-	/* status         */ GRAVITY | OWNERIMMUNE,
-	/* color          */ BLUE,
-	/* radius         */ 8,
-	/* num debris     */ (int)(alt_sparks + rfrac()),
-	/* min,max dir    */ min_dir, max_dir,
-	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3.0, max_life
-	);
+    Make_debris(pos,
+		pl->vel,
+		pl->id,
+		pl->team,
+		OBJ_SPARK,
+		THRUST_MASS * ALT_SPARK_MASS_FACT,
+		GRAVITY | OWNERIMMUNE,
+		BLUE,
+		8,
+		(int)(alt_sparks + rfrac()),
+		min_dir, max_dir,
+		1.0, max_speed,
+		3.0, max_life);
 }
 
 void Record_shove(player *pl, player *pusher, long shove_time)
@@ -447,20 +443,18 @@ void Tank_handle_detach(player *pl)
 }
 
 
-void Make_wreckage(
-    /* pos              */ clpos  pos,
-    /* vel              */ vector vel,
-    /* owner id         */ int    id,
-    /* owner team	*/ int    team,
-    /* min,max mass     */ double min_mass,     double max_mass,
-    /* total mass       */ double total_mass,
-    /* status           */ long   status,
-    /* color            */ int    color,
-    /* max wreckage     */ int    max_wreckage,
-    /* min,max dir      */ int    min_dir,      int    max_dir,
-    /* min,max speed    */ double min_speed,    double max_speed,
-    /* min,max life     */ double min_life,     double max_life
-)
+void Make_wreckage(clpos  pos,
+		   vector vel,
+		   int    owner_id,
+		   int    owner_team,
+		   double min_mass,     double max_mass,
+		   double total_mass,
+		   long   status,
+		   int    color,
+		   int    max_wreckage,
+		   int    min_dir,      int    max_dir,
+		   double min_speed,    double max_speed,
+		   double min_life,     double max_life)
 {
     wireobject		*wreckage;
     int			i, size;
@@ -506,8 +500,8 @@ void Make_wreckage(
 	    break;
 
 	wreckage->color = color;
-	wreckage->id = id;
-	wreckage->team = team;
+	wreckage->id = owner_id;
+	wreckage->team = owner_team;
 	wreckage->type = OBJ_WRECKAGE;
 
 	/* Position */
@@ -555,7 +549,7 @@ void Make_wreckage(
     }
 }
 
-/* Explode a fighter */
+
 void Explode_fighter(player *pl)
 {
     int min_debris;
@@ -568,38 +562,33 @@ void Explode_fighter(player *pl)
     /* reduce debris since we also create wreckage objects */
     min_debris >>= 1; /* Removed *2.0 from range */
 
-    Make_debris(
-	/* pos            */ pl->pos,
-	/* vel            */ pl->vel,
-	/* owner id       */ pl->id,
-	/* owner team	  */ pl->team,
-	/* kind           */ OBJ_DEBRIS,
-	/* mass           */ 3.5,
-	/* status         */ GRAVITY,
-	/* color          */ RED,
-	/* radius         */ 8,
-	/* num debris     */ (int)(min_debris + debris_range * rfrac()),
-	/* min,max dir    */ 0, RES-1,
-	/* min,max speed  */ 20.0, 20.0 + pl->mass * 0.5,
-	/* min,max life   */ 5.0, 5.0 + pl->mass * 1.5
-	);
+    Make_debris(pl->pos,
+		pl->vel,
+		pl->id,
+		pl->team,
+		OBJ_DEBRIS,
+		3.5,
+		GRAVITY,
+		RED,
+		8,
+		(int)(min_debris + debris_range * rfrac()),
+		0, RES-1,
+		20.0, 20.0 + pl->mass * 0.5,
+		5.0, 5.0 + pl->mass * 1.5);
 
     if (!BIT(pl->status, KILLED))
 	return;
 
-    Make_wreckage(
-	/* pos.x, pos.y     */ pl->pos,
-	/* vel.x, vel.y     */ pl->vel,
-	/* owner id         */ pl->id,
-	/* owner team	    */ pl->team,
-	/* min,max mass     */ MAX(pl->mass/8.0, 0.33), pl->mass,
-	/* total mass       */ 2.0 * pl->mass,
-	/* status           */ GRAVITY,
-	/* color            */ WHITE,
-	/* max wreckage     */ 10,
-	/* min,max dir      */ 0, RES-1,
-	/* min,max speed    */ 10.0, 10.0 + pl->mass * 0.5,
-	/* min,max life     */ 5.0, 5.0 + pl->mass * 1.5
-	);
-
+    Make_wreckage(pl->pos,
+		  pl->vel,
+		  pl->id,
+		  pl->team,
+		  MAX(pl->mass/8.0, 0.33), pl->mass,
+		  2.0 * pl->mass,
+		  GRAVITY,
+		  WHITE,
+		  10,
+		  0, RES-1,
+		  10.0, 10.0 + pl->mass * 0.5,
+		  5.0, 5.0 + pl->mass * 1.5);
 }

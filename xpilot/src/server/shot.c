@@ -1153,17 +1153,17 @@ void Delete_shot(int ind)
 
 	    Make_debris(ball->prevpos,
 			ball->vel,
-			ball->id,			/* owner id */
-			ball->team,			/* owner team */
-			OBJ_DEBRIS,			/* kind */
-			DEBRIS_MASS,			/* mass */
-			GRAVITY,			/* status */
-			RED,				/* color */
-			8,				/* radius */
-			(int)(10 + 10 * rfrac()),	/* num debris */
-			0, RES - 1,			/* min, max dir */
-			10.0, 50.0,			/* min, max speed */
-			10.0, 54.0);			/* min, max life */
+			ball->id,
+			ball->team,
+			OBJ_DEBRIS,
+			DEBRIS_MASS,
+			GRAVITY,
+			RED,
+			8,
+			(int)(10 + 10 * rfrac()),
+			0, RES - 1,
+			10.0, 50.0,
+			10.0, 54.0);
 	}
 	break;
 	/* Shots related to a player. */
@@ -1257,17 +1257,16 @@ void Delete_shot(int ind)
 
 	Make_debris(shot->prevpos,
 		    shot->vel,
-		    shot->id,		/* owner id */
-		    shot->team,		/* owner team */
+		    shot->id,
+		    shot->team,
 		    type,
 		    mass,
 		    status,
 		    color,
-		    6,			/* radius */
+		    6,
 		    num_debris,
-		    0, RES - 1,		/* min, max dir */
-		    20 * speed_modv,	/* min, max speed */
-		    (intensity >> 2) * speed_modv,
+		    0, RES - 1,
+		    20 * speed_modv, (intensity >> 2) * speed_modv,
 		    min_life, max_life);
 	break;
 
