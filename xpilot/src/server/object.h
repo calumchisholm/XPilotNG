@@ -77,10 +77,11 @@
 #define CONFUSED		(1U<<3)
 #define FROMCANNON		(1U<<4)		/* Object from cannon */
 #define RECREATE		(1U<<5)		/* Recreate ball */
+#define THRUSTING		(1U<<6)		/* Engine is thrusting */
 #define OWNERIMMUNE		(1U<<7)		/* Owner is immune to object */
 #define NOEXPLOSION		(1U<<8)		/* No recreate explosion */
 #define COLLISIONSHOVE		(1U<<9)		/* Collision counts as shove */
-#define RANDOM_ITEM		(1U<<10)	/* item shows up as random */
+#define RANDOM_ITEM		(1U<<10)	/* Item shows up as random */
 
 /*
  * Weapons modifiers.

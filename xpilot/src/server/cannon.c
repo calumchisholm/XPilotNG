@@ -619,7 +619,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    /* FALLTHROUGH */
 	case 1:
 	    if (options.allowHeatSeekers
-		&& BIT(pl->pl_status, THRUSTING)) {
+		&& Player_is_thrusting(pl)) {
 		Fire_general_shot(world, NULL, c, c->team, c->pos,
 				  OBJ_HEAT_SHOT, dir, mods, pl->id);
 		sound_play_sensors(c->pos, FIRE_HEAT_SHOT_SOUND);

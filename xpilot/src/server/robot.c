@@ -1029,9 +1029,9 @@ static void Tank_play(player_t *pl)
     int		t = frame_loops % (TANK_NOTHRUST_TIME + TANK_THRUST_TIME);
 
     if (t == 0)
-	SET_BIT(pl->pl_status, THRUSTING);
+	Player_thrust(pl, true);
     else if (t == TANK_THRUST_TIME)
-	CLR_BIT(pl->pl_status, THRUSTING);
+	Player_thrust(pl, false);
 }
 
 void Robot_update(world_t *world)

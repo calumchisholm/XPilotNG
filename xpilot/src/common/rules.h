@@ -50,16 +50,13 @@
 #define CLIENT_RULES_MASK	(WRAP_PLAY|TEAM_PLAY|TIMING|LIMITED_LIVES|\
 				 ALLIANCES)
 /*
- * Possible object and player status bits.
- * Needed here because client needs them too.
+ * Player status bits.
  * The bits that the client needs must fit into a byte,
  * so the first 8 bitvalues are reserved for that purpose.
  */
-#define PLAYING			(1U<<0)		/* Not returning to base */
-#define PAUSE			(1U<<1) 	/* Must stay below 8 */
-#define THRUSTING		(1U<<3)		/* not used by client? */
-#define GAME_OVER		(1U<<2)		/* Must stay below 8 */
-#define WANT_AUDIO		(1U<<5)		/* whether client has SOUND */
+#define PLAYING			(1U<<0)		/* Ugly hack */
+#define PAUSE			(1U<<1) 	/* Player is paused */
+#define GAME_OVER		(1U<<2)		/* Ugly hack */
 
 typedef struct {
     int		lives;

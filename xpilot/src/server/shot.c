@@ -1572,7 +1572,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 	    pl = NULL;
 	    shot->count = HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR;
 	}
-	if (pl && BIT(pl->pl_status, THRUSTING)) {
+	if (pl && Player_is_thrusting(pl)) {
 	    /*
 	     * Target is thrusting,
 	     * set number to moves to correct error value
@@ -1599,7 +1599,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 		    player_t *pl_i = Player_by_index(i);
 		    clpos_t engine;
 
-		    if (!BIT(pl_i->pl_status, THRUSTING))
+		    if (!Player_is_thrusting(pl_i))
 			continue;
 
 		    engine = Ship_get_engine_clpos(pl_i->ship, pl_i->dir);

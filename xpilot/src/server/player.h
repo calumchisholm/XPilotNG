@@ -338,6 +338,7 @@ struct player {
     bool	muted;			/* player started is muted? */
     bool	isowner;		/* player started this server? */
     bool	isoperator;		/* player has operator privileges? */
+    bool	want_audio;		/* player wants audio from server */
 
     int		privs;			/* Player privileges */
 
@@ -356,9 +357,13 @@ int GetInd(int id);
 /* player was killed this frame ? */
 static inline bool Player_is_killed(player_t *pl)
 {
+#ifdef USE_PL_STATE
+    return pl->pl_state == PL_STATE_PAUSED ? true : false;
+#else
     if (BIT(pl->pl_status, KILLED))
 	return true;
     return false;
+#endif
 }
 
 /*
@@ -376,33 +381,27 @@ static inline player_t *Player_by_id(int id)
     return Player_by_index(GetInd(id));
 }
 
+static inline bool Player_is_waiting(player_t *pl)
+{
 #ifdef USE_PL_STATE
-static inline bool Player_is_waiting(player_t *pl)
-{
     return pl->pl_state == PL_STATE_WAITING ? true : false;
-}
 #else
-static inline bool Player_is_waiting(player_t *pl)
-{
     if (BIT(pl->pl_status, GAME_OVER) && pl->mychar == 'W')
 	return true;
     return false;
-}
 #endif
-
-#ifdef USE_PL_STATE
-static inline bool Player_is_paused(player_t *pl)
-{
-    return pl->pl_state == PL_STATE_PAUSED ? true : false;
 }
-#else
+
 static inline bool Player_is_paused(player_t *pl)
 {
+#ifdef USE_PL_STATE
+    return pl->pl_state == PL_STATE_PAUSED ? true : false;
+#else
     if (BIT(pl->pl_status, PAUSE))
 	return true;
     return false;
-}
 #endif
+}
 
 static inline void Player_set_state(player_t *pl, int state)
 {
@@ -431,6 +430,21 @@ static inline void Player_set_state(player_t *pl, int state)
     default:
 	break;
     }
+}
+
+static inline void Player_thrust(player_t *pl, bool on)
+{
+    if (on)
+	SET_BIT(pl->obj_status, THRUSTING);
+    else
+	CLR_BIT(pl->obj_status, THRUSTING);
+}
+
+static inline bool Player_is_thrusting(player_t *pl)
+{
+    if (BIT(pl->obj_status, THRUSTING))
+	return true;
+    return false;
 }
 
 static inline bool Player_is_self_destructing(player_t *pl)
@@ -507,7 +521,6 @@ static inline bool Player_used_emergency_shield(player_t *pl)
 	return true;
     return false;
 }
-
 
 static inline bool Player_is_playing(player_t *pl)
 {

@@ -67,7 +67,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	|| (options.laserIsStunGun == true
 	    && options.allowLaserModifiers == false)) {
 	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
-	    || BIT(pl->pl_status, THRUSTING)) {
+	    || Player_is_thrusting(pl)) {
 	    if (kp)
 		Set_message_f("%s got paralysed by %s's stun laser.%s",
 			      pl->name, kp->name,
@@ -77,7 +77,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 
 	    CLR_BIT(pl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
-	    CLR_BIT(pl->pl_status, THRUSTING);
+	    Player_thrust(pl, false);
 	    pl->stunned += 5;
 	}
     } else if (BIT(pulse->mods.laser, BLIND)) {

@@ -839,7 +839,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
 		    Autopilot(pl, false);
-		SET_BIT(pl->pl_status, THRUSTING);
+		Player_thrust(pl, true);
 		break;
 
 	    case KEY_CLOAK:
@@ -947,7 +947,7 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
 		    Autopilot(pl, false);
-		CLR_BIT(pl->pl_status, THRUSTING);
+		Player_thrust(pl, false);
 		break;
 
 	    case KEY_REPROGRAM:

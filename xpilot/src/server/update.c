@@ -240,7 +240,7 @@ void Emergency_shield (player_t *pl, bool on)
  */
 void Autopilot(player_t *pl, bool on)
 {
-    CLR_BIT(pl->pl_status, THRUSTING);
+    Player_thrust(pl, false);
     if (on) {
 	pl->auto_power_s = pl->power;
 	pl->auto_turnspeed_s = pl->turnspeed;
@@ -400,7 +400,7 @@ static void do_Autopilot (player_t *pl)
      * will impart some sideways velocity.
      */
     if (pl->turnspeed != turnspeed && vad > RES/32) {
-	CLR_BIT(pl->pl_status, THRUSTING);
+	Player_thrust(pl, false);
 	return;
     }
 
@@ -409,9 +409,9 @@ static void do_Autopilot (player_t *pl)
      * we don't want to over thrust.
      */
     if (pl->power > power)
-	CLR_BIT(pl->pl_status, THRUSTING);
+	Player_thrust(pl, false);
     else
-	SET_BIT(pl->pl_status, THRUSTING);
+	Player_thrust(pl, true);
 }
 
 
@@ -605,7 +605,7 @@ static void Use_items(player_t *pl)
 
     if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	if (pl->fuel.sum > 0
-	    && BIT(pl->pl_status, THRUSTING)
+	    && Player_is_thrusting(pl)
 	    && (pl->emergency_thrust_left -= timeStep) <= 0) {
 	    if (pl->item[ITEM_EMERGENCY_THRUST])
 		Emergency_thrust(pl, true);
@@ -868,7 +868,7 @@ static void Update_players(world_t *world)
 
 	if (pl->fuel.sum <= 0) {
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_CLOAKING_DEVICE|HAS_DEFLECTOR);
-	    CLR_BIT(pl->pl_status, THRUSTING);
+	    Player_thrust(pl, false);
 	}
 	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))
 	    CLR_BIT(pl->used, HAS_REFUEL);
@@ -876,7 +876,7 @@ static void Update_players(world_t *world)
 	/*
 	 * Update acceleration vector etc.
 	 */
-	if (BIT(pl->pl_status, THRUSTING)) {
+	if (Player_is_thrusting(pl)) {
 	    double power = pl->power;
 	    double f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
 	    int a = (BIT(pl->used, HAS_EMERGENCY_THRUST)
@@ -1030,7 +1030,7 @@ static void Update_players(world_t *world)
 
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || options.cloakedExhaust)
 	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {
-	    if (BIT(pl->pl_status, THRUSTING))
+	    if (Player_is_thrusting(pl))
   		Thrust(pl);
 	}
 
@@ -1080,7 +1080,7 @@ void Update_objects(world_t *world)
 		pl->stunned = 0;
 	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
 	    pl->did_shoot = false;
-	    CLR_BIT(pl->pl_status, THRUSTING);
+	    Player_thrust(pl, false);
 	}
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(pl);
