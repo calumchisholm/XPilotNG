@@ -583,8 +583,9 @@ void Explode_fighter(player *pl)
 	/* min,max life   */ 5, 5 + (pl->mass * 1.5)
 	);
 
-    if ( !BIT(pl->status, KILLED) )
+    if (!BIT(pl->status, KILLED))
 	return;
+
     Make_wreckage(
 	/* pos.x, pos.y     */ pl->pos,
 	/* vel.x, vel.y     */ pl->vel,
