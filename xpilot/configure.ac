@@ -4,7 +4,8 @@ AC_INIT(xpilot, 4.5.4X)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
-dnl AC_CONFIG_AUX_DIR(config)
+AC_CONFIG_AUX_DIR(config)
+dnl AC_CANONICAL_HOST
 
 dnl  Checks for programs.
 AC_PROG_CC
@@ -25,32 +26,30 @@ AC_PATH_XTRA
 
 dnl  Checks for header files.
 AC_HEADER_STDC
-dnl AC_HEADER_TIME
-dnl AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h limits.h memory.h netdb.h netinet/in.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h])
+AC_HEADER_TIME
+dnl AC_HEADER_STDBOOL
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h limits.h memory.h netdb.h netinet/in.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h])
 
 dnl  Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 AC_C_VOLATILE
-dnl AC_TYPE_MODE_T
-dnl AC_TYPE_SIGNAL
+AC_TYPE_MODE_T
+AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
-dnl AC_STRUCT_TM
+AC_STRUCT_TM
 
 dnl  Checks for library functions.
-dnl AC_FUNC_MEMCMP
-dnl AC_FUNC_SELECT_ARGTYPES
-dnl AC_FUNC_STRFTIME
-dnl AC_FUNC_VPRINTF
-dnl AC_FUNC_ERROR_AT_LINE
-dnl AC_FUNC_MALLOC
-dnl AC_FUNC_REALLOC
-dnl AC_FUNC_SETVBUF_REVERSED
-dnl AC_FUNC_STAT
-dnl AC_FUNC_STRTOD
-dnl AC_HEADER_STDBOOL
-
-dnl AC_CHECK_FUNCS([alarm bzero floor gethostbyaddr gethostbyname gethostname gettimeofday inet_ntoa isascii memchr memmove memset mkdir pow rint select socket sqrt strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul])
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_FUNC_MEMCMP
+AC_FUNC_SELECT_ARGTYPES
+AC_FUNC_SETVBUF_REVERSED
+AC_FUNC_STAT
+AC_FUNC_STRFTIME
+AC_FUNC_STRTOD
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([alarm floor gethostbyaddr gethostbyname gethostname gettimeofday inet_ntoa isascii memchr memmove memset mkdir pow rint select socket sqrt strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul])
 
 AC_CONFIG_FILES([Makefile \
 	lib/Makefile \

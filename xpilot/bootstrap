@@ -1,9 +1,13 @@
 #! /bin/sh
 
+#
+# Use this script to create the configure script and some other files.
+#
+
 set -x
+mkdir config
 touch NEWS README AUTHORS ChangeLog
-#aclocal -I config
-aclocal
+aclocal -I config
 autoheader
 automake --gnu --add-missing --copy
 autoconf
