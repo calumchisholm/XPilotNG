@@ -169,7 +169,7 @@ static bool setShipShapeFile(xp_option_t *opt, const char *value)
 
 static char *getShipShapeFile(xp_option_t *opt)
 {
-    return shipShapeSetting;
+    return shipShapeFileSetting;
 }
 
 static bool setPower(xp_option_t *opt, double val)
