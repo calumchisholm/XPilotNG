@@ -250,15 +250,9 @@ void ButtonPress_event(XEvent *event)
 	|| event->xbutton.window == talkWindow) {
         if (pointerControl
 	    && !talk_mapped
-	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
-	    int i;
-	    for (i = 0;
-		 i < (int)NUM_BUTTON_DEFS(event->xbutton.button - 1);
-		 i++) {
-	    	if (Key_press(buttonDefs[event->xbutton.button - 1][i]))
-		    Net_key_change();
-	    }
-	}
+	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
+	    Pointer_button_pressed(event->xbutton.button);
+
 #ifndef _WINDOWS
 	else if (selectionAndHistory) {
 	    switch (event->xbutton.button) {
@@ -320,15 +314,9 @@ int ButtonRelease_event(XEvent *event)
 
         if (pointerControl
 	    && !talk_mapped
-	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
-	    int i;
-	    for (i = 0;
-		 i < (int)NUM_BUTTON_DEFS(event->xbutton.button - 1);
-		 i++) {
-	    	if (Key_release(buttonDefs[event->xbutton.button - 1][i]))
-		    Net_key_change();
-	    }
-	}
+	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
+	    Pointer_button_released(event->xbutton.button);
+
 #ifndef _WINDOWS
 	else if (!selectionAndHistory)
 	    return 0;

@@ -654,8 +654,12 @@ extern long		time_left;
 extern bool roundend;
 extern bool played_this_round;
 
-/* event.c */
+/*
+ * event.c
+ */
 void Pointer_control_set_state(bool on);
+void Pointer_button_pressed(int button);
+void Pointer_button_released(int button);
 int Key_init(void);
 int Key_update(void);
 bool Key_press(keys_t key);
@@ -670,12 +674,19 @@ void Set_auto_shield(bool on);
 void Set_toggle_shield(bool on);
 void Talk_set_state(bool on);
 
+/*
+ * messages.c
+ */
 int Alloc_msgs(void);
 void Free_msgs(void);
 void Add_message(const char *message);
 void Add_pending_messages(void);
 void Add_roundend_messages(other_t **order);
 void Print_messages_to_stdout(void);
+
+/*
+ * client.c
+ */
 double Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, double *damage);
 int Target_by_index(int ind, int *xp, int *yp, int *dead_time, double *damage);

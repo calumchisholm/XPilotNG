@@ -380,6 +380,37 @@ void Set_toggle_shield(bool on)
     }
 }
 
+/*
+ * Function to call when a button of a pointing device has been pressed.
+ * Argument 'button' should be 1 for the first pointer button, etc.
+ */
+void Pointer_button_pressed(int button)
+{
+    int i, b_index = button - 1;
+
+    if (button < 1 || button > MAX_POINTER_BUTTONS)
+	return;
+
+    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++) {
+	if (Key_press(buttonDefs[b_index][i]))
+	    Net_key_change();
+    }
+}
+
+void Pointer_button_released(int button)
+{
+    int i, b_index = button - 1;
+
+    if (button < 1 || button > MAX_POINTER_BUTTONS)
+	return;
+
+    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++) {
+	if (Key_release(buttonDefs[b_index][i]))
+	    Net_key_change();
+    }
+}
+
+
 #ifdef OPTIONHACK
 
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
