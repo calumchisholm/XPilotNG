@@ -450,7 +450,7 @@ void Rank_get_saved_score(player *pl)
 
     for (i = 0; i < MAX_SCORES; i++) {
 	score = &scores[i];
-	if ( strcmp(pl->name, score->nick) == 0 )
+	if ( strcasecmp(pl->name, score->nick) == 0 )
 	    if ( score->pl == 0 ) {
 		/* Ok, found it. */
 		score->pl = pl;
