@@ -77,7 +77,7 @@ double rfrac(void)
      * Return a pseudo-random value in the range { 0.0 <= x < 1.0 }.
      * Use randomMT() which returns a 32 bit PRN and multiply by 1/(1<<32).
      */
-    return (double) randomMT() * 0.00000000023283064365386962890625;
+    return (double) (randomMT() * 0.00000000023283064365386962890625);
 }
 
 
