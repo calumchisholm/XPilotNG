@@ -3132,6 +3132,17 @@ static option_desc opts[] = {
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"survivalScore",
+	"survivalScore",
+	"0.0",
+	&options.survivalScore,
+	valReal,
+	tuner_dummy,
+	"Multiplicator for quadratic score increase over time \n"
+        "survived with lowered shield",
+ 	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"pauseTax",
 	"pauseTax",
 	"0.0",

@@ -44,9 +44,9 @@ typedef struct ranknode {
     int ballsCashed, ballsSaved;
     int ballsWon, ballsLost;
     double bestball;
-
     double score;
     player_t *pl;
+    double max_survival_time;
 } ranknode_t;
 
 bool Rank_get_stats(const char *name, char *buf, size_t size);
@@ -132,6 +132,22 @@ static inline void Rank_ballrun(player_t *pl, double tim)
 	    pl->rank->bestball = tim;
     }
 }
+
+static inline void Rank_survival(player_t *pl, double tim)
+{
+    if (pl->rank) {
+        if (pl->rank->max_survival_time == 0
+            || tim > pl->rank->max_survival_time)
+	    pl->rank->max_survival_time = tim;
+    }
+}
+
+
+static inline double Rank_get_max_survival_time(player_t *pl)
+{
+    return pl->rank ? pl->rank->max_survival_time : 0;
+}
+
 
 static inline double Rank_get_best_ballrun(player_t *pl)
 {

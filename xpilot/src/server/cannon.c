@@ -453,18 +453,23 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	player_t *pl = Player_by_index(i);
 	double tdist, tdx, tdy;
 
+        /* KHS: cannon dodgers mode:               */
+	/* Cannons fire on players in any range    */
 	tdx = WRAP_DCX(pl->pos.cx - c->pos.cx) / CLICK;
-	if (ABS(tdx) >= visualrange)
-	    continue;
+	if (ABS(tdx) >= visualrange
+	    && options.survivalScore == 0.0)
+ 	    continue;
 	tdy = WRAP_DCY(pl->pos.cy - c->pos.cy) / CLICK;
-	if (ABS(tdy) >= visualrange)
+	if (ABS(tdy) >= visualrange
+	    && options.survivalScore == 0.0)
 	    continue;
 	tdist = LENGTH(tdx, tdy);
-	if (tdist > visualrange)
+	if (tdist > visualrange
+	    && options.survivalScore == 0.0)
 	    continue;
 
 	/* mode 3 also checks if a player is using a phasing device */
-	if (!Player_is_alive(pl)
+	if (Player_is_paused(pl)
 	    || (BIT(world->rules->mode, TEAM_PLAY)
 		&& pl->team == c->team)
 	    || ((pl->forceVisible <= 0)
@@ -481,7 +486,11 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	    break;
 	default:
 	case 1:
-	    if (tdist < range)
+	    
+	    /* KHS disable this range check, too */
+            /* in cannon dodgers */
+	    if (tdist < range 
+		|| options.survivalScore != 0.0)
 		ready = true;
 	    break;
 	case 2:

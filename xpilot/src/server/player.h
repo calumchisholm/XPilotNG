@@ -245,6 +245,7 @@ typedef struct player {
     int		last_lap_time;		/* What was your last pass? */
     int		last_check_dir;		/* player dir at last checkpoint */
     long	last_wall_touch;	/* last time player touched a wall */
+    double      survival_time;          /* time player has survived unshielded*/
 
     base_t	*home_base;
     struct {

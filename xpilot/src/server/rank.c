@@ -196,6 +196,7 @@ static void SortRankings(void)
     highKR -= lowKR;
     highHF -= lowHF;
 
+
     {
 	const double factorSC = (highSC != 0.0) ? (100.0 / highSC) : 0.0;
 	const double factorKD = (highKD != 0.0) ? (100.0 / highKD) : 0.0;
@@ -227,7 +228,13 @@ static void SortRankings(void)
 
 	    rank_base[i].ratio
 		= 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
-	}
+
+	    /* KHS: maximum survived time serves as factor */
+	    if(options.survivalScore != 0.0){
+		rank_base[i].ratio=rank->max_survival_time;
+	    }
+	} 
+	  
 
 	/* And finally we sort the ranks, wheee! */
 	qsort(rank_base, MAX_SCORES, sizeof(rank_t), rank_cmp);
@@ -359,10 +366,10 @@ bool Rank_get_stats(const char *name, char *buf, size_t size)
 
     snprintf(buf, size,
 	     "%-15s  SC: %7.1f  K/D: %5d/%5d  R: %4d  SH: %6d  "
-	     "B: %d/%d/%d/%d/%.2f",
+	     "B: %d/%d/%d/%d/%.2f TM: %.2f",
 	     r->name, r->score, r->kills, r->deaths, r->rounds, r->shots,
 	     r->ballsCashed, r->ballsSaved, r->ballsWon, r->ballsLost,
-	     r->bestball);
+	     r->bestball,r->max_survival_time);
 
     return true;
 }
@@ -407,7 +414,9 @@ void Rank_show_ranks(void)
 
 	if (num > 0)
 	    strlcat(msg, ", ", sizeof(msg));
-	snprintf(tmpbuf, sizeof(tmpbuf), "%d. %s (%.2f)",
+	snprintf(tmpbuf, sizeof(tmpbuf), 
+		 (options.survivalScore == 0.0) ? 
+		 "%d. %s (%.2f)" : "%d. %s (%.1f)",
 		 num + 1, rank->name, rank_base[i].ratio);
 	strlcat(msg, tmpbuf, sizeof(msg));
 	num++;
@@ -420,7 +429,6 @@ void Rank_show_ranks(void)
 
     return;
 }
-
 
 static void Init_ranknode(ranknode_t *rank,
 			  const char *name, const char *user, const char *host)
@@ -662,6 +670,11 @@ void Rank_write_rankfile(void)
 	    && fprintf(file, "bestball=\"%.2f\" ", rank->bestball) < 0)
 	    goto writefailed;
 
+        if (rank->max_survival_time > 0
+            && fprintf(file, "max_survival_time=\"%.2f\" ", 
+            rank->max_survival_time) < 0)
+	    goto writefailed;
+
 	if (fprintf(file, "timestamp=\"%u\" ", (unsigned)rank->timestamp) < 0)
 	    goto writefailed;
 	
@@ -773,6 +786,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 		rank->ballsCashed = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "bestball"))
 		rank->bestball = atof(*(attr + 1));
+	    if (!strcasecmp(*attr, "max_survival_time"))
+	        rank->max_survival_time = atof(*(attr + 1));
 	    if (!strcasecmp(*attr, "timestamp"))
 		rank->timestamp = atoi(*(attr + 1));
 
