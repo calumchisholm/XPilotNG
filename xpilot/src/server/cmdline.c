@@ -292,7 +292,6 @@ int		maxDefensiveItems;	/* items can player carry */
 int		roundDelaySeconds;	/* delay before start of each round */
 int		maxRoundTime;		/* max. duration of each round */
 #if 0
-int		roundsToPlay;		/* # of rounds to play. */
 int		roundsPlayed;		/* # of rounds played sofar. */
 #endif
 int		maxVisibleObject;	/* how many objects a player can see */
@@ -3338,6 +3337,16 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"numberOfRounds",
+	"numRounds",
+	"0",
+	&roundsToPlay,
+	valInt,
+	tuner_dummy,
+	"The number of rounds to play.  Unlimited if 0.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"maxVisibleObject",
 	"maxVisibleObjects",
 	"1000",
@@ -3450,18 +3459,6 @@ static option_desc options[] = {
 	"May players protect their nicks with a password?\n",
 	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
     },
-#if 0
-    {
-	"numberOfRounds",
-	"numRounds",
-	"0",
-	&numberOfRounds,
-	valInt,
-	tuner_dummy,
-	"The number of rounds to play. If 0, unlimited.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-#endif
     {
 	"playerLimit",
 	"playerLimit",
