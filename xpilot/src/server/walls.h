@@ -158,7 +158,15 @@ extern poly_t *pdata;
 extern int *estyleptr;
 extern int *edgeptr;
 extern group_t groups[];
-#define groupptr_by_id(group) (&groups[(group)])
+extern int num_groups, max_groups;
+
+static inline group_t *groupptr_by_id(int group)
+{
+    if (group >= 0 && group < num_groups)
+	return &groups[group];
+    return NULL;
+}
+
 extern int num_pstyles, num_estyles, num_bstyles;
 
 #endif
