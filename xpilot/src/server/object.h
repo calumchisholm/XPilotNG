@@ -181,26 +181,27 @@ struct cell_node {
     clpos_t		prevpos;	/* previous position */		\
     clpos_t		extmove;	/* For collision detection */	\
     float		wall_time;	/* bounce/crash time within frame */ \
-    int			collmode;	/* collision checking mode */	\
     vector_t		vel;		/* speed in x,y */		\
     vector_t		acc;		/* acceleration in x,y */	\
     float		mass;		/* mass in unigrams */		\
     double		life;		/* No of ticks left to live */	\
     long		status;		/* gravity, etc. */		\
-    int			type;		/* one bit of OBJ_XXX */	\
 /* Item pack count is kept in the 'count' field, float now, change !@# */ \
     float		count;		/* Misc timings */		\
     modifiers_t		mods;		/* Modifiers to this object */	\
+    int			type;		/* one bit of OBJ_XXX */	\
     u_byte		color;		/* Color of object */		\
-    short		missile_dir;	/* missile direction */		\
-    int		wormHoleHit, wormHoleDest; \
+    u_byte		missile_dir;	/* missile direction */		\
+    u_byte		collmode;	/* collision checking mode */	\
+    short		wormHoleHit;	\
+    short		wormHoleDest;	\
 
 /* up to here all object types are the same as all player types. */
 
 #define OBJECT_EXTEND	\
     cell_node_t		cell;		/* node in cell linked list */	\
-    int			pl_range;	/* distance for collision */	\
-    int			pl_radius;	/* distance for hit */		\
+    short		pl_range;	/* distance for collision */	\
+    short		pl_radius;	/* distance for hit */		\
     long		info;		/* Miscellaneous info */	\
     double		fusetime;	/* Frame when considered fused */ \
 
@@ -336,7 +337,7 @@ struct xp_wireobject {
     float		turnspeed;	/* how fast to turn */
 
     u_byte		size;		/* Size of object (wreckage) */
-    short		rotation;	/* Rotation direction */
+    u_byte		rotation;	/* Rotation direction */
 
 #define WIRE_IND(ind)	((wireobject_t *)Obj[(ind)])
 #define WIRE_PTR(obj)	((wireobject_t *)(obj))
@@ -353,8 +354,8 @@ struct xp_pulseobject {
 
     OBJECT_EXTEND
 
-    int			dir;		/* Direction of the pulse */
     float		len;		/* Length of the pulse */
+    u_byte		dir;		/* Direction of the pulse */
     bool		refl;		/* Pulse was reflected ? */
 
 #define PULSE_IND(ind)	((pulseobject_t *)Obj[(ind)])
