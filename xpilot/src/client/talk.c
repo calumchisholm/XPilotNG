@@ -314,9 +314,7 @@ static void Talk_delete_emphasized_text(void)
     oldlen = strlen(talk_str);
     newlen = oldlen;
 
-    /* kps - there is a bug here, see file BUGS. */
-    if (oldlen > 0) {
-	/*assert(oldlen >= selection.talk.x2);*/
+    if (oldlen > 0 && oldlen >= selection.talk.x2) {
 	strncpy(&new_str[selection.talk.x1], &talk_str[selection.talk.x2],
 		oldlen - selection.talk.x2);
 	talk_cursor.point = selection.talk.x1;
@@ -327,8 +325,7 @@ static void Talk_delete_emphasized_text(void)
 	    talk_cursor.point = newlen;
     }
     new_str[newlen] = '\0';
-    if (talk_cursor.point > newlen)
-	fatal("Bug in Talk_delete_emphasized_text");
+    assert(talk_cursor.point <= newlen);
 
     width = XTextWidth(talkFont, talk_str, (int)selection.talk.x1);
     /*
@@ -572,8 +569,10 @@ int Talk_do_event(XEvent *event)
 	     */
 	    talk_str[0] = '\0';
 	    talk_cursor.point = 0;
-	    if (selectionAndHistory)
+	    if (selectionAndHistory) {
 		save_talk_str = false;
+		selection.talk.state = SEL_NONE;
+	    }
 	    result = false;
 	    break;
 
@@ -855,7 +854,7 @@ int Talk_paste(char *data, size_t data_len, bool overwrite)
     size_t max_width  = (TALK_WINDOW_WIDTH - 2*TALK_INSIDE_BORDER - 5);
 
     size_t accept_len;			/* for still matching the window */
-    char paste_buf[MAX_CHARS];	/* gets the XBuffer */
+    char paste_buf[MAX_CHARS];		/* gets the XBuffer */
     char tmp_str[MAX_CHARS];
     char talk_backup[MAX_CHARS];	/* no `collision' with data */
     bool cursor_visible = false;
@@ -1243,10 +1242,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 
     /* quick check if there are messages at all */
     if (TalkMsg[0]->len == 0) {
-	if (selection.len > 0)
-	    selection.draw.state = SEL_SELECTED;
-	else
-	    selection.draw.state = SEL_NONE;
+	Selection_set_state();
 	return;
     }
 
@@ -1311,12 +1307,9 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	int 	current_line;	/* when going through a multi line selection */
 
 
-	if ( selection.draw.state != SEL_PENDING) {
+	if (selection.draw.state != SEL_PENDING) {
 	    /* no proper start of cut */
-	    if (selection.len > 0)
-		selection.draw.state = SEL_SELECTED;
-	    else
-		selection.draw.state = SEL_NONE;
+	    Selection_set_state();
 	    return;
 	}
 
