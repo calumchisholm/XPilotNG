@@ -814,7 +814,6 @@ static void Xpmap_cannon_to_polygon(int ind)
 
 
 #define N 12
-/* kps - do we want a polygon for out wormholes ??? */
 static void Xpmap_wormhole_to_polygon(int ind)
 {
     int cx, cy, ps, es, i, r;
@@ -822,9 +821,7 @@ static void Xpmap_wormhole_to_polygon(int ind)
     clpos pos[N + 1];
     wormhole_t *wormhole = &World.wormHoles[ind];
 
-    /* too buggy currently */
-    return ;
-
+    /* don't make a polygon for an out wormhole */
     if (wormhole->type == WORM_OUT)
 	return;
 

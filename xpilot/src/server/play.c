@@ -346,6 +346,9 @@ bool Balltarget_hitfunc(struct group *group, struct move *move)
 }
 
 
+/*
+ * Cannon specific functions
+ */
 int Cannon_hitmask(cannon_t *cannon)
 {
     if (cannon->dead_time > 0)
@@ -403,7 +406,7 @@ extern struct move_parameters mp;
  */
 bool Cannon_hitfunc(struct group *group, struct move *move)
 {
-    object *obj = NULL;
+    object *obj = move->obj;
     int ind = group->item_id;
     cannon_t *cannon = &World.cannon[ind];
     unsigned long cannon_mask;
@@ -414,9 +417,8 @@ bool Cannon_hitfunc(struct group *group, struct move *move)
 	return false;
     }
 
-    if (move->obj == NULL)
+    if (obj == NULL)
 	return true;
-    obj = move->obj;
 
     cannon_mask = mp.obj_cannon_mask | OBJ_PLAYER;
     if (!BIT(cannon_mask, obj->type))
@@ -458,6 +460,10 @@ bool Cannon_hitfunc(struct group *group, struct move *move)
     return true;
 }
 
+
+/*
+ * Target specific functions
+ */
 int Target_hitmask(target_t *targ)
 {
     if (targ->dead_time)
@@ -546,6 +552,42 @@ bool Target_hitfunc(struct group *group, struct move *move)
 #endif
 
 
+/*
+ * Wormhole specific functions
+ */
+int Wormhole_hitmask(wormhole_t *wormhole)
+{
+    if (wormhole->type == WORM_OUT)
+	return ALL_BITS;
+    return 0;
+}
+
+bool Wormhole_hitfunc(struct group *group, struct move *move)
+{
+    object *obj = move->obj;
+    int ind = group->item_id;
+    wormhole_t *wormhole = &World.wormHoles[ind];
+
+    /* this should never happen */
+    if (wormhole->type == WORM_OUT) {
+	warn("wormhole->type == WORM_OUT\n");
+	return false;
+    }
+
+    return false;
+
+    if (obj == NULL)
+	return true;
+
+    if (obj->type == OBJ_PLAYER) {
+	player *pl = (player *)obj;
+    } else {
+	;
+    }
+
+    return true;
+}
+
 void Wormhole_remove_from_map(int ind)
 {
     wormhole_t		*wormhole = &World.wormHoles[ind];
@@ -558,6 +600,9 @@ void Wormhole_remove_from_map(int ind)
 }
 
 
+/*
+ * Handling of group properties
+ */
 void Team_immunity_init(void)
 {
     P_grouphack(CANNON, Cannon_set_hitmask);

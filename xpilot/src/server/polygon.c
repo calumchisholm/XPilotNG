@@ -307,12 +307,14 @@ void P_end_cannon(void)
 
 int P_start_wormhole(int ind)
 {
+    wormhole_t		*wormhole = &World.wormHoles[ind];
+
     current_group = ++num_groups;
     Check_groupcount();
     groups[current_group].type = WORMHOLE;
     groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hitmask = 0;
-    groups[current_group].hitfunc = NULL;
+    groups[current_group].hitmask = Wormhole_hitmask(wormhole);
+    groups[current_group].hitfunc = Wormhole_hitfunc;
     groups[current_group].item_id = ind;
     return current_group;
 }
