@@ -559,8 +559,10 @@ static void Players_turn(void)
 	if (pl->turnresistance)
 	    pl->turnvel *= pl->turnresistance;
 
-	if (pl->turnqueue) new_float_dir = pl->wanted_float_dir;/*TURNQUEUE*/
-	else new_float_dir = pl->float_dir;
+	if (pl->use_turnqueue)
+	    new_float_dir = pl->wanted_float_dir;/*TURNQUEUE*/
+	else
+	    new_float_dir = pl->float_dir;
 	    
 	new_float_dir += pl->turnvel;
 
@@ -570,7 +572,9 @@ static void Players_turn(void)
 	    new_float_dir -= RES;
 
 	Player_set_float_dir(pl, new_float_dir);
-    	if (pl->turnqueue) pl->wanted_float_dir = pl->float_dir;/*TURNQUEUE*/
+
+    	if (pl->use_turnqueue)
+	    pl->wanted_float_dir = pl->float_dir;/*TURNQUEUE*/
 	
 	if (!pl->turnresistance)
 	    pl->turnvel = 0;

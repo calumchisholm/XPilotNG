@@ -732,7 +732,7 @@ static int Cmd_kick(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
 static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size)
 {
-    int new_lock;
+    bool new_lock;
 
     if (!arg || !*arg) {
 	snprintf(msg, size, "The game is currently %s.",
@@ -744,9 +744,9 @@ static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	return CMD_RESULT_NOT_OPERATOR;
 
     if (!strcmp(arg, "1"))
-	new_lock = 1;
+	new_lock = true;
     else if (!strcmp(arg, "0"))
-	new_lock = 0;
+	new_lock = false;
     else {
 	snprintf(msg, size, "Invalid argument '%s'.  Specify either 0 or 1.",
 		 arg);
@@ -793,8 +793,7 @@ static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t s
     return CMD_RESULT_SUCCESS;
 }
 
-static int Cmd_mute(char *arg, player_t *pl, int oper,
-			  char *msg, size_t size)
+static int Cmd_mute(char *arg, player_t *pl, int oper, char *msg, size_t size)
 {
     int new_mute;
     player_t *mutee;
@@ -810,12 +809,13 @@ static int Cmd_mute(char *arg, player_t *pl, int oper,
 	return CMD_RESULT_NOT_OPERATOR;
 
     if (!strcmp(arg, "1"))
-	new_mute = 1;
+	new_mute = true;
     else if (!strcmp(arg, "0"))
-	new_mute = 0;
-    else if ((mutee = Get_player_by_name(arg,NULL,&errorstr)) != NULL) {
-    	mutee->muted = (mutee->muted == 0);
-	snprintf(msg, size, "Player %s is now %s.",mutee->name,mutee->muted ? "muted" : "unmuted");
+	new_mute = false;
+    else if ((mutee = Get_player_by_name(arg, NULL, &errorstr)) != NULL) {
+    	mutee->muted = mutee->muted ? false : true;
+	snprintf(msg, size, "Player %s is now %s.",
+		 mutee->name, mutee->muted ? "muted" : "unmuted");
     	return CMD_RESULT_SUCCESS;
     } else {
     	strlcpy(msg, errorstr, size);
@@ -880,9 +880,9 @@ static int Cmd_op(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	    break;
 	case 'o':
 	    if (cmd == '+')
-		pl->isoperator = 1;
+		pl->isoperator = true;
 	    else
-		pl->isoperator = 0;
+		pl->isoperator = false;
 	    break;
 	default:
 	    snprintf(msg, size, "Invalid operator command '%c'.", *arg);
@@ -915,14 +915,14 @@ static int Cmd_password(char *arg, player_t *pl, int oper,
 	strlcpy(msg, "Wrong.", size);
 	if (pl->isoperator && pl->rectype != 2) {
 	    NumOperators--;
-	    pl->isoperator = 0;
+	    pl->isoperator = false;
 	    strlcat(msg, "  You lost operator status.", size);
 	}
     }
     else {
 	if (!pl->isoperator && pl->rectype != 2) {
 	    NumOperators++;
-	    pl->isoperator = 1;
+	    pl->isoperator = true;
 	    pl->privs |= PRIV_AUTOKICKLAST;
 	}
 	strlcpy(msg, "You got operator status.", size);
@@ -1236,14 +1236,14 @@ static int Cmd_turnqueue(char *arg, player_t *pl, int oper, char *msg, size_t si
 
     if (!arg || !*arg) {
 	snprintf(msg, size, "Turnqueue is %s.",
-		 pl->turnqueue ? "on" : "off");
+		 pl->use_turnqueue ? "on" : "off");
 	return CMD_RESULT_SUCCESS;
     }
 
     if (!strcmp(arg, "1"))
-	pl->turnqueue = 1;
+	pl->use_turnqueue = true;
     else if (!strcmp(arg, "0"))
-	pl->turnqueue = 0;
+	pl->use_turnqueue = false;
     else {
 	snprintf(msg, size, "Invalid argument '%s'.  Specify either 0 or 1.",
 		 arg);
@@ -1251,7 +1251,7 @@ static int Cmd_turnqueue(char *arg, player_t *pl, int oper, char *msg, size_t si
     }
 
     snprintf(msg, size, "Turnqueue is turned %s.",
-		  pl->turnqueue ? "on" : "off");
+		  pl->use_turnqueue ? "on" : "off");
 
     return CMD_RESULT_SUCCESS;
 }
