@@ -778,12 +778,12 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 		  8.0, 68.0);
 
     if (pl) {
-	if (options.cannonPoints > 0) {
-	    if (pl->score <= options.cannonMaxScore
-		&& !(BIT(world->rules->mode, TEAM_PLAY)
-		     && pl->team == c->team))
-		Score(pl, options.cannonPoints, c->pos, "");
-	}
+	double sc = Rate(pl->score, CANNON_SCORE) / 4;
+
+	if (BIT(world->rules->mode, TEAM_PLAY)
+	    && pl->team == c->team)
+	    sc = -sc;
+	Score(pl, sc, c->pos, "");
     }
 }
 

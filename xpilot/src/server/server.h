@@ -257,10 +257,6 @@ extern struct options {
     double	unownedKillScoreMult;
     double	tagItKillScoreMult;
     double	tagKillItScoreMult;
-    double	asteroidPoints;
-    double	cannonPoints;
-    double	asteroidMaxScore;
-    double	cannonMaxScore;
 
     double	destroyItemInCollisionProb;
     bool 	allowSmartMissiles;

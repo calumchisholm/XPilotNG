@@ -1033,14 +1033,15 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 {
     double v = VECTOR_LENGTH(ast->vel);
     double cost = collision_cost(ast->mass, v);
+    double sc;
 
     ast->life += ASTEROID_FUEL_HIT(ED_PL_CRASH, ast->size);
     if (ast->life < 0.0)
 	ast->life = 0.0;
-    if (ast->life == 0.0
-	&& options.asteroidPoints > 0.0
-	&& pl->score <= options.asteroidMaxScore)
-	Score(pl, options.asteroidPoints, ast->pos, "");
+    if (ast->life == 0.0) {
+	sc = Rate(pl->score, ASTEROID_SCORE) * options.unownedKillScoreMult;
+	Score(pl, sc, ast->pos, "");
+    }
 
     if (!Player_used_emergency_shield(pl))
 	Player_add_fuel(pl, -cost);
@@ -1059,11 +1060,12 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	    Set_message_f("%s was hit by an asteroid.", pl->name);
 	sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "[Asteroid]");
-	if (Player_is_tank(pl) && options.asteroidPoints > 0) {
+	if (Player_is_tank(pl)) {
 	    player_t *owner_pl = Player_by_id(pl->lock.pl_id);
 
-	    if (owner_pl->score <= options.asteroidMaxScore)
-		Score(owner_pl, options.asteroidPoints, ast->pos, "");
+	    sc = Rate(owner_pl->score, ASTEROID_SCORE)
+		* options.unownedKillScoreMult;
+	    Score(owner_pl, sc, ast->pos, "");
 	}
 	return;
     }
@@ -1436,16 +1438,17 @@ static void AsteroidCollision(world_t *world)
 		if (ast->life < 0.0)
 		    ast->life = 0.0;
 		if (ast->life == 0.0) {
-		    if (options.asteroidPoints > 0.0
-			&& (obj->id != NO_ID
-			    || (obj->type == OBJ_BALL
-				&& BALL_PTR(obj)->owner != NO_ID))) {
+		    if ((obj->id != NO_ID
+			 || (obj->type == OBJ_BALL
+			     && BALL_PTR(obj)->owner != NO_ID))) {
 			int owner_id = ((obj->type == OBJ_BALL)
 					? BALL_PTR(obj)->owner
 					: obj->id);
 			player_t *pl = Player_by_id(owner_id);
-			if (pl->score <= options.asteroidMaxScore)
-			    Score(pl, options.asteroidPoints, ast->pos, "");
+			double sc = Rate(pl->score, ASTEROID_SCORE)
+			    * options.unownedKillScoreMult;
+
+			Score(pl, sc, ast->pos, "");
 		    }
 
 		    /* break; */

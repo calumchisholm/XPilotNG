@@ -2194,46 +2194,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"asteroidPoints",
-	"asteroidPoints",
-	"1.0",
-	&options.asteroidPoints,
-	valReal,
-	tuner_dummy,
-	"Points awarded for breaking an asteroid.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"cannonPoints",
-	"cannonPoints",
-	"1.0",
-	&options.cannonPoints,
-	valReal,
-	tuner_dummy,
-	"Points awarded for killing a cannon.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"asteroidMaxScore",
-	"asteroidMaxScore",
-	"100.0",
-	&options.asteroidMaxScore,
-	valReal,
-	tuner_dummy,
-	"Maximum score to receive points for breaking an asteroid.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"cannonMaxScore",
-	"cannonMaxScore",
-	"100.0",
-	&options.cannonMaxScore,
-	valReal,
-	tuner_dummy,
-	"Maximum score to receive points for killing a cannon.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"movingItemProb",
 	"movingItemProb",
 	"0.2",

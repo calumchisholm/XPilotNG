@@ -31,6 +31,7 @@
 #ifndef SCORE_H
 #define SCORE_H
 
+#define ASTEROID_SCORE		-1436.0
 #define CANNON_SCORE	    	-1436.0
 #define WALL_SCORE	    	2000.0
 
