@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -844,14 +844,14 @@ int Net_init(char *server, int port)
 		break;
 	    }
 	}
-	if (found_socket == 0) 
+	if (found_socket == 0)
 	{
 	    error("Could not find a usable port in given port range");
 	    return -1;
 	}
     }
-    
-    
+
+
     if (server && sock_connect(&sock, server, port) == -1) {
 	error("Can't connect to server %s on port %d", server, port);
 	sock_close(&sock);
@@ -1189,7 +1189,7 @@ static int Net_packet(void)
 
 	if (receive_tbl[type] == NULL) {
 	    errno = 0;
-	    IFNWINDOWS(error("Received unknown packet type (%d, %d), dropping frame.", 
+	    IFNWINDOWS(error("Received unknown packet type (%d, %d), dropping frame.",
 			type, prev_type);)
 	    Sockbuf_clear(&rbuf);
 	    break;
@@ -1364,7 +1364,7 @@ static void Net_lag_measurement(long key_ack)
 	printf("N ");
     }
 #endif
-    
+
     num = 0;
     sum = 0;
     for (i = 0; i < KEYBOARD_STORE; i++) {
@@ -1529,7 +1529,7 @@ int Net_input(void)
 	if ((i == receive_window_size - 1 && i > 0)
 #ifdef _WINDOWS
 		|| drawPending
-		|| (ThreadedDraw && 
+		|| (ThreadedDraw &&
 				!WaitForSingleObject(dinfo.eventNotDrawing, 0) == WAIT_OBJECT_0)
 #endif
 		) {
@@ -1606,7 +1606,7 @@ int Net_input(void)
      */
     n = Net_packet();
 
-    if (last_frame > oldest_frame) {
+    if (last_frame->loops > oldest_frame->loops) {
 	/*
 	 * Switch buffers to prevent gaps.
 	 */
@@ -1642,7 +1642,13 @@ int Net_input(void)
 	Net_flush();
     }
 
-    return 1 + (last_frame > oldest_frame);
+    /* This was "return 1 + (last_frame->loops > oldest_frame->loops);",
+     * but that doesn't make sense as last_frame->loops is always set to 0
+     * above. This return value is only compared with -1 anyway.
+     * Should still read this whole function and check whether it makes
+     * sense (there was discussion on xpilot-hacks, but the patch from
+     * C R Johnson looked wrong too). XXX !@# */
+    return 1;
 }
 
 /*
@@ -1846,7 +1852,7 @@ static void Check_view_dimensions(void)
 	ext_view_y_offset = (height_wanted - active_view_height) / 2;
     }
 }
-  
+
 
 /*
  * Receive the packet with counts for all the items.
@@ -3158,4 +3164,3 @@ int Send_fps_request(int fps)
     }
     return 0;
 }
-
