@@ -263,7 +263,8 @@ void Main_loop(void)
 
     if (playback && (*playback_ei == main_loops)) {
 	char *a, *b, *c, *d, *e;
-	int i, j;
+	int i;
+	unsigned j;
 	a = playback_es;
 	while (*playback_es++);
 	b = playback_es;
@@ -637,6 +638,8 @@ void Log_game(const char *heading)
 
     fputs(str, fp);
     fclose(fp);
+#else
+    (void)heading;
 #endif
 }
 
