@@ -864,7 +864,7 @@ Optional Features:
   --enable-mbx            support for X Multibuffer Extension in client
   --enable-plockserver    lock the xpilot-ng server into memory
   --enable-development    enable development code
-  --enable-newsched       enable new server scheduling most useful on Linux
+  --enable-select-sched   enable new server scheduling most useful on Linux
                           2.6
   --disable-replay        disable building of replay program
   --disable-x11-client    disable X11 client
@@ -1953,9 +1953,9 @@ _ACEOF
 fi
 fi;
 
-# Check whether --enable-newsched or --disable-newsched was given.
-if test "${enable_newsched+set}" = set; then
-  enableval="$enable_newsched"
+# Check whether --enable-select_sched or --disable-select_sched was given.
+if test "${enable_select_sched+set}" = set; then
+  enableval="$enable_select_sched"
 
 fi;
 
@@ -3575,7 +3575,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-	enable_newsched=yes
+	enable_select_sched=yes
 	enable_sdl_gameloop=yes
 	enable_replay=no
 	enable_x11_client=no
@@ -5467,10 +5467,10 @@ _ACEOF
 
 fi
 
-if test x$enable_newsched = xyes; then
+if test x$enable_select_sched = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
-#define NEWSCHED 1
+#define SELECT_SCHED 1
 _ACEOF
 
 fi

@@ -56,8 +56,8 @@ AC_ARG_ENABLE(development,
 	AC_DEFINE([DEVELOPMENT], 1, [enable development code])
 fi])
 
-AC_ARG_ENABLE(newsched,
-	AC_HELP_STRING([--enable-newsched],
+AC_ARG_ENABLE(select_sched,
+	AC_HELP_STRING([--enable-select-sched],
 		[enable new server scheduling most useful on Linux 2.6]))
 
 AC_ARG_ENABLE(replay,
@@ -159,7 +159,7 @@ if test x$windows_target = xyes; then
 	AC_SUBST(W32_LIBS)
 	AC_DEFINE([_WINDOWS], 1, [compiling for windows target])
 
-	enable_newsched=yes
+	enable_select_sched=yes
 	enable_sdl_gameloop=yes
 	enable_replay=no
 	enable_x11_client=no
@@ -191,8 +191,8 @@ if test x$enable_x11_client = xyes; then
 	AC_DEFINE([X11_CLIENT], 1, [enable x11 client])
 fi
 
-if test x$enable_newsched = xyes; then
-	AC_DEFINE([NEWSCHED], 1,
+if test x$enable_select_sched = xyes; then
+	AC_DEFINE([SELECT_SCHED], 1,
 		[enable new server scheduling most useful on Linux 2.6])
 fi
 

@@ -179,7 +179,7 @@ int main(int argc, char **argv)
     teamcup_open_score_file();
     teamcup_round_start();
 
-#ifdef NEWSCHED
+#ifdef SELECT_SCHED
     install_timer_tick(Main_loop, FPS);
 #else
     if (options.timerResolution > 0)

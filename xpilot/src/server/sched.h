@@ -34,11 +34,11 @@ void remove_input(int fd);
 void sched(void);
 void stop_sched(void);
 
-#ifdef NEWSCHED
+#ifdef SELECT_SCHED
 
 void install_timer_tick(void (*func)(void), int freq);
 
-#else /* NEWSCHED */
+#else /* SELECT_SCHED */
 
 #ifndef _WINDOWS
 void install_timer_tick(void (*func)(void), int freq);
@@ -48,6 +48,6 @@ extern	void install_timer_tick(void (__stdcall *func)(void *,unsigned int ,unsig
 void install_timeout(void (*func)(void *), int offset, void *arg);
 void remove_timeout(void (*func)(void *), void *arg);
 
-#endif /* NEWSCHED */
+#endif /* SELECT_SCHED */
 
 #endif

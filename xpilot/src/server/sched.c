@@ -156,7 +156,7 @@ static void sched_select_error(void)
     End_game();
 }
 
-#ifdef NEWSCHED
+#ifdef SELECT_SCHED
 
 bool sched_running = false;
 
@@ -329,7 +329,7 @@ void sched(void)
     }
 }
 
-#else /* NEWSCHED */
+#else /* SELECT_SCHED */
 
 int sched_running = false;
 
@@ -783,4 +783,4 @@ void sched(void)
 
 #endif /* _WINDOWS */
 
-#endif /* NEWSCHED */
+#endif /* SELECT_SCHED */

@@ -3287,7 +3287,7 @@ static option_desc opts[] = {
 	"Does the server send sound events to players that request sound.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-#ifndef NEWSCHED
+#ifndef SELECT_SCHED
     {
 	"timerResolution",
 	"timerResolution",
@@ -3798,7 +3798,7 @@ void Timing_setup(world_t *world)
 {
     LIMIT(FPS, 1, MAX_SERVER_FPS);
     LIMIT(options.gameSpeed, 0.0, FPS);
-#ifndef NEWSCHED
+#ifndef SELECT_SCHED
     LIMIT(options.timerResolution, 0, 100);
 #endif
     if (options.gameSpeed == 0.0)
@@ -3867,7 +3867,7 @@ void Timing_setup(world_t *world)
     if (options.robotTicksPerSecond == 0)
 	options.robotTicksPerSecond = FPS;
     LIMIT(options.robotTicksPerSecond, 1, FPS);
-#ifdef NEWSCHED
+#ifdef SELECT_SCHED
     install_timer_tick(NULL, FPS);
 #else
     install_timer_tick(NULL, options.timerResolution ? options.timerResolution

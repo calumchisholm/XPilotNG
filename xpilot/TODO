@@ -123,9 +123,6 @@ Task: Make it so that if a team has a treasure, players get bases first that
 are closer to the treasure.
 Developer: kps
 
-Task: Rename newsched to selectsched.
-Developer: kps
-
 Task: Make it so that no defaultsFile is used in server by default.
 Developer: kps
 

@@ -275,9 +275,6 @@
 /* support for X Multibuffer Extension in client */
 #undef MBX
 
-/* enable new server scheduling most useful on Linux 2.6 */
-#undef NEWSCHED
-
 /* Name of package */
 #undef PACKAGE
 
@@ -313,6 +310,9 @@
 
 /* enable sdl gameloop in sdl client */
 #undef SDL_GAMELOOP
+
+/* enable new server scheduling most useful on Linux 2.6 */
+#undef SELECT_SCHED
 
 /* Define to the type of arg 1 for `select'. */
 #undef SELECT_TYPE_ARG1
