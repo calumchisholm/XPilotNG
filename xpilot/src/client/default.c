@@ -483,6 +483,26 @@ static bool Set_showDecor(xp_option_t *opt, bool val)
     return true;
 }
 
+static bool Set_client_dir_prediction(xp_option_t *opt, bool val)
+{
+    UNUSED_PARAM(opt);
+    if (val) {
+        if (!client_dir_prediction) {
+	    /* reset pointer movements */
+            int m;
+            for (m=0; m < MAX_POINTER_MOVES; m++)
+                pointer_moves[m].id = -1;
+            pointer_move_next = 0;
+            last_keyboard_ack = 0;
+	    client_dir_prediction = true;
+	}
+    } else {
+        client_dir_prediction = false;
+    }
+    
+    return true;
+}
+
 void defaultCleanup(void)
 {
     XFREE(keydefs);
@@ -789,6 +809,14 @@ xp_option_t default_options[] = {
 	"position on the radar in the center and raw the rest of the radar\n"
 	"around it.  Note that this requires a fast graphics system.\n"),
 
+    XP_BOOL_OPTION(
+	"clientDirPrediction",
+	false,
+	&client_dir_prediction,
+	Set_client_dir_prediction,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Client paints the wanted direction of your ship instead of what the\n"
+	"server sent you. Possible differences are corrected in roundtrip time.\n"),
     XP_BOOL_OPTION(
 	"showShipShapes",
 	true,

@@ -49,6 +49,10 @@ display_t               server_display;
 int			receive_window_size = 3;
 long			last_loops;
 bool                    packetMeasurement;
+pointer_move_t		pointer_moves[MAX_POINTER_MOVES];
+int			pointer_move_next;
+long			last_keyboard_ack;
+bool			client_dir_prediction;
 #ifdef _WINDOWS
 int			received_self = FALSE;
 #endif
@@ -65,7 +69,6 @@ static int		keyboard_delta;
 static unsigned		magic;
 static time_t           last_send_anything;
 static long		last_keyboard_change,
-			last_keyboard_ack,
 			last_keyboard_update,
 			reliable_offset,
 			talk_pending,
@@ -2558,6 +2561,16 @@ int Send_pointer_move(int movement)
     old_tv = tv;
 #endif
 
+    if (client_dir_prediction) {
+	pointer_moves[pointer_move_next].movement = movement;
+	pointer_moves[pointer_move_next].turnspeed = turnspeed;
+	pointer_moves[pointer_move_next].id = last_keyboard_change + 1;
+	
+        pointer_move_next++;
+	if (pointer_move_next >= MAX_POINTER_MOVES)
+	    pointer_move_next = 0;
+    }
+
     if (version >= 0x4F13) {
 	total += movement;
 	movement = total;
@@ -2565,6 +2578,10 @@ int Send_pointer_move(int movement)
 
     if (Packet_printf(&wbuf, "%c%hd", PKT_POINTER_MOVE, movement) == -1)
 	return -1;
+    
+    if (client_dir_prediction)
+	Net_key_change();	
+    
     return 0;
 }
 

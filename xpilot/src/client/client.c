@@ -23,7 +23,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 #include "xpclient.h"
 
 /* kps - move to some header */
@@ -1825,6 +1824,34 @@ int Handle_ball(int x, int y, int id, int style)
     return 0;
 }
 
+static int predict_self_dir(int received_dir)
+{
+    int pointer_delta = 0, dir_delta, new_dir;
+    int index = pointer_move_next - 1;
+    int count = 0;
+
+    if (index < 0)
+	index = MAX_POINTER_MOVES - 1;
+    
+    while (pointer_moves[index].id > last_keyboard_ack && count < 50) {
+        pointer_delta += pointer_moves[index].movement
+	    * pointer_moves[index].turnspeed;
+	index--;
+	if (index < 0)
+	    index = MAX_POINTER_MOVES - 1;
+	count++;
+    }
+    
+    dir_delta = pointer_delta / (RES/2);
+    new_dir = (received_dir - dir_delta);
+    while (new_dir < 0)
+	new_dir += RES;
+    while (new_dir > RES)
+	new_dir -= RES;
+
+    return new_dir;
+}
+
 int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
 		int eshield, int phased, int deflector)
 {
@@ -1833,7 +1860,10 @@ int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
     t.x = x;
     t.y = y;
     t.id = id;
-    t.dir = dir;
+    if (client_dir_prediction && self && self->id == id)
+        t.dir = predict_self_dir(dir);
+    else
+        t.dir = dir;
     t.shield = shield;
     t.cloak = cloak;
     t.eshield = eshield;

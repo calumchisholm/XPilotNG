@@ -49,6 +49,19 @@ extern long	 last_loops;
 extern bool      packetMeasurement;
 extern display_t server_display; /* the servers idea about our display */
 
+typedef struct {
+    int movement;
+    int turnspeed;
+    int id;
+} pointer_move_t;
+
+#define MAX_POINTER_MOVES 128
+
+extern pointer_move_t pointer_moves[MAX_POINTER_MOVES];
+extern int pointer_move_next;
+extern long last_keyboard_ack;
+extern bool client_dir_prediction;
+
 int Net_setup(void);
 int Net_verify(char *real, char *nick, char *dpy);
 int Net_init(char *server, int port);
