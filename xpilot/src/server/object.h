@@ -498,6 +498,8 @@ struct player {
     pl_fuel_t	fuel;			/* ship tanks and the stored fuel */
     double	emptymass;		/* Mass of empty ship */
     double	float_dir;		/* Direction, in float var */
+    double	float_dir_cos;		/* Cosine of float_dir */
+    double	float_dir_sin;		/* Sine of float_dir */
     double	turnresistance;		/* How much is lost in % */
     double	turnvel;		/* Current velocity of turn (right) */
     double	oldturnvel;		/* Last velocity of turn (right) */

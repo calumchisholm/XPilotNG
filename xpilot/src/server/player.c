@@ -197,7 +197,7 @@ void Go_home(player *pl)
 	pos.cx = pos.cy = dir = vx = vy = velo = 0;
 
     pl->dir = dir;
-    pl->float_dir = dir;
+    Player_set_float_dir(pl, (double)dir);
     Player_position_init_clicks(
 	pl, (int)(pos.cx + CLICK * vx),	(int)(pos.cy + CLICK * vy));
     pl->vel.x = vx;
@@ -365,7 +365,8 @@ int Init_player(int ind, shipshape_t *ship)
 
     pl->vel.x = pl->vel.y = 0.0;
     pl->acc.x = pl->acc.y = 0.0;
-    pl->float_dir = pl->dir = DIR_UP;
+    pl->dir = DIR_UP;
+    Player_set_float_dir(pl, (double)pl->dir);
 
     pl->turnvel		= 0.0;
     pl->oldturnvel	= 0.0;

@@ -356,6 +356,7 @@ extern double		ecmSizeFactor;
 extern char		*playerPasswordsFileName;
 extern int		playerPasswordsFileSizeLimit;
 extern bool		maraTurnqueue;
+extern bool		ngControls;
 extern bool		ignoreMaxFPS;
 extern bool		polygonMode;
 
@@ -675,6 +676,15 @@ void Team_game_over(int winning_team, const char *reason);
 void Individual_game_over(int winner);
 void Race_game_over(void);
 int Team_immune(int id1, int id2);
+static inline void Player_set_float_dir(player *pl, double new_float_dir)
+{
+    if (ngControls && new_float_dir != pl->float_dir) {
+	pl->float_dir = new_float_dir;
+	pl->float_dir_cos = cos(pl->float_dir * 2.0 * PI / RES);
+	pl->float_dir_sin = sin(pl->float_dir * 2.0 * PI / RES);
+    } else
+	pl->float_dir = new_float_dir;
+}
 
 /*
  * Prototypes for robot.c

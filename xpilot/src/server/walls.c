@@ -2834,7 +2834,7 @@ void Turn_player(player *pl)
 			next_dir, hitmask, OBJ_PTR(pl),
 			pl->pos.cx, pl->pos.cy) != NO_GROUP) {
 	    if (!maraTurnqueue)
-		pl->float_dir = pl->dir;
+		Player_set_float_dir(pl, (double)pl->dir);
 	    break;
 	}
 	pl->dir = next_dir;

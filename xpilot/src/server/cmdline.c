@@ -320,8 +320,10 @@ bool		polygonMode;		/* Run server in polygon mode even
 bool		ignoreMaxFPS;		/* Temporary hack */
 bool		baselessPausing;
 bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
+bool		ngControls;		/* Kps improved steering and shooting */
 int		pausedFPS;		/* Limited FPS for pausers */
 int		waitingFPS;		/* Limited FPS for waiters */
+
 
 /*
  * Two functions which can be used if an option does not have its own
@@ -3584,6 +3586,16 @@ static option_desc options[] = {
 	"This is a temporary option to test Mara's \"turnqueue\" hack.\n"
 	"The idea is that if a ship is turning when it hits the wall,\n"
 	"the turn will be completed after the bounce.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"ngControls",
+	"ngControls",
+	"false",
+	&ngControls,
+	valBool,
+	tuner_dummy,
+	"Enable double precision steering and aiming of main gun.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

@@ -650,6 +650,7 @@ static void Players_turn(void)
 {
     int i;
     player *pl;
+    double new_float_dir;
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
@@ -672,12 +673,15 @@ static void Players_turn(void)
 	if (pl->turnresistance)
 	    pl->turnvel *= pl->turnresistance;
 
-	pl->float_dir += RES * pl->turnvel / 128.0;
+	new_float_dir = pl->float_dir;
+	new_float_dir += RES * pl->turnvel / 128.0;
 
-	while (pl->float_dir < 0)
-	    pl->float_dir += RES;
-	while (pl->float_dir >= RES)
-	    pl->float_dir -= RES;
+	while (new_float_dir < 0)
+	    new_float_dir += RES;
+	while (new_float_dir >= RES)
+	    new_float_dir -= RES;
+
+	Player_set_float_dir(pl, new_float_dir);
 
 	if (!pl->turnresistance)
 	    pl->turnvel = 0;
@@ -1147,14 +1151,15 @@ static void Update_players(void)
 		power = AFTER_BURN_POWER(power, a);
 		f = AFTER_BURN_FUEL(f, a);
 	    }
-#if 1
-	    pl->acc.x = power * tcos(pl->dir) / inert;
-	    pl->acc.y = power * tsin(pl->dir) / inert;
-#else
-	    /* experimental code to use double precision for steering */
-	    pl->acc.x = power * cos(pl->float_dir * 2.0 * PI / RES) / inert;
-	    pl->acc.y = power * sin(pl->float_dir * 2.0 * PI / RES) / inert;
-#endif
+
+	    if (!ngControls) {
+		pl->acc.x = power * tcos(pl->dir) / inert;
+		pl->acc.y = power * tsin(pl->dir) / inert;
+	    } else {
+		pl->acc.x = power * pl->float_dir_cos / inert;
+		pl->acc.y = power * pl->float_dir_sin / inert;
+	    }
+
 	    /* Decrement fuel */
 	    if (do_update_this_frame)
 		Player_add_fuel(pl, -f);

@@ -25,6 +25,7 @@
 
 char shot_version[] = VERSION;
 
+static void Fire_main_shot_in_float_dir(player *pl, clpos pos);
 
 #define MISSILE_POWER_SPEED_FACT	0.25
 #define MISSILE_POWER_TURNSPEED_FACT	0.75
@@ -387,6 +388,74 @@ char *Describe_shot(int type, long status, modifiers mods, int hit)
     return msg;
 }
 
+static void Fire_main_shot_in_float_dir(player *pl, clpos pos)
+{
+    int			fuse = 0, status = GRAVITY;
+    double		mass = ShotsMass, life = ShotsLife, speed = ShotsSpeed;
+    clpos		shotpos;
+    modifiers		mods;
+    object		*shot;
+    double		dx, dy;
+
+    if (NumObjs >= MAX_TOTAL_SHOTS)
+	return;
+
+    CLEAR_MODS(mods);
+    if (pl) {
+	if (pl->fuel.sum < -ED_SHOT)
+	    return;
+	Player_add_fuel(pl, ED_SHOT);
+	sound_play_sensors(pl->pos, FIRE_SHOT_SOUND);
+	Rank_FireShot(pl);
+    }
+    if (!ShotsGravity)
+	CLR_BIT(status, GRAVITY);
+
+    /*
+     * Calculate the maximum time it would take to cross one ships width,
+     * don't fuse the shot/missile/torpedo for the owner only until that
+     * time passes.  This is a hack to stop various odd missile and shot
+     * mounting points killing the player when they're firing.
+     */
+    fuse += (int)((2.0 * (double)SHIP_SZ) / speed + 1.0);
+
+    if ((shot = Object_allocate()) == NULL)
+	return;
+
+    shot->life 	= life;
+    shot->fusetime 	= frame_time + fuse;
+    shot->mass	= mass;
+    shot->count 	= 0;
+    shot->info 	= 0;
+    shot->type	= OBJ_SHOT;
+    shot->id	= pl->id;
+    shot->team	= pl->team;
+    shot->color	= pl->color;
+
+    shotpos = pos;
+    shotpos.cx = WRAP_XCLICK(shotpos.cx);
+    shotpos.cy = WRAP_YCLICK(shotpos.cy);
+    Object_position_init_clicks(shot, shotpos.cx, shotpos.cy);
+
+    shot->acc.x = shot->acc.y = 0;
+
+    shot->vel.x 	= pl->vel.x + pl->float_dir_cos * speed;
+    shot->vel.y 	= pl->vel.y + pl->float_dir_sin * speed;
+    shot->status	= status;
+    shot->mods  	= mods;
+    shot->pl_range  = 0;
+    shot->pl_radius = 0;
+    Cell_add_object(shot);
+
+    /* Recoil. */
+    dx = dy = 0;
+    dx += (shot->vel.x - pl->vel.x) * shot->mass;
+    dy += (shot->vel.y - pl->vel.y) * shot->mass;
+    pl->vel.x -= dx / pl->mass;
+    pl->vel.y -= dy / pl->mass;
+}
+
+
 void Fire_main_shot(player *pl, int type, int dir)
 {
     clpos m_gun, pos;
@@ -398,7 +467,11 @@ void Fire_main_shot(player *pl, int type, int dir)
     pos.cx = pl->pos.cx + m_gun.cx;
     pos.cy = pl->pos.cy + m_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
+    /* Main gun has only RES directions */
+    if (ngControls && type == OBJ_SHOT && dir == pl->dir)
+	Fire_main_shot_in_float_dir(pl, pos);
+    else
+	Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
 void Fire_shot(player *pl, int type, int dir)
