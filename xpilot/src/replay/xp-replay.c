@@ -712,8 +712,8 @@ static Pixmap RReadTile(struct xprc *rc)
 	exit(1);
     }
     img->data = (char *)MyMalloc(img->bytes_per_line * height, MEM_GC);
-    for (y = 0; y < img->height; y++) {
-	for (x = 0; x < img->width; x++) {
+    for (y = 0; y < (unsigned)img->height; y++) {
+	for (x = 0; x < (unsigned)img->width; x++) {
 	    ch = RReadByte(rc->fp);
 	    XPutPixel(img, x, y, rc->pixels[ch]);
 	}
@@ -1949,8 +1949,7 @@ static void Init_topmain(struct xui *ui, struct xprc *rc)
     topw = 26 - BUTTON_SPACING;
     toph = 0;
 
-    for (i = 0; i < NUM_BUTTONS; i++) {
-
+    for (i = 0; i < (int)NUM_BUTTONS; i++) {
 	topw += buttonInit[i].width + BUTTON_BORDER + BUTTON_SPACING;
 	if (toph < buttonInit[i].height)
 	    toph = buttonInit[i].height;
@@ -1978,7 +1977,7 @@ static void Init_topmain(struct xui *ui, struct xprc *rc)
 
     x = 5;
     y = (toph>>1) + 5;
-    for (i = 0; i < NUM_BUTTONS; i++) {
+    for (i = 0; i < (int)NUM_BUTTONS; i++) {
 	union button_image p;
 
 	p.icon = XCreateBitmapFromData(dpy, ui->topmain,
@@ -3040,7 +3039,7 @@ static void dox(struct xui *ui, struct xprc *rc)
 
 	    case ClientMessage:
 		if (event.xclient.message_type == ProtocolAtom
-		    && event.xclient.data.l[0] == KillAtom)
+		    && (unsigned)event.xclient.data.l[0] == KillAtom)
 		    return;
 		break;
 

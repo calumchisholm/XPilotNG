@@ -1,5 +1,4 @@
 /* 
- *
  * XP-Replay, playback an XPilot session.  Copyright (C) 1994-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -213,8 +212,9 @@ int CheckButtonEvent(XEvent *event)
 	if (event->xbutton.button == 1)
 	    ReleaseButton(b, (event->xbutton.x >= 0 &&
 			      event->xbutton.y >= 0 &&
-			      event->xbutton.x < b->width &&
-			      event->xbutton.y < b->height) ? True : False);
+			      event->xbutton.x < (int)b->width &&
+			      event->xbutton.y < (int)b->height)
+			  ? True : False);
 	return(1);
     default:
 	break;
@@ -250,15 +250,14 @@ void RedrawButton(Button b)
     if (b->flags & BUTTON_TEXT)
  	XDrawString(b->display, b->window, gc, 5, 5 + buttonFont->ascent,
 		    b->image.string, strlen(b->image.string));
-    else if (b->image.icon != None)
-    {
+    else if (b->image.icon != None) {
 	int x, y, w, h;
 	
 	w = (b->imagewidth);
-	if (w > b->width)
+	if (w > (int)b->width)
 	    w = b->width;
 	h = (b->imageheight);
-	if (h > b->height)
+	if (h > (int)b->height)
 	    h = b->height;
 	x = (b->width-w)>>1;
 	y = (b->height-h)>>1;
