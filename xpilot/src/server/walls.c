@@ -610,6 +610,8 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
     double x, y, l2, l;
     int group, type, mapobj_ind;
     world_t *world = &World;
+    bool constant_speed_subtracted
+	= (pl->last_wall_touch == frame_loops ? true : false);
 
     x = linet[line].delta.cx;
     y = linet[line].delta.cy;
@@ -721,7 +723,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
      * Otherwise constantSpeed will accelerate your ship when you
      * slide along a wall.
      */
-    if (options.constantSpeed) {
+    if (options.constantSpeed && !constant_speed_subtracted) {
 	pl->vel.x -= options.constantSpeed * pl->acc.x;
 	pl->vel.y -= options.constantSpeed * pl->acc.y;
     }
