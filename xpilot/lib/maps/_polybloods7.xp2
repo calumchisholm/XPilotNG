@@ -10,8 +10,7 @@
 <Option name="allowplayerkilling" value="yes"/>
 <Option name="allowshields" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
-<Option name="ballconnectorspringconstant" value="1650"/>
-<Option name="ballradius" value="10"/>
+<Option name="ballradius" value="8"/>
 <Option name="ballswallbounce" value="yes"/>
 <Option name="baselesspausing" value="yes"/>
 <Option name="dataurl" value="http://xpilot.sourceforge.net/maps/polybloods.xpd"/>
@@ -23,14 +22,13 @@
 <Option name="gravity" value="0"/>
 <Option name="initialafterburners" value="2"/>
 <Option name="initialautopilots" value="1"/>
-<Option name="initialfuel" value="1000"/>
 <Option name="itemprobmult" value="0.0"/>
 <Option name="kineticenergyfueldrain" value="no"/>
 <Option name="limitedlives" value="yes"/>
 <Option name="limitedvisibility" value="no"/>
 <Option name="mapauthor" value="Patrick Kenny, mods by Samaseon"/>
 <Option name="mapheight" value="3500"/>
-<Option name="mapname" value="Polygon Blood&apos;s Music v7.2"/>
+<Option name="mapname" value="Polygon Blood&apos;s Music v7.5"/>
 <Option name="mapwidth" value="3500"/>
 <Option name="maxplayershots" value="12"/>
 <Option name="maxshieldedwallbouncespeed" value="100"/>
@@ -39,7 +37,7 @@
 <Option name="playersonradar" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
 <Option name="playerwallbouncebrakefactor" value="0.5"/>
-<Option name="playerwallfriction" value="0.8"/>
+<Option name="playerwallfriction" value="0.5"/>
 <Option name="reserverobotteam" value="no"/>
 <Option name="robots" value="0"/>
 <Option name="robotteam" value="0"/>
@@ -51,7 +49,6 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="usewreckage" value="no"/>
 <Option name="waitingfps" value="0"/>
-<Option name="wallbouncefueldrainmult" value="0.1"/>
 <Option name="worldlives" value="3"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
@@ -781,16 +778,16 @@
 <Offset x="1216" y="0"/> <Offset x="0" y="1216"/>
 <Offset x="-1216" y="0"/> <Offset x="0" y="-1216"/>
 </Polygon></BallTarget>
-<Base team="4" x="59360" y="169120" dir = "32"/>
-<Base team="4" x="75040" y="166880" dir = "32"/>
-<Base team="4" x="84000" y="182560" dir = "96"/>
-<Base team="4" x="86240" y="157920" dir = "32"/>
-<Base team="4" x="101920" y="171360" dir = "32"/>
-<Base team="2" x="144480" y="32480" dir = "32"/>
-<Base team="2" x="153440" y="21280" dir = "32"/>
-<Base team="2" x="164640" y="3360" dir = "32"/>
-<Base team="2" x="173600" y="34720" dir = "96"/>
-<Base team="2" x="187040" y="12320" dir = "32"/>
+<Base team="4" x="59360" y="169120" dir="32" order="3"/>
+<Base team="4" x="75040" y="166880" dir="32" order="4"/>
+<Base team="4" x="84000" y="182560" dir="96" order="5"/>
+<Base team="4" x="86240" y="157920" dir="32" order="2"/>
+<Base team="4" x="101920" y="171360" dir="32" order="1"/>
+<Base team="2" x="144480" y="32480" dir="32" order="2"/>
+<Base team="2" x="153440" y="21280" dir="32" order="1"/>
+<Base team="2" x="164640" y="3360" dir="32" order="3"/>
+<Base team="2" x="173600" y="34720" dir="96" order="5"/>
+<Base team="2" x="187040" y="12320" dir="32" order="4"/>
 <Fuel x="1120" y="84000"/>
 <Fuel x="16800" y="32480"/>
 <Fuel x="16800" y="57120"/>

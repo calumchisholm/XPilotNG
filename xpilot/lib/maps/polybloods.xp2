@@ -8,7 +8,6 @@
 <Option name="allowplayerkilling" value="yes"/>
 <Option name="allowshields" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
-<Option name="ballconnectorspringconstant" value="1650"/>
 <Option name="ballradius" value="8"/>
 <Option name="ballstyles" value="false"/>
 <Option name="ballswallbounce" value="yes"/>
@@ -25,7 +24,7 @@
 <Option name="limitedvisibility" value="no"/>
 <Option name="mapauthor" value="Blood, Samaseon and Throat"/>
 <Option name="mapheight" value="3500"/>
-<Option name="mapname" value="Polygon Blood's Music v8.4"/>
+<Option name="mapname" value="Polygon Blood's Music v8.5"/>
 <Option name="mapwidth" value="3500"/>
 <Option name="maxplayershots" value="12"/>
 <Option name="maxshieldedwallbouncespeed" value="100"/>
@@ -34,7 +33,7 @@
 <Option name="playersonradar" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
 <Option name="playerwallbouncebrakefactor" value="0.5"/>
-<Option name="playerwallfriction" value="1.0"/>
+<Option name="playerwallfriction" value="0.5"/>
 <Option name="reserverobotteam" value="no"/>
 <Option name="robots" value="0"/>
 <Option name="robotteam" value="0"/>
@@ -1974,16 +1973,16 @@
 <Offset x="0" y="-1280"/>
 </Polygon>
 </BallTarget>
-<Base team="4" x="59360" y="169120" dir="32"/>
-<Base team="4" x="75040" y="166880" dir="32"/>
-<Base team="4" x="84000" y="182560" dir="96"/>
-<Base team="4" x="86240" y="157920" dir="32"/>
-<Base team="4" x="101920" y="171360" dir="32"/>
-<Base team="2" x="144480" y="32480" dir="32"/>
-<Base team="2" x="153440" y="21280" dir="32"/>
-<Base team="2" x="164640" y="3360" dir="32"/>
-<Base team="2" x="173600" y="34720" dir="96"/>
-<Base team="2" x="187040" y="12320" dir="32"/>
+<Base team="4" x="59360" y="169120" dir="32" order="3"/>
+<Base team="4" x="75040" y="166880" dir="32" order="4"/>
+<Base team="4" x="84000" y="182560" dir="96" order="5"/>
+<Base team="4" x="86240" y="157920" dir="32" order="2"/>
+<Base team="4" x="101920" y="171360" dir="32" order="1"/>
+<Base team="2" x="144480" y="32480" dir="32" order="2"/>
+<Base team="2" x="153440" y="21280" dir="32" order="1"/>
+<Base team="2" x="164640" y="3360" dir="32" order="3"/>
+<Base team="2" x="173600" y="34720" dir="96" order="5"/>
+<Base team="2" x="187040" y="12320" dir="32" order="4"/>
 <Fuel x="1120" y="84000"/>
 <Fuel x="16800" y="32480"/>
 <Fuel x="16800" y="57120"/>
