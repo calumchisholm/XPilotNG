@@ -1,4 +1,4 @@
-# xpilots option dump
+# /home/jli/xpilot/src/server/xpilots option dump
 # 
 # LIBDIR = /usr/local/games/lib/xpilot/
 # DEFAULTS_FILE_NAME = /usr/local/games/lib/xpilot/defaults
@@ -12,21 +12,13 @@ shotMass:                                0.1
 shotSpeed:                               21.0
 shotLife:                                60
 fireRepeatRate:                          2
-maxRobots:                               4
-minRobots:                               -1
-robotsTalk:                              false
-robotsLeave:                             true
-robotLeaveLife:                          50
-robotLeaveScore:                         -90
-robotLeaveRatio:                         -5
-robotTeam:                               0
-restrictRobots:                          true
-reserveRobotTeam:                        true
 maxPlayerShots:                          256
 shotsGravity:                            true
 idleRun:                                 false
+noQuit:                                  false
 mapWidth:                                3500
 mapHeight:                               3500
+mapFileName:                             globe.xp
 mapName:                                 unknown
 mapAuthor:                               anonymous
 contactPort:                             15345
@@ -47,28 +39,29 @@ cloakedShield:                           yes
 maxObjectWallBounceSpeed:                40
 maxShieldedWallBounceSpeed:              50
 maxUnshieldedWallBounceSpeed:            20
-maxShieldedPlayerWallBounceAngle:        90
-maxUnshieldedPlayerWallBounceAngle:      30
 playerWallBounceBrakeFactor:             0.89
 objectWallBounceBrakeFactor:             0.95
 objectWallBounceLifeFactor:              0.80
 wallBounceFuelDrainMult:                 1.0
 wallBounceDestroyItemProb:               0.0
+reportToMetaServer:                      yes
+searchDomainForXPilot:                   no
+denyHosts:                               
 limitedVisibility:                       no
 minVisibilityDistance:                   0.0
 maxVisibilityDistance:                   0.0
 limitedLives:                            no
 worldLives:                              0
+reset:                                   yes
+resetOnHuman:                            no
 teamPlay:                                no
 teamFuel:                                no
 teamCannons:                             no
 cannonSmartness:                         1
 cannonsUseItems:                         no
 keepShots:                               no
-teamAssign:                              yes
 teamImmunity:                            yes
 ecmsReprogramMines:                      yes
-ecmsReprogramRobots:                     yes
 targetKillTeam:                          no
 targetTeamCollision:                     yes
 targetSync:                              no
@@ -76,11 +69,8 @@ treasureKillTeam:                        no
 treasureCollisionDestroys:               yes
 treasureCollisionMayKill:                no
 wreckageCollisionMayKill:                no
-ignore20MaxFPS:                          true
 timing:                                  no
 edgeWrap:                                no
-edgeBounce:                              yes
-extraBorder:                             no
 gravityPoint:                            0,0
 gravityAngle:                            90
 gravityPointSource:                      false
@@ -91,7 +81,6 @@ wormholeVisible:                         true
 itemConcentratorVisible:                 true
 wormTime:                                0
 defaultsFileName:                        
-scoreTableFileName:                      
 framesPerSecond:                         14
 allowSmartMissiles:                      True
 allowHeatSeekers:                        True
@@ -208,18 +197,24 @@ maxTractorBeams:                         4
 maxAutopilots:                           10
 maxEmergencyShields:                     10
 gameDuration:                            0.0
+allowViewing:                            false
 friction:                                0.0
 checkpointRadius:                        6.0
 raceLaps:                                3
-lockOtherTeam:                           true
+lockOtherTeam:                           false
 loseItemDestroys:                        false
-useWreckage:                             true
-maxOffensiveItems:                       100
-maxDefensiveItems:                       100
 roundDelay:                              0
 maxRoundTime:                            0
-roundsToPlay:                            0
-analyticalCollisionDetection:            true
 pLockServer:                             false
+ignore20MaxFPS:                          true
 timerResolution:                         0
+password:                                
+numberOfRounds:                          0
+playerLimit:                             0
+recordMode:                              0
+constantScoring:                         no
+elimination:                             no
+dataURL:                                 
+clientPortStart:                         0
+clientPortEnd:                           0
 
