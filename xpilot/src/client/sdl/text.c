@@ -342,7 +342,7 @@ fontbounds printsize(font_data *ft_font, const char *fmt, ...)
     	vsnprintf(text, BUFSIZE, fmt, ap);    /* And Converts Symbols To Actual Numbers */
     	va_end(ap); 	    	    /* Results Are Stored In Text */
     }
-    return nprintsize(ft_font, BUFSIZE, text);
+    return nprintsize(ft_font, BUFSIZE, "%s", text);
 }
 
 bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
@@ -494,7 +494,7 @@ void print(font_data *ft_font, int color, int XALIGN, int YALIGN, int x, int y, 
     
     font=ft_font->list_base;
 
-    returnval = nprintsize(ft_font,length,text);
+    returnval = nprintsize(ft_font,length,"%s",text);
     
     yoff = (returnval.height/2.0f)*((float)YALIGN) - ft_font->h;
 

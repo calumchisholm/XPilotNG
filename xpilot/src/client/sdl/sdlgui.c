@@ -462,16 +462,16 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     switch (type) {
     case SETUP_BASE_UP:
-	mapnprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),maxCharsInNames,other->nick_name);
+	mapnprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),maxCharsInNames,"%s",other->nick_name);
         break;
     case SETUP_BASE_DOWN:
-	mapnprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(int)(y + BLOCK_SZ / 1.5),maxCharsInNames,other->nick_name);
+	mapnprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(int)(y + BLOCK_SZ / 1.5),maxCharsInNames,"%s",other->nick_name);
         break;
     case SETUP_BASE_LEFT:
-	mapnprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),maxCharsInNames,other->nick_name);
+	mapnprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),maxCharsInNames,"%s",other->nick_name);
         break;
     case SETUP_BASE_RIGHT:
-	mapnprint(&mapfont,color,LEFT,UP     ,(x - BLOCK_SZ / 2) ,(y),maxCharsInNames,other->nick_name);
+	mapnprint(&mapfont,color,LEFT,UP     ,(x - BLOCK_SZ / 2) ,(y),maxCharsInNames,"%s",other->nick_name);
         break;
     default:
         errno = 0;
@@ -1310,7 +1310,7 @@ void Paint_score_objects(void)
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
   		if (wrap(&x, &y)) {
-		    /*mapprint(&mapfont,scoreObjectColorRGBA,CENTER,CENTER,x,y,sobj->msg);*/
+		    /*mapprint(&mapfont,scoreObjectColorRGBA,CENTER,CENTER,x,y,"%s",sobj->msg);*/
 		    if (!score_object_texs[i].texture)
 		    	draw_text(&mapfont, scoreObjectColorRGBA
 			    	    ,CENTER,CENTER, x, y, sobj->msg, true
@@ -1411,7 +1411,7 @@ static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
     if (!meterBorderColorRGBA)
 	color = meter_color;
 
-    /*HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);*/
+    /*HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,"%s",title);*/
     disp_text(tex,color,x_alignment,CENTER,xstr,draw_height - y - meterHeight/2,true);
 }
 
@@ -1538,7 +1538,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 		  color,CENTER,CENTER,
 		  hud_pos_x,
 		  hud_pos_y -(- hudSize + HUD_OFFSET - BORDER),
-		  strlen(target->id_string),target->id_string);
+		  strlen(target->id_string),"%s",target->id_string);
 
     }
 
@@ -1698,7 +1698,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	    maxWidth = MAX(maxWidth, fb.width + BORDER + ITEM_SIZE);
 	    
 	    HUDprint(&gamefont,hudItemsColorRGBA,RIGHT,UP,horiz_pos - ITEM_SIZE - BORDER
-	    	    ,draw_height - vert_pos - ITEM_SIZE,str);
+	    	    ,draw_height - vert_pos - ITEM_SIZE,"%s",str);
 
 	    vert_pos += vertSpacing;
 
