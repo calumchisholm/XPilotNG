@@ -510,7 +510,7 @@ static void Paint_world_radar_old(void)
 	    xmoff = xm * Setup->y;
 	    start = end = -1;
 	    xp = xi;
-	    for (yi = 0; yi < RadarHeight; yi++) {
+	    for (yi = 0; yi < (int)RadarHeight; yi++) {
 		visibleColorChange = 0;
 		ym = (int)(yi * ys + 0.5);
 		type = Setup->map_data[xmoff + ym];
@@ -543,14 +543,15 @@ static void Paint_world_radar_old(void)
 		}
 
 		if (start != -1
-		    && (!vis || yi == RadarHeight - 1 || visibleColorChange)) {
+		    && (!vis || yi == (int)RadarHeight - 1
+			|| visibleColorChange)) {
 		    if (end > start) {
 			segments[nsegment].x1 = xp;
 			segments[nsegment].y1 = RadarHeight - 1 - start;
 			segments[nsegment].x2 = xp;
 			segments[nsegment].y2 = RadarHeight - 1 - end;
 			nsegment++;
-			if (nsegment >= max || yi == RadarHeight - 1) {
+			if (nsegment >= max || yi == (int)RadarHeight - 1) {
 			    XDrawSegments(dpy, radarPixmap2, radarGC,
 					  segments, nsegment);
 			    nsegment = 0;
@@ -559,7 +560,7 @@ static void Paint_world_radar_old(void)
 			points[npoint].x = xp;
 			points[npoint].y = RadarHeight - 1 - start;
 			npoint++;
-			if (npoint >= max || yi == RadarHeight - 1) {
+			if (npoint >= max || yi == (int)RadarHeight - 1) {
 			    XDrawPoints(dpy, radarPixmap2, radarGC,
 					points, npoint, CoordModeOrigin);
 			    npoint = 0;
