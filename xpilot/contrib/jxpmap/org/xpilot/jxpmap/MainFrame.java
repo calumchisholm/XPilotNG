@@ -8,9 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,17 +33,22 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 public class MainFrame extends JFrame implements ActionListener {
+    
+    private static final Dimension BUTTON_SIZE = new Dimension(26, 26);
     
     private MapCanvas canvas;
     private int zoom;
     
     private ButtonGroup toggleGroup;
     private JLabel lblZoom;
-    private JLabel lblGrid;
+    private JSpinner gridSpinner;
+    private JToggleButton gridToggle;
     private File mapFile;
     private BshConsole bshConsole;
     private JMenu scriptMenu;
@@ -173,15 +175,14 @@ public class MainFrame extends JFrame implements ActionListener {
     
     private void buildToolBar () {
         
-        JToolBar tb1 = new JToolBar(SwingConstants.VERTICAL);
-        JToolBar tb2 = new JToolBar(SwingConstants.HORIZONTAL);        
+        JToolBar tb1 = new JToolBar(SwingConstants.HORIZONTAL);
+        tb1.setFloatable(false);
+        JToolBar tb2 = new JToolBar(SwingConstants.VERTICAL);
+        tb2.setFloatable(false);        
         lblZoom = new JLabel("x1");
         lblZoom.setHorizontalAlignment(SwingConstants.CENTER);
         Font f = lblZoom.getFont();
         lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));
-        lblGrid = new JLabel("off");
-        lblGrid.setHorizontalAlignment(SwingConstants.CENTER);
-        lblGrid.setFont(lblZoom.getFont());                
         toggleGroup = new ButtonGroup();
        
         tb1.add(newToggle("select", "/images/arrow.gif", "Select"));       
@@ -195,8 +196,10 @@ public class MainFrame extends JFrame implements ActionListener {
         tb1.add(newButton("undo", "/images/undo.gif", "Undo"));
         tb1.add(newButton("redo", "/images/redo.gif", "Redo"));  
         tb1.addSeparator();
-        tb1.add(gridButton());
-        tb1.add(lblGrid);
+        tb1.add(makeGridSpinner());
+        tb1.add(makeGridToggle());
+        tb1.addSeparator();
+        tb1.add(makeFastRenderingToggle());
         
         tb2.add(newToggle("newWall", "/images/polyicon.gif", "New wall"));        
         tb2.add(newToggle("newFuel", "/images/fuelicon.gif", "New fuel station"));
@@ -219,8 +222,8 @@ public class MainFrame extends JFrame implements ActionListener {
         tb2.add(newButton("makeCannon", "/images/cannonicon.gif", "Make cannon"));
         tb2.add(newToggle("makeWormhole", "/images/wormicon.gif", "Make wormhole"));
                 
-        getContentPane().add(tb1, BorderLayout.EAST);
-        getContentPane().add(tb2, BorderLayout.NORTH);        
+        getContentPane().add(tb1, BorderLayout.NORTH);
+        getContentPane().add(tb2, BorderLayout.EAST);        
     }
     
     
@@ -269,7 +272,8 @@ public class MainFrame extends JFrame implements ActionListener {
         b.setToolTipText(toolTip);
         b.setActionCommand(cmd);
         b.addActionListener(this);
-        b.setPreferredSize(new Dimension(26, 26));
+        b.setPreferredSize(BUTTON_SIZE);
+        b.setMaximumSize(BUTTON_SIZE);
         toggleGroup.add(b);
         return b;
     }
@@ -279,58 +283,63 @@ public class MainFrame extends JFrame implements ActionListener {
         JButton b = new JButton(new ImageIcon(getClass().getResource(name)));
         b.setToolTipText(toolTip);
         b.setActionCommand(cmd);
-        b.setPreferredSize(new Dimension(26, 26));
+        b.setPreferredSize(BUTTON_SIZE);
+        b.setMaximumSize(BUTTON_SIZE);
         b.addActionListener(this);
         return b;
     }
     
-    private JToggleButton gridButton() {
+    private JSpinner makeGridSpinner() {
+        gridSpinner = new JSpinner(
+            new SpinnerNumberModel(8, 1, 256, 1) {
+                public void setValue(Object value) {
+                    super.setValue(value);
+                    if (gridToggle.isSelected())
+                        canvas.setGrid(getNumber().intValue());
+                }
+            });
+        gridSpinner.setEnabled(false);
+        gridSpinner.setToolTipText("Edit grid size");
+        gridSpinner.setPreferredSize(new Dimension(34, 26));
+        gridSpinner.setMaximumSize(new Dimension(34, 26));
+        return gridSpinner;
+    }
+        
+    private JToggleButton makeGridToggle() {
         JToggleButton b = new JToggleButton(new ImageIcon(
-            getClass().getResource("/images/polyicon.gif")));
+            getClass().getResource("/images/gridicon.gif")));
         b.setToolTipText("Toggle grid");
         b.setActionCommand("grid");
-        b.setPreferredSize(new Dimension(26, 26));
+        b.setPreferredSize(BUTTON_SIZE);
+        b.setMaximumSize(BUTTON_SIZE);        
         b.addActionListener(this);
-        b.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent me) {
-                if ((me.getModifiers() 
-                & InputEvent.BUTTON1_MASK) == 0) {
-                    int grid = promptGrid();
-                    if (grid == 0) return;
-                    if (canvas.getGrid() > 0) {
-                        canvas.setGrid(grid);
-                        lblGrid.setText(String.valueOf(grid));
-                    } else {
-                        canvas.setGrid(-grid);
-                    }
-                }
-            }
-        });
-        return b;       
+        this.gridToggle = b;
+        return b;
     }
     
-    private int promptGrid() {
-        String sz = JOptionPane.showInputDialog(this, "Enter grid size");
-        if (sz == null) return 0;
-        try {
-            int value = Integer.parseInt(sz);
-            if (value <= 0) throw new NumberFormatException();
-            return value;
-        } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(
-                this, "Invalid grid size", "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
-        return 0;
+    private JToggleButton makeFastRenderingToggle() {
+        JToggleButton b = new JToggleButton(new ImageIcon(
+            getClass().getResource("/images/fasticon.gif")));
+        b.setToolTipText("Fast rendering mode");
+        b.setActionCommand("fast");
+        b.addActionListener(this);
+        b.setMaximumSize(BUTTON_SIZE);        
+        b.setPreferredSize(BUTTON_SIZE);
+        return b;
+    }
+    
+    private void fast() {
+        canvas.setFastRendering(!canvas.isFastRendering());
+        canvas.repaint();
     }
     
     private void grid() {
-        int grid = -canvas.getGrid();
-        canvas.setGrid(grid);
-        if (grid > 0) {
-            lblGrid.setText(String.valueOf(grid));
+        if (gridToggle.isSelected()) {
+            canvas.setGrid(((Number)gridSpinner.getValue()).intValue());
+            gridSpinner.setEnabled(true);
         } else {
-            lblGrid.setText("off");
+            canvas.setGrid(-1);
+            gridSpinner.setEnabled(false);            
         }
     }
     

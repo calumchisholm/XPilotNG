@@ -50,7 +50,7 @@ public class MapCanvas extends JComponent {
         dragHandler = new DragHandler();
         selectHandler = new SelectHandler();
         selected = new ArrayList();
-        grid = -8;
+        grid = -1;
     }
 
     public void setCanvasEventHandler(CanvasEventHandler h) {
@@ -72,7 +72,7 @@ public class MapCanvas extends JComponent {
     public void setFastRendering(boolean value) {
         this.fastRendering = value;
     }
-    
+        
     public boolean isFastRendering() {
         return this.fastRendering;
     }
@@ -970,13 +970,15 @@ public class MapCanvas extends JComponent {
     private class DragHandler extends CanvasEventAdapter {
         
         private Point dragStart;
-        private Point offsetStart;        
+        private Point offsetStart;
+        private boolean wasFastRendering;        
         
         public void mousePressed(MouseEvent evt) {
             toScreen(evt);
             dragStart = evt.getPoint();
             offsetStart = new Point(offset);
-            setFastRendering(true);            
+            wasFastRendering = isFastRendering();
+            setFastRendering(true);           
         }
         
         public void mouseDragged(MouseEvent evt) {
@@ -989,7 +991,7 @@ public class MapCanvas extends JComponent {
         }
         
         public void mouseReleased(MouseEvent evt) {
-            setFastRendering(false);
+            setFastRendering(wasFastRendering);
             setCanvasEventHandler(null);
             repaint();                        
         }
