@@ -29,6 +29,7 @@
 #endif
 #ifndef _WINDOWS
 #include <stdlib.h>
+#include <string.h>
 #include <X11/Xlib.h>
 #endif
 
@@ -410,6 +411,8 @@ int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 	    GCLineWidth|GCLineStyle|GCCapStyle|GCJoinStyle|GCGraphicsExposures;
 	maskGC = XCreateGC(dpy, pixmap, values, &xgc);
     }
+
+    return 0;
 }
 
 /**

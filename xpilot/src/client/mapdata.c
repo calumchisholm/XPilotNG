@@ -61,7 +61,7 @@ int Mapdata_setup (const char *urlstr) {
     strncpy(path, texturePath, 1024 - 1);
     path[1024 - 1] = '\0';
 
-    while (dir = strtok(texturePath, ":"))
+    for (dir = strtok(texturePath, ":"); dir; dir = strtok(NULL, ":"))
         if (access(dir, R_OK | W_OK | X_OK) == 0) 
             break;
     
@@ -154,11 +154,13 @@ static int Mapdata_extract (const char *name) {
 
     if (gzgets(in, buf, COPY_BUF_SIZE) == Z_NULL) {
         error("failed to read header from %s", name);
+        gzclose(in);
         return 0;
     }
 
     if (sscanf(buf, "XPD %d\n", &count) != 1) {
         error("invalid header in %s", name);
+        gzclose(in);
         return 0;
     }    
 
@@ -166,6 +168,7 @@ static int Mapdata_extract (const char *name) {
 
         if (gzgets(in, buf, COPY_BUF_SIZE) == Z_NULL) {
             error("failed to read file info from %s", name);
+            gzclose(in);
             return 0;
         }
 
@@ -173,6 +176,13 @@ static int Mapdata_extract (const char *name) {
 
         if (sscanf(buf, "%s\n%ld\n", fname + strlen(dir) + 1, &size) != 2) {
             error("failed to parse file info %s", buf);
+            gzclose(in);
+            return 0;
+        }
+
+        /* security check */
+        if (strchr(fname + strlen(dir) + 1, '/') != NULL) {
+            error("file name %s is illegal", fname);
             gzclose(in);
             return 0;
         }

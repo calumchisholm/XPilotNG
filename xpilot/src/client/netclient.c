@@ -296,6 +296,7 @@ static unsigned int get_ushort(char **ptr)
 static void Create_polygon_styles_for_testing ()
 {
     int i;
+    extern int Bitmap_add(const char *, int, bool);
 
     char *textureNames[] = {
         "texture0.ppm",
@@ -649,6 +650,8 @@ int Net_setup(void)
 	}
 	if (0) /* commented out to avoid problems outside testing */
 	{
+            extern int Mapdata_setup (const char *);
+
             if (Mapdata_setup(Setup->author)) {
 
                 Create_polygon_styles_for_testing();
