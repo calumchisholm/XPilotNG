@@ -502,11 +502,11 @@ void Tractor_beam(int ind)
     DFLOAT	maxdist, percent;
     long	cost;
 
+    /* kps - add lock_pl = Player_by_id(pl->lock.pl_id); */
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
     if (BIT(pl->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
 	!= (LOCK_PLAYER|LOCK_VISIBLE)
-	|| BIT(Player_by_id(pl->lock.pl_id)->status,
-	       PLAYING|PAUSE|KILLED|GAME_OVER) != PLAYING
+	|| !Player_is_playing(Player_by_id(pl->lock.pl_id))
 	|| pl->lock.distance >= maxdist
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
 	|| BIT(Player_by_id(pl->lock.pl_id)->used, HAS_PHASING_DEVICE)) {
@@ -646,7 +646,7 @@ void Do_transporter(int ind)
     for (i = 0; i < NumPlayers; i++) {
 	p = Players(i);
 	if (p == pl
-	    || BIT(p->status, PLAYING|PAUSE|GAME_OVER) != PLAYING
+	    || !Player_is_active(p)
 	    || Team_immune(pl->id, p->id)
 	    || IS_TANK_PTR(p)
 	    || BIT(p->used, HAS_PHASING_DEVICE))
@@ -1147,7 +1147,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 	if (BIT(p->used, HAS_PHASING_DEVICE))
 	    continue;
 
-	if (BIT(p->status, PLAYING|GAME_OVER|PAUSE) == PLAYING) {
+	if (Player_is_active(p)) {
 	    range = Wrap_length(cx - p->pos.cx,
 				cy - p->pos.cy) / CLICK;
 	    if (range > ECM_DISTANCE)

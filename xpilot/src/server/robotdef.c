@@ -344,7 +344,7 @@ static void Robot_default_invite(int ind, int inv_ind)
 	if (inviter->id == war_id)
 	    accept = 0;
 	/* don't accept players who are not active */
-	if (BIT(inviter->status, PLAYING|GAME_OVER|PAUSE) != PLAYING)
+	if (!Player_is_active(inviter))
 	    accept = 0;
 	/* don't accept players with scores substantially lower than ours */
 	else if (inviter->score < (pl->score - limit))
@@ -1008,8 +1008,7 @@ static bool Check_robot_target(int ind,
 		 && pl->fuel.sum + ED_LASER > pl->fuel.l3
 		 && new_mode == RM_ATTACK) {
 	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
-		&& BIT(Player_by_id(my_data->robot_lock_id)->status,
-		       PLAYING|PAUSE|GAME_OVER) == PLAYING) {
+		&& Player_is_active(Player_by_id(my_data->robot_lock_id))) {
 		ship = Player_by_id(my_data->robot_lock_id);
 	    }
 	    else if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
@@ -1018,8 +1017,7 @@ static bool Check_robot_target(int ind,
 	    else {
 		ship = NULL;
 	    }
-	    if (ship
-		&& BIT(ship->status, PLAYING|PAUSE|GAME_OVER) == PLAYING) {
+	    if (ship && Player_is_active(ship)) {
 
 		DFLOAT	x1, y1, x3, y3, x4, y4, x5, y5;
 		DFLOAT	ship_dist, dir3, dir4, dir5;
@@ -1240,9 +1238,8 @@ static bool Detect_hunt(int ind, int j)
 		*ship = Players(j);
     int		dx, dy;
 
-    if (BIT(ship->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
+    if (!Player_is_playing(ship))
 	return false;		/* can't go after non-playing ships */
-    }
 
     if (BIT(ship->used, HAS_PHASING_DEVICE))
 	return false;		/* can't do anything with phased ships */
@@ -1437,10 +1434,11 @@ static bool Ball_handler(int ind)
 	    }
 	}
 	for (i = 0; i < NumPlayers; i++) {
-	    dist = (int)(LENGTH(ball->pos.cx - Players(i)->pos.cx,
-				ball->pos.cy - Players(i)->pos.cy) / CLICK);
-	    if (Players(i)->id != pl->id
-		&& (BIT(Players(i)->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
+	    player *pl_i = Players(i);
+	    dist = (int)(LENGTH(ball->pos.cx - pl_i->pos.cx,
+				ball->pos.cy - pl_i->pos.cy) / CLICK);
+	    if (pl_i->id != pl->id
+		&& Player_is_active(pl_i)
 		&& dist < dist_np)
 		dist_np = dist;
 	}
@@ -2082,8 +2080,7 @@ static void Robot_default_play(int ind)
 	j = GetInd(my_data->robot_lock_id);
 	ship = Players(j);
 
-	if (BIT(Player_by_id(my_data->robot_lock_id)->status,
-		PLAYING|GAME_OVER|PAUSE) == PLAYING) {
+	if (Player_is_active(ship)) {
 
 	    if (Detect_hunt(ind, j)) {
 

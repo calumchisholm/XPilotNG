@@ -414,12 +414,16 @@ static int Frame_status(int conn, int ind)
     CLR_BIT(pl->lock.tagged, LOCK_VISIBLE);
     if (BIT(pl->lock.tagged, LOCK_PLAYER) && BIT(pl->used, HAS_COMPASS)) {
 	lock_id = pl->lock.pl_id;
+	/* kps - fix - lock_pl = Player_by_id(lock_id); */
 	lock_ind = GetInd(lock_id);
 
 	if ((!BIT(World.rules->mode, LIMITED_VISIBILITY)
 	     || pl->lock.distance <= pl->sensor_range)
 #ifndef SHOW_CLOAKERS_RANGE
-	    && (pl->visibility[lock_ind].canSee || OWNS_TANK(ind, lock_ind) || TEAM(ind, lock_ind) || ALLIANCE(ind, lock_ind))
+	    && (pl->visibility[lock_ind].canSee
+		|| OWNS_TANK(ind, lock_ind)
+		|| TEAM(ind, lock_ind)
+		|| ALLIANCE(ind, lock_ind))
 #endif
 	    && BIT(Players(lock_ind)->status, PLAYING|GAME_OVER) == PLAYING
 	    && (playersOnRadar
@@ -1137,7 +1141,9 @@ static void Frame_radar(int conn, int ind)
 	|| NumPseudoPlayers > 0
 	|| NumAlliances > 0) {
 	for (k = 0; k < num_player_shuffle; k++) {
+	    player *pl_i;
 	    i = player_shuffle_ptr[k];
+	    pl_i = Players(i);
 	    /*
 	     * Don't show on the radar:
 	     *		Ourselves (not necessarily same as who we watch).
@@ -1145,16 +1151,16 @@ static void Frame_radar(int conn, int ind)
 	     *		People in other teams or alliances if;
 	     *			no playersOnRadar or if not visible
 	     */
-	    if (Players(i)->conn == conn
-		|| BIT(Players(i)->status, PLAYING|PAUSE|GAME_OVER) != PLAYING
+	    if (pl_i->conn == conn
+		|| !Player_is_active(pl_i) /* kps - active / playing ??? */
 		|| (!TEAM(i, ind)
 		    && !ALLIANCE(ind, i)
 		    && !OWNS_TANK(ind, i)
 		    && (!playersOnRadar || !pl->visibility[i].canSee))) {
 		continue;
 	    }
-	    cx = Players(i)->pos.cx;
-	    cy = Players(i)->pos.cy;
+	    cx = pl_i->pos.cx;
+	    cy = pl_i->pos.cy;
 	    if (BIT(World.rules->mode, LIMITED_VISIBILITY)
 		&& Wrap_length(pl->pos.cx - cx,
 			       pl->pos.cy - cy) > pl->sensor_range * CLICK) {

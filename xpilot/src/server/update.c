@@ -598,8 +598,7 @@ static void Cannon_update(void)
 	    if ((Wrap_length(tpl->pos.cx - c->pos.cx,
 			     tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
-		&& BIT(tpl->status, PLAYING|GAME_OVER|KILLED|PAUSE)
-		   == PLAYING) {
+		&& Player_is_playing(tpl)) {
 		General_tractor_beam(-1, c->pos.cx, c->pos.cy,
 				     c->item[ITEM_TRACTOR_BEAM], ind,
 				     c->tractor_is_pressor);
@@ -677,7 +676,7 @@ static void Player_turns(void)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
 
-	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE) != PLAYING)
+	if (!Player_is_active(pl))
 	    continue;
 
 	/* Only do autopilot code if switched on and player is not
@@ -974,7 +973,7 @@ void Update_objects(void)
 	    }
 	}
 
-	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE) != PLAYING)
+	if (!Player_is_active(pl))
 	    continue;
 
 	if (round_delay > 0)
@@ -1359,7 +1358,7 @@ void Update_objects(void)
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player *pl = Players(i);
 
-	if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
+	if (Player_is_playing(pl))
 	    Update_tanks(&(pl->fuel));
 	if (BIT(pl->status, KILLED)) {
 	    Throw_items(i);

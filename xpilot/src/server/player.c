@@ -1384,7 +1384,7 @@ void Compute_game_status(void)
 		lap = 0;
 		for (i = 0; i < NumPlayers; i++) {
 		    pl = Players(i);
-		    if (BIT(pl->status, PAUSE|GAME_OVER|PLAYING) != PLAYING)
+		    if (!Player_is_active(pl))
 			continue;
 		    if (pl->round < pl_i->round) {
 			count++;
@@ -1397,7 +1397,7 @@ void Compute_game_status(void)
 		}
 		for (i = 0; i < NumPlayers; i++) {
 		    pl = Players(i);
-		    if (BIT(pl->status, PAUSE|GAME_OVER|PLAYING) != PLAYING)
+		    if (!Player_is_active(pl))
 			continue;
 		    if (pl->round < pl_i->round) {
 			Player_death_reset(i);

@@ -111,10 +111,9 @@ bool team_dead(int team)
     int i;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players(i)->team == team &&
-	    BIT(Players(i)->status, PLAYING|GAME_OVER|PAUSE) == PLAYING) {
+	player *pl = Players(i);
+	if (pl->team == team && Player_is_active(pl))
 	    return false;
-	}
     }
     return true;
 }
@@ -132,7 +131,7 @@ static bool Player_lock_allowed(int ind, int lock)
     }
 
     /* if we are actively playing then we can lock since we are not viewing. */
-    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
+    if (Player_is_active(pl))
 	return true;
 
     /* if there is no team play then we can always lock on anyone. */
@@ -192,16 +191,17 @@ int Player_lock_closest(int ind, int next)
     newpl = -1;
     best = FLT_MAX;
     for (i = 0; i < NumPlayers; i++) {
+	player *pl_i = Players(i);
 	if (i == lock
-	    || (BIT(Players(i)->status, PLAYING|PAUSE|GAME_OVER) != PLAYING)
+	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(ind, i)
 	    || OWNS_TANK(ind, i)
 	    || TEAM(ind,i)
 	    || ALLIANCE(ind, i)) {
 	    continue;
 	}
-	l = Wrap_length(Players(i)->pos.cx - pl->pos.cx,
-			Players(i)->pos.cy - pl->pos.cy);
+	l = Wrap_length(pl_i->pos.cx - pl->pos.cx,
+			pl_i->pos.cy - pl->pos.cy);
 	if (l >= dist && l < best) {
 	    best = l;
 	    newpl = i;
@@ -225,6 +225,7 @@ bool Team_zero_pausing_available(void)
 	    && World.teams[0].NumBases > World.teams[0].NumMembers);
 }
 
+/* kps - changed int onoff to bool on */
 void Pause_player(int ind, int onoff)
 {
     player		*pl = Players(ind);
@@ -250,21 +251,6 @@ void Pause_player(int ind, int onoff)
 	    CLR_BIT(pl->status, PAUSE);
 	    updateScores = true;
 	    if (BIT(World.rules->mode, LIMITED_LIVES)) {
-#if 0
-		for (i = 0; i < NumPlayers; i++) {
-		    /* If a non-team member has lost a life,
-		     * then it's too late to join. */
-		    if (i == ind) {
-			continue;
-		    }
-		    if (Players(i)->life < World.rules->lives
-			&& !TEAM(ind, i)
-			&& !BIT(Players(i)->status, PAUSE)) {
-			toolate = true;
-			break;
-		    }
-		}
-#endif
 		/* Its always too late */
 		toolate = true;
 	    }

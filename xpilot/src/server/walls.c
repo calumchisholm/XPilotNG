@@ -2811,7 +2811,7 @@ static void Move_player_new(int ind)
     DFLOAT fric;
     vector oldv;
 
-    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
+    if (!Player_is_playing(pl)) {
 	if (!BIT(pl->status, KILLED|PAUSE)) {
 	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
 	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
@@ -2925,7 +2925,8 @@ static void Turn_player_new(int ind)
     if (new_dir == pl->dir) {
 	return;
     }
-    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
+    if (!Player_is_playing(pl)) {
+	/* kps - what is the point of this ??? */
 	pl->dir = new_dir;
 	return;
     }
@@ -2939,8 +2940,9 @@ static void Turn_player_new(int ind)
 
     while (pl->dir != new_dir) {
 	next_dir = MOD2(pl->dir + sign, RES);
-	if (Shape_morph((shape *)pl->ship, pl->dir, (shape *)pl->ship, next_dir, hitmask,
-			(object *)pl, pl->pos.cx, pl->pos.cy) != NO_GROUP) {
+	if (Shape_morph((shape *)pl->ship, pl->dir, (shape *)pl->ship,
+			next_dir, hitmask, (object *)pl,
+			pl->pos.cx, pl->pos.cy) != NO_GROUP) {
 	    if (!maraTurnqueue)
 		pl->float_dir = pl->dir;
 	    break;

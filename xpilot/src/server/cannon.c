@@ -396,7 +396,7 @@ static void Cannon_aim(int ind, int weapon, int *target, int *dir)
 	    continue;
 
 	/* mode 3 also checks if a player is using a phasing device */
-	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE|KILLED) != PLAYING
+	if (!Player_is_playing(pl)
 	    || (BIT(World.rules->mode, TEAM_PLAY)
 		&& pl->team == c->team)
 	    || ((pl->forceVisible <= 0)

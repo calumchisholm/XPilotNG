@@ -292,7 +292,7 @@ static void PlayerCollision(void)
     /* Player - player, checkpoint, treasure, object and wall */
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING)
+	if (!Player_is_playing(pl))
 	    continue;
 
 	if (!INSIDE_MAP(pl->pos.cx, pl->pos.cy)) {
@@ -312,10 +312,8 @@ static void PlayerCollision(void)
 	    for (j = i + 1; j < NumPlayers; j++) {
 		player *pl_j = Players(j);
 
-		if (BIT(pl_j->status, PLAYING|PAUSE|GAME_OVER|KILLED)
-		    != PLAYING) {
+		if (!Player_is_playing(pl_j))
 		    continue;
-		}
 		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
 		    continue;
 		if (is_polygon_map || !useOldCode) {
@@ -693,7 +691,7 @@ static void PlayerObjectCollision(int ind)
     /*
      * Collision between a player and an object.
      */
-    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING)
+    if (!Player_is_playing(pl))
 	return;
 
     Cell_get_objects(OBJ_X_IN_BLOCKS(pl), OBJ_Y_IN_BLOCKS(pl),
