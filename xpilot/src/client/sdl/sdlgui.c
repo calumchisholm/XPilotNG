@@ -58,7 +58,7 @@ int packetDropMeterColor    = 0xff000055;
 int packetLagMeterColor     = 0xff000055;
 int temporaryMeterColor     = 0xff000055;
 
-int dirPtrColor   	    = 0x0000ff44;
+int dirPtrColor   	    = 0x0000ff22;
 int hudHLineColor   	    = 0x0000ff44;
 int hudVLineColor   	    = 0x0000ff44;
 int hudItemsColor   	    = 0x0000ff44;

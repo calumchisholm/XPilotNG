@@ -152,6 +152,7 @@ void setupPaint_stationary(void)
     paintSetupMode = STATIONARY_MODE;
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
     glLoadIdentity();
     glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
     glScalef(scale, scale, scale);
@@ -166,6 +167,7 @@ void setupPaint_moving(void)
     paintSetupMode = MOVING_MODE;
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
     glLoadIdentity();
     glTranslatef(-world.x * scale, -world.y * scale, 0);
     glScalef(scale, scale, scale);
