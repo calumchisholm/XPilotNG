@@ -340,7 +340,7 @@ static void Place_asteroid(world_t *world)
 	for (i = 0; i < NumPlayers; i++) {
 	    player_t *pl = Player_by_index(i);
 
-	    if (!Player_is_playing(pl))
+	    if (!Player_is_alive(pl))
 		continue;
 
 	    if (Wrap_length(pos.cx - pl->pos.cx,

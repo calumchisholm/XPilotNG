@@ -100,7 +100,7 @@ void Cannon_update(world_t *world, bool do_less_frequent_update)
 	    if ((Wrap_length(tpl->pos.cx - c->pos.cx,
 			     tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
-		&& Player_is_playing(tpl)) {
+		&& Player_is_alive(tpl)) {
 		General_tractor_beam(world, NULL, c->pos,
 				     c->item[ITEM_TRACTOR_BEAM],
 				     tpl, c->tractor_is_pressor);
@@ -459,7 +459,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	    continue;
 
 	/* mode 3 also checks if a player is using a phasing device */
-	if (!Player_is_playing(pl)
+	if (!Player_is_alive(pl)
 	    || (BIT(world->rules->mode, TEAM_PLAY)
 		&& pl->team == c->team)
 	    || ((pl->forceVisible <= 0)

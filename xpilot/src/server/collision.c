@@ -192,7 +192,7 @@ static void PlayerCollision(world_t *world)
     /* Player - player, checkpoint, treasure, object and wall */
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
-	if (!Player_is_playing(pl))
+	if (!Player_is_alive(pl))
 	    continue;
 
 	if (!World_contains_clpos(world, pl->pos)) {
@@ -212,7 +212,7 @@ static void PlayerCollision(world_t *world)
 		player_t *pl_j = Player_by_index(j);
 		double range;
 
-		if (!Player_is_playing(pl_j))
+		if (!Player_is_alive(pl_j))
 		    continue;
 		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
 		    continue;
@@ -535,7 +535,7 @@ static void PlayerObjectCollision(player_t *pl)
     /*
      * Collision between a player and an object.
      */
-    if (!Player_is_playing(pl))
+    if (!Player_is_alive(pl))
 	return;
 
     if (NumObjs >= options.cellGetObjectsThreshold)

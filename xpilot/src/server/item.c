@@ -444,7 +444,7 @@ void Tractor_beam(player_t *pl)
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
     if (BIT(pl->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
 	!= (LOCK_PLAYER|LOCK_VISIBLE)
-	|| !Player_is_playing(locked_pl)
+	|| !Player_is_alive(locked_pl)
 	|| pl->lock.distance >= maxdist
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
 	|| BIT(locked_pl->used, HAS_PHASING_DEVICE)) {

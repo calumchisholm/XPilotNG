@@ -1165,7 +1165,7 @@ void Update_objects(world_t *world)
     for (i = NumPlayers - 1; i >= 0; i--) {
 	pl = Player_by_index(i);
 
-	if (Player_is_playing(pl))
+	if (Player_is_alive(pl))
 	    Update_tanks(&(pl->fuel));
 
 	if (Player_is_killed(pl)) {
@@ -1187,7 +1187,7 @@ void Update_objects(world_t *world)
 	else
 	    pl->pauseTime = 0;
 
-	if (Player_is_playing(pl) && pl->recovery_count <= 0) {
+	if (Player_is_alive(pl) && pl->recovery_count <= 0) {
 	    pl->idleTime += timePerFrame;
 	    if (Player_is_human(pl)
 		&& options.maxIdleTime > 0

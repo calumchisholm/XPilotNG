@@ -2749,7 +2749,7 @@ void Move_player(player_t *pl)
     vector_t oldv;
     world_t *world = &World;
 
-    if (!Player_is_playing(pl)) {
+    if (!Player_is_alive(pl)) {
 	if (!(Player_is_killed(pl)
 	      || Player_is_paused(pl))) {
 	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
@@ -2888,7 +2888,7 @@ void Turn_player(player_t *pl)
     if (new_dir == pl->dir)
 	return;
 
-    if (!Player_is_playing(pl)) {
+    if (!Player_is_alive(pl)) {
 	/* kps - what is the point of this ??? */
 	/* virus - it prevents you from turning ship while ur dead ;) */
 	/* kps - why is pl->dir set to new_dir then ? */

@@ -470,7 +470,7 @@ void PlayerCheckpointCollision(player_t *pl)
 
 	if (pl->round != 0)
 	    pl->time++;
-	if (Player_is_playing(pl)
+	if (Player_is_alive(pl)
 	    && Wrap_length(pl->pos.cx - check->pos.cx,
 			   pl->pos.cy - check->pos.cy)
 	    < options.checkpointRadius * BLOCK_CLICKS

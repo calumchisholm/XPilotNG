@@ -782,7 +782,7 @@ static void Robotdef_fire_laser(player_t *pl)
     else
 	return;
 
-    /* kps - this should be Player_is_playing() ? */
+    /* kps - this should be Player_is_alive() ? */
     if (!Player_is_active(ship))
 	return;
 
@@ -1178,7 +1178,7 @@ static bool Detect_ship(player_t *pl, player_t *ship)
     double distance;
 
     /* can't go after non-playing ships */
-    if (!Player_is_playing(ship))
+    if (!Player_is_alive(ship))
 	return false;
 
     /* can't do anything with phased ships */

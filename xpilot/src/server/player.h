@@ -528,8 +528,11 @@ static inline bool Player_used_emergency_shield(player_t *pl)
     return false;
 }
 
-static inline bool Player_is_playing(player_t *pl)
+static inline bool Player_is_alive(player_t *pl)
 {
+#ifdef USE_PL_STATE
+    return pl->pl_state == PL_STATE_ALIVE ? true : false;
+#else
     if (Player_is_killed(pl))
 	return false;
     if (Player_is_paused(pl))
@@ -537,6 +540,7 @@ static inline bool Player_is_playing(player_t *pl)
     if (BIT(pl->pl_status, PLAYING|GAME_OVER) == PLAYING)
 	return true;
     return false;
+#endif
 }
 
 static inline bool Player_is_active(player_t *pl)

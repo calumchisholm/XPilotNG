@@ -949,7 +949,7 @@ static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size)
     }
 
     if (pl2->conn != NULL) {
-	if (Player_is_playing(pl2))
+	if (Player_is_alive(pl2))
 	    Kill_player(pl2, false);
 	Pause_player(pl2, true);
 	snprintf(msg, size, "%s was paused by %s. [*Server notice*]",

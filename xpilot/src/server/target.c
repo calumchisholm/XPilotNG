@@ -228,7 +228,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	if (pl->team == targ->team) {
 	    if (options.targetKillTeam
 		&& targets_remaining == 0
-		&& Player_is_playing(pl))
+		&& Player_is_alive(pl))
 		Player_set_state(pl, PL_STATE_KILLED);
 	    Score(pl, -sc, targ->pos, "Target: ");
 	}
