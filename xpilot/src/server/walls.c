@@ -334,7 +334,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	int		i, j;
 	double		sc;
 
-	SET_BIT(pl->pl_status, KILLED);
+	Player_set_state(pl, PL_STATE_KILLED);
 	sprintf(msg, howfmt, pl->name, (!pt) ? " head first" : "");
 
 	/* get a list of who pushed me */

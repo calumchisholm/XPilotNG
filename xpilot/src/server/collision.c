@@ -196,7 +196,7 @@ static void PlayerCollision(world_t *world)
 	    continue;
 
 	if (!World_contains_clpos(world, pl->pos)) {
-	    SET_BIT(pl->pl_status, KILLED);
+	    Player_set_state(pl, PL_STATE_KILLED);
 	    Set_message_f("%s left the known universe.", pl->name);
 	    sc = Rate(WALL_SCORE, pl->score);
 	    Score(pl, -sc, pl->pos, pl->name);
@@ -261,12 +261,12 @@ static void PlayerCollision(world_t *world)
 		if (pl->fuel.sum <= 0.0
 		    || (!BIT(pl->used, HAS_SHIELD)
 			&& !BIT(pl->have, HAS_ARMOR)))
-		    SET_BIT(pl->pl_status, KILLED);
+		    Player_set_state(pl, PL_STATE_KILLED);
 
 		if (pl_j->fuel.sum <= 0.0
 		    || (!BIT(pl_j->used, HAS_SHIELD)
 			&& !BIT(pl_j->have, HAS_ARMOR)))
-		    SET_BIT(pl_j->pl_status, KILLED);
+		    Player_set_state(pl_j, PL_STATE_KILLED);
 
 		if (!BIT(pl->used, HAS_SHIELD)
 		    && BIT(pl->have, HAS_ARMOR))
@@ -747,7 +747,7 @@ static void Player_collides_with_ball(player_t *pl, object_t *obj)
 	    Robot_war(pl, kp);
 	}
     }
-    SET_BIT(pl->pl_status, KILLED);
+    Player_set_state(pl, PL_STATE_KILLED);
 }
 
 
@@ -1013,7 +1013,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 	    && options.wreckageCollisionMayKill
 	    && !BIT(pl->used, HAS_SHIELD)
 	    && !BIT(pl->have, HAS_ARMOR))) {
-	SET_BIT(pl->pl_status, KILLED);
+	Player_set_state(pl, PL_STATE_KILLED);
 	sprintf(msg, "%s succumbed to an explosion.", pl->name);
 	if (obj->id != NO_ID) {
 	    kp = Player_by_id(obj->id);
@@ -1063,7 +1063,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	&& (pl->fuel.sum == 0.0
 	    || (!BIT(pl->used, HAS_SHIELD)
 		&& !BIT(pl->have, HAS_ARMOR)))) {
-	SET_BIT(pl->pl_status, KILLED);
+	Player_set_state(pl, PL_STATE_KILLED);
 	if (pl->velocity > v)
 	    /* player moves faster than asteroid */
 	    Set_message_f("%s smashed into an asteroid.", pl->name);
@@ -1237,7 +1237,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		Robot_war(pl, kp);
 	    }
-	    SET_BIT(pl->pl_status, KILLED);
+	    Player_set_state(pl, PL_STATE_KILLED);
 	    return;
 
 	default:

@@ -70,6 +70,8 @@
 #define PL_TYPE_ROBOT		1
 #define PL_TYPE_TANK		2
 
+#define PL_STATE_KILLED		1
+
 /*
  * Different types of attributes a player can have.
  * These are the bits of the player->have and player->used fields.
@@ -377,6 +379,12 @@ static inline bool Player_is_paused(player_t *pl)
     if (BIT(pl->pl_status, PAUSE))
 	return true;
     return false;
+}
+
+static inline void Player_set_state(player_t *pl, int state)
+{
+    if (state == PL_STATE_KILLED)
+	SET_BIT(pl->pl_status, KILLED);
 }
 
 static inline bool Player_is_self_destructing(player_t *pl)

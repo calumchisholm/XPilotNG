@@ -841,7 +841,7 @@ static void Update_players(world_t *world)
 			* options.selfDestructScoreMult;
 		    Score(pl, -sc, pl->pos, "Self-Destruct");
 		}
-		SET_BIT(pl->pl_status, KILLED);
+		Player_set_state(pl, PL_STATE_KILLED);
 		Set_message_f("%s has committed suicide.", pl->name);
 		Throw_items(pl);
 		Kill_player(pl, true);

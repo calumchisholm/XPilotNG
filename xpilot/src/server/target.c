@@ -229,7 +229,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	    if (options.targetKillTeam
 		&& targets_remaining == 0
 		&& Player_is_playing(pl))
-		SET_BIT(pl->pl_status, KILLED);
+		Player_set_state(pl, PL_STATE_KILLED);
 	    Score(pl, -sc, targ->pos, "Target: ");
 	}
 	else if (pl->team == kp->team &&

@@ -89,7 +89,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	Player_add_fuel(pl, ED_LASER_HIT);
 	if (!BIT(pl->used, HAS_SHIELD)
 	    && !BIT(pl->have, HAS_ARMOR)) {
-	    SET_BIT(pl->pl_status, KILLED);
+	    Player_set_state(pl, PL_STATE_KILLED);
 	    if (kp) {
 		Set_message_f("%s got roasted alive by %s's laser.%s",
 			      pl->name, kp->name,

@@ -177,7 +177,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	    Score(pl_i, -sc, pos, "Treasure: ");
 	    Rank_lost_ball(pl_i);
 	    if (options.treasureKillTeam)
-		SET_BIT(pl_i->pl_status, KILLED);
+		Player_set_state(pl_i, PL_STATE_KILLED);
 	}
 	else if (pl_i->team == pl->team &&
 		 (pl_i->team != TEAM_NOT_SET || pl_i->id == pl->id)) {
