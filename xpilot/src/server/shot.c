@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -566,7 +566,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 	life = CANNON_SHOT_LIFE;
 	SET_BIT(status, FROMCANNON);
     }
-    
+
 
     switch (type) {
     default:
@@ -945,7 +945,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 
     for (r = 0, i = 0; i < minis; i++, r++) {
 	object *shot;
-	
+
 	if ((shot = Object_allocate()) == NULL) {
 	    break;
 	}
@@ -1353,24 +1353,30 @@ void Delete_shot(int ind)
 	switch (shot->info) {
 
 	case ITEM_MISSILE:
-	    if (shot->life <= 0 && shot->color != WHITE) {
-		shot->color = WHITE;
-		shot->life  = WARN_TIME;
-		return;
-	    }
-	    if (shot->life <= 0 && rfrac() < rogueHeatProb) {
-		addHeat = 1;
+	    /* If -timeStep < shot->life <= 0, then it died of old age. */
+	    /* If it was picked up, then life was set to 0 and it is now
+	     * -timeStep after the substract in update.c. */
+	    if (-timeStep < shot->life && shot->life <= 0) {
+		if (shot->color != WHITE) {
+		    shot->color = WHITE;
+		    shot->life  = WARN_TIME;
+		    return;
+		}
+		if (rfrac() < rogueHeatProb)
+		    addHeat = 1;
 	    }
 	    break;
 
 	case ITEM_MINE:
-	    if (shot->life <= 0 && shot->color != WHITE) {
-		shot->color = WHITE;
-		shot->life  = WARN_TIME;
-		return;
-	    }
-	    if (shot->life <= 0 && rfrac() < rogueMineProb) {
-		addMine = 1;
+	    /* See comment for ITEM_MISSILE above */
+	    if (-timeStep < shot->life && shot->life <= 0) {
+		if (shot->color != WHITE) {
+		    shot->color = WHITE;
+		    shot->life  = WARN_TIME;
+		    return;
+		}
+		if (rfrac() < rogueMineProb)
+		    addMine = 1;
 	    }
 	    break;
 	}
@@ -1954,5 +1960,3 @@ void Move_mine(int ind)
 	}
     }
 }
-
-
