@@ -201,7 +201,7 @@ static void debris_store(world_t *world, int cx, int cy, int color)
 
 static void fastshot_end(connection_t *conn)
 {
-    int			i;
+    int i;
 
     for (i = 0; i < DEBRIS_TYPES * 2; i++) {
 	if (fastshot_num[i] != 0) {
@@ -234,7 +234,7 @@ static void Frame_radar_buffer_reset(void)
 
 static void Frame_radar_buffer_add(clpos_t pos, int s)
 {
-    radar_t		*p;
+    radar_t *p;
 
     EXPAND(radar_ptr, num_radar, max_radar, radar_t, 1);
     p = &radar_ptr[num_radar++];
@@ -243,21 +243,15 @@ static void Frame_radar_buffer_add(clpos_t pos, int s)
     p->size = s;
 }
 
-static void Frame_radar_buffer_send(connection_t *conn)
+static void Frame_radar_buffer_send(connection_t *conn, player_t *pl)
 {
-    int			i;
-    int			dest;
-    int			tmp;
-    radar_t		*p;
-    const int		radar_width = 256;
-    int			radar_height;
-    int			radar_x;
-    int			radar_y;
-    int			send_x;
-    int			send_y;
-    shuffle_t		*radar_shuffle;
-    size_t		shuffle_bufsize;
-    world_t *world = &World;
+    int i, dest, tmp;
+    radar_t *p;
+    const int radar_width = 256;
+    int radar_height, radar_x, radar_y, send_x, send_y;
+    shuffle_t *radar_shuffle;
+    size_t shuffle_bufsize;
+    world_t *world = pl->world;
 
     radar_height = (radar_width * world->height) / world->width;
 
@@ -321,8 +315,7 @@ static void Frame_radar_buffer_send(connection_t *conn)
 
 static void Frame_radar_buffer_free(void)
 {
-    free(radar_ptr);
-    radar_ptr = NULL;
+    XFREE(radar_ptr);
     num_radar = 0;
     max_radar = 0;
 }
@@ -355,15 +348,10 @@ static int num2str(int num, char *str, int i)
 
 static int Frame_status(connection_t *conn, player_t *pl)
 {
-    world_t *world = &World;
-    static char		mods[MAX_CHARS];
-    int			n,
-			lock_ind,
-			lock_id = NO_ID,
-			lock_dist = 0,
-			lock_dir = 0,
-			i,
-			showautopilot;
+    world_t *world = pl->world;
+    static char mods[MAX_CHARS];
+    int n, lock_ind, lock_id = NO_ID, lock_dist = 0, lock_dir = 0, i;
+    int showautopilot;
 
     /*
      * Don't make lock visible during this frame if;
@@ -481,23 +469,20 @@ static int Frame_status(connection_t *conn, player_t *pl)
 
 static void Frame_map(connection_t *conn, player_t *pl)
 {
-    int			i,
-			k,
-			conn_bit = (1 << conn->ind);
-    const int		fuel_packet_size = 5;
-    const int		cannon_packet_size = 5;
-    const int		target_packet_size = 7;
-    const int		wormhole_packet_size = 5;
-    int			bytes_left = 2000;
-    int			max_packet;
-    int			packet_count;
-    world_t *world = &World;
+    int i, k, conn_bit = (1 << conn->ind);
+    const int fuel_packet_size = 5;
+    const int cannon_packet_size = 5;
+    const int target_packet_size = 7;
+    const int wormhole_packet_size = 5;
+    int bytes_left = 2000, max_packet, packet_count;
+    world_t *world = pl->world;
 
     packet_count = 0;
     max_packet = MAX(5, bytes_left / target_packet_size);
     i = MAX(0, pl->last_target_update);
     for (k = 0; k < world->NumTargets; k++) {
 	target_t *targ;
+
 	if (++i >= world->NumTargets)
 	    i = 0;
 	targ = Targets(world, i);
@@ -537,6 +522,7 @@ static void Frame_map(connection_t *conn, player_t *pl)
     i = MAX(0, pl->last_fuel_update);
     for (k = 0; k < world->NumFuels; k++) {
 	fuel_t *fs;
+
 	if (++i >= world->NumFuels)
 	    i = 0;
 
@@ -560,6 +546,7 @@ static void Frame_map(connection_t *conn, player_t *pl)
     i = MAX(0, pl->last_wormhole_update);
     for (k = 0; k < world->NumWormholes; k++) {
 	wormhole_t *worm;
+
 	if (++i >= world->NumWormholes)
 	    i = 0;
 	worm = Wormholes(world, i);
@@ -580,14 +567,13 @@ static void Frame_map(connection_t *conn, player_t *pl)
 
 static void Frame_shuffle_objects(void)
 {
-    int				i;
-    size_t			memsize;
+    int i;
+    size_t memsize;
 
     num_object_shuffle = MIN(NumObjs, MAX_VISIBLE_OBJECTS);
 
     if (max_object_shuffle < num_object_shuffle) {
-	if (object_shuffle_ptr != NULL)
-	    free(object_shuffle_ptr);
+	XFREE(object_shuffle_ptr);
 	max_object_shuffle = num_object_shuffle;
 	memsize = max_object_shuffle * sizeof(shuffle_t);
 	object_shuffle_ptr = malloc(memsize);
@@ -620,8 +606,7 @@ static void Frame_shuffle_players(void)
     num_player_shuffle = MIN(NumPlayers, MAX_SHUFFLE_INDEX);
 
     if (max_player_shuffle < num_player_shuffle) {
-	if (player_shuffle_ptr != NULL)
-	    free(player_shuffle_ptr);
+	XFREE(player_shuffle_ptr);
 	max_player_shuffle = num_player_shuffle;
 	memsize = max_player_shuffle * sizeof(shuffle_t);
 	player_shuffle_ptr = malloc(memsize);
@@ -871,7 +856,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 static void Frame_ships(connection_t *conn, player_t *pl)
 {
     int i, k;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];
@@ -992,7 +977,7 @@ static void Frame_radar(connection_t *conn, player_t *pl)
     int i, k, mask, shownuke, size;
     object_t *shot;
     clpos_t pos;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     Frame_radar_buffer_reset();
 
@@ -1089,7 +1074,7 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 	}
     }
 
-    Frame_radar_buffer_send(conn);
+    Frame_radar_buffer_send(conn, pl);
 }
 
 static void Frame_lose_item_state(player_t *pl)
@@ -1105,7 +1090,7 @@ static void Frame_lose_item_state(player_t *pl)
 
 static void Frame_parameters(connection_t *conn, player_t *pl)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     Get_display_parameters(conn, &view_width, &view_height,
 			   &debris_colors, &spark_rand);
