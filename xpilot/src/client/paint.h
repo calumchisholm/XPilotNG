@@ -45,6 +45,8 @@
 #define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
 
 #define TITLE_DELAY		500	/* Should probably change to seconds */
+
+#define DSIZE			4	/* Size of diamond (on radar) */
 /* constants end */
 
 

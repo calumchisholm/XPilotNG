@@ -37,10 +37,6 @@
 #include "net.h"
 #endif
 
-#ifndef DRAW_H
-/* need shipshape_t. */
-#include "draw.h"
-#endif
 
 
 /*

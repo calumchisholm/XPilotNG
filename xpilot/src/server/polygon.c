@@ -123,7 +123,6 @@ static clpos_t P_cv;
 void P_start_polygon(clpos_t pos, int style)
 {
     poly_t t;
-    world_t *world = &World;
 
     if (!World_contains_clpos(pos)) {
 	warn("Polygon start point (%d, %d) is not inside the map"
@@ -274,7 +273,6 @@ void P_end_balltarget(void)
 
 int P_start_target(int target_ind)
 {
-    world_t *world = &World;
     target_t *targ = Target_by_index(target_ind);
 
     targ->group = Create_group(TARGET,
@@ -292,7 +290,6 @@ void P_end_target(void)
 
 int P_start_cannon(int cannon_ind)
 {
-    world_t *world = &World;
     cannon_t *cannon = Cannon_by_index(cannon_ind);
 
     cannon->group = Create_group(CANNON,
@@ -310,7 +307,6 @@ void P_end_cannon(void)
 
 int P_start_wormhole(int wormhole_ind)
 {
-    world_t *world = &World;
     wormhole_t *wormhole = Wormhole_by_index(wormhole_ind);
 
     wormhole->group = Create_group(WORMHOLE,
@@ -328,7 +324,6 @@ void P_end_wormhole(void)
 
 int P_start_friction_area(int fa_ind)
 {
-    world_t *world = &World;
     friction_area_t *fa = FrictionArea_by_index(fa_ind);
 
     fa->group = Create_group(FRICTION,

@@ -48,7 +48,7 @@
 #endif
 #ifndef DRAW_H
 /* need shipshape_t */
-#include "draw.h"
+#include "shipshape.h"
 #endif
 #ifndef ITEM_H
 /* need NUM_ITEMS */

@@ -270,7 +270,6 @@ typedef int socklen_t;
 #include "click.h"
 #include "commonproto.h"
 #include "const.h"
-#include "draw.h"
 #include "error.h"
 #include "item.h"
 #include "list.h"

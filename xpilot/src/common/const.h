@@ -167,4 +167,51 @@ do { \
 #undef rand
 #define rand()	please dont use rand.
 
+/*
+ * The server supports only 4 colors, except for spark/debris, which
+ * may have 8 different colors.
+ */
+#define NUM_COLORS	    4
+
+#define BLACK		    0
+#define WHITE		    1
+#define BLUE		    2
+#define RED		    3
+
+/*
+ * Windows deals in Pens, not Colors.  So each pen has to have all of its
+ * attributes defined.
+ */
+#if defined(_WINDOWS) && !defined(PENS_OF_PLENTY)
+#define	CLOAKCOLOROFS	15	/* colors 16 and 17 are dashed white/blue */
+#define	MISSILECOLOR	18	/* wide white pen */
+#define	LASERCOLOR	19	/* wide red pen */
+#define	LASERTEAMCOLOR	20	/* wide blue pen */
+#define	FUNKCOLORS	6	/* 6 funky colors here (15-20) */
+#endif
+
+/*
+ * The minimum and maximum playing window sizes supported by the server.
+ */
+#define MIN_VIEW_SIZE	    384
+#define MAX_VIEW_SIZE	    1024
+#define DEF_VIEW_SIZE	    768
+
+/*
+ * Spark rand limits.
+ */
+#define MIN_SPARK_RAND	    0		/* Not display spark */
+#define MAX_SPARK_RAND	    0x80	/* Always display spark */
+#define DEF_SPARK_RAND	    0x55	/* 66% */
+
+#define	UPDATE_SCORE_DELAY	(FPS)
+
+/*
+ * Polygon style flags
+ */
+#define STYLE_FILLED          (1U << 0)
+#define STYLE_TEXTURED        (1U << 1)
+#define STYLE_INVISIBLE       (1U << 2)
+#define STYLE_INVISIBLE_RADAR (1U << 3)
+
 #endif

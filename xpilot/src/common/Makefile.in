@@ -207,7 +207,6 @@ libxpcommon_a_SOURCES = \
 	arraylist.c arraylist.h astershape.h audio.h \
 	bit.h \
 	checknames.c checknames.h click.h commonproto.h config.c const.h \
-	draw.h \
 	error.c error.h \
 	item.h \
 	keys.h \
