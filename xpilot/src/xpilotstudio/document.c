@@ -57,7 +57,6 @@ void DestroyXpDocument(LPXPSTUDIODOCUMENT lpXpStudioDocument)
 /***************************************************************************/
 LPMAPDOCUMENT CreateNewMapDoc() {
 	LPMAPDOCUMENT lpMapDocument;
-//	XP_POINT *vert; //For Debuging
 	int i;
 	
 	if ((lpMapDocument = (LPMAPDOCUMENT) malloc(sizeof(MAPDOCUMENT))) == NULL)
@@ -69,12 +68,8 @@ LPMAPDOCUMENT CreateNewMapDoc() {
 	{
 	memset(lpMapDocument, 0, sizeof(MAPDOCUMENT));
 	lpMapDocument->MapStruct.comments = NULL;
-	lpMapDocument->view_zoom=1;
 	lpMapDocument->selectedbool=FALSE;
-//	lpMapDocument->MapGeometry.ballareas = NULL;
-//	lpMapDocument->MapGeometry.balltargets = NULL;
-//	lpMapDocument->MapGeometry.walls = NULL;
-//	lpMapDocument->MapGeometry.targets = NULL;
+	lpMapDocument->MapGeometry.num_estyles = 1;
 	}
 	
 	/*Create a prefs template, setting the default values, then point the documents

@@ -37,12 +37,12 @@
 
 /*MapEditor*/
 #define MAX_MAP_SIZE			31500
-#define MAX_LINE_LEN			100
+#define MAX_LINE_LEN			1000
 #define MINIMAP_WIDTH			1000
 #define DEFAULT_WIDTH			3500
 #define DEFAULT_HEIGHT			3500
-#define DEFAULT_MAP_ZOOM		10
-#define TOOLSWIDTH				70
+#define DEFAULT_MAP_ZOOM		1
+#define TOOLSWIDTH				120
 
 
 #define UNTITLED "(untitled)"
@@ -77,6 +77,7 @@
 #define IDM_MAP_CURRENT				9012
 #define IDM_MAP_DECOR				9013
 #define IDM_MAP_CHECKPOINT			9014
+#define IDM_MAPPICK					9015
 
 //Variant types for wormholes.
 #define IDM_MAP_WORM_NORMAL		700
@@ -87,20 +88,14 @@
 #define IDM_MAP_POSITIVE		710
 #define IDM_MAP_NEGATIVE		711
 
-//Variant types for walls.
-//Walls cannot be set to normal, this constant is provided
-//to enable checking that none of the others such as hidden are set.
-#define IDM_MAP_NORMAL			720
-#define IDM_MAP_HIDDEN			721
-
 /*Map Modification Options*/
 #define IDM_PICKITEM			850
-#define IDM_ADDVERTEX			851
-#define IDM_DELVERTEX			852
+//#define IDM_ADDVERTEX			851
+//#define IDM_DELVERTEX			852
 #define IDM_MOVEITEM			853
 #define IDM_DELETEITEM			854
 #define IDM_UPDATE_ITEM_PARAMS	855
-#define IDM_MOVEVERTEX			856
+//#define IDM_MOVEVERTEX			856
 #define IDM_REORDERCHECKPOINT	857
 
 /*All the ship symbol types*/
@@ -407,3 +402,23 @@
 		: ((dy) > (lpMapDocument->height >> 1) \
 		    ? (dy) - lpMapDocument->height \
 		    : (dy)))
+
+/*
+ * Macro to add one new element of a given type to a dynamic array.
+ * T is the type of the element.
+ * P is the pointer to the array memory.
+ * N is the current number of elements in the array.
+ * M is the current size of the array.
+ * V is the new element to add.
+ * The goal is to keep the number of malloc/realloc calls low
+ * while not wasting too much memory because of over-allocation.
+ */
+#define STORE(T,P,N,M,V)						\
+    if (N >= M && ((M <= 0)						\
+	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
+	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
+	ErrorHandler("No memory");						\
+	exit(1);							\
+    } else								\
+	(P[N++] = V)
+

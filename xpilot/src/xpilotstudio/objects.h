@@ -245,7 +245,8 @@ some Windows functions will still have to use the windows POINT struct.*/
 typedef struct {
 	int x, y;
 	int delta_x, delta_y;
-	int hidden; //Is the segment drawn to this point hidden?
+	int edge_style; //Used to set the individual edge's style up to here.
+	int selected;
 } XP_POINT;
 
 /*This creates a list of polygons, and should be used for simple
@@ -256,10 +257,12 @@ typedef struct polygonlist {
 	unsigned short team;
 	int selected;
 	struct polygonlist *next;
+	int polygon_style;
 } polygonlist;
 
 typedef struct itemlist {
 	XP_POINT pos;
+	XP_POINT *bounding_box;
 	unsigned short team;
 	unsigned short direction;
 	unsigned short variant;
@@ -267,22 +270,44 @@ typedef struct itemlist {
 	struct itemlist *next;
 } itemlist;
 
+struct polystyle {
+    char id[100];
+	int color;
+    int texture_id;
+    int defedge_id;
+    int flags;
+};
+
+struct edgestyle {
+    char id[100];
+    int width;
+	int color;
+    int style;
+};
+
+struct bmpstyle {
+    char id[100];
+    char filename[30];
+    int flags;
+};
+
 typedef struct {
+	struct polystyle pstyles[256];
+	struct edgestyle estyles[256];
+	struct bmpstyle  bstyles[256];
+	int num_pstyles, num_bstyles, num_estyles; /* "Internal" edgestyle */
 	polygonlist *walls; //List of Wall Polygons
 	polygonlist *decors; //List of Decor Polygons
 	polygonlist *ballareas; //List of Ball Area Polygons
 	polygonlist *balltargets; //List of Ball Target Polygons
 	itemlist *targets; //List of Target Items
 	itemlist *fuels; //List of Fuel Items
-	int num_fuels; //The total number of Fuels
 	itemlist *cannons; //List of Cannon Items
 	itemlist *balls; //List of Ball Items
-	int num_balls; //The total number of Balls
 	itemlist *gravities; //List of Gravities Items
 	itemlist *circulargravities; //List of Circular Gravities
 	itemlist *itemconcentrators; //List of Item Concentrators
 	itemlist *bases; //List of Base Items
-	int num_bases; //The total number of Bases
 	itemlist *currents; //List of Currents Items
 	itemlist *wormholes; //List of Wormhole Items
 	itemlist *checkpoints; //List of Checkpoint Items
@@ -315,8 +340,9 @@ typedef struct {
 	int view_y; //The current Y scroll location.
 	int changed; //Has the current map changed?
 	polygonlist *selectedpoly; //The selected polygon.
-	int numselvert; //The number of the selected vertex.
 	itemlist *selecteditem; //The selected Item
+	XP_POINT *selectedvert; //The selected vertex
+	int numselvert; //The number of the selected vertex.
 	int selectedtype; //The type of thing thats selected.	
 	int selectedbool; //Is anything selected.
 } MAPDOCUMENT, *LPMAPDOCUMENT;

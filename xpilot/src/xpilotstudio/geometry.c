@@ -96,7 +96,6 @@ int CreateItem(LPMAPDOCUMENT lpMapDocument, int x, int y, int dx, int dy,
 	case IDM_MAP_FUEL:
 		fDrawing = FALSE;
 		num = 1;
-		lpMapDocument->MapGeometry.num_fuels++;
 		break;
 	case IDM_MAP_CANNON:
 		fDrawing = FALSE;
@@ -105,12 +104,10 @@ int CreateItem(LPMAPDOCUMENT lpMapDocument, int x, int y, int dx, int dy,
 	case IDM_MAP_BALL:
 		fDrawing = FALSE;
 		num = 3;
-		lpMapDocument->MapGeometry.num_balls++;
 		break;
 	case IDM_MAP_BASE:
 		fDrawing = FALSE;
 		num = 4;
-		lpMapDocument->MapGeometry.num_bases++;
 		break;
 	case IDM_MAP_CURRENT:
 		fDrawing = FALSE;
@@ -142,8 +139,9 @@ int CreateItem(LPMAPDOCUMENT lpMapDocument, int x, int y, int dx, int dy,
 
 	if (ispoly)
 	{
+		/*ToDo Add information for processing of polygon styles*/
 			return (AddItemToPolygonlist(lpMapDocument, addpolylist[num].pglp,
-			x, y, dx, dy, teamSet, bSegHidden, 0, closing));
+			x, y, dx, dy, 0, teamSet, 0, closing));
 	}
 	else
 	{
@@ -153,11 +151,11 @@ int CreateItem(LPMAPDOCUMENT lpMapDocument, int x, int y, int dx, int dy,
 	}
 }
 /***************************************************************************/
-/* *AddItemToItemlist                                                      */
+/* AddItemToItemlist                                                       */
 /* Arguments :                                                             */
 /*   *varitmlp: an itemlist                                                */
-/*   x                                                                    */
-/*   y                                                                    */
+/*   x                                                                     */
+/*   y                                                                     */
 /*   team                                                                  */
 /*   direction                                                             */
 /*   variant                                                               */
@@ -193,6 +191,19 @@ int AddItemToItemlist(itemlist **varitmlp, int x, int y,
 	item->pos.y = y;
 	item->team = team;
 	item->selected = FALSE;
+
+	/*Enter the bounding box information for items. Using generic block sizes for now,
+	but at some point this should be better sized to the object.*/
+	item->bounding_box = (XP_POINT *) malloc(sizeof(XP_POINT)*4);
+	item->bounding_box[0].x= item->pos.x-17;
+	item->bounding_box[0].y= item->pos.y+17;
+	item->bounding_box[1].delta_x = 35;
+	item->bounding_box[1].delta_y= 0;
+	item->bounding_box[2].delta_x = 0;
+	item->bounding_box[2].delta_y= -35;
+	item->bounding_box[3].delta_x = -35;
+	item->bounding_box[3].delta_y= 0;
+
 	
 	/*Set the angle for rotatable blocks*/
 	switch (type)
@@ -221,13 +232,12 @@ int AddItemToItemlist(itemlist **varitmlp, int x, int y,
 	return FALSE;
 }
 /***************************************************************************/
-/* *AddItemToPolygonlist                                                   */
+/* AddItemToPolygonlist                                                    */
 /* Arguments :                                                             */
 /*   *varpglp: a polygon list                                              */
 /*   x                                                                     */
 /*   y                                                                     */
 /*   team                                                                  */
-/*   hidden : is this wall hidden?                                         */
 /*   coordtype                                                             */
 /*		TRUE if coordinates are specified as offsets, as loaded from a file*/
 /*		FALSE if coordinates are x,y, as drawn by user                     */
@@ -238,7 +248,7 @@ int AddItemToItemlist(itemlist **varitmlp, int x, int y,
 /* Purpose : Create and add a vertex to the polygon list                   */
 /***************************************************************************/
 int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int x, int y,
-								  int dx, int dy, int team, int hidden,
+								  int dx, int dy, int style, int team,
 								  int coordtype, int closing)
 {
 	polygonlist *polygon = NULL;
@@ -246,6 +256,7 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 	XP_POINT *vert = NULL;
 	static XP_POINT prevpoint;
 	static XP_POINT startpoint;
+	int checkDir = FALSE;
 	
 	vert = (XP_POINT *) malloc(sizeof(XP_POINT));
 	
@@ -279,7 +290,10 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 		startpoint.delta_y = 0;
 
 		startpoint.x = prevpoint.x = x;
-		startpoint.y = prevpoint.y = y;		
+		startpoint.y = prevpoint.y = y;
+		
+		polygon->polygon_style = style;
+		vert->edge_style = lpMapDocument->MapGeometry.pstyles[style].defedge_id;
 	}
 	else if (!coordtype)
 	{
@@ -299,6 +313,7 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 			vert->x = polygon->vertex[0].x;
 			vert->y = polygon->vertex[0].y;
 			fCreatingPolygon = FALSE;
+			checkDir = TRUE;
 		}
 		else
 		{		
@@ -310,6 +325,7 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 			prevpoint.x = x;
 			prevpoint.y = y;
 		}
+		vert->edge_style = style;
 	}
 	else
 	{
@@ -320,10 +336,11 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 		vert->delta_y = y;
 		prevpoint.x = vert->x = prevpoint.x + x;
 		prevpoint.y = vert->y = prevpoint.y + y;
+		vert->edge_style = style;
 	}
 
 	//If the new point is too far away, or we didn't move at all,
-	//Then we have nothing valuable to contribute so return to CreateItem.
+	//Then we have nothing valuable to contribute so RETURN.
 	if ((vert->delta_x == 0 && vert->delta_y == 0) || (hypot(vert->delta_x, vert->delta_y) > MAX_LINE_LEN))
 	{
 		if (closing)
@@ -334,106 +351,17 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 		free(vert);
 		return TRUE;
 	}
-	vert->hidden = hidden;
 
 	AddVertexToList(polygon, vert);
 	polygon->team = team;
 
+	if (checkDir)
+	{
+		if (!IsCounterClockwise(polygon))
+			ReversePolygonOrientation(polygon);
+	}
+
 	return FALSE;
-}
-/***************************************************************************/
-/* *AddVertexToList                                                        */
-/* Arguments :                                                             */
-/*   **polygon                                                             */
-/*   *vert                                                                 */
-/* Purpose : Add the vertext to the list.                                  */
-/***************************************************************************/
-int AddVertexToList(polygonlist *polygon, XP_POINT *vert)
-{
-
-	if (polygon->vertex == NULL)
-	{
-		polygon->vertex = vert;
-		fCreatingPolygon = TRUE;
-		polygon->num_verts = 1;
-		polygon->selected = 0;
-	}
-	else
-	{
-		polygon->num_verts++;
-		polygon->vertex = realloc(polygon->vertex, polygon->num_verts*sizeof(XP_POINT));
-		polygon->vertex[polygon->num_verts-1].x = vert->x;
-		polygon->vertex[polygon->num_verts-1].y = vert->y;
-		polygon->vertex[polygon->num_verts-1].delta_x = vert->delta_x;
-		polygon->vertex[polygon->num_verts-1].delta_y = vert->delta_y;
-		polygon->vertex[polygon->num_verts-1].hidden = vert->hidden;
-		free(vert);
-	}
-	return FALSE;
-}
-
-/***************************************************************************/
-/* InsidePolygon		                                                   */
-/* Arguments :                                                             */
-/*	polygon: a list of points                                              */
-/*	N: the number of vertexes                                              */
-/*	x: the xcoord to check                                                 */
-/*	y: the ycoord to check                                                 */
-/* Return :                                                                */
-/*   TRUE if outside                                                       */
-/*   FALSE if inside                                                       */
-/* Purpose : Determine whether the specified coordinates are in  a polygon */
-/***************************************************************************/
-int InsidePolygon(XP_POINT *plygn, int N, int x, int y)
-{
-	//This Function Creates an new point array and
-	//calculates the x,y coordinates of each point from the
-	//delta values specified in the original points.
-	//The new x,y coords are NOT wrapped, as this would
-	//Invalidate the polygon.
-	//The new values are not stored, merely used for checking.
-	int counter = 0;
-	int i;
-	double xinters;
-	XP_POINT p, p1, p2;
-	XP_POINT *polygon;
-
-	p.x = x;
-	p.y = y;
-
-	polygon = (XP_POINT *) malloc(sizeof(XP_POINT) * N);
-
-	polygon[0].x = plygn[0].x;
-	polygon[0].y = plygn[0].y;
-	for (i=1; i<N; i++)
-	{
-		polygon[i].x = polygon[i-1].x+plygn[i].delta_x;
-		polygon[i].y = polygon[i-1].y+plygn[i].delta_y;
-	}
-
-	p1 = polygon[0];
-	for (i=1;i<=N;i++) {
-			p2 = polygon[i % N];
-		if (p.y > min(p1.y, p2.y)) {
-			if (p.y <= max(p1.y, p2.y)){
-				if (p.x <= max(p1.x, p2.x)) {
-					if (p1.y != p2.y) {
-						xinters = (p.y-p1.y) * (p2.x-p1.x)/(p2.y-p1.y)+p1.x;
-						if (p1.x == p2.x || p.x <= xinters)
-							counter++;
-					}
-				}
-			}
-		}
-		p1=p2;
-	}
-
-	free(polygon);
-
-	if (counter % 2 == 0)
-		return(FALSE); //Inside
-	else
-		return(TRUE); //Outside
 }
 /***************************************************************************/
 /* SelectItem                                                              */
@@ -445,13 +373,16 @@ int InsidePolygon(XP_POINT *plygn, int N, int x, int y)
 /* Return :                                                                */
 /*   FALSE always successful                                               */
 /* Purpose :   Select whatever is at the current coords                    */
+/* Revised 3/23/01: This function has to do some farely complex selection, */
+/* as we wish to be able to select vertexes, edges, entire polygons, items.*/
+/* I'm sure my code here is going to suck. Just a warning. ;-)             */
 /***************************************************************************/
 int SelectItem(LPMAPDOCUMENT lpMapDocument, int x, int y)
 {
 	polygonlist *pglp = NULL;
 	itemlist *itmlp = NULL;
 	XP_POINT *tempvlist = NULL;
-	int i;
+	int i, vtx;
 	int numchecks = 15;
 	struct checkable {
 		struct polygonlist *pglp;
@@ -462,35 +393,56 @@ int SelectItem(LPMAPDOCUMENT lpMapDocument, int x, int y)
 	struct checkable checklist[15] =
 	{
 		{NULL, lpMapDocument->MapGeometry.balls, IDM_MAP_BALL},
+		{NULL, lpMapDocument->MapGeometry.fuels, IDM_MAP_FUEL},
 		{lpMapDocument->MapGeometry.walls, NULL, IDM_MAP_WALL},
 		{lpMapDocument->MapGeometry.balltargets, NULL, IDM_MAP_BALLTARGET},
 		{lpMapDocument->MapGeometry.ballareas, NULL, IDM_MAP_BALLAREA},
+		{lpMapDocument->MapGeometry.decors, NULL, IDM_MAP_DECOR},
 		{NULL, lpMapDocument->MapGeometry.bases, IDM_MAP_BASE},
+		{NULL, lpMapDocument->MapGeometry.checkpoints, IDM_MAP_CHECKPOINT},
 		{NULL, lpMapDocument->MapGeometry.targets, IDM_MAP_TARGET},
 		{NULL, lpMapDocument->MapGeometry.cannons, IDM_MAP_CANNON},
-		{NULL, lpMapDocument->MapGeometry.checkpoints, IDM_MAP_CHECKPOINT},
 		{NULL, lpMapDocument->MapGeometry.currents, IDM_MAP_CURRENT},
 		{NULL, lpMapDocument->MapGeometry.gravities, IDM_MAP_GRAVITY},
 		{NULL, lpMapDocument->MapGeometry.circulargravities, IDM_MAP_CIRCULAR_GRAVITY},
-		{NULL, lpMapDocument->MapGeometry.fuels, IDM_MAP_FUEL},
 		{NULL, lpMapDocument->MapGeometry.itemconcentrators, IDM_MAP_ITEM_CONC},
 		{NULL, lpMapDocument->MapGeometry.wormholes, IDM_MAP_WORMHOLE},
-		{lpMapDocument->MapGeometry.decors, NULL, IDM_MAP_DECOR},
 	};
 
-	lpMapDocument->selectedbool = FALSE;
-	lpMapDocument->selectedpoly = NULL;
-	lpMapDocument->selecteditem = NULL;
+	UpdateSelections(lpMapDocument, TRUE);
+	//lpMapDocument->selectedbool = FALSE;
+	//lpMapDocument->selectedpoly = NULL;
+	//lpMapDocument->selecteditem = NULL;
+	//lpMapDocument->selectedvert = FALSE;
 	for (i = 0; i < numchecks; i++)
 	{
+		//Check the polygon list specified to see if we selected one of the
+		//polygons in that list.
 		pglp = checklist[i].pglp;		
 		while (pglp != NULL)
 		{
 			if (!lpMapDocument->selectedbool)
 			{
+				//First check to see if this is a polygon vertex.
+				vtx = IsVertexOfPolygon(pglp->vertex, pglp->num_verts, x, y);
+				if (vtx != -1)
+				{
+					lpMapDocument->selectedbool = TRUE;
+					lpMapDocument->numselvert = vtx;
+					pglp->vertex[vtx].selected = TRUE;
+					pglp->selected = TRUE;
+					lpMapDocument->selectedpoly = pglp;
+					lpMapDocument->selectedtype = IDM_VERTEX;
+					lpMapDocument->selectedvert = &pglp->vertex[vtx];
+					//ErrorHandler("x: %d, y: %d", lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y);
+					return FALSE;
+				}
+
+				//If this isn't a vertex then we should see if it's
+				//inside a polygon.
 				pglp->selected = InsidePolygon(pglp->vertex,pglp->num_verts,x, y);
-				/*If the starting point of the polygon is wrapped around the other
-				side, then the above check won't work. So check to see if it was wrapped.*/
+				//If the starting point of the polygon is wrapped around the other
+				//side, then the above check won't work. So check to see if it was wrapped.
 
 				if (!lpMapDocument->selectedbool && !pglp->selected)
 					pglp->selected = InsidePolygon(pglp->vertex,pglp->num_verts, x-lpMapDocument->width, y+lpMapDocument->height);
@@ -523,50 +475,44 @@ int SelectItem(LPMAPDOCUMENT lpMapDocument, int x, int y)
 				lpMapDocument->selectedtype = checklist[i].type;
 				teamSet = pglp->team;
 			}
-//			if (vlp->selected && fItemSelected)
-//				selectedpoly = vlp;
 
 			pglp = pglp->next;
 		}
+
+
+		//Now check the itemlist specified.
 		itmlp =  checklist[i].itmlp; 
 		while (itmlp != NULL)
 		{
 			if (!lpMapDocument->selectedbool)
 			{
-				tempvlist = (XP_POINT *) malloc(sizeof(XP_POINT)*4);
-				tempvlist[0].x= itmlp->pos.x-17;
-				tempvlist[0].y= itmlp->pos.y+17;
-				tempvlist[1].delta_x = 35;
-				tempvlist[1].delta_y= 0;
-				tempvlist[2].delta_x = 0;
-				tempvlist[2].delta_y= -35;
-				tempvlist[3].delta_x = -35;
-				tempvlist[3].delta_y= 0;
+				//Check within the specified bounding box.//
+				//TO DO. Make bounding box variable num of points instead of req'd 4.
+				//This would require each item having a polygon instead of a vertex list attribute.
 
-				itmlp->selected = InsidePolygon(tempvlist,4,x, y);
+				itmlp->selected = InsidePolygon(itmlp->bounding_box,4,x, y);
 				//If the starting point of the polygon is wrapped around the other
-				//side, then the above check won't work. So check to see if it was wrapped.*/
+				//side, then the above check won't work. So check to see if it was wrapped.
 
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x-lpMapDocument->width, y+lpMapDocument->height);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x-lpMapDocument->width, y+lpMapDocument->height);
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x, y+lpMapDocument->height);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x, y+lpMapDocument->height);
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x+lpMapDocument->width, y+lpMapDocument->height);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x+lpMapDocument->width, y+lpMapDocument->height);
 
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x-lpMapDocument->width, y);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x-lpMapDocument->width, y);
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x+lpMapDocument->width, y);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x+lpMapDocument->width, y);
 
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x-lpMapDocument->width, y-lpMapDocument->height);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x-lpMapDocument->width, y-lpMapDocument->height);
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x, y-lpMapDocument->height);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x, y-lpMapDocument->height);
 				if (!lpMapDocument->selectedbool && !itmlp->selected)
-					itmlp->selected = InsidePolygon(tempvlist,4, x+lpMapDocument->width, y-lpMapDocument->height);
+					itmlp->selected = InsidePolygon(itmlp->bounding_box,4, x+lpMapDocument->width, y-lpMapDocument->height);
 
-				free(tempvlist);
 			}
 			else
 				itmlp->selected = FALSE;
@@ -586,69 +532,6 @@ int SelectItem(LPMAPDOCUMENT lpMapDocument, int x, int y)
 
 	}
 	return FALSE;
-}
-/***************************************************************************/
-/* IsCounterClockwise                                                      */
-/* Arguments :                                                             */
-/*    pglp - a simple polygon                                              */
-/* Purpose :   Test to see if the polygon is counter clockwise             */
-/* Return :                                                                */
-/*   TRUE if counterclockwise                                              */
-/*   FALSE if clockwise                                                    */
-/***************************************************************************/
-int IsCounterClockwise (polygonlist *pglp)
-{
-	int area = 0;
-	int ai, i, j;
-
-	for (i = pglp->num_verts-1, j=0; j < pglp->num_verts; i=j, j++)
-	{
-		ai = pglp->vertex[i].x * pglp->vertex[j].y -
-		pglp->vertex[j].x * pglp->vertex[i].y;
-		area+=ai;
-	}
-	
-	if (area > 0)
-		return TRUE;
-	else
-		return FALSE;
-}
-/***************************************************************************/
-/* ReversePolygonOrientation                                               */
-/* Arguments :                                                             */
-/*    pglp - a simple polygon                                              */
-/* Purpose :   Reverse the order of vertexes in a polygon, except the first*/
-/***************************************************************************/
-void ReversePolygonOrientation(polygonlist *pglp)
-{
-	XP_POINT *vertex;
-	int i,j, prevx, prevy;
-
-	vertex = (XP_POINT *) malloc(sizeof(XP_POINT)*pglp->num_verts);
-
-	//Now swap the order of the points into the temporary struct.
-	for (i=pglp->num_verts-1, j=0; j<pglp->num_verts; i--, j++)
-	{
-		vertex[j].x = pglp->vertex[i].x;
-		vertex[j].y = pglp->vertex[i].y;
-		//Be sure to shift the special attributes to the correct item,
-		//because the variant is specified at the ending point, which will
-		//have changed to be a different index.
-		vertex[j].hidden = pglp->vertex[i+1].hidden;
-	}
-	//Now reload the main struct, recalculating when necessary.
-	prevx = prevy = 0;
-	for(i=0; i <pglp->num_verts; i++)
-	{
-		pglp->vertex[i].x = vertex[i].x;
-		pglp->vertex[i].y = vertex[i].y;
-		pglp->vertex[i].delta_x = pglp->vertex[i].x - prevx;
-		pglp->vertex[i].delta_y = pglp->vertex[i].y - prevy;
-		pglp->vertex[i].hidden = vertex[i].hidden;
-		prevx = pglp->vertex[i].x;
-		prevy = pglp->vertex[i].y;
-	}
-	free(vertex);
 }
 /***************************************************************************/
 /* DeleteMapItem		                                                   */
@@ -732,6 +615,12 @@ void DeleteMapItem(LPMAPDOCUMENT lpMapDocument)
 	case IDM_MAP_WORMHOLE:
 		num = 14;
 		break;
+	case IDM_VERTEX:
+		//If we have a vertex selected, we can delete that right
+		//here and then RETURN.
+		DeleteVertex(&lpMapDocument->selectedpoly, lpMapDocument->numselvert);
+		UpdateSelections(lpMapDocument, TRUE);
+		return;
 	}
 	lpMapDocument->selectedbool = FALSE;
 
@@ -778,17 +667,8 @@ void DeleteMapItem(LPMAPDOCUMENT lpMapDocument)
 	{
 		switch (lpMapDocument->selectedtype)
 		{
-		case IDM_MAP_BALL:
-			lpMapDocument->MapGeometry.num_balls--;
-			break;
-		case IDM_MAP_BASE:
-			lpMapDocument->MapGeometry.num_bases--;
-			break;
 		case IDM_MAP_CHECKPOINT:
 			lpMapDocument->MapGeometry.num_checkpoints--;
-			break;
-		case IDM_MAP_FUEL:
-			lpMapDocument->MapGeometry.num_fuels--;
 			break;
 		}
 
@@ -823,40 +703,6 @@ void DeleteMapItem(LPMAPDOCUMENT lpMapDocument)
 	}
 }
 /***************************************************************************/
-/* FindClosestVertex                                                       */
-/* Arguments :                                                             */
-/*    lpMapDocument - pointer to map document.                             */
-/*	polygon: a list of points                                              */
-/*	x: the xcoord to check                                                 */
-/*	y: the ycoord to check                                                 */
-/* Return :                                                                */
-/*   number of closest vertex if one is close enough                       */
-/*   0 if no vertex is close enough                                        */
-/* Purpose : Find the vertex closest to x,y in a given polygon.            */
-/***************************************************************************/
-int FindClosestVertex(LPMAPDOCUMENT lpMapDocument, polygonlist *polygon, int x, int y)
-{
-	int n = 0;
-	int i, l, delta, closest;
-
-	delta = lpMapDocument->width;
-
-	for(i=0; i<polygon->num_verts; i++)
-	{
-		l = Wrap_length(lpMapDocument, (x - polygon->vertex[i].x),
-			(y - polygon->vertex[i].y));
-		if (l <= delta)
-		{
-			delta = l;
-			closest = i;
-		}
-	}
-	if (delta < 50)
-		return closest; //Return this point, cause we're within range
-	else
-		return 0; //Just let the first point be selected.
-}
-/***************************************************************************/
 /* Wrap_length	                                                           */
 /* Arguments :                                                             */
 /*    lpMapDocument - pointer to map document.                             */
@@ -873,166 +719,14 @@ double Wrap_length(LPMAPDOCUMENT lpMapDocument, double dx, double dy)
 	return LENGTH(dx, dy);
 }
 /***************************************************************************/
-/* DeleteVertex                                                            */
-/* Arguments :                                                             */
-/*    lpMapDocument - pointer to map document.                             */
-/*	polygon: a list of points                                              */
-/*	num: the vertex to delete                                              */
-/* Purpose : Delete the specified vertex                                   */
-/***************************************************************************/
-void DeleteVertex(polygonlist **polygon, int num)
-{
-	int i, j, prevx, prevy;
-
-	XP_POINT *vert;
-	polygonlist *pglp;
-	pglp = *polygon;
-
-	vert = (XP_POINT *) malloc(pglp->num_verts*sizeof(XP_POINT));
-	prevx = prevy = 0;
-	for (i = 0, j = 0; i < pglp->num_verts; i++, j++)
-	{
-		if (i == num)
-			i++;
-		vert[j].x = pglp->vertex[i].x;
-		vert[j].y = pglp->vertex[i].y;
-		vert[j].delta_x = vert[j].x - prevx;
-		vert[j].delta_y = vert[j].y - prevy;
-		prevx = vert[j].x;
-		prevy = vert[j].y;
-	}
-	pglp->num_verts--;
-	realloc(pglp->vertex, pglp->num_verts*sizeof(XP_POINT));
-	for (i = 0; i < pglp->num_verts; i++)
-	{
-		pglp->vertex[i].x = vert[i].x;
-		pglp->vertex[i].y = vert[i].y;
-		pglp->vertex[i].delta_x = vert[i].delta_x;
-		pglp->vertex[i].delta_y = vert[i].delta_y;
-	}
-
-	free(vert);
-}
-/***************************************************************************/
-/* MoveVertex                                                              */
-/* Arguments :                                                             */
-/*    lpMapDocument - pointer to map document.                             */
-/*	polygon: a list of points                                              */
-/*	num: the vertex to delete                                              */
-/*	deltax: the change along the x axis                                    */
-/*	deltay: the change along the y axis                                    */
-/* Purpose : Move the specified vertex the specified distance              */
-/***************************************************************************/
-int MoveVertex(polygonlist **polygon, int num, int deltax, int deltay)
-{
-	int tempdx, tempdy;
-	polygonlist *pglp;
-	pglp = *polygon;
-	
-	if ((num != 0) && (num!=pglp->num_verts-1))
-	{
-		//Make sure the new point wont be too far away from the previous(chain)
-		//point.
-		tempdx = pglp->vertex[num].delta_x + deltax;
-		tempdy = pglp->vertex[num].delta_y + deltay;
-		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
-		{
-			return TRUE;
-		}
-		
-		//Make sure the new point wont be too far away from the next
-		//point.
-		tempdx = pglp->vertex[num+1].delta_x-deltax;
-		tempdy = pglp->vertex[num+1].delta_y-deltay;
-		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
-		{
-			return TRUE;
-		}
-	}
-	else
-	{
-		//If we're the first point make sure the new point will be
-		//valid.
-		tempdx = pglp->vertex[pglp->num_verts-1].delta_x+deltax;
-		tempdy = pglp->vertex[pglp->num_verts-1].delta_y+deltay;
-		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
-		{
-			return TRUE;
-		}
-		//Check against the second point.
-		tempdx = pglp->vertex[1].delta_x-deltax;
-		tempdy = pglp->vertex[1].delta_y-deltay;
-		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
-		{
-			return TRUE;
-		}
-
-	}
-
-	if((num != 0) && (num != pglp->num_verts-1))
-	{
-		pglp->vertex[num].x += deltax;
-		pglp->vertex[num].y += deltay;
-		pglp->vertex[num].delta_x += deltax;
-		pglp->vertex[num].delta_y += deltay;
-		
-		pglp->vertex[num+1].delta_x = pglp->vertex[num+1].delta_x-deltax;
-		pglp->vertex[num+1].delta_y = pglp->vertex[num+1].delta_y-deltay;
-	}
-	else
-	{
-		pglp->vertex[0].x += deltax;
-		pglp->vertex[0].y += deltay;
-		pglp->vertex[1].delta_x -= deltax;
-		pglp->vertex[1].delta_y -= deltay;
-		pglp->vertex[pglp->num_verts-1].x += deltax;
-		pglp->vertex[pglp->num_verts-1].y += deltay;
-		pglp->vertex[pglp->num_verts-1].delta_x += deltax;
-		pglp->vertex[pglp->num_verts-1].delta_y += deltay;
-	}
-
-	return FALSE;
-}
-/***************************************************************************/
-/* CountEdgesOfType                                                        */
-/* Arguments :                                                             */
-/*    lpMapDocument - pointer to map document.                             */
-/*	polygon: a list of points                                              */
-/*	type: the type of edges to count                                       */
-/* Purpose : Count the number of edges of the specified type               */
-/***************************************************************************/
-int CountEdgesOfType(polygonlist **polygon, int type)
-{
-	int i, count = 0;
-	polygonlist *pglp;
-	pglp = *polygon;
-
-	for (i = 0; i < pglp->num_verts; i++)
-	{
-		switch (type)
-		{
-		case IDM_MAP_HIDDEN:
-			if (pglp->vertex[i].hidden == TRUE)
-				count++;
-			break;
-		case IDM_MAP_NORMAL:
-			//Update this if statement if any new attributes are added.
-			//Normal walls have no attributes as true;
-			if (pglp->vertex[i].hidden == FALSE)
-				count++;
-			break;
-		}
-	}
-	return count;
-}
-/***************************************************************************/
 /* ReorderItemTo	     	                                               */
 /* Arguments :                                                             */
-/*	iteml: a list of items                                                  */
+/*	iteml: a list of items                                                 */
+/*	item: an item                                                          */
 /*  num: the new number for the checkpoint.                                */
-/* Purpose : Delete the selected polygon.                                  */
+/* Purpose : Reorder items in tan item list to be in a different order     */
 /***************************************************************************/
-void ReorderItemTo(itemlist **iteml, itemlist **item, int num)
+/*void ReorderItemTo(itemlist **iteml, itemlist **item, int num)
 {
 	itemlist *itmlp = NULL;
 	itemlist *item2 = *item;
@@ -1041,7 +735,7 @@ void ReorderItemTo(itemlist **iteml, itemlist **item, int num)
 
 	itmlp = *iteml;
 
-/* 	count=0;
+ 	count=0;
 	while (itmlp->next != NULL)
 	{
 		count++;
@@ -1129,9 +823,9 @@ void ReorderItemTo(itemlist **iteml, itemlist **item, int num)
 				itmlp = itmlp->next;
 			}
 		}
-	}*/
+	}
 
-}
+}*/
 /***************************************************************************/
 /* FindClosestItemInList                                                   */
 /* Arguments :                                                             */
@@ -1144,7 +838,7 @@ void ReorderItemTo(itemlist **iteml, itemlist **item, int num)
 /*   0 if no vertex is close enough                                        */
 /* Purpose : Find the closest item in an item list                         */
 /***************************************************************************/
-int FindClosestItemInList(LPMAPDOCUMENT lpMapDocument, int x, int y, itemlist **item)
+/*int FindClosestItemInList(LPMAPDOCUMENT lpMapDocument, int x, int y, itemlist **item)
 {
 	itemlist *itmlp;
 	int n = 0;
@@ -1171,3 +865,105 @@ int FindClosestItemInList(LPMAPDOCUMENT lpMapDocument, int x, int y, itemlist **
 //	else
 //		return 0; //Just let the first point be selected.
 }
+*/
+/***************************************************************************/
+/* AddStyleToMap                                                           */
+/* Arguments :                                                             */
+/* Return :                                                                */
+/*   TRUE if errors                                                        */
+/*   FALSE if successful                                                   */
+/* Purpose : Adds a style to the map                                       */
+/***************************************************************************/
+int AddStyleToMap(LPMAPDOCUMENT lpMapDocument, int type, char *idstr, int width, int color,
+				  int style, char *edgestr, int flags, char *texturestr, char *filenamestr)
+{
+	int i;
+
+	switch (type)
+	{
+		//Edge Style
+	case 0: 
+		i = lpMapDocument->MapGeometry.num_estyles; /*remember that estyles[0] is the first one!*/
+		sprintf(lpMapDocument->MapGeometry.estyles[i].id, "%s", idstr);
+		lpMapDocument->MapGeometry.estyles[i].width = width;
+		lpMapDocument->MapGeometry.estyles[i].color = color;
+		lpMapDocument->MapGeometry.estyles[i].style = style;
+		lpMapDocument->MapGeometry.num_estyles++;
+		break;
+		//Polygon Style
+	case 1: 
+		i = lpMapDocument->MapGeometry.num_pstyles;/*remember that pstyles[0] is the first one!*/
+		sprintf(lpMapDocument->MapGeometry.pstyles[i].id, "%s", idstr);
+		lpMapDocument->MapGeometry.pstyles[i].color = color;
+		lpMapDocument->MapGeometry.pstyles[i].defedge_id = get_edge_id(lpMapDocument, edgestr);
+		if (texturestr)
+			lpMapDocument->MapGeometry.pstyles[i].texture_id = get_bmp_id(lpMapDocument, texturestr);
+		lpMapDocument->MapGeometry.pstyles[i].flags = flags;
+		lpMapDocument->MapGeometry.num_pstyles++;
+		break;
+		//Bitmap Style
+	case 2: 
+		i = lpMapDocument->MapGeometry.num_bstyles;/*remember that bstyles[0] is the first one!*/
+		sprintf(lpMapDocument->MapGeometry.bstyles[i].id, "%s", idstr);
+		sprintf(lpMapDocument->MapGeometry.bstyles[i].filename, "%s", filenamestr);
+		lpMapDocument->MapGeometry.bstyles[i].flags = flags;
+		lpMapDocument->MapGeometry.num_bstyles++;
+		break;
+	}
+
+	return FALSE;
+}
+/***************************************************************************/
+/* InsideSelected                                                          */
+/* Arguments :                                                             */
+/*    lpMapDocument - pointer to map document.                             */
+/*	x: the xcoord to check                                                 */
+/*	y: the ycoord to check                                                 */
+/* Return :                                                                */
+/*   TRUE if outside                                                       */
+/*   FALSE if inside                                                       */
+/* Purpose : Findout if the point specified is within the selected item    */
+/***************************************************************************/
+int InsideSelected(LPMAPDOCUMENT lpMapDocument, int x, int y)
+{
+	int rval = 0, num = 0;
+	XP_POINT *tempptlist;
+
+	if (lpMapDocument->selectedbool)
+		if (lpMapDocument->selectedpoly)
+		{
+			tempptlist = lpMapDocument->selectedpoly->vertex;
+			num = lpMapDocument->selectedpoly->num_verts;
+		}
+		else if (lpMapDocument->selecteditem)
+		{
+			tempptlist = lpMapDocument->selecteditem->bounding_box;
+			num = 4;
+		}
+
+		rval = InsidePolygon(tempptlist, num, x, y);
+		//If the starting point of the polygon is wrapped around the other
+		//side, then the above check won't work. So check to see if it was wrapped.
+		
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x-lpMapDocument->width, y+lpMapDocument->height);
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x, y+lpMapDocument->height);
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x+lpMapDocument->width, y+lpMapDocument->height);
+		
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x-lpMapDocument->width, y);
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x+lpMapDocument->width, y);
+		
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x-lpMapDocument->width, y-lpMapDocument->height);
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x, y-lpMapDocument->height);
+		if (!rval)
+			rval = InsidePolygon(tempptlist, num, x+lpMapDocument->width, y-lpMapDocument->height);
+
+		return rval;		
+}
+

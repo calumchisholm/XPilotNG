@@ -26,13 +26,10 @@ only use ANSI 'c' code here, so that its compatible on any OS.*/
 #include "default_settings.h"
 
 int iSelectionMapSyms = 0;
-int iSelectionMapTools = 0;
 int iSelectionShape = 0;
 int iSelectionWormhole = 0;
 int iSelectionPolarity = 0;
-//int iSelectionWallType = 0;
 int iSelectionMapModify = 0;
-int bSegHidden = FALSE;
 
 int fDrawing = 0;
 int fCreatingPolygon;
@@ -72,6 +69,15 @@ int NewMapInit(LPMAPDOCUMENT lpMapDocument)
 		lpMapDocument->PrefsArray[i].output = FALSE;
 
 	Setup_default_server_options(lpMapDocument);
+
+	/*Default EdgeStyles*/
+//	AddStyleToMap(lpMapDocument, 0, "xpbluehidden", -1, strtol("4E7CFF", NULL, 16),0, NULL, 0, NULL, NULL);
+//	AddStyleToMap(lpMapDocument, 0, "xpredhidden", -1, strtol("FF3A27", NULL, 16), 0, NULL, 0, NULL, NULL);
+//	AddStyleToMap(lpMapDocument, 0, "yellow", 2, strtol("FFFF00", NULL, 16), 0, NULL, 0, NULL, NULL);
+	/*Default PolygonStyles*/
+//	AddStyleToMap(lpMapDocument, 1, "xpblue", 0, strtol("4E7CFF", NULL, 16), 0, "xpbluehidden", 1, NULL, NULL);
+//	AddStyleToMap(lpMapDocument, 1, "xpred", 0, strtol("FF3A27", NULL, 16), 0, "xpredhidden", 1, NULL, NULL);
+//	AddStyleToMap(lpMapDocument, 1, "emptyyellow", 0, strtol("FF", NULL, 16), 0, "yellow", 0, NULL, NULL);
 	return 0;
 }
 /***************************************************************************/
@@ -111,59 +117,8 @@ int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMap
 	case IDM_PICKITEM:
 		SelectItem(lpMapDocument, x, y);
 		break;
-	case IDM_ADDVERTEX:
-		if (lpMapDocument->selectedpoly)
-		{
-			vert = (XP_POINT *) malloc(sizeof(XP_POINT));
-			vert->x = x;
-			vert->y = y;
-			vert->delta_x = min(x - lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].x,
-				lpMapDocument->width - lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].x + x);
-			vert->delta_y = y - lpMapDocument->selectedpoly->vertex[lpMapDocument->selectedpoly->num_verts-1].y;
-			vert->hidden = bSegHidden;
-			AddVertexToList(lpMapDocument->selectedpoly, vert);
-		}
-		else
-			SelectItem(lpMapDocument, x, y);		
-		break;
-	case IDM_DELVERTEX:
-		if (lpMapDocument->selectedpoly && lpMapDocument->selectedpoly->num_verts >= 2)
-		{
-			DeleteVertex(&lpMapDocument->selectedpoly, lpMapDocument->numselvert);
-		}
-		else if (lpMapDocument->selectedpoly)
-		{
-			DeleteMapItem(lpMapDocument);
-		}
-		else
-			SelectItem(lpMapDocument, x, y);		
-		break;
-	case IDM_MOVEVERTEX:
-		if (lpMapDocument->selectedpoly)
-		{
-			if (!fDragging)
-			{
-				startx = x;
-				starty = y;
-				fDragging = TRUE;
-			}
-			else
-			{
-				deltax = x - startx;
-				deltay = y - starty;
-				if (MoveVertex(&lpMapDocument->selectedpoly, lpMapDocument->numselvert, deltax, deltay))
-				{
-					StatusUpdate("Couldn't move vertex!");
-				}
-				fDragging = FALSE;
-			}
-		}
-		else
-			SelectItem(lpMapDocument, x, y);		
-		break;
-
 	case IDM_MOVEITEM:
-		if (lpMapDocument->selectedpoly || lpMapDocument->selecteditem)
+		if (lpMapDocument->selectedpoly || lpMapDocument->selecteditem || lpMapDocument->selectedvert)
 		{
 			if (!fDragging)
 			{
@@ -175,20 +130,24 @@ int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMap
 			{
 				deltax = x - startx;
 				deltay = y - starty;
-				if (lpMapDocument->selectedpoly)
+				if (lpMapDocument->selectedpoly && !lpMapDocument->selectedvert)
 				{
-					lpMapDocument->selectedpoly->vertex[0].x = WRAP_XPIXEL(lpMapDocument->selectedpoly->vertex[0].x+deltax);
-					lpMapDocument->selectedpoly->vertex[0].y = WRAP_YPIXEL(lpMapDocument->selectedpoly->vertex[0].y+deltay);
-					for (i = 1; i<lpMapDocument->selectedpoly->num_verts; i++)
-					{
-						lpMapDocument->selectedpoly->vertex[i].x = lpMapDocument->selectedpoly->vertex[i-1].x + lpMapDocument->selectedpoly->vertex[i].delta_x;
-						lpMapDocument->selectedpoly->vertex[i].y = lpMapDocument->selectedpoly->vertex[i-1].y + lpMapDocument->selectedpoly->vertex[i].delta_y;
-					}
+					MovePolygon(lpMapDocument, lpMapDocument->selectedpoly->vertex,
+						lpMapDocument->selectedpoly->num_verts, deltax, deltay);
 				}
-				else
+				else if (lpMapDocument->selecteditem)
 				{
 					lpMapDocument->selecteditem->pos.x = WRAP_XPIXEL(lpMapDocument->selecteditem->pos.x + deltax);
 					lpMapDocument->selecteditem->pos.y = WRAP_YPIXEL(lpMapDocument->selecteditem->pos.y + deltay);
+					MovePolygon(lpMapDocument, lpMapDocument->selecteditem->bounding_box,
+						4, deltax, deltay);
+				}
+				else if (lpMapDocument->selectedvert)
+				{
+					if (MoveVertex(&lpMapDocument->selectedpoly, lpMapDocument->numselvert, deltax, deltay))
+					{
+						StatusUpdate("Couldn't move vertex!");
+					}
 				}
 				fDragging = FALSE;
 			}
@@ -196,7 +155,7 @@ int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMap
 		else
 			SelectItem(lpMapDocument, x, y);		
 		break;
-	case IDM_REORDERCHECKPOINT:
+/*	case IDM_REORDERCHECKPOINT:
 		if (lpMapDocument->selecteditem && lpMapDocument->selectedtype == IDM_MAP_CHECKPOINT)
 		{
 //			if (!fReordering)
@@ -216,19 +175,20 @@ int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMap
 		}
 		else
 			SelectItem(lpMapDocument, x, y);		
-		break;
+		break;*/
 	}
 	return 0;
 }
 /***************************************************************************/
-/* UpdateSelected                                                          */
+/* UpdateSelections                                                        */
 /* Arguments :                                                             */
 /*    lpMapDocument - pointer to map document.                             */
+/*    clear - should all selections be cleared?                            */
 /* Purpose :   Change the selected items settings                          */
 /***************************************************************************/
-void UpdateSelected(LPMAPDOCUMENT lpMapDocument)
+void UpdateSelections(LPMAPDOCUMENT lpMapDocument, int clear)
 {
-	if (lpMapDocument->selectedbool)
+	if (lpMapDocument->selectedbool && !clear)
 	{
 		if (lpMapDocument->selecteditem)
 		{
@@ -240,5 +200,14 @@ void UpdateSelected(LPMAPDOCUMENT lpMapDocument)
 		{
 			lpMapDocument->selectedpoly->team = teamSet;
 		}
+	}
+	if (clear)
+	{
+		lpMapDocument->selectedbool = FALSE;
+		lpMapDocument->selecteditem = NULL;
+		lpMapDocument->selectedpoly = NULL;
+		lpMapDocument->selectedvert = NULL;
+		lpMapDocument->numselvert = -1;
+		lpMapDocument->selectedtype = 0;
 	}
 }

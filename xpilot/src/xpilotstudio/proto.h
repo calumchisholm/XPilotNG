@@ -25,7 +25,7 @@
 int NewMapInit(LPMAPDOCUMENT);
 void Setup_default_server_options(LPMAPDOCUMENT);
 int DoModifyCommand(LPMAPDOCUMENT, int, int, int);
-void UpdateSelected(LPMAPDOCUMENT);
+void UpdateSelections(LPMAPDOCUMENT, int);
 
 /*document.c*/
 LPXPSTUDIODOCUMENT CreateNewXpDocument(int);
@@ -36,6 +36,9 @@ LPSHIPDOCUMENT CreateNewShipDoc();
 void DestroyShipDoc(LPSHIPDOCUMENT);
 
 /*map_file.c*/
+int get_bmp_id(LPMAPDOCUMENT, const char *);
+int get_edge_id(LPMAPDOCUMENT, const char *);
+int get_poly_id(LPMAPDOCUMENT, const char *);
 static void tagstart(void *, const char *, const char **);
 static void tagend(void *, const char *);
 int Load_lines(int);
@@ -44,11 +47,11 @@ int SaveMap(LPMAPDOCUMENT, char *, int, int);
 int	AddOption(LPMAPDOCUMENT, char *, char *, int, int);
 int	YesNo(char *);
 char	*StrToNum(char *, int, int);
-int	LoadMapData(LPMAPDOCUMENT, char *);
 char	*getMultilineValue();
 int FindOption(LPMAPDOCUMENT, char *);
-void WritePolygonList(FILE *, polygonlist *, int);
+void WritePolygonList(FILE *, LPMAPDOCUMENT, polygonlist *, int);
 void WriteItemList(FILE *, itemlist *, int);
+void WriteStyles(FILE *, LPMAPDOCUMENT);
 
 /*errors.c*/
 void ErrorHandler(char *, ...);
@@ -57,26 +60,33 @@ void StatusUpdate(char *, ...);
 /*geometry.c*/
 int CreateItem(LPMAPDOCUMENT, int, int, int, int, int, int);
 int AddItemToPolygonlist(LPMAPDOCUMENT, polygonlist **, int, int, int, int, int, int, int, int);
-int AddVertexToList(polygonlist *, XP_POINT *);
 int AddItemToItemlist(itemlist **, int, int, int, int, int, int);
-int InsidePolygon(XP_POINT *, int, int, int);
 int SelectItem(LPMAPDOCUMENT, int, int);
 void DeleteMapItem(LPMAPDOCUMENT);
-int IsCounterClockwise (polygonlist *);
-void ReversePolygonOrientation(polygonlist *);
-int FindClosestVertex(LPMAPDOCUMENT, polygonlist *, int, int);
 double Wrap_length(LPMAPDOCUMENT, double, double);
-void DeleteVertex(polygonlist **, int);
-int MoveVertex(polygonlist **, int, int, int);
-int CountEdgesOfType(polygonlist **, int);
-void ReorderItemTo(itemlist **, itemlist **, int num);
-int FindClosestItemInList(LPMAPDOCUMENT, int, int, itemlist **);
+/*void ReorderItemTo(itemlist **, itemlist **, int);*/
+/*int FindClosestItemInList(LPMAPDOCUMENT, int, int, itemlist **);*/
+int AddStyleToMap(LPMAPDOCUMENT, int, char *, int, int, int, char *, int, char *, char *);
+int InsideSelected(LPMAPDOCUMENT, int, int);
 
 /*draw.c*/
 void DrawMapEntire(LPMAPDOCUMENT);
-void DrawPolygonList(LPMAPDOCUMENT, polygonlist *, int, int, int);
+void DrawSymbol(LPMAPDOCUMENT, int, int, int, int, int);
+void DrawPolygonList(LPMAPDOCUMENT, polygonlist *, int, int);
 void DrawVertexList(LPMAPDOCUMENT, polygonlist *, int, int, int);
 void DrawItemList(LPMAPDOCUMENT, itemlist *, int, int, int);
 
 /*helper.c*/
 void GetSetEnterableInfo(void);
+
+/*polygon.c*/
+int AddVertexToList(polygonlist *, XP_POINT *);
+int InsidePolygon(XP_POINT *, int, int, int);
+int IsVertexOfPolygon(XP_POINT *, int, int, int);
+int IsCounterClockwise (polygonlist *);
+void ReversePolygonOrientation(polygonlist *);
+int FindClosestVertex(LPMAPDOCUMENT, polygonlist *, int, int);
+void DeleteVertex(polygonlist **, int);
+int MoveVertex(polygonlist **, int, int, int);
+int MovePolygon(LPMAPDOCUMENT, XP_POINT *, int, int, int);
+

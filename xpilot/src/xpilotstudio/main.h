@@ -58,12 +58,11 @@ extern int variantSet;
 
 //The currently selected buttons
 extern int iSelectionMapSyms;
-extern int iSelectionMapTools;
+//extern int iSelectionMapTools;
 extern int iSelectionShape;
 extern int iSelectionWormhole;
 extern int iSelectionPolarity;
 extern int iSelectionMapModify;
-//extern int iSelectionWallType;
 extern int bSegHidden;
 
 extern int iSelectionShipTools;

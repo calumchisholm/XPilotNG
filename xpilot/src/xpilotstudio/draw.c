@@ -28,6 +28,9 @@
 HDC mapDC;
 HDC shiplistDC;
 HDC shipviewDC;
+
+HPEN hEdgePens[256];
+HBRUSH hPolygonBrushes[256];
 #endif
 
 segment_t mapicon_seg[16] = {
@@ -64,6 +67,7 @@ void DrawMapEntire(LPMAPDOCUMENT lpMapDocument)
 	polygonlist *pglp;
 	itemlist *itmlp;
 	int numpgondraw = 4;
+	float zoom = lpMapDocument->view_zoom;
 	struct pgondraw {
 		struct polygonlist *pglp;
 		int type;
@@ -73,8 +77,8 @@ void DrawMapEntire(LPMAPDOCUMENT lpMapDocument)
 	{
 		{lpMapDocument->MapGeometry.walls, IDM_MAP_WALL, COLOR_WALL},
 		{lpMapDocument->MapGeometry.decors, IDM_MAP_DECOR, COLOR_DECOR},
-		{lpMapDocument->MapGeometry.balltargets, IDM_MAP_BALLTARGET, COLOR_BALLTARGET},
 		{lpMapDocument->MapGeometry.ballareas, IDM_MAP_BALLAREA, COLOR_BALLAREA},
+		{lpMapDocument->MapGeometry.balltargets, IDM_MAP_BALLTARGET, COLOR_BALLTARGET},
 	};
 	int numitemdraw = 11;
 	struct itemdraw {
@@ -104,7 +108,32 @@ void DrawMapEntire(LPMAPDOCUMENT lpMapDocument)
 	mapDC = GetDC(hwndTemp);
 	storeFont = GetZoomFont(mapDC, lpMapDocument);
 	hPenSelected = CreatePen (PS_SOLID,0,COLOR_SELECT);
-	hPenHidden = CreatePen (PS_SOLID,0,COLOR_HIDDEN);
+
+	for (i = 1; i <= lpMapDocument->MapGeometry.num_estyles; i++)
+	{
+			/*For some reason, the color orders from the file go BGR instead of RGB.
+			We want to leave the number itself alone though, since thats the way
+			xpilot does it. So just swap the values.*/
+		hEdgePens[i] = CreatePen(lpMapDocument->MapGeometry.estyles[i].style,
+			lpMapDocument->MapGeometry.estyles[i].width, 
+			RGB(GetBValue(lpMapDocument->MapGeometry.estyles[i].color),
+			GetGValue(lpMapDocument->MapGeometry.estyles[i].color),
+			GetRValue(lpMapDocument->MapGeometry.estyles[i].color))
+			);
+	}
+	for (i = 0; i < lpMapDocument->MapGeometry.num_pstyles; i++)
+	{
+		if (lpMapDocument->MapGeometry.pstyles[i].flags == 1)
+		{
+		hPolygonBrushes[i] = CreateSolidBrush(
+			RGB(GetBValue(lpMapDocument->MapGeometry.pstyles[i].color),
+			GetGValue(lpMapDocument->MapGeometry.pstyles[i].color),
+			GetRValue(lpMapDocument->MapGeometry.pstyles[i].color))
+			);
+		}
+		/*To Do: Else for pattern brushes*/
+	}
+
 #endif
 
 	for (i = 0; i < numpgondraw; i++)
@@ -112,27 +141,20 @@ void DrawMapEntire(LPMAPDOCUMENT lpMapDocument)
 		if (!pgondrawlist[i].pglp)
 			continue;
 		pglp = pgondrawlist[i].pglp;
-#ifdef _WINDOWS
-		hPenCurrent = CreatePen(PS_SOLID, 0, pgondrawlist[i].color);
-		SelectObject(mapDC, hPenCurrent);
-#endif
 		//Row Above
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x-lpMapDocument->width, lpMapDocument->view_y-lpMapDocument->height);
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x, lpMapDocument->view_y-lpMapDocument->height);
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x+lpMapDocument->width, lpMapDocument->view_y-lpMapDocument->height);
+		DrawPolygonList(lpMapDocument, pglp, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
+		DrawPolygonList(lpMapDocument, pglp, (int) (lpMapDocument->view_x/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
+		DrawPolygonList(lpMapDocument, pglp, (int) ((lpMapDocument->view_x+lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
 		
 		//Left and Right
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x-lpMapDocument->width, lpMapDocument->view_y);
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x, lpMapDocument->view_y); //DefaultView
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x+lpMapDocument->width, lpMapDocument->view_y);
+		DrawPolygonList(lpMapDocument, pglp, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) (lpMapDocument->view_y/zoom));
+		DrawPolygonList(lpMapDocument, pglp, (int) (lpMapDocument->view_x/zoom), (int) (lpMapDocument->view_y/zoom)); //DefaultView
+		DrawPolygonList(lpMapDocument, pglp, (int) ((lpMapDocument->view_x+lpMapDocument->width)/zoom), (int) (lpMapDocument->view_y/zoom));
 		
 		//Row Below
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x-lpMapDocument->width, lpMapDocument->view_y+lpMapDocument->height);
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x, lpMapDocument->view_y+lpMapDocument->height);
-		DrawPolygonList(lpMapDocument, pglp, pgondrawlist[i].type, lpMapDocument->view_x+lpMapDocument->width, lpMapDocument->view_y+lpMapDocument->height);
-#ifdef _WINDOWS
-		DeleteObject(SelectObject(mapDC, GetStockObject(BLACK_PEN)));
-#endif
+		DrawPolygonList(lpMapDocument, pglp, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
+		DrawPolygonList(lpMapDocument, pglp, (int) (lpMapDocument->view_x/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
+		DrawPolygonList(lpMapDocument, pglp, (int) ((lpMapDocument->view_x+lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
 	}
 
 	for (i = 0; i < numitemdraw; i++)
@@ -145,127 +167,172 @@ void DrawMapEntire(LPMAPDOCUMENT lpMapDocument)
 		SelectObject(mapDC, hPenCurrent);
 #endif
 		//Row Above
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x-lpMapDocument->width, lpMapDocument->view_y-lpMapDocument->height);
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x, lpMapDocument->view_y-lpMapDocument->height);
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x+lpMapDocument->width, lpMapDocument->view_y-lpMapDocument->height);
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) (lpMapDocument->view_x/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) ((lpMapDocument->view_x+lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
 		
 		//Left and Right
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x-lpMapDocument->width, lpMapDocument->view_y);
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x, lpMapDocument->view_y); //DefaultView
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x+lpMapDocument->width, lpMapDocument->view_y);
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) (lpMapDocument->view_y/zoom));
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) (lpMapDocument->view_x/zoom), (int) (lpMapDocument->view_y/zoom)); //DefaultView
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) ((lpMapDocument->view_x+lpMapDocument->width)), (int) (lpMapDocument->view_y/zoom));
 		
 		//Row Below
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x-lpMapDocument->width, lpMapDocument->view_y+lpMapDocument->height);
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x, lpMapDocument->view_y+lpMapDocument->height);
-		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x+lpMapDocument->width, lpMapDocument->view_y+lpMapDocument->height);
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) (lpMapDocument->view_x/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
+		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, (int) ((lpMapDocument->view_x+lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
 #ifdef _WINDOWS
 		DeleteObject(SelectObject(mapDC, GetStockObject(BLACK_PEN)));
 #endif
 	}
 
+	if (lpMapDocument->selectedbool && lpMapDocument->selectedtype == IDM_VERTEX)
+	{
+#ifdef _WINDOWS
+		SelectObject(mapDC, hPenSelected);
+#endif
+		//Row Above
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) (lpMapDocument->view_x/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) ((lpMapDocument->view_x+lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y-lpMapDocument->height)/zoom));
+		
+		//Left and Right
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) (lpMapDocument->view_y/zoom));
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) (lpMapDocument->view_x/zoom), (int) (lpMapDocument->view_y/zoom)); //DefaultView
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) ((lpMapDocument->view_x+lpMapDocument->width)), (int) (lpMapDocument->view_y/zoom));
+		
+		//Row Below
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) ((lpMapDocument->view_x-lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) (lpMapDocument->view_x/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
+		DrawSymbol(lpMapDocument, IDM_VERTEX, lpMapDocument->selectedvert->x, lpMapDocument->selectedvert->y, (int) ((lpMapDocument->view_x+lpMapDocument->width)/zoom), (int) ((lpMapDocument->view_y+lpMapDocument->height)/zoom));
+	}
+	
+
 #ifdef _WINDOWS
 	SelectObject(mapDC, GetStockObject(BLACK_PEN));
+	for (i = 1; hEdgePens[i] != NULL; i++)
+	{
+		DeleteObject(hEdgePens[i]);
+	}
+	for (i = 0; hPolygonBrushes[i] != NULL; i++)
+	{
+		DeleteObject(hPolygonBrushes[i]);
+	}
+
 	DeleteObject(hPenSelected);
-	DeleteObject(hPenHidden);
 	DeleteZoomFont(mapDC, storeFont);
 	ReleaseDC(hwndTemp,mapDC);
 #endif
 
 }
 /***************************************************************************/
+/* DrawSymbol                                                              */
+/* Arguments :                                                             */
+/*   type: the type of symbol to draw                                      */
+/*   ax: where to draw x coord                                             */
+/*   ay: where to draw y coord                                             */
+/*   offsx : offset in x dir                                               */
+/*   offsy : offset in y dir                                               */
+/* Purpose : Draw the specified list of polygons.                          */
+/***************************************************************************/
+void DrawSymbol(LPMAPDOCUMENT lpMapDocument, int type, int ax, int ay, int offsx, int offsy)
+{
+	int x, y;
+	float zoom = lpMapDocument->view_zoom;
+
+	x = ax;
+	y = lpMapDocument->height - ay;
+	switch (type)
+	{
+	case IDM_VERTEX:
+		Arc(mapDC, (int)(x/zoom-offsx-4),(int)(y/zoom-offsy-4),
+			(int)(x/zoom-offsx+5),(int)(y/zoom-offsy+5),
+			(int)(x/zoom-offsx),(int)(y/zoom-offsy),
+			(int)(x/zoom-offsx),(int)(y/zoom-offsy));
+		break;
+	}
+}
+/***************************************************************************/
 /* DrawPolygonList                                                         */
 /* Arguments :                                                             */
 /*   lpMapDocument: pointer to map document.                               */
 /*   pglp: pointer to the polygon to draw.                                 */
-/* Purpose : Draw the specified polygon.                                   */
+/*   offsx : offset in x dir                                               */
+/*   offsy : offset in y dir                                               */
+/* Purpose : Draw the specified list of polygons.                          */
 /***************************************************************************/
-void DrawPolygonList(LPMAPDOCUMENT lpMapDocument, polygonlist *pglp, int type,
+void DrawPolygonList(LPMAPDOCUMENT lpMapDocument, polygonlist *pglp,
 					 int offsx, int offsy)
 {
 	polygonlist *pglptemp;
-	char strng[2];
+//	char strng[2];
 	int x = 0, y = 0, i;
 	int startx = 0, starty = 0;
+	float zoom = lpMapDocument->view_zoom;
 #ifdef _WINDOWS
-	HPEN hstorePen;
-	HPEN htempPen;
-#endif
+	POINT polypoints[256];
+
 	pglptemp = pglp;
 
 	while (pglptemp != NULL)
 	{
-			startx = x = pglptemp->vertex[0].x;
-			starty = y = lpMapDocument->height-pglptemp->vertex[0].y;
-#ifdef _WINDOWS
-			MoveToEx(mapDC, x-offsx,
-				y-offsy, NULL);
-#endif
-		if (pglptemp->selected && lpMapDocument->selectedbool && !fDrawing)
-#ifdef _WINDOWS
-			hstorePen = SelectObject(mapDC, hPenSelected);
-#endif
-		for(i = 1; i < pglptemp->num_verts; i++)
-		{
-			x += pglptemp->vertex[i].delta_x;
-			y -= pglptemp->vertex[i].delta_y;
+			if (lpMapDocument->MapGeometry.pstyles[pglptemp->polygon_style].flags == 1)
+			{
+				for (i = 0; i < pglptemp->num_verts; i++)
+				{
+					polypoints[i].x = (int)(pglptemp->vertex[i].x/zoom)-offsx;
+					polypoints[i].y = (int)((lpMapDocument->height-pglptemp->vertex[i].y)/zoom)-offsy;
+				}
+				if (!lpMapDocument->selectedvert && pglptemp->selected && lpMapDocument->selectedbool && !fDrawing)
+					SelectObject(mapDC, hPenSelected);
+				else
+					SelectObject(mapDC, hEdgePens[lpMapDocument->MapGeometry.pstyles[pglptemp->polygon_style].defedge_id]);
 
-			if (pglptemp->vertex[i].hidden)
-				if (!pglptemp->selected)
-#ifdef _WINDOWS
-					htempPen = SelectObject(mapDC, hPenHidden);
-#endif
-
-#ifdef _WINDOWS
-			LineTo(mapDC, x-offsx,
-				y-offsy);
-#endif
-			if (pglptemp->vertex[i].hidden)
-				if (!pglptemp->selected)
-#ifdef _WINDOWS
-					SelectObject(mapDC, htempPen);
-#endif
-		}
-		
-		if (fDrawing || pglptemp->selected)
-		{
-#ifdef _WINDOWS
-			Arc(mapDC, (int)(startx-4)-offsx,(int)(starty-4)-offsy,
-				(int)(startx+5)-offsx,(int)(starty+5)-offsy,
-				startx-offsx,starty-offsy,
-				startx-offsx,starty-offsy);
-#endif
-		}
-
-		if (pglptemp->selected)
-#ifdef _WINDOWS
-			Arc(mapDC, pglptemp->vertex[lpMapDocument->numselvert].x-4-offsx,lpMapDocument->height-pglptemp->vertex[lpMapDocument->numselvert].y-4-offsy,
-			pglptemp->vertex[lpMapDocument->numselvert].x+5-offsx,lpMapDocument->height-pglptemp->vertex[lpMapDocument->numselvert].y+5-offsy,
-			pglptemp->vertex[lpMapDocument->numselvert].x-offsx,lpMapDocument->height-pglptemp->vertex[lpMapDocument->numselvert].y-offsy,
-			pglptemp->vertex[lpMapDocument->numselvert].x-offsx,lpMapDocument->height-pglptemp->vertex[lpMapDocument->numselvert].y-offsy);
-#endif
-
-		if (fDrawing || pglptemp->selected)
-#ifdef _WINDOWS
-			SelectObject(mapDC, hstorePen);
-#endif
-
-		//Then label the polygon with the teamnumber if it should be done.
-		if (type != IDM_MAP_WALL && type != IDM_MAP_DECOR)
-		{
-			sprintf(strng, "%d\0", pglptemp->team);
-#ifdef _WINDOWS
-			TextOut(mapDC, startx - offsx, starty - offsy, strng, strlen(strng));
-#endif
-		}
-
-		pglptemp = pglptemp->next;
+				SelectObject(mapDC, hPolygonBrushes[pglptemp->polygon_style]);
+				Polygon(mapDC, polypoints, pglptemp->num_verts);
+			}
+			if (lpMapDocument->MapGeometry.pstyles[pglptemp->polygon_style].flags == 0)
+			{
+				x = (int)(pglptemp->vertex[0].x/zoom);
+				y = (int)((lpMapDocument->height-pglptemp->vertex[0].y)/zoom);
+				MoveToEx(mapDC, x-offsx,
+					y-offsy, NULL);
+				SelectObject(mapDC, hEdgePens[lpMapDocument->MapGeometry.pstyles[pglptemp->polygon_style].defedge_id]);
+				
+				if (!lpMapDocument->selectedvert && pglptemp->selected && lpMapDocument->selectedbool && !fDrawing)
+					SelectObject(mapDC, hPenSelected);
+				
+				for(i = 1; i < pglptemp->num_verts; i++)
+				{
+					x += (int)(pglptemp->vertex[i].delta_x/zoom);
+					y -= (int)(pglptemp->vertex[i].delta_y/zoom);
+					
+					if (pglptemp->vertex[i].edge_style != pglptemp->vertex[i-1].edge_style)
+						if (!pglptemp->selected)
+						{
+							SelectObject(mapDC, hEdgePens[pglptemp->vertex[i].edge_style]);
+						}
+						
+						//Draw the line
+						LineTo(mapDC, x-offsx,
+							y-offsy);
+				}
+			}
+			pglptemp = pglptemp->next;
 	}
+
+	SelectObject(mapDC, GetStockObject(BLACK_PEN));
+	SelectObject(mapDC, GetStockObject(BLACK_BRUSH));
+#endif
+
 }
 /***************************************************************************/
 /* DrawItemList                                                            */
 /* Arguments :                                                             */
 /*   lpMapDocument: pointer to map document.                               */
 /*   itmlp: pointer to the itemlist to draw.                               */
+/*   type: the type of item to draw                                        */
+/*   offsx : offset in x dir                                               */
+/*   offsy : offset in y dir                                               */
 /* Purpose : Draw the specified list of items.                             */
 /***************************************************************************/
 void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
@@ -274,14 +341,13 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 	itemlist item;
 	int x = 0, y = 0;
 	int x2 = 0, y2 = 0;
-	char strng[2];
+//	char strng[2];
 	int picnum, i, numcheck=1;
 	double angle; //The angle to draw at.
 	double zoom = lpMapDocument->view_zoom; //The current map zoom.
 	
 	int draw; //Do we need to draw?
-	int tofsx, tofsy; //Tweaks for text offsets, block dependant.
-//Windows only stuff
+//	int tofsx, tofsy; //Tweaks for text offsets, block dependant.
 #ifdef _WINDOWS
 	RECT	rect;
 	POINT	points[10]; //Win point structure, accepts only (long) dims
@@ -351,10 +417,10 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 		//FILL THE POINTS ARRAY WITH THE SIZES FROM THE ICON SEGMENT
 		for (i=0;i<mapicon_seg[picnum].num_points; i++)
 		{
-			points[i].x = (x+(long) ( (mapicon_seg[picnum].x[i] * cos(angle))
-					+ (mapicon_seg[picnum].y[i] * sin(angle)) )) - offsx;
-			points[i].y = (y+(long) ( (mapicon_seg[picnum].y[i] * cos(angle))
-					- (mapicon_seg[picnum].x[i] * sin(angle)) )) - offsy;
+			points[i].x = (int)((x+(long) ( (mapicon_seg[picnum].x[i] * cos(angle))
+					+ (mapicon_seg[picnum].y[i] * sin(angle)) ))/zoom - offsx);
+			points[i].y = (int)((y+(long) ( (mapicon_seg[picnum].y[i] * cos(angle))
+					- (mapicon_seg[picnum].x[i] * sin(angle)) ))/zoom - offsy);
 		}
 		
 		if (item.selected && lpMapDocument->selectedbool)
@@ -403,10 +469,10 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 		{
 			for (i=0;i<mapicon_seg[picnum].num_points; i++)
 			{
-				points[i].x = (x+(long) ( (mapicon_seg[picnum].x[i] * cos(angle))
-					+ (mapicon_seg[picnum].y[i] * sin(angle)) )) - offsx;
-				points[i].y = (y+(long) ( (mapicon_seg[picnum].y[i] * cos(angle))
-					- (mapicon_seg[picnum].x[i] * sin(angle)) )) - offsy;
+				points[i].x = (int)((x+(long) ( (mapicon_seg[picnum].x[i] * cos(angle))
+					+ (mapicon_seg[picnum].y[i] * sin(angle)) ))/zoom - offsx);
+				points[i].y = (int)((y+(long) ( (mapicon_seg[picnum].y[i] * cos(angle))
+					- (mapicon_seg[picnum].x[i] * sin(angle)) ))/zoom - offsy);
 			}
 #ifdef _WINDOWS
 			Polyline(mapDC, points, mapicon_seg[picnum].num_points);
@@ -418,13 +484,13 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 		{
 		case IDM_MAP_BALL:
 #ifdef _WINDOWS
-			Arc(mapDC, (int)(x-8)-offsx,(int)(y-8)-offsy,
-				(int)(x+9)-offsx,(int)(y+9)-offsy,
-				x-offsx,y-offsy,
-				x-offsx,y-offsy);
+			Arc(mapDC, (int)((x-8)/zoom-offsx),(int)((y-8)/zoom-offsy),
+				(int)((x+9)/zoom-offsx),(int)((y+9)/zoom-offsy),
+				(int)(x/zoom-offsx),(int)(y/zoom-offsy),
+				(int)(x/zoom-offsx),(int)(y/zoom-offsy));
 #endif
 			break;
-		case IDM_MAP_GRAVITY:
+/*		case IDM_MAP_GRAVITY:
 #ifdef _WINDOWS
 			Arc(mapDC, (int)(x-15)-offsx,(int)(y-15)-offsy,
 				(int)(x+16)-offsx,(int)(y+16)-offsy,
@@ -455,9 +521,9 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 				x-offsx,y-offsy,
 				x-offsx,y-offsy);
 #endif
-			break;
+			break;*/
 		}
-////////
+/*////////
 ////////Draw any text if there is any.
 		draw = 0;
 		tofsx = tofsy = 0;
@@ -488,10 +554,8 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 			rect.right = x-tofsx-offsx;
 			rect.bottom = y-tofsy-offsy;
 			DrawText(mapDC, strng, strlen(strng), &rect, DT_NOCLIP);
-//			TextOut(mapDC, x+tofsx-offsx, y+tofsy-offsy, strng, strlen(strng));
-//			ExtTextOut(mapDC, x+tofsx-offsx, y+tofsy-offsy, NULL, NULL, strng, strlen(strng), NULL);
 #endif
-////////
+////////*/
 
 	if (item.selected && lpMapDocument->selectedbool)
 #ifdef _WINDOWS

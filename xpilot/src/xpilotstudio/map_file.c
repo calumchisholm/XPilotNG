@@ -26,6 +26,42 @@ int startx, starty;
 int type, team;
 LPMAPDOCUMENT lpTempMapDocument; //Temporary pointer to map document
 								//used by callback functions below.
+
+int get_bmp_id(LPMAPDOCUMENT lpMapDocument, const char *s)
+{
+    int i;
+
+    for (i = 0; i < lpMapDocument->MapGeometry.num_bstyles; i++)
+	if (!strcmp(lpMapDocument->MapGeometry.bstyles[i].id, s))
+	    return i;
+    ErrorHandler("Undeclared bmpstyle %s", s);
+    return 0;
+}
+
+
+int get_edge_id(LPMAPDOCUMENT lpMapDocument, const char *s)
+{
+    int i;
+
+    for (i = 0; i < lpMapDocument->MapGeometry.num_estyles; i++)
+	if (!strcmp(lpMapDocument->MapGeometry.estyles[i].id, s))
+	    return i;
+    ErrorHandler("Undeclared edgestyle %s", s);
+    return -1;
+}
+
+
+int get_poly_id(LPMAPDOCUMENT lpMapDocument, const char *s)
+{
+    int i;
+
+    for (i = 0; i < lpMapDocument->MapGeometry.num_pstyles; i++)
+	if (!strcmp(lpMapDocument->MapGeometry.pstyles[i].id, s))
+	    return i;
+    ErrorHandler("Undeclared polystyle %s", s);
+    return 0;
+}
+
 static void tagstart(void *data, const char *el, const char **attr)
 {
 	//Create a list of all the types of polygons
@@ -36,11 +72,87 @@ static void tagstart(void *data, const char *el, const char **attr)
 	struct polygontypes polylist[4] =
 	{
 		&lpTempMapDocument->MapGeometry.walls,
-		&lpTempMapDocument->MapGeometry.ballareas,
-		&lpTempMapDocument->MapGeometry.balltargets,
-		&lpTempMapDocument->MapGeometry.decors,
+			&lpTempMapDocument->MapGeometry.ballareas,
+			&lpTempMapDocument->MapGeometry.balltargets,
+			&lpTempMapDocument->MapGeometry.decors,
 	};
-    int x, y, dir, variant, hidden;
+    int x, y, dir, variant, style = -1, edgestyle = -1;
+	static int current_estyle;
+	char temp[6];
+	
+    if (!strcasecmp(el, "Polystyle")) {
+		lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].id[sizeof(lpTempMapDocument->MapGeometry.pstyles[0].id) - 1] = 0;
+		lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].color = 0;
+		lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].texture_id = 0;
+		lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].defedge_id = 0;
+		lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].flags = 0;
+		
+		while (*attr) {
+			if (!strcasecmp(*attr, "id"))
+				strncpy(lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].id, *(attr + 1),
+				sizeof(lpTempMapDocument->MapGeometry.pstyles[0].id) - 1);
+			if (!strcasecmp(*attr, "color"))
+			{
+				lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].color = strtol(*(attr + 1), NULL, 16);
+			}
+			if (!strcasecmp(*attr, "texture"))
+				lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].texture_id = get_bmp_id(lpTempMapDocument, *(attr + 1));
+			if (!strcasecmp(*attr, "defedge"))
+				lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].defedge_id = get_edge_id(lpTempMapDocument, *(attr + 1));
+			if (!strcasecmp(*attr, "flags"))
+				lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].flags = atoi(*(attr + 1)); /* names @!# */
+			attr += 2;
+		}
+		if (lpTempMapDocument->MapGeometry.pstyles[lpTempMapDocument->MapGeometry.num_pstyles].defedge_id == 0) {
+			ErrorHandler("Polygon default edgestyle cannot be omitted or set "
+				"to 'internal'!");
+			exit(1);
+		}
+		lpTempMapDocument->MapGeometry.num_pstyles++;
+    }
+	
+    if (!strcasecmp(el, "Edgestyle")) {
+		lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].id[sizeof(lpTempMapDocument->MapGeometry.estyles[0].id) - 1] = 0;
+		lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].width = 0;
+		lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].color = 0;
+		lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].style = 0;
+		while (*attr) {
+			if (!strcasecmp(*attr, "id"))
+				strncpy(lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].id, *(attr + 1),
+				sizeof(lpTempMapDocument->MapGeometry.estyles[0].id) - 1);
+			if (!strcasecmp(*attr, "width"))
+				lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].width = atoi(*(attr + 1));
+			if (!strcasecmp(*attr, "color"))
+			{
+				lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].color = strtol(*(attr + 1), NULL, 16);
+			}
+			if (!strcasecmp(*attr, "style")) /* !@# names later */
+				lpTempMapDocument->MapGeometry.estyles[lpTempMapDocument->MapGeometry.num_estyles].style = atoi(*(attr + 1));
+			attr += 2;
+		}
+		lpTempMapDocument->MapGeometry.num_estyles++;
+    }
+	
+    if (!strcasecmp(el, "Bmpstyle")) {
+		lpTempMapDocument->MapGeometry.bstyles[lpTempMapDocument->MapGeometry.num_bstyles].flags = 0;
+		lpTempMapDocument->MapGeometry.bstyles[lpTempMapDocument->MapGeometry.num_bstyles].filename[sizeof(lpTempMapDocument->MapGeometry.bstyles[0].filename) - 1] = 0;
+		lpTempMapDocument->MapGeometry.bstyles[lpTempMapDocument->MapGeometry.num_bstyles].id[sizeof(lpTempMapDocument->MapGeometry.bstyles[0].id) - 1] = 0;
+		/* add checks that these are filled !@# */
+		
+		while (*attr) {
+			if (!strcasecmp(*attr, "id"))
+				strncpy(lpTempMapDocument->MapGeometry.bstyles[lpTempMapDocument->MapGeometry.num_bstyles].id, *(attr + 1),
+				sizeof(lpTempMapDocument->MapGeometry.bstyles[0].id) - 1);
+			if (!strcasecmp(*attr, "filename"))
+				strncpy(lpTempMapDocument->MapGeometry.bstyles[lpTempMapDocument->MapGeometry.num_bstyles].filename, *(attr + 1),
+				sizeof(lpTempMapDocument->MapGeometry.bstyles[0].filename) - 1);
+			if (!strcasecmp(*attr, "scalable"))
+				if (!strcasecmp(*(attr + 1), "yes"))
+					lpTempMapDocument->MapGeometry.bstyles[lpTempMapDocument->MapGeometry.num_bstyles].flags |= 1;
+				attr += 2;
+		}
+		lpTempMapDocument->MapGeometry.num_bstyles++;
+    }
 
 	if (!strcasecmp(el, "Walls")) {
 		type = 0;
@@ -61,22 +173,30 @@ static void tagstart(void *data, const char *el, const char **attr)
 		}
 		type = 2;
     }
- 	if (!strcasecmp(el, "Decorations")) {
+ 	if (!strcasecmp(el, "Decor")) {
 		type = 3;
     }
    
 	if (!strcasecmp(el, "Polygon")) {
 		while (*attr) {
 			if (!strcasecmp(*attr, "x"))
-				startx = atoi(*(attr + 1));
+				startx = atoi(*(attr + 1)) / 64;
 			if (!strcasecmp(*attr, "y"))
-				starty = atoi(*(attr + 1));
+				starty = atoi(*(attr + 1)) / 64;
+		    if (!strcasecmp(*attr, "style"))
+				style = get_poly_id(lpTempMapDocument, *(attr + 1));
 			attr += 2;
 		}
+		if (style == -1) {
+			ErrorHandler("Currently you must give polygon style, no default");
+			exit(1);
+		}
 		AddItemToPolygonlist(lpTempMapDocument, polylist[type].pglp,
-				startx, starty, 0, 0, team, 0, 0, FALSE);
+				startx, starty, 0, 0, style, team, 0, FALSE);
+		current_estyle = lpTempMapDocument->MapGeometry.pstyles[style].defedge_id;
 		return;
     }
+
 
     if (!strcasecmp(el, "Option")) {
 	AddOption(lpTempMapDocument, (char *)*(attr + 1), (char *)*(attr + 3), TRUE, TRUE);
@@ -88,9 +208,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 			if (!strcasecmp(*attr, "team"))
 				team = atoi(*(attr + 1));
 			if (!strcasecmp(*attr, "x"))
-				x = atoi(*(attr + 1));
+				x = atoi(*(attr + 1)) / 64;
 			if (!strcasecmp(*attr, "y"))
-				y = atoi(*(attr + 1));
+				y = atoi(*(attr + 1)) / 64;
 			if (!strcasecmp(*attr, "dir"))
 				dir = atoi(*(attr + 1));
 			attr += 2;
@@ -98,11 +218,57 @@ static void tagstart(void *data, const char *el, const char **attr)
 			AddItemToItemlist(&lpTempMapDocument->MapGeometry.bases,
 			x, y,
 			team, dir, 0, IDM_MAP_BASE);
-		lpTempMapDocument->MapGeometry.num_bases++;
 		return;
     }
 
-    if (!strcasecmp(el, "Current")) {
+    if (!strcasecmp(el, "Fuel")) {
+		team = 99;
+		while (*attr) {
+			if (!strcasecmp(*attr, "team"))
+				team = atoi(*(attr + 1));
+			if (!strcasecmp(*attr, "x"))
+				x = atoi(*(attr + 1)) / 64;
+			if (!strcasecmp(*attr, "y"))
+				y = atoi(*(attr + 1)) / 64;
+			attr += 2;
+		}
+			AddItemToItemlist(&lpTempMapDocument->MapGeometry.fuels,
+			x, y,
+			team, 0, 0, IDM_MAP_FUEL);
+		return;
+    }
+
+	if (!strcasecmp(el, "Ball")) {
+		while (*attr) {
+			if (!strcasecmp(*attr, "team"))
+				team = atoi(*(attr + 1));
+			if (!strcasecmp(*attr, "x"))
+				x = atoi(*(attr + 1)) / 64;
+			if (!strcasecmp(*attr, "y"))
+				y = atoi(*(attr + 1)) / 64;
+			attr += 2;
+		}
+			AddItemToItemlist(&lpTempMapDocument->MapGeometry.balls,
+			x, y,
+			team, 0, 0, IDM_MAP_BALL);
+		return;
+    }
+
+	if (!strcasecmp(el, "Check")) {
+		lpTempMapDocument->MapGeometry.num_checkpoints++;
+		while (*attr) {
+			if (!strcasecmp(*attr, "x"))
+				x = atoi(*(attr + 1));
+			if (!strcasecmp(*attr, "y"))
+				y = atoi(*(attr + 1));
+			attr += 2;
+		}
+			AddItemToItemlist(&lpTempMapDocument->MapGeometry.checkpoints,
+			x, y,
+			0, 0, lpTempMapDocument->MapGeometry.num_checkpoints, IDM_MAP_CHECKPOINT);
+		return;
+    }
+/*    if (!strcasecmp(el, "Current")) {
 		while (*attr) {
 			if (!strcasecmp(*attr, "x"))
 				x = atoi(*(attr + 1));
@@ -117,22 +283,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 			0, dir, 0, IDM_MAP_CURRENT);
 		return;
     }
-    if (!strcasecmp(el, "Fuel")) {
-		while (*attr) {
-			if (!strcasecmp(*attr, "team"))
-				team = atoi(*(attr + 1));
-			if (!strcasecmp(*attr, "x"))
-				x = atoi(*(attr + 1));
-			if (!strcasecmp(*attr, "y"))
-				y = atoi(*(attr + 1));
-			attr += 2;
-		}
-			AddItemToItemlist(&lpTempMapDocument->MapGeometry.fuels,
-			x, y,
-			team, 0, 0, IDM_MAP_FUEL);
-		lpTempMapDocument->MapGeometry.num_fuels++;
-		return;
-    }
+
 	if (!strcasecmp(el, "Target")) {
 		while (*attr) {
 			if (!strcasecmp(*attr, "team"))
@@ -149,22 +300,6 @@ static void tagstart(void *data, const char *el, const char **attr)
 		return;
     }
 
-	if (!strcasecmp(el, "Ball")) {
-		while (*attr) {
-			if (!strcasecmp(*attr, "team"))
-				team = atoi(*(attr + 1));
-			if (!strcasecmp(*attr, "x"))
-				x = atoi(*(attr + 1));
-			if (!strcasecmp(*attr, "y"))
-				y = atoi(*(attr + 1));
-			attr += 2;
-		}
-			AddItemToItemlist(&lpTempMapDocument->MapGeometry.balls,
-			x, y,
-			team, 0, 0, IDM_MAP_BALL);
-		lpTempMapDocument->MapGeometry.num_balls++;
-		return;
-    }
 
 	if (!strcasecmp(el, "Cannon")) {
 		while (*attr) {
@@ -241,40 +376,27 @@ static void tagstart(void *data, const char *el, const char **attr)
 			x, y,
 			0, 0, variant, IDM_MAP_WORMHOLE);
 		return;
-    }
-	if (!strcasecmp(el, "Check")) {
-		lpTempMapDocument->MapGeometry.num_checkpoints++;
+    }*/
+
+
+
+	if (!strcasecmp(el, "Offset")) {
 		while (*attr) {
 			if (!strcasecmp(*attr, "x"))
-				x = atoi(*(attr + 1));
+				x = atoi(*(attr + 1)) / 64;
 			if (!strcasecmp(*attr, "y"))
-				y = atoi(*(attr + 1));
+				y = atoi(*(attr + 1)) / 64;
+			if (!strcasecmp(*attr, "style"))
+				edgestyle = get_edge_id(lpTempMapDocument, *(attr + 1));
 			attr += 2;
 		}
-			AddItemToItemlist(&lpTempMapDocument->MapGeometry.checkpoints,
-			x, y,
-			0, 0, lpTempMapDocument->MapGeometry.num_checkpoints, IDM_MAP_CHECKPOINT);
-		return;
-    }
-
-	if (strcasecmp(el, "Offset"))
-	return;
-		while (*attr) {
-			if (!strcasecmp(*attr, "x"))
-				x = atoi(*(attr + 1));
-			if (!strcasecmp(*attr, "y"))
-				y = atoi(*(attr + 1));
-			if (!strcasecmp(*attr, "hidden"))
-			{
-				if (!strcasecmp(*(attr + 1), "yes"))
-					hidden = 1;
-				else
-					hidden = 0;
-			}
-			attr += 2;
+		if (edgestyle != -1 && edgestyle != current_estyle) {
+			current_estyle = edgestyle;
 		}
 		AddItemToPolygonlist(lpTempMapDocument, polylist[type].pglp,
-		x, y, 0, 0, team, hidden, 1, FALSE);
+			x, y, 0, 0, current_estyle, team, 1, FALSE);
+		return;
+	}
     return;
 }
 
@@ -283,7 +405,6 @@ static void tagend(void *data, const char *el)
     if (strcmp(el, "Polygon"))
 	return;
 	fCreatingPolygon = FALSE;
-//	type = team = 0;
     return;
 }
 
@@ -389,11 +510,6 @@ int SaveMap(LPMAPDOCUMENT lpMapDocument, char * pstrFileName, int saveData, int 
 			  fprintf(ofile,"\n");
 	fprintf(ofile,"-->\n\n");
 	}
-	fprintf(ofile,"<Featurecount bases=\"%d\" balls=\"%d\" fuels=\"%d\" checks=\"%d\"/>\n",
-		lpMapDocument->MapGeometry.num_bases,
-		lpMapDocument->MapGeometry.num_balls,
-		lpMapDocument->MapGeometry.num_fuels,
-		lpMapDocument->MapGeometry.num_checkpoints);
 	fprintf(ofile, "<GeneralOptions>\n");
 	for ( n=0; n< NUMPREFS; n++ )
 	{
@@ -455,20 +571,37 @@ int SaveMap(LPMAPDOCUMENT lpMapDocument, char * pstrFileName, int saveData, int 
 	}
 	fprintf(ofile, "</GeneralOptions>\n");
 
+	WriteStyles(ofile, lpMapDocument);
+
 	//Walls
 	if (lpMapDocument->MapGeometry.walls != NULL)
 	{
 		pglp = lpMapDocument->MapGeometry.walls;
-		WritePolygonList(ofile, pglp, IDM_MAP_WALL);
+		WritePolygonList(ofile, lpMapDocument, pglp, IDM_MAP_WALL);
 	}
 	
 	//Decorations
 	if (lpMapDocument->MapGeometry.decors != NULL)
 	{
 		pglp = lpMapDocument->MapGeometry.decors;
-		WritePolygonList(ofile, pglp, IDM_MAP_DECOR);
+		WritePolygonList(ofile, lpMapDocument, pglp, IDM_MAP_DECOR);
 	}
 	
+
+	//BallAreas
+	if (lpMapDocument->MapGeometry.ballareas != NULL)
+	{
+		pglp = lpMapDocument->MapGeometry.ballareas;
+		WritePolygonList(ofile, lpMapDocument, pglp, IDM_MAP_BALLAREA);
+	}
+	
+	//BallTargets
+	if (lpMapDocument->MapGeometry.balltargets != NULL)
+	{
+		pglp = lpMapDocument->MapGeometry.balltargets;
+		WritePolygonList(ofile, lpMapDocument, pglp, IDM_MAP_BALLTARGET);
+	}
+
 	//Ball
 	if (lpMapDocument->MapGeometry.balls != NULL)
 	{
@@ -476,49 +609,44 @@ int SaveMap(LPMAPDOCUMENT lpMapDocument, char * pstrFileName, int saveData, int 
 		WriteItemList(ofile, itmlp, IDM_MAP_BALL);
 	}
 
-	//BallAreas
-	if (lpMapDocument->MapGeometry.ballareas != NULL)
-	{
-		pglp = lpMapDocument->MapGeometry.ballareas;
-		WritePolygonList(ofile, pglp, IDM_MAP_BALLAREA);
-	}
-	
-	//BallTargets
-	if (lpMapDocument->MapGeometry.balltargets != NULL)
-	{
-		pglp = lpMapDocument->MapGeometry.balltargets;
-		WritePolygonList(ofile, pglp, IDM_MAP_BALLTARGET);
-	}
-	
-	//Targets
-	if (lpMapDocument->MapGeometry.targets != NULL)
-	{
-		itmlp = lpMapDocument->MapGeometry.targets;
-		WriteItemList(ofile, itmlp, IDM_MAP_TARGET);
-	}
-	
 	//Fuels
 	if (lpMapDocument->MapGeometry.fuels != NULL)
 	{
 		itmlp = lpMapDocument->MapGeometry.fuels;
 		WriteItemList(ofile, itmlp, IDM_MAP_FUEL);
 	}
-				
-	//Cannons
-	if (lpMapDocument->MapGeometry.cannons != NULL)
-	{
-		itmlp = lpMapDocument->MapGeometry.cannons;
-		WriteItemList(ofile, itmlp, IDM_MAP_CANNON);
-	}
-	
+
 	//Bases
 	if (lpMapDocument->MapGeometry.bases != NULL)
 	{
 		itmlp = lpMapDocument->MapGeometry.bases;
 		WriteItemList(ofile, itmlp, IDM_MAP_BASE);
 	}
+
+	//Checkpoints
+	if (lpMapDocument->MapGeometry.checkpoints != NULL)
+	{
+		itmlp = lpMapDocument->MapGeometry.checkpoints;
+		WriteItemList(ofile, itmlp, IDM_MAP_CHECKPOINT);
+	}
+
+/*	//Targets
+	if (lpMapDocument->MapGeometry.targets != NULL)
+	{
+		itmlp = lpMapDocument->MapGeometry.targets;
+		WriteItemList(ofile, itmlp, IDM_MAP_TARGET);
+	}
 	
-	//Currents
+				
+	//Cannons
+	if (lpMapDocument->MapGeometry.cannons != NULL)
+	{
+		itmlp = lpMapDocument->MapGeometry.cannons;
+		WriteItemList(ofile, itmlp, IDM_MAP_CANNON);
+	}*/
+	
+	
+/*	//Currents
 	if (lpMapDocument->MapGeometry.currents != NULL)
 	{
 		itmlp = lpMapDocument->MapGeometry.currents;
@@ -551,14 +679,8 @@ int SaveMap(LPMAPDOCUMENT lpMapDocument, char * pstrFileName, int saveData, int 
 	{
 		itmlp = lpMapDocument->MapGeometry.wormholes;
 		WriteItemList(ofile, itmlp, IDM_MAP_WORMHOLE);
-	}
+	}*/
 
-	//Checkpoints
-	if (lpMapDocument->MapGeometry.checkpoints != NULL)
-	{
-		itmlp = lpMapDocument->MapGeometry.checkpoints;
-		WriteItemList(ofile, itmlp, IDM_MAP_CHECKPOINT);
-	}
 	//Output the footer and close the file.
 	fprintf(ofile, "</XPilotMap>\n");
 	fclose(ofile);
@@ -610,10 +732,10 @@ int AddOption(LPMAPDOCUMENT lpMapDocument, char *name, char *value, int output, 
 
 		switch(lpMapDocument->PrefsArray[option].type)
 		{
-			
+
 		case MAPDATA:
-			if (loadData)
-			return (LoadMapData(lpMapDocument, value));
+//			if (loadData)
+//			return (LoadMapData(lpMapDocument, value));
 			return 0;
 		case MAPWIDTH:
 			lpMapDocument->width = atoi(value);
@@ -699,34 +821,6 @@ char *StrToNum(char *string, int len, int type)
 	return (char *) returnval;
 }
 /***************************************************************************/
-/* LoadMapData                                                             */
-/* Arguments :                                                             */
-/*   lpMapDocument: pointer to document data                                */
-/*   value                                                                 */
-/* Purpose :                                                               */
-/***************************************************************************/
-int LoadMapData(LPMAPDOCUMENT lpMapDocument, char *value)
-{
-/*	int                   x=0, y=0; 
-	
-	while ( *value != '\0' )
-	{
-		if ( *value == '\n' )
-		{
-			x = 0;
-			y ++;
-		}
-		else
-		{
-			lpMapDocument->MapStruct.data[x++][y].cdata = *value;
-		}
-		value ++;
-	}
-	CountBases(lpMapDocument);
-	CountCheckPoints(lpMapDocument);*/
-	return 0;
-}
-/***************************************************************************/
 /* FindOption                                                              */
 /* Arguments :                                                             */
 /*   lpMapDocument: pointer to document data                                */
@@ -751,12 +845,15 @@ int FindOption(LPMAPDOCUMENT lpMapDocument, char *name)
 /***************************************************************************/
 /* WritePolygonList                                                        */
 /* Arguments :                                                             */
+/*   ofile : file to write out to.                                         */
 /*   pglp: pointer to the polygon to draw.                                 */
+/*   type : the type of polygon list this is.                              */
 /* Purpose : Write out the specified polygon.                              */
 /***************************************************************************/
-void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
+void WritePolygonList(FILE *ofile, LPMAPDOCUMENT lpMapDocument, polygonlist *pglp, int type)
 {
 	int i, count;
+	int writescale=64;
 
 	/*Special information tags that affect all polygons
 	in this list are entered here.*/
@@ -766,11 +863,14 @@ void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
 		fprintf(ofile, "<Walls>\n");
 		break;
 		case IDM_MAP_DECOR:
-		fprintf(ofile, "<Decorations>\n");
+		fprintf(ofile, "<Decor>\n");
 		break;
 	}
 	while (pglp != NULL)
 	{
+		// Dont Write out the polygon unless it has at least 3 points.
+		if (pglp->num_verts >= 3)
+		{
 		/*Special information tags that affect only this particular
 		polygon are entered here*/
 		switch (type)
@@ -786,35 +886,30 @@ void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
 		if (!IsCounterClockwise(pglp))
 			ReversePolygonOrientation(pglp);
 
-		fprintf(ofile, "<Polygon x=\"%d\" y=\"%d\"",
-			pglp->vertex[0].x, pglp->vertex[0].y);
-		//Are there any hidden edges?
-		count = CountEdgesOfType(&pglp, IDM_MAP_HIDDEN);
-		if (count > 0)
-			fprintf(ofile, " hidedges=\"%d\"", count);
-		//ToDo: Add counts and attributes for other types of edges here.
-
-		//Close the tag.
-		fprintf(ofile, ">\n");
-
-		for(i = 1; i< pglp->num_verts; i++)
-		{
-			fprintf(ofile, "<Offset x=\"%d\" y=\"%d\"", pglp->vertex[i].delta_x, pglp->vertex[i].delta_y);
-			if (pglp->vertex[i].hidden)
-				fprintf(ofile, " hidden=\"yes\"");
-
-			fprintf(ofile, "/>\n");
-		}
-		/*Close out the polygon Tag*/
-		fprintf(ofile, "</Polygon>\n");
-		switch (type)
-		{
-		case IDM_MAP_BALLAREA:
-			fprintf(ofile, "</BallArea>\n");
-			break;
-		case IDM_MAP_BALLTARGET:
-			fprintf(ofile, "</BallTarget>\n");
-			break;
+			fprintf(ofile, "<Polygon x=\"%d\" y=\"%d\" style=\"%s\"\>\n",
+				pglp->vertex[0].x*writescale, pglp->vertex[0].y*writescale,
+				lpMapDocument->MapGeometry.pstyles[pglp->polygon_style].id);
+			
+			for(i = 1; i< pglp->num_verts; i++)
+			{
+				fprintf(ofile, "<Offset x=\"%d\" y=\"%d\"",
+					pglp->vertex[i].delta_x*writescale, pglp->vertex[i].delta_y*writescale);
+				if (pglp->vertex[i].edge_style != pglp->vertex[i-1].edge_style)
+					fprintf(ofile, " style=\"%s\"",
+					lpMapDocument->MapGeometry.estyles[pglp->vertex[i].edge_style].id);
+				fprintf(ofile, "/>\n");
+			}
+			//Close out the polygon Tag
+			fprintf(ofile, "</Polygon>\n");
+			switch (type)
+			{
+			case IDM_MAP_BALLAREA:
+				fprintf(ofile, "</BallArea>\n");
+				break;
+			case IDM_MAP_BALLTARGET:
+				fprintf(ofile, "</BallTarget>\n");
+				break;
+			}
 		}
 		pglp = pglp->next;
 	}
@@ -825,43 +920,51 @@ void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
 		fprintf(ofile, "</Walls>\n");
 		break;
 		case IDM_MAP_DECOR:
-		fprintf(ofile, "</Decorations>\n");
+		fprintf(ofile, "</Decor>\n");
 		break;
 	}
 }
 /***************************************************************************/
 /* WriteItemList                                                           */
 /* Arguments :                                                             */
+/*   ofile : file to write out to.                                         */
 /*   pglp: pointer to the polygon to draw.                                 */
+/*   type : the type of item list this is.                                 */
 /* Purpose : Write out the specified polygon.                              */
 /***************************************************************************/
 void WriteItemList(FILE *ofile, itemlist *itmlp, int type)
 {
+	int writescale=64;
+
 	while (itmlp != NULL)
 	{
 		switch (type){
 		case IDM_MAP_BASE:
 			fprintf(ofile, "<Base x=\"%d\" y=\"%d\" team=\"%d\" dir=\"%d\"/>\n",
-				itmlp->pos.x, itmlp->pos.y,
+				itmlp->pos.x*writescale, itmlp->pos.y*writescale,
 				itmlp->team, itmlp->direction);
-			break;
-		case IDM_MAP_CURRENT:
-			fprintf(ofile, "<Current x=\"%d\" y=\"%d\" dir=\"%d\"/>\n", 
-				itmlp->pos.x, itmlp->pos.y,
-				itmlp->direction);
 			break;
 		case IDM_MAP_FUEL:
 			fprintf(ofile, "<Fuel x=\"%d\" y=\"%d\" team=\"%d\"/>\n",
-				itmlp->pos.x, itmlp->pos.y,
-				itmlp->team);
-			break;
-		case IDM_MAP_TARGET:
-			fprintf(ofile, "<Target x=\"%d\" y=\"%d\" team=\"%d\"/>\n",
-				itmlp->pos.x, itmlp->pos.y,
+				itmlp->pos.x*writescale, itmlp->pos.y*writescale,
 				itmlp->team);
 			break;
 		case IDM_MAP_BALL:
 			fprintf(ofile, "<Ball x=\"%d\" y=\"%d\" team=\"%d\"/>\n",
+				itmlp->pos.x*writescale, itmlp->pos.y*writescale,
+				itmlp->team);
+			break;
+		case IDM_MAP_CHECKPOINT:
+			fprintf(ofile, "<Check x=\"%d\" y=\"%d\"/>\n",
+				itmlp->pos.x*writescale, itmlp->pos.y*writescale);
+			break;
+/*		case IDM_MAP_CURRENT:
+			fprintf(ofile, "<Current x=\"%d\" y=\"%d\" dir=\"%d\"/>\n", 
+				itmlp->pos.x, itmlp->pos.y,
+				itmlp->direction);
+			break;
+		case IDM_MAP_TARGET:
+			fprintf(ofile, "<Target x=\"%d\" y=\"%d\" team=\"%d\"/>\n",
 				itmlp->pos.x, itmlp->pos.y,
 				itmlp->team);
 			break;
@@ -888,12 +991,44 @@ void WriteItemList(FILE *ofile, itemlist *itmlp, int type)
 			fprintf(ofile, "<Wormhole x=\"%d\" y=\"%d\" variant=\"%d\"/>\n",
 				itmlp->pos.x, itmlp->pos.y,
 				itmlp->variant);
-			break;
-		case IDM_MAP_CHECKPOINT:
-			fprintf(ofile, "<Check x=\"%d\" y=\"%d\"/>\n",
-				itmlp->pos.x, itmlp->pos.y);
-			break;
+			break;*/
 		}
 		itmlp = itmlp->next;
 	}
+}
+/***************************************************************************/
+/* WriteStyles                                                             */
+/* Arguments :                                                             */
+/*   ofile : file to write out to.                                         */
+/*   lpMapDocument: pointer to document data                               */
+/* Purpose : Write out the edge, polygon, and bitmap styles.               */
+/***************************************************************************/
+void WriteStyles(FILE *ofile, LPMAPDOCUMENT lpMapDocument)
+{
+	int i;
+
+	for (i = 1; i < lpMapDocument->MapGeometry.num_estyles; i++)
+		fprintf(ofile, "<Edgestyle id=\"%s\" width=\"%d\" color=\"%x\" style=\"%d\"/>\n",
+		lpMapDocument->MapGeometry.estyles[i].id,
+		lpMapDocument->MapGeometry.estyles[i].width,
+		lpMapDocument->MapGeometry.estyles[i].color,
+		lpMapDocument->MapGeometry.estyles[i].style);
+
+	for (i = 0; i < lpMapDocument->MapGeometry.num_bstyles; i++)
+	{
+		fprintf(ofile, "<Bmpstyle filename=\"%s\" scalable=\"",
+		lpMapDocument->MapGeometry.bstyles[i].filename);
+		if (lpMapDocument->MapGeometry.bstyles[i].flags)
+			fprintf(ofile, "yes");
+		else
+			fprintf(ofile, "no");
+		fprintf(ofile, "\" />\n");
+	}
+
+	for (i = 0; i < lpMapDocument->MapGeometry.num_pstyles; i++)
+		fprintf(ofile, "<Polystyle id=\"%s\" color=\"%x\" defedge=\"%s\" flags=\"%d\" />\n",
+		lpMapDocument->MapGeometry.pstyles[i].id,
+		lpMapDocument->MapGeometry.pstyles[i].color,
+		lpMapDocument->MapGeometry.estyles[lpMapDocument->MapGeometry.pstyles[i].defedge_id].id,
+		lpMapDocument->MapGeometry.pstyles[i].flags);
 }
