@@ -200,8 +200,9 @@ void Gui_paint_fuel(int x, int y, int fuel)
 	if (!text_width || lastScaleFactor != scaleFactor) {
 	    lastScaleFactor = scaleFactor;
 	    text_width = XTextWidth(gameFont, s, 1);
-	    text_is_bigger = text_width+4 > WINSCALE(BLOCK_SZ)+1 ||
-			    (gameFont->ascent + gameFont->descent) > WINSCALE(BLOCK_SZ) + 2;
+	    text_is_bigger = (text_width + 4 > WINSCALE(BLOCK_SZ) + 1)
+		|| (gameFont->ascent + gameFont->descent)
+		> WINSCALE(BLOCK_SZ) + 2;
 	}
 	SET_FG(colors[fuelColor].pixel);
 	size = (BLOCK_SZ - 2*FUEL_BORDER) * fuel / MAX_STATION_FUEL;
@@ -211,15 +212,16 @@ void Gui_paint_fuel(int x, int y, int fuel)
 	    rd.drawLine(dpy, p_draw, gameGC,
 			WINSCALE(X(x + FUEL_BORDER)),
 			WINSCALE(Y(y + FUEL_BORDER + size)),
-			WINSCALE(X(x + FUEL_BORDER + (BLOCK_SZ - 2*FUEL_BORDER))),
+			WINSCALE(X(x + FUEL_BORDER
+				   + (BLOCK_SZ - 2*FUEL_BORDER))),
 			WINSCALE(Y(y + FUEL_BORDER + size)));
-	} else {
+	} else
 	    rd.fillRectangle(dpy, p_draw, gameGC,
 			     SCALEX(x + FUEL_BORDER),
 			     SCALEY(y + FUEL_BORDER + size),
 			     WINSCALE(BLOCK_SZ - 2*FUEL_BORDER + 1),
 			     WINSCALE(size + 1));
-	}
+
 	if (!text_is_bigger)
 	    Erase_rectangle(WINSCALE(X(x)) - 1,
 			    WINSCALE(Y(y + BLOCK_SZ)) - 1,
@@ -235,8 +237,8 @@ void Gui_paint_fuel(int x, int y, int fuel)
 	XSetFunction(dpy, gameGC, GXcopy);
 
 	if (text_is_bigger)
-	    Erase_rectangle(x - 2, y - gameFont->ascent,
-			    text_width + 4, gameFont->ascent + gameFont->descent);
+	    Erase_rectangle(x - 2, y - gameFont->ascent, text_width + 4,
+			    gameFont->ascent + gameFont->descent);
     }
     else {
 #define BITMAP_FUEL_BORDER 3
@@ -363,8 +365,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 			X(x-1), Y(y));
 	    break;
 	default:
-	    errno = 0;
-	    error("Bad base dir.");
+	    warn("Bad base dir.");
 	    return;
 	}
     }
@@ -387,8 +388,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 			WINSCALE(Y(y + BLOCK_SZ)), 0);
 	    break;
 	default:
-	    errno = 0;
-	    error("Bad base dir.");
+	    warn("Bad base dir.");
 	    return;
 	}
     }
@@ -477,7 +477,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 }
 
 
-void Gui_paint_decor(int x, int y, int xi, int yi, int type, bool last, bool more_y)
+void Gui_paint_decor(int x, int y, int xi, int yi, int type,
+		     bool last, bool more_y)
 {
     XPoint		    points[5];
 
@@ -496,11 +497,14 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type, bool last, bool mor
 
     if (!decorReady) {
 	memset(decor, 0, sizeof decor);
-	decor[SETUP_DECOR_FILLED] = DECOR_UP | DECOR_LEFT | DECOR_DOWN | DECOR_RIGHT;
+	decor[SETUP_DECOR_FILLED]
+	    = DECOR_UP | DECOR_LEFT | DECOR_DOWN | DECOR_RIGHT;
 	decor[SETUP_DECOR_RU] = DECOR_UP | DECOR_RIGHT | DECOR_CLOSED;
-	decor[SETUP_DECOR_RD] = DECOR_DOWN | DECOR_RIGHT | DECOR_OPEN | DECOR_BELOW;
+	decor[SETUP_DECOR_RD]
+	    = DECOR_DOWN | DECOR_RIGHT | DECOR_OPEN | DECOR_BELOW;
 	decor[SETUP_DECOR_LU] = DECOR_UP | DECOR_LEFT | DECOR_OPEN;
-	decor[SETUP_DECOR_LD] = DECOR_LEFT | DECOR_DOWN | DECOR_CLOSED | DECOR_BELOW;
+	decor[SETUP_DECOR_LD]
+	    = DECOR_LEFT | DECOR_DOWN | DECOR_CLOSED | DECOR_BELOW;
     }
 
     if (BIT(instruments, SHOW_TEXTURED_DECOR)) {
@@ -614,14 +618,11 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type, bool last, bool mor
 		fill_bottom_right = x + BLOCK_SZ;
 	    }
 	}
-	if (mask & DECOR_RIGHT) {
+	if (mask & DECOR_RIGHT)
 	    fill_top_right = fill_bottom_right = x + BLOCK_SZ;
-	}
-	if (fill_top_left == -1) {
+	if (fill_top_left == -1)
 	    fill_top_left = fill_bottom_left = x;
-	}
-	if (fill_top_right == -1
-	    && (last || more_y)) {
+	if (fill_top_right == -1 && (last || more_y)) {
 	    fill_top_right = x + BLOCK_SZ;
 	    fill_bottom_right = x + BLOCK_SZ;
 	}
@@ -646,10 +647,8 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type, bool last, bool mor
 				WINSCALE(right_x - left_x) + 4,
 				WINSCALE(BLOCK_SZ) + 3);
 	    }
-	    fill_top_left =
-	    fill_top_right =
-	    fill_bottom_left =
-	    fill_bottom_right = -1;
+	    fill_top_left = fill_top_right =
+	    fill_bottom_left = fill_bottom_right = -1;
 	}
     }
     if (decorTileDoit && last)
@@ -686,15 +685,14 @@ void Gui_paint_setup_check(int x, int y, bool isNext)
 	    Erase_points(0, points, 5);
 	}
     } else {
-	if (isNext) {
+	if (isNext)
 	    Bitmap_paint(p_draw, BM_CHECKPOINT, WINSCALE(X(x)),
 			 WINSCALE(Y(y + BLOCK_SZ)), 1);
 
-	} else {
+	else
 	    Bitmap_paint(p_draw, BM_CHECKPOINT, WINSCALE(X(x)),
 			 WINSCALE(Y(y + BLOCK_SZ)), 0);
 
-	}
 	Erase_rectangle(WINSCALE(X(x)),
 			WINSCALE(Y(y+BLOCK_SZ)),
 			WINSCALE(BLOCK_SZ),
@@ -784,11 +782,9 @@ void Gui_paint_setup_pos_grav(int x, int y)
 		Y(y+BLOCK_SZ/2),
 		X(x+BLOCK_SZ-5),
 		Y(y+BLOCK_SZ/2));
-    } else {
+    } else
 	Bitmap_paint(p_draw, BM_PLUSGRAVITY, WINSCALE(X(x)),
 		     WINSCALE(Y(y + BLOCK_SZ)), 0);
-
-    }
 }
 
 
@@ -805,10 +801,9 @@ void Gui_paint_setup_neg_grav(int x, int y)
 		    Y(y+BLOCK_SZ/2),
 		    X(x+BLOCK_SZ-5),
 		    Y(y+BLOCK_SZ/2));
-    } else {
+    } else
 	Bitmap_paint(p_draw, BM_MINUSGRAVITY, WINSCALE(X(x)),
 		     WINSCALE(Y(y + BLOCK_SZ)), 0);
-    }
 }
 
 
@@ -925,10 +920,9 @@ void Gui_paint_setup_worm(int x, int y, int wormDrawCount)
 		X(x) + _O[0] * 2, Y(y + BLOCK_SZ) + _O[1] * 2,
 		INSIDE_BL - _O[2] * 2, INSIDE_BL - _O[2] * 2, 0, 64 * 360);
     }
-    else {
+    else
 	Bitmap_paint(p_draw, BM_WORMHOLE, WINSCALE(X(x)),
 		     WINSCALE(Y(y + BLOCK_SZ)), wormDrawCount);
-    }
 }
 
 
@@ -961,9 +955,8 @@ void Gui_paint_setup_item_concentrator(int x, int y)
 	if (concentratorloop != loops) {
 	    concentratorloop = loops;
 	    rot_dir += 5;
-	    for (i = 0; i < NELEM(tris); i++) {
+	    for (i = 0; i < NELEM(tris); i++)
 		tris[i].rot_dir += tris[i].rot_speed;
-	    }
 	}
 	for (i = 0; i < NELEM(tris); i++) {
 	    /* I'll bet you didn't know that floating point math
@@ -987,18 +980,17 @@ void Gui_paint_setup_item_concentrator(int x, int y)
 			  * tsin(MOD2(tdir + 2*RES/3, RES))));
 	    /* Trace("DC: %d cx=%d/%d %d/%d %d/%d %d/%d %d/%d\n",
 		    i, cx, cy, pts[0].x, pts[0].y,
-		    pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y); */
+		    pts[1].x, pts[1].y, pts[2].x, pts[2].y,
+		    pts[3].x, pts[3].y); */
 
 	    pts[3] = pts[0];
 	    rd.drawLines(dpy, p_draw, gameGC,
 			 pts, NELEM(pts), CoordModeOrigin);
 	    Erase_points(0, pts, NELEM(pts));
 	}
-    } else {
+    } else
 	Bitmap_paint(p_draw, BM_CONCENTRATOR, WINSCALE(X(x)),
 		     WINSCALE(Y(y + BLOCK_SZ)), (loops + (x + x * y)) % 32);
-
-    }
 }
 
 
@@ -1031,9 +1023,8 @@ void Gui_paint_setup_asteroid_concentrator(int x, int y)
 	if (concentratorloop != loops) {
 	    concentratorloop = loops;
 	    rot_dir += 5;
-	    for (i = 0; i < NELEM(sqrs); i++) {
+	    for (i = 0; i < NELEM(sqrs); i++)
 		sqrs[i].rot_dir += sqrs[i].rot_speed;
-	    }
 	}
 	for (i = 0; i < NELEM(sqrs); i++) {
 	    /* I'll bet you didn't know that floating point math
@@ -1047,25 +1038,31 @@ void Gui_paint_setup_asteroid_concentrator(int x, int y)
 	    tdir = MOD2(sqrs[i].rot_dir, RES);
 	    pts[0].x = WINSCALE(cx + (int)(sqrs[i].size * tcos(tdir)));
 	    pts[0].y = WINSCALE(cy + (int)(sqrs[i].size * tsin(tdir)));
-	    pts[1].x = WINSCALE(cx + (int)(sqrs[i].size * tcos(MOD2(tdir + RES/4, RES))));
-	    pts[1].y = WINSCALE(cy + (int)(sqrs[i].size * tsin(MOD2(tdir + RES/4, RES))));
-	    pts[2].x = WINSCALE(cx + (int)(sqrs[i].size * tcos(MOD2(tdir + 2*RES/4, RES))));
-	    pts[2].y = WINSCALE(cy + (int)(sqrs[i].size * tsin(MOD2(tdir + 2*RES/4, RES))));
-		pts[3].x = WINSCALE(cx + (int)(sqrs[i].size * tcos(MOD2(tdir + 3*RES/4, RES))));
-	    pts[3].y = WINSCALE(cy + (int)(sqrs[i].size * tsin(MOD2(tdir + 3*RES/4, RES))));
+	    pts[1].x = WINSCALE(cx + (int)(sqrs[i].size
+					   * tcos(MOD2(tdir + RES/4, RES))));
+	    pts[1].y = WINSCALE(cy + (int)(sqrs[i].size
+					   * tsin(MOD2(tdir + RES/4, RES))));
+	    pts[2].x = WINSCALE(cx + (int)(sqrs[i].size
+					   * tcos(MOD2(tdir + 2*RES/4, RES))));
+	    pts[2].y = WINSCALE(cy + (int)(sqrs[i].size
+					   * tsin(MOD2(tdir + 2*RES/4, RES))));
+	    pts[3].x = WINSCALE(cx + (int)(sqrs[i].size
+					   * tcos(MOD2(tdir + 3*RES/4, RES))));
+	    pts[3].y = WINSCALE(cy + (int)(sqrs[i].size
+					   * tsin(MOD2(tdir + 3*RES/4, RES))));
 	    /* Trace("DC: %d cx=%d/%d %d/%d %d/%d %d/%d %d/%d\n",
 		    i, cx, cy, pts[0].x, pts[0].y,
-		    pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y); */
+		    pts[1].x, pts[1].y, pts[2].x, pts[2].y,
+		    pts[3].x, pts[3].y); */
 
 	    pts[4] = pts[0];
 	    rd.drawLines(dpy, p_draw, gameGC,
 			 pts, NELEM(pts), CoordModeOrigin);
 	    Erase_points(0, pts, NELEM(pts));
 	}
-    } else {
+    } else
 	Bitmap_paint(p_draw, BM_ASTEROIDCONC, WINSCALE(X(x)),
 		     WINSCALE(Y(y + BLOCK_SZ)), (loops + (x + x * y)) % 32);
-    }
 }
 
 
