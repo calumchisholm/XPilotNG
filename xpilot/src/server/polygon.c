@@ -194,6 +194,11 @@ void P_vertex(int cx, int cy, int edgestyle)
 
 void P_end_polygon(void)
 {
+    if (ptscount < 3) {
+	warn("Polygon with less than 3 edges?? (start %d, %d)",
+	     pdata[num_polys - 1].x, pdata[num_polys - 1].y);
+	exit(-1);
+    }
     pdata[num_polys - 1].num_points = ptscount;
     pdata[num_polys - 1].num_echanges
 	= ecount -pdata[num_polys - 1].estyles_start;
@@ -212,7 +217,7 @@ void P_start_ballarea(void)
 
 void P_end_ballarea(void)
 {
-    current_group = 0; 
+    current_group = 0;
 }
 
 void P_start_balltarget(int team)
@@ -228,7 +233,7 @@ void P_start_balltarget(int team)
 
 void P_end_balltarget(void)
 {
-    current_group = 0; 
+    current_group = 0;
 }
 
 void P_start_target(int team, int ind)
@@ -243,7 +248,7 @@ void P_start_target(int team, int ind)
 
 void P_end_target(void)
 {
-    current_group = 0; 
+    current_group = 0;
 }
 
 void P_start_cannon(int cx, int cy, int dir, int team, int ind)
@@ -258,7 +263,7 @@ void P_start_cannon(int cx, int cy, int dir, int team, int ind)
 
 void P_end_cannon(void)
 {
-    current_group = 0; 
+    current_group = 0;
 }
 
 void P_start_wormhole(int ind)
@@ -273,7 +278,7 @@ void P_start_wormhole(int ind)
 
 void P_end_wormhole(void)
 {
-    current_group = 0; 
+    current_group = 0;
 }
 
 void P_start_frictionarea(void)
@@ -288,7 +293,7 @@ void P_start_frictionarea(void)
 
 void P_end_frictionarea(void)
 {
-    current_group = 0; 
+    current_group = 0;
 }
 
 void P_start_decor(void)
@@ -335,7 +340,3 @@ int P_get_poly_id(const char *s)
     warn("Undeclared polystyle %s", s);
     return -1;
 }
-
-
-
-
