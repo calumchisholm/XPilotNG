@@ -2,7 +2,11 @@
  * XPilot NG, a multiplayer space war game.
  *
  * Copyright (C) 1991-2001 by
- * Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska
+ *
+ *      Bjørn Stabell        <bjoern@xpilot.org>
+ *      Ken Ronny Schouten   <ken@xpilot.org>
+ *      Bert Gijsbers        <bert@xpilot.org>
+ *      Dick Balaska         <dick@xpilot.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
