@@ -118,15 +118,18 @@ static void Paint_background_dots(void)
 
 static void Compute_bounds(ipos *min, ipos *max, const irec *b)
 {
-    min->x = (world.x - (b->x + b->w)) / Setup->width;
-    if (world.x > b->x + b->w) min->x++;
-    max->x = (world.x + ext_view_width - b->x) / Setup->width;
-    if (world.x + ext_view_width < b->x) max->x--;
-    min->y = (world.y - (b->y + b->h)) / Setup->height;
-    if (world.y > b->y + b->h) min->y++;
-    max->y = (world.y + ext_view_height - b->y) / Setup->height;
-    if (world.y + ext_view_height < b->y) max->y--;
-
+    if (BIT(Setup->mode, WRAP_PLAY)) {
+	min->x = (world.x - (b->x + b->w)) / Setup->width;
+	if (world.x > b->x + b->w) min->x++;
+	max->x = (world.x + ext_view_width - b->x) / Setup->width;
+	if (world.x + ext_view_width < b->x) max->x--;
+	min->y = (world.y - (b->y + b->h)) / Setup->height;
+	if (world.y > b->y + b->h) min->y++;
+	max->y = (world.y + ext_view_height - b->y) / Setup->height;
+	if (world.y + ext_view_height < b->y) max->y--;
+    } else {
+	min->x = min->y = max->x = max->y = 0;
+    }
 }
 
 
