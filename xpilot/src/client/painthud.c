@@ -1015,6 +1015,9 @@ static char *crashes[] = { "crashed", "smashed", "smacked", "was trashed",
 static char *obstacles[] =
     { "wall", "target", "treasure", "cannon", NULL };
 
+static char *teamnames[] =
+    { "2", "4", "0", "1", "3", "5", "6", "7", "8", "9", NULL };
+
 
 /* increase if you want to look for messages with more player names. */
 #define MSG_MAX_NAMES 3
@@ -1087,6 +1090,17 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
 	for (i = 0; crashes[i] != NULL; i++) {
 	    if (strncmp(msg, crashes[i], strlen(crashes[i])) == 0) {
 		msg += strlen(crashes[i]);
+		return Msg_match_fmt(msg, fmt, nm);
+	    }
+	}
+	break;
+    case 't':
+	for (i = 0; teamnames[i] != NULL; i++) {
+	    printf("msg = \"%s\", trying teamname \"%s\"\n",
+		   msg, teamnames[i]);
+	    if (strncmp(msg, teamnames[i], strlen(teamnames[i])) == 0) {
+		strncpy(nm->name[nm->index++], teamnames[i], 2);
+		msg += strlen(teamnames[i]);
 		return Msg_match_fmt(msg, fmt, nm);
 	    }
 	}
@@ -1276,7 +1290,7 @@ static void Msg_parse(char *message, size_t len)
  */
 
 /* reset scan */
-static void Msg_scan_for_total_reset(char *message)
+static bool Msg_scan_for_total_reset(char *message)
 {
     static char total_reset[] = "Total reset";
 
@@ -1286,20 +1300,26 @@ static void Msg_scan_for_total_reset(char *message)
 	killratio_deaths = 0;
 	killratio_totalkills = 0;
 	killratio_totaldeaths = 0;
+	ballstats_cashes = 0;
+	ballstats_teamcashes = 0;
+	ballstats_lostballs = 0;
+	return true;
     }
+
+    return false;
 }
 
-static void Msg_scan_for_replace_treasure(char *message)
+static bool Msg_scan_for_replace_treasure(char *message)
 {
     char replace[40];
 
     if (self == NULL)
-	return;
+	return false;
 
     sprintf(replace, "(team %d) has replaced the treasure", self->team);
     if (strstr(message, replace)) {
 	ball_shout = false;
-	return;
+	return true;
     }
 
     /*
@@ -1310,10 +1330,40 @@ static void Msg_scan_for_replace_treasure(char *message)
      * it was not our team that replaced the ball, it was the other team.
      * In this case, we can clear the cover flag.
      */
-    if (num_playing_teams == 2
-	&& strstr(message, "has replaced the treasure")) {
-	need_cover = false;
+    if (strstr(message, "has replaced the treasure")) {
+	if (num_playing_teams == 2)
+	    need_cover = false;
+	return true;
     }
+
+    return false;
+}
+
+static bool Msg_scan_for_ball_destruction(char *message)
+{
+    msgnames_t mn;
+
+    if (!self)
+	return false;
+
+    memset(&mn, 0, sizeof(mn));
+    if (Msg_match_fmt(message,
+		      " < %n's (%t) team has destroyed team %t treasure >",
+		      &mn)) {
+	int destroyer_team = atoi(mn.name[0]);
+	/*int destroyed_team = atoi(mn.name[1]);*/
+	char *destroyer = mn.name[2];
+	
+	if (destroyer_team == self->team)
+	    ballstats_teamcashes++;
+	else
+	    ballstats_lostballs++;
+	if (!strcmp(destroyer, self->name)) {
+	    ballstats_cashes++;
+	}
+	return true;
+    }
+    return false;
 }
 
 /* Mara's ball message scan */
@@ -1499,8 +1549,9 @@ void Add_message(char *message)
 	Msg_do_bms(message);
 
     if (Msg_is_in_angle_brackets(message)) {
-	Msg_scan_for_total_reset(message);
-	Msg_scan_for_replace_treasure(message);
+	if (Msg_scan_for_ball_destruction(message));
+	else if (Msg_scan_for_replace_treasure(message));
+	else Msg_scan_for_total_reset(message);
     }
 
 #ifndef _WINDOWS

@@ -1307,14 +1307,16 @@ static void Print_roundend_messages(other_t **order)
     sprintf(hackbuf, "Kill ratio - Round: %d/%d, Total: %d/%d",
 	    killratio_kills, killratio_deaths,
 	    killratio_totalkills, killratio_totaldeaths);
-
     killratio_kills = 0;
     killratio_deaths = 0;
-	
     Add_message(hackbuf);
+
+    sprintf(hackbuf, "Balls cashed - Self/Team/Lost: %d/%d/%d",
+	    ballstats_cashes, ballstats_teamcashes, ballstats_lostballs);
+    Add_message(hackbuf);
+
     s = hackbuf;
     s += sprintf(s, "Points - ");
-
     /*
      * Scores are nice to see e.g. in cup recordings.
      */
