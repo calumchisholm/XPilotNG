@@ -535,31 +535,28 @@ static void Widget_draw_viewer(widget_t *widget, XExposeEvent *expose)
     widget_viewer_t	*viewerw = (widget_viewer_t *)widget->sub;
     int			start,
 			end,
-			y0,
-			y1,
+			y_0,
+			y_1,
 			text_height = viewerw->font->ascent
 				    + viewerw->font->descent;
 
-    y0 = viewerw->visible_y;
-    y1 = viewerw->real_height;
+    y_0 = viewerw->visible_y;
+    y_1 = viewerw->real_height;
     if (expose != NULL) {
-	y0 = MAX(y0, expose->y);
-	y1 = MIN(y1, expose->y + expose->height);
+	y_0 = MAX(y_0, expose->y);
+	y_1 = MIN(y_1, expose->y + expose->height);
     }
-    else {
-	y1 = MIN(y1, viewerw->visible_y + widget->height);
-    }
-    start = (y0 - 20) / text_height;
-    end = (y1 - 20) / text_height + 1;
-    if (start < 0) {
+    else
+	y_1 = MIN(y_1, viewerw->visible_y + widget->height);
+
+    start = (y_0 - 20) / text_height;
+    end = (y_1 - 20) / text_height + 1;
+    if (start < 0)
 	start = 0;
-    }
-    if (end > viewerw->num_lines) {
+    if (end > viewerw->num_lines)
 	end = viewerw->num_lines;
-    }
-    if (start < end) {
+    if (start < end)
 	Widget_viewer_draw_lines(widget, start, end);
-    }
 }
 
 static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)

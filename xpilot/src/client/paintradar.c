@@ -140,7 +140,7 @@ static void Paint_checkpoint_radar(float xf, float yf)
 
 static void Paint_self_radar(float xf, float yf)
 {
-    int		x, y, x1, y1, xw, yw;
+    int		x, y, x_1, y_1, xw, yw;
 
     if (selfVisible != 0 && loops % 16 < 13) {
 	x = (int)(FOOpos.x * xf + 0.5) - slidingradar_x;
@@ -150,22 +150,22 @@ static void Paint_self_radar(float xf, float yf)
 	if (y <= 0)
 	    y += RadarHeight;
 
-	x1 = (int)(x + 8 * tcos(heading));
-	y1 = (int)(y - 8 * tsin(heading));
+	x_1 = (int)(x + 8 * tcos(heading));
+	y_1 = (int)(y - 8 * tsin(heading));
 	XDrawLine(dpy, p_radar, radarGC,
-		  x, y, x1, y1);
+		  x, y, x_1, y_1);
 	if (BIT(Setup->mode, WRAP_PLAY)) {
-	    xw = x1 - (x1 + 256) % 256;
-	    yw = y1 - (y1 + RadarHeight) % RadarHeight;
+	    xw = x_1 - (x_1 + 256) % 256;
+	    yw = y_1 - (y_1 + RadarHeight) % RadarHeight;
 	    if (xw != 0)
 		XDrawLine(dpy, p_radar, radarGC,
-			  x - xw, y, x1 - xw, y1);
+			  x - xw, y, x_1 - xw, y_1);
 	    if (yw != 0) {
 		XDrawLine(dpy, p_radar, radarGC,
-			  x, y - yw, x1, y1 - yw);
+			  x, y - yw, x_1, y_1 - yw);
 		if (xw != 0)
 		    XDrawLine(dpy, p_radar, radarGC,
-			      x - xw, y - yw, x1 - xw, y1 - yw);
+			      x - xw, y - yw, x_1 - xw, y_1 - yw);
 	    }
 	}
     }
@@ -536,28 +536,23 @@ static void Paint_world_radar_old(void)
 	    }
 	}
     }
-    if (nsegment > 0) {
-	XDrawSegments(dpy, s_radar, radarGC,
-		      segments, nsegment);
-    }
-    if (npoint > 0) {
+    if (nsegment > 0)
+	XDrawSegments(dpy, s_radar, radarGC, segments, nsegment);
+
+    if (npoint > 0)
 	XDrawPoints(dpy, s_radar, radarGC,
 		    points, npoint, CoordModeOrigin);
-    }
 
-    if (s_radar == p_radar) {
+    if (s_radar == p_radar)
 	XSetPlaneMask(dpy, radarGC,
 		      AllPlanes & ~(dpl_2[0] | dpl_2[1]));
-    }
 
     for (i = 0;; i++) {
 	int dead_time, damage;
-	if (Target_by_index(i, &xi, &yi, &dead_time, &damage) == -1) {
+	if (Target_by_index(i, &xi, &yi, &dead_time, &damage) == -1)
 	    break;
-	}
-	if (dead_time) {
+	if (dead_time)
 	    continue;
-	}
 	Paint_radar_block(xi, yi, targetRadarColor);
     }
 }

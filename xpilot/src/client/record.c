@@ -543,17 +543,16 @@ static int RDrawLines(Display *display, Drawable drawable, GC gc,
 }
 
 static int RDrawLine(Display *display, Drawable drawable, GC gc,
-		     int x1, int y1,
-		     int x2, int y2)
+		     int x_1, int y_1, int x_2, int y_2)
 {
-    XDrawLine(display, drawable, gc, x1, y1, x2, y2);
+    XDrawLine(display, drawable, gc, x_1, y_1, x_2, y_2);
     if (drawable == p_draw) {
 	putc(RC_DRAWLINE, recordFP);
 	RWriteGC(gc, RSTROKEGC | RTILEGC);
-	RWriteShort(x1);
-	RWriteShort(y1);
-	RWriteShort(x2);
-	RWriteShort(y2);
+	RWriteShort(x_1);
+	RWriteShort(y_1);
+	RWriteShort(x_2);
+	RWriteShort(y_2);
     }
     return 0;
 }

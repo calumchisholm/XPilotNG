@@ -221,16 +221,14 @@ static int Uncompress_map(void)
 static int get_short(char **ptr)
 {
     *ptr += 2;
-    return ((signed char) *(*ptr - 2) << 8) +
-	(unsigned char) (*(*ptr - 1));
+    return ((signed char) *(*ptr - 2) << 8) + (unsigned char) (*(*ptr - 1));
 }
 
 /* Unsigned version */
 static unsigned int get_ushort(char **ptr)
 {
     *ptr += 2;
-    return ((unsigned char) *(*ptr - 2) << 8) + (unsigned char) *(*ptr -
-								  1);
+    return ((unsigned char) *(*ptr - 2) << 8) + (unsigned char) *(*ptr - 1);
 }
 
 static int get_32bit(char **ptr)
@@ -1866,13 +1864,13 @@ int Receive_modifiers(void)
 int Receive_refuel(void)
 {
     int		n;
-    short	x0, y0, x1, y1;
+    short	x_0, y_0, x_1, y_1;
     u_byte	ch;
 
     if ((n = Packet_scanf(&rbuf, "%c%hd%hd%hd%hd",
-			  &ch, &x0, &y0, &x1, &y1)) <= 0)
+			  &ch, &x_0, &y_0, &x_1, &y_1)) <= 0)
 	return n;
-    if ((n = Handle_refuel(x0, y0, x1, y1)) == -1)
+    if ((n = Handle_refuel(x_0, y_0, x_1, y_1)) == -1)
 	return -1;
     return 1;
 }
@@ -1880,14 +1878,14 @@ int Receive_refuel(void)
 int Receive_connector(void)
 {
     int		n;
-    short	x0, y0, x1, y1;
+    short	x_0, y_0, x_1, y_1;
     u_byte	ch, tractor;
 
     n = Packet_scanf(&rbuf, "%c%hd%hd%hd%hd%c",
-		     &ch, &x0, &y0, &x1, &y1, &tractor);
+		     &ch, &x_0, &y_0, &x_1, &y_1, &tractor);
     if (n <= 0)
 	return n;
-    if ((n = Handle_connector(x0, y0, x1, y1, tractor)) == -1)
+    if ((n = Handle_connector(x_0, y_0, x_1, y_1, tractor)) == -1)
 	return -1;
     return 1;
 }
@@ -2163,13 +2161,13 @@ int Receive_ecm(void)
 int Receive_trans(void)
 {
     int			n;
-    short		x1, y1, x2, y2;
+    short		x_1, y_1, x_2, y_2;
     u_byte		ch;
 
     if ((n = Packet_scanf(&rbuf, "%c%hd%hd%hd%hd",
-			  &ch, &x1, &y1, &x2, &y2)) <= 0)
+			  &ch, &x_1, &y_1, &x_2, &y_2)) <= 0)
 	return n;
-    if ((n = Handle_trans(x1, y1, x2, y2)) == -1)
+    if ((n = Handle_trans(x_1, y_1, x_2, y_2)) == -1)
 	return -1;
     return 1;
 }

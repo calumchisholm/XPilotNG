@@ -1930,7 +1930,7 @@ static void finish_inside(int block, int group)
     int inside;
     struct inside_block *gblock;
     short *ptr;
-    int x1, x2, y1, y2, s, j;
+    int cx1, cx2, cy1, cy2, s, j;
     struct tempy *yptr;
     struct templine *lptr;
     void *tofree;
@@ -1990,25 +1990,25 @@ static void finish_inside(int block, int group)
     inside = temparray[block].inside;
     if ( (ptr = gblock->lines) != NULL) {
 	while (*ptr != 32767) {
-	    x1 = *ptr++ * 2 - B_CLICKS * 2 + 1;
-	    y1 = *ptr++ * 2 + 1;
-	    x2 = *ptr++ * 2 - B_CLICKS * 2 + 1;
-	    y2 = *ptr++ * 2 + 1;
-	    if (y1 < 0) {
-		if (y2 >= 0) {
-		    if (x1 > 0 && x2 >= 0)
+	    cx1 = *ptr++ * 2 - B_CLICKS * 2 + 1;
+	    cy1 = *ptr++ * 2 + 1;
+	    cx2 = *ptr++ * 2 - B_CLICKS * 2 + 1;
+	    cy2 = *ptr++ * 2 + 1;
+	    if (cy1 < 0) {
+		if (cy2 >= 0) {
+		    if (cx1 > 0 && cx2 >= 0)
 			inside++;
-		    else if ((x1 >= 0 || x2 >= 0) &&
-			     (s = y1 * (x1 - x2) - x1 * (y1 - y2)) > 0)
+		    else if ((cx1 >= 0 || cx2 >= 0) &&
+			     (s = cy1 * (cx1 - cx2) - cx1 * (cy1 - cy2)) > 0)
 			inside++;
 		}
 	    }
 	    else
-		if (y2 <= 0) {
-		    if (x1 > 0 && x2 >= 0)
+		if (cy2 <= 0) {
+		    if (cx1 > 0 && cx2 >= 0)
 			inside++;
-		    else if ((x1 >= 0 || x2 >= 0) &&
-			     (s = y1 * (x1 - x2) - x1 * (y1 - y2)) < 0)
+		    else if ((cx1 >= 0 || cx2 >= 0) &&
+			     (s = cy1 * (cx1 - cx2) - cx1 * (cy1 - cy2)) < 0)
 			inside++;
 		}
 	}

@@ -955,31 +955,31 @@ static bool Check_robot_target(player *pl, clpos item_pos, int new_mode)
 
 	    if (ship && Player_is_active(ship)) {
 
-		DFLOAT	x1, y1, x3, y3, x4, y4, x5, y5;
+		DFLOAT	x2, y2, x3, y3, x4, y4, x5, y5;
 		DFLOAT	ship_dist, dir3, dir4, dir5;
 		clpos m_gun;
 
 		m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
-		x1 = CLICK_TO_PIXEL(pl->pos.cx) + pl->vel.x
+		x2 = CLICK_TO_PIXEL(pl->pos.cx) + pl->vel.x
 		    + CLICK_TO_PIXEL(m_gun.cx);
-		y1 = CLICK_TO_PIXEL(pl->pos.cy) + pl->vel.y
+		y2 = CLICK_TO_PIXEL(pl->pos.cy) + pl->vel.y
 		    + CLICK_TO_PIXEL(m_gun.cy);
 		x3 = CLICK_TO_PIXEL(ship->pos.cx) + ship->vel.x;
 		y3 = CLICK_TO_PIXEL(ship->pos.cy) + ship->vel.y;
 
-		ship_dist = Wrap_length(PIXEL_TO_CLICK(x3 - x1),
-					PIXEL_TO_CLICK(y3 - y1)) / CLICK;
+		ship_dist = Wrap_length(PIXEL_TO_CLICK(x3 - x2),
+					PIXEL_TO_CLICK(y3 - y2)) / CLICK;
 
 		/* kps -
 		   changed PULSE_LIFE(pl->item[ITEM_LASER]) to pulseLife */
 		if (ship_dist < pulseSpeed * pulseLife + SHIP_SZ) {
-		    dir3 = Wrap_findDir(x3 - x1, y3 - y1);
+		    dir3 = Wrap_findDir(x3 - x2, y3 - y2);
 		    x4 = x3 + tcos(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
 		    y4 = y3 + tsin(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;
 		    x5 = x3 + tcos(MOD2((int)(dir3 + RES/4), RES)) * SHIP_SZ;
 		    y5 = y3 + tsin(MOD2((int)(dir3 + RES/4), RES)) * SHIP_SZ;
-		    dir4 = Wrap_findDir(x4 - x1, y4 - y1);
-		    dir5 = Wrap_findDir(x5 - x1, y5 - y1);
+		    dir4 = Wrap_findDir(x4 - x2, y4 - y2);
+		    dir5 = Wrap_findDir(x5 - x2, y5 - y2);
 		    if ((dir4 > dir5)
 			? (pl->dir >= dir4 || pl->dir <= dir5)
 			: (pl->dir >= dir4 && pl->dir <= dir5))
