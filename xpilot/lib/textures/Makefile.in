@@ -116,7 +116,6 @@ xpilottextures_DATA = \
 	allitems.ppm \
 	asteroidconcentrator.ppm \
 	ball.ppm \
-	ball.xpm \
 	base_down.ppm \
 	base_left.ppm \
 	base_right.ppm \
@@ -137,26 +136,26 @@ xpilottextures_DATA = \
 	holder1.ppm \
 	holder2.ppm \
 	logo.ppm \
-	metalite.xpm \
+	metalite.ppm \
 	meter.ppm \
 	mine_other.ppm \
 	mine_team.ppm \
 	minus.ppm \
-	moon.xpm \
+	moon.ppm \
 	paused.ppm \
 	plus.ppm \
 	radar.ppm \
 	radar2.ppm \
 	radar3.ppm \
 	refuel.ppm \
-	rock4.xpm \
+	rock4.ppm \
 	ship.ppm \
 	ship_blue.ppm \
 	ship_red.ppm \
 	ship_red2.ppm \
 	ship_red3.ppm \
 	sparks.ppm \
-	volcanic.xpm \
+	volcanic.ppm \
 	wall_bottom.ppm \
 	wall_dl.ppm \
 	wall_dr.ppm \
