@@ -354,25 +354,37 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private void showOptions () {
         EditorDialog.show
-            (this, new MapOptionEditor(canvas.getModel().options), false);
+            (this, 
+             new MapOptionEditor(canvas.getModel().options), 
+             false, 
+             EditorDialog.CLOSE);
     }
 
 
     private void showImages () {
         EditorDialog.show
-            (this, new ImageListEditor(canvas.getModel().pixmaps), false);
+            (this, 
+             new ImageListEditor(canvas.getModel().pixmaps), 
+             false,
+             EditorDialog.CLOSE);
     }
 
 
     private void showPolygonStyles () {
         EditorDialog.show
-            (this, new PolygonStyleManager(canvas), false);
+            (this, 
+             new PolygonStyleManager(canvas), 
+             false,
+             EditorDialog.CLOSE);
     }
 
 
     private void showEdgeStyles () {
         EditorDialog.show
-            (this, new EdgeStyleManager(canvas), false);
+            (this, 
+             new EdgeStyleManager(canvas), 
+             false,
+             EditorDialog.CLOSE);
     }
 
 

@@ -18,17 +18,14 @@ public class ImageListEditor extends EditorPanel
     private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDel;
-    private List myPixmaps;
-    private List modelsPixmaps;
+    private List pixmaps;
     
 
     public ImageListEditor (List pixmaps) {
 
         setTitle("Image Manager");
 
-        modelsPixmaps = pixmaps;
-        myPixmaps = new ArrayList();
-        myPixmaps.addAll(pixmaps);
+        this.pixmaps = pixmaps;
 
         jlistModel = new DefaultListModel();
         for (int i = 0; i < pixmaps.size(); i++) 
@@ -37,7 +34,7 @@ public class ImageListEditor extends EditorPanel
         jlist.addListSelectionListener(this);
         jlist.setFixedCellWidth(100);
         JScrollPane sp = new JScrollPane(jlist);
-
+        
         setLayout(new GridLayout(1,2));
         JPanel p1 = new JPanel(new BorderLayout(5, 5));
         JPanel p2 = new JPanel();
@@ -73,7 +70,7 @@ public class ImageListEditor extends EditorPanel
     public void valueChanged (ListSelectionEvent evt) {
         int index = jlist.getSelectedIndex();
         if (index == -1) return;
-        showImage(((Pixmap)myPixmaps.get(index)).getImage());
+        showImage(((Pixmap)pixmaps.get(index)).getImage());
     }
 
 
@@ -85,7 +82,7 @@ public class ImageListEditor extends EditorPanel
             Pixmap pixmap = new Pixmap();
             EditorDialog.show(this, new PixmapEditor(pixmap), true);
             if (pixmap.getFileName() != null) {
-                myPixmaps.add(pixmap);
+                pixmaps.add(pixmap);
                 jlistModel.addElement(pixmap.getFileName());
             }
             return;
@@ -100,7 +97,7 @@ public class ImageListEditor extends EditorPanel
                      "Information", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            Pixmap pixmap = (Pixmap)myPixmaps.get(index);
+            Pixmap pixmap = (Pixmap)pixmaps.get(index);
             EditorDialog.show(this, new PixmapEditor(pixmap), true);
             jlistModel.set(index, pixmap.getFileName());
             return;
@@ -115,16 +112,9 @@ public class ImageListEditor extends EditorPanel
                      "Information", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            myPixmaps.remove(index);
+            pixmaps.remove(index);
             jlistModel.remove(index);
             return;
         }
-    }
-
-
-    public boolean apply () {
-        modelsPixmaps.clear();
-        modelsPixmaps.addAll(myPixmaps);
-        return true;
     }
 }

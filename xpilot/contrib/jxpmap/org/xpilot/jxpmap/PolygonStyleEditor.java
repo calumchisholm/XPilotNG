@@ -52,13 +52,15 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
         cmbTexture = new JComboBox();
         cmbTexture.addItem("None");
         int i = 0;
-        int j = 0;
+        int j = 1;
         for (Iterator iter = model.pixmaps.iterator(); iter.hasNext(); j++) {
             Pixmap p = (Pixmap)iter.next();
             cmbTexture.addItem(p.getFileName());
+            System.out.println(p + " ?= " + style.getTexture());
             if (style.getTexture() == p) i = j;
         }
         add(cmbTexture);
+        System.out.println("setting selected index to " + i);
         cmbTexture.setSelectedIndex(i);
         
         add(new JLabel("Edges:"));
@@ -109,8 +111,7 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
         }
         else style.setTexture((Pixmap)model.pixmaps.get(i - 1));
         i = cmbEdgeStyle.getSelectedIndex();
-        if (i > 0) 
-            style.setDefaultEdgeStyle((LineStyle)model.edgeStyles.get(i - 1));
+        style.setDefaultEdgeStyle((LineStyle)model.edgeStyles.get(i));
         style.setVisible(cbVisible.isSelected());
         style.setVisibleInRadar(cbVisibleInRadar.isSelected());
         

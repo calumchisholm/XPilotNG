@@ -19,9 +19,7 @@ public class PolygonStyleManager extends EditorPanel
     private JButton btnAdd;
     private JButton btnEdit;
     private JButton btnDel;
-    private List myStyles;
-    private List origStyles;
-    private MapModel model;
+    private List styles;
     private MapCanvas canvas;
     
     
@@ -30,19 +28,16 @@ public class PolygonStyleManager extends EditorPanel
         setTitle("Polygon Style Manager");
 
         this.canvas = canvas;
-        this.model = canvas.getModel();
-        this.origStyles = model.polyStyles;
-        myStyles = new ArrayList();
-        myStyles.addAll(origStyles);
+        this.styles = canvas.getModel().polyStyles;
         
         jlistModel = new DefaultListModel();
-        for (int i = 0; i < origStyles.size(); i++) 
-            jlistModel.addElement(((PolygonStyle)myStyles.get(i)).getId());
+        for (int i = 0; i < styles.size(); i++) 
+            jlistModel.addElement(((PolygonStyle)styles.get(i)).getId());
         jlist = new JList(jlistModel);
         jlist.addListSelectionListener(this);
         jlist.setFixedCellWidth(100);
         JScrollPane sp = new JScrollPane(jlist);
-
+        
         setLayout(new GridLayout(1,2));
         JPanel p1 = new JPanel(new BorderLayout(5, 5));
         JPanel p2 = new JPanel();
@@ -80,21 +75,22 @@ public class PolygonStyleManager extends EditorPanel
     public void valueChanged (ListSelectionEvent evt) {
         int index = jlist.getSelectedIndex();
         if (index == -1) return;
-        showPreview((PolygonStyle)myStyles.get(index));
+        showPreview((PolygonStyle)styles.get(index));
     }
     
     
     public void actionPerformed (ActionEvent evt) {
         Object src = evt.getSource();
-
+        
         if (src == btnAdd) {
 
+            MapModel model = canvas.getModel();
             PolygonStyle style = new PolygonStyle();
             style.setDefaultEdgeStyle(model.getDefaultEdgeStyle());
             EditorDialog.show
                 (this, new PolygonStyleEditor(style, model), true);
             if (style.getId() != null) {
-                myStyles.add(style);
+                styles.add(style);
                 jlistModel.addElement(style.getId());
             }
             return;
@@ -102,6 +98,7 @@ public class PolygonStyleManager extends EditorPanel
             
         } else if (src == btnEdit) {
 
+            MapModel model = canvas.getModel();
             int index = jlist.getSelectedIndex();
             if (index == -1) {
                 JOptionPane.showMessageDialog
@@ -109,10 +106,12 @@ public class PolygonStyleManager extends EditorPanel
                      "Information", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            PolygonStyle style = (PolygonStyle)myStyles.get(index);
+            PolygonStyle style = (PolygonStyle)styles.get(index);
             EditorDialog.show
                 (this, new PolygonStyleEditor(style, model), true);
             jlistModel.set(index, style.getId());
+            canvas.repaint();
+            preview.repaint();
             return;
 
 
@@ -125,18 +124,9 @@ public class PolygonStyleManager extends EditorPanel
                      "Information", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            myStyles.remove(index);
+            styles.remove(index);
             jlistModel.remove(index);
             return;
         }
-    }
-
-
-    public boolean apply () {
-        origStyles.clear();
-        origStyles.addAll(myStyles);
-        canvas.repaint();
-        preview.repaint();
-        return true;
     }
 }
