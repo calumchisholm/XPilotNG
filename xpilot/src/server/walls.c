@@ -220,11 +220,11 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	    drainfactor = (drainfactor * drainfactor * ABS(obj->mass))
 			  / (ShotsSpeed * ShotsSpeed * ShotsMass);
 	} else
-	    drainfactor = 1.0f;
-	targ->damage += (int)(ED_SHOT_HIT * drainfactor * SHOT_MULT(obj));
+	    drainfactor = 1.0;
+	targ->damage += ED_SHOT_HIT * drainfactor * SHOT_MULT(obj);
 	break;
     case OBJ_PULSE:
-	targ->damage += (int)(ED_LASER_HIT);
+	targ->damage += ED_LASER_HIT;
 	break;
     case OBJ_SMART_SHOT:
     case OBJ_TORPEDO:
@@ -233,9 +233,9 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	    /* happens at end of round reset. */
 	    return;
 	if (BIT(obj->mods.nuclear, NUCLEAR))
-	    targ->damage = 0;
+	    targ->damage = 0.0;
 	else
-	    targ->damage += (int)(ED_SMART_SHOT_HIT / (obj->mods.mini + 1));
+	    targ->damage += ED_SMART_SHOT_HIT / (obj->mods.mini + 1);
 	break;
     case OBJ_MINE:
 	if (!obj->mass)
@@ -256,7 +256,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 
     targ->conn_mask = 0;
     targ->last_change = frame_loops;
-    if (targ->damage > 0)
+    if (targ->damage > 0.0)
 	return;
 
     Target_remove_from_map(targ);
@@ -343,7 +343,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	Rank_AddTargetKill(kp);
 
     sc  = Rate(win_score, lose_score);
-    por = (sc*lose_team_members)/win_team_members;
+    por = (sc * lose_team_members) /win_team_members;
 
     for (j = 0; j < NumPlayers; j++) {
 	player *pl = Players(j);
@@ -697,7 +697,6 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 	return 0;
     }
 
-    /* kps - wormhole polygons disabled */
     if (type == WORMHOLE) {
 	Object_crash(obj, move, CrashWormHole, mapobj_ind);
 	return 0;
