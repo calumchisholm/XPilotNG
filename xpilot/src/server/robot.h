@@ -151,13 +151,10 @@ typedef struct robot_default_data {
     double	robot_normal_speed;
     double	robot_attack_speed;
     double	robot_max_speed;
-    int		last_used_ecm;          /* relative to robot_count */
     int		last_dropped_mine;      /* relative to robot_count */
     int		last_fired_missile;     /* relative to robot_count */
     int		last_thrown_ball;	/* relative to robot_count */
     int		longterm_mode;		/* long term robot mode */
-    int		lock_last_seen;		/* last time robot saw target */
-    position_t	lock_last_pos;		/* last known position of target */
     double	fuel_l1;		/* Fuel critical level */
     double	fuel_l2;		/* Fuel warning level */
     double	fuel_l3;		/* Fuel notify level */

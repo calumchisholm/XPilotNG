@@ -273,7 +273,6 @@ static void Robot_default_create(player_t *pl, char *str)
     my_data->fuel_l2 = 200.0 + 0.4 * (my_data->defense - my_data->attack);
     my_data->fuel_l1 = 100.0 + 0.2 * (my_data->defense - my_data->attack);
 
-    my_data->last_used_ecm	= 0;
     my_data->last_dropped_mine	= 0;
     my_data->last_fired_missile	= 0;
     my_data->last_thrown_ball	= 0;
@@ -1112,8 +1111,10 @@ static bool Check_robot_hunt(player_t *pl)
     if (!BIT(my_data->robot_lock, LOCK_PLAYER)
 	|| my_data->robot_lock_id == pl->id)
 	return false;
+
     if (pl->fuel.sum < my_data->fuel_l3 /*MAX_PLAYER_FUEL/2*/)
 	return false;
+
     ship = Player_by_id(my_data->robot_lock_id);
     if (!Detect_ship(pl, ship))
 	return false;
@@ -1364,6 +1365,7 @@ static bool Ball_handler(player_t *pl)
 	}
 	for (i = 0; i < NumPlayers; i++) {
 	    player_t *pl_i = Player_by_index(i);
+
 	    dist = LENGTH(ball->pos.cx - pl_i->pos.cx,
 			  ball->pos.cy - pl_i->pos.cy) / CLICK;
 	    if (pl_i->id != pl->id
@@ -1382,6 +1384,7 @@ static bool Ball_handler(player_t *pl)
 	     clear_path && dist < (closest_tr_dist - BLOCK_SZ);
 	     dist += BLOCK_SZ / 2) {
 	    double fraction = (double)dist / closest_tr_dist;
+
 	    dx = (int)((fraction * xdist) + bbpos.bx);
 	    dy = (int)((fraction * ydist) + bbpos.by);
 
@@ -1907,22 +1910,12 @@ static void Robot_default_play(player_t *pl)
 	j = GetInd(ship->id);
 
 	if (Detect_ship(pl, ship)) {
-
-	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
-		&& my_data->robot_lock_id == ship->id) {
-		my_data->lock_last_seen = my_data->robot_count;
-		my_data->lock_last_pos.x = CLICK_TO_PIXEL(ship->pos.cx);
-		my_data->lock_last_pos.y = CLICK_TO_PIXEL(ship->pos.cy);
-	    }
-
 	    distance = Wrap_length(ship->pos.cx - pl->pos.cx,
 				   ship->pos.cy - pl->pos.cy) / CLICK;
-
 	    if (distance < ship_dist) {
 		ship_i = GetInd(my_data->robot_lock_id);
 		ship_dist = distance;
 	    }
-
 	    if (distance < enemy_dist) {
 		enemy_i = j;
 		enemy_dist = distance;
@@ -1973,9 +1966,8 @@ static void Robot_default_play(player_t *pl)
 
     if (ship_i != -1
 	&& BIT(my_data->robot_lock, LOCK_PLAYER)
-	&& my_data->robot_lock_id == Player_by_index(ship_i)->id) {
+	&& my_data->robot_lock_id == Player_by_index(ship_i)->id)
 	ship_i = -1; /* don't avoid target */
-    }
 
     if (enemy_i >= 0) {
 	ship = Player_by_index(enemy_i);
@@ -2032,6 +2024,7 @@ static void Robot_default_play(player_t *pl)
     }
     if (BIT(world->rules->mode, TIMING) && !navigate_checked) {
 	int delta_dir;
+
 	if (item_i >= 0) {
 	    delta_dir =
 		(int)(pl->dir
