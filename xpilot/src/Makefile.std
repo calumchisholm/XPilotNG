@@ -30,7 +30,7 @@ VERSION=4.5.4X
 #
 # Change these for your site
 #
-LOCALGURU=xpilot@xpilot.org
+LOCALGURU=ksoderbl@cc.hut.fi
 INSTALLDIR=/usr/local
 #INSTALLDIR=/u/1/ksoderbl/solaris
 BINDIR=$(INSTALLDIR)/bin

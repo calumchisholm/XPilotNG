@@ -292,7 +292,9 @@ void Expose_about_window(void)
 	"read the XPilot FAQ (Frequently Asked Questions), "
 	"and the on-line manual pages for xpilot(6) and xpilots(6).\n"
 	"\n"
-	"You can report any bug you find to <xpilot@xpilot.org>.\n"
+	"This an EXPERIMENTAL version of XPilot.\n"
+	"Look for more info at http://xpilot.sourceforge.net/\n"
+	"You can report any bug you find to <ksoderbl@cc.hut.fi>.\n"
 	"\n\n"
 	"Good luck as a future xpilot,\n"
 	"Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers & Dick Balaska",

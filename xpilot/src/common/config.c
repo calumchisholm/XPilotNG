@@ -41,7 +41,7 @@
  * is in the Makefile.std and in the Imakefile.
  */
 #ifndef LOCALGURU
-#    define LOCALGURU		"xpilot@xpilot.org"
+#    define LOCALGURU		"ksoderbl@cc.hut.fi"
 #endif
 
 #ifndef	DEFAULT_MAP

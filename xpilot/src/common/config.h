@@ -26,7 +26,7 @@
 #define CONFIG_H
 
 #ifndef LOCALGURU
-#define LOCALGURU "xpilot@xpilot.org"
+#define LOCALGURU "ksoderbl@cc.hut.fi"
 #endif
 
 #ifdef MOD2
