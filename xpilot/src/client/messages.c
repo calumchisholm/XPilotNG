@@ -472,7 +472,6 @@ static msg_bms_t Msg_do_bms(char *message)
     static char pop_text1[] = "POP";
     static char pop_text2[] = "Pop";
     static char pop_text3[] = "pop";
-    bool ball = false, safe = false, cover = false, pop = false;
     char *bracket = NULL;
     int len, i, n = 0;
 
