@@ -55,7 +55,6 @@
 #include "configure.h"
 #include "dbuff.h"
 #include "default.h"
-#include "paint.h"
 #include "paintdata.h"
 #include "paintmacros.h"
 #include "record.h"
@@ -64,6 +63,7 @@
 #include "xevent.h"
 #include "xeventhandlers.h"
 #include "xinit.h"
+#include "xpaint.h"
 
 #endif /* XPCLIENT_X11_H */
 

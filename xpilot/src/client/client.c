@@ -26,18 +26,11 @@
 
 /* kps - hack */
 extern void Raise_window(void);
-extern void Radar_show_target(int x, int y);
-extern void Radar_hide_target(int x, int y);
-extern void Play_beep(void);
 extern int Key_init(void);
 extern int Bitmap_add(char *filename, int count, bool scalable);
-extern int Paint_init(void);
-extern void Paint_cleanup(void);
-extern void Paint_frame(void);
 extern int Init_playing_windows(void);
 extern void Quit(void);
 extern int Startup_server_motd(void);
-extern int Check_view_dimensions(void);
 extern void Reset_shields(void);
 
 char client_version[] = VERSION;
@@ -1544,7 +1537,7 @@ int Handle_team_score(int team, double score)
     return 0;
 }
 
-int Handle_timing(int id, int check, int round, long loops)
+int Handle_timing(int id, int check, int round, long tloops)
 {
     other_t		*other;
 
@@ -1558,7 +1551,7 @@ int Handle_timing(int id, int check, int round, long loops)
 	other->check = check;
 	other->round = round;
 	other->timing = round * num_checks + check;
-	other->timing_loops = loops;
+	other->timing_loops = tloops;
 	scoresChanged = true;
     }
 

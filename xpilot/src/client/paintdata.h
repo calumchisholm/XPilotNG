@@ -35,14 +35,6 @@
 #define MAX_COLOR_LEN 32 /* Max. length of a color name */
 #endif
 
-extern unsigned long	current_foreground;
-
-static inline void SET_FG(unsigned long fg)
-{
-    if (fg != current_foreground)
-	XSetForeground(dpy, gameGC, current_foreground = fg);
-}
-
 extern XRectangle	*rect_ptr[MAX_COLORS];
 extern int		num_rect[MAX_COLORS], max_rect[MAX_COLORS];
 extern XArc		*arc_ptr[MAX_COLORS];

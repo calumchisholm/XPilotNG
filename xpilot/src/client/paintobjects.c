@@ -26,18 +26,7 @@
 char paintobjects_version[] = VERSION;
 
 /* TODO: move these to some generic header */
-extern short	ext_view_width;		/* Width of extended visible area */
-extern short	ext_view_height;	/* Height of extended visible area */
-extern int	active_view_width;	/* Width of active map area displayed. */
-extern int	active_view_height;	/* Height of active map area displayed. */
-extern int	ext_view_x_offset;	/* Offset of ext_view_width */
-extern int	ext_view_y_offset;	/* Offset of ext_view_height */
-extern ipos	world;
-extern ipos	realWorld;
 extern int      num_spark_colors;
-
-#define X(co)   ((int) ((co) - world.x))
-#define Y(co)   ((int) (world.y + ext_view_height - (co)))
 
 #define COLOR(i)	(i / areas)
 #define BASE_X(i)	(((i % x_areas) << 8) + ext_view_x_offset)

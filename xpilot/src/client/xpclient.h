@@ -62,6 +62,7 @@
 #include "guimap.h"      /* guimap.c depends on X11 */
 #include "guiobjects.h"
 #include "netclient.h"
+#include "paint.h"
 #include "protoclient.h" /* misc. hacks */
 #include "recordfmt.h"
 #include "talk.h"        /* talk.c depends on X11 */

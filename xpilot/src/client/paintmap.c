@@ -29,14 +29,6 @@ char paintmap_version[] = VERSION;
 static double 	hrLimitTime = 0.0;
 
 
-/* TODO: move these to some generic header */
-extern short	ext_view_width;		/* Width of extended visible area */
-extern short	ext_view_height;	/* Height of extended visible area */
-extern ipos	world;
-extern double	hudRadarLimit;		/* Limit for hudradar drawing */
-extern double	timePerFrame;
-
-
 void Paint_vcannon(void)
 {
     int	i;

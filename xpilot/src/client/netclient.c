@@ -25,7 +25,6 @@
 
 /* kps - fix */
 extern int Key_update(void);
-extern void Game_over_action(u_byte status);
 
 char netclient_version[] = VERSION;
 
@@ -378,6 +377,7 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 		retries;
     time_t	last;
 
+    (void)my_team;
     for (retries = 0;;) {
 	if (retries == 0 || time(NULL) - last >= 3) {
 	    if (retries++ >= MAX_VERIFY_RETRIES) {
