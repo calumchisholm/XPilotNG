@@ -1,9 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "SDL.h"
+#include "xpclient.h"
 #include "sdlkeys.h"
-
-void iterative_clean(keylist *list, int maxdepth);
 
 typedef struct {
 	char*	name;
@@ -164,30 +163,9 @@ char *Get_name_by_key(SDLKey key)
     return NULL;
 }
 
-void iterative_clean(keylist *list, int maxdepth)
+xp_keysym_t String_to_xp_keysym(const char *name)
 {
-    keylist *temp;
-    while (list) {
-    	temp = (keylist *)list->next;
-	free(list);
-	list = temp;
-	if (!(--maxdepth)) {
-	    printf("iterative_clean seems endless =( probably a messed up keylist\n");
-	    return;
-	}
-    }
-}
-
-void freeKeyMap(void)
-{
-    int i;
-    for( i = 0; i < SDLK_LAST ; ++i) {
-    	/* TODO: this max depth number should be fixed */
-    	iterative_clean( keyMap[i] , SDLK_LAST);
-    }
-    for( i = 0; i < NUM_MOUSE_BUTTONS ; ++i) {
-    	/* TODO: this max depth number should be fixed */
-    	iterative_clean( buttonMap[i] , SDLK_LAST);
-    }
-    /* for no reason whatsoever do: free(KeyMap); */
+    SDLKey sdlk = Get_key_by_name(name);
+    if (sdlk == SDLK_UNKNOWN) return XP_KS_UNKNOWN;
+    return (xp_keysym_t)sdlk;
 }

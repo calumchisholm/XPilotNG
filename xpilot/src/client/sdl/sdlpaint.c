@@ -268,6 +268,17 @@ void CloseConfMenu(void)
     Close_Widget(testWidget[1]);
 }
 
+bool Set_scaleFactor(xp_option_t *opt, double val)
+{
+    scaleFactor = val;
+    scale = 1 / val;
+}
+
+bool Set_altScaleFactor(xp_option_t *opt, double val)
+{
+    scaleFactor_s = val;
+}
+
 int Paint_init(void)
 {
     extern bool players_exposed; /* paint.c */
@@ -306,10 +317,6 @@ int Paint_init(void)
     if (Scorelist_init() == -1)
 	return -1;
 
-    //    scale = 1.171875;
-    scale = 0.8;
-    scaleFactor = 1.0 / scale;
-    scaleFactor_s = 1.0;
     scoresChanged = true;
     players_exposed = true;
     

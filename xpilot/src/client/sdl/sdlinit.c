@@ -69,7 +69,10 @@ int Init_playing_windows(void)
     draw_depth =  videoInfo->vfmt->BitsPerPixel;
     
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	    
+
+    /* TODO: implement parsing of geometry option and remove these */
+    draw_width = 1024;
+    draw_height = 768;
     if ((MainSDLSurface = SDL_SetVideoMode(draw_width, 
 			 draw_height, 
 			 draw_depth, 
@@ -142,6 +145,55 @@ void Quit(void)
     Radar_cleanup();
     fontclean(&gamefont);
     fontclean(&messagefont);
-    freeKeyMap();
     SDL_Quit();
+}
+
+static bool Set_geometry(xp_option_t *opt, const char *val)
+{
+    int len, w, h;
+    char s[20];
+    char *p1, *p2;
+
+    if (val == NULL) return false;
+    len = strlen(val);
+    if (len == 0 || len > 19) return false;
+    strcpy(s, val);
+    
+    if (s[0] == '=') p1 = s + 1;
+    p2 = strchr(p1, 'x');
+    if (p2 == NULL) p2 = strchr(p1, 'X');
+    if (p2 == NULL) return false;
+    *p2 = '\0';
+    w = atoi(p1);
+    if (w == 0) return false;
+    p1 = p2 = p2 + 1;
+    while(isdigit(*p2)) p2++;
+    *p2 = '\0';
+    h = atoi(p1);
+    if (h == 0) return false;
+    Resize_Window(w, h);
+    return true;
+}
+
+static const char* Get_geometry(xp_option_t *opt)
+{
+    static char buf[20]; /* should be enough */
+    sprintf(buf, "%dx%d", draw_width, draw_height);
+    return buf;
+}
+
+static xp_option_t sdlinit_options[] = {
+    XP_STRING_OPTION(
+	"geometry",
+	"1024x768",
+	NULL,
+	0,
+	Set_geometry,
+	Get_geometry,
+	"Set the initial window geometry.\n")
+};
+
+void Store_sdlinit_options(void)
+{
+    STORE_OPTIONS(sdlinit_options);
 }

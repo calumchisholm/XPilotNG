@@ -143,11 +143,8 @@ bool Key_press_toggle_fullscreen(void)
 
 int Process_event(SDL_Event *evt)
 {
-    int key_change = 0;
+    int button;
     movement = 0;
-    keylist *temp;
-    int button,i=0;
-/*#define test*/
     
     if (Console_process(evt)) return 1;
     
@@ -158,25 +155,17 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_KEYDOWN:
 	if (Console_isVisible()) break;
-    	temp = keyMap[evt->key.keysym.sym];
-    	while (temp) {
-    	    key_change |= Key_press(temp->key);
-	    temp = (keylist *)temp->next;
-    	}
+	Keyboard_button_pressed((xp_keysym_t)evt->key.keysym.sym);
 	break;
 	
     case SDL_KEYUP:
 	if (Console_isVisible()) break;
-    	temp = keyMap[evt->key.keysym.sym];
-    	while (temp) {
-    	    key_change |= Key_release(temp->key);
-	    temp = (keylist *)temp->next;
-    	}
+	Keyboard_button_released((xp_keysym_t)evt->key.keysym.sym);
 	break;
 	
     case SDL_MOUSEBUTTONDOWN:
+	button = evt->button.button;
 	if (!pointerControl) {
-	    button = evt->button.button;
 	    if ( (target[button-1] = find_guiarea(evt->button.x,evt->button.y)) ) {
 	    	if (target[button-1]->button) {
 		    target[button-1]->button(button,evt->button.state,
@@ -189,11 +178,7 @@ int Process_event(SDL_Event *evt)
 	    }
 	    
 	} else {
-    	    temp = buttonMap[evt->button.button - 1];
-    	    while (temp) {
-    	    	key_change |= Key_press(temp->key);
-	    	temp = (keylist *)temp->next;
-    	    }
+	    Pointer_button_pressed(button);
 	}
 	break;
 	
@@ -203,14 +188,14 @@ int Process_event(SDL_Event *evt)
 	else {
 	    /*xpprintf("mouse motion xrel=%i yrel=%i\n",evt->motion.xrel,evt->motion.yrel);*/
 	    /*for (i = 0;i<NUM_MOUSE_BUTTONS;++i)*/ /* dragdrop for all mouse buttons*/
-	    if (target[i]) { /*is button one pressed?*/
+	    if (target[0]) { /*is button one pressed?*/
 	    	/*xpprintf("SDL_MOUSEBUTTONDOWN drag: area found!\n");*/
-	    	if (target[i]->motion) {
-		    target[i]->motion(evt->motion.xrel,evt->motion.yrel,
+	    	if (target[0]->motion) {
+		    target[0]->motion(evt->motion.xrel,evt->motion.yrel,
 		    	    	    	evt->button.x,evt->button.y,
-					target[i]->motiondata);
+					target[0]->motiondata);
 #ifdef test
-    	    	    xpprintf("target[i]->motiondata:%i->%i\n",(int)target[i],(int)target[i]->motiondata);
+    	    	    xpprintf("target[0]->motiondata:%i->%i\n",(int)target[0],(int)target[0]->motiondata);
 #endif
 		}
 	    } else {
@@ -231,14 +216,10 @@ int Process_event(SDL_Event *evt)
 	break;
 	
     case SDL_MOUSEBUTTONUP:
+	button = evt->button.button;
 	if (pointerControl) {
-    	    temp = buttonMap[evt->button.button - 1];
-    	    while (temp) {
-    	    	key_change |= Key_release(temp->key);
-    	    	temp = (keylist *)temp->next;
-    	    }
+	    Pointer_button_released(button);
 	} else {
-	    button = evt->button.button;
 	    if ( target[button-1] ) {
 	    	if (target[button-1]->button) {
 		    target[button-1]->button(button,evt->button.state,
@@ -261,9 +242,10 @@ int Process_event(SDL_Event *evt)
       break;
     }
     
-    if (key_change) Net_key_change();
-    if (movement) Send_pointer_move(movement);
-    if (key_change || movement) Net_flush();
+    if (movement) {
+	Send_pointer_move(movement);
+	Net_flush();
+    }
     return 1;
 }
 

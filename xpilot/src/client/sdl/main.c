@@ -3,12 +3,12 @@
 
 extern void Game_loop(void);
 extern void Options_cleanup(void);
+extern void Store_sdlinit_options(void);
 
 static void Main_shutdown(void)
 {
     Net_cleanup();
     Client_cleanup();
-    Options_cleanup();
 }
 
 static void sigcatch(int signum)
@@ -33,14 +33,10 @@ int main(int argc, char *argv[])
     connectParam.contact_port = SERVER_PORT;
     connectParam.team = TEAM_NOT_SET;
 
-    *hostname = 0;
-    cp = getenv("XPILOTHOST");
-    if (cp) strlcpy(hostname, cp, sizeof(hostname));
-    else sock_get_local_hostname(hostname, sizeof hostname, 0);
-
-    cp = getenv("XPILOTUSER");
-    if (cp) strlcpy(connectParam.user_name, cp, sizeof(connectParam.user_name));
-    else Get_login_name(connectParam.user_name, sizeof(connectParam.user_name) - 1);
+    Store_default_options();
+    Store_talk_macro_options();
+    Store_key_options();
+    Store_sdlinit_options();
 
     memset(&xpArgs, 0, sizeof(xp_args_t));
     Parse_options(&argc, argv);
