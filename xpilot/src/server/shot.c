@@ -612,7 +612,7 @@ void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 	switch (type) {
 	case OBJ_HEAT_SHOT:
 #ifndef HEAT_LOCK
-	    lock = -1;
+	    lock = NO_ID;
 #else  /* HEAT_LOCK */
 	    if (pl == NULL) {
 		lock = target_id;
@@ -620,10 +620,9 @@ void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
 		    && BIT(World.rules->mode, LIMITED_VISIBILITY))) {
-		    lock = -1;
-		} else {
+		    lock = NO_ID;
+		} else
 		    lock = pl->lock.pl_id;
-		}
 	    }
 #endif /* HEAT_LOCK */
 	    if (pl) {
@@ -651,7 +650,7 @@ void Fire_general_shot(player *pl, unsigned short team, bool cannon,
 	    break;
 
 	case OBJ_TORPEDO:
-	    lock = -1;
+	    lock = NO_ID;
 	    fuse = 8;
 	    break;
 	}
