@@ -495,7 +495,6 @@ int World_place_friction_area(world_t *world, clpos_t pos, double fric);
 void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2);
 void Wormhole_line_init(void);
 
-void Find_base_direction(world_t *world);
 void Compute_gravity(void);
 double Wrap_findDir(double dx, double dy);
 double Wrap_cfindDir(int dx, int dy);

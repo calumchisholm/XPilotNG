@@ -41,6 +41,7 @@ world_t World;
 bool is_polygon_map = false;
 
 /*static void Generate_random_map(void);*/
+static void Find_base_direction(world_t *world);
 static void Find_base_order(world_t *world);
 static void Reset_map_object_counters(world_t *world);
 
@@ -553,6 +554,9 @@ bool Grok_map(world_t *world)
     if (!is_polygon_map)
 	Xpmap_blocks_to_polygons(world);
 
+    Compute_gravity();
+    Find_base_direction(world);
+
     return true;
 }
 
@@ -606,7 +610,7 @@ int Find_closest_team(world_t *world, clpos_t pos)
 }
 
 
-void Find_base_direction(world_t *world)
+static void Find_base_direction(world_t *world)
 {
     /* kps - this might go wrong if we run in -options.polygonMode ? */
     if (!is_polygon_map)

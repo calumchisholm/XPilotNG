@@ -64,8 +64,8 @@ static void Handle_signal(int sig_no);
 
 int main(int argc, char **argv)
 {
-    int			timer_tick_rate;
-    char		*addr;
+    int timer_tick_rate;
+    char *addr;
     world_t *world = &World;
 
     memset(world, 0, sizeof(world_t));
@@ -86,24 +86,23 @@ int main(int argc, char **argv)
 	      "for details see the\n"
 	   "  provided COPYING file.\n\n");
 
-    /*Conf_print();*/
-
     init_error(argv[0]);
     Check_server_versions();
 
-    /*seedMT((unsigned)time((time_t *)0) * Get_process_id());*/
+    /*seedMT((unsigned)time(NULL) * Get_process_id());*/
     /* Removed seeding random number generator because of server recordings. */
 
     Groups_init();
+
+    /* Make trigonometric tables */
+    Make_table();
+
     if (Parser(argc, argv) == false)
 	exit(1);
-    warn("num_groups is %d", num_groups);
 
     Init_recording();
-    plock_server(options.pLockServer);           /* Lock the server into memory */
-    Make_table();			/* Make trigonometric tables */
-    Compute_gravity();
-    Find_base_direction(world);
+    /* Lock the server into memory */
+    plock_server(options.pLockServer);
 
     Walls_init();
 
@@ -114,12 +113,8 @@ int main(int argc, char **argv)
     Alloc_cells();
 
     Move_init();
-
     Robot_init();
-
-    /* kps - remove ??? */
     Treasure_init();
-
     Hitmasks_init();
 
     Rank_init_saved_scores();
@@ -146,13 +141,11 @@ int main(int argc, char **argv)
 
     Get_login_name(Server.owner, sizeof Server.owner);
 
-    /*
-     * options.Log, if enabled.
-     */
+    /* Log, if enabled. */
     Log_game("START");
 
     if (!Contact_init())
-	return(false);
+	return 1;
 
     Meta_init();
 
@@ -161,6 +154,7 @@ int main(int argc, char **argv)
 
     if (Setup_net_server() == -1)
 	End_game();
+
 #ifndef _WINDOWS
     if (options.NoQuit)
 	signal(SIGHUP, SIG_IGN);
@@ -173,6 +167,7 @@ int main(int argc, char **argv)
     signal(SIGFPE, SIG_IGN);
 #endif
 #endif	/* _WINDOWS */
+
     /*
      * Set the time the server started
      */
@@ -182,7 +177,6 @@ int main(int argc, char **argv)
 	xpprintf("%s Server runs at %d frames per second\n",
 		 showtime(), options.framesPerSecond);
 
-    /* kps - move this somewhere else ? */
     teamcup_open_score_file();
     teamcup_round_start();
 
