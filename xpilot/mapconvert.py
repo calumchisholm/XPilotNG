@@ -2,6 +2,7 @@
 from __future__ import division, generators
 
 KEEP_MAPDATA = 1
+WALL_SHRINK_HACK = 0
 
 # Requires python 2.2 or newer
 
@@ -737,6 +738,26 @@ def convert(options):
                  for point in p if point[2] != (0, 0)]
 	x = (p[0][0] % map.width) * BCLICKS
 	y = (-p[0][1] % map.height) * BCLICKS
+
+	if WALL_SHRINK_HACK:
+	    s = WALL_SHRINK_HACK
+	    ch = [(-edge[1] // BCLICKS, edge[0] // BCLICKS) for edge in edges]
+	    ch2 = []
+	    for ((x1, y1), (x2, y2)) in zip(ch[-1:] + ch[:-1], ch):
+		if x1 * x2 >= 0 and y1 * y2 >= 0:
+		    ch2.append((x1 or x2, y1 or y2))
+		elif x1 and x2 and y1 and y2:
+		    ch2.append((x1 + x2, y1 + y2))
+		else:
+		    ch2.append(((x1 + x2) * 2 + x1 * (not y1) + x2 * (not y2
+			), (y1 + y2) * 2 + y1 * (not x1) + y2 * (not x2)))
+	    ch2 = [(x1 * s, y1 * s) for (x1, y1) in ch2]
+	    x = (x + ch2[0][0]) % (map.width * BCLICKS)
+	    y = (y + ch2[0][1]) % (map.height * BCLICKS)
+	    ch2 = [(x2 - x1, y2 - y1) for ((x1,y1), (x2,y2)) in zip(ch2,
+		ch2[1:] + ch2[:1])]
+	    edges = [(edge[0] + ch[0], edge[1] + ch[1], edge[2]) for edge, ch
+			in zip(edges, ch2)]
 	print '<Polygon x="%d" y="%d" style="xpblue">' % (x, y)
         prevh = 0
         curh = edges[0][2]
