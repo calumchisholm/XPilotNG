@@ -241,16 +241,15 @@ void Paint_frame(void)
      * We don't want things to happen too fast at high fps.
      */
     time_counter += timePerFrame;
-    if (time_counter >= 1.0 / 15) {
+    if (time_counter >= 1.0 / 20) {
 	loopsSlow++;
 	time_counter = 0.0;
     }
 
     /*
      * Estimate suitable number of frames to do the base warning.
-     * kps - maybe add baseWarningTime option ;).
      */
-    baseWarningFrames = 3 * FPS;
+    baseWarningFrames = 3 * clientFPS;
 
     /*
      * Switch between two different window titles.
