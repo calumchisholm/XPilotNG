@@ -69,6 +69,13 @@ struct xp_option {
     const char *name;
     const char *help;
 
+    /* noarg option stuff */
+
+#define XP_NOARG_OPTION_DUMMY \
+	NULL
+
+    bool *noarg_ptr;
+
     /* bool option stuff */
 
 #define XP_BOOL_OPTION_DUMMY \
@@ -131,25 +138,25 @@ struct xp_option {
  * Macros for initalizing options.
  */
 
-#if 0
-#define XP_NOARG_OPTION(name, help) \
+#define XP_NOARG_OPTION(name, valptr, help) \
 { \
     xp_noarg_option,\
 	name,\
 	help,\
+	valptr,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
 	XP_DOUBLE_OPTION_DUMMY,\
 	XP_STRING_OPTION_DUMMY,\
 	XP_KEY_OPTION_DUMMY,\
 }
-#endif
 
 #define XP_BOOL_OPTION(name, defval, valptr, setfunc, help) \
 { \
     xp_bool_option,\
 	name,\
 	help,\
+	XP_NOARG_OPTION_DUMMY,\
 	defval,\
 	valptr,\
 	setfunc,\
@@ -164,6 +171,7 @@ struct xp_option {
     xp_int_option,\
 	name,\
 	help,\
+	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	defval,\
 	minval,\
@@ -180,6 +188,7 @@ struct xp_option {
     xp_double_option,\
 	name,\
 	help,\
+	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
 	defval,\
@@ -196,6 +205,7 @@ struct xp_option {
     xp_string_option,\
 	name,\
 	help,\
+	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
 	XP_DOUBLE_OPTION_DUMMY,\
@@ -212,6 +222,7 @@ struct xp_option {
     xp_key_option,\
 	name,\
 	help,\
+	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
 	XP_DOUBLE_OPTION_DUMMY,\

@@ -60,6 +60,8 @@ static inline xp_option_t *Find_option(const char *name)
 static void Print_default_value(xp_option_t *opt)
 {
     switch (opt->type) {
+    case xp_noarg_option:
+	break;
     case xp_bool_option:
 	printf("        The default value is: %s.\n",
 	       opt->bool_defval == true ? "True" : "False");
@@ -134,6 +136,19 @@ void Usage(void)
 	  );
 
     exit(1);
+}
+
+
+static void Set_noarg_option(xp_option_t *opt, bool value)
+{
+    assert(opt);
+    assert(opt->type == xp_noarg_option);
+    assert(opt->noarg_ptr);
+
+    *opt->noarg_ptr = value;	
+
+    printf("Value of option %s is now %s.\n", opt->name,
+	   *opt->noarg_ptr ? "true" : "false");
 }
 
 
@@ -275,6 +290,9 @@ void Set_option(const char *name, const char *value)
     }
 
     switch (opt->type) {
+    case xp_noarg_option:
+	Set_noarg_option(opt, ON(value) ? true : false);
+	break;
     case xp_bool_option:
 	Set_bool_option(opt, ON(value) ? true : false);
 	break;
@@ -325,6 +343,9 @@ void Store_option(xp_option_t *opt)
 
     /* Set the default value */
     switch (opt->type) {
+    case xp_noarg_option:
+	Set_noarg_option(opt, false);
+	break;
     case xp_bool_option:
 	Set_bool_option(opt, opt->bool_defval);
 	break;

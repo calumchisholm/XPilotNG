@@ -36,6 +36,12 @@ keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 #ifdef OPTIONHACK
 
+bool noarg_help;
+bool noarg_version;
+bool noarg_join;
+bool noarg_text;
+bool noarg_list;
+
 char mynickname[MAX_NAME_LEN];
 char myusername[MAX_NAME_LEN];
 char myhostname[MAX_HOST_LEN];
@@ -120,58 +126,31 @@ static char *getShipShape(xp_option_t *opt)
 
 xp_option_t default_options[] = {
 
-#if 0
     XP_NOARG_OPTION(
 	"help",
+	&noarg_help,
 	"Display this help message.\n"),
 
     XP_NOARG_OPTION(
 	"version",
+	&noarg_version,
 	"Show the source code version.\n"),
 
-    {
-	"help",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Display this help message.\n",
-	0
-    },
-    {
-	"version",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Show the source code version.\n",
-	0
-    },
-
-    {
+    XP_NOARG_OPTION(
 	"join",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Join the game immediately, no questions asked.\n",
-	0
-    },
-    {
+	&noarg_join,
+	"Join the game immediately, no questions asked.\n"),
+
+    XP_NOARG_OPTION(
 	"text",
-	"Yes",
-	"No",
-	KEY_DUMMY,
+	&noarg_text,
 	"Use the simple text interface to contact a server\n"
-	"instead of the graphical user interface.\n",
-	0
-    },
-    {
+	"instead of the graphical user interface.\n"),
+
+    XP_NOARG_OPTION(
 	"list",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"List all servers running on the local network.\n",
-	0
-    },
-#endif
+	&noarg_list,
+	"List all servers running on the local network.\n"),
 
     XP_STRING_OPTION(
 	"shipShape",
