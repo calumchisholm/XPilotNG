@@ -52,6 +52,8 @@
 typedef struct {
     bool	talking;	/* Some talk window is open? */
     bool	pointerControl;	/* Pointer (mouse) control is on? */
+    bool	restorePointerControl;
+				/* Pointer control should be restored later? */
     bool	quitMode;	/* Client is in quit mode? */
     double	clientLag;
     double	scaleFactor;
@@ -559,7 +561,6 @@ extern bool	scoresChanged;
 extern bool	toggle_shield;		/* Are shields toggled by a press? */
 extern bool	shields;		/* When shields are considered up */
 extern bool	auto_shield;            /* drops shield for fire */
-extern bool	initialPointerControl;	/* Start by using mouse for control? */
 
 extern int	maxFPS;			/* Max FPS player wants from server */
 extern int 	oldMaxFPS;
@@ -672,8 +673,8 @@ void Pointer_control_newbie_message(void);
 /*
  * Platform specific code needs to implement these.
  */
-void Pointer_control_set_state(bool on);
-void Talk_set_state(bool on);
+void Platform_specific_pointer_control_set_state(bool on);
+void Platform_specific_talk_set_state(bool on);
 void Record_toggle(void);
 void Toggle_fullscreen(void);
 void Toggle_radar_and_scorelist(void);
@@ -681,6 +682,9 @@ void Toggle_radar_and_scorelist(void);
 /*
  * event.c
  */
+void Pointer_control_set_state(bool on);
+void Talk_set_state(bool on);
+
 void Pointer_button_pressed(int button);
 void Pointer_button_released(int button);
 void Keyboard_button_pressed(xp_keysym_t ks);

@@ -92,13 +92,11 @@ void Console_show(void)
 {
     CON_Show(console);
     Console_refresh();
-    clData.talking = true;
 }
 
 void Console_hide(void)
 {
     CON_Hide(console);
-    clData.talking = false;
 }
 
 int Console_isVisible(void)
@@ -139,5 +137,5 @@ void Console_print(const char *str, ...)
 void command_handler(ConsoleInformation *con, char *command)
 {
     Net_talk(command);
-    Console_hide();
+    Talk_set_state(false);
 }

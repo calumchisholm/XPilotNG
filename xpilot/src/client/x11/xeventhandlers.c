@@ -184,10 +184,12 @@ void FocusIn_event(XEvent *event)
     if (!gotFocus)
 	time(&back_in_play_since);
 #endif
-    if (initialPointerControl && !clData.talking) {
-	initialPointerControl = false;
+#if 0 /* kps - this is probably not useful any more */
+    if (clData.restorePointerControl && !clData.talking) {
 	Pointer_control_set_state(true);
+	clData.restorePointerControl = false;
     }
+#endif
     gotFocus = true;
     XAutoRepeatOff(dpy);
 }
@@ -195,10 +197,12 @@ void FocusIn_event(XEvent *event)
 void UnmapNotify_event(XEvent *event)
 {
     UNUSED_PARAM(event);
+#if 0 /* kps - this is probably not useful any more */
     if (clData.pointerControl) {
-	initialPointerControl = true;
+	clData.restorePointerControl = true;
 	Pointer_control_set_state(false);
     }
+#endif
     gotFocus = false;
     XAutoRepeatOn(dpy);
     Key_clear_counts();

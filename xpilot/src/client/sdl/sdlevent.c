@@ -39,19 +39,9 @@ GLWidget *hovertarget = NULL;
 
 int Process_event(SDL_Event *evt);
 
-
-void Talk_set_state(bool on)
+void Platform_specific_pointer_control_set_state(bool on)
 {
-    if (clData.talking == on)
-	return;
-
-    Console_show();
-}
-
-void Pointer_control_set_state(bool on)
-{
-    if (clData.pointerControl == on)
-	return;
+    assert(clData.pointerControl != on);
 
     if (on) {
     	MainWidget_ShowMenu(MainWidget, false);
@@ -71,9 +61,15 @@ void Pointer_control_set_state(bool on)
 	    Disable_emulate3buttons(on, info.info.x11.display);
     }
 #endif
+}
 
-    clData.pointerControl = on;
-    Pointer_control_newbie_message();
+void Platform_specific_talk_set_state(bool on)
+{
+    assert(clData.talking != on);
+    if (on)
+	Console_show();
+    else
+	Console_hide();
 }
 
 void Record_toggle(void)

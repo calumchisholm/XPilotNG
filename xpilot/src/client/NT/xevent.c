@@ -25,8 +25,6 @@
 
 #include "xpclient_x11.h"
 
-bool		initialPointerControl = false;
-
 int	talk_key_repeating;
 XEvent	talk_key_repeat_event;
 struct timeval talk_key_repeat_time;
@@ -65,10 +63,9 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     return ret;
 }
 
-void Pointer_control_set_state(bool on)
+void Platform_specific_pointer_control_set_state(bool on)
 {
-    if (clData.pointerControl == on)
-	return;
+    assert(clData.pointerControl != on);
 
     if (on) {
 	XGrabPointer(dpy, drawWindow, true, 0, GrabModeAsync,
@@ -86,31 +83,18 @@ void Pointer_control_set_state(bool on)
 	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 	XFlush(dpy);
     }
-
-    clData.pointerControl = on;
-    Pointer_control_newbie_message();
 }
 
-void Talk_set_state(bool on)
+void Platform_specific_talk_set_state(bool on)
 {
     char *wintalkstr;
 
-    if (clData.talking == on)
-	return;
+    assert(clData.talking != on);
 
-    if (clData.pointerControl) {
-	initialPointerControl = true;
-	Pointer_control_set_state(false);
-    }
-
+    /* kps - this seems not to care so much about the value of 'on' ? */
     wintalkstr = (char *)mfcDoTalkWindow();
     if (*wintalkstr)
 	Net_talk(wintalkstr);
-
-    if (initialPointerControl) {
-	initialPointerControl = false;
-	Pointer_control_set_state(true);
-    }
 
     scoresChanged = true;
 }

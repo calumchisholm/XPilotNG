@@ -26,8 +26,6 @@
 #include "xpclient_x11.h"
 #include "../xhacks.h"
 
-bool		initialPointerControl = false;
-
 int	talk_key_repeating;
 XEvent	talk_key_repeat_event;
 struct timeval talk_key_repeat_time;
@@ -65,10 +63,9 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     return ret;
 }
 
-void Pointer_control_set_state(bool on)
+void Platform_specific_pointer_control_set_state(bool on)
 {
-    if (clData.pointerControl == on)
-	return;
+    assert(clData.pointerControl != on);
 
     if (on) {
 	if (mouseAccelInClient)
@@ -93,33 +90,19 @@ void Pointer_control_set_state(bool on)
 	XFlush(dpy);
     }
     Disable_emulate3buttons(on, dpy);
-    clData.pointerControl = on;
-    Pointer_control_newbie_message();
 }
 
-void Talk_set_state(bool on)
+void Platform_specific_talk_set_state(bool on)
 {
-    if (clData.talking == on)
-	return;
+    assert(clData.talking != on);
 
     if (on) {
-	/* Enable talking, disable pointer control if it is enabled. */
-	if (clData.pointerControl) {
-	    initialPointerControl = true;
-	    Pointer_control_set_state(false);
-	}
 	XSelectInput(dpy, drawWindow,
 		     PointerMotionMask | ButtonPressMask | ButtonReleaseMask);
 	Talk_map_window(true);
     }
-    else {
-	/* Disable talking, enable pointer control if it was enabled. */
+    else
 	Talk_map_window(false);
-	if (initialPointerControl) {
-	    initialPointerControl = false;
-	    Pointer_control_set_state(true);
-	}
-    }
 }
 
 void Toggle_radar_and_scorelist(void)

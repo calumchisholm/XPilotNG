@@ -69,6 +69,38 @@ void Pointer_control_newbie_message(void)
     Add_newbie_message(msg);
 }
 
+void Pointer_control_set_state(bool on)
+{
+    if (clData.pointerControl == on)
+	return;
+    Platform_specific_pointer_control_set_state(on);
+    clData.pointerControl = on;
+    if (!clData.restorePointerControl)
+	Pointer_control_newbie_message();
+}
+
+void Talk_set_state(bool on)
+{
+    if (clData.talking == on)
+	return;
+    if (on) {
+	/* When enabling talking, disable pointer control if it is enabled. */
+	if (clData.pointerControl) {
+	    clData.restorePointerControl = true;
+	    Pointer_control_set_state(false);
+	}
+    }
+    Platform_specific_talk_set_state(on);
+    if (!on) {
+	/* When disabling talking, enable pointer control if it was enabled. */
+	if (clData.restorePointerControl) {
+	    Pointer_control_set_state(true);
+	    clData.restorePointerControl = false;
+	}
+    }
+    clData.talking = on;
+}
+
 static inline int pointer_button_index_by_option(xp_option_t *opt)
 {
     return atoi(Option_get_name(opt) + strlen("pointerButton")) - 1;
