@@ -1578,6 +1578,9 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	    sprintf(msg, "Your client doesn't support polygon maps. "
 		    "What you see might not match the real map. %s", sender);
 	    Set_player_message(pl, msg);
+	    sprintf(msg, "See http://xpilot.sf.net/ for information "
+		    "about polygon map format. %s", sender);
+	    Set_player_message(pl, msg);
 	}
     }
 
