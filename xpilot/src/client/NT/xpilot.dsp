@@ -578,7 +578,7 @@ SOURCE=..\..\common\config.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\common\config.h
+SOURCE=..\..\common\xpconfig.h
 # End Source File
 # Begin Source File
 

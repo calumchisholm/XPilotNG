@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -27,7 +26,7 @@
 #include <ctype.h>
 
 #include "version.h"
-#include "config.h"
+#include "xpconfig.h"
 
 #ifdef _WINDOWS
 /* #include "NT/winClient.h" */

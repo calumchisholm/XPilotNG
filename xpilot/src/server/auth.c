@@ -38,7 +38,7 @@
 #include "auth.h"
 #include "pack.h"
 #include "commonproto.h"
-#include "config.h"
+#include "xpconfig.h"
 #include "proto.h"
 #include "global.h"
 

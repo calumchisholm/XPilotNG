@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -42,7 +41,7 @@
 
 #define SERVER
 #include "version.h"
-#include "config.h"
+#include "xpconfig.h"
 #include "serverconst.h"
 #include "global.h"
 #include "proto.h"

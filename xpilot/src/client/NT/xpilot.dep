@@ -1,7 +1,7 @@
 # Microsoft Developer Studio Generated Dependency File, included by xpilot.mak
 
 ..\about.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -38,7 +38,7 @@
 ..\client.c : \
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -57,7 +57,7 @@
 	
 
 ..\colors.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -73,7 +73,7 @@
 ..\configure.c : \
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -95,7 +95,7 @@
 	
 
 ..\datagram.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -115,7 +115,7 @@
 	"..\..\common\bit.h"\
 	"..\..\common\checknames.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -137,7 +137,7 @@
 
 ..\gfx2d.c : \
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\portability.h"\
 	"..\gfx2d.h"\
@@ -150,7 +150,7 @@
 
 ..\guimap.c : \
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -177,7 +177,7 @@
 	"..\..\common\astershape.h"\
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -205,7 +205,7 @@
 	
 
 ..\join.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -221,7 +221,7 @@
 ..\netclient.c : \
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -248,7 +248,7 @@
 ..\paint.c : \
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -275,7 +275,7 @@
 ..\paintdata.c : \
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -295,7 +295,7 @@
 ..\painthud.c : \
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -319,7 +319,7 @@
 
 ..\paintmap.c : \
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -342,7 +342,7 @@
 ..\paintobjects.c : \
 	"..\..\common\astershape.h"\
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -371,7 +371,7 @@
 
 ..\paintradar.c : \
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -388,7 +388,7 @@
 	
 
 ..\query.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\NT\winNet.h"\
 	"..\..\common\socklib.h"\
 	"..\protoclient.h"\
@@ -398,7 +398,7 @@
 
 ..\record.c : \
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -417,7 +417,7 @@
 ..\talkmacros.c : \
 	"..\..\common\bit.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -441,7 +441,7 @@
 	"..\..\common\bit.h"\
 	"..\..\common\checknames.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\net.h"\
 	"..\..\common\NT\winNet.h"\
@@ -458,7 +458,7 @@
 ..\texture.c : \
 	"..\..\..\lib\textures\ball.xpm"\
 	"..\..\..\lib\textures\rock4.xpm"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -479,7 +479,7 @@
 
 ..\widget.c : \
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -498,7 +498,7 @@
 
 ..\xevent.c : \
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -525,7 +525,7 @@
 
 ..\xeventhandlers.c : \
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -550,7 +550,7 @@
 	
 
 ..\xinit.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -596,7 +596,7 @@
 	"..\..\common\bit.h"\
 	"..\..\common\checknames.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\net.h"\
 	"..\..\common\NT\winNet.h"\
@@ -668,7 +668,7 @@
 
 .\winConfig.c : \
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\item.h"\
@@ -732,18 +732,18 @@
 ..\..\common\checknames.c : \
 	"..\..\common\checknames.h"\
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\pack.h"\
 	
 
 ..\..\common\config.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	
 
 ..\..\common\error.c : \
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\NT\winX.h"\
 	"..\..\common\portability.h"\
@@ -753,13 +753,13 @@
 
 ..\..\common\math.c : \
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	
 
 ..\..\common\net.c : \
 	"..\..\common\bit.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\net.h"\
 	"..\..\common\NT\winNet.h"\
@@ -769,13 +769,13 @@
 
 ..\..\common\portability.c : \
 	"..\..\common\commonproto.h"\
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\portability.h"\
 	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
 	
 
 ..\..\common\shipshape.c : \
-	"..\..\common\config.h"\
+	"..\..\common\xpconfig.h"\
 	"..\..\common\const.h"\
 	"..\..\common\draw.h"\
 	"..\..\common\NT\winX.h"\

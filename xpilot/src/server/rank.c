@@ -12,7 +12,7 @@
 
 #define SERVER
 #include "version.h"
-#include "config.h"
+#include "xpconfig.h"
 #include "types.h"
 #include "const.h"
 #include "global.h"
