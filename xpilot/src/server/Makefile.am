@@ -11,7 +11,7 @@ xpilots_SOURCES = \
 	fileparser.c frame.c \
 	id.c item.c \
 	laser.c \
-	map.c map.h metaserver.c metaserver.h \
+	map.c map.h metaserver.c \
 	netserver.c netserver.h \
 	object.c object.h objpos.c objpos.h option.c \
 	parser.c play.c player.c polygon.c \

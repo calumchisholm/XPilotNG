@@ -48,7 +48,6 @@
 #include "connection.h"
 #include "defaults.h"
 #include "map.h"
-#include "metaserver.h"
 #include "netserver.h"
 #include "objpos.h"
 #include "packet.h"
