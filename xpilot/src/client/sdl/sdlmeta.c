@@ -382,101 +382,102 @@ static bool join_server(Connect_param_t *conpar, server_info_t *sip)
 
 int Meta_window(Connect_param_t *conpar)
 {
-  static char err[MSG_LEN] = {0};
-  int num_serv = 0;
-  server_info_t *sip;
-  GLWidget *meta, *target = NULL;
-  SDL_Event evt;
-
-  if (!server_list ||
-      List_size(server_list) < 10 ||
-      server_list_creation_time + 5 < time(NULL)) {
+    static char err[MSG_LEN] = {0};
+    int num_serv = 0;
+    server_info_t *sip;
+    GLWidget *meta, *target = NULL;
+    SDL_Event evt;
     
-    Delete_server_list();
-    if ((num_serv = Get_meta_data(err)) <= 0) {
-      fprintf(stderr, "Error: couldnt get meta list\n");
-      return -1;
-    } else {
-      printf("xpilot_sdl: Got %d servers\n",num_serv);
+    if (!server_list ||
+	List_size(server_list) < 10 ||
+	server_list_creation_time + 5 < time(NULL)) {
+	
+	Delete_server_list();
+	if ((num_serv = Get_meta_data(err)) <= 0) {
+	    fprintf(stderr, "Error: couldnt get meta list\n");
+	    return -1;
+	} else {
+	    printf("xpilot_sdl: Got %d servers\n",num_serv);
+	}
     }
-  }
+    
+    if (Welcome_sort_server_list() == -1) {
+	Delete_server_list();
+	error("out of memory");
+	return -1;
+    }
+    
+    meta = Init_MetaWidget(server_list);
+    if (!meta) return -1;
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, draw_width, draw_height, 0);
+    set_alphacolor(blackRGBA);
+    glBegin(GL_QUADS);
+    glVertex2i(0,0);
+    glVertex2i(draw_width,0);
+    glVertex2i(draw_width,draw_height);
+    glVertex2i(0,draw_height);
+    glEnd();
+    glEnable(GL_SCISSOR_TEST);
+    glDisable(GL_BLEND);
+    
+    while(1) {
 
-  if (Welcome_sort_server_list() == -1) {
-    Delete_server_list();
-    error("out of memory");
-    return -1;
-  }
-
-  meta = Init_MetaWidget(server_list);
-  if (!meta) return -1;
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluOrtho2D(0, draw_width, draw_height, 0);
-  set_alphacolor(blackRGBA);
-  glBegin(GL_QUADS);
-  glVertex2i(0,0);
-  glVertex2i(draw_width,0);
-  glVertex2i(draw_width,draw_height);
-  glVertex2i(0,draw_height);
-  glEnd();
-
-  while(1) {
-
-      glEnable(GL_SCISSOR_TEST);
-      DrawGLWidgetsi(meta, 0, 0, draw_width, draw_height);
-      glDisable(GL_SCISSOR_TEST);
-      SDL_GL_SwapBuffers();
-      
-      if (!SDL_WaitEvent(&evt)) {
-	  error("error while waiting for events");
-	  return -1;
-      }
-
-      switch(evt.type) {
-      case SDL_QUIT: 
-	  return -1;
-
-      case SDL_USEREVENT:
-	  if (join_server(conpar, (server_info_t*)evt.user.data1)) {
-	      glMatrixMode(GL_PROJECTION);
-	      glLoadIdentity();
-	      gluOrtho2D(0, draw_width, 0, draw_height);
-	      return 0;
-	  }
-	  break;
-
-      case SDL_MOUSEBUTTONDOWN:
-	  target = FindGLWidgeti(meta, evt.button.x, evt.button.y);
-	  if (target && target->button)
-	      target->button(evt.button.button, 
-			     evt.button.state,
-			     evt.button.x,
-			     evt.button.y,
-			     target->buttondata);
-	  break;
-
-      case SDL_MOUSEBUTTONUP:
-	  if (target && target->button) {
-	      target->button(evt.button.button, 
-			     evt.button.state,
-			     evt.button.x,
-			     evt.button.y,
-			     target->buttondata);
-	      target = NULL;
-	  }
-	  break;
-      
-      case SDL_MOUSEMOTION:
-	  if (target && target->motion)
-	      target->motion(evt.motion.xrel,
-			     evt.motion.yrel,
-			     evt.button.x,
-			     evt.button.y,
-			     target->motiondata);
-	  break;
-      }
-  }
+	DrawGLWidgetsi(meta, 0, 0, draw_width, draw_height);
+	SDL_GL_SwapBuffers();
+	
+	SDL_WaitEvent(&evt);
+	do {
+	    
+	    switch(evt.type) {
+	    case SDL_QUIT: 
+		return -1;
+		
+	    case SDL_USEREVENT:
+		if (join_server(conpar, (server_info_t*)evt.user.data1)) {
+		    glEnable(GL_BLEND);
+		    glDisable(GL_SCISSOR_TEST);
+		    glMatrixMode(GL_PROJECTION);
+		    glLoadIdentity();
+		    gluOrtho2D(0, draw_width, 0, draw_height);
+		    return 0;
+		}
+		break;
+		
+	    case SDL_MOUSEBUTTONDOWN:
+		target = FindGLWidgeti(meta, evt.button.x, evt.button.y);
+		if (target && target->button)
+		    target->button(evt.button.button, 
+				   evt.button.state,
+				   evt.button.x,
+				   evt.button.y,
+				   target->buttondata);
+		break;
+		
+	    case SDL_MOUSEBUTTONUP:
+		if (target && target->button) {
+		    target->button(evt.button.button, 
+				   evt.button.state,
+				   evt.button.x,
+				   evt.button.y,
+				   target->buttondata);
+		    target = NULL;
+		}
+		break;
+		
+	    case SDL_MOUSEMOTION:
+		if (target && target->motion)
+		    target->motion(evt.motion.xrel,
+				   evt.motion.yrel,
+				   evt.button.x,
+				   evt.button.y,
+				   target->motiondata);
+		break;
+	    }
+	} while (SDL_PollEvent(&evt));
+    }	
 }
