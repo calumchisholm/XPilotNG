@@ -93,7 +93,7 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
     Set_message(msg);
 
     if (!somebody_flag) {
-	SCORE(ind, Rate(pl->score, CANNON_SCORE)/2, cx, cy, "Treasure:");
+	Score(pl, Rate(pl->score, CANNON_SCORE)/2, cx, cy, "Treasure:");
 	return 0;
     }
 
@@ -115,7 +115,7 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 		&& pl_i->mychar == 'W'))
 	    continue;
 	if (pl_i->team == td->team) {
-	    SCORE(i, -sc, cx, cy, "Treasure: ");
+	    Score(pl_i, -sc, cx, cy, "Treasure: ");
 	    Rank_LostBall(pl_i);
 	    if (treasureKillTeam)
 		SET_BIT(pl_i->status, KILLED);
@@ -128,7 +128,7 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 		}
 		Rank_WonBall(pl_i);
 	    }
-	    SCORE(i, (i == ind ? 3*por : 2*por), cx, cy, "Treasure: ");
+	    Score(pl_i, (i == ind ? 3*por : 2*por), cx, cy, "Treasure: ");
 	}
     }
 
@@ -249,7 +249,7 @@ void Ball_is_replaced(ballobject *ball)
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 
-    SCORE(GetInd(pl->id), 5, ball->pos.cx, ball->pos.cy, "Treasure: ");
+    Score(pl, 5, ball->pos.cx, ball->pos.cy, "Treasure: ");
     sprintf(msg, " < %s (team %d) has replaced the treasure >",
 	    pl->name, pl->team);
     Set_message(msg);

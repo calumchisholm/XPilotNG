@@ -150,7 +150,7 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 		    sc = Rate(0, pl->score)
 			* laserKillScoreMult
 			* selfKillScoreMult;
-		    SCORE(ind, -sc, vicpl->pos.cx, vicpl->pos.cy, vicpl->name);
+		    Score(pl, -sc, pl->pos.cx, pl->pos.cy, pl->name);
 		    strcat(msg, " How strange!");
 		} else {
 		    sc = Rate(pl->score, vicpl->score)
@@ -159,7 +159,7 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 		}
 	    } else {
 		sc = Rate(CANNON_SCORE, vicpl->score) / 4;
-		SCORE(ind, -sc, vicpl->pos.cx, vicpl->pos.cy, "Cannon");
+		Score(vicpl, -sc, vicpl->pos.cx, vicpl->pos.cy, "Cannon");
 		if (BIT(World.rules->mode, TEAM_PLAY)
 		    && vicpl->team != pulse->team)
 		    TEAM_SCORE(pulse->team, sc);

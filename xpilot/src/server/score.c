@@ -45,10 +45,8 @@
 char score_version[] = VERSION;
 
 
-void SCORE(int ind, DFLOAT points, int cx, int cy, const char *msg)
+void Score(player *pl, DFLOAT points, int cx, int cy, const char *msg)
 {
-    player	*pl = Players(ind);
-
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	if (!teamShareScore) {
 	    Rank_AddScore(pl, points);
@@ -146,9 +144,9 @@ void Score_players(int winner, DFLOAT winner_score, char *winner_msg,
 	if (loser_score > 0)
 	    loser_score = -loser_score;
     }
-    SCORE(winner, winner_score, pl_loser->pos.cx, pl_loser->pos.cy,
+    Score(pl_winner, winner_score, pl_loser->pos.cx, pl_loser->pos.cy,
 	  winner_msg);
-    SCORE(loser, loser_score, pl_loser->pos.cx, pl_loser->pos.cy,
+    Score(pl_loser, loser_score, pl_loser->pos.cx, pl_loser->pos.cy,
 	  loser_msg);
 }
 

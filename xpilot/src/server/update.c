@@ -960,7 +960,7 @@ void Update_objects(void)
 		if (BIT(pl->status, SELF_DESTRUCT)) {
 		    if (selfDestructScoreMult != 0) {
 			DFLOAT sc = Rate(0, pl->score) * selfDestructScoreMult;
-			SCORE(GetInd(pl->id), -sc, pl->pos.cx, pl->pos.cy,
+			Score(pl, -sc, pl->pos.cx, pl->pos.cy,
 			      "Self-Destruct");
 		    }
 		    SET_BIT(pl->status, KILLED);

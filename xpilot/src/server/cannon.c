@@ -729,8 +729,7 @@ void Cannon_dies(int ind, player *pl)
 	    if (pl->score <= cannonMaxScore
 		&& !(BIT(World.rules->mode, TEAM_PLAY)
 		     && pl->team == cannon->team)) {
-		SCORE(killer, cannonPoints, cannon->pos.cx,
-					    cannon->pos.cy, "");
+		Score(pl, cannonPoints, cannon->pos.cx, cannon->pos.cy, "");
 	    }
 	}
     }

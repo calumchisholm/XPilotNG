@@ -426,7 +426,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	sc = Rate(kp->score, CANNON_SCORE)/4;
 	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
 	if (sc >= 0.01) {
-	    SCORE(killer, sc, targ->pos.cx, targ->pos.cy, "Target: ");
+	    Score(kp, sc, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
 	/*
 	 * If players can't collide with their own targets, we
@@ -454,26 +454,26 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     por = (sc*lose_team_members)/win_team_members;
 
     for (j = 0; j < NumPlayers; j++) {
-	player *pl_j = Players(j);
+	player *pl = Players(j);
 
 	if (IS_TANK_IND(j)
-	    || (BIT(pl_j->status, PAUSE)
-		&& pl_j->count <= 0)
-	    || (BIT(pl_j->status, GAME_OVER)
-		&& pl_j->mychar == 'W'
-		&& pl_j->score == 0)) {
+	    || (BIT(pl->status, PAUSE)
+		&& pl->count <= 0)
+	    || (BIT(pl->status, GAME_OVER)
+		&& pl->mychar == 'W'
+		&& pl->score == 0)) {
 	    continue;
 	}
-	if (pl_j->team == targ->team) {
+	if (pl->team == targ->team) {
 	    if (targetKillTeam
 		&& targets_remaining == 0
-		&& !BIT(pl_j->status, KILLED|PAUSE|GAME_OVER))
-		SET_BIT(pl_j->status, KILLED);
-	    SCORE(j, -sc, targ->pos.cx, targ->pos.cy, "Target: ");
+		&& !BIT(pl->status, KILLED|PAUSE|GAME_OVER))
+		SET_BIT(pl->status, KILLED);
+	    Score(pl, -sc, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
-	else if (pl_j->team == kp->team &&
-		 (pl_j->team != TEAM_NOT_SET || j == killer)) {
-	    SCORE(j, por, targ->pos.cx, targ->pos.cy, "Target: ");
+	else if (pl->team == kp->team &&
+		 (pl->team != TEAM_NOT_SET || j == killer)) {
+	    Score(pl, por, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
     }
 }
@@ -664,7 +664,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 	}
 	if (num_pushers == 0) {
 	    sc = Rate(WALL_SCORE, pl->score);
-	    SCORE(ind, -sc, pl->pos.cx, pl->pos.cy, hudmsg);
+	    Score(pl, -sc, pl->pos.cx, pl->pos.cy, hudmsg);
 	    strcat(msg, ".");
 	    Set_message(msg);
 	}
@@ -692,16 +692,15 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 		}
 		sc = cnt[i] * Rate(pusher->score, pl->score)
 				    * shoveKillScoreMult / total_pusher_count;
-		SCORE(GetInd(pusher->id), sc,
-		      pl->pos.cx, pl->pos.cy, pl->name);
+		Score(pusher, sc, pl->pos.cx, pl->pos.cy, pl->name);
 		if (i >= num_pushers - 1) {
-		    pusher->kills++;
+		    Rank_AddKill(pusher);
 		}
 
 	    }
 	    sc = Rate(average_pusher_score, pl->score)
-		       * shoveKillScoreMult;
-	    SCORE(ind, -sc, pl->pos.cx, pl->pos.cy, "[Shove]");
+		* shoveKillScoreMult;
+	    Score(pl, -sc, pl->pos.cx, pl->pos.cy, "[Shove]");
 
 	    strcpy(msg_ptr, ".");
 	    Set_message(msg);
