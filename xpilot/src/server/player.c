@@ -705,7 +705,9 @@ void Reset_all_players(void)
 	    } else {
 		Kill_player(i, false);
 		if (pl != Players(i)) {
-		    /* player was deleted. */
+		    /* kps - fix */
+		    /* UGLY HACK - player was deleted. */
+		    /* Please don't change loop index inside a for loop!!! */
 		    i--;
 		    continue;
 		}
@@ -950,12 +952,12 @@ static void Give_best_player_bonus(DFLOAT average_score,
 
 static void Give_individual_bonus(int ind, DFLOAT average_score)
 {
-    DFLOAT		ratio;
-    DFLOAT		points;
+    DFLOAT		ratio, points;
+    player		*pl = Players(ind);
 
-    ratio = (DFLOAT) Players(ind)->kills / (Players(ind)->deaths + 1);
-    points = ratio * Rate(Players(ind)->score, average_score);
-    SCORE(ind, points, Players(ind)->pos.cx, Players(ind)->pos.cy, "[Winner]");
+    ratio = (DFLOAT) pl->kills / (pl->deaths + 1);
+    points = ratio * Rate(pl->score, average_score);
+    SCORE(ind, points, pl->pos.cx, pl->pos.cy, "[Winner]");
 }
 
 
@@ -1828,7 +1830,8 @@ void Delete_player(int ind)
     if (pl->isoperator) {
 	if (!--NumOperators && game_lock) {
 	    game_lock = false;
-	    Set_message(" < The game has been unlocked as the last operator left! >");
+	    Set_message(" < The game has been unlocked as "
+			"the last operator left! >");
 	}
     }
 
