@@ -850,7 +850,6 @@ static void Give_best_player_bonus(double average_score,
     double		points;
     char		msg[MSG_LEN];
 
-
     if (best_ratio == 0)
 	sprintf(msg, "There is no Deadly Player.");
     else if (num_best_players == 1) {
@@ -867,8 +866,7 @@ static void Give_best_player_bonus(double average_score,
 	for (i = 0; i < num_best_players; i++) {
 	    player	*bp = Players(best_players[i]);
 	    double	ratio = Rate(bp->score, average_score);
-	    double	score = (ratio + num_best_players)
-				/ num_best_players;
+	    double	score = (ratio + num_best_players) / num_best_players;
 
 	    if (msg[0]) {
 		if (i == num_best_players - 1)
@@ -881,7 +879,7 @@ static void Give_best_player_bonus(double average_score,
 		msg[0] = '\0';
 	    }
 	    strcat(msg, bp->name);
-	    points = (int) (best_ratio * score);
+	    points = best_ratio * score;
 	    Score(bp, points, bp->pos, "[Deadly]");
 	}
 	if (strlen(msg) + 64 >= sizeof(msg)) {
