@@ -166,7 +166,8 @@ void Expose_about_window(void)
 	    XSetForeground(dpy, textGC, colors[BLACK].pixel);
 	    XFillRectangle(dpy, aboutWindow, textGC,
 			   BORDER, box_start,
-			   2*ITEM_SIZE+2*BORDER, box_end - box_start);
+			   2*ITEM_SIZE+2*BORDER,
+			   (unsigned)box_end - box_start);
 	    XSetForeground(dpy, textGC, colors[RED].pixel);
 	    Paint_item((u_byte)i, aboutWindow, textGC, 2*BORDER + ITEM_SIZE,
 		       old_y + ITEM_TRIANGLE_SIZE);
@@ -272,7 +273,7 @@ void Expose_about_window(void)
 
 static void About_create_window(void)
 {
-    const int			windowWidth = ABOUT_WINDOW_WIDTH,
+    const unsigned int		windowWidth = ABOUT_WINDOW_WIDTH,
 				buttonWindowHeight = 2*BTN_BORDER
 				    + buttonFont->ascent + buttonFont->descent,
 				windowHeight = ABOUT_WINDOW_HEIGHT;
@@ -417,6 +418,7 @@ void About(Window w)
 
 int About_callback(int widget_desc, void *data, const char **str)
 {
+    (void)widget_desc; (void)data; (void)str;
     if (about_created == false) {
 	About_create_window();
 	about_created = true;
@@ -431,7 +433,7 @@ static bool		keys_created = false;
 
 int Keys_callback(int widget_desc, void *data, const char **unused)
 {
-
+    (void)widget_desc; (void)data;
     if (keys_created == false) {
 	unsigned	bufsize = (maxKeyDefs * 64);
 	char		*buf = calloc(bufsize, 1),
@@ -501,6 +503,7 @@ static int		motd_auto_popup;
 
 int Motd_callback(int widget_desc, void *data, const char **str)
 {
+    (void)widget_desc; (void)data; (void)str;
     if (motd_buf == NULL || refreshMotd) {
 	motd_auto_popup = 0;
 	Net_ask_for_motd(0, MAX_MOTD_SIZE);

@@ -323,9 +323,9 @@ int Handle_vbase(int x, int y, int xi, int yi, int type);
 int Handle_vdecor(int x, int y, int xi, int yi, int type);
 int Handle_message(char *msg);
 int Handle_eyes(int id);
-void Paint_item_symbol(u_byte type, Drawable d, GC mygc,
+void Paint_item_symbol(int type, Drawable d, GC mygc,
 		       int x, int y, int color);
-void Paint_item(u_byte type, Drawable d, GC mygc, int x, int y);
+void Paint_item(int type, Drawable d, GC mygc, int x, int y);
 void Paint_shots(void);
 void Paint_ships(void);
 void Paint_radar(void);

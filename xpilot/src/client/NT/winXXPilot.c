@@ -1082,7 +1082,7 @@ void WinXResize(void)
     }
 }
 
-void PaintWinClient()
+void PaintWinClient(void)
 {
 #if 0
     RECT rect;
@@ -1152,7 +1152,7 @@ void PaintWinClient()
 #endif
 }
 
-void MarkPlayersForRedraw()
+void MarkPlayersForRedraw(void)
 {
     RECT rect;
 
@@ -1161,8 +1161,7 @@ void MarkPlayersForRedraw()
     UpdateWindow(xid[players].hwnd.hWnd);
 }
 
-void paintItemSymbol(unsigned char type, Drawable d, GC gc, int x, int y,
-		     int color)
+void paintItemSymbol(int type, Drawable d, GC gc, int x, int y, int color)
 {
     HDC hDC = xid[d].hwnd.hBmpDC;
 

@@ -60,10 +60,10 @@ static void Dummy_newFrame(void) {}
 static void Dummy_endFrame(void) {}
 
 #ifdef _WINDOWS
-extern void paintItemSymbol(unsigned char type, Drawable drawable, GC mygc,
+extern void paintItemSymbol(int type, Drawable drawable, GC mygc,
 			    int x, int y, int color);
 #else
-static void Dummy_paintItemSymbol(unsigned char type, Drawable drawable,
+static void Dummy_paintItemSymbol(int type, Drawable drawable,
 				  GC mygc, int x, int y, int color) {}
 #endif
 
@@ -633,7 +633,7 @@ static int RFillPolygon(Display *display, Drawable drawable, GC gc,
     return 0;
 }
 
-static void RPaintItemSymbol(unsigned char type, Drawable drawable, GC mygc,
+static void RPaintItemSymbol(int type, Drawable drawable, GC mygc,
 			     int x, int y, int color)
 {
 #ifdef _WINDOWS

@@ -76,9 +76,9 @@ int			ButtonHeight;
 Atom			ProtocolAtom, KillAtom;
 int			buttonColor, windowColor, borderColor;
 bool			quitting = false;
-int			top_width, top_height, /*top_x, top_y, */ top_posmask;
-int			draw_width, draw_height;
-int			players_width, players_height;
+unsigned int		top_width, top_height, /*top_x, top_y, */ top_posmask;
+unsigned int		draw_width, draw_height;
+unsigned int		players_width, players_height;
 char			*geometry;
 bool			radar_score_mapped;
 bool			autoServerMotdPopup;
@@ -1067,18 +1067,21 @@ void Free_msgs(void)
 
 static int Config_callback(int widget_desc, void *data, const char **str)
 {
+    (void)widget_desc; (void)data; (void)str;
     Config(true, CONFIG_DEFAULT);
     return 0;
 }
 
 static int Colors_callback(int widget_desc, void *data, const char **str)
 {
+    (void)widget_desc; (void)data; (void)str;
     Config(true, CONFIG_COLORS);
     return 0;
 }
 
 static int Score_callback(int widget_desc, void *data, const char **str)
 {
+    (void)widget_desc; (void)data; (void)str;
     Config(false, CONFIG_NONE);
     if (showRealName != false) {
 	showRealName = false;
@@ -1089,6 +1092,7 @@ static int Score_callback(int widget_desc, void *data, const char **str)
 
 static int Player_callback(int widget_desc, void *data, const char **str)
 {
+    (void)widget_desc; (void)data; (void)str;
     Config(false, CONFIG_NONE);
     if (showRealName != true) {
 	showRealName = true;
@@ -1099,6 +1103,7 @@ static int Player_callback(int widget_desc, void *data, const char **str)
 
 static int Quit_callback(int widget_desc, void *data, const char **str)
 {
+    (void)widget_desc; (void)data; (void)str;
     quitting = true;
     return 0;
 }
@@ -1174,6 +1179,7 @@ void Quit(void)
 
 int FatalError(Display *display)
 {
+    (void)display;
     Net_cleanup();
     /*
      * Quit(&client);

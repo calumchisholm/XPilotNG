@@ -76,7 +76,7 @@ static int wrap(int *xp, int *yp)
 
 /*db960828 added color parameter cause Windows needs to blt a different
          bitmap based on the color. Unix ignores this parameter*/
-void Paint_item_symbol(u_byte type, Drawable d, GC mygc, int x, int y, int color)
+void Paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int color)
 {
     if (!texturedObjects) {
 #ifdef _WINDOWS
@@ -99,7 +99,7 @@ void Paint_item_symbol(u_byte type, Drawable d, GC mygc, int x, int y, int color
 }
 
 
-void Paint_item(u_byte type, Drawable d, GC mygc, int x, int y)
+void Paint_item(int type, Drawable d, GC mygc, int x, int y)
 {
     const int		SIZE = ITEM_TRIANGLE_SIZE;
     XPoint		points[5];
@@ -121,13 +121,13 @@ void Paint_item(u_byte type, Drawable d, GC mygc, int x, int y)
     str[0] = itemtype_ptr[i].type + '0';
     str[1] = '\0';
     rd.drawString(dpy, d, mygc,
-		x - XTextWidth(gameFont, str, 1)/2,
-		y + SIZE - 1,
-		str, 1);
+		  x - XTextWidth(gameFont, str, 1)/2,
+		  y + SIZE - 1,
+		  str, 1);
 #endif
     Paint_item_symbol(type, d, mygc,
-		x - ITEM_SIZE/2,
-		y - SIZE + 2, ITEM_PLAYFIELD);
+		      x - ITEM_SIZE/2,
+		      y - SIZE + 2, ITEM_PLAYFIELD);
 }
 
 
