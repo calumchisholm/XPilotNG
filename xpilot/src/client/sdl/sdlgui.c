@@ -1555,7 +1555,6 @@ void Paint_HUD(void)
 bool newcode = true;
 
     fontbounds dummy;
-    hudRadarLimit = 0.050;
     tex_index = 0;
     glEnable(GL_BLEND);
     /*
@@ -1595,7 +1594,7 @@ bool newcode = true;
 		  * hudRadarScale / hudRadarMapScale),
 	    hudRadarDotSize);
 
-	/*if (BIT(instruments, MAP_RADAR))*/
+	if (instruments.showMapRadar)
 	    Paint_hudradar(hudRadarMapScale*scale,
     	    	    	   (active_view_width / 2)*scale,
 			   (active_view_height / 2)*scale,
