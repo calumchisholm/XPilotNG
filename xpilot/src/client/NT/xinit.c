@@ -732,35 +732,12 @@ void Resize(Window w, unsigned width, unsigned height)
 /*
  * Cleanup player structure, close the display etc.
  */
-void Quit(void)
+void Platform_specific_cleanup(void)
 {
-#ifndef _WINDOWS
-
-  /* Here we restore the mouse to its former self */
-  /* the option may have been toggled in game to  */
-  /* off so we cant trust that                    */
-
-    if (dpy != NULL) {
-      if (pre_exists) {
-	XChangePointerControl(dpy, True, True, pre_acc_num,
-			      pre_acc_denom, pre_threshold);
-      }
-	XAutoRepeatOn(dpy);
-	Colors_cleanup();
-	XCloseDisplay(dpy);
-	dpy = NULL;
-	if (kdpy) {
-	    XAutoRepeatOn(kdpy);
-	    XCloseDisplay(kdpy);
-	    kdpy = NULL;
-	}
-    }
-#else
     if (button_form) {
 	Widget_destroy(button_form);
 	button_form = 0;
     }
-#endif
     Widget_cleanup();
 }
 
@@ -770,7 +747,6 @@ int FatalError(Display *display)
     UNUSED_PARAM(display);
     Net_cleanup();
     /*
-     * Quit(&client);
      * It's already a fatal I/O error, nothing to cleanup.
      */
     exit(0);

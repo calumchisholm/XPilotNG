@@ -291,7 +291,7 @@ int Resize_Window( int width, int height )
 }
 
 
-void Quit(void)
+void Platform_specific_cleanup(void)
 {
     Close_Widget(&MainWidget);
     Gui_cleanup();

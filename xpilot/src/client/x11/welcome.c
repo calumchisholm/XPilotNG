@@ -1591,7 +1591,8 @@ int Welcome_screen(Connect_param_t * conpar)
 	Welcome_cleanup();
 	result = Join(conpar);
     } else
-	Quit();
+	/* kps - ?????? */
+	Platform_specific_cleanup();
 
     return result;
 }

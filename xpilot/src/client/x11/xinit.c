@@ -747,9 +747,9 @@ void Resize(Window w, unsigned width, unsigned height)
 
 
 /*
- * Cleanup player structure, close the display etc.
+ * Close the display etc.
  */
-void Quit(void)
+void Platform_specific_cleanup(void)
 {
     /* Here we restore the mouse to its former self */
     /* the option may have been toggled in game to  */
@@ -776,13 +776,9 @@ void Quit(void)
 int FatalError(Display *display)
 {
     UNUSED_PARAM(display);
-    Net_cleanup();
-    /*
-     * Quit(&client);
-     * It's already a fatal I/O error, nothing to cleanup.
-     */
-    exit(0);
-    return(0);
+    Client_exit(0);
+    /* make complier not warn */
+    return 0;
 }
 
 void Scale_dashes(void)

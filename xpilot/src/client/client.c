@@ -2224,7 +2224,7 @@ void Client_cleanup(void)
 {
     int		i;
 
-    Quit();
+    Platform_specific_cleanup();
     Free_selectionAndHistory();
     Free_msgs();
     if (max_others > 0) {
@@ -2375,6 +2375,6 @@ int Client_check_pointer_move_interval(void)
 void Client_exit(int status)
 {
     Net_cleanup();
-    Quit();
+    Platform_specific_cleanup();
     exit(status);
 }

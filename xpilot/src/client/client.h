@@ -784,7 +784,7 @@ void Client_exit(int status);
 int Init_playing_windows(void);
 void Raise_window(void);
 void Reset_shields(void);
-void Quit(void);
+void Platform_specific_cleanup(void);
 
 #ifdef _WINDOWS
 void MarkPlayersForRedraw(void);
