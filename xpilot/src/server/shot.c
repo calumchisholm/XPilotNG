@@ -1151,13 +1151,11 @@ void Delete_shot(int ind)
 		break;
 	    sound_play_sensors(ball->pos.cx, ball->pos.cy, EXPLODE_BALL_SOUND);
 
-	    if (is_polygon_map || !useOldCode) {
-		/* The ball could be inside a BallArea, check whether
-		 * the sparks can exist here. Should we set a team? */
-		if (is_inside(ball->prevpos.cx, ball->prevpos.cy,
-			 NONBALL_BIT | NOTEAM_BIT, (object *)ball) != NO_GROUP)
-		    break;
-	    }
+	    /* The ball could be inside a BallArea, check whether
+	     * the sparks can exist here. Should we set a team? */
+	    if (is_inside(ball->prevpos.cx, ball->prevpos.cy,
+			  NONBALL_BIT | NOTEAM_BIT, OBJ_PTR(ball)) != NO_GROUP)
+		break;
 
 	    Make_debris(
 		/* pos.x, pos.y   */ ball->prevpos.cx, ball->prevpos.cy,
