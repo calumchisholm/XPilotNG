@@ -629,13 +629,13 @@ void Xpmap_find_base_direction(void)
 
 /* number of vertices in polygon */
 #define N (2 + 12)
-static void Xpmap_treasure_to_polygon(int ind)
+static void Xpmap_treasure_to_polygon(int item_id)
 {
     int cx, cy, i, r, n;
     double angle;
     int polystyle, edgestyle;
     clpos pos[N + 1];
-    treasure_t *treasure = &World.treasures[ind];
+    treasure_t *treasure = &World.treasures[item_id];
 
     polystyle = P_get_poly_id("treasure_ps");
     edgestyle = P_get_edge_id("treasure_es");
@@ -664,7 +664,7 @@ static void Xpmap_treasure_to_polygon(int ind)
     pos[N] = pos[0];
 
     /* create balltarget */
-    P_start_balltarget(treasure->team);
+    P_start_balltarget(treasure->team, item_id);
     P_start_polygon(pos[0].cx, pos[0].cy, polystyle);
     for (i = 1; i <= N; i++)
 	P_vertex(pos[i].cx, pos[i].cy, edgestyle); 

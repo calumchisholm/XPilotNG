@@ -264,11 +264,21 @@ void Ball_hits_goal(ballobject *ball, int group)
 {
     player *owner;
     treasure_t *td;
+    char msg[MSG_LEN];
 
-    if (ball->owner == NO_ID) {	/* Probably the player quit */
+    /*
+     * Player already quit ?
+     */
+    if (ball->owner == NO_ID) {
 	SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 	return;
     }
+    /*
+     * If it's not team play, nothing interesting happens.
+     */
+    if (!BIT(World.rules->mode, TEAM_PLAY))
+	return;
+
     td = &World.treasures[ball->treasure];
     if (td->team == groups[group].team) {
 	Ball_is_replaced(ball);
@@ -276,8 +286,15 @@ void Ball_hits_goal(ballobject *ball, int group)
     }
     owner = Player_by_id(ball->owner);
     if (groups[group].team == owner->team) {
+	treasure_t *tt = &World.treasures[groups[group].item_id];
+
 	Ball_is_destroyed(ball);
-	if (Punish_team(owner, td, ball->pos.cx, ball->pos.cy))
+
+	if (captureTheFlag && !tt->have && !tt->empty) {
+	    sprintf(msg, " < The treasure must be safe before you "
+		    "can cash an opponent's! >");
+	    Set_message(msg);
+	} else if (Punish_team(owner, td, ball->pos.cx, ball->pos.cy))
 	    CLR_BIT(ball->status, RECREATE);
 	return;
     }

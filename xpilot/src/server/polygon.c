@@ -215,7 +215,7 @@ void P_end_ballarea(void)
     current_group = 0;
 }
 
-int P_start_balltarget(int team)
+int P_start_balltarget(int team, int item_id)
 {
     current_group = ++num_groups;
     Check_groupcount();
@@ -224,7 +224,7 @@ int P_start_balltarget(int team)
     groups[current_group].hitmask = NONBALL_BIT;
     /*= NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));*/
     groups[current_group].hitfunc = Balltarget_hitfunc;
-    groups[current_group].item_id = -1;
+    groups[current_group].item_id = item_id;
     return current_group;
 }
 
@@ -233,9 +233,9 @@ void P_end_balltarget(void)
     current_group = 0;
 }
 
-int P_start_target(int team, int ind)
+int P_start_target(int team, int item_id)
 {
-    target_t *targ = &World.targets[ind];
+    target_t *targ = &World.targets[item_id];
 
     current_group = ++num_groups;
     Check_groupcount();
@@ -243,7 +243,7 @@ int P_start_target(int team, int ind)
     groups[current_group].team = team;
     groups[current_group].hitmask = Target_hitmask(targ);
     groups[current_group].hitfunc = NULL /*Target_hitfunc*/;
-    groups[current_group].item_id = ind;
+    groups[current_group].item_id = item_id;
     targ->group = current_group;
     return current_group;
 }
@@ -253,9 +253,9 @@ void P_end_target(void)
     current_group = 0;
 }
 
-int P_start_cannon(int team, int ind)
+int P_start_cannon(int team, int item_id)
 {
-    cannon_t *cannon = &World.cannon[ind];
+    cannon_t *cannon = &World.cannon[item_id];
 
     current_group = ++num_groups;
     Check_groupcount();
@@ -263,7 +263,7 @@ int P_start_cannon(int team, int ind)
     groups[current_group].team = team;
     groups[current_group].hitmask = Cannon_hitmask(cannon);
     groups[current_group].hitfunc = Cannon_hitfunc;
-    groups[current_group].item_id = ind;
+    groups[current_group].item_id = item_id;
     cannon->group = current_group;
     return current_group;
 }
@@ -273,9 +273,9 @@ void P_end_cannon(void)
     current_group = 0;
 }
 
-int P_start_wormhole(int ind)
+int P_start_wormhole(int item_id)
 {
-    wormhole_t		*wormhole = &World.wormHoles[ind];
+    wormhole_t *wormhole = &World.wormHoles[item_id];
 
     current_group = ++num_groups;
     Check_groupcount();
@@ -283,7 +283,7 @@ int P_start_wormhole(int ind)
     groups[current_group].team = TEAM_NOT_SET;
     groups[current_group].hitmask = Wormhole_hitmask(wormhole);
     groups[current_group].hitfunc = Wormhole_hitfunc;
-    groups[current_group].item_id = ind;
+    groups[current_group].item_id = item_id;
     return current_group;
 }
 

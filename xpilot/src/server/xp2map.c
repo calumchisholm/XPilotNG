@@ -139,7 +139,12 @@ static void tagstart(void *data, const char *el, const char **attr)
 		team = atoi(*(attr + 1));
 	    attr += 2;
 	}
-	P_start_balltarget(team);
+	/*
+	 * kps - Currently we don't know item id for balltargets,
+	 * this means that captureTheFlag stuff does not work
+	 * on xp2 maps.
+	 */
+	P_start_balltarget(team, -1);
 	return;
     }
 
