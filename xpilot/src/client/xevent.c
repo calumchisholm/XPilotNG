@@ -31,6 +31,16 @@ char xevent_version[] = VERSION;
 bool		initialPointerControl = false;
 bool		pointerControl = false;
 
+int	talk_key_repeating;
+XEvent	talk_key_repeat_event;
+struct timeval talk_key_repeat_time;
+static struct timeval time_now;
+
+static ipos_t	delta;
+ipos_t	mousePosition;	/* position of mouse pointer. */
+int	mouseMovement;	/* horizontal mouse movement. */
+
+
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
     keys_t ret = Generic_lookup_key((xp_keysym_t)ks, reset);
@@ -264,10 +274,9 @@ void Talk_event(XEvent *event)
 	Talk_set_state(false);
 }
 
-int	talk_key_repeating;
-XEvent	talk_key_repeat_event;
-struct timeval talk_key_repeat_time;
-static struct timeval time_now;
+
+
+#ifndef _WINDOWS
 
 void xevent_keyboard(int queued)
 {
@@ -328,10 +337,6 @@ void xevent_keyboard(int queued)
 #endif
 }
 
-static ipos_t	delta;
-ipos_t	mousePosition;	/* position of mouse pointer. */
-int	mouseMovement;	/* horizontal mouse movement. */
-
 void xevent_pointer(void)
 {
 #ifndef _WINDOWS
@@ -382,8 +387,6 @@ void xevent_pointer(void)
     }
 }
 
-
-#ifndef _WINDOWS
 
 int x_event(int new_input)
 {
@@ -498,6 +501,116 @@ int x_event(int new_input)
 }
 
 #else  /* _WINDOWS */
+
+void xevent_keyboard(int queued)
+{
+    int			i;
+#ifndef _WINDOWS
+    int			n;
+    XEvent		event;
+#endif
+
+    if (talk_key_repeating) {
+	gettimeofday(&time_now, NULL);
+	i = 1000000 * (time_now.tv_sec - talk_key_repeat_time.tv_sec) +
+	    time_now.tv_usec - talk_key_repeat_time.tv_usec;
+	if ((talk_key_repeating > 1 && i > 50000) || i > 500000) {
+	    Talk_event(&talk_key_repeat_event);
+	    talk_key_repeating = 2;
+	    talk_key_repeat_time = time_now;
+	    if (!talk_mapped)
+		talk_key_repeating = 0;
+	}
+    }
+
+#ifndef _WINDOWS
+    if (kdpy) {
+	n = XEventsQueued(kdpy, queued);
+	for (i = 0; i < n; i++) {
+	    XNextEvent(kdpy, &event);
+	    switch (event.type) {
+	    case KeyPress:
+	    case KeyRelease:
+		Key_event(&event);
+		break;
+
+		/* Back in play */
+	    case FocusIn:
+		gotFocus = true;
+		XAutoRepeatOff(kdpy);
+		break;
+
+		/* Probably not playing now */
+	    case FocusOut:
+	    case UnmapNotify:
+		gotFocus = false;
+		XAutoRepeatOn(kdpy);
+		break;
+
+	    case MappingNotify:
+		XRefreshKeyboardMapping(&event.xmapping);
+		break;
+
+	    default:
+		warn("Unknown event type (%d) in xevent_keyboard",
+		     event.type);
+		break;
+	    }
+	}
+    }
+#endif
+}
+
+void xevent_pointer(void)
+{
+#ifndef _WINDOWS
+    XEvent		event;
+#endif
+
+    if (pointerControl) {
+	if (!talk_mapped) {
+
+#ifdef _WINDOWS
+	    /* This is a HACK to fix mouse control under windows. */
+	    {
+		 POINT point;
+
+		 GetCursorPos(&point);
+		 mouseMovement = point.x - draw_width/2;
+		 XWarpPointer(dpy, None, drawWindow,
+			      0, 0, 0, 0,
+			      draw_width/2, draw_height/2);
+	    }
+		/* fix end */
+#endif
+
+	    if (mouseMovement != 0) {
+    	    	Send_pointer_move(mouseMovement);
+		delta.x = draw_width / 2 - mousePosition.x;
+		delta.y = draw_height / 2 - mousePosition.y;
+		if (ABS(delta.x) > 3 * draw_width / 8
+		    || ABS(delta.y) > 1 * draw_height / 8) {
+
+#ifndef _WINDOWS
+		    memset(&event, 0, sizeof(event));
+		    event.type = MotionNotify;
+		    event.xmotion.display = dpy;
+		    event.xmotion.window = drawWindow;
+		    event.xmotion.x = draw_width/2;
+		    event.xmotion.y = draw_height/2;
+		    XSendEvent(dpy, drawWindow, False,
+			       PointerMotionMask, &event);
+		    XWarpPointer(dpy, None, drawWindow,
+				 0, 0, 0, 0,
+				 (int)draw_width/2, (int)draw_height/2);
+#endif
+		    XFlush(dpy);
+		}
+	    }
+	}
+    }
+}
+
 
 int win_xevent(XEvent event)
 {
