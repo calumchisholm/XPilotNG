@@ -176,10 +176,10 @@ void Place_general_mine(player *pl, int team, long status,
 		    Describe_shot(OBJ_MINE, status, mods, 0));
 	    Set_message(msg);
 	    sound_play_all(NUKE_LAUNCH_SOUND);
-	} else {
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-	      BIT(status, GRAVITY) ? DROP_MOVING_MINE_SOUND : DROP_MINE_SOUND);
-	}
+	} else
+	    sound_play_sensors(pl->pos,
+			       BIT(status, GRAVITY)
+			       ? DROP_MOVING_MINE_SOUND : DROP_MINE_SOUND);
     }
 
     minis = (mods.mini + 1);
@@ -536,7 +536,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    if (pl->fuel.sum < -ED_SHOT)
 		return;
 	    Add_fuel(&(pl->fuel), (long)(ED_SHOT));
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, FIRE_SHOT_SOUND);
+	    sound_play_sensors(pl->pos, FIRE_SHOT_SOUND);
 	    Rank_FireShot(pl);
 	}
 	if (!ShotsGravity)
@@ -605,9 +605,9 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 #ifndef HEAT_LOCK
 	    lock = NO_ID;
 #else  /* HEAT_LOCK */
-	    if (pl == NULL) {
+	    if (pl == NULL)
 		lock = target_id;
-	    } else {
+	    else {
 		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 		|| ((pl->lock.distance > pl->sensor_range)
 		    && BIT(World.rules->mode, LIMITED_VISIBILITY))) {
@@ -616,10 +616,8 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 		    lock = pl->lock.pl_id;
 	    }
 #endif /* HEAT_LOCK */
-	    if (pl) {
-		sound_play_sensors(pl->pos.cx, pl->pos.cy,
-				   FIRE_HEAT_SHOT_SOUND);
-	    }
+	    if (pl)
+		sound_play_sensors(pl->pos, FIRE_HEAT_SHOT_SOUND);
 	    max_speed = SMART_SHOT_MAX_SPEED * HEAT_SPEED_FACT;
 	    turnspeed = SMART_TURNSPEED * HEAT_SPEED_FACT;
 	    speed *= HEAT_SPEED_FACT;
@@ -662,11 +660,10 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 			Describe_shot(type, status, mods, 0));
 		Set_message(msg);
 		sound_play_all(NUKE_LAUNCH_SOUND);
-	    } else if (type == OBJ_SMART_SHOT) {
-		sound_play_sensors(pl->pos.cx, pl->pos.cy, FIRE_SMART_SHOT_SOUND);
-	    } else if (type == OBJ_TORPEDO) {
-		sound_play_sensors(pl->pos.cx, pl->pos.cy, FIRE_TORPEDO_SOUND);
-	    }
+	    } else if (type == OBJ_SMART_SHOT)
+		sound_play_sensors(pl->pos, FIRE_SMART_SHOT_SOUND);
+	    else if (type == OBJ_TORPEDO)
+		sound_play_sensors(pl->pos, FIRE_TORPEDO_SOUND);
 	}
 	break;
     }
@@ -1140,7 +1137,7 @@ void Delete_shot(int ind)
 	    addBall = 1;
 	    if (BIT(ball->status, NOEXPLOSION))
 		break;
-	    sound_play_sensors(ball->pos.cx, ball->pos.cy, EXPLODE_BALL_SOUND);
+	    sound_play_sensors(ball->pos, EXPLODE_BALL_SOUND);
 
 	    /* The ball could be inside a BallArea, check whether
 	     * the sparks can exist here. Should we set a team? */
@@ -1185,11 +1182,9 @@ void Delete_shot(int ind)
 	if (BIT(shot->mods.nuclear, NUCLEAR))
 	    sound_play_all(NUKE_EXPLOSION_SOUND);
 	else if (BIT(shot->type, OBJ_MINE))
-	    sound_play_sensors(shot->pos.cx, shot->pos.cy,
-			       MINE_EXPLOSION_SOUND);
+	    sound_play_sensors(shot->pos, MINE_EXPLOSION_SOUND);
 	else
-	    sound_play_sensors(shot->pos.cx, shot->pos.cy,
-			       OBJECT_EXPLOSION_SOUND);
+	    sound_play_sensors(shot->pos, OBJECT_EXPLOSION_SOUND);
 
 	if (BIT(shot->mods.warhead, CLUSTER)) {
 	    type = OBJ_SHOT;
@@ -1399,6 +1394,10 @@ void Fire_general_laser(player *pl, int team, int cx, int cy,
 {
     int			life;
     pulseobject		*pulse;
+    clpos		pos;
+
+    pos.cx = cx;
+    pos.cy = cy;
 
     if (!INSIDE_MAP(cx, cy)) {
 	warn("Fire_general_laser: not inside map.\n");
@@ -1413,7 +1412,7 @@ void Fire_general_laser(player *pl, int team, int cx, int cy,
 
     if (pl) {
 	Add_fuel(&(pl->fuel), (long)ED_LASER);
-	sound_play_sensors(cx, cy, FIRE_LASER_SOUND);
+	sound_play_sensors(pos, FIRE_LASER_SOUND);
 	/* kps - hmm ??? */
 	/*life = (int)PULSE_LIFE(pl->item[ITEM_LASER]);*/
 	life = pulseLife;

@@ -110,7 +110,7 @@ void Phasing(player *pl, int on)
 	    pl->ball = NULL;
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	CLR_BIT(pl->status, GRAVITY);
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_ON_SOUND);
+	sound_play_sensors(pl->pos, PHASING_ON_SOUND);
     } else {
 	int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 	int group;
@@ -121,7 +121,7 @@ void Phasing(player *pl, int on)
 		CLR_BIT(pl->have, HAS_PHASING_DEVICE);
 	}
 	SET_BIT(pl->status, GRAVITY);
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_OFF_SOUND);
+	sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
 	/* kps - ok to have this check here ? */
 	if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
 				     OBJ_PTR(pl), (shape *)pl->ship, pl->dir))
@@ -205,14 +205,12 @@ void Emergency_thrust(player *pl, int on)
 	}
 	if (!BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	    SET_BIT(pl->used, HAS_EMERGENCY_THRUST);
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-			       EMERGENCY_THRUST_ON_SOUND);
+	    sound_play_sensors(pl->pos, EMERGENCY_THRUST_ON_SOUND);
 	}
     } else {
 	if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	    CLR_BIT(pl->used, HAS_EMERGENCY_THRUST);
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-			       EMERGENCY_THRUST_OFF_SOUND);
+	    sound_play_sensors(pl->pos, EMERGENCY_THRUST_OFF_SOUND);
 	}
 	if (pl->emergency_thrust_left <= 0) {
 	    if (pl->item[ITEM_EMERGENCY_THRUST] <= 0)
@@ -236,8 +234,7 @@ void Emergency_shield (player *pl, int on)
 		SET_BIT(pl->have, HAS_SHIELD);
 		if (!BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
 		    SET_BIT(pl->used, HAS_EMERGENCY_SHIELD);
-		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-				       EMERGENCY_SHIELD_ON_SOUND);
+		    sound_play_sensors(pl->pos, EMERGENCY_SHIELD_ON_SOUND);
 		}
 	    }
 	}
@@ -252,8 +249,7 @@ void Emergency_shield (player *pl, int on)
 	}
 	if (BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
 	    CLR_BIT(pl->used, HAS_EMERGENCY_SHIELD);
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-			       EMERGENCY_SHIELD_OFF_SOUND);
+	    sound_play_sensors(pl->pos, EMERGENCY_SHIELD_OFF_SOUND);
 	}
     }
 }
@@ -274,14 +270,14 @@ void Autopilot(player *pl, int on)
 	pl->power = (MIN_PLAYER_POWER+MAX_PLAYER_POWER)/2.0;
 	pl->turnspeed = (MIN_PLAYER_TURNSPEED+MAX_PLAYER_TURNSPEED)/2.0;
 	pl->turnresistance = 0.2;
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, AUTOPILOT_ON_SOUND);
+	sound_play_sensors(pl->pos, AUTOPILOT_ON_SOUND);
     } else {
 	pl->power = pl->auto_power_s;
 	pl->turnacc = 0.0;
 	pl->turnspeed = pl->auto_turnspeed_s;
 	pl->turnresistance = pl->auto_turnresistance_s;
 	CLR_BIT(pl->used, HAS_AUTOPILOT);
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, AUTOPILOT_OFF_SOUND);
+	sound_play_sensors(pl->pos, AUTOPILOT_OFF_SOUND);
     }
 }
 
@@ -577,15 +573,13 @@ static void Cannon_update(void)
 	if (c->emergency_shield_left > 0) {
 	    if ((c->emergency_shield_left -= timeStep) <= 0) {
 		CLR_BIT(c->used, HAS_EMERGENCY_SHIELD);
-		sound_play_sensors(c->pos.cx, c->pos.cy,
-				   EMERGENCY_SHIELD_OFF_SOUND);
+		sound_play_sensors(c->pos, EMERGENCY_SHIELD_OFF_SOUND);
 	    }
 	}
 	if (c->phasing_left > 0) {
 	    if ((c->phasing_left -= timeStep) <= 0) {
 		CLR_BIT(c->used, HAS_PHASING_DEVICE);
-	        sound_play_sensors(c->pos.cx, c->pos.cy,
-				   PHASING_OFF_SOUND);
+	        sound_play_sensors(c->pos, PHASING_OFF_SOUND);
 	    }
 	}
     }
@@ -1146,7 +1140,7 @@ void Update_objects(void)
 		    }
 		}
 
-		sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
+		sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 		dest = World.wormholes[j].pos;
 
 	    } else { /* wormHoleHit == -1 */
@@ -1183,7 +1177,7 @@ void Update_objects(void)
 				       CLICK_TO_BLOCK(dest.cy));
 #endif
 		j = -2;
-		sound_play_sensors(pl->pos.cx, pl->pos.cy, HYPERJUMP_SOUND);
+		sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
 	    }
 
 	    /*
@@ -1244,7 +1238,7 @@ void Update_objects(void)
 	     */
 	    pl->warped = 12 * 1.0;
 
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
+	    sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 	}
 	/* end of somewhat-supported warping stuff */
 #endif

@@ -1911,7 +1911,7 @@ void Detach_ball(player *pl, ballobject *ball)
 	if (cnt == 0)
 	    CLR_BIT(pl->have, HAS_BALL);
 	else
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, DROP_BALL_SOUND);
+	    sound_play_sensors(pl->pos, DROP_BALL_SOUND);
     }
 }
 

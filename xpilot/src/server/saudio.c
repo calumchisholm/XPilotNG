@@ -133,7 +133,7 @@ void sound_play_all(int index)
  * is what the player can see on the screen. A volume is assigned to the
  * sound depending on the location within the sound range.
  */
-void sound_play_sensors(int cx, int cy, int index)
+void sound_play_sensors(clpos pos, int index)
 {
     int             i,
 		    volume;
@@ -151,8 +151,8 @@ void sound_play_sensors(int cx, int cy, int index)
 	if (!BIT(pl->status, WANT_AUDIO))
 	    continue;
 
-	dx = ABS(pl->pos.cx - cx);
-	dy = ABS(pl->pos.cy - cy);
+	dx = ABS(pl->pos.cx - pos.cx);
+	dy = ABS(pl->pos.cy - pos.cy);
 	range = sound_range(pl);
 
 	if (dx >= 0 && dx <= range && dy >= 0 && dy <= range) {

@@ -60,7 +60,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 	return;
     }
 
-    sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_EAT_LASER_SOUND);
+    sound_play_sensors(pl->pos, PLAYER_EAT_LASER_SOUND);
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	== (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	return;
@@ -134,8 +134,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 			"%s got roasted alive by cannonfire.",
 			pl->name);
 	    }
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-			       PLAYER_ROASTED_SOUND);
+	    sound_play_sensors(pl->pos, PLAYER_ROASTED_SOUND);
 	    Set_message(msg);
 	    if (kp && kp->id != pl->id) {
 		Rank_AddLaserKill(kp);

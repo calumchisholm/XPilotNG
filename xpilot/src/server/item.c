@@ -482,21 +482,25 @@ void General_tractor_beam(player *pl, int cx, int cy,
 		percent, force, dist;
     long	cost;
     int		theta;
+    clpos	pos;
 
-    dist = Wrap_length(cx - victim->pos.cx, cy - victim->pos.cy) / CLICK;
+    pos.cx = cx;
+    pos.cy = cy;
+    dist = Wrap_length(pos.cx - victim->pos.cx,
+		       pos.cy - victim->pos.cy) / CLICK;
     if (dist > maxdist)
 	return;
     percent = TRACTOR_PERCENT(dist, maxdist);
     cost = (long)TRACTOR_COST(percent);
     force = TRACTOR_FORCE(pressor, percent, maxforce);
 
-    sound_play_sensors(cx, cy,
-		       (pressor ? PRESSOR_BEAM_SOUND : TRACTOR_BEAM_SOUND));
+    sound_play_sensors(pos, pressor ? PRESSOR_BEAM_SOUND : TRACTOR_BEAM_SOUND);
 
     if (pl)
 	Add_fuel(&(pl->fuel), cost);
 
-    theta = (int)Wrap_cfindDir(cx - victim->pos.cx, cy - victim->pos.cy);
+    theta = (int)Wrap_cfindDir(pos.cx - victim->pos.cx,
+			       pos.cy - victim->pos.cy);
 
     if (pl) {
 	pl->vel.x += tcos(theta) * (force / pl->mass);
@@ -608,7 +612,7 @@ void Do_transporter(player *pl)
 
     /* no victims in range */
     if (!victim) {
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, TRANSPORTER_FAIL_SOUND);
+	sound_play_sensors(pl->pos, TRANSPORTER_FAIL_SOUND);
 	Add_fuel(&(pl->fuel), ED_TRANSPORTER);
 	pl->item[ITEM_TRANSPORTER]--;
 	return;
@@ -626,6 +630,10 @@ void Do_general_transporter(player *pl, int cx, int cy, player *victim,
     int			i;
     int			item = ITEM_FUEL;
     long		amount;
+    clpos		pos;
+
+    pos.cx = cx;
+    pos.cy = cy;
 
     /* choose item type to steal */
     for (i = 0; i < 50; i++) {
@@ -638,19 +646,18 @@ void Do_general_transporter(player *pl, int cx, int cy, player *victim,
 
     if (i == 50) {
 	/* you can't pluck from a bald chicken.. */
-	sound_play_sensors(cx, cy, TRANSPORTER_FAIL_SOUND);
+	sound_play_sensors(pos, TRANSPORTER_FAIL_SOUND);
 	if (!pl) {
 	    *amountp = 0;
 	    *itemp = -1;
 	}
 	return;
     } else {
-	sound_play_sensors(cx, cy, TRANSPORTER_SUCCESS_SOUND);
+	sound_play_sensors(pos, TRANSPORTER_SUCCESS_SOUND);
 	if (NumTransporters < MAX_TOTAL_TRANSPORTERS) {
 	    Transporters[NumTransporters] = (trans_t *)malloc(sizeof(trans_t));
 	    if (Transporters[NumTransporters] != NULL) {
-		Transporters[NumTransporters]->pos.cx = cx;
-		Transporters[NumTransporters]->pos.cy = cy;
+		Transporters[NumTransporters]->pos = pos;
 		Transporters[NumTransporters]->victim = victim;
 		Transporters[NumTransporters]->id = (pl ? pl->id : NO_ID);
 		Transporters[NumTransporters]->count = 5;
@@ -934,7 +941,7 @@ void Fire_general_ecm(player *pl, int team, int cx, int cy)
 	pl->ecmcount++;
 	pl->item[ITEM_ECM]--;
 	Add_fuel(&(pl->fuel), ED_ECM);
-	sound_play_sensors(cx, cy, ECM_SOUND);
+	sound_play_sensors(ecm->pos, ECM_SOUND);
     }
 
     for (i = 0; i < NumObjs; i++) {
@@ -967,9 +974,8 @@ void Fire_general_ecm(player *pl, int team, int cx, int cy)
 		}
 	    } else if ((pl && Team_immune(pl->id, owner_pl->id))
 		       || (BIT(World.rules->mode, TEAM_PLAY)
-			   && team == shot->team)) {
+			   && team == shot->team))
 		continue;
-	    }
 	}
 
 	switch (shot->type) {

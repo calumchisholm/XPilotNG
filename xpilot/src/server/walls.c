@@ -312,7 +312,7 @@ void Object_hits_target(object *obj, target_t *targ, long player_cost)
     if (!somebody_flag)
 	return;
 
-    sound_play_sensors(targ->pos.cx, targ->pos.cy, DESTROY_TARGET_SOUND);
+    sound_play_sensors(targ->pos, DESTROY_TARGET_SOUND);
 
     if (targets_remaining > 0) {
 	sc = Rate(kp->score, CANNON_SCORE)/4;
@@ -450,38 +450,38 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
     case CrashWall:
 	howfmt = "%s crashed%s against a wall";
 	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	break;
 
     case CrashWallSpeed:
 	howfmt = "%s smashed%s against a wall";
 	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	break;
 
     case CrashWallNoFuel:
 	howfmt = "%s smacked%s against a wall";
 	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	break;
 
     case CrashWallAngle:
 	howfmt = "%s was trashed%s against a wall";
 	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	break;
 
     case CrashTarget:
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), -1);
 	break;
 
     case CrashTreasure:
 	howfmt = "%s smashed%s against a treasure";
 	hudmsg = "[Treasure]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	break;
 
     case CrashCannon:
@@ -491,8 +491,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 		howfmt = "%s smashed%s against a cannon";
 		hudmsg = "[Cannon]";
-		sound_play_sensors(pl->pos.cx, pl->pos.cy,
-				   PLAYER_HIT_CANNON_SOUND);
+		sound_play_sensors(pl->pos, PLAYER_HIT_CANNON_SOUND);
 	    }
 	    if (!BIT(cannon->used, HAS_EMERGENCY_SHIELD)) {
 		/* pl gets points if the cannon is rammed with shields up */
@@ -508,13 +507,13 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
     case CrashUniverse:
 	howfmt = "%s left the known universe%s";
 	hudmsg = "[Universe]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	break;
 
     case CrashUnknown:
 	howfmt = "%s slammed%s into a programming error";
 	hudmsg = "[Bug]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
 	break;
     }
 
@@ -884,8 +883,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 		/* min,max life   */ 10, 10 + (intensity >> 1)
 		);
 #endif
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-			       PLAYER_BOUNCED_SOUND);
+	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
 		cost <<= FUEL_SCALE_BITS;
 		cost = (long)(cost * (wallBounceFuelDrainMult / 4.0));

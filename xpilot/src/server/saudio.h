@@ -41,7 +41,7 @@
 #define sound_player_on(player, on)
 #define sound_play_player(player, index)
 #define sound_play_all(index)
-#define sound_play_sensors(x, y, index)
+#define sound_play_sensors(pos, index)
 #define sound_play_queued(player)
 #define sound_close(player)
 
@@ -53,7 +53,7 @@ int		sound_player_init(player *);
 void		sound_player_on(player *pl, int on);
 void		sound_play_player(player *, int);
 void		sound_play_all(int);
-void		sound_play_sensors(int, int, int);
+void		sound_play_sensors(clpos, int);
 void		sound_play_queued(player * pl);
 void		sound_close(player * pl);
 
