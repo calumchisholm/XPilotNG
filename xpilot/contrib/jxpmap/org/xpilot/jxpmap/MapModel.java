@@ -184,6 +184,7 @@ public class MapModel {
         private Map opMap;
         private int ballAreaTeam;
         private int ballTargetTeam;
+        private boolean decor;
 
 
         public MapDocumentHandler () {
@@ -194,6 +195,7 @@ public class MapModel {
             opMap = new HashMap();
             ballAreaTeam = -1;
             ballTargetTeam = -1;
+            decor = false;
         }
         
 
@@ -218,6 +220,8 @@ public class MapModel {
                     } else if (ballTargetTeam != -1) {
                         poly.type = MapPolygon.TYPE_BALLTARGET;
                         poly.team = ballTargetTeam;
+                    } else if (decor) {
+                        poly.type = MapPolygon.TYPE_DECORATION;
                     }
                     
                 } else if (name.equalsIgnoreCase("offset")) {
@@ -329,7 +333,10 @@ public class MapModel {
 
                     ballTargetTeam = Integer.parseInt(atts.getValue("team"));
 
-                } else if (name.equalsIgnoreCase("scale")) {
+                } else if (name.equalsIgnoreCase("decor")) {
+
+                    decor = true;
+
                 }
 
             } catch (Exception e) {
@@ -350,6 +357,9 @@ public class MapModel {
 
                 } else if (name.equalsIgnoreCase("balltarget")) {
                     ballTargetTeam = -1;
+
+                } else if (name.equalsIgnoreCase("decor")) {
+                    decor = false;
 
                 }
             } catch (Exception e) {

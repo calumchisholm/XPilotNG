@@ -16,6 +16,7 @@ public class MapPolygon extends MapObject {
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_BALLAREA = 1;
     public static final int TYPE_BALLTARGET = 2;
+    public static final int TYPE_DECORATION = 3;
 
 
     protected Polygon polygon;
@@ -132,7 +133,7 @@ public class MapPolygon extends MapObject {
     
     public void printXml (PrintWriter out) throws IOException {
 
-        if (polygon.npoints == 0) return;
+        if (polygon.npoints < 2) return;
 
         if (getType() == TYPE_BALLAREA) {
             out.print("<BallArea team=\"");
@@ -142,6 +143,8 @@ public class MapPolygon extends MapObject {
             out.print("<BallTarget team=\"");
             out.print(getTeam());
             out.println("\">");
+        } else if (getType() == TYPE_DECORATION) {
+            out.println("<Decor>");
         }
 
         out.print("<Polygon x=\"");
@@ -203,6 +206,8 @@ public class MapPolygon extends MapObject {
             out.println("</BallArea>");
         } else if (getType() == TYPE_BALLTARGET) {
             out.println("</BallTarget>");
+        } else if (getType() == TYPE_DECORATION) {
+            out.println("</Decor>");
         }
     }
     

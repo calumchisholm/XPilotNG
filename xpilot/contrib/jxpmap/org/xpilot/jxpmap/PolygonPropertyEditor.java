@@ -36,7 +36,9 @@ public class PolygonPropertyEditor extends EditorPanel {
         cmbType.addItem("Normal");
         cmbType.addItem("Ball area");
         cmbType.addItem("Ball target");
-        cmbStyle.setSelectedIndex(polygon.getType());
+        cmbType.addItem("Decoration");
+
+        cmbType.setSelectedIndex(polygon.getType());
         add(cmbType);
         
         add(new JLabel("Team:"));
