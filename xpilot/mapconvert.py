@@ -403,7 +403,7 @@ def convert(options):
 		l[0] = int(l[0] + sin(1. * l[0] * l[1] / 2786) * (2240 / 3)) % mxc
 		l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
 
-    print "<XPilotMap>"
+    print '<XPilotMap version="1.0">'
 
     mapd = options['mapdata']
     del options['mapdata']
@@ -419,6 +419,8 @@ def convert(options):
     print '<Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>'
 
     for p in polys2:
+        while center(p[-1][0] - p[-2][0], mxc) * center(p[0][1] - p[-1][1], myc) == center(p[-1][1] - p[-2][1], myc) * center(p[0][0] - p[-1][0], mxc):
+            p.insert(0, p.pop())
 	print '<Polygon x="%d" y="%d" style="xpblue">' % tuple(p[-1][:2])
 	x = p[-1][0]
 	y = p[-1][1]
