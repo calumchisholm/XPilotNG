@@ -578,31 +578,44 @@ void Paint_score_entry(int entry_num,
      * Draw the line
      * e94_msu eKthHacks
      */
-    if (strchr("DPW", other->mychar)
-	&& !mono) {
+    if (mono)
+	ShadowDrawString(dpy, players, scoreListGC, SCORE_BORDER, thisLine,
+			 label, colors[scoreColor].pixel, colors[BLACK].pixel);
+    else {
+	int color;
 
-	if (other->id == self->id)
-	    XSetForeground(dpy, scoreListGC,
-			   colors[scoreInactiveSelfColor].pixel);
-	else
-	    XSetForeground(dpy, scoreListGC, colors[scoreInactiveColor].pixel);
+	if (!is_team && strchr("DPW", other->mychar)) {
+	    if (other->id == self->id)
+		color = scoreInactiveSelfColor;
+	    else
+		color = scoreInactiveColor;
 
-	XDrawString(dpy, players, scoreListGC,
-		    SCORE_BORDER, thisLine,
-		    label, strlen(label));
-    } else {
-	if (!mono &&
-	    other->id == self->id)
+	    XSetForeground(dpy, scoreListGC, colors[color].pixel);
+	    XDrawString(dpy, players, scoreListGC,
+			SCORE_BORDER, thisLine,
+			label, strlen(label));
+	} else {
+	    if (!is_team) {
+		if (other->id == self->id)
+		    color = scoreSelfColor;
+		else
+		    color = scoreColor;
+	    } else {
+		color = Team_color(other->team);
+
+		if (!color) {
+		    if (other->team == self->team)
+			color = scoreOwnTeamColor;
+		    else
+			color = scoreEnemyTeamColor;
+		}
+	    }
+
 	    ShadowDrawString(dpy, players, scoreListGC, SCORE_BORDER,
 			     thisLine, label,
-			     colors[scoreSelfColor].pixel,
+			     colors[color].pixel,
 			     colors[BLACK].pixel);
-	else
-	    ShadowDrawString(dpy, players, scoreListGC,
-			     SCORE_BORDER, thisLine,
-			     label,
-			     colors[scoreColor].pixel,
-			     colors[BLACK].pixel);
+	}
     }
 
     /*
