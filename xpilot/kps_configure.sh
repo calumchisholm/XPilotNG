@@ -11,10 +11,14 @@ export CFLAGS_C=" \
 -Wsequence-point \
 -Wbad-function-cast \
 "
+# -DKPS_TEST=1 \
+# -DDEVELOPMENT=1 \
+# -O2 \
 
 export CFLAGS=" \
 -O2 \
 -g \
+-Wno-long-long \
 -Wall \
 -Wmissing-prototypes \
 -Wstrict-prototypes \
@@ -44,7 +48,8 @@ export CFLAGS=" \
 "
 
 if [ "x$CC" != "xg++" ]; then
-    CFLAGS="$CFLAGS $CFLAGS_C"
+    export CFLAGS="$CFLAGS $CFLAGS_C"
 fi
 
-./configure --prefix=$HOME
+./configure --prefix=$HOME --enable-sound
+
