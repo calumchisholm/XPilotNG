@@ -176,8 +176,9 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 	Segment_add(color, x+mw3_4, y-1,	x+mw3_4, y+meterHeight+1);
     }
 
-    if (!meterBorderColor)
+    if (!meterBorderColor) {
 	SET_FG(colors[meter_color].pixel);
+    }
 
     rd.drawString(dpy, p_draw, gc,
 		  (xstr), WINSCALE(y)+(gameFont->ascent+meterHeight)/2,
@@ -481,7 +482,7 @@ void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
     const int		BORDER = 3;
     char		str[50];
     int			vert_pos, horiz_pos;
-    int			i, j, maxWidth = -1,
+    int			i, maxWidth = -1,
 			rect_x, rect_y, rect_width, rect_height;
     static int		vertSpacing = -1;
 

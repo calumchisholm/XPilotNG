@@ -739,7 +739,7 @@ static void Frame_shots(int conn, int ind)
 {
     player			*pl = Players[ind];
     int				cx, cy;
-    int				lcx, lcy, ldir;
+    int				lcx = -1, lcy = -1, ldir = 0;
     int				i, k, color;
     int				fuzz = 0, teamshot, len;
     int				obj_count;
