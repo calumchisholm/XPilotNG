@@ -203,7 +203,7 @@ static option_desc opts[] = {
     {
 	"shotHitFuelDrainUsesKineticEnergy",
 	"kineticEnergyFuelDrain",
-	"yes",
+	"true",
 	&options.shotHitFuelDrainUsesKineticEnergy,
 	valBool,
 	tuner_dummy,
@@ -611,7 +611,7 @@ static option_desc opts[] = {
     {
 	"allowPlayerCrashes",
 	"allowPlayerCrashes",
-	"yes",
+	"true",
 	&options.allowPlayerCrashes,
 	valBool,
 	Set_world_rules,
@@ -621,7 +621,7 @@ static option_desc opts[] = {
     {
 	"allowPlayerBounces",
 	"allowPlayerBounces",
-	"yes",
+	"true",
 	&options.allowPlayerBounces,
 	valBool,
 	Set_world_rules,
@@ -631,7 +631,7 @@ static option_desc opts[] = {
     {
 	"allowPlayerKilling",
 	"killings",
-	"yes",
+	"true",
 	&options.allowPlayerKilling,
 	valBool,
 	Set_world_rules,
@@ -641,7 +641,7 @@ static option_desc opts[] = {
     {
 	"allowShields",
 	"shields",
-	"yes",
+	"true",
 	&options.allowShields,
 	valBool,
 	tuner_allowshields,
@@ -651,7 +651,7 @@ static option_desc opts[] = {
     {
 	"playerStartsShielded",
 	"playerStartShielded",
-	"yes",
+	"true",
 	&options.playerStartsShielded,
 	valBool,
 	tuner_playerstartsshielded,
@@ -661,7 +661,7 @@ static option_desc opts[] = {
     {
 	"shotsWallBounce",
 	"shotsWallBounce",
-	"no",
+	"false",
 	&options.shotsWallBounce,
 	valBool,
 	Move_init,
@@ -671,7 +671,7 @@ static option_desc opts[] = {
     {
 	"ballsWallBounce",
 	"ballsWallBounce",
-	"yes",
+	"true",
 	&options.ballsWallBounce,
 	valBool,
 	Move_init,
@@ -681,7 +681,7 @@ static option_desc opts[] = {
     {
 	"ballCollisions",
 	"ballCollisions",
-	"no",
+	"false",
 	&options.ballCollisions,
 	valBool,
 	tuner_dummy,
@@ -691,7 +691,7 @@ static option_desc opts[] = {
     {
 	"ballSparkCollisions",
 	"ballSparkCollisions",
-	"yes",
+	"true",
 	&options.ballSparkCollisions,
 	valBool,
 	tuner_dummy,
@@ -701,7 +701,7 @@ static option_desc opts[] = {
     {
 	"minesWallBounce",
 	"minesWallBounce",
-	"no",
+	"false",
 	&options.minesWallBounce,
 	valBool,
 	Move_init,
@@ -711,7 +711,7 @@ static option_desc opts[] = {
     {
 	"itemsWallBounce",
 	"itemsWallBounce",
-	"yes",
+	"true",
 	&options.itemsWallBounce,
 	valBool,
 	Move_init,
@@ -721,7 +721,7 @@ static option_desc opts[] = {
     {
 	"missilesWallBounce",
 	"missilesWallBounce",
-	"no",
+	"false",
 	&options.missilesWallBounce,
 	valBool,
 	Move_init,
@@ -731,7 +731,7 @@ static option_desc opts[] = {
     {
 	"sparksWallBounce",
 	"sparksWallBounce",
-	"yes",
+	"true",
 	&options.sparksWallBounce,
 	valBool,
 	Move_init,
@@ -742,7 +742,7 @@ static option_desc opts[] = {
     {
 	"debrisWallBounce",
 	"debrisWallBounce",
-	"no",
+	"false",
 	&options.debrisWallBounce,
 	valBool,
 	Move_init,
@@ -752,7 +752,7 @@ static option_desc opts[] = {
     {
 	"asteroidsWallBounce",
 	"asteroidsWallBounce",
-	"yes",
+	"true",
 	&options.asteroidsWallBounce,
 	valBool,
 	Move_init,
@@ -762,7 +762,7 @@ static option_desc opts[] = {
     {
 	"pulsesWallBounce",
 	"pulsesWallBounce",
-	"no",
+	"false",
 	&options.pulsesWallBounce,
 	valBool,
 	Move_init,
@@ -772,7 +772,7 @@ static option_desc opts[] = {
     {
 	"cloakedExhaust",
 	"cloakedExhaust",
-	"yes",
+	"true",
 	&options.cloakedExhaust,
 	valBool,
 	tuner_dummy,
@@ -920,7 +920,7 @@ static option_desc opts[] = {
     {
 	"reportToMetaServer",
 	"reportMeta",
-	"yes",
+	"true",
 	&options.reportToMetaServer,
 	valBool,
 	tuner_none,
@@ -940,7 +940,7 @@ static option_desc opts[] = {
     {
 	"searchDomainForXPilot",
 	"searchDomainForXPilot",
-	"no",
+	"false",
 	&options.searchDomainForXPilot,
 	valBool,
 	tuner_none,
@@ -961,7 +961,7 @@ static option_desc opts[] = {
     {
 	"limitedVisibility",
 	"limitedVisibility",
-	"no",
+	"false",
 	&options.limitedVisibility,
 	valBool,
 	Set_world_rules,
@@ -991,7 +991,7 @@ static option_desc opts[] = {
     {
 	"limitedLives",
 	"limitedLives",
-	"no",
+	"false",
 	&options.limitedLives,
 	valBool,
 	tuner_none,
@@ -1012,7 +1012,7 @@ static option_desc opts[] = {
     {
 	"reset",
 	"reset",
-	"yes",
+	"true",
 	&options.endOfRoundReset,
 	valBool,
 	tuner_dummy,
@@ -1052,7 +1052,7 @@ static option_desc opts[] = {
     {
 	"allowAlliances",
 	"alliances",
-	"yes",
+	"true",
 	&options.allowAlliances,
 	valBool,
 	tuner_allowalliances,
@@ -1074,7 +1074,7 @@ static option_desc opts[] = {
     {
 	"announceAlliances",
 	"announceAlliances",
-	"no",
+	"false",
 	&options.announceAlliances,
 	valBool,
 	tuner_announcealliances,
@@ -1087,7 +1087,7 @@ static option_desc opts[] = {
     {
 	"teamPlay",
 	"teams",
-	"no",
+	"false",
 	&options.teamPlay,
 	valBool,
 	tuner_none,
@@ -1108,7 +1108,7 @@ static option_desc opts[] = {
     {
 	"teamFuel",
 	"teamFuel",
-	"no",
+	"false",
 	&options.teamFuel,
 	valBool,
 	tuner_dummy,
@@ -1118,7 +1118,7 @@ static option_desc opts[] = {
     {
 	"teamCannons",
 	"teamCannons",
-	"no",
+	"false",
 	&options.teamCannons,
 	valBool,
 	tuner_teamcannons,
@@ -1142,7 +1142,7 @@ static option_desc opts[] = {
     {
 	"cannonsPickupItems",
 	"cannonsPickupItems",
-	"no",
+	"false",
 	&options.cannonsPickupItems,
 	valBool,
 	Move_init,
@@ -1152,7 +1152,7 @@ static option_desc opts[] = {
     {
 	"cannonFlak",
 	"cannonAAA",
-	"yes",
+	"true",
 	&options.cannonFlak,
 	valBool,
 	tuner_dummy,
@@ -1417,7 +1417,7 @@ static option_desc opts[] = {
     {
 	"keepShots",
 	"keepShots",
-	"no",
+	"false",
 	&options.keepShots,
 	valBool,
 	tuner_dummy,
@@ -1427,7 +1427,7 @@ static option_desc opts[] = {
     {
 	"teamImmunity",
 	"teamImmunity",
-	"yes",
+	"true",
 	&options.teamImmunity,
 	valBool,
 	Team_immunity_init,
@@ -1438,7 +1438,7 @@ static option_desc opts[] = {
     {
 	"ecmsReprogramMines",
 	"ecmsReprogramMines",
-	"yes",
+	"true",
 	&options.ecmsReprogramMines,
 	valBool,
 	tuner_dummy,
@@ -1448,7 +1448,7 @@ static option_desc opts[] = {
     {
 	"ecmsReprogramRobots",
 	"ecmsReprogramRobots",
-	"yes",
+	"true",
 	&options.ecmsReprogramRobots,
 	valBool,
 	tuner_dummy,
@@ -1458,7 +1458,7 @@ static option_desc opts[] = {
     {
 	"targetKillTeam",
 	"targetKillTeam",
-	"no",
+	"false",
 	&options.targetKillTeam,
 	valBool,
 	tuner_dummy,
@@ -1468,7 +1468,7 @@ static option_desc opts[] = {
     {
 	"targetTeamCollision",
 	"targetCollision",
-	"yes",
+	"true",
 	&options.targetTeamCollision,
 	valBool,
 	Target_init,
@@ -1478,7 +1478,7 @@ static option_desc opts[] = {
     {
 	"targetSync",
 	"targetSync",
-	"no",
+	"false",
 	&options.targetSync,
 	valBool,
 	tuner_dummy,
@@ -1499,7 +1499,7 @@ static option_desc opts[] = {
     {
 	"treasureKillTeam",
 	"treasureKillTeam",
-	"no",
+	"false",
 	&options.treasureKillTeam,
 	valBool,
 	tuner_dummy,
@@ -1509,7 +1509,7 @@ static option_desc opts[] = {
     {
 	"captureTheFlag",
 	"ctf",
-	"no",
+	"false",
 	&options.captureTheFlag,
 	valBool,
 	tuner_dummy,
@@ -1531,7 +1531,7 @@ static option_desc opts[] = {
     {
 	"treasureCollisionDestroys",
 	"treasureCollisionDestroy",
-	"yes",
+	"true",
 	&options.treasureCollisionDestroys,
 	valBool,
 	tuner_dummy,
@@ -1581,7 +1581,7 @@ static option_desc opts[] = {
     {
 	"connectorIsString",
 	"connectorIsString",
-	"no",
+	"false",
 	&options.connectorIsString,
 	valBool,
 	tuner_dummy,
@@ -1604,7 +1604,7 @@ static option_desc opts[] = {
     {
 	"treasureCollisionMayKill",
 	"treasureUnshieldedCollisionKills",
-	"no",
+	"false",
 	&options.treasureCollisionMayKill,
 	valBool,
 	tuner_dummy,
@@ -1614,7 +1614,7 @@ static option_desc opts[] = {
     {
 	"wreckageCollisionMayKill",
 	"wreckageUnshieldedCollisionKills",
-	"no",
+	"false",
 	&options.wreckageCollisionMayKill,
 	valBool,
 	tuner_dummy,
@@ -1624,7 +1624,7 @@ static option_desc opts[] = {
     {
 	"asteroidCollisionMayKill",
 	"asteroidUnshieldedCollisionKills",
-	"yes",
+	"true",
 	&options.asteroidCollisionMayKill,
 	valBool,
 	tuner_dummy,
@@ -1644,7 +1644,7 @@ static option_desc opts[] = {
     {
 	"tagGame",
  	"tag",
- 	"no",
+ 	"false",
  	&options.tagGame,
  	valBool,
  	Tune_tagGame,
@@ -1678,7 +1678,7 @@ static option_desc opts[] = {
     {
 	"timing",
 	"race",
-	"no",
+	"false",
 	&options.timing,
 	valBool,
 	tuner_none,
@@ -1710,7 +1710,7 @@ static option_desc opts[] = {
     {
 	"edgeWrap",
 	"edgeWrap",
-	"no",
+	"false",
 	&options.edgeWrap,
 	valBool,
 	tuner_none,
@@ -1720,7 +1720,7 @@ static option_desc opts[] = {
     {
 	"edgeBounce",
 	"edgeBounce",
-	"yes",
+	"true",
 	&options.edgeBounce,
 	valBool,
 	tuner_dummy,
@@ -1730,7 +1730,7 @@ static option_desc opts[] = {
     {
 	"extraBorder",
 	"extraBorder",
-	"no",
+	"false",
 	&options.extraBorder,
 	valBool,
 	tuner_none,
@@ -1902,16 +1902,6 @@ static option_desc opts[] = {
 	tuner_none,
 	"The maximum size in bytes of the admin message file.\n",
 	OPT_COMMAND | OPT_DEFAULTS
-    },
-    {
-	"zeroSumScoring",
-	"zeroSum",
-	"false",
-	&options.zeroSumScoring,
-	valBool,
-	tuner_dummy,
-	"Use Zero sum scoring or not.\n",
-	OPT_COMMAND | OPT_VISIBLE
     },
     {
 	"rankFileName",
@@ -3612,7 +3602,7 @@ static option_desc opts[] = {
     {
 	"constantScoring",
 	"constantScoring",
-	"no",
+	"false",
 	&options.constantScoring,
 	valBool,
 	tuner_dummy,
@@ -3620,9 +3610,19 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"zeroSumScoring",
+	"zeroSum",
+	"false",
+	&options.zeroSumScoring,
+	valBool,
+	tuner_dummy,
+	"Use Zero sum scoring?\n",
+	OPT_COMMAND | OPT_VISIBLE
+    },
+    {
 	"elimination",
 	"elimination",
-	"no",
+	"false",
 	&options.eliminationRace,
 	valBool,
 	tuner_dummy,
