@@ -26,15 +26,19 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
+#include <limits.h>
 #include <signal.h>
 #include <setjmp.h>
 #include <string.h>
 #include <time.h>
 
 #include <sys/types.h>
+#include <sys/file.h>
+#include <sys/stat.h>
 
 #ifndef _WINDOWS
 # include <unistd.h>
@@ -43,8 +47,12 @@
 #  include <sys/time.h>
 # endif
 # ifdef _AIX
+#  ifndef _BSD_INCLUDES
+#   define _BSD_INCLUDES
+#  endif
 #  include <sys/select.h>
 # endif
+# include <sys/file.h>
 # include <sys/param.h>
 # include <sys/ioctl.h>
 # include <sys/socket.h>
@@ -73,19 +81,12 @@
 # include <resolv.h>
 #endif
 
-#ifdef PLOCKSERVER
-# if defined(__linux__)
-#  include <sys/mman.h>
-# else
-#  include <sys/lock.h>
-# endif
-#endif
-
 #if defined(_WINDOWS)
 # include "NT/winNet.h"
   /* need this for printf wrappers. */
 # ifdef	_XPILOTNTSERVER_
 #  include "../server/NT/winServer.h"
+#  include "../server/NT/winSvrThread.h"
 extern char *showtime(void);
 # elif !defined(_XPMONNT_)
 #  include "NT/winX.h"
@@ -96,6 +97,7 @@ static void Win_show_error(char *errmsg);
 
 #ifdef _WINDOWS
 # include <windows.h>
+# include <io.h>
 # include <process.h>
 # include "NT/winNet.h"
 # undef	va_start
@@ -120,11 +122,13 @@ static void Win_show_error(char *errmsg);
 #include "const.h"
 #include "draw.h"
 #include "error.h"
+#include "item.h"
 #include "list.h"
 #include "net.h"
 #include "pack.h"
 #include "packet.h"
 #include "portability.h"
+#include "rules.h"
 #include "socklib.h"
 
 #undef HAVE_STDARG

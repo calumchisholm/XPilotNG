@@ -125,8 +125,8 @@ LINUX_LPLUS = $(LINUX_CFLAGS)
 # Client can be single-threaded.
 #
 OS2_CC = gcc
-#OS2_CFLAGS = $(DEFS) $(INCS) -fno-strength-reduce -Zmtd -Zbsd-signals -I. -I$(X11ROOT)/xfree86/include -DWINDOWSCALING -DMBX -D__ST_MT_ERRNO__ -D_OS2_ -DFUNCPROTO=15 -DNARROWPROTO -Dstrncasecmp=strnicmp -Dstrcasecmp=stricmp
-OS2_CFLAGS = $(DEFS) $(INCS) -fno-strength-reduce -Zmtd -Zbsd-signals -I. -I$(X11ROOT)/xfree86/include -DWINDOWSCALING -DMBX -D__ST_MT_ERRNO__ -D_OS2_ -DFUNCPROTO=15 -DNARROWPROTO
+#OS2_CFLAGS = $(DEFS) $(INCS) -fno-strength-reduce -Zmtd -Zbsd-signals -I. -I$(X11ROOT)/xfree86/include -DMBX -D__ST_MT_ERRNO__ -D_OS2_ -DFUNCPROTO=15 -DNARROWPROTO -Dstrncasecmp=strnicmp -Dstrcasecmp=stricmp
+OS2_CFLAGS = $(DEFS) $(INCS) -fno-strength-reduce -Zmtd -Zbsd-signals -I. -I$(X11ROOT)/xfree86/include -DMBX -D__ST_MT_ERRNO__ -D_OS2_ -DFUNCPROTO=15 -DNARROWPROTO
 OS2_OPT = -O2
 OS2_MLIB = -lsocket -lbsd -lm -Zbin-files -Zexe
 OS2_XLIB = -L$(X11ROOT)/xfree86/lib -L$(LIBRARY_PATH) -lX11 -lXext
@@ -524,24 +524,47 @@ depend-replay:
 	cd replay && gcc -MM -I../common -I../client $(SRCS3) >> ../Makefile.std
 
 # DO NOT DELETE
-checknames.o: checknames.c version.h xpconfig.h commonproto.h types.h \
-  const.h error.h pack.h checknames.h
-config.o: config.c version.h xpconfig.h
-error.o: error.c version.h xpconfig.h const.h types.h error.h \
-  portability.h commonproto.h
-list.o: list.c list.h
-math.o: math.c version.h xpconfig.h const.h types.h error.h commonproto.h
-net.o: net.c version.h xpconfig.h const.h types.h error.h net.h socklib.h \
-  packet.h bit.h
-portability.o: portability.c version.h xpconfig.h portability.h \
-  commonproto.h types.h
+checknames.o: checknames.c xpcommon.h version.h xpconfig.h bit.h \
+  checknames.h commonproto.h types.h const.h draw.h ../server/click.h \
+  error.h item.h list.h net.h socklib.h pack.h packet.h portability.h \
+  rules.h
+config.o: config.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
+error.o: error.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
+list.o: list.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
+math.o: math.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
+net.o: net.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
+portability.o: portability.c xpcommon.h version.h xpconfig.h bit.h \
+  checknames.h commonproto.h types.h const.h draw.h ../server/click.h \
+  error.h item.h list.h net.h socklib.h pack.h packet.h portability.h \
+  rules.h
 randommt.o: randommt.c
-shipshape.o: shipshape.c version.h xpconfig.h const.h types.h draw.h \
-  ../server/click.h error.h
-socklib.o: socklib.c version.h socklib.h commonproto.h types.h
-strcasecmp.o: strcasecmp.c
-strdup.o: strdup.c error.h commonproto.h types.h
-strlcpy.o: strlcpy.c commonproto.h types.h
+shipshape.o: shipshape.c xpcommon.h version.h xpconfig.h bit.h \
+  checknames.h commonproto.h types.h const.h draw.h ../server/click.h \
+  error.h item.h list.h net.h socklib.h pack.h packet.h portability.h \
+  rules.h
+socklib.o: socklib.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
+strcasecmp.o: strcasecmp.c xpcommon.h version.h xpconfig.h bit.h \
+  checknames.h commonproto.h types.h const.h draw.h ../server/click.h \
+  error.h item.h list.h net.h socklib.h pack.h packet.h portability.h \
+  rules.h
+strdup.o: strdup.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
+strlcpy.o: strlcpy.c xpcommon.h version.h xpconfig.h bit.h checknames.h \
+  commonproto.h types.h const.h draw.h ../server/click.h error.h item.h \
+  list.h net.h socklib.h pack.h packet.h portability.h rules.h
 xpmemory.o: xpmemory.c error.h commonproto.h types.h
 about.o: about.c xpclient.h ../common/version.h ../common/xpconfig.h \
   ../common/astershape.h ../common/types.h ../common/bit.h \
@@ -1045,465 +1068,475 @@ xpmread.o: xpmread.c xpclient.h ../common/version.h ../common/xpconfig.h \
   guiobjects.h ignore.h netclient.h paint.h paintdata.h paintmacros.h \
   protoclient.h record.h recordfmt.h talk.h texture.h widget.h xevent.h \
   xeventhandlers.h xinit.h xpmread.h
-alliance.o: alliance.c xpserver.h ../common/version.h \
+alliance.o: alliance.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+asteroid.o: asteroid.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+auth.o: auth.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-asteroid.o: asteroid.c xpserver.h ../common/version.h \
+cannon.o: cannon.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-auth.o: auth.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-cannon.o: cannon.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-cell.o: cell.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-cmdline.o: cmdline.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-collision.o: collision.c xpserver.h ../common/version.h \
+cell.o: cell.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-command.o: command.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-contact.o: contact.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-event.o: event.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-fileparser.o: fileparser.c xpserver.h ../common/version.h \
+cmdline.o: cmdline.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-frame.o: frame.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-id.o: id.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-item.o: item.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-laser.o: laser.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-map.o: map.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-metaserver.o: metaserver.c xpserver.h ../common/version.h \
+collision.o: collision.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+command.o: command.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-netserver.o: netserver.c xpserver.h ../common/version.h \
+contact.o: contact.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-object.o: object.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-objpos.o: objpos.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-option.o: option.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-parser.o: parser.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-play.o: play.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-player.o: player.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-polygon.o: polygon.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-rank.o: rank.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-recwrap.o: recwrap.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-robot.o: robot.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-robotdef.o: robotdef.c xpserver.h ../common/version.h \
+event.o: event.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-rules.o: rules.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-saudio.o: saudio.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-sched.o: sched.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-score.o: score.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-server.o: server.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-ship.o: ship.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-shipshape_s.o: shipshape_s.c xpserver.h ../common/version.h \
+fileparser.o: fileparser.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+frame.o: frame.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-shot.o: shot.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-showtime.o: showtime.c xpserver.h ../common/version.h \
+id.o: id.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-srecord.o: srecord.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-tuner.o: tuner.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-update.o: update.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-walls.o: walls.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
-  score.h server.h srecord.h tuner.h walls.h
-walls_old.o: walls_old.c xpserver.h ../common/version.h \
+item.o: item.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
   ../common/commonproto.h ../common/types.h ../common/const.h \
-  ../common/draw.h ../server/click.h ../common/error.h global.h object.h \
-  serverconst.h ../common/keys.h ../common/item.h rank.h map.h \
-  ../common/rules.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/portability.h proto.h defaults.h asteroid.h \
-  auth.h cannon.h click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-wildmap.o: wildmap.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+laser.o: laser.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-xpmap.o: xpmap.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+map.o: map.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
-xp2map.o: xp2map.c xpserver.h ../common/version.h ../common/xpconfig.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/types.h ../common/const.h ../common/draw.h ../server/click.h \
-  ../common/error.h global.h object.h serverconst.h ../common/keys.h \
-  ../common/item.h rank.h map.h ../common/rules.h ../common/list.h \
-  ../common/net.h ../common/socklib.h ../common/pack.h \
-  ../common/portability.h proto.h defaults.h asteroid.h auth.h cannon.h \
-  click.h connection.h metaserver.h netserver.h objpos.h \
-  ../common/packet.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+metaserver.o: metaserver.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+netserver.o: netserver.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+object.o: object.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+objpos.o: objpos.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+option.o: option.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+parser.o: parser.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+play.o: play.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+player.o: player.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+polygon.o: polygon.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+rank.o: rank.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+recwrap.o: recwrap.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+robot.o: robot.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+robotdef.o: robotdef.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+rules.o: rules.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+saudio.o: saudio.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+sched.o: sched.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+score.o: score.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+server.o: server.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+ship.o: ship.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+shipshape_s.o: shipshape_s.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+shot.o: shot.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+showtime.o: showtime.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+srecord.o: srecord.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+tuner.o: tuner.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+update.o: update.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+walls.o: walls.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+walls_old.o: walls_old.c xpserver.h ../common/xpcommon.h \
+  ../common/version.h ../common/xpconfig.h ../common/bit.h \
+  ../common/checknames.h ../common/commonproto.h ../common/types.h \
+  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
+  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
+  ../common/pack.h ../common/packet.h ../common/portability.h \
+  ../common/rules.h asteroid.h auth.h cannon.h click.h connection.h \
+  defaults.h global.h object.h serverconst.h ../common/keys.h rank.h \
+  map.h metaserver.h netserver.h objpos.h proto.h recwrap.h robot.h \
+  saudio.h sched.h ../common/setup.h score.h server.h srecord.h tuner.h \
+  walls.h
+wildmap.o: wildmap.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+xpmap.o: xpmap.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
+  score.h server.h srecord.h tuner.h walls.h
+xp2map.o: xp2map.c xpserver.h ../common/xpcommon.h ../common/version.h \
+  ../common/xpconfig.h ../common/bit.h ../common/checknames.h \
+  ../common/commonproto.h ../common/types.h ../common/const.h \
+  ../common/draw.h ../server/click.h ../common/error.h ../common/item.h \
+  ../common/list.h ../common/net.h ../common/socklib.h ../common/pack.h \
+  ../common/packet.h ../common/portability.h ../common/rules.h asteroid.h \
+  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
+  serverconst.h ../common/keys.h rank.h map.h metaserver.h netserver.h \
+  objpos.h proto.h recwrap.h robot.h saudio.h sched.h ../common/setup.h \
   score.h server.h srecord.h tuner.h walls.h
 xp-replay.o: xp-replay.c ../client/recordfmt.h ../common/item.h buttons.h \
   xp-replay.h ../client/items/itemRocketPack.xbm \
