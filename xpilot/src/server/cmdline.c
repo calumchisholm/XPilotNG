@@ -545,10 +545,7 @@ static option_desc opts[] = {
 	&options.mapFileName,
 	valString,
 	tuner_none,
-	"The filename of the map to use.\n"
-	"Or \"wild\" if you want a map by The Wild Map Generator.\n"
-	"The geometry of a \"wild\" map is given by the -mapWidth\n"
-	"and the -mapHeight options.\n",
+	"The filename of the map to use.\n",
 	OPT_COMMAND | OPT_DEFAULTS
     },
     {
