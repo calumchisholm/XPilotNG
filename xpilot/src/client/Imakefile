@@ -8,32 +8,11 @@ COMMON = ../common/
 /*
  * Sound configuration
  */
-#if defined(NCD_SOUND)
-  AUDIOINC = $(NCDAUDIOINC)
-  AUDIOLIB = $(NCDAUDIOLIB)
-  AUDIOSRC = ncdaudio.c
-  AUDIOOBJ = ncdaudio.o
-  AUDIODEF = -DSOUND
-#else
 #if defined(RPLAY_SOUND)
   AUDIOINC = $(RPLAYAUDIOINC)
   AUDIOLIB = $(RPLAYAUDIOLIB)
   AUDIOSRC = rplayaudio.c
   AUDIOOBJ = rplayaudio.o
-  AUDIODEF = -DSOUND
-#else
-#if defined(AF_SOUND)
-  AUDIOINC = $(AFAUDIOINC)
-  AUDIOLIB = $(AFAUDIOLIB)
-  AUDIOSRC = afaudio.c
-  AUDIOOBJ = afaudio.o
-  AUDIODEF = -DSOUND
-#else
-#if defined(HP_SOUND)
-  AUDIOINC = $(HPAUDIOINC)
-  AUDIOLIB = $(HPAUDIOLIB)
-  AUDIOSRC = hpaudio.c
-  AUDIOOBJ = hpaudio.o
   AUDIODEF = -DSOUND
 #else	/* no sound */
 #if defined(DEBUG_SOUND)
@@ -49,10 +28,7 @@ COMMON = ../common/
   AUDIOOBJ =
   AUDIODEF =
 #endif /* DEBUG_SOUND */
-#endif /* HP_SOUND */
-#endif /* AF_SOUND */
 #endif /* RPLAY_SOUND */
-#endif /* NCD_SOUND */
 
 #ifdef Erase
 DEFS_ERASE = -DERASE=1

@@ -187,15 +187,6 @@ ZLIB = $(ZLIBD) -lz
 
 
 #
-# For NCDaudio support, uncomment the following lines in addition to adding
-# -DSOUND to the DEFS line above
-#
-#AUDIOINC = -I/usr/local/include
-#AUDIOLIB = -L/usr/local/lib -laudio
-#AUDIOSRC = ncdaudio.c
-#AUDIOOBJ = ncdaudio.o
-
-#
 # For rplay support, uncomment the following lines in addition to adding
 # -DSOUND to the DEFS line above
 #
@@ -203,16 +194,6 @@ ZLIB = $(ZLIBD) -lz
 #AUDIOLIB = -L/usr/local/lib -lrplay
 #AUDIOSRC = rplayaudio.c
 #AUDIOOBJ = rplayaudio.o
-
-#
-# For HP audio support, uncomment the following lines in addition to adding
-# -DSOUND to the DEFS line above.
-# NOTE that this doesn't really work well.  Dunno why.  Blame Alib & Aserver.
-#
-#AUDIOINC =
-#AUDIOLIB = -lAlib
-#AUDIOSRC = hpaudio.c
-#AUDIOOBJ = hpaudio.o
 
 #
 # Common library libxpcommon.a

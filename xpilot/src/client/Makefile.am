@@ -27,5 +27,5 @@ xpilot_SOURCES = \
 
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
-#EXTRA_xpilot_SOURCES = ncdaudio.c rplayaudio.c afaudio.c hpaudio.c debugaudio.c
+#EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
 SUBDIRS = items
