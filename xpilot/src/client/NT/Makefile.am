@@ -1,16 +1,6 @@
 
 EXTRA_DIST = \
-BSString.cpp   TalkWindow.cpp  winAudio.h    wintalk.c \
-BSString.h     TalkWindow.h    winBitmap.c   xpilot.dep \
-MainFrm.cpp    winBitmap.h     xpilot.dsp \
-MainFrm.h      winClient.h     xpilot.dsw \
-XPilotNT.cpp   winColors.c     xpilot.mak \
-XPilotNT.h     winConfig.c     xpilot.rc \
-RecordDummy.c  credits.inc.h   winConfig.h   xpilotDoc.cpp \
-Splash.cpp     resource.h      winXThread.c  xpilotDoc.h \
-Splash.h       winAbout.cpp    winXThread.h  xpilotView.cpp \
-StdAfx.cpp     winAbout.h      winXXPilot.c  xpilotView.h \
-StdAfx.h       winAudio.c      winXXPilot.h
+about.c bitmaps.c bitmaps.h BSString.cpp BSString.h colors.c configure.c credits.inc.h dbuff.h guimap.c guiobjects.c icon.h join.c MainFrm.cpp MainFrm.h Makefile Makefile.am Makefile.in paintdata.c painthud.c paintradar.c record.c RecordDummy.c record.h resource.h Splash.cpp Splash.h StdAfx.cpp StdAfx.h TalkWindow.cpp TalkWindow.h welcome.c widget.c widget.h winAbout.cpp winAbout.h winAudio.c winAudio.h winBitmap.c winBitmap.h winClient.h winColors.c winConfig.c winConfig.h wintalk.c winXThread.c winXThread.h winXXPilot.c winXXPilot.h xdefault.c xevent.c xevent.h xeventhandlers.c xeventhandlers.h xinit.c xinit.h xpaint.c xpilot.c xpilot.dep xpilotDoc.cpp xpilotDoc.h xpilot.dsp xpilot.dsw xpilot.mak XPilotNT.cpp XPilotNT.h xpilot.rc xpilotView.cpp xpilotView.h
 
 SUBDIRS = res
 
