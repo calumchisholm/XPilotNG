@@ -718,38 +718,40 @@ static void Gui_paint_marking_lights(int id, int x, int y, shipobj *ship, int di
 
     if (((loopsSlow + id) & 0xF) == 0) {
 	for (lcnt = 0; lcnt < ship->num_l_light; lcnt++) {
+	    position l_light = Ship_get_l_light_position(ship, lcnt, dir);
 	    Rectangle_add(RED,
-			  X(x + ship->l_light[lcnt][dir].x) - 2,
-			  Y(y + ship->l_light[lcnt][dir].y) - 2,
+			  X(x + l_light.x) - 2,
+			  Y(y + l_light.y) - 2,
 			  6, 6);
 	    Segment_add(RED,
-			X(x + ship->l_light[lcnt][dir].x)-8,
-			Y(y + ship->l_light[lcnt][dir].y),
-			X(x + ship->l_light[lcnt][dir].x)+8,
-			Y(y + ship->l_light[lcnt][dir].y));
+			X(x + l_light.x)-8,
+			Y(y + l_light.y),
+			X(x + l_light.x)+8,
+			Y(y + l_light.y));
 	    Segment_add(RED,
-			X(x + ship->l_light[lcnt][dir].x),
-			Y(y + ship->l_light[lcnt][dir].y)-8,
-			X(x + ship->l_light[lcnt][dir].x),
-			Y(y + ship->l_light[lcnt][dir].y)+8);
+			X(x + l_light.x),
+			Y(y + l_light.y)-8,
+			X(x + l_light.x),
+			Y(y + l_light.y)+8);
 	}
     } else if (((loopsSlow + id) & 0xF) == 2) {
 	for (lcnt = 0; lcnt < ship->num_r_light; lcnt++) {
 	    int rightLightColor = maxColors > 4 ? 4 : BLUE;
+	    position r_light = Ship_get_r_light_position(ship, lcnt, dir);
 	    Rectangle_add(rightLightColor,
-			  X(x + ship->r_light[lcnt][dir].x)-2,
-			  Y(y + ship->r_light[lcnt][dir].y)-2,
+			  X(x + r_light.x)-2,
+			  Y(y + r_light.y)-2,
 			  6, 6);
 	    Segment_add(rightLightColor,
-			X(x + ship->r_light[lcnt][dir].x)-8,
-			Y(y + ship->r_light[lcnt][dir].y),
-			X(x + ship->r_light[lcnt][dir].x)+8,
-			Y(y + ship->r_light[lcnt][dir].y));
+			X(x + r_light.x)-8,
+			Y(y + r_light.y),
+			X(x + r_light.x)+8,
+			Y(y + r_light.y));
 	    Segment_add(rightLightColor,
-			X(x + ship->r_light[lcnt][dir].x),
-			Y(y + ship->r_light[lcnt][dir].y)-8,
-			X(x + ship->r_light[lcnt][dir].x),
-			Y(y + ship->r_light[lcnt][dir].y)+8);
+			X(x + r_light.x),
+			Y(y + r_light.y)-8,
+			X(x + r_light.x),
+			Y(y + r_light.y)+8);
 	}
     }
 }
@@ -869,15 +871,15 @@ static int set_shipshape(int world_x, int world_y,
 		  int dir, shipobj *ship, XPoint *points)
 {
     int			cnt;
-    register position	*ship_point_pos;
+    register position	ship_point_pos;
     register XPoint	*xpts = points;
     int			window_x;
     int			window_y;
 
     for (cnt = 0; cnt < ship->num_points; cnt++) {
-	ship_point_pos = &(ship->pts[cnt][dir]);
-	window_x = X(world_x + ship_point_pos->x);
-	window_y = Y(world_y + ship_point_pos->y);
+	ship_point_pos = Ship_get_point_position(ship, cnt, dir);
+	window_x = X(world_x + ship_point_pos.x);
+	window_y = Y(world_y + ship_point_pos.y);
 	xpts->x = WINSCALE(window_x);
 	xpts->y = WINSCALE(window_y);
 	xpts++;
