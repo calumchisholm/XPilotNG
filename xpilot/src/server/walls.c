@@ -2886,7 +2886,85 @@ void Turn_player(player_t *pl)
 		length = Wrap_length(linet[ans.line].delta.cx,
 				     linet[ans.line].delta.cy);
 		if (length != 0) {
-	    /* velocity to push player away from wall */
+	    /* khs this is the previous implementation with a fixed factor     */
+	    /*pl->vel.x += linet[ans.line].delta.cy/length * options.turnPush; */
+	    /*pl->vel.y -= linet[ans.line].delta.cx/length * options.turnPush; */
+	    /* khs the following lines implement different functions,          */
+	    /* that make turnPush have a strong effect with low                */
+	    /* speed of the ship perpenticular to the wall, weak effect with   */
+	    /* high speed the idea is that turnPush should remove wallglue but */
+	    /* not interfere with the game  */
+	    double fact, velo;
+	    
+	    double c, s;              /* cosine and sine of 2 times line angle */
+	    double cl, sl;            /* cosine and sine of line angle         */
+	    double x, y, l2, l;
+
+	    /* calculate speed of ship perpenticular to the wall - this value  */
+	    /*could be taken from Bounce_player later on                       */
+
+	    x = linet[ans.line].delta.cx;
+	    y = linet[ans.line].delta.cy;
+	    l2 = (x*x + y*y);
+	    c = (x*x - y*y) / l2;
+	    s = 2*x*y / l2;
+	    l = sqrt(l2);
+	    cl = x / l;
+	    sl = y / l;
+	    
+	    velo = abs(pl->vel.x * (-sl) + pl->vel.y * cl); /*perpenticular velocity*/
+
+	    /* different functions used for different values of pushType */
+	    /* (turnPush = 0: off and all this isn't executed) */
+	    /* 0: off             */
+	    /* 1: linear relation */
+	    /* 2: tanh relation   */
+	    /* 3: sine relation   */
+	    /* 4: cosine relation */
+	    /* 5: cosine-square relation */
+	    /* pushMin = turnpush factor at speed higher than turnPush          */
+	    /* pushMax = turnpush factor at 0 speed                             */
+	    /* turnPush = speed at which the function becomes constant pushMin  */
+	    if( velo > options.turnPush ) 
+	      fact = options.pushMin;
+	    else
+	      switch (options.pushType) {
+	      default:
+		fact=options.pushMin;
+		break;
+	      case 0:
+		fact= 0;
+	      case 1:
+		fact= options.pushMax 
+		  - velo/options.turnPush 
+		  * (options.pushMax - options.pushMin);
+		break;
+	      case 2: 
+		fact= options.pushMax 
+		  - tanh(velo*PI/options.turnPush)
+		  * (options.pushMax-options.pushMin);
+		break;
+	      case 3: 
+		fact= options.pushMax 
+		  - tsin((int)(velo/options.turnPush*RES/4+0.5))
+		  * (options.pushMax-options.pushMin);
+		break;
+	      case 4: 
+		fact= (options.pushMax-options.pushMin)/2 
+		  * (1+tcos((int)(velo/options.turnPush*RES/2+0.5)))
+		  + options.pushMin;
+		break;
+	      case 5: 
+		fact= (options.pushMax-options.pushMin) 
+		  * sqr((1+tcos((int)(velo/options.turnPush*RES/2+0.5)))/2)
+		  + options.pushMin;
+		break;
+	      }
+#if 0
+	      sprintf(msg, "velo: %.1f fact: %.2f [%s]", velo, fact, pl->name);
+	      Set_message(msg);
+#endif	      
+		    /* velocity to push player away from wall */
 		    pl->vel.x += linet[ans.line].delta.cy / length
 			* options.turnPush;
 		    pl->vel.y -= linet[ans.line].delta.cx / length
