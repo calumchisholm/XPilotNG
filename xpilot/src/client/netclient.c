@@ -2568,6 +2568,8 @@ int Send_audio_request(int on)
 
 int Send_fps_request(int fps)
 {
+    assert(fps > 0);
+    assert(fps <= MAX_SUPPORTED_FPS);
     if (Packet_printf(&wbuf, "%c%c", PKT_ASYNC_FPS, fps) == -1)
 	return -1;
     return 0;

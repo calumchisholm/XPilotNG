@@ -34,7 +34,7 @@
 #define MIN_RECEIVE_WINDOW_SIZE		1
 #define MAX_RECEIVE_WINDOW_SIZE		4
 
-#define MAX_SUPPORTED_FPS		200
+#define MAX_SUPPORTED_FPS		255
 
 typedef struct {
     int view_width;

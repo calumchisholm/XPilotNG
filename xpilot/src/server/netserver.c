@@ -3202,10 +3202,14 @@ static int Receive_fps_request(connection_t *connp)
     }
     if (connp->id != NO_ID) {
 	pl = Player_by_id(connp->id);
+	/*
+	 * kps - 0 could be made to mean "no limit" ?
+	 * Now both 0 and 1 mean 1.
+	 */
 	if (fps == 0)
 	    fps = 1;
 	if (!FEATURE(connp, F_POLY) && (fps == 20) && options.ignore20MaxFPS)
-	    fps = 100;
+	    fps = MAX_SERVER_FPS;
  	pl->player_fps = fps;
     }
 

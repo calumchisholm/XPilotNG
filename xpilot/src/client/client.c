@@ -2212,9 +2212,16 @@ int Client_setup(void)
 
 int Client_fps_request(void)
 {
-    LIMIT(maxFPS, 1, 200);
+    LIMIT(maxFPS, 1, MAX_SUPPORTED_FPS);
     oldMaxFPS = maxFPS;
     return Send_fps_request(maxFPS);
+}
+
+int Check_client_fps(void)
+{
+    if (oldMaxFPS != maxFPS)
+	return Client_fps_request();
+    return 0;
 }
 
 int Client_power(void)
@@ -2345,16 +2352,6 @@ void Client_cleanup(void)
     }
     Map_cleanup();
     Paint_cleanup();
-}
-
-int Check_client_fps(void)
-{
-    if (oldMaxFPS != maxFPS) {
-	LIMIT(maxFPS, 1, 200);
-	oldMaxFPS = maxFPS;
-	return Send_fps_request(maxFPS);
-    }
-    return 0;
 }
 
 int Client_pointer_move(int movement)

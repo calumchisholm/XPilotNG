@@ -678,7 +678,7 @@ xp_option_t default_options[] = {
 
     XP_INT_OPTION(
 	"maxFPS",
-	100,
+	MAX_SUPPORTED_FPS,
 	1,
 	MAX_SUPPORTED_FPS,
 	&maxFPS,

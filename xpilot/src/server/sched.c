@@ -144,7 +144,7 @@ static void setup_timer(void)
     /*
      * Install a real-time timer.
      */
-    if (timer_freq <= 0 || timer_freq > 100) {
+    if (timer_freq <= 0 || timer_freq > MAX_SERVER_FPS) {
 	error("illegal timer frequency: %ld", timer_freq);
 	exit(1);
     }

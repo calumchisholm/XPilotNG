@@ -272,4 +272,7 @@
 #define POLYGON_MAX_OFFSET	30000
 #define NO_GROUP		(-1)
 
+/* Maximum frames per second the server code supports. */
+#define MAX_SERVER_FPS		255
+
 #endif

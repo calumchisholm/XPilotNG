@@ -3719,21 +3719,9 @@ static void Check_baseless(world_t *world)
 
 void Timing_setup(world_t *world)
 {
-    if (FPS > 100)
-	FPS = 100;
-    if (FPS < 1)
-	FPS = 1;
-
-    if (options.timerResolution > 100)
-	options.timerResolution = 100;
-    if (options.timerResolution < 0)
-	options.timerResolution = 0;
-
-    if (options.gameSpeed > FPS)
-	options.gameSpeed = FPS;
-    if (options.gameSpeed < 0.0)
-	options.gameSpeed = 0.0;
-
+    LIMIT(FPS, 1, MAX_SERVER_FPS);
+    LIMIT(options.timerResolution, 0, 100);
+    LIMIT(options.gameSpeed, 0.0, FPS);
     if (options.gameSpeed == 0.0)
 	options.gameSpeed = FPS;
     if (options.gameSpeed < FPS / 50.)
