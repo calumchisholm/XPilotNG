@@ -853,8 +853,7 @@ static void Do_warping(player *pl)
 
 	/* try to find empty space to hyperjump to */
 	for (counter = 20; counter > 0; counter--) {
-	    dest.cx = (int)(rfrac() * world->cwidth);
-	    dest.cy = (int)(rfrac() * world->cheight);
+	    dest = World_get_random_clpos(world);
 	    if (shape_is_inside(dest.cx, dest.cy, hitmask,
 				(object *)pl, (shape_t *)pl->ship,
 				pl->dir)

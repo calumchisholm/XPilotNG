@@ -237,10 +237,9 @@ void Place_item(player *pl, int item)
 		pos = World_wrap_clpos(world, pos);
 		if (!World_contains_clpos(world, pos))
 		    continue;
-	    } else {
-		pos.cx = (int)(rfrac() * world->cwidth);
-		pos.cy = (int)(rfrac() * world->cheight);
-	    }
+	    } else
+		pos = World_get_random_clpos(world);
+
 
 	    /*if (BIT(1U << world->block[bx][by], SPACE_BLOCKS|CANNON_BIT))*/
 	    if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL)
@@ -880,7 +879,8 @@ void do_lose_item(player *pl)
     if (pl->item[item] <= 0)
 	return;
 
-    if (options.loseItemDestroys == false && !BIT(pl->used, HAS_PHASING_DEVICE))
+    if (options.loseItemDestroys == false
+	&& !BIT(pl->used, HAS_PHASING_DEVICE))
 	Place_item(pl, item);
     else
 	pl->item[item]--;

@@ -287,6 +287,16 @@ static inline bool World_contains_clpos(world_t *world, clpos pos)
     return true;
 }
 
+static inline clpos World_get_random_clpos(world_t *world)
+{
+    clpos pos;
+
+    pos.cx = (int)(rfrac() * world->cwidth);
+    pos.cy = (int)(rfrac() * world->cheight);
+
+    return pos;
+}
+
 static inline int World_wrap_xclick(world_t *world, int cx)
 {
     if (!BIT(world->rules->mode, WRAP_PLAY))

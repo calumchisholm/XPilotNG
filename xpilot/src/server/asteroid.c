@@ -184,7 +184,8 @@ void Break_asteroid(wireobject *asteroid)
 		    3.0, 10.0);
     }
 
-    if ((options.asteroidMaxItems > 0) && (rfrac() < options.asteroidItemProb)) {
+    if ((options.asteroidMaxItems > 0)
+	&& (rfrac() < options.asteroidItemProb)) {
 	int	nitems = (int)(rfrac() * options.asteroidMaxItems) + 1;
 	int	i;
 	vector	vel;
@@ -307,7 +308,8 @@ static void Place_asteroid(void)
     space |= FRICTION_BIT;
     /* would be dubious: space |= CANNON_BIT; */
 
-    if (world->NumAsteroidConcs > 0 && rfrac() < options.asteroidConcentratorProb)
+    if (world->NumAsteroidConcs > 0
+	&& rfrac() < options.asteroidConcentratorProb)
 	con = AsteroidConcs(world, (int)(rfrac() * world->NumAsteroidConcs));
     else
 	con = NULL;
@@ -330,10 +332,9 @@ static void Place_asteroid(void)
 	    pos = World_wrap_clpos(world, pos);
 	    if (!World_contains_clpos(world, pos))
 		continue;
-	} else {
-	    pos.cx = (int)(rfrac() * world->cwidth);
-	    pos.cy = (int)(rfrac() * world->cheight);
-	}
+	} else
+	    pos = World_get_random_clpos(world);
+
 	bpos = Clpos_to_blpos(pos);
 
 	/* kps - world->block must be removed */
