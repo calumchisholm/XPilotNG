@@ -936,16 +936,20 @@ void Update_objects(void)
 	    } else {
 		pl->count = -1;
 		if (!BIT(pl->status, PLAYING)) {
+		    /*
+		     * kps - another idle check comes later in this file.
+		     * Are both needed ?
+		     */
 		    if (pl->idleCount >= IDLETHRESHOLD) { /* idle */
 			if (!game_lock && Team_zero_pausing_available()) {
 			    sprintf(msg,
 				    "%s was pause-swapped because of idling.",
-				    Players(i)->name);
-			    Handle_player_command(Players(i), "team 0");
+				    pl->name);
+			    Handle_player_command(pl, "team 0");
 			} else {
 			    Pause_player(i, 1);
 			    sprintf(msg, "%s was paused for idling.",
-				    Players(i)->name);
+				    pl->name);
 			}
 			Set_message(msg);
 			continue;
