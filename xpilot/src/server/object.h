@@ -277,9 +277,9 @@ struct xp_mineobject {
 
     OBJECT_EXTEND
 
-    int 		owner;		/* Who's object is this ? */
     float		ecm_range;	/* Range from last ecm center */
     float		spread_left;	/* how much spread time left */
+    short 		owner;		/* Who's object is this ? */
 
 #define MINE_IND(ind)	((mineobject_t *)Obj[(ind)])
 #define MINE_PTR(ptr)	((mineobject_t *)(ptr))
@@ -358,9 +358,9 @@ struct xp_ballobject {
 
     OBJECT_EXTEND
 
-    int 		owner;		/* Who's object is this ? */
     treasure_t		*treasure;	/* treasure for ball */
-    int 		style;		/* What polystyle to use */
+    short 		owner;		/* Who's object is this ? */
+    short		style;		/* What polystyle to use */
 
 #define BALL_IND(ind)	((ballobject_t *)Obj[(ind)])
 #define BALL_PTR(obj)	((ballobject_t *)(obj))
