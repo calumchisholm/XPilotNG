@@ -1122,7 +1122,7 @@ static int init_blockmap(void)
     return 0;
 }
 
-Map_init(void)
+static int Map_init(void)
 {
     return oldServer ? init_blockmap() : init_polymap();
 }
