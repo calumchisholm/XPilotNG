@@ -550,6 +550,7 @@ extern	XSetDashes(Display* dpy, GC gc, int dash_offset,
 				   const char dash_list[], int n);
 extern	XChangeWindowAttributes(Display* dpy, Window w, unsigned long valuemask,
 								XSetWindowAttributes* attributes);
+extern	XSetWindowBackground(Display* dpy, Window w, unsigned long background_pixel);
 extern	XGetWindowAttributes(Display* dpy, Window w, XWindowAttributes* attributes);
 #define	NoSymbol	0L
 extern	XFontStruct* XQueryFont(Display* dpy, XID font_ID);

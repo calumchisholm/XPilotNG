@@ -381,7 +381,7 @@ static void Widget_draw_input(widget_t *widget, const char *str)
 static void Widget_draw_color(widget_t *widget, const char *str, int color)
 {
     /* Setup the background color */
-    IFNWINDOWS(XSetWindowBackground(dpy, widget->window, colors[color].pixel));
+    XSetWindowBackground(dpy, widget->window, colors[color].pixel);
 
     if (colors[color].pixel == colors[WHITE].pixel) {
 	/* change the text color to black */

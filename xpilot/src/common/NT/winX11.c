@@ -925,6 +925,10 @@ XChangeWindowAttributes(Display* dpy, Window w, unsigned long valuemask,
 {	return(0); }
 
 /*****************************************************************************/
+XSetWindowBackground(Display* dpy, Window w, unsigned long background_pixel)
+{	/* TODO */ return(0); }
+
+/*****************************************************************************/
 XGetWindowAttributes(Display* dpy, Window w, XWindowAttributes* attributes)
 {
 	RECT	rect;
