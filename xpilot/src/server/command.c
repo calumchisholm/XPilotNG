@@ -1031,7 +1031,7 @@ static int Cmd_nuke(char *arg, player *pl, int oper, char *msg)
     return CMD_RESULT_SUCCESS;
 }
 
-
+/* kps - this one is a bit obscure, maybe clean it up a bit ? */
 static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 {
     player *issuer = pl;
@@ -1039,22 +1039,29 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
     char *name;
     int cmd, priv;
 
-    if (!oper) {
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
     if (!arg || (*arg != '+' && *arg != '-')) {
-	sprintf(msg, "Invalid argument.");
+	sprintf(msg, "Usage: /op {+|-}[nlo]+ <player name>");
 	return CMD_RESULT_ERROR;
     }
 
     name = strpbrk(arg, " \t");
     if (name) {
-	int ind;
+	char *errorstr;
+	/*int ind;*/
 
 	*name++ = '\0';
 	while (isspace(*name)) name++;
 
+#if 1
+	pl = Get_player_by_name(name, NULL, &errorstr);
+	if (!pl) {
+	    strcpy(msg, errorstr);
+	    return CMD_RESULT_ERROR;
+	}
+#else
 	ind = Get_player_index_by_name(name);
 	switch (ind) {
 	case -1:
@@ -1065,6 +1072,7 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 	    return CMD_RESULT_ERROR;
 	}
 	pl = Players(ind);
+#endif
     }
 
     priv = 0;
