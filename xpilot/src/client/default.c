@@ -3676,7 +3676,7 @@ unsigned String_hash(const char *s)
 }
 
 
-char* Get_keyHelpString(keys_t key)
+const char *Get_keyHelpString(keys_t key)
 {
     int			i;
     char		*nl;

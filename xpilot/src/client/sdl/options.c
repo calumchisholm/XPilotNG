@@ -2679,7 +2679,7 @@ unsigned String_hash(const char *s)
 }
 
 
-char* Get_keyHelpString(keys_t key)
+const char *Get_keyHelpString(keys_t key)
 {
     int			i;
     char		*nl;
@@ -2711,7 +2711,7 @@ const char* Get_keyResourceString(keys_t key)
 }
 
 
-static void Usage(void)
+void Usage(void)
 {
     int			i;
 
