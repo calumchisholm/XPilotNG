@@ -829,6 +829,18 @@ static void Paint_MetaWidget(GLWidget *widget)
     glDisable(GL_TEXTURE_2D);
 }
 
+static void Close_MetaWidget(GLWidget *widget)
+{
+    MetaWidget *info;
+
+    if (widget->WIDGET != METAWIDGET) {
+	error("expected METAWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
+    info = (MetaWidget*)widget->wid_info;
+    if (info->texture) glDeleteTextures(1, &(info->texture));
+}
+
 static GLWidget *Init_MetaWidget(list_t servers)
 {
     GLWidget *tmp;
@@ -857,6 +869,7 @@ static GLWidget *Init_MetaWidget(list_t servers)
     tmp->bounds.h       = META_HEIGHT;
     tmp->wid_info       = info;
     tmp->Draw           = Paint_MetaWidget;
+    tmp->Close          = Close_MetaWidget;
 
     if (!(info->table = Init_MetaTableWidget(tmp, servers))) {
 	free(tmp);
@@ -961,6 +974,7 @@ int Meta_window(Connect_param_t *conpar)
 		
 	    case SDL_USEREVENT:
 		if (join_server(conpar, (server_info_t*)evt.user.data1)) {
+		    Close_Widget(&meta);
 		    glEnable(GL_BLEND);
 		    glMatrixMode(GL_PROJECTION);
 		    glLoadIdentity();
