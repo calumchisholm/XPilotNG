@@ -210,7 +210,7 @@ int World_place_target(world_t *world, clpos_t pos, int team)
     return ind;
 }
 
-int World_place_wormhole(world_t *world, clpos_t pos, wormType type)
+int World_place_wormhole(world_t *world, clpos_t pos, wormtype_t type)
 {
     wormhole_t t;
     int ind = world->NumWormholes;
@@ -218,7 +218,6 @@ int World_place_wormhole(world_t *world, clpos_t pos, wormType type)
     t.pos = pos;
     t.countdown = 0;
     t.lastdest = NO_IND;
-    t.temporary = false;
     t.type = type;
     t.lastblock = SPACE;
     t.lastID = NO_ID;
@@ -874,97 +873,4 @@ void Wormhole_line_init(world_t *world)
     }
 
     return;
-}
-
-void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
-{
-    wormhole_t inhole, outhole, *wwhtemp;
-
-    if ((wwhtemp = realloc(world->wormholes,
-			   (world->NumWormholes + 2) * sizeof(wormhole_t)))
-	== NULL) {
-	error("No memory for temporary wormholes.");
-	return;
-    }
-    world->wormholes = wwhtemp;
-
-    inhole.pos.cx = BLOCK_CENTER(xin);
-    inhole.pos.cy = BLOCK_CENTER(yin);
-    inhole.countdown = options.wormholeStableTicks;
-    inhole.lastdest = world->NumWormholes + 1;
-    inhole.temporary = true;
-    inhole.type = WORM_IN;
-    inhole.lastblock = world->block[xin][yin];
-    /*inhole.lastID = Map_get_itemid(xin, yin);*/
-    world->wormholes[world->NumWormholes] = inhole;
-    world->block[xin][yin] = WORMHOLE;
-    /*Map_set_itemid(xin, yin, world->NumWormholes);*/
-
-    outhole.pos.cx = BLOCK_CENTER(xout);
-    outhole.pos.cy = BLOCK_CENTER(yout);
-    outhole.countdown = options.wormholeStableTicks;
-    outhole.temporary = true;
-    outhole.type = WORM_OUT;
-    outhole.lastblock = world->block[xout][yout];
-    /*outhole.lastID = Map_get_itemid(xout, yout);*/
-    world->wormholes[world->NumWormholes + 1] = outhole;
-    world->block[xout][yout] = WORMHOLE;
-    /*Map_set_itemid(xout, yout, world->NumWormholes + 1);*/
-
-    world->NumWormholes += 2;
-}
-
-
-void remove_temp_wormhole(world_t *world, int ind)
-{
-    World_remove_wormhole(world, Wormhole_by_index(world, ind));
-
-    world->NumWormholes--;
-    if (ind != world->NumWormholes)
-	world->wormholes[ind] = world->wormholes[world->NumWormholes];
-
-    world->wormholes = realloc(world->wormholes,
-			       world->NumWormholes * sizeof(wormhole_t));
-}
-
-void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2)
-{
-
-#if 0
-
-#if 0 /* kps - temporary wormholes disabled currently */
-    if (counter
-	&& options.wormTime
-	&& BIT(1U << world->block[OBJ_X_IN_BLOCKS(pl)]
-	       [OBJ_Y_IN_BLOCKS(pl)],
-	       SPACE_BIT)
-	&& BIT(1U << world->block[CLICK_TO_BLOCK(dest.cx)]
-	       [CLICK_TO_BLOCK(dest.cy)],
-	       SPACE_BIT))
-	add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
-			   OBJ_Y_IN_BLOCKS(pl),
-			   CLICK_TO_BLOCK(dest.cx),
-			   CLICK_TO_BLOCK(dest.cy));
-#endif
-
-
-    if (is_polygon_map) {
-	;
-    } else {
-	blpos blk1, blk2;
-	int type1, type2;
-
-	blk1 = Clpos_to_blkpos(pos1);
-	type1 = World_get_block(blk1);
-
-	blk2 = Clpos_to_blkpos(pos2);
-	type2 = World_get_block(blk2);
-
-	if (!(type1 == SPACE && type2 == SPACE)) {
-	    warn("World_add_temporary_wormholes: could not add tmp wormholes: "
-		 "type1 = %d, type2 = %d", type1, type2);
-	    return;
-	}
-    }
-#endif
 }

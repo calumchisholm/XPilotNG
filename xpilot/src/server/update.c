@@ -1127,9 +1127,6 @@ void Update_objects(world_t *world)
 
 	if ((wh->countdown -= timeStep) <= 0)
 	    wh->countdown = 0;
-
-	if (wh->temporary && wh->countdown <= 0)
-	    remove_temp_wormhole(world, i);
     }
 
 

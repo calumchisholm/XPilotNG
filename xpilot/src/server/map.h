@@ -142,14 +142,13 @@ typedef struct asteroid {
     int		chance;		/* Chance [0..127] for asteroid to appear */
 } asteroid_t;
 
-typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
+typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormtype_t;
 
 typedef struct wormhole {
     clpos_t	pos;
     int		lastdest;	/* last destination wormhole */
     double	countdown;	/* >0 warp to lastdest else random */
-    bool	temporary;	/* wormhole was left by hyperjump */
-    wormType	type;
+    wormtype_t	type;
     int		lastID;
     int		lastblock;	/* block it occluded */
     int		group;

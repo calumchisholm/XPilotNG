@@ -364,7 +364,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Wormhole")) {
 	clpos_t pos = DEFAULT_POS;
-	wormType type = WORM_NORMAL;
+	wormtype_t type = WORM_NORMAL;
 	int wh_ind;
 
 	while (*attr) {

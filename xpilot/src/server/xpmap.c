@@ -730,7 +730,7 @@ static void Xpmap_place_treasure(world_t *world, blkpos_t blk, bool empty,
 			     TEAM_NOT_SET, empty, 0xff);
 }
 
-static void Xpmap_place_wormhole(world_t *world, blkpos_t blk, wormType type,
+static void Xpmap_place_wormhole(world_t *world, blkpos_t blk, wormtype_t type,
 				 bool create)
 {
     World_set_block(world, blk, WORMHOLE);

@@ -471,7 +471,6 @@ static void Frame_map(connection_t *conn, player_t *pl)
     const int fuel_packet_size = 5;
     const int cannon_packet_size = 5;
     const int target_packet_size = 7;
-    const int wormhole_packet_size = 5;
     int bytes_left = 2000, max_packet, packet_count;
     world_t *world = pl->world;
 
@@ -536,28 +535,6 @@ static void Frame_map(connection_t *conn, player_t *pl)
 		if (++packet_count >= max_packet)
 		    break;
 	    }
-	}
-    }
-
-    packet_count = 0;
-    max_packet = MAX(5, bytes_left / wormhole_packet_size);
-    i = MAX(0, pl->last_wormhole_update);
-    for (k = 0; k < world->NumWormholes; k++) {
-	wormhole_t *worm;
-
-	if (++i >= world->NumWormholes)
-	    i = 0;
-	worm = Wormhole_by_index(world, i);
-	if (options.wormholeVisible
-	    && worm->temporary
-	    && (worm->type == WORM_IN
-		|| worm->type == WORM_NORMAL)
-	    && clpos_inview(&cv, worm->pos)) {
-	    Send_wormhole(conn, worm->pos);
-	    pl->last_wormhole_update = i;
-	    bytes_left -= max_packet * wormhole_packet_size;
-	    if (++packet_count >= max_packet)
-		break;
 	}
     }
 }

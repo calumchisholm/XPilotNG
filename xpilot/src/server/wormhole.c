@@ -102,8 +102,7 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
 	do
 	    wh_dest = (int)(rfrac() * world->NumWormholes);
 	while (world->wormholes[wh_dest].type == WORM_IN
-	       || pl->wormHoleHit == wh_dest
-	       || world->wormholes[wh_dest].temporary);
+	       || pl->wormHoleHit == wh_dest);
 	return wh_dest;
     }
 
@@ -114,8 +113,7 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
 	wormhole_t *wh = Wormhole_by_index(world, wh_dest);
 
 	if (wh_dest == pl->wormHoleHit
-	    || wh->type == WORM_IN
-	    || wh->temporary)
+	    || wh->type == WORM_IN)
 	    continue;
 
 	wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
@@ -185,8 +183,7 @@ void Traverse_wormhole(player_t *pl)
 
     if (wh_dest != pl->wormHoleHit) {
 	wh_hit->lastdest = wh_dest;
-	if (!world->wormholes[wh_dest].temporary)
-	    wh_hit->countdown = options.wormholeStableTicks;
+	wh_hit->countdown = options.wormholeStableTicks;
     }
 
     CLR_BIT(pl->status, WARPING);
@@ -223,12 +220,6 @@ void Hyperjump(player_t *pl)
 	sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
 	return;
     }
-
-#if 0
-    /* kps - we need a option warpingCreatesWormhole or such */
-    if (options.wormholeStableTicks > 0)
-	World_add_temporary_wormholes(world, pl->pos, dest);
-#endif
 
     sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
 
