@@ -210,10 +210,6 @@ static bool Key_press_select_lose_item(void)
     return true;
 }
 
-/* kps hack */
-#define DEFAULT_KEY_POINTER_CONTROL "space"
-
-
 bool Key_press(keys_t key)
 {
     static bool thrusthelp = false;
@@ -223,8 +219,21 @@ bool Key_press(keys_t key)
     switch (key) {
     case KEY_THRUST:
 	if (newbie && !thrusthelp && !pointerControl) {
-	    Add_newbie_message("Steering with mouse is superior. Press " 
-			       DEFAULT_KEY_POINTER_CONTROL " to enable it.");
+	    xp_option_t *opt = Find_option("keyPointerControl");
+	    char msg[MSG_LEN];
+	    const char *val;
+
+	    if (!opt)
+		break;
+	    val = Option_value_to_string(opt);
+	    if (strlen(val) == 0)
+		break;
+
+	    snprintf(msg, sizeof(msg),
+		     "Steering with mouse is superior. "
+		     "Enable with one of: %s.", val);
+
+	    Add_newbie_message(msg);
 	    thrusthelp = true;
 	}
 	break;
@@ -286,10 +295,27 @@ bool Key_press(keys_t key)
 	return Key_press_show_messages();
 
     case KEY_POINTER_CONTROL:
-	if (!pointerControl)
-	    Add_newbie_message("Mouse steering enabled. Press "
-			       DEFAULT_KEY_POINTER_CONTROL
-			       " to disable it.");
+	if (newbie) {
+	    if(!pointerControl) {
+		xp_option_t *opt = Find_option("keyPointerControl");
+		char msg[MSG_LEN];
+		const char *val;
+
+		if (!opt)
+		    break;
+		val = Option_value_to_string(opt);
+		if (strlen(val) == 0)
+		    break;
+
+		snprintf(msg, sizeof(msg),
+			 "Mouse steering enabled. "
+			 "Disable with one of: %s.", val);
+
+		Add_newbie_message(msg);
+	    }
+	    else
+		Add_newbie_message("Mouse steering disabled.");
+	}
 	return Key_press_pointer_control();
 
     case KEY_TOGGLE_RECORD:
@@ -585,7 +611,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyThrust",
-	"Shift_R Shift_L Up",
+	"Shift_L Up", /* Shift_R was here also */
 	KEY_THRUST,
 	"Thrust.\n"),
 
@@ -713,7 +739,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keySwapSettings",
-	"Escape",
+	"", /* was Escape */
 	KEY_SWAP_SETTINGS,
 	"Swap control settings.\n"
 	"These are the power, turn speed and turn resistance settings.\n"),
@@ -739,7 +765,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyDropBall",
-	"d",
+	"d Delete BackSpace",
 	KEY_DROP_BALL,
 	"Drop a ball.\n"),
 
@@ -1033,7 +1059,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyPointerControl",
-	"KP_Enter " DEFAULT_KEY_POINTER_CONTROL,
+	"space KP_Enter",
 	KEY_POINTER_CONTROL,
 	"Toggle pointer control.\n"),
 
@@ -1099,7 +1125,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keySendMsg11",
-	"", /* F11 is keyToggleFullScreen now */
+	"Escape", /* F11 is keyToggleFullScreen now */
 	KEY_MSG_11,
 	"Sends the talkmessage stored in msg11.\n"),
 
