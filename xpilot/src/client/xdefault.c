@@ -74,7 +74,7 @@ static bool Set_geometry(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *Get_geometry(xp_option_t *opt)
+static const char *Get_geometry(xp_option_t *opt)
 {
     (void)opt;
     return geometry;

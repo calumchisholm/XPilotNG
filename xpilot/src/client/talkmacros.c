@@ -397,7 +397,7 @@ static bool Set_talk_macro(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *Get_talk_macro(xp_option_t *opt)
+static const char *Get_talk_macro(xp_option_t *opt)
 {
     int i = index_by_option(opt);
 

@@ -922,7 +922,7 @@ static bool setRecordFile(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *getRecordFile(xp_option_t *opt)
+static const char *getRecordFile(xp_option_t *opt)
 {
     (void)opt;
     return record_filename;

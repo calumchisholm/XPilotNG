@@ -539,7 +539,7 @@ static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *getPointerButtonBinding(xp_option_t *opt)
+static const char *getPointerButtonBinding(xp_option_t *opt)
 {
     int ind = pointer_button_index_by_option(opt);
 

@@ -130,19 +130,19 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *Get_nickName(xp_option_t *opt)
+static const char *Get_nickName(xp_option_t *opt)
 {
     (void)opt;
     return connectParam.nick_name;
 }
 
-static char *Get_userName(xp_option_t *opt)
+static const char *Get_userName(xp_option_t *opt)
 {
     (void)opt;
     return connectParam.user_name;
 }
 
-static char *Get_hostName(xp_option_t *opt)
+static const char *Get_hostName(xp_option_t *opt)
 {
     (void)opt;
     return connectParam.host_name;
@@ -158,7 +158,7 @@ static bool Set_texturePath(xp_option_t *opt, const char *value)
     warn("texturePath is now %s", texturePath);
     return true;
 }
-static char *Get_texturePath(xp_option_t *opt)
+static const char *Get_texturePath(xp_option_t *opt)
 {
     (void)opt;
     return texturePath;
@@ -248,7 +248,7 @@ static bool Set_shipShape(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *Get_shipShape(xp_option_t *opt)
+static const char *Get_shipShape(xp_option_t *opt)
 {
     (void)opt;
     return shipShapeSetting;
@@ -267,7 +267,7 @@ static bool Set_shipShapeFile(xp_option_t *opt, const char *value)
     return true;
 }
 
-static char *Get_shipShapeFile(xp_option_t *opt)
+static const char *Get_shipShapeFile(xp_option_t *opt)
 {
     (void)opt;
     return shipShapeFileSetting;

@@ -41,7 +41,7 @@ typedef bool (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
 typedef bool (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
 typedef bool (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
 typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
-typedef char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
+typedef const char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
 typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
 
 
