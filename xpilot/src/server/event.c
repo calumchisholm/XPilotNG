@@ -325,21 +325,16 @@ static void Player_toggle_pause(player_t *pl)
     else if (Player_is_hoverpaused(pl))
 	pausetype = hoverpaused;
     else {
-	clpos_t pos = pl->home_base->pos;
-	int dx = ABS(CENTER_XCLICK(pl->pos.cx - pos.cx));
-	int dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
+	base_t *base = pl->home_base;
+	double dist = Wrap_length(pl->pos.cx - base->pos.cx,
+				  pl->pos.cy - base->pos.cy);
 	double minv;
 
-	if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
+	if (dist < 1.5 * BLOCK_CLICKS) {
 	    minv = 3.0;
 	    pausetype = paused;
 	} else {
-	    /*
-	     * Hover pause doesn't work within two squares of the
-	     * players home base, they would want the better pause.
-	     */
-	    if (dx < 2 * BLOCK_CLICKS && dy < 2 * BLOCK_CLICKS)
-		return;
+	    /* Too far away from normal pause, use hoverpause. */
 	    minv = 5.0;
 	    pausetype = hoverpaused;
 	}
