@@ -967,25 +967,23 @@ void Frame_update(void)
 	     * With allowViewing on, everyone gets full framerate.
 	     */
 	    if (BIT(pl->status, PAUSE)) {
-		if (frame_loops & 0x03) {
+		if (frame_loops & 0x03)
 		    continue;
-		}
 	    } else {
-		if (frame_loops & 0x01) {
+		if (frame_loops & 0x01)
 		    continue;
-		}
 	    }
 	}
 
 	/*
 	* Reduce frame rate to player's own rate.
 	*/
-	if (pl->player_count > 0) {
-	    pl->player_round++;
-	    if (pl->player_round >= pl->player_count) {
-		pl->player_round = 0;
+	if (pl->player_fps < FPS) {
+	    int divisor = (FPS - 1) / pl->player_fps + 1;
+	    /* Even combined with above pause check gives at least every
+	     * (4 * divisor)th frame. */
+	    if (frame_loops % divisor)
 		continue;
-	    }
 	}
 
 	if (Send_start_of_frame(conn) == -1) {

@@ -441,9 +441,7 @@ int Init_player(int ind, wireobj *ship)
     pl->prev_life	= pl->life;
     pl->ball 		= NULL;
 
-    pl->player_fps	= FPS;
-    pl->player_round	= 0;
-    pl->player_count	= 0;
+    pl->player_fps	= 50; /* Client should send a value after startup */
 
     pl->kills		= 0;
     pl->deaths		= 0;

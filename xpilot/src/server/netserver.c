@@ -3461,23 +3461,15 @@ static int Receive_fps_request(int ind)
     unsigned char	fps;
 
     if ((n = Packet_scanf(&connp->r, "%c%c", &ch, &fps)) <= 0) {
-	if (n == -1) {
+	if (n == -1)
 	    Destroy_connection(ind, "read error");
-	}
 	return n;
     }
     if (connp->id != -1) {
 	pl = Players[GetInd[connp->id]];
+	if (fps == 0)
+	    fps = 1;
 	pl->player_fps = fps;
-	if (fps > FPS) pl->player_fps = FPS;
-	if (fps < (FPS / 2)) pl->player_fps = (FPS+1) / 2;
-	if (fps == 0) pl->player_fps = FPS;
-	n = FPS - pl->player_fps;
-	if (n <= 0) {
-	    pl->player_count = 0;
-	} else {
-	    pl->player_count = FPS / n;
-	}
     }
 
     return 1;

@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -1046,7 +1045,7 @@ static int Config_create_maxVolume(int widget_desc, int *height)
 static int Config_create_maxFPS(int widget_desc, int *height)
 {
     return Config_create_int(widget_desc, height,
-			     "maxFPS", &maxFPS, FPS / 2, FPS,
+			     "maxFPS", &maxFPS, 1, 200,
 			     Config_update_maxFPS, NULL);
 }
 

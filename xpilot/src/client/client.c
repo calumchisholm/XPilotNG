@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -1506,7 +1505,7 @@ int Client_setup(void)
 
 int Client_fps_request(void)
 {
-    LIMIT(maxFPS, FPS / 2, FPS);
+    LIMIT(maxFPS, 1, 200);
     oldMaxFPS = maxFPS;
     return Send_fps_request(maxFPS);
 }
@@ -1598,7 +1597,7 @@ int Client_wrap_mode(void)
 int Check_client_fps(void)
 {
     if (oldMaxFPS != maxFPS) {
-	LIMIT(maxFPS, FPS / 2, FPS);
+	LIMIT(maxFPS, 1, 200);
 	oldMaxFPS = maxFPS;
 	return Send_fps_request(maxFPS);
     }
