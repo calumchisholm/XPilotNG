@@ -225,14 +225,14 @@ static void Frame_radar_buffer_reset(void)
     num_radar = 0;
 }
 
-static void Frame_radar_buffer_add(int cx, int cy, int s)
+static void Frame_radar_buffer_add(clpos pos, int s)
 {
     radar_t		*p;
 
     EXPAND(radar_ptr, num_radar, max_radar, radar_t, 1);
     p = &radar_ptr[num_radar++];
-    p->x = CLICK_TO_PIXEL(cx);
-    p->y = CLICK_TO_PIXEL(cy);
+    p->x = CLICK_TO_PIXEL(pos.cx);
+    p->y = CLICK_TO_PIXEL(pos.cy);
     p->size = s;
 }
 
@@ -256,8 +256,8 @@ static void Frame_radar_buffer_send(connection_t *conn)
     if (num_radar > MIN(256, MAX_SHUFFLE_INDEX))
 	num_radar = MIN(256, MAX_SHUFFLE_INDEX);
     shuffle_bufsize = (num_radar * sizeof(shuffle_t));
-    radar_shuffle = (shuffle_t *) malloc(shuffle_bufsize);
-    if (radar_shuffle == (shuffle_t *) NULL)
+    radar_shuffle = malloc(shuffle_bufsize);
+    if (radar_shuffle == NULL)
 	return;
     for (i = 0; i < num_radar; i++)
 	radar_shuffle[i] = i;
@@ -580,7 +580,7 @@ static void Frame_shuffle_objects(void)
 	    free(object_shuffle_ptr);
 	max_object_shuffle = num_object_shuffle;
 	memsize = max_object_shuffle * sizeof(shuffle_t);
-	object_shuffle_ptr = (shuffle_t *) malloc(memsize);
+	object_shuffle_ptr = malloc(memsize);
 	if (object_shuffle_ptr == NULL)
 	    max_object_shuffle = 0;
     }
@@ -614,7 +614,7 @@ static void Frame_shuffle_players(void)
 	    free(player_shuffle_ptr);
 	max_player_shuffle = num_player_shuffle;
 	memsize = max_player_shuffle * sizeof(shuffle_t);
-	player_shuffle_ptr = (shuffle_t *) malloc(memsize);
+	player_shuffle_ptr = malloc(memsize);
 	if (player_shuffle_ptr == NULL)
 	    max_player_shuffle = 0;
     }
@@ -973,7 +973,7 @@ static void Frame_radar(connection_t *conn, player *pl)
 {
     int			i, k, mask, shownuke, size;
     object		*shot;
-    int			cx, cy;
+    clpos		pos;
 
     Frame_radar_buffer_reset();
 
@@ -1019,11 +1019,10 @@ static void Frame_radar(connection_t *conn, player *pl)
 		    continue;
 	    }
 
-	    cx = shot->pos.cx;
-	    cy = shot->pos.cy;
-	    if (Wrap_length(pl->pos.cx - cx,
-			    pl->pos.cy - cy) <= pl->sensor_range * CLICK)
-		Frame_radar_buffer_add(cx, cy, size);
+	    pos = shot->pos;
+	    if (Wrap_length(pl->pos.cx - pos.cx,
+			    pl->pos.cy - pos.cy) <= pl->sensor_range * CLICK)
+		Frame_radar_buffer_add(pos, size);
 	}
     }
 #endif
@@ -1051,11 +1050,10 @@ static void Frame_radar(connection_t *conn, player *pl)
 		    && (!playersOnRadar || !pl->visibility[i].canSee))) {
 		continue;
 	    }
-	    cx = pl_i->pos.cx;
-	    cy = pl_i->pos.cy;
+	    pos = pl_i->pos;
 	    if (BIT(World.rules->mode, LIMITED_VISIBILITY)
-		&& Wrap_length(pl->pos.cx - cx,
-			       pl->pos.cy - cy) > pl->sensor_range * CLICK)
+		&& Wrap_length(pl->pos.cx - pos.cx,
+			       pl->pos.cy - pos.cy) > pl->sensor_range * CLICK)
 		continue;
 	    if (BIT(pl->used, HAS_COMPASS)
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
@@ -1066,7 +1064,7 @@ static void Frame_radar(connection_t *conn, player *pl)
 	    size = 3;
 	    if (TEAM(pl_i, pl) || ALLIANCE(pl, pl_i) || OWNS_TANK(pl, pl_i))
 		size |= 0x80;
-	    Frame_radar_buffer_add(cx, cy, size);
+	    Frame_radar_buffer_add(pos, size);
 	}
     }
 
