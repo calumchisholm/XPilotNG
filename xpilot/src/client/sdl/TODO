@@ -1,0 +1,55 @@
+TODO
+----
+
+Task:
+  Implement the Gui_* methods in sdlgui.c. Most of those are probably easy
+  to implement by just painting the appropriate image.
+Developer:
+  
+Task:
+  Implement the Gui_paint_polygon properly. According to OpenGL specs the
+  polygons should be simple and convex. In xpilot polygons are simple but
+  often non-convex, so this may require polygon tessellation. The GLU
+  library provides the necessary functionality.
+Developer:
+
+Task:
+  Implement radar painting. The most effective way would probably be
+  to use similar strategy as the X client uses. The radar walls are
+  painted to an image which is then painted to the screen.
+Developer: baron
+
+Task:
+  Text/font handling. OpenGL does not provide any easy way to draw text.
+  My propose is to use bitmaps for each character and implement a function
+  that uses those bitmaps to draw text.
+Developer:
+
+Task:
+  Talk window. This task depends on the text/font handling task.
+Developer:
+
+Task:
+  Message display. This task depends on the text/font handling task.
+Developer:
+
+Task:
+  Score display. This task depends on the text/font handling task.
+Developer:
+
+Task:
+  Scalefactor. This could be done with OpenGL's glScale but the rounding
+  errors make the map change from frame to frame. If possible this effect
+  should be minimized.
+Developer:
+
+Task:
+  Windows support. The biggest thing here is to implement options.c and 
+  Game_loop without using X.
+Developer:
+
+Task:
+  Add more tasks here.
+
+
+  
