@@ -456,8 +456,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 }
 
 
-void Player_crash(player *pl, struct move *move, int crashtype,
-		  int item_id, int pt)
+void Player_crash(player *pl, int crashtype, int item_id, int pt)
 {
     const char		*howfmt = NULL;
     const char          *hudmsg = NULL;
@@ -557,8 +556,6 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 	DFLOAT		sc;
 
 	SET_BIT(pl->status, KILLED);
-	move->delta.cx = 0;
-	move->delta.cy = 0;
 	sprintf(msg, howfmt, pl->name, (!pt) ? " head first" : "");
 
 	/* get a list of who pushed me */
@@ -828,17 +825,17 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     type = groups[group].type;
     item_id = groups[group].item_id;
     if (type == TREASURE) {
-	Player_crash(pl, move, CrashTreasure, NO_ID, 1);
+	Player_crash(pl, CrashTreasure, NO_ID, 1);
 	return;
     }
 
     if (type == WORMHOLE) {
-	Player_crash(pl, move, CrashWormHole, item_id, 1);
+	Player_crash(pl, CrashWormHole, item_id, 1);
 	return;
     }
 
     if (type == CANNON) {
-	Player_crash(pl, move, CrashCannon, item_id, 1);
+	Player_crash(pl, CrashCannon, item_id, 1);
 	if (BIT(pl->status, KILLED))
 	    return;
 	/* The player may bounce from the cannon if both have shields up. */
@@ -871,9 +868,9 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 
 	if (speed > max_speed) {
 	    if (type == TARGET)
-		Player_crash(pl, move, CrashTarget, item_id, 1);
+		Player_crash(pl, CrashTarget, item_id, 1);
 	    else
-		Player_crash(pl, move, CrashWallSpeed, NO_ID, 1);
+		Player_crash(pl, CrashWallSpeed, NO_ID, 1);
 	    return;
 	}
 
@@ -890,10 +887,10 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	    Item_damage(pl, wallBounceDestroyItemProb);
 	}
 	if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
-	    if (type == TARGET) 
-		Player_crash(pl, move, CrashTarget, item_id, 1);
+	    if (type == TARGET)
+		Player_crash(pl, CrashTarget, item_id, 1);
 	    else
-		Player_crash(pl, move, CrashWallNoFuel, NO_ID, 1);
+		Player_crash(pl, CrashWallNoFuel, NO_ID, 1);
 	    return;
 	}
 	/* !@# I didn't implement wall direction calculation yet. */
@@ -2795,11 +2792,17 @@ void Move_player(player *pl)
 	    mv.delta.cx -= ans.moved.cx;
 	    mv.delta.cy -= ans.moved.cy;
 	    if (ans.line != -1) {
-		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0)
+		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 		    Bounce_player(pl, &mv, ans.line, ans.point);
+		    if (BIT(pl->status, KILLED))
+			break;
+		}
 		else if (!Shape_away(&mv, (shape *)pl->ship, pl->dir, ans.line, &ans)) {
-		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0)
+		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 			Bounce_player(pl, &mv, ans.line, ans.point);
+			if (BIT(pl->status, KILLED))
+			    break;
+		    }
 		    else {
 			/* This case could be handled better,
 			 * I'll write the code for that if this

@@ -121,8 +121,7 @@ void Phasing(player *pl, int on)
 	if (shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
 			    (object *)pl, (shape *)pl->ship, pl->dir)
 	    != NO_GROUP) {
-	    struct move mv;
-	    Player_crash(pl, &mv, CrashWall, NO_ID, 0);
+	    Player_crash(pl, CrashWall, NO_ID, 0);
 	}
     }
 }
@@ -1124,10 +1123,10 @@ void Update_objects(void)
 
 			wcx = WRAP_DCX(wh->pos.cx - wh_hit->pos.cx);
 			wcy = WRAP_DCY(wh->pos.cy - wh_hit->pos.cy);
-			
+
 			proximity = (pl->vel.y * wcx + pl->vel.x * wcy);
 			proximity = ABS(proximity);
-			
+
 			if (pl->vel.x * wcx + pl->vel.y * wcy < 0) {
 			    if (proximity < proxRear) {
 				nearestRear = j;
@@ -1140,7 +1139,7 @@ void Update_objects(void)
 		    }
 
 #define RANDOM_REAR_WORM 1
-		    
+
 		    if (! RANDOM_REAR_WORM) {
 			j = nearestFront < 0 ? nearestRear : nearestFront;
 		    } else {

@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -70,9 +70,7 @@ void Player_position_set_clicks(player *pl, int cx, int cy)
 	    *(double *)(-1) = 4321.0;
 	    abort();
 	} else {
-	    struct move mv;
-
-	    Player_crash(pl, &mv, CrashUnknown, -1, 1);
+	    Player_crash(pl, CrashUnknown, -1, 1);
 	    return;
 	}
     }
