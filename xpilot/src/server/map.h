@@ -229,12 +229,7 @@ typedef struct {
     char		author[MAX_CHARS];
     char		dataURL[MAX_CHARS];
 
-    /* kps - ng does not want **block and **itemID */
     u_byte		**block;        /* type of item in each block */
-
-			/* index into mapobject depending on value of corresponding block,
-			** -1 for space, walls, etc */
-    unsigned short	**itemID;
 
     vector		**gravity;
 
