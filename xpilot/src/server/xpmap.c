@@ -142,7 +142,7 @@ static void Xpmap_setup(world_t *world)
 
 setup_t *Xpmap_init_setup(world_t *world)
 {
-    int			i, x, y, team, type = -1,
+    int			i, x, y, team, type = -1, dir, wtype,
 			wormhole = 0,
 			treasure = 0,
 			target = 0,
@@ -221,29 +221,39 @@ setup_t *Xpmap_init_setup(world_t *world)
 	    case LEFT_GRAV:	*mapptr = SETUP_LEFT_GRAV; break;
 	    case ITEM_CONCENTRATOR:
 		*mapptr = SETUP_ITEM_CONCENTRATOR; break;
+
 	    case ASTEROID_CONCENTRATOR:
 		*mapptr = SETUP_ASTEROID_CONCENTRATOR; break;
+
 	    case DECOR_FILLED:	*mapptr = SETUP_DECOR_FILLED; break;
 	    case DECOR_RU:	*mapptr = SETUP_DECOR_RU; break;
 	    case DECOR_RD:	*mapptr = SETUP_DECOR_RD; break;
 	    case DECOR_LU:	*mapptr = SETUP_DECOR_LU; break;
 	    case DECOR_LD:	*mapptr = SETUP_DECOR_LD; break;
+
 	    case WORMHOLE:
 		if (wormhole >= world->NumWormholes) {
+		    /*
+		     * This can happen on an xp2 map if the block mapdata
+		     * contains more wormholes than is specified in the
+		     * xml data.
+		     */
 		    warn("Too many wormholes in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		switch (world->wormholes[wormhole++].type) {
+		wtype = world->wormholes[wormhole++].type;
+		switch (wtype) {
 		case WORM_NORMAL: *mapptr = SETUP_WORM_NORMAL; break;
 		case WORM_IN:     *mapptr = SETUP_WORM_IN; break;
 		case WORM_OUT:    *mapptr = SETUP_WORM_OUT; break;
 		default:
-		    error("Bad wormhole (%d,%d).", x, y);
-		    free(mapdata);
-		    return NULL;
+		    warn("Bad wormhole (%d,%d).", x, y);
+		    *mapptr = SETUP_SPACE;
+		    break;
 		}
 		break;
+
 	    case TREASURE:
 		if (treasure >= world->NumTreasures) {
 		    warn("Too many treasures in block mapdata.");
@@ -255,6 +265,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 		    team = 0;
 		*mapptr = SETUP_TREASURE + team;
 		break;
+
 	    case TARGET:
 		if (target >= world->NumTargets) {
 		    warn("Too many targets in block mapdata.");
@@ -266,6 +277,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 		    team = 0;
 		*mapptr = SETUP_TARGET + team;
 		break;
+
 	    case BASE:
 		if (base >= world->NumBases) {
 		    warn("Too many bases in block mapdata.");
@@ -275,37 +287,47 @@ setup_t *Xpmap_init_setup(world_t *world)
 		team = world->bases[base].team;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
-		switch (world->bases[base++].dir) {
+		dir = world->bases[base++].dir;
+		switch (dir) {
 		case DIR_UP:    *mapptr = SETUP_BASE_UP + team; break;
 		case DIR_RIGHT: *mapptr = SETUP_BASE_RIGHT + team; break;
 		case DIR_DOWN:  *mapptr = SETUP_BASE_DOWN + team; break;
 		case DIR_LEFT:  *mapptr = SETUP_BASE_LEFT + team; break;
 		default:
-		    error("Bad base at (%d,%d).", x, y);
-		    free(mapdata);
-		    return NULL;
+		    warn("Bad base at (%d,%d), (dir = %d).", x, y, dir);
+		    /*
+		     * kps - this could be improved, that is send some dir
+		     * that is closer to the original dir
+		     */
+		    *mapptr = SETUP_BASE_UP + team;
+		    break;
 		}
 		break;
+
 	    case CANNON:
 		if (cannon >= world->NumCannons) {
 		    warn("Too many cannons in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		switch (world->cannons[cannon++].dir) {
+		dir = world->cannons[cannon++].dir;
+		switch (dir) {
 		case DIR_UP:	*mapptr = SETUP_CANNON_UP; break;
 		case DIR_RIGHT:	*mapptr = SETUP_CANNON_RIGHT; break;
 		case DIR_DOWN:	*mapptr = SETUP_CANNON_DOWN; break;
 		case DIR_LEFT:	*mapptr = SETUP_CANNON_LEFT; break;
 		default:
-		    error("Bad cannon at (%d,%d).", x, y);
-		    free(mapdata);
-		    return NULL;
+		    warn("Bad cannon at (%d,%d), (dir = %d).", x, y, dir);
+		    /* kps - this could be improved */
+		    *mapptr = SETUP_CANNON_UP;
+		    break;
 		}
 		break;
+
 	    case CHECK:
 		for (i = 0; i < world->NumChecks; i++) {
 		    check_t *check = Checks(world, i);
+
 		    blpos bpos = Clpos_to_blpos(check->pos);
 		    if (x != bpos.bx || y != bpos.by)
 			continue;
@@ -313,13 +335,14 @@ setup_t *Xpmap_init_setup(world_t *world)
 		    break;
 		}
 		if (i >= world->NumChecks) {
-		    error("Bad checkpoint at (%d,%d).", x, y);
-		    free(mapdata);
-		    return NULL;
+		    warn("Bad checkpoint at (%d,%d).", x, y);
+		    *mapptr = SETUP_SPACE;
+		    break;
 		}
 		break;
+
 	    default:
-		error("Unknown map type (%d) at (%d,%d).", type, x, y);
+		warn("Unknown map type (%d) at (%d,%d).", type, x, y);
 		*mapptr = SETUP_SPACE;
 		break;
 	    }
