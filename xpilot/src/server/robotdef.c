@@ -130,6 +130,23 @@ static bool Really_empty_space(player_t *pl, int x, int y)
 }
 #endif
 
+/* watch out for strong gravity */
+static inline bool Strong_gravity(player_t *pl, clpos_t pos, int travel_dir)
+{
+    vector_t grav;
+    int gravity_dir;
+    world_t *world = pl->world;
+
+    grav = World_gravity(world, pos);
+    if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
+	gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
+			      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
+	if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
+	    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4)
+	    return true;
+    }
+    return false;
+}
 
 /*
  * Prototypes for methods of the default robot type.
@@ -437,8 +454,6 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
     bool			evade, left_ok, right_ok;
     int				i, safe_width, travel_dir, delta_dir, aux_dir;
     int				px[3], py[3];
-    vector_t			grav;
-    int				gravity_dir;
     long			dx, dy;
     double			velocity;
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
@@ -501,20 +516,13 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 		    right_ok = false;
 		continue;
 	    }
-	    /* Watch out for strong gravity */
-	    grav = World_gravity(world, d);
-	    if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
-		gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
-				      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
-		if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
-		    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4) {
-		    evade = true;
-		    if (i == 1)
-			left_ok = false;
-		    if (i == 2)
-			right_ok = false;
-		    continue;
-		}
+	    if (Strong_gravity(pl, d, travel_dir)) {
+		evade = true;
+		if (i == 1)
+		    left_ok = false;
+		if (i == 2)
+		    right_ok = false;
+		continue;
 	    }
 	}
     }
@@ -582,17 +590,9 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 		left_ok = false;
 		continue;
 	    }
-	    /* watch out for strong gravity */
-	    grav = World_gravity(world, d);
-	    if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
-		gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
-				      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
-		if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
-		    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4) {
-
-		    left_ok = false;
-		    continue;
-		}
+	    if (Strong_gravity(pl, d, travel_dir)) {
+		left_ok = false;
+		continue;
 	    }
 	}
 
@@ -617,17 +617,9 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 		right_ok = false;
 		continue;
 	    }
-	    /* watch out for strong gravity */
-	    grav = World_gravity(world, d);
-	    if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
-		gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
-				      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
-		if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
-		    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4) {
-
-		    right_ok = false;
-		    continue;
-		}
+	    if (Strong_gravity(pl, d, travel_dir)) {
+		right_ok = false;
+		continue;
 	    }
 	}
     }
