@@ -279,8 +279,11 @@ void ButtonPress_event(XEvent *event)
     if (xbutton->window == drawWindow) {
 	switch (xbutton->button) {
 	case Button1:
-	    /* start cutting from the talk messages */
-	    Talk_cut_from_messages(xbutton);
+	    if (Talk_cut_area_hit(xbutton))
+		/* start cutting from the talk messages */
+		Talk_cut_from_messages(xbutton);
+	    else
+		Pointer_control_set_state(true);
 	    break;
 
 	case Button2:

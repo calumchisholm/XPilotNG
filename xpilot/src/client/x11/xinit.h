@@ -86,6 +86,7 @@ extern int Talk_do_event(XEvent *event);
 extern int Talk_paste(char* data, size_t len, bool overwrite);
 extern int Talk_place_cursor(XButtonEvent *xbutton, bool pending);
 extern void Talk_window_cut(XButtonEvent *xbutton);
+extern bool Talk_cut_area_hit(XButtonEvent *xbutton);
 extern void Talk_cut_from_messages(XButtonEvent *xbutton);
 extern void Clear_selection(void);
 extern int FatalError(Display *);

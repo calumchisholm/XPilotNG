@@ -1170,6 +1170,25 @@ void Talk_window_cut(XButtonEvent* xbutton)
     } /* ButtonRelease */
 }
 
+bool Talk_cut_area_hit(XButtonEvent *xbutton)
+{
+    const int BORDER = 10;
+    const int SPACING = messageFont->ascent+messageFont->descent+1;
+    int y;	/* of initial ButtonEvent */
+
+    y = xbutton->y - BORDER;
+
+    if (y < 0)
+	y = -1;
+    else
+	y /= SPACING;
+
+    if (y < maxMessages)
+	return true;
+
+    return false;
+}
+
 /*
  * wanted:
  * indices of the characters and the rows of start and end of
@@ -1184,9 +1203,8 @@ void Talk_window_cut(XButtonEvent* xbutton)
 void Talk_cut_from_messages(XButtonEvent* xbutton)
 {
 
-    const int	BORDER = 10,
-		SPACING = messageFont->ascent+messageFont->descent+1;
-
+    const int BORDER = 10;
+    const int SPACING = messageFont->ascent+messageFont->descent+1;
     int		x, y;	/* of initial ButtonEvent */
 
     typedef struct {
