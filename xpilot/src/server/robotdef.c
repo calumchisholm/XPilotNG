@@ -1707,8 +1707,9 @@ static void Robot_default_play_check_objects(int ind,
 	    SET_BIT(pl->used, HAS_CONNECTOR);
 	}
 
-	/* Ignore shots if shields already up - nothing else to do anyway */
-	if (BIT(shot->type, OBJ_SHOT|OBJ_CANNON_SHOT)
+	/* Ignore shots and laser pulses if shields already up
+	   - nothing else to do anyway */
+	if (BIT(shot->type, OBJ_SHOT|OBJ_CANNON_SHOT|OBJ_PULSE)
 	    && BIT(pl->used, HAS_SHIELD)) {
 	    continue;
 	}
@@ -1776,6 +1777,16 @@ static void Robot_default_play_check_objects(int ind,
 	if (shot->id == pl->id
 	    && selfImmunity) {
 	    continue;
+	}
+
+	/*
+	 * Own non-reflected laser pulses too.
+	 */
+	if (BIT(shot->type, OBJ_PULSE)) {
+	    pulseobject *pulse = PULSE_PTR(shot);
+	    if (pulse->id == pl->id
+		&& !pulse->refl)
+		continue;
 	}
 
 	/* Find nearest missile/mine */
@@ -1876,53 +1887,6 @@ static void Robot_default_play_check_objects(int ind,
 	}
     }
 
-}
-
-
-static void Robot_default_play_check_lasers(int ind)
-{
-    /* kps - move this to check objects function above */
-#if 0 /* laserhack */
-    player			*pl = Players[ind];
-    int				j;
-    int				dx, dy;
-    int				distance2;
-    int				shield_range;
-    robot_default_data_t	*my_data = Robot_default_get_data(pl);
-
-    /*
-     * Test if others are firing lasers at us.
-     * Maybe move this into the player loop.
-     */
-    if (BIT(pl->used, HAS_SHIELD) == 0
-	&& BIT(pl->have, HAS_SHIELD) != 0) {
-	shield_range = 21 + SHIP_SZ;
-	for (j = 0; j < NumPulses; j++) {
-	    pulse_t *pulse = Pulses[j];
-	    if (pulse->id == pl->id
-		&& !pulse->refl)
-		continue;
-	    if (Team_immune(pulse->id, pl->id))
-		continue;
-	    if (pl->id == pulse->id
-		&& selfImmunity)
-		continue;
-	    dx = (long)WRAP_DX(pl->pos.px - CLICK_TO_PIXEL(pulse->pos.cx));
-	    dy = (long)WRAP_DY(pl->pos.py - CLICK_TO_PIXEL(pulse->pos.cy));
-	    distance2 = sqr(dx) + sqr(dy);
-	    if ((distance2 < sqr(CLICK_TO_PIXEL(PULSE_LENGTH))
-		 || (distance2 < sqr(2 * CLICK_TO_PIXEL(PULSE_LENGTH))
-		     && ABS(findDir(dx, dy) - pulse->dir) < RES / 8))
-		&& (int)(rfrac() * 100) <
-		   (85 + (my_data->defense / 7) - (my_data->attack / 50))) {
-		SET_BIT(pl->used, HAS_SHIELD);
-		if (!cloakedShield)
-		    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
-		break;
-	    }
-	}
-    }
-#endif
 }
 
 
@@ -2045,8 +2009,6 @@ static void Robot_default_play(int ind)
     Robot_default_play_check_objects(ind,
 				     &item_i, &item_dist, &item_imp,
 				     &mine_i, &mine_dist);
-
-    Robot_default_play_check_lasers(ind);
 
     /* Note: Only take time to navigate if not being shot at */
     /* KK: it seems that this 'Check_robot_navigate' function caused
