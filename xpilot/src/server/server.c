@@ -233,7 +233,7 @@ void Main_loop(void)
 		    xpprintf("%s Server will stop in %g minutes.\n",
 			     showtime(), options.gameDuration);
 		    gameOverTime
-			= (time_t)(options.gameDuration * 60) + time((time_t *)NULL);
+			= (time_t)(options.gameDuration * 60) + time(NULL);
 		}
 	    }
 	}
@@ -299,9 +299,9 @@ int End_game(void)
     playback = rplayback; /* Could be called from signal handler */
     if (ShutdownServer == 0) {
 	warn("Shutting down...");
-	sprintf(msg, "shutting down: %s", ShutdownReason);
+	snprintf(msg, sizeof(msg), "shutting down: %s", ShutdownReason);
     } else
-	sprintf(msg, "server exiting");
+	snprintf(msg, sizeof(msg), "server exiting");
 
     teamcup_close_score_file();
 
@@ -370,17 +370,11 @@ int End_game(void)
  */
 int Pick_team(int pick_for_type)
 {
-    int			i,
-			least_players,
-			num_available_teams = 0,
-			playing_teams = 0,
-			losing_team;
-    player_t		*pl;
-    int			playing[MAX_TEAMS];
-    int			free_bases[MAX_TEAMS];
-    int			available_teams[MAX_TEAMS];
-    long		team_score[MAX_TEAMS];
-    long		losing_score;
+    int i, least_players, num_available_teams = 0, playing_teams = 0;
+    int losing_team;
+    player_t *pl;
+    int playing[MAX_TEAMS], free_bases[MAX_TEAMS], available_teams[MAX_TEAMS];
+    double team_score[MAX_TEAMS], losing_score;
     world_t *world = &World;
 
     /* If game_lock is on, can't join playing teams (might be able to join
@@ -478,49 +472,45 @@ int Pick_team(int pick_for_type)
  * Return status for server
  *
  * TODO
-*/
+ */
 void Server_info(char *str, size_t max_size)
 {
-    int			i, j, k;
-    player_t		*pl, **order, *best = NULL;
-    double		ratio, best_ratio = -1e7;
-    char		name[MAX_CHARS];
-    char		lblstr[MAX_CHARS];
-    char		msg[MSG_LEN];
+    int i, j, k;
+    player_t *pl, **order;
+    char name[MAX_CHARS], lblstr[MAX_CHARS], msg[MSG_LEN];
     world_t *world = &World;
 
-    sprintf(str,
-	    "SERVER VERSION..: %s\n"
-	    "STATUS..........: %s\n"
-	    "MAX SPEED.......: %d fps\n"
-	    "WORLD...........: %s\n"
-	    "      AUTHOR....: %s\n"
-	    "      SIZE......: %dx%d pixels\n"
-	    "PLAYERS.........: %2d/%2d\n"
-	    "\n"
-	    "EXPERIMENTAL SERVER, see\n"
-	    "http://xpilot.sourceforge.net/\n"
-	    "\n",
-	    server_version,
-	    (game_lock && ShutdownServer == -1) ? "locked" :
-	    (!game_lock && ShutdownServer != -1) ? "shutting down" :
-	    (game_lock && ShutdownServer != -1) ?
-	    "locked and shutting down" : "ok",
-	    FPS,
-	    world->name, world->author, world->width, world->height,
-	    NumPlayers, world->NumBases);
+    snprintf(str, max_size,
+	     "SERVER VERSION..: %s\n"
+	     "STATUS..........: %s\n"
+	     "CURRENT FPS.....: %d\n"
+	     "WORLD...........: %s\n"
+	     "      AUTHOR....: %s\n"
+	     "      SIZE......: %dx%d pixels\n"
+	     "PLAYERS.........: %2d/%2d\n"
+	     "\n"
+	     "XPILOT NG SERVER, see\n"
+	     "http://xpilot.sourceforge.net/\n"
+	     "\n",
+	     server_version,
+	     (game_lock && ShutdownServer == -1) ? "locked" :
+	     (!game_lock && ShutdownServer != -1) ? "shutting down" :
+	     (game_lock && ShutdownServer != -1) ?
+	     "locked and shutting down" : "ok",
+	     FPS,
+	     world->name, world->author, world->width, world->height,
+	     NumPlayers, world->NumBases);
 
-    if (strlen(str) >= max_size) {
-	warn("Server_info string overflow (%d)", max_size);
-	str[max_size - 1] = '\0';
-	return;
-    }
+    assert(strlen(str) < max_size);
+
     if (NumPlayers <= 0)
 	return;
 
-    sprintf(msg, "\n"
-	   "NO:  TM: NAME:             LIFE:   SC:    PLAYER:\n"
-	   "-------------------------------------------------\n");
+    strlcpy(msg, "\n"
+	    "NO:  TM: NAME:             LIFE:   SC:    PLAYER:\n"
+	    "-------------------------------------------------\n",
+	    sizeof(msg));
+
     if (strlen(msg) + strlen(str) >= max_size)
 	return;
 
@@ -533,17 +523,7 @@ void Server_info(char *str, size_t max_size)
     }
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (BIT(world->rules->mode, LIMITED_LIVES))
-	    ratio = pl->score;
-	else
-	    ratio = pl->score / (pl->life + 1);
 
-	if ((best == NULL
-		|| ratio > best_ratio)
-	    && !BIT(pl->status, PAUSE)) {
-	    best_ratio = ratio;
-	    best = pl;
-	}
 	for (j = 0; j < i; j++) {
 	    if (order[j]->score < pl->score) {
 		for (k = i; k > j; k--)
@@ -556,23 +536,11 @@ void Server_info(char *str, size_t max_size)
     for (i = 0; i < NumPlayers; i++) {
 	pl = order[i];
 	strlcpy(name, pl->name, MAX_CHARS);
-	if (Player_is_robot(pl)) {
-	    if ((k = Robot_war_on_player(pl)) != NO_ID) {
-		sprintf(name + strlen(name), " (%s)",
-			Player_by_id(k)->name);
-		if (strlen(name) >= 19)
-		    strcpy(&name[17], ")");
-	    }
-	}
-	sprintf(lblstr, "%c%c %-19s%03d%6d",
-		(pl == best) ? '*' : pl->mychar,
-		(pl->team == TEAM_NOT_SET) ? ' ' : (pl->team + '0'),
-		name, (int)pl->life, (int)pl->score);
-	sprintf(msg, "%2d... %-36s%s@%s\n",
-		i+1, lblstr, pl->username,
-		Player_is_human(pl)
-		? pl->hostname
-		: "xpilot.org");
+	snprintf(lblstr, sizeof(lblstr), "%c%c %-19s%03d%6d",
+		 pl->mychar, pl->team == TEAM_NOT_SET ? ' ' : (pl->team + '0'),
+		 name, (int)pl->life, (int)pl->score);
+	snprintf(msg, sizeof(msg), "%2d... %-36s%s@%s\n",
+		 i + 1, lblstr, pl->username, pl->hostname);
 	if (strlen(msg) + strlen(str) >= max_size)
 	    break;
 	strlcat(str, msg, max_size);
@@ -631,12 +599,9 @@ void Log_game(const char *heading)
     ptr = localtime(&lt);
     strftime(timenow, 79, "%I:%M:%S %p %Z %A, %B %d, %Y", ptr);
 
-    sprintf(str,"%-50.50s\t%10.10s@%-15.15s\tWorld: %-25.25s\t%10.10s\n",
-	    timenow,
-	    Server.owner,
-	    Server.host,
-	    world->name,
-	    heading);
+    snprintf(str, sizeof(str),
+	     "%-50.50s\t%10.10s@%-15.15s\tWorld: %-25.25s\t%10.10s\n",
+	     timenow, Server.owner, Server.host, world->name, heading);
 
     if ((fp = fopen(Conf_logfile(), "a")) == NULL) {
 	error("Couldn't open log file, contact %s", Conf_localguru());
@@ -649,9 +614,10 @@ void Log_game(const char *heading)
 
 void Game_Over(void)
 {
-    long		maxsc, minsc;
-    int			i, win, lose;
-    char		msg[128];
+    double maxsc, minsc;
+    int i, win_team = TEAM_NOT_SET, lose_team = TEAM_NOT_SET;
+    char msg[MSG_LEN];
+    player_t *win_pl = NULL, *lose_pl = NULL;
     world_t *world = &World;
 
     Set_message("Game over...");
@@ -664,11 +630,10 @@ void Game_Over(void)
     options.gameDuration = -1.0;
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
-	int teamscore[MAX_TEAMS];
+	double teamscore[MAX_TEAMS];
 
-	maxsc = -32767;
-	minsc = 32767;
-	win = lose = -1;
+	maxsc = -1e6;
+	minsc = 1e6;
 
 	for (i = 0; i < MAX_TEAMS; i++)
 	    teamscore[i] = 1234567; /* These teams are not used... */
@@ -685,35 +650,36 @@ void Game_Over(void)
 	    }
 	}
 
-	for (i=0; i < MAX_TEAMS; i++) {
+	for (i = 0; i < MAX_TEAMS; i++) {
 	    if (teamscore[i] != 1234567) {
 		if (teamscore[i] > maxsc) {
 		    maxsc = teamscore[i];
-		    win = i;
+		    win_team = i;
 		}
 		if (teamscore[i] < minsc) {
 		    minsc = teamscore[i];
-		    lose = i;
+		    lose_team = i;
 		}
 	    }
 	}
 
-	if (win != -1) {
-	    sprintf(msg,"Best team (%ld Pts): Team %d", maxsc, win);
+	if (win_team != TEAM_NOT_SET) {
+	    snprintf(msg, sizeof(msg), "Best team (%.2f Pts): Team %d",
+		     maxsc, win_team);
 	    Set_message(msg);
 	    xpprintf("%s\n", msg);
 	}
 
-	if (lose != -1 && lose != win) {
-	    sprintf(msg,"Worst team (%ld Pts): Team %d", minsc, lose);
+	if (lose_team != TEAM_NOT_SET && lose_team != win_team) {
+	    snprintf(msg, sizeof(msg), "Worst team (%.2f Pts): Team %d",
+		     minsc, lose_team);
 	    Set_message(msg);
 	    xpprintf("%s\n", msg);
 	}
     }
 
-    maxsc = -32767;
-    minsc = 32767;
-    win = lose = -1;
+    maxsc = -1e6;
+    minsc = 1e6;
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Players(i);
@@ -722,21 +688,21 @@ void Game_Over(void)
 	if (Player_is_human(pl_i)) {
 	    if (pl_i->score > maxsc) {
 		maxsc = pl_i->score;
-		win = i;
+		win_pl = pl_i;
 	    }
 	    if (pl_i->score < minsc) {
 		minsc = pl_i->score;
-		lose = i;
+		lose_pl = pl_i;
 	    }
 	}
     }
-    if (win != -1) {
-	sprintf(msg,"Best human player: %s", Players(win)->name);
+    if (win_pl) {
+	snprintf(msg, sizeof(msg), "Best human player: %s", win_pl->name);
 	Set_message(msg);
 	xpprintf("%s\n", msg);
     }
-    if (lose != -1 && lose != win) {
-	sprintf(msg,"Worst human player: %s", Players(lose)->name);
+    if (lose_pl && lose_pl != win_pl) {
+	snprintf(msg, sizeof(msg), "Worst human player: %s", lose_pl->name);
 	Set_message(msg);
 	xpprintf("%s\n", msg);
     }
@@ -749,11 +715,11 @@ void Server_log_admin_message(player_t *pl, const char *str)
      * Only log the message if logfile already exists,
      * is writable and less than some KBs in size.
      */
-    const char		*logfilename = options.adminMessageFileName;
-    const int		logfile_size_limit = options.adminMessageFileSizeLimit;
-    FILE		*fp;
-    struct stat		st;
-    char		msg[MSG_LEN * 2];
+    const char *logfilename = options.adminMessageFileName;
+    const int logfile_size_limit = options.adminMessageFileSizeLimit;
+    FILE *fp;
+    struct stat st;
+    char msg[MSG_LEN * 2];
 
     if ((logfilename != NULL) &&
 	(logfilename[0] != '\0') &&
@@ -774,7 +740,7 @@ void Server_log_admin_message(player_t *pl, const char *str)
 		Player_get_dpy(pl),
 		str);
 	fclose(fp);
-	sprintf(msg, "%s [%s]:[%s]", str, pl->name, "GOD");
+	snprintf(msg, sizeof(msg), "%s [%s]:[%s]", str, pl->name, "GOD");
 	Set_player_message(pl, msg);
     }
     else
