@@ -1448,9 +1448,8 @@ static int Net_read(frame_buf_t *frame)
  */
 int Net_input(void)
 {
-    int		i,
-		j,
-		n;
+    int		i, j, n;
+    int		num_buffered_packets;
     frame_buf_t	*frame,
 		*last_frame,
 		*oldest_frame = &Frames[0],
@@ -1560,6 +1559,7 @@ int Net_input(void)
      * Find oldest packet.
      */
     last_frame = oldest_frame = &Frames[0];
+    num_buffered_packets = 1; /* Could be 0, but returns before using this */
     for (i = 1; i < receive_window_size; i++, last_frame++) {
 	frame = &Frames[i];
 	if (frame->loops == 0) {
@@ -1568,6 +1568,7 @@ int Net_input(void)
 		 * This is an unidentifiable packet.
 		 * Process it last, because it arrived last.
 		 */
+		num_buffered_packets++;
 		continue;
 	    } else {
 		/*
@@ -1577,9 +1578,11 @@ int Net_input(void)
 		break;
 	    }
 	}
-	else if (frame->loops < oldest_frame->loops
-	    || oldest_frame->loops == 0) {
-	    oldest_frame = frame;
+	else {
+	    num_buffered_packets++;
+	    if (frame->loops < oldest_frame->loops
+		|| oldest_frame->loops == 0)
+		oldest_frame = frame;
 	}
     }
 
@@ -1606,7 +1609,7 @@ int Net_input(void)
      */
     n = Net_packet();
 
-    if (last_frame /*->loops*/ > oldest_frame /*->loops*/) {
+    if (last_frame != oldest_frame) {
 	/*
 	 * Switch buffers to prevent gaps.
 	 */
@@ -1642,15 +1645,7 @@ int Net_input(void)
 	Net_flush();
     }
 
-    /* This was "return 1 + (last_frame->loops > oldest_frame->loops);",
-     * but that doesn't make sense as last_frame->loops is always set to 0
-     * above. This return value is only compared with -1 anyway.
-     * Should still read this whole function and check whether it makes
-     * sense (there was discussion on xpilot-hacks, but the patch from
-     * C R Johnson looked wrong too). XXX !@# */
-    /* kps - the "fix" causes massive client lag */
-    /* "fix": return 1; */
-    return 1 + (last_frame > oldest_frame);
+    return num_buffered_packets;
 }
 
 /*
