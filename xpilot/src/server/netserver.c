@@ -369,7 +369,10 @@ static int Init_setup_old(void)
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		*mapptr = SETUP_TARGET + World.targets[target++].team;
+		team = World.targets[target++].team;
+		if (team == TEAM_NOT_SET)
+		    team = 0;
+		*mapptr = SETUP_TARGET + team;
 		break;
 	    case BASE:
 		if (base >= World.NumBases) {
@@ -377,10 +380,9 @@ static int Init_setup_old(void)
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		if (World.bases[base].team == TEAM_NOT_SET)
+		team = World.bases[base].team;
+		if (team == TEAM_NOT_SET)
 		    team = 0;
-		else
-		    team = World.bases[base].team;
 		switch (World.bases[base++].dir) {
 		case DIR_UP:    *mapptr = SETUP_BASE_UP + team; break;
 		case DIR_RIGHT: *mapptr = SETUP_BASE_RIGHT + team; break;
