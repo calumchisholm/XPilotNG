@@ -636,8 +636,9 @@ void Update_score_table(void)
 	    pl->prev_mychar = pl->mychar;
 	    pl->prev_alliance = pl->alliance;
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players(i)->conn != NOT_CONNECTED) {
-		    Send_score(Players(i)->conn, pl->id,
+		player *pl_i = Players(i);
+		if (pl_i->conn != NOT_CONNECTED) {
+		    Send_score(pl_i->conn, pl->id,
 			       pl->score, pl->life,
 			       pl->mychar, pl->alliance);
 		}
@@ -658,8 +659,9 @@ void Update_score_table(void)
 				? (World.NumChecks - 1)
 				: (pl->check - 1);
 		for (i = 0; i < NumPlayers; i++) {
-		    if (Players(i)->conn != NOT_CONNECTED) {
-			Send_timing(Players(i)->conn, pl->id, check, pl->round);
+		    player *pl_i = Players(i);
+		    if (pl_i->conn != NOT_CONNECTED) {
+			Send_timing(pl_i->conn, pl->id, check, pl->round);
 		    }
 		}
 	    }
@@ -672,8 +674,9 @@ void Update_score_table(void)
 	    if (team->score != team->prev_score) {
 		team->prev_score = team->score;
 		for (i = 0; i < NumPlayers; i++) {
-		    if (Players(i)->conn != NOT_CONNECTED) {
-			Send_team_score(Players(i)->conn, j, team->score);
+		    player *pl_i = Players(i);
+		    if (pl_i->conn != NOT_CONNECTED) {
+			Send_team_score(pl_i->conn, j, team->score);
 		    }
 		}
 	    }

@@ -78,8 +78,9 @@ void TEAM_SCORE(int team, DFLOAT points)
 	int i;
 	DFLOAT share = World.teams[team].score / World.teams[team].NumMembers;
 	for (i = 0; i < NumPlayers; i++) {
-	    if (Players(i)->team == team) {
-		Rank_SetScore(Players(i), share);
+	    player *pl_i = Players(i);
+	    if (pl_i->team == team) {
+		Rank_SetScore(pl_i, share);
 	    }
 	}
     }
@@ -94,8 +95,9 @@ void Alliance_score(int id, DFLOAT points)
     DFLOAT	share = points / member_count;
 
     for (i = 0; i < NumPlayers; i++) {
-	if (Players(i)->alliance == id) {
-	    Rank_AddScore(Players(i), share);
+	player *pl_i = Players(i);
+	if (pl_i->alliance == id) {
+	    Rank_AddScore(pl_i, share);
 	}
     }
 }
@@ -130,19 +132,23 @@ DFLOAT Rate(DFLOAT winner, DFLOAT loser)
 void Score_players(int winner, DFLOAT winner_score, char *winner_msg,
 		   int loser, DFLOAT loser_score, char *loser_msg)
 {
+    player *pl_winner, *pl_loser;
+
+    pl_winner = Players(winner);
+    pl_loser = Players(loser);
     if (TEAM(winner, loser)
-	|| (Players(winner)->alliance != ALLIANCE_NOT_SET
-	    && Players(winner)->alliance == Players(loser)->alliance)
+	|| (pl_winner->alliance != ALLIANCE_NOT_SET
+	    && pl_winner->alliance == pl_loser->alliance)
 	|| (IS_TANK_IND(loser)
-	    && GetInd(Players(loser)->lock.pl_id) == winner)) {
+	    && GetInd(pl_loser->lock.pl_id) == winner)) {
 	if (winner_score > 0)
 	    winner_score = -winner_score;
 	if (loser_score > 0)
 	    loser_score = -loser_score;
     }
-    SCORE(winner, winner_score, Players(loser)->pos.cx, Players(loser)->pos.cy,
+    SCORE(winner, winner_score, pl_loser->pos.cx, pl_loser->pos.cy,
 	  winner_msg);
-    SCORE(loser, loser_score, Players(loser)->pos.cx, Players(loser)->pos.cy,
+    SCORE(loser, loser_score, pl_loser->pos.cx, pl_loser->pos.cy,
 	  loser_msg);
 }
 
