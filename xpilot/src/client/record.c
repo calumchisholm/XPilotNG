@@ -59,7 +59,8 @@ static void Dummy_newFrame(void) {}
 static void Dummy_endFrame(void) {}
 
 #ifdef _WINDOWS
-extern void paintItemSymbol(unsigned char type, Drawable drawable, GC mygc, int x, int y, int color);
+extern void paintItemSymbol(unsigned char type, Drawable drawable, GC mygc,
+			    int x, int y, int color);
 #else
 static void Dummy_paintItemSymbol(unsigned char type, Drawable drawable,
 				  GC mygc, int x, int y, int color) {}
@@ -119,9 +120,8 @@ static void RWriteString(char *str)
     int				i;
 
     RWriteUShort(len);
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len; i++)
 	putc(str[i], recordFP);
-    }
 }
 
 /*
@@ -157,9 +157,8 @@ static void RWriteHeader(void)
     RWriteByte(FPS);
     time(&t);
     strlcpy(buf, ctime(&t), sizeof(buf));
-    if ((ptr = strchr(buf, '\n')) != NULL) {
+    if ((ptr = strchr(buf, '\n')) != NULL)
 	*ptr = '\0';
-    }
     RWriteString(buf);
 
     /* Write info about graphics setup. */
@@ -168,10 +167,10 @@ static void RWriteHeader(void)
 	RWriteULong(colors[i].pixel);
 #ifdef _WINDOWS
 	{
-		COLORREF col = WinXPColour(colors[i].pixel);
-		RWriteUShort(256*GetRValue(col));
-		RWriteUShort(256*GetGValue(col));
-		RWriteUShort(256*GetBValue(col));
+	    COLORREF col = WinXPColour(colors[i].pixel);
+	    RWriteUShort(256*GetRValue(col));
+	    RWriteUShort(256*GetGValue(col));
+	    RWriteUShort(256*GetBValue(col));
 	}
 #else
 	RWriteUShort(colors[i].red);
@@ -195,14 +194,12 @@ static int RGetPixelIndex(unsigned long pixel)
     int			i;
 
     for (i = 0; i < maxColors; i++) {
-	if (pixel == colors[i].pixel) {
+	if (pixel == colors[i].pixel)
 	    return i;
-	}
     }
     for (i = 1; i < maxColors; i++) {
-	if (pixel == (colors[BLACK].pixel ^ colors[i].pixel)) {
+	if (pixel == (colors[BLACK].pixel ^ colors[i].pixel))
 	    return i + maxColors;
-	}
     }
 
     return WHITE;
@@ -259,9 +256,8 @@ static void RWriteTile(Pixmap tile)
 	for (x = 0; x < img->width; x++) {
 	    unsigned long pixel = XGetPixel(img, x, y);
 	    for (i = 0; i < maxColors - 1; i++) {
-		if (pixel == colors[i].pixel) {
+		if (pixel == colors[i].pixel)
 		    break;
-		}
 	    }
 	    RWriteByte(i);
 	}
@@ -298,53 +294,46 @@ static void RWriteGC(GC gc, unsigned long req_mask)
 	XGetGCValues(dpy, gc, write_mask, &values);
 
 	if ((write_mask & prev_mask & GCForeground) != 0) {
-	    if (prev_values.foreground == values.foreground) {
+	    if (prev_values.foreground == values.foreground)
 		write_mask &= ~GCForeground;
-	    } else {
+	    else
 		prev_values.foreground = values.foreground;
-	    }
 	}
 	if ((write_mask & prev_mask & GCBackground) != 0) {
-	    if (prev_values.background == values.background) {
+	    if (prev_values.background == values.background)
 		write_mask &= ~GCBackground;
-	    } else {
+	    else
 		prev_values.background = values.background;
-	    }
 	}
 	if ((write_mask & prev_mask & GCLineWidth) != 0) {
-	    if (prev_values.line_width == values.line_width) {
+	    if (prev_values.line_width == values.line_width)
 		write_mask &= ~GCLineWidth;
-	    } else {
+	    else
 		prev_values.line_width = values.line_width;
-	    }
 	}
 	if ((write_mask & prev_mask & GCLineStyle) != 0) {
-	    if (prev_values.line_style == values.line_style) {
+	    if (prev_values.line_style == values.line_style)
 		write_mask &= ~GCLineStyle;
-	    } else {
+	    else
 		prev_values.line_style = values.line_style;
-	    }
 	}
 	if ((write_mask & prev_mask & GCDashOffset) != 0) {
-	    if (prev_values.dash_offset == values.dash_offset) {
+	    if (prev_values.dash_offset == values.dash_offset)
 		write_mask &= ~GCDashOffset;
-	    } else {
+	    else
 		prev_values.dash_offset = values.dash_offset;
-	    }
 	}
 	if ((write_mask & prev_mask & GCFunction) != 0) {
-	    if (prev_values.function == values.function) {
+	    if (prev_values.function == values.function)
 		write_mask &= ~GCFunction;
-	    } else {
+	    else
 		prev_values.function = values.function;
-	    }
 	}
 	if ((write_mask & prev_mask & GCFillStyle) != 0) {
-	    if (prev_values.fill_style == values.fill_style) {
+	    if (prev_values.fill_style == values.fill_style)
 		write_mask &= ~GCFillStyle;
-	    } else {
+	    else
 		prev_values.fill_style = values.fill_style;
-	    }
 	    /*
 	     * We only update some values if they
 	     * are going to be used.
@@ -353,31 +342,26 @@ static void RWriteGC(GC gc, unsigned long req_mask)
 	     */
 	    if (values.fill_style == FillTiled) {
 		if ((write_mask & prev_mask & GCTileStipXOrigin) != 0) {
-		    if (prev_values.ts_x_origin == values.ts_x_origin) {
+		    if (prev_values.ts_x_origin == values.ts_x_origin)
 			write_mask &= ~GCTileStipXOrigin;
-		    } else {
+		    else
 			prev_values.ts_x_origin = values.ts_x_origin;
-		    }
 		}
 		if ((write_mask & prev_mask & GCTileStipYOrigin) != 0) {
-		    if (prev_values.ts_y_origin == values.ts_y_origin) {
+		    if (prev_values.ts_y_origin == values.ts_y_origin)
 			write_mask &= ~GCTileStipYOrigin;
-		    } else {
+		    else
 			prev_values.ts_y_origin = values.ts_y_origin;
-		    }
 		}
 		if ((write_mask & prev_mask & GCTile) != 0) {
-		    if (prev_values.tile == values.tile) {
+		    if (prev_values.tile == values.tile)
 			write_mask &= ~GCTile;
-		    } else {
+		    else
 			prev_values.tile = values.tile;
-		    }
 		}
-	    }
-	    else {
+	    } else
 		write_mask &= ~(GCTileStipXOrigin | GCTileStipYOrigin
 				| GCTile);
-	    }
 	}
 
 	if (!write_mask && !record_dash_dirty) {
@@ -443,9 +427,8 @@ static void RWriteGC(GC gc, unsigned long req_mask)
     if (record_dash_dirty) {
 	int i;
 	RWriteByte(record_num_dashes);
-	for (i = 0; i < record_num_dashes; i++) {
+	for (i = 0; i < record_num_dashes; i++)
 	    RWriteByte(record_dashes[i]);
-	}
     }
     if (write_mask & RTILEGC) {
 	if (write_mask & GCFillStyle)
@@ -464,9 +447,8 @@ static void RNewFrame(void)
 {
     static int		before;
 
-    if (!before++) {
+    if (!before++)
 	RWriteHeader();
-    }
 
     recording = True;
 
@@ -483,11 +465,10 @@ static void REndFrame(void)
 	XGetGCValues(dpy, gc, GCForeground, &values);
 
 	RWriteByte(RC_DAMAGED);
-	if ((damaged & 1) != 0) {
+	if ((damaged & 1) != 0)
 	    XSetForeground(dpy, gc, colors[BLUE].pixel);
-	} else {
+	else
 	    XSetForeground(dpy, gc, colors[BLACK].pixel);
-	}
 	RWriteGC(gc, GCForeground | RTILEGC);
 	RWriteByte(damaged);
 
@@ -641,7 +622,7 @@ static void RPaintItemSymbol(unsigned char type, Drawable drawable, GC mygc,
 			     int x, int y, int color)
 {
 #ifdef _WINDOWS
-	paintItemSymbol(type, drawable, mygc, x, y, color);
+    paintItemSymbol(type, drawable, mygc, x, y, color);
 #endif
     if (drawable == p_draw) {
 	putc(RC_PAINTITEMSYMBOL, recordFP);
@@ -823,8 +804,7 @@ long Record_size(void)
 void Record_toggle(void)
 {
 #if !(defined(_WINDOWS) && defined(PENS_OF_PLENTY))
-/* No recording available with PEN_OF_PLENTY under Windows.
-*/
+    /* No recording available with PEN_OF_PLENTY under Windows. */
     if (record_filename != NULL) {
 	if (!record_start) {
 	    record_start = True;
@@ -836,17 +816,15 @@ void Record_toggle(void)
 		    record_start = False;
 		} else {
 		    setvbuf(recordFP, NULL, _IOFBF, (size_t)(8 * 1024));
-# ifdef _WINDOWS
-			setmode(fileno(recordFP), O_BINARY);
-# endif
+		    IFWINDOWS(setmode(fileno(recordFP), O_BINARY));
 		}
 	    }
-	} else {
+	} else
 	    record_start = False;
-	}
-	if (record_start) {
+
+	if (record_start)
 	    rd = Rdrawing;
-	} else {
+	else {
 	    rd = Xdrawing;
 	    recording = False;
 	}
@@ -874,8 +852,6 @@ void Record_cleanup(void)
 void Record_init(char *filename)
 {
     rd = Xdrawing;
-    if (filename != NULL && filename[0] != '\0') {
+    if (filename != NULL && filename[0] != '\0')
 	record_filename = xp_strdup(filename);
-    }
 }
-
