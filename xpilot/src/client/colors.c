@@ -1298,7 +1298,7 @@ static xp_option_t color_options[] = {
 
     COLOR_INDEX_OPTION(
 	"buttonColor",
-	5,
+	2,
 	&buttonColor,
 	"Which color number to use for drawing buttons.\n"),
 
