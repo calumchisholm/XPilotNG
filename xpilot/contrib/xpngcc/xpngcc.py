@@ -140,7 +140,7 @@ class MainFrame(wx.Frame):
 	def __init__(self, *args, **kwds):
 		kwds["style"] = wx.DEFAULT_FRAME_STYLE
 		wx.Frame.__init__(self, *args, **kwds)
-		self.SetSize((800, 600))
+		self.SetSize((800, 650))
 		self.SetBackgroundColour(wx.Colour(0, 0, 0))
 		s = wx.BoxSizer(wx.VERTICAL)
 		s.Add(self.makeTopPanel(), 0, wx.EXPAND, 0)
