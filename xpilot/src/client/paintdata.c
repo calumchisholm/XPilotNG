@@ -25,12 +25,12 @@
 
 char paintdata_version[] = VERSION;
 
-XRectangle	*rect_ptr[MAX_COLORS];
-int		num_rect[MAX_COLORS], max_rect[MAX_COLORS];
-XArc		*arc_ptr[MAX_COLORS];
-int		num_arc[MAX_COLORS], max_arc[MAX_COLORS];
-XSegment	*seg_ptr[MAX_COLORS];
-int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
+static XRectangle	*rect_ptr[MAX_COLORS];
+static int		num_rect[MAX_COLORS], max_rect[MAX_COLORS];
+static XArc		*arc_ptr[MAX_COLORS];
+static int		num_arc[MAX_COLORS], max_arc[MAX_COLORS];
+static XSegment		*seg_ptr[MAX_COLORS];
+static int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
 
 unsigned long	current_foreground;
 

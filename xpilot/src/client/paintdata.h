@@ -21,8 +21,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef PAINTTYPES_H
-#define PAINTTYPES_H
+#ifndef PAINTDATA_H
+#define PAINTDATA_H
 
 /* need u_byte */
 #ifndef	TYPES_H
@@ -34,13 +34,6 @@
 #define MAX_COLORS  16   /* Max. switched colors ever */
 #define MAX_COLOR_LEN 32 /* Max. length of a color name */
 #endif
-
-extern XRectangle	*rect_ptr[MAX_COLORS];
-extern int		num_rect[MAX_COLORS], max_rect[MAX_COLORS];
-extern XArc		*arc_ptr[MAX_COLORS];
-extern int		num_arc[MAX_COLORS], max_arc[MAX_COLORS];
-extern XSegment		*seg_ptr[MAX_COLORS];
-extern int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
 
 extern void Rectangle_start(void);
 extern void Rectangle_end(void);
