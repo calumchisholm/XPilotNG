@@ -385,7 +385,7 @@ int Pick_team(int pick_for_type);
 void Server_info(char *str, unsigned max_size);
 void Log_game(const char *heading);
 void Game_Over(void);
-void Server_log_admin_message(int ind, const char *str);
+void Server_log_admin_message(player *pl, const char *str);
 int plock_server(int on);
 void Main_loop(void);
 

@@ -3170,7 +3170,7 @@ static void Handle_talk(int ind, char *str)
 	}
     }
     else if (strcasecmp(str, "god") == 0) {
-	Server_log_admin_message(GetInd(connp->id), cp);
+	Server_log_admin_message(pl, cp);
     }
     else {						/* Player message */
 	sent = -1;
@@ -3416,6 +3416,20 @@ const char *Get_player_dpy(int ind)
     connection_t	*connp = &Conn[ind];
 
     return connp->dpy;
+}
+
+const char *Player_get_addr(player *pl)
+{
+    if (pl->conn != NOT_CONNECTED)
+	return Conn[pl->conn].addr;
+    return NULL;
+}
+
+const char *Player_get_dpy(player *pl)
+{
+    if (pl->conn != NOT_CONNECTED)
+	return Conn[pl->conn].dpy;
+    return NULL;
 }
 
 static int Receive_shape(int ind)

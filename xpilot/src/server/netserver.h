@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -128,6 +127,8 @@ int Get_player_id(int);
 int Get_conn_version(int ind);
 const char *Get_player_addr(int ind);
 const char *Get_player_dpy(int ind);
+const char *Player_get_addr(player *pl);
+const char *Player_get_dpy(player *pl);
 int Send_shape(int ind, int shape);
 
 #endif

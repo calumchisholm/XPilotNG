@@ -808,7 +808,7 @@ void Game_Over(void)
 }
 
 
-void Server_log_admin_message(int ind, const char *str)
+void Server_log_admin_message(player *pl, const char *str)
 {
     /*
      * Only log the message if logfile already exists,
@@ -818,7 +818,6 @@ void Server_log_admin_message(int ind, const char *str)
     const int		logfile_size_limit = adminMessageFileSizeLimit;
     FILE		*fp;
     struct stat		st;
-    player		*pl = Players(ind);
     char		msg[MSG_LEN * 2];
 
     if ((logfilename != NULL) &&
@@ -836,8 +835,8 @@ void Server_log_admin_message(int ind, const char *str)
 		showtime(),
 		pl->name,
 		pl->realname, pl->hostname,
-		Get_player_addr(ind),
-		Get_player_dpy(ind),
+		Player_get_addr(pl),
+		Player_get_dpy(pl),
 		str);
 	fclose(fp);
 	sprintf(msg, "%s [%s]:[%s]", str, pl->name, "GOD");
