@@ -542,8 +542,6 @@ extern char	*packet_measure;	/* packet measurement in a second */
 extern long	packet_loop;		/* start of measurement */
 
 extern bool	showUserName;		/* Show username instead of nickname */
-extern char	nickname[MAX_CHARS];	/* Nick-name of player */
-extern char	username[MAX_CHARS];	/* Real name of player */
 extern char	servername[MAX_CHARS];	/* Name of server connecting to */
 extern unsigned	version;		/* Version of the server */
 extern bool	scoresChanged;

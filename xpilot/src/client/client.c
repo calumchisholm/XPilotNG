@@ -125,8 +125,6 @@ char	*packet_measure;	/* packet measurement in a second */
 long	packet_loop;		/* start of measurement */
 
 bool	showUserName = false;	/* Show user name instead of nick name */
-char	nickname[MAX_CHARS];	/* Nick name of player */
-char	username[MAX_CHARS];	/* User name of player */
 char	servername[MAX_CHARS];	/* Name of server connecting to */
 unsigned	version;	/* Version of the server */
 bool	toggle_shield;		/* Are shields toggled by a press? */
@@ -1402,7 +1400,8 @@ int Handle_player(int id, int player_team, int mychar,
     }
     if (self == NULL
 	&& (myself
-	    || (version < 0x4F10 && strcmp(nickname, nick_name) == 0))) {
+	    || (version < 0x4F10
+		&& strcmp(connectParam.nick_name, nick_name) == 0))) {
 	if (other != &Others[0]) {
 	    /* Make `self' the first member of Others[]. */
 	    *other = Others[0];

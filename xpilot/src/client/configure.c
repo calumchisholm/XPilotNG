@@ -781,7 +781,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 			";\n"
 			"; General configuration options\n"
 			";\n");
-    Config_save_resource(fp, "name", nickname);
+    Config_save_resource(fp, "name", connectParam.nick_name);
     Config_save_bool(fp, "autoShield", auto_shield);
     Config_save_int(fp, "clientPortStart", clientPortStart);
     Config_save_float(fp, "scaleFactor", scaleFactor);

@@ -66,9 +66,6 @@ static bool Set_nickName(xp_option_t *opt, const char *value)
 	xpprintf("to \"%s\".\n", connectParam.nick_name);
     }
 
-    /* kps - remove nickname */
-    strlcpy(nickname, connectParam.nick_name, sizeof(nickname));
-
     return true;
 }
 
@@ -93,9 +90,6 @@ static bool Set_userName(xp_option_t *opt, const char *value)
 	xpprintf("to \"%s\".\n", connectParam.user_name);
     }
 
-    /* kps - remove username */
-    strlcpy(username, connectParam.user_name, sizeof(username));
-
     /* hack - if nickname is not set, set nickname to username */
     if (strlen(connectParam.nick_name) == 0)
 	Set_nickName(NULL, connectParam.user_name);
@@ -109,8 +103,6 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
 
     (void)opt;
     assert(value);
-
-    warn("Set_hostName: value = %s", value);
 
     connectParam.host_name[0] = '\0';
     if (cp)
@@ -1221,20 +1213,6 @@ void Store_default_options(void)
 #if 0
 
 
-/*
- * Structure to store all the client options.
- * The most important field is the help field.
- * It is used to self-document the client to
- * the user when "xpilot -help" is issued.
- * Help lines can span multiple lines, but for
- * the key help window only the first line is used.
- */
-cl_option_t options[] = {
-
-};
-
-int optionsCount = NELEM(options);
-
 unsigned String_hash(const char *s)
 {
     unsigned		hash = 0;
@@ -1242,38 +1220,6 @@ unsigned String_hash(const char *s)
     for (; *s; s++)
 	hash = (((hash >> 29) & 7) | (hash << 3)) ^ *s;
     return hash;
-}
-
-
-const char *Get_keyHelpString(keys_t key)
-{
-    int			i;
-    char		*nl;
-    static char		buf[MAX_CHARS];
-
-    for (i = 0; i < NELEM(options); i++) {
-	if (options[i].key == key) {
-	    strlcpy(buf, options[i].help, sizeof buf);
-	    if ((nl = strchr(buf, '\n')) != NULL)
-		*nl = '\0';
-	    return buf;
-	}
-    }
-
-    return NULL;
-}
-
-
-const char* Get_keyResourceString(keys_t key)
-{
-    int			i;
-
-    for (i = 0; i < NELEM(options); i++) {
-	if (options[i].key == key)
-	    return options[i].name;
-    }
-
-    return NULL;
 }
 
 
@@ -1321,15 +1267,6 @@ static int Find_resource(XrmDatabase db, const char *resource,
 
     return 1;
 #endif
-}
-
-
-static int Get_resource(XrmDatabase db,
-			const char *resource, char *result, unsigned size)
-{
-    int			ind;
-
-    return Find_resource(db, resource, result, size, &ind);
 }
 
 
@@ -1452,20 +1389,6 @@ void Parse_options(int *argcp, char **argvp)
 
 #ifndef _WINDOWS
 
-    /*
-     * Check for bad arguments.
-     */
-    for (i = 1; i < *argcp; i++) {
-	if (argvp[i][0] == '-' || argvp[i][0] == '+') {
-	    warn("Unknown or incomplete option '%s'", argvp[i]);
-	    warn("Type: %s -help to see a list of options", argvp[0]);
-	    exit(1);
-	}
-	/* The rest of the arguments are hostnames of servers. */
-    }
-
-    Get_resource(argDB, "shutdown", xpArgs.shutdown_reason, MAX_CHARS);
-
     if (Get_string_resource(argDB, "display", connectParam.disp_name, MAX_DISP_LEN) == 0
 	|| connectParam.disp_name[0] == '\0') {
 	if ((ptr = getenv(DISPLAY_ENV)) != NULL)
@@ -1493,100 +1416,12 @@ void Parse_options(int *argcp, char **argvp)
 	exit(1);
     }
 
-    if (Get_string_resource(argDB, "keyboard", resValue, MAX_DISP_LEN) == 0
-	|| resValue[0] == '\0') {
-	if ((ptr = getenv(KEYBOARD_ENV)) != NULL)
-	    strlcpy(resValue, ptr, MAX_DISP_LEN);
-    }
-    if (resValue[0] == '\0')
-	kdpy = NULL;
-    else if ((kdpy = XOpenDisplay(resValue)) == NULL) {
-	error("Can't open keyboard '%s'", resValue);
-	exit(1);
-    }
-
-    Get_resource(argDB, "visual", visualName, sizeof visualName);
-    if (strncasecmp(visualName, "list", 4) == 0) {
-	List_visuals();
-	exit(0);
-    }
-
-    Get_file_defaults(&rDB);
-
-    XrmMergeDatabases(argDB, &rDB);
-
     Get_string_resource(rDB, "geometry", resValue, sizeof resValue);
     geometry = xp_strdup(resValue);
 #endif
 
-    Get_resource(rDB, "user", resValue, MAX_NAME_LEN);
-    if (resValue[0])
-	strlcpy(connectParam.user_name, resValue, MAX_NAME_LEN);
-
-    if (Check_user_name(connectParam.user_name) == NAME_ERROR) {
-	xpprintf("Fixing username from \"%s\" ", connectParam.user_name);
-	Fix_user_name(connectParam.user_name);
-	xpprintf("to \"%s\".\n", connectParam.user_name);
-    }
-
-    Get_resource(rDB, "host", resValue, MAX_HOST_LEN);
-    if (resValue[0])
-	strlcpy(hostname, resValue, MAX_HOST_LEN);
-
-    if (Check_host_name(hostname) == NAME_ERROR) {
-	xpprintf("Fixing host from \"%s\" ", hostname);
-	Fix_host_name(hostname);
-	xpprintf("to \"%s\".\n", hostname);
-    }
-
-
-    Get_resource(rDB, "name", connectParam.nick_name, MAX_NAME_LEN);
-    if (!connectParam.nick_name[0])
-	strlcpy(connectParam.nick_name, connectParam.user_name, MAX_NAME_LEN);
-    CAP_LETTER(connectParam.nick_name[0]);
-    if (connectParam.nick_name[0] < 'A' || connectParam.nick_name[0] > 'Z') {
-	warn("Your player name \"%s\" should start with an uppercase letter",
-	     connectParam.nick_name);
-	exit(1);
-    }
-    if (Check_nick_name(connectParam.nick_name) == NAME_ERROR) {
-	xpprintf("Fixing nick from \"%s\" ", connectParam.nick_name);
-	Fix_nick_name(connectParam.nick_name);
-	xpprintf("to \"%s\".\n", connectParam.nick_name);
-    }
-
-    strlcpy(username, connectParam.user_name, sizeof(username));
-    strlcpy(nickname, connectParam.nick_name, sizeof(nickname));
-
-    Get_int_resource(rDB, "team", &connectParam.team);
-
-    IFWINDOWS( Config_get_name(nickname) );
-    IFWINDOWS( Config_get_team(&connectParam.team) );
-
     Get_shipshape_resource(rDB, &shipShape);
     Validate_shape_str(shipShape);
-
-    Get_resource(rDB, "modifierBank4", modBankStr[3], sizeof modBankStr[3]);
-
-    Get_resource(rDB, "visual", visualName, sizeof visualName);
-
-    /* Windows already derived maxColors in InitWinX */
-    IFNWINDOWS( Get_int_resource(rDB, "maxColors", &maxColors) );
-
-    for (i = 0; i < MAX_COLORS; i++) {
-	char buf[16];
-	sprintf(buf, "color%d", i);
-	if (!Get_string_resource(rDB, buf, resValue, MAX_COLOR_LEN)) {
-	    if (i < NUM_COLORS)
-		strlcpy(resValue, color_names[i], MAX_COLOR_LEN);
-	}
-	strlcpy(color_names[i], resValue, MAX_COLOR_LEN);
-    }
-
-
-
-    Get_resource(rDB, "sparkColors", sparkColors, MSG_LEN);
-
 
     Get_bool_resource(rDB, "fullColor", &fullColor);
     Get_bool_resource(rDB, "texturedObjects", &texturedObjects);
@@ -1594,7 +1429,6 @@ void Parse_options(int *argcp, char **argvp)
 	texturedObjects = false;
 	instruments.showTexturedWalls = false;
     }
-    Get_bool_resource(rDB, "pointerControl", &initialPointerControl);
 
     Get_resource(rDB, "recordFile", resValue, sizeof resValue);
     Record_init(resValue);

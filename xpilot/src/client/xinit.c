@@ -301,7 +301,7 @@ static void Init_disp_prop(Display *d, Window win,
 	sprintf(msg, "%s -- Server at \"%s\".", TITLE, servername);
     XStoreName(d, win, msg);
 
-    sprintf(msg, "%s:%s", nickname, servername);
+    sprintf(msg, "%s:%s", connectParam.nick_name, servername);
     XSetIconName(d, win, msg);
 
     if (d != dpy)
