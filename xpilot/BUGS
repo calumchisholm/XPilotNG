@@ -1,3 +1,13 @@
+-----------------------------------------------------------------
+Problem :When TreasureCollisionDestroys is set to false it doesnt bounce off the ship it sticks to it.
+Found by:Throat
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
+
 
 Problem : Joining a game with textures turned off (walls or objects)
 	  and then trying to turn them on in game, does not work!
