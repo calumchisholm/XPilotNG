@@ -1271,7 +1271,7 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	case ITEM_ARMOR:	/* makes you heavier */
 	    return ROBOT_IGNORE_ITEM;
 	default:		/* unknown */
-	    warn("Rank_item_value: unknown item.");
+	    warn("Rank_item_value: unknown item %ld.", itemtype);
 	    return ROBOT_IGNORE_ITEM;
 	}
     } else {
