@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 
 import javax.swing.JOptionPane;
@@ -76,10 +78,11 @@ public class MapOptions {
 
         out.println("<GeneralOptions>");
 
-        for (Iterator iter = options.values().iterator(); iter.hasNext();) {
+        ArrayList list = new ArrayList(options.values());
+        Collections.sort(list);
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
             Option opt = (Option)iter.next();
-            if (opt.value.equals(opt.defaultValue))
-                continue;
+            if (!opt.isModified()) continue;
             out.print("<Option name=\"");
             out.print(opt.name);
             out.print("\" value=\"");
@@ -137,7 +140,7 @@ public class MapOptions {
         return sb.toString();
     }
     
-    public class Option {
+    public class Option implements Comparable {
         public String name;
         public String value;
         public String defaultValue;
@@ -153,7 +156,17 @@ public class MapOptions {
         public boolean isModified() {
             if (value == defaultValue) return false;
             if (value == null && defaultValue != null) return true;
-            return !value.equals(defaultValue);
+            if (value.equalsIgnoreCase(defaultValue)) return false;
+            if ("false".equals(defaultValue))
+                return !("no".equalsIgnoreCase(value) 
+                    || "off".equalsIgnoreCase(value));
+            if ("true".equals(defaultValue))
+                return !("yes".equalsIgnoreCase(value)
+                    || "on".equalsIgnoreCase(value));
+            return true;
+        }
+        public int compareTo(Object o) {
+            return name.compareTo(((Option)o).name);
         }
     }
 }
