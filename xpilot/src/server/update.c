@@ -955,7 +955,6 @@ static void Update_players(void)
 	    CLR_BIT(pl->used, USES_SHIELD);
 	    CLR_BIT(pl->used, USES_CLOAKING_DEVICE);
 	    CLR_BIT(pl->used, USES_DEFLECTOR);
-	    Thrust(pl, false);
 	}
 	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))
 	    CLR_BIT(pl->used, USES_REFUEL);
@@ -965,6 +964,13 @@ static void Update_players(void)
 	 */
 	if (Player_is_thrusting(pl)) {
 	    double power = pl->power;
+	    if (pl->fuel.sum <= 0) 
+		power=MIN_PLAYER_POWER * 0.6; 
+	    /* fly with lowest power with "no fuel" KHS */
+	    /* shall emulate flying with last energy  reserves - */
+	    /* this is to not render players completely helpless */
+	    /* until self destruct when alone on a map */
+	     
 	    double f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
 	    int a = (Player_uses_emergency_thrust(pl)
 		     ? MAX_AFTERBURNER
