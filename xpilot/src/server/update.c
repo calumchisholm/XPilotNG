@@ -501,68 +501,11 @@ static void do_Autopilot (player *pl)
     }
 }
 
-/********** **********
- * Updating objects and the like.
- */
-void Update_objects(void)
+
+static void Fuel_update(void)
 {
-    int i, j;
-    player *pl;
-    object *obj;
+    int i;
 
-    /*
-     * Since the amount per frame of some things could get too small to
-     * be represented accurately as an integer, FPSMultiplier makes these
-     * things happen less often (in terms of frames) rather than smaller
-     * amount each time.
-     *
-     * Can also be used to do some updates less frequently.
-     */
-    do_update_this_frame = false;
-    if ((time_to_update -= timeStep) <= 0) {
-	do_update_this_frame = true;
-	time_to_update += TIME_FACT;
-    }
-
-#if 0
-    xpprintf(__FILE__ ": frame loops / update : %ld / %d\n",
-	     frame_loops, do_update_this_frame);
-#endif
-
-    /*
-     * Update robots.
-     */
-    Robot_update();
-
-    /*
-     * Autorepeat fire, must unfortunately be done here, not in
-     * the player loop below, because of collisions between the shots
-     * and the auto-firing player that would otherwise occur.
-     */
-    if (fireRepeatRate > 0) {
-	for (i = 0; i < NumPlayers; i++) {
-	    pl = Players[i];
-	    if (BIT(pl->used, HAS_SHOT)) {
-		Fire_normal_shots(i);
-	    }
-	}
-    }
-
-    /*
-     * Special items.
-     */
-    if (do_update_this_frame) {
-	for (i = 0; i < NUM_ITEMS; i++)
-	    if (World.items[i].num < World.items[i].max
-		&& World.items[i].chance > 0
-		&& (rfrac() * World.items[i].chance) < 1.0f) {
-		Place_item(i, -1);
-	    }
-    }
-
-    /*
-     * Let the fuel stations regenerate some fuel.
-     */
     if (NumPlayers > 0) {
 	DFLOAT fuel = (NumPlayers * STATION_REGENERATION);
 	int frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
@@ -585,10 +528,13 @@ void Update_objects(void)
 	    World.fuel[i].last_change = frame_loops;
 	}
     }
+}
 
-    /*
-     * Update shots.
-     */
+static void Misc_object_update(void)
+{
+    int i;
+    object *obj;
+
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
 
@@ -598,10 +544,8 @@ void Update_objects(void)
 	else if (BIT(obj->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT|OBJ_TORPEDO))
 	    Move_smart_shot(i);
 
-	else if (BIT(obj->type, OBJ_BALL)) {
-	    if (obj->id != NO_ID)
-		Connector_force(i);
-	}
+	else if (BIT(obj->type, OBJ_BALL) && obj->id != NO_ID)
+	    Connector_force(i);
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {
 	    wireobject *wireobj = WIRE_PTR(obj);
@@ -618,46 +562,14 @@ void Update_objects(void)
 
 	update_object_speed(obj);
 
-	if (!BIT(obj->type, OBJ_ASTEROID)) {
+	if (!BIT(obj->type, OBJ_ASTEROID))
 	    Move_object(obj);
-	}
-
     }
+}
 
-    /*
-     * Asteroids.
-     */
-    Asteroid_update();
-
-    /*
-     * Update ECM blasts
-     */
-    for (i = 0; i < NumEcms; i++) {
-	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
-	    if (Ecms[i]->id != NO_ID)
-		Players[GetInd[Ecms[i]->id]]->ecmcount--;
-	    free(Ecms[i]);
-	    --NumEcms;
-	    Ecms[i] = Ecms[NumEcms];
-	    i--;
-	}
-    }
-
-    /*
-     * Update transporters
-     */
-    for (i = 0; i < NumTransporters; i++) {
-	if ((Transporters[i]->count -= timeStep) <= 0) {
-	    free(Transporters[i]);
-	    --NumTransporters;
-	    Transporters[i] = Transporters[NumTransporters];
-	    i--;
-	}
-    }
-
-    /*
-     * Updating cannons, maybe a little bit of fireworks too?
-     */
+static void Cannon_update(int do_update_this_frame)
+{
+    int i;
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->dead_time > 0) {
@@ -731,10 +643,12 @@ void Update_objects(void)
 	    }
 	}
     }
+}
 
-    /*
-     * Update targets
-     */
+static void Target_update(void)
+{
+    int i, j;
+
     for (i = 0; i < World.NumTargets; i++) {
 	if (World.targets[i].dead_time > 0) {
 	    if ((World.targets[i].dead_time -= timeStep) <= 0) {
@@ -770,7 +684,99 @@ void Update_objects(void)
 	World.targets[i].conn_mask = 0;
 	World.targets[i].last_change = frame_loops;
     }
+}
 
+
+/********** **********
+ * Updating objects and the like.
+ */
+void Update_objects(void)
+{
+    int i, j;
+    player *pl;
+
+    /*
+     * Since the amount per frame of some things could get too small to
+     * be represented accurately as an integer, FPSMultiplier makes these
+     * things happen less often (in terms of frames) rather than smaller
+     * amount each time.
+     *
+     * Can also be used to do some updates less frequently.
+     */
+    do_update_this_frame = false;
+    if ((time_to_update -= timeStep) <= 0) {
+	do_update_this_frame = true;
+	time_to_update += TIME_FACT;
+    }
+
+#if 0
+    xpprintf(__FILE__ ": frame loops / update : %ld / %d\n",
+	     frame_loops, do_update_this_frame);
+#endif
+
+    /*
+     * Update robots.
+     */
+    Robot_update();
+
+    /*
+     * Autorepeat fire, must unfortunately be done here, not in
+     * the player loop below, because of collisions between the shots
+     * and the auto-firing player that would otherwise occur.
+     */
+    if (fireRepeatRate > 0) {
+	for (i = 0; i < NumPlayers; i++) {
+	    pl = Players[i];
+	    if (BIT(pl->used, HAS_SHOT)) {
+		Fire_normal_shots(i);
+	    }
+	}
+    }
+
+    /*
+     * Special items.
+     */
+    if (do_update_this_frame) {
+	for (i = 0; i < NUM_ITEMS; i++)
+	    if (World.items[i].num < World.items[i].max
+		&& World.items[i].chance > 0
+		&& (rfrac() * World.items[i].chance) < 1.0f) {
+		Place_item(i, -1);
+	    }
+    }
+
+    Fuel_update();
+    Misc_object_update();
+    Asteroid_update();
+
+    /*
+     * Update ECM blasts
+     */
+    for (i = 0; i < NumEcms; i++) {
+	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
+	    if (Ecms[i]->id != NO_ID)
+		Players[GetInd[Ecms[i]->id]]->ecmcount--;
+	    free(Ecms[i]);
+	    --NumEcms;
+	    Ecms[i] = Ecms[NumEcms];
+	    i--;
+	}
+    }
+
+    /*
+     * Update transporters
+     */
+    for (i = 0; i < NumTransporters; i++) {
+	if ((Transporters[i]->count -= timeStep) <= 0) {
+	    free(Transporters[i]);
+	    --NumTransporters;
+	    Transporters[i] = Transporters[NumTransporters];
+	    i--;
+	}
+    }
+
+    Cannon_update(do_update_this_frame);
+    Target_update();
 
     /* * * * * *
      *
@@ -784,7 +790,6 @@ void Update_objects(void)
 
 	if ((pl->damaged -= timeStep) <= 0)
 	    pl->damaged = 0;
-
 
 	/* kps - fix these */
 	if (pl->flooding > FPS + 1) {
@@ -949,15 +954,14 @@ void Update_objects(void)
 	/*
 	 * Compute turn
 	 */
-	pl->turnvel	+= pl->turnacc;
+	pl->turnvel += pl->turnacc;
 
 	/*
 	 * turnresistance is zero: client requests linear turning behaviour
 	 * when playing with pointer control.
 	 */
-	if (pl->turnresistance) {
+	if (pl->turnresistance)
 	    pl->turnvel *= pl->turnresistance;
-	}
 
 	/* kps - ng does not want this */
 	if (turnThrust) {
