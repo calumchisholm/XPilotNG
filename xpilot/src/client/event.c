@@ -969,6 +969,12 @@ xp_option_t key_options[] = {
         "Toggles the radar and score windows on and off.\n"),
 
     XP_KEY_OPTION(
+        "keyToggleFullScreen",
+        "F11",
+        KEY_TOGGLE_FULLSCREEN,
+        "Toggles between fullscreen mode and window mode.\n"),
+
+    XP_KEY_OPTION(
 	"keySelectItem",
 	"KP_0 KP_Insert",
 	KEY_SELECT_ITEM,
@@ -1080,7 +1086,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keySendMsg11",
-	"F11",
+	"",
 	KEY_MSG_11,
 	"Sends the talkmessage stored in msg11.\n"),
 
