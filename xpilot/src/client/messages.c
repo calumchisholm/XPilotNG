@@ -624,7 +624,7 @@ static bool Msg_is_from_our_team(const char *message, const char **msg2)
 	    continue;
 	if (!strcmp(&message[len - bufstrlen], buf)) {
 	    *msg2 = buf;
-	    strlcpy(buf, message, len - bufstrlen - 1);
+	    strlcpy(buf, message, len - bufstrlen);
 	    return true;
 	}
 
@@ -635,7 +635,7 @@ static bool Msg_is_from_our_team(const char *message, const char **msg2)
 	    continue;
 	if (!strcmp(&message[len - bufstrlen], buf)) {
 	    *msg2 = buf;
-	    strlcpy(buf, message, len - bufstrlen - 1);
+	    strlcpy(buf, message, len - bufstrlen);
 	    return true;
 	}
     }
