@@ -1547,8 +1547,8 @@ int Handle_score_object(double score, int x, int y, char *msg)
 	if (Using_score_decimals())
 	    sprintf(sobj->hud_msg, "%s %.*f", msg, showScoreDecimals, score);
 	else {
-	    /*int sc = rint(score);*/
-	    sprintf(sobj->hud_msg, "%s %d", msg, rint(score));
+	    int sc = (int)(score >= 0.0 ? score + 0.5 : score - 0.5);
+	    sprintf(sobj->hud_msg, "%s %d", msg, sc);
 	}
 	sobj->hud_msg_len = strlen(sobj->hud_msg);
 	sobj->hud_msg_width = -1;
@@ -1559,8 +1559,8 @@ int Handle_score_object(double score, int x, int y, char *msg)
     if (Using_score_decimals())
 	sprintf(sobj->msg, "%.*f", showScoreDecimals, score);
     else {
-	/*int sc = rint(score);*/
-	sprintf(sobj->msg, "%d", rint(score));
+	int sc = (int)(score >= 0.0 ? score + 0.5 : score - 0.5);
+	sprintf(sobj->msg, "%d", sc);
     }
     sobj->msg_len = strlen(sobj->msg);
     sobj->msg_width = -1;
