@@ -961,10 +961,6 @@ static void Hyperjump(player *pl)
     pl->forceVisible += 15;
 
     CLR_BIT(pl->status, WARPING);
-    SET_BIT(pl->status, WARPED);
-
-    /* kps - why play both wormhole and hyperjump sounds ? */
-    sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 }
 
 
