@@ -146,7 +146,7 @@ struct xp_option {
 }
 #endif
 
-#define XP_BOOL_OPTION(name, valptr, defval, setfunc, help) \
+#define XP_BOOL_OPTION(name, defval, valptr, setfunc, help) \
 { \
     xp_bool_option,\
 	name,\
@@ -160,7 +160,7 @@ struct xp_option {
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_INT_OPTION(name, valptr, defval, minval, maxval, setfunc, help) \
+#define XP_INT_OPTION(name, defval, minval, maxval, valptr, setfunc, help) \
 { \
     xp_int_option,\
 	name,\
@@ -176,7 +176,7 @@ struct xp_option {
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_DOUBLE_OPTION(name, valptr, defval, minval, maxval, setfunc, help) \
+#define XP_DOUBLE_OPTION(name, defval, minval, maxval, valptr, setfunc, help) \
 { \
     xp_double_option,\
 	name,\
@@ -192,7 +192,7 @@ struct xp_option {
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_STRING_OPTION(name, valptr, size, defval, setfunc, getfunc, help) \
+#define XP_STRING_OPTION(name, defval, valptr, size, setfunc, getfunc, help) \
 { \
     xp_string_option,\
 	name,\

@@ -110,23 +110,23 @@ xp_option_t default_options[] = {
 
     XP_STRING_OPTION(
 	"name",
+	"",
 	nickname,
 	sizeof nickname,
-	"",
 	NULL, NULL,
 	"Set the nickname.\n"),
 
     XP_BOOL_OPTION(
 	"showShipShapes",
-	&instruments.showShipShapes,
 	true,
+	&instruments.showShipShapes,
 	NULL,
 	"Should others' shipshapes be displayed or not.\n"),
 
     XP_BOOL_OPTION(
 	"showMyShipShape",
-	&instruments.showMyShipShape,
 	true,
+	&instruments.showMyShipShape,
 	NULL,
 	"Should your own shipshape be displayed or not.\n"),
 

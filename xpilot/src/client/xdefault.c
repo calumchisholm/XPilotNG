@@ -49,9 +49,9 @@ char xdisplay[MAX_DISP_LEN];
 xp_option_t xdefault_options[] = {
     XP_STRING_OPTION(
 	"display",
+	"",
 	xdisplay,
 	sizeof xdisplay,
-	"",
 	NULL,
 	NULL,
 	"Set the X display.\n"),
