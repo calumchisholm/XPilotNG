@@ -165,7 +165,7 @@ char netserver_version[] = VERSION;
 static connection_t	*Conn = NULL;
 static int		max_connections = 0;
 static setup_t		*Setup = NULL;
-static setup_t		*Oldsetup;
+static setup_t		*Oldsetup = NULL;
 static int		(*playing_receive[256])(int ind),
 			(*login_receive[256])(int ind),
 			(*drain_receive[256])(int ind);
@@ -434,8 +434,7 @@ static int Init_setup_old(void)
     free(mapdata);
     Oldsetup->setup_size = ((char *) &Oldsetup->map_data[0] - (char *) Oldsetup) + size;
     Oldsetup->map_data_len = size;
-    Oldsetup->map_order = type; /* kps - !ng */
-    Oldsetup->frames_per_second = FPS;
+    Oldsetup->map_order = type;
     Oldsetup->lives = World.rules->lives;
     Oldsetup->mode = World.rules->mode;
     Oldsetup->x = World.x;
@@ -480,7 +479,6 @@ static int Init_setup(void)
     free(mapdata);
     Setup->setup_size = ((char *) &Setup->map_data[0] - (char *) Setup) + size;
     Setup->map_data_len = size;
-    Setup->frames_per_second = FPS;
     Setup->lives = World.rules->lives;
     Setup->mode = World.rules->mode;
     Setup->width = World.width;
@@ -1188,7 +1186,7 @@ static int Handle_setup(int ind)
 			      S->map_data_len,
 			      S->mode, S->lives,
 			      S->x, S->y,
-			      S->frames_per_second, S->map_order,
+			      framesPerSecond, S->map_order,
 			      S->name, S->author);
 	else
 	    n = Packet_printf(&connp->c,
@@ -1196,7 +1194,7 @@ static int Handle_setup(int ind)
 			      S->map_data_len,
 			      S->mode, S->lives,
 			      S->width, S->height,
-			      S->frames_per_second, S->name,
+			      framesPerSecond, S->name,
 			      S->author, S->data_url);
 	if (n <= 0) {
 	    Destroy_connection(ind, "setup 0 write error");
