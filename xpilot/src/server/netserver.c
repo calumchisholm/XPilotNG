@@ -3403,21 +3403,6 @@ int Get_conn_version(int ind)
     return connp->version;
 }
 
-const char *Get_player_addr(int ind)
-{
-    /*connection_t	*connp = &Conn[ind];*/
-    connection_t	*connp = &Conn[Players(ind)->conn];
-
-    return connp->addr;
-}
-
-const char *Get_player_dpy(int ind)
-{
-    connection_t	*connp = &Conn[ind];
-
-    return connp->dpy;
-}
-
 const char *Player_get_addr(player *pl)
 {
     if (pl->conn != NOT_CONNECTED)

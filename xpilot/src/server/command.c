@@ -470,13 +470,13 @@ static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
 
     ind = Get_player_index_by_name(arg);
     if (ind >= 0) {
-		const char *addr = Get_player_addr(ind);
-/*		const char *addr = Conns[Players[ind]->conn]->addr;*/
+	player *pl = Players(ind);
+	const char *addr = Player_get_addr(pl);
 
 	if (addr == NULL) {
-	    sprintf(msg, "Unable to get address for %s.", arg);
+	    sprintf(msg, "Unable to get address for %s.", pl->name);
 	} else {
-	    sprintf(msg, "%s plays from: %s.", Players(ind)->name, addr);
+	    sprintf(msg, "%s plays from: %s.", pl->name, addr);
 	}
     } else {
 	if (ind == -1) {
