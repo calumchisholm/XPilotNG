@@ -189,8 +189,7 @@
 <Option name="roundstoplay" value="0"/>
 <Option name="shieldedmining" value="yes"/>
 <Option name="resetonhuman" value="0"/>
-<Option name="oldthrust" value="0.5"/>
-<Option name="shipmass" value="19.5"/>
+<Option name="shipmass" value="20"/>
 <Option name="treasurecollisionmaykill" value="no"/>
 <Option name="ballcollisions" value="no"/>
 <Option name="announcealliances" value="no"/>

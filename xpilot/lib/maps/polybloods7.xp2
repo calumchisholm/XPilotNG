@@ -14,7 +14,6 @@
 <Option name="ballradius" value="10"/>
 <Option name="ballswallbounce" value="yes"/>
 <Option name="baselesspausing" value="yes"/>
-<Option name="constantspeed" value="0.5"/>
 <Option name="dataurl" value="http://xpilot.sourceforge.net/maps/polybloods.xpd"/>
 <Option name="debriswallbounce" value="no"/>
 <Option name="destroyitemincollisionprob" value="0.3"/>

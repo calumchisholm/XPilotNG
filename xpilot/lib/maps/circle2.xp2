@@ -11,7 +11,6 @@
 <Option name="allowshields" value="no"/>
 <Option name="allowshipshapes" value="yes"/>
 <Option name="baselesspausing" value="yes"/>
-<Option name="constantspeed" value="0.5"/>
 <Option name="usedebris" value="no"/>
 <Option name="cannonflak" value="false"/>
 <Option name="edgewrap" value="yes"/>
