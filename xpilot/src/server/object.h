@@ -132,7 +132,7 @@ typedef struct {
     unsigned int	spread	:2;	/* Z# modifier */
     unsigned int	power	:2;	/* B# modifier */
     unsigned int	laser	:2;	/* LS LB modifier */
-    unsigned int	spare	:2;	/* padding for alignment */
+    unsigned int	spare	:18;	/* padding for alignment */
 } modifiers;
 
 #define CLEAR_MODS(mods)	memset(&(mods), 0, sizeof(modifiers))
@@ -374,6 +374,7 @@ struct _wireobject {
 
     u_byte		size;		/* Size of object (wreckage) */
     u_byte		rotation;	/* Rotation direction */
+    u_byte		pad[2];
 
 #ifdef __cplusplus
 			_wireobject() {}
@@ -566,7 +567,8 @@ struct player {
     char	auth_nick[MAX_CHARS];	/* Original nick (/auth command) */
     char	realname[MAX_CHARS];	/* Real name of player */
     char	hostname[MAX_CHARS];	/* Hostname of client player uses */
-    uint16_t	pseudo_team;	/* Which team for detaching tanks */
+    uint16_t	pseudo_team;		/* Which team for detaching tanks */
+    uint16_t	unused2;		/* padding for alignment */
     int		alliance;		/* Member of which alliance? */
     int		prev_alliance;		/* prev. alliance for score */
     int		invite;			/* Invitation for alliance */
@@ -607,6 +609,8 @@ struct player {
     BITV_DECL(last_keyv, NUM_KEYS);	/* Keyboard state */
     BITV_DECL(prev_keyv, NUM_KEYS);	/* Keyboard state */
 
+    uint16_t	unused3;		/* padding for alignment */    
+
     long	frame_last_busy;	/* When player touched keyboard. */
 
     void	*audio;			/* audio private data */
@@ -629,6 +633,7 @@ struct player {
 #ifdef __cplusplus
 		player() {}
 #endif
+    
 };
 
 #endif
