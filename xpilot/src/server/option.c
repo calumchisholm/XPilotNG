@@ -242,6 +242,36 @@ static int get_poly_id(const char *s)
 static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
+    static int xptag = 0;
+
+    if (!strcasecmp(el, "XPilotMap")) {
+	double version = 0;
+	while (*attr) {
+	    if (!strcasecmp(*attr, "version"))
+		version = atof(*(attr + 1));
+	    attr += 2;
+	}
+	errno = 0;
+	if (version == 0) {
+	    error("Old(?) map file with no version number");
+	    error("Not guaranteed to work");
+	}
+	else if (version < 1)
+	    error("Impossible version in map file");
+	else if (version > 1) {
+	    error("Map file has newer version than this server recognizes.");
+	    error("The map file might use unsupported features.");
+	}
+	xptag = 1;
+	return;
+    }
+
+    if (!xptag) {
+	errno = 0;
+	fatal("This doesn't look like a map file "
+	      " (XPilotMap must be first tag).");
+	return; /* not reached */
+    }
 
     if (!strcasecmp(el, "Polystyle")) {
 	pstyles[num_pstyles].id[sizeof(pstyles[0].id) - 1] = 0;
@@ -271,6 +301,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    exit(1);
 	}
 	num_pstyles++;
+	return;
     }
 
     if (!strcasecmp(el, "Edgestyle")) {
@@ -291,6 +322,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	num_estyles++;
+	return;
     }
 
     if (!strcasecmp(el, "Bmpstyle")) {
@@ -312,13 +344,15 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	num_bstyles++;
+	return;
     }
 
-    if (!strcasecmp(el, "Scale")) {
+    if (!strcasecmp(el, "Scale")) { /* "Undocumented feature" */
 	if (!*attr || strcasecmp(*attr, "value"))
 	    error("Invalid Scale");
 	else
 	    scale = atof(*(attr + 1));
+	return;
     }
 
     if (!strcasecmp(el, "BallArea")) {
@@ -326,6 +360,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	groups[current_group].type = TREASURE;
 	groups[current_group].team = TEAM_NOT_SET;
 	groups[current_group].hit_mask = BALL_BIT;
+	return;
     }
 
     if (!strcasecmp(el, "BallTarget")) {
@@ -339,10 +374,13 @@ static void tagstart(void *data, const char *el, const char **attr)
 	groups[current_group].type = TREASURE;
 	groups[current_group].team = team;
 	groups[current_group].hit_mask = NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));
+	return;
     }
 
-    if (!strcasecmp(el, "Decor"))
+    if (!strcasecmp(el, "Decor")) {
 	is_decor = 1;
+	return;
+    }
 
     if (!strcasecmp(el, "Polygon")) {
 	int x, y, style = -1;
@@ -394,6 +432,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	t.x = x;
 	t.y = y;
 	STORE(ipos, World.check, World.NumChecks, max_checks, t);
+	return;
     }
 
     if (!strcasecmp(el, "Fuel")) {
@@ -417,6 +456,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	t.last_change = frame_loops;
 	t.team = team;
 	STORE(fuel_t, World.fuel, World.NumFuels, max_fuels, t);
+	return;
     }
 
     if (!strcasecmp(el, "Base")) {
@@ -451,6 +491,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    t.team = TEAM_NOT_SET;
 	}
 	STORE(base_t, World.base, World.NumBases, max_bases, t);
+	return;
     }
 
     if (!strcasecmp(el, "Ball")) {
@@ -474,6 +515,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	World.teams[team].NumTreasures++;
 	World.teams[team].TreasuresLeft++;
 	STORE(treasure_t, World.treasures, World.NumTreasures, max_balls, t);
+	return;
     }
 
     if (!strcasecmp(el, "Option")) {
@@ -489,7 +531,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	return;
     }
 
-    if (!strcmp(el, "Offset")) {
+    if (!strcasecmp(el, "Offset")) {
 	int x, y, edgestyle = -1;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
@@ -515,6 +557,11 @@ static void tagstart(void *data, const char *el, const char **attr)
 	ptscount++;
 	return;
     }
+
+    if (!strcasecmp(el, "GeneralOptions"))
+	return;
+
+    error("Unknown map tag: \"%s\"", el);
     return;
 }
 
