@@ -567,7 +567,6 @@ int ExitApplication(HandlerInfo info)
     XFreeGC(display, White_GC);
     XFreeGC(display, Black_GC);
     XFreeGC(display, xorgc);
-#ifndef MONO
     XFreeGC(display, Wall_GC);
     XFreeGC(display, Decor_GC);
     XFreeGC(display, Fuel_GC);
@@ -579,7 +578,6 @@ int ExitApplication(HandlerInfo info)
     XFreeGC(display, Wormhole_GC);
     XFreeGC(display, Base_GC);
     XFreeGC(display, Cannon_GC);
-#endif
     T_CloseServerConnection();
     exit(1);
 }

@@ -37,11 +37,7 @@
 #define                  JUSTIFY_CENTER  2
 #define                  CROP_RIGHT      0
 #define                  CROP_LEFT       1
-#ifdef MONO
-#define                  BKGR            T_Fore_GC
-#else
 #define                  BKGR            T_Back_GC
-#endif
 
 typedef char max_str_t[255];
 

@@ -689,25 +689,15 @@ void T_DrawEntryField(T_Form_t * form, T_Field_t * field)
     if (field == (T_Field_t *) form->entry) {
 	tmpstr = field->charvar;
 	tmpstr += form->entry_pos;
-#ifdef MONO
-	T_DrawButton(form->window, field->x, field->y, field->width,
-		     field->height, LOWERED, 1);
-#else
 	T_DrawButton(form->window, field->x, field->y, field->width,
 		     field->height, RAISED, 1);
-#endif
 	T_DrawString(form->window, field->x + 5, field->y,
 		     field->width - 10, field->height, BKGR, tmpstr,
 		     JUSTIFY_LEFT, CROP_RIGHT,
 		     form->entry_cursor - form->entry_pos);
     } else {
-#ifdef MONO
-	T_DrawButton(form->window, field->x, field->y, field->width,
-		     field->height, RAISED, 1);
-#else
 	T_DrawButton(form->window, field->x, field->y, field->width,
 		     field->height, LOWERED, 1);
-#endif
 	T_DrawString(form->window, field->x + 5, field->y,
 		     field->width - 10, field->height, BKGR,
 		     field->charvar, JUSTIFY_LEFT, CROP_RIGHT, -1);

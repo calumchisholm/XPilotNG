@@ -263,9 +263,6 @@ void DrawMapPic(Window win, int x, int y, int picnum, int zoom)
 {
     XPoint points[5];
     int i, arc, xo = 0, yo = 0;
-#ifdef MONO
-    GC gc;
-#endif
 
     if (picnum == 20)
 	return;
@@ -280,48 +277,7 @@ void DrawMapPic(Window win, int x, int y, int picnum, int zoom)
 	points[i].x = mapicon_seg[picnum].x[i] * zoom + x + xo;
 	points[i].y = mapicon_seg[picnum].y[i] * zoom + y + yo;
     }
-   /*-----------------------------------------------------------------*/
-#ifdef MONO
-    if ((win != mapwin) || (x < TOOLSWIDTH)) {
-	gc = Black_GC;
-    } else {
-	gc = White_GC;
-    }
-    if (picnum == 5) {
-	XFillRectangle(display, win, gc, x + 1, y + 1, zoom - 1, zoom - 1);
-    }
-    XDrawLines(display, win, gc, points,
-	       mapicon_seg[picnum].num_points, CoordModeOrigin);
-    arc = (int) (.7 * zoom);
-    if (((zoom - arc) / 2) * 2 != (zoom - arc))
-	arc--;
-    if ((picnum > 10) && (picnum < 16)) {
-	XDrawArc(display, win, gc, (int) (x + (zoom - arc) / 2),
-		 (int) (y + (zoom - arc) / 2), arc, arc, 0, 23040);
-	if (picnum > 12) {
-	    XDrawArc(display, win, gc, (int) (x + .15 * zoom),
-		     (int) (y + .15 * zoom), (int) (.4 * zoom),
-		     (int) (.4 * zoom), 0, 23040);
-	}
-	return;
-    } else if (picnum == 16) {
-	XDrawArc(display, win, gc, (int) (x + .25 * zoom),
-		 (int) (y + .25 * zoom), (int) (.5 * zoom),
-		 (int) (.5 * zoom), 0, 23040);
-	return;
-    } else if (picnum == 17) {
-	XDrawArc(display, win, gc, (int) (x + .15 * zoom),
-		 (int) (y + .15 * zoom), (int) (.7 * zoom),
-		 (int) (.7 * zoom), 5760, -18880);
-	return;
-    } else if (picnum == 18) {
-	XDrawArc(display, win, gc, (int) (x + .15 * zoom),
-		 (int) (y + .15 * zoom), (int) (.7 * zoom),
-		 (int) (.7 * zoom), 5760, 18880);
-	return;
-    }
-#else
-   /*------------------------------------------------------------*/
+    /*-----------------------------------------------------------------*/
     if ((picnum >= 0) && (picnum <= 4)) {	/* Walls */
 	XDrawLines(display, win, Wall_GC, points,
 		   mapicon_seg[picnum].num_points, CoordModeOrigin);
@@ -459,7 +415,6 @@ void DrawMapPic(Window win, int x, int y, int picnum, int zoom)
 		 (int) (.5 * zoom), 0, -12000);
 	return;
     }
-#endif
 }
 
 /***************************************************************************/
@@ -478,13 +433,6 @@ void DrawSmallMap(void)
 		   smlmap_width, smlmap_height);
     for (i = 0; i < smlmap_height; i++)
 	for (j = 0; j < smlmap_width; j++)
-#ifdef MONO
-	    if (mapicon_ptr[map.data[(int) (j * smlmap_xscale)]
-			    [(int) (i * smlmap_yscale)] - 32] < 6) {
-		XDrawPoint(display, smlmap_pixmap, White_GC, j + smlmap_x,
-			   i + smlmap_y);
-	    }
-#else
 	    switch (mapicon_ptr[map.data[(int) (j * smlmap_xscale)]
 				[(int) (i * smlmap_yscale)] - 32]) {
 
@@ -564,7 +512,6 @@ void DrawSmallMap(void)
 			   j + smlmap_x, i + smlmap_y);
 		break;
 	    }
-#endif
 
     XCopyArea(display, smlmap_pixmap, mapwin, White_GC, 1, 0,
 	      TOOLSWIDTH - 2, TOOLSWIDTH, 1, TOOLSHEIGHT - TOOLSWIDTH);
@@ -593,12 +540,6 @@ void UpdateSmallMap(int x, int y)
 	    for (j = y2; j < ys; j++) {
 		data = mapicon_ptr[map.data[(int) (i * smlmap_xscale)]
 				   [(int) (j * smlmap_yscale)] - 32];
-#ifdef MONO
-		if (data < 6) {
-		    XDrawPoint(display, mapwin, White_GC, i + smlmap_x,
-			       j + smlmap_y + TOOLSHEIGHT - TOOLSWIDTH);
-		}
-#else
 		switch (data) {
 
 		case 0:
@@ -683,7 +624,6 @@ void UpdateSmallMap(int x, int y)
 		    break;
 
 		}
-#endif
 	    }
 
     } else {

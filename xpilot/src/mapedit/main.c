@@ -874,7 +874,6 @@ int main(int argc, char *argv[])
     T_GetGC(&Black_GC, "black");
     T_GetGC(&xorgc, "white");
     XSetFunction(display, xorgc, GXxor);
-#ifndef MONO
     T_GetGC(&Wall_GC, COLOR_WALL);
     T_GetGC(&Decor_GC, COLOR_DECOR);
     T_GetGC(&Fuel_GC, COLOR_FUEL);
@@ -887,13 +886,12 @@ int main(int argc, char *argv[])
     T_GetGC(&Base_GC, COLOR_BASE);
     T_GetGC(&Cannon_GC, COLOR_CANNON);
     T_GetGC(&Friction_GC, COLOR_FRICTION);
-#endif
 
     mapwin = T_MakeWindow(50, (int) ((root_height - mapwin_height) / 2),
 			  mapwin_width, mapwin_height, "white", "black");
     T_SetWindowName(mapwin,
-		    PACKAGE_NAME " XP-Mapedit",
-		    PACKAGE_NAME " XP-Mapedit");
+		    PACKAGE_NAME " XP-MapEdit",
+		    PACKAGE_NAME " XP-MapEdit");
     XSelectInput(display, mapwin, ExposureMask | ButtonPressMask |
 		 KeyPressMask | StructureNotifyMask | ButtonReleaseMask |
 		 PointerMotionMask);
@@ -922,7 +920,7 @@ int main(int argc, char *argv[])
 
 
 /* RTT allow setting of server options from the default_settings array above */
-void Setup_default_server_options()
+void Setup_default_server_options(void)
 {
     int i;
 
