@@ -64,6 +64,16 @@ Files
 affected:
 
 -----------------------------------------------------------------
+Problem : If you put logo.ppm in your current dirctory and start the X
+          client, this file will be used in the score list. More generally
+	  the client should take the textures first from texturedir.
+Found by: kps
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
 Problem :
 Found by:
 Solution:
