@@ -33,8 +33,8 @@
 char update_version[] = VERSION;
 
 int		roundtime = -1;		/* time left this round */
-static double	time_to_update = 1;	/* time before less frequent updates */
-static bool	do_update_this_frame = false; /* less frequent update this frame */
+static double	time_to_tick = 1.0;	/* game time till next tick */
+static bool	tick = false; 		/* new tick of game time this frame */
 
 static inline void update_object_speed(world_t *world, object_t *obj)
 {
@@ -692,7 +692,7 @@ static void Use_items(player_t *pl)
     /*
      * Compute energy drainage
      */
-    if (do_update_this_frame) {
+    if (tick) {
 	if (BIT(pl->used, USES_SHIELD))
 	    Player_add_fuel(pl, ED_SHIELD);
 
@@ -978,7 +978,7 @@ static void Update_players(world_t *world)
 	    }
 
 	    /* Decrement fuel */
-	    if (do_update_this_frame)
+	    if (tick)
 		Player_add_fuel(pl, -f);
 	} else
 	    pl->acc.x = pl->acc.y = 0.0;
@@ -1141,13 +1141,13 @@ void Update_objects(world_t *world)
      *
      * Can also be used to do some updates less frequently.
      */
-    do_update_this_frame = false;
-    if ((time_to_update -= timeStep) <= 0) {
-	do_update_this_frame = true;
-	time_to_update += 1;
+    tick = false;
+    if ((time_to_tick -= timeStep) <= 0.0) {
+	tick = true;
+	time_to_tick += 1.0;
     }
 
-    Robot_update(world, do_update_this_frame);
+    Robot_update(world, tick);
 
     /*
      * Fast aim:
@@ -1185,7 +1185,7 @@ void Update_objects(world_t *world)
     /*
      * Special items.
      */
-    if (do_update_this_frame) {
+    if (tick) {
 	for (i = 0; i < NUM_ITEMS; i++)
 	    if (world->items[i].num < world->items[i].max
 		&& world->items[i].chance > 0
@@ -1201,7 +1201,7 @@ void Update_objects(world_t *world)
     if (world->NumTransporters > 0)
 	Transporter_update(world);
     if (world->NumCannons > 0)
-	Cannon_update(world, do_update_this_frame);
+	Cannon_update(world, tick);
     if (world->NumTargets > 0)
 	Target_update(world);
     if (!options.fastAim)
