@@ -22,7 +22,7 @@
 <Option name="initialafterburners" value="2"/>
 <Option name="initialautopilots" value="1"/>
 <Option name="initialfuel" value="1000"/>
-<Option name="itemprobmult" value="0.0000"/>
+<Option name="itemprobmult" value="0.0"/>
 <Option name="kineticenergyfueldrain" value="no"/>
 <Option name="limitedlives" value="yes"/>
 <Option name="limitedvisibility" value="no"/>
