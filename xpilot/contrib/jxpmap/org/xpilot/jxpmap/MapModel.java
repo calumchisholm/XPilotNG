@@ -557,8 +557,9 @@ public class MapModel extends ModelObject {
                         if (es != null) special = true;
                         edges.add(es);
                     } else if (name2.equalsIgnoreCase("style")) {
-                        LineStyle ls = (LineStyle)estyles.get(atts(n2, "id"));
-                        if (ls != null) states.put(atts(n2, "state"), ls);
+                        PolygonStyle ps = 
+							(PolygonStyle)pstyles.get(atts(n2, "id"));
+                        if (ps != null) states.put(atts(n2, "state"), ps);
                         else System.err.println(
                             "undefined state style: " + atts(n2, "id"));
                     } else {
