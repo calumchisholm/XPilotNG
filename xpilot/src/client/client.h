@@ -441,8 +441,8 @@ extern score_object_t	score_objects[MAX_SCORE_OBJECTS];
 extern int		score_object;
 
 extern int      oldServer; /* Compatibility mode for old block-based servers */
-extern ipos	FOOpos;
-extern ipos	FOOvel;
+extern ipos	selfPos;
+extern ipos	selfVel;
 extern short	heading;
 extern short	nextCheckPoint;
 extern u_byte	numItems[NUM_ITEMS];

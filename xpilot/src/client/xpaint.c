@@ -130,8 +130,8 @@ void Paint_frame(void)
 
     Check_view_dimensions();
 
-    world.x = FOOpos.x - (ext_view_width / 2);
-    world.y = FOOpos.y - (ext_view_height / 2);
+    world.x = selfPos.x - (ext_view_width / 2);
+    world.y = selfPos.y - (ext_view_height / 2);
     realWorld = world;
     if (BIT(Setup->mode, WRAP_PLAY)) {
 	if (world.x < 0 && world.x + ext_view_width < Setup->width)
@@ -287,8 +287,8 @@ void Paint_frame(void)
 	    int x, y, w, h;
 	    double xp, yp, xo, yo;
 
-	    xp = (double) (FOOpos.x * 256) / Setup->width;
-	    yp = (double) (FOOpos.y * RadarHeight) / Setup->height;
+	    xp = (double) (selfPos.x * 256) / Setup->width;
+	    yp = (double) (selfPos.y * RadarHeight) / Setup->height;
 	    xo = (double) 256 / 2;
 	    yo = (double) RadarHeight / 2;
 	    if (xo <= xp)

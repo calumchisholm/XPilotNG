@@ -182,8 +182,8 @@ void Paint_frame(void)
 {
     Check_view_dimensions();
 
-    world.x = FOOpos.x - (ext_view_width / 2);
-    world.y = FOOpos.y - (ext_view_height / 2);
+    world.x = selfPos.x - (ext_view_width / 2);
+    world.y = selfPos.y - (ext_view_height / 2);
     realWorld = world;
     if (BIT(Setup->mode, WRAP_PLAY)) {
 	if (world.x < 0 && world.x + ext_view_width < Setup->width)

@@ -38,8 +38,8 @@ unsigned RadarHeight = 0;
 unsigned RadarWidth = 256;	/* radar width at the server */ 
 
 int     oldServer;
-ipos	FOOpos;
-ipos	FOOvel;
+ipos	selfPos;
+ipos	selfVel;
 short	heading;
 short	nextCheckPoint;
 
@@ -1686,10 +1686,10 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 		double newFuelSum, double newFuelMax, int newPacketSize,
 		u_byte status)
 {
-    FOOpos.x = x;
-    FOOpos.y = y;
-    FOOvel.x = vx;
-    FOOvel.y = vy;
+    selfPos.x = x;
+    selfPos.y = y;
+    selfVel.x = vx;
+    selfVel.y = vy;
     heading = newHeading;
     displayedPower = newPower;
     displayedTurnspeed = newTurnspeed;
@@ -1860,7 +1860,7 @@ int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
      * while self could be NULL here.
      */
     if (!selfVisible
-	&& ((x == FOOpos.x && y == FOOpos.y) || (self && id == self->id))) {
+	&& ((x == selfPos.x && y == selfPos.y) || (self && id == self->id))) {
 
         eyesId = id;
 	eyes = Other_by_id(eyesId);

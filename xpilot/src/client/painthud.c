@@ -535,12 +535,12 @@ void Paint_HUD(void)
      */
     if (ptr_move_fact != 0.0
 	&& selfVisible
-	&& (FOOvel.x != 0 || FOOvel.y != 0))
+	&& (selfVel.x != 0 || selfVel.y != 0))
 	Segment_add(hudColor,
 		    ext_view_width / 2,
 		    ext_view_height / 2,
-		    (int)(ext_view_width / 2 - ptr_move_fact * FOOvel.x),
-		    (int)(ext_view_height / 2 + ptr_move_fact * FOOvel.y));
+		    (int)(ext_view_width / 2 - ptr_move_fact * selfVel.x),
+		    (int)(ext_view_height / 2 + ptr_move_fact * selfVel.y));
 
     if (selfVisible && dirPtrColor)
 	Segment_add(dirPtrColor,
@@ -581,8 +581,8 @@ void Paint_HUD(void)
     /*
      * Display the HUD
      */
-    hud_pos_x = (int)(ext_view_width / 2 - hud_move_fact * FOOvel.x);
-    hud_pos_y = (int)(ext_view_height / 2 + hud_move_fact * FOOvel.y);
+    hud_pos_x = (int)(ext_view_width / 2 - hud_move_fact * selfVel.x);
+    hud_pos_y = (int)(ext_view_height / 2 + hud_move_fact * selfVel.y);
 
     /* HUD frame */
     gcv.line_style = LineOnOffDash;

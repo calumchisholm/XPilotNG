@@ -144,8 +144,8 @@ static void Paint_self_radar(double xf, double yf)
     int		x, y, x_1, y_1, xw, yw;
 
     if (selfVisible != 0 && loops % 16 < 13) {
-	x = (int)(FOOpos.x * xf + 0.5) - slidingradar_x;
-	y = RadarHeight - (int)(FOOpos.y * yf + 0.5) - 1 - slidingradar_y;
+	x = (int)(selfPos.x * xf + 0.5) - slidingradar_x;
+	y = RadarHeight - (int)(selfPos.y * yf + 0.5) - 1 - slidingradar_y;
 	if (x <= 0)
 	    x += 256;
 	if (y <= 0)

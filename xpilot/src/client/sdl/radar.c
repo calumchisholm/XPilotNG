@@ -189,8 +189,8 @@ static void Radar_paint_objects(void)
     SDL_Rect rb = radar_bounds;
 
     if (instruments.showSlidingRadar) {
-	sx = FOOpos.x * rb.w / Setup->width;
-	sy = FOOpos.y * rb.h / Setup->height;
+	sx = selfPos.x * rb.w / Setup->width;
+	sy = selfPos.y * rb.h / Setup->height;
     }
     
     for (i = 0; i < num_radar; i++) {
@@ -333,8 +333,8 @@ void Radar_paint(void)
         float xp, yp, xo, yo;
         SDL_Rect sr, dr;
         
-        xp = (float) (FOOpos.x * radar_bounds.w) / Setup->width;
-        yp = (float) (FOOpos.y * radar_bounds.h) / Setup->height;
+        xp = (float) (selfPos.x * radar_bounds.w) / Setup->width;
+        yp = (float) (selfPos.y * radar_bounds.h) / Setup->height;
         xo = (float) radar_bounds.w / 2;
         yo = (float) radar_bounds.h / 2;
         if (xo <= xp) {
