@@ -1324,7 +1324,7 @@ static void Print_roundend_messages(other_t **order)
 		(DFLOAT)killratio_totalkills / rounds_played);
 
     sprintf(hackbuf, "Kill ratio - Round: %d/%d Total: %d/%d (%s) "
-	    "Rounds played: %d Avg. kills/round: %s",
+	    "Rounds played: %d  Avg.kills/round: %s",
 	    killratio_kills, killratio_deaths,
 	    killratio_totalkills, killratio_totaldeaths, kdratio,
 	    rounds_played, killsperround);
