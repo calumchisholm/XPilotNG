@@ -1,3 +1,277 @@
+2004-08-29 21:08  darelcullen
+
+	* TODO: TODO update
+
+2004-08-29 16:37  kps
+
+	* TODO: Wrote a few things we need to do for xpilot ng.
+
+2004-08-26 22:05  kps
+
+	* src/client/NT/: Makefile.am, Makefile.in: changes due to added
+	  files.
+
+2004-08-26 21:41  kps
+
+	* src/client/NT/: paintdata.h, xpaint.h, xpclient_x11.h: Added some
+	  more files needed by NT client.
+
+2004-08-25 18:41  kps
+
+	* doc/man/: xpilot-ng-replay.man, xpilot-ng-sdl.man,
+	  xpilot-ng-server.man, xpilot-ng-x11.man: Generated new man pages
+	  due to new options.
+
+2004-08-25 00:26  kps
+
+	* contrib/TkXpInterface/.cvsignore: ignore tkxpinterface stuff
+
+2004-08-25 00:22  kps
+
+	* src/client/x11/.cvsignore: added cvsignore file.
+
+2004-08-25 00:18  kps
+
+	* src/server/: cmdline.c, play.c, server.h: New server option
+	  useDebris aka useSparks which toggles creation of debris.
+	  Default is true.
+
+2004-08-24 22:06  kps
+
+	* src/client/: about.c, bitmaps.c, bitmaps.h, colors.c,
+	  configure.c, dbuff.c, dbuff.h, guimap.c, guiobjects.c, icon.h,
+	  join.c, paintdata.c, paintdata.h, painthud.c, paintradar.c,
+	  record.c, record.h, talk.c, welcome.c, widget.c, widget.h,
+	  xdefault.c, xevent.c, xevent.h, xeventhandlers.c,
+	  xeventhandlers.h, xinit.c, xinit.h, xpaint.c, xpaint.h,
+	  xpclient_x11.h, xpilot.c: Removed x11 specific files from
+	  src/client directory.
+
+2004-08-24 21:38  kps
+
+	* configure, configure.ac, src/client/Makefile.am,
+	  src/client/Makefile.in, src/client/NT/Makefile.am,
+	  src/client/NT/Makefile.in, src/client/NT/about.c,
+	  src/client/NT/bitmaps.c, src/client/NT/bitmaps.h,
+	  src/client/NT/colors.c, src/client/NT/configure.c,
+	  src/client/NT/dbuff.h, src/client/NT/guimap.c,
+	  src/client/NT/guiobjects.c, src/client/NT/icon.h,
+	  src/client/NT/join.c, src/client/NT/paintdata.c,
+	  src/client/NT/painthud.c, src/client/NT/paintradar.c,
+	  src/client/NT/record.c, src/client/NT/record.h,
+	  src/client/NT/welcome.c, src/client/NT/widget.c,
+	  src/client/NT/widget.h, src/client/NT/xdefault.c,
+	  src/client/NT/xevent.c, src/client/NT/xevent.h,
+	  src/client/NT/xeventhandlers.c, src/client/NT/xeventhandlers.h,
+	  src/client/NT/xinit.c, src/client/NT/xinit.h,
+	  src/client/NT/xpaint.c, src/client/NT/xpilot.c,
+	  src/client/NT/xpilot.dsp, src/client/x11/Makefile.am,
+	  src/client/x11/Makefile.in, src/client/x11/about.c,
+	  src/client/x11/bitmaps.c, src/client/x11/bitmaps.h,
+	  src/client/x11/colors.c, src/client/x11/configure.c,
+	  src/client/x11/dbuff.c, src/client/x11/dbuff.h,
+	  src/client/x11/guimap.c, src/client/x11/guiobjects.c,
+	  src/client/x11/icon.h, src/client/x11/join.c,
+	  src/client/x11/paintdata.c, src/client/x11/paintdata.h,
+	  src/client/x11/painthud.c, src/client/x11/paintradar.c,
+	  src/client/x11/record.c, src/client/x11/record.h,
+	  src/client/x11/talk.c, src/client/x11/welcome.c,
+	  src/client/x11/widget.c, src/client/x11/widget.h,
+	  src/client/x11/xdefault.c, src/client/x11/xevent.c,
+	  src/client/x11/xevent.h, src/client/x11/xeventhandlers.c,
+	  src/client/x11/xeventhandlers.h, src/client/x11/xinit.c,
+	  src/client/x11/xinit.h, src/client/x11/xpaint.c,
+	  src/client/x11/xpaint.h, src/client/x11/xpclient_x11.h,
+	  src/client/x11/xpilot.c: Moved x11 specific client files into
+	  src/client/x11 and src/client/NT.
+
+2004-08-23 14:08  kps
+
+	* src/server/walls.c: When ship bounces, remove constantSpeed from
+	  player velocity vector before calculating the new velocity
+	  vector. This way you can't accumulate the constantSpeed by
+	  sliding along a wall.
+
+2004-08-23 13:54  kps
+
+	* src/server/player.c: Don't lose items when pausing.  The reason
+	  this bug/feature appeared was that Player_death_reset is now
+	  called when someone pauses. That change was done so that player
+	  would be properly reset when pausing so that e.g. player would
+	  stop shooting etc.
+
+2004-08-17 20:55  kps
+
+	* src/client/sdl/sdlgui.c: Added option texturedBalls for sdl
+	  client.
+
+2004-08-16 20:19  kps
+
+	* src/server/: sched.c, sched.h: Removed some unused functions from
+	  sched.c
+
+2004-08-15 22:18  kps
+
+	* src/server/shot.c: Don't use sprintf where _f versions of
+	  Set_message functions can be used.
+
+2004-08-15 19:56  kps
+
+	* src/server/: frame.c, map.c, map.h, server.h, update.c,
+	  wormhole.c, xp2map.c, xpmap.c: Removed broken support for
+	  temporary wormholes.	I've never seen temporary wormholes used
+	  anyway.
+
+2004-08-14 12:40  kps
+
+	* src/server/: asteroid.c, map.c, map.h, robotdef.c, server.h,
+	  walls.c, xpmap.c: Robots now use shape_is_inside to determine
+	  what is empty space on map.  This is done by using a new shape
+	  'filled_wire' which is the shape of a map block.  Removed
+	  'SPACE_BLOCKS' which was a bitmap with a bit for each type of
+	  block which should be considered space (this is not needed since
+	  this can be done with polygon methods). Removed from map.h
+	  definitions of block bits ('SPACE_BIT' etc).
+
+2004-08-05 19:37  kps
+
+	* src/server/update.c: Throat contributed some code to reset warped
+	  bit of players when they exit a wormhole. This means one can warp
+	  more than once per life now, whee!!!
+
+2004-07-15 16:03  kps
+
+	* src/server/xpmap.c: Try to avoid "Bad homebase index" error in
+	  block based clients.	If multiple bases are in the area of the
+	  same block on a polygon map, we line up the extra bases close to
+	  the origin of the map.  Note that bases will not be in the order
+	  the block based client expects, so bases might have wrong team
+	  number or player name shown in block based clients. This could
+	  probably be fixed by sorting the bases in int world->bases array.
+
+2004-07-15 14:25  kps
+
+	* src/common/pack.h: instruments.useBlockProtocol became
+	  instruments.blockProtocol.
+
+2004-07-15 00:18  kps
+
+	* src/client/: client.c, client.h, default.c, guimap.c,
+	  guiobjects.c, messages.c, paintmap.c, paintradar.c, xpaint.c,
+	  xpilot.c, NT/winXXPilot.c, sdl/radar.c, sdl/sdlgui.c: Client
+	  option teamShotSize works now. Apparently it was broken somewhere
+	  between xpilot 4.0.0 and xpilot 4.5.4. Teamshots now honor
+	  showNastyShots option.  Renamed fields in instruments_t and some
+	  client variables (shot_size, teamshot_size, spark_size, ...) to
+	  have same names as the relevant options.
+
+2004-07-13 22:38  kps
+
+	* src/client/: client.h, guiobjects.c, xdefault.c, xpaint.h: Jimmy
+	  Andersson contributed code that paints round shots instead of
+	  rectangles.  Max size of shots and teamshots is now 20 (was 8).
+	  Moved showNastyShots into instruments_t.
+
+2004-07-13 11:44  kps
+
+	* lib/maps/: polybloods.xp2, polybloods7.xp2: Removed some useless
+	  options and data.
+
+2004-07-10 21:59  kps
+
+	* src/client/textinterface.c: 'R' is not more a privileged command
+	  in textinterface (used to set robotnum).
+
+2004-07-10 17:31  darelcullen
+
+	* BUGS: Added 2 new bugs :(
+
+2004-07-06 01:42  kps
+
+	* lib/maps/: polybloods.xp2, polybloods7.xp2: slightly less powered
+	  settings afterburnerpower 1.1 ballconnectorspringconstant 1650
+
+2004-07-05 19:17  kps
+
+	* lib/maps/: polybloods.xp2, polybloods7.xp2: Set
+	  playerwallfriction to 0.8 and wallbouncefueldrainmult to 0.1.
+
+2004-07-04 21:40  kps
+
+	* src/server/walls.c: Changed constant C2 in uau's wallbounces to
+	  1-playerwallbrake.  (The change in speed parallel to wall during
+	  wall bounce is MIN(C1*perpendicular_change, C2*parallel_speed)).
+
+2004-07-04 20:48  kps
+
+	* lib/maps/polybloods.xp2: Changed playerwallbrake to 0.5 now that
+	  we have mara's or uau's wallbounces.
+
+2004-07-04 20:22  kps
+
+	* lib/maps/polybloods.xp2: New default settings in polybloods.xp2.
+	  Map version is now 8.3.  afterburnerpowermult 1.2
+	  ballconnectorspringconstant 1800 ballradius 10 constantspeed 0.5
+
+2004-07-04 20:14  kps
+
+	* lib/maps/polybloods.xp2: Sorted options alphabetically.
+
+2004-07-04 20:08  kps
+
+	* lib/maps/polybloods7.xp2: New "standard" settings: constantspeed
+	  0.5 afterburnerpowermult 1.2 ballradius 10
+	  ballconnectorspringconstant 1800
+
+2004-07-04 19:58  kps
+
+	* lib/maps/polybloods7.xp2: Removed some more unnecessary options.
+
+2004-07-04 19:54  kps
+
+	* lib/maps/polybloods7.xp2: Sorted options alphabetically.
+
+2004-07-04 19:36  kps
+
+	* lib/maps/polybloods7.xp2: Removed some unnecessary options.
+
+2004-07-04 18:47  kps
+
+	* lib/maps/polybloods7.xp2: Removed mapdata option (server can
+	  create the blocks from polygons).  Made dataurl option
+	  polybloods.xpd (opengl has problems with rtc2.xpd).
+
+2004-07-04 14:53  kps
+
+	* lib/maps/: Makefile.am, Makefile.in, polybloods7.xp2: Added
+	  polybloods v7 map to distro. Main difference to v8 is that v7 did
+	  not have rounded or modified walls.
+
+2004-07-03 22:58  kps
+
+	* src/server/: cmdline.c, server.h, walls.c: New wall bounce code.
+	  New option playerWallFriction (0.5 by default).  New option
+	  maraWallBounce (temporary option; true by default).  Mara's wall
+	  bounces work like this: Vtangent2 =
+	  (1-Vnormal1/Vtotal1*wallfriction)*Vtangent1 Uau's wall bounces
+	  work like this: change the parallel one by
+	  MIN(C1*perpendicular_change, C2*parallel_speed) if you assume the
+	  wall has a coefficient of friction C1.
+
+2004-06-30 01:15  kps
+
+	* src/client/netclient.c: OOPS! Commited some wrong code in
+	  netclient.c in revision 1.92.  Revision 1.93 is the same as 1.91.
+
+2004-06-30 01:11  kps
+
+	* configure, configure.ac, src/client/netclient.c: Define some
+	  extra CPPFLAGS and LDFLAGS to use in FreeBSD.
+
+2004-06-29 21:28  darelcullen
+
+	* ChangeLog: Updated Changelog
+
 2004-06-23 13:28  kps
 
 	* src/server/shot.c: Make option constantSpeed affect shots'
@@ -1223,6 +1497,11 @@
 2004-04-13 17:51  kps
 
 	* src/server/robot.c: Use improved Set_message().
+
+2004-04-13 15:26  darelcullen
+
+	* src/client/sdl/res/xpilot.ico: nice xpilot icon (C) colonel blood
+	  :)
 
 2004-04-13 15:24  darelcullen
 
