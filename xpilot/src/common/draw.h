@@ -99,7 +99,8 @@
 /* kps - fix this somehow */
 #include "../server/click.h"
 
-typedef struct {
+/* clk used on server, pxl on client */
+typedef union {
     clpos clk;
     position pxl;
 } shapepos;
@@ -145,7 +146,6 @@ extern void Rotate_point(shapepos pt[RES]);
 extern void Rotate_position(position pt[RES]);
 extern void Rotate_ship(shipobj *w);
 extern shapepos ipos2shapepos(ipos pos);
-extern shipobj *do_parse_shape(char *str);
 
 #if 0
 #define Ship_get_point_clpos(ship, i, dir)       ((ship)->pts[i][dir])
