@@ -813,9 +813,9 @@
 <Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>
 </Polygon></BallArea>
 <BallTarget team="4">
-<Polygon x="119296" y="182016" style="balltarget">
-<Offset x="1088" y="0"/> <Offset x="0" y="1088"/>
-<Offset x="-1088" y="0"/> <Offset x="0" y="-1088"/>
+<Polygon x="119232" y="181952" style="balltarget">
+<Offset x="1216" y="0"/> <Offset x="0" y="1216"/>
+<Offset x="-1216" y="0"/> <Offset x="0" y="-1216"/>
 </Polygon></BallTarget>
 <Ball team="2" x="140000" y="49921"/>
 <BallArea>
@@ -824,9 +824,9 @@
 <Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>
 </Polygon></BallArea>
 <BallTarget team="2">
-<Polygon x="139456" y="49856" style="balltarget">
-<Offset x="1088" y="0"/> <Offset x="0" y="1088"/>
-<Offset x="-1088" y="0"/> <Offset x="0" y="-1088"/>
+<Polygon x="139392" y="49792" style="balltarget">
+<Offset x="1216" y="0"/> <Offset x="0" y="1216"/>
+<Offset x="-1216" y="0"/> <Offset x="0" y="-1216"/>
 </Polygon></BallTarget>
 <Base team="4" x="59360" y="169120" dir = "32"/>
 <Base team="4" x="75040" y="166880" dir = "32"/>
