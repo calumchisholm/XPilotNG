@@ -1109,7 +1109,7 @@ static int Quit_callback(int widget_desc, void *data, const char **str)
 }
 
 
-void Resize(Window w, int width, int height)
+void Resize(Window w, unsigned width, unsigned height)
 {
     if (w != topWindow)
 	return;

@@ -93,7 +93,7 @@ extern void Talk_reverse_cut(void);
 extern void Quit(void);
 extern int FatalError(Display *);
 extern void Draw_score_table(void);
-extern void Resize(Window w, int width, int height);
+extern void Resize(Window w, unsigned width, unsigned height);
 
 extern int DrawShadowText(Display*, Window, GC,
 			  int x_border, int start_y, const char *str,

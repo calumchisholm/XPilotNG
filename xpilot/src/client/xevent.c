@@ -40,6 +40,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     keys_t ret = KEY_DUMMY;
     static int i = 0;
 
+    (void)event;
     if (reset) {
 	/* binary search since keyDefs is sorted on keysym. */
 	int lo = 0, hi = maxKeyDefs - 1;
@@ -98,7 +99,7 @@ void Pointer_control_set_state(int on)
 		     CurrentTime);
 	XWarpPointer(dpy, None, drawWindow,
 		     0, 0, 0, 0,
-		     draw_width/2, draw_height/2);
+		     (int)draw_width/2, (int)draw_height/2);
 	XDefineCursor(dpy, drawWindow, pointerControlCursor);
 	XSelectInput(dpy, drawWindow,
 		     PointerMotionMask | ButtonPressMask | ButtonReleaseMask);
@@ -194,6 +195,7 @@ bool Key_check_talk_macro(keys_t key)
 
 bool Key_press_id_mode(keys_t key)
 {
+    (void)key;
     showRealName = showRealName ? false : true;
     scoresChanged++;
     return false;	/* server doesn't need to know */
@@ -201,6 +203,7 @@ bool Key_press_id_mode(keys_t key)
 
 bool Key_press_autoshield_hack(keys_t key)
 {
+    (void)key;
     if (auto_shield && BITV_ISSET(keyv, KEY_SHIELD))
 	BITV_CLR(keyv, KEY_SHIELD);
     return false;
@@ -229,6 +232,7 @@ bool Key_press_shield(keys_t key)
 
 bool Key_press_fuel(keys_t key)
 {
+    (void)key;
     fuelTime = FUEL_NOTIFY_TIME;
     return false;
 }
@@ -238,6 +242,7 @@ bool Key_press_swap_settings(keys_t key)
     double tmp;
 #define SWAP(a, b) (tmp = (a), (a) = (b), (b) = tmp)
 
+    (void)key;
     SWAP(power, power_s);
     SWAP(turnspeed, turnspeed_s);
     SWAP(turnresistance, turnresistance_s);
@@ -250,6 +255,8 @@ bool Key_press_swap_settings(keys_t key)
 bool Key_press_swap_scalefactor(keys_t key)
 {
     double tmp;
+
+    (void)key;
     tmp = scaleFactor;
     scaleFactor = scaleFactor_s;
     scaleFactor_s = tmp;
@@ -264,6 +271,7 @@ bool Key_press_swap_scalefactor(keys_t key)
 
 bool Key_press_increase_power(keys_t key)
 {
+    (void)key;
     power = power * 1.10;
     power = MIN(power, MAX_PLAYER_POWER);
     Send_power(power);
@@ -276,6 +284,7 @@ bool Key_press_increase_power(keys_t key)
 
 bool Key_press_decrease_power(keys_t key)
 {
+    (void)key;
     power = power * 0.90;
     power = MAX(power, MIN_PLAYER_POWER);
     Send_power(power);
@@ -287,6 +296,7 @@ bool Key_press_decrease_power(keys_t key)
 
 bool Key_press_increase_turnspeed(keys_t key)
 {
+    (void)key;
     turnspeed = turnspeed * 1.05;
     turnspeed = MIN(turnspeed, MAX_PLAYER_TURNSPEED);
     Send_turnspeed(turnspeed);
@@ -298,6 +308,7 @@ bool Key_press_increase_turnspeed(keys_t key)
 
 bool Key_press_decrease_turnspeed(keys_t key)
 {
+    (void)key;
     turnspeed = turnspeed * 0.95;
     turnspeed = MAX(turnspeed, MIN_PLAYER_TURNSPEED);
     Send_turnspeed(turnspeed);
@@ -309,36 +320,42 @@ bool Key_press_decrease_turnspeed(keys_t key)
 
 bool Key_press_talk(keys_t key)
 {
+    (void)key;
     Talk_set_state((talk_mapped == false) ? true : false);
     return false;	/* server doesn't need to know */
 }
 
 bool Key_press_show_items(keys_t key)
 {
+    (void)key;
     TOGGLE_BIT(instruments, SHOW_ITEMS);
     return false;	/* server doesn't need to know */
 }
 
 bool Key_press_show_messages(keys_t key)
 {
+    (void)key;
     TOGGLE_BIT(instruments, SHOW_MESSAGES);
     return false;	/* server doesn't need to know */
 }
 
 bool Key_press_pointer_control(keys_t key)
 {
+    (void)key;
     Pointer_control_set_state(!pointerControl);
     return false;	/* server doesn't need to know */
 }
 
 bool Key_press_toggle_record(keys_t key)
 {
+    (void)key;
     Record_toggle();
     return false;	/* server doesn't need to know */
 }
 
 bool Key_press_toggle_radar_score(keys_t key)
 {
+    (void)key;
     if (radar_score_mapped) {
 
 	/* change the draw area to be the size of the window */
@@ -394,6 +411,7 @@ bool Key_press_toggle_radar_score(keys_t key)
 #ifndef _WINDOWS
 bool Key_press_msgs_stdout(keys_t key)
 {
+    (void)key;
     if (selectionAndHistory)
 	Print_messages_to_stdout();
     return false;	/* server doesn't need to know */
@@ -402,6 +420,7 @@ bool Key_press_msgs_stdout(keys_t key)
 
 bool Key_press_select_lose_item(keys_t key)
 {
+    (void)key;
     if (lose_item_active == 1)
         lose_item_active = 2;
     else
@@ -750,7 +769,7 @@ void xevent_pointer(void)
 			       PointerMotionMask, &event);
 		    XWarpPointer(dpy, None, drawWindow,
 				 0, 0, 0, 0,
-				 draw_width/2, draw_height/2);
+				 (int)draw_width/2, (int)draw_height/2);
 #endif
 		    XFlush(dpy);
 		}
