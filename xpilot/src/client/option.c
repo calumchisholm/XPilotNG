@@ -515,10 +515,10 @@ const char *Option_value_to_string(xp_option_t *opt)
 	/*
 	 * Assertion in Store_option guarantees one of these is not NULL. 
 	 */
-	if (opt->str_ptr)
-	    return opt->str_ptr;
-	else
+	if (opt->str_getfunc)
 	    return opt->str_getfunc(opt);
+	else
+	    return opt->str_ptr;
     case xp_key_option:
 	assert(opt->key_string);
 	return opt->key_string;
