@@ -254,6 +254,8 @@ void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h)
 }
 void DrawGLWidgets( void )
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glScissor(0, 0, draw_width, draw_height);
     glEnable(GL_SCISSOR_TEST);
     DrawGLWidgetsi( MainWidget , 0, 0, draw_width, draw_height );
