@@ -32,9 +32,132 @@ extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 extern void Get_xpilotrc_file(char *, unsigned);
 
+typedef enum {
+    xp_noarg_option,
+    xp_bool_option,
+    xp_int_option,
+    xp_double_option,
+    xp_string_option,
+    xp_color_option,
+    xp_key_option,
+} xp_option_type_t;
+
+typedef struct xp_option xp_option_t;
+
+typedef void (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
+typedef void (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
+typedef void (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
+typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
+typedef bool (*xp_key_option_setfunc_t)    (xp_option_t *opt, const char *val);
+
+
+struct xp_option {
+    xp_option_type_t type;
+
+    const char *name;
+    const char *help;
+
+    /* bool option stuff */
+    bool bool_defval;
+    bool *bool_ptr;
+    xp_bool_option_setfunc_t bool_setfunc;
+
+    /* integer option stuff */
+    int int_defval;
+    int int_minval;
+    int int_maxval;
+    int *int_ptr;
+    xp_int_option_setfunc_t int_setfunc;
+
+    /* double option stuff */
+    double dbl_defval;
+    double dbl_minval;
+    double dbl_maxval;
+    double *dbl_ptr;
+    xp_double_option_setfunc_t dbl_setfunc;
+
+    /* string option stuff */
+    const char *str_defval;
+    char *str_ptr;
+    xp_string_option_setfunc_t str_setfunc;
+
+    /* color option stuff */
+    /*color_t *color_ptr;*/
+
+    /* key option stuff */
+    keys_t key;
+    xp_key_option_setfunc_t key_setfunc;
+    /* ... */
+
+};
+
+
+
+
+#define XP_BOOL_OPTION_DUMMY \
+	false, NULL, NULL
+#define XP_INT_OPTION_DUMMY \
+	0, 0, 0, NULL, NULL
+#define XP_DOUBLE_OPTION_DUMMY \
+	0, 0, 0, NULL, NULL
+#define XP_STRING_OPTION_DUMMY \
+	NULL, NULL, NULL
+#define XP_KEY_OPTION_DUMMY \
+	KEY_DUMMY, NULL
+
 /*
  * Macros for initalizing options.
  */
+
+
+#define XP_BOOL_OPTION(name, valptr, defval, setfunc, help) \
+{ \
+    xp_bool_option,\
+	name,\
+	help,\
+	defval,\
+	valptr,\
+	setfunc,\
+	XP_INT_OPTION_DUMMY,\
+	XP_DOUBLE_OPTION_DUMMY,\
+	XP_STRING_OPTION_DUMMY,\
+	XP_KEY_OPTION_DUMMY,\
+}
+
+#define XP_INT_OPTION(name, valptr, defval, minval, maxval, setfunc, help) \
+{ \
+    xp_int_option,\
+	name,\
+	help,\
+	XP_BOOL_OPTION_DUMMY,\
+	defval,\
+	minval,\
+	maxval,\
+	valptr,\
+	setfunc,\
+	XP_DOUBLE_OPTION_DUMMY,\
+	XP_STRING_OPTION_DUMMY,\
+	XP_KEY_OPTION_DUMMY,\
+}
+
+#define XP_DOUBLE_OPTION(name, valptr, defval, minval, maxval, setfunc, help) \
+{ \
+    xp_double_option,\
+	name,\
+	help,\
+	XP_BOOL_OPTION_DUMMY,\
+	XP_INT_OPTION_DUMMY,\
+	defval,\
+	minval,\
+	maxval,\
+	valptr,\
+	setfunc,\
+	XP_STRING_OPTION_DUMMY,\
+	XP_KEY_OPTION_DUMMY,\
+}
+
+
+
 
 
 #endif

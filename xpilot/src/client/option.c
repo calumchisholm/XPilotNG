@@ -43,60 +43,10 @@ bool power_setfunc(const char *name, const char *value, void *private)
 }
 #endif
 
-typedef enum {
-    xp_noarg_opt,
-    xp_int_opt,
-    xp_float_opt,
-    xp_bool_opt,
-    xp_string_opt,
-    xp_color_opt,
-    xp_key_opt,
-} xp_option_type_t;
-
-typedef struct xp_option {
-    xp_option_type_t type;
-
-    const char *name;
-    const char *help;
-
-    /* bool option stuff */
-    bool bool_defval;
-    bool *bool_ptr;
-
-    /* integer option stuff */
-    int int_defval;
-    int int_minval;
-    int int_maxval;
-    int *int_ptr;
-
-    /* floating point option stuff */
-    double flt_defval;
-    double flt_minval;
-    double flt_maxval;
-    double *flt_ptr;
-
-    /* string option stuff */
-    const char *str_defval;
-    char *str_ptr;
-
-    /* color option stuff */
-    /*color_t *color_ptr;*/
-
-    /* key option stuff */
-    keys_t key;
-    /* ... */
-
-} xp_option_t;
-
-
-
 int num_options = 0;
 int max_options = 0;
 
-typedef bool (*cl_option_setfunc_t)(const char *name,
-				    const char *value,
-				    void *private);
-
+#if 0
 typedef struct {
     const char		*name;		/* option name */
     const char		*noArg;		/* value for non-argument options */
@@ -107,36 +57,13 @@ typedef struct {
     cl_option_setfunc_t	setfunc;
     void		*private;	/* passed to set function */
 } cl_option_t;
+#endif
 
 xp_option_t *options = NULL;
 
 
-#if 0
-#define XP_OPT_BOOL_DUMMY \
-	false, NULL
-#define XP_OPT_INT_DUMMY \
-	0, 0, 0, NULL
-#define XP_OPT_FLOAT_DUMMY \
-	0, 0, 0, NULL
-#define XP_OPT_STRING_DUMMY \
-	NULL, NULL
-
-#define XP_OPT_FLOAT(name, valptr, defval, minval, maxval, setfunc, help) \
-{ \
-    XP_OPT_INT_T,\
-	name,\
-	help,\
-	XP_OPT_BOOL_DUMMY,\
-	XP_OPT_INT_DUMMY,\
-	defval,\
-	minval,\
-	maxval,\
-	valptr,\
-	XP_OPT_STR_DUMMY,\
-}
-
 xp_option_t xxx[] = {
-    XP_OPT_FLOAT(
+    XP_DOUBLE_OPTION(
 	"power",
 	&power,
 	55.0,
@@ -144,10 +71,9 @@ xp_option_t xxx[] = {
 	MAX_PLAYER_POWER,
 	NULL,
 	"Set the engine power.\n"
-	"Valid values are in the range 5-55.\n",
+	"Valid values are in the range 5-55.\n"
 	),
 };
-#endif
 
 static inline xp_option_t *Option_by_index(int ind)
 {
@@ -395,8 +321,9 @@ void Get_xpilotrc_file(char *path, unsigned size)
 void Get_xpilotrc_file(char *path, unsigned size)
 {
     /* kps - some windows pro implement this */
+#error "Function Get_xpilotrc_file() not implemented."
 }
-#endif
+#endif /* _WINDOWS */
 
 void Usage(void)
 {
