@@ -420,7 +420,7 @@ int Net_setup(void)
     else {
 	int i, j, startx, starty, polyc, hidcount, nexthid;
 	int dx, dy, cx, cy, pc;
-        int *styles, curstyle;
+        int *styles;
 	xp_polygon_t poly;
 	ipos *points, min, max;
 	signed char *ptr;
@@ -432,30 +432,34 @@ int Net_setup(void)
 
 
         /* TODO Get these from server somehow */
-        edgestyles = malloc(4 * sizeof(edgestyle_t));
-        if (edgestyles == NULL) {
+        edge_styles = malloc(2 * sizeof(edge_style_t));
+        if (edge_styles == NULL) {
             error("no memory for edge styles");
             return -1;
         }
 
-        /* default style */
-        edgestyles[0].width = 3;
-        edgestyles[0].color = wallColor;
-        edgestyles[0].style = LineSolid;
+        /* default edge style */
+        edge_styles[0].width = 3;
+        edge_styles[0].color = wallColor;
+        edge_styles[0].style = LineSolid;
 
-        /* some other styles.. */
+        /* hidden edge style */
+        edge_styles[1].width = -1;
 
-        edgestyles[1].width = 5;
-        edgestyles[1].color = RED;
-        edgestyles[1].style = LineSolid;
+        polygon_styles = malloc(2 * sizeof(polygon_style_t));
+        if (polygon_styles == NULL) {
+            error("no memory for polygon styles");
+            return -1;
+        }
 
-        edgestyles[2].width = 3;
-        edgestyles[2].color = WHITE;
-        edgestyles[2].style = LineOnOffDash;
-
-        edgestyles[3].width = -1;
-
-        curstyle = 0;
+        /* default polygon style */
+        polygon_styles[0].visible = true;
+        polygon_styles[0].visible_in_radar = true;
+        polygon_styles[0].method = NOFILL;
+        polygon_styles[0].def_edge_style = 0;
+        
+        /* hidden polygon style */
+        polygon_styles[1].visible = false;
 
 	polyc = (unsigned char)*ptr++ << 8;
 	polyc += (unsigned char)*ptr++;
@@ -478,9 +482,13 @@ int Net_setup(void)
 		error("no memory for points");
 		return -1;
 	    }
-            if ((styles = malloc(pc * sizeof(int))) == NULL) {
-                error("no memory for styles");
-                return -1;
+            if (hidcount) {
+                if ((styles = malloc(pc * sizeof(int))) == NULL) {
+                    error("no memory for special edges");
+                    return -1;
+                }
+            } else {
+                styles = NULL;
             }
 	    startx = (unsigned char)*ptr++ << 8;
 	    startx += (unsigned char)*ptr++;
@@ -488,16 +496,19 @@ int Net_setup(void)
 	    starty += (unsigned char)*ptr++;
 	    points[0].x = cx = min.x = max.x = startx;
 	    points[0].y = cy = min.y = max.y = starty;
+
 	    if (!nexthid) {
-		styles[0] = 3;
+		styles[0] = 0; /* -1 means default */
 		hidcount--;
 		if (hidcount) {
 		    nexthid = *hidptr++ << 8;
 		    nexthid += *hidptr++;
 		}
 	    }
-	    else
-		styles[0] = curstyle;
+	    else {
+		if (styles) styles[0] = -1;
+            }
+
 	    for (j = 1; j < pc; j++) {
 		dx = *ptr++ << 8;
 		dx += (unsigned char)*ptr++;
@@ -512,24 +523,21 @@ int Net_setup(void)
 		points[j].x = dx;
 		points[j].y = dy;
 
-                /* hack for testing */
-                if (0 && (float)rand() / RAND_MAX > 0.8) {
-                    curstyle = ((float)rand() / RAND_MAX) * 4;
-                    if (curstyle == 4) curstyle--;
-                }
 		if (nexthid == j) {
-		    styles[j] = 3;
+		    styles[j] = 1;
 		    hidcount--;
 		    if (hidcount) {
 			nexthid = *hidptr++ << 8;
 			nexthid += *hidptr++;
 		    }
 		}
-		else
-		    styles[j] = curstyle;
+		else {
+                    if (styles) styles[j] = -1;
+                }
 	    }
 	    poly.points = points;
-            poly.styles = styles;
+            poly.edge_styles = styles;
+            poly.style = 0;
 	    poly.num_points = pc;
 	    poly.bounds.x = min.x;
 	    poly.bounds.y = min.y;

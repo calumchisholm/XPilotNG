@@ -180,8 +180,13 @@ int           num_checks = 0;
 xp_polygon_t  *polygons = 0;
 int           num_polygons = 0, max_polygons = 0;
 
-edgestyle_t   *edgestyles = 0;
-int           num_edgestyles = 0, max_edgestyles = 0;
+
+edge_style_t     *edge_styles = 0;
+int              num_edge_styles = 0, max_edge_styles = 0;
+
+polygon_style_t  *polygon_styles = 0;
+int              num_polygon_styles = 0, max_polygon_styles = 0;
+
 
 static cannontime_t	*cannons = 0;
 static int		num_cannons = 0;

@@ -165,18 +165,35 @@ typedef struct {
 
 
 typedef struct {
-    char           width;       /* Line width, -1 means no line */
-    int            color;       /* Line color */
-    int            style;       /* LineSolid, LineOnOffDash, LineDoubleDash */
-    int            texture;     /* Index of texture, not used for now */
-} edgestyle_t;
+    int        width;           /* Line width, -1 means no line */
+    int        color;           /* Line color */
+    int        style;           /* LineSolid, LineOnOffDash, LineDoubleDash */
+} edge_style_t;
+
+
+typedef enum {
+    NOFILL,
+    FILLED,
+    TEXTURED
+} fill_style_t;
+
 
 typedef struct {
-    ipos        *points;
-    int         num_points;
-    irec        bounds;
-    int         texture;
-    int         *styles;
+    bool         visible;         /* Should the polygon be drawn at all */
+    bool         visible_in_radar;/* Should the polygon be drawn in radar */
+    int          color;           /* The color if drawn in filled mode */
+    int          texture;         /* The texture if drawn in texture mode */
+    fill_style_t method;          /* Recommended drawing method */
+    int          def_edge_style;  /* The default style for edges */ 
+} polygon_style_t;
+
+
+typedef struct {
+    ipos        *points;        /* points[0] is absolute, rest are relative */
+    int         num_points;     /* number of points */
+    irec        bounds;         /* bounding box for the polygon */
+    int         *edge_styles;   /* optional array of indexes to edge_styles */
+    int         style;          /* index to polygon_styles array */
 } xp_polygon_t; 
 
 
@@ -350,8 +367,12 @@ extern int              num_checks;
 extern xp_polygon_t     *polygons;
 extern int               num_polygons, max_polygons;
 
-extern edgestyle_t      *edgestyles;
-extern int               num_edgestyles, max_edgestyles;
+extern edge_style_t     *edge_styles;
+extern int               num_edge_styles, max_edge_styles;
+
+extern polygon_style_t  *polygon_styles;
+extern int               num_polygon_styles, max_polygon_styles;
+
 
 int Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);
