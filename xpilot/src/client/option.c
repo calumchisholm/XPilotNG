@@ -136,18 +136,76 @@ static void Store_option_struct(xp_option_t *opt)
 }
 #endif
 
+static void Set_bool_option(xp_option_t *opt, bool value)
+{
+    assert(opt);
+    assert(opt->type == xp_bool_option);
+    if (opt->bool_setfunc)
+	opt->bool_setfunc(opt, value);
+    else
+	*opt->bool_ptr = value;
+}
+
+static void Set_int_option(xp_option_t *opt, int value)
+{
+    assert(opt);
+    assert(opt->type == xp_int_option);
+    LIMIT(value, opt->int_minval, opt->int_maxval);
+
+    if (opt->int_setfunc)
+	opt->int_setfunc(opt, value);
+    else
+	*opt->int_ptr = value;
+}
+
+static void Set_double_option(xp_option_t *opt, double value)
+{
+    assert(opt);
+    assert(opt->type == xp_double_option);
+    LIMIT(value, opt->dbl_minval, opt->dbl_maxval);
+
+    if (opt->dbl_setfunc)
+	opt->dbl_setfunc(opt, value);
+    else
+	*opt->dbl_ptr = value;
+}
+
+
+
 /*
  * This could also be used from a client '\set' command, e.g.
  * "\set scalefactor 1.5"
  */
-
 void Set_option(const char *name, const char *value)
 {
-#if 0
     xp_option_t *opt;
-    bool set_ok;
 
     opt = Find_option(name);
+
+    if (!opt) {
+	warn("Could not find option \"%s\"\n", name);
+	return;
+    }
+
+    switch (opt->type) {
+    case xp_bool_option:
+	Set_bool_option(opt, ON(value) ? true : false);
+	break;
+    case xp_int_option:
+	Set_int_option(opt, atoi(value));
+	break;
+    case xp_double_option:
+	Set_double_option(opt, atof(value));
+	break;
+    default:
+	warn("FOO");
+    }
+
+#if 0
+
+    bool set_ok;
+
+
 
     if (!opt) {
 	/*Store_option(name, value);

@@ -95,7 +95,7 @@ struct xp_option {
 
     const char *str_defval;
     char *str_ptr;
-    size_t size;
+    size_t str_size;
     xp_string_option_setfunc_t str_setfunc;
 
     /* color option stuff */
