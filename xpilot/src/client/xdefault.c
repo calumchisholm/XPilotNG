@@ -376,8 +376,8 @@ xp_option_t xdefault_options[] = {
 
     XP_INT_OPTION(
         "mouseAccelThresh",
-	1,
-	1,
+	0,
+	0,
 	10,
 	&new_threshold,
 	Set_accthresh,
