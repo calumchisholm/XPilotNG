@@ -47,6 +47,7 @@
 # define HAVE_STRNCASECMP 1
 # define HAVE_LIBZ 1
 # define PACKAGE "xpilot-ng"
+# define PACKAGE_BUGREPORT "kps@users.sourceforge.net"
 #endif
 
 #include <stdio.h>
