@@ -20,10 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-/*#define TIME_CODE*/
-#ifdef TIME_CODE
-    #include <sys/time.h>
-#endif
 
 #include "xpclient.h"
 #include <GL/gl.h>
@@ -53,22 +49,13 @@ static TTF_Font     *scoreListFont;
 static char         *scoreListFontName = "VeraMoBd.ttf";
 static sdl_window_t scoreListWin;
 static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
-static guiarea_t    *scoreListArea;
 static bool         scoreListMoving;
-static widget_list_t *ScoreList_widgetItem;
-static guiarea_t    *window_guiarea;
 
-static widget_list_t *ConfMenu;
-static GLWidget *testWidget[3];
-static int testValue;
-static int testMinValue;
-static int testMaxValue;
-static double testValue2;
-static bool testValue3;
-static double testMinValue2;
-static double testMaxValue2;
+static GLWidget *ConfMenu;
+static GLWidget *testWidget[4];
+GLWidget *MainWidgetList = NULL;
 
-void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y, void *data)
+/*void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y, void *data)
 {
     if (state == SDL_PRESSED) {
 
@@ -97,7 +84,7 @@ void select_move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
     	select_bounds->w += xrel;
     	select_bounds->h += yrel;
     }
-}
+}*/
 
 /* function to reset our viewport after a window resize */
 int Resize_Window( int width, int height )
@@ -106,8 +93,6 @@ int Resize_Window( int width, int height )
     
     draw_width = width;
     draw_height = height;
-    window_guiarea->bounds.w = width;
-    window_guiarea->bounds.h = height;
     
     if (!SDL_SetVideoMode( width,
 			   height,
@@ -134,11 +119,12 @@ int Resize_Window( int width, int height )
     return 0;
 }
 
-static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
+void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
 {
     if (state == SDL_PRESSED) {
     	if (button == 1)
 	    scoreListMoving = true;
+	
     }
     
     if (state == SDL_RELEASED) {
@@ -147,30 +133,22 @@ static void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void
     }
 }
 
-static void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
+void Scorelist_move(Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
 {
     if (scoreListMoving) {
-	scoreListWin.x += xrel;
-	scoreListWin.y += yrel;
-	scoreListArea->bounds.x = scoreListWin.x;
-	scoreListArea->bounds.y = scoreListWin.y;
+	((GLWidget *)data)->bounds.x = scoreListWin.x += xrel;
+	((GLWidget *)data)->bounds.y = scoreListWin.y += yrel;
     }
 }
 
 
-static void Scorelist_cleanup(void)
+void Scorelist_cleanup( GLWidget *widget )
 {
     TTF_CloseFont(scoreListFont);
     sdl_window_destroy(&scoreListWin);
-    unregister_guiarea(scoreListArea);
 }
 
-static void Scorelist_reg(widget_list_t *LI)
-{
-    scoreListArea = register_guiarea(*(SDL_Rect *)(LI->GuiRegData), Scorelist_button, NULL, Scorelist_move, NULL, NULL, NULL);
-}
-
-static void Scorelist_paint(widget_list_t *LI)
+void Scorelist_paint(GLWidget *widget)
 {
     if (scoresChanged) {
 	/* This is the easiest way to track if
@@ -185,8 +163,8 @@ static void Scorelist_paint(widget_list_t *LI)
 	     * so I have to repaint it */
 	    scoresChanged = 1;
 	    Paint_score_table();
-	    scoreListArea->bounds.w = scoreListWin.w;
-	    scoreListArea->bounds.h = scoreListWin.h;
+	    widget->bounds.w = scoreListWin.w;
+	    widget->bounds.h = scoreListWin.h;
 	}
 	sdl_window_refresh(&scoreListWin);
     }
@@ -213,66 +191,91 @@ static void Scorelist_paint(widget_list_t *LI)
     glEnd();
 }
 
-static int Scorelist_init(void)
+GLWidget *Init_ScorelistWidget(void)
 {
-    static SDL_Rect r = { 10, 240, 200, 100 };
+    GLWidget *tmp	= malloc(sizeof(GLWidget));
+    if ( !tmp ) {
+        error("Failed to malloc in Init_ScorelistWidget");
+	return NULL;
+    }
+    tmp->WIDGET     	= SCORELISTWIDGET;
+    tmp->bounds.x   	= 10;
+    tmp->bounds.y   	= 240;
+    tmp->bounds.w   	= 200;
+    tmp->bounds.h   	= 100;
+
     scoreListFont = TTF_OpenFont(scoreListFontName, 11);
     if (scoreListFont == NULL) {
 	error("opening font %s failed", scoreListFontName);
-	return -1;
+	return NULL;
     }
-    if (sdl_window_init(&scoreListWin, r.x, r.y, r.w, r.h)) {
+    if (sdl_window_init(&scoreListWin, tmp->bounds.x, tmp->bounds.y, tmp->bounds.w, tmp->bounds.h)) {
 	error("failed to init scorelist window");
-	return -1;
+	return NULL;
     }
-    ScoreList_widgetItem = AppendListItem(MainList,Scorelist_paint,NULL,Scorelist_reg,&r,NULL,NULL);
-    return 0;
+    tmp->wid_info   	= NULL;
+    tmp->Draw	    	= Scorelist_paint;
+    tmp->Close	    	= Scorelist_cleanup;
+    tmp->SetBounds  	= NULL;
+    tmp->button     	= Scorelist_button;
+    tmp->buttondata 	= tmp;
+    tmp->motion     	= Scorelist_move;
+    tmp->motiondata 	= tmp;
+    tmp->hover	    	= NULL;
+    tmp->hoverdata  	= NULL;
+    tmp->children   	= NULL;
+    tmp->next	    	= NULL;
+
+    return tmp;
 }
+
 #ifndef _WINDOWS
+void ConfMenu_poschange( GLfloat pos , void *data);
+void ConfMenu_poschange( GLfloat pos , void *data) {
+    printf("ConfMenu_poschange %f\n", pos);
+}
+
 int InitConfMenu(void)
 {
     SDL_Rect bounds;
-    if (!(ConfMenu=MakeWidgetList(NULL,NULL,NULL,NULL,NULL,NULL))) {
-	error("ConfMenu widget-list initialization failed");
-	return 1;
+
+    if ( (testWidget[0] = Init_OptionWidget(&gamefont, Find_option("maxFPS"))) ) {
+    	bounds.x = 500;
+    	bounds.y = 0;
+    	bounds.w = testWidget[0]->bounds.w;
+    	bounds.h = testWidget[0]->bounds.h;
+    	SetBounds_GLWidget(testWidget[0],&bounds);
+    	AppendGLWidgetList(&MainWidgetList,testWidget[0]);
     }
-    testValue = 999;
-    testMinValue = 0;
-    testMaxValue = 998;
-    testValue2 = 9.99;
-    testMinValue2 = 0.0;
-    testMaxValue2 = 9.98;
-    testWidget[0] = Init_IntChooserWidget(ConfMenu, &gamefont, "testValue1", &testValue, &testMinValue, &testMaxValue, NULL, NULL);
-    testWidget[1] = Init_DoubleChooserWidget(ConfMenu, &gamefont, "testValue2", &testValue2, &testMinValue2, &testMaxValue2, NULL, NULL);
-    testWidget[2] = Init_BoolChooserWidget(ConfMenu, &gamefont, "showTexturedWalls", &(instruments.showTexturedWalls), NULL, NULL);
 
-    bounds.x = 500;
-    bounds.y = 0;
-    bounds.w = testWidget[0]->bounds.w;
-    bounds.h = testWidget[0]->bounds.h+10;
-    SetBounds_GLWidget(testWidget[0],&bounds);
-    bounds.x = 500;
-    bounds.y = testWidget[0]->bounds.h+1;
-    bounds.w = testWidget[1]->bounds.w;
-    bounds.h = testWidget[1]->bounds.h;
-    SetBounds_GLWidget(testWidget[1],&bounds);
-    bounds.x = 500;
-    bounds.y = testWidget[1]->bounds.y+testWidget[1]->bounds.h+1;
-    bounds.w = testWidget[2]->bounds.w;
-    bounds.h = testWidget[2]->bounds.h;
-    SetBounds_GLWidget(testWidget[2],&bounds);
+    if ( (testWidget[1] = Init_OptionWidget(&gamefont, Find_option("scaleFactor"))) ) {
+    	bounds.x = 500;
+    	bounds.y = testWidget[0]->bounds.h+1;
+    	bounds.w = testWidget[1]->bounds.w;
+    	bounds.h = testWidget[1]->bounds.h;
+    	SetBounds_GLWidget(testWidget[1],&bounds);
+    	AppendGLWidgetList(&MainWidgetList,testWidget[1]);
+    }
+
+    if ( (testWidget[2] = Init_OptionWidget(&gamefont, Find_option("texturedWalls"))) ) {
+    	bounds.x = 500;
+    	bounds.y = testWidget[1]->bounds.y+testWidget[1]->bounds.h+1;
+    	bounds.w = testWidget[2]->bounds.w;
+    	bounds.h = testWidget[2]->bounds.h;
+    	SetBounds_GLWidget(testWidget[2],&bounds);
+    	AppendGLWidgetList(&MainWidgetList,testWidget[2]);
+    }
+
+    if ( (testWidget[3] = Init_ScrollbarWidget(false, 0.0f, 0.3f, SB_HORISONTAL,ConfMenu_poschange,NULL)) ) {
+    	bounds.x = 500;
+    	bounds.y = testWidget[2]->bounds.y+testWidget[2]->bounds.h+1;
+    	bounds.w = testWidget[2]->bounds.w;
+    	bounds.h = testWidget[2]->bounds.h;
+    	SetBounds_GLWidget(testWidget[3],&bounds);
+    	AppendGLWidgetList(&MainWidgetList,testWidget[3]);
+    }
    
-    AddListGuiAreas(ConfMenu);
     return 0;
-}
-
-void CloseConfMenu(void)
-{
-    if (!ConfMenu) return;
-    DelListGuiAreas(ConfMenu);
-    CleanList(ConfMenu);
-    Close_Widget(testWidget[0]);
-    Close_Widget(testWidget[1]);
 }
 #endif
 bool Set_scaleFactor(xp_option_t *opt, double val)
@@ -292,7 +295,6 @@ int Paint_init(void)
 {
     extern bool players_exposed; /* paint.c */
     int i;
-	SDL_Rect bounds;
 
     if (TTF_Init()) {
 	error("SDL_ttf initialization failed: %s", SDL_GetError());
@@ -309,12 +311,6 @@ int Paint_init(void)
     if (Images_init() == -1) 
 	return -1;
 
-    select_bounds = NULL;
-    bounds.x = bounds.y = 0;
-	bounds.w = draw_width;
-	bounds.h = draw_height;
-    window_guiarea = register_guiarea(bounds,select_button,NULL,select_move,NULL,NULL,NULL);
-
     for (i=0;i<MAX_SCORE_OBJECTS;++i)
     	score_object_texs[i].texture = 0;
     for (i=0;i<MAX_METERS;++i)
@@ -322,13 +318,6 @@ int Paint_init(void)
     for (i=0;i<2*MAX_MSGS;++i)
     	message_texs[i].texture = 0;
     
-    if (!(MainList=MakeWidgetList(NULL,NULL,NULL,NULL,NULL,NULL))) {
-	error("Main widget-list initialization failed");
-	return -1;
-    }
-    if (Scorelist_init() == -1)
-	return -1;
-
     scoresChanged = 1;
     players_exposed = true;
     
@@ -338,11 +327,8 @@ int Paint_init(void)
 void Paint_cleanup(void)
 {
     int i;
-    /*CloseConfMenu();*/
-    Scorelist_cleanup();
     Images_cleanup();
     TTF_Quit();
-    clean_guiarea_list();
 
     for (i=0;i<MAX_SCORE_OBJECTS;++i)
     	if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
@@ -407,6 +393,9 @@ void setupPaint_stationary(void)
     if (paintSetupMode & STATIONARY_MODE) return;
     paintSetupMode = STATIONARY_MODE;
     glPopMatrix();
+    { /* glPopMatrix produces an error */
+        GLenum gl_error = glGetError( );
+    }
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -445,11 +434,6 @@ void setupPaint_HUD(void)
 void Paint_frame(void)
 {
     Check_view_dimensions();
-#ifdef TIME_CODE
-    static struct timeval timed[17][2];
-    int i;
-    int measuretime = 100;    
-#endif
     
     world.x = selfPos.x - (ext_view_width / 2);
     world.y = selfPos.y - (ext_view_height / 2);
@@ -495,9 +479,6 @@ void Paint_frame(void)
     }
 
     if (damaged <= 0) {
-#ifdef TIME_CODE
-	gettimeofday(&timed[0][1],NULL);
-#endif
     	/*glClear(GL_COLOR_BUFFER_BIT);*/
 	/* on my machine this seems about 10 times faster
 	 * with seemingly the same result
@@ -510,9 +491,6 @@ void Paint_frame(void)
 	    glVertex2i(0,draw_height);
 	glEnd();
 
-#ifdef TIME_CODE
-	gettimeofday(&timed[1][1],NULL);
-#endif
 	glEnable(GL_BLEND);
     	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -522,9 +500,6 @@ void Paint_frame(void)
     	setupPaint_stationary();
 	
     	Paint_world();
-#ifdef TIME_CODE
-	gettimeofday(&timed[2][1],NULL);
-#endif
 
 	if (oldServer) {
 	    Paint_vfuel();
@@ -534,95 +509,33 @@ void Paint_frame(void)
 	} else
 	    Paint_objects();
 
-#ifdef TIME_CODE
-	gettimeofday(&timed[3][1],NULL);
-#endif
-
     	Paint_score_objects();
 	
-#ifdef TIME_CODE
-	gettimeofday(&timed[4][1],NULL);
-#endif
-	
 	Paint_shots();
-#ifdef TIME_CODE
-	gettimeofday(&timed[5][1],NULL);
-#endif
+
 	setupPaint_moving();
 	Paint_ships();
-#ifdef TIME_CODE
-	gettimeofday(&timed[6][1],NULL);
-#endif
 
 	setupPaint_HUD();
 
-#ifdef TIME_CODE
-	gettimeofday(&timed[7][1],NULL);
-#endif
     	Paint_meters();
-#ifdef TIME_CODE
-	gettimeofday(&timed[8][1],NULL);
-#endif
     	Paint_HUD();
-#ifdef TIME_CODE
-	gettimeofday(&timed[9][1],NULL);
-#endif
     	Paint_client_fps();
-#ifdef TIME_CODE
-	gettimeofday(&timed[10][1],NULL);
-#endif
 
 	Paint_messages();       
-#ifdef TIME_CODE
-	gettimeofday(&timed[11][1],NULL);
-#endif
 	Console_paint();
-#ifdef TIME_CODE
-	gettimeofday(&timed[12][1],NULL);
-#endif
 	Paint_select();
-#ifdef TIME_CODE
-	gettimeofday(&timed[13][1],NULL);
-#endif
-	if (MainList)
-	    DrawWidgetList(MainList);
-#ifdef TIME_CODE
-	gettimeofday(&timed[14][1],NULL);
-#endif
-	/*if (ConfMenu)
-	    DrawWidgetList(ConfMenu);
-    	else if (InitConfMenu()) error("ConfMenu initialization failed");*/
-    
-#ifdef TIME_CODE
-    	gettimeofday(&timed[15][1],NULL);
-#endif
-	
-	
+
+    	DrawGLWidgets();
+    	{ /* TODO: find this error */
+            /* Check for error conditions. */
+            GLenum gl_error = glGetError( );
+    	}
+    		
 	glPopMatrix();
     }
     
     SDL_GL_SwapBuffers();
-#ifdef TIME_CODE
-    gettimeofday(&timed[16][1],NULL);
-
-    for (i=16;i>0;--i)
-    	timed[i][1].tv_usec = timed[i][1].tv_usec - timed[i-1][1].tv_usec
-    			    + ((timed[i][1].tv_sec - timed[i-1][1].tv_sec)*1000000);
-    for (i=0;i<17;++i)
-    	timed[i][0].tv_usec += timed[i][1].tv_usec;
-    
-    if (!(loops%measuretime)) {
-    	xpprintf("----------Paint_foo times----------\n");
-    	for (i=1;i<17;++i)
-    	    xpprintf("<%li\t%2i>\n",timed[i][0].tv_usec,i);
-    	for (i=1;i<16;++i)
-    	    timed[16][0].tv_usec += timed[i][0].tv_usec;
-    	xpprintf("**[ total %li µs over %i frames ]**\n",timed[16][0].tv_usec,measuretime);
-    for (i=0;i<17;++i)
-    	timed[i][0].tv_usec = 0;
-    	
-    }
-#endif
 }
 
 void Paint_score_start(void)

@@ -5,7 +5,7 @@
 #include "text.h"
 #include "console.h"
 #include "sdlkeys.h"
-#include "radar.h"
+#include "glwidgets.h"
 #include "sdlpaint.h"
 
 /* These are only needed for the polygon tessellation */
@@ -23,7 +23,6 @@ const SDL_VideoInfo *videoInfo;
 /* Flags to pass to SDL_SetVideoMode */
 int videoFlags;
 SDL_Surface  *MainSDLSurface = NULL;
-widget_list_t *MainList = NULL;
 
 int Init_playing_windows(void)
 {
@@ -121,8 +120,12 @@ int Init_playing_windows(void)
     sdl_init_colors();
     Init_spark_colors();
     */
-    if (Radar_init(10,10,200,200)) {
+    if ( !AppendGLWidgetList(&MainWidgetList,Init_RadarWidget(10,10,200,200)) ) {
 	error("radar initialization failed");
+	return -1;
+    }
+    if ( !AppendGLWidgetList(&MainWidgetList,Init_ScorelistWidget()) ) {
+	error("scorelist initialization failed");
 	return -1;
     }
     if (Console_init()) {
@@ -133,17 +136,17 @@ int Init_playing_windows(void)
 	error("gui initialization failed");
 	return -1;
     }
-    AddListGuiAreas(MainList);
 
+    //InitConfMenu();
+    
     return 0;
 }
 
 void Quit(void) 
 {
-    CleanList(MainList);
+    Close_WidgetTree(MainWidgetList);
     Gui_cleanup();
     Console_cleanup();
-    Radar_cleanup();
     fontclean(&gamefont);
     fontclean(&messagefont);
     SDL_Quit();

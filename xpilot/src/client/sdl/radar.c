@@ -5,6 +5,7 @@
 #include "sdlpaint.h"
 #include "SDL_gfxPrimitives.h"
 #include "radar.h"
+#include "glwidgets.h"
 
 /* kps - had to add prefix so that these would not conflict with options */
 color_t wallRadarColorValue = 0xa0;
@@ -12,13 +13,12 @@ color_t targetRadarColorValue = 0xa0;
 color_t decorRadarColorValue = 0xff0000;
 color_t bgRadarColorValue = 0xa00000ff;
 
-static SDL_Rect    radar_bounds;      /* radar position and dimensions */
 static SDL_Surface *radar_surface;     /* offscreen image with walls */
 static GLuint      radar_texture;     /* above as an OpenGL texture */
-static guiarea_t *guiarea;
 
-void Radar_guiReg(widget_list_t *LI);
-void Radar_guiUnReg(widget_list_t *LI);
+void Radar_cleanup( GLWidget *widget );
+static void Radar_paint( GLWidget *widget );
+void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data);
 
 #define RGBA(RGB) \
     ((RGB) & 0xff000000 ? (RGB) & 0xff000000 : 0xff000000 \
@@ -33,18 +33,18 @@ static int pow2_ceil(int t)
     return r;
 }
 
-static void Radar_paint_border(void)
+static void Radar_paint_border(GLWidget *radar)
 {
     glBegin(GL_LINE_LOOP);
     glColor4ub(0, 0, 0, 0xff);
-    glVertex2i(radar_bounds.x, radar_bounds.y + radar_bounds.h);
+    glVertex2i(radar->bounds.x, radar->bounds.y + radar->bounds.h);
     glColor4ub(0, 0x00, 0x90, 0xff);
-    glVertex2i(radar_bounds.x, radar_bounds.y);
+    glVertex2i(radar->bounds.x, radar->bounds.y);
     glColor4ub(0, 0, 0, 0xff);
-    glVertex2i(radar_bounds.x + radar_bounds.w, radar_bounds.y);
+    glVertex2i(radar->bounds.x + radar->bounds.w, radar->bounds.y);
     glColor4ub(0, 0x00, 0x90, 0xff);
-    glVertex2i(radar_bounds.x + radar_bounds.w,
-	       radar_bounds.y + radar_bounds.h);
+    glVertex2i(radar->bounds.x + radar->bounds.w,
+	       radar->bounds.y + radar->bounds.h);
     glEnd();
 }
 
@@ -52,13 +52,13 @@ static void Radar_paint_border(void)
  * Paints a block in the radar to the given position using the
  * given color. This one doesn't do any locking on the surface.
  */
-static void Radar_paint_block(SDL_Surface *s, int xi, int yi, color_t color)
+static void Radar_paint_block(GLWidget *radar, SDL_Surface *s, int xi, int yi, color_t color)
 {
     SDL_Rect block;
-    block.x = xi * radar_bounds.w / Setup->x;
-    block.y = radar_bounds.h - (yi + 1) * radar_bounds.h / Setup->y;
-    block.w = (xi + 1) * radar_bounds.w / Setup->x - block.x;
-    block.h = radar_bounds.h - yi * radar_bounds.h / Setup->y - block.y;
+    block.x = xi * radar->bounds.w / Setup->x;
+    block.y = radar->bounds.h - (yi + 1) * radar->bounds.h / Setup->y;
+    block.w = (xi + 1) * radar->bounds.w / Setup->x - block.x;
+    block.h = radar->bounds.h - yi * radar->bounds.h / Setup->y - block.y;
 
     SDL_FillRect(s, &block, RGBA(color));
 }
@@ -67,7 +67,7 @@ static void Radar_paint_block(SDL_Surface *s, int xi, int yi, color_t color)
  * Paints an image of the world on the radar surface when the map
  * is a block map.
  */
-static void Radar_paint_world_blocks(SDL_Surface *s)
+static void Radar_paint_world_blocks(GLWidget *radar, SDL_Surface *s)
 {
     double damage;
     int i, xi, yi, type, color;
@@ -113,7 +113,7 @@ static void Radar_paint_world_blocks(SDL_Surface *s)
 
             color = bcolor[type];
             if (color & 0xffffff)
-                Radar_paint_block(s, xi, yi, color);
+                Radar_paint_block(radar, s, xi, yi, color);
         }
     }
 
@@ -137,7 +137,7 @@ static void Compute_bounds(ipos *min, ipos *max, const irec *b)
  * Paints an image of the world on the radar surface when the map
  * is a polygon map.
  */
-static void Radar_paint_world_polygons(SDL_Surface *s)
+static void Radar_paint_world_polygons(GLWidget *radar, SDL_Surface *s)
 {
     int i, j, xoff, yoff;
     ipos min, max;
@@ -158,14 +158,14 @@ static void Radar_paint_world_polygons(SDL_Surface *s)
 
 		int x = polygons[i].points[0].x + xoff * Setup->width;
 		int y = -polygons[i].points[0].y + (1-yoff) * Setup->height;
-		vx[0] = (x * radar_bounds.w) / Setup->width;
-		vy[0] = (y * radar_bounds.h) / Setup->height;
+		vx[0] = (x * radar->bounds.w) / Setup->width;
+		vy[0] = (y * radar->bounds.h) / Setup->height;
 
 		for (j = 1; j < polygons[i].num_points; j++) {
 		    x += polygons[i].points[j].x;
 		    y -= polygons[i].points[j].y;
-		    vx[j]= (x * radar_bounds.w) / Setup->width;
-		    vy[j] = (y * radar_bounds.h) / Setup->height;
+		    vx[j]= (x * radar->bounds.w) / Setup->width;
+		    vy[j] = (y * radar->bounds.h) / Setup->height;
 		}
 
 		color = polygon_styles[polygons[i].style].rgb;
@@ -184,11 +184,11 @@ static void Radar_paint_world_polygons(SDL_Surface *s)
 /*
  * Paints objects (ships, etc.) visible in the radar.
  */
-static void Radar_paint_objects(void)
+static void Radar_paint_objects( GLWidget *radar )
 {
     int	i, x, y, s;
     float fx, fy, sx, sy;
-    SDL_Rect rb = radar_bounds;
+    SDL_Rect rb = radar->bounds;
 
     if (instruments.showSlidingRadar) {
 	sx = selfPos.x * rb.w / Setup->width;
@@ -251,10 +251,8 @@ static void Radar_paint_checkpoints(float xf, float yf)
 
 void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
 {
-    ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->x += xrel;
-    ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->y += yrel;
-    ((SDL_Rect *)(((widget_list_t *)data)->GuiUnRegData))->x = ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->x;
-    ((SDL_Rect *)(((widget_list_t *)data)->GuiUnRegData))->y = ((SDL_Rect *)(((widget_list_t *)data)->GuiRegData))->y;
+    ((GLWidget *)data)->bounds.x += xrel;
+    ((GLWidget *)data)->bounds.y += yrel;
 }
 
 /*
@@ -263,29 +261,32 @@ void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
  * For each frame OpenGL is used to paint rectangles with this walls
  * texture and on top of that the radar objects.
  */
-int Radar_init(int x, int y, int w, int h)
+GLWidget *Init_RadarWidget(int x, int y, int w, int h)
 {
-    static SDL_Rect *bounds;
-    
-    bounds = malloc(sizeof(SDL_Rect));
-    
-    radar_bounds.x = bounds->x = x;
-    radar_bounds.y = bounds->y = y;
-    radar_bounds.w = bounds->w = w;
-    radar_bounds.h = bounds->h = h * RadarHeight / RadarWidth;
-
+    GLWidget *tmp	= malloc(sizeof(GLWidget));
+    if ( !tmp ) {
+        error("Failed to malloc in Init_RadarWidget");
+	return NULL;
+    }
+    tmp->WIDGET     	= RADARWIDGET;
+    tmp->bounds.x   	= x;
+    tmp->bounds.y   	= y;
+    tmp->bounds.w   	= w;
+    tmp->bounds.h   	= h * RadarHeight / RadarWidth;
+		    
     radar_surface =
 	SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA,
-                             pow2_ceil(bounds->w),
-			     pow2_ceil(bounds->h), 32,
+                             pow2_ceil(tmp->bounds.w),
+			     pow2_ceil(tmp->bounds.h), 32,
                              RMASK, GMASK, BMASK, AMASK);
     if (!radar_surface) {
         error("Could not create radar surface: %s", SDL_GetError());
-        return -1;
+	free(tmp);
+        return NULL;
     }
 
-    if (oldServer) Radar_paint_world_blocks(radar_surface);
-    else Radar_paint_world_polygons(radar_surface);
+    if (oldServer) Radar_paint_world_blocks(tmp, radar_surface);
+    else Radar_paint_world_polygons(tmp, radar_surface);
 
     glGenTextures(1, &radar_texture);
     glBindTexture(GL_TEXTURE_2D, radar_texture);
@@ -297,13 +298,24 @@ int Radar_init(int x, int y, int w, int h)
                     GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST);
-		    
-    AppendListItem(MainList,Radar_paint,bounds,Radar_guiReg,bounds,NULL,NULL);
+
+    tmp->wid_info   	= NULL;
+    tmp->Draw	    	= Radar_paint;
+    tmp->Close	    	= Radar_cleanup;
+    tmp->SetBounds  	= NULL;
+    tmp->button     	= NULL;
+    tmp->buttondata 	= NULL;
+    tmp->motion     	= move;
+    tmp->motiondata 	= tmp;
+    tmp->hover	    	= NULL;
+    tmp->hoverdata  	= NULL;
+    tmp->children   	= NULL;
+    tmp->next	    	= NULL;
     
-    return 0;
+    return tmp;
 }
 
-void Radar_cleanup(void)
+void Radar_cleanup( GLWidget *widget )
 {
     glDeleteTextures(1, &radar_texture);
     SDL_FreeSurface(radar_surface);
@@ -335,31 +347,19 @@ static void Radar_blit_world(SDL_Rect *sr, SDL_Rect *dr)
     glDisable(GL_TEXTURE_2D);
 }
 
-void Radar_guiReg(widget_list_t *LI)
-{
-    LI->GuiUnRegData = register_guiarea(*((SDL_Rect *)(LI->GuiRegData)),NULL,NULL,move,LI,NULL,NULL);
-    LI->GuiUnReg = Radar_guiUnReg;
-}
-
-void Radar_guiUnReg(widget_list_t *LI)
-{
-    unregister_guiarea(LI->GuiUnRegData);
-    free(LI->DrawData);
-    LI->DrawData = LI->GuiRegData = NULL;
-    DelListItem(MainList,LI);
-}
-
 /*
  * Paints the radar surface and objects to the screen.
  */
-static void Radar_paint(widget_list_t *LI)
+static void Radar_paint( GLWidget *widget )
 {
-	float xf, yf;
+    float xf, yf;
+    
+    SDL_Rect radar_bounds;
 
-    radar_bounds.x = ((SDL_Rect *)LI->DrawData)->x;
-    radar_bounds.y = ((SDL_Rect *)LI->DrawData)->y;
-    radar_bounds.w = ((SDL_Rect *)LI->DrawData)->w;
-    radar_bounds.h = ((SDL_Rect *)LI->DrawData)->h;
+    radar_bounds.x = ((GLWidget *)widget)->bounds.x;
+    radar_bounds.y = ((GLWidget *)widget)->bounds.y;
+    radar_bounds.w = ((GLWidget *)widget)->bounds.w;
+    radar_bounds.h = ((GLWidget *)widget)->bounds.h;
 
     xf = (float)radar_bounds.w / (float)Setup->width;
     yf = (float)radar_bounds.h / (float)Setup->height;
@@ -414,9 +414,9 @@ static void Radar_paint(widget_list_t *LI)
     }
 
     Radar_paint_checkpoints(xf, yf);
-    Radar_paint_objects();
+    Radar_paint_objects( widget );
     Radar_paint_self(xf, yf);
-    Radar_paint_border();
+    Radar_paint_border( widget );
 }
 
 /* these 2 are here to allow linking to libxpclient */

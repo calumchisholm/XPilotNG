@@ -1076,7 +1076,7 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
 void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 		    int shield, int deflector, int eshield)
 {
-    int i;
+    int i, color;
     shipshape_t *ship;
     shapepos    point;
     other_t 	*other;
@@ -1084,15 +1084,17 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     ship = Ship_by_id(id);
     if (!(other = Other_by_id(id))) return;
 
+    color = Gui_calculate_ship_color(id,other);
+    
     if (shield) {
-	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, blueRGBA - 128);
+    	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, (color & 0xffffff00) + ((color & 0x000000ff)/2));
     }
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_LINE_SMOOTH);
     glLineWidth(shipLineWidth);
-    set_alphacolor(Gui_calculate_ship_color(id,other));
+    set_alphacolor(color);
 
     glBegin(GL_LINE_LOOP);
     for (i = 0; i < ship->num_points; i++) {

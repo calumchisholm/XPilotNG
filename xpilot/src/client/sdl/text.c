@@ -444,8 +444,8 @@ fontbounds nprintsize(font_data *ft_font, int length, const char *fmt, ...)
 fontbounds printsize(font_data *ft_font, const char *fmt, ...)
 {
     fontbounds returnval;
-	char text[BUFSIZE];  /* Holds Our String */
-	va_list	ap; 	    /* Pointer To List Of Arguments */
+    char text[BUFSIZE];  /* Holds Our String */
+    va_list ap; 	    /* Pointer To List Of Arguments */
     
     returnval.width=0.0;
     returnval.height=0.0;
@@ -465,15 +465,15 @@ fontbounds printsize(font_data *ft_font, const char *fmt, ...)
 
 bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
 {
-	SDL_Color white = { 0xFF, 0xFF, 0xFF, 0x00 };
+    SDL_Color white = { 0xFF, 0xFF, 0xFF, 0x00 };
     SDL_Color *forecol;
     SDL_Surface *glyph = NULL;
-	GLenum gl_error;
+    GLenum gl_error;
 
     if (!(ft_font)) return false;
     if (!(ft_font->ttffont)) return false;
     if (!(string_tex)) return false;
-    if (!strlen(text)) return false;
+    if (!strlen(text)) return false; /* something is printing an empty string each frame */
     
     forecol = &white;
 	

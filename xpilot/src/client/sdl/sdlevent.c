@@ -26,6 +26,7 @@
 #include "SDL.h"
 #include "console.h"
 #include "sdlpaint.h"
+#include "glwidgets.h"
 
 char sdlevent_version[] = VERSION;
 
@@ -34,8 +35,8 @@ bool            initialPointerControl = false;
 bool            pointerControl = false;
 
 static int	movement;	/* horizontal mouse movement. */
-static guiarea_t *target[NUM_MOUSE_BUTTONS];
-guiarea_t   	*hovertarget;
+static GLWidget *target[NUM_MOUSE_BUTTONS];
+static GLWidget *hovertarget;
 
 int Process_event(SDL_Event *evt);
 
@@ -174,7 +175,7 @@ int Process_event(SDL_Event *evt)
     case SDL_MOUSEBUTTONDOWN:
 	button = evt->button.button;
 	if (!pointerControl) {
-	    if ( (target[button-1] = find_guiarea(evt->button.x,evt->button.y)) ) {
+	    if ( (target[button-1] = FindGLWidget(evt->button.x,evt->button.y)) ) {
 	    	if (target[button-1]->button) {
 		    target[button-1]->button(button,evt->button.state,
 		    	    	    	    evt->button.x,evt->button.y,
@@ -207,7 +208,7 @@ int Process_event(SDL_Event *evt)
 #endif
 		}
 	    } else {
-    	    	guiarea_t *tmp = find_guiarea(evt->button.x,evt->button.y);
+    	    	GLWidget *tmp = FindGLWidget(evt->button.x,evt->button.y);
 		if (tmp != hovertarget) {
 		    if (tmp && tmp->hover)
     	    	    	tmp->hover(true,evt->button.x,evt->button.y,tmp->hoverdata);

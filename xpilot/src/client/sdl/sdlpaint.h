@@ -1,7 +1,7 @@
 #ifndef SDLPAINT_H
 #define SDLPAINT_H
 
-#include "widget_wrappers.h"
+#include "SDL.h"
 
 #define MAX_VERTICES 10000
 
@@ -62,5 +62,4 @@ extern void Paint_select(void);
 
 extern SDL_Surface  *MainSDLSurface;
 
-extern widget_list_t *MainList;
 #endif
