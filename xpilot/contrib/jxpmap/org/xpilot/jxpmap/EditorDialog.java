@@ -27,9 +27,9 @@ public class EditorDialog extends JDialog implements ActionListener {
         JPanel p1 = null;
         if (buttons == CLOSE) {
             p1 = new JPanel(new GridLayout(1,1));
-            btnCancel = new JButton("Close");
-            btnCancel.addActionListener(this);
-            p1.add(btnCancel);
+            btnOk = new JButton("Close");
+            btnOk.addActionListener(this);
+            p1.add(btnOk);
         } else {
             p1 = new JPanel(new GridLayout(1,2));
 
