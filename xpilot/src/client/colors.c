@@ -1108,7 +1108,8 @@ static xp_option_t color_options[] = {
 	&maxColors,
 	Set_maxColors,
 	XP_OPTFLAG_DEFAULT,
-	"The number of colors to use.  Valid values are 4, 8 and 16.\n"),
+	"The number of colors to use.\n"
+	"Use value 16. Other values are not actively supported.\n"),
 
     /* 16 user definable color values */
     XP_STRING_OPTION(
