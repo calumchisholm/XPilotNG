@@ -716,21 +716,29 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
      * be destroyed.
      */
     Delta_mv(OBJ_PTR(pl), OBJ_PTR(ball));
-    if (!Player_uses_emergency_shield(pl)) {
+    if (!Player_uses_emergency_shield(pl))
 	Player_add_fuel(pl, ED_BALL_HIT);
-	if (options.treasureCollisionDestroys) {
-	    if (BIT(world->rules->mode, TEAM_PLAY)
-	    	&& pl->team == ball->ball_treasure->team)
-		Rank_saved_ball(pl);
-	    ball->life = 0;
-	}
+
+    if (options.treasureCollisionDestroys) {
+	if (BIT(world->rules->mode, TEAM_PLAY)
+	    && pl->team == ball->ball_treasure->team)
+	    Rank_saved_ball(pl);
+	ball->life = 0;
     }
+
     if (pl->fuel.sum > 0) {
 	if (!options.treasureCollisionMayKill
-	    || BIT(pl->used, HAS_SHIELD))
+	    || BIT(pl->used, HAS_SHIELD)){
+	    if(!options.treasureCollisionDestroys)
+		Obj_repel(OBJ_PTR(ball), OBJ_PTR(pl), 
+			  ( ball->pl_radius + SHIP_SZ) * 1.3 *CLICK);
 	    return;
+	}
 	if (!BIT(pl->used, HAS_SHIELD)
 	    && Player_has_armor(pl)) {
+	    if(!options.treasureCollisionDestroys)
+		Obj_repel(OBJ_PTR(ball), OBJ_PTR(pl), 
+			  ( ball->pl_radius + SHIP_SZ) * 1.3 * CLICK);
 	    Player_hit_armor(pl);
 	    return;
 	}
