@@ -805,9 +805,9 @@ static int Score_callback(int widget_desc, void *data, const char **str)
 {
     UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     Config(false, CONFIG_NONE);
-    if (showUserName != false) {
+    if (showUserName) {
 	showUserName = false;
-	scoresChanged = 1;
+	scoresChanged = true;
     }
     return 0;
 }
@@ -816,9 +816,9 @@ static int Player_callback(int widget_desc, void *data, const char **str)
 {
     UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     Config(false, CONFIG_NONE);
-    if (showUserName != true) {
+    if (!showUserName) {
 	showUserName = true;
-	scoresChanged = 1;
+	scoresChanged = true;
     }
     return 0;
 }

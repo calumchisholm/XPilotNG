@@ -91,7 +91,7 @@ static bool Key_check_talk_macro(keys_t key)
 static bool Key_press_id_mode(void)
 {
     showUserName = showUserName ? false : true;
-    scoresChanged++;
+    scoresChanged = true;
     return false;	/* server doesn't need to know */
 }
 

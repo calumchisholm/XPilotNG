@@ -328,14 +328,14 @@ extern "C" void DoWinAboutBox()
     theApp.OnCmdMsg(ID_APP_ABOUT, 0, NULL, NULL);
 }
 
-extern "C" int scoresChanged;
+extern "C" bool scoresChanged;
 
 void CXpilotView::OnActivateView(BOOL bActivate, CView * pActivateView,
 				 CView * pDeactiveView)
 {
     // TODO: Add your specialized code here and/or call the base class
     if (bActivate)
-	scoresChanged = 1;
+	scoresChanged = true;
 
     CView::OnActivateView(bActivate, pActivateView, pDeactiveView);
 }

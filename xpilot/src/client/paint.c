@@ -312,7 +312,7 @@ void Paint_score_table(void)
 
     if (num_others < 1) {
 	Paint_score_start();
-	scoresChanged = 0;
+	scoresChanged = false;
 	return;
     }
 
@@ -358,6 +358,6 @@ void Paint_score_table(void)
 
     IFWINDOWS( MarkPlayersForRedraw() );
 
-    scoresChanged = 0;
+    scoresChanged = false;
 }
 

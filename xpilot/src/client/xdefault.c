@@ -120,7 +120,7 @@ static bool Set_fullColor(xp_option_t *opt, bool val)
 	Set_texturedObjects(NULL, false);
     }
     /* Make sure texture on score list is redrawn. */
-    scoresChanged = 1;
+    scoresChanged = true;
     return true;
 }
 

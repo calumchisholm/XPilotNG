@@ -548,7 +548,7 @@ extern long	packet_loop;		/* start of measurement */
 extern bool	showUserName;		/* Show username instead of nickname */
 extern char	servername[MAX_CHARS];	/* Name of server connecting to */
 extern unsigned	version;		/* Version of the server */
-extern int	scoresChanged;
+extern bool	scoresChanged;
 extern bool	toggle_shield;		/* Are shields toggled by a press? */
 extern bool	shields;		/* When shields are considered up */
 extern bool	auto_shield;            /* drops shield for fire */

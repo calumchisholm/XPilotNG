@@ -140,7 +140,7 @@ static void Talk_set_state(bool on)
 	Pointer_control_set_state(true);
     }
 
-    scoresChanged = 1;
+    scoresChanged = true;
 }
 #endif
 

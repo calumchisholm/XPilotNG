@@ -149,7 +149,7 @@ static void Scorelist_paint(GLWidget *widget)
 			      + 2 * SCORE_BORDER);
 	    /* Unfortunately the resize loses the surface
 	     * so I have to repaint it */
-	    scoresChanged = 1;
+	    scoresChanged = true;
 	    Paint_score_table();
 	    widget->bounds.w = scoreListWin.w+2;
 	    widget->bounds.h = scoreListWin.h+2;
@@ -242,7 +242,7 @@ int Paint_init(void)
     for (i=0;i<MAX_METERS;++i)
     	meter_texs[i].texture = 0;
     
-    scoresChanged = 1;
+    scoresChanged = true;
     players_exposed = true;
     
     return 0;
