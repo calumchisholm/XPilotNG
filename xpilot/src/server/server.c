@@ -158,6 +158,8 @@ int main(int argc, char **argv)
 
     Move_init();
 
+    Rank_init_saved_scores();
+
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	int i;
 	for (i=0; i < World.NumTreasures; i++)
@@ -365,6 +367,9 @@ void End_game(void)
     Meta_gone();
 
     Contact_cleanup();
+
+    Rank_web_scores();
+    Rank_save_data();
 
     Free_players();
     Free_shots();

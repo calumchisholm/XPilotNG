@@ -53,6 +53,7 @@ extern int Rate(int winner, int loser);
 
 bool		updateScores = true;
 
+static void Player_death_reset(int ind);
 
 /********* **********
  * Functions on player array.
@@ -970,6 +971,8 @@ void Team_game_over(int winning_team, const char *reason)
     Count_rounds();
 
     free(best_players);
+    Rank_web_scores();
+    Rank_show_standings(); /* Relies on values initialized in web_scores */
 }
 
 void Individual_game_over(int winner)
@@ -1743,8 +1746,14 @@ void Delete_player(int ind)
     sound_close(pl);
 
     NumPlayers--;
-    if (IS_TANK_PTR(pl)) {
+    if (IS_TANK_PTR(pl))
 	NumPseudoPlayers--;
+    else {
+	Rank_save_score(pl);
+	if (NumPlayers == NumPseudoPlayers) {
+	    Rank_web_scores();
+	    Rank_save_data();
+	}
     }
 
     if (pl->team != TEAM_NOT_SET && !IS_TANK_PTR(pl)) {
@@ -1839,12 +1848,15 @@ void Kill_player(int ind)
 {
     /* Don't create an explosion if the player is being transported back
      * to home base after being killed. */
-    if (BIT(Players[ind]->status, PLAYING))
+    if (BIT(Players[ind]->status, PLAYING)) {
 	Explode_fighter(ind);
+	Rank_death(Players[ind]);
+    }
+
     Player_death_reset(ind);
 }
 
-void Player_death_reset(int ind)
+static void Player_death_reset(int ind)
 {
     player		*pl = Players[ind];
     long		minfuel;
@@ -1909,8 +1921,6 @@ void Player_death_reset(int ind)
     else {
 	pl->life++;
     }
-
-    pl->deaths++;
 
     pl->have	= DEF_HAVE;
     pl->used	|= DEF_USED;

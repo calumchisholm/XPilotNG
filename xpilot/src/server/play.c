@@ -69,8 +69,7 @@ static int Punish_team(int ind, int t_destroyed, int posx, int posy)
 		|| (BIT(Players[i]->status, PAUSE)
 		    && Players[i]->count <= 0)
 		|| (BIT(Players[i]->status, GAME_OVER)
-		    && Players[i]->mychar == 'W'
-		    && Players[i]->score == 0)) {
+		    && Players[i]->mychar == 'W')) {
 		continue;
 	    }
 	    if (Players[i]->team == td->team) {
@@ -118,19 +117,22 @@ static int Punish_team(int ind, int t_destroyed, int posx, int posy)
 	if (Players[i]->team == td->team) {
 	    SCORE(i, -sc, posx, posy,
 		  "Treasure: ");
+	    Rank_lost_ball(Players[i]);
 	    if (treasureKillTeam)
 		SET_BIT(Players[i]->status, KILLED);
 	}
 	else if (Players[i]->team == pl->team &&
 		 (Players[i]->team != TEAM_NOT_SET || i == ind)) {
+	    if (i == ind && lose_team_members > 0)
+		Rank_cashed_ball(Players[i]);
+	    Rank_won_ball(Players[i]);
 	    SCORE(i, (i == ind ? 3*por : 2*por), posx, posy,
 		  "Treasure: ");
 	}
     }
 
-    if (treasureKillTeam) {
-	Players[ind]->kills++;
-    }
+    if (treasureKillTeam)
+	Rank_kill(Players[ind]);
 
     updateScores = true;
 
@@ -163,6 +165,7 @@ void Ball_hits_goal(object *ball, int group)
 	sprintf(msg, " < %s (team %d) has replaced the treasure >",
 		pl->name, pl->team);
 	Set_message(msg);
+	Rank_saved_ball(pl);
 	return;
     }
     /*

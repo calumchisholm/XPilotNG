@@ -1177,6 +1177,8 @@ static int Handle_login(int ind)
 	Set_message(msg);
     }
 
+    Rank_get_saved_score(pl);
+
     return 0;
 }
 

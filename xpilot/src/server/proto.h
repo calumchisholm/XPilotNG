@@ -215,7 +215,6 @@ void Compute_game_status(void);
 void Delete_player(int ind);
 void Detach_ball(int ind, int ball);
 void Kill_player(int ind);
-void Player_death_reset(int ind);
 void Team_game_over(int winning_team, const char *reason);
 void Individual_game_over(int winner);
 void Race_game_over(void);
@@ -293,5 +292,24 @@ void parseOptions(void);
  */
 void Init_recording(void);
 void Handle_recording_buffers(void);
+
+/*
+ * Prototypes for rank.c
+ */
+
+void Rank_init_saved_scores(void);
+void Rank_get_saved_score(player *pl);
+void Rank_save_data(void);
+void Rank_web_scores(void);
+void Rank_save_score(const player *pl);
+void Rank_show_standings(void);
+void Rank_kill(player *pl);
+void Rank_lost_ball(player *pl);
+void Rank_cashed_ball(player *pl);
+void Rank_won_ball(player *pl);
+void Rank_saved_ball(player *pl);
+void Rank_death(player *pl);
+void Rank_add_score(player *pl, int points);
+void Rank_fire_shot(player *pl);
 
 #endif

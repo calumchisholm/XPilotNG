@@ -238,6 +238,7 @@ void Pause_player(int ind, int onoff)
 	SET_BIT(pl->status, PAUSE);
 	pl->mychar = 'P';
 	updateScores = true;
+	strcpy(pl->scorenode->logout, "paused");
 	if (BIT(pl->have, OBJ_BALL))
 	    Detach_ball(ind, -1);
 	Player_lock_closest(ind, 0);

@@ -45,16 +45,16 @@ SRCS = \
 	cannon.c cmdline.c collision.c contact.c \
 	event.c frame.c id.c item.c \
 	map.c metaserver.c netserver.c objpos.c option.c play.c player.c \
-	srecord.c recwrap.c rules.c saudio.c sched.c \
-	server.c ship.c shot.c update.c walls.c shipshape.c
+	rank.c recwrap.c rules.c saudio.c sched.c \
+	server.c ship.c shot.c srecord.c update.c walls.c shipshape.c
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 OBJS = \
 	cannon.o cmdline.o collision.o contact.o \
 	event.o frame.o id.o item.o \
 	map.o metaserver.o netserver.o objpos.o option.o play.o player.o \
-	srecord.o recwrap.o rules.o saudio.o sched.o \
-	server.o ship.o shot.o update.o walls.o shipshape.o
+	rank.o recwrap.o rules.o saudio.o sched.o \
+	server.o ship.o shot.o srecord.o update.o walls.o shipshape.o
 
 DEPLIBS = $(COMMON)libxpcommon.a 
 

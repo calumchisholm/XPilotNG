@@ -403,7 +403,7 @@ void SCORE(int ind, int points, int x, int y, const char *msg)
 {
     player	*pl = Players[ind];
 
-    pl->score += (points);
+    Rank_add_score(pl, points);
 
     if (pl->conn != NOT_CONNECTED)
 	Send_score_object(pl->conn, points, x, y, msg);
@@ -590,7 +590,7 @@ static void PlayerCollision(void)
 			sound_play_sensors(Players[j]->pos.cx,
 					   Players[j]->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			pl->kills++;
+			Rank_kill(pl);
 			if (IS_TANK_IND(i)) {
 			    sc = (int)floor(Rate(Players[i_tank_owner]->score,
 						 Players[j]->score)
@@ -617,7 +617,7 @@ static void PlayerCollision(void)
 			Set_message(msg);
 			sound_play_sensors(pl->pos.cx, pl->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			Players[j]->kills++;
+			Rank_kill(Players[j]);
 			sc = (int)floor(Rate(Players[j]->score, pl->score)
 				   * runoverKillScoreMult);
 			Score_players(j_tank_owner, sc, pl->name,
@@ -938,7 +938,7 @@ static void PlayerObjectCollision(int ind)
 		    SCORE(ind, PTS_PR_PL_SHOT, pl->pos.cx, pl->pos.cy,
 			  Players[killer]->name);
 		} else {
-		    Players[killer]->kills++;
+		    Rank_kill(Players[killer]);
 		    sc = (int)floor(Rate(Players[killer]->score, pl->score)
 			       * ballKillScoreMult);
 		    Score_players(killer, sc, pl->name,
@@ -1190,7 +1190,7 @@ static void PlayerObjectCollision(int ind)
 			SCORE(ind, PTS_PR_PL_SHOT, pl->pos.cx, pl->pos.cy,
 			      (killer == -1) ? "[Explosion]" : pl->name);
 		    } else {
-			Players[killer]->kills++;
+			Rank_kill(Players[killer]);
 			sc = (int)floor(Rate(Players[killer]->score, pl->score)
 				   * explosionKillScoreMult);
 			Score_players(killer, sc, pl->name,
@@ -1334,7 +1334,7 @@ static void PlayerObjectCollision(int ind)
 			      Players[killer]->name);
 		    } else {
 			DFLOAT factor;
-			Players[killer]->kills++;
+			Rank_kill(Players[killer]);
 			switch (obj->type) {
 			case OBJ_SHOT:
 			    if (BIT(obj->mods.warhead, CLUSTER)) {
@@ -1560,7 +1560,7 @@ static void LaserCollision(void)
 					   PLAYER_ROASTED_SOUND);
 			Set_message(msg);
 			if (pl && pl->id != vic->id) {
-			    pl->kills++;
+			    Rank_kill(pl);
 			}
 		    }
 		    if (!BIT(vic->used, OBJ_SHIELD)

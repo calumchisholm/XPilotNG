@@ -192,8 +192,13 @@ char *Conf_default_map(void)
 char *Conf_servermotdfile(void)
 {
     static char conf[] = SERVERMOTDFILE;
+    char *filename;
 
-    return conf;
+    filename = getenv("XPILOTSERVERMOTD");
+    if (filename == NULL)
+	filename = conf;
+
+    return filename;
 }
 
 char *Conf_localmotdfile(void)

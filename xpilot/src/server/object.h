@@ -264,13 +264,32 @@ typedef struct {
     int		time;
 } shove_t;
 
+typedef struct player player;
+typedef struct ScoreNode {
+    char nick[MAX_CHARS];
+    char real[MAX_CHARS];
+    char host[MAX_CHARS];
+    char logout[MAX_CHARS];
+    int timestamp;
+    short score;
+    unsigned short kills;
+    unsigned short deaths;
+    unsigned short rounds;
+    unsigned long firedShots;
+    unsigned short ballsSaved;
+    unsigned short ballsLost;
+    unsigned short ballsWon;
+    unsigned short ballsCashed;
+
+    player *pl;
+} ScoreNode;
+
 /* IMPORTANT
  *
  * This is the player structure, the first part MUST be similar to object_t,
  * this makes it possible to use the same basic operations on both of them
  * (mainly used in update.c).
  */
-typedef struct player player;
 struct player {
     byte	color;			/* Color of object */
     u_byte	dir;			/* Direction of acceleration */
@@ -413,6 +432,7 @@ struct player {
     int		isowner;		/* If player started this server. */
     int         isoperator;             /* Player has operator privileges */
     int         rectype;                /* normal, saved or spectator */
+    ScoreNode	*scorenode;
 #ifdef __cplusplus
 		player() {}
 #endif
