@@ -92,26 +92,25 @@ int Init_playing_windows(void)
 
 static bool find_size(int *w, int *h)
 {
-    SDL_Rect **modes;
-    int i;
+    SDL_Rect **modes, *m;
+    int i, d, best_i, best_d;
 
     modes = SDL_ListModes(NULL, videoFlags);
     if (modes == NULL) return false;
     if (modes == (SDL_Rect**)-1) return true;
-
-    if (!modes[1]) {
-	*w = modes[0]->w;
-	*h = modes[0]->h;
-    } else {
-	for (i = 1; modes[i]; i++) {
-	    if (*w > modes[i]->w) {
-		*w = modes[i - 1]->w;
-		*h = modes[i - 1]->h;
-		break;
-	    }
+    
+    best_i = 0;
+    best_d = INT_MAX;
+    for (i = 0; modes[i]; i++) {
+	m = modes[i];
+	d = (m->w - *w)*(m->w - *w) + (m->h - *h)*(m->h - *h);
+	if (d < best_d) {
+	    best_d = d;
+	    best_i = i;
 	}
     }
-
+    *w = modes[best_i]->w;
+    *h = modes[best_i]->h;
     return true;
 }
 
