@@ -655,7 +655,7 @@ extern bool played_this_round;
 /*
  * somewhere
  */
-char *Program_name(void);
+const char *Program_name(void);
 
 /*
  * event.c

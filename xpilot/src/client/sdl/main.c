@@ -49,7 +49,7 @@ static void sigcatch(int signum)
 
 }
 
-char *Program_name(void)
+const char *Program_name(void)
 {
     return "xpilot-ng-sdl";
 }
