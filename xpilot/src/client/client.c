@@ -36,7 +36,7 @@ Connect_param_t connectParam;
 
 bool	is_server = false;	/* used in common code */
 
-bool	scoresChanged = false;
+int	scoresChanged = 1;
 unsigned RadarHeight = 0;
 unsigned RadarWidth = 256;	/* radar width at the server */ 
 
@@ -1360,13 +1360,13 @@ int Handle_leave(int id)
 	    *other = other[1];
 	    other++;
 	}
-	scoresChanged = true;
+	scoresChanged = 1;
     }
     for (i = 0; i < num_others; i++) {
 	other = &Others[i];
 	if (other->war_id == id) {
 	    other->war_id = -1;
-	    scoresChanged = true;
+	    scoresChanged = 1;
 	}
     }
     return 0;
@@ -1423,7 +1423,7 @@ int Handle_player(int id, int player_team, int mychar,
     strlcpy(other->id_string, nick_name, sizeof(other->id_string));
     strlcpy(other->user_name, user_name, sizeof(other->user_name));
     strlcpy(other->host_name, host_name, sizeof(other->host_name));
-    scoresChanged = true;
+    scoresChanged = 1;
     other->ship = Convert_shape_str(shape);
     other->ignorelevel = 0;
     Calculate_shield_radius(other->ship);
@@ -1475,7 +1475,7 @@ int Handle_war(int robot_id, int killer_id)
     robot->war_id = killer_id;
     sprintf(msg, "%s declares war on %s.", robot->nick_name, killer->nick_name);
     Add_message(msg);
-    scoresChanged = true;
+    scoresChanged = 1;
 
     return 0;
 }
@@ -1498,7 +1498,7 @@ int Handle_seek(int programmer_id, int robot_id, int sought_id)
     sprintf(msg, "%s has programmed %s to seek %s.",
 	    programmer->nick_name, robot->nick_name, sought->nick_name);
     Add_message(msg);
-    scoresChanged = true;
+    scoresChanged = 1;
 
 
     return 0;
@@ -1521,7 +1521,7 @@ int Handle_score(int id, double score, int life, int mychar, int alliance)
 	other->life = life;
 	other->mychar = mychar;
 	other->alliance = alliance;
-	scoresChanged = true;
+	scoresChanged = 1;
     }
 
     return 0;
@@ -1531,7 +1531,7 @@ int Handle_team_score(int team, double score)
 {
     if (teamscores[team] != score) {
 	teamscores[team] = score;
-	scoresChanged = true;
+	scoresChanged = 1;
     }
 
     return 0;
@@ -1552,7 +1552,7 @@ int Handle_timing(int id, int check, int round, long tloops)
 	other->round = round;
 	other->timing = round * num_checks + check;
 	other->timing_loops = tloops;
-	scoresChanged = true;
+	scoresChanged = 1;
     }
 
     return 0;

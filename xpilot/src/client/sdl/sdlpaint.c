@@ -183,7 +183,7 @@ static void Scorelist_paint(widget_list_t *LI)
 			      + 2 * SCORE_BORDER);
 	    /* Unfortunately the resize loses the surface
 	     * so I have to repaint it */
-	    scoresChanged = true;
+	    scoresChanged = 1;
 	    Paint_score_table();
 	    scoreListArea->bounds.w = scoreListWin.w;
 	    scoreListArea->bounds.h = scoreListWin.h;
@@ -326,7 +326,7 @@ int Paint_init(void)
     if (Scorelist_init() == -1)
 	return -1;
 
-    scoresChanged = true;
+    scoresChanged = 1;
     players_exposed = true;
     
     return 0;

@@ -799,7 +799,7 @@ static int Score_callback(int widget_desc, void *data, const char **str)
     Config(false, CONFIG_NONE);
     if (showUserName != false) {
 	showUserName = false;
-	scoresChanged = true;
+	scoresChanged = 1;
     }
     return 0;
 }
@@ -810,7 +810,7 @@ static int Player_callback(int widget_desc, void *data, const char **str)
     Config(false, CONFIG_NONE);
     if (showUserName != true) {
 	showUserName = true;
-	scoresChanged = true;
+	scoresChanged = 1;
     }
     return 0;
 }
