@@ -560,8 +560,8 @@ void Wormhole_remove_from_map(int ind)
 
     bx = CLICK_TO_BLOCK(wormhole->pos.cx);
     by = CLICK_TO_BLOCK(wormhole->pos.cy);
-    World.block[bx][by] = SPACE;
-    Map_set_itemid(bx, by, -1);
+    World.block[bx][by] = wormhole->lastblock;
+    Map_set_itemid(bx, by, wormhole->lastID);
 }
 
 
