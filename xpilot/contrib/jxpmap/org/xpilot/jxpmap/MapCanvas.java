@@ -24,6 +24,7 @@ public class MapCanvas extends JComponent {
         AwtEventHandler handler = new AwtEventHandler();
         addMouseListener(handler);
         addMouseMotionListener(handler);
+
     }
 
 
@@ -50,6 +51,7 @@ public class MapCanvas extends JComponent {
         this.it = null;
         eventHandler = null;
         revalidate();
+        repaint();
     }
 
     

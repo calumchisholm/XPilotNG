@@ -20,6 +20,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private JButton btnZoomIn;
     private JButton btnZoomOut;
     private JLabel lblZoom;
+    private File mapFile;
 
     public MainFrame () {
 
@@ -29,6 +30,8 @@ public class MainFrame extends JFrame implements ActionListener {
         getContentPane().add(sp, BorderLayout.CENTER);
         buildMenuBar();
         buildToolBar();
+        buildActionMap();
+        buildInputMap();
         setSize(500, 400);
         zoom = 0;
     }
@@ -146,13 +149,32 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
 
+    private void buildActionMap () {
+        ActionMap am = canvas.getActionMap();
+        am.put("quickSave", new GuiAction("quickSave"));
+        am.put("quickOpen", new GuiAction("quickOpen"));
+    }
+
+
+    private void buildInputMap () {
+        InputMap im = canvas.getInputMap(canvas.WHEN_IN_FOCUSED_WINDOW);
+        im.put(KeyStroke.getKeyStroke("control S"), "quickSave");
+        im.put(KeyStroke.getKeyStroke("control L"), "quickOpen");        
+    }
+
+
     public void actionPerformed (ActionEvent ae) {
         String cmd = ae.getActionCommand();
+        dispatchCommand(cmd);
+    }
+
+
+    private void dispatchCommand (String cmd) {
         try {
             getClass().getDeclaredMethod(cmd, null).invoke(this, null);
         } catch (NoSuchMethodException nsme) {
             JOptionPane.showMessageDialog
-                (this, "Sorry, operation "+ ae.getActionCommand() + 
+                (this, "Sorry, operation " + cmd + 
                  " is not implemented yet", "Error",
                  JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
@@ -315,6 +337,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
     private void newMap () {
+        mapFile = null;
         setModel(new MapModel());
         showOptions();
     }
@@ -323,11 +346,13 @@ public class MainFrame extends JFrame implements ActionListener {
     private void openMap () {
         
         JFileChooser fc = new JFileChooser();
+        if (mapFile != null) fc.setSelectedFile(mapFile);
         int rv = fc.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) return;
         
         File f = fc.getSelectedFile();
         if (f == null) return;
+        mapFile = f;
         
         MapModel model = new MapModel();
         try {
@@ -344,12 +369,14 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
     private void saveMap () {
-        JFileChooser fc = new JFileChooser();
+        JFileChooser fc = new JFileChooser(mapFile);
+        if (mapFile != null) fc.setSelectedFile(mapFile);
         int rv = fc.showSaveDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) return;
 
         File f = fc.getSelectedFile();
         if (f == null) return;
+        mapFile = f;
         
         try {
             canvas.getModel().save(f);
@@ -403,6 +430,43 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
 
+    private void quickSave () {
+
+        if (mapFile == null) {
+            saveMap();
+            return;
+        }
+        try {
+            canvas.getModel().save(mapFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog
+                (this, "Saving failed: " + e.getMessage(), "Error",
+                 JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+    private void quickOpen () {
+
+        if (mapFile == null) {
+            openMap();
+            return;
+        }
+        MapModel model = new MapModel();
+        try {
+            model.load(mapFile.getAbsolutePath());
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog
+                (this, "Loading failed: " + e.getMessage(), "Error", 
+                 JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        setModel(model);
+    }
+
+
     private void updateToggles (JToggleButton boss) {
         if (boss != btnNewPoly) btnNewPoly.setSelected(false);
         if (boss != btnNewFuel) btnNewFuel.setSelected(false);
@@ -426,6 +490,21 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
 
+    private class GuiAction extends AbstractAction {
+
+        private String cmd;
+
+        public GuiAction (String cmd) {
+            super();
+            this.cmd = cmd;
+        }
+
+        public void actionPerformed (ActionEvent ae) {
+            MainFrame.this.dispatchCommand(cmd);
+        }
+    }
+
+
     public static void main (String args[]) throws Exception {
 
         MainFrame mf = new MainFrame();
@@ -433,6 +512,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
         if (args.length == 0) mf.newMap();
         else {
+            mf.mapFile = new File(args[0]);
             MapModel model = new MapModel();
             if (args.length > 0) model.load(args[0]);
             mf.setModel(model);

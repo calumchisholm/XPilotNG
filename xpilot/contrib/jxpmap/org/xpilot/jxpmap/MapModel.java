@@ -33,9 +33,9 @@ public class MapModel {
         options = new MapOptions();
 
         LineStyle ls;
-        ls = new LineStyle("internal", 1, Color.black, LineStyle.STYLE_HIDDEN);
+        ls = new LineStyle("internal", 0, Color.black, LineStyle.STYLE_HIDDEN);
         edgeStyles.add(ls);
-        ls = new LineStyle("default", 1, Color.blue, LineStyle.STYLE_SOLID);
+        ls = new LineStyle("default", 0, Color.blue, LineStyle.STYLE_SOLID);
         edgeStyles.add(ls);
         defEdgeStyleIndex = 1;
         
