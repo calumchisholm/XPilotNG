@@ -124,6 +124,7 @@ typedef struct {
     char		*addr;			/* address of players host */
     char		*host;			/* hostname of players host */
     int			rectype;		/* normal/saved/spectator */
+    int			features;		/* supported features */
 } connection_t;
 
 #endif

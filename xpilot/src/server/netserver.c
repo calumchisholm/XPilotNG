@@ -138,6 +138,42 @@ int			compress_maps = 1;
 int			login_in_progress;
 static int		num_logins, num_logouts;
 
+static void Feature_init(connection_t *connp)
+{
+    int v = connp->version;
+    int features = 0;
+
+    if (v < 0x4F00) {
+	if (v >= 0x4210)
+	    SET_BIT(features, F_TEAMRADAR);
+	if (v >= 0x4300)
+	    SET_BIT(features, F_SEPARATEPHASING);
+	if (v >= 0x4400)
+	    SET_BIT(features, F_ASTEROID);
+	if (v >= 0x4401)
+	    SET_BIT(features, F_FASTRADAR);
+	if (v >= 0x4500)
+	    SET_BIT(features, F_FLOATSCORE);
+	if (v >= 0x4501)
+	    SET_BIT(features, F_TEMPWORM);
+    }
+    else {
+	SET_BIT(features, F_POLY);
+	SET_BIT(features, F_TEAMRADAR);
+
+	SET_BIT(features, F_SEPARATEPHASING);
+	if (v >= 0x4F10)
+	    SET_BIT(features, F_EXPLICITSELF);
+	if (v >= 0x4F11) {
+	    SET_BIT(features, F_ASTEROID);
+	    SET_BIT(features, F_FASTRADAR);
+	    SET_BIT(features, F_FLOATSCORE);
+	    SET_BIT(features, F_TEMPWORM);
+	}
+    }
+    connp->features = features;
+    return;
+}
 
 /*
  * Compress the map data using a simple Run Length Encoding algorithm.
@@ -371,8 +407,7 @@ static int Init_setup_old(void)
 	type = SETUP_MAP_ORDER_XY;
 	size = Compress_map(mapdata, World.x * World.y);
 	if (size <= 0 || size > World.x * World.y) {
-	    errno = 0;
-	    error("Map compression error (%d)", size);
+	    warn("Map compression error (%d)", size);
 	    free(mapdata);
 	    return -1;
 	}
@@ -985,6 +1020,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     connp->ship = NULL;
     connp->team = team;
     connp->version = version;
+    Feature_init(connp);
     connp->start = main_loops;
     connp->magic = /*randomMT() +*/ my_port + sock.fd + team + main_loops;
     connp->id = NO_ID;
@@ -1046,14 +1082,10 @@ static int Handle_listening(connection_t *connp)
     errno = 0;
     n = sock_receive_anyRec(&connp->r.sock, connp->r.buf, connp->r.size);
     if (n <= 0) {
-	if (n == 0
-	    || errno == EWOULDBLOCK
-	    || errno == EAGAIN) {
+	if (n == 0 || errno == EWOULDBLOCK || errno == EAGAIN)
 	    n = 0;
-	}
-	else if (n != 0) {
+	else if (n != 0)
 	    Destroy_connection(connp, "read first packet error");
-	}
 	return n;
     }
     connp->r.len = n;
@@ -1137,13 +1169,13 @@ static int Handle_setup(connection_t *connp)
 	return -1;
     }
 
-    if (connp->version >= 0x4F00)
+    if (FEATURE(connp, F_POLY))
 	S = Setup;
     else
 	S = Oldsetup;
 
     if (connp->setup == 0) {
-	if (connp->version < 0x4F00 || !is_polygon_map)
+	if (!FEATURE(connp, F_POLY) || !is_polygon_map)
 	    n = Packet_printf(&connp->c,
 			      "%ld" "%ld%hd" "%hd%hd" "%hd%hd" "%s%s",
 			      S->map_data_len,
@@ -1249,9 +1281,8 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
     const char		sender[] = "[*Server notice*]";
 
     if (NumPlayers - NumPseudoPlayers >= World.NumBases) {
-	errno = 0;
 	strlcpy(errmsg, "Not enough bases for players", errsize);
-	error("%s", errmsg);
+	warn("%s", errmsg);
 	return -1;
     }
     if (BIT(World.rules->mode, TEAM_PLAY)) {
@@ -1274,9 +1305,8 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	    connp->team = Pick_team(PickForHuman);
 	    if (connp->team == TEAM_NOT_SET ||
 		(connp->team == robotTeam && reserveRobotTeam)) {
-		errno = 0;
 		strlcpy(errmsg, "Can't pick team", errsize);
-		error("%s", errmsg);
+		warn("%s", errmsg);
 		return -1;
 	    }
 	}
@@ -1285,8 +1315,7 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
     }
     for (i = 0; i < NumPlayers; i++) {
 	if (strcasecmp(Players(i)->name, connp->nick) == 0) {
-	    errno = 0;
-	    error("Name already in use %s", connp->nick);
+	    warn("Name already in use %s", connp->nick);
 	    strlcpy(errmsg, "Name already in use", errsize);
 	    return -1;
 	}
@@ -1497,7 +1526,7 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 		"Your nick is password-protected and has been modified. %s",
 		sender);
 	Set_player_message(pl, msg);
-	if (connp->version < 0x4F10) {
+	if (!FEATURE(connp, F_EXPLICITSELF)) {
 	    sprintf(msg,
 		    "This modification breaks things in your client. %s",
 		    sender);
@@ -1523,20 +1552,20 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	const char sender[] = "[*Server notice*]";
 	sprintf(msg, "Server runs version %s. %s", VERSION, sender);
 	Set_player_message(pl, msg);
-	if (connp->version < 0x4401) {
+	if (!FEATURE(connp, F_FASTRADAR)) {
 	    sprintf(msg,
 		    "Your client does not support the fast radar packet. %s",
 		   sender);
 	    Set_player_message(pl, msg);
 	}
-	if (connp->version < 0x4400 && maxAsteroidDensity > 0) {
+	if (!FEATURE(connp, F_ASTEROID) && maxAsteroidDensity > 0) {
 	    sprintf(msg,
 		    "Your client will see the %d asteroids as balls. %s",
 		    (int)World.asteroids.max,
 		    sender);
 	    Set_player_message(pl, msg);
 	}
-	if (is_polygon_map && connp->version < 0x4F00) {
+	if (is_polygon_map && !FEATURE(connp, F_POLY)) {
 	    sprintf(msg, "Your client doesn't support polygon maps. "
 		    "What you see might not match the real map. %s", sender);
 	    Set_player_message(pl, msg);
@@ -1942,8 +1971,7 @@ int Send_self(connection_t *connp,
 int Send_leave(connection_t *connp, int id)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for leave info (%d,%d)",
+	warn("Connection not ready for leave info (%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -1956,8 +1984,7 @@ int Send_leave(connection_t *connp, int id)
 int Send_war(connection_t *connp, int robot_id, int killer_id)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for war declaration (%d,%d)",
+	warn("Connection not ready for war declaration (%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -1971,8 +1998,7 @@ int Send_war(connection_t *connp, int robot_id, int killer_id)
 int Send_seek(connection_t *connp, int programmer_id, int robot_id, int sought_id)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for seek declaration (%d,%d)",
+	warn("Connection not ready for seek declaration (%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -1992,8 +2018,7 @@ int Send_player(connection_t *connp, int id)
     int			himself = (pl->conn == connp);
 
     if (!BIT(connp->state, CONN_PLAYING|CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for player info (%d,%d)",
+	warn("Connection not ready for player info (%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -2005,14 +2030,12 @@ int Send_player(connection_t *connp, int id)
 		      pl->name, pl->realname, pl->hostname,
 		      buf);
     if (n > 0) {
-	if (connp->version < 0x4F10) {
+	if (!FEATURE(connp, F_EXPLICITSELF))
 	    n = Packet_printf(&connp->c, "%S", ext);
-	} else {
+	else
 	    n = Packet_printf(&connp->c, "%S%c", ext, himself);
-	}
-	if (n <= 0) {
+	if (n <= 0)
 	    connp->c.len = sbuf_len;
-	}
     }
     return n;
 }
@@ -2029,18 +2052,16 @@ int Send_score(connection_t *connp, int id, DFLOAT score,
        score = (DFLOAT)(-5000.0); */
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for score(%d,%d)",
+	warn("Connection not ready for score(%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
-    if (connp->version < 0x4500
-	|| (connp->version >= 0x4F09 && connp->version < 0x4F11)) {
+    if (!FEATURE(connp, F_FLOATSCORE))
 	/* older clients don't get alliance info or decimals of the score */
 	return Packet_printf(&connp->c, "%c%hd%hd%hd%c", PKT_SCORE,
 			     id, (int)(score + (score > 0 ? 0.5 : -0.5)),
 			     life, mychar);
-    } else {
+    else {
 	int allchar = ' ';
 	if (alliance != ALLIANCE_NOT_SET) {
 	    if (announceAlliances) {
@@ -2062,16 +2083,12 @@ int Send_score(connection_t *connp, int id, DFLOAT score,
 int Send_team_score(connection_t *connp, int team, DFLOAT score)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for team score(%d,%d)",
+	warn("Connection not ready for team score(%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
-    if (connp->version < 0x4500
-	|| (connp->version >= 0x4F09 && connp->version < 0x4F11)) {
-	/* older clients don't know about team scores */
+    if (!FEATURE(connp, F_TEAMSCORE))
 	return 0;
-    }
     return Packet_printf(&connp->c, "%c%hd%d", PKT_TEAM_SCORE,
 		         team, (int)(score * 100 + (score > 0 ? 0.5 : -0.5)));
 }
@@ -2084,8 +2101,7 @@ int Send_timing(connection_t *connp, int id, int check, int round)
     int			num_checks = OLD_MAX_CHECKS;
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for timing(%d,%d)",
+	warn("Connection not ready for timing(%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -2101,8 +2117,7 @@ int Send_timing(connection_t *connp, int id, int check, int round)
 int Send_base(connection_t *connp, int id, int num)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for base info (%d,%d)",
+	warn("Connection not ready for base info (%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
@@ -2124,8 +2139,7 @@ int Send_score_object(connection_t *connp, DFLOAT score, int cx, int cy,
     int			bx, by;
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for base info (%d,%d)",
+	warn("Connection not ready for base info (%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
@@ -2133,17 +2147,14 @@ int Send_score_object(connection_t *connp, DFLOAT score, int cx, int cy,
     bx = CLICK_TO_BLOCK(cx);
     by = CLICK_TO_BLOCK(cy);
 
-    if (connp->version < 0x4500
-	|| (connp->version >= 0x4F09 && connp->version < 0x4F11)) {
-	/* older clients don't get decimals of the score */
+    if (!FEATURE(connp, F_FLOATSCORE))
 	return Packet_printf(&connp->c, "%c%hd%hu%hu%s",PKT_SCORE_OBJECT,
 			     (int)(score + (score > 0 ? 0.5 : -0.5)),
 			     bx, by, string);
-    } else {
+    else
 	return Packet_printf(&connp->c, "%c%d%hu%hu%s",PKT_SCORE_OBJECT,
 			     (int)(score * 100 + (score > 0 ? 0.5 : -0.5)),
 			     bx, by, string);
-    }
 }
 
 int Send_cannon(connection_t *connp, int num, int dead_time)
@@ -2189,8 +2200,7 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
     sockbuf_t		*w = &connp->w;
 
     if ((n & 0xFF) != n) {
-	errno = 0;
-	error("Bad number of debris %d", n);
+	warn("Bad number of debris %d", n);
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 2;
@@ -2211,7 +2221,7 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
 
 int Send_wreckage(connection_t *connp, int cx, int cy, u_byte wrtype, u_byte size, u_byte rot)
 {
-    if (wreckageCollisionMayKill && connp->version > 0x4201)
+    if (wreckageCollisionMayKill)
 	/* Set the highest bit when wreckage is deadly. */
 	wrtype |= 0x80;
     else
@@ -2228,7 +2238,7 @@ int Send_asteroid(connection_t *connp, int cx, int cy, u_byte type, u_byte size,
     int		x = CLICK_TO_PIXEL(cx),
     		y = CLICK_TO_PIXEL(cy);
 
-    if (connp->version < 0x4400)
+    if (!FEATURE(connp, F_ASTEROID))
 	return Send_ecm(connp, x, y, 2 * (int) ASTEROID_RADIUS(size) / CLICK);
 
     type_size = ((type & 0x0F) << 4) | (size & 0x0F);
@@ -2243,8 +2253,7 @@ int Send_fastshot(connection_t *connp, int type, unsigned char *p, int n)
     sockbuf_t		*w = &connp->w;
 
     if ((n & 0xFF) != n) {
-	errno = 0;
-	error("Bad number of fastshot %d", n);
+	warn("Bad number of fastshot %d", n);
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 3;
@@ -2294,8 +2303,7 @@ int Send_wormhole(connection_t *connp, int cx, int cy)
     int		x = CLICK_TO_PIXEL(cx),
     		y = CLICK_TO_PIXEL(cy);
 
-    if (connp->version < 0x4501
-	|| (connp->version >= 0x4F09 && connp->version < 0x4F11)) {
+    if (!FEATURE(connp, F_TEMPWORM)) {
 	const int wormStep = 5;
 	int wormAngle = (frame_loops & 7) * (RES / 8);
 
@@ -2343,6 +2351,8 @@ int Send_trans(connection_t *connp, int cx1, int cy1, int cx2, int cy2)
 int Send_ship(connection_t *connp, int cx, int cy, int id, int dir,
 	      int shield, int cloak, int emergency_shield, int phased, int deflector)
 {
+    if (!FEATURE(connp, F_SEPARATEPHASING))
+	cloak |= phased;
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd" "%c" "%c",
 			 PKT_SHIP, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id,
@@ -2382,6 +2392,9 @@ int Send_laser(connection_t *connp, int color, int cx, int cy, int len, int dir)
 
 int Send_radar(connection_t *connp, int x, int y, int size)
 {
+    if (!FEATURE(connp, F_TEAMRADAR))
+	size &= ~0x80;
+
     return Packet_printf(&connp->w, "%c%hd%hd%c", PKT_RADAR, x, y, size);
 }
 
@@ -2391,17 +2404,15 @@ int Send_fastradar(connection_t *connp, unsigned char *buf, int n)
     sockbuf_t		*w = &connp->w;
 
     if ((n & 0xFF) != n) {
-	errno = 0;
-	error("Bad number of fastradar %d", n);
+	warn("Bad number of fastradar %d", n);
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 3;
     if (n * 3 >= avail) {
-	if (avail > 3) {
+	if (avail > 3)
 	    n = (avail - 2) / 3;
-	} else {
+	else
 	    return 0;
-	}
     }
     w->buf[w->len++] = PKT_FASTRADAR;
     w->buf[w->len++] = (unsigned char)(n & 0xFF);
@@ -2437,8 +2448,7 @@ int Send_eyes(connection_t *connp, int id)
 int Send_message(connection_t *connp, const char *msg)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for message (%d,%d)",
+	warn("Connection not ready for message (%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
@@ -2454,8 +2464,7 @@ int Send_start_of_frame(connection_t *connp)
 {
     if (connp->state != CONN_PLAYING) {
 	if (connp->state != CONN_READY) {
-	    errno = 0;
-	    error("Connection not ready for frame (%d,%d)",
+	    warn("Connection not ready for frame (%d,%d)",
 		connp->state, connp->id);
 	}
 	return -1;
@@ -2564,14 +2573,12 @@ static int Receive_play(connection_t *connp)
     char		errmsg[MAX_CHARS];
 
     if ((n = Packet_scanf(&connp->r, "%c", &ch)) != 1) {
-	errno = 0;
-	error("Cannot receive play packet");
+	warn("Cannot receive play packet");
 	Destroy_connection(connp, "receive error");
 	return -1;
     }
     if (ch != PKT_PLAY) {
-	errno = 0;
-	error("Packet is not of play type");
+	warn("Packet is not of play type");
 	Destroy_connection(connp, "not play");
 	return -1;
     }
@@ -2581,8 +2588,7 @@ static int Receive_play(connection_t *connp)
 		connp->r.ptr = connp->r.buf + connp->r.len;
 		return 0;
 	    }
-	    errno = 0;
-	    error("Connection not in login state (%02x)", connp->state);
+	    warn("Connection not in login state (%02x)", connp->state);
 	    Destroy_connection(connp, "not login");
 	    return -1;
 	}
@@ -2655,8 +2661,7 @@ static int Receive_power(connection_t *connp)
 	pl->turnresistance_s = power;
 	break;
     default:
-	errno = 0;
-	error("Not a power packet (%d,%02x)", ch, connp->state);
+	warn("Not a power packet (%d,%02x)", ch, connp->state);
 	Destroy_connection(connp, "not power");
 	return -1;
     }
@@ -2803,14 +2808,12 @@ static int Receive_ack(connection_t *connp)
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%ld",
 			  &ch, &rel, &rel_loops)) <= 0) {
-	errno = 0;
-	error("Cannot read ack packet (%d)", n);
+	warn("Cannot read ack packet (%d)", n);
 	Destroy_connection(connp, "read error");
 	return -1;
     }
     if (ch != PKT_ACK) {
-	errno = 0;
-	error("Not an ack packet (%d)", ch);
+	warn("Not an ack packet (%d)", ch);
 	Destroy_connection(connp, "not ack");
 	return -1;
     }
@@ -2865,8 +2868,7 @@ static int Receive_ack(connection_t *connp)
     diff = rel - connp->reliable_offset;
     if (diff > connp->c.len) {
 	/* Impossible to ack data that has not been send */
-	errno = 0;
-	error("Bad ack (diff=%ld,cru=%ld,c=%ld,len=%d)",
+	warn("Bad ack (diff=%ld,cru=%ld,c=%ld,len=%d)",
 	    diff, rel, connp->reliable_offset, connp->c.len);
 	Destroy_connection(connp, "bad ack");
 	return -1;
@@ -2907,8 +2909,7 @@ static int Receive_ack(connection_t *connp)
 
 static int Receive_discard(connection_t *connp)
 {
-    errno = 0;
-    error("Discarding packet %d while in state %02x",
+    warn("Discarding packet %d while in state %02x",
 	  connp->r.ptr[0], connp->state);
     connp->r.ptr = connp->r.buf + connp->r.len;
 
@@ -2917,8 +2918,7 @@ static int Receive_discard(connection_t *connp)
 
 static int Receive_undefined(connection_t *connp)
 {
-    errno = 0;
-    error("Unknown packet type (%d,%02x)", connp->r.ptr[0], connp->state);
+    warn("Unknown packet type (%d,%02x)", connp->r.ptr[0], connp->state);
     Destroy_connection(connp, "undefined packet");
     return -1;
 }
@@ -3264,11 +3264,6 @@ void Get_display_parameters(connection_t *connp, int *width, int *height,
 int Get_player_id(connection_t *connp)
 {
     return connp->id;
-}
-
-int Get_conn_version(connection_t *connp)
-{
-    return connp->version;
 }
 
 const char *Player_get_addr(player *pl)

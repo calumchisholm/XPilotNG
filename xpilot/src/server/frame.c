@@ -241,7 +241,6 @@ static void Frame_radar_buffer_send(connection_t *conn)
     int			i;
     int			dest;
     int			tmp;
-    int			ver;
     radar_t		*p;
     const int		radar_width = 256;
     int			radar_height;
@@ -254,17 +253,14 @@ static void Frame_radar_buffer_send(connection_t *conn)
 
     radar_height = (radar_width * World.height) / World.width;
 
-    if (num_radar > MIN(256, MAX_SHUFFLE_INDEX)) {
+    if (num_radar > MIN(256, MAX_SHUFFLE_INDEX))
 	num_radar = MIN(256, MAX_SHUFFLE_INDEX);
-    }
     shuffle_bufsize = (num_radar * sizeof(shuffle_t));
     radar_shuffle = (shuffle_t *) malloc(shuffle_bufsize);
-    if (radar_shuffle == (shuffle_t *) NULL) {
+    if (radar_shuffle == (shuffle_t *) NULL)
 	return;
-    }
-    for (i = 0; i < num_radar; i++) {
+    for (i = 0; i < num_radar; i++)
 	radar_shuffle[i] = i;
-    }
 
     if (conn->ind < World.NumBases) {
 	/* permute. */
@@ -280,8 +276,7 @@ static void Frame_radar_buffer_send(connection_t *conn)
 	}
     }
 
-    ver = Get_conn_version(conn);
-    if (ver <= 0x4400 || (ver >= 0x4F09 && ver < 0x4F11)) {
+    if (!FEATURE(conn, F_FASTRADAR)) {
 	for (i = 0; i < num_radar; i++) {
 	    p = &radar_ptr[radar_shuffle[i]];
 	    radar_x = (radar_width * p->x) / World.width;
@@ -303,22 +298,19 @@ static void Frame_radar_buffer_send(connection_t *conn)
 	    p = &radar_ptr[radar_shuffle[i]];
 	    radar_x = (radar_width * p->x) / World.width;
 	    radar_y = (radar_height * p->y) / World.height;
-	    if (radar_y >= 1024) {
+	    if (radar_y >= 1024)
 		continue;
-	    }
 	    buf[buf_index++] = (unsigned char)(radar_x);
 	    buf[buf_index++] = (unsigned char)(radar_y & 0xFF);
 	    buf[buf_index] = (unsigned char)((radar_y >> 2) & 0xC0);
-	    if (p->size & 0x80) {
+	    if (p->size & 0x80)
 		buf[buf_index] |= (unsigned char)(0x20);
-	    }
 	    buf[buf_index] |= (unsigned char)(p->size & 0x07);
 	    buf_index++;
 	    fast_count++;
 	}
-	if (fast_count > 0) {
+	if (fast_count > 0)
 	    Send_fastradar(conn, buf, fast_count);
-	}
     }
 
     free(radar_shuffle);
@@ -471,20 +463,16 @@ static int Frame_status(connection_t *conn, player *pl)
 	Send_shieldtime(conn,
 			(int) pl->emergency_shield_left,
 			EMERGENCY_SHIELD_TIME);
-    if (BIT(pl->status, SELF_DESTRUCT) && pl->count > 0) {
+    if (BIT(pl->status, SELF_DESTRUCT) && pl->count > 0)
 	Send_destruct(conn, (int)pl->count);
-    }
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	Send_phasingtime(conn,
 			 (int)pl->phasing_left,
 			 PHASING_TIME);
-    if (ShutdownServer != -1) {
+    if (ShutdownServer != -1)
 	Send_shutdown(conn, ShutdownServer, ShutdownDelay);
-    }
-
-    if (round_delay_send > 0) {
+    if (round_delay_send > 0)
 	Send_rounddelay(conn, round_delay, roundDelaySeconds * FPS);
-    }
 
     return 1;
 }
@@ -527,17 +515,15 @@ static void Frame_map(connection_t *conn, player *pl)
     max_packet = MAX(5, bytes_left / cannon_packet_size);
     i = MAX(0, pl->last_cannon_update);
     for (k = 0; k < World.NumCannons; k++) {
-	if (++i >= World.NumCannons) {
+	if (++i >= World.NumCannons)
 	    i = 0;
-	}
 	if (click_inview(&cv, World.cannon[i].pos.cx, World.cannon[i].pos.cy)) {
 	    if (BIT(World.cannon[i].conn_mask, conn_bit) == 0) {
 		Send_cannon(conn, i, (int)World.cannon[i].dead_time);
 		pl->last_cannon_update = i;
 		bytes_left -= max_packet * cannon_packet_size;
-		if (++packet_count >= max_packet) {
+		if (++packet_count >= max_packet)
 		    break;
-		}
 	    }
 	}
     }
@@ -546,9 +532,8 @@ static void Frame_map(connection_t *conn, player *pl)
     max_packet = MAX(5, bytes_left / fuel_packet_size);
     i = MAX(0, pl->last_fuel_update);
     for (k = 0; k < World.NumFuels; k++) {
-	if (++i >= World.NumFuels) {
+	if (++i >= World.NumFuels)
 	    i = 0;
-	}
 	if (BIT(World.fuel[i].conn_mask, conn_bit) == 0) {
 #if 0 /* old block based stuff */
 	    if (World.block[World.fuel[i].blk_pos.x]
@@ -572,9 +557,8 @@ static void Frame_map(connection_t *conn, player *pl)
 		Send_fuel(conn, i, (int) World.fuel[i].fuel);
 		pl->last_fuel_update = i;
 		bytes_left -= max_packet * fuel_packet_size;
-		if (++packet_count >= max_packet) {
+		if (++packet_count >= max_packet)
 		    break;
-		}
 	    }
 #endif
 	}
@@ -585,9 +569,8 @@ static void Frame_map(connection_t *conn, player *pl)
     i = MAX(0, pl->last_wormhole_update);
     for (k = 0; k < World.NumWormholes; k++) {
 	wormhole_t *worm;
-	if (++i >= World.NumWormholes) {
+	if (++i >= World.NumWormholes)
 	    i = 0;
-	}
 	worm = &World.wormHoles[i];
 	if (wormholeVisible
 	    && worm->temporary
@@ -606,9 +589,8 @@ static void Frame_map(connection_t *conn, player *pl)
 	    Send_wormhole(conn, worm->pos.cx, worm->pos.cy);
 	    pl->last_wormhole_update = i;
 	    bytes_left -= max_packet * wormhole_packet_size;
-	    if (++packet_count >= max_packet) {
+	    if (++packet_count >= max_packet)
 		break;
-	    }
 	}
     }
 }
@@ -633,13 +615,12 @@ static void Frame_shuffle_objects(void)
 	}
     }
 
-    if (max_object_shuffle < num_object_shuffle) {
+    if (max_object_shuffle < num_object_shuffle)
 	num_object_shuffle = max_object_shuffle;
-    }
 
-    for (i = 0; i < num_object_shuffle; i++) {
+    for (i = 0; i < num_object_shuffle; i++)
 	object_shuffle_ptr[i] = i;
-    }
+
     /* permute. Not perfect distribution but probably doesn't matter here */
     for (i = num_object_shuffle - 1; i >= 0; --i) {
 	if (object_shuffle_ptr[i] == i) {
@@ -659,24 +640,21 @@ static void Frame_shuffle_players(void)
     num_player_shuffle = MIN(NumPlayers, MAX_SHUFFLE_INDEX);
 
     if (max_player_shuffle < num_player_shuffle) {
-	if (player_shuffle_ptr != NULL) {
+	if (player_shuffle_ptr != NULL)
 	    free(player_shuffle_ptr);
-	}
 	max_player_shuffle = num_player_shuffle;
 	memsize = max_player_shuffle * sizeof(shuffle_t);
 	player_shuffle_ptr = (shuffle_t *) malloc(memsize);
-	if (player_shuffle_ptr == NULL) {
+	if (player_shuffle_ptr == NULL)
 	    max_player_shuffle = 0;
-	}
     }
 
-    if (max_player_shuffle < num_player_shuffle) {
+    if (max_player_shuffle < num_player_shuffle)
 	num_player_shuffle = max_player_shuffle;
-    }
 
-    for (i = 0; i < num_player_shuffle; i++) {
+    for (i = 0; i < num_player_shuffle; i++)
 	player_shuffle_ptr[i] = i;
-    }
+
     /* permute. */
     for (i = 0; i < num_player_shuffle; i++) {
 	int j = (int)(rfrac() * (num_player_shuffle - i) + i);
@@ -715,9 +693,8 @@ static void Frame_shots(connection_t *conn, player *pl)
 		     &obj_count);
     for (k = 0; k < num_object_shuffle; k++) {
 	i = object_shuffle_ptr[k];
-	if (i >= obj_count) {
+	if (i >= obj_count)
 	    continue;
-	}
 	shot = obj_list[i];
 	cx = shot->pos.cx;
 	cy = shot->pos.cy;
@@ -821,9 +798,8 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    } else if (shot->mods.nuclear && (frame_loops_slow & 2)) {
 		color = RED;
 		teamshot = DEBRIS_TYPES;
-	    } else {
+	    } else
 		teamshot = 0;
-	    }
 
 	    fastshot_store(shot->pos.cx - cv.world.cx,
 			   shot->pos.cy - cv.world.cy,
@@ -974,12 +950,7 @@ static void Frame_ships(connection_t *conn, player *pl)
 		      pl_i->id,
 		      pl_i->dir,
 		      BIT(pl_i->used, HAS_SHIELD) != 0,
-#if 1
 		      BIT(pl_i->used, HAS_CLOAKING_DEVICE) != 0,
-#else /* kps - ng wants this, why? */
-		      (BIT(pl_i->used, OBJ_CLOAKING_DEVICE) != 0
-		       || BIT(pl_i->used, OBJ_PHASING_DEVICE) != 0),
-#endif
 		      BIT(pl_i->used, HAS_EMERGENCY_SHIELD) != 0,
 		      BIT(pl_i->used, HAS_PHASING_DEVICE) != 0,
 		      BIT(pl_i->used, HAS_DEFLECTOR) != 0
@@ -1161,20 +1132,14 @@ static void Frame_parameters(connection_t *conn, player *pl)
     cv.world.cy = pl->pos.cy - view_cheight / 2;
     cv.realWorld = cv.world;
     if (BIT (World.rules->mode, WRAP_PLAY)) {
-	if (cv.world.cx < 0 && cv.world.cx + view_cwidth < World.cwidth) {
+	if (cv.world.cx < 0 && cv.world.cx + view_cwidth < World.cwidth)
 	    cv.world.cx += World.cwidth;
-	}
-	else if (cv.world.cx > 0
-		 && cv.world.cx + view_cwidth >= World.cwidth) {
+	else if (cv.world.cx > 0 && cv.world.cx + view_cwidth >= World.cwidth)
 	    cv.realWorld.cx -= World.cwidth;
-	}
-	if (cv.world.cy < 0 && cv.world.cy + view_cheight < World.cheight) {
+	if (cv.world.cy < 0 && cv.world.cy + view_cheight < World.cheight)
 	    cv.world.cy += World.cheight;
-	}
-	else if (cv.world.cy > 0
-		 && cv.world.cy + view_cheight >= World.cheight) {
+	else if (cv.world.cy > 0 && cv.world.cy + view_cheight >=World.cheight)
 	    cv.realWorld.cy -= World.cheight;
-	}
     }
 }
 
@@ -1275,9 +1240,8 @@ void Frame_update(void)
 	    Send_damaged(conn, (int)pl2->damaged);
 	else {
 	    Frame_parameters(conn, pl2);
-	    if (Frame_status(conn, pl2) <= 0) {
+	    if (Frame_status(conn, pl2) <= 0)
 		continue;
-	    }
 	    Frame_map(conn, pl2);
 	    Frame_shots(conn, pl2);
 	    Frame_ships(conn, pl2);
@@ -1313,9 +1277,8 @@ void Set_message(const char *message)
     if (!rplayback || playback)
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
-	    if (pl->conn != NULL) {
+	    if (pl->conn != NULL)
 		Send_message(pl->conn, msg);
-	    }
 	}
     for (i = 0; i < NumObservers; i++) {
 	pl = Players(i + observerStart);

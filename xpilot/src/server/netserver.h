@@ -89,9 +89,18 @@ int Send_trans(connection_t *connp, int cx1, int cy1, int cx2, int cy2);
 void Get_display_parameters(connection_t *connp, int *width, int *height,
 			    int *debris_colors, int *spark_rand);
 int Get_player_id(connection_t *connp);
-int Get_conn_version(connection_t *connp);
 const char *Player_get_addr(player *pl);
 const char *Player_get_dpy(player *pl);
 int Send_shape(connection_t *connp, int shape);
+#define FEATURE(connp, feature)	((connp)->features & (feature))
+#define F_POLY		(1 << 0)
+#define F_FLOATSCORE	(1 << 1)
+#define F_TEAMSCORE F_FLOATSCORE
+#define F_EXPLICITSELF	(1 << 2)
+#define F_ASTEROID	(1 << 3)
+#define F_TEMPWORM	(1 << 4)
+#define F_FASTRADAR	(1 << 5)
+#define F_SEPARATEPHASING (1 << 6)
+#define F_TEAMRADAR	(1 << 7)
 
 #endif
