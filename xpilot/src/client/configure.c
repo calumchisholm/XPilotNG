@@ -105,6 +105,7 @@ static int Update_bool_option(int widget_desc, void *data, bool *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
+    /*warn("Update_bool_option called for %s.", Option_get_name(opt));*/
     Set_bool_option(opt, *val);
 
     return 0;
@@ -115,6 +116,7 @@ static int Update_int_option(int widget_desc, void *data, int *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
+    /*warn("Update_int_option called for %s.", Option_get_name(opt));*/
     Set_int_option(opt, *val);
 
     return 0;
@@ -125,6 +127,7 @@ static int Update_double_option(int widget_desc, void *data, double *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
+    /*warn("Update_double_option called for %s.", Option_get_name(opt));*/
     Set_double_option(opt, *val);
 
     return 0;
@@ -493,14 +496,6 @@ static int Config_create_double(int widget_desc, int *height,
 }
 
 
-#define CONFIG_CREATE_COLOR(c) \
-Config_create_color(widget_desc, height, c, #c, &c, 0, maxColors-1, NULL, NULL)
-
-
-
-
-
-
 static int Config_create_save(int widget_desc, int *height)
 {
     static char		save_str[] = "Save Configuration";
@@ -537,16 +532,22 @@ static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
 				  *opt->bool_ptr,
 				  Update_bool_option, opt);
     case xp_int_option:
-	return Config_create_int(widget_desc, height,
-				 Option_get_name(opt),
-				 opt->int_ptr, opt->int_minval,
-				 opt->int_maxval,
-				 Update_int_option, opt);
+	/* kps tmp hack */
+	if (opt->int_minval == 0 && opt->int_maxval == maxColors-1)
+	    return Config_create_color(widget_desc, height, *opt->int_ptr,
+				       Option_get_name(opt), opt->int_ptr,
+				       opt->int_minval, opt->int_maxval,
+				       Update_int_option, opt);
+	else
+	    return Config_create_int(widget_desc, height,
+				     Option_get_name(opt), opt->int_ptr,
+				     opt->int_minval, opt->int_maxval,
+				     Update_int_option, opt);
+
     case xp_double_option:
 	return Config_create_double(widget_desc, height,
-				    Option_get_name(opt),
-				    opt->dbl_ptr, opt->dbl_minval,
-				    opt->dbl_maxval,
+				    Option_get_name(opt), opt->dbl_ptr,
+				    opt->dbl_minval, opt->dbl_maxval,
 				    Update_double_option, opt);
     default:
 	return Config_create_bool(widget_desc, height,
