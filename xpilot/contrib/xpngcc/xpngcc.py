@@ -13,9 +13,11 @@ nick = None
 def get_nick():
 	global nick
 	if nick: return nick
-	opts = options.parse_xpilotrc(config.xpilotrc)
-	if opts.has_key('name'): nick = opts['name']
-	else: nick = os.environ['USER']
+	if os.path.exists(config.xpilotrc):
+		opts = options.parse_xpilotrc(config.xpilotrc)
+		if opts.has_key('name'): nick = opts['name']
+	if not nick:
+		nick = os.environ['USER']
 	return nick
 
 def launch(parent, program):

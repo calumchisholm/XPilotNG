@@ -117,7 +117,7 @@ class FilterPanel(wx.Panel):
 	def on_action(self, evt):
 		self.action[1]()
 	def set_filter(self, str):
-		self.text.SetValue(str)
+		if str:	self.text.SetValue(str)
 
 class OptionsPanel(wx.Panel):
 	def __init__(self, parent, options, action):
@@ -151,7 +151,7 @@ class ClientOptionsPanel(OptionsPanel):
 		self.xpilotrc = xpilotrc
 		opts = parse_options([client, '-help'])
 		if os.path.exists(xpilotrc):
-			vals = parse_xpilotrc(file(xpilotrc))
+			vals = parse_xpilotrc(xpilotrc)
 			join_options_with_values(opts, vals)
 		sort_options(opts)
 		OptionsPanel.__init__(self, parent, opts, ('Save', self.save))

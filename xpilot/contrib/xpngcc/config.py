@@ -1,6 +1,6 @@
 import os
 
-client = 'xpilot-ng-client'
+client = 'xpilot-ng-x11'
 server = 'xpilot-ng-server'
 xpilotrc = os.environ['HOME'] + '/.xpilotrc'
 record_url = 'http://xpilot.sourceforge.net/ballruns/'
