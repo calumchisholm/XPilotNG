@@ -155,7 +155,7 @@ static void Set_bool_option(xp_option_t *opt, bool value)
     else
 	*opt->bool_ptr = value;
 
-    printf("Value of option %s is now %s\n", opt->name,
+    printf("Value of option %s is now %s.\n", opt->name,
 	   *opt->bool_ptr ? "true" : "false");
 }
 
@@ -171,7 +171,7 @@ static void Set_int_option(xp_option_t *opt, int value)
     else
 	*opt->int_ptr = value;
 
-    printf("Value of option %s is now %d\n", opt->name, *opt->int_ptr);
+    printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);
 }
 
 static void Set_double_option(xp_option_t *opt, double value)
@@ -186,7 +186,7 @@ static void Set_double_option(xp_option_t *opt, double value)
     else
 	*opt->dbl_ptr = value;
 
-    printf("Value of option %s is now %f\n", opt->name, *opt->dbl_ptr);
+    printf("Value of option %s is now %f.\n", opt->name, *opt->dbl_ptr);
 }
 
 static void Set_string_option(xp_option_t *opt, const char *value)
@@ -199,7 +199,7 @@ static void Set_string_option(xp_option_t *opt, const char *value)
     else
 	strlcpy(opt->str_ptr, value, opt->str_size);
 
-    printf("Value of option %s is now \"%s\"\n", opt->name, opt->str_ptr);
+    printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
 }
 
 static xp_key_binding_callback_t key_binding_callback = NULL;
@@ -227,8 +227,8 @@ static void Set_key_option(xp_option_t *opt, const char *value)
 	     str = strtok(NULL, " \t\r\n")) {
 	    bool ok;
 	    /*
-	     * The platform specific code must register a callback for us to register
-	     * keys.
+	     * The platform specific code must register a callback
+	     * for us to bind keys.
 	     */
 	    assert(key_binding_callback != NULL);
 	    ok = (*key_binding_callback)(opt->key, str);

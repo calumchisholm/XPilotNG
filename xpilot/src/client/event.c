@@ -558,8 +558,7 @@ xp_option_t key_options[] = {
         "",
         KEY_SWAP_SCALEFACTOR,
         NULL,
-        "Swap scalefactor settings.\n"
-        "These are the scalefactor settings.\n"),
+        "Swap scalefactor settings.\n"),
 
     XP_KEY_OPTION(
 	"keyChangeHome",
