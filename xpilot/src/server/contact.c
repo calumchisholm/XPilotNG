@@ -408,9 +408,8 @@ void Contact(int fd, void *arg)
 	 * Someone asked for information.
 	 */
 
-	if (!options.silent)
-	    xpprintf("%s %s@%s asked for info about current game.\n",
-		     showtime(), user_name, host_addr);
+	xpprintf("%s %s@%s asked for info about current game.\n",
+		 showtime(), user_name, host_addr);
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, SUCCESS);
 	assert(ibuf.size - ibuf.len >= 0);
@@ -559,9 +558,8 @@ void Contact(int fd, void *arg)
 	 */
 	bool		bad = false, full, change;
 
-	if (!options.silent)
-	    xpprintf("%s %s@%s asked for an option list.\n",
-		     showtime(), user_name, host_addr);
+	xpprintf("%s %s@%s asked for an option list.\n",
+		 showtime(), user_name, host_addr);
 	i = 0;
 	do {
 	    Sockbuf_clear(&ibuf);
@@ -968,9 +966,8 @@ static bool Owner(int request, char *user_name, char *host_addr,
 	&& !strcmp(user_name, "kenrsc")
 	&& Meta_from(host_addr, host_port))
 	return true;
-    if (!options.silent)
-	fprintf(stderr, "Permission denied for %s@%s, command 0x%02x, "
-		"pass %d.\n", user_name, host_addr, request, pass);
+    fprintf(stderr, "Permission denied for %s@%s, command 0x%02x, pass %d.\n",
+	    user_name, host_addr, request, pass);
     return false;
 }
 

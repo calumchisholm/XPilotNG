@@ -209,9 +209,8 @@ static int Init_setup(world_t *world)
     }
 
     size = Polys_to_client(&mapdata);
-    if (!options.silent)
-	xpprintf("%s Server->client polygon map transfer size is %d bytes.\n",
-		 showtime(), size);
+    xpprintf("%s Server->client polygon map transfer size is %d bytes.\n",
+	     showtime(), size);
 
     if ((Setup = (setup_t *)malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold setup");
@@ -388,14 +387,13 @@ void Destroy_connection(connection_t *connp, const char *reason)
 	sock_get_errorRec(sock);
 	sock_writeRec(sock, pkt, len);
     }
-    if (!options.silent)
-	xpprintf("%s Goodbye %s=%s@%s|%s (\"%s\")\n",
-		 showtime(),
-		 connp->nick ? connp->nick : "",
-		 connp->user ? connp->user : "",
-		 connp->host ? connp->host : "",
-		 connp->dpy ? connp->dpy : "",
-		 reason);
+    xpprintf("%s Goodbye %s=%s@%s|%s (\"%s\")\n",
+	     showtime(),
+	     connp->nick ? connp->nick : "",
+	     connp->user ? connp->user : "",
+	     connp->host ? connp->host : "",
+	     connp->dpy ? connp->dpy : "",
+	     reason);
 
     Conn_set_state(connp, CONN_FREE, CONN_FREE);
 
@@ -678,9 +676,8 @@ int Setup_connection(char *user, char *nick, char *dpy, int team,
     }
 
     if (free_conn_index >= max_connections) {
-	if (!options.silent)
-	    xpprintf("%s Full house for %s(%s)@%s(%s)\n",
-		     showtime(), user, nick, host, dpy);
+	xpprintf("%s Full house for %s(%s)@%s(%s)\n",
+		 showtime(), user, nick, host, dpy);
 	return -1;
     }
     connp = &Conn[free_conn_index];
@@ -812,12 +809,10 @@ static int Handle_listening(connection_t *connp)
 	    return -1;
 	}
     }
-    if (!options.silent) {
-	xpprintf("%s Welcome %s=%s@%s|%s (%s/%d)", showtime(),
-		 connp->nick, connp->user, connp->host, connp->dpy,
-		 connp->addr, connp->his_port);
-	xpprintf(" (version %04x)\n", connp->version);
-    }
+    xpprintf("%s Welcome %s=%s@%s|%s (%s/%d)", showtime(),
+	     connp->nick, connp->user, connp->host, connp->dpy,
+	     connp->addr, connp->his_port);
+    xpprintf(" (version %04x)\n", connp->version);
     if (connp->r.ptr[0] != PKT_VERIFY) {
 	Send_reply(connp, PKT_VERIFY, PKT_FAILURE);
 	Send_reliable(connp);
@@ -834,9 +829,8 @@ static int Handle_listening(connection_t *connp)
     Fix_user_name(user);
     Fix_nick_name(nick);
     if (strcmp(user, connp->user) || strcmp(nick, connp->nick)) {
-	if (!options.silent)
-	    xpprintf("%s Client verified incorrectly (%s,%s)(%s,%s)\n",
-		     showtime(), user, nick, connp->user, connp->nick);
+	xpprintf("%s Client verified incorrectly (%s,%s)(%s,%s)\n",
+		 showtime(), user, nick, connp->user, connp->nick);
 	Send_reply(connp, PKT_VERIFY, PKT_FAILURE);
 	Send_reliable(connp);
 	Destroy_connection(connp, "verify incorrect");
@@ -1095,15 +1089,13 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	return -1;
     }
 
-    if (!options.silent) {
-	if (pl->rectype < 2)
-	    xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
-		     pl->name, NumPlayers, pl->home_base ? pl->home_base->ind :
-		     -1);
-	else
-	    xpprintf("%s spectator %s (%d) starts.\n", showtime(), pl->name,
-		     NumSpectators);
-    }
+    if (pl->rectype < 2)
+	xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
+		 pl->name, NumPlayers, pl->home_base ? pl->home_base->ind :
+		 -1);
+    else
+	xpprintf("%s spectator %s (%d) starts.\n", showtime(), pl->name,
+		 NumSpectators);
 
     /*
      * Tell him about himself first.

@@ -47,10 +47,10 @@ static void Xpmap_extra_error(int line_num)
     if (line_num > prev_line_num) {
 	prev_line_num = line_num;
 	if (++error_count <= max_error)
-	    xpprintf("Map file contains extraneous characters on line %d\n",
-		     line_num);
+	    warn("Map file contains extraneous characters on line %d",
+		 line_num);
 	else if (error_count - max_error == 1)
-	    xpprintf("And so on...\n");
+	    warn("And so on...");
     }
 }
 
@@ -63,9 +63,9 @@ static void Xpmap_missing_error(int line_num)
     if (line_num > prev_line_num) {
 	prev_line_num = line_num;
 	if (++error_count <= max_error)
-	    xpprintf("Not enough map data on map data line %d\n", line_num);
+	    warn("Not enough map data on map data line %d", line_num);
 	else if (error_count - max_error == 1)
-	    xpprintf("And so on...\n");
+	    warn("And so on...");
     }
 }
 
@@ -578,11 +578,9 @@ setup_t *Xpmap_init_setup(world_t *world)
 	}
     }
 
-    if (!options.silent) {
-	if (type != SETUP_MAP_UNCOMPRESSED)
-	    xpprintf("%s Block map compression ratio is %-4.2f%%\n",
-		     showtime(), 100.0 * size / numblocks);
-    }
+    if (type != SETUP_MAP_UNCOMPRESSED)
+	xpprintf("%s Block map compression ratio is %-4.2f%%\n",
+		 showtime(), 100.0 * size / numblocks);
 
     if ((setup = (setup_t *)malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold oldsetup");
@@ -645,16 +643,14 @@ void Xpmap_grok_map_data(world_t *world)
 	    if (c == '\0' || c == EOF) {
 		if (x < world->x) {
 		    /* not enough map data on this line */
-		    if (!options.silent)
-			Xpmap_missing_error(world->y - y);
+		    Xpmap_missing_error(world->y - y);
 		    c = ' ';
 		} else
 		    c = '\n';
 	    } else {
 		if (c == '\n' && x < world->x) {
 		    /* not enough map data on this line */
-		    if (!options.silent)
-			Xpmap_missing_error(world->y - y);
+		    Xpmap_missing_error(world->y - y);
 		    c = ' ';
 		} else
 		    s++;
@@ -663,8 +659,7 @@ void Xpmap_grok_map_data(world_t *world)
 	if (x >= world->x || c == '\n') {
 	    y--; x = -1;
 	    if (c != '\n') {			/* Get rest of line */
-		if (!options.silent)
-		    Xpmap_extra_error(world->y - y);
+		Xpmap_extra_error(world->y - y);
 		while (c != '\n' && c != EOF)
 		    c = *s++;
 	    }

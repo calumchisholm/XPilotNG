@@ -778,7 +778,7 @@ static void Robot_create(world_t *world)
 
     Robot_talks(ROBOT_TALK_ENTER, robot->name, "");
 
-    if (!options.silent && options.logRobots)
+    if (options.logRobots)
 	xpprintf("%s %s (%d, %s) starts at startpos %d.\n",
 		 showtime(), robot->name, NumPlayers, robot->username,
 		 robot->home_base->ind);

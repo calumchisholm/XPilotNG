@@ -54,7 +54,6 @@ extern struct options {
     double	fireRepeatRate;
     double	laserRepeatRate;
     bool	Log;
-    bool	silent;
     bool	RawMode;
     bool	NoQuit;
     bool	logRobots;

@@ -638,11 +638,10 @@ bool Grok_map(world_t *world)
 	exit(1);
     }
 
-    if (!options.silent)
-	xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
-		 "Team play: %s\n",
-		 world->name, world->NumBases, world->width, world->height,
-		 BIT(world->rules->mode, TEAM_PLAY) ? "on" : "off");
+    xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
+	     "Team play: %s\n",
+	     world->name, world->NumBases, world->width, world->height,
+	     BIT(world->rules->mode, TEAM_PLAY) ? "on" : "off");
 
     if (!is_polygon_map)
 	Xpmap_blocks_to_polygons(world);

@@ -1208,8 +1208,7 @@ void Set_message(const char *message)
     char tmp[MSG_LEN];
 
     if ((i = strlen(message)) >= MSG_LEN) {
-	if (!options.silent)
-	    warn("Max message len exceed (%d,%s)", i, message);
+	warn("Max message len exceed (%d,%s)", i, message);
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;
     } else
@@ -1239,8 +1238,7 @@ void Set_player_message(player_t *pl, const char *message)
 	return;
 
     if ((i = strlen(message)) >= MSG_LEN) {
-	if (!options.silent)
-	    warn("Max message len exceed (%d,%s)", i, message);
+	warn("Max message len exceed (%d,%s)", i, message);
 	strlcpy(tmp, message, MSG_LEN);
 	msg = tmp;
     } else
@@ -1264,8 +1262,7 @@ void Set_message_f(const char *fmt, ...)
     va_end(ap);
 
     if ((len = strlen(msg)) >= MSG_LEN) {
-	if (!options.silent)
-	    warn("Set_message_f: Max len exceeded (%d,\"%s\")", len, msg);
+	warn("Set_message_f: Max len exceeded (%d,\"%s\")", len, msg);
 	msg[MSG_LEN - 1] = '\0';
 	assert(strlen(msg) < MSG_LEN);
     }
@@ -1298,9 +1295,8 @@ void Set_player_message_f(player_t *pl, const char *fmt, ...)
     va_end(ap);
 
     if ((len = strlen(msg)) >= MSG_LEN) {
-	if (!options.silent)
-	    warn("Set_player_message_f: Max len exceeded (%d,\"%s\")",
-		 len, msg);
+	warn("Set_player_message_f: Max len exceeded (%d,\"%s\")",
+	     len, msg);
 	msg[MSG_LEN - 1] = '\0';
 	assert(strlen(msg) < MSG_LEN);
     }

@@ -477,16 +477,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"silent",
-	"silent",
-	"false",
-	&options.silent,
-	valBool,
-	tuner_dummy,
-	"Is the server really silent?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"idleRun",
 	"rawMode",
 	"false",
@@ -2521,7 +2511,7 @@ static option_desc opts[] = {
 	&options.maxItemDensity,
 	valReal,
 	Tune_item_probs,
-	"Maximum density [0.0-1.0] for items (max items per block).\n",
+	"Maximum density for items (max items per block).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

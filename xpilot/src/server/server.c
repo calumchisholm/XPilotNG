@@ -172,9 +172,8 @@ int main(int argc, char **argv)
      */
     serverStartTime = time(NULL);
 
-    if (!options.silent)
-	xpprintf("%s Server runs at %d frames per second\n",
-		 showtime(), options.framesPerSecond);
+    xpprintf("%s Server runs at %d frames per second\n",
+	     showtime(), options.framesPerSecond);
 
     teamcup_init();
 
