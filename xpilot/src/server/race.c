@@ -465,15 +465,12 @@ void PlayerCheckpointCollision(player_t *pl)
     if (!BIT(world->rules->mode, TIMING))
 	return;
 
-    if (Player_is_paused(pl))
-	return;
-
-    if (BIT(pl->pl_status, GAME_OVER) == 0) {
+    if (Player_is_active(pl)) {
 	check_t *check = Check_by_index(world, pl->check);
 
 	if (pl->round != 0)
 	    pl->time++;
-	if (BIT(pl->pl_status, PLAYING|KILLED) == PLAYING
+	if (Player_is_playing(pl)
 	    && Wrap_length(pl->pos.cx - check->pos.cx,
 			   pl->pos.cy - check->pos.cy)
 	    < options.checkpointRadius * BLOCK_CLICKS
