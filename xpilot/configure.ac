@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([XPilot NG], 4.6.6, kps@users.sourceforge.net, xpilot-ng)
+AC_INIT([XPilot NG], 4.7.0ng-a1, kps@users.sourceforge.net, xpilot-ng)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpclient.h)
 
@@ -17,13 +17,13 @@ dnl  Copyright & stuff.
 XP_AUTHORS="Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"
 AC_SUBST([XP_AUTHORS])
 
-XP_COPYRIGHTDATE="1991-2004"
+XP_COPYRIGHTDATE="1991-2005"
 AC_SUBST([XP_COPYRIGHTDATE])
 
 XP_COPYRIGHT="Copyright © $XP_COPYRIGHTDATE by $XP_AUTHORS"
 AC_SUBST([XP_COPYRIGHT])
 
-AC_SUBST([XP_RELEASEDATE],["Sep 13, 2004"])
+AC_SUBST([XP_RELEASEDATE],["Jan 4, 2005"])
 AC_SUBST([XP_DATADIR],"$prefix/share/xpilot-ng")
 
 dnl  Checks for options.

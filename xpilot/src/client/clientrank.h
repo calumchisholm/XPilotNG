@@ -1,5 +1,5 @@
 /* 
- * XPilotNG, an XPilot-like multiplayer space war game.
+ * XPilot NG, a multiplayer space war game.
  *
  * Copyright (C) TODO Erik Andersson
  *

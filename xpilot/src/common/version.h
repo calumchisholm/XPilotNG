@@ -1,7 +1,7 @@
 /* 
- * XPilotNG, an XPilot-like multiplayer space war game.
+ * XPilot NG, a multiplayer space war game.
  *
- * Copyright (C) 1991-2004 by
+ * Copyright (C) 1991-2005 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,11 +30,11 @@
 #ifndef	VERSION_H
 #define	VERSION_H
 
-#define TITLE			"XPilot NG 4.6.6"
+#define TITLE			"XPilot NG 4.7.0ng-a1"
 #ifndef VERSION
-#  define VERSION		"4.6.6"
+#  define VERSION		"4.7.0ng-a1"
 #endif
 #define AUTHORS			"Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"
-#define COPYRIGHT		"Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"
+#define COPYRIGHT		"Copyright © 1991-2005 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"
 
 #endif /* VERSION_H */
