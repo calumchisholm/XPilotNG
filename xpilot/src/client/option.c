@@ -607,11 +607,15 @@ static bool Set_key_option(xp_option_t *opt, const char *value)
 	xp_keysym_t ks = String_to_xp_keysym(str);
 
 	if (ks == XP_KS_UNKNOWN) {
-	    warn("Invalid keysym \"%s\" for key \"%s\".\n", str,
-		 opt->name);
+	    warn("Invalid keysym \"%s\" for key \"%s\".\n", str, opt->name);
 	    continue;
 	}
 
+	/*
+	 * kps - here we should count how many succesful bindings we've done,
+	 * and if no successful bindings was done, the old setting should
+	 * be restored.
+	 */
 	Store_xpkeydef(ks, opt->key);
     }
 
