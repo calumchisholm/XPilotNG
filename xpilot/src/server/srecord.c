@@ -89,6 +89,11 @@ void Get_recording_data(void)
 
     for (i = 0; i < NOMORE; i++) {
 	fread(&len, sizeof(int), 1, recf1);
+	if (len > 149000) {
+	    errno = 0;
+	    error("Incorrect chunk length reading recording");
+	    exit(1);
+	}
 	Read_data(i, len);
     }
     *(int*)readto[EI] = INT_MAX;
