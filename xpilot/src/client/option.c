@@ -756,11 +756,105 @@ static int num_ok_options = 0;
  * Here is some sort of pseudo regular expression:
  * xpilot{.*}option[whitespace]:[whitespace][value][; comment]
  */
-#if 0
+#if 1
 static void Parse_xpilotrc_line(const char *line)
 {
-    
+    char *lcpy = xp_safe_strdup(line);
+    char *l = lcpy, *colon, *name, *value, *semicolon, *comment = NULL;
+    xpilotrc_line_t t;
+    xp_option_t *opt;
+    int i;
 
+    memset(&t, 0, sizeof(xpilotrc_line_t));
+
+    if (!(strncasecmp(l, "xpilot.", 7) == 0
+	  || strncasecmp(l, "xpilot*", 7) == 0))
+	goto line_is_comment;
+    
+    /* line starts with "xpilot." or "xpilot*" (ignoring case) */
+    l += strlen("xpilot.");
+
+    colon = strchr(l, ':');
+    if (colon == NULL)
+	goto line_is_comment;
+
+    /*
+     * Divide line into two parts, the first part containing the option
+     * name and possible whitespace, the other one containing possible
+     * white space, the option value and possibly a comment.
+     */
+    *colon = '\0';
+
+    /* remove trailing whitespace from option name */
+    i = ((int)strlen(l)) - 1;
+    while (i >= 0 && isspace(l[i]))
+	l[i--] = '\0';
+
+    name = l;
+    /*warn("looking for option \"%s\": %s",
+      name, Find_option(name) ? "found" : "not found");*/
+
+    opt = Find_option(name);
+    if (opt == NULL)
+	goto line_is_comment;
+
+
+    /* did we see this before ? */
+    for (i = 0; i < num_xpilotrc_lines; i++) {
+	xpilotrc_line_t *x = &xpilotrc_lines[i];
+	
+	if (x->opt == opt) {
+	    /* same option defined several times in xpilotrc */
+	    warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	    warn("Option %s previously given on line %d, ignoring new value.",
+		 name, i + 1);
+	    goto line_is_comment;
+	}
+    }
+
+    /* option is known: proceed to handle the value */
+    l = colon + 1;
+
+    /* skip initial whitespace in value */
+    while (isspace(*l))
+	l++;
+
+    value = l;
+    /* everything after semicolon is comment, ignore it. */
+    semicolon = strchr(l, ';');
+    if (semicolon) {
+	/*warn("found comment \"%s\" on line \"%s\"\n", semicolon, line);*/
+	comment = xp_safe_strdup(semicolon);
+	*semicolon = '\0';
+    }
+
+    if (!Set_option(name, value, xp_option_origin_xpilotrc)) {
+	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	warn("Failed to set option %s value \"%s\", ignoring.", name, value);
+	goto line_is_comment;
+    }
+
+    /*warn("option %s value is \"%s\"", name, value);*/
+
+    t.opt = opt;
+    t.comment = comment;
+    STORE(xpilotrc_line_t,
+	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
+    num_ok_options++;
+    xp_free(lcpy);
+    return;
+
+ line_is_comment:
+    /*
+     * If we can't parse the line, then we just treat it as a comment.
+     */
+    /*warn("Comment: \"%s\"", line);*/
+    XFREE(comment);
+    t.opt = NULL;
+    t.comment = xp_safe_strdup(line);
+    STORE(xpilotrc_line_t,
+	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
+    xp_free(lcpy);
 }
 
 #else
