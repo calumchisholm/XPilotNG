@@ -457,81 +457,6 @@ int Init_top(void)
 	WinXParseGeometry(geometry, &top_width, &top_height);
 #endif	/* _WINDOWS */
 
-#ifndef _WINDOWS
-    /*
-     * Create item bitmaps
-     */
-    for (i = 0; i < NUM_ITEMS; i++)
-	itemBitmaps[i]
-	    = XCreateBitmapFromData(dpy, topWindow,
-				    (char *)itemBitmapData[i].data,
-				    ITEM_SIZE, ITEM_SIZE);
-
-    /*
-     * Creates and initializes the graphic contexts.
-     */
-    xgc.line_width = 0;
-    xgc.line_style = LineSolid;
-    xgc.cap_style = CapButt;
-    xgc.join_style = JoinMiter;		/* I think this is fastest, is it? */
-    xgc.graphics_exposures = False;
-    values
-	= GCLineWidth|GCLineStyle|GCCapStyle|GCJoinStyle|GCGraphicsExposures;
-
-    messageGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    radarGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    buttonGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    scoreListGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    textGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    talkGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    motdGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    gameGC	= XCreateGC(dpy, topWindow, values, &xgc);
-    XSetBackground(dpy, gameGC, colors[BLACK].pixel);
-
-    /*
-     * Set fonts
-     */
-    gameFont
-	= Set_font(dpy, gameGC, gameFontName, "gameFont");
-    messageFont
-	= Set_font(dpy, messageGC, messageFontName, "messageFont");
-    scoreListFont
-	= Set_font(dpy, scoreListGC, scoreListFontName, "scoreListFont");
-    buttonFont
-	= Set_font(dpy, buttonGC, buttonFontName, "buttonFont");
-    textFont
-	= Set_font(dpy, textGC, textFontName, "textFont");
-    talkFont
-	= Set_font(dpy, talkGC, talkFontName, "talkFont");
-    motdFont
-	= Set_font(dpy, motdGC, motdFontName, "motdFont");
-
-    XSetState(dpy, gameGC,
-	      WhitePixel(dpy, DefaultScreen(dpy)),
-	      BlackPixel(dpy, DefaultScreen(dpy)),
-	      GXcopy, AllPlanes);
-    XSetState(dpy, radarGC,
-	      WhitePixel(dpy, DefaultScreen(dpy)),
-	      BlackPixel(dpy, DefaultScreen(dpy)),
-	      GXcopy, AllPlanes);
-    XSetState(dpy, messageGC,
-	      WhitePixel(dpy, DefaultScreen(dpy)),
-	      BlackPixel(dpy, DefaultScreen(dpy)),
-	      GXcopy, AllPlanes);
-    XSetState(dpy, buttonGC,
-	      WhitePixel(dpy, DefaultScreen(dpy)),
-	      BlackPixel(dpy, DefaultScreen(dpy)),
-	      GXcopy, AllPlanes);
-    XSetState(dpy, scoreListGC,
-	      WhitePixel(dpy, DefaultScreen(dpy)),
-	      BlackPixel(dpy, DefaultScreen(dpy)),
-	      GXcopy, AllPlanes);
-
-    if (dbuf_state->type == COLOR_SWITCH)
-	XSetPlaneMask(dpy, gameGC, dbuf_state->drawing_planes);
-
-#endif
-
     return 0;
 }
 
@@ -684,80 +609,9 @@ int Init_playing_windows(void)
      */
     XSelectInput(dpy, radarWindow, ExposureMask);
     XSelectInput(dpy, playersWindow, ExposureMask);
-#ifndef _WINDOWS
-    if (!selectionAndHistory)
-	XSelectInput(dpy, drawWindow, 0);
-    else
-	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 
-    /*
-     * Initialize misc. pixmaps if we're not color switching.
-     * (This could be in dbuff_init_buffer completely IMHO, -- Metalite)
-     */
-    switch (dbuf_state->type) {
-
-    case PIXMAP_COPY:
-	radarPixmap
-	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-	radarPixmap2
-	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-	drawPixmap
-	    = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
-			    dispDepth);
-	break;
-
-    case MULTIBUFFER:
-	radarPixmap
-	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-	radarPixmap2
-	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-	dbuff_init_buffer(dbuf_state);
-	break;
-
-    case COLOR_SWITCH:
-	radarPixmap2 = radarWindow;
-	radarPixmap = radarWindow;
-	drawPixmap = drawWindow;
-	Paint_sliding_radar();
-	break;
-
-    default:
-	assert(0 && "Init_playing_windows: unknown dbuf state type.");
-	break;
-    }
-
-    XAutoRepeatOff(dpy);	/* We don't want any autofire, yet! */
-    if (kdpy)
-	XAutoRepeatOff(kdpy);
-
-    /*
-     * Define a blank cursor for use with pointer control
-     */
-    XQueryBestCursor(dpy, drawWindow, 1, 1, &w, &h);
-    pix = XCreatePixmap(dpy, drawWindow, w, h, 1);
-    cursorGC = XCreateGC(dpy, pix, 0, NULL);
-    XSetForeground(dpy, cursorGC, 0);
-    XFillRectangle(dpy, pix, cursorGC, 0, 0, w, h);
-    XFreeGC(dpy, cursorGC);
-    pointerControlCursor = XCreatePixmapCursor(dpy, pix, pix, &colors[BLACK],
-					       &colors[BLACK], 0, 0);
-    XFreePixmap(dpy, pix);
-
-    /*
-     * Maps the windows, makes the visible. Voila!
-     */
-    XMapSubwindows(dpy, topWindow);
-    XMapWindow(dpy, topWindow);
-    XSync(dpy, False);
-
-    if (kdpy) {
-	XMapWindow(kdpy, keyboardWindow);
-	XSync(kdpy, False);
-    }
-#else
     /* WinXSetEvent(players, WM_PAINT, WinXPaintPlayers); */
     pointerControlCursor = !None;
-#endif
 
     Init_spark_colors();
 
