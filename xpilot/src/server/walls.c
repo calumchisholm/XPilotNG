@@ -1546,31 +1546,63 @@ static void Tbox_hack(void)
 static void Distance_init(void)
 {
     int cx,cy;
-    int lineno[DITBLSZ];
-    int dis[DITBLSZ];
+    int *lineno, *dis;
     int lsx, lsy, ldx, ldy, temp, dist, n, i, bx, by, j, k;
+    int base, height2, by2, width, height;
     unsigned short *lptr;
 
     /* max line delta 32767 */
 
     blockline = ralloc(NULL, mapx * mapy * sizeof(struct blockinfo));
     llist = ralloc(NULL, mapx * mapy * DITBLSZ * sizeof(short));
-    plist = ralloc(NULL, mapx * mapy * 50 * sizeof(short)); /* !@# */
+    lineno = ralloc(NULL, mapx * mapy * DITBLSZ * sizeof(int));
+    dis = ralloc(NULL, mapx * mapy * DITBLSZ * sizeof(int));
     lptr = llist;
     for (bx = 0; bx < mapx; bx++)
-	for (by = 0; by < mapy; by++) {
+	for (by = 0; by < mapy; by++)
 	    for (i = 0; i < DITBLSZ; i++) {
-		dis[i] = MAX_MOVE + B_CLICKS / 2;
-		lineno[i] = 65535;
+		dis[(by * mapx + bx) * DITBLSZ + i] = MAX_MOVE + B_CLICKS / 2;
+		lineno[(by * mapx + bx) * DITBLSZ +i] = 65535;
 	    }
-	    cx = bx * B_CLICKS + B_CLICKS / 2;
-	    cy = by * B_CLICKS + B_CLICKS / 2;
-	    for (i = 0; i < linec; i++) {
+    for (i = 0; i < linec; i++) {
+	bx = linet[i].start.x;
+	by = linet[i].start.y;
+	width = linet[i].delta.x;
+	height = linet[i].delta.y;
+	if (width < 0) {
+	    bx += width;
+	    width = -width;
+	    bx = WRAP_XCLICK(bx);
+	}
+	if (height < 0) {
+	    by += height;
+	    height = -height;
+	    by = WRAP_YCLICK(by);
+	}
+	width = (width + 2 * MAX_MOVE) / B_CLICKS + 5;
+	if (width >= mapx)
+	    width = mapx;
+	height = (height + 2 * MAX_MOVE) / B_CLICKS + 5;
+	if (height >= mapy)
+	    height = mapy;
+	bx = (bx - MAX_MOVE) / B_CLICKS - 2;
+	by = (by - MAX_MOVE) / B_CLICKS - 2;
+	while (bx < 0)
+	    bx += mapx;
+	while (by < 0)
+	    by += mapy;
+	height2 = height;
+	by2 = by;
+	for (; width-- > 0; bx = bx == mapx - 1 ? 0 : bx + 1)
+	    for (by = by2, height = height2; height -- > 0; by = by == mapy - 1? 0 : by + 1) {
+		cx = bx * B_CLICKS + B_CLICKS / 2;
+		cy = by * B_CLICKS + B_CLICKS / 2;
+		base = (by * mapx + bx) * DITBLSZ;
 		lsx = CENTER_XCLICK(linet[i].start.x - cx);
-		if (ABS(lsx) > 32767 + CUTOFF + B_CLICKS / 2)
+		if (ABS(lsx) > 32767 + MAX_MOVE + B_CLICKS / 2)
 		    continue;
 		lsy = CENTER_YCLICK(linet[i].start.y - cy);
-		if (ABS(lsy) > 32767 + CUTOFF + B_CLICKS / 2)
+		if (ABS(lsy) > 32767 + MAX_MOVE + B_CLICKS / 2)
 		    continue;
 		ldx = linet[i].delta.x;
 		ldy = linet[i].delta.y;
@@ -1615,23 +1647,23 @@ static void Distance_init(void)
 		   detection. Used to get away from a line after a bounce. */
 		if (dist < CUTOFF + B_CLICKS / 2)
 		    for (j = 1; j < DITBLSZ; j++) {
-			if (dis[j] <= dist)
+			if (dis[base + j] <= dist)
 			    continue;
-			k = dis[j];
+			k = dis[base + j];
 			n = j;
 			for (j++; j < DITBLSZ; j++)
-			    if (dis[j] > k) {
-				k = dis[j];
+			    if (dis[base + j] > k) {
+				k = dis[base + j];
 				n = j;
 			    }
-			if (dis[0] > dis[n])
-			    dis[0] = dis[n];
-			dis[n] = dist;
-			lineno[n] = i;
+			if (dis[base + 0] > dis[base + n])
+			    dis[base + 0] = dis[base + n];
+			dis[base + n] = dist;
+			lineno[base + n] = i;
 			goto stored;
 		    }
-		if (dist < dis[0])
-		    dis[0] = dist;
+		if (dist < dis[base + 0])
+		    dis[base + 0] = dist;
 		if (dist < B_CLICKS / 2 + DICLOSE) {
 		    printf("Not enough space in line table. Fix allocation in walls.c\n");
 		    exit(1);
@@ -1639,38 +1671,80 @@ static void Distance_init(void)
 	    stored:
 		; /* semicolon for ansi compatibility */
 	    }
+	}
+    for (bx = 0; bx < mapx; bx++)
+	for (by = 0; by < mapy; by++) {
+	    base = (by * mapx + bx) * DITBLSZ;
 	    k = bx + mapx * by;
-	    blockline[k].distance = dis[0] - B_CLICKS / 2;
+	    blockline[k].distance = dis[base + 0] - B_CLICKS / 2;
 	    blockline[k].lines = lptr;
-	    for (j = 1; j < 30 && lineno[j] != 65535; j++)
-		*lptr++ = lineno[j];
+	    for (j = 1; j < 30 && lineno[base + j] != 65535; j++)
+		*lptr++ = lineno[base + j];
 	    *lptr++ = 65535;
 	}
+    free(lineno);
+    free(dis);
 }
 
 static void Corner_init(void)
 {
     int bx, by, cx, cy, dist, i;
-    unsigned short *ptr;
-    int block;
+    unsigned short *ptr, *temp;
+    int block, size = mapx * mapy;
+    int height, height2, width, by2;
 
-    ptr = plist;
-    for (bx = 0; bx < mapx; bx++)
-	for (by = 0; by < mapy; by++) {
-	    block = bx + mapx * by;
-	    dist = blockline[block].distance + MAX_SHAPE_OFFSET + B_CLICKS / 2;
-	    blockline[block].points = ptr;
-	    cx = bx * B_CLICKS + B_CLICKS / 2;
-	    cy = by * B_CLICKS + B_CLICKS / 2;
-	    for (i = 0; i < linec; i++) {
+#define DISIZE 100
+    temp = ralloc(NULL, mapx * mapy * DISIZE * sizeof(short)); /* !@# */
+    for (i = 0; i < mapx * mapy; i++)
+	temp[i * DISIZE] = 0;
+    for (i = 0; i < linec; i++) {
+	bx = linet[i].start.x;
+	by = linet[i].start.y;
+	width = height = (2 * MAX_MOVE) / B_CLICKS + 7;
+	if (width >= mapx)
+	    width = mapx;
+	if (height >= mapy)
+	    height = mapy;
+	bx = (bx - MAX_MOVE) / B_CLICKS - 3;
+	by = (by - MAX_MOVE) / B_CLICKS - 3;
+	while (bx < 0)
+	    bx += mapx;
+	while (by < 0)
+	    by += mapy;
+	height2 = height;
+	by2 = by;
+	for (; width-- > 0; bx = bx == mapx - 1 ? 0 : bx + 1)
+	    for (by = by2, height = height2; height -- > 0; by = by == mapy - 1? 0 : by + 1) {
+		block = bx + mapx * by;
+		dist = blockline[block].distance + MAX_SHAPE_OFFSET + B_CLICKS / 2;
+		cx = bx * B_CLICKS + B_CLICKS / 2;
+		cy = by * B_CLICKS + B_CLICKS / 2;
 		if (ABS(CENTER_XCLICK(linet[i].start.x - cx)) > dist)
 		    continue;
 		if (ABS(CENTER_YCLICK(linet[i].start.y - cy)) > dist)
 		    continue;
-		*ptr++ = i;
+		temp[++temp[DISIZE * block] + DISIZE * block] = i;
+		size++;
 	    }
-	    *ptr++ = 65535;
+    }
+    plist = ralloc(NULL, size * sizeof(short));
+    ptr = plist;
+    for (block = 0; block < mapx * mapy; block++) {
+	blockline[block].points = ptr;
+	i = temp[block * DISIZE];
+	if (i > DISIZE - 1) {
+	    errno = 0;
+	    error("Not enough corner space in walls.c, add more.");
+	    exit(1);
 	}
+	while (i > 0) {
+	    *ptr++ = temp[block * DISIZE + i];
+	    i--;
+	}
+	*ptr++ = 65535;
+    }
+    free(temp);
+#undef DISIZE
 }
 
 

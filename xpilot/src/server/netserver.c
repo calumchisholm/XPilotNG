@@ -2172,7 +2172,6 @@ int Send_reliable(int ind)
 	rel_off += len;
 	read_buf += len;
     }
-    printf(" ");
 
     /*
      * Drop rest of outgoing data packet if something remains at all.
