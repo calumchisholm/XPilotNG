@@ -651,7 +651,7 @@ def convert(options):
 	bases.sort()
 	bases = [b[1] for b in bases]
     elif KEEP_MAPDATA: # old client expects this order
-	bases = [((b.x, -b.y), b) for b in bases]
+	bases = [((b.x, b.y), b) for b in bases]
 	bases.sort()
 	bases = [b[1] for b in bases]
     # If teamfuel is on, the fuel belongs to the team with the nearest base
