@@ -189,6 +189,7 @@ static int Cmd_mutepaused(char *arg, player_t *pl, int oper, char *msg, size_t s
 static int Cmd_op(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_password(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size);
+static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_queue(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size);
@@ -305,6 +306,13 @@ static Command_info commands[] = {
 	"/pause <player name or ID number>.  Pauses player.  (operator)",
 	1,
 	Cmd_pause
+    },
+    {
+	"plinfo",
+	"pl",
+	"/plinfo <player name or ID number>.  Show misc. player info.",
+	0,
+	Cmd_plinfo
     },
     {
 	"queue",
@@ -994,6 +1002,34 @@ static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return CMD_RESULT_SUCCESS;
 }
 
+static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size)
+{
+    const char *errorstr;
+    player_t *pl2;
+
+    UNUSED_PARAM(oper);
+
+    if (!arg || !*arg)
+	return CMD_RESULT_NO_NAME;
+
+    pl2 = Get_player_by_name(arg, NULL, &errorstr);
+    if (!pl2) {
+	strlcpy(msg, errorstr, size);
+	return CMD_RESULT_ERROR;
+    }
+
+    if (!Player_is_human(pl2)) {
+	snprintf(msg, size, "Robots and tanks don't have player info.");
+	return CMD_RESULT_ERROR;
+    }
+
+    snprintf(msg, size,
+	     "%-15s Ver: 0x%x  MaxFPS: %d  Turnspeed: %.2f  Turnres: %.2f",
+	     pl->name, pl->version,
+	     pl->player_fps, pl->turnspeed, pl->turnresistance);
+
+    return CMD_RESULT_SUCCESS;
+}
 
 static int Cmd_queue(char *arg, player_t *pl, int oper, char *msg, size_t size)
 {
