@@ -234,7 +234,7 @@ bool		allowClusters;
 bool		allowModifiers;
 bool		allowLaserModifiers;
 bool		allowShipShapes;
-bool		allowPlayerPasswords;
+/*bool		allowPlayerPasswords;*/
 
 bool		playersOnRadar;		/* Are players visible on radar? */
 bool		missilesOnRadar;	/* Are missiles visible on radar? */
@@ -3476,6 +3476,7 @@ static option_desc options[] = {
 	"if players change passwords!).\n",
 	OPT_COMMAND | OPT_DEFAULTS
     },
+#if 0
     {
 	"allowPlayerPasswords",
 	"PlayerPasswords",
@@ -3486,6 +3487,7 @@ static option_desc options[] = {
 	"May players protect their nicks with a password?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+#endif
     {
 	"playerLimit",
 	"playerLimit",
