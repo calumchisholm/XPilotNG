@@ -27,7 +27,6 @@ static void Main_shutdown(void)
 {
     Net_cleanup();
     Client_cleanup();
-    sock_cleanup();
 }
 
 static void sigcatch(int signum)

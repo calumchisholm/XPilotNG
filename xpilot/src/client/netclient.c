@@ -564,9 +564,9 @@ int Net_init(char *server, int port)
  */
 void Net_cleanup(void)
 {
-    int		i;
-    sock_t	sock = wbuf.sock;
-    char	ch;
+    int i;
+    sock_t sock = wbuf.sock;
+    char ch;
 
     if (sock.fd > 2) {
 	ch = PKT_QUIT;
@@ -583,15 +583,11 @@ void Net_cleanup(void)
 	    else
 		break;
 	}
-	free(Frames);
-	Frames = NULL;
+	XFREE(Frames);
     }
     Sockbuf_cleanup(&cbuf);
     Sockbuf_cleanup(&wbuf);
-    if (Setup != NULL) {
-	free(Setup);
-	Setup = NULL;
-    }
+    XFREE(Setup);
     if (sock.fd > 2) {
 	ch = PKT_QUIT;
 	if (sock_write(&sock, &ch, 1) != 1) {
@@ -605,6 +601,7 @@ void Net_cleanup(void)
 	}
 	sock_close(&sock);
     }
+    sock_cleanup();
 }
 
 /*
@@ -789,10 +786,8 @@ void Net_init_measurement(void)
 		memset(packet_measure, PACKET_DRAW, MAX_SUPPORTED_FPS);
 	}
     }
-    else if (packet_measure != NULL) {
-	free(packet_measure);
-	packet_measure = NULL;
-    }
+    else
+	XFREE(packet_measure);
 }
 
 void Net_init_lag_measurement(void)
