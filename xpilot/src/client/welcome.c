@@ -2396,12 +2396,7 @@ int Welcome_screen(Connect_param_t * conpar)
 
     if (!quitting && joining) {
 	Welcome_cleanup();
-	result = Join(conpar->server_addr,
-		      conpar->server_name,
-		      conpar->login_port,
-		      conpar->real_name,
-		      conpar->nick_name,
-		      conpar->disp_name, conpar->server_version);
+	result = Join(conpar);
     } else
 	Quit();
 

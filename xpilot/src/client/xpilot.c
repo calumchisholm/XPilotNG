@@ -178,10 +178,7 @@ extern void Handle_x_options(void);
     }
 
     if (result == 1)
-	retval =
-	  Join(conpar->server_addr, conpar->server_name,
-	       conpar->login_port, conpar->real_name, conpar->nick_name,
-	       conpar->disp_name, conpar->server_version);
+	retval = Join(conpar);
     
     if (instruments.useClientRanker)
 	Print_saved_scores();

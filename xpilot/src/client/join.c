@@ -172,8 +172,8 @@ static void sigcatch(int signum)
     exit(1);
 }
 
-int Join(char *server_addr, char *server_name, int port, char *real,
-	 char *nick, char *display, unsigned server_version)
+
+int Join(Connect_param_t *conpar)
 {
     signal(SIGINT, sigcatch);
     signal(SIGTERM, sigcatch);
@@ -184,16 +184,19 @@ int Join(char *server_addr, char *server_name, int port, char *real,
 
     IFWINDOWS( received_self = FALSE );
     IFWINDOWS( Progress("Client_init") );
-    if (Client_init(server_name, server_version) == -1)
+    if (Client_init(conpar->server_name, conpar->server_version) == -1)
 	return -1;
 
-    IFWINDOWS( Progress("Net_init %s", server_addr) );
-    if (Net_init(server_addr, port) == -1) {
+    IFWINDOWS( Progress("Net_init %s", conpar->server_addr) );
+    if (Net_init(conpar->server_addr, conpar->login_port) == -1) {
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Net_verify '%s'= '%s'", nick, real) );
-    if (Net_verify(real, nick, display) == -1) {
+    IFWINDOWS( Progress("Net_verify '%s'= '%s'",
+			conpar->nick_name, conpar->real_name) );
+    if (Net_verify(conpar->real_name,
+		   conpar->nick_name,
+		   conpar->disp_name) == -1) {
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
