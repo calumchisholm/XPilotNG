@@ -59,6 +59,7 @@ REC_LU = 's'
 REC_RU = 'a'
 REC_LD = 'w'
 REC_RD = 'q'
+ATTRACT = '$'
 BCLICKS = 35 * 64
 
 class Wrapcoords:
@@ -204,6 +205,14 @@ def convert(options):
 	    else:
 		base.team = ord(map[loc]) - ord('0')
 	    base.dir = 32
+	    if map[loc.u()] in ATTRACT:
+		base.dir = 32
+	    elif map[loc.d()] in ATTRACT:
+		base.dir = 96
+	    elif map[loc.r()] in ATTRACT:
+		base.dir = 0
+	    elif map[loc.l()] in ATTRACT:
+		base.dir = 64
 	    base.loc = loc.copy()
 	    bases.append(base)
 	if map[loc] == '*':
