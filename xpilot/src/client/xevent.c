@@ -382,6 +382,9 @@ void xevent_pointer(void)
     }
 }
 
+
+#ifndef _WINDOWS
+
 #ifndef _WINDOWS
 int x_event(int new_input)
 #else
@@ -505,3 +508,131 @@ int win_xevent(XEvent event)
     xevent_pointer();
     return 0;
 }
+
+#else  /* _WINDOWS */
+
+#ifndef _WINDOWS
+int x_event(int new_input)
+#else
+int win_xevent(XEvent event)
+#endif
+{
+    int			queued = 0;
+#ifndef _WINDOWS
+    int			i, n;
+    XEvent		event;
+#endif
+
+#ifdef SOUND
+    audioEvents();
+#endif /* SOUND */
+
+    mouseMovement = 0;
+
+#ifndef _WINDOWS
+    switch (new_input) {
+    case 0: queued = QueuedAlready; break;
+    case 1: queued = QueuedAfterReading; break;
+    case 2: queued = QueuedAfterFlush; break;
+    default:
+	warn("Bad input queue type (%d)", new_input);
+	return -1;
+    }
+    n = XEventsQueued(dpy, queued);
+    for (i = 0; i < n; i++) {
+	XNextEvent(dpy, &event);
+#endif
+	switch (event.type) {
+
+#ifndef _WINDOWS
+	    /*
+	     * after requesting a selection we are notified that we
+	     * can access it.
+	     */
+	case SelectionNotify:
+	    SelectionNotify_event(&event);
+	    break;
+	    /*
+	     * we are requested to provide a selection.
+	     */
+	case SelectionRequest:
+	    SelectionRequest_event(&event);
+	    break;
+
+	case SelectionClear:
+	    if (selectionAndHistory)
+		Clear_selection();
+	    break;
+
+	case MapNotify:
+	    MapNotify_event(&event);
+	    break;
+
+	case ClientMessage:
+	    if (ClientMessage_event(&event) == -1)
+		return -1;
+	    break;
+
+	    /* Back in play */
+	case FocusIn:
+	    FocusIn_event(&event);
+	    break;
+
+	    /* Probably not playing now */
+	case FocusOut:
+	case UnmapNotify:
+	    UnmapNotify_event(&event);
+	    break;
+
+	case MappingNotify:
+	    XRefreshKeyboardMapping(&event.xmapping);
+	    break;
+
+
+	case ConfigureNotify:
+	    ConfigureNotify_event(&event);
+	    break;
+#endif
+
+	case KeyPress:
+	    talk_key_repeating = 0;
+	    /* FALLTHROUGH */
+	case KeyRelease:
+	    KeyChanged_event(&event);
+	    break;
+
+	case ButtonPress:
+	    ButtonPress_event(&event);
+	    break;
+
+	case MotionNotify:
+	    MotionNotify_event(&event);
+	    break;
+
+	case ButtonRelease:
+	    if (ButtonRelease_event(&event) == -1)
+	        return -1;
+	    break;
+
+	case Expose:
+	    Expose_event(&event);
+	    break;
+
+	case EnterNotify:
+	case LeaveNotify:
+	    Widget_event(&event);
+	    break;
+
+	default:
+	    break;
+	}
+#ifndef _WINDOWS
+    }
+#endif
+
+    xevent_keyboard(queued);
+    xevent_pointer();
+    return 0;
+}
+
+#endif /* _WINDOWS */
