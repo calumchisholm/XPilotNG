@@ -686,8 +686,8 @@ void xevent_keyboard(int queued)
 #endif
 
     if (talk_key_repeat_count > 0) {
-	if (++talk_key_repeat_count >= clientFPS
-	    && (((talk_key_repeat_count - clientFPS) % ((clientFPS + 2) / 3))
+	if (++talk_key_repeat_count >= /*client*/FPS
+	    && (((talk_key_repeat_count - /*client*/FPS) % ((/*client*/FPS + 2) / 3))
 		== 0)) {
 	    Talk_event(&talk_key_repeat_event);
 	    if (!talk_mapped)
