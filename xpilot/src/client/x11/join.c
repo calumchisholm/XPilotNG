@@ -99,7 +99,6 @@ static void Input_loop(void)
 	}
 	if (FD_ISSET(netfd, &rfds) || result > 1) {
 	    struct timeval tv1, tv2;
-	    double t1, t2;
 
 	    gettimeofday(&tv1, NULL);
 
@@ -138,11 +137,7 @@ static void Input_loop(void)
 
 	    if (newSecond) {
 		gettimeofday(&tv2, NULL);
-
-		t1 = timeval_to_seconds(&tv1);
-		t2 = timeval_to_seconds(&tv2);
-
-		clData.clientLag = (t2 - t1) * 1e3;
+		clData.clientLag = 1e-3 * timeval_sub(&tv2, &tv1);
 	    }
 	}
     }
