@@ -456,9 +456,11 @@ void Tank_handle_detach(player *pl)
     Player_remove_tank(GetInd(pl->id), ct);
 
     for (i = 0; i < NumPlayers - 1; i++) {
-	if (Players(i)->conn != NOT_CONNECTED) {
-	    Send_player(Players(i)->conn, dummy->id);
-	    Send_score(Players(i)->conn, dummy->id,
+	player *pl_i = Players(i);
+
+	if (pl_i->conn != NOT_CONNECTED) {
+	    Send_player(pl_i->conn, dummy->id);
+	    Send_score(pl_i->conn, dummy->id,
 		       dummy->score, dummy->life,
 		       dummy->mychar, dummy->alliance);
 	}
