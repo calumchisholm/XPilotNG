@@ -818,9 +818,9 @@ void Robot_delete(player_t *pl, bool kicked)
 	    if (!Player_is_robot(pl_i))
 		continue;
 
-	    if (pl_i->score < low_score) {
+	    if (Get_Score(pl_i) < low_score) {
 		low_pl = pl_i;
-		low_score = low_pl->score;
+		low_score = Get_Score(low_pl);
 	    }
 	}
 	if (low_pl)
@@ -905,7 +905,7 @@ void Robot_war(player_t *pl, player_t *kp)
     }
 
     if (Player_is_robot(pl)
-	&& rfrac() * 100.0 < kp->score - pl->score
+	&& rfrac() * 100.0 < Get_Score(kp) - Get_Score(pl)
 	&& !Players_are_teammates(pl, kp)
 	&& !Players_are_allies(pl, kp)) {
 

@@ -179,39 +179,22 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	if (!BIT(pl->used, HAS_SHIELD)
 	    && !Player_has_armor(pl)) {
 	    Player_set_state(pl, PL_STATE_KILLED);
+    	    Handle_Scoring(SCORE_LASER,kp,pl,cannon);
 	    if (kp) {
 		Set_message_f("%s got roasted alive by %s's laser.%s",
 			      pl->name, kp->name,
 			      pl->id == kp->id ? " How strange!" : "");
-		if (pl->id == kp->id) {
-		    sc = Rate(0.0, kp->score)
-			* options.laserKillScoreMult
-			* options.selfKillScoreMult;
-		    if (!options.zeroSumScoring) Score(kp, -sc, kp->pos, kp->name);
-		}
-		else {
-		    sc = Rate(kp->score, pl->score)
-			* options.laserKillScoreMult;
-		    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
-		}
 	    }
 	    else if (cannon != NULL) {
-		sc = Rate(cannon->score, pl->score)
-		    * options.cannonKillScoreMult;
-		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Cannon");
 		Set_message_f("%s got roasted alive by cannonfire.", pl->name);
 	    }
 	    else {
 		assert(pulse->id == NO_ID);
-		sc = Rate(UNOWNED_SCORE, pl->score)
-		    * options.unownedKillScoreMult;
-		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "");
 		Set_message_f("%s got roasted alive.", pl->name);
 	    }
 
 	    sound_play_sensors(pl->pos, PLAYER_ROASTED_SOUND);
 	    if (kp && kp->id != pl->id) {
-		Rank_add_laser_kill(kp);
 		Robot_war(pl, kp);
 	    }
 	}

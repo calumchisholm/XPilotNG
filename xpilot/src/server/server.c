@@ -419,7 +419,7 @@ int Pick_team(int pick_for_type)
 	if (!playing[pl->team]++)
 	    playing_teams++;
 	if (Player_is_human(pl) || Player_is_robot(pl))
-	    team_score[pl->team] += pl->score;
+	    team_score[pl->team] +=  Get_Score(pl);
     }
     if (playing_teams <= 1) {
 	for (i = 0; i < MAX_TEAMS; i++) {
@@ -533,7 +533,7 @@ void Server_info(char *str, size_t max_size)
 	pl = Player_by_index(i);
 
 	for (j = 0; j < i; j++) {
-	    if (order[j]->score < pl->score) {
+	    if ( Get_Score(order[j]) <  Get_Score(pl)) {
 		for (k = i; k > j; k--)
 		    order[k] = order[k - 1];
 		break;
@@ -546,7 +546,7 @@ void Server_info(char *str, size_t max_size)
 	strlcpy(name, pl->name, MAX_CHARS);
 	snprintf(lblstr, sizeof(lblstr), "%c%c %-19s%03d%6d",
 		 pl->mychar, pl->team == TEAM_NOT_SET ? ' ' : (pl->team + '0'),
-		 name, pl->pl_life, (int)pl->score);
+		 name, pl->pl_life, (int) Get_Score(pl));
 	snprintf(msg, sizeof(msg), "%2d... %-36s%s@%s\n",
 		 i + 1, lblstr, pl->username, pl->hostname);
 	if (strlen(msg) + strlen(str) >= max_size)
@@ -654,7 +654,7 @@ void Game_Over(void)
 		team = pl->team;
 		if (teamscore[team] == 1234567)
 		    teamscore[team] = 0;
-		teamscore[team] += pl->score;
+		teamscore[team] +=  Get_Score(pl);
 	    }
 	}
 
@@ -694,12 +694,12 @@ void Game_Over(void)
 
 	Player_set_state(pl_i, PL_STATE_DEAD);
 	if (Player_is_human(pl_i)) {
-	    if (pl_i->score > maxsc) {
-		maxsc = pl_i->score;
+	    if (Get_Score(pl_i) > maxsc) {
+		maxsc = Get_Score(pl_i);
 		win_pl = pl_i;
 	    }
-	    if (pl_i->score < minsc) {
-		minsc = pl_i->score;
+	    if (Get_Score(pl_i) < minsc) {
+		minsc = Get_Score(pl_i);
 		lose_pl = pl_i;
 	    }
 	}

@@ -69,7 +69,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 {
     int j;
     player_t *kp;
-    double sc, por, win_score = 0.0, lose_score = 0.0, drainfactor;
+    double win_score = 0.0, lose_score = 0.0, drainfactor;
     int win_team_members = 0, lose_team_members = 0,
 	targets_remaining = 0, targets_total = 0;
     vector_t zero_vel = {0.0, 0.0};
@@ -167,13 +167,13 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 		continue;
 
 	    if (pl->team == targ->team) {
-		lose_score += pl->score;
+		lose_score +=  Get_Score(pl);
 		lose_team_members++;
 		if (!Player_is_dead(pl))
 		    somebody = true;
 	    }
 	    else if (pl->team == kp->team) {
-		win_score += pl->score;
+		win_score +=  Get_Score(pl);
 		win_team_members++;
 	    }
 	}
@@ -191,14 +191,12 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     }
     if (!somebody)
 	return;
+	
+    Handle_Scoring(SCORE_TARGET,kp,NULL,targ);
 
     sound_play_sensors(targ->pos, DESTROY_TARGET_SOUND);
 
     if (targets_remaining > 0) {
-	sc = Rate(kp->score, TARGET_SCORE)/4;
-	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
-	if (sc >= 0.01)
-	    if (!options.zeroSumScoring) Score(kp, sc, targ->pos, "Target: ");
 	/*
 	 * If players can't collide with their own targets, we
 	 * assume there are many used as shields.  Don't litter
@@ -212,33 +210,6 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 
     Set_message_f("%s blew up team %d's %starget.",
 		  kp->name, targ->team, (targets_total > 1) ? "last " : "");
-
-    if (options.targetKillTeam)
-	Rank_add_target_kill(kp);
-
-    sc  = Rate(win_score, lose_score);
-    por = (sc * lose_team_members) /win_team_members;
-
-    for (j = 0; j < NumPlayers; j++) {
-	player_t *pl = Player_by_index(j);
-
-	if (Player_is_tank(pl)
-	    || (Player_is_paused(pl) && pl->pause_count <= 0)
-	    || Player_is_waiting(pl))
-	    continue;
-
-	if (pl->team == targ->team) {
-	    if (options.targetKillTeam
-		&& targets_remaining == 0
-		&& Player_is_alive(pl))
-		Player_set_state(pl, PL_STATE_KILLED);
-	    if (!options.zeroSumScoring) Score(pl, -sc, targ->pos, "Target: ");
-	}
-	else if (pl->team == kp->team &&
-		 (pl->team != TEAM_NOT_SET || pl->id == kp->id))
-	    if (!options.zeroSumScoring) Score(pl, por, targ->pos, "Target: ");
-	    /*if (options.zeroSumScoring);*//* TODO */
-    }
 }
 
 hitmask_t Target_hitmask(target_t *targ)

@@ -630,12 +630,12 @@ void Update_score_table(world_t *world)
 		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->conn != NULL)
-		    Send_score(pl_i->conn, pl->id, pl->score, pl->pl_life,
+		    Send_score(pl_i->conn, pl->id,  Get_Score(pl), pl->pl_life,
 			       pl->mychar, pl->alliance);
 	    }
 	    for (i = 0; i < NumSpectators; i++)
 		Send_score(Player_by_index(i + spectatorStart)->conn, pl->id,
-			   pl->score, pl->pl_life, pl->mychar, pl->alliance);
+			    Get_Score(pl), pl->pl_life, pl->mychar, pl->alliance);
 	}
 	if (BIT(world->rules->mode, TIMING)) {
 	    if (pl->check != pl->prev_check
@@ -827,7 +827,7 @@ static void Compute_end_of_round_values(double *average_score,
 	    continue;
 
 	n++;
-	*average_score += pl->score;
+	*average_score +=  Get_Score(pl);
 	ratio = (double) pl->kills / (pl->deaths + 1);
 	if (ratio > *best_ratio) {
 	    *best_ratio = ratio;
@@ -859,7 +859,7 @@ static void Give_best_player_bonus(double average_score,
 		"%s is the Deadliest Player with a kill ratio of %d/%d.",
 		bp->name,
 		bp->kills, bp->deaths);
-	points = best_ratio * Rate(bp->score, average_score);
+	points = best_ratio * Rate(Get_Score(bp), average_score);
 	if (!options.zeroSumScoring) Score(bp, points, bp->pos, "[Deadliest]");
     	Rank_add_deadliest(bp);
 	/*if (options.zeroSumScoring);*//* TODO */
@@ -867,7 +867,7 @@ static void Give_best_player_bonus(double average_score,
 	msg[0] = '\0';
 	for (i = 0; i < num_best_players; i++) {
 	    player_t	*bp = Player_by_index(best_players[i]);
-	    double	ratio = Rate(bp->score, average_score);
+	    double	ratio = Rate(Get_Score(bp), average_score);
 	    double	score = (ratio + num_best_players) / num_best_players;
 
 	    if (msg[0]) {
@@ -903,7 +903,7 @@ static void Give_individual_bonus(player_t *pl, double average_score)
     double ratio, points;
 
     ratio = (double) pl->kills / (pl->deaths + 1);
-    points = ratio * Rate(pl->score, average_score);
+    points = ratio * Rate( Get_Score(pl), average_score);
     if (!options.zeroSumScoring) Score(pl, points, pl->pos, "[Winner]");
     /*if (options.zeroSumScoring);*//* TODO */
 }
@@ -1205,7 +1205,7 @@ void Compute_game_status(world_t *world)
 
 		if (Player_is_paused(pl_i) || Player_is_tank(pl_i))
 		    continue;
-		team_score[pl_i->team] += pl_i->score;
+		team_score[pl_i->team] += Get_Score(pl_i);
 	    }
 
 	    for (winners = i = 0; i < MAX_TEAMS; i++) {

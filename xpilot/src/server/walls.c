@@ -338,21 +338,20 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 		cnt[j] = 1;
 	    }
 	    total_pusher_count++;
-	    total_pusher_score += pushers[j]->score;
+	    total_pusher_score += Get_Score(pushers[j]);
 	}
 	if (num_pushers == 0) {
-	    sc = Rate(WALL_SCORE, pl->score);
-	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, hudmsg);
+	    Handle_Scoring(SCORE_WALL_DEATH,NULL,pl,hudmsg);
 	    strcat(msg, ".");
 	    Set_message(msg);
-	}
-	else {
+	} else {
 	    int		msg_len = strlen(msg);
 	    char	*msg_ptr = &msg[msg_len];
-	    double	average_pusher_score
-		= total_pusher_score / total_pusher_count;
+	    double	average_pusher_score = total_pusher_score / total_pusher_count;
  	    bool	was_tagged = (tagItPlayerId == pl->id),
 			pusher_is_tagged = false;
+	    double mult;
+	    player_t dummy;
 
 	    for (i = 0; i < num_pushers; i++) {
 		player_t	*pusher = pushers[i];
@@ -370,35 +369,30 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 		    msg_len += name_len;
 		    msg_ptr += name_len;
 		}
-		sc = cnt[i] * Rate(pusher->score, pl->score)
-		    * options.shoveKillScoreMult
-		    / total_pusher_count;
-
+		mult = cnt[i] / total_pusher_count;
 		if (options.tagGame) {
 		    if (tagItPlayerId == pusher->id) {
-			sc *= options.tagItKillScoreMult;
+			mult *= options.tagItKillScoreMult;
  			pusher_is_tagged = true;
  		    } else if (was_tagged && num_pushers == 1) {
- 			sc *= options.tagKillItScoreMult;
+ 			mult *= options.tagKillItScoreMult;
  			Transfer_tag(pl, pusher);
  		    }
  		}
 
-		if (!options.zeroSumScoring) Score(pusher, sc, pl->pos, pl->name);
+		Handle_Scoring(SCORE_SHOVE_KILL,pusher,pl,&mult);
 		if (i >= num_pushers - 1)
 		    Rank_add_shove_kill(pusher);
 	    }
-	    sc = Rate(average_pusher_score, pl->score)
-		* options.shoveKillScoreMult;
 
 	    if (options.tagGame && num_pushers == 1) {
  		if (was_tagged)
- 		    sc *= options.tagKillItScoreMult;
+ 		    mult = options.tagKillItScoreMult;
 		else if (pusher_is_tagged)
- 		    sc *= options.tagItKillScoreMult;
+ 		    mult = options.tagItKillScoreMult;
  	    }
-
-	    if (!options.zeroSumScoring || num_pushers >=1 ) Score(pl, -sc, pl->pos, "[Shove]");
+    	    dummy.score = average_pusher_score;
+	    Handle_Scoring(SCORE_SHOVE_DEATH,&dummy,pl,&mult);
 
 	    strcpy(msg_ptr, ".");
 	    Set_message(msg);
@@ -410,7 +404,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
     }
 
     if (Player_is_killed(pl)
-	&& pl->score < 0
+	&&  Get_Score(pl) < 0
 	&& Player_is_robot(pl)) {
 	pl->home_base = Base_by_index(world, 0);
 	Pick_startpos(pl);
@@ -2902,12 +2896,12 @@ void Turn_player(player_t *pl, bool push)
 			    next_dir, hitmask, OBJ_PTR(pl),
 			    pl->pos.cx, pl->pos.cy, &ans);
 	if (group != NO_GROUP) {
-    	    double /*fact,*/ velon /*, velot*/;
+    	    double fact, velon, velot;
     	    double cl, sl;  	/* cosine and sine of line angle    	    */
     	    double cln, sln;	/* cosine and sine of line normal   	    */
     	    double pc, ps;	/* cosine and sine of the points    	    */
     	    double pdc, pds;	/* cosine and sine of the points direction  */
-    	    double x, y, l /*, v*/;
+    	    double x, y, l, v;
 	    double power = pl->power;
 	    int a = (BIT(pl->used, USES_EMERGENCY_THRUST)
 		     ? MAX_AFTERBURNER
@@ -2921,11 +2915,8 @@ void Turn_player(player_t *pl, bool push)
 	    if (!push)
 		break;
 
-    	    p = Ship_get_point_clpos((shipshape_t *)pl->ship,
-				     ans.point, pl->dir);
-    	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship,
-			(ans.point + 1) % (((shape_t *)pl->ship)->num_points),
-			pl->dir);
+    	    p = Ship_get_point_clpos((shipshape_t *)pl->ship ,ans.point ,pl->dir);
+    	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship ,(ans.point + 1)%(((shape_t *)pl->ship)->num_points) ,pl->dir);
 
 	    length = 0;
 
@@ -2935,13 +2926,14 @@ void Turn_player(player_t *pl, bool push)
     	    	if (length != 0) {
     	    	    x = linet[ans.line].delta.cx;
     	    	    y = linet[ans.line].delta.cy;
-		} else
+		} else {
 		    break;
+		}
 	    } else {
     	    	x = p2.cx - p.cx;
     	    	y = p2.cy - p.cy;
 	    }
-
+	    
     	    l = sqrt(x*x + y*y);
     	    cl = x / l;
     	    sl = y / l;
@@ -2969,8 +2961,9 @@ void Turn_player(player_t *pl, bool push)
     	    	pds = -pc;
     	    }
     	    
-	    if (a)
+	    if (a) {
 		power = AFTER_BURN_POWER(power, a);
+	    }
 
     	    /*v = ( power / inert ) * options.turnPush;
 
@@ -2997,8 +2990,7 @@ void Turn_player(player_t *pl, bool push)
     	    	pl->vel.y += velon * sln;
 	    }
     	    
-	    /*velot = velon * options.playerWallFriction
-	     * ((-pdc) * cl + (-pds) * sl);
+	    /*velot = velon * options.playerWallFriction * ((-pdc) * cl + (-pds) * sl);
     	    pl->vel.x += velot * cl;
     	    pl->vel.y += velot * sl;*/
 	    

@@ -177,20 +177,20 @@ void teamcup_round_end(int winning_team)
 		continue;
 
 	    pl = Player_by_index(j);
-	    if (best == NumPlayers || pl->score > best_score) {
-		best_score = pl->score;
+	    if (best == NumPlayers ||  Get_Score(pl) > best_score) {
+		best_score =  Get_Score(pl);
 		best = j;
 	    }
 	}
 
 	list[best] = NumPlayers;
 	pl = Player_by_index(best);
-	teamcup_log("%d\t%d\t%2d/%d\t%s\n", pl->team, (int)(pl->score),
+	teamcup_log("%d\t%d\t%2d/%d\t%s\n", pl->team, (int) Get_Score(pl),
 		    pl->kills, pl->deaths, pl->name);
 
 	if (team_score[pl->team] == double_max)
 	    team_score[pl->team] = 0.0;
-	team_score[pl->team] += pl->score;
+	team_score[pl->team] +=  Get_Score(pl);
 	team_players[pl->team]++;
     }
 

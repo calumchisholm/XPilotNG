@@ -370,7 +370,7 @@ void Tank_handle_detach(player_t *pl)
     tank->pseudo_team = pl->pseudo_team;
     tank->alliance = ALLIANCE_NOT_SET;
     tank->invite = NO_ID;
-    tank->score = pl->score - options.tankScoreDecrement;
+    tank->score =  Get_Score(pl) - options.tankScoreDecrement;
 
     /* Fuel is the one from chosen tank */
     tank->fuel.sum =

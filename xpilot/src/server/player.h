@@ -404,16 +404,19 @@ static inline bool Player_is_hoverpaused(player_t *pl)
     return false;
 }
 
+extern void Set_Score(player_t *pl, double score);
+extern void Add_Score(player_t *pl, double score);
+
 static inline void Player_add_score(player_t *pl, double points)
 {
-    pl->score += points;
+    Add_Score(pl,points);
     pl->update_score = true;
     updateScores = true;
 }
 
 static inline void Player_set_score(player_t *pl, double points)
 {
-    pl->score = points;
+    Set_Score(pl,points);
     pl->update_score = true;
     updateScores = true;
 }

@@ -582,7 +582,7 @@ void Rank_save_score(player_t * pl)
 {
     ranknode_t *rank = pl->rank;
 
-    rank->score = pl->score;
+    rank->score =  Get_Score(pl);
     rank->pl = NULL;
     rank->timestamp = time(NULL);
 }

@@ -368,7 +368,7 @@ static void Robot_default_invite(player_t *pl, player_t *inviter)
 	    return;
 	}
     }
-    limit = MAX(ABS(pl->score / MAX((my_data->attack / 10), 10)),
+    limit = MAX(ABS( Get_Score(pl) / MAX((my_data->attack / 10), 10)),
 		my_data->defense);
     if (inviter->alliance == ALLIANCE_NOT_SET) {
 	/* don't accept players we are at war with */
@@ -378,7 +378,7 @@ static void Robot_default_invite(player_t *pl, player_t *inviter)
 	if (!Player_is_active(inviter))
 	    we_accept = false;
 	/* don't accept players with scores substantially lower than ours */
-	else if (inviter->score < (pl->score - limit))
+	else if ( Get_Score(inviter) < ( Get_Score(pl) - limit))
 	    we_accept = false;
     }
     else {
@@ -392,12 +392,12 @@ static void Robot_default_invite(player_t *pl, player_t *inviter)
 		    we_accept = false;
 		    break;
 		}
-		avg_score += pl_i->score;
+		avg_score +=  Get_Score(pl_i);
 	    }
 	}
 	if (we_accept) {
 	    avg_score = avg_score / member_count;
-	    if (avg_score < (pl->score - limit))
+	    if (avg_score < ( Get_Score(pl) - limit))
 		we_accept = false;
 	}
     }
@@ -2024,7 +2024,7 @@ static void Robot_default_play(player_t *pl)
 	    || (enemy_dist < pl->lock.distance*2
 		&& BIT(world->rules->mode, TEAM_PLAY)
 		&& BIT(ship->have, HAS_BALL))
-	    || ship->score > Player_by_id(pl->lock.pl_id)->score) {
+	    || Get_Score(ship) > Get_Score(Player_by_id(pl->lock.pl_id))) {
 	    pl->lock.pl_id = ship->id;
 	    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
 	    pl->lock.distance = enemy_dist;

@@ -880,7 +880,7 @@ static void Update_players(world_t *world)
 
 	/* ugly hack */
 	if (Player_is_human(pl))
-	    pl->rank->score = pl->score;
+	    pl->rank->score =  Get_Score(pl);
 
 	if (pl->pause_count > 0) {
 	    /*assert(Player_is_paused(pl)
@@ -920,11 +920,7 @@ static void Update_players(world_t *world)
 	if (Player_is_self_destructing(pl)) {
 	    pl->self_destruct_count -= timeStep;
 	    if (pl->self_destruct_count <= 0) {
-		if (options.selfDestructScoreMult != 0) {
-		    double sc = Rate(0.0, pl->score)
-			* options.selfDestructScoreMult;
-		    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Self-Destruct");
-		}
+	    	Handle_Scoring(SCORE_SELF_DESTRUCT,pl,NULL,NULL);
 		Player_set_state(pl, PL_STATE_KILLED);
 		Set_message_f("%s has committed suicide.", pl->name);
 		Throw_items(pl);

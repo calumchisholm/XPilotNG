@@ -184,7 +184,6 @@ void Check_collision(world_t *world)
 static void PlayerCollision(world_t *world)
 {
     int i, j;
-    double sc, sc2;
     player_t *pl;
 
     /* Player - player, checkpoint, treasure, object and wall */
@@ -196,8 +195,7 @@ static void PlayerCollision(world_t *world)
 	if (!World_contains_clpos(world, pl->pos)) {
 	    Player_set_state(pl, PL_STATE_KILLED);
 	    Set_message_f("%s left the known universe.", pl->name);
-	    sc = Rate(WALL_SCORE, pl->score);
-	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, pl->name);
+	    Handle_Scoring(SCORE_WALL_DEATH,NULL,pl,NULL);
 	    continue;
 	}
 
@@ -279,84 +277,18 @@ static void PlayerCollision(world_t *world)
 		    if (Player_is_killed(pl)) {
 			Set_message_f("%s and %s crashed.",
 				      pl->name, pl_j->name);
-			if (!Player_is_tank(pl) && !Player_is_tank(pl_j)) {
-			    sc = Rate(pl_j->score, pl->score)
-				* options.crashScoreMult;
-			    sc2 = Rate(pl->score, pl_j->score)
-				* options.crashScoreMult;
-			    Score_players(pl, -sc, pl_j->name,
-					  pl_j, -sc2, pl->name, false);
-			}
-			else if (Player_is_tank(pl)) {
-			    player_t *i_tank_owner_pl
-				= Player_by_id(pl->lock.pl_id);
-
-			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
-				* options.tankKillScoreMult;
-			    Score_players(i_tank_owner_pl, sc, pl_j->name,
-					  pl_j, -sc, pl->name, true);
-			}
-			else if (Player_is_tank(pl_j)) {
-			    player_t *j_tank_owner_pl
-
-				= Player_by_id(pl_j->lock.pl_id);
-			    sc = Rate(j_tank_owner_pl->score, pl->score)
-				* options.tankKillScoreMult;
-			    Score_players(j_tank_owner_pl, sc, pl->name,
-					  pl, -sc, pl_j->name, true);
-			} /* don't bother scoring two tanks */
+			Handle_Scoring(SCORE_COLLISION,pl,pl_j,NULL);
 		    } else {
-			int i_tank_owner = i;
-			player_t *i_tank_owner_pl;
-
-			if (Player_is_tank(pl)) {
-			    i_tank_owner = GetInd(pl->lock.pl_id);
-			    if (i_tank_owner == j)
-				i_tank_owner = i;
-			}
-			i_tank_owner_pl = Player_by_index(i_tank_owner);
 			Set_message_f("%s ran over %s.", pl->name, pl_j->name);
-			sound_play_sensors(pl_j->pos,
-					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			if (Player_is_tank(pl)) {
-			    Rank_add_tank_kill(i_tank_owner_pl);
-			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
-				* options.tankKillScoreMult;
-			} else {
-			    Rank_add_runover_kill(pl);
-			    sc = Rate(pl->score, pl_j->score)
-				* options.runoverKillScoreMult;
-			}
-			Score_players(i_tank_owner_pl, sc, pl_j->name,
-				      pl_j, -sc, pl->name, true);
+			sound_play_sensors(pl_j->pos, PLAYER_RAN_OVER_PLAYER_SOUND);
+			Handle_Scoring(SCORE_ROADKILL,pl,pl_j,NULL);
 		    }
 
 		} else {
 		    if (Player_is_killed(pl)) {
-			int j_tank_owner = j;
-			player_t *j_tank_owner_pl;
-
-			if (Player_is_tank(pl_j)) {
-			    j_tank_owner = GetInd(pl_j->lock.pl_id);
-			    if (j_tank_owner == i)
-				j_tank_owner = j;
-			}
-			j_tank_owner_pl = Player_by_index(j_tank_owner);
 			Set_message_f("%s ran over %s.", pl_j->name, pl->name);
-			sound_play_sensors(pl->pos,
-					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			if (Player_is_tank(pl_j)) {
-			    Rank_add_tank_kill(j_tank_owner_pl);
-			    sc = Rate(j_tank_owner_pl->score, pl->score)
-				* options.tankKillScoreMult;
-			} else {
-			    Rank_add_runover_kill(pl_j);
-			    sc = Rate(pl_j->score, pl->score)
-				* options.runoverKillScoreMult;
-			}
-
-			Score_players(j_tank_owner_pl, sc, pl->name,
-				      pl, -sc, pl_j->name, true);
+			sound_play_sensors(pl->pos, PLAYER_RAN_OVER_PLAYER_SOUND);
+			Handle_Scoring(SCORE_ROADKILL,pl_j,pl,NULL);
 		    }
 		}
 
@@ -705,7 +637,6 @@ static void PlayerObjectCollision(player_t *pl)
 
 static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 {
-    double sc;
     world_t *world = pl->world;
 
     /*
@@ -743,26 +674,17 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
     }
     if (ball->ball_owner == NO_ID) {
 	Set_message_f("%s was killed by a ball.", pl->name);
-	sc = Rate(0.0, pl->score)
-		* options.ballKillScoreMult
-		* options.unownedKillScoreMult;
-	if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Ball");
+	Handle_Scoring(SCORE_BALL_KILL,NULL,pl,NULL);
     } else {
 	player_t *kp = Player_by_id(ball->ball_owner);
 
 	Set_message_f("%s was killed by a ball owned by %s.%s",
 		      pl->name, kp->name,
 		      kp->id == pl->id ? "  How strange!" : "");
+	
+	Handle_Scoring(SCORE_BALL_KILL,kp,pl,NULL);
 
-	if (kp->id == pl->id) {
-	    sc = Rate(0.0, pl->score)
-		   * options.ballKillScoreMult
-		   * options.selfKillScoreMult;
-	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, kp->name);
-	} else {
-	    Rank_add_ball_kill(kp);
-	    sc = Rate(kp->score, pl->score) * options.ballKillScoreMult;
-	    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
+	if (kp->id != pl->id) {
 	    Robot_war(pl, kp);
 	}
     }
@@ -957,7 +879,6 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
 {
     player_t *kp = NULL;
-    double sc;
 
     sound_play_sensors(pl->pos, PLAYER_HIT_MINE_SOUND);
     if (mine->id == NO_ID && mine->mine_owner == NO_ID)
@@ -968,8 +889,7 @@ static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
     else if (mine->mine_owner == mine->id) {
 	kp = Player_by_id(mine->mine_owner);
 	Set_message_f("%s hit %s %s by %s.", pl->name,
-		      Describe_shot(mine->type, mine->obj_status,
-				    mine->mods, 1),
+		      Describe_shot(mine->type, mine->obj_status, mine->mods, 1),
 		      BIT(mine->obj_status, GRAVITY) ? "thrown " : "dropped ",
 		      kp->name);
     }
@@ -982,8 +902,7 @@ static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
 	}
 	Set_message_f("%s hit %s reprogrammed by %s.",
 		      pl->name,
-		      Describe_shot(mine->type, mine->obj_status,
-				    mine->mods, 1),
+		      Describe_shot(mine->type, mine->obj_status, mine->mods, 1),
 		      reprogrammer_name);
     }
     else {
@@ -1008,8 +927,7 @@ static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
 	 * for a low-scored-player hitting a high-scored-player's mine.
 	 * Maybe not.
 	 */
-	sc = Rate(kp->score, pl->score) * options.mineScoreMult;
-	Score_players(kp, sc, pl->name, pl, -sc, kp->name, false);
+	Handle_Scoring(SCORE_HIT_MINE,kp,pl,NULL);
     }
 }
 
@@ -1017,7 +935,7 @@ static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
 static void Player_collides_with_debris(player_t *pl, object_t *obj)
 {
     player_t *kp = NULL;
-    double cost, sc;
+    double cost;
     char msg[MSG_LEN];
 
     cost = collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
@@ -1038,15 +956,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 		sprintf(msg + strlen(msg), "  How strange!");
 	}
 	Set_message(msg);
-	if (!kp || kp->id == pl->id) {
-	    sc = Rate(0.0, pl->score)
-		* options.explosionKillScoreMult * options.selfKillScoreMult;
-	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, (kp == NULL) ? "[Explosion]" : pl->name);
-	} else {
-	    Rank_add_explosion_kill(kp);
-	    sc = Rate(kp->score, pl->score) * options.explosionKillScoreMult;
-	    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
-	}
+	Handle_Scoring(SCORE_EXPLOSION,kp,pl,NULL);
 	obj->life = 0.0;
 	return;
     }
@@ -1062,14 +972,12 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 {
     double v = VECTOR_LENGTH(ast->vel);
     double cost = collision_cost(ast->mass, v);
-    double sc;
 
     ast->life += ASTEROID_FUEL_HIT(ED_PL_CRASH, ast->wire_size);
     if (ast->life < 0.0)
 	ast->life = 0.0;
     if (ast->life == 0.0) {
-	sc = Rate(pl->score, ASTEROID_SCORE) * options.unownedKillScoreMult;
-	if (!options.zeroSumScoring) Score(pl, sc, ast->pos, "");
+    	Handle_Scoring(SCORE_ASTEROID_KILL,pl,NULL,(void *)ast);
     }
 
     if (!Player_uses_emergency_shield(pl))
@@ -1085,14 +993,10 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	    Set_message_f("%s smashed into an asteroid.", pl->name);
 	else
 	    Set_message_f("%s was hit by an asteroid.", pl->name);
-	sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
-	if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "[Asteroid]");
+	Handle_Scoring(SCORE_ASTEROID_DEATH,NULL,pl,NULL);
 	if (Player_is_tank(pl)) {
 	    player_t *owner_pl = Player_by_id(pl->lock.pl_id);
-
-	    sc = Rate(owner_pl->score, ASTEROID_SCORE)
-		* options.unownedKillScoreMult;
-	    if (!options.zeroSumScoring) Score(owner_pl, sc, ast->pos, "");
+	    Handle_Scoring(SCORE_ASTEROID_KILL,owner_pl,NULL,(void *)ast);
 	}
 	return;
     }
@@ -1113,7 +1017,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 {
     player_t *kp = NULL;
     cannon_t *cannon = NULL; 
-    double sc, drainfactor, drain;
+    double drainfactor, drain;
     world_t *world = pl->world;
 
     /*
@@ -1198,8 +1102,6 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	    Player_hit_armor(pl);
 
     } else {
-	double factor;
-
 	switch (obj->type) {
 	case OBJ_TORPEDO:
 	case OBJ_SMART_SHOT:
@@ -1211,27 +1113,10 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 
 		sound_play_sensors(pl->pos, PLAYER_HIT_CANNONFIRE_SOUND);
 		Set_message_f("%s was hit by cannonfire.", pl->name);
-
-		/*KHS: for cannon dodgers; cannon hit substracts*/
-		/* fixed percentage of score */		
-
-	        if (options.survivalScore != 0.0)
-		    sc = pl->score * 0.02; 
-		else
-		    if (cannon != NULL)
-			sc = Rate(cannon->score, pl->score)
-			    * options.cannonKillScoreMult;
-		    else {
-			assert(obj->id == NO_ID);
-			sc = Rate(UNOWNED_SCORE, pl->score)
-			    * options.cannonKillScoreMult;
-		    }
-
 	    } else if (obj->id == NO_ID) {
 		Set_message_f("%s was killed by %s.", pl->name,
 			      Describe_shot(obj->type, obj->obj_status,
 					    obj->mods, 1));
-		sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
 	    } else {
 		kp = Player_by_id(obj->id);
 		Set_message_f("%s was killed by %s from %s.%s", pl->name,
@@ -1241,48 +1126,18 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 			      kp->id == pl->id ? "  How strange!" : "");
 		if (kp->id == pl->id) {
 		    sound_play_sensors(pl->pos, PLAYER_SHOT_THEMSELF_SOUND);
-		    sc = Rate(0.0, pl->score) * options.selfKillScoreMult;
-		} else {
-		    Rank_add_shot_kill(kp);
-		    sc = Rate(kp->score, pl->score);
 		}
 	    }
+    	    
+	    Handle_Scoring(SCORE_SHOT_DEATH,kp,pl,(void *)obj);
 
-	    switch (obj->type) {
-	    case OBJ_SHOT:
-		if (Mods_get(obj->mods, ModsCluster))
-		    factor = options.clusterKillScoreMult;
-		else
-		    factor = options.shotKillScoreMult;
-		break;
-	    case OBJ_TORPEDO:
-		factor = options.torpedoKillScoreMult;
-		break;
-	    case OBJ_SMART_SHOT:
-		factor = options.smartKillScoreMult;
-		break;
-	    case OBJ_HEAT_SHOT:
-		factor = options.heatKillScoreMult;
-		break;
-	    default:
-		factor = options.shotKillScoreMult;
-		break;
-	    }
-
-	    sc *= factor;
-	    if (BIT(obj->obj_status, FROMCANNON)) {
-		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Cannon");
-	    } else if (obj->id == NO_ID || kp->id == pl->id) {
-		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
-	    } else {
-		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
+	    if ((!BIT(obj->obj_status, FROMCANNON)) && (!(obj->id == NO_ID || kp->id == pl->id))) {
 		Robot_war(pl, kp);
 	    }
 
 	    /* survival */
-	    if (options.survivalScore != 0.0
-		&& (pl->survival_time > 10 
-		    || pl->survival_time > Rank_get_max_survival_time(pl))) {
+	    if (options.survivalScore != 0.0 && (pl->survival_time > 10 
+    	    	|| pl->survival_time > Rank_get_max_survival_time(pl))) {
 
 		Set_message_f(" < %s has survived %.1f seconds (%.1f)>",
 			      pl->name, 
@@ -1449,10 +1304,7 @@ static void AsteroidCollision(world_t *world)
 					? BALL_PTR(obj)->ball_owner
 					: obj->id);
 			player_t *pl = Player_by_id(owner_id);
-			double sc = Rate(pl->score, ASTEROID_SCORE)
-			    * options.unownedKillScoreMult;
-
-			if (!options.zeroSumScoring) Score(pl, sc, ast->pos, "");
+			Handle_Scoring(SCORE_ASTEROID_KILL,pl,NULL,(void *)ast);
 		    }
 
 		    /* break; */

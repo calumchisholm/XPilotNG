@@ -835,11 +835,7 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 		  8.0, 68.0);
 
     if (pl) {
-	double sc = Rate(pl->score, c->score) * options.cannonKillScoreMult;
-
-	if (BIT(world->rules->mode, TEAM_PLAY) && pl->team == c->team)
-	    sc = -sc;
-	if (!options.zeroSumScoring) Score(pl, sc, c->pos, "");
+    	Handle_Scoring(SCORE_CANNON_KILL,pl,NULL,c);
     }
 }
 

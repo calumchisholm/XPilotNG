@@ -829,7 +829,7 @@ static option_desc opts[] = {
     {
 	"playerWallBounceType",
 	"wallBounceType",
-	"2",
+	"3",
 	&options.playerWallBounceType,
 	valInt,
 	tuner_playerwallbouncetype,

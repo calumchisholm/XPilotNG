@@ -99,9 +99,9 @@ static int Kick_robot_players(world_t *world, int team)
 
 		if (!Player_is_robot(pl_i) || pl_i->team == options.robotTeam)
 		    continue;
-		if (pl_i->score < low_score) {
+		if (Get_Score(pl_i) < low_score) {
 		    low_pl = pl_i;
-		    low_score = pl_i->score;
+		    low_score = Get_Score(pl_i);
 		}
 	    }
 	    if (low_pl) {
@@ -125,9 +125,9 @@ static int Kick_robot_players(world_t *world, int team)
 
 		if (!Player_is_robot(pl_i) || pl_i->team != team)
 		    continue;
-		if (pl_i->score < low_score) {
+		if (Get_Score(pl_i) < low_score) {
 		    low_pl = pl_i;
-		    low_score = pl_i->score;
+		    low_score = Get_Score(pl_i);
 		}
 	    }
 	    if (low_pl) {
