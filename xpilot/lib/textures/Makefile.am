@@ -31,6 +31,7 @@ xpilottextures_DATA = \
 	mine_other.ppm \
 	mine_team.ppm \
 	minus.ppm \
+	missile.ppm \
 	moon.ppm \
 	paused.ppm \
 	plus.ppm \
