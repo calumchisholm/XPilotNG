@@ -568,8 +568,6 @@ extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern byte	lose_item;		/* flag and index to drop item */
 extern int	lose_item_active;	/* one of the lose keys is pressed */
 
-extern bool	autoServerMotdPopup;
-
 #ifdef SOUND
 extern char 	sounds[PATH_MAX];	/* audio mappings */
 extern char 	audioServer[PATH_MAX];	/* audio server */

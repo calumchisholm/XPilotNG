@@ -105,7 +105,6 @@ extern void Scale_dashes(void);
 #ifdef _WINDOWS
 extern int Credits_callback(int, void *, const char **);
 #endif
-extern int Startup_server_motd(void);
 
 #endif
 

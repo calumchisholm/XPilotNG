@@ -52,7 +52,7 @@ static bool Set_nickName(xp_option_t *opt, const char *value)
     if (connectParam.nick_name[0] < 'A' || connectParam.nick_name[0] > 'Z') {
 	warn("Your player name \"%s\" should start with an uppercase letter.",
 	     connectParam.nick_name);
-	exit(1);
+	connectParam.nick_name[0] = 'X';
     }
 
     if (Check_nick_name(connectParam.nick_name) == NAME_ERROR) {
@@ -1113,14 +1113,6 @@ xp_option_t default_options[] = {
 	Set_autoShield,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Are shields lowered automatically for weapon fire?\n"),
-
-    XP_BOOL_OPTION(
-	"autoServerMotdPopup",
-	false,
-	&autoServerMotdPopup,
-	NULL,
-	XP_OPTFLAG_DEFAULT,
-	"Automatically popup the MOTD of the server on startup.\n"),
 
     XP_DOUBLE_OPTION(
 	"fuelNotify",

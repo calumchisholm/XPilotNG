@@ -592,21 +592,9 @@ int Handle_motd(long off, char *buf, int len, long filesize)
     return 0;
 }
 
-int Startup_server_motd(void)
-{
-    if (autoServerMotdPopup) {
-	motd_auto_popup = true;
-	return Net_ask_for_motd(0, MAX_MOTD_SIZE);
-    }
-    return 0;
-}
-
 void aboutCleanup(void)
 {
-    if (motd_buf) {
-	free(motd_buf);
-	motd_buf = NULL;
-    }
+    XFREE(motd_buf);
 }
 
 #ifdef _WINDOWS

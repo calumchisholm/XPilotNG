@@ -28,7 +28,6 @@
 
 /* kps - move to some header */
 extern int Bitmap_add(char *filename, int count, bool scalable);
-extern int Startup_server_motd(void);
 
 char client_version[] = VERSION;
 
@@ -157,8 +156,6 @@ int	lose_item_active;	/* one of the lose keys is pressed */
 
 double	scaleFactor;
 double	scaleFactor_s;
-
-bool	autoServerMotdPopup;
 
 #ifdef SOUND
 char 	sounds[PATH_MAX];	/* audio mappings */
@@ -2219,19 +2216,19 @@ int Client_fps_request(void)
 
 int Client_power(void)
 {
-    int		i;
+    int i;
 
     if (Send_power(power) == -1
 	|| Send_power_s(power_s) == -1
 	|| Send_turnspeed(turnspeed) == -1
 	|| Send_turnspeed_s(turnspeed_s) == -1
 	|| Send_turnresistance(turnresistance) == -1
-	|| Send_turnresistance_s(turnresistance_s) == -1
-	|| Startup_server_motd() == -1) {
+	|| Send_turnresistance_s(turnresistance_s) == -1)
 	return -1;
-    }
+
     if (Check_view_dimensions() == -1) 
 	return -1;
+
     for (i = 0; i < NUM_MODBANKS; i++) {
 	if (Send_modifier_bank(i) == -1)
 	    return -1;
