@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT(XPilot, 4.5.4X2, ksoderbl@cc.hut.fi, xpilot)
+AC_INIT(XPilot, 4.5.4X2, kps@users.sourceforge.net, xpilot)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
 AM_INIT_AUTOMAKE
@@ -10,9 +10,9 @@ AM_CONFIG_HEADER(config.h)
 dnl AC_CANONICAL_HOST
 
 dnl  Copyright & stuff.
-AC_SUBST([XP_AUTHORS],["Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
+AC_SUBST([XP_AUTHORS],["Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
 AC_SUBST([XP_COPYRIGHTDATE],["1991-2003"])
-AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2003 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
+AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2003 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
 AC_SUBST([XP_RELEASEDATE],["Sep 4, 2003"])
 AC_SUBST([XP_INSTLIBDIR],$prefix/lib/xpilot)
 AC_SUBST([XP_TITLE],["XPilot 4.5.4X2"])
