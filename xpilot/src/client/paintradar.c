@@ -599,7 +599,9 @@ static void Paint_world_radar_old(void)
 		      AllPlanes & ~(dpl_2[0] | dpl_2[1]));
 
     for (i = 0;; i++) {
-	int dead_time, targ_damage;
+	int dead_time;
+	double targ_damage;
+
 	if (Target_by_index(i, &xi, &yi, &dead_time, &targ_damage) == -1)
 	    break;
 	if (dead_time)

@@ -275,7 +275,7 @@ double Fuel_by_pos(int x, int y)
     return fuelp->fuel;
 }
 
-int Target_by_index(int ind, int *xp, int *yp, int *dead_time, int *damage)
+int Target_by_index(int ind, int *xp, int *yp, int *dead_time, double *damage)
 {
     if (ind < 0 || ind >= num_targets)
 	return -1;
@@ -286,7 +286,7 @@ int Target_by_index(int ind, int *xp, int *yp, int *dead_time, int *damage)
     return 0;
 }
 
-int Target_alive(int x, int y, int *damage)
+int Target_alive(int x, int y, double *damage)
 {
     int 		i, lo, hi, pos;
 
@@ -358,17 +358,16 @@ int Handle_cannon(int ind, int dead_time)
     return 0;
 }
 
-int Handle_target(int num, int dead_time, int damage)
+int Handle_target(int num, int dead_time, double damage)
 {
     if (num < 0 || num >= num_targets) {
 	warn("Bad target index (%d)", num);
 	return 0;
     }
     if (dead_time == 0
-	&& (damage < 1
-	|| damage > TARGET_DAMAGE)) {
-	warn("BUG target %d, dead %d, damage %d", num, dead_time, damage);
-    }
+	&& (damage <= 0.0 || damage > TARGET_DAMAGE))
+	warn("BUG target %d, dead %d, damage %f", num, dead_time, damage);
+
     if (targets[num].dead_time > 0 && dead_time == 0) {
 	int pos = targets[num].pos;
 	Radar_show_target(pos / Setup->y, pos % Setup->y);

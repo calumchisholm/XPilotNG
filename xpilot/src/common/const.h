@@ -134,7 +134,7 @@ extern double		tbl_cos[];
 				    * BLOCK_SZ))
 #else
 #define MAX_STATION_FUEL	500.0
-#define TARGET_DAMAGE		(250<<8)
+#define TARGET_DAMAGE		250.0
 #endif
 
 /*

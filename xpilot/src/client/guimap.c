@@ -1036,7 +1036,7 @@ void Gui_paint_decor_dot(int x, int y, int size)
 }
 
 
-void Gui_paint_setup_target(int x, int y, int team, int damage, bool own)
+void Gui_paint_setup_target(int x, int y, int team, double damage, bool own)
 {
     int	    size, a1, a2, b1, b2, color;
     char    s[2];

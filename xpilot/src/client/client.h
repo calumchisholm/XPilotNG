@@ -205,7 +205,7 @@ typedef struct {
 typedef struct {
     int		pos;		/* Block index */
     short	dead_time;	/* Frames inactive */
-    unsigned short	damage;		/* Damage to target */
+    double	damage;		/* Damage to target */
 } target_t;
 
 typedef struct {
@@ -593,12 +593,12 @@ extern long		time_left;
 
 
 double Fuel_by_pos(int x, int y);
-int Target_alive(int x, int y, int *damage);
-int Target_by_index(int ind, int *xp, int *yp, int *dead_time, int *damage);
+int Target_alive(int x, int y, double *damage);
+int Target_by_index(int ind, int *xp, int *yp, int *dead_time, double *damage);
 int Handle_fuel(int ind, double fuel);
 int Cannon_dead_time_by_pos(int x, int y, int *dot);
 int Handle_cannon(int ind, int dead_time);
-int Handle_target(int num, int dead_time, int damage);
+int Handle_target(int num, int dead_time, double damage);
 int Base_info_by_pos(int x, int y, int *id, int *team);
 int Handle_base(int id, int ind);
 int Check_pos_by_index(int ind, int *xp, int *yp);

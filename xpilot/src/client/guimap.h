@@ -46,7 +46,7 @@ void Gui_paint_setup_worm(int x, int y, int wormDrawCount);
 void Gui_paint_setup_item_concentrator(int x, int y);
 void Gui_paint_setup_asteroid_concentrator(int x, int y);
 void Gui_paint_decor_dot(int x, int y, int size);
-void Gui_paint_setup_target(int x, int y, int team, int damage, bool own);
+void Gui_paint_setup_target(int x, int y, int team, double damage, bool own);
 void Gui_paint_setup_treasure(int x, int y, int team, bool own);
 
 void Gui_paint_walls(int x, int y, int type);

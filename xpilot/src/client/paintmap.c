@@ -477,7 +477,8 @@ void Paint_world(void)
 		case SETUP_TARGET+8:
 		case SETUP_TARGET+9:
 		    {
-			int damage, team, own;
+			int team, own;
+			double damage;
 
 			if (Target_alive(xi, yi, &damage) != 0)
 			    break;

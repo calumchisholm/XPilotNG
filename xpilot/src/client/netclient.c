@@ -2129,7 +2129,7 @@ int Receive_target(void)
     if ((n = Packet_scanf(&rbuf, "%c%hu%hu%hu", &ch,
 			  &num, &dead_time, &damage)) <= 0)
 	return n;
-    if ((n = Handle_target(num, dead_time, damage)) == -1)
+    if ((n = Handle_target(num, dead_time, (double)damage / 256.0)) == -1)
 	return -1;
     if (wbuf.len < MAX_MAP_ACK_LEN)
 	Packet_printf(&wbuf, "%c%ld%hu", PKT_ACK_TARGET, last_loops, num);
