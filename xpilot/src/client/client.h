@@ -632,7 +632,7 @@ extern bool roundend;
 extern bool played_this_round;
 
 /* event.c */
-void Pointer_control_set_state(int on);
+void Pointer_control_set_state(bool on);
 int Key_init(void);
 int Key_update(void);
 bool Key_press(keys_t key);
@@ -642,8 +642,8 @@ bool Key_press_swap_scalefactor(void);
 bool Key_press_talk(void);
 bool Key_press_toggle_radar_score(void);
 bool Key_press_toggle_record(void);
-void Set_auto_shield(int on);
-void Set_toggle_shield(int on);
+void Set_auto_shield(bool on);
+void Set_toggle_shield(bool on);
 void Talk_set_state(bool on);
 
 int Alloc_msgs(void);

@@ -86,7 +86,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     return (ret);
 }
 
-void Pointer_control_set_state(int on)
+void Pointer_control_set_state(bool on)
 {
     if (on) {
 	pointerControl = true;
