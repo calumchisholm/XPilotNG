@@ -1,3 +1,5 @@
+# Requires python 2.0
+
 removedopts = ['extraborder', 'edgebounce', "maxshieldedplayerwallbounceangle",
 "maxshieldedbounceangle", "maxunshieldedplayerwallbounceangle",
 "maxunshieldedbounceangle", "scoretablefilename", "scoretable", 'teamassign',
@@ -43,7 +45,6 @@ def center(coord, size):
     return ((coord + size / 2) % size - size / 2)
 
 dirs = ((1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1))
-SPACE = ' .'  # More need to be added here for the algorithm to work correctly
 FILLED = 'x#' # Consider fuel stations as a filled block
 REC_LU = 's'
 REC_RU = 'a'
@@ -120,10 +121,52 @@ class Map:
 class Struct:
     pass
 
+def polydir(poly):
+    xd, yd = poly[-1][2]
+    wind = 0
+    for point in poly:
+	if (yd >= 0) ^ (point[2][1] >= 0):
+	    side = xd * point[2][1] - point[2][0] * yd
+	    if side != 0:
+		if side > 0:
+		    wind += 1
+		else:
+		    wind -= 1
+	xd, yd = point[2]
+    return wind / 2
+
+def dist2(x1, y1, x2, y2, width, height):
+    x = (x1 - x2 + (width >> 1)) % width - (width >> 1)
+    y = (y1 - y2 + (height >> 1)) % height - (height >> 1)
+    return 1. * x * x + 1. * y * y
+
+# Only for polygons converted from blocks and going in the right direction.
+def inside(x, y, poly, width, height):
+    lastdir = 0
+    mindist = width
+    mindir = -1
+    count = 0
+    for p in poly:
+	if p[1] == y and (p[0] - x) % width < mindist:
+	    mindir = lastdir
+	    mindist = (p[0] - x) % width
+	lastdir = p[2][1] or lastdir
+    mindir = mindir or lastdir
+    return mindir > 0
+
 def convert(options):
     height = int(options['mapheight'])
     width = int(options['mapwidth'])
-    map = Map(options['mapdata'].splitlines(), width, height)
+    map = options['mapdata'].splitlines()
+    if options.get('edgewrap') not in ['yes', 'on', 'true']: #default off
+	height += 2
+	width += 2
+	map = [' ' + line + ' ' for line in map]
+	map = [' ' * width] + map + [' ' * width]
+	options['mapwidth'] = `width`
+	options['mapheight'] = `height`
+	options['mapdata'] = "\n".join(map)+'\n'
+    map = Map(map, width, height)
     done = Map([[0] * width for i in range(height)], width, height)
     bases = []
     balls = []
@@ -160,20 +203,23 @@ def convert(options):
 	else:
 	    continue
 	l = startloc.copy()
+	startdir = dir
 	poly = []
 	while 1:
-	    poly.append((l.x, l.y, dir))
+	    poly.append((l.x, l.y, dirs[dir]))
 	    if dir in [6, 7]:
 		done[l] = 1
 	    elif dir == 5:
-		done[l.l()] =1
+		done[l.l()] = 1
 	    l.godir(dir)
-	    if l == startloc:
-		break
 	    dir = (dir + 3) % 8
 	    while map.d(l, dir):
 		dir = (dir - 1) % 8
+	    if l == startloc and dir == startdir:
+		break
 	polys.append(poly)
+    mxc = BCLICKS * width
+    myc = BCLICKS * height
     for bl in balls:
 	maxd = 30000 * 30000
 	for bs in bases:
@@ -182,22 +228,98 @@ def convert(options):
 		bl.team = bs.team
     polys2 = []
     for p in polys:
-	polys2.append([[q[0] * BCLICKS, q[1] * BCLICKS] for q in p])
-
+	polys2.append([[q[0] * BCLICKS, q[1] * BCLICKS, q[2]] for q in p])
     # Invert the map vertically.
     for p in polys2:
 	for p2 in p:
 	    if p2[1]:  # Keep 0 at 0, don't move to maxheight + 1 !
 		p2[1] = height * BCLICKS - p2[1]
-
-    mxc = BCLICKS * width
-    myc = BCLICKS * height
+		p2[2] = (p2[2][0], -p2[2][1])
+    neglist = []
+    poslist = [] 
+    for p in polys2:
+	if polydir(p) > 0:
+	    poslist.append(p)
+	else:
+	    neglist.append(p)
+    totlist = neglist + poslist
+    negcount = len(neglist)
+    poscount = len(poslist)
+    totcount = len(totlist)
+    cdict = [{} for i in range(totcount)]
+    clist = [[] for i in range(totcount)]
+    for i in range(negcount):
+	closest = 0
+	for j in range(negcount, negcount + poscount):
+	    if closest and cdict[j].has_key(closest):
+		continue
+	    if inside(neglist[i][0][0], neglist[i][0][1], totlist[j], mxc, myc):
+		if not closest or cdict[closest].has_key(j):
+		    closest = j
+		else:
+		    if inside(totlist[closest][0][0], totlist[closest][0][1], totlist[j], mxc, myc):
+			cdict[j][closest] = 1
+		    else:
+			cdict[closest][j] = 1
+			closest = j
+	if closest:
+	    clist[closest].append(i)
+    reslist = []
+    for i in range(negcount, totcount):
+	if not clist[i]:
+	    reslist.append(totlist[i])
+	    continue
+	dist = [(1e98, 0, 0)] * len(clist[i])
+	count = len(clist[i])
+	res = totlist[i]
+	offset = 0
+	last = i
+	while count > 0:
+	    for j in range(len(clist[i])):
+		if clist[i][j] < 0:
+		    continue
+		r = totlist[clist[i][j]]
+		mindist = dist[j][0]
+		for k in range(len(totlist[last])):
+		    x = totlist[last][k][0]
+		    y = totlist[last][k][1]
+		    for l in range(len(r)):
+			d = dist2(r[l][0], r[l][1], x, y, mxc, myc)
+			if d < mindist:
+			    mindist = d
+			    dist[j] = (mindist, k + offset, l)
+	    mindist = 1e99
+	    mink = -2.1
+	    for k in range(len(clist[i])):
+		if clist[i][k] < 0:
+		    continue
+		if dist[k][0] < mindist:
+		    mink = k
+		    mindist = dist[k][0]
+	    r = totlist[clist[i][mink]]
+	    r = r[dist[mink][2]:] + r[:dist[mink][2]+1]
+	    totlist[clist[i][mink]] = r
+	    o = dist[mink][1]
+	    offset = o + 1
+	    res = res[:o + 1] + r + res[o:]
+	    last = clist[i][mink]
+	    clist[i][mink] = -1
+	    count -= 1
+	    for k in range(len(clist[i])):
+		if clist[i][k] < 0:
+		    continue
+		if dist[k][1] > o:
+		    dist[k] = (dist[k][0], dist[k][1] + len(r) + 1, dist[k][2])
+	reslist.append(res)
+    polys2 = reslist
+		    
     # This part just for Bloods
     from math import sin
     for p in polys2:
 	for l in p:
-	    l[0] = int(l[0] + sin(1. * l[0] * l[1] / 2786) * (2240 / 3)) % mxc
-	    l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
+	    pass
+#	    l[0] = int(l[0] + sin(1. * l[0] * l[1] / 2786) * (2240 / 3)) % mxc
+#	    l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
 
     print "<XPilotMap>"
 
@@ -219,12 +341,12 @@ def convert(options):
     print '</GeneralOptions>'
 
     for p in polys2:
-	print '<Polygon x="%d" y="%d">' % tuple(p[0])
+	print '<Polygon x="%d" y="%d">' % tuple(p[0][:2])
 	x = p[0][0]
 	y = p[0][1]
 	for c in p[1:]:
 	    print '<Offset x="%d" y="%d"/>' % (center(c[0] - x, mxc), center(c[1] - y, myc))
-	    x, y = c
+	    x, y = c[:2]
 	print "</Polygon>"
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y)
