@@ -51,7 +51,7 @@
 
 int sock_closeRec(sock_t *sock)
 {
-    return 0;  /* no recording code checks this value */
+    return sock_close(sock); /* no recording code checks this value */
 }
 
 

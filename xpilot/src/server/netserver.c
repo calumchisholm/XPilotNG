@@ -584,7 +584,6 @@ void Destroy_connection(int ind, const char *reason)
     Sockbuf_cleanup(&connp->w);
     Sockbuf_cleanup(&connp->r);
     Sockbuf_cleanup(&connp->c);
-    memset(connp, 0, sizeof(*connp));
 
     num_logouts++;
 
@@ -593,6 +592,7 @@ void Destroy_connection(int ind, const char *reason)
 	sock_writeRec(sock, pkt, len);
     }
     sock_closeRec(sock);
+    memset(connp, 0, sizeof(*connp));
 }
 
 
