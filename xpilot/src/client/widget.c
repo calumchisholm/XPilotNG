@@ -1123,17 +1123,22 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 		LIMIT(cval, colorw->min, colorw->max);
 		if (cval != *colorw->val) {
 		    *colorw->val = cval; 
- 
-		    Widget_draw(sub_widget_desc);
-  		}
+ 		    Widget_draw(sub_widget_desc);
+		    if (colorw->callback) {
+			if ((*colorw->callback)(sub_widget_desc,
+						colorw->user_data,
+						colorw->val) == 1)
+			    Widget_draw(sub_widget_desc);
+		    }
 #ifdef _WINDOWS
- 		{
-		    widget_t* widget = Widget_pointer(sub_widget_desc);
-		    WinXFlush(widget->window);
-		    widget = Widget_pointer(widget_desc);
-		    WinXFlush(widget->window);
- 		}
+		    {
+			widget_t* widget = Widget_pointer(sub_widget_desc);
+			WinXFlush(widget->window);
+			widget = Widget_pointer(widget_desc);
+			WinXFlush(widget->window);
+		    }
 #endif
+		}
 		break;
 
 	    case WIDGET_INPUT_DOUBLE:
