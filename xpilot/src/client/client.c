@@ -55,8 +55,6 @@
 
 char client_version[] = VERSION;
 
-#define MAX_CHECKPOINT	26
-
 char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
 int			scoresChanged = 0;
@@ -170,19 +168,20 @@ static other_t		*Others = 0;
 static int		num_others = 0,
 			max_others = 0;
 
-fuelstation_t	*fuels = 0;
-int		num_fuels = 0;
+fuelstation_t *fuels = 0;
+int	      num_fuels = 0;
 
-homebase_t	*bases = 0;
-int		num_bases = 0;
+homebase_t    *bases = 0;
+int	      num_bases = 0;
+
+checkpoint_t  *checks = 0;
+int           num_checks = 0;
 
 static cannontime_t	*cannons = 0;
 static int		num_cannons = 0;
 
 static target_t		*targets = 0;
 static int		num_targets = 0;
-
-static checkpoint_t	checks[MAX_CHECKPOINT];
 
 score_object_t		score_objects[MAX_SCORE_OBJECTS];
 int			score_object = 0;
@@ -407,7 +406,7 @@ int Handle_base(int id, int ind)
 
 int Check_pos_by_index(int ind, int *xp, int *yp)
 {
-    if (ind < 0 || ind >= MAX_CHECKPOINT) {
+    if (ind < 0 || ind >= num_checks) {
 	errno = 0;
 	error("Bad checkpoint index (%d)", ind);
 	*xp = 0;
@@ -424,7 +423,7 @@ int Check_index_by_pos(int x, int y)
     int			i, pos;
 
     pos = x * Setup->y + y;
-    for (i = 0; i < MAX_CHECKPOINT; i++) {
+    for (i = 0; i < num_checks; i++) {
 	if (pos == checks[i].pos) {
 	    return i;
 	}
@@ -898,7 +897,7 @@ static int Map_init(void)
 	}
 	num_cannons = 0;
     }
-    for (i = 0; i < MAX_CHECKPOINT; i++) {
+    for (i = 0; i < num_checks; i++) {
 	types[SETUP_CHECK + i] = 5;
     }
     for (i = 0; i < max; i++) {
@@ -1191,7 +1190,7 @@ int Handle_timing(int id, int check, int round)
 	|| other->round != round) {
 	other->check = check;
 	other->round = round;
-	other->timing = round * MAX_CHECKS + check;
+	other->timing = round * num_checks + check;
 	other->timing_loops = last_loops;
 	scoresChanged = 1;
     }

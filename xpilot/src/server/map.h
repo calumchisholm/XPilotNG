@@ -222,7 +222,7 @@ typedef struct {
     int		NumCannons;
     cannon_t	*cannon;
     int		NumChecks;
-    ipos	check[MAX_CHECKS];
+    ipos	*check;
     int		NumWormholes;
     wormhole_t	*wormHoles;
     int		NumTreasures;

@@ -412,8 +412,11 @@ int Net_setup(void)
 	}
     }
 
-    if (Setup->map_order != SETUP_MAP_XY_WITH_LINES)
+    if (Setup->map_order != SETUP_MAP_XY_WITH_LINES) {
 	oldServer = 1;
+	num_checks = 26; /* even if there really aren't any */
+	checks = malloc(num_checks * sizeof(checkpoint_t));
+    }
     else {
 	int i, j, startx, starty;
 	int polyc;
@@ -516,6 +519,26 @@ int Net_setup(void)
             fuels[i].bounds.y = cy - BLOCK_SZ / 2;
             fuels[i].bounds.w = BLOCK_SZ;
             fuels[i].bounds.h = BLOCK_SZ;
+	}
+	num_checks = *ptr++;
+	if (num_checks != 0) {
+#if 0
+	    checks = malloc(num_checks * sizeof(checkpoint_t));
+	    if (checks == NULL) {
+		error("No memory for checkpoints (%d)", num_checks);
+		exit(1);
+	    }
+#else
+	    error("Checkpoint drawing not implemented yet");
+	    exit(1);
+#endif
+	}
+	for (i = 0; i < num_checks; i++) {
+	    cx = *ptr++ << 8;
+	    cx += (unsigned char)*ptr++;
+	    cy = *ptr++ << 8;
+	    cy += (unsigned char)*ptr++;
+	    /* SET APPROPRIATE COORDS/BOUNDS HERE */
 	}
     }
 
@@ -2224,8 +2247,8 @@ int Receive_timing(void)
     if (n <= 0) {
 	return n;
     }
-    check = timing % MAX_CHECKS;
-    round = timing / MAX_CHECKS;
+    check = timing % num_checks;
+    round = timing / num_checks;
     if ((n = Handle_timing(id, check, round)) == -1) {
 	return -1;
     }

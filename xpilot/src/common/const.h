@@ -194,8 +194,7 @@ extern DFLOAT		tbl_cos[];
 
 #define MAX_OBSERVERS   8
 
-/* Do NOT change these! */
-#define MAX_CHECKS		26
+/* Do NOT change this! */
 #define MAX_TEAMS		10
 
 #define PSEUDO_TEAM(i,j)\

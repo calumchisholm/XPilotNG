@@ -305,9 +305,6 @@ void Grok_map(void)
 	case 'c':
 	    World.NumCannons++;
 	    break;
-	case '#':
-	    World.NumFuels++;
-	    break;
 	case '!':
 	    World.NumTargets++;
 	    break;
@@ -328,14 +325,6 @@ void Grok_map(void)
 	case '(':
 	case ')':
 	    World.NumWormholes++;
-	    break;
-	case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-	case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
-	case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
-	case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
-	case 'Y': case 'Z':
-	    if (BIT(World.rules->mode, TIMING))
-		World.NumChecks++;
 	    break;
 	default:
 	    break;
@@ -380,7 +369,6 @@ void Grok_map(void)
     }
 
     World.NumCannons = 0;		/* Now reset all counters since */
-    World.NumFuels = 0;			/* we will recount everything */
     World.NumGravs = 0;			/* (and reuse these counters) */
     World.NumWormholes = 0;		/* while inserting the objects */
                        ;		/* into structures. */
@@ -492,10 +480,6 @@ void Grok_map(void)
 		    World.NumCannons++;
 		    break;
 
-		case '*':
-		    line[y] = TREASURE;
-		    itemID[y] = World.NumTreasures;
-		    break;
 		case '!':
 		    line[y] = TARGET;
 		    itemID[y] = World.NumTargets;
@@ -522,20 +506,6 @@ void Grok_map(void)
 		    break;
 		case '$':
 		    line[y] = BASE_ATTRACTOR;
-		    break;
-		case '_':
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-		    line[y] = BASE;
-		    itemID[y] = World.NumBases;
 		    break;
 
 		case '+':
@@ -625,20 +595,6 @@ void Grok_map(void)
 		    line[y] = WORMHOLE;
 		    itemID[y] = World.NumWormholes;
 		    World.NumWormholes++;
-		    break;
-
-		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-		case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
-		case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
-		case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
-		case 'Y': case 'Z':
-		    if (BIT(World.rules->mode, TIMING)) {
-			World.check[c-'A'].x = x * BLOCK_CLICKS + BLOCK_CLICKS / 2;
-			World.check[c-'A'].y = y * BLOCK_CLICKS + BLOCK_CLICKS / 2;
-			line[y] = CHECK;
-		    } else {
-			line[y] = SPACE;
-		    }
 		    break;
 
 		case 'b':

@@ -327,6 +327,8 @@ extern int		num_fuels;
 extern homebase_t	*bases;
 extern int		num_bases;
 
+extern checkpoint_t     *checks;
+extern int              num_checks;
 
 int Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);

@@ -1577,7 +1577,7 @@ int Send_timing(int ind, int id, int check, int round)
 	return 0;
     }
     return Packet_printf(&connp->c, "%c%hd%hu", PKT_TIMING,
-			 id, round * MAX_CHECKS + check);
+			 id, round * World.NumChecks + check);
 }
 
 /*

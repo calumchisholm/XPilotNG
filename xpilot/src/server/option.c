@@ -236,6 +236,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	World.NumBases = 0;
 	World.NumTreasures = 0;
 	World.NumFuels = 0;
+	World.NumChecks = 0;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "bases"))
 		World.NumBases = atoi(*(attr + 1));
@@ -243,6 +244,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 		World.NumTreasures = atoi(*(attr + 1));
 	    else if (!strcasecmp(*attr, "fuels"))
 		World.NumFuels = atoi(*(attr + 1));
+	    else if (!strcasecmp(*attr, "checks"))
+		World.NumChecks = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	if (World.NumBases > 0) {
@@ -259,11 +262,35 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    exit(-1);
 	}
 	if (World.NumFuels > 0
-	    && (World.fuel = (fuel_t *)
-		malloc(World.NumFuels * sizeof(fuel_t))) == NULL) {
+	    && (World.fuel = malloc(World.NumFuels * sizeof(fuel_t))) ==NULL) {
 	    error("Out of memory - fuel depots");
 	    exit(-1);
 	}
+	if (World.NumChecks > 0
+	    && (World.check = malloc(World.NumChecks * sizeof(ipos))) ==NULL) {
+	    error("Out of memory - checkpoints");
+	    exit(-1);
+	}
+    }
+
+    if (!strcasecmp(el, "Check")) {
+	static int checknum;
+	int x, y;
+
+	if (checknum > World.NumChecks) {
+	    error("Given checkpoint count incorrect (too small).\n");
+	    exit(1);
+	}
+	while (*attr) {
+	    if (!strcasecmp(*attr, "x"))
+		x = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "y"))
+		y = atoi(*(attr + 1));
+	    attr += 2;
+	}
+	World.check[checknum].x = x;
+	World.check[checknum].y = y;
+	checknum++;
     }
 
     if (!strcasecmp(el, "Fuel")) {

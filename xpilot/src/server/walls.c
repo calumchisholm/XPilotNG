@@ -1338,6 +1338,13 @@ int Polys_to_client(char *ptr)
 	*ptr++ = World.fuel[i].clk_pos.y >> CLICK_SHIFT + 8;
 	*ptr++ = World.fuel[i].clk_pos.y >> CLICK_SHIFT & 0xff;
     }
+    *ptr++ = World.NumChecks;
+    for (i = 0; i < World.NumChecks; i++) {
+	*ptr++ = World.check[i].x >> CLICK_SHIFT + 8;
+	*ptr++ = World.check[i].x >> CLICK_SHIFT & 0xff;
+	*ptr++ = World.check[i].y >> CLICK_SHIFT + 8;
+	*ptr++ = World.check[i].y >> CLICK_SHIFT & 0xff;
+    }
     return ptr - start;
 }
 
