@@ -55,7 +55,7 @@ typedef struct {
  */
 
 typedef struct {
-    int		width, height;
+    unsigned	width, height;
     int		count;
     RGB_COLOR	**data;
 

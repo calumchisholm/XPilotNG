@@ -27,9 +27,9 @@ char net_version[] = VERSION;
 
 int last_packet_of_frame;
 
-int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, int size, int state)
+int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, size_t size, int state)
 {
-    if ((sbuf->buf = sbuf->ptr = (char *) malloc(size)) == NULL)
+    if ((sbuf->buf = sbuf->ptr = malloc(size)) == NULL)
 	return -1;
 
     if (sock != (sock_t *) NULL)

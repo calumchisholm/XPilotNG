@@ -58,7 +58,7 @@ static const char	*gray_defaults[MAX_COLORS] = {
 
 char		visualName[MAX_VISUAL_NAME];
 Visual		*visual;
-int		dispDepth;
+unsigned	dispDepth;
 bool		colorSwitch;
 bool		multibuffer;
 bool		fullColor;	/* Whether to try using colors as close to

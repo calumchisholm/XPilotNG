@@ -164,8 +164,8 @@ int Bitmap_create(Drawable d, int img)
 
     for (j = 0; j < ABS(pix->count); j++) {
 	if (pix->scalable) {
-	    pix->width = WINSCALE(pix->picture.width);
-	    pix->height = WINSCALE(pix->picture.height);
+	    pix->width = UWINSCALE(pix->picture.width);
+	    pix->height = UWINSCALE(pix->picture.height);
 	}
 
 	if (Bitmap_create_begin(d, pix, j) == -1) {
@@ -176,9 +176,8 @@ int Bitmap_create(Drawable d, int img)
 	if (pix->height == pix->picture.height &&
 	    pix->width == pix->picture.width) {
 	    Bitmap_picture_copy(pix, j);
-	} else {
+	} else
 	    Bitmap_picture_scale(pix, j);
-	}
 
 	if (Bitmap_create_end(d) == -1) {
 	    pix->state = BMS_ERROR;
@@ -278,8 +277,8 @@ static void Bitmap_picture_copy(xp_pixmap_t * xp_pixmap, int image)
     int x, y;
     RGB_COLOR color;
 
-    for (y = 0; y < xp_pixmap->height; y++) {
-	for (x = 0; x < xp_pixmap->width; x++) {
+    for (y = 0; y < (int)xp_pixmap->height; y++) {
+	for (x = 0; x < (int)xp_pixmap->width; x++) {
 	    color = Picture_get_pixel(&(xp_pixmap->picture), image, x, y);
 	    Bitmap_set_pixel(xp_pixmap, image, x, y, color);
 	}
@@ -396,9 +395,7 @@ static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp)
 	pm->bitmaps[bmp].mask = None;
     }
 
-    if (!
-	(pixmap =
-	 XCreatePixmap(dpy, d, pm->width, pm->height, dispDepth))) {
+    if (!(pixmap = XCreatePixmap(dpy, d, pm->width, pm->height, dispDepth))) {
 	error("Could not create pixmap");
 	return -1;
     }

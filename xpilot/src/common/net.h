@@ -78,7 +78,7 @@ typedef struct {
 
 extern int last_packet_of_frame;
 
-int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, int size, int state);
+int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, size_t size, int state);
 int Sockbuf_cleanup(sockbuf_t *sbuf);
 int Sockbuf_clear(sockbuf_t *sbuf);
 int Sockbuf_advance(sockbuf_t *sbuf, int len);

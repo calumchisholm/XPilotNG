@@ -95,7 +95,7 @@
 
 typedef struct {
     Pixmap		bitmap;
-    int			scale_width, scale_height;    
+    unsigned		scale_width, scale_height;    
 
     Pixmap		mask;
     bbox_t		bbox;
@@ -115,7 +115,7 @@ typedef struct {
 typedef struct {
     const char		*filename;
     int			count;
-    int			width, height;
+    unsigned		width, height;
 
     int			state;
     bool		scalable;
