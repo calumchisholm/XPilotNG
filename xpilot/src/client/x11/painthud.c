@@ -1056,14 +1056,14 @@ xp_option_t hud_options[] = {
 
     COLOR_INDEX_OPTION(
 	"hudRadarEnemyColor",
-	11,
+	3,
 	&hudRadarEnemyColor,
 	"Which color number to use for drawing hudradar dots\n"
 	"that represent enemy ships.\n"),
 
     COLOR_INDEX_OPTION(
 	"hudRadarOtherColor",
-	4,
+	2,
 	&hudRadarOtherColor,
 	"Which color number to use for drawing hudradar dots\n"
 	"that represent friendly ships or other objects.\n"),

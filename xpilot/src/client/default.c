@@ -732,7 +732,7 @@ xp_option_t default_options[] = {
 
     XP_INT_OPTION(
 	"hudRadarDotSize",
-	8,
+	10,
 	1,
 	SHIP_SZ,
 	&hudRadarDotSize,

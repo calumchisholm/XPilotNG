@@ -67,7 +67,6 @@ static bool testxcolors = false;
 #define TEXT_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
 /*"-*-*-bold-i-*--14-*-*-*-p-*-iso8859-1"*/
 #define TALK_FONT	"-*-fixed-bold-*-*--15-*-*-*-c-*-iso8859-1"
-#define KEY_LIST_FONT	"-*-fixed-medium-r-*--10-*-*-*-c-*-iso8859-1"
 #define MOTD_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
 /*"-*-courier-bold-r-*--14-*-*-*-*-*-iso8859-1"*/
 
