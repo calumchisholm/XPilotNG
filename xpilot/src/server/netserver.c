@@ -106,25 +106,16 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+
+/* Is this needed? */
 #if !defined(VMS)
 # include <sys/param.h>
 #endif
-#if defined(__hpux)
-# include <time.h>
-#else
-# if defined(_AIX)
-#  if !defined(_BSD_INCLUDES)
-#   define _BSD_INCLUDES
-#  endif
-#  include <time.h>
-# endif
-# ifdef sco
-#  include <time.h>
-# endif
-#ifndef	_WINDOWS
-# include <sys/time.h>
-#endif
-#endif
+
+#include <time.h>
+
+/* THIS IS INSIDE THE ELSE PART OF #ifdef _WINDOWS!!!!! Didn't remove it yet
+   because maybe it should be in use? */
 #ifdef	_WINDOWS
 #include "winNet.h"
 #include <io.h>
@@ -135,6 +126,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #endif
+
 #endif
 
 #include <ctype.h>
