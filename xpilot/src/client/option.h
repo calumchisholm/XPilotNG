@@ -110,10 +110,12 @@ struct xp_option {
     /* key option stuff */
 
 #define XP_KEY_OPTION_DUMMY \
-	NULL, KEY_DUMMY
+	NULL, NULL, KEY_DUMMY
 
     const char *key_defval;
+    char *key_string;
     keys_t key;
+
     /* ... */
 
 };
@@ -274,6 +276,7 @@ static inline xp_option_t *Option_by_index(int ind)
 	XP_DOUBLE_OPTION_DUMMY,\
 	XP_STRING_OPTION_DUMMY,\
 	defval,\
+	NULL,\
 	key,\
 }
 

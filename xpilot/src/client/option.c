@@ -267,6 +267,9 @@ static bool Set_key_option(xp_option_t *opt, const char *value)
     assert(value);
 
     valcpy = xp_safe_strdup(value);
+    if (opt->key_string)
+	xp_free(opt->key_string);
+    opt->key_string = xp_safe_strdup(value);
 
     /*
      * No setfunc supported, rather a key binding callback is used.
@@ -387,7 +390,8 @@ void Set_command(const char *args)
 
 	newvalue = Option_value_to_string(opt);
 	snprintf(msg, sizeof(msg),
-		 "The value of %s is now %s. [*Client reply*]", nm, newvalue);
+		 "The value of %s is now \"%s\". [*Client reply*]",
+		 nm, newvalue);
 	Add_message(msg);
     } else {
 	Add_message("Boring... [*Client reply*]");
@@ -415,13 +419,14 @@ const char *Option_value_to_string(xp_option_t *opt)
 	sprintf(buf, "%.3lf", *opt->dbl_ptr);
 	break;
     case xp_string_option:
+	/* Assertion in Store_option guarantees one of these is not NULL. */
 	if (opt->str_ptr)
 	    return opt->str_ptr;
 	else
 	    return opt->str_getfunc(opt);
     case xp_key_option:
-	/* kps TODO */
-	return "currently unknown";
+	assert(opt->key_string);
+	return opt->key_string;
     default:
 	assert(0 && "Unknown option type");
     }
@@ -450,12 +455,12 @@ void Get_command(const char *args)
 	const char *nm = Option_get_name(opt);
 	if (val && strlen(val) > 0)
 	    snprintf(msg, sizeof(msg),
-		     "The value of %s is %s. [*Client reply*]", nm, val);
+		     "The value of %s is \"%s\". [*Client reply*]", nm, val);
 	else
 	    sprintf(msg, "The option %s has no value. [*Client reply*]", nm);
 	Add_message(msg);
     } else {
-	sprintf(msg, "No client option named %s. [*Client reply*]", name);
+	sprintf(msg, "No client option named \"%s\". [*Client reply*]", name);
 	Add_message(msg);
     }
 
@@ -486,6 +491,9 @@ void Store_option(xp_option_t *opt)
     assert(opt->int_defval <= opt->int_maxval);
     assert(opt->dbl_defval >= opt->dbl_minval);
     assert(opt->dbl_defval <= opt->dbl_maxval);
+
+    if (opt->type == xp_string_option)
+	assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
 
     memcpy(&option, opt, sizeof(xp_option_t));
 
