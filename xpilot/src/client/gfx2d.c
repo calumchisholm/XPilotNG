@@ -108,7 +108,7 @@ static int Picture_find_path(const char *filename, char *path,
 	}
     }
 
-    error("Can't find PPM file \"%s\"", filename);
+    /*error("Can't find PPM file \"%s\"", filename);*/
     return(false);
 }
 
