@@ -77,7 +77,7 @@ int sock_receive_anyRec(sock_t *sock, char *rbuf, int size)
     if (playback) {
 	i = *(playback_shorts++);
 	if (i > 0) {
-	    memcpy(rbuf, playback_data, i);
+	    memcpy(rbuf, playback_data, (size_t)i);
 	    playback_data += i;
 	}
 	else
@@ -88,7 +88,7 @@ int sock_receive_anyRec(sock_t *sock, char *rbuf, int size)
     if (record) {
 	*(playback_shorts++) = i;
 	if (i > 0) {
-	    memcpy(playback_data, rbuf, i);
+	    memcpy(playback_data, rbuf, (size_t)i);
 	    playback_data += i;
 	}
 	else
@@ -105,7 +105,7 @@ int sock_readRec(sock_t *sock, char *rbuf, int size)
     if (playback) {
 	i = *(playback_shorts++);
 	if (i > 0) {
-	    memcpy(rbuf, playback_data, i);
+	    memcpy(rbuf, playback_data, (size_t)i);
 	    playback_data += i;
 	}
 	else
@@ -116,7 +116,7 @@ int sock_readRec(sock_t *sock, char *rbuf, int size)
     if (record) {
 	*(playback_shorts++) = i;
 	if (i > 0) {
-	    memcpy(playback_data, rbuf, i);
+	    memcpy(playback_data, rbuf, (size_t)i);
 	    playback_data += i;
 	}
 	else
@@ -341,14 +341,12 @@ int Sockbuf_writeRec(sockbuf_t *sbuf, char *buf, int len)
 		  sbuf->state, sbuf->size, sbuf->len, len);
 	    return -1;
 	}
-	if (Sockbuf_flushRec(sbuf) == -1) {
+	if (Sockbuf_flushRec(sbuf) == -1)
 	    return -1;
-	}
-	if (sbuf->size - sbuf->len < len) {
+	if (sbuf->size - sbuf->len < len)
 	    return 0;
-	}
     }
-    memcpy(sbuf->buf + sbuf->len, buf, len);
+    memcpy(sbuf->buf + sbuf->len, buf, (size_t)len);
     sbuf->len += len;
 
     return len;
