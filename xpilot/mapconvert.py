@@ -26,7 +26,7 @@ knownopts = """
 allowclusters allowheatseekers allowlasermodifiers allowmodifiers
 allownukes allowplayerbounces allowplayercrashes allowplayerkilling
 allowshields allowshipshapes allowsmartmissiles allowtorpedoes
-allowviewing ballkillscoremult ballswallbounce baseminerange
+allowviewing ballkillscoremult ballradius ballswallbounce baseminerange
 cannonitemprobmult cannonsmartness cannonsuseitems checkpointradius
 cloakedexhaust cloakedshield clusterkillscoremult contactport
 crashscoremult debriswallbounce defaultsfilename denyhosts
@@ -76,7 +76,7 @@ treasurecollisiondestroys treasurecollisionmaykill treasurekillteam
 treasuresonradar version wallbouncedestroyitemprob
 wallbouncefueldrainmult worldlives wormholevisible wormtime
 wreckagecollisionmaykill mapdata
-teamzeropausing fullframerate fullzeroframerate treatballaspoint
+teamzeropausing fullframerate fullzeroframerate
 robots maxrobots minrobots robotfile robotstalk robotsleave robotleavelife
 robotleavescore robotleaveratio robotteam restrictrobots reserverobotteam
 robotrealname robothostname ecmsreprogramrobots
@@ -780,12 +780,12 @@ def convert(options):
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y - 479)
 	print '<BallArea>'
-	print '<Polygon x="%d" y="%d" style="xpred">' % (ball.x - 1120, ball.y - 1120)
+	print '<Polygon x="%d" y="%d" style="xpblue">' % (ball.x - 1120, ball.y - 1120)
 	print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
 	print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
 	print '</Polygon></BallArea>'
 	print '<BallTarget team="%d">' % ball.team
-	print '<Polygon x="%d" y="%d" style="emptyyellow">' % (ball.x - 480, ball.y - 480)
+	print '<Polygon x="%d" y="%d" style="xpred">' % (ball.x - 480, ball.y - 480)
 	print '<Offset x="960" y="0"/> <Offset x="0" y="960"/>'
 	print '<Offset x="-960" y="0"/> <Offset x="0" y="-960"/>'
 	print '</Polygon></BallTarget>'
