@@ -2,11 +2,7 @@
  * XPilot NG, a multiplayer space war game.
  *
  * Copyright (C) 1991-2001 by
- *
- *      Bjørn Stabell        <bjoern@xpilot.org>
- *      Ken Ronny Schouten   <ken@xpilot.org>
- *      Bert Gijsbers        <bert@xpilot.org>
- *      Dick Balaska         <dick@xpilot.org>
+ * Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,7 +97,6 @@
 #define MAX_PASS_LEN		16
 
 #define MAX_TOTAL_SHOTS		16384	/* must be <= 65536 */
-#define MAX_TOTAL_PULSES	(5 * 64)
 #define MAX_TOTAL_ECMS		64
 #define MAX_TOTAL_TRANSPORTERS	(2 * 64)
 
@@ -156,9 +151,6 @@
 #define GRAVS_POWER		2.7
 
 #define ECM_DISTANCE		(VISIBILITY_DISTANCE*0.4)
-/* kps - maybe change this to ((VISIBILITY_DISTANCE*0.2) * CLICK),
- *   or even better, do VISIBILITY_DISTANCE *= CLICK
- */
 #define TRANSPORTER_DISTANCE	(VISIBILITY_DISTANCE*0.2)
 
 /*#define SHOT_DEFAULT_LIFE	60.0*/
@@ -217,14 +209,6 @@
 #define HEAT_SHOT_LEN		15
 #define TORPEDO_LEN		18
 
-#if 0
-#define PULSE_SPEED		(90 * CLICK)
-#define PULSE_SAMPLE_DISTANCE	(5 * CLICK)
-#define PULSE_LENGTH		(PULSE_SPEED - PULSE_SAMPLE_DISTANCE)
-#define PULSE_MIN_LIFE		(4.5)
-#define PULSE_LIFE(lasers)	(PULSE_MIN_LIFE + ((lasers) / 4))
-#endif
-/*#define PULSE_DEFAULT_LIFE	6.0*/
 #define CANNON_PULSE_LIFE	(4.75)
 
 #define TRACTOR_MAX_RANGE(items)  (200 + (items) * 50)
