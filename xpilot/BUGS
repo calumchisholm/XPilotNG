@@ -1,7 +1,25 @@
+-------------------------------------------------------------------
+Problem :
+Found by:
+Solution:
+Fixed by:
+Files 
+affected:
+
 
 -------------------------------------------------------------------
-Problem : 
-Found by: 
+Problem :Toggle full screen does not work in the sdl client
+if you have a geometry that cannot work in fullscreenmode
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files 
+affected:
+
+-------------------------------------------------------------------
+Problem : if you have a msg key and toggleradarscore on the same key
+the client exits cleanly (default xpilotrc does not have this problem)
+Found by: Colonel Blood
 Solution:
 Fixed by:
 Files 
