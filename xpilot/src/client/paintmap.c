@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -98,27 +97,14 @@ void Paint_vfuel(void)
     }
 }
 
-/* Easier to paint appearing ships from here for old servers, therefore
- * this declaration of a function from guiobjects.c */
-extern void Gui_paint_appearing(int x, int y, int id, int count);
-
 void Paint_vbase(void)
 {
-    int	i, j, id, team;;
+    int	i, id, team;
     if (num_vbase > 0) {
 	for (i = 0; i < num_vbase; i++) {
 	    Base_info_by_pos(vbase_ptr[i].xi, vbase_ptr[i].yi, &id, &team);
 	    Gui_paint_base(vbase_ptr[i].x, vbase_ptr[i].y, id, team,
 			   vbase_ptr[i].type);
-	    if ((baseWarningType & 1) && id != -1) {
-		for (j = 0; j < num_bases; j++) {
-		    if (bases[j].id == id &&
-			bases[j].deathtime > loops - baseWarningFrames)
-			Gui_paint_appearing(vbase_ptr[i].x + BLOCK_SZ / 2,
-					    vbase_ptr[i].y + BLOCK_SZ / 2, id,
-					    1);
-		}
-	    }
 	}
 	RELEASE(vbase_ptr, num_vbase, max_vbase);
     }
@@ -234,15 +220,6 @@ void Paint_objects(void)
                      bases[i].bounds.y + yoff * Setup->height,
                      bases[i].id, bases[i].team,
                      bases[i].type);
-
-		if ((baseWarningType & 1)
-		    && bases[i].id != -1
-		    && bases[i].deathtime > loops - baseWarningFrames) {
-		    Gui_paint_appearing(
-			bases[i].bounds.x + xoff * Setup->width + BLOCK_SZ / 2,
-			bases[i].bounds.y + yoff * Setup->height+ BLOCK_SZ / 2,
-			bases[i].id, 1);
-		}
             }
         }
     }

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -58,6 +57,7 @@
 #include "protoclient.h"
 #include "bitmaps.h"
 #include "guimap.h"
+#include "guiobjects.h"
 
 
 char guimap_version[] = VERSION;
@@ -328,48 +328,66 @@ void Gui_paint_fuel(int x, int y, int fuel)
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
-    int baseColor = baseNameColor;
+    int color;
     int i;
     const int BORDER = 4;		/* in pixels */
     int size;
     other_t *other;
     char s[3];
+    homebase_t *base = NULL;
 
-    /* Mara's flashy basewarning */
-    if ((baseWarningType & 2) && id != -1) {
+    if (baseNameColor)
+	color = baseNameColor;
+    else
+	color = WHITE;
+
+    if (id != -1) {
 	for (i = 0; i < num_bases; i++) {
-	    if (bases[i].id == id &&
-		bases[i].deathtime > loops - baseWarningFrames) {
-		if (loopsSlow & 1) {
-		    baseColor = WHITE;
-		    /*Paint_baseInfoOnHudRadar(x,y); */
-		} else
-		    baseColor = RED;
+	    if (bases[i].id == id) {
+		base = &bases[i];
+		break;
 	    }
 	}
     }
 
-    if (!texturedObjects) {
-	SET_FG(colors[baseColor].pixel);
+    if (base != NULL
+	&& base->deathtime > loops - baseWarningFrames) {
 
+	/* red box basewarning */
+	if (baseWarningType & 1)
+	    Gui_paint_appearing(x + BLOCK_SZ / 2, y + BLOCK_SZ / 2, id, 1);
+
+	/* Mara's flashy basewarning */
+	if (baseWarningType & 2) {
+	    if (loopsSlow & 1) {
+		color = WHITE;
+		/*Paint_baseInfoOnHudRadar(x,y); */
+	    } else
+		color = RED;
+	}
+    }
+
+    SET_FG(colors[color].pixel);
+
+    if (!texturedObjects) {
 	switch (type) {
 	case SETUP_BASE_UP:
-	    Segment_add(baseColor,
+	    Segment_add(color,
 			X(x), Y(y-1),
 			X(x+BLOCK_SZ), Y(y-1));
 	    break;
 	case SETUP_BASE_DOWN:
-	    Segment_add(baseColor,
+	    Segment_add(color,
 			X(x), Y(y+BLOCK_SZ+1),
 			X(x+BLOCK_SZ), Y(y+BLOCK_SZ+1));
 	    break;
 	case SETUP_BASE_LEFT:
-	    Segment_add(baseColor,
+	    Segment_add(color,
 			X(x+BLOCK_SZ+1), Y(y+BLOCK_SZ),
 			X(x+BLOCK_SZ+1), Y(y));
 	    break;
 	case SETUP_BASE_RIGHT:
-	    Segment_add(baseColor,
+	    Segment_add(color,
 			X(x-1), Y(y+BLOCK_SZ),
 			X(x-1), Y(y));
 	    break;
@@ -380,8 +398,6 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	}
     }
     else {
-	SET_FG(colors[baseColor].pixel);
-
 	switch (type) {
 	case SETUP_BASE_UP:
 	    Bitmap_paint(p_draw, BM_BASE_DOWN, WINSCALE(X(x)),
