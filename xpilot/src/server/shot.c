@@ -1095,15 +1095,14 @@ void Fire_normal_shots(player *pl)
 /* Removes shot from array */
 void Delete_shot(int ind)
 {
-    object		*shot = Obj[ind];	/* Used when swapping places */
-    ballobject		*ball;
-    player		*pl;
-    bool		addMine = false, addHeat = false, addBall = false;
-    modifiers		mods;
-    long		status;
-    int			i;
-    int			intensity, type, color;
-    double		modv, speed_modv, life_modv, num_modv, mass;
+    object *shot = Obj[ind];	/* Used when swapping places */
+    ballobject *ball;
+    player *pl;
+    bool addMine = false, addHeat = false, addBall = false;
+    modifiers mods;
+    long status;
+    int i, intensity, type, color, num_debris;
+    double modv, speed_modv, life_modv, num_modv, mass, min_life, max_life;
     world_t *world = &World;
 
     switch (shot->type) {
@@ -1152,22 +1151,19 @@ void Delete_shot(int ind)
 			  NONBALL_BIT | NOTEAM_BIT, OBJ_PTR(ball)) != NO_GROUP)
 		break;
 
-	    Make_debris(
-		/* pos            */ ball->prevpos,
-		/* vel            */ ball->vel,
-		/* owner id       */ ball->id,
-		/* owner team     */ ball->team,
-		/* kind           */ OBJ_DEBRIS,
-		/* mass           */ DEBRIS_MASS,
-		/* status         */ GRAVITY,
-		/* color          */ RED,
-		/* radius         */ 8,
-		/* num debris     */ (int)(10 + 10 * rfrac()),
-		/* min,max dir    */ 0, RES-1,
-		/* min,max speed  */ 10.0, 50.0,
-		/* min,max life   */ 10.0, 54.0
-		);
-
+	    Make_debris(ball->prevpos,
+			ball->vel,
+			ball->id,			/* owner id */
+			ball->team,			/* owner team */
+			OBJ_DEBRIS,			/* kind */
+			DEBRIS_MASS,			/* mass */
+			GRAVITY,			/* status */
+			RED,				/* color */
+			8,				/* radius */
+			(int)(10 + 10 * rfrac()),	/* num debris */
+			0, RES - 1,			/* min, max dir */
+			10.0, 50.0,			/* min, max speed */
+			10.0, 54.0);			/* min, max life */
 	}
 	break;
 	/* Shots related to a player. */
@@ -1250,23 +1246,33 @@ void Delete_shot(int ind)
 	if (BIT(shot->type, OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_SMART_SHOT))
 	    intensity /= (1 + shot->mods.power);
 
-	Make_debris(
-	    /* pos            */ shot->prevpos,
-	    /* vel            */ shot->vel,
-	    /* owner id       */ shot->id,
-	    /* owner team     */ shot->team,
-	    /* kind           */ type,
-	    /* mass           */ mass,
-	    /* status         */ status,
-	    /* color          */ color,
-	    /* radius         */ 6,
-	    /* num debris     */ (int)((0.20 * intensity * num_modv) +
-	                         (0.10 * intensity * num_modv * rfrac())),
-	    /* min,max dir    */ 0, RES-1,
-	    /* min,max speed  */ 20 * speed_modv,
-				 (intensity >> 2) * speed_modv,
-	    /* min,max life   */ (8 * life_modv), (intensity >> 1) * life_modv
-	    );
+	num_debris = (int)((0.20 * intensity * num_modv) +
+			   (0.10 * intensity * num_modv * rfrac()));
+	min_life = 8 * life_modv;
+	max_life = (intensity >> 1) * life_modv;
+
+#if 0
+	warn("type = %16s (%c%c) inten = %-6d num = %-6d life: %.1f - %.1f",
+	     Object_typename(shot),
+	     (BIT(shot->mods.nuclear, NUCLEAR) ? 'N' : '-'),
+	     (BIT(shot->mods.warhead, CLUSTER) ? 'C' : '-'),
+	     intensity, num_debris, min_life, max_life);
+#endif
+
+	Make_debris(shot->prevpos,
+		    shot->vel,
+		    shot->id,		/* owner id */
+		    shot->team,		/* owner team */
+		    type,
+		    mass,
+		    status,
+		    color,
+		    6,			/* radius */
+		    num_debris,
+		    0, RES - 1,		/* min, max dir */
+		    20 * speed_modv,	/* min, max speed */
+		    (intensity >> 2) * speed_modv,
+		    min_life, max_life);
 	break;
 
     case OBJ_SHOT:
