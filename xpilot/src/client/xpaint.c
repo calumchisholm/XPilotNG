@@ -284,39 +284,50 @@ void Paint_frame(void)
 			    0, 0, 256, RadarHeight, 0, 0);
 #endif
 	} else {
-	    int x, y, w, h;
+	    int x, y;
 	    double xp, yp, xo, yo;
+	    unsigned w1, h1, w2, h2;
 
 	    xp = (double) (selfPos.x * 256) / Setup->width;
 	    yp = (double) (selfPos.y * RadarHeight) / Setup->height;
 	    xo = (double) 256 / 2;
 	    yo = (double) RadarHeight / 2;
-	    if (xo <= xp)
-		x = (int) (xp - xo + 0.5);
-	    else
-		x = (int) (256 + xp - xo + 0.5);
 
-	    if (yo <= yp)
-		y = (int) (yp - yo + 0.5);
-	    else
-		y = (int) (RadarHeight + yp - yo + 0.5);
+	    assert(xp >= 0.0);
+	    assert(xp < 256.0);
+	    assert(yp >= 0.0);
+	    assert(yp < RadarHeight);
 
-	    y = RadarHeight - y - 1;
-	    w = 256 - x;
-	    h = RadarHeight - y;
+	    /* kps - i don't see what adding 0.5 to these helps. */
+	    x = xp - xo /*+ 0.5*/;
+	    y = yp - yo /*+ 0.5*/;
+	    if (x <= 0.0)
+		x += 256;
+	    if (y <= 0.0)
+		y += RadarHeight;
+	    w1 = (unsigned)x;
+	    h1 = (unsigned)y;
+
+	    assert(w1 > 0);
+	    assert(w1 <= 256);
+	    assert(h1 > 0);
+	    assert(h1 <= RadarHeight);
+
+	    h2 = RadarHeight - h1;
+	    w2 = 256 - w1;
 
 #ifndef _WINDOWS
-	    if (x < 0 || y < 0 || w < 0 || h < 0)
-		warn("BUG: in radar paint x = %d, y = %d, w = %d, h = %d",
-		     x, y, w, h);
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      0, 0, (unsigned)x, (unsigned)y, w, h);
-	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      x, 0, (unsigned)w, (unsigned)y, 0, h);
-	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      0, y, (unsigned)x, (unsigned)h, w, 0);
-	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      x, y, (unsigned)w, (unsigned)h, 0, 0);
+		      0, (int)h2, w1, h1, (int)w2, 0);
+	    if (w2 > 0)
+		XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
+			  (int)w1, (int)h2, w2, h1, 0, 0);
+	    if (h2 > 0)
+		XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
+			  0, 0, w1, h2, (int)w2, (int)h1);
+	    if (w2 > 0 && h2 > 0)
+		XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
+			  (int)w1, 0, w2, h2, 0, (int)h1);
 #else
 	    Paint_world_radar();
 #endif
