@@ -445,7 +445,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 
     case CrashWormHole:
 	SET_BIT(pl->status, WARPING);
-	pl->wormHoleHit = Wormholes(mapobj_ind);
+	pl->wormHoleHit = mapobj_ind;
 	break;
 
     case CrashWall:
