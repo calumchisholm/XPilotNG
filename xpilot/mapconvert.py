@@ -301,10 +301,14 @@ def convert(options):
     neglist = []
     poslist = []
     for p in polys2:
-	if polydir(p) > 0:
+        direction = polydir(p)
+	if direction > 0:
 	    poslist.append(p)
-	else:
+	elif direction < 0:
 	    neglist.append(p)
+        else:
+            print >> sys.stderr, "Converting this map isn't supported (yet?)"
+            sys.exit(1)
     totlist = neglist + poslist
     negcount = len(neglist)
     poscount = len(poslist)
@@ -398,12 +402,7 @@ def convert(options):
     print '</GeneralOptions>'
 
     for p in polys2:
-	internal = [i for i in range(len(p)) if p[i][2] == None]
-	sstr = '<Polygon x="%d" y="%d"' % tuple(p[-1][:2])
-	if internal:
-	    sstr += ' hidedges="%d"' % len(internal)
-	sstr += '>'
-	print sstr
+	print '<Polygon x="%d" y="%d">' % tuple(p[-1][:2])
 	x = p[-1][0]
 	y = p[-1][1]
 	h = not p[-1][2]

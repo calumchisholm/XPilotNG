@@ -246,14 +246,21 @@ struct bmpstyle {
     int flags;
 };
 
-struct polydata {
+typedef struct {
     int style;
-};
+    int group;
+    int *edges;
+    int x, y;
+    int num_points;
+    int hidden;
+    int num_hidden;
+} poly_t;
 
 extern struct polystyle pstyles[256];
 extern struct edgestyle estyles[256];
 extern struct bmpstyle  bstyles[256];
-extern struct polydata  pdata[1000];
+extern poly_t *pdata;
+extern int *hidptr;
 
 extern int num_pstyles, num_estyles, num_bstyles;
 #endif

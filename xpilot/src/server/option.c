@@ -172,24 +172,23 @@ static char	*FileName;
 #define BALL_BIT (1 << 11)
 #define NONBALL_BIT (1 << 12)
 
-extern int polygons[];
+static int edg[5000 * 2]; /* !@# change pointers in poly_t when realloc poss.*/
 extern int polyc;
 extern int groupc;
 extern struct {int type; unsigned int hit_mask; int team;} groups[];
 
-int *poly = polygons;
-int *polypts;
+int *edges = edg;
 int *hidptr;
-int ptscount;
+int ptscount, hidcount;
 char *mapd;
 
 struct polystyle pstyles[256];
 struct edgestyle estyles[256];
 struct bmpstyle  bstyles[256];
-struct polydata  pdata[1000];
+poly_t *pdata;
 
 int num_pstyles, num_estyles, num_bstyles;
-int max_bases, max_balls, max_fuels, max_checks;
+static int max_bases, max_balls, max_fuels, max_checks, max_polys, max_hidden;
 
 
 static int get_bmp_id(const char *s)
@@ -337,28 +336,26 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Polygon")) {
-	int x, y, hidcount = 0;
+	int x, y, style = 0;
+	poly_t t;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
 		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
 		y = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "hidedges"))
-		hidcount = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "style"))
-		pdata[polyc].style = get_poly_id(*(attr + 1));
+		style = get_poly_id(*(attr + 1));
 	    attr += 2;
 	}
-	polyc++;
 	ptscount = 0;
-	*poly++ = groupc;
-	polypts = poly++;
-	*poly++ = hidcount;
-	hidptr = poly;
-	poly += hidcount + 1;
-	*poly++ = x;
-	*poly++ = y;
+	t.x = x;
+	t.y = y;
+	t.group = groupc;
+	t.edges = edges;
+	t.style = style;
+	t.hidden = hidcount;
+	STORE(poly_t, pdata, polyc, max_polys, t);
 	return;
     }
 
@@ -482,10 +479,10 @@ static void tagstart(void *data, const char *el, const char **attr)
 		hidden = 1;
 	    attr += 2;
 	}
-	*poly++ = x;
-	*poly++ = y;
+	*edges++ = x;
+	*edges++ = y;
 	if (hidden)
-	    *hidptr++ = ptscount;
+	    STORE(int, hidptr, hidcount, max_hidden, ptscount);
 	ptscount++;
 	return;
     }
@@ -496,8 +493,9 @@ static void tagend(void *data, const char *el)
 {
     void cmdhack(void);
     if (!strcasecmp(el, "Polygon")) {
-	*polypts = ptscount;
-	*hidptr = INT_MAX;
+	pdata[polyc - 1].num_points = ptscount;
+	pdata[polyc - 1].num_hidden = hidcount - pdata[polyc - 1].hidden;
+	STORE(int, hidptr, hidcount, max_hidden, INT_MAX);
     }
     if (!strcasecmp(el, "GeneralOptions")) {
 	cmdhack(); /* !@# */

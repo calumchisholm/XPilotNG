@@ -138,8 +138,6 @@ unsigned short *llist;
 
 unsigned short *plist;
 
-int polygons[10000];
-
 int linec = 0;
 
 int polyc = 0;
@@ -1302,32 +1300,31 @@ static void store_32bit(char **ptr, int i)
 int Polys_to_client(char *ptr)
 {
     int i, j, startx, starty, dx, dy, group, hid;
-    int *p = polygons;
+    int *edges;
     char *start = ptr;
 
     store_short(&ptr, polyc);
     for (i = 0; i < polyc; i++) {
-	group = *p++;
-	j = *p++;
-	hid = *p++;
+	group = pdata[i].group;
+	j = pdata[i].num_points;
+	hid = pdata[i].num_hidden;
 	store_short(&ptr, hid);
-	while (*p != INT_MAX) {
-	    store_short(&ptr, *p);
-	    p++;
-	}
-	p++; /* skip the INT_MAX */
+	edges = hidptr + pdata[i].hidden;
+	while (*edges != INT_MAX)
+	    store_short(&ptr, *edges++);
 	dx = 0;
 	dy = 0;
-	startx = *p++;
-	starty = *p++;
+	startx = pdata[i].x;
+	starty = pdata[i].y;
+	edges = pdata[i].edges;
 	store_short(&ptr, j);
 	store_short(&ptr, startx >> CLICK_SHIFT);
 	store_short(&ptr, starty >> CLICK_SHIFT);
 	startx = 0;
 	starty = 0;
 	for (; j > 0; j--) {
-	    dx += *p++;
-	    dy += *p++;
+	    dx += *edges++;
+	    dy += *edges++;
 	    if (j != 1) {
 		store_short(&ptr, (dx >> CLICK_SHIFT) - startx);
 		store_short(&ptr, (dy >> CLICK_SHIFT) - starty);
@@ -1831,25 +1828,24 @@ static void Ball_line_init(void)
 
 static void Poly_to_lines()
 {
-    int i, np, j, startx, starty, dx, dy, group, hid, *hidptr;
-    int *p = polygons;
+    int i, np, j, startx, starty, dx, dy, group, *hid;
+    int *edges;
 
     linec = 0;
     for (i = 0; i < polyc; i++) {
-	group = *p++;
-	np = *p++;
-	hid = *p++;
-	hidptr = p;
-	p += hid + 1;
+	group = pdata[i].group;
+	np = pdata[i].num_points;
+	hid = hidptr + pdata[i].hidden;
 	dx = 0;
 	dy = 0;
-	startx = *p++;
-	starty = *p++;
+	startx = pdata[i].x;
+	starty = pdata[i].y;
+	edges = pdata[i].edges;
 	for (j = 0; j < np; j++) {
-	    if (j == *hidptr) {
-		hidptr++;
-		dx += *p++;
-		dy += *p++;
+	    if (j == *hid) {
+		hid++;
+		dx += *edges++;
+		dy += *edges++;
 		continue;
 	    }
 	    if (!(linec % 2000))
@@ -1857,10 +1853,10 @@ static void Poly_to_lines()
 	    linet[linec].group = group;
 	    linet[linec].start.x = TWRAP_XCLICK(startx + dx);
 	    linet[linec].start.y = TWRAP_YCLICK(starty + dy);
-	    linet[linec].delta.x = *p;
-	    dx += *p++;
-	    linet[linec++].delta.y = *p;
-	    dy += *p++;
+	    linet[linec].delta.x = *edges;
+	    dx += *edges++;
+	    linet[linec++].delta.y = *edges;
+	    dy += *edges++;
 	}
 	if (dx || dy) {
 	    errno = 0;
