@@ -2272,123 +2272,123 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "torpedoKillScoreMult",
-        "torpedoKillScoreMult",
-        "1.0",
-        &options.torpedoKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for torpedo kills.\n",
+	"torpedoKillScoreMult",
+	"torpedoKillScoreMult",
+	"1.0",
+	&options.torpedoKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for torpedo kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "smartKillScoreMult",
-        "smartKillScoreMult",
-        "1.0",
-        &options.smartKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for smart missile kills.\n",
+	"smartKillScoreMult",
+	"smartKillScoreMult",
+	"1.0",
+	&options.smartKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for smart missile kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "heatKillScoreMult",
-        "heatKillScoreMult",
-        "1.0",
-        &options.heatKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for heatseeker kills.\n",
+	"heatKillScoreMult",
+	"heatKillScoreMult",
+	"1.0",
+	&options.heatKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for heatseeker kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "clusterKillScoreMult",
-        "clusterKillScoreMult",
-        "1.0",
-        &options.clusterKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for cluster debris kills.\n",
+	"clusterKillScoreMult",
+	"clusterKillScoreMult",
+	"1.0",
+	&options.clusterKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for cluster debris kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "laserKillScoreMult",
-        "laserKillScoreMult",
-        "1.0",
-        &options.laserKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for laser kills.\n",
+	"laserKillScoreMult",
+	"laserKillScoreMult",
+	"1.0",
+	&options.laserKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for laser kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "tankKillScoreMult",
-        "tankKillScoreMult",
-        "0.44",
-        &options.tankKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for tank kills.\n",
+	"tankKillScoreMult",
+	"tankKillScoreMult",
+	"0.44",
+	&options.tankKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for tank kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "runoverKillScoreMult",
-        "runoverKillScoreMult",
-        "0.33",
-        &options.runoverKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for player runovers.\n",
+	"runoverKillScoreMult",
+	"runoverKillScoreMult",
+	"0.33",
+	&options.runoverKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for player runovers.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "ballKillScoreMult",
-        "ballKillScoreMult",
-        "1.0",
-        &options.ballKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for ball kills.\n",
+	"ballKillScoreMult",
+	"ballKillScoreMult",
+	"1.0",
+	&options.ballKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for ball kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "explosionKillScoreMult",
-        "explosionKillScoreMult",
-        "0.33",
-        &options.explosionKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for explosion kills.\n",
+	"explosionKillScoreMult",
+	"explosionKillScoreMult",
+	"0.33",
+	&options.explosionKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for explosion kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "shoveKillScoreMult",
-        "shoveKillScoreMult",
-        "0.5",
-        &options.shoveKillScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for shove kills.\n",
+	"shoveKillScoreMult",
+	"shoveKillScoreMult",
+	"0.5",
+	&options.shoveKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for shove kills.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "crashScoreMult",
-        "crashScoreMult",
-        "0.33",
-        &options.crashScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for player crashes.\n",
+	"crashScoreMult",
+	"crashScoreMult",
+	"0.33",
+	&options.crashScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for player crashes.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-        "mineScoreMult",
-        "mineScoreMult",
-        "0.17",
-        &options.mineScoreMult,
-        valReal,
-        tuner_dummy,
-        "Multiplication factor to scale score for mine hits.\n",
+	"mineScoreMult",
+	"mineScoreMult",
+	"0.17",
+	&options.mineScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for mine hits.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2551,13 +2551,10 @@ static option_desc opts[] = {
 	&options.itemConcentratorRadius,
 	valReal,
 	Set_misc_item_limits,
-	"The maximum distance from an item concentator for items to appear in.\n"
-	"Sensible values are in the range 1.0 to 20.0.\n"
-	"If no item concentators are defined in a map then items can popup anywhere.\n"
-	"If any are any then items popup in the vicinity of an item concentrator\n"
-	"with probability itemConcentratorProb and anywhere the remainder of the time.\n"
-	"An item concentrator is drawn on screen as three rotating triangles.\n"
-	"The map symbol is the percentage symbol '%'.\n",
+	"Range within which an item concentrator can create an item.\n"
+	"Sensible values are in the range 1.0 to 20.0 (unit is 35 pixels).\n"
+	"If there are no item concentrators, items might popup anywhere.\n"
+	"Some clients draw item concentrators as three rotating triangles.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2567,9 +2564,9 @@ static option_desc opts[] = {
 	&options.itemConcentratorProb,
 	valReal,
 	Set_misc_item_limits,
-	"The probability, if any item concentrators are present, that they will be\n"
-	"used.  This proportion of items will be placed near item concentrators,\n"
-	"within itemConcentratorRadius.\n",
+	"The chance for an item to appear near an item concentrator.\n"
+	"If this is less than 1.0 or there are no item concentrators,"
+	"items may also popup where there is no concentrator nearby.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2579,14 +2576,10 @@ static option_desc opts[] = {
 	&options.asteroidConcentratorRadius,
 	valReal,
 	Tune_asteroid_prob,
-	"The maximum distance from an asteroid concentrator for asteroids to\n"
-	"appear in.  Sensible values are in the range 1.0 to 20.0.\n"
-	"If no asteroid concentrators are defined in a map then asteroids can\n"
-	"popup anywhere.  If any are then asteroids popup in the vicinity of an\n"
-	"asteroid concentrator with probability asteroidConcentratorProb and anywhere\n"
-	"the remainder of the time.  An asteroid concentrator is drawn on the\n"
-	"screen as three rotating squares.  The map symbol is the ampersand\n"
-	"'&'.\n",
+	"Range within which an asteroid concentrator can create an asteroid.\n"
+	"Sensible values are in the range 1.0 to 20.0 (unit is 35 pixels).\n"
+	"If there are no such concentrators, asteroids can popup anywhere.\n"
+	"Some clients draw these concentrators as three rotating squares.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2596,9 +2589,9 @@ static option_desc opts[] = {
 	&options.asteroidConcentratorProb,
 	valReal,
 	Tune_asteroid_prob,
-	"The probability, if any asteroid concentrators are present, that they will\n"
-	"be used.  This proportion of asteroids will be placed near asteroid\n"
-	"concentrators, within asteroidConcentratorRadius.\n",
+	"The chance for an asteroid to appear near an asteroid concentrator.\n"
+	"If this is less than 1.0 or there are no asteroid concentrators,"
+	"asteroids may also appear where there is no concentrator nearby.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3280,7 +3273,7 @@ static option_desc opts[] = {
 	valReal,
 	tuner_dummy,
 	"Multiplicator for quadratic score increase over time \n"
-        "survived with lowered shield",
+	"survived with lowered shield",
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3483,7 +3476,7 @@ static option_desc opts[] = {
 	valString,
 	tuner_dummy,
 	"The password needed to obtain operator privileges.\n"
-        "If specified on the command line, on many systems other\n"
+	"If specified on the command line, on many systems other\n"
 	"users will be able to see the password.  Therefore, using\n"
 	"the password file instead is recommended.",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_PASSWORD
