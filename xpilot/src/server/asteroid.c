@@ -327,6 +327,7 @@ static void Make_asteroid(int cx, int cy,
  * Tries to place a new asteroid on the map.
  * Calls Make_asteroid() to actually create the new asteroid
  */
+/* kps - change this to use polygon based is_inside code */
 static void Place_asteroid(void)
 {
     int			place_count;

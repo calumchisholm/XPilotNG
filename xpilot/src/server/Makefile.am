@@ -22,7 +22,7 @@ xpilots_SOURCES = \
 	showtime.c srecord.c srecord.h \
 	tuner.c tuner.h \
 	update.c \
-	walls.c walls.h walls_old.c wildmap.c \
+	walls.c walls.h wildmap.c \
 	xp2map.c xpmap.c xpserver.h
 
 xpilots_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11

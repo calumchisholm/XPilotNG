@@ -28,16 +28,6 @@
 	| FUEL_BIT | CANNON_BIT | TREASURE_BIT | TARGET_BIT \
 	| CHECK_BIT | WORMHOLE_BIT)
 
-unsigned SPACE_BLOCKS = (
-	SPACE_BIT | BASE_BIT | WORMHOLE_BIT |
-	POS_GRAV_BIT | NEG_GRAV_BIT | CWISE_GRAV_BIT | ACWISE_GRAV_BIT |
-	UP_GRAV_BIT | DOWN_GRAV_BIT | RIGHT_GRAV_BIT | LEFT_GRAV_BIT |
-	DECOR_LU_BIT | DECOR_LD_BIT | DECOR_RU_BIT | DECOR_RD_BIT |
-	DECOR_FILLED_BIT | CHECK_BIT | ITEM_CONCENTRATOR_BIT |
-	FRICTION_BIT | ASTEROID_CONCENTRATOR_BIT
-    );
-
-struct move_parameters mp;
 extern DFLOAT wallBounceExplosionMult;
 static char msg[MSG_LEN];
 
@@ -250,15 +240,6 @@ void Walls_init_old(void)
     Walldist_alloc();
     Walldist_init();
 }
-
-void Treasure_init(void)
-{
-    int i;
-    for (i = 0; i < World.NumTreasures; i++) {
-	Make_treasure_ball(i);
-    }
-}
-
 
 static void Bounce_edge(move_state_t *ms, move_bounce_t bounce)
 {

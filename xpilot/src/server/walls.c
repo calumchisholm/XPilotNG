@@ -25,16 +25,19 @@
 
 char walls_version[] = VERSION;
 
+/* kps - remove when all code has been polygonized */
+unsigned SPACE_BLOCKS = (
+	SPACE_BIT | BASE_BIT | WORMHOLE_BIT |
+	POS_GRAV_BIT | NEG_GRAV_BIT | CWISE_GRAV_BIT | ACWISE_GRAV_BIT |
+	UP_GRAV_BIT | DOWN_GRAV_BIT | RIGHT_GRAV_BIT | LEFT_GRAV_BIT |
+	DECOR_LU_BIT | DECOR_LD_BIT | DECOR_RU_BIT | DECOR_RD_BIT |
+	DECOR_FILLED_BIT | CHECK_BIT | ITEM_CONCENTRATOR_BIT |
+	FRICTION_BIT | ASTEROID_CONCENTRATOR_BIT
+    );
 
-
-extern struct move_parameters mp;
+struct move_parameters mp;
 DFLOAT wallBounceExplosionMult;
 static char msg[MSG_LEN];
-
-/* kps compatibility hacks - plz remove if you can */
-void Walls_init_old(void);
-
-static void Walls_init_new(void);
 
 /* polygon map related stuff */
 
@@ -141,18 +144,6 @@ bool can_hit(struct group *groupptr, struct move *move)
     return groupptr->hitfunc(groupptr, move);
 }
 #endif
-
-
-void Walls_init(void)
-{
-    /*
-     * Always do the walls_init_new(), since we treat the
-     * block map as a polygon map.
-     */
-    if (!is_polygon_map)
-	Walls_init_old();
-    Walls_init_new();
-}
 
 void Move_init(void)
 {
@@ -2552,7 +2543,7 @@ static void Poly_to_lines(void)
 }
 
 
-void Walls_init_new(void)
+void Walls_init(void)
 {
     DFLOAT x, y, l2;
     int i;
@@ -2591,14 +2582,17 @@ void Walls_init_new(void)
     }
 }
 
-
-static char msg[MSG_LEN];
-
+void Treasure_init(void)
+{
+    int i;
+    for (i = 0; i < World.NumTreasures; i++) {
+	Make_treasure_ball(i);
+    }
+}
 
 
 static void Move_ball(object *obj)
 {
-    /*object		*obj = Obj[ind];*/
     struct move mv;
     struct collans ans;
     int owner;
@@ -2668,7 +2662,6 @@ static void Move_ball(object *obj)
 
 
 /* kps- collision.c has a move_object call in ng */
-/* used to have ind argument in ng */
 void Move_object(object *obj)
 {
     int t;
@@ -2676,7 +2669,6 @@ void Move_object(object *obj)
     struct collans ans;
     int trycount = 5000;
     int team;            /* !@# should make TEAM_NOT_SET 0 */
-    /*object *obj = Obj[ind];*/
 
     mv.obj = obj;
     Object_position_remember(obj);
