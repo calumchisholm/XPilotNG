@@ -30,7 +30,6 @@
 char configure_version[] = VERSION;
 
 static int Config_create_save(int widget_desc, int *height);
-static int Config_update_bool(int widget_desc, void *data, bool *val);
 static int Config_close(int widget_desc, void *data, const char **strptr);
 static int Config_next(int widget_desc, void *data, const char **strptr);
 static int Config_prev(int widget_desc, void *data, const char **strptr);
@@ -101,9 +100,19 @@ static int Nelem_config_creator(void)
 #endif
 }
 
+static int Update_bool_option(int widget_desc, void *data, bool *val)
+{
+    xp_option_t *opt = data;
+
+    (void)widget_desc;
+    Set_bool_option(opt, *val);
+
+    return 0;
+}
+
 static int Update_int_option(int widget_desc, void *data, int *val)
 {
-    xp_option_t *opt = (xp_option_t *)data;
+    xp_option_t *opt = data;
 
     (void)widget_desc;
     Set_int_option(opt, *val);
@@ -113,7 +122,7 @@ static int Update_int_option(int widget_desc, void *data, int *val)
 
 static int Update_double_option(int widget_desc, void *data, double *val)
 {
-    xp_option_t *opt = (xp_option_t *)data;
+    xp_option_t *opt = data;
 
     (void)widget_desc;
     Set_double_option(opt, *val);
@@ -491,23 +500,6 @@ Config_create_color(widget_desc, height, c, #c, &c, 0, maxColors-1, NULL, NULL)
 
 
 
-static int Config_create_showNastyShots(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "nastyShots",
-                              (showNastyShots) ? true : false,
-                              Config_update_bool, &showNastyShots);
-}
-
-int foobarColor;
-
-static int Config_create_hudHLineColor(int widget_desc, int *height)
-{
-    return CONFIG_CREATE_COLOR(foobarColor);
-}
-
-
-
-
 
 static int Config_create_save(int widget_desc, int *height)
 {
@@ -539,6 +531,11 @@ static int Config_create_save(int widget_desc, int *height)
 static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
 {
     switch (Option_get_type(opt)) {
+    case xp_bool_option:
+	return Config_create_bool(widget_desc, height,
+				  Option_get_name(opt),
+				  *opt->bool_ptr,
+				  Update_bool_option, opt);
     case xp_int_option:
 	return Config_create_int(widget_desc, height,
 				 Option_get_name(opt),
@@ -557,19 +554,6 @@ static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
 				  true, NULL, NULL);
 	return 0;
     }
-}
-
-/* General purpose update callback for booleans.
- * Requires that a pointer to the boolean value has been given as
- * client_data argument, and updates this value to the real value.
- */
-static int Config_update_bool(int widget_desc, void *data, bool *val)
-{
-    bool *client_data = (bool *) data;
-
-    (void)widget_desc;
-    *client_data = *val;
-    return 0;
 }
 
 static void Config_save_failed(const char *reason, const char **strptr)
@@ -768,8 +752,6 @@ static void Config_save_keys(FILE *fp)
     }
 }
 
-extern int team9Color;
-
 static int Config_save(int widget_desc, void *button_str, const char **strptr)
 {
     int			i;
@@ -807,10 +789,10 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 			";\n"
 			"; General configuration options\n"
 			";\n");
-    Config_save_resource(fp, "name", connectParam.nick_name);
-    Config_save_bool(fp, "autoShield", auto_shield);
-    Config_save_int(fp, "clientPortStart", clientPortStart);
-    Config_save_float(fp, "scaleFactor", scaleFactor);
+    /*Config_save_resource(fp, "name", connectParam.nick_name);
+      Config_save_bool(fp, "autoShield", auto_shield);
+      Config_save_int(fp, "clientPortStart", clientPortStart);
+      Config_save_float(fp, "scaleFactor", scaleFactor);*/
 
     /* colors */
     Config_save_comment(fp,
@@ -820,7 +802,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 			"; The value 0 means transparent for the color "
 			"options.\n"
 			";\n");
-    Config_save_int(fp, "team9Color", team9Color);
+    /*Config_save_int(fp, "team9Color", team9Color);*/
 
     Config_save_comment(fp,
 			";\n"
@@ -842,7 +824,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 	Config_save_resource(fp, buf, modBankStr[i]);
     }
 
-    IFWINDOWS( Config_save_window_positions() );
     Config_save_comment(fp,
 			";\n"
 			"; Other options\n"
@@ -881,8 +862,6 @@ static int Config_save_confirm_callback(int widget_desc, void *popup_desc,
 
 int Config(bool doit, int what)
 {
-    IFWINDOWS( Trace("***Config %d\n", doit) );
-
     /* kps - get rid of the old widgets, it's the most easy way */
     Config_destroy();
     if (doit == false)
