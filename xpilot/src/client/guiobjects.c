@@ -405,7 +405,8 @@ void Gui_paint_appearing(int x, int y, int id, int count)
     if (version >= 0x4F12) {
 	homebase_t *base = Homebase_by_id(id);
 	/* hack */
-	base->deathtime = loops;
+	if (base != NULL)
+	    base->deathtime = loops;
     }
 
 #if 1
