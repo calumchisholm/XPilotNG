@@ -1,0 +1,37 @@
+
+===============================================================================
+====                       XPilot NG Change Log                            ====
+===============================================================================
+
+This is a summary of changes of release 4.5.4X compared to release 4.5.4.
+
+===============================================================================
+
+This is a summary of changes of release 4.3.1X compared to release 4.3.1.
+
+An evil buffer overflow bug has been fixed in the server.
+
+VMS is no longer supported since nobody took care of it.
+The default installation path has been changed.
+
+Two new client options (user, host). Patch by Paul Alexander Drees. This
+allows you to specify the user@host on the command line or in your .xpilotrc.
+
+New client option messagesToStdout for players that want player messages (and
+optionally status messages) to go to standard output. (Thorsten Kroeger)
+
+Player passwords support. Several new server options: allowPlayerPasswords
+(-PlayerPasswords), playerPasswordsFileName and playerPasswordsFileSizeLimit
+(-playerPasswordsFile and -playerPasswordsLimit). Passwords are disabled by
+default. Default file name is LIBDIR/player_passwords. Default limit is
+1 megabyte (file may grow a little bigger than the limit!). (Thorsten Kroeger)
+
+Regarding the player passwords support, have a look at the new commands
+/setpass and /auth.
+
+A minor bug has been fixed that would cause the client not to work properly
+if it fixed the nick name at startup. It also wouldn't work correctly with
+the newly implemented password support. This fix implies a new MAGIC version.
+(Thorsten)
+
+===============================================================================
