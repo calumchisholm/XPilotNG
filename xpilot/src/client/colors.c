@@ -1127,11 +1127,11 @@ xp_option_t color_options[] = {
     XP_INT_OPTION(
 	"maxColors",
 	MAX_COLORS,
-	4,
+	MAX_COLORS,
 	MAX_COLORS,
 	&maxColors,
 	NULL,
-	"The number of colors to use.  Valid values are 4, 8 and 16.\n"),
+	"The number of colors to use.  Valid values are 16, 16 and 16.\n"),
 
     /* 16 user definable color values */
     XP_STRING_OPTION(
