@@ -216,6 +216,9 @@ int             playerLimit;            /* allow less players than bases */
 int             recordMode;             /* 0=off, 1=record, 2=playback */
 int             constantScoring;        /* Fixed points for kills etc? */
 int             eliminationRace;        /* Last player drops each lap? */
+int		clientPortStart;	/* First UDP port for clients */
+int             clientPortEnd;          /* Last one (these are for firewalls)*/
+					   
 
 extern char	conf_default_map_string[];	/* from common/config.c */
 
@@ -2379,6 +2382,26 @@ static optionDesc options[] = {
 	valString,
 	tuner_dummy,
 	"URL where the client can get extra data for this map\n",
+	MAP(NULL)
+    },
+    {
+	"clientPortStart",
+	"clientPortStart",
+	"0",
+	&clientPortStart,
+	valInt,
+	tuner_dummy,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
+	MAP(NULL)
+    },
+    {
+	"clientPortEnd",
+	"clientPortEnd",
+	"0",
+	&clientPortEnd,
+	valInt,
+	tuner_dummy,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls)\n",
 	MAP(NULL)
     }
 };

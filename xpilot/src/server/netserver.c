@@ -603,6 +603,7 @@ void Destroy_connection(int ind, const char *reason)
     DgramCloseRec(sock);
 }
 
+
 int Check_connection(char *real, char *nick, char *dpy, char *addr)
 {
     int			i;
@@ -623,6 +624,51 @@ int Check_connection(char *real, char *nick, char *dpy, char *addr)
     }
     return -1;
 }
+
+
+void Create_client_socket(int *socket, int *port)
+{
+    int i;
+
+    if (!clientPortStart || !clientPortEnd) {
+	if ((*socket = CreateDgramSocket(0)) == -1) {
+	    error("Cannot create datagram socket (%d)", sl_errno);
+	    return;
+	}
+    }
+    else {
+	for (i = clientPortStart; i <= clientPortEnd; i++)
+	    if ( (*socket = CreateDgramSocket(i)) != -1)
+		goto found;
+	error("Could not find a useable port in given port range");
+	*socket = -1;
+	return;
+    }
+found:
+    if ( (*port = GetPortNum(*socket)) == -1) {
+	error("Cannot get port from socket");
+	goto error;
+    }
+    if (SetSocketNonBlocking(*socket, 1) == -1) {
+	error("Cannot make client socket non-blocking");
+	goto error;
+    }
+    if (SetSocketReceiveBufferSize(*socket, SERVER_RECV_SIZE + 256) == -1) {
+	error("Cannot set receive buffer size to %d", SERVER_RECV_SIZE + 256);
+	goto error; /* Not strictly necessary */
+    }
+    if (SetSocketSendBufferSize(*socket, SERVER_SEND_SIZE + 256) == -1) {
+	error("Cannot set send buffer size to %d", SERVER_SEND_SIZE + 256);
+	goto error;
+    }
+    return;
+
+error:
+    DgramClose(*socket);
+    *socket = -1;
+    return;
+}
+
 
 /*
  * A client has requested a playing connection with this server.
@@ -701,35 +747,18 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     connp = &Conn[free_conn_index];
 
     if (!playback) {
-	if ((sock = CreateDgramSocket(0)) == -1) {
-	    error("Cannot create datagram socket (%d)", sl_errno);
-	    return -1;
-	}
-	if ( (my_port = GetPortNum(sock)) == -1) {
-	    error("Cannot get port from socket");
-	    DgramClose(sock);
-	    return -1;
-	}
-	if (SetSocketNonBlocking(sock, 1) == -1) {
-	    error("Cannot make client socket non-blocking");
-	    DgramClose(sock);
-	    return -1;
-	}
-	if (SetSocketReceiveBufferSize(sock, SERVER_RECV_SIZE + 256) == -1) {
-	    error("Cannot set receive buffer size to %d", SERVER_RECV_SIZE + 256);
-	}
-	if (SetSocketSendBufferSize(sock, SERVER_SEND_SIZE + 256) == -1) {
-	    error("Cannot set send buffer size to %d", SERVER_SEND_SIZE + 256);
+	Create_client_socket(&sock, &my_port);
+	if (rrecord) {
+	    *playback_ei++ = sock - min_fd;
+	    *playback_ei++ = my_port;
 	}
     }
     else {
 	sock = *playback_ei++;
 	my_port = *playback_ei++;
     }
-    if (rrecord) {
-	*playback_ei++ = sock - min_fd;
-	*playback_ei++ = my_port;
-    }
+    if (sock == -1)
+	return -1;
 
     Sockbuf_init(&connp->w, sock, SERVER_SEND_SIZE,
 		 SOCKBUF_WRITE | SOCKBUF_DGRAM);

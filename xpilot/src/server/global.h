@@ -238,6 +238,8 @@ extern int              recordMode;
 extern int              constantScoring;
 extern int              eliminationRace;
 extern char             *dataURL;
+extern int	       	clientPortStart;
+extern int		clientPortEnd;
 
 #endif
 
