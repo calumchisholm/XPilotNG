@@ -27,6 +27,7 @@
 #include "sdlkeys.h"
 #include "glwidgets.h"
 #include "sdlpaint.h"
+#include "sdlinit.h"
 
 /* These are only needed for the polygon tessellation */
 /* I'd like to move them to Paint_init/cleanup but because it */
@@ -51,7 +52,7 @@ int mapFontSize;
 char *gamefontname;
 
 /* ugly kps hack */
-bool file_exists(const char *path) 
+static bool file_exists(const char *path) 
 { 
   FILE *fp;
 
@@ -124,7 +125,7 @@ int Init_window(void)
     	error("SDL_ttf initialization failed: %s", SDL_GetError());
     	return -1;
     }
-    xpprintf("SDL_ttf initialized\n");
+    warn("SDL_ttf initialized.\n");
 
     Conf_print();
 

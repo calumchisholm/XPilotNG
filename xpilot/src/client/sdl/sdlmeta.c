@@ -109,8 +109,6 @@ typedef struct {
     char     *players_str;
 } PlayerListWidget;
 
-extern GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
-
 
 static void Scroll_PlayerListWidget(GLfloat pos, void *data)
 {
@@ -367,7 +365,7 @@ static void SetBounds_StatusWidget(GLWidget *widget, SDL_Rect *wb)
     }
 }
 
-static void add_status_entry(char *name, char *value, GLWidget *parent)
+static void add_status_entry(const char *name, char *value, GLWidget *parent)
 {
     GLWidget *name_label, *value_label;
     StatusWidget *info;
@@ -1006,11 +1004,10 @@ int Meta_window(Connect_param_t *conpar)
 	
 	Delete_server_list();
 	if ((num_serv = Get_meta_data(err)) <= 0) {
-	    fprintf(stderr, "Error: couldnt get meta list\n");
+	    error("Couldn't get meta list.");
 	    return -1;
-	} else {
-	    printf("xpilot_sdl: Got %d servers\n",num_serv);
-	}
+	} else
+	    warn("Got %d servers.", num_serv);
     }
     
     if (Welcome_sort_server_list() == -1) {

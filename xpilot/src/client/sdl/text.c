@@ -355,8 +355,14 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
     if (!(ft_font)) return false;
     if (!(ft_font->ttffont)) return false;
     if (!(string_tex)) return false;
+#if 0
     if (!strlen(text)) return false; /* something is printing an empty string each frame */
-    
+#else
+    /* kps - fix for empty author field in cannon dodgers */
+    if (!strlen(text))
+	text = " ";
+#endif
+
     forecol = &white;
 	
     string_tex->font_height = ft_font->h;
