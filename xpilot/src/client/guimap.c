@@ -471,8 +471,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
 	if ((other = Other_by_id(id)) != NULL) {
 	    if (other->name_width == 0) {
-		other->name_len = strlen(other->name);
-		other->name_width = 2 + XTextWidth(gameFont, other->name,
+		other->name_len = strlen(other->id_string);
+		other->name_width = 2 + XTextWidth(gameFont, other->id_string,
 						   other->name_len);
 	    }
 	}
