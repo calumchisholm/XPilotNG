@@ -347,7 +347,8 @@ void Radar_paint(void)
         } else {
             y = (int) (radar_bounds.h + yp - yo + 0.5);
         }
-        y = radar_bounds.h - y - 1;
+	/* CB fixed radar bug   y = radar_bounds.h - y - 1; */
+	y = radar_bounds.h - y;
         w = radar_bounds.w - x;
         h = radar_bounds.h - y;
         
