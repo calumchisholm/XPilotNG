@@ -25,39 +25,31 @@
 
 char painthud_version[] = VERSION;
 
-int	hudColor;		/* Color index for HUD drawing */
-int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
-int	hudVLineColor;		/* Color index for vert. HUD line drawing */
-int	hudItemsColor;		/* Color index for HUD items drawing */
-int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
-int	hudRadarOtherColor;	/* Color index for other hudradar dots */
-int	hudLockColor;		/* Color index for lock on HUD drawing */
-int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
-int	dirPtrColor;		/* Color index for dirptr drawing */
-int	messagesColor;		/* Color index for messages */
-int	oldMessagesColor;	/* Color index for old messages */
-int	msgScanBallColor;	/* Color index for ball msg */
-int	msgScanSafeColor;	/* Color index for safe msg */
-int	msgScanCoverColor;	/* Color index for cover msg */
-int	msgScanPopColor;	/* Color index for pop msg */
-
-int	hudRadarDotSize;	/* Size for hudradar dot drawing */
-double	hudRadarScale;		/* Scale for hudradar drawing */
-double	hudRadarMapScale;		/* Scale for mapradar drawing */
-double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
-				   your ship than this factor of visible
-				   range */
-int	hudSize;		/* Size for HUD drawing */
-
-int	fuelMeterColor;		/* Color index for fuel meter */
-int	powerMeterColor;	/* Color index for power meter */
-int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
-int	packetSizeMeterColor;	/* Color index for packet size meter */
-int	packetLossMeterColor;	/* Color index for packet loss meter */
-int	packetDropMeterColor;	/* Color index for packet drop meter */
-int	packetLagMeterColor;	/* Color index for packet lag meter */
-int	temporaryMeterColor;	/* Color index for temporary meter drawing */
-int	meterBorderColor;	/* Color index for meter border drawing */
+static int hudColor;		/* Color index for HUD drawing */
+static int hudHLineColor;	/* Color index for horiz. HUD line drawing */
+static int hudVLineColor;	/* Color index for vert. HUD line drawing */
+static int hudItemsColor;	/* Color index for HUD items drawing */
+static int hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
+static int hudRadarOtherColor;	/* Color index for other hudradar dots */
+static int hudLockColor;	/* Color index for lock on HUD drawing */
+static int fuelGaugeColor;	/* Color index for fuel gauge drawing */
+static int dirPtrColor;		/* Color index for dirptr drawing */
+static int messagesColor;	/* Color index for messages */
+static int oldMessagesColor;	/* Color index for old messages */
+static int msgScanBallColor;	/* Color index for ball msg */
+static int msgScanSafeColor;	/* Color index for safe msg */
+static int msgScanCoverColor;	/* Color index for cover msg */
+static int msgScanPopColor;	/* Color index for pop msg */
+static int fuelMeterColor;	/* Color index for fuel meter */
+static int powerMeterColor;	/* Color index for power meter */
+static int turnSpeedMeterColor;	/* Color index for turnspeed meter */
+static int packetSizeMeterColor;/* Color index for packet size meter */
+static int packetLossMeterColor;/* Color index for packet loss meter */
+static int packetDropMeterColor;/* Color index for packet drop meter */
+static int packetLagMeterColor;	/* Color index for packet lag meter */
+static int temporaryMeterColor;	/* Color index for temporary meter drawing */
+static int meterBorderColor;	/* Color index for meter border drawing */
+static int scoreObjectColor;	/* Color index for map score objects */
 
 radar_t	*old_radar_ptr;
 int	old_num_radar, old_max_radar;
@@ -552,7 +544,7 @@ void Paint_HUD(void)
 		    (int) (ext_view_height / 2 - 100 * tsin(heading)));
 
     if (hudRadarEnemyColor || hudRadarOtherColor) {
-	hudRadarMapScale = (double) Setup->width / (double) 256;
+	double hudRadarMapScale = (double) Setup->width / (double) 256;
 	Paint_hudradar(
 	    hudRadarScale,
 	    hudRadarLimit * (active_view_width / 2) * hudRadarScale
@@ -1197,6 +1189,11 @@ xp_option_t hud_options[] = {
 	&meterBorderColor,
 	"Which color number to use for drawing borders of meters.\n"),
 
+    COLOR_INDEX_OPTION(
+	"scoreObjectColor",
+	4,
+	&scoreObjectColor,
+	"Which color number to use for drawing score objects.\n"),
 
 };
 

@@ -561,7 +561,7 @@ extern char	modBankStr[][MAX_CHARS];/* modifier banks strings */
 
 extern int	clientPortStart;	/* First UDP port for clients */
 extern int	clientPortEnd;		/* Last one (these are for firewalls) */
-
+extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern byte	lose_item;		/* flag and index to drop item */
 extern int	lose_item_active;	/* one of the lose keys is pressed */
 

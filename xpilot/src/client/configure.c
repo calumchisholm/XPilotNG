@@ -484,17 +484,19 @@ static int Config_create_showNastyShots(int widget_desc, int *height)
                               Config_update_bool, &showNastyShots);
 }
 
-extern int hudHLineColor;
+int foobarColor;
+
 static int Config_create_hudHLineColor(int widget_desc, int *height)
 {
-    return CONFIG_CREATE_COLOR(hudHLineColor);
+    return CONFIG_CREATE_COLOR(foobarColor);
 }
 
+double foobarDouble;
 
 static int Config_create_hudRadarScale(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
-			       "hudRadarScale", &hudRadarScale, 0.5, 4.0,
+			       "foobarDouble", &foobarDouble, 0.5, 4.0,
 			       NULL, NULL);
 }
 

@@ -88,14 +88,6 @@ int	spark_color[MAX_COLORS];
 int	buttonColor;		/* Color index for button drawing */
 int	windowColor;		/* Color index for window drawing */
 int	borderColor;		/* Color index for border drawing */
-int	clockColor;		/* Clock color index */
-int	scoreColor;		/* Score list color index */
-int	scoreSelfColor;		/* Score list own score color index */
-int	scoreInactiveColor;	/* Score list inactive player color index */
-int	scoreInactiveSelfColor;	/* Score list inactive self color index */
-int	scoreOwnTeamColor;	/* Score list own team color index */
-int	scoreEnemyTeamColor;	/* Score list enemy team color index */
-int	scoreObjectColor;	/* Color index for map score objects */
 int	zeroLivesColor;		/* Color to associate with 0 lives */
 int	oneLifeColor;		/* Color to associate with 1 life */
 int	twoLivesColor;		/* Color to associate with 2 lives */
@@ -1290,13 +1282,6 @@ xp_option_t color_options[] = {
 	"Which color number to use for drawing the shipshapes hack.\n"),
 
     COLOR_INDEX_OPTION(
-	"clockColor",
-	1,
-	&clockColor,
-	"Which color number to use for drawing the clock.\n"
-	"The clock is displayed in the top right of the score window.\n"),
-
-    COLOR_INDEX_OPTION(
 	"ballColor",
 	1,
 	&ballColor,
@@ -1413,48 +1398,6 @@ xp_option_t color_options[] = {
 	2,
 	&mineNameColor,
 	"Which color number to use for drawing names of mines.\n"),
-
-    COLOR_INDEX_OPTION(
-	"scoreColor",
-	1,
-	&scoreColor,
-	"Which color number to use for drawing score list entries.\n"),
-
-    COLOR_INDEX_OPTION(
-	"scoreSelfColor",
-	3,
-	&scoreSelfColor,
-	"Which color number to use for drawing your own score.\n"),
-
-    COLOR_INDEX_OPTION(
-	"scoreInactiveColor",
-	12,
-	&scoreInactiveColor,
-	"Which color number to use for drawing inactive players's scores.\n"),
-
-    COLOR_INDEX_OPTION(
-	"scoreInactiveSelfColor",
-	12,
-	&scoreInactiveSelfColor,
-	"Which color number to use for drawing your score when inactive.\n"),
-
-    COLOR_INDEX_OPTION(
-	"scoreOwnTeamColor",
-	4,
-	&scoreOwnTeamColor,
-	"Which color number to use for drawing your own team score.\n"),
-
-    COLOR_INDEX_OPTION(
-	"scoreEnemyTeamColor",
-	11,
-	&scoreEnemyTeamColor,
-	"Which color number to use for drawing enemy team score.\n"),
-
-    COLOR_INDEX_OPTION(
-	"scoreObjectColor",
-	4,
-	&scoreObjectColor,
-	"Which color number to use for drawing score objects.\n"),
 
     COLOR_INDEX_OPTION(
 	"team0Color",

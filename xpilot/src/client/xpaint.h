@@ -120,6 +120,8 @@ extern void Gui_paint_item_symbol(int type, Drawable d, GC mygc,
 				  int x, int y, int c);
 extern void Gui_paint_item(int type, Drawable d, GC mygc, int x, int y);
 
+extern void Store_xpaint_options(void);
+
 /*
  * colors.c
  */

@@ -29,7 +29,12 @@ char myName[] = "xpilot";
 char myClass[] = "XPilot";
 
 int	baseWarningType;	/* Which type of base warning you prefer */
-
+int	hudRadarDotSize;	/* Size for hudradar dot drawing */
+double	hudRadarScale;		/* Scale for hudradar drawing */
+double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
+				   your ship than this factor of visible
+				   range */
+int	hudSize;		/* Size for HUD drawing */
 
 /*
  * kps TODO:

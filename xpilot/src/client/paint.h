@@ -73,21 +73,13 @@ extern int	mineNameColor;		/* Color index for mine name drawing */
 extern int	teamShotColor;		/* Color index for harmless shot drawing */
 extern int	ballColor;		/* Color index for ball drawing */
 extern int	connColor;		/* Color index for connector drawing */
-extern int	baseWarningType;	/* Which type of base warning you prefer */
+
 extern int	wallColor;		/* Color index for wall drawing */
 
 extern int	wallRadarColor;		/* Color index for walls on radar */
 extern int	targetRadarColor;	/* Color index for targets on radar */
 extern int	decorColor;		/* Color index for decoration drawing */
 extern int	decorRadarColor;	/* Color index for decorations on radar */
-extern int	clockColor;		/* Clock color index */
-extern int	scoreColor;		/* Score list color index */
-extern int	scoreSelfColor;		/* Score list own score color index */
-extern int	scoreInactiveColor;	/* Score list inactive player color index */
-extern int	scoreInactiveSelfColor;	/* Score list inactive self color index */
-extern int	scoreOwnTeamColor;	/* Score list own team color index */
-extern int	scoreEnemyTeamColor;	/* Score list enemy team color index */
-extern int	scoreObjectColor;	/* Color index for map score objects */
 
 extern bool	gotFocus;		/* Do we have the mouse pointer */
 extern bool	talk_mapped;		/* Is talk window visible */

@@ -86,6 +86,15 @@ bool	players_exposed;
 
 static double   time_counter = 0.0;
 
+static int clockColor;		/* Clock color index */
+static int scoreColor;		/* Score list color indices */
+static int scoreSelfColor;	/* Score list own score color index */
+static int scoreInactiveColor;	/* Score list inactive player color index */
+static int scoreInactiveSelfColor;
+				/* Score list inactive self color index */
+static int scoreOwnTeamColor;	/* Score list own team color index */
+static int scoreEnemyTeamColor;	/* Score list enemy team color index */
+
 static void Paint_clock(bool redraw);
 
 int Paint_init(void)
@@ -669,4 +678,55 @@ void Play_beep(void)
 {
     XBell(dpy, 0);
     XFlush(dpy);
+}
+
+
+xp_option_t xpaint_options[] = {
+    COLOR_INDEX_OPTION(
+	"clockColor",
+	1,
+	&clockColor,
+	"Which color number to use for drawing the clock.\n"
+	"The clock is displayed in the top right of the score window.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreColor",
+	1,
+	&scoreColor,
+	"Which color number to use for drawing score list entries.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreSelfColor",
+	3,
+	&scoreSelfColor,
+	"Which color number to use for drawing your own score.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreInactiveColor",
+	12,
+	&scoreInactiveColor,
+	"Which color number to use for drawing inactive players's scores.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreInactiveSelfColor",
+	12,
+	&scoreInactiveSelfColor,
+	"Which color number to use for drawing your score when inactive.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreOwnTeamColor",
+	4,
+	&scoreOwnTeamColor,
+	"Which color number to use for drawing your own team score.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreEnemyTeamColor",
+	11,
+	&scoreEnemyTeamColor,
+	"Which color number to use for drawing enemy team score.\n"),
+};
+
+void Store_xpaint_options(void)
+{
+    STORE_OPTIONS(xpaint_options);
 }
