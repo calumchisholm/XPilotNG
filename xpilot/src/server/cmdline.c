@@ -115,7 +115,7 @@ static option_desc opts[] = {
 	NULL,
 	valVoid,
 	tuner_none,
-	"Print all options with their default values in defaultsfile format.\n",
+	"Print all options and their default values in defaultsfile format.\n",
 	OPT_NONE
     },
     {
@@ -369,7 +369,7 @@ static option_desc opts[] = {
     {
 	"robotHostName",
 	"robotHostName",
-	"xpilot.org",
+	"xpilot.sourceforge.net",
 	&options.robotHostName,
 	valString,
 	Tune_robot_host_name,
@@ -389,7 +389,7 @@ static option_desc opts[] = {
     {
 	"tankHostName",
 	"tankHostName",
-	"tanks.org",
+	"xpilot.sourceforge.net",
 	&options.tankHostName,
 	valString,
 	Tune_tank_host_name,
@@ -1211,7 +1211,7 @@ static option_desc opts[] = {
 	&World.items[ITEM_FUEL].cannon_initial,
 	valInt,
 	Set_initial_resources,
-	"How much fuel cannons start with, or the minimum after being killed.\n",
+	"How much fuel cannons start with.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2565,7 +2565,7 @@ static option_desc opts[] = {
 	valReal,
 	Set_misc_item_limits,
 	"The chance for an item to appear near an item concentrator.\n"
-	"If this is less than 1.0 or there are no item concentrators,"
+	"If this is less than 1.0 or there are no item concentrators,\n"
 	"items may also popup where there is no concentrator nearby.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -2590,7 +2590,7 @@ static option_desc opts[] = {
 	valReal,
 	Tune_asteroid_prob,
 	"The chance for an asteroid to appear near an asteroid concentrator.\n"
-	"If this is less than 1.0 or there are no asteroid concentrators,"
+	"If this is less than 1.0 or there are no asteroid concentrators,\n"
 	"asteroids may also appear where there is no concentrator nearby.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -2601,7 +2601,7 @@ static option_desc opts[] = {
 	&options.rogueHeatProb,
 	valReal,
 	tuner_dummy,
-	"Probability that unclaimed missile packs will go rogue.",
+	"Probability that unclaimed missile packs will go rogue.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2611,7 +2611,7 @@ static option_desc opts[] = {
 	&options.rogueMineProb,
 	valReal,
 	tuner_dummy,
-	"Probability that unclaimed mine items will activate.",
+	"Probability that unclaimed mine items will activate.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2831,7 +2831,7 @@ static option_desc opts[] = {
 	&World.items[ITEM_FUEL].initial,
 	valInt,
 	Set_initial_resources,
-	"How much fuel players start with, or the minimum after being killed.\n",
+	"How much fuel players start with.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
