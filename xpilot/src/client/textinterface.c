@@ -781,8 +781,9 @@ int Contact_servers(int count, char **servers,
 	    Sockbuf_clear(&sbuf);
 	    Packet_printf(&sbuf, "%u%s%hu%c", MAGIC, conpar->user_name,
 			  sock_get_port(&sbuf.sock), CONTACT_pack);
+	    assert(sbuf.len >= 0);
 	    if (Query_all(&sbuf.sock, conpar->contact_port,
-			  sbuf.buf, sbuf.len) == -1) {
+			  sbuf.buf, (size_t)sbuf.len) == -1) {
 		error("Couldn't send contact requests");
 		exit(1);
 	    }

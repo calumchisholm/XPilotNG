@@ -184,12 +184,11 @@ struct Meta {
     enum MetaState state;	/* connecting, readable, receiving */
 };
 
-/* lclint points out that the sock stucture is not correctly */
-/* initialised */
+#define META_INIT_SOCK {-2, {0, 0}, 0, {0, 0, 0}, NULL, NULL}
 
 static struct Meta metas[NUM_METAS] = {
-    {META_HOST,     META_IP,     {-2}, MetaConnecting},
-    {META_HOST_TWO, META_IP_TWO, {-2}, MetaConnecting}
+    {META_HOST,     META_IP,     META_INIT_SOCK, MetaConnecting},
+    {META_HOST_TWO, META_IP_TWO, META_INIT_SOCK, MetaConnecting}
 };
 
 /*
@@ -1334,6 +1333,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
 
     char *s;
 
+    (void)widget; (void)text;
     global_sip = sip;
 
     Widget_destroy_children(subform_widget);
@@ -1954,6 +1954,7 @@ static int Internet_cb(int widget, void *user_data, const char **text)
 {
     Connect_param_t *conpar = (Connect_param_t *) user_data;
 
+    (void)widget; (void)text;
     Welcome_set_mode(ModeInternet);
 
     if (!server_list ||
@@ -2015,6 +2016,7 @@ static int Help_cb(int widget, void *user_data, const char **text)
  */
 static int Quit_cb(int widget, void *user_data, const char **text)
 {
+    (void)widget; (void)user_data; (void)text;
     Welcome_set_mode(ModeQuit);
 
     quitting = true;
@@ -2160,7 +2162,7 @@ static void Welcome_cleanup(void)
  */
 static void Welcome_set_mode(enum Welcome_mode new_welcome_mode)
 {
-    int old_welcome_mode = welcome_mode;
+    enum Welcome_mode old_welcome_mode = welcome_mode;
 
     Widget_destroy_children(subform_widget);
 
