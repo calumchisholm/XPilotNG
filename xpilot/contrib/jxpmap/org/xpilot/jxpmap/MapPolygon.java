@@ -4,8 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -25,6 +24,25 @@ public class MapPolygon extends MapObject {
     protected int type;
     protected int team;
 
+    public Object deepClone (Map context) {
+
+        MapPolygon clone = (MapPolygon)super.deepClone(context);
+
+        clone.polygon = new Polygon(polygon.xpoints, 
+                                    polygon.ypoints, 
+                                    polygon.npoints);
+
+        clone.style = (PolygonStyle)style.deepClone(context);
+
+        if (edgeStyles != null) {
+            ArrayList l = new ArrayList();
+            for (Iterator i = edgeStyles.iterator(); i.hasNext();)
+                l.add(((LineStyle)i.next()).deepClone(context));
+            clone.edgeStyles = l;
+        }
+
+        return clone;
+    }
 
     public MapPolygon () {}
 
@@ -285,64 +303,74 @@ public class MapPolygon extends MapObject {
             Rectangle b = getBounds();
             Point p = me.getPoint();
             Polygon pl = polygon;
-
-
+            Rectangle larger = 
+                new Rectangle(b.x - 20 * 64,
+                              b.y - 20 * 64,
+                              b.width + 40 * 64,
+                              b.height + 40 * 64);
+            Point[] wraps = canvas.computeWraps(larger, p);
+            if (wraps.length == 0) return false;
+            
+            double thresholdSq = 100 / (canvas.getScale() * canvas.getScale());
             if ((me.getModifiers() & InputEvent.BUTTON1_MASK) != 0
                 && me.getID() == me.MOUSE_PRESSED) {
                 
-                if (b.x - 20 * 64 > p.x
-                    || b.y - 20 * 64 > p.y
-                    || b.x + b.width + 20 * 64 < p.x
-                    || b.y + b.height + 20 * 64 < p.y) return false;
-                
-                for (int i = 0; i < pl.npoints; i++) {
-                    if (Point.distanceSq
-                        (p.x, p.y, pl.xpoints[i], 
-                         pl.ypoints[i]) < 25 * 64 * 64) {
-                        
-                        if (canvas.isErase()) {
-                            removePoint(i);
-                            canvas.repaint();
-                        } else {
-                            canvas.setCanvasEventHandler
-                                (new PolygonPointMoveHandler(me, i));
+                for (int pi = 0; pi < wraps.length; pi++) {
+                    Point wp = wraps[pi];
+                    for (int i = 0; i < pl.npoints; i++) {
+                        if (Point.distanceSq
+                            (wp.x, wp.y, pl.xpoints[i], 
+                             pl.ypoints[i]) < thresholdSq) {
+                            
+                            if (canvas.isErase()) {
+                                canvas.saveUndo();
+                                removePoint(i);
+                                canvas.repaint();
+                            } else {
+                                canvas.setCanvasEventHandler
+                                    (new PolygonPointMoveHandler(me, i));
+                            }
+                            return true;
                         }
-                        return true;
                     }
                 }
             }
                 
             if (!canvas.isErase()) {
                     
-                for (int i = 0; i < pl.npoints; i++) {
-                        
-                    int ni = (i + 1) % pl.npoints;
-                    if (Line2D.ptSegDistSq(pl.xpoints[i],
-                                           pl.ypoints[i],
-                                           pl.xpoints[ni],
-                                           pl.ypoints[ni],
-                                           p.x, p.y) < 25 * 64 * 64) {
-
-                        if ((me.getModifiers() & 
-                             InputEvent.BUTTON1_MASK) != 0) {
+                for (int pi = 0; pi < wraps.length; pi++) {
+                    Point wp = wraps[pi];
+                    for (int i = 0; i < pl.npoints; i++) {
+                        int ni = (i + 1) % pl.npoints;
+                        if (Line2D.ptSegDistSq(pl.xpoints[i],
+                                               pl.ypoints[i],
+                                               pl.xpoints[ni],
+                                               pl.ypoints[ni],
+                                               wp.x, wp.y) < thresholdSq) {
                             
-                            if (me.getID() == me.MOUSE_PRESSED) {
-                                insertPoint(i + 1, p);
-                                canvas.repaint();
-                                canvas.setCanvasEventHandler
-                                    (new PolygonPointMoveHandler(me, i + 1));
-                                return true;
-                            }
-
-                        } else {
-
-                            if (me.getID() == me.MOUSE_CLICKED) {
-                                EditorDialog.show
-                                    (canvas,
-                                     new EdgePropertyEditor(canvas, this, i),
-                                     true,
-                                     EditorDialog.OK_CANCEL);
-                                return true;
+                            if ((me.getModifiers() & 
+                                 InputEvent.BUTTON1_MASK) != 0) {
+                                
+                                if (me.getID() == me.MOUSE_PRESSED) {
+                                    canvas.saveUndo();
+                                    insertPoint(i + 1, p);
+                                    canvas.repaint();
+                                    canvas.setCanvasEventHandler
+                                        (new PolygonPointMoveHandler
+                                         (me, i + 1));
+                                    return true;
+                                }
+                                
+                            } else {
+                                
+                                if (me.getID() == me.MOUSE_CLICKED) {
+                                    EditorDialog.show
+                                        (canvas, new EdgePropertyEditor
+                                         (canvas, this, i),
+                                         true,
+                                         EditorDialog.OK_CANCEL);
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -440,7 +468,7 @@ public class MapPolygon extends MapObject {
             g.setXORMode(Color.black);
             g.setColor(Color.white);
             if (stroke == null) stroke = getPreviewStroke(c.getScale());
-            g.setStroke(stroke);
+            //g.setStroke(stroke);
 
             if (remove) {
                 c.drawShape(g, poly);
@@ -458,6 +486,7 @@ public class MapPolygon extends MapObject {
                                     poly.npoints - 1);
                     MapPolygon.this.style = 
                         c.getModel().getDefaultPolygonStyle();
+                    c.saveUndo();
                     c.getModel().addToFront(MapPolygon.this);
 
                     // This hack consumes mouse released and mouse clicked
@@ -491,7 +520,7 @@ public class MapPolygon extends MapObject {
             g.setXORMode(Color.black);
             g.setColor(Color.white);
             if (stroke == null) stroke = getPreviewStroke(c.getScale());
-            g.setStroke(stroke);
+            //g.setStroke(stroke);
             if (remove) c.drawShape(g, poly);
             
             int li = poly.npoints - 1;
@@ -542,7 +571,7 @@ public class MapPolygon extends MapObject {
             Graphics2D g = (Graphics2D)c.getGraphics();
             g.setXORMode(Color.black);
             g.setColor(Color.white);
-            g.setStroke(stroke);
+            //g.setStroke(stroke);
 
             if (!virgin) drawPreview(g, c);
             else virgin = false;
@@ -555,6 +584,9 @@ public class MapPolygon extends MapObject {
         
 
         public void mouseReleased (MouseEvent evt) {
+
+            MapCanvas c = (MapCanvas)evt.getSource();
+            c.saveUndo();
             
             polygon.xpoints[index] = evt.getX();
             polygon.ypoints[index] = evt.getY();
@@ -562,7 +594,6 @@ public class MapPolygon extends MapObject {
                                     polygon.ypoints, 
                                     polygon.npoints);
             polygon = p;
-            MapCanvas c = (MapCanvas)evt.getSource();
             c.setCanvasEventHandler(null);
             c.repaint();
         }

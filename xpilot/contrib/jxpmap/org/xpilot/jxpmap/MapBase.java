@@ -72,7 +72,7 @@ public class MapBase extends MapObject {
 
     
     public EditorPanel getPropertyEditor (MapCanvas c) {
-        return new BasePropertyEditor();
+        return new BasePropertyEditor(c);
     }
 
 
@@ -89,9 +89,10 @@ public class MapBase extends MapObject {
 
         private JComboBox cmbTeam;
         private JComboBox cmbDir;
+        private MapCanvas canvas;
 
 
-        public BasePropertyEditor () {
+        public BasePropertyEditor (MapCanvas canvas) {
 
             setTitle("Base Properties");
 
@@ -113,12 +114,19 @@ public class MapBase extends MapObject {
             add(cmbTeam);
             add(new JLabel("Direction:"));
             add(cmbDir);
+
+            this.canvas = canvas;
         }
         
         
         public boolean apply () {
-            setTeam(cmbTeam.getSelectedIndex() + 1);
-            setDir(cmbDir.getSelectedIndex() * 32);
+            int newTeam = cmbTeam.getSelectedIndex() + 1;
+            int newDir = cmbDir.getSelectedIndex() * 32;
+            if (newTeam != getTeam() || newDir != getDir()) {
+                canvas.saveUndo();
+                setTeam(newTeam);
+                setDir(newDir);
+            }                
             return true;
         }
     }

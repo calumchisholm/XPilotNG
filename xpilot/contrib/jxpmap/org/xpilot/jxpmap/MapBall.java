@@ -45,15 +45,16 @@ public class MapBall extends MapObject {
 
 
     public EditorPanel getPropertyEditor (MapCanvas canvas) {
-        return new BallPropertyEditor();
+        return new BallPropertyEditor(canvas);
     }
 
 
     private class BallPropertyEditor extends EditorPanel {
 
         private JComboBox cmbTeam;
+        private MapCanvas canvas;
 
-        public BallPropertyEditor () {
+        public BallPropertyEditor (MapCanvas canvas) {
             setTitle("Ball Properties");
             setLayout(new java.awt.GridLayout(1, 2));
             cmbTeam = new JComboBox();
@@ -62,11 +63,15 @@ public class MapBall extends MapObject {
             cmbTeam.setSelectedIndex(getTeam() - 1);
             add(new JLabel("Team:"));
             add(cmbTeam);
+            this.canvas = canvas;
         }
         
-        
         public boolean apply () {
-            setTeam(cmbTeam.getSelectedIndex() + 1);
+            int newTeam = cmbTeam.getSelectedIndex() + 1;
+            if (newTeam != getTeam()) {
+                canvas.saveUndo();
+                setTeam(newTeam);
+            }
             return true;
         }
     }

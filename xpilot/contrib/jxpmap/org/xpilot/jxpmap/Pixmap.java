@@ -2,14 +2,14 @@ package org.xpilot.jxpmap;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Map;
 
-public class Pixmap {
+public class Pixmap extends ModelObject {
     
     private String fileName;
     private boolean scalable;
     private BufferedImage image;
 
-    
     public Pixmap () {
         this.scalable = true;
     }

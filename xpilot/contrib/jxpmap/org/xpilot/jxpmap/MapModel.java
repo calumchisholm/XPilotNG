@@ -9,9 +9,10 @@ import java.io.*;
 import java.util.*;
 import javax.xml.parsers.*;
 import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 
-public class MapModel {
+public class MapModel extends ModelObject {
 
     List pixmaps;
     List objects;
@@ -22,6 +23,33 @@ public class MapModel {
     int defEdgeStyleIndex;
     int defPolygonStyleIndex;
 
+    public Object deepClone (Map context) {
+
+        MapModel clone = (MapModel)super.deepClone(context);
+            
+        ArrayList l = new ArrayList();
+        for (Iterator i = pixmaps.iterator(); i.hasNext();)
+            l.add(((Pixmap)i.next()).deepClone(context));
+        clone.pixmaps = l;
+
+        l = new ArrayList();
+        for (Iterator i = objects.iterator(); i.hasNext();)
+            l.add(((MapObject)i.next()).deepClone(context));
+        clone.objects = l;
+        
+        l = new ArrayList();
+        for (Iterator i = edgeStyles.iterator(); i.hasNext();)
+            l.add(((LineStyle)i.next()).deepClone(context));
+        clone.edgeStyles = l;
+        
+        l = new ArrayList();
+        for (Iterator i = polyStyles.iterator(); i.hasNext();)
+            l.add(((PolygonStyle)i.next()).deepClone(context));
+        clone.polyStyles = l;
+        
+        clone.options = new MapOptions(options);
+        return clone;
+    }
     
     public MapModel () {
 
@@ -121,7 +149,7 @@ public class MapModel {
         throws IOException, SAXException, ParserConfigurationException {
 
         edgeStyles.clear();
-	LineStyle ls;
+        LineStyle ls;
         ls = new LineStyle("internal", 0, Color.black, LineStyle.STYLE_HIDDEN);
         edgeStyles.add(ls);
         polyStyles.clear();
@@ -132,9 +160,9 @@ public class MapModel {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setValidating(false);
 
-        Parser parser = spf.newSAXParser().getParser();
-        parser.setDocumentHandler(new MapDocumentHandler());
-        parser.parse(uri);
+        XMLReader reader = spf.newSAXParser().getXMLReader();
+        reader.setContentHandler(new MapDocumentHandler());
+        reader.parse(uri);
 
         System.out.println(fileName + " parsed successfully");
         System.out.println("loading images");
@@ -191,7 +219,7 @@ public class MapModel {
     }
 
 
-    private class MapDocumentHandler extends HandlerBase {
+    private class MapDocumentHandler extends DefaultHandler {
 
         private List polys;
         private Poly poly;
@@ -207,7 +235,7 @@ public class MapModel {
         public MapDocumentHandler () {
             polys = new ArrayList();
             estyles = new HashMap();
-	    estyles.put("internal", edgeStyles.get(0));
+            estyles.put("internal", edgeStyles.get(0));
             pstyles = new HashMap();
             bstyles = new HashMap();
             opMap = new HashMap();
@@ -217,7 +245,10 @@ public class MapModel {
         }
         
 
-        public void startElement (String name, AttributeList atts) 
+        public void startElement (String ns, 
+                                  String local,
+                                  String name, 
+                                  Attributes atts) 
             throws SAXException {
 
             try {
@@ -363,7 +394,8 @@ public class MapModel {
         }
 
 
-        public void endElement (String name) throws SAXException {
+        public void endElement (String ns, String local, String name) 
+            throws SAXException {
             
             try {
                 if (name.equalsIgnoreCase("polygon")) {

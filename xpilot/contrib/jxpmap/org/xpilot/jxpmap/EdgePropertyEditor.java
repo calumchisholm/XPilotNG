@@ -45,7 +45,7 @@ public class EdgePropertyEditor extends EditorPanel {
 
 
     public boolean apply () {
-
+        canvas.saveUndo();
         int styleIndex = cmbStyle.getSelectedIndex();
         LineStyle style = (LineStyle)model.edgeStyles.get(styleIndex);
         if (style == polygon.getStyle().getDefaultEdgeStyle()) style = null;

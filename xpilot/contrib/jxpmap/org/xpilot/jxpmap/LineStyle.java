@@ -4,7 +4,7 @@ import java.awt.*;
 import java.io.PrintWriter;
 import java.io.IOException;
 
-public class LineStyle {
+public class LineStyle extends ModelObject {
 
     public static final int STYLE_SOLID = 0;
     public static final int STYLE_ONOFFDASH = 1;
@@ -17,7 +17,6 @@ public class LineStyle {
     private String id;    
     private int width;
     private float cscale;
-
     
     public LineStyle () {
         color = Color.black;

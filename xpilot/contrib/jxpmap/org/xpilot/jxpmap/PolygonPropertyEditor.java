@@ -12,11 +12,13 @@ public class PolygonPropertyEditor extends EditorPanel {
 
     private MapPolygon polygon;
     private MapModel model;
+    private MapCanvas canvas;
 
     
     public PolygonPropertyEditor (MapCanvas canvas, MapPolygon poly) {
 
         this.polygon = poly;
+        this.canvas = canvas;
         this.model = canvas.getModel();
 
         setTitle("Polygon Properties");
@@ -55,7 +57,7 @@ public class PolygonPropertyEditor extends EditorPanel {
 
 
     public boolean apply () {
-
+        canvas.saveUndo();
         int styleIndex = cmbStyle.getSelectedIndex();
         PolygonStyle style = (PolygonStyle)model.polyStyles.get(styleIndex);
         polygon.setStyle(style);

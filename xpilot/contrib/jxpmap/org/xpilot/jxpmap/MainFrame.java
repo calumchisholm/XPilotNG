@@ -7,7 +7,6 @@ import java.io.File;
 
 public class MainFrame extends JFrame implements ActionListener {
 
-    private JScrollPane sp;
     private MapCanvas canvas;
     private int zoom;
 
@@ -17,8 +16,8 @@ public class MainFrame extends JFrame implements ActionListener {
     private JToggleButton btnNewBall;
     private JToggleButton btnNewCheckPoint;
     private JToggleButton btnErase;
-    private JButton btnZoomIn;
-    private JButton btnZoomOut;
+    private JButton btnUndo;
+    private JButton btnRedo;
     private JLabel lblZoom;
     private File mapFile;
 
@@ -26,14 +25,14 @@ public class MainFrame extends JFrame implements ActionListener {
 
         super("jXPMap Editor");
         canvas = new MapCanvas();
-        sp = new JScrollPane(canvas);
-        getContentPane().add(sp, BorderLayout.CENTER);
+        getContentPane().add(canvas, BorderLayout.CENTER);
         buildMenuBar();
         buildToolBar();
         buildActionMap();
         buildInputMap();
-        setSize(500, 400);
-        zoom = 0;
+        setSize(800, 600);
+        Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(ss.width / 2 - 400, ss.height / 2 - 300);
     }
 
 
@@ -70,6 +69,19 @@ public class MainFrame extends JFrame implements ActionListener {
         menuItem = new JMenuItem("Exit");
         menu.add(menuItem);
         menuItem.setActionCommand("exitApp");
+        menuItem.addActionListener(this);
+
+
+        menu = new JMenu("Edit");
+        menuBar.add(menu);
+        menuItem = new JMenuItem("Undo");
+        menu.add(menuItem);
+        menuItem.setActionCommand("undo");
+        menuItem.addActionListener(this);
+
+        menuItem = new JMenuItem("Redo");
+        menu.add(menuItem);
+        menuItem.setActionCommand("redo");
         menuItem.addActionListener(this);
 
 
@@ -129,21 +141,29 @@ public class MainFrame extends JFrame implements ActionListener {
 
         toolBar.addSeparator();
 
-        btnZoomIn = createButton
+        JButton btn = createButton
             ("zoomIn", "/images/zoominicon.gif", "Zoom in");
-        toolBar.add(btnZoomIn);
+        toolBar.add(btn);
 
-        btnZoomOut = createButton
+        btn = createButton
             ("zoomOut", "/images/zoomouticon.gif", "Zoom out");
-        toolBar.add(btnZoomOut);
-
-        toolBar.addSeparator();
+        toolBar.add(btn);
 
         lblZoom = new JLabel();
         lblZoom.setHorizontalAlignment(SwingConstants.CENTER);
         Font f = lblZoom.getFont();
         lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));
         toolBar.add(lblZoom);
+
+        toolBar.addSeparator();
+
+        btnUndo = createButton
+            ("undo", "/images/undo.gif", "Undo");
+        toolBar.add(btnUndo);
+
+        btnRedo = createButton
+            ("redo", "/images/redo.gif", "Redo");
+        toolBar.add(btnRedo);
 
         getContentPane().add(toolBar, BorderLayout.WEST);
     }
@@ -159,7 +179,8 @@ public class MainFrame extends JFrame implements ActionListener {
     private void buildInputMap () {
         InputMap im = canvas.getInputMap(canvas.WHEN_IN_FOCUSED_WINDOW);
         im.put(KeyStroke.getKeyStroke("control S"), "quickSave");
-        im.put(KeyStroke.getKeyStroke("control L"), "quickOpen");        
+        im.put(KeyStroke.getKeyStroke("control L"), "quickOpen");
+        im.put(KeyStroke.getKeyStroke("control Z"), "undo");
     }
 
 
@@ -207,6 +228,10 @@ public class MainFrame extends JFrame implements ActionListener {
         return b;
     }
 
+    private void setZoom (int zoom) {
+        this.zoom = zoom;
+        updateScale();
+    }
 
     private void zoomIn () {
         zoom++;
@@ -339,7 +364,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private void newMap () {
         mapFile = null;
         setModel(new MapModel());
-        showOptions();
+        //setZoom(-5);
     }
 
     
@@ -365,6 +390,7 @@ public class MainFrame extends JFrame implements ActionListener {
             return;
         }
         setModel(model);
+        //setZoom(-5);
     }
 
 
@@ -466,6 +492,20 @@ public class MainFrame extends JFrame implements ActionListener {
         setModel(model);
     }
 
+    private void undo () {
+        if (!canvas.getUndoManager().canRedo()) {
+            canvas.saveUndo();
+            canvas.getUndoManager().undo();
+        }
+        if (canvas.getUndoManager().canUndo())
+            canvas.getUndoManager().undo();
+    }
+
+    private void redo () {
+        if (canvas.getUndoManager().canRedo())
+            canvas.getUndoManager().redo();
+    }
+
 
     private void updateToggles (JToggleButton boss) {
         if (boss != btnNewPoly) btnNewPoly.setSelected(false);
@@ -516,7 +556,7 @@ public class MainFrame extends JFrame implements ActionListener {
             MapModel model = new MapModel();
             if (args.length > 0) model.load(args[0]);
             mf.setModel(model);
-
+            //mf.setZoom(-5);
         }
     }
 }

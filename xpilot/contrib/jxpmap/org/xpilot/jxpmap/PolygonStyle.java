@@ -3,8 +3,9 @@ package org.xpilot.jxpmap;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
-public class PolygonStyle {
+public class PolygonStyle extends ModelObject {
 
     public static final int FILL_NONE = 0;
     public static final int FILL_COLOR = 1;
@@ -17,6 +18,15 @@ public class PolygonStyle {
     private int fillStyle;
     private LineStyle defEdgeStyle;
     private String id;
+
+    public Object deepClone (Map context) {
+        PolygonStyle ps = (PolygonStyle)super.deepClone(context);
+        if (texture != null)
+            ps.texture = (Pixmap)texture.deepClone(context);
+        if (defEdgeStyle != null)
+            ps.defEdgeStyle = (LineStyle)defEdgeStyle.deepClone(context);
+        return ps;
+    }
 
 
     public boolean isVisible () {

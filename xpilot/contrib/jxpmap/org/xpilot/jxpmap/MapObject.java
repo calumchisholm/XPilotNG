@@ -6,15 +6,22 @@ import java.awt.geom.AffineTransform;
 import javax.swing.*;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.Map;
 
 
-public abstract class MapObject {
+public abstract class MapObject extends ModelObject {
     
     protected Rectangle bounds;
     protected Stroke previewStroke;
     protected Image img;
     protected MapObjectPopup popup;
-
+    
+    public Object deepClone (Map context) {
+        MapObject clone = (MapObject)super.deepClone(context);
+        clone.bounds = new Rectangle(bounds);
+        clone.popup = new MapObjectPopup(clone);
+        return clone;
+    }
     
     public MapObject () {
         this(null, 0, 0, 0, 0);
@@ -52,7 +59,6 @@ public abstract class MapObject {
     public boolean contains (Point p) {
         return getBounds().contains(p);
     }
-
 
     public int getZOrder () {
         return 10;
@@ -112,7 +118,7 @@ public abstract class MapObject {
         if (evt instanceof MouseEvent) {
             MouseEvent me = (MouseEvent)evt;
 
-            if (contains(me.getPoint())) {
+            if (canvas.containsWrapped(this, me.getPoint())) {
                 if (me.isPopupTrigger()) {
                     Point p = me.getPoint();
                     canvas.getTransform().transform(p, p);
@@ -122,6 +128,7 @@ public abstract class MapObject {
                 } else {
                     if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
                         if (canvas.isErase()) {
+                            canvas.saveUndo();
                             canvas.getModel().removeObject(this);
                             canvas.repaint();
                         } else {
@@ -189,7 +196,7 @@ public abstract class MapObject {
             g.setXORMode(Color.black);
             g.setColor(Color.white);
             if (stroke == null) stroke = getPreviewStroke(c.getScale());
-            g.setStroke(stroke);
+            //g.setStroke(stroke);
             
             if (toBeRemoved != null) c.drawShape(g, toBeRemoved);
             
@@ -202,6 +209,7 @@ public abstract class MapObject {
         public void mousePressed (MouseEvent evt) {
 
             MapCanvas c = (MapCanvas)evt.getSource();
+            c.saveUndo();
             c.getModel().addToFront(MapObject.this);
             MapObject.this.moveTo(evt.getX() - offset.x, 
                                   evt.getY() - offset.y);
@@ -238,7 +246,7 @@ public abstract class MapObject {
             g.setXORMode(Color.black);
             g.setColor(Color.white);
             if (stroke == null) stroke = getPreviewStroke(c.getScale());
-            g.setStroke(stroke);
+            //g.setStroke(stroke);
 
             if (toBeRemoved != null) c.drawShape(g, toBeRemoved);
 
@@ -249,9 +257,10 @@ public abstract class MapObject {
 
         
         public void mouseReleased (MouseEvent evt) {
+            MapCanvas c = (MapCanvas)evt.getSource();
+            c.saveUndo();
             MapObject.this.moveTo(evt.getX() - offset.x, 
                                   evt.getY() - offset.y);
-            MapCanvas c = (MapCanvas)evt.getSource();
             c.setCanvasEventHandler(null);
             c.repaint();
         }
