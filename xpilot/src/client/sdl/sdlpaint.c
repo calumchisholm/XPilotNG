@@ -82,7 +82,7 @@ int Paint_init(void)
     if (Images_init() == -1) 
 	return -1;
 
-    scale = 0.7;
+    scale = 1.171975;
     scaleFactor = 1.0 / scale;
 
     return 0;

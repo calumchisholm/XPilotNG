@@ -38,11 +38,11 @@ int green   = 0x00ff00ff;
 
 int wallColor		    = 0x0000ffff;
 int hudColor		    = 0xff000088;
-int connColor	    	    = 0xff880088;
+int connColor	    	    = 0x00ff0088;
 int scoreObjectColor 	    = 0x00ff0088;
 int fuelColor 	    	    = 0xff000088;
-int messagesColor   	    = 0xff00ffff;
-int oldMessagesColor   	    = 0xff00ff88;
+int messagesColor   	    = 0x00aaaa88;
+int oldMessagesColor   	    = 0x00888888;
 int msgScanBallColor   	    = 0xff000088;
 int msgScanSafeColor   	    = 0x00ff0088;
 int msgScanCoverColor  	    = 0xaaaa0088;
@@ -54,21 +54,21 @@ static int meterHeight	= 10;
 double hudRadarScale = 2.0;
 float hudRadarMapScale;
 int hudRadarDotSize = 6;
-int meterBorderColor   	    = 0x0000ffff;
-int fuelMeterColor   	    = 0x0000ffff;
-int powerMeterColor   	    = 0x0000ffff;
-int turnSpeedMeterColor     = 0x0000ffff;
-int packetSizeMeterColor    = 0x0000ffff;
-int packetLossMeterColor    = 0x0000ffff;
-int packetDropMeterColor    = 0x0000ffff;
-int packetLagMeterColor     = 0x0000ffff;
-int temporaryMeterColor     = 0x0000ffff;
+int meterBorderColor   	    = 0x0000ff55;
+int fuelMeterColor   	    = 0x0000ff55;
+int powerMeterColor   	    = 0x0000ff55;
+int turnSpeedMeterColor     = 0x0000ff55;
+int packetSizeMeterColor    = 0x0000ff55;
+int packetLossMeterColor    = 0x0000ff55;
+int packetDropMeterColor    = 0x0000ff55;
+int packetLagMeterColor     = 0x0000ff55;
+int temporaryMeterColor     = 0x0000ff55;
 
-int dirPtrColor   	    = 0x0000ffff;
-int hudHLineColor   	    = 0x0000ffff;
-int hudVLineColor   	    = 0x0000ffff;
-int hudItemsColor   	    = 0x0000ffff;
-int fuelGaugeColor   	    = 0x0000ffff;
+int dirPtrColor   	    = 0x0000ff44;
+int hudHLineColor   	    = 0x0000ff44;
+int hudVLineColor   	    = 0x0000ff44;
+int hudItemsColor   	    = 0x0000ff44;
+int fuelGaugeColor   	    = 0x0000ff44;
 int selfLWColor   	    = 0xff0000ff;
 int teamLWColor   	    = 0xff00ffff;
 int enemyLWColor   	    = 0xffff00ff;
@@ -83,8 +83,8 @@ int team7Color   	    = 0x00000000;
 int team8Color   	    = 0x00000000;
 int team9Color   	    = 0x00000000;
 
-int hudRadarEnemyColor	    = 0xff0000ff;
-int hudRadarOtherColor	    = 0x00ff00ff;
+int hudRadarEnemyColor	    = 0xff000088;
+int hudRadarOtherColor	    = 0x00ff0088;
 
 
 /*static void set_color(int color)
@@ -113,7 +113,7 @@ int GL_Y(int y) {
 void Segment_add(int color, int x_1, int y_1, int x_2, int y_2)
 {
     set_alphacolor(color);
-    glBegin( GL_LINES );
+    glBegin( GL_LINE_LOOP );
     	glVertex2i(x_1,y_1);
 	glVertex2i(x_2,y_2);
     glEnd();
@@ -121,11 +121,14 @@ void Segment_add(int color, int x_1, int y_1, int x_2, int y_2)
 
 void Circle(int color,
 	    int x, int y,
-	    int radius)
+	    int radius, int filled)
 {
     float i,resolution = 32;
     set_alphacolor(color);
-    glBegin( GL_LINE_LOOP );
+    if (filled)
+    	glBegin( GL_POLYGON );
+    else
+    	glBegin( GL_LINE_LOOP );
     	/* Silly resolution */
     	for (i = 0.0f; i < TABLE_SIZE; i=i+((float)TABLE_SIZE)/resolution)
     	    glVertex2f((int)(x + tcos((int)i)*radius),(int)(y + tsin((int)i)*radius));
@@ -405,11 +408,15 @@ void Gui_paint_ball(int x, int y)
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     set_alphacolor(connColor);
     glBegin(GL_LINES);
     glVertex2i(x_1, y_1);
     glVertex2i(x_2, y_2);
     glEnd();
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 }
 
 void Gui_paint_mine(int x, int y, int teammine, char *name)
@@ -518,6 +525,8 @@ void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
 
 void Gui_paint_connector(int x_0, int y_0, int x_1, int y_1, int tractor)
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     set_alphacolor(connColor);
     glLineStipple(tractor ? 2 : 4, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
@@ -526,6 +535,7 @@ void Gui_paint_connector(int x_0, int y_0, int x_1, int y_1, int tractor)
     glVertex2i(x_1, y_1);
     glEnd();
     glDisable(GL_LINE_STIPPLE);
+    glDisable(GL_BLEND);
 }
 
 void Gui_paint_transporter(int x_0, int y_0, int x_1, int y_1)
@@ -800,6 +810,8 @@ void Paint_meters(void)
 {
     int y = 20, color;
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     if (fuelMeterColor)
 	Paint_meter(-10, y += 20, "Fuel",
 		    (int)fuelSum, (int)fuelMax, fuelMeterColor);
@@ -878,6 +890,7 @@ void Paint_meters(void)
 			"SHUTDOWN", shutdown_count, shutdown_delay,
 			temporaryMeterColor);
     }
+    glDisable(GL_BLEND);
 }
 
 static void Paint_lock(int hud_pos_x, int hud_pos_y)
@@ -916,10 +929,10 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
 	    
 	    if (radar_ptr[i].type == normal) {
 		if (hudRadarEnemyColor)
-		    Circle(hudRadarEnemyColor, x, y, sz);
+		    Circle(hudRadarEnemyColor, x, y, sz, 1);
 	    } else {
 		if (hudRadarOtherColor)
-		    Circle(hudRadarOtherColor, x, y, sz);
+		    Circle(hudRadarOtherColor, x, y, sz, 1);
 	    }
 	}
     }
@@ -941,9 +954,11 @@ void Paint_HUD(void)
     fontbounds dummy;
     hudRadarLimit = 0.050;
     
+    glEnable(GL_BLEND);
     /*
      * Show speed pointer
      */
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     if (ptr_move_fact != 0.0
 	&& selfVisible
 	&& (FOOvel.x != 0 || FOOvel.y != 0))
@@ -965,6 +980,7 @@ void Paint_HUD(void)
     
     /* TODO */
     /* This should be done in a nicer way now (using radar.c maybe) */
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     if (hudRadarEnemyColor || hudRadarOtherColor) {
 	hudRadarMapScale = (double) Setup->width / (double) 256;
@@ -984,15 +1000,17 @@ void Paint_HUD(void)
     }
     
 
+    glDisable(GL_BLEND);
     /* message scan hack by mara*/
     if (instruments.useBallMessageScan) {
 	if (ball_shout && msgScanBallColor)
 	    Circle(msgScanBallColor, draw_width / 2,
-		    draw_height / 2, 8*scale);
+		    draw_height / 2, 8*scale,0);
 	if (need_cover && msgScanCoverColor)
 	    Circle(msgScanCoverColor, draw_width / 2,
-		    draw_height / 2, 6*scale);
+		    draw_height / 2, 6*scale,0);
     }
+    glEnable(GL_BLEND);
 
     /*
      * Display the HUD
@@ -1000,6 +1018,7 @@ void Paint_HUD(void)
     hud_pos_x = (int)(draw_width / 2 - hud_move_fact * FOOvel.x);
     hud_pos_y = (int)(draw_height / 2 + hud_move_fact * FOOvel.y);
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     /* HUD frame */
     glLineStipple(4, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
@@ -1143,19 +1162,20 @@ void Paint_HUD(void)
 	    glVertex2i(tempx+tempw,tempy);
 	glEnd();
     }
+    glDisable(GL_BLEND);
 }
 
 void Paint_messages(void)
 {
     int		i, x, y, top_y, bot_y, width, len;
     const int	BORDER = 10,
-		SPACING = messagefont.h*1.3+1;
+		SPACING = messagefont.linespacing;
     const int	BORDERx_bot = BORDER, BORDERx_top = 200 + BORDER;
     message_t	*msg;
     int		last_msg_index = 0, msg_color;
 
-    top_y = draw_height - messagefont.h - BORDER;
-    bot_y = BORDER;
+    top_y = draw_height - messagefont.linespacing;
+    bot_y = messagefont.linespacing;
 
     /* get number of player messages */
     if (selectionAndHistory) {
@@ -1274,8 +1294,9 @@ void Paint_messages(void)
 		    l = selection.draw.x1;
 		    ptr2 = &(msg->txt[selection.draw.x1]);
 		    /*xoff2 = XTextWidth(messageFont, msg->txt,
-				       selection.draw.x1);*/
-		    xoff2 = messagefont.w*len;/*this is not accurate*/
+				          glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+ selection.draw.x1);*/
+		    xoff2 = fontprintsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
 
 		    if (TALK_MSG_SCREENPOS(last_msg_index,i)
 			< selection.draw.y2) {
@@ -1297,7 +1318,7 @@ void Paint_messages(void)
 			    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
 			    /*xoff3 = XTextWidth(messageFont, msg->txt,
 					       selection.draw.x2 + 1);*/
-			    xoff3 = messagefont.w*len;/*this is not accurate*/
+			    xoff3 = fontprintsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
 			    l3 = len - selection.draw.x2 - 1;
 			}
 		    } /* only line */
@@ -1319,7 +1340,7 @@ void Paint_messages(void)
 		    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
 		    /*xoff3 = XTextWidth(messageFont, msg->txt,
 				       selection.draw.x2 + 1);*/
-		    xoff3 = messagefont.w*len;/*this is not accurate*/
+		    xoff3 = fontprintsize(&messagefont,msg->txt).width*len;/*this is not accurate*/
 		    l3 = len - selection.draw.x2 - 1;
 		}
 	    } /* last line */
@@ -1345,7 +1366,7 @@ void Paint_messages(void)
 	    fontprint(&gamefont,LEFT,CENTER,x,y,msg->txt);
 	}
 
-	width = messagefont.w*MIN(len, msg->len); /*this is not accurate*/
+	width = fontprintsize(&messagefont,"e").width*MIN(len, msg->len); /*this is not accurate*/
     }
 }
 

@@ -11,6 +11,7 @@ int Init_playing_windows(void)
 {
     char defaultfont[] = "defaultfont.bmp"; /* TODO make bmp fonts work */
     char testfont[] = "Test.ttf";
+    int fontsize = 12;
     /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
     
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -48,14 +49,14 @@ int Init_playing_windows(void)
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
     
-    if (fontinit(&gamefont,testfont,16,16)) {
+    if (fontinit(&gamefont,testfont,fontsize)) {
     	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
-	if (fontinit(&gamefont,defaultfont,16,16))
+	if (fontinit(&gamefont,defaultfont,fontsize))
 	    error("Default font failed! gamefont not available!");
     }
-    if (fontinit(&messagefont,testfont,16,16)) {
+    if (fontinit(&messagefont,testfont,fontsize)) {
     	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
-	if (fontinit(&gamefont,defaultfont,16,16))
+	if (fontinit(&gamefont,defaultfont,fontsize))
 	    error("Default font failed! messagefont not available!");
     }
         

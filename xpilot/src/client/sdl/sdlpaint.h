@@ -36,6 +36,6 @@ void setupPaint_HUD(void);
 extern int GL_X(int x);
 extern int GL_Y(int y);
 extern void Segment_add(int color, int x_1, int y_1, int x_2, int y_2);
-extern void Circle(int color, int x, int y, int radius);
+extern void Circle(int color, int x, int y, int radius, int filled);
 
 #endif
