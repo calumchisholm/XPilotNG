@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -69,9 +68,9 @@ struct recordable_drawing {
 		     int dash_offset, const char *dash_list, int n);
 };
 
-extern struct recordable_drawing	rd;	/* external Drawing interface */
+extern struct recordable_drawing rd;	/* external Drawing interface */
 
-extern int		recording;	/* Are we recording or not. */
+extern bool recording;	/* Are we recording or not. */
 
 
 long Record_size(void);

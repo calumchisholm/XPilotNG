@@ -44,8 +44,8 @@ char record_version[] = VERSION;
 static char		*record_filename = NULL;/* Name of recordfile. */
 static FILE		*recordFP = NULL;	/* File handle for writing
 						 * recording frames to. */
-int			recording = False;	/* Are we recording or not. */
-static int		record_start = False;	/* Should we start recording
+bool			recording = false;	/* Are we recording or not. */
+static bool		record_start = false;	/* Should we start recording
 						 * at the next frame. */
 static int		record_frame_count = 0;	/* How many recorded frames. */
 static const char	*record_dashes;		/* Which dash list to use. */
@@ -71,7 +71,7 @@ extern char	hostname[];
 
 /*
  * Miscellaneous recording functions.
- * These are only called when (recording == True).
+ * These are only called when (recording == true).
  */
 static void RWriteByte(unsigned char i)
 {
@@ -186,7 +186,7 @@ static void RWriteHeader(void)
 
     record_dashes = dashes;
     record_num_dashes = NUM_DASHES;
-    record_dash_dirty = True;
+    record_dash_dirty = true;
 }
 
 static int RGetPixelIndex(unsigned long pixel)
@@ -445,12 +445,13 @@ static void RWriteGC(GC gc, unsigned long req_mask)
 
 static void RNewFrame(void)
 {
-    static int		before;
+    static bool		before = false;
 
-    if (!before++)
+    if (!before)
 	RWriteHeader();
 
-    recording = True;
+    before = true;
+    recording = true;
 
     putc(RC_NEWFRAME, recordFP);
     RWriteUShort(draw_width);
@@ -479,7 +480,7 @@ static void REndFrame(void)
 
     fflush(recordFP);
 
-    recording = False;
+    recording = false;
 
     record_frame_count++;	/* Number of frames written sofar. */
 }
@@ -717,7 +718,7 @@ static int RSetDashes(Display *display, GC gc,
     XSetDashes(display, gc, dash_offset, dash_list, n);
     record_dashes = dash_list;	/* supposedly static memory */
     record_num_dashes = n;
-    record_dash_dirty = True;
+    record_dash_dirty = true;
     return 0;
 }
 
@@ -807,26 +808,26 @@ void Record_toggle(void)
     /* No recording available with PEN_OF_PLENTY under Windows. */
     if (record_filename != NULL) {
 	if (!record_start) {
-	    record_start = True;
+	    record_start = true;
 	    if (!recordFP) {
 		if ((recordFP = fopen(record_filename, "w")) == NULL) {
 		    perror("Unable to open record file");
 		    free(record_filename);
 		    record_filename = NULL;
-		    record_start = False;
+		    record_start = false;
 		} else {
 		    setvbuf(recordFP, NULL, _IOFBF, (size_t)(8 * 1024));
 		    IFWINDOWS(setmode(fileno(recordFP), O_BINARY));
 		}
 	    }
 	} else
-	    record_start = False;
+	    record_start = false;
 
 	if (record_start)
 	    rd = Rdrawing;
 	else {
 	    rd = Xdrawing;
-	    recording = False;
+	    recording = false;
 	}
     }
 #endif
