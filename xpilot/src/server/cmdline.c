@@ -3189,6 +3189,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"useDebris",
+	"useSparks",
+	"true",
+	&options.useDebris,
+	valBool,
+	tuner_dummy,
+	"Are debris particles (sparks) created where appropriate?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"useWreckage",
 	"useWreckage",
 	"true",

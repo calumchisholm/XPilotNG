@@ -145,7 +145,10 @@ void Make_debris(world_t  *world,
     int i;
     double life;
     modifiers_t mods;
-    
+
+    if (!options.useDebris)
+	return;
+
     pos = World_wrap_clpos(world, pos);
     if (!World_contains_clpos(world, pos))
 	return;

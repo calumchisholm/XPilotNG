@@ -358,6 +358,7 @@ extern struct options {
     int		maxRoundTime;
     int		roundsToPlay;
 
+    bool	useDebris;
     bool	useWreckage;
     bool	ignore20MaxFPS;
     char	*password;
