@@ -227,9 +227,11 @@ void Place_item(int item, int ind)
 	    py -= World.cheight;
 	bx = px / BLOCK_CLICKS;
 	by = py / BLOCK_CLICKS;
+	/* !@#
 	if (!BIT(1U << World.block[bx][by], SPACE_BLOCKS)) {
 	    return;
 	}
+	*/
     } else {
 	if (rfrac() < movingItemProb) {
 	    grav = GRAVITY;
@@ -276,9 +278,11 @@ void Place_item(int item, int ind)
 		bx = px / BLOCK_CLICKS;
 		by = py / BLOCK_CLICKS;
 	    }
+	    /* !@#
 	    if (BIT(1U << World.block[bx][by], SPACE_BLOCKS|CANNON_BIT)) {
 		break;
 	    }
+	    */
 	}
     }
     vx = vy = 0;
@@ -1155,5 +1159,3 @@ void Fire_ecm(int ind)
 
     Fire_general_ecm(ind, pl->team, pl->pos.cx, pl->pos.cy);
 }
-
-

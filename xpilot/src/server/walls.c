@@ -69,6 +69,8 @@ static struct move_parameters mp; /* moved here */
 #define CUTOFF (2 * BLOCK_CLICKS) /* Not sure about the optimum value */
 #define MAX_MOVE 32000
 #define SEPARATION_DIST 64
+/* This must be increased if the ship corners are allowed to go farther
+   when turning! */
 #define MAX_SHAPE_OFFSET (15 * CLICK)
 #define NOTEAM_BIT (1 << 10)
 #define BALL_BIT (1 << 11)

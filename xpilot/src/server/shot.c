@@ -1700,7 +1700,7 @@ void Move_smart_shot(int ind)
 	    }
 	    if (xi < 0 || xi >= World.x || yi < 0 || yi >= World.y)
 		break;
-
+	    /* !@#
 	    switch(World.block[xi][yi]) {
 	    case TARGET:
 	    case TREASURE:
@@ -1716,7 +1716,7 @@ void Move_smart_shot(int ind)
 			shot_speed -= acc * (SMART_SHOT_DECFACT+1);
 		}
 		foundw = 1;
-	    }
+	    } */
 	}
 
 	i = ((int)(shot->dir * 8 / RES)&7) + 8;
@@ -1731,7 +1731,7 @@ void Move_smart_shot(int ind)
 		yt = yi + sur[(i+j+si)&7].dy;
 
 		if (xt >= 0 && xt < World.x && yt >= 0 && yt < World.y)
-		    switch (World.block[xt][yt]) {
+		  /* switch (World.block[xt][yt]) {
 		    case TARGET:
 		    case TREASURE:
 		    case FUEL:
@@ -1747,7 +1747,7 @@ void Move_smart_shot(int ind)
 		    default:
 			++k;
 			break;
-		    }
+		    } */;
 	    }
 	    if (k > freemax
 		|| (k == freemax
@@ -1820,5 +1820,3 @@ void Move_mine(int ind)
 	shot->acc.y = 0;
     }
 }
-
-

@@ -674,8 +674,10 @@ void Reset_all_players(void)
 	    for (i = 0; i < World.NumTargets; i++) {
 		if (World.targets[i].damage != TARGET_DAMAGE
 		    || World.targets[i].dead_time != 0) {
+		  /* !@#
 		    World.block[World.targets[i].pos.x][World.targets[i].pos.y]
 			= TARGET;
+			*/
 		    World.targets[i].dead_time = 0;
 		    World.targets[i].damage = TARGET_DAMAGE;
 		    World.targets[i].conn_mask = 0;
@@ -1214,7 +1216,6 @@ void Compute_game_status(void)
 		num_waiting_players = 0,
 		position = 1,
 		total_pts, pts;
-	
 
 	/* Handle finishing of laps */
 	for (i = 0; i < NumPlayers; i++) {

@@ -97,10 +97,6 @@ void Init_map(void)
 
 void Free_map(void)
 {
-    if (World.block) {
-	free(World.block);
-	World.block = NULL;
-    }
     if (World.gravity) {
 	free(World.gravity);
 	World.gravity = NULL;
@@ -136,12 +132,9 @@ void Alloc_map(void)
 {
     int x;
 
-    if (World.block || World.gravity)
+    if (World.gravity)
 	Free_map();
 
-    World.block =
-	(unsigned char **)malloc(sizeof(unsigned char *)*World.x
-				 + World.x*sizeof(unsigned char)*World.y);
     World.gravity =
 	(vector **)malloc(sizeof(vector *)*World.x
 			  + World.x*sizeof(vector)*World.y);
@@ -149,7 +142,7 @@ void Alloc_map(void)
     World.cannon = NULL;
     World.wormHoles = NULL;
     World.itemConcentrators = NULL;
-    if (World.block == NULL || World.gravity == NULL) {
+    if (World.gravity == NULL) {
 	Free_map();
 	error("Couldn't allocate memory for map (%d bytes)",
 	      World.x * (World.y * (sizeof(unsigned char) + sizeof(vector))
@@ -157,20 +150,13 @@ void Alloc_map(void)
 			 + sizeof(unsigned char*)));
 	exit(-1);
     } else {
-	unsigned char *map_line;
-	unsigned char **map_pointer;
 	vector *grav_line;
 	vector **grav_pointer;
 
-	map_pointer = World.block;
-	map_line = (unsigned char*) ((unsigned char**)map_pointer + World.x);
 	grav_pointer = World.gravity;
 	grav_line = (vector*) ((vector**)grav_pointer + World.x);
 
 	for (x=0; x<World.x; x++) {
-	    *map_pointer = map_line;
-	    map_pointer += 1;
-	    map_line += World.y;
 	    *grav_pointer = grav_line;
 	    grav_pointer += 1;
 	    grav_line += World.y;
@@ -747,7 +733,7 @@ static void Compute_local_gravity(void)
 	if ((last_yi = gy + GRAV_RANGE) > max_yi) {
 	    last_yi = max_yi;
 	}
-	gtype = World.block[gx][gy];
+	/* !@#	gtype = World.block[gx][gy]; */
 	mod_xi = (first_xi < 0) ? (first_xi + World.x) : first_xi;
 	dx = gx - first_xi;
 	fx = force;
@@ -821,7 +807,8 @@ void Compute_gravity(void)
     Compute_local_gravity();
 }
 
-
+/* !@# */
+#if 0
 void add_temp_wormholes(int xin, int yin, int xout, int yout, int ind)
 {
     wormhole_t inhole, outhole, *wwhtemp;
@@ -873,3 +860,4 @@ void remove_temp_wormhole(int ind)
 					    World.NumWormholes
 					    * sizeof(wormhole_t));
 }
+#endif

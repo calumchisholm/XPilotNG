@@ -197,8 +197,6 @@ typedef struct {
     char	name[MAX_CHARS];
     char	author[MAX_CHARS];
 
-    u_byte	**block;        /* type of item in each block */
-
     vector	**gravity;
 
     item_t	items[NUM_ITEMS];

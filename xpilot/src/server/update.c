@@ -541,6 +541,8 @@ void Update_objects(void)
 	}
     }
 
+/* !@# turn back on after implemented */
+#if 0
     /*
      * Updating cannons, maybe a little bit of fireworks too?
      */
@@ -641,6 +643,7 @@ void Update_objects(void)
 	World.targets[i].conn_mask = 0;
 	World.targets[i].last_change = frame_loops;
     }
+#endif /* not-yet-supported cannons and targets */
 
     /* * * * * *
      *
@@ -956,6 +959,8 @@ void Update_objects(void)
 		   + FUEL_MASS(pl->fuel.sum)
 		   + pl->item[ITEM_ARMOR] * ARMOR_MASS;
 
+/* Turn back on after implemented */
+#if 0
 	if (BIT(pl->status, WARPING)) {
 	    position w;
 	    int wx, wy, proximity,
@@ -1110,6 +1115,7 @@ void Update_objects(void)
 
 	    sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
 	}
+#endif /* not-yet-supported warping stuff */
 
 	if (!BIT(pl->status, PAUSE)) {
 	    update_object_speed(pl);	    /* New position */
@@ -1132,6 +1138,8 @@ void Update_objects(void)
 	pl->used &= pl->have;
     }
 
+/* !@# */
+#if 0
     for (i = World.NumWormholes - 1; i >= 0; i--) {
 	if (World.wormHoles[i].countdown > 0) {
 	    World.wormHoles[i].countdown--;
@@ -1141,7 +1149,7 @@ void Update_objects(void)
 	    remove_temp_wormhole(i);
 	}
     }
-
+#endif
 
 
     for (i = 0; i < NumPlayers; i++) {
@@ -1217,4 +1225,3 @@ void Update_objects(void)
     if (updateScores && frame_loops % UPDATE_SCORE_DELAY == 0)
 	Update_score_table();
 }
-
