@@ -508,7 +508,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 
     pl->last_wall_touch = frame_loops;
     {
-	DFLOAT	speed = VECTOR_LENGTH(pl->vel); /* !@# yeah i know */
+	DFLOAT	speed = VECTOR_LENGTH(pl->vel);
 	int	v = (int) speed >> 2;
 	int	m = (int) (pl->mass - pl->emptymass * 0.75f);
 	DFLOAT	b = 1 - 0.5f * playerWallBrakeFactor;
@@ -530,9 +530,8 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	 * Small explosion and fuel loss if survived a hit on a wall.
 	 * This doesn't affect the player as the explosion is sparks
 	 * which don't collide with player.
-	 * Clumsy touches (head first) with wall are more costly.
 	 */
-	cost *= 1.5;
+	cost *= 0.9; /* used to depend on bounce angle, .5 .. 1.0 */
 	if (BIT(pl->used, (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD))
 	    != (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)) {
 	    Add_fuel(&pl->fuel, (long)(-((cost << FUEL_SCALE_BITS)
