@@ -198,7 +198,8 @@ void Go_home(player *pl)
 
     pl->dir = dir;
     pl->float_dir = dir;
-    Player_position_init_clicks(pl, pos.cx + CLICK * vx, pos.cy + CLICK * vy);
+    Player_position_init_clicks(
+	pl, (int)(pos.cx + CLICK * vx),	(int)(pos.cy + CLICK * vy));
     pl->vel.x = vx;
     pl->vel.y = vy;
     pl->velocity = velo;
@@ -530,20 +531,20 @@ void Alloc_players(int number)
 {
     player *p;
     struct _visibility *t;
+    size_t n = number;
     int i;
 
     /* kps - fix this so you can memset the player struct to 0 later */
 
     /* Allocate space for pointers */
-    PlayersArray = (player **) calloc(number, sizeof(player *));
+    PlayersArray = (player **) calloc(n, sizeof(player *));
 
     /* Allocate space for all entries, all player structs */
-    p = playerArray = (player *) calloc(number, sizeof(player));
+    p = playerArray = (player *) calloc(n, sizeof(player));
 
     /* Allocate space for all visibility arrays, n arrays of n entries */
     t = visibilityArray =
-	(struct _visibility *) calloc(number * number,
-				      sizeof(struct _visibility));
+	(struct _visibility *) calloc(n * n, sizeof(struct _visibility));
 
     if (!PlayersArray || !playerArray || !visibilityArray) {
 	error("Not enough memory for Players.");
@@ -599,12 +600,12 @@ void Update_score_table(void)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 		if (pl_i->conn != NULL)
-		    Send_score(pl_i->conn, pl->id, pl->score, pl->life,
+		    Send_score(pl_i->conn, pl->id, pl->score, (int)pl->life,
 			       pl->mychar, pl->alliance);
 	    }
 	    for (i = 0; i < NumObservers; i++)
 		Send_score(Players(i + observerStart)->conn, pl->id,
-			   pl->score, pl->life, pl->mychar, pl->alliance);
+			   pl->score, (int)pl->life, pl->mychar, pl->alliance);
 	}
 	if (BIT(World.rules->mode, TIMING)) {
 	    if (pl->check != pl->prev_check
@@ -1176,7 +1177,7 @@ void Race_game_over(void)
 			(num_best_players == 1) ? "had" : "shares",
 			(double) bestlap / FPS);
 		Set_message(msg);
-		Score(pl, 5 + num_active_players, pl->pos,
+		Score(pl, 5.0 + num_active_players, pl->pos,
 		      (num_best_players == 1)
 		      ? "[Fastest lap]" : "[Joint fastest lap]");
 	    }

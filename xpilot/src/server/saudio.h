@@ -38,12 +38,12 @@
  * Define like this to avoid having to put #ifdef SOUND all over the place.
  */
 #define sound_player_init(player)		((player)->audio = NULL)
-#define sound_player_on(player, on)
-#define sound_play_player(player, index)
-#define sound_play_all(index)
+#define sound_player_on(player, on)		do { ; } while (0)
+#define sound_play_player(player, index)	do { ; } while (0)
+#define sound_play_all(index)			do { ; } while (0)
 #define sound_play_sensors(pos, index)		do { ; } while (0)
-#define sound_play_queued(player)
-#define sound_close(player)
+#define sound_play_queued(player)		do { ; } while (0)
+#define sound_close(player)			do { ; } while (0)
 
 #else						/* SOUND */
 
