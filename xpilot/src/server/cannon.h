@@ -94,6 +94,7 @@ void Cannon_add_item(cannon_t *cannon, int type, int amount);
 void Cannon_throw_items(cannon_t *cannon);
 void Cannon_check_defense(cannon_t *cannon);
 void Cannon_check_fire(cannon_t *cannon);
+void Object_hits_cannon(object_t *obj, cannon_t *c);
 void Cannon_dies(cannon_t *cannon, player_t *pl);
 hitmask_t Cannon_hitmask(cannon_t *cannon);
 void Cannon_set_hitmask(int group, cannon_t *cannon);

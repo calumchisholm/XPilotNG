@@ -1184,3 +1184,52 @@ void Fire_ecm(player_t *pl)
 
     Fire_general_ecm(pl->world, pl->id, pl->team, pl->pos);
 }
+
+Item_t Item_by_option_name(const char *name)
+{
+    if (!strcasecmp(name, "initialfuel"))
+	return ITEM_FUEL;
+    if (!strcasecmp(name, "initialwideangles"))
+	return ITEM_WIDEANGLE;
+    if (!strcasecmp(name, "initialrearshots"))
+	return ITEM_REARSHOT;
+    if (!strcasecmp(name, "initialafterburners"))
+	return ITEM_AFTERBURNER;
+    if (!strcasecmp(name, "initialcloaks"))
+	return ITEM_CLOAK;
+    if (!strcasecmp(name, "initialsensors"))
+	return ITEM_SENSOR;
+    if (!strcasecmp(name, "initialtransporters"))
+	return ITEM_TRANSPORTER;
+    if (!strcasecmp(name, "initialtanks"))
+	return ITEM_TANK;
+    if (!strcasecmp(name, "initialmines"))
+	return ITEM_MINE;
+    if (!strcasecmp(name, "initialmissiles"))
+	return ITEM_MISSILE;
+    if (!strcasecmp(name, "initialecms"))
+	return ITEM_ECM;
+    if (!strcasecmp(name, "initiallasers"))
+	return ITEM_LASER;
+    if (!strcasecmp(name, "initialemergencythrusts"))
+	return ITEM_EMERGENCY_THRUST;
+    if (!strcasecmp(name, "initialtractorbeams"))
+	return ITEM_TRACTOR_BEAM;
+    if (!strcasecmp(name, "initialautopilots"))
+	return ITEM_AUTOPILOT;
+    if (!strcasecmp(name, "initialemergencyshields"))
+	return ITEM_EMERGENCY_SHIELD;
+    if (!strcasecmp(name, "initialdeflectors"))
+	return ITEM_DEFLECTOR;
+    if (!strcasecmp(name, "initialhyperjumps"))
+	return ITEM_HYPERJUMP;
+    if (!strcasecmp(name, "initialphasings"))
+	return ITEM_PHASING;
+    if (!strcasecmp(name, "initialmirrors"))
+	return ITEM_MIRROR;
+    if (!strcasecmp(name, "initialarmor")
+	|| !strcasecmp(name, "initialarmors"))
+	return ITEM_ARMOR;
+
+    return NO_ITEM;
+}

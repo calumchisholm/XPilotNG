@@ -1180,17 +1180,17 @@ static option_desc opts[] = {
 	"1: default (random direction),\n"
 	"2: good (small error),\n"
 	"3: accurate (aims at predicted player position).\n"
-	"Also influences use of weapons if cannonsUseItems is on.\n",
+	"Also influences use of weapons.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"cannonsUseItems",
+	"cannonsPickupItems",
 	"cannonsPickupItems",
 	"no",
-	&options.cannonsUseItems,
+	&options.cannonsPickupItems,
 	valBool,
-	tuner_cannonsuseitems,
-	"Do cannons use items?\n",
+	Move_init,
+	"Do cannons pick up items?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1246,6 +1246,216 @@ static option_desc opts[] = {
 	"Maximum life of cannon shots, measured in ticks.\n"
 	"If this is set to a value less than minCannonShotLife, then\n"
 	"minCannonShotLife will be set to that same value.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialFuel",
+	"cannonInitialFuel",
+	"0",
+	&World.items[ITEM_FUEL].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How much fuel cannons start with, or the minimum after being killed.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialTanks",
+	"cannonInitialTanks",
+	"0",
+	&World.items[ITEM_TANK].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many tanks cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialECMs",
+	"cannonInitialECMs",
+	"0",
+	&World.items[ITEM_ECM].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many ECMs cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialArmor",
+	"cannonInitialArmors",
+	"0",
+	&World.items[ITEM_ARMOR].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How much armor cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialMines",
+	"cannonInitialMines",
+	"0",
+	&World.items[ITEM_MINE].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many mines cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialMissiles",
+	"cannonInitialMissiles",
+	"0",
+	&World.items[ITEM_MISSILE].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many missiles cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialCloaks",
+	"cannonInitialCloaks",
+	"0",
+	&World.items[ITEM_CLOAK].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many cloaks cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialSensors",
+	"cannonInitialSensors",
+	"0",
+	&World.items[ITEM_SENSOR].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many sensors cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialWideangles",
+	"cannonInitialWideangles",
+	"0",
+	&World.items[ITEM_WIDEANGLE].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many wideangles cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialRearshots",
+	"cannonInitialRearshots",
+	"0",
+	&World.items[ITEM_REARSHOT].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many rearshots cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialAfterburners",
+	"cannonInitialAfterburners",
+	"0",
+	&World.items[ITEM_AFTERBURNER].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many afterburners cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialTransporters",
+	"cannonInitialTransporters",
+	"0",
+	&World.items[ITEM_TRANSPORTER].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many transporters cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialMirrors",
+	"cannonInitialMirrors",
+	"0",
+	&World.items[ITEM_MIRROR].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many mirrors cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialDeflectors",
+	"cannonInitialDeflectors",
+	"0",
+	&World.items[ITEM_DEFLECTOR].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many deflectors cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialHyperJumps",
+	"cannonInitialHyperJumps",
+	"0",
+	&World.items[ITEM_HYPERJUMP].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many hyperjumps cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialPhasings",
+	"cannonInitialPhasings",
+	"0",
+	&World.items[ITEM_PHASING].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many phasing devices cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialLasers",
+	"cannonInitialLasers",
+	"0",
+	&World.items[ITEM_LASER].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many lasers cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialEmergencyThrusts",
+	"cannonInitialEmergencyThrusts",
+	"0",
+	&World.items[ITEM_EMERGENCY_THRUST].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many emergency thrusts cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialTractorBeams",
+	"cannonInitialTractorBeams",
+	"0",
+	&World.items[ITEM_TRACTOR_BEAM].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many tractor/pressor beams cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialAutopilots",
+	"cannonInitialAutopilots",
+	"0",
+	&World.items[ITEM_AUTOPILOT].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many autopilots cannons start with.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonInitialEmergencyShields",
+	"cannonInitialEmergencyShields",
+	"0",
+	&World.items[ITEM_EMERGENCY_SHIELD].cannon_initial,
+	valInt,
+	Set_initial_resources,
+	"How many emergency shields cannons start with.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2346,16 +2556,6 @@ static option_desc opts[] = {
 	valReal,
 	Tune_item_probs,
 	"Item Probability Factor scales all item probabilities.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"cannonItemProbMult",
-	"cannonItemProbMult",
-	"1.0",
-	&options.cannonItemProbMult,
-	valReal,
-	tuner_dummy,
-	"Average number of items a cannon gets per minute.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

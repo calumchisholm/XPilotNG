@@ -167,7 +167,7 @@ void Move_init(world_t *world)
     mp.obj_cannon_mask = (KILLING_SHOTS) | OBJ_MINE_BIT | OBJ_SHOT_BIT
 	| OBJ_PULSE_BIT | OBJ_SMART_SHOT_BIT | OBJ_TORPEDO_BIT
 	| OBJ_HEAT_SHOT_BIT | OBJ_ASTEROID_BIT;
-    if (options.cannonsUseItems)
+    if (options.cannonsPickupItems)
 	mp.obj_cannon_mask |= OBJ_ITEM_BIT;
     mp.obj_target_mask = mp.obj_cannon_mask | OBJ_BALL_BIT | OBJ_SPARK_BIT;
     mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL_BIT | OBJ_PULSE_BIT;
@@ -211,26 +211,8 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 	break;
 
     case CrashCannon:
-        {
-	    cannon_t *c = Cannon_by_index(world, mapobj_ind);
-
-	    obj->life = 0;
-	    if (obj->type == OBJ_ITEM) {
-		itemobject_t *item = ITEM_PTR(obj);
-
-		Cannon_add_item(c, item->item_type, item->item_count);
-	    }
-	    else {
-		player_t *pl = Player_by_id(obj->id);
-
-		if (!BIT(c->used, HAS_EMERGENCY_SHIELD)) {
-		    if (c->item[ITEM_ARMOR] > 0)
-			c->item[ITEM_ARMOR]--;
-		    else
-			Cannon_dies(c, pl);
-		}
-	    }
-	}
+	obj->life = 0;
+	Object_hits_cannon(obj, Cannon_by_index(world, mapobj_ind));
 	break;
 
     case CrashUnknown:
@@ -242,9 +224,9 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 
 void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 {
-    const char		*howfmt = NULL;
-    const char          *hudmsg = NULL;
-    world_t *world = &World;
+    const char *howfmt = NULL;
+    const char *hudmsg = NULL;
+    world_t *world = pl->world;
 
     msg[0] = '\0';
 
@@ -619,7 +601,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
     double cl, sl;		/* cosine and sine of line angle */
     double x, y, l2, l;
     int group, type, mapobj_ind;
-    world_t *world = &World;
+    world_t *world = pl->world;
     bool constant_speed_subtracted
 	= (pl->last_wall_touch == frame_loops ? true : false);
 
@@ -2750,7 +2732,7 @@ void Move_player(player_t *pl)
     struct collans ans;
     double fric = friction;
     vector_t oldv;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (!Player_is_alive(pl)) {
 	if (!(Player_is_killed(pl)

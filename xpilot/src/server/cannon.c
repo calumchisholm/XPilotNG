@@ -67,8 +67,7 @@ void Cannon_update(world_t *world, bool tick)
 	 * Call cannon "AI" routines only once per tick.
 	 */
 	if (tick) {
-	    if (options.cannonsUseItems
-		&& rfrac() < 0.65)
+	    if (rfrac() < 0.65)
 		Cannon_check_defense(c);
 
 	    if (!BIT(c->used, HAS_EMERGENCY_SHIELD)
@@ -77,20 +76,6 @@ void Cannon_update(world_t *world, bool tick)
 		&& (c->tractor_count <= 0)
 		&& rfrac() * 16 < 1)
 		Cannon_check_fire(c);
-	    else if (options.cannonsUseItems
-		     && options.itemProbMult > 0
-		     && options.cannonItemProbMult > 0) {
-		int item_type = (int)(rfrac() * NUM_ITEMS);
-		/* this gives the cannon an item about once every minute */
-		if (world->items[item_type].cannonprob > 0
-		    && options.cannonItemProbMult > 0
-		    && (int)(rfrac() * (60 * 12))
-		    < (options.cannonItemProbMult
-		       * world->items[item_type].cannonprob))
-		    Cannon_add_item(c, item_type,
-				    (item_type == ITEM_FUEL
-				     ?  ENERGY_PACK_FUEL : 1));
-	    }
 	}
 
 	if ((c->damaged -= timeStep) <= 0)
@@ -136,7 +121,7 @@ void Cannon_add_item(cannon_t *c, int item_type, int amount)
 
     switch (item_type) {
     case ITEM_TANK:
-	c->item[ITEM_TANK]++;
+	c->item[ITEM_TANK] += amount;
 	LIMIT(c->item[ITEM_TANK], 0, world->items[ITEM_TANK].limit);
 	/* FALLTHROUGH */
     case ITEM_FUEL:
@@ -154,7 +139,7 @@ void Cannon_add_item(cannon_t *c, int item_type, int amount)
 
 void Cannon_throw_items(cannon_t *c)
 {
-    int i, dir;
+    int i, dir, init_amount;
     itemobject_t *item;
     double velocity;
     world_t *world = c->world;
@@ -162,7 +147,10 @@ void Cannon_throw_items(cannon_t *c)
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (i == ITEM_FUEL)
 	    continue;
-	c->item[i] -= world->items[i].initial;
+	init_amount = c->initial_items[i];
+	if (init_amount < 0)
+	    init_amount = world->items[i].cannon_initial;
+	c->item[i] -= init_amount;
 	while (c->item[i] > 0) {
 	    int amount = world->items[i].max_per_pack
 			 - (int)(rfrac() * (1 + world->items[i].max_per_pack
@@ -217,19 +205,15 @@ void Cannon_init(cannon_t *c)
 
 void Cannon_init_items(cannon_t *c)
 {
-    int i;
+    int i, init_amount;
     world_t *world = c->world;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	c->item[i] = 0;
-	if (options.cannonsUseItems) {
-	    int amount = c->initial_items[i];
-
-	    if (amount < 0)
-		amount = (int)(rfrac() * (world->items[i].initial + 1));
-
-	    Cannon_add_item(c, i, amount);
-	}
+	init_amount = c->initial_items[i];
+	if (init_amount < 0)
+	    init_amount = world->items[i].cannon_initial;
+	Cannon_add_item(c, i, init_amount);
     }
 }
 
@@ -777,6 +761,24 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     }
 }
 
+void Object_hits_cannon(object_t *obj, cannon_t *c)
+{
+    if (obj->type == OBJ_ITEM) {
+	itemobject_t *item = ITEM_PTR(obj);
+
+	Cannon_add_item(c, item->item_type, item->item_count);
+    }
+    else {
+	player_t *pl = Player_by_id(obj->id);
+
+	if (!BIT(c->used, HAS_EMERGENCY_SHIELD)) {
+	    if (c->item[ITEM_ARMOR] > 0)
+		c->item[ITEM_ARMOR]--;
+	    else
+		Cannon_dies(c, pl);
+	}
+    }
+}
 
 void Cannon_dies(cannon_t *c, player_t *pl)
 {
@@ -934,6 +936,11 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
 void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
 {
     Item_t item;
+    const char *origname = name;
+
+    /* Remove possible cannon prefix from option name. */
+    if (!strncasecmp(name, "cannon", 6))
+	name += 6;
 
     item = Item_by_option_name(name);
     if (item != NO_ITEM) {
@@ -941,7 +948,7 @@ void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
 	return;
     }
 
-    if (!strcasecmp(name, "cannonsmartness")) {
+    if (!strcasecmp(name, "smartness")) {
 	int smartness = atoi(value);
 
 	LIMIT(smartness, 0, CANNON_SMARTNESS_MAX);
@@ -949,7 +956,7 @@ void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
 	return;
     }
 
-    if (!strcasecmp(name, "cannonshotspeed")) {
+    if (!strcasecmp(name, "shotspeed")) {
 	float shot_speed = atof(value);
 
 	/* limit ? */
@@ -957,5 +964,5 @@ void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
 	return;
     }
 
-    warn("This server doesn't support option %s for cannons.", name);
+    warn("This server doesn't support option %s for cannons.", origname);
 }

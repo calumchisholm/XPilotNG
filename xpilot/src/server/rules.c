@@ -70,8 +70,7 @@ static void Set_item_chance(world_t *world, int item)
 {
     double max
 	= options.itemProbMult * options.maxItemDensity * world->x * world->y;
-    double sum = 0;
-    int i, num = 0;
+    int i;
 
     if (options.itemProbMult * world->items[item].prob > 0) {
 	world->items[item].chance = (int)(1.0
@@ -88,24 +87,6 @@ static void Set_item_chance(world_t *world, int item)
 	    world->items[item].max = (int)max;
     } else
 	world->items[item].max = 0;
-
-    if (!BIT(CANNON_USE_ITEM, 1U << item)) {
-	world->items[item].cannonprob = 0;
-	return;
-    }
-    for (i = 0; i < NUM_ITEMS; i++) {
-	if (world->items[i].prob > 0
-	    && BIT(CANNON_USE_ITEM, 1U << i)) {
-	    sum += world->items[i].prob;
-	    num++;
-	}
-    }
-    if (num)
-	world->items[item].cannonprob = world->items[item].prob
-				       * (num / sum)
-				       * (options.maxItemDensity / 0.00012);
-    else
-	world->items[item].cannonprob = 0;
 }
 
 
@@ -228,6 +209,9 @@ void Set_initial_resources(world_t *world)
 
     for (i = 0; i < NUM_ITEMS; i++)
 	LIMIT(world->items[i].initial, 0, world->items[i].limit);
+
+    for (i = 0; i < NUM_ITEMS; i++)
+	LIMIT(world->items[i].cannon_initial, 0, world->items[i].limit);
 
     CLR_BIT(DEF_HAVE,
 	HAS_CLOAKING_DEVICE |

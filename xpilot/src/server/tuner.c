@@ -162,19 +162,6 @@ void tuner_teamcannons(world_t *world)
     }
 }
 
-void tuner_cannonsuseitems(world_t *world)
-{
-    int i;
-    cannon_t *c;
-
-    Move_init(world);
-
-    for (i = 0; i < world->NumCannons; i++) {
-	c = Cannon_by_index(world, i);
-	Cannon_init_items(c);
-    }
-}
-
 void tuner_mincannonshotlife(world_t *world)
 {
     UNUSED_PARAM(world);

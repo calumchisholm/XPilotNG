@@ -1197,10 +1197,14 @@ void Update_objects(world_t *world)
     Fuel_update(world);
     Misc_object_update(world);
     Asteroid_update(world);
-    Ecm_update(world);
-    Transporter_update(world);
-    Cannon_update(world, do_update_this_frame);
-    Target_update(world);
+    if (NumEcms > 0)
+	Ecm_update(world);
+    if (NumTransporters > 0)
+	Transporter_update(world);
+    if (world->NumCannons > 0)
+	Cannon_update(world, do_update_this_frame);
+    if (world->NumTargets > 0)
+	Target_update(world);
     if (!options.fastAim)
 	Players_turn();
     Update_players(world);

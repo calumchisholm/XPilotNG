@@ -118,7 +118,7 @@ extern struct options {
     bool	teamFuel;
     bool	teamCannons;
     int		cannonSmartness;
-    bool	cannonsUseItems;
+    bool	cannonsPickupItems;
     bool	cannonFlak;
     double	cannonDeadTicks;
     double	minCannonShotLife;
@@ -231,7 +231,6 @@ extern struct options {
     double	rogueHeatProb;
     double	rogueMineProb;
     double	itemProbMult;
-    double	cannonItemProbMult;
     double	asteroidItemProb;
     int		asteroidMaxItems;
     double	maxItemDensity;
