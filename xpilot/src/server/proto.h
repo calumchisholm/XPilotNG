@@ -289,7 +289,7 @@ void Cannon_dies(cannon_t *cannon, player *pl);
  * Prototypes for command.c
  */
 void Handle_player_command(player *pl, char *cmd);
-player *Get_player_by_name(char *str, int *errcode, char **errorstr_p);
+player *Get_player_by_name(char *str, int *errcode, const char **errorstr_p);
 
 /*
  * Prototypes for player.c

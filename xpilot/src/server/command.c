@@ -35,7 +35,7 @@ char command_version[] = VERSION;
  * and a string describing the error is stored in
  * 'errorstr_p' if that is not NULL.
  */
-player *Get_player_by_name(char *str, int *error_p, char **errorstr_p)
+player *Get_player_by_name(char *str, int *error_p, const char **errorstr_p)
 {
     int i;
     player *found_pl = NULL, *pl;
@@ -113,7 +113,7 @@ static void Send_info_about_player(player * pl)
 	pl_i = Players(i);
 	if (pl_i->conn != NULL) {
 	    Send_team(pl_i->conn, pl->id, pl->team);
-	    Send_score(pl_i->conn, pl->id, pl->score, pl->life,
+	    Send_score(pl_i->conn, pl->id, pl->score, (int)pl->life,
 		       pl->mychar, pl->alliance);
 	    if (pl->home_base != NULL)
 		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
@@ -255,7 +255,8 @@ static Command_info commands[] = {
     {
 	"mutepaused",
 	"m",
-	"Just /mute 1 mutes, /mute 0 unmutes paused players WITHOUT BASE.  (operator)",
+	"Just /mute 1 mutes, /mute 0 unmutes paused players WITHOUT BASE.  "
+	"(operator)",
 	0,      /* checked in the function */
 	Cmd_mutepaused
     },
@@ -439,7 +440,9 @@ void Handle_player_command(player *pl, char *cmd)
 static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
 {
     player *pl2 = NULL;
-    char *errorstr;
+    const char *errorstr;
+
+    (void)pl;
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -475,9 +478,10 @@ static int Cmd_advance(char *arg, player *pl, int oper, char *msg)
 {
     int			result;
 
-    if (!oper) {
+    (void)pl;
+
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
     if (record || playback) {
 	strcpy(msg, "Command currently disabled during recording for "
@@ -523,6 +527,8 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
     };
     int			i, cmd;
 
+    (void)pl; (void)oper;
+
     if (!BIT(World.rules->mode, ALLIANCES)) {
 	strlcpy(msg, "Alliances are not allowed.", MSG_LEN);
 	result = CMD_RESULT_ERROR;
@@ -547,7 +553,7 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
 	}
 	else if (arg) {
 	    /* a name is specified */
-	    char *errorstr;
+	    const char *errorstr;
 	    player *pl2 = Get_player_by_name(arg, NULL, &errorstr);
 	    if (pl2) {
 		if (cmd == AllyInvite)
@@ -672,6 +678,8 @@ static int Cmd_get(char *arg, player *pl, int oper, char *msg)
     char value[MAX_CHARS];
     int i;
 
+    (void)pl; (void)oper;
+
     if (!arg || !*arg) {
 	strcpy(msg, "Usage: /get option.");
 	return CMD_RESULT_ERROR;
@@ -705,6 +713,8 @@ static int Cmd_help(char *arg, player *pl, int oper, char *msg)
 {
     int			i;
 
+    (void)pl; (void)oper;
+
     if (!*arg) {
 	strcpy(msg, "Commands: ");
 	for(i = 0; i < NELEM(commands); i++) {
@@ -731,7 +741,7 @@ static int Cmd_help(char *arg, player *pl, int oper, char *msg)
 static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
 {
     player		*kicked_pl;
-    char		*errorstr;
+    const char		*errorstr;
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -837,6 +847,8 @@ static int Cmd_nuke(char *arg, player *pl, int oper, char *msg)
     RankInfo *rank;
     player *pl2;
 
+    (void)pl;
+
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
 
@@ -884,7 +896,7 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 
     name = strpbrk(arg, " \t");
     if (name) {
-	char *errorstr;
+	const char *errorstr;
 
 	*name++ = '\0';
 	while (isspace(*name))
@@ -938,6 +950,8 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_password(char *arg, player *pl, int oper, char *msg)
 {
+    (void)oper;
+
     if (!password || !arg || strcmp(arg, password)) {
 	strcpy(msg, "Wrong.");
 	if (pl->isoperator && pl->rectype != 2) {
@@ -960,8 +974,7 @@ static int Cmd_password(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 {
-    /*int			i;*/
-    char *errorstr;
+    const char *errorstr;
     player *pl2;
 
     if (!oper)
@@ -996,6 +1009,8 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 static int Cmd_queue(char *arg, player *pl, int oper, char *msg)
 {
     int			result;
+
+    (void)arg; (void)pl; (void)oper;
 
     if (record || playback) {
 	strcpy(msg, "Command currently disabled during recording for "
@@ -1053,8 +1068,10 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_stats(char *arg, player *pl, int oper, char *msg)
 {
-    char *errorstr;
+    const char *errorstr;
     player *pl2;
+
+    (void)pl; (void)oper;
 
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
@@ -1083,6 +1100,8 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     int			swap_allowed;
     char		*arg2;
 
+    (void)oper;
+
     /*
      * Assume nothing will be said or done.
      */
@@ -1101,7 +1120,8 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     else {
 	team = strtoul(arg, &arg2, 0);
 	if (arg2 && *arg2) {
-	    char *errorstr;
+	    const char *errorstr;
+
 	    if (!pl->isoperator) {
 		sprintf(msg,
 			"You need operator status to swap other players.");
@@ -1365,6 +1385,7 @@ static int Cmd_setpass(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_version(char *arg, player *pl, int oper, char *msg)
 {
+    (void)arg; (void)pl; (void)oper;
     sprintf(msg, "XPilot version %s.", VERSION);
     return CMD_RESULT_SUCCESS;
 }
