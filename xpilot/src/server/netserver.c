@@ -1891,8 +1891,9 @@ int Send_score_object(connection_t *connp, double score, clpos pos,
 
 int Send_cannon(connection_t *connp, int num, int dead_time)
 {
-    return Packet_printf(&connp->w, "%c%hu%hu", PKT_CANNON,
-			 num, dead_time);
+    if (FEATURE(connp, F_POLY))
+	return 0;
+    return Packet_printf(&connp->w, "%c%hu%hu", PKT_CANNON, num, dead_time);
 }
 
 int Send_destruct(connection_t *connp, int count)
@@ -2027,6 +2028,8 @@ int Send_mine(connection_t *connp, clpos pos, int teammine, int id)
 
 int Send_target(connection_t *connp, int num, int dead_time, double damage)
 {
+    if (FEATURE(connp, F_POLY))
+	return 0;
     return Packet_printf(&connp->w, "%c%hu%hu%hu", PKT_TARGET,
 			 num, dead_time, (int)(damage * 256.0));
 }
