@@ -842,14 +842,13 @@ int Handle_keyboard(int ind)
 
 		    /* toggle pause mode */
 		    /* team 0 pausing */
-		    sprintf(team_0, "team 0");
 		    if (teamZeroPausing && (pl->team == 0)) {
 			Pause_player(ind, 1);
 		    } else {
 			/* allow players who get idlepaused to unpause */
 			if (Team_zero_pausing_available()
 			    && !BIT(pl->status, PAUSE)) {
-			    Handle_player_command(pl, team_0);
+			    Handle_player_command(pl, "team 0");
 			} else {
 			    Pause_player(ind, !BIT(pl->status, PAUSE));
 			}

@@ -930,8 +930,7 @@ void Update_objects(void)
 			    sprintf(msg,
 				    "%s was pause-swapped because of idling.",
 				    Players[i]->name);
-			    sprintf(team_0,"team 0");
-			    Handle_player_command(Players[i],team_0);
+			    Handle_player_command(Players[i], "team 0");
 			} else {
 			    Pause_player(i, 1);
 			    sprintf(msg, "%s was paused for idling.",
@@ -1352,8 +1351,7 @@ void Update_objects(void)
 			if (!game_lock && Team_zero_pausing_available()) {
 			    sprintf(msg, "%s was pause-swapped because of "
 				    "idling.", Players[i]->name);
-			    sprintf(team_0, "team 0");
-			    Handle_player_command(Players[i],team_0);
+			    Handle_player_command(Players[i], "team 0");
 			} else {
 			    Pause_player(i, 1);
 			    sprintf(msg, "%s was paused for idling.",

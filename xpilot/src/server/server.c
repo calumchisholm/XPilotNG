@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -105,10 +105,8 @@ static bool		Log = true;
 #endif
 static bool		NoPlayersEnteredYet = true;
 int			game_lock = false;
-int			lock_zero = false;
-int			mute_zero = false;
-bool			teamZeroPausing;
-char			team_0[] = "team 0";
+int			lock_zero;
+int			mute_zero;
 
 time_t			gameOverTime = 0;
 time_t			serverTime = 0;
@@ -377,7 +375,7 @@ int End_game(void)
     }
     record = rrecord;
     playback = rplayback;
-    
+
     if (recordMode != 0) {
 	recordMode = 0;
 	Init_recording();

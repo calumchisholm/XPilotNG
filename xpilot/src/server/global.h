@@ -289,7 +289,6 @@ extern bool		teamZeroPausing;
 extern int		game_lock;
 extern int		lock_zero;
 extern int		mute_zero;
-extern char		team_0[];
 
 extern char		*motdFileName;
 extern char	       	*scoreTableFileName;

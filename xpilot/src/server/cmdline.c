@@ -349,6 +349,7 @@ bool		polygonMode;		/* Run server in polygon mode even
 					   with block based (.xp) mapfile */
 bool		fastAim;		/* Turn before shooting in frame */
 bool		ignoreMaxFPS;		/* Temporary hack */
+bool		teamZeroPausing;
 
 /*
 ** Two functions which can be used if an option
