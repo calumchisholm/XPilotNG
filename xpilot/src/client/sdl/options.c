@@ -62,7 +62,6 @@ char			myName[] = "xpilot";
 char			myClass[] = "XPilot";
 
 
-extern char *talk_fast_msgs[];	/* talk macros */
 char talk_fast_temp_buf[7];		/* can handle up to 999 fast msgs */
 char *talk_fast_temp_buf_big;
 

@@ -28,10 +28,6 @@
 
 char sdlevent_version[] = VERSION;
 
-
-extern char *talk_fast_msgs[];	/* talk macros */
-
-
 static BITV_DECL(keyv, NUM_KEYS);
 
 /* TODO: remove these from client.h and put them in *event.h */

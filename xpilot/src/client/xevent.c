@@ -26,8 +26,6 @@
 char xevent_version[] = VERSION;
 
 
-extern char *talk_fast_msgs[];	/* talk macros */
-
 static BITV_DECL(keyv, NUM_KEYS);
 
 bool		initialPointerControl = false;

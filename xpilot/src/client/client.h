@@ -423,18 +423,19 @@ typedef struct {
 } message_t;
 /* typedefs end */
 
-extern message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
-/* store incoming messages while a cut is pending */
-extern message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
-/* history of the talk window */
-extern char	*HistoryMsg[MAX_HIST_MSGS];
+extern message_t	*TalkMsg[];
+extern message_t	*GameMsg[];
+extern message_t	*TalkMsg_pending[];	/* store incoming messages */
+extern message_t	*GameMsg_pending[];	/* while a cut is pending */
+extern char		*HistoryMsg[];		/* talk window history */
 
-extern int	maxLinesInHistory;	/* number of lines to save in history */
-/* provide cut&paste and message history */
-extern selection_t	selection;	/* selection in talk or draw window */
-extern int	maxMessages;
-extern int	messagesToStdout;
-extern bool	selectionAndHistory;
+extern int		maxLinesInHistory;	/* lines to save in history */
+extern selection_t	selection;		/* in talk/draw window */
+extern int		maxMessages;
+extern int		messagesToStdout;
+extern bool		selectionAndHistory;
+
+extern char		*talk_fast_msgs[];	/* talk macros */
 
 extern score_object_t	score_objects[MAX_SCORE_OBJECTS];
 extern int		score_object;
