@@ -3407,19 +3407,21 @@ static void Move_ball(int ind)
 
     move.delta.x = FLOAT_TO_CLICK(obj->vel.x) * framespeed2;
     move.delta.y = FLOAT_TO_CLICK(obj->vel.y) * framespeed2;
-    obj->extpos.x = obj->pos.cx + move.delta.x;
-    while (obj->extpos.x >= World.cwidth)
-	obj->extpos.x -= World.cwidth;
-    while (obj->extpos.x <= 0)
-	obj->extpos.x += World.cwidth;
-    obj->extpos.y = obj->pos.cy + move.delta.y;
-    while (obj->extpos.y >= World.cheight)
-	obj->extpos.y -= World.cheight;
-    while (obj->extpos.y <0)
-	obj->extpos.y += World.cheight;
+    obj->extmove.x = move.delta.x;
+    obj->extmove.y = move.delta.y;
 
     if (obj->id != -1 && BIT(Players[GetInd[obj->id]]->used, OBJ_PHASING_DEVICE)) {
-	Object_position_set_clicks(obj, obj->extpos.x, obj->extpos.y);
+	int x = obj->pos.cx + move.delta.x;
+	int y = obj->pos.cy + move.delta.y;
+	while (x >= World.cwidth)
+	    x -= World.cwidth;
+	while (x < 0)
+	    x += World.cwidth;
+	while (y >= World.cheight)
+	    y -= World.cheight;
+	while (y < 0)
+	    y += World.cheight;
+	Object_position_set_clicks(obj, x, y);
 	return;
     }
     if (obj->owner == -1 || Players[GetInd[obj->owner]]->team == TEAM_NOT_SET)
@@ -3505,8 +3507,8 @@ void Move_object(int ind)
     move.start.y = obj->pos.cy;
     move.delta.x = FLOAT_TO_CLICK(obj->vel.x * framespeed2);
     move.delta.y = FLOAT_TO_CLICK(obj->vel.y * framespeed2);
-    obj->extpos.x = WRAP_XCLICK(obj->pos.cx + move.delta.x);
-    obj->extpos.y = WRAP_YCLICK(obj->pos.cy + move.delta.y);
+    obj->extmove.x = move.delta.x;
+    obj->extmove.y = move.delta.y;
     while (move.delta.x || move.delta.y) {
 	if (!trycount--) {
 	    sprintf(msg, "COULDN'T MOVE OBJECT!!!! Type = %d, x = %d, y = %d. Object was DELETED. [*DEBUG*]", obj->type, move.start.x, move.start.y);
@@ -3570,19 +3572,22 @@ void Move_player(int ind)
 
     move.delta.x = FLOAT_TO_CLICK(pl->vel.x) * framespeed2;
     move.delta.y = FLOAT_TO_CLICK(pl->vel.y) * framespeed2;
-    pl->extpos.x = pl->pos.cx + move.delta.x;
-    while (pl->extpos.x >= World.cwidth)
-	pl->extpos.x -= World.cwidth;
-    while (pl->extpos.x <= 0)
-	pl->extpos.x += World.cwidth;
-    pl->extpos.y = pl->pos.cy + move.delta.y;
-    while (pl->extpos.y >= World.cheight)
-	pl->extpos.y -= World.cheight;
-    while (pl->extpos.y <0)
-	pl->extpos.y += World.cheight;
+    pl->extmove.x = move.delta.x;
+    pl->extmove.y = move.delta.y;
 
-    if (BIT(pl->used, OBJ_PHASING_DEVICE))
-	Player_position_set_clicks(pl, pl->extpos.x, pl->extpos.y);
+    if (BIT(pl->used, OBJ_PHASING_DEVICE)) {
+	int x = pl->pos.cx + move.delta.x;
+	int y = pl->pos.cy + move.delta.y;
+	while (x >= World.cwidth)
+	    x -= World.cwidth;
+	while (x < 0)
+	    x += World.cwidth;
+	while (y >= World.cheight)
+	    y -= World.cheight;
+	while (y < 0)
+	    y += World.cheight;
+	Player_position_set_clicks(pl, x, y);
+    }
     else {
 	if (pl->team != TEAM_NOT_SET)
 	    move.hit_mask = NONBALL_BIT | 1 << pl->team;

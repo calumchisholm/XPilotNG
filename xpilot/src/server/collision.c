@@ -61,89 +61,42 @@ char collision_version[] = VERSION;
  * Kudos to Svenske and Mad Gurka for beta testing, and Murx for
  * invaluable insights.
  */
-int in_range_acd(int p1x, int p1y, int p2x, int p2y,
-		 int q1x, int q1y, int q2x, int q2y,
-		 int r)
+/* doubles because the multiplies might overflow ints */
+static int in_range_acd(double dx, double dy, double dvx, double dvy, double r)
 {
-    double	fac1, fac2;
     double	tmin, fminx, fminy;
     double	top, bot;
-    double      x2d, y2d;
-    bool	mpx, mpy, mqx, mqy;
 
     /*
      * Get the wrapped coordinates straight
      */
     if (BIT(World.rules->mode, WRAP_PLAY)) {
-	if ( (mpx = (ABS(p2x - p1x) > World.cwidth / 2)) ) {
-	    if (p1x > p2x)
-		p1x -= World.cwidth;
-	    else
-		p2x -= World.cwidth;
-	}
-	if ( (mpy = (ABS(p2y - p1y) > World.cheight / 2)) ) {
-	    if (p1y > p2y)
-		p1y -= World.cheight;
-	    else
-		p2y -= World.cheight;
-	}
-	if ( (mqx = (ABS(q2x - q1x) > World.cwidth / 2)) ) {
-	    if (q1x > q2x)
-		q1x -= World.cwidth;
-	    else
-		q2x -= World.cwidth;
-	}
-	if ( (mqy = (ABS(q2y - q1y) > World.cheight / 2)) ) {
-	    if (q1y > q2y)
-		q1y -= World.cheight;
-	    else
-		q2y -= World.cheight;
-	}
-
-	if (mpx && !mqx && (q2x > World.cwidth / 2 || q1x > World.cwidth / 2)) {
-	    q1x -= World.cwidth;
-	    q2x -= World.cwidth;
-	}
-
-	if (mqy && !mpy && (q2y > World.cheight / 2 || q1y > World.cheight / 2)) {
-	    q1y -= World.cheight;
-	    q2y -= World.cheight;
-	}
-
-	if (mqx && !mpx && (p2x > World.cwidth / 2 || p1x > World.cwidth / 2)) {
-	    p1x -= World.cwidth;
-	    p2x -= World.cwidth;
-	}
-
-	if (mqy && !mpy && (p2y > World.cheight / 2 || p1y > World.cheight / 2)) {
-	    p1y -= World.cheight;
-	    p2y -= World.cheight;
-	}
+	if (dx > World.cwidth / 2)
+	    dx -= World.cwidth;
+	else if (dx < -World.cwidth / 2)
+	    dx += World.cwidth;
+	if (dy > World.cheight / 2)
+	    dy -= World.cheight;
+	else if (dy < -World.cheight / 2)
+	    dy += World.cheight;
     }
 
-    /*
-     * Do the detection
-     */
-    x2d = p2x - q2x;
-    y2d = p2y - q2y;
-    if (x2d * x2d + y2d * y2d < r * r)
+    if (dx * dx + dy * dy < r * r)
 	return 1;
-    fac1 = -p1x + q1x + x2d;
-    fac2 = -p1y + q1y + y2d;
-    top = (fac1 * x2d + fac2 * y2d);
-    bot = (fac1 * fac1 + fac2 * fac2);
+    top = -(dvx * dx + dvy * dy);
+    bot = dvx * dvx + dvy * dvy;
     if (top < 0 || bot < CLICK * CLICK || top > bot)
 	return 0;
     tmin = top / bot;
-    fminx = x2d - fac1 * tmin;
-    fminy = y2d - fac2 * tmin;
+    fminx = dx + dvx * tmin;
+    fminy = dy + dvy * tmin;
     if (fminx * fminx + fminy * fminy < r * r)
 	return 1;
     else
 	return 0;
 }
 
-int in_range_simple(int px, int py, int qx, int qy, int r)
+static int in_range_simple(int px, int py, int qx, int qy, int r)
 {
     int dx = px - qx, dy = py - qy;
 
@@ -161,91 +114,42 @@ int in_range_simple(int px, int py, int qx, int qy, int r)
 	return 0;
 }
 
-int in_range_partial(int p1x, int p1y, int p2x, int p2y,
-		     int q1x, int q1y, int q2x, int q2y,
-		     int r, DFLOAT wall_time)
+static int in_range_partial(double dx, double dy, double dvx, double dvy,
+			    double r, DFLOAT wall_time)
 {
-    double	fac1, fac2;
     double	tmin, fminx, fminy;
     double	top, bot;
-    double      x2d, y2d;
-    bool	mpx, mpy, mqx, mqy;
 
     /*
      * Get the wrapped coordinates straight
      */
     if (BIT(World.rules->mode, WRAP_PLAY)) {
- 	if ( (mpx = (ABS(p2x - p1x) > World.cwidth / 2)) ) {
- 	    if (p1x > p2x)
- 		p1x -= World.cwidth;
- 	    else
- 		p2x -= World.cwidth;
- 	}
- 	if ( (mpy = (ABS(p2y - p1y) > World.cheight / 2)) ) {
- 	    if (p1y > p2y)
- 		p1y -= World.cheight;
- 	    else
- 		p2y -= World.cheight;
- 	}
- 	if ( (mqx = (ABS(q2x - q1x) > World.cwidth / 2)) ) {
- 	    if (q1x > q2x)
- 		q1x -= World.cwidth;
- 	    else
- 		q2x -= World.cwidth;
- 	}
- 	if ( (mqy = (ABS(q2y - q1y) > World.cheight / 2)) ) {
- 	    if (q1y > q2y)
- 		q1y -= World.cheight;
- 	    else
- 		q2y -= World.cheight;
- 	}
-
- 	if (mpx && !mqx && (q2x > World.cwidth / 2 || q1x > World.cwidth / 2)) {
- 	    q1x -= World.cwidth;
- 	    q2x -= World.cwidth;
- 	}
-
- 	if (mqy && !mpy && (q2y > World.cheight / 2 || q1y > World.cheight / 2)) {
- 	    q1y -= World.cheight;
- 	    q2y -= World.cheight;
- 	}
-
- 	if (mqx && !mpx && (p2x > World.cwidth / 2 || p1x > World.cwidth / 2)) {
- 	    p1x -= World.cwidth;
- 	    p2x -= World.cwidth;
- 	}
-
- 	if (mqy && !mpy && (p2y > World.cheight / 2 || p1y > World.cheight / 2)) {
- 	    p1y -= World.cheight;
- 	    p2y -= World.cheight;
- 	}
+	if (dx > World.cwidth / 2)
+	    dx -= World.cwidth;
+	else if (dx < -World.cwidth / 2)
+	    dx += World.cwidth;
+	if (dy > World.cheight / 2)
+	    dy -= World.cheight;
+	else if (dy < -World.cheight / 2)
+	    dy += World.cheight;
     }
 
-    /*
-     * Do the detection
-     */
-    x2d = p2x - q2x;
-    y2d = p2y - q2y;
-    fac1 = -p1x + q1x + x2d;
-    fac2 = -p1y + q1y + y2d;
-    top = (fac1 * x2d + fac2 * y2d);
-    bot = (fac1 * fac1 + fac2 * fac2);
-
-    if (top >= bot)
+    top = -(dvx * dx + dvy * dy);
+    bot = dvx * dvx + dvy * dvy;
+    if (top <= 0)
 	return 0;
-    if (bot < 5 * CLICK * CLICK || top < 0)
-	tmin = 1 - wall_time;
+    if (bot < 5 * CLICK * CLICK || top >= bot)
+	tmin = wall_time;
     else
 	tmin = top / bot;
-    if (tmin < 1 - wall_time)
-	tmin = 1 - wall_time;
-    fminx = x2d - fac1 * tmin;
-    fminy = y2d - fac2 * tmin;
+    fminx = dx + dvx * tmin;
+    fminy = dy + dvy * tmin;
     if (fminx * fminx + fminy * fminy < r * r)
- 	return 1;
+	return 1;
     else
- 	return 0;
+	return 0;
 }
+
 
 /*
  * Globals
@@ -497,10 +401,11 @@ static void PlayerCollision(void)
 		}
 		if (BIT(Players[j]->used, OBJ_PHASING_DEVICE))
 		    continue;
-		if (!in_range_acd(pl->prevpos.x, pl->prevpos.y, pl->pos.cx, pl->pos.cy,
-				      Players[j]->prevpos.x, Players[j]->prevpos.y,
-				      Players[j]->pos.cx, Players[j]->pos.cy,
-				      (2*SHIP_SZ-6) * CLICK)) {
+		if (!in_range_acd(pl->prevpos.x - Players[j]->prevpos.x,
+				  pl->prevpos.y - Players[j]->prevpos.y,
+				  pl->pos.cx - pl->prevpos.x + Players[j]->prevpos.x - Players[j]->pos.cx,
+				  pl->pos.cy - pl->prevpos.y + Players[j]->prevpos.y - Players[j]->pos.cy,
+				  (2*SHIP_SZ-6) * CLICK)) {
 			continue;
 		}
 
@@ -767,7 +672,7 @@ static void PlayerObjectCollision(int ind)
 	       therefore moved at constant speed from obj->prevpos to
 	       obj->pos. Check whether it was within range during movement
 	       using analytical collision detection.
-	   2 - Object was moving from obj->prevpos to obj->extpos but it
+	   2 - Object was moving from obj->prevpos by obj->extmove but it
 	       hit a wall and was destroyed after completing obj->wall_time
 	       of the distance. Check whether it was within range similarly
 	       to case 1 but only consider hits at the beginning of the
@@ -798,17 +703,19 @@ static void PlayerObjectCollision(int ind)
 				  range * CLICK);
 	    break;
 	case 1:
-	    hit = in_range_acd(pl->prevpos.x, pl->prevpos.y,
-			       pl->pos.cx, pl->pos.cy,
-			       obj->prevpos.x, obj->prevpos.y,
-			       obj->pos.cx, obj->pos.cy,
+	    hit = in_range_acd(pl->prevpos.x - obj->prevpos.x,
+			       pl->prevpos.y - obj->prevpos.y,
+			       pl->pos.cx - pl->prevpos.x -
+			       (obj->pos.cx - obj->prevpos.x),
+			       pl->pos.cy - pl->prevpos.y-
+			       (obj->pos.cy - obj->prevpos.y),
 			       range * CLICK);
 	    break;
 	case 2:
-	    hit = in_range_partial(pl->prevpos.x, pl->prevpos.y,
-				   pl->pos.cx, pl->pos.cy,
-				   obj->prevpos.x, obj->prevpos.y,
-				   obj->extpos.x, obj->extpos.y,
+	    hit = in_range_partial(pl->prevpos.x - obj->prevpos.x,
+				   pl->prevpos.y - obj->prevpos.y,
+				   pl->pos.cx - pl->prevpos.x - obj->extmove.x,
+				   pl->pos.cy - pl->prevpos.y - obj->extmove.y,
 				   range * CLICK, obj->wall_time);
 	    break;
 	default:
@@ -866,18 +773,20 @@ static void PlayerObjectCollision(int ind)
 				      radius * CLICK);
 		break;
 	    case 1:
-		hit = in_range_acd(pl->prevpos.x, pl->prevpos.y,
-				   pl->pos.cx, pl->pos.cy,
-				   obj->prevpos.x, obj->prevpos.y,
-				   obj->pos.cx, obj->pos.cy,
+		hit = in_range_acd(pl->prevpos.x - obj->prevpos.x,
+				   pl->prevpos.y - obj->prevpos.y,
+				   pl->pos.cx - pl->prevpos.x -
+				   (obj->pos.cx - obj->prevpos.x),
+				   pl->pos.cy - pl->prevpos.y-
+				   (obj->pos.cy - obj->prevpos.y),
 				   radius * CLICK);
 		break;
 	    case 2:
-		hit = in_range_partial(pl->prevpos.x, pl->prevpos.y,
-				       pl->pos.cx, pl->pos.cy,
-				       obj->prevpos.x, obj->prevpos.y,
-				       obj->extpos.x, obj->extpos.y,
-				       radius * CLICK, obj->wall_time);
+		hit = in_range_partial(pl->prevpos.x - obj->prevpos.x,
+				   pl->prevpos.y - obj->prevpos.y,
+				   pl->pos.cx - pl->prevpos.x - obj->extmove.x,
+				   pl->pos.cy - pl->prevpos.y - obj->extmove.y,
+				   radius * CLICK, obj->wall_time);
 		break;
 	    default:
 		error("Unimplemented collision mode %d", obj->collmode);
@@ -932,7 +841,6 @@ static void PlayerObjectCollision(int ind)
 
 		sprintf(msg, "%s was killed by a ball owned by %s.",
 			pl->name, Players[killer]->name);
-
 		if (killer == ind) {
 		    strcat(msg, "  How strange!");
 		    SCORE(ind, PTS_PR_PL_SHOT, pl->pos.cx, pl->pos.cy,
@@ -1466,20 +1374,21 @@ static void LaserCollision(void)
 		    continue;
 		}
 		if (obj->life) {
-		    if (!in_range_acd(vic->prevpos.x, vic->prevpos.y,
-				      vic->pos.cx, vic->pos.cy,
-				      obj->prevpos.x, obj->prevpos.y,
-				      obj->pos.cx, obj->pos.cy,
-				      PIXEL_TO_CLICK(SHIP_SZ)))
+		    if (!in_range_acd(vic->prevpos.x - obj->prevpos.x,
+				      vic->prevpos.y - obj->prevpos.y,
+				      vic->pos.cx - vic->prevpos.x -
+				      (obj->pos.cx - obj->prevpos.x),
+				      vic->pos.cy - vic->prevpos.y-
+				      (obj->pos.cy - obj->prevpos.y),
+				      SHIP_SZ * CLICK))
 			continue;
 		}
 		else
-		    if (!in_range_partial(vic->prevpos.x, vic->prevpos.y,
-					  vic->pos.cx, vic->pos.cy,
-					  obj->prevpos.x, obj->prevpos.y,
-					  obj->extpos.x, obj->extpos.y,
-					  PIXEL_TO_CLICK(SHIP_SZ),
-					  obj->wall_time))
+		    if (!in_range_partial(vic->prevpos.x - obj->prevpos.x,
+				vic->prevpos.y - obj->prevpos.y,
+				vic->pos.cx - vic->prevpos.x - obj->extmove.x,
+				vic->pos.cy - vic->prevpos.y - obj->extmove.y,
+				SHIP_SZ * CLICK, obj->wall_time))
 			continue;
 		vic->forceVisible++;
 		pulse->len = PULSE_LENGTH - 1;

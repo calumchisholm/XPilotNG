@@ -161,7 +161,7 @@ struct _object {
     u_short	team;			/* Team of player or cannon */
     objposition	pos;			/* World coordinates */
     ipos	prevpos;		/* Object's previous position... */
-    ipos        extpos;                 /* For collision detection */
+    ipos	extmove;		/* For collision detection */
     DFLOAT      wall_time;              /* Time of bounce/crash within frame */
     int         collmode;               /* collision checking mode */
     vector	vel;
@@ -296,7 +296,7 @@ struct player {
     u_short	team;			/* What team is the player on? */
     objposition	pos;			/* World coordinates */
     ipos	prevpos;		/* Previous position... */
-    ipos        extpos;                 /* For collision detection */
+    ipos        extmove;		/* For collision detection */
     DFLOAT      wall_time;              /* Time of bounce/crash within frame */
     int         collmode;               /* collision checking mode */
     vector	vel;			/* Velocity of object */
