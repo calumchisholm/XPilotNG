@@ -3,6 +3,7 @@ xpilottexturesdir =  $(pkgdatadir)/textures
 xpilottextures_DATA = \
 	acwise_grav.ppm \
 	allitems.ppm \
+	asteroid.ppm \
 	asteroidconcentrator.ppm \
 	ball.ppm \
 	ball_gray.ppm \
