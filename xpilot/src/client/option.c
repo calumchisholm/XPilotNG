@@ -714,40 +714,158 @@ void Store_option(xp_option_t *opt)
 <SynrG> kps: would be nice if not only it saved options known to other clients, but also comments in the original
 */
 
+
+typedef struct xpilotrc_line {
+    const char *comment;
+    size_t size;
+    xp_option_t *opt;
+} xpilotrc_line_t;
+
+static xpilotrc_line_t	*xpilotrc_lines = NULL;
+static int num_xpilotrc_lines = 0, max_xpilotrc_lines = 0;
+static int num_ok_options = 0;
+
 static void Parse_xpilotrc_line(const char *line)
 {
-    char *s;
+    char *l = xp_safe_strdup(line);
+    char *first, *second, *colon, *name, *value = NULL, *comment;
+    xpilotrc_line_t t;
+    xp_option_t *opt;
+    int i;
 
-    /*xpprintf("parsing xpilotrc line \"%s\"\n", line);*/
-    /*
-     * Ignore lines that don't start with xpilot. or
-     * xpilot*
-     */
-    if (!(strncasecmp(line, "xpilot.", 7) == 0
-	  || strncasecmp(line, "xpilot*", 7) == 0))
-	/*
-	 * not interested 
-	 */
-	return;
+    memset(&t, 0, sizeof(xpilotrc_line_t));
 
-    /* printf("-> line is now \"%s\"\n", line); */
-    line += 7;
-    /* printf("-> line is now \"%s\"\n", line); */
-    if (!(s = strchr(line, ':'))) {
-	/* no colon on line with xpilot. or xpilot* */
-	/* warn("line missing colon"); */
-	return;
+    /*warn("line is \"%s\"", line);*/
+
+    /* everything after semicolon is comment, ignore it. */
+    comment = strchr(l, ';');
+    if (comment) {
+	/*warn("found comment on line \"%s\"\n", line);*/
+	t.comment = xp_safe_strdup(line);
+	*comment = '\0';
     }
 
-    /*
-     * Zero the colon, advance to next char, remove leading whitespace
-     * from option value.
-     */
-    *s++ = '\0';
-    while (isspace(*s))
-	s++;
+    first = strtok(l, " \t");
+    if (!first) {
+	/* comment line or empty line */
+	/*warn("line \"%s\" has comment or is empty.", line);*/
+	goto out;
+    }
 
-    Set_option(line, s, xp_option_origin_xpilotrc);
+    if (!(strncasecmp(first, "xpilot.", 7) == 0
+	  || strncasecmp(first, "xpilot*", 7) == 0)) {
+	/* consider it a comment */
+	t.comment = xp_safe_strdup(line);
+	goto out;
+    }
+
+    /* line starts with "xpilot." or "xpilot*" */
+    first += strlen("xpilot.");
+    /*warn("of token remains \"%s\"", first);*/
+    /* get rid of colon if one is found */
+    colon = strchr(first, ':');
+    if (colon) {
+	/*
+	 * There might be stuff after the colon, e.g. if line is
+	 * xpilot.wallColor:2
+	 */
+	if (strlen(colon) > 1) {
+	    value = colon + 1;
+	    /*warn("value is \"%s\"\n", value);*/
+	}
+	*colon = '\0';
+    }
+    /*warn("of token remains \"%s\"", first);*/
+    /* now first should point to the option name */
+    name = first;
+    opt = Find_option(name);
+    if (!opt) {
+	/* this client doesn't know about this option */
+	/* warn("Parse_xpilotrc_line: Unknown option \"%s\"\n", first); */
+	/* let's just store the line, treat it as a comment */
+	t.comment = xp_safe_strdup(line);
+	goto out;
+    }
+
+    /* did we see this before ? */
+    for (i = 0; i < num_xpilotrc_lines; i++) {
+	xpilotrc_line_t *x = &xpilotrc_lines[i];
+	
+	if (x->opt == opt) {
+	    /* same option defined several times in xpilotrc */
+	    warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	    warn("Option %s previously given on line %d, ignoring new value.",
+		 name, i + 1);
+	    /* treat as comment */
+	    t.comment = xp_safe_strdup(line);
+	    goto out;
+	}
+    }
+
+    /* ok let's see if a valid value was given */
+
+    /* maybe colon wasn't in first token */
+    if (!value) {
+	if (!colon) {
+	    /*
+	     * line may be like "xpilot.foobar :<something>", then the colon
+	     * wasn't found in the first token
+	     */
+	    second = strtok(NULL, " \t");
+	    /*warn("second is \"%s\"", second);*/
+	    if (second == NULL || *second != ':') {
+		/* no colon on line, not ok */
+		warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+		warn("Line has no colon after option name, ignoring.");
+		/* treat as comment */
+		t.comment = xp_safe_strdup(line);
+		goto out;
+	    }
+	    colon = second;
+	    /*warn("colon: \"%s\"", colon);*/
+	    if (strlen(colon) > 1)
+		/* e.g xpilot.wallColor :2 */
+		value = colon + 1;
+	    else
+		/* e.g xpilot.wallColor : 2 */
+		value = strtok(NULL, "");
+	}
+	else {
+	    /* line was like xpilot.wallColor: value */
+	    /*warn("YYY line is \"%s\"", line);*/
+	    value = strtok(NULL, "");
+	}
+    }
+
+    if (!value) {
+	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	warn("No value given for option, ignoring.");
+	/* treat as comment */
+	t.comment = xp_safe_strdup(line);
+	goto out;
+    }
+
+    /* remove leading whitespace */
+    while (isspace(*value))
+	value++;
+
+    /*warn("option is %s, value \"%s\"", name, value);*/
+
+    if (!Set_option(name, value, xp_option_origin_xpilotrc)) {
+	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	warn("Failed to set option %s value \"%s\", ignoring.", name, value);
+	/* treat as comment */
+	t.comment = xp_safe_strdup(line);
+	goto out;
+    }
+
+    t.opt = opt;
+    num_ok_options++;
+
+ out:
+    STORE(xpilotrc_line_t,
+	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
+    xp_free(l);
 }
 
 
@@ -760,20 +878,9 @@ static inline bool is_noarg_option(const char *name)
     return true;
 }
 
-
-typedef struct xpilotrc {
-    char	*line;
-    size_t	size;
-} xpilotrc_t;
-
-static xpilotrc_t	*xpilotrc_ptr;
-static int		num_xpilotrc, max_xpilotrc;
-
-
-
 int Xpilotrc_read(const char *path)
 {
-    char buf[BUFSIZ];
+    char buf[4096]; /* long enough max line length in xpilotrc? */
     FILE *fp;
 
     assert(path);
@@ -801,6 +908,10 @@ int Xpilotrc_read(const char *path)
 	    *cp = '\0';
 	Parse_xpilotrc_line(buf);
     }
+
+    /*warn("Total number of nonempty lines in xpilotrc: %d",
+      num_xpilotrc_lines);
+      warn("Number of options set: %d\n", num_ok_options);*/
 
     fclose(fp);
 
