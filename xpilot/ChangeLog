@@ -10152,3 +10152,84 @@
 	  Moved stuff from src/server/global.h and src/server/proto.h into
 	  src/server/server.h.
 
+2004-01-07 23:46  darelcullen
+
+	* ChangeLog: Updated
+
+2004-01-08 13:49  kps
+
+	* src/client/talkmacros.c: Made default BALL SAFE etc. macros (on
+	  keys F5-F8) go only to own team.
+
+2004-01-08 14:16  kps
+
+	* src/client/talkmacros.c: Moved BALL etc warnings to F1-F4 for
+	  easier reach (was F5-F8). Put swap macro (team 2 <-> 4) on F5.
+
+2004-01-08 16:09  kps
+
+	* src/client/event.c: Added key 'f' for keyConnector default.
+
+2004-01-10 12:08  kps
+
+	* src/common/draw.h: Changed the Ship_get_* macros to inline
+	  functions.
+
+2004-01-10 13:32  kps
+
+	* src/client/messages.c: Print current kill ratio with 3 decimals.
+
+2004-01-10 18:47  juhal
+
+	* src/client/sdl/: gameloop.c, win32hacks.c: needed for the windows
+	  version
+
+2004-01-11 15:05  juhal
+
+	* src/client/sdl/sdlgui.c: added painting of mines
+
+2004-01-11 20:23  juhal
+
+	* lib/textures/missile.ppm: added a missile image
+
+2004-01-11 20:24  juhal
+
+	* src/client/sdl/: images.c, images.h, sdlgui.c: added missile and
+	  item painting
+
+2004-01-11 21:21  juhal
+
+	* src/client/sdl/sdlgui.c: added laser painting
+
+2004-01-11 22:36  kps
+
+	* src/server/: netserver.c, object.h, update.c, walls.c, xp2map.c:
+	  EXPERIMENTAL change to allow changing RES to values > 128.  This
+	  is for testing purposes only. If you compile a client with RES >
+	  128 it will break with the current code, so don't use it.  The
+	  idea is to compile the server with high RES which should give
+	  better aiming and steering.
+
+2004-01-11 22:46  kps
+
+	* src/server/update.c: Added Uau's experimental code to use cos and
+	  sin of float dir to update acceleration vector.
+
+2004-01-12 00:07  kps
+
+	* Makefile.in, lib/textures/Makefile.am, lib/textures/Makefile.in:
+	  Added missile picture to distro.
+
+2004-01-12 00:16  kps
+
+	* src/client/default.c: Removed unesessary printout of changed
+	  texturePath.
+
+2004-01-12 18:47  kps
+
+	* src/server/: cmdline.c, object.h, player.c, server.h, shot.c,
+	  update.c, walls.c: Added code to use player float dir for
+	  shooting with main gun and thrusting.  This can be enabled by
+	  setting the server option ngControls to true, the default is
+	  false.
+
