@@ -20,8 +20,8 @@ public class MapModel extends ModelObject {
     List polyStyles;
     MapOptions options;
     float defaultScale;
-    int defEdgeStyleIndex;
-    int defPolygonStyleIndex;
+    LineStyle defEdgeStyle;
+    PolygonStyle defPolygonStyle;
 
     public Object deepClone (Map context) {
 
@@ -65,7 +65,7 @@ public class MapModel extends ModelObject {
         edgeStyles.add(ls);
         ls = new LineStyle("default", 0, Color.blue, LineStyle.STYLE_SOLID);
         edgeStyles.add(ls);
-        defEdgeStyleIndex = 1;
+        defEdgeStyle = ls;
         
         PolygonStyle ps;
         ps = new PolygonStyle();
@@ -75,7 +75,7 @@ public class MapModel extends ModelObject {
         ps.setFillStyle(PolygonStyle.FILL_NONE);
         ps.setDefaultEdgeStyle(ls);
         polyStyles.add(ps);
-        defPolygonStyleIndex = 1;
+        defPolygonStyle = ps;
     }
 
 
@@ -90,26 +90,23 @@ public class MapModel extends ModelObject {
 
 
     public LineStyle getDefaultEdgeStyle () {
-        if (defEdgeStyleIndex >= edgeStyles.size()) 
-            defEdgeStyleIndex = edgeStyles.size() - 1;
-        return (LineStyle)edgeStyles.get(defEdgeStyleIndex);
+        return defEdgeStyle;
     }
 
 
-    public void setDefaultEdgeStyle (int index) {
-        defEdgeStyleIndex = index;
+    public void setDefaultEdgeStyle (LineStyle style) {
+        this.defEdgeStyle = style;
+
     }
 
 
     public PolygonStyle getDefaultPolygonStyle () {
-        if (defPolygonStyleIndex >= polyStyles.size()) 
-            defPolygonStyleIndex = polyStyles.size() - 1;
-        return (PolygonStyle)polyStyles.get(defPolygonStyleIndex);
+        return defPolygonStyle;
     }
     
     
-    public void setDefaultPolygonStyle (int index) {
-        defPolygonStyleIndex = index;
+    public void setDefaultPolygonStyle (PolygonStyle style) {
+        this.defPolygonStyle = style;
     }
 
 
@@ -139,9 +136,20 @@ public class MapModel extends ModelObject {
         objects.add(moNew);
     }
 
+    public void addObject (int index, MapObject mo) {
+        objects.add(index, mo);
+    }
     
+    public int indexOf (MapObject mo) {
+        return objects.indexOf(mo);
+    }
+
     public void removeObject (MapObject mo) {
         objects.remove(mo);
+    }
+
+    public void removeObject (int index) {
+        objects.remove(index);
     }
 
 
@@ -173,8 +181,8 @@ public class MapModel extends ModelObject {
             px.load();
         }
 
-        defEdgeStyleIndex = edgeStyles.size() - 1;
-        defPolygonStyleIndex = polyStyles.size() - 1;
+        defEdgeStyle = (LineStyle)edgeStyles.get(edgeStyles.size() - 1);
+        defPolygonStyle = (PolygonStyle)polyStyles.get(polyStyles.size() - 1);
 
         System.out.println("ready");
     }

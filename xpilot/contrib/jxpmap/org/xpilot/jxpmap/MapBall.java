@@ -68,10 +68,8 @@ public class MapBall extends MapObject {
         
         public boolean apply () {
             int newTeam = cmbTeam.getSelectedIndex() + 1;
-            if (newTeam != getTeam()) {
-                canvas.saveUndo();
-                setTeam(newTeam);
-            }
+            if (newTeam != getTeam()) 
+                canvas.setBallTeam(MapBall.this, newTeam);
             return true;
         }
     }

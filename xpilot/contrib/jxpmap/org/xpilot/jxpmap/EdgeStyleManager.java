@@ -86,9 +86,9 @@ public class EdgeStyleManager extends EditorPanel
 
             LineStyle style = new LineStyle();
             EditorDialog.show
-                (this, new EdgeStyleEditor(style, canvas.getModel()), true);
+                (this, new EdgeStyleEditor(style, canvas, true), true);
             if (style.getId() != null) {
-                styles.add(style);
+                canvas.addEdgeStyle(style);
                 jlistModel.addElement(style.getId());
             }
             return;
@@ -105,7 +105,7 @@ public class EdgeStyleManager extends EditorPanel
             }
             LineStyle style = (LineStyle)styles.get(index);
             EditorDialog.show
-                (this, new EdgeStyleEditor(style, canvas.getModel()), true);
+                (this, new EdgeStyleEditor(style, canvas, false), true);
             jlistModel.set(index, style.getId());
             canvas.repaint();
             preview.repaint();
@@ -121,7 +121,7 @@ public class EdgeStyleManager extends EditorPanel
                      "Information", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            styles.remove(index);
+            canvas.removeEdgeStyle((LineStyle)styles.get(index));
             jlistModel.remove(index);
             return;
         }

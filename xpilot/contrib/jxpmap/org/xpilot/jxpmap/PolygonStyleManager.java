@@ -88,9 +88,9 @@ public class PolygonStyleManager extends EditorPanel
             PolygonStyle style = new PolygonStyle();
             style.setDefaultEdgeStyle(model.getDefaultEdgeStyle());
             EditorDialog.show
-                (this, new PolygonStyleEditor(style, model), true);
+                (this, new PolygonStyleEditor(style, canvas, true), true);
             if (style.getId() != null) {
-                styles.add(style);
+                canvas.addPolygonStyle(style);
                 jlistModel.addElement(style.getId());
             }
             return;
@@ -108,9 +108,8 @@ public class PolygonStyleManager extends EditorPanel
             }
             PolygonStyle style = (PolygonStyle)styles.get(index);
             EditorDialog.show
-                (this, new PolygonStyleEditor(style, model), true);
+                (this, new PolygonStyleEditor(style, canvas, false), true);
             jlistModel.set(index, style.getId());
-            canvas.repaint();
             preview.repaint();
             return;
 
@@ -124,7 +123,7 @@ public class PolygonStyleManager extends EditorPanel
                      "Information", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            styles.remove(index);
+            canvas.removePolygonStyle((PolygonStyle)styles.get(index));
             jlistModel.remove(index);
             return;
         }

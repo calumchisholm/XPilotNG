@@ -31,6 +31,7 @@ public class MainFrame extends JFrame implements ActionListener {
         buildActionMap();
         buildInputMap();
         setSize(800, 600);
+	setDefaultCloseOperation(EXIT_ON_CLOSE);
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(ss.width / 2 - 400, ss.height / 2 - 300);
     }
@@ -493,10 +494,6 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     private void undo () {
-        if (!canvas.getUndoManager().canRedo()) {
-            canvas.saveUndo();
-            canvas.getUndoManager().undo();
-        }
         if (canvas.getUndoManager().canUndo())
             canvas.getUndoManager().undo();
     }

@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.io.*;
 
 public class MapCanvas extends JComponent {
@@ -18,7 +19,6 @@ public class MapCanvas extends JComponent {
     private boolean erase;
     private Point offset;
     private UndoManager undoManager;
-    private ModelEdit currentEdit;
 
     public MapCanvas () {
 
@@ -38,13 +38,6 @@ public class MapCanvas extends JComponent {
     
     public CanvasEventHandler getCanvasEventHandler () {
         return eventHandler;
-    }
-
-    public void saveUndo () {
-        MapModel clone = (MapModel)getModel().deepClone(new HashMap());
-        if (currentEdit != null) currentEdit.next = clone;
-        currentEdit = new ModelEdit(clone);
-        undoManager.addEdit(currentEdit);
     }
 
     public UndoManager getUndoManager() {
@@ -230,39 +223,283 @@ public class MapCanvas extends JComponent {
         }
     }
 
-    
-    private class ModelEdit extends AbstractUndoableEdit {
-        
-        public MapModel prev;
-        public MapModel next;
-        
-        public ModelEdit (MapModel prev) {
-            this.prev = prev;
-        }
-
-        public boolean canRedo () {
-            return super.canRedo() && next != null;
-        }
-
-        public void undo () {
-            super.undo();
-            setModel(prev);
-        }
-
-        public void redo () {
-            super.redo();
-            setModel(next);
-        }
-
-        private void setModel (MapModel m) {
-            MapCanvas.this.model = m;
-            MapCanvas.this.at = null;
-            MapCanvas.this.it = null;
-            MapCanvas.this.eventHandler = null;
-            MapCanvas.this.repaint();
-        }
+    private void doEdit (MapEdit e) {
+        e.edit();
+        getUndoManager().addEdit(e);
+	repaint();
     }
-    
+
+    private abstract class MapEdit extends AbstractUndoableEdit {
+	public abstract void unedit ();
+	public abstract void edit ();
+	public void undo () {
+	    super.undo();
+	    unedit();
+	    repaint();
+	}
+	public void redo () {
+	    super.redo();
+	    edit();
+	    repaint();
+	}
+    }
+
+    public void setPolygonEdgeStyle (final MapPolygon p, 
+                                     final int edgeIndex, 
+                                     final LineStyle newStyle) {
+        final LineStyle oldStyle = p.getEdgeStyle(edgeIndex);
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    p.setEdgeStyle(edgeIndex, oldStyle);
+                }
+                public void edit () {
+                    p.setEdgeStyle(edgeIndex, newStyle);
+                }
+            });
+    }
+
+    public void removePolygonPoint (final MapPolygon p, final int i) {
+        final Point point = p.getPoint(i);
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    p.insertPoint(i, point);
+                }
+                public void edit () {
+                    p.removePoint(i);
+                }
+            });        
+    }
+
+    public void insertPolygonPoint (final MapPolygon p,
+                                    final int i,
+                                    final Point point) {
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    p.removePoint(i);
+                }
+                public void edit () {
+                    p.insertPoint(i, point);
+                }
+            });                
+    }
+
+    public void movePolygonPoint (final MapPolygon p, 
+                                  final int i,
+                                  final int newX,
+                                  final int newY) {
+        final Point oldPoint = p.getPoint(i);
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    p.setPoint(i, oldPoint.x, oldPoint.y);
+                }
+                public void edit () {
+                    p.setPoint(i, newX, newY);
+                }
+            });
+    }
+
+    public void setPolygonProperties (final MapPolygon p,
+                                      final PolygonStyle newStyle,
+                                      final int newType,
+                                      final int newTeam) {
+        final PolygonStyle oldStyle = p.getStyle();
+        final int oldType = p.getType();
+        final int oldTeam = p.getTeam();
+        final PolygonStyle oldDefaultStyle = model.getDefaultPolygonStyle();
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    p.setStyle(oldStyle);
+                    p.setType(oldType);
+                    p.setTeam(oldTeam);
+                    model.setDefaultPolygonStyle(oldDefaultStyle);
+                }
+                public void edit () {
+                    p.setStyle(newStyle);
+                    p.setType(newType);
+                    p.setTeam(newTeam);
+                    model.setDefaultPolygonStyle(newStyle);
+                }
+            });        
+    }
+
+
+    public void setBallTeam (final MapBall b, final int newTeam) {
+        final int oldTeam = b.getTeam();
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    b.setTeam(oldTeam);
+                }
+                public void edit () {
+                    b.setTeam(newTeam);
+                }
+            });
+    }
+
+    public void setBaseProperties (final MapBase b, 
+                                   final int newTeam,
+                                   final int newDir) {
+        final int oldTeam = b.getTeam();
+        final int oldDir = b.getDir();
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    b.setTeam(oldTeam);
+                    b.setDir(oldDir);
+                }
+                public void edit () {
+                    b.setTeam(newTeam);
+                    b.setDir(newDir);
+                }
+            });
+    }
+
+    public void removeMapObject (final MapObject o) {
+        final int i = getModel().indexOf(o);
+        if (i == -1) return;
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    getModel().addObject(i, o);
+                }
+                public void edit () {
+                    getModel().removeObject(i);
+                }
+            });
+    }
+
+    public void addMapObject (final MapObject o) {
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    getModel().removeObject(o);
+                }
+                public void edit () {
+                    getModel().addToFront(o);
+                }
+            });
+    }
+
+    public void moveMapObject (final MapObject o, 
+                               final int newX, 
+                               final int newY) {
+        final int oldX = o.getBounds().x;
+        final int oldY = o.getBounds().y;
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    o.moveTo(oldX, oldY);
+                }
+                public void edit () {
+                    o.moveTo(newX, newY);
+                }
+            });
+    }
+
+    public void addEdgeStyle (final LineStyle style) {
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    getModel().edgeStyles.remove(style);
+                }
+                public void edit () {
+                    getModel().edgeStyles.add(style);
+                }
+            });
+    }
+
+    public void removeEdgeStyle (final LineStyle style) {
+	final java.util.List oldStyles = getModel().edgeStyles;
+        doEdit(new MapEdit() {
+                public void unedit () {
+		    getModel().edgeStyles = oldStyles;
+                }
+                public void edit () {
+                    getModel().edgeStyles.remove(style);
+                }
+            });
+    }
+
+    public void addPolygonStyle (final PolygonStyle style) {
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    getModel().polyStyles.remove(style);
+                }
+                public void edit () {
+                    getModel().polyStyles.add(style);
+                }
+            });
+    }
+
+    public void removePolygonStyle (final PolygonStyle style) {
+	final java.util.List oldStyles = new ArrayList(getModel().polyStyles);
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    getModel().polyStyles = oldStyles;
+                }
+                public void edit () {
+                    getModel().polyStyles.remove(style);
+                }
+            });
+    }
+
+    public void setEdgeStyleProperties (final LineStyle style,
+                                        final String newId,
+                                        final int newStyle,
+                                        final int newWidth,
+                                        final Color newColor) {
+        final String oldId = style.getId();
+        final int oldStyle = style.getStyle();
+        final int oldWidth = style.getWidth();
+        final Color oldColor = style.getColor();
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    set(oldId, oldStyle, oldWidth, oldColor);
+                }
+                public void edit () {
+                    set(newId, newStyle, newWidth, newColor);
+                }
+                private void set (String id, int s, int w, Color c) {
+                    style.setId(id);
+                    style.setStyle(s);
+                    style.setWidth(w);
+                    style.setColor(c);
+                }
+            });
+    }
+
+
+    public void setPolygonStyleProperties (final PolygonStyle style,
+                                           final String newId,
+                                           final int newFillStyle,
+                                           final Color newColor,
+                                           final Pixmap newTexture,
+                                           final LineStyle newDefEdgeStyle,
+                                           final boolean newVisible,
+                                           final boolean newVisInRadar) {
+        final String oldId = style.getId();
+        final int oldFillStyle = style.getFillStyle();
+        final Color oldColor = style.getColor();
+        final Pixmap oldTexture = style.getTexture();
+        final LineStyle oldDefEdgeStyle = style.getDefaultEdgeStyle();
+        final boolean oldVisible = style.isVisible();
+        final boolean oldVisInRadar = style.isVisibleInRadar();
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    set(oldId, oldFillStyle, oldColor, oldTexture, 
+                        oldDefEdgeStyle, oldVisible, oldVisInRadar);
+                }
+                public void edit () {
+                    set(newId, newFillStyle, newColor, newTexture, 
+                        newDefEdgeStyle, newVisible, newVisInRadar);
+                }
+                private void set (String id, int fs, Color c, Pixmap t, 
+                                  LineStyle es, boolean v, boolean vr) {
+                    style.setId(id);
+                    style.setFillStyle(fs);
+                    style.setColor(c);
+                    style.setTexture(t);
+                    style.setDefaultEdgeStyle(es);
+                    model.setDefaultEdgeStyle(es);
+                    style.setVisible(v);
+                    style.setVisibleInRadar(vr);
+                }
+            });
+    }
     
     private class AwtEventHandler implements CanvasEventHandler {
 

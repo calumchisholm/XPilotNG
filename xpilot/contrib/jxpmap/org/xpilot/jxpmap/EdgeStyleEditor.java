@@ -15,13 +15,19 @@ public class EdgeStyleEditor extends EditorPanel implements ActionListener {
     private JTextField tfName;
 
     private LineStyle style;
+    private MapCanvas canvas;
     private MapModel model;
+    private boolean isNew;
 
     
-    public EdgeStyleEditor (LineStyle style, MapModel model) {
+    public EdgeStyleEditor (LineStyle style, 
+                            MapCanvas canvas,
+                            boolean isNew) {
         
         this.style = style;
-        this.model = model;
+        this.canvas = canvas;
+        this.isNew = isNew;
+        this.model = canvas.getModel();
         
         setTitle("Edge Style Properties");
         setLayout(new GridLayout(4, 2));
@@ -65,10 +71,19 @@ public class EdgeStyleEditor extends EditorPanel implements ActionListener {
                  "Information", JOptionPane.INFORMATION_MESSAGE);
             return false;
         }
-        style.setId(tfName.getText());
-        style.setStyle(cmbStyle.getSelectedIndex());
-        style.setWidth(cmbWidth.getSelectedIndex());
-        style.setColor(bColor.getBackground());
+        if (isNew) {
+            style.setId(tfName.getText());
+            style.setStyle(cmbStyle.getSelectedIndex());
+            style.setWidth(cmbWidth.getSelectedIndex());
+            style.setColor(bColor.getBackground());
+        } else {
+            canvas.setEdgeStyleProperties
+                (style,
+                 tfName.getText(),
+                 cmbStyle.getSelectedIndex(),
+                 cmbWidth.getSelectedIndex(),
+                 bColor.getBackground());
+        }
         return true;
     }
 

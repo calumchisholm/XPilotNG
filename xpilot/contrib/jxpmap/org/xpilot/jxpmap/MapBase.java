@@ -122,11 +122,8 @@ public class MapBase extends MapObject {
         public boolean apply () {
             int newTeam = cmbTeam.getSelectedIndex() + 1;
             int newDir = cmbDir.getSelectedIndex() * 32;
-            if (newTeam != getTeam() || newDir != getDir()) {
-                canvas.saveUndo();
-                setTeam(newTeam);
-                setDir(newDir);
-            }                
+            if (newTeam != getTeam() || newDir != getDir())
+                canvas.setBaseProperties(MapBase.this, newTeam, newDir);
             return true;
         }
     }

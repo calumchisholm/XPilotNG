@@ -57,17 +57,13 @@ public class PolygonPropertyEditor extends EditorPanel {
 
 
     public boolean apply () {
-        canvas.saveUndo();
         int styleIndex = cmbStyle.getSelectedIndex();
         PolygonStyle style = (PolygonStyle)model.polyStyles.get(styleIndex);
-        polygon.setStyle(style);
-        model.setDefaultPolygonStyle(styleIndex);
-        
-        polygon.setType(cmbType.getSelectedIndex());
-        
-        if (polygon.getType() != MapPolygon.TYPE_NORMAL) {
-            polygon.setTeam(cmbTeam.getSelectedIndex() + 1);
-        }
+        int type = cmbType.getSelectedIndex();
+        int team = polygon.getTeam();
+        if (polygon.getType() != MapPolygon.TYPE_NORMAL)
+            team = cmbTeam.getSelectedIndex() + 1;
+        canvas.setPolygonProperties(polygon, style, type, team);
         return true;
     }
 }

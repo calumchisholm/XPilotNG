@@ -128,9 +128,7 @@ public abstract class MapObject extends ModelObject {
                 } else {
                     if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
                         if (canvas.isErase()) {
-                            canvas.saveUndo();
-                            canvas.getModel().removeObject(this);
-                            canvas.repaint();
+                            canvas.removeMapObject(this);
                         } else {
                             canvas.setCanvasEventHandler(new MoveHandler(me));
                         }
@@ -209,13 +207,10 @@ public abstract class MapObject extends ModelObject {
         public void mousePressed (MouseEvent evt) {
 
             MapCanvas c = (MapCanvas)evt.getSource();
-            c.saveUndo();
-            c.getModel().addToFront(MapObject.this);
             MapObject.this.moveTo(evt.getX() - offset.x, 
                                   evt.getY() - offset.y);
             c.setCanvasEventHandler(null);
             if (cmd != null) cmd.run();
-            c.repaint();
         }
     }
 
@@ -258,11 +253,10 @@ public abstract class MapObject extends ModelObject {
         
         public void mouseReleased (MouseEvent evt) {
             MapCanvas c = (MapCanvas)evt.getSource();
-            c.saveUndo();
-            MapObject.this.moveTo(evt.getX() - offset.x, 
-                                  evt.getY() - offset.y);
+            c.moveMapObject(MapObject.this,
+                            evt.getX() - offset.x, 
+                            evt.getY() - offset.y);
             c.setCanvasEventHandler(null);
-            c.repaint();
         }
     }
 }

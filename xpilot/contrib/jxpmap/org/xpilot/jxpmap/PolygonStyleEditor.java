@@ -17,12 +17,18 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
 
     private PolygonStyle style;
     private MapModel model;
+    private MapCanvas canvas;
+    private boolean isNew;
 
     
-    public PolygonStyleEditor (PolygonStyle style, MapModel model) {
+    public PolygonStyleEditor (PolygonStyle style, 
+                               MapCanvas canvas, 
+                               boolean isNew) {
         
         this.style = style;
-        this.model = model;
+        this.canvas = canvas;
+        this.model = canvas.getModel();
+        this.isNew = isNew;
         
         setTitle("Polygon Style Properties");
         setLayout(new GridLayout(7, 2));
@@ -96,26 +102,44 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
                  "Information", JOptionPane.INFORMATION_MESSAGE);
             return false;
         }
-        style.setId(tfName.getText());
-        style.setFillStyle(cmbFillStyle.getSelectedIndex());
-        style.setColor(bColor.getBackground());
+        String id = tfName.getText();
+        int fillStyle = cmbFillStyle.getSelectedIndex();
+        Color color = bColor.getBackground();
+        Pixmap texture = null;
         int i = cmbTexture.getSelectedIndex();
         if (i == 0) {
-            if (style.getFillStyle() == style.FILL_TEXTURED) {
+            if (fillStyle == style.FILL_TEXTURED) {
                 JOptionPane.showMessageDialog
                     (this, "Select a texture if you want textured filling.",
                      "Information", JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
-            style.setTexture(null);
         }
-        else style.setTexture((Pixmap)model.pixmaps.get(i - 1));
-        i = cmbEdgeStyle.getSelectedIndex();
-        style.setDefaultEdgeStyle((LineStyle)model.edgeStyles.get(i));
-        model.setDefaultEdgeStyle(i);
-        style.setVisible(cbVisible.isSelected());
-        style.setVisibleInRadar(cbVisibleInRadar.isSelected());
-        
+        else texture = (Pixmap)model.pixmaps.get(i - 1);
+        LineStyle defEdgeStyle = (LineStyle)model.edgeStyles.get
+            (cmbEdgeStyle.getSelectedIndex());
+        boolean visible = cbVisible.isSelected();
+        boolean visibleInRadar = cbVisibleInRadar.isSelected();
+        if (isNew) {
+            style.setId(id);
+            style.setFillStyle(fillStyle);
+            style.setColor(color);
+            style.setTexture(texture);
+            style.setDefaultEdgeStyle(defEdgeStyle);
+            model.setDefaultEdgeStyle(defEdgeStyle);
+            style.setVisible(visible);
+            style.setVisibleInRadar(visibleInRadar);
+        } else {
+            canvas.setPolygonStyleProperties
+                (style,
+                 id,
+                 fillStyle,
+                 color,
+                 texture,
+                 defEdgeStyle,
+                 visible,
+                 visibleInRadar);
+        }
         return true;
     }
 

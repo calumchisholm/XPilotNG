@@ -323,9 +323,7 @@ public class MapPolygon extends MapObject {
                              pl.ypoints[i]) < thresholdSq) {
                             
                             if (canvas.isErase()) {
-                                canvas.saveUndo();
-                                removePoint(i);
-                                canvas.repaint();
+                                canvas.removePolygonPoint(this, i);
                             } else {
                                 canvas.setCanvasEventHandler
                                     (new PolygonPointMoveHandler(me, i));
@@ -352,9 +350,7 @@ public class MapPolygon extends MapObject {
                                  InputEvent.BUTTON1_MASK) != 0) {
                                 
                                 if (me.getID() == me.MOUSE_PRESSED) {
-                                    canvas.saveUndo();
-                                    insertPoint(i + 1, p);
-                                    canvas.repaint();
+                                    canvas.insertPolygonPoint(this, i + 1, p);
                                     canvas.setCanvasEventHandler
                                         (new PolygonPointMoveHandler
                                          (me, i + 1));
@@ -396,6 +392,19 @@ public class MapPolygon extends MapObject {
         }
     }
 
+
+    public Point getPoint (int i) {
+        if (i <= 0) throw new IllegalArgumentException("i = " + i);
+        return new Point(polygon.xpoints[i], polygon.ypoints[i]);
+    }
+
+    public void setPoint (int i, int x, int y) {
+        if (i <= 0 || i >= polygon.npoints)
+            throw new IllegalArgumentException("i = " + i);
+        polygon.xpoints[i] = x;
+        polygon.ypoints[i] = y;
+        polygon.invalidate();
+    }
     
     public void insertPoint (int i, Point p) {
         if (i <= 0) throw new IllegalArgumentException("i = " + i);
@@ -486,8 +495,7 @@ public class MapPolygon extends MapObject {
                                     poly.npoints - 1);
                     MapPolygon.this.style = 
                         c.getModel().getDefaultPolygonStyle();
-                    c.saveUndo();
-                    c.getModel().addToFront(MapPolygon.this);
+                    c.addMapObject(MapPolygon.this);
 
                     // This hack consumes mouse released and mouse clicked
                     // events associated with this mouse pressed event.
@@ -500,7 +508,6 @@ public class MapPolygon extends MapObject {
                             }
                         });
                     if (cmd != null) cmd.run();
-                    c.repaint();
                     return;
                 }
             }
@@ -586,16 +593,8 @@ public class MapPolygon extends MapObject {
         public void mouseReleased (MouseEvent evt) {
 
             MapCanvas c = (MapCanvas)evt.getSource();
-            c.saveUndo();
-            
-            polygon.xpoints[index] = evt.getX();
-            polygon.ypoints[index] = evt.getY();
-            Polygon p = new Polygon(polygon.xpoints, 
-                                    polygon.ypoints, 
-                                    polygon.npoints);
-            polygon = p;
+            c.movePolygonPoint(MapPolygon.this, index, evt.getX(), evt.getY());
             c.setCanvasEventHandler(null);
-            c.repaint();
         }
 
 
