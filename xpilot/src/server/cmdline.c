@@ -855,10 +855,36 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"playerWallBounceType",
+	"wallBounceType",
+	"2",
+	&options.playerWallBounceType,
+	valInt,
+	tuner_playerwallbouncetype,
+	"What kind of ship wall bounces to use.\n"
+	"\n"
+	"A value of 0 gives the old XPilot wall bounces, where the ship\n"
+	"velocity in the direction perpendicular to the wall is reversed\n"
+	"after which the velocity is multiplied by the value of the\n"
+	"playerWallBounceBrakeFactor option.\n"
+	"\n"
+	"A value of 1 gives the \"separate multipliers\" implementation.\n"
+	"\n"
+	"A value of 2 causes Mara's suggestion for the speed change in the\n"
+	"direction parallel to the wall to be used.\n"
+	"Vtangent2 = (1-Vnormal1/Vtotal1*wallfriction)*Vtangent1\n"
+	"\n"
+	"A value of 3 causes Uau's suggestion to be used:\n"
+	"change the parallel one by\n"
+	"MIN(C1*perpendicular_change, C2*parallel_speed)\n"
+	"if you assume the wall has a coefficient of friction C1.\n.",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"playerWallBounceBrakeFactor",
 	"playerWallBrake",
 	"0.89",
-	&options.playerWallBrakeFactor,
+	&options.playerWallBounceBrakeFactor,
 	valReal,
 	Move_init,
 	"Factor to slow down ship in direction perpendicular to the wall\n"
@@ -867,7 +893,7 @@ static option_desc opts[] = {
     },
     {
 	"playerWallFriction",
-	"playerWallFriction",
+	"wallFriction",
 	"0.5",
 	&options.playerWallFriction,
 	valReal,
@@ -879,7 +905,7 @@ static option_desc opts[] = {
 	"objectWallBounceBrakeFactor",
 	"objectWallBrake",
 	"0.95",
-	&options.objectWallBrakeFactor,
+	&options.objectWallBounceBrakeFactor,
 	valReal,
 	Move_init,
 	"Factor to slow down objects when they hit the wall (0 to 1).\n",
@@ -3428,41 +3454,25 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"maraWallBounce",
-	"maraWallBounce",
-	"true",
-	&options.maraWallBounce,
-	valBool,
+	"constantSpeed",
+	"oldThrust",
+	"0",
+	&options.constantSpeed,
+	valReal,
 	tuner_dummy,
-	"Use mara's suggestion for the speed change in the direction\n"
-	"parallel to the wall.\n"
-	"Vtangent2 = (1-Vnormal1/Vtotal1*wallfriction)*Vtangent1\n"
-	"If not, uau's suggestion is used:\n"
-	"change the parallel one by\n"
-	"MIN(C1*perpendicular_change, C2*parallel_speed)\n"
-	"if you assume the wall has a coefficient of friction C1.\n.",
+	"Make ship move forward at a constant speed when thrust key is held\n"
+	"down, in addition to the normal acceleration. The constant speed\n"
+	"is proportional to the product of the acceleration of the ship\n"
+	"(varying with ship mass and afterburners) and the value of this\n"
+	"option. Note that this option is quite unphysical and can using it\n"
+	"can cause weird effects (with bounces for example).\n"
+	"Low values close to 0.5 (maybe in the range 0.3 to 1) for this\n"
+	"option can be used if you want to increase ship agility without\n"
+	"increasing speeds otherwise. This can improve gameplay for example\n"
+	"on the Blood's Music map. Higher values make the ship behaviour\n"
+	"visibly weird.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-     {
-       "constantSpeed",
-       "oldThrust",
-       "0",
-       &options.constantSpeed,
-       valReal,
-       tuner_dummy,
-       "Make ship move forward at a constant speed when thrust key is held\n"
-       "down, in addition to the normal acceleration. The constant speed\n"
-       "is proportional to the product of the acceleration of the ship\n"
-       "(varying with ship mass and afterburners) and the value of this\n"
-       "option. Note that this option is quite unphysical and can using it\n"
-       "can cause weird effects (with bounces for example).\n"
-       "Low values close to 0.5 (maybe in the range 0.3 to 1) for this\n"
-       "option can be used if you want to increase ship agility without\n"
-       "increasing speeds otherwise. This can improve gameplay for example\n"
-       "on the Blood's Music map. Higher values make the ship behaviour\n"
-       "visibly weird.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-     },
     {
 	"thrustWidth",
 	"sprayWidth",

@@ -47,5 +47,6 @@ void tuner_gameduration(world_t *world);
 void tuner_racelaps(world_t *world);
 void tuner_allowalliances(world_t *world);
 void tuner_announcealliances(world_t *world);
+void tuner_playerwallbouncetype(world_t *world);
 
 #endif

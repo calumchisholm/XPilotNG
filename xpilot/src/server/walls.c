@@ -136,9 +136,9 @@ void Move_init(world_t *world)
     LIMIT(options.maxShieldedWallBounceSpeed, 0, world->hypotenuse);
     LIMIT(options.maxUnshieldedWallBounceSpeed, 0, world->hypotenuse);
 
-    LIMIT(options.playerWallBrakeFactor, 0, 1);
-    LIMIT(options.playerWallFriction, 0, 1);
-    LIMIT(options.objectWallBrakeFactor, 0, 1);
+    LIMIT(options.playerWallBounceBrakeFactor, 0, 1);
+    LIMIT(options.playerWallFriction, 0, FLT_MAX);
+    LIMIT(options.objectWallBounceBrakeFactor, 0, 1);
     LIMIT(options.objectWallBounceLifeFactor, 0, 1);
     LIMIT(options.wallBounceFuelDrainMult, 0, 1000);
     wallBounceExplosionMult = sqrt(options.wallBounceFuelDrainMult);
@@ -488,7 +488,7 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
 static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 {
     double fx, fy;
-    double c, s, wall_brake_factor = options.objectWallBrakeFactor;
+    double c, s, wall_brake_factor = options.objectWallBounceBrakeFactor;
     int group, type;
     int mapobj_ind;
     world_t *world = &World;
@@ -647,7 +647,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	double	speed = VECTOR_LENGTH(pl->vel);
 	double	v = speed * 0.25;
 	double	m = pl->mass - pl->emptymass * 0.75;
-	double	b = 1.0 - 0.5 * options.playerWallBrakeFactor;
+	double	b = 1.0 - 0.5 * options.playerWallBounceBrakeFactor;
 	double	cost = b * m * v;
 	double	max_speed = BIT(pl->used, HAS_SHIELD)
 		? options.maxShieldedWallBounceSpeed
@@ -728,14 +728,26 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	pl->vel.y -= options.constantSpeed * pl->acc.y;
     }
 
-#if 1
-    /*
-     * Determine new velocity vector and move->delta after bounce.
-     * The vector move->delta is the remaining amount left to move
-     * in this frame.
-     */
 
-    {
+    if (options.playerWallBounceType == 0) {
+	double fx, fy;
+
+	fx = move->delta.cx * c + move->delta.cy * s;
+	fy = move->delta.cx * s - move->delta.cy * c;
+	move->delta.cx = fx * options.playerWallBounceBrakeFactor;
+	move->delta.cy = fy * options.playerWallBounceBrakeFactor;
+	fx = pl->vel.x * c + pl->vel.y * s;
+	fy = pl->vel.x * s - pl->vel.y * c;
+	pl->vel.x = fx * options.playerWallBounceBrakeFactor;
+	pl->vel.y = fy * options.playerWallBounceBrakeFactor;
+    }
+    else {
+
+	/*
+	 * Determine new velocity vector and move->delta after bounce.
+	 * The vector move->delta is the remaining amount left to move
+	 * in this frame.
+	 */
 	vector_t vel, vel1, mvd, mvd1;
 
 	/*
@@ -756,10 +768,21 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	 * iii. Determine how much perpendicular and parallel components
 	 * change.
 	 */
-	vel.y *= options.playerWallBrakeFactor;
-	mvd.y *= options.playerWallBrakeFactor;
+	vel.y *= options.playerWallBounceBrakeFactor;
+	mvd.y *= options.playerWallBounceBrakeFactor;
 
-	if (options.maraWallBounce) {
+	if (options.playerWallBounceType == 1) {
+	    double factor = 1.0 - options.playerWallFriction;
+	    /*
+	     * kps: simple "separate multipliers" implementation
+	     */
+	    if (factor < 0.0)
+		factor = 0.0;
+	    vel.x *= factor;
+	    mvd.x *= factor;
+	}
+	else if (options.playerWallBounceType == 2) {
+
 	    double vtotal1 = VECTOR_LENGTH(vel1);
 	    double vnormal1 = ABS(vel1.y);
 	    double wallfriction = options.playerWallFriction;
@@ -768,13 +791,15 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	     * mara:
 	     * Vtangent2 = (1-Vnormal1/Vtotal1*wallfriction)*Vtangent1;
 	     */
+	    if (factor < 0.0)
+		factor = 0.0;
 	    vel.x *= factor;
 	    mvd.x *= factor;
 	}
-	else {
+	else if (options.playerWallBounceType == 3) {
 	    double change;
 	    double C1 = options.playerWallFriction;
-	    double C2 = 1.0 - options.playerWallBrakeFactor;
+	    double C2 = 1.0 - options.playerWallBounceBrakeFactor;
 	    double perpendicular_change, parallel_speed;
 	    /*
 	     * uau:
@@ -805,20 +830,6 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	move->delta.cx = mvd.x * cl + mvd.y * (-sl);
 	move->delta.cy = mvd.x * sl + mvd.y *   cl;
     }
-#else
-    {
-	double fx, fy;
-
-	fx = move->delta.cx * c + move->delta.cy * s;
-	fy = move->delta.cx * s - move->delta.cy * c;
-	move->delta.cx = fx * options.playerWallBrakeFactor;
-	move->delta.cy = fy * options.playerWallBrakeFactor;
-	fx = pl->vel.x * c + pl->vel.y * s;
-	fy = pl->vel.x * s - pl->vel.y * c;
-	pl->vel.x = fx * options.playerWallBrakeFactor;
-	pl->vel.y = fy * options.playerWallBrakeFactor;
-    }
-#endif
 }
 
 

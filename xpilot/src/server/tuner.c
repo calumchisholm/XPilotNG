@@ -235,3 +235,13 @@ void tuner_announcealliances(world_t *world)
     UNUSED_PARAM(world);
     updateScores = true;
 }
+
+void tuner_playerwallbouncetype(world_t *world)
+{
+    int type = options.playerWallBounceType;
+
+    UNUSED_PARAM(world);
+
+    if (!(type >= 0 && type <= 3))
+	options.playerWallBounceType = 2;
+}
