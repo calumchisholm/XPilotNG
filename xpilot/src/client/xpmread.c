@@ -44,6 +44,9 @@
 #define XPM_READ_C
 #include "xpmread.h"
 
+/* From colors.c */
+extern unsigned long (*RGB)(u_byte r, u_byte g, u_byte b);
+
 char xpmread_version[] = VERSION;
 
 /* Kludge for visuals under C++ */
@@ -469,18 +472,24 @@ static int xpm_colors_to_pixels(XPM *xpm, enum XPM_key key,
 	    }
 	}
 	else {
-	    unsigned	dr, dg, db, dist, mindist = UINT_MAX;
+            if (!blockBitmaps) {
+                unsigned	dr, dg, db, dist, mindist = UINT_MAX;
 
-	    for (j = 0; j < maxColors; j++) {
-		dr = xcolor.red - colors[j].red;
-		dg = xcolor.green - colors[j].green;
-		db = xcolor.blue - colors[j].blue;
-		dist = sqr(dr) + sqr(dg) + sqr(db);
-		if (dist < mindist) {
-		    mindist = dist;
-		    pixels[i] = colors[j].pixel;
-		}
-	    }
+                for (j = 0; j < maxColors; j++) {
+                    dr = xcolor.red - colors[j].red;
+                    dg = xcolor.green - colors[j].green;
+                    db = xcolor.blue - colors[j].blue;
+                    dist = sqr(dr) + sqr(dg) + sqr(db);
+                    if (dist < mindist) {
+                        mindist = dist;
+                        pixels[i] = colors[j].pixel;
+                    }
+                }
+            } else {
+                pixels[i] = RGB(xcolor.red >> 8, 
+                                xcolor.green >> 8, 
+                                xcolor.blue >> 8);
+            }
 	}
     }
     return 0;

@@ -179,13 +179,25 @@ void Paint_objects(void)
 
     for (i = 0; i < num_polygon; i++) {
 
-        irec b = polygon_ptr[i].bounds;
-        b.y -= b.h;
-        Compute_bounds(&min, &max, &b);
+        Compute_bounds(&min, &max, &polygon_ptr[i].bounds);
 
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {
                 Gui_paint_polygon(i, xoff, yoff);
+            }
+        }
+    }
+
+    for (i = 0; i < num_fuels; i++) {
+
+        Compute_bounds(&min, &max, &fuels[i].bounds);
+
+        for (xoff = min.x; xoff <= max.x; xoff++) {
+            for (yoff = min.y; yoff <= max.y; yoff++) {
+                Gui_paint_fuel
+                    (fuels[i].bounds.x + xoff * Setup->width,
+                     fuels[i].bounds.y + yoff * Setup->height,
+                     fuels[i].fuel);
             }
         }
     }
@@ -205,16 +217,16 @@ void Paint_objects(void)
         }
     }
 
-    for (i = 0; i < num_fuels; i++) {
+    for (i = 0; i < num_checks; i++) {
 
-        Compute_bounds(&min, &max, &fuels[i].bounds);
+        Compute_bounds(&min, &max, &checks[i].bounds);
 
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {
-                Gui_paint_fuel
-                    (fuels[i].bounds.x + xoff * Setup->width,
-                     fuels[i].bounds.y + yoff * Setup->height,
-                     fuels[i].fuel);
+                Gui_paint_setup_check
+                    (checks[i].bounds.x + xoff * Setup->width,
+                     checks[i].bounds.y + yoff * Setup->height,
+                     (i == nextCheckPoint));
             }
         }
     }
@@ -365,7 +377,8 @@ void Paint_world(void)
 		    }
 		    break;
 		case SETUP_CHECK:
-		    Gui_paint_setup_check(x, y, xi, yi);
+		    Gui_paint_setup_check
+                        (x, y, (Check_index_by_pos(xi, yi) == nextCheckPoint));
 		    break;
 
 		case SETUP_ACWISE_GRAV:

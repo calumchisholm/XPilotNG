@@ -709,7 +709,7 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type, bool last, bool mor
 }
 
 
-void Gui_paint_setup_check(int x, int y, int xi, int yi)
+void Gui_paint_setup_check(int x, int y, bool isNext)
 {
     XPoint points[5];
     if (!blockBitmaps) {
@@ -724,7 +724,7 @@ void Gui_paint_setup_check(int x, int y, int xi, int yi)
 	points[3].y = WINSCALE(Y(y+(BLOCK_SZ/2)));
 	points[4] = points[0];
 
-	if (Check_index_by_pos(xi, yi) == nextCheckPoint) {
+        if (isNext) {
 	    rd.fillPolygon(dpy, p_draw, gc,
 			   points, 5,
 			   Convex, CoordModeOrigin);
@@ -738,7 +738,7 @@ void Gui_paint_setup_check(int x, int y, int xi, int yi)
 	    Erase_points(0, points, 5);
 	}
     } else {
-	if (Check_index_by_pos(xi, yi) == nextCheckPoint) {
+        if (isNext) {
 	    PaintBitmap(p_draw, BM_CHECKPOINT, WINSCALE(X(x)), WINSCALE(Y(y + BLOCK_SZ)),
 		WINSCALE(BLOCK_SZ), WINSCALE(BLOCK_SZ), 1);
 	
@@ -1210,6 +1210,7 @@ static int Rectangles_intersect(irec r1, irec r2) {
 void Gui_paint_polygon(int i, int xoff, int yoff) {
 
     int j,x,y,texture = 0, filled = 0;
+    ipos ship;
     static XPoint poly[10000];
     static int		wallTileReady = 0;
     static Pixmap	wallTile = None;
@@ -1231,22 +1232,20 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
     XSetLineAttributes(dpy, gc, WINSCALE(4), LineSolid, CapButt, JoinMiter);
     if (BIT(instruments, SHOW_FILLED_WORLD)) filled = 1;
     
-    x = polygon_ptr[i].point_ptr[0].x - world.x + xoff * Setup->width;
-    y = world.y + view_height - polygon_ptr[i].point_ptr[0].y - yoff * 
-        Setup->height;
+    x = xoff * Setup->width;
+    y = yoff * Setup->height;
+    ship.x = WINSCALE(world.x);
+    ship.y = WINSCALE(world.y + view_height);
     
-    poly[0].x = WINSCALE(x);
-    poly[0].y = WINSCALE(y);
-    
-    for (j = 1; j < polygon_ptr[i].num_point; j++) {
+    for (j = 0; j < polygon_ptr[i].num_point; j++) {
         x += polygon_ptr[i].point_ptr[j].x;
         y += polygon_ptr[i].point_ptr[j].y;
-        poly[j].x = WINSCALE(x);
-        poly[j].y = WINSCALE(y);
+        poly[j].x = WINSCALE(x) - ship.x;
+        poly[j].y = ship.y - WINSCALE(y);
     }
     poly[j].x = poly[0].x;
     poly[j].y = poly[0].y;
-    
+
     if (filled | texture) {
         if (texture) XSetFillStyle(dpy, gc, FillTiled);
 	rd.fillPolygon(dpy, p_draw, gc, poly, polygon_ptr[i].num_point,

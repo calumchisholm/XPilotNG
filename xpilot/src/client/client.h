@@ -161,6 +161,7 @@ typedef struct {
 
 typedef struct {
     int		pos;		/* Block index */
+    irec        bounds;         /* Location in map */
 } checkpoint_t;
 
 #define SCORE_OBJECT_COUNT	100

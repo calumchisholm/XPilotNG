@@ -133,13 +133,18 @@ static void Paint_checkpoint_radar(float xf, float yf)
     XPoint		points[5];
 
     if (BIT(Setup->mode, TIMING)) {
-	Check_pos_by_index(nextCheckPoint, &x, &y);
-	x = ((int)(x * BLOCK_SZ * xf + 0.5) ) - slidingradar_x;
-	y = (RadarHeight - (int)(y * BLOCK_SZ * yf + 0.5) + DSIZE - 1) - slidingradar_y;
-	if (x <= 0) {
-	    x += 256;
-	}
-	if (y <= 0) {
+        if (oldServer) {
+            Check_pos_by_index(nextCheckPoint, &x, &y);
+            x = ((int)(x * BLOCK_SZ * xf + 0.5) ) - slidingradar_x;
+            y = (RadarHeight - (int)(y * BLOCK_SZ * yf + 0.5) + DSIZE - 1) - 
+                slidingradar_y;
+        } else {
+            /* add code to handle new server */
+        }
+        if (x <= 0) {
+            x += 256;
+        }
+        if (y <= 0) {
 	    y += RadarHeight;
 	}
 	/* top */
@@ -679,7 +684,7 @@ void Paint_world_radar(void)
       for (j = 1; j < polygon_ptr[i].num_point; j++) {
 
         x += polygon_ptr[i].point_ptr[j].x;
-        y += polygon_ptr[i].point_ptr[j].y;
+        y -= polygon_ptr[i].point_ptr[j].y;
 
         poly[j].x = (x * 256) / Setup->width;
         poly[j].y = (y * RadarHeight) / Setup->height;

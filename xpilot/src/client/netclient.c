@@ -453,9 +453,8 @@ int Net_setup(void)
 		dx += (unsigned char)*ptr++;
 		dy = *ptr++ << 8;
 		dy += (unsigned char)*ptr++;
-		dy = -dy;
 		cx += dx;
-		cy -= dy;
+		cy += dy;
 		if (min.x > cx) min.x = cx;
 		if (min.y > cy) min.y = cy;
 		if (max.x < cx) max.x = cx;
@@ -466,7 +465,7 @@ int Net_setup(void)
 	    poly.point_ptr = points;
 	    poly.num_point = pc;
 	    poly.bounds.x = min.x;
-	    poly.bounds.y = max.y;
+	    poly.bounds.y = min.y;
 	    poly.bounds.w = max.x - min.x;
 	    poly.bounds.h = max.y - min.y;
 	    STORE(xp_polygon_t, polygon_ptr, num_polygon, max_polygon, poly);
@@ -522,23 +521,22 @@ int Net_setup(void)
 	}
 	num_checks = *ptr++;
 	if (num_checks != 0) {
-#if 0
+
 	    checks = malloc(num_checks * sizeof(checkpoint_t));
 	    if (checks == NULL) {
 		error("No memory for checkpoints (%d)", num_checks);
 		exit(1);
 	    }
-#else
-	    error("Checkpoint drawing not implemented yet");
-	    exit(1);
-#endif
 	}
 	for (i = 0; i < num_checks; i++) {
 	    cx = *ptr++ << 8;
 	    cx += (unsigned char)*ptr++;
 	    cy = *ptr++ << 8;
 	    cy += (unsigned char)*ptr++;
-	    /* SET APPROPRIATE COORDS/BOUNDS HERE */
+            checks[i].bounds.x = cx - BLOCK_SZ / 2;
+            checks[i].bounds.y = cy - BLOCK_SZ / 2;
+            checks[i].bounds.w = BLOCK_SZ;
+            checks[i].bounds.h = BLOCK_SZ;
 	}
     }
 
