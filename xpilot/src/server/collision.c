@@ -802,7 +802,9 @@ static void PlayerObjectCollision(int ind)
 				   range * CLICK, obj->wall_time);
 	    break;
 	default:
+#if 0
 	    error("Unimplemented collision mode %d", obj->collmode);
+#endif
 	    continue;
 	}
 	if (!hit)
@@ -1564,4 +1566,3 @@ static void LaserCollision(void)
 	obj->life = 0;
     }
 }
-
