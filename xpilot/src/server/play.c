@@ -306,7 +306,7 @@ void Ball_hits_goal(ballobject *ball, struct group *groupptr)
  * This function is called when something would hit a balltarget.
  * The function determines if it hits or not.
  */
-bool Balltarget_hitfunc(struct group *group, struct move *move)
+bool Balltarget_hitfunc(struct group *groupptr, struct move *move)
 {
     ballobject *ball = NULL;
 
@@ -333,8 +333,8 @@ bool Balltarget_hitfunc(struct group *group, struct move *move)
 	 * the ball and the target are of the same team, but the
 	 * owner is not.
 	 */
-	if (World.treasures[ball->treasure].team == group->team
-	    && Player_by_id(ball->owner)->team != group->team)
+	if (World.treasures[ball->treasure].team == groupptr->team
+	    && Player_by_id(ball->owner)->team != groupptr->team)
 	    return false;
 	return true;
     }
@@ -403,10 +403,10 @@ extern struct move_parameters mp;
  *
  * Ideas stolen from Move_segment in walls_old.c
  */
-bool Cannon_hitfunc(struct group *group, struct move *move)
+bool Cannon_hitfunc(struct group *groupptr, struct move *move)
 {
     object *obj = move->obj;
-    int ind = group->item_id;
+    int ind = groupptr->item_id;
     cannon_t *cannon = &World.cannon[ind];
     unsigned long cannon_mask;
 
@@ -499,33 +499,6 @@ void Target_remove_from_map(target_t *targ)
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
-#if 0
-bool Target_hitfunc(struct group *group, struct move *move)
-{
-    object *obj = NULL;
-    int ind = group->item_id;
-    target_t *targ = &World.targets[ind];
-    unsigned long target_mask;
-
-    /* target is dead ? */
-    if (targ->dead_time > 0) {
-	xpprintf("BUG: Target_hitfunc called for dead target.\n");
-	return false;
-    }
-
-    if (move->obj == NULL)
-	return true;
-    obj = move->obj;
-
-    target_mask = mp.obj_target_mask | OBJ_PLAYER;
-    if (!BIT(target_mask, obj->type))
-	return false;
-
-    return true;
-}
-#endif
-
-
 /*
  * Wormhole specific functions
  */
@@ -536,10 +509,10 @@ int Wormhole_hitmask(wormhole_t *wormhole)
     return 0;
 }
 
-bool Wormhole_hitfunc(struct group *group, struct move *move)
+bool Wormhole_hitfunc(struct group *groupptr, struct move *move)
 {
     object *obj = move->obj;
-    int ind = group->item_id;
+    int ind = groupptr->item_id;
     wormhole_t *wormhole = &World.wormHoles[ind];
 
     /* this should never happen, because of the hitmask */
