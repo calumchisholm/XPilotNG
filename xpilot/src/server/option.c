@@ -189,7 +189,7 @@ struct bmpstyle  bstyles[256];
 poly_t *pdata;
 
 int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
-static int max_bases, max_balls, max_fuels, max_checks, max_polys,max_echanges;
+int max_bases, max_balls, max_fuels, max_checks, max_polys,max_echanges; /* !@# make static after testing done */
 static int current_estyle, current_group, is_decor;
 
 static int get_bmp_id(const char *s)

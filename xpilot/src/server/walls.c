@@ -1375,196 +1375,212 @@ int Polys_to_client(char *ptr)
 }
 
 
-void Line_to_client(int *ptr)
-{
-    int i;
-
-    *ptr++ = htonl(linec);
-    for (i = 0; i < linec; i++) {
-	*ptr++ = htonl(linet[i].start.x);
-	*ptr++ = htonl(linet[i].start.y);
-	*ptr++ = htonl(WRAP_XCLICK(linet[i].start.x + linet[i].delta.x));
-	*ptr++ = htonl(WRAP_YCLICK(linet[i].start.y + linet[i].delta.y));
-    }
-    return;
-}
-
 #if 0
-static void Convert_to_lines(void)
+struct test {
+    double distance;
+    double direction;
+    int fill;
+};
+
+
+struct test array[110][110];
+
+
+#define STORE(T,P,N,M,V)						\
+    if (N >= M && ((M <= 0)						\
+	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
+	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
+	error("No memory");						\
+	exit(1);							\
+    } else								\
+	(P[N++] = V)
+
+
+#define POSMOD(x, y) ((x) >= 0 ? (x) % (y) : (x) % (y) + (y))
+
+static void inside_test(void)
 {
-    struct {
-	int sx;
-	int sy;
-	int dx;
-	int dy;
-	int ox;
-	int oy;
-	int exc;
-    } lines[8] = {
-	{0,0,BLOCK_CLICKS,0, 0, -1, 2},
-	{BLOCK_CLICKS,0,0,BLOCK_CLICKS, 1, 0, 3},
-	{BLOCK_CLICKS,BLOCK_CLICKS,-BLOCK_CLICKS,0, 0, 1, 0},
-	{0,BLOCK_CLICKS,0,-BLOCK_CLICKS, -1, 0, 1},
-	{0,0,BLOCK_CLICKS,BLOCK_CLICKS, 0, 0, -1},
-	{BLOCK_CLICKS,BLOCK_CLICKS,-BLOCK_CLICKS,-BLOCK_CLICKS, 0, 0, -1},
-	{BLOCK_CLICKS,0,-BLOCK_CLICKS,BLOCK_CLICKS, 0, 0, -1},
-	{0,BLOCK_CLICKS,BLOCK_CLICKS,-BLOCK_CLICKS, 0, 0, -1}
-    };
+    int dx, dy, bx, by, ox, oy, startx, starty, xsign, ysign, x1, x2, y1, y2;
+    int i, j, last_height, last_width, num_points, minx, miny, poly;
+    int bx2, by2, maxx, maxy;
+    double xdist, ydist, dist;
+    int *edges;
 
-    struct {
-	int type;
-	int lines[4];
-    } blocks[6] = {
-	{FILLED, {0, 1, 2, 3}},
-	{FUEL, {0, 1, 2, 3}},
-	{REC_LU, {2, 3, 4, -1}},
-	{REC_LD, {0, 3, 6, -1}},
-	{REC_RU, {1, 2, 7, -1}},
-	{REC_RD, {0, 1, 5, -1}}
-    };
-    int bx, by, i, j, k, n;
-
-    linec = 0;
-    for (bx = 0; bx < World.x; bx++)
-	for (by = 0; by < World.y; by++)
-	    for (i = 0; i < 6; i++)
-		if (blocks[i].type == World.block[bx][by])
-		    for (j = 0; j < 4; j++)
-			if (blocks[i].lines[j] == -1)
-			    break;
-			else {
-			    if (lines[blocks[i].lines[j]].exc != -1)
-				for (k = 0; k < 6; k++)
-				    if (World.block[(World.x + bx + lines[blocks[i].lines[j]].ox) % World.x][(World.y + by + lines[blocks[i].lines[j]].oy) % World.y] == blocks[k].type)
-					for (n = 0; n < 4; n++)
-					    if (blocks[k].lines[n] == lines[blocks[i].lines[j]].exc)
-						goto foo;
-			    linet[linec].start.x = WRAP_XCLICK(lines[blocks[i].lines[j]].sx + bx * BLOCK_CLICKS);
-			    linet[linec].start.y = WRAP_YCLICK(lines[blocks[i].lines[j]].sy + by * BLOCK_CLICKS);
-			    linet[linec].delta.x = lines[blocks[i].lines[j]].dx;
-			    linet[linec++].delta.y = lines[blocks[i].lines[j]].dy;
-			foo:
-			    ; /* semicolon for ansi compatibility */
-			}
-}
-
-static void Perturb(void)
-{
-    int i, x, y, x2, y2;
-
-    for (i = 0; i < linec; i++) {
-	x = linet[i].start.x;
-	y = linet[i].start.y;
-	x2 = WRAP_XCLICK(linet[i].start.x + linet[i].delta.x);
-	y2 = WRAP_YCLICK(linet[i].start.y + linet[i].delta.y);
-	x += sin(y * x / 2786.) * (BLOCK_CLICKS / 3);
-	y += sin(y * x / 1523.) * (BLOCK_CLICKS / 3);
-	x2 += sin(y2 * x2 / 2786.) * (BLOCK_CLICKS / 3);
-	y2 += sin(x2 * y2 / 1523.) * (BLOCK_CLICKS / 3);
-	linet[i].start.x = WRAP_XCLICK(x);
-	linet[i].start.y = WRAP_YCLICK(y);
-	linet[i].delta.x = CENTER_XCLICK(x2 - x);
-	linet[i].delta.y = CENTER_YCLICK(y2 - y);
-    }
-    return;
-}
-
-static void Add_zigzag(void)
-{
-    int i, x = 0, y = 0;
-    linet[linec].start.x = 0;
-    linet[linec].start.y = 0;
-    linet[linec].delta.x = -500;
-    linet[linec].delta.y = 5000;
-    linec++;
-    x = -500;
-    y = 5000;
-    for (i = 0; i < 10; i ++) {
-	linet[linec].start.x = x;
-	linet[linec].start.y = y;
-	linet[linec].delta.x = -500;
-	linet[linec].delta.y = -4000;
-	x += -500;
-	y += -4000;
-	linec++;
-	linet[linec].start.x = x;
-	linet[linec].start.y = y;
-	linet[linec].delta.x = -500;
-	linet[linec].delta.y = 4000;
-	x += -500;
-	y += 4000;
-	linec++;
-    }
-    linet[linec].start.x = x;
-    linet[linec].start.y = y;
-    linet[linec].delta.x = -500;
-    linet[linec].delta.y = -5000;
-    x += - 500;
-    y += -5000;
-    linec++;
-    linet[linec].start.x = x;
-    linet[linec].start.y = y;
-    linet[linec].delta.x = 11000;
-    linet[linec].delta.y = 0;
-    linec++;
-    return;
-}
-
-static void Tbox_hack(void)
-{
-    int group = 1, bx, by;
-    for (bx = 0; bx < World.x; bx++)
-	for (by = 0; by < World.y; by++)
-	    if (TREASURE == World.block[bx][by]) {
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS);
-		linet[linec].delta.x = 2240;
-		linet[linec].delta.y = 0;
-		linet[linec++].group = group;
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS + 2240);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS);
-		linet[linec].delta.x = 0;
-		linet[linec].delta.y = 2240;
-		linet[linec++].group = group;
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS + 2240);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS + 2240);
-		linet[linec].delta.x = -2240;
-		linet[linec].delta.y = 0;
-		linet[linec++].group = group;
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS + 2240);
-		linet[linec].delta.x = 0;
-		linet[linec].delta.y = -2240;
-		linet[linec++].group = group;
-		groups[group].type = TREASURE;
-		groups[group].hit_mask = BALL_BIT;
-		groups[group].team = 2 * (3 - group);
-		group++;
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS + 750);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS + 750);
-		linet[linec].delta.x = 740;
-		linet[linec].delta.y = 0;
-		linet[linec++].group = group;
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS + 1490);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS + 750);
-		linet[linec].delta.x = 0;
-		linet[linec].delta.y = 740;
-		linet[linec++].group = group;
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS + 1490);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS + 1490);
-		linet[linec].delta.x = -740;
-		linet[linec].delta.y = 0;
-		linet[linec++].group = group;
-		linet[linec].start.x = WRAP_XCLICK(bx * BLOCK_CLICKS + 750);
-		linet[linec].start.y = WRAP_YCLICK(by * BLOCK_CLICKS + 1490);
-		linet[linec].delta.x = 0;
-		linet[linec].delta.y = -740;
-		linet[linec++].group = group;
-		groups[group].type = TREASURE;
-		groups[group].hit_mask = NONBALL_BIT | (NOTEAM_BIT << 1) - 1 & ~ (1 << 2 * (3 - group / 2));
-		groups[group].team = 2 * (3 - group / 2);
-		group++;
+    for (i = 0; i < mapx; i++)
+	for (j = 0; j < mapy; j++) {
+	    array[i][j].distance = -1;
+	    array[i][j].fill = 2;
+	}
+    last_width = (World.cwidth - 1) % B_CLICKS + 1;
+    last_height = (World.cheight - 1) % B_CLICKS + 1;
+    for (poly = 0; poly < polyc; poly++) {
+	if (pdata[poly].is_decor)
+	    continue;
+/*	group = pdata[poly].group; !@# */
+	num_points = pdata[poly].num_points;
+	dx = 0;
+	dy = 0;
+	startx = pdata[poly].x;
+	starty = pdata[poly].y;
+	bx = startx >> B_SHIFT;
+	by = starty >> B_SHIFT;
+	bx2 = minx = maxx = bx;
+	by2 = miny = maxy = by;
+	edges = pdata[poly].edges;
+	for (j = 0; j < num_points; j++) {
+	    if (startx >> B_SHIFT != bx || starty >> B_SHIFT != by)
+		while (1);
+	    ox = startx & B_MASK;
+	    oy = starty & B_MASK;
+	    dx = *edges++;
+	    dy = *edges++;
+	    ysign = dy >= 0 ? 1 : -1;
+	    xsign = dx >= 0 ? 1 : -1;
+	    if (dy >= 0)
+		y1 = 0;
+	    else {
+		y1 = B_CLICKS;
+		if (by == mapy - 1)
+		    y1 = last_height;
 	    }
+	    if (dx >= 0)
+		x1 = 0;
+	    else {
+		x1 = B_CLICKS;
+		if (bx == mapx - 1)
+		    x1 = last_width;
+	    }
+	    if (ox >= array[bx][by].distance && (ox >array[bx][by].distance
+		|| ABS(((double)dx) / dy) < array[bx][by].direction) && dy) {
+		    array[bx][by].distance = ox;
+		    array[bx][by].direction = ABS(((double)dx)/dy);
+		    array[bx][by].fill = dy < 0;
+	    }
+	    x2 = x1 + xsign * B_CLICKS;
+	    y2 = y1 + ysign * B_CLICKS;
+	    if (bx == mapx - 1)
+		x2 = x1 + xsign * last_width;
+	    if (by == mapy - 1)
+		y2 = y1 + ysign * last_height;
+	    while (1) {
+		if (array[bx][by].fill == 2)
+		    array[bx][by].fill = 0;
+		if (ABS(dx) >= ABS(dy)) {
+		    xdist = (x2 - ox) * xsign;
+		    if (xdist == -dx)
+			xdist = 32768;
+		    ydist = 32768;
+		    if (dy != 0)
+			ydist = ((double)(y2 - oy) * dx) / dy * xsign;
+		    if (ydist == -dy)
+			ydist = 32768;
+		    if (xdist > dx * xsign && ydist > dx * xsign)
+			break;
+		}
+		else {
+		    ydist = (y2 - oy) * ysign;
+		    if (ydist == -dy)
+			ydist = 32768;
+		    xdist = 32768;
+		    if (dx != 0)
+			xdist = ((double)(x2 - ox) * dy) / dx * ysign;
+		    if (xdist == -dx)
+			xdist = 32768;
+		    if (xdist > dy * ysign && ydist > dy * ysign)
+			break;
+		}
+		if (ydist <= xdist) {
+		    if (ABS(dx) > ABS(dy))
+			dist = ox + xsign * ydist - (xsign > 0 ? x1 : x2);
+		    else
+			dist = ox + ydist * ysign * dx / dy -
+			    (xsign > 0 ? x1 : x2);
+	    if (dist >= array[bx][by].distance && (dist >array[bx][by].distance
+		|| ABS(((double)dx) / dy) < array[bx][by].direction)) {
+		    array[bx][by].distance = dist;
+		    array[bx][by].direction = ABS(((double)dx)/dy);
+		    array[bx][by].fill = dy < 0;
+	    }
+		}
+		/* If x/ydist is an integer, it should be exact
+		 * on modern processors. */
+		if (xdist <= ydist) {
+		    bx2 += xsign;
+		    if (bx2 > maxx)
+			maxx = bx2;
+		    if (bx2 < minx)
+			minx = bx2;
+		    bx = POSMOD(bx2, mapx);
+		    x1 = x2;
+		    x2 = x1 + xsign * B_CLICKS;
+		    if (bx != mapx - 1) {
+			x2 = x1 + xsign * B_CLICKS;
+			dist -= B_CLICKS * xsign;
+		    }
+		    else {
+			x2 = x1 + xsign * last_width;
+			dist -= B_CLICKS * xsign;
+		    }
+		}
+		if (ydist <= xdist) {
+		    by2 += ysign;
+		    if (by2 > maxy)
+			maxy = by2;
+		    if (by2 < miny)
+			miny = by2;
+		    by = POSMOD(by2, mapy);
+		    y1 = y2;
+		    y2 = y1 + ysign * B_CLICKS;
+		    if (by == mapy - 1)
+			y2 = y1 + ysign * last_height;
+	    if (dist >= array[bx][by].distance && (dist >array[bx][by].distance
+		|| ABS(((double)dx) / dy) < array[bx][by].direction)) {
+		    array[bx][by].distance = dist;
+		    array[bx][by].direction = ABS(((double)dx)/dy);
+		    array[bx][by].fill = dy < 0;
+	    }
+		}
+	    }
+	    startx = WRAP_XCLICK(startx + dx);
+	    starty = WRAP_YCLICK(starty + dy);
+	}
+	bx = maxx - minx + 1;
+	if (bx > 2 * mapx)
+	    bx = 2 * mapx;
+	by = maxy - miny + 1;
+	if (by > mapy)
+	    by = mapy;
+	for (i = POSMOD(miny, mapy); by-- > 0; i++) {
+	    if (i == mapy)
+		i = 0;
+	    bx2 = bx;
+	    x1 = 0;
+	    for (j = POSMOD(minx, mapx); bx2-- > 0; j++) {
+		if (j == mapx)
+		    j = 0;
+		if (array[j][i].fill < 2) {
+		    x1 = array[j][i].fill;
+		}
+		else {
+		    if (x1) {
+			fuel_t t;
+			extern int max_fuels;
+			t.clk_pos.x = j * B_CLICKS + B_CLICKS / 2;
+			t.clk_pos.y = i * B_CLICKS + B_CLICKS / 2;
+			t.fuel = START_STATION_FUEL;
+			t.conn_mask = (unsigned)-1;
+			t.last_change = frame_loops;
+			t.team = 1;
+			STORE(fuel_t, World.fuel, World.NumFuels, max_fuels,t);
+		    }
+		}
+		array[j][i].fill = 2;
+		array[j][i].distance = -1;
+/*		array[j][i].direction = 0;*/
+	    }
+	}
+    }
+    return;
 }
 #endif
 
@@ -1820,7 +1836,8 @@ static void Ball_line_init(void)
     return;
 }
 
-static void Poly_to_lines()
+
+static void Poly_to_lines(void)
 {
     int i, np, j, startx, starty, dx, dy, group, *styleptr, style;
     int *edges;
@@ -1868,6 +1885,7 @@ static void Poly_to_lines()
     return;
 }
 
+
 void Walls_init(void)
 {
     DFLOAT x, y, l2;
@@ -1876,13 +1894,12 @@ void Walls_init(void)
     mapx = (World.cwidth + B_MASK) >> B_SHIFT;
     mapy = (World.cheight + B_MASK) >> B_SHIFT;
     Poly_to_lines();
-    /*    Convert_to_lines(); */
-    /*    Perturb(); */
-    /*    Tbox_hack(); */
-    /*    Add_zigzag(); */
     Distance_init();
     Corner_init();
     Ball_line_init();
+#if 0
+    inside_test();
+#endif
     groups[0].type = FILLED;
 
     for (i = 0; i < linec; i++) {
@@ -1893,6 +1910,7 @@ void Walls_init(void)
 	linet[i].s = 2*x*y / l2;
     }
 }
+
 
 /* end */
 char walls_version[] = VERSION;
@@ -3455,11 +3473,12 @@ void Turn_player(int ind)
     int		new_dir = MOD2((int)(pl->float_dir + 0.5f), RES);
     int		sign, hitmask;
 
-    if (recOpt)
+    if (recOpt) {
 	if (record)
 	    *playback_data++ = new_dir;
 	else if (playback)
 	    new_dir = *playback_data++;
+    }
     if (new_dir == pl->dir) {
 	return;
     }
