@@ -65,7 +65,6 @@ typedef struct {
 #define NumObjs		(ObjCount + 0)
 #define MAX_SPECTATORS	8
 
-extern player		**PlayersArray;
 extern object		*Obj[];
 extern ecm_t		*Ecms[];
 extern trans_t		*Transporters[];

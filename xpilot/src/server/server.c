@@ -37,7 +37,6 @@ int			NumAlliances = 0;
 int			NumSpectators = 0;
 int			NumOperators = 0;
 int			spectatorStart;
-player			**PlayersArray;
 server			Server;
 char			*serverAddr;
 int			ShutdownServer = -1;

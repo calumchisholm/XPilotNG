@@ -29,6 +29,7 @@ char player_version[] = VERSION;
 bool		updateScores = true;
 
 static int	playerArrayNumber;
+static player	**PlayersArray;
 static int	GetIndArray[NUM_IDS + MAX_SPECTATORS + 1];
 
 /*
