@@ -115,8 +115,6 @@ static int		view_width,
 			view_height,
 			view_cwidth,
 			view_cheight,
-			horizontal_blocks,
-			vertical_blocks,
 			debris_x_areas,
 			debris_y_areas,
 			debris_areas,
@@ -268,14 +266,14 @@ static void Frame_radar_buffer_reset(void)
     num_radar = 0;
 }
 
-static void Frame_radar_buffer_add(int x, int y, int s)
+static void Frame_radar_buffer_add(int cx, int cy, int s)
 {
     radar_t		*p;
 
     EXPAND(radar_ptr, num_radar, max_radar, radar_t, 1);
     p = &radar_ptr[num_radar++];
-    p->x = x;
-    p->y = y;
+    p->x = CLICK_TO_PIXEL(cx);
+    p->y = CLICK_TO_PIXEL(cy);
     p->size = s;
 }
 
@@ -1145,8 +1143,7 @@ static void Frame_radar(int conn, int ind)
 	    cy = shot->pos.cy;
 	    if (Wrap_length(pl->pos.cx - cx,
 			    pl->pos.cy - cy) <= pl->sensor_range * CLICK) {
-		Frame_radar_buffer_add(CLICK_TO_PIXEL(cx),
-				       CLICK_TO_PIXEL(cy), size);
+		Frame_radar_buffer_add(cx, cy, size);
 	    }
 	}
     }
@@ -1190,8 +1187,7 @@ static void Frame_radar(int conn, int ind)
 	    if (TEAM(i, ind) || ALLIANCE(ind, i) || OWNS_TANK(ind, i)) {
 		size |= 0x80;
 	    }
-	    Frame_radar_buffer_add(CLICK_TO_PIXEL(cx),
-				   CLICK_TO_PIXEL(cy), size);
+	    Frame_radar_buffer_add(cx, cy, size);
 	}
     }
 
@@ -1220,9 +1216,6 @@ static void Frame_parameters(int conn, int ind)
     debris_x_areas = (view_width + 255) >> 8;
     debris_y_areas = (view_height + 255) >> 8;
     debris_areas = debris_x_areas * debris_y_areas;
-    /* kps - remove these 2 for ng */
-    horizontal_blocks = (view_width + (BLOCK_SZ - 1)) / BLOCK_SZ;
-    vertical_blocks = (view_height + (BLOCK_SZ - 1)) / BLOCK_SZ;
 
     view_cwidth = view_width * CLICK;
     view_cheight = view_height * CLICK;
