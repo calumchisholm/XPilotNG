@@ -37,6 +37,7 @@
 <Option name="playersonradar" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
 <Option name="playerwallbouncebrakefactor" value="0.5"/>
+<Option name="playerwallfriction" value="0.8"/>
 <Option name="reserverobotteam" value="no"/>
 <Option name="robots" value="0"/>
 <Option name="robotteam" value="0"/>
@@ -48,6 +49,7 @@
 <Option name="treasuresonradar" value="no"/>
 <Option name="usewreckage" value="no"/>
 <Option name="waitingfps" value="0"/>
+<Option name="wallbouncefueldrainmult" value="0.1"/>
 <Option name="worldlives" value="3"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
