@@ -1524,10 +1524,10 @@ static void LaserCollision(void)
 			vic->stunned += 5;
 		    }
 		} else if (BIT(pulse->mods.laser, BLIND)) {
-		    vic->damaged += (FPS + 6);
-		    vic->forceVisible += (FPS + 6);
+		    vic->damaged += (12 + 6);
+		    vic->forceVisible += (12 + 6);
 		    if (pl)
-			Record_shove(vic, pl, frame_loops + FPS + 6);
+			Record_shove(vic, pl, frame_loops + 12 + 6);
 		} else {
 		    Add_fuel(&(vic->fuel), (long)ED_LASER_HIT);
 		    if (!BIT(vic->used, OBJ_SHIELD)

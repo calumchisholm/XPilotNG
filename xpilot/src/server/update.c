@@ -120,7 +120,7 @@ static void Transport_to_home(int ind)
 void Phasing (int ind, int on)
 {
     player	*pl = Players[ind];
-    const int	phasing_time = 4 * FPS;
+    const int	phasing_time = 4 * 12;
 
     if (on) {
 	if (pl->phasing_left <= 0) {
@@ -153,7 +153,7 @@ void Phasing (int ind, int on)
 void Emergency_thrust (int ind, int on)
 {
     player	*pl = Players[ind];
-    const int	emergency_thrust_time = 4 * FPS;
+    const int	emergency_thrust_time = 4 * 12;
 
     if (on) {
 	if (pl->emergency_thrust_left <= 0) {
@@ -183,12 +183,10 @@ void Emergency_thrust (int ind, int on)
 void Emergency_shield (int ind, int on)
 {
     player	*pl = Players[ind];
-    const int	emergency_shield_time = 4 * FPS;	/* 8 -> 4 */
 
     if (on) {
 	if (pl->emergency_shield_left <= 0) {
-	    pl->emergency_shield_left = emergency_shield_time;
-	    pl->emergency_shield_max = emergency_shield_time;
+	    pl->emergency_shield_left = EMERGENCY_SHIELD_TIME;
 	    pl->item[ITEM_EMERGENCY_SHIELD]--;
 	}
 	SET_BIT(pl->have, OBJ_SHIELD);
@@ -569,7 +567,7 @@ void Update_objects(void)
 		/* this gives the cannon an item about once every minute */
 		if (World.items[item].cannonprob > 0
 		    && cannonItemProbMult > 0
-		    && (int)(rfrac() * (60 * FPS))
+		    && (int)(rfrac() * (60 * 12))
 			< (cannonItemProbMult * World.items[item].cannonprob)) {
 		    Cannon_add_item(i, item, (item == ITEM_FUEL ?
 					ENERGY_PACK_FUEL >> FUEL_SCALE_BITS
@@ -707,16 +705,15 @@ void Update_objects(void)
 	}
 
 	if (pl->shield_time > 0) {
-	    if (--pl->shield_time == 0) {
-		if (!BIT(pl->used, OBJ_EMERGENCY_SHIELD)) {
+	    if ((pl->shield_time -= framespeed) <= 0) {
+		pl->shield_time = 0;
+		if (!BIT(pl->used, OBJ_EMERGENCY_SHIELD))
 		    CLR_BIT(pl->used, OBJ_SHIELD);
-		}
 	    }
 	    if (BIT(pl->used, OBJ_SHIELD) == 0) {
 		/* BG 95/06/03: change test on "have" to "used". */
-		if (!BIT(pl->used, OBJ_EMERGENCY_SHIELD)) {
+		if (!BIT(pl->used, OBJ_EMERGENCY_SHIELD))
 		    CLR_BIT(pl->have, OBJ_SHIELD);
-		}
 		pl->shield_time = 0;
 	    }
 	}

@@ -415,7 +415,7 @@ static int Frame_status(int conn, int ind)
     if (BIT(pl->used, OBJ_EMERGENCY_SHIELD))
 	Send_shieldtime(conn,
 			pl->emergency_shield_left,
-			pl->emergency_shield_max);
+			EMERGENCY_SHIELD_TIME);
     if (BIT(pl->status, SELF_DESTRUCT) && pl->count > 0) {
 	Send_destruct(conn, pl->count >> TIME_BITS);
     }

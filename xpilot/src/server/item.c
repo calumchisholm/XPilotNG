@@ -1019,7 +1019,7 @@ void Fire_general_ecm(int ind, u_short team, int x, int y)
 		shot->life = 0;
 		break;
 	    }
-	    shot->count = ((int)(8*(1-range)) + 2) * FPS;
+	    shot->count = ((int)(8*(1-range)) + 2) * 12;
 	    if (   !BIT(shot->status, CONFUSED)
 		&& (closest_mine == NULL || range < closest_mine_range)) {
 		closest_mine = shot;

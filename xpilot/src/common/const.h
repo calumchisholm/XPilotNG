@@ -316,6 +316,7 @@ extern DFLOAT		tbl_cos[];
 	((percent) * (maxforce) * ((tr_pr) ? -1 : 1))
 
 #define WARN_TIME               2
+#define EMERGENCY_SHIELD_TIME	4*12
 
 #define BALL_STRING_LENGTH      (120 * CLICK)
 

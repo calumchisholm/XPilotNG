@@ -201,7 +201,7 @@ void Go_home(int ind)
     if (playerStartsShielded != 0) {
 	SET_BIT(pl->used, OBJ_SHIELD);
 	if (playerShielding == 0) {
-	    pl->shield_time = 2 * FPS;
+	    pl->shield_time = 2 * 12 * TIME_FACT;
 	    SET_BIT(pl->have, OBJ_SHIELD);
 	}
 	if (BIT(pl->have, OBJ_DEFLECTOR))
@@ -410,7 +410,6 @@ int Init_player(int ind, wireobj *ship)
     pl->emergency_thrust_left = 0;
     pl->emergency_thrust_max = 0;
     pl->emergency_shield_left = 0;
-    pl->emergency_shield_max = 0;
     pl->phasing_left	= 0;
     pl->phasing_max	= 0;
     pl->ecmcount	= 0;
@@ -1884,7 +1883,6 @@ static void Player_death_reset(int ind)
     pl->emergency_thrust_left = 0;
     pl->emergency_thrust_max = 0;
     pl->emergency_shield_left = 0;
-    pl->emergency_shield_max = 0;
     pl->phasing_left	= 0;
     pl->phasing_max	= 0;
     pl->damaged 	= 0;

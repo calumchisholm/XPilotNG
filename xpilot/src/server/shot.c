@@ -1288,7 +1288,7 @@ void Delete_shot(int ind)
 	case ITEM_MISSILE:
 	    if (shot->life <= 0 && shot->color != WHITE) {
 		shot->color = WHITE;
-		shot->life  = FPS * WARN_TIME;
+		shot->life  = 12 * WARN_TIME;
 		return;
 	    }
 	    if (shot->life <= 0 && rfrac() < rogueHeatProb) {
@@ -1299,7 +1299,7 @@ void Delete_shot(int ind)
 	case ITEM_MINE:
 	    if (shot->life <= 0 && shot->color != WHITE) {
 		shot->color = WHITE;
-		shot->life  = FPS * WARN_TIME;
+		shot->life  = 12 * WARN_TIME;
 		return;
 	    }
 	    if (shot->life <= 0 && rfrac() < rogueMineProb) {

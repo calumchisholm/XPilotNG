@@ -348,7 +348,6 @@ struct player {
     int		emergency_thrust_left;	/* how much emergency thrust left */
     int		emergency_thrust_max;	/* maximum time left */
     int		emergency_shield_left;	/* how much emergency shield left */
-    int		emergency_shield_max;	/* maximum time left */
     int		phasing_left;		/* how much time left */
     int		phasing_max;		/* maximum time left */
 
