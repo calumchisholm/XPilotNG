@@ -184,6 +184,8 @@ AC_CHECK_FUNCS([ \
 	strchr \
 	strdup \
 	strerror \
+	strlcat \
+	strlcpy \
 	strncasecmp \
 	strpbrk \
 	strrchr \

@@ -6817,6 +6817,8 @@ done
 
 
 
+
+
 for ac_func in  \
 	alarm \
 	floor \
@@ -6839,6 +6841,8 @@ for ac_func in  \
 	strchr \
 	strdup \
 	strerror \
+	strlcat \
+	strlcpy \
 	strncasecmp \
 	strpbrk \
 	strrchr \
