@@ -1,6 +1,8 @@
 <XPilotMap version="1.1">
 <GeneralOptions>
 <Option name="afterburnerPowerMult" value="1.1"/>
+<Option name="treasureCollisionKills" value="no"/>
+<Option name="ballCollisionFuelDrain" value="0"/>
 <Option name="allowPlayerBounces" value="no"/>
 <Option name="allowShields" value="no"/>
 <Option name="ballConnectorSpringConstant" value="1650"/>
