@@ -511,7 +511,7 @@ int Find_closest_team(world_t *world, clpos_t pos);
  */
 setup_t *Xpmap_init_setup(world_t *world);
 void Xpmap_print(void);
-void Xpmap_grok_map_data(world_t *world, char *map_data);
+void Xpmap_grok_map_data(world_t *world);
 void Xpmap_allocate_checks(world_t *world);
 void Xpmap_tags_to_internal_data(world_t *world, bool create_objects);
 void Xpmap_find_map_object_teams(world_t *world);

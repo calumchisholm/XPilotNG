@@ -556,7 +556,7 @@ bool Grok_map(world_t *world)
 	return false;
 
     if (!is_polygon_map) {
-	Xpmap_grok_map_data(world, options.mapData);
+	Xpmap_grok_map_data(world);
 	Xpmap_tags_to_internal_data(world, true);
 	Xpmap_find_map_object_teams(world);
     }

@@ -106,23 +106,94 @@ static void Xpmap_setup(world_t *world)
 {
     assert(world->block);
 
-    /* Client will quit if it gets a nonexistent homebase, so create
-     * some bases to make it happy. Of course it's impossible to play
-     * with this, but at least we can tell the player what's wrong... */
-    if (options.mapData == NULL) {
-	int x;
+    if (options.mapData) {
+	Xpmap_grok_map_data(world);
+	Xpmap_tags_to_internal_data(world, false);
+    } else {
+	int i;
+	blkpos_t blk;
+	clpos_t pos;
 
-	options.mapData = malloc((size_t)world->NumBases + 1);
-	if (options.mapData == NULL) {
-	    error("Couldn't allocate memory");
-	    exit(-1);
+	/*
+	 * Create blocks out of polygons.
+	 */
+	for (blk.by = 0; blk.by < world->y; blk.by++)
+	    for (blk.bx = 0; blk.bx < world->x; blk.bx++)
+		World_set_block(world, blk, SPACE);
+
+	for (blk.by = 0; blk.by < world->y; blk.by++) {
+	    for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
+		int num_inside = 0;
+		bool r_inside = false, u_inside = false;
+		bool l_inside = false, d_inside = false;
+
+		pos = Block_get_center_clpos(blk);
+
+		if (is_inside(pos.cx + BLOCK_CLICKS/3, pos.cy, 0, NULL) == 0) {
+		    r_inside = true;
+		    num_inside++;
+		}
+
+		if (is_inside(pos.cx, pos.cy + BLOCK_CLICKS/3, 0, NULL) == 0) {
+		    u_inside = true;
+		    num_inside++;
+		}
+
+		if (is_inside(pos.cx - BLOCK_CLICKS/3, pos.cy, 0, NULL) == 0) {
+		    l_inside = true;
+		    num_inside++;
+		}
+
+		if (is_inside(pos.cx, pos.cy - BLOCK_CLICKS/3, 0, NULL) == 0) {
+		    d_inside = true;
+		    num_inside++;
+		}
+
+		if (num_inside > 2)
+		    World_set_block(world, blk, FILLED);
+
+		if (num_inside == 2) {
+		    if (r_inside && u_inside)
+			World_set_block(world, blk, REC_RU);
+		    if (u_inside && l_inside)
+			World_set_block(world, blk, REC_LU);
+		    if (l_inside && d_inside)
+			World_set_block(world, blk, REC_LD);
+		    if (d_inside && r_inside)
+			World_set_block(world, blk, REC_RD);
+		}
+	    }
 	}
-	for (x = 0; x < world->NumBases; x++)
-	    options.mapData[x] = '1';
-	options.mapData[world->NumBases] = 0;
+
+	/*
+	 * Create blocks out of map objects. Note that some of these
+	 * may be in the same block, which might be an error.
+	 */
+	for (i = 0; i < world->NumFuels; i++) {
+	    fuel_t *fs = Fuels(world, i);
+
+	    blk = Clpos_to_blkpos(fs->pos);
+	    World_set_block(world, blk, FUEL);
+	}
+
+	for (i = 0; i < world->NumBases; i++) {
+	    base_t *base = Bases(world, i);
+
+	    blk = Clpos_to_blkpos(base->pos);
+	    World_set_block(world, blk, BASE);
+	}
+
+#if 0
+	for (i = 0; i < world->NumTreasures; i++) {
+	    treasure_t *t = Treasures(world, i);
+
+	    blk = Clpos_to_blkpos(t->pos);
+	    /*World_set_block(world, blk, TREASURE);*/
+	    warn("TREASURE %d: team %d", i, t->team);
+
+	}
+#endif
     }
-    Xpmap_grok_map_data(world, options.mapData);
-    Xpmap_tags_to_internal_data(world, false);
 }
 
 
@@ -376,11 +447,16 @@ setup_t *Xpmap_init_setup(world_t *world)
  * Create world->block using options.mapData.
  * Free options.mapData.
  */
-void Xpmap_grok_map_data(world_t *world, char *map_data)
+void Xpmap_grok_map_data(world_t *world)
 {
     int x = -1, y = world->y - 1, c;
-    char *s = map_data;
+    char *s = options.mapData;
     blkpos_t blk;
+
+    if (options.mapData == NULL) {
+	warn("Map didn't have any mapData.");
+	return;
+    }
 
     while (y >= 0) {
 
