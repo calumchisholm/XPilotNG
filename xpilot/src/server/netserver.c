@@ -904,7 +904,7 @@ static int Handle_setup(int ind)
 			  "%ld" "%ld%hd" "%hd%hd" "%hd%s" "%s%S",
 			  Setup->map_data_len,
 			  Setup->mode, Setup->lives,
-			  Setup->height, Setup->width,
+			  Setup->width, Setup->height,
 			  Setup->frames_per_second, Setup->name,
 			  Setup->author, Setup->data_url);
 	if (n <= 0) {
