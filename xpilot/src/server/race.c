@@ -389,6 +389,16 @@ void Race_game_over(world_t *world)
     Reset_all_players(world);
 }
 
+void Player_reset_timing(player_t *pl)
+{
+    pl->round = 0;
+    pl->check = 0;
+    pl->time = 0;
+    pl->best_lap = 0;
+    pl->last_lap = 0;
+    pl->last_lap_time = 0;
+}
+
 void Player_pass_checkpoint(player_t *pl)
 {
     int j;

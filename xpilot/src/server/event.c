@@ -236,16 +236,11 @@ void Pause_player(player_t *pl, bool on)
 	    return;
 	}
 	if (pl->pause_count <= 0) {
-	    bool toolate = false;
-
 	    pl->idleTime = 0;
 	    CLR_BIT(pl->status, PAUSE);
 	    updateScores = true;
-	    if (BIT(world->rules->mode, LIMITED_LIVES))
-		/* Its always too late */
-		toolate = true;
-
-	    if (toolate) {
+	    if (BIT(world->rules->mode, LIMITED_LIVES)) {
+		/* too late, wait for next round */
 		pl->life = 0;
 		pl->mychar = 'W';
 		SET_BIT(pl->status, GAME_OVER);
@@ -256,14 +251,7 @@ void Pause_player(player_t *pl, bool on)
 		if (BIT(world->rules->mode, LIMITED_LIVES))
 		    pl->life = world->rules->lives;
 	    }
-	    if (BIT(world->rules->mode, TIMING)) {
-		pl->round = 0;
-		pl->check = 0;
-		pl->time = 0;
-		pl->best_lap = 0;
-		pl->last_lap = 0;
-		pl->last_lap_time = 0;
-	    }
+	    Player_reset_timing(pl);
 	}
     }
 }

@@ -617,13 +617,8 @@ void Reset_all_players(world_t *world)
 
 	CLR_BIT(pl->status, GAME_OVER);
 	CLR_BIT(pl->have, HAS_BALL);
+	Player_reset_timing(pl);
 
-	pl->round = 0;
-	pl->check = 0;
-	pl->time = 0;
-	pl->best_lap = 0;
-	pl->last_lap = 0;
-	pl->last_lap_time = 0;
 	if (!BIT(pl->status, PAUSE)) {
 	    pl->mychar = ' ';
 	    pl->idleTime = 0;

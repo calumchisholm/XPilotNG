@@ -826,6 +826,7 @@ static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
  */
 void Race_compute_game_status(world_t *world);
 void Race_game_over(world_t *world);
+void Player_reset_timing(player_t *pl);
 void Player_pass_checkpoint(player_t *pl);
 void PlayerCheckpointCollision(player_t *pl);
 

@@ -172,7 +172,6 @@ static void Player_collides_with_mine(player_t *pl, object_t *obj);
 static void Player_collides_with_debris(player_t *pl, object_t *obj);
 static void Player_collides_with_asteroid(player_t *pl, wireobject_t *obj);
 static void Player_collides_with_killing_shot(player_t *pl, object_t *obj);
-static void Player_pass_checkpoint(player_t *pl);
 
 
 void Check_collision(world_t *world)
