@@ -280,7 +280,7 @@ static void Frame_radar_buffer_send(connection_t *conn)
     else {
 	unsigned char buf[3*256];
 	int buf_index = 0;
-	int fast_count = 0;
+	unsigned fast_count = 0;
 
 	if (num_radar > 256)
 	    num_radar = 256;
@@ -381,8 +381,7 @@ static int Frame_status(connection_t *conn, player *pl)
 		|| click_inview(&cv, lock_pl->pos.cx, lock_pl->pos.cy))
 	    && pl->lock.distance != 0) {
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
-	    lock_dir
-		= (int)Wrap_cfindDir(lock_pl->pos.cx - pl->pos.cx,
+	    lock_dir = Wrap_cfindDir(lock_pl->pos.cx - pl->pos.cx,
 				     lock_pl->pos.cy - pl->pos.cy);
 	    lock_dist = (int)pl->lock.distance;
 	}
@@ -446,17 +445,17 @@ static int Frame_status(connection_t *conn, player *pl)
 
     if (BIT(pl->used, HAS_EMERGENCY_THRUST))
 	Send_thrusttime(conn,
-			pl->emergency_thrust_left,
+			(int) pl->emergency_thrust_left,
 			EMERGENCY_THRUST_TIME);
     if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
 	Send_shieldtime(conn,
 			(int) pl->emergency_shield_left,
 			EMERGENCY_SHIELD_TIME);
     if (BIT(pl->status, SELF_DESTRUCT) && pl->count > 0)
-	Send_destruct(conn, (int)pl->count);
+	Send_destruct(conn, (int) pl->count);
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	Send_phasingtime(conn,
-			 (int)pl->phasing_left,
+			 (int) pl->phasing_left,
 			 PHASING_TIME);
     if (ShutdownServer != -1)
 	Send_shutdown(conn, ShutdownServer, ShutdownDelay);

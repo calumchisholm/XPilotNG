@@ -92,11 +92,11 @@
 
 char netserver_version[] = VERSION;
 
-static int Compress_map(unsigned char *map, int size);
+static int Compress_map(unsigned char *map, size_t size);
 static int Init_setup(void);
 static int Handle_listening(connection_t *connp);
 static int Handle_setup(connection_t *connp);
-static int Handle_login(connection_t *connp, char *errmsg, int errsize);
+static int Handle_login(connection_t *connp, char *errmsg, size_t errsize);
 static void Handle_input(int fd, void *arg);
 
 static int Receive_keyboard(connection_t *connp);
@@ -134,7 +134,7 @@ static setup_t		*Oldsetup = NULL;
 static int		(*playing_receive[256])(connection_t *connp),
 			(*login_receive[256])(connection_t *connp),
 			(*drain_receive[256])(connection_t *connp);
-int			compress_maps = 1;
+static bool		compress_maps = true;
 int			login_in_progress;
 static int		num_logins, num_logouts;
 
@@ -187,14 +187,14 @@ static void Feature_init(connection_t *connp)
  * This works well for most maps which have lots of series of the
  * same map object and is simple enough to got implemented quickly.
  */
-static int Compress_map(unsigned char *map, int size)
+static int Compress_map(unsigned char *map, size_t size)
 {
     int			i, j, k;
 
-    for (i = j = 0; i < size; i++, j++) {
-	if (i + 1 < size
+    for (i = j = 0; i < (int)size; i++, j++) {
+	if (i + 1 < (int)size
 	    && map[i] == map[i + 1]) {
-	    for (k = 2; i + k < size; k++) {
+	    for (k = 2; i + k < (int)size; k++) {
 		if (map[i] != map[i + k])
 		    break;
 		if (k == 255)
@@ -236,7 +236,7 @@ static void Setup_old_blockmap(void)
      * some bases to make it happy. Of course it's impossible to play
      * with this, but at least we can tell the player what's wrong... */
     if (mapData == NULL) {
-	mapData = malloc(World.NumBases + 1);
+	mapData = malloc((size_t)World.NumBases + 1);
 	if (mapData == NULL) {
 	    error("Couldn't allocate memory");
 	    exit(-1);
@@ -252,13 +252,14 @@ static void Setup_old_blockmap(void)
 
 static int Init_setup_old(void)
 {
-    int			i, x, y, team, type = -1, size,
+    int			i, x, y, team, type = -1,
 			wormhole = 0,
 			treasure = 0,
 			target = 0,
 			base = 0,
 			cannon = 0;
     unsigned char	*mapdata, *mapptr;
+    size_t		size, numblocks;
 
     if (is_polygon_map && World.block) {
 	free(World.block);
@@ -267,11 +268,12 @@ static int Init_setup_old(void)
     if (World.block == NULL)
 	Setup_old_blockmap(); /* Never freed as of now */
 
-    if ((mapdata = (unsigned char *) malloc(World.x * World.y)) == NULL) {
+    numblocks = World.x * World.y;
+    if ((mapdata = malloc(numblocks)) == NULL) {
 	error("No memory for mapdata");
 	return -1;
     }
-    memset(mapdata, SETUP_SPACE, World.x * World.y);
+    memset(mapdata, SETUP_SPACE, numblocks);
     mapptr = mapdata;
     errno = 0;
     for (x = 0; x < World.x; x++) {
@@ -400,13 +402,13 @@ static int Init_setup_old(void)
 	    }
 	}
     }
-    if (compress_maps == 0) {
+    if (!compress_maps) {
 	type = SETUP_MAP_UNCOMPRESSED;
-	size = World.x * World.y;
+	size = numblocks;
     } else {
 	type = SETUP_MAP_ORDER_XY;
-	size = Compress_map(mapdata, World.x * World.y);
-	if (size <= 0 || size > World.x * World.y) {
+	size = Compress_map(mapdata, numblocks);
+	if (size <= 0 || size > numblocks) {
 	    warn("Map compression error (%d)", size);
 	    free(mapdata);
 	    return -1;
@@ -420,11 +422,11 @@ static int Init_setup_old(void)
 #ifndef SILENT
     if (type != SETUP_MAP_UNCOMPRESSED) {
 	xpprintf("%s Block map compression ratio is %-4.2f%%\n", showtime(),
-	    100.0 * size / (World.x * World.y));
+	    100.0 * size / numblocks);
     }
 #endif
 
-    if ((Oldsetup = (setup_t *) malloc(sizeof(setup_t) + size)) == NULL) {
+    if ((Oldsetup = malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold oldsetup");
 	free(mapdata);
 	return -1;
@@ -455,7 +457,7 @@ static int Init_setup_old(void)
  */
 static int Init_setup(void)
 {
-    int			size;
+    size_t		size;
     int			result;
     unsigned char	*mapdata;
 
@@ -470,7 +472,7 @@ static int Init_setup(void)
 	     showtime(), size);
 #endif
 
-    if ((Setup = (setup_t *) malloc(sizeof(setup_t) + size)) == NULL) {
+    if ((Setup = malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold setup");
 	free(mapdata);
 	return -1;
@@ -1256,7 +1258,7 @@ static void LegalizeHost(char *string)
  * and if this succeeds update the player information
  * to all connected players.
  */
-static int Handle_login(connection_t *connp, char *errmsg, int errsize)
+static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 {
     player		*pl;
     int			i, war_on_id, conn_bit, nick_mod = 0;
@@ -1415,7 +1417,7 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
      */
     Send_player(pl->conn, pl->id);
     Send_score(pl->conn, pl->id, pl->score,
-	       pl->life, pl->mychar, pl->alliance);
+	       (int)pl->life, pl->mychar, pl->alliance);
     if (pl->home_base) /* Spectators don't have bases */
 	Send_base(pl->conn, pl->id, pl->home_base->ind);
     /*
@@ -1432,7 +1434,7 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	pl_i = Players(i);
 	Send_player(pl->conn, pl_i->id);
 	Send_score(pl->conn, pl_i->id, pl_i->score,
-		   pl_i->life, pl_i->mychar, pl_i->alliance);
+		   (int)pl_i->life, pl_i->mychar, pl_i->alliance);
 	if (!IS_TANK_PTR(pl_i) && pl_i->home_base != NULL)
 	    Send_base(pl->conn, pl_i->id, pl_i->home_base->ind);
     }
@@ -1461,7 +1463,7 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, pl->id);
 	    Send_score(pl_i->conn, pl->id, pl->score,
-		       pl->life, pl->mychar, pl->alliance);
+		       (int)pl->life, pl->mychar, pl->alliance);
 	    if (pl->home_base)
 		Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
@@ -1636,6 +1638,7 @@ static void Handle_input(int fd, void *arg)
     short		*pbscheck = NULL;
     char		*pbdcheck = NULL;
 
+    (void)fd;
     if (connp->state & (CONN_PLAYING | CONN_READY))
 	receive_tbl = &playing_receive[0];
     else if (connp->state == CONN_LOGIN)
@@ -1667,7 +1670,7 @@ static void Handle_input(int fd, void *arg)
 	    return;
 	}
 	*playback_shorts++ = connp->r.len;
-	memcpy(playback_data, connp->r.buf, connp->r.len);
+	memcpy(playback_data, connp->r.buf, (size_t)connp->r.len);
 	playback_data += connp->r.len;
 	pbdcheck = playback_data;
 	pbscheck = playback_shorts;
@@ -1677,7 +1680,7 @@ static void Handle_input(int fd, void *arg)
 	    Destroy_connection(connp, "input error");
 	    return;
 	}
-	memcpy(connp->r.buf, playback_data, connp->r.len);
+	memcpy(connp->r.buf, playback_data, (size_t)connp->r.len);
 	playback_data += connp->r.len;
     }
 
@@ -1703,7 +1706,7 @@ static void Handle_input(int fd, void *arg)
 	    memmove(playback_data - (connp->r.buf + connp->r.len - pkt),
 		    playback_data
 		    - (connp->r.buf + connp->r.len - connp->r.ptr),
-		    connp->r.buf + connp->r.len - connp->r.ptr);
+		    (size_t)(connp->r.buf + connp->r.len - connp->r.ptr));
 	    playback_data -= len;
 	    pbdcheck = playback_data;
 	    if ( !(*(playback_shorts - 1) -= len) ) {
@@ -2160,7 +2163,7 @@ int Send_rounddelay(connection_t *connp, int count, int max)
     return Packet_printf(&connp->w, "%c%hd%hd", PKT_ROUNDDELAY, count, max);
 }
 
-int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
+int Send_debris(connection_t *connp, int type, unsigned char *p, unsigned n)
 {
     int			avail;
     sockbuf_t		*w = &connp->w;
@@ -2170,7 +2173,7 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 2;
-    if (n * 2 >= avail) {
+    if ((int)n * 2 >= avail) {
 	if (avail > 2)
 	    n = (avail - 1) / 2;
 	else
@@ -2185,7 +2188,7 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, int n)
 }
 
 int Send_wreckage(connection_t *connp, int cx, int cy,
-		  u_byte wrtype, u_byte size, u_byte rot)
+		  int wrtype, int size, int rot)
 {
     if (wreckageCollisionMayKill)
 	/* Set the highest bit when wreckage is deadly. */
@@ -2199,7 +2202,7 @@ int Send_wreckage(connection_t *connp, int cx, int cy,
 }
 
 int Send_asteroid(connection_t *connp, int cx, int cy,
-		  u_byte type, u_byte size, u_byte rot)
+		  int type, int size, int rot)
 {
     u_byte	type_size;
     int		x = CLICK_TO_PIXEL(cx),
@@ -2214,7 +2217,7 @@ int Send_asteroid(connection_t *connp, int cx, int cy,
 		         x, y, type_size, rot);
 }
 
-int Send_fastshot(connection_t *connp, int type, unsigned char *p, int n)
+int Send_fastshot(connection_t *connp, int type, unsigned char *p, unsigned n)
 {
     int			avail;
     sockbuf_t		*w = &connp->w;
@@ -2224,7 +2227,7 @@ int Send_fastshot(connection_t *connp, int type, unsigned char *p, int n)
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 3;
-    if (n * 2 >= avail) {
+    if ((int)n * 2 >= avail) {
 	if (avail > 2)
 	    n = (avail - 1) / 2;
 	else
@@ -2375,7 +2378,7 @@ int Send_radar(connection_t *connp, int x, int y, int size)
     return Packet_printf(&connp->w, "%c%hd%hd%c", PKT_RADAR, x, y, size);
 }
 
-int Send_fastradar(connection_t *connp, unsigned char *buf, int n)
+int Send_fastradar(connection_t *connp, unsigned char *buf, unsigned n)
 {
     int			avail;
     sockbuf_t		*w = &connp->w;
@@ -2385,7 +2388,7 @@ int Send_fastradar(connection_t *connp, unsigned char *buf, int n)
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 3;
-    if (n * 3 >= avail) {
+    if ((int)n * 3 >= avail) {
 	if (avail > 3)
 	    n = (avail - 2) / 3;
 	else
@@ -2393,7 +2396,7 @@ int Send_fastradar(connection_t *connp, unsigned char *buf, int n)
     }
     w->buf[w->len++] = PKT_FASTRADAR;
     w->buf[w->len++] = (unsigned char)(n & 0xFF);
-    memcpy(&w->buf[w->len], buf, n * 3);
+    memcpy(&w->buf[w->len], buf, (size_t)n * 3);
     w->len += n * 3;
 
     return (2 + (n * 3));
@@ -2503,9 +2506,9 @@ static int Receive_keyboard(connection_t *connp)
     player		*pl;
     long		change;
     u_byte		ch;
-    int			size = KEYBOARD_SIZE;
+    size_t		size = KEYBOARD_SIZE;
 
-    if (connp->r.ptr - connp->r.buf + size + 1 + 4 > connp->r.len)
+    if (connp->r.ptr - connp->r.buf + (int)size + 1 + 4 > connp->r.len)
 	/*
 	 * Incomplete client packet.
 	 */
@@ -3284,9 +3287,9 @@ static int Receive_motd(connection_t *connp)
 #ifdef _WINDOWS
 #define	close(__a)	_close(__a)
 #endif
-int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
+static int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 {
-    static int		motd_size;
+    static size_t	motd_size;
     static char		*motd_buf;
     static long		motd_loops;
     static time_t	motd_mtime;
@@ -3301,7 +3304,8 @@ int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 	|| (motd_loops + MAX_MOTD_LOOPS < main_loops
 	    && offset == 0)) {
 
-	int			fd, size;
+	int			fd;
+	size_t			size;
 	struct stat		st;
 
 	motd_loops = main_loops;
@@ -3328,7 +3332,7 @@ int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
 	    }
 	    if (motd_buf)
 		free(motd_buf);
-	    if ((motd_buf = (char *) malloc(size)) == NULL) {
+	    if ((motd_buf = malloc(size)) == NULL) {
 		close(fd);
 		return -1;
 	    }
@@ -3352,13 +3356,13 @@ int Get_motd(char *buf, int offset, int maxlen, int *size_ptr)
     if (size_ptr)
 	*size_ptr = motd_size;
 
-    if (offset + maxlen > motd_size)
+    if (offset + maxlen > (int)motd_size)
 	maxlen = motd_size - offset;
 
     if (maxlen <= 0)
 	return 0;
 
-    memcpy(buf, motd_buf + offset, maxlen);
+    memcpy(buf, motd_buf + offset, (size_t)maxlen);
     return maxlen;
 }
 

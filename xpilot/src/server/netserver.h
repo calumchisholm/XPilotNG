@@ -24,7 +24,6 @@
 #ifndef	NETSERVER_H
 #define	NETSERVER_H
 
-int Get_motd(char *buf, int offset, int maxlen, int *size_ptr);
 int Setup_net_server(void);
 void Conn_change_nick(connection_t *connp, const char *nick);
 void Destroy_connection(connection_t *connp, const char *reason);
@@ -59,10 +58,10 @@ int Send_thrusttime(connection_t *connp, int count, int max);
 int Send_shieldtime(connection_t *connp, int count, int max);
 int Send_phasingtime(connection_t *connp, int count, int max);
 int Send_rounddelay(connection_t *connp, int count, int max);
-int Send_debris(connection_t *connp, int type, unsigned char *p, int n);
-int Send_wreckage(connection_t *connp, int cx, int cy, u_byte wrtype, u_byte size, u_byte rot);
-int Send_asteroid(connection_t *connp, int cx, int cy, u_byte type, u_byte size, u_byte rot);
-int Send_fastshot(connection_t *connp, int type, unsigned char *p, int n);
+int Send_debris(connection_t *connp, int type, unsigned char *p, unsigned n);
+int Send_wreckage(connection_t *connp, int cx, int cy, int wrtype, int size, int rot);
+int Send_asteroid(connection_t *connp, int cx, int cy, int type, int size, int rot);
+int Send_fastshot(connection_t *connp, int type, unsigned char *p, unsigned n);
 int Send_missile(connection_t *connp, int cx, int cy, int len, int dir);
 int Send_ball(connection_t *connp, int cx, int cy, int id);
 int Send_mine(connection_t *connp, int cx, int cy, int teammine, int id);
@@ -78,7 +77,7 @@ int Send_refuel(connection_t *connp, int cx0, int cy0, int cx1, int cy1);
 int Send_connector(connection_t *connp, int cx0, int cy0, int cx1, int cy1, int tractor);
 int Send_laser(connection_t *connp, int color, int cx, int cy, int len, int dir);
 int Send_radar(connection_t *connp, int x, int y, int size);
-int Send_fastradar(connection_t *connp, unsigned char *buf, int n);
+int Send_fastradar(connection_t *connp, unsigned char *buf, unsigned n);
 int Send_damaged(connection_t *connp, int damaged);
 int Send_message(connection_t *connp, const char *msg);
 int Send_loseitem(connection_t *connp, int lose_item_index);
