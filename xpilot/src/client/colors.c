@@ -42,18 +42,18 @@ char colors_version[] = VERSION;
 /*
  * Default colors.
  */
-#define XP_COLOR0		"#000000"
-#define XP_COLOR1		"#FFFFFF"
-#define XP_COLOR2		"#4E7CFF"
-#define XP_COLOR3		"#FF3A27"
-#define XP_COLOR4		"#33BB44"
+#define XP_COLOR0		"#000000"		/* black */
+#define XP_COLOR1		"#FFFFFF"		/* white */
+#define XP_COLOR2		"#4E7CFF"		/* "xpblue" */
+#define XP_COLOR3		"#FF3A27"		/* "xpred" */
+#define XP_COLOR4		"#33BB44"		/* "xpgreen" */
 #define XP_COLOR5		"#992200"
 #define XP_COLOR6		"#BB7700"
 #define XP_COLOR7		"#EE9900"
 #define XP_COLOR8		"#002299"
 #define XP_COLOR9		"#CC4400"
 #define XP_COLOR10		"#DD8800"
-#define XP_COLOR11		"#FFBB11"
+#define XP_COLOR11		"#FFBB11"		/* "xpyellow" */
 #define XP_COLOR12		"#9F9F9F"
 #define XP_COLOR13		"#5F5F5F"
 #define XP_COLOR14		"#DFDFDF"
@@ -985,8 +985,8 @@ xp_option_t color_options[] = {
 
     XP_INT_OPTION(
 	"maxColors",
-	4,
 	MAX_COLORS,
+	4,
 	MAX_COLORS,
 	&maxColors,
 	NULL,
