@@ -147,7 +147,7 @@ void Quit(void)
 
 static bool Set_geometry(xp_option_t *opt, const char *s)
 {
-    int w, h;
+    int w = 0, h = 0;
 
     if (s[0] == '=') {
 	sscanf(s, "%*c%d%*c%d", &w, &h);
