@@ -43,10 +43,10 @@ double	        hudRadarLimit;		/* Limit for hudradar drawing */
 int Resize_Window( int width, int height )
 {
     extern int videoFlags;
-  
+    
     draw_width = width;
     draw_height = height;
-
+    
     SDL_SetVideoMode( width,
  		      height,
  		      draw_depth, 
@@ -68,7 +68,7 @@ int Resize_Window( int width, int height )
 
     /* Setup our viewport. */
     glViewport( 0, 0, ( GLint )draw_width, ( GLint )draw_height );
-
+    
     return 0;
 }
 
@@ -233,7 +233,6 @@ void Paint_frame(void)
 	loopsSlow++;
 	time_counter -= (1.0 / 12);
     }
-    
     if (damaged <= 0) {
     	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -272,6 +271,7 @@ void Paint_frame(void)
     	Paint_messages();       
 	Radar_paint();
 	Console_paint();
+	glPopMatrix();
     }
 
     SDL_GL_SwapBuffers();
