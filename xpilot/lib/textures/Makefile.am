@@ -1,6 +1,7 @@
 
 xpilottexturesdir =  $(pkglibdir)/textures
 xpilottextures_DATA = \
+	acwise_grav.ppm \
 	allitems.ppm \
 	asteroidconcentrator.ppm \
 	ball.ppm \
@@ -19,6 +20,7 @@ xpilottextures_DATA = \
 	checkpoint.ppm \
 	clouds.ppm \
 	concentrator.ppm \
+	cwise_grav.ppm \
 	fuel2.ppm \
 	fuelcell.ppm \
 	holder1.ppm \
