@@ -558,7 +558,7 @@ void Server_info(char *str, unsigned max_size)
 		(pl->team == TEAM_NOT_SET) ? ' ' : (pl->team + '0'),
 		name, (int)pl->life, (int)pl->score);
 	sprintf(msg, "%2d... %-36s%s@%s\n",
-		i+1, lblstr, pl->realname,
+		i+1, lblstr, pl->username,
 		IS_HUMAN_PTR(pl)
 		? pl->hostname
 		: "xpilot.org");
@@ -754,7 +754,7 @@ void Server_log_admin_message(player *pl, const char *str)
 		"\t%s\n",
 		showtime(),
 		pl->name,
-		pl->realname, pl->hostname,
+		pl->username, pl->hostname,
 		Player_get_addr(pl),
 		Player_get_dpy(pl),
 		str);

@@ -376,16 +376,16 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     color |= 0x000000ff;
     switch (type) {
     case SETUP_BASE_UP:
-	mapprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),other->name);
+	mapprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),other->nick_name);
         break;
     case SETUP_BASE_DOWN:
-	mapprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(y + BLOCK_SZ / 1.5),other->name);
+	mapprint(&mapfont,color,CENTER,UP   ,(x)    	    	,(y + BLOCK_SZ / 1.5),other->nick_name);
         break;
     case SETUP_BASE_LEFT:
-	mapprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),other->name);
+	mapprint(&mapfont,color,RIGHT,UP    ,(x + BLOCK_SZ / 2) ,(y),other->nick_name);
         break;
     case SETUP_BASE_RIGHT:
-	mapprint(&mapfont,color,LEFT,UP     ,(x - BLOCK_SZ / 2) ,(y),other->name);
+	mapprint(&mapfont,color,LEFT,UP     ,(x - BLOCK_SZ / 2) ,(y),other->nick_name);
         break;
     default:
         errno = 0;
@@ -844,10 +844,10 @@ static int Gui_is_my_tank(other_t *other)
 	    return 0;
     }
 
-    if (strlcpy(tank_name, self->name, MAX_NAME_LEN) < MAX_NAME_LEN)
+    if (strlcpy(tank_name, self->nick_name, MAX_NAME_LEN) < MAX_NAME_LEN)
 	strlcat(tank_name, "'s tank", MAX_NAME_LEN);
 
-    if (strcmp(tank_name, other->name))
+    if (strcmp(tank_name, other->nick_name))
 	return 0;
 
     return 1;

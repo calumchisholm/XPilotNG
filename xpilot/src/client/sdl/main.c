@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
     else sock_get_local_hostname(hostname, sizeof hostname, 0);
 
     cp = getenv("XPILOTUSER");
-    if (cp) strlcpy(connectParam.real_name, cp, sizeof(connectParam.real_name));
-    else Get_login_name(connectParam.real_name, sizeof(connectParam.real_name) - 1);
+    if (cp) strlcpy(connectParam.user_name, cp, sizeof(connectParam.user_name));
+    else Get_login_name(connectParam.user_name, sizeof(connectParam.user_name) - 1);
 
     memset(&xpArgs, 0, sizeof(xp_args_t));
     Parse_options(&argc, argv);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	error("failed to initialize networking"); 
 	exit(1);
     }
-    if (Net_verify(connectParam.real_name, 
+    if (Net_verify(connectParam.user_name, 
 		   connectParam.nick_name, 
 		   connectParam.disp_name)) {
 	error("failed to verify networking"); 

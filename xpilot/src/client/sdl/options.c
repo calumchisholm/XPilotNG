@@ -3152,12 +3152,12 @@ void Parse_options(int *argcp, char **argvp)
 
     Get_resource(rDB, "user", resValue, MAX_NAME_LEN);
     if (resValue[0])
-	strlcpy(connectParam.real_name, resValue, MAX_NAME_LEN);
+	strlcpy(connectParam.user_name, resValue, MAX_NAME_LEN);
 
-    if (Check_real_name(connectParam.real_name) == NAME_ERROR) {
-	xpprintf("Fixing realname from \"%s\" ", connectParam.real_name);
-	Fix_real_name(connectParam.real_name);
-	xpprintf("to \"%s\".\n", connectParam.real_name);
+    if (Check_user_name(connectParam.user_name) == NAME_ERROR) {
+	xpprintf("Fixing username from \"%s\" ", connectParam.user_name);
+	Fix_user_name(connectParam.user_name);
+	xpprintf("to \"%s\".\n", connectParam.user_name);
     }
 
     Get_resource(rDB, "host", resValue, MAX_HOST_LEN);
@@ -3173,7 +3173,7 @@ void Parse_options(int *argcp, char **argvp)
 
     Get_resource(rDB, "name", connectParam.nick_name, MAX_NAME_LEN);
     if (!connectParam.nick_name[0])
-	strlcpy(connectParam.nick_name, connectParam.real_name, MAX_NAME_LEN);
+	strlcpy(connectParam.nick_name, connectParam.user_name, MAX_NAME_LEN);
     CAP_LETTER(connectParam.nick_name[0]);
     if (connectParam.nick_name[0] < 'A' || connectParam.nick_name[0] > 'Z') {
 	warn("Your player name \"%s\" should start with an uppercase letter",
@@ -3186,7 +3186,7 @@ void Parse_options(int *argcp, char **argvp)
 	xpprintf("to \"%s\".\n", connectParam.nick_name);
     }
 
-    strlcpy(realname, connectParam.real_name, sizeof(realname));
+    strlcpy(username, connectParam.user_name, sizeof(username));
     strlcpy(nickname, connectParam.nick_name, sizeof(nickname));
 
     Get_int_resource(rDB, "team", &connectParam.team);

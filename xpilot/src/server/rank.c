@@ -471,7 +471,7 @@ void Rank_get_saved_score(player * pl)
     /* Didn't find it, use the least-recently-used node. */
     score = &scores[oldest];
 
-    Init_scorenode(score, pl->name, pl->realname, pl->hostname);
+    Init_scorenode(score, pl->name, pl->username, pl->hostname);
     strcpy(score->entry.logout, "playing");
     score->pl = pl;
     score->entry.timestamp = time(0);

@@ -922,8 +922,8 @@ static int Score_callback(int widget_desc, void *data, const char **str)
 {
     (void)widget_desc; (void)data; (void)str;
     Config(false, CONFIG_NONE);
-    if (showRealName != false) {
-	showRealName = false;
+    if (showUserName != false) {
+	showUserName = false;
 	scoresChanged = true;
     }
     return 0;
@@ -933,8 +933,8 @@ static int Player_callback(int widget_desc, void *data, const char **str)
 {
     (void)widget_desc; (void)data; (void)str;
     Config(false, CONFIG_NONE);
-    if (showRealName != true) {
-	showRealName = true;
+    if (showUserName != true) {
+	showUserName = true;
 	scoresChanged = true;
     }
     return 0;

@@ -367,7 +367,7 @@ int Net_setup(void)
  * this info from the ENTER_GAME_pack.
  */
 #define	MAX_VERIFY_RETRIES	5
-int Net_verify(char *real, char *nick, char *disp)
+int Net_verify(char *user_name, char *nick_name, char *disp)
 {
     int		n,
 		type,
@@ -383,7 +383,8 @@ int Net_verify(char *real, char *nick, char *disp)
 	    }
 	    Sockbuf_clear(&wbuf);
 	    /* IFWINDOWS( Trace("Verifying to sock=%d\n", wbuf.sock) ); */
-	    n = Packet_printf(&wbuf, "%c%s%s%s", PKT_VERIFY, real, nick, disp);
+	    n = Packet_printf(&wbuf, "%c%s%s%s", PKT_VERIFY,
+			      user_name, nick_name, disp);
 	    if (n <= 0 || Sockbuf_flush(&wbuf) <= 0) {
 		error("Can't send verify packet");
 		return -1;
@@ -1966,21 +1967,21 @@ int Receive_player(void)
     int			n;
     short		id;
     u_byte		ch, myteam, mychar, myself = 0;
-    char		name[MAX_CHARS],
-			real[MAX_CHARS],
-			host[MAX_CHARS],
+    char		nick_name[MAX_CHARS],
+			user_name[MAX_CHARS],
+			host_name[MAX_CHARS],
 			shape[2*MSG_LEN],
 			*cbuf_ptr = cbuf.ptr;
 
     if ((n = Packet_scanf(&cbuf,
 			  "%c%hd%c%c" "%s%s%s" "%S",
 			  &ch, &id, &myteam, &mychar,
-			  name, real, host,
+			  nick_name, user_name, host_name,
 			  shape)) <= 0)
 	return n;
-    name[MAX_NAME_LEN - 1] = '\0';
-    real[MAX_NAME_LEN - 1] = '\0';
-    host[MAX_HOST_LEN - 1] = '\0';
+    nick_name[MAX_NAME_LEN - 1] = '\0';
+    user_name[MAX_NAME_LEN - 1] = '\0';
+    host_name[MAX_HOST_LEN - 1] = '\0';
 
     if (version < 0x4F10)
 	n = Packet_scanf(&cbuf, "%S", &shape[strlen(shape)]);
@@ -1991,7 +1992,7 @@ int Receive_player(void)
 	return n;
     }
 
-    if ((n = Handle_player(id, myteam, mychar, name, real, host,
+    if ((n = Handle_player(id, myteam, mychar, nick_name, user_name, host_name,
 			   shape, myself)) == -1)
 	return -1;
     return 1;

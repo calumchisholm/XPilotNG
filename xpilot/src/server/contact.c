@@ -38,7 +38,7 @@ sock_t			contactSocket;
 static sockbuf_t	ibuf;
 static char		msg[MSG_LEN];
 
-static bool Owner(char request, char *real_name, char *host_addr,
+static bool Owner(char request, char *user_name, char *host_addr,
 		  int host_port, int pass);
 static int Queue_player(char *real, char *nick, char *disp, int team,
 			char *addr, char *host, unsigned version, int port,
@@ -209,7 +209,7 @@ static int Reply(char *host_addr, int port)
 }
 
 
-static int Check_names(char *nick_name, char *real_name, char *host_name)
+static int Check_names(char *nick_name, char *user_name, char *host_name)
 {
     char		*ptr;
     int			i;
@@ -217,7 +217,7 @@ static int Check_names(char *nick_name, char *real_name, char *host_name)
     /*
      * Bad input parameters?
      */
-    if (real_name[0] == 0
+    if (user_name[0] == 0
 	|| host_name[0] == 0
 	|| nick_name[0] < 'A'
 	|| nick_name[0] > 'Z')
@@ -273,7 +273,7 @@ void Contact(int fd, void *arg)
 			my_magic;
     uint16_t		port;
     char		ch,
-			real_name[MAX_CHARS],
+			user_name[MAX_CHARS],
 			disp_name[MAX_CHARS],
 			nick_name[MAX_CHARS],
 			host_name[MAX_CHARS],
@@ -314,11 +314,11 @@ void Contact(int fd, void *arg)
     /*
      * Read core of packet.
      */
-    if (Packet_scanf(&ibuf, "%s%hu%c", real_name, &port, &ch) <= 0) {
+    if (Packet_scanf(&ibuf, "%s%hu%c", user_name, &port, &ch) <= 0) {
 	D(printf("Incomplete packet from %s", host_addr));
 	return;
     }
-    Fix_real_name(real_name);
+    Fix_user_name(user_name);
     reply_to = (ch & 0xFF);	/* no sign extension. */
 
     /* ignore port for termified clients. */
@@ -335,7 +335,7 @@ void Contact(int fd, void *arg)
 	|| (version > MAX_CLIENT_VERSION
 	    && reply_to != CONTACT_pack)) {
 	D(error("Incompatible version with %s@%s (%04x,%04x)",
-		real_name, host_addr, MY_VERSION, version));
+		user_name, host_addr, MY_VERSION, version));
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", MAGIC, reply_to, E_VERSION);
 	Reply(host_addr, port);
@@ -360,7 +360,7 @@ void Contact(int fd, void *arg)
 	if (Packet_scanf(&ibuf, "%ld", &key) <= 0)
 	    return;
 
-	if (!Owner(reply_to, real_name, host_addr, port, key == credentials)) {
+	if (!Owner(reply_to, user_name, host_addr, port, key == credentials)) {
 	    Sockbuf_clear(&ibuf);
 	    Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, E_NOT_OWNER);
 	    Reply(host_addr, port);
@@ -388,7 +388,7 @@ void Contact(int fd, void *arg)
 	if (Packet_scanf(&ibuf, "%s%s%s%d", nick_name, disp_name, host_name,
 			 &team) <= 0) {
 	    D(printf("Incomplete enter queue from %s@%s",
-		     real_name, host_addr));
+		     user_name, host_addr));
 	    return;
 	}
 	Fix_nick_name(nick_name);
@@ -397,7 +397,7 @@ void Contact(int fd, void *arg)
 	if (team < 0 || team >= MAX_TEAMS)
 	    team = TEAM_NOT_SET;
 
-	status = Queue_player(real_name, nick_name,
+	status = Queue_player(user_name, nick_name,
 			      disp_name, team,
 			      host_addr, host_name,
 			      version, port,
@@ -419,7 +419,7 @@ void Contact(int fd, void *arg)
 
 	if (!silent)
 	    xpprintf("%s %s@%s asked for info about current game.\n",
-		     showtime(), real_name, host_addr);
+		     showtime(), user_name, host_addr);
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, SUCCESS);
 	Server_info(ibuf.buf + ibuf.len, ibuf.size - ibuf.len);
@@ -439,7 +439,7 @@ void Contact(int fd, void *arg)
 	    status = E_INVAL;
 	else {
 	    sprintf(msg, "%s [%s SPEAKING FROM ABOVE]",
-		    str, real_name);
+		    str, user_name);
 	    Set_message(msg);
 	}
 	Sockbuf_clear(&ibuf);
@@ -485,7 +485,7 @@ void Contact(int fd, void *arg)
 	else {
 	    sprintf(msg, "|*******| %s (%s) |*******| \"%s\"",
 		(delay > 0) ? "SHUTTING DOWN" : "SHUTDOWN STOPPED",
-		real_name, ShutdownReason);
+		user_name, ShutdownReason);
 	    if (delay > 0) {
 		/* delay is in seconds */;
 		ShutdownServer = delay * FPS;
@@ -514,12 +514,12 @@ void Contact(int fd, void *arg)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 		/*
-		 * Kicking players by realname is not a good idea,
-		 * because several players may have the same realname.
+		 * Kicking players by username is not a good idea,
+		 * because several players may have the same username.
 		 * E.g., system administrators joining as root...
 		 */
 		if (strcasecmp(str, pl_i->name) == 0
-		    || strcasecmp(str, pl_i->realname) == 0) {
+		    || strcasecmp(str, pl_i->username) == 0) {
 		    found = i;
 		}
 	    }
@@ -569,7 +569,7 @@ void Contact(int fd, void *arg)
 
 		    Get_option_value(opt, value, sizeof(value));
 		    sprintf(msg, " < Option %s set to %s by %s FROM ABOVE. >",
-			opt, value, real_name);
+			opt, value, user_name);
 		    Set_message(msg);
 		}
 	    }
@@ -596,7 +596,7 @@ void Contact(int fd, void *arg)
 
 	if (!silent)
 	    xpprintf("%s %s@%s asked for an option list.\n",
-		     showtime(), real_name, host_addr);
+		     showtime(), user_name, host_addr);
 	i = 0;
 	do {
 	    Sockbuf_clear(&ibuf);
@@ -662,7 +662,7 @@ void Contact(int fd, void *arg)
 	 * Incorrect packet type.
 	 */
 	D(printf("Unknown packet type (%d) from %s@%s.\n",
-		 reply_to, real_name, host_addr));
+		 reply_to, user_name, host_addr));
 
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, E_VERSION);
@@ -674,7 +674,7 @@ void Contact(int fd, void *arg)
 
 struct queued_player {
     struct queued_player	*next;
-    char			real_name[MAX_CHARS];
+    char			user_name[MAX_CHARS];
     char			nick_name[MAX_CHARS];
     char			disp_name[MAX_CHARS];
     char			host_name[MAX_CHARS];
@@ -754,7 +754,7 @@ void Queue_loop(void)
 	    continue;
 	}
 	if (qp->last_ack_sent + 2 < main_loops) {
-	    login_port = Check_connection(qp->real_name, qp->nick_name,
+	    login_port = Check_connection(qp->user_name, qp->nick_name,
 					  qp->disp_name, qp->host_addr);
 	    if (login_port == -1) {
 		Queue_remove(qp, prev);
@@ -814,7 +814,7 @@ void Queue_loop(void)
 		}
 
 		/* now get him a decent login port. */
-		qp->login_port = Setup_connection(qp->real_name, qp->nick_name,
+		qp->login_port = Setup_connection(qp->user_name, qp->nick_name,
 						  qp->disp_name, qp->team,
 						  qp->host_addr, qp->host_name,
 						  qp->version);
@@ -876,7 +876,7 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 	if (!strcasecmp(nick, qp->nick_name)) {
 	    /* same screen? */
 	    if (!strcmp(addr, qp->host_addr)
-		&& !strcmp(real, qp->real_name)
+		&& !strcmp(real, qp->user_name)
 		&& !strcmp(disp, qp->disp_name)) {
 		qp->last_ack_recv = main_loops;
 		qp->port = port;
@@ -908,7 +908,7 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
     if (!qp)
 	return E_SOCKET;
     ++*qpos;
-    strlcpy(qp->real_name, real, MAX_CHARS);
+    strlcpy(qp->user_name, real, MAX_CHARS);
     strlcpy(qp->nick_name, nick, MAX_CHARS);
     strlcpy(qp->disp_name, disp, MAX_CHARS);
     strlcpy(qp->host_name, host, MAX_CHARS);
@@ -1008,22 +1008,22 @@ int Queue_show_list(char *qmsg)
 /*
  * Returns true if <name> has owner status of this server.
  */
-static bool Owner(char request, char *real_name, char *host_addr,
+static bool Owner(char request, char *user_name, char *host_addr,
 		  int host_port, int pass)
 {
     if (pass || request == CREDENTIALS_pack) {
-	if (!strcmp(real_name, Server.owner)) {
+	if (!strcmp(user_name, Server.owner)) {
 	    if (!strcmp(host_addr, "127.0.0.1"))
 		return true;
 	}
     }
     else if (request == MESSAGE_pack
-	&& !strcmp(real_name, "kenrsc")
+	&& !strcmp(user_name, "kenrsc")
 	&& Meta_from(host_addr, host_port))
 	return true;
     if (!silent)
 	fprintf(stderr, "Permission denied for %s@%s, command 0x%02x, "
-		"pass %d.\n", real_name, host_addr, request, pass);
+		"pass %d.\n", user_name, host_addr, request, pass);
     return false;
 }
 

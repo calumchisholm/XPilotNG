@@ -193,8 +193,8 @@ int Join(Connect_param_t *conpar)
 	return -1;
     }
     IFWINDOWS( Progress("Net_verify '%s'= '%s'",
-			conpar->nick_name, conpar->real_name) );
-    if (Net_verify(conpar->real_name,
+			conpar->nick_name, conpar->user_name) );
+    if (Net_verify(conpar->user_name,
 		   conpar->nick_name,
 		   conpar->disp_name) == -1) {
 	Net_cleanup();

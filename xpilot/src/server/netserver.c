@@ -1119,7 +1119,7 @@ static int Handle_listening(connection_t *connp)
 	Destroy_connection(connp, "verify incomplete");
 	return -1;
     }
-    Fix_real_name(real);
+    Fix_user_name(real);
     Fix_nick_name(nick);
     if (strcmp(real, connp->real) || strcmp(nick, connp->nick)) {
 	if (!silent)
@@ -1338,13 +1338,13 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     /*strlcpy(pl->rawname, connp->nick, MAX_CHARS);*/
     strlcpy(pl->name, connp->nick, MAX_CHARS);
     /*strlcpy(pl->auth_nick, old_nick, MAX_CHARS);*/
-    strlcpy(pl->realname, connp->real, MAX_CHARS);
+    strlcpy(pl->username, connp->real, MAX_CHARS);
     strlcpy(pl->hostname, connp->host, MAX_CHARS);
     /* kps - what about auth_nick ? */
     LegalizeName(pl->name);
-    LegalizeName(pl->realname);
+    LegalizeName(pl->username);
     LegalizeHost(pl->hostname);
-    pl->isowner = (!strcmp(pl->realname, Server.owner) &&
+    pl->isowner = (!strcmp(pl->username, Server.owner) &&
 		   !strcmp(connp->addr, "127.0.0.1"));
     pl->team = connp->team;
     pl->version = connp->version;
@@ -1478,10 +1478,10 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		World.name, World.author);
     else if (BIT(World.rules->mode, TEAM_PLAY))
 	sprintf(msg, "%s (%s, team %d) has entered \"%s\", made by %s.",
-		pl->name, pl->realname, pl->team, World.name, World.author);
+		pl->name, pl->username, pl->team, World.name, World.author);
     else
 	sprintf(msg, "%s (%s) has entered \"%s\", made by %s.",
-		pl->name, pl->realname, World.name, World.author);
+		pl->name, pl->username, World.name, World.author);
 
     if (pl->rectype < 2)
 	Set_message(msg);
@@ -1982,7 +1982,7 @@ int Send_player(connection_t *connp, int id)
 		      "%c%hd" "%c%c" "%s%s%s" "%S",
 		      PKT_PLAYER, pl->id,
 		      pl->team, pl->mychar,
-		      pl->name, pl->realname, pl->hostname,
+		      pl->name, pl->username, pl->hostname,
 		      buf);
     if (n > 0) {
 	if (!FEATURE(connp, F_EXPLICITSELF))

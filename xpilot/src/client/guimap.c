@@ -448,7 +448,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     }
     if (other) {
 	rd.drawString(dpy, drawPixmap, gameGC, x, y,
-		      other->name, other->name_len);
+		      other->nick_name, other->name_len);
 	x += other->name_width;
     }
     /* Extra base info */

@@ -565,7 +565,7 @@ void Paint_score_start(void)
     char	headingStr[MSG_LEN];
     SDL_Surface *header;
 
-    if (showRealName)
+    if (showUserName)
 	strlcpy(headingStr, "NICK=USER@HOST", sizeof(headingStr));
     else if (BIT(Setup->mode, TEAM_PLAY))
 	strlcpy(headingStr, "  SCORE NAME           LIFE", sizeof(headingStr));
@@ -627,8 +627,9 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
     /*
      * Setup the status line
      */
-    if (showRealName)
-	sprintf(label, "%s=%s@%s", other->name, other->real, other->host);
+    if (showUserName)
+	sprintf(label, "%s=%s@%s",
+		other->nick_name, other->user_name, other->host_name);
     else {
 	other_t *war = Other_by_id(other->war_id);
 
@@ -663,15 +664,15 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 
 	if (BIT(Setup->mode, TEAM_PLAY))
 	    sprintf(label, "%c%s %-15s%s",
-		    other->mychar, scoreStr, other->name, lifeStr);
+		    other->mychar, scoreStr, other->nick_name, lifeStr);
 	else {
 	    sprintf(label, "%c %s%s%s%s  %s",
 		    other->mychar, raceStr, teamStr,
 		    scoreStr, lifeStr,
-		    other->name);
+		    other->nick_name);
 	    if (war) {
-		if (strlen(label) + strlen(war->name) + 5 < sizeof(label))
-		    sprintf(label + strlen(label), " (%s)", war->name);
+		if (strlen(label) + strlen(war->nick_name) + 5 < sizeof(label))
+		    sprintf(label + strlen(label), " (%s)", war->nick_name);
 	    }
 	}
     }

@@ -320,10 +320,10 @@ extern bool		useWreckage;
 extern bool		ignore20MaxFPS;
 extern char		*password;
 
-extern char		*robotRealName;
+extern char		*robotUserName;
 extern char		*robotHostName;
 
-extern char		*tankRealName;
+extern char		*tankUserName;
 extern char		*tankHostName;
 extern int		tankScoreDecrement;
 

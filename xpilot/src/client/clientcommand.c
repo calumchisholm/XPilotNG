@@ -43,24 +43,24 @@ static void print_ignorelist(void)
 
     for (i = 0; i < num_others; i++) {
 	if (Others[i].ignorelevel == 1) {
-	    if (strlen(buffer) + strlen(Others[i].name) + 17 > MAX_CHARS) {
+	    if (strlen(buffer) + strlen(Others[i].nick_name) + 17 > MAX_CHARS) {
 		strcat(buffer, "[*Client reply*]");
 		Add_message(buffer);
 		buffer[0] = '\0';
 	    }
 
-	    strcat(buffer, Others[i].name);
+	    strcat(buffer, Others[i].nick_name);
 	    strcat(buffer, " ");
 	    check = 1;
 	} else if (Others[i].ignorelevel == 2) {
-	    if (strlen(buffer) + strlen(Others[i].name) + 18 > MAX_CHARS) {
+	    if (strlen(buffer) + strlen(Others[i].nick_name) + 18 > MAX_CHARS) {
 		strcat(buffer, "[*Client reply*]");
 		Add_message(buffer);
 		buffer[0] = '\0';
 	    }
 
 	    strcat(buffer, "!");
-	    strcat(buffer, Others[i].name);
+	    strcat(buffer, Others[i].nick_name);
 	    strcat(buffer, " ");
 
 	    check = 1;
@@ -149,12 +149,12 @@ static void ignorePlayer(char *name, int level)
     if (other != NULL) {
 	if (level == 1) {
 	    snprintf(buf, sizeof(buf),
-		     "Ignoring %s (textmask). [*Client reply*]", other->name);
+		     "Ignoring %s (textmask). [*Client reply*]", other->nick_name);
 	    Add_message(buf);
 	} else {
 	    snprintf(buf, sizeof(buf),
 		     "Ignoring %s (completely). [*Client reply*]",
-		     other->name);
+		     other->nick_name);
 	    Add_message(buf);
 	}
 	other->ignorelevel = level;
@@ -168,7 +168,7 @@ static void unignorePlayer(char *name)
 
     if (other != NULL) {
 	snprintf(buf, sizeof(buf),
-		 "Stopped ignoring %s. [*Client reply*]", other->name);
+		 "Stopped ignoring %s. [*Client reply*]", other->nick_name);
 	Add_message(buf);
 	other->ignorelevel = 0;
     }

@@ -282,10 +282,10 @@ char		*password;		/* password for operator status */
 int		clientPortStart;	/* First UDP port for clients */
 int		clientPortEnd;		/* Last one (these are for firewalls) */
 
-char		*robotRealName;		/* Real name for robot */
+char		*robotUserName;		/* User name for robot */
 char		*robotHostName;		/* Host name for robot */
 
-char		*tankRealName;		/* Real name for tank */
+char		*tankUserName;		/* User name for tank */
 char		*tankHostName;		/* Host name for tank */
 int		tankScoreDecrement;	/* Amount by which the tank's score */
 					/* is decreased from the player's */
@@ -335,9 +335,9 @@ void tuner_none(void)  {}
 void tuner_dummy(void) {}
 
 
-static void Tune_robot_real_name(void) { Fix_real_name(robotRealName); }
+static void Tune_robot_user_name(void) { Fix_user_name(robotUserName); }
 static void Tune_robot_host_name(void) { Fix_host_name(robotHostName); }
-static void Tune_tank_real_name(void)  { Fix_real_name(tankRealName); }
+static void Tune_tank_user_name(void)  { Fix_user_name(tankUserName); }
 static void Tune_tank_host_name(void)  { Fix_host_name(tankHostName); }
 static void Check_baseless(void);
 
@@ -623,13 +623,13 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"robotRealName",
+	"robotUserName",
 	"robotRealName",
 	"robot",
-	&robotRealName,
+	&robotUserName,
 	valString,
-	Tune_robot_real_name,
-	"What is the robots' apparent real name?\n",
+	Tune_robot_user_name,
+	"What is the robots' apparent user name?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -643,13 +643,13 @@ static option_desc options[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"tankRealName",
+	"tankUserName",
 	"tankRealName",
 	"tank",
-	&tankRealName,
+	&tankUserName,
 	valString,
-	Tune_tank_real_name,
-	"What is the tanks' apparent real name?\n",
+	Tune_tank_user_name,
+	"What is the tanks' apparent user name?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

@@ -589,10 +589,10 @@ static int Gui_is_my_tank(other_t *other)
 	    return 0;
     }
 
-    if (strlcpy(tank_name, self->name, MAX_NAME_LEN) < MAX_NAME_LEN)
+    if (strlcpy(tank_name, self->nick_name, MAX_NAME_LEN) < MAX_NAME_LEN)
 	strlcat(tank_name, "'s tank", MAX_NAME_LEN);
 
-    if (strcmp(tank_name, other->name))
+    if (strcmp(tank_name, other->nick_name))
 	return 0;
 
     return 1;

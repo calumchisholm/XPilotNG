@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -30,8 +29,8 @@
 
 #define PROT_EXT	'~'
 
-int Check_real_name(char *name);
-void Fix_real_name(char *name);
+int Check_user_name(char *name);
+void Fix_user_name(char *name);
 int Check_nick_name(char *name);
 void Fix_nick_name(char *name);
 int Check_host_name(char *name);

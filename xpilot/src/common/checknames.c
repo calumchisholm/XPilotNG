@@ -25,7 +25,7 @@
 
 char checknames_version[] = VERSION;
 
-int Check_real_name(char *name)
+int Check_user_name(char *name)
 {
     unsigned char *str;
 
@@ -43,7 +43,7 @@ int Check_real_name(char *name)
     return NAME_OK;
 }
 
-void Fix_real_name(char *name)
+void Fix_user_name(char *name)
 {
     unsigned char *str;
 

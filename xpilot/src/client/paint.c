@@ -197,11 +197,11 @@ static int Team_heading(int entrynum, int teamnum,
     tmp.name_width = 0;
     tmp.ship = NULL;
     if (teamnum != TEAM_PAUSEHACK)
-	sprintf(tmp.name, "TEAM %d", tmp.team);
+	sprintf(tmp.nick_name, "TEAM %d", tmp.team);
     else
-	sprintf(tmp.name, "Pause Wusses");
-    strcpy(tmp.real, tmp.name);
-    strcpy(tmp.host, "");
+	sprintf(tmp.nick_name, "Pause Wusses");
+    strcpy(tmp.user_name, tmp.nick_name);
+    strcpy(tmp.host_name, "");
 #if 0
     if (BIT(Setup->mode, LIMITED_LIVES) && teamlives == 0)
 	tmp.mychar = 'D';

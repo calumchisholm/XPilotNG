@@ -231,7 +231,7 @@ void Meta_update(int change)
 			"%s%s=%s@%s",
 			(first) ? "add players " : ",",
 			pl_i->name,
-			pl_i->realname,
+			pl_i->username,
 			pl_i->hostname);
 		len += strlen(&string[len]);
 

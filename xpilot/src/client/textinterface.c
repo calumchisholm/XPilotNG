@@ -327,7 +327,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 
 	Sockbuf_clear(ibuf);
 	Packet_printf(ibuf, "%u%s%hu", VERSION2MAGIC(conpar->server_version),
-		      conpar->real_name, sock_get_port(&ibuf->sock));
+		      conpar->user_name, sock_get_port(&ibuf->sock));
 
 	if (privileged_cmd && !has_credentials)
 	    Packet_printf(ibuf, "%c%ld", CREDENTIALS_pack, 0L);
@@ -604,7 +604,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 			Sockbuf_clear(ibuf);
 			Packet_printf(ibuf, "%u%s%hu",
 				      VERSION2MAGIC(conpar->server_version),
-				      conpar->real_name,
+				      conpar->user_name,
 				      sock_get_port(&ibuf->sock));
 			Packet_printf(ibuf, "%c%s%s%s%d", ENTER_QUEUE_pack,
 				      conpar->nick_name, conpar->disp_name,
@@ -779,7 +779,7 @@ int Contact_servers(int count, char **servers,
 	compat_mode = 0;
 	do {
 	    Sockbuf_clear(&sbuf);
-	    Packet_printf(&sbuf, "%u%s%hu%c", MAGIC, conpar->real_name,
+	    Packet_printf(&sbuf, "%u%s%hu%c", MAGIC, conpar->user_name,
 			  sock_get_port(&sbuf.sock), CONTACT_pack);
 	    if (Query_all(&sbuf.sock, conpar->contact_port,
 			  sbuf.buf, sbuf.len) == -1) {
@@ -836,7 +836,7 @@ int Contact_servers(int count, char **servers,
 		Sockbuf_clear(&sbuf);
 		Packet_printf(&sbuf, "%u%s%hu%c",
 			      compat_mode ? COMPATIBILITY_MAGIC : MAGIC,
-			      conpar->real_name, sock_get_port(&sbuf.sock),
+			      conpar->user_name, sock_get_port(&sbuf.sock),
 			      CONTACT_pack);
 		if (sock_send_dest(&sbuf.sock, servers[i],
 			      conpar->contact_port,

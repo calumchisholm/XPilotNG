@@ -205,9 +205,9 @@ typedef struct {
     short	name_len;	/* In bytes */
     short	ignorelevel;
     shipshape_t	*ship;
-    char	name[MAX_CHARS];
-    char	real[MAX_CHARS];
-    char	host[MAX_CHARS];
+    char	nick_name[MAX_CHARS];
+    char	user_name[MAX_CHARS];
+    char	host_name[MAX_CHARS];
     char	id_string[MAX_CHARS];
 } other_t;
 
@@ -546,9 +546,9 @@ extern int	packet_lag;		/* approximate lag in frames */
 extern char	*packet_measure;	/* packet measurement in a second */
 extern long	packet_loop;		/* start of measurement */
 
-extern bool	showRealName;		/* Show realname instead of nickname */
+extern bool	showUserName;		/* Show username instead of nickname */
 extern char	nickname[MAX_CHARS];	/* Nick-name of player */
-extern char	realname[MAX_CHARS];	/* Real name of player */
+extern char	username[MAX_CHARS];	/* Real name of player */
 extern char	servername[MAX_CHARS];	/* Name of server connecting to */
 extern unsigned	version;		/* Version of the server */
 extern bool	scoresChanged;
@@ -703,9 +703,9 @@ other_t *Other_by_id(int id);
 other_t *Other_by_name(char *name, bool show_error_msg);
 shipshape_t *Ship_by_id(int id);
 int Handle_leave(int id);
-int Handle_player(int id, int team, int mychar, char *player_name,
-		  char *real_name, char *host_name, char *shape,
-		  int myself);
+int Handle_player(int id, int team, int mychar,
+		  char *nick_name, char *user_name, char *host_name,
+		  char *shape, int myself);
 int Handle_team(int id, int pl_team);
 int Handle_score(int id, double score, int life, int mychar, int alliance);
 int Handle_score_object(double score, int x, int y, char *msg);

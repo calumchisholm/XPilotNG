@@ -87,7 +87,7 @@ static const char *teamnames[] = {
 /* structure to store names found in a message */
 typedef struct {
     int index;
-    char name[MSG_MAX_NAMES][MAX_CHARS];
+    char nick_name[MSG_MAX_NAMES][MAX_CHARS];
 } msgnames_t;
 
 /* recursive descent parser for messages */
@@ -116,14 +116,14 @@ static bool Msg_match_fmt(const char *msg, const char *fmt, msgnames_t *mn)
     msg += len;
 
     switch (*(fp + 1)) {
-	char *name;
-    case 'n':			/* name */
+	char *nick;
+    case 'n':			/* nick */
 	for (i = 0; i < num_others; i++) {
-	    name = Others[i].name;
-	    len = strlen(name);
-	    if ((strncmp(msg, name, len) == 0)
+	    nick = Others[i].nick_name;
+	    len = strlen(nick);
+	    if ((strncmp(msg, nick, len) == 0)
 		&& Msg_match_fmt(msg + len, fmt, mn)) {
-		strncpy(mn->name[mn->index++], name, len + 1);
+		strncpy(mn->nick_name[mn->index++], nick, len + 1);
 		return true;
 	    }
 	}
@@ -156,10 +156,10 @@ static bool Msg_match_fmt(const char *msg, const char *fmt, msgnames_t *mn)
 	    }
 	}
 	break;
-    case 't':			/* "name" of a team */
+    case 't':			/* "nick" of a team */
 	for (i = 0; teamnames[i] != NULL; i++) {
 	    if (strncmp(msg, teamnames[i], strlen(teamnames[i])) == 0) {
-		strncpy(mn->name[mn->index++], teamnames[i], 2);
+		strncpy(mn->nick_name[mn->index++], teamnames[i], 2);
 		msg += strlen(teamnames[i]);
 		return Msg_match_fmt(msg, fmt, mn);
 	    }
@@ -208,12 +208,12 @@ static bool Msg_scan_for_replace_treasure(const char *message)
     if (Msg_match_fmt(message,
 		      " < %n (team %t) has replaced the treasure >",
 		      &mn)) {
-	int replacer_team = atoi(mn.name[0]);
-	char *replacer = mn.name[1];
+	int replacer_team = atoi(mn.nick_name[0]);
+	char *replacer = mn.nick_name[1];
 
 	if (replacer_team == self->team) {
 	    ball_shout = false;
-	    if (!strcmp(replacer, self->name))
+	    if (!strcmp(replacer, self->nick_name))
 		ballstats_replaces++;
 	    return true;
 	}
@@ -244,13 +244,13 @@ static bool Msg_scan_for_ball_destruction(const char *message)
     if (Msg_match_fmt(message,
 		      " < %n's (%t) team has destroyed team %t treasure >",
 		      &mn)) {
-	int destroyer_team = atoi(mn.name[0]);
-	int destroyed_team = atoi(mn.name[1]);
-	char *destroyer = mn.name[2];
+	int destroyer_team = atoi(mn.nick_name[0]);
+	int destroyed_team = atoi(mn.nick_name[1]);
+	char *destroyer = mn.nick_name[2];
 
 	if (destroyer_team == self->team) {
 	    ballstats_teamcashes++;
-	    if (!strcmp(destroyer, self->name))
+	    if (!strcmp(destroyer, self->nick_name))
 		ballstats_cashes++;
 	}
 	if (destroyed_team == self->team)
@@ -379,22 +379,22 @@ static void Msg_scan_game_msg(const char *message)
 
     if (Msg_match_fmt(message, "%n was killed by %s from %n.", &mn)) {
 	DP(printf("shot:\n"));
-	killer = mn.name[0];
-	victim = mn.name[1];
+	killer = mn.nick_name[0];
+	victim = mn.nick_name[1];
 
     } else if (Msg_match_fmt(message, "%n %c%h against a %o.", &mn)) {
 	DP(printf("crashed into obstacle:\n"));
-	victim = mn.name[0];
+	victim = mn.nick_name[0];
 
     } else if (Msg_match_fmt(message, "%n and %n crashed.", &mn)) {
 	DP(printf("crash:\n"));
-	victim = mn.name[1];
-	victim2 = mn.name[0];
+	victim = mn.nick_name[1];
+	victim2 = mn.nick_name[0];
 
     } else if (Msg_match_fmt(message, "%n ran over %n.", &mn)) {
 	DP(printf("overrun:\n"));
-	killer = mn.name[1];
-	victim = mn.name[0];
+	killer = mn.nick_name[1];
+	victim = mn.nick_name[0];
 
     } else if (Msg_match_fmt
 	       (message, "%n %c%h against a %o with help from %n", &mn)) {
@@ -403,45 +403,45 @@ static void Msg_scan_game_msg(const char *message)
 	 * please fix this if you like, all helpers should get a kill
 	 * (look at server/walls.c)
 	 */
-	killer = mn.name[0];
-	victim = mn.name[1];
+	killer = mn.nick_name[0];
+	victim = mn.nick_name[1];
 
     } else if (Msg_match_fmt(message, "%n has committed suicide.", &mn)) {
 	DP(printf("suicide:\n"));
-	victim = mn.name[0];
+	victim = mn.nick_name[0];
 
     } else if (Msg_match_fmt(message, "%n was killed by a ball.", &mn)) {
 	DP(printf("killed by ball:\n"));
-	victim = mn.name[0];
+	victim = mn.nick_name[0];
 
     } else if (Msg_match_fmt
 	       (message, "%n was killed by a ball owned by %n.", &mn)) {
 	DP(printf("killed by ball:\n"));
-	killer = mn.name[0];
-	victim = mn.name[1];
+	killer = mn.nick_name[0];
+	victim = mn.nick_name[1];
 
     } else
 	if (Msg_match_fmt(message, "%n succumbed to an explosion.", &mn)) {
 	DP(printf("killed by explosion:\n"));
-	victim = mn.name[0];
+	victim = mn.nick_name[0];
 
     } else
 	if (Msg_match_fmt
 	    (message, "%n succumbed to an explosion from %n.", &mn)) {
 	DP(printf("killed by explosion:\n"));
-	killer = mn.name[0];
-	victim = mn.name[1];
+	killer = mn.nick_name[0];
+	victim = mn.nick_name[1];
 
     } else if (Msg_match_fmt
 	       (message, "%n got roasted alive by %n's laser.", &mn)) {
 	DP(printf("roasted alive:\n"));
-	killer = mn.name[0];
-	victim = mn.name[1];
+	killer = mn.nick_name[0];
+	victim = mn.nick_name[1];
 
     } else if (Msg_match_fmt
 	       (message, "%n was hit by cannonfire.", &mn)) {
 	DP(printf("hit by cannonfire:\n"));
-	victim = mn.name[0];
+	victim = mn.nick_name[0];
 
     } else
 	/* none of the above, nothing to do */
@@ -450,19 +450,19 @@ static void Msg_scan_game_msg(const char *message)
 
     if (killer != NULL) {
 	DP(printf("Killer is %s.\n", killer));
-	if (strcmp(killer, self->name) == 0)
+	if (strcmp(killer, self->nick_name) == 0)
 	    i_am_killer = true;
     }
 
     if (victim != NULL) {
 	DP(printf("Victim is %s.\n", victim));
-	if (strcmp(victim, self->name) == 0)
+	if (strcmp(victim, self->nick_name) == 0)
 	    i_am_victim = true;
     }
 
     if (victim2 != NULL) {
 	DP(printf("Second victim is %s.\n", victim2));
-	if (strcmp(victim2, self->name) == 0)
+	if (strcmp(victim2, self->nick_name) == 0)
 	    i_am_victim2 = true;
     }
 
@@ -623,7 +623,7 @@ static bool Msg_is_from_our_team(const char *message, const char **msg2)
 	    continue;
 
 	/* first check if someone in your team sent the message for all */
-	sprintf(buf, "[%s]", other->name);
+	sprintf(buf, "[%s]", other->nick_name);
 	bufstrlen = strlen(buf);
 	if (len < bufstrlen)
 	    continue;
@@ -634,7 +634,7 @@ static bool Msg_is_from_our_team(const char *message, const char **msg2)
 	}
 
 	/* if not, check if it was sent to your team only */
-	sprintf(buf, "[%s]:[%d]", other->name, other->team);
+	sprintf(buf, "[%s]:[%d]", other->nick_name, other->team);
 	bufstrlen = strlen(buf);
 	if (len < bufstrlen)
 	    continue;
@@ -949,7 +949,7 @@ void Add_roundend_messages(other_t **order)
 	    continue;
 
 	if (Using_score_decimals()) {
-	    sprintf(hackbuf2, "%s: %.*f ", other->name,
+	    sprintf(hackbuf2, "%s: %.*f ", other->nick_name,
 		    showScoreDecimals, other->score);
 	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
 		Add_message(hackbuf);
@@ -959,7 +959,7 @@ void Add_roundend_messages(other_t **order)
 	} else {
 	    int sc = rint(other->score);
 
-	    sprintf(hackbuf2, "%s: %d ", other->name, sc);
+	    sprintf(hackbuf2, "%s: %d ", other->nick_name, sc);
 	    if ((s - hackbuf) + strlen(hackbuf2) > MSG_LEN) {
 		Add_message(hackbuf);
 		s = hackbuf;

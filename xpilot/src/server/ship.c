@@ -363,7 +363,7 @@ void Tank_handle_detach(player *pl)
 
     strlcpy(dummy->name, pl->name, MAX_CHARS);
     strlcat(dummy->name, "'s tank", MAX_CHARS);
-    strlcpy(dummy->realname, tankRealName, MAX_CHARS);
+    strlcpy(dummy->username, tankUserName, MAX_CHARS);
     strlcpy(dummy->hostname, tankHostName, MAX_CHARS);
     dummy->home_base	= pl->home_base;
     dummy->team		= pl->team;

@@ -36,6 +36,39 @@ char myClass[] = "XPilot";
 
 char myshipshapefile[PATH_MAX + 1];
 
+static bool Set_nickName(xp_option_t *opt, const char *value)
+{
+    return false;
+}
+
+static bool Set_userName(xp_option_t *opt, const char *value)
+{
+    return false;
+}
+
+static bool Set_hostName(xp_option_t *opt, const char *value)
+{
+    return false;
+}
+
+static char *Get_nickName(xp_option_t *opt)
+{
+    (void)opt;
+    return connectParam.nick_name;
+}
+
+static char *Get_userName(xp_option_t *opt)
+{
+    (void)opt;
+    return connectParam.user_name;
+}
+
+static char *Get_hostName(xp_option_t *opt)
+{
+    (void)opt;
+    return hostname;
+}
+
 static bool Set_texturePath(xp_option_t *opt, const char *value)
 {
     (void)opt;
@@ -311,25 +344,37 @@ xp_option_t default_options[] = {
     XP_STRING_OPTION(
 	"name",
 	"",
+	NULL, 0,
+	Set_nickName, Get_nickName,
+#if 0
 	connectParam.nick_name,
 	sizeof connectParam.nick_name,
 	NULL, NULL,
+#endif
 	"Set the nickname.\n"),
 
     XP_STRING_OPTION(
 	"user",
 	"newbie",
-	connectParam.real_name,
-	sizeof connectParam.real_name,
+	NULL, 0,
+	Set_userName, Get_userName,
+#if 0
+	connectParam.user_name,
+	sizeof connectParam.user_name,
 	NULL, NULL,
+#endif
 	"Set the username.\n"),
 
     XP_STRING_OPTION(
 	"host",
 	"xpilot",
+	NULL, 0,
+	Set_hostName, Get_hostName,
+#if 0
 	hostname,        /* netclient.c */
 	sizeof hostname,
 	NULL, NULL,
+#endif
 	"Set the hostname.\n"),
 
     XP_INT_OPTION(
@@ -2822,7 +2867,7 @@ cl_option_t options[] = {
 	NULL,
 	"u",
 	KEY_ID_MODE,
-	"Toggle User mode (show real names).\n",
+	"Toggle User mode (show user names).\n",
 	0
     },
     {
@@ -4154,8 +4199,8 @@ void Parse_options(int *argcp, char **argvp)
 	error("Can't open display '%s'", connectParam.disp_name);
 	if (strcmp(connectParam.disp_name, "NO_X") == 0) {
 	    /* user does not want X stuff.  experimental.  use at own risk. */
-	    if (*connectParam.real_name)
-		strlcpy(connectParam.nick_name, connectParam.real_name, MAX_NAME_LEN);
+	    if (*connectParam.user_name)
+		strlcpy(connectParam.nick_name, connectParam.user_name, MAX_NAME_LEN);
 	    else
 		strlcpy(connectParam.nick_name, "X", MAX_NAME_LEN);
 	    connectParam.team = TEAM_NOT_SET;
@@ -4215,12 +4260,12 @@ void Parse_options(int *argcp, char **argvp)
 
     Get_resource(rDB, "user", resValue, MAX_NAME_LEN);
     if (resValue[0])
-	strlcpy(connectParam.real_name, resValue, MAX_NAME_LEN);
+	strlcpy(connectParam.user_name, resValue, MAX_NAME_LEN);
 
-    if (Check_real_name(connectParam.real_name) == NAME_ERROR) {
-	xpprintf("Fixing realname from \"%s\" ", connectParam.real_name);
-	Fix_real_name(connectParam.real_name);
-	xpprintf("to \"%s\".\n", connectParam.real_name);
+    if (Check_user_name(connectParam.user_name) == NAME_ERROR) {
+	xpprintf("Fixing username from \"%s\" ", connectParam.user_name);
+	Fix_user_name(connectParam.user_name);
+	xpprintf("to \"%s\".\n", connectParam.user_name);
     }
 
     Get_resource(rDB, "host", resValue, MAX_HOST_LEN);
@@ -4236,7 +4281,7 @@ void Parse_options(int *argcp, char **argvp)
 
     Get_resource(rDB, "name", connectParam.nick_name, MAX_NAME_LEN);
     if (!connectParam.nick_name[0])
-	strlcpy(connectParam.nick_name, connectParam.real_name, MAX_NAME_LEN);
+	strlcpy(connectParam.nick_name, connectParam.user_name, MAX_NAME_LEN);
     CAP_LETTER(connectParam.nick_name[0]);
     if (connectParam.nick_name[0] < 'A' || connectParam.nick_name[0] > 'Z') {
 	warn("Your player name \"%s\" should start with an uppercase letter",
@@ -4249,7 +4294,7 @@ void Parse_options(int *argcp, char **argvp)
 	xpprintf("to \"%s\".\n", connectParam.nick_name);
     }
 
-    strlcpy(realname, connectParam.real_name, sizeof(realname));
+    strlcpy(username, connectParam.user_name, sizeof(username));
     strlcpy(nickname, connectParam.nick_name, sizeof(nickname));
 
     Get_int_resource(rDB, "team", &connectParam.team);

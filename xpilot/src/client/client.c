@@ -124,9 +124,9 @@ int	packet_lag;		/* approximate lag in frames */
 char	*packet_measure;	/* packet measurement in a second */
 long	packet_loop;		/* start of measurement */
 
-bool	showRealName = false;	/* Show realname instead of nick name */
-char	nickname[MAX_CHARS];	/* Nick-name of player */
-char	realname[MAX_CHARS];	/* Real name of player */
+bool	showUserName = false;	/* Show user name instead of nick name */
+char	nickname[MAX_CHARS];	/* Nick name of player */
+char	username[MAX_CHARS];	/* User name of player */
 char	servername[MAX_CHARS];	/* Name of server connecting to */
 unsigned	version;	/* Version of the server */
 bool	toggle_shield;		/* Are shields toggled by a press? */
@@ -1257,7 +1257,7 @@ other_t *Other_by_name(char *name, bool show_error_msg)
     /* Look for an exact match on player nickname. */
     for (i = 0; i < num_others; i++) {
 	other = &Others[i];
-	if (!strcasecmp(other->name, name))
+	if (!strcasecmp(other->nick_name, name))
 	    return other;
     }
 
@@ -1265,7 +1265,7 @@ other_t *Other_by_name(char *name, bool show_error_msg)
     for (i = 0; i < num_others; i++) {
 	other = &Others[i];
 
-	if (!strncasecmp(other->name, name, len)) {
+	if (!strncasecmp(other->nick_name, name, len)) {
 	    if (found_other)
 		goto match_several;
 	    found_other = other;
@@ -1282,8 +1282,8 @@ other_t *Other_by_name(char *name, bool show_error_msg)
 	int j;
 	other = &Others[i];
 
-	for (j = 0; j < 1 + (int)strlen(other->name) - (int)len; j++) {
-	    if (!strncasecmp(other->name + j, name, len)) {
+	for (j = 0; j < 1 + (int)strlen(other->nick_name) - (int)len; j++) {
+	    if (!strncasecmp(other->nick_name + j, name, len)) {
 		if (found_other)
 		    goto match_several;
 		found_other = other;
@@ -1317,7 +1317,7 @@ other_t *Other_by_name(char *name)
 	return NULL;
 
     for (i = 0; i < num_others; i++) {
-	if (!strcmp(name, Others[i].name))
+	if (!strcmp(name, Others[i].nick_name))
 	    return &Others[i];
     }
     return NULL;
@@ -1350,7 +1350,7 @@ int Handle_leave(int id)
 	 * Silent about tanks and robots.
 	 */
 	if (other->mychar != 'T' && other->mychar != 'R') {
-	    sprintf(msg, "%s left this world.", other->name);
+	    sprintf(msg, "%s left this world.", other->nick_name);
 	    Add_message(msg);
 	}
 	num_others--;
@@ -1370,15 +1370,15 @@ int Handle_leave(int id)
     return 0;
 }
 
-int Handle_player(int id, int player_team, int mychar, char *player_name,
-		  char *real_name, char *host_name, char *shape,
-		  int myself)
+int Handle_player(int id, int player_team, int mychar,
+		  char *nick_name, char *user_name, char *host_name,
+		  char *shape, int myself)
 {
     other_t		*other;
 
 #ifdef OPTIONHACK
-    warn("Handle player: id=%d, player_name=%s, real_name=%s, host_name=%s",
-	 id, player_name, real_name, host_name);
+    warn("Handle player: id=%d, nick_name=%s, user_name=%s, host_name=%s",
+	 id, nick_name, user_name, host_name);
     warn("myself = %d", myself);
 #endif
 
@@ -1404,7 +1404,7 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
     }
     if (self == NULL
 	&& (myself
-	    || (version < 0x4F10 && strcmp(nickname, player_name) == 0))) {
+	    || (version < 0x4F10 && strcmp(nickname, nick_name) == 0))) {
 	if (other != &Others[0]) {
 	    /* Make `self' the first member of Others[]. */
 	    *other = Others[0];
@@ -1422,10 +1422,10 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
     other->mychar = mychar;
     other->war_id = -1;
     other->name_width = 0;
-    strlcpy(other->name, player_name, sizeof(other->name));
-    strlcpy(other->id_string, player_name, sizeof(other->id_string));
-    strlcpy(other->real, real_name, sizeof(other->real));
-    strlcpy(other->host, host_name, sizeof(other->host));
+    strlcpy(other->nick_name, nick_name, sizeof(other->nick_name));
+    strlcpy(other->id_string, nick_name, sizeof(other->id_string));
+    strlcpy(other->user_name, user_name, sizeof(other->user_name));
+    strlcpy(other->host_name, host_name, sizeof(other->host_name));
     scoresChanged = true;
     other->ship = Convert_shape_str(shape);
     other->ignorelevel = 0;
@@ -1476,7 +1476,7 @@ int Handle_war(int robot_id, int killer_id)
 	return 0;
     }
     robot->war_id = killer_id;
-    sprintf(msg, "%s declares war on %s.", robot->name, killer->name);
+    sprintf(msg, "%s declares war on %s.", robot->nick_name, killer->nick_name);
     Add_message(msg);
     scoresChanged = true;
 
@@ -1499,7 +1499,7 @@ int Handle_seek(int programmer_id, int robot_id, int sought_id)
     }
     robot->war_id = sought_id;
     sprintf(msg, "%s has programmed %s to seek %s.",
-	    programmer->name, robot->name, sought->name);
+	    programmer->nick_name, robot->nick_name, sought->nick_name);
     Add_message(msg);
     scoresChanged = true;
 

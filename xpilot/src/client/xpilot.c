@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
 
     cp = getenv("XPILOTUSER");
     if (cp)
-	strlcpy(connectParam.real_name, cp, sizeof(connectParam.real_name));
+	strlcpy(connectParam.user_name, cp, sizeof(connectParam.user_name));
     else
-	Get_login_name(connectParam.real_name, sizeof(connectParam.real_name) - 1);
+	Get_login_name(connectParam.user_name, sizeof(connectParam.user_name) - 1);
 
     IFWINDOWS( connectParam.disp_name[0] = '\0' );
 
