@@ -1,0 +1,160 @@
+(also check src/client/sdl/TODO)
+Note that for each task there is a developer. If you want to work on any of
+these tasks, ask that developer first, so you can agree on how to proceed.
+
+SOME TASKS TODO FOR XPILOT NG
+-----------------------------
+
+Task: Implement compatibility mode for old clients (block protocol) in server,
+when running a polygon map. For this task, one needs to make sure that the
+number of map objects (e.g. fuel boxes) in the sent mapdata matches the number
+on the map. Note that for checkpoints, some hack might be needed since an
+xp2 map can have more than 26 checkpoints, which is the maximum on old maps.
+Note also that server migth need to rearrange the map objects so that the old
+clients see e.g. the bases in the right order. When this task is done, mapdata
+option support can be removed from xp2 maps. Check file src/server/xpmap.c.
+Developer: kps
+
+Task: Write a select() based frame scheduling in server. Currently an interval
+timer is used, which doesn't give the correct FPS in some cases. If the select
+based frame scheduling works ok, then also the server timerresolution option
+can be removed. Check src/server/sched.c. Note that when there is a server
+freeze it would be good if the players don't get a fast forward after that,
+rather just continue processing frames like nothing happened.
+Developer: kps
+
+Task: After select based server frame scheduling has been implemented,
+implement code that tries to process stuff between frames, so that there is
+a minimum amount of stuff todo when the actual frame update is done.
+Developer: kps
+
+Task: Change hit area of ships to match the default triangle shipshape. You
+need to modify the analytical collision detection code in file
+src/server/collision.c. More difficult task would be to write collision
+detection code for an arbitrary, possibly a concave shape.
+Developer: kps
+
+Task: Make a "physically correct" replacement for the oldthrust hack. This
+could possibly be done by adding an emergency thruster that would activate
+when the ship has turned. Idea with this is that when ship has turned,
+it is assumed the player tries to maneuver, and the emergency thruster
+activates automatically. Reason that extra thruster can't be used all the time
+is either that it would overheat or that it gets its energy from ship turns :)
+Developer: kps
+
+Task: Fix ship maneuverability so that fighting at high fps works as well
+or rather better than it used to work on low fps. This should work on all maps,
+not just on maps that have oldthrust option not equal to zero etc.
+Developer: kps
+
+Task: Extend xpilot ng network protocol so that polygon styles can be changed
+during the game. Current idea is to send to the client the polygon index and
+the new style index for that polygon. This feature can then be used to make
+e.g. polygon cannons disappear.
+Developer: kps
+
+Task: Make wormholes warp other objects than players.
+Developer: kps
+
+Task: Make a newbie friendly default map where newbies can learn the very
+basics of the game. The current idea is to make a conversion of new dark hell.
+For this task, it would be good if wormholes would work and that cannons
+could be made to disappear.
+Developer: throat
+
+Task: Server lag should be minimised, ideally so that when the time comes
+to send the next frame to the clients, the frame could be sent at once,
+or at least so that variance in time between frames is minimised.
+Developer: kps
+
+Task: Make it so that server uses only 1 or 2 ports. Currently server uses
+one contact port and one port per client. In case server is made to use only
+one port, that would mean active clients would use that same port for
+communication. If server is made to use 2 ports, the contact port would be
+reserved for contact stuff and the other port for all clients.
+Developer: kps
+
+Task: Fix server recordings. Currently there are 3 problems. Firstly, the
+ngsteering option which makes thrust use the ship's floating point direction
+instead of one of 128 directions breaks the recording, since it doesn't store
+the floating point direction. Second, the server recodings are not robust.
+In a test game with 6 players, the replay of the recording only worked about
+10 minutes. Thirdly, the recording should be put behind some interface so
+that it doesn't mess up the code too much.
+Developer: kps
+
+Task: Fix elimination race mode and clean up the race related code.
+Developer: kps
+
+Task: Make a new polygon based race map.
+Developer: kps
+
+Task: Write robot code that can control robots on a race map.
+Developer: kps
+
+Task: Rewrite robot navigation so that it isn't block based.
+Developer: kps
+
+Task: Rewrite smart missile navigation so that it isn't block based.
+Developer: kps
+
+Task: Make it so that one can unpause in games with baselesspausing
+without needing to write a team command.
+Developer: kps
+
+Task: Find out if xpilot 4.5.4 has better ship steering than ng. Some
+players have reported this. Possibly it is just because of "client lag".
+Developer: kps
+
+Task: Remove bottlenecks in server. This means using a profiler and trying
+to find ways to speed up processing in places where the server uses a lot
+of time.
+Developer: kps
+
+Task: Make it so that one can use -list command in client even if X is not
+running.
+Developer: kps
+
+Task: Add code that handles the case when some map object reappears on top
+of some object. This can happen for example when a destroyed cannon reappears.
+Developer: kps
+
+Task: Add support for more map objects in mapconvert.py. Also possibly add
+a default texture file for these converted maps.
+Developer: kps
+
+Task: Fix pausing so that player state is reset properly when pausing.
+E.g. your ship should not continue fireing when paused, you should be able
+to use all your items after unpausing etc.
+Developer: kps
+
+Task: Code to make ship push it self away from a wall when turning, "turnpush".
+Developer: throat
+
+Task: Fix ball statistics counter in client so that balls that are cased when
+no enemy is around are not counted.
+Developer: kps
+
+Task: When server op does total reset to start a new match, don't clear scores
+of pausing players.
+Developer: kps
+
+Task: Improve audio support. Add support for "3D" sound where info about
+the sound sources' positions and velocities are sent to clients so that
+stuff like Doppler effect can be done. Note that there should be some
+uncertainty (noise) in the positions and velocities so that this info can't
+be used to make an automatic targetting system.
+Developer: kps
+
+Task: Improve newbie mode, for example automatically change scale factor
+so that the whole visible area is seen if screen resolution is small.
+Developer: kps
+
+Task: Team / base specific starting items / options. This could be used to
+make a polygon version of the Predators vs Marines map. Check
+http://groups.google.ca/groups?q=predators+xpilot&hl=en&lr=&ie=UTF-8&scoring=r&selm=4iu3mg%2462t%40oban.cc.ic.ac.uk&rnum=1
+Developer: kps
+
+Task: Client side prediction, which could be used to reduce lag a bit, possibly
+even allowing local style ship control.
+Developer: kps
