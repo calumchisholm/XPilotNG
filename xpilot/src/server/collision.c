@@ -33,20 +33,6 @@ static bool in_range_acd(double dx, double dy, double dvx, double dvy,
     double	tmin, fminx, fminy;
     double	top, bot;
 
-    /*
-     * Get the wrapped coordinates straight
-     */
-    if (BIT(World.rules->mode, WRAP_PLAY)) {
-	if (dx > World.cwidth / 2)
-	    dx -= World.cwidth;
-	else if (dx < -World.cwidth / 2)
-	    dx += World.cwidth;
-	if (dy > World.cheight / 2)
-	    dy -= World.cheight;
-	else if (dy < -World.cheight / 2)
-	    dy += World.cheight;
-    }
-
     if (dx * dx + dy * dy < r * r)
 	return true;
     top = -(dvx * dx + dvy * dy);
@@ -66,14 +52,6 @@ static bool in_range_simple(int px, int py, int qx, int qy, int r)
 {
     int dx = px - qx, dy = py - qy;
 
-    if (dx > World.cwidth >> 1)
-	dx -= World.cwidth;
-    else if (dx < -World.cwidth >> 1)
-	dx += World.cwidth;
-    if (dy > World.cheight >> 1)
-	dy -= World.cheight;
-    else if (dy < -World.cheight >> 1)
-	dy += World.cheight;
     if ((double)dx * dx + (double)dy * dy < r * r)
 	return true;
     else
@@ -85,20 +63,6 @@ static bool in_range_partial(double dx, double dy, double dvx, double dvy,
 {
     double	tmin, fminx, fminy;
     double	top, bot;
-
-    /*
-     * Get the wrapped coordinates straight
-     */
-    if (BIT(World.rules->mode, WRAP_PLAY)) {
-	if (dx > World.cwidth / 2)
-	    dx -= World.cwidth;
-	else if (dx < -World.cwidth / 2)
-	    dx += World.cwidth;
-	if (dy > World.cheight / 2)
-	    dy -= World.cheight;
-	else if (dy < -World.cheight / 2)
-	    dy += World.cheight;
-    }
 
     top = -(dvx * dx + dvy * dy);
     bot = dvx * dvx + dvy * dvy;
