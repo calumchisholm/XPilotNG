@@ -114,6 +114,7 @@ bool		ballsWallBounce;	/* Do balls bounce off walls? */
 bool		ballCollisions;		/* Do balls participate in colls.? */
 bool		ballSparkCollisions;	/* Do sparks push balls around? */
 bool		asteroidsWallBounce;	/* Do asteroids bounce off walls? */
+bool		pulsesWallBounce;	/* Do laser pulses bounce off walls? */
 bool		cloakedExhaust;		/* Generate exhaust when cloaked? */
 bool		cloakedShield;		/* Allowed to use shields when cloaked? */
 bool		ecmsReprogramMines;	/* Do ecms reprogram mines? */
@@ -1024,6 +1025,16 @@ static option_desc options[] = {
 	valBool,
 	Move_init,
 	"Do asteroids bounce off walls?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"pulsesWallBounce",
+	"pulsesWallBounce",
+	"no",
+	&pulsesWallBounce,
+	valBool,
+	Move_init,
+	"Do laser pulses bounce off walls?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

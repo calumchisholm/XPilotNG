@@ -247,7 +247,7 @@ void Move_init(void)
     if (asteroidsWallBounce) {
 	SET_BIT(mp.obj_bounce_mask, OBJ_ASTEROID);
     }
-    if (1 /* kps ??? */) {
+    if (pulsesWallBounce) {
 	SET_BIT(mp.obj_bounce_mask, OBJ_PULSE);
     }
 
