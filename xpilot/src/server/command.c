@@ -102,6 +102,7 @@ static void Send_info_about_player(player * pl)
     int			i;
 
     for (i = 0; i < observerStart + NumObservers; i++) {
+	player *pl_i;
 	/* hack */
 	if (i == NumPlayers) {
 	    if (!NumObservers) {
@@ -110,11 +111,12 @@ static void Send_info_about_player(player * pl)
 		i = observerStart;
 	    }
 	}
-	if (Players(i)->conn != NOT_CONNECTED) {
-	    Send_player(Players(i)->conn, pl->id);
-	    Send_score(Players(i)->conn, pl->id, pl->score, pl->life,
+	pl_i = Players(i);
+	if (pl_i->conn != NOT_CONNECTED) {
+	    Send_player(pl_i->conn, pl->id);
+	    Send_score(pl_i->conn, pl->id, pl->score, pl->life,
 		       pl->mychar, pl->alliance);
-	    Send_base(Players(i)->conn, pl->id, pl->home_base);
+	    Send_base(pl_i->conn, pl->id, pl->home_base);
 	}
     }
 }
@@ -1052,10 +1054,8 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 	player *pl_i = Players(i);
 
 	if (pl_i->conn != NOT_CONNECTED) {
-	    if (BIT(pl_i->status, PLAYING | PAUSE | GAME_OVER | KILLED)
-		== PLAYING) {
+	    if (Player_is_playing(pl_i))
 		Kill_player(i, false);
-	    }
 	    if (Team_zero_pausing_available()) {
 		sprintf(msg, "%s was pause-swapped by %s.",
 			pl_i->name, pl->name);
