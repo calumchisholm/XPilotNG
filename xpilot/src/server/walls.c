@@ -2891,8 +2891,6 @@ void Turn_player(player_t *pl, bool push)
 	    double inert = pl->mass;
 	    double cx,cy;
 	    static move_t move;
-    	    
-	    /*xpprintf("ans=(%i,%i,%i,%i)\n",ans.line,ans.point,ans.moved.cx,ans.moved.cy);*/
 	    
 	    Player_set_float_dir(pl, (double)pl->dir);
 
@@ -2905,6 +2903,7 @@ void Turn_player(player_t *pl, bool push)
     	    p = Ship_get_point_clpos((shipshape_t *)pl->ship, ans.point, pl->dir);
     	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship, (ans.point + 1)%(((shape_t *)pl->ship)->num_points), pl->dir);
 
+	    /* x,y defines the direction of the line that prevented turning */
 	    if (ans.line != -1) {
 		length = Wrap_length(linet[ans.line].delta.cx,
 				     linet[ans.line].delta.cy);
@@ -2922,12 +2921,15 @@ void Turn_player(player_t *pl, bool push)
 		break;
 	    }
 	    
+	    /* cosine and sine of the line's tangent */
     	    cl = x / l;
     	    sl = y / l;
 
+	    /* cosine and sine of the line's normal */
     	    cln = sl;
     	    sln = -cl;
 
+	    /* pc and ps defines cosine and sine of the point vector */
 	    if (ans.line != -1) {
     	    	l = sqrt(p.cx * p.cx + p.cy * p.cy);
 	    	pc = p.cx / l;
@@ -2940,6 +2942,11 @@ void Turn_player(player_t *pl, bool push)
     	    	ps = cy / l;
 	    }
 		    
+	    /* 
+	     * pdc pds defines cosine and sine of the points direction
+	     * (if it is a wall point, its the direction of the spot
+	     * of the shipline that hit it)
+	     */
     	    if (sign == 1) {
     	    	pdc = -ps;
     	    	pds = pc;
@@ -2948,17 +2955,29 @@ void Turn_player(player_t *pl, bool push)
     	    	pds = -pc;
     	    }
 	    
+	    /* 
+	     * Shipshapes can be hit from the "inside", fixing this
+	     */
 	    if ((ans.line == -1) && ((pdc * cln + pds * sln) > 0)) {
 	    	cln = -cln;
 		sln = -sln;
 	    } 
     	    
+	    /* 
+	     * Push strength depends on burner power, ship mass and
+	     * constantSpeed
+	     */
 	    if (a) {
 		power = AFTER_BURN_POWER(power, a);
 	    }
 
      	    velon = (power / inert)*(1 + options.constantSpeed);
     	    	    
+	    /* 
+	     * If we are approaching the wall that stops our turn we
+	     * need to bounce the ship. (we do this with no movement
+	     * since we just want to bounce it, not move it)
+	     */
     	    if ((pl->vel.x*cln + pl->vel.y*sln) < 0) {
 	    	move.delta.cx = 0;
 	    	move.delta.cy = 0;
@@ -2970,15 +2989,17 @@ void Turn_player(player_t *pl, bool push)
 	    
 	    velot = velon * options.playerWallFriction * ((-pdc) * cl + (-pds) * sl);
 	    
+	    /*
+	     * First store away the old speed vector, then do the turnpush move
+	     * and then restore speed
+	     */
 	    x = pl->vel.x;
 	    y = pl->vel.y;
      	    pl->vel.x = velon * cln + options.turnGrip * velot * cl;
     	    pl->vel.y = velon * sln + options.turnGrip * velot * sl;	    
 	    Move_player(pl);
- 	    pl->vel.x = x + options.turnPushPersistance
-	    	    	* (velon * cln + options.turnGrip * velot * cl);
-	    pl->vel.y = y + options.turnPushPersistance
-	    	    	* (velon * sln + options.turnGrip * velot * sl);
+ 	    pl->vel.x = x + options.turnPushPersistance * pl->vel.x;
+	    pl->vel.y = y + options.turnPushPersistance * pl->vel.y;
 	    
 	    break;
 	}
