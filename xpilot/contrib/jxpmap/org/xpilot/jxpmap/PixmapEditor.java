@@ -18,7 +18,8 @@ import java.awt.event.ActionEvent;
 
 public class PixmapEditor extends EditorPanel {
     
-    private static File lastSelection;
+    private static File lastSelection = 
+        new File(System.getProperty("user.dir"));
 
     private Pixmap pixmap;
     private JTextField nameField;
@@ -28,7 +29,6 @@ public class PixmapEditor extends EditorPanel {
         setTitle("Image");
         this.pixmap = pixmap;
         setLayout(new BorderLayout(5, 5));
-        
         nameField = new JTextField(10);
         if (pixmap.getFileName() != null)
             nameField.setText(pixmap.getFileName());

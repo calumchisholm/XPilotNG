@@ -25,6 +25,8 @@ import java.util.Map;
 
 public class MapPolygon extends MapObject {
 
+    private static final Stroke SELECTED_STROKE = new BasicStroke(1);
+    
     protected Polygon polygon;
     protected PolygonStyle style;
     protected ArrayList edgeStyles;
@@ -231,9 +233,11 @@ public class MapPolygon extends MapObject {
         if (!style.isVisible()) return;
 
         Polygon p = polygon;
+        boolean fastRendering =
+            g.getRenderingHint(RenderingHints.KEY_RENDERING)
+            == RenderingHints.VALUE_RENDER_SPEED;
 
-        if (g.getRenderingHint(RenderingHints.KEY_RENDERING)
-        != RenderingHints.VALUE_RENDER_SPEED) {
+        if (!fastRendering) {
             if (style.getFillStyle() == PolygonStyle.FILL_COLOR) {
                 g.setColor(style.getColor());
                 g.fillPolygon(p);
@@ -287,6 +291,19 @@ public class MapPolygon extends MapObject {
                 }
             }
         }
+        
+        if (!fastRendering && isSelected()) {
+            g.setStroke(SELECTED_STROKE);
+            g.setColor(Color.white);
+            int sz = (int)(20 / scale);
+            int off = sz / 2;
+            for (int i = 0; i < p.npoints; i++) {
+                g.drawArc(
+                    p.xpoints[i] - off,
+                    p.ypoints[i] - off,
+                    sz, sz, 0, 360);
+            }
+        }
     }
 
 
@@ -327,6 +344,7 @@ public class MapPolygon extends MapObject {
                             (wp.x, wp.y, pl.xpoints[i], 
                              pl.ypoints[i]) < thresholdSq) {
                             
+                            canvas.setSelectedObject(this);
                             if (canvas.isErase()) {
                                 canvas.removePolygonPoint(this, i);
                             } else {
@@ -351,6 +369,7 @@ public class MapPolygon extends MapObject {
                                                pl.ypoints[ni],
                                                wp.x, wp.y) < thresholdSq) {
                             
+                            canvas.setSelectedObject(this);
                             if ((me.getModifiers() & 
                                  InputEvent.BUTTON1_MASK) != 0) {
                                 

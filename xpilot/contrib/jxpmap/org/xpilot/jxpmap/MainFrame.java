@@ -45,7 +45,6 @@ public class MainFrame extends JFrame implements ActionListener {
     private BshConsole bshConsole;
 
     public MainFrame () {
-
         super("jXPMap Editor");
         canvas = new MapCanvas();
         getContentPane().add(canvas, BorderLayout.CENTER);
@@ -377,7 +376,7 @@ public class MainFrame extends JFrame implements ActionListener {
     
     private void openMap () {
         
-        JFileChooser fc = new JFileChooser(mapFile);
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (mapFile != null) fc.setSelectedFile(mapFile);
         if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
         
@@ -401,7 +400,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
     private void saveMap () {
-        JFileChooser fc = new JFileChooser(mapFile);
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (mapFile != null) fc.setSelectedFile(mapFile);
         if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
@@ -421,7 +420,7 @@ public class MainFrame extends JFrame implements ActionListener {
     
     
     private void importXml () {
-        JFileChooser fc = new JFileChooser(mapFile);
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
         File f = fc.getSelectedFile();
         if (f == null) return;
@@ -454,7 +453,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     private void exportXml () {
-        JFileChooser fc = new JFileChooser(mapFile);
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
         File f = fc.getSelectedFile();

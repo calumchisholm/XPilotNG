@@ -32,6 +32,7 @@ public class MapCanvas extends JComponent {
     private UndoManager undoManager;
     private MapEdit currentEdit;
     private boolean fastRendering;
+    private MapObject selected;
 
     public MapCanvas() {
 
@@ -65,6 +66,17 @@ public class MapCanvas extends JComponent {
     
     public boolean isFastRendering() {
         return this.fastRendering;
+    }
+    
+    public MapObject getSelectedObject() {
+        return selected;
+    }
+    
+    public void setSelectedObject(MapObject object) {
+        if (selected != null) selected.setSelected(false);
+        selected = object;
+        if (selected != null) 
+            selected.setSelected(true);
     }
 
     public void setModel(MapModel m) {
@@ -437,6 +449,24 @@ public class MapCanvas extends JComponent {
         });
     }
     
+    public void setBallProperties(
+        final Ball b,
+        final int newTeam,
+        final PolygonStyle newStyle) {
+        final int oldTeam = b.getTeam();
+        final PolygonStyle oldStyle = b.getStyle();
+        doEdit(new AbstractMapEdit() {
+            public void unedit() {
+                b.setTeam(oldTeam);
+                b.setStyle(oldStyle);                
+            }
+            public void edit() {
+                b.setTeam(newTeam);
+                b.setStyle(newStyle);
+            }
+        });
+    }
+    
     public void setGravProperties(
         final Grav grav,
         final int newType,
@@ -716,6 +746,7 @@ public class MapCanvas extends JComponent {
                 }
             }
             
+            setSelectedObject(null);
             setFastRendering(true);
         }
 

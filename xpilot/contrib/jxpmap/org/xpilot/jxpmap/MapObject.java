@@ -25,6 +25,7 @@ public abstract class MapObject extends ModelObject {
     protected Image img;
     protected MapObjectPopup popup;
     protected int team;
+    protected boolean selected;
     
     public Object deepClone (Map context) {
         MapObject clone = (MapObject)super.deepClone(context);
@@ -69,6 +70,13 @@ public abstract class MapObject extends ModelObject {
         } 
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+    
+    public void setSelected(boolean value) {
+        this.selected = value;
+    }
 
     public int getTeam () {
         return team;
@@ -173,6 +181,7 @@ public abstract class MapObject extends ModelObject {
                             canvas.setCanvasEventHandler(
                                 copy().new CopyHandler(me));
                         } else {
+                            canvas.setSelectedObject(this);
                             canvas.setCanvasEventHandler(new MoveHandler(me));
                         }
                     }

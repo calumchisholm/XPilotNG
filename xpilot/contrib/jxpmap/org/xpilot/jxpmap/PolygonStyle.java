@@ -104,10 +104,11 @@ public class PolygonStyle extends ModelObject {
         out.print("<PolyStyle id=\"");
         out.print(id);
 
-        if (fillStyle == FILL_COLOR && color != null) {
+        if (color != null) {
             out.print("\" color=\"");
             out.print(toRgb(color));
-        } else if (fillStyle == FILL_TEXTURED && texture != null) {
+        }
+        if (fillStyle == FILL_TEXTURED && texture != null) {
             out.print("\" texture=\"");
             out.print(texture.getFileName());
         }
@@ -128,6 +129,15 @@ public class PolygonStyle extends ModelObject {
         if (!isVisible()) flags |= 4;
         if (!isVisibleInRadar()) flags |= 8;
         return flags;
+    }
+    
+    
+    public void parseFlags (int flags) {
+        fillStyle = FILL_NONE;
+        if ((flags & 1) != 0) fillStyle = FILL_COLOR;
+        if ((flags & 2) != 0) fillStyle = FILL_TEXTURED;
+        if ((flags & 4) != 0) setVisible(false);
+        if ((flags & 8) != 0) setVisibleInRadar(false);
     }
 
     

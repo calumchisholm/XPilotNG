@@ -297,7 +297,7 @@ public class MapModel extends ModelObject {
         StringWriter w = new StringWriter();
         PrintWriter out = new PrintWriter(w);
         
-        out.println("<XPilotMap>");        
+        out.println("<XPilotMap version=\"1.1\">");  
         options.printXml(out);
         for (Iterator iter = pixmaps.iterator(); iter.hasNext();) {
             Pixmap p = (Pixmap)iter.next();
@@ -319,18 +319,21 @@ public class MapModel extends ModelObject {
         return w.toString();        
     }
 
+    private interface MapTag {
+        public MapObject toMapObject() throws SAXException;
+    }   
 
     private class MapDocumentHandler extends DefaultHandler {
 
-        private List polys;
-        private Poly poly;
+        private List tags;
+        private PolyTag poly;
         private Map pstyles;
         private Map bstyles;
         private Map estyles;
         private Map opMap;
 
         public MapDocumentHandler () {
-            polys = new ArrayList();
+            tags = new ArrayList();
             estyles = new HashMap();
             estyles.put("internal", edgeStyles.get(0));
             pstyles = new HashMap();
@@ -348,7 +351,7 @@ public class MapModel extends ModelObject {
             try {
                 if (name.equalsIgnoreCase("polygon")) {
                     
-                    if (poly == null) poly = new Poly();
+                    if (poly == null) poly = new PolyTag();
                     poly.style = atts.getValue("style");
                    
                     poly.points.add(new PolyPoint
@@ -425,17 +428,15 @@ public class MapModel extends ModelObject {
                     MapObject o = SimpleMapObject.createFuel();
                     Rectangle r = o.getBounds();
                     o.moveTo(x - r.width / 2, y - r.height / 2);
-                    addToFront(o);
+                    tags.add(new ObjectTag(o));
 
                 } else if (name.equalsIgnoreCase("ball")) {
 
                     int x = Integer.parseInt(atts.getValue("x"));
                     int y = Integer.parseInt(atts.getValue("y"));
                     int team = Integer.parseInt(atts.getValue("team"));
-                    Ball o = new Ball(x, y, team);
-                    Rectangle r = o.getBounds();
-                    o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addToFront(o);
+                    String style = atts.getValue("style");
+                    tags.add(new BallTag(x, y, team, style));
 
                 } else if (name.equalsIgnoreCase("base")) {
 
@@ -446,7 +447,7 @@ public class MapModel extends ModelObject {
                     Base o = new Base(x, y, dir, team);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addToFront(o);
+                    tags.add(new ObjectTag(o));
 
                 } else if (name.equalsIgnoreCase("check")) {
 
@@ -455,7 +456,7 @@ public class MapModel extends ModelObject {
                     MapObject o = SimpleMapObject.createCheck();
                     Rectangle r = o.getBounds();
                     o.moveTo(x - r.width / 2, y - r.height / 2);
-                    addToFront(o);
+                    tags.add(new ObjectTag(o));
                     
                 } else if (name.equalsIgnoreCase("itemconcentrator")) {
 
@@ -464,7 +465,7 @@ public class MapModel extends ModelObject {
                     MapObject o = SimpleMapObject.createItemConcentrator();
                     Rectangle r = o.getBounds();
                     o.moveTo(x - r.width / 2, y - r.height / 2);
-                    addToFront(o);
+                    tags.add(new ObjectTag(o));
 
                 } else if (name.equalsIgnoreCase("asteroidconcentrator")) {
 
@@ -473,7 +474,7 @@ public class MapModel extends ModelObject {
                     MapObject o = SimpleMapObject.createAsteroidConcentrator();
                     Rectangle r = o.getBounds();
                     o.moveTo(x - r.width / 2, y - r.height / 2);
-                    addToFront(o);
+                    tags.add(new ObjectTag(o));
                     
                 } else if (name.equalsIgnoreCase("grav")) {
 
@@ -484,7 +485,7 @@ public class MapModel extends ModelObject {
                     Grav grav = new Grav(x, y, type, force);
                     Rectangle r = grav.getBounds();
                     grav.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addToFront(grav);
+                    tags.add(new ObjectTag(grav));
 
                 } else if (name.equalsIgnoreCase("wormhole")) {
 
@@ -494,27 +495,27 @@ public class MapModel extends ModelObject {
                     Wormhole hole = new Wormhole(x, y, type);
                     Rectangle r = hole.getBounds();
                     hole.moveTo(r.x - r.width / 2, r.y - r.height / 2);
-                    addToFront(hole);
+                    tags.add(new ObjectTag(hole));
 
                 } else if (name.equalsIgnoreCase("ballarea")) {
 
-                    poly = new Poly();
+                    poly = new PolyTag();
                     poly.type = 1;
 
                 } else if (name.equalsIgnoreCase("balltarget")) {
 
-                    poly = new Poly();
+                    poly = new PolyTag();
                     poly.type = 2;
                     poly.team = Integer.parseInt(atts.getValue("team"));
 
                 } else if (name.equalsIgnoreCase("decor")) {
                     
-                    poly = new Poly();
+                    poly = new PolyTag();
                     poly.type = 3;
 
                 } else if (name.equalsIgnoreCase("cannon")) {
                     
-                    poly = new Poly();
+                    poly = new PolyTag();
                     poly.type = 4;
                     String tmp = atts.getValue("team");
                     poly.team = (tmp != null) ? Integer.parseInt(tmp) : -1;
@@ -524,7 +525,7 @@ public class MapModel extends ModelObject {
                     
                 } else if (name.equalsIgnoreCase("target")) {
                     
-                    poly = new Poly();
+                    poly = new PolyTag();
                     poly.type = 5;
                     poly.team = Integer.parseInt(atts.getValue("team"));
                     
@@ -541,7 +542,7 @@ public class MapModel extends ModelObject {
             throws SAXException {
             try {
                 if (name.equalsIgnoreCase("polygon")) {
-                    polys.add(poly);
+                    tags.add(poly);
                     poly = null;
                 }
             } catch (Exception e) {
@@ -553,9 +554,8 @@ public class MapModel extends ModelObject {
     
         public void endDocument () throws SAXException {
             try {
-
                 options = new MapOptions(opMap);
-                
+
                 for (Iterator iter = pstyles.values().iterator(); 
                      iter.hasNext();) {
 
@@ -563,20 +563,10 @@ public class MapModel extends ModelObject {
 
                     PolygonStyle style = new PolygonStyle();
                     style.setId(ps.id);
-                    style.setVisible(true);
-                    style.setVisibleInRadar(true);
-                    
-                    if (ps.textureId != null) {
+                    if (ps.color != null) style.setColor(ps.color);      
+                    if (ps.textureId != null) 
                         style.setTexture((Pixmap)bstyles.get(ps.textureId));
-                        style.setFillStyle(PolygonStyle.FILL_TEXTURED);
-
-                    } else if (ps.color != null) {
-                        style.setColor(ps.color);
-                        style.setFillStyle(PolygonStyle.FILL_COLOR);
-
-                    } else {
-                        style.setFillStyle(PolygonStyle.FILL_NONE);
-                    }
+                    style.parseFlags(ps.flags);
                     
                     LineStyle ls = (LineStyle)estyles.get(ps.defEdgeId);
                     if (ls == null)
@@ -588,76 +578,9 @@ public class MapModel extends ModelObject {
                     ps.ref = style;
                 }
 
-                for (Iterator iter = polys.iterator(); iter.hasNext();) {
-
-                    Poly p = (Poly)iter.next();
-                    
-                    PolyStyle ps = (PolyStyle)pstyles.get(p.style);
-                    if (ps == null) 
-                        throw new SAXException
-                            ("Undefined polygon style: " + p.style);
-                    PolygonStyle style = ps.ref;
-
-                    LineStyle defls = style.getDefaultEdgeStyle();
-                    ArrayList edges = p.hasSpecialEdges ? 
-                        new ArrayList() : null;
-                    Polygon awtp = new Polygon();
-                    
-                    Iterator i2 = p.points.iterator();
-                    PolyPoint pnt = (PolyPoint)i2.next();
-                    int x = pnt.x;
-                    int y = pnt.y;
-                    awtp.addPoint(x, y);
-                    
-                    // Current line style. 
-                    // Using null to indicate default.
-                    LineStyle cls = null;
-
-                    while (i2.hasNext()) {
-
-                        pnt = (PolyPoint)i2.next();
-
-                        // last point is not needed
-                        if (i2.hasNext()) {
-                            x += pnt.x;
-                            y += pnt.y;
-                            awtp.addPoint(x, y);
-                        }
-
-                        if (edges != null) {
-                            if (pnt.style != null) {
-                                cls = (LineStyle)estyles.get(pnt.style);
-                                if (cls == null)
-                                    throw new SAXException
-                                        ("Undefined edge style: " + pnt.style);
-                                if (cls == defls) cls = null;
-                            }
-                            edges.add(cls);
-                        }
-                    }
-                    
-                    switch(p.type) {
-                        case 1: 
-                            addToFront(new BallArea(awtp, style, edges)); 
-                            break;
-                        case 2: 
-                            addToFront(new BallTarget(awtp, style, edges, p.team)); 
-                            break;
-                        case 3: 
-                            addToFront(new Decoration(awtp, style, edges)); 
-                            break;
-                        case 4: 
-                            addToFront(new Cannon(awtp, style, edges, p.team, p.x, p.y, p.dir)); 
-                            break;
-                        case 5: 
-                            addToFront(new Target(awtp, style, edges, p.team)); 
-                            break;
-                        default:
-                            addToFront(new MapPolygon(awtp, style, edges)); 
-                            break;
-                    }
+                for (Iterator i = tags.iterator(); i.hasNext();) {
+                    addToFront(((MapTag)i.next()).toMapObject());
                 }
-
                 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -667,17 +590,91 @@ public class MapModel extends ModelObject {
 
 
         // Utility classes used during parsing
+        
+        private class ObjectTag implements MapTag {
+            
+            private MapObject o;
+            
+            ObjectTag(MapObject o) {
+                this.o = o;
+            }
+            
+            public MapObject toMapObject() {
+                return o;
+            }
+        }
 
-        private class Poly {
+        private class PolyTag implements MapTag {
+            
             String style;
             List points;
             int type, team, dir, x, y;
             boolean hasSpecialEdges;
-            public Poly() {
+            
+            PolyTag() {
                 points = new ArrayList();
             }
-        }
+            
+            public MapObject toMapObject() throws SAXException {
+                PolyStyle ps = (PolyStyle)pstyles.get(style);
+                if (ps == null) 
+                    throw new SAXException
+                        ("Undefined polygon style: " + style);
+                        
+                LineStyle defls = ps.ref.getDefaultEdgeStyle();
+                ArrayList edges = hasSpecialEdges ? new ArrayList() : null;
+                Polygon awtp = new Polygon();
+                
+                Iterator i2 = points.iterator();
+                PolyPoint pnt = (PolyPoint)i2.next();
+                int x = pnt.x;
+                int y = pnt.y;
+                awtp.addPoint(x, y);
+                
+                // Current line style. 
+                // Using null to indicate default.
+                LineStyle cls = null;
 
+                while (i2.hasNext()) {
+
+                    pnt = (PolyPoint)i2.next();
+
+                    // last point is not needed
+                    if (i2.hasNext()) {
+                        x += pnt.x;
+                        y += pnt.y;
+                        awtp.addPoint(x, y);
+                    }
+
+                    if (edges != null) {
+                        if (pnt.style != null) {
+                            cls = (LineStyle)estyles.get(pnt.style);
+                            if (cls == null)
+                                throw new SAXException
+                                    ("Undefined edge style: " + pnt.style);
+                            if (cls == defls) cls = null;
+                        }
+                        edges.add(cls);
+                    }
+                }
+                
+                switch(type) {
+                    case 1: 
+                        return new BallArea(awtp, ps.ref, edges); 
+                    case 2: 
+                        return new BallTarget(awtp, ps.ref, edges, team); 
+                    case 3: 
+                        return new Decoration(awtp, ps.ref, edges); 
+                    case 4: 
+                        return new Cannon(awtp, ps.ref, edges, team, x, y, dir); 
+                    case 5: 
+                        return new Target(awtp, ps.ref, edges, team); 
+                    default:
+                        return new MapPolygon(awtp, ps.ref, edges); 
+                }                
+            }
+        }
+        
 
         private class PolyPoint {
             int x;
@@ -707,6 +704,35 @@ public class MapModel extends ModelObject {
                 this.textureId = textureId;
                 this.defEdgeId = defEdgeId;
                 this.flags = flags;
+            }
+        }
+        
+        private class BallTag implements MapTag {
+            int x;
+            int y;
+            int team;
+            String style;
+            
+            BallTag(int x, int y, int team, String style) {
+                this.x = x;
+                this.y = y;
+                this.team = team;
+                this.style = style;
+            }
+            
+            public MapObject toMapObject() throws SAXException {
+                PolygonStyle pstyle = null;
+                if (style != null) {
+                    PolyStyle ps = (PolyStyle)pstyles.get(style);
+                    if (ps == null) 
+                        throw new SAXException
+                            ("Undefined polygon style: " + style);
+                    pstyle = ps.ref;
+                }
+                MapObject o = new Ball(x, y, team, pstyle);
+                Rectangle r = o.getBounds();
+                o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
+                return o;
             }
         }
     }
