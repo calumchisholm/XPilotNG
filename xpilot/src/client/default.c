@@ -21,7 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 #  include "xpclient.h"
 #else
 #  include "xpclient_x11.h"
@@ -32,7 +32,7 @@ char default_version[] = VERSION;
 char myName[] = "xpilot";
 char myClass[] = "XPilot";
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
 /*
  * kps TODO:
@@ -1103,18 +1103,9 @@ void Store_default_options(void)
 
 
 
-#else /* OPTIONHACK */
+#else
 
 
-
-
-
-
-
-
-
-
-/*#ifndef OPTIONHACK*/
 
 cl_option_t options[];
 
@@ -4708,4 +4699,4 @@ void	defaultCleanup(void)
 }
 
 
-#endif /* OPTIONHACK */
+#endif /* OLD_OPTIONS */

@@ -26,11 +26,11 @@
 
 #include "option.h"
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 void Store_default_options(void);
 #endif
 
-#ifndef OPTIONHACK
+#ifdef OLD_OPTIONS
 typedef struct {
     const char		*name;		/* option name */
     const char		*noArg;		/* value for non-argument options */

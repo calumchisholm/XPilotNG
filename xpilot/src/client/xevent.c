@@ -38,12 +38,11 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
     keys_t ret = KEY_DUMMY;
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
     ret = Generic_lookup_key((xp_keysym_t)ks, reset);
 
-
-#else /* ! OPTIONHACK */
+#else
     static int i = 0;
 
     (void)event;
@@ -89,7 +88,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	}
     }
 #endif
-#endif /* OPTIONHACK */
+#endif /* OLD_OPTIONS */
 
     IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
 
@@ -283,7 +282,7 @@ bool Key_press_toggle_fullscreen(void)
 
 void Key_event(XEvent *event)
 {
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
     KeySym ks;
 
     if ((ks = XLookupKeysym(&event->xkey, 0)) == NoSymbol)

@@ -25,7 +25,7 @@
 
 char option_version[] = VERSION;
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
 
 int num_options = 0;

@@ -123,7 +123,7 @@ struct xp_option {
 
 /* number of options in global option array */
 extern int num_options;
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 extern xp_option_t *options;
 #endif
 
@@ -158,7 +158,7 @@ void Store_option(xp_option_t *);
 	Store_option(& (option_array) [ii]); \
 } \
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 static inline const char *Option_get_name(xp_option_t *opt)
 {
     assert(opt);

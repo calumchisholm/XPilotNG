@@ -1107,7 +1107,7 @@ void Init_spark_colors(void)
 }
 
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
 static bool Spark_colors_setfunc (xp_option_t *opt, const char *val)
 {
@@ -1713,5 +1713,5 @@ void Store_color_options(void)
 }
 
 
-#endif /* OPTIONHACK */
+#endif /* OLD_OPTIONS */
 

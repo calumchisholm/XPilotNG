@@ -374,7 +374,7 @@ int Talk_macro(int i)
     return 0;
 }
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
 static inline int index_by_option(xp_option_t *opt)
 {
@@ -451,7 +451,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg5",
-	"",
+	"***    BALL! Our ball is gone! Save it!   ***",
 	NULL, 0,
 	Set_talk_macro,
 	Get_talk_macro,
@@ -459,7 +459,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg6",
-	"",
+	"*** SAFE! Our ball is safe. ***",
 	NULL, 0,
 	Set_talk_macro,
 	Get_talk_macro,
@@ -467,7 +467,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg7",
-	"",
+	"*** COVER! The enemy ball is approaching our base. ***",
 	NULL, 0,
 	Set_talk_macro,
 	Get_talk_macro,
@@ -475,7 +475,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg8",
-	"",
+	"*** POP! The enemy ball is back at the enemy base. ***",
 	NULL, 0,
 	Set_talk_macro,
 	Get_talk_macro,

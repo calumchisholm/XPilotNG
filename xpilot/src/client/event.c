@@ -415,7 +415,7 @@ void Pointer_button_released(int button)
 }
 
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
 void Keyboard_button_pressed(xp_keysym_t ks)
 {
@@ -1086,7 +1086,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keySendMsg11",
-	"",
+	"", /* F11 is keyToggleFullScreen now */
 	KEY_MSG_11,
 	"Sends the talkmessage stored in msg11.\n"),
 

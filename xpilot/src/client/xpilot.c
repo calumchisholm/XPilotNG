@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     connectParam.contact_port = SERVER_PORT;
     connectParam.team = TEAM_NOT_SET;
 
-#ifndef OPTIONHACK
+#ifdef OLD_OPTIONS
     *hostname = 0;
     cp = getenv("XPILOTHOST");
     if (cp)
@@ -105,11 +105,11 @@ int main(int argc, char *argv[])
 	strlcpy(connectParam.user_name, cp, sizeof(connectParam.user_name));
     else
 	Get_login_name(connectParam.user_name, sizeof(connectParam.user_name));
-#endif /* OPTIONHACK */
+#endif
 
     IFWINDOWS( connectParam.disp_name[0] = '\0' );
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
     /*Set_key_binding_callback(Key_binding_callback);*/
     Store_default_options();
     Store_talk_macro_options();
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 
     /*strcpy(clientname,connectParam.nick_name); */
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
     /*Usage();*/
     Handle_x_options();
 #endif

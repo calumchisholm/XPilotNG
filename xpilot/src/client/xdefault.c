@@ -36,7 +36,7 @@ static bool testxafter = false;
 static bool testxcolors = false;
 #endif /* DEVELOPMENT */
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
 
 #define DISPLAY_ENV	"DISPLAY"

@@ -908,7 +908,7 @@ void Record_init(const char *filename)
 }
 
 
-#ifdef OPTIONHACK
+#ifndef OLD_OPTIONS
 
 static bool setRecordFile(xp_option_t *opt, const char *value)
 {
