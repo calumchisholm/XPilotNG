@@ -74,7 +74,7 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 static char msg[MSG_LEN];
 
 
-static void Transport_to_home(int ind)
+static void Transport_to_home(player *pl)
 {
     /*
      * Transport a corpse from the place where it died back to its homebase,
@@ -84,7 +84,6 @@ static void Transport_to_home(int ind)
      * acceleration G, during the second part we make this a negative one -G.
      * This results in a visually pleasing take off and landing.
      */
-    player		*pl = Players(ind);
     int			cx, cy;
     DFLOAT		dx, dy, t, m;
     const int		T = RECOVERY_DELAY;
@@ -914,7 +913,7 @@ void Update_objects(void)
 	    pl->count -= timeStep;
 	    if (pl->count > 0) {
 		if (!BIT(pl->status, PLAYING)) {
-		    Transport_to_home(i);
+		    Transport_to_home(pl);
 		    Move_player(pl);
 		    continue;
 		}
