@@ -437,10 +437,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 	    if (BIT(obj->type, OBJ_ITEM)) {
 		Cannon_add_item(c, obj->info, obj->count);
 	    } else {
-		player *pl = NULL;
-
-		if (obj->id != NO_ID)
-		    pl = Player_by_id(obj->id);
+		player *pl = Player_by_id(obj->id);
 
 		if (!BIT(c->used, HAS_EMERGENCY_SHIELD)) {
 		    if (c->item[ITEM_ARMOR] > 0)
@@ -722,30 +719,23 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 	return 0;
     }
 
-    /* kps hack */
     if (type == TARGET) {
 	obj->life = 0;
 	Object_hits_target(obj, &World.targets[item_id], -1);
 	return 0;
     }
-    /* kps hack */
 
-    /* kps hack */
     if (type == CANNON) {
 	Object_crash(obj, move, CrashCannon, item_id);
 	return 0;
     }
-    /* kps hack */
 
-#if 1
-    /* kps hack */
+    /* kps - wormhole polygons disabled */
     if (type == WORMHOLE) {
-	/* kps - ??? */
 	Object_crash(obj, move, CrashWormHole, item_id);
 	return 0;
     }
-    /* kps hack */
-#endif
+
     if (!BIT(mp.obj_bounce_mask, obj->type)) {
 	obj->life = 0;
 	return 0;
@@ -842,19 +832,15 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	return;
     }
 
-    /* kps hack */
     if (type == WORMHOLE) {
 	Player_crash(pl, move, CrashWormHole, item_id, 1);
 	return;
     }
-    /* kps hack */
 
-    /* kps hack */
     if (type == CANNON) {
 	Player_crash(pl, move, CrashCannon, item_id, 1);
 	return;
     }
-    /* kps hack */
 
     pl->last_wall_touch = frame_loops;
     {
