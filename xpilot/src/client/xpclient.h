@@ -26,21 +26,37 @@
 
 #include "xpcommon.h"
 
-#include <zlib.h>
-
-#ifndef _WINDOWS
-# include <X11/X.h>
-# include <X11/Xlib.h>
-# include <X11/Xos.h>
-# include <X11/Xutil.h>
-# include <X11/keysym.h>
-# include <X11/Xatom.h>
-# include <X11/Xmd.h>
-# include <X11/Xresource.h>
-# ifdef	__apollo
-#  include <X11/ap_keysym.h>
-# endif
+#ifdef HAVE_ZLIB_H
+#  include <zlib.h>
+#else
+#  error "Header zlib.h missing. Please install zlib."
 #endif
+
+#ifdef HAVE_X11_X_H
+#  include <X11/X.h>
+#endif
+#ifdef HAVE_X11_XLIB_H
+#  include <X11/Xlib.h>
+#endif
+#ifdef HAVE_X11_XOS_H
+#  include <X11/Xos.h>
+#endif
+#ifdef HAVE_X11_XUTIL_H
+#  include <X11/Xutil.h>
+#endif
+#ifdef HAVE_X11_KEYSYM_H
+#  include <X11/keysym.h>
+#endif
+#ifdef HAVE_X11_XATOM_H
+#  include <X11/Xatom.h>
+#endif
+#ifdef HAVE_X11_XMD_H
+#  include <X11/Xmd.h>
+#endif
+#ifdef HAVE_X11_XRESOURCE_H
+#  include <X11/Xresource.h>
+#endif
+
 
 #ifdef _WINDOWS
 # include "NT/winBitmap.h"

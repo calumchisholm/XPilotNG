@@ -27,15 +27,16 @@
 #define SERVER
 #include "xpcommon.h"
 
-/*#include <crypt.h>*/
-#include <expat.h>
+#ifdef HAVE_EXPAT_H
+#  include <expat.h>
+#endif
 
 #ifdef PLOCKSERVER
-# if defined(__linux__)
-#  include <sys/mman.h>
-# else
-#  include <sys/lock.h>
-# endif
+#  ifdef HAVE_SYS_MMAN_H
+#    include <sys/mman.h>
+#  elif defined HAVE_SYS_LOCK_H
+#    include <sys/lock.h>
+#  endif
 #endif
 
 #include "asteroid.h"

@@ -23,7 +23,6 @@
 
 #include "xpclient.h"
 
-
 char dbuff_version[] = VERSION;
 
 
@@ -43,7 +42,7 @@ static void dbuff_release(dbuff_state_t *state)
 #ifdef MBX
 	if (state->type == MULTIBUFFER
 	    && state->colormap_index != 2)
-	    XmbufDestroyBuffers(state->display, draw);
+	    XmbufDestroyBuffers(state->display, drawWindow);
 #endif
 
 	free(state);
@@ -174,8 +173,7 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
 		return NULL;
 	    }
 	}
-    }
-    else {
+    } else {
 	colorarray[WHITE].pixel = WhitePixel(display, DefaultScreen(display));
 	colorarray[BLACK].pixel = BlackPixel(display, DefaultScreen(display));
 	colorarray[BLUE].pixel  = WhitePixel(display, DefaultScreen(display));
@@ -193,12 +191,11 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
 
     state->drawing_planes = state->drawing_plane_masks[state->colormap_index];
 
-    if (state->type == COLOR_SWITCH) {
+    if (state->type == COLOR_SWITCH)
 	XStoreColors(state->display,
 		     state->xcolormap,
 		     state->colormaps[state->colormap_index],
 		     state->colormap_size);
-    }
 
     return state;
 }
@@ -210,7 +207,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
     if (state->type == MULTIBUFFER) {
 	if (state->colormap_index == 2) {
 	    state->colormap_index = 0;
-	    if (XmbufCreateBuffers(state->display, draw, 2,
+	    if (XmbufCreateBuffers(state->display, drawWindow, 2,
 				   MultibufferUpdateActionUndefined,
 				   MultibufferUpdateHintFrequent,
 				   state->mbx.mbx_draw) != 2) {
@@ -226,7 +223,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
 	    state->colormap_index = 0;
 	    state->dbe.dbe_draw =
 		XdbeAllocateBackBufferName(state->display,
-					   draw,
+					   drawWindow,
 					   XdbeBackground);
 	    if (state->dbe.dbe_draw == 0) {
 		perror("Couldn't create double buffering back buffer");
@@ -258,7 +255,7 @@ void dbuff_switch(dbuff_state_t *state)
     else if (state->type == MULTIBUFFER) {
 	XdbeSwapInfo		swap;
 
-	swap.swap_window	= draw;
+	swap.swap_window	= drawWindow;
 	swap.swap_action	= XdbeBackground;
 	if (!XdbeSwapBuffers(state->display, &swap, 1)) {
 	    perror("XdbeSwapBuffers failed");

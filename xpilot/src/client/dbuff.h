@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -25,19 +24,25 @@
 #ifndef	DBUFF_H
 #define	DBUFF_H
 
+#include "xpcommon.h"
+
 #ifdef DBE
-# include <X11/extensions/Xdbe.h>
-# undef MBX
+#  ifdef HAVE_X11_EXTENSIONS_XDBE_H
+#    include <X11/extensions/Xdbe.h>
+#  endif
+#  undef MBX
 #else
-# undef XdbeBackBuffer
-# define XdbeBackBuffer	unsigned int
+#  undef XdbeBackBuffer
+#  define XdbeBackBuffer	unsigned int
 #endif
 
 #ifdef MBX
-# include <X11/extensions/multibuf.h>
+#  ifdef HAVE_X11_EXTENSIONS_MULTIBUF_H
+#    include <X11/extensions/multibuf.h>
+#  endif
 #else
-# undef Multibuffer
-# define Multibuffer	unsigned int
+#   undef Multibuffer
+#   define Multibuffer	unsigned int
 #endif
 
 
@@ -92,10 +97,10 @@ void end_dbuff(dbuff_state_t *state);
 void dbuff_list(Display *display);
 
 #ifndef MBX
-# undef Multibuffer
+#  undef Multibuffer
 #endif
 #ifndef DBE
-# undef XdbeBackBuffer
+#  undef XdbeBackBuffer
 #endif
 
 #endif

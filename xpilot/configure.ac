@@ -22,7 +22,7 @@ fi])
 AC_ARG_ENABLE(mbx,
 	AC_HELP_STRING([--enable-mbx],
 			[support for X Multibuffer Extension in client]),
-[if test $enable_dbe = yes; then
+[if test $enable_mbx = yes; then
 	AC_DEFINE([MBX], 1, [support for X Multibuffer Extension in client])
 fi])
 
@@ -90,6 +90,7 @@ AC_CHECK_HEADERS([ \
 	bstring.h \
 	ctype.h \
 	errno.h \
+	expat.h \
 	fcntl.h \
 	float.h \
 	limits.h \
@@ -109,11 +110,24 @@ AC_CHECK_HEADERS([ \
 	sys/fcntl.h \
 	sys/inttypes.h \
 	sys/ioctl.h \
+	sys/lock.h \
+	sys/mman.h \
 	sys/param.h \
 	sys/socket.h \
 	sys/sockio.h \
 	sys/time.h \
 	values.h \
+	zlib.h \
+	X11/X.h \
+	X11/Xlib.h \
+	X11/Xos.h \
+	X11/Xutil.h \
+	X11/keysym.h \
+	X11/Xatom.h \
+	X11/Xmd.h \
+	X11/Xresource.h \
+	X11/extensions/Xdbe.h \
+	X11/extensions/multibuf.h \
 	])
 
 dnl  Checks for typedefs, structures, and compiler characteristics.

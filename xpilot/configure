@@ -1713,7 +1713,7 @@ fi;
 # Check whether --enable-mbx or --disable-mbx was given.
 if test "${enable_mbx+set}" = set; then
   enableval="$enable_mbx"
-  if test $enable_dbe = yes; then
+  if test $enable_mbx = yes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define MBX 1
@@ -4953,6 +4953,20 @@ done
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 for ac_header in  \
 	arpa/inet.h \
 	arpa/nameser.h \
@@ -4960,6 +4974,7 @@ for ac_header in  \
 	bstring.h \
 	ctype.h \
 	errno.h \
+	expat.h \
 	fcntl.h \
 	float.h \
 	limits.h \
@@ -4979,11 +4994,24 @@ for ac_header in  \
 	sys/fcntl.h \
 	sys/inttypes.h \
 	sys/ioctl.h \
+	sys/lock.h \
+	sys/mman.h \
 	sys/param.h \
 	sys/socket.h \
 	sys/sockio.h \
 	sys/time.h \
 	values.h \
+	zlib.h \
+	X11/X.h \
+	X11/Xlib.h \
+	X11/Xos.h \
+	X11/Xutil.h \
+	X11/keysym.h \
+	X11/Xatom.h \
+	X11/Xmd.h \
+	X11/Xresource.h \
+	X11/extensions/Xdbe.h \
+	X11/extensions/multibuf.h \
 
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
