@@ -350,7 +350,7 @@ static int Away(struct move *move, int line)
     lsx = linet[line].start.x - move->start.x;
     lsy = linet[line].start.y - move->start.y;
     lsx = CENTER_XCLICK(lsx);
-    lsy = CENTER_XCLICK(lsy);
+    lsy = CENTER_YCLICK(lsy);
 
     if (ABS(linet[line].delta.x) >= ABS(linet[line].delta.y)) {
 	dx = 0;
@@ -367,7 +367,7 @@ static int Away(struct move *move, int line)
 	return -1;
     }
 
-    lines = blockline[(move->start.x >> B_SHIFT) * mapx + (move->start.y >> B_SHIFT)].lines;
+    lines = blockline[(move->start.x >> B_SHIFT) + mapx * (move->start.y >> B_SHIFT)].lines;
     while ( (i = *lines++) != 65535) {
 	if (i == line)
 	    continue;
@@ -417,7 +417,7 @@ static int Shape_move1(int dx, int dy, struct move *move, const wireobj *shape, 
     unsigned short *lines, *points;
     int block;
 
-    block = (move->start.x >> B_SHIFT) * mapx + (move->start.y >> B_SHIFT);
+    block = (move->start.x >> B_SHIFT) + mapx * (move->start.y >> B_SHIFT);
     for (p = 0; p < shape->num_points; p++) {
 	lines = blockline[block].lines;
 	/* Can use the same block for all points because the block of the
@@ -545,11 +545,19 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone, const u
 	}
 	lsx -= msx;
 	lsy -= msy;
-	lsy = CENTER_YCLICK(lsy);
+	if (chxy) {
+	    lsx = CENTER_YCLICK(lsx);
+	    lsy = CENTER_XCLICK(lsy);
+	}
+	else {
+	    lsx = CENTER_XCLICK(lsx);
+	    lsy = CENTER_YCLICK(lsy);
+	}
 	if (*height < lsy + (ldy < 0 ? ldy : 0))
 	    continue;
 	if (0 > lsy + (ldy < 0 ? 0 : ldy))
 	    continue;
+	
 	lsx = CENTER_XCLICK(lsx);
 
 	if (ldx < 0) {
@@ -635,7 +643,7 @@ static void Move_point(const struct move *move, struct collans *answer)
     int x, temp;
     unsigned short *lines;
 
-    block = (move->start.x >> B_SHIFT) * mapx + (move->start.y >> B_SHIFT);
+    block = (move->start.x >> B_SHIFT) + mapx * (move->start.y >> B_SHIFT);
     x = blockline[block].distance;
     lines = blockline[block].lines;
 
@@ -756,8 +764,8 @@ static void Shape_move(const struct move *move, const wireobj *shape, int dir, s
 
     for (p = 0; p < shape->num_points; p++) {
 	msx = WRAP_XCLICK(move->start.x + shape->pts[p][dir].x);
-	msy = WRAP_XCLICK(move->start.y + shape->pts[p][dir].y);
-	block = (msx >> B_SHIFT) * mapx + (msy >> B_SHIFT);
+	msy = WRAP_YCLICK(move->start.y + shape->pts[p][dir].y);
+	block = (msx >> B_SHIFT) + mapx * (msy >> B_SHIFT);
 	if (chx)
 	    msx = -msx;
 	if (chy)
@@ -788,7 +796,7 @@ static void Shape_move(const struct move *move, const wireobj *shape, int dir, s
 	    minpoint = p;
     }
 
-    block = (move->start.x >> B_SHIFT) * mapx + (move->start.y >> B_SHIFT);
+    block = (move->start.x >> B_SHIFT) + mapx * (move->start.y >> B_SHIFT);
     points = blockline[block].points;
     lines = Shape_lines(shape, dir);
     x = -1;
@@ -856,7 +864,7 @@ static int Shape_turn1(const wireobj *shape, int hitmask, int x, int y, int dir,
     }
 
     /* Convex shapes would be much easier. */
-    points = blockline[(x >> B_SHIFT) * mapx + (y >> B_SHIFT)].points;
+    points = blockline[(x >> B_SHIFT) + mapx * (y >> B_SHIFT)].points;
     while ( (p = *points++) != 65535) {
 	if (linet[p].group && (groups[linet[p].group].hit_mask & hitmask))
 	    continue;
@@ -1258,7 +1266,7 @@ static void Distance_init(void)
 		lsx = CENTER_XCLICK(linet[i].start.x - cx);
 		if (ABS(lsx) > 32767 + CUTOFF + B_CLICKS / 2)
 		    continue;
-		lsy = CENTER_XCLICK(linet[i].start.y - cy);
+		lsy = CENTER_YCLICK(linet[i].start.y - cy);
 		if (ABS(lsy) > 32767 + CUTOFF + B_CLICKS / 2)
 		    continue;
 		ldx = linet[i].delta.x;
@@ -1328,7 +1336,7 @@ static void Distance_init(void)
 	    stored:
 		; /* semicolon for ansi compatibility */
 	    }
-	    k = bx * mapx + by;
+	    k = bx + mapx * by;
 	    blockline[k].distance = dis[0] - B_CLICKS / 2;
 	    blockline[k].lines = lptr;
 	    for (j = 1; j < 30 && lineno[j] != 65535; j++)
@@ -1346,7 +1354,7 @@ static void Corner_init(void)
     ptr = plist;
     for (bx = 0; bx < mapx; bx++)
 	for (by = 0; by < mapy; by++) {
-	    block = mapx * bx + by;
+	    block = bx + mapx * by;
 	    dist = blockline[block].distance + MAX_SHAPE_OFFSET + B_CLICKS / 2;
 	    blockline[block].points = ptr;
 	    cx = bx * B_CLICKS + B_CLICKS / 2;
