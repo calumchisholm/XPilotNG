@@ -469,7 +469,7 @@ void General_tractor_beam(world_t *world, int id, clpos_t pos,
     double maxforce = TRACTOR_MAX_FORCE(items), percent, force, dist, cost, a;
     int theta;
     player_t *pl = Player_by_id(id);
-    cannon_t *cannon = Cannon_by_id(world, id);
+    /*cannon_t *cannon = Cannon_by_id(world, id);*/
 
     dist = Wrap_length(pos.cx - victim->pos.cx,
 		       pos.cy - victim->pos.cy) / CLICK;
@@ -624,7 +624,7 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     int i, item = ITEM_FUEL;
     double amount;
     player_t *pl = Player_by_id(id);
-    cannon_t *cannon = Cannon_by_id(world, id);
+    /*cannon_t *cannon = Cannon_by_id(world, id);*/
 
     /* choose item type to steal */
     for (i = 0; i < 50; i++) {
@@ -919,7 +919,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
     player_t *p;
     ecm_t *ecm;
     player_t *pl = Player_by_id(id);
-    cannon_t *cannon = Cannon_by_id(world, id);
+    /*cannon_t *cannon = Cannon_by_id(world, id);*/
 
     if (NumEcms >= MAX_TOTAL_ECMS)
 	return;

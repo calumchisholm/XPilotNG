@@ -593,5 +593,6 @@ static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
 
 void Player_print_state(player_t *pl, const char *funcname);
 void Player_set_state(player_t *pl, int state);
+void Player_set_modbank(player_t *pl, int bank, const char *str);
 
 #endif

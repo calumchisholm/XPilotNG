@@ -393,3 +393,85 @@ void Mods_filter(modifiers_t *mods, world_t *world)
     if (!BIT(world->rules->mode, ALLOW_LASER_MODIFIERS))
 	Mods_set(mods, ModsLaser, 0, world);
 }
+
+static int str2num (const char **strp, int min, int max)
+{
+    const char *str = *strp;
+    int num = 0;
+
+    while (isdigit(*str)) {
+	num *= 10;
+	num += *str++ - '0';
+    }
+    *strp = str;
+    LIMIT(num, min, max);
+    return num;
+}
+
+void Player_set_modbank(player_t *pl, int bank, const char *str)
+{
+    const char *cp;
+    modifiers_t mods;
+    int mini, velocity, spread, power;
+    world_t *world = pl->world;
+
+    if (bank >= NUM_MODBANKS)
+	return;
+
+    Mods_clear(&mods);
+
+    for (cp = str; *cp; cp++) {
+	switch (*cp) {
+	case 'F': case 'f':
+	    if (*(cp+1) == 'N' || *(cp+1) == 'n')
+		Mods_set(&mods, ModsNuclear,
+			 MODS_NUCLEAR|MODS_FULLNUCLEAR, world);
+	    break;
+	case 'N': case 'n':
+	    if (Mods_get(mods, ModsNuclear) == 0)
+		Mods_set(&mods, ModsNuclear, MODS_NUCLEAR, world);
+	    break;
+	case 'C': case 'c':
+	    Mods_set(&mods, ModsCluster, 1, world);
+	    break;
+	case 'I': case 'i':
+	    Mods_set(&mods, ModsImplosion, 1, world);
+	    break;
+	case 'V': case 'v':
+	    cp++;
+	    velocity = str2num (&cp, 0, MODS_VELOCITY_MAX);
+	    Mods_set(&mods, ModsVelocity, velocity, world);
+	    cp--;
+	    break;
+	case 'X': case 'x':
+	    cp++;
+	    mini = str2num (&cp, 1, MODS_MINI_MAX+1) - 1;
+	    Mods_set(&mods, ModsMini, mini, world);
+	    cp--;
+	    break;
+	case 'Z': case 'z':
+	    cp++;
+	    spread = str2num (&cp, 0, MODS_SPREAD_MAX);
+	    Mods_set(&mods, ModsSpread, spread, world);
+	    cp--;
+	    break;
+	case 'B': case 'b':
+	    cp++;
+	    power = str2num (&cp, 0, MODS_POWER_MAX);
+	    Mods_set(&mods, ModsPower, power, world);
+	    cp--;
+	    break;
+	case 'L': case 'l':
+	    cp++;
+	    if (*cp == 'S' || *cp == 's')
+		Mods_set(&mods, ModsLaser, MODS_LASER_STUN, world);
+	    if (*cp == 'B' || *cp == 'b')
+		Mods_set(&mods, ModsLaser, MODS_LASER_BLIND, world);
+	    break;
+	default:
+	    /* Ignore unknown modifiers. */
+	    break;
+	}
+    }
+    pl->modbank[bank] = mods;
+}
