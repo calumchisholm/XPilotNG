@@ -314,18 +314,7 @@ static void Talk_delete_emphasized_text(void)
     oldlen = strlen(talk_str);
     newlen = oldlen;
 
-    /*
-     * NOTE - there is a bug here
-     * to reproduce it:
-     * 1. press m to write a message
-     * 2. write some garbage into the message buffer
-     * 3. use the mouse to select some text there from the
-     *    middle of what you wrote
-     * 4. press escape to clise the message window
-     * 5. press m again to write another message (the old message will be gone)
-     * 6. start writing the new message and the client crashes
-     */
-
+    /* kps - there is a bug here, see file BUGS. */
     if (oldlen > 0) {
 	/*assert(oldlen >= selection.talk.x2);*/
 	strncpy(&new_str[selection.talk.x1], &talk_str[selection.talk.x2],
