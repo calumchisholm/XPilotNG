@@ -290,7 +290,7 @@ static void PlayerCollision(void)
     player		*pl;
 
     /* Player - player, checkpoint, treasure, object and wall */
-    for (i=0; i<NumPlayers; i++) {
+    for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
 	if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING)
 	    continue;
@@ -309,28 +309,30 @@ static void PlayerCollision(void)
 
 	/* Player - player */
 	if (BIT(World.rules->mode, CRASH_WITH_PLAYER | BOUNCE_WITH_PLAYER)) {
-	    for (j=i+1; j<NumPlayers; j++) {
-		if (BIT(Players(j)->status, PLAYING|PAUSE|GAME_OVER|KILLED)
+	    for (j = i + 1; j < NumPlayers; j++) {
+		player *pl_j = Players(j);
+
+		if (BIT(pl_j->status, PLAYING|PAUSE|GAME_OVER|KILLED)
 		    != PLAYING) {
 		    continue;
 		}
-		if (BIT(Players(j)->used, HAS_PHASING_DEVICE))
+		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
 		    continue;
 		if (is_polygon_map || !useOldCode) {
-		    if (!in_range_acd(pl->prevpos.cx - Players(j)->prevpos.cx,
-				      pl->prevpos.cy - Players(j)->prevpos.cy,
-				      pl->extmove.cx - Players(j)->extmove.cx,
-				      pl->extmove.cy - Players(j)->extmove.cy,
+		    if (!in_range_acd(pl->prevpos.cx - pl_j->prevpos.cx,
+				      pl->prevpos.cy - pl_j->prevpos.cy,
+				      pl->extmove.cx - pl_j->extmove.cx,
+				      pl->extmove.cy - pl_j->extmove.cy,
 				      (2*SHIP_SZ-6) * CLICK)) {
  			continue;
 		    }
 		} else {
 		    if (!in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
 					  pl->pos.cx, pl->pos.cy,
-					  Players(j)->prevpos.cx,
-					  Players(j)->prevpos.cy,
-					  Players(j)->pos.cx,
-					  Players(j)->pos.cy,
+					  pl_j->prevpos.cx,
+					  pl_j->prevpos.cy,
+					  pl_j->pos.cx,
+					  pl_j->pos.cy,
 					  PIXEL_TO_CLICK(2*SHIP_SZ-6))) {
 			continue;
 		    }
@@ -352,26 +354,27 @@ static void PlayerCollision(void)
 		 * The choosing of the first line may not be easy however.
 		 */
 
-		if (Team_immune(pl->id, Players(j)->id)
+		if (Team_immune(pl->id, pl_j->id)
 		    || PSEUDO_TEAM(i, j)) {
 		    continue;
 		}
-		sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_PLAYER_SOUND);
+		sound_play_sensors(pl->pos.cx, pl->pos.cy,
+				   PLAYER_HIT_PLAYER_SOUND);
 		if (BIT(World.rules->mode, BOUNCE_WITH_PLAYER)) {
 		    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 			Add_fuel(&(pl->fuel), (long)ED_PL_CRASH);
 			Item_damage(i, destroyItemInCollisionProb);
 		    }
-		    if (BIT(Players(j)->used, (HAS_SHIELD|
+		    if (BIT(pl_j->used, (HAS_SHIELD|
 					       HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-			Add_fuel(&(Players(j)->fuel), (long)ED_PL_CRASH);
+			Add_fuel(&(pl_j->fuel), (long)ED_PL_CRASH);
 			Item_damage(j, destroyItemInCollisionProb);
 		    }
 		    pl->forceVisible = 20;
-		    Players(j)->forceVisible = 20;
-		    Obj_repel((object *)pl, (object *)Players(j),
+		    pl_j->forceVisible = 20;
+		    Obj_repel((object *)pl, (object *)pl_j,
 			      PIXEL_TO_CLICK(2*SHIP_SZ));
 		}
 		if (!BIT(World.rules->mode, CRASH_WITH_PLAYER)) {
@@ -383,47 +386,47 @@ static void PlayerCollision(void)
 			&& !BIT(pl->have, HAS_ARMOR))) {
 		    SET_BIT(pl->status, KILLED);
 		}
-		if (Players(j)->fuel.sum <= 0
-		    || (!BIT(Players(j)->used, HAS_SHIELD)
-			&& !BIT(Players(j)->have, HAS_ARMOR))) {
-		    SET_BIT(Players(j)->status, KILLED);
+		if (pl_j->fuel.sum <= 0
+		    || (!BIT(pl_j->used, HAS_SHIELD)
+			&& !BIT(pl_j->have, HAS_ARMOR))) {
+		    SET_BIT(pl_j->status, KILLED);
 		}
 
 		if (!BIT(pl->used, HAS_SHIELD)
 		    && BIT(pl->have, HAS_ARMOR)) {
 		    Player_hit_armor(i);
 		}
-		if (!BIT(Players(j)->used, HAS_SHIELD)
-		    && BIT(Players(j)->have, HAS_ARMOR)) {
+		if (!BIT(pl_j->used, HAS_SHIELD)
+		    && BIT(pl_j->have, HAS_ARMOR)) {
 		    Player_hit_armor(j);
 		}
 
-		if (BIT(Players(j)->status, KILLED)) {
+		if (BIT(pl_j->status, KILLED)) {
 		    if (BIT(pl->status, KILLED)) {
 			sprintf(msg, "%s and %s crashed.",
-				pl->name, Players(j)->name);
+				pl->name, pl_j->name);
 			Set_message(msg);
 			if (!IS_TANK_IND(i) && !IS_TANK_IND(j)) {
-			    sc = Rate(Players(j)->score, pl->score)
-			 		    * crashScoreMult;
-			    sc2 = Rate(pl->score, Players(j)->score)
-					     * crashScoreMult;
-			    Score_players(i, -sc, Players(j)->name,
+			    sc = Rate(pl_j->score, pl->score)
+				* crashScoreMult;
+			    sc2 = Rate(pl->score, pl_j->score)
+				* crashScoreMult;
+			    Score_players(i, -sc, pl_j->name,
 					  j, -sc2, pl->name);
 			} else if (IS_TANK_IND(i)) {
 			    int i_tank_owner = GetInd(Players(i)->lock.pl_id);
 			    sc = Rate(Players(i_tank_owner)->score,
-				      Players(j)->score)
-					    * tankKillScoreMult;
-			    Score_players(i_tank_owner, sc, Players(j)->name,
+				      pl_j->score)
+				* tankKillScoreMult;
+			    Score_players(i_tank_owner, sc, pl_j->name,
 					  j, -sc, pl->name);
 			} else if (IS_TANK_IND(j)) {
-			    int j_tank_owner = GetInd(Players(j)->lock.pl_id);
+			    int j_tank_owner = GetInd(pl_j->lock.pl_id);
 			    sc = Rate(Players(j_tank_owner)->score,
-						 pl->score)
-					    * tankKillScoreMult;
+				      pl->score)
+				* tankKillScoreMult;
 			    Score_players(j_tank_owner, sc, pl->name,
-					  i, -sc, Players(j)->name);
+					  i, -sc, pl_j->name);
 			} /* don't bother scoring two tanks */
 		    } else {
 			int i_tank_owner = i;
@@ -434,21 +437,20 @@ static void PlayerCollision(void)
 			    }
 			}
 			sprintf(msg, "%s ran over %s.",
-				pl->name, Players(j)->name);
+				pl->name, pl_j->name);
 			Set_message(msg);
-			sound_play_sensors(Players(j)->pos.cx,
-					   Players(j)->pos.cy,
+			sound_play_sensors(pl_j->pos.cx, pl_j->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
 			Rank_AddKill(pl);
 			if (IS_TANK_IND(i)) {
 			    sc = Rate(Players(i_tank_owner)->score,
-						 Players(j)->score)
-					    * tankKillScoreMult;
+				      pl_j->score)
+				* tankKillScoreMult;
 			} else {
-			    sc = Rate(pl->score, Players(j)->score)
-					    * runoverKillScoreMult;
+			    sc = Rate(pl->score, pl_j->score)
+				* runoverKillScoreMult;
 			}
-			Score_players(i_tank_owner, sc, Players(j)->name,
+			Score_players(i_tank_owner, sc, pl_j->name,
 				      j, -sc, pl->name);
 		    }
 
@@ -456,30 +458,30 @@ static void PlayerCollision(void)
 		    if (BIT(pl->status, KILLED)) {
 			int j_tank_owner = j;
 			if (IS_TANK_IND(j)) {
-			    j_tank_owner = GetInd(Players(j)->lock.pl_id);
+			    j_tank_owner = GetInd(pl_j->lock.pl_id);
 			    if (j_tank_owner == i) {
 				j_tank_owner = j;
 			    }
 			}
 			sprintf(msg, "%s ran over %s.",
-				Players(j)->name, pl->name);
+				pl_j->name, pl->name);
 			Set_message(msg);
 			sound_play_sensors(pl->pos.cx, pl->pos.cy,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			Rank_AddKill(Players(j));
+			Rank_AddKill(pl_j);
 			if (IS_TANK_IND(j)) {
 			    sc = Rate(Players(j_tank_owner)->score, pl->score)
-				   * tankKillScoreMult;
+				* tankKillScoreMult;
 			} else {
-			    sc = Rate(Players(j)->score, pl->score)
-				   * runoverKillScoreMult;
+			    sc = Rate(pl_j->score, pl->score)
+				* runoverKillScoreMult;
 			}
 			Score_players(j_tank_owner, sc, pl->name,
-				      i, -sc, Players(j)->name);
+				      i, -sc, pl_j->name);
 		    }
 		}
 
-		if (BIT(Players(j)->status, KILLED)) {
+		if (BIT(pl_j->status, KILLED)) {
 		    if (IS_ROBOT_IND(j)
 			&& Robot_war_on_player(j) == pl->id) {
 			Robot_reset_war(j);
@@ -488,7 +490,7 @@ static void PlayerCollision(void)
 
 		if (BIT(pl->status, KILLED)) {
 		    if (IS_ROBOT_PTR(pl)
-			&& Robot_war_on_player(i) == Players(j)->id) {
+			&& Robot_war_on_player(i) == pl_j->id) {
 			Robot_reset_war(i);
 		    }
 		    /* cannot crash with more than one player at the same time? */
