@@ -33,9 +33,10 @@ bool		pointerControl = false;
 extern Cursor	pointerControlCursor;
 
 /* XPilot Mouse settings */
+extern bool pre_exists;
+extern bool mouseAccelInClient;
 extern int new_acc_num, new_acc_denom, new_threshold;
 extern int pre_acc_num, pre_acc_denom, pre_threshold;
-extern bool mouseAccelInClient;
 
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
@@ -143,11 +144,16 @@ static void Talk_set_state(bool on)
 bool Key_press_pointer_control(void)
 {
 #ifndef _WINDOWS
-  if ((pointerControl) && (mouseAccelInClient)) {
-    XChangePointerControl(dpy, True, True, pre_acc_num, pre_acc_denom, pre_threshold);
-  } else {
-    XChangePointerControl(dpy, True, True, new_acc_num, new_acc_denom, new_threshold);
+
+  if (mouseAccelInClient) {    
+    if ((pre_exists) && (pointerControl)) {
+      XChangePointerControl(dpy, True, True, 
+			    pre_acc_num, pre_acc_denom, pre_threshold);
+    } else {
+      XChangePointerControl(dpy, True, True, new_acc_num, new_acc_denom, new_threshold);
+    }
   }
+
 #endif
     Pointer_control_set_state(!pointerControl);
     

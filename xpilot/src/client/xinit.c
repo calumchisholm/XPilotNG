@@ -82,7 +82,7 @@ bool			ignoreWindowManager;
 
 /* For restoring the mouse back to normal */
 extern int pre_acc_num, pre_acc_denom, pre_threshold;
-
+extern bool pre_exists;
 
 /*static char myName[] = "xpilot";*/
 static char myClass[] = "XPilot";
@@ -879,8 +879,13 @@ void Quit(void)
 #ifndef _WINDOWS
 
   /* Here we restore the mouse to its former self */
-  XChangePointerControl(dpy, True, True, pre_acc_num,
-			pre_acc_denom, pre_threshold);
+  /* the option may have been toggled in game to  */
+  /* off so we cant trust that                    */
+
+  if (pre_exists) {
+    XChangePointerControl(dpy, True, True, pre_acc_num,
+			  pre_acc_denom, pre_threshold);
+  }
 
     if (dpy != NULL) {
 	XAutoRepeatOn(dpy);

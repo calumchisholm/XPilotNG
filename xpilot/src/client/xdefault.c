@@ -33,9 +33,10 @@ bool	titleFlip;		/* Do special title bar flipping? */
 bool	showNastyShots = false;	/* show original flavor shots or the new 
 				   "nasty shots" */
 
-int pre_acc_num, new_acc_num;   /* pre are the Saved mouse settings */
-int pre_acc_denom, new_acc_denom; 
-int pre_threshold, new_threshold; 
+bool pre_exists = False;
+int pre_acc_num, new_acc_num = 0;   /* pre are the Saved mouse settings */
+int pre_acc_denom, new_acc_denom = 1; 
+int pre_threshold, new_threshold = 0; 
 bool mouseAccelInClient = false;
 
 #ifdef DEVELOPMENT
@@ -138,6 +139,7 @@ static bool Set_texturedObjects(xp_option_t *opt, bool val)
 bool Set_acc(xp_option_t *opt, int value)
 {
   if (value < 0) {
+    new_acc_num = 0;
     return false;
   } else {
     new_acc_num = value;
@@ -157,6 +159,7 @@ bool Set_acc(xp_option_t *opt, int value)
 bool Set_accdenom(xp_option_t *opt, int value)
 {
   if (value < 0) {
+    new_acc_denom = 1;
     return false;
   } else {
     new_acc_denom = value;
@@ -169,13 +172,13 @@ bool Set_accdenom(xp_option_t *opt, int value)
 #endif
     }
     return true;
-  }
-  
+  }  
 }     
 
 bool Set_accthresh(xp_option_t *opt, int value)
 {
   if (value < 0) {
+    new_threshold = 0;
     return false;
   } else {    
     new_threshold = value;
@@ -510,9 +513,9 @@ void Handle_X_options(void)
     /* in the code as we can back up the existing mouse acceleration   */
     /* we are going to overide these with xpilot settings, and want to */
     /* restore these settings on exiting xpilot                        */
-    
+    pre_exists = True;
     XGetPointerControl(dpy, &pre_acc_num, &pre_acc_denom, &pre_threshold);
-    
+
 
 #ifdef DEVELOPMENT
     if (testxsync) {
