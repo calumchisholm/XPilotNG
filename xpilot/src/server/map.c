@@ -477,28 +477,29 @@ static bool Grok_map_old(void);
 static bool Grok_map_size(void)
 {
     bool bad = false;
+    int w = mapWidth, h = mapHeight;
 
     if (!is_polygon_map) {
-	mapWidth *= BLOCK_SZ;
-	mapHeight *= BLOCK_SZ;
+	w *= BLOCK_SZ;
+	h *= BLOCK_SZ;
     }
 
-    if (mapWidth < BLOCK_SZ) {
+    if (w < BLOCK_SZ) {
 	warn("mapWidth too small, minimum is 1 block (%d pixels).\n",
 	     BLOCK_SZ);
 	bad = true;
     }
-    if (mapWidth > MAX_MAP_SIZE * BLOCK_SZ) {
+    if (w > MAX_MAP_SIZE * BLOCK_SZ) {
 	warn("mapWidth too big, maximum is %d blocks (%d pixels).\n",
 	    MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
 	bad = true;
     }
-    if (mapHeight < BLOCK_SZ) {
+    if (h < BLOCK_SZ) {
 	warn("mapHeight too small, minimum is 1 block (%d pixels).\n",
 	     BLOCK_SZ);
 	bad = true;
     }
-    if (mapHeight > MAX_MAP_SIZE * BLOCK_SZ) {
+    if (h > MAX_MAP_SIZE * BLOCK_SZ) {
 	warn("mapWidth too big, maximum is %d blocks (%d pixels).\n",
 	     MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
 	bad = true;
@@ -508,8 +509,8 @@ static bool Grok_map_size(void)
 	return false;
 
     /* pixel sizes */
-    World.width = mapWidth;
-    World.height = mapHeight;
+    World.width = w;
+    World.height = h;
     if (!is_polygon_map && extraBorder) {
 	World.width += 2 * BLOCK_SZ;
 	World.height += 2 * BLOCK_SZ;
