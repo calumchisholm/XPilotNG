@@ -63,7 +63,6 @@ bool		RawMode;		/* Calculate frames even if there */
 bool		NoQuit;			/* Don't quit even if there are */
 					/* no human players playing */
 char		*mapFileName;		/* Name of mapfile... */
-char		*mapData;		/* Raw map data... */
 int		mapWidth;		/* Width of the universe */
 int		mapHeight;		/* Height of the universe */
 char		*mapName;		/* Name of the universe */
@@ -418,16 +417,6 @@ optionDesc options[] = {
 	tuner_none,
 	"The server contact port number.\n",
 	MAP("General")
-    },
-    {
-	"mapData",
-	"mapData",
-	NULL,
-	&mapData,
-	valString,
-	tuner_none,
-	"The map's topology.\n",
-	MAP(NULL)
     },
     {
 	"allowPlayerCrashes",
@@ -2606,25 +2595,23 @@ int Parser(int argc, char **argv)
     /*
      * Read map file if map data not found yet.
      */
-    if (!(fname = getOption("mapData"))) {
-	if ((fname = getOption("mapFileName")) != NULL) {
-	    if (!parseMapFile(fname)) {
-		xpprintf("Unable to read %s, trying to open %s\n", fname, Conf_default_map());
-		if (!parseMapFile(Conf_default_map())) {
-		    xpprintf("Unable to read %s\n", Conf_default_map());
-		    errno = 0;
-		    error("Unable to read any map. Exiting.");
-		    exit(1);
-		}
-	    }
-	} else {
-	    xpprintf("Map not specified, trying to open %s\n", Conf_default_map());
+    if ((fname = getOption("mapFileName")) != NULL) {
+	if (!parseMapFile(fname)) {
+	    xpprintf("Unable to read %s, trying to open %s\n", fname, Conf_default_map());
 	    if (!parseMapFile(Conf_default_map())) {
-	      xpprintf("Unable to read %s\n", Conf_default_map());
-	      errno = 0;
-	      error("Unable to read any map. Exiting.");
-	      exit(1);
+		xpprintf("Unable to read %s\n", Conf_default_map());
+		errno = 0;
+		error("Unable to read any map. Exiting.");
+		exit(1);
 	    }
+	}
+    } else {
+	xpprintf("Map not specified, trying to open %s\n", Conf_default_map());
+	if (!parseMapFile(Conf_default_map())) {
+	    xpprintf("Unable to read %s\n", Conf_default_map());
+	    errno = 0;
+	    error("Unable to read any map. Exiting.");
+	    exit(1);
 	}
     }
 

@@ -61,7 +61,6 @@ static char sourceid[] =
 World_map World;
 
 
-static u_short Find_closest_team(int posx, int posy);
 static void Find_base_order(void);
 
 
@@ -228,8 +227,6 @@ void Grok_map(void)
     if (mapWidth > MAX_MAP_SIZE || mapHeight > MAX_MAP_SIZE) {
 	errno = 0;
 	error("mapWidth or mapHeight exceeds map size limit %d", MAX_MAP_SIZE);
-	free(mapData);
-	mapData = NULL;
     } else {
 	World.x = mapWidth;
 	World.y = mapHeight;
@@ -258,6 +255,18 @@ void Grok_map(void)
 	CLR_BIT(World.rules->mode, TEAM_PLAY);
     }
 
+    if (BIT(World.rules->mode, TIMING))
+	Find_base_order();
+
+#ifndef	SILENT
+    xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d\nTeam play: %s\n",
+	   World.name, World.NumBases, World.x, World.y,
+	   BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
+#endif
+    return;
+}
+
+#if 0
     s = mapData;
     while (y >= 0) {
 
@@ -751,46 +760,9 @@ void Grok_map(void)
 	}
     }
 
-    if (BIT(World.rules->mode, TIMING)) {
-	Find_base_order();
-    }
-
-#ifndef	SILENT
-    xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d\nTeam play: %s\n",
-	   World.name, World.NumBases, World.x, World.y,
-	   BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
-#endif
-
     D( Print_map(); )
 }
-
-
-
-/*
- * Return the team that is closest to this position.
- */
-static u_short Find_closest_team(int posx, int posy)
-{
-    u_short team = TEAM_NOT_SET;
-    int i;
-    DFLOAT closest = FLT_MAX, l;
-
-    posx = posx * BLOCK_CLICKS + BLOCK_CLICKS / 2;
-    posy = posy * BLOCK_CLICKS + BLOCK_CLICKS / 2;
-    for (i=0; i<World.NumBases; i++) {
-	if (World.base[i].team == TEAM_NOT_SET)
-	    continue;
-
-	l = Wrap_length(posx - World.base[i].pos.x, posy -World.base[i].pos.y);
-
-	if (l < closest) {
-	    team = World.base[i].team;
-	    closest = l;
-	}
-    }
-
-    return team;
-}
+#endif
 
 
 /*

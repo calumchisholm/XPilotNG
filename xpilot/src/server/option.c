@@ -328,29 +328,6 @@ static void tagstart(void *data, const char *el, const char **attr)
 	ballnum++;
     }
 
-    
-    if (!strcasecmp(el, "Mapdata")) {
-	int x = atoi(*(attr+1));   /* This tag will be removed anyway... */
-	int y = atoi(*(attr+3));
-	int len = (x + 1) * y + 1;
-	int i;
-	mapd = malloc(len);
-
-	for (i = 0; i < len; i++)
-	    mapd[i] = ' ';
-	mapd[len] = 0;
-
-	for (i = 0; i < y; i++)
-	    mapd[i * (x + 1) + x] = '\n';
-	attr += 4;
-	while (*attr) {
-	    mapd[atoi(*(attr + 1) + 1)] = **(attr + 1);
-	    attr += 2;
-	}
-	addOption("mapdata", mapd, 0, NULL);
-	return;
-    }
-
     if (!strcasecmp(el, "Option")) {
 	const char *name, *value;
 	while (*attr) {
