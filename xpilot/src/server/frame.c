@@ -983,9 +983,10 @@ static void Frame_ships(int conn, int ind)
 	    if (click_inview(&cv, t->pos.cx, t->pos.cy)) {
 		int j;
 		for (j = 0; j < 3; j++) {
+		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir);
 		    Send_connector(conn,
-				   t->pos.cx + t->ship->pts[j][t->dir].cx,
-				   t->pos.cy + t->ship->pts[j][t->dir].cy,
+				   t->pos.cx + pts.cx,
+				   t->pos.cy + pts.cy,
 				   cannon->pos.cx,
 				   cannon->pos.cy, 1);
 		}
@@ -1057,9 +1058,10 @@ static void Frame_ships(int conn, int ind)
 		int j;
 
 		for (j = 0; j < 3; j++) {
+		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir);
 		    Send_connector(conn,
-				   t->pos.cx + t->ship->pts[j][t->dir].cx,
-				   t->pos.cy + t->ship->pts[j][t->dir].cy,
+				   t->pos.cx + pts.cx,
+				   t->pos.cy + pts.cy,
 				   pl_i->pos.cx,
 				   pl_i->pos.cy, 1);
 		}

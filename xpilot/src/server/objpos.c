@@ -144,20 +144,17 @@ void Player_position_debug(player *pl, const char *msg)
 	   pl->prevpos.cx,
 	   pl->prevpos.cy);
     for (i = 0; i < pl->ship->num_points; i++) {
+	clpos pts = Ship_get_point_clpos(pl->ship, i, pl->dir);
 	printf("\t%2d\tB %d, %d, P %d, %d, C %d, %d, O %d, %d\n",
 		i,
-	       (int)((pl->pos.bx
-		      + CLICK_TO_BLOCK(pl->ship->pts[i][pl->dir].cx))),
-	       (int)((pl->pos.by
-		      + CLICK_TO_BLOCK(pl->ship->pts[i][pl->dir].cy))),
-	       (int)(pl->pos.px
-		     + CLICK_TO_PIXEL(pl->ship->pts[i][pl->dir].cx)),
-	       (int)(pl->pos.py
-		     + CLICK_TO_PIXEL(pl->ship->pts[i][pl->dir].cy)),
-	       (int)(pl->pos.cx + pl->ship->pts[i][pl->dir].cx),
-	       (int)(pl->pos.cy + pl->ship->pts[i][pl->dir].cy),
-	       (int)(pl->prevpos.cx + pl->ship->pts[i][pl->dir].cx),
-	       (int)(pl->prevpos.cy + pl->ship->pts[i][pl->dir].cy));
+	       (int)((pl->pos.bx + CLICK_TO_BLOCK(pts.cx))),
+	       (int)((pl->pos.by + CLICK_TO_BLOCK(pts.cy))),
+	       (int)(pl->pos.px + CLICK_TO_PIXEL(pts.cx)),
+	       (int)(pl->pos.py + CLICK_TO_PIXEL(pts.cy)),
+	       (int)(pl->pos.cx + pts.cx),
+	       (int)(pl->pos.cy + pts.cy),
+	       (int)(pl->prevpos.cx + pts.cx),
+	       (int)(pl->prevpos.cy + pts.cy));
     }
 #endif
 }

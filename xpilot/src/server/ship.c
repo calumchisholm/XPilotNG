@@ -63,8 +63,9 @@ void Thrust(int ind)
     const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);
     const DFLOAT	max_life = 3 + pl->power * 0.35;
-    int			cx = pl->pos.cx + pl->ship->engine[pl->dir].cx;
-    int			cy = pl->pos.cy + pl->ship->engine[pl->dir].cy;
+    clpos		engine = Ship_get_engine_clpos(pl->ship, pl->dir);
+    int			cx = pl->pos.cx + engine.cx;
+    int			cy = pl->pos.cy + engine.cy;
     int			afterburners;
     DFLOAT		tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
     DFLOAT		alt_sparks;

@@ -147,7 +147,16 @@ extern void Calculate_shield_radius(shipobj *w);
 extern int Validate_shape_str(char *str);
 extern void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 				  unsigned shape_version);
-void Rotate_point(SHIPCOORD pt[RES]);
+extern void Rotate_point(SHIPCOORD pt[RES]);
+
+#define Ship_get_point_clpos(ship, i, dir)       (ship)->pts[i][dir]
+#define Ship_get_engine_clpos(ship, dir)         (ship)->engine[dir]
+#define Ship_get_m_gun_clpos(ship, dir)          (ship)->m_gun[dir]
+#define Ship_get_l_gun_clpos(ship, gun, dir)     (ship)->l_gun[gun][dir]
+#define Ship_get_r_gun_clpos(ship, gun, dir)     (ship)->r_gun[gun][dir]
+#define Ship_get_l_rgun_clpos(ship, gun, dir)    (ship)->l_rgun[gun][dir]
+#define Ship_get_r_rgun_clpos(ship, gun, dir)    (ship)->r_rgun[gun][dir]
+#define Ship_get_m_rack_clpos(ship, rack, dir)   (ship)->m_rack[rack][dir]
 
 extern DFLOAT rfrac(void);
 

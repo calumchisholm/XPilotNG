@@ -1011,9 +1011,11 @@ static bool Check_robot_target(int ind,
 
 		DFLOAT	x1, y1, x3, y3, x4, y4, x5, y5;
 		DFLOAT	ship_dist, dir3, dir4, dir5;
+		clpos m_gun;
 
-		x1 = pl->pos.px + pl->vel.x + CLICK_TO_PIXEL(pl->ship->m_gun[pl->dir].cx);
-		y1 = pl->pos.py + pl->vel.y + CLICK_TO_PIXEL(pl->ship->m_gun[pl->dir].cy);
+		m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
+		x1 = pl->pos.px + pl->vel.x + CLICK_TO_PIXEL(m_gun.cx);
+		y1 = pl->pos.py + pl->vel.y + CLICK_TO_PIXEL(m_gun.cy);
 		x3 = ship->pos.px + ship->vel.x;
 		y3 = ship->pos.py + ship->vel.y;
 

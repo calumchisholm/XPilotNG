@@ -435,12 +435,14 @@ void Fire_main_shot(int ind, int type, int dir)
 {
     player *pl = Players[ind];
     int cx, cy;
+    clpos m_gun;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    cx = pl->pos.cx + pl->ship->m_gun[pl->dir].cx;
-    cy = pl->pos.cy + pl->ship->m_gun[pl->dir].cy;
+    m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
+    cx = pl->pos.cx + m_gun.cx;
+    cy = pl->pos.cy + m_gun.cy;
 
     Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 }
@@ -460,12 +462,14 @@ void Fire_left_shot(int ind, int type, int dir, int gun)
 {
     player *pl = Players[ind];
     int cx, cy;
+    clpos l_gun;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    cx = pl->pos.cx + pl->ship->l_gun[gun][pl->dir].cx;
-    cy = pl->pos.cy + pl->ship->l_gun[gun][pl->dir].cy;
+    l_gun = Ship_get_l_gun_clpos(pl->ship, gun, pl->dir);
+    cx = pl->pos.cx + l_gun.cx;
+    cy = pl->pos.cy + l_gun.cy;
 
     Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 
@@ -475,12 +479,14 @@ void Fire_right_shot(int ind, int type, int dir, int gun)
 {
     player *pl = Players[ind];
     int cx, cy;
+    clpos r_gun;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    cx = pl->pos.cx + pl->ship->r_gun[gun][pl->dir].cx;
-    cy = pl->pos.cy + pl->ship->r_gun[gun][pl->dir].cy;
+    r_gun = Ship_get_r_gun_clpos(pl->ship, gun, pl->dir);
+    cx = pl->pos.cx + r_gun.cx;
+    cy = pl->pos.cy + r_gun.cy;
 
     Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 
@@ -490,12 +496,14 @@ void Fire_left_rshot(int ind, int type, int dir, int gun)
 {
     player *pl = Players[ind];
     int cx, cy;
+    clpos l_rgun;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    cx = pl->pos.cx + pl->ship->l_rgun[gun][pl->dir].cx;
-    cy = pl->pos.cy + pl->ship->l_rgun[gun][pl->dir].cy;
+    l_rgun = Ship_get_l_rgun_clpos(pl->ship, gun, pl->dir);
+    cx = pl->pos.cx + l_rgun.cx;
+    cy = pl->pos.cy + l_rgun.cy;
 
     Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 
@@ -505,12 +513,14 @@ void Fire_right_rshot(int ind, int type, int dir, int gun)
 {
     player *pl = Players[ind];
     int cx, cy;
+    clpos r_rgun;
 
     if (pl->shots >= ShotsMax || BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    cx = pl->pos.cx + pl->ship->r_rgun[gun][pl->dir].cx;
-    cy = pl->pos.cy + pl->ship->r_rgun[gun][pl->dir].cy;
+    r_rgun = Ship_get_r_rgun_clpos(pl->ship, gun, pl->dir);
+    cx = pl->pos.cx + r_rgun.cx;
+    cy = pl->pos.cy + r_rgun.cy;
 
     Fire_general_shot(ind, pl->team, 0, cx, cy, type, dir, pl->mods, -1);
 
@@ -958,6 +968,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 	shotpos.cx	= cx;
 	shotpos.cy	= cy;
 	if (pl && type != OBJ_SHOT) {
+	    clpos m_rack;
 	    if (r == on_this_rack) {
 		/*
 		 * We've fired all the mini missiles for the current rack,
@@ -969,9 +980,12 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 		    rack_no = 0;
 		r = 0;
 	    }
-	    shotpos.cx += pl->ship->m_rack[rack_no][pl->dir].cx;
-	    shotpos.cy += pl->ship->m_rack[rack_no][pl->dir].cy;
-	    side = CLICK_TO_PIXEL(pl->ship->m_rack[rack_no][0].cy);
+	    m_rack = Ship_get_m_rack_clpos(pl->ship, rack_no, pl->dir);
+	    shotpos.cx += m_rack.cx;
+	    shotpos.cy += m_rack.cy;
+	    /*side = CLICK_TO_PIXEL(pl->ship->m_rack[rack_no][0].cy);*/
+	    side = CLICK_TO_PIXEL(
+		Ship_get_m_rack_clpos(pl->ship, rack_no, 0).cy);
 	}
 	shotpos.cx = WRAP_XCLICK(shotpos.cx);
 	shotpos.cy = WRAP_YCLICK(shotpos.cy);
@@ -1419,6 +1433,7 @@ void Fire_laser(int ind)
     player	*pl = Players[ind];
     int		cx, cy;
     double	laserRepeatRate = 2;
+    clpos	m_gun;
 
     if (frame_time <= pl->laser_time + laserRepeatRate - timeStep + 1e-3)
  	return;
@@ -1429,8 +1444,9 @@ void Fire_laser(int ind)
 	if (pl->fuel.sum < -ED_LASER)
 	    CLR_BIT(pl->used, HAS_LASER);
 	else {
-	    cx = pl->pos.cx + pl->ship->m_gun[pl->dir].cx;
-	    cy = pl->pos.cy + pl->ship->m_gun[pl->dir].cy;
+	    m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
+	    cx = pl->pos.cx + m_gun.cx;
+	    cy = pl->pos.cy + m_gun.cy;
 	    cx = WRAP_XCLICK(cx);
 	    cy = WRAP_YCLICK(cy);
 	    Fire_general_laser(ind, pl->team, cx, cy, pl->dir, pl->mods);
@@ -1629,12 +1645,13 @@ void Move_smart_shot(int ind)
     if (shot->type == OBJ_HEAT_SHOT) {
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;
 	if (shot->info >= 0) {
+	    clpos engine;
 	    /* Get player and set min to distance */
 	    pl = Players[ GetInd[shot->info] ];
-	    range = Wrap_length(pl->pos.cx + pl->ship->engine[pl->dir].cx
-				- shot->pos.cx,
-				pl->pos.cy + pl->ship->engine[pl->dir].cy
-				- shot->pos.cy) / CLICK;
+	    engine = Ship_get_engine_clpos(pl->ship, pl->dir);
+	    range = Wrap_length(pl->pos.cx + engine.cx - shot->pos.cx,
+				pl->pos.cy + engine.cy - shot->pos.cy)
+		/ CLICK;
 	} else {
 	    /* No player. Number of moves so that new target is searched */
 	    pl = 0;
@@ -1666,14 +1683,15 @@ void Move_smart_shot(int ind)
 		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
 		for (i=0; i<NumPlayers; i++) {
 		    player *p = Players[i];
+		    clpos engine;
 
 		    if (!BIT(p->status, THRUSTING))
 			continue;
 
-		    l = Wrap_length(p->pos.cx + p->ship->engine[p->dir].cx
-				    - shot->pos.cx,
-				    p->pos.cy + p->ship->engine[p->dir].cy
-				    - shot->pos.cy) / CLICK;
+		    engine = Ship_get_engine_clpos(p->ship, p->dir);
+		    l = Wrap_length(p->pos.cx + engine.cx - shot->pos.cx,
+				    p->pos.cy + engine.cy - shot->pos.cy)
+			/ CLICK;
 		    /*
 		     * After burners can be detected easier;
 		     * so scale the length:
