@@ -5444,7 +5444,7 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 	echo "$as_me:$LINENO: result: $have_libsdl_ttf" >&5
 echo "${ECHO_T}$have_libsdl_ttf" >&6
 	if test x$have_libsdl_ttf = xyes; then
-	    SDL_EXTRA_LIBS="-lSDL_ttf"
+	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_ttf"
 	else
 	    { { echo "$as_me:$LINENO: error: Unable to find SDL_ttf headers and libraries" >&5
 echo "$as_me: error: Unable to find SDL_ttf headers and libraries" >&2;}
@@ -5507,7 +5507,7 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 	echo "$as_me:$LINENO: result: $have_libsdl_image" >&5
 echo "${ECHO_T}$have_libsdl_image" >&6
 	if test x$have_libsdl_image = xyes; then
-	    SDL_EXTRA_LIBS="-lSDL_image"
+	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_image"
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_SDL_IMAGE 1

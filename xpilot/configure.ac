@@ -138,7 +138,7 @@ if test x$enable_sdl_client = xyes; then
 	])
 	AC_MSG_RESULT($have_libsdl_ttf)
 	if test x$have_libsdl_ttf = xyes; then
-	    SDL_EXTRA_LIBS="-lSDL_ttf"
+	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_ttf"
 	else
 	    AC_MSG_ERROR(Unable to find SDL_ttf headers and libraries)
 	fi
@@ -156,7 +156,7 @@ if test x$enable_sdl_client = xyes; then
 	])
 	AC_MSG_RESULT($have_libsdl_image)
 	if test x$have_libsdl_image = xyes; then
-	    SDL_EXTRA_LIBS="-lSDL_image"
+	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_image"
 	    AC_DEFINE([HAVE_SDL_IMAGE], 1, [hack])
 	else
 	    AC_MSG_WARN(Unable to find SDL_image headers and libraries)
