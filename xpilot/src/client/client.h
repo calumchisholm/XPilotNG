@@ -442,11 +442,6 @@ typedef struct {
 /* typedefs end */
 
 extern bool		newbie;
-extern int		baseWarningType;
-extern int		hudRadarDotSize;
-extern double		hudRadarScale;
-extern double		hudRadarLimit;
-extern int		hudSize;
 extern char		*geometry;
 extern xp_args_t	xpArgs;
 extern Connect_param_t	connectParam;
