@@ -45,8 +45,6 @@
 <Option name="maxplayershots" value="12"/>
 <Option name="maxshieldedwallbouncespeed" value="100"/>
 <Option name="maxunshieldedwallbouncespeed" value="90"/>
-<Option name="minefusetime" value="420"/>
-<Option name="nukesonradar" value="yes"/>
 <Option name="pausedfps" value="0"/>
 <Option name="playersonradar" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
@@ -54,10 +52,8 @@
 <Option name="reserverobotteam" value="no"/>
 <Option name="robots" value="0"/>
 <Option name="robotteam" value="0"/>
-<Option name="roguemineprob" value="0.02"/>
 <Option name="roundstoplay" value="0"/>
 <Option name="shieldeditempickup" value="no"/>
-<Option name="shieldedmining" value="yes"/>
 <Option name="shotsgravity" value="yes"/>
 <Option name="shotswallbounce" value="no"/>
 <Option name="sparkswallbounce" value="yes"/>
