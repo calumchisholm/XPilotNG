@@ -118,13 +118,13 @@ void Score_players(player *winner_pl, double winner_score, char *winner_msg,
 	    loser_score = -loser_score;
     }
 
-    if (tagGame && winner_score > 0.0) {
-	if (tag == winner_pl->id) {
-	    winner_score *= 2;
-	    loser_score *= 2;
-	} else if (tag == loser_pl->id) {
-	    winner_score *= 10;
-	    loser_score *= 10;
+    if (tagGame && winner_score > 0.0 && loser_score < 0.0) {
+	if (tagItPlayerId == winner_pl->id) {
+	    winner_score *= tagItKillMult;
+	    loser_score *= tagItKillMult;
+	} else if (tagItPlayerId == loser_pl->id) {
+	    winner_score *= tagKillItMult;
+	    loser_score *= tagKillItMult;
 	    Transfer_tag(loser_pl, winner_pl);
 	}
     }

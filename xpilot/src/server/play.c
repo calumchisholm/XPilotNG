@@ -25,17 +25,17 @@
 
 char play_version[] = VERSION;
 
-int tag = NO_ID;	/* player who is 'it' */
+int tagItPlayerId = NO_ID;	/* player who is 'it' */
  
 void Transfer_tag(player *oldtag_pl, player *newtag_pl)
 {
     char	msg[MSG_LEN];
  
-    if (tag != oldtag_pl->id
+    if (tagItPlayerId != oldtag_pl->id
  	|| oldtag_pl->id == newtag_pl->id)
  	return;
      
-    tag = newtag_pl->id;
+    tagItPlayerId = newtag_pl->id;
     sprintf(msg, " < %s killed %s and gets to be 'it' now. >",
 	    newtag_pl->name, oldtag_pl->name);
     Set_message(msg);
@@ -44,11 +44,11 @@ void Transfer_tag(player *oldtag_pl, player *newtag_pl)
 #if 0
 double Handle_tag(double sc, player *victim_pl, player *killer_pl)
 {
-    if (tag == killer_pl->id)
-	return 2.0 * sc;
-    else if (tag == victim_pl->id) {
+    if (tagItPlayerId == killer_pl->id)
+	return tagItKillMult * sc;
+    else if (tagItPlayerId == victim_pl->id) {
 	Transfer_tag(victim_pl, killer_pl);
-	return 10.0 * sc;
+	return tagKillItMult * sc;
     }
     return sc;
 }
@@ -68,7 +68,7 @@ static inline bool Player_can_be_tagged(player *pl)
 void Check_tag(void)
 {
     int num = 0, i, candidate;
-    player *tag_pl = Player_by_id(tag);
+    player *tag_pl = Player_by_id(tagItPlayerId);
 
     if (tag_pl && !BIT(tag_pl->status, PAUSE))
 	return;
@@ -81,7 +81,7 @@ void Check_tag(void)
     }
 
     if (num == 0) {
-	tag = NO_ID;
+	tagItPlayerId = NO_ID;
 	return;
     }
 
@@ -90,23 +90,23 @@ void Check_tag(void)
     for (i = candidate; i < NumPlayers; i++) {
 	player *pl = Players(i);
 	if (Player_can_be_tagged(pl)) {
-	    tag = pl->id;
+	    tagItPlayerId = pl->id;
 	    break;
 	}
     }
 
-    if (tag == NO_ID) {
+    if (tagItPlayerId == NO_ID) {
 	for (i = 0; i < candidate; i++) {
 	    player *pl = Players(i);
 	    if (Player_can_be_tagged(pl)) {
-		tag = pl->id;
+		tagItPlayerId = pl->id;
 		break;
 	    }
 	}
     }
 
     /* someone should be tagged by now */
-    assert(tag != NO_ID);
+    assert(tagItPlayerId != NO_ID);
 }
 
 static int Punish_team(player *pl, treasure_t *td, clpos pos)
@@ -696,4 +696,3 @@ void Hitmasks_init(void)
     Target_init();
     Team_immunity_init();
 }
-

@@ -1282,11 +1282,12 @@ void Update_objects(void)
       * In tag games, check if anyone is tagged. otherwise, tag someone.
       */
     if (tagGame) {
-	int oldtag = tag;
+	int oldtag = tagItPlayerId;
 
 	Check_tag();
-	if (tag != oldtag && tag != NO_ID) {
-	    sprintf(msg, " < %s is 'it' now. >", Player_by_id(tag)->name);
+	if (tagItPlayerId != oldtag && tagItPlayerId != NO_ID) {
+	    sprintf(msg, " < %s is 'it' now. >",
+		    Player_by_id(tagItPlayerId)->name);
 	    Set_message(msg);
 	}
     }

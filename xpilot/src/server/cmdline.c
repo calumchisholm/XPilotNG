@@ -183,6 +183,8 @@ double		mineScoreMult;
 double		selfKillScoreMult;
 double		selfDestructScoreMult;
 double		unownedKillScoreMult;
+double		tagItKillMult;
+double		tagKillItMult;
 double		asteroidPoints;
 double		cannonPoints;
 double		asteroidMaxScore;
@@ -345,7 +347,7 @@ static void Tune_robot_user_name(void) { Fix_user_name(robotUserName); }
 static void Tune_robot_host_name(void) { Fix_host_name(robotHostName); }
 static void Tune_tank_user_name(void)  { Fix_user_name(tankUserName); }
 static void Tune_tank_host_name(void)  { Fix_host_name(tankHostName); }
-static void Tune_tagGame(void)         { if (!tagGame) tag = NO_ID; }
+static void Tune_tagGame(void)         { if (!tagGame) tagItPlayerId = NO_ID; }
 static void Check_baseless(void);
 
 static option_desc options[] = {
@@ -1634,6 +1636,27 @@ static option_desc options[] = {
  	"One player is 'it' (is worth more points when killed than the\n"
  	"others). After this player is killed, the one who killed them\n"
  	"becomes 'it', and so on.\n",
+ 	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"tagKillItMult",
+	"tagKillItMult",
+ 	"10.0",
+ 	&tagKillItMult,
+ 	valReal,
+ 	tuner_dummy,
+ 	"Score multiplier for killing 'it' (tagGame must be on).\n",
+ 	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"tagItKillMult",
+	"tagItKillMult",
+ 	"2.0",
+ 	&tagItKillMult,
+ 	valReal,
+ 	tuner_dummy,
+ 	"Score multiplier when 'it' kills an enemy player\n"
+	"(tagGame must be on).\n",
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

@@ -185,7 +185,7 @@ extern bool		teamAssign;
 extern bool		teamImmunity;
 extern bool		teamShareScore;
 extern bool		tagGame;
-extern int		tag;
+extern int		tagItPlayerId;
 extern bool		timing;
 extern bool		ballrace;
 extern bool		ballrace_connect;
@@ -228,6 +228,8 @@ extern double		mineScoreMult;
 extern double		selfKillScoreMult;
 extern double		selfDestructScoreMult;
 extern double		unownedKillScoreMult;
+extern double		tagItKillMult;
+extern double		tagKillItMult;
 extern double		asteroidPoints;
 extern double		cannonPoints;
 extern double		asteroidMaxScore;
@@ -728,6 +730,7 @@ void Team_game_over(int winning_team, const char *reason);
 void Individual_game_over(int winner);
 void Race_game_over(void);
 int Team_immune(int id1, int id2);
+
 static inline void Player_set_float_dir(player *pl, double new_float_dir)
 {
     if (ngControls && new_float_dir != pl->float_dir) {
@@ -848,7 +851,6 @@ void expandKeyword(const char *keyword);
 /*
  * Prototypes for laser.c
  */
-void Laser_pulse_collision(void);
 void Laser_pulse_hits_player(player *pl, pulseobject *pulse);
 
 /*
