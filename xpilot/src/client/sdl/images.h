@@ -64,6 +64,8 @@ typedef struct {
 #define IMG_METER	  29
 #define IMG_ASTEROIDCONC  30
 #define IMG_SHIELD        31
+#define IMG_ACWISEGRAV    32
+#define IMG_CWISEGRAV     33
 
 int Images_init(void);
 void Images_cleanup(void);

@@ -433,50 +433,127 @@ void Gui_paint_hudradar_limit(int x, int y, int xi, int yi)
 
 void Gui_paint_setup_check(int x, int y, bool isNext)
 {
+    if (isNext) {
+	Image_paint(IMG_CHECKPOINT, x, y, 0, whiteRGBA);
+    } else {
+	Image_paint(IMG_CHECKPOINT, x, y, 0, whiteRGBA - 128);
+    }
 }
 
 void Gui_paint_setup_acwise_grav(int x, int y)
 {
+    Image_paint(IMG_ACWISEGRAV, x, y, loopsSlow % 6, whiteRGBA);
 }
 
 void Gui_paint_setup_cwise_grav(int x, int y)
 {
+    Image_paint(IMG_CWISEGRAV, x, y, loopsSlow % 6, whiteRGBA);
 }
 
 void Gui_paint_setup_pos_grav(int x, int y)
 {
+    Image_paint(IMG_PLUSGRAVITY, x, y, 0, whiteRGBA);
 }
 
 void Gui_paint_setup_neg_grav(int x, int y)
 {
+    Image_paint(IMG_MINUSGRAVITY, x, y, 0, whiteRGBA);
+}
+
+static void paint_dir_grav(int x, int y, int dir)
+{
+    const int sz = BLOCK_SZ;
+    int cb, c0, c1, c2, p1, p2, swp;
+
+    cb = redRGBA - 255;
+    p1 = loops % sz;
+    p2 = (loops + sz / 2) % sz;
+
+    if (p1 < p2) {
+	c0 = cb + p1 * 128 / (sz / 2);
+	c1 = cb;
+	c2 = cb + 128;
+    } else {
+	c0 = cb + (sz - p1) * 128 / (sz / 2);
+	c1 = cb + 128;
+	c2 = cb;
+	swp = p1; p1 = p2; p2 = swp;
+    }
+
+    glEnable(GL_BLEND);
+
+#define GRAV(x0,y0,x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7) \
+    glBegin(GL_QUAD_STRIP);\
+    set_alphacolor(c0); glVertex2i(x+x0,y+y0); glVertex2i(x+x1,y+y1);\
+    set_alphacolor(c1); glVertex2i(x+x2,y+y2); glVertex2i(x+x3,y+y3);\
+    set_alphacolor(c2); glVertex2i(x+x4,y+y4); glVertex2i(x+x5,y+y5);\
+    set_alphacolor(c0); glVertex2i(x+x6,y+y6); glVertex2i(x+x7,y+y7);\
+    glEnd();
+
+    switch(dir) {
+    case 0: /* up */
+	GRAV( 0,  0, sz,  0,
+	      0, p1, sz, p1,
+	      0, p2, sz, p2,
+	      0, sz, sz, sz);
+	break;
+    case 1: /* right */
+	GRAV( 0,  0,  0, sz,
+	     p1,  0, p1, sz,
+	     p2,  0, p2, sz,
+	     sz,  0, sz, sz);
+	break;
+    case 2: /* down */
+	GRAV( 0,    sz, sz,    sz,
+	      0, sz-p1, sz, sz-p1,
+	      0, sz-p2, sz, sz-p2,
+	      0,     0, sz,     0);
+	break;
+    case 3: /* left */
+	GRAV(   sz, 0,    sz, sz,
+	     sz-p1, 0, sz-p1, sz,
+	     sz-p2, 0, sz-p2, sz,
+	        0,  0,     0, sz);
+	break;
+    }    
+#undef GRAV
+
+    glDisable(GL_BLEND);
 }
 
 void Gui_paint_setup_up_grav(int x, int y)
 {
+    paint_dir_grav(x, y, 0);
 }
 
 void Gui_paint_setup_down_grav(int x, int y)
 {
+    paint_dir_grav(x, y, 2);
 }
 
 void Gui_paint_setup_right_grav(int x, int y)
 {
+    paint_dir_grav(x, y, 1);
 }
 
 void Gui_paint_setup_left_grav(int x, int y)
 {
+    paint_dir_grav(x, y, 3);
 }
 
 void Gui_paint_setup_worm(int x, int y)
 {
+    Image_paint(IMG_WORMHOLE, x, y, loopsSlow % 8, whiteRGBA);
 }
 
 void Gui_paint_setup_item_concentrator(int x, int y)
 {
+    Image_paint(IMG_CONCENTRATOR, x, y, loopsSlow % 32, whiteRGBA);
 }
 
 void Gui_paint_setup_asteroid_concentrator(int x, int y)
 {
+    Image_paint(IMG_ASTEROIDCONC, x, y, loopsSlow % 32, whiteRGBA);
 }
 
 void Gui_paint_decor_dot(int x, int y, int size)

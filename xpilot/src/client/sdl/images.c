@@ -209,6 +209,8 @@ int Images_init(void)
     DEF_IMG("meter.ppm", -2);
     DEF_IMG("asteroidconcentrator.ppm", 32);
     DEF_IMG("shield.ppm", 1);
+    DEF_IMG("acwise_grav.ppm", -6);
+    DEF_IMG("cwise_grav.ppm", -6);
 
     first_texture = num_images;
 
