@@ -777,6 +777,7 @@ int Client_fps_request(void);
 int Client_power(void);
 int Client_pointer_move(int movement);
 int Client_check_pointer_move_interval(void);
+void Client_exit(int status);
 
 int Init_playing_windows(void);
 void Raise_window(void);

@@ -155,6 +155,9 @@ typedef enum {
     KEY_INCREASE_TURNSPEED,
     KEY_DECREASE_TURNSPEED,
     KEY_TOGGLE_FULLSCREEN,
+    KEY_EXIT,
+    KEY_YES,
+    KEY_NO,
     NUM_CLIENT_KEYS	/* The number of keys really used by the client. */
 #endif
 } keys_t;

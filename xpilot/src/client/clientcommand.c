@@ -247,11 +247,7 @@ void executeCommand(const char *talk_str)
 	break;
     case 12:			/* quit */
     case 13:			/* q */
-	/* kps - is this ok ? */
-	Net_cleanup();
-	Quit();
-	exit(0);
-	break;
+	Client_exit(0);
     default:
 	warn("BUG: bad command num %d in executeCommand()", command_num);
 	assert(0);

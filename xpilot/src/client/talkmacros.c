@@ -502,7 +502,7 @@ xp_option_t talk_macro_options[] = {
 
     XP_STRING_OPTION(
 	"msg11",
-	"\\quit",
+	"",
 	NULL, 0,
 	Set_talk_macro, NULL, Get_talk_macro,
 	XP_OPTFLAG_DEFAULT,

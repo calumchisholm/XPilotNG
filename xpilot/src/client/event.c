@@ -38,6 +38,35 @@ keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 { NULL, NULL, NULL, NULL, NULL };
 
+
+static void Pointer_control_newbie_message(void)
+{
+    xp_option_t *opt = Find_option("keyPointerControl");
+    char msg[MSG_LEN];
+    const char *val;
+
+    if (!newbie)
+	return;
+
+    if (!opt)
+	return;
+
+    val = Option_value_to_string(opt);
+    if (strlen(val) == 0)
+	return;
+
+    if(!pointerControl)
+	snprintf(msg, sizeof(msg),
+		 "Mouse steering enabled. "
+		 "Key(s) to disable it: %s.", val);
+    else
+	snprintf(msg, sizeof(msg),
+		 "Mouse steering disabled. "
+		 "Key(s) to enable it: %s.", val);
+
+    Add_newbie_message(msg);
+}
+
 static inline int pointer_button_index_by_option(xp_option_t *opt)
 {
     return atoi(Option_get_name(opt) + strlen("pointerButton")) - 1;
@@ -210,6 +239,43 @@ static bool Key_press_select_lose_item(void)
     return true;
 }
 
+static bool quit_mode = false;
+
+static bool Key_press_yes(void)
+{
+    if (quit_mode)
+	Client_exit(0);
+    return false;	/* server doesn't need to know */
+}
+
+static bool Key_press_no(void)
+{
+    if (quit_mode) {
+	Add_message("Phew. [*Client reply*]");
+	quit_mode = false;
+    }
+    return false;	/* server doesn't need to know */
+}
+
+static bool Key_press_exit(void)
+{
+    /* exit pointer control if exit key pressed in pointer control mode */
+    if (pointerControl) {
+	Pointer_control_newbie_message();
+	return Key_press_pointer_control();
+    }
+
+    if (quit_mode)
+	/* pressing exit button again exits quit mode */
+	Key_press_no();
+    else {
+	quit_mode = true;
+	Add_message("Really Quit (y/n) ? []");
+    }
+
+    return false;	/* server doesn't need to know */
+}
+
 bool Key_press(keys_t key)
 {
     static bool thrusthelp = false;
@@ -295,28 +361,7 @@ bool Key_press(keys_t key)
 	return Key_press_show_messages();
 
     case KEY_POINTER_CONTROL:
-	if (newbie) {
-    	    xp_option_t *opt = Find_option("keyPointerControl");
-	    char msg[MSG_LEN];
-	    const char *val;
-
-	    if (!opt)
-	    	break;
-	    val = Option_value_to_string(opt);
-	    if (strlen(val) == 0)
-	    	break;
-
-	    if(!pointerControl)
-		snprintf(msg, sizeof(msg),
-			 "Mouse steering enabled. "
-			 "Key(s) to disable it: %s.", val);
-	    else
-		snprintf(msg, sizeof(msg),
-			 "Mouse steering disabled. "
-			 "Key(s) to enable it: %s.", val);
-
-    	    Add_newbie_message(msg);
-	}
+	Pointer_control_newbie_message();
 	return Key_press_pointer_control();
 
     case KEY_TOGGLE_RECORD:
@@ -335,6 +380,14 @@ bool Key_press(keys_t key)
     case KEY_LOSE_ITEM:
 	if (!Key_press_select_lose_item())
 	    return false;
+
+    case KEY_EXIT:
+	return Key_press_exit();
+    case KEY_YES:
+	return Key_press_yes();
+    case KEY_NO:
+	return Key_press_no();
+
     default:
 	break;
     }
@@ -597,7 +650,6 @@ static const char *getPointerButtonBinding(xp_option_t *opt)
  */
 /* unused: a s */
 xp_option_t key_options[] = {
-
     XP_KEY_OPTION(
 	"keyTurnLeft",
 	"Left",
@@ -1065,6 +1117,27 @@ xp_option_t key_options[] = {
 	"Toggle pointer control.\n"),
 
     XP_KEY_OPTION(
+	"keyExit",
+	"Escape",
+	KEY_EXIT,
+	"Generic exit key.\n"
+	"Used for example to exit mouse mode or quit the client.\n"),
+
+    XP_KEY_OPTION(
+	"keyYes",
+	"y",
+	KEY_YES,
+	"Positive reply key.\n"
+	"Used to reply 'yes' to client questions.\n"),
+
+    XP_KEY_OPTION(
+	"keyNo",
+	"n",
+	KEY_NO,
+	"Negative reply key.\n"
+	"Used to reply 'no' to client questions.\n"),
+
+    XP_KEY_OPTION(
 	"keySendMsg1",
 	"F1",
 	KEY_MSG_1,
@@ -1126,13 +1199,13 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keySendMsg11",
-	"Escape", /* F11 is keyToggleFullScreen now */
+	"", /* F11 is keyToggleFullScreen now */
 	KEY_MSG_11,
 	"Sends the talkmessage stored in msg11.\n"),
 
     XP_KEY_OPTION(
 	"keySendMsg12",
-	"F12",
+	"",
 	KEY_MSG_12,
 	"Sends the talkmessage stored in msg12.\n"),
 
