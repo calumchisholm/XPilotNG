@@ -432,11 +432,12 @@ static void PlayerCollision(void)
 	     */
 	    int dist, mindist = ballConnectorLength * CLICK;
 	    for (j = 0; j < NumObjs; j++) {
-		if (BIT(Obj[j]->type, OBJ_BALL) && Obj[j]->id == NO_ID) {
-		    dist = Wrap_length(pl->pos.cx - Obj[j]->pos.cx,
-				       pl->pos.cy - Obj[j]->pos.cy);
+		object *obj = Obj[j];
+		if (BIT(obj->type, OBJ_BALL) && obj->id == NO_ID) {
+		    dist = Wrap_length(pl->pos.cx - obj->pos.cx,
+				       pl->pos.cy - obj->pos.cy);
 		    if (dist < mindist) {
-			ballobject *ball = BALL_PTR(Obj[j]);
+			ballobject *ball = BALL_PTR(obj);
 			int bteam = ball->treasure->team;
 
 			/*
@@ -451,7 +452,7 @@ static void PlayerCollision(void)
 			if (!BIT(World.rules->mode, TEAM_PLAY)
 			    || ball->owner != NO_ID
 			    || pl->team != bteam) {
-			    pl->ball = BALL_PTR(Obj[j]);
+			    pl->ball = ball;
 			    mindist = dist;
 			}
 		    }
