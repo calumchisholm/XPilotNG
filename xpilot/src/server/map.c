@@ -281,7 +281,7 @@ int Map_place_wormhole(int cx, int cy, wormType type)
     t.pos.cy = cy;
     t.countdown = 0;
     t.lastdest = -1;
-    t.temporary = 0;
+    t.temporary = false;
     t.type = type;
     t.lastblock = SPACE;
     t.lastID = -1;
@@ -1045,22 +1045,27 @@ void add_temp_wormholes(int xin, int yin, int xout, int yout)
 
     inhole.pos.cx = BLOCK_CENTER(xin);
     inhole.pos.cy = BLOCK_CENTER(yin);
+    inhole.countdown = wormTime;
+    inhole.lastdest = World.NumWormholes + 1;
+    inhole.temporary = true;
+    inhole.type = WORM_IN;
+    inhole.lastblock = World.block[xin][yin];
+    inhole.lastID = Map_get_itemid(xin, yin);
+    World.wormHoles[World.NumWormholes] = inhole;
+    World.block[xin][yin] = WORMHOLE;
+    Map_set_itemid(xin, yin, World.NumWormholes);
+
     outhole.pos.cx = BLOCK_CENTER(xout);
     outhole.pos.cy = BLOCK_CENTER(yout);
-    inhole.countdown = outhole.countdown = wormTime;
-    inhole.lastdest = World.NumWormholes + 1;
-    inhole.temporary = outhole.temporary = 1;
-    inhole.type = WORM_IN;
+    outhole.countdown = wormTime;
+    outhole.temporary = true;
     outhole.type = WORM_OUT;
-    inhole.lastblock = World.block[xin][yin];
     outhole.lastblock = World.block[xout][yout];
-    inhole.lastID = Map_get_itemid(xin, yin);
     outhole.lastID = Map_get_itemid(xout, yout);
-    World.wormHoles[World.NumWormholes] = inhole;
     World.wormHoles[World.NumWormholes + 1] = outhole;
-    World.block[xin][yin] = World.block[xout][yout] = WORMHOLE;
-    Map_set_itemid(xin, yin, World.NumWormholes);
+    World.block[xout][yout] = WORMHOLE;
     Map_set_itemid(xout, yout, World.NumWormholes + 1);
+
     World.NumWormholes += 2;
 }
 
