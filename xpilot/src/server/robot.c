@@ -631,10 +631,9 @@ static void Robot_talks(enum robot_talk_t says_what,
 	"%s will be assimilated [%s]",
     };
 
-    static int		next_msg = -1;
-    const char		**msgsp;
-    int			two, i, n;
-    char		msg[MSG_LEN];
+    static int next_msg = -1;
+    const char **msgsp;
+    int two, i, n;
 
     if (options.robotsTalk != true && says_what != ROBOT_TALK_ENTER)
 	return;
@@ -672,10 +671,9 @@ static void Robot_talks(enum robot_talk_t says_what,
 
     i = next_msg % n;
     if (two == 2)
-	sprintf(msg, msgsp[i], other_name, robot_name);
+	Set_message(msgsp[i], other_name, robot_name);
     else
-	sprintf(msg, msgsp[i], robot_name);
-    Set_message(msg);
+	Set_message(msgsp[i], robot_name);
 }
 
 
@@ -687,7 +685,6 @@ static void Robot_create(world_t *world)
     int i, num, most_used, least_used;
     robot_data_t *data, *new_data;
     robot_type_t *rob_type;
-    char msg[MSG_LEN];
 
     if (peek_ID() == 0)
 	return;
@@ -808,10 +805,9 @@ static void Robot_create(world_t *world)
 	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
-	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
-		options.roundDelaySeconds,
-		(BIT(world->rules->mode, TIMING)? "race" : "round"));
-	Set_message(msg);
+	Set_message("Player entered. Delaying %d seconds until next %s.",
+		    options.roundDelaySeconds,
+		    (BIT(world->rules->mode, TIMING) ? "race" : "round"));
     }
 
     updateScores = true;
@@ -827,7 +823,6 @@ void Robot_destroy(player_t *pl)
 void Robot_delete(player_t *pl, bool kicked)
 {
     int i;
-    char msg[MSG_LEN];
 
     if (pl == NULL) {
 	player_t *low_pl = NULL;
@@ -852,11 +847,9 @@ void Robot_delete(player_t *pl, bool kicked)
     }
 
     if (pl) {
-	if (kicked) {
-	    sprintf(msg, "\"%s\" upset the gods and was kicked out "
-		    "of the game.", pl->name);
-	    Set_message(msg);
-	}
+	if (kicked)
+	    Set_message("%s upset the gods and was kicked out of the game.",
+			pl->name);
 	Delete_player(pl);
     }
 }
@@ -1003,27 +996,32 @@ static void Robot_play(player_t *pl)
  */
 static int Robot_check_leave(player_t *pl)
 {
-    char msg[MSG_LEN];
+    bool leave = false;
     world_t *world = pl->world;
 
     if (options.robotsLeave
 	&& pl->life > 0
 	&& !BIT(world->rules->mode, LIMITED_LIVES)
 	&& (BIT(pl->status, PLAYING) || pl->recovery_count <= 0)) {
-	msg[0] = '\0';
-	if (options.robotLeaveLife > 0
-	    && pl->life >= options.robotLeaveLife)
-	    sprintf(msg, "%s retired.", pl->name);
-	else if (options.robotLeaveScore != 0
-		 && pl->score < options.robotLeaveScore)
-	    sprintf(msg, "%s left out of disappointment.", pl->name);
-	else if (options.robotLeaveRatio != 0
-		 && pl->score / (pl->life + 1) < options.robotLeaveRatio)
-	    sprintf(msg, "%s played too badly.", pl->name);
 
-	if (msg[0] != '\0') {
+	if (options.robotLeaveLife > 0
+	    && pl->life >= options.robotLeaveLife) {
+	    Set_message("%s retired.", pl->name);
+	    leave = true;
+	}
+	else if (options.robotLeaveScore != 0
+		 && pl->score < options.robotLeaveScore) {
+	    Set_message("%s left out of disappointment.", pl->name);
+	    leave = true;
+	}
+	else if (options.robotLeaveRatio != 0
+		 && pl->score / (pl->life + 1) < options.robotLeaveRatio) {
+	    Set_message("%s played too badly.", pl->name);
+	    leave = true;
+	}
+
+	if (leave) {
 	    Robot_talks(ROBOT_TALK_LEAVE, pl->name, "");
-	    Set_message(msg);
 	    Robot_delete(pl, false);
 	    return true;
 	}
