@@ -146,8 +146,8 @@ static bool Set_noarg_option(xp_option_t *opt, bool value)
     assert(opt->noarg_ptr);
 
     *opt->noarg_ptr = value;
-    printf("Value of option %s is now %s.\n", opt->name,
-	   *opt->noarg_ptr ? "true" : "false");
+    /*printf("Value of option %s is now %s.\n", opt->name,
+     *opt->noarg_ptr ? "true" : "false");*/
     return true;
 }
 
@@ -173,8 +173,8 @@ static bool Set_bool_option(xp_option_t *opt, bool value)
     if (opt->bool_setfunc)
 	retval = opt->bool_setfunc(opt, value);
 
-    printf("Value of option %s is now %s.\n", opt->name,
-	   *opt->bool_ptr ? "true" : "false");
+    /*printf("Value of option %s is now %s.\n", opt->name,
+     *opt->bool_ptr ? "true" : "false");*/
     return retval;
 }
 
@@ -199,7 +199,7 @@ static bool Set_int_option(xp_option_t *opt, int value)
     if (opt->int_setfunc)
 	retval = opt->int_setfunc(opt, value);
 
-    printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);
+    /*printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);*/
     return retval;
 }
 
@@ -224,7 +224,7 @@ static bool Set_double_option(xp_option_t *opt, double value)
     if (opt->dbl_setfunc)
 	retval = opt->dbl_setfunc(opt, value);
 
-    printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);
+    /*printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);*/
     return retval;
 }
 
@@ -247,11 +247,11 @@ static bool Set_string_option(xp_option_t *opt, const char *value)
     if (opt->str_setfunc)
 	retval = opt->str_setfunc(opt, value);
 
-    if (opt->str_ptr)
-	printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
-    else
-	printf("Value of option %s is now \"%s\".\n",
-	       opt->name, opt->str_getfunc(opt));
+    /*if (opt->str_ptr)
+      printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
+      else
+      printf("Value of option %s is now \"%s\".\n",
+      opt->name, opt->str_getfunc(opt));*/
     return retval;
 }
 
