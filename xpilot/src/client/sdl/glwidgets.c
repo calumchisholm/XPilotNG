@@ -33,7 +33,7 @@
 /* BEGIN: Main GLWidget stuff	    	    	    */
 /****************************************************/
 
-void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h);
+void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h );
 GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
 
 GLWidget *Init_EmptyBaseGLWidget( void )
@@ -80,7 +80,7 @@ void Close_WidgetTree ( GLWidget **widget )
     *widget = NULL;
 }
 
-void Close_Widget (GLWidget **widget)
+void Close_Widget ( GLWidget **widget )
 {
     GLWidget *tmp;
 
@@ -104,7 +104,7 @@ void Close_Widget (GLWidget **widget)
 }
 
 /* IMPORTANT: compound widgets need to edit this function */
-void SetBounds_GLWidget(GLWidget *widget, SDL_Rect *b)
+void SetBounds_GLWidget( GLWidget *widget, SDL_Rect *b )
 {
     if (!widget) {
     	error("NULL widget passed to SetBounds_GLWidget!");
@@ -126,7 +126,7 @@ void SetBounds_GLWidget(GLWidget *widget, SDL_Rect *b)
 }
 
 /* Eventually this will be the only visible initializer I guess */
-GLWidget *Init_OptionWidget(font_data *font, xp_option_t *opt)
+GLWidget *Init_OptionWidget( font_data *font, xp_option_t *opt )
 {
     if (!opt) {
     	error("Faulty parameter to Init_DoubleChooserWidget: opt is a NULL pointer!");
@@ -301,10 +301,10 @@ GLWidget *FindGLWidget( Uint16 x, Uint16 y )
 /**********************/
 /* Begin:  ArrowWidget*/
 /**********************/
-void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data);
-void Paint_ArrowWidget(GLWidget *widget);
+void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+void Paint_ArrowWidget( GLWidget *widget );
 
-void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data)
+void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     ArrowWidget *tmp;
     
@@ -326,7 +326,7 @@ void button_ArrowWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *
     }
 }
 
-void Paint_ArrowWidget(GLWidget *widget)
+void Paint_ArrowWidget( GLWidget *widget )
 {
     GLWidget *tmp;
     SDL_Rect *b;
@@ -421,11 +421,11 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction,int width, int height,
 /**********************/
 /* Begin: SlideWidget*/
 /**********************/
-void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data);
-void motion_SlideWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data);
+void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
+void motion_SlideWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data );
 void Paint_SlideWidget( GLWidget *widget );
 
-void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
+void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
 {
     SlideWidget *tmp;
     
@@ -445,7 +445,7 @@ void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *da
     }
 }
 
-void Paint_SlideWidget(GLWidget *widget)
+void Paint_SlideWidget( GLWidget *widget )
 {
     GLWidget *tmp;
     SDL_Rect *b;
@@ -484,8 +484,7 @@ void Paint_SlideWidget(GLWidget *widget)
 
 GLWidget *Init_SlideWidget( bool locked,
     	     void (*motion)( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data ), void *motiondata,
-	     void (*release)(void *releasedata),void *releasedata
-	     )
+	     void (*release)(void *releasedata),void *releasedata )
 {
     GLWidget *tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
@@ -520,13 +519,13 @@ GLWidget *Init_SlideWidget( bool locked,
 /*************************/
 /* Begin: ScrollbarWidget*/
 /*************************/
-void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data);
-void release_ScrollbarWidget( void *releasedata);
-void Paint_ScrollbarWidget(GLWidget *widget);
-void SetBounds_ScrollbarWidget(GLWidget *widget, SDL_Rect *b);
-void Close_ScrollbarWidget (GLWidget *widget);
+void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data );
+void release_ScrollbarWidget( void *releasedata );
+void Paint_ScrollbarWidget( GLWidget *widget );
+void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b );
+void Close_ScrollbarWidget ( GLWidget *widget );
 
-void Close_ScrollbarWidget (GLWidget *widget)
+void Close_ScrollbarWidget ( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=SCROLLBARWIDGET) {
@@ -535,7 +534,7 @@ void Close_ScrollbarWidget (GLWidget *widget)
     }
 }
 
-void SetBounds_ScrollbarWidget(GLWidget *widget, SDL_Rect *b)
+void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b )
 {
     ScrollbarWidget *tmp;
     SDL_Rect sb;
@@ -575,7 +574,7 @@ void SetBounds_ScrollbarWidget(GLWidget *widget, SDL_Rect *b)
     SetBounds_GLWidget(tmp->slide,&sb);
 }
 
-void Paint_ScrollbarWidget(GLWidget *widget)
+void Paint_ScrollbarWidget( GLWidget *widget )
 {
     static int bgcolor  = 0x00000044;
     SDL_Rect *b = &(widget->bounds);
@@ -590,7 +589,7 @@ void Paint_ScrollbarWidget(GLWidget *widget)
     glEnd();
 }
 
-void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data)
+void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data )
 {
     GLWidget *tmp;
     ScrollbarWidget *wid_info;
@@ -625,6 +624,8 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
 	    return;
     }
     
+    if (!move) return;
+    
     wid_info->oldmoves += move;
     
     if (wid_info->oldmoves > 0) {
@@ -642,7 +643,8 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
     	wid_info->poschange(wid_info->pos,wid_info->poschangedata);
 }
 
-void release_ScrollbarWidget( void *releasedata ) {
+void release_ScrollbarWidget( void *releasedata )
+{
     GLWidget *tmp;
     ScrollbarWidget *wid_info;
     if (!releasedata) return;
@@ -653,9 +655,9 @@ void release_ScrollbarWidget( void *releasedata ) {
     wid_info->oldmoves = 0;
 }
 
-GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size,
-    	    	    	    	ScrollWidget_dir_t dir,
-    	    	    	    	void (*poschange)( GLfloat pos , void *poschangedata), void *poschangedata )
+GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWidget_dir_t dir,
+    	    	    	    	void (*poschange)( GLfloat pos , void *poschangedata),
+				void *poschangedata )
 {
     GLWidget *tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
@@ -695,13 +697,98 @@ GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size,
 /*   End: ScrollbarWidget*/
 /*************************/
 
+/***********************/
+/* Begin:  LabelWidget*/
+/***********************/
+void Paint_LabelWidget( GLWidget *widget );
+void Close_LabelWidget ( GLWidget *widget );
+
+void Close_LabelWidget( GLWidget *widget )
+{
+    if (!widget) return;
+    if (widget->WIDGET !=LABELWIDGET) {
+    	error("Wrong widget type for Close_LabelWidget [%i]",widget->WIDGET);
+	return;
+    }
+    free_string_texture(&(((LabelWidget *)widget->wid_info)->tex));
+}
+
+void Paint_LabelWidget( GLWidget *widget )
+{
+    GLWidget *tmp;
+    SDL_Rect *b;
+    LabelWidget *wid_info;
+
+    if (!widget) return;
+     
+    tmp = widget;
+    b = &(tmp->bounds);
+    wid_info = (LabelWidget *)(tmp->wid_info);
+    
+    if ( wid_info->bgcolor && *(wid_info->bgcolor) ) {
+    	set_alphacolor(*(wid_info->bgcolor));
+    
+    	glBegin(GL_QUADS);
+    	    glVertex2i(b->x     	,b->y);
+   	    glVertex2i(b->x + b->w  ,b->y);
+    	    glVertex2i(b->x + b->w  ,b->y+b->h);
+    	    glVertex2i(b->x     	,b->y+b->h);
+     	glEnd();
+    }
+    
+    if (wid_info->fgcolor)
+    	disp_text(&(wid_info->tex), *(wid_info->fgcolor), CENTER, CENTER, tmp->bounds.x+tmp->bounds.w/2, draw_height - tmp->bounds.y-tmp->bounds.h/2, true);
+    else
+    	disp_text(&(wid_info->tex), whiteRGBA, CENTER, CENTER, tmp->bounds.x+tmp->bounds.w/2, draw_height - tmp->bounds.y-tmp->bounds.h/2, true);
+}
+
+GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor )
+{
+    GLWidget *tmp;
+
+    if (!text) {
+    	error("text missing for Init_LabelWidget.");
+	return NULL;
+    }
+    tmp	= Init_EmptyBaseGLWidget();
+    if ( !tmp ) {
+        error("Failed to malloc in Init_LabelWidget");
+	return NULL;
+    }
+    tmp->wid_info   	= malloc(sizeof(LabelWidget));
+    if ( !(tmp->wid_info) ) {
+    	free(tmp);
+        error("Failed to malloc in Init_LabelWidget");
+	return NULL;
+    }
+
+    if ( !render_text(&gamefont, text, &(((LabelWidget *)tmp->wid_info)->tex)) ) {
+    	free(tmp->wid_info);
+    	free(tmp);
+        error("Failed to render text in Init_LabelWidget");
+	return NULL;
+    } 
+    
+    tmp->WIDGET     	= LABELWIDGET;
+    tmp->bounds.w   	= (((LabelWidget *)tmp->wid_info)->tex).width;
+    tmp->bounds.h   	= (((LabelWidget *)tmp->wid_info)->tex).height;
+    ((LabelWidget *)tmp->wid_info)->fgcolor  = fgcolor;
+    ((LabelWidget *)tmp->wid_info)->bgcolor  = bgcolor;
+    tmp->Draw	    	= Paint_LabelWidget;
+    tmp->Close     	= Close_LabelWidget;
+    return tmp;
+}
+/********************/
+/* End:  LabelWidget*/
+/********************/
+
 /***********************************/
 /* Begin:  LabeledRadiobuttonWidget*/
 /***********************************/
-void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data);
+void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
 void Paint_LabeledRadiobuttonWidget( GLWidget *widget );
 
-void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data)
+void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
 {
     LabeledRadiobuttonWidget *tmp;
     if (!data) return;
@@ -717,7 +804,7 @@ void button_LabeledRadiobuttonWidget( Uint8 button, Uint8 state , Uint16 x , Uin
     }
 }
 
-void Paint_LabeledRadiobuttonWidget(GLWidget *widget)
+void Paint_LabeledRadiobuttonWidget( GLWidget *widget )
 {
     GLWidget *tmp;
     SDL_Rect *b;
@@ -753,7 +840,8 @@ void Paint_LabeledRadiobuttonWidget(GLWidget *widget)
 }
 
 GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offtex,
-    	    	    	 void (*action)(bool state, void *actiondata), void *actiondata, bool start_state)
+    	    	    	    	    	void (*action)(bool state, void *actiondata),
+					void *actiondata, bool start_state )
 {
     GLWidget *tmp;
 
@@ -793,20 +881,20 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
 /*****************************/
 /* Begin:  BoolChooserWidget */
 /*****************************/
-void Paint_BoolChooserWidget(GLWidget *widget);
-void BoolChooserWidget_SetValue(bool state, void *data);
-void Close_BoolChooserWidget (GLWidget *widget);
-void SetBounds_BoolChooserWidget(GLWidget *widget, SDL_Rect *b);
+void Paint_BoolChooserWidget( GLWidget *widget );
+void BoolChooserWidget_SetValue( bool state, void *data );
+void Close_BoolChooserWidget ( GLWidget *widget );
+void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b );
 
 static int num_BoolChooserWidget = 0;
 static string_tex_t *BoolChooserWidget_ontex = NULL;
 static string_tex_t *BoolChooserWidget_offtex = NULL;
 
-void Close_BoolChooserWidget(GLWidget *widget)
+void Close_BoolChooserWidget( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=BOOLCHOOSERWIDGET) {
-    	error("Wrong widget type for SetBounds_BoolChooserWidget [%i]",widget->WIDGET);
+    	error("Wrong widget type for Close_BoolChooserWidget [%i]",widget->WIDGET);
 	return;
     }
     
@@ -821,7 +909,7 @@ void Close_BoolChooserWidget(GLWidget *widget)
     }
 }
 
-void SetBounds_BoolChooserWidget(GLWidget *widget, SDL_Rect *b)
+void SetBounds_BoolChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     GLWidget *tmp;
     SDL_Rect b2;
@@ -842,19 +930,19 @@ void SetBounds_BoolChooserWidget(GLWidget *widget, SDL_Rect *b)
     
     b2.h = tmp->bounds.h;
     b2.w = tmp->bounds.w;
-    b2.x = widget->bounds.x + widget->bounds.w -2 -tmp->bounds.w;
+    b2.x = widget->bounds.x + widget->bounds.w - 2 - tmp->bounds.w;
     b2.y = widget->bounds.y + 1;
 	    
     SetBounds_GLWidget(tmp,&b2);
 }
 
-void BoolChooserWidget_SetValue(bool state, void *data)
+void BoolChooserWidget_SetValue( bool state, void *data )
 {
     Set_bool_option(((BoolChooserWidget *)data)->opt, state,
 		    xp_option_origin_config);
 }
 
-void Paint_BoolChooserWidget(GLWidget *widget)
+void Paint_BoolChooserWidget( GLWidget *widget )
 {
     //static int bg_color     = 0x0000ff88;
     static int name_color   = 0xffff66ff;
@@ -876,7 +964,7 @@ void Paint_BoolChooserWidget(GLWidget *widget)
     disp_text(&(wid_info->nametex), name_color, LEFT, CENTER, widget->bounds.x+2/*|_text*/, draw_height - widget->bounds.y - widget->bounds.h/2, true);
 }
 
-GLWidget *Init_BoolChooserWidget(font_data *font, xp_option_t *opt)
+GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt )
 {
     GLWidget *tmp;
     BoolChooserWidget *wid_info;
@@ -984,11 +1072,11 @@ GLWidget *Init_BoolChooserWidget(font_data *font, xp_option_t *opt)
 /***************************/
 void IntChooserWidget_Add( void *data );
 void IntChooserWidget_Subtract( void *data );
-void Paint_IntChooserWidget(GLWidget *widget);
-void Close_IntChooserWidget (GLWidget *widget);
-void SetBounds_IntChooserWidget(GLWidget *widget, SDL_Rect *b);
+void Paint_IntChooserWidget( GLWidget *widget );
+void Close_IntChooserWidget ( GLWidget *widget );
+void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b );
 
-void Close_IntChooserWidget (GLWidget *widget)
+void Close_IntChooserWidget ( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=INTCHOOSERWIDGET) {
@@ -1000,7 +1088,7 @@ void Close_IntChooserWidget (GLWidget *widget)
     free_string_texture( &(((IntChooserWidget *)widget->wid_info)->valuetex) );
 }
 
-void SetBounds_IntChooserWidget(GLWidget *widget, SDL_Rect *b)
+void SetBounds_IntChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     IntChooserWidget *tmp;
     SDL_Rect rab,lab;
@@ -1094,7 +1182,7 @@ void IntChooserWidget_Subtract( void *data )
     }
 }
 
-void Paint_IntChooserWidget(GLWidget *widget)
+void Paint_IntChooserWidget( GLWidget *widget )
 {
     //static int bg_color     = 0x0000ff88;
     static int name_color   = 0xffff66ff;
@@ -1129,7 +1217,7 @@ void Paint_IntChooserWidget(GLWidget *widget)
     disp_text(&(wid_info->valuetex), value_color, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
 }
 
-GLWidget *Init_IntChooserWidget(font_data *font, xp_option_t *opt)
+GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt )
 {
     int valuespace;
     GLWidget *tmp;
@@ -1232,11 +1320,11 @@ GLWidget *Init_IntChooserWidget(font_data *font, xp_option_t *opt)
 /******************************/
 void DoubleChooserWidget_Add( void *data );
 void DoubleChooserWidget_Subtract( void *data );
-void Paint_DoubleChooserWidget(GLWidget *widget);
-void Close_DoubleChooserWidget (GLWidget *widget);
-void SetBounds_DoubleChooserWidget(GLWidget *widget, SDL_Rect *b);
+void Paint_DoubleChooserWidget( GLWidget *widget );
+void Close_DoubleChooserWidget ( GLWidget *widget );
+void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b );
 
-void Close_DoubleChooserWidget (GLWidget *widget)
+void Close_DoubleChooserWidget ( GLWidget *widget )
 {
     if (!widget) return;
     if (widget->WIDGET !=DOUBLECHOOSERWIDGET) {
@@ -1248,7 +1336,7 @@ void Close_DoubleChooserWidget (GLWidget *widget)
     free_string_texture( &(((DoubleChooserWidget *)widget->wid_info)->valuetex) );
 }
 
-void SetBounds_DoubleChooserWidget(GLWidget *widget, SDL_Rect *b)
+void SetBounds_DoubleChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
     DoubleChooserWidget *tmp;
     SDL_Rect rab,lab;
@@ -1340,7 +1428,7 @@ void DoubleChooserWidget_Subtract( void *data )
     }
 }
 
-void Paint_DoubleChooserWidget(GLWidget *widget)
+void Paint_DoubleChooserWidget( GLWidget *widget )
 {
     //static int bg_color     = 0x0000ff88;
     static int name_color   = 0xffff66ff;
@@ -1367,7 +1455,7 @@ void Paint_DoubleChooserWidget(GLWidget *widget)
     disp_text(&(wid_info->valuetex), value_color, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
 }
 
-GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt)
+GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt )
 {
     int valuespace;
     GLWidget *tmp;
@@ -1541,11 +1629,11 @@ GLWidget *Init_MainWidget( font_data *font )
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
-void ConfMenu_poschange( GLfloat pos , void *data);
+void ConfMenu_poschange( GLfloat pos , void *data );
 void Paint_ConfMenuWidget( GLWidget *widget );
 void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b );
 
-void ConfMenu_poschange( GLfloat pos , void *data)
+void ConfMenu_poschange( GLfloat pos , void *data )
 {
     GLWidget *widget;
     ConfMenuWidget *wid_info;

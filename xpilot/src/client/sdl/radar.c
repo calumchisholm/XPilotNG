@@ -76,9 +76,9 @@ static void Radar_paint_border(GLWidget *radar)
     glColor4ub(0, 0x00, 0x90, 0xff);
     glVertex2i(radar->bounds.x, radar->bounds.y);
     glColor4ub(0, 0, 0, 0xff);
-    glVertex2i(radar->bounds.x + radar->bounds.w, radar->bounds.y);
+    glVertex2i(radar->bounds.x + radar->bounds.w - 1, radar->bounds.y);
     glColor4ub(0, 0x00, 0x90, 0xff);
-    glVertex2i(radar->bounds.x + radar->bounds.w,
+    glVertex2i(radar->bounds.x + radar->bounds.w - 1,
 	       radar->bounds.y + radar->bounds.h);
     glEnd();
 }
@@ -367,8 +367,8 @@ GLWidget *Init_RadarWidget(void)
     tmp->WIDGET     	= RADARWIDGET;
     tmp->bounds.x   	= radar_bounds.x;
     tmp->bounds.y   	= radar_bounds.y;
-    tmp->bounds.w   	= radar_bounds.w+1;
-    tmp->bounds.h   	= radar_bounds.h * RadarHeight / RadarWidth+1;
+    tmp->bounds.w   	= radar_bounds.w;
+    tmp->bounds.h   	= radar_bounds.h * RadarHeight / RadarWidth;
     tmp->Draw	    	= Radar_paint;
     tmp->Close	    	= Radar_cleanup;
     tmp->button     	= button;

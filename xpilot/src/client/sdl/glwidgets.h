@@ -57,9 +57,9 @@ extern GLWidget *MainWidget;
 void Close_Widget ( GLWidget **widget );
 void Close_WidgetTree ( GLWidget **widget );
 /* to reshape the widget, and automagically reshape and place sub-widgets */
-void SetBounds_GLWidget(GLWidget *wid, SDL_Rect *b);
+void SetBounds_GLWidget(GLWidget *wid, SDL_Rect *b );
 /* Initializes the appropriate config widget (if implemented), returns NULL otherwise */
-GLWidget *Init_OptionWidget( font_data *font, xp_option_t *opt);
+GLWidget *Init_OptionWidget( font_data *font, xp_option_t *opt );
 
 bool AppendGLWidgetList( GLWidget **list, GLWidget *widget );
 void PrependGLWidgetList( GLWidget **list, GLWidget *widget );
@@ -83,20 +83,20 @@ GLWidget *FindGLWidget( Uint16 x,Uint16 y );
  * And each time it is drawn lit, it calls (*action).
  * Button two causes it set 'tap' and calls (*action),
  * (*action) needs to reset it for it to work again. (still haven't
- * decided whether automati reset is better)
+ * decided whether automatic reset is better)
  */
 #define ARROWWIDGET 0
 typedef enum {RIGHTARROW,UPARROW,LEFTARROW,DOWNARROW} ArrowWidget_dir_t;
 typedef struct {
-    ArrowWidget_dir_t direction;
-    bool    	    press;/*this is set/unset automagically (set:call action each draw)*/
-    bool    	    tap;/*action needs to clear this (action called once)*/
-    bool    	    locked;/*Won't call action for any reason*/
-    void    	    (*action)(void *data);
-    void    	    *actiondata;
+    ArrowWidget_dir_t	direction;
+    bool    	    	press;/*this is set/unset automagically (set:call action each draw)*/
+    bool    	    	tap;/*action needs to clear this (action called once)*/
+    bool    	    	locked;/*Won't call action for any reason*/
+    void    	    	(*action)(void *data);
+    void    	    	*actiondata;
 } ArrowWidget;
 GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction, int width, int height,
-    	    	    	    void (*action)( void *data ), void *actiondata);
+    	    	    	    void (*action)( void *data ), void *actiondata );
 /*********************/
 /* End:  ArrowWidget */
 /*********************/
@@ -108,13 +108,12 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction, int width, int height,
 typedef struct {
     bool    sliding;/*Don't slide*/
     bool    locked;/*Don't slide*/
-    void    (*release)(void *releasedata);
+    void    (*release)( void *releasedata );
     void    *releasedata;
 } SlideWidget;
 GLWidget *Init_SlideWidget( bool locked,
     	     void (*motion)( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data ), void *motiondata,
-	     void (*release)(void *releasedata),void *releasedata
-	     );
+	     void (*release)( void *releasedata),void *releasedata );
 /*********************/
 /* End: SlideWidget  */
 /*********************/
@@ -126,34 +125,49 @@ typedef enum {SB_VERTICAL, SB_HORISONTAL} ScrollWidget_dir_t;
 /* note 0.0 <= pos && pos + size <= 1.0 */
 #define SCROLLBARWIDGET 2
 typedef struct {
-    GLWidget	*slide;
-    GLfloat 	pos;
-    GLfloat 	size;
-    Sint16  	oldmoves;
+    GLWidget	    	*slide;
+    GLfloat 	    	pos;
+    GLfloat 	    	size;
+    Sint16  	    	oldmoves;
     ScrollWidget_dir_t	dir;
-    void    	(*poschange)( GLfloat pos , void *poschangedata);
-    void    	*poschangedata;
+    void    	    (	*poschange)( GLfloat pos , void *poschangedata );
+    void    	    	*poschangedata;
 } ScrollbarWidget;
-GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size,
-    	    	    	    	ScrollWidget_dir_t dir,
+GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size,ScrollWidget_dir_t dir,
     	    	    	    	void (*poschange)( GLfloat pos , void *data), void *data );
 /*************************/
 /* End:  ScrollbarWidget */
 /*************************/
 
+/**********************/
+/* Begin: LabelWidget */
+/**********************/
+#define LABELWIDGET 3
+typedef struct {
+    string_tex_t    tex;
+    int     	    *bgcolor;
+    int     	    *fgcolor;
+} LabelWidget;
+GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor );
+/********************/
+/* End: LabelWidget */
+/********************/
+
 /***********************************/
 /* Begin: LabeledRadiobuttonWidget */
 /***********************************/
-#define LABELEDRADIOBUTTONWIDGET 3
+#define LABELEDRADIOBUTTONWIDGET 4
 typedef struct {
     bool    	    state;
     string_tex_t    *ontex;
     string_tex_t    *offtex;
-    void    	    (*action)(bool state, void *actiondata);
+    void    	    (*action)( bool state, void *actiondata );
     void    	    *actiondata;
 } LabeledRadiobuttonWidget;
 /* TODO : add some abstraction layer to init function */
-GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offtex, void (*action)(bool state, void *actiondata), void *actiondata, bool start_state);
+GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offtex,
+    	    	    	    	    	void (*action)(bool state, void *actiondata),
+					void *actiondata, bool start_state);
 /*********************************/
 /* End: LabeledRadiobuttonWidget */
 /*********************************/
@@ -161,14 +175,14 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
 /****************************/
 /* Begin: BoolChooserWidget */
 /****************************/
-#define BOOLCHOOSERWIDGET 4
+#define BOOLCHOOSERWIDGET 5
 typedef struct {
     xp_option_t     *opt;
     GLWidget	    *buttonwidget;
     string_tex_t    nametex;
 } BoolChooserWidget;
 
-GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt);
+GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt );
 /**************************/
 /* End: BoolChooserWidget */
 /**************************/
@@ -176,7 +190,7 @@ GLWidget *Init_BoolChooserWidget( font_data *font, xp_option_t *opt);
 /***************************/
 /* Begin: IntChooserWidget */
 /***************************/
-#define INTCHOOSERWIDGET 5
+#define INTCHOOSERWIDGET 6
 typedef struct {
     string_tex_t    nametex;
     xp_option_t     *opt;
@@ -188,7 +202,7 @@ typedef struct {
     int     	    direction;
 } IntChooserWidget;
 
-GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt);
+GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt );
 /*************************/
 /* End: IntChooserWidget */
 /*************************/
@@ -196,7 +210,7 @@ GLWidget *Init_IntChooserWidget( font_data *font, xp_option_t *opt);
 /******************************/
 /* Begin: DoubleChooserWidget */
 /******************************/
-#define DOUBLECHOOSERWIDGET 6
+#define DOUBLECHOOSERWIDGET 7
 typedef struct {
     string_tex_t    nametex;
     xp_option_t     *opt;
@@ -208,7 +222,7 @@ typedef struct {
     int     	    direction;
 } DoubleChooserWidget;
 
-GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt);
+GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt );
 /****************************/
 /* End: DoubleChooserWidget */
 /****************************/
@@ -216,9 +230,9 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt);
 /**********************/
 /* Begin: RadarWidget */
 /**********************/
-#define RADARWIDGET 7
+#define RADARWIDGET 8
 
-extern GLWidget *Init_RadarWidget(void);
+extern GLWidget *Init_RadarWidget( void );
 /********************/
 /* End: RadarWidget */
 /********************/
@@ -226,9 +240,9 @@ extern GLWidget *Init_RadarWidget(void);
 /**************************/
 /* Begin: ScorelistWidget */
 /**************************/
-#define SCORELISTWIDGET 8
+#define SCORELISTWIDGET 9
 
-extern GLWidget *Init_ScorelistWidget(void);
+extern GLWidget *Init_ScorelistWidget( void );
 /************************/
 /* End: ScorelistWidget */
 /************************/
@@ -236,10 +250,10 @@ extern GLWidget *Init_ScorelistWidget(void);
 /**********************/
 /* Begin: MainWidget  */
 /**********************/
-#define MAINWIDGET 9
+#define MAINWIDGET 10
 typedef struct {
-    GLWidget *confmenu;
-    font_data *font;
+    GLWidget	*confmenu;
+    font_data	*font;
 } WrapperWidget;
 
 GLWidget *Init_MainWidget( font_data *font );
@@ -250,10 +264,10 @@ GLWidget *Init_MainWidget( font_data *font );
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
-#define CONFMENUWIDGET 10
+#define CONFMENUWIDGET 11
 typedef struct {
     int     	list_height;
-    GLWidget *scrollbar;
+    GLWidget	*scrollbar;
 } ConfMenuWidget;
 
 GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );
