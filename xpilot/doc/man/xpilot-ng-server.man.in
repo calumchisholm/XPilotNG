@@ -3,8 +3,8 @@
 .\" @XP_COPYRIGHT@.
 .\"
 .TH XPILOTS 6 "Requires UDP and X11"
-.ds )H GNU Public License 2.0 applies
-.ds ]W XPilot @VERSION@: @XP_RELEASEDATE@
+.ds )H GNU General Public License 2.0 applies
+.ds ]W @PACKAGE_STRING@: @XP_RELEASEDATE@
 .if n .ad l	\" If nroff formatter, adjust left margin only
 .if t .ad b	\" If troff formatter, adjust both margins
 

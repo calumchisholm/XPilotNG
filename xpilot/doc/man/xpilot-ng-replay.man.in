@@ -2,32 +2,36 @@
 .\"
 .\" @XP_COPYRIGHT@ & Steven Singer.
 .\"
-.TH XP-REPLAY 6 "Requires X11"
-.ds )H GNU Public License 2.0 applies
-.ds ]W XPilot @VERSION@: @XP_RELEASEDATE@
+.TH XPILOT-NG-REPLAY 6 "Requires X11"
+.ds )H GNU General Public License 2.0 applies
+.ds ]W @PACKAGE_STRING@: @XP_RELEASEDATE@
 .if n .ad l	\" If nroff formatter, adjust left margin only
 .if t .ad b	\" If troff formatter, adjust both margins
 
 .SH NAME
 
-xp-replay \- Playback an XPilot session.
+xpilot-ng-replay \- Playback an XPilot session.
 
 
 .SH SYNOPSIS
 
-.B xp-replay
+.B xpilot-ng-replay
 .B [-help]
 .B [-scale \fIfactor\fC]
 .B [-gamma \fIfactor\fC]
 .B [-compress]
+.B [-fps \fIvalue\fC]
+.B [-FPS \fIvalue\fC]
+.B [-loop]
+.B [-play]
 .B [-verbose]
 .B inputfile
 
 
 .SH OVERVIEW
 
-xp-replay is a program to view an XPilot recording. It takes record files
-produced by \fIxpilot(6)\fP and allows the user to replay them and make
+xpilot-ng-replay is a program to view an XPilot recording. It takes record files
+produced by \fIxpilot-ng-x11(6)\fP and allows the user to replay them and make
 snapshots of frames.
 
 .SS Options
@@ -49,6 +53,18 @@ Valid scale factors are in the range [0.01 - 1.0].
 .B -gamma \fIfactor\fP
 Sets the gamma correction factor when saving scaled frames.
 Valid gamma correction factors are in the range [0.1 - 10].
+.TP 15
+.B -fps \fIvalue\fP
+Set the number of frames per second used for replay and recording.
+.TP 15
+.B -FPS \fIvalue\fP
+Same as -fps \fIvalue\fP.
+.TP 15
+.B -play
+Start playing immediately.
+.TP 15
+.B -loop
+Loop after playing.
 .PP
 If the filename given is `\-' then the standard input is read. Frames read
 from the standard input are stored in memory to allow the user to jump
@@ -178,37 +194,40 @@ option is available to save files in compressed format.
 
 The simplest invocation is
 .IP
-.B xp-replay test-recording.xpr
+.B xpilot-ng-replay test-recording.xpr
 .PP
 which will play back a recording, and save frames at the original size.
-
-To save frames smaller that the original size use something like
-.IP
-.B xp-replay -scale 0.5 -gamma 2 test-recording.xpr
-.PP
-which will save frames at half size.
 
 You may want to compress the recording files to save disk space. You can
 then play them back directly without uncompressing them first using
 .IP
-.B zcat test-recording.xpr.Z | xp-replay -
+.B gzip -cd test-recording.xpr.gz | xpilot-ng-replay -
 .PP
 however, this may limit your ability to rewind through the recording.
 
-.B xp-replay
-automatically recognizes if a file is in compress format and gzip
-format.  If this is the case then it automatically starts
-.B compress -d
-or
+.B xpilot-ng-replay
+automatically recognizes if a file is in gzip, bzip2 or compress format.
+If this is the case then it automatically starts
 .B gzip -d
+or
+.B bzip2 -d
+or
+.B compress -d
 to uncompress the file before playback.
+
+To save frames smaller that the original size use something like
+.IP
+.B xpilot-ng-replay -scale 0.5 -gamma 2 test-recording.xpr
+.PP
+which will save frames at half size.
 
 
 .SH AUTHORS
 
 \fBxp-replay\fP was originally designed and developed by
-Steven Singer (S.Singer@ph.surrey.ac.uk). Additional develpoment was
-performed by Bert Gijsbers (bert@xpilot.org).
+Steven Singer (S.Singer@ph.surrey.ac.uk). Additional development was
+performed by Bert Gijsbers (bert@xpilot.org). \fBxpilot-ng-replay\fP
+is a slightly improved version.
 
 The scaling and gamma correction code was taken from the \fBpbmplus\fP
 package, which is Copyright (C) 1989, 1991 by Jef Poskanzer.
@@ -220,8 +239,8 @@ Bugs can be mailed to \fB@PACKAGE_BUGREPORT@\fP.
 
 
 .SH SEE ALSO
-xpilot(6), xpilots(6), ppm(5), compress(1), gzip(1)
+xpilot-ng-x11(6), xpilot-ng-server(6), ppm(5), gzip(1)
 .\"
-.\" index		\fIxpilot\fP \- multiplayer war game
-.\" index		\fIxpilots\fP \- server module for xpilot
+.\" index		\fIxpilot-ng-x11\fP \- multiplayer war game
+.\" index		\fIxpilot-ng-server\fP \- @PACKAGE_NAME@ server
 

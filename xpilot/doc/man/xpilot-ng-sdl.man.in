@@ -3,8 +3,8 @@
 .\" @XP_COPYRIGHT@.
 .\"
 .TH XPILOT 6 "Requires UDP and X11"
-.ds )H GNU Public License 2.0 applies
-.ds ]W XPilot @VERSION@: @XP_RELEASEDATE@
+.ds )H GNU General Public License 2.0 applies
+.ds ]W @PACKAGE_STRING@: @XP_RELEASEDATE@
 .if n .ad l	\" If nroff formatter, adjust left margin only
 .if t .ad b	\" If troff formatter, adjust both margins
 
@@ -1548,7 +1548,7 @@ the following information:
 .TP
 \(bu Which Xresources you're using.
 .TP
-\(bu The full version of xpilot, i.e., @VERSION@
+\(bu The full version of @PACKAGE_NAME@, i.e., @PACKAGE_VERSION@
 .TP
 \(bu What the bug looks like (symptoms)
 .TP
