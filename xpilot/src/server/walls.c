@@ -1325,19 +1325,19 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	    yn2 = ptn2.cy - yp;
 
 #define TEMPFUNC(X1, Y1, X2, Y2)                                           \
-			  myanswer->line = -1;  			  \
-			  myanswer->point = i;  			  \
-			  myanswer->moved.cx = (X2) - (X1);		  \
-			  myanswer->moved.cy = (Y2) - (Y1);		  \
+			   myanswer->line = -1;  			   \
+			   myanswer->point = i;  			   \
+			   myanswer->moved.cx = (X2) - (X1);		   \
+			   myanswer->moved.cy = (Y2) - (Y1);		   \
 	    if ((X1) < 0) {                                                \
 		if ((X2) >= 0) {                                           \
 		    if ((Y1) > 0 && (Y2) >= 0)                             \
 			t++;                                               \
 		    else if (((Y1) >= 0 || (Y2) >= 0) &&                   \
 			     (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) >= 0){\
-		       if (s == 0){					  \
+		       if (s == 0){					   \
      	    	    	    return linet[p].group;                         \
-	    	    	}   	    	    	    	    	    	    \
+	    	    	}   	    	    	    	    	    	   \
 			else                                               \
 			    t++;                                           \
 		    }                                                      \
@@ -1347,7 +1347,7 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 		if ((X2) <= 0) {                                           \
 		    if ((X2) == 0) {                                       \
 			if ((Y2)==0||((X1)==0 && (((Y1)<=0 && (Y2)>= 0) || \
-						((Y1) >= 0 && (Y2)<=0)))){\
+						 ((Y1) >= 0 && (Y2)<=0)))){\
 			    return linet[p].group;                         \
                               		         }                         \
 		    }                                                      \
@@ -1369,10 +1369,10 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 #undef TEMPFUNC
 
 	   if (t & 1){
-	     myanswer->line = p;  /*p not a line, but point*/
+	     myanswer->line = -1;  /*p not a line, but point*/
 	     myanswer->point = i;			     
-	     myanswer->moved.cx = mv.delta.cx;  	     
-	     myanswer->moved.cy = mv.delta.cy;  	  
+	     myanswer->moved.cx = 0;  	     
+	     myanswer->moved.cy = 0;
 	     return linet[p].group;
 	   }
 	    xo1 = xo2;
@@ -2878,15 +2878,15 @@ void Turn_player(player_t *pl)
 	if (Shape_morph((shape_t *)pl->ship, pl->dir, (shape_t *)pl->ship,
 			next_dir, hitmask, OBJ_PTR(pl),
 			pl->pos.cx, pl->pos.cy, &ans) != NO_GROUP) {
+	    Player_set_float_dir(pl, (double)pl->dir);
 
-	    /* velocity to push player away from wall */
 	    length = 0;
 
-	    if (ans.line != -1) {
+	    if ((options.turnPush != 0) && (ans.line != -1)) {
 		length = Wrap_length(linet[ans.line].delta.cx,
 				     linet[ans.line].delta.cy);
-		/*ans.moved.cx, ans.moved.cy);*/
 		if (length != 0) {
+	    /* velocity to push player away from wall */
 		    pl->vel.x += linet[ans.line].delta.cy / length
 			* options.turnPush;
 		    pl->vel.y -= linet[ans.line].delta.cx / length
@@ -2896,20 +2896,6 @@ void Turn_player(player_t *pl)
 		 * khs
 		 * code for handling corners could go here for ans.line == -1
 		 */
-	    }
-	    Player_set_float_dir(pl, (double)pl->dir);
-
-	    /* kps - why is this done again ??? (was done above) */
-
-	    /* velocity to push player away from wall */
-	    length = Wrap_length(linet[ans.line].delta.cx,
-				 linet[ans.line].delta.cy);
-	    /*ans.moved.cx, ans.moved.cy);*/
-	    if (length != 0) {
-		pl->vel.x += linet[ans.line].delta.cy / length
-		    * options.turnPush;
-		pl->vel.y -= linet[ans.line].delta.cx / length
-		    * options.turnPush;
 	    }
 	    break;
 	}
