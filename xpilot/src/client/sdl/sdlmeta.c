@@ -54,21 +54,27 @@ static const char stat_header[] = "Status";
 
 
 #define SELECTED_BG 0x009000ff
+#define ROW_FG 0xffff00ff
 #define ROW_BG1 0x0000a0ff
 #define ROW_BG2 0x000070ff
+#define HEADER_FG 0xffff00ff
+#define HEADER_BG 0xff0000ff
 #define ROW_HEIGHT 20
 #define VERSION_WIDTH 100
 #define COUNT_WIDTH 20
 #define META_WIDTH 800
 #define META_HEIGHT (30 * ROW_HEIGHT + 3*10 + 30)
 
-#define METAWIDGET 100
-#define METATABLEWIDGET 101
-#define METAROWWIDGET 102
+#define METAWIDGET        100
+#define METATABLEWIDGET   101
+#define METAROWWIDGET     102
+#define METAHEADERWIDGET  103
+#define STATUSWIDGET      104
 
 typedef struct {
     list_t                server_list;
     GLWidget	          *scrollbar;
+    GLWidget              *header;
     struct _MetaRowWidget *selected;
 } MetaTableWidget;
 
@@ -80,6 +86,15 @@ typedef struct _MetaRowWidget {
     server_info_t   *sip;
     bool            is_selected;
 } MetaRowWidget;
+
+typedef struct {
+    Uint32 fg;
+    Uint32 bg;
+} MetaHeaderWidget;
+
+typedef struct {
+    server_info_t  *sip;
+} StatusWidget;
 
 extern GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
 
@@ -183,7 +198,7 @@ static GLWidget *Init_MetaRowWidget(server_info_t *sip,
 	return NULL;
     }
     sprintf(row->count_str, "%u", sip->users);
-    row->fg             = 0xffff00ff;
+    row->fg             = ROW_FG;
     row->bg             = bg;
     row->sip            = sip;
     row->table          = table;
@@ -202,15 +217,47 @@ static GLWidget *Init_MetaRowWidget(server_info_t *sip,
         col->buttondata = tmp; \
 	AppendGLWidgetList(&(tmp->children), col); \
     }
-    
     COLUMN(sip->hostname);
     COLUMN(sip->mapname);
     COLUMN(sip->version);
     COLUMN(row->count_str);
-
 #undef COLUMN
 
     return tmp;
+}
+
+static GLWidget *Init_MetaHeaderWidget(void)
+{
+    GLWidget *tmp, *col;
+    MetaHeaderWidget *info;
+
+    if (!(tmp = Init_EmptyBaseGLWidget())) {
+        error("Widget init failed");
+	return NULL;
+    }
+    if (!(info = (MetaHeaderWidget*)malloc(sizeof(MetaHeaderWidget)))) {
+	error("out of memory");
+	free(tmp);
+	return NULL;
+    }
+    info->fg       = HEADER_FG;
+    info->bg       = HEADER_BG;
+    tmp->wid_info  = info;
+    tmp->WIDGET    = METAHEADERWIDGET;
+    tmp->SetBounds = SetBounds_MetaRowWidget;
+
+#define HEADER(TEXT) \
+    if ((col = Init_LabelWidget((TEXT), &(info->bg), &(info->fg)))) { \
+	((LabelWidget*)col->wid_info)->align = LEFT; \
+	AppendGLWidgetList(&(tmp->children), col); \
+    }
+    HEADER("Server");
+    HEADER("Map");
+    HEADER("Version");
+    HEADER("Pl");
+#undef COLUMN
+
+    return tmp;    
 }
 
 static void Scroll_MetaTableWidget(GLfloat pos, void *data)
@@ -227,7 +274,7 @@ static void Scroll_MetaTableWidget(GLfloat pos, void *data)
     }
 
     info = (MetaTableWidget*)widget->wid_info;
-    y = widget->bounds.y 
+    y = widget->bounds.y + ROW_HEIGHT
 	- (int)(List_size(info->server_list) * ROW_HEIGHT * pos);
 
     for (row = widget->children; row; row = row->next) {
@@ -246,7 +293,7 @@ static void SetBounds_MetaTableWidget(GLWidget *widget, SDL_Rect *b)
     GLWidget *row;
     MetaTableWidget *info;
     GLfloat table_height;
-    SDL_Rect *wb, sb, rb;
+    SDL_Rect *wb, sb, rb, hb;
 
     if (widget->WIDGET != METATABLEWIDGET) {
 	error("expected METATABLEWIDGET got [%d]", widget->WIDGET);
@@ -261,8 +308,12 @@ static void SetBounds_MetaTableWidget(GLWidget *widget, SDL_Rect *b)
 	Close_Widget(&(info->scrollbar));
 	DelGLWidgetListItem(&(widget->children), info->scrollbar);
     }
+    if (info->header != NULL) {
+	Close_Widget(&(info->header));
+	DelGLWidgetListItem(&(widget->children), info->header);
+    }
 
-    y = b->y;
+    y = b->y + ROW_HEIGHT;
     for (row = widget->children; row; row = row->next) {
 	rb.x = b->x;
 	rb.y = y;
@@ -278,19 +329,29 @@ static void SetBounds_MetaTableWidget(GLWidget *widget, SDL_Rect *b)
 				 SB_VERTICAL, Scroll_MetaTableWidget, widget);
 	if (info->scrollbar != NULL) {
 	    wb = &(widget->bounds);
-	    sb = info->scrollbar->bounds;
 	    sb.x = wb->x + wb->w - 10;
-	    sb.y = wb->y; 
+	    sb.y = wb->y + ROW_HEIGHT; 
 	    sb.w = 10;
-	    sb.h = wb->h;
+	    sb.h = wb->h - ROW_HEIGHT;
 	    SetBounds_GLWidget(info->scrollbar, &sb);
 	    AppendGLWidgetList(&(widget->children), info->scrollbar);
 	} else {
-	    error("failed to make a scroll bar for meta table");
+	    error("failed to create a scroll bar for meta table");
 	    return;
 	}
     }
-    
+    info->header = Init_MetaHeaderWidget();
+    if (info->header != NULL) {
+	hb.x = widget->bounds.x;
+	hb.y = widget->bounds.y - 1; /* don't ask why */
+	hb.w = widget->bounds.w - 10;
+	hb.h = ROW_HEIGHT;
+	SetBounds_GLWidget(info->header, &hb);
+	AppendGLWidgetList(&(widget->children), info->header);
+    } else {
+	error("failed to create a header for meta table");
+	return;
+    }
 }
 
 static GLWidget *Init_MetaTableWidget(list_t servers)
@@ -415,19 +476,20 @@ int Meta_window(Connect_param_t *conpar)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, draw_width, draw_height, 0);
-    set_alphacolor(blackRGBA);
-    glBegin(GL_QUADS);
-    glVertex2i(0,0);
-    glVertex2i(draw_width,0);
-    glVertex2i(draw_width,draw_height);
-    glVertex2i(0,draw_height);
-    glEnd();
-    glEnable(GL_SCISSOR_TEST);
     glDisable(GL_BLEND);
     
     while(1) {
 
+	set_alphacolor(blackRGBA);
+	glBegin(GL_QUADS);
+	glVertex2i(0,0);
+	glVertex2i(draw_width,0);
+	glVertex2i(draw_width,draw_height);
+	glVertex2i(0,draw_height);
+	glEnd();
+	glEnable(GL_SCISSOR_TEST);
 	DrawGLWidgetsi(meta, 0, 0, draw_width, draw_height);
+	glDisable(GL_SCISSOR_TEST);
 	SDL_GL_SwapBuffers();
 	
 	SDL_WaitEvent(&evt);
@@ -440,7 +502,6 @@ int Meta_window(Connect_param_t *conpar)
 	    case SDL_USEREVENT:
 		if (join_server(conpar, (server_info_t*)evt.user.data1)) {
 		    glEnable(GL_BLEND);
-		    glDisable(GL_SCISSOR_TEST);
 		    glMatrixMode(GL_PROJECTION);
 		    glLoadIdentity();
 		    gluOrtho2D(0, draw_width, 0, draw_height);
