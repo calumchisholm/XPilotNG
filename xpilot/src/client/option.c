@@ -993,34 +993,56 @@ static void Config_save_keys(FILE *fp)
 #endif
 
 #define TABSIZE 8
-static void Xpilotrc_write_line(FILE *fp, xpilotrc_line_t *lp)
+static void Xpilotrc_create_line(char *buf, size_t size,
+				 xp_option_t *opt,
+				 const char *comment,
+				 bool comment_whole_line)
 {
-    char buf[4096];
-    xp_option_t *opt = lp->opt;
     int len, numtabs, i;
 
-    strcpy(buf, "");
+    assert(buf != NULL);
+
+    if (comment_whole_line) {
+	char *s = ";";
+
+	assert(size > strlen(s));
+	strlcpy(buf, s, size);
+	buf += strlen(s);
+	size -= strlen(s);
+    }
+    else
+	strcpy(buf, "");
 
     if (opt) {
 	const char *value;
 
-	snprintf(buf, sizeof(buf), "xpilot.%s:", opt->name);
+	snprintf(buf, size, "xpilot.%s:", opt->name);
 	len = (int) strlen(buf);
 	/* assume tabs are max size of TABSIZE */
 	numtabs = ((5 * TABSIZE - 1) - len) / TABSIZE;
 	for (i = 0; i < numtabs; i++)
-	    strlcat(buf, "\t", sizeof(buf));
+	    strlcat(buf, "\t", size);
 	value = Option_value_to_string(opt);
 	if (value)
-	    strlcat(buf, value, sizeof(buf));
+	    strlcat(buf, value, size);
     }
 
-    if (lp->comment)
-	strlcat(buf, lp->comment, sizeof(buf));
-
-    fprintf(fp, "%s\n", buf);
+    if (comment)
+	strlcat(buf, comment, size);
 }
 #undef TABSIZE
+
+static void Xpilotrc_write_line(FILE *fp, const char *buf)
+{
+#ifndef _WINDOWS
+    const char *endline = "\n";
+#else
+    const char *endline = "\r\n"; /* CR LF */
+#endif
+    /*warn("writing line \"%s\"", buf);*/
+
+    fprintf(fp, "%s%s", buf, endline);
+}
 
 int Xpilotrc_write(const char *path)
 {
@@ -1047,6 +1069,8 @@ int Xpilotrc_write(const char *path)
 	int j;
 	bool was_in_xpilotrc = false;
 
+	memset(&t, 0, sizeof(xpilotrc_line_t));
+
 	for (j = 0; j < num_xpilotrc_lines; j++) {
 	    xpilotrc_line_t *lp = &xpilotrc_lines[j];
 
@@ -1064,26 +1088,51 @@ int Xpilotrc_write(const char *path)
 	origin = Option_get_origin(opt);
 	assert(origin != xp_option_origin_xpilotrc);
 
-	/*if (origin == xp_option_origin_default)
-	  t.comment = xp_safe_strdup("\t\t; default");*/
 	if (origin == xp_option_origin_cmdline)
 	    continue;
 	if (origin == xp_option_origin_env)
 	    continue;
-	/*if (origin == xp_option_origin_config)
-	    t.comment = xp_safe_strdup("\t\t; from config menu");
-	if (origin == xp_option_origin_setcmd)
-	t.comment = xp_safe_strdup("\t\t; from set command");*/
-	t.opt = opt;
+
+	/*
+	 * Let's save commented default values to xpilotrc, unless
+	 * such a comment already exists.
+	 */
+	if (origin == xp_option_origin_default) {
+	    char buf[4096];
+	    bool found = false;
+
+	    Xpilotrc_create_line(buf, sizeof(buf), opt, NULL, true);
+
+	    for (j = 0; j < num_xpilotrc_lines; j++) {
+		xpilotrc_line_t *lp = &xpilotrc_lines[j];
+
+		if (lp->opt == NULL
+		    && lp->comment != NULL
+		    && !strcmp(buf, lp->comment)) {
+		    found = true;
+		    break;
+		}
+	    }		
+
+	    if (found)
+		/* was already in xpilotrc */
+		continue;
+
+	    t.comment = xp_safe_strdup(buf);
+	} else
+	    t.opt = opt;
 
 	STORE(xpilotrc_line_t,
 	      xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
     }
 
     for (i = 0; i < num_xpilotrc_lines; i++) {
+	char buf[4096];
 	xpilotrc_line_t *lp = &xpilotrc_lines[i];
 
-	Xpilotrc_write_line(fp, lp);
+	Xpilotrc_create_line(buf, sizeof(buf), lp->opt, lp->comment, false);
+
+	Xpilotrc_write_line(fp, buf);
     }
 
     fclose(fp);
