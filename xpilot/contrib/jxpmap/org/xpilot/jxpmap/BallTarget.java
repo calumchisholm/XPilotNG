@@ -24,7 +24,7 @@ public class BallTarget extends MapPolygon {
     }
 
     public void printXml(PrintWriter out) throws IOException {
-        out.println("<BallTarget>");
+        out.println("<BallTarget team=\"" + getTeam() + "\">");
         super.printXml(out);
         out.println("</BallTarget>");
     }

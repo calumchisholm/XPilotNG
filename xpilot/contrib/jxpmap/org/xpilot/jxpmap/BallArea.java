@@ -17,22 +17,13 @@ public class BallArea extends MapPolygon {
         super();
     }   
     
-    public BallArea(Polygon p, PolygonStyle style, ArrayList edgeStyles, int team) {
+    public BallArea(Polygon p, PolygonStyle style, ArrayList edgeStyles) {
         super(p, style, edgeStyles);
-        setTeam(team);
     }
 
     public void printXml(PrintWriter out) throws IOException {
         out.println("<BallArea>");
         super.printXml(out);
         out.println("</BallArea>");
-    }
-
-    public EditorPanel getPropertyEditor(MapCanvas canvas) {
-        CompoundEditor ce = 
-            new CompoundEditor("BallArea", canvas, this);
-        ce.add(new TeamEditor("Team", canvas, this));
-        ce.add(super.getPropertyEditor(canvas));
-        return ce;
     }
 }

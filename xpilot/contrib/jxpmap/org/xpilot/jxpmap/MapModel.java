@@ -274,8 +274,7 @@ public class MapModel extends ModelObject {
                     
                     if (poly == null) poly = new Poly();
                     poly.style = atts.getValue("style");
-
-                    poly.points = new ArrayList();                    
+                   
                     poly.points.add(new PolyPoint
                         (Integer.parseInt(atts.getValue("x")), 
                          Integer.parseInt(atts.getValue("y")), 
@@ -386,7 +385,6 @@ public class MapModel extends ModelObject {
 
                     poly = new Poly();
                     poly.type = 1;
-                    poly.team = Integer.parseInt(atts.getValue("team"));
 
                 } else if (name.equalsIgnoreCase("balltarget")) {
 
@@ -427,7 +425,10 @@ public class MapModel extends ModelObject {
         public void endElement (String ns, String local, String name) 
             throws SAXException {
             try {
-                if (name.equalsIgnoreCase("polygon")) polys.add(poly);
+                if (name.equalsIgnoreCase("polygon")) {
+                    polys.add(poly);
+                    poly = null;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new SAXException(e);
@@ -472,7 +473,6 @@ public class MapModel extends ModelObject {
                     ps.ref = style;
                 }
 
-                
                 for (Iterator iter = polys.iterator(); iter.hasNext();) {
 
                     Poly p = (Poly)iter.next();
@@ -523,7 +523,7 @@ public class MapModel extends ModelObject {
                     
                     switch(p.type) {
                         case 1: 
-                            addToFront(new BallArea(awtp, style, edges, p.team)); 
+                            addToFront(new BallArea(awtp, style, edges)); 
                             break;
                         case 2: 
                             addToFront(new BallTarget(awtp, style, edges, p.team)); 
@@ -537,7 +537,7 @@ public class MapModel extends ModelObject {
                         case 5: 
                             addToFront(new Target(awtp, style, edges, p.team)); 
                             break;
-                        default: 
+                        default:
                             addToFront(new MapPolygon(awtp, style, edges)); 
                             break;
                     }
@@ -558,6 +558,9 @@ public class MapModel extends ModelObject {
             List points;
             int type, team, dir, x, y;
             boolean hasSpecialEdges;
+            public Poly() {
+                points = new ArrayList();
+            }
         }
 
 

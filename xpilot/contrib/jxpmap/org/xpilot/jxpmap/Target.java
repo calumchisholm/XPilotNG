@@ -21,9 +21,9 @@ public class Target extends MapPolygon {
     }
 
     public void printXml(PrintWriter out) throws IOException {
-        out.println("<BallArea>");
+        out.println("<Target team=\"" + getTeam() + "\">");
         super.printXml(out);
-        out.println("</BallArea>");
+        out.println("</Target>");
     }
 
     public EditorPanel getPropertyEditor(MapCanvas canvas) {
