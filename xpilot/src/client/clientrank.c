@@ -23,14 +23,8 @@
 
 #include "xpclient.h"
 
-/* message scan hack by Mara*/
 #define MAX_SCORES 500
-/* end message scan hack by Mara*/
 
-
-/* message scan hack by Mara*/
-/* message scan hack by Mara*/
-/* message scan hack by Mara*/
 static const char CLIENTSCOREFILE[] = "CLIENTSCOREFILE";
 static const char CLIENTRANKINGPAGE[] = "CLIENTRANKINGPAGE";
 static const char CLIENTNOJSRANKINGPAGE[] = "CLIENTNOJSRANKINGPAGE";
@@ -48,28 +42,12 @@ static int recent[10];
 static int oldest_cache = 0;
 /*static ScoreNode dummyScoreNode;*/
 
-static int timesort[MAX_SCORES];	/*mara client hack */
+static int timesort[MAX_SCORES];
 static double kd[MAX_SCORES];
 static int kdsort[MAX_SCORES];
 
+static int Client_Scoring = 0;
 
-
-static const int meterHeight = 10;
-
-int Client_Scoring = 0;
-
-
-
-#if 0
-static void swap(ScoreNode * sn1, ScoreNode * sn2)
-{				/*mara client hack */
-    ScoreNode *dummy;
-
-    dummy = sn1;
-    sn1 = sn2;
-    sn2 = dummy;
-}				/*mara client hack */
-#endif
 static void swapd(double *d1, double *d2)
 {
     double d;
@@ -191,8 +169,6 @@ void Rank_score(void)
 	    }
 	}
     }
-    for (i = 0; i < MAX_SCORES; i++) {
-    }
 
     /*if (getenv(CLIENTRANKINGPAGE) != NULL) { */
     if (clientRankHTMLFile != NULL) {
@@ -285,9 +261,8 @@ void Init_saved_scores(void)
 	timesort[i] = i;
 	i++;
     }
-    if (Client_Scoring == 1) {
+    if (Client_Scoring == 1)
 	Time_Sort();
-    }
 }
 
 int Get_saved_score(char *nick)
@@ -374,13 +349,6 @@ void Print_saved_scores(void)
 	fclose(file);
     }
 }
-
-/* end message scan hack by Mara*/
-/* end message scan hack by Mara*/
-/* end message scan hack by Mara*/
-
-
-
 
 
 /*called from guimap for basewarning */
