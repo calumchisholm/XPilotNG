@@ -4,6 +4,8 @@ import gtk
 # render_pixmap_and_mask method seemed to always cause a segmentation fault
 # if the gtk module had not been imported...
 from javastuff import *
+from MapObjectPopup import MapObjectPopup
+import EditorDialog
 
 class MapObject:
     def __init__(self, x, y, width, height, img):
@@ -52,7 +54,20 @@ class MapObject:
                 else:
                     canvas.setCanvasEventHandler(MoveHandler(self, me))
                 return 1
+            elif me.button == 3:
+                self.a = MapObjectPopup(self, me.orig, canvas)
+                return 1
         return 0
+
+    def getPropertyEditor(self, canvas):
+        class C(gtk.GtkLabel):
+            def apply(self):
+                return 1
+        editor = C("No editable properties")
+        editor.buttons = EditorDialog.CLOSE
+        editor.show()
+        return editor
+
 
 class CreateHandler:
     def __init__(self, object):

@@ -2,6 +2,7 @@ from javastuff import *
 from MapObject import MapObject
 from PolygonStyle import PolygonStyle
 from LineStyle import LineStyle
+from PolygonPropertyEditor import PolygonPropertyEditor
 
 import gtk
 import GDK
@@ -71,10 +72,14 @@ class MapPolygon(MapObject):
         else:
             raise "unimplemented"
 
+    def getPropertyEditor(self, canvas):
+        return PolygonPropertyEditor(canvas, self)
+
     def checkEvent(self, canvas, me):
         b = self.getBounds()
         p = me.getPoint()
         pl = self.polygon
+        THRESHOLD = 25 / canvas.scale**2
 
         larger = Rectangle(b.x - 20 * 64, b.y - 20 * 64,
                            b.width + 40 * 64, b.height + 40 * 64)
@@ -85,7 +90,7 @@ class MapPolygon(MapObject):
         if me.button == 1:
             for i in range(len(pl.points)):
                 point = pl.points[i]
-                if canvas.wrapdist2(p, point) < 25 * 64 * 64:
+                if canvas.wrapdist2(p, point) < THRESHOLD:
                     if canvas.isErase():
                         if self.polygon.npoints > 3:
                             self.removePoint(i)
@@ -101,7 +106,7 @@ class MapPolygon(MapObject):
                     p1 = pl.points[i - 1]
                     p2 = pl.points[i]
                     if ptSeqDistSq(p1.x, p1.y, p2.x, p2.y, p.x + wrap[0],
-                                   p.y + wrap[1]) < 102400:           #5^2 64^2
+                                   p.y + wrap[1]) < THRESHOLD:
                         if me.button == 1:
                             self.insertPoint(i, p)
                             canvas.setCanvasEventHandler(PolygonPointMoveHandler(
@@ -173,7 +178,7 @@ class MapPolygon(MapObject):
             file.write('/>\n')
             pp = p
         file.write('</Polygon>\n')
-        
+
         if self.getType() == self.TYPE_BALLAREA:
             file.write('</BallArea>\n')
         elif self.getType() == self.TYPE_BALLTARGET:

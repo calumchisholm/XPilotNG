@@ -98,6 +98,9 @@ class MapModel:
     def addToFront(self, moNew):
         self.addObject(moNew, 1)
 
+    def addToBack(self, moNew):
+        self.addObject(moNew, 0)
+
     def addObject(self, moNew, front):
         znew = moNew.getZOrder()
         for i in range(len(self.objects)):

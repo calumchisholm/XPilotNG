@@ -4,10 +4,11 @@ import GDK
 from javastuff import *
 
 class MouseEvent:
-    def __init__(self, point, button, area):
+    def __init__(self, point, button, area, orig = None):
         self.p = point
         self.button = button
         self.area = area
+        self.orig = orig
 
     def getX(self):
         return self.p.x
@@ -172,12 +173,12 @@ class MapCanvas:
         if self.eventHandler:
             if event.type == GDK.BUTTON_PRESS:
                 evt = MouseEvent(self.it(Point(event.x, event.y)),
-                                 event.button, self)
+                                 event.button, self, event)
                 print 'press', evt.p.x, evt.p.y
                 self.eventHandler.mousePressed(evt)
             elif event.type == GDK.BUTTON_RELEASE:
                 evt = MouseEvent(self.it(Point(event.x, event.y)),
-                                 event.button, self)
+                                 event.button, self, event)
                 self.eventHandler.mouseReleased(evt)
             elif event.type == GDK.MOTION_NOTIFY:
                 if event.is_hint:
@@ -185,11 +186,11 @@ class MapCanvas:
                 else:
                     x = event.x
                     y = event.y
-                evt = MouseEvent(self.it(Point(x, y)), None, self)
+                evt = MouseEvent(self.it(Point(x, y)), None, self, event)
                 self.eventHandler.mouseMoved(evt)
         elif event.type == GDK.BUTTON_PRESS:
             evt = MouseEvent(self.it(Point(event.x, event.y)), event.button,
-                             self)
+                             self, event)
             print 'press', evt.p.x, evt.p.y
             for o in self.model.objects:
                 if o.checkEvent(self, evt):

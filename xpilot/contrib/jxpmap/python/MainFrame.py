@@ -122,6 +122,10 @@ class MainFrame:
 
     def zoom(self, widget, value):
         self.zoom += value
+        if self.zoom > 20:
+            self.zoom = 20
+        elif self.zoom < -20:
+            self.zoom = -20
         self.updateScale()
 
     def toggleEraseMode(self, widget, data):

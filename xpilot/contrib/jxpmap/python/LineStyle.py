@@ -32,4 +32,3 @@ class LineStyle:
             s = self.style
         file.write('<Edgestyle id="%s" width="%d" color="%s" style="%d"/>\n' %
                    (self.id, w, toRGB(self.color), s))
-
