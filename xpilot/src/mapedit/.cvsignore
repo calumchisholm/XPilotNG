@@ -1,0 +1,12 @@
+xpilot-ng-sdl
+xpilot-ng-x11
+xpilot-ng-server
+xpilot-ng-replay
+xpilot-ng-xp-mapedit
+Makefile
+Makefile.my
+tags
+log
+.depend
+.deps
+nohup.out

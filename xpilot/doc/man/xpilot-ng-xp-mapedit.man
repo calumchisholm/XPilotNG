@@ -28,7 +28,7 @@ Output this help
 .HP
 \fB\-\-version\fR
 .IP
-Output program version
+Output version
 .SH "SEE ALSO"
 The full documentation for
 .B xpilot-ng-xp-mapedit

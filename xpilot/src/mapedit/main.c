@@ -26,6 +26,7 @@
  * $Id$
  */
 
+#include "xpcommon.h"
 #include                 "main.h"
 #include                 "default_colors.h"
 
@@ -724,9 +725,11 @@ void ParseArgs(int argc, char *argv[])
    static char           *options[] = {
       "-font",
       "-display",
-      "-help"
+      "-help",
+      "--help",
+      "--version"
    };
-   int                   NUMOPTIONS = 3;
+   int                   NUMOPTIONS = 5;
    int                   index, option;
 
    for (index = 1; index < argc; index++) {
@@ -749,6 +752,8 @@ void ParseArgs(int argc, char *argv[])
             break;
 
          case 2:
+         case 3:
+
             fprintf(stdout, "Usage :\n\n	%s [options] [mapfile]\n\n", argv[0]);
             fprintf(stdout, "[mapfile] is the map you wish to edit. Leaving it blank will start a new map\n");
             fprintf(stdout, "[options] can be\n\n");
@@ -758,14 +763,22 @@ void ParseArgs(int argc, char *argv[])
             fprintf(stdout, "    Display mapeditor on this display instead of the current\n\n");
             fprintf(stdout, "  -help\n");
             fprintf(stdout, "    Output this help\n\n");
+            fprintf(stdout, "  --help\n");
+            fprintf(stdout, "    Output this help\n\n");
+            fprintf(stdout, "  --version\n");
+            fprintf(stdout, "    Output version\n\n");
             exit(0);
 
-         default:
-            if(argv[index][0] != '-')
-               strcpy(map.mapFileName, argv[index] );
-            else
-               fprintf(stderr, "%s illegal option, ignoring.\n", argv[index]);
-            break;
+      case 4:
+	  fprintf(stdout, "xpilot-ng-xp-mapedit " VERSION "\n");
+	  exit(0);
+
+      default:
+	  if(argv[index][0] != '-')
+	      strcpy(map.mapFileName, argv[index] );
+	  else
+	      fprintf(stderr, "%s illegal option, ignoring.\n", argv[index]);
+	  break;
 
       }
    }

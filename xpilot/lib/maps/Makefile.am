@@ -2,6 +2,7 @@
 xpilotmapdir = $(pkgdatadir)/maps
 xpilotmap_DATA = \
 	blood-music.xp2 \
+	circle2.xp2 \
 	dodgers-robots.xp2 \
 	dragon-1.0.xp2 \
 	polybloods.xp2 \
