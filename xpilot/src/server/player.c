@@ -878,16 +878,13 @@ static void Give_individual_bonus(player_t *pl, double average_score)
 
 static void Count_rounds(void)
 {
-    char msg[MSG_LEN];
-
     if (!options.roundsToPlay)
 	return;
 
     ++roundsPlayed;
 
-    sprintf(msg, " < Round %d out of %d completed. >",
-	    roundsPlayed, options.roundsToPlay);
-    Set_message(msg);
+    Set_message_f(" < Round %d out of %d completed. >",
+		  roundsPlayed, options.roundsToPlay);
     /* only do the game over once */
     if (roundsPlayed == options.roundsToPlay)
 	Game_Over();
@@ -898,7 +895,6 @@ void Team_game_over(world_t *world, int winning_team, const char *reason)
 {
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
-    char msg[MSG_LEN];
 
     if (!(best_players = malloc(NumPlayers * sizeof(int)))) {
 	warn("no mem");
@@ -914,14 +910,13 @@ void Team_game_over(world_t *world, int winning_team, const char *reason)
 
     /* Print out the results of the round */
     if (winning_team != -1) {
-	sprintf(msg, " < Team %d has won the round%s! >", winning_team,
-		reason);
+	Set_message_f(" < Team %d has won the round%s! >",
+		      winning_team, reason);
 	sound_play_all(TEAM_WIN_SOUND);
     } else {
-	sprintf(msg, " < We have a draw%s! >", reason);
+	Set_message_f(" < We have a draw%s! >", reason);
 	sound_play_all(TEAM_DRAW_SOUND);
     }
-    Set_message(msg);
 
     /* Give bonus to the best player */
     Give_best_player_bonus(average_score,
@@ -969,7 +964,6 @@ void Individual_game_over(world_t *world, int winner)
 {
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
-    char msg[MSG_LEN];
 
     if (!(best_players = malloc(NumPlayers * sizeof(int)))) {
 	warn("no mem");
@@ -991,8 +985,7 @@ void Individual_game_over(world_t *world, int winner)
 	/* Perhaps this should be a different sound? */
 	sound_play_all(PLAYER_WIN_SOUND);
     } else {
-	sprintf(msg, " < %s has won the round! >", Players(winner)->name);
-	Set_message(msg);
+	Set_message_f(" < %s has won the round! >", Players(winner)->name);
 	sound_play_all(PLAYER_WIN_SOUND);
     }
 
@@ -1039,7 +1032,6 @@ void Race_game_over(world_t *world)
     int i, j, k,
 	bestlap = 0, num_best_players = 0,
 	num_active_players = 0, num_ordered_players = 0, *order;
-    char msg[MSG_LEN];
 
     /*
      * Reassign players's starting positions based upon
@@ -1129,12 +1121,10 @@ void Race_game_over(world_t *world)
 		continue;
 
 	    if (pl->best_lap == bestlap) {
-		sprintf(msg,
-			"%s %s the best lap time of %.2fs",
-			pl->name,
-			(num_best_players == 1) ? "had" : "shares",
-			(double) bestlap / FPS);
-		Set_message(msg);
+		Set_message_f("%s %s the best lap time of %.2fs",
+			      pl->name,
+			      (num_best_players == 1) ? "had" : "shares",
+			      (double) bestlap / FPS);
 		Score(pl, 5.0 + num_active_players, pl->pos,
 		      (num_best_players == 1)
 		      ? "[Fastest lap]" : "[Joint fastest lap]");
