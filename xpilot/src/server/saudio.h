@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -39,7 +38,7 @@
  * Define like this to avoid having to put #ifdef SOUND all over the place.
  */
 #define sound_player_init(player)		((player)->audio = NULL)
-#define sound_player_onoff(player, onoff)
+#define sound_player_on(player, on)
 #define sound_play_player(player, index)
 #define sound_play_all(index)
 #define sound_play_sensors(x, y, index)
@@ -51,7 +50,7 @@
 #include "audio.h"
 
 int		sound_player_init(player *);
-void		sound_player_onoff(player *pl, int onoff);
+void		sound_player_on(player *pl, int on);
 void		sound_play_player(player *, int);
 void		sound_play_all(int);
 void		sound_play_sensors(int, int, int);

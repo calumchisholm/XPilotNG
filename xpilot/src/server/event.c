@@ -225,12 +225,11 @@ bool Team_zero_pausing_available(void)
 	    && World.teams[0].NumBases > World.teams[0].NumMembers);
 }
 
-/* kps - changed int onoff to bool on */
-void Pause_player(int ind, int onoff)
+void Pause_player(int ind, int on)
 {
     player		*pl = Players(ind);
 
-    if (onoff != 0 && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
+    if (on && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    World.teams[pl->team].SwapperId = -1;
 	pl->count = 10 * FPS;
@@ -243,7 +242,7 @@ void Pause_player(int ind, int onoff)
 	if (BIT(pl->have, HAS_BALL))
 	    Detach_ball(ind, -1);
     }
-    else if (onoff == 0 && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
+    else if (!on && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
 	if (pl->count <= 0) {
 	    bool toolate = false;
 

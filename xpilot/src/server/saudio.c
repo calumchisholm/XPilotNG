@@ -88,7 +88,7 @@ static void queue_audio(player * pl, int index, int volume)
 
 int sound_player_init(player * pl)
 {
-    SDBG(printf("sound_player_init %p\n", pl);)
+    SDBG(printf("sound_player_init %p\n", pl));
 
     pl->audio = NULL;
 
@@ -99,11 +99,11 @@ int sound_player_init(player * pl)
  * Set (or reset) a player status flag indicating
  * that a player wants (or doesn't want) sound.
  */
-void sound_player_onoff(player *pl, int onoff)
+void sound_player_on(player *pl, int on)
 {
-    SDBG(printf("sound_player_onoff %p, %d\n", pl, onoff);)
+    SDBG(printf("sound_player_on %p, %d\n", pl, on));
 
-    if (onoff) {
+    if (on) {
 	if (!BIT(pl->status, WANT_AUDIO)) {
 	    SET_BIT(pl->status, WANT_AUDIO);
 	    sound_play_player(pl, START_SOUND);
@@ -119,7 +119,7 @@ void sound_player_onoff(player *pl, int onoff)
  */
 void sound_play_player(player * pl, int index)
 {
-    SDBG(printf("sound_play_player %p, %d\n", pl, index);)
+    SDBG(printf("sound_play_player %p, %d\n", pl, index));
 
     if (BIT(pl->status, WANT_AUDIO)) {
 	queue_audio(pl, index, 100);
@@ -133,7 +133,7 @@ void sound_play_all(int index)
 {
     int i;
 
-    SDBG(printf("sound_play_all %d\n", index);)
+    SDBG(printf("sound_play_all %d\n", index));
 
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
@@ -159,7 +159,7 @@ void sound_play_sensors(int cx, int cy, int index)
 		    factor;
     player         *pl;
 
-    SDBG(printf("sound_play_sensors %d, %d, %d\n", cx, cy, index);)
+    SDBG(printf("sound_play_sensors %d, %d, %d\n", cx, cy, index));
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
@@ -188,7 +188,7 @@ void sound_play_queued(player * pl)
     AudioQPtr       p,
 		    n;
 
-    SDBG(printf("sound_play_sensors %p\n", pl);)
+    SDBG(printf("sound_play_sensors %p\n", pl));
 
     p = (AudioQPtr)pl->audio;
     pl->audio = NULL;
@@ -206,7 +206,7 @@ void sound_close(player * pl)
     AudioQPtr       p,
 		    n;
 
-    SDBG(printf("sound_close %p\n", pl);)
+    SDBG(printf("sound_close %p\n", pl));
 
     p = (AudioQPtr)pl->audio;
     pl->audio = NULL;

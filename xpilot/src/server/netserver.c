@@ -3670,9 +3670,9 @@ static int Receive_audio_request(int ind)
     player		*pl;
     int			n;
     unsigned char	ch;
-    unsigned char	onoff;
+    unsigned char	on;
 
-    if ((n = Packet_scanf(&connp->r, "%c%c", &ch, &onoff)) <= 0) {
+    if ((n = Packet_scanf(&connp->r, "%c%c", &ch, &on)) <= 0) {
 	if (n == -1) {
 	    Destroy_connection(ind, "read error");
 	}
@@ -3680,7 +3680,7 @@ static int Receive_audio_request(int ind)
     }
     if (connp->id != NO_ID) {
 	pl = Player_by_id(connp->id);
-	sound_player_onoff(pl, onoff);
+	sound_player_on(pl, on);
     }
 
     return 1;

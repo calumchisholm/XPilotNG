@@ -98,7 +98,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id);
  */
 int Handle_keyboard(int);
 bool Team_zero_pausing_available(void);
-void Pause_player(int ind, int onoff);
+void Pause_player(int ind, int on);
 int Player_lock_closest(int ind, int next);
 bool team_dead(int team);
 void filter_mods(modifiers *mods);
@@ -386,7 +386,7 @@ void Server_info(char *str, unsigned max_size);
 void Log_game(const char *heading);
 void Game_Over(void);
 void Server_log_admin_message(int ind, const char *str);
-int plock_server(int onoff);
+int plock_server(int on);
 void Main_loop(void);
 
 
