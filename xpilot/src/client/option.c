@@ -651,7 +651,7 @@ static void Parse_xpilotrc_line(const char *line)
 {
     char *s;
 
-    /* printf("parsing xpilotrc line \"%s\"\n", line); */
+    /*xpprintf("parsing xpilotrc line \"%s\"\n", line);*/
     /*
      * Ignore lines that don't start with xpilot. or
      * xpilot*
@@ -702,76 +702,6 @@ typedef struct xpilotrc {
 static xpilotrc_t	*xpilotrc_ptr;
 static int		num_xpilotrc, max_xpilotrc;
 
-
-
-static int Xpilotrc_add(char *line)
-{
-    int			size;
-    char		*str;
-
-    if (strncmp(line, "XPilot", 6) != 0 && strncmp(line, "xpilot", 6) != 0)
-	return 0;
-    if (line[6] != '.' && line[6] != '*')
-	return 0;
-    if ((str = strchr(line + 7, ':')) == NULL)
-	return 0;
-
-    size = str - (line + 7);
-    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL) {
-	num_xpilotrc = 0;
-	max_xpilotrc = 75;
-	if ((xpilotrc_ptr = (xpilotrc_t *)
-		malloc(max_xpilotrc * sizeof(xpilotrc_t))) == NULL) {
-	    max_xpilotrc = 0;
-	    return -1;
-	}
-    }
-    if (num_xpilotrc >= max_xpilotrc) {
-	max_xpilotrc *= 2;
-	if ((xpilotrc_ptr = (xpilotrc_t *) realloc(xpilotrc_ptr,
-		max_xpilotrc * sizeof(xpilotrc_t))) == NULL) {
-	    max_xpilotrc = 0;
-	    return -1;
-	}
-    }
-    if ((str = xp_strdup(line)) == NULL)
-	return -1;
-
-    xpilotrc_ptr[num_xpilotrc].line = str;
-    xpilotrc_ptr[num_xpilotrc].size = size;
-    num_xpilotrc++;
-    return 0;
-}
-
-static void Xpilotrc_end(FILE *fp)
-{
-    int			i;
-
-    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL)
-	return;
-
-    for (i = 0; i < num_xpilotrc; i++) {
-	fprintf(fp, "%s", xpilotrc_ptr[i].line);
-	free(xpilotrc_ptr[i].line);
-    }
-    free(xpilotrc_ptr);
-    xpilotrc_ptr = NULL;
-    max_xpilotrc = 0;
-    num_xpilotrc = 0;
-}
-
-static void Xpilotrc_use(char *line)
-{
-    int			i;
-
-    for (i = 0; i < num_xpilotrc; i++) {
-	if (strncmp(xpilotrc_ptr[i].line + 7, line + 7,
-		    xpilotrc_ptr[i].size + 1) == 0) {
-	    free(xpilotrc_ptr[i].line);
-	    xpilotrc_ptr[i--] = xpilotrc_ptr[--num_xpilotrc];
-	}
-    }
-}
 
 
 int Xpilotrc_read(const char *path)
@@ -1107,15 +1037,12 @@ void Xpilotrc_get_filename(char *path, size_t size)
 	strlcat(path, defaultFile, size);
     } else
 	strlcpy(path, "", size);
-
-    return path;
 }
 #else
 void Xpilotrc_get_filename(char *path, size_t size)
 {
     /* kps - wouldn't xpilotrc.txt be a better name ? */
     strlcpy(path, ".xpilotrc", size);
-    return path;
 }
 #endif /* _WINDOWS */
 
