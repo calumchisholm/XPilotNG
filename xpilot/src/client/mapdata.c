@@ -383,12 +383,14 @@ static int Mapdata_download(const URL *url, const char *filePath)
 			n = len - i - 1;
 			memmove(buf, buf + i + 1, n);
 			len = len - i - 1;
+		    } else if (i == len - 1) {
+			len = 0;
 		    }
 		}
 	    }
 	}
 
-	if (!header) {
+	if (!header && len) {
 	    n = len;
 	    if (fwrite(buf, 1, n, f) < n) {
 		error("file write failed");
