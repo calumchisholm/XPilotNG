@@ -40,7 +40,7 @@ public class Pixmap extends ModelObject {
     }
     
     
-    public void setImage () {
+    public void setImage (BufferedImage image) {
         this.image = image;
     }
     
