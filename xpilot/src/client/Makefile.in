@@ -130,7 +130,7 @@ xpilot_SOURCES = \
 	paintmacros.h paintmap.c paintobjects.c paintradar.c protoclient.h \
 	query.c \
 	record.c record.h recordfmt.h \
-	sim.c simbloods.h syslimit.c \
+	syslimit.c \
 	talk.c talk.h talkmacros.c textinterface.c texture.c texture.h \
 	usleep.c \
 	welcome.c widget.c widget.h \
@@ -159,11 +159,11 @@ am_xpilot_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) caudio.$(OBJEXT) \
 	messages.$(OBJEXT) netclient.$(OBJEXT) paint.$(OBJEXT) \
 	paintdata.$(OBJEXT) painthud.$(OBJEXT) paintmap.$(OBJEXT) \
 	paintobjects.$(OBJEXT) paintradar.$(OBJEXT) query.$(OBJEXT) \
-	record.$(OBJEXT) sim.$(OBJEXT) syslimit.$(OBJEXT) \
-	talk.$(OBJEXT) talkmacros.$(OBJEXT) textinterface.$(OBJEXT) \
-	texture.$(OBJEXT) usleep.$(OBJEXT) welcome.$(OBJEXT) \
-	widget.$(OBJEXT) xevent.$(OBJEXT) xeventhandlers.$(OBJEXT) \
-	xinit.$(OBJEXT) xpilot.$(OBJEXT) xpmread.$(OBJEXT)
+	record.$(OBJEXT) syslimit.$(OBJEXT) talk.$(OBJEXT) \
+	talkmacros.$(OBJEXT) textinterface.$(OBJEXT) texture.$(OBJEXT) \
+	usleep.$(OBJEXT) welcome.$(OBJEXT) widget.$(OBJEXT) \
+	xevent.$(OBJEXT) xeventhandlers.$(OBJEXT) xinit.$(OBJEXT) \
+	xpilot.$(OBJEXT) xpmread.$(OBJEXT)
 xpilot_OBJECTS = $(am_xpilot_OBJECTS)
 xpilot_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilot_LDFLAGS =
@@ -185,9 +185,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/painthud.Po ./$(DEPDIR)/paintmap.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/paintobjects.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/paintradar.Po ./$(DEPDIR)/query.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/record.Po ./$(DEPDIR)/sim.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/syslimit.Po ./$(DEPDIR)/talk.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/talkmacros.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/record.Po ./$(DEPDIR)/syslimit.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/talk.Po ./$(DEPDIR)/talkmacros.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/textinterface.Po ./$(DEPDIR)/texture.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/usleep.Po ./$(DEPDIR)/welcome.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/widget.Po ./$(DEPDIR)/xevent.Po \
@@ -279,7 +278,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paintradar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/record.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/syslimit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/talk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/talkmacros.Po@am__quote@

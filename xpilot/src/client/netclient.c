@@ -2836,14 +2836,9 @@ int Send_display(void)
 	return 0;
     }
 
-    if (simulating) {
-	ext_view_width = width_wanted;
-	ext_view_height = height_wanted;
-	Check_view_dimensions();
-    }
-    else if (Packet_printf(&wbuf, "%c%hd%hd%c%c", PKT_DISPLAY,
-			   width_wanted, height_wanted,
-			   num_spark_colors, spark_rand) == -1)
+    if (Packet_printf(&wbuf, "%c%hd%hd%c%c", PKT_DISPLAY,
+		      width_wanted, height_wanted,
+		      num_spark_colors, spark_rand) == -1)
 	return -1;
 
     old_spark_rand = spark_rand;

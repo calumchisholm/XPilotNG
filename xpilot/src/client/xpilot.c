@@ -149,8 +149,6 @@ int main(int argc, char *argv[])
     if (!noLocalMotd)
 	printfile(Conf_localmotdfile());
 
-    Simulate();
-
     if (text || auto_connect || argv[1] || is_this_windows()) {
 	if (list_servers)
 	    printf("LISTING AVAILABLE SERVERS:\n");
