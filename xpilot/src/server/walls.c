@@ -706,7 +706,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 
 	    /* Robots will declare war on anyone who shoves them. */
 	    i = (int)(rfrac() * num_pushers);
-	    Robot_war(pl, GetInd(pushers[i]->id));
+	    Robot_war(pl, pushers[i]);
 	}
     }
 

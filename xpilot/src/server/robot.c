@@ -947,12 +947,11 @@ int Robot_war_on_player(player *pl)
  * Maybe this is enough reason for the killed robot to change
  * its behavior with respect to the player it has been killed by.
  */
-void Robot_war(player *pl, int killer)
+void Robot_war(player *pl, player *kp)
 {
-    player		*kp = Players(killer);
     int			i;
 
-    if (kp == pl) {
+    if (kp->id == pl->id) {
 	return;
     }
 

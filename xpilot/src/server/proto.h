@@ -358,7 +358,7 @@ void Robot_delete(player *robot, bool kicked);
 void Robot_destroy(player *robot);
 void Robot_update(void);
 void Robot_invite(player *robot, player *inviter);
-void Robot_war(player *robot, int killer);
+void Robot_war(player *robot, player *killer);
 void Robot_reset_war(player *robot);
 int Robot_war_on_player(player *robot);
 void Robot_go_home(player *robot);

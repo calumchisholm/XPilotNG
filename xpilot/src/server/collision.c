@@ -976,7 +976,7 @@ static void Player_collides_with_ball(player *pl, object *obj, int radius)
 		       * ballKillScoreMult;
 	    Score_players(kp, sc, pl->name,
 			  pl, -sc, kp->name);
-	    Robot_war(pl, GetInd(kp->id));
+	    Robot_war(pl, kp);
 	}
     }
     Set_message(msg);
@@ -1494,7 +1494,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    } else {
 		Score_players(kp, sc, pl->name,
 			      pl, -sc, kp->name);
-		Robot_war(pl, GetInd(kp->id));
+		Robot_war(pl, kp);
 	    }
 	    Set_message(msg);
 	    SET_BIT(pl->status, KILLED);
