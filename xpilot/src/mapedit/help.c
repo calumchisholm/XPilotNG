@@ -26,6 +26,7 @@
  * $Id$
  */
 
+#include "xpcommon.h"
 #include                 "main.h"
 
 Window helpwin;
@@ -315,7 +316,7 @@ void DrawHelpWin(void)
 		   "The Neg. button reverses the filled blocks and spaces.");
 	T_DrawText(helpwin, 10, 300 + 3 * HELP_BTN_HEIGHT, HELP_WIDTH - 20,
 		   100, BKGR,
-		   "XP-Mapedit was originally written by Aaron Averill\nPlease send any bugs, patches, enhancements or comments to the current maintainers at:\n\nmapedit@xpilot.org");
+		   "XP-Mapedit was originally written by Aaron Averill\nPlease send any bugs, patches, enhancements or comments to the current maintainer at:\n\n" PACKAGE_BUGREPORT);
     }
 
 }

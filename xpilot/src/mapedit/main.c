@@ -895,7 +895,9 @@ int main(int argc, char *argv[])
 
     mapwin = T_MakeWindow(50, (int) ((root_height - mapwin_height) / 2),
 			  mapwin_width, mapwin_height, "white", "black");
-    T_SetWindowName(mapwin, "XP-MapEdit", "XP-MapEdit");
+    T_SetWindowName(mapwin,
+		    PACKAGE_NAME " XP-Mapedit",
+		    PACKAGE_NAME " XP-Mapedit");
     XSelectInput(display, mapwin, ExposureMask | ButtonPressMask |
 		 KeyPressMask | StructureNotifyMask | ButtonReleaseMask |
 		 PointerMotionMask);
