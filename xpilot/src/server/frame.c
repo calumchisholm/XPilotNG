@@ -1122,13 +1122,13 @@ static void Frame_parameters(connection_t *conn, player_t *pl)
 
 void Frame_update(void)
 {
-    int			i, ind, player_fps;
-    connection_t        *conn;
-    player_t		*pl, *pl2;
-    time_t		newTimeLeft = 0;
-    static time_t	oldTimeLeft;
-    static bool		game_over_called = false;
-    static double	frame_time2 = 0.0;
+    int i, ind, player_fps;
+    connection_t *conn;
+    player_t *pl, *pl2;
+    time_t newTimeLeft = 0;
+    static time_t oldTimeLeft;
+    static bool game_over_called = false;
+    static double frame_time2 = 0.0;
 
     frame_loops++;
     frame_time += timeStep;
@@ -1168,8 +1168,7 @@ void Frame_update(void)
 	     * Lower the frame rate for pausing players
 	     * to reduce network load.
 	     */
-	    if (Player_is_paused(pl)
-		&& options.pausedFPS)
+	    if (options.pausedFPS)
 		player_fps = options.pausedFPS;
 	}
 	player_fps = MIN(player_fps, pl->player_fps);
