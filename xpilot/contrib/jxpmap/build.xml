@@ -22,6 +22,7 @@
         <fileset dir="." includes="org/xpilot/jxpmap/defopts"/>
         <fileset dir="." includes="org/xpilot/jxpmap/init.bsh"/>
         <zipfileset src="bsh-2.0b1.jar"/>
+        <zipfileset src="kunststoff.jar"/>
         <manifest>
             <attribute name="Main-Class" 
                 value="org.xpilot.jxpmap.MainFrame"/>
