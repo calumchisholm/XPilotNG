@@ -418,13 +418,13 @@ int Net_setup(void)
 	checks = malloc(num_checks * sizeof(checkpoint_t));
     }
     else {
-	int i, j, startx, starty;
-	int polyc;
+	int i, j, startx, starty, polyc, hidcount, nexthid;
 	int dx, dy, cx, cy, pc;
         int *styles, curstyle;
 	xp_polygon_t poly;
 	ipos *points, min, max;
 	signed char *ptr;
+	unsigned char *hidptr;
 
 	oldServer = 0;
 	ptr = Setup->map_data;
@@ -462,7 +462,16 @@ int Net_setup(void)
 	for (i = 0; i < polyc; i++) {
 	    dx = 0;
 	    dy = 0;
-	    ptr += 2; /* No different types implemented yet */
+	    hidcount = (unsigned char)*ptr++ << 8;
+	    hidcount += (unsigned char)*ptr++;
+	    hidptr = ptr;
+	    if (hidcount) {
+		nexthid = *hidptr++ << 8;
+		nexthid += *hidptr++;
+	    }
+	    else
+		nexthid = INT_MAX;
+	    ptr += hidcount * 2;
 	    pc = (unsigned char)*ptr++ << 8;
 	    pc += (unsigned char)*ptr++;
 	    if ((points = malloc(pc * sizeof(ipos))) == NULL) {
@@ -479,7 +488,16 @@ int Net_setup(void)
 	    starty += (unsigned char)*ptr++;
 	    points[0].x = cx = min.x = max.x = startx;
 	    points[0].y = cy = min.y = max.y = starty;
-            styles[0] = curstyle;
+	    if (!nexthid) {
+		styles[0] = 3;
+		hidcount--;
+		if (hidcount) {
+		    nexthid = *hidptr++ << 8;
+		    nexthid += *hidptr++;
+		}
+	    }
+	    else
+		styles[0] = curstyle;
 	    for (j = 1; j < pc; j++) {
 		dx = *ptr++ << 8;
 		dx += (unsigned char)*ptr++;
@@ -499,7 +517,16 @@ int Net_setup(void)
                     curstyle = ((float)rand() / RAND_MAX) * 4;
                     if (curstyle == 4) curstyle--;
                 }
-                styles[j] = curstyle;
+		if (nexthid == j) {
+		    styles[j] = 3;
+		    hidcount--;
+		    if (hidcount) {
+			nexthid = *hidptr++ << 8;
+			nexthid += *hidptr++;
+		    }
+		}
+		else
+		    styles[j] = curstyle;
 	    }
 	    poly.points = points;
             poly.styles = styles;

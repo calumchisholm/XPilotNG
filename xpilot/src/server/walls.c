@@ -1285,7 +1285,7 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 
 int Polys_to_client(char *ptr)
 {
-    int i, j, startx, starty, dx, dy, group;
+    int i, j, startx, starty, dx, dy, group, hid;
     int *p = polygons;
     char *start = ptr;
 
@@ -1294,12 +1294,19 @@ int Polys_to_client(char *ptr)
     for (i = 0; i < polyc; i++) {
 	group = *p++;
 	j = *p++;
+	hid = *p++;
+	*ptr++ = hid >> 8;
+	*ptr++ = hid & 0xff;
+	while (*p != INT_MAX) {
+	    *ptr++ = *p >> 8;
+	    *ptr++ = *p & 0xff;
+	    p++;
+	}
+	p++; /* skip the INT_MAX */
 	dx = 0;
 	dy = 0;
 	startx = *p++;
 	starty = *p++;
-	*ptr++ = 0; /* 2 bytes for type */
-	*ptr++ = 0;
 	*ptr++ = j >> 8;
 	*ptr++ = j & 0xff;
 	*ptr++ = startx >> CLICK_SHIFT + 8;
@@ -1308,13 +1315,15 @@ int Polys_to_client(char *ptr)
 	*ptr++ = starty >> CLICK_SHIFT & 0xff;
 	startx = 0;
 	starty = 0;
-	for (; j > 1; j--) {
+	for (; j > 0; j--) {
 	    dx += *p++;
 	    dy += *p++;
-	    *ptr++ = (dx >> CLICK_SHIFT) - startx >> 8;
-	    *ptr++ = (dx >> CLICK_SHIFT) - startx & 0xff;
-	    *ptr++ = (dy >> CLICK_SHIFT) - starty >> 8;
-	    *ptr++ = (dy >> CLICK_SHIFT) - starty & 0xff;
+	    if (j != 1) {
+		*ptr++ = (dx >> CLICK_SHIFT) - startx >> 8;
+		*ptr++ = (dx >> CLICK_SHIFT) - startx & 0xff;
+		*ptr++ = (dy >> CLICK_SHIFT) - starty >> 8;
+		*ptr++ = (dy >> CLICK_SHIFT) - starty & 0xff;
+	    }
 	    startx = dx >> CLICK_SHIFT;
 	    starty = dy >> CLICK_SHIFT;
 	}
@@ -1781,35 +1790,42 @@ static void Ball_line_init(void)
 
 static void Poly_to_lines()
 {
-    int i, j, startx, starty, dx, dy, group;
+    int i, np, j, startx, starty, dx, dy, group, hid, *hidptr;
     int *p = polygons;
 
     linec = 0;
     for (i = 0; i < polyc; i++) {
 	group = *p++;
-	j = *p++;
+	np = *p++;
+	hid = *p++;
+	hidptr = p;
+	p += hid + 1;
 	dx = 0;
 	dy = 0;
 	startx = *p++;
 	starty = *p++;
-	if (!(linec % 2000))
-	    linet = ralloc(linet, (linec + 2000) * sizeof(struct bline));
-	linet[linec].group = group;
-	linet[linec].start.x = startx;
-	linet[linec++].start.y = starty;
-	for (; j > 1; j--) {
+	for (j = 0; j < np; j++) {
+	    if (j == *hidptr) {
+		hidptr++;
+		dx += *p++;
+		dy += *p++;
+		continue;
+	    }
 	    if (!(linec % 2000))
 		linet = ralloc(linet, (linec + 2000) * sizeof(struct bline));
-	    linet[linec - 1].delta.x = *p;
-	    dx += *p++;
-	    linet[linec - 1].delta.y = *p;
-	    dy += *p++;
 	    linet[linec].group = group;
-	    linet[linec].start.x = WRAP_XCLICK(startx + dx);
-	    linet[linec++].start.y = WRAP_YCLICK(starty + dy);
+	    linet[linec].start.x = TWRAP_XCLICK(startx + dx);
+	    linet[linec].start.y = TWRAP_YCLICK(starty + dy);
+	    linet[linec].delta.x = *p;
+	    dx += *p++;
+	    linet[linec++].delta.y = *p;
+	    dy += *p++;
 	}
-	linet[linec - 1].delta.x = -dx;
-	linet[linec - 1].delta.y = -dy;
+	if (dx || dy) {
+	    errno = 0;
+	    error("Polygon %d (%d points) doesn't start and end at the same place", i + 1, np);
+	    exit(1);
+	}
     }
     linet = ralloc(linet, (linec + S_LINES) * sizeof(struct bline));
     return;

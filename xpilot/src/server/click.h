@@ -62,6 +62,15 @@
 		    ? (y_) - World.cheight \
 		    : (y_)))
 
+#define TWRAP_XCLICK(x_) \
+     ((x_) > 0 ? (x_) % World.cwidth : \
+      ((x_) % World.cwidth + World.cwidth))
+
+#define TWRAP_YCLICK(y_) \
+     ((y_) > 0 ? (y_) % World.cheight : \
+      ((y_) % World.cheight + World.cheight))
+
+
 #define CENTER_XCLICK(X) (((X) < -(World.cwidth >> 1)) ? (X) + World.cwidth : (((X) >= (World.cwidth >> 1)) ? (X) - World.cwidth : (X)))
 
 #define CENTER_YCLICK(X) \

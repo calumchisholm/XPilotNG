@@ -179,6 +179,7 @@ extern struct {int type; unsigned int hit_mask; int team;} groups[];
 
 int *poly = polygons;
 int *polypts;
+int *hidptr;
 int ptscount;
 char *mapd;
 
@@ -213,19 +214,24 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Polygon")) {
-	int x, y;
+	int x, y, hidcount = 0;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
 		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
 		y = atoi(*(attr + 1)) * scale;
+	    if (!strcasecmp(*attr, "hidedges"))
+		hidcount = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	polyc++;
-	ptscount = 1;
+	ptscount = 0;
 	*poly++ = groupc;
 	polypts = poly++;
+	*poly++ = hidcount;
+	hidptr = poly;
+	poly += hidcount + 1;
 	*poly++ = x;
 	*poly++ = y;
 	return;
@@ -412,16 +418,20 @@ static void tagstart(void *data, const char *el, const char **attr)
 	return;
     }
     if (!strcmp(el, "Offset")) {
-	int x, y;
+	int x, y, hidden = 0;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
 		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
 		y = atoi(*(attr + 1)) * scale;
+	    if (!strcasecmp(*attr, "hidden"))
+		hidden = 1;
 	    attr += 2;
 	}
 	*poly++ = x;
 	*poly++ = y;
+	if (hidden)
+	    *hidptr++ = ptscount;
 	ptscount++;
 	return;
     }
@@ -431,8 +441,10 @@ static void tagstart(void *data, const char *el, const char **attr)
 static void tagend(void *data, const char *el)
 {
     void cmdhack(void);
-    if (!strcasecmp(el, "Polygon"))
+    if (!strcasecmp(el, "Polygon")) {
 	*polypts = ptscount;
+	*hidptr = INT_MAX;
+    }
     if (!strcasecmp(el, "GeneralOptions")) {
 	cmdhack(); /* !@# */
 	parseOptions();
