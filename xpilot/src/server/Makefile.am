@@ -1,6 +1,6 @@
 
 INCLUDES = -I$(top_srcdir)/src/common
-AM_CPPFLAGS = -DLIBDIR=\"$(pkglibdir)/\"
+AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
 bin_PROGRAMS = xpilots
 xpilots_SOURCES = \
 	alliance.c asteroid.c asteroid.h auth.c auth.h \

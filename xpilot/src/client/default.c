@@ -283,7 +283,7 @@ xp_option_t default_options[] = {
 
     XP_STRING_OPTION(
 	"shipShapeFile",
-	SHIP_FILE,  /*conf_ship_file_string,*/
+	CONF_SHIP_FILE,
 	NULL, 0,
 	Set_shipShapeFile, Get_shipShapeFile,
 	"An optional file where shipshapes can be stored.\n"
@@ -935,7 +935,7 @@ xp_option_t default_options[] = {
     /* conf_* */
     XP_STRING_OPTION(
 	"texturePath",
-	TEXTUREDIR, /* conf_texturedir_string, */
+	CONF_TEXTUREDIR,
 	NULL, 0,
 	Set_texturePath, Get_texturePath,
 	"Search path for texture files.\n"
@@ -988,7 +988,7 @@ xp_option_t default_options[] = {
 #ifdef SOUND
     XP_STRING_OPTION(
 	"sounds",
-	SOUNDFILE,
+	CONF_SOUNDFILE,
 	sounds, sizeof sounds,
 	NULL, NULL,
 	"Specifies the sound file.\n"),
@@ -997,7 +997,7 @@ xp_option_t default_options[] = {
 	"maxVolume",
 	100,
 	0,
-	100, /* kps - not sure what this value means, probably a percentage */
+	255,
 	&maxVolume,
 	NULL,
 	"Specifies the volume to play sounds with.\n"),

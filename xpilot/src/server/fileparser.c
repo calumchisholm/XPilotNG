@@ -524,7 +524,7 @@ fileAddExtension(const char *file, const char *ext)
 }
 
 
-#if defined(COMPRESSED_MAPS)
+#ifdef CONF_COMPRESSED_MAPS
 static bool     usePclose = false;
 
 
@@ -532,8 +532,8 @@ static bool
 isCompressed(const char *filename)
 {
     int             fnlen = strlen(filename);
-    int             celen = strlen(ZCAT_EXT);
-    if (fnlen > celen && !strcmp(&filename[fnlen - celen], ZCAT_EXT))
+    int             celen = strlen(Conf_zcat_ext());
+    if (fnlen > celen && !strcmp(&filename[fnlen - celen], Conf_zcat_ext()))
 	return true;
     return false;
 }
@@ -565,15 +565,15 @@ openCompressedFile(const char *filename)
     if (!isCompressed(filename)) {
 	if (access(filename, 4) == 0)
 	    return fileOpen(filename);
-	newname = fileAddExtension(filename, ZCAT_EXT);
+	newname = fileAddExtension(filename, Conf_zcat_ext());
 	if (!newname)
 	    return NULL;
 	filename = newname;
     }
     if (access(filename, 4) == 0) {
-	cmdline = malloc(strlen(ZCAT_FORMAT) + strlen(filename) + 1);
+	cmdline = malloc(strlen(CONF_ZCAT_FORMAT) + strlen(filename) + 1);
 	if (cmdline) {
-	    sprintf(cmdline, ZCAT_FORMAT, filename);
+	    sprintf(cmdline, CONF_ZCAT_FORMAT, filename);
 	    fp = popen(cmdline, "r");
 	    if (fp) {
 		usePclose = true;
@@ -618,21 +618,21 @@ openCompressedFile(const char *filename)
  * or compress filename extension.
  * The search order should be:
  *      filename
- *      filename.gz              if COMPRESSED_MAPS is true
+ *      filename.gz                   if CONF_COMPRESSED_MAPS is true
  *      filename.xp2
- *      filename.xp2.gz          if COMPRESSED_MAPS is true
+ *      filename.xp2.gz               if CONF_COMPRESSED_MAPS is true
  *      filename.xp
- *      filename.xp.gz           if COMPRESSED_MAPS is true
+ *      filename.xp.gz                if CONF_COMPRESSED_MAPS is true
  *      filename.map
- *      filename.map.gz          if COMPRESSED_MAPS is true
- *      MAPDIR filename
- *      MAPDIR filename.gz       if COMPRESSED_MAPS is true
- *      MAPDIR filename.xp2
- *      MAPDIR filename.xp2.gz   if COMPRESSED_MAPS is true
- *      MAPDIR filename.xp
- *      MAPDIR filename.xp.gz    if COMPRESSED_MAPS is true
- *      MAPDIR filename.map
- *      MAPDIR filename.map.gz   if COMPRESSED_MAPS is true
+ *      filename.map.gz               if CONF_COMPRESSED_MAPS is true
+ *      CONF_MAPDIR filename
+ *      CONF_MAPDIR filename.gz       if CONF_COMPRESSED_MAPS is true
+ *      CONF_MAPDIR filename.xp2
+ *      CONF_MAPDIR filename.xp2.gz   if CONF_COMPRESSED_MAPS is true
+ *      CONF_MAPDIR filename.xp
+ *      CONF_MAPDIR filename.xp.gz    if CONF_COMPRESSED_MAPS is true
+ *      CONF_MAPDIR filename.map
+ *      CONF_MAPDIR filename.map.gz   if CONF_COMPRESSED_MAPS is true
  */
 static FILE    *
 openMapFile(const char *filename)

@@ -28,41 +28,42 @@ char config_version[] = VERSION;
 
 char *Conf_libdir(void)
 {
-    static char conf[] = LIBDIR;
+    static char conf[] = CONF_LIBDIR;
 
     return conf;
 }
 
 char *Conf_defaults_file_name(void)
 {
-    static char conf[] = DEFAULTS_FILE_NAME;
+    static char conf[] = CONF_DEFAULTS_FILE_NAME;
 
     return conf;
 }
 
 char *Conf_password_file_name(void)
 {
-    static char conf[] = PASSWORD_FILE_NAME;
+    static char conf[] = CONF_PASSWORD_FILE_NAME;
 
     return conf;
 }
 
+#if 0
 char *Conf_player_passwords_file_name(void)
 {
-    static char conf[] = PLAYER_PASSWORDS_FILE_NAME;
+    static char conf[] = CONF_PLAYER_PASSWORDS_FILE_NAME;
 
     return conf;
 }
-
+#endif
 
 char *Conf_mapdir(void)
 {
-    static char conf[] = MAPDIR;
+    static char conf[] = CONF_MAPDIR;
 
     return conf;
 }
 
-static char conf_default_map_string[] = DEFAULT_MAP;
+static char conf_default_map_string[] = CONF_DEFAULT_MAP;
 
 char *Conf_default_map(void)
 {
@@ -71,7 +72,7 @@ char *Conf_default_map(void)
 
 char *Conf_servermotdfile(void)
 {
-    static char conf[] = SERVERMOTDFILE;
+    static char conf[] = CONF_SERVERMOTDFILE;
     static char env[] = "XPILOTSERVERMOTD";
     char *filename;
 
@@ -84,12 +85,12 @@ char *Conf_servermotdfile(void)
 
 char *Conf_localmotdfile(void)
 {
-    static char conf[] = LOCALMOTDFILE;
+    static char conf[] = CONF_LOCALMOTDFILE;
 
     return conf;
 }
 
-char conf_logfile_string[] = LOGFILE;
+char conf_logfile_string[] = CONF_LOGFILE;
 
 char *Conf_logfile(void)
 {
@@ -97,7 +98,7 @@ char *Conf_logfile(void)
 }
 
 /* needed by client/default.c */
-char conf_ship_file_string[] = SHIP_FILE;
+char conf_ship_file_string[] = CONF_SHIP_FILE;
 
 char *Conf_ship_file(void)
 {
@@ -105,7 +106,7 @@ char *Conf_ship_file(void)
 }
 
 /* needed by client/default.c */
-char conf_texturedir_string[] = TEXTUREDIR;
+char conf_texturedir_string[] = CONF_TEXTUREDIR;
 
 char *Conf_texturedir(void)
 {
@@ -113,7 +114,7 @@ char *Conf_texturedir(void)
 }
 
 /* needed by client/default.c */
-char conf_soundfile_string[] = SOUNDFILE;
+char conf_soundfile_string[] = CONF_SOUNDFILE;
 
 char *Conf_soundfile(void)
 {
@@ -122,19 +123,19 @@ char *Conf_soundfile(void)
 
 char *Conf_localguru(void)
 {
-    static char conf[] = LOCALGURU;
+    static char conf[] = CONF_LOCALGURU;
 
     return conf;
 }
 
 char *Conf_contactaddress(void)
 {
-    static char conf[] = CONTACTADDRESS;
+    static char conf[] = CONF_CONTACTADDRESS;
 
     return conf;
 }
 
-static char conf_robotfile_string[] = ROBOTFILE;
+static char conf_robotfile_string[] = CONF_ROBOTFILE;
 
 char *Conf_robotfile(void)
 {
@@ -143,21 +144,21 @@ char *Conf_robotfile(void)
 
 char *Conf_zcat_ext(void)
 {
-    static char conf[] = ZCAT_EXT;
+    static char conf[] = CONF_ZCAT_EXT;
 
     return conf;
 }
 
 char *Conf_zcat_format(void)
 {
-    static char conf[] = ZCAT_FORMAT;
+    static char conf[] = CONF_ZCAT_FORMAT;
 
     return conf;
 }
 
 char *Conf_sounddir(void)
 {
-    static char conf[] = SOUNDDIR;
+    static char conf[] = CONF_SOUNDDIR;
 
     return conf;
 }
@@ -174,9 +175,6 @@ void Conf_print(void)
 #ifdef MBX
     xpprintf("MBX\n");
 #endif
-#ifdef LOG
-    xpprintf("LOG\n");
-#endif
 #ifdef SERVER_SOUND
     xpprintf("SERVER_SOUND\n");
 #endif
@@ -190,8 +188,6 @@ void Conf_print(void)
     xpprintf("Conf_libdir()             = %s\n", Conf_libdir());
     xpprintf("Conf_defaults_file_name() = %s\n", Conf_defaults_file_name());
     xpprintf("Conf_password_file_name() = %s\n", Conf_password_file_name());
-    xpprintf("Conf_player_passwords_file_name() = %s\n",
-	     Conf_player_passwords_file_name());
     xpprintf("Conf_mapdir()             = %s\n", Conf_mapdir());
     xpprintf("Conf_default_map()        = %s\n", Conf_default_map());
     xpprintf("Conf_servermotdfile()     = %s\n", Conf_servermotdfile());

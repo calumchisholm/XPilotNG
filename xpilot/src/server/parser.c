@@ -191,14 +191,13 @@ static void Parser_dump_config(char *progname)
     xpprintf("\n");
     xpprintf("# %s option dump\n", progname);
     xpprintf("# \n");
-    xpprintf("# LIBDIR = %s\n", Conf_libdir());
-    xpprintf("# DEFAULTS_FILE_NAME = %s\n", Conf_defaults_file_name());
-    xpprintf("# PASSWORD_FILE_NAME = %s\n", Conf_password_file_name());
-    xpprintf("# PLAYER_PASSWORDS_FILE_NAME = %s\n", Conf_player_passwords_file_name());
-    xpprintf("# MAPDIR = %s\n", Conf_mapdir());
-    xpprintf("# DEFAULT_MAP = %s\n", Conf_default_map());
-    xpprintf("# SERVERMOTDFILE = %s\n", Conf_servermotdfile());
-    xpprintf("# ROBOTFILE = %s\n", Conf_robotfile());
+    xpprintf("# CONF_LIBDIR = %s\n", Conf_libdir());
+    xpprintf("# CONF_DEFAULTS_FILE_NAME = %s\n", Conf_defaults_file_name());
+    xpprintf("# CONF_PASSWORD_FILE_NAME = %s\n", Conf_password_file_name());
+    xpprintf("# CONF_MAPDIR = %s\n", Conf_mapdir());
+    xpprintf("# CONF_DEFAULT_MAP = %s\n", Conf_default_map());
+    xpprintf("# CONF_SERVERMOTDFILE = %s\n", Conf_servermotdfile());
+    xpprintf("# CONF_ROBOTFILE = %s\n", Conf_robotfile());
     xpprintf("# \n");
 }
 

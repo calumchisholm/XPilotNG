@@ -233,7 +233,7 @@ void Main_loop(void)
 
 	Update_objects();
 
-	if ((main_loops % UPDATES_PR_FRAME) == 0)
+	if ((main_loops % CONF_UPDATES_PR_FRAME) == 0)
 	    Frame_update();
     }
 

@@ -24,33 +24,30 @@
 #ifndef XPCONFIG_H
 #define XPCONFIG_H
 
-#ifndef LIBDIR
+#ifndef CONF_LIBDIR
 #  ifndef _WINDOWS
-#    error "LIBDIR NOT DEFINED. GIVING UP."
+#    error "CONF_LIBDIR NOT DEFINED. GIVING UP."
 #  else
-#    define LIBDIR			"lib/"
+#    define CONF_LIBDIR			"lib/"
 #  endif
 #endif
 
-#define LOCALGURU			"kps@users.sourceforge.net"
-#define DEFAULT_MAP			"polybloods.xp2"
-#define MAPDIR				LIBDIR "maps/"
-#define TEXTUREDIR			LIBDIR "textures/"
-#define SOUNDDIR			LIBDIR "sound/"
-#define ZCAT_EXT			".gz"
-#define ZCAT_FORMAT 			"gzip -d -c < %s"
+#define CONF_LOCALGURU			"kps@users.sourceforge.net"
+#define CONF_DEFAULT_MAP		"polybloods.xp2"
+#define CONF_MAPDIR			CONF_LIBDIR "maps/"
+#define CONF_TEXTUREDIR			CONF_LIBDIR "textures/"
+#define CONF_SOUNDDIR			CONF_LIBDIR "sound/"
 
 #ifndef _WINDOWS
 
-#  define DEFAULTS_FILE_NAME		LIBDIR "defaults"
-#  define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords"
-#  define PASSWORD_FILE_NAME		LIBDIR "password"
-#  define ROBOTFILE			LIBDIR "robots"
-#  define SERVERMOTDFILE		LIBDIR "servermotd"
-#  define LOCALMOTDFILE			LIBDIR "localmotd"
-#  define LOGFILE			LIBDIR "log"
-#  define SHIP_FILE       		""
-#  define SOUNDFILE	  		SOUNDDIR "sounds"
+#  define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults"
+#  define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password"
+#  define CONF_ROBOTFILE		CONF_LIBDIR "robots"
+#  define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd"
+#  define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd"
+#  define CONF_LOGFILE			CONF_LIBDIR "log"
+#  define CONF_SHIP_FILE       		""
+#  define CONF_SOUNDFILE	  	CONF_SOUNDDIR "sounds"
 #  ifdef DEBUG
 #    define D(x)	x ;  fflush(stdout);
 #  else
@@ -59,15 +56,14 @@
 
 #else /* _WINDOWS */
 
-#  define DEFAULTS_FILE_NAME		LIBDIR "defaults.txt"
-#  define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords.txt"
-#  define PASSWORD_FILE_NAME		LIBDIR "password.txt"
-#  define ROBOTFILE			LIBDIR "robots.txt"
-#  define SERVERMOTDFILE		LIBDIR "servermotd.txt"
-#  define LOCALMOTDFILE			LIBDIR "localmotd.txt"
-#  define LOGFILE			LIBDIR "log.txt"
-#  define SHIP_FILE			"XPilot.shp"
-#  define SOUNDFILE			SOUNDDIR "sounds.txt"
+#  define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults.txt"
+#  define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password.txt"
+#  define CONF_ROBOTFILE		CONF_LIBDIR "robots.txt"
+#  define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd.txt"
+#  define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd.txt"
+#  define CONF_LOGFILE			CONF_LIBDIR "log.txt"
+#  define CONF_SHIP_FILE		"XPilot.shp"
+#  define CONF_SOUNDFILE		CONF_SOUNDDIR "sounds.txt"
 #  ifdef _DEBUG
 #    define DEBUG	1
 #    define D(x)	x
@@ -77,8 +73,16 @@
 
 #endif /* _WINDOWS */
 
+#if 0 /* currently unused */
+#ifndef _WINDOWS
+#  define CONF_PLAYER_PASSWORDS_FILE_NAME CONF_LIBDIR "player_passwords"
+#else
+#  define CONF_PLAYER_PASSWORDS_FILE_NAME CONF_LIBDIR "player_passwords.txt"
+#endif
+#endif
+
 /* Please don't change this one. */
-#define CONTACTADDRESS			"xpilot@xpilot.org"
+#define CONF_CONTACTADDRESS		"xpilot@xpilot.org"
 
 /*
  * Uncomment this if your machine doesn't use
@@ -91,21 +95,23 @@
  * how often the server should draw a frame.  (Hmm...)
  */
 
-#define UPDATES_PR_FRAME	1
+#define CONF_UPDATES_PR_FRAME	1
 
 /*
  * If COMPRESSED_MAPS is defined, the server will attempt to uncompress
- * maps on the fly (but only if neccessary). ZCAT_FORMAT should produce
- * a command that will unpack the given .Z file to stdout (for use in popen).
- * ZCAT_EXT should define the proper compressed file extension.
+ * maps on the fly (but only if neccessary). CONF_ZCAT_FORMAT should produce
+ * a command that will unpack the given .gz file to stdout (for use in popen).
+ * CONF_ZCAT_EXT should define the proper compressed file extension.
  */
 
 #ifndef _WINDOWS
-#  define COMPRESSED_MAPS
+#  define CONF_COMPRESSED_MAPS
 #else
 /* Couldn't find a popen(), also compress and gzip don't exist. */
-#  undef COMPRESSED_MAPS
+#  undef CONF_COMPRESSED_MAPS
 #endif
+#define CONF_ZCAT_EXT			".gz"
+#define CONF_ZCAT_FORMAT 		"gzip -d -c < %s"
 
 /*
  * Windows doesn't play with stdin/out well at all... 
