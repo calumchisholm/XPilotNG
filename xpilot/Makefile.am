@@ -1,2 +1,2 @@
 SUBDIRS = src lib doc
-noinst_DATA = mapconvert.py
+dist_pkgdata_DATA = mapconvert.py
