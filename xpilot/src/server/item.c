@@ -504,12 +504,6 @@ void Do_deflector(int ind)
     long	dx, dy;
     DFLOAT      dist;
 
-    if (pl->fuel.sum < -ED_DEFLECTOR) {
-	CLR_BIT(pl->used, OBJ_DEFLECTOR);
-	return;
-    }
-    Add_fuel(&(pl->fuel), (long)ED_DEFLECTOR);
-
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
 

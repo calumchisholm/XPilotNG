@@ -2460,6 +2460,10 @@ static optionDesc options[] = {
 
 void Timing_setup(void)
 {
+    if (FPSMultiplier < 1)
+	FPSMultiplier = 1;
+    if (FPSMultiplier > 64)
+	FPSMultiplier = 64;
     framespeed = TIME_FACT / FPSMultiplier;
     framespeed2 = 1. / FPSMultiplier;
     ShotsLife = ShotsLifeSetting * TIME_FACT;

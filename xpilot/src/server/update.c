@@ -720,11 +720,10 @@ void Update_objects(void)
 
 	if (BIT(pl->used, OBJ_PHASING_DEVICE)) {
 	    if (--pl->phasing_left <= 0) {
-		if (pl->item[ITEM_PHASING]) {
+		if (pl->item[ITEM_PHASING])
 		    Phasing(i, 1);
-		} else {
+		else
 		    Phasing(i, 0);
-		}
 	    }
 	}
 
@@ -732,11 +731,10 @@ void Update_objects(void)
 	    if (pl->fuel.sum > 0
 		&& BIT(pl->status, THRUSTING)
 		&& --pl->emergency_thrust_left <= 0) {
-		if (pl->item[ITEM_EMERGENCY_THRUST]) {
+		if (pl->item[ITEM_EMERGENCY_THRUST])
 		    Emergency_thrust(i, 1);
-		} else {
+		else
 		    Emergency_thrust(i, 0);
-		}
 	    }
 	}
 
@@ -744,32 +742,29 @@ void Update_objects(void)
 	    if (pl->fuel.sum > 0
 		&& BIT(pl->used, OBJ_SHIELD)
 		&& --pl->emergency_shield_left <= 0) {
-		if (pl->item[ITEM_EMERGENCY_SHIELD]) {
+		if (pl->item[ITEM_EMERGENCY_SHIELD])
 		    Emergency_shield(i, 1);
-		} else {
+		else
 		    Emergency_shield(i, 0);
-		}
 	    }
 	}
 
 	if (BIT(pl->used, OBJ_LASER)) {
 	    if (pl->item[ITEM_LASER] <= 0
-		|| BIT(pl->used, OBJ_PHASING_DEVICE)) {
+		|| BIT(pl->used, OBJ_PHASING_DEVICE))
 		CLR_BIT(pl->used, OBJ_LASER);
-	    } else {
+	    else
 		Fire_laser(i);
-	    }
 	}
 
-	if (BIT(pl->used, OBJ_DEFLECTOR)) {
+	if (BIT(pl->used, OBJ_DEFLECTOR))
 	    Do_deflector(i);
-	}
 
 	/*
 	 * Only do autopilot code if switched on and player is not
 	 * damaged (ie. can see).
 	 */
-	if (   (BIT(pl->used, OBJ_AUTOPILOT))
+	if ((BIT(pl->used, OBJ_AUTOPILOT))
 	    || (BIT(pl->status, HOVERPAUSE) && !pl->damaged)) {
 		do_Autopilot(pl);
 	}
@@ -805,14 +800,20 @@ void Update_objects(void)
 	Turn_player(i);
 
 
-	/*
-	 * Compute energy drainage
-	 */
-	if (BIT(pl->used, OBJ_SHIELD))
-	    Add_fuel(&(pl->fuel), (long)ED_SHIELD);
+	/* Compute energy drainage
+	 * Since the amount per frame could get too small to be represented
+	 * accurately as an integer, FPSMultiplier makes this happen less
+	 * often (in terms of frames) rather than smaller amount each time. */
+	if (frame_loops % FPSMultiplier == 0) {
+	    if (BIT(pl->used, OBJ_SHIELD))
+		Add_fuel(&(pl->fuel), (long)ED_SHIELD);
 
-	if (BIT(pl->used, OBJ_CLOAKING_DEVICE))
-	    Add_fuel(&(pl->fuel), (long)ED_CLOAKING_DEVICE);
+	    if (BIT(pl->used, OBJ_CLOAKING_DEVICE))
+		Add_fuel(&(pl->fuel), (long)ED_CLOAKING_DEVICE);
+
+	    if (BIT(pl->used, OBJ_DEFLECTOR))
+		Add_fuel(&(pl->fuel), (long)ED_DEFLECTOR);
+	}
 
 #define UPDATE_RATE 100
 
@@ -931,7 +932,8 @@ void Update_objects(void)
 	    }
 	    pl->acc.x = power * tcos(pl->dir) / inert;
 	    pl->acc.y = power * tsin(pl->dir) / inert;
-	    Add_fuel(&(pl->fuel), (long)(-f * FUEL_SCALE_FACT)); /* Decrement fuel */
+	    if (frame_loops % FPSMultiplier == 0)
+		Add_fuel(&(pl->fuel), (long)(-f * FUEL_SCALE_FACT));
 	} else {
 	    pl->acc.x = pl->acc.y = 0.0;
 	}
