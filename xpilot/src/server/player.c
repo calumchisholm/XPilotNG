@@ -207,7 +207,7 @@ void Go_home(player_t *pl)
 	    Deflector(pl, true);
     }
     Player_thrust(pl, false);
-    pl->updateVisibility = 1;
+    pl->updateVisibility = true;
     for (i = 0; i < NumPlayers; i++) {
 	pl->visibility[i].lastChange = 0;
 	Player_by_index(i)->visibility[ind].lastChange = 0;
@@ -605,6 +605,9 @@ void Reset_all_players(world_t *world)
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
+
+	/*Player_print_state(pl, "Reset_all_players1");*/
+
 	if (options.endOfRoundReset) {
 	    if (Player_is_paused(pl))
 		Player_death_reset(pl, false);
@@ -623,6 +626,8 @@ void Reset_all_players(world_t *world)
 	if (!Player_is_paused(pl)
 	    && !Player_is_waiting(pl))
 	    Rank_add_round(pl);
+
+	/*Player_print_state(pl, "Reset_all_players2");*/
 
 	CLR_BIT(pl->have, HAS_BALL);
 	Player_reset_timing(pl);

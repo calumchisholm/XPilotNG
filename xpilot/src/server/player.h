@@ -307,7 +307,7 @@ struct player {
     double	forceVisible;
     double	damaged;
     double	stunned;
-    int		updateVisibility;
+    bool	updateVisibility;
 
     int		last_target_update;	/* index of last updated target */
     int		last_cannon_update;	/* index of last updated cannon */

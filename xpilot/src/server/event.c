@@ -196,11 +196,8 @@ void Pause_player(player_t *pl, bool on)
 	pl->pause_count = 10 * 12;
 	/* player might have paused when recovering */
 	pl->recovery_count = 0;
-	pl->updateVisibility = 1;
+	pl->updateVisibility = true;
 	Player_set_state(pl, PL_STATE_PAUSED);
-	/* kps - can this happen ??? */
-	if (pl->pauseTime != 0)
-	    warn("Pause_player: pl pausetime was != 0 (%.3f)", pl->pauseTime);
 	pl->pauseTime = 0;
 	if (options.baselessPausing) {
 	    world->teams[pl->team].NumMembers--;
@@ -243,11 +240,8 @@ void Pause_player(player_t *pl, bool on)
 		pl->life = 0;
 		Player_set_state(pl, PL_STATE_WAITING);
 	    } else {
-		pl->mychar = ' ';
+		Player_set_state(pl, PL_STATE_ALIVE);
 		Go_home(pl);
-		SET_BIT(pl->pl_status, PLAYING);
-		if (BIT(world->rules->mode, LIMITED_LIVES))
-		    pl->life = world->rules->lives;
 	    }
 	    Player_reset_timing(pl);
 	}

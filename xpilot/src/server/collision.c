@@ -837,7 +837,7 @@ static void Player_collides_with_item(player_t *pl, object_t *obj)
     case ITEM_SENSOR:
 	pl->item[item_index] += (int)obj->count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
-	pl->updateVisibility = 1;
+	pl->updateVisibility = true;
 	sound_play_sensors(pl->pos, SENSOR_PACK_PICKUP_SOUND);
 	break;
     case ITEM_AFTERBURNER:
@@ -862,7 +862,7 @@ static void Player_collides_with_item(player_t *pl, object_t *obj)
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
 	if (pl->item[item_index] > 0)
 	    SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
-	pl->updateVisibility = 1;
+	pl->updateVisibility = true;
 	sound_play_sensors(pl->pos, CLOAKING_DEVICE_PICKUP_SOUND);
 	break;
     case ITEM_FUEL:

@@ -140,13 +140,13 @@ void Cloak(player_t *pl, bool on)
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
 	    sound_play_player(pl, CLOAK_SOUND);
-	    pl->updateVisibility = 1;
+	    pl->updateVisibility = true;
 	    SET_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	}
     } else {
 	if (BIT(pl->used, HAS_CLOAKING_DEVICE)) {
 	    sound_play_player(pl, CLOAK_SOUND);
-	    pl->updateVisibility = 1;
+	    pl->updateVisibility = true;
 	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
 	}
 	if (!pl->item[ITEM_CLOAK])
@@ -1130,14 +1130,14 @@ void Update_objects(world_t *world)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
 
-	pl->updateVisibility = 0;
+	pl->updateVisibility = false;
 
 	if (pl->forceVisible > 0) {
 	    if ((pl->forceVisible -= timeStep) <= 0)
 		pl->forceVisible = 0;
 
 	    if (!pl->forceVisible)
-		pl->updateVisibility = 1;
+		pl->updateVisibility = true;
 	}
 
 	if (BIT(pl->used, HAS_TRACTOR_BEAM))
