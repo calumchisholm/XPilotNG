@@ -702,7 +702,7 @@ static inline bool Player_is_active(player_t *pl)
 /* kps - add id.h ? */
 static inline bool Is_player_id(int id)
 {
-    if (id >= 0 && id < NUM_IDS)
+    if (id >= 1 && id <= NUM_IDS)
 	return true;
     return false;
 }
