@@ -32,7 +32,7 @@ char ship_version[] = VERSION;
  * Functions for ship movement.
  */
 
-void Thrust(player_t *pl)
+void Make_thrust_sparks(player_t *pl)
 {
     static int min_dir, max_dir;
     static double max_speed;
@@ -318,7 +318,7 @@ void Tank_handle_detach(player_t *pl)
     player_t *tank;
     int i, ct;
 
-    if (BIT(pl->used, HAS_PHASING_DEVICE))
+    if (Player_is_phasing(pl))
 	return;
 
     /* Return, if no more players or no tanks */

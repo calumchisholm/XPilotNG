@@ -203,7 +203,7 @@ static void PlayerCollision(world_t *world)
 	    continue;
 	}
 
-	if (BIT(pl->used, HAS_PHASING_DEVICE))
+	if (Player_is_phasing(pl))
 	    continue;
 
 	/* Player - player */
@@ -214,7 +214,7 @@ static void PlayerCollision(world_t *world)
 
 		if (!Player_is_alive(pl_j))
 		    continue;
-		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
+		if (Player_is_phasing(pl_j))
 		    continue;
 
 		range = (2*SHIP_SZ-6) * CLICK;
@@ -242,11 +242,11 @@ static void PlayerCollision(world_t *world)
 
 		sound_play_sensors(pl->pos, PLAYER_HIT_PLAYER_SOUND);
 		if (BIT(world->rules->mode, BOUNCE_WITH_PLAYER)) {
-		    if (!Player_used_emergency_shield(pl)) {
+		    if (!Player_uses_emergency_shield(pl)) {
 			Player_add_fuel(pl, ED_PL_CRASH);
 			Item_damage(pl, options.destroyItemInCollisionProb);
 		    }
-		    if (!Player_used_emergency_shield(pl_j)) {
+		    if (!Player_uses_emergency_shield(pl_j)) {
 			Player_add_fuel(pl_j, ED_PL_CRASH);
 			Item_damage(pl_j, options.destroyItemInCollisionProb);
 		    }
@@ -382,7 +382,7 @@ static void PlayerCollision(world_t *world)
 
 	/* Player picking up ball/treasure */
 	if (!BIT(pl->used, HAS_CONNECTOR)
-	    || BIT(pl->used, HAS_PHASING_DEVICE))
+	    || Player_is_phasing(pl))
 	    pl->ball = NULL;
 	else if (pl->ball != NULL) {
 	    ballobject_t *ball = pl->ball;
@@ -598,7 +598,7 @@ static void PlayerObjectCollision(player_t *pl)
 	}
 	else if (obj->type == OBJ_BALL
 		 && obj->id != NO_ID) {
-	    if (BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE))
+	    if (Player_is_phasing(Player_by_id(obj->id)))
 		continue;
 	}
 	else if (obj->type == OBJ_PULSE) {
@@ -714,7 +714,7 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
      * be destroyed.
      */
     Delta_mv(OBJ_PTR(pl), OBJ_PTR(ball));
-    if (!Player_used_emergency_shield(pl)) {
+    if (!Player_uses_emergency_shield(pl)) {
 	Player_add_fuel(pl, ED_BALL_HIT);
 	if (options.treasureCollisionDestroys)
 	    ball->life = 0;
@@ -828,8 +828,6 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_PHASING:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
-	if (pl->item[item_index] > 0)
-	    SET_BIT(pl->have, HAS_PHASING_DEVICE);
 	sound_play_sensors(pl->pos, PHASING_DEVICE_PICKUP_SOUND);
 	break;
     case ITEM_SENSOR:
@@ -999,7 +997,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 
     cost = collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
 
-    if (!Player_used_emergency_shield(pl))
+    if (!Player_uses_emergency_shield(pl))
 	Player_add_fuel(pl, -cost);
     if (pl->fuel.sum == 0.0
 	|| (obj->type == OBJ_WRECKAGE
@@ -1049,7 +1047,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	Score(pl, sc, ast->pos, "");
     }
 
-    if (!Player_used_emergency_shield(pl))
+    if (!Player_uses_emergency_shield(pl))
 	Player_add_fuel(pl, -cost);
 
     if (options.asteroidCollisionMayKill
@@ -1140,7 +1138,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 			      kp->name);
 	    }
 	    drain = Missile_hit_drain(MISSILE_PTR(obj));
-	    if (!Player_used_emergency_shield(pl))
+	    if (!Player_uses_emergency_shield(pl))
 		Player_add_fuel(pl, drain);
 	    pl->forceVisible += 2;
 	    break;
@@ -1148,7 +1146,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	case OBJ_SHOT:
 	case OBJ_CANNON_SHOT:
 	    sound_play_sensors(pl->pos, PLAYER_EAT_SHOT_SOUND);
-	    if (!Player_used_emergency_shield(pl)) {
+	    if (!Player_uses_emergency_shield(pl)) {
 		if (options.shotHitFuelDrainUsesKineticEnergy) {
 		    double rel_velocity = LENGTH(pl->vel.x - obj->vel.x,
 						 pl->vel.y - obj->vel.y);
@@ -1343,7 +1341,7 @@ static void AsteroidCollision(world_t *world)
 	    /* don't collide with phased balls */
 	    if (obj->type == OBJ_BALL
 		&& obj->id != NO_ID
-		&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE))
+		&& Player_is_phasing(Player_by_id(obj->id)))
 		continue;
 
 	    radius = (ast->pl_radius + obj->pl_radius) * CLICK;
@@ -1466,7 +1464,7 @@ static void BallCollision(world_t *world)
 	if (ball->type != OBJ_BALL ||	/* not a ball */
 	    ball->life <= 0.0 ||	/* dying ball */
 	    (ball->id != NO_ID
-	     && BIT(Player_by_id(ball->id)->used, HAS_PHASING_DEVICE)) ||
+	     && Player_is_phasing(Player_by_id(ball->id))) ||
 					/* phased ball */
 	    ball->ball_treasure->have)	/* safe in a treasure */
 	    continue;
@@ -1526,7 +1524,7 @@ static void BallCollision(world_t *world)
 			break;
 
 		    if (b2->id != NO_ID
-			&& BIT(Player_by_id(b2->id)->used, HAS_PHASING_DEVICE))
+			&& Player_is_phasing(Player_by_id(b2->id)))
 			break;
 		}
 

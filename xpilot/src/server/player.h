@@ -99,7 +99,7 @@ extern bool		updateScores;
 #define HAS_CONNECTOR		(1U<<20)
 #define HAS_EMERGENCY_SHIELD	(1U<<19)
 #define USES_DEFLECTOR		(1U<<18)
-#define HAS_PHASING_DEVICE	(1U<<17)
+#define USES_PHASING_DEVICE	(1U<<17)
 #define HAS_SHOT		(1U<<4)
 #define HAS_BALL		(1U<<3)
 
@@ -516,10 +516,25 @@ static inline bool Players_are_allies(player_t *pl1, player_t *pl2)
     return false;
 }
 
-static inline bool Player_used_emergency_shield(player_t *pl)
+static inline bool Player_uses_emergency_shield(player_t *pl)
 {
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) ==
 	(HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+	return true;
+    return false;
+}
+
+static inline bool Player_is_phasing(player_t *pl)
+{
+    if (BIT(pl->used, USES_PHASING_DEVICE))
+	return true;
+    return false;
+}
+
+static inline bool Player_has_phasing_device(player_t *pl)
+{
+    if (pl->item[ITEM_PHASING] > 0
+	|| pl->phasing_left > 0.0)
 	return true;
     return false;
 }

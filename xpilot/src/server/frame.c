@@ -393,7 +393,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
 			EMERGENCY_SHIELD_TIME);
     if (Player_is_self_destructing(pl))
 	Send_destruct(conn, (int) pl->self_destruct_count);
-    if (BIT(pl->used, HAS_PHASING_DEVICE))
+    if (Player_is_phasing(pl))
 	Send_phasingtime(conn,
 			 (int) pl->phasing_left,
 			 PHASING_TIME);
@@ -877,7 +877,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 		      BIT(pl_i->used, HAS_SHIELD) != 0,
 		      BIT(pl_i->used, HAS_CLOAKING_DEVICE) != 0,
 		      BIT(pl_i->used, HAS_EMERGENCY_SHIELD) != 0,
-		      BIT(pl_i->used, HAS_PHASING_DEVICE) != 0,
+		      Player_is_phasing(pl_i) ? 1 : 0,
 		      BIT(pl_i->used, USES_DEFLECTOR) != 0
 	    );
 	}

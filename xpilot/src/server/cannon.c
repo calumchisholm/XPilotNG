@@ -72,7 +72,7 @@ void Cannon_update(world_t *world, bool tick)
 		Cannon_check_defense(c);
 
 	    if (!BIT(c->used, HAS_EMERGENCY_SHIELD)
-		&& !BIT(c->used, HAS_PHASING_DEVICE)
+		&& !BIT(c->used, USES_PHASING_DEVICE)
 		&& (c->damaged <= 0)
 		&& (c->tractor_count <= 0)
 		&& rfrac() * 16 < 1)
@@ -118,7 +118,7 @@ void Cannon_update(world_t *world, bool tick)
 	}
 	if (c->phasing_left > 0) {
 	    if ((c->phasing_left -= timeStep) <= 0) {
-		CLR_BIT(c->used, HAS_PHASING_DEVICE);
+		CLR_BIT(c->used, USES_PHASING_DEVICE);
 	        sound_play_sensors(c->pos, PHASING_OFF_SOUND);
 	    }
 	}
@@ -263,7 +263,7 @@ static int Cannon_select_defense(cannon_t *c)
 
     /* still protected */
     if (BIT(c->used, HAS_EMERGENCY_SHIELD)
-	|| BIT(c->used, HAS_PHASING_DEVICE))
+	|| BIT(c->used, USES_PHASING_DEVICE))
 	return -1;
 
     if (c->item[ITEM_EMERGENCY_SHIELD])
@@ -351,7 +351,7 @@ static void Cannon_defend(cannon_t *c, int defense)
 	break;
     case CD_PHASING:
 	c->phasing_left += 4 * 12;
-	SET_BIT(c->used, HAS_PHASING_DEVICE);
+	SET_BIT(c->used, USES_PHASING_DEVICE);
 	c->tractor_count = 0;
 	c->item[ITEM_PHASING]--;
 	sound_play_sensors(c->pos, PHASING_ON_SOUND);
@@ -485,7 +485,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 		&& (int)(rfrac() * (pl->item[ITEM_CLOAK] + 1))
 		   > (int)(rfrac() * (c->item[ITEM_SENSOR] + 1)))
 	    || (smartness > 2
-		&& BIT(pl->used, HAS_PHASING_DEVICE)))
+		&& Player_is_phasing(pl)))
 	    continue;
 
 	switch (smartness) {
@@ -909,7 +909,7 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
     assert (! (cannon->dead_ticks > 0));
 
     /* if cannon is phased nothing will hit it */
-    if (BIT(cannon->used, HAS_PHASING_DEVICE))
+    if (BIT(cannon->used, USES_PHASING_DEVICE))
 	return false;
 
     if (obj == NULL)

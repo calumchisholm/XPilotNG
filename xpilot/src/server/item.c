@@ -40,10 +40,6 @@ static void Item_update_flags(player_t *pl)
 	CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
     }
-    if (pl->item[ITEM_PHASING] <= 0
-	&& !BIT(pl->used, HAS_PHASING_DEVICE)
-	&& pl->phasing_left <= 0)
-	CLR_BIT(pl->have, HAS_PHASING_DEVICE);
     if (pl->item[ITEM_EMERGENCY_THRUST] <= 0
 	&& !BIT(pl->used, HAS_EMERGENCY_THRUST)
 	&& pl->emergency_thrust_left <= 0)
@@ -436,8 +432,8 @@ void Tractor_beam(player_t *pl)
 	!= (LOCK_PLAYER|LOCK_VISIBLE)
 	|| !Player_is_alive(locked_pl)
 	|| pl->lock.distance >= maxdist
-	|| BIT(pl->used, HAS_PHASING_DEVICE)
-	|| BIT(locked_pl->used, HAS_PHASING_DEVICE)) {
+	|| Player_is_phasing(pl)
+	|| Player_is_phasing(locked_pl)) {
 	CLR_BIT(pl->used, USES_TRACTOR_BEAM);
 	return;
     }
@@ -498,6 +494,7 @@ void Do_deflector(player_t *pl)
     int i, obj_count;
     double dx, dy, dist;
 
+    /* kps - deflector energy usage currently buggy */
     if (pl->fuel.sum < -ED_DEFLECTOR) {
 	if (BIT(pl->used, USES_DEFLECTOR))
 	    Deflector(pl, false);
@@ -573,7 +570,7 @@ void Do_transporter(player_t *pl)
     /* if not available, fail silently */
     if (!pl->item[ITEM_TRANSPORTER]
 	|| pl->fuel.sum < -ED_TRANSPORTER
-	|| BIT(pl->used, HAS_PHASING_DEVICE))
+	|| Player_is_phasing(pl))
 	return;
 
     /* find victim */
@@ -584,7 +581,7 @@ void Do_transporter(player_t *pl)
 	    || !Player_is_active(pl_i)
 	    || Team_immune(pl->world, pl->id, pl_i->id)
 	    || Player_is_tank(pl_i)
-	    || BIT(pl_i->used, HAS_PHASING_DEVICE))
+	    || Player_is_phasing(pl_i))
 	    continue;
 	dist = Wrap_length(pl->pos.cx - pl_i->pos.cx,
 			   pl->pos.cy - pl_i->pos.cy);
@@ -710,11 +707,8 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
         break;
     case ITEM_PHASING:
 	what = "a phasing device";
-	if (!victim->item[item]) {
-	    if (BIT(victim->used, HAS_PHASING_DEVICE))
-		Phasing(victim, false);
-	    CLR_BIT(victim->have, HAS_PHASING_DEVICE);
-	}
+	if (!Player_has_phasing_device(victim))
+	    Phasing(victim, false);
         break;
     case ITEM_LASER:
 	what = "a laser";
@@ -812,7 +806,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     case ITEM_DEFLECTOR:
 	break;
     case ITEM_PHASING:
-	SET_BIT(pl->have, HAS_PHASING_DEVICE);
 	break;
     case ITEM_EMERGENCY_THRUST:
 	SET_BIT(pl->have, HAS_EMERGENCY_THRUST);
@@ -874,8 +867,8 @@ void do_lose_item(player_t *pl)
     if (pl->item[item] <= 0)
 	return;
 
-    if (options.loseItemDestroys == false
-	&& !BIT(pl->used, HAS_PHASING_DEVICE))
+    if (!options.loseItemDestroys
+	&& !Player_is_phasing(pl))
 	Place_item(pl->world, pl, item);
     else
 	pl->item[item]--;
@@ -1074,7 +1067,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 	if (pl && Players_are_allies(pl, p))
 	    continue;
 
-	if (BIT(p->used, HAS_PHASING_DEVICE))
+	if (Player_is_phasing(p))
 	    continue;
 
 	if (Player_is_active(p)) {
@@ -1155,7 +1148,7 @@ void Fire_ecm(player_t *pl)
     if (pl->item[ITEM_ECM] == 0
 	|| pl->fuel.sum <= -ED_ECM
 	|| pl->ecmcount >= MAX_PLAYER_ECMS
-	|| BIT(pl->used, HAS_PHASING_DEVICE))
+	|| Player_is_phasing(pl))
 	return;
 
     Fire_general_ecm(pl->world, pl->id, pl->team, pl->pos);

@@ -536,7 +536,7 @@ int Handle_keyboard(player_t *pl)
 	}
 
 	/* allow these functions while you're phased */
-	if (BIT(pl->used, HAS_PHASING_DEVICE) && pressed) {
+	if (Player_is_phasing(pl) && pressed) {
 	    switch (key) {
 	    case KEY_LOCK_NEXT:
 	    case KEY_LOCK_PREV:
@@ -925,7 +925,7 @@ int Handle_keyboard(player_t *pl)
 			if (!BIT(pl->used, HAS_AUTOPILOT))
 			    Autopilot(pl, true);
 
-			if (BIT(pl->used, HAS_PHASING_DEVICE))
+			if (Player_is_phasing(pl))
 			    Phasing(pl, false);
 
 			/*
@@ -1010,8 +1010,8 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_PHASING:
-		if (BIT(pl->have, HAS_PHASING_DEVICE))
-		    Phasing(pl, !BIT(pl->used, HAS_PHASING_DEVICE));
+		if (Player_has_phasing_device(pl))
+		    Phasing(pl, !Player_is_phasing(pl));
 		break;
 
 	    case KEY_SELECT_ITEM:

@@ -300,14 +300,14 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
         {
 	    cannon_t *cannon = Cannon_by_index(world, mapobj_ind);
 
-	    if (!Player_used_emergency_shield(pl)) {
+	    if (!Player_uses_emergency_shield(pl)) {
 		howfmt = "%s smashed%s against a cannon";
 		hudmsg = "[Cannon]";
 		sound_play_sensors(pl->pos, PLAYER_HIT_CANNON_SOUND);
 	    }
 	    if (!BIT(cannon->used, HAS_EMERGENCY_SHIELD)) {
 		/* pl gets points if the cannon is rammed with shields up */
-		if (Player_used_emergency_shield(pl))
+		if (Player_uses_emergency_shield(pl))
 		    Cannon_dies(cannon, pl);
 		else
 		    Cannon_dies(cannon, NULL);
@@ -663,7 +663,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 		? options.maxShieldedWallBounceSpeed
 		: options.maxUnshieldedWallBounceSpeed;
 
-	if (Player_used_emergency_shield(pl))
+	if (Player_uses_emergency_shield(pl))
 	    max_speed = 100.0;
 
 	/* only use armor if neccessary */
@@ -689,7 +689,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	 * which don't collide with player.
 	 */
 	cost *= 0.9; /* used to depend on bounce angle, .5 .. 1.0 */
-	if (!Player_used_emergency_shield(pl)) {
+	if (!Player_uses_emergency_shield(pl)) {
 	    Player_add_fuel(pl, -cost * options.wallBounceFuelDrainMult);
 	    Item_damage(pl, options.wallBounceDestroyItemProb);
 	}
@@ -2614,7 +2614,7 @@ static void Move_ball(object_t *obj)
     obj->extmove.cy = mv.delta.cy;
 
     if (obj->id != NO_ID
-	&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE)) {
+	&& Player_is_phasing(Player_by_id(obj->id))) {
 	clpos_t pos;
 
 	pos.cx = obj->pos.cx + mv.delta.cx;
@@ -2769,7 +2769,7 @@ void Move_player(player_t *pl)
     }
 
     /* Figure out which friction to use. */
-    if (BIT(pl->used, HAS_PHASING_DEVICE))
+    if (Player_is_phasing(pl))
 	fric = friction;
     else if (world->NumFrictionAreas > 0) {
 	int group, i;
@@ -2816,7 +2816,7 @@ void Move_player(player_t *pl)
     pl->extmove.cy = mv.delta.cy;
 #endif
 
-    if (BIT(pl->used, HAS_PHASING_DEVICE)) {
+    if (Player_is_phasing(pl)) {
 	pos.cx = pl->pos.cx + mv.delta.cx;
 	pos.cy = pl->pos.cy + mv.delta.cy;
 	pos = World_wrap_clpos(world, pos);

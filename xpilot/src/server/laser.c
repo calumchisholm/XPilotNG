@@ -148,7 +148,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
     }
 
     sound_play_sensors(pl->pos, PLAYER_EAT_LASER_SOUND);
-    if (Player_used_emergency_shield(pl))
+    if (Player_uses_emergency_shield(pl))
 	return;
     assert(pulse->type == OBJ_PULSE);
 

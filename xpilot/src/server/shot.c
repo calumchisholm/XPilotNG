@@ -49,7 +49,7 @@ static inline bool Player_can_place_mine(player_t *pl)
 {
     if (pl->item[ITEM_MINE] <= 0)
 	return false;
-    if (BIT(pl->used, HAS_PHASING_DEVICE))
+    if (Player_is_phasing(pl))
 	return false;
     if (BIT(pl->used, HAS_SHIELD)
 	&& !options.shieldedMining)
@@ -260,7 +260,7 @@ void Detonate_mines(player_t *pl)
     int i, closest = -1;
     double dist, min_dist = world->hypotenuse * CLICK + 1;
 
-    if (BIT(pl->used, HAS_PHASING_DEVICE))
+    if (Player_is_phasing(pl))
 	return;
 
     for (i = 0; i < NumObjs; i++) {
@@ -357,7 +357,8 @@ char *Describe_shot(int type, int status, modifiers_t mods, int hit)
 static inline bool Player_can_fire_shot(player_t *pl)
 {
     if (pl->shots >= options.maxPlayerShots
-	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
+	|| BIT(pl->used, HAS_SHIELD)
+	|| Player_is_phasing(pl))
 	return false;
     return true;
 }

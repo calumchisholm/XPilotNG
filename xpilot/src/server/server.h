@@ -247,7 +247,7 @@ void Free_options(void);
 /*
  * Prototypes for player.c
  */
-void Thrust(player_t *pl);
+void Make_thrust_sparks(player_t *pl);
 void Record_shove(player_t *pl, player_t *pusher, long shove_time);
 void Delta_mv(object_t *ship, object_t *obj);
 void Delta_mv_elastic(object_t *obj1, object_t *obj2);

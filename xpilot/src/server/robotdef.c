@@ -1177,7 +1177,7 @@ static bool Detect_ship(player_t *pl, player_t *ship)
 	return false;
 
     /* can't do anything with phased ships */
-    if (BIT(ship->used, HAS_PHASING_DEVICE))
+    if (Player_is_phasing(ship))
 	return false;
 
     /* trivial */

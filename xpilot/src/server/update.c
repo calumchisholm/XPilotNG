@@ -104,7 +104,7 @@ void Phasing(player_t *pl, bool on)
 	    pl->phasing_left = PHASING_TIME;
 	    pl->item[ITEM_PHASING]--;
 	}
-	SET_BIT(pl->used, HAS_PHASING_DEVICE);
+	SET_BIT(pl->used, USES_PHASING_DEVICE);
 	CLR_BIT(pl->used, HAS_REFUEL);
 	CLR_BIT(pl->used, HAS_REPAIR);
 	if (BIT(pl->used, HAS_CONNECTOR))
@@ -116,11 +116,7 @@ void Phasing(player_t *pl, bool on)
 	hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 	int group;
 
-	CLR_BIT(pl->used, HAS_PHASING_DEVICE);
-	if (pl->phasing_left <= 0) {
-	    if (pl->item[ITEM_PHASING] <= 0)
-		CLR_BIT(pl->have, HAS_PHASING_DEVICE);
-	}
+	CLR_BIT(pl->used, USES_PHASING_DEVICE);
 	SET_BIT(pl->obj_status, GRAVITY);
 	sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
 	/* kps - ok to have this check here ? */
@@ -643,9 +639,9 @@ static void Use_items(player_t *pl)
 	}
     }
 
-    if (BIT(pl->used, HAS_PHASING_DEVICE)) {
+    if (Player_is_phasing(pl)) {
 	if ((pl->phasing_left -= timeStep) <= 0) {
-	    if (pl->item[ITEM_PHASING])
+	    if (pl->item[ITEM_PHASING] > 0)
 		Phasing(pl, true);
 	    else
 		Phasing(pl, false);
@@ -684,7 +680,7 @@ static void Use_items(player_t *pl)
 	if (BIT(pl->used, HAS_SHIELD))
 	    Player_add_fuel(pl, ED_SHIELD);
 
-	if (BIT(pl->used, HAS_PHASING_DEVICE))
+	if (Player_is_phasing(pl))
 	    Player_add_fuel(pl, ED_PHASING_DEVICE);
 
 	if (BIT(pl->used, HAS_CLOAKING_DEVICE))
@@ -706,7 +702,7 @@ static void Do_refuel(player_t *pl)
     if ((Wrap_length(pl->pos.cx - fs->pos.cx,
 		     pl->pos.cy - fs->pos.cy) > 90.0 * CLICK)
 	|| (pl->fuel.sum >= pl->fuel.max)
-	|| BIT(pl->used, HAS_PHASING_DEVICE)
+	|| Player_is_phasing(pl)
 	|| (BIT(world->rules->mode, TEAM_PLAY)
 	    && options.teamFuel
 	    && fs->team != pl->team)) {
@@ -750,7 +746,7 @@ static void Do_repair(player_t *pl)
 		     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
 	|| targ->damage >= TARGET_DAMAGE
 	|| targ->dead_ticks > 0
-	|| BIT(pl->used, HAS_PHASING_DEVICE))
+	|| Player_is_phasing(pl))
 	CLR_BIT(pl->used, HAS_REPAIR);
     else {
 	int n = pl->fuel.num_tanks;
@@ -1098,14 +1094,15 @@ static void Update_players(world_t *world)
 	}
 
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || options.cloakedExhaust)
-	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {
+	    && !Player_is_phasing(pl)) {
 	    if (Player_is_thrusting(pl))
-  		Thrust(pl);
+  		Make_thrust_sparks(pl);
 	}
 
 	Compute_sensor_range(pl);
 
-	pl->used &= pl->have;
+	/* idiotic hack */
+	/*pl->used &= pl->have;*/
     }
 }
 
@@ -1155,7 +1152,8 @@ void Update_objects(world_t *world)
 	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
 	    Fire_normal_shots(pl);
 	if (BIT(pl->used, HAS_LASER)) {
-	    if (pl->item[ITEM_LASER] <= 0 || BIT(pl->used, HAS_PHASING_DEVICE))
+	    if (pl->item[ITEM_LASER] <= 0
+		|| Player_is_phasing(pl))
 		CLR_BIT(pl->used, HAS_LASER);
 	    else
 		Fire_laser(pl);
