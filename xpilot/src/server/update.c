@@ -349,9 +349,9 @@ static void do_Autopilot (player *pl)
 	if (gravity.x == 0 && gravity.y == 0)
 	    vad = pl->dir;
 	else
-	    vad = (int)findDir(-gravity.x, -gravity.y);
+	    vad = findDir(-gravity.x, -gravity.y);
     } else
-	vad = (int)findDir(-pl->vel.x, -pl->vel.y);
+	vad = findDir(-pl->vel.x, -pl->vel.y);
 
     vad = MOD2(vad - pl->dir, RES);
     if (vad > RES/2) {
