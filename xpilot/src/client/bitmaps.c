@@ -86,10 +86,11 @@ static int Bitmap_init(int img);
 static void Bitmap_picture_copy(xp_pixmap_t * xp_pixmap, int image);
 static void Bitmap_picture_scale(xp_pixmap_t * xp_pixmap, int image);
 
+#ifndef _WINDOWS
 static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp);
 static int Bitmap_create_end(Drawable d);
 static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
-
+#endif
 
 /*
  * Adds the standard images into global pixmaps array.
