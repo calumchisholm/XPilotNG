@@ -222,17 +222,13 @@ static bool Process_commands(sockbuf_t *ibuf,
 			     int auto_shutdown, char *shutdown_reason,
 			     Connect_param_t *conpar)
 {
-    int			i, len, retries, delay, max_robots, success;
-    char		c, status, reply_to;
-    char		linebuf[MAX_LINE];
-    unsigned short	port, qpos;
-    bool		has_credentials = false;
-    int			cmd_credentials = 0;
-    bool		privileged_cmd;
-    int			max_replies;
-    long		key = 0;
-    time_t		qsent = 0;
-    static char		localhost[] = "127.0.0.1";
+    int i, len, retries, delay, success, cmd_credentials = 0, max_replies;
+    char c, status, reply_to, linebuf[MAX_LINE];
+    unsigned short port, qpos;
+    bool has_credentials = false, privileged_cmd;
+    long key = 0;
+    time_t qsent = 0;
+    static char localhost[] = "127.0.0.1";
 
 #ifdef _WINDOWS
     auto_connect = TRUE;	/* I want to join */
