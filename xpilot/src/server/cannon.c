@@ -49,12 +49,12 @@
 char cannon_version[] = VERSION;
 
 
-static int Cannon_select_weapon(int ind);
-static void Cannon_aim(int ind, int weapon, int *target, int *dir);
-static void Cannon_fire(int ind, int weapon, int target, int dir);
-static int Cannon_in_danger(int ind);
-static int Cannon_select_defense(int ind);
-static void Cannon_defend(int ind, int defense);
+static int Cannon_select_weapon(cannon_t *cannon);
+static void Cannon_aim(cannon_t *cannon, int weapon, int *target, int *dir);
+static void Cannon_fire(cannon_t *cannon, int weapon, int target, int dir);
+static int Cannon_in_danger(cannon_t *cannon);
+static int Cannon_select_defense(cannon_t *cannon);
+static void Cannon_defend(cannon_t *cannon, int defense);
 
 /* the items that are useful to cannons.
    these are the items that cannon get 'for free' once in a while.
@@ -72,21 +72,18 @@ long CANNON_USE_ITEM = (ITEM_BIT_FUEL|ITEM_BIT_WIDEANGLE
 /* adds the given amount of an item to the cannon's inventory. the number of
    tanks is taken to be 1. amount is then the amount of fuel in that tank.
    fuel is given in 'units', but is stored in fuelpacks. */
-void Cannon_add_item(int ind, int item, int amount)
+void Cannon_add_item(cannon_t *c, int item, int amount)
 {
-    cannon_t	*c = World.cannon + ind;
-
     switch (item) {
     case ITEM_TANK:
 	c->item[ITEM_TANK]++;
 	LIMIT(c->item[ITEM_TANK], 0, World.items[ITEM_TANK].limit);
 	/* FALLTHROUGH */
     case ITEM_FUEL:
-	c->item[ITEM_FUEL] += (int)(amount / (ENERGY_PACK_FUEL >> FUEL_SCALE_BITS)
-			      + 0.5);
+	c->item[ITEM_FUEL]
+	    += (int)(amount / (ENERGY_PACK_FUEL >> FUEL_SCALE_BITS) + 0.5);
 	LIMIT(c->item[ITEM_FUEL], 0, (int)(World.items[ITEM_FUEL].limit
-				     / (ENERGY_PACK_FUEL >> FUEL_SCALE_BITS)
-				     + 0.5));
+			/ (ENERGY_PACK_FUEL >> FUEL_SCALE_BITS) + 0.5));
 	break;
     default:
 	c->item[item] += amount;
@@ -95,9 +92,8 @@ void Cannon_add_item(int ind, int item, int amount)
     }
 }
 
-void Cannon_throw_items(int ind)
+void Cannon_throw_items(cannon_t *c)
 {
-    cannon_t	*c = World.cannon + ind;
     int		i, dir;
     object	*obj;
     DFLOAT	velocity;
@@ -145,16 +141,16 @@ void Cannon_throw_items(int ind)
 
 /* initializes the given cannon at startup or after death and gives it some
    items. */
-void Cannon_init(int ind)
+void Cannon_init(cannon_t *c)
 {
-    cannon_t	*c = &World.cannon[ind];
     int		i;
 
     c->last_change = frame_loops;
     for (i = 0; i < NUM_ITEMS; i++) {
 	c->item[i] = 0;
 	if (cannonsUseItems)
-	    Cannon_add_item(ind, i, (int)(rfrac() * (World.items[i].initial + 1)));
+	    Cannon_add_item(c, i,
+			    (int)(rfrac() * (World.items[i].initial + 1)));
     }
     c->damaged = 0;
     c->tractor_target = -1;
@@ -165,50 +161,54 @@ void Cannon_init(int ind)
     c->phasing_left = 0;
 }
 
-void Cannon_check_defense(int ind)
+void Cannon_check_defense(cannon_t *c)
 {
-    int defense = Cannon_select_defense(ind);
+    int defense = Cannon_select_defense(c);
 
     if (defense >= 0
-	&& Cannon_in_danger(ind)) {
-	Cannon_defend(ind, defense);
+	&& Cannon_in_danger(c)) {
+	Cannon_defend(c, defense);
     }
 }
 
-void Cannon_check_fire(int ind)
+void Cannon_check_fire(cannon_t *c)
 {
     int	target = -1,
     	dir = 0,
-	weapon = Cannon_select_weapon(ind);
+	weapon = Cannon_select_weapon(c);
 
-    Cannon_aim(ind, weapon, &target, &dir);
+    Cannon_aim(c, weapon, &target, &dir);
     if (target != -1)
-	Cannon_fire(ind, weapon, target, dir);
+	Cannon_fire(c, weapon, target, dir);
 }
 
 /* selects one of the available defenses. see cannon.h for descriptions. */
-static int Cannon_select_defense(int ind)
+static int Cannon_select_defense(cannon_t *c)
 {
-    cannon_t	*c = World.cannon + ind;
-
+    /* mode 0 does not defend */
     if (cannonSmartness == 0)
-	return -1;	/* mode 0 does not defend */
+	return -1;
+
+    /* still protected */
     if (BIT(c->used, HAS_EMERGENCY_SHIELD)
 	|| BIT(c->used, HAS_PHASING_DEVICE))
-	return -1;	/* still protected */
+	return -1;
+
     if (c->item[ITEM_EMERGENCY_SHIELD])
 	return CD_EM_SHIELD;
+
     if (c->item[ITEM_PHASING])
 	return CD_PHASING;
-    return -1;	/* no defense available */
+
+    /* no defense available */
+    return -1;
 }
 
 /* checks if a cannon is about to be hit by a hazardous object.
    mode 0 does not detect danger.
    modes 1 - 3 use progressively more accurate detection. */
-static int Cannon_in_danger(int ind)
+static int Cannon_in_danger(cannon_t *c)
 {
-    cannon_t	*c = World.cannon + ind;
     const int	range = 4 * BLOCK_SZ;
     const long	kill_shots = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT
 	    			| OBJ_PULSE | OBJ_SMART_SHOT | OBJ_HEAT_SHOT
@@ -263,10 +263,8 @@ static int Cannon_in_danger(int ind)
 }
 
 /* activates the selected defense. */
-static void Cannon_defend(int ind, int defense)
+static void Cannon_defend(cannon_t *c, int defense)
 {
-    cannon_t	*c = World.cannon + ind;
-
     switch (defense) {
     case CD_EM_SHIELD:
 	c->emergency_shield_left += 4 * 12;
@@ -285,10 +283,8 @@ static void Cannon_defend(int ind, int defense)
 }
 
 /* selects one of the available weapons. see cannon.h for descriptions. */
-static int Cannon_select_weapon(int ind)
+static int Cannon_select_weapon(cannon_t *c)
 {
-    cannon_t	*c = World.cannon + ind;
-
     if (c->item[ITEM_MINE]
 	&& rfrac() < 0.5f)
 	return CW_MINE;
@@ -331,9 +327,8 @@ static int Cannon_select_weapon(int ind)
    modes 1 and 2 only fire if a player is within range of the selected weapon.
    mode 3 only fires if a player will be in range when the shot is expected to hit.
  */
-static void Cannon_aim(int ind, int weapon, int *target, int *dir)
+static void Cannon_aim(cannon_t *c, int weapon, int *target, int *dir)
 {
-    cannon_t	*c = World.cannon + ind;
     int		speed = ShotsSpeed;
     int		range = CANNON_SHOT_LIFE_MAX * speed;
     int		cx = c->pos.cx;
@@ -483,9 +478,8 @@ static void Cannon_aim(int ind, int weapon, int *target, int *dir)
 
 /* does the actual firing. also determines in which way to use weapons that
    have more than one possible use. */
-static void Cannon_fire(int ind, int weapon, int target, int dir)
+static void Cannon_fire(cannon_t *c, int weapon, int target, int dir)
 {
-    cannon_t	*c = World.cannon + ind;
     player	*pl = Players(target);
     int		cx = c->pos.cx;
     int		cy = c->pos.cy;
@@ -601,7 +595,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    long amount = 0;
 	    Do_general_transporter(NULL, cx, cy, target, &item, &amount);
 	    if (item != -1)
-		Cannon_add_item(ind, item, amount);
+		Cannon_add_item(c, item, amount);
 	} else {
 	    sound_play_sensors(cx, cy, TRANSPORTER_FAIL_SOUND);
 	    played = true;
@@ -680,56 +674,52 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 }
 
 
-void Cannon_dies(int ind, player *pl)
+void Cannon_dies(cannon_t *c, player *pl)
 {
-    cannon_t		*cannon = &World.cannon[ind];
-    int			killer = -1;
-
-    Cannon_remove_from_map(ind);
-    Cannon_throw_items(ind);
-    Cannon_init(ind);
-    sound_play_sensors(cannon->pos.cx, cannon->pos.cy, CANNON_EXPLOSION_SOUND);
+    Cannon_remove_from_map(c);
+    Cannon_throw_items(c);
+    Cannon_init(c);
+    sound_play_sensors(c->pos.cx, c->pos.cy, CANNON_EXPLOSION_SOUND);
     Make_debris(
-	/* pos.cx, pos.cy   */ cannon->pos.cx, cannon->pos.cy,
+	/* pos.cx, pos.cy   */ c->pos.cx, c->pos.cy,
 	/* vel.x, vel.y   */ 0.0, 0.0,
 	/* owner id       */ NO_ID,
-	/* owner team	  */ cannon->team,
+	/* owner team	  */ c->team,
 	/* kind           */ OBJ_DEBRIS,
 	/* mass           */ 4.5,
 	/* status         */ GRAVITY,
 	/* color          */ RED,
 	/* radius         */ 6,
 	/* num debris     */ 20 + 20 * rfrac(),
-	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
+	/* min,max dir    */ (int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
 	/* min,max speed  */ 20, 50,
 	/* min,max life   */ 8, 68
 	);
     Make_wreckage(
-	/* pos.cx, pos.cy   */ cannon->pos.cx, cannon->pos.cy,
+	/* pos.cx, pos.cy   */ c->pos.cx, c->pos.cy,
 	/* vel.x, vel.y   */ 0.0, 0.0,
 	/* owner id       */ NO_ID,
-	/* owner team	  */ cannon->team,
+	/* owner team	  */ c->team,
 	/* min,max mass   */ 3.5, 23,
 	/* total mass     */ 28,
 	/* status         */ GRAVITY,
 	/* color          */ WHITE,
 	/* max wreckage   */ 10,
-	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
+	/* min,max dir    */ (int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
 	/* min,max speed  */ 10, 25,
 	/* min,max life   */ 8, 68
 	);
 
     if (pl) {
-	killer = GetInd(pl->id);
 	if (cannonPoints > 0) {
 	    if (BIT(World.rules->mode, TEAM_PLAY)
 		&& teamCannons) {
-		TEAM_SCORE(cannon->team, -cannonPoints);
+		TEAM_SCORE(c->team, -cannonPoints);
 	    }
 	    if (pl->score <= cannonMaxScore
 		&& !(BIT(World.rules->mode, TEAM_PLAY)
-		     && pl->team == cannon->team)) {
-		Score(pl, cannonPoints, cannon->pos.cx, cannon->pos.cy, "");
+		     && pl->team == c->team)) {
+		Score(pl, cannonPoints, c->pos.cx, c->pos.cy, "");
 	    }
 	}
     }

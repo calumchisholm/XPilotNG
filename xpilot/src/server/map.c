@@ -175,7 +175,7 @@ int Map_place_cannon(int cx, int cy, int dir, int team)
     t.conn_mask = (unsigned)-1;
     t.group = -1;
     STORE(cannon_t, World.cannon, World.NumCannons, max_cannons, t);
-    Cannon_init(ind);
+    Cannon_init(&World.cannon[ind]);
     Map_set_itemid(CLICK_TO_BLOCK(cx), CLICK_TO_BLOCK(cy), ind);
     return ind;
 }

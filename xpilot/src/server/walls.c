@@ -511,20 +511,23 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 	break;
 
     case CrashCannon:
-	obj->life = 0;
-	if (BIT(obj->type, OBJ_ITEM)) {
-	    Cannon_add_item(item_id, obj->info, obj->count);
-	} else {
-	    player *pl = NULL;
+        {
+	    cannon_t *c = &World.cannon[item_id];
+	    obj->life = 0;
+	    if (BIT(obj->type, OBJ_ITEM)) {
+		Cannon_add_item(c, obj->info, obj->count);
+	    } else {
+		player *pl = NULL;
 
-	    if (obj->id != NO_ID)
-		pl = Player_by_id(obj->id);
+		if (obj->id != NO_ID)
+		    pl = Player_by_id(obj->id);
 
-	    if (!BIT(World.cannon[item_id].used, HAS_EMERGENCY_SHIELD)) {
-		if (World.cannon[item_id].item[ITEM_ARMOR] > 0)
-		    World.cannon[item_id].item[ITEM_ARMOR]--;
-		else
-		    Cannon_dies(item_id, pl);
+		if (!BIT(c->used, HAS_EMERGENCY_SHIELD)) {
+		    if (c->item[ITEM_ARMOR] > 0)
+			c->item[ITEM_ARMOR]--;
+		    else
+			Cannon_dies(c, pl);
+		}
 	    }
 	}
 	break;
@@ -594,19 +597,23 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 	break;
 
     case CrashCannon:
-	if (BIT(pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
-	    != (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-	    howfmt = "%s smashed%s against a cannon";
-	    hudmsg = "[Cannon]";
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_CANNON_SOUND);
-	}
-	if (!BIT(World.cannon[item_id].used, HAS_EMERGENCY_SHIELD)) {
-	    /* player gets points if the cannon is rammed with shields up */
+        {
+	    cannon_t *cannon = &World.cannon[item_id];
 	    if (BIT(pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
-		== (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-		Cannon_dies(item_id, pl);
-	    else
-		Cannon_dies(item_id, NULL);
+		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
+		howfmt = "%s smashed%s against a cannon";
+		hudmsg = "[Cannon]";
+		sound_play_sensors(pl->pos.cx, pl->pos.cy,
+				   PLAYER_HIT_CANNON_SOUND);
+	    }
+	    if (!BIT(cannon->used, HAS_EMERGENCY_SHIELD)) {
+		/* pl gets points if the cannon is rammed with shields up */
+		if (BIT(pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
+		    == (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+		    Cannon_dies(cannon, pl);
+		else
+		    Cannon_dies(cannon, NULL);
+	    }
 	}
 	break;
 

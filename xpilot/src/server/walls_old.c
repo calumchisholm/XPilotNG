@@ -1485,33 +1485,6 @@ static void Move_segment(move_state_t *ms)
     }
 }
 
-#if 0
-void Cannon_dies(int ind, player *pl);
-
-static void Cannon_dies_old(move_state_t *ms)
-{
-    int ind = ms->cannon;
-    player *pl = NULL;
-
-    if (!ms->mip->pl) {
-	/*
-	 * If it was not a player that crashed  into the cannon,
-	 * look if it was something fired by a player.
-	 */
-	if (ms->mip->obj->id != NO_ID) {
-	    pl = Player_by_id(ms->mip->obj->id);
-	}
-    } else if (BIT(ms->mip->pl->used, HAS_SHIELD|HAS_EMERGENCY_SHIELD)
-	       == (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-	/* if player rammed the cannon with shields up, he gets a kill */
-	pl = ms->mip->pl;
-    }
-
-    Cannon_dies(ind, pl);
-}
-#endif
-
-
 void Object_hits_target(int ind, object *obj, long player_cost);
 
 static void Object_hits_target_old(move_state_t *ms, long player_cost)

@@ -541,7 +541,7 @@ static void Cannon_update(void)
 
 	if (c->dead_time > 0) {
 	    if ((c->dead_time -= timeStep) <= 0)
-		Cannon_restore_on_map(i);
+		Cannon_restore_on_map(c);
 	    continue;
 	} else {
 	    /* don't check too often, because this gets quite expensive
@@ -550,7 +550,7 @@ static void Cannon_update(void)
 		&& cannonsUseItems
 		&& cannonsDefend
 		&& rfrac() < 0.65) {
-		Cannon_check_defense(i);
+		Cannon_check_defense(c);
 	    }
 	    if (do_update_this_frame
 		&& !BIT(c->used, HAS_EMERGENCY_SHIELD)
@@ -558,7 +558,7 @@ static void Cannon_update(void)
 		&& (c->damaged <= 0)
 		&& (c->tractor_count <= 0)
 		&& rfrac() * 16 < 1) {
-		Cannon_check_fire(i);
+		Cannon_check_fire(c);
 	    }
 	    else if (do_update_this_frame
 		     && cannonsUseItems
@@ -570,7 +570,7 @@ static void Cannon_update(void)
 		    && cannonItemProbMult > 0
 		    && (int)(rfrac() * (60 * 12))
 		    < (cannonItemProbMult * World.items[item].cannonprob)) {
-		    Cannon_add_item(i, item, (item == ITEM_FUEL ?
+		    Cannon_add_item(c, item, (item == ITEM_FUEL ?
 					ENERGY_PACK_FUEL >> FUEL_SCALE_BITS
 					: 1));
 		}

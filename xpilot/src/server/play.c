@@ -371,35 +371,33 @@ void Cannon_set_hitmask(int ind)
 }
 
 
-void Cannon_restore_on_map(int ind)
+void Cannon_restore_on_map(cannon_t *c)
 {
-    cannon_t		*cannon = &World.cannon[ind];
     int			bx, by;
 
-    bx = CLICK_TO_BLOCK(cannon->pos.cx);
-    by = CLICK_TO_BLOCK(cannon->pos.cy);
+    bx = CLICK_TO_BLOCK(c->pos.cx);
+    by = CLICK_TO_BLOCK(c->pos.cy);
     World.block[bx][by] = CANNON;
 
-    cannon->conn_mask = 0;
-    cannon->last_change = frame_loops;
-    cannon->dead_time = 0;
+    c->conn_mask = 0;
+    c->last_change = frame_loops;
+    c->dead_time = 0;
 
-    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
+    P_set_hitmask(c->group, Cannon_hitmask(c));
 }
 
-void Cannon_remove_from_map(int ind)
+void Cannon_remove_from_map(cannon_t *c)
 {
-    cannon_t		*cannon = &World.cannon[ind];
     int			bx, by;
 
-    cannon->dead_time = cannonDeadTime;
-    cannon->conn_mask = 0;
+    c->dead_time = cannonDeadTime;
+    c->conn_mask = 0;
 
-    bx = CLICK_TO_BLOCK(cannon->pos.cx);
-    by = CLICK_TO_BLOCK(cannon->pos.cy);
+    bx = CLICK_TO_BLOCK(c->pos.cx);
+    by = CLICK_TO_BLOCK(c->pos.cy);
     World.block[bx][by] = SPACE;
 
-    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
+    P_set_hitmask(c->group, Cannon_hitmask(c));
 }
 
 

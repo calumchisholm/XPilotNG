@@ -177,7 +177,7 @@ void tuner_cannonsuseitems(void)
 	    c->item[j] = 0;
 
 	    if (cannonsUseItems)
-		Cannon_add_item(i, j,
+		Cannon_add_item(c, j,
 				(int)(rfrac() * (World.items[j].initial + 1)));
 	}
     }

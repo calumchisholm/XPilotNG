@@ -227,8 +227,8 @@ bool Balltarget_hitfunc(struct group *group, struct move *move);
 
 int Cannon_hitmask(cannon_t *cannon);
 bool Cannon_hitfunc(struct group *group, struct move *move);
-void Cannon_restore_on_map(int ind);
-void Cannon_remove_from_map(int ind);
+void Cannon_restore_on_map(cannon_t *cannon);
+void Cannon_remove_from_map(cannon_t *cannon);
 
 int Target_hitmask(target_t *targ);
 void Target_init(void);
@@ -307,12 +307,12 @@ list_t Asteroid_get_list(void);
 /*
  * Prototypes for cannon.c
  */
-void Cannon_init(int ind);
-void Cannon_add_item(int ind, int item, int amount);
-void Cannon_throw_items(int ind);
-void Cannon_check_defense(int ind);
-void Cannon_check_fire(int ind);
-void Cannon_dies(int ind, player *pl);
+void Cannon_init(cannon_t *cannon);
+void Cannon_add_item(cannon_t *cannon, int item, int amount);
+void Cannon_throw_items(cannon_t *cannon);
+void Cannon_check_defense(cannon_t *cannon);
+void Cannon_check_fire(cannon_t *cannon);
+void Cannon_dies(cannon_t *cannon, player *pl);
 
 /*
  * Prototypes for command.c
