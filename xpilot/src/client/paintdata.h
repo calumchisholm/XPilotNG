@@ -29,10 +29,10 @@
 #include "types.h"
 #endif
 
-/* need MAX_COLORS */
+/* Define Windows Colours */
 #ifdef _WINDOWS
-#define MAX_COLORS  16   /* Max. switched colors ever */
-#define MAX_COLOR_LEN 32 /* Max. length of a color name */
+#define MAX_COLORS 16
+#define MAX_COLOR_LEN 32
 #endif
 
 extern void Rectangle_start(void);
