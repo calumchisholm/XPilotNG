@@ -691,7 +691,7 @@ int CountDefensiveItems(player *pl)
 
 static void PlayerObjectCollision(player *pl)
 {
-    int		j, range, radius, hit, obj_count;
+    int		j, range, radius, obj_count;
     object	*obj, **obj_list;
 
     /*
@@ -1499,7 +1499,7 @@ static void Player_pass_checkpoint(player *pl)
 
 static void AsteroidCollision(void)
 {
-    int		j, radius, obj_count, hit;
+    int		j, radius, obj_count;
     object	*ast;
     object	*obj = NULL, **obj_list;
     list_t	list;
