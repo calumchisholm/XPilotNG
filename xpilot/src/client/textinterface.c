@@ -770,9 +770,9 @@ int Contact_servers(int count, char **servers,
 		exit(1);
 	    }
 	    if (retries == 0) {
-		printf("Searching for a \"xpilots\" "
+		printf("Searching for an XPilot "
 		       "server on the local net...\n");
-		IFWINDOWS( Progress("Searching for a \"xpilots\" "
+		IFWINDOWS( Progress("Searching for an XPilot "
 				    "server on the local net...") );
 	    } else {
 		printf("Searching once more...\n");

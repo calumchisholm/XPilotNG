@@ -1533,7 +1533,7 @@ static int Welcome_input_loop(Connect_param_t * conpar)
     Welcome_set_mode(ModeWaiting);
 
     /* Start main loop */
-    Welcome_create_label(1, "Welcome to Improved XPilot!");
+    Welcome_create_label(1, "Welcome to XPilot NG!");
 
     while (!quitting && !joining) {
 	XNextEvent(dpy, &event);
