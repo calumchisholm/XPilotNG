@@ -523,9 +523,9 @@ struct option {
     {
 	"texturedObjects",
 	NULL,
-	"No",
+	"Yes",
 	KEY_DUMMY,
-	"Whether to draw ships, shots and walls with textures.\n"
+	"Whether to draw certain game objects with textures.\n"
 	"Be warned that this requires more graphics speed.\n"
 	"fullColor must be on for this to work.\n"
 	"You may also need to enable multibuffering or double-buffering.\n"

@@ -77,7 +77,9 @@ extern position *wreckageShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS];
 
 extern XGCValues	gcv;
 
-int blockBitmapShips = 1;
+static int blockBitmapShips = 0; /* Turned this off because the images drawn
+				  * don't match the actual shipshape used
+				  * for wall collisions by the server. */
 
 void Gui_paint_ball(int x, int y)
 {
