@@ -859,9 +859,14 @@ void Record_toggle(void)
 void Record_cleanup(void)
 {
     if (record_filename != NULL && record_frame_count > 0) {
+	long pos = ftell(recordFP);
+
 	fflush(recordFP);
 	printf("Recorded %d frames to %s\n",
 	       record_frame_count, record_filename);
+	printf("Recording size is %.2f MB (avg. %.2f kB/frame).\n",
+	       (double)pos / 1e6,
+	       (1e-3 * pos)/(double)record_frame_count);
     }
 }
 
