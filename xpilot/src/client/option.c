@@ -257,12 +257,21 @@ xp_keydefs_t *keydefs = NULL;
 int num_keydefs = 0;
 int max_keydefs = 0;
 
+
+/*
+ * This function is used when platform specific code has an event where
+ * the user has pressed or released the key defined by the keysym 'ks'.
+ * When the key state has changed, the first call to this function should have
+ * 'reset' true, then following calls related to the same event should
+ * have 'reset' false. For each returned xpilot key, the calling code
+ * should call some handler. The function should be called until it returns
+ * KEY_DUMMY.
+ */
 keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
 {
     keys_t ret = KEY_DUMMY;
     static int i = 0;
 
-    /* linear search */
     if (reset)
 	i = 0;
 
@@ -293,7 +302,7 @@ static void Store_keydef(int ks, keys_t key)
 	xp_keydefs_t *kd = &keydefs[i];
 
 	if (kd->keysym == ks && kd->key == key) {
-	    warn("Pair (%d, %d) exist from before", ks, (int) key);
+	    /*warn("Pair (%d, %d) exist from before", ks, (int) key);*/
 	    /*
 	     * already exists, no need to store 
 	     */
@@ -319,7 +328,7 @@ static void Store_keydef(int ks, keys_t key)
     }
 
     /*
-     * ok just store it then 
+     * no lazily deleted entry, ok, just store it then
      */
     STORE(xp_keydefs_t, keydefs, num_keydefs, max_keydefs, keydef);
 }
@@ -447,7 +456,7 @@ bool Set_option(const char *name, const char *value, xp_option_origin_t origin)
     case xp_key_option:
 	return Set_key_option(opt, value, origin);
     default:
-	assert(0 && "BUG: Unknown option type");
+	assert(0 && "TODO");
     }
     return false;
 }
@@ -977,7 +986,7 @@ void Parse_options(int *argcp, char **argvp)
 
 	    /* Add GNU style option support e.g. --wallcolor=1 ??? */
 	    if (is_noarg_option(arg)) {
-		Set_option(arg, "true",xp_option_origin_cmdline );
+		Set_option(arg, "true", xp_option_origin_cmdline);
 		num_remaining_args--;
 		for (i = 0; i < num_remaining_args; i++)
 		    argvp[arg_ind + i] = argvp[arg_ind + i + 1];
