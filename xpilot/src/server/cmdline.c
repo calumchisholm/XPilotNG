@@ -637,7 +637,7 @@ static option_desc options[] = {
 	valInt,
 	Timing_setup,
 	"How many times per second to call robot round tick?\n"
-	"The value will be limited into the range 1 to server FPS.\n" 
+	"The value will be limited into the range 1 to server FPS.\n"
 	"A value of 0 means one tick per frame.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -704,9 +704,7 @@ static option_desc options[] = {
     {
 	"defaultShipShape",
 	"defaultShipShape",
-	"(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)"
-	"(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)"
-	"(MR: 15,0)",
+	"(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)" "(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)" "(MR: 15,0)",
 	&defaultShipShape,
 	valString,
 	tuner_none,
@@ -717,10 +715,7 @@ static option_desc options[] = {
     {
 	"tankShipShape",
 	"tankShipShape",
-	"(NM:fueltank)"
-	"(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 "
-	"9,-8 14,-5)"
-	"(EN: -15,0)(MG: 15,0)",
+	"(NM:fueltank)" "(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 " "9,-8 14,-5)" "(EN: -15,0)(MG: 15,0)",
 	&tankShipShape,
 	valString,
 	tuner_none,
@@ -1616,7 +1611,8 @@ static option_desc options[] = {
 	"Can ships be destroyed when hit by an asteroid?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    {   "ignore20MaxFPS",
+    {
+	"ignore20MaxFPS",
 	"ignore20MaxFPS",
 	"true",
 	&ignore20MaxFPS,
@@ -3710,7 +3706,7 @@ static option_desc options[] = {
     {
 	"teamcup",
 	"teamcup",
-	false,
+	"false",
 	&teamcup,
 	valBool,
 	tuner_dummy,
