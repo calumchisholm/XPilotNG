@@ -111,49 +111,6 @@ extern DFLOAT		tbl_cos[];
 #define QUICK_LENGTH(x,y)	( ABS(x)+ABS(y) ) /*-BA Only approx, but v. quick */
 #define LIMIT(val, lo, hi)	( val=(val)>(hi)?(hi):((val)<(lo)?(lo):(val)) )
 
-/*
- * Two macros for edge wrap of x and y coordinates measured in pixels.
- * Note that the correction needed shouldn't ever be bigger than one mapsize.
- */
-#define WRAP_XPIXEL(x_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((x_) < 0 \
-		? (x_) + World.width \
-		: ((x_) >= World.width \
-		    ? (x_) - World.width \
-		    : (x_))) \
-	    : (x_))
-
-#define WRAP_YPIXEL(y_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((y_) < 0 \
-		? (y_) + World.height \
-		: ((y_) >= World.height \
-		    ? (y_) - World.height \
-		    : (y_))) \
-	    : (y_))
-
-/*
- * Two macros for edge wrap of x and y coordinates measured in map blocks.
- * Note that the correction needed shouldn't ever be bigger than one mapsize.
- */
-#define WRAP_XBLOCK(x_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((x_) < 0 \
-		? (x_) + World.x \
-		: ((x_) >= World.x \
-		    ? (x_) - World.x \
-		    : (x_))) \
-	    : (x_))
-
-#define WRAP_YBLOCK(y_)	\
-	(BIT(World.rules->mode, WRAP_PLAY) \
-	    ? ((y_) < 0 \
-		? (y_) + World.y \
-		: ((y_) >= World.y \
-		    ? (y_) - World.y \
-		    : (y_))) \
-	    : (y_))
 
 /*
  * Two macros for edge wrap of differences in position.

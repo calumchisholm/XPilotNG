@@ -10,14 +10,14 @@ TOPDIR=..
  */
 #define PassCDebugFlags	'CDEBUGFLAGS=$(CDEBUGFLAGS)'
 
-          SUBDIRS = common client server replay mapedit		/* make all */
-  MAKEFILESUBDIRS = common client server replay mapedit		/* make Makefiles */
-     CLEANSUBDIRS = common client server replay mapedit		/* make clean */
-       DEPSUBDIRS = common client server replay mapedit		/* make depend */
-   INSTALLSUBDIRS =        client server replay mapedit		/* make install */
-  INCLUDESSUBDIRS = common					/* make includes */
-INSTALLMANSUBDIRS = 						/* make install.man */
-       TAGSUBDIRS = common client server					/* make tag */
+          SUBDIRS = common client server replay 	/* make all */
+  MAKEFILESUBDIRS = common client server replay 	/* make Makefiles */
+     CLEANSUBDIRS = common client server replay 	/* make clean */
+       DEPSUBDIRS = common client server replay 	/* make depend */
+   INSTALLSUBDIRS =        client server replay 	/* make install */
+  INCLUDESSUBDIRS = common				/* make includes */
+INSTALLMANSUBDIRS = 					/* make install.man */
+       TAGSUBDIRS = common client server		/* make tag */
 
 MakeSubdirs($(SUBDIRS))
 DependSubdirs($(DEPSUBDIRS))
