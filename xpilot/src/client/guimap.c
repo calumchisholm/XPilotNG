@@ -1210,7 +1210,7 @@ static int Rectangles_intersect(irec r1, irec r2) {
 void Gui_paint_polygon(int i, int xoff, int yoff) {
 
     int j,x,y,texture = 0, filled = 0;
-    static XPoint poly[5000 / 4];
+    static XPoint poly[10000];
     static int		wallTileReady = 0;
     static Pixmap	wallTile = None;
 

@@ -618,7 +618,7 @@ void Paint_world_radar_old(void)
 void Paint_world_radar(void)
 {
   int i,j,k;
-  static XPoint poly[5000 / 4];
+  static XPoint poly[10000];
 
 #define DBG if(0) printf
 
