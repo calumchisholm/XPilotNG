@@ -691,7 +691,7 @@ void xevent_keyboard(int queued)
 	gettimeofday(&time_now, NULL);
 	i = 1000000 * (time_now.tv_sec - talk_key_repeat_time.tv_sec) +
 	    time_now.tv_usec - talk_key_repeat_time.tv_usec;
-	if (talk_key_repeating > 1 && i > 50000 || i > 5000000) {
+	if (talk_key_repeating > 1 && i > 50000 || i > 500000) {
 	    Talk_event(&talk_key_repeat_event);
 	    talk_key_repeating = 2;
 	    talk_key_repeat_time = time_now;
