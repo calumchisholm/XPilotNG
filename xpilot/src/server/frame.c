@@ -369,13 +369,11 @@ static int Frame_status(connection_t *conn, player_t *pl)
 
 	if ((!BIT(world->rules->mode, LIMITED_VISIBILITY)
 	     || pl->lock.distance <= pl->sensor_range)
-#ifndef SHOW_CLOAKERS_RANGE
 	    && (pl->visibility[lock_ind].canSee
 		|| Player_owns_tank(pl, lock_pl)
 		|| Players_are_teammates(pl, lock_pl)
 		|| Players_are_allies(pl, lock_pl))
-#endif
-	    && BIT(lock_pl->pl_status, PLAYING|GAME_OVER) == PLAYING
+	    && Player_is_alive(lock_pl)
 	    && (options.playersOnRadar
 		|| clpos_inview(&cv, lock_pl->pos))
 	    && pl->lock.distance != 0) {
@@ -900,17 +898,16 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	i = player_shuffle_ptr[k];
 	pl_i = Player_by_index(i);
 
-	if (BIT(pl_i->pl_status, GAME_OVER))
+	if (Player_is_waiting(pl_i)
+	    || Player_is_dead(pl_i))
 	    continue;
 
-	if (!BIT(pl_i->pl_status, PLAYING) 
-	    || Player_is_paused(pl_i)) {
+	if (Player_is_paused(pl_i)
+	    || Player_is_appearing(pl_i)) {
 	    if (pl_i->home_base == NULL)
 		continue;
-
 	    if (!clpos_inview(&cv, pl_i->home_base->pos))
 		continue;
-
 	    if (Player_is_paused(pl_i))
 		Send_paused(conn, pl_i->home_base->pos,
 			    (int)pl_i->pause_count);
@@ -990,7 +987,6 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 
     Frame_radar_buffer_reset();
 
-#ifndef NO_SMART_MIS_RADAR
     if (options.nukesOnRadar)
 	mask = OBJ_SMART_SHOT_BIT|OBJ_TORPEDO_BIT|OBJ_HEAT_SHOT_BIT
 	    |OBJ_MINE_BIT;
@@ -1039,7 +1035,6 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 		Frame_radar_buffer_add(pos, size);
 	}
     }
-#endif
 
     if (options.playersOnRadar
 	|| BIT(world->rules->mode, TEAM_PLAY)
@@ -1062,9 +1057,9 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 		|| (!Players_are_teammates(pl_i, pl)
 		    && !Players_are_allies(pl, pl_i)
 		    && !Player_owns_tank(pl, pl_i)
-		    && (!options.playersOnRadar || !pl->visibility[i].canSee))) {
+		    && (!options.playersOnRadar
+			|| !pl->visibility[i].canSee)))
 		continue;
-	    }
 	    pos = pl_i->pos;
 	    if (BIT(world->rules->mode, LIMITED_VISIBILITY)
 		&& Wrap_length(pl->pos.cx - pos.cx,
@@ -1073,9 +1068,8 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 	    if (BIT(pl->used, HAS_COMPASS)
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
 		&& GetInd(pl->lock.pl_id) == i
-		&& frame_loops_slow % 5 >= 3) {
+		&& frame_loops_slow % 5 >= 3)
 		continue;
-	    }
 	    size = 3;
 	    if (Players_are_teammates(pl_i, pl)
 		|| Players_are_allies(pl, pl_i)
@@ -1168,7 +1162,10 @@ void Frame_update(void)
 	    continue;
 	playback = (pl->rectype == 1);
 	player_fps = FPS;
-	if (BIT(pl->pl_status, PAUSE|GAME_OVER) && pl->rectype != 2) {
+	if ((Player_is_paused(pl)
+	     || Player_is_waiting(pl)
+	     || Player_is_dead(pl))
+	    && pl->rectype != 2) {
 	    /*
 	     * Lower the frame rate for non-playing players
 	     * to reduce network load.
@@ -1196,6 +1193,7 @@ void Frame_update(void)
 	    Send_time_left(conn, newTimeLeft);
 	else if (options.maxRoundTime > 0 && roundtime >= 0)
 	    Send_time_left(conn, (roundtime + FPS - 1) / FPS);
+
 	/*
 	 * If status is GAME_OVER or PAUSE'd, the user may look through the
 	 * other players 'eyes'. Option lockOtherTeam determines whether
