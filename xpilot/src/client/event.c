@@ -703,7 +703,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyConnector",
-	"Control_L",
+	"f Control_L",
 	KEY_CONNECTOR,
 	"Connect to a ball.\n"),
 
