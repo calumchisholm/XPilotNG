@@ -2599,13 +2599,21 @@ int Parser(int argc, char **argv)
 	if ((fname = getOption("mapFileName")) != NULL) {
 	    if (!parseMapFile(fname)) {
 		xpprintf("Unable to read %s, trying to open %s\n", fname, Conf_default_map());
-		if (!parseMapFile(Conf_default_map()))
+		if (!parseMapFile(Conf_default_map())) {
 		    xpprintf("Unable to read %s\n", Conf_default_map());
+		    errno = 0;
+		    error("Unable to read any map. Exiting.");
+		    exit(1);
+		}
 	    }
 	} else {
 	    xpprintf("Map not specified, trying to open %s\n", Conf_default_map());
-	    if (!parseMapFile(Conf_default_map()))
-		xpprintf("Unable to read %s\n", Conf_default_map());
+	    if (!parseMapFile(Conf_default_map())) {
+	      xpprintf("Unable to read %s\n", Conf_default_map());
+	      errno = 0;
+	      error("Unable to read any map. Exiting.");
+	      exit(1);
+	    }
 	}
     }
 

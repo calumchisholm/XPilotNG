@@ -411,7 +411,7 @@ int Load_lines(int fd)
 	    return false;
 	}
 	if (!XML_Parse(p, buff, len, !len)) {
-	    error("Parse error at line %d:\n%s\n",
+	    error("Parse error reading map at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));
 	    exit(1);

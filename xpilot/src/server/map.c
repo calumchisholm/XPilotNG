@@ -258,15 +258,6 @@ void Grok_map(void)
 	CLR_BIT(World.rules->mode, TEAM_PLAY);
     }
 
-    if (!mapData) {
-	errno = 0;
-	error("Generating random map");
-	Generate_random_map();
-	if (!mapData) {
-	    return;
-	}
-    }
-
     s = mapData;
     while (y >= 0) {
 
@@ -773,88 +764,6 @@ void Grok_map(void)
     D( Print_map(); )
 }
 
-
-/*
- * Stupid random map routine, only to be used if the game can't open any
- * map file. :)
- */
-void Generate_random_map(void)
-{
-    int			x,
-			y,
-			i,
-			size,
-			num_bases = 25,
-			num_fuels = (World.x * World.y) / (1000 * (1.0f + rfrac())),
-			num_cannons = (World.x * World.y) / (100 * (1.0f + rfrac())),
-			num_blocks = (World.x * World.y) / (50 * (1.0f + rfrac())),
-			num_gravs = (World.x * World.y) / (2000 * (1.0f + rfrac())),
-			num_worms = (World.x * World.y) / (2000 * (1.0f + rfrac()));
-
-    strcpy(World.name, "Random Land");
-    strcpy(World.author, "The Computer");
-
-    size = (World.x + 1) * World.y + 1;
-    if ((mapData = (char *)malloc(size)) == NULL) {
-	error("Can't allocate map");
-	return;
-    }
-    memset(mapData, ' ', size);
-
-    while (--num_blocks >= 0) {
-	switch ((int)(rfrac() * 5)) {
-	case 0: i = 'a'; break;
-	case 1: i = 'w'; break;
-	case 2: i = 'q'; break;
-	case 3: i = 's'; break;
-	default: i = 'x'; break;
-	}
-	mapData[(rand() % World.x) + (rand() % World.y) * (World.x + 1)] = i;
-    }
-    while (--num_cannons >= 0) {
-	switch (rand()%4) {
-	case 0: i = 'd'; break;
-	case 1: i = 'f'; break;
-	case 2: i = 'r'; break;
-	default: i = 'c'; break;
-	}
-	mapData[(rand() % World.x) + (rand() % World.y) * (World.x + 1)] = i;
-    }
-    while (--num_gravs >= 0) {
-	switch (rand()%4) {
-	case 0: i = '+'; break;
-	case 1: i = '-'; break;
-	case 2: i = '<'; break;
-	default: i = '>'; break;
-	}
-	mapData[(rand() % World.x) + (rand() % World.y) * (World.x + 1)] = i;
-    }
-    while (--num_fuels >= 0) {
-	mapData[(rand() % World.x) + (rand() % World.y) * (World.x + 1)] = '#';
-    }
-    while (--num_worms >= 0) {
-	switch (rand()%3) {
-	case 0: i = '('; break;
-	case 1: i = ')'; break;
-	default: i = '@'; break;
-	}
-	mapData[(rand() % World.x) + (rand() % World.y) * (World.x + 1)] = i;
-    }
-    while (--num_bases >= 0) {
-	i = '0' + num_bases % 10;
-	mapData[(rand() % World.x) + (rand() % World.y) * (World.x + 1)] = i;
-    }
-    for (i='A'; i<='Z'; i++) {
-	x = rand() % (World.x-2) + 1;
-	y = rand() % (World.y-2) + 1;
-	mapData[x + y * (World.x + 1)] = i;
-    }
-    for (y = 0; y < World.y; y++) {
-	mapData[(y + 1) * (World.x + 1) - 1] = '\n';
-    }
-
-    mapData[size - 1] = '\0';
-}
 
 
 /*

@@ -70,8 +70,6 @@ void Init_map(void);
 void Free_map(void);
 void Alloc_map(void);
 void Grok_map(void);
-void Generate_random_map(void);
-void Find_base_direction(void);
 void Compute_gravity(void);
 DFLOAT Wrap_findDir(DFLOAT dx, DFLOAT dy);
 DFLOAT Wrap_length(int dx, int dy);
