@@ -1777,8 +1777,7 @@ int is_inside(int cx, int cy, int hitmask, const object *obj)
     if (gblock->group == NO_GROUP)
 	return NO_GROUP;
     do {
-	if (gblock->group
-	    && (!can_hit(&groups[gblock->group], &mv))) {
+	if (gblock->group && (!can_hit(&groups[gblock->group], &mv))) {
 	    gblock = gblock->next;
 	    continue;
 	}
@@ -2108,7 +2107,7 @@ static void Inside_init(void)
     int *edges;
 
     allocate_inside();
-    for (group = 0; group <= num_groups; group++) {
+    for (group = 0; group < num_groups; group++) {
 	minx = -1;
 	for (poly = 0; poly < num_polys; poly++) {
 	    if (pdata[poly].is_decor || pdata[poly].group != group)
@@ -2173,6 +2172,8 @@ static void Inside_init(void)
 		starty = WRAP_YCLICK(starty + dy);
 	    }
 	}
+	if (minx == -1)
+	    continue;
 	bx = maxx - minx + 1;
 	if (bx > 2 * mapx)
 	    bx = 2 * mapx;
