@@ -708,7 +708,7 @@ static void Player_collides_with_ball(player *pl, object *obj, int radius)
      * shields up, or die with shields down.  The treasure may
      * be destroyed.
      */
-    Obj_repel((object *)pl, obj, radius);
+    Delta_mv((object *)pl, obj);
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 	Add_fuel(&(pl->fuel), (long)ED_BALL_HIT);
