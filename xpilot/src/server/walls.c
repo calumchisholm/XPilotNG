@@ -1009,120 +1009,6 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 }
 
 
-/* Move shape by 1 click. Used in Shape_away. */
-static int Shape_move1(int dx, int dy, struct move *move,
-		       const shipobj *shape, int dir, int *line, int *point)
-{
-    int i, p, lsx, lsy, res;
-    unsigned short *lines, *points;
-    int block;
-
-    block = (move->start.cx >> B_SHIFT) + mapx * (move->start.cy >> B_SHIFT);
-    for (p = 0; p < shape->num_points; p++) {
-	lines = blockline[block].lines;
-	/* Can use the same block for all points because the block of the
-	 * center point contains lines for their start & end positions. */
-	while ( (i = *lines++) != 65535) {
-	    if (linet[i].group
-		&& (!can_hit(&groups[linet[i].group], move)))
-		continue;
-	    lsx = linet[i].start.cx - move->start.cx - shape->pts[p][dir].cx;
-	    lsy = linet[i].start.cy - move->start.cy - shape->pts[p][dir].cy;
-	    lsx = CENTER_XCLICK(lsx);
-	    lsy = CENTER_YCLICK(lsy);
-
-	    if (lsx < dx && lsx + linet[i].delta.cx < dx)
-		continue;
-	    if (lsx > dx && lsx + linet[i].delta.cx > dx)
-		continue;
-	    if (lsy < dy && lsy + linet[i].delta.cy < dy)
-		continue;
-	    if (lsy > dy && lsy + linet[i].delta.cy > dy)
-		continue;
-
-	    if ( (res = SIDE(lsx - dx, lsy - dy, i)) == 0
-		 || res > 0 != SIDE(lsx, lsy, i) > 0) {
-		if (res) {
-		    if (lsx < 0 && lsx + linet[i].delta.cx < 0)
-			continue;
-		    if (lsx > 0 && lsx + linet[i].delta.cx > 0)
-			continue;
-		    if (lsy < 0 && lsy + linet[i].delta.cy < 0)
-			continue;
-		    if (lsy > 0 && lsy + linet[i].delta.cy > 0)
-			continue;
-		}
-		*line = i;
-		return 0;
-	    }
-	}
-    }
-
-    points = blockline[block].points;
-    while ( (p = *points++) != 65535) {
-	if (linet[p].group
-	    && (!can_hit(&groups[linet[p].group], move)))
-	    continue;
-	lines = Shape_lines(shape, dir);
-	while ( (i = *lines++) != 65535) {
-	    lsx = linet[i].start.cx + (linet[p].start.cx - move->start.cx);
-	    lsy = linet[i].start.cy + (linet[p].start.cy - move->start.cy);
-	    lsx = CENTER_XCLICK(lsx);
-	    lsy = CENTER_YCLICK(lsy);
-
-	    if (lsx < dx && lsx + linet[i].delta.cx < dx)
-		continue;
-	    if (lsx > dx && lsx + linet[i].delta.cx > dx)
-		continue;
-	    if (lsy < dy && lsy + linet[i].delta.cy < dy)
-		continue;
-	    if (lsy > dy && lsy + linet[i].delta.cy > dy)
-		continue;
-
-	    if ( (res = SIDE(lsx - dx, lsy - dy, i)) == 0
-		 || res > 0 != SIDE(lsx, lsy, i) > 0) {
-		if (res) {
-		    if (lsx < 0 && lsx + linet[i].delta.cx < 0)
-			continue;
-		    if (lsx > 0 && lsx + linet[i].delta.cx > 0)
-			continue;
-		    if (lsy < 0 && lsy + linet[i].delta.cy < 0)
-			continue;
-		    if (lsy > 0 && lsy + linet[i].delta.cy > 0)
-			continue;
-		}
-		*line = i;
-		*point = p;
-		return 0;
-	    }
-	}
-    }
-
-    move->start.cx = WRAP_XCLICK(move->start.cx + dx);
-    move->start.cy = WRAP_YCLICK(move->start.cy + dy);
-    return 1;
-}
-
-
-/* Move a shape away from a line after a collision. Needed for the same
- * reason as Away(). */
-static int Shape_away(struct move *move, const shipobj *shape,
-		      int dir, int line, int *rline, int *rpoint)
-{
-    int dx, dy;
-
-    if (ABS(linet[line].delta.cx) >= ABS(linet[line].delta.cy)) {
-	dx = 0;
-	dy = -SIGN(linet[line].delta.cx);
-    }
-    else {
-	dy = 0;
-	dx = SIGN(linet[line].delta.cy);
-    }
-    return Shape_move1(dx, dy, move, shape, dir, rline, rpoint);
-}
-
-
 /* Used internally by the movement routines to find the first line
  * (in the list given by *lines) that the given trajectory hits. */
 static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
@@ -1130,7 +1016,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 		       int chxy, const struct move *move, int *minline,
 		       int *height)
 {
-    int lsx, lsy, ldx, ldy, temp, bigger, start, end, i, x, sy, ey, prod;
+    int lsx, lsy, ldx, ldy, temp, mirror, start, end, i, x, sy, ey, prod;
     int mbase = mdy >> 1, hit = 0;
 
     while ( (i = *lines++) != 65535) {
@@ -1173,11 +1059,13 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 	if (0 > lsy + (ldy < 0 ? 0 : ldy))
 	    continue;
 
+	mirror = chx ^ chy ^ chxy;
 	if (ldx < 0) {
 	    lsx += ldx;
 	    ldx = -ldx;
 	    lsy += ldy;
 	    ldy = -ldy;
+	    mirror ^= 1;
 	}
 
 	start = MAX(0, lsx);
@@ -1192,14 +1080,17 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 	    if (!ldx && (lsy + (ldy < 0 ? ldy : 0) > sy ||
 			 lsy + (ldy < 0 ? 0 : ldy) < sy))
 		continue;
+	    if ( (prod = -lsx * ldy + lsy * ldx) > 0 == mirror || prod == 0)
+		continue;
 	    start--;
 	}
 	else {
-	    bigger = prod > 0;
+	    if (prod > 0 == mirror)
+		continue;
 	    ey = LINEY(mdx, mdy, mbase, end);
 	    if ( ABS(prod) >= ldx
 		 && ABS( (prod = (end - lsx) * ldy - (ey - lsy) * ldx) )
-		 >= ldx && prod > 0 == bigger)
+		 >= ldx && prod > 0 != mirror)
 		continue;
 	    {
 		int schs, sche;
@@ -1228,7 +1119,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 		for (x = schs; x <= sche; x++)
 		    if ( (prod = (x - lsx) * ldy
 			  - (LINEY(mdx, mdy, mbase, x) - lsy) * ldx)
-			 >= 0 != bigger || prod == 0)
+			 >= 0 == mirror || prod == 0)
 			goto found;
 		continue;
 	    found:
@@ -1680,22 +1571,17 @@ static int Away(struct move *move, int line)
  * be too efficient. */
 static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 {
-    int x, y, xm, ym, s1, s2;
-    int l1sx, l2sx, l1sy, l2sy, l1dx, l2dx, l1dy, l2dy;
-    int side;
+    int x, y, xm, ym;
+    int l1sx, l2sx, l1sy, l2sy;
 
-    l1sx = linet[l1].start.cx - move->start.cx;
-    l1sy = linet[l1].start.cy - move->start.cy;
+    l1sx = move->start.cx - linet[l1].start.cx;
+    l1sy = move->start.cy - linet[l1].start.cy;
     l1sx = CENTER_XCLICK(l1sx);
     l1sy = CENTER_YCLICK(l1sy);
-    l1dx = linet[l1].delta.cx;
-    l1dy = linet[l2].delta.cy;
-    l2sx = linet[l2].start.cx - move->start.cx;
-    l2sy = linet[l2].start.cy - move->start.cy;
+    l2sx = move->start.cx - linet[l2].start.cx;
+    l2sy = move->start.cy - linet[l2].start.cy;
     l2sx = CENTER_XCLICK(l2sx);
     l2sy = CENTER_YCLICK(l2sy);
-    l2dx = linet[l2].delta.cx;
-    l2dy = linet[l2].delta.cy;
 
     for (;;) {
 	if (SIDE(obj->vel.x, obj->vel.y, l1) < 0) {
@@ -1710,28 +1596,24 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 	break;
     }
 
-    xm = SIGN(move->delta.cx);
-    ym = SIGN(move->delta.cy);
+    xm = SIGN(obj->vel.x);
+    ym = SIGN(obj->vel.y);
 
-    s1 = SIDE(move->start.cx - l1sx, move->start.cy - l1sy, l1) > 0;
-    s2 = SIDE(move->start.cx - l2sx, move->start.cy - l2sy, l2) > 0;
-
-#define TMPFUNC(X, Y) ((side = SIDE((X), (Y), l1)) == 0 || side > 0 != s1 || (side = SIDE((X), (Y), l2)) == 0 || side > 0 != s2)
+#define TMPFUNC(X, Y) (SIDE((X) + l1sx, (Y) + l1sy, l1) <= 0 || SIDE((X) + l2sx, (Y) + l2sy, l2) <= 0)
 
     if (ABS(obj->vel.x) >= ABS(obj->vel.y)) {
 	x = xm;
 	y = 0;
 	for (;;) {
-	    if (TMPFUNC(move->start.cx + x, move->start.cy + y)) {
+	    if (TMPFUNC(x, y)) {
 		y += ym;
-		if (!TMPFUNC(move->start.cx + x, move->start.cy + y + ym))
+		if (!TMPFUNC(x, y + ym))
 		    break;
 		else
-		    x += xm;;
+		    x += xm;
 	    }
 	    else {
-		if (TMPFUNC(move->start.cx + x, move->start.cy + y + 1) &&
-		    TMPFUNC(move->start.cx + x, move->start.cy + y - 1))
+		if (TMPFUNC(x, y + 1) && TMPFUNC(x, y - 1))
 		    x += xm;
 		else
 		    break;
@@ -1748,16 +1630,15 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 	x = 0;
 	y = ym;
 	for (;;) {
-	    if (TMPFUNC(move->start.cx + x, move->start.cy + y)) {
+	    if (TMPFUNC(x, y)) {
 		x += xm;
-		if (!TMPFUNC(move->start.cx + x + xm, move->start.cy + y))
+		if (!TMPFUNC(x + xm, y))
 		    break;
 		else
 		    y += ym;
 	    }
 	    else {
-		if (TMPFUNC(move->start.cx + x + 1, move->start.cy + y) &&
-		    TMPFUNC(move->start.cx + x - 1, move->start.cy + y))
+		if (TMPFUNC(x + 1, y) && TMPFUNC(x - 1, y))
 		    y += ym;
 		else
 		    break;
@@ -1777,6 +1658,35 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
     move->start.cy = WRAP_YCLICK(move->start.cy + y);
     return 1;
 }
+
+
+/* Move a shape away from a line after a collision. Needed for the same
+ * reason as Away(). */
+static int Shape_away(struct move *move, const shipobj *shape,
+		      int dir, int line, struct collans *ans)
+{
+    int dx, dy;
+    clvec delta_saved;
+
+    if (ABS(linet[line].delta.cx) >= ABS(linet[line].delta.cy)) {
+	dx = 0;
+	dy = -SIGN(linet[line].delta.cx);
+    }
+    else {
+	dy = 0;
+	dx = SIGN(linet[line].delta.cy);
+    }
+
+    delta_saved = move->delta;
+    move->delta.cx = dx;
+    move->delta.cy = dy;
+    Shape_move(move, shape, dir, ans);
+    move->start.cx = WRAP_XCLICK(move->start.cx + ans->moved.cx);
+    move->start.cy = WRAP_YCLICK(move->start.cy + ans->moved.cy);
+    move->delta = delta_saved;
+    return ans->line == -1 && ans->point == -1;
+}
+
 
 static void store_byte(int value, unsigned char **start, int *offset, int *sz)
 {
@@ -2452,9 +2362,6 @@ static void Distance_init(void)
 			dist = MIN(ABS(dist), ABS(lsy - ldy * lsx / ldx));
 		    dist = dist / 2 - 3; /* 3? didn't bother to get the right value */
 		}
-		dist--;
-		/* Room for one extra click of movement after main collision
-		   detection. Used to get away from a line after a bounce. */
 		if (dist < CUTOFF + B_CLICKS / 2) {
 		    if (dist < B_CLICKS / 2 + DICLOSE)
 			distbound = LINSIZE;
@@ -2700,7 +2607,6 @@ static char msg[MSG_LEN];
 static void Move_ball(object *obj)
 {
     /*object		*obj = Obj[ind];*/
-    int line, point;
     struct move mv;
     struct collans ans;
     int owner;
@@ -2742,28 +2648,25 @@ static void Move_ball(object *obj)
 	mv.delta.cx -= ans.moved.cx;
 	mv.delta.cy -= ans.moved.cy;
 	if (ans.line != -1) {
-	    if (!Shape_away(&mv, &ball_wire, 0, ans.line, &line, &point)) {
+	    if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
+		if (!Bounce_object(obj, &mv, ans.line, ans.point))
+		    break;
+	    }
+	    else if (!Shape_away(&mv, &ball_wire, 0, ans.line, &ans)) {
 		if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
 		    if (!Bounce_object(obj, &mv, ans.line, ans.point))
 			break;
 		}
-		else if (SIDE(obj->vel.x, obj->vel.y, line) < 0) {
-		    if (!Bounce_object(obj, &mv, line, point))
-			break;
-		}
 		else {
 		    /* This case could be handled better,
-		       I'll write the code for that if this
-		       happens too often. */
+		     * I'll write the code for that if this
+		     * happens too often. */
 		    mv.delta.cx = 0;
 		    mv.delta.cy = 0;
 		    obj->vel.x = 0;
 		    obj->vel.y = 0;
 		}
 	    }
-	    else if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0)
-		if (!Bounce_object(obj, &mv, ans.line, ans.point))
-		    break;
 	}
     }
     Object_position_set_clicks(obj, mv.start.cx, mv.start.cy);
@@ -2854,7 +2757,6 @@ static void Move_player_new(int ind)
 {
     player *pl = Players[ind];
     clpos  pos;
-    int    line, point;
     struct move mv;
     struct collans ans;
 
@@ -2917,12 +2819,11 @@ static void Move_player_new(int ind)
 	    mv.delta.cx -= ans.moved.cx;
 	    mv.delta.cy -= ans.moved.cy;
 	    if (ans.line != -1) {
-		if (!Shape_away(&mv, pl->ship, pl->dir,
-				ans.line, &line, &point)) {
+		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0)
+		    Bounce_player(pl, &mv, ans.line, ans.point);
+		else if (!Shape_away(&mv, pl->ship, pl->dir, ans.line, &ans)) {
 		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0)
 			Bounce_player(pl, &mv, ans.line, ans.point);
-		    else if (SIDE(pl->vel.x, pl->vel.y, line) < 0)
-			Bounce_player(pl, &mv, line, point);
 		    else {
 			/* This case could be handled better,
 			 * I'll write the code for that if this
@@ -2938,8 +2839,6 @@ static void Move_player_new(int ind)
 			pl->vel.y = 0;
 		    }
 		}
-		else if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0)
-		    Bounce_player(pl, &mv, ans.line, ans.point);
 	    }
 	}
 	Player_position_set_clicks(pl, mv.start.cx, mv.start.cy);
