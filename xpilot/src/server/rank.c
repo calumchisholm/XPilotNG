@@ -262,8 +262,7 @@ void Rank_write_webpage(void)
     fprintf(file, "%s", headernojs);
 
     for (i = 0; i < MAX_SCORES; i++) {
-	const int j = rank_base[i].ind;
-	const ranknode_t *rank = &ranknodes[j];
+	ranknode_t *rank = &ranknodes[rank_base[i].ind];
 
 	if (strlen(rank->name) == 0)
 	    continue;
@@ -511,8 +510,7 @@ void Rank_write_score_file(void)
     
 
     for (i = 0; i < rank_entries; i++) {
-	int idx = rank_base[i].ind;
-	ranknode_t *rank = &ranknodes[idx];
+	ranknode_t *rank = &ranknodes[rank_base[i].ind];
 
 	if (strlen(rank->name) == 0)
 	    continue;
