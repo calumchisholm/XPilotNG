@@ -404,35 +404,6 @@ static inline bool Player_is_paused(player_t *pl)
 #endif
 }
 
-static inline void Player_set_state(player_t *pl, int state)
-{
-    pl->pl_state = state;
-
-    switch (state) {
-    case PL_STATE_KILLED:
-	SET_BIT(pl->pl_status, KILLED);
-	break;
-    case PL_STATE_PAUSED:
-	pl->mychar = 'P';
-	SET_BIT(pl->pl_status, PAUSE);
-	break;
-    case PL_STATE_WAITING:
-	pl->mychar = 'W';
-	SET_BIT(pl->pl_status, GAME_OVER);
-	break;
-    case PL_STATE_DEAD:
-	pl->mychar = 'D';
-	SET_BIT(pl->pl_status, GAME_OVER);
-	break;
-
-    case PL_STATE_APPEARING:
-    case PL_STATE_ALIVE:
-    case PL_STATE_GAME_OVER:
-    default:
-	break;
-    }
-}
-
 static inline void Player_thrust(player_t *pl, bool on)
 {
     if (on)
@@ -586,5 +557,6 @@ static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
 }
 
 void Player_print_state(player_t *pl, const char *funcname);
+void Player_set_state(player_t *pl, int state);
 
 #endif

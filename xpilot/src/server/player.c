@@ -1715,3 +1715,34 @@ void Player_print_state(player_t *pl, const char *funcname)
     warn("%-20s: %-16s (%c): %-20s %s ", funcname, pl->name, pl->mychar,
 	 state2str(pl->pl_state), status2str(pl->pl_status));
 }
+
+void Player_set_state(player_t *pl, int state)
+{
+    pl->pl_state = state;
+
+    switch (state) {
+    case PL_STATE_WAITING:
+	pl->mychar = 'W';
+	SET_BIT(pl->pl_status, GAME_OVER);
+	break;
+    case PL_STATE_APPEARING:
+	break;
+    case PL_STATE_ALIVE:
+	break;
+    case PL_STATE_KILLED:
+	SET_BIT(pl->pl_status, KILLED);
+	break;
+    case PL_STATE_DEAD:
+	pl->mychar = 'D';
+	SET_BIT(pl->pl_status, GAME_OVER);
+	break;
+    case PL_STATE_PAUSED:
+	pl->mychar = 'P';
+	SET_BIT(pl->pl_status, PAUSE);
+	break;
+    case PL_STATE_GAME_OVER:
+	break;
+    default:
+	break;
+    }
+}
