@@ -652,7 +652,7 @@ static void Gui_paint_rounddelay(int x, int y)
 /*  Here starts the paint functions for ships  (MM) */
 static void Gui_paint_ship_name(int x, int y, other_t *other)
 {
-    FIND_NAME_WIDTH(other);
+    Check_name_string(other);
     if (shipNameColor) {
 	int color = Life_color(other);
 	if (!color)

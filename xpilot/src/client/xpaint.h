@@ -102,9 +102,9 @@ static inline void SET_FG(unsigned long fg)
 /*
  * MS compiler might not grok this, in that case define inline to empty.
  */
-static inline void FIND_NAME_WIDTH(other_t *other)
+static inline void Check_name_string(other_t *other)
 {
-    if (other->max_chars_in_names != maxCharsInNames) {
+    if (other && other->max_chars_in_names != maxCharsInNames) {
 	int len;
 
 	strlcpy(other->id_string, other->nick_name, sizeof(other->id_string));
