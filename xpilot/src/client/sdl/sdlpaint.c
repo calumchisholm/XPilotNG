@@ -26,6 +26,7 @@
 #include "SDL.h"
 #include "xpclient.h"
 #include "sdlpaint.h"
+#include "images.h"
 
 char sdlpaint_version[] = VERSION;
 
@@ -41,7 +42,7 @@ int	        active_view_height;	/* Height of active map area displayed. */
 int	        ext_view_x_offset;	/* Offset ext_view_width */
 int	        ext_view_y_offset;	/* Offset ext_view_height */
 long		loops = 0;
-unsigned long	loopsSlow = 0;	/* Proceeds slower than loops */
+unsigned long	loopsSlow = 0;	        /* Proceeds slower than loops */
 static double   time_counter = 0.0;
 double          timePerFrame = 0.0;
 double	        hudRadarLimit;		/* Limit for hudradar drawing */
@@ -49,24 +50,21 @@ double	        hudRadarLimit;		/* Limit for hudradar drawing */
 
 int Paint_init(void)
 {
-    /* TODO
     if (Init_wreckage() == -1)
 	return -1;
-
+    
     if (Init_asteroids() == -1)
 	return -1;
 
-    if (Bitmaps_init() == -1)
+    if (Images_init() == -1) 
 	return -1;
-    */
+
     return 0;
 }
 
 void Paint_cleanup(void)
 {
-    /* TODO
-    Bitmaps_cleanup();
-    */
+    Images_cleanup();
 }
 
 int Check_view_dimensions(void)

@@ -26,8 +26,10 @@
 #include "SDL.h"
 #include "xpclient.h"
 #include "sdlpaint.h"
+#include "images.h"
 
 int wallColor = 0xff;
+extern unsigned long	loopsSlow;	        /* Proceeds slower than loops */
 
 static void set_color(int color)
 {
@@ -40,10 +42,60 @@ static void set_color(int color)
 
 void Gui_paint_cannon(int x, int y, int type)
 {
+    switch (type) {
+    case SETUP_CANNON_UP:
+        Image_paint(IMG_CANNON_DOWN, x, y + BLOCK_SZ, 0);
+        break;
+    case SETUP_CANNON_DOWN:
+        Image_paint(IMG_CANNON_UP, x, y + BLOCK_SZ - 1, 0);
+        break;
+    case SETUP_CANNON_LEFT:
+        Image_paint(IMG_CANNON_RIGHT, x, y + BLOCK_SZ, 0);
+        break;
+    case SETUP_CANNON_RIGHT:
+        Image_paint(IMG_CANNON_LEFT, x - 1, y + BLOCK_SZ, 0);
+        break;
+    default:
+        errno = 0;
+        error("Bad cannon dir.");
+        return;
+    }
 }
 
 void Gui_paint_fuel(int x, int y, double fuel)
 {
+#define FUEL_BORDER 3
+
+    int size, frame;
+    irec area;
+    image_t *img;
+
+    img = Image_get(IMG_FUEL);
+    if (img == NULL) return;
+
+    /* x + x * y will give a pseudo random number,
+     * so different fuelcells will not be displayed with the same
+     * image-frame. */
+    frame = ABS(loopsSlow + x + x * y) % (img->num_frames * 2);
+
+    /* the animation is played from image 0-15 then back again
+     * from image 15-0 */
+    if (frame >= img->num_frames)
+	frame = (2 * img->num_frames - 1) - frame;
+
+    size = (BLOCK_SZ - 2 * FUEL_BORDER) * fuel / MAX_STATION_FUEL;
+
+    Image_paint(IMG_FUELCELL, x, y, 0);
+
+    area.x = 0;
+    area.y = 0;
+    area.w = BLOCK_SZ - 2 * FUEL_BORDER;
+    area.h = size;
+    Image_paint_area(IMG_FUEL, 
+		     x + FUEL_BORDER, 
+		     y + FUEL_BORDER, 
+		     frame, 
+		     &area);
 }
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
@@ -131,6 +183,7 @@ void Gui_paint_walls(int x, int y, int type)
 {
     set_color(wallColor);
     glBegin(GL_LINES);
+
 
     if (type & BLUE_LEFT) {
 	glVertex2i(x, y);
@@ -308,7 +361,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     glBegin(GL_LINE_LOOP);
     for (i = 0; i < ship->num_points; i++) {
 	point = Ship_get_point(ship, i, dir);
-	glVertex2d(x + point.pxl.x, y + point.pxl.y);
+	glVertex2i(x + point.pxl.x, y + point.pxl.y);
     }
     glEnd();
 }

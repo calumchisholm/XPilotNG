@@ -8,11 +8,6 @@ void Play_beep(void)
     fprintf(stderr, "\aBEEP\n");
 }
 
-int Bitmap_add(char *filename, int count, bool scalable)
-{
-    return 0;
-}
-
 void Print_messages_to_stdout(void) {}
 
 void Radar_show_target(int x, int y) {}

@@ -49,6 +49,7 @@ int Init_playing_windows(void)
     Init_spark_colors();
     Radar_init();
     */
+    return 0;
 }
 
 void Quit(void) 
