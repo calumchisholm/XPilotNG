@@ -80,12 +80,6 @@
 	((pl1)->pseudo_team == (pl2)->pseudo_team)
 
 /*
- * Not used where we wish to know if a player is on the same team
- * and has immunity to shots, thrust sparks, lasers, ecms, etc.
- */
-/*#define TEAM_IMMUNE(pl1, pl2)	(options.teamImmunity && TEAM((pl1), (pl2)))*/
-
-/*
  * Used when we want to pass an index which is not in use.
  */
 #define NO_IND			(-1)
@@ -110,8 +104,6 @@
 #define MAX_CANNON_ID		(EXPIRED_MINE_ID + NUM_CANNON_IDS)
 
 #define MAX_TOTAL_SHOTS		16384	/* must be <= 65536 */
-#define MAX_TOTAL_ECMS		64
-#define MAX_TOTAL_TRANSPORTERS	(2 * 64)
 
 /*
  * Energy drainage
@@ -171,12 +163,8 @@
 #define MINE_SENSE_BASE_RANGE   (MINE_RANGE*1.3)
 #define MINE_SENSE_RANGE_FACTOR (MINE_RANGE*0.3)
 #define MINE_MASS		30.0
-/*#define MINE_LIFETIME           (5000+(randomMT()&255)) */
-/*#define MINE_DEFAULT_LIFE	7200.0	*/
 #define MINE_SPEED_FACT		1.3
 
-/*#define MISSILE_LIFETIME	((randomMT()%(64 * 12 - 1) + 128 * 12))*/
-/*#define MISSILE_DEFAULT_LIFE	2400.0 */
 #define MISSILE_MASS		5.0
 #define MISSILE_RANGE		4
 #define SMART_SHOT_ACC		0.6
@@ -197,7 +185,6 @@
 #define NUKE_MASS_MULT		1
 #define NUKE_MINE_EXPL_MULT	3
 #define NUKE_SMART_EXPL_MULT	4
-/*#define NUKE_DEFAULT_DEBRIS_LIFE	120.0*/
 
 #define HEAT_RANGE		(VISIBILITY_DISTANCE/2)
 #define HEAT_SPEED_FACT		1.7

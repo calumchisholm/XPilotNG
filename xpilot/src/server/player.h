@@ -346,23 +346,6 @@ typedef struct player {
 
 } player_t;
 
-#define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */
-typedef struct {
-    double	size;
-    clpos_t	pos;
-    int		id;
-} ecm_t;
-
-/*
- * Transporter info.
- */
-typedef struct {
-    clpos_t	pos;
-    player_t	*victim;
-    int		id;
-    double	count;
-} trans_t;
-
 extern int	playerArrayNumber;
 extern player_t	**PlayersArray;
 

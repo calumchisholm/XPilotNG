@@ -70,7 +70,6 @@ static void Set_item_chance(world_t *world, int item)
 {
     double max
 	= options.itemProbMult * options.maxItemDensity * world->x * world->y;
-    int i;
 
     if (options.itemProbMult * world->items[item].prob > 0) {
 	world->items[item].chance = (int)(1.0

@@ -645,17 +645,15 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	}
 	return;
     } else {
+	transporter_t t;
+
+	t.pos = pos;
+	t.victim_id = victim->id;
+	t.id = (pl ? pl->id : NO_ID);
+	t.count = 5.0;
+	STORE(transporter_t, world->transporters,
+	      world->NumTransporters, world->MaxTransporters, t);
 	sound_play_sensors(pos, TRANSPORTER_SUCCESS_SOUND);
-	if (NumTransporters < MAX_TOTAL_TRANSPORTERS) {
-	    Transporters[NumTransporters] = (trans_t *)malloc(sizeof(trans_t));
-	    if (Transporters[NumTransporters] != NULL) {
-		Transporters[NumTransporters]->pos = pos;
-		Transporters[NumTransporters]->victim = victim;
-		Transporters[NumTransporters]->id = (pl ? pl->id : NO_ID);
-		Transporters[NumTransporters]->count = 5;
-		NumTransporters++;
-	    }
-	}
     }
 
     /* remove loot from victim */
@@ -918,22 +916,16 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
     int i, j;
     double range, perim, damage;
     player_t *p;
-    ecm_t *ecm;
+    ecm_t *ecm, t;
     player_t *pl = Player_by_id(id);
     /*cannon_t *cannon = Cannon_by_id(world, id);*/
 
-    if (NumEcms >= MAX_TOTAL_ECMS)
-	return;
+    t.pos = pos;
+    t.id = (pl ? pl->id : NO_ID);
+    t.size = ECM_DISTANCE;
+    STORE(ecm_t, world->ecms, world->NumEcms, world->MaxEcms, t);
 
-    Ecms[NumEcms] = XMALLOC(ecm_t, 1);
-    if (Ecms[NumEcms] == NULL)
-	return;
-
-    ecm = Ecms[NumEcms];
-    ecm->pos = pos;
-    ecm->id = (pl ? pl->id : NO_ID);
-    ecm->size = ECM_DISTANCE;
-    NumEcms++;
+    ecm = Ecm_by_index(world, world->NumEcms - 1);
     if (pl) {
 	pl->ecmcount++;
 	pl->item[ITEM_ECM]--;

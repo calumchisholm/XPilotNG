@@ -36,12 +36,7 @@ char object_version[] = VERSION;
  * Global variables
  */
 int			ObjCount = 0;
-int			NumPulses = 0;
-int			NumEcms = 0;
-int			NumTransporters = 0;
 object_t		*Obj[MAX_TOTAL_SHOTS];
-ecm_t			*Ecms[MAX_TOTAL_ECMS];
-trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
 
 
 static void Object_incr_count(void)

@@ -58,8 +58,6 @@ typedef struct {
 #define MAX_SPECTATORS	8
 
 extern object_t		*Obj[];
-extern ecm_t		*Ecms[];
-extern trans_t		*Transporters[];
 extern long		frame_loops;
 extern long		frame_loops_slow;
 extern double		frame_time;
@@ -70,8 +68,6 @@ extern int		NumOperators;
 extern int		NumPseudoPlayers;
 extern int		NumQueuedPlayers;
 extern int		ObjCount;
-extern int		NumEcms;
-extern int		NumTransporters;
 extern int		NumAlliances;
 extern int		NumRobots;
 extern int		login_in_progress;

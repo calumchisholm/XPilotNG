@@ -206,6 +206,24 @@ typedef struct friction_area {
     int		group;
 } friction_area_t;
 
+#define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */
+typedef struct {
+    double	size;
+    clpos_t	pos;
+    int		id;
+} ecm_t;
+
+/*
+ * Transporter info.
+ */
+typedef struct {
+    clpos_t	pos;
+    int		victim_id;
+    int		id;
+    double	count;
+} transporter_t;
+
+
 extern bool is_polygon_map;
 
 struct world {
@@ -248,6 +266,12 @@ struct world {
     asteroid_concentrator_t	*asteroidConcs;
     int		NumFrictionAreas, MaxFrictionAreas;
     friction_area_t		*frictionAreas;
+
+    int		NumEcms, MaxEcms;
+    ecm_t	*ecms;
+
+    int		NumTransporters, MaxTransporters;
+    transporter_t	*transporters;
 
     bool	have_options;
 };
@@ -391,6 +415,20 @@ static inline friction_area_t *FrictionArea_by_index(world_t *world, int ind)
 {
     if (ind >= 0 && ind < world->NumFrictionAreas)
 	return &world->frictionAreas[ind];
+    return NULL;
+}
+
+static inline ecm_t *Ecm_by_index(world_t *world, int ind)
+{
+    if (ind >= 0 && ind < world->NumEcms)
+	return &world->ecms[ind];
+    return NULL;
+}
+
+static inline transporter_t *Transporter_by_index(world_t *world, int ind)
+{
+    if (ind >= 0 && ind < world->NumTransporters)
+	return &world->transporters[ind];
     return NULL;
 }
 

@@ -799,19 +799,29 @@ static void Frame_ships(connection_t *conn, player_t *pl)
     int i, k;
     world_t *world = pl->world;
 
-    for (i = 0; i < NumEcms; i++) {
-	ecm_t *ecm = Ecms[i];
+    for (i = 0; i < world->NumEcms; i++) {
+	ecm_t *ecm = Ecm_by_index(world, i);
 
-	Send_ecm(conn, ecm->pos, (int)ecm->size);
+	if (clpos_inview(&cv, ecm->pos))
+	    Send_ecm(conn, ecm->pos, (int)ecm->size);
     }
 
-    for (i = 0; i < NumTransporters; i++) {
-	trans_t *trans = Transporters[i];
-	player_t *victim = trans->victim,
-	    *tpl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
+    for (i = 0; i < world->NumTransporters; i++) {
+	transporter_t *trans = Transporter_by_index(world, i);
+	player_t *victim = Player_by_id(trans->victim_id);
+	player_t *tpl = Player_by_id(trans->id);
 	clpos_t	pos = (tpl ? tpl->pos : trans->pos);
 
-	Send_trans(conn, victim->pos, pos);
+	/*
+	 * kps - If players quite, transporters are not currently cleaned up
+	 * (I think).
+	 */
+	if (victim == NULL || tpl == NULL)
+	    continue;
+
+	if (clpos_inview(&cv, victim->pos)
+	    || clpos_inview(&cv, pos))
+	    Send_trans(conn, victim->pos, pos);
     }
 
     for (i = 0; i < world->NumCannons; i++) {

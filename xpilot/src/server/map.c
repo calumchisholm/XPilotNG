@@ -56,6 +56,9 @@ static void Check_map_object_counters(world_t *world)
     assert(world->NumBases == 0);
     assert(world->NumItemConcs == 0);
     assert(world->NumAsteroidConcs == 0);
+    assert(world->NumFrictionAreas == 0);
+    assert(world->NumEcms == 0);
+    assert(world->NumTransporters == 0);
 
     for (i = 0; i < MAX_TEAMS; i++) {
 	assert(world->teams[i].NumMembers == 0);
