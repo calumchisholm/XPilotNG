@@ -183,10 +183,6 @@ int *hidptr;
 int ptscount;
 char *mapd;
 
-/* temporary, for testing !@# */
-int hack[1000];
-int hackused;
-
 struct polystyle pstyles[256];
 struct edgestyle estyles[256];
 struct bmpstyle  bstyles[256];
@@ -298,11 +294,6 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	num_bstyles++;
-    }
-
-    if (!strcasecmp(el, "XXX")) {/* temporary !@# */
-	hack[polyc - 1] = atoi(*(attr + 1));
-	hackused = 1;
     }
 
     if (!strcasecmp(el, "Scale")) {

@@ -665,7 +665,7 @@ int Net_setup(void)
                 Create_polygon_styles_for_testing();
 
                 for (i = 0; i < polyc; i++) {
-                    int sid = *ptr++;
+                    int sid = 0; /* set styles elsewhere */
                     if (sid == 100 || sid < 0 || sid >= 9) sid = rand() % 9;
                     polygons[i].style = sid;
                 }

@@ -1356,13 +1356,6 @@ int Polys_to_client(char *ptr)
 	store_short(&ptr, World.check[i].x >> CLICK_SHIFT);
 	store_short(&ptr, World.check[i].y >> CLICK_SHIFT);
     }
-    { /* temporary !@# */
-	extern int hackused;
-	extern int hack[100];
-	if (hackused)
-	    for (i = 0; i < polyc; i++)
-		*ptr++ = hack[i];
-    }
     {
 	*ptr++ = num_pstyles;
 	*ptr++ = num_estyles;
