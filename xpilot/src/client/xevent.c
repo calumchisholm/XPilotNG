@@ -41,7 +41,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 
     (void)event;
 
-#if 0 /* linear search */
+#if 1 /* linear search */
     if (reset)
 	i = 0;
 
@@ -53,6 +53,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 	if (ks == keydefs[i].keysym) {
 	    ret = keydefs[i].key;
 	    i++;
+	    break;
 	}
     }
 #else /* binary search */
@@ -103,7 +104,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     }
 #endif
 
-    return (ret);
+    return ret;
 }
 
 void Pointer_control_set_state(bool on)
