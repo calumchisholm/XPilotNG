@@ -147,8 +147,8 @@ static void Set_noarg_option(xp_option_t *opt, bool value)
 
     *opt->noarg_ptr = value;	
 
-    printf("Value of option %s is now %s.\n", opt->name,
-	   *opt->noarg_ptr ? "true" : "false");
+    /*printf("Value of option %s is now %s.\n", opt->name,
+     *opt->noarg_ptr ? "true" : "false");*/
 }
 
 
@@ -171,8 +171,8 @@ static void Set_bool_option(xp_option_t *opt, bool value)
     if (opt->bool_setfunc)
 	opt->bool_setfunc(opt, value);
 
-    printf("Value of option %s is now %s.\n", opt->name,
-	   *opt->bool_ptr ? "true" : "false");
+    /*printf("Value of option %s is now %s.\n", opt->name,
+     *opt->bool_ptr ? "true" : "false");*/
 }
 
 static void Set_int_option(xp_option_t *opt, int value)
@@ -181,6 +181,12 @@ static void Set_int_option(xp_option_t *opt, int value)
     assert(opt->type == xp_int_option);
     assert(opt->int_ptr);
 
+    if (!(value >= opt->int_minval && value <= opt->int_maxval)) {
+	warn("Bad value %d for option \"%s\", using default...",
+	     value, opt->name);
+	value = opt->int_defval;
+    }
+
     LIMIT(value, opt->int_minval, opt->int_maxval);
 
     *opt->int_ptr = value;
@@ -188,7 +194,7 @@ static void Set_int_option(xp_option_t *opt, int value)
     if (opt->int_setfunc)
 	opt->int_setfunc(opt, value);
 
-    printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);
+    /*printf("Value of option %s is now %d.\n", opt->name, *opt->int_ptr);*/
 }
 
 static void Set_double_option(xp_option_t *opt, double value)
@@ -197,6 +203,12 @@ static void Set_double_option(xp_option_t *opt, double value)
     assert(opt->type == xp_double_option);
     assert(opt->dbl_ptr);
 
+    if (!(value >= opt->dbl_minval && value <= opt->dbl_maxval)) {
+	warn("Bad value %.3f for option \"%s\", using default...",
+	     value, opt->name);
+	value = opt->dbl_defval;
+    }
+
     LIMIT(value, opt->dbl_minval, opt->dbl_maxval);
 
     *opt->dbl_ptr = value;
@@ -204,7 +216,7 @@ static void Set_double_option(xp_option_t *opt, double value)
     if (opt->dbl_setfunc)
 	opt->dbl_setfunc(opt, value);
 
-    printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);
+    /*printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);*/
 }
 
 static void Set_string_option(xp_option_t *opt, const char *value)
@@ -224,11 +236,12 @@ static void Set_string_option(xp_option_t *opt, const char *value)
     if (opt->str_setfunc)
 	opt->str_setfunc(opt, value);
 
-    if (opt->str_ptr)
-	printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
-    else
-	printf("Value of option %s is now \"%s\".\n",
-	       opt->name, opt->str_getfunc(opt));
+    /*if (opt->str_ptr)
+      printf("Value of option %s is now \"%s\".\n", opt->name, opt->str_ptr);
+      else
+      printf("Value of option %s is now \"%s\".\n",
+      opt->name, opt->str_getfunc(opt));
+    */
 }
 
 static xp_key_binding_callback_t key_binding_callback = NULL;
@@ -266,9 +279,9 @@ static void Set_key_option(xp_option_t *opt, const char *value)
 	if (!ok)
 	    warn("Invalid keysym \"%s\" for key \"%s\".\n",
 		 str, opt->name);
-	else
+	/*else
 	    printf("Keysym \"%s\" was successfully bound to key \"%s\".\n",
-		   str, opt->name);
+	    str, opt->name);*/
     }
 
     xp_free(valcpy);
