@@ -1014,7 +1014,7 @@ static void Do_warping(player *pl)
  */
 static void Update_players(void)
 {
-    int i;
+    int i, j;
     player *pl;
 
     for (i = 0; i < NumPlayers; i++) {
@@ -1184,7 +1184,7 @@ static void Update_players(void)
  */
 void Update_objects(void)
 {
-    int i, j;
+    int i;
     player *pl;
 
     /*
