@@ -3369,12 +3369,14 @@ static option_desc opts[] = {
     },
     {
 	"useDebris",
-	"useSparks",
+	"useDebris",
 	"true",
 	&options.useDebris,
 	valBool,
 	tuner_dummy,
-	"Are debris particles (sparks) created where appropriate?\n",
+	"Are debris particles created where appropriate?\n"
+	"Value affect ship exhaust sparks and cluster debris.\n"
+	"To disallow cluster weapons but not sparks, set allowClusters off.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
