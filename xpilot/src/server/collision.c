@@ -1574,8 +1574,6 @@ static void AsteroidCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
-	    bool hit1, hit2;
-
 	    obj = obj_list[j];
 	    assert(obj != NULL);
 
@@ -1604,47 +1602,7 @@ static void AsteroidCollision(void)
 		continue;
 
 	    radius = (ast->pl_radius + obj->pl_radius) * CLICK;
-
-	    hit1 = in_range(OBJ_PTR(ast), obj, radius);
-
-	    if (is_polygon_map || !useOldCode) {
-		switch (obj->collmode) {
-		case 0:
-		    hit2 = in_range_simple(ast->pos.cx, ast->pos.cy,
-					   obj->pos.cx, obj->pos.cy,
-					   radius);
-		    break;
-		case 1:
-		    hit2 = in_range_acd(ast->prevpos.cx - obj->prevpos.cx,
-					ast->prevpos.cy - obj->prevpos.cy,
-					ast->extmove.cx - obj->extmove.cx,
-					ast->extmove.cy - obj->extmove.cy,
-					radius);
-		    break;
-		case 2:
-		    hit2 = in_range_partial(ast->prevpos.cx - obj->prevpos.cx,
-					    ast->prevpos.cy - obj->prevpos.cy,
-					    ast->extmove.cx - obj->extmove.cx,
-					    ast->extmove.cy - obj->extmove.cy,
-					    radius, obj->wall_time);
-		    break;
-		case 3:
-		default:
-#if 0
-		    warn("Unimplemented collision mode %d", obj->collmode);
-#endif
-		    hit2 = false;
-		}
-	    } else {
-		hit2 = in_range_acd_old(ast->prevpos.cx, ast->prevpos.cy,
-					ast->pos.cx, ast->pos.cy,
-					obj->prevpos.cx, obj->prevpos.cy,
-					obj->pos.cx, obj->pos.cy,
-					radius);
-	    }
-
-	    assert(hit1 == hit2);
-	    if (!hit1)
+	    if (!in_range(OBJ_PTR(ast), obj, radius))
 		continue;
 
 	    switch (obj->type) {
