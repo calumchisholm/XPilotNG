@@ -354,16 +354,16 @@ int Team_immune(int id1, int id2);
  */
 void Parse_robot_file(void);
 void Robot_init(void);
-void Robot_delete(int ind, int kicked);
-void Robot_destroy(int ind);
+void Robot_delete(player *robot, bool kicked);
+void Robot_destroy(player *robot);
 void Robot_update(void);
-void Robot_invite(int ind, int inv_ind);
-void Robot_war(int ind, int killer);
-void Robot_reset_war(int ind);
-int Robot_war_on_player(int ind);
-void Robot_go_home(int ind);
-void Robot_program(int ind, int victim_id);
-void Robot_message(int ind, const char *message);
+void Robot_invite(player *robot, int inv_ind);
+void Robot_war(player *robot, int killer);
+void Robot_reset_war(player *robot);
+int Robot_war_on_player(player *robot);
+void Robot_go_home(player *robot);
+void Robot_program(player *robot, int victim_id);
+void Robot_message(player *robot, const char *message);
 
 /*
  * Prototypes for rules.c

@@ -483,16 +483,16 @@ static void PlayerCollision(void)
 		}
 
 		if (BIT(pl_j->status, KILLED)) {
-		    if (IS_ROBOT_IND(j)
-			&& Robot_war_on_player(j) == pl->id) {
-			Robot_reset_war(j);
+		    if (IS_ROBOT_PTR(pl_j)
+			&& Robot_war_on_player(pl_j) == pl->id) {
+			Robot_reset_war(pl_j);
 		    }
 		}
 
 		if (BIT(pl->status, KILLED)) {
 		    if (IS_ROBOT_PTR(pl)
-			&& Robot_war_on_player(i) == pl_j->id) {
-			Robot_reset_war(i);
+			&& Robot_war_on_player(pl) == pl_j->id) {
+			Robot_reset_war(pl);
 		    }
 		    /* cannot crash with more than one player at the same time? */
 		    /* hmm, if 3 players meet at the same point at the same time? */
@@ -976,7 +976,7 @@ static void Player_collides_with_ball(player *pl, object *obj, int radius)
 		       * ballKillScoreMult;
 	    Score_players(kp, sc, pl->name,
 			  pl, -sc, kp->name);
-	    Robot_war(GetInd(pl->id), GetInd(kp->id));
+	    Robot_war(pl, GetInd(kp->id));
 	}
     }
     Set_message(msg);
@@ -1494,7 +1494,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 	    } else {
 		Score_players(kp, sc, pl->name,
 			      pl, -sc, kp->name);
-		Robot_war(GetInd(pl->id), GetInd(kp->id));
+		Robot_war(pl, GetInd(kp->id));
 	    }
 	    Set_message(msg);
 	    SET_BIT(pl->status, KILLED);

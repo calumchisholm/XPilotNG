@@ -625,7 +625,7 @@ void Server_info(char *str, unsigned max_size)
 	pl = order[i];
 	strlcpy(name, pl->name, MAX_CHARS);
 	if (IS_ROBOT_PTR(pl)) {
-	    if ((k = Robot_war_on_player(GetInd(pl->id))) != NO_ID) {
+	    if ((k = Robot_war_on_player(pl)) != NO_ID) {
 		sprintf(name + strlen(name), " (%s)",
 			Player_by_id(k)->name);
 		if (strlen(name) >= 19) {

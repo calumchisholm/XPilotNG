@@ -89,14 +89,14 @@
 typedef struct {
     const char		*name;
     void		(*round_tick)(void);
-    void		(*create)(int ind, char *str);
-    void		(*go_home)(int ind);
-    void		(*play)(int ind);
-    void		(*set_war)(int ind, int killer);
-    int			(*war_on_player)(int ind);
-    void		(*message)(int ind, const char *str);
-    void		(*destroy)(int ind);
-    void		(*invite)(int ind, int inv_ind);
+    void		(*create)(player *robot, char *str);
+    void		(*go_home)(player *robot);
+    void		(*play)(player *robot);
+    void		(*set_war)(player *victim, int killer);
+    int			(*war_on_player)(player *robot);
+    void		(*message)(player *robot, const char *str);
+    void		(*destroy)(player *robot);
+    void		(*invite)(player *robot, int inv_ind);
 } robot_type_t;
 
 /*

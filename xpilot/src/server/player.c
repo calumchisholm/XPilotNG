@@ -253,7 +253,7 @@ void Go_home(player *pl)
     }
 
     if (IS_ROBOT_PTR(pl)) {
-	Robot_go_home(ind);
+	Robot_go_home(pl);
     }
 }
 
@@ -1820,7 +1820,7 @@ void Delete_player(player *pl)
     Leave_alliance(pl);
 
     if (IS_ROBOT_PTR(pl)) {
-	Robot_destroy(ind);
+	Robot_destroy(pl);
     }
     if (pl->isoperator) {
 	if (!--NumOperators && game_lock) {
@@ -1957,9 +1957,9 @@ void Delete_player(player *pl)
 	    CLR_BIT(pl_i->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE);
 	    CLR_BIT(pl_i->used, HAS_TRACTOR_BEAM);
 	}
-	if (IS_ROBOT_IND(i)
-	    && Robot_war_on_player(i) == id) {
-	    Robot_reset_war(i);
+	if (IS_ROBOT_PTR(pl_i)
+	    && Robot_war_on_player(pl_i) == id) {
+	    Robot_reset_war(pl_i);
 	}
 	for (j = 0; j < LOCKBANK_MAX; j++) {
 	    if (pl_i->lockbank[j] == id)
@@ -2101,7 +2101,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 		if (IS_ROBOT_PTR(pl)) {
 		    if (!BIT(World.rules->mode, TIMING|TEAM_PLAY)
 			|| (robotsLeave && pl->score < robotLeaveScore)) {
-			Robot_delete(ind, false);
+			Robot_delete(pl, false);
 			return;
 		    }
 		}

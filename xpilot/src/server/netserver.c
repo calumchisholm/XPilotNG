@@ -1488,6 +1488,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
      * And tell all the others about him.
      */
     for (i = 0; i < observerStart + NumObservers - 1; i++) {
+	player *pl_i;
 	/* hack alert */
 	if (i == NumPlayers - 1) {
 	    if (!NumObservers) {
@@ -1496,20 +1497,21 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 		i = observerStart;
 	    }
 	}
-	if (Players(i)->rectype == 1 && pl->rectype == 2)
+	pl_i = Players(i);
+	if (pl_i->rectype == 1 && pl->rectype == 2)
 	    continue;
-	if (Players(i)->conn != NOT_CONNECTED) {
-	    Send_player(Players(i)->conn, pl->id);
-	    Send_score(Players(i)->conn, pl->id, pl->score,
+	if (pl_i->conn != NOT_CONNECTED) {
+	    Send_player(pl_i->conn, pl->id);
+	    Send_score(pl_i->conn, pl->id, pl->score,
 		       pl->life, pl->mychar, pl->alliance);
-	    Send_base(Players(i)->conn, pl->id, pl->home_base);
+	    Send_base(pl_i->conn, pl->id, pl->home_base);
 	}
 	/*
 	 * And tell him about the relationships others have with eachother.
 	 */
-	else if (IS_ROBOT_IND(i)) {
-	    if ((war_on_id = Robot_war_on_player(i)) != NO_ID) {
-		Send_war(pl->conn, Players(i)->id, war_on_id);
+	else if (IS_ROBOT_PTR(pl_i)) {
+	    if ((war_on_id = Robot_war_on_player(pl_i)) != NO_ID) {
+		Send_war(pl->conn, pl_i->id, war_on_id);
 	    }
 	}
     }
@@ -1650,9 +1652,11 @@ static int Handle_login(int ind, char *errmsg, int errsize)
     }
 
     /* idle */
-    for (i = 0; i < NumPlayers; i++)
-	if (Players(i)->mychar == ' ')
-	    Players(i)->idleCount = 0;
+    for (i = 0; i < NumPlayers; i++) {
+	player *pl_i = Players(i);
+	if (pl_i->mychar == ' ')
+	    pl_i->idleCount = 0;
+    }
 
     return 0;
 }
@@ -3126,8 +3130,9 @@ static void Handle_talk(int ind, char *str)
 	} else {
 	    sprintf(msg + strlen(msg), ":[zero]");
 	    for (sent = i = 0; i < NumPlayers; i++) {
-		if (Players(i)->team == 0)
-		    Set_player_message (Players(i), msg);
+		player *pl_i = Players(i);
+		if (pl_i->team == 0)
+		    Set_player_message (pl_i, msg);
 	    }
 	}
 	return;
@@ -3142,9 +3147,10 @@ static void Handle_talk(int ind, char *str)
 	sent = 0;
 	if (!(teamZeroPausing && mute_zero && pl->team == 0 && team != 0)) {
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players(i)->team == team) {
+		player *pl_i = Players(i);
+		if (pl_i->team == team) {
 		    sent++;
-		    Set_player_message (Players(i), msg);
+		    Set_player_message(pl_i, msg);
 		}
 	    }
 	}
@@ -3169,7 +3175,7 @@ static void Handle_talk(int ind, char *str)
 #if 0
 	/* first look for an exact match on player nickname. */
 	for (i = 0; i < NumPlayers; i++) {
-	    if (strcasecmp(Players(i)->name, str) == 0) {
+	    if (strcasecmp(pl_i->name, str) == 0) {
 		sent = i;
 		break;
 	    }
@@ -3177,8 +3183,8 @@ static void Handle_talk(int ind, char *str)
 	if (sent == -1) {
 	    /* now look for a partial match on both nick and realname. */
 	    for (sent = -1, i = 0; i < NumPlayers; i++) {
-		if (strncasecmp(Players(i)->name, str, len) == 0
-		    || strncasecmp(Players(i)->realname, str, len) == 0)
+		if (strncasecmp(pl_i->name, str, len) == 0
+		    || strncasecmp(pl_i->realname, str, len) == 0)
 		    sent = (sent == -1) ? i : -2;
 	    }
 	}

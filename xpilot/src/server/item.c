@@ -1203,7 +1203,7 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
 		    /*
 		     * Player programs robot to seek target.
 		     */
-		    Robot_program(i, pl->lock.pl_id);
+		    Robot_program(p, pl->lock.pl_id);
 		    for (j = 0; j < NumPlayers; j++) {
 			player *pl_j = Players(j);
 			if (pl_j->conn != NOT_CONNECTED) {

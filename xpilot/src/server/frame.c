@@ -1411,6 +1411,6 @@ void Set_player_message(player *pl, const char *message)
 	Send_message(pl->conn, msg);
     }
     else if (IS_ROBOT_PTR(pl)) {
-	Robot_message(GetInd(pl->id), msg);
+	Robot_message(pl, msg);
     }
 }

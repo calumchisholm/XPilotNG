@@ -70,7 +70,7 @@ void tuner_maxrobots(void)
     }
 
     while (maxRobots < NumRobots) {
-	Robot_delete(-1, true);
+	Robot_delete(NULL, true);
     }
 }
 

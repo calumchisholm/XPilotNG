@@ -798,7 +798,7 @@ static void Robot_create(void)
 
     Pick_startpos(robot);
 
-    (*rob_type->create)(NumPlayers, rob->config);
+    (*rob_type->create)(robot, rob->config);
 
     Go_home(robot);
 
@@ -848,46 +848,40 @@ static void Robot_create(void)
 }
 
 
-void Robot_destroy(int ind)
+void Robot_destroy(player *pl)
 {
-    player		*pl = Players(ind);
-
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].destroy)(ind);
-    free(Players(ind)->robot_data_ptr);
-    Players(ind)->robot_data_ptr = NULL;
+    (*robot_types[pl->robot_data_ptr->robot_types_ind].destroy)(pl);
+    free(pl->robot_data_ptr);
+    pl->robot_data_ptr = NULL;
 }
 
-
-void Robot_delete(int ind, int kicked)
+void Robot_delete(player *pl, bool kicked)
 {
-    long		i,
-			low_i = -1;
+    int			i;
+    player		*low_pl = NULL;
     DFLOAT		low_score = (DFLOAT)LONG_MAX;
     char		msg[MSG_LEN];
 
-    if (ind == -1) {
+    if (pl == NULL) {
 	/*
 	 * Find the robot with the lowest score.
 	 */
-
 	for (i = 0; i < NumPlayers; i++) {
-	    player *pl_i = Players(i);
+	    player *pl2 = Players(i);
 
-	    if (!IS_ROBOT_IND(i))
+	    if (!IS_ROBOT_PTR(pl2))
 		continue;
 
-	    if (pl_i->score < low_score) {
-		low_i = i;
-		low_score = pl_i->score;
+	    if (pl2->score < low_score) {
+		low_pl = pl2;
+		low_score = low_pl->score;
 	    }
 	}
-	if (low_i >= 0) {
-	    ind = low_i;
-	}
+	if (low_pl)
+	    pl = low_pl;
     }
 
-    if (ind >= 0) {
-	player *pl = Players(ind);
+    if (pl) {
 	if (kicked) {
 	    sprintf(msg, "\"%s\" upset the gods and was kicked out "
 		    "of the game.", pl->name);
@@ -900,21 +894,17 @@ void Robot_delete(int ind, int kicked)
 /*
  * Ask a robot for an alliance
  */
-void Robot_invite(int ind, int inv_ind)
+void Robot_invite(player *pl, int inv_ind)
 {
-    player	*pl = Players(ind);
-
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].invite)(ind, inv_ind);
+    (*robot_types[pl->robot_data_ptr->robot_types_ind].invite)(pl, inv_ind);
 }
 
 /*
  * Turn on a war lock.
  */
-static void Robot_set_war(int ind, int victim_id)
+static void Robot_set_war(player *pl, int victim_id)
 {
-    player		*pl = Players(ind);
-
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].set_war)(ind, victim_id);
+    (*robot_types[pl->robot_data_ptr->robot_types_ind].set_war)(pl, victim_id);
 }
 
 
@@ -923,18 +913,18 @@ static void Robot_set_war(int ind, int victim_id)
  * The only time when this can be called is if
  * a player a robot has war on leaves the game.
  */
-void Robot_reset_war(int ind)
+void Robot_reset_war(player *pl)
 {
-    Robot_set_war(ind, -1);
+    Robot_set_war(pl, -1);
 }
 
 
 /*
  * Someone has programmed a robot (using ECM) to seek some player.
  */
-void Robot_program(int ind, int victim_id)
+void Robot_program(player *pl, int victim_id)
 {
-    Robot_set_war(ind, victim_id);
+    Robot_set_war(pl, victim_id);
 }
 
 
@@ -942,13 +932,12 @@ void Robot_program(int ind, int victim_id)
  * Return the id of the player this robot has war on.
  * If the robot is not in peace mode then return -1.
  */
-int Robot_war_on_player(int ind)
+int Robot_war_on_player(player *pl)
 {
-    player		*pl = Players(ind);
     robot_type_t	*rob_type =
 			    &robot_types[pl->robot_data_ptr->robot_types_ind];
 
-    return (*rob_type->war_on_player)(ind);
+    return (*rob_type->war_on_player)(pl);
 }
 
 
@@ -958,27 +947,26 @@ int Robot_war_on_player(int ind)
  * Maybe this is enough reason for the killed robot to change
  * its behavior with respect to the player it has been killed by.
  */
-void Robot_war(int ind, int killer)
+void Robot_war(player *pl, int killer)
 {
-    player		*pl = Players(ind),
-			*kp = Players(killer);
+    player		*kp = Players(killer);
     int			i;
 
-    if (killer == ind) {
+    if (kp == pl) {
 	return;
     }
 
     if (IS_ROBOT_PTR(kp)) {
 	Robot_talks(ROBOT_TALK_KILL, kp->name, pl->name);
 
-	if (Robot_war_on_player(killer) == pl->id)
+	if (Robot_war_on_player(kp) == pl->id)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 		if (pl_i->conn != NOT_CONNECTED) {
 		    Send_war(pl_i->conn, kp->id, NO_ID);
 		}
 	    }
-	Robot_set_war(killer, -1);
+	Robot_set_war(kp, -1);
     }
 
     if (IS_ROBOT_PTR(pl)
@@ -994,7 +982,7 @@ void Robot_war(int ind, int killer)
 	 */
 	/* pl->fuel.sum = MAX_PLAYER_FUEL; */
 
-	if (Robot_war_on_player(ind) != kp->id) {
+	if (Robot_war_on_player(pl) != kp->id) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
 		if (pl_i->conn != NOT_CONNECTED) {
@@ -1002,7 +990,7 @@ void Robot_war(int ind, int killer)
 		}
 	    }
 	    sound_play_all(DECLARE_WAR_SOUND);
-	    Robot_set_war(ind, kp->id);
+	    Robot_set_war(pl, kp->id);
 	}
     }
 }
@@ -1011,9 +999,9 @@ void Robot_war(int ind, int killer)
 /*
  * A robot starts on its homebase.
  */
-void Robot_go_home(int ind)
+void Robot_go_home(player *pl)
 {
-    (*robot_types[Players(ind)->robot_data_ptr->robot_types_ind].go_home)(ind);
+    (*robot_types[pl->robot_data_ptr->robot_types_ind].go_home)(pl);
 }
 
 
@@ -1021,22 +1009,21 @@ void Robot_go_home(int ind)
  * Someone sends a message to a robot.
  * The format of the message is: "This is the real message [receiver]:[sender]"
  */
-void Robot_message(int ind, const char *message)
+void Robot_message(player *pl, const char *message)
 {
-    player		*pl = Players(ind);
     robot_type_t	*rob_type =
 			    &robot_types[pl->robot_data_ptr->robot_types_ind];
 
-    (*rob_type->message)(ind, message);
+    (*rob_type->message)(pl, message);
 }
 
 
 /*
  * A robot plays this frame.
  */
-static void Robot_play(int ind)
+static void Robot_play(player *pl)
 {
-    (*robot_types[Players(ind)->robot_data_ptr->robot_types_ind].play)(ind);
+    (*robot_types[pl->robot_data_ptr->robot_types_ind].play)(pl);
 }
 
 
@@ -1045,9 +1032,8 @@ static void Robot_play(int ind)
  * Return false if robot continues playing,
  * return true if robot leaves the game.
  */
-static int Robot_check_leave(int ind)
+static int Robot_check_leave(player *pl)
 {
-    player		*pl = Players(ind);
     char		msg[MSG_LEN];
 
     if (robotsLeave
@@ -1066,7 +1052,7 @@ static int Robot_check_leave(int ind)
 	if (msg[0] != '\0') {
 	    Robot_talks(ROBOT_TALK_LEAVE, pl->name, "");
 	    Set_message(msg);
-	    Robot_delete(ind, false);
+	    Robot_delete(pl, false);
 	    return true;
 	}
     }
@@ -1093,10 +1079,9 @@ static void Robot_round_tick(void)
 /*
  * Update tanks here.
  */
-static void Tank_play(int ind)
+static void Tank_play(player *pl)
 {
-    player		*pl = Players(ind);
-    int			t = frame_loops % (TANK_NOTHRUST_TIME + TANK_THRUST_TIME);
+    int		t = frame_loops % (TANK_NOTHRUST_TIME + TANK_THRUST_TIME);
 
     if (t == 0) {
 	SET_BIT(pl->status, THRUSTING);
@@ -1137,7 +1122,7 @@ void Robot_update(void)
 	    if ((num_playing_ships > World.NumBases)
 		|| (num_any_ships > NUM_IDS)
 		|| (num_playing_ships > maxRobots && NumRobots > minRobots)) {
-		Robot_delete(-1, false);
+		Robot_delete(NULL, false);
 	    }
 	}
     }
@@ -1152,7 +1137,7 @@ void Robot_update(void)
 	pl = Players(i);
 
 	if (IS_TANK_PTR(pl)) {
-	    Tank_play(i);
+	    Tank_play(pl);
 	    continue;
 	}
 
@@ -1164,13 +1149,13 @@ void Robot_update(void)
 	if (BIT(pl->status, PLAYING|GAME_OVER) != PLAYING) {
 	    /* Only check for leave if not being transported to homebase. */
 	    if (!pl->count > 0) {
-		if (Robot_check_leave(i))
+		if (Robot_check_leave(pl))
 		    i--;
 	    }
 	    continue;
 	}
 
-	if (Robot_check_leave(i)) {
+	if (Robot_check_leave(pl)) {
 	    i--;
 	    continue;
 	}
@@ -1182,6 +1167,6 @@ void Robot_update(void)
 	/*
 	 * Let the robot code control this robot.
 	 */
-	Robot_play(i);
+	Robot_play(pl);
     }
 }

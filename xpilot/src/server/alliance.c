@@ -94,7 +94,7 @@ int Invite_player(player *pl, player *ally)
     /* set & send invitation */
     pl->invite = ally->id;
     if (IS_ROBOT_PTR(ally)) {
-	Robot_invite(GetInd(ally->id), GetInd(pl->id));
+	Robot_invite(ally, GetInd(pl->id));
     }
     else if (IS_HUMAN_PTR(ally)) {
 	char msg[MSG_LEN];

@@ -541,7 +541,6 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 void Player_crash(player *pl, struct move *move, int crashtype,
 		  int item_id, int pt)
 {
-    int			ind = GetInd(pl->id);
     const char		*howfmt = NULL;
     const char          *hudmsg = NULL;
 
@@ -707,7 +706,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 
 	    /* Robots will declare war on anyone who shoves them. */
 	    i = (int)(rfrac() * num_pushers);
-	    Robot_war(ind, GetInd(pushers[i]->id));
+	    Robot_war(pl, GetInd(pushers[i]->id));
 	}
     }
 

@@ -143,7 +143,7 @@ static int Kick_robot_players(int team)
 	if (BIT(World.rules->mode, TEAM_PLAY) && reserveRobotTeam) {
 	    /* kick robot with lowest score from any team but robotTeam */
 	    int low_score = INT_MAX;
-	    int low_i = -1;
+	    player *low_pl = NULL;
 	    int i;
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
@@ -151,25 +151,25 @@ static int Kick_robot_players(int team)
 		if (!IS_ROBOT_IND(i) || pl_i->team == robotTeam)
 		    continue;
 		if (pl_i->score < low_score) {
-		    low_i = i;
+		    low_pl = pl_i;
 		    low_score = pl_i->score;
 		}
 	    }
-	    if (low_i >= 0) {
-		Robot_delete(low_i, true);
+	    if (low_pl) {
+		Robot_delete(low_pl, true);
 		return 1;
 	    }
 	    return 0;
 	} else {
 	    /* kick random robot */
-	    Robot_delete(-1, true);
+	    Robot_delete(NULL, true);
 	    return 1;
 	}
     } else {
 	if (World.teams[team].NumRobots > 0) {
 	    /* kick robot with lowest score from this team */
 	    int low_score = INT_MAX;
-	    int low_i = -1;
+	    player *low_pl = NULL;
 	    int i;
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
@@ -177,12 +177,12 @@ static int Kick_robot_players(int team)
 		if (!IS_ROBOT_IND(i) || pl_i->team != team)
 		    continue;
 		if (pl_i->score < low_score) {
-		    low_i = i;
+		    low_pl = pl_i;
 		    low_score = pl_i->score;
 		}
 	    }
-	    if (low_i >= 0) {
-		Robot_delete(low_i, true);
+	    if (low_pl) {
+		Robot_delete(low_pl, true);
 		return 1;
 	    }
 	    return 0;
@@ -714,7 +714,7 @@ void Contact(int fd, void *arg)
 		minRobots = maxRobots;
 	    }
 	    while (maxRobots < NumRobots) {
-		Robot_delete(-1, true);
+		Robot_delete(NULL, true);
 	    }
 	}
 

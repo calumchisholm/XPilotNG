@@ -171,7 +171,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 	    Set_message(msg);
 	    if (kp && kp->id != pl->id) {
 		Rank_AddLaserKill(kp);
-		Robot_war(GetInd(pl->id), killer);
+		Robot_war(pl, killer);
 	    }
 	}
 	if (!BIT(pl->used, HAS_SHIELD)
