@@ -330,7 +330,6 @@ struct player {
     DFLOAT	turnresistance;		/* How much is lost in % */
     DFLOAT	turnvel;		/* Current velocity of turn (right) */
     DFLOAT	turnacc;		/* Current acceleration of turn */
-    long	mode;			/* Player mode, currently */
     long	score;			/* Current score of player */
     long	prev_score;		/* Last score that has been updated */
     int		prev_life;		/* Last life that has been updated */

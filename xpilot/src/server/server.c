@@ -548,11 +548,10 @@ void Server_info(char *str, unsigned max_size)
     }
     for (i=0; i<NumPlayers; i++) {
 	pl = Players[i];
-	if (BIT(pl->mode, LIMITED_LIVES)) {
+	if (BIT(World.rules->mode, LIMITED_LIVES))
 	    ratio = (DFLOAT) pl->score;
-	} else {
+	else
 	    ratio = (DFLOAT) pl->score / (pl->life + 1);
-	}
 	if ((best == NULL
 		|| ratio > best_ratio)
 	    && !BIT(pl->status, PAUSE)) {

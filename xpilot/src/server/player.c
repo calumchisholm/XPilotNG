@@ -416,7 +416,6 @@ int Init_player(int ind, wireobj *ship)
     pl->damaged 	= 0;
     pl->stunned		= 0;
 
-    pl->mode		= World.rules->mode;
     pl->status		= PLAYING | GRAVITY | DEF_BITS;
     pl->have		= DEF_HAVE;
     pl->used		= DEF_USED;
@@ -455,7 +454,8 @@ int Init_player(int ind, wireobj *ship)
 	 * then it's too late to join.
 	 * But we don't know team here!
 	 * The TEAM macro referenced random values. Removed. -uau */
-	if (BIT(World.rules->mode, LIMITED_LIVES) && Players[i]->life < World.rules->lives || BIT(Players[i]->mode, GAME_OVER)) {
+	if (BIT(World.rules->mode, LIMITED_LIVES) && Players[i]->life <
+		    World.rules->lives || BIT(Players[i]->status, GAME_OVER)) {
 	    too_late = true;
 	    break;
 	}
@@ -1893,7 +1893,7 @@ static void Player_death_reset(int ind)
     pl->fuel.sum	= MAX(pl->fuel.sum, minfuel);
     Player_init_fuel(ind, pl->fuel.sum);
 
-    if (BIT(pl->mode, LIMITED_LIVES)) {
+    if (BIT(World.rules->mode, LIMITED_LIVES)) {
 	pl->life--;
 	if (pl->life == -1) {
 	    pl->life = 0;

@@ -248,13 +248,12 @@ void Pause_player(int ind, int onoff)
 
 	    CLR_BIT(pl->status, PAUSE);
 	    updateScores = true;
-	    if (BIT(pl->mode, LIMITED_LIVES)) {
+	    if (BIT(World.rules->mode, LIMITED_LIVES)) {
 		for (i = 0; i < NumPlayers; i++) {
 		    /* If a non-team member has lost a life,
 		     * then it's too late to join. */
-		    if (i == ind) {
+		    if (i == ind)
 			continue;
-		    }
 		    if (Players[i]->life < World.rules->lives && !TEAM(ind, i) && !BIT(Players[i]->status, PAUSE)) {
 			toolate = true;
 			break;
@@ -269,9 +268,8 @@ void Pause_player(int ind, int onoff)
 		pl->mychar = ' ';
 		Go_home(ind);
 		SET_BIT(pl->status, PLAYING);
-		if (BIT(pl->mode, LIMITED_LIVES)) {
+		if (BIT(World.rules->mode, LIMITED_LIVES))
 		    pl->life = World.rules->lives;
-		}
 	    }
 	    if (BIT(World.rules->mode, TIMING)) {
 		pl->round = 0;

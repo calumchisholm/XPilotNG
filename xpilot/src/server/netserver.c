@@ -2597,7 +2597,7 @@ static void Set_swapper_state(int ind)
     if(BIT(pl->status, PAUSE)) {
 	Go_home(ind);
     }
-    else if (BIT(pl->mode, LIMITED_LIVES))
+    else if (BIT(World.rules->mode, LIMITED_LIVES))
 	for (i = 0; i < NumPlayers; i++)
 	    if (!TEAM(ind, i) && !BIT(Players[i]->status,PAUSE)) {
 		if (pl->mychar == ' ')
