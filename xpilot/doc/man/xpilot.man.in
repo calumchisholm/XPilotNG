@@ -1193,12 +1193,6 @@ The limit when the HUD fuel bar will flash faster. (Default 100.0)
 .B showHUD
 Should the HUD be on or off. (Default true)
 .TP 12
-.B verticalHUDLine
-Should the vertical lines in the HUD be drawn. (Default false)
-.TP 12
-.B horizontalHUDLine
-Should the horizontal lines in the HUD be drawn. (Default true)
-.TP 12
 .B speedFactHUD
 Should the HUD me moved, to indicate the current velocity. Negativ values will
 inverse the moving of the HUD. (Default 0.0)
@@ -1282,11 +1276,6 @@ key release.
 When this option is on then shields are lowered automatically
 when firing a weapon or dropping a mine.  After the firing
 the shields are raised again too.
-.TP 12
-.B shieldDrawSolid
-Are shields drawn in a solid line.
-Not setting a value for this option will select the best value
-automatically for your particular display system.
 .TP 12
 .B fuelMeter
 Determines if the fuel meter should be visible. This meter visualizes your
@@ -1433,20 +1422,6 @@ The font used in the talk window.
 .B motdFont
 The font used in the MOTD window and in the key list window.
 This must be a non-proportional font.
-.TP 12
-.B black
-Specifies the color to use for black.  Default is #000000 which is equivalent
-to specifying Black.
-.TP 12
-.B white
-Specifies the color to use for white.  Default is #FFFFFF which is equivalent
-to specifying White.
-.TP 12
-.B blue
-Specifies the color to use for blue.
-.TP 12
-.B red
-Specifies the color to use for red.
 .TP 12
 .B color0
 Specifies the color to use for color 0.  One can specify colors
