@@ -993,7 +993,7 @@ void WinXCreateItemBitmaps(void)
 				       ITEM_SIZE, ITEM_SIZE,
 				       colors[RED].pixel);
     }
-    Colors_init_block_bitmaps();
+    Colors_init_bitmaps();
     
 }
 #endif

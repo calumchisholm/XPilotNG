@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -38,13 +37,13 @@ static int Colors_get_palette_index(int rgb);
 void Colors_init_style_colors(void);
 
 
-int Colors_init_block_bitmaps(void)
+int Colors_init_bitmaps(void)
 {
     Colors_init_style_colors();
     return 0;
 }
 
-void Colors_free_block_bitmaps(void)
+void Colors_free_bitmaps(void)
 {
 }
 
