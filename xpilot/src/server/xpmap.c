@@ -97,7 +97,7 @@ static int Compress_map(unsigned char *map, size_t size)
 }
 
 
-void Setup_old_blockmap(world_t *world)
+static void Xpmap_setup(world_t *world)
 {
     int x;
     unsigned char *map_line;
@@ -139,7 +139,7 @@ void Setup_old_blockmap(world_t *world)
 }
 
 
-setup_t *Init_setup_old(world_t *world)
+setup_t *Xpmap_init_setup(world_t *world)
 {
     int			i, x, y, team, type = -1,
 			wormhole = 0,
@@ -156,7 +156,7 @@ setup_t *Init_setup_old(world_t *world)
 	world->block = NULL;
     }
     if (world->block == NULL)
-	Setup_old_blockmap(world);
+	Xpmap_setup(world);
 
     numblocks = world->x * world->y;
     if ((mapdata = malloc(numblocks)) == NULL) {

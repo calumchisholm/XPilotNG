@@ -92,7 +92,7 @@
 
 char netserver_version[] = VERSION;
 
-static int Init_setup(void);
+static int Init_setup(world_t *world);
 static int Handle_listening(connection_t *connp);
 static int Handle_setup(connection_t *connp);
 static int Handle_login(connection_t *connp, char *errmsg, size_t errsize);
@@ -185,13 +185,12 @@ static void Feature_init(connection_t *connp)
  * We only setup this structure once to save time when new
  * players log in during play.
  */
-static int Init_setup(void)
+static int Init_setup(world_t *world)
 {
     size_t		size;
-    int			result;
     unsigned char	*mapdata;
 
-    Oldsetup = Init_setup_old(&World);
+    Oldsetup = Xpmap_init_setup(world);
 
     if (!is_polygon_map) {
 	if (Oldsetup)
@@ -215,12 +214,12 @@ static int Init_setup(void)
     free(mapdata);
     Setup->setup_size = ((char *) &Setup->map_data[0] - (char *) Setup) + size;
     Setup->map_data_len = size;
-    Setup->lives = World.rules->lives;
-    Setup->mode = World.rules->mode;
-    Setup->width = World.width;
-    Setup->height = World.height;
-    strlcpy(Setup->name, World.name, sizeof(Setup->name));
-    strlcpy(Setup->author, World.author, sizeof(Setup->author));
+    Setup->lives = world->rules->lives;
+    Setup->mode = world->rules->mode;
+    Setup->width = world->width;
+    Setup->height = world->height;
+    strlcpy(Setup->name, world->name, sizeof(Setup->name));
+    strlcpy(Setup->author, world->author, sizeof(Setup->author));
     strlcpy(Setup->data_url, dataURL, sizeof(Setup->data_url));
 
     return 0;
@@ -296,7 +295,7 @@ int Setup_net_server(void)
 
     Init_receive();
 
-    if (Init_setup() == -1)
+    if (Init_setup(&World) == -1)
 	return -1;
     /*
      * The number of connections is limited by the number of bases
