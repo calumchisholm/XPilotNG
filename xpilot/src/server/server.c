@@ -566,20 +566,20 @@ static void Handle_signal(int sig_no)
 	    signal(SIGHUP, SIG_IGN);
 	    return;
 	}
-	error("Caught SIGHUP, terminating.");
+	xpinfo("Caught SIGHUP, terminating.");
 	End_game();
 	break;
     case SIGINT:
-	error("Caught SIGINT, terminating.");
+	xpinfo("Caught SIGINT, terminating.");
 	End_game();
 	break;
     case SIGTERM:
-	error("Caught SIGTERM, terminating.");
+	xpinfo("Caught SIGTERM, terminating.");
 	End_game();
 	break;
 
     default:
-	error("Caught unkown signal: %d", sig_no);
+	xpinfo("Caught unknown signal: %d", sig_no);
 	End_game();
 	break;
     }
