@@ -756,7 +756,6 @@ static int num_ok_options = 0;
  * Here is some sort of pseudo regular expression:
  * xpilot{.*}option[whitespace]:[whitespace][value][; comment]
  */
-#if 1
 static void Parse_xpilotrc_line(const char *line)
 {
     char *lcpy = xp_safe_strdup(line);
@@ -775,8 +774,12 @@ static void Parse_xpilotrc_line(const char *line)
     l += strlen("xpilot.");
 
     colon = strchr(l, ':');
-    if (colon == NULL)
+    if (colon == NULL) {
+	/* no colon on line, not ok */
+	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
+	warn("Line has no colon after option name, ignoring.");
 	goto line_is_comment;
+    }
 
     /*
      * Divide line into two parts, the first part containing the option
@@ -856,146 +859,6 @@ static void Parse_xpilotrc_line(const char *line)
 	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
     xp_free(lcpy);
 }
-
-#else
-static void Parse_xpilotrc_line(const char *line)
-{
-    char *l = xp_safe_strdup(line);
-    char *first, *second, *colon, *name, *value = NULL, *comment;
-    xpilotrc_line_t t;
-    xp_option_t *opt;
-    int i;
-
-    memset(&t, 0, sizeof(xpilotrc_line_t));
-
-    /*warn("line is \"%s\"", line);*/
-
-    /* everything after semicolon is comment, ignore it. */
-    comment = strchr(l, ';');
-    if (comment) {
-	/*warn("found comment on line \"%s\"\n", line);*/
-	t.comment = xp_safe_strdup(comment);
-	*comment = '\0';
-    }
-
-    first = strtok(l, " \t");
-    if (!first) {
-	/* comment line or empty line */
-	/*warn("line \"%s\" has comment or is empty.", line);*/
-	goto out;
-    }
-
-    if (!(strncasecmp(first, "xpilot.", 7) == 0
-	  || strncasecmp(first, "xpilot*", 7) == 0)) {
-	/* consider it a comment */
-	t.comment = xp_safe_strdup(line);
-	goto out;
-    }
-
-    /* line starts with "xpilot." or "xpilot*" */
-    first += strlen("xpilot.");
-    /*warn("of token remains \"%s\"", first);*/
-    /* get rid of colon if one is found */
-    colon = strchr(first, ':');
-    if (colon) {
-	/*
-	 * There might be stuff after the colon, e.g. if line is
-	 * xpilot.wallColor:2
-	 */
-	if (strlen(colon) > 1) {
-	    value = colon + 1;
-	    /*warn("value is \"%s\"\n", value);*/
-	}
-	*colon = '\0';
-    }
-    /*warn("of token remains \"%s\"", first);*/
-    /* now first should point to the option name */
-    name = first;
-    opt = Find_option(name);
-    if (!opt) {
-	/* this client doesn't know about this option */
-	/* warn("Parse_xpilotrc_line: Unknown option \"%s\"\n", first); */
-	/* let's just store the line, treat it as a comment */
-	t.comment = xp_safe_strdup(line);
-	goto out;
-    }
-
-    /* did we see this before ? */
-    for (i = 0; i < num_xpilotrc_lines; i++) {
-	xpilotrc_line_t *x = &xpilotrc_lines[i];
-	
-	if (x->opt == opt) {
-	    /* same option defined several times in xpilotrc */
-	    warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
-	    warn("Option %s previously given on line %d, ignoring new value.",
-		 name, i + 1);
-	    /* treat as comment */
-	    t.comment = xp_safe_strdup(line);
-	    goto out;
-	}
-    }
-
-    /* ok let's see if a valid value was given */
-
-    /* maybe colon wasn't in first token */
-    if (!value) {
-	if (!colon) {
-	    /*
-	     * line may be like "xpilot.foobar :<something>", then the colon
-	     * wasn't found in the first token
-	     */
-	    second = strtok(NULL, " \t");
-	    /*warn("second is \"%s\"", second);*/
-	    if (second == NULL || *second != ':') {
-		/* no colon on line, not ok */
-		warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
-		warn("Line has no colon after option name, ignoring.");
-		/* treat as comment */
-		t.comment = xp_safe_strdup(line);
-		goto out;
-	    }
-	    colon = second;
-	    /*warn("colon: \"%s\"", colon);*/
-	    if (strlen(colon) > 1)
-		/* e.g xpilot.wallColor :2 */
-		value = colon + 1;
-	    else
-		/* e.g xpilot.wallColor : 2 */
-		value = strtok(NULL, "");
-	}
-	else {
-	    /* line was like xpilot.wallColor: value */
-	    value = strtok(NULL, "");
-	}
-    }
-
-    /* strtok might return NULL for an empty option value. */
-    if (!value)
-	value = "";
-
-    /* remove leading whitespace */
-    while (isspace(*value))
-	value++;
-
-    /*warn("option is %s, value \"%s\"", name, value);*/
-
-    if (!Set_option(name, value, xp_option_origin_xpilotrc)) {
-	warn("WARNING: Xpilotrc line %d:", num_xpilotrc_lines + 1);
-	warn("Failed to set option %s value \"%s\", ignoring.", name, value);
-	/* treat as comment */
-	t.comment = xp_safe_strdup(line);
-	goto out;
-    }
-
-    t.opt = opt;
-    num_ok_options++;
-
- out:
-    STORE(xpilotrc_line_t,
-	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
-    xp_free(l);
-}
-#endif
 
 static inline bool is_noarg_option(const char *name)
 {
