@@ -385,7 +385,7 @@ xp_option_t default_options[] = {
 	"shipShape",
 	"",
 	NULL, 0,
-	Set_shipShape, Get_shipShape,
+	Set_shipShape, NULL, Get_shipShape,
 	"Define the ship shape to use.  Because the argument to this option\n"
 	"is rather large (up to 500 bytes) the recommended way to set\n"
 	"this option is in the .xpilotrc file in your home directory.\n"
@@ -399,7 +399,7 @@ xp_option_t default_options[] = {
 	"shipShapeFile",
 	CONF_SHIP_FILE,
 	NULL, 0,
-	Set_shipShapeFile, Get_shipShapeFile,
+	Set_shipShapeFile, NULL, Get_shipShapeFile,
 	"An optional file where shipshapes can be stored.\n"
 	"If this resource is defined and it refers to an existing file\n"
 	"then shipshapes can be referenced to by their name.\n"
@@ -418,7 +418,7 @@ xp_option_t default_options[] = {
 	"",
 	xpArgs.shutdown_reason,
 	sizeof xpArgs.shutdown_reason,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"Shutdown the server with a message.\n"
 	"The message used is the first argument to this option.\n"),
 
@@ -426,21 +426,21 @@ xp_option_t default_options[] = {
 	"name",
 	"",
 	NULL, 0,
-	Set_nickName, Get_nickName,
+	Set_nickName, NULL, Get_nickName,
 	"Set the nickname.\n"),
 
     XP_STRING_OPTION(
 	"user",
 	"",
 	NULL, 0,
-	Set_userName, Get_userName,
+	Set_userName, NULL, Get_userName,
 	"Set the username.\n"),
 
     XP_STRING_OPTION(
 	"host",
 	"",
 	NULL, 0,
-	Set_hostName, Get_hostName,
+	Set_hostName, NULL, Get_hostName,
 	"Set the hostname.\n"),
 
     XP_INT_OPTION(
@@ -1009,28 +1009,28 @@ xp_option_t default_options[] = {
 	"modifierBank1",
 	"",
 	modBankStr[0], sizeof modBankStr[0],
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The default weapon modifier values for the first modifier bank.\n"),
 
     XP_STRING_OPTION(
 	"modifierBank2",
 	"",
 	modBankStr[1], sizeof modBankStr[1],
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The default weapon modifier values for the second modifier bank.\n"),
 
     XP_STRING_OPTION(
 	"modifierBank3",
 	"",
 	modBankStr[2], sizeof modBankStr[2],
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The default weapon modifier values for the third modifier bank.\n"),
 
     XP_STRING_OPTION(
 	"modifierBank4",
 	"",
 	modBankStr[3], sizeof modBankStr[3],
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The default weapon modifier values for the fourth modifier bank.\n"),
 
     /* conf_* */
@@ -1038,7 +1038,7 @@ xp_option_t default_options[] = {
 	"texturePath",
 	CONF_TEXTUREDIR,
 	NULL, 0,
-	Set_texturePath, Get_texturePath,
+	Set_texturePath, NULL, Get_texturePath,
 	"Search path for texture files.\n"
 	"This is a list of one or more directories separated by colons.\n"),
 
@@ -1065,7 +1065,7 @@ xp_option_t default_options[] = {
 	"",
 	clientRankFile,
 	sizeof clientRankFile,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"An optional file where clientside kill/death rank is stored.\n"),
 
     XP_STRING_OPTION(
@@ -1073,7 +1073,7 @@ xp_option_t default_options[] = {
 	"",
 	clientRankHTMLFile,
 	sizeof clientRankHTMLFile,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"An optional file where clientside kill/death rank is\n"
 	"published in HTML format.\n"),
 
@@ -1082,7 +1082,7 @@ xp_option_t default_options[] = {
 	"",
 	clientRankHTMLNOJSFile,
 	sizeof clientRankHTMLNOJSFile,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"An optional file where clientside kill/death rank is\n"
 	"published in HTML format, w/o JavaScript.\n"),
 
@@ -1091,7 +1091,7 @@ xp_option_t default_options[] = {
 	"sounds",
 	CONF_SOUNDFILE,
 	sounds, sizeof sounds,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"Specifies the sound file.\n"),
 
     XP_INT_OPTION(
@@ -1107,7 +1107,7 @@ xp_option_t default_options[] = {
 	"audioServer",
 	"",
 	audioServer, sizeof audioServer,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	KEY_DUMMY,
 	"Specifies the audio server to use.\n"),
 #endif

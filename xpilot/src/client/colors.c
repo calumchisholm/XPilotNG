@@ -1139,7 +1139,7 @@ xp_option_t color_options[] = {
 	XP_COLOR0,
 	color_names[0],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the first color.\n"),
 
     XP_STRING_OPTION(
@@ -1147,7 +1147,7 @@ xp_option_t color_options[] = {
 	XP_COLOR1,
 	color_names[1],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the second color.\n"),
 
     XP_STRING_OPTION(
@@ -1155,7 +1155,7 @@ xp_option_t color_options[] = {
 	XP_COLOR2,
 	color_names[2],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the third color.\n"),
 
     XP_STRING_OPTION(
@@ -1163,7 +1163,7 @@ xp_option_t color_options[] = {
 	XP_COLOR3,
 	color_names[3],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the fourth color.\n"),
 
     XP_STRING_OPTION(
@@ -1171,7 +1171,7 @@ xp_option_t color_options[] = {
 	XP_COLOR4,
 	color_names[4],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the fifth color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1180,7 +1180,7 @@ xp_option_t color_options[] = {
 	XP_COLOR5,
 	color_names[5],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the sixth color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1189,7 +1189,7 @@ xp_option_t color_options[] = {
 	XP_COLOR6,
 	color_names[6],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the seventh color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1198,7 +1198,7 @@ xp_option_t color_options[] = {
 	XP_COLOR7,
 	color_names[7],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the eighth color.\n"
 	"This is only used if maxColors is set to 8 or 16.\n"),
 
@@ -1207,7 +1207,7 @@ xp_option_t color_options[] = {
 	XP_COLOR8,
 	color_names[8],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the nineth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1216,7 +1216,7 @@ xp_option_t color_options[] = {
 	XP_COLOR9,
 	color_names[9],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the tenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1225,7 +1225,7 @@ xp_option_t color_options[] = {
 	XP_COLOR10,
 	color_names[10],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the eleventh color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1234,7 +1234,7 @@ xp_option_t color_options[] = {
 	XP_COLOR11,
 	color_names[11],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the twelfth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1243,7 +1243,7 @@ xp_option_t color_options[] = {
 	XP_COLOR12,
 	color_names[12],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the thirteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1252,7 +1252,7 @@ xp_option_t color_options[] = {
 	XP_COLOR13,
 	color_names[13],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the fourteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1261,7 +1261,7 @@ xp_option_t color_options[] = {
 	XP_COLOR14,
 	color_names[14],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the fifteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1270,7 +1270,7 @@ xp_option_t color_options[] = {
 	XP_COLOR15,
 	color_names[15],
 	MAX_COLOR_LEN,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The color value for the sixteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
 
@@ -1280,7 +1280,7 @@ xp_option_t color_options[] = {
 	"5,6,7,3",
 	sparkColors,
 	sizeof sparkColors,
-	Spark_colors_setfunc, NULL,
+	Spark_colors_setfunc, NULL, NULL,
 	"Which color numbers to use for spark and debris particles.\n"),
 
 #define COLOR_INDEX_OPTION(name, defval, valptr, help) \

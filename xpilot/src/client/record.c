@@ -934,8 +934,7 @@ xp_option_t record_options[] = {
 	"recordFile",
 	"",
 	NULL, 0,
-	setRecordFile,
-	getRecordFile,
+	setRecordFile, NULL, getRecordFile,
 	"An optional file where a recording of a game can be made.\n"
 	"If this file is undefined then recording isn't possible.\n"),
 

@@ -153,7 +153,7 @@ xp_option_t xdefault_options[] = {
 	"geometry",
 	"1024x768",
 	NULL, 0,
-	Set_geometry, Get_geometry,
+	Set_geometry, NULL, Get_geometry,
 	"Set the window size and position in standard X geometry format.\n"
 	"The maximum allowed window size is 1922x1440.\n"),
 
@@ -162,7 +162,7 @@ xp_option_t xdefault_options[] = {
 	"",
 	displayName,
 	sizeof displayName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"Set the X display.\n"),
 
     XP_STRING_OPTION(
@@ -170,7 +170,7 @@ xp_option_t xdefault_options[] = {
 	"",
 	keyboardName,
 	sizeof keyboardName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"Set the X keyboard input if you want keyboard input from\n"
 	"another display.  The default is to use the keyboard input from\n"
 	"the X display.\n"),
@@ -180,7 +180,7 @@ xp_option_t xdefault_options[] = {
 	"",
 	visualName,
 	sizeof visualName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"Specify which visual to use for allocating colors.\n"
 	"To get a listing of all possible visuals on your dislay\n"
 	"set the argument for this option to list.\n"),
@@ -226,7 +226,7 @@ xp_option_t xdefault_options[] = {
 	GAME_FONT,
 	gameFontName,
 	sizeof gameFontName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The font used on the HUD and for most other text.\n"),
 
     XP_STRING_OPTION(
@@ -234,7 +234,7 @@ xp_option_t xdefault_options[] = {
 	SCORE_LIST_FONT,
 	scoreListFontName,
 	sizeof scoreListFontName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The font used on the score list.\n"
 	"This must be a non-proportional font.\n"),
 
@@ -243,7 +243,7 @@ xp_option_t xdefault_options[] = {
 	BUTTON_FONT,
 	buttonFontName,
 	sizeof buttonFontName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The font used on all buttons.\n"),
 
     XP_STRING_OPTION(
@@ -251,7 +251,7 @@ xp_option_t xdefault_options[] = {
 	TEXT_FONT,
 	textFontName,
 	sizeof textFontName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The font used in the help and about windows.\n"),
 
     XP_STRING_OPTION(
@@ -259,7 +259,7 @@ xp_option_t xdefault_options[] = {
 	TALK_FONT,
 	talkFontName,
 	sizeof talkFontName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The font used in the talk window.\n"),
 
     XP_STRING_OPTION(
@@ -267,7 +267,7 @@ xp_option_t xdefault_options[] = {
 	MOTD_FONT,
 	motdFontName,
 	sizeof motdFontName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The font used in the MOTD window and key list window.\n"
 	"This must be a non-proportional font.\n"),
 
@@ -276,7 +276,7 @@ xp_option_t xdefault_options[] = {
 	MESSAGE_FONT,
 	messageFontName,
 	sizeof messageFontName,
-	NULL, NULL,
+	NULL, NULL, NULL,
 	"The font used for drawing messages.\n"),
 
     XP_BOOL_OPTION(

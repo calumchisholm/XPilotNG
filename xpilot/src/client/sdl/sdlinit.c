@@ -177,8 +177,7 @@ static xp_option_t sdlinit_options[] = {
 	"1024x768",
 	NULL,
 	0,
-	Set_geometry,
-	Get_geometry,
+	Set_geometry, NULL, Get_geometry,
 	"Set the initial window geometry.\n")
 };
 

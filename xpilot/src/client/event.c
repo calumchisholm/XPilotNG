@@ -1152,40 +1152,35 @@ xp_option_t key_options[] = {
 	"pointerButton1",
 	"keyFireShot",
 	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
+	setPointerButtonBinding, NULL, getPointerButtonBinding,
 	"The key to activate when pressing the first mouse button.\n"),
 
     XP_STRING_OPTION(
 	"pointerButton2",
 	"keyThrust",
 	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
+	setPointerButtonBinding, NULL, getPointerButtonBinding,
 	"The key to activate when pressing the second mouse button.\n"),
 
     XP_STRING_OPTION(
 	"pointerButton3",
 	"keyDropBall",
 	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
+	setPointerButtonBinding, NULL, getPointerButtonBinding,
 	"The key to activate when pressing the third mouse button.\n"),
 
     XP_STRING_OPTION(
 	"pointerButton4",
 	"",
 	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
+	setPointerButtonBinding, NULL, getPointerButtonBinding,
 	"The key to activate when pressing the fourth mouse button.\n"),
 
     XP_STRING_OPTION(
 	"pointerButton5",
 	"",
 	NULL, 0,
-	setPointerButtonBinding,
-	getPointerButtonBinding,
+	setPointerButtonBinding, NULL, getPointerButtonBinding,
 	"The key to activate when pressing the fifth mouse button.\n"),
 
 

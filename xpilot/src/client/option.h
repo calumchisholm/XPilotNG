@@ -51,6 +51,7 @@ struct xp_option {
 
     const char *name;
     const char *help;
+    void *private_data;   /* currently only used for string options */
 
     /* noarg option stuff */
 
@@ -158,6 +159,12 @@ static inline keys_t Option_get_key(xp_option_t *opt)
     return opt->key;
 }
 
+static inline void *Option_get_private_data(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->private_data;
+}
+
 static inline xp_option_t *Option_by_index(int ind)
 {
     if (ind < 0 || ind >= num_options)
@@ -178,6 +185,7 @@ static inline xp_option_t *Option_by_index(int ind)
     xp_noarg_option,\
 	name,\
 	help,\
+	NULL,\
 	valptr,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
@@ -191,6 +199,7 @@ static inline xp_option_t *Option_by_index(int ind)
     xp_bool_option,\
 	name,\
 	help,\
+	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
 	defval,\
 	valptr,\
@@ -206,6 +215,7 @@ static inline xp_option_t *Option_by_index(int ind)
     xp_int_option,\
 	name,\
 	help,\
+	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	defval,\
@@ -223,6 +233,7 @@ static inline xp_option_t *Option_by_index(int ind)
     xp_double_option,\
 	name,\
 	help,\
+	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
@@ -235,11 +246,12 @@ static inline xp_option_t *Option_by_index(int ind)
 	XP_KEY_OPTION_DUMMY,\
 }
 
-#define XP_STRING_OPTION(name, defval, valptr, size, setfunc, getfunc, help) \
+#define XP_STRING_OPTION(name, defval, valptr, size, setfunc, private_data, getfunc, help) \
 { \
     xp_string_option,\
 	name,\
 	help,\
+	private_data,\
 	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
@@ -257,6 +269,7 @@ static inline xp_option_t *Option_by_index(int ind)
     xp_key_option,\
 	name,\
 	help,\
+	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
 	XP_BOOL_OPTION_DUMMY,\
 	XP_INT_OPTION_DUMMY,\
@@ -269,7 +282,7 @@ static inline xp_option_t *Option_by_index(int ind)
 
 #define XP_KS_UNKNOWN (-1)
 typedef int xp_keysym_t;
-xp_keysym_t String_to_xp_keysym(const char *str);
-keys_t Generic_lookup_key(xp_keysym_t ks, bool reset);
+extern xp_keysym_t String_to_xp_keysym(const char *str);
+extern keys_t Generic_lookup_key(xp_keysym_t ks, bool reset);
 
 #endif /* OPTION_H */
