@@ -203,7 +203,7 @@ struct _cell_node {
     objposition		pos;		/* World coordinates */		\
     clpos		prevpos;	/* previous position */		\
     clpos		extmove;	/* For collision detection */	\
-    DFLOAT		wall_time;	/* bounce/crash time within frame */		\
+    DFLOAT		wall_time;	/* bounce/crash time within frame */ \
     int			collmode;	/* collision checking mode */	\
     vector		vel;		/* speed in x,y */		\
     vector		acc;		/* acceleration in x,y */	\
@@ -213,14 +213,14 @@ struct _cell_node {
     int			type;		/* one bit of OBJ_XXX */	\
     int			count;		/* Misc timings */		\
     modifiers		mods;		/* Modifiers to this object */	\
-    /* kps - ng wants byte */ u_byte		color;		/* Color of object */		\
+    u_byte		color;		/* Color of object */		\
     u_byte		missile_dir;	/* missile direction */	\
 /* up to here all object types are the same as all player types. */
 
 #define OBJECT_EXTEND	\
     cell_node		cell;		/* node in cell linked list */	\
     long		info;		/* Miscellaneous info */	\
-    long		fuseframe;	/* Frame when considered fused */	\
+    long		fuseframe;	/* Frame when considered fused */ \
     int			pl_range;	/* distance for collision */	\
     int			pl_radius;	/* distance for hit */		\
 /* up to here all object types are the same. */
@@ -389,6 +389,28 @@ struct _wireobject {
 
 
 /*
+ * Pulse object used for laser pulses.
+ */
+typedef struct _pulseobject pulseobject;
+struct _pulseobject {
+
+    OBJECT_BASE
+
+    OBJECT_EXTEND
+
+    int			dir;		/* Direction of the pulse */
+    int			len;		/* Length of the pulse */
+
+#ifdef __cplusplus
+			_pulseobject() {}
+#endif
+
+#define PULSE_IND(ind)	((pulseobject *)Obj[(ind)])
+#define PULSE_PTR(obj)	((pulseobject *)(obj))
+};
+
+
+/*
  * Any object type should be part of this union.
  */
 typedef union _anyobject anyobject;
@@ -400,6 +422,7 @@ union _anyobject {
     smartobject		smart;
     torpobject		torp;
     wireobject		wireobj;
+    pulseobject		pulse;
 };
 
 
