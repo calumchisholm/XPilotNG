@@ -100,46 +100,6 @@ player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 }
 
 
-int Get_player_index_by_name(char *name)
-{
-    int			i, j, len;
-
-    if (!name || !*name)
-	return -1;
-
-    /* Id given directly */
-    if (isdigit(*name)) {
-	i = atoi(name);
-	if ((i > 0 && i <= NUM_IDS)
-	    && (j = GetInd(i)) >= 0
-	    && j < NumPlayers
-	    && Players(j)->id == i) {
-	    return j;
-	}
-	else
-	    return -1;
-    }
-
-    /* look for an exact match on player nickname. */
-    for (i = 0; i < NumPlayers; i++) {
-	if (strcasecmp(Players(i)->name, name) == 0) {
-	    return i;
-	}
-    }
-
-    /* now look for a partial match on both nick and realname. */
-    len = strlen(name);
-    for (j = -1, i = 0; i < NumPlayers; i++) {
-	if (strncasecmp(Players(i)->name, name, len) == 0
-	    || strncasecmp(Players(i)->realname, name, len) == 0) {
-	    j = (j == -1) ? i : -2;
-	}
-    }
-
-    return j;
-}
-
-
 static void Send_info_about_player(player * pl)
 {
     int			i;
@@ -897,21 +857,19 @@ static int Cmd_mutepaused(char *arg, player *pl, int oper, char *msg)
 static int Cmd_nuke(char *arg, player *pl, int oper, char *msg)
 {
     RankInfo *rank;
-    int ind;
+    player *pl2;
 
-    if (!oper) {
+    if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
-    }
 
-    if (!arg || !*arg) {
+    if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
-    }
 
-    ind = Get_player_index_by_name(arg);
+    pl2 = Get_player_by_name(arg, NULL, NULL);
 
     /* hopefully this will help some weird issues */
-    if (ind >= 0)
-	rank = Rank_get_by_name(Players(ind)->name);
+    if (pl2)
+	rank = Rank_get_by_name(pl2->name);
     else
 	rank = Rank_get_by_name(arg);
 
@@ -920,9 +878,8 @@ static int Cmd_nuke(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_ERROR;
     }
 
-    if (ind >= 0) {
-	Players(ind)->score = 0;
-    }
+    if (pl2)
+	pl2->score = 0;
 
     sprintf(msg, "Nuked %s.", rank->entry.nick);
 
