@@ -28,8 +28,6 @@ char shipshape_c_version[] = VERSION;
 extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
 
-bool is_server = false;
-
 void Rotate_point(shapepos pt[RES])
 {
     int			i;

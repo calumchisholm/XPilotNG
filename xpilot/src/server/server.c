@@ -46,6 +46,7 @@ int			ShutdownDelay = 1000;
 char			ShutdownReason[MAX_CHARS];
 int 			framesPerSecond = 18;
 long			main_loops = 0;		/* needed in events.c */
+bool			is_server = true;	/* used in common code */
 
 #ifdef LOG
 static bool		Log = true;

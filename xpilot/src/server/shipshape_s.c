@@ -25,8 +25,6 @@
 
 char shipshape_s_version[] = VERSION;
 
-bool is_server = true;
-
 extern void	Make_table(void);
 
 void Rotate_point(shapepos pt[RES])

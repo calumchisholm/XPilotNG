@@ -26,6 +26,7 @@
 char client_version[] = VERSION;
 
 
+bool			is_server = false;	/* used in common code */
 char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
 int			scoresChanged = 0;
