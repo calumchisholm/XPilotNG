@@ -45,6 +45,13 @@ typedef struct xpilotrc {
 static xpilotrc_t	*xpilotrc_ptr;
 static int		num_xpilotrc, max_xpilotrc;
 
+static int num_default_options = 0;
+static int max_default_options = 0;
+static int *default_option_indices = NULL;
+static int num_color_options = 0;
+static int max_color_options = 0;
+static int *color_option_indices = NULL;
+
 static bool		config_created = false,
 			config_mapped = false;
 static int		config_page,
@@ -68,36 +75,30 @@ static int		config_page,
 static int		*config_widget_desc,
 			config_save_confirm_desc = NO_WIDGET;
 
-static int	(*config_creator_default[])(int widget_desc, int *height) = {
-    Config_create_save			/* must be last */
-};
-
-static int	(*config_creator_colors[])(int widget_desc, int *height) = {
-    Config_create_save			/* must be last */
-};
-
-static int (**config_creator)(int widget_desc, int *height);
-
-/* this must be updated if new config menu items are added */
-#define CONFIG_MAX_WIDGET_IDS \
-(MAX(NELEM(config_creator_default), \
-     NELEM(config_creator_colors)))
-
-static int config_widget_ids[CONFIG_MAX_WIDGET_IDS];
-
+static int *config_widget_ids = NULL;
 static int config_what = CONFIG_NONE;
 
 /* this must be updated if new config menu items are added */
 static int Nelem_config_creator(void)
 {
-    return num_options; /* TODO */
-#if 0
-    if (config_creator == config_creator_colors)
-	return NELEM(config_creator_colors);
-    if (config_creator == config_creator_default)
-	return NELEM(config_creator_default);
+    if (config_what == CONFIG_DEFAULT)
+	return num_default_options + 1;
+    if (config_what == CONFIG_COLORS)
+	return num_color_options + 1;
     return 0;
-#endif
+}
+
+static xp_option_t *Config_creator_option(int i)
+{
+    int ind = -1;
+
+    if (config_what == CONFIG_DEFAULT
+	&& i >= 0 && i < num_default_options)
+	ind = default_option_indices[i];
+    if (config_what == CONFIG_COLORS
+	&& i >= 0 && i < num_color_options)
+	ind = color_option_indices[i];
+    return Option_by_index(ind);
 }
 
 static int Update_bool_option(int widget_desc, void *data, bool *val)
@@ -200,7 +201,7 @@ static void Create_config(void)
     num = -1;
     full = true;
     for (i = 0; i < Nelem_config_creator(); i++) {
-	xp_option_t *opt = Option_by_index(i);
+	xp_option_t *opt = Config_creator_option(i);
 
 	if (full == true) {
 	    full = false;
@@ -252,16 +253,10 @@ static void Create_config(void)
 
 	    height = config_space;
 	}
-#if 0
-	if ((config_widget_ids[i] =
-	     (*config_creator[i])(config_widget_desc[num], &height)) == 0) {
-	    i--;
-	    full = true;
-	    if (height == config_space)
-		break;
-	    continue;
-	}
-#else
+
+	if (opt == NULL && i != Nelem_config_creator()-1)
+	    assert(0);
+
 	if ((config_widget_ids[i] =
 	     config_creator_new(opt, config_widget_desc[num], &height)) == 0) {
 	    i--;
@@ -270,7 +265,7 @@ static void Create_config(void)
 		break;
 	    continue;
 	}
-#endif
+
     }
     if (i < Nelem_config_creator()) {
 	for (; num >= 0; num--) {
@@ -525,6 +520,9 @@ static int Config_create_save(int widget_desc, int *height)
 
 static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
 {
+    if (opt == NULL)
+	return Config_create_save(widget_desc, height);
+
     switch (Option_get_type(opt)) {
     case xp_bool_option:
 	return Config_create_bool(widget_desc, height,
@@ -533,7 +531,7 @@ static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
 				  Update_bool_option, opt);
     case xp_int_option:
 	/* kps tmp hack */
-	if (opt->int_minval == 0 && opt->int_maxval == maxColors-1)
+	if (opt->int_minval == 0 && opt->int_maxval == MAX_COLORS-1)
 	    return Config_create_color(widget_desc, height, *opt->int_ptr,
 				       Option_get_name(opt), opt->int_ptr,
 				       opt->int_minval, opt->int_maxval,
@@ -665,7 +663,7 @@ static void Config_save_resource(FILE *fp, const char *resource, char *value)
 }
 #endif
 
-
+#if 0
 static void Config_save_comment(FILE *fp, const char *comment)
 {
     IFNWINDOWS(fprintf(fp, "%s", comment));
@@ -694,7 +692,7 @@ static void Config_save_bool(FILE *fp, const char *resource, int value)
     sprintf(buf, "%s", (value != 0) ? "True" : "False");
     Config_save_resource(fp, resource, buf);
 }
-
+#endif
 
 /*
  * Find a key in keydefs[].
@@ -755,12 +753,19 @@ static void Config_save_keys(FILE *fp)
 
 static int Config_save(int widget_desc, void *button_str, const char **strptr)
 {
+#if 1
+
+    Add_message("Config_save() is currently broken. [*Client notice*]");
+    return 1;
+
+#else
     int			i;
     FILE		*fp = NULL;
     char		buf[512];
 #ifndef _WINDOWS	/* Windows does no file handling on its own. */
     char		oldfile[PATH_MAX + 1],
 			newfile[PATH_MAX + 1];
+
 
     *strptr = "Saving...";
     Widget_draw(widget_desc);
@@ -848,6 +853,8 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 
     *strptr = (char *) button_str;
     return 1;
+
+#endif
 }
 
 static int Config_save_confirm_callback(int widget_desc, void *popup_desc,
@@ -867,11 +874,6 @@ int Config(bool doit, int what)
     Config_destroy();
     if (doit == false)
 	return false;
-
-    if (what == CONFIG_DEFAULT)
-	config_creator = config_creator_default;
-    else if (what == CONFIG_COLORS)
-	config_creator = config_creator_colors;
 
     config_what = what;
 
@@ -924,3 +926,37 @@ void Config_redraw(void)
     for (i = 0; i < Nelem_config_creator(); i++)
 	Widget_draw(config_widget_ids[i]);
 }
+
+
+
+void Config_init(void)
+{
+    int i, max_ids;
+
+    for (i = 0; i < num_options; i++) {
+	xp_option_t *opt = Option_by_index(i);
+	xp_option_type_t type = Option_get_type(opt);
+
+	/* kps - temporary hack */
+	if (type == xp_int_option
+	    && opt->int_minval == 0 && opt->int_maxval == MAX_COLORS-1) {
+	    STORE(int, color_option_indices,
+		  num_color_options, max_color_options, i);
+	} else if (type == xp_int_option
+		   || type == xp_double_option
+		   || type == xp_bool_option) {
+	    STORE(int, default_option_indices,
+		  num_default_options, max_default_options, i);
+	}
+    }
+
+    /* +1 is for the save widget */
+    max_ids = MAX(num_color_options, num_default_options) + 1;
+
+    config_widget_ids = malloc(max_ids * sizeof(int));
+    if (config_widget_ids == NULL) {
+	error("Config_init: not enough memory.");
+	exit(1);
+    }
+}
+

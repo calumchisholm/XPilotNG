@@ -105,6 +105,7 @@ int main(int argc, char *argv[])
     Parse_options(&argc, argv);
     /*strcpy(clientname,connectParam.nick_name); */
 
+    Config_init();
     Handle_X_options();
     
     /* CLIENTRANK */
