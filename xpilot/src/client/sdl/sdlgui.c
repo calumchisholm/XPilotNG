@@ -116,6 +116,7 @@ float hudRadarDotScale;
 
 static double shipLineWidth;
 static bool smoothLines;
+static bool texturedBalls;
 static GLuint polyListBase = 0;
 static GLuint polyEdgeListBase = 0;
 static GLuint asteroid = 0;
@@ -765,7 +766,22 @@ void Gui_paint_ball(int x, int y, int style)
     if (style >= 0 && style < num_polygon_styles)
 	rgba = (polygon_styles[style].rgb << 8) | 0xff;
 
-    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0, rgba);
+    if (texturedBalls)
+	Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0, rgba);
+    else {
+	int i, numvert = 16, ang = RES / numvert;
+	/* kps hack, feel free to improve */
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	set_alphacolor(ballColorRGBA);
+	if (smoothLines) glEnable(GL_LINE_SMOOTH);
+	glBegin(GL_LINE_LOOP);
+	for (i = 0; i < numvert; i++)
+	    glVertex2d((double)x + tcos(i * ang) * BALL_RADIUS,
+		       (double)y + tsin(i * ang) * BALL_RADIUS);
+	glEnd();
+	if (smoothLines) glDisable(GL_LINE_SMOOTH);
+    }
 }
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
@@ -2100,6 +2116,14 @@ static xp_option_t sdlgui_options[] = {
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Use antialized smooth lines.\n"),
+
+    XP_BOOL_OPTION(
+        "texturedBalls",
+        true,
+	&texturedBalls,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Draw balls with textures.\n"),
 
     XP_INT_OPTION(
         "hudRadarEnemyShape",
