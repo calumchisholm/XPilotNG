@@ -863,8 +863,8 @@ int Contact_init(void);
 void Contact(int fd, void *arg);
 void Queue_kick(const char *nick);
 void Queue_loop(world_t *world);
-int Queue_advance_player(char *name, char *msg);
-int Queue_show_list(char *msg);
+int Queue_advance_player(char *name, char *msg, size_t size);
+int Queue_show_list(char *msg, size_t size);
 void Set_deny_hosts(world_t *world);
 
 /*

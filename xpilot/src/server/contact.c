@@ -853,7 +853,7 @@ void Queue_loop(world_t *world)
     }
 }
 
-static int Queue_player(char *real, char *nick, char *disp, int team,
+static int Queue_player(char *user, char *nick, char *disp, int team,
 			char *addr, char *host, unsigned version, int port,
 			int *qpos)
 {
@@ -861,7 +861,7 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
     struct queued_player *qp, *prev = 0;
 
     *qpos = 0;
-    if ((status = Check_names(nick, real, host)) != SUCCESS)
+    if ((status = Check_names(nick, user, host)) != SUCCESS)
 	return status;
 
     for (qp = qp_list; qp; prev = qp, qp = qp->next) {
@@ -873,7 +873,7 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 	if (!strcasecmp(nick, qp->nick_name)) {
 	    /* same screen? */
 	    if (!strcmp(addr, qp->host_addr)
-		&& !strcmp(real, qp->user_name)
+		&& !strcmp(user, qp->user_name)
 		&& !strcmp(disp, qp->disp_name)) {
 		qp->last_ack_recv = main_loops;
 		qp->port = port;
@@ -907,11 +907,11 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
     if (!qp)
 	return E_SOCKET;
     ++*qpos;
-    strlcpy(qp->user_name, real, MAX_CHARS);
-    strlcpy(qp->nick_name, nick, MAX_CHARS);
-    strlcpy(qp->disp_name, disp, MAX_CHARS);
-    strlcpy(qp->host_name, host, MAX_CHARS);
-    strlcpy(qp->host_addr, addr, MAX_CHARS);
+    strlcpy(qp->user_name, user, sizeof(qp->user_name));
+    strlcpy(qp->nick_name, nick, sizeof(qp->nick_name));
+    strlcpy(qp->disp_name, disp, sizeof(qp->disp_name));
+    strlcpy(qp->host_name, host, sizeof(qp->host_name));
+    strlcpy(qp->host_addr, addr, sizeof(qp->host_addr));
     qp->port = port;
     qp->team = team;
     qp->version = version;
@@ -933,12 +933,12 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 /*
  * Move a player higher up in the list of waiting players.
  */
-int Queue_advance_player(char *name, char *qmsg)
+int Queue_advance_player(char *name, char *qmsg, size_t size)
 {
     struct queued_player *qp, *prev, *first = NULL;
 
     if (strlen(name) >= MAX_NAME_LEN) {
-	strcpy(qmsg, "Name too long.");
+	strlcpy(qmsg, "Name too long.", size);
 	return -1;
     }
 
@@ -946,9 +946,9 @@ int Queue_advance_player(char *name, char *qmsg)
 
 	if (!strcasecmp(qp->nick_name, name)) {
 	    if (!prev)
-		strcpy(qmsg, "Already first.");
+		strlcpy(qmsg, "Already first.", size);
 	    else if (qp->login_port != -1)
-		strcpy(qmsg, "Already entering game.");
+		strlcpy(qmsg, "Already entering game.", size);
 	    else {
 		/* Remove "qp" from list. */
 		prev->next = qp->next;
@@ -963,7 +963,7 @@ int Queue_advance_player(char *name, char *qmsg)
 		    qp->next = qp_list;
 		    qp_list = qp;
 		}
-		strcpy(qmsg, "Done.");
+		strlcpy(qmsg, "Done.", size);
 	    }
 	    return 0;
 	}
@@ -971,30 +971,31 @@ int Queue_advance_player(char *name, char *qmsg)
 	    first = qp;
     }
 
-    sprintf(qmsg, "Player \"%s\" not in queue.", name);
+    snprintf(qmsg, size, "Player \"%s\" not in queue.", name);
 
     return 0;
 }
 
 
-int Queue_show_list(char *qmsg)
+int Queue_show_list(char *qmsg, size_t size)
 {
-    int len, count;
+    int count = 1;
+    size_t len;
     struct queued_player *qp = qp_list;
 
     if (!qp) {
-	strcpy(qmsg, "The queue is empty.");
+	strlcpy(qmsg, "The queue is empty.", size);
 	return 0;
     }
 
-    strcpy(qmsg, "Queue: ");
+    strlcpy(qmsg, "Queue: ", size);
     len = strlen(qmsg);
-    count = 1;
+    assert(size - len > 0);
     do {
-	sprintf(qmsg + len, "%d. %s  ", count++, qp->nick_name);
-	len += strlen(qmsg + len);
+	snprintf(qmsg + len, size - len, "%d. %s  ", count++, qp->nick_name);
+	len = strlen(qmsg);
 	qp = qp->next;
-    } while (qp != NULL && len + 32 < MSG_LEN);
+    } while (qp != NULL && len + 32 < size);
 
     /* strip last 2 spaces. */
     qmsg[len - 2] = '\0';
