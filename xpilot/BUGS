@@ -1,3 +1,4 @@
+
 -------------------------------------------------------------------
 Problem : 
 Found by: 
@@ -5,6 +6,16 @@ Solution:
 Fixed by:
 Files 
 affected:
+
+-------------------------------------------------------------------
+Problem : shotsize 8 with texturedObjects works ok in the lg [old] client
+          while it doesnt work in ng
+Found by: Throat
+Solution:
+Fixed by:
+Files 
+affected:
+
 -------------------------------------------------------------------
 Problem : If you build the sdl client you HAVE to make install from root
           otherwise it will not find the fonts file and Seg Fault!!
