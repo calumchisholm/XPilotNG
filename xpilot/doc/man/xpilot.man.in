@@ -2,7 +2,7 @@
 .\"
 .\" @<COPYRIGHT>@.
 .\"
-.TH XPILOT @<MANEXT>@ "Requires UDP and X11"
+.TH XPILOT 6 "Requires UDP and X11"
 .ds )H GNU Public License 2.0 applies
 .ds ]W XPilot @<VERSION>@: @<RELEASEDATE>@
 .if n .ad l	\" If nroff formatter, adjust left margin only
@@ -48,7 +48,7 @@ anything else.
 To start playing, you need to connect to a \fBserver\fP by
 using a \fBclient\fP program called \fIxpilot\fP.  If there are
 no servers running, you will have to start one of your own (see
-man-page \fIxpilots(@<MANEXT>@)\fP).
+man-page \fIxpilots(6)\fP).
 
 
 .SS Options
@@ -133,7 +133,7 @@ deal with communication to the current server only.  You may
 enter the game by pressing CR (Return/Enter).
 
 If you are the owner of the server you will have a few extra
-options.  See \fIxpilots(@<MANEXT>@)\fP.
+options.  See \fIxpilots(6)\fP.
 
 .SH THE WELCOME WINDOW
 
@@ -146,7 +146,7 @@ corner.  These buttons are:
 Search for \fBxpilot\fP servers on the local network and display a list
 of matches.  Press the \fBJoin game\fP button beside the desired server name
 to start playing.  If no servers are listed, you will need to start one.
-See \fIxpilots(@<MANEXT>@)\fP.
+See \fIxpilots(6)\fP.
 
 .TP 12
 .B Internet
@@ -403,7 +403,7 @@ Displays the Message Of The Day if the server has one available.
 
 .SH GAME CONCEPTS
 
-The game objective varies as the server (\fIxpilots(@<MANEXT>@)\fP) is
+The game objective varies as the server (\fIxpilots(6)\fP) is
 very configurable.  However, below you will find short
 descriptions of some of the main concepts of the game.
 
@@ -413,14 +413,14 @@ descriptions of some of the main concepts of the game.
 All objects in the game are affected by gravity - that is, they
 will accelerate in the direction the gravity is strongest.  The
 strength and direction of the gravity is user configurable (see
-\fIxpilots(@<MANEXT>@)\fP), and can even be set to 0.
+\fIxpilots(6)\fP), and can even be set to 0.
 
 Some objects affect the gravity in a limited area, these are
 called \fBgravs\fP and they exist in miscellaneous types
 (attractive, repulsive, clockwise, anti-clockwise).  Gravs are
 shown as red circles with some symbol inside which is different
 for each type of grav.  (For more information on how the affect
-the gravity, see \fIxpilots(@<MANEXT>@)\fP.)
+the gravity, see \fIxpilots(6)\fP.)
 
 .SS Wormholes
 
@@ -1039,7 +1039,7 @@ Load player lock from bank 4.
 .TP 12
 .B keyToggleRecord {KP_5}.
 Toggle recording of session to file (see the recordFile option).
-This recording can later be reviewed with the \fIxp-replay(@<MANEXT>@)\fP program
+This recording can later be reviewed with the \fIxp-replay(6)\fP program
 .TP 12
 .B keyPointerControl {KP_Enter}
 Toggle mouse pointer control.
@@ -1315,7 +1315,7 @@ Some window managers like twm may have problems with
 flipping title bars.  Hence this option to turn it off.
 .TP 12
 .B slidingRadar
-If the game is in edgewrap mode (see \fIxpilots(@<MANEXT>@)\fP) then the
+If the game is in edgewrap mode (see \fIxpilots(6)\fP) then the
 radar will keep your position on the radar in the center and
 draw the rest of the radar around it.  This requires very
 good X performance and a pretty fast workstation.  Default is off.
@@ -1610,7 +1610,7 @@ File containing the sound to sound-file mapping.
 .PD
 
 .SH SEE ALSO
-xpilots(@<MANEXT>@), xp-replay(@<MANEXT>@)
+xpilots(6), xp-replay(6)
 .\"
 .\" index		\fIxpilot\fP \- multiplayer war game
 .\" index		\fIxpilots\fP \- server module for xpilot

@@ -2,7 +2,7 @@
 .\"
 .\" @<COPYRIGHT>@.
 .\"
-.TH XPILOTS @<MANEXT>@ "Requires UDP and X11"
+.TH XPILOTS 6 "Requires UDP and X11"
 .ds )H GNU Public License 2.0 applies
 .ds ]W XPilot @<VERSION>@: @<RELEASEDATE>@
 .if n .ad l	\" If nroff formatter, adjust left margin only
@@ -38,7 +38,7 @@ This manual explains the following topics:
 .B - Creating new maps.
 .PP
 Complete coverage of the game basics and how to connect to a server are
-given in the manual pages for \fIxpilot(@<MANEXT>@)\fP.
+given in the manual pages for \fIxpilot(6)\fP.
 
 
 .SS Command options
@@ -243,7 +243,7 @@ also enter the game when there is space for them.
 
 .SS Prompt options (owner only)
 If you are the owner of a server you have successfully connected to (with
-\fIxpilot(@<MANEXT>@)\fP), you have several special commands available, all of which
+\fIxpilot(6)\fP), you have several special commands available, all of which
 applies to the current server only:
 .TP 15
 .B m
@@ -349,7 +349,7 @@ you if you cannot change a value, or if you specify an invalid value.
 
 .SH WARNINGS AND BUGS
 
-See \fIxpilot(@<MANEXT>@)\fP.
+See \fIxpilot(6)\fP.
 
 
 .SH AUTHORS
@@ -392,4 +392,4 @@ Password file.
 
 .SH SEE ALSO
 
-xpilot(@<MANEXT>@), xset(1), emacs(1)
+xpilot(6), xset(1), emacs(1)
