@@ -499,7 +499,7 @@ void Server_info(char *str, unsigned max_size)
 	    "      AUTHOR.....: %s\n"
 	    "PLAYERS (%2d/%2d)..:\n"
 	    "\n"
-	    "EXPERIMENTAL SERVER, STANDARD CLIENTS DO NOT WORK\n",
+	    "EXPERIMENTAL SERVER, see http://xpilot.sourceforge.net/\n",
 	    server_version,
 	    (game_lock && ShutdownServer == -1) ? "locked" :
 	    (!game_lock && ShutdownServer != -1) ? "shutting down" :

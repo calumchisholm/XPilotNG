@@ -2923,7 +2923,7 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
 	break;
 
     case VERSION_CMD:
-	sprintf(msg, "4.2.0 test version");
+	sprintf(msg, "4.3.0 test version");
 	break;
 
     case HELP_CMD:
