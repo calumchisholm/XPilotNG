@@ -291,8 +291,8 @@ int Process_event(SDL_Event *evt)
       break;
     }
     
-    gettimeofday(&now,NULL);
     if (mouseMovement) {
+    	gettimeofday(&now,NULL);
     	if (!movement_interval || (now.tv_sec > next_time.tv_sec) || (now.tv_usec > next_time.tv_usec)) {
 	    next_time.tv_sec = now.tv_sec;
 	    next_time.tv_usec = now.tv_usec + movement_interval;
