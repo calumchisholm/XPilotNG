@@ -1,5 +1,12 @@
 # Requires python 2.0
 
+# Doesn't yet work for maps where a single wall wraps all around the map
+# back to the same point.
+
+# Some parts of this code are really hacky and ugly, they're probably
+# difficult to read even in Python. If this was Perl or something I
+# probably couldn't read them myself...
+
 removedopts = ['extraborder', 'edgebounce', "maxshieldedplayerwallbounceangle",
 "maxshieldedbounceangle", "maxunshieldedplayerwallbounceangle",
 "maxunshieldedbounceangle", "scoretablefilename", "scoretable", 'teamassign',
@@ -265,7 +272,7 @@ def convert(options):
 		p2[1] = height * BCLICKS - p2[1]
 	    p2[2] = (p2[2][0], -p2[2][1])
     neglist = []
-    poslist = [] 
+    poslist = []
     for p in polys2:
 	if polydir(p) > 0:
 	    poslist.append(p)
@@ -331,6 +338,10 @@ def convert(options):
 	    o = dist[mink][1]
 	    offset = o + 1
 	    res = res[:o + 1] + r + res[o:]
+	    res[o] = res[o][:]
+	    res[o][2] = None
+	    res[o + len(r)] = res[o + len(r)][:]
+	    res[o + len(r)][2] = None
 	    last = clist[i][mink]
 	    clist[i][mink] = -1
 	    count -= 1
@@ -341,7 +352,7 @@ def convert(options):
 		    dist[k] = (dist[k][0], dist[k][1] + len(r) + 1, dist[k][2])
 	reslist.append(res)
     polys2 = reslist
-		    
+
     # Turn this on if you want to randomize the map edges
     if 0:
 	from math import sin
@@ -362,12 +373,20 @@ def convert(options):
     print '</GeneralOptions>'
 
     for p in polys2:
-	print '<Polygon x="%d" y="%d">' % tuple(p[0][:2])
+	internal = [i for i in range(len(p)) if p[i][2] == None]
+	sstr = '<Polygon x="%d" y="%d"' % tuple(p[0][:2])
+	if internal:
+	    sstr += ' hidedges="%d"' % len(internal)
+	sstr += '>'
+	print sstr
 	x = p[0][0]
 	y = p[0][1]
+	h = p[0][2]
 	for c in p[1:]:
+	    if not h:
+		print '<Hidden/>'
 	    print '<Offset x="%d" y="%d"/>' % (center(c[0] - x, mxc), center(c[1] - y, myc))
-	    x, y = c[:2]
+	    x, y, h = c
 	print "</Polygon>"
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y)
