@@ -1103,11 +1103,10 @@ void Paint_client_fps(void)
     char		buf[32];
     int			len;
 
-    /*if (!showFPS)
-     * return;
-     */
+    if (!hudColor)
+	return;
 
-    SET_FG(colors[BLUE].pixel);
+    SET_FG(colors[hudColor].pixel);
     sprintf(buf, "FPS: %d", clientFPS);
     len = strlen(buf);
     w = XTextWidth(gameFont, buf, len);
