@@ -549,7 +549,7 @@ void Do_deflector(player *pl)
     for (i = 0; i < obj_count; i++) {
 	obj = obj_list[i];
 
-	if (obj->life <= 0)
+	if (obj->life <= 0 || obj->mass == 0)
 	    continue;
 
 	if (obj->id == pl->id) {
