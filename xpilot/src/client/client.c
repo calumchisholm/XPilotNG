@@ -35,6 +35,7 @@ extern int Paint_init(void);
 extern void Paint_cleanup(void);
 extern void Paint_frame(void);
 extern int Init_playing_windows(void);
+extern void Quit(void);
 extern int Startup_server_motd(void);
 extern int Check_view_dimensions(void);
 
@@ -2308,6 +2309,7 @@ void Client_cleanup(void)
 {
     int		i;
 
+    Quit();
     Free_selectionAndHistory();
     Free_msgs();
     if (max_others > 0) {
