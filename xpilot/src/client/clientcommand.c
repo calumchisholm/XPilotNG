@@ -76,7 +76,7 @@ static void print_ignorelist(void)
 	strcat(buffer, "[*Client reply*]");
 	Add_message(buffer);
     } else
-	Add_message("Ignorelist is empty [*Client reply*]");
+	Add_message("Ignorelist is empty. [*Client reply*]");
 }
 
 static void print_help(const char *arg)
@@ -193,8 +193,8 @@ void executeCommand(const char *talk_str)
 	return;
     }
 
-    strlcpy(str, talk_str, MAX_CHARS);  warn("executeCommand: str = %s", str);
-    command = strtok(str, " ");         warn("command = \"%s\"", command);
+    strlcpy(str, talk_str, MAX_CHARS);
+    command = strtok(str, " ");
 
     for (i = 0; i < NELEM(c_commands); i++) {
 	if (!strcmp(command, c_commands[i]))
@@ -207,35 +207,7 @@ void executeCommand(const char *talk_str)
     }
 
     /* argument can contains spaces, that's why we have "" and not " " */
-    argument = strtok(NULL, ""); warn("argument = \"%s\"", argument);
-
-#if 0
-    unsigned i;
-    char command[MAX_CHARS];
-    char argument[MAX_CHARS] = "";
-    int command_num;
-
-    strlcpy(command, &talk_str[1], MAX_CHARS - 1);	/* removes '\' */
-    for (i = 0; i < strlen(command); i++) {
-	if (command[i] == ' ')
-	    break;
-    }
-
-    command[i] = '\0';
-
-    if (i + 2 < strlen(talk_str))
-	strcpy(argument, &talk_str[i + 2]);
-
-    for (i = 0; i < NELEM(c_commands); i++) {
-	if (!strcmp(command, c_commands[i]))
-	    break;
-    }
-
-    if (i == NELEM(c_commands)) {
-	Add_message("Invalid clientcommand. [*Client reply*]");
-	return;
-    }
-#endif
+    argument = strtok(NULL, "");
 
     command_num = i;
     switch (command_num) {
