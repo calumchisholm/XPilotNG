@@ -232,8 +232,7 @@ static void RWriteTile(Pixmap tile)
     static tile_list_t		*list = NULL;
     tile_list_t			*lptr;
     static int			next_tile_id = 1;
-    unsigned			x, y;
-    int				i;
+    int				x, y, i;
     XImage			*img;
 
     for (lptr = list; lptr != NULL; lptr = lptr->next) {

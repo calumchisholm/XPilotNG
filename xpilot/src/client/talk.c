@@ -51,8 +51,8 @@ static bool		talk_created;
 static char		talk_str[MAX_CHARS];
 static struct {
     bool		visible;
-    short		offset;
-    short		point;
+    int			offset;
+    int			point;
 } talk_cursor;
 
 /* position in history when browsing in the talk window */
@@ -101,7 +101,7 @@ void Talk_cursor(bool visible)
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    "_", 1);
 	XSetForeground(dpy, talkGC, colors[WHITE].pixel);
-	if (talk_cursor.point < strlen(talk_str)) {
+	if (talk_cursor.point < (int)strlen(talk_str)) {
 	    /* cursor _in message */
 	    if (selectionAndHistory && selection.talk.state == SEL_EMPHASIZED
 		  && talk_cursor.point >= selection.talk.x1
@@ -123,7 +123,7 @@ void Talk_cursor(bool visible)
 	 * unemphasized underscore
 	 */
 	if (selectionAndHistory
-	    && talk_cursor.point < strlen(talk_str)
+	    && talk_cursor.point < (int)strlen(talk_str)
 	    && talk_str[talk_cursor.point] == '_'
 	    && ( selection.talk.state != SEL_EMPHASIZED
 		|| talk_cursor.point < selection.talk.x1
@@ -464,12 +464,13 @@ int Talk_do_event(XEvent *event)
 		     * `talk_crs_repeat_count' is reset at `KeyRelease'
 		     */
 		    if (talk_crs_repeat_count > CRS_START_HOPPING) {
-			if (talk_cursor.point < strlen(talk_str) - CRS_HOP)
+			if (talk_cursor.point
+			    < (int)strlen(talk_str) - CRS_HOP)
 			    talk_cursor.point += CRS_HOP;
 			else
 			    talk_cursor.point = strlen(talk_str);
 		    } else {
-			if (talk_cursor.point < strlen(talk_str)) {
+			if (talk_cursor.point < (int)strlen(talk_str)) {
 			    talk_cursor.point++;
 			    talk_crs_repeat_count++;
 			}
@@ -644,7 +645,7 @@ int Talk_do_event(XEvent *event)
 	    /*
 	     * Put cursor one character forward.
 	     */
-	    if (talk_cursor.point < strlen(talk_str)) {
+	    if (talk_cursor.point < (int)strlen(talk_str)) {
 		Talk_cursor(false);
 		talk_cursor.point++;
 		Talk_cursor(true);
@@ -1070,7 +1071,7 @@ int Talk_place_cursor(XButtonEvent* xbutton, bool pending)
     }
 
     /* no implicit lengthening of talk_str */
-    if (cursor_pos > strlen(talk_str)) {
+    if (cursor_pos > (int)strlen(talk_str)) {
         if (Button == 1)
             selection.talk.incl_nl = true;
         cursor_pos = strlen(talk_str);

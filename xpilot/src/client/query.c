@@ -213,7 +213,7 @@ int Query_all(sock_t *sock, int port, char *msg, int msglen)
 	close(fd);
 	return Query_fudged(sock, port, msg, msglen);
     }
-    for (len = 0; len + sizeof(struct ifreq) <= ifconf.ifc_len;) {
+    for (len = 0; len + (int)sizeof(struct ifreq) <= ifconf.ifc_len;) {
 	ifreqp = (struct ifreq *)&ifconf.ifc_buf[len];
 
 	D( printf("interface name %s\n", ifreqp->ifr_name) );
@@ -221,6 +221,7 @@ int Query_all(sock_t *sock, int port, char *msg, int msglen)
 
 	len += sizeof(struct ifreq);
 #if BSD >= 199006 || HAVE_SA_LEN || defined(_SOCKADDR_LEN) || defined(_AIX)
+	/* kps - is this really needed ?????? */
 	/*
 	 * Recent TCP/IP implementations have a sa_len member in the socket
 	 * address structure in order to support protocol families that have

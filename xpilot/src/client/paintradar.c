@@ -320,7 +320,7 @@ static void Paint_world_radar_old(void)
     for (i = 0; i < 10; i++)
 	visible[SETUP_TARGET+i] = 1;
 
-    for (i = BLUE_BIT; i < sizeof visible; i++)
+    for (i = BLUE_BIT; i < (int)sizeof visible; i++)
 	visible[i] = 1;
 
     if (BIT(instruments, SHOW_DECOR)) {
@@ -346,7 +346,7 @@ static void Paint_world_radar_old(void)
     for (i = 0; i < 10; i++)
 	visibleColor[SETUP_TARGET+i] = targetRadarColor;
 
-    for (i = BLUE_BIT; i < sizeof visible; i++)
+    for (i = BLUE_BIT; i < (int)sizeof visible; i++)
 	visibleColor[i] = wallRadarColor;
 
     if (BIT(instruments, SHOW_DECOR))
