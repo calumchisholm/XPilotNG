@@ -495,7 +495,7 @@ static void Msg_scan_game_msg(const char *message)
 	    static char		mybuf[MSG_LEN];
 
 	    if (killratio_deaths > 0)
-		sprintf(mybuf, "Current kill ratio: %d/%d (%.02f).",
+		sprintf(mybuf, "Current kill ratio: %d/%d (%.03f).",
 			killratio_kills, killratio_deaths, 
 			(double)killratio_kills / killratio_deaths);
 
