@@ -107,8 +107,6 @@ void filter_mods(modifiers *mods);
 /*
  * Prototypes for map.c
  */
-/*void Init_map(void);*/
-void Alloc_map(void);
 void Free_map(void);
 bool Grok_map(void);
 bool Grok_map_options(void);

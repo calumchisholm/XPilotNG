@@ -74,11 +74,8 @@ World_map World;
 bool is_polygon_map = false;
 
 static void Generate_random_map(void);
-
 static void Find_base_order(void);
-
 static void Reset_map_object_counters(void);
-static void Reset_itemid_array(void);
 
 
 static void shrink(void **pp, size_t size)
@@ -354,11 +351,6 @@ int Map_place_grav(int cx, int cy, DFLOAT force, int type)
 }
 
 
-
-
-
-
-
 void Free_map(void)
 {
     if (World.block) {
@@ -407,8 +399,15 @@ void Free_map(void)
     }
 }
 
+static void Init_itemid_array(void)
+{
+    int x, y;
+    for (x = 0; x < World.x; x++)
+	for (y = 0; y < World.y; y++)
+	    Map_set_itemid(x, y, -1);
+}
 
-void Alloc_map(void)
+static void Alloc_map(void)
 {
     int x;
 
@@ -466,6 +465,8 @@ void Alloc_map(void)
 	    grav_line += World.y;
 	}
     }
+
+    Init_itemid_array();
 }
 
 
@@ -495,15 +496,6 @@ static void Reset_map_object_counters(void)
 	World.teams[i].prev_score = 0;
 	World.teams[i].SwapperId = NO_ID;
     }
-}
-
-
-static void Reset_itemid_array(void)
-{
-    int x, y;
-    for (x = 0; x < World.x; x++)
-	for (y = 0; y < World.y; y++)
-	    Map_set_itemid(x, y, -1);
 }
 
 
@@ -619,8 +611,6 @@ bool Grok_map(void)
 
 	Xpmap_grok_map_data();
 	Xpmap_allocate_checks();
-	Reset_map_object_counters();
-	Reset_itemid_array();
 	Xpmap_tags_to_internal_data(true);
 	Xpmap_find_map_object_teams();
     }
