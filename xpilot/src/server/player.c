@@ -370,16 +370,8 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
     }
 }
 
-static void Player_paused_reset(player_t *pl, bool add_rank_death)
+static void Player_paused_reset(player_t *pl)
 {
-    int i;
-    world_t *world = pl->world;
-
-    if (Player_is_tank(pl)) {
-	Delete_player(pl);
-	return;
-    }
-
     Detach_ball(pl, NULL);
     if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->pl_status, HOVERPAUSE)) {
 	CLR_BIT(pl->pl_status, HOVERPAUSE);
@@ -390,21 +382,12 @@ static void Player_paused_reset(player_t *pl, bool add_rank_death)
     pl->acc.x		= pl->acc.y	= 0.0;
     pl->emptymass	= pl->mass	= options.shipMass;
     pl->obj_status	&= ~(KILL_OBJ_BITS);
-    pl->pl_status	&= ~(KILL_PL_BITS);
-
-    if (!Player_is_paused(pl)) {
-	for (i = 0; i < NUM_ITEMS; i++) {
-	    if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-		pl->item[i] = world->items[i].initial;
-	}
-    }
 
     pl->forceVisible	= 0;
-    if (Player_is_paused(pl))
-	/* don't allow unpause while other players haven't yet appeared */
-	pl->pause_count = MAX(RECOVERY_DELAY, pl->pause_count);
-    else
-	pl->recovery_count = RECOVERY_DELAY;
+
+    /* don't allow unpause while other players haven't yet appeared */
+    pl->pause_count = MAX(RECOVERY_DELAY, pl->pause_count);
+
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;
     pl->emergency_shield_left = 0;
@@ -413,50 +396,6 @@ static void Player_paused_reset(player_t *pl, bool add_rank_death)
     pl->damaged 	= 0;
     pl->stunned		= 0;
     pl->lock.distance	= 0;
-
-    if (!Player_is_paused(pl))
-	Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
-
-    /*-BA Handle the combination of limited life games and
-     *-BA options.robotLeaveLife by making a robot leave iff it gets
-     *-BA eliminated in any round.  Means that options.robotLeaveLife
-     *-BA is ignored, but that options.robotsLeave is still respected.
-     *-KK Added check on race mode. Since in race mode everyone
-     *-KK gets killed at the end of the round, all robots would
-     *-KK be replaced in the next round. I don't think that's
-     *-KK the Right Thing to do.
-     *-KK Also, only check a robot's score at the end of the round.
-     *-KK 27-2-98 Check on team mode too. It's very confusing to
-     *-KK have different robots in your team every round.
-     */
-
-    if (!Player_is_paused(pl)) {
-
-	if (add_rank_death)
-	    Rank_add_death(pl);
-
-	if (BIT(world->rules->mode, LIMITED_LIVES)) {
-	    Player_set_life(pl, pl->pl_life - 1);
-	    if (pl->pl_life == -1) {
-		if (Player_is_robot(pl)) {
-		    if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
-			|| (options.robotsLeave
-			    && pl->score < options.robotLeaveScore)) {
-			Robot_delete(pl, false);
-			return;
-		    }
-		}
-		Player_set_life(pl, 0);
-		if (!Player_is_waiting(pl))
-		    Player_set_state(pl, PL_STATE_DEAD);
-		Player_lock_closest(pl, false);
-	    }
-	}
-	else {
-	    Player_set_life(pl, pl->pl_life + 1);
-	    Player_set_state(pl, PL_STATE_APPEARING);
-	}
-    }
 
     pl->have	= DEF_HAVE;
     pl->used	|= DEF_USED;
@@ -1592,13 +1531,13 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     int i;
     world_t *world = pl->world;
 
-    if (Player_is_paused(pl)) {
-	Player_paused_reset(pl, add_rank_death);
+    if (Player_is_tank(pl)) {
+	Delete_player(pl);
 	return;
     }
 
-    if (Player_is_tank(pl)) {
-	Delete_player(pl);
+    if (Player_is_paused(pl)) {
+	Player_paused_reset(pl);
 	return;
     }
 
@@ -1612,21 +1551,16 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->acc.x		= pl->acc.y	= 0.0;
     pl->emptymass	= pl->mass	= options.shipMass;
     pl->obj_status	&= ~(KILL_OBJ_BITS);
+    /* remove KILLED and PLAYING */
     pl->pl_status	&= ~(KILL_PL_BITS);
 
-    if (!Player_is_paused(pl)) {
-	for (i = 0; i < NUM_ITEMS; i++) {
-	    if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-		pl->item[i] = world->items[i].initial;
-	}
+    for (i = 0; i < NUM_ITEMS; i++) {
+	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+	    pl->item[i] = world->items[i].initial;
     }
 
     pl->forceVisible	= 0;
-    if (Player_is_paused(pl))
-	/* don't allow unpause while other players haven't yet appeared */
-	pl->pause_count = MAX(RECOVERY_DELAY, pl->pause_count);
-    else
-	pl->recovery_count = RECOVERY_DELAY;
+    pl->recovery_count = RECOVERY_DELAY;
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;
     pl->emergency_shield_left = 0;
@@ -1636,8 +1570,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->stunned		= 0;
     pl->lock.distance	= 0;
 
-    if (!Player_is_paused(pl))
-	Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
+    Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
 
     /*-BA Handle the combination of limited life games and
      *-BA options.robotLeaveLife by making a robot leave iff it gets
@@ -1652,32 +1585,29 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
      *-KK have different robots in your team every round.
      */
 
-    if (!Player_is_paused(pl)) {
+    if (add_rank_death)
+	Rank_add_death(pl);
 
-	if (add_rank_death)
-	    Rank_add_death(pl);
-
-	if (BIT(world->rules->mode, LIMITED_LIVES)) {
-	    Player_set_life(pl, pl->pl_life - 1);
-	    if (pl->pl_life == -1) {
-		if (Player_is_robot(pl)) {
-		    if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
-			|| (options.robotsLeave
-			    && pl->score < options.robotLeaveScore)) {
-			Robot_delete(pl, false);
-			return;
-		    }
+    if (BIT(world->rules->mode, LIMITED_LIVES)) {
+	Player_set_life(pl, pl->pl_life - 1);
+	if (pl->pl_life == -1) {
+	    if (Player_is_robot(pl)) {
+		if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
+		    || (options.robotsLeave
+			&& pl->score < options.robotLeaveScore)) {
+		    Robot_delete(pl, false);
+		    return;
 		}
-		Player_set_life(pl, 0);
-		if (!Player_is_waiting(pl))
-		    Player_set_state(pl, PL_STATE_DEAD);
-		Player_lock_closest(pl, false);
 	    }
+	    Player_set_life(pl, 0);
+	    if (!Player_is_waiting(pl))
+		Player_set_state(pl, PL_STATE_DEAD);
+	    Player_lock_closest(pl, false);
 	}
-	else {
-	    Player_set_life(pl, pl->pl_life + 1);
-	    Player_set_state(pl, PL_STATE_APPEARING);
-	}
+    }
+    else {
+	Player_set_life(pl, pl->pl_life + 1);
+	Player_set_state(pl, PL_STATE_APPEARING);
     }
 
     pl->have	= DEF_HAVE;
