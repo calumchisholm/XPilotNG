@@ -184,9 +184,20 @@ void Paint_frame(void)
 	Paint_client_fps();
 
 	Paint_messages();
-	Paint_radar();
 	Paint_score_objects();
 	*/
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0, draw_width, draw_height, 0);
+
+	Radar_paint();
+
+	glPopMatrix();
+
     }
 
     SDL_GL_SwapBuffers();
