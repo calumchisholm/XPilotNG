@@ -121,9 +121,9 @@ struct grav {
 };
 
 struct base {
-    clpos		pos;
-    int			dir;
-    int			ind;
+    clpos	pos;
+    int		dir;
+    int		ind;
     unsigned short	team;
 };
 
@@ -133,21 +133,21 @@ struct baseorder {
 };
 
 struct cannon {
-    clpos		pos;
-    int			dir;
-    unsigned		conn_mask;
-    long		last_change;
-    int			item[NUM_ITEMS];
-    int			tractor_target;
-    bool		tractor_is_pressor;
+    clpos	pos;
+    int		dir;
+    unsigned	conn_mask;
+    long	last_change;
+    int		item[NUM_ITEMS];
+    int		tractor_target;
+    bool	tractor_is_pressor;
     unsigned short	team;
-    long		used;
-    DFLOAT		dead_time;
-    DFLOAT		damaged;
-    DFLOAT		tractor_count;
-    DFLOAT		emergency_shield_left;
-    DFLOAT		phasing_left;
-    int			group;
+    long	used;
+    DFLOAT	dead_time;
+    DFLOAT	damaged;
+    DFLOAT	tractor_count;
+    DFLOAT	emergency_shield_left;
+    DFLOAT	phasing_left;
+    int		group;
 };
 
 struct item {
@@ -170,32 +170,32 @@ struct asteroid {
 };
 
 struct wormhole {
-    clpos		pos;
-    int			lastdest;	/* last destination wormhole */
-    DFLOAT		countdown;	/* >0 warp to lastdest else random */
-    bool		temporary;	/* wormhole was left by hyperjump */
-    wormType		type;
-    u_byte		lastblock;	/* block it occluded */
-    unsigned short	lastID;
+    clpos	pos;
+    int		lastdest;	/* last destination wormhole */
+    DFLOAT	countdown;	/* >0 warp to lastdest else random */
+    bool	temporary;	/* wormhole was left by hyperjump */
+    wormType	type;
+    u_byte	lastblock;	/* block it occluded */
+    int		lastID;
 };
 
 struct treasure {
-    clpos		pos;
-    bool		have;	/* true if this treasure has ball in it */
+    clpos	pos;
+    bool	have;		/* true if this treasure has ball in it */
     unsigned short	team;	/* team of this treasure */
-    int 		destroyed;	/* how often this treasure destroyed */
-    bool		empty;	/* true if this treasure never had a ball */
+    int 	destroyed;	/* how often this treasure destroyed */
+    bool	empty;		/* true if this treasure never had a ball */
 };
 
 struct target {
-    clpos		pos;
+    clpos	pos;
     unsigned short	team;
-    DFLOAT		dead_time;
-    int			damage;
-    unsigned		conn_mask;
-    unsigned 		update_mask;
-    long		last_change;
-    int			group;
+    DFLOAT	dead_time;
+    int		damage;
+    unsigned	conn_mask;
+    unsigned 	update_mask;
+    long	last_change;
+    int		group;
 };
 
 struct team {
@@ -222,47 +222,47 @@ struct asteroid_concentrator {
 extern bool is_polygon_map;
 
 typedef struct {
-    int			x, y;		/* Size of world in blocks */
-    int			diagonal;	/* Diagonal length in blocks */
-    int			width, height;	/* Size of world in pixels (optimization) */
-    int			cwidth, cheight;/* Size of world in clicks */
-    int			hypotenuse;	/* Diagonal length in pixels (optimization) */
-    rules_t		*rules;
-    char		name[MAX_CHARS];
-    char		author[MAX_CHARS];
-    char		dataURL[MAX_CHARS];
+    int		x, y;		/* Size of world in blocks */
+    int		diagonal;	/* Diagonal length in blocks */
+    int		width, height;	/* Size of world in pixels (optimization) */
+    int		cwidth, cheight;/* Size of world in clicks */
+    int		hypotenuse;	/* Diagonal length in pixels (optimization) */
+    rules_t	*rules;
+    char	name[MAX_CHARS];
+    char	author[MAX_CHARS];
+    char	dataURL[MAX_CHARS];
 
-    u_byte		**block;        /* type of item in each block */
+    u_byte	**block;	/* type of item in each block */
 
-    vector		**gravity;
+    vector	**gravity;
 
-    item_t		items[NUM_ITEMS];
+    item_t	items[NUM_ITEMS];
 
-    asteroid_t		asteroids;
+    asteroid_t	asteroids;
 
-    team_t		teams[MAX_TEAMS];
+    team_t	teams[MAX_TEAMS];
 
-    int			NumTeamBases;      /* How many 'different' teams are allowed */
-    int			NumBases;
-    base_t		*base;
-    baseorder_t		*baseorder; /* kps - ng does not want this */
-    int			NumFuels;
-    fuel_t		*fuel;
-    int			NumGravs;
-    grav_t		*grav;
-    int			NumCannons;
-    cannon_t		*cannon;
-    int			NumChecks;
-    clpos		*check;
-    int			NumWormholes;
-    wormhole_t		*wormHoles;
-    int			NumTreasures;
-    treasure_t		*treasures;
-    int			NumTargets;
-    target_t		*targets;
-    int			NumItemConcentrators;
-    item_concentrator_t	*itemConcentrators;
-    int			NumAsteroidConcs;
+    int		NumTeamBases;	/* How many 'different' teams are allowed */
+    int		NumBases;
+    base_t	*base;
+    baseorder_t	*baseorder;
+    int		NumFuels;
+    fuel_t	*fuel;
+    int		NumGravs;
+    grav_t	*grav;
+    int		NumCannons;
+    cannon_t	*cannon;
+    int		NumChecks;
+    clpos	*check;
+    int		NumWormholes;
+    wormhole_t	*wormHoles;
+    int		NumTreasures;
+    treasure_t	*treasures;
+    int		NumTargets;
+    target_t	*targets;
+    int		NumItemConcentrators;
+    item_concentrator_t		*itemConcentrators;
+    int		NumAsteroidConcs;
     asteroid_concentrator_t	*asteroidConcs;
 } World_map;
 
