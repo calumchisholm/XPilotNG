@@ -146,7 +146,7 @@ bool AppendGLWidgetList( GLWidget **list, GLWidget *item )
     GLWidget **curr;
 
     if (!list) {
-    	error("No list holder for Append2List %i");
+    	error("No list holder for AppendGLWidgetList %i");
     	return false;
     }
     if (!item) {
@@ -157,6 +157,14 @@ bool AppendGLWidgetList( GLWidget **list, GLWidget *item )
 
     curr = list;
     while (*curr) {
+    	/* Just a trivial check if item already is in the list
+	 * doesn't check for item's trailers however!
+	 * Make sure items aren't added twice!
+	 */
+	if (*curr == item) {
+	    error("AppendGLWidgetList: item is already in the list!");
+	    return false;
+	}
     	curr = &((*curr)->next);
     }
     *curr = item;
@@ -235,7 +243,7 @@ void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h)
     	w2 = MIN(x+w,curr->bounds.x+curr->bounds.w) - x2;
     	h2 = MIN(y+h,curr->bounds.y+curr->bounds.h) - y2;
 	
-	glScissor(x2-1, draw_height - y2 - h2-1, w2+2, h2+2);
+	glScissor(x2, draw_height - y2 - h2, w2+1, h2+1);
 	if (curr->Draw) curr->Draw(curr);
 	
 	DrawGLWidgetsi(curr->children,x2, y2, w2, h2);
@@ -493,6 +501,8 @@ GLWidget *Init_SlideWidget( bool locked,
 	return NULL;
     }
     tmp->WIDGET     	= SLIDEWIDGET;
+    tmp->bounds.x   	= 0;
+    tmp->bounds.y   	= 0;
     tmp->bounds.w   	= 10;
     tmp->bounds.h   	= 10;
     ((SlideWidget *)tmp->wid_info)->sliding = false;
@@ -619,9 +629,9 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
 	    return;
     }
     
-    if (!move) return;
-    
     wid_info->oldmoves += move;
+    
+    if (!(wid_info->oldmoves)) return;
     
     if (wid_info->oldmoves > 0) {
     	coord2 = MIN(max-size,*coord1+wid_info->oldmoves);
@@ -648,6 +658,25 @@ void release_ScrollbarWidget( void *releasedata )
     wid_info = (ScrollbarWidget *)tmp->wid_info;
     
     wid_info->oldmoves = 0;
+}
+
+void ScrollbarWidget_SetSlideSize( GLWidget *widget, GLfloat size )
+{
+    ScrollbarWidget *sb;
+    
+    if (!widget) return;
+    if (widget->WIDGET !=SCROLLBARWIDGET) {
+    	error("Wrong widget type for SetBounds_ScrollbarWidget [%i]",widget->WIDGET);
+	return;
+    }
+    if (!(sb = (ScrollbarWidget *)(widget->wid_info))) {
+    	error("ScrollbarWidget_SetSlideSize: wid_info missing!");
+	return;
+    }
+    
+    sb->size = MIN(1.0f,MAX(0.0f,size));
+    
+    SetBounds_ScrollbarWidget(widget,&(widget->bounds));
 }
 
 GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size, ScrollWidget_dir_t dir,
@@ -1599,7 +1628,7 @@ void Paint_ListWidget( GLWidget *widget );
 
 bool ListWidget_Append( GLWidget *list, GLWidget *item )
 {
-    GLWidget **curr;
+    GLWidget *curr1, **curr2;
     ListWidget *wid_info;
     
     if (!list) {
@@ -1618,19 +1647,27 @@ bool ListWidget_Append( GLWidget *list, GLWidget *item )
     	error("ListWidget_Append: *item is NULL");
 	return false;
     }
-    item->next = NULL;/*TODO figure out how to handle a non NULL case properly*/
 
-    curr = &(list->children);
-    while (*curr) {
-	if (*curr == item) {
-	    error("ListWidget_Append: item is already in the list!");
-	    return false;
+    curr1 = item;
+    while (curr1) {   	
+	curr2 = &(list->children);
+    	while (*curr2) {
+	    if (*curr2 == curr1) break;
+	    curr2 = &((*curr2)->next);
+    	}
+
+    	if (*curr2) {
+	    error("ListWidget_Append: Attempt to append an existing item!");
+	    break;
 	}
-	curr = &((*curr)->next);
-    }
-    *curr = item;
+	
+	*curr2 = curr1;
+	curr1 = curr1->next;
+	/* disengage added item from the item list t be added */
+	(*curr2)->next = NULL;
 
-    ++wid_info->num_elements;
+     	++wid_info->num_elements;
+    }
     
     /* This works since SetBounds_ListWidget copies the content
      * if the SDL_Rect *
@@ -1642,7 +1679,7 @@ bool ListWidget_Append( GLWidget *list, GLWidget *item )
 
 bool ListWidget_Prepend( GLWidget *list, GLWidget *item )
 {
-    GLWidget *curr;
+    GLWidget *curr1, *curr2, **entry_pt, *first;
     ListWidget *wid_info;
     /*int y_rel;*/
     
@@ -1662,20 +1699,30 @@ bool ListWidget_Prepend( GLWidget *list, GLWidget *item )
     	error("ListWidget_Prepend: *item is NULL");
 	return false;
     }
-
-    curr = list->children;
-    while (curr) {
-	if (curr == item) {
-	    error("ListWidget_Prepend: item is already in the list!");
-	    return false;
+    
+    entry_pt = &(list->children);
+    first = *entry_pt;
+    
+    curr1 = item;
+    while (curr1) {
+    	curr2 = list->children;
+    	while (curr2) {
+	    if (curr2 == item) break;
+	    curr2 = curr2->next;
+    	}
+	
+	if (curr2) {
+	    error("ListWidget_Append: Attempt to append an existing item!");
+	    break;
 	}
-	curr = curr->next;
+    	
+	*entry_pt = curr1;
+	curr1 = curr1->next;
+	(*entry_pt)->next = first;
+	entry_pt = &((*entry_pt)->next);
+
+    	++wid_info->num_elements;
     }
-    
-    item->next = list->children;
-    list->children = item;
-    
-    ++wid_info->num_elements;
     
     /* This works since SetBounds_ListWidget copies the content
      * if the SDL_Rect *
@@ -1687,7 +1734,7 @@ bool ListWidget_Prepend( GLWidget *list, GLWidget *item )
 
 bool ListWidget_Insert( GLWidget *list, GLWidget *target, GLWidget *item )
 {
-    GLWidget **curr,**tg;
+    GLWidget **curr, *curr1, *curr2;
     ListWidget *wid_info;
     
     if (!list) {
@@ -1707,29 +1754,37 @@ bool ListWidget_Insert( GLWidget *list, GLWidget *target, GLWidget *item )
 	return false;
     }
 
-    tg = NULL;
-    
     curr = &(list->children);
     while (*curr) {
-	if (*curr == item) {
-	    error("ListWidget_Insert: item is already in the list!");
-	    return false;
-	}
-	if (*curr == target) {
-	    tg = curr;
-	}
+	if (*curr == target) break;
 	curr = &((*curr)->next);
     }
     
-    if (!tg) {
+    if (!(*curr)) {
 	    error("ListWidget_Insert: target is not in the list!");
 	    return false;
     }
     
-    item->next = *tg;
-    *tg = item;
-    
-    ++wid_info->num_elements;
+    curr1 = item;
+    while (curr1) {
+    	curr2 = list->children;
+    	while (curr2) {
+	    if (curr2 == item) break;
+	    curr2 = curr2->next;
+    	}
+	
+	if (curr2) {
+	    error("ListWidget_Append: Attempt to append an existing item!");
+	    break;
+	}
+    	
+	*curr = curr1;
+	curr1 = curr1->next;
+	(*curr)->next = target;
+	curr = &((*curr)->next);
+
+    	++wid_info->num_elements;
+    }
     
     /* This works since SetBounds_ListWidget copies the content
      * if the SDL_Rect *
@@ -2089,16 +2144,17 @@ void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
 	return;
     }
     
-    if (wid_info->masque) {
+    if (wid_info->content) {
     	pos = ((ScrollbarWidget *)(wid_info->scroller->wid_info))->pos;
     	bounds.y = widget->bounds.y - pos*(wid_info->content->bounds.h);
     	bounds.h = wid_info->content->bounds.h;
-	((ScrollbarWidget *)(wid_info->scroller->wid_info))->size = MIN(((GLfloat)widget->bounds.h)/((GLfloat)bounds.h),1.0f);
+	
+	ScrollbarWidget_SetSlideSize(wid_info->scroller,MIN(((GLfloat)widget->bounds.h)/((GLfloat)bounds.h),1.0f));
 	
     	bounds.w = widget->bounds.w - wid_info->scroller->bounds.w;
     	bounds.x = widget->bounds.x;
     
-    	SetBounds_GLWidget(wid_info->masque,&bounds);
+    	SetBounds_GLWidget(wid_info->content,&bounds);
     }
 }
 
@@ -2129,6 +2185,14 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
     tmp->bounds.h   	= 0;
     tmp->SetBounds  	= SetBounds_ScrollPaneWidget;
     
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->masque = Init_EmptyBaseGLWidget()))
+    	) {
+	error("Init_ScrollPaneWidget: Failed to init masque!");
+	Close_Widget(&(wid_info->scroller));
+	Close_Widget(&tmp);
+    	return NULL;
+    }
+    
     if ( !AppendGLWidgetList(&(tmp->children),
     	    (wid_info->scroller = Init_ScrollbarWidget(false,0.0f,1.0f,SB_VERTICAL
 	    	    	    	    ,ScrollPaneWidget_poschange,tmp)))
@@ -2138,17 +2202,11 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
     	return NULL;
     }
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->masque = Init_EmptyBaseGLWidget()))
-    	) {
-	error("Init_ScrollPaneWidget: Failed to init masque!");
-	Close_Widget(&(wid_info->scroller));
-	Close_Widget(&tmp);
-    	return NULL;
-    }
-    
     if (wid_info->content) {
     	if ( !AppendGLWidgetList(&(wid_info->masque->children),wid_info->content) ) {
 	    error("Init_ScrollPaneWidget: Failed to adopt the content to the masque!");
+	    Close_Widget(&tmp);
+    	    return NULL;
     	}
     
         tmp->bounds.w = wid_info->content->bounds.w;
@@ -2314,52 +2372,41 @@ GLWidget *Init_MainWidget( font_data *font )
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
-void ConfMenu_poschange( GLfloat pos , void *data );
 void Paint_ConfMenuWidget( GLWidget *widget );
-void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b );
-
-void ConfMenu_poschange( GLfloat pos , void *data )
-{
-    GLWidget *widget;
-    ConfMenuWidget *wid_info;
-    SDL_Rect bounds;
-    GLWidget *curr;
-    
-    if ( !data ) {
-        error("NULL data to ConfMenu_poschange!");
-	return;
-    }
-    widget = (GLWidget *)data;
-    wid_info = ((ConfMenuWidget *)(widget->wid_info));
-
-    curr = widget->children->children;
-    bounds.y = widget->bounds.y+5 - pos*(wid_info->list_height);
-    while (curr) {
-    	if (curr != wid_info->scrollbar) {
-    	    bounds.x = curr->bounds.x;
-    	    bounds.w = curr->bounds.w;
-    	    bounds.h = curr->bounds.h;
-    	    SetBounds_GLWidget(curr,&bounds);
-	    bounds.y += bounds.h;
-	}
-	curr = curr->next;
-    }
-    
-}
 
 void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
 {
+    ConfMenuWidget *wid_info;
+    SDL_Rect bounds;
+    
     if (!widget ) {
-    	error("tried to change bounds on NULL ConfMenuWidget!");
+    	error("SetBounds_ConfMenuWidget: tried to change bounds on NULL ConfMenuWidget!");
+	return;
+    }
+    if ( widget->WIDGET != CONFMENUWIDGET ) {
+    	error("SetBounds_ConfMenuWidget: Wrong widget type! [%i]",widget->WIDGET);
+	return;
+    }
+    if (!(wid_info = (ConfMenuWidget *)(widget->wid_info))) {
+    	error("SetBounds_ConfMenuWidget: wid_info missing!");
 	return;
     }
     if (!b ) {
-    	error("tried to set NULL bounds on ConfMenuWidget!");
+    	error("SetBounds_ConfMenuWidget: tried to set NULL bounds on ConfMenuWidget!");
 	return;
     }
-    /*widget->bounds.x = b->x;
-    widget->bounds.y = b->y;*/
-    /*not resizable atm*/
+        
+    bounds.x = b->x;
+    bounds.y = b->y;
+    bounds.w = b->w;
+    bounds.h = b->h;
+    
+    widget->bounds.x = b->x;
+    widget->bounds.y = b->y;
+    widget->bounds.w = b->w;
+    widget->bounds.h = b->h;
+    
+    SetBounds_GLWidget(wid_info->scrollpane,&bounds);
 }
 
 void Paint_ConfMenuWidget( GLWidget *widget )
@@ -2368,7 +2415,7 @@ void Paint_ConfMenuWidget( GLWidget *widget )
     int bgColor = 0x0000ff88;
 
     if (!widget ) {
-    	error("tried to paint NULL ConfMenuWidget!");
+    	error("tPaint_ConfMenuWidget: tried to paint NULL ConfMenuWidget!");
 	return;
     }
     glEnable(GL_BLEND);
@@ -2394,13 +2441,11 @@ void Paint_ConfMenuWidget( GLWidget *widget )
 
 GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
 {
-    GLWidget *tmp;
+    GLWidget *tmp, *item, *dummy, *list;
     ConfMenuWidget *wid_info;
     SDL_Rect bounds;
-    int i, itemwidth = 0;
+    int i;
     xp_option_t *opt;
-    GLWidget *item;
-    GLWidget *curr;
 
     tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
@@ -2416,62 +2461,59 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
     wid_info = ((ConfMenuWidget *)(tmp->wid_info));
     
     tmp->WIDGET     	= CONFMENUWIDGET;
-    tmp->bounds.x   	= x;
-    tmp->bounds.y   	= y;
     tmp->Draw	    	= Paint_ConfMenuWidget;
     tmp->SetBounds  	= SetBounds_ConfMenuWidget;
     
-    /* Lets make an empty widget to hold the kids */
-    tmp->children	= Init_EmptyBaseGLWidget();
-    if ( !(tmp->children) ) {
+    dummy = Init_EmptyBaseGLWidget();
+    if ( !dummy ) {
         error("Failed to malloc in Init_ConfMenu");
 	return NULL;
     }
-    wid_info->list_height=0;
+    
     for ( i=0 ; i < num_options; ++i ) {
     	opt = Option_by_index(i);
 	item = Init_OptionWidget(font,opt);
 	if (item) {
-	    AppendGLWidgetList( &(tmp->children->children), item );
-	    if (item->bounds.w > itemwidth) itemwidth = item->bounds.w;
-	    (wid_info->list_height) += item->bounds.h;
+	    AppendGLWidgetList( &(dummy->next), item );
 	}
-    }
-    tmp->bounds.h   	= MIN((wid_info->list_height)+10,512);
-    tmp->children->bounds.h = tmp->bounds.h - 10;
-    tmp->children->bounds.x = bounds.x = tmp->bounds.x+5;
-    tmp->children->bounds.y = bounds.y = tmp->bounds.y+5;
-    bounds.w = itemwidth;
-    curr = tmp->children->children;
-    while (curr) {
-    	bounds.h = curr->bounds.h;
-    	SetBounds_GLWidget(curr,&bounds);
-	bounds.y += bounds.h;
-	curr = curr->next;
-    }
-    
-    if ( (wid_info->list_height) > tmp->bounds.h - 10) {
-    	wid_info->scrollbar = Init_ScrollbarWidget(false,0.0f, ((float)(tmp->bounds.h-10))/((float)(wid_info->list_height)), SB_VERTICAL, ConfMenu_poschange, tmp );
-    	if (wid_info->scrollbar) {
-	    bounds.x = tmp->bounds.x + 5 + itemwidth;
-	    bounds.y = tmp->bounds.y + 5;
-	    bounds.h = tmp->bounds.h - 10;
-	    bounds.w = wid_info->scrollbar->bounds.w;
-	    tmp->bounds.w = wid_info->scrollbar->bounds.w + 10 + itemwidth;
-	    SetBounds_GLWidget(wid_info->scrollbar,&bounds);
-	    AppendGLWidgetList( &(tmp->children->children), wid_info->scrollbar );
-	} else {
-	    error("Failed to make a scrollbar for Init_ConfMenu\n");
-	    Close_Widget(&tmp);
-	    return NULL;
-	}
-    } else {
-    	wid_info->scrollbar = NULL;
-    	tmp->bounds.w = itemwidth +10;
     }
 
-    tmp->children->bounds.w = tmp->bounds.w - 10;
+    if (!dummy) {
+    	error("Init_ConfMenuWidget: Couldn't make dummy!");
+	Close_Widget(&tmp);
+	return NULL;
+    }
+
+    if (!(list = Init_ListWidget(0,0,&nullRGBA,&nullRGBA,LW_DOWN,LW_RIGHT,false))) {
+    	error("Init_ConfMenuWidget: Couldn't make the list widget!");
+	Close_WidgetTree(&(dummy->next));
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    
+    ListWidget_Append(list,dummy->next);
+
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->scrollpane = Init_ScrollPaneWidget(list))) ) {
+    	error("Init_ConfMenuWidget: Couldn't make the scrollpane!");
+	Close_WidgetTree(&dummy);
+	Close_Widget(&tmp);
+	return NULL;
+    }
+    
+    Close_Widget(&dummy);
    
+    tmp->bounds.x   	= x;
+    tmp->bounds.y   	= y;
+    tmp->bounds.w   	= wid_info->scrollpane->bounds.w+2;
+    tmp->bounds.h   	= 512;
+    
+    bounds.x = tmp->bounds.x + 1;
+    bounds.y = tmp->bounds.y + 1;
+    bounds.w = tmp->bounds.w - 2;
+    bounds.h = tmp->bounds.h - 2;
+    
+    SetBounds_GLWidget(wid_info->scrollpane,&bounds);
+       
     return tmp;
 }
 /***********************/

@@ -1,7 +1,7 @@
 /*
  * XPilotNG/SDL, an SDL/OpenGL XPilot client.
  *
- * Copyright (C) 2003-2004 Erik Andersson <maximan@users.sourceforge.net>
+ * Copyright (C) 2003-2004 Erik Andersson <deity_at_home.se>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -160,6 +160,8 @@ typedef struct {
 } ScrollbarWidget;
 GLWidget *Init_ScrollbarWidget( bool locked, GLfloat pos, GLfloat size,ScrollWidget_dir_t dir,
     	    	    	    	void (*poschange)( GLfloat pos , void *data), void *data );
+
+void ScrollbarWidget_SetSlideSize( GLWidget *widget, GLfloat size );
 /*************************/
 /* End:  ScrollbarWidget */
 /*************************/
@@ -260,7 +262,7 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt );
 /**********************/
 /* Begin: ListWidget  */
 /**********************/
-typedef enum {LW_UP, LW_DOWN} ListWidget_ver_dir_t;
+typedef enum {LW_DOWN, LW_UP} ListWidget_ver_dir_t;
 typedef enum {LW_RIGHT, LW_LEFT} ListWidget_hor_dir_t;
 #define LISTWIDGET 8
 typedef struct {
@@ -357,8 +359,7 @@ GLWidget *Init_MainWidget( font_data *font );
 /**************************/
 #define CONFMENUWIDGET 12
 typedef struct {
-    int     	list_height;
-    GLWidget	*scrollbar;
+    GLWidget	*scrollpane;
 } ConfMenuWidget;
 
 GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );

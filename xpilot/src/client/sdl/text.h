@@ -1,7 +1,7 @@
 /*
  * XPilotNG/SDL, an SDL/OpenGL XPilot client.
  *
- * Copyright (C) 2003-2004  Erik Andersson <maximan@users.sourceforge.net>
+ * Copyright (C) 2003-2004  Erik Andersson <deity_at_home.se>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,7 +130,6 @@ name_tex_t *others_name_texs;*/
 
 #define MAX_METERS 12
 extern string_tex_t meter_texs[];
-extern string_tex_t message_texs[];
 #define MAX_HUD_TEXS 10 
 extern string_tex_t HUD_texs[];
 #endif

@@ -4,7 +4,7 @@
  * Copyright (C) 2003-2004 by 
  *
  *      Juha Lindström       <juhal@users.sourceforge.net>
- *      Erik Andersson       <maximan@users.sourceforge.net>
+ *      Erik Andersson       <deity_at_home.se>
  *
  * Copyright (C) 1991-2002 by
  *

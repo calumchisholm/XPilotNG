@@ -4,7 +4,7 @@
  * Copyright (C) 2003-2004 by 
  *
  *      Juha Lindström       <juhal@users.sourceforge.net>
- *      Erik Andersson       <maximan@users.sourceforge.net>
+ *      Erik Andersson       <deity_at_home.se>
  *      Darel Cullen         <darelcullen@users.sourceforge.net>
  *
  * Copyright (C) 1991-2002 by
@@ -253,8 +253,6 @@ int Paint_init(void)
     	score_object_texs[i].texture = 0;
     for (i=0;i<MAX_METERS;++i)
     	meter_texs[i].texture = 0;
-    for (i=0;i<2*MAX_MSGS;++i)
-    	message_texs[i].texture = 0;
     
     scoresChanged = 1;
     players_exposed = true;
@@ -272,8 +270,6 @@ void Paint_cleanup(void)
     	if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
     for (i=0;i<MAX_METERS;++i)
     	if (meter_texs[i].texture) free_string_texture(&meter_texs[i]);
-    for (i=0;i<2*MAX_MSGS;++i)
-    	if (message_texs[i].texture) free_string_texture(&message_texs[i]);
 }
 
 /* This one works best for things that are fixed in position
