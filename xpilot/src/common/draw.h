@@ -112,7 +112,7 @@ typedef struct {
     int		num_orig_points;	/* points before SSHACK */
     shapepos	cashed_pts[MAX_SHIP_PTS2];
     int		cashed_dir;
-} shape;
+} shape_t;
 
 typedef struct {			/* Defines wire-obj, i.e. ship */
     shapepos	*pts[MAX_SHIP_PTS2];	/* the shape rotated many ways */
@@ -143,43 +143,43 @@ typedef struct {			/* Defines wire-obj, i.e. ship */
     char*	name;
     char*	author;
 #endif
-} shipobj;
+} shipshape_t;
 
-extern shipobj *Default_ship(void);
-extern void Free_ship_shape(shipobj *ship);
-extern shipobj *Parse_shape_str(char *str);
-extern shipobj *Convert_shape_str(char *str);
-extern void Calculate_shield_radius(shipobj *ship);
+extern shipshape_t *Default_ship(void);
+extern void Free_ship_shape(shipshape_t *ship);
+extern shipshape_t *Parse_shape_str(char *str);
+extern shipshape_t *Convert_shape_str(char *str);
+extern void Calculate_shield_radius(shipshape_t *ship);
 extern int Validate_shape_str(char *str);
-extern void Convert_ship_2_string(shipobj *ship, char *buf, char *ext,
+extern void Convert_ship_2_string(shipshape_t *ship, char *buf, char *ext,
 				  unsigned shape_version);
 extern void Rotate_point(shapepos pt[RES]);
 extern void Rotate_position(position pt[RES]);
 extern shapepos ipos2shapepos(ipos pos);
 extern position shapepos2position(shapepos pt);
-extern shapepos *Shape_get_points(shape *s, int dir);
+extern shapepos *Shape_get_points(shape_t *s, int dir);
 
-shapepos Ship_get_point(shipobj *ship, int i, int dir);
-shapepos Ship_get_engine(shipobj *ship, int dir);
-shapepos Ship_get_m_gun(shipobj *ship, int dir);
-shapepos Ship_get_l_gun(shipobj *ship, int gun, int dir);
-shapepos Ship_get_r_gun(shipobj *ship, int gun, int dir);
-shapepos Ship_get_l_rgun(shipobj *ship, int gun, int dir);
-shapepos Ship_get_r_rgun(shipobj *ship, int gun, int dir);
-shapepos Ship_get_l_light(shipobj *ship, int l, int dir);
-shapepos Ship_get_r_light(shipobj *ship, int l, int dir);
-shapepos Ship_get_m_rack(shipobj *ship, int rack, int dir);
+shapepos Ship_get_point(shipshape_t *ship, int i, int dir);
+shapepos Ship_get_engine(shipshape_t *ship, int dir);
+shapepos Ship_get_m_gun(shipshape_t *ship, int dir);
+shapepos Ship_get_l_gun(shipshape_t *ship, int gun, int dir);
+shapepos Ship_get_r_gun(shipshape_t *ship, int gun, int dir);
+shapepos Ship_get_l_rgun(shipshape_t *ship, int gun, int dir);
+shapepos Ship_get_r_rgun(shipshape_t *ship, int gun, int dir);
+shapepos Ship_get_l_light(shipshape_t *ship, int l, int dir);
+shapepos Ship_get_r_light(shipshape_t *ship, int l, int dir);
+shapepos Ship_get_m_rack(shipshape_t *ship, int rack, int dir);
 
-position Ship_get_point_position(shipobj *ship, int i, int dir);
-position Ship_get_engine_position(shipobj *ship, int dir);
-position Ship_get_m_gun_position(shipobj *ship, int dir);
-position Ship_get_l_gun_position(shipobj *ship, int gun, int dir);
-position Ship_get_r_gun_position(shipobj *ship, int gun, int dir);
-position Ship_get_l_rgun_position(shipobj *ship, int gun, int dir);
-position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir);
-position Ship_get_l_light_position(shipobj *ship, int l, int dir);
-position Ship_get_r_light_position(shipobj *ship, int l, int dir);
-position Ship_get_m_rack_position(shipobj *ship, int rack, int dir);
+position Ship_get_point_position(shipshape_t *ship, int i, int dir);
+position Ship_get_engine_position(shipshape_t *ship, int dir);
+position Ship_get_m_gun_position(shipshape_t *ship, int dir);
+position Ship_get_l_gun_position(shipshape_t *ship, int gun, int dir);
+position Ship_get_r_gun_position(shipshape_t *ship, int gun, int dir);
+position Ship_get_l_rgun_position(shipshape_t *ship, int gun, int dir);
+position Ship_get_r_rgun_position(shipshape_t *ship, int gun, int dir);
+position Ship_get_l_light_position(shipshape_t *ship, int l, int dir);
+position Ship_get_r_light_position(shipshape_t *ship, int l, int dir);
+position Ship_get_m_rack_position(shipshape_t *ship, int rack, int dir);
 
 #ifdef SERVER
 
@@ -196,15 +196,15 @@ position Ship_get_m_rack_position(shipobj *ship, int rack, int dir);
 
 #endif
 
-void Ship_set_point(shipobj *ship, int i, ipos pos);
-void Ship_set_engine(shipobj *ship, ipos pos);
-void Ship_set_m_gun(shipobj *ship, ipos pos);
-void Ship_set_l_gun(shipobj *ship, int i, ipos pos);
-void Ship_set_r_gun(shipobj *ship, int i, ipos pos);
-void Ship_set_l_rgun(shipobj *ship, int i, ipos pos);
-void Ship_set_r_rgun(shipobj *ship, int i, ipos pos);
-void Ship_set_l_light(shipobj *ship, int i, ipos pos);
-void Ship_set_r_light(shipobj *ship, int i, ipos pos);
-void Ship_set_m_rack(shipobj *ship, int i, ipos pos);
+void Ship_set_point(shipshape_t *ship, int i, ipos pos);
+void Ship_set_engine(shipshape_t *ship, ipos pos);
+void Ship_set_m_gun(shipshape_t *ship, ipos pos);
+void Ship_set_l_gun(shipshape_t *ship, int i, ipos pos);
+void Ship_set_r_gun(shipshape_t *ship, int i, ipos pos);
+void Ship_set_l_rgun(shipshape_t *ship, int i, ipos pos);
+void Ship_set_r_rgun(shipshape_t *ship, int i, ipos pos);
+void Ship_set_l_light(shipshape_t *ship, int i, ipos pos);
+void Ship_set_r_light(shipshape_t *ship, int i, ipos pos);
+void Ship_set_m_rack(shipshape_t *ship, int i, ipos pos);
 
 #endif

@@ -992,7 +992,7 @@ other_t *Other_by_name(char *name)
 }
 #endif
 
-shipobj *Ship_by_id(int id)
+shipshape_t *Ship_by_id(int id)
 {
     other_t		*other;
 

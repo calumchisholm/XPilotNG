@@ -730,7 +730,7 @@ static void Robot_create(void)
 
     Init_player(NumPlayers, (allowShipShapes)
 			    ? Parse_shape_str(rob->shape)
-			    : (shipobj *)NULL);
+			    : (shipshape_t *)NULL);
     robot = Players(NumPlayers);
     SET_BIT(robot->type_ext, OBJ_EXT_ROBOT);
     robot->robot_data_ptr = new_data;

@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -37,7 +36,7 @@
 #endif
 
 #ifndef DRAW_H
-/* need shipobj. */
+/* need shipshape_t. */
 #include "draw.h"
 #endif
 
@@ -120,7 +119,7 @@ typedef struct {
     char		*real;			/* real login name of player */
     char		*nick;			/* nickname of player */
     char		*dpy;			/* display of player */
-    shipobj		*ship;			/* ship shape of player */
+    shipshape_t		*ship;			/* ship shape of player */
     char		*addr;			/* address of players host */
     char		*host;			/* hostname of players host */
     int			rectype;		/* normal/saved/spectator */

@@ -41,7 +41,7 @@
 #include "bit.h"
 #endif
 #ifndef DRAW_H
-/* need shipobj */
+/* need shipshape_t */
 #include "draw.h"
 #endif
 #ifndef ITEM_H
@@ -507,7 +507,7 @@ struct player {
     DFLOAT	score;			/* Current score of player */
     DFLOAT	prev_score;		/* Last score that has been updated */
     int		prev_life;		/* Last life that has been updated */
-    shipobj	*ship;			/* wire model of ship shape */
+    shipshape_t	*ship;			/* wire model of ship shape */
     DFLOAT	power;			/* Force of thrust */
     DFLOAT	power_s;		/* Saved power fiks */
     DFLOAT	turnspeed_s;		/* Saved turnspeed */

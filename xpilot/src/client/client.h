@@ -36,7 +36,7 @@
 
 
 #ifndef DRAW_H
-/* need shipobj */
+/* need shipshape_t */
 #include "draw.h"
 #endif
 #ifndef ITEM_H
@@ -120,7 +120,7 @@ typedef struct {
     short	war_id;
     short	name_width;	/* In pixels */
     short	name_len;	/* In bytes */
-    shipobj	*ship;
+    shipshape_t	*ship;
     char	name[MAX_CHARS];
     char	real[MAX_CHARS];
     char	host[MAX_CHARS];
@@ -389,7 +389,7 @@ int Check_pos_by_index(int ind, int *xp, int *yp);
 int Check_index_by_pos(int x, int y);
 other_t *Other_by_id(int id);
 other_t *Other_by_name(char *name, bool show_error_msg);
-shipobj *Ship_by_id(int id);
+shipshape_t *Ship_by_id(int id);
 int Handle_leave(int id);
 int Handle_player(int id, int team, int mychar, char *player_name,
 		  char *real_name, char *host_name, char *shape,

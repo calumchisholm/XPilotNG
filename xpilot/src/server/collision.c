@@ -413,7 +413,7 @@ static void PlayerCollision(void)
 		    {
 			/* The ball might already be inside the team's ball
 			 * target. */
-			extern shape ball_wire;
+			extern shape_t ball_wire;
 			group = shape_is_inside(ball->pos.cx,
 						ball->pos.cy,
 						BALL_BIT | HITMASK(pl->team),

@@ -81,7 +81,7 @@ void Move_player(player *pl);
 void Turn_player(player *pl);
 int is_inside(int x, int y, int hitmask, const object *obj);
 int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
-		    const shape *s, int dir);
+		    const shape_t *s, int dir);
 int Polys_to_client(unsigned char **);
 void Ball_line_init(void);
 void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt);
@@ -311,7 +311,7 @@ void Player_add_tank(player *pl, long tank_fuel);
 void Player_remove_tank(player *pl, int which_tank);
 void Player_hit_armor(player *pl);
 void Player_used_kill(player *pl);
-int Init_player(int ind, shipobj *ship);
+int Init_player(int ind, shipshape_t *ship);
 void Alloc_players(int number);
 void Free_players(void);
 void Update_score_table(void);

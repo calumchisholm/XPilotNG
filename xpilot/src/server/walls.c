@@ -107,7 +107,7 @@ struct test {
 
 struct test *temparray;
 
-shape ball_wire;
+shape_t ball_wire;
 
 #define LINEY(X, Y, BASE, ARG)  (((Y)*(ARG)+(BASE))/(X))
 #define SIDE(X, Y, LINE) (linet[(LINE)].delta.cy * (X) - linet[(LINE)].delta.cx * (Y))
@@ -618,11 +618,11 @@ static void *ralloc(void *ptr, size_t size)
     return ptr;
 }
 
-static unsigned short *Shape_lines(const shape *s, int dir)
+static unsigned short *Shape_lines(const shape_t *s, int dir)
 {
     int i;
     static unsigned short foo[100];
-    static const shape *lastshape;
+    static const shape_t *lastshape;
     static int lastdir;
     const int os = num_lines;
     shapepos *pts;
@@ -635,7 +635,7 @@ static unsigned short *Shape_lines(const shape *s, int dir)
     lastshape = s;
     lastdir = dir;
 
-    pts = Shape_get_points((shape *)s, dir);
+    pts = Shape_get_points((shape_t *)s, dir);
     for (i = 0; i < s->num_points; i++) {
 	clpos pt = pts[i].clk;
 
@@ -1160,7 +1160,7 @@ static void Move_point(const struct move *move, struct collans *answer)
  * For example, there's no need to consider all the points
  * separately if the shape is not close to a wall.
  */
-static void Shape_move(const struct move *move, const shape *s,
+static void Shape_move(const struct move *move, const shape_t *s,
 		       int dir, struct collans *answer)
 {
     int minline, mindone, minheight, minpoint;
@@ -1204,7 +1204,7 @@ static void Shape_move(const struct move *move, const shape *s,
     minline = -1;
     minpoint = -1;
 
-    pts = Shape_get_points((shape *)s, dir);
+    pts = Shape_get_points((shape_t *)s, dir);
     for (i = 0; i < s->num_points; i++) {
 	clpos pt = pts[i].clk;
 
@@ -1296,7 +1296,7 @@ static void Shape_move(const struct move *move, const shape *s,
  * not explicitly constructed in the algorithm). Return the number of a group
  * that would be hit during morphing or NO_GROUP if there is enough room. */
 /* This might be useful elsewhere in the code, need not be kept static */
-static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
+static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
 		       int dir2, int hitmask, const object *obj, int x, int y)
 {
     struct collans answer;
@@ -1308,8 +1308,8 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
     mv.hitmask = hitmask;
     mv.obj = OBJ_PTR(obj);
-    /*pts1 = Shape_get_points((shape *)shape1, dir1);
-      pts2 = Shape_get_points((shape *)shape2, dir2);*/
+    /*pts1 = Shape_get_points((shape_t *)shape1, dir1);
+      pts2 = Shape_get_points((shape_t *)shape2, dir2);*/
 
     /* kps - can this happen ?? */
     if (shape1->num_points != shape2->num_points)
@@ -1323,8 +1323,8 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
 	  ptx1 = pts1[i].clk;
 	  ptx2 = pts2[i].clk;*/
-	pt1 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
-	pt2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
+	pt1 = Ship_get_point_clpos((shipshape_t *)shape1, i, dir1);
+	pt2 = Ship_get_point_clpos((shipshape_t *)shape2, i, dir2);
 
 	/*assert(ptx1.cx == pt1.cx);
 	  assert(ptx1.cy == pt1.cy);
@@ -1360,8 +1360,10 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
 	/*pto1 = pts1[num_points - 1].clk;
 	  ptn1 = pts2[num_points - 1].clk;*/
-	pto1 = Ship_get_point_clpos((shipobj *)shape1, num_points - 1, dir1);
-	ptn1 = Ship_get_point_clpos((shipobj *)shape2, num_points - 1, dir2);
+	pto1 = Ship_get_point_clpos(
+	    (shipshape_t *)shape1, num_points - 1, dir1);
+	ptn1 = Ship_get_point_clpos(
+	    (shipshape_t *)shape2, num_points - 1, dir2);
 
 	xo1 = pto1.cx - xp;
 	yo1 = pto1.cy - yp;
@@ -1374,8 +1376,8 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
 
 	    /*pto2 = pts1[i].clk;
 	      ptn2 = pts2[i].clk;*/
-	    pto2 = Ship_get_point_clpos((shipobj *)shape1, i, dir1);
-	    ptn2 = Ship_get_point_clpos((shipobj *)shape2, i, dir2);
+	    pto2 = Ship_get_point_clpos((shipshape_t *)shape1, i, dir1);
+	    ptn2 = Ship_get_point_clpos((shipshape_t *)shape2, i, dir2);
 
 	    xo2 = pto2.cx - xp;
 	    yo2 = pto2.cy - yp;
@@ -1599,7 +1601,7 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 
 /* Move a shape away from a line after a collision. Needed for the same
  * reason as Away(). */
-static int Shape_away(struct move *move, const shape *s,
+static int Shape_away(struct move *move, const shape_t *s,
 		      int dir, int line, struct collans *ans)
 {
     int dx, dy;
@@ -1833,10 +1835,10 @@ int is_inside(int cx, int cy, int hitmask, const object *obj)
 /* Similar to the above, except check whether any part of the shape
  * (edge or inside) would hit the group. */
 int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
-		    const shape *s, int dir)
+		    const shape_t *s, int dir)
 {
     static shapepos zeropos;
-    static shape zeroshape;
+    static shape_t zeroshape;
     int i, group;
 
     /* Implemented by first checking whether the middle point of the
@@ -2752,7 +2754,7 @@ void Move_player(player *pl)
 	mv.start.cx = pl->pos.cx;
 	mv.start.cy = pl->pos.cy;
 	while (mv.delta.cx || mv.delta.cy) {
-	    Shape_move(&mv, (shape *)pl->ship, pl->dir, &ans);
+	    Shape_move(&mv, (shape_t *)pl->ship, pl->dir, &ans);
 	    mv.start.cx = WRAP_XCLICK(mv.start.cx + ans.moved.cx);
 	    mv.start.cy = WRAP_YCLICK(mv.start.cy + ans.moved.cy);
 	    mv.delta.cx -= ans.moved.cx;
@@ -2763,7 +2765,8 @@ void Move_player(player *pl)
 		    if (BIT(pl->status, KILLED))
 			break;
 		}
-		else if (!Shape_away(&mv, (shape *)pl->ship, pl->dir, ans.line, &ans)) {
+		else if (!Shape_away(&mv, (shape_t *)pl->ship, pl->dir,
+				     ans.line, &ans)) {
 		    if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 			Bounce_player(pl, &mv, ans.line, ans.point);
 			if (BIT(pl->status, KILLED))
@@ -2826,7 +2829,7 @@ void Turn_player(player *pl)
 
     while (pl->dir != new_dir) {
 	next_dir = MOD2(pl->dir + sign, RES);
-	if (Shape_morph((shape *)pl->ship, pl->dir, (shape *)pl->ship,
+	if (Shape_morph((shape_t *)pl->ship, pl->dir, (shape_t *)pl->ship,
 			next_dir, hitmask, OBJ_PTR(pl),
 			pl->pos.cx, pl->pos.cy) != NO_GROUP) {
 	    if (!maraTurnqueue)

@@ -355,7 +355,7 @@ static void Player_init_fuel(player *pl, long total_fuel)
     }
 }
 
-int Init_player(int ind, shipobj *ship)
+int Init_player(int ind, shipshape_t *ship)
 {
     player		*pl = Players(ind);
     bool		too_late = false;
@@ -388,7 +388,7 @@ int Init_player(int ind, shipobj *ship)
     if (allowShipShapes && ship)
 	pl->ship = ship;
     else {
-	shipobj *tryship = Parse_shape_str(defaultShipShape);
+	shipshape_t *tryship = Parse_shape_str(defaultShipShape);
 
 	if (tryship)
 	    pl->ship = tryship;

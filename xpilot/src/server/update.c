@@ -124,8 +124,8 @@ void Phasing(player *pl, bool on)
 	sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
 	/* kps - ok to have this check here ? */
 	if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-				     OBJ_PTR(pl), (shape *)pl->ship, pl->dir))
-	    != NO_GROUP)
+				     OBJ_PTR(pl), (shape_t *)pl->ship,
+				     pl->dir)) != NO_GROUP)
 	    /* kps - check for crashes against targets etc ??? */
 	    Player_crash(pl, CrashWall, NO_IND, 0);
     }
