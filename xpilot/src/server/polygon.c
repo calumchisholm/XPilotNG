@@ -89,6 +89,14 @@ static int current_estyle, current_group, is_decor;
 /* !@# add a final realloc later to free wasted memory */
 
 
+static void Check_groupcount(void)
+{
+    if (current_group == 1000) {
+	warn("Server didn't allocate enough space for groups");
+	exit(1);
+    }
+}
+
 void P_edgestyle(char *id, int width, int color, int style)
 {
     if (num_estyles > 255) {
@@ -217,6 +225,7 @@ void P_end_polygon(void)
 int P_start_ballarea(void)
 {
     current_group = ++num_groups;
+    Check_groupcount();
     groups[current_group].type = TREASURE;
     groups[current_group].team = TEAM_NOT_SET;
     groups[current_group].hit_mask = BALL_BIT;
@@ -233,6 +242,7 @@ void P_end_ballarea(void)
 int P_start_balltarget(int team)
 {
     current_group = ++num_groups;
+    Check_groupcount();
     groups[current_group].type = TREASURE;
     groups[current_group].team = team;
     groups[current_group].hit_mask = NONBALL_BIT;
@@ -252,6 +262,7 @@ int P_start_target(int team, int ind)
     target_t *targ = &World.targets[ind];
 
     current_group = ++num_groups;
+    Check_groupcount();
     groups[current_group].type = TARGET;
     groups[current_group].team = team;
     groups[current_group].hit_mask = Target_hitmask(targ);
@@ -271,6 +282,7 @@ int P_start_cannon(int team, int ind)
     cannon_t *cannon = &World.cannon[ind];
 
     current_group = ++num_groups;
+    Check_groupcount();
     groups[current_group].type = CANNON;
     groups[current_group].team = team;
     groups[current_group].hit_mask = Cannon_hitmask(cannon);
@@ -288,6 +300,7 @@ void P_end_cannon(void)
 int P_start_wormhole(int ind)
 {
     current_group = ++num_groups;
+    Check_groupcount();
     groups[current_group].type = WORMHOLE;
     groups[current_group].team = TEAM_NOT_SET;
     groups[current_group].hit_mask = 0;
@@ -304,6 +317,7 @@ void P_end_wormhole(void)
 int P_start_frictionarea(void)
 {
     current_group = ++num_groups;
+    Check_groupcount();
     groups[current_group].type = FRICTION;
     groups[current_group].team = TEAM_NOT_SET;
     groups[current_group].hit_mask = 0xFFFFFFFF; /* kps - hack */
