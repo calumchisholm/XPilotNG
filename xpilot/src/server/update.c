@@ -921,8 +921,36 @@ static void Update_players(world_t *world)
 		Traverse_wormhole(pl);
 	}
 
-	update_object_speed(world, OBJ_PTR(pl));
-	Move_player(pl);
+	
+	{
+	    double ax = pl->acc.x;
+	    double ay = pl->acc.y;
+	    if (BIT(pl->status, GRAVITY)) {
+		vector_t gravity = World_gravity(world, pl->pos);
+		ax += gravity.x;
+		ay += gravity.y;
+	    }
+	    ax *= timeStep / 2;
+	    ay *= timeStep / 2;
+	    pl->vel.x += ax;
+	    pl->vel.y += ay;
+	    if (options.constantSpeed) {
+		pl->vel.x += options.constantSpeed * pl->acc.x;
+		pl->vel.y += options.constantSpeed * pl->acc.y;
+		Move_player(pl);
+		/* Bounces aren't really compatible with constant speed.
+		 * I guess this behaviour is as good as any.
+		 * Doesn't work right with stuff like friction. */
+		if (pl->last_wall_touch != frame_loops) { /* no bounce */
+		    pl->vel.x -= options.constantSpeed * pl->acc.x;
+		    pl->vel.y -= options.constantSpeed * pl->acc.y;
+		}
+	    }
+	    else
+		Move_player(pl);
+	    pl->vel.x += ax;
+	    pl->vel.y += ay;
+	}
 
 	/*
 	 * kps - hack to measure distance travelled, use e.g. with

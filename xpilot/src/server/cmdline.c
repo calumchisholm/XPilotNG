@@ -3483,6 +3483,21 @@ static option_desc opts[] = {
 	"Enable improved precision steering and aiming of main gun.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+    {
+	"constantSpeed",
+	"constantSpeed",
+	0,
+	&options.constantSpeed,
+	valReal,
+	tuner_dummy,
+	"Make ship move forward at a constant speed when thrust key is held\n"
+	"down, in addition to the normal acceleration. The constant speed\n"
+	"is proportional to the product of the acceleration of the ship\n"
+	"(varying with ship mass and afterburners) and the value of this\n"
+	"option. Note that this option is quite unphysical and can using it\n"
+	"can cause weird effects (with bounces for example).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
     { /* kps - temp hack to disable ball styles during runtime */
 	"ballStyles",
 	"ballStyles",

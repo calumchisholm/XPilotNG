@@ -390,6 +390,7 @@ extern struct options {
     double	gameSpeed;
     bool	maraTurnqueue;
     bool	ngControls;
+    double	constantSpeed;
     bool	ballStyles;
     bool	ignoreMaxFPS;
     bool	polygonMode;
