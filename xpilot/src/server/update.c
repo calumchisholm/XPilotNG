@@ -826,8 +826,9 @@ static void Update_players(world_t *world)
 	    pl->recovery_count -= timeStep;
 	    if (pl->recovery_count <= 0) {
 		/* Player has recovered. */
+		/* kps - unless he was killed on last life ... */
 		pl->recovery_count = 0;
-		Player_set_state(pl, PL_STATE_ALIVE);
+		SET_BIT(pl->pl_status, PLAYING);
 		Go_home(pl); 
 	    }
 	    else {
