@@ -514,7 +514,7 @@ setup_t *Xpmap_init_setup(world_t *world);
 void Xpmap_print(void);
 void Xpmap_grok_map_data(world_t *world);
 void Xpmap_allocate_checks(world_t *world);
-void Xpmap_tags_to_internal_data(world_t *world, bool create_objects);
+void Xpmap_tags_to_internal_data(world_t *world);
 void Xpmap_find_map_object_teams(world_t *world);
 void Xpmap_find_base_direction(world_t *world);
 void Xpmap_blocks_to_polygons(world_t *world);
