@@ -53,6 +53,11 @@ Task:
 Developer:
 
 Task:
+  Rewrite options.c so that it does not use X resources. This would be a 
+  useful feature in the X client as well.
+Developer: kps
+
+Task:
   Add more tasks here.
 
 
