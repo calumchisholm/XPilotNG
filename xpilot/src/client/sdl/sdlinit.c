@@ -38,13 +38,9 @@ int Init_playing_windows(void)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glViewport(0, 0, draw_width, draw_height);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(0, draw_width, draw_height, 0, -1, 1);
+    glOrtho(0, draw_width, 0, draw_height, -1, 1);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity(); 
 
-    /* Use alpha blending */
-    /*    SDL_SetAlpha(Surface, SDL_SRCALPHA, SDL_ALPHA_TRANSPARENT);*/
-	
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
     

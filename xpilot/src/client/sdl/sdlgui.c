@@ -27,7 +27,7 @@
 #include "xpclient.h"
 #include "sdlpaint.h"
 
-int wallColor = 0x000000ff;
+int wallColor = 0xff;
 
 static void set_color(int color)
 {
@@ -185,8 +185,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     x = xoff * Setup->width;
     y = yoff * Setup->height;
 
-    glBegin(GL_LINE_STRIP);
-    glVertex2i(x, y);
+    glBegin(GL_LINE_LOOP);
     
     for (j = 0; j < polygon.num_points; j++) {
         x += polygon.points[j].x;
@@ -300,4 +299,16 @@ void Gui_paint_ships_end(void)
 void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 		    int shield, int deflector, int eshield)
 {
+    int i;
+    shipshape_t *ship;
+    shapepos    point;
+
+    ship = Ship_by_id(id);
+    set_color(0xffffff);
+    glBegin(GL_LINE_LOOP);
+    for (i = 0; i < ship->num_points; i++) {
+	point = Ship_get_point(ship, i, dir);
+	glVertex2d(x + point.pxl.x, y + point.pxl.y);
+    }
+    glEnd();
 }

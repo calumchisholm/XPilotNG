@@ -160,6 +160,10 @@ void Paint_frame(void)
 	loopsSlow++;
 	time_counter -= (1.0 / 12);
     }
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(-world.x, -world.y, 0);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -174,9 +178,9 @@ void Paint_frame(void)
 	} else
 	    Paint_objects();
 
-	/* TODO
 	Paint_shots();
 	Paint_ships();
+	/* TODO
 	Paint_meters();
 	Paint_HUD();
 	Paint_client_fps();
@@ -186,5 +190,7 @@ void Paint_frame(void)
 	Paint_score_objects();
 	*/
     }
+
+    SDL_GL_SwapBuffers();
 }
 
