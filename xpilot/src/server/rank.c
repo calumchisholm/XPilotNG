@@ -41,8 +41,13 @@ static bool Rank_parse_scorefile(FILE *file);
 static const char *xpilotscorefile = NULL;
 static rankinfo_t scores[MAX_SCORES];
 
-static int rankedplayer[MAX_SCORES];
-static double ratio[MAX_SCORES];
+typedef struct rank {
+    int ind;
+    double ratio;
+} rank_t;
+
+static rank_t rank_base[MAX_SCORES];
+
 static double sc_table[MAX_SCORES];
 static double kr_table[MAX_SCORES];
 static double kd_table[MAX_SCORES];
@@ -52,17 +57,23 @@ static bool playerstag = false;
 static int num_players = 0;
 static int rank_entries = 0;
 
-static inline void swap2(int *i1, int *i2, double *d1, double *d2)
+static int rank_cmp(const void *p1, const void *p2)
 {
-    int i;
-    double d;
+    rank_t *r1, *r2;
 
-    i = *i1;
-    d = *d1;
-    *i1 = *i2;
-    *d1 = *d2;
-    *i2 = i;
-    *d2 = d;
+    r1 = (rank_t *)p1;
+    r2 = (rank_t *)p2;
+
+    /*
+     * Function qsort(3) normally sorts array elements into ascending order.
+     * We want a descending order (greatest ratio first), that's why we
+     * tell qsort a greater ratio is less than a lesser ratio.
+     */
+    if (r1->ratio < r2->ratio)
+	return 1;
+    if (r1->ratio > r2->ratio)
+	return -1;
+    return 0;
 }
 
 static char *rank_showtime(void)
@@ -173,11 +184,11 @@ static void SortRankings(void)
 
 	for (i = 0; i < MAX_SCORES; i++) {
 	    rankinfo_t *score = &scores[i];
-	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf, rank;
+	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf;
 
-	    rankedplayer[i] = i;
+	    rank_base[i].ind = i;
 	    if (score->name[0] == '\0') {
-		ratio[i] = -1;
+		rank_base[i].ratio = -1;
 		continue;
 	    }
 	    ranked_players++;
@@ -192,20 +203,13 @@ static void SortRankings(void)
 	    rkr = (kr - lowKR) * factorKR;
 	    rhf = (hf - lowHF) * factorHF;
 
-	    rank = 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
-	    ratio[i] = rank;
+	    rank_base[i].ratio
+		= 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
 	}
 	rank_entries = ranked_players;
 
-	/* And finally we sort the ranks, using some lame N^2 sort.. wheee! */
-	for (i = 0; i < ranked_players; i++) {
-	    int j;
-	    for (j = i + 1; j < ranked_players; j++) {
-		if (ratio[i] < ratio[j])
-		    swap2(&rankedplayer[i], &rankedplayer[j],
-			  &ratio[i], &ratio[j]);
-	    }
-	}
+	/* And finally we sort the ranks, wheee! */
+	qsort(rank_base, ranked_players, sizeof(rank_t), rank_cmp);
     }
 }
 
@@ -252,7 +256,7 @@ void Rank_write_webpage(void)
 
 	    fprintf(file, "%s", headernojs);
 	    for (i = 0; i < MAX_SCORES; i++) {
-		const int j = rankedplayer[i];
+		const int j = rank_base[i].ind;
 		const rankinfo_t *score = &scores[j];
 
 		if (score->name[0] != '\0') {
@@ -282,7 +286,7 @@ void Rank_write_webpage(void)
 			    score->ballsWon,
 			    score->ballsLost,
 			    score->bestball,
-			    ratio[i],
+			    rank_base[i].ratio,
 			    score->user,
 			    score->host,
 			    score->logout);
@@ -321,7 +325,7 @@ void Rank_show_ranks(void)
     int i;
 
     for (i = 0; i < MAX_SCORES; i++) {
-	rankinfo_t *score = &scores[rankedplayer[i]];
+	rankinfo_t *score = &scores[rank_base[i].ind];
 
 	if (score->pl != NULL) {
 	    char msg[MSG_LEN];
@@ -477,7 +481,7 @@ void Rank_write_score_file(void)
     
 
     for (i = 0; i < rank_entries; i++) {
-	int idx = rankedplayer[i];
+	int idx = rank_base[i].ind;
 	rankinfo_t *rank = &scores[idx];
 
 	if (rank->name[0] == '\0')
