@@ -68,8 +68,6 @@ char xinit_version[] = VERSION;
 
 extern message_t	*TalkMsg[], *GameMsg[];
 extern message_t	*TalkMsg_pending[], *GameMsg_pending[];
-extern char		*HistMsg[];
-extern int		RadarHeight;
 
 /*
  * Globals.
@@ -775,9 +773,8 @@ int Init_playing_windows(void)
 #endif
 
     if (!top) {
-	if (Init_top()) {
+	if (Init_top())
 	    return -1;
-	}
     }
 
     Scale_dashes();
@@ -788,7 +785,8 @@ int Init_playing_windows(void)
     /*
      * What follows is poor code.  WinX needs to know beforehand if its
      * dealing with draw because it might want to create 2 bitmaps for it.
-     * Since i know draw is the first window created (after top), i can cheat it.
+     * Since i know draw is the first window created (after top),
+     * i can cheat it.
      */
     draw = 1;
 #endif
@@ -909,12 +907,10 @@ int Init_playing_windows(void)
     XSelectInput(dpy, radar, ExposureMask);
     XSelectInput(dpy, players, ExposureMask);
 #ifndef _WINDOWS
-    if (!selectionAndHistory) {
+    if (!selectionAndHistory)
 	XSelectInput(dpy, draw, 0);
-    } else {
+    else
 	XSelectInput(dpy, draw, ButtonPressMask | ButtonReleaseMask);
-    }
-
 
     /*
      * Initialize misc. pixmaps if we're not color switching.

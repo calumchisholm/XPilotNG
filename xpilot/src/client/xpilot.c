@@ -227,7 +227,6 @@ extern char widget_version[];
 extern char xevent_version[];
 extern char xeventhandlers_version[];
 extern char xinit_version[];
-extern char xpilot_version[];
 extern char xpmread_version[];
 
 

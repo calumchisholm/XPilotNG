@@ -31,8 +31,6 @@ char join_version[] = VERSION;
 
 void xpilotShutdown(void);
 
-extern void Record_cleanup(void);
-
 
 #ifndef _WINDOWS
 static void Input_loop(void)

@@ -109,12 +109,6 @@ extern bool		Is_allowed(char *);
 #endif
 
 /*
- * record.c
- */
-extern void Record_cleanup(void);
-extern void Record_init(char *filename);
-
-/*
  * sim.c
  */
 extern void Simulate(void);

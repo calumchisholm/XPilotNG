@@ -58,11 +58,7 @@ int			mute_baseless;
 time_t			gameOverTime = 0;
 time_t			serverTime = 0;
 
-extern int		login_in_progress;
-extern int		NumQueuedPlayers;
-
 static void Check_server_versions(void);
-extern void Main_loop(void);
 static void Handle_signal(int sig_no);
 
 int main(int argc, char **argv)
@@ -818,7 +814,6 @@ extern char rules_version[];
 extern char saudio_version[];
 extern char sched_version[];
 extern char score_version[];
-extern char server_version[];
 extern char ship_version[];
 extern char shipshape_version[];
 extern char shot_version[];

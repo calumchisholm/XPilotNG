@@ -54,9 +54,6 @@ u_byte	debris_colors;		/* Number of debris intensities from server */
 bool	markingLights;
 
 
-extern XGCValues	gcv;
-extern setup_t		*Setup;
-
 
 static int wrap(int *xp, int *yp)
 {

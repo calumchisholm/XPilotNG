@@ -25,9 +25,6 @@
 
 char auth_version[] = VERSION;
 
-extern int ShutdownServer;
-extern char ShutdownReason[];
-
 #if 0
 /*
  * This function returns -1 if an error occurred or 0 if there aren't any

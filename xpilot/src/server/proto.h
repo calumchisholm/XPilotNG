@@ -192,7 +192,6 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 		       modifiers mods, int target_id);
 void Fire_normal_shots(player *pl);
 void Fire_main_shot(player *pl, int type, int dir);
-void Fire_shot(player *pl, int type, int dir);
 void Fire_left_shot(player *pl, int type, int dir, int gun);
 void Fire_right_shot(player *pl, int type, int dir, int gun);
 void Fire_left_rshot(player *pl, int type, int dir, int gun);
@@ -298,7 +297,7 @@ void Cannon_dies(cannon_t *cannon, player *pl);
  * Prototypes for command.c
  */
 void Handle_player_command(player *pl, char *cmd);
-player *Get_player_by_name(char *str, int *error, char **errorstr_p);
+player *Get_player_by_name(char *str, int *errcode, char **errorstr_p);
 
 /*
  * Prototypes for player.c
@@ -507,24 +506,6 @@ char *showtime(void);
  */
 void Init_recording(void);
 void Handle_recording_buffers(void);
-
-/*
- * Prototypes for rank.c
- */
-void Rank_init_saved_scores(void);
-void Rank_get_saved_score(player *pl);
-void Rank_save_data(void);
-void Rank_web_scores(void);
-void Rank_save_score(const player *pl);
-void Rank_show_standings(void);
-void Rank_kill(player *pl);
-void Rank_lost_ball(player *pl);
-void Rank_cashed_ball(player *pl);
-void Rank_won_ball(player *pl);
-void Rank_saved_ball(player *pl);
-void Rank_death(player *pl);
-void Rank_add_score(player *pl, DFLOAT points);
-void Rank_set_score(player *pl, DFLOAT points);
-void Rank_fire_shot(player *pl);
+void Get_recording_data(void);
 
 #endif

@@ -94,9 +94,6 @@ extern int ballstats_teamcashes;
 extern int ballstats_lostballs;
 extern bool played_this_round;
 extern int rounds_played;
-extern homebase_t *bases;
-extern int num_bases;
-
 
 extern char	dashes[NUM_DASHES];
 extern char	cdashes[NUM_CDASHES];
@@ -354,9 +351,5 @@ int Handle_time_left(long sec);
 void Game_over_action(u_byte stat);
 int Team_color(int);
 int Life_color(other_t *other);
-/*
- * Prototype from blockbitmaps.c
- */
-int Block_bitmaps_create(void);
 
 #endif

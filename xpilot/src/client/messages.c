@@ -34,7 +34,6 @@ char		*HistoryMsg[MAX_HIST_MSGS];
 
 #ifndef _WINDOWS
 /* selection in talk- or draw-window */
-extern selection_t selection;
 extern void Delete_pending_messages(void);
 #endif
 

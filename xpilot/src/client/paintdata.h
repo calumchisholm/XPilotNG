@@ -283,7 +283,7 @@ extern int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
 
 extern int		eyesId;		/* Player we get frame updates for */
 extern other_t		*eyes;		/* Player we get frame updates for */
-extern short		snooping;	/* are we snooping on someone else? */
+extern bool		snooping;	/* are we snooping on someone else? */
 extern int		eyeTeam;	/* Team of player we get updates for */
 
 extern void Erase_do_start(void);

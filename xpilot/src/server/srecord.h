@@ -1,10 +1,6 @@
 #ifndef SRECORD_H
 #define SRECORD_H
 
-/* Here for sched.c, which doesn't include proto.h */
-void Handle_recording_buffers(void);
-void Get_recording_data(void);
-
 extern int   playback;
 extern int   record;
 extern int   rrecord;

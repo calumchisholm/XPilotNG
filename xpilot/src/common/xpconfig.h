@@ -223,7 +223,6 @@ char *Conf_servermotdfile(void);
 char *Conf_localmotdfile(void);
 char *Conf_logfile(void);
 char *Conf_ship_file(void);
-char *Conf_mapdir(void);
 char *Conf_texturedir(void);
 char *Conf_sounddir(void);
 char *Conf_soundfile(void);

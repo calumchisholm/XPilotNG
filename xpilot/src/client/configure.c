@@ -61,9 +61,6 @@ char configure_version[] = VERSION;
 #define PATH_MAX	1023
 #endif
 
-extern const char	*Get_keyResourceString(keys_t key);
-extern void		Get_xpilotrc_file(char *, unsigned);
-
 static int Config_create_power(int widget_desc, int *height);
 static int Config_create_turnSpeed(int widget_desc, int *height);
 static int Config_create_turnResistance(int widget_desc, int *height);

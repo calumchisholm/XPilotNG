@@ -49,7 +49,7 @@ extern int		ButtonHeight;
 extern char		visualName[MAX_VISUAL_NAME];
 extern Visual		*visual;
 extern int		dispDepth;
-extern bool		useErase;
+extern bool		useErase;	/* use the Erase hack for slow X */
 extern bool		texturedObjects;
 extern bool		fullColor;
 extern bool		colorSwitch;
@@ -91,14 +91,14 @@ extern void Clear_selection(void);
 extern void Print_messages_to_stdout(void);
 extern void Talk_reverse_cut(void);
 extern void Quit(void);
-extern int FatalError(Display *dpy);
+extern int FatalError(Display *);
 extern void Draw_score_table(void);
 extern void Resize(Window w, int width, int height);
 
-extern int DrawShadowText(Display*, Window w, GC gc,
+extern int DrawShadowText(Display*, Window, GC,
 			  int x_border, int start_y, const char *str,
 			  unsigned long fg, unsigned long bg);
-extern void ShadowDrawString(Display*, Window w, GC gc,
+extern void ShadowDrawString(Display*, Window, GC,
 			     int x, int start_y, const char *str,
 			     unsigned long fg, unsigned long bg);
 /*

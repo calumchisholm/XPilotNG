@@ -38,9 +38,6 @@ extern int	movement;	/* horizontal mouse movement. */
 typedef CARD32  Atom32;
 #endif
 
-/* selection in talk or draw window */
-extern selection_t selection;
-
 /* store message in history, when it is sent? */
 extern bool save_talk_str;
 

@@ -329,8 +329,6 @@ extern bool	shields;		/* When shields are considered up */
 extern bool	auto_shield;            /* drops shield for fire */
 extern bool	initialPointerControl;	/* Start by using mouse for control? */
 extern bool	pointerControl;		/* current state of mouse ship flying */
-extern bool	useErase;		/* use the Erase hack for slow X */
-
 extern int	maxFPS;			/* Client's own FPS */
 extern int 	oldMaxFPS;
 
@@ -351,7 +349,7 @@ extern int	maxLinesInHistory;	/* number of lines to save in history */
 
 #ifndef  _WINDOWS
 /* provide cut&paste and message history */
-extern	selection_t	selection;
+extern	selection_t	selection;	/* selection in talk or draw window */
 extern	char		*HistoryMsg[MAX_HIST_MSGS];
 #endif
 
@@ -420,22 +418,14 @@ void Client_flush(void);
 void Client_sync(void);
 int Client_wrap_mode(void);
 
-#ifdef XlibSpecificationRelease
-void Key_event(XEvent *event);
-#endif
-#ifndef _WINDOWS
-int x_event(int);
-#else
-int win_xevent(XEvent event);
+#ifdef _WINDOWS
 void MarkPlayersForRedraw(void);
 #endif
 
-int Key_init(void);
-int Key_update(void);
 int Check_client_fps(void);
 
 #ifdef	SOUND
-extern	void audioEvents();
+extern	void audioEvents(void);
 #endif
 
 #endif

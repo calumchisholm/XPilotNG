@@ -1716,8 +1716,6 @@ void Compute_game_status(void)
     }
 }
 
-extern int game_lock;
-
 void Delete_player(player *pl)
 {
     int			ind = GetInd(pl->id);

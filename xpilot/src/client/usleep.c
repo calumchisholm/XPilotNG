@@ -15,8 +15,6 @@
 #include "xpclient.h"
 
 
-int micro_delay(unsigned usec);
-
 int micro_delay(unsigned usec)
 {
 #if 0 /* SYSV */

@@ -66,11 +66,7 @@ static int		history_pos = 0;
 selection_t		selection;
 bool			save_talk_str = false; /* see Get_msg_from_history */
 
-extern keys_t Lookup_key(XEvent *event, KeySym ks, bool reset);
-extern void Add_pending_messages(void);
-
 extern message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
-extern char		*HistoryMsg[MAX_HIST_MSGS];
 
 static void Talk_create_window(void)
 {

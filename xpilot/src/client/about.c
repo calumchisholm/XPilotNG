@@ -47,12 +47,6 @@ static bool		about_created;
  */
 static int itemsplit = -1;
 
-/* extern int About_callback(int, void *, const char **);
-   extern int Keys_callback(int, void *, const char **);
-   extern int Motd_callback(int, void *, const char **);
-*/
-extern const char* Item_get_text(int i);
-
 /*
  * General text formatting routine which does wrap around
  * if necessary at whitespaces.  The function returns the

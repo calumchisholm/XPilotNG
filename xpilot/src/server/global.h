@@ -84,7 +84,8 @@ extern int		NumAlliances;
 extern int		NumRobots, maxRobots, minRobots;
 extern int		login_in_progress;
 extern char		ShutdownReason[];
-
+extern sock_t		contactSocket;
+extern time_t		serverTime;
 extern char		*robotFile;
 extern int		robotsTalk, robotsLeave, robotLeaveLife;
 extern int		robotLeaveScore, robotLeaveRatio;
@@ -343,8 +344,6 @@ extern int		maxPauseTime;
 extern long		KILLING_SHOTS;
 extern unsigned		SPACE_BLOCKS;
 
-extern int		timerResolution;
-extern char		*password;
 extern int		numberOfRounds;
 extern int		playerLimit;
 extern int		playerLimit_orig;
@@ -353,8 +352,6 @@ extern int		recordFlushInterval;
 extern int		constantScoring;
 extern int		eliminationRace;
 extern char		*dataURL;
-extern int		clientPortStart;
-extern int		clientPortEnd;
 extern char		*recordFileName;
 extern DFLOAT		gameSpeed;
 extern DFLOAT		timeStep;

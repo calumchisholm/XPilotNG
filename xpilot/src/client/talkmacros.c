@@ -32,13 +32,6 @@ char talkmacros_version[] = VERSION;
 /* The final string, sent to the server */
 static char	final_str[MAX_CHARS];
 
-extern int	eyesId;		/* Player we get frame updates for */
-extern other_t	*eyes;		/* Player we get frame updates for */
-extern short	snooping;	/* Are we snooping on someone else? */
-
-/* exported (to xevent.c) */
-int		Talk_macro(char *str);
-
 #define MSG_PARSED_FIELD_LEN      20
 
 /*

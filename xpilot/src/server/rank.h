@@ -70,25 +70,32 @@ typedef struct RankInfo {
 #define Rank_SetLogoutMessage(rank,msg) \
 	do { strcpy((rank)->entry.logout, (msg)); } while(0)
 
-void Rank_init_saved_scores(void);
-
+#if 0
 void Rank_get_saved_score(struct player *pl);
-
 void Rank_write_score_file(void);
-
 void Rank_write_webpage(void);
-
 void Rank_save_score(const struct player * pl);
-
 void Rank_get_stats(struct player *pl, char *buf);
-
 void Rank_show_ranks(void);
-
 bool Rank_IsLegalNameUserHost(const char string[]);
-
 RankInfo *Rank_get_by_name(char *name);
-
 void Rank_nuke_score(RankInfo *rank);
+#endif
+void Rank_init_saved_scores(void);
+void Rank_get_saved_score(player *pl);
+void Rank_save_data(void);
+void Rank_web_scores(void);
+void Rank_save_score(const player *pl);
+void Rank_show_standings(void);
+void Rank_kill(player *pl);
+void Rank_lost_ball(player *pl);
+void Rank_cashed_ball(player *pl);
+void Rank_won_ball(player *pl);
+void Rank_saved_ball(player *pl);
+void Rank_death(player *pl);
+void Rank_add_score(player *pl, DFLOAT points);
+void Rank_set_score(player *pl, DFLOAT points);
+void Rank_fire_shot(player *pl);
 
 
 /*

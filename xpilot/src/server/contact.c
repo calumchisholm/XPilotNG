@@ -40,11 +40,9 @@ static char		msg[MSG_LEN];
 
 static bool Owner(char request, char *real_name, char *host_addr,
 		  int host_port, int pass);
-void Queue_loop(void);
 static int Queue_player(char *real, char *nick, char *disp, int team,
 			char *addr, char *host, unsigned version, int port,
 			int *qpos);
-void Contact(int fd, void *arg);
 static int Check_address(char *addr);
 
 void Contact_cleanup(void)

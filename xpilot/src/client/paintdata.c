@@ -84,7 +84,7 @@ int		num_seg[MAX_COLORS], max_seg[MAX_COLORS];
 
 int		eyesId;		/* Player we get frame updates for */
 other_t		*eyes;		/* Player we get frame updates for */
-short		snooping;	/* are we snooping on someone else? */
+bool		snooping;	/* are we snooping on someone else? */
 int		eyeTeam = TEAM_NOT_SET;
 
 unsigned long	current_foreground;
@@ -418,7 +418,7 @@ int Handle_start(long server_loops)
 int Handle_end(long server_loops)
 {
     end_loops = server_loops;
-    snooping = self && (eyesId != self->id);
+    snooping = (self && eyesId != self->id) ? true : false;
     Paint_frame();
     return 0;
 }

@@ -55,7 +55,6 @@ typedef struct {
 } radar_t;
 
 
-extern time_t		gameOverTime;
 long			frame_loops = 1;
 long			frame_loops_slow = 1;
 double			frame_time = 0;

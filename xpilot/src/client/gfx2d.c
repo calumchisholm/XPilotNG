@@ -32,20 +32,13 @@ char gfx2d_version[] = VERSION;
 #endif
 
 
-extern char	*texturePath;		/* Path list of texture directories */
-
-#ifndef _WINDOWS
-/* from xpmread.c */
-extern int xpm_picture_from_file(xp_picture_t * pic, char *filename);
-#endif
-
 /*
-    Purpose: initialize xp_picture structure and load it from file.
-    Error handling is incomplete.
-
-    return 0 on success.
-    return -1 on error.
-*/
+ *   Purpose: initialize xp_picture structure and load it from file.
+ *   Error handling is incomplete.
+ *
+ *   return 0 on success.
+ *   return -1 on error.
+ */
 
 int Picture_init (xp_picture_t *picture, const char *filename, int count)
 {

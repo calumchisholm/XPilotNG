@@ -32,6 +32,6 @@
 #define TALK_FAST_MIDDLE_DELIMITER	'|'
 #define TALK_FAST_SPECIAL_TALK_CHAR	'#'
 
-int Talk_macro(char *str);
+extern int Talk_macro(char *str);
 
 #endif
