@@ -1262,9 +1262,6 @@ Display a small digital clock.
 .B clockAMPM
 Displays clock in 24hr or 12hr format. (Default: False)
 .TP 12
-.B noLocalMotd
-Do not display the local Message Of The Day.
-.TP 12
 .B autoServerMotdPopup
 Automatically popup the MOTD of the server on startup.
 .TP 12

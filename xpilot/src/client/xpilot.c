@@ -58,11 +58,8 @@ static void printfile(const char *filename)
 int main(int argc, char *argv[])
 {
     int				result, retval = 1;
-    bool			auto_connect = false,
-				text = false,
-				list_servers = false,
-				auto_shutdown = false,
-				noLocalMotd = false;
+    bool			auto_connect = false, text = false,
+				list_servers = false, auto_shutdown = false;
     char			*cp;
     Connect_param_t		*conpar;
     static char			shutdown_reason[MAX_CHARS];
@@ -133,8 +130,7 @@ int main(int argc, char *argv[])
     Parse_options(&argc, argv, conpar->real_name,
 		  &conpar->contact_port, &conpar->team,
 		  &text, &list_servers,
-		  &auto_connect, &noLocalMotd,
-		  conpar->nick_name, conpar->disp_name,
+		  &auto_connect, conpar->nick_name, conpar->disp_name,
 		  hostname, shutdown_reason);
 
     /*strcpy(clientname,conpar->nick_name); */
@@ -161,8 +157,7 @@ extern void Handle_x_options(void);
     /*
      * --- Message of the Day ---
      */
-    if (!noLocalMotd)
-	printfile(Conf_localmotdfile());
+    printfile(Conf_localmotdfile());
 
     if (text || auto_connect || argv[1] || is_this_windows()) {
 	if (list_servers)

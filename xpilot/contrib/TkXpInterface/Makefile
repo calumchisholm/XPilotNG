@@ -65,7 +65,7 @@ PINGOPTIONS= $$remoteServer 64 3
 #the xpilots's client. Type "xpilot -help" to have the avalable options.
 #Example :
 #
-#CLIENTOPTIONS= -geometry 100x100 -noLocalMotd -mono
+#CLIENTOPTIONS= -geometry 100x100 -mono
 #
 # Don't forget if more than 1 player use TkXpInterface they will have all the
 # same options ! so don't add for instance "-name Avatar"

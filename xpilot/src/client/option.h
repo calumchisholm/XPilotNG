@@ -26,7 +26,7 @@
 
 extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 			  int *my_team, bool *text, bool *list,
-			  bool *join, bool *noLocalMotd,
+			  bool *join,
 			  char *nickName, char *dispName, char *hostName,
 			  char *shut_msg);
 

@@ -22,11 +22,8 @@ static void sigcatch(int signum)
 
 int main(int argc, char *argv[])
 {
-    bool			auto_connect = false,
-				text = false,
-				list_servers = false,
-				auto_shutdown = false,
-				noLocalMotd = false;
+    bool			auto_connect = false, text = false,
+				list_servers = false, auto_shutdown = false;
     Connect_param_t             conpar;
     char			shutdown_reason[MAX_CHARS];
     char                        *cp;
@@ -50,7 +47,7 @@ int main(int argc, char *argv[])
     Parse_options(&argc, argv, conpar.real_name,
 		  &conpar.contact_port, &conpar.team,
 		  &text, &list_servers,
-		  &auto_connect, &noLocalMotd,
+		  &auto_connect,
 		  conpar.nick_name, conpar.disp_name,
 		  hostname, shutdown_reason);
 

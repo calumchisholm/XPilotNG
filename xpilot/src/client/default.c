@@ -155,15 +155,6 @@ xp_option_t default_options[] = {
 	0
     },
     {
-	"noLocalMotd",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Do not display the local Message Of The Day.\n",
-	0
-    },
-
-    {
 	"text",
 	"Yes",
 	"No",
@@ -1167,14 +1158,6 @@ cl_option_t options[] = {
 	"",
 	KEY_DUMMY,
 	"Join the game immediately, no questions asked.\n",
-	0
-    },
-    {
-	"noLocalMotd",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Do not display the local Message Of The Day.\n",
 	0
     },
     {
@@ -4081,7 +4064,7 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 
 void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		   int *my_team, bool *text, bool *list,
-		   bool *join, bool *noLocalMotd,
+		   bool *join,
 		   char *nickName, char *dispName, char *hostName,
 		   char *shut_msg)
 {
@@ -4181,7 +4164,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	    Get_bool_resource(argDB, "list", list);
 	    *text = true;
 	    *join = false;
-	    *noLocalMotd = true;
 	    XrmDestroyDatabase(argDB);
 	    free(xopt);
 	    return;
@@ -4283,7 +4265,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bool_resource(rDB, "text", text);
     Get_bool_resource(rDB, "list", list);
     Get_bool_resource(rDB, "join", join);
-    Get_bool_resource(rDB, "noLocalMotd", noLocalMotd);
     Get_bool_resource(rDB, "autoServerMotdPopup", &autoServerMotdPopup);
 
     Get_shipshape_resource(rDB, &shipShape);
