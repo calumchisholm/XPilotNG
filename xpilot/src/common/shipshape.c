@@ -29,9 +29,9 @@ static int	Get_shape_keyword(char *keyw);
 static int	shape2wire(char *ship_shape_str, shipobj *ship);
 static void	Rotate_ship(shipobj *ship);
 
-int	debugShapeParsing = 0;
-int	verboseShapeParsing = 0;
-int	shapeLimits;
+bool	debugShapeParsing = false;
+bool	verboseShapeParsing = false;
+bool	shapeLimits = true;
 extern bool is_server;
 
 /* kps - tmp hack */
@@ -645,7 +645,8 @@ static int shape2wire(char *ship_shape_str, shipobj *ship)
 			minCount = 3, minSize = 22 + 16;
 	int		low = 0, hi = 0, left = 0, right = 0,
 			count = 0, change, max = 0,
-			lowest = 0, highest = 0, leftmost = 0, rightmost = 0;
+			lowest = 0, highest = 0,
+			leftmost = 0, rightmost = 0;
 	int		invalid = 0;
 	const int	checkWidthAgainstLongestAxis = 1;
 
@@ -1090,8 +1091,11 @@ void Free_ship_shape(shipobj *ship)
 
 shipobj *Parse_shape_str(char *str)
 {
-    verboseShapeParsing = debugShapeParsing;
-    shapeLimits = 1;
+    if (is_server)
+	verboseShapeParsing = debugShapeParsing;
+    else
+	verboseShapeParsing = true;
+    shapeLimits = true;
     return do_parse_shape(str);
 }
 
@@ -1106,8 +1110,8 @@ int Validate_shape_str(char *str)
 {
     shipobj		*ship;
 
-    verboseShapeParsing = 1;
-    shapeLimits = 1;
+    verboseShapeParsing = true;
+    shapeLimits = true;
     ship = do_parse_shape(str);
     Free_ship_shape(ship);
     return (ship && ship != Default_ship());
