@@ -1550,3 +1550,18 @@ void Ship_set_m_rack(shipobj *ship, DFLOAT x, DFLOAT y)
 	ship->m_rack[0][0].pxl.y = y;
     }
 }
+
+shapepos ipos2shapepos(ipos pos)
+{
+    shapepos pt;
+
+    if (is_server) {
+	pt.clk.cx = PIXEL_TO_CLICK(pos.x);
+	pt.clk.cy = PIXEL_TO_CLICK(pos.y);
+    } else {
+	pt.pxl.x = pos.x;
+	pt.pxl.y = pos.y;
+    }
+
+    return pt;
+}

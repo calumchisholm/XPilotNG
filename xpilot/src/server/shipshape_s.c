@@ -41,16 +41,6 @@ void Rotate_point(shapepos pt[RES])
     }
 }
 
-shapepos ipos2shapepos(ipos pos)
-{
-    shapepos shpos;
-
-    shpos.clk.cx = PIXEL_TO_CLICK(pos.x);
-    shpos.clk.cy = PIXEL_TO_CLICK(pos.y);
-
-    return shpos;
-}
-
 /* kps - tmp hack */
 shapepos *Shape_get_points(shape *s, int dir)
 {

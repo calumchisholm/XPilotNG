@@ -58,17 +58,6 @@ void Calculate_shield_radius(shipobj *w)
 			: (max_radius + 2 - (max_radius & 1));
 }
 
-shapepos ipos2shapepos(ipos pos)
-{
-    shapepos shpos;
-
-    shpos.pxl.x = pos.x;
-    shpos.pxl.y = pos.y;
-
-    return shpos;
-}
-
-
 
 position Ship_get_point_position(shipobj *ship, int i, int dir)
 {
