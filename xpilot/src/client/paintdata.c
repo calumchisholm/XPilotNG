@@ -848,7 +848,7 @@ int Handle_message(char *msg)
 	}
 	ignoree[i] = '\0';
 
-	other = Other_by_name(ignoree);
+	other = Other_by_name(ignoree, false);
 
 	if (other == NULL) {	/* Not in list, probably servermessage */
 	    Add_message(msg);

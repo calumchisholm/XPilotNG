@@ -917,7 +917,7 @@ other_t *Other_by_id(int id)
     return NULL;
 }
 
-other_t *Other_by_name(char *name)
+other_t *Other_by_name(char *name, bool show_error_msg)
 {
     int i;
     other_t *found_other = NULL, *other;
@@ -968,12 +968,14 @@ other_t *Other_by_name(char *name)
 
  match_none:
     {
-	Add_message("Name does not match any player. [*Client reply*]");
+	if (show_error_msg)
+	    Add_message("Name does not match any player. [*Client reply*]");
 	return NULL;
     }
  match_several:
     {
-	Add_message("Name matches several players. [*Client reply*]");
+	if (show_error_msg)
+	    Add_message("Name matches several players. [*Client reply*]");
 	return NULL;
     }
 }

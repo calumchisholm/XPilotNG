@@ -446,7 +446,7 @@ static void Msg_scan_game_msg(char *message)
 
     /* handle death array */
     if (victim != NULL) {
-	other = Other_by_name(victim);
+	other = Other_by_name(victim, false);
 
 	/*for safety... could possibly happen with
 	  loss or parser bugs =) */
@@ -458,7 +458,7 @@ static void Msg_scan_game_msg(char *message)
     }
 
     if (victim2 != NULL) {
-	other = Other_by_name(victim);
+	other = Other_by_name(victim, false);
 	if (other != NULL)
 	    Msg_scan_death(other->id);
     } else {
