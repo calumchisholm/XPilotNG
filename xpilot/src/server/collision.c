@@ -131,7 +131,7 @@ static int in_range_acd_old(
 
 /* new acd functions */
 /* doubles because the multiplies might overflow ints */
-int in_range_acd(double dx, double dy, double dvx, double dvy, double r)
+static int in_range_acd(double dx, double dy, double dvx, double dvy, double r)
 {
     double	tmin, fminx, fminy;
     double	top, bot;
@@ -165,7 +165,7 @@ int in_range_acd(double dx, double dy, double dvx, double dvy, double r)
 	return 0;
 }
 
-int in_range_simple(int px, int py, int qx, int qy, int r)
+static int in_range_simple(int px, int py, int qx, int qy, int r)
 {
     int dx = px - qx, dy = py - qy;
 
@@ -183,8 +183,8 @@ int in_range_simple(int px, int py, int qx, int qy, int r)
 	return 0;
 }
 
-int in_range_partial(double dx, double dy, double dvx, double dvy,
-		     double r, DFLOAT wall_time)
+static int in_range_partial(double dx, double dy, double dvx, double dvy,
+			    double r, DFLOAT wall_time)
 {
     double	tmin, fminx, fminy;
     double	top, bot;
@@ -219,7 +219,38 @@ int in_range_partial(double dx, double dy, double dvx, double dvy,
 	return 0;
 }
 
+/* Collmodes:
+   0 - Object has not been moved in walls.c after it was created.
+       Check only whether end-of-frame position is on top of a
+       player.
+   1 - Object was moved in walls.c. It did not hit walls and
+       therefore moved at constant speed from obj->prevpos to
+       obj->pos. Check whether it was within range during movement
+       using analytical collision detection.
+   2 - Object was moving from obj->prevpos by obj->extmove but it
+       hit a wall and was destroyed after completing obj->wall_time
+       of the distance. Check whether it was within range similarly
+       to case 1 but only consider hits at the beginning of the
+       frame before obj->wall_time.
+   3 - Object bounced off a wall at least once without getting
+       destroyed. Checking all the linear parts of movement
+       separately is not implemented yet so we don't detect any
+       possible collisions. Note that it would already be possible
+       to check the first linear part until obj->wall_time similarly
+       to case 2. This is not done because we lack the information
+       needed to calculate the effect of non-fatal hits. The
+       direction and speed of the object at the moment of impact
+       were likely completely different from the end-of-frame values
+       we have now.
 
+       Different collision modes for players have not been implemented
+       yet. It's supposed that they move in a straight line from
+       prevpos to pos. This can lead to some erroneous hits.
+*/
+bool in_range(object *obj1, object *obj2, double range)
+{
+    return true;
+}
 
 /*
  * Globals
@@ -626,34 +657,7 @@ int CountDefensiveItems(player *pl)
     return count;
 }
 
-/* Collmodes:
-   0 - Object has not been moved in walls.c after it was created.
-       Check only whether end-of-frame position is on top of a
-       player.
-   1 - Object was moved in walls.c. It did not hit walls and
-       therefore moved at constant speed from obj->prevpos to
-       obj->pos. Check whether it was within range during movement
-       using analytical collision detection.
-   2 - Object was moving from obj->prevpos by obj->extmove but it
-       hit a wall and was destroyed after completing obj->wall_time
-       of the distance. Check whether it was within range similarly
-       to case 1 but only consider hits at the beginning of the
-       frame before obj->wall_time.
-   3 - Object bounced off a wall at least once without getting
-       destroyed. Checking all the linear parts of movement
-       separately is not implemented yet so we don't detect any
-       possible collisions. Note that it would already be possible
-       to check the first linear part until obj->wall_time similarly
-       to case 2. This is not done because we lack the information
-       needed to calculate the effect of non-fatal hits. The
-       direction and speed of the object at the moment of impact
-       were likely completely different from the end-of-frame values
-       we have now.
 
-       Different collision modes for players have not been implemented
-       yet. It's supposed that they move in a straight line from
-       prevpos to pos. This can lead to some erroneous hits.
-*/
 static void PlayerObjectCollision(player *pl)
 {
     int		j, range, radius, hit, obj_count;

@@ -63,10 +63,6 @@ int IsOffensiveItem(enum Item i);
 int IsDefensiveItem(enum Item i);
 int CountOffensiveItems(player *pl);
 int CountDefensiveItems(player *pl);
-int in_range_acd(double dx, double dy, double dvx, double dvy, double r);
-int in_range_simple(int px, int py, int qx, int qy, int r);
-int in_range_partial(double dx, double dy, double dvx, double dvy,
-		     double r, DFLOAT wall_time);
 
 /*
  * Prototypes for id.c
