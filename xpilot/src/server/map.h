@@ -103,49 +103,34 @@
 #define DIR_LEFT		(RES/2)
 #define DIR_DOWN		(3*RES/4)
 
-typedef struct fuel fuel_t;
-typedef struct grav grav_t;
-typedef struct base base_t;
-typedef struct baseorder baseorder_t;
-typedef struct cannon cannon_t;
-typedef struct check check_t;
-typedef struct item item_t;
-typedef struct asteroid asteroid_t;
-typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
-typedef struct wormhole wormhole_t;
-typedef struct treasure treasure_t;
-typedef struct target target_t;
-typedef struct team team_t;
-typedef struct item_concentrator item_concentrator_t;
-typedef struct asteroid_concentrator asteroid_concentrator_t;
 
-struct fuel {
+typedef struct fuel {
     clpos	pos;
     double	fuel;
     unsigned	conn_mask;
     long	last_change;
     int		team;
-};
+} fuel_t;
 
-struct grav {
+typedef struct grav {
     clpos	pos;
     double	force;
     int		type;
-};
+} grav_t;
 
-struct base {
+typedef struct base {
     clpos	pos;
     int		dir;
     int		ind;
     int		team;
-};
+} base_t;
 
-struct baseorder {
+typedef struct baseorder {
     int		base_idx;	/* Index in World.base[] */
     double	dist;		/* Distance to first checkpoint */
-};
+} baseorder_t;
 
-struct cannon {
+typedef struct cannon {
     clpos	pos;
     int		dir;
     unsigned	conn_mask;
@@ -161,13 +146,13 @@ struct cannon {
     double	emergency_shield_left;
     double	phasing_left;
     int		group;
-};
+} cannon_t;
 
-struct check {
+typedef struct check {
     clpos	pos;
-};
+} check_t;
 
-struct item {
+typedef struct item {
     double	prob;		/* Probability [0..1] for item to appear */
     int		max;		/* Max on world at a given time */
     int		num;		/* Number active right now */
@@ -177,16 +162,18 @@ struct item {
     int		max_per_pack;	/* maximum number of elements per item. */
     int		initial;	/* initial number of elements per player. */
     int		limit;		/* max number of elements per player/cannon. */
-};
+} item_t;
 
-struct asteroid {
+typedef struct asteroid {
     double	prob;		/* Probability [0..1] for asteroid to appear */
     int		max;		/* Max on world at a given time */
     int		num;		/* Number active right now */
     int		chance;		/* Chance [0..127] for asteroid to appear */
-};
+} asteroid_t;
 
-struct wormhole {
+typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
+
+typedef struct wormhole {
     clpos	pos;
     int		lastdest;	/* last destination wormhole */
     double	countdown;	/* >0 warp to lastdest else random */
@@ -195,17 +182,17 @@ struct wormhole {
     int		lastID;
     u_byte	lastblock;	/* block it occluded */
     u_byte	pad[3];
-};
+} wormhole_t;
 
-struct treasure {
+typedef struct treasure {
     clpos	pos;
     bool	have;		/* true if this treasure has ball in it */
     int		team;		/* team of this treasure */
     int 	destroyed;	/* how often this treasure destroyed */
     bool	empty;		/* true if this treasure never had a ball */
-};
+} treasure_t;
 
-struct target {
+typedef struct target {
     clpos	pos;
     int		team;
     double	dead_time;
@@ -214,9 +201,9 @@ struct target {
     unsigned 	update_mask;
     long	last_change;
     int		group;
-};
+} target_t;
 
-struct team {
+typedef struct team {
     int		NumMembers;		/* Number of current members */
     int		NumRobots;		/* Number of robot players */
     int		NumBases;		/* Number of bases owned */
@@ -227,15 +214,15 @@ struct team {
     int		SwapperId;		/* Player swapping to this full team */
     double	score;
     double	prev_score;
-};
+} team_t;
 
-struct item_concentrator {
+typedef struct item_concentrator {
     clpos	pos;
-};
+} item_concentrator_t;
 
-struct asteroid_concentrator {
+typedef struct asteroid_concentrator {
     clpos	pos;
-};
+} asteroid_concentrator_t;
 
 extern bool is_polygon_map;
 
