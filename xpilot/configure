@@ -862,7 +862,6 @@ Optional Features:
 			  (and sometimes confusing) to the casual installer
   --enable-dbe            support for X Doublebuffer Extension in client
   --enable-mbx            support for X Multibuffer Extension in client
-  --enable-serversound    Turns on sound support in the server (not client)
   --enable-plockserver    lock the xpilot server (xpilots) into memory
   --enable-development    enable development code
   --enable-sdl-client     enable sdl client
@@ -1909,18 +1908,6 @@ if test "${enable_mbx+set}" = set; then
 
 cat >>confdefs.h <<\_ACEOF
 #define MBX 1
-_ACEOF
-
-fi
-fi;
-
-# Check whether --enable-serversound or --disable-serversound was given.
-if test "${enable_serversound+set}" = set; then
-  enableval="$enable_serversound"
-  if test x$enable_serversound = xyes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define SERVER_SOUND 1
 _ACEOF
 
 fi

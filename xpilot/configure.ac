@@ -40,13 +40,6 @@ AC_ARG_ENABLE(mbx,
 	AC_DEFINE([MBX], 1, [support for X Multibuffer Extension in client])
 fi])
 
-AC_ARG_ENABLE(serversound,
-	AC_HELP_STRING([--enable-serversound],
-			[Turns on sound support in the server (not client)]),
-[if test x$enable_serversound = xyes; then
-	AC_DEFINE([SERVER_SOUND], 1, [Turns on sound support in the server])
-fi])
-
 AC_ARG_ENABLE(plockserver,
 	AC_HELP_STRING([--enable-plockserver],
 			[lock the xpilot server (xpilots) into memory]),

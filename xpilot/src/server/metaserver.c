@@ -118,11 +118,6 @@ void Meta_init(void)
 
 void Meta_update(int change)
 {
-#ifdef SOUND
-#define SOUND_SUPPORT_STR	"yes"
-#else
-#define SOUND_SUPPORT_STR	"no"
-#endif
 #define GIVE_META_SERVER_A_HINT	180
 
     char 		string[MAX_STR_LEN];
@@ -209,14 +204,14 @@ void Meta_update(int change)
 	    "add timing %d\n"
 	    "add stime %ld\n"
 	    "add queue %d\n"
-	    "add sound " SOUND_SUPPORT_STR "\n",
+	    "add sound %s\n",
 	    Server.host, num_active_players,
 	    META_VERSION, world->name, world->x, world->y, world->author,
 	    world->NumBases, FPS, options.contactPort,
 	    game_mode, world->NumTeamBases, freebases,
 	    BIT(world->rules->mode, TIMING) ? 1:0,
 	    (long)(time(NULL) - serverTime),
-	    queue_length);
+	    queue_length, options.sound ? "yes" : "no");
 
 
     /*

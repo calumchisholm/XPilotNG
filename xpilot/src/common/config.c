@@ -180,9 +180,6 @@ void Conf_print(void)
 #ifdef MBX
     xpprintf("MBX\n");
 #endif
-#ifdef SERVER_SOUND
-    xpprintf("SERVER_SOUND\n");
-#endif
 #ifdef PLOCKSERVER
     xpprintf("PLOCKSERVER\n");
 #endif

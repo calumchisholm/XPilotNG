@@ -3202,6 +3202,16 @@ static option_desc opts[] = {
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
+	"sound",
+	"sound",
+	"true",
+	&options.sound,
+	valBool,
+	tuner_dummy,
+	"Does the server send sound events to players that request sound.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    }, 
+    {
 	"timerResolution",
 	"timerResolution",
 	"0",
