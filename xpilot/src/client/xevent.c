@@ -41,7 +41,7 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 
     (void)event;
 
-#if 1 /* linear search */
+#if 0 /* linear search */
     if (reset)
 	i = 0;
 
