@@ -578,64 +578,6 @@ xp_option_t default_options[] = {
 	0
     },
     {
-	"gameFont",
-	NULL,
-	GAME_FONT,
-	KEY_DUMMY,
-	"The font used on the HUD and for most other text.\n",
-	0
-    },
-    {
-	"scoreListFont",
-	NULL,
-	SCORE_LIST_FONT,
-	KEY_DUMMY,
-	"The font used on the score list.\n"
-	"This must be a non-proportional font.\n",
-	0
-    },
-    {
-	"buttonFont",
-	NULL,
-	BUTTON_FONT,
-	KEY_DUMMY,
-	"The font used on all buttons.\n",
-	0
-    },
-    {
-	"textFont",
-	NULL,
-	TEXT_FONT,
-	KEY_DUMMY,
-	"The font used in the help and about windows.\n",
-	0
-    },
-    {
-	"talkFont",
-	NULL,
-	TALK_FONT,
-	KEY_DUMMY,
-	"The font used in the talk window.\n",
-	0
-    },
-    {
-	"motdFont",
-	NULL,
-	MOTD_FONT,
-	KEY_DUMMY,
-	"The font used in the MOTD window and key list window.\n"
-	"This must be a non-proportional font.\n",
-	0
-    },
-    {
-	"messageFont",
-	NULL,
-	MESSAGE_FONT,
-	KEY_DUMMY,
-	"The font used for drawing messages.\n",
-	0
-    },
-    {
 	"maxMessages",
 	NULL,
 	"8",

@@ -92,6 +92,65 @@ xp_option_t xdefault_options[] = {
 	NULL,
 	"Use the X windows multibuffer extension if present.\n"),
 
+    XP_STRING_OPTION(
+	"gameFont",
+	GAME_FONT,
+	gameFontName,
+	sizeof gameFontName,
+	NULL, NULL,
+	"The font used on the HUD and for most other text.\n"),
+
+    XP_STRING_OPTION(
+	"scoreListFont",
+	SCORE_LIST_FONT,
+	scoreListFontName,
+	sizeof scoreListFontName,
+	NULL, NULL,
+	"The font used on the score list.\n"
+	"This must be a non-proportional font.\n"),
+
+    XP_STRING_OPTION(
+	"buttonFont",
+	BUTTON_FONT,
+	buttonFontName,
+	sizeof buttonFontName,
+	NULL, NULL,
+	"The font used on all buttons.\n"),
+
+    XP_STRING_OPTION(
+	"textFont",
+	TEXT_FONT,
+	textFontName,
+	sizeof textFontName,
+	NULL, NULL,
+	"The font used in the help and about windows.\n"),
+
+    XP_STRING_OPTION(
+	"talkFont",
+	TALK_FONT,
+	talkFontName,
+	sizeof talkFontName,
+	NULL, NULL,
+	"The font used in the talk window.\n"),
+
+    XP_STRING_OPTION(
+	"motdFont",
+	MOTD_FONT,
+	motdFontName,
+	sizeof motdFontName,
+	NULL, NULL,
+	"The font used in the MOTD window and key list window.\n"
+	"This must be a non-proportional font.\n"),
+
+    XP_STRING_OPTION(
+	"messageFont",
+	MESSAGE_FONT,
+	messageFontName,
+	sizeof messageFontName,
+	NULL, NULL,
+	"The font used for drawing messages.\n"),
+
+
 };
 
 void Store_x_options(void)
