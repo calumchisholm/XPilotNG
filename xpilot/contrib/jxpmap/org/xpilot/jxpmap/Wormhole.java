@@ -26,9 +26,10 @@ public class Wormhole extends Group {
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_IN = 1;
     public static final int TYPE_OUT = 2;
+    public static final int TYPE_FIXED = 3;
 
     public static final String[] TYPES = {
-        "normal", "in", "out"        
+        "normal", "in", "out", "fixed"        
     };
 
     private int x, y, type;
@@ -38,35 +39,34 @@ public class Wormhole extends Group {
 
     public Wormhole() {
         super();
-        setImage("wormhole_in.gif");
+        setType(TYPE_NORMAL);
     }
     
     public Wormhole(Collection c) {
         super(c);
-        setImage("wormhole_in.gif");
         this.x = (int)getBounds().getCenterX();
         this.y = (int)getBounds().getCenterY();
+        setType(TYPE_NORMAL);
     }
     
     public Wormhole(Collection c, int x, int y, int type) {
         super(c);
         this.x = x;
         this.y = y;
-        this.type = type;
-        setImage("wormhole_in.gif");
+        setType(type);
     }
     
     public Wormhole (Collection c, int x, int y, String typeStr) {
         super(c);
         this.x = x;
-        this.y = y;        
+        this.y = y;
+        setType(TYPE_NORMAL);        
         for (int i = 0; i < TYPES.length; i++) {
             if (typeStr.equals(TYPES[i])) {
-                this.type = i;
+                setType(type);
                 break;
             }
         }
-        setImage("wormhole_in.gif");
     }
     
     public void moveTo(int x, int y) {
@@ -98,9 +98,10 @@ public class Wormhole extends Group {
     }
 
     public void setType(int i) {
-        if (i > TYPE_OUT) 
+        if (i >= TYPES.length) 
             throw new IllegalArgumentException("illegal wormhole type: " + i);
         type = i;
+        setImage("wormhole_" + TYPES[i] + ".gif");
     }
     
     public void setType(String name) {
@@ -134,6 +135,14 @@ public class Wormhole extends Group {
         super.paint(g, scale);
         if (type != TYPE_IN)
             g.drawImage(getImage(), getImageTransform(), null);
+        if (type == TYPE_FIXED && isSelected()) {
+            g.setColor(Color.white);
+            g.setStroke(getPreviewStroke(scale));
+            g.drawLine(
+                (int)getBounds().getBounds2D().getCenterX(),
+                (int)getBounds().getBounds2D().getCenterY(),
+                x, y);
+        }
     }    
     
     public void printXml (PrintWriter out) throws IOException {
@@ -165,7 +174,7 @@ public class Wormhole extends Group {
             setTitle("Wormhole");
 
             cmbType = new JComboBox();
-            for (int i = 0; i <= TYPE_OUT; i++) 
+            for (int i = 0; i < TYPES.length; i++) 
                 cmbType.addItem(TYPES[i]);
             cmbType.setSelectedIndex(getType());
             add(new JLabel("Type"));
