@@ -94,7 +94,7 @@ class MapPolygon(MapObject):
                     continue
                 lstyle = cs or self.style.defaultEdgeStyle
                 if lstyle.style != LineStyle.STYLE_HIDDEN or nofill:
-                    gc.foreground = colormap.alloc(*gcolor(style.color))
+                    gc.foreground = colormap.alloc(*gcolor(lstyle.color))
                     gtk.draw_lines(di.area, gc, points[si:i+1])
                 si = i
                 cs = self.edgeStyles[i]
@@ -102,7 +102,7 @@ class MapPolygon(MapObject):
             points2.append(points[0])
             lstyle = cs or self.style.defaultEdgeStyle
             if lstyle.style != LineStyle.STYLE_HIDDEN or nofill:
-                gc.foreground = colormap.alloc(*gcolor(style.color))
+                gc.foreground = colormap.alloc(*gcolor(lstyle.color))
                 gtk.draw_lines(di.area, gc, points2)
 
         if di.canvas.showPoints:
