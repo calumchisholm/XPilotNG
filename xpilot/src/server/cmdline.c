@@ -1153,7 +1153,7 @@ static option_desc opts[] = {
 	&options.cannonDeadTicks,
 	valReal,
 	tuner_dummy,
-	"How many seconds do cannons stay dead?\n"
+	"How many ticks do cannons stay dead?\n"
 	"Replaces option cannonDeadTime.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -1922,13 +1922,13 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"mineFuseTime",
-	"mineFuseTime",
+	"mineFuseTicks",
+	"mineFuseTicks",
 	"0.0",
-	&options.mineFuseTime,
-	valSec,
+	&options.mineFuseTicks,
+	valReal,
 	tuner_dummy,
-	"Number of seconds after which owned mines become deadly (0=never).\n",
+	"Number of ticks after which owned mines become deadly (0=never).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1968,7 +1968,7 @@ static option_desc opts[] = {
 	&options.baseMineRange,
 	valReal,
 	tuner_dummy,
-	"Minimum distance from base mines may be used.\n",
+	"Minimum distance from base mines may be used (unit is blocks).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

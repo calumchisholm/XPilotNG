@@ -230,7 +230,7 @@ extern struct options {
     int		nukeMinMines;
     double	nukeClusterDamage;
     double	nukeDebrisLife;
-    int		mineFuseTime;
+    double	mineFuseTicks;
     double	mineLife;
     double	minMineSpeed;
     double	missileLife;

@@ -152,14 +152,14 @@ void Place_general_mine(player_t *pl, int team, long status,
 	if (options.baseMineRange) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->home_base == NULL)
 		    continue;
 		if (pl_i->id != pl->id
 		    && !Team_immune(pl_i->id, pl->id)
 		    && !Player_is_tank(pl_i)) {
-		    int dx = pos.cx - pl_i->home_base->pos.cx;
-		    int dy = pos.cy - pl_i->home_base->pos.cy;
-		    if (Wrap_length(dx, dy)
+		    if (Wrap_length(pos.cx - pl_i->home_base->pos.cx,
+				    pos.cy - pl_i->home_base->pos.cy)
 			<= options.baseMineRange * BLOCK_CLICKS) {
 			Set_player_message(pl, "No base mining!");
 			return;
@@ -193,7 +193,7 @@ void Place_general_mine(player_t *pl, int team, long status,
 
 	mine->type = OBJ_MINE;
 	mine->color = BLUE;
-	mine->fusetime = options.mineFuseTime;
+	mine->fusetime = options.mineFuseTicks;
 	mine->status = status;
 	mine->id = (pl ? pl->id : NO_ID);
 	mine->team = team;
@@ -1885,7 +1885,7 @@ void Update_mine(mineobject_t *mine)
 	}
     }
 
-    /* if options.mineFuseTime == 0, owner immunity never expires */
+    /* if options.mineFuseTicks == 0, owner immunity never expires */
     if (BIT(mine->status, OWNERIMMUNE) && mine->fusetime > 0) {
 	if ((mine->fusetime -= timeStep) <= 0) {
 	    CLR_BIT(mine->status, OWNERIMMUNE);
