@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -26,7 +25,7 @@
 #define GUIOBJECTS_H
 
 void Gui_paint_ball(int x, int y);
-void Gui_paint_ball_connecter(int x1, int y1, int x2, int y2);
+void Gui_paint_ball_connecter(int x_1, int y_1, int x_2, int y_2);
 
 void Gui_paint_mine(int x, int y, int teammine, char *name);
 
@@ -46,24 +45,25 @@ void Gui_paint_missile(int x, int y, int len, int dir);
 
 void Gui_paint_lasers_begin(void);
 void Gui_paint_lasers_end(void);
-void Gui_paint_laser(int color, int x1, int y1, int len, int dir);
+void Gui_paint_laser(int color, int x_1, int y_1, int len, int dir);
 
 void Gui_paint_paused(int x, int y, int count);
 void Gui_paint_appearing(int x, int y, int id, int count);
 
 void Gui_paint_ecm(int x, int y, int size);
 
-void Gui_paint_refuel(int x0, int y0, int x1, int y1);
+void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1);
 
-void Gui_paint_connector(int x0, int y0, int x1, int y1, int tractor);
+void Gui_paint_connector(int x_0, int y_0, int x_1, int y_1, int tractor);
 
-void Gui_paint_transporter(int x0, int y0, int x1, int y1);
+void Gui_paint_transporter(int x_0, int y_0, int x_1, int y_1);
 
 void Gui_paint_all_connectors_begin(void);
 
 void Gui_paint_ships_begin(void);
 void Gui_paint_ships_end(void);
 
-void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased, int shield, int deflector, int eshield);
+void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
+		    int shield, int deflector, int eshield);
 
 #endif
