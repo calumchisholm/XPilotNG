@@ -177,9 +177,9 @@ void Paint_objects(void)
     int i, xoff, yoff;
     ipos min, max;
 
-    for (i = 0; i < num_polygon; i++) {
+    for (i = 0; i < num_polygons; i++) {
 
-        Compute_bounds(&min, &max, &polygon_ptr[i].bounds);
+        Compute_bounds(&min, &max, &polygons[i].bounds);
 
         for (xoff = min.x; xoff <= max.x; xoff++) {
             for (yoff = min.y; yoff <= max.y; yoff++) {

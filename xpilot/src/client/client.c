@@ -177,6 +177,12 @@ int	      num_bases = 0;
 checkpoint_t  *checks = 0;
 int           num_checks = 0;
 
+xp_polygon_t  *polygons = 0;
+int           num_polygons = 0, max_polygons = 0;
+
+edgestyle_t   *edgestyles = 0;
+int           num_edgestyles = 0, max_edgestyles = 0;
+
 static cannontime_t	*cannons = 0;
 static int		num_cannons = 0;
 

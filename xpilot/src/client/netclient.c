@@ -73,13 +73,13 @@
 #include "packet.h"
 #include "bit.h"
 #include "paint.h"
+#include "paintdata.h"
 #include "xinit.h"
 #include "pack.h"
 #include "socklib.h"
 #include "protoclient.h"
 #include "portability.h"
 #include "talk.h"
-#include "paintdata.h"
 
 #ifdef	SOUND
 #include "audio.h"
@@ -421,6 +421,7 @@ int Net_setup(void)
 	int i, j, startx, starty;
 	int polyc;
 	int dx, dy, cx, cy, pc;
+        int *styles, curstyle;
 	xp_polygon_t poly;
 	ipos *points, min, max;
 	signed char *ptr;
@@ -428,6 +429,33 @@ int Net_setup(void)
 	oldServer = 0;
 	ptr = Setup->map_data;
 	Setup->map_order = SETUP_MAP_UNCOMPRESSED;
+
+
+        /* TODO Get these from server somehow */
+        edgestyles = malloc(4 * sizeof(edgestyle_t));
+        if (edgestyles == NULL) {
+            error("no memory for edge styles");
+            return -1;
+        }
+
+        /* default style */
+        edgestyles[0].width = 3;
+        edgestyles[0].color = wallColor;
+        edgestyles[0].style = LineSolid;
+
+        /* some other styles.. */
+
+        edgestyles[1].width = 5;
+        edgestyles[1].color = RED;
+        edgestyles[1].style = LineSolid;
+
+        edgestyles[2].width = 3;
+        edgestyles[2].color = WHITE;
+        edgestyles[2].style = LineOnOffDash;
+
+        edgestyles[3].width = -1;
+
+        curstyle = 0;
 
 	polyc = (unsigned char)*ptr++ << 8;
 	polyc += (unsigned char)*ptr++;
@@ -441,12 +469,17 @@ int Net_setup(void)
 		error("no memory for points");
 		return -1;
 	    }
+            if ((styles = malloc(pc * sizeof(int))) == NULL) {
+                error("no memory for styles");
+                return -1;
+            }
 	    startx = (unsigned char)*ptr++ << 8;
 	    startx += (unsigned char)*ptr++;
 	    starty = (unsigned char)*ptr++ << 8;
 	    starty += (unsigned char)*ptr++;
 	    points[0].x = cx = min.x = max.x = startx;
 	    points[0].y = cy = min.y = max.y = starty;
+            styles[0] = curstyle;
 	    for (j = 1; j < pc; j++) {
 		dx = *ptr++ << 8;
 		dx += (unsigned char)*ptr++;
@@ -460,14 +493,22 @@ int Net_setup(void)
 		if (max.y < cy) max.y = cy;
 		points[j].x = dx;
 		points[j].y = dy;
+
+                /* hack for testing */
+                if (0 && (float)rand() / RAND_MAX > 0.8) {
+                    curstyle = ((float)rand() / RAND_MAX) * 4;
+                    if (curstyle == 4) curstyle--;
+                }
+                styles[j] = curstyle;
 	    }
-	    poly.point_ptr = points;
-	    poly.num_point = pc;
+	    poly.points = points;
+            poly.styles = styles;
+	    poly.num_points = pc;
 	    poly.bounds.x = min.x;
 	    poly.bounds.y = min.y;
 	    poly.bounds.w = max.x - min.x;
 	    poly.bounds.h = max.y - min.y;
-	    STORE(xp_polygon_t, polygon_ptr, num_polygon, max_polygon, poly);
+	    STORE(xp_polygon_t, polygons, num_polygons, max_polygons, poly);
 	}
 	num_bases = *ptr++;
 	bases = (homebase_t *) malloc(num_bases * sizeof(homebase_t));

@@ -89,8 +89,6 @@ vdecor_t	*vdecor_ptr;
 int		 num_vdecor, max_vdecor;
 wreckage_t	*wreckage_ptr;
 int		 num_wreckage, max_wreckage;
-xp_polygon_t    *polygon_ptr;
-int             num_polygon = 0, max_polygon;
 
 long		time_left = -1;
 long		start_loops, end_loops;

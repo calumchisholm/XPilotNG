@@ -110,7 +110,6 @@
     }
 
 
-
 typedef struct {
     DFLOAT	ratio;
     short	id;
@@ -163,6 +162,23 @@ typedef struct {
     int		pos;		/* Block index */
     irec        bounds;         /* Location in map */
 } checkpoint_t;
+
+
+typedef struct {
+    char           width;       /* Line width, -1 means no line */
+    int            color;       /* Line color */
+    int            style;       /* LineSolid, LineOnOffDash, LineDoubleDash */
+    int            texture;     /* Index of texture, not used for now */
+} edgestyle_t;
+
+typedef struct {
+    ipos        *points;
+    int         num_points;
+    irec        bounds;
+    int         texture;
+    int         *styles;
+} xp_polygon_t; 
+
 
 #define SCORE_OBJECT_COUNT	100
 typedef struct {
@@ -330,6 +346,12 @@ extern int		num_bases;
 
 extern checkpoint_t     *checks;
 extern int              num_checks;
+
+extern xp_polygon_t     *polygons;
+extern int               num_polygons, max_polygons;
+
+extern edgestyle_t      *edgestyles;
+extern int               num_edgestyles, max_edgestyles;
 
 int Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);

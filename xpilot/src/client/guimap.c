@@ -1209,11 +1209,13 @@ static int Rectangles_intersect(irec r1, irec r2) {
 
 void Gui_paint_polygon(int i, int xoff, int yoff) {
 
-    int j,x,y,texture = 0, filled = 0;
-    ipos ship;
-    static XPoint poly[10000];
+    static XPoint points[10000];
     static int		wallTileReady = 0;
     static Pixmap	wallTile = None;
+
+    int j,x,y,texture = 0, filled = 0;
+    ipos ship;
+    xp_polygon_t polygon;
 
     if (BIT(instruments, SHOW_TEXTURED_WALLS)) {
 	if (!wallTileReady) {
@@ -1228,8 +1230,9 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
 	}
     }
 
+    polygon = polygons[i];
+
     SET_FG(colors[wallColor].pixel);
-    XSetLineAttributes(dpy, gc, WINSCALE(4), LineSolid, CapButt, JoinMiter);
     if (BIT(instruments, SHOW_FILLED_WORLD)) filled = 1;
     
     x = xoff * Setup->width;
@@ -1237,24 +1240,49 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
     ship.x = WINSCALE(world.x);
     ship.y = WINSCALE(world.y + view_height);
     
-    for (j = 0; j < polygon_ptr[i].num_point; j++) {
-        x += polygon_ptr[i].point_ptr[j].x;
-        y += polygon_ptr[i].point_ptr[j].y;
-        poly[j].x = WINSCALE(x) - ship.x;
-        poly[j].y = ship.y - WINSCALE(y);
+    for (j = 0; j < polygon.num_points; j++) {
+        x += polygon.points[j].x;
+        y += polygon.points[j].y;
+        points[j].x = WINSCALE(x) - ship.x;
+        points[j].y = ship.y - WINSCALE(y);
     }
-    poly[j].x = poly[0].x;
-    poly[j].y = poly[0].y;
+    points[j].x = points[0].x;
+    points[j].y = points[0].y;
+    
 
     if (filled | texture) {
         if (texture) XSetFillStyle(dpy, gc, FillTiled);
-	rd.fillPolygon(dpy, p_draw, gc, poly, polygon_ptr[i].num_point,
+	rd.fillPolygon(dpy, p_draw, gc, points, polygon.num_points,
 		       Nonconvex, CoordModeOrigin);
         if (texture) XSetFillStyle(dpy, gc, FillSolid);
     }
-    if (texture || !filled)
-	rd.drawLines(dpy, p_draw, gc, poly, polygon_ptr[i].num_point + 1,
+    
+    if (1 || texture || !filled) {
+        
+        int begin, style;
+        
+        for (j = 0; j < polygon.num_points;) {
+            
+            begin = j;
+            style = polygon.styles[j++];
+            while (polygon.styles[j] == style && 
+                   j < polygon.num_points - 1) j++;
+            
+            if (edgestyles[style].width != -1) {
+                SET_FG(colors[edgestyles[style].color].pixel);
+                
+                XSetLineAttributes
+                    (dpy, gc, 
+                     WINSCALE(edgestyles[style].width), 
+                     edgestyles[style].style, CapButt, JoinMiter);
+                
+                rd.drawLines
+                    (dpy, p_draw, gc, 
+                     points + begin, j + 1 - begin,
                      CoordModeOrigin);
-
+            }
+        }
+    }
+    
     XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinMiter);
 }

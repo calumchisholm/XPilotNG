@@ -133,12 +133,6 @@ typedef struct {
     u_byte		wrecktype, size, rotation;
 } wreckage_t;
 
-typedef struct {
-    ipos                *point_ptr;
-    int                 num_point;
-    irec                bounds;
-    int                 texture;
-} xp_polygon_t; 
 
 extern refuel_t		*refuel_ptr;
 extern int		 num_refuel, max_refuel;
@@ -180,8 +174,6 @@ extern vdecor_t		*vdecor_ptr;
 extern int		 num_vdecor, max_vdecor;
 extern wreckage_t	*wreckage_ptr;
 extern int		 num_wreckage, max_wreckage;
-extern xp_polygon_t     *polygon_ptr;
-extern int               num_polygon, max_polygon;
 
 extern long		start_loops, end_loops;
 extern long		time_left;

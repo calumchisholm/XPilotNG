@@ -671,11 +671,11 @@ void Paint_world_radar(void)
     int y_offset = ((k / 3) - 1) * Setup->height;
 
     /* loop through all the polygons */
-    for (i = 0; i < num_polygon; i++) {
+    for (i = 0; i < num_polygons; i++) {
 
       /* location of current polygon */
-      int x = polygon_ptr[i].point_ptr[0].x + x_offset;
-      int y = Setup->height - polygon_ptr[i].point_ptr[0].y + y_offset;
+      int x = polygons[i].points[0].x + x_offset;
+      int y = Setup->height - polygons[i].points[0].y + y_offset;
 
       poly[0].x = (x * 256) / Setup->width;
       poly[0].y = (y * RadarHeight) / Setup->height;
@@ -684,10 +684,10 @@ void Paint_world_radar(void)
       DBG("(%d,%d) ", poly[0].x, poly[0].y);
 
       /* loop through the points in the current polygon */
-      for (j = 1; j < polygon_ptr[i].num_point; j++) {
+      for (j = 1; j < polygons[i].num_points; j++) {
 
-        x += polygon_ptr[i].point_ptr[j].x;
-        y -= polygon_ptr[i].point_ptr[j].y;
+        x += polygons[i].points[j].x;
+        y -= polygons[i].points[j].y;
 
         poly[j].x = (x * 256) / Setup->width;
         poly[j].y = (y * RadarHeight) / Setup->height;
@@ -695,7 +695,7 @@ void Paint_world_radar(void)
       }
 
       DBG("\n");
-      XFillPolygon(dpy, s_radar, radarGC, poly, polygon_ptr[i].num_point,
+      XFillPolygon(dpy, s_radar, radarGC, poly, polygons[i].num_points,
                    Nonconvex, CoordModeOrigin);
     }
   }
