@@ -35,6 +35,7 @@ static void confmenu_callback( void );
 static void hover_optionWidget( int over, Uint16 x , Uint16 y , void *data );
 
 static char *scrap = NULL;
+static GLWidget *scraptarget = NULL;
 
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
@@ -80,6 +81,7 @@ static void Close_WidgetTree ( GLWidget **widget )
     for (i=0;i<NUM_MOUSE_BUTTONS;++i)
     	if (*widget == clicktarget[i]) clicktarget[i]=NULL;
     if (*widget == hovertarget) hovertarget=NULL;
+    if (*widget == scraptarget) scraptarget=NULL;
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
     free(*widget);
@@ -107,6 +109,7 @@ void Close_Widget ( GLWidget **widget )
     for (i=0;i<NUM_MOUSE_BUTTONS;++i)
     	if (*widget == clicktarget[i]) clicktarget[i]=NULL;
     if (*widget == hovertarget) hovertarget=NULL;
+    if (*widget == scraptarget) scraptarget=NULL;
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
 
@@ -434,17 +437,17 @@ GLWidget *FindGLWidget( GLWidget *list, Uint16 x, Uint16 y )
 
 void load_textscrap(char *text)
 {
-	{ /* Convert the scrap from UNIX text to Mac text */
-		char *cp;
-		int   i;
-		scrap = realloc(scrap, strlen(text)+1);
-		strcpy(scrap, text);
-		for ( cp=scrap, i=0; i<(int)strlen(scrap); ++cp, ++i ) {
-			if ( *cp == '\n' )
-				*cp = '\r';
-		}
-	}
-	put_scrap(T('T','E','X','T'), strlen(scrap), scrap);
+    char *cp;
+    int   i;
+    
+    scraptarget = NULL;
+    scrap = realloc(scrap, strlen(text)+1);
+    strcpy(scrap, text);
+    for ( cp=scrap, i=0; i<(int)strlen(scrap); ++cp, ++i ) {
+    	if ( *cp == '\n' )
+    	    *cp = '\r';
+    }
+    put_scrap(T('T','E','X','T'), strlen(scrap), scrap);
 }
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */
@@ -961,7 +964,10 @@ static void button_LabelWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y,
     tmp = (LabelWidget *)(((GLWidget *)data)->wid_info);
     if (state == SDL_PRESSED) {
 	if (button == 1) {
-	    if ((tmp->tex).text) load_textscrap((tmp->tex).text);
+	    if ((tmp->tex).text) {
+	    	load_textscrap((tmp->tex).text);
+		scraptarget = (GLWidget *)data;
+	    }
 	}
     }
 }
@@ -1000,7 +1006,9 @@ static void Paint_LabelWidget( GLWidget *widget )
     GLWidget *tmp;
     SDL_Rect *b;
     LabelWidget *wid_info;
-    int x, y;
+    int x, y, alpha;
+    Uint32 color;
+    static int flasher = 0;
 
     if (!widget) return;
      
@@ -1026,22 +1034,27 @@ static void Paint_LabelWidget( GLWidget *widget )
 	wid_info->valign == CENTER ? tmp->bounds.y + tmp->bounds.h / 2 :
 	tmp->bounds.y + tmp->bounds.h;
 
+    
     if ( wid_info->fgcolor )
-    	disp_text(&(wid_info->tex), 
-		  *(wid_info->fgcolor), 
-		  wid_info->align, 
-		  wid_info->valign, 
-		  x, 
-		  draw_height - y, 
-		  true);
+    	color = *(wid_info->fgcolor);
     else
-    	disp_text(&(wid_info->tex), 
-		  whiteRGBA, 
-		  wid_info->align, 
-		  wid_info->valign, 
-		  x, 
-		  draw_height - y, 
-		  true);
+    	color = whiteRGBA;
+	
+    if (scraptarget == tmp) {
+	alpha = MAX(0,MIN(255,(color & 255) + tsin(flasher)*64));
+	flasher += TABLE_SIZE/clientFPS;
+    	if (flasher >= TABLE_SIZE) flasher -= TABLE_SIZE;
+	
+	color = (color&0xFFFFFF00) + alpha;
+    }
+	
+    disp_text(&(wid_info->tex), 
+    	    	color, 
+    	    	wid_info->align, 
+    	    	wid_info->valign, 
+    	    	x, 
+    	    	draw_height - y, 
+    	    	true);
 }
 
 GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor, int align, int valign  )
@@ -3123,6 +3136,7 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
 	}
 	if (button == 2) {
     	    if (Console_isVisible()) {
+	    	scraptarget = NULL;
 	    	get_scrap(T('T','E','X','T'), &scraplen, &scrap);
 		if ( scraplen == 0 ) return;
 	    	event.type = SDL_KEYDOWN;
