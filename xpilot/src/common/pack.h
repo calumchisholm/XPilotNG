@@ -105,9 +105,9 @@
  * 4.F.1.2: Show ships about to appear on bases, new team change packet.
  */
 #ifdef SERVER
-#define	MAGIC		(is_polygon_map ? 0x4F12F4ED : 0x4501F4ED)
+#define	MAGIC		(is_polygon_map ? 0x4F13F4ED : 0x4501F4ED)
 #else
-#define	MAGIC		0x4F12F4ED
+#define	MAGIC		0x4F13F4ED
 #endif
 
 #define MAGIC2VERSION(M)	(((M) >> 16) & 0xFFFF)

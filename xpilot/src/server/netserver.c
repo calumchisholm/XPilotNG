@@ -174,6 +174,8 @@ static void Feature_init(connection_t *connp)
 	    SET_BIT(features, F_SHOW_APPEARING);
 	    SET_BIT(features, F_SENDTEAM);
 	}
+	if (v >= 0x4F13)
+	    SET_BIT(features, F_CUMULATIVETURN);
     }
     connp->features = features;
     return;
@@ -1054,6 +1056,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     connp->view_height = DEF_VIEW_SIZE;
     connp->debris_colors = 0;
     connp->spark_rand = DEF_SPARK_RAND;
+    connp->last_mouse_pos = 0;
     connp->rectype = rplayback ? 2-playback : 0;
     Conn_set_state(connp, CONN_LISTENING, CONN_FREE);
     if (connp->w.buf == NULL
@@ -3443,6 +3446,14 @@ static int Receive_pointer_move(connection_t *connp)
     pl = Player_by_id(connp->id);
     if (BIT(pl->status, HOVERPAUSE))
 	return 1;
+
+    if (FEATURE(connp, F_CUMULATIVETURN)) {
+	int16_t delta;
+
+	delta = movement - connp->last_mouse_pos;
+	connp->last_mouse_pos = movement;
+	movement = delta;
+    }
 
     if (BIT(pl->used, HAS_AUTOPILOT))
 	Autopilot(pl, false);

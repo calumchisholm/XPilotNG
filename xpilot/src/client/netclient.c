@@ -2482,7 +2482,7 @@ int Send_display(int width, int height, int sparks, int spark_colors)
 
     if (Packet_printf(&wbuf, "%c%hd%hd%c%c", PKT_DISPLAY,
 		      width_wanted, height_wanted,
-		      spark_colors, 
+		      spark_colors,
 		      sparks) == -1)
 	return -1;
 
@@ -2504,6 +2504,13 @@ int Send_modifier_bank(int bank)
 
 int Send_pointer_move(int movement)
 {
+    static int total;
+
+    if (version >= 0x4F13) {
+	total += movement;
+	movement = total;
+    }
+
     if (Packet_printf(&wbuf, "%c%hd", PKT_POINTER_MOVE, movement) == -1)
 	return -1;
     return 0;
