@@ -3536,7 +3536,7 @@ static option_desc opts[] = {
     {
 	"constantSpeed",
 	"oldThrust",
-	"0",
+	"1.0",
 	&options.constantSpeed,
 	valReal,
 	tuner_dummy,
