@@ -994,19 +994,7 @@ static void Move_segment(move_state_t *ms)
     case TARGET:
 	if (block_type == TARGET) {
 	    if (mi->target_crashes) {
-		/*-BA This can be slow for large number of targets.
-		 *     added itemID array for extra speed, (at cost of some memory.)
-		 *     
-		 *for (i = 0; ; i++) {
-		 *    if (World.targets[i].pos.cx / BLOCK_CLICKS == block.x
-		 *	&& World.targets[i].pos.cy / BLOCK_CLICKS == block.y) {
-		 *	break;
-		 *     }
-		 * }
-		 *
-		 * ms->target = i;
-		 */
-		ms->target = i = World.itemID[block.x][block.y];
+		ms->target = i = Map_get_itemid(block.x, block.y);
 
 		if (!targetTeamCollision) {
 		    int team;

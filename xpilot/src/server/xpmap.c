@@ -245,7 +245,7 @@ static void Xpmap_place_cannon(int x, int y, int dir)
     }
 
     World.block[x][y] = CANNON;
-    World.itemID[x][y] = Map_place_cannon(cx, cy, dir, TEAM_NOT_SET);
+    Map_place_cannon(cx, cy, dir, TEAM_NOT_SET);
 }
 
 /*
@@ -259,7 +259,7 @@ static void Xpmap_place_base(int x, int y, int team)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = BASE;
-    World.itemID[x][y] = Map_place_base(cx, cy, DIR_UP, team);
+    Map_place_base(cx, cy, DIR_UP, team);
 }
 
 static void Xpmap_place_fuel(int x, int y)
@@ -267,7 +267,7 @@ static void Xpmap_place_fuel(int x, int y)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = FUEL;
-    World.itemID[x][y] = Map_place_fuel(cx, cy, TEAM_NOT_SET);
+    Map_place_fuel(cx, cy, TEAM_NOT_SET);
 }
 
 static void Xpmap_place_treasure(int x, int y, bool empty)
@@ -275,7 +275,7 @@ static void Xpmap_place_treasure(int x, int y, bool empty)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = TREASURE;
-    World.itemID[x][y] = Map_place_treasure(cx, cy, TEAM_NOT_SET, empty);
+    Map_place_treasure(cx, cy, TEAM_NOT_SET, empty);
 }
 
 static void Xpmap_place_wormhole(int x, int y, wormType type)
@@ -283,7 +283,7 @@ static void Xpmap_place_wormhole(int x, int y, wormType type)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = WORMHOLE;
-    World.itemID[x][y] = Map_place_wormhole(cx, cy, type);
+    Map_place_wormhole(cx, cy, type);
 }
 
 static void Xpmap_place_target(int x, int y)
@@ -291,7 +291,7 @@ static void Xpmap_place_target(int x, int y)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = TARGET;
-    World.itemID[x][y] = Map_place_target(cx, cy, TEAM_NOT_SET);
+    Map_place_target(cx, cy, TEAM_NOT_SET);
 }
 
 static void Xpmap_place_check(int x, int y, int index)
@@ -300,10 +300,11 @@ static void Xpmap_place_check(int x, int y, int index)
 
     if (!BIT(World.rules->mode, TIMING)) {
 	World.block[x][y] = SPACE;
+	return;
     }
 
     World.block[x][y] = CHECK;
-    World.itemID[x][y] = Map_place_check(cx, cy, index);
+    Map_place_check(cx, cy, index);
 }
 
 static void Xpmap_place_item_concentrator(int x, int y)
@@ -311,7 +312,7 @@ static void Xpmap_place_item_concentrator(int x, int y)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = ITEM_CONCENTRATOR;
-    World.itemID[x][y] = Map_place_item_concentrator(cx, cy);
+    Map_place_item_concentrator(cx, cy);
 }
 
 static void Xpmap_place_asteroid_concentrator(int x, int y)
@@ -319,7 +320,7 @@ static void Xpmap_place_asteroid_concentrator(int x, int y)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = ASTEROID_CONCENTRATOR;
-    World.itemID[x][y] = Map_place_asteroid_concentrator(cx, cy);
+    Map_place_asteroid_concentrator(cx, cy);
 }
 
 static void Xpmap_place_grav(int x, int y, DFLOAT force, int type)
@@ -327,7 +328,7 @@ static void Xpmap_place_grav(int x, int y, DFLOAT force, int type)
     int cx = BLOCK_CENTER(x), cy = BLOCK_CENTER(y);
 
     World.block[x][y] = type;
-    World.itemID[x][y] = Map_place_grav(cx, cy, force, type);
+    Map_place_grav(cx, cy, force, type);
 }
 
 static void Xpmap_place_block(int x, int y, int type)
@@ -350,7 +351,6 @@ void Xpmap_create_map_objects(void)
 	for (y = 0; y < World.y; y++) {
 
 	    c = World.block[x][y];
-	    World.itemID[x][y] = (unsigned short) -1;
 	    
 	    switch (c) {
 	    case ' ':

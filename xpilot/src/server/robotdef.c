@@ -428,7 +428,7 @@ static bool Really_empty_space(int ind, int x, int y)
 
     case WORMHOLE:
 	if (!wormholeVisible
-	    || World.wormHoles[World.itemID[x][y]].type == WORM_OUT) {
+	    || World.wormHoles[Map_get_itemid(x, y)].type == WORM_OUT) {
 	    return true;
 	} else {
 	    return false;
@@ -437,7 +437,7 @@ static bool Really_empty_space(int ind, int x, int y)
     case TARGET:
 	if (!targetTeamCollision
 	    && BIT(World.rules->mode, TEAM_PLAY)
-	    && World.targets[World.itemID[x][y]].team == pl->team) {
+	    && World.targets[Map_get_itemid(x, y)].team == pl->team) {
 	    return true;
 	} else {
 	    return false;
@@ -446,7 +446,7 @@ static bool Really_empty_space(int ind, int x, int y)
     case CANNON:
 	if (teamImmunity
 	    && BIT(World.rules->mode, TEAM_PLAY)
-	    && World.cannon[World.itemID[x][y]].team == pl->team) {
+	    && World.cannon[Map_get_itemid(x, y)].team == pl->team) {
 	    return true;
 	} else {
 	    return false;

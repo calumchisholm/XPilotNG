@@ -113,6 +113,7 @@ void Free_map(void);
 bool Grok_map(void);
 bool Grok_map_new(void);
 
+int Map_get_itemid(int x, int y);
 int Map_place_cannon(int cx, int cy, int dir, int team);
 int Map_place_base(int cx, int cy, int dir, int team);
 int Map_place_fuel(int cx, int cy, int team);
