@@ -86,6 +86,13 @@ AC_CHECK_LIB(expat, XML_ParserCreate)
 AC_PATH_X
 AC_PATH_XTRA
 
+dnl kps - Hack to link with libXext if DBE or MBX is configured
+if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then
+	X_EXTENSIONS_LIB="-lXext"
+else
+	X_EXTENSIONS_LIB=
+fi
+AC_SUBST(X_EXTENSIONS_LIB)
 
 dnl Figure out which math library to use
 dnl (borrowed from from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz)

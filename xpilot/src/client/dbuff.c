@@ -125,7 +125,7 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
 				&state->dbe.dbe_major,
 				&state->dbe.dbe_minor)) {
 	    dbuff_release(state);
-	    fprintf(stderr, "XdbeQueryExtension failed\n");
+	    warn("XdbeQueryExtension failed.");
 	    return NULL;
 	}
 #elif defined(MBX)
@@ -135,18 +135,18 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
 				 &state->mbx.mbx_ev_base,
 				 &state->mbx.mbx_err_base)) {
 	    dbuff_release(state);
-	    fprintf(stderr, "XmbufQueryExtension failed\n");
+	    warn("XmbufQueryExtension failed.");
 	    return NULL;
 	}
 #else
-	printf("Support for multibuffering was not configured.\n");
+	warn("Support for multibuffering was not configured.");
 	dbuff_release(state);
 	return NULL;
 #endif
 	break;
 
     default:
-	fprintf(stderr, "Illegal dbuff_t %d\n", type);
+	warn("Illegal dbuff_t %d.");
 	exit(1);
     }
 
@@ -212,7 +212,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
 				   MultibufferUpdateActionUndefined,
 				   MultibufferUpdateHintFrequent,
 				   state->mbx.mbx_draw) != 2) {
-		perror("Couldn't create double buffering buffers");
+		error("Couldn't create double buffering buffers.");
 		exit(1);
 	    }
 	}
@@ -227,7 +227,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
 					   drawWindow,
 					   XdbeBackground);
 	    if (state->dbe.dbe_draw == 0) {
-		perror("Couldn't create double buffering back buffer");
+		error("Couldn't create double buffering back buffer.");
 		exit(1);
 	    }
 	}
@@ -259,7 +259,7 @@ void dbuff_switch(dbuff_state_t *state)
 	swap.swap_window	= drawWindow;
 	swap.swap_action	= XdbeBackground;
 	if (!XdbeSwapBuffers(state->display, &swap, 1)) {
-	    perror("XdbeSwapBuffers failed");
+	    error("XdbeSwapBuffers failed.");
 	    exit(1);
 	}
     }
@@ -297,7 +297,7 @@ static void dbuff_list_dbe(Display *display)
     printf("\n");
     info = XdbeGetVisualInfo(display, NULL, &n);
     if (!info) {
-	printf("Could not obtain double buffer extension info\n");
+	warn("Could not obtain double buffer extension info.");
 	return;
     }
     for (i = 0; i < n; i++) {

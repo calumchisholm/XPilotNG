@@ -36,7 +36,7 @@ libxpclient_a_SOURCES = \
 	option.c default.c
 
 #xpilot_CFLAGS = @X_CFLAGS@
-xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
+xpilot_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
 
 # From section Conditional subdirectories with AM_CONDITIONAL
