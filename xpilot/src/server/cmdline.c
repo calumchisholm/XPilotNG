@@ -173,7 +173,7 @@ static option_desc opts[] = {
 	"60.0",
 	&options.shotLife,
 	valReal,
-	Timing_setup,
+	tuner_dummy,
 	"Life of bullets in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -194,7 +194,7 @@ static option_desc opts[] = {
 	"2.0",
 	&options.fireRepeatRate,
 	valReal,
-	Timing_setup,
+	tuner_dummy,
 	"Number of ticks per automatic fire (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -214,7 +214,7 @@ static option_desc opts[] = {
 	"6.0",
 	&options.pulseLife,
 	valReal,
-	Timing_setup,
+	tuner_dummy,
 	"Life of laser pulses shot by ships, in ticks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
