@@ -79,23 +79,23 @@ Window	keyboardWindow;		/* Keyboard window */
  */
 				/* supports 1 active font per window */
 Window	textWindow;		/* for the GC into the config window */
-Window	msgWindow;		/* for meesages into the playfield */
+Window	msgWindow;		/* for messages into the playfield */
 Window	buttonWindow;		/* to calculate size of buttons */
 #endif
 
-Pixmap	p_draw;			/* Saved pixmap for the drawing */
+Pixmap	drawPixmap;		/* Saved pixmap for the drawing */
 				/* area (monochromes use this) */
 Window	playersWindow;		/* Player list window */
 				/* monochromes) */
 int	maxMessages;		/* Max. number of messages to display */
 int	messagesToStdout;	/* Send messages to standard output */
-Window	about_w;		/* About window */
+Window	aboutWindow;
 Window	about_close_b;		/* About window's close button */
 Window	about_next_b;		/* About window's next button */
 Window	about_prev_b;		/* About window's previous button */
 Window	keys_close_b;		/* Help window's close button */
-Window	talk_w;			/* Talk window */
-XColor	colors[MAX_COLORS];	/* Colors */
+Window	talkWindow;
+XColor	colors[MAX_COLORS];
 Colormap	colormap;	/* Private colormap */
 int	maxColors;		/* Max. number of colors to use */
 bool	gotFocus;
@@ -324,14 +324,14 @@ void Paint_frame(void)
     /*
      * Now switch planes and clear the screen.
      */
-    if (p_radar != radarWindow && radar_exposures > 0) {
+    if (radarPixmap != radarWindow && radar_exposures > 0) {
 	if (BIT(instruments, SHOW_SLIDING_RADAR) == 0
 	    || BIT(Setup->mode, WRAP_PLAY) == 0) {
 #ifndef _WINDOWS
-	    XCopyArea(dpy, p_radar, radarWindow, gameGC,
+	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 		      0, 0, 256, RadarHeight, 0, 0);
 #else
-	    WinXBltPixToWin(p_radar, radarWindow,
+	    WinXBltPixToWin(radarPixmap, radarWindow,
 			    0, 0, 256, RadarHeight, 0, 0);
 #endif
 	} else {
@@ -358,13 +358,13 @@ void Paint_frame(void)
 	    h = RadarHeight - y;
 
 #ifndef _WINDOWS
-	    XCopyArea(dpy, p_radar, radarWindow, gameGC,
+	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 		      0, 0, x, y, w, h);
-	    XCopyArea(dpy, p_radar, radarWindow, gameGC,
+	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 		      x, 0, w, y, 0, h);
-	    XCopyArea(dpy, p_radar, radarWindow, gameGC,
+	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 		      0, y, x, h, w, 0);
-	    XCopyArea(dpy, p_radar, radarWindow, gameGC,
+	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 		      x, y, w, h, 0, 0);
 #else
 	    Paint_world_radar();
@@ -376,7 +376,7 @@ void Paint_frame(void)
 
 #ifndef _WINDOWS
     if (dbuf_state->type == PIXMAP_COPY)
-	XCopyArea(dpy, p_draw, drawWindow, gameGC,
+	XCopyArea(dpy, drawPixmap, drawWindow, gameGC,
 		  0, 0, draw_width, draw_height, 0, 0);
 
     dbuff_switch(dbuf_state);
@@ -399,7 +399,7 @@ void Paint_frame(void)
 #ifndef _WINDOWS
 	    if (dbuf_state->multibuffer_type != MULTIBUFFER_DBE) {
 		SET_FG(colors[BLACK].pixel);
-		XFillRectangle(dpy, p_draw, gameGC,
+		XFillRectangle(dpy, drawPixmap, gameGC,
 			       0, 0, draw_width, draw_height);
 	    }
 #endif

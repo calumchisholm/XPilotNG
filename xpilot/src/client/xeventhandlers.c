@@ -98,7 +98,7 @@ static void Selection_request(void)
     }
     else {
 	prop = XInternAtom(dpy, "VT_SELECTION", False);
-	XConvertSelection(dpy, XA_PRIMARY, XA_STRING, prop, talk_w,
+	XConvertSelection(dpy, XA_PRIMARY, XA_STRING, prop, talkWindow,
 			    CurrentTime);
 	/* the selectionNotify event `will do the rest' */
     }
@@ -244,7 +244,7 @@ void KeyChanged_event(XEvent *event)
 #endif
     if (event->xkey.window == topWindow)
         Key_event(event);
-    else if (event->xkey.window == talk_w) {
+    else if (event->xkey.window == talkWindow) {
         if (event->type == KeyPress) {
 	    talk_key_repeating = 1;
 	    /* TODO: implement gettimeofday() for windows */
@@ -265,7 +265,7 @@ void KeyChanged_event(XEvent *event)
 void ButtonPress_event(XEvent *event)
 {
     if (event->xbutton.window == drawWindow
-	|| event->xbutton.window == talk_w) {
+	|| event->xbutton.window == talkWindow) {
         if (pointerControl
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS) {
@@ -295,7 +295,7 @@ void ButtonPress_event(XEvent *event)
 
 	    case Button2:
 	        if (talk_mapped) {
-		    if (event->xbutton.window == talk_w)
+		    if (event->xbutton.window == talkWindow)
 		        Talk_place_cursor(&(event->xbutton), false);
 		    Selection_request();
 		}
@@ -333,7 +333,7 @@ void MotionNotify_event(XEvent *event)
 int ButtonRelease_event(XEvent *event)
 {
     if (event->xbutton.window == drawWindow
-	|| event->xbutton.window == talk_w) {
+	|| event->xbutton.window == talkWindow) {
 
         if (pointerControl
 	    && !talk_mapped
@@ -393,7 +393,7 @@ void Expose_event(XEvent *event)
 	    scoresChanged++;
 	}
     }
-    else if (event->xexpose.window == about_w) {
+    else if (event->xexpose.window == aboutWindow) {
 	if (event->xexpose.count == 0)
 	    Expose_about_window();
     }
@@ -403,7 +403,7 @@ void Expose_event(XEvent *event)
 	else
 	    radar_exposures++;
     }
-    else if (event->xexpose.window == talk_w) {
+    else if (event->xexpose.window == talkWindow) {
 	if (event->xexpose.count == 0) {
 	    Talk_event(event);
 	    if (!talk_mapped)

@@ -73,7 +73,7 @@ static void Talk_create_window(void)
     /*
      * Create talk window.
      */
-    talk_w
+    talkWindow
 	= XCreateSimpleWindow(dpy, drawWindow,
 			      TALK_WINDOW_X, TALK_WINDOW_Y,
 			      TALK_WINDOW_WIDTH, TALK_WINDOW_HEIGHT,
@@ -81,10 +81,10 @@ static void Talk_create_window(void)
 			      colors[BLACK].pixel);
 
     if (!selectionAndHistory)
-	XSelectInput(dpy, talk_w,
+	XSelectInput(dpy, talkWindow,
 		     KeyPressMask | KeyReleaseMask | ExposureMask);
     else
-	XSelectInput(dpy, talk_w, ButtonPressMask | ButtonReleaseMask |
+	XSelectInput(dpy, talkWindow, ButtonPressMask | ButtonReleaseMask |
 				KeyPressMask | KeyReleaseMask | ExposureMask);
 }
 
@@ -96,7 +96,7 @@ void Talk_cursor(bool visible)
 
     if (visible == false) {
 	XSetForeground(dpy, talkGC, colors[BLACK].pixel);
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    talk_cursor.offset + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    "_", 1);
@@ -108,7 +108,7 @@ void Talk_cursor(bool visible)
 		  && talk_cursor.point < selection.talk.x2)
 		/* cursor in a selection? redraw the character emphasized */
 		XSetForeground(dpy, talkGC, colors[DRAW_EMPHASIZED].pixel);
-	    XDrawString(dpy, talk_w, talkGC,
+	    XDrawString(dpy, talkWindow, talkGC,
 			talk_cursor.offset + TALK_INSIDE_BORDER,
 			talkFont->ascent + TALK_INSIDE_BORDER,
 			&talk_str[talk_cursor.point], 1);
@@ -130,7 +130,7 @@ void Talk_cursor(bool visible)
 		|| talk_cursor.point >= selection.talk.x2) )
 	    XSetForeground(dpy, talkGC, colors[DRAW_EMPHASIZED].pixel);
 
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    talk_cursor.offset + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    "_", 1);
@@ -153,20 +153,20 @@ void Talk_map_window(bool map)
 	    Talk_create_window();
 	    talk_created = true;
 	}
-	XMapWindow(dpy, talk_w);
+	XMapWindow(dpy, talkWindow);
 	talk_mapped = true;
 
 	XQueryPointer(dpy, DefaultRootWindow(dpy),
 		      &root, &child, &root_x, &root_y, &win_x, &win_y,
 		      &keys_buttons);
-	XWarpPointer(dpy, None, talk_w,
+	XWarpPointer(dpy, None, talkWindow,
 		     0, 0, 0, 0,
 		     TALK_WINDOW_WIDTH - (TALK_WINDOW_HEIGHT / 2),
 		     TALK_WINDOW_HEIGHT / 2);
 	XFlush(dpy);	/* warp pointer ASAP. */
     }
     else if (talk_created == true) {
-	XUnmapWindow(dpy, talk_w);
+	XUnmapWindow(dpy, talkWindow);
 	XWarpPointer(dpy, None, root, 0, 0, 0, 0, root_x, root_y);
 	XFlush(dpy);	/* warp pointer ASAP. */
 	talk_mapped = false;
@@ -194,7 +194,7 @@ static void Talk_refresh(void)
 	/* don't redraw. it's not there anymore */
 	return;
     else if (len == 0) {
-	XClearWindow(dpy, talk_w);
+	XClearWindow(dpy, talkWindow);
 	return;
     }
 
@@ -203,7 +203,7 @@ static void Talk_refresh(void)
     else
 	XSetForeground(dpy, talkGC, colors[WHITE].pixel);
 
-    XDrawString(dpy, talk_w, talkGC,
+    XDrawString(dpy, talkWindow, talkGC,
 		XTextWidth(talkFont, talk_str, selection.talk.x1)
 		 + TALK_INSIDE_BORDER,
 		talkFont->ascent + TALK_INSIDE_BORDER,
@@ -371,7 +371,7 @@ static void Talk_delete_emphasized_text(void)
      */
     if (newlen < oldlen) {
 	XSetForeground(dpy, talkGC, colors[BLACK].pixel);
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    width + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    &talk_str[talk_cursor.point],
@@ -379,7 +379,7 @@ static void Talk_delete_emphasized_text(void)
 	XSetForeground(dpy, talkGC, colors[WHITE].pixel);
     }
     if (talk_cursor.point < newlen)
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    width + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    &new_str[talk_cursor.point],
@@ -412,8 +412,8 @@ int Talk_do_event(XEvent *event)
     switch (event->type) {
 
     case Expose:
-	XClearWindow(dpy, talk_w);
-	XDrawString(dpy, talk_w, talkGC,
+	XClearWindow(dpy, talkWindow);
+	XDrawString(dpy, talkWindow, talkGC,
 		    TALK_INSIDE_BORDER, talkFont->ascent + TALK_INSIDE_BORDER,
 		    talk_str, strlen(talk_str));
 	if (selectionAndHistory && selection.talk.state == SEL_EMPHASIZED)
@@ -515,7 +515,7 @@ int Talk_do_event(XEvent *event)
 			Talk_cursor(false);
 			talk_cursor.point = 0;
 			Talk_cursor(true);
-			XClearWindow(dpy, talk_w);
+			XClearWindow(dpy, talkWindow);
 		    }
 		    break;
 
@@ -768,7 +768,7 @@ int Talk_do_event(XEvent *event)
 	     */
 	    if (newlen < oldlen) {
 		XSetForeground(dpy, talkGC, colors[BLACK].pixel);
-		XDrawString(dpy, talk_w, talkGC, XTextWidth(talkFont, talk_str,
+		XDrawString(dpy, talkWindow, talkGC, XTextWidth(talkFont, talk_str,
 				talk_cursor.point) + TALK_INSIDE_BORDER,
 			    talkFont->ascent + TALK_INSIDE_BORDER,
 			    &talk_str[talk_cursor.point],
@@ -776,7 +776,7 @@ int Talk_do_event(XEvent *event)
 		XSetForeground(dpy, talkGC, colors[WHITE].pixel);
 	    }
 	    if (talk_cursor.point < newlen)
-		XDrawString(dpy, talk_w, talkGC, XTextWidth(talkFont, talk_str,
+		XDrawString(dpy, talkWindow, talkGC, XTextWidth(talkFont, talk_str,
 				talk_cursor.point) + TALK_INSIDE_BORDER,
 			    talkFont->ascent + TALK_INSIDE_BORDER,
 			    &new_str[talk_cursor.point],
@@ -826,14 +826,14 @@ int Talk_do_event(XEvent *event)
 		 * Erase old text from cursor to end of line.
 		 */
 		XSetForeground(dpy, talkGC, colors[BLACK].pixel);
-		XDrawString(dpy, talk_w, talkGC,
+		XDrawString(dpy, talkWindow, talkGC,
 			    oldwidth + TALK_INSIDE_BORDER,
 			    talkFont->ascent + TALK_INSIDE_BORDER,
 			    &talk_str[talk_cursor.point],
 			    oldlen - talk_cursor.point);
 		XSetForeground(dpy, talkGC, colors[WHITE].pixel);
 	    }
-	    XDrawString(dpy, talk_w, talkGC,
+	    XDrawString(dpy, talkWindow, talkGC,
 			oldwidth + TALK_INSIDE_BORDER,
 			talkFont->ascent + TALK_INSIDE_BORDER,
 			&new_str[talk_cursor.point],
@@ -952,9 +952,9 @@ int Talk_paste(char *data, int data_len, bool overwrite)
      * graphics
      */
     if (overwrite) {
-	XClearWindow(dpy, talk_w);
+	XClearWindow(dpy, talkWindow);
 	XSetForeground(dpy, talkGC, colors[WHITE].pixel);
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    tmp_str, accept_len );
@@ -969,7 +969,7 @@ int Talk_paste(char *data, int data_len, bool overwrite)
 	     * erase from the point of insertion on
 	     */
 	    XSetForeground(dpy, talkGC, colors[BLACK].pixel);
-	    XDrawString(dpy, talk_w, talkGC,
+	    XDrawString(dpy, talkWindow, talkGC,
 			XTextWidth(talkFont, talk_backup, talk_cursor.point)
 			+ TALK_INSIDE_BORDER,
 			talkFont->ascent + TALK_INSIDE_BORDER,
@@ -979,7 +979,7 @@ int Talk_paste(char *data, int data_len, bool overwrite)
 	}
 
 	/* the new part of the line */
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    XTextWidth(talkFont, talk_backup, talk_cursor.point)
 		    + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
@@ -1003,7 +1003,7 @@ int Talk_paste(char *data, int data_len, bool overwrite)
 void Talk_resize(void)
 {
     if (talk_created)
-	XMoveResizeWindow(dpy, talk_w,
+	XMoveResizeWindow(dpy, talkWindow,
 			  TALK_WINDOW_X, TALK_WINDOW_Y,
 			  TALK_WINDOW_WIDTH, TALK_WINDOW_HEIGHT);
 }
@@ -1200,7 +1200,7 @@ void Talk_window_cut(XButtonEvent* xbutton)
 	/*
 	 * making the cut available; see end of Talk_cut_from_messages()
 	 */
-	XSetSelectionOwner(dpy, XA_PRIMARY, talk_w, CurrentTime);
+	XSetSelectionOwner(dpy, XA_PRIMARY, talkWindow, CurrentTime);
 	/* `cut buffer' is binary stuff - append '\0'  */
 	strncpy(tmp, &talk_str[selection.talk.x1],
 		selection.talk.x2 - selection.talk.x1);

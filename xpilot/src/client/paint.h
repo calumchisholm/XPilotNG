@@ -140,16 +140,16 @@ extern Window	radarWindow, playersWindow;
 #ifdef _WINDOWS				/* see paint.c for details */
 extern Window	textWindow, msgWindow, buttonWindow;
 #endif
-extern Pixmap	p_draw;			/* Drawing area pixmap */
-extern Pixmap	p_radar;		/* Radar drawing pixmap */
-extern Pixmap	s_radar;		/* Second radar drawing pixmap */
+extern Pixmap	drawPixmap;		/* Drawing area pixmap */
+extern Pixmap	radarPixmap;		/* Radar drawing pixmap */
+extern Pixmap	radarPixmap2;		/* Second radar drawing pixmap */
 extern long	dpl_1[2];		/* Used by radar hack */
 extern long	dpl_2[2];		/* Used by radar hack */
-extern Window	about_w;		/* The About window */
+extern Window	aboutWindow;		/* The About window */
 extern Window	about_close_b;		/* About close button */
 extern Window	about_next_b;		/* About next page button */
 extern Window	about_prev_b;		/* About prev page button */
-extern Window	talk_w;			/* Talk window */
+extern Window	talkWindow;		/* Talk window */
 extern XColor	colors[MAX_COLORS];	/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */

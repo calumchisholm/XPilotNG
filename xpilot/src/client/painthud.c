@@ -109,7 +109,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 	int color = meterBorderColor;
 
 	SET_FG(colors[color].pixel);
-	rd.drawRectangle(dpy, p_draw, gameGC,
+	rd.drawRectangle(dpy, drawPixmap, gameGC,
 		       WINSCALE(x), WINSCALE(y),
 		       WINSCALE(meterWidth), WINSCALE(meterHeight));
 	Erase_4point(WINSCALE(x), WINSCALE(y),
@@ -126,7 +126,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     if (!meterBorderColor)
 	SET_FG(colors[meter_color].pixel);
 
-    rd.drawString(dpy, p_draw, gameGC,
+    rd.drawString(dpy, drawPixmap, gameGC,
 		  (xstr), WINSCALE(y)+(gameFont->ascent+meterHeight)/2,
 		  title, strlen(title));
     Erase_rectangle(xstr,
@@ -139,7 +139,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
     /*int width = WINSCALE((int)(((meterWidth-3)*val)/(max?max:1)));*/
 
     /*printf("TODO: implement paint meter\n");*/
-    /*PaintMeter(p_draw, BM_METER,
+    /*PaintMeter(drawPixmap, BM_METER,
       WINSCALE(x), WINSCALE(y),
       WINSCALE(meterWidth), WINSCALE(11),
       width);*/
@@ -182,7 +182,7 @@ void Paint_score_objects(void)
 		    SET_FG(colors[scoreObjectColor].pixel);
 		    x = WINSCALE(X(x)) - sobj->msg_width / 2,
 		    y = WINSCALE(Y(y)) + gameFont->ascent / 2,
-		    rd.drawString(dpy, p_draw, gameGC,
+		    rd.drawString(dpy, drawPixmap, gameGC,
 				x, y,
 				sobj->msg,
 				sobj->msg_len);
@@ -311,7 +311,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 	SET_FG(colors[color].pixel);
 
 	FIND_NAME_WIDTH(target);
-	rd.drawString(dpy, p_draw, gameGC,
+	rd.drawString(dpy, drawPixmap, gameGC,
 		      WINSCALE(hud_pos_x) - target->name_width / 2,
 		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
 		      - gameFont->descent ,
@@ -334,7 +334,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 	    else
 		SET_FG(colors[hudColor].pixel);
 
-	    rd.drawString(dpy, p_draw, gameGC,
+	    rd.drawString(dpy, drawPixmap, gameGC,
 			  WINSCALE(hud_pos_x + hudSize - HUD_OFFSET + BORDER),
 			  WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER)
 			  - gameFont->descent,
@@ -373,7 +373,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 			  - size * 0.5),
 		y = (int)(hud_pos_y - MIN_HUD_SIZE * 0.6 * tsin(lock_dir)
 			  - size * 0.5),
-		rd.fillArc(dpy, p_draw, gameGC,
+		rd.fillArc(dpy, drawPixmap, gameGC,
 			 WINSCALE(x), WINSCALE(y),
 			 WINSCALE(size), WINSCALE(size), 0, 64*360);
 		Erase_rectangle(WINSCALE(x), WINSCALE(y),
@@ -504,7 +504,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	    int len, width;
 
 	    /* Paint item symbol */
-	    Paint_item_symbol((u_byte)i, p_draw, gameGC,
+	    Paint_item_symbol((u_byte)i, drawPixmap, gameGC,
 			horiz_pos - ITEM_SIZE,
 			vert_pos,
 			ITEM_HUD);
@@ -513,7 +513,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 		if (lose_item_active != 0) {
 		    if (lose_item_active < 0)
 			lose_item_active++;
-		    rd.drawRectangle(dpy, p_draw, gameGC,
+		    rd.drawRectangle(dpy, drawPixmap, gameGC,
 				horiz_pos-ITEM_SIZE-2,
 				vert_pos-2, ITEM_SIZE+2, ITEM_SIZE+2);
 		}
@@ -523,7 +523,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	    sprintf(str, "%d", num);
 	    len = strlen(str);
 	    width = XTextWidth(gameFont, str, len);
-	    rd.drawString(dpy, p_draw, gameGC,
+	    rd.drawString(dpy, drawPixmap, gameGC,
 			  horiz_pos - ITEM_SIZE - BORDER - width,
 			  vert_pos + ITEM_SIZE/2 + gameFont->ascent/2,
 			  str, len);
@@ -623,7 +623,7 @@ void Paint_HUD(void)
 
     if (hudHLineColor) {
 	SET_FG(colors[hudHLineColor].pixel);
-	rd.drawLine(dpy, p_draw, gameGC,
+	rd.drawLine(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x - hudSize),
 		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET),
 		    WINSCALE(hud_pos_x + hudSize),
@@ -633,7 +633,7 @@ void Paint_HUD(void)
 		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET),
 		      WINSCALE(hud_pos_x + hudSize),
 		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET));
-	rd.drawLine(dpy, p_draw, gameGC,
+	rd.drawLine(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x - hudSize),
 		    WINSCALE(hud_pos_y + hudSize - HUD_OFFSET),
 		    WINSCALE(hud_pos_x + hudSize),
@@ -646,7 +646,7 @@ void Paint_HUD(void)
     }
     if (hudVLineColor) {
 	SET_FG(colors[hudVLineColor].pixel);
-	rd.drawLine(dpy, p_draw, gameGC,
+	rd.drawLine(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
 		    WINSCALE(hud_pos_y -hudSize),
 		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
@@ -656,7 +656,7 @@ void Paint_HUD(void)
 		      WINSCALE(hud_pos_y - hudSize),
 		      WINSCALE(hud_pos_x - hudSize + HUD_OFFSET),
 		      WINSCALE(hud_pos_y + hudSize));
-	rd.drawLine(dpy, p_draw, gameGC,
+	rd.drawLine(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
 		    WINSCALE(hud_pos_y - hudSize),
 		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
@@ -678,7 +678,7 @@ void Paint_HUD(void)
 	SET_FG(colors[hudColor].pixel);
 	did_fuel = 1;
 	sprintf(str, "%04d", (int)fuelSum);
-	rd.drawString(dpy, p_draw, gameGC,
+	rd.drawString(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x + hudSize-HUD_OFFSET+BORDER),
 		    WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
 				+ gameFont->ascent,
@@ -692,7 +692,7 @@ void Paint_HUD(void)
 		strcpy(str,"M ");
 	    else
 		sprintf(str, "T%d", fuelCurrent);
-	    rd.drawString(dpy, p_draw, gameGC,
+	    rd.drawString(dpy, drawPixmap, gameGC,
 			WINSCALE(hud_pos_x + hudSize-HUD_OFFSET + BORDER),
 			WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 			+ gameFont->descent + 2*gameFont->ascent,
@@ -721,7 +721,7 @@ void Paint_HUD(void)
 		    sobj->hud_msg_width > WINSCALE(2*hudSize-HUD_OFFSET*2) &&
 		    (did_fuel || hudVLineColor))
 		    ++j;
-		rd.drawString(dpy, p_draw, gameGC,
+		rd.drawString(dpy, drawPixmap, gameGC,
 			      WINSCALE(hud_pos_x) - sobj->hud_msg_width/2,
 			      WINSCALE(hud_pos_y + hudSize-HUD_OFFSET + BORDER)
 			      + gameFont->ascent
@@ -742,7 +742,7 @@ void Paint_HUD(void)
 	    sprintf(str, "%3d:%02d",
 		    (int)(time_left / 60), (int)(time_left % 60));
 	    size = XTextWidth(gameFont, str, strlen(str));
-	    rd.drawString(dpy, p_draw, gameGC,
+	    rd.drawString(dpy, drawPixmap, gameGC,
 			  WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER)
 			  - size,
 			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
@@ -758,7 +758,7 @@ void Paint_HUD(void)
 
 	/* Update the modifiers */
 	modlen = strlen(mods);
-	rd.drawString(dpy, p_draw, gameGC,
+	rd.drawString(dpy, drawPixmap, gameGC,
 		      WINSCALE(hud_pos_x - hudSize+HUD_OFFSET-BORDER)
 		      - XTextWidth(gameFont, mods, modlen),
 		      WINSCALE(hud_pos_y + hudSize-HUD_OFFSET+BORDER)
@@ -774,7 +774,7 @@ void Paint_HUD(void)
 	if (autopilotLight) {
 	    int text_width = XTextWidth(gameFont, autopilot,
 					sizeof(autopilot)-1);
-	    rd.drawString(dpy, p_draw, gameGC,
+	    rd.drawString(dpy, drawPixmap, gameGC,
 			  WINSCALE(hud_pos_x) - text_width/2,
 			  WINSCALE(hud_pos_y - hudSize+HUD_OFFSET - BORDER)
 			  - gameFont->descent * 2 - gameFont->ascent,
@@ -805,7 +805,7 @@ void Paint_HUD(void)
 		 || (fuelSum > fuelLevel2))))) {
 
 	SET_FG(colors[fuelGaugeColor].pixel);
-	rd.drawRectangle(dpy, p_draw, gameGC,
+	rd.drawRectangle(dpy, drawPixmap, gameGC,
 			 WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 				  + FUEL_GAUGE_OFFSET) - 1,
 			 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
@@ -820,7 +820,7 @@ void Paint_HUD(void)
 		     WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
 
 	size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
-	rd.fillRectangle(dpy, p_draw, gameGC,
+	rd.fillRectangle(dpy, drawPixmap, gameGC,
 			 WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 				  + FUEL_GAUGE_OFFSET) + 1,
 			 WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
@@ -1025,22 +1025,22 @@ void Paint_messages(void)
 
 	    if (ptr) {
 		XSetForeground(dpy, messageGC, colors[msg_color].pixel);
-		rd.drawString(dpy, p_draw, messageGC, x + xoff, y, ptr, l);
+		rd.drawString(dpy, drawPixmap, messageGC, x + xoff, y, ptr, l);
 	    }
 	    if (ptr2) {
 		XSetForeground(dpy, messageGC, colors[DRAW_EMPHASIZED].pixel);
-		rd.drawString(dpy, p_draw, messageGC, x + xoff2, y, ptr2, l2);
+		rd.drawString(dpy, drawPixmap, messageGC, x + xoff2, y, ptr2, l2);
 	    }
 	    if (ptr3) {
 		XSetForeground(dpy, messageGC, colors[msg_color].pixel);
-		rd.drawString(dpy, p_draw, messageGC, x + xoff3, y, ptr3, l3);
+		rd.drawString(dpy, drawPixmap, messageGC, x + xoff3, y, ptr3, l3);
 	    }
 
 	} else /* not emphasized */
 #endif
 	{
 	    XSetForeground(dpy, messageGC, colors[msg_color].pixel);
-	    rd.drawString(dpy, p_draw, messageGC, x, y, msg->txt, len);
+	    rd.drawString(dpy, drawPixmap, messageGC, x, y, msg->txt, len);
 	}
 
 	if (len < msg->len)
@@ -1073,7 +1073,7 @@ void Paint_recording(void)
     w = XTextWidth(gameFont, buf, len);
     x = WINSCALE(ext_view_width) - 10 - w;
     y = 10 + gameFont->ascent;
-    XDrawString(dpy, p_draw, gameGC, x, y, buf, len);
+    XDrawString(dpy, drawPixmap, gameGC, x, y, buf, len);
     Erase_rectangle( x - 1, WINSCALE(10),
 			 w+2, gameFont->ascent + gameFont->descent);
 }
@@ -1095,7 +1095,7 @@ void Paint_client_fps(void)
     w = XTextWidth(gameFont, buf, len);
     x = WINSCALE(ext_view_width) - 10 - w;
     y = 200 + gameFont->ascent;
-    rd.drawString(dpy, p_draw, gameGC, x, y, buf, len);
+    rd.drawString(dpy, drawPixmap, gameGC, x, y, buf, len);
     Erase_rectangle(x - 1,  WINSCALE(200),
 		    w + 2, gameFont->ascent + gameFont->descent);
 }

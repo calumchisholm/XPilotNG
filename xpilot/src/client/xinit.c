@@ -811,8 +811,8 @@ int Init_playing_windows(void)
 	colors[i].pixel = i;
 
     players_exposed = 1;
-    /* p_radar = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth); */
-    s_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+    /* radarPixmap = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth); */
+    radarPixmap2 = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
     /*
      * Create item bitmaps AFTER the windows
      */
@@ -910,22 +910,27 @@ int Init_playing_windows(void)
     switch (dbuf_state->type) {
 
     case PIXMAP_COPY:
-	p_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-	s_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-	p_draw  = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
-				dispDepth);
+	radarPixmap
+	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+	radarPixmap2
+	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+	drawPixmap
+	    = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
+			    dispDepth);
 	break;
 
     case MULTIBUFFER:
-	p_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-	s_radar = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+	radarPixmap
+	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
+	radarPixmap2
+	    = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
 	dbuff_init_buffer(dbuf_state);
 	break;
 
     case COLOR_SWITCH:
-	s_radar = radarWindow;
-	p_radar = radarWindow;
-	p_draw = drawWindow;
+	radarPixmap2 = radarWindow;
+	radarPixmap = radarWindow;
+	drawPixmap = drawWindow;
 	Paint_sliding_radar();
 	break;
 
@@ -1124,9 +1129,9 @@ void Resize(Window w, int width, int height)
     XResizeWindow(dpy, drawWindow, draw_width, draw_height);
 #ifndef _WINDOWS
     if (dbuf_state->type == PIXMAP_COPY) {
-	XFreePixmap(dpy, p_draw);
-	p_draw = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
-			       dispDepth);
+	XFreePixmap(dpy, drawPixmap);
+	drawPixmap = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
+				   dispDepth);
     }
 #endif
     players_height = top_height - (RadarHeight + ButtonHeight + 2);

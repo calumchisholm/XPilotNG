@@ -106,7 +106,7 @@ void Erase_do_start(void)
     }
     if (BIT(erp->flags, ERASE_INITIALIZED) == 0) {
 	SET_FG(colors[BLACK].pixel);
-	XFillRectangle(dpy, p_draw, gameGC, 0, 0, draw_width, draw_height);
+	XFillRectangle(dpy, drawPixmap, gameGC, 0, 0, draw_width, draw_height);
 	SET_BIT(erp->flags, ERASE_INITIALIZED);
     }
     erp->num_rect = 0;
@@ -136,11 +136,11 @@ void Erase_do_end(void)
     SET_FG(colors[BLACK].pixel);
 
     if (erp->num_rect != 0) {
-	XFillRectangles(dpy, p_draw, gameGC, erp->rect_ptr, erp->num_rect);
+	XFillRectangles(dpy, drawPixmap, gameGC, erp->rect_ptr, erp->num_rect);
 	UNEXPAND(erp->rect_ptr, erp->num_rect, erp->max_rect);
     }
     if (erp->num_arc != 0) {
-	XDrawArcs(dpy, p_draw, gameGC, erp->arc_ptr, erp->num_arc);
+	XDrawArcs(dpy, drawPixmap, gameGC, erp->arc_ptr, erp->num_arc);
 	UNEXPAND(erp->arc_ptr, erp->num_arc, erp->max_arc);
     }
     for (i = 0; i <= MAX_LINE_WIDTH; i++) {
@@ -148,7 +148,7 @@ void Erase_do_end(void)
 	    XSetLineAttributes(dpy, gameGC, i,
 			       LineSolid, CapProjecting, JoinMiter);
 	    linewidth = true;
-	    XDrawSegments(dpy, p_draw, gameGC,
+	    XDrawSegments(dpy, drawPixmap, gameGC,
 			  erp->seg_ptr[i], erp->num_seg[i]);
 	    UNEXPAND(erp->seg_ptr[i], erp->num_seg[i], erp->max_seg[i]);
 	}
@@ -285,7 +285,7 @@ void Rectangle_end(void)
     for (i = 0; i < maxColors; i++) {
 	if (num_rect[i] > 0) {
 	    SET_FG(colors[i].pixel);
-	    rd.fillRectangles(dpy, p_draw, gameGC, rect_ptr[i], num_rect[i]);
+	    rd.fillRectangles(dpy, drawPixmap, gameGC, rect_ptr[i], num_rect[i]);
 	    Erase_rectangles(rect_ptr[i], num_rect[i]);
 	    RELEASE(rect_ptr[i], num_rect[i], max_rect[i]);
 	}
@@ -320,7 +320,7 @@ void Arc_end(void)
     for (i = 0; i < maxColors; i++) {
 	if (num_arc[i] > 0) {
 	    SET_FG(colors[i].pixel);
-	    rd.drawArcs(dpy, p_draw, gameGC, arc_ptr[i], num_arc[i]);
+	    rd.drawArcs(dpy, drawPixmap, gameGC, arc_ptr[i], num_arc[i]);
 	    Erase_arcs(arc_ptr[i], num_arc[i]);
 	    RELEASE(arc_ptr[i], num_arc[i], max_arc[i]);
 	}
@@ -360,7 +360,7 @@ void Segment_end(void)
     for (i = 0; i < maxColors; i++) {
 	if (num_seg[i] > 0) {
 	    SET_FG(colors[i].pixel);
-	    rd.drawSegments(dpy, p_draw, gameGC,
+	    rd.drawSegments(dpy, drawPixmap, gameGC,
 			    seg_ptr[i], num_seg[i]);
 	    Erase_segments(seg_ptr[i], num_seg[i]);
 	    RELEASE(seg_ptr[i], num_seg[i], max_seg[i]);

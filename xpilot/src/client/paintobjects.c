@@ -142,7 +142,7 @@ static void Paint_items(void)
 	    x = itemtype_ptr[i].x;
 	    y = itemtype_ptr[i].y;
 	    if (wrap(&x, &y)) {
-		Paint_item((u_byte)itemtype_ptr[i].type, p_draw, gameGC,
+		Paint_item((u_byte)itemtype_ptr[i].type, drawPixmap, gameGC,
 			    WINSCALE(X(x)), WINSCALE(Y(y)));
 		Erase_rectangle(WINSCALE(X(x)) - ITEM_TRIANGLE_SIZE,
 				WINSCALE(Y(y)) - ITEM_TRIANGLE_SIZE,

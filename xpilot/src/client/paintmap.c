@@ -576,7 +576,7 @@ void Paint_world(void)
 			    XSetFillStyle(dpy, gameGC, FillTiled);
 			else
 			    SET_FG(colors[wallColor].pixel);
-			rd.fillPolygon(dpy, p_draw, gameGC,
+			rd.fillPolygon(dpy, drawPixmap, gameGC,
 				       points, 5,
 				       Convex, CoordModeOrigin);
 			if (wallTileDoit)
@@ -613,7 +613,7 @@ void Paint_world(void)
 		XSetFillStyle(dpy, gameGC, FillTiled);
 	    else
 		SET_FG(colors[wallColor].pixel);
-	    rd.fillPolygon(dpy, p_draw, gameGC,
+	    rd.fillPolygon(dpy, drawPixmap, gameGC,
 			   points, 5,
 			   Convex, CoordModeOrigin);
 	    if (wallTileDoit)

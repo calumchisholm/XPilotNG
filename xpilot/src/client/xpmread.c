@@ -548,7 +548,7 @@ static Pixmap xpm_image_to_pixmap(XPM *xpm, XImage *img)
     Pixmap		pixmap;
     GC			pixgc;
 
-    pixmap = XCreatePixmap(dpy, p_draw, xpm->width, xpm->height, dispDepth);
+    pixmap = XCreatePixmap(dpy, drawPixmap, xpm->width, xpm->height, dispDepth);
     if (pixmap != None) {
 	pixgc = XCreateGC(dpy, pixmap, 0, NULL);
 	XPutImage(dpy, pixmap, pixgc, img, 0, 0, 0, 0, xpm->width, xpm->height);
