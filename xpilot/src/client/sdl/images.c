@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include "xpclient.h"
 #include "images.h"
+#include "sdlpaint.h"
 
 static image_t *images = NULL;
 static int num_images = 0, max_images = 0;
@@ -125,8 +126,10 @@ void Image_paint_area(int ind, int x, int y, int frame, irec *r)
     tx1 = ((float)frame * img->frame_width + r->x) / img->data_width;
     ty1 = ((float)r->y) / img->data_height;
     tx2 = ((float)frame * img->frame_width + r->x + r->w) / img->data_width;
-    ty2 = ((float)r->y + r->h) / img->data_height;
-
+    ty2 = ((float)r->y + r->h) / (img->data_height-1);
+    /* this above -1 seems to keep individual stationary textures from changing */
+    /* for fixing moving textures... dunno except going to window choords =( */
+    
     glBindTexture(GL_TEXTURE_2D, img->name);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
@@ -134,11 +137,11 @@ void Image_paint_area(int ind, int x, int y, int frame, irec *r)
     glColor4ub(255, 255, 255, 255);
 
     glBegin(GL_QUADS);
-    glTexCoord2f(tx1, ty1); glVertex2i(x, y);
-    glTexCoord2f(tx2, ty1); glVertex2i(x + r->w, y);
-    glTexCoord2f(tx2, ty2); glVertex2i(x + r->w, y + r->h);
-    glTexCoord2f(tx1, ty2); glVertex2i(x, y + r->h);
-    glEnd();
+    glTexCoord2f(tx1, ty1); glVertex2i(x    	, y 	    );
+    glTexCoord2f(tx2, ty1); glVertex2i(x + r->w , y 	    );
+    glTexCoord2f(tx2, ty2); glVertex2i(x + r->w , y + r->h  );
+    glTexCoord2f(tx1, ty2); glVertex2i(x    	, y + r->h  );
+    glEnd();    
 
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);

@@ -23,4 +23,10 @@ extern double           scale;              /* The opengl scale factor */
 /* code to set the viewport size */
 int Resize_Window( int width, int height );
 
+/* helper function in sdlgui.c, some may be removed soon */
+extern int GL_X(int x);
+extern int GL_Y(int y);
+extern void Segment_add(int color, int x_1, int y_1, int x_2, int y_2);
+extern void Circle(int color, int x, int y, int radius);
+
 #endif

@@ -431,9 +431,12 @@ int Process_event(SDL_Event *evt)
 	break;
 	
     case SDL_MOUSEBUTTONDOWN:
-	if (!pointerControl) break;
-	key_change |= Key_press(buttonMap[evt->button.button - 1]);
-	break;
+	if (!pointerControl) {
+	    break;
+	} else {
+	    key_change |= Key_press(buttonMap[evt->button.button - 1]);
+	    break;
+	}
 	
     case SDL_MOUSEMOTION:
 	if (!pointerControl) break;

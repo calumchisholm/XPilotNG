@@ -38,7 +38,6 @@ static double   time_counter = 0.0;
 double	        hudRadarLimit;		/* Limit for hudradar drawing */
 double          scale;                  /* The opengl scale factor */
 
-
 /* function to reset our viewport after a window resize */
 int Resize_Window( int width, int height )
 {
@@ -189,13 +188,23 @@ void Paint_frame(void)
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(-world.x * scale, -world.y * scale, 0);
+    glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
     glScalef(scale, scale, scale);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (damaged <= 0) {
-	Paint_world();
+    	glMatrixMode(GL_MODELVIEW);
+    	glLoadIdentity();
+    	glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
+    	glScalef(scale, scale, scale);
+
+    	glClear(GL_COLOR_BUFFER_BIT);
+
+	glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+    	Paint_world();
 
 	if (oldServer) {
 	    Paint_vfuel();
@@ -207,22 +216,22 @@ void Paint_frame(void)
 
 	Paint_shots();
 	Paint_ships();
-	/* TODO
-	Paint_meters();
-	Paint_HUD();
-	Paint_client_fps();
 
-	Paint_messages();
-	Paint_score_objects();
-	*/
-
-	glMatrixMode(GL_MODELVIEW);
+    	glDisable(GL_BLEND);
+	
+	glMatrixMode(GL_MODELVIEW);/*do we need this?*/
 	glLoadIdentity();
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
 	gluOrtho2D(0, draw_width, draw_height, 0);
 
+    	Paint_meters();
+    	Paint_HUD();
+    	Paint_client_fps();
+
+    	Paint_messages();       
+    	Paint_score_objects();
 	Radar_paint();
 
 	glPopMatrix();
