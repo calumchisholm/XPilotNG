@@ -15,7 +15,7 @@
 <Option name="ballradius" value="8"/>
 <Option name="baselesspausing" value="yes"/>
 <Option name="allowmodifiers" value="no"/>
-<Option name="playerwallbouncebrakefactor" value="0.5"/>
+<Option name="playerwallbouncebrakefactor" value="0.6"/>
 <Option name="ballswallbounce" value="yes"/>
 <Option name="allowclusters" value="no"/>
 <Option name="mapheight" value="3500"/>
