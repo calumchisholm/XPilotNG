@@ -35,72 +35,72 @@
 #include "glwidgets.h"
 #include "text.h"
 
-int nullRGBA    = 0x00000000;
-int blackRGBA   = 0x000000ff;
-int whiteRGBA   = 0xffffffff;
-int blueRGBA    = 0x0000ffff;
-int redRGBA     = 0xff0000ff;
-int greenRGBA   = 0x00ff00ff;
+Uint32 nullRGBA    = 0x00000000;
+Uint32 blackRGBA   = 0x000000ff;
+Uint32 whiteRGBA   = 0xffffffff;
+Uint32 blueRGBA    = 0x0000ffff;
+Uint32 redRGBA     = 0xff0000ff;
+Uint32 greenRGBA   = 0x00ff00ff;
 
-int wallColorRGBA;
-int hudColorRGBA;
-int connColorRGBA;
-int scoreObjectColorRGBA;
-int fuelColorRGBA;
-int messagesColorRGBA;
-int oldmessagesColorRGBA;
-int msgScanBallColorRGBA;
-int msgScanSafeColorRGBA;
-int msgScanCoverColorRGBA;
-int msgScanPopColorRGBA;
-int ballColorRGBA;
+Uint32 wallColorRGBA;
+Uint32 hudColorRGBA;
+Uint32 connColorRGBA;
+Uint32 scoreObjectColorRGBA;
+Uint32 fuelColorRGBA;
+Uint32 messagesColorRGBA;
+Uint32 oldmessagesColorRGBA;
+Uint32 msgScanBallColorRGBA;
+Uint32 msgScanSafeColorRGBA;
+Uint32 msgScanCoverColorRGBA;
+Uint32 msgScanPopColorRGBA;
+Uint32 ballColorRGBA;
 
-int meterBorderColorRGBA;
-int fuelMeterColorRGBA;
-int powerMeterColorRGBA;
-int turnSpeedMeterColorRGBA;
-int packetSizeMeterColorRGBA;
-int packetLossMeterColorRGBA;
-int packetDropMeterColorRGBA;
-int packetLagMeterColorRGBA;
-int temporaryMeterColorRGBA;
+Uint32 meterBorderColorRGBA;
+Uint32 fuelMeterColorRGBA;
+Uint32 powerMeterColorRGBA;
+Uint32 turnSpeedMeterColorRGBA;
+Uint32 packetSizeMeterColorRGBA;
+Uint32 packetLossMeterColorRGBA;
+Uint32 packetDropMeterColorRGBA;
+Uint32 packetLagMeterColorRGBA;
+Uint32 temporaryMeterColorRGBA;
 
-int dirPtrColorRGBA;
-int hudHLineColorRGBA;
-int hudVLineColorRGBA;
-int hudItemsColorRGBA;
-int fuelGaugeColorRGBA;
-int selfLWColorRGBA;
-int teamLWColorRGBA;
-int enemyLWColorRGBA;
-int team0ColorRGBA;
-int team1ColorRGBA;
-int team2ColorRGBA;
-int team3ColorRGBA;
-int team4ColorRGBA;
-int team5ColorRGBA;
-int team6ColorRGBA;
-int team7ColorRGBA;
-int team8ColorRGBA;
-int team9ColorRGBA;
-int shipNameColorRGBA;
-int baseNameColorRGBA;
-int manyLivesColorRGBA;
-int twoLivesColorRGBA;
-int oneLifeColorRGBA;
-int zeroLivesColorRGBA;
+Uint32 dirPtrColorRGBA;
+Uint32 hudHLineColorRGBA;
+Uint32 hudVLineColorRGBA;
+Uint32 hudItemsColorRGBA;
+Uint32 fuelGaugeColorRGBA;
+Uint32 selfLWColorRGBA;
+Uint32 teamLWColorRGBA;
+Uint32 enemyLWColorRGBA;
+Uint32 team0ColorRGBA;
+Uint32 team1ColorRGBA;
+Uint32 team2ColorRGBA;
+Uint32 team3ColorRGBA;
+Uint32 team4ColorRGBA;
+Uint32 team5ColorRGBA;
+Uint32 team6ColorRGBA;
+Uint32 team7ColorRGBA;
+Uint32 team8ColorRGBA;
+Uint32 team9ColorRGBA;
+Uint32 shipNameColorRGBA;
+Uint32 baseNameColorRGBA;
+Uint32 manyLivesColorRGBA;
+Uint32 twoLivesColorRGBA;
+Uint32 oneLifeColorRGBA;
+Uint32 zeroLivesColorRGBA;
 
-int hudRadarEnemyColorRGBA;
-int hudRadarOtherColorRGBA;
+Uint32 hudRadarEnemyColorRGBA;
+Uint32 hudRadarOtherColorRGBA;
 
-int scoreInactiveSelfColorRGBA;
-int scoreInactiveColorRGBA;
-int scoreSelfColorRGBA;
-int scoreColorRGBA;
-int scoreOwnTeamColorRGBA;
-int scoreEnemyTeamColorRGBA;
+Uint32 scoreInactiveSelfColorRGBA;
+Uint32 scoreInactiveColorRGBA;
+Uint32 scoreSelfColorRGBA;
+Uint32 scoreColorRGBA;
+Uint32 scoreOwnTeamColorRGBA;
+Uint32 scoreEnemyTeamColorRGBA;
 
-int selectionColorRGBA;
+Uint32 selectionColorRGBA;
 
 int hudSize 	    	= 250;
 static int meterWidth	= 60;
@@ -126,7 +126,7 @@ int Gui_init(void);
 void Gui_cleanup(void);
 
 /* better to use alpha everywhere, less confusion */
-void set_alphacolor(int color)
+void set_alphacolor(Uint32 color)
 {
     glColor4ub((color >> 24) & 255,
     	       (color >> 16) & 255,
@@ -134,7 +134,7 @@ void set_alphacolor(int color)
 	       color & 255);
 }
 
-static GLubyte get_alpha(int color)
+static GLubyte get_alpha(Uint32 color)
 {
     return (color & 255);
 }
@@ -147,7 +147,7 @@ int GL_Y(int y) {
 }
 
 /* remove this later maybe? to tedious for me to edit them all away now */
-void Segment_add(int color, int x_1, int y_1, int x_2, int y_2)
+void Segment_add(Uint32 color, int x_1, int y_1, int x_2, int y_2)
 {
     set_alphacolor(color);
     glBegin( GL_LINE_LOOP );
@@ -156,7 +156,7 @@ void Segment_add(int color, int x_1, int y_1, int x_2, int y_2)
     glEnd();
 }
 
-void Circle(int color,
+void Circle(Uint32 color,
 	    int x, int y,
 	    int radius, int filled)
 {
@@ -245,10 +245,10 @@ int Gui_init(void)
 	return -1;
     }
 
-    gluTessCallback(tess, GLU_TESS_BEGIN, glBegin);
+    gluTessCallback(tess, GLU_TESS_BEGIN, (_GLUfuncptr)glBegin);
 	/* TODO: figure out proper casting here */
-    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (void*)vertex_callback);
-    gluTessCallback(tess, GLU_TESS_END, glEnd);
+    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (_GLUfuncptr)vertex_callback);
+    gluTessCallback(tess, GLU_TESS_END, (_GLUfuncptr)glEnd);
 
     for (i = 0; i < num_polygons; i++) {
 	tessellate_polygon(tess, i);
@@ -1773,7 +1773,8 @@ bool newcode = true;
 
 void Paint_messages(void)
 {
-    int j, i = 0, *msg_color;
+    int j, i = 0;
+    Uint32 *msg_color;
     /*const int BORDER = 10;*/
     GLWidget *tmp = NULL;
     GLWidget *tmp2 = NULL;

@@ -81,7 +81,7 @@ void Close_WidgetTree ( GLWidget **widget );
 /* to reshape the widget, and automagically reshape and place sub-widgets */
 void SetBounds_GLWidget(GLWidget *wid, SDL_Rect *b );
 /* Initializes the appropriate config widget (if implemented), returns NULL otherwise */
-GLWidget *Init_OptionWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
+GLWidget *Init_OptionWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor );
 
 bool AppendGLWidgetList( GLWidget **list, GLWidget *widget );
 void PrependGLWidgetList( GLWidget **list, GLWidget *widget );
@@ -127,9 +127,25 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction, int width, int height,
 /*********************/
 
 /***********************/
+/* Begin: ButtonWidget  */
+/***********************/
+#define BUTTONWIDGET 1
+typedef struct {
+    Uint32    *normal_color;
+    Uint32    *pressed_color;
+    bool    pressed;
+    void    (*action)(void *data);
+    void    *actiondata;
+} ButtonWidget;
+GLWidget *Init_ButtonWidget( Uint32 *normal_color, Uint32 *pressed_color, void (*action)(void *data), void *actiondata);
+/*********************/
+/* End: ButtonWidget  */
+/*********************/
+
+/***********************/
 /* Begin: SlideWidget  */
 /***********************/
-#define SLIDEWIDGET 1
+#define SLIDEWIDGET 2
 typedef struct {
     bool    sliding;/*Don't slide*/
     bool    locked;/*Don't slide*/
@@ -148,7 +164,7 @@ GLWidget *Init_SlideWidget( bool locked,
 /***************************/
 typedef enum {SB_VERTICAL, SB_HORISONTAL} ScrollWidget_dir_t;
 /* note 0.0 <= pos && pos + size <= 1.0 */
-#define SCROLLBARWIDGET 2
+#define SCROLLBARWIDGET 3
 typedef struct {
     GLWidget	    	*slide;
     GLfloat 	    	pos;
@@ -169,17 +185,17 @@ void ScrollbarWidget_SetSlideSize( GLWidget *widget, GLfloat size );
 /**********************/
 /* Begin: LabelWidget */
 /**********************/
-#define LABELWIDGET 3
+#define LABELWIDGET 4
 typedef struct {
     string_tex_t    tex;
-    int     	    *fgcolor;
-    int     	    *bgcolor;
+    Uint32     	    *fgcolor;
+    Uint32     	    *bgcolor;
     int             align;  /* horizontal alignemnt */
     int             valign; /* vertical alignment   */
 } LabelWidget;
-GLWidget *Init_LabelWidget( const char *text , int *fgcolor, int *bgcolor, int align, int valign );
+GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor, int align, int valign );
 
-bool LabelWidget_SetColor( GLWidget *widget , int *fgcolor, int *bgcolor );
+bool LabelWidget_SetColor( GLWidget *widget , Uint32 *fgcolor, Uint32 *bgcolor );
 
 /********************/
 /* End: LabelWidget */
@@ -188,7 +204,7 @@ bool LabelWidget_SetColor( GLWidget *widget , int *fgcolor, int *bgcolor );
 /***********************************/
 /* Begin: LabeledRadiobuttonWidget */
 /***********************************/
-#define LABELEDRADIOBUTTONWIDGET 4
+#define LABELEDRADIOBUTTONWIDGET 5
 typedef struct {
     bool    	    state;
     string_tex_t    *ontex;
@@ -207,16 +223,16 @@ GLWidget *Init_LabeledRadiobuttonWidget( string_tex_t *ontex, string_tex_t *offt
 /****************************/
 /* Begin: BoolChooserWidget */
 /****************************/
-#define BOOLCHOOSERWIDGET 5
+#define BOOLCHOOSERWIDGET 6
 typedef struct {
     xp_option_t     *opt;
     GLWidget	    *buttonwidget;
     GLWidget	    *name;
-    int     	    *fgcolor;
-    int     	    *bgcolor;
+    Uint32     	    *fgcolor;
+    Uint32     	    *bgcolor;
 } BoolChooserWidget;
 
-GLWidget *Init_BoolChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
+GLWidget *Init_BoolChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor );
 /**************************/
 /* End: BoolChooserWidget */
 /**************************/
@@ -224,7 +240,7 @@ GLWidget *Init_BoolChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
 /***************************/
 /* Begin: IntChooserWidget */
 /***************************/
-#define INTCHOOSERWIDGET 6
+#define INTCHOOSERWIDGET 7
 typedef struct {
     GLWidget	    *name;
     xp_option_t     *opt;
@@ -233,11 +249,11 @@ typedef struct {
     GLWidget	    *leftarrow;
     GLWidget	    *rightarrow;
     int     	    direction;
-    int     	    *fgcolor;
-    int     	    *bgcolor;
+    Uint32     	    *fgcolor;
+    Uint32     	    *bgcolor;
 } IntChooserWidget;
 
-GLWidget *Init_IntChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
+GLWidget *Init_IntChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor );
 /*************************/
 /* End: IntChooserWidget */
 /*************************/
@@ -245,7 +261,7 @@ GLWidget *Init_IntChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
 /******************************/
 /* Begin: DoubleChooserWidget */
 /******************************/
-#define DOUBLECHOOSERWIDGET 7
+#define DOUBLECHOOSERWIDGET 8
 typedef struct {
     GLWidget	    *name;
     xp_option_t     *opt;
@@ -254,11 +270,11 @@ typedef struct {
     GLWidget	    *leftarrow;
     GLWidget	    *rightarrow;
     int     	    direction;
-    int     	    *fgcolor;
-    int     	    *bgcolor;
+    Uint32     	    *fgcolor;
+    Uint32     	    *bgcolor;
 } DoubleChooserWidget;
 
-GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor );
+GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor );
 /****************************/
 /* End: DoubleChooserWidget */
 /****************************/
@@ -268,7 +284,7 @@ GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor
 /**********************/
 typedef enum {LW_DOWN, LW_UP} ListWidget_ver_dir_t;
 typedef enum {LW_RIGHT, LW_LEFT} ListWidget_hor_dir_t;
-#define LISTWIDGET 8
+#define LISTWIDGET 9
 typedef struct {
      int num_elements;
      Uint32 *bg;
@@ -306,7 +322,7 @@ GLWidget *ListWidget_GetItemByIndex( GLWidget *list, int i );
 /****************************/
 /* Begin: ScrollPaneWidget  */
 /****************************/
-#define SCROLLPANEWIDGET 8
+#define SCROLLPANEWIDGET 10
 typedef struct {
     GLWidget	*scroller;
     GLWidget	*masque;
@@ -322,7 +338,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content );
 /**********************/
 /* Begin: RadarWidget */
 /**********************/
-#define RADARWIDGET 9
+#define RADARWIDGET 11
 
 extern GLWidget *Init_RadarWidget( void );
 /********************/
@@ -332,7 +348,7 @@ extern GLWidget *Init_RadarWidget( void );
 /**************************/
 /* Begin: ScorelistWidget */
 /**************************/
-#define SCORELISTWIDGET 10
+#define SCORELISTWIDGET 12
 
 extern GLWidget *Init_ScorelistWidget( void );
 /************************/
@@ -342,7 +358,7 @@ extern GLWidget *Init_ScorelistWidget( void );
 /**********************/
 /* Begin: MainWidget  */
 /**********************/
-#define MAINWIDGET 11
+#define MAINWIDGET 13
 typedef struct {
     GLWidget	*confmenu;
     GLWidget	*radar;
@@ -361,7 +377,7 @@ GLWidget *Init_MainWidget( font_data *font );
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
-#define CONFMENUWIDGET 12
+#define CONFMENUWIDGET 14
 typedef struct {
     GLWidget	*scrollpane;
 } ConfMenuWidget;
@@ -374,7 +390,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );
 /*****************************/
 /* Begin: ImageButtonWidget  */
 /*****************************/
-#define IMAGEBUTTONWIDGET 13
+#define IMAGEBUTTONWIDGET 15
 typedef struct {
     Uint32 fg;
     Uint32 bg;

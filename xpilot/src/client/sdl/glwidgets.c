@@ -122,7 +122,7 @@ void SetBounds_GLWidget( GLWidget *widget, SDL_Rect *b )
 }
 
 /* Eventually this will be the only visible initializer I guess */
-GLWidget *Init_OptionWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
+GLWidget *Init_OptionWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor )
 {
     if (!opt) {
     	error("Faulty parameter to Init_DoubleChooserWidget: opt is a NULL pointer!");
@@ -336,12 +336,13 @@ void Paint_ArrowWidget( GLWidget *widget )
     SDL_Rect *b;
     ArrowWidget *wid_info;
     ArrowWidget_dir_t dir;
-    static int normalcolor  = 0xff0000ff;
-    static int presscolor   = 0x00ff00ff;
-    static int tapcolor     = 0xffffffff;
-    static int lockcolor    = 0x88000088;
+    static Uint32 normalcolor  = 0xff0000ff;
+    static Uint32 presscolor   = 0x00ff00ff;
+    static Uint32 tapcolor     = 0xffffffff;
+    static Uint32 lockcolor    = 0x88000088;
     
-	if (!widget) return;	
+    if (!widget) return;
+    	
     tmp = widget;
     b = &(tmp->bounds);
     wid_info = (ArrowWidget *)(tmp->wid_info);
@@ -423,6 +424,87 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction,int width, int height,
 /********************/
 
 /**********************/
+/* Begin:  ButtonWidget*/
+/**********************/
+void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
+void Paint_ButtonWidget( GLWidget *widget );
+
+void button_ButtonWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+{
+    ButtonWidget *tmp;
+    
+    if (!data) return;
+    tmp = (ButtonWidget *)(((GLWidget *)data)->wid_info);
+    if (state == SDL_PRESSED) {
+	if (button == 1) {
+    	    tmp->pressed = true;
+	    if (tmp->action) tmp->action(tmp->actiondata);
+	}
+    }
+    if (state == SDL_RELEASED) {
+	if (button == 1) {
+    	    tmp->pressed = false;
+	}
+    }
+}
+
+void Paint_ButtonWidget( GLWidget *widget )
+{
+    ButtonWidget *wid_info;
+    int color;
+    
+    if (!widget) return;	
+    if (!(wid_info = (ButtonWidget *)(widget->wid_info))) return;
+    
+    if (wid_info->pressed) {
+    	if (wid_info->pressed_color)
+	    color = *(wid_info->pressed_color);
+	else color = redRGBA;
+    } else {
+    	if (wid_info->normal_color)
+	    color = *(wid_info->normal_color);
+	else color = greenRGBA;
+    }
+    
+    set_alphacolor(color);
+    glBegin(GL_QUADS);
+    	glVertex2i( widget->bounds.x 	    	    	, widget->bounds.y	    	    	);
+    	glVertex2i( widget->bounds.x	    	    	, widget->bounds.y+widget->bounds.h	);
+    	glVertex2i( widget->bounds.x+widget->bounds.w	, widget->bounds.y+widget->bounds.h	);
+    	glVertex2i( widget->bounds.x+widget->bounds.w	, widget->bounds.y	    	    	);
+    glEnd();
+}
+
+GLWidget *Init_ButtonWidget( Uint32 *normal_color, Uint32 *pressed_color, void (*action)(void *data), void *actiondata)
+{
+    GLWidget *tmp	= Init_EmptyBaseGLWidget();
+    if ( !tmp ) {
+        error("Failed to malloc in Init_ButtonWidget");
+	return NULL;
+    }
+    tmp->wid_info   	= malloc(sizeof(ButtonWidget));
+    if ( !(tmp->wid_info) ) {
+    	free(tmp);
+        error("Failed to malloc in Init_ButtonWidget");
+	return NULL;
+    }
+    tmp->WIDGET     	= BUTTONWIDGET;
+    ((ButtonWidget *)tmp->wid_info)->pressed = false;
+    ((ButtonWidget *)tmp->wid_info)->normal_color = normal_color;
+    ((ButtonWidget *)tmp->wid_info)->pressed_color = pressed_color;
+    ((ButtonWidget *)tmp->wid_info)->action = action;
+    ((ButtonWidget *)tmp->wid_info)->actiondata = actiondata;
+    tmp->Draw	    	= Paint_ButtonWidget;
+    tmp->button     	= button_ButtonWidget;
+    tmp->buttondata 	= tmp;
+    return tmp;
+}
+
+/********************/
+/* End:  ButtonWidget*/
+/********************/
+
+/**********************/
 /* Begin: SlideWidget*/
 /**********************/
 void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
@@ -455,10 +537,10 @@ void Paint_SlideWidget( GLWidget *widget )
     SlideWidget *wid_info;
 
    
-    static int normalcolor  = 0xff0000ff;
-    static int presscolor   = 0x00ff00ff;
-    static int lockcolor  = 0x333333ff;
-    int color;
+    static Uint32 normalcolor  = 0xff0000ff;
+    static Uint32 presscolor   = 0x00ff00ff;
+    static Uint32 lockcolor  = 0x333333ff;
+    Uint32 color;
 
     if (!widget) return;
     tmp = widget;
@@ -581,7 +663,7 @@ void SetBounds_ScrollbarWidget( GLWidget *widget, SDL_Rect *b )
 
 void Paint_ScrollbarWidget( GLWidget *widget )
 {
-    static int bgcolor  = 0x00000044;
+    static Uint32 bgcolor  = 0x00000044;
     SDL_Rect *b = &(widget->bounds);
     
     set_alphacolor( bgcolor );
@@ -737,7 +819,7 @@ void Close_LabelWidget( GLWidget *widget )
     free_string_texture(&(((LabelWidget *)widget->wid_info)->tex));
 }
 
-bool LabelWidget_SetColor( GLWidget *widget , int *fgcolor, int *bgcolor )
+bool LabelWidget_SetColor( GLWidget *widget , Uint32 *fgcolor, Uint32 *bgcolor )
 {
     LabelWidget *wi;
     
@@ -805,7 +887,7 @@ void Paint_LabelWidget( GLWidget *widget )
 		  true);
 }
 
-GLWidget *Init_LabelWidget( const char *text , int *fgcolor, int *bgcolor, int align, int valign  )
+GLWidget *Init_LabelWidget( const char *text , Uint32 *fgcolor, Uint32 *bgcolor, int align, int valign  )
 {
     GLWidget *tmp;
 
@@ -874,10 +956,10 @@ void Paint_LabeledRadiobuttonWidget( GLWidget *widget )
     GLWidget *tmp;
     SDL_Rect *b;
     LabeledRadiobuttonWidget *wid_info;
-    static int false_bg_color	= 0x00000044;
-    static int true_bg_color	= 0x00000044;
-    static int false_text_color	= 0xff0000ff;
-    static int true_text_color	= 0x00ff00ff;
+    static Uint32 false_bg_color	= 0x00000044;
+    static Uint32 true_bg_color	    	= 0x00000044;
+    static Uint32 false_text_color	= 0xff0000ff;
+    static Uint32 true_text_color	= 0x00ff00ff;
 
     if (!widget) return;
      
@@ -1026,8 +1108,8 @@ void Paint_BoolChooserWidget( GLWidget *widget )
     if ( !(wid_info = (BoolChooserWidget *)(widget->wid_info))) return;
 
     if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
-    	glEnable(GL_BLEND);
-    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    	/*glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
     	set_alphacolor( *(wid_info->bgcolor) );
     	glBegin(GL_QUADS);
     	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
@@ -1038,7 +1120,7 @@ void Paint_BoolChooserWidget( GLWidget *widget )
     }
 }
 
-GLWidget *Init_BoolChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
+GLWidget *Init_BoolChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor )
 {
     GLWidget *tmp;
     BoolChooserWidget *wid_info;
@@ -1286,8 +1368,8 @@ void Paint_IntChooserWidget( GLWidget *widget )
     else if (wid_info->direction < 0) ++(wid_info->direction);
 
     if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
-    	glEnable(GL_BLEND);
-    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    	/*glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
     	set_alphacolor(*(wid_info->bgcolor));
     	glBegin(GL_QUADS);
     	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
@@ -1302,7 +1384,7 @@ void Paint_IntChooserWidget( GLWidget *widget )
     	disp_text(&(wid_info->valuetex), whiteRGBA, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
 }
 
-GLWidget *Init_IntChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
+GLWidget *Init_IntChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor )
 {
     int valuespace;
     GLWidget *tmp;
@@ -1543,8 +1625,8 @@ void Paint_DoubleChooserWidget( GLWidget *widget )
     else if (wid_info->direction < 0) ++(wid_info->direction);
 
     if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
-    	glEnable(GL_BLEND);
-    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    	/*glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
     	set_alphacolor(*(wid_info->bgcolor));
     	glBegin(GL_QUADS);
     	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
@@ -1560,7 +1642,7 @@ void Paint_DoubleChooserWidget( GLWidget *widget )
     	disp_text(&(wid_info->valuetex), whiteRGBA, RIGHT, CENTER, wid_info->rightarrow->bounds.x-1/*value_>*/-2/*>_|*/, draw_height - widget->bounds.y - widget->bounds.h/2, true );
 }
 
-GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, int *fgcolor, int *bgcolor )
+GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor )
 {
     int valuespace;
     GLWidget *tmp;
@@ -1970,8 +2052,8 @@ void Paint_ListWidget( GLWidget *widget )
     
     wid_info = (ListWidget *)(widget->wid_info);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    /*glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 
     glBegin(GL_QUADS);
 
@@ -2449,15 +2531,15 @@ void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
 
 void Paint_ConfMenuWidget( GLWidget *widget )
 {
-    int edgeColor = 0xff0000ff;
-    int bgColor = 0x0000ff88;
+    Uint32 edgeColor = 0xff0000ff;
+    Uint32 bgColor = 0x0000ff88;
 
     if (!widget ) {
     	error("tPaint_ConfMenuWidget: tried to paint NULL ConfMenuWidget!");
 	return;
     }
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    /*glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
     set_alphacolor(bgColor);
     glBegin(GL_QUADS);
     	glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
@@ -2484,7 +2566,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
     SDL_Rect bounds;
     int i;
     xp_option_t *opt;
-    static int name_color   = 0xffff66ff;
+    static Uint32 name_color   = 0xffff66ff;
 
     tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {

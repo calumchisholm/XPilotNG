@@ -45,25 +45,25 @@ void setupPaint_moving(void);
 void setupPaint_HUD(void);
 
 /* helper function in sdlgui.c, some may be removed soon */
-extern int nullRGBA;
-extern int blackRGBA;
-extern int whiteRGBA;
-extern int blueRGBA;
-extern int redRGBA;
-extern int greenRGBA;
+extern Uint32 nullRGBA;
+extern Uint32 blackRGBA;
+extern Uint32 whiteRGBA;
+extern Uint32 blueRGBA;
+extern Uint32 redRGBA;
+extern Uint32 greenRGBA;
 
-extern int scoreInactiveSelfColorRGBA;
-extern int scoreInactiveColorRGBA;
-extern int scoreSelfColorRGBA;
-extern int scoreColorRGBA;
-extern int scoreOwnTeamColorRGBA;
-extern int scoreEnemyTeamColorRGBA;
+extern Uint32 scoreInactiveSelfColorRGBA;
+extern Uint32 scoreInactiveColorRGBA;
+extern Uint32 scoreSelfColorRGBA;
+extern Uint32 scoreColorRGBA;
+extern Uint32 scoreOwnTeamColorRGBA;
+extern Uint32 scoreEnemyTeamColorRGBA;
 
 extern int GL_X(int x);
 extern int GL_Y(int y);
-extern void Segment_add(int color, int x_1, int y_1, int x_2, int y_2);
-extern void Circle(int color, int x, int y, int radius, int filled);
-extern void set_alphacolor(int color);
+extern void set_alphacolor(Uint32 color);
+extern void Segment_add(Uint32 color, int x_1, int y_1, int x_2, int y_2);
+extern void Circle(Uint32 color, int x, int y, int radius, int filled);
 
 extern irec_t *select_bounds;
 extern void Paint_select(void);

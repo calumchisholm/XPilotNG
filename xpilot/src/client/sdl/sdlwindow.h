@@ -24,7 +24,7 @@
 #include "xpclient_sdl.h"
 
 typedef struct {
-    int tx_id;
+    GLuint tx_id;
     SDL_Surface *surface;
     int x, y, w, h;
 } sdl_window_t;

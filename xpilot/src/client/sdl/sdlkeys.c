@@ -176,7 +176,7 @@ char *Get_name_by_key(SDLKey key)
 
     for (k = &sdlkeys[0]; k->name != NULL; k++)
         if (key == k->key)
-            return k->name;
+            return (char *)(k->name);
 
     return NULL;
 }

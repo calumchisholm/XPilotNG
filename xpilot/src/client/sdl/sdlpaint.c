@@ -277,11 +277,13 @@ void Paint_cleanup(void)
  */
 void setupPaint_stationary(void)
 {
+    GLenum gl_error;
+    
     if (paintSetupMode & STATIONARY_MODE) return;
     paintSetupMode = STATIONARY_MODE;
     glPopMatrix();
     { /* glPopMatrix produces an error */
-        GLenum gl_error = glGetError( );
+        gl_error = glGetError( );
     }
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -320,6 +322,8 @@ void setupPaint_HUD(void)
 
 void Paint_frame(void)
 {
+    GLenum gl_error;
+    
     Check_view_dimensions();
     
     world.x = selfPos.x - (ext_view_width / 2);
@@ -416,7 +420,7 @@ void Paint_frame(void)
     	DrawGLWidgets();
     	{ /* TODO: find this error */
             /* Check for error conditions. */
-            GLenum gl_error = glGetError( );
+            gl_error = glGetError( );
     	}
     		
 	glPopMatrix();
