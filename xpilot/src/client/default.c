@@ -38,13 +38,29 @@ char myClass[] = "XPilot";
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
+option options[] = {
+    {
+	"help",
+	"Yes",
+	"",
+	KEY_DUMMY,
+	"Display this help message.\n",
+	0
+    }
+};
+
+
 /*
  * This could also be used from a client '\set' command, e.g.
  * "\set scalefactor 1.5"
  */
+
 void Set_option(char *option, char *value)
 {
     printf("setting option '%s' to '%s'\n", option, value);
+    
+
+    
 }
 
 
@@ -93,6 +109,14 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     char buf[BUFSIZ];
     FILE *fp;
 
+    /*
+     * Create data structure holding all options we know of and their values.
+     */
+    warn("numoptions: %d", NELEM(options));
+
+    /*
+     * Read options from xpilotrc.
+     */
     Get_xpilotrc_file(path, sizeof(path));
     if (strlen(path) > 0
 	&& ((fp = fopen(path, "r")) != NULL)) {

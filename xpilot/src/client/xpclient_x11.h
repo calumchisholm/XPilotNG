@@ -54,7 +54,6 @@
 #include "bitmaps.h"
 #include "configure.h"
 #include "dbuff.h"
-#include "default.h"
 #include "paintdata.h"
 #include "record.h"
 #include "widget.h"
