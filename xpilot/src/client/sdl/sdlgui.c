@@ -775,14 +775,42 @@ void Gui_paint_missile(int x, int y, int len, int dir)
 
 void Gui_paint_lasers_begin(void)
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_LINE_SMOOTH);
 }
 
 void Gui_paint_lasers_end(void)
 {
+    glDisable(GL_BLEND);
+    glDisable(GL_LINE_SMOOTH);
+
 }
 
 void Gui_paint_laser(int color, int x_1, int y_1, int len, int dir)
 {
+    int	x_2, y_2, rgba;
+    x_2 = (int)(x_1 + len * tcos(dir));
+    y_2 = (int)(y_1 + len * tsin(dir));
+
+    rgba = 
+	(color == RED) ? redRGBA :
+	(color == BLUE) ? blueRGBA : 
+	whiteRGBA;
+
+    set_alphacolor(rgba - 128);
+    glLineWidth(5);
+    glBegin(GL_LINES);
+    glVertex2i(x_1, y_1);
+    glVertex2i(x_2, y_2);
+    glEnd();
+
+    set_alphacolor(rgba);
+    glLineWidth(1);
+    glBegin(GL_LINES);
+    glVertex2i(x_1, y_1);
+    glVertex2i(x_2, y_2);
+    glEnd();
 }
 
 void Gui_paint_paused(int x, int y, int count)
