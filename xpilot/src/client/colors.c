@@ -1057,15 +1057,6 @@ xp_option_t color_options[] = {
 	NULL,
 	"The number of colors to use.  Valid values are 4, 8 and 16.\n"),
 
-    XP_BOOL_OPTION(
-	"fullColor",
-	true,
-	&fullColor,
-	NULL,            /* kps - need a setfunc here */
-	"Whether to use a colors as close as possible to the specified ones\n"
-	"or use a few standard colors for everything. May require more\n"
-	"resources from your system.\n"),
-
     /* 16 user definable color values */
     XP_STRING_OPTION(
 	"color0",

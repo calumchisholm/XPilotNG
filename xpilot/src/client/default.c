@@ -42,6 +42,21 @@ char mynickname[MAX_NAME_LEN];
 char myusername[MAX_NAME_LEN];
 char myhostname[MAX_HOST_LEN];
 
+static bool setTexturePath(xp_option_t *opt, const char *value)
+{
+    (void)opt;
+    if (texturePath)
+	xp_free(texturePath);
+
+    texturePath = xp_safe_strdup(value);
+    return true;
+}
+static char *getTexturePath(xp_option_t *opt)
+{
+    (void)opt;
+    return texturePath;
+}
+
 xp_option_t default_options[] = {
 
 #if 0
@@ -219,6 +234,23 @@ xp_option_t default_options[] = {
         "Specifies alternative scaling factor for the drawing window.\n"),
 
     /* instruments */
+    
+    XP_BOOL_OPTION(
+	"mapRadar",
+	true,
+	&instruments.showMapRadar,
+	NULL,
+	"Paint radar dots' positions on the map.\n"),
+
+    XP_BOOL_OPTION(
+	"slidingRadar",
+	true,
+	&instruments.showSlidingRadar,
+	NULL,
+	"If the game is in edgewrap mode then the radar will keep your\n"
+	"position on the radar in the center and raw the rest of the radar\n"
+	"around it.  Note that this requires a fast graphics system.\n"),
+
     XP_BOOL_OPTION(
 	"showShipShapes",
 	true,
@@ -248,6 +280,39 @@ xp_option_t default_options[] = {
 	NULL,
 	"Paint remaining lives next to ships.\n"),
 
+    XP_BOOL_OPTION(
+	"showID",
+	false,
+	&instruments.showShipId,
+	NULL,
+	"Show ID numbers instead of ship names on the playfield?\n"),
+
+    XP_BOOL_OPTION(
+	"filledWorld",
+	false,
+	&instruments.showFilledWorld,
+	NULL,
+	"Draws the walls solid, filled with one color,\n"
+	"unless overridden by texture.\n"
+	"Be warned that this option needs fast graphics.\n"),
+
+    XP_BOOL_OPTION(
+	"texturedWalls",
+	true,
+	&instruments.showTexturedWalls,
+	NULL,
+	"Allows drawing polygon bitmaps specified by the (new-style) map.\n"
+	"Be warned that this needs a reasonably fast graphics system.\n"),
+
+    XP_BOOL_OPTION(
+	"outlineWorld",
+	false,
+	&instruments.showOutlineWorld,
+	NULL,
+	"Draws only the outline of all the wall blocks\n"
+	"on block based maps.\n"),
+
+    /* fuel warning limits */
 
     XP_DOUBLE_OPTION(
 	"fuelNotify",
@@ -322,6 +387,18 @@ xp_option_t default_options[] = {
 	modBankStr[3], sizeof modBankStr[3],
 	NULL, NULL,
 	"The default weapon modifier values for the fourth modifier bank.\n"),
+
+    /* conf_* */
+    XP_STRING_OPTION(
+	"texturePath",
+	TEXTUREDIR, /* conf_texturedir_string, */
+	NULL, 0,
+	setTexturePath,
+	getTexturePath,
+	"Search path for texture files.\n"
+	"This is a list of one or more directories separated by colons.\n"),
+
+
 
 #if 0
 
@@ -434,82 +511,7 @@ xp_option_t default_options[] = {
 	0
     },
 
-    {
-	"mapRadar",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Paint radar dots' position on the map \n",
-	0
-    },
 
-
-    {
-	"slidingRadar",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"If the game is in edgewrap mode then the radar will keep your\n"
-	"position on the radar in the center and raw the rest of the radar\n"
-	"around it.  Note that this requires a fast graphics system.\n",
-	0
-    },
-    {
-	"outlineWorld",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Draws only the outline of all the blue map constructs.\n",
-	0
-    },
-    {
-	"filledWorld",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Draws the walls solid, filled with one color,\n"
-	"unless overridden by texture.\n"
-	"Be warned that this option needs fast graphics.\n",
-	0
-    },
-    {
-	"texturedWalls",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Allows drawing polygon bitmaps specified by the (new-style) map.\n"
-	"Be warned that this needs a reasonably fast graphics system.\n",
-	0
-    },
-    {
-	"texturePath",
-	NULL,
-	conf_texturedir_string,
-	KEY_DUMMY,
-	"Search path for texture files.\n"
-	"This is a list of one or more directories separated by colons.\n",
-	0
-    },
-
-    {
-	"texturedObjects",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Whether to draw certain game objects with textures.\n"
-	"Be warned that this requires more graphics speed.\n"
-	"fullColor must be on for this to work.\n"
-	"You may also need to enable multibuffering or double-buffering.\n",
-	0
-    },
-    {
-	"showID",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should ID numbers be shown instead of ship names on the playfield?\n",
-	0
-    },
     {
 	"markingLights",
 	NULL,

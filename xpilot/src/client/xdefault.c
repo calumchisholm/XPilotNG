@@ -48,6 +48,25 @@ static char displayName[MAX_DISP_LEN];
 static char keyboardName[MAX_DISP_LEN];
 
 xp_option_t xdefault_options[] = {
+    XP_BOOL_OPTION(
+	"fullColor",
+	true,
+	&fullColor,
+	NULL,            /* kps - need a setfunc here */
+	"Whether to use a colors as close as possible to the specified ones\n"
+	"or use a few standard colors for everything. May require more\n"
+	"resources from your system.\n"),
+
+    XP_BOOL_OPTION(
+	"texturedObjects",
+	true,
+	&texturedObjects,
+	NULL,
+	"Whether to draw certain game objects with textures.\n"
+	"Be warned that this requires more graphics speed.\n"
+	"fullColor must be on for this to work.\n"
+	"You may also need to enable multibuffering or double-buffering.\n"),
+
     XP_STRING_OPTION(
 	"display",
 	"",
