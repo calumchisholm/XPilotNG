@@ -35,64 +35,6 @@ char myClass[] = "XPilot";
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 
-#ifndef OPTIONHACK
-
-cl_option_t options[];
-
-int num_options = 0;
-int max_options = 0;
-
-void Usage(void)
-{
-    int			i;
-
-    printf(
-"Usage: xpilot [-options ...] [server]\n"
-"Where options include:\n"
-"\n"
-	  );
-    for (i = 0; i < num_options; i++) {
-	printf("    -%s %s\n", options[i].name,
-	       (options[i].noArg == NULL) ? "<value>" : "");
-	if (options[i].help && options[i].help[0]) {
-	    const char *str;
-	    printf("        ");
-	    for (str = options[i].help; *str; str++) {
-		putchar(*str);
-		if (*str == '\n' && str[1])
-		    printf("        ");
-	    }
-	    if (str[-1] != '\n')
-		putchar('\n');
-	}
-	if (options[i].fallback && options[i].fallback[0]) {
-	    printf("        The default %s: %s.\n",
-		   (options[i].key == KEY_DUMMY)
-		       ? "value is"
-		       : (strchr(options[i].fallback, ' ') == NULL)
-			   ? "key is"
-			   : "keys are",
-		   options[i].fallback);
-	}
-	printf("\n");
-    }
-    printf(
-"Most of these options can also be set in the .xpilotrc file\n"
-"in your home directory.\n"
-"Each key option may have multiple keys bound to it and\n"
-"one key may be used by multiple key options.\n"
-"If no server is specified then xpilot will search\n"
-"for servers on your local network.\n"
-"For a listing of remote servers try: telnet meta.xpilot.org 4400 \n"
-	  );
-
-    exit(1);
-}
-#endif
-
-
-
-
 
 #ifdef OPTIONHACK
 
@@ -174,7 +116,7 @@ xp_option_t default_options[] = {
 
     XP_STRING_OPTION(
 	"user",
-	"",
+	"newbie",
 	myusername,
 	sizeof myusername,
 	NULL, NULL,
@@ -182,7 +124,7 @@ xp_option_t default_options[] = {
 
     XP_STRING_OPTION(
 	"host",
-	"",
+	"xpilot",
 	myhostname,
 	sizeof myhostname,
 	NULL, NULL,
@@ -258,6 +200,25 @@ xp_option_t default_options[] = {
 	"Set the ship's alternate turn resistance.\n"
 	"See also the keySwapSettings option.\n"),
 
+    XP_DOUBLE_OPTION(
+	"scaleFactor",
+	1.0,
+	MIN_SCALEFACTOR,
+	MAX_SCALEFACTOR,
+	&scaleFactor,
+	NULL,
+	"Specifies scaling factor for the drawing window.\n"),
+
+    XP_DOUBLE_OPTION(
+        "altScaleFactor",
+        2.0,
+	MIN_SCALEFACTOR,
+	MAX_SCALEFACTOR,
+	&scaleFactor_s,
+	NULL,
+        "Specifies alternative scaling factor for the drawing window.\n"),
+
+    /* instruments */
     XP_BOOL_OPTION(
 	"showShipShapes",
 	true,
@@ -271,6 +232,67 @@ xp_option_t default_options[] = {
 	&instruments.showMyShipShape,
 	NULL,
 	"Should your own shipshape be displayed or not.\n"),
+
+    XP_BOOL_OPTION(
+	"ballMsgScan",
+	true,
+	&instruments.useBallMessageScan,
+	NULL,
+	"Scan messages for BALL, SAFE, COVER and POP and paint\n"
+	"warning circles inside ship.\n"),
+
+    XP_BOOL_OPTION(
+	"showLivesByShip",
+	false,
+	&instruments.showLivesByShip,
+	NULL,
+	"Paint remaining lives next to ships.\n"),
+
+
+    XP_DOUBLE_OPTION(
+	"fuelNotify",
+	500.0,
+	0.0,
+	1000.0,
+	&fuelLevel3,
+	NULL,
+	"The limit when the HUD fuel bar will become visible.\n"),
+
+    XP_DOUBLE_OPTION(
+	"fuelWarning",
+	200.0,
+	0.0,
+	1000.0,
+	&fuelLevel2,
+	NULL,
+	"The limit when the HUD fuel bar will start flashing.\n"),
+
+    XP_DOUBLE_OPTION(
+	"fuelCritical",
+	100.0,
+	0.0,
+	1000.0,
+	&fuelLevel1,
+	NULL,
+	"The limit when the HUD fuel bar will flash faster.\n"),
+
+    XP_DOUBLE_OPTION(
+	"speedFactHUD",
+	0.0,
+	-10.0,
+	+10.0,
+	&hud_move_fact,
+	NULL,
+	"How much to move HUD to indicate the current velocity.\n"),
+
+    XP_DOUBLE_OPTION(
+	"speedFactPTR",
+	0.0,
+	-10.0,
+	+10.0,
+	&ptr_move_fact,
+    	NULL,
+	"Uses a red line to indicate the current velocity and direction.\n"),
 
     /* modbanks */
     XP_STRING_OPTION(
@@ -420,80 +442,8 @@ xp_option_t default_options[] = {
 	"Paint radar dots' position on the map \n",
 	0
     },
-    {
-	"showShipShapes",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should others' shipshapes be displayed or not.\n",
-	0
-    },
-    {
-	"showMyShipShape",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should your own shipshape be displayed or not.\n",
-	0
-    },
-    {
-	"ballMsgScan",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Scan messages for BALL, SAFE, COVER and POP and paint \n"
-	"warning circles inside ship.\n",
-	0
-    },
-    /* these 2 should really be color options */
-    {
-	"showLivesByShip",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Paint remaining lives next to ships.\n",
-	0
-    },
-    {
-	"fuelNotify",
-	NULL,
-	"500.0",
-	KEY_DUMMY,
-	"The limit when the HUD fuel bar will become visible.\n",
-	0
-    },
-    {
-	"fuelWarning",
-	NULL,
-	"200.0",
-	KEY_DUMMY,
-	"The limit when the HUD fuel bar will start flashing.\n",
-	0
-    },
-    {
-	"fuelCritical",
-	NULL,
-	"100.0",
-	KEY_DUMMY,
-	"The limit when the HUD fuel bar will flash faster.\n",
-	0
-    },
-    {
-	"speedFactHUD",
-	NULL,
-	"0.0",
-	KEY_DUMMY,
-	"Should the HUD be moved, to indicate the current velocity?\n",
-	0
-    },
-    {
-	"speedFactPTR",
-	NULL,
-	"0.0",
-	KEY_DUMMY,
-	"Uses a red line to indicate the current velocity and direction.\n",
-	0
-    },
+
+
     {
 	"slidingRadar",
 	NULL,
@@ -998,22 +948,7 @@ xp_option_t default_options[] = {
 	0
 	},
 #endif
-    {
-	"scaleFactor",
-	NULL,
-	"1.0",
-	KEY_DUMMY,
-	"Specifies scaling factor for the drawing window.\n",
-	0
-    },
-    {
-        "altScaleFactor",
-        NULL,
-        "2.0",
-        KEY_DUMMY,
-        "Specifies alternative scaling factor for the drawing window.\n",
-	0
-    },
+
 #ifdef SOUND
     {
 	"sounds",
@@ -1065,6 +1000,71 @@ void Store_default_options(void)
 
 
 #else /* OPTIONHACK */
+
+
+
+
+
+
+
+
+
+
+/*#ifndef OPTIONHACK*/
+
+cl_option_t options[];
+
+int num_options = 0;
+int max_options = 0;
+
+void Usage(void)
+{
+    int			i;
+
+    printf(
+"Usage: xpilot [-options ...] [server]\n"
+"Where options include:\n"
+"\n"
+	  );
+    for (i = 0; i < num_options; i++) {
+	printf("    -%s %s\n", options[i].name,
+	       (options[i].noArg == NULL) ? "<value>" : "");
+	if (options[i].help && options[i].help[0]) {
+	    const char *str;
+	    printf("        ");
+	    for (str = options[i].help; *str; str++) {
+		putchar(*str);
+		if (*str == '\n' && str[1])
+		    printf("        ");
+	    }
+	    if (str[-1] != '\n')
+		putchar('\n');
+	}
+	if (options[i].fallback && options[i].fallback[0]) {
+	    printf("        The default %s: %s.\n",
+		   (options[i].key == KEY_DUMMY)
+		       ? "value is"
+		       : (strchr(options[i].fallback, ' ') == NULL)
+			   ? "key is"
+			   : "keys are",
+		   options[i].fallback);
+	}
+	printf("\n");
+    }
+    printf(
+"Most of these options can also be set in the .xpilotrc file\n"
+"in your home directory.\n"
+"Each key option may have multiple keys bound to it and\n"
+"one key may be used by multiple key options.\n"
+"If no server is specified then xpilot will search\n"
+"for servers on your local network.\n"
+"For a listing of remote servers try: telnet meta.xpilot.org 4400 \n"
+	  );
+
+    exit(1);
+}
+
+
 
 
 
