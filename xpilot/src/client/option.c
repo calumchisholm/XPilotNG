@@ -33,16 +33,31 @@ int max_options = 0;
 xp_option_t *options = NULL;
 
 
+unsigned String_hash(const char *s)
+{
+    unsigned		hash = 0;
+
+    for (; *s; s++) {
+	/* hash gives same values even if case is different */
+	int c = tolower(*s);
+
+	hash = (((hash >> 29) & 7) | (hash << 3)) ^ c;
+    }
+
+    return hash;
+}
+
 xp_option_t *Find_option(const char *name)
 {
     int i;
+    unsigned hash = String_hash(name);
 
     /*
      * This could be speeded up with a hash table or just by
      * hashing the option name.
      */
     for (i = 0; i < num_options; i++) {
-	if (!strcasecmp(name, options[i].name))
+	if (hash == options[i].hash && !strcasecmp(name, options[i].name))
 	    return &options[i];
     }
 
@@ -399,13 +414,7 @@ static bool is_legal_value(xp_option_type_t type, const char *value)
     return true;
 }
 
-/*
- * This could also be used from a client '\set' command, e.g.
- * "\set scalefactor 1.5"
- */
-/*
- * returns true if ok 
- */
+
 bool Set_option(const char *name, const char *value)
 {
     xp_option_t *opt;
@@ -435,8 +444,7 @@ bool Set_option(const char *name, const char *value)
     case xp_key_option:
 	return Set_key_option(opt, value);
     default:
-	warn("FOO");
-	assert(0);
+	assert(0 && "BUG: Unknown option type");
     }
     return false;
 }
@@ -564,6 +572,9 @@ void Store_option(xp_option_t *opt)
     assert(strlen(opt->name) > 0);
     assert(opt->help);
     assert(strlen(opt->help) > 0);
+
+    /* Find_option() needs the hash value. */
+    opt->hash = String_hash(opt->name);
 
     /*
      * Let's not allow several options with the same name 
@@ -1105,14 +1116,6 @@ const char *Xpilotrc_get_filename(void)
 #if 0
 
 
-unsigned String_hash(const char *s)
-{
-    unsigned		hash = 0;
-
-    for (; *s; s++)
-	hash = (((hash >> 29) & 7) | (hash << 3)) ^ *s;
-    return hash;
-}
 
 
 static int Find_resource(XrmDatabase db, const char *resource,

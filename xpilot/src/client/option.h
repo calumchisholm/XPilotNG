@@ -62,10 +62,11 @@ struct xp_option {
     xp_option_type_t type;
 
     const char *name;
+    unsigned hash;		/* hash of name */
     xp_option_flags_t flags;
 
     const char *help;
-    void *private_data;   /* currently only used for string options */
+    void *private_data;		/* currently only used for string options */
 
     /* noarg option stuff */
 
@@ -215,7 +216,7 @@ static inline xp_option_t *Option_by_index(int ind)
 #define XP_NOARG_OPTION(name, valptr, flags, help) \
 { \
     xp_noarg_option,\
-	name,\
+	name, 0,\
 	flags,\
 	help,\
 	NULL,\
@@ -230,7 +231,7 @@ static inline xp_option_t *Option_by_index(int ind)
 #define XP_BOOL_OPTION(name, defval, valptr, setfunc, flags, help) \
 { \
     xp_bool_option,\
-	name,\
+	name, 0,\
 	flags,\
 	help,\
 	NULL,\
@@ -247,7 +248,7 @@ static inline xp_option_t *Option_by_index(int ind)
 #define XP_INT_OPTION(name, defval, minval, maxval, valptr, setfunc, flags, help) \
 { \
     xp_int_option,\
-	name,\
+	name, 0,\
 	flags,\
 	help,\
 	NULL,\
@@ -273,7 +274,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, XP_OPTFLAG_CONFIG_
 #define XP_DOUBLE_OPTION(name, defval, minval, maxval, valptr, setfunc, flags, help) \
 { \
     xp_double_option,\
-	name,\
+	name, 0,\
 	flags,\
 	help,\
 	NULL,\
@@ -292,7 +293,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, XP_OPTFLAG_CONFIG_
 #define XP_STRING_OPTION(name, defval, valptr, size, setfunc, private_data, getfunc, flags, help) \
 { \
     xp_string_option,\
-	name,\
+	name, 0,\
 	flags,\
 	help,\
 	private_data,\
@@ -311,7 +312,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, XP_OPTFLAG_CONFIG_
 #define XP_KEY_OPTION(name, defval, key, help) \
 { \
     xp_key_option,\
-	name,\
+	name, 0,\
 	XP_OPTFLAG_DEFAULT,\
 	help,\
 	NULL,\
