@@ -389,7 +389,6 @@ extern struct options {
     char	*recordFileName;
     double	gameSpeed;
     bool	maraTurnqueue;
-    double	oldAcceleration;
     bool	ngControls;
     bool	ballStyles;
     bool	ignoreMaxFPS;
@@ -457,8 +456,8 @@ void Groups_init(void);
 void Walls_init(world_t *world);
 void Treasure_init(world_t *world);
 void Move_init(world_t *world);
-void Move_object(object_t *obj, vector_t oldvel);
-void Move_player(player_t *pl, vector_t oldvel);
+void Move_object(object_t *obj);
+void Move_player(player_t *pl);
 void Turn_player(player_t *pl);
 int is_inside(int x, int y, hitmask_t hitmask, const object_t *obj);
 int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,

@@ -314,7 +314,7 @@ void Make_item(world_t *world, clpos_t pos, vector_t vel,
     obj->team = TEAM_NOT_SET;
     Object_position_init_clpos(world, obj, pos);
     obj->vel = vel;
-    obj->acc.x = 0.0;
+    obj->acc.x =
     obj->acc.y = 0.0;
     obj->mass = 10.0;
     obj->life = 1500 + rfrac() * 512;

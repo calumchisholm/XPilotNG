@@ -367,9 +367,7 @@ static void Place_asteroid(world_t *world)
 
 static void Asteroid_move(wireobject_t *wireobj)
 {
-    object_t *obj = OBJ_PTR(wireobj);
-    /*TODO: calc oldvel correctly so that asteroids move right in gravity*/
-    Move_object(obj, obj->vel);
+    Move_object(OBJ_PTR(wireobj));
 }
 
 
