@@ -133,9 +133,6 @@ int main(int argc, char *argv[])
 		  hostname, shutdown_reason);
 
     /*strcpy(clientname,conpar->nick_name); */
-#ifdef OPTIONHACK
-    Usage();
-#endif
     
     /* CLIENTRANK */
     Init_saved_scores();

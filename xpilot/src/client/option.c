@@ -199,7 +199,7 @@ static void Set_string_option(xp_option_t *opt, const char *value)
     else
 	strlcpy(opt->str_ptr, value, opt->str_size);
 
-    printf("Value of option %s is now \"%s\"\n", opt->name, *opt->str_ptr);
+    printf("Value of option %s is now \"%s\"\n", opt->name, opt->str_ptr);
 }
 
 /*
@@ -227,26 +227,14 @@ void Set_option(const char *name, const char *value)
     case xp_double_option:
 	Set_double_option(opt, atof(value));
 	break;
+    case xp_string_option:
+	Set_string_option(opt, value);
+	break;
     default:
 	warn("FOO");
+	assert(0);
     }
 
-#if 0
-
-    bool set_ok;
-
-
-
-    if (!opt) {
-	/*Store_option(name, value);
-	  opt = Find_option(name);*/
-	return false;
-    }
-
-    set_ok = opt->setfunc(opt->name, value, opt->private);
-
-    return set_ok;
-#endif
 }
 
 
@@ -283,60 +271,14 @@ void Store_option(xp_option_t *opt)
     case xp_double_option:
 	Set_double_option(opt, opt->dbl_defval);
 	break;
+    case xp_string_option:
+	Set_string_option(opt, opt->str_defval);
+	break;
     default:
 	warn("FOO");
     }
 
 }
-
-
-
-#if 0
-static void Store_option(const char *name,
-			 const char *value_to_set,
-			 const char *help,
-			 xp_option_setfunc_t setfunc,
-			 void *private)
-     
-{
-    xp_option_t option;
-
-    assert(name);
-    assert(strlen(name) > 0);
-
-    /* Let's not allow several options with the same name */
-    assert(Find_option(name) == NULL);
-
-    option.name = name;
-    option.help = help;
-    option.setfunc = setfunc;
-    option.private = private;
-
-    STORE(xp_option_t, options, num_options, max_options, option);
-
-    /*
-     * If no setfunc, value can't be set.
-     */
-    if (option.setfunc) {
-	bool set_ok;
-	set_ok = option.setfunc(name, value_to_set, private);
-	/* Setting the default value must succeed */
-	if (!set_ok) {
-	    warn("Setting default value for option %s failed.", name);
-	    assert(0 && "Setting option default value must succeed.");
-	}
-    }
-}
-
-static void Store_option_struct(xp_option_t *opt)
-{
-    Store_option(opt->name,
-		 opt->fallback,
-		 opt->help,
-		 opt->setfunc,
-		 opt->private);
-}
-#endif
 
 
 
