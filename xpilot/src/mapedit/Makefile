@@ -1021,7 +1021,6 @@ main.o: main.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1037,8 +1036,7 @@ main.o: main.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h \
  /usr/include/ctype.h /usr/include/memory.h /usr/include/math.h \
@@ -1050,7 +1048,6 @@ expose.o: expose.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1066,8 +1063,7 @@ expose.o: expose.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h  \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h \
  /usr/include/ctype.h /usr/include/memory.h /usr/include/math.h \
@@ -1079,7 +1075,6 @@ events.o: events.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1095,8 +1090,7 @@ events.o: events.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h  \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h \
  /usr/include/ctype.h /usr/include/memory.h /usr/include/math.h \
@@ -1108,7 +1102,6 @@ tools.o: tools.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1124,8 +1117,7 @@ tools.o: tools.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h \
  /usr/include/ctype.h /usr/include/memory.h /usr/include/math.h \
@@ -1137,7 +1129,6 @@ file.o: file.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1153,8 +1144,7 @@ file.o: file.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h \
  /usr/include/ctype.h /usr/include/memory.h /usr/include/math.h \
@@ -1166,7 +1156,6 @@ round.o: round.c /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1182,8 +1171,7 @@ round.o: round.c /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/ctype.h main.h /usr/include/stdlib.h \
  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
  /usr/include/alloca.h /usr/include/memory.h /usr/include/math.h \
@@ -1195,7 +1183,6 @@ help.o: help.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1211,8 +1198,7 @@ help.o: help.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h \
  /usr/include/ctype.h /usr/include/memory.h /usr/include/math.h \
@@ -1223,7 +1209,6 @@ help.o: help.c main.h /usr/X11R6/include/X11/Xlib.h \
 grow.o: grow.c /usr/X11R6/include/X11/Xlib.h /usr/include/sys/types.h \
  /usr/include/features.h /usr/include/sys/cdefs.h \
  /usr/include/gnu/stubs.h /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1239,8 +1224,7 @@ grow.o: grow.c /usr/X11R6/include/X11/Xlib.h /usr/include/sys/types.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h  \
  /usr/include/ctype.h main.h /usr/include/stdlib.h \
  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
  /usr/include/alloca.h /usr/include/memory.h /usr/include/math.h \
@@ -1252,7 +1236,6 @@ forms.o: forms.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1268,8 +1251,7 @@ forms.o: forms.c main.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h \
  /usr/include/ctype.h /usr/include/memory.h /usr/include/math.h \
@@ -1281,7 +1263,6 @@ T_Toolkit.o: T_Toolkit.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1297,8 +1278,7 @@ T_Toolkit.o: T_Toolkit.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h  \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h T_Form.h \
  T_Popup.h T_Handler.h T_proto.h default_colors.h
@@ -1306,7 +1286,6 @@ T_Form.o: T_Form.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1322,8 +1301,7 @@ T_Form.o: T_Form.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h T_Form.h \
  T_Popup.h T_Handler.h T_proto.h
@@ -1331,7 +1309,6 @@ T_Popup.o: T_Popup.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1347,8 +1324,7 @@ T_Popup.o: T_Popup.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h T_Form.h \
  T_Popup.h T_Handler.h T_proto.h
@@ -1356,7 +1332,6 @@ T_Handler.o: T_Handler.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/include/sys/types.h /usr/include/features.h \
  /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h \
  /usr/include/bits/types.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stddef.h \
  /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -1372,8 +1347,7 @@ T_Handler.o: T_Handler.c T_Toolkit.h /usr/X11R6/include/X11/Xlib.h \
  /usr/X11R6/include/X11/keysymdef.h /usr/include/stdio.h \
  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
  /usr/include/bits/wchar.h /usr/include/gconv.h \
- /usr/lib/gcc-lib/i386-linux/2.95.4/include/stdarg.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio_lim.h \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/alloca.h T_Form.h \
  T_Popup.h T_Handler.h T_proto.h
