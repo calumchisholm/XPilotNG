@@ -75,12 +75,11 @@ treasurecollisiondestroys treasurecollisionmaykill treasurekillteam
 treasuresonradar version wallbouncedestroyitemprob
 wallbouncefueldrainmult worldlives wormholevisible wormtime
 wreckagecollisionmaykill mapdata
-teamzeropausing fullframerate fullzeroframerate
+teamzeropausing fullframerate fullzeroframerate treatballaspoint
 robots maxrobots minrobots robotfile robotstalk robotsleave robotleavelife
 robotleavescore robotleaveratio robotteam restrictrobots reserverobotteam
 robotrealname robothostname ecmsreprogramrobots
 maxdefensiveitems maxoffensiveitems usewreckage
-teamcup
 """.split()
 
 def checkopts(options):
