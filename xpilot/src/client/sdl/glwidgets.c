@@ -261,7 +261,7 @@ void DrawGLWidgets( void )
  * Similar to DrawGLWidgets, but this one needs to traverse the
  * tree in reverse order! (since the things painted last will
  * be seen ontop, thus should get first pick of events
- * So it will descend to the last widget in teh list's last child
+ * So it will descend to the last child in the list's last widget
  * then traverse back trying to find the target.
  */
 /*
@@ -423,7 +423,6 @@ GLWidget *Init_ArrowWidget( ArrowWidget_dir_t direction,int width, int height,
 /* Begin: SlideWidget*/
 /**********************/
 void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data );
-void motion_SlideWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data );
 void Paint_SlideWidget( GLWidget *widget );
 
 void button_SlideWidget( Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data )
@@ -714,6 +713,25 @@ void Close_LabelWidget( GLWidget *widget )
     free_string_texture(&(((LabelWidget *)widget->wid_info)->tex));
 }
 
+bool LabelWidget_SetColor( GLWidget *widget , int *bgcolor, int *fgcolor )
+{
+    LabelWidget *wi;
+    
+    if (!widget) return false;
+    if (widget->WIDGET !=LABELWIDGET) {
+    	error("Wrong widget type for LabelWidget_SetColor [%i]",widget->WIDGET);
+	return false;
+    }
+    
+    if ( !(wi = widget->wid_info) ) {
+    	error("LabelWidget_SetColor: widget->wid_info missing!");
+	return false;
+    }
+    wi->bgcolor = bgcolor;
+    wi->fgcolor = fgcolor;
+    
+    return true;
+}
 void Paint_LabelWidget( GLWidget *widget )
 {
     GLWidget *tmp;
@@ -763,7 +781,7 @@ void Paint_LabelWidget( GLWidget *widget )
 		  true);
 }
 
-GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor )
+GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor, int align, int valign  )
 {
     GLWidget *tmp;
 
@@ -795,8 +813,8 @@ GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor )
     tmp->bounds.h   	= (((LabelWidget *)tmp->wid_info)->tex).height;
     ((LabelWidget *)tmp->wid_info)->fgcolor  = fgcolor;
     ((LabelWidget *)tmp->wid_info)->bgcolor  = bgcolor;
-    ((LabelWidget *)tmp->wid_info)->align    = CENTER;
-    ((LabelWidget *)tmp->wid_info)->valign   = CENTER;
+    ((LabelWidget *)tmp->wid_info)->align    = align;
+    ((LabelWidget *)tmp->wid_info)->valign   = valign;
     tmp->Draw	    	= Paint_LabelWidget;
     tmp->Close     	= Close_LabelWidget;
     return tmp;
@@ -1579,6 +1597,579 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt )
 /****************************/
 
 /**********************/
+/* Begin: ListWidget  */
+/**********************/
+void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b );
+void Paint_ListWidget( GLWidget *widget );
+
+bool ListWidget_Append( GLWidget *list, GLWidget *item )
+{
+    GLWidget **curr;
+    ListWidget *wid_info;
+    
+    if (!list) {
+    	error("ListWidget_Append: *list is NULL!");
+	return false;
+    }
+    if (list->WIDGET != LISTWIDGET) {
+    	error("ListWidget_Append: list is not a LISTWIDGET! [%i]",list->WIDGET);
+	return false;
+    }
+    if (!(wid_info = list->wid_info)) {
+    	error("ListWidget_Append: list->wid_info missing!");
+	return false;
+    }
+    if (!item) {
+    	error("ListWidget_Append: *item is NULL");
+	return false;
+    }
+    item->next = NULL;/*TODO figure out how to handle a non NULL case properly*/
+
+    curr = &(list->children);
+    while (*curr) {
+	if (*curr == item) {
+	    error("ListWidget_Append: item is already in the list!");
+	    return false;
+	}
+	curr = &((*curr)->next);
+    }
+    *curr = item;
+
+    ++wid_info->num_elements;
+    
+    /* This works since SetBounds_ListWidget copies the content
+     * if the SDL_Rect *
+     */
+    SetBounds_ListWidget( list, &(list->bounds));
+
+    return true;
+}
+
+bool ListWidget_Prepend( GLWidget *list, GLWidget *item )
+{
+    GLWidget *curr;
+    ListWidget *wid_info;
+    int y_rel;
+    
+    if (!list) {
+    	error("ListWidget_Prepend: *list is NULL!");
+	return false;
+    }
+    if (list->WIDGET != LISTWIDGET) {
+    	error("ListWidget_Prepend: list is not a LISTWIDGET! [%i]",list->WIDGET);
+	return false;
+    }
+    if (!(wid_info = list->wid_info)) {
+    	error("ListWidget_Prepend: list->wid_info missing!");
+	return false;
+    }
+    if (!item) {
+    	error("ListWidget_Prepend: *item is NULL");
+	return false;
+    }
+
+    curr = list->children;
+    while (curr) {
+	if (curr == item) {
+	    error("ListWidget_Prepend: item is already in the list!");
+	    return false;
+	}
+	curr = curr->next;
+    }
+    
+    item->next = list->children;
+    list->children = item;
+    
+    ++wid_info->num_elements;
+    
+    /* This works since SetBounds_ListWidget copies the content
+     * if the SDL_Rect *
+     */
+    SetBounds_ListWidget( list, &(list->bounds));
+    
+    return true;
+}
+
+bool ListWidget_Insert( GLWidget *list, GLWidget *target, GLWidget *item )
+{
+    GLWidget **curr,**tg;
+    ListWidget *wid_info;
+    
+    if (!list) {
+    	error("ListWidget_Insert: *list is NULL!");
+	return false;
+    }
+    if (list->WIDGET != LISTWIDGET) {
+    	error("ListWidget_Insert: list is not a LISTWIDGET! [%i]",list->WIDGET);
+	return false;
+    }
+    if (!(wid_info = list->wid_info)) {
+    	error("ListWidget_Insert: list->wid_info missing!");
+	return false;
+    }
+    if (!item) {
+    	error("ListWidget_Insert: *item is NULL");
+	return false;
+    }
+
+    tg = NULL;
+    
+    curr = &(list->children);
+    while (*curr) {
+	if (*curr == item) {
+	    error("ListWidget_Insert: item is already in the list!");
+	    return false;
+	}
+	if (*curr == target) {
+	    tg = curr;
+	}
+	curr = &((*curr)->next);
+    }
+    
+    if (!tg) {
+	    error("ListWidget_Insert: target is not in the list!");
+	    return false;
+    }
+    
+    item->next = *tg;
+    *tg = item;
+    
+    ++wid_info->num_elements;
+    
+    /* This works since SetBounds_ListWidget copies the content
+     * if the SDL_Rect *
+     */
+    SetBounds_ListWidget( list, &(list->bounds));
+    
+    return true;
+}
+
+bool ListWidget_Remove( GLWidget *list, GLWidget *item )
+{
+    GLWidget **curr;
+    ListWidget *wid_info;
+    
+    if (!list) {
+    	error("ListWidget_Remove: *list is NULL!");
+	return false;
+    }
+    if (list->WIDGET != LISTWIDGET) {
+    	error("ListWidget_Remove: list is not a LISTWIDGET! [%i]",list->WIDGET);
+	return false;
+    }
+    if (!(wid_info = list->wid_info)) {
+    	error("ListWidget_Remove: list->wid_info missing!");
+	return false;
+    }
+    if (!item) {
+    	error("ListWidget_Remove: *item is NULL");
+	return false;
+    }
+
+    curr = &(list->children);
+    while (*curr) {
+	if (*curr == item) {
+	    break;
+	}
+	curr = &((*curr)->next);
+    }
+    
+    if (!(*curr)) {
+	    error("ListWidget_Remove: item is not in the list!");
+	    return false;
+    }
+    
+    *curr = item->next;
+    
+    --wid_info->num_elements;
+    
+    /* This works since SetBounds_ListWidget copies the content
+     * if the SDL_Rect *
+     */
+    SetBounds_ListWidget( list, &(list->bounds));
+    
+    return true;
+}
+
+bool ListWidget_SetScrollorder( GLWidget *list, bool order )
+{
+    GLWidget **curr;
+    ListWidget *wid_info;
+    
+    if (!list) {
+    	error("ListWidget_SetScrollorder: *list is NULL!");
+	return false;
+    }
+    if (list->WIDGET != LISTWIDGET) {
+    	error("ListWidget_SetScrollorder: list is not a LISTWIDGET! [%i]",list->WIDGET);
+	return false;
+    }
+    if (!(wid_info = list->wid_info)) {
+    	error("ListWidget_SetScrollorder: list->wid_info missing!");
+	return false;
+    }
+
+    wid_info->reverse_scroll = order;
+        
+    /* This works since SetBounds_ListWidget copies the content
+     * if the SDL_Rect *
+     */
+    SetBounds_ListWidget( list, &(list->bounds));
+    
+    return true;
+}
+
+int ListWidget_NELEM( GLWidget *list )
+{
+    ListWidget *wid_info;
+    
+    if (!list) {
+    	error("ListWidget_NELEM: *list is NULL!");
+	return -1;
+    }
+    if (list->WIDGET != LISTWIDGET) {
+    	error("ListWidget_NELEM: list is not a LISTWIDGET! [%i]",list->WIDGET);
+	return -1;
+    }
+    if (!(wid_info = list->wid_info)) {
+    	error("ListWidget_Remove: list->wid_info missing!");
+	return -1;
+    }
+    
+    return wid_info->num_elements;
+}
+
+GLWidget *ListWidget_GetItemByIndex( GLWidget *list, int i )
+{
+    GLWidget *curr;
+    ListWidget *wid_info;
+    int j;
+    
+    if (!list) {
+    	error("ListWidget_NELEM: *list is NULL!");
+	return NULL;
+    }
+    if (list->WIDGET != LISTWIDGET) {
+    	error("ListWidget_NELEM: list is not a LISTWIDGET! [%i]",list->WIDGET);
+	return NULL;
+    }
+    if (!(wid_info = list->wid_info)) {
+    	error("ListWidget_Remove: list->wid_info missing!");
+	return NULL;
+    }
+    
+    if ( i > ( wid_info->num_elements - 1) ) return NULL;
+    
+    curr = list->children;
+    j = 0;
+    while (curr && (j<i)) {
+	curr = curr->next;
+    	++j;
+    }
+    
+    if ( j != i ) return NULL;
+    
+    return curr;
+}
+
+
+void Paint_ListWidget( GLWidget *widget )
+{
+    ListWidget *wid_info;
+    GLWidget *curr;
+
+    if (!widget) return;
+    
+    wid_info = (ListWidget *)(widget->wid_info);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBegin(GL_QUADS);
+
+    curr = widget->children;
+    while (curr) {
+    	if (*(wid_info->bg)) {
+    	    set_alphacolor(*(wid_info->bg));
+
+    	    glVertex2i(curr->bounds.x	    	    	,curr->bounds.y	    	    	);
+    	    glVertex2i(curr->bounds.x+widget->bounds.w	,curr->bounds.y	    	    	);
+    	    glVertex2i(curr->bounds.x+widget->bounds.w	,curr->bounds.y+curr->bounds.h	);
+    	    glVertex2i(curr->bounds.x 	    	    	,curr->bounds.y+curr->bounds.h	);
+    	}
+    	curr = curr->next;
+    }
+
+    glEnd();
+}
+
+/* This setbounds method has very special behaviour; basically
+ * only one corner of the bounding box is regarded, this is 
+ * because the list is an expanding/contracting entity, and
+ * thus the others might soon get overridden anyway.
+ * The only way to properly bound a ListWidget is to make a
+ * bounding widget adopt it. (i.e. a scrollpane)
+ */
+void SetBounds_ListWidget( GLWidget *widget, SDL_Rect *b )
+{
+    ListWidget *tmp;
+    SDL_Rect bounds,b2;
+    GLWidget *curr;    
+    
+    if (!widget) return;
+    if (!b) return;
+    if (widget->WIDGET !=LISTWIDGET) {
+    	error("Wrong widget type for SetBounds_ListWidget [%i]",widget->WIDGET);
+	return;
+    }
+
+    if (!(tmp = (ListWidget *)(widget->wid_info))) {
+    	error("SetBounds_ListWidget: wid_info missing!");
+	return;
+    }
+    
+    bounds.y = b->y;
+    bounds.x = b->x;
+    bounds.w = 0;
+    bounds.h = 0;
+    curr = widget->children;
+    while(curr) {
+    	bounds.w = MAX(bounds.w,curr->bounds.w);
+	bounds.h += curr->bounds.h;
+	curr = curr->next;
+    }
+
+    if (tmp->v_dir == LW_UP) {
+    	bounds.y += b->h - bounds.h;
+    }
+    if (tmp->h_dir == LW_LEFT) {
+    	bounds.x += b->w - bounds.w;
+    }
+    
+    widget->bounds.y = bounds.y;
+    widget->bounds.h = bounds.h;
+    widget->bounds.x = bounds.x;
+    widget->bounds.w = bounds.w;
+    
+    curr = widget->children;
+    while(curr) {
+    	bounds.h -= curr->bounds.h;
+
+	b2.y = bounds.y;
+	if (tmp->reverse_scroll) {
+    	    b2.y += bounds.h;
+    	} else {
+	    bounds.y += curr->bounds.h;
+	}
+
+    	b2.x = bounds.x;
+	if (tmp->h_dir == LW_LEFT) {
+	    b2.x += bounds.w - curr->bounds.w;
+	}
+	
+	b2.h = curr->bounds.h;
+	b2.w = widget->bounds.w;
+	/*b2.w = curr->bounds.w;*/ /*TODO: make this optional*/
+	
+	SetBounds_GLWidget( curr, &b2 );
+
+	curr = curr->next;
+    }
+}
+
+GLWidget *Init_ListWidget( Uint16 x, Uint16 y, Uint32 *bg, Uint32 *highlight_color
+    	    	    	    ,ListWidget_ver_dir_t v_dir, ListWidget_hor_dir_t h_dir
+			    ,bool reverse_scroll )
+{
+    GLWidget *tmp;
+    ListWidget *wid_info;
+    
+    tmp	= Init_EmptyBaseGLWidget();
+    if ( !tmp ) {
+        error("Failed to malloc GLWidget in Init_ListWidget");
+	return NULL;
+    }
+    tmp->wid_info   	= malloc(sizeof(ListWidget));
+    if ( !(tmp->wid_info) ) {
+    	free(tmp);
+        error("Failed to malloc MainWidget in Init_ListWidget");
+	return NULL;
+    }
+    wid_info = ((ListWidget *)tmp->wid_info);
+    wid_info->num_elements = 0;
+    wid_info->bg	= bg;
+    wid_info->highlight_color	= highlight_color;
+    wid_info->reverse_scroll	= reverse_scroll;
+    wid_info->v_dir	= v_dir;
+    wid_info->h_dir	= h_dir;
+    
+    tmp->WIDGET     	= LISTWIDGET;
+    tmp->bounds.x   	= x;
+    tmp->bounds.y   	= y;
+    tmp->bounds.w   	= 0;
+    tmp->bounds.h   	= 0;
+    tmp->SetBounds  	= SetBounds_ListWidget;
+    tmp->Draw	    	= Paint_ListWidget;
+
+    return tmp;
+}
+
+/*******************/
+/* End: ListWidget */
+/*******************/
+
+/****************************/
+/* Begin: ScrollPaneWidget  */
+/****************************/
+void ScrollPaneWidget_poschange( GLfloat pos , void *data );
+void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b );
+
+void ScrollPaneWidget_poschange( GLfloat pos , void *data )
+{
+    GLWidget *widget;
+    ScrollPaneWidget *wid_info;
+    SDL_Rect bounds;
+    GLWidget *curr;
+    
+    if ( !data ) {
+        error("NULL data to ScrollPaneWidget_poschange!");
+	return;
+    }
+    widget = (GLWidget *)data;
+    wid_info = ((ScrollPaneWidget *)(widget->wid_info));
+
+    if (wid_info->content) {
+    	bounds.y = widget->bounds.y - pos*(wid_info->content->bounds.h);
+    	bounds.x = wid_info->content->bounds.x;
+    	bounds.w = wid_info->content->bounds.w;
+    	bounds.h = wid_info->content->bounds.h;
+    	SetBounds_GLWidget(wid_info->content,&bounds);
+    }    
+}
+
+void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
+{
+    ScrollPaneWidget *wid_info;
+    SDL_Rect bounds;
+    GLfloat pos;
+    
+    if (!widget) return;
+    if (!b) return;
+    if (widget->WIDGET != SCROLLPANEWIDGET) {
+    	error("Wrong widget type for SetBounds_ScrollPaneWidget [%i]",widget->WIDGET);
+	return;
+    }
+
+    if (!(wid_info = (ScrollPaneWidget *)(widget->wid_info))) {
+    	error("SetBounds_ScrollPaneWidget: wid_info missing!");
+	return;
+    }
+    
+    widget->bounds.x = b->x;
+    widget->bounds.w = b->w;
+    widget->bounds.y = b->y;
+    widget->bounds.h = b->h;
+    
+    if (wid_info->scroller) {
+    	bounds.y = widget->bounds.y;
+    	bounds.h = widget->bounds.h;
+    	bounds.w = wid_info->scroller->bounds.w;
+    	bounds.x = widget->bounds.x + widget->bounds.w - wid_info->scroller->bounds.w;
+    
+    	SetBounds_GLWidget(wid_info->scroller,&bounds);
+    } else {
+    	error("SetBounds_ScrollPaneWidget: scroller missing!");
+	return;
+    }
+    
+    if (wid_info->masque) {
+    	bounds.y = widget->bounds.y;
+    	bounds.h = widget->bounds.h;
+    	bounds.w = widget->bounds.w - wid_info->scroller->bounds.w;
+    	bounds.x = widget->bounds.x;
+    
+    	SetBounds_GLWidget(wid_info->masque,&bounds);
+    } else {
+    	error("SetBounds_ScrollPaneWidget: masque missing!");
+	return;
+    }
+    
+    if (wid_info->masque) {
+    	pos = ((ScrollbarWidget *)(wid_info->scroller->wid_info))->pos;
+    	bounds.y = widget->bounds.y - pos*(wid_info->content->bounds.h);
+    	bounds.h = wid_info->content->bounds.h;
+	((ScrollbarWidget *)(wid_info->scroller->wid_info))->size = MIN(((GLfloat)widget->bounds.h)/((GLfloat)bounds.h),1.0f);
+	
+    	bounds.w = widget->bounds.w - wid_info->scroller->bounds.w;
+    	bounds.x = widget->bounds.x;
+    
+    	SetBounds_GLWidget(wid_info->masque,&bounds);
+    }
+}
+
+GLWidget *Init_ScrollPaneWidget( GLWidget *content )
+{
+    GLWidget *tmp;
+    ScrollPaneWidget *wid_info;
+    SDL_Rect b;
+    
+    tmp	= Init_EmptyBaseGLWidget();
+    if ( !tmp ) {
+        error("Failed to malloc GLWidget in Init_ScrollPaneWidget");
+	return NULL;
+    }
+    tmp->wid_info   	= malloc(sizeof(ScrollPaneWidget));
+    if ( !(tmp->wid_info) ) {
+    	free(tmp);
+        error("Failed to malloc MainWidget in Init_ScrollPaneWidget");
+	return NULL;
+    }
+    wid_info = ((ScrollPaneWidget *)tmp->wid_info);
+    wid_info->content	= content;
+    
+    tmp->WIDGET     	= SCROLLPANEWIDGET;
+    tmp->bounds.x   	= 0;
+    tmp->bounds.y   	= 0;
+    tmp->bounds.w   	= 0;
+    tmp->bounds.h   	= 0;
+    tmp->SetBounds  	= SetBounds_ScrollPaneWidget;
+    
+    if ( !AppendGLWidgetList(&(tmp->children),
+    	    (wid_info->scroller = Init_ScrollbarWidget(false,0.0f,1.0f,SB_VERTICAL
+	    	    	    	    ,ScrollPaneWidget_poschange,tmp)))
+	) {
+	error("Init_ScrollPaneWidget: Failed to init scroller!");
+	Close_Widget(&tmp);
+    	return NULL;
+    }
+    
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->masque = Init_EmptyBaseGLWidget()))
+    	) {
+	error("Init_ScrollPaneWidget: Failed to init masque!");
+	Close_Widget(&(wid_info->scroller));
+	Close_Widget(&tmp);
+    	return NULL;
+    }
+    
+    if (wid_info->content) {
+    	if ( !AppendGLWidgetList(&(wid_info->masque->children),wid_info->content) ) {
+	    error("Init_ScrollPaneWidget: Failed to adopt the content to the masque!");
+    	}
+    
+        tmp->bounds.w = wid_info->content->bounds.w;
+        tmp->bounds.h = wid_info->content->bounds.h;
+    }
+    
+    tmp->bounds.w += wid_info->scroller->bounds.w;
+    
+    return tmp;
+}
+
+/**************************/
+/* End: ScrollPaneWidget  */
+/**************************/
+
+/**********************/
 /* Begin: MainWidget  */
 /**********************/
 void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data );
@@ -1682,7 +2273,7 @@ void ConfMenu_poschange( GLfloat pos , void *data )
     	    SetBounds_GLWidget(curr,&bounds);
 	    bounds.y += bounds.h;
 	}
-	curr = (GLWidget *)(curr->next);
+	curr = curr->next;
     }
     
 }
@@ -1697,10 +2288,11 @@ void SetBounds_ConfMenuWidget( GLWidget *widget, SDL_Rect *b )
     	error("tried to set NULL bounds on ConfMenuWidget!");
 	return;
     }
-    widget->bounds.x = b->x;
-    widget->bounds.y = b->y;
+    /*widget->bounds.x = b->x;
+    widget->bounds.y = b->y;*/
     /*not resizable atm*/
 }
+
 void Paint_ConfMenuWidget( GLWidget *widget )
 {
     int edgeColor = 0xff0000ff;
@@ -1786,7 +2378,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
     	bounds.h = curr->bounds.h;
     	SetBounds_GLWidget(curr,&bounds);
 	bounds.y += bounds.h;
-	curr = (GLWidget *)(curr->next);
+	curr = curr->next;
     }
     
     if ( (wid_info->list_height) > tmp->bounds.h - 10) {
@@ -1816,9 +2408,10 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y )
 /***********************/
 /* End: ConfMenuWidget */
 /***********************/
-/**************************/
+
+/****************************/
 /* Begin: ImageButtonWidget */
-/**************************/
+/****************************/
 
 static void Button_ImageButtonWidget(Uint8 button, Uint8 state, Uint16 x, 
 			      Uint16 y, void *data)
@@ -1995,6 +2588,6 @@ GLWidget *Init_ImageButtonWidget(const char *text,
     tmp->buttondata     = tmp;
     return tmp;
 }
-/***********************/
+/**************************/
 /* End: ImageButtonWidget */
-/***********************/
+/**************************/

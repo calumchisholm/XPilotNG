@@ -33,8 +33,6 @@ bool            initialPointerControl = false;
 bool            pointerControl = false;
 
 static int	movement;	/* horizontal mouse movement. */
-static GLWidget *target[NUM_MOUSE_BUTTONS];
-static GLWidget *hovertarget;
 
 int Process_event(SDL_Event *evt);
 
@@ -178,9 +176,6 @@ int Process_event(SDL_Event *evt)
 		    target[button-1]->button(button,evt->button.state,
 		    	    	    	    evt->button.x,evt->button.y,
 					    target[button-1]->buttondata);
-#ifdef test
-    	    	    xpprintf("target[button-1]->buttondata:%i->%i\n",(int)target[button-1],(int)target[button-1]->buttondata);
-#endif
 		}
 	    }
 	    
@@ -201,9 +196,6 @@ int Process_event(SDL_Event *evt)
 		    target[0]->motion(evt->motion.xrel,evt->motion.yrel,
 		    	    	    	evt->button.x,evt->button.y,
 					target[0]->motiondata);
-#ifdef test
-    	    	    xpprintf("target[0]->motiondata:%i->%i\n",(int)target[0],(int)target[0]->motiondata);
-#endif
 		}
 	    } else {
     	    	GLWidget *tmp = FindGLWidget(evt->button.x,evt->button.y);
@@ -212,9 +204,6 @@ int Process_event(SDL_Event *evt)
     	    	    	tmp->hover(true,evt->button.x,evt->button.y,tmp->hoverdata);
     	    	    if (hovertarget && hovertarget->hover) {
 		    	hovertarget->hover(false,evt->button.x,evt->button.y,hovertarget->hoverdata);
-#ifdef test
-		    	xpprintf("hovertarget->hoverdata:%i->%i\n",(int)hovertarget,(int)hovertarget->hoverdata);
-#endif
 		    }
 		    hovertarget = tmp;
 		}
@@ -232,9 +221,6 @@ int Process_event(SDL_Event *evt)
 		    target[button-1]->button(button,evt->button.state,
 		    	    	    	    	evt->button.x,evt->button.y,
 						target[button-1]->buttondata);
-#ifdef test
-    	    	    xpprintf("target[button-1]->buttondata:%i->%i\n",(int)target[button-1],(int)target[button-1]->buttondata);
-#endif
 		}
 		target[button-1] = NULL;
 	    }

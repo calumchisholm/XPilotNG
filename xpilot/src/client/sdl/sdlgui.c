@@ -34,6 +34,7 @@
 #include "SDL.h"
 #include "sdlpaint.h"
 #include "images.h"
+#include "glwidgets.h"
 #include "text.h"
 
 int nullRGBA    = 0x00000000;
@@ -1765,333 +1766,117 @@ bool newcode = true;
     glDisable(GL_BLEND);
 }
 
-typedef char msg_txt_t[MSG_LEN];
-
 void Paint_messages(void)
 {
-    int		i, j, x, y, top_y, bot_y, width, len, i_2;
-    const int	BORDER = 10,
-		SPACING = messagefont.linespacing;
-    const int	BORDERx_bot = BORDER, BORDERx_top = 200 + BORDER;
+    int j,i,*msg_color;;
+    const int BORDER = 10;
+    GLWidget *tmp = NULL,*tmp2 = NULL;
+    LabelWidget *wi;
+    static old_maxMessages = 0;
+    static message_t **msgs[2];
+    static bool revscroll = false;
+    static GLWidget *msg_list[2] = {NULL,NULL};
     message_t	*msg;
-    int		last_msg_index = 0, msg_color;
-
-    static msg_txt_t talk_texts[MAX_MSGS];
-    static msg_txt_t game_texts[MAX_MSGS];
-    int offset;
-
-bool newcode = true;
-
-/* TODO: find a nicer solution for this, its a bit of a hack ;)
- * couldn't think of one that didn't include changing client.h
- * and messages.c
- */
-if (newcode) {
-
-    offset = 0;
-    for (j = maxMessages-1 ; j >= 0 ; --j) {
-    	if (!strlen(TalkMsg[j]->txt)) {
-	    strlcpy(talk_texts[j],"\0",MSG_LEN);
-	    if (message_texs[j].texture) {
-	    	//xpprintf("Freeing texture %i for empty string %\n",message_texs[j].texture,j);
-	    	free_string_texture(&message_texs[j]);
-	    }
-	} else {
-	    bool found_it = false;
-	    for (i = offset; i <= j; ++i) {
-		if ( (found_it = (strcmp(TalkMsg[j]->txt,talk_texts[j-i])==0))) {
-		    if (!i) break;
-		    if (j + i >= maxMessages)
-			if (message_texs[j].texture) {
-			    //xpprintf("Freeing texture %i for msgs text %i: %s\n",message_texs[j].texture,j,TalkMsg[j]->txt);   
-	    	    	    free_string_texture(&message_texs[j]);
-			}
-		    strlcpy(talk_texts[j],talk_texts[j-i],MSG_LEN);
-		    message_texs[j]=message_texs[j-i];
-		    break;
-		}
-	    }
-
-    	    offset = i;
-
-    	    if (!found_it) {
-	    	strlcpy(talk_texts[j],TalkMsg[j]->txt,MSG_LEN);
-	    	message_texs[j].texture=0;
-	    }
+    
+    msgs[0] = TalkMsg;
+    msgs[1] = GameMsg;
+    
+    if (!msg_list[0]) {
+    	if (!(msg_list[0] = Init_ListWidget(200+BORDER,BORDER,&nullRGBA,&greenRGBA
+	    	    	    	,LW_DOWN,LW_RIGHT,instruments.showReverseScroll) )) {
+	    error("Paint_messages: Can't make a listwidget for chat messages!");
+	    return;
 	}
+	AppendGLWidgetList(&(MainWidget->children),msg_list[0]);
     }
-
-   /* for (j = maxMessages-1 ; j >= 0 ; --j) {
-    	xpprintf("[%i] %i %s\n",j,message_texs[j].texture,TalkMsg[j]->txt);
+    if (!msg_list[1]) {
+    	if (!(msg_list[1] = Init_ListWidget(BORDER,draw_height-BORDER,&nullRGBA,&greenRGBA
+	    	    	    	,LW_UP,LW_RIGHT,!instruments.showReverseScroll) )) {
+	    error("Paint_messages: Can't make a listwidget for game messages!");
+	    return;
+	} 
+	AppendGLWidgetList(&(MainWidget->children),msg_list[1]);
     }
-    xpprintf("-------------------------\n");*/
-
-    offset = 0;
-    for (j = maxMessages-1 ; j >= 0 ; --j) {
-    	if (!strlen(GameMsg[j]->txt)) {
-	    strlcpy(game_texts[j],"\0",MSG_LEN);
-	    if (message_texs[j+MAX_MSGS].texture)
-	    	free_string_texture(&message_texs[j+MAX_MSGS]);
-	} else {
-	    bool found_it = false;
-	    for (i = offset; i <= j; ++i) {
-		if ( (found_it = (strcmp(GameMsg[j]->txt,game_texts[j-i])==0))) {
-		    if (!i) break;
-		    if (j + i >= maxMessages)
-			if (message_texs[j+MAX_MSGS].texture)
-	    	    	    free_string_texture(&message_texs[j+MAX_MSGS]);
-		    strlcpy(game_texts[j],game_texts[j-i],MSG_LEN);
-		    message_texs[j+MAX_MSGS]=message_texs[j-i+MAX_MSGS];
-		    break;
-		}
-	    }
-
-    	    offset = i;
-
-    	    if (!found_it) {
-	    	strlcpy(game_texts[j],GameMsg[j]->txt,MSG_LEN);
-	    	message_texs[j+MAX_MSGS].texture=0;
-	    }
-	}
+    
+    if ( revscroll != instruments.showReverseScroll ) {
+    	ListWidget_SetScrollorder(msg_list[0],instruments.showReverseScroll);
+    	ListWidget_SetScrollorder(msg_list[1],!instruments.showReverseScroll);
+	revscroll = instruments.showReverseScroll;
     }
- }
-
-    top_y = draw_height - messagefont.linespacing;
-    bot_y = messagefont.linespacing;
-
-    /* get number of player messages */
-    if (selectionAndHistory) {
-	while (last_msg_index < maxMessages
-		&& TalkMsg[last_msg_index]->len != 0)
-	    last_msg_index++;
-	last_msg_index--; /* make it an index */
+    
+    if ( maxMessages < old_maxMessages ) {
+    	while (tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages)) {
+    	    ListWidget_Remove(msg_list[i],tmp);
+	    Close_Widget(&tmp);
+    	}
+    	while (tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages)) {
+    	    ListWidget_Remove(msg_list[i],tmp);
+	    Close_Widget(&tmp);
+    	}
     }
-
-    for (i = (instruments.showReverseScroll ? 2 * maxMessages - 1 : 0);
-	 (instruments.showReverseScroll ? i >= 0 : i < 2 * maxMessages);
-	 i += (instruments.showReverseScroll ? -1 : 1)) {
-	if (i < maxMessages)
-	    msg = TalkMsg[i];
-	else
-	    msg = GameMsg[i - maxMessages];
-	if (msg->len == 0)
-	    continue;
-
-	/*
-	 * While there is something emphasized, freeze the life time counter
-	 * of a message if it is not drawn "flashed" (not in oldmessagesColorRGBA)
-	 * anymore.
-	 */
-	if (msg->lifeTime > MSG_FLASH_TIME
-	    || !selectionAndHistory
-	    || (selection.draw.state != SEL_PENDING
-		&& selection.draw.state != SEL_EMPHASIZED)) {
-	    if ((msg->lifeTime -= timePerFrame) <= 0.0) {
-		msg->txt[0] = '\0';
-		msg->len = 0;
-		msg->lifeTime = 0.0;
+    
+    /* TODO: check whether there is a more efficient way to do this!
+     * i.e. add labelwidgets as messages are added/removed
+     * For now this will have to do...
+     */
+    for ( i=0 ; i < 2 ; ++i)
+    for ( j=0 ; j <= maxMessages-1 ; ++j) {
+    	msg = (msgs[i])[j];
+	tmp = tmp2 = NULL;
+	
+    	if ((msg->lifeTime -= timePerFrame) <= 0.0) {
+    	    msg->txt[0] = '\0';
+    	    msg->len = 0;
+    	    msg->lifeTime = 0.0;
+    	}
+	
+	if (tmp = ListWidget_GetItemByIndex(msg_list[i],j) ) {
+	    if ( !(wi = (LabelWidget *)tmp->wid_info) ) {
+	    	error("Paint_messages: ListWidget lacks a wid_info ptr!");
 		continue;
 	    }
+	    if (strlen(msg->txt)) {
+	    	if ( strcmp(msg->txt, wi->tex.text) ) {
+		    tmp2 = Init_LabelWidget(msg->txt,&nullRGBA,&messagesColorRGBA,LEFT,CENTER);
+		    ListWidget_Insert(msg_list[i],tmp,tmp2);
+		    if (ListWidget_NELEM(msg_list[i])>maxMessages) {
+		    	tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages);
+			ListWidget_Remove(msg_list[i],tmp);
+			Close_Widget(&tmp);
+		    }
+		} else tmp2 = tmp;
+	    } else {
+	    	ListWidget_Remove(msg_list[i],tmp);
+		Close_Widget(&tmp);
+	    }
+	} else {
+	    if (strlen(msg->txt)) {
+		tmp2 = Init_LabelWidget(msg->txt,&nullRGBA,&messagesColorRGBA,LEFT,CENTER);
+		ListWidget_Append(msg_list[i],tmp2);
+	    }
 	}
-
+		
 	if (msg->lifeTime <= MSG_FLASH_TIME)
-	    msg_color = oldmessagesColorRGBA;
+	    msg_color = &oldmessagesColorRGBA;
 	else {
 	    /* If paused, don't bother to paint messages in mscScan* colors. */
 	    if (self && strchr("P", self->mychar))
-		msg_color = messagesColorRGBA;
+		msg_color = &messagesColorRGBA;
 	    else {
 		switch (msg->bmsinfo) {
-		case BmsBall:	msg_color = msgScanBallColorRGBA;	break;
-		case BmsSafe:	msg_color = msgScanSafeColorRGBA;	break;
-		case BmsCover:	msg_color = msgScanCoverColorRGBA;	break;
-		case BmsPop:	msg_color = msgScanPopColorRGBA;	break;
-		default:	msg_color = messagesColorRGBA;	break;
+		case BmsBall:	msg_color = &msgScanBallColorRGBA;	break;
+		case BmsSafe:	msg_color = &msgScanSafeColorRGBA;	break;
+		case BmsCover:	msg_color = &msgScanCoverColorRGBA;	break;
+		case BmsPop:	msg_color = &msgScanPopColorRGBA;	break;
+		default:	msg_color = &messagesColorRGBA;	    	break;
 		}
 	    }
 	}
-
-	if (msg_color == 0)
-	    continue;
-
-	if (i < maxMessages) {
-	    x = BORDERx_top;
-	    y = top_y;
-	    top_y -= SPACING;
-	} else {
-	    if (!instruments.showMessages)
-		continue;
-	    x = BORDERx_bot;
-	    y = bot_y;
-	    bot_y += SPACING;
-	}
-
-	i_2=(i<maxMessages)?i:(MAX_MSGS+i-maxMessages);
-
-	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
-
-	/* TODO: make sure this works! */
-	/* new message? */
-	len = MIN(msg->len, len);
-	/*
-	 * it's an emphasized talk message
-	 */
-	if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED
-	    && i < maxMessages
-	    && TALK_MSG_SCREENPOS(last_msg_index,i) >= selection.draw.y1
-	    && TALK_MSG_SCREENPOS(last_msg_index,i) <= selection.draw.y2) {
-
-	    /*
-	     * three strings (ptr), where they begin (xoff) and their
-	     * length (l):
-	     *   1st is an umemph. string to the left of a selection,
-	     *   2nd an emphasized part itself,
-	     *   3rd an unemph. part to the right of a selection.
-	     * set the according variables if a part exists.
-	     * e.g: a selection of several lines `stopping' somewhere in
-	     *   the middle of a line -> ptr2,ptr3 are needed to draw
-	     *   this line
-	     */
-	    char	*ptr  = NULL;
-	    int		xoff  = 0, l = 0;
-	    char	*ptr2 = NULL;
-	    int		xoff2 = 0, l2 = 0;
-	    char	*ptr3 = NULL;
-	    int		xoff3 = 0, l3 = 0;
-
-	    if (TALK_MSG_SCREENPOS(last_msg_index,i) > selection.draw.y1
-		 && TALK_MSG_SCREENPOS(last_msg_index,i) < selection.draw.y2) {
-		    /* all emphasized on this line */
-		    /*xxxxxxxxx*/
-		ptr2 = msg->txt;
-		l2 = len;
-		xoff2 = 0;
-	    } else if (TALK_MSG_SCREENPOS(last_msg_index,i)
-		       == selection.draw.y1) {
-		    /* first/only line */
-		    /*___xxx[___]*/
-		ptr = msg->txt;
-		xoff = 0;
-		if ( len < selection.draw.x1)
-		    l = len;
-		else {
-			/* at least two parts */
-			/*___xxx[___]*/
-			/*    ^      */
-		    l = selection.draw.x1;
-		    ptr2 = &(msg->txt[selection.draw.x1]);
-		    /*xoff2 = XTextWidth(messageFont, msg->txt, selection.draw.x1);*/
-		    xoff2 = nprintsize(&messagefont,l,msg->txt).width;/*this is not accurate*/
-
-		    if (TALK_MSG_SCREENPOS(last_msg_index,i)
-			< selection.draw.y2) {
-			    /* first line */
-			    /*___xxxxxx*/
-			    /*     ^   */
-			l2 = len - selection.draw.x1;
-		    } else {
-			    /* only line */
-			    /*___xxx___*/
-			if (len <= selection.draw.x2)
-				/*___xxx___*/
-				/*    ^    */
-			    l2 = len - selection.draw.x1;
-			else {
-				/*___xxx___*/
-				/*       ^ */
-			    l2 = selection.draw.x2 - selection.draw.x1 + 1;
-			    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
-			    /*xoff3 = XTextWidth(messageFont, msg->txt,
-					       selection.draw.x2 + 1);*/
-			    xoff3 = nprintsize(&messagefont,selection.draw.x2 + 1,msg->txt).width;/*this is not accurate*/
-			    l3 = len - selection.draw.x2 - 1;
-			}
-		    } /* only line */
-		} /* at least two parts */
-	    } else {
-		    /* last line */
-		    /*xxxxxx[___]*/
-		ptr2 = msg->txt;
-		xoff2 = 0;
-		if (len <= selection.draw.x2 + 1)
-			/* all blue */
-			/*xxxxxx[___]*/
-			/*  ^        */
-		    l2 = len;
-		else {
-			/*xxxxxx___*/
-			/*       ^ */
-		    l2 = selection.draw.x2 + 1;
-		    ptr3 = &(msg->txt[selection.draw.x2 + 1]);
-		    /*xoff3 = XTextWidth(messageFont, msg->txt,
-				       selection.draw.x2 + 1);*/
-		    xoff3 = nprintsize(&messagefont,selection.draw.x2 + 1,msg->txt).width*len;/*this is not accurate*/
-		    l3 = len - selection.draw.x2 - 1;
-		}
-	    } /* last line */
-
-    	    /* TODO: make it possible to actually divide this per character
-	     * meanwhile just ballpark guess to a fraction of the width... ;)
-	     */
-	    xpprintf("DO WE EVER GET HERE???\n");
-	    if (newcode)
-	    	if (!message_texs[i_2].texture) render_text(&gamefont,msg->txt,&message_texs[i_2]);
-	    if (ptr) {
-		if (!newcode)
-		    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);
-	    	else {
-		    disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
-	    	    	    	,(float)( (int)&ptr-(int)&msg->txt  	)/msg->len
-	    	    	    	,(float)( (int)&ptr-(int)&msg->txt + l	)/msg->len
-	    	    	    	,0.0f
-	    	    	    	,1.0f
-		    	    	,true);
-		}
-	    }
-	    if (ptr2) {
-		if (!newcode)
-		    HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);
-	    	else {
-		    disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
-	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt 	    )/msg->len
-	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt + l2    )/msg->len
-	    	    	    	,0.0f
-	    	    	    	,1.0f
-		    	    	,true);
-		}
-	    }
-	    if (ptr3) {
-		if (!newcode)
-		    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);
-	    	else {
-		    disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
-	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt 	    )/msg->len
-	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt + l3    )/msg->len
-	    	    	    	,0.0f
-	    	    	    	,1.0f
-		    	    	,true);
-		}
-	    }
-
-	} else {
-    	    if (!newcode)
-    	    	HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);
-	    else {
-		if (!message_texs[i_2].texture) render_text(&gamefont,msg->txt,&message_texs[i_2]);
-	    	disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
-	    	    	    ,0.0f
-	    	    	    ,(float)len/msg->len
-	    	    	    ,0.0f
-	    	    	    ,1.0f
-			    ,true);
-	    }
-	}
-
-    	if (!newcode)
-	    width = nprintsize(&messagefont,MIN(len, msg->len),msg->txt).width; /*this is not accurate*/
-	else
-	    width = message_texs[i_2].width;
+	
+	if (tmp2) LabelWidget_SetColor(tmp2, &nullRGBA, msg_color);
     }
+    	
+    old_maxMessages = maxMessages;
 }
 
 static bool set_rgba_color_option(xp_option_t *opt, const char *val)

@@ -512,6 +512,9 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
     	string_tex->height = glyph->h;
 
     	SDL_FreeSurface(glyph);
+	
+	string_tex->text = (char *)malloc(sizeof(char)*(strlen(text)+1));
+	sprintf(string_tex->text,"%s\0",text);
     
     } else {
     	printf("TTF_RenderText_Blended failed for [%s]\n",text);
@@ -604,6 +607,8 @@ void free_string_texture(string_tex_t *string_tex)
     if (string_tex) {
     	glDeleteTextures(1,&(string_tex->texture));
     	string_tex->texture = 0;
+	if (string_tex->text) free(string_tex->text);
+	string_tex->text = NULL;
     }
 }
 

@@ -277,7 +277,8 @@ static GLWidget *Init_PlayerListWidget(server_info_t *sip)
     if (!(header = 
 	  Init_LabelWidget("Players", 
 			   &(info->header_bg), 
-			   &(info->header_fg)))) {
+			   &(info->header_fg),
+			   CENTER,CENTER))) {
 	error("failed to create header for player list");
 	free(players_str);
 	List_delete(players);
@@ -307,8 +308,8 @@ static GLWidget *Init_PlayerListWidget(server_info_t *sip)
 	player = (char*)SI_DATA(iter);
 	row = Init_LabelWidget(player,
 			       &(info->item_bg),
-			       &(info->item_fg));
-	((LabelWidget*)row->wid_info)->align = LEFT;
+			       &(info->item_fg),
+			       LEFT,CENTER);
 	if (!row) break;
 	AppendGLWidgetList(&(tmp->children), row);
     }
@@ -379,15 +380,15 @@ static void add_status_entry(char *name, char *value, GLWidget *parent)
     if ((name_label = 
 	 Init_LabelWidget(name, 
 			  &(info->name_bg), 
-			  &(info->name_fg)))) {
-	((LabelWidget*)name_label->wid_info)->align = LEFT;
+			  &(info->name_fg),
+			  LEFT,CENTER))) {
 	AppendGLWidgetList(&(parent->children), name_label);
     }
     if ((value_label = 
 	 Init_LabelWidget(value, 
 			  &(info->value_bg), 
-			  &(info->value_fg)))) {
-	((LabelWidget*)value_label->wid_info)->align = LEFT;
+			  &(info->value_fg),
+			  LEFT,CENTER))) {
 	AppendGLWidgetList(&(parent->children), value_label);
     }
 }
@@ -635,8 +636,7 @@ static GLWidget *Init_MetaRowWidget(server_info_t *sip,
     tmp->buttondata     = tmp;
 
 #define COLUMN(TEXT) \
-    if ((col = Init_LabelWidget((TEXT), NULL, &(row->fg)))) { \
-	((LabelWidget*)col->wid_info)->align = LEFT; \
+    if ((col = Init_LabelWidget((TEXT), NULL, &(row->fg), LEFT, CENTER))) { \
         col->button = Button_MetaRowWidget; \
         col->buttondata = tmp; \
 	AppendGLWidgetList(&(tmp->children), col); \
@@ -671,8 +671,7 @@ static GLWidget *Init_MetaHeaderWidget(void)
     tmp->SetBounds = SetBounds_MetaRowWidget;
 
 #define HEADER(TEXT) \
-    if ((col = Init_LabelWidget((TEXT), &(info->bg), &(info->fg)))) { \
-	((LabelWidget*)col->wid_info)->align = LEFT; \
+    if ((col = Init_LabelWidget((TEXT), &(info->bg), &(info->fg), LEFT, CENTER))) { \
 	AppendGLWidgetList(&(tmp->children), col); \
     }
     HEADER("Server");

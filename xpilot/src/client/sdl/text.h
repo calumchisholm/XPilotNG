@@ -54,6 +54,7 @@ typedef struct {
 typedef struct {
     GLuint texture;
     texcoord_t texcoords;
+    char *text;
     int width;
     int height;
     int font_height;

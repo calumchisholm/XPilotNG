@@ -22,6 +22,7 @@
 #define GLWIDGETS_H
 
 #include <GL/gl.h>
+#include "sdlkeys.h"
 #include "SDL.h"
 #include "text.h"
 
@@ -89,6 +90,8 @@ bool DelGLWidgetListItem( GLWidget **list, GLWidget *widget );
 void DrawGLWidgets( void );
 GLWidget *FindGLWidget( Uint16 x,Uint16 y );
 
+static GLWidget *target[NUM_MOUSE_BUTTONS];
+static GLWidget *hovertarget;
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */
 /****************************************************/
@@ -171,7 +174,10 @@ typedef struct {
     int             align;  /* horizontal alignemnt */
     int             valign; /* vertical alignment   */
 } LabelWidget;
-GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor );
+GLWidget *Init_LabelWidget( const char *text , int *bgcolor, int *fgcolor, int align, int valign );
+
+bool LabelWidget_SetColor( GLWidget *widget , int *bgcolor, int *fgcolor );
+
 /********************/
 /* End: LabelWidget */
 /********************/
@@ -251,9 +257,65 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt );
 /****************************/
 
 /**********************/
+/* Begin: ListWidget  */
+/**********************/
+typedef enum {LW_UP, LW_DOWN} ListWidget_ver_dir_t;
+typedef enum {LW_RIGHT, LW_LEFT} ListWidget_hor_dir_t;
+#define LISTWIDGET 8
+typedef struct {
+     int num_elements;
+     Uint32 *bg;
+     Uint32 *highlight_color;/*not used (yet) */
+     bool   reverse_scroll;
+     ListWidget_ver_dir_t   v_dir;
+     ListWidget_hor_dir_t   h_dir;    
+} ListWidget;
+
+GLWidget *Init_ListWidget( Uint16 x, Uint16 y, Uint32 *bg, Uint32 *highlight_color
+    	    	    	    ,ListWidget_ver_dir_t v_dir, ListWidget_hor_dir_t h_dir
+			    ,bool reverse_scroll );
+
+/*TODO: allow lists in prepen,append (needs to check against loops) */
+
+/* Adds a new item last in the list */
+bool ListWidget_Append( GLWidget *list, GLWidget *item );
+/* Adds a new item first in the list */
+bool ListWidget_Prepend( GLWidget *list, GLWidget *item );
+/* Adds a new item just before target in the list */
+bool ListWidget_Insert( GLWidget *list, GLWidget *target, GLWidget *item );
+/* Removes an item from the list */
+bool ListWidget_Remove( GLWidget *list, GLWidget *item );
+
+bool ListWidget_SetScrollorder( GLWidget *list, bool order );
+
+int ListWidget_NELEM( GLWidget *list );
+/* first item is indexed [0], last is [ListWidget_NELEM - 1]*/
+GLWidget *ListWidget_GetItemByIndex( GLWidget *list, int i );
+
+/*******************/
+/* End: ListWidget */
+/*******************/
+
+/****************************/
+/* Begin: ScrollPaneWidget  */
+/****************************/
+#define SCROLLPANEWIDGET 8
+typedef struct {
+    GLWidget	*scroller;
+    GLWidget	*masque;
+    GLWidget	*content;
+} ScrollPaneWidget;
+
+GLWidget *Init_ScrollPaneWidget( GLWidget *content );
+
+/**************************/
+/* End: ScrollPaneWidget  */
+/**************************/
+
+/**********************/
 /* Begin: RadarWidget */
 /**********************/
-#define RADARWIDGET 8
+#define RADARWIDGET 9
 
 extern GLWidget *Init_RadarWidget( void );
 /********************/
@@ -263,7 +325,7 @@ extern GLWidget *Init_RadarWidget( void );
 /**************************/
 /* Begin: ScorelistWidget */
 /**************************/
-#define SCORELISTWIDGET 9
+#define SCORELISTWIDGET 10
 
 extern GLWidget *Init_ScorelistWidget( void );
 /************************/
@@ -273,7 +335,7 @@ extern GLWidget *Init_ScorelistWidget( void );
 /**********************/
 /* Begin: MainWidget  */
 /**********************/
-#define MAINWIDGET 10
+#define MAINWIDGET 11
 typedef struct {
     GLWidget	*confmenu;
     font_data	*font;
@@ -287,7 +349,7 @@ GLWidget *Init_MainWidget( font_data *font );
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
-#define CONFMENUWIDGET 11
+#define CONFMENUWIDGET 12
 typedef struct {
     int     	list_height;
     GLWidget	*scrollbar;
@@ -298,10 +360,10 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );
 /* End: ConfMenuWidget */
 /***********************/
 
-/**************************/
+/*****************************/
 /* Begin: ImageButtonWidget  */
-/**************************/
-#define IMAGEBUTTONWIDGET 12
+/*****************************/
+#define IMAGEBUTTONWIDGET 13
 typedef struct {
     Uint32 fg;
     Uint32 bg;
@@ -320,8 +382,8 @@ GLWidget *Init_ImageButtonWidget(const char *text,
 				 Uint32 bg, 
 				 Uint32 fg,
 				 void (*onClick)(GLWidget *widget));
-/***********************/
+/**************************/
 /* End: ImageButtonWidget */
-/***********************/
+/**************************/
 
 #endif
