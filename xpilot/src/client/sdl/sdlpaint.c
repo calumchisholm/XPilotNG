@@ -269,6 +269,13 @@ void setupPaint_HUD(void)
 
 void Paint_frame(void)
 {
+    static int oldt = 0;
+    struct timeval tv1, tv2;
+    double t1 = 0.0, t2 = 0.0;
+
+    gettimeofday(&tv1, NULL);
+    t1 = timeval_to_seconds(&tv1);
+
     Paint_frame_start();
 
     if (damaged <= 0) {
@@ -327,6 +334,13 @@ void Paint_frame(void)
     }
     
     SDL_GL_SwapBuffers();
+
+    if ((int)t1 > oldt) {
+	gettimeofday(&tv2, NULL);
+	t2 = timeval_to_seconds(&tv2);
+	clData.clientLag = (t2 - t1) * 1e3;
+	oldt = (int)t1;
+    }
 }
 
 void Paint_score_start(void)

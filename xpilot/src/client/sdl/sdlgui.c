@@ -1453,6 +1453,7 @@ void Paint_HUD_values(void)
     y = draw_height - 9*(MAX((GLuint)meterHeight,gamefont.h) + 6);
 
     HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y,"FPS: %.3f",clientFPS);
+    HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,x,y-20,"CL.LAG : %.1f ms", clData.clientLag);
 }
 
 static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
