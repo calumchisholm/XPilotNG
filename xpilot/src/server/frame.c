@@ -776,15 +776,15 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    break;
 
 	case OBJ_TORPEDO:
-	    len =(distinguishMissiles ? TORPEDO_LEN : MISSILE_LEN);
+	    len = distinguishMissiles ? TORPEDO_LEN : MISSILE_LEN;
 	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_SMART_SHOT:
-	    len =(distinguishMissiles ? SMART_SHOT_LEN : MISSILE_LEN);
+	    len = distinguishMissiles ? SMART_SHOT_LEN : MISSILE_LEN;
 	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_HEAT_SHOT:
-	    len =(distinguishMissiles ? HEAT_SHOT_LEN : MISSILE_LEN);
+	    len = distinguishMissiles ? HEAT_SHOT_LEN : MISSILE_LEN;
 	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_BALL:
