@@ -134,7 +134,7 @@ xpilots_SOURCES = \
 	showtime.c srecord.c srecord.h \
 	teamcup.h teamcup.c tuner.c tuner.h \
 	update.c \
-	walls.c walls.h wildmap.c \
+	walls.c walls.h \
 	xp2map.c xpmap.c xpserver.h
 
 
@@ -161,7 +161,7 @@ am_xpilots_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
 	showtime.$(OBJEXT) srecord.$(OBJEXT) teamcup.$(OBJEXT) \
 	tuner.$(OBJEXT) update.$(OBJEXT) walls.$(OBJEXT) \
-	wildmap.$(OBJEXT) xp2map.$(OBJEXT) xpmap.$(OBJEXT)
+	xp2map.$(OBJEXT) xpmap.$(OBJEXT)
 xpilots_OBJECTS = $(am_xpilots_OBJECTS)
 xpilots_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilots_LDFLAGS =
@@ -190,8 +190,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/showtime.Po ./$(DEPDIR)/srecord.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/teamcup.Po ./$(DEPDIR)/tuner.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/update.Po ./$(DEPDIR)/walls.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/wildmap.Po ./$(DEPDIR)/xp2map.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xpmap.Po
+@AMDEP_TRUE@	./$(DEPDIR)/xp2map.Po ./$(DEPDIR)/xpmap.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -285,7 +284,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tuner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/update.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/walls.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wildmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xp2map.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpmap.Po@am__quote@
 

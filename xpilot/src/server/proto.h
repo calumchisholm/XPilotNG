@@ -122,14 +122,6 @@ DFLOAT Wrap_cfindDir(int dx, int dy);
 DFLOAT Wrap_length(int dx, int dy);
 int Find_closest_team(int cx, int cy);
 
-int Wildmap(
-	int width,
-	int height,
-	char *name,
-	char *author,
-	char **data,
-	int *width_ptr,
-	int *height_ptr);
 
 /*
  * Prototypes for xpmap.c

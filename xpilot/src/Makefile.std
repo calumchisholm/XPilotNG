@@ -31,7 +31,6 @@ VERSION=4.5.4X2
 #
 LOCALGURU=ksoderbl@cc.hut.fi
 INSTALLDIR=/usr/local
-#INSTALLDIR=/u/1/ksoderbl/solaris
 BINDIR=$(INSTALLDIR)/bin
 LIBDIR=$(INSTALLDIR)/lib/xpilot
 MANDIR=$(INSTALLDIR)/man/man6
@@ -252,7 +251,7 @@ OBJS2 = alliance.o asteroid.o auth.o cannon.o cell.o cmdline.o \
 	saudio.o sched.o score.o server.o \
 	ship.o shot.o showtime.o srecord.o \
 	teamcup.o tuner.o \
-	update.o walls.o wildmap.o xpmap.o xp2map.o
+	update.o walls.o xpmap.o xp2map.o
 SRCS2 = alliance.c asteroid.c auth.c cannon.c cell.c cmdline.c \
 	collision.c command.c contact.c \
 	event.c fileparser.c frame.c \
@@ -264,7 +263,7 @@ SRCS2 = alliance.c asteroid.c auth.c cannon.c cell.c cmdline.c \
 	saudio.c sched.c score.c server.c \
 	ship.c shot.c showtime.c srecord.c \
 	teamcup.c tuner.c \
-	update.c walls.c wildmap.c xpmap.c xp2map.c
+	update.c walls.c xpmap.c xp2map.c
 
 #
 # Playback program xp-replay
@@ -1480,17 +1479,6 @@ update.o: update.c xpserver.h ../common/xpcommon.h ../common/version.h \
   netserver.h objpos.h proto.h recwrap.h robot.h saudio.h sched.h score.h \
   srecord.h teamcup.h tuner.h walls.h
 walls.o: walls.c xpserver.h ../common/xpcommon.h ../common/version.h \
-  ../common/xpconfig.h ../common/astershape.h ../common/types.h \
-  ../common/bit.h ../common/checknames.h ../common/commonproto.h \
-  ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \
-  ../common/item.h ../common/list.h ../common/net.h ../common/socklib.h \
-  ../common/pack.h ../common/packet.h ../common/portability.h \
-  ../common/rules.h ../common/setup.h ../common/wreckshape.h asteroid.h \
-  auth.h cannon.h click.h connection.h defaults.h global.h object.h \
-  serverconst.h server.h ../common/keys.h rank.h map.h metaserver.h \
-  netserver.h objpos.h proto.h recwrap.h robot.h saudio.h sched.h score.h \
-  srecord.h teamcup.h tuner.h walls.h
-wildmap.o: wildmap.c xpserver.h ../common/xpcommon.h ../common/version.h \
   ../common/xpconfig.h ../common/astershape.h ../common/types.h \
   ../common/bit.h ../common/checknames.h ../common/commonproto.h \
   ../common/const.h ../common/draw.h ../server/click.h ../common/error.h \

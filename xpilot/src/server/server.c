@@ -823,7 +823,6 @@ extern char teamcup_version[];
 extern char tuner_version[];
 extern char update_version[];
 extern char walls_version[];
-extern char wildmap_version[];
 extern char xpmap_version[];
 extern char xp2map_version[];
 
@@ -880,7 +879,6 @@ static void Check_server_versions(void)
 	{ "tuner", tuner_version },
 	{ "update", update_version },
 	{ "walls", walls_version },
-	{ "wildmap", wildmap_version },
 	{ "xpmap", xpmap_version },
 	{ "xp2map", xp2map_version },
     };

@@ -604,23 +604,6 @@ bool Grok_map_options(void)
     return true;
 }
 
-#if 0
-/*
- * Use wildmap to generate a random map.
- */
-/* kps - we need a poly random map generator */
-
-static void Generate_random_map(void)
-{
-    edgeWrap = true;
-    mapWidth = 150;
-    mapHeight = 150;
-
-    Wildmap(mapWidth, mapHeight, World.name, World.author, &mapData,
-	    &mapWidth, &mapHeight);
-    Grok_map_size();
-}
-#endif
 
 /*
  * Return the team that is closest to this click position.
