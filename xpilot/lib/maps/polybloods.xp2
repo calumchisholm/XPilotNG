@@ -18,7 +18,7 @@
 <Option name="itemmineprob" value="0.8"/>
 <Option name="identifymines" value="yes"/>
 <Option name="shieldedmining" value="yes"/>
-<Option name="initialafterburners" value="3"/>
+<Option name="initialafterburners" value="2"/>
 <Option name="pausedfps" value="0"/>
 <Option name="allowplayercrashes" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
