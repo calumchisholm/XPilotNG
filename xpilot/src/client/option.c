@@ -73,7 +73,7 @@ static void Print_default_value(xp_option_t *opt)
 	break;
     case xp_bool_option:
 	printf("        The default value is: %s.\n",
-	       opt->bool_defval == true ? "True" : "False");
+	       opt->bool_defval == true ? "yes" : "no");
 	break;
     case xp_int_option:
 	printf("        The default value is: %d.\n", opt->int_defval);
@@ -144,6 +144,7 @@ static void Version(void)
 
 bool Set_noarg_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 {
+    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->type == xp_noarg_option);
     assert(opt->noarg_ptr);
@@ -161,6 +162,7 @@ bool Set_bool_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 {
     bool retval = true;
 
+    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->type == xp_bool_option);
     assert(opt->bool_ptr);
@@ -273,6 +275,7 @@ bool Set_string_option(xp_option_t *opt, const char *value,
 {
     bool retval = true;
 
+    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->type == xp_string_option);
     assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
@@ -400,6 +403,7 @@ static bool Set_key_option(xp_option_t *opt, const char *value,
     /*bool retval = true;*/
     char *str, *valcpy;
 
+    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->name);
     assert(opt->type == xp_key_option);
@@ -571,10 +575,10 @@ const char *Option_value_to_string(xp_option_t *opt)
 
     switch (opt->type) {
     case xp_noarg_option:
-	sprintf(buf, "%s", *opt->noarg_ptr == true ? "true" : "false");
+	sprintf(buf, "%s", *opt->noarg_ptr == true ? "yes" : "no");
 	break;
     case xp_bool_option:
-	sprintf(buf, "%s", *opt->bool_ptr == true ? "true" : "false");
+	sprintf(buf, "%s", *opt->bool_ptr == true ? "yes" : "no");
 	break;
     case xp_int_option:
 	sprintf(buf, "%d", *opt->int_ptr);
