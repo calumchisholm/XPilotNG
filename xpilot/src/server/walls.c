@@ -716,6 +716,16 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	}
     }
 
+    /*
+     * Remove constantSpeed before bounce.
+     * Otherwise constantSpeed will accelerate your ship when you
+     * slide along a wall.
+     */
+    if (options.constantSpeed) {
+	pl->vel.x -= options.constantSpeed * pl->acc.x;
+	pl->vel.y -= options.constantSpeed * pl->acc.y;
+    }
+
 #if 1
     /*
      * Determine new velocity vector and move->delta after bounce.
