@@ -1,16 +1,21 @@
 #include <signal.h>
 #include "xpclient.h"
+#include "sdlinit.h"
+#include "sdlmeta.h"
+
 
 extern void Game_loop(void);
 extern void Options_cleanup(void);
 extern void Store_sdlinit_options(void);
 extern void Store_sdlgui_options(void);
 
+
 #ifdef _WINDOWS
 /* from win32hacks.c */
 extern int Winsock_init();
 extern void Winsock_cleanup();
 #endif
+
 
 static void Main_shutdown(void)
 {
@@ -28,11 +33,13 @@ static void sigcatch(int signum)
     Main_shutdown();
     error("got signal %d\n", signum);
     exit(1);
+
 }
 
 int main(int argc, char *argv[])
 {
     bool auto_shutdown = false;
+    char servername[512];
 
     init_error(argv[0]);
 
@@ -62,12 +69,24 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-    if (!Contact_servers(argc - 1, &argv[1],
-			 xpArgs.auto_connect, xpArgs.list_servers,
-			 auto_shutdown, xpArgs.shutdown_reason,
-			 0, NULL, NULL, NULL, NULL,
-			 &connectParam)) return 0;
-
+     if (argc == 1) {
+       if (Init_window()) {
+	 error("Could not create a drawable window \
+                check your SDL and TTF settings..");
+       }
+              
+       Meta_window(servername);
+     } else {
+       if (!Contact_servers(argc - 1, &argv[1],
+			    xpArgs.auto_connect, xpArgs.list_servers,
+			    auto_shutdown, xpArgs.shutdown_reason,
+			    0, NULL, NULL, NULL, NULL,
+			    &connectParam)) return 0;
+       if (Init_window()) {
+	 error("Could not create a drawable window \
+                check your SDL and TTF settings..");
+       }
+     }
     /* If something goes wrong before Client_setup I'll leave the
      * cleanup to the OS because afaik Client_cleanup will clean
      * stuff initialized in Client_setup. */
@@ -77,6 +96,7 @@ int main(int argc, char *argv[])
 	exit(1);
     }
 
+    
     if (Net_init(connectParam.server_addr, connectParam.login_port)) {
 	error("failed to initialize networking"); 
 	exit(1);
