@@ -36,11 +36,11 @@ static void Parse_help(char *progname)
     int			j;
     int			flags, all_flags;
     const char		*str;
-    option_desc		*options;
+    option_desc		*option_descs;
     int			option_count;
     char		msg[MSG_LEN];
 
-    options = Get_option_descs(&option_count);
+    option_descs = Get_option_descs(&option_count);
 
     printf("Usage: %s [ options ]\n"
 	   "\n",
@@ -61,28 +61,29 @@ static void Parse_help(char *progname)
 	   "\n");
     for (j = 0; j < option_count; j++) {
 	printf("    %s%s",
-	       options[j].type == valBool ? "-/+" : "-",
-	       options[j].name);
-	if (strcasecmp(options[j].commandLineOption, options[j].name))
-	    xpprintf(" or %s", options[j].commandLineOption);
+	       option_descs[j].type == valBool ? "-/+" : "-",
+	       option_descs[j].name);
+	if (strcasecmp(option_descs[j].commandLineOption,
+		       option_descs[j].name))
+	    xpprintf(" or %s", option_descs[j].commandLineOption);
 	printf(" %s\n",
-	       options[j].type == valInt ? "<integer>" :
-	       options[j].type == valReal ? "<real>" :
-	       options[j].type == valString ? "<string>" :
-	       options[j].type == valIPos ? "<position>" :
-	       options[j].type == valSec ? "<seconds>" :
-	       options[j].type == valList ? "<list>" :
+	       option_descs[j].type == valInt ? "<integer>" :
+	       option_descs[j].type == valReal ? "<real>" :
+	       option_descs[j].type == valString ? "<string>" :
+	       option_descs[j].type == valIPos ? "<position>" :
+	       option_descs[j].type == valSec ? "<seconds>" :
+	       option_descs[j].type == valList ? "<list>" :
 	       "");
-	for (str = options[j].helpLine; *str; str++) {
-	    if (str == options[j].helpLine || str[-1] == '\n') {
+	for (str = option_descs[j].helpLine; *str; str++) {
+	    if (str == option_descs[j].helpLine || str[-1] == '\n') {
 		putchar('\t');
 	    }
 	    putchar(*str);
 	}
-	if (str > options[j].helpLine && str[-1] != '\n') {
+	if (str > option_descs[j].helpLine && str[-1] != '\n') {
 	    putchar('\n');
 	}
-	flags = options[j].flags;
+	flags = option_descs[j].flags;
 	all_flags = (OPT_ORIGIN_ANY | OPT_VISIBLE);
 	if ((flags & all_flags) != all_flags && flags != 0) {
 	    strlcpy(msg, "[ Flags: command, ", sizeof(msg));
@@ -122,19 +123,19 @@ static void Parse_help(char *progname)
 static void Parser_dump_options(char *progname)
 {
     int			j;
-    option_desc		*options;
+    option_desc		*option_descs;
     int			option_count;
 
     (void)progname;
-    options = Get_option_descs(&option_count);
+    option_descs = Get_option_descs(&option_count);
 
     for (j = 0; j < option_count; j++) {
-	if (options[j].type != valVoid) {
-	    int len = strlen(options[j].name);
-	    xpprintf("%s:%*s%s\n", options[j].name,
+	if (option_descs[j].type != valVoid) {
+	    int len = strlen(option_descs[j].name);
+	    xpprintf("%s:%*s%s\n", option_descs[j].name,
 		   (len < 40) ? (40 - len) : 1, "",
-		   (options[j].defaultValue != NULL)
-		       ? options[j].defaultValue
+		   (option_descs[j].defaultValue != NULL)
+		       ? option_descs[j].defaultValue
 		       : "");
 	}
     }
@@ -148,30 +149,30 @@ static void Parser_dump_options(char *progname)
 static void Parser_dump_flags(char *progname)
 {
     int			j;
-    option_desc		*options;
+    option_desc		*option_descs;
     int			option_count;
     char		msg[MSG_LEN];
 
     (void)progname;
-    options = Get_option_descs(&option_count);
+    option_descs = Get_option_descs(&option_count);
 
     for (j = 0; j < option_count; j++) {
-	int len = strlen(options[j].name);
+	int len = strlen(option_descs[j].name);
 	strlcpy(msg, "{", sizeof(msg));
-	if ((options[j].flags & OPT_COMMAND) != 0)
+	if ((option_descs[j].flags & OPT_COMMAND) != 0)
 	    strlcat(msg, "command, ", sizeof(msg));
-	if ((options[j].flags & OPT_PASSWORD) != 0)
+	if ((option_descs[j].flags & OPT_PASSWORD) != 0)
 	    strlcat(msg, "passwordfile, ", sizeof(msg));
-	if ((options[j].flags & OPT_DEFAULTS) != 0)
+	if ((option_descs[j].flags & OPT_DEFAULTS) != 0)
 	    strlcat(msg, "defaults, ", sizeof(msg));
-	if ((options[j].flags & OPT_MAP) != 0)
+	if ((option_descs[j].flags & OPT_MAP) != 0)
 	    strlcat(msg, "map, ", sizeof(msg));
-	if ((options[j].flags & OPT_VISIBLE) != 0)
+	if ((option_descs[j].flags & OPT_VISIBLE) != 0)
 	    strlcat(msg, "visible, ", sizeof(msg));
 	if ((strlen(msg) >= 2))
 	    msg[strlen(msg) - 2] = '\0';
 	strlcat(msg, "}", sizeof(msg));
-	xpprintf("%s:%*s%s\n", options[j].name,
+	xpprintf("%s:%*s%s\n", option_descs[j].name,
 		 (len < 40) ? (40 - len) : 1, "", msg);
     }
     xpprintf("\n");
@@ -183,10 +184,10 @@ static void Parser_dump_flags(char *progname)
  */
 static void Parser_dump_config(char *progname)
 {
-    option_desc		*options;
+    option_desc		*option_descs;
     int			option_count;
 
-    options = Get_option_descs(&option_count);
+    option_descs = Get_option_descs(&option_count);
 
     xpprintf("\n");
     xpprintf("# %s option dump\n", progname);
