@@ -381,13 +381,15 @@ public class MapPolygon extends MapObject {
 
 
     public boolean checkAwtEvent (MapCanvas canvas, AWTEvent evt) {
+        
+        if (canvas.getMode() != MapCanvas.MODE_ERASE
+            && canvas.getMode() != MapCanvas.MODE_EDIT)
+            return super.checkAwtEvent(canvas, evt);
 
         if (evt.getID() == MouseEvent.MOUSE_PRESSED 
         || evt.getID() == MouseEvent.MOUSE_CLICKED) {
                 
             MouseEvent me = (MouseEvent)evt;
-            if (me.isControlDown()) 
-                return super.checkAwtEvent(canvas, evt);
             Rectangle b = getBounds();
             Point p = me.getPoint();
             Polygon pl = polygon;
@@ -402,7 +404,6 @@ public class MapPolygon extends MapObject {
             double thresholdSq = 100 / (canvas.getScale() * canvas.getScale());
             if ((me.getModifiers() & InputEvent.BUTTON1_MASK) != 0
                 && me.getID() == MouseEvent.MOUSE_PRESSED) {
-                
                 for (int pi = 0; pi < wraps.length; pi++) {
                     Point wp = wraps[pi];
                     for (int i = 0; i < pl.npoints; i++) {
@@ -411,9 +412,9 @@ public class MapPolygon extends MapObject {
                              pl.ypoints[i]) < thresholdSq) {
                             
                             canvas.setSelectedObject(this);
-                            if (canvas.isErase()) {
+                            if (canvas.getMode() == MapCanvas.MODE_ERASE) {
                                 canvas.removePolygonPoint(this, i);
-                            } else {
+                            } else if (canvas.getMode() == MapCanvas.MODE_EDIT) {
                                 canvas.setCanvasEventHandler
                                     (new PolygonPointMoveHandler(me, i));
                             }
@@ -423,7 +424,7 @@ public class MapPolygon extends MapObject {
                 }
             }
                 
-            if (!canvas.isErase()) {
+            if (canvas.getMode() == MapCanvas.MODE_EDIT) {
                     
                 for (int pi = 0; pi < wraps.length; pi++) {
                     Point wp = wraps[pi];

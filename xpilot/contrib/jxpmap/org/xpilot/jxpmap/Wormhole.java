@@ -184,7 +184,8 @@ public class Wormhole extends Group {
 
     
     public boolean checkAwtEvent(MapCanvas canvas, AWTEvent evt) {
-        if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
+        if (canvas.getMode() == MapCanvas.MODE_EDIT 
+        && evt.getID() == MouseEvent.MOUSE_PRESSED) {
             MouseEvent me = (MouseEvent)evt;
             if (
             (me.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {

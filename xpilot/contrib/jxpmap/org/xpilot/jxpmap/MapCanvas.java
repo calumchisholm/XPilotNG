@@ -24,14 +24,18 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 public class MapCanvas extends JComponent {
+    
+    public static final int MODE_SELECT = 0;
+    public static final int MODE_EDIT = 1;
+    public static final int MODE_ERASE = 2;
+    public static final int MODE_COPY = 3;
 
     private MapModel model;
     private float scale;
     private AffineTransform at, it;
     private CanvasEventHandler eventHandler;
     private CanvasEventHandler dragHandler, selectHandler;
-    private boolean erase;
-    private boolean copy;
+    private int mode;
     private Point offset;
     private UndoManager undoManager;
     private MapEdit currentEdit;
@@ -51,6 +55,7 @@ public class MapCanvas extends JComponent {
         selectHandler = new SelectHandler();
         selected = new ArrayList();
         grid = -1;
+        mode = MODE_SELECT;
     }
 
     public void setCanvasEventHandler(CanvasEventHandler h) {
@@ -120,23 +125,15 @@ public class MapCanvas extends JComponent {
         eventHandler = null;
         revalidate();
     }
-
-    public boolean isErase() {
-        return erase;
-    }
-
-    public void setErase(boolean erase) {
-        this.erase = erase;
+    
+    public void setMode(int mode) {
+        this.mode = mode;
     }
     
-    public boolean isCopy() {
-        return copy;
+    public int getMode() {
+        return mode;
     }
 
-    public void setCopy(boolean copy) {
-        this.copy = copy;
-    }
-    
     public void setGrid(int grid) {
         this.grid = grid;
     }
@@ -853,7 +850,7 @@ public class MapCanvas extends JComponent {
         public void mouseClicked(MouseEvent evt) {
             if (model == null)
                 return;
-            transformEvent(evt);
+            transformEvent(evt, true);
             if (eventHandler != null) {
                 eventHandler.mouseClicked(evt);
                 return;
@@ -870,7 +867,7 @@ public class MapCanvas extends JComponent {
             if (model == null)
                 return;
             if (eventHandler != null) {
-                transformEvent(evt);
+                transformEvent(evt, true);
                 eventHandler.mouseEntered(evt);
                 return;
             }
@@ -880,7 +877,7 @@ public class MapCanvas extends JComponent {
             if (model == null)
                 return;
             if (eventHandler != null) {
-                transformEvent(evt);
+                transformEvent(evt, true);
                 eventHandler.mouseExited(evt);
                 return;
             }
@@ -889,7 +886,7 @@ public class MapCanvas extends JComponent {
         public void mousePressed(MouseEvent evt) {
             if (model == null)
                 return;
-            transformEvent(evt);
+            transformEvent(evt, true);
             if (eventHandler != null) {
                 eventHandler.mousePressed(evt);
                 return;
@@ -916,7 +913,7 @@ public class MapCanvas extends JComponent {
         public void mouseReleased(MouseEvent evt) {           
             if (model == null)
                 return;
-            transformEvent(evt);
+            transformEvent(evt, true);
             if (eventHandler != null) {
                 eventHandler.mouseReleased(evt);
                 return;
@@ -932,7 +929,7 @@ public class MapCanvas extends JComponent {
         public void mouseDragged(MouseEvent evt) {
             if (model == null)
                 return;
-            transformEvent(evt);
+            transformEvent(evt, true);
             if (eventHandler != null) {
                 eventHandler.mouseDragged(evt);
                 return;
@@ -943,19 +940,19 @@ public class MapCanvas extends JComponent {
             if (model == null)
                 return;
             if (eventHandler != null) {
-                transformEvent(evt);
+                transformEvent(evt, true);
                 eventHandler.mouseMoved(evt);
                 return;
             }
         }
 
-        private void transformEvent(MouseEvent evt) {
+        private void transformEvent(MouseEvent evt, boolean snap) {
             int x = evt.getX();
             int y = evt.getY();
             int g = grid * 64;
             Point mapp = new Point(x, y);
             getInverse().transform(mapp, mapp);
-            if (g > 0) {
+            if (snap && g > 0) {
                 mapp.x = (mapp.x / g) * g;
                 mapp.y = (mapp.y / g) * g;
             }

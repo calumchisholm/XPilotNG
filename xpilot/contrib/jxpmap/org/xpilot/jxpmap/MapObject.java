@@ -194,9 +194,9 @@ public abstract class MapObject extends ModelObject {
                 } else {
                     if (evt.getID() == MouseEvent.MOUSE_PRESSED
                     && (me.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
-                        if (canvas.isErase()) {
+                        if (canvas.getMode() == MapCanvas.MODE_ERASE) {
                             canvas.removeMapObject(this);
-                        } else if (canvas.isCopy()) {
+                        } else if (canvas.getMode() == MapCanvas.MODE_COPY) {
                             canvas.setCanvasEventHandler(
                                 copy().new CopyHandler(me));
                         } else {

@@ -78,7 +78,12 @@ public class MapOptions extends HashMap {
         size.width *= 64;
         size.height *= 64;
         
-        edgeWrap = "yes".equalsIgnoreCase((String)get("edgewrap"));
+        Object oew = get("edgewrap");
+        if (oew != null) {
+            String ew = ((String)oew).toLowerCase();
+            edgeWrap = "yes".equals(ew) || "true".equals(ew);
+        }
+        
     }
 
 

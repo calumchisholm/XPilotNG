@@ -54,7 +54,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private JMenu scriptMenu;
     private bsh.Interpreter interpreter;
     
-    public MainFrame () throws Exception {
+    public MainFrame() throws Exception {
         super("jXPMap Editor");
         canvas = new MapCanvas();
         getContentPane().add(canvas, BorderLayout.CENTER);
@@ -86,7 +86,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void buildMenuBar () {
+    private void buildMenuBar() {
         
         JMenu menu;
         JMenuItem menuItem;
@@ -173,7 +173,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void buildToolBar () {
+    private void buildToolBar() {
         
         JToolBar tb1 = new JToolBar(SwingConstants.HORIZONTAL);
         tb1.setFloatable(false);
@@ -184,10 +184,13 @@ public class MainFrame extends JFrame implements ActionListener {
         Font f = lblZoom.getFont();
         lblZoom.setFont(f.deriveFont((float)(f.getSize() - 2)));
         toggleGroup = new ButtonGroup();
-       
-        tb1.add(newToggle("select", "/images/arrow.gif", "Select"));       
+        
+        JToggleButton tb = newToggle("select", "/images/arrow.gif", "Select");
+        tb.setSelected(true);
+        tb1.add(tb);
+        tb1.add(newToggle("editMode", "/images/editobjicon.gif", "Edit objects"));
         tb1.add(newToggle("eraseMode", "/images/eraseicon.gif", "Erasing mode"));
-        tb1.add(newToggle("copyMode", "/images/copyicon.gif", "Copy mode"));                
+        tb1.add(newToggle("copyMode", "/images/copyicon.gif", "Copy mode"));
         tb1.addSeparator();        
         tb1.add(newButton("zoomIn", "/images/zoominicon.gif", "Zoom in"));
         tb1.add(newButton("zoomOut", "/images/zoomouticon.gif", "Zoom out"));
@@ -227,14 +230,14 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void buildActionMap () {
+    private void buildActionMap() {
         ActionMap am = canvas.getActionMap();
         am.put("quickSave", new GuiAction("quickSave"));
         am.put("quickOpen", new GuiAction("quickOpen"));
     }
     
     
-    private void buildInputMap () {
+    private void buildInputMap() {
         InputMap im = canvas.getInputMap(
         MapCanvas.WHEN_IN_FOCUSED_WINDOW);
         im.put(KeyStroke.getKeyStroke("control S"), "quickSave");
@@ -348,19 +351,19 @@ public class MainFrame extends JFrame implements ActionListener {
         updateScale();
     }
     
-    private void zoomIn () {
+    private void zoomIn() {
         zoom++;
         updateScale();
     }
     
     
-    private void zoomOut () {
+    private void zoomOut() {
         zoom--;
         updateScale();
     }
     
     
-    private void updateScale () {
+    private void updateScale() {
         float df = canvas.getModel().getDefaultScale();
         canvas.setScale
         ((zoom >= 0) ?
@@ -375,18 +378,17 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
     
-    private void select () {
-        canvas.setErase(false);
-        canvas.setCopy(false);
+    private void select() {
+        canvas.setMode(MapCanvas.MODE_SELECT);
         canvas.setCanvasEventHandler(null);
         canvas.repaint();
     }
     
-    private void newWall () {
+    private void newWall() {
         newMapObject(new MapPolygon());
     }
     
-    private void makeBallArea () {
+    private void makeBallArea() {
         if (canvas.getSelectedObjects().isEmpty()) {
             JOptionPane.showMessageDialog
             (this, "First select the objects that belong to the ball area.", 
@@ -397,7 +399,7 @@ public class MainFrame extends JFrame implements ActionListener {
         canvas.makeBallAreaFromSelected();
     }
     
-    private void makeBallTarget () {
+    private void makeBallTarget() {
         if (canvas.getSelectedObjects().isEmpty()) {
             JOptionPane.showMessageDialog
             (this, "First select the objects that belong to the ball target.", 
@@ -408,7 +410,7 @@ public class MainFrame extends JFrame implements ActionListener {
         canvas.makeBallTargetFromSelected();
     }
     
-    private void makeDecor () {
+    private void makeDecor() {
         if (canvas.getSelectedObjects().isEmpty()) {
             JOptionPane.showMessageDialog
             (this, "First select the objects that belong to the decoration.", 
@@ -420,7 +422,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     }
     
-    private void makeFriction () {
+    private void makeFriction() {
         if (canvas.getSelectedObjects().isEmpty()) {
             JOptionPane.showMessageDialog
             (this, "First select the objects that belong to the friction area.", 
@@ -431,7 +433,7 @@ public class MainFrame extends JFrame implements ActionListener {
         canvas.makeFrictionAreaFromSelected();
     }    
     
-    private void makeTarget () {
+    private void makeTarget() {
         if (canvas.getSelectedObjects().isEmpty()) {
             JOptionPane.showMessageDialog
             (this, "First select the objects that belong to the target.", 
@@ -442,19 +444,19 @@ public class MainFrame extends JFrame implements ActionListener {
         canvas.makeTargetFromSelected();
     }    
     
-    private void newFuel () {
+    private void newFuel() {
         newMapObject(SimpleMapObject.createFuel());
     }
     
-    private void newBase () {
+    private void newBase() {
         newMapObject(new Base());
     }
     
-    private void newBall () {
+    private void newBall() {
         newMapObject(new Ball());    
     }
     
-    private void makeCannon () {
+    private void makeCannon() {
         if (canvas.getSelectedObjects().isEmpty()) {
             JOptionPane.showMessageDialog
             (this, "First select the objects that belong to the cannon.", 
@@ -465,23 +467,23 @@ public class MainFrame extends JFrame implements ActionListener {
         canvas.makeCannonFromSelected();
     }
         
-    private void newCheckPoint () {
+    private void newCheckPoint() {
         newMapObject(SimpleMapObject.createCheck());
     }
     
-    private void newItemConcentrator () {
+    private void newItemConcentrator() {
         newMapObject(SimpleMapObject.createItemConcentrator());
     }
     
-    private void newAsteroidConcentrator () {
+    private void newAsteroidConcentrator() {
         newMapObject(SimpleMapObject.createAsteroidConcentrator());
     }
     
-    private void newGrav () {
+    private void newGrav() {
         newMapObject(new Grav());
     }
     
-    private void makeWormhole () {
+    private void makeWormhole() {
         if (canvas.getSelectedObjects().isEmpty()) {
             JOptionPane.showMessageDialog
             (this, "First select the objects that belong to the wormhole.", 
@@ -492,45 +494,48 @@ public class MainFrame extends JFrame implements ActionListener {
         canvas.makeWormholeFromSelected();
     }
     
-    private void newMapObject (MapObject o) {
-        canvas.setErase(false);
-        canvas.setCopy(false);
+    private void newMapObject(MapObject o) {
+        canvas.setMode(MapCanvas.MODE_SELECT);
         canvas.setCanvasEventHandler(o.getCreateHandler(null));        
-    } 
+    }
     
-    
-    private void eraseMode () {
+    private void editMode() {
         canvas.setCanvasEventHandler(null);
-        canvas.setErase(true);
+        canvas.setMode(MapCanvas.MODE_EDIT);
+    }
+    
+    private void eraseMode() {
+        canvas.setCanvasEventHandler(null);
+        canvas.setMode(MapCanvas.MODE_ERASE);
         canvas.repaint();
     }
     
-    private void copyMode () {
+    private void copyMode() {
         canvas.setCanvasEventHandler(null);
-        canvas.setCopy(true);
+        canvas.setMode(MapCanvas.MODE_COPY);
         canvas.repaint();
     }
     
-    private void group () {
+    private void group() {
         canvas.makeGroupFromSelected();
     }
     
-    private void ungroup () {
+    private void ungroup() {
         canvas.ungroupSelected();
     }
     
-    private void regroup () {
+    private void regroup() {
         canvas.regroupSelected();
     }
     
-    private void newMap () {
+    private void newMap() {
         mapFile = null;
         setModel(new MapModel());
         //setZoom(-5);
     }
     
     
-    private void openMap () {
+    private void openMap() {
         
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (mapFile != null) fc.setSelectedFile(mapFile);
@@ -555,7 +560,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void saveMap () {
+    private void saveMap() {
         if (!validateMap()) return;
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (mapFile != null) fc.setSelectedFile(mapFile);
@@ -576,7 +581,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void importXml () {
+    private void importXml() {
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
         File f = fc.getSelectedFile();
@@ -609,7 +614,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
     
-    private void exportXml () {
+    private void exportXml() {
         if (!validateMap()) return;
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
@@ -633,12 +638,12 @@ public class MainFrame extends JFrame implements ActionListener {
         }            
     }
     
-    private void exitApp () {
+    private void exitApp() {
         System.exit(0);
     }
     
     
-    private void showOptions () {
+    private void showOptions() {
         EditorDialog.show
         (this, 
         new MapOptionEditor(canvas.getModel().options), 
@@ -647,7 +652,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void showImages () {
+    private void showImages() {
         EditorDialog.show
         (this, 
         new ImageListEditor(canvas.getModel().pixmaps), 
@@ -656,7 +661,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void showPolygonStyles () {
+    private void showPolygonStyles() {
         EditorDialog.show
         (this, 
         new PolygonStyleManager(canvas), 
@@ -665,7 +670,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void showEdgeStyles () {
+    private void showEdgeStyles() {
         EditorDialog.show
         (this, 
         new EdgeStyleManager(canvas), 
@@ -674,7 +679,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void showBeanShellConsole () {
+    private void showBeanShellConsole() {
         if (bshConsole == null) {
             try {
                 Map vars = new HashMap();
@@ -692,7 +697,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void quickSave () {
+    private void quickSave() {
         
         if (mapFile == null) {
             saveMap();
@@ -709,7 +714,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     
-    private void quickOpen () {
+    private void quickOpen() {
         
         if (mapFile == null) {
             openMap();
@@ -728,20 +733,20 @@ public class MainFrame extends JFrame implements ActionListener {
         setModel(model);
     }
     
-    private void undo () {
+    private void undo() {
         if (canvas.getUndoManager().canUndo())
             canvas.getUndoManager().undo();
         canvas.repaint();            
     }
     
-    private void redo () {
+    private void redo() {
         if (canvas.getUndoManager().canRedo())
             canvas.getUndoManager().redo();
         canvas.repaint();            
     }
     
     
-    private boolean validateMap () {
+    private boolean validateMap() {
         Object[] error = canvas.getModel().validateModel();
         if (error == null) return true;
         canvas.setSelectedObject((MapObject)error[0]);
