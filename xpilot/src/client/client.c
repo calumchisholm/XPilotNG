@@ -1573,6 +1573,8 @@ void Client_score_table(void)
     } else {
 	Determine_team_order(team_order, team);
 
+	/* add an empty line */
+	entrynum++;
 	for (i = (BIT(hackedInstruments, TREAT_ZERO_SPECIAL) ? 1 : 0);
 	     i < MAX_TEAMS;
 	     i++) {

@@ -506,7 +506,7 @@ void Paint_score_start(void)
     if (showRealName) {
 	strlcpy(headingStr, "NICK=USER@HOST", sizeof(headingStr));
     } else if (BIT(Setup->mode, TEAM_PLAY)) {
-	;
+	strlcpy(headingStr, " AL  SCORE   NAME     LIFE", sizeof(headingStr));
     } else {
 	strlcpy(headingStr, "  ", sizeof(headingStr));
 	if (BIT(Setup->mode, TIMING)) {
@@ -523,11 +523,11 @@ void Paint_score_start(void)
     }
     Paint_score_background(thisLine);
 
-    if (!BIT(Setup->mode, TEAM_PLAY) || showRealName) {
+    if (1/*!BIT(Setup->mode, TEAM_PLAY) || showRealName*/) {
 	ShadowDrawString(dpy, players, scoreListGC,
 			 SCORE_BORDER, thisLine,
 			 headingStr,
-			 colors[WHITE].pixel,
+			 colors[scoreColor].pixel,
 			 colors[BLACK].pixel);
 
 	gcv.line_style = LineSolid;
