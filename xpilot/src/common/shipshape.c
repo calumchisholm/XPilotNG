@@ -140,8 +140,9 @@ shipobj *Default_ship(void)
 
     return &sh;
 }
+#endif
 
-static int shape2wire(char *ship_shape_str, shipobj *w)
+int shape2wire(char *ship_shape_str, shipobj *w)
 {
 /*
  * Macros to simplify limit-checking for ship points.
@@ -960,22 +961,22 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 	}
     }
 
-    i = sizeof(position) * RES;
-    if (!(w->pts[0] = (position*)malloc(w->num_points * i))
+    i = sizeof(shapepos) * RES;
+    if (!(w->pts[0] = (shapepos*)malloc(w->num_points * i))
 	|| (w->num_l_gun
-	    && !(w->l_gun[0] = (position*)malloc(w->num_l_gun * i)))
+	    && !(w->l_gun[0] = (shapepos*)malloc(w->num_l_gun * i)))
 	|| (w->num_r_gun
-	    && !(w->r_gun[0] = (position*)malloc(w->num_r_gun * i)))
+	    && !(w->r_gun[0] = (shapepos*)malloc(w->num_r_gun * i)))
 	|| (w->num_l_rgun
-	    && !(w->l_rgun[0] = (position*)malloc(w->num_l_rgun * i)))
+	    && !(w->l_rgun[0] = (shapepos*)malloc(w->num_l_rgun * i)))
 	|| (w->num_r_rgun
-	    && !(w->r_rgun[0] = (position*)malloc(w->num_r_rgun * i)))
+	    && !(w->r_rgun[0] = (shapepos*)malloc(w->num_r_rgun * i)))
 	|| (w->num_l_light
-	    && !(w->l_light[0] = (position*)malloc(w->num_l_light * i)))
+	    && !(w->l_light[0] = (shapepos*)malloc(w->num_l_light * i)))
 	|| (w->num_r_light
-	    && !(w->r_light[0] = (position*)malloc(w->num_r_light * i)))
+	    && !(w->r_light[0] = (shapepos*)malloc(w->num_r_light * i)))
 	|| (w->num_m_rack
-	    && !(w->m_rack[0] = (position*)malloc(w->num_m_rack * i)))
+	    && !(w->m_rack[0] = (shapepos*)malloc(w->num_m_rack * i)))
 	) {
 	error("Not enough memory for ship shape");
 	if (w->pts[0]) {
@@ -1030,51 +1031,40 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
 	w->m_rack[i] = &w->m_rack[i - 1][RES];
     }
 
-    for (i = 0; i < w->num_points; i++) {
-	w->pts[i][0].x = pt[i].x;
-	w->pts[i][0].y = pt[i].y;
-    }
-    if (engineSet) {
-	w->engine[0].x = engine.x;
-	w->engine[0].y = engine.y;
-    }
-    if (mainGunSet) {
-	w->m_gun[0].x = m_gun.x;
-	w->m_gun[0].y = m_gun.y;
-    }
-    for (i = 0; i < w->num_l_gun; i++) {
-	w->l_gun[i][0].x = l_gun[i].x;
-	w->l_gun[i][0].y = l_gun[i].y;
-    }
-    for (i = 0; i < w->num_r_gun; i++) {
-	w->r_gun[i][0].x = r_gun[i].x;
-	w->r_gun[i][0].y = r_gun[i].y;
-    }
-    for (i = 0; i < w->num_l_rgun; i++) {
-	w->l_rgun[i][0].x = l_rgun[i].x;
-	w->l_rgun[i][0].y = l_rgun[i].y;
-    }
-    for (i = 0; i < w->num_r_rgun; i++) {
-	w->r_rgun[i][0].x = r_rgun[i].x;
-	w->r_rgun[i][0].y = r_rgun[i].y;
-    }
-    for (i = 0; i < w->num_l_light; i++) {
-	w->l_light[i][0].x = l_light[i].x;
-	w->l_light[i][0].y = l_light[i].y;
-    }
-    for (i = 0; i < w->num_r_light; i++) {
-	w->r_light[i][0].x = r_light[i].x;
-	w->r_light[i][0].y = r_light[i].y;
-    }
-    for (i = 0; i < w->num_m_rack; i++) {
-	w->m_rack[i][0].x = m_rack[i].x;
-	w->m_rack[i][0].y = m_rack[i].y;
-    }
+    for (i = 0; i < w->num_points; i++)
+	w->pts[i][0] = ipos2shapepos(pt[i]);
+
+    if (engineSet)
+	w->engine[0] = ipos2shapepos(engine);
+
+    if (mainGunSet)
+	w->m_gun[0] = ipos2shapepos(m_gun);
+
+    for (i = 0; i < w->num_l_gun; i++)
+	w->l_gun[i][0] = ipos2shapepos(l_gun[i]);
+
+    for (i = 0; i < w->num_r_gun; i++)
+	w->r_gun[i][0] = ipos2shapepos(r_gun[i]);
+
+    for (i = 0; i < w->num_l_rgun; i++)
+	w->l_rgun[i][0] = ipos2shapepos(l_rgun[i]);
+
+    for (i = 0; i < w->num_r_rgun; i++)
+	w->r_rgun[i][0] = ipos2shapepos(r_rgun[i]);
+
+    for (i = 0; i < w->num_l_light; i++)
+	w->l_light[i][0] = ipos2shapepos(l_light[i]);
+
+    for (i = 0; i < w->num_r_light; i++)
+	w->r_light[i][0] = ipos2shapepos(r_light[i]);
+
+    for (i = 0; i < w->num_m_rack; i++)
+	w->m_rack[i][0] = ipos2shapepos(m_rack[i]);
+
     Rotate_ship(w);
 
     return 0;
 }
-#endif
 
 static shipobj *do_parse_shape(char *str)
 {
