@@ -184,6 +184,14 @@ char *mapd;
 
 static void tagstart(void *data, const char *el, const char **attr)
 {
+    static double scale = 1;
+
+    if (!strcasecmp(el, "Scale")) {
+	if (!*attr || strcasecmp(*attr, "value"))
+	    error("Invalid Scale");
+	else
+	    scale = atof(*(attr + 1));
+    }
     if (!strcasecmp(el, "BallArea")) {
 	int team;
 	groupc++;
@@ -209,9 +217,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1));
+		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1));
+		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
 	polyc++;
@@ -283,9 +291,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1));
+		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1));
+		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
 	World.check[checknum].x = x;
@@ -306,9 +314,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "team"))
 		team = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1));
+		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1));
+		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
 	World.fuel[fuelnum].clk_pos.x = x;
@@ -332,9 +340,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "team"))
 		team = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1));
+		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1));
+		y = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "dir"))
 		dir = atoi(*(attr + 1));
 	    attr += 2;
@@ -376,9 +384,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "team"))
 		team = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1));
+		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1));
+		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
 	World.treasures[ballnum].pos.x = x;
@@ -407,9 +415,9 @@ static void tagstart(void *data, const char *el, const char **attr)
 	int x, y;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
-		x = atoi(*(attr + 1));
+		x = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
-		y = atoi(*(attr + 1));
+		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
 	*poly++ = x;
