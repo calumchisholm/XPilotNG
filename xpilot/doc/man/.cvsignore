@@ -1,4 +1,8 @@
 Makefile
+xpilot-ng-replay.man
+xpilot-ng-sdl.man
+xpilot-ng-server.man
+xpilot-ng-x11.man
 xpilot.man
 xpilots.man
 xp-replay.man

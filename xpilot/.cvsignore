@@ -3,3 +3,10 @@ My.config
 README
 xmkmf
 xxpilots
+autom4te.cache
+config.h
+config.log
+config.status
+configure.scan
+configure.sh
+stamp-h1
