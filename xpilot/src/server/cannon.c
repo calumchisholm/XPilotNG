@@ -28,8 +28,9 @@ char cannon_version[] = VERSION;
 
 
 static int Cannon_select_weapon(cannon_t *cannon);
-static void Cannon_aim(cannon_t *cannon, int weapon, int *target, int *dir);
-static void Cannon_fire(cannon_t *cannon, int weapon, int target, int dir);
+static void Cannon_aim(cannon_t *cannon, int weapon,
+		       player **pl_p, int *dir);
+static void Cannon_fire(cannon_t *cannon, int weapon, player *pl, int dir);
 static int Cannon_in_danger(cannon_t *cannon);
 static int Cannon_select_defense(cannon_t *cannon);
 static void Cannon_defend(cannon_t *cannon, int defense);
@@ -143,21 +144,19 @@ void Cannon_check_defense(cannon_t *c)
 {
     int defense = Cannon_select_defense(c);
 
-    if (defense >= 0
-	&& Cannon_in_danger(c)) {
+    if (defense >= 0 && Cannon_in_danger(c))
 	Cannon_defend(c, defense);
-    }
 }
 
 void Cannon_check_fire(cannon_t *c)
 {
-    int	target = -1,
-    	dir = 0,
+    player *pl = NULL;
+    int	dir = 0,
 	weapon = Cannon_select_weapon(c);
 
-    Cannon_aim(c, weapon, &target, &dir);
-    if (target != -1)
-	Cannon_fire(c, weapon, target, dir);
+    Cannon_aim(c, weapon, &pl, &dir);
+    if (pl)
+	Cannon_fire(c, weapon, pl, dir);
 }
 
 /* selects one of the available defenses. see cannon.h for descriptions. */
@@ -305,7 +304,7 @@ static int Cannon_select_weapon(cannon_t *c)
    modes 1 and 2 only fire if a player is within range of the selected weapon.
    mode 3 only fires if a player will be in range when the shot is expected to hit.
  */
-static void Cannon_aim(cannon_t *c, int weapon, int *target, int *dir)
+static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 {
     int		speed = ShotsSpeed;
     int		range = CANNON_SHOT_LIFE_MAX * speed;
@@ -421,11 +420,11 @@ static void Cannon_aim(cannon_t *c, int weapon, int *target, int *dir)
 	}
 	if (found || ready) {
 	    closest = tdist;
-	    *target = i;
+	    *pl_p = pl;
 	}
     }
     if (!(found || ready)) {
-	*target = -1;
+	*pl_p = NULL;
 	return;
     }
 
@@ -456,9 +455,8 @@ static void Cannon_aim(cannon_t *c, int weapon, int *target, int *dir)
 
 /* does the actual firing. also determines in which way to use weapons that
    have more than one possible use. */
-static void Cannon_fire(cannon_t *c, int weapon, int target, int dir)
+static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 {
-    player	*pl = Players(target);
     int		cx = c->pos.cx;
     int		cy = c->pos.cy;
     modifiers	mods;
@@ -517,7 +515,7 @@ static void Cannon_fire(cannon_t *c, int weapon, int target, int dir)
 	default:
 	    if (allowSmartMissiles) {
 		Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_SMART_SHOT,
-				  dir, mods, target);
+				  dir, mods, pl->id);
 		sound_play_sensors(cx, cy, FIRE_SMART_SHOT_SOUND);
 		played = true;
 		break;
@@ -525,9 +523,9 @@ static void Cannon_fire(cannon_t *c, int weapon, int target, int dir)
 	    /* FALLTHROUGH */
 	case 1:
 	    if (allowHeatSeekers
-		&& BIT(Players(target)->status, THRUSTING)) {
+		&& BIT(pl->status, THRUSTING)) {
 		Fire_general_shot(NULL, c->team, 1, cx, cy, OBJ_HEAT_SHOT,
-				  dir, mods, target);
+				  dir, mods, pl->id);
 		sound_play_sensors(cx, cy, FIRE_HEAT_SHOT_SOUND);
 		played = true;
 		break;
@@ -571,7 +569,7 @@ static void Cannon_fire(cannon_t *c, int weapon, int target, int dir)
 	    < TRANSPORTER_DISTANCE * CLICK) {
 	    int item = -1;
 	    long amount = 0;
-	    Do_general_transporter(NULL, cx, cy, target, &item, &amount);
+	    Do_general_transporter(NULL, cx, cy, pl, &item, &amount);
 	    if (item != -1)
 		Cannon_add_item(c, item, amount);
 	} else {

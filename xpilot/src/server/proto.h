@@ -227,7 +227,7 @@ void Fire_general_laser(player *pl, unsigned short team, int cx, int cy,
 			int dir, modifiers mods);
 void Do_deflector(player *pl);
 void Do_transporter(player *pl);
-void Do_general_transporter(player *pl, int cx, int cy, int target,
+void Do_general_transporter(player *pl, int cx, int cy, player *victim,
 			    int *item, long *amount);
 void do_hyperjump(player *pl);
 void do_lose_item(player *pl);

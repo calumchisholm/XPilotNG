@@ -582,8 +582,8 @@ void Do_deflector(player *pl)
 
 void Do_transporter(player *pl)
 {
-    player	*p;
-    int		i, target = -1;
+    player	*victim = NULL;
+    int		i;
     DFLOAT	dist, closest = TRANSPORTER_DISTANCE * CLICK;
 
     /* if not available, fail silently */
@@ -594,22 +594,23 @@ void Do_transporter(player *pl)
 
     /* find victim */
     for (i = 0; i < NumPlayers; i++) {
-	p = Players(i);
-	if (p == pl
-	    || !Player_is_active(p)
-	    || Team_immune(pl->id, p->id)
-	    || IS_TANK_PTR(p)
-	    || BIT(p->used, HAS_PHASING_DEVICE))
+	player *pl_i = Players(i);
+	if (pl_i == pl
+	    || !Player_is_active(pl_i)
+	    || Team_immune(pl->id, pl_i->id)
+	    || IS_TANK_PTR(pl_i)
+	    || BIT(pl_i->used, HAS_PHASING_DEVICE))
 	    continue;
-	dist = Wrap_length(pl->pos.cx - p->pos.cx, pl->pos.cy - p->pos.cy);
+	dist = Wrap_length(pl->pos.cx - pl_i->pos.cx,
+			   pl->pos.cy - pl_i->pos.cy);
 	if (dist < closest) {
 	    closest = dist;
-	    target = i;
+	    victim = pl_i;
 	}
     }
 
     /* no victims in range */
-    if (target == -1) {
+    if (!victim) {
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, TRANSPORTER_FAIL_SOUND);
 	Add_fuel(&(pl->fuel), ED_TRANSPORTER);
 	pl->item[ITEM_TRANSPORTER]--;
@@ -617,13 +618,12 @@ void Do_transporter(player *pl)
     }
 
     /* victim found */
-    Do_general_transporter(pl, pl->pos.cx, pl->pos.cy, target, NULL, NULL);
+    Do_general_transporter(pl, pl->pos.cx, pl->pos.cy, victim, NULL, NULL);
 }
 
-void Do_general_transporter(player *pl, int cx, int cy, int target,
+void Do_general_transporter(player *pl, int cx, int cy, player *victim,
 			    int *itemp, long *amountp)
 {
-    player		*victim = Players(target);
     char		msg[MSG_LEN];
     const char		*what = NULL;
     int			i;
@@ -654,7 +654,7 @@ void Do_general_transporter(player *pl, int cx, int cy, int target,
 	    if (Transporters[NumTransporters] != NULL) {
 		Transporters[NumTransporters]->pos.cx = cx;
 		Transporters[NumTransporters]->pos.cy = cy;
-		Transporters[NumTransporters]->target = victim->id;
+		Transporters[NumTransporters]->victim = victim;
 		Transporters[NumTransporters]->id = (pl ? pl->id : NO_ID);
 		Transporters[NumTransporters]->count = 5;
 		NumTransporters++;

@@ -452,7 +452,7 @@ typedef struct {
  */
 typedef struct {
     clpos	pos;
-    int		target;
+    player	*victim;
     int		id;
     DFLOAT	count;
 } trans_t;

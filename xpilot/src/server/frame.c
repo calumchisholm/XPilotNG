@@ -859,7 +859,7 @@ static void Frame_ships(connection_t *conn, player *pl)
     }
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
-	player 	*victim = Player_by_id(trans->target),
+	player 	*victim = trans->victim,
 		*pl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
 	int 	cx = (pl ? pl->pos.cx : trans->pos.cx),
 		cy = (pl ? pl->pos.cy : trans->pos.cy);
