@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2003 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -35,10 +35,10 @@ typedef struct {
     char *query;
 } URL;
 
-static int Mapdata_extract (const char *name);
-static int Mapdata_download (const URL *url, const char *filePath);
-static int Url_parse (const char *urlstr, URL *url);
-static void Url_free_parsed (URL *url);
+static int Mapdata_extract(const char *name);
+static int Mapdata_download(const URL *url, const char *filePath);
+static int Url_parse(const char *urlstr, URL *url);
+static void Url_free_parsed(URL *url);
 
 
 int Mapdata_setup(const char *urlstr)
@@ -55,7 +55,7 @@ int Mapdata_setup(const char *urlstr)
 	warn("malformed URL: %s", urlstr);
 	return false;
     }
-	
+
     for (name = url.path + strlen(url.path) - 1; name > url.path; name--) {
 	if (*(name - 1) == '/')
 	    break;
@@ -74,9 +74,9 @@ int Mapdata_setup(const char *urlstr)
     for (dir = strtok(texturePath, ":"); dir; dir = strtok(NULL, ":"))
 	if (access(dir, R_OK | W_OK | X_OK) == 0)
 	    break;
-    
+
     if (dir == NULL) {
-	
+
 	/* texturePath hasn't got a directory with proper access rights */
 	/* so lets create one into users home dir */
 
@@ -85,10 +85,10 @@ int Mapdata_setup(const char *urlstr)
 	    error("couldn't access any dir in %s and HOME is unset", path);
 	    goto end;
 	}
-	
+
 	if (strlen(home) == 0)
 	    sprintf(buf, "%s", DATADIR);
-	else if (home[strlen(home) - 1] == PATHNAME_SEP) 
+	else if (home[strlen(home) - 1] == PATHNAME_SEP)
 	    sprintf(buf, "%s%s", home, DATADIR);
 	else
 	    sprintf(buf, "%s%c%s", home, PATHNAME_SEP, DATADIR);
@@ -102,10 +102,10 @@ int Mapdata_setup(const char *urlstr)
 
 	dir = buf;
     }
-    
+
     if (strlen(dir) == 0)
 	sprintf(path, "%s", name);
-    else if (dir[strlen(dir) - 1] == PATHNAME_SEP) 
+    else if (dir[strlen(dir) - 1] == PATHNAME_SEP)
 	sprintf(path, "%s%s", dir, name);
     else
 	sprintf(path, "%s%c%s", dir, PATHNAME_SEP, name);
@@ -114,7 +114,7 @@ int Mapdata_setup(const char *urlstr)
 	error("no extension in file name %s.", name);
 	goto end;
     }
-    
+
     /* temporarily make path point to the directory name */
     ptr = strrchr(path, '.');
     *ptr = '\0';
@@ -161,7 +161,7 @@ int Mapdata_setup(const char *urlstr)
 }
 
 
-static int Mapdata_extract (const char *name)
+static int Mapdata_extract(const char *name)
 {
     gzFile in;
     FILE *out;
@@ -267,7 +267,7 @@ static int Mapdata_extract (const char *name)
 }
 
 
-static int Mapdata_download (const URL *url, const char *filePath)
+static int Mapdata_download(const URL *url, const char *filePath)
 {
     char buf[1024];
     int rv, header, c, len, i;
@@ -337,7 +337,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
 	}
 
 	if (len == 0) {
-	    rv = true;
+	    rv = !header;
 	    break;
 	}
 
@@ -380,7 +380,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
 }
 
 
-static int Url_parse (const char *urlstr, URL *url)
+static int Url_parse(const char *urlstr, URL *url)
 {
     int len, i, beg, doPort;
     char *buf;
@@ -459,7 +459,7 @@ static int Url_parse (const char *urlstr, URL *url)
 }
 
 
-static void Url_free_parsed (URL *url)
+static void Url_free_parsed(URL *url)
 {
     free(url->protocol);
 }
