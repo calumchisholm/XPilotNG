@@ -25,21 +25,6 @@
 
 char update_version[] = VERSION;
 
-
-/* kps - gravity is block based, even on polygon maps */
-#define update_object_speed(o_)						\
-    if (BIT((o_)->status, GRAVITY)) {					\
-	(o_)->vel.x += ((o_)->acc.x					\
-	  + World.gravity[OBJ_X_IN_BLOCKS(o_)][OBJ_Y_IN_BLOCKS(o_)].x)  \
-          * timeStep;							\
-	(o_)->vel.y += ((o_)->acc.y					\
-	  + World.gravity[OBJ_X_IN_BLOCKS(o_)][OBJ_Y_IN_BLOCKS(o_)].y)  \
-          * timeStep;							\
-    } else {								\
-	(o_)->vel.x += (o_)->acc.x * timeStep;			\
-	(o_)->vel.y += (o_)->acc.y * timeStep;			\
-    }
-
 int	round_delay = 0;	/* delay until start of next round */
 int	round_delay_send = 0;	/* number of frames to send round_delay */
 int	roundtime = -1;		/* time left this round */
@@ -48,6 +33,24 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static char msg[MSG_LEN];
 
+
+/* kps - gravity is block based, even on polygon maps */
+static inline void update_object_speed(object *obj)
+{
+    if (BIT(obj->status, GRAVITY)) {
+	obj->vel.x
+	    += (obj->acc.x
+		+ World.gravity[OBJ_X_IN_BLOCKS(obj)][OBJ_Y_IN_BLOCKS(obj)].x)
+	    * timeStep;
+	obj->vel.y
+	    += (obj->acc.y
+		+ World.gravity[OBJ_X_IN_BLOCKS(obj)][OBJ_Y_IN_BLOCKS(obj)].y)
+	    * timeStep;
+    } else {
+	obj->vel.x += obj->acc.x * timeStep;
+	obj->vel.y += obj->acc.y * timeStep;
+    }
+}
 
 static void Transport_to_home(player *pl)
 {
@@ -1244,7 +1247,7 @@ void Update_objects(void)
 	if (BIT(pl->status, WARPING))
 	    Do_warping(pl);
 
-	update_object_speed(pl);	    /* New position */
+	update_object_speed(OBJ_PTR(pl));
 	Move_player(pl);
 
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || cloakedExhaust)
