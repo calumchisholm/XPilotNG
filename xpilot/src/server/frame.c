@@ -51,6 +51,7 @@
 #include "error.h"
 #include "srecord.h"
 #include "click.h"
+#include "commonproto.h"
 
 char frame_version[] = VERSION;
 
@@ -534,7 +535,7 @@ static void Frame_shots(int conn, int ind)
 	case OBJ_DEBRIS:
 	    if ((fuzz >>= 7) < 0x40) {
 		if (conn < World.NumBases)  /* if not pl-> */
-		    fuzz = rand();
+		    fuzz = randomMT();
 		else
 		    fuzz = 0;
 	    }
@@ -1114,4 +1115,3 @@ void Set_player_message(player *pl, const char *message)
     if (pl->conn != NOT_CONNECTED)
 	Send_message(pl->conn, msg);
 }
-

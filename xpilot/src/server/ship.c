@@ -44,6 +44,7 @@
 #include "objpos.h"
 #include "netserver.h"
 #include "click.h"
+#include "commonproto.h"
 
 char ship_version[] = VERSION;
 
@@ -67,7 +68,7 @@ void Thrust(int ind)
     static int		keep_rand;
     int			this_rand = (((keep_rand >>= 2)
 					? (keep_rand)
-					: (keep_rand = rand())) & 0x03);
+					: (keep_rand = randomMT())) & 0x03);
     int			tot_sparks = (int)((pl->power * 0.15) + this_rand + 1);
     int 		x = pl->pos.cx + pl->ship->engine[pl->dir].x;
     int                 y = pl->pos.cy + pl->ship->engine[pl->dir].y;
@@ -584,7 +585,7 @@ void Make_wreckage(
 	if ( size > 255 )
 	    size = 255;
 	wreckage->size = size;
-	wreckage->info = rand();
+	wreckage->info = randomMT();
 
 	radius = wreckage->size * 16 / 256;
 	if ( radius < 8 ) radius = 8;
@@ -645,4 +646,3 @@ void Explode_fighter(int ind)
 	);
 
 }
-

@@ -45,6 +45,7 @@
 #include "objpos.h"
 #include "netserver.h"
 #include "click.h"
+#include "commonproto.h"
 
 char shot_version[] = VERSION;
 

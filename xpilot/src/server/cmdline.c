@@ -218,13 +218,24 @@ int             constantScoring;        /* Fixed points for kills etc? */
 int             eliminationRace;        /* Last player drops each lap? */
 int		clientPortStart;	/* First UDP port for clients */
 int             clientPortEnd;          /* Last one (these are for firewalls)*/
-					   
+
 
 extern char	conf_default_map_string[];	/* from common/config.c */
 
 #define	MAP(_x)		_x
 /* #define	MAP(_x)	 */
 
+/*
+ * Two functions which can be used if an option
+ * does not have its own function which should
+ * be called after the option value has been
+ * changed during runtime.  The tuner_none
+ * function should be specified when an option
+ * cannot be changed at all during runtime.
+ * The tuner_dummy can be specified if it
+ * is OK to modify the option during runtime
+ * and no follow up action is needed.
+ */
 static void tuner_none(void)  {}
 static void tuner_dummy(void) {}
 

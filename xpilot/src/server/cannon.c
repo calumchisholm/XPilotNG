@@ -48,6 +48,7 @@
 #include "walls.h"
 #include "cannon.h"
 #include "netserver.h"
+#include "commonproto.h"
 
 char cannon_version[] = VERSION;
 

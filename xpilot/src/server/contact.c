@@ -56,6 +56,8 @@
 #include "error.h"
 #include "checknames.h"
 #include "srecord.h"
+#include "commonproto.h"
+#include "portability.h"
 
 char contact_version[] = VERSION;
 
@@ -320,10 +322,10 @@ void Contact(int fd, void *arg)
 	static long		credentials;
 
 	if (!credentials) {
-	    credentials = (time(NULL) * (time_t)getpid());
+	    credentials = (time(NULL) * (time_t)Get_process_id());
 	    credentials ^= (long)Contact;
 	    credentials	+= (long)key + (long)&key;
-	    credentials ^= (long)rand() << 1;
+	    credentials ^= (long)randomMT() << 1;
 	    credentials &= 0xFFFFFFFF;
 	}
 	if (Packet_scanf(&ibuf, "%ld", &key) <= 0) {

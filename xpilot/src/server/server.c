@@ -141,7 +141,8 @@ int main(int argc, char **argv)
 #endif /* SUNCMW */
     init_error(argv[0]);
     srand(1); /* !@# srand(time((time_t *)0) * Get_process_id());
-	         Removed because of server recordings */
+	         Removed because of server recordings.
+	         Changed to seedMT() in current version with new RNG */
     Check_server_versions();
     if (!Parser(argc, argv))
 #ifndef	_WINDOWS
