@@ -1713,6 +1713,51 @@ int Widget_create_label(int parent_desc,
     }
     return widget_desc;
 }
+int Widget_create_colored_label(int parent_desc,
+				int x, int y,
+				int width, int height, bool centered,
+				int border, int bg, int bord,
+				const char *str)
+{
+    int			widget_desc;
+    Window		window;
+    widget_t		*parent_widget;
+    widget_label_t	*labelw;
+
+    if ((parent_widget = Widget_pointer(parent_desc)) == NULL
+	|| parent_widget->type != WIDGET_FORM) {
+	warn("Widget_create_label: Invalid parent widget");
+	return NO_WIDGET;
+    }
+    if ((labelw = (widget_label_t *) malloc(sizeof(*labelw))) == NULL) {
+	error("No memory for label widget");
+	return NO_WIDGET;
+    }
+    labelw->str = str;
+    if (centered) {
+      labelw->x_offset = (width - XTextWidth(textFont, str, strlen(str))) / 2;
+    }
+    else {
+      labelw->x_offset = 5;
+    }
+    labelw->y_offset = (height - (textFont->ascent + textFont->descent)) / 2;
+    
+    window =
+	XCreateSimpleWindow(dpy, parent_widget->window,
+			    x, y, width, height,
+			    border, colors[bord].pixel,
+			    colors[bg].pixel);
+    XSelectInput(dpy, window, ExposureMask);
+    widget_desc = Widget_create(WIDGET_LABEL, "label", window,
+				width, height, labelw);
+    if (widget_desc == NO_WIDGET)
+	return NO_WIDGET;
+    if (Widget_add_child(parent_desc, widget_desc) == NO_WIDGET) {
+	Widget_destroy(widget_desc);
+	return NO_WIDGET;
+    }
+    return widget_desc;
+}
 
 static int Widget_create_arrow(widget_type_t type, int parent_desc,
 			       int x, int y,

@@ -349,6 +349,24 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
     char *server_addrs;
     char *name_ptrs[MAX_LOCAL_SERVERS];
     char *addr_ptrs[MAX_LOCAL_SERVERS];
+    int max_width = 0;
+    int button;
+    int button_width;
+    int button_height;
+    int button_x;
+    int button_y;
+    
+    int button2;
+    int button2_width;
+    int button2_height;
+    int button2_x;
+    int button2_y;
+    
+    int button3;
+    int button3_width;
+    int button3_height;
+    int button3_x;
+    int button3_y;
 
     Internet_widget_cleanup();
 
@@ -386,24 +404,7 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
     label_height = textFont->ascent + textFont->descent;
 
     if (n > 0) {
-	int max_width = 0;
-	int button;
-	int button_width;
-	int button_height;
-	int button_x;
-	int button_y;
-
-	int button2;
-	int button2_width;
-	int button2_height;
-	int button2_x;
-	int button2_y;
-
-	int button3;
-	int button3_width;
-	int button3_height;
-	int button3_x;
-	int button3_y;
+	
 
 	localnet_conpars =
 	    (Connect_param_t *) malloc(n * sizeof(Connect_param_t));
@@ -1042,7 +1043,9 @@ static int Get_meta_data(void)
     Meta_connect(&connections, &max);
     if (!connections) {
 	Welcome_create_label(1,
-			     "Could not establish connections with any metaserver");
+			     "Could not establish connections with any metaserver" \
+			     ", either the meta is not responding or you have" \
+			     " network problems" );
 	return -1;
     }
 
@@ -1281,7 +1284,7 @@ static int Internet_server_show_cb(int widget, void *user_data,
     char *p = NULL;
     char *eqptr = NULL;
     char *playslist = xp_strdup(sip->playlist);
-    static char longest_text[] = "                              ";
+    static char longest_text[] = "                                 ";
 
     struct Label {
 	const char *label;
@@ -1343,16 +1346,19 @@ static int Internet_server_show_cb(int widget, void *user_data,
 		labels[i].commas++;
 		label_y += label_height + label_space;
 	    }
+	    /* one extra for the header */
+	    label_y += label_height + label_space;
 	}
 	labels[i].height = (label_y - labels[i].yoff) - label_space;
     }
 
     label_width = max_label_width + 2 * label_space;
+
     for (i = 0; i < NELEM(labels); i++)
-	Widget_create_label(subform_widget,
-			    label_x, labels[i].yoff,
-			    label_width, labels[i].height, true,
-			    label_border, labels[i].label);
+	Widget_create_colored_label(subform_widget,
+				    label_x, labels[i].yoff,
+				    label_width, labels[i].height, true,
+				    label_border, 9, WHITE , labels[i].label);
 
 
     /* if the meta string data was indexable this would be easier */
@@ -1360,11 +1366,11 @@ static int Internet_server_show_cb(int widget, void *user_data,
     i = 0;
 
 
-    Widget_create_label(subform_widget,
-			label_x + label_width, labels[i].yoff,
-			data_label_width, labels[i].height, true,
-			label_border, sip->hostname);
-
+    Widget_create_colored_label(subform_widget,
+				label_x + label_width, labels[i].yoff,
+				data_label_width, labels[i].height, true,
+				label_border, BLACK, WHITE, sip->hostname);
+    
     /* Create a join button to join this server */
 
     Widget_create_activate(subform_widget,
@@ -1373,15 +1379,15 @@ static int Internet_server_show_cb(int widget, void *user_data,
 			   labels[i].yoff,
 			   data_label_width, labels[i].height,
 			   label_border, "Join This Server",
-			   Internet_server_join_cb, (void *) sip);
+			   Internet_server_join_cb,(void *) sip);
     i++;
 
     /* Version label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->version);
+			label_border,  BLACK, WHITE,sip->version);
 
     /* back to list button */
 
@@ -1397,101 +1403,101 @@ static int Internet_server_show_cb(int widget, void *user_data,
 
     /* Number of users label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->users ? sip->users_str : "");
+			label_border,  BLACK, WHITE,sip->users ? sip->users_str : "");
     i++;
 
     /* Map name label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->mapname);
+			label_border, BLACK, WHITE, sip->mapname);
     i++;
 
     /* Map size label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->mapsize);
+			label_border, BLACK, WHITE, sip->mapsize);
     i++;
 
     /* Map author label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->author);
+			label_border, BLACK, WHITE, sip->author);
 
     i++;
 
 
     /* Map status label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->status);
+			label_border,  BLACK, WHITE,sip->status);
 
     i++;
 
     /* Number of bases label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->bases_str);
+			label_border,  BLACK, WHITE, sip->bases_str);
     i++;
 
     /* Number of teambases label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->teambases_str);
+			label_border, BLACK, WHITE, sip->teambases_str);
 
     i++;
 
     /* Freebases label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->freebases);
+			label_border,  BLACK, WHITE, sip->freebases);
     i++;
 
     /* Number in Queue label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->queue_str);
+			label_border,  BLACK, WHITE, sip->queue_str);
     i++;
 
     /* Number of frames per second label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->fps_str);
+			label_border,  BLACK, WHITE, sip->fps_str);
     i++;
     /* Is there sound label */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border, sip->sound);
+			label_border,  BLACK, WHITE, sip->sound);
     i++;
 
     /* Is this a race map label  */
 
-    Widget_create_label(subform_widget,
+    Widget_create_colored_label(subform_widget,
 			label_x + label_width, labels[i].yoff,
 			data_label_width, labels[i].height, true,
-			label_border,
+				label_border, BLACK, WHITE,
 			((strcmp(sip->timing, "0") ==
 			  0) ? "Not a race" : "Race!"));
     i++;
@@ -1504,6 +1510,23 @@ static int Internet_server_show_cb(int widget, void *user_data,
        player meta port instead of the game meta port */
 
     /* my_strtok destroys playslist */
+    /* Could introduce new resources here, but lets force some color */
+    /* changes instead */
+
+    Widget_create_colored_label(subform_widget,
+				label_x + label_width,
+				label_y,
+				player_label_width, label_height, true,
+				label_border, 9, WHITE, "Player Name");
+    
+    Widget_create_colored_label(subform_widget,
+				label_x + label_width + player_label_width,
+				label_y,
+				host_label_width, label_height, true,
+				label_border, 9, WHITE, "Player Host");
+
+    label_y += label_height + label_space;
+
 
     for (p = my_strtok(playslist, ","); p; p = my_strtok(NULL, ",")) {
 
@@ -1513,18 +1536,18 @@ static int Internet_server_show_cb(int widget, void *user_data,
 	}
 
 
-	Widget_create_label(subform_widget,
+	Widget_create_colored_label(subform_widget,
 			    label_x + label_width,
 			    label_y,
 			    player_label_width, label_height, false,
-			    label_border, p);
+			    label_border, BLACK, WHITE, p);
 	p = eqptr + 1;
 
-	Widget_create_label(subform_widget,
+	Widget_create_colored_label(subform_widget,
 			    label_x + label_width + player_label_width,
 			    label_y,
 			    host_label_width, label_height, false,
-			    label_border, p);
+			    label_border, BLACK, WHITE, p);
 
 	label_y += label_height + label_space;
     }

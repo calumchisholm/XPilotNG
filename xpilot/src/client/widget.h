@@ -205,6 +205,11 @@ int Widget_create_label(int parent_desc,
 			int x, int y,
 			int width, int height, bool centered,
 			int border, const char *str);
+int Widget_create_colored_label(int parent_desc,
+				int x, int y,
+				int width, int height, bool centered,
+				int border, int bg, int bord,
+				const char *str);
 int Widget_create_arrow_right(int parent_desc, int x, int y,
 			      int width, int height,
 			      int border,
