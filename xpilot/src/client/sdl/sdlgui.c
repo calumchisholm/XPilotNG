@@ -776,10 +776,10 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 
     set_alphacolor(meter_color);
     glBegin( GL_POLYGON );
-    	glVertex2i(x-2,y);
-    	glVertex2i(x-2,y+2+meterHeight-3);
-    	glVertex2i(x-2+(int)(((meterWidth)*val)/(max?max:1)),y+2+meterHeight-3);
-    	glVertex2i(x-2+(int)(((meterWidth)*val)/(max?max:1)),y);
+    	glVertex2i(x,y);
+    	glVertex2i(x,y+2+meterHeight-3);
+    	glVertex2i(x+(int)(((meterWidth)*val)/(max?max:1)),y+2+meterHeight-3);
+    	glVertex2i(x+(int)(((meterWidth)*val)/(max?max:1)),y);
     glEnd();
     
     
