@@ -288,8 +288,7 @@ void Turn_player(player *pl)
 void Object_hits_target(int ind, object *obj, long player_cost)
 {
     target_t		*targ = &World.targets[ind];
-    int			j,
-			killer;
+    int			j;
     player		*kp;
     DFLOAT		sc, por,
 			win_score = 0,
@@ -309,8 +308,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     if (obj->id <= 0)
 	return;
 
-    killer = GetInd(obj->id);
-    kp = Players(killer);
+    kp = Player_by_id(obj->id);
     if (targ->team == obj->team)
 	return;
 
@@ -472,7 +470,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	    Score(pl, -sc, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
 	else if (pl->team == kp->team &&
-		 (pl->team != TEAM_NOT_SET || j == killer)) {
+		 (pl->team != TEAM_NOT_SET || pl->id == kp->id)) {
 	    Score(pl, por, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
     }
