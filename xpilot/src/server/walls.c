@@ -1614,7 +1614,7 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
 	    yn1 = yn2;
 	}
     }
-    return -1;
+    return NO_GROUP;
 }
 
 
@@ -1833,8 +1833,8 @@ int is_inside(int cx, int cy, int hit_mask, const object *obj)
     mv.hit_mask = hit_mask;
     mv.obj = (object *)obj;
     gblock = &inside_table[(cx >> B_SHIFT) + mapx * (cy >> B_SHIFT)];
-    if (gblock->group == -1)
-	return -1;
+    if (gblock->group == NO_GROUP)
+	return NO_GROUP;
     do {
 	if (gblock->group
 	    && (!can_hit(&groups[gblock->group], &mv))) {
@@ -1897,7 +1897,7 @@ int is_inside(int cx, int cy, int hit_mask, const object *obj)
 	    return gblock->group;
 	gblock = gblock->next;
     } while (gblock);
-    return -1;
+    return NO_GROUP;
 }
 
 
@@ -1913,7 +1913,7 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
 	    zeroshape.pts[i] = &zeropos;
     }
 
-    if ( (group = is_inside(cx, cy, hitmask, obj)) != -1)
+    if ( (group = is_inside(cx, cy, hitmask, obj)) != NO_GROUP)
 	return group;
     zeroshape.num_points = shape->num_points;
     return Shape_morph(&zeroshape, 0, shape, dir, hitmask, obj, cx, cy);
@@ -1991,7 +1991,7 @@ static void finish_inside(int block, int group)
     void *tofree;
 
     gblock = &inside_table[block];
-    if (gblock->group != -1) {
+    if (gblock->group != NO_GROUP) {
 	while (gblock->next) /* Maintain group order*/
 	    gblock = gblock->next;
 	gblock->next = ralloc(NULL, sizeof(struct inside_block));
@@ -2090,7 +2090,7 @@ static void allocate_inside(void)
 	inside_table[i].y = NULL;
 	inside_table[i].lines = NULL;
 	inside_table[i].base_value = 0;
-	inside_table[i].group = -1;
+	inside_table[i].group = NO_GROUP;
 	inside_table[i].next = NULL;
     }
 }
@@ -2607,7 +2607,7 @@ static void Move_ball_new(object *obj)
     obj->extmove.cx = mv.delta.cx;
     obj->extmove.cy = mv.delta.cy;
 
-    if (obj->id != -1
+    if (obj->id != NO_ID
 	&& BIT(Players[GetInd[obj->id]]->used, HAS_PHASING_DEVICE)) {
 
 	int cx = obj->pos.cx + mv.delta.cx;
@@ -2691,7 +2691,7 @@ static void Move_object_new(object *obj)
     }
 #else
     if (obj->type == OBJ_BALL) {
-	if (obj->owner != -1)
+	if (obj->owner != NO_ID)
 	    team =  Players[GetInd[obj->owner]].team;
 	else
 	    team = TEAM_NOT_SET;
@@ -2877,7 +2877,7 @@ static void Turn_player_new(int ind)
     while (pl->dir != new_dir) {
 	next_dir = MOD2(pl->dir + sign, RES);
 	if (Shape_morph(pl->ship, pl->dir, pl->ship, next_dir, hitmask,
-			(object *)pl, pl->pos.cx, pl->pos.cy) != -1) {
+			(object *)pl, pl->pos.cx, pl->pos.cy) != NO_GROUP) {
 	    pl->float_dir = pl->dir;
 	    break;
 	}

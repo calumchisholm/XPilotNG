@@ -535,10 +535,12 @@ static void PlayerCollision(void)
 			/* The ball might already be inside the team's ball
 			 * target. */
 			extern shipobj ball_wire;
-			if ((group = shape_is_inside(ball->pos.cx,
-				       ball->pos.cy,
-				       BALL_BIT | HITMASK(pl->team),
-				       (object *)ball, &ball_wire, 0)) != -1) {
+			group = shape_is_inside(ball->pos.cx,
+						ball->pos.cy,
+						BALL_BIT | HITMASK(pl->team),
+						(object *)ball,
+						&ball_wire, 0);
+			if (group != NO_GROUP) {
 			    Ball_hits_goal(ball, group);
 			    ball->life = 0;
 			}

@@ -404,7 +404,7 @@ static bool Really_empty_space(int ind, int x, int y)
     for (i = -1; i <= 1; i++) {
 	for (j = -1; j <= 1; j++) {
 	    group = is_inside(cx + i * delta, cy + j * delta, hitmask, NULL);
-	    if (group != -1)
+	    if (group != NO_GROUP)
 		inside++;
 	    else
 		outside++;

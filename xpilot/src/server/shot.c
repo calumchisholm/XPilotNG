@@ -1190,7 +1190,8 @@ void Delete_shot(int ind)
 		/* The ball could be inside a BallArea, check whether
 		 * the sparks can exist here. Should we set a team? */
 		if (is_inside(ball->prevpos.cx, ball->prevpos.cy,
-			      NONBALL_BIT | NOTEAM_BIT, (object *)ball) != -1)
+			      NONBALL_BIT | NOTEAM_BIT, (object *)ball)
+		    != NO_GROUP)
 		    break;
 	    }
 
