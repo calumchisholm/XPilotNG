@@ -82,12 +82,10 @@ static void Xpmap_missing_error(int line_num)
 
     if (line_num > prev_line_num) {
 	prev_line_num = line_num;
-	if (++error_count <= max_error) {
+	if (++error_count <= max_error)
 	    xpprintf("Not enough map data on map data line %d\n", line_num);
-	}
-	else if (error_count - max_error == 1) {
+	else if (error_count - max_error == 1)
 	    xpprintf("And so on...\n");
-	}
     }
 #endif
 }
@@ -117,10 +115,9 @@ void Xpmap_grok_map_data(void)
 		x = -1;
 		y--;
 		continue;
-	    } else {
+	    } else
 		/* make extra border of solid rock */
 		c = 'x';
-	    }
 	}
 	else {
 	    c = *s;
@@ -129,26 +126,23 @@ void Xpmap_grok_map_data(void)
 		    /* not enough map data on this line */
 		    Xpmap_missing_error(World.y - y);
 		    c = ' ';
-		} else {
+		} else
 		    c = '\n';
-		}
 	    } else {
 		if (c == '\n' && x < World.x) {
 		    /* not enough map data on this line */
 		    Xpmap_missing_error(World.y - y);
 		    c = ' ';
-		} else {
+		} else
 		    s++;
-		}
 	    }
 	}
 	if (x >= World.x || c == '\n') {
 	    y--; x = -1;
 	    if (c != '\n') {			/* Get rest of line */
 		Xpmap_extra_error(World.y - y);
-		while (c != '\n' && c != EOF) {
+		while (c != '\n' && c != EOF)
 		    c = *s++;
-		}
 	    }
 	    continue;
 	}
@@ -489,32 +483,29 @@ void Xpmap_find_map_object_teams(void)
 	    team = Find_closest_team(World.treasures[i].pos.cx,
 				     World.treasures[i].pos.cy);
 	    World.treasures[i].team = team;
-	    if (team == TEAM_NOT_SET) {
+	    if (team == TEAM_NOT_SET)
 		error("Couldn't find a matching team for the treasure.");
-	    } else {
+	    else {
 		World.teams[team].NumTreasures++;
-		if (!World.treasures[i].empty) {
+		if (!World.treasures[i].empty)
 		    World.teams[team].TreasuresLeft++;
-		} else {
+		else
 		    World.teams[team].NumEmptyTreasures++;
-		}
 	    }
 	}
 	for (i = 0; i < World.NumTargets; i++) {
 	    team = Find_closest_team(World.targets[i].pos.cx,
 				     World.targets[i].pos.cy);
-	    if (team == TEAM_NOT_SET) {
+	    if (team == TEAM_NOT_SET)
 		error("Couldn't find a matching team for the target.");
-	    }
 	    World.targets[i].team = team;
 	}
 	if (teamCannons) {
 	    for (i = 0; i < World.NumCannons; i++) {
 		team = Find_closest_team(World.cannon[i].pos.cx,
 					 World.cannon[i].pos.cy);
-		if (team == TEAM_NOT_SET) {
+		if (team == TEAM_NOT_SET)
 		    error("Couldn't find a matching team for the cannon.");
-		}
 		World.cannon[i].team = team;
 	    }
 	}
@@ -522,9 +513,8 @@ void Xpmap_find_map_object_teams(void)
 	for (i = 0; i < World.NumFuels; i++) {
 	    team = Find_closest_team(World.fuel[i].pos.cx,
 				     World.fuel[i].pos.cy);
-	    if (team == TEAM_NOT_SET) {
+	    if (team == TEAM_NOT_SET)
 		error("Couldn't find a matching team for fuelstation.");
-	    }
 	    World.fuel[i].team = team;
 	}
     }
@@ -552,9 +542,9 @@ void Xpmap_find_base_direction(void)
 	double	dx = World.gravity[x][y].x,
 		dy = World.gravity[x][y].y;
 
-	if (dx == 0.0 && dy == 0.0) {	/* Undefined direction? */
+	if (dx == 0.0 && dy == 0.0)	/* Undefined direction? */
 	    dir = DIR_UP;	/* Should be set to direction of gravity! */
-	} else {
+	else {
 	    dir = (int)findDir(-dx, -dy);
 	    dir = ((dir + RES/8) / (RES/4)) * (RES/4);	/* round it */
 	    dir = MOD2(dir, RES);
@@ -563,9 +553,8 @@ void Xpmap_find_base_direction(void)
 	/*BASES SNAP TO UPWARDS ATTRACTOR FIRST*/
         if (y == World.y - 1 && World.block[x][0] == BASE_ATTRACTOR
 	    && BIT(World.rules->mode, WRAP_PLAY)) {  /*check wrapped*/
-	    if (att == -1 || dir == DIR_UP) {
+	    if (att == -1 || dir == DIR_UP)
 		att = DIR_UP;
-	    }
 	}
 	if (y < World.y - 1 && World.block[x][y + 1] == BASE_ATTRACTOR) {
 	    if (att == -1 || dir == DIR_UP) {
@@ -575,50 +564,42 @@ void Xpmap_find_base_direction(void)
 	/*THEN DOWNWARDS ATTRACTORS*/
         if (y == 0 && World.block[x][World.y-1] == BASE_ATTRACTOR
 	    && BIT(World.rules->mode, WRAP_PLAY)) { /*check wrapped*/
-	    if (att == -1 || dir == DIR_DOWN) {
+	    if (att == -1 || dir == DIR_DOWN)
 		att = DIR_DOWN;
-	    }
 	}
 	if (y > 0 && World.block[x][y - 1] == BASE_ATTRACTOR) {
-	    if (att == -1 || dir == DIR_DOWN) {
+	    if (att == -1 || dir == DIR_DOWN)
 		att = DIR_DOWN;
-	    }
 	}
 	/*THEN RIGHTWARDS ATTRACTORS*/
 	if (x == World.x - 1 && World.block[0][y] == BASE_ATTRACTOR
 	    && BIT(World.rules->mode, WRAP_PLAY)) { /*check wrapped*/
-	    if (att == -1 || dir == DIR_RIGHT) {
+	    if (att == -1 || dir == DIR_RIGHT)
 		att = DIR_RIGHT;
-	    }
 	}
 	if (x < World.x - 1 && World.block[x + 1][y] == BASE_ATTRACTOR) {
-	    if (att == -1 || dir == DIR_RIGHT) {
+	    if (att == -1 || dir == DIR_RIGHT)
 		att = DIR_RIGHT;
-	    }
 	}
 	/*THEN LEFTWARDS ATTRACTORS*/
 	if (x == 0 && World.block[World.x-1][y] == BASE_ATTRACTOR
 	    && BIT(World.rules->mode, WRAP_PLAY)) { /*check wrapped*/
-	    if (att == -1 || dir == DIR_LEFT) {
+	    if (att == -1 || dir == DIR_LEFT)
 		att = DIR_LEFT;
-	    }
 	}
 	if (x > 0 && World.block[x - 1][y] == BASE_ATTRACTOR) {
-	    if (att == -1 || dir == DIR_LEFT) {
+	    if (att == -1 || dir == DIR_LEFT)
 		att = DIR_LEFT;
-	    }
 	}
-	if (att != -1) {
+	if (att != -1)
 	    dir = att;
-	}
 	World.base[i].dir = dir;
     }
     for (i = 0; i < World.x; i++) {
 	int j;
 	for (j = 0; j < World.y; j++) {
-	    if (World.block[i][j] == BASE_ATTRACTOR) {
+	    if (World.block[i][j] == BASE_ATTRACTOR)
 		World.block[i][j] = SPACE;
-	    }
 	}
     }
 }
