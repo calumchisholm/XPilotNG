@@ -104,9 +104,69 @@ static int Compress_map(unsigned char *map, size_t size)
 
 static void Create_blockmap_from_polygons(world_t *world)
 {
-    int i, j;
+    int i, j, h;
     blkpos_t blk;
     clpos_t pos;
+    shape_t r_wire, u_wire, l_wire, d_wire;
+    shapepos_t r_coords[3], u_coords[3], l_coords[3], d_coords[3];
+
+    r_wire.num_points = 3;
+    u_wire.num_points = 3;
+    l_wire.num_points = 3;
+    d_wire.num_points = 3;
+
+    for (i = 0; i < 3; i++)
+	r_wire.pts[i] = &r_coords[i];
+    for (i = 0; i < 3; i++)
+	u_wire.pts[i] = &u_coords[i];
+    for (i = 0; i < 3; i++)
+	l_wire.pts[i] = &l_coords[i];
+    for (i = 0; i < 3; i++)
+	d_wire.pts[i] = &d_coords[i];
+
+    /*
+     * Block is divided to 4 parts, r, u, l and d, the middle 6x6 area of
+     * of the block looking like this (each char is an area of 1x1 click).
+     * The capital r 'R' is the middle of the block (coordinates 0,0).
+     *
+     * uuuuur
+     * luuurr
+     * lluRrr
+     * llldrr
+     * lldddr
+     * lddddd
+     */
+
+    h = BLOCK_CLICKS / 2;
+
+    r_coords[0].clk.cx = 0;
+    r_coords[0].clk.cy = 0; /* this is the R position in the block */
+    r_coords[1].clk.cx = h - 1; 
+    r_coords[1].clk.cy = 1 - h;
+    r_coords[2].clk.cx = h - 1;
+    r_coords[2].clk.cy = h - 1;
+
+    u_coords[0].clk.cx = -1;
+    u_coords[0].clk.cy = 0;
+    u_coords[1].clk.cx = h - 2;
+    u_coords[1].clk.cy = h - 1;
+    u_coords[2].clk.cx = -h;
+    u_coords[2].clk.cy = h - 1;
+
+    l_coords[0].clk.cx = -1;
+    l_coords[0].clk.cy = -1;
+    l_coords[1].clk.cx = -h;
+    l_coords[1].clk.cy = h - 2;
+    l_coords[2].clk.cx = -h;
+    l_coords[2].clk.cy = -h;
+
+    d_coords[0].clk.cx = 0;
+    d_coords[0].clk.cy = -1;
+    d_coords[1].clk.cx = 1 - h;
+    d_coords[1].clk.cy = -h;
+    d_coords[2].clk.cx = h - 1;
+    d_coords[2].clk.cy = -h;
+
 
     /*
      * Create blocks out of polygons.
@@ -115,6 +175,65 @@ static void Create_blockmap_from_polygons(world_t *world)
 	for (blk.bx = 0; blk.bx < world->x; blk.bx++)
 	    World_set_block(world, blk, SPACE);
 
+
+    for (blk.by = 0; blk.by < world->y; blk.by++) {
+	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
+	    int num_inside = 0;
+	    bool r_inside = false, u_inside = false;
+	    bool l_inside = false, d_inside = false;
+
+	    pos = Block_get_center_clpos(blk);
+
+	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &r_wire, 0) == 0) {
+		r_inside = true;
+		num_inside++;
+	    }
+	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &u_wire, 0) == 0) {
+		u_inside = true;
+		num_inside++;
+	    }
+	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &l_wire, 0) == 0) {
+		l_inside = true;
+		num_inside++;
+	    }
+	    if (shape_is_inside(pos.cx, pos.cy, 0, NULL, &d_wire, 0) == 0) {
+		d_inside = true;
+		num_inside++;
+	    }
+
+	    if (num_inside > 2)
+		World_set_block(world, blk, FILLED);
+
+	    if (num_inside == 2) {
+		if (r_inside && u_inside)
+		    World_set_block(world, blk, REC_RU);
+		if (u_inside && l_inside)
+		    World_set_block(world, blk, REC_LU);
+		if (l_inside && d_inside)
+		    World_set_block(world, blk, REC_LD);
+		if (d_inside && r_inside)
+		    World_set_block(world, blk, REC_RD);
+		if (u_inside && d_inside)
+		    World_set_block(world, blk, FILLED);
+		if (r_inside && l_inside)
+		    World_set_block(world, blk, FILLED);
+	    }
+
+	    if (num_inside == 1) {
+		if (r_inside)
+		    World_set_block(world, blk, REC_RU);
+		if (u_inside)
+		    World_set_block(world, blk, REC_LU);
+		if (l_inside)
+		    World_set_block(world, blk, REC_LD);
+		if (d_inside)
+		    World_set_block(world, blk, REC_RD);
+	    }
+
+	}
+    }
+
+#if 0
     for (blk.by = 0; blk.by < world->y; blk.by++) {
 	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
 	    int num_inside = 0;
@@ -158,6 +277,7 @@ static void Create_blockmap_from_polygons(world_t *world)
 	    }
 	}
     }
+#endif
 
     /*
      * Create blocks out of map objects. Note that some of these
