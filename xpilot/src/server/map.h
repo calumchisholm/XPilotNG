@@ -171,8 +171,8 @@ typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
 
 typedef struct {
     clpos		pos;
-    int			lastdest,	/* last destination wormhole */
-			countdown;	/* if >0 warp to lastdest else random */
+    int			lastdest;	/* last destination wormhole */
+    DFLOAT		countdown;	/* >0 warp to lastdest else random */
     bool		temporary;	/* wormhole was left by hyperjump */
     wormType		type;
     u_byte		lastblock;	/* block it occluded */
@@ -184,7 +184,7 @@ typedef struct {
     bool		have;	/* true if this treasure has ball in it */
     unsigned short	team;	/* team of this treasure */
     int 		destroyed;	/* how often this treasure destroyed */
-    bool		empty;	/* true if this treasure never had a ball in it */
+    bool		empty;	/* true if this treasure never had a ball */
 } treasure_t;
 
 typedef struct {

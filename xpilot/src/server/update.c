@@ -481,19 +481,21 @@ static void Fuel_update(void)
 	return;
 
     for (i = 0; i < World.NumFuels; i++) {
-	if (World.fuel[i].fuel == MAX_STATION_FUEL)
+	fuel_t *fs = &World.fuel[i];
+
+	if (fs->fuel == MAX_STATION_FUEL)
 	    continue;
-	if ((World.fuel[i].fuel += fuel) >= MAX_STATION_FUEL)
-	    World.fuel[i].fuel = MAX_STATION_FUEL;
-	else if (World.fuel[i].last_change + frames_per_update > frame_loops) {
+	if ((fs->fuel += fuel) >= MAX_STATION_FUEL)
+	    fs->fuel = MAX_STATION_FUEL;
+	else if (fs->last_change + frames_per_update > frame_loops) {
 	    /*
 	     * We don't send fuelstation info to the clients every frame
 	     * if it wouldn't change their display.
 	     */
 	    continue;
 	}
-	World.fuel[i].conn_mask = 0;
-	World.fuel[i].last_change = frame_loops;
+	fs->conn_mask = 0;
+	fs->last_change = frame_loops;
     }
 }
 
@@ -1280,15 +1282,14 @@ void Update_objects(void)
 	pl->used &= pl->have;
     }
 
-    /* kps - ng does not want this for loop */
     for (i = World.NumWormholes - 1; i >= 0; i--) {
-	if (World.wormHoles[i].countdown > 0) {
-	    World.wormHoles[i].countdown--;
-	}
-	if (World.wormHoles[i].temporary
-	    && World.wormHoles[i].countdown <= 0) {
+	wormhole_t *w = &World.wormHoles[i];
+
+	if ((w->countdown -= timeStep) <= 0)
+	    w->countdown = 0;
+
+	if (w->temporary && w->countdown <= 0)
 	    remove_temp_wormhole(i);
-	}
     }
 
 
