@@ -261,8 +261,7 @@ static void Make_asteroid(int cx, int cy,
 {
     wireobject	*asteroid;
     DFLOAT	radius;
-    int		bx;
-    int		by;
+    /*int		bx, by;*/
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
 	return;
@@ -275,8 +274,13 @@ static void Make_asteroid(int cx, int cy,
     cx = WRAP_XCLICK(cx);
     cy = WRAP_YCLICK(cy);
 
-    bx = cx / BLOCK_CLICKS;
-    by = cy / BLOCK_CLICKS;
+    /* kps - hack, here we should check a bigger area */
+    if (is_inside(cx, cy, NOTEAM_BIT | NONBALL_BIT, NULL) != NO_GROUP)
+	return;
+
+#if 0
+    bx = CLICK_TO_BLOCK(cx);
+    by = CLICK_TO_BLOCK(cy);
     if (BIT(World.block[bx][by], FILLED_BIT|FUEL_BIT|TARGET_BIT|TREASURE_BIT)) {
 	return;
     } else if (BIT(World.block[bx][by], REC_LU|REC_RU|REC_LD|REC_RD)) {
@@ -301,6 +305,7 @@ static void Make_asteroid(int cx, int cy,
 	    break;
 	}
     }
+#endif
 
     asteroid = WIRE_PTR(Object_allocate());
     if (asteroid == NULL) {
