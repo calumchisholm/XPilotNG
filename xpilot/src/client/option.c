@@ -795,6 +795,7 @@ const char *Get_keyResourceString(keys_t key)
 
 void defaultCleanup(void)
 {
+#if 0
     if (keydefs) {
 	free(keydefs);
 	keydefs = NULL;
@@ -807,6 +808,7 @@ void defaultCleanup(void)
 	free(shipShape);
 	shipShape = NULL;
     }
+#endif
 
 #ifdef SOUND
     audioCleanup();
