@@ -54,17 +54,6 @@ Fixed by:
 Files affected:
 
 -----------------------------------------------------------------
-Problem : Introduction of new option code breaks shipShape file handling
-	  ie. if you have shipShapeFile /home/user/.shipshapes, and just 
-	  use the name of the ship in the .xpilotrc, you get an error 
-	  message "not enough ship points defined" 
-Found by:
-Solution:
-Fixed by:
-Files 
-affected:
-
------------------------------------------------------------------
 Problem : If someone in your team died and is recovering, you can
 	  take his base and then he will be swapped to have some other
 	  base, but with full recovery delay. This way you can keep
