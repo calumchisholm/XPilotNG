@@ -871,7 +871,7 @@ static option_desc opts[] = {
     {
 	"maxSparkWallBounceSpeed",
 	"maxSparkBounceSpeed",
-	"40.0",
+	"80.0", /* was "40.0" */
 	&options.maxSparkWallBounceSpeed,
 	valReal,
 	Move_init,
@@ -3520,7 +3520,7 @@ static option_desc opts[] = {
     {
 	"thrustWidth",
 	"sprayWidth",
-	"1.0",
+	"0.25", /* was "1.0" */
 	&options.thrustWidth,
 	valReal,
 	tuner_dummy,
@@ -3530,7 +3530,7 @@ static option_desc opts[] = {
     {
 	"thrustMass",
 	"sparkWeight",
-	"0.7",
+	"0.0435", /* was "0.7" */
 	&options.thrustMass,
 	valReal,
 	tuner_dummy,
@@ -3540,7 +3540,7 @@ static option_desc opts[] = {
     {
 	"sparkSpeed",
 	"sparkVel",
-	"1.0",
+	"30.0", /* was "1.0" */
 	&options.sparkSpeed,
 	valReal,
 	tuner_dummy,
