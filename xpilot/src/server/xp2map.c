@@ -32,6 +32,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     static double scale = 1;
     static int xptag = 0;
 
+    (void)data;
     if (!strcasecmp(el, "XPilotMap")) {
 	double version = 0;
 	while (*attr) {
@@ -427,6 +428,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 static void tagend(void *data, const char *el)
 {
+    (void)data;
     if (!strcasecmp(el, "Decor"))
 	P_end_decor();
     else if (!strcasecmp(el, "BallArea"))
@@ -479,6 +481,7 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin)
     int len;
     XML_Parser p = XML_ParserCreate(NULL);
 
+    (void)opt_origin;
     if (!p) {
 	warn("Creating Expat instance for map parsing failed.\n");
 	/*exit(1);*/
