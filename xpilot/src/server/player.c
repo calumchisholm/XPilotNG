@@ -130,7 +130,6 @@ void Pick_startpos(int ind)
 	      ind, World.NumBases, num_free, pick, seen);
 	End_game();
     } else {
-	/* kps - change to pl->home_base = i */
 	pl->home_base = BIT(World.rules->mode, TIMING) ?
 			World.baseorder[i].base_idx : i;
 	if (ind < NumPlayers) {
@@ -203,7 +202,7 @@ void Go_home(int ind)
     pl->turnacc = pl->turnvel = 0.0;
     memset(pl->last_keyv, 0, sizeof(pl->last_keyv));
     memset(pl->prev_keyv, 0, sizeof(pl->prev_keyv));
-    Emergency_shield(ind, 0); /* kps - ng addition */
+    Emergency_shield(ind, 0);
     Player_used_kill(ind);
 
     if (playerStartsShielded != 0) {
@@ -389,12 +388,11 @@ int Init_player(int ind, shipobj *ship)
 
     /*
      * If you don't want to allow shipshapes because the shape
-     * requirements have not been rewritten yet, change to "if 0".
+     * requirements have not been rewritten yet, set
+     * allowShipShapes to false.
      */
-#if 1
-    if (allowShipShapes == true && ship) {
+    if (allowShipShapes && ship)
 	pl->ship = ship;
-    }
     else {
 	shipobj *tryship = Parse_shape_str(defaultShipShape);
 
@@ -403,9 +401,6 @@ int Init_player(int ind, shipobj *ship)
 	else
 	    pl->ship = Default_ship();
     }
-#else
-    pl->ship = Default_ship();
-#endif
 
     pl->power			= 55.0;
     pl->turnspeed		= 10.0;
