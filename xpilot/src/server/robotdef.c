@@ -260,7 +260,7 @@ static void Robot_default_message(player *pl, const char *message)
     }
     printf("%s got message \"%s\" from \"%s\"\n", pl->name, msg, sender_name);
 #else
-    (void)pl; (void)message;
+    UNUSED_PARAM(pl); UNUSED_PARAM(message);
 #endif
 }
 
@@ -347,7 +347,7 @@ static bool Really_empty_space(player *pl, int x, int y)
     int inside = 0, outside = 0;
     hitmask_t hitmask = NONBALL_BIT; /* kps - ok ? */
 
-    (void)pl;
+    UNUSED_PARAM(pl);
     /*
      * kps hack - check a few positions inside the block, if none of them
      * are inside, assume it is empty

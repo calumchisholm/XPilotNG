@@ -92,14 +92,16 @@ static void catch_timer(int signum)
 {
     static unsigned int		timer_count = 0;
 
-    (void)signum;
+    UNUSED_PARAM(signum);
     timer_count += FPS;
     if (timer_count >= (unsigned)options.timerResolution) {
 	timer_count -= options.timerResolution;
 	timer_ticks++;
 	if (timer_count >= (unsigned)options.timerResolution)
-	    /* Don't let timer_count grow boundlessly with options.timerResolution 0
-	     * now that options.timerResolution can be changed at runtime. */
+	    /*
+	     * Don't let timer_count grow boundlessly with timer resolution 0
+	     * now that timer resolution can be changed at runtime.
+	     */
 	    timer_count = 0;
     }
 }

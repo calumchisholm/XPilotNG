@@ -445,7 +445,7 @@ static int Cmd_addr(char *arg, player *pl, int oper, char *msg)
     player *pl2 = NULL;
     const char *errorstr;
 
-    (void)pl;
+    UNUSED_PARAM(pl);
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -481,7 +481,7 @@ static int Cmd_advance(char *arg, player *pl, int oper, char *msg)
 {
     int			result;
 
-    (void)pl;
+    UNUSED_PARAM(pl);
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -531,7 +531,7 @@ static int Cmd_ally(char *arg, player *pl, int oper, char *msg)
     };
     int			i, cmd;
 
-    (void)pl; (void)oper;
+    UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
     if (!BIT(world->rules->mode, ALLIANCES)) {
 	strlcpy(msg, "Alliances are not allowed.", MSG_LEN);
@@ -682,7 +682,7 @@ static int Cmd_get(char *arg, player *pl, int oper, char *msg)
     char value[MAX_CHARS];
     int i;
 
-    (void)pl; (void)oper;
+    UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
     if (!arg || !*arg) {
 	strcpy(msg, "Usage: /get option.");
@@ -717,7 +717,7 @@ static int Cmd_help(char *arg, player *pl, int oper, char *msg)
 {
     int			i;
 
-    (void)pl; (void)oper;
+    UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
     if (!*arg) {
 	strcpy(msg, "Commands: ");
@@ -851,7 +851,7 @@ static int Cmd_nuke(char *arg, player *pl, int oper, char *msg)
     RankInfo *rank;
     player *pl2;
 
-    (void)pl;
+    UNUSED_PARAM(pl);
 
     if (!oper)
 	return CMD_RESULT_NOT_OPERATOR;
@@ -954,7 +954,7 @@ static int Cmd_op(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_password(char *arg, player *pl, int oper, char *msg)
 {
-    (void)oper;
+    UNUSED_PARAM(oper);
 
     if (!options.password || !arg || strcmp(arg, options.password)) {
 	strcpy(msg, "Wrong.");
@@ -1014,7 +1014,7 @@ static int Cmd_queue(char *arg, player *pl, int oper, char *msg)
 {
     int			result;
 
-    (void)arg; (void)pl; (void)oper;
+    UNUSED_PARAM(arg); UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
     if (record || playback) {
 	strcpy(msg, "Command currently disabled during recording for "
@@ -1076,7 +1076,7 @@ static int Cmd_stats(char *arg, player *pl, int oper, char *msg)
     const char *errorstr;
     player *pl2;
 
-    (void)pl; (void)oper;
+    UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
@@ -1106,7 +1106,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     char		*arg2;
     world_t *world = &World;
 
-    (void)oper;
+    UNUSED_PARAM(oper);
 
     /*
      * Assume nothing will be said or done.
@@ -1395,7 +1395,7 @@ static int Cmd_setpass(char *arg, player *pl, int oper, char *msg)
 
 static int Cmd_version(char *arg, player *pl, int oper, char *msg)
 {
-    (void)arg; (void)pl; (void)oper;
+    UNUSED_PARAM(arg); UNUSED_PARAM(pl); UNUSED_PARAM(oper);
     sprintf(msg, "XPilot version %s.", VERSION);
     return CMD_RESULT_SUCCESS;
 }

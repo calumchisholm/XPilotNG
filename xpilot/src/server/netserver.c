@@ -1381,7 +1381,7 @@ static void Handle_input(int fd, void *arg)
     short		*pbscheck = NULL;
     char		*pbdcheck = NULL;
 
-    (void)fd;
+    UNUSED_PARAM(fd);
     if (connp->state & (CONN_PLAYING | CONN_READY))
 	receive_tbl = &playing_receive[0];
     else if (connp->state == CONN_LOGIN)

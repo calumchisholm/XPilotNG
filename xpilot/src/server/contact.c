@@ -283,7 +283,7 @@ void Contact(int fd, void *arg)
 			host_addr[24],
 			str[MSG_LEN];
 
-    (void)fd; (void)arg;
+    UNUSED_PARAM(fd); UNUSED_PARAM(arg);
     /*
      * Someone connected to us, now try and decipher the message :)
      */
