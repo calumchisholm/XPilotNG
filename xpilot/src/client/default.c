@@ -31,6 +31,39 @@
 # define PATH_MAX	1023
 #endif
 
+#ifdef OPTIONHACK
+typedef bool (*cl_option_setfunc_t)(const char *name,
+				    const char *value,
+				    void *private);
+
+typedef struct {
+    const char		*name;		/* option name */
+    const char		*noArg;		/* value for non-argument options */
+    const char		*fallback;	/* default value */
+    keys_t		key;		/* key if not KEY_DUMMY */
+    const char		*help;		/* user help (multiline) */
+    unsigned		hash;		/* option name hashed. */
+    cl_option_setfunc_t	setfunc;
+    void		*private;	/* passed to set function */
+} cl_option_t;
+
+cl_option_t *options = NULL;
+
+#else
+
+typedef struct {
+    const char		*name;		/* option name */
+    const char		*noArg;		/* value for non-argument options */
+    const char		*fallback;	/* default value */
+    keys_t		key;		/* key if not KEY_DUMMY */
+    const char		*help;		/* user help (multiline) */
+    unsigned		hash;		/* option name hashed. */
+} cl_option_t;
+
+cl_option_t options[];
+
+#endif
+
 char default_version[] = VERSION;
 
 char myName[] = "xpilot";
@@ -40,11 +73,6 @@ keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 int num_options = 0;
 int max_options = 0;
-#ifdef OPTIONHACK
-cl_option_t *options = NULL;
-#else
-cl_option_t options[];
-#endif
 
 static void Usage(void)
 {
@@ -102,6 +130,14 @@ static void Usage(void)
 
 /* kps tries to make this work without Xrm */
 
+
+bool helpsetfunc(const char *name,
+		 const char *value,
+		 void *private)
+{
+    return true;
+}
+
 cl_option_t default_options[] = {
     {
 	"help",
@@ -109,7 +145,9 @@ cl_option_t default_options[] = {
 	"",
 	KEY_DUMMY,
 	"Display this help message.\n",
-	0
+	0,
+	helpsetfunc,
+	default_options
     }
 };
 
@@ -132,16 +170,53 @@ static inline cl_option_t *Find_option(const char *name)
     return NULL;
 }
 
-static void Insert_option(const char *name, const char *value)
+
+/*
+ * NOTE: Store option assumes the passed pointers will remain valid.
+ */
+static void Store_option(const char *name,
+			 const char *value_to_set,
+			 const char *help,
+			 cl_option_setfunc_t setfunc,
+			 void *private)
+     
 {
     cl_option_t option;
 
+    assert(name);
+    assert(strlen(name) > 0);
+
+    /* Let's not allow several options with the same name */
     assert(Find_option(name) == NULL);
 
-    option.name = xp_safe_strdup(name);
-    option.noArg = xp_safe_strdup(value);
+    option.name = name;
+    option.help = help;
+    option.setfunc = setfunc;
+    option.private = private;
 
     STORE(cl_option_t, options, num_options, max_options, option);
+
+    /*
+     * If no setfunc, value can't be set.
+     */
+    if (option.setfunc) {
+	bool set_ok;
+	set_ok = option.setfunc(name, value_to_set, private);
+	/* Setting the default value must succeed */
+	if (!set_ok) {
+	    warn("Setting default value for option %s failed.", name);
+	    assert(0 && "Setting option default value must succeed.");
+	}
+    }
+}
+
+static void Store_option_struct(cl_option_t *opt)
+{
+    Store_option(opt->name,
+		 opt->fallback,
+		 opt->help,
+		 opt->setfunc,
+		 opt->private);
 }
 
 /*
@@ -154,9 +229,11 @@ void Set_option(const char *name, const char *value)
     cl_option_t *opt;
 
     opt = Find_option(name);
+
     if (!opt) {
-	Insert_option(name, value);
-	opt = Find_option(name);
+	/*Store_option(name, value);
+	  opt = Find_option(name);*/
+	return;
     }
 
     printf("setting option '%s' to '%s'\n", opt->name, opt->noArg);
@@ -207,6 +284,16 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     char path[PATH_MAX + 1];
     char buf[BUFSIZ];
     FILE *fp;
+
+    /* kps - do before Parse_options */
+    {
+	int i;
+
+	for (i = 0; i < NELEM(default_options); i++)
+	    Store_option_struct(&default_options[i]);
+    }
+
+
 
     /*
      * Create data structure holding all options we know of and their values.

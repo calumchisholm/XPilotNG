@@ -24,15 +24,6 @@
 #ifndef DEFAULT_H
 #define DEFAULT_H
 
-typedef struct {
-    const char		*name;		/* option name */
-    const char		*noArg;		/* value for non-argument options */
-    const char		*fallback;	/* default value */
-    keys_t		key;		/* key if not KEY_DUMMY */
-    const char		*help;		/* user help (multiline) */
-    unsigned		hash;		/* option name hashed. */
-} cl_option_t;
-
 #if 0
 extern cl_option_t	*options;
 extern int		num_options;	/* number of options */
