@@ -358,36 +358,36 @@ static void PlayerCollision(void)
 	    for (j = i + 1; j < NumPlayers; j++) {
 		player *pl_j = Players(j);
 		int range;
+		bool hit1, hit2;
 
 		if (!Player_is_playing(pl_j))
 		    continue;
 		if (BIT(pl_j->used, HAS_PHASING_DEVICE))
 		    continue;
 		range = (2*SHIP_SZ-6) * CLICK;
-#if 1
-		if (!in_range(OBJ_PTR(pl), OBJ_PTR(pl_j), range))
-		    continue;
-#else
+
+		hit1 = in_range(OBJ_PTR(pl), OBJ_PTR(pl_j), range);
+
 		if (is_polygon_map || !useOldCode) {
-		    if (!in_range_acd(pl->prevpos.cx - pl_j->prevpos.cx,
-				      pl->prevpos.cy - pl_j->prevpos.cy,
-				      pl->extmove.cx - pl_j->extmove.cx,
-				      pl->extmove.cy - pl_j->extmove.cy,
-				      range)) {
- 			continue;
-		    }
+		    hit2 = in_range_acd(pl->prevpos.cx - pl_j->prevpos.cx,
+					pl->prevpos.cy - pl_j->prevpos.cy,
+					pl->extmove.cx - pl_j->extmove.cx,
+					pl->extmove.cy - pl_j->extmove.cy,
+					range);
 		} else {
-		    if (!in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
-					  pl->pos.cx, pl->pos.cy,
-					  pl_j->prevpos.cx,
-					  pl_j->prevpos.cy,
-					  pl_j->pos.cx,
-					  pl_j->pos.cy,
-					  range)) {
-			continue;
-		    }
+		    hit2 = in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
+					    pl->pos.cx, pl->pos.cy,
+					    pl_j->prevpos.cx,
+					    pl_j->prevpos.cy,
+					    pl_j->pos.cx,
+					    pl_j->pos.cy,
+					    range);
 		}
-#endif
+
+		assert(hit1 == hit2);
+		if (!hit1)
+		    continue;
+
 		/*
 		 * Here we can add code to do more accurate player against
 		 * player collision detection.
@@ -725,57 +725,56 @@ static void PlayerObjectCollision(player *pl)
 		     &obj_list, &obj_count);
 
     for (j = 0; j < obj_count; j++) {
+	bool hit1, hit2;
+
 	obj = obj_list[j];
 
 	range = (SHIP_SZ + obj->pl_range) * CLICK;
 
-#if 1
-	if (!in_range(OBJ_PTR(pl), obj, range))
-	    continue;
-#else
+	hit1 = in_range(OBJ_PTR(pl), obj, range);
+
 	if (is_polygon_map || !useOldCode) {
 	    switch (obj->collmode) {
 	    case 0:
-		hit = in_range_simple(pl->pos.cx, pl->pos.cy,
-				      obj->pos.cx, obj->pos.cy,
-				      range);
+		hit2 = in_range_simple(pl->pos.cx, pl->pos.cy,
+				       obj->pos.cx, obj->pos.cy,
+				       range);
 		break;
 	    case 1:
-		hit = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
-				   pl->prevpos.cy - obj->prevpos.cy,
-				   pl->extmove.cx - obj->extmove.cx,
-				   pl->extmove.cy - obj->extmove.cy,
-				   range);
+		hit2 = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
+				    pl->prevpos.cy - obj->prevpos.cy,
+				    pl->extmove.cx - obj->extmove.cx,
+				    pl->extmove.cy - obj->extmove.cy,
+				    range);
 		break;
 	    case 2:
-		hit = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
-				       pl->prevpos.cy - obj->prevpos.cy,
-				       pl->extmove.cx - obj->extmove.cx,
-				       pl->extmove.cy - obj->extmove.cy,
-				       range, obj->wall_time);
+		hit2 = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
+					pl->prevpos.cy - obj->prevpos.cy,
+					pl->extmove.cx - obj->extmove.cx,
+					pl->extmove.cy - obj->extmove.cy,
+					range, obj->wall_time);
 		break;
 	    case 3:
 	    default:
 #if 0
 		warn("Unimplemented collision mode %d", obj->collmode);
 #endif
-		continue;
+		hit2 = false;
 	    }
-	    if (!hit)
-		continue;
 	} else {
 	    if (obj->life <= 0)
-		continue;
-
-	    if (!in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
-				  pl->pos.cx, pl->pos.cy,
-				  obj->prevpos.cx, obj->prevpos.cy,
-				  obj->pos.cx, obj->pos.cy,
-				  range)) {
-		continue;
-	    }
+		hit2 = false;
+	    else
+		hit2 = in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
+					pl->pos.cx, pl->pos.cy,
+					obj->prevpos.cx, obj->prevpos.cy,
+					obj->pos.cx, obj->pos.cy,
+					range);
 	}
-#endif
+
+	assert(hit1 == hit2);
+	if (!hit1)
+	    continue;
 
 	if (obj->id != NO_ID) {
 	    if (obj->id == pl->id) {
@@ -832,51 +831,53 @@ static void PlayerObjectCollision(player *pl)
 	radius = (SHIP_SZ + obj->pl_radius) * CLICK;
 
 	if (radius >= range) {
-	    hit = true;
+	    hit1 = hit2 = true;
 	} else {
-#if 1
 	    /*
 	     * kps - why is radius used in the NG functions and range
 	     * in the old one ?
 	     */
-	    hit = in_range(OBJ_PTR(pl), obj, radius);
-#else
+	    hit1 = in_range(OBJ_PTR(pl), obj, radius);
+
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
-		    hit = in_range_simple(pl->pos.cx, pl->pos.cy,
-					  obj->pos.cx, obj->pos.cy,
-					  radius);
+		    hit2 = in_range_simple(pl->pos.cx, pl->pos.cy,
+					   obj->pos.cx, obj->pos.cy,
+					   radius);
 		    break;
 		case 1:
-		    hit = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
-				       pl->prevpos.cy - obj->prevpos.cy,
-				       pl->extmove.cx - obj->extmove.cx,
-				       pl->extmove.cy - obj->extmove.cy,
-				       radius);
+		    hit2 = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
+					pl->prevpos.cy - obj->prevpos.cy,
+					pl->extmove.cx - obj->extmove.cx,
+					pl->extmove.cy - obj->extmove.cy,
+					radius);
 		    break;
 		case 2:
-		    hit = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
-					   pl->prevpos.cy - obj->prevpos.cy,
-					   pl->extmove.cx - obj->extmove.cx,
-					   pl->extmove.cy - obj->extmove.cy,
-					   radius, obj->wall_time);
+		    hit2 = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
+					    pl->prevpos.cy - obj->prevpos.cy,
+					    pl->extmove.cx - obj->extmove.cx,
+					    pl->extmove.cy - obj->extmove.cy,
+					    radius, obj->wall_time);
 		    break;
 		default:
 		    warn("Unimplemented collision mode %d", obj->collmode);
-		    continue;
+		    hit2 = false;
 		}
 	    } else {
-		hit = in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
-				       pl->pos.cx, pl->pos.cy,
-				       obj->prevpos.cx, obj->prevpos.cy,
-				       obj->pos.cx, obj->pos.cy,
-				       range);
+		hit2 = in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
+					pl->pos.cx, pl->pos.cy,
+					obj->prevpos.cx, obj->prevpos.cy,
+					obj->pos.cx, obj->pos.cy,
+					range);
 
 
 	    }
-#endif
 	}
+
+	assert(hit1 == hit2);
+	if (!hit1)
+	    continue;
 
 #if 0
 	if ((is_polygon_map || !useOldCode) && obj->collmode != 1) {
@@ -1636,6 +1637,8 @@ static void AsteroidCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
+	    bool hit1, hit2;
+
 	    obj = obj_list[j];
 	    assert(obj != NULL);
 
@@ -1664,50 +1667,48 @@ static void AsteroidCollision(void)
 		continue;
 
 	    radius = (ast->pl_radius + obj->pl_radius) * CLICK;
-#if 1
-	    if (!in_range(OBJ_PTR(ast), obj, radius))
-		continue;
-#else
+
+	    hit1 = in_range(OBJ_PTR(ast), obj, radius);
+
 	    if (is_polygon_map || !useOldCode) {
 		switch (obj->collmode) {
 		case 0:
-		    hit = in_range_simple(ast->pos.cx, ast->pos.cy,
-					  obj->pos.cx, obj->pos.cy,
-					  radius);
+		    hit2 = in_range_simple(ast->pos.cx, ast->pos.cy,
+					   obj->pos.cx, obj->pos.cy,
+					   radius);
 		    break;
 		case 1:
-		    hit = in_range_acd(ast->prevpos.cx - obj->prevpos.cx,
-				       ast->prevpos.cy - obj->prevpos.cy,
-				       ast->extmove.cx - obj->extmove.cx,
-				       ast->extmove.cy - obj->extmove.cy,
-				       radius);
+		    hit2 = in_range_acd(ast->prevpos.cx - obj->prevpos.cx,
+					ast->prevpos.cy - obj->prevpos.cy,
+					ast->extmove.cx - obj->extmove.cx,
+					ast->extmove.cy - obj->extmove.cy,
+					radius);
 		    break;
 		case 2:
-		    hit = in_range_partial(ast->prevpos.cx - obj->prevpos.cx,
-					   ast->prevpos.cy - obj->prevpos.cy,
-					   ast->extmove.cx - obj->extmove.cx,
-					   ast->extmove.cy - obj->extmove.cy,
-					   radius, obj->wall_time);
+		    hit2 = in_range_partial(ast->prevpos.cx - obj->prevpos.cx,
+					    ast->prevpos.cy - obj->prevpos.cy,
+					    ast->extmove.cx - obj->extmove.cx,
+					    ast->extmove.cy - obj->extmove.cy,
+					    radius, obj->wall_time);
 		    break;
 		case 3:
 		default:
 #if 0
 		    warn("Unimplemented collision mode %d", obj->collmode);
 #endif
-		    continue;
+		    hit2 = false;
 		}
-		if (!hit)
-		    continue;
 	    } else {
-		if (!in_range_acd_old(ast->prevpos.cx, ast->prevpos.cy,
-				      ast->pos.cx, ast->pos.cy,
-				      obj->prevpos.cx, obj->prevpos.cy,
-				      obj->pos.cx, obj->pos.cy,
-				      radius)) {
-		    continue;
-		}
+		hit2 = in_range_acd_old(ast->prevpos.cx, ast->prevpos.cy,
+					ast->pos.cx, ast->pos.cy,
+					obj->prevpos.cx, obj->prevpos.cy,
+					obj->pos.cx, obj->pos.cy,
+					radius);
 	    }
-#endif
+
+	    assert(hit1 == hit2);
+	    if (!hit1)
+		continue;
 
 	    switch (obj->type) {
 	    case OBJ_BALL:
