@@ -462,8 +462,7 @@ void General_tractor_beam(player *pl, clpos pos,
 {
     double	maxdist = TRACTOR_MAX_RANGE(items),
 		maxforce = TRACTOR_MAX_FORCE(items),
-		percent, force, dist;
-    long	cost;
+		percent, force, dist, cost;
     int		theta;
 
     dist = Wrap_length(pos.cx - victim->pos.cx,
@@ -471,13 +470,13 @@ void General_tractor_beam(player *pl, clpos pos,
     if (dist > maxdist)
 	return;
     percent = TRACTOR_PERCENT(dist, maxdist);
-    cost = (long)TRACTOR_COST(percent);
+    cost = TRACTOR_COST(percent);
     force = TRACTOR_FORCE(pressor, percent, maxforce);
 
     sound_play_sensors(pos, pressor ? PRESSOR_BEAM_SOUND : TRACTOR_BEAM_SOUND);
 
     if (pl)
-	Add_fuel(&(pl->fuel), cost);
+	Player_add_fuel(pl, cost);
 
     theta = (int)Wrap_cfindDir(pos.cx - victim->pos.cx,
 			       pos.cy - victim->pos.cy);
@@ -507,7 +506,7 @@ void Do_deflector(player *pl)
 	    Deflector(pl, false);
 	return;
     }
-    Add_fuel(&(pl->fuel), (long)ED_DEFLECTOR);
+    Player_add_fuel(pl, ED_DEFLECTOR);
 
     Cell_get_objects(OBJ_X_IN_BLOCKS(pl), OBJ_Y_IN_BLOCKS(pl),
 		     (int)(range / BLOCK_CLICKS + 1), 200,
@@ -592,7 +591,7 @@ void Do_transporter(player *pl)
     /* no victims in range */
     if (!victim) {
 	sound_play_sensors(pl->pos, TRANSPORTER_FAIL_SOUND);
-	Add_fuel(&(pl->fuel), ED_TRANSPORTER);
+	Player_add_fuel(pl, ED_TRANSPORTER);
 	pl->item[ITEM_TRANSPORTER]--;
 	return;
     }
@@ -602,13 +601,13 @@ void Do_transporter(player *pl)
 }
 
 void Do_general_transporter(player *pl, clpos pos, player *victim,
-			    int *itemp, long *amountp)
+			    int *itemp, double *amountp)
 {
     char		msg[MSG_LEN];
     const char		*what = NULL;
     int			i;
     int			item = ITEM_FUEL;
-    long		amount;
+    double		amount;
 
     /* choose item type to steal */
     for (i = 0; i < 50; i++) {
@@ -623,7 +622,7 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	/* you can't pluck from a bald chicken.. */
 	sound_play_sensors(pos, TRANSPORTER_FAIL_SOUND);
 	if (!pl) {
-	    *amountp = 0;
+	    *amountp = 0.0;
 	    *itemp = -1;
 	}
 	return;
@@ -642,7 +641,7 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
     }
 
     /* remove loot from victim */
-    amount = 1;
+    amount = 1.0;
     if (!(item == ITEM_MISSILE
 	  || item == ITEM_FUEL
 	  || item == ITEM_TANK))
@@ -657,13 +656,13 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	    CLR_BIT(victim->have, HAS_AFTERBURNER);
 	break;
     case ITEM_MISSILE:
-	amount = MIN(victim->item[item], 3);
-	if (amount == 1)
+	amount = (double)MIN(victim->item[item], 3);
+	if (amount == 1.0)
 	    sprintf(msg, "%s stole a missile from %s.",
 		    (pl ? pl->name : "A cannon"), victim->name);
 	else
-	    sprintf(msg, "%s stole %ld missiles from %s",
-		    (pl ? pl->name : "A cannon"), amount, victim->name);
+	    sprintf(msg, "%s stole %d missiles from %s",
+		    (pl ? pl->name : "A cannon"), (int)amount, victim->name);
         break;
     case ITEM_CLOAK:
 	what = "a cloaking device";
@@ -762,15 +761,15 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
     case ITEM_FUEL:
 	{
 	    /* choose percantage between 10 and 50. */
-	    double percent = 10.0f + 40.0f * rfrac();
-	    amount = (long)(victim->fuel.sum * percent / 100);
-	    sprintf(msg, "%s stole %ld units (%d%%) of fuel from %s.",
+	    double percent = 10.0 + 40.0 * rfrac();
+	    amount = victim->fuel.sum * percent / 100.0;
+	    sprintf(msg, "%s stole %.1f units (%d%%) of fuel from %s.",
 		    (pl ? pl->name : "A cannon"),
-		    amount >> FUEL_SCALE_BITS,
+		    amount / FUEL_SCALE_FACT,
 		    (int)(percent + 0.5),
 		    victim->name);
 	}
-	Add_fuel(&(victim->fuel), -amount);
+	Player_add_fuel(victim, -amount);
         break;
     default:
 	warn("Do_general_transporter: unknown item type.");
@@ -788,13 +787,13 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	*itemp = item;
 	*amountp = amount;
 	if (item == ITEM_FUEL || item == ITEM_TANK)
-	    *amountp >>= FUEL_SCALE_BITS;
+	    *amountp /= FUEL_SCALE_FACT;
 	return;
     }
 
     /* don't forget the penalty for robbery */
     pl->item[ITEM_TRANSPORTER]--;
-    Add_fuel(&(pl->fuel), ED_TRANSPORTER);
+    Player_add_fuel(pl, ED_TRANSPORTER);
 
     /* update thief */
     if (!(item == ITEM_FUEL
@@ -842,7 +841,7 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 	    Player_add_tank(pl, amount);
 	break;
     case ITEM_FUEL:
-	Add_fuel(&(pl->fuel), amount);
+	Player_add_fuel(pl, amount);
 	break;
     default:
 	break;
@@ -861,8 +860,7 @@ bool Do_hyperjump(player *pl)
     if (pl->fuel.sum < -ED_HYPERJUMP)
 	return false;
     pl->item[ITEM_HYPERJUMP]--;
-    /*Player_add_fuel(pl, ED_HYPERJUMP);*/
-    Add_fuel(&(pl->fuel), ED_HYPERJUMP);
+    Player_add_fuel(pl, ED_HYPERJUMP);
     SET_BIT(pl->status, WARPING);
     pl->wormHoleHit = -1;
     return true;
@@ -921,7 +919,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
     if (pl) {
 	pl->ecmcount++;
 	pl->item[ITEM_ECM]--;
-	Add_fuel(&(pl->fuel), ED_ECM);
+	Player_add_fuel(pl, ED_ECM);
 	sound_play_sensors(ecm->pos, ECM_SOUND);
     }
 

@@ -1901,8 +1901,8 @@ int Send_self(connection_t *connp,
 		      pl->check,
 
 		      pl->fuel.current,
-		      pl->fuel.sum >> FUEL_SCALE_BITS,
-		      pl->fuel.max >> FUEL_SCALE_BITS,
+		      (int)(pl->fuel.sum / FUEL_SCALE_FACT),
+		      (int)(pl->fuel.max / FUEL_SCALE_FACT),
 
 		      connp->view_width, connp->view_height,
 		      connp->debris_colors,

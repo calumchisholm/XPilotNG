@@ -249,13 +249,13 @@ static void PlayerCollision(void)
 		if (BIT(World.rules->mode, BOUNCE_WITH_PLAYER)) {
 		    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-			Add_fuel(&(pl->fuel), (long)ED_PL_CRASH);
+			Player_add_fuel(pl, ED_PL_CRASH);
 			Item_damage(pl, destroyItemInCollisionProb);
 		    }
 		    if (BIT(pl_j->used, (HAS_SHIELD|
 					       HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-			Add_fuel(&(pl_j->fuel), (long)ED_PL_CRASH);
+			Player_add_fuel(pl_j, ED_PL_CRASH);
 			Item_damage(pl_j, destroyItemInCollisionProb);
 		    }
 		    pl->forceVisible = 20;
@@ -710,7 +710,7 @@ static void Player_collides_with_ball(player *pl, object *obj)
     Delta_mv((object *)pl, obj);
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-	Add_fuel(&(pl->fuel), (long)ED_BALL_HIT);
+	Player_add_fuel(pl, ED_BALL_HIT);
 	if (treasureCollisionDestroys)
 	    ball->life = 0;
     }
@@ -864,7 +864,7 @@ static void Player_collides_with_item(player *pl, object *obj)
 	sound_play_sensors(pl->pos, CLOAKING_DEVICE_PICKUP_SOUND);
 	break;
     case ITEM_FUEL:
-	Add_fuel(&(pl->fuel), ENERGY_PACK_FUEL);
+	Player_add_fuel(pl, ENERGY_PACK_FUEL);
 	sound_play_sensors(pl->pos, ENERGY_PACK_PICKUP_SOUND);
 	break;
     case ITEM_MINE:
@@ -920,7 +920,7 @@ static void Player_collides_with_item(player *pl, object *obj)
 	if (pl->fuel.num_tanks < World.items[ITEM_TANK].limit)
 	    Player_add_tank(pl, TANK_FUEL(pl->fuel.num_tanks + 1));
 	else
-	    Add_fuel(&(pl->fuel), TANK_FUEL(MAX_TANKS));
+	    Player_add_fuel(pl, TANK_FUEL(MAX_TANKS));
 	sound_play_sensors(pl->pos, TANK_PICKUP_SOUND);
 	break;
     case NUM_ITEMS:
@@ -998,13 +998,13 @@ static void Player_collides_with_debris(player *pl, object *obj)
 {
     player		*kp;
     double		v = VECTOR_LENGTH(obj->vel);
-    long		tmp = (long) (2 * obj->mass * v);
-    long		cost = ABS(tmp);
+    double		tmp = 2 * obj->mass * v;
+    double		cost = ABS(tmp);
     double		sc;
 
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	Add_fuel(&pl->fuel, - cost);
+	Player_add_fuel(pl, -cost);
     if (pl->fuel.sum == 0
 	|| (obj->type == OBJ_WRECKAGE
 	    && wreckageCollisionMayKill
@@ -1045,8 +1045,8 @@ static void Player_collides_with_debris(player *pl, object *obj)
 static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 {
     double	v = VECTOR_LENGTH(ast->vel);
-    long	tmp = (long) (2 * ast->mass * v);
-    long	cost = ABS(tmp);
+    double	tmp = 2 * ast->mass * v;
+    double	cost = ABS(tmp);
 
     ast->life += ASTEROID_FUEL_HIT(ED_PL_CRASH, ast->size);
     if (ast->life < 0)
@@ -1058,7 +1058,7 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
     }
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	Add_fuel(&pl->fuel, -cost);
+	Player_add_fuel(pl, -cost);
 
     if (asteroidCollisionMayKill
 	&& (pl->fuel.sum == 0
@@ -1093,7 +1093,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
     player	*kp = NULL;
     double	sc;
     double   	drainfactor;
-    long	drain;
+    double	drain;
 
     /*
      * Player got hit by a potentially deadly object.
@@ -1140,11 +1140,11 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 				      obj->mods, 1),
 			kp->name);
 	    }
-	    drain = (long)(ED_SMART_SHOT_HIT /
+	    drain = (ED_SMART_SHOT_HIT /
 		((obj->mods.mini + 1) * (obj->mods.power + 1)));
 	    if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 		!= (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-		Add_fuel(&(pl->fuel), drain);
+		Player_add_fuel(pl, drain);
 	    pl->forceVisible += 2;
 	    Set_message(msg);
 	    break;
@@ -1161,9 +1161,9 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 			= ((rel_velocity * rel_velocity * ABS(obj->mass))
 			   / (ShotsSpeed * ShotsSpeed * ShotsMass));
 		} else
-		    drainfactor = 1.0f;
-		drain = (long)(ED_SHOT_HIT * drainfactor * SHOT_MULT(obj));
-		Add_fuel(&(pl->fuel), drain);
+		    drainfactor = 1.0;
+		drain = ED_SHOT_HIT * drainfactor * SHOT_MULT(obj);
+		Player_add_fuel(pl, drain);
 	    }
 	    pl->forceVisible += SHOT_MULT(obj);
 	    break;

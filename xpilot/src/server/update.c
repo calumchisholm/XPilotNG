@@ -743,16 +743,16 @@ static void Use_items(player *pl)
      */
     if (do_update_this_frame) {
 	if (BIT(pl->used, HAS_SHIELD))
-	    Add_fuel(&(pl->fuel), (long)ED_SHIELD);
+	    Player_add_fuel(pl, ED_SHIELD);
 
 	if (BIT(pl->used, HAS_PHASING_DEVICE))
-	    Add_fuel(&(pl->fuel), (long)ED_PHASING_DEVICE);
+	    Player_add_fuel(pl, ED_PHASING_DEVICE);
 
 	if (BIT(pl->used, HAS_CLOAKING_DEVICE))
-	    Add_fuel(&(pl->fuel), (long)ED_CLOAKING_DEVICE);
+	    Player_add_fuel(pl, ED_CLOAKING_DEVICE);
 
 	if (BIT(pl->used, HAS_DEFLECTOR))
-	    Add_fuel(&(pl->fuel), (long)ED_DEFLECTOR);
+	    Player_add_fuel(pl, ED_DEFLECTOR);
     }
 }
 
@@ -781,9 +781,9 @@ static void Do_refuel(player *pl)
 		fs->fuel -= REFUEL_RATE * timeStep;
 		fs->conn_mask = 0;
 		fs->last_change = frame_loops;
-		Add_fuel(&(pl->fuel), REFUEL_RATE * timeStep);
+		Player_add_fuel(pl, REFUEL_RATE * timeStep);
 	    } else {
-		Add_fuel(&(pl->fuel), fs->fuel);
+		Player_add_fuel(pl, fs->fuel);
 		fs->fuel = 0;
 		fs->conn_mask = 0;
 		fs->last_change = frame_loops;
@@ -822,7 +822,7 @@ static void Do_repair(player *pl)
 		targ->damage += TARGET_FUEL_REPAIR_PER_FRAME;
 		targ->conn_mask = 0;
 		targ->last_change = frame_loops;
-		Add_fuel(&(pl->fuel), -REFUEL_RATE * timeStep);
+		Player_add_fuel(pl, -REFUEL_RATE * timeStep);
 		if (targ->damage > TARGET_DAMAGE) {
 		    targ->damage = TARGET_DAMAGE;
 		    break;
@@ -1224,7 +1224,7 @@ void Update_objects(void)
 	    pl->acc.y = power * tsin(pl->dir) / inert;
 	    /* Decrement fuel */
 	    if (do_update_this_frame)
-		Add_fuel(&(pl->fuel), (long)(-f * FUEL_SCALE_FACT));
+		Player_add_fuel(pl, -f * FUEL_SCALE_FACT);
 	} else
 	    pl->acc.x = pl->acc.y = 0.0;
 

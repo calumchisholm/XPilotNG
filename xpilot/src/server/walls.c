@@ -186,7 +186,7 @@ void Move_init(void)
     mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL | OBJ_PULSE;
 }
 
-static void Object_hits_target(object *obj, target_t *targ, long player_cost)
+static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 {
     int			j;
     player		*kp;
@@ -244,8 +244,8 @@ static void Object_hits_target(object *obj, target_t *targ, long player_cost)
 	targ->damage -= TARGET_DAMAGE / (obj->mods.mini + 1);
 	break;
     case OBJ_PLAYER:
-	if (player_cost <= 0 || player_cost > TARGET_DAMAGE / 4)
-	    player_cost = TARGET_DAMAGE / 4;
+	if (player_cost <= 0.0 || player_cost > TARGET_DAMAGE / 4.0)
+	    player_cost = TARGET_DAMAGE / 4.0;
 	targ->damage -= player_cost;
 	break;
 
@@ -814,18 +814,17 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     pl->last_wall_touch = frame_loops;
     {
 	double	speed = VECTOR_LENGTH(pl->vel);
-	int	v = (int) speed >> 2;
-	int	m = (int) (pl->mass - pl->emptymass * 0.75f);
-	double	b = 1 - 0.5f * playerWallBrakeFactor;
-	long	cost = (long) (b * m * v);
+	double	v = speed * 0.25;
+	double	m = pl->mass - pl->emptymass * 0.75;
+	double	b = 1.0 - 0.5 * playerWallBrakeFactor;
+	double	cost = b * m * v;
 	double	max_speed = BIT(pl->used, HAS_SHIELD)
 		? maxShieldedWallBounceSpeed
 		: maxUnshieldedWallBounceSpeed;
 
 	if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	    == (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-	    max_speed = 100;
-	}
+	    == (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
+	    max_speed = 100.0;
 
 	/* only use armor if neccessary */
 	if (speed > max_speed
@@ -852,7 +851,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	cost *= 0.9; /* used to depend on bounce angle, .5 .. 1.0 */
 	if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
 	    != (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
-	    Add_fuel(&pl->fuel, (long)(-((cost << FUEL_SCALE_BITS)
+	    Player_add_fuel(pl, (-((cost * FUEL_SCALE_FACT)
 					 * wallBounceFuelDrainMult)));
 	    Item_damage(pl, wallBounceDestroyItemProb);
 	}
@@ -886,8 +885,8 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 #endif
 	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
-		cost <<= FUEL_SCALE_BITS;
-		cost = (long)(cost * (wallBounceFuelDrainMult / 4.0));
+		cost *= FUEL_SCALE_FACT;
+		cost *= (wallBounceFuelDrainMult / 4.0);
 		Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), cost);
 	    }
 	}

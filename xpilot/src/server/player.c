@@ -270,15 +270,15 @@ void Compute_sensor_range(player *pl)
 /*
  * Give ship one more tank, if possible.
  */
-void Player_add_tank(player *pl, long tank_fuel)
+void Player_add_tank(player *pl, double tank_fuel)
 {
-    long		tank_cap, add_fuel;
+    double		tank_cap, add_fuel;
 
     if (pl->fuel.num_tanks < MAX_TANKS) {
 	pl->fuel.num_tanks++;
 	tank_cap = TANK_CAP(pl->fuel.num_tanks);
 	add_fuel = tank_fuel;
-	LIMIT(add_fuel, 0, tank_cap);
+	LIMIT(add_fuel, 0.0, tank_cap);
 	pl->fuel.sum += add_fuel;
 	pl->fuel.max += tank_cap;
 	pl->fuel.tank[pl->fuel.num_tanks] = add_fuel;

@@ -105,7 +105,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 	if (kp)
 	    Record_shove(pl, kp, frame_loops + 12 + 6);
     } else {
-	Add_fuel(&(pl->fuel), (long)ED_LASER_HIT);
+	Player_add_fuel(pl, ED_LASER_HIT);
 	if (!BIT(pl->used, HAS_SHIELD)
 	    && !BIT(pl->have, HAS_ARMOR)) {
 	    SET_BIT(pl->status, KILLED);

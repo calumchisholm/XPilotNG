@@ -88,9 +88,7 @@ void Place_general_mine(player *pl, int team, long status,
 {
     char		msg[MSG_LEN];
     int			used;
-    double		life;
-    long		drain;
-    double		mass;
+    double		life, drain, mass;
     int			i, minis;
     vector		mv;
 
@@ -138,10 +136,10 @@ void Place_general_mine(player *pl, int team, long status,
     if (pl) {
 	drain = ED_MINE;
 	if (BIT(mods.warhead, CLUSTER))
-	    drain += (long)(CLUSTER_MASS_DRAIN(mass));
+	    drain += CLUSTER_MASS_DRAIN(mass);
 	if (pl->fuel.sum < -drain) {
-	    sprintf(msg, "You need at least %ld fuel units to %s %s!",
-		    (-drain) >> FUEL_SCALE_BITS,
+	    sprintf(msg, "You need at least %.1f fuel units to %s %s!",
+		    (-drain) / FUEL_SCALE_FACT,
 		    (BIT(status, GRAVITY) ? "throw" : "drop"),
 		    Describe_shot(OBJ_MINE, status, mods, 0));
 	    Set_player_message (pl, msg);
@@ -164,7 +162,7 @@ void Place_general_mine(player *pl, int team, long status,
 		}
 	    }
 	}
-	Add_fuel(&(pl->fuel), drain);
+	Player_add_fuel(pl, drain);
 	pl->item[ITEM_MINE] -= used;
 
 	if (used > 1) {
@@ -486,8 +484,8 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 			on_this_rack = 0,
 			side = 0,
 			fired = 0;
-    long		drain;
-    double		mass = ShotsMass,
+    double		drain,
+    			mass = ShotsMass,
 			life = ShotsLife,
 			speed = ShotsSpeed,
 			turnspeed = 0,
@@ -525,7 +523,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	if (pl) {
 	    if (pl->fuel.sum < -ED_SHOT)
 		return;
-	    Add_fuel(&(pl->fuel), (long)(ED_SHOT));
+	    Player_add_fuel(pl, ED_SHOT);
 	    sound_play_sensors(pl->pos, FIRE_SHOT_SOUND);
 	    Rank_FireShot(pl);
 	}
@@ -582,7 +580,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	drain = used * ED_SMART_SHOT;
 	if (BIT(mods.warhead, CLUSTER)) {
 	    if (pl)
-		drain += (long)(CLUSTER_MASS_DRAIN(mass));
+		drain += CLUSTER_MASS_DRAIN(mass);
 	}
 
 	if (pl && BIT(pl->status, KILLED))
@@ -639,13 +637,13 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 
 	if (pl) {
 	    if (pl->fuel.sum < -drain) {
-		sprintf(msg, "You need at least %ld fuel units to fire %s!",
-			(-drain) >> FUEL_SCALE_BITS,
+		sprintf(msg, "You need at least %.1f fuel units to fire %s!",
+			(-drain) / FUEL_SCALE_FACT,
 			Describe_shot(type, status, mods, 0));
 		Set_player_message (pl, msg);
 		return;
 	    }
-	    Add_fuel(&(pl->fuel), drain);
+	    Player_add_fuel(pl, drain);
 	    pl->item[ITEM_MISSILE] -= used;
 
 	    if (used > 1) {
@@ -1393,7 +1391,7 @@ void Fire_general_laser(player *pl, int team, clpos pos,
 	return;
 
     if (pl) {
-	Add_fuel(&(pl->fuel), (long)ED_LASER);
+	Player_add_fuel(pl, ED_LASER);
 	sound_play_sensors(pos, FIRE_LASER_SOUND);
 	/* kps - hmm ??? */
 	/*life = (int)PULSE_LIFE(pl->item[ITEM_LASER]);*/

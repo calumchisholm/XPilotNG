@@ -210,7 +210,7 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
  * Add fuel to fighter's tanks.
  * Maybe use more than one of tank to store the fuel.
  */
-void Add_fuel(pl_fuel_t *ft, long fuel)
+void Add_fuel(pl_fuel_t *ft, double fuel)
 {
     if (ft->sum + fuel > ft->max)
 	fuel = ft->max - ft->sum;
@@ -229,25 +229,25 @@ void Update_tanks(pl_fuel_t *ft)
 {
     if (ft->num_tanks) {
 	int  t, check;
-	long low_level;
-	long fuel;
-	long *f;
+	double low_level;
+	double fuel;
+	double *f;
 	double frame_refuel = REFUEL_RATE * timeStep;
 
 	/* Set low_level to minimum fuel in each tank */
 	low_level = ft->sum / (ft->num_tanks + 1) - 1;
-	if (low_level < 0)
-	    low_level = 0;
+	if (low_level < 0.0)
+	    low_level = 0.0;
 	if (TANK_REFILL_LIMIT < low_level)
 	    low_level = TANK_REFILL_LIMIT;
 
 	t = ft->num_tanks;
-	check = MAX_TANKS<<2;
+	check = MAX_TANKS << 2;
 	fuel = 0;
 	f = ft->tank + t;
 
-	while (t>=0 && check--) {
-	    long m = TANK_CAP(t);
+	while (t >= 0 && check--) {
+	    double m = TANK_CAP(t);
 
 	    /* Add the previous over/underflow and do a new cut */
 	    *f += fuel;
