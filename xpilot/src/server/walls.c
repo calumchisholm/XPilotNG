@@ -290,6 +290,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     target_t		*targ = &World.targets[ind];
     int			j,
 			killer;
+    player		*kp;
     DFLOAT		sc, por,
 			win_score = 0,
 			lose_score = 0;
@@ -309,6 +310,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	return;
 
     killer = GetInd(obj->id);
+    kp = Players(killer);
     if (targ->team == obj->team)
 	return;
 
@@ -383,23 +385,25 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < NumPlayers; j++) {
+	    player *pl_j = Players(j);
+
 	    if (IS_TANK_IND(j)
-		|| (BIT(Players(j)->status, PAUSE)
-		    && Players(j)->count <= 0)
-		|| (BIT(Players(j)->status, GAME_OVER)
-		    && Players(j)->mychar == 'W'
-		    && Players(j)->score == 0)) {
+		|| (BIT(pl_j->status, PAUSE)
+		    && pl_j->count <= 0)
+		|| (BIT(pl_j->status, GAME_OVER)
+		    && pl_j->mychar == 'W'
+		    && pl_j->score == 0)) {
 		continue;
 	    }
-	    if (Players(j)->team == targ->team) {
-		lose_score += Players(j)->score;
+	    if (pl_j->team == targ->team) {
+		lose_score += pl_j->score;
 		lose_team_members++;
-		if (BIT(Players(j)->status, GAME_OVER) == 0) {
+		if (BIT(pl_j->status, GAME_OVER) == 0) {
 		    somebody_flag = 1;
 		}
 	    }
-	    else if (Players(j)->team == Players(killer)->team) {
-		win_score += Players(j)->score;
+	    else if (pl_j->team == kp->team) {
+		win_score += pl_j->score;
 		win_team_members++;
 	    }
 	}
@@ -419,7 +423,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     sound_play_sensors(targ->pos.cx, targ->pos.cy, DESTROY_TARGET_SOUND);
 
     if (targets_remaining > 0) {
-	sc = Rate(Players(killer)->score, CANNON_SCORE)/4;
+	sc = Rate(kp->score, CANNON_SCORE)/4;
 	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
 	if (sc >= 0.01) {
 	    SCORE(killer, sc, targ->pos.cx, targ->pos.cy, "Target: ");
@@ -431,42 +435,44 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	 */
 	if (targetTeamCollision && targets_total < 10) {
 	    sprintf(msg, "%s blew up one of team %d's targets.",
-		    Players(killer)->name, (int) targ->team);
+		    kp->name, (int) targ->team);
 	    Set_message(msg);
 	}
 	return;
     }
 
     sprintf(msg, "%s blew up team %d's %starget.",
-	    Players(killer)->name,
+	    kp->name,
 	    (int) targ->team,
 	    (targets_total > 1) ? "last " : "");
     Set_message(msg);
 
     if (targetKillTeam)
-	Rank_AddTargetKill(Players(killer));
+	Rank_AddTargetKill(kp);
 
     sc  = Rate(win_score, lose_score);
     por = (sc*lose_team_members)/win_team_members;
 
     for (j = 0; j < NumPlayers; j++) {
+	player *pl_j = Players(j);
+
 	if (IS_TANK_IND(j)
-	    || (BIT(Players(j)->status, PAUSE)
-		&& Players(j)->count <= 0)
-	    || (BIT(Players(j)->status, GAME_OVER)
-		&& Players(j)->mychar == 'W'
-		&& Players(j)->score == 0)) {
+	    || (BIT(pl_j->status, PAUSE)
+		&& pl_j->count <= 0)
+	    || (BIT(pl_j->status, GAME_OVER)
+		&& pl_j->mychar == 'W'
+		&& pl_j->score == 0)) {
 	    continue;
 	}
-	if (Players(j)->team == targ->team) {
+	if (pl_j->team == targ->team) {
 	    if (targetKillTeam
 		&& targets_remaining == 0
-		&& !BIT(Players(j)->status, KILLED|PAUSE|GAME_OVER))
-		SET_BIT(Players(j)->status, KILLED);
+		&& !BIT(pl_j->status, KILLED|PAUSE|GAME_OVER))
+		SET_BIT(pl_j->status, KILLED);
 	    SCORE(j, -sc, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
-	else if (Players(j)->team == Players(killer)->team &&
-		 (Players(j)->team != TEAM_NOT_SET || j == killer)) {
+	else if (pl_j->team == kp->team &&
+		 (pl_j->team != TEAM_NOT_SET || j == killer)) {
 	    SCORE(j, por, targ->pos.cx, targ->pos.cy, "Target: ");
 	}
     }
