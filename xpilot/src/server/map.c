@@ -483,6 +483,8 @@ bool Grok_map(void)
 	Find_base_order();
     }
 
+    Realloc_map_objects();
+
 #ifndef	SILENT
     xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
 	     "Team play: %s\n", World.name, World.NumBases, World.width,
@@ -566,6 +568,7 @@ static void shrink(void **pp, size_t size)
 
 #define SHRINK(T,P,N,M) { \
 if ((M) > (N)) { \
+  xpprintf("Shrinking " #P " from %d to %d.\n", (M), (N)); \
   shrink((void **)&(P), (N) * sizeof(T)); \
   M = (N); \
 } } \
@@ -716,8 +719,6 @@ static bool Grok_map_old(void)
     }
 
     Xpmap_find_map_object_teams();
-
-    Realloc_map_objects();
 
     return TRUE;
 }
