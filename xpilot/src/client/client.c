@@ -1051,7 +1051,11 @@ static int init_polymap(void)
 	checks[i].bounds.h = BLOCK_SZ;
     }
 
-    if (Setup->data_url[0])
+    /*
+     * kps - hack.
+     * Player can disable downloading of textures by having texturedWalls off.
+     */
+    if (instruments.showTexturedWalls && Setup->data_url[0])
 	Mapdata_setup(Setup->data_url);
     Colors_init_style_colors();    
 
