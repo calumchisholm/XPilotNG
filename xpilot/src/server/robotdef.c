@@ -1258,7 +1258,7 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	case ITEM_WIDEANGLE:
 	    if (options.maxPlayerShots <= 0
 		|| options.shotLife <= 0
-		|| !options.playerKillings)
+		|| !options.allowPlayerKilling)
 		return ROBOT_HANDY_ITEM;
 	    else
 		return ROBOT_MUST_HAVE_ITEM;
@@ -1266,7 +1266,7 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	case ITEM_MISSILE:
 	    if (options.maxPlayerShots <= 0
 		|| options.shotLife <= 0
-		|| !options.playerKillings)
+		|| !options.allowPlayerKilling)
 		return ROBOT_IGNORE_ITEM;
 	    else
 		return ROBOT_MUST_HAVE_ITEM;
@@ -1276,7 +1276,7 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	    return ROBOT_MUST_HAVE_ITEM;
 
 	case ITEM_LASER:
-	    if (options.playerKillings)
+	    if (options.allowPlayerKilling)
 		return ROBOT_MUST_HAVE_ITEM;
 	    else
 		return ROBOT_HANDY_ITEM;
@@ -2021,8 +2021,8 @@ static void Robot_default_play(player_t *pl)
     }
     if (!evade_checked) {
 	if (Check_robot_evade(pl, mine_i, ship_i)) {
-	    if (options.playerShielding == 0
-		&& options.playerStartsShielded != 0
+	    if (!options.allowShields
+		&& options.playerStartsShielded
 		&& BIT(pl->have, HAS_SHIELD)) {
 		SET_BIT(pl->used, HAS_SHIELD);
 	    }
@@ -2125,8 +2125,8 @@ static void Robot_default_play(player_t *pl)
     }
 
     if (Check_robot_hunt(pl)) {
-	if (options.playerShielding == 0
-	    && options.playerStartsShielded != 0
+	if (!options.allowShields
+	    && options.playerStartsShielded
 	    && BIT(pl->have, HAS_SHIELD)) {
 	    SET_BIT(pl->used, HAS_SHIELD);
 	}
@@ -2136,8 +2136,8 @@ static void Robot_default_play(player_t *pl)
     if (Robot_default_play_check_map(pl) == 1)
 	return;
 
-    if (options.playerShielding == 0
-	&& options.playerStartsShielded != 0
+    if (!options.allowShields
+	&& options.playerStartsShielded
 	&& BIT(pl->have, HAS_SHIELD)) {
 	SET_BIT(pl->used, HAS_SHIELD);
     }

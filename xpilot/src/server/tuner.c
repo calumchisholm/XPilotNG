@@ -82,13 +82,13 @@ void tuner_minrobots(world_t *world)
 	options.maxRobots = options.minRobots;
 }
 
-void tuner_playershielding(world_t *world)
+void tuner_allowshields(world_t *world)
 {
     int i;
 
     Set_world_rules(world);
 
-    if (options.playerShielding) {
+    if (options.allowShields) {
 	SET_BIT(DEF_HAVE, HAS_SHIELD);
 
 	for (i = 0; i < NumPlayers; i++) {
@@ -116,7 +116,7 @@ void tuner_playerstartsshielded(world_t *world)
 {
     UNUSED_PARAM(world);
 
-    if (options.playerShielding)
+    if (options.allowShields)
 	/* Doesn't make sense to turn off when shields are on. */
 	options.playerStartsShielded = true;
 }

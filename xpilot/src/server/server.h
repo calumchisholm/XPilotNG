@@ -160,10 +160,10 @@ extern struct options {
     int 	contactPort;
     char	*serverHost;
     char	*greeting;
-    bool	crashWithPlayer;
-    bool	bounceWithPlayer;
-    bool	playerKillings;
-    bool	playerShielding;
+    bool	allowPlayerCrashes;
+    bool	allowPlayerBounces;
+    bool	allowPlayerKilling;
+    bool	allowShields;
     bool	playerStartsShielded;
     bool	shotsWallBounce;
     bool	ballsWallBounce;

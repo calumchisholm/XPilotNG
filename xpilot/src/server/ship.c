@@ -413,7 +413,7 @@ void Tank_handle_detach(player_t *pl)
     tank->have = DEF_HAVE;
     tank->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
 
-    if (!options.playerShielding) {
+    if (!options.allowShields) {
 	tank->shield_time = 30 * 12;
 	tank->have |= HAS_SHIELD;
     }

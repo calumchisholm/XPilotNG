@@ -316,10 +316,10 @@ void Set_world_rules(world_t *world)
     static rules_t rules;
 
     rules.mode =
-      ((options.crashWithPlayer ? CRASH_WITH_PLAYER : 0)
-       | (options.bounceWithPlayer ? BOUNCE_WITH_PLAYER : 0)
-       | (options.playerKillings ? PLAYER_KILLINGS : 0)
-       | (options.playerShielding ? PLAYER_SHIELDING : 0)
+      ((options.allowPlayerCrashes ? CRASH_WITH_PLAYER : 0)
+       | (options.allowPlayerBounces ? BOUNCE_WITH_PLAYER : 0)
+       | (options.allowPlayerKilling ? PLAYER_KILLINGS : 0)
+       | (options.allowShields ? PLAYER_SHIELDING : 0)
        | (options.limitedVisibility ? LIMITED_VISIBILITY : 0)
        | (options.limitedLives ? LIMITED_LIVES : 0)
        | (options.teamPlay ? TEAM_PLAY : 0)

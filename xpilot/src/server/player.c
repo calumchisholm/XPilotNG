@@ -196,7 +196,7 @@ void Go_home(player_t *pl)
 
     if (options.playerStartsShielded) {
 	SET_BIT(pl->used, HAS_SHIELD);
-	if (options.playerShielding == 0) {
+	if (!options.allowShields) {
 	    pl->shield_time = SHIELD_TIME;
 	    SET_BIT(pl->have, HAS_SHIELD);
 	}

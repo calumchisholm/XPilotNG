@@ -35,7 +35,7 @@ void tuner_shipmass(world_t *world);
 void tuner_ballmass(world_t *world);
 void tuner_maxrobots(world_t *world);
 void tuner_minrobots(world_t *world);
-void tuner_playershielding(world_t *world);
+void tuner_allowshields(world_t *world);
 void tuner_playerstartsshielded(world_t *world);
 void tuner_worldlives(world_t *world);
 void tuner_cannonsmartness(world_t *world);
