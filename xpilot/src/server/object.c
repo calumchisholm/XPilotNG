@@ -75,11 +75,9 @@ void Object_free_ind(int ind)
 	Object_decr_count();
 	Obj[ind] = Obj[ObjCount];
 	Obj[ObjCount] = obj;
-    }
-    else {
+    } else
 	warn("Cannot free object %d, when count = %d, and total = %d !",
 	     ind, ObjCount, MAX_TOTAL_SHOTS);
-    }
 }
 
 void Object_free_ptr(object *obj)
@@ -92,9 +90,8 @@ void Object_free_ptr(object *obj)
 	    break;
 	}
     }
-    if (i < 0) {
+    if (i < 0)
 	warn("Could NOT free object!");
-    }
 }
 
 static anyobject *objArray;
@@ -129,7 +126,7 @@ void Free_shots(void)
 
 
 /* kps debug hack */
-char *Object_typename(object *obj)
+const char *Object_typename(object *obj)
 {
     int type;
 

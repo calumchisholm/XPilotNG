@@ -463,7 +463,7 @@ void Object_free_ind(int ind);
 void Object_free_ptr(object *obj);
 void Alloc_shots(int number);
 void Free_shots(void);
-char *Object_typename(object *obj);
+const char *Object_typename(object *obj);
 
 /*
  * Prototypes for polygon.c
