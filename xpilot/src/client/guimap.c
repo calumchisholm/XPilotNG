@@ -1184,18 +1184,17 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 {
     static XPoint points[10000];
 
-    int j,x,y;
+    int j, x, y, sindex, width, did_fill;
     ipos ship;
     xp_polygon_t polygon;
     polygon_style_t style;
-    bool textured, filled, outline;
+    bool textured, filled;
 
     polygon = polygons[i];
     style = polygon_styles[polygon.style];
 
     if (!style.visible) return;
 
-    outline = BIT(instruments, SHOW_OUTLINE_WORLD);
     textured = BIT(instruments, SHOW_TEXTURED_WALLS) && blockBitmaps;
     filled = BIT(instruments, SHOW_FILLED_WORLD);
 
@@ -1213,83 +1212,80 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     points[j].x = points[0].x;
     points[j].y = points[0].y;
 
-    if (!outline && (filled || textured || style.method != NOFILL)) {
-        if (textured || style.method == TEXTURED) {
-	    xp_bitmap_t *bmp =
-		Bitmap_get(p_draw,
-			   textured ? BM_WALL_TEXTURE : style.texture, 0);
-	    if (bmp != NULL) {
-		XSetTile(dpy, gc, bmp->bitmap);
-                /*
-		XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x),
-			     WINSCALE(realWorld.y));
-                */
-                XSetTSOrigin(dpy, gc, WINSCALE(polygon.bounds.x) - ship.x,
-                             ship.y - WINSCALE(polygon.bounds.y +
-                                               polygon.bounds.h));
-		XSetFillStyle(dpy, gc, FillTiled);
-	    }
+    did_fill = 0;
+    if ((filled || textured) && style.method != NOFILL) {
+        if (textured && style.method == TEXTURED) {
+	    xp_bitmap_t *bmp = Bitmap_get(p_draw, style.texture, 0);
+	    if (bmp == NULL)
+		goto notexture; /* Print an error here? */
+	    XSetTile(dpy, gc, bmp->bitmap);
+	    /*
+	      XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x),
+	      WINSCALE(realWorld.y));
+	    */
+	    XSetTSOrigin(dpy, gc, WINSCALE(polygon.bounds.x) - ship.x,
+		       ship.y - WINSCALE(polygon.bounds.y + polygon.bounds.h));
+	    XSetFillStyle(dpy, gc, FillTiled);
         } else {
+	notexture:
             XSetFillStyle(dpy, gc, FillSolid);
-            SET_FG(colors[filled ? wallColor : style.color].pixel);
+            SET_FG(blockBitmaps ? style.color : colors[wallColor].pixel);
         }
+	did_fill = 1;
 	rd.fillPolygon(dpy, p_draw, gc, points, polygon.num_points,
                        Nonconvex, CoordModeOrigin);
     }
     XSetFillStyle(dpy, gc, FillSolid);
 
-    if (!filled) {
-        int sindex = style.def_edge_style;
+    sindex = style.def_edge_style;
 
-        if (polygon.edge_styles == NULL) {
-            /* No special edges */
+    if (polygon.edge_styles == NULL) { /* No special edges */
+	width = edge_styles[sindex].width;
+	if (width != -1 || !did_fill) {  /* did_fill to avoid invisibility */
+	    if (width == -1)
+		width = 0;
+	    XSetLineAttributes(dpy, gc, WINSCALE(width),
+		edge_styles[sindex].style, CapButt, JoinMiter);
 
-            if (edge_styles[sindex].width != -1) {
+	    if (blockBitmaps)
+		SET_FG(edge_styles[sindex].color);
+	    else
+		SET_FG(colors[wallColor].pixel);
 
-                XSetLineAttributes(
-		    dpy, gc, WINSCALE(edge_styles[sindex].width),
-		    edge_styles[sindex].style, CapButt, JoinMiter);
+	    rd.drawLines(dpy, p_draw, gc, points,
+			 polygon.num_points + 1, CoordModeOrigin);
+	}
+    }
+    else {
+	/* This polygon has special edges */
 
-                if (blockBitmaps)
-                    SET_FG(edge_styles[sindex].color);
-                else
-                    SET_FG(colors[wallColor].pixel);
+	int begin;
 
-                rd.drawLines(dpy, p_draw, gc, points,
-                     polygon.num_points + 1, CoordModeOrigin);
-            }
+	for (j = 0; j < polygon.num_points;) {
+	    begin = j;
+	    sindex = polygon.edge_styles[j++];
 
-        } else {
-            /* This polygon has special edges */
+	    while ((polygon.edge_styles[j] == sindex)
+		   && (j < polygon.num_points - 1)) j++;
 
-            int begin;
+	    /* Style 0 means internal edges which are never shown */
+	    width = edge_styles[sindex].width;
+	    if (sindex != 0 && (edge_styles[sindex].width != -1 || !did_fill)){
+		if (width == -1)
+		    width = 0;
+		XSetLineAttributes(dpy, gc, WINSCALE(width),
+			      edge_styles[sindex].style, CapButt, JoinMiter);
 
-            for (j = 0; j < polygon.num_points;) {
-                begin = j;
-                sindex = polygon.edge_styles[j++];
+		if (blockBitmaps)
+		    SET_FG(edge_styles[sindex].color);
+		else
+		    SET_FG(colors[wallColor].pixel);
 
-                while ((polygon.edge_styles[j] == sindex)
-                       && (j < polygon.num_points - 1)) j++;
-
-                if (sindex == -1) sindex = style.def_edge_style;
-
-		/* Style 0 means internal edges which are never shown */
-                if (sindex != 0 && edge_styles[sindex].width != -1) {
-                    XSetLineAttributes(dpy, gc,
-                         WINSCALE(edge_styles[sindex].width),
-                         edge_styles[sindex].style, CapButt, JoinMiter);
-
-                    if (blockBitmaps)
-                        SET_FG(edge_styles[sindex].color);
-                    else
-                        SET_FG(colors[wallColor].pixel);
-
-                    rd.drawLines
-                        (dpy, p_draw, gc,
-                         points + begin, j + 1 - begin,
-                         CoordModeOrigin);
-                }
-            }
+		rd.drawLines
+		    (dpy, p_draw, gc,
+		     points + begin, j + 1 - begin,
+		     CoordModeOrigin);
+	    }
         }
     }
     XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinMiter);
