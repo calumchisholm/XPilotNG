@@ -28,6 +28,8 @@ xpilottextures_DATA = \
 	holder1.ppm \
 	holder2.ppm \
 	logo.ppm \
+	metabtndown.png \
+	metabtnup.png \
 	metalite.ppm \
 	meter.ppm \
 	mine_other.ppm \
