@@ -27,7 +27,6 @@
 /* kps - hack */
 extern void Radar_show_target(int x, int y);
 extern void Radar_hide_target(int x, int y);
-extern void Add_message(char *message);
 extern int Bitmap_add_std_textures(void);
 extern void Play_beep(void);
 extern void Quit(void);

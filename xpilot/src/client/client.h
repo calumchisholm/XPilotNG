@@ -89,6 +89,13 @@
 
 #define FUEL_NOTIFY_TIME	3.0
 
+#define MAX_MSGS		15	/* Max. messages displayed ever */
+#define MAX_HIST_MSGS		128	/* Max. messages in history */
+
+#define MSG_LIFE_TIME		120.0	/* Seconds */
+#define MSG_FLASH_TIME		105.0	/* Old messages have life time less
+					   than this */
+
 /*
  * Macros to manipulate dynamic arrays.
  */
@@ -394,6 +401,37 @@ typedef struct {
     bool	keep_emphasizing;
 } selection_t;
 
+/* typedefs begin */
+typedef enum {
+    BmsNone = 0,
+    BmsBall,
+    BmsSafe,
+    BmsCover,
+    BmsPop
+} msg_bms_t;
+
+typedef struct {
+    char		txt[MSG_LEN];
+    short		len;
+    /*short		pixelLen;*/
+    double		lifeTime;
+    msg_bms_t		bmsinfo;
+} message_t;
+/* typedefs end */
+
+extern message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
+/* store incoming messages while a cut is pending */
+extern message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
+/* history of the talk window */
+extern char	*HistoryMsg[MAX_HIST_MSGS];
+
+extern int	maxLinesInHistory;	/* number of lines to save in history */
+/* provide cut&paste and message history */
+extern selection_t	selection;	/* selection in talk or draw window */
+extern int	maxMessages;
+extern int	messagesToStdout;
+extern bool	selectionAndHistory;
+
 extern int      oldServer; /* Compatibility mode for old block-based servers */
 extern ipos	FOOpos;
 extern ipos	FOOvel;
@@ -509,15 +547,6 @@ extern char 	audioServer[MAX_CHARS];	/* audio server */
 extern int 	maxVolume;		/* maximum volume (in percent) */
 #endif /* SOUND */
 
-extern int	maxLinesInHistory;	/* number of lines to save in history */
-#define MAX_HIST_MSGS	128		/* maximum */
-
-#ifndef  _WINDOWS
-/* provide cut&paste and message history */
-extern	selection_t	selection;	/* selection in talk or draw window */
-extern	char		*HistoryMsg[MAX_HIST_MSGS];
-#endif
-
 /* mapdata accessible to outside world */
 
 extern int	        num_playing_teams;
@@ -592,6 +621,8 @@ extern long		start_loops, end_loops;
 extern long		time_left;
 
 
+void Add_message(char *message);
+void Add_pending_messages(void);
 double Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, double *damage);
 int Target_by_index(int ind, int *xp, int *yp, int *dead_time, double *damage);

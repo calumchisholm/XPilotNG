@@ -30,8 +30,6 @@
 #define MAX_COLORS		16	/* Max. switched colors ever */
 #define MAX_COLOR_LEN		32	/* Max. length of a color name */
 
-#define MAX_MSGS		15	/* Max. messages displayed ever */
-
 #define NUM_DASHES		2
 #define NUM_CDASHES		2
 #define DASHES_LENGTH		12
@@ -44,31 +42,8 @@
 
 #define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
 
-#define MSG_LIFE_TIME		120.0	/* Seconds */
-#define MSG_FLASH_TIME		105.0	/* Old messages have life time less
-					   than this */
-
 #define TITLE_DELAY		500	/* Should probably change to seconds */
 /* constants end */
-
-
-/* typedefs begin */
-typedef enum {
-    BmsNone = 0,
-    BmsBall,
-    BmsSafe,
-    BmsCover,
-    BmsPop
-} msg_bms_t;
-
-typedef struct {
-    char		txt[MSG_LEN];
-    short		len;
-    short		pixelLen;
-    double		lifeTime;
-    msg_bms_t		bmsinfo;
-} message_t;
-/* typedefs end */
 
 
 /* which index a message actually has (consider SHOW_REVERSE_SCROLL) */
@@ -271,9 +246,6 @@ extern int	clientFPS;
 extern time_t	currentTime;
 extern bool	newSecond;
 extern double	timePerFrame;
-extern int	maxMessages;
-extern int	messagesToStdout;
-extern bool	selectionAndHistory;
 
 extern double	scaleFactor;	/* scale the draw (main playfield) window */
 extern double	scaleFactor_s;
@@ -297,8 +269,6 @@ extern void	Init_scale_array(void);
  */
 
 void Init_paint(void);
-void Add_message(char *message);
-
 void Paint_item_symbol(int type, Drawable d, GC mygc,
 		       int x, int y, int color);
 void Paint_item(int type, Drawable d, GC mygc, int x, int y);
@@ -323,7 +293,6 @@ void Paint_meters(void);
 void Paint_HUD(void);
 int  Get_message(int *pos, char *message, int req_length, int key);
 void Paint_messages(void);
-void Add_pending_messages(void);
 void Paint_recording(void);
 void Paint_client_fps(void);
 void Paint_frame(void);

@@ -66,9 +66,6 @@ char xinit_version[] = VERSION;
 #define ABOUT_WINDOW_WIDTH	600
 #define ABOUT_WINDOW_HEIGHT	700
 
-extern message_t	*TalkMsg[], *GameMsg[];
-extern message_t	*TalkMsg_pending[], *GameMsg_pending[];
-
 /*
  * Globals.
  */

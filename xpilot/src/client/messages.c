@@ -21,22 +21,35 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* kps - this file should be made X11 independent */
-
-#include "xpclient_x11.h"
+#include "xpclient.h"
 
 char messages_version[] = VERSION;
 
 
 message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
-/* store incoming messages while a cut is pending */
 message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
-/* history of the talk window */
 char		*HistoryMsg[MAX_HIST_MSGS];
+
+int	maxMessages;		/* Max. number of messages to display */
+int	messagesToStdout;	/* Send messages to standard output */
+bool	selectionAndHistory;
 
 bool ball_shout = false;
 bool need_cover = false;
 
+bool roundend = false;
+int killratio_kills = 0;
+int killratio_deaths = 0;
+int killratio_totalkills = 0;
+int killratio_totaldeaths = 0;
+int ballstats_cashes = 0;
+int ballstats_replaces = 0;
+int ballstats_teamcashes = 0;
+int ballstats_lostballs = 0;
+bool played_this_round = false;
+int rounds_played = 0;
+
+static void Delete_pending_messages(void);
 
 /*
  * Little less ugly message scan hack by Samaseon (ksoderbl@cc.hut.fi)
@@ -270,7 +283,7 @@ static void Msg_scan_death(int id)
 
     for (i = 0; i < num_bases; i++) {
 	if (bases[i].id == id) {
-	    bases[i].deathtime = loops;
+	    bases[i].deathtime = end_loops;
 	    break;
 	}
     }
@@ -642,8 +655,7 @@ static bool Msg_is_from_our_team(char *message, char **bracket)
 void Add_message(char *message)
 {
     int			i;
-    size_t		len;
-    message_t		*tmp, **msg_set;
+    message_t		*msg, **msg_set;
     bool		is_game_msg = false, want_scan = false;
     msg_bms_t		bmsinfo = BmsNone;
     char		*bracket = NULL;
@@ -727,17 +739,15 @@ void Add_message(char *message)
     } /* talk messages */
 #endif
 
-    tmp = msg_set[maxMessages - 1];
+    msg = msg_set[maxMessages - 1];
     for (i = maxMessages - 1; i > 0; i--)
 	msg_set[i] = msg_set[i - 1];
 
-    msg_set[0] = tmp;
-
-    msg_set[0]->lifeTime = MSG_LIFE_TIME;
-    strlcpy(msg_set[0]->txt, message, MSG_LEN);
-    len = strlen(message);
-    msg_set[0]->len = len;
-    msg_set[0]->bmsinfo = bmsinfo;
+    msg_set[0] = msg;
+    msg->lifeTime = MSG_LIFE_TIME;
+    strlcpy(msg->txt, message, MSG_LEN);
+    msg->len = strlen(message);
+    msg->bmsinfo = bmsinfo;
 
 #ifndef _WINDOWS
     /*
@@ -772,9 +782,6 @@ void Add_message(char *message)
     }
 #endif
 
-    msg_set[0]->pixelLen = XTextWidth(messageFont, msg_set[0]->txt,
-				      msg_set[0]->len);
-
     /* Print messages to standard output.
      */
     if (messagesToStdout == 2 ||
@@ -793,6 +800,7 @@ static void Delete_pending_messages(void)
 {
     message_t* msg;
     int i;
+
     if (!selectionAndHistory)
 	return;
 

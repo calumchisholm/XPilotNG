@@ -28,18 +28,6 @@ char paint_version[] = VERSION;
 /*
  * Globals.
  */
-bool roundend = false;
-int killratio_kills = 0;
-int killratio_deaths = 0;
-int killratio_totalkills = 0;
-int killratio_totaldeaths = 0;
-int ballstats_cashes = 0;
-int ballstats_replaces = 0;
-int ballstats_teamcashes = 0;
-int ballstats_lostballs = 0;
-bool played_this_round = false;
-int rounds_played = 0;
-
 ipos	world;
 ipos	realWorld;
 
@@ -90,8 +78,6 @@ Pixmap	drawPixmap;		/* Saved pixmap for the drawing */
 				/* area (monochromes use this) */
 Window	playersWindow;		/* Player list window */
 				/* monochromes) */
-int	maxMessages;		/* Max. number of messages to display */
-int	messagesToStdout;	/* Send messages to standard output */
 Window	aboutWindow;
 Window	about_close_b;		/* About window's close button */
 Window	about_next_b;		/* About window's next button */
@@ -125,7 +111,7 @@ int		clientFPS = 1;	/* How many fps we actually paint */
 static time_t	old_time = 0;	/* Previous value of time */
 time_t		currentTime;	/* Current value of time() */
 bool		newSecond = false; /* True if time() incremented this frame */
-static int	frame_count = 0;/* Used to estimate client fps */
+static int	fps_estimate = 0;/* Used to estimate client fps */
 double		timePerFrame = 0.0;/* How much real time proceeds per frame */
 static double	time_counter = 0.0;
 
@@ -236,7 +222,7 @@ void Paint_frame(void)
 	warn("Start neq. End (%ld,%ld,%ld)", start_loops, end_loops, loops);
     loops = end_loops;
 
-    frame_count++;
+    fps_estimate++;
 
     currentTime = time(NULL);
     if (currentTime != old_time) {
@@ -249,10 +235,10 @@ void Paint_frame(void)
      * If time() changed from previous value, assume one second has passed.
      */
     if (newSecond) {
-	clientFPS = frame_count;
+	clientFPS = fps_estimate;
 	/* kps - improve */
 	recordFPS = clientFPS;
-	frame_count = 0;
+	fps_estimate = 0;
 	/*
 	 * I've changed some places that used FPS (from setup) in client
 	 * to use clientFPS, to allow client to adapt to server changing

@@ -68,8 +68,6 @@ static int		history_pos = 0;
 selection_t		selection;
 bool			save_talk_str = false; /* see Get_msg_from_history */
 
-extern message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
-
 static void Talk_create_window(void)
 {
     /*
@@ -1384,7 +1382,8 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	    c2.x	= 0;
 	}
 	/* cut started at end of line; jump to next if possible */
-	if ((c1.x > TalkMsg[TALK_MSG_SCREENPOS(last_msg_index, c1.y)]->pixelLen
+	ptr = TalkMsg[TALK_MSG_SCREENPOS(last_msg_index, c1.y)];
+	if ((c1.x > XTextWidth(messageFont, ptr->txt, ptr->len)
 	    || c1.x_off == 1)  &&  c1.y < c2.y) {
 	    c1.x	= 0;
 	    c1.y	+= 1;
@@ -1395,7 +1394,6 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	/*
 	 * find the indices in the talk string
 	 */
-	ptr = TalkMsg[TALK_MSG_SCREENPOS(last_msg_index,c1.y)];
 	c1.str_index = 0;
 	if (c1.x_off == 1)
 	    c1.str_index = ptr->len - 1;

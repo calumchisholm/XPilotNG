@@ -958,10 +958,7 @@ void Paint_messages(void)
 	    rd.drawString(dpy, drawPixmap, messageGC, x, y, msg->txt, len);
 	}
 
-	if (len < msg->len)
-	    width = XTextWidth(messageFont, msg->txt, len);
-	else
-	    width = msg->pixelLen;
+	width = XTextWidth(messageFont, msg->txt, MIN(len, msg->len));
     }
 }
 
