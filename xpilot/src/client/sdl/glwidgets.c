@@ -577,7 +577,7 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
     ScrollbarWidget *wid_info = (ScrollbarWidget *)tmp->wid_info;
     GLWidget *slide = wid_info->slide;
     
-    Sint16 *coord1, *coord2, min, max, size, move;
+    Sint16 *coord1, coord2, min, max, size, move;
    
     switch (wid_info->dir) {
     	case SB_VERTICAL:
@@ -602,12 +602,12 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
     wid_info->oldmoves += move;
     
     if (wid_info->oldmoves > 0) {
-    	*coord2 = MIN(max-size,*coord1+wid_info->oldmoves);
+    	coord2 = MIN(max-size,*coord1+wid_info->oldmoves);
     } else if (wid_info->oldmoves < 0) {
-    	*coord2 = MAX(min,*coord1+wid_info->oldmoves);
+    	coord2 = MAX(min,*coord1+wid_info->oldmoves);
     }
-    wid_info->oldmoves -= *coord2 - *coord1;
-    *coord1 = *coord2;
+    wid_info->oldmoves -= coord2 - *coord1;
+    *coord1 = coord2;
 
     GLfloat oldpos = wid_info->pos;
     wid_info->pos = ((GLfloat)(*coord1 - min))/((GLfloat)(max - min));
