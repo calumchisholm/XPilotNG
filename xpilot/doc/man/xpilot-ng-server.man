@@ -216,9 +216,6 @@ Height of the world in pixels.
 \fB\-mapFileName\fR or map <string>
 .IP
 The filename of the map to use.
-Or "wild" if you want a map by The Wild Map Generator.
-The geometry of a "wild" map is given by the \fB\-mapWidth\fR
-and the \fB\-mapHeight\fR options.
 [ Flags: command, defaults, invisible ]
 .HP
 \fB\-mapName\fR <string>
@@ -532,12 +529,6 @@ Also influences use of weapons if cannonsUseItems is on.
 .IP
 Do cannons use items?
 .HP
-\-/+cannonsDefend
-.IP
-Do cannons actively use defensive items like emergency shields and
-phasing devices?
-This only works if cannons are actually allowed to use items.
-.HP
 \-/+cannonFlak or cannonAAA
 .IP
 Do cannons fire flak or normal bullets?
@@ -546,6 +537,22 @@ Do cannons fire flak or normal bullets?
 .IP
 How many ticks do cannons stay dead?
 Replaces option cannonDeadTime.
+.HP
+\fB\-cannonShotSpeed\fR <real>
+.IP
+Speed of cannon shots.
+.HP
+\fB\-minCannonShotLife\fR <real>
+.IP
+Minimum life of cannon shots, measured in ticks.
+If this is set to a value greater than maxCannonShotLife, then
+maxCannonShotLife will be set to that same value.
+.HP
+\fB\-maxCannonShotLife\fR <real>
+.IP
+Maximum life of cannon shots, measured in ticks.
+If this is set to a value less than minCannonShotLife, then
+minCannonShotLife will be set to that same value.
 .HP
 \-/+keepShots
 .IP
@@ -976,6 +983,10 @@ Multiplication factor to scale score for self\-destructing.
 Multiplication factor to scale score for being killed by asteroids
 or other objects without an owner.
 .HP
+\fB\-cannonKillScoreMult\fR <real>
+.IP
+Multiplication factor to scale score for being killed by cannons.
+.HP
 \fB\-movingItemProb\fR <real>
 .IP
 Probability for an item to appear as moving.
@@ -1328,6 +1339,11 @@ The duration of the game in minutes (aka. pizza mode).
 Should paused players keep their bases?
 Can only be used on teamplay maps for now.
 .HP
+\fB\-survivalScore\fR <real>
+.IP
+Multiplicator for quadratic score increase over time
+survived with lowered shield
+.HP
 \fB\-pauseTax\fR <real>
 .IP
 How many points to subtract from pausing players each second.
@@ -1607,7 +1623,6 @@ This option is read only.
 \fB\-cellGetObjectsThreshold\fR or cellThreshold <integer>
 .IP
 Use Cell_get_objects if there is this many objects or more.
-[ Flags: command ]
 .IP
 The probabilities are in the range [0.0\-1.0] and they refer to the
 probability that an event will occur in a block per second.
