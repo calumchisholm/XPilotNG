@@ -303,6 +303,9 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 	 * owner is not.
 	 */
 	if (ball->ball_treasure->team != options.specialBallTeam /* kps - ? */
+	    /* khs - "special" ball and "special" treasure have the same "team" */
+	    /* the player/team that gets this ball into this treasure scores    */
+            /* against all other teams, therefore the ball must be able to hit - ok? */
 	    && ball->ball_treasure->team == gp->team
 	    && Player_by_id(ball->ball_owner)->team != gp->team)
 	    return false;
