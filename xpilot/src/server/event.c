@@ -114,7 +114,7 @@ bool team_dead(int team)
 
     for (i = 0; i < NumPlayers; i++) {
 	if (Players[i]->team == team &&
-	    BIT(Players[i]->status, PLAYING|GAME_OVER) == PLAYING) {
+	    BIT(Players[i]->status, PLAYING|GAME_OVER|PAUSE) == PLAYING) {
 	    alive = true;
 	    break;
 	}
@@ -135,29 +135,24 @@ static bool Player_lock_allowed(int ind, int lock)
     }
 
     /* if we are actively playing then we can lock since we are not viewing. */
-    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER) == PLAYING) {
+    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	return true;
-    }
 
     /* if there is no team play then we can always lock on anyone. */
-    if (!BIT(World.rules->mode, TEAM_PLAY)) {
+    if (!BIT(World.rules->mode, TEAM_PLAY))
 	return true;
-    }
 
     /* we can always lock on players from our own team. */
-    if (TEAM(ind, lock)) {
+    if (TEAM(ind, lock))
 	return true;
-    }
 
     /* if lockOtherTeam is true then we can always lock on other teams. */
-    if (lockOtherTeam) {
+    if (lockOtherTeam)
 	return true;
-    }
 
     /* if our own team is dead then we can lock on anyone. */
-    if (team_dead(pl->team)) {
+    if (team_dead(pl->team))
 	return true;
-    }
 
     /* can't find any reason why this lock should be allowed. */
     return false;
@@ -249,7 +244,6 @@ void Pause_player(int ind, int onoff)
 	strcpy(pl->rank->entry.logout, "paused");
 	if (BIT(pl->have, HAS_BALL))
 	    Detach_ball(ind, -1);
-	/*Player_lock_closest(ind, 0);*/ /* kps - ng wants this */
     }
     else if (onoff == 0 && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
 	if (pl->count <= 0) {
