@@ -886,12 +886,11 @@ void Quit(void)
   /* the option may have been toggled in game to  */
   /* off so we cant trust that                    */
 
-  if (pre_exists) {
-    XChangePointerControl(dpy, True, True, pre_acc_num,
-			  pre_acc_denom, pre_threshold);
-  }
-
     if (dpy != NULL) {
+      if (pre_exists) {
+	XChangePointerControl(dpy, True, True, pre_acc_num,
+			      pre_acc_denom, pre_threshold);
+      }
 	XAutoRepeatOn(dpy);
 	Colors_cleanup();
 	XCloseDisplay(dpy);
