@@ -2713,13 +2713,14 @@ void Move_object(object *obj)
     return;
 }
 
+bool in_move_player = false;
 
 void Move_player(player *pl)
 {
     clpos  pos;
     move_t mv;
     struct collans ans;
-    double fric;
+    double fric = friction;
     vector oldv;
     world_t *world = &World;
 
@@ -2741,12 +2742,26 @@ void Move_player(player *pl)
     /* Figure out which friction to use. */
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	fric = friction;
-    else {
-	/*
-	 * kps - insert code here which checks if we are on a
-	 * friction polygon and use it's friction?
-	 */
-	fric = friction;
+    else if (world->NumFrictionAreas > 0) {
+	int group, i;
+
+	in_move_player = true;
+	
+	group = is_inside(pl->pos.cx, pl->pos.cy, NONBALL_BIT, (object *)pl);
+	if (group != NO_GROUP) {
+	    for (i = 0; i < world->NumFrictionAreas; i++) {
+		frictionarea_t *fa = FrictionAreas(world, i);
+
+		if (fa->group == group) {
+		     /* kps - this should depend on gamespeed */
+		    fric = fa->friction;
+		    break;
+		}
+
+	    }
+	}
+
+	in_move_player = false;
     }
 
     /* Velocity vector might change as a result of friction and options.coriolis. */

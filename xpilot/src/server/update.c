@@ -919,10 +919,10 @@ static void Traverse_wormhole(player *pl)
     assert(pl->wormHoleHit != -1);
 
     if (wh_dest != pl->wormHoleHit) {
-	world->wormholes[pl->wormHoleHit].lastdest = wh_dest;
+	wh_hit->lastdest = wh_dest;
 	if (!world->wormholes[wh_dest].temporary)
-	    world->wormholes[pl->wormHoleHit].countdown
-		= (options.wormTime ? options.wormTime : WORMCOUNT);
+	    wh_hit->countdown
+		= options.wormTime > 0 ? options.wormTime : WORMCOUNT;
     }
 
     CLR_BIT(pl->status, WARPING);

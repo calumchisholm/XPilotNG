@@ -393,51 +393,6 @@ extern struct options {
 extern shape_t		ball_wire;
 extern shape_t		wormhole_wire;
 
-static inline base_t *Bases(world_t *world, int ind)
-{
-    return &world->bases[ind];
-}
-static inline fuel_t *Fuels(world_t *world, int ind)
-{
-    return &world->fuels[ind];
-}
-static inline cannon_t *Cannons(world_t *world, int ind)
-{
-    return &world->cannons[ind];
-}
-static inline check_t *Checks(world_t *world, int ind)
-{
-    return &world->checks[ind];
-}
-static inline grav_t *Gravs(world_t *world, int ind)
-{
-    return &world->gravs[ind];
-}
-static inline target_t *Targets(world_t *world, int ind)
-{
-    return &world->targets[ind];
-}
-static inline treasure_t *Treasures(world_t *world, int ind)
-{
-    return &world->treasures[ind];
-}
-static inline wormhole_t *Wormholes(world_t *world, int ind)
-{
-    return &world->wormholes[ind];
-}
-static inline asteroid_concentrator_t *AsteroidConcs(world_t *world, int ind)
-{
-    return &world->asteroidConcs[ind];
-}
-static inline item_concentrator_t *ItemConcs(world_t *world, int ind)
-{
-    return &world->itemConcs[ind];
-}
-static inline team_t *Teams(world_t *world, int team)
-{
-    return &world->teams[team];
-}
-
 /* determine if a block is one of SPACE_BLOCKS */
 #define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
 
@@ -528,6 +483,7 @@ int World_place_treasure(world_t *world, clpos pos, int team, bool empty);
 int World_place_wormhole(world_t *world, clpos pos, wormType type);
 int World_place_item_concentrator(world_t *world, clpos pos);
 int World_place_asteroid_concentrator(world_t *world, clpos pos);
+int World_place_frictionarea(world_t *world, double fric);
 
 void World_add_temporary_wormholes(world_t *world, clpos pos1, clpos pos2);
 void Wormhole_line_init(void);
@@ -627,6 +583,8 @@ void World_remove_target(world_t *world, target_t *targ);
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
 void World_remove_wormhole(world_t *world, wormhole_t *wormhole);
+
+bool Frictionarea_hitfunc(group_t *groupptr, move_t *move);
 
 void Team_immunity_init(void);
 void Hitmasks_init(void);
@@ -1007,7 +965,7 @@ int P_start_wormhole(int wormhole_ind);
 void P_end_wormhole(void);
 void P_start_decor(void);
 void P_end_decor(void);
-int P_start_frictionarea(void);
+int P_start_frictionarea(int area_ind);
 void P_end_frictionarea(void);
 int P_get_bmp_id(const char *s);
 int P_get_edge_id(const char *s);

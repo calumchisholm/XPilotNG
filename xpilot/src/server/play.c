@@ -677,6 +677,18 @@ void World_remove_wormhole(world_t *world, wormhole_t *wormhole)
     World_set_block(world, blk, wormhole->lastblock);
 }
 
+/* kps - this is really ugly */
+extern bool in_move_player;
+
+bool Frictionarea_hitfunc(group_t *groupptr, move_t *move)
+{
+    (void)groupptr; (void)move;
+
+    if (in_move_player)
+	return true;
+    return false;
+}
+
 /*
  * Handling of group properties
  */

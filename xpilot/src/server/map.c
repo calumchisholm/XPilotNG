@@ -72,6 +72,8 @@ static void Realloc_map_objects(world_t *world)
 	   world->NumItemConcs, world->MaxItemConcs);
     SHRINK(asteroid_concentrator_t, world->asteroidConcs,
 	   world->NumAsteroidConcs, world->MaxAsteroidConcs);
+    SHRINK(frictionarea_t, world->frictionAreas,
+	   world->NumFrictionAreas, world->MaxFrictionAreas);
 }
 
 int World_place_cannon(world_t *world, clpos pos, int dir, int team)
@@ -242,6 +244,17 @@ int World_place_grav(world_t *world, clpos pos, double force, int type)
     return ind;
 }
 
+int World_place_frictionarea(world_t *world, double fric)
+{
+    frictionarea_t t;
+    int ind = world->NumFrictionAreas;
+
+    t.friction = fric;
+    STORE(frictionarea_t, world->frictionAreas,
+	  world->NumFrictionAreas, world->MaxFrictionAreas, t);
+    return ind;
+}
+
 void World_free(world_t *world)
 {
     XFREE(world->block);
@@ -254,6 +267,7 @@ void World_free(world_t *world)
     XFREE(world->wormholes);
     XFREE(world->itemConcs);
     XFREE(world->asteroidConcs);
+    XFREE(world->frictionAreas);
 }
 
 static void World_alloc(world_t *world)

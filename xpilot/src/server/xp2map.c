@@ -379,14 +379,16 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "FrictionArea")) {
-	double fric = 0.0; /* kps - other default ??? */
+	double fric = 0.0;
+	int area_ind;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "friction"))
 		fric = atof(*(attr + 1));
 	    attr += 2;
 	}
-	/*World_place_...(world, team);*/
+	area_ind = World_place_frictionarea(world, fric);
+	P_start_frictionarea(area_ind);
 	return;
     }
 
