@@ -28,32 +28,22 @@ char dbuff_version[] = VERSION;
 
 
 
-
-#ifdef SPARC_CMAP_HACK
-extern char   frameBuffer[MAX_CHARS]; /* frame buffer */
-#endif
-
-
 dbuff_state_t   *dbuf_state;	/* Holds current dbuff state */
 
 
 static void dbuff_release(dbuff_state_t *state)
 {
     if (state != NULL) {
-	if (state->colormaps[0] != NULL) {
+	if (state->colormaps[0] != NULL)
 	    free(state->colormaps[0]);
-	}
-	if (state->colormaps[1] != NULL) {
+	if (state->colormaps[1] != NULL)
 	    free(state->colormaps[1]);
-	}
-	if (state->planes != NULL) {
+	if (state->planes != NULL)
 	    free(state->planes);
-	}
 #ifdef MBX
 	if (state->type == MULTIBUFFER
-	    && state->colormap_index != 2) {
+	    && state->colormap_index != 2)
 	    XmbufDestroyBuffers(state->display, draw);
-	}
 #endif
 
 	free(state);
@@ -210,20 +200,6 @@ dbuff_state_t *start_dbuff(Display *display, Colormap xcolormap,
 		     state->colormap_size);
     }
 
-    state->cmap_hack.fbfd = -1;
-#ifdef SPARC_CMAP_HACK
-    if (state->type == COLOR_SWITCH) {
-	state->cmap_hack.fbfd = open(frameBuffer, O_RDONLY, 0);
-	if (state->cmap_hack.fbfd != -1) {
-	    state->cmap_hack.hardcmap.index = state->pixel;
-	    state->cmap_hack.hardcmap.count = state->colormap_size;
-	    state->cmap_hack.hardcmap.red = malloc(state->colormap_size);
-	    state->cmap_hack.hardcmap.green = malloc(state->colormap_size);
-	    state->cmap_hack.hardcmap.blue = malloc(state->colormap_size);
-	}
-    }
-#endif
-
     return state;
 }
 
@@ -267,38 +243,16 @@ void dbuff_init_buffer(dbuff_state_t *state)
 void dbuff_switch(dbuff_state_t *state)
 {
 #ifdef MBX
-    if (state->type == MULTIBUFFER) {
+    if (state->type == MULTIBUFFER)
 	p_draw = state->mbx.mbx_draw[state->colormap_index];
-    }
 #endif
 
     state->colormap_index ^= 1;
 
-    if (state->type == COLOR_SWITCH) {
-#ifdef SPARC_CMAP_HACK
-	if (state->cmap_hack.fbfd != -1) {
-	    int		i;
-
-	    for (i = 0; i < state->colormap_size; i++) {
-		state->cmap_hack.hardcmap.red[i] =
-		    state->colormaps[state->colormap_index][i].red >> 8;
-		state->cmap_hack.hardcmap.green[i] =
-		    state->colormaps[state->colormap_index][i].green >> 8;
-		state->cmap_hack.hardcmap.blue[i] =
-		    state->colormaps[state->colormap_index][i].blue >> 8;
-	    }
-	    if (ioctl(state->cmap_hack.fbfd, FBIOPUTCMAP,
-		      &state->cmap_hack.hardcmap) == -1) {
-		perror("ioctl FBIOPUTCMAP");
-		close(state->cmap_hack.fbfd);
-		state->cmap_hack.fbfd = -1;
-	    }
-	} else
-#endif
-
+    if (state->type == COLOR_SWITCH)
 	XStoreColors(state->display, state->xcolormap,
-		     state->colormaps[state->colormap_index], state->colormap_size);
-    }
+		     state->colormaps[state->colormap_index],
+		     state->colormap_size);
 #ifdef DBE
     else if (state->type == MULTIBUFFER) {
 	XdbeSwapInfo		swap;
@@ -312,11 +266,10 @@ void dbuff_switch(dbuff_state_t *state)
     }
 #endif
 #ifdef MBX
-    else if (state->type == MULTIBUFFER) {
+    else if (state->type == MULTIBUFFER)
 	XmbufDisplayBuffers(state->display, 1,
 			    &state->mbx.mbx_draw[state->colormap_index],
 			    0, 200);
-    }
 #endif
 
     state->drawing_planes = state->drawing_plane_masks[state->colormap_index];

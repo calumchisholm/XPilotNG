@@ -26,13 +26,6 @@ AC_ARG_ENABLE(mbx,
 	AC_DEFINE([MBX], 1, [support for X Multibuffer Extension in client])
 fi])
 
-AC_ARG_ENABLE(sparccmaphack,
-	AC_HELP_STRING([--enable-sparccmaphack],
-			[support for SPARC colormap hack in client]),
-[if test $enable_sparccmaphack = yes; then
-	AC_DEFINE([SPARC_CMAP_HACK], 1, [support for SPARC colormap hack in client])
-fi])
-
 AC_ARG_ENABLE(log,
 	AC_HELP_STRING([--enable-log],
 			[Try to log every server start to log file]),

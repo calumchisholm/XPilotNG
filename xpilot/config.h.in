@@ -289,9 +289,6 @@
 /* Makes the server real silent */
 #undef SILENT
 
-/* support for SPARC colormap hack in client */
-#undef SPARC_CMAP_HACK
-
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
