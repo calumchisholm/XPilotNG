@@ -957,6 +957,21 @@ static void Robot_play(player_t *pl)
 }
 
 
+/*-BA Handle the combination of limited life games and
+ *-BA options.robotLeaveLife by making a robot leave iff it gets
+ *-BA eliminated in any round.  Means that options.robotLeaveLife
+ *-BA is ignored, but that options.robotsLeave is still respected.
+ * kps - this is bad, rather just count how many times the robot has died
+ * also in limited life games.
+ *-KK Added check on race mode. Since in race mode everyone
+ *-KK gets killed at the end of the round, all robots would
+ *-KK be replaced in the next round. I don't think that's
+ *-KK the Right Thing to do.
+ *-KK Also, only check a robot's score at the end of the round.
+ *-KK 27-2-98 Check on team mode too. It's very confusing to
+ *-KK have different robots in your team every round.
+ */
+
 /*
  * Check if robot is still considered good enough to continue playing.
  * Return false if robot continues playing,

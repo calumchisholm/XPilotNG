@@ -81,7 +81,7 @@ extern time_t		serverStartTime;
 extern server_t		Server;
 extern char		*serverAddr;
 extern uint32_t		DEF_HAVE, DEF_USED, USED_KILL;
-extern uint16_t		KILL_OBJ_BITS, KILL_PL_BITS;
+extern uint16_t		KILL_OBJ_BITS;
 extern int		ShutdownServer, ShutdownDelay;
 extern long		main_loops;
 extern int		mapRule;

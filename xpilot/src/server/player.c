@@ -1516,8 +1516,26 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->acc.x		= pl->acc.y	= 0.0;
     pl->emptymass	= pl->mass	= options.shipMass;
     pl->obj_status	&= ~(KILL_OBJ_BITS);
-    /* remove FOO_KILLED and FOO_PLAYING */
-    pl->pl_status	&= ~(KILL_PL_BITS);
+
+    if (BIT(world->rules->mode, LIMITED_LIVES)) {
+	bool waiting = Player_is_waiting(pl);
+
+	Player_set_life(pl, pl->pl_life - 1);
+	Player_set_state(pl, PL_STATE_APPEARING);
+
+	if (pl->pl_life == -1) {
+	    Player_set_life(pl, 0);
+	    if (waiting)
+		Player_set_state(pl, PL_STATE_WAITING);
+	    else
+		Player_set_state(pl, PL_STATE_DEAD);
+	    Player_lock_closest(pl, false);	    
+	}
+    }
+    else {
+	Player_set_life(pl, pl->pl_life + 1);
+	Player_set_state(pl, PL_STATE_APPEARING);
+    }
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
@@ -1525,7 +1543,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     }
 
     pl->forceVisible	= 0;
-    pl->recovery_count = RECOVERY_DELAY;
+    assert(pl->recovery_count == RECOVERY_DELAY);
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;
     pl->emergency_shield_left = 0;
@@ -1537,44 +1555,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 
     Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
 
-    /*-BA Handle the combination of limited life games and
-     *-BA options.robotLeaveLife by making a robot leave iff it gets
-     *-BA eliminated in any round.  Means that options.robotLeaveLife
-     *-BA is ignored, but that options.robotsLeave is still respected.
-     *-KK Added check on race mode. Since in race mode everyone
-     *-KK gets killed at the end of the round, all robots would
-     *-KK be replaced in the next round. I don't think that's
-     *-KK the Right Thing to do.
-     *-KK Also, only check a robot's score at the end of the round.
-     *-KK 27-2-98 Check on team mode too. It's very confusing to
-     *-KK have different robots in your team every round.
-     */
-
     if (add_rank_death)
 	Rank_add_death(pl);
-
-    if (BIT(world->rules->mode, LIMITED_LIVES)) {
-	Player_set_life(pl, pl->pl_life - 1);
-	if (pl->pl_life == -1) {
-#if 0 /* kps - handle this in robot.c or robotdef.c */
-	    if (Player_is_robot(pl)
-		&& !BIT(world->rules->mode, TIMING|TEAM_PLAY)) {
-		Robot_delete(pl, false);
-		return;
-	    }
-#endif
-	    Player_set_life(pl, 0);
-	    if (!Player_is_waiting(pl))
-		Player_set_state(pl, PL_STATE_DEAD);
-	    Player_lock_closest(pl, false);
-	}
-	else
-	    Player_set_state(pl, PL_STATE_APPEARING);
-    }
-    else {
-	Player_set_life(pl, pl->pl_life + 1);
-	Player_set_state(pl, PL_STATE_APPEARING);
-    }
 
     pl->have	= DEF_HAVE;
     pl->used	|= DEF_USED;
