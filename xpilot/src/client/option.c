@@ -671,7 +671,7 @@ void Parse_options(int *argcp, char **argvp)
     char path[PATH_MAX + 1];
     char buf[BUFSIZ];
     FILE *fp;
-    int arg_ind, num_remaining_args, num_servers = 0;
+    int arg_ind, num_remaining_args, num_servers = 0, i;
 
     /*
      * Read options from xpilotrc.
@@ -708,7 +708,6 @@ void Parse_options(int *argcp, char **argvp)
 
 	    /* Add GNU style option support e.g. --wallcolor=1 ??? */
 	    if (is_noarg_option(arg)) {
-		int i;
 		Set_option(arg, "true");
 		num_remaining_args--;
 		for (i = 0; i < num_remaining_args; i++)
@@ -719,7 +718,6 @@ void Parse_options(int *argcp, char **argvp)
 		if (num_remaining_args >= 2) {
 		    ok = Set_option(arg, argvp[arg_ind + 1]);
 		    if (ok) {
-			int i;
 			num_remaining_args -= 2;
 			for (i = 0; i < num_remaining_args; i++)
 			    argvp[arg_ind + i] = argvp[arg_ind + i + 2];
@@ -744,6 +742,8 @@ void Parse_options(int *argcp, char **argvp)
      * The remaining args are assumed to be names of servers to try to contact.
      * + 1 is for the program name.
      */
+    for (i = num_servers + 1; i < *argcp; i++)
+	argvp[i] = NULL;
     *argcp = num_servers + 1;
 
     if (xpArgs.help)
