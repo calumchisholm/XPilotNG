@@ -137,6 +137,7 @@ typedef struct {
     ipos                *point_ptr;
     int                 num_point;
     irec                bounds;
+    int                 texture;
 } xp_polygon_t; 
 
 extern refuel_t		*refuel_ptr;

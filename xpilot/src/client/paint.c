@@ -224,7 +224,7 @@ void Paint_frame(void)
 	Rectangle_start();
 	Segment_start();
 
-	Paint_world();
+	if (!num_polygon) Paint_world();
 
 	Segment_end();
 	Rectangle_end();
@@ -232,10 +232,14 @@ void Paint_frame(void)
 	Rectangle_start();
 	Segment_start();
 
-	Paint_vfuel();
-	Paint_vdecor();
-	Paint_vcannon();
-	Paint_vbase();
+        if (!num_polygon) {
+            Paint_vfuel();
+            Paint_vdecor();
+            Paint_vcannon();
+            Paint_vbase();
+        } else {
+            Paint_objects();
+        }
 	Paint_shots();
 
 	Rectangle_end();

@@ -50,6 +50,7 @@
 #include "xinit.h"
 #include "protoclient.h"
 #include "guimap.h"
+#include "mapdata.h"
 char paintmap_version[] = VERSION;
 
 #define X(co)  ((int) ((co) - world.x))
@@ -83,19 +84,20 @@ void Paint_vfuel(void)
 {
     int	i;
     if (num_vfuel > 0) {
-	for (i = 0; i < num_vfuel; i++) {
-	    Gui_paint_fuel(vfuel_ptr[i].x, vfuel_ptr[i].y, vfuel_ptr[i].fuel);
-	}
-	RELEASE(vfuel_ptr, num_vfuel, max_vfuel);
+        for (i = 0; i < num_vfuel; i++) {
+            Gui_paint_fuel(vfuel_ptr[i].x, vfuel_ptr[i].y, vfuel_ptr[i].fuel);
+        }
+        RELEASE(vfuel_ptr, num_vfuel, max_vfuel);
     }
 }
 
 void Paint_vbase(void)
 {
-    int	i;
+    int	i, id, team;
     if (num_vbase > 0) {
 	for (i = 0; i < num_vbase; i++) {
-	    Gui_paint_base(vbase_ptr[i].x, vbase_ptr[i].y, vbase_ptr[i].xi, vbase_ptr[i].yi, vbase_ptr[i].type);
+            Base_info_by_pos(vbase_ptr[i].xi, vbase_ptr[i].yi, &id, &team);
+	    Gui_paint_base(vbase_ptr[i].x, vbase_ptr[i].y, id, team, vbase_ptr[i].type);
 	}
 	RELEASE(vbase_ptr, num_vbase, max_vbase);
     }
@@ -115,6 +117,82 @@ void Paint_vdecor(void)
 			    vdecor_ptr[i].type, last, more_y);
 	}
 	RELEASE(vdecor_ptr, num_vdecor, max_vdecor);
+    }
+}
+
+
+void Paint_objects(void) 
+{
+    int i, xoff, yoff;
+    ipos min, max;
+    irec b;
+
+    for (i = 0; i < num_polygon; i++) {
+
+        b = polygon_ptr[i].bounds;
+        b.y -= b.h;
+        min.x = (world.x - (b.x + b.w)) / Setup->width;
+        if (world.x > b.x + b.w) min.x++;
+        max.x = (world.x + view_width - b.x) / Setup->width;
+        if (world.x + view_width < b.x) max.x--;
+        min.y = (world.y - (b.y + b.h)) / Setup->height;
+        if (world.y > b.y + b.h) min.y++;
+        max.y = (world.y + view_height - b.y) / Setup->height;
+        if (world.y + view_height < b.y) max.y--;
+
+        for (xoff = min.x; xoff <= max.x; xoff++) {
+            for (yoff = min.y; yoff <= max.y; yoff++) {
+                Gui_paint_polygon(i, xoff, yoff);
+            }
+        }
+    }
+
+    
+    for (i = 0; i < num_bases; i++) {
+
+        b = bases[i].bounds;
+        
+        min.x = (world.x - (b.x + b.w)) / Setup->width;
+        if (world.x > b.x + b.w) min.x++;
+        max.x = (world.x + view_width - b.x) / Setup->width;
+        if (world.x + view_width < b.x) max.x--;
+        min.y = (world.y - (b.y + b.h)) / Setup->height;
+        if (world.y > b.y + b.h) min.y++;
+        max.y = (world.y + view_height - b.y) / Setup->height;
+        if (world.y + view_height < b.y) max.y--;
+
+        for (xoff = min.x; xoff <= max.x; xoff++) {
+            for (yoff = min.y; yoff <= max.y; yoff++) {
+                Gui_paint_base
+                    (b.x + xoff * Setup->width, 
+                     b.y + yoff * Setup->height, 
+                     bases[i].id, bases[i].team, 
+                     bases[i].type);
+            }
+        }
+    }
+
+    for (i = 0; i < num_fuels; i++) {
+
+        b = fuels[i].bounds;
+        
+        min.x = (world.x - (b.x + b.w)) / Setup->width;
+        if (world.x > b.x + b.w) min.x++;
+        max.x = (world.x + view_width - b.x) / Setup->width;
+        if (world.x + view_width < b.x) max.x--;
+        min.y = (world.y - (b.y + b.h)) / Setup->height;
+        if (world.y > b.y + b.h) min.y++;
+        max.y = (world.y + view_height - b.y) / Setup->height;
+        if (world.y + view_height < b.y) max.y--;
+
+        for (xoff = min.x; xoff <= max.x; xoff++) {
+            for (yoff = min.y; yoff <= max.y; yoff++) {
+                Gui_paint_fuel
+                    (b.x + xoff * Setup->width, 
+                     b.y + yoff * Setup->height, 
+                     fuels[i].fuel);
+            }
+        }
     }
 }
 
@@ -217,9 +295,6 @@ void Paint_world(void)
 			     world.y + view_height/2 - MAX_VIEW_SIZE/2,
 			     world.x + view_width/2 + MAX_VIEW_SIZE/2,
 			     world.y + view_height/2 + MAX_VIEW_SIZE/2);
-
-    if (num_polygon)
-	Gui_paint_world_polygons(wallTile);
 
     for (ryb = yb; ryb <= ye; ryb++, yi++, y += BLOCK_SZ, mapbase++) {
 

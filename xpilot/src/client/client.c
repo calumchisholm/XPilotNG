@@ -169,11 +169,11 @@ static other_t		*Others = 0;
 static int		num_others = 0,
 			max_others = 0;
 
-static fuelstation_t	*fuels = 0;
-static int		num_fuels = 0;
+fuelstation_t	*fuels = 0;
+int		num_fuels = 0;
 
-static homebase_t	*bases = 0;
-static int		num_bases = 0;
+homebase_t	*bases = 0;
+int		num_bases = 0;
 
 static cannontime_t	*cannons = 0;
 static int		num_cannons = 0;
@@ -271,7 +271,9 @@ int Handle_fuel(int ind, int fuel)
 	error("Bad fuelstation index (%d)", ind);
 	return -1;
     }
+
     fuels[ind].fuel = fuel;
+
     return 0;
 }
 
@@ -384,17 +386,18 @@ int Base_info_by_pos(int x, int y, int *idp, int *teamp)
 
 int Handle_base(int id, int ind)
 {
-    int		i;
-
+    int i;
+    
     if (ind < 0 || ind >= num_bases) {
-	errno = 0;
-	error("Bad homebase index (%d)", ind);
-	return -1;
+        errno = 0;
+        error("Bad homebase index (%d)", ind);
+        return -1;
     }
+    
     for (i = 0; i < num_bases; i++) {
-	if (bases[i].id == id) {
-	    bases[i].id = -1;
-	}
+        if (bases[i].id == id) {
+            bases[i].id = -1;
+        }
     }
     bases[ind].id = id;
 
@@ -903,6 +906,10 @@ static int Map_init(void)
 	case 1:
 	    fuels[num_fuels].pos = i;
 	    fuels[num_fuels].fuel = MAX_STATION_FUEL;
+            fuels[num_fuels].bounds.x = (i / Setup->y) * BLOCK_SZ;
+            fuels[num_fuels].bounds.y = (i % Setup->y) * BLOCK_SZ;
+            fuels[num_fuels].bounds.w = BLOCK_SZ;
+            fuels[num_fuels].bounds.h = BLOCK_SZ;
 	    num_fuels++;
 	    break;
 	case 2:
@@ -921,6 +928,11 @@ static int Map_init(void)
 	    bases[num_bases].pos = i;
 	    bases[num_bases].id = -1;
 	    bases[num_bases].team = type % 10;
+            bases[num_bases].bounds.x = (i / Setup->y) * BLOCK_SZ;
+            bases[num_bases].bounds.y = (i % Setup->y) * BLOCK_SZ;
+            bases[num_bases].bounds.w = BLOCK_SZ;
+            bases[num_bases].bounds.h = BLOCK_SZ;
+            bases[num_bases].type = type - (type % 10);
 	    num_bases++;
 	    Setup->map_data[i] = type - (type % 10);
 	    break;

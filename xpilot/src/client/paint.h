@@ -220,6 +220,7 @@ void Paint_vcannon(void);
 void Paint_vfuel(void);
 void Paint_vbase(void);
 void Paint_vdecor(void);
+void Paint_objects(void);
 void Paint_world(void);
 void Paint_score_entry(int entry_num, other_t* other, bool best);
 void Paint_score_start(void);

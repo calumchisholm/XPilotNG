@@ -410,6 +410,7 @@ int Net_setup(void)
 	    }
 	}
     }
+
     if (Setup->map_order == SETUP_MAP_XY_WITH_LINES) {
 	int i, j, startx, starty;
 	int polyc;
@@ -466,76 +467,6 @@ int Net_setup(void)
 	      STORE(xp_polygon_t, polygon_ptr, num_polygon, max_polygon, poly);
 	}
     }
-#if 0
-#define DBG if (0) printf
-    {
-	int size2 = Setup->map_data_len / 4 * 4;
-	int *ptr, linec, lines[5000];
-	int i, j, k, start, found;
-	int out[5000 / 4]; /* out[i] is 1 if line i is in some known polygon */
-	int p[5000 / 4 + 1]; /* points in one polygon */
-	int pc = 0; /* count of point indexes in p */
-
-	size2 = size2 / 4 * 4;
-	ptr = Setup->map_data + size2 - 19996;
-	linec = *ptr++;
-	linec = ntohl(linec);
-	for (i = 0; i < linec * 4; i++)
-	    lines[i] = ntohl(*ptr++);
-	Setup->map_data_len -= 20000;
-	Setup->map_order = SETUP_MAP_ORDER_XY;
-        
-	memset(out, 0, sizeof(out));
-
-	for (i = 0; i < linec * 4; i += 4) 
-	    DBG("%d: (%d,%d) - (%d,%d)\n", i, 
-		lines[i] >> 6, lines[i + 1] >> 6, 
-		lines[i + 2] >> 6, lines[i + 3] >> 6);
-
-	for (i = 0; i < 4 * linec; i += 4) {
-
-	    if (out[i / 4]) continue;
-	    out[i / 4] = 1;
-	    pc = 0;
-	    p[pc++] = i;
-	    p[pc++] = k = i + 2;
-	    start = i;
-
-	    while (1) {
-		for (j = 0, found = 0; j < linec * 4; j += 4) {
-		    if (out[j / 4]) continue;
-		    if (lines[j] == lines[k] && lines[j + 1] == lines[k + 1]) {
-			out[j / 4] = 1;
-			p[pc++] = k = j + 2;
-			found = 1;
-			break;
-		    }
-		    if (lines[j + 2] == lines[k] && lines[j + 3] == lines[k + 1]) {
-			out[j / 4] = 1;
-			p[pc++] = k = j;
-			found = 1;
-			break;
-		    }
-		}
-
-		if (lines[k] == lines[start] && lines[k + 1] == lines[start + 1]) {
-		    /* Found a complete polygon. */
-		    Store_polygon(lines, p, pc);
-		    break;
-		}
-
-		if (!found) {
-		    /* 
-		     * There seems to be no end to this polygon. 
-		     * Discard it and move on 
-		     */
-		    break;
-		}
-	    }
-	}
-    }
-#undef DBG
-#endif
 
     if (Setup->map_order != SETUP_MAP_UNCOMPRESSED) {
 	if (Uncompress_map() == -1) {

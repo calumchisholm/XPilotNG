@@ -334,11 +334,11 @@ void Gui_paint_fuel(int x, int y, long fuel)
 }
 
 
-void Gui_paint_base(int x, int y, int xi, int yi, int type)
+void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     if (!blockBitmaps) {
-	const int	BORDER = 4;					/* in pixels */
-	int		id, team, size;
+	const int	BORDER = 4;	/* in pixels */
+	int		size;
 	other_t	*other;
 	char	s[3];
 
@@ -371,9 +371,7 @@ void Gui_paint_base(int x, int y, int xi, int yi, int type)
 	    return;
 	}
 	/* only draw base teams if ship naming is on, SKS 25/05/94 */
-	if (!BIT(instruments, SHOW_SHIP_NAME) ||
-	    Base_info_by_pos(xi, yi, &id, &team) == -1)
-	    return;
+	if (!BIT(instruments, SHOW_SHIP_NAME)) return;
 
 	/* operate in pixels from here out */
 	x = WINSCALE(X(x));
@@ -435,7 +433,7 @@ void Gui_paint_base(int x, int y, int xi, int yi, int type)
     }
     else {
 	const int BORDER = 4;	/* in pixels */
-	int id, team, size;
+	int size;
 	other_t *other;
 	char s[3];
 
@@ -468,9 +466,7 @@ void Gui_paint_base(int x, int y, int xi, int yi, int type)
 	    return;
 	}
 	/* only draw base teams if ship naming is on, SKS 25/05/94 */
-	if (!BIT(instruments, SHOW_SHIP_NAME) ||
-	    Base_info_by_pos(xi, yi, &id, &team) == -1)
-	    return;
+	if (!BIT(instruments, SHOW_SHIP_NAME)) return;
 
 	/* operate in pixels from here out */
 	x = WINSCALE(X(x));
@@ -1210,83 +1206,54 @@ static int Rectangles_intersect(irec r1, irec r2) {
   return 0;
 }
 
-static int Polygon_visible(int index, int copy) 
-{
-  irec view;
-  irec poly = polygon_ptr[index].bounds;
 
-  poly.x = poly.x + ((copy % 3) - 1) * Setup->width;;
-  poly.y = poly.y - ((copy / 3) - 1) * Setup->height;
-  poly.w = poly.w;
-  poly.h = poly.h;
+void Gui_paint_polygon(int i, int xoff, int yoff) {
 
-  view.x = world.x;
-  view.y = world.y + view_height;
-  view.w = view_width;
-  view.h = view_height;
+    int j,x,y,texture = 0, filled = 0;
+    static XPoint poly[5000 / 4];
+    static int		wallTileReady = 0;
+    static Pixmap	wallTile = None;
 
-  return Rectangles_intersect(poly, view);
-}
+    if (BIT(instruments, SHOW_TEXTURED_WALLS)) {
+	if (!wallTileReady) {
+	    wallTile = Texture_wall();
+	    wallTileReady = (wallTile == None) ? -1 : 1;
+	}
+	if (wallTileReady == 1) {
+	    texture = 1;
+	    XSetTile(dpy, gc, wallTile);
+	    XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), 
+                         WINSCALE(realWorld.y));
+	}
+    }
 
-
-void Gui_paint_world_polygons(Pixmap wallTile) 
-{
-  int i,j,k,x,y,texture=0, filled = 0;
-  static XPoint poly[5000 / 4];
-
-  SET_FG(colors[wallColor].pixel);
-  XSetLineAttributes(dpy, gc, WINSCALE(4), LineSolid, CapButt, JoinMiter);
-  if (wallTile != None && BIT(instruments, SHOW_TEXTURED_WALLS)) texture = 1;
-  if (BIT(instruments, SHOW_FILLED_WORLD))
-    filled = 1;
-
-  /* 
-   * The map is drawn 9 times into different locations
-   * so that polygons going over the world edge seem to
-   * appear on the other side. The locations are like
-   * the following:
-   * 012
-   * 345
-   * 678
-   * The copy number 4 is the world being displayed. Now if
-   * a polygon extends from 4 to 5, it appears on the left
-   * side of 4 because the copy drawn in 3 extends to 4.
-   */
-  for (k = 0; k < 9; k++) {
-
-    /* offsets of the current copy */
-    int x_offset = ((k % 3) - 1) * Setup->width;
-    int y_offset = ((k / 3) - 1) * Setup->height;
+    SET_FG(colors[wallColor].pixel);
+    XSetLineAttributes(dpy, gc, WINSCALE(4), LineSolid, CapButt, JoinMiter);
+    if (BIT(instruments, SHOW_FILLED_WORLD)) filled = 1;
     
-
-    for (i = 0; i < num_polygon; i++) {
-
-      if (!Polygon_visible(i, k)) continue;
-      
-      x = polygon_ptr[i].point_ptr[0].x - world.x + x_offset;
-      y = world.y + view_height - polygon_ptr[i].point_ptr[0].y + y_offset;
-        
-      poly[0].x = WINSCALE(x);
-      poly[0].y = WINSCALE(y);
-
-      for (j = 1; j < polygon_ptr[i].num_point; j++) {
+    x = polygon_ptr[i].point_ptr[0].x - world.x + xoff * Setup->width;
+    y = world.y + view_height - polygon_ptr[i].point_ptr[0].y - yoff * 
+        Setup->height;
+    
+    poly[0].x = WINSCALE(x);
+    poly[0].y = WINSCALE(y);
+    
+    for (j = 1; j < polygon_ptr[i].num_point; j++) {
         x += polygon_ptr[i].point_ptr[j].x;
         y += polygon_ptr[i].point_ptr[j].y;
         poly[j].x = WINSCALE(x);
         poly[j].y = WINSCALE(y);
-      }
-
-      if (filled | texture) {
-	if (texture) XSetFillStyle(dpy, gc, FillTiled);
+    }
+    
+    if (filled | texture) {
+        if (texture) XSetFillStyle(dpy, gc, FillTiled);
 	rd.fillPolygon(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
 		       Nonconvex, CoordModeOrigin);
-	if (texture) XSetFillStyle(dpy, gc, FillSolid);
-      }
-      if (texture || !filled)
-	rd.drawLines(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
-                   CoordModeOrigin);
+        if (texture) XSetFillStyle(dpy, gc, FillSolid);
     }
-  }
+    if (texture || !filled)
+	rd.drawLines(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
+                     CoordModeOrigin);
 
-  XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinMiter);
+    XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinMiter);
 }

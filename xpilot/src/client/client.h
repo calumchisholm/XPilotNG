@@ -133,14 +133,18 @@ typedef struct {
 } other_t;
 
 typedef struct {
-    int		pos;		/* Block index */
-    long	fuel;		/* Amount of fuel available */
+    int         pos;		/* Block index */
+    long        fuel;		/* Amount of fuel available */
+    irec        bounds;         /* Location in map */
+
 } fuelstation_t;
 
 typedef struct {
-    int		pos;		/* Block index */
+    int         pos;		/* Block index */
     short	id,		/* Id of owner or -1 */
 		team;		/* Team this base belongs to */
+    irec        bounds;         /* Location in map */
+    int         type;           /* orientation */
 } homebase_t;
 
 typedef struct {
@@ -312,6 +316,16 @@ extern int 	maxVolume;		/* maximum volume (in percent) */
 
 extern int	maxLinesInHistory;	/* number of lines to save in history */
 #define MAX_HIST_MSGS	128		/* maximum */
+
+
+/* mapdata accessible to outside world */
+
+extern fuelstation_t	*fuels;
+extern int		num_fuels;
+
+extern homebase_t	*bases;
+extern int		num_bases;
+
 
 int Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);
