@@ -120,9 +120,10 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 {
     int i;
     double win_score = 0.0,lose_score = 0.0;
-    int win_team_members = 0, lose_team_members = 0, somebody_flag = 0;
+    int win_team_members = 0, lose_team_members = 0;
     double sc, por;
     world_t *world = pl->world;
+    bool somebody = false;
 
     Check_team_members (world, td->team);
     if (td->team == pl->team)
@@ -139,8 +140,8 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	    if (pl_i->team == td->team) {
 		lose_score += pl_i->score;
 		lose_team_members++;
-		if (BIT(pl_i->pl_status, GAME_OVER) == 0)
-		    somebody_flag = 1;
+		if (!Player_is_dead(pl_i))
+		    somebody = true;
 	    }
 	    else if (pl_i->team == pl->team) {
 		win_score += pl_i->score;
@@ -153,7 +154,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
     Set_message_f(" < %s's (%d) team has destroyed team %d treasure >",
 		  pl->name, pl->team, td->team);
 
-    if (!somebody_flag) {
+    if (!somebody) {
 	Score(pl, Rate(pl->score, CANNON_SCORE)/2, pos, "Treasure:");
 	return 0;
     }

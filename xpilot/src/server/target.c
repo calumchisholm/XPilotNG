@@ -70,10 +70,11 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     int j;
     player_t *kp;
     double sc, por, win_score = 0.0, lose_score = 0.0, drainfactor;
-    int win_team_members = 0, lose_team_members = 0, somebody_flag = 0,
+    int win_team_members = 0, lose_team_members = 0,
 	targets_remaining = 0, targets_total = 0;
     vector_t zero_vel = {0.0, 0.0};
     world_t *world = &World;
+    bool somebody = false;
 
     /* a normal shot or a direct mine hit work, cannons don't */
     /* KK: should shots/mines by cannons of opposing teams work? */
@@ -167,8 +168,8 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	    if (pl->team == targ->team) {
 		lose_score += pl->score;
 		lose_team_members++;
-		if (BIT(pl->pl_status, GAME_OVER) == 0)
-		    somebody_flag = 1;
+		if (!Player_is_dead(pl))
+		    somebody = true;
 	    }
 	    else if (pl->team == kp->team) {
 		win_score += pl->score;
@@ -176,7 +177,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	    }
 	}
     }
-    if (somebody_flag) {
+    if (somebody) {
 	for (j = 0; j < world->NumTargets; j++) {
 	    target_t *t = Target_by_index(world, j);
 
@@ -187,7 +188,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	    }
 	}
     }
-    if (!somebody_flag)
+    if (!somebody)
 	return;
 
     sound_play_sensors(targ->pos, DESTROY_TARGET_SOUND);
