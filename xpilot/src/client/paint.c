@@ -475,7 +475,7 @@ void Paint_score_start(void)
     if (showRealName) {
 	strlcpy(headingStr, "NICK=USER@HOST", sizeof(headingStr));
     } else if (BIT(Setup->mode, TEAM_PLAY)) {
-	strlcpy(headingStr, " AL  SCORE   NAME     LIFE", sizeof(headingStr));
+	strlcpy(headingStr, "     SCORE   NAME     LIFE", sizeof(headingStr));
     } else {
 	strlcpy(headingStr, "  ", sizeof(headingStr));
 	if (BIT(Setup->mode, TIMING)) {
