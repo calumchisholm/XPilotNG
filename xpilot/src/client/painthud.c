@@ -1077,7 +1077,8 @@ void Add_message(char *message)
 #endif
 	}
     } else {
-	Message_scan_hack(message, len);
+	if (oldServer)
+	    Message_scan_hack(message, len);
 #ifndef _WINDOWS
 	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
 	    msg_set = GameMsg_pending;
