@@ -699,7 +699,7 @@ static void *ralloc(void *ptr, size_t size)
 
 static unsigned short *Shape_lines(const shape *s, int dir)
 {
-    int p;
+    int i;
     static unsigned short foo[100];
     static const shape *lastshape;
     static int lastdir;
@@ -715,23 +715,23 @@ static unsigned short *Shape_lines(const shape *s, int dir)
     lastdir = dir;
 
     /*pts = Shape_get_points((shape *)s, dir);*/
-    for (p = 0; p < s->num_points; p++) {
+    for (i = 0; i < s->num_points; i++) {
 	/*clpos pt = pts[p].clk;*/
-	clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);
-	linet[p + os].start.cx = -pt.cx;
-	linet[p + os].start.cy = -pt.cy;
+	clpos pt = Ship_get_point_clpos((shipobj *)s, i, dir);
+	linet[i + os].start.cx = -pt.cx;
+	linet[i + os].start.cy = -pt.cy;
     }
-    for (p = 0; p < s->num_points - 1; p++) {
-	linet[p + os].delta.cx
-	    = linet[p + os + 1].start.cx - linet[p + os].start.cx;
-	linet[p + os].delta.cy
-	    = linet[p + os + 1].start.cy - linet[p + os].start.cy;
+    for (i = 0; i < s->num_points - 1; i++) {
+	linet[i + os].delta.cx
+	    = linet[i + os + 1].start.cx - linet[i + os].start.cx;
+	linet[i + os].delta.cy
+	    = linet[i + os + 1].start.cy - linet[i + os].start.cy;
     }
-    linet[p + os].delta.cx = linet[os].start.cx - linet[p + os].start.cx;
-    linet[p + os].delta.cy = linet[os].start.cy - linet[p + os].start.cy;
-    for (p = 0; p < s->num_points; p++)
-	foo[p] = p + os;
-    foo[p] = 65535;
+    linet[i + os].delta.cx = linet[os].start.cx - linet[i + os].start.cx;
+    linet[i + os].delta.cy = linet[os].start.cy - linet[i + os].start.cy;
+    for (i = 0; i < s->num_points; i++)
+	foo[i] = i + os;
+    foo[i] = 65535;
     return foo;
 }
 
@@ -1254,7 +1254,7 @@ static void Shape_move(const struct move *move, const shape *s,
 		       int dir, struct collans *answer)
 {
     int minline, mindone, minheight, minpoint;
-    int p, block;
+    int i, block;
     int msx = move->start.cx, msy = move->start.cy;
     int mdx = move->delta.cx, mdy = move->delta.cy;
     int mbase;
@@ -1295,8 +1295,8 @@ static void Shape_move(const struct move *move, const shape *s,
     minpoint = -1;
 
     /*pts = Shape_get_points((shape *)s, dir);*/
-    for (p = 0; p < s->num_points; p++) {
-	clpos pt = Ship_get_point_clpos((shipobj *)s, p, dir);
+    for (i = 0; i < s->num_points; i++) {
+	clpos pt = Ship_get_point_clpos((shipobj *)s, i, dir);
 	/*clpos pt = pts[p].clk;*/
 	msx = WRAP_XCLICK(move->start.cx + pt.cx);
 	msy = WRAP_YCLICK(move->start.cy + pt.cy);
@@ -1332,19 +1332,19 @@ static void Shape_move(const struct move *move, const shape *s,
 
 	if (Lines_check(msx, msy, mdx, mdy, &mindone, lines, chx, chy,
 			chxy, move, &minline, &minheight))
-	    minpoint = p;
+	    minpoint = i;
     }
 
     block = (move->start.cx >> B_SHIFT) + mapx * (move->start.cy >> B_SHIFT);
     points = blockline[block].points;
     lines = Shape_lines(s, dir);
     x = -1;
-    while ( ( p = *points++) != 65535) {
-	if (linet[p].group
-	    && (!can_hit(&groups[linet[p].group], (struct move *)move)))
+    while ( ( i = *points++) != 65535) {
+	if (linet[i].group
+	    && (!can_hit(&groups[linet[i].group], (struct move *)move)))
 	    continue;
-	msx = move->start.cx - linet[p].start.cx;
-	msy = move->start.cy - linet[p].start.cy;
+	msx = move->start.cx - linet[i].start.cx;
+	msy = move->start.cy - linet[i].start.cy;
 	if (chx)
 	    msx = -msx;
 	if (chy)
@@ -1356,7 +1356,7 @@ static void Shape_move(const struct move *move, const shape *s,
 	}
 	if (Lines_check(msx, msy, mdx, mdy, &mindone, lines, chx, chy,
 			chxy, move, &minline, &minheight))
-	    minpoint = p;
+	    minpoint = i;
     }
 
     answer->point = minpoint;
