@@ -25,42 +25,33 @@
 
 #define MAX_SCORES 500
 
-static const char CLIENTSCOREFILE[] = "CLIENTSCOREFILE";
-static const char CLIENTRANKINGPAGE[] = "CLIENTRANKINGPAGE";
-static const char CLIENTNOJSRANKINGPAGE[] = "CLIENTNOJSRANKINGPAGE";
-char *clientRankFile = NULL;	/* */
-char *clientRankHTMLFile = NULL;	/* */
-char *clientRankHTMLNOJSFile = NULL;	/* */
+char *clientRankFile = NULL;
+char *clientRankHTMLFile = NULL;
+char *clientRankHTMLNOJSFile = NULL;
 
 /*
-Defining one/both of CLIENTRANKINGPAGE/CLIENTNOJSRANKINGPAGE while leaving
-CLIENTSCOREFILE undefined grants a rank of last/(current maybe aswell) xpilot session
-*/
-/* Score data */
+ * Defining one/both of CLIENTRANKINGPAGE/CLIENTNOJSRANKINGPAGE while leaving
+ * CLIENTSCOREFILE undefined grants a rank of last/(current maybe aswell)
+ * xpilot session.
+ */
 static ScoreNode scores[MAX_SCORES];
 static int recent[10];
 static int oldest_cache = 0;
-/*static ScoreNode dummyScoreNode;*/
-
 static int timesort[MAX_SCORES];
 static double kd[MAX_SCORES];
 static int kdsort[MAX_SCORES];
-
-static int Client_Scoring = 0;
+static bool client_Scoring = false;
 
 static void swapd(double *d1, double *d2)
 {
-    double d;
-
-    d = *d1;
+    double d = *d1;
     *d1 = *d2;
     *d2 = d;
 }
+
 static void swapi(int *i1, int *i2)
 {
-    int i;
-
-    i = *i1;
+    int i = *i1;
     *i1 = *i2;
     *i2 = i;
 }
@@ -69,17 +60,19 @@ static void swapi(int *i1, int *i2)
 void Time_Sort(void)
 {
     int i;
+
     for (i = 0; i < MAX_SCORES; i++) {
 	int j;
+
 	for (j = i + 1; j < MAX_SCORES; j++) {
 	    if (scores[timesort[i]].timestamp <
 		scores[timesort[j]].timestamp)
 		swapi(&timesort[i], &timesort[j]);
 	}
     }
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++)
 	recent[i] = timesort[i];
-    }
+
     oldest_cache = 5;
 }
 
@@ -150,8 +143,8 @@ void Rank_score(void)
 	"d = The number of time I have shot him<br>"
 	"r = the quota between k and d<br>" "</body></html>";
 
-
     int i;
+
     for (i = 0; i < MAX_SCORES; i++) {
 	kdsort[i] = i;
 	kd[i] =
@@ -162,6 +155,7 @@ void Rank_score(void)
 
     for (i = 0; i < MAX_SCORES; i++) {
 	int j;
+
 	for (j = i + 1; j < MAX_SCORES; j++) {
 	    if (kd[i] < kd[j]) {
 		swapi(&kdsort[i], &kdsort[j]);
@@ -170,10 +164,9 @@ void Rank_score(void)
 	}
     }
 
-    /*if (getenv(CLIENTRANKINGPAGE) != NULL) { */
     if (clientRankHTMLFile != NULL) {
-	/*FILE * const file = fopen(getenv(CLIENTRANKINGPAGE), "w"); */
 	FILE *const file = fopen(clientRankHTMLFile, "w");
+
 	if (file != NULL && fseek(file, 2000, SEEK_SET) == 0) {
 	    int i;
 	    fprintf(file, "%s", HEADER);
@@ -189,14 +182,12 @@ void Rank_score(void)
 	    fprintf(file, "</script>");
 	    fprintf(file, FOOTER);
 	    fclose(file);
-	} else
-	    error("Could not open the rank file.");
+	}
     }
 
-    /* if (getenv(CLIENTNOJSRANKINGPAGE) != NULL) {
-       FILE * const file = fopen(getenv(CLIENTNOJSRANKINGPAGE), "w"); */
     if (clientRankHTMLNOJSFile != NULL) {
 	FILE *const file = fopen(clientRankHTMLNOJSFile, "w");
+
 	if (file != NULL && fseek(file, 2000, SEEK_SET) == 0) {
 	    int i;
 	    fprintf(file, "%s", HEADERNOJS);
@@ -218,10 +209,12 @@ void Rank_score(void)
 	    }
 	    fprintf(file, FOOTER);
 	    fclose(file);
-	} else
-	    error("Could not open the rank file.");
+	}
     }
 
+    if (clientRankHTMLFile == NULL && clientRankHTMLNOJSFile == NULL)
+	warn("You have not specified clientRankHTMLFile or "
+	     "clientRankHTMLNOJSFile.");
 }
 
 static void Init_scorenode(ScoreNode * node, const char nick[])
@@ -231,28 +224,28 @@ static void Init_scorenode(ScoreNode * node, const char nick[])
     node->deaths = 0;
 }
 
-/* Read scores from disk, and zero-initialize the ones that are not used.
-   Call this on startup. */
+/*
+ * Read scores from disk, and zero-initialize the ones that are not used.
+ * Call this on startup.
+ */
 void Init_saved_scores(void)
 {
     int i = 0;
 
-    /*if ( getenv(CLIENTSCOREFILE) != NULL ) { */
     if (clientRankFile != NULL) {
-	/* FILE *file = fopen(getenv(CLIENTSCOREFILE), "r"); */
 	FILE *file = fopen(clientRankFile, "r");
-	if (file != NULL) {
 
+	if (file != NULL) {
 	    const int actual = fread(scores, sizeof(ScoreNode),
 				     MAX_SCORES, file);
 	    if (actual != MAX_SCORES)
-		error("Error when reading score file!\n");
+		warn("Error when reading score file!\n");
 
 	    i += actual;
 
 	    fclose(file);
 	}
-	Client_Scoring = 1;
+	client_Scoring = true;
     }
 
     while (i < MAX_SCORES) {
@@ -261,7 +254,7 @@ void Init_saved_scores(void)
 	timesort[i] = i;
 	i++;
     }
-    if (Client_Scoring == 1)
+    if (client_Scoring)
 	Time_Sort();
 }
 
@@ -301,31 +294,31 @@ int Find_player(char *nick)
 
 void Add_rank_Kill(char *nick)
 {
-    int i;
-    i = Find_player(nick);
+    int i = Find_player(nick);
+
     scores[recent[i]].kills = scores[recent[i]].kills + 1;
     scores[recent[i]].timestamp = time(0);
 }
 
 void Add_rank_Death(char *nick)
 {
-    int i;
-    i = Find_player(nick);
+    int i = Find_player(nick);
+
     scores[recent[i]].deaths = scores[recent[i]].deaths + 1;
     scores[recent[i]].timestamp = time(0);
 }
 
 int Get_kills(char *nick)
 {
-    int i;
-    i = Find_player(nick);
+    int i = Find_player(nick);
+
     return scores[recent[i]].kills;
 }
 
 int Get_deaths(char *nick)
 {
-    int i;
-    i = Find_player(nick);
+    int i = Find_player(nick);
+
     return scores[recent[i]].deaths;
 }
 
@@ -334,48 +327,15 @@ int Get_deaths(char *nick)
 void Print_saved_scores(void)
 {
     FILE *file = NULL;
-    Rank_score();
 
-    /* if ( getenv(CLIENTSCOREFILE) != NULL &&
-       (file = fopen(getenv(CLIENTSCOREFILE), "w")) != NULL ) { */
+    Rank_score();
     if (clientRankFile != NULL &&
 	(file = fopen(clientRankFile, "w")) != NULL) {
-
 	const int actual = fwrite(scores, sizeof(ScoreNode),
 				  MAX_SCORES, file);
 	if (actual != MAX_SCORES)
-	    error("Error when writing score file!\n");
+	    warn("Error when writing score file!\n");
 
 	fclose(file);
     }
 }
-
-
-/*called from guimap for basewarning */
-/*void Paint_baseInfoOnHudRadar(int xi, int yi)*/
-/*{
-   float x,y,x2,y2,x3,y3;
-	float hrscale = hrScale;
-	float hrw = (float)hrscale * (float)256;
-	float hrh = (float)hrscale * (float)RadarHeight;
-	int sz = hrSize;
-	float xf = (float) hrw / (float) Setup->width;
-   float yf = (float) hrh / (float) Setup->height;
-   
-   x = X(xi) + SHIP_SZ/2;
-   y = Y(yi) - SHIP_SZ*4/3;
-   x2 = (ext_view_width / 2) - (sz/2);
-   y2 = (ext_view_height / 2) -(sz/2);
-   x3 = (x-x2)*xf + x2;
-   y3 = (y-y2)*yf + y2;
-
-   if (hrColor1 >= 1)
-	   Arc_add(hrColor1, (int)x, (int)y, sz, sz, 0,
-			   64 * 360);
-   if (hrColor1 >= 1)
-	   Arc_add(hrColor1, (int)x2,(int)y2, sz, sz, 0,
-			   64 * 360);
-   if (hrColor2 >= 1)
-	   Arc_add(hrColor2, (int)x3, (int)y3, sz, sz, 0,
-			   64 * 360);
-		      		   }*//*doesn't work (yet) since client only knows visible bases */
