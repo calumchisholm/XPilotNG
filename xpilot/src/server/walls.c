@@ -1925,11 +1925,6 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
     static shipobj zeroshape;
     int i, group;
 
-    if (zeroshape.pts[0] == NULL) {
-	for (i = 0; i < MAX_SHIP_PTS; i++)
-	    zeroshape.pts[i] = &zeropos;
-    }
-
     /* Implemented by first checking whether the middle point of the
      * shape is on top of something. If not, check whether it is possible
      * to enlarge a degenerate shape where all points are on top of each
@@ -1938,7 +1933,18 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
 
     if ( (group = is_inside(cx, cy, hitmask, obj)) != NO_GROUP)
 	return group;
+
+    /*
+     * kps - Ship numpoints can be > MAX_SHIP_PTS because of
+     * SSHACK. This should somehow be fixed.
+     */
     zeroshape.num_points = shape->num_points;
+
+    if (zeroshape.pts[0] == NULL) {
+	for (i = 0; i < zeroshape.num_points; i++)
+	    zeroshape.pts[i] = &zeropos;
+    }
+
     return Shape_morph(&zeroshape, 0, shape, dir, hitmask, obj, cx, cy);
 }
 
