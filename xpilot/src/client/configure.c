@@ -459,7 +459,7 @@ static void Create_config(void)
     config_float_width = 4 + XTextWidth(buttonFont, "0.22", 4);
 
     config_max = Nelem_config_creator();
-    config_widget_desc = (int *) malloc(config_max * sizeof(int));
+    config_widget_desc = malloc(config_max * sizeof(int));
     if (config_widget_desc == NULL) {
 	error("No memory for config");
 	return;
@@ -476,9 +476,9 @@ static void Create_config(void)
 				     config_x, config_y,
 				     config_width, config_height,
 				     0);
-	    if (config_widget_desc[num] == 0) {
+	    if (config_widget_desc[num] == 0)
 		break;
-	    }
+
 	    height = config_height - config_space - config_button_height;
 	    width = 2 * config_button_space + XTextWidth(buttonFont,
 							  "PREV", 4);
@@ -489,9 +489,9 @@ static void Create_config(void)
 				       width, config_button_height,
 				       0, "PREV", Config_prev,
 				       (void *)(long)num);
-	    if (widget_desc == 0) {
+	    if (widget_desc == 0)
 		break;
-	    }
+
 	    width = 2 * config_button_space + XTextWidth(buttonFont,
 							  "NEXT", 4);
 	    offset = config_width - width - config_space;
@@ -501,9 +501,9 @@ static void Create_config(void)
 				       width, config_button_height,
 				       0, "NEXT", Config_next,
 				       (void *)(long)num);
-	    if (widget_desc == 0) {
+	    if (widget_desc == 0)
 		break;
-	    }
+
 	    width = 2 * config_button_space + XTextWidth(buttonFont,
 							  "CLOSE", 5);
 	    offset = config_space;
@@ -513,37 +513,34 @@ static void Create_config(void)
 				       width, config_button_height,
 				       0, "CLOSE", Config_close,
 				       (void *)(long)num);
-	    if (widget_desc == 0) {
+	    if (widget_desc == 0)
 		break;
-	    }
+
 	    height = config_space;
 	}
 	if ((config_widget_ids[i] =
 	     (*config_creator[i])(config_widget_desc[num], &height)) == 0) {
 	    i--;
 	    full = true;
-	    if (height == config_space) {
+	    if (height == config_space)
 		break;
-	    }
 	    continue;
 	}
     }
     if (i < Nelem_config_creator()) {
 	for (; num >= 0; num--) {
-	    if (config_widget_desc[num] != 0) {
+	    if (config_widget_desc[num] != 0)
 		Widget_destroy(config_widget_desc[num]);
-	    }
 	}
 	config_created = false;
 	config_mapped = false;
     } else {
 	config_max = num + 1;
-	config_widget_desc = (int *)realloc(config_widget_desc,
-					    config_max * sizeof(int));
+	config_widget_desc = realloc(config_widget_desc,
+				     config_max * sizeof(int));
 	config_page = 0;
-	for (i = 0; i < config_max; i++) {
+	for (i = 0; i < config_max; i++)
 	    Widget_map_sub(config_widget_desc[i]);
-	}
 	config_created = true;
 	config_mapped = false;
     }
@@ -656,7 +653,7 @@ static int Config_create_int(int widget_desc, int *height,
 			     0, intw);
     offset += config_arrow_width;
     Widget_create_arrow_right(widget_desc, offset, *height
-			      + (config_entry_height - config_arrow_height) / 2,
+			      + (config_entry_height-config_arrow_height) / 2,
 			      config_arrow_width, config_arrow_height,
 			      0, intw);
     *height += config_entry_height + config_space;
@@ -745,7 +742,7 @@ static int Config_create_float(int widget_desc, int *height,
 			     0, floatw);
     offset += config_arrow_width;
     Widget_create_arrow_right(widget_desc, offset, *height
-			      + (config_entry_height - config_arrow_height) / 2,
+			      + (config_entry_height-config_arrow_height) / 2,
 			      config_arrow_width, config_arrow_height,
 			      0, floatw);
     *height += config_entry_height + config_space;
@@ -1773,14 +1770,15 @@ static int Config_update_scaleFactor(int widget_desc, void *data, double *val)
 
 static void Config_save_failed(const char *reason, const char **strptr)
 {
-    if (config_save_confirm_desc != NO_WIDGET) {
+    if (config_save_confirm_desc != NO_WIDGET)
 	Widget_destroy(config_save_confirm_desc);
-    }
+
     config_save_confirm_desc
 	= Widget_create_confirm(reason, Config_save_confirm_callback);
-    if (config_save_confirm_desc != NO_WIDGET) {
+
+    if (config_save_confirm_desc != NO_WIDGET)
 	Widget_raise(config_save_confirm_desc);
-    }
+
     *strptr = "Saving failed...";
 }
 
@@ -2255,9 +2253,8 @@ void Config_resize(void)
 
     if (config_created == true) {
 	Config_destroy();
-	if (mapped == true) {
-	  Config(mapped, CONFIG_NONE /* kps ??? */);
-	}
+	if (mapped == true)
+	    Config(mapped, CONFIG_NONE);
     }
 }
 
