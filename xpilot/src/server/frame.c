@@ -209,8 +209,10 @@ static int click_inview(click_visibility_t *v, int cx, int cy)
     ptr_[num_].y = (unsigned char) yd;					  \
     num_++;
 
-static void fastshot_store(int xf, int yf, int color, int offset)
+static void fastshot_store(int cx, int cy, int color, int offset)
 {
+    int xf = CLICK_TO_PIXEL(cx),
+	yf = CLICK_TO_PIXEL(cy);
 #define ptr_		(fastshot_ptr[i])
 #define num_		(fastshot_num[i])
 #define max_		(fastshot_max[i])
@@ -220,8 +222,10 @@ static void fastshot_store(int xf, int yf, int color, int offset)
 #undef max_
 }
 
-static void debris_store(int xf, int yf, int color)
+static void debris_store(int cx, int cy, int color)
 {
+    int xf = CLICK_TO_PIXEL(cx),
+	yf = CLICK_TO_PIXEL(cy);
 #define ptr_		(debris_ptr[i])
 #define num_		(debris_num[i])
 #define max_		(debris_max[i])
@@ -811,8 +815,8 @@ static void Frame_shots(int conn, int ind)
 		}
 	    }
 
-	    debris_store((int)(shot->pos.px - CLICK_TO_PIXEL(cv.world.cx)),
-			 (int)(shot->pos.py - CLICK_TO_PIXEL(cv.world.cy)),
+	    debris_store(shot->pos.cx - cv.world.cx,
+			 shot->pos.cy - cv.world.cy,
 			 color);
 	    break;
 
@@ -852,8 +856,8 @@ static void Frame_shots(int conn, int ind)
 		teamshot = 0;
 	    }
 
-	    fastshot_store((int)(shot->pos.px - CLICK_TO_PIXEL(cv.world.cx)),
-			   (int)(shot->pos.py - CLICK_TO_PIXEL(cv.world.cy)),
+	    fastshot_store(shot->pos.cx - cv.world.cx,
+			   shot->pos.cy - cv.world.cy,
 			   color, teamshot);
 	    break;
 
