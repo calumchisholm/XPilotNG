@@ -76,9 +76,8 @@ char *Conf_servermotdfile(void)
     char *filename;
 
     filename = getenv(env);
-    if (filename == NULL) {
+    if (filename == NULL)
 	filename = conf;
-    }
 
     return filename;
 }
@@ -174,9 +173,6 @@ void Conf_print(void)
 #endif
 #ifdef MBX
     xpprintf("MBX\n");
-#endif
-#ifdef SPARC_CMAP_HACK
-    xpprintf("SPARC_CMAP_HACK\n");
 #endif
 #ifdef LOG
     xpprintf("LOG\n");
