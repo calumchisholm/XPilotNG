@@ -92,10 +92,8 @@ __inline int gettimeofday(struct timeval *tv, struct timezone *tz)
 
     return 0;
 
-#endif /* HAVE_GETTIMEOFDAY */
 }
-
-
+#endif /* HAVE_GETTIMEOFDAY */
 
 #endif
 

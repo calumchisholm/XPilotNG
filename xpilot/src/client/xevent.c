@@ -31,6 +31,42 @@ char xevent_version[] = VERSION;
 bool		initialPointerControl = false;
 bool		pointerControl = false;
 
+#ifndef HAVE_GETTIMEOFDAY
+__inline int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+    FILETIME        ft;
+    LARGE_INTEGER   li;
+    __int64         t;
+    static int      tzflag;
+
+    if (tv)
+    {
+        GetSystemTimeAsFileTime(&ft);
+        li.LowPart  = ft.dwLowDateTime;
+        li.HighPart = ft.dwHighDateTime;
+        t  = li.QuadPart;       /* In 100-nanosecond intervals */
+        t -= EPOCHFILETIME;     /* Offset to the Epoch time */
+        t /= 10;                /* In microseconds */
+        tv->tv_sec  = (long)(t / 1000000);
+        tv->tv_usec = (long)(t % 1000000);
+    }
+
+    if (tz)
+    {
+        if (!tzflag)
+        {
+            _tzset();
+            tzflag++;
+        }
+        tz->tz_minuteswest = _timezone / 60;
+        tz->tz_dsttime = _daylight;
+    }
+
+    return 0;
+
+}
+#endif /* HAVE_GETTIMEOFDAY */
+
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
     keys_t ret = Generic_lookup_key((xp_keysym_t)ks, reset);
@@ -332,13 +368,16 @@ void xevent_keyboard(int queued)
 static ipos_t	delta;
 ipos_t	mousePosition;	/* position of mouse pointer. */
 int	mouseMovement;	/* horizontal mouse movement. */
-
+struct timeval next_time = {0,0};
+int maxMouseTurnsPF;
+long movement_interval;
 
 void xevent_pointer(void)
 {
 #ifndef _WINDOWS
     XEvent		event;
 #endif
+    static struct timeval now = {0,0};
 
     if (pointerControl) {
 	if (!talk_mapped) {
@@ -349,7 +388,7 @@ void xevent_pointer(void)
 		 POINT point;
 
 		 GetCursorPos(&point);
-		 mouseMovement = point.x - draw_width/2;
+		 mouseMovement += point.x - draw_width/2;
 		 XWarpPointer(dpy, None, drawWindow,
 			      0, 0, 0, 0,
 			      draw_width/2, draw_height/2);
@@ -358,7 +397,21 @@ void xevent_pointer(void)
 #endif
 
 	    if (mouseMovement != 0) {
-		Send_pointer_move(mouseMovement);
+#ifndef _WINDOWS
+    	    	gettimeofday(&now,NULL);
+		if (!movement_interval || (now.tv_sec > next_time.tv_sec) || (now.tv_usec > next_time.tv_usec)) {
+	    	    next_time.tv_sec = now.tv_sec;
+	    	    next_time.tv_usec = now.tv_usec + movement_interval;
+	    	    while ( next_time.tv_usec > 1000000 ) {
+	    	    	++next_time.tv_sec;
+		    	next_time.tv_usec -= 1000000;
+	    	    }
+	    	    Send_pointer_move(mouseMovement);
+    	    	    mouseMovement = 0;
+	    	}
+#else
+    	    	Send_pointer_move(mouseMovement);
+#endif
 		delta.x = draw_width / 2 - mousePosition.x;
 		delta.y = draw_height / 2 - mousePosition.y;
 		if (ABS(delta.x) > 3 * draw_width / 8
@@ -400,7 +453,7 @@ int win_xevent(XEvent event)
     audioEvents();
 #endif /* SOUND */
 
-    mouseMovement = 0;
+    /*mouseMovement = 0*/;
 
 #ifndef _WINDOWS
     switch (new_input) {

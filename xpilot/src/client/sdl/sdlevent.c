@@ -19,6 +19,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <sys/time.h>
+
 #include "xpclient_sdl.h"
 
 #include "sdlkeys.h"
@@ -32,12 +34,52 @@ char sdlevent_version[] = VERSION;
 bool            initialPointerControl = false;
 bool            pointerControl = false;
 
-static int	movement;	/* horizontal mouse movement. */
+/* horizontal mouse movement. */
+int	mouseMovement;
+struct timeval next_time = {0,0};
+int maxMouseTurnsPF;
+long movement_interval;
 
 GLWidget *target[NUM_MOUSE_BUTTONS];
 GLWidget *hovertarget = NULL;
 
 int Process_event(SDL_Event *evt);
+
+#ifndef HAVE_GETTIMEOFDAY
+__inline int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+    FILETIME        ft;
+    LARGE_INTEGER   li;
+    __int64         t;
+    static int      tzflag;
+
+    if (tv)
+    {
+        GetSystemTimeAsFileTime(&ft);
+        li.LowPart  = ft.dwLowDateTime;
+        li.HighPart = ft.dwHighDateTime;
+        t  = li.QuadPart;       /* In 100-nanosecond intervals */
+        t -= EPOCHFILETIME;     /* Offset to the Epoch time */
+        t /= 10;                /* In microseconds */
+        tv->tv_sec  = (long)(t / 1000000);
+        tv->tv_usec = (long)(t % 1000000);
+    }
+
+    if (tz)
+    {
+        if (!tzflag)
+        {
+            _tzset();
+            tzflag++;
+        }
+        tz->tz_minuteswest = _timezone / 60;
+        tz->tz_dsttime = _daylight;
+    }
+
+    return 0;
+
+}
+#endif /* HAVE_GETTIMEOFDAY */
 
 bool Key_press_swap_scalefactor(void)
 {
@@ -154,8 +196,8 @@ bool Key_press_toggle_fullscreen(void)
 int Process_event(SDL_Event *evt)
 {
     int button;
-    movement = 0;
-    
+    static struct timeval now = {0,0};
+
     if (Console_process(evt)) return 1;
     
     switch (evt->type) {
@@ -190,9 +232,9 @@ int Process_event(SDL_Event *evt)
 	break;
 	
     case SDL_MOUSEMOTION:
-	if (pointerControl)
-	    movement += evt->motion.xrel;
-	else {
+	if (pointerControl) {
+	    mouseMovement += evt->motion.xrel;
+	} else {
 	    /*xpprintf("mouse motion xrel=%i yrel=%i\n",evt->motion.xrel,evt->motion.yrel);*/
 	    /*for (i = 0;i<NUM_MOUSE_BUTTONS;++i)*/ /* dragdrop for all mouse buttons*/
 	    if (target[0]) { /*is button one pressed?*/
@@ -240,9 +282,19 @@ int Process_event(SDL_Event *evt)
       break;
     }
     
-    if (movement) {
-	Send_pointer_move(movement);
-	Net_flush();
+    gettimeofday(&now,NULL);
+    if (mouseMovement) {
+    	if (!movement_interval || (now.tv_sec > next_time.tv_sec) || (now.tv_usec > next_time.tv_usec)) {
+	    next_time.tv_sec = now.tv_sec;
+	    next_time.tv_usec = now.tv_usec + movement_interval;
+	    while ( next_time.tv_usec > 1000000 ) {
+	    	++next_time.tv_sec;
+		next_time.tv_usec -= 1000000;
+	    }
+	    Send_pointer_move(mouseMovement);
+	    Net_flush();
+    	    mouseMovement = 0;
+	}
     }
     return 1;
 }

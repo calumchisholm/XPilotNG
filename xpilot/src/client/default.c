@@ -377,7 +377,18 @@ static bool Set_maxFPS(xp_option_t *opt, int val)
 {
     UNUSED_PARAM(opt);
     maxFPS = val;
+    if (maxMouseTurnsPF) movement_interval = 1000000 / (maxMouseTurnsPF*MIN(maxFPS,FPS));
+    else movement_interval = 0;
     Check_client_fps();
+    return true;
+}
+
+static bool Set_maxMouseTurnsPF(xp_option_t *opt, int val)
+{
+    UNUSED_PARAM(opt);
+    maxMouseTurnsPF = val;
+    if (maxMouseTurnsPF) movement_interval = 1000000 / (maxMouseTurnsPF*MIN(maxFPS,FPS));
+    else movement_interval = 0;
     return true;
 }
 
@@ -675,6 +686,18 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set maximum FPS supported by the client. The server will try to\n"
 	"send at most this many frames per second to the client.\n"),
+
+    XP_INT_OPTION(
+	"maxMouseTurnsPF",
+	0,
+	0,
+	15,
+	&maxMouseTurnsPF,
+	Set_maxMouseTurnsPF,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set maximum number of mouse turns sent during a frame interval\n"
+	"(so per second max is MIN(maxFPS,FPS)/maxMouseTurnsPF)\n"
+	"Set to 0 to disable this feature (its mostly useful on modem)\n"),
 
     XP_DOUBLE_OPTION(
 	"sparkProb",
