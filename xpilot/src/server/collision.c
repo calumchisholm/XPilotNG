@@ -1880,7 +1880,6 @@ static void MineCollision(void)
 			   OBJ_HEAT_SHOT |
 			   OBJ_CANNON_SHOT;
 
-    /* kps - use new acd here too, as in PlayerObjectCollision */
     for (i = 0; i < NumObjs; i++) {
 	mine = MINE_IND(i);
 
@@ -1895,21 +1894,55 @@ static void MineCollision(void)
 			 &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
+	    int r, hit;
+
 	    obj = obj_list[j];
 
 	    if (!BIT(obj->type, collide_object_types))
 		continue;
 
-	    if (obj->life <= 0)
-		continue;
+	    r = PIXEL_TO_CLICK(mineShotDetonateDistance + obj->pl_radius);
 
-	    if (!in_range_acd_old(mine->prevpos.cx, mine->prevpos.cy,
-				  mine->pos.cx, mine->pos.cy,
-				  obj->prevpos.cx, obj->prevpos.cy,
-				  obj->pos.cx, obj->pos.cy,
-				  PIXEL_TO_CLICK(mineShotDetonateDistance
-						 + obj->pl_radius))) {
-		continue;
+	    if (is_polygon_map || !useOldCode) {
+		switch (obj->collmode) {
+		case 0:
+		    hit = in_range_simple(mine->pos.cx, mine->pos.cy,
+					  obj->pos.cx, obj->pos.cy,
+					  r);
+		    break;
+		case 1:
+		    hit = in_range_acd(mine->prevpos.cx - obj->prevpos.cx,
+				       mine->prevpos.cy - obj->prevpos.cy,
+				       mine->extmove.cx - obj->extmove.cx,
+				       mine->extmove.cy - obj->extmove.cy,
+				       r);
+		    break;
+		case 2:
+		    hit = in_range_partial(mine->prevpos.cx - obj->prevpos.cx,
+					   mine->prevpos.cy - obj->prevpos.cy,
+					   mine->extmove.cx - obj->extmove.cx,
+					   mine->extmove.cy - obj->extmove.cy,
+					   r, obj->wall_time);
+		    break;
+		case 3:
+		default:
+#if 0
+		    warn("Unimplemented collision mode %d", obj->collmode);
+#endif
+		    continue;
+		}
+		if (!hit)
+		    continue;
+	    } else {
+		if (obj->life <= 0)
+		    continue;
+
+		if (!in_range_acd_old(mine->prevpos.cx, mine->prevpos.cy,
+				      mine->pos.cx, mine->pos.cy,
+				      obj->prevpos.cx, obj->prevpos.cy,
+				      obj->pos.cx, obj->pos.cy, r)) {
+		    continue;
+		}
 	    }
 
 	    /* bang! */
