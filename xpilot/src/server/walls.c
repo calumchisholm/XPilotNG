@@ -1297,25 +1297,23 @@ int Polys_to_client(char *ptr)
 	edges = estyleptr + pdata[i].estyles_start;
 	while (*edges != INT_MAX)
 	    store_short(&ptr, *edges++);
-	dx = 0;
-	dy = 0;
 	startx = pdata[i].x;
 	starty = pdata[i].y;
 	edges = pdata[i].edges;
 	store_short(&ptr, j);
 	store_short(&ptr, startx >> CLICK_SHIFT);
 	store_short(&ptr, starty >> CLICK_SHIFT);
-	startx = 0;
-	starty = 0;
+	dx = startx;
+	dy = starty;
 	for (; j > 0; j--) {
 	    dx += *edges++;
 	    dy += *edges++;
 	    if (j != 1) {
-		store_short(&ptr, (dx >> CLICK_SHIFT) - startx);
-		store_short(&ptr, (dy >> CLICK_SHIFT) - starty);
+		store_short(&ptr, (dx >> CLICK_SHIFT) - (startx>>CLICK_SHIFT));
+		store_short(&ptr, (dy >> CLICK_SHIFT) - (starty>>CLICK_SHIFT));
 	    }
-	    startx = dx >> CLICK_SHIFT;
-	    starty = dy >> CLICK_SHIFT;
+	    startx = dx;
+	    starty = dy;
 	}
     }
     *ptr++ = World.NumBases;
