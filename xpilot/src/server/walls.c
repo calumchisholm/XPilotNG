@@ -1941,7 +1941,7 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
     zeroshape.num_points = shape->num_points;
 
     if (zeroshape.pts[0] == NULL) {
-	for (i = 0; i < zeroshape.num_points; i++)
+	for (i = 0; i < MAX_SHIP_PTS2; i++)
 	    zeroshape.pts[i] = &zeropos;
     }
 
