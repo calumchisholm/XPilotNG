@@ -120,7 +120,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %doc AUTHORS doc/BUGS doc/ChangeLog doc/CREDITS doc/FAQ doc/FIXED FEATURES INSTALL NEWS README TODO
 /usr/local/bin/xpilot-ng-sdl
-/usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts/ConsoleFont.bmp
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts/VeraMoBd.ttf
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/textures/acwise_grav.ppm

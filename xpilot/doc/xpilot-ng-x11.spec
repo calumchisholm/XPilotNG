@@ -108,7 +108,7 @@ start a server of your own (see man-page xpilots(6)).
 
 
 %build
-./configure --prefix=/usr/local
+./configure --prefix=/usr/local --enable-sound
 make
 
 %install
@@ -123,7 +123,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/local/bin/xpilot-ng-x11
 /usr/local/bin/xpilot-ng-server
 /usr/local/bin/xpilot-ng-replay
-/usr/local/share/xpilot-ng/xpilot-ng/fonts/ConsoleFont.bmp
 /usr/local/share/xpilot-ng/fonts/VeraMoBd.ttf
 /usr/local/share/xpilot-ng/fonts
 /usr/local/share/xpilot-ng/maps/polybloods.xp2
