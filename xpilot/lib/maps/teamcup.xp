@@ -1,4 +1,7 @@
-numberofrounds:20
+teamcup:true
+wreckage: false
+numberofrounds:12
+useWreckage: false
 noquit:false
 maxunshieldedwallbouncespeed:90
 maxunshieldedplayerwallbounceangle:180
@@ -89,7 +92,7 @@ roguemineprob:0.02
 limitedlives : yes
 mapwidth : 100
 mapheight : 100
-mapname : Xpilot-Tournament Map (Blood's Music)
+mapname : XPilot-Tournament Map (Blood's Music)
 mapauthor : "Patrick Kenny - pkenny@eecs.umich.edu"
 edgewrap : yes
 teamplay : yes
@@ -99,6 +102,10 @@ limitedvisibility : no
 gravity : 0
 maxplayershots : 12
 shotsgravity : yes
+
+ballradius: 0
+kineticenergyfueldrain: false
+baselesspausing: true
 
 mapData: \multiline: EndOfMapdata
                                        axxxx                       xxxxxxxxx                        
