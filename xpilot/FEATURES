@@ -2,9 +2,10 @@ FEATURES
 ========
 
 The xpilot polygon (also known as xpilot upgrade) package includes 
-the following differences from the official xpilot client (xpilot-4.5.4)
+the following differences from official xpilot (xpilot-4.5.4)
 
 General:
+
 	* ./configure builds instead of xmkmf -a - easier to build.
 
 	* .rpm .deb and .tar.gz packages available.
@@ -15,6 +16,7 @@ General:
 	* Numerous bug fixes, and code cleanups / quality improvement. 
 
 Client:
+
 	* An XPilot client written using SDL and OpenGL - works in 
 	  both windows/linux and unix with slick new textures, common
 	  code shared with the X11 client.
@@ -53,8 +55,7 @@ Server :
 	  own textures directly to a client.
 
 	* New collision code, collisions are handled properly and ships 
-	  cannot get stuck on acute walls anymore
-
+	  cannot get stuck on acute walls anymore.
 
 	* Many new server commands, more server variables can be altered
  	  online such as gamespeed and fps.
@@ -70,8 +71,8 @@ Server :
         * Improved ball handling, better collisions, and the ball is no
 	  longer treated as a point.
 
-        * better collision detection for laser pulses and shots , added 
-          an option to make laser pulses bounce off walls
+        * better collision detection for laser pulses and shots, added
+          an option to make laser pulses bounce off walls.
 
 Tools:
 
