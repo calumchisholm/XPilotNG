@@ -243,6 +243,7 @@ extern struct options {
     double	pauseTax;
     int		pausedFPS;
     int		waitingFPS;
+    int		deadFPS;
 
     char	*motdFileName;
     char	*scoreTableFileName;

@@ -1162,14 +1162,20 @@ void Frame_update(void)
 	    continue;
 	playback = (pl->rectype == 1);
 	player_fps = FPS;
-	if (Player_is_paused(pl)
+	if ((Player_is_paused(pl)
+	     || Player_is_waiting(pl)
+	     || Player_is_dead(pl))
 	    && pl->rectype != 2) {
 	    /*
-	     * Lower the frame rate for pausing players
+	     * Lower the frame rate for some players
 	     * to reduce network load.
 	     */
-	    if (options.pausedFPS)
+	    if (Player_is_paused(pl) && options.pausedFPS)
 		player_fps = options.pausedFPS;
+	    else if (Player_is_waiting(pl) && options.waitingFPS)
+		player_fps = options.waitingFPS;
+	    else if (Player_is_dead(pl) && options.deadFPS)
+		player_fps = options.deadFPS;
 	}
 	player_fps = MIN(player_fps, pl->player_fps);
 

@@ -43,7 +43,7 @@ extern char	conf_logfile_string[];	/* Default name of log file */
 double		timeStep;		/* Game time step per frame */
 double		timePerFrame;		/* Real time elapsed per frame */
 double		ecmSizeFactor;		/* Factor for ecm size update */
-struct options options;
+struct options	options;
 
 /*
  * Two functions which can be used if an option does not have its own
@@ -3580,6 +3580,36 @@ static option_desc opts[] = {
 	tuner_dummy,
 	"Maximum FPS shown to paused players. 0 means full framerate.\n"
 	"Can be used to reduce server bandwidth consumption.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"waitingFramesPerSecond",
+	"waitingFPS",
+	"0",
+	&options.waitingFPS,
+	valInt,
+	tuner_dummy,
+	"Maximum FPS shown to players in waiting state.\n"
+	"0 means full framerate. Can be used to limit bandwidth used.\n"
+	"Waiting players are those that have just joined a game and have to\n"
+	"wait until next round starts. Note that in clients, a W is shown\n"
+	"next to waiting players' names in the score list.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"deadFramesPerSecond",
+	"deadFPS",
+	"0",
+	&options.deadFPS,
+	valInt,
+	tuner_dummy,
+	"Maximum FPS shown to players in dead state.\n"
+	"0 means full framerate. Can be used to limit bandwidth used.\n"
+	"This option should only be used if pausedFPS and waitingFPS\n"
+	"options don't limit bandwidth usage enough.\n"
+	"Dead players are those that have played this round but have run\n"
+	"out of lives. Note that in clients, a D is shown next to dead\n"
+	"players' names in the score list.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     /* teamcup related options */
