@@ -119,7 +119,7 @@ class MapCanvas:
 
     def initUndo(self):
         if UNDO_LEVELS > 0:
-            self.undos = [None] * (UNDO_LEVELS + 1)
+            self.undos = [None] * (UNDO_LEVELS + 2)
             self.undoIndex = -1
             self.saveUndo()
         else:
@@ -137,6 +137,10 @@ class MapCanvas:
         gtk.gdk_flush()
         self.undoIndex += 1
         self.undos[self.undoIndex] = copy.deepcopy(self.model)
+        if self.undoIndex > UNDO_LEVELS:
+            self.undos = self.undos[1:]
+            self.undos.append(None)
+            self.undoIndex -= 1
 
     def undo(self, dir = -1):
         if not self.undos:
