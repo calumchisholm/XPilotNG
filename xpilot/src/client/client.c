@@ -1459,11 +1459,11 @@ int Client_init(char *server, unsigned server_version)
 	return -1;
     }
 
-    if (Add_object_bitmaps() == -1) {
+    if (Bitmap_add_std_objects() == -1) {
         return -1;
     }
 
-    if (Add_default_textures() == -1) {
+    if (Bitmap_add_std_textures() == -1) {
         return -1;
     }
 

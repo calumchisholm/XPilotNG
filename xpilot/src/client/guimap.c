@@ -296,6 +296,7 @@ void Gui_paint_fuel(int x, int y, long fuel)
 	int size;
         irec area;
         bbox_t *box;
+	xp_bitmap_t *bit;
 
 	/* x + x * y will give a pseudo random number, 
 	so different fuelcells will not be displayed with the same image-frame.*/
@@ -312,17 +313,19 @@ void Gui_paint_fuel(int x, int y, long fuel)
 	Bitmap_paint(p_draw, BM_FUELCELL, WINSCALE(X(x)), 
                      WINSCALE(Y(y + BLOCK_SZ)), 0);
 
-        box = &pixmaps[BM_FUEL].bitmaps[image].bbox;
+	
+	bit = Bitmap_get(p_draw, BM_FUEL, image);
+        box = &bit->bbox;
         area.x = 0;
         area.y = 0;
         area.w = BLOCK_SZ - 2 * BITMAP_FUEL_BORDER;
         area.h = WINSCALE(size);
 
         Bitmap_paint_area
-            (p_draw, BM_FUEL, 
+            (p_draw, bit,
              WINSCALE(X(x + BITMAP_FUEL_BORDER)), 
              WINSCALE(Y(y + size + BITMAP_FUEL_BORDER)), 
-             image, &area);
+             &area);
 
 	Erase_rectangle(WINSCALE(X(x)) - 1,
 			WINSCALE(Y(y + BLOCK_SZ)) - 1,
@@ -1217,12 +1220,15 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
 
     if (filled || textured || style.method != NOFILL) {
         if (textured || style.method == TEXTURED) {
-            Pixmap tile = 
-                textured ? PIXMAP(BM_WALL_TEXTURE,0) : PIXMAP(style.texture,0);
-            XSetTile(dpy, gc, tile);
-            XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), 
-                         WINSCALE(realWorld.y));
-            XSetFillStyle(dpy, gc, FillTiled);
+	    xp_bitmap_t *bmp = 
+		Bitmap_get(p_draw, 
+			   textured ? BM_WALL_TEXTURE : style.texture, 0);
+	    if (bmp != NULL) {
+		XSetTile(dpy, gc, bmp->bitmap);
+		XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), 
+			     WINSCALE(realWorld.y));
+		XSetFillStyle(dpy, gc, FillTiled);
+	    }
         } else {
             XSetFillStyle(dpy, gc, FillSolid);
             SET_FG(colors[filled ? wallColor : style.color].pixel);

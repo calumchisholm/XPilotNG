@@ -1280,14 +1280,13 @@ static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
 	if (blockBitmaps == false) {
 	    /* see if we can use blockBitmaps at all. */
 	    blockBitmaps = true;
-	    if (Colors_init_block_bitmaps() == -1 || Bitmaps_init() == -1) {
+	    if (Colors_init_block_bitmaps() == -1) {
 		/* no we can't have blockBitmaps. */
 		blockBitmaps = false;
 		/* and redraw our widget as false. */
 		*val = false;
 		return 1;
 	    }
-            Bitmaps_create(top);
 	}
 	else {
 	    Colors_free_block_bitmaps();
@@ -1300,9 +1299,13 @@ static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
 #ifdef	WINDOWSCALING
 static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val)
 {
+    int i;
     Init_scale_array();
     Resize(top, top_width, top_height);
     Scale_dashes();
+    for (i = 0; i < num_pixmaps; i++)
+	if (pixmaps[i].state == BMS_READY) 
+	    pixmaps[i].state = BMS_INITIALIZED;
     return 0;
 }
 #endif

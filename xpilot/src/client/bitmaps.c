@@ -92,11 +92,11 @@ xp_pixmap_t *pixmaps = 0;
 int num_pixmaps = 0, max_pixmaps = 0;
 
 
-static void Bitmap_create (Drawable d, xp_pixmap_t *pixmap, int bmp);
-static void Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp);
-static void Bitmap_create_end (Drawable d);
+static int  Bitmap_init (int img);
 static void Bitmap_picture_copy (xp_pixmap_t *xp_pixmap, int image);
 static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image);
+static int  Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp);
+static int  Bitmap_create_end (Drawable d);
 static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
 
 
@@ -104,13 +104,14 @@ static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
  * Adds the standard object bitmaps (aka. block bitmaps) specified
  * in the object_pixmaps array into global pixmaps array.
  */
-int Add_object_bitmaps (void)
+int Bitmap_add_std_objects (void)
 {
     int i;
     xp_pixmap_t pixmap;
     for (i = 0; i < NUM_OBJECT_BITMAPS; i++) {
         pixmap = object_pixmaps[i];
-        pixmap.scalable = 1;
+        pixmap.scalable = (i == BM_LOGO || i == BM_SCORE_BG) ? false : true;
+	pixmap.state = BMS_UNINITIALIZED;
         STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
     }
     return 0;
@@ -121,12 +122,13 @@ int Add_object_bitmaps (void)
  * Defines the standard texture bitmaps specified in the standard_textures
  * array into global pixmaps array.
  */
-int Add_default_textures (void)
+int Bitmap_add_std_textures (void)
 {
     xp_pixmap_t pixmap;
     pixmap.filename="rock4.xpm";
     pixmap.count=1;
     pixmap.scalable=false;
+    pixmap.state = BMS_UNINITIALIZED;
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
     /* this is for decor */
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
@@ -134,6 +136,7 @@ int Add_default_textures (void)
     pixmap.filename="ball.xpm";
     pixmap.count=1;
     pixmap.scalable=false;
+    pixmap.state = BMS_UNINITIALIZED;
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
 
     return 0;
@@ -144,103 +147,107 @@ int Add_default_textures (void)
  * Adds a new bitmap needed by the current map into global pixmaps.
  * Returns the index of the newly added bitmap in the array.
  */
-int Add_bitmap (char *filename, int count, bool scalable)
+int Bitmap_add (char *filename, int count, bool scalable)
 {
     xp_pixmap_t pixmap;
     pixmap.count = count;
     pixmap.scalable = scalable;
+    pixmap.state = BMS_UNINITIALIZED;
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
     return num_pixmaps;
 }
 
 
-/*
- * Purpose: initialize the bitmaps, currently i call it after
- * item bitmaps has been created.
- * i hacked the rotations member, it's really #images, but it can also
- * be negative.
- * if rotations > 0 then rotate it (resolution = #images)
- * else it's a handdrawn animation (#images = -rotations) or similar images
- * collected in same ppm for convenience for editing purposes (items).
- *
- * return 0 on success.
- * return -1 on error.
+/**
+ * Creates the Pixmaps needed for the given image.
  */
-int Bitmaps_init (void)
+int Bitmap_create (Drawable d, int img)
 {
-    int i, j, count;
-    static int initialized = 0;
-    if (initialized) return (initialized == 2) ? 0 : -1;
-    else initialized = 1;
+    int j;
+    xp_pixmap_t *pix = &pixmaps[img];
 
-    for (i = 0; i < num_pixmaps; i++) {
+    if (pix->state == BMS_UNINITIALIZED) Bitmap_init(img);
+    if (pix->state != BMS_INITIALIZED) return -1;
 
-        count = ABS(pixmaps[i].count);
+    for (j = 0; j < ABS(pix->count); j++) {
+	if (pix->scalable) {
+	    pix->width = WINSCALE(pix->picture.width);
+	    pix->height = WINSCALE(pix->picture.height);
+	}
 
-        if (!(pixmaps[i].bitmaps = malloc(count * sizeof(xp_bitmap_t)))) {
-            error("not enough memory for bitmaps");
-            return -1;
-        }
-
-        for (j = 0; j < count; j++)
-            pixmaps[i].bitmaps[j].bitmap =
-                pixmaps[i].bitmaps[j].mask = None;
-
-        if (Picture_init
-            (&pixmaps[i].picture,
-             pixmaps[i].filename,
-             pixmaps[i].count) == -1)
-            return -1;
-
-        pixmaps[i].width = pixmaps[i].picture.width;
-        pixmaps[i].height = pixmaps[i].picture.height;
+	if (Bitmap_create_begin(d, pix, j) == -1) {
+	    pix->state = BMS_ERROR;
+	    return -1;
+	}
+	
+	if (pix->height == pix->picture.height &&
+	    pix->width == pix->picture.width) {
+	    Bitmap_picture_copy(pix, j);
+	} else {
+	    Bitmap_picture_scale(pix, j);
+	}
+	
+	if (Bitmap_create_end(d) == -1) {
+	    pix->state = BMS_ERROR;
+	    return -1;
+	}
     }
 
-    initialized = 2;
+    pix->state = BMS_READY;
+
     return 0;
 }
 
 
-int Bitmaps_create (Drawable d)
-{
-    int i,j;
-    for (i = 0; i < num_pixmaps; i++) {
-        for (j = 0; j < ABS(pixmaps[i].count); j++) {
-            if (pixmaps[i].scalable) {
-                pixmaps[i].width = WINSCALE(pixmaps[i].picture.width);
-                pixmaps[i].height = WINSCALE(pixmaps[i].picture.height);
-            }
-            Bitmap_create(d, &pixmaps[i], j);
-        }
+/**
+ * Gets a pointer to the bitmap specified with img and bmp.
+ * Ensures that the bitmap returned has been initialized and created
+ * properly. Returns NULL if the specified bitmap is not in appropriate
+ * state.
+ */
+xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp) {
+    
+    if (pixmaps[img].state != BMS_READY) {
+	if (Bitmap_create(d, img) == -1) return NULL;
     }
+    
+    return &pixmaps[img].bitmaps[bmp];
+}
+
+
+/**
+ * Loads and initializes the given image.
+ */
+static int Bitmap_init (int img)
+{
+    int j, count;
+
+    count = ABS(pixmaps[img].count);
+    
+    if (!(pixmaps[img].bitmaps = malloc(count * sizeof(xp_bitmap_t)))) {
+	error("not enough memory for bitmaps");
+	pixmaps[img].state = BMS_ERROR;
+	return -1;
+    }
+    
+    for (j = 0; j < count; j++)
+	pixmaps[img].bitmaps[j].bitmap =
+	    pixmaps[img].bitmaps[j].mask = None;
+    
+    if (Picture_init
+	(&pixmaps[img].picture,
+	 pixmaps[img].filename,
+	 pixmaps[img].count) == -1) {
+	pixmaps[img].state = BMS_ERROR;
+	return -1;
+    }
+    
+    pixmaps[img].width = pixmaps[img].picture.width;
+    pixmaps[img].height = pixmaps[img].picture.height;
+    pixmaps[img].state = BMS_INITIALIZED;
+    
     return 0;
 }
-
-
-/*
- * Purpose: create a device/OS dependent bitmap.
- * The windows version need to create and lock a device context.
- * I got no clue what the unix version needs before and after drawing the
- * picture to the pixmap.
- * (the windows version just need the Drawable as parameter, the unix version
- * might need more)
- */
-static void Bitmap_create (Drawable d, xp_pixmap_t *pixmap, int bmp)
-{
-    Bitmap_create_begin(d, pixmap, bmp);
-
-    if (pixmap->height == pixmap->picture.height &&
-        pixmap->width == pixmap->picture.width) {
-	/* exactly same size as original */
-	Bitmap_picture_copy(pixmap, bmp);
-    } else {
-	Bitmap_picture_scale(pixmap, bmp);
-    }
-
-    Bitmap_create_end(d);
-}
-
-
 
 
 /*
@@ -335,11 +342,11 @@ extern unsigned long	(*RGB)(unsigned char r, unsigned char g, unsigned char b);
 static GC maskGC;
 
 
-/*
- *    Purpose: to allocate and prepare a pixmap for drawing.
- *   this might be inlined in block_bitmap_create instead?
+/**
+ * Allocates and prepares a pixmap for drawing in a platform
+ * dependent (UNIX) way. 
  */
-static void Bitmap_create_begin(Drawable d, xp_pixmap_t *pm, int bmp)
+static int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 {
     Drawable pixmap;
 
@@ -354,14 +361,14 @@ static void Bitmap_create_begin(Drawable d, xp_pixmap_t *pm, int bmp)
 
     if (!(pixmap = XCreatePixmap(dpy, d, pm->width, pm->height, dispDepth))) {
 	error("Could not create pixmap");
-	exit(1);
+	return -1;
     }
 
     pm->bitmaps[bmp].bitmap = pixmap;
 
     if (!(pixmap = XCreatePixmap(dpy, d, pm->width, pm->height, 1))) {
 	error("Could not create mask pixmap");
-	exit(1);
+	return -1;
     }
     pm->bitmaps[bmp].mask = pixmap;
 
@@ -380,12 +387,14 @@ static void Bitmap_create_begin(Drawable d, xp_pixmap_t *pm, int bmp)
     }
 }
 
-/*
- * Purpose: to deallocate resources needed during creation of a bitmap.
+/**
+ * Deallocates resources needed when creating and drawing a pixmap.
  */
-static void Bitmap_create_end(Drawable d)
+static int Bitmap_create_end (Drawable d)
 {
+    return 0;
 }
+
 
 /*
  * Purpose: set 1 pixel in the device/OS dependent bitmap.
@@ -417,26 +426,27 @@ static void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
  */
 void Bitmap_paint(Drawable d, int img, int x, int y, int bmp)
 {
-    bbox_t *box = &pixmaps[img].bitmaps[bmp].bbox;
+    xp_bitmap_t *bit;
+    bbox_t *box;
     irec   area;
+
+    if ((bit = Bitmap_get(d, img, bmp)) == NULL) return;
+    box = &bit->bbox;
 
     area.x = box->xmin;
     area.y = box->ymin;
     area.w = box->xmax + 1 - box->xmin;
     area.h = box->ymax + 1 - box->ymin;
 
-    Bitmap_paint_area(d, img, x + area.x, y + area.y, bmp, &area);
+    Bitmap_paint_area(d, bit, x + area.x, y + area.y, &area);
 }
 
 
-/*
- * Purpose: Paint an area r of a bitmap specified with img and bmp in
- * a device dependent manner.
+/**
+ * Purpose: Paint an area r of xp_bitmap bit in a device dependent manner.
  */
-void Bitmap_paint_area(Drawable d, int img, int x, int y, int bmp, irec *r)
-{
-    xp_bitmap_t	*bit = &pixmaps[img].bitmaps[bmp];
-
+void Bitmap_paint_area(Drawable d, xp_bitmap_t *bit, int x, int y, irec *r)
+{    
     XSetClipOrigin(dpy, gc, x - r->x, y - r->y);
     XSetClipMask(dpy, gc, bit->mask);
     XCopyArea(dpy, bit->bitmap, d, gc, r->x, r->y, r->w, r->h, x, y);

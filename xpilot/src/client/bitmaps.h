@@ -80,9 +80,10 @@
 #define BM_DECOR_TEXTURE 44
 #define BM_BALL_TEXTURE  45
 
-
-#define BG_IMAGE_HEIGHT 442  
-#define LOGO_HEIGHT     223
+#define BMS_UNINITIALIZED 0
+#define BMS_INITIALIZED 1
+#define BMS_READY 2
+#define BMS_ERROR -1
 
 typedef struct {
     Pixmap        bitmap;
@@ -92,7 +93,7 @@ typedef struct {
 
 typedef struct {
     char	  *filename;
-    int           count, width, height;
+    int           count, width, height, state;
     bool          scalable;
     xp_bitmap_t	  *bitmaps;
     xp_picture_t  picture;
@@ -101,13 +102,13 @@ typedef struct {
 extern xp_pixmap_t *pixmaps;
 extern int num_pixmaps, max_pixmaps;
 
-#define PIXMAP(A,B) pixmaps[(A)].bitmaps[(B)].bitmap
+int Bitmap_add_std_objects (void);
+int Bitmap_add_std_textures (void);
+int Bitmap_add (char *filename, int count, bool scalable);
+int Bitmap_create (Drawable d, int img);
 
-int  Bitmaps_init(void);
-int  Bitmaps_create(Drawable d);
-void Bitmap_paint(Drawable d, int img, int x, int y, int bmp);
-void Bitmap_paint_area(Drawable d, int img, int x, int y, int bmp, irec *r);
-int Add_object_bitmaps(void);
-int Add_default_textures(void);
+xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp);
+void Bitmap_paint (Drawable d, int img, int x, int y, int bmp);
+void Bitmap_paint_area (Drawable d, xp_bitmap_t *bit, int x, int y, irec *r);
 
 #endif

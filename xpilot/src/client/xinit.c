@@ -695,14 +695,6 @@ int Init_top(void)
 	XSetPlaneMask(dpy, gc, dbuf_state->drawing_planes);
     }
 
-    /*
-     * Create all the other bitmaps
-     */
-    if (blockBitmaps) {
-        Bitmaps_init();
-        Bitmaps_create(top);
-    }
-
 
 #endif
 
@@ -954,8 +946,6 @@ void WinXCreateItemBitmaps()
 				       ITEM_SIZE, ITEM_SIZE, colors[RED].pixel);
     }
     Colors_init_block_bitmaps();
-    Bitmaps_init();
-    Bitmaps_create(draw);
     
 }
 #endif

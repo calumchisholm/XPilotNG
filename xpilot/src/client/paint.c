@@ -399,21 +399,26 @@ void Paint_score_background(int thisLine)
     if (!blockBitmaps) {
 	XClearWindow(dpy, players);
     } else {
+	int bgh, lh;
+	
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
-
+	
 	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
 				  0, 0,
 				  players_width, BG_IMAGE_HEIGHT); )
-
+	    
 	Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
-
-	if (players_height > BG_IMAGE_HEIGHT + LOGO_HEIGHT) {
+	Bitmap_get(players, BM_LOGO, 0);
+	bgh = pixmaps[BM_SCORE_BG].height;
+	lh  = pixmaps[BM_LOGO].height;
+	
+	if (players_height > bgh + lh) {
 	    XFillRectangle(dpy, players, scoreListGC,
-			   0, BG_IMAGE_HEIGHT,
+			   0, bgh,
 			   players_width,
-			   players_height - (BG_IMAGE_HEIGHT + LOGO_HEIGHT));
+			   players_height - (bgh + lh));
 	}
-	Bitmap_paint(players, BM_LOGO, 0, players_height - LOGO_HEIGHT, 0);
+	Bitmap_paint(players, BM_LOGO, 0, players_height - lh, 0);
 
 	XFlush(dpy);
     }

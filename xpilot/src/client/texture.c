@@ -212,19 +212,25 @@ Pixmap Texture_ball(void)
 
 Pixmap Texture_wall(void)
 {
+    xp_bitmap_t *bmp;
     if (!blockBitmaps) return None;
-    return pixmaps[BM_WALL_TEXTURE].bitmaps[0].bitmap;
+    if ((bmp = Bitmap_get(top, BM_WALL_TEXTURE, 0)) == NULL) return None;
+    return bmp->bitmap;
 }
 
 Pixmap Texture_decor(void)
 {
+    xp_bitmap_t *bmp;
     if (!blockBitmaps) return None;
-    return pixmaps[BM_DECOR_TEXTURE].bitmaps[0].bitmap;
+    if ((bmp = Bitmap_get(top, BM_DECOR_TEXTURE, 0)) == NULL) return None;
+    return bmp->bitmap;
 }
 
 Pixmap Texture_ball(void)
 {
+    xp_bitmap_t *bmp;
     if (!blockBitmaps) return None;
-    return pixmaps[BM_BALL_TEXTURE].bitmaps[0].bitmap;
+    if ((bmp = Bitmap_get(top, BM_BALL_TEXTURE, 0)) == NULL) return None;
+    return bmp->bitmap;
 }
 
