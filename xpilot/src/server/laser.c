@@ -484,8 +484,7 @@ void Laser_pulse_collision(void)
 	} else {
 	    cx1 = pulse->pos.cx;
 	    cy1 = pulse->pos.cy;
-	    if (cx1 < 0 || cx1 >= World.cwidth ||
-		cy1 < 0 || cy1 >= World.cheight) {
+	    if (!INSIDE_MAP(cx1, cy1)) {
 		pulse->len = 0;
 		continue;
 	    }

@@ -137,7 +137,7 @@ void P_start_polygon(int cx, int cy, int style)
 {
     poly_t t;
 
-    if (cx < 0 || cx >= World.cwidth || cy < 0 || cy > World.cheight) {
+    if (!INSIDE_MAP(cx, cy)) {
 	warn("Polygon start point (%d, %d) is not inside the map"
 	     "(0 <= x < %d, 0 <= y < %d)",
 	     cx, cy, World.cwidth, World.cheight);

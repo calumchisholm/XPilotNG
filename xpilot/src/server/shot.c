@@ -133,10 +133,8 @@ void Place_general_mine(int ind, unsigned short team, long status,
 
     cx = WRAP_XCLICK(cx);
     cy = WRAP_YCLICK(cy);
-    if (cx < 0 || cx >= World.cwidth || cy < 0 || cy >= World.cheight) {
-	printf(__FILE__ ": mine bug\n"); /* kps - remove */
+    if (!INSIDE_MAP(cx, cy))
 	return;
-    }
 
     if (pl && BIT(pl->status, KILLED)) {
 	life = (int)(rfrac() * 12 * TIME_FACT);
@@ -552,7 +550,7 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 			angle,
 			spread;
     vector		mv;
-    ipos		shotpos;
+    clpos		shotpos;
     object		*mini_objs[MODS_MINI_MAX + 1];
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
@@ -968,8 +966,8 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 	    MISSILE_PTR(shot)->max_speed = max_speed;
 	}
 
-	shotpos.x	= cx;
-	shotpos.y	= cy;
+	shotpos.cx	= cx;
+	shotpos.cy	= cy;
 	if (pl && type != OBJ_SHOT) {
 	    if (r == on_this_rack) {
 		/*
@@ -982,18 +980,15 @@ void Fire_general_shot(int ind, unsigned short team, bool cannon,
 		    rack_no = 0;
 		r = 0;
 	    }
-	    shotpos.x += pl->ship->m_rack[rack_no][pl->dir].cx;
-	    shotpos.y += pl->ship->m_rack[rack_no][pl->dir].cy;
+	    shotpos.cx += pl->ship->m_rack[rack_no][pl->dir].cx;
+	    shotpos.cy += pl->ship->m_rack[rack_no][pl->dir].cy;
 	    side = CLICK_TO_PIXEL(pl->ship->m_rack[rack_no][0].cy);
 	}
-	shotpos.x = WRAP_XCLICK(shotpos.x);
-	shotpos.y = WRAP_YCLICK(shotpos.y);
-	if (shotpos.x < 0 || shotpos.x >= World.cwidth ||
-	    shotpos.y < 0 || shotpos.y >= World.cheight) {
-	    printf(__FILE__ ": shotpos bug\n"); /* kps - remove */
+	shotpos.cx = WRAP_XCLICK(shotpos.cx);
+	shotpos.cy = WRAP_YCLICK(shotpos.cy);
+	if (!INSIDE_MAP(shotpos.cx, shotpos.cy))
 	    continue;
-	}
-	Object_position_init_clicks(shot, shotpos.x, shotpos.y);
+	Object_position_init_clicks(shot, shotpos.cx, shotpos.cy);
 
 	if (type == OBJ_SHOT || !pl) {
 	    angle = 0.0;
@@ -1440,10 +1435,8 @@ void Fire_laser(int ind)
 		+ PIXEL_TO_CLICK(pl->vel.y) * timeStep2;
 	    cx = WRAP_XCLICK(cx);
 	    cy = WRAP_YCLICK(cy);
-	    if (cx >= 0 && cx < World.cwidth &&
-		cy >= 0 && cy < World.cheight) {
+	    if (INSIDE_MAP(cx, cy))
 		Fire_general_laser(ind, pl->team, cx, cy, pl->dir, pl->mods);
-	    }
 	}
     }
 }

@@ -544,10 +544,8 @@ void Make_wreckage(
 
     cx = WRAP_XCLICK(cx);
     cy = WRAP_YCLICK(cy);
-    if (cx < 0 || cx >= World.cwidth || cy < 0 || cy >= World.cheight) {
-	printf(__FILE__ ": bug\n"); /* kps - remove */
+    if (!INSIDE_MAP(cx, cy))
 	return;
-    }
 
     if (max_life < min_life)
 	max_life = min_life;

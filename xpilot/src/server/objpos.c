@@ -48,7 +48,7 @@ void Object_position_set_clicks(object *obj, int cx, int cy)
 {
     struct _objposition		*pos = (struct _objposition *)&obj->pos;
 
-    if (cx < 0 || cx >= World.cwidth || cy < 0 || cy >= World.cheight) {
+    if (!INSIDE_MAP(cx, cy)) {
 	if (0) {
 	    printf("BUG!  Illegal object position %d,%d\n", cx, cy);
 	    printf("      Type = %d (%s)\n", obj->type, Object_typename(obj));
@@ -86,7 +86,7 @@ void Player_position_set_clicks(player *pl, int cx, int cy)
 {
     struct _objposition		*pos = (struct _objposition *)&pl->pos;
 
-    if (cx < 0 || cx >= World.cwidth || cy < 0 || cy >= World.cheight) {
+    if (!INSIDE_MAP(cx, cy)) {
 	if (0) {
 	    printf("BUG!  Illegal player position %d,%d\n", cx, cy);
 	    *(double *)(-1) = 4321.0;

@@ -1275,8 +1275,7 @@ void Update_objects(void)
 			    + (PIXEL_TO_CLICK(w.y) - pl->pos.cy);
 			ballpos.cx = WRAP_XCLICK(ballpos.cx);
 			ballpos.cy = WRAP_YCLICK(ballpos.cy);
-			if (ballpos.cx < 0 || ballpos.cx >= World.cwidth ||
-			    ballpos.cy < 0 || ballpos.cy >= World.cheight) {
+			if (!INSIDE_MAP(ballpos.cx, ballpos.cy)) {
 			    b->life = 0;
 			    continue;
 			}

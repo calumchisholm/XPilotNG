@@ -352,15 +352,8 @@ void Make_item(int cx, int cy,
 {
     object *obj;
 
-    /* kps - remove */
-    if (cx < 0 || cx >= World.cwidth) {
-	printf(__FILE__ "Make item cx = %d\n", cx); 
+    if (!INSIDE_MAP(cx, cy))
 	return;
-    }
-    if (cy < 0 || cy >= World.cheight) {
-	printf(__FILE__ "Make item cy = %d\n", cy);
-	return;
-    }
 
     if (World.items[item].num >= World.items[item].max)
 	return;

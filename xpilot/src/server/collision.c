@@ -297,9 +297,7 @@ static void PlayerCollision(void)
 	if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING)
 	    continue;
 
-	if (pl->pos.cx < 0 || pl->pos.cy < 0
-	    || pl->pos.cx >= World.cwidth
-	    || pl->pos.cy >= World.cheight) {
+	if (!INSIDE_MAP(pl->pos.cx, pl->pos.cy)) {
 	    SET_BIT(pl->status, KILLED);
 	    sprintf(msg, "%s left the known universe.", pl->name);
 	    Set_message(msg);
