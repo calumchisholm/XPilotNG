@@ -1005,7 +1005,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 	return;
     }
 
-    ship_color = Gui_calculate_ship_color(id, other);
+    if (!(ship_color = Gui_calculate_ship_color(id, other))) return;
 
     if (cloak == 0 && phased == 0) {
 	if (!texturedObjects || !texturedShips) {
