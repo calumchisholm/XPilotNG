@@ -1173,7 +1173,7 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 	Paint_sliding_radar();
     }
     else if (bit == SHOW_DECOR) {
-	Map_dots();
+	if (oldServer) Map_dots();
 	Paint_world_radar();
     }
     
@@ -1201,7 +1201,7 @@ static int Config_update_dots(int widget_desc, void *data, int *val)
     if (val == &map_point_size && map_point_size > 1) {
 	return 0;
     }
-    Map_dots();
+    if (oldServer) Map_dots();
     return 0;
 }
 
