@@ -66,6 +66,7 @@
 #   define HAVE_INTTYPES_H 1
 #  endif
 #  ifdef __FreeBSD__
+#   define HAVE_FLOAT_H 1
 #   define HAVE_SYS_INTTYPES_H 1    
 #  endif
 #  ifndef _SEQUENT_
@@ -75,10 +76,12 @@
 #  endif
 #  ifdef __sgi
 #   define HAVE_BSTRING_H 1
+#   define HAVE_FLOAT_H 1
 #  endif
 #  ifdef __sun__
 #   define HAVE_ARPA_NAMESER_H 1
 #   define HAVE_RESOLV_H 1
+#   define HAVE_VALUES_H 1
 #  endif
 #  if defined(SVR4) || defined(__svr4__)
 #   define HAVE_SYS_FILIO_H 1
@@ -159,20 +162,24 @@
 # endif
 #endif
 
-#ifdef HAVE_SETJMP_H
-# include <setjmp.h>
+#ifdef HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
+#ifdef HAVE_FLOAT_H
+# include <float.h>
 #endif
 
 #ifdef HAVE_LIMITS_H
 # include <limits.h>
 #endif
 
-#ifdef HAVE_FCNTL_H
-# include <fcntl.h>
-#endif
-
 #ifdef HAVE_PWD_H
 # include <pwd.h>
+#endif
+
+#ifdef HAVE_SETJMP_H
+# include <setjmp.h>
 #endif
 
 #ifdef HAVE_SYS_FILE_H
@@ -247,6 +254,10 @@
 
 #ifdef HAVE_RESOLV_H
 # include <resolv.h>
+#endif
+
+#ifdef HAVE_VALUES_H
+# include <values.h>
 #endif
 
 /* Evil Windows hacks. Yuck. */
