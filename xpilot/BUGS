@@ -1,3 +1,13 @@
+Problem :Hitting the pause key while floating makes the ship got to
+	 autopilot and then start spinning out of control
+Found by:Colonel Blood
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
+
 Problem :Op command can take a + sign with no argument
 Found by:Colonel Blood
 Solution:
