@@ -447,7 +447,7 @@ def convert(options):
 # The styles of these polygons will be changed later...
     for ball in balls:
 	print '<Ball team="%d" x="%d" y="%d"/>' % (ball.team, ball.x, ball.y)
-	print '<BallArea team="%d">' % ball.team
+	print '<BallArea>'
 	print '<Polygon x="%d" y="%d" style="xpred">' % (ball.x - 1120, ball.y - 640)
 	print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
 	print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'

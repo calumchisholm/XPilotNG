@@ -322,10 +322,9 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "BallArea")) {
-	int team;
 	current_group = ++num_groups;
 	groups[current_group].type = TREASURE;
-	groups[current_group].team = team;
+	groups[current_group].team = TEAM_NOT_SET;
 	groups[current_group].hit_mask = BALL_BIT;
     }
 

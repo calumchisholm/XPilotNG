@@ -784,7 +784,7 @@
 <Offset x="-4480" y="0"/>
 </Polygon>
 <Ball team="4" x="119840" y="182080"/>
-<BallArea team="4">
+<BallArea>
 <Polygon x="118720" y="181440" style="xpred">
 <Offset x="2240" y="0"/> <Offset x="0" y="2240"/>
 <Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>
@@ -795,7 +795,7 @@
 <Offset x="-960" y="0"/> <Offset x="0" y="-960"/>
 </Polygon></BallTarget>
 <Ball team="2" x="140000" y="49920"/>
-<BallArea team="2">
+<BallArea>
 <Polygon x="138880" y="49280" style="xpred">
 <Offset x="2240" y="0"/> <Offset x="0" y="2240"/>
 <Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>
