@@ -2711,7 +2711,7 @@ bool in_move_player = false;
 void Move_player(player_t *pl)
 {
     clpos_t  pos;
-    move_t mv,oldmv;
+    move_t mv;
     struct collans ans;
     double fric = friction;
     vector_t oldv;
@@ -2784,7 +2784,6 @@ void Move_player(player_t *pl)
 	pos = World_wrap_clpos(world, pos);
 	Player_position_set_clpos(pl, pos);
     } else {
-    	bool run_once = false;
 	mv.hitmask = NONBALL_BIT | HITMASK(pl->team);
 	mv.start.cx = pl->pos.cx;
 	mv.start.cy = pl->pos.cy;
@@ -2794,13 +2793,6 @@ void Move_player(player_t *pl)
 	    mv.start.cy = WRAP_YCLICK(mv.start.cy + ans.moved.cy);
 	    mv.delta.cx -= ans.moved.cx;
 	    mv.delta.cy -= ans.moved.cy;
-	    if (run_once && (oldmv.delta.cx == mv.delta.cx)
-	    	&& (oldmv.delta.cy == mv.delta.cy)) {
-	    	error("endless loop in Move_Player prevented");/*TODO fix this!*/
-		break;
-	    }
-	    oldmv.delta.cx = mv.delta.cx;
-	    oldmv.delta.cy = mv.delta.cy;
 	    if (ans.line != -1) {
 		if (SIDE(pl->vel.x, pl->vel.y, ans.line) < 0) {
 		    Bounce_player(pl, &mv, ans.line, ans.point);
@@ -2828,7 +2820,6 @@ void Move_player(player_t *pl)
 		    }
 		}
 	    }
-	    run_once = true;
 	}
 	Player_position_set_clvec(pl, mv.start);
     }
