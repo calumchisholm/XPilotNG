@@ -34,6 +34,10 @@ char myClass[] = "XPilot";
 
 #ifdef OPTIONHACK
 
+/*
+ * kps TODO:
+ * make sure this does not exit if nickname is set using \set command.
+ */
 static bool Set_nickName(xp_option_t *opt, const char *value)
 {
     assert(value);
