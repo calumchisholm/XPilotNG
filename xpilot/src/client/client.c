@@ -2375,7 +2375,7 @@ int Client_check_pointer_move_interval(void)
 void Client_exit(int status)
 {
     Net_cleanup();
-    Platform_specific_cleanup();
+    Client_cleanup();
     exit(status);
 }
 
