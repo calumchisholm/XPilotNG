@@ -40,11 +40,6 @@
 # include "walls.h"
 #endif
 
-#ifndef MAX
-#define MAX(a,b)  ((a) > (b) ? (a) : (b))
-#define MIN(a,b)  ((a) < (b) ? (a) : (b))
-#endif
-
 /*
  * When using this, add a final realloc later to free wasted memory
  */
