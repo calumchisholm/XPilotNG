@@ -21,6 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <zlib.h>
 #include "xpserver.h"
 
 char xp2map_version[] = VERSION;
@@ -480,6 +481,9 @@ bool isXp2MapFile(int fd)
 
     /* assume this works */
     (void)lseek(fd, 0, SEEK_SET);
+    /* gz magic from gzio.h */
+    if (buf[0] == (char)0x1f && buf[1] == (char)0x8b)
+	return true;
     if (!strncmp(start, buf, strlen(start)))
 	return true;
     return false;
@@ -487,8 +491,11 @@ bool isXp2MapFile(int fd)
 
 bool parseXp2MapFile(int fd, optOrigin opt_origin)
 {
+    gzFile in;
+    struct stat info;
     char buff[8192];
     int len;
+    unsigned int left;
     XML_Parser p = XML_ParserCreate(NULL);
 
     UNUSED_PARAM(opt_origin);
@@ -497,18 +504,49 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin)
 	return false;
     }
     XML_SetElementHandler(p, tagstart, tagend);
-    do {
-	len = read(fd, buff, 8192);
-	if (len < 0) {
-	    error("Error reading map!");
+    /* dup used here because gzclose closes the fd */
+    fd = dup(fd);
+    if (fd == -1 || (in = gzdopen(fd, "rb")) == NULL) {
+	error("Error reading map!");
+	return false;
+    }
+    if (gzgets(in, buff, 8192) == Z_NULL) {
+	error("Error reading map!");
+	gzclose(in);
+	return false;
+    }
+    if (strncmp("XPD ", buff, 4) == 0) {
+	if (gzgets(in, buff, 8192) == Z_NULL
+	    || sscanf(buff, "%*s %u", &left) != 1) {
+	    error("Bad xpd file header");
+	    gzclose(in);
 	    return false;
 	}
-	if (!XML_Parse(p, buff, len, !len)) {
+    } else {
+	if (gzrewind(in) == -1
+	    || 	fstat(fd, &info) == -1) {
+	    error("Error reading map!");
+	    gzclose(in);
+	    return false;
+	}
+	left = (unsigned int)info.st_size;
+    }
+    do {
+	len = gzread(in, buff, MIN(8192, left));
+	if (len < 0) {
+	    error("Error reading map!");
+	    gzclose(in);
+	    return false;
+	}
+	left -= len;
+	if (!XML_Parse(p, buff, len, left == 0)) {
 	    warn("Parse error reading map at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));
+	    gzclose(in);
 	    return false;
 	}
-    } while (len);
+    } while (left);
+    gzclose(in);
     return true;
 }
