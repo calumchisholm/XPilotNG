@@ -26,15 +26,47 @@ SDL_Surface  *MainSDLSurface = NULL;
 
 int Init_playing_windows(void)
 {
-    char defaultfont[] = CONF_FONTDIR "defaultfont.bmp"; /* TODO make bmp fonts work */
-    char testfont[] = CONF_FONTDIR "Test.ttf";
-    int gamefontsize = 12;
-    int messagefontsize = 16;
-    int mapfontsize = 12;
-    int value;
-    /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
+  
+   
+    /*
+    sdl_init_colors();
+    Init_spark_colors();
+    */
+    if ( !AppendGLWidgetList(&MainWidget,Init_MainWidget(&gamefont)) ) {
+	error("widget initialization failed");
+	return -1;
+    }
+    if (Console_init()) {
+	error("console initialization failed");
+	return -1;
+    }
+    if (Gui_init()) {
+	error("gui initialization failed");
+	return -1;
+    }
 
-    Conf_print();
+    return 0;
+}
+
+
+int Init_window(void)
+{  
+  char defaultfont[] = CONF_FONTDIR "defaultfont.bmp"; /* TODO make bmp fonts work */
+  char testfont[] = CONF_FONTDIR "Test.ttf";
+  int gamefontsize = 12;
+  int messagefontsize = 16;
+  int mapfontsize = 12;
+  int value;
+  /*char testfont[] = "/doze/windows/fonts/trebuc.ttf";*/
+
+
+  if (TTF_Init()) {
+    error("SDL_ttf initialization failed: %s", SDL_GetError());
+    return -1;
+  }
+  xpprintf("SDL_ttf initialized\n");
+  
+ Conf_print();
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         error("failed to initialize SDL: %s", SDL_GetError());
@@ -115,25 +147,6 @@ int Init_playing_windows(void)
 	if (fontinit(&mapfont,defaultfont,mapfontsize))
 	    error("Default font failed! messagefont not available!");
     }
- 
-    /*
-    sdl_init_colors();
-    Init_spark_colors();
-    */
-    if ( !AppendGLWidgetList(&MainWidget,Init_MainWidget(&gamefont)) ) {
-	error("widget initialization failed");
-	return -1;
-    }
-    if (Console_init()) {
-	error("console initialization failed");
-	return -1;
-    }
-    if (Gui_init()) {
-	error("gui initialization failed");
-	return -1;
-    }
-
-    return 0;
 }
 
 void Quit(void) 
