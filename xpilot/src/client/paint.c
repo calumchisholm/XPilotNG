@@ -403,25 +403,26 @@ void Paint_score_background(int thisLine)
 	
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
 	
-	Bitmap_get(players, BM_SCORE_BG, 0);
-	Bitmap_get(players, BM_LOGO, 0);
-	bgh = pixmaps[BM_SCORE_BG].height;
-	lh  = pixmaps[BM_LOGO].height;
+	if (Bitmap_get(players, BM_SCORE_BG, 0) != NULL &&
+            Bitmap_get(players, BM_LOGO, 0) != NULL) {
+            bgh = pixmaps[BM_SCORE_BG].height;
+            lh  = pixmaps[BM_LOGO].height;
 	
-	IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
-				  0, 0,
-				  players_width, bgh); )
+            IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
+                                      0, 0,
+                                      players_width, bgh); )
 	    
-	Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
-	if (players_height > bgh + lh) {
-	    XFillRectangle(dpy, players, scoreListGC,
-			   0, bgh,
-			   players_width,
-			   players_height - (bgh + lh));
-	}
-	Bitmap_paint(players, BM_LOGO, 0, players_height - lh, 0);
-
-	XFlush(dpy);
+                Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
+            if (players_height > bgh + lh) {
+                XFillRectangle(dpy, players, scoreListGC,
+                               0, bgh,
+                               players_width,
+                               players_height - (bgh + lh));
+            }
+            Bitmap_paint(players, BM_LOGO, 0, players_height - lh, 0);
+            
+            XFlush(dpy);
+        }
     }
 
 }

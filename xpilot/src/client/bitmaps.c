@@ -172,6 +172,7 @@ int Bitmap_create (Drawable d, int img)
     if (pix->state == BMS_UNINITIALIZED) Bitmap_init(img);
     if (pix->state != BMS_INITIALIZED) return -1;
 
+
     for (j = 0; j < ABS(pix->count); j++) {
 	if (pix->scalable) {
 	    pix->width = WINSCALE(pix->picture.width);
@@ -410,7 +411,6 @@ int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 	error("Could not create pixmap");
 	return -1;
     }
-
     pm->bitmaps[bmp].bitmap = pixmap;
 
     if (!(pixmap = XCreatePixmap(dpy, d, pm->width, pm->height, 1))) {
@@ -472,7 +472,7 @@ void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
  * Purpose: Paint an area r of xp_bitmap bit in a device dependent manner.
  */
 void Bitmap_paint_area(Drawable d, xp_bitmap_t *bit, int x, int y, irec *r)
-{    
+{   
     XSetClipOrigin(dpy, gc, x - r->x, y - r->y);
     XSetClipMask(dpy, gc, bit->mask);
     XCopyArea(dpy, bit->bitmap, d, gc, r->x, r->y, r->w, r->h, x, y);

@@ -293,20 +293,24 @@ void Gui_paint_fuel(int x, int y, long fuel)
 #define BITMAP_FUEL_BORDER 3
 
         int fuel_images = ABS(pixmaps[BM_FUEL].count);
-	int size;
+	int size, image;
         irec area;
         bbox_t *box;
 	xp_bitmap_t *bit;
 
 	/* x + x * y will give a pseudo random number,
-	so different fuelcells will not be displayed with the same image-frame.*/
-	int image = ( (loops + x + x * y) % (fuel_images * 2) );
+         * so different fuelcells will not be displayed with the same 
+         * image-frame.
+         * The ABS is needed to ensure image is not negative even with
+         * large scale factors. */
 
-	/* the animation is played from image 0-15 then back again from image 15-0 */
+	image = ABS( (loops + x + x * y) % (fuel_images * 2) );
+
+	/* the animation is played from image 0-15 then back again 
+         * from image 15-0 */
 
 	if (image >= fuel_images)
 	    image = (2 * fuel_images - 1) - image;
-
 
 	size = (BLOCK_SZ - 2 * BITMAP_FUEL_BORDER) * fuel / MAX_STATION_FUEL;
 
@@ -315,22 +319,23 @@ void Gui_paint_fuel(int x, int y, long fuel)
 
 
 	bit = Bitmap_get(p_draw, BM_FUEL, image);
-        box = &bit->bbox;
-        area.x = 0;
-        area.y = 0;
-        area.w = BLOCK_SZ - 2 * BITMAP_FUEL_BORDER;
-        area.h = WINSCALE(size);
+        if (bit != NULL) {
+            box = &bit->bbox;
+            area.x = 0;
+            area.y = 0;
+            area.w = WINSCALE(BLOCK_SZ - 2 * BITMAP_FUEL_BORDER);
+            area.h = WINSCALE(size);
 
-        Bitmap_paint_area
-            (p_draw, bit,
-             WINSCALE(X(x + BITMAP_FUEL_BORDER)),
-             WINSCALE(Y(y + size + BITMAP_FUEL_BORDER)),
-             &area);
-
-	Erase_rectangle(WINSCALE(X(x)) - 1,
-			WINSCALE(Y(y + BLOCK_SZ)) - 1,
-			WINSCALE(BLOCK_SZ) + 2, WINSCALE(BLOCK_SZ) + 2);
-
+            Bitmap_paint_area
+                (p_draw, bit,
+                 WINSCALE(X(x + BITMAP_FUEL_BORDER)),
+                 WINSCALE(Y(y + size + BITMAP_FUEL_BORDER)),
+                 &area);
+            
+            Erase_rectangle(WINSCALE(X(x)) - 1,
+                            WINSCALE(Y(y + BLOCK_SZ)) - 1,
+                            WINSCALE(BLOCK_SZ) + 2, WINSCALE(BLOCK_SZ) + 2);
+        }
     }
 }
 
