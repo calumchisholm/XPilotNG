@@ -56,18 +56,15 @@ DFLOAT		ShipMass;		/* Default mass of ship */
 DFLOAT		ballMass;		/* Default mass of balls */
 DFLOAT		ShotsMass;		/* Default mass of shots */
 DFLOAT		ShotsSpeed;		/* Default speed of shots */
-int		ShotsLife;		/* Default number of ticks */
+DFLOAT		ShotsLife;		/* Default number of ticks */
 					/* each shot will live */
-static DFLOAT	ShotsLifeSetting;	/* Above is set through this */
 
 bool		shotHitFuelDrainUsesKineticEnergy;	/* see option name */
 
 DFLOAT		pulseSpeed;		/* Default speed of laser pulse */
 DFLOAT		pulseLength;		/* Max length of laser pulse */
-int		pulseLife;		/* Default number of ticks */
+DFLOAT		pulseLife;		/* Default number of ticks */
 					/* each pulse will live */
-static DFLOAT	pulseLifeSetting;	/* Above is set through this */
-
 int		maxRobots;		/* How many robots should enter */
 int		minRobots;		/* the game? */
 char		*robotFile;		/* Filename for robot parameters */
@@ -184,7 +181,7 @@ DFLOAT		nukeClusterDamage;	/* multiplier for damage from nuke */
 int		mineFuseTime;		/* Length of time mine is fused */
 int		mineLife;		/* lifetime of mines */
 DFLOAT		minMineSpeed;		/* minimum speed of mines */
-int		missileLife;		/* lifetime of missiles */
+DFLOAT		missileLife;		/* lifetime of missiles */
 int		baseMineRange;		/* Distance from base mines may be used */
 int		mineShotDetonateDistance; /* When does a shot trigger a mine? */
 
@@ -335,8 +332,8 @@ int		eliminationRace;	/* Last player drops each lap? */
 
 DFLOAT		FPSMultiplier;		/* Slow everything by this factor */
 DFLOAT		gameSpeed;		/* FPS/FPSMultiplier */
-int		timeStep;		/* Game time step per frame */
-DFLOAT		timeStep2;		/* timeStep /TIME_FACT */
+int		timeStep;
+DFLOAT		timeStep2;		/* Game time step per frame */
 					/* before: framespeed, framespeed2 */
 DFLOAT		ecmSizeFactor;		/* Factor for ecm size update */
 
@@ -469,7 +466,7 @@ static option_desc options[] = {
 	"shotLife",
 	"shotLife",
 	"60.0",
-	&ShotsLifeSetting,
+	&ShotsLife,
 	valReal,
 	Timing_setup,
 	"Life of bullets in ticks.\n",
@@ -512,7 +509,7 @@ static option_desc options[] = {
 	"pulseLife",
 	"pulseLife",
 	"6.0", /* kps - should be PULSE_LIFE(lasers) */
-	&pulseLifeSetting,
+	&pulseLife,
 	valReal,
 	Timing_setup,
 	"Life of laser pulses shot by ships, in ticks.\n",
@@ -859,7 +856,7 @@ static option_desc options[] = {
 	"The server's fully qualified domain name (for multihomed hosts).\n",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
-    { /* kps - ng does not want mapdata */
+    {
 	"mapData",
 	"mapData",
 	NULL,
@@ -1606,7 +1603,7 @@ static option_desc options[] = {
 	"Can ships be destroyed when hit by an asteroid?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    {   "ignore20MaxFPS", /* kps - ng does not want this */
+    {   "ignore20MaxFPS",
 	"ignore20MaxFPS",
 	"true",
 	&ignore20MaxFPS,
@@ -2110,7 +2107,7 @@ static option_desc options[] = {
 	"0",
 	&mineLife,
 	valInt,
-	tuner_minelife,
+	tuner_dummy,
 	"Life of mines in ticks, zero means use default.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -2129,8 +2126,8 @@ static option_desc options[] = {
 	"missileLife",
 	"0",
 	&missileLife,
-	valInt,
-	tuner_missilelife,
+	valReal,
+	tuner_dummy,
 	"Life of missiles in ticks, zero means use default.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -3223,7 +3220,7 @@ static option_desc options[] = {
 	"false",
 	&teamZeroPausing,
 	valBool,
-	tuner_dummy, /* kps - changed from tuner_none */
+	tuner_dummy,
 	"Should team zero be considered a pause only team?\n",
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
@@ -3468,7 +3465,7 @@ static option_desc options[] = {
 	valString,
 	tuner_none,
 	"The filename of the player passwords file to read when authenticating.\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+	OPT_COMMAND | OPT_DEFAULTS
     },
     {
 	"playerPasswordsFileSizeLimit",
@@ -3479,7 +3476,7 @@ static option_desc options[] = {
 	tuner_none,
 	"Maximum size of player passwords file in bytes (may become bigger\n"
 	"if players change passwords!).\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+	OPT_COMMAND | OPT_DEFAULTS
     },
     {
 	"allowPlayerPasswords",
@@ -3489,7 +3486,7 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"May players protect their nicks with a password?\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"playerLimit",
@@ -3500,7 +3497,7 @@ static option_desc options[] = {
 	tuner_dummy,
 	"Allow only (number of bases)-playerLimit players to enter.\n"
 	"This option will probably change in future versions.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE  /* kps - was OPT_ANY */
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"recordMode",
@@ -3515,7 +3512,7 @@ static option_desc options[] = {
 	"spectators who can watch the recorded game from anyone's\n"
 	"viewpoint. Can be set to 0 in the middle of a game to stop"
 	"recording.\n",
-	OPT_COMMAND | OPT_DEFAULTS /* kps - was OPT_CMDLINE */
+	OPT_COMMAND | OPT_DEFAULTS
     },
     {
 	"recordFileName",
@@ -3525,7 +3522,7 @@ static option_desc options[] = {
 	valString,
 	tuner_none,
 	"Name of the file where server recordings are saved.\n",
-	OPT_COMMAND | OPT_DEFAULTS /* kps - was OPT_CMDLINE */
+	OPT_COMMAND | OPT_DEFAULTS
     },
     {
 	"recordFlushInterval",
@@ -3539,7 +3536,7 @@ static option_desc options[] = {
 	"This is useful if you want to replay the game on another server\n"
 	"while it is still being played. There is a small overhead\n"
 	"(some dozens of bytes extra recording file size) for each flush.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE /* kps - was OPT_ANY */
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"constantScoring",
@@ -3549,7 +3546,7 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Whether the scores given from various things are fixed.\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"elimination",
@@ -3559,7 +3556,7 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Race mode where the last player drops out each lap.\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"dataURL",
@@ -3569,7 +3566,7 @@ static option_desc options[] = {
 	valString,
 	tuner_dummy,
 	"URL where the client can get extra data for this map\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
 #if 0
     {
@@ -3581,7 +3578,7 @@ static option_desc options[] = {
 	Timing_setup,
 	"Everything is slowed by this factor. Allows using higher\n"
 	"FPS without making the game too fast.\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS /* kps - was OPT_ANY */
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
 #endif
     {
@@ -3594,7 +3591,7 @@ static option_desc options[] = {
 	"Rate at which game events happen. Allows using higher\n"
 	"FPS without making the game too fast.\n"
 	"A value of 0 means the game speed is the same as FPS.\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     /* useOldCode - kps tmp hack */
     {
@@ -3605,7 +3602,7 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Use old code in some places when playing on a block based map?\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"polygonMode",
@@ -3617,7 +3614,7 @@ static option_desc options[] = {
 	"Force use of polygon protocol when communicating with clients?\n"
 	"(useful for debugging if you want to see the polygons created\n"
 	"in the blocks to polygons conversion function).\n",
-	OPT_ORIGIN_ANY | OPT_DEFAULTS
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"fastAim",
@@ -3629,7 +3626,8 @@ static option_desc options[] = {
 	"When calculating a frame, turn the ship before firing.\n"
 	"This means you can change aim one frame faster.\n"
 	"Added this option to see how much difference changing the order\n"
-	"would make.\n"
+	"would make.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"ignoreMaxFPS",
@@ -3642,7 +3640,8 @@ static option_desc options[] = {
 	"This is a hack for demonstration purposes to allow changing\n"
 	"the server FPS when there are old clients with broken maxFPS\n"
 	"handling. Those clients could be better dealt with separately.\n"
-	"This option will be removed in the future (hopefully).\n"
+	"This option will be removed in the future (hopefully).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
 };
 
@@ -3790,9 +3789,6 @@ void Timing_setup(void)
     timeStep = (int)(TIME_FACT / FPSMultiplier);
     timeStep2 = 1. / FPSMultiplier;
 
-    ShotsLife = ShotsLifeSetting * TIME_FACT;
-    pulseLife = pulseLifeSetting * TIME_FACT;
-
     friction = frictionSetting;
 
     /* If friction > 1, the result is silly - allow such settings but
@@ -3808,7 +3804,6 @@ void Timing_setup(void)
     xpprintf(__FILE__ ": FPSMultiplier     = %f\n", FPSMultiplier);
     xpprintf(__FILE__ ": timeStep          = %d\n", timeStep);
     xpprintf(__FILE__ ": timeStep2         = %f\n", timeStep2);
-    xpprintf(__FILE__ ": ShotsLife         = %d\n", ShotsLife);
     xpprintf(__FILE__ ": friction          = %f\n", friction);
 #endif
 }
