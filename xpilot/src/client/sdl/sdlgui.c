@@ -997,7 +997,7 @@ void Gui_paint_fastshot(int color, int x, int y)
 
     Image_paint(IMG_BULLET,
 		x + world.x - size/2,
-		world.y - 6 + ext_view_height - y,
+		world.y - 16 + size/2 - 1 + ext_view_height - y,
 		size - 1, whiteRGBA);
 }
 
@@ -1007,7 +1007,7 @@ void Gui_paint_teamshot(int x, int y)
 
     Image_paint(IMG_BULLET_OWN,
 		x + world.x - size/2,
-		world.y - 6 + ext_view_height - y,
+		world.y - 16 + size/2 - 1 + ext_view_height - y,
 		size - 1, whiteRGBA);
 }
 
