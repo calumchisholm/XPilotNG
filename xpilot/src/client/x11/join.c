@@ -126,7 +126,26 @@ static void Input_loop(void)
 		    error("Bad net flush before sync");
 		    return;
 		}
-		XSync(dpy, False);
+
+		{
+		    struct timeval tv1, tv2;
+		    double t1, t2;
+
+		    if (newSecond)
+			gettimeofday(&tv1, NULL);
+
+		    XSync(dpy, False);
+
+		    if (newSecond) {
+			gettimeofday(&tv2, NULL);
+
+			t1 = timeval_to_seconds(tv1);
+			t2 = timeval_to_seconds(tv2);
+
+			clData.clientLag = (t2 - t1) * 1e3;
+		    }
+		}
+
 		if (Handle_input(1) == -1)
 		    return;
 	    }

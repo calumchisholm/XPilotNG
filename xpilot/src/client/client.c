@@ -27,6 +27,8 @@
 
 char client_version[] = VERSION;
 
+client_data_t	clData;
+
 char	*geometry;
 xp_args_t xpArgs;
 Connect_param_t connectParam;

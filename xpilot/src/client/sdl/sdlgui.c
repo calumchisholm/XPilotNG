@@ -1422,9 +1422,9 @@ void Paint_select(void)
     glEnd();
 }
 
-void Paint_client_fps(void)
+void Paint_HUD_values(void)
 {
-    int			x, y;
+    int x, y;
 
     if (!hudColorRGBA)
 	return;

@@ -50,6 +50,10 @@
 #endif
 
 typedef struct {
+    double	clientLag;
+} client_data_t;
+
+typedef struct {
     bool blockProtocol;
     bool clientRanker;
     bool clockAMPM;
@@ -434,6 +438,8 @@ typedef struct {
     msg_bms_t		bmsinfo;
 } message_t;
 /* typedefs end */
+
+extern client_data_t	clData;
 
 extern bool		newbie;
 extern char		*geometry;

@@ -967,21 +967,33 @@ void Paint_recording(void)
 }
 
 
-void Paint_client_fps(void)
+void Paint_HUD_values(void)
 {
-    int			w, x, y, len;
-    char		buf[32];
+    int w, x, y, len, w2, len2, wmax;
+    static char buf[32], buf2[32];
 
     if (!hudColor)
 	return;
 
     SET_FG(colors[hudColor].pixel);
-    sprintf(buf, "FPS: %.3f", clientFPS);
+
+    sprintf(buf,  "FPS    : %.3f", clientFPS);
+    sprintf(buf2, "CL.LAG : %.1f ms", clData.clientLag);
+
     len = strlen(buf);
     w = XTextWidth(gameFont, buf, len);
-    x = WINSCALE(ext_view_width) - 10 - w;
+    len2 = strlen(buf2);
+    w2 = XTextWidth(gameFont, buf2, len2);
+
+    wmax = MAX(w, w2);
+
+    x = WINSCALE(ext_view_width) - 10 - wmax;
     y = 200 + gameFont->ascent;
     rd.drawString(dpy, drawPixmap, gameGC, x, y, buf, len);
+
+    x = WINSCALE(ext_view_width) - 10 - wmax;
+    y = 220 + gameFont->ascent;
+    rd.drawString(dpy, drawPixmap, gameGC, x, y, buf2, len2);
 }
 
 xp_option_t hud_options[] = {

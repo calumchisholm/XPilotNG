@@ -111,7 +111,7 @@ void Paint_HUD(void);
 int  Get_message(int *pos, char *message, int req_length, int key);
 void Paint_messages(void);
 void Paint_recording(void);
-void Paint_client_fps(void);
+void Paint_HUD_values(void);
 void Paint_frame(void);
 void Paint_frame_start(void);
 int Team_color(int);

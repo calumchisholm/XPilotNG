@@ -163,7 +163,7 @@ void Paint_frame(void)
 	Paint_meters();
 	Paint_HUD();
 	Paint_recording();
-	Paint_client_fps();
+	Paint_HUD_values();
 
 	Rectangle_end();
 	Segment_end();

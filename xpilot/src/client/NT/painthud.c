@@ -850,10 +850,10 @@ void Paint_recording(void)
 }
 
 
-void Paint_client_fps(void)
+void Paint_HUD_values(void)
 {
-    int			w, x, y, len;
-    char		buf[32];
+    int w, x, y, len;
+    char buf[32];
 
     if (!hudColor)
 	return;

@@ -313,7 +313,7 @@ void Paint_frame(void)
 
     	Paint_meters();
     	Paint_HUD();
-    	Paint_client_fps();
+    	Paint_HUD_values();
 
 	Paint_messages();       
 	Console_paint();
