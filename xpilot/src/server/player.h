@@ -182,6 +182,7 @@ typedef struct player {
     uint16_t	pl_status;		/* FOO_PLAYING, etc. */
     uint16_t	pl_state;		/* one of PL_STATE_* */
     int		pl_life;		/* Lives left (if lives limited) */
+    int		pl_leave_life;		/* Deaths since last joining server */
 
     double	turnspeed;		/* How fast player acc-turns */
     double	velocity;		/* Absolute speed */

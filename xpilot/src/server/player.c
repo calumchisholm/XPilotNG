@@ -1555,8 +1555,10 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 
     Player_init_fuel(pl, (double)world->items[ITEM_FUEL].initial);
 
-    if (add_rank_death)
+    if (add_rank_death) {
 	Rank_add_death(pl);
+	pl->pl_leave_life++;
+    }
 
     pl->have	= DEF_HAVE;
     pl->used	|= DEF_USED;

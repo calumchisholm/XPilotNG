@@ -956,22 +956,6 @@ static void Robot_play(player_t *pl)
     (*rob_type->robot_play)(pl);
 }
 
-
-/*-BA Handle the combination of limited life games and
- *-BA options.robotLeaveLife by making a robot leave iff it gets
- *-BA eliminated in any round.  Means that options.robotLeaveLife
- *-BA is ignored, but that options.robotsLeave is still respected.
- * kps - this is bad, rather just count how many times the robot has died
- * also in limited life games.
- *-KK Added check on race mode. Since in race mode everyone
- *-KK gets killed at the end of the round, all robots would
- *-KK be replaced in the next round. I don't think that's
- *-KK the Right Thing to do.
- *-KK Also, only check a robot's score at the end of the round.
- *-KK 27-2-98 Check on team mode too. It's very confusing to
- *-KK have different robots in your team every round.
- */
-
 /*
  * Check if robot is still considered good enough to continue playing.
  * Return false if robot continues playing,
@@ -980,26 +964,20 @@ static void Robot_play(player_t *pl)
 static bool Robot_check_leave(player_t *pl)
 {
     bool leave = false;
-    world_t *world = pl->world;
 
     if (!options.robotsLeave)
 	return false;
 
-    if (pl->pl_life > 0
-	&& !BIT(world->rules->mode, LIMITED_LIVES)
-	&& (BIT(pl->pl_status, FOO_PLAYING) || pl->recovery_count <= 0)) {
+    if (options.robotLeaveLife > 0
+	&& pl->pl_leave_life >= options.robotLeaveLife) {
+	Set_message_f("%s retired.", pl->name);
+	leave = true;
+    }
 
-	if (options.robotLeaveLife > 0
-	    && pl->pl_life >= options.robotLeaveLife) {
-	    Set_message_f("%s retired.", pl->name);
-	    leave = true;
-	}
-
-	if (leave) {
-	    Robot_talks(ROBOT_TALK_LEAVE, pl->name, "");
-	    Robot_delete(pl, false);
-	    return true;
-	}
+    if (leave) {
+	Robot_talks(ROBOT_TALK_LEAVE, pl->name, "");
+	Robot_delete(pl, false);
+	return true;
     }
 
     return false;
@@ -1011,7 +989,7 @@ static bool Robot_check_leave(player_t *pl)
  */
 static void Robot_round_tick(world_t *world)
 {
-    int			i;
+    int i;
 
     if (NumRobots > 0) {
 	for (i = 0; i < num_robot_types; i++)
@@ -1129,17 +1107,9 @@ void Robot_update(world_t *world)
 	    /* Ignore non-robots. */
 	    continue;
 
-	if (BIT(pl->pl_status, FOO_PLAYING|FOO_GAME_OVER) != FOO_PLAYING) {
-	    /* Only check for leave if not being transported to homebase. */
-	    if (pl->recovery_count <= 0) {
-		if (Robot_check_leave(pl))
-		    i--;
-	    }
-	    continue;
-	}
-
-	if (Robot_check_leave(pl)) {
-	    i--;
+	if (!Player_is_alive(pl)) {
+	    if (Robot_check_leave(pl))
+		i--;
 	    continue;
 	}
 
