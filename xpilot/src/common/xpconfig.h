@@ -26,12 +26,13 @@
 #ifndef XPCONFIG_H
 #define XPCONFIG_H
 
-#ifndef CONF_LIBDIR
-#  ifndef _WINDOWS
-#    error "CONF_LIBDIR NOT DEFINED. GIVING UP."
-#  else
-#    define CONF_LIBDIR			"lib/"
-#  endif
+#ifdef _WINDOWS
+#  /* kps - what about this ???? */
+#  define CONF_DATADIR			"lib/"
+#endif
+
+#ifndef CONF_DATADIR
+#  error "CONF_DATADIR NOT DEFINED. GIVING UP."
 #endif
 
 #ifndef CONF_LOCALGURU
@@ -43,48 +44,48 @@
 #endif
 
 #ifndef CONF_MAPDIR
-#  define CONF_MAPDIR			CONF_LIBDIR "maps/"
+#  define CONF_MAPDIR			CONF_DATADIR "maps/"
 #endif
 
 #ifndef CONF_TEXTUREDIR
-#  define CONF_TEXTUREDIR		CONF_LIBDIR "textures/"
+#  define CONF_TEXTUREDIR		CONF_DATADIR "textures/"
 #endif
 
 #ifndef CONF_SOUNDDIR
-#  define CONF_SOUNDDIR			CONF_LIBDIR "sound/"
+#  define CONF_SOUNDDIR			CONF_DATADIR "sound/"
 #endif
 
 #ifndef CONF_FONTDIR
-#  define CONF_FONTDIR			CONF_LIBDIR "fonts/"
+#  define CONF_FONTDIR			CONF_DATADIR "fonts/"
 #endif
 
 #ifndef CONF_DEFAULTS_FILE_NAME
-#  define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults.txt"
+#  define CONF_DEFAULTS_FILE_NAME	CONF_DATADIR "defaults.txt"
 #endif
 
 #ifndef CONF_PASSWORD_FILE_NAME
-#  define CONF_PASSWORD_FILE_NAME	CONF_LIBDIR "password.txt"
+#  define CONF_PASSWORD_FILE_NAME	CONF_DATADIR "password.txt"
 #endif
 
 /* not used currently */
 #ifndef CONF_PLAYER_PASSWORDS_FILE_NAME
-#  define CONF_PLAYER_PASSWORDS_FILE_NAME CONF_LIBDIR "player_passwords.txt"
+#  define CONF_PLAYER_PASSWORDS_FILE_NAME CONF_DATADIR "player_passwords.txt"
 #endif
 
 #ifndef CONF_ROBOTFILE
-#  define CONF_ROBOTFILE		CONF_LIBDIR "robots.txt"
+#  define CONF_ROBOTFILE		CONF_DATADIR "robots.txt"
 #endif
 
 #ifndef CONF_SERVERMOTDFILE
-#  define CONF_SERVERMOTDFILE		CONF_LIBDIR "servermotd.txt"
+#  define CONF_SERVERMOTDFILE		CONF_DATADIR "servermotd.txt"
 #endif
 
 #ifndef CONF_LOCALMOTDFILE
-#  define CONF_LOCALMOTDFILE		CONF_LIBDIR "localmotd.txt"
+#  define CONF_LOCALMOTDFILE		CONF_DATADIR "localmotd.txt"
 #endif
 
 #ifndef CONF_LOGFILE
-#  define CONF_LOGFILE			CONF_LIBDIR "log.txt"
+#  define CONF_LOGFILE			CONF_DATADIR "log.txt"
 #endif
 
 #ifndef CONF_SOUNDFILE

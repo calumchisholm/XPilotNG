@@ -1,5 +1,5 @@
 
-xpilotfontdir = $(pkglibdir)/fonts
+xpilotfontdir = $(pkgdatadir)/fonts
 xpilotfont_DATA = \
 	ConsoleFont.bmp \
 	Test.ttf \

@@ -1,5 +1,5 @@
 
-xpilotmapdir = $(pkglibdir)/maps
+xpilotmapdir = $(pkgdatadir)/maps
 xpilotmap_DATA = \
 	polybloods.xp2 \
 	sadistic_bastard_v2.xp2 \

@@ -183,7 +183,7 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
+AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\"
 noinst_LIBRARIES = libxpcommon.a
 libxpcommon_a_SOURCES = \
 	astershape.h audio.h \

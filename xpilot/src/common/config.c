@@ -28,9 +28,9 @@
 char config_version[] = VERSION;
 
 
-char *Conf_libdir(void)
+char *Conf_datadir(void)
 {
-    static char conf[] = CONF_LIBDIR;
+    static char conf[] = CONF_DATADIR;
 
     return conf;
 }
@@ -191,7 +191,7 @@ void Conf_print(void)
 
     xpprintf("Conf_localguru()          = %s\n", Conf_localguru());
     xpprintf("Conf_contactaddress()     = %s\n", Conf_contactaddress());
-    xpprintf("Conf_libdir()             = %s\n", Conf_libdir());
+    xpprintf("Conf_datadir()            = %s\n", Conf_datadir());
     xpprintf("Conf_defaults_file_name() = %s\n", Conf_defaults_file_name());
     xpprintf("Conf_password_file_name() = %s\n", Conf_password_file_name());
     xpprintf("Conf_mapdir()             = %s\n", Conf_mapdir());

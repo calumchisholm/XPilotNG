@@ -155,7 +155,7 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-xpilottexturesdir = $(pkglibdir)/textures
+xpilottexturesdir = $(pkgdatadir)/textures
 xpilottextures_DATA = \
 	acwise_grav.ppm \
 	allitems.ppm \

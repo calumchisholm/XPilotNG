@@ -1,7 +1,6 @@
 
 bin_PROGRAMS = xpilot-ng-x11
-AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
-INCLUDES = -I$(top_srcdir)/src/common
+AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" -I$(top_srcdir)/src/common
 xpilot_ng_x11_SOURCES = \
 	about.c \
 	bitmaps.c bitmaps.h \

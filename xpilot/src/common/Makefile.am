@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
+AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\"
 noinst_LIBRARIES = libxpcommon.a
 libxpcommon_a_SOURCES = \
 	astershape.h audio.h \

@@ -1,5 +1,5 @@
 
-xpilottexturesdir =  $(pkglibdir)/textures
+xpilottexturesdir =  $(pkgdatadir)/textures
 xpilottextures_DATA = \
 	acwise_grav.ppm \
 	allitems.ppm \

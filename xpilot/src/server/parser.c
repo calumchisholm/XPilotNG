@@ -194,7 +194,7 @@ static void Parser_dump_config(char *progname)
     xpprintf("\n");
     xpprintf("# %s option dump\n", progname);
     xpprintf("# \n");
-    xpprintf("# CONF_LIBDIR = %s\n", Conf_libdir());
+    xpprintf("# CONF_DATADIR = %s\n", Conf_datadir());
     xpprintf("# CONF_DEFAULTS_FILE_NAME = %s\n", Conf_defaults_file_name());
     xpprintf("# CONF_PASSWORD_FILE_NAME = %s\n", Conf_password_file_name());
     xpprintf("# CONF_MAPDIR = %s\n", Conf_mapdir());

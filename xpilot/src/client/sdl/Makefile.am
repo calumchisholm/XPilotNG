@@ -1,7 +1,7 @@
 
 bin_PROGRAMS = xpilot-ng-sdl
-AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
-INCLUDES = -I$(top_srcdir)/src/common -I$(top_srcdir)/src/client
+AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" \
+	-I$(top_srcdir)/src/common -I$(top_srcdir)/src/client
 xpilot_ng_sdl_SOURCES = \
 	DT_drawtext.c DT_drawtext.h \
 	SDL_console.c SDL_console.h SDL_gfxPrimitives.c SDL_gfxPrimitives.h \

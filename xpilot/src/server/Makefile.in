@@ -208,8 +208,7 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-INCLUDES = -I$(top_srcdir)/src/common
-AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
+AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" -I$(top_srcdir)/src/common
 xpilot_ng_server_SOURCES = \
 	alliance.c asteroid.c asteroid.h auth.c auth.h \
 	cannon.c cannon.h cell.c click.h cmdline.c collision.c \

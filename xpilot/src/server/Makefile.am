@@ -1,6 +1,4 @@
-
-INCLUDES = -I$(top_srcdir)/src/common
-AM_CPPFLAGS = -DCONF_LIBDIR=\"$(pkglibdir)/\"
+AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" -I$(top_srcdir)/src/common
 bin_PROGRAMS = xpilot-ng-server
 xpilot_ng_server_SOURCES = \
 	alliance.c asteroid.c asteroid.h auth.c auth.h \
