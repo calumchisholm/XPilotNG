@@ -91,7 +91,7 @@ void Pick_startpos(player_t *pl)
 	prev_num_bases = world->NumBases;
 	if (free_bases != NULL)
 	    free(free_bases);
-	free_bases = (char *) malloc(world->NumBases * sizeof(*free_bases));
+	free_bases = malloc(world->NumBases * sizeof(*free_bases));
 	if (free_bases == NULL) {
 	    error("Can't allocate memory for free_bases");
 	    End_game();
@@ -494,6 +494,7 @@ int Init_player(int ind, shipshape_t *ship)
 
     {
 	static unsigned short	pseudo_team_no = 0;
+
 	pl->pseudo_team = pseudo_team_no++;
     }
     pl->mychar		= ' ';
@@ -579,11 +580,10 @@ void Alloc_players(int number)
     PlayersArray = (player_t **) calloc(n, sizeof(player_t *));
 
     /* Allocate space for all entries, all player structs */
-    p = playerArray = (player_t *) calloc(n, sizeof(player_t));
+    p = playerArray = calloc(n, sizeof(player_t));
 
     /* Allocate space for all visibility arrays, n arrays of n entries */
-    t = visibilityArray =
-	(visibility_t *) calloc(n * n, sizeof(visibility_t));
+    t = visibilityArray = calloc(n * n, sizeof(visibility_t));
 
     if (!PlayersArray || !playerArray || !visibilityArray) {
 	error("Not enough memory for Players.");
@@ -639,6 +639,7 @@ void Update_score_table(void)
 	    pl->prev_alliance = pl->alliance;
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->conn != NULL)
 		    Send_score(pl_i->conn, pl->id, pl->score, (int)pl->life,
 			       pl->mychar, pl->alliance);
@@ -659,6 +660,7 @@ void Update_score_table(void)
 				: (pl->check - 1);
 		for (i = 0; i < NumPlayers; i++) {
 		    player_t *pl_i = Players(i);
+
 		    if (pl_i->conn != NULL)
 			Send_timing(pl_i->conn, pl->id, check, pl->round);
 		}
@@ -666,13 +668,14 @@ void Update_score_table(void)
 	}
     }
     if (BIT(world->rules->mode, TEAM_PLAY)) {
-	team_t	*team;
 	for (j = 0; j < MAX_TEAMS; j++) {
-	    team = &(world->teams[j]);
+	    team_t *team = Teams(world, j);
+
 	    if (team->score != team->prev_score) {
 		team->prev_score = team->score;
 		for (i = 0; i < NumPlayers; i++) {
 		    player_t *pl_i = Players(i);
+
 		    if (pl_i->conn != NULL)
 			Send_team_score(pl_i->conn, j, team->score);
 		}
@@ -743,6 +746,7 @@ void Reset_all_players(void)
 	for (j = NumObjs - 1; j >= 0 ; j--) {
 	    if (BIT(Obj[j]->type, OBJ_BALL)) {
 		ballobject_t *ball = BALL_IND(j);
+
 		ball->id = NO_ID;
 		ball->life = 0;
 		ball->owner = 0;	/* why not -1 ??? */
@@ -782,9 +786,10 @@ void Reset_all_players(void)
     if (options.endOfRoundReset) {
 	for (i = 0; i < NumObjs; i++) {
 	    object_t *obj = Obj[i];
+
 	    if (BIT(obj->type, OBJ_SHOT|OBJ_MINE|OBJ_DEBRIS|OBJ_SPARK
 			       |OBJ_CANNON_SHOT|OBJ_TORPEDO|OBJ_SMART_SHOT
-			       |OBJ_HEAT_SHOT|OBJ_ITEM)) {
+			       |OBJ_HEAT_SHOT|OBJ_PULSE|OBJ_ITEM)) {
 		obj->life = 0;
 		if (BIT(obj->type, OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_HEAT_SHOT
 				   |OBJ_CANNON_SHOT|OBJ_MINE))
@@ -834,7 +839,9 @@ void Check_team_members(int team)
 	     team, teamp->NumMembers, members);
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
-	    if (!Player_is_tank(pl) && pl->team == team && pl->home_base != NULL)
+	    if (!Player_is_tank(pl)
+		&& pl->team == team
+		&& pl->home_base != NULL)
 		warn("Team %d currently has player %d: \"%s\"",
 		     team, i+1, pl->name);
 	}
@@ -1093,6 +1100,7 @@ void Individual_game_over(int winner)
     else if (winner == -2) {
 	for (j = 0; j < NumPlayers; j++) {
 	    player_t *pl_j = Players(j);
+
 	    if (Player_is_robot(pl_j)) {
 		for (i = 0; i < num_best_players; i++) {
 		    if (j == best_players[i])
@@ -1129,7 +1137,7 @@ void Race_game_over(void)
      * Reassign players's starting positions based upon
      * personal best lap times.
      */
-    if ((order = (int *)malloc(NumPlayers * sizeof(int))) != NULL) {
+    if ((order = malloc(NumPlayers * sizeof(int))) != NULL) {
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
 	    if (Player_is_tank(pl))
@@ -1141,6 +1149,7 @@ void Race_game_over(void)
 	    else {
 		for (j = 0; j < i; j++) {
 		    player_t *pl_j = Players(order[j]);
+
 		    if (pl->best_lap < pl_j->best_lap)
 			break;
 
@@ -1727,6 +1736,7 @@ void Compute_game_status(void)
 
 	for (i = 0; i < NumPlayers; i++)  {
 	    player_t *pl_i = Players(i);
+
 	    if (BIT(pl_i->status, PAUSE) || Player_is_tank(pl_i))
 		continue;
 	    if (!BIT(pl_i->status, GAME_OVER)) {
@@ -1832,6 +1842,7 @@ void Delete_player(player_t *pl)
 	    }
 	    else if (BIT(obj->type, OBJ_BALL)) {
 		ballobject_t *ball = BALL_PTR(obj);
+
 		if (ball->owner == id)
 		    ball->owner = NO_ID;
 	    }
@@ -1883,6 +1894,7 @@ void Delete_player(player_t *pl)
 
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player_t *pl_i = Players(i);
+
 	if (Player_is_tank(pl_i)
 	    && pl_i->lock.pl_id == id) {
 	    /* remove tanks which were released by this player. */
@@ -1913,6 +1925,7 @@ void Delete_player(player_t *pl)
 
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player_t *pl_i = Players(i);
+
 	if (pl_i->conn != NULL)
 	    Send_leave(pl_i->conn, id);
 	else if (Player_is_tank(pl_i)) {
@@ -2063,7 +2076,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 	    if (pl->life == -1) {
 		if (Player_is_robot(pl)) {
 		    if (!BIT(world->rules->mode, TIMING|TEAM_PLAY)
-			|| (options.robotsLeave && pl->score < options.robotLeaveScore)) {
+			|| (options.robotsLeave
+			    && pl->score < options.robotLeaveScore)) {
 			Robot_delete(pl, false);
 			return;
 		    }
