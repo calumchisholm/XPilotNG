@@ -243,6 +243,24 @@ static bool Key_press_pointer_control(void)
     return false;	/* server doesn't need to know */
 }
 
+static bool Key_press_toggle_fullscreen(void)
+{
+    Toggle_fullscreen();
+    return false;	/* server doesn't need to know */
+}
+
+static bool Key_press_toggle_radar_score(void)
+{
+    Toggle_radar_and_scorelist();
+    return false;	/* server doesn't need to know */
+}
+
+static bool Key_press_toggle_record(void)
+{
+    Record_toggle();
+    return false;	/* server doesn't need to know */
+}
+
 static bool Key_press_msgs_stdout(void)
 {
     Print_messages_to_stdout();

@@ -132,7 +132,7 @@ bool Key_press_talk(void)
     return false;	/* server doesn't need to know */
 }
 
-bool Key_press_toggle_radar_score(void)
+void Toggle_radar_and_scorelist(void)
 {
     if (radar_score_mapped) {
 
@@ -181,19 +181,11 @@ bool Key_press_toggle_radar_score(void)
 
 	radar_score_mapped = true;
     }
-
-    return false;
 }
 
-bool Key_press_toggle_record(void)
+void Toggle_fullscreen(void)
 {
-    Record_toggle();
-    return false;	/* server doesn't need to know */
-}
-
-bool Key_press_toggle_fullscreen(void)
-{
-    return false;
+    return;
 }
 
 void Key_event(XEvent *event)

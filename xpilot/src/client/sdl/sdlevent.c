@@ -81,23 +81,21 @@ void Pointer_control_set_state(bool on)
     pointerControl = on;
 }
 
-bool Key_press_toggle_record(void)
+void Record_toggle(void)
 {
-    /* TODO: implement if you think it is worth it 
-    Record_toggle();
-    */
-    return false;	/* server doesn't need to know */
+    /* TODO: implement if you think it is worth it */
+    Add_message("Can't record with this client. [*Client reply*]");
 }
 
-bool Key_press_toggle_radar_score(void)
+void Toggle_radar_and_scorelist(void)
 {
     /* TODO */
-    return false;
+    return;
 }
 
 #ifndef _WINDOWS
 extern int videoFlags;
-bool Key_press_toggle_fullscreen(void)
+void Toggle_fullscreen(void)
 {
     static int initial_w = -1, initial_h = -1;
     int w, h;
@@ -110,7 +108,7 @@ bool Key_press_toggle_fullscreen(void)
     if (videoFlags & SDL_FULLSCREEN) {
 	videoFlags ^= SDL_FULLSCREEN;
 	Resize_Window(initial_w, initial_h);
-	return false;
+	return;
     }
 
     w = initial_w = draw_width;
@@ -118,18 +116,16 @@ bool Key_press_toggle_fullscreen(void)
 
     videoFlags ^= SDL_FULLSCREEN;
     if (Resize_Window(w, h) == 0)
-		return false;
-    
+	return;
+
     videoFlags ^= SDL_FULLSCREEN;
     Resize_Window(initial_w, initial_h);
-    Add_message("Failed to change video mode [*Client reply*]");
-    return false;
+    Add_message("Failed to change video mode. [*Client reply*]");
 }
 #else
-bool Key_press_toggle_fullscreen(void)
+void Toggle_fullscreen(void)
 {
-	Add_message("Changing mode does not work in windows [*Client reply*]");
-	return false;
+    Add_message("Changing mode does not work in Windows. [*Client reply*]");
 }
 #endif
 
