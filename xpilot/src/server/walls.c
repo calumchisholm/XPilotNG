@@ -1066,8 +1066,10 @@ void Polys_to_client(char *ptr)
 	for (; j > 1; j--) {
 	    dx += *p++;
 	    dy += *p++;
-	    *ptr++ = (dx >> CLICK_SHIFT) - startx;
-	    *ptr++ = (dy >> CLICK_SHIFT) - starty;
+	    *ptr++ = (dx >> CLICK_SHIFT) - startx >> 8;
+	    *ptr++ = (dx >> CLICK_SHIFT) - startx & 0xff;
+	    *ptr++ = (dy >> CLICK_SHIFT) - starty >> 8;
+	    *ptr++ = (dy >> CLICK_SHIFT) - starty & 0xff;
 	    startx = dx >> CLICK_SHIFT;
 	    starty = dy >> CLICK_SHIFT;
 	}

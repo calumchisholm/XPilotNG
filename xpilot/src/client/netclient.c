@@ -417,7 +417,7 @@ int Net_setup(void)
 	xp_polygon_t poly;
 	ipos *points, min, max;
 	int size2 = Setup->map_data_len / 4 * 4;
-	char *ptr;
+	signed char *ptr;
 
 	size2 = size2 / 4 * 4;
 	ptr = Setup->map_data + size2 - 19996;
@@ -443,8 +443,11 @@ int Net_setup(void)
 	    points[0].x = cx = min.x = max.x = startx;
 	    points[0].y = cy = min.y = max.y = starty;
 	    for (j = 1; j < pc; j++) {
-		dx = *ptr++;
-		dy = -*ptr++;
+		dx = *ptr++ << 8;
+		dx += (unsigned char)*ptr++;
+		dy = *ptr++ << 8;
+		dy += (unsigned char)*ptr++;
+		dy = -dy;
 		cx += dx;
 		cy -= dy;
 		if (min.x > cx) min.x = cx;
