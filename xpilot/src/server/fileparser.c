@@ -330,7 +330,7 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
 /*
  * Parse a file containing defaults (and possibly a map).
  */
-static bool parseOpenFile(FILE * ifile, optOrigin opt_origin)
+static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
 {
     int fd, n;
     size_t map_offset, map_size;
@@ -350,7 +350,7 @@ static bool parseOpenFile(FILE * ifile, optOrigin opt_origin)
      */
     if (isXp2MapFile(fd)) {
 	is_polygon_map = true;
-	return parseXp2MapFile(fd, opt_origin);
+	return parseXp2MapFile(fd, opt_origin, world);
     }
 
     /*
@@ -666,15 +666,15 @@ static void closeDefaultsFile(FILE *fp)
 /*
  * Parse a file containing defaults.
  */
-bool parseDefaultsFile(const char *filename)
+bool parseDefaultsFile(const char *filename, world_t *world)
 {
-    FILE           *ifile;
-    bool            result;
+    FILE *ifile;
+    bool result;
 
     if ((ifile = openDefaultsFile(filename)) == NULL)
 	return false;
 
-    result = parseOpenFile(ifile, OPT_DEFAULTS);
+    result = parseOpenFile(ifile, OPT_DEFAULTS, world);
     closeDefaultsFile(ifile);
 
     return true;
@@ -684,7 +684,7 @@ bool parseDefaultsFile(const char *filename)
 /*
  * Parse a file containing password.
  */
-bool parsePasswordFile(const char *filename)
+bool parsePasswordFile(const char *filename, world_t *world)
 {
     FILE *ifile;
     bool result;
@@ -692,7 +692,7 @@ bool parsePasswordFile(const char *filename)
     if ((ifile = openDefaultsFile(filename)) == NULL)
 	return false;
 
-    result = parseOpenFile(ifile, OPT_PASSWORD);
+    result = parseOpenFile(ifile, OPT_PASSWORD, world);
     closeDefaultsFile(ifile);
 
     return true;
@@ -702,7 +702,7 @@ bool parsePasswordFile(const char *filename)
 /*
  * Parse a file containing a map.
  */
-bool parseMapFile(const char *filename)
+bool parseMapFile(const char *filename, world_t *world)
 {
     FILE *ifile;
     bool result;
@@ -710,7 +710,7 @@ bool parseMapFile(const char *filename)
     if ((ifile = openMapFile(filename)) == NULL)
 	return false;
 
-    result = parseOpenFile(ifile, OPT_MAP);
+    result = parseOpenFile(ifile, OPT_MAP, world);
     closeMapFile(ifile);
 
     return result;

@@ -29,11 +29,16 @@ char xp2map_version[] = VERSION;
 
 #define DEFAULT_POS { -1, -1 }
 
+/*
+ * The world whose map we are currently parsing.
+ */
+static world_t *current_world = NULL;
+
 static void tagstart(void *data, const char *el, const char **attr)
 {
     static double scale = 1;
     static int xptag = 0;
-    world_t *world = &World;
+    world_t *world = current_world;
 
     UNUSED_PARAM(data);
     if (!strcasecmp(el, "XPilotMap")) {
@@ -439,7 +444,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 static void tagend(void *data, const char *el)
 {
-    world_t *world = &World;
+    world_t *world = current_world;
 
     UNUSED_PARAM(data);
     if (!strcasecmp(el, "Decor"))
@@ -493,7 +498,7 @@ bool isXp2MapFile(int fd)
     return false;
 }
 
-bool parseXp2MapFile(int fd, optOrigin opt_origin)
+bool parseXp2MapFile(int fd, optOrigin opt_origin, world_t *world)
 {
     gzFile in;
     struct stat info;
@@ -501,6 +506,8 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin)
     int len;
     unsigned int left;
     XML_Parser p = XML_ParserCreate(NULL);
+
+    current_world = world;
 
     UNUSED_PARAM(opt_origin);
     if (!p) {

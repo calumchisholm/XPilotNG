@@ -36,12 +36,10 @@ char parser_version[] = VERSION;
  */
 static void Parse_help(char *progname)
 {
-    int			j;
-    int			flags, all_flags;
-    const char		*str;
-    option_desc		*option_descs;
-    int			option_count;
-    char		msg[MSG_LEN];
+    int j, flags, all_flags, option_count;
+    const char *str;
+    option_desc *option_descs;
+    char msg[MSG_LEN];
 
     option_descs = Get_option_descs(&option_count);
 
@@ -77,30 +75,24 @@ static void Parse_help(char *progname)
 	       option_descs[j].type == valList ? "<list>" :
 	       "");
 	for (str = option_descs[j].helpLine; *str; str++) {
-	    if (str == option_descs[j].helpLine || str[-1] == '\n') {
+	    if (str == option_descs[j].helpLine || str[-1] == '\n')
 		putchar('\t');
-	    }
 	    putchar(*str);
 	}
-	if (str > option_descs[j].helpLine && str[-1] != '\n') {
+	if (str > option_descs[j].helpLine && str[-1] != '\n')
 	    putchar('\n');
-	}
 	flags = option_descs[j].flags;
 	all_flags = (OPT_ORIGIN_ANY | OPT_VISIBLE);
 	if ((flags & all_flags) != all_flags && flags != 0) {
 	    strlcpy(msg, "[ Flags: command, ", sizeof(msg));
-	    if ((flags & OPT_PASSWORD) != 0) {
+	    if ((flags & OPT_PASSWORD) != 0)
 		strlcat(msg, "passwordfile, ", sizeof(msg));
-	    }
-	    if ((flags & (OPT_DEFAULTS | OPT_MAP)) == OPT_DEFAULTS) {
+	    if ((flags & (OPT_DEFAULTS | OPT_MAP)) == OPT_DEFAULTS)
 		strlcat(msg, "defaults, ", sizeof(msg));
-	    }
-	    if ((flags & OPT_MAP) != 0) {
+	    if ((flags & OPT_MAP) != 0)
 		strlcat(msg, "any, ", sizeof(msg));
-	    }
-	    if ((flags & OPT_VISIBLE) == 0) {
+	    if ((flags & OPT_VISIBLE) == 0)
 		strlcat(msg, "invisible, ", sizeof(msg));
-	    }
 	    msg[strlen(msg) - 2] = '\0';
 	    strlcat(msg, " ]", sizeof(msg));
 	    printf("\t%s\n", msg);
@@ -124,9 +116,8 @@ static void Parse_help(char *progname)
  */
 static void Parser_dump_options(char *progname)
 {
-    int			j;
-    option_desc		*option_descs;
-    int			option_count;
+    int j, option_count;
+    option_desc *option_descs;
 
     UNUSED_PARAM(progname);
     option_descs = Get_option_descs(&option_count);
@@ -134,6 +125,7 @@ static void Parser_dump_options(char *progname)
     for (j = 0; j < option_count; j++) {
 	if (option_descs[j].type != valVoid) {
 	    int len = strlen(option_descs[j].name);
+
 	    xpprintf("%s:%*s%s\n", option_descs[j].name,
 		   (len < 40) ? (40 - len) : 1, "",
 		   (option_descs[j].defaultValue != NULL)
@@ -150,16 +142,16 @@ static void Parser_dump_options(char *progname)
  */
 static void Parser_dump_flags(char *progname)
 {
-    int			j;
-    option_desc		*option_descs;
-    int			option_count;
-    char		msg[MSG_LEN];
+    int j, option_count;
+    option_desc *option_descs;
+    char msg[MSG_LEN];
 
     UNUSED_PARAM(progname);
     option_descs = Get_option_descs(&option_count);
 
     for (j = 0; j < option_count; j++) {
 	int len = strlen(option_descs[j].name);
+
 	strlcpy(msg, "{", sizeof(msg));
 	if ((option_descs[j].flags & OPT_COMMAND) != 0)
 	    strlcat(msg, "command, ", sizeof(msg));
@@ -186,8 +178,8 @@ static void Parser_dump_flags(char *progname)
  */
 static void Parser_dump_config(char *progname)
 {
-    option_desc		*option_descs;
-    int			option_count;
+    option_desc *option_descs;
+    int option_count;
 
     option_descs = Get_option_descs(&option_count);
 
@@ -225,19 +217,20 @@ static void Parser_dump_all(char *progname)
  */
 int Parser_list_option(int *ind, char *buf)
 {
-    int			i = *ind;
-    option_desc		*opts;
-    int			option_count;
+    int i = *ind, option_count;
+    option_desc *opts;
 
     opts = Get_option_descs(&option_count);
 
-
     if (i < 0 || i >= option_count)
 	return -1;
+
     if (opts[i].defaultValue == NULL)
 	return 0;
+
     if ((opts[i].flags & OPT_VISIBLE) == 0)
 	return 0;
+
     switch (opts[i].type) {
     case valInt:
 	sprintf(buf, "%s:%d", opts[i].name, *(int *)opts[i].variable);
@@ -260,13 +253,16 @@ int Parser_list_option(int *ind, char *buf)
     case valList:
 	{
 	    list_t list = *(list_t *)opts[i].variable;
+
 	    sprintf(buf, "%s:", opts[i].name);
 	    if (list) {
 		list_iter_t iter;
+
 		for (iter = List_begin(list);
 		     iter != List_end(list);
 		     LI_FORWARD(iter)) {
 		    char *str = LI_DATA(iter);
+
 		    if (iter != List_begin(list))
 			strlcat(buf, ",", MSG_LEN);
 		    if (strlcat(buf, str, MSG_LEN) >= MSG_LEN)
@@ -288,12 +284,12 @@ int Parser_list_option(int *ind, char *buf)
  */
 static bool Parse_check_info_request(char **argv, int i)
 {
-    char		*arg = argv[i];
+    char *arg = argv[i];
 
-    if (arg[0] == '-' && arg[1] == '-') {
+    if (arg[0] == '-' && arg[1] == '-')
 	/* when arg starts with two dashes skip first one */
 	arg++;
-    }
+
     if (strcmp(arg, "-help") == 0
 	|| strcmp(arg, "-h") == 0) {
 	Parse_help(*argv);
@@ -329,13 +325,12 @@ static bool Parse_check_info_request(char **argv, int i)
  * and read the server defaults file and map file.
  * Then convert the map data into a World structure.
  */
-bool Parser(int argc, char **argv)
+bool Parser(int argc, char **argv, world_t *world)
 {
-    int			i;
-    bool		status;
-    char		*fname;
-    option_desc		*desc;
-    world_t *world = &World;
+    int i;
+    bool status;
+    char *fname;
+    option_desc *desc;
 
     options.mapData = NULL;
     options.mapWidth = 0;
@@ -353,6 +348,7 @@ bool Parser(int argc, char **argv)
 	    if (desc != NULL) {
 		if (desc->type == valBool) {
 		    const char *bool_value;
+
 		    if (argv[i][0] == '-')
 			bool_value = "true";
 		    else
@@ -381,36 +377,36 @@ bool Parser(int argc, char **argv)
      * Read local defaults file
      */
     if ((fname = Option_get_value("defaultsFileName", NULL)) != NULL)
-	parseDefaultsFile(fname);
+	parseDefaultsFile(fname, world);
     else
-	parseDefaultsFile(Conf_defaults_file_name());
+	parseDefaultsFile(Conf_defaults_file_name(), world);
 
     /*
      * Read local password file
      */
     if ((fname = Option_get_value("passwordFileName", NULL)) != NULL)
-	parsePasswordFile(fname);
+	parsePasswordFile(fname, world);
     else
-	parsePasswordFile(Conf_password_file_name());
+	parsePasswordFile(Conf_password_file_name(), world);
 
     /*
      * Read map file if map data not found yet.
      *
-     * If "mapFileName" is defined and it is not equal to "wild"
-     * then read it's contents from file.  Else read a default map.
+     * If "mapFileName" is defined then read it's contents from file.
+     * Else read a default map.
      */
     if (!(fname = Option_get_value("mapData", NULL))) {
 	if ((fname = Option_get_value("mapFileName", NULL)) != NULL) {
-	    if (strcasecmp(fname, "wild") && !parseMapFile(fname)) {
+	    if (!parseMapFile(fname, world)) {
 		xpprintf("Unable to read %s, trying to open %s\n",
 			 fname, Conf_default_map());
-		if (!parseMapFile(Conf_default_map()))
+		if (!parseMapFile(Conf_default_map(), world))
 		    xpprintf("Unable to read %s\n", Conf_default_map());
 	    }
 	} else {
 	    xpprintf("Map not specified, trying to open %s\n",
 		     Conf_default_map());
-	    if (!parseMapFile(Conf_default_map()))
+	    if (!parseMapFile(Conf_default_map(), world))
 		xpprintf("Unable to read %s\n", Conf_default_map());
 	}
     }
@@ -477,6 +473,7 @@ int Tune_option(char *name, char *val)
     case valString:
 	{
 	    char *s = xp_strdup(val);
+
 	    if (!s)
 		return 0;
 	    if (*(char **)(opt->variable) != opt->defaultValue)
@@ -493,7 +490,7 @@ int Tune_option(char *name, char *val)
 
 int Get_option_value(const char *name, char *value, size_t size)
 {
-    option_desc		*opt;
+    option_desc *opt;
 
     if (size < 12)
 	return -1;	/* Generic error. */

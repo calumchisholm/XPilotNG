@@ -526,7 +526,7 @@ void Xpmap_blocks_to_polygons(world_t *world);
  * Prototypes for xp2map.c
  */
 bool isXp2MapFile(int fd);
-bool parseXp2MapFile(int fd, optOrigin opt_origin);
+bool parseXp2MapFile(int fd, optOrigin opt_origin, world_t *world);
 
 
 /*
@@ -909,16 +909,16 @@ void Convert_string_to_list(const char *value, list_t *list_ptr);
  * Prototypes for parser.c
  */
 int Parser_list_option(int *ind, char *buf);
-bool Parser(int argc, char **argv);
+bool Parser(int argc, char **argv, world_t *world);
 int Tune_option(char *name, char *val);
 int Get_option_value(const char *name, char *value, size_t size);
 
 /*
  * Prototypes for fileparser.c
  */
-bool parseDefaultsFile(const char *filename);
-bool parsePasswordFile(const char *filename);
-bool parseMapFile(const char *filename);
+bool parseDefaultsFile(const char *filename, world_t *world);
+bool parsePasswordFile(const char *filename, world_t *world);
+bool parseMapFile(const char *filename, world_t *world);
 void expandKeyword(const char *keyword);
 
 /*

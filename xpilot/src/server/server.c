@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     /* Make trigonometric tables */
     Make_table();
 
-    if (Parser(argc, argv) == false)
+    if (!Parser(argc, argv, world))
 	exit(1);
 
     Init_recording(world);
