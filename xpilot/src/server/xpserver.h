@@ -46,7 +46,6 @@
 #endif
 
 #include "asteroid.h"
-#include "auth.h"
 #include "cannon.h"
 #include "click.h"
 #include "connection.h"

@@ -180,7 +180,6 @@ static void Set_swapper_state(player_t *pl)
 static int Cmd_addr(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_advance(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg, size_t size);
-/*static int Cmd_auth(char *arg, player_t *pl, int oper, char *msg, size_t size);*/
 static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_help(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_kick(char *arg, player_t *pl, int oper, char *msg, size_t size);
@@ -194,7 +193,6 @@ static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size)
 static int Cmd_queue(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size);
-/*static int Cmd_setpass(char *arg, player_t *pl, int oper, char *msg, size_t size);*/
 static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_version(char *arg, player_t *pl, int oper, char *msg, size_t size);
@@ -237,16 +235,6 @@ static Command_info commands[] = {
 	0,
 	Cmd_ally
     },
-#if 0
-    {
-	"auth",
-	"au",
-	"/auth <password>.  Use this command if your nick is "
-	"password-protected. ",
-	0,
-	Cmd_auth
-    },
-#endif
     {
 	"get",
 	"g",
@@ -345,16 +333,6 @@ static Command_info commands[] = {
 	1,
 	Cmd_set
     },
-#if 0
-    {
-	"setpass",
-	"setp",
-	"/setpass <new pw> <new pw> [old pw]. "
-	"Protects your nick with a password. ",
-	0,
-	Cmd_setpass
-    },
-#endif
     {
 	"stats",
 	"st",
@@ -627,90 +605,6 @@ static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg, size_t size)
     }
     return result;
 }
-
-#if 0
-static int Cmd_auth(char *arg, player_t *pl, int oper, char *msg, size_t size)
-{
-    int r, i = -1;
-
-    if (!allowPlayerPasswords) {
-	strlcpy(msg, "Player passwords are disabled on this server.", size);
-	return CMD_RESULT_ERROR;
-    }
-
-    if (!*pl->auth_nick) {
-	str.cpy(msg, "You're already authenticated or your nick isn't "
-		"password-protected.", size);
-	return CMD_RESULT_ERROR;
-    }
-
-    if (!arg || !*arg) {
-	strlcpy(msg, "Need a password.", size);
-	return CMD_RESULT_ERROR;
-    }
-
-    while (*arg == ' ')
-	arg++;
-    if (!*arg) {
-	strlcpy(msg, "Need a password.", size);
-	return CMD_RESULT_ERROR;
-    }
-    r = Check_player_password(pl->auth_nick, arg);
-    if (r & (PASSWD_WRONG | PASSWD_ERROR)) {
-	char *reason = NULL, *reason_p = NULL;
-
-	if (r & PASSWD_ERROR)
-	    reason_p = "Couldn't check password";
-	else
-	    reason_p = "Wrong password";
-	if (reason_p)
-	    warn("Authentication failed (%s -> %s): %s.",
-		 pl->name, pl->auth_nick, reason_p);
-	snprintf(msg, size, "Authentication (->%s) failed: %s.",
-		 pl->auth_nick, reason ? reason : reason_p);
-	return CMD_RESULT_ERROR;
-    }
-
-    snprintf(msg, size, "\"%s\" successfully authenticated (%s).",
-	     pl->name, pl->auth_nick);
-    warn(msg);
-    Set_message(msg);
-
-    Queue_kick(pl->auth_nick);
-
-    for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Player_by_index(i);
-
-	if (pl != pl_i &&
-	    !strcasecmp(pl_i->auth_nick, pl->auth_nick))
-	{
-	    snprintf(msg, size, "%s has been kicked out (nick collision).",
-		     pl_i->name);
-	    if (pl_i->conn == NULL)
-		Delete_player(pl_i);
-	    else
-		Destroy_connection(pl_i->conn,
-				   "kicked out (someone else authenticated "
-				   "for the same nick)");
-	    warn(msg);
-	    Set_message(msg);
-	}
-    }
-
-    /* kps - what to do about the ranking stuff here ? */
-    /*Rank_save_score(pl);*/
-    Conn_change_nick(pl->conn, pl->auth_nick);
-    strlcpy(pl->name, pl->auth_nick, sizeof(pl->name));
-    /*Rank_get_saved_score(pl);*/
-#error "Send_info doesn't send name now, fix"
-    Send_info_about_player(pl);
-    pl->auth_nick[0] = 0;
-
-    *msg = 0;
-
-    return CMD_RESULT_SUCCESS;
-}
-#endif
 
 static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size)
 {
@@ -1342,94 +1236,6 @@ static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
     return CMD_RESULT_ERROR;
 }
-
-#if 0
-static int Cmd_setpass(char *arg, player_t *pl, int oper,
-		       char *msg, size_t size)
-{
-    char *new_pw, *new_pw2, *old_pw;
-    int r, new = 0;
-
-    if (!allowPlayerPasswords) {
-	strlcpy(msg, "Player passwords are disabled on this server.", size);
-	return CMD_RESULT_ERROR;
-    }
-
-    if (pl->name[strlen(pl->name)-1] == PROT_EXT) {
-	strlcpy(msg, "You cannot set a password for your current nick.", size);
-	return CMD_RESULT_ERROR;
-    }
-
-    if (!arg || !*arg) {
-	strlcpy(msg, "Need at least two arguments.", size);
-	return CMD_RESULT_ERROR;
-    }
-
-    new_pw = strtok(arg, " ");
-    new_pw2 = strtok(NULL, " ");
-    old_pw = strtok(NULL, " ");
-
-    if (!new_pw || strlen(new_pw) < MIN_PASS_LEN) {
-	snprintf(msg, size, "Minimum password length allowed is %d.",
-		 MIN_PASS_LEN);
-	return CMD_RESULT_ERROR;
-    }
-    if (strlen(new_pw) > MAX_PASS_LEN) {
-	snprintf(msg, size, "Maximum password length allowed is %d.",
-		 MAX_PASS_LEN);
-	return CMD_RESULT_ERROR;
-    }
-    if (!new_pw2) {
-	strlcpy(msg, "Please specify new password twice.", size);
-	return CMD_RESULT_ERROR;
-    }
-    if (strcmp(new_pw, new_pw2)) {
-	strlcpy(msg, "Passwords don't match. Try again.", size);
-	return CMD_RESULT_ERROR;
-    }
-    if (old_pw && !strcmp(old_pw, new_pw)) {
-	strlcpy(msg, "New and old password are the same. Nothing changed.".
-		size);
-	return CMD_RESULT_ERROR;
-    }
-
-    r = Check_player_password(pl->name, old_pw ? old_pw : "");
-    switch (r) {
-    case PASSWD_NONE:
-	new = 1;
-
-    case PASSWD_OK:
-	r = Set_player_password(pl->name, new_pw, new);
-	if (!r) {
-	    strcpy(msg, "Okay.");
-	} else {
-	    warn("Command \"/setpass\": Error setting password for "
-		 "player \"%s\".", pl->name);
-	    strlcpy(msg, r == -1 ?
-		    "Server error." :
-		    "Sorry, no more player passwords allowed. Limit reached!",
-		    size);
-	    return CMD_RESULT_ERROR;
-	}
-	break;
-
-    case PASSWD_WRONG:
-	if (old_pw && old_pw[0])
-	    strlcpy(msg, "Old password is wrong. Nothing changed.", size);
-	else
-	    strlcpy(msg, "Need old password as third argument.", size);
-	return CMD_RESULT_ERROR;
-
-    case PASSWD_ERROR:
-	warn("Command \"/setpass\": Couldn't check password of "
-	     "player \"%s\".", pl->name);
-	strlcpy(msg, "Server error.", size);
-	return CMD_RESULT_ERROR;
-    }
-
-    return CMD_RESULT_SUCCESS;
-}
-#endif
 
 static int Cmd_version(char *arg, player_t *pl, int oper,
 		       char *msg, size_t size)

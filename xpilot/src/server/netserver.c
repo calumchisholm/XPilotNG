@@ -359,14 +359,6 @@ static void Conn_set_state(connection_t *connp, int state, int drain_state)
     login_in_progress = num_conn_busy - num_conn_playing;
 }
 
-#if 0
-void Conn_change_nick(connection_t *connp, const char *nick)
-{
-    XFREE(connp->nick);
-    connp->nick = xp_strdup(nick);
-}
-#endif
-
 /*
  * Cleanup a connection.  The client may not know yet that
  * it is thrown out of the game so we send it a quit packet.
@@ -1010,9 +1002,8 @@ static void LegalizeHost(char *string)
 static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 {
     player_t *pl;
-    int i, war_on_id, conn_bit /*, nick_mod = 0*/;
+    int i, war_on_id, conn_bit;
     char msg[MSG_LEN];
-    /*char old_nick[MAX_NAME_LEN], *p; */
     const char sender[] = "[*Server notice*]";
     world_t *world = &World;
 
@@ -1041,41 +1032,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    return -1;
 	}
     }
-#if 0 /* player passwords currently disabled */
-    r = PASSWD_OK;
-    if (allowPlayerPasswords)
-	r = Check_player_password(connp->nick, "");
-    if (r == PASSWD_ERROR) {
-	warn("Can't check whether nick \"%s\" is protected.", connp->nick);
-	return -1;
-    }
-    *old_nick = 0;
-    if (r == PASSWD_WRONG) {
-	strlcpy(old_nick, connp->nick, MAX_CHARS);
-	nick_mod = 1;
-	while (1) {
-	    p = connp->nick;
-	    if (strlen(p) < MAX_NAME_LEN - 1) {
-		p += strlen(p);
-		*p++ = PROT_EXT;
-		*p = 0;
-	    } else if (p[MAX_NAME_LEN-2] != PROT_EXT)
-		p[MAX_NAME_LEN-2] = PROT_EXT;
-	    else if ((p = strchr(p, PROT_EXT)) && (p > connp->nick + 1))
-		*--p = PROT_EXT;
-	    else {
-		warn("What the heck?! I wasn't able to find an alternative "
-		     "nick for \"%s\".", connp->nick);
-		return -1;
-	    }
-	    for (i = NumPlayers; i--;)
-		if (!strcasecmp(Player_by_index(i)->name, connp->nick))
-		    break;
-	    if (i == -1)
-		break;
-	}
-    }
-#endif
     if (connp->rectype < 2) {
 	if (!Init_player(world, NumPlayers, connp->ship)) {
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
@@ -1090,7 +1046,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     pl->rectype = connp->rectype;
 
     strlcpy(pl->name, connp->nick, MAX_CHARS);
-    /*strlcpy(pl->auth_nick, old_nick, MAX_CHARS);*/
     strlcpy(pl->username, connp->user, MAX_CHARS);
     strlcpy(pl->hostname, connp->host, MAX_CHARS);
 
@@ -1138,12 +1093,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	error("%s", errmsg);
 	return -1;
     }
-
-#if 0
-    if (nick_mod)
-	xpprintf("%s Nick \"%s\" has been changed to \"%s\".\n",
-		 showtime(), old_nick, connp->nick);
-#endif
 
     if (!options.silent) {
 	if (pl->rectype < 2)
@@ -1223,30 +1172,6 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    Set_message_f("%s (%s) has entered \"%s\", made by %s.",
 			  pl->name, pl->username, world->name, world->author);
     }
-
-#if 0
-    if (nick_mod) {
-	sprintf(msg,
-		"Your nick is password-protected and has been modified. %s",
-		sender);
-	Set_player_message(pl, msg);
-	if (!FEATURE(connp, F_EXPLICITSELF)) {
-	    sprintf(msg,
-		    "This modification breaks things in your client. %s",
-		    sender);
-	    Set_player_message(pl, msg);
-	    sprintf(msg,
-		    "Your client will work correctly once you "
-		    "authenticate. %s",
-		sender);
-	    Set_player_message(pl, msg);
-	}
-	sprintf(msg,
-		"Send a message containing \"/help auth\" for help. %s",
-		sender);
-	Set_player_message(pl, msg);
-    }
-#endif
 
     if (options.greeting) {
 	snprintf(msg, sizeof(msg), "%s %s", options.greeting, sender);

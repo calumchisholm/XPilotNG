@@ -552,8 +552,6 @@ struct player {
     char	mychar;			/* Special char for player */
     char	prev_mychar;		/* Special char for player */
     char	name[MAX_CHARS];	/* Nick-name of player */
-  /*char	rawname[MAX_CHARS];*/	/* Not legalized Nick-name */
-  /*char	auth_nick[MAX_CHARS];*/	/* Original nick (/auth command) */
     char	username[MAX_CHARS];	/* Real name of player */
     char	hostname[MAX_CHARS];	/* Hostname of client player uses */
     uint16_t	pseudo_team;		/* Which team for detaching tanks */

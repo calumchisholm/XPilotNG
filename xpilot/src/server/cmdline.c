@@ -35,10 +35,6 @@
 char cmdline_version[] = VERSION;
 
 
-#if 0
-char		*playerPasswordsFileName;
-int		playerPasswordsFileSizeLimit;
-#endif
 double		friction;
 double		coriolisCosine, coriolisSine;	/* cos and sin of cor. angle */
 int		roundsPlayed;		/* # of rounds played sofar. */
@@ -3317,39 +3313,6 @@ static option_desc opts[] = {
 	"address can join.\n",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
-#if 0
-    {
-	"playerPasswordsFileName",
-	"playerPasswordsFile",
-	NULL,
-	&playerPasswordsFileName,
-	valString,
-	tuner_none,
-	"The filename of the player passwords file to read when authenticating.\n",
-	OPT_COMMAND | OPT_DEFAULTS
-    },
-    {
-	"playerPasswordsFileSizeLimit",
-	"playerPasswordsLimit",
-	"1000000",
-	&playerPasswordsFileSizeLimit,
-	valInt,
-	tuner_none,
-	"Maximum size of player passwords file in bytes (may become bigger\n"
-	"if players change passwords!).\n",
-	OPT_COMMAND | OPT_DEFAULTS
-    },
-    {
-	"allowPlayerPasswords",
-	"PlayerPasswords",
-	"False",
-	&allowPlayerPasswords,
-	valBool,
-	tuner_dummy,
-	"May players protect their nicks with a password?\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-#endif
     {
 	"playerLimit",
 	"playerLimit",

@@ -752,7 +752,6 @@ void Server_log_admin_message(player_t *pl, const char *str)
  * for incorrectly compiled programs.
  */
 extern char asteroid_version[];
-extern char auth_version[];
 extern char cannon_version[];
 extern char cell_version[];
 extern char checknames_version[];
@@ -807,7 +806,6 @@ static void Check_server_versions(void)
 	char		*versionstr;
     } file_versions[] = {
 	{ "asteroid", asteroid_version },
-	{ "auth", auth_version },
 	{ "cannon", cannon_version },
 	{ "cell", cell_version },
 	{ "checknames", checknames_version },
