@@ -37,7 +37,6 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 {
     player_t *kp;
     double sc;
-    char msg[MSG_LEN];
     world_t *world = pl->world;
 
     kp = Player_by_id(pulse->id);
@@ -72,18 +71,13 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    && options.allowLaserModifiers == false)) {
 	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
 	    || BIT(pl->status, THRUSTING)) {
-	    if (kp) {
-		sprintf(msg,
-			"%s got paralysed by %s's stun laser.",
-			pl->name, kp->name);
-		if (pl->id == kp->id)
-		    strcat(msg, " How strange!");
-	    } else
-		sprintf(msg,
-			"%s got paralysed by a stun laser.",
-			pl->name);
+	    if (kp)
+		Set_message("%s got paralysed by %s's stun laser.%s",
+			    pl->name, kp->name,
+			    pl->id == kp->id ? " How strange!" : "");
+	    else
+		Set_message("%s got paralysed by a stun laser.", pl->name);
 
-	    Set_message(msg);
 	    CLR_BIT(pl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
 	    CLR_BIT(pl->status, THRUSTING);
@@ -100,15 +94,14 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    && !BIT(pl->have, HAS_ARMOR)) {
 	    SET_BIT(pl->status, KILLED);
 	    if (kp) {
-		sprintf(msg,
-			"%s got roasted alive by %s's laser.",
-			pl->name, kp->name);
+		Set_message("%s got roasted alive by %s's laser.%s",
+			    pl->name, kp->name,
+			    pl->id == kp->id ? " How strange!" : "");
 		if (pl->id == kp->id) {
 		    sc = Rate(0.0, kp->score)
 			* options.laserKillScoreMult
 			* options.selfKillScoreMult;
 		    Score(kp, -sc, kp->pos, kp->name);
-		    strcat(msg, " How strange!");
 		} else {
 		    sc = Rate(kp->score, pl->score)
 			* options.laserKillScoreMult;
@@ -120,12 +113,9 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 		if (BIT(world->rules->mode, TEAM_PLAY)
 		    && pl->team != pulse->team)
 		    Team_score(world, pulse->team, sc);
-		sprintf(msg,
-			"%s got roasted alive by cannonfire.",
-			pl->name);
+		Set_message("%s got roasted alive by cannonfire.", pl->name);
 	    }
 	    sound_play_sensors(pl->pos, PLAYER_ROASTED_SOUND);
-	    Set_message(msg);
 	    if (kp && kp->id != pl->id) {
 		Rank_add_laser_kill(kp);
 		Robot_war(pl, kp);
