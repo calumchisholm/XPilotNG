@@ -122,7 +122,7 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
     t.conn_mask = (unsigned)-1;
     t.group = NO_GROUP;
     STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
-    cannon = Cannons(world, ind);
+    cannon = Cannon_by_index(world, ind);
     Cannon_init(cannon);
     return ind;
 }
@@ -271,8 +271,11 @@ int World_place_check(world_t *world, clpos_t pos, int ind)
 	if (world->NumChecks == 0)
 	    alloc_old_checks(world);
 
-	check = Checks(world, ind);
-
+	/*
+	 * kps hack - we can't use Check_by_index because it might return
+	 * NULL since ind can here be >= world->NumChecks.
+	 */
+	check = &world->checks[ind];
 	if (World_contains_clpos(world, check->pos)) {
 	    warn("Map contains too many '%c' checkpoints.", 'A' + ind);
 	    return NO_IND;
@@ -343,7 +346,7 @@ void World_init(world_t *world)
     memset(world, 0, sizeof(world_t));
 
     for (i = 0; i < MAX_TEAMS; i++)
-	Teams(world, i)->SwapperId = NO_ID;
+	Team_by_index(world, i)->SwapperId = NO_ID;
 }
 
 void World_free(world_t *world)
@@ -445,7 +448,7 @@ static void Verify_wormhole_consistency(world_t *world)
 
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
 	for (i = 0; i < world->NumWormholes; i++)
-	    World_remove_wormhole(world, Wormholes(world, i));
+	    World_remove_wormhole(world, Wormhole_by_index(world, i));
 	world->NumWormholes = 0;
     }
 
@@ -453,9 +456,9 @@ static void Verify_wormhole_consistency(world_t *world)
 	for (i = 0; i < world->NumWormholes; i++) {
 	    int j = (int)(rfrac() * world->NumWormholes);
 
-	    while (Wormholes(world, j)->type == WORM_IN)
+	    while (Wormhole_by_index(world, j)->type == WORM_IN)
 		j = (int)(rfrac() * world->NumWormholes);
-	    Wormholes(world, i)->lastdest = j;
+	    Wormhole_by_index(world, i)->lastdest = j;
 	}
     }
 }
@@ -607,7 +610,8 @@ int Find_closest_team(world_t *world, clpos_t pos)
     double closest = FLT_MAX, l;
 
     for (i = 0; i < world->NumBases; i++) {
-	base_t *base = Bases(world, i);
+	base_t *base = Base_by_index(world, i);
+
 	if (base->team == TEAM_NOT_SET)
 	    continue;
 
@@ -886,14 +890,14 @@ void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 
 void remove_temp_wormhole(world_t *world, int ind)
 {
-    World_remove_wormhole(world, Wormholes(world, ind));
+    World_remove_wormhole(world, Wormhole_by_index(world, ind));
 
     world->NumWormholes--;
     if (ind != world->NumWormholes)
 	world->wormholes[ind] = world->wormholes[world->NumWormholes];
 
     world->wormholes = realloc(world->wormholes,
-			      world->NumWormholes * sizeof(wormhole_t));
+			       world->NumWormholes * sizeof(wormhole_t));
 }
 
 void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2)

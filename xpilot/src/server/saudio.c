@@ -130,7 +130,7 @@ void sound_play_all(int sound_ind)
     SDBG(printf("sound_play_all %d\n", sound_ind));
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (BIT(pl_i->status, WANT_AUDIO))
 	    sound_play_player(pl_i, sound_ind);
@@ -155,7 +155,7 @@ void sound_play_sensors(clpos_t pos, int sound_ind)
     SDBG(printf("sound_play_sensors %d, %d, %d\n", cx, cy, sound_ind));
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	if (!BIT(pl->status, WANT_AUDIO))
 	    continue;

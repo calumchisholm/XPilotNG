@@ -180,7 +180,7 @@ void Meta_update(bool change)
     memset(active_per_team, 0, sizeof active_per_team);
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl = Players(i);
+	player_t *pl = Player_by_index(i);
 
 	if (!Player_is_human(pl) || BIT(pl->status, PAUSE))
 	    continue;
@@ -198,7 +198,7 @@ void Meta_update(bool change)
 	bool firstteam = true;
 
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    team_t *team = Teams(world, i);
+	    team_t *team = Team_by_index(world, i);
 
 	    if (i == options.robotTeam && options.reserveRobotTeam)
 		continue;
@@ -252,7 +252,7 @@ void Meta_update(bool change)
     first = true;
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl = Players(i);
+	player_t *pl = Player_by_index(i);
 	char str[4 * MAX_CHARS];
 	char tstr[32];
 

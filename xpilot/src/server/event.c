@@ -53,7 +53,7 @@ static void Refuel(player_t *pl)
 
     CLR_BIT(pl->used, HAS_REFUEL);
     for (i = 0; i < world->NumFuels; i++) {
-	fs = Fuels(world, i);
+	fs = Fuel_by_index(world, i);
 	l = Wrap_length(pl->pos.cx - fs->pos.cx,
 			pl->pos.cy - fs->pos.cy);
 	if (BIT(pl->used, HAS_REFUEL) == 0 || l < dist) {
@@ -77,7 +77,7 @@ static void Repair(player_t *pl)
 
     CLR_BIT(pl->used, HAS_REPAIR);
     for (i = 0; i < world->NumTargets; i++) {
-	targ = Targets(world, i);
+	targ = Target_by_index(world, i);
 	if (targ->team == pl->team
 	    && targ->dead_ticks <= 0) {
 	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
@@ -96,7 +96,7 @@ bool team_dead(int team)
     int i;
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl = Players(i);
+	player_t *pl = Player_by_index(i);
 	if (pl->team == team && !BIT(pl->status, PAUSE|GAME_OVER))
 	    return false;
     }
@@ -158,7 +158,7 @@ int Player_lock_closest(player_t *pl, bool next)
     }
     best = FLT_MAX;
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 	if (pl_i == lock_pl
 	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(pl, pl_i)
@@ -206,7 +206,7 @@ void Pause_player(player_t *pl, bool on)
 	    world->teams[pl->team].NumMembers--;
 	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->conn != NULL) {
 		    Send_base(pl_i->conn, -1, pl->home_base->ind);
@@ -214,7 +214,7 @@ void Pause_player(player_t *pl, bool on)
 		}
 	    }
 	    for (i = spectatorStart; i < spectatorStart + NumSpectators; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		Send_base(pl_i->conn, -1, pl->home_base->ind);
 		Send_team(pl_i->conn, pl->id, 0);
@@ -422,12 +422,13 @@ int Handle_keyboard(player_t *pl)
 		    }
 		    if (i == j)
 			break;
-		} while (i == ind || BIT(Players(i)->status, GAME_OVER|PAUSE)
-			 || !Player_lock_allowed(pl, Players(i)));
+		} while (i == ind
+			 || BIT(Player_by_index(i)->status, GAME_OVER|PAUSE)
+			 || !Player_lock_allowed(pl, Player_by_index(i)));
 		if (i == ind)
 		    CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
 		else {
-		    pl->lock.pl_id = Players(i)->id;
+		    pl->lock.pl_id = Player_by_index(i)->id;
 		    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
 		}
 		break;
@@ -447,7 +448,7 @@ int Handle_keyboard(player_t *pl)
 		    && (k = pl->lock.pl_id) > 0
 		    && (i = GetInd(k)) > 0
 		    && i < NumPlayers
-		    && Players(i)->id == k
+		    && Player_by_index(i)->id == k
 		    && i != ind)
 		    break;
 
@@ -466,7 +467,8 @@ int Handle_keyboard(player_t *pl)
 	    case KEY_CHANGE_HOME:
 		msg[0] = '\0';
 		for (i = 0; i < world->NumBases; i++) {
-		    base_t *base = Bases(world, i);
+		    base_t *base = Base_by_index(world, i);
+
 		    dx = ABS(CENTER_XCLICK(base->pos.cx - pl->pos.cx));
 		    dy = ABS(CENTER_YCLICK(base->pos.cy - pl->pos.cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
@@ -482,7 +484,8 @@ int Handle_keyboard(player_t *pl)
 		    }
 		}
 		for (i = 0; i < NumPlayers; i++) {
-		    player_t *pl_i = Players(i);
+		    player_t *pl_i = Player_by_index(i);
+
 		    if (pl_i->id != pl->id
 			&& !Player_is_tank(pl_i)
 			&& pl->home_base == pl_i->home_base) {
@@ -496,13 +499,13 @@ int Handle_keyboard(player_t *pl)
 		    Set_message(msg);
 		}
 		for (i = 0; i < NumPlayers; i++) {
-		    player_t *pl_i = Players(i);
+		    player_t *pl_i = Player_by_index(i);
 
 		    if (pl_i->conn != NULL)
 			Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 		}
 		for (i = 0; i < NumSpectators; i++) {
-		    Send_base(Players(i + spectatorStart)->conn,
+		    Send_base(Player_by_index(i + spectatorStart)->conn,
 			      pl->id, pl->home_base->ind);
  		}
 		break;

@@ -317,7 +317,8 @@ static void Place_asteroid(world_t *world)
 
     if (world->NumAsteroidConcs > 0
 	&& rfrac() < options.asteroidConcentratorProb)
-	con = AsteroidConcs(world, (int)(rfrac() * world->NumAsteroidConcs));
+	con = AsteroidConc_by_index(world,
+				    (int)(rfrac() * world->NumAsteroidConcs));
     else
 	con = NULL;
 
@@ -344,7 +345,7 @@ static void Place_asteroid(world_t *world)
 	okay = true;
 
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl = Players(i);
+	    player_t *pl = Player_by_index(i);
 
 	    if (!Player_is_playing(pl))
 		continue;

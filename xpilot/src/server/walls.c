@@ -206,7 +206,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 
     case CrashTarget:
 	obj->life = 0;
-	Object_hits_target(obj, Targets(world, mapobj_ind), -1.0);
+	Object_hits_target(obj, Target_by_index(world, mapobj_ind), -1.0);
 	break;
 
     case CrashWall:
@@ -220,7 +220,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 
     case CrashCannon:
         {
-	    cannon_t *c = Cannons(world, mapobj_ind);
+	    cannon_t *c = Cannon_by_index(world, mapobj_ind);
 
 	    obj->life = 0;
 	    if (BIT(obj->type, OBJ_ITEM))
@@ -292,7 +292,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
 	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
-	Object_hits_target(OBJ_PTR(pl), Targets(world, mapobj_ind), -1.0);
+	Object_hits_target(OBJ_PTR(pl), Target_by_index(world, mapobj_ind), -1.0);
 	break;
 
     case CrashTreasure:
@@ -303,7 +303,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 
     case CrashCannon:
         {
-	    cannon_t *cannon = Cannons(world, mapobj_ind);
+	    cannon_t *cannon = Cannon_by_index(world, mapobj_ind);
 
 	    if (!Player_used_emergency_shield(pl)) {
 		howfmt = "%s smashed%s against a cannon";
@@ -438,7 +438,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
     }
 
     if (BIT(pl->status, KILLED) && pl->score < 0 && Player_is_robot(pl)) {
-	pl->home_base = Bases(world, 0);
+	pl->home_base = Base_by_index(world, 0);
 	Pick_startpos(pl);
     }
 }
@@ -526,7 +526,7 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 
     if (type == TARGET) {
 	obj->life = 0;
-	Object_hits_target(obj, Targets(world, mapobj_ind), -1.0);
+	Object_hits_target(obj, Target_by_index(world, mapobj_ind), -1.0);
 	return 0;
     }
 
@@ -723,7 +723,8 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	    sound_play_sensors(pl->pos, PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
 		cost *= options.wallBounceFuelDrainMult / 4.0;
-		Object_hits_target(OBJ_PTR(pl), Targets(world, mapobj_ind), cost);
+		Object_hits_target(OBJ_PTR(pl),
+				   Target_by_index(world, mapobj_ind), cost);
 	    }
 	}
     }
@@ -2379,7 +2380,7 @@ void Treasure_init(world_t *world)
     int i;
 
     for (i = 0; i < world->NumTreasures; i++)
-	Make_treasure_ball(world, Treasures(world, i));
+	Make_treasure_ball(world, Treasure_by_index(world, i));
 }
 
 
@@ -2624,7 +2625,7 @@ void Move_player(player_t *pl)
 	group = is_inside(pl->pos.cx, pl->pos.cy, NONBALL_BIT, (object_t *)pl);
 	if (group != NO_GROUP) {
 	    for (i = 0; i < world->NumFrictionAreas; i++) {
-		friction_area_t *fa = FrictionAreas(world, i);
+		friction_area_t *fa = FrictionArea_by_index(world, i);
 
 		if (fa->group == group) {
 		    fric = fa->friction;

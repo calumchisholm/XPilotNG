@@ -28,7 +28,7 @@
 void Object_hits_wormhole(object_t *obj, int ind)
 {
     /*world_t *world = &World;
-      wormhole_t *wormhole = Wormholes(world, ind);*/
+      wormhole_t *wormhole = Wormhole_by_index(world, ind);*/
 
     SET_BIT(obj->status, WARPING);
     obj->wormHoleHit = ind;
@@ -111,7 +111,7 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
     proxFront = proxRear = 1e20;
 
     for (wh_dest = 0; wh_dest < world->NumWormholes; wh_dest++) {
-	wormhole_t *wh = Wormholes(world, wh_dest);
+	wormhole_t *wh = Wormhole_by_index(world, wh_dest);
 
 	if (wh_dest == pl->wormHoleHit
 	    || wh->type == WORM_IN
@@ -162,7 +162,7 @@ void Traverse_wormhole(player_t *pl)
     clpos_t dest;
     int wh_dest;
     world_t *world = pl->world;
-    wormhole_t *wh_hit = Wormholes(world, pl->wormHoleHit);
+    wormhole_t *wh_hit = Wormhole_by_index(world, pl->wormHoleHit);
 
 #if 0
     warn("player %s is in Traverse_wormhole", pl->name);
@@ -258,7 +258,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 {
     object_t *obj = move->obj;
     world_t *world = &World;
-    wormhole_t *wormhole = Wormholes(world, gp->mapobj_ind);
+    wormhole_t *wormhole = Wormhole_by_index(world, gp->mapobj_ind);
 
     if (wormhole->type == WORM_OUT)
 	return false;
@@ -297,7 +297,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 	 */
 	if (pl->warped > 0
 	    && wormhole->type == WORM_NORMAL
-	    && wormhole == Wormholes(pl->wormHoleDest)
+	    && wormhole == Wormhole_by_index(pl->wormHoleDest)
 	    /* kps - wormHoleDest is now pointer */
 	    /*&& pl->wormHoleDest == ind */)
 	    return false;

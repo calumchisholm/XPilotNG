@@ -669,21 +669,24 @@ player_t *Get_player_by_name(const char *str,
 /*
  * Prototypes for player.c
  */
-player_t *Players(int ind);
+extern int	playerArrayNumber;
+extern player_t	**PlayersArray;
+
 int GetInd(int id);
+
+/*
+ * Get player with index 'ind' from Players array.
+ */
+static inline player_t *Player_by_index(int ind)
+{
+    if (ind < 0 || ind >= playerArrayNumber)
+	return NULL;
+    return PlayersArray[ind];
+}
 
 static inline player_t *Player_by_id(int id)
 {
-    int ind = GetInd(id);
-
-#if 0
-    if (ind < 0 || ind >= NumPlayers) {
-	warn("ind = %d, (ind < 0 || ind >= NumPlayers)", ind);
-	return NULL;
-    }
-#endif
-
-    return Players(ind);
+    return Player_by_index(GetInd(id));
 }
 
 static inline bool Player_is_playing(player_t *pl)

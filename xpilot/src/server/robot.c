@@ -701,7 +701,7 @@ static void Robot_create(world_t *world)
 	    most_used = i;
     }
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (Player_is_robot(pl_i)) {
 	    data = (robot_data_t *)pl_i->robot_data_ptr;
@@ -732,7 +732,7 @@ static void Robot_create(world_t *world)
     Init_player(world, NumPlayers,
 		options.allowShipShapes ? Parse_shape_str(rob->shape) : NULL);
 
-    robot = Players(NumPlayers);
+    robot = Player_by_index(NumPlayers);
     SET_BIT(robot->type_ext, OBJ_EXT_ROBOT);
     robot->robot_data_ptr = new_data;
 
@@ -750,7 +750,7 @@ static void Robot_create(world_t *world)
     robot->check = 0;
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	robot->team = Pick_team(PickForRobot);
-	teamp = Teams(world, robot->team);
+	teamp = Team_by_index(world, robot->team);
 	assert(teamp); /* if teamplay, can't have TEAM_NOT_SET */
 	teamp->NumMembers++;
 	teamp->NumRobots++;
@@ -782,7 +782,7 @@ static void Robot_create(world_t *world)
     }
 
     for (i = 0; i < NumPlayers - 1; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, robot->id);
@@ -828,7 +828,7 @@ void Robot_delete(player_t *pl, bool kicked)
 	 * Find the robot with the lowest score.
 	 */
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 
 	    if (!Player_is_robot(pl_i))
 		continue;
@@ -918,7 +918,7 @@ void Robot_war(player_t *pl, player_t *kp)
 
 	if (Robot_war_on_player(kp) == pl->id) {
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->conn != NULL)
 		    Send_war(pl_i->conn, kp->id, NO_ID);
@@ -942,7 +942,7 @@ void Robot_war(player_t *pl, player_t *kp)
 
 	if (Robot_war_on_player(pl) != kp->id) {
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->conn != NULL)
 		    Send_war(pl_i->conn, pl->id, kp->id);
@@ -1139,7 +1139,7 @@ void Robot_update(world_t *world)
     Robot_round_tick(world);
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl = Players(i);
+	player_t *pl = Player_by_index(i);
 
 	if (Player_is_tank(pl)) {
 	    Tank_play(pl);

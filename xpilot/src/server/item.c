@@ -217,7 +217,8 @@ void Place_item(world_t *world, player_t *pl, int item)
 	    rand_item = 0;
 
 	if (world->NumItemConcs > 0 && rfrac() < options.itemConcentratorProb)
-	    con = ItemConcs(world, (int)(rfrac() * world->NumItemConcs));
+	    con = ItemConc_by_index(world,
+				    (int)(rfrac() * world->NumItemConcs));
 	else
 	    con = NULL;
 	/*
@@ -417,7 +418,7 @@ void Detonate_items(player_t *pl)
 	     * mean a misfire.
 	     */
 	    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
-	    pl->lock.pl_id = Players((int)(rfrac() * NumPlayers))->id;
+	    pl->lock.pl_id = Player_by_index((int)(rfrac() * NumPlayers))->id;
 
 	    switch ((int)(rfrac() * 3)) {
 	    case 0:	type = OBJ_TORPEDO;	break;
@@ -576,7 +577,7 @@ void Do_transporter(player_t *pl)
 
     /* find victim */
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (pl_i == pl
 	    || !Player_is_active(pl_i)
@@ -976,7 +977,8 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 		&& pl->visibility[GetInd(pl->lock.pl_id)].canSee)
 		smart->new_info = pl->lock.pl_id;
 	    else
-		smart->new_info = Players((int)(rfrac() * NumPlayers))->id;
+		smart->new_info
+		    = Player_by_index((int)(rfrac() * NumPlayers))->id;
 	    /* Can't redirect missiles to team mates. */
 	    /* So let the missile keep on following this unlucky player. */
 	    /*-BA Why not redirect missiles to team mates?
@@ -1045,7 +1047,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
     /* in non-team mode cannons are immune to cannon ECMs */
     if (BIT(world->rules->mode, TEAM_PLAY) || pl) {
 	for (i = 0; i < world->NumCannons; i++) {
-	    cannon_t *c = Cannons(world, i);
+	    cannon_t *c = Cannon_by_index(world, i);
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)
 		&& c->team == team)
@@ -1063,7 +1065,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
     }
 
     for (i = 0; i < NumPlayers; i++) {
-	p = Players(i);
+	p = Player_by_index(i);
 
 	if (p == pl)
 	    continue;
@@ -1149,12 +1151,11 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 		     */
 		    Robot_program(p, pl->lock.pl_id);
 		    for (j = 0; j < NumPlayers; j++) {
-			player_t *pl_j = Players(j);
+			player_t *pl_j = Player_by_index(j);
 
-			if (pl_j->conn != NULL) {
+			if (pl_j->conn != NULL)
 			    Send_seek(pl_j->conn, pl->id,
 				      p->id, pl->lock.pl_id);
-			}
 		    }
 		}
 	    }

@@ -366,7 +366,7 @@ void teamcup_round_end(int winning_team)
 	    if (list[j] == NumPlayers)
 		continue;
 
-	    pl = Players(j);
+	    pl = Player_by_index(j);
 	    if (best == NumPlayers || pl->score > best_score) {
 		best_score = pl->score;
 		best = j;
@@ -374,7 +374,7 @@ void teamcup_round_end(int winning_team)
 	}
 
 	list[best] = NumPlayers;
-	pl = Players(best);
+	pl = Player_by_index(best);
 	teamcup_log("%d\t%d\t%2d/%d\t%s\n", pl->team, (int)(pl->score),
 		    pl->kills, pl->deaths, pl->name);
 
@@ -406,7 +406,7 @@ void teamcup_round_end(int winning_team)
 	    for (i = 0; i < NumPlayers; i++) {
 		struct teamcup_player_init pinit;
 
-		pl = Players(i);
+		pl = Player_by_index(i);
 		pinit.magic = htons(INIT_PLAYER_MAGIC);
 		pinit.id = htons(i);
 		pinit.team = pl->team;
@@ -421,7 +421,7 @@ void teamcup_round_end(int winning_team)
 	for (i = 0; i < NumPlayers; i++) {
 	    struct teamcup_player_status pstat;
 
-	    pl = Players(i);
+	    pl = Player_by_index(i);
 	    pstat.magic = htons(PLAYER_STATUS_MAGIC);
 	    pstat.id = htons(i);
 	    /*status server won't know about float scores I think*/

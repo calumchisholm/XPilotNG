@@ -42,7 +42,7 @@ void tuner_shipmass(world_t *world)
     UNUSED_PARAM(world);
 
     for (i = 0; i < NumPlayers; i++)
-	Players(i)->emptymass = options.shipMass;
+	Player_by_index(i)->emptymass = options.shipMass;
 }
 
 void tuner_ballmass(world_t *world)
@@ -92,7 +92,7 @@ void tuner_playershielding(world_t *world)
 	SET_BIT(DEF_HAVE, HAS_SHIELD);
 
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 
 	    if (!Player_is_tank(pl_i)) {
 		if (!BIT(pl_i->used, HAS_SHOT))
@@ -108,7 +108,7 @@ void tuner_playershielding(world_t *world)
 
 	for (i = 0; i < NumPlayers; i++)
 	    /* approx 2 seconds to get to safety */
-	    Players(i)->shield_time = SHIELD_TIME;
+	    Player_by_index(i)->shield_time = SHIELD_TIME;
     }
 }
 
@@ -148,7 +148,7 @@ void tuner_teamcannons(world_t *world)
 
     if (options.teamCannons) {
 	for (i = 0; i < world->NumCannons; i++) {
-	    cannon_t *cannon = Cannons(world, i);
+	    cannon_t *cannon = Cannon_by_index(world, i);
 
 	    team = Find_closest_team(world, cannon->pos);
 	    if (team == TEAM_NOT_SET)
@@ -158,7 +158,7 @@ void tuner_teamcannons(world_t *world)
     }
     else {
 	for (i = 0; i < world->NumCannons; i++)
-	    Cannons(world, i)->team = TEAM_NOT_SET;
+	    Cannon_by_index(world, i)->team = TEAM_NOT_SET;
     }
 }
 
@@ -170,7 +170,7 @@ void tuner_cannonsuseitems(world_t *world)
     Move_init(world);
 
     for (i = 0; i < world->NumCannons; i++) {
-	c = Cannons(world, i);
+	c = Cannon_by_index(world, i);
 	for (j = 0; j < NUM_ITEMS; j++) {
 	    c->item[j] = 0;
 
@@ -190,7 +190,7 @@ void tuner_wormhole_stable_ticks(world_t *world)
 	options.wormholeStableTicks = 0.0;
 
     for (i = 0; i < world->NumWormholes; i++)
-	Wormholes(world, i)->countdown = options.wormholeStableTicks;
+	Wormhole_by_index(world, i)->countdown = options.wormholeStableTicks;
 }
 
 void tuner_modifiers(world_t *world)
@@ -200,7 +200,7 @@ void tuner_modifiers(world_t *world)
     Set_world_rules(world);
 
     for (i = 0; i < NumPlayers; i++)
-	filter_mods(world, &Players(i)->mods);
+	filter_mods(world, &Player_by_index(i)->mods);
 }
 
 void tuner_gameduration(world_t *world)

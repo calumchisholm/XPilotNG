@@ -64,14 +64,14 @@ player_t *Get_player_by_name(const char *str,
 
     /* Look for an exact match on player nickname. */
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 	if (!strcasecmp(pl->name, str))
 	    return pl;
     }
 
     /* Look if 'str' matches beginning of only one nick. */
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	if (!strncasecmp(pl->name, str, len)) {
 	    if (found_pl)
@@ -89,7 +89,7 @@ player_t *Get_player_by_name(const char *str,
     for (i = 0; i < NumPlayers; i++) {
 	int j;
 
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	for (j = 0; j < 1 + (int)strlen(pl->name) - (int)len; j++) {
 	    if (!strncasecmp(pl->name + j, str, len)) {
@@ -130,7 +130,7 @@ static void Send_info_about_player(player_t *pl)
 	    i = spectatorStart - 1;
 	    continue;
 	}
-	pl_i = Players(i);
+	pl_i = Player_by_index(i);
 	if (pl_i->conn != NULL) {
 	    Send_team(pl_i->conn, pl->id, pl->team);
 	    updateScores = true;
@@ -152,7 +152,7 @@ static void Set_swapper_state(player_t *pl)
 	int i;
 
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 
 	    if (!Players_are_teammates(pl, pl_i) &&
 		!BIT(pl_i->status, PAUSE)) {
@@ -662,7 +662,7 @@ static int Cmd_auth(char *arg, player_t *pl, int oper, char *msg, size_t size)
     Queue_kick(pl->auth_nick);
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (pl != pl_i &&
 	    !strcasecmp(pl_i->auth_nick, pl->auth_nick))
@@ -1026,7 +1026,7 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
     if (arg && !strcasecmp(arg, "all")) {
 	for (i = NumPlayers - 1; i >= 0; i--)
-	    Rank_set_score(Players(i), 0.0);
+	    Rank_set_score(Player_by_index(i), 0.0);
 	for (i = 0; i < MAX_TEAMS; i++)
 	    world->teams[i].score = 0;
 	Reset_all_players(world);
@@ -1207,7 +1207,7 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
     }
     /* Swap a paused player away from the full team */
     for (i = NumPlayers - 1; i >= 0; i--) {
-	player_t *pl2 = Players(i);
+	player_t *pl2 = Player_by_index(i);
 
 	if (pl2->conn != NULL && BIT(pl2->status, PAUSE)
 	    && (pl2->team == team) && pl2->home_base != NULL) {

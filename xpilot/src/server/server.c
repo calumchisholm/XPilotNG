@@ -306,7 +306,7 @@ int End_game(void)
     teamcup_close_score_file();
 
     while (NumPlayers > 0) {	/* Kick out all remaining players */
-	pl = Players(NumPlayers - 1);
+	pl = Player_by_index(NumPlayers - 1);
 	if (pl->conn == NULL)
 	    Delete_player(pl);
 	else
@@ -315,7 +315,7 @@ int End_game(void)
 
     record = playback = 0;
     while (NumSpectators > 0) {
-	pl = Players(spectatorStart + NumSpectators - 1);
+	pl = Player_by_index(spectatorStart + NumSpectators - 1);
 	Destroy_connection(pl->conn, msg);
     }
     record = rrecord;
@@ -407,7 +407,7 @@ int Pick_team(int pick_for_type)
      * And calculate the score for each team.
      */
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 	if (Player_is_tank(pl))
 	    continue;
 	if (BIT(pl->status, PAUSE))
@@ -526,7 +526,7 @@ void Server_info(char *str, size_t max_size)
 	return;
     }
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	for (j = 0; j < i; j++) {
 	    if (order[j]->score < pl->score) {
@@ -643,7 +643,7 @@ void Game_Over(void)
 	    teamscore[i] = 1234567; /* These teams are not used... */
 
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl = Players(i);
+	    player_t *pl = Player_by_index(i);
 	    int team;
 
 	    if (Player_is_human(pl)) {
@@ -686,7 +686,7 @@ void Game_Over(void)
     minsc = 1e6;
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	SET_BIT(pl_i->status, GAME_OVER);
 	if (Player_is_human(pl_i)) {

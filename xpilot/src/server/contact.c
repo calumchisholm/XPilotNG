@@ -98,7 +98,7 @@ static int Kick_robot_players(world_t *world, int team)
 	    player_t *low_pl = NULL;
 
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (!Player_is_robot(pl_i) || pl_i->team == options.robotTeam)
 		    continue;
@@ -124,7 +124,7 @@ static int Kick_robot_players(world_t *world, int team)
 	    player_t *low_pl = NULL;
 
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (!Player_is_robot(pl_i) || pl_i->team != team)
 		    continue;
@@ -152,7 +152,7 @@ static int do_kick(int team, int nonlast)
     int i, num_unpaused = 0;
 
     for (i = NumPlayers - 1; i >= 0; i--) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (pl_i->conn != NULL
 	    && BIT(pl_i->status, PAUSE)
@@ -232,7 +232,7 @@ static int Check_names(char *nick_name, char *user_name, char *host_name)
 	    break;
     }
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (strcasecmp(pl_i->name, nick_name) == 0) {
 	    D(printf("%s %s\n", pl_i->name, nick_name));

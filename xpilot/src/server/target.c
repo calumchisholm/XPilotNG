@@ -30,7 +30,7 @@ void Target_update(world_t *world)
     int i, j;
 
     for (i = 0; i < world->NumTargets; i++) {
-	target_t *targ = Targets(world, i);
+	target_t *targ = Target_by_index(world, i);
 
 	if (targ->dead_ticks > 0) {
 	    if ((targ->dead_ticks -= timeStep) <= 0) {
@@ -38,7 +38,7 @@ void Target_update(world_t *world)
 
 		if (options.targetSync) {
 		    for (j = 0; j < world->NumTargets; j++) {
-			target_t *t = Targets(world, j);
+			target_t *t = Target_by_index(world, j);
 
 			if (t->team == targ->team)
 			    World_restore_target(world, t);
@@ -162,7 +162,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < NumPlayers; j++) {
-	    player_t *pl_j = Players(j);
+	    player_t *pl_j = Player_by_index(j);
 
 	    if (Player_is_tank(pl_j)
 		|| (BIT(pl_j->status, PAUSE) && pl_j->pause_count <= 0)
@@ -183,7 +183,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     }
     if (somebody_flag) {
 	for (j = 0; j < world->NumTargets; j++) {
-	    target_t *t = Targets(world, j);
+	    target_t *t = Target_by_index(world, j);
 
 	    if (t->team == targ->team) {
 		targets_total++;
@@ -223,7 +223,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
     por = (sc * lose_team_members) /win_team_members;
 
     for (j = 0; j < NumPlayers; j++) {
-	player_t *pl = Players(j);
+	player_t *pl = Player_by_index(j);
 
 	if (Player_is_tank(pl)
 	    || (BIT(pl->status, PAUSE) && pl->pause_count <= 0)
@@ -275,7 +275,7 @@ void Target_init(world_t *world)
 	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == TARGET)
-	    Target_set_hitmask(group, Targets(world, gp->mapobj_ind));
+	    Target_set_hitmask(group, Target_by_index(world, gp->mapobj_ind));
     }
 
 #if 0

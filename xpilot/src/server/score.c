@@ -60,7 +60,7 @@ void Team_score(world_t *world, int team, double points)
     if (team == TEAM_NOT_SET)	/* could happen if teamCannons is off */
 	return;
 
-    teamp = Teams(world, team);
+    teamp = Team_by_index(world, team);
     teamp->score += points;
 
     if (options.teamShareScore) {
@@ -68,7 +68,7 @@ void Team_score(world_t *world, int team, double points)
 	double share = teamp->score / teamp->NumMembers;
 
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 
 	    if (pl_i->team == team)
 		Rank_set_score(pl_i, share);
@@ -85,7 +85,7 @@ void Alliance_score(int id, double points)
     double share = points / member_count;
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (pl_i->alliance == id)
 	    Rank_add_score(pl_i, share);

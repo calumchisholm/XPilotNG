@@ -123,7 +123,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 
 	    if (Player_is_tank(pl_i)
 		|| (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
@@ -159,7 +159,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
     por = (sc * lose_team_members) / (2 * win_team_members + 1);
 
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (Player_is_tank(pl_i)
 	    || (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
@@ -219,7 +219,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 	return;
     }
     if (gp->team == owner->team) {
-	treasure_t *tt = Treasures(world, gp->mapobj_ind);
+	treasure_t *tt = Treasure_by_index(world, gp->mapobj_ind);
 
 	Ball_is_destroyed(ball);
 

@@ -343,66 +343,92 @@ static inline clpos_t World_wrap_clpos(world_t *world, clpos_t pos)
 }
 
 
-static inline base_t *Bases(world_t *world, int ind)
+static inline base_t *Base_by_index(world_t *world, int ind)
 {
-    return &world->bases[ind];
+    if (ind >= 0 && ind < world->NumBases)
+	return &world->bases[ind];
+    return NULL;
 }
 
-static inline fuel_t *Fuels(world_t *world, int ind)
+static inline fuel_t *Fuel_by_index(world_t *world, int ind)
 {
-    return &world->fuels[ind];
+    if (ind >= 0 && ind < world->NumFuels)
+	return &world->fuels[ind];
+    return NULL;
 }
 
-static inline cannon_t *Cannons(world_t *world, int ind)
+static inline cannon_t *Cannon_by_index(world_t *world, int ind)
 {
-    return &world->cannons[ind];
+    if (ind >= 0 && ind < world->NumCannons)
+	return &world->cannons[ind];
+    return NULL;
 }
 
-static inline check_t *Checks(world_t *world, int ind)
+static inline check_t *Check_by_index(world_t *world, int ind)
 {
-    return &world->checks[ind];
+    if (ind >= 0 && ind < world->NumChecks)
+	return &world->checks[ind];
+    return NULL;
 }
 
-static inline grav_t *Gravs(world_t *world, int ind)
+static inline grav_t *Grav_by_index(world_t *world, int ind)
 {
-    return &world->gravs[ind];
+    if (ind >= 0 && ind < world->NumGravs)
+	return &world->gravs[ind];
+    return NULL;
 }
 
-static inline target_t *Targets(world_t *world, int ind)
+static inline target_t *Target_by_index(world_t *world, int ind)
 {
-    return &world->targets[ind];
+    if (ind >= 0 && ind < world->NumTargets)
+	return &world->targets[ind];
+    return NULL;
 }
 
-static inline treasure_t *Treasures(world_t *world, int ind)
+static inline treasure_t *Treasure_by_index(world_t *world, int ind)
 {
-    return &world->treasures[ind];
+    if (ind >= 0 && ind < world->NumTreasures)
+	return &world->treasures[ind];
+    return NULL;
 }
 
-static inline wormhole_t *Wormholes(world_t *world, int ind)
+static inline wormhole_t *Wormhole_by_index(world_t *world, int ind)
 {
-    return &world->wormholes[ind];
+    if (ind >= 0 && ind < world->NumWormholes)
+	return &world->wormholes[ind];
+    return NULL;
 }
 
-static inline asteroid_concentrator_t *AsteroidConcs(world_t *world, int ind)
+static inline asteroid_concentrator_t *AsteroidConc_by_index(world_t *world,
+							     int ind)
 {
-    return &world->asteroidConcs[ind];
+    if (ind >= 0 && ind < world->NumAsteroidConcs)
+	return &world->asteroidConcs[ind];
+    return NULL;
 }
 
-static inline item_concentrator_t *ItemConcs(world_t *world, int ind)
+static inline item_concentrator_t *ItemConc_by_index(world_t *world, int ind)
 {
-    return &world->itemConcs[ind];
+    if (ind >= 0 && ind < world->NumItemConcs)
+	return &world->itemConcs[ind];
+    return NULL;
 }
 
-static inline friction_area_t *FrictionAreas(world_t *world, int ind)
+static inline friction_area_t *FrictionArea_by_index(world_t *world, int ind)
 {
-    return &world->frictionAreas[ind];
+    if (ind >= 0 && ind < world->NumFrictionAreas)
+	return &world->frictionAreas[ind];
+    return NULL;
 }
 
-static inline team_t *Teams(world_t *world, int team)
+/*
+ * Here the index is the team number.
+ */
+static inline team_t *Team_by_index(world_t *world, int ind)
 {
-    if (team == TEAM_NOT_SET)
-	return NULL;
-    return &world->teams[team];
+    if (ind >= 0 && ind < MAX_TEAMS)
+	return &world->teams[ind];
+    return NULL;
 }
 
 #endif

@@ -159,7 +159,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, long status,
 	}
 	if (options.baseMineRange) {
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->home_base == NULL)
 		    continue;
@@ -1080,7 +1080,7 @@ void Delete_shot(world_t *world, int ind)
 	     * Maybe some player is still busy trying to connect to this ball.
 	     */
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->ball == ball)
 		    pl_i->ball = NULL;
@@ -1585,7 +1585,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 
 		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
 		for (i = 0; i < NumPlayers; i++) {
-		    player_t *pl_i = Players(i);
+		    player_t *pl_i = Player_by_index(i);
 		    clpos_t engine;
 
 		    if (!BIT(pl_i->status, THRUSTING))
@@ -1645,7 +1645,7 @@ void Update_missile(world_t *world, missileobject_t *shot)
 		|| smart->count == CONFUSED_TIME)) {
 
 	    if (smart->count > 0) {
-		smart->info = Players((int)(rfrac() * NumPlayers))->id;
+		smart->info = Player_by_index((int)(rfrac() * NumPlayers))->id;
 		smart->count -= timeStep;
 	    } else {
 		smart->count = 0;

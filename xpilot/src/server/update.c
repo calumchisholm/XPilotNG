@@ -77,7 +77,7 @@ static void Transport_to_home(player_t *pl)
 	    check = pl->check - 1;
 	else
 	    check = world->NumChecks - 1;
-	startpos = Checks(world, check)->pos;
+	startpos = Check_by_index(world, check)->pos;
     } else
 	startpos = pl->home_base->pos;
 
@@ -450,7 +450,7 @@ static void Fuel_update(world_t *world)
     frames_per_update = MAX_STATION_FUEL / (fuel * BLOCK_SZ);
 
     for (i = 0; i < world->NumFuels; i++) {
-	fuel_t *fs = Fuels(world, i);
+	fuel_t *fs = Fuel_by_index(world, i);
 
 	if (fs->fuel == MAX_STATION_FUEL)
 	    continue;
@@ -551,7 +551,7 @@ static void Players_turn(void)
     double new_float_dir;
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	if (!Player_is_active(pl))
 	    continue;
@@ -661,7 +661,7 @@ static void Use_items(player_t *pl)
 static void Do_refuel(player_t *pl)
 {
     world_t *world = pl->world;
-    fuel_t *fs = Fuels(world, pl->fs);
+    fuel_t *fs = Fuel_by_index(world, pl->fs);
 
     if ((Wrap_length(pl->pos.cx - fs->pos.cx,
 		     pl->pos.cy - fs->pos.cy) > 90.0 * CLICK)
@@ -704,7 +704,7 @@ static void Do_refuel(player_t *pl)
 static void Do_repair(player_t *pl)
 {
     world_t *world = pl->world;
-    target_t *targ = Targets(world, pl->repair_target);
+    target_t *targ = Target_by_index(world, pl->repair_target);
 
     if ((Wrap_length(pl->pos.cx - targ->pos.cx,
 		     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
@@ -747,7 +747,7 @@ static inline void Update_visibility(player_t *pl, int ind)
     int j;
 
     for (j = 0; j < NumPlayers; j++) {
-	player_t *pl_j = Players(j);
+	player_t *pl_j = Player_by_index(j);
 
 	if (pl->forceVisible > 0)
 	    pl_j->visibility[ind].canSee = true;
@@ -784,7 +784,7 @@ static void Update_players(world_t *world)
     player_t *pl;
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	if (BIT(pl->status, PAUSE)) {
 	    if (options.pauseTax > 0.0 && (frame_loops % FPS) == 0) {
@@ -1059,7 +1059,7 @@ void Update_objects(world_t *world)
     Players_turn();
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	if (pl->stunned > 0) {
 	    pl->stunned -= timeStep;
@@ -1101,7 +1101,7 @@ void Update_objects(world_t *world)
     Update_players(world);
 
     for (i = world->NumWormholes - 1; i >= 0; i--) {
-	wormhole_t *wh = Wormholes(world, i);
+	wormhole_t *wh = Wormhole_by_index(world, i);
 
 	if ((wh->countdown -= timeStep) <= 0)
 	    wh->countdown = 0;
@@ -1112,7 +1112,7 @@ void Update_objects(world_t *world)
 
 
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	pl->updateVisibility = 0;
 
@@ -1144,7 +1144,7 @@ void Update_objects(world_t *world)
      * Update tanks, Kill players that ought to be killed.
      */
     for (i = NumPlayers - 1; i >= 0; i--) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 
 	if (Player_is_playing(pl))
 	    Update_tanks(&(pl->fuel));

@@ -55,7 +55,7 @@ void Cannon_update(world_t *world, bool do_less_frequent_update)
     int i;
 
     for (i = 0; i < world->NumCannons; i++) {
-	cannon_t *c = Cannons(world, i);
+	cannon_t *c = Cannon_by_index(world, i);
 
 	if (c->dead_ticks > 0) {
 	    if ((c->dead_ticks -= timeStep) <= 0)
@@ -440,7 +440,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
     }
 
     for (i = 0; i < NumPlayers && !ready; i++) {
-	player_t *pl = Players(i);
+	player_t *pl = Player_by_index(i);
 	double tdist, tdx, tdy;
 
 	tdx = WRAP_DCX(pl->pos.cx - c->pos.cx) / CLICK;
@@ -846,7 +846,7 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
 {
     object_t *obj = move->obj;
     world_t *world = &World;
-    cannon_t *cannon = Cannons(world, gp->mapobj_ind);
+    cannon_t *cannon = Cannon_by_index(world, gp->mapobj_ind);
     unsigned long cannon_mask;
 
     /* this should never happen if hitmasks are ok */

@@ -193,7 +193,7 @@ static void PlayerCollision(world_t *world)
 
     /* Player - player, checkpoint, treasure, object and wall */
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
+	pl = Player_by_index(i);
 	if (!Player_is_playing(pl))
 	    continue;
 
@@ -211,7 +211,7 @@ static void PlayerCollision(world_t *world)
 	/* Player - player */
 	if (BIT(world->rules->mode, CRASH_WITH_PLAYER | BOUNCE_WITH_PLAYER)) {
 	    for (j = i + 1; j < NumPlayers; j++) {
-		player_t *pl_j = Players(j);
+		player_t *pl_j = Player_by_index(j);
 		double range;
 
 		if (!Player_is_playing(pl_j))
@@ -317,7 +317,7 @@ static void PlayerCollision(world_t *world)
 			    if (i_tank_owner == j)
 				i_tank_owner = i;
 			}
-			i_tank_owner_pl = Players(i_tank_owner);
+			i_tank_owner_pl = Player_by_index(i_tank_owner);
 			Set_message_f("%s ran over %s.", pl->name, pl_j->name);
 			sound_play_sensors(pl_j->pos,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
@@ -344,7 +344,7 @@ static void PlayerCollision(world_t *world)
 			    if (j_tank_owner == i)
 				j_tank_owner = j;
 			}
-			j_tank_owner_pl = Players(j_tank_owner);
+			j_tank_owner_pl = Player_by_index(j_tank_owner);
 			Set_message_f("%s ran over %s.", pl_j->name, pl->name);
 			sound_play_sensors(pl->pos,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
@@ -1304,11 +1304,13 @@ static void PlayerCheckpointCollision(player_t *pl)
 
     if (BIT(world->rules->mode, TIMING)
 	&& BIT(pl->status, PAUSE|GAME_OVER) == 0) {
+	check_t *check = Check_by_index(world, pl->check);
+
 	if (pl->round != 0)
 	    pl->time++;
 	if (BIT(pl->status, PLAYING|KILLED) == PLAYING
-	    && Wrap_length(pl->pos.cx - Checks(world, pl->check)->pos.cx,
-			   pl->pos.cy - Checks(world, pl->check)->pos.cy)
+	    && Wrap_length(pl->pos.cx - check->pos.cx,
+			   pl->pos.cy - check->pos.cy)
 	    < options.checkpointRadius * BLOCK_CLICKS
 	    && !Player_is_tank(pl)
 	    && !options.ballrace)
@@ -1495,7 +1497,7 @@ static void BallCollision(world_t *world)
 	    player_t *owner = Player_by_id(ball->owner);
 
 	    if (!options.ballrace_connect || ball->id == owner->id) {
-		clpos_t cpos = Checks(world, owner->check)->pos;
+		clpos_t cpos = Check_by_index(world, owner->check)->pos;
 
 		if (Wrap_length(ball->pos.cx - cpos.cx,
 				ball->pos.cy - cpos.cy)

@@ -1035,7 +1035,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     } else
 	connp->team = TEAM_NOT_SET;
     for (i = 0; i < NumPlayers; i++) {
-	if (strcasecmp(Players(i)->name, connp->nick) == 0) {
+	if (strcasecmp(Player_by_index(i)->name, connp->nick) == 0) {
 	    warn("Name already in use %s", connp->nick);
 	    strlcpy(errmsg, "Name already in use", errsize);
 	    return -1;
@@ -1069,7 +1069,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		return -1;
 	    }
 	    for (i = NumPlayers; i--;)
-		if (!strcasecmp(Players(i)->name, connp->nick))
+		if (!strcasecmp(Player_by_index(i)->name, connp->nick))
 		    break;
 	    if (i == -1)
 		break;
@@ -1081,11 +1081,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
 	    return -1;
 	}
-	pl = Players(NumPlayers);
+	pl = Player_by_index(NumPlayers);
     } else {
 	if (!Init_player(world, spectatorStart + NumSpectators, connp->ship))
 	    return -1;
-	pl = Players(spectatorStart + NumSpectators);
+	pl = Player_by_index(spectatorStart + NumSpectators);
     }
     pl->rectype = connp->rectype;
 
@@ -1115,7 +1115,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	}
 	Rank_get_saved_score(pl);
 	if (pl->team != TEAM_NOT_SET && pl->home_base != NULL) {
-	    team_t *teamp = Teams(world, pl->team);
+	    team_t *teamp = Team_by_index(world, pl->team);
 
 	    teamp->NumMembers++;
 	    if (options.teamShareScore) {
@@ -1181,7 +1181,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    i = spectatorStart - 1;
 	    continue;
 	}
-	pl_i = Players(i);
+	pl_i = Player_by_index(i);
 	Send_player(pl->conn, pl_i->id);
 	Send_score(pl->conn, pl_i->id, pl_i->score,
 		   (int)pl_i->life, pl_i->mychar, pl_i->alliance);
@@ -1207,7 +1207,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    i = spectatorStart - 1;
 	    continue;
 	}
-	pl_i = Players(i);
+	pl_i = Player_by_index(i);
 	if (pl_i->rectype == 1 && pl->rectype == 2)
 	    continue;
 	if (pl_i->conn != NULL) {
@@ -1297,7 +1297,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     conn_bit = (1 << connp->ind);
     for (i = 0; i < world->NumCannons; i++) {
-	cannon_t *cannon = Cannons(world, i);
+	cannon_t *cannon = Cannon_by_index(world, i);
 	/*
 	 * The client assumes at startup that all cannons are active.
 	 */
@@ -1307,7 +1307,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    CLR_BIT(cannon->conn_mask, conn_bit);
     }
     for (i = 0; i < world->NumFuels; i++) {
-	fuel_t *fs = Fuels(world, i);
+	fuel_t *fs = Fuel_by_index(world, i);
 	/*
 	 * The client assumes at startup that all fuelstations are filled.
 	 */
@@ -1317,7 +1317,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    CLR_BIT(fs->conn_mask, conn_bit);
     }
     for (i = 0; i < world->NumTargets; i++) {
-	target_t *targ = Targets(world, i);
+	target_t *targ = Target_by_index(world, i);
 	/*
 	 * The client assumes at startup that all targets are not damaged.
 	 */
@@ -1359,7 +1359,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     /* kps - dubious */
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl_i = Players(i);
+	player_t *pl_i = Player_by_index(i);
 
 	if (pl_i->mychar == ' ')
 	    pl_i->idleTime = 0;
@@ -2723,7 +2723,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	    Set_message(msg);
 	else {
 	    for (sent = i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->home_base == NULL)
 		    Set_player_message (pl_i, msg);
@@ -2741,7 +2741,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	sent = 0;
 	if (!(mute_baseless && pl->home_base == NULL)) {
 	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
+		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->team == team) {
 		    sent++;

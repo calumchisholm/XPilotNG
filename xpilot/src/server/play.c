@@ -84,7 +84,7 @@ void Check_tag(void)
 
     /* Find number of players that might get the tag */
     for (i = 0; i < NumPlayers; i++) {
-	player_t *pl = Players(i);
+	player_t *pl = Player_by_index(i);
 	if (Player_can_be_tagged(pl))
 	    num++;
     }
@@ -97,7 +97,7 @@ void Check_tag(void)
     /* select first candidate for tag */
     candidate = (int)(rfrac() * num);
     for (i = candidate; i < NumPlayers; i++) {
-	player_t *pl = Players(i);
+	player_t *pl = Player_by_index(i);
 	if (Player_can_be_tagged(pl)) {
 	    tagItPlayerId = pl->id;
 	    break;
@@ -106,7 +106,7 @@ void Check_tag(void)
 
     if (tagItPlayerId == NO_ID) {
 	for (i = 0; i < candidate; i++) {
-	    player_t *pl = Players(i);
+	    player_t *pl = Player_by_index(i);
 	    if (Player_can_be_tagged(pl)) {
 		tagItPlayerId = pl->id;
 		break;
@@ -231,7 +231,8 @@ void Team_immunity_init(world_t *world)
 	group_t *gp = groupptr_by_id(group);
 
 	if (gp->type == CANNON) {
-	    cannon_t *cannon = Cannons(world, gp->mapobj_ind);
+	    cannon_t *cannon = Cannon_by_index(world, gp->mapobj_ind);
+
 	    assert(cannon->group == group);
 	    Cannon_set_hitmask(group, cannon);
 	}

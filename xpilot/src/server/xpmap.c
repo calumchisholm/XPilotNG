@@ -284,14 +284,14 @@ static void Create_blockmap_from_polygons(world_t *world)
      * may be in the same block, which might be an error.
      */
     for (i = 0; i < world->NumFuels; i++) {
-	fuel_t *fs = Fuels(world, i);
+	fuel_t *fs = Fuel_by_index(world, i);
 
 	blk = Clpos_to_blkpos(fs->pos);
 	World_set_block(world, blk, FUEL);
     }
 
     for (i = 0; i < world->NumBases; i++) {
-	base_t *base = Bases(world, i);
+	base_t *base = Base_by_index(world, i);
 
 	blk = Clpos_to_blkpos(base->pos);
 	World_set_block(world, blk, BASE);
@@ -517,7 +517,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 
 	    case CHECK:
 		for (i = 0; i < world->NumChecks; i++) {
-		    check_t *check = Checks(world, i);
+		    check_t *check = Check_by_index(world, i);
 		    blkpos_t bpos = Clpos_to_blkpos(check->pos);
 
 		    if (x != bpos.bx || y != bpos.by)
@@ -959,11 +959,11 @@ void Xpmap_find_map_object_teams(world_t *world)
      * Determine which team a stuff belongs to.
      */
     for (i = 0; i < world->NumTreasures; i++) {
-	treasure_t *treasure = Treasures(world, i);
+	treasure_t *treasure = Treasure_by_index(world, i);
 	team_t *teamp;
 
 	treasure->team = Find_closest_team(world, treasure->pos);
-	teamp = Teams(world, treasure->team);
+	teamp = Team_by_index(world, treasure->team);
 	assert(teamp != NULL);
 
 	teamp->NumTreasures++;
@@ -974,21 +974,21 @@ void Xpmap_find_map_object_teams(world_t *world)
     }
 
     for (i = 0; i < world->NumTargets; i++) {
-	target_t *targ = Targets(world, i);
+	target_t *targ = Target_by_index(world, i);
 
 	targ->team = Find_closest_team(world, targ->pos);
     }
 
     if (options.teamCannons) {
 	for (i = 0; i < world->NumCannons; i++) {
-	    cannon_t *cannon = Cannons(world, i);
+	    cannon_t *cannon = Cannon_by_index(world, i);
 
 	    cannon->team = Find_closest_team(world, cannon->pos);
 	}
     }
 
     for (i = 0; i < world->NumFuels; i++) {
-	fuel_t *fs = Fuels(world, i);
+	fuel_t *fs = Fuel_by_index(world, i);
 
 	fs->team = Find_closest_team(world, fs->pos);
     }
@@ -1008,7 +1008,7 @@ void Xpmap_find_base_direction(world_t *world)
     blkpos_t blk;
 
     for (i = 0; i < world->NumBases; i++) {
-	base_t *base = Bases(world, i);
+	base_t *base = Base_by_index(world, i);
 	int x, y, dir, att;
 	vector_t gravity = World_gravity(world, base->pos);
 
@@ -1097,7 +1097,7 @@ static void Xpmap_treasure_to_polygon(world_t *world, int treasure_ind)
     int cx, cy, i, r, n;
     double angle;
     int polystyle, edgestyle;
-    treasure_t *treasure = Treasures(world, treasure_ind);
+    treasure_t *treasure = Treasure_by_index(world, treasure_ind);
     clpos_t pos[N + 1];
 
     polystyle = P_get_poly_id("treasure_ps");
@@ -1173,7 +1173,7 @@ static void Xpmap_block_polygon(clpos_t bpos, int polystyle, int edgestyle)
 static void Xpmap_target_to_polygon(world_t *world, int target_ind)
 {
     int ps, es;
-    target_t *targ = Targets(world, target_ind);
+    target_t *targ = Target_by_index(world, target_ind);
 
     ps = P_get_poly_id("target_ps");
     es = P_get_edge_id("target_es");
@@ -1238,7 +1238,7 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
 static void Xpmap_cannon_to_polygon(world_t *world, int cannon_ind)
 {
     int ps, es;
-    cannon_t *cannon = Cannons(world, cannon_ind);
+    cannon_t *cannon = Cannon_by_index(world, cannon_ind);
 
     ps = P_get_poly_id("cannon_ps");
     es = P_get_edge_id("cannon_es");
@@ -1253,7 +1253,7 @@ static void Xpmap_wormhole_to_polygon(world_t *world, int wormhole_ind)
 {
     int ps, es, i, r;
     double angle;
-    wormhole_t *wormhole = Wormholes(world, wormhole_ind);
+    wormhole_t *wormhole = Wormhole_by_index(world, wormhole_ind);
     clpos_t pos[N + 1], wpos;
 
     /* don't make a polygon for an out wormhole */
@@ -1284,7 +1284,7 @@ static void Xpmap_wormhole_to_polygon(world_t *world, int wormhole_ind)
 static void Xpmap_friction_area_to_polygon(world_t *world, int fa_ind)
 {
     int ps, es;
-    friction_area_t *fa = FrictionAreas(world, fa_ind);
+    friction_area_t *fa = FrictionArea_by_index(world, fa_ind);
 
     ps = P_get_poly_id("fa_ps");
     es = P_get_edge_id("fa_es");

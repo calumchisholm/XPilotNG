@@ -3754,7 +3754,7 @@ void Timing_setup(world_t *world)
 	LIMIT(options.blockFriction, -1.0, 1.0);
 
 	for (i = 0; i < world->NumFrictionAreas; i++) {
-	    friction_area_t *fa = FrictionAreas(world, i);
+	    friction_area_t *fa = FrictionArea_by_index(world, i);
 	    double fric;
 
 	    /*

@@ -292,7 +292,7 @@ static void Robot_default_invite(player_t *pl, player_t *inviter)
 	/* if there is a human in our alliance, they should decide
 	   let robots refuse in this case */
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 	    if (Player_is_human(pl_i) && Players_are_allies(pl, pl_i)) {
 		we_accept = false;
 		break;
@@ -321,7 +321,7 @@ static void Robot_default_invite(player_t *pl, player_t *inviter)
 	int	member_count = Get_alliance_member_count(inviter->alliance);
 
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 	    if (pl_i->alliance == inviter->alliance) {
 		if (pl_i->id == war_id) {
 		    we_accept = false;
@@ -542,7 +542,7 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 	}
     }
     if (ship_i >= 0) {
-	ship = Players(ship_i);
+	ship = Player_by_index(ship_i);
 	aux_dir = Wrap_cfindDir(ship->pos.cx - pl->pos.cx
 				+ PIXEL_TO_CLICK(ship->vel.x * 2),
 				ship->pos.cy - pl->pos.cy
@@ -1350,7 +1350,7 @@ static bool Ball_handler(player_t *pl)
     world_t *world = pl->world;
 
     for (i = 0; i < world->NumTreasures; i++) {
-	treasure_t *treasure = Treasures(world, i);
+	treasure_t *treasure = Treasure_by_index(world, i);
 
 	if ((BIT(pl->have, HAS_BALL) || pl->ball)
 	    && treasure->team == pl->team) {
@@ -1361,7 +1361,7 @@ static bool Ball_handler(player_t *pl)
 		closest_tr_dist = dist;
 	    }
 	} else if (treasure->team != pl->team
-		   && Teams(world, treasure->team)->NumMembers > 0
+		   && Team_by_index(world, treasure->team)->NumMembers > 0
 		   && !BIT(pl->have, HAS_BALL)
 		   && !pl->ball
 		   && treasure->have) {
@@ -1392,7 +1392,7 @@ static bool Ball_handler(player_t *pl)
 	    }
 	}
 	for (i = 0; i < NumPlayers; i++) {
-	    player_t *pl_i = Players(i);
+	    player_t *pl_i = Player_by_index(i);
 	    dist = LENGTH(ball->pos.cx - pl_i->pos.cx,
 			  ball->pos.cy - pl_i->pos.cy) / CLICK;
 	    if (pl_i->id != pl->id
@@ -1400,7 +1400,7 @@ static bool Ball_handler(player_t *pl)
 		&& dist < dist_np)
 		dist_np = dist;
 	}
-	closest_treasure = Treasures(world, closest_tr);
+	closest_treasure = Treasure_by_index(world, closest_tr);
 	bdir = findDir(ball->vel.x, ball->vel.y);
 	tdir = Wrap_cfindDir(closest_treasure->pos.cx - ball->pos.cx,
 			     closest_treasure->pos.cy - ball->pos.cy);
@@ -1489,7 +1489,7 @@ static int Robot_default_play_check_map(player_t *pl)
     world_t *world = pl->world;
 
     for (j = 0; j < world->NumFuels; j++) {
-	fuel_t *fs = Fuels(world, j);
+	fuel_t *fs = Fuel_by_index(world, j);
 
 	if (fs->fuel < 100.0)
 	    continue;
@@ -1509,12 +1509,12 @@ static int Robot_default_play_check_map(player_t *pl)
     }
 
     for (j = 0; j < world->NumTargets; j++) {
-	target_t *targ = Targets(world, j);
+	target_t *targ = Target_by_index(world, j);
 
 	/* Ignore dead or owned targets */
 	if (targ->dead_ticks > 0
 	    || pl->team == targ->team
-	    || Teams(world, targ->team)->NumMembers == 0)
+	    || Team_by_index(world, targ->team)->NumMembers == 0)
 	    continue;
 
 	dcx = targ->pos.cx - pl->pos.cx;
@@ -1542,12 +1542,12 @@ static int Robot_default_play_check_map(player_t *pl)
 	SET_BIT(pl->used, HAS_REFUEL);
 	pl->fs = fuel_i;
 
-	if (Check_robot_target(pl, Fuels(world, fuel_i)->pos, RM_REFUEL))
+	if (Check_robot_target(pl, Fuel_by_index(world, fuel_i)->pos, RM_REFUEL))
 	    return 1;
     }
     if (target_i != NO_IND) {
 	SET_BIT(my_data->longterm_mode, TARGET_KILL);
-	if (Check_robot_target(pl, Targets(world, target_i)->pos,
+	if (Check_robot_target(pl, Target_by_index(world, target_i)->pos,
 			       RM_CANNON_KILL))
 	    return 1;
 
@@ -1555,7 +1555,7 @@ static int Robot_default_play_check_map(player_t *pl)
     }
 
     for (j = 0; j < world->NumCannons; j++) {
-	cannon_t *cannon = Cannons(world, j);
+	cannon_t *cannon = Cannon_by_index(world, j);
 
 	if (cannon->dead_ticks > 0)
 	    continue;
@@ -1579,7 +1579,7 @@ static int Robot_default_play_check_map(player_t *pl)
 #endif
 
     if (cannon_i != NO_IND) {
-	cannon_t *cannon = Cannons(world, cannon_i);
+	cannon_t *cannon = Cannon_by_index(world, cannon_i);
 	clpos_t d = cannon->pos;
 
 	d.cx += (BLOCK_CLICKS * 0.1 * tcos(cannon->dir));
@@ -1596,7 +1596,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	SET_BIT(pl->used, HAS_REFUEL);
 	pl->fs = fuel_i;
 
-	if (Check_robot_target(pl, Fuels(world, fuel_i)->pos, RM_REFUEL))
+	if (Check_robot_target(pl, Fuel_by_index(world, fuel_i)->pos, RM_REFUEL))
 	    return 1;
     }
 
@@ -1888,7 +1888,7 @@ static void Robot_default_play(player_t *pl)
 
     if (pl->fuel.sum < pl->fuel.max * 0.80) {
 	for (j = 0; j < world->NumFuels; j++) {
-	    fuel_t *fs = Fuels(world, j);
+	    fuel_t *fs = Fuel_by_index(world, j);
 
 	    if (BIT(world->rules->mode, TEAM_PLAY)
 		&& options.teamFuel
@@ -1915,7 +1915,7 @@ static void Robot_default_play(player_t *pl)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < world->NumTargets; j++) {
-	    target_t *targ = Targets(world, j);
+	    target_t *targ = Target_by_index(world, j);
 
 	    if (targ->team == pl->team
 		&& targ->damage < TARGET_DAMAGE
@@ -2002,7 +2002,7 @@ static void Robot_default_play(player_t *pl)
 
 	for (j = 0; j < NumPlayers; j++) {
 
-	    ship = Players(j);
+	    ship = Player_by_index(j);
 	    if (j == GetInd(pl->id)
 		|| !Player_is_active(ship)
 		|| Team_immune(pl->id, ship->id))
@@ -2044,12 +2044,12 @@ static void Robot_default_play(player_t *pl)
 
     if (ship_i != -1
 	&& BIT(my_data->robot_lock, LOCK_PLAYER)
-	&& my_data->robot_lock_id == Players(ship_i)->id) {
+	&& my_data->robot_lock_id == Player_by_index(ship_i)->id) {
 	ship_i = -1; /* don't avoid target */
     }
 
     if (enemy_i >= 0) {
-	ship = Players(enemy_i);
+	ship = Player_by_index(enemy_i);
 	if (!BIT(pl->lock.tagged, LOCK_PLAYER)
 	    || (enemy_dist < pl->lock.distance/2
 		&& (BIT(world->rules->mode, TIMING) ?
@@ -2124,7 +2124,7 @@ static void Robot_default_play(player_t *pl)
 	    || (item_imp == ROBOT_IGNORE_ITEM)
 	    || (delta_dir < 3 * RES / 4 && delta_dir > RES / 4)) {
 	    navigate_checked = true;
-	    if (Check_robot_target(pl, Checks(world, pl->check)->pos,
+	    if (Check_robot_target(pl, Check_by_index(world, pl->check)->pos,
 				   RM_NAVIGATE))
 		return;
 	}
