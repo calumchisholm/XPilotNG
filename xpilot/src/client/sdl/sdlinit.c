@@ -22,7 +22,7 @@ const SDL_VideoInfo *videoInfo;
 
 /* Flags to pass to SDL_SetVideoMode */
 int videoFlags;
-SDL_Surface  *MainSDLSurface;
+SDL_Surface  *MainSDLSurface = NULL;
 widget_list_t *MainList = NULL;
 
 int Init_playing_windows(void)
@@ -70,9 +70,6 @@ int Init_playing_windows(void)
     
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    /* TODO: implement parsing of geometry option and remove these */
-    draw_width = 1024;
-    draw_height = 768;
     if ((MainSDLSurface = SDL_SetVideoMode(draw_width, 
 			 draw_height, 
 			 draw_depth, 
@@ -159,6 +156,7 @@ static bool Set_geometry(xp_option_t *opt, const char *val)
     if (len == 0 || len > 19) return false;
     strcpy(s, val);
     
+    p1 = s;
     if (s[0] == '=') p1 = s + 1;
     p2 = strchr(p1, 'x');
     if (p2 == NULL) p2 = strchr(p1, 'X');
@@ -171,7 +169,13 @@ static bool Set_geometry(xp_option_t *opt, const char *val)
     *p2 = '\0';
     h = atoi(p1);
     if (h == 0) return false;
-    Resize_Window(w, h);
+
+    if (MainSDLSurface != NULL) {
+	Resize_Window(w, h);
+    } else {
+	draw_width = w;
+	draw_height = h;
+    }
     return true;
 }
 
