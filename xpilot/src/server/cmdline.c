@@ -2512,6 +2512,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"cannonItemProbMult",
+	"cannonItemProbMult",
+	"1.0",
+	&options.cannonItemProbMult,
+	valReal,
+	tuner_dummy,
+	"Average number of items a cannon gets per minute.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"maxItemDensity",
 	"maxItemDensity",
 	"0.00012",

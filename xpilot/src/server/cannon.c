@@ -73,6 +73,19 @@ void Cannon_update(world_t *world, bool tick)
 		&& (c->tractor_count <= 0)
 		&& rfrac() * 16 < 1)
 		Cannon_check_fire(c);
+
+	    if (options.itemProbMult > 0
+		&& options.cannonItemProbMult > 0) {
+		int item = (int)(rfrac() * NUM_ITEMS);
+		/* this gives the cannon an item about once every minute */
+		if (world->items[item].cannonprob > 0
+		    && options.cannonItemProbMult > 0
+		    && (int)(rfrac() * (60 * 12))
+		    < (options.cannonItemProbMult
+		       * world->items[item].cannonprob))
+		    Cannon_add_item(c, item, (item == ITEM_FUEL
+					      ?  ENERGY_PACK_FUEL : 1));
+	    }
 	}
 
 	if ((c->damaged -= timeStep) <= 0)

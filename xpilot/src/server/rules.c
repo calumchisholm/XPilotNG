@@ -67,6 +67,8 @@ static void Set_item_chance(world_t *world, int item)
 {
     double max
 	= options.itemProbMult * options.maxItemDensity * world->x * world->y;
+    double sum = 0;
+    int i, num = 0;
 
     if (options.itemProbMult * world->items[item].prob > 0) {
 	world->items[item].chance = (int)(1.0
@@ -83,6 +85,24 @@ static void Set_item_chance(world_t *world, int item)
 	    world->items[item].max = (int)max;
     } else
 	world->items[item].max = 0;
+
+    if (!BIT(CANNON_USE_ITEM, 1U << item)) {
+	world->items[item].cannonprob = 0;
+	return;
+    }
+    for (i = 0; i < NUM_ITEMS; i++) {
+	if (world->items[i].prob > 0
+	    && BIT(CANNON_USE_ITEM, 1U << i)) {
+	    sum += world->items[i].prob;
+	    num++;
+	}
+    }
+    if (num)
+	world->items[item].cannonprob = world->items[item].prob
+				       * (num / sum)
+				       * (options.maxItemDensity / 0.00012);
+    else
+	world->items[item].cannonprob = 0;
 }
 
 

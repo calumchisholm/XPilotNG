@@ -47,13 +47,6 @@ Server:
 Task: Make the new ndh.xp2 work ok.
 Developer: throat / baron / kps
 
-Task: Add back feature that cannons can get items from thin air.
-Developer: kps
-
-Task: Make cannons fire if a player is "anywhere near" and not paused
-       (this could be a bit harder without breaking old behavior.)
-Developer: throat / kps
-
 Task: Make wormholes warp other objects than players.
 Developer: kps
 

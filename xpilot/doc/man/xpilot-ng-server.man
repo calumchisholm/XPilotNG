@@ -75,6 +75,14 @@ Maximum speed of bullets.
 .IP
 Life of bullets in ticks.
 .HP
+\-/+treasureCollisionKills or treasureKills
+.IP
+Does a player die when hitting a ballarea?
+.HP
+\fB\-ballCollisionFuelDrain\fR or ballFuelDrain <real>
+.IP
+How much fuel does a ball collision cost?
+.HP
 \-/+shotHitFuelDrainUsesKineticEnergy or kineticEnergyFuelDrain
 .IP
 Does the fuel drain from shot hits depend on their mass and speed?
@@ -1077,6 +1085,10 @@ The maximum number of items a broken asteroid can release.
 \fB\-itemProbMult\fR or itemProbFact <real>
 .IP
 Item Probability Factor scales all item probabilities.
+.HP
+\fB\-cannonItemProbMult\fR <real>
+.IP
+Average number of items a cannon gets per minute.
 .HP
 \fB\-maxItemDensity\fR <real>
 .IP

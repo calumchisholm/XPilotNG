@@ -134,6 +134,7 @@ typedef struct item {
     int		max;		/* Max on world at a given time */
     int		num;		/* Number active right now */
     int		chance;		/* Chance [0..127] for this item to appear */
+    double	cannonprob;	/* Relative probability for item to appear */
     int		min_per_pack;	/* minimum number of elements per item. */
     int		max_per_pack;	/* maximum number of elements per item. */
     int		initial;	/* initial number of elements per player. */

@@ -227,6 +227,7 @@ extern struct options {
     double	rogueHeatProb;
     double	rogueMineProb;
     double	itemProbMult;
+    double	cannonItemProbMult;
     double	asteroidItemProb;
     int		asteroidMaxItems;
     double	maxItemDensity;

@@ -93,8 +93,8 @@ arraylist_t *Arraylist_create(size_t element_size)
 	padded_size *= ARRAYLIST_ELEMENT_ALIGNMENT;
 	padded_size += ARRAYLIST_ELEMENT_ALIGNMENT;
 
-	warn("Arraylist_create: Increasing element size from %d to %d.",
-	     element_size, padded_size);
+	/*warn("Arraylist_create: Increasing element size from %d to %d.",
+	  element_size, padded_size);*/
     }
 
     if (alp == NULL)
