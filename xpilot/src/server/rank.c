@@ -26,15 +26,7 @@
 char rank_version[] = VERSION;
 
 /* MAX_SCORES = how many players we remember */
-#define MAX_SCORES 250
-
-#define RANKING_SERVER		"Ranking server"
-
-#define PAGEHEAD \
-/* Head of page */ \
-"<h1>" PACKAGE_NAME " @ " RANKING_SERVER "</h1>" \
-"<a href=\"previous_ranks.html\">Previous rankings</a> " \
-"<a href=\"rank_explanation.html\">How does the ranking work?</a><hr>\n"
+#define MAX_SCORES 300
 
 static bool Rank_parse_rankfile(FILE *file);
 
@@ -279,9 +271,13 @@ static const char *Rank_get_logout_message(ranknode_t *rank)
 /* Sort the ranks and save them to the webpage. */
 void Rank_write_webpage(void)
 {
-    static const char headernojs[] =
-	"<html><head><title>" PACKAGE_NAME " @ " RANKING_SERVER "</title>\n"
-	"</head><body>\n" PAGEHEAD TABLEHEAD;
+    static const char header[] =
+	"<html><head><title>" PACKAGE_NAME " @ %s</title>\n"
+	"</head><body>\n"
+	"<h1>" PACKAGE_NAME " @ %s</h1>" /* <-- server name at %s and %s */
+	"<a href=\"previous_ranks.html\">Previous rankings</a> "
+	"<a href=\"rank_explanation.html\">How does the ranking work?</a>"
+	"<hr>\n" TABLEHEAD;
 
     static const char footer[] = "</table>"
 	"<i>Explanation for ballstats</i>:<br>"
@@ -310,7 +306,7 @@ void Rank_write_webpage(void)
 	return;
     }
 
-    fprintf(file, "%s", headernojs);
+    fprintf(file, header, Server.host, Server.host);
 
     for (i = 0; i < MAX_SCORES; i++) {
 	ranknode_t *rank = &ranknodes[rank_base[i].ind];
