@@ -754,14 +754,6 @@ static void Use_items(int i)
 	}
     }
 
-    if (BIT(pl->used, HAS_LASER)) {
-	if (pl->item[ITEM_LASER] <= 0
-	    || BIT(pl->used, HAS_PHASING_DEVICE))
-	    CLR_BIT(pl->used, HAS_LASER);
-	else
-	    Fire_laser(i);
-    }
-
     if (do_update_this_frame && BIT(pl->used, HAS_DEFLECTOR))
 	Do_deflector(i);	/* !@# no real need for do_update_this_frame */
 
@@ -818,18 +810,27 @@ void Update_objects(void)
 
     if (fastAim)
 	Player_turns();
-    /*
-     * Autorepeat fire, must unfortunately be done here, not in
-     * the player loop below, because of collisions between the shots
-     * and the auto-firing player that would otherwise occur.
-     */
-    if (fireRepeatRate > 0) {
-	for (i = 0; i < NumPlayers; i++) {
-	    pl = Players[i];
-	    if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
-		Fire_normal_shots(i);
+
+    for (i = 0; i < NumPlayers; i++) {
+	pl = Players[i];
+
+	if (pl->stunned > 0) {
+	    pl->stunned -= timeStep;
+	    if (pl->stunned <= 0)
+		pl->stunned = 0;
+	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
 	    pl->did_shoot = false;
+	    CLR_BIT(pl->status, THRUSTING);
 	}
+	if (BIT(pl->used, HAS_SHOT) || pl->did_shoot)
+	    Fire_normal_shots(i);
+	if (BIT(pl->used, HAS_LASER)) {
+	    if (pl->item[ITEM_LASER] <= 0 || BIT(pl->used, HAS_PHASING_DEVICE))
+		CLR_BIT(pl->used, HAS_LASER);
+	    else
+		Fire_laser(i);
+	}
+	pl->did_shoot = false;
     }
 
     /*
@@ -968,14 +969,6 @@ void Update_objects(void)
 
 	if (round_delay > 0)
 	    continue;
-
-	if (pl->stunned > 0) {
-	    pl->stunned -= timeStep;
-	    if (pl->stunned <= 0)
-		pl->stunned = 0;
-	    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT);
-	    CLR_BIT(pl->status, THRUSTING);
-	}
 
 	Use_items(i);
 
