@@ -735,9 +735,6 @@ void Check_team_members(world_t *world, int team)
 	}
 	teamp->NumMembers = members;
     }
-
-    if (options.teamcup)
-	teamcup_round_start();
 }
 
 
@@ -918,6 +915,8 @@ void Team_game_over(world_t *world, int winning_team, const char *reason)
     Count_rounds();
 
     free(best_players);
+
+    teamcup_round_start();
 
     /* Ranking */
     Rank_write_webpage();

@@ -395,10 +395,6 @@ void Rank_show_ranks(void)
     strlcat(msg, ".", sizeof(msg));
     Set_message(msg);
 
-    /* let's not show top rankings if playing teamcup */
-    if (options.teamcup)
-	return;
-
     /* show a few best ranks */
     snprintf(msg, sizeof(msg), " < Top %d ranks: ",
 	     numranks < 3 ? numranks : 3);

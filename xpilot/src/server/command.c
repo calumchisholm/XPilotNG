@@ -1050,9 +1050,7 @@ static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 	Set_message(msg);
 	strlcpy(msg, "", size);
 
-	teamcup_close_score_file();
-	teamcup_open_score_file();
-	teamcup_round_start();
+	teamcup_game_start();
     }
     else {
 	Reset_all_players(world);

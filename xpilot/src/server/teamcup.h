@@ -21,16 +21,11 @@
 #ifndef	TEAMCUP_H
 #define	TEAMCUP_H
 
-#define TEAMCUP_MAX_MATCHES  256
-#define TEAMCUP_STATUS_PORTNO  3749
-#define TEAMCUP_STATUS_PORTSTR "3749"
-
+void teamcup_init(void);
 void teamcup_log(const char *fmt, ...);
+void teamcup_game_start(void);
 void teamcup_round_start(void);
 void teamcup_round_end(int winning_team);
-void teamcup_open_score_file(void);
-void teamcup_close_score_file(void);
-void teamcup_kill_child(void);
 void teamcup_game_over(void);
 
 #endif

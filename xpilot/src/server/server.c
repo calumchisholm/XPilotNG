@@ -176,8 +176,7 @@ int main(int argc, char **argv)
 	xpprintf("%s Server runs at %d frames per second\n",
 		 showtime(), options.framesPerSecond);
 
-    teamcup_open_score_file();
-    teamcup_round_start();
+    teamcup_init();
 
 #ifdef SELECT_SCHED
     install_timer_tick(Main_loop, FPS);
@@ -314,7 +313,7 @@ int End_game(void)
     } else
 	snprintf(msg, sizeof(msg), "server exiting");
 
-    teamcup_close_score_file();
+    teamcup_game_over();
 
     while (NumPlayers > 0) {	/* Kick out all remaining players */
 	pl = Player_by_index(NumPlayers - 1);
@@ -351,9 +350,7 @@ int End_game(void)
     World_free(world);
     Free_cells(world);
     Free_options();
-    Log_game("END");			    /* options.Log end */
-
-    teamcup_kill_child();
+    Log_game("END");
 
     sock_cleanup();
     exit (0);

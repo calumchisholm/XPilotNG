@@ -3612,32 +3612,43 @@ static option_desc opts[] = {
 	"false",
 	&options.teamcup,
 	valBool,
-	tuner_dummy,
+	tuner_none,
 	"Is this a teamcup match?.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
+	OPT_MAP
     },
     {
-	"teamcupStatServer",
-	"statServer",
-	"shell.e.kth.se",
-	&options.teamcupStatServer,
+	"teamcupName",
+	"teamcupName",
+	"",
+	&options.teamcupName,
+ 	valString,
+	tuner_none,
+	"The name of the teamcup (used only if teamcup is true).\n",
+	OPT_MAP
+    },
+    {
+	"teamcupMailAddress",
+	"teamcupMailAddress",
+	"",
+	&options.teamcupMailAddress,
 	valString,
-	tuner_dummy,
-	"Teamcup status server to report to.\n",
-	OPT_COMMAND | OPT_VISIBLE
+	tuner_none,
+	"The mail address where players should send match results.\n",
+	OPT_MAP
     },
     {
-	"teamcupStatPort",
-	"statPort",
-	TEAMCUP_STATUS_PORTSTR,
-	&options.teamcupStatPort,
-	valInt,
-	tuner_dummy,
-	"Port of the teamcup status server.\n",
-	OPT_COMMAND | OPT_VISIBLE
-    },
-    {
-	"teamcupMatchNumber",
+	"teamcupScoreFileNamePrefix",
+	"teamcupScoreFileNamePrefix",
+	"",
+	&options.teamcupScoreFileNamePrefix,
+	valString,
+	tuner_none,
+	"First part of file name for teamcup score files.\n"
+	"The whole filename will be this followed by the match number.\n",
+	OPT_MAP
+     },
+     {
+ 	"teamcupMatchNumber",
 	"match",
 	"0",
 	&options.teamcupMatchNumber,

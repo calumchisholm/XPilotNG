@@ -312,8 +312,9 @@ extern struct options {
     bool	polygonMode;
     bool	fastAim;
     bool	teamcup;
-    char	*teamcupStatServer;
-    int		teamcupStatPort;
+    char	*teamcupName;
+    char	*teamcupMailAddress;
+    char	*teamcupScoreFileNamePrefix;
     int		teamcupMatchNumber;
 
     double	mainLoopTime;
