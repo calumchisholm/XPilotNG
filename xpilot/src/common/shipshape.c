@@ -51,6 +51,7 @@ int	Get_shape_keyword(char *keyw);
 int	debugShapeParsing = 0;
 int	verboseShapeParsing = 0;
 int	shapeLimits;
+extern bool do_sshack;
 
 extern void	Make_table(void);
 
@@ -182,7 +183,7 @@ int shape2wire(char *ship_shape_str, shipobj *w)
 			inx, iny, max,
 			ofNum, ofLeft, ofRight,		/* old format */
 			shape_version = 0;
-    ipos 		pt[MAX_SHIP_PTS],
+    ipos 		pt[MAX_SHIP_PTS2],
 			engine,
 			m_gun,
 			l_light[MAX_LIGHT_PTS],
@@ -200,6 +201,7 @@ int shape2wire(char *ship_shape_str, shipobj *w)
 			buf[MSG_LEN];
 
     w->num_points = 0;
+    w->num_orig_points = 0;
     w->num_l_gun = 0;
     w->num_r_gun = 0;
     w->num_l_rgun = 0;
@@ -269,7 +271,7 @@ int shape2wire(char *ship_shape_str, shipobj *w)
 		    }
 		    break;
 		}
-		if (w->num_points >= MAX_SHIP_PTS) {
+		if (w->num_orig_points >= MAX_SHIP_PTS) {
 		    if (verboseShapeParsing) {
 			xpprintf("Too many ship shape coordinates\n");
 		    }
@@ -971,6 +973,17 @@ int shape2wire(char *ship_shape_str, shipobj *w)
 	}
     }
 
+    w->num_orig_points = w->num_points;
+
+    /*MARA evil hack*/
+    if (do_sshack) {
+	pt[w->num_points] = pt[0];
+	for (i = 1; i < w->num_points; i++)
+	    pt[i+w->num_points] = pt[w->num_points-i];
+	w->num_points = w->num_points * 2;
+    }
+    /*MARA evil hack*/
+
     i = sizeof(shapepos) * RES;
     if (!(w->pts[0] = (shapepos*)malloc(w->num_points * i))
 	|| (w->num_l_gun
@@ -1165,7 +1178,7 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 	position engine, m_gun;
 	strcpy(buf, "(SH:");
 	buflen = strlen(&buf[0]);
-	for (i = 0; i < w->num_points && i < MAX_SHIP_PTS; i++) {
+	for (i = 0; i < w->num_orig_points && i < MAX_SHIP_PTS; i++) {
 	    position pt = Ship_get_point_position(w, i, 0);
 	    sprintf(&buf[buflen], " %d,%d", (int)pt.x, (int)pt.y);
 	    buflen += strlen(&buf[buflen]);

@@ -92,6 +92,8 @@
  */
 #define MIN_SHIP_PTS	    3
 #define MAX_SHIP_PTS	    24
+/* SSHACK needs to double the vertices */
+#define MAX_SHIP_PTS2	    (MAX_SHIP_PTS * 2)
 #define MAX_GUN_PTS	    3
 #define MAX_LIGHT_PTS	    3
 #define MAX_RACK_PTS	    4
@@ -107,8 +109,9 @@ typedef union {
 
 
 typedef struct {			/* Defines wire-obj, i.e. ship */
-    shapepos	*pts[MAX_SHIP_PTS];	/* the shape rotated many ways */
+    shapepos	*pts[MAX_SHIP_PTS2];	/* the shape rotated many ways */
     int		num_points;		/* total points in object */
+    int		num_orig_points;	/* points before SSHACK */
     shapepos	engine[RES];		/* Engine position */
     shapepos	m_gun[RES];		/* Main gun position */
     int		num_l_gun,

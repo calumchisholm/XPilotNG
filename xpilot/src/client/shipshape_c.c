@@ -49,6 +49,8 @@ char shipshape_c_version[] = VERSION;
 extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
 
+bool do_sshack = false;
+
 void Rotate_point(shapepos pt[RES])
 {
     int			i;
@@ -71,6 +73,7 @@ shipobj *Default_ship(void)
 
     if (!sh.num_points) {
 	sh.num_points = 3;
+	sh.num_orig_points = 3;
 	sh.pts[0] = &pts[0][0];
 	sh.pts[0][0].pxl.x = 15;
 	sh.pts[0][0].pxl.y = 0;
