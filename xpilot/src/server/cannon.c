@@ -823,10 +823,9 @@ void Cannon_dies(cannon_t *c, player_t *pl)
     if (pl) {
 	double sc = Rate(pl->score, c->score) * options.cannonKillScoreMult;
 
-	if (BIT(world->rules->mode, TEAM_PLAY)
-	    && pl->team == c->team)
+	if (BIT(world->rules->mode, TEAM_PLAY) && pl->team == c->team)
 	    sc = -sc;
-	Score(pl, sc, c->pos, "");
+	if (!options.zeroSumScoring) Score(pl, sc, c->pos, "");
     }
 }
 

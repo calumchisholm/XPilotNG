@@ -843,7 +843,9 @@ static void Give_best_player_bonus(double average_score,
 		bp->name,
 		bp->kills, bp->deaths);
 	points = best_ratio * Rate(bp->score, average_score);
-	Score(bp, points, bp->pos, "[Deadliest]");
+	if (!options.zeroSumScoring) Score(bp, points, bp->pos, "[Deadliest]");
+    	Rank_add_deadliest(bp);
+	/*if (options.zeroSumScoring);*//* TODO */
     } else {
 	msg[0] = '\0';
 	for (i = 0; i < num_best_players; i++) {
@@ -863,7 +865,9 @@ static void Give_best_player_bonus(double average_score,
 	    }
 	    strcat(msg, bp->name);
 	    points = best_ratio * score;
-	    Score(bp, points, bp->pos, "[Deadly]");
+	    if (!options.zeroSumScoring) Score(bp, points, bp->pos, "[Deadly]");
+	    Rank_add_deadliest(bp);
+	    /*if (options.zeroSumScoring);*//* TODO */
 	}
 	if (strlen(msg) + 64 >= sizeof(msg)) {
 	    Set_message(msg);
@@ -883,7 +887,8 @@ static void Give_individual_bonus(player_t *pl, double average_score)
 
     ratio = (double) pl->kills / (pl->deaths + 1);
     points = ratio * Rate(pl->score, average_score);
-    Score(pl, points, pl->pos, "[Winner]");
+    if (!options.zeroSumScoring) Score(pl, points, pl->pos, "[Winner]");
+    /*if (options.zeroSumScoring);*//* TODO */
 }
 
 void Count_rounds(void)

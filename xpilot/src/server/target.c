@@ -200,7 +200,7 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 	sc = Rate(kp->score, TARGET_SCORE)/4;
 	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
 	if (sc >= 0.01)
-	    Score(kp, sc, targ->pos, "Target: ");
+	    if (!options.zeroSumScoring) Score(kp, sc, targ->pos, "Target: ");
 	/*
 	 * If players can't collide with their own targets, we
 	 * assume there are many used as shields.  Don't litter
@@ -234,11 +234,12 @@ void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 		&& targets_remaining == 0
 		&& Player_is_alive(pl))
 		Player_set_state(pl, PL_STATE_KILLED);
-	    Score(pl, -sc, targ->pos, "Target: ");
+	    if (!options.zeroSumScoring) Score(pl, -sc, targ->pos, "Target: ");
 	}
 	else if (pl->team == kp->team &&
 		 (pl->team != TEAM_NOT_SET || pl->id == kp->id))
-	    Score(pl, por, targ->pos, "Target: ");
+	    if (!options.zeroSumScoring) Score(pl, por, targ->pos, "Target: ");
+	    /*if (options.zeroSumScoring);*//* TODO */
     }
 }
 

@@ -917,7 +917,7 @@ static void Update_players(world_t *world)
 		if (options.selfDestructScoreMult != 0) {
 		    double sc = Rate(0.0, pl->score)
 			* options.selfDestructScoreMult;
-		    Score(pl, -sc, pl->pos, "Self-Destruct");
+		    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Self-Destruct");
 		}
 		Player_set_state(pl, PL_STATE_KILLED);
 		Set_message_f("%s has committed suicide.", pl->name);

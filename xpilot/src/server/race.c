@@ -226,7 +226,7 @@ void Race_compute_game_status(world_t *world)
 		    Set_message(msg);
 		    sprintf(msg, "[Position %d%s]", pos,
 			    (num_finished_players == 1) ? "" : " (jointly)");
-		    Score(pl, pts, pl->pos, msg);
+		    if (!options.zeroSumScoring) Score(pl, pts, pl->pos, msg);
 		}
 		else {
 		    sprintf(msg,
@@ -368,7 +368,7 @@ void Race_game_over(world_t *world)
 			      pl->name,
 			      (num_best_players == 1) ? "had" : "shares",
 			      (double) bestlap / FPS);
-		Score(pl, 5.0 + num_active_players, pl->pos,
+		if (!options.zeroSumScoring) Score(pl, 5.0 + num_active_players, pl->pos,
 		      (num_best_players == 1)
 		      ? "[Fastest lap]" : "[Joint fastest lap]");
 	    }

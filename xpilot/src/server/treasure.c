@@ -94,7 +94,7 @@ void Ball_is_replaced(ballobject_t *ball)
     ball->life = 0;
     SET_BIT(ball->obj_status, (NOEXPLOSION|RECREATE));
 
-    Score(pl, 5.0, ball->pos, "Treasure: ");
+    if (!options.zeroSumScoring) Score(pl, 5.0, ball->pos, "Treasure: ");
     Set_message_f(" < %s (team %d) has replaced the treasure >",
 		  pl->name, pl->team);
     Rank_saved_ball(pl);
@@ -156,6 +156,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 
     if (!somebody) {
 	Score(pl, Rate(pl->score, TREASURE_SCORE)/2, pos, "Treasure:");
+	/*if (options.zeroSumScoring);*//* TODO */
 	return 0;
     }
 
@@ -176,6 +177,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 
 	if (pl_i->team == td->team) {
 	    Score(pl_i, -sc, pos, "Treasure: ");
+	    /*if (options.zeroSumScoring);*//* TODO */
 	    Rank_lost_ball(pl_i);
 	    if (options.treasureKillTeam)
 		Player_set_state(pl_i, PL_STATE_KILLED);
@@ -187,8 +189,8 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 		    Rank_cashed_ball(pl_i);
 		Rank_won_ball(pl_i);
 	    }
-	    Score(pl_i, (pl_i->id == pl->id ? 3*por : 2*por),
-		  pos, "Treasure: ");
+	    Score(pl_i, (pl_i->id == pl->id ? 3*por : 2*por), pos, "Treasure: ");
+	    /*if (options.zeroSumScoring);*//* TODO */
 	}
     }
 

@@ -190,7 +190,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 		    sc = Rate(0.0, kp->score)
 			* options.laserKillScoreMult
 			* options.selfKillScoreMult;
-		    Score(kp, -sc, kp->pos, kp->name);
+		    if (!options.zeroSumScoring) Score(kp, -sc, kp->pos, kp->name);
 		}
 		else {
 		    sc = Rate(kp->score, pl->score)
@@ -201,14 +201,14 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    else if (cannon != NULL) {
 		sc = Rate(cannon->score, pl->score)
 		    * options.cannonKillScoreMult;
-		Score(pl, -sc, pl->pos, "Cannon");
+		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Cannon");
 		Set_message_f("%s got roasted alive by cannonfire.", pl->name);
 	    }
 	    else {
 		assert(pulse->id == NO_ID);
 		sc = Rate(UNOWNED_SCORE, pl->score)
 		    * options.unownedKillScoreMult;
-		Score(pl, -sc, pl->pos, "");
+		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "");
 		Set_message_f("%s got roasted alive.", pl->name);
 	    }
 

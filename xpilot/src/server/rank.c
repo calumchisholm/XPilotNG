@@ -44,6 +44,7 @@ static double sc_table[MAX_SCORES];
 static double kr_table[MAX_SCORES];
 static double kd_table[MAX_SCORES];
 static double hf_table[MAX_SCORES];
+static double dr_table[MAX_SCORES];
 
 static bool playerstag = false;
 static int num_players = 0;
@@ -124,6 +125,7 @@ static void SortRankings(void)
     double lowKD = 0.0, highKD = 0.0;
     double lowKR = 0.0, highKR = 0.0;
     double lowHF = 0.0, highHF = 0.0;
+    double lowDR = 0.0, highDR = 0.0;
     bool foundFirst = false;
     int k;
 
@@ -134,7 +136,7 @@ static void SortRankings(void)
        rank. */
     for (k = 0; k < MAX_SCORES; k++) {
 	ranknode_t *rank = &ranknodes[k];
-	double attenuation, kills, sc, kd, kr, hf;
+	double attenuation, kills, sc, kd, kr, hf, dr;
 
 	if (strlen(rank->name) == 0)
 	    continue;
@@ -155,17 +157,20 @@ static void SortRankings(void)
 	      ((double) rank->ballsCashed /
 	       (double) rank->ballsLost) :
 	      (double) rank->ballsCashed) * attenuation;
+    	dr = (double) rank->deadliest * attenuation;
 
 	sc_table[k] = sc;
 	kd_table[k] = kd;
 	kr_table[k] = kr;
 	hf_table[k] = hf;
+	dr_table[k] = dr;
 
 	if (!foundFirst) {
 	    lowSC = highSC = sc;
 	    lowKD = highKD = kd;
 	    lowKR = highKR = kr;
 	    lowHF = highHF = hf;
+	    lowDR = highDR = hf;
 	    foundFirst = true;
 	} else {
 	    if (sc > highSC)
@@ -187,6 +192,11 @@ static void SortRankings(void)
 		highHF = hf;
 	    else if (hf < lowHF)
 		lowHF = hf;
+	    
+	    if (dr > highDR)
+		highDR = dr;
+	    else if (hf < lowDR)
+		lowDR = dr;
 	}
     }
 
@@ -195,6 +205,7 @@ static void SortRankings(void)
     highKD -= lowKD;
     highKR -= lowKR;
     highHF -= lowHF;
+    highDR -= lowDR;
 
 
     {
@@ -202,12 +213,13 @@ static void SortRankings(void)
 	const double factorKD = (highKD != 0.0) ? (100.0 / highKD) : 0.0;
 	const double factorKR = (highKR != 0.0) ? (100.0 / highKR) : 0.0;
 	const double factorHF = (highHF != 0.0) ? (100.0 / highHF) : 0.0;
+	const double factorDR = (highDR != 0.0) ? (100.0 / highDR) : 0.0;
 	int i;
 
 	rank_entries = 0;
 	for (i = 0; i < MAX_SCORES; i++) {
 	    ranknode_t *rank = &ranknodes[i];
-	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf;
+	    double sc, kd, kr, hf, dr, rsc, rkd, rkr, rhf, rdr;
 
 	    rank_base[i].ind = i;
 	    if (strlen(rank->name) == 0) {
@@ -220,14 +232,16 @@ static void SortRankings(void)
 	    kd = kd_table[i];
 	    kr = kr_table[i];
 	    hf = hf_table[i];
+	    dr = dr_table[i];
 
 	    rsc = (sc - lowSC) * factorSC;
 	    rkd = (kd - lowKD) * factorKD;
 	    rkr = (kr - lowKR) * factorKR;
 	    rhf = (hf - lowHF) * factorHF;
+	    rdr = (dr - lowDR) * factorDR;
 
 	    rank_base[i].ratio
-		= 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
+		= 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf + 0.20 * rdr;
 
 	    /* KHS: maximum survived time serves as factor */
 	    if(options.survivalScore != 0.0){
@@ -268,6 +282,7 @@ static const char *Rank_get_logout_message(ranknode_t *rank)
 "<td align=right><h1><u><b>Deaths</b></u></h1></td>" \
 "<td align=right><h1><u><b>Rounds</b></u></h1></td>" \
 "<td align=right><h1><u><b>Shots</b></u></h1></td>" \
+"<td align=center><h1><u><b>Deadliest</b></u></h1></td>" \
 "<td align=center><h1><u><b>Balls</b></u></h1></td>" \
 "<td align=right><h1><u><b>Ratio</b></u></h1></td>" \
 "<td align=right><h1><u><b>User</b></u></h1></td>" \
@@ -333,12 +348,14 @@ void Rank_write_webpage(void)
 		"<td align=right>%u"
 		"<td align=right>%u"
 		"<td align=right>%u"
+		"<td align=right>%u"
 		"<td align=center>%u/%u/%u/%u/%.2f"
 		"<td align=right>%.2f"
 		"<td align=right>%s",
 		rank->score,
 		rank->kills, rank->deaths,
 		rank->rounds, rank->shots,
+		rank->deadliest,
 		rank->ballsCashed, rank->ballsSaved,
 		rank->ballsWon, rank->ballsLost,
 		rank->bestball,
@@ -365,9 +382,9 @@ bool Rank_get_stats(const char *name, char *buf, size_t size)
 	return false;
 
     snprintf(buf, size,
-	     "%-15s  SC: %7.1f  K/D: %5d/%5d  R: %4d  SH: %6d  "
+	     "%-15s  SC: %7.1f  K/D: %5d/%5d  R: %4d  SH: %6d  Dl: %d "
 	     "B: %d/%d/%d/%d/%.2f TM: %.2f",
-	     r->name, r->score, r->kills, r->deaths, r->rounds, r->shots,
+	     r->name, r->score, r->kills, r->deaths, r->rounds, r->shots, r->deadliest,
 	     r->ballsCashed, r->ballsSaved, r->ballsWon, r->ballsLost,
 	     r->bestball,r->max_survival_time);
 
@@ -650,6 +667,10 @@ void Rank_write_rankfile(void)
 	    && fprintf(file, "shots=\"%d\" ", rank->shots) < 0)
 	    goto writefailed;
 
+	if (rank->deadliest > 0
+	    && fprintf(file, "deadliest=\"%d\" ", rank->deadliest) < 0)
+	    goto writefailed;
+
 	if (rank->ballsCashed > 0
 	    && fprintf(file, "ballscashed=\"%d\" ", rank->ballsCashed) < 0)
 	    goto writefailed;
@@ -775,6 +796,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "rounds"))
 		rank->rounds = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "shots"))
+		rank->shots = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "deadliest"))
 		rank->shots = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "ballssaved"))
 		rank->ballsSaved = atoi(*(attr + 1));

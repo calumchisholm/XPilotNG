@@ -347,7 +347,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 	}
 	if (num_pushers == 0) {
 	    sc = Rate(WALL_SCORE, pl->score);
-	    Score(pl, -sc, pl->pos, hudmsg);
+	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, hudmsg);
 	    strcat(msg, ".");
 	    Set_message(msg);
 	}
@@ -390,6 +390,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
  		}
 
 		Score(pusher, sc, pl->pos, pl->name);
+		/*if (options.zeroSumScoring);*//* TODO */
 		if (i >= num_pushers - 1)
 		    Rank_add_shove_kill(pusher);
 	    }
@@ -403,7 +404,8 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
  		    sc *= options.tagItKillScoreMult;
  	    }
 
-	    Score(pl, -sc, pl->pos, "[Shove]");
+	    if (!options.zeroSumScoring || num_pushers >=1 ) Score(pl, -sc, pl->pos, "[Shove]");
+	    /*if (options.zeroSumScoring);*//* TODO */
 
 	    strcpy(msg_ptr, ".");
 	    Set_message(msg);

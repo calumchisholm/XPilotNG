@@ -171,6 +171,7 @@ extern struct options {
     double	cannonKillScoreMult;
     double	tagItKillScoreMult;
     double	tagKillItScoreMult;
+    bool    	zeroSumScoring;
 
     double	destroyItemInCollisionProb;
     bool 	allowSmartMissiles;

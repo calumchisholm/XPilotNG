@@ -41,6 +41,7 @@ typedef struct ranknode {
 
     int kills, deaths;
     int rounds, shots;
+    int deadliest;
     int ballsCashed, ballsSaved;
     int ballsWon, ballsLost;
     double bestball;
@@ -99,6 +100,12 @@ static inline void Rank_add_round(player_t *pl)
 {
     if (pl->rank)
 	pl->rank->rounds++;
+}
+
+static inline void Rank_add_deadliest(player_t *pl)
+{
+    if (pl->rank)
+	pl->rank->deadliest++;
 }
 
 static inline void Rank_cashed_ball(player_t *pl)

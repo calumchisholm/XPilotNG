@@ -1904,6 +1904,16 @@ static option_desc opts[] = {
 	OPT_COMMAND | OPT_DEFAULTS
     },
     {
+	"zeroSumScoring",
+	"zeroSum",
+	"false",
+	&options.zeroSumScoring,
+	valBool,
+	tuner_dummy,
+	"Use Zero sum scoring or not.\n",
+	OPT_COMMAND | OPT_DEFAULTS
+    },
+    {
 	"rankFileName",
 	"rankFileName",
 	NULL,

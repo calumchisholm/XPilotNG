@@ -199,7 +199,7 @@ static void PlayerCollision(world_t *world)
 	    Player_set_state(pl, PL_STATE_KILLED);
 	    Set_message_f("%s left the known universe.", pl->name);
 	    sc = Rate(WALL_SCORE, pl->score);
-	    Score(pl, -sc, pl->pos, pl->name);
+	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, pl->name);
 	    continue;
 	}
 
@@ -735,7 +735,7 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 	sc = Rate(0.0, pl->score)
 		* options.ballKillScoreMult
 		* options.unownedKillScoreMult;
-	Score(pl, -sc, pl->pos, "Ball");
+	if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Ball");
     } else {
 	player_t *kp = Player_by_id(ball->ball_owner);
 
@@ -747,7 +747,8 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 	    sc = Rate(0.0, pl->score)
 		   * options.ballKillScoreMult
 		   * options.selfKillScoreMult;
-	    Score(pl, -sc, pl->pos, kp->name);
+	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, kp->name);
+	    /*if (options.zeroSumScoring);*//* TODO */
 	} else {
 	    Rank_add_ball_kill(kp);
 	    sc = Rate(kp->score, pl->score) * options.ballKillScoreMult;
@@ -1030,7 +1031,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 	if (!kp || kp->id == pl->id) {
 	    sc = Rate(0.0, pl->score)
 		* options.explosionKillScoreMult * options.selfKillScoreMult;
-	    Score(pl, -sc, pl->pos, (kp == NULL) ? "[Explosion]" : pl->name);
+	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, (kp == NULL) ? "[Explosion]" : pl->name);
 	} else {
 	    Rank_add_explosion_kill(kp);
 	    sc = Rate(kp->score, pl->score) * options.explosionKillScoreMult;
@@ -1058,7 +1059,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	ast->life = 0.0;
     if (ast->life == 0.0) {
 	sc = Rate(pl->score, ASTEROID_SCORE) * options.unownedKillScoreMult;
-	Score(pl, sc, ast->pos, "");
+	if (!options.zeroSumScoring) Score(pl, sc, ast->pos, "");
     }
 
     if (!Player_uses_emergency_shield(pl))
@@ -1075,13 +1076,13 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 	else
 	    Set_message_f("%s was hit by an asteroid.", pl->name);
 	sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
-	Score(pl, -sc, pl->pos, "[Asteroid]");
+	if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "[Asteroid]");
 	if (Player_is_tank(pl)) {
 	    player_t *owner_pl = Player_by_id(pl->lock.pl_id);
 
 	    sc = Rate(owner_pl->score, ASTEROID_SCORE)
 		* options.unownedKillScoreMult;
-	    Score(owner_pl, sc, ast->pos, "");
+	    if (!options.zeroSumScoring) Score(owner_pl, sc, ast->pos, "");
 	}
 	return;
     }
@@ -1260,9 +1261,9 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 
 	    sc *= factor;
 	    if (BIT(obj->obj_status, FROMCANNON))
-		Score(pl, -sc, pl->pos, "Cannon");
+		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Cannon");
 	    else if (obj->id == NO_ID || kp->id == pl->id)
-		Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
+		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
 	    else {
 		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		Robot_war(pl, kp);
@@ -1441,7 +1442,7 @@ static void AsteroidCollision(world_t *world)
 			double sc = Rate(pl->score, ASTEROID_SCORE)
 			    * options.unownedKillScoreMult;
 
-			Score(pl, sc, ast->pos, "");
+			if (!options.zeroSumScoring) Score(pl, sc, ast->pos, "");
 		    }
 
 		    /* break; */
