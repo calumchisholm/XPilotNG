@@ -34,11 +34,6 @@ message_t	*TalkMsg_pending[MAX_MSGS], *GameMsg_pending[MAX_MSGS];
 /* history of the talk window */
 char		*HistoryMsg[MAX_HIST_MSGS];
 
-#ifndef _WINDOWS
-/* selection in talk- or draw-window */
-extern void Delete_pending_messages(void);
-#endif
-
 bool ball_shout = false;
 bool need_cover = false;
 
@@ -794,7 +789,7 @@ void Add_message(char *message)
 /*
  * clear the buffer for the pending messages
  */
-void Delete_pending_messages(void)
+static void Delete_pending_messages(void)
 {
     message_t* msg;
     int i;
