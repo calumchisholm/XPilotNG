@@ -48,7 +48,7 @@ char sdlpaint_version[] = VERSION;
  * Globals.
  */
 static TTF_Font     *scoreListFont;
-static char         *scoreListFontName = CONF_FONTDIR "VeraMoBd.ttf";
+static const char   *scoreListFontName = CONF_FONTDIR "VeraMoBd.ttf";
 static sdl_window_t scoreListWin;
 static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
 static bool         scoreListMoving;
