@@ -710,50 +710,7 @@ static void PlayerObjectCollision(player *pl)
 	obj = obj_list[j];
 
 	range = (SHIP_SZ + obj->pl_range) * CLICK;
-
-	hit1 = in_range(OBJ_PTR(pl), obj, range);
-
-	if (is_polygon_map || !useOldCode) {
-	    switch (obj->collmode) {
-	    case 0:
-		hit2 = in_range_simple(pl->pos.cx, pl->pos.cy,
-				       obj->pos.cx, obj->pos.cy,
-				       range);
-		break;
-	    case 1:
-		hit2 = in_range_acd(pl->prevpos.cx - obj->prevpos.cx,
-				    pl->prevpos.cy - obj->prevpos.cy,
-				    pl->extmove.cx - obj->extmove.cx,
-				    pl->extmove.cy - obj->extmove.cy,
-				    range);
-		break;
-	    case 2:
-		hit2 = in_range_partial(pl->prevpos.cx - obj->prevpos.cx,
-					pl->prevpos.cy - obj->prevpos.cy,
-					pl->extmove.cx - obj->extmove.cx,
-					pl->extmove.cy - obj->extmove.cy,
-					range, obj->wall_time);
-		break;
-	    case 3:
-	    default:
-#if 0
-		warn("Unimplemented collision mode %d", obj->collmode);
-#endif
-		hit2 = false;
-	    }
-	} else {
-	    if (obj->life <= 0)
-		hit2 = false;
-	    else
-		hit2 = in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
-					pl->pos.cx, pl->pos.cy,
-					obj->prevpos.cx, obj->prevpos.cy,
-					obj->pos.cx, obj->pos.cy,
-					range);
-	}
-
-	assert(hit1 == hit2);
-	if (!hit1)
+	if (!in_range(OBJ_PTR(pl), obj, range))
 	    continue;
 
 	if (obj->id != NO_ID) {
