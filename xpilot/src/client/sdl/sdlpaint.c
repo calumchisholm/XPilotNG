@@ -300,9 +300,9 @@ int Paint_init(void)
 	return -1;
 
     //    scale = 1.171875;
-    scale = 0.8;
+    scale = 1.0;
     scaleFactor = 1.0 / scale;
-    scaleFactor_s = 1.0;
+    scaleFactor_s = 1.0 / 0.8;
     scoresChanged = true;
     players_exposed = true;
         
@@ -535,8 +535,8 @@ void Paint_frame(void)
 	
 	glPopMatrix();
     }
+    
     SDL_GL_SwapBuffers();
-	
     if (timing) gettimeofday(&timed[16][1],NULL);
 
     if (timing) {
@@ -558,7 +558,6 @@ void Paint_frame(void)
 	    
 	}
     }
-    /*xpprintf("time for Paint_frame() = %i\n",SDL_GetTicks()-now);*/
 }
 
 void Paint_score_start(void)

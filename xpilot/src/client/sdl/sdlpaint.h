@@ -72,4 +72,6 @@ void clean_guiarea_list(void);
 irec *select_bounds;
 extern void Paint_select(void);
 
+extern SDL_Surface  *MainSDLSurface;
+
 #endif

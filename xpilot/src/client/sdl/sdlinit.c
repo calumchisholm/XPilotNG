@@ -6,6 +6,7 @@
 #include "console.h"
 #include "sdlkeys.h"
 #include "radar.h"
+#include "sdlpaint.h"
 
 /* These are only needed for the polygon tessellation */
 /* I'd like to move them to Paint_init/cleanup but because it */
@@ -21,6 +22,7 @@ const SDL_VideoInfo *videoInfo;
 
 /* Flags to pass to SDL_SetVideoMode */
 int videoFlags;
+SDL_Surface  *MainSDLSurface;
 
 int Init_playing_windows(void)
 {
@@ -66,14 +68,13 @@ int Init_playing_windows(void)
     
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	    
-    if (SDL_SetVideoMode(draw_width, 
+    if ((MainSDLSurface = SDL_SetVideoMode(draw_width, 
 			 draw_height, 
 			 draw_depth, 
-			 videoFlags ) == NULL) {
+			 videoFlags )) == NULL) {
       error("Could not find a valid GLX visual for your display");
     }
-    
-    
+        
     SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
     printf("RGB bpp %d/", value);
     SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE,&value);

@@ -551,14 +551,35 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-#if 0
+
+#if 1
+    /* This ugly mess appears to stop most of the walls' wobbling...*/
+    /* TODO: sort this mess out */
+    int xtrim = 0;
+    if (scale != 1.0)
+    	if (ABS(world.x-polygon.points[0].x)<(Setup->width/2))
+    	    xtrim = ceil(scale)*(world.x<(polygon.points[0].x+1));
+    	else
+    	    xtrim = 1;
+	
+    int ytrim = 0;
+    if (scale != 1.0)
+    	if (ABS(world.y-polygon.points[0].y)<(Setup->height/2))
+    	    ytrim = -(world.y>(polygon.points[0].y));
+    	else
+    	    ytrim = -(int)scale;
+    	
+    glTranslatef((int)(( xoff * Setup->width + polygon.points[0].x + ((int)((-world.x)*scale)/scale) + xtrim ) * scale),
+		 (int)(( yoff * Setup->height + polygon.points[0].y + ((int)((-world.y)*scale)/scale) + ytrim ) * scale),
+	0);
+    glScalef(scale, scale, 0);
+#elif 0
     /* This makes the textures flicker */
     glScalef(scale, scale, 0);
     glTranslatef(xoff * Setup->width + polygon.points[0].x - world.x,
 		 yoff * Setup->height + polygon.points[0].y - world.y,
 		 0);
-#endif
-#if 1
+#else
     /* This makes the walls wobble */
     glTranslatef((int)((xoff * Setup->width + polygon.points[0].x
 			- world.x) * scale),
@@ -567,7 +588,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	0);
     glScalef(scale, scale, 0);
 #endif
-
+    
     if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
 	    BIT(p_style.flags, STYLE_TEXTURED | STYLE_FILLED)) {
 	if (BIT(p_style.flags, STYLE_TEXTURED)
@@ -580,7 +601,10 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	    glCallList(polyListBase + i);
 	}
     }
-
+/* might be useful when trying to fix wall-wobbling */
+#if 0    
+    mapprint(&mapfont,whiteRGBA,LEFT,DOWN,0,0,"%i %i %i %i %i",i,polygon.points[0].x,world.x,polygon.points[0].y,world.y);
+#endif
     set_alphacolor((e_style.rgb << 8) | 0xff);
     glLineWidth(e_style.width * scale);
     glEnable(GL_BLEND);
