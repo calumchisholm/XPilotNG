@@ -81,6 +81,7 @@ int ballstats_cashes = 0;
 int ballstats_replaces = 0;
 int ballstats_teamcashes = 0;
 int ballstats_lostballs = 0;
+int rounds_played = 0;
 
 XFontStruct* gameFont;		/* The fonts used in the game */
 XFontStruct* messageFont;

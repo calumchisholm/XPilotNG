@@ -1294,8 +1294,6 @@ int Handle_score_object(DFLOAT score, int x, int y, char *msg)
     return 0;
 }
 
-/* kps - does this info exist somewhere else ? */
-static int rounds_played = 0;
 
 static void Print_roundend_messages(other_t **order)
 {

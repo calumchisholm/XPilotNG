@@ -379,6 +379,7 @@ static bool Msg_scan_for_total_reset(char *message)
 	ballstats_replaces = 0;
 	ballstats_teamcashes = 0;
 	ballstats_lostballs = 0;
+	rounds_played = 0;
 	return true;
     }
 
