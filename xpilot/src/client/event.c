@@ -37,9 +37,9 @@ keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 { NULL, NULL, NULL, NULL, NULL };
 
-int Key_get_count(keys_t key);
-bool Key_inc_count(keys_t key);
-bool Key_dec_count(keys_t key);
+static int Key_get_count(keys_t key);
+static bool Key_inc_count(keys_t key);
+static bool Key_dec_count(keys_t key);
 
 static void Pointer_control_newbie_message(void)
 {
@@ -325,7 +325,7 @@ static bool Key_press_exit(void)
     return false;	/* server doesn't need to know */
 }
 
-int Key_get_count(keys_t key)
+static int Key_get_count(keys_t key)
 {
    if (key >= NUM_KEYS)
        return -1;
@@ -333,7 +333,7 @@ int Key_get_count(keys_t key)
    return keyv_new[key];
 }
 
-bool Key_inc_count(keys_t key)
+static bool Key_inc_count(keys_t key)
 {
     if (key >= NUM_KEYS)
 	return false;
@@ -346,7 +346,7 @@ bool Key_inc_count(keys_t key)
     return false;
 }
 
-bool Key_dec_count(keys_t key)
+static bool Key_dec_count(keys_t key)
 {
     if (key >= NUM_KEYS)
 	return false;
@@ -438,7 +438,7 @@ bool Key_press(keys_t key)
 	break;
 
     case KEY_ID_MODE:
-	return (Key_press_id_mode());
+	return Key_press_id_mode();
 
     case KEY_FIRE_SHOT:
     case KEY_FIRE_LASER:
@@ -822,19 +822,19 @@ static const char *getPointerButtonBinding(xp_option_t *opt)
 xp_option_t key_options[] = {
     XP_KEY_OPTION(
 	"keyTurnLeft",
-	"Left",
+	"",
 	KEY_TURN_LEFT,
 	"Turn left (anti-clockwise).\n"),
 
     XP_KEY_OPTION(
 	"keyTurnRight",
-	"Right",
+	"",
 	KEY_TURN_RIGHT,
 	"Turn right (clockwise).\n"),
 
     XP_KEY_OPTION(
 	"keyThrust",
-	"Up",
+	"Shift_R Shift_L",
 	KEY_THRUST,
 	"Thrust.\n"),
 
@@ -846,7 +846,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyFireShot",
-	"Shift_L Shift_R Control_L Control_R",
+	"Control_L Control_R",
 	KEY_FIRE_SHOT,
 	"Fire shot.\n"
 	"Note that shields must be down to fire.\n"),
@@ -895,7 +895,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockClose",
-	"",		/* Select and Up removed */
+	"Select Up",
 	KEY_LOCK_CLOSE,
 	"Lock on closest player.\n"),
 
@@ -907,19 +907,19 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockNext",
-	"Next",		/* a.k.a. Page Down */
+	"Next Right",		/* Next is a.k.a. Page Down */
 	KEY_LOCK_NEXT,
 	"Lock on next player.\n"),
 
     XP_KEY_OPTION(
 	"keyLockPrev",
-	"Prior",	/* a.k.a. Page Up */
+	"Prior Right",		/* Prior is a.k.a. Page Up */
 	KEY_LOCK_PREV,
 	"Lock on previous player.\n"),
 
     XP_KEY_OPTION(
 	"keyRefuel",
-	"f",
+	"f Control_L Control_R",
 	KEY_REFUEL,
 	"Refuel.\n"),
 
@@ -964,7 +964,7 @@ xp_option_t key_options[] = {
 	"keySwapSettings",
 	"",
 	KEY_SWAP_SETTINGS,
-	"Swap control settings.\n"
+	"Swap to alternate control settings.\n"
 	"These are the power, turn speed and turn resistance settings.\n"),
 
     XP_KEY_OPTION(
@@ -978,11 +978,11 @@ xp_option_t key_options[] = {
 	"Home h",
 	KEY_CHANGE_HOME,
 	"Change home base.\n"
-	"When the ship is stationary on a new homebase.\n"),
+	"When the ship is close to a suitable base.\n"),
 
     XP_KEY_OPTION(
 	"keyConnector",
-	"f",
+	"f Control_L Control_R",
 	KEY_CONNECTOR,
 	"Connect to a ball.\n"),
 
