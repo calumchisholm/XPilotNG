@@ -114,7 +114,7 @@ void Talk_cursor(bool visible)
 	talk_cursor.offset = XTextWidth(talkFont, talk_str,
 					(int)talk_cursor.point);
 	/*
-	 * goodie: `inverse' cursor (an underscore) if there is already an
+	 * goodie: 'inverse' cursor (an underscore) if there is already an
 	 * unemphasized underscore
 	 */
 	if (talk_cursor.point < strlen(talk_str)
@@ -172,7 +172,7 @@ void Talk_map_window(bool map)
 
 /*
  * redraw a possible selection [un]emphasized.
- * to unemphasize a selection, `selection.txt' is needed.
+ * to unemphasize a selection, 'selection.txt' is needed.
  * thus selection.talk.state == SEL_SELECTED indicates that it
  * should not be drawn emphasized
  */
@@ -236,15 +236,15 @@ static void Add_msg_to_history(char *message)
 }
 
 /*
- * Fetch a message from the `history' by returning a pointer to it.
+ * Fetch a message from the 'history' by returning a pointer to it.
  * Choice depends on current poition (*pos, call by ref for modification here)
- * and `direction' of browsing
+ * and 'direction' of browsing
  *
- * if we are here _and the gobal `save_talk_str' is set, then the submitted
+ * if we are here _and the gobal 'save_talk_str' is set, then the submitted
  * message is unfinished - call Add_msg_to_history(), but don't return
  * the next line.
  * Purpose: gives ability to abort writing a message and resume later.
- * The global `save_talk' can be set anywhere else in the code whenever
+ * The global 'save_talk' can be set anywhere else in the code whenever
  * a line from the history gets modified
  * (thus save_talk not as parameter here)
  *
@@ -292,7 +292,7 @@ static char *Get_msg_from_history(int* pos, char *message, keys_t direction)
 /*
  * Pressing a key while there is an emphasized text in the talk window
  * substitutes this text, means: delete the text before inserting the
- * new character and place the character at this `gap'.
+ * new character and place the character at this 'gap'.
  */
 static void Talk_delete_emphasized_text(void)
 {
@@ -397,18 +397,18 @@ int Talk_do_event(XEvent *event)
 	break;
 
     case KeyPress:
-	/* `strange' keys exist */
+	/* 'strange' keys exist */
 	if ((keysym = XLookupKeysym(&event->xkey, 0)) == NoSymbol)
 	    break;
 
-	/* `unprintables'? */
+	/* 'unprintables'? */
 	if (XLookupString(&event->xkey, &ch, 1, &keysym, &compose)
 		== NoSymbol) {
 
 	    keys_t key;		/* what key is it */
 	    char *tmp;		/* for receiving a line from the history */
 
-	    /* search the `key' */
+	    /* search the 'key' */
 	    for (key = Lookup_key(event, keysym, true);
 		 key != KEY_DUMMY;
 		 key = Lookup_key(event, keysym, false)) {
@@ -417,7 +417,7 @@ int Talk_do_event(XEvent *event)
 		    Talk_cursor(false);
 		    /*
 		     * faster cursor movement after some time.
-		     * `talk_crs_repeat_count' is reset at `KeyRelease'
+		     * 'talk_crs_repeat_count' is reset at 'KeyRelease'
 		     */
 		    if (talk_crs_repeat_count > CRS_START_HOPPING) {
 			if (talk_cursor.point < strlen(talk_str) - CRS_HOP)
@@ -480,7 +480,7 @@ int Talk_do_event(XEvent *event)
 
 		} /* switch */
 	    } /* for */
-	    break; /* out of `KeyPress' */
+	    break; /* out of 'KeyPress' */
 	} /* XLookupString() == NoSymbol */
 
 	/*
@@ -809,13 +809,13 @@ int Talk_do_event(XEvent *event)
 }
 
 /*
- * Try to paste `data_len' amount of `data' at the cursor position into
- * the talk window.  Cut off overflow (`accept_len').
+ * Try to paste 'data_len' amount of 'data' at the cursor position into
+ * the talk window.  Cut off overflow ('accept_len').
  *
- * The global `talk_str' will contain the new content.
+ * The global 'talk_str' will contain the new content.
  * (safe if *data references *talk_str).
  *
- * if `overwrite' then don't insert/append but substitute the text
+ * if 'overwrite' then don't insert/append but substitute the text
  *
  * Return the number of pasted characters.
  */
@@ -831,7 +831,7 @@ int Talk_paste(char *data, size_t data_len, bool overwrite)
     size_t accept_len;			/* for still matching the window */
     char paste_buf[MAX_CHARS];		/* gets the XBuffer */
     char tmp_str[MAX_CHARS];
-    char talk_backup[MAX_CHARS];	/* no `collision' with data */
+    char talk_backup[MAX_CHARS];	/* no 'collision' with data */
     bool cursor_visible = false;
     int i;
 
@@ -869,7 +869,7 @@ int Talk_paste(char *data, size_t data_len, bool overwrite)
 
     /*
      * substitute unprintables according to iso-latin-1.
-     *  (according to `data_len' one could ask for all but the
+     *  (according to 'data_len' one could ask for all but the
      *   final '\0' to be converted, but we have only text selections anyway)
      */
     /* don't convert a final newline to space */
@@ -968,7 +968,7 @@ void Talk_resize(void)
 static int Text_width_to_pos(XFontStruct *font, char *text, size_t len,
 			     int width)
 {
-    /* dummies for `XTextExtents', the faster version of XTextWidth */
+    /* dummies for 'XTextExtents', the faster version of XTextWidth */
     int	font_ascent_return, font_descent_return, direction_return;
     /* wanted: overall_return.width */
     XCharStruct overall_return;
@@ -989,7 +989,7 @@ static int Text_width_to_pos(XFontStruct *font, char *text, size_t len,
  * place the cursor in the talk window with help of the pointer button.
  * return the cursor position as index in talk_str.
  *
- * place cursor conveniently, if `pending' is set and cutting
+ * place cursor conveniently, if 'pending' is set and cutting
  * in the talk window finished outside of it (border is also outside).
  */
 int Talk_place_cursor(XButtonEvent* xbutton, bool pending)
@@ -1148,7 +1148,7 @@ void Talk_window_cut(XButtonEvent* xbutton)
 	 * making the cut available; see end of Talk_cut_from_messages()
 	 */
 	XSetSelectionOwner(dpy, XA_PRIMARY, talkWindow, CurrentTime);
-	/* `cut buffer' is binary stuff - append '\0'  */
+	/* 'cut buffer' is binary stuff - append '\0'  */
 	assert(selection.talk.x2 >= selection.talk.x1);
 	strlcpy(tmp, &talk_str[selection.talk.x1],
 		selection.talk.x2 - selection.talk.x1 + 1);
@@ -1197,7 +1197,7 @@ bool Talk_cut_area_hit(XButtonEvent *xbutton)
  * for proper cutting: Notice if cutting heppens left from the most left
  * or right from the most right character (c1/2.x_off).
  *
- * while the cut is pending, the state of Talk+GameMsg[] is `freezed'
+ * while the cut is pending, the state of Talk+GameMsg[] is 'freezed'
  * in Paint_message(). thus call Add_pending_messages() here after this.
  */
 void Talk_cut_from_messages(XButtonEvent* xbutton)
@@ -1364,7 +1364,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 		= Text_width_to_pos(messageFont, ptr->txt, ptr->len, c2.x);
 
 	/*
-	 * `c1' ~ `c2':
+	 * 'c1' ~ 'c2':
 	 * the cut doesn't really include a character:
 	 * - cutting from the end of a line to the beginning of the next
 	 * - or different pixels but the same character
@@ -1378,7 +1378,7 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	}
 
 	/*
-	 * `plug-in':
+	 * 'plug-in':
 	 * don't include the last character (if explicitly clicked on)
 	 */
 	if (c2.str_index == 0) {
@@ -1469,9 +1469,9 @@ void Talk_cut_from_messages(XButtonEvent* xbutton)
 	selection.len = strlen(selection.txt);
 
 	/*
-	 * store in `cut buffer',
+	 * store in 'cut buffer',
 	 * usually a selection request is served by the event in xevent.c.
-	 * We get that event as we own the `primary' from now on.
+	 * We get that event as we own the 'primary' from now on.
 	 * draw the selection emphasized from now on
 	 */
 	XSetSelectionOwner(dpy, XA_PRIMARY, drawWindow, CurrentTime);

@@ -786,7 +786,7 @@ void Add_message(const char *message)
         last_msg_index--; /* make it an index */
 
 	/*
-	 * keep the emphasizing (`jumping' from talk window to talk messages)
+	 * keep the emphasizing ('jumping' from talk window to talk messages)
 	 */
 	if (selection.keep_emphasizing) {
 	    selection.keep_emphasizing = false;
@@ -816,8 +816,8 @@ void Add_message(const char *message)
 	if ((scrolling && selection.draw.y2 == 0)
 	    || (selection.draw.y1 == maxMessages - 1)) {
 	    /*
-	     * the emphasizing vanishes, as it's `last' line
-	     * is `scrolled away'
+	     * the emphasizing vanishes, as it's 'last' line
+	     * is 'scrolled away'
 	     */
 	    selection.draw.state = SEL_SELECTED;
 	} else {

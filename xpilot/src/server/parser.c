@@ -411,7 +411,7 @@ bool Parser(int argc, char **argv, world_t *world)
 	}
     }
     /*
-     * Parse the options database and `internalise' it.
+     * Parse the options database and 'internalise' it.
      */
     Options_parse();
 
@@ -432,8 +432,8 @@ bool Parser(int argc, char **argv, world_t *world)
  * Options which can be modified have a so called tuner function,
  * which checks the validity of the new option value, and possibly
  * does something extra depending upon the option in question.
- * Options which don't need such a tuner function set it to `tuner_dummy'.
- * Options which cannot be modified have the tuner set to `tuner_none'.
+ * Options which don't need such a tuner function set it to 'tuner_dummy'.
+ * Options which cannot be modified have the tuner set to 'tuner_none'.
  */
 int Tune_option(char *name, char *val)
 {

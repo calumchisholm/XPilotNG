@@ -502,7 +502,7 @@ void Ping_servers(void)
 
 		if (reply_serial != it_sip->serial)
 		    /* replied to an old ping, alive but
-		     * slower than `interval' at least
+		     * slower than 'interval' at least
 		     */
 		    it_sip->pingtime = MIN(it_sip->pingtime, PING_SLOW);
 		else {

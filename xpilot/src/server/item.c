@@ -78,7 +78,7 @@ static void Item_update_flags(player_t *pl)
 
 /*
  * Player loses some items after some event (collision, bounce).
- * The `prob' parameter gives the chance that items are lost
+ * The 'prob' parameter gives the chance that items are lost
  * and, if they are lost, what percentage.
  */
 void Item_damage(player_t *pl, double prob)

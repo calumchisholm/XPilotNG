@@ -1122,7 +1122,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
      * Player got hit by a potentially deadly object.
      *
      * When a player has shields up, and not enough fuel
-     * to `absorb' the shot then shields are lowered.
+     * to 'absorb' the shot then shields are lowered.
      * This is not very logical, rather in this case
      * the shot should be considered to be deadly too.
      *

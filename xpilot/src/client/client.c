@@ -450,7 +450,7 @@ int Check_index_by_pos(int x, int y)
 }
 
 /*
- * Convert a `space' map block into a dot.
+ * Convert a 'space' map block into a dot.
  */
 static void Map_make_dot(unsigned char *data)
 {
@@ -1361,7 +1361,7 @@ int Handle_player(int id, int player_team, int mychar,
 	    if (Others == NULL)
 		fatal("Not enough memory for player info");
 	    if (self != NULL)
-		/* We've made `self' the first member of Others[]. */
+		/* We've made 'self' the first member of Others[]. */
 		self = &Others[0];
 	}
 	other = &Others[num_others++];
@@ -1371,7 +1371,7 @@ int Handle_player(int id, int player_team, int mychar,
 	    || (version < 0x4F10
 		&& strcmp(connectParam.nick_name, nick_name) == 0))) {
 	if (other != &Others[0]) {
-	    /* Make `self' the first member of Others[]. */
+	    /* Make 'self' the first member of Others[]. */
 	    *other = Others[0];
 	    other = &Others[0];
 	}

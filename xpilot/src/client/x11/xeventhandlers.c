@@ -42,7 +42,7 @@ void Clear_alert_messages(void)
 /*
  * code for the following three functions and the selectionEvents
  * happily and with benediction taken from the terminal emulator
- * `rxvt-2.6Pre2' (GNU) maintained by Geoff Wing <gcw@pobox.com>.
+ * 'rxvt-2.6Pre2' (GNU) maintained by Geoff Wing <gcw@pobox.com>.
  * (modified)
  */
 static void Selection_paste(Window win, unsigned prop, int Delete)
@@ -91,7 +91,7 @@ static void Selection_request(void)
 	prop = XInternAtom(dpy, "VT_SELECTION", False);
 	XConvertSelection(dpy, XA_PRIMARY, XA_STRING, prop, talkWindow,
 			    CurrentTime);
-	/* the selectionNotify event `will do the rest' */
+	/* the selectionNotify event 'will do the rest' */
     }
 }
 

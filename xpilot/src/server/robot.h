@@ -64,7 +64,7 @@
  *    5) The playing function which gets called each loop.
  *       The programming challenge here is to implement
  *       different characters per robot, while at the
- *       same time not calculating `everything' every
+ *       same time not calculating 'everything' every
  *       time this function is called.  i.e., try to give
  *       the robot some long term goals which are only
  *       recalculated once every couple of seconds or so.

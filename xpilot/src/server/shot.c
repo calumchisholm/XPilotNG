@@ -288,7 +288,7 @@ void Detonate_mines(player_t *pl)
 }
 
 /*
- * Describes shot of `type' which has `status' and `mods'.  If `hit' is
+ * Describes shot of 'type' which has 'status' and 'mods'.  If 'hit' is
  * non-zero this description is part of a collision, otherwise its part
  * of a launch message.
  */
@@ -767,28 +767,28 @@ void Fire_general_shot(world_t *world, int id, int team,
      *
      * The *starting* rack number for each salvo cycles through the number
      * of missiles racks.  This is stored in the player variable
-     * `pl->missile_rack', and is only incremented after each salvo (not
+     * 'pl->missile_rack', and is only incremented after each salvo (not
      * after each mini missile is fired).  This value is used to initialise
-     * `rack_no', which stores the current rack that missiles are fired from.
+     * 'rack_no', which stores the current rack that missiles are fired from.
      *
-     * `on_this_rack' is computed to be the number of missiles that will be
-     * fired from `rack_no', and `r' is used as a counter to this value.
+     * 'on_this_rack' is computed to be the number of missiles that will be
+     * fired from 'rack_no', and 'r' is used as a counter to this value.
      *
-     * `racks_left' count how many unused missiles racks are left on the ship
+     * 'racks_left' count how many unused missiles racks are left on the ship
      * in this mini missile salvo.
      *
      * 			Comment Point 2
      *			---------------
      *
-     * When `r' reaches `on_this_rack' all the missiles have been fired for
-     * this rack, and the next rack should be used.  `rack_no' is incremented
-     * modulo the number of available racks, and `racks_left' is decremented.
-     * At this point `on_this_rack' is recomputed for the next rack, and `r'
+     * When 'r' reaches 'on_this_rack' all the missiles have been fired for
+     * this rack, and the next rack should be used.  'rack_no' is incremented
+     * modulo the number of available racks, and 'racks_left' is decremented.
+     * At this point 'on_this_rack' is recomputed for the next rack, and 'r'
      * reset to zero.  Thus initially these two variables are both zero, and
-     * `rack_no' is one less, such that these variables can be computed inside
+     * 'rack_no' is one less, such that these variables can be computed inside
      * the loop to make the code simpler.
      *
-     * The computation of `on_this_rack' is as follows;  Given that there
+     * The computation of 'on_this_rack' is as follows;  Given that there
      * are M missiles and R racks remaining;
      *
      *	on_this_rack = int(M / R);	(ie. round down to lowest int)
@@ -801,7 +801,7 @@ void Fire_general_shot(world_t *world, int id, int team,
      * more precise, and trivially can be seen that when R is 1, will
      * give an exact number of missiles to fire on the last rack.
      *
-     * In the code `M' is (minis - i), and `R' is racks_left.
+     * In the code 'M' is (minis - i), and 'R' is racks_left.
      *
      *			Comment Point 3
      *			---------------
@@ -824,15 +824,15 @@ void Fire_general_shot(world_t *world, int id, int team,
      * 3		1	0	-1
      * 4		1	0.333	-0.333	-1
      *
-     * In this code `N' is `on_this_rack'.
+     * In this code 'N' is 'on_this_rack'.
      *
      * Also the position of the missile rack from the center line of the
-     * ship (stored in `side') has a linear effect on the angle, such that
+     * ship (stored in 'side') has a linear effect on the angle, such that
      * a point farthest from the center line contributes the largest angle;
      *
      * angle += (side / SHIP_SZ)
      *
-     * Since the eventual `angle' value used in the code should be a
+     * Since the eventual 'angle' value used in the code should be a
      * percentage of the unmodified launch angle, it should be ranged between
      * -1.00 and +1.00, and thus the first angle is reduced by 33% and the
      * second by 66%.

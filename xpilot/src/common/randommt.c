@@ -1,5 +1,5 @@
 /*
-** This is the ``Mersenne Twister'' random number generator MT19937, which
+** This is the ''Mersenne Twister'' random number generator MT19937, which
 ** generates pseudorandom integers uniformly distributed in 0..(2^32 - 1)
 ** starting from any odd seed in 0..(2^32 - 1).  This version is a recode
 ** by Shawn Cokus (Cokus@math.washington.edu) on March 8, 1998 of a version by
@@ -13,10 +13,10 @@
 ** number generations per second on this machine.
 **
 ** According to the URL <http://www.math.keio.ac.jp/~matumoto/emt.html>
-** (and paraphrasing a bit in places), the Mersenne Twister is ``designed
+** (and paraphrasing a bit in places), the Mersenne Twister is ''designed
 ** with consideration of the flaws of various existing generators,'' has
 ** a period of 2^19937 - 1, gives a sequence that is 623-dimensionally
-** equidistributed, and ``has passed many stringent tests, including the
+** equidistributed, and ''has passed many stringent tests, including the
 ** die-hard test of G. Marsaglia and the load test of P. Hellekalek and
 ** S. Wegenkittl.''  It is efficient in memory usage (typically using 2506
 ** to 5012 bytes of static data, depending on data type sizes, and the code

@@ -408,7 +408,7 @@ typedef struct {
         bool    state;	/* current state of the selection */
         size_t  x1;	/* string indices */
         size_t  x2;
-        bool    incl_nl;/* include a `\n'? */
+        bool    incl_nl;/* include a '\n'? */
     } talk ;
     /* a selection in the draw window */
     struct {
@@ -421,7 +421,7 @@ typedef struct {
     char	*txt;   /* allocated when needed */
     size_t	txt_size;	/* size of txt buffer */
     size_t	len;
-    /* when a message `jumps' from talk window to the player messages: */
+    /* when a message 'jumps' from talk window to the player messages: */
     bool	keep_emphasizing;
 } selection_t;
 

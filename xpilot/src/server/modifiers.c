@@ -29,7 +29,7 @@ char modifiers_version[] = VERSION;
 
 
 /*
- * Fast conversion of `num' into `str' starting at position `i', returns
+ * Fast conversion of 'num' into 'str' starting at position 'i', returns
  * index of character after converted number.
  */
 static int num2str(int num, char *str, int i)

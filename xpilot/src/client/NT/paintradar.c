@@ -290,7 +290,7 @@ void Paint_sliding_radar(void)
 
 /*
  * Try and draw an area of the radar which represents block position
- * `xi' `yi'.  If `draw' is zero the area is cleared.
+ * 'xi' 'yi'.  If 'draw' is zero the area is cleared.
  */
 static void Paint_radar_block(int xi, int yi, int color)
 {
@@ -313,10 +313,10 @@ static void Paint_radar_block(int xi, int yi, int color)
 	ys = (double)(Setup->y - 1) / (RadarHeight - 1);
 	/*
 	 * Calculate the min and max points on the radar that would show
-	 * block position `xi' and `yi'.  Note `xp' is the minimum x coord
-	 * for `xi',which is one more than the previous xi value would give,
-	 * and `xw' is the maximum, which is then changed to a width value.
-	 * Similarly for `yw' and `yp' (the roles are reversed because the
+	 * block position 'xi' and 'yi'.  Note 'xp' is the minimum x coord
+	 * for 'xi',which is one more than the previous xi value would give,
+	 * and 'xw' is the maximum, which is then changed to a width value.
+	 * Similarly for 'yw' and 'yp' (the roles are reversed because the
 	 * radar is upside down).
 	 */
 	xp = (int)((xi - 0.5) / xs) + 1;

@@ -53,8 +53,8 @@ double Rate(double winner, double loser)
 }
 
 /*
- * Cause `winner' to get `winner_score' points added with message
- * `winner_msg', and similarly with the `loser' and equivalent
+ * Cause 'winner' to get 'winner_score' points added with message
+ * 'winner_msg', and similarly with the 'loser' and equivalent
  * variables.
  *
  * In general the winner_score should be positive, and the loser_score

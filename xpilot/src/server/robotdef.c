@@ -257,7 +257,7 @@ static void Robot_default_create(player_t *pl, char *str)
     }
     /*
      * some parameters which may be changed to be dependent upon
-     * the `attack' and `defense' settings of this robot.
+     * the 'attack' and 'defense' settings of this robot.
      */
     if (BIT(world->rules->mode, TIMING)) {
 	my_data->robot_normal_speed = 10.0;

@@ -771,9 +771,9 @@ static int RSetDashes(Display *display, GC gc,
 
 
 /*
- * The `_Xconst' trick from <X11/Xfuncproto.h> doesn't work
+ * The '_Xconst' trick from <X11/Xfuncproto.h> doesn't work
  * on Suns when not compiling under full ANSI mode.
- * So we force the prototypes to use `const' instead of `_Xconst'
+ * So we force the prototypes to use 'const' instead of '_Xconst'
  * by means of defining function types and casting with them.
  */
 typedef int (*draw_string_proto_t)(Display *, Drawable, GC,

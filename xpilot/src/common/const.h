@@ -149,7 +149,7 @@ do { \
 
 /*
  * Size (pixels) of radius for legal HIT!
- * Was 14 until 4.2. Increased due to `analytical collision detection'
+ * Was 14 until 4.2. Increased due to 'analytical collision detection'
  * which inspects a real circle and not just a square anymore.
  */
 #define SHIP_SZ		        16

@@ -234,7 +234,7 @@ void Base_set_option(base_t *base, const char *name, const char *value)
 }
 
 /*
- * Compute the current sensor range for player `pl'.  This is based on the
+ * Compute the current sensor range for player 'pl'.  This is based on the
  * amount of fuel, the number of sensor items (each one adds 25%), and the
  * minimum and maximum visibility limits in effect.
  */

@@ -605,7 +605,7 @@ void Net_cleanup(void)
 }
 
 /*
- * Calculate a new `keyboard-changed-id' which the server has to ack.
+ * Calculate a new 'keyboard-changed-id' which the server has to ack.
  */
 void Net_key_change(void)
 {
@@ -648,7 +648,7 @@ int Net_fd(void)
 }
 
 /*
- * Try to send a `start play' packet to the server and get an
+ * Try to send a 'start play' packet to the server and get an
  * acknowledgement from the server.  This is called after
  * we have initialized all our other stuff like the user interface
  * and we also have the map already.

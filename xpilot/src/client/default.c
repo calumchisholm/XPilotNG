@@ -1053,8 +1053,8 @@ xp_option_t default_options[] = {
 	&maxLinesInHistory,
 	NULL,
 	XP_OPTFLAG_DEFAULT,
-	"Number of your messages saved in the `history' of the talk window.\n"
-	"`history' is accessible with `keyTalkCursorUp/Down'.\n"),
+	"Number of your messages saved in the 'history' of the talk window.\n"
+	"'history' is accessible with 'keyTalkCursorUp/Down'.\n"),
 
     XP_BOOL_OPTION(
 	"toggleShield",

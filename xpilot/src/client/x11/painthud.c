@@ -841,7 +841,7 @@ void Paint_messages(void)
 	     *   2nd an emphasized part itself,
 	     *   3rd an unemph. part to the right of a selection.
 	     * set the according variables if a part exists.
-	     * e.g: a selection of several lines `stopping' somewhere in
+	     * e.g: a selection of several lines 'stopping' somewhere in
 	     *   the middle of a line -> ptr2,ptr3 are needed to draw
 	     *   this line
 	     */

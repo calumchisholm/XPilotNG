@@ -249,7 +249,7 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
     *++s = 0;
 
     /*
-     * Deal with `define: MACRO \multiline: TAG'. 
+     * Deal with 'define: MACRO \multiline: TAG'. 
      */
     if (strcmp(name, "define") == 0) {
 	p = value;
@@ -295,18 +295,18 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
 	value = getMultilineValue(map_ptr, value);
 
     /*
-     * Deal with `expand: MACRO'. 
+     * Deal with 'expand: MACRO'. 
      */
     if (strcmp(name, "expand") == 0)
 	expandKeyword(value);
 
 #ifdef REGIONS			/* not yet */
     /*
-     * Deal with `region: \multiline: TAG'. 
+     * Deal with 'region: \multiline: TAG'. 
      */
     else if (strcmp(name, "region") == 0) {
 	if (!multiline) {	/* Must be multiline. */
-	    error("regions must use `\\multiline:'.\n");
+	    error("regions must use '\\multiline:'.\n");
 	    free(name);
 	    free(head);
 	    return;
@@ -722,7 +722,7 @@ void expandKeyword(const char *keyword)
 
     p = Option_get_value(keyword, &expand_origin);
     if (p == NULL)
-	warn("Can't expand `%s' because it has not been defined.\n",
+	warn("Can't expand '%s' because it has not been defined.\n",
 	     keyword);
     else {
 	while (*p)
