@@ -33,18 +33,12 @@
 
 void Config_get_name(char *name);
 void Config_get_team(int *my_team);
-void Config_save_resource(FILE *fp, const char *resource, char *value);
+void Config_save_resource(FILE * fp, const char *resource, char *value);
 void Config_save_window_positions(void);
-void Config_get_profile_string(
-	const char* key,
-	const char* def,
-	char* result,
-	int size);
-void Config_get_resource(
-	const char *resource,
-	char *result,
-	unsigned size,
-	int* index);
+void Config_get_profile_string(const char *key,
+			       const char *def, char *result, int size);
+void Config_get_resource(const char *resource,
+			 char *result, unsigned size, int *index);
 char *Get_xpilotini_file(int level);
 
 #endif

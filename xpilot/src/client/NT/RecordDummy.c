@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -30,12 +29,17 @@
 #include "../../common/NT/winX.h"
 #include "../record.h"
 
-int			recording = False;	/* Are we recording or not. */
+int recording = False;		/* Are we recording or not. */
 
-extern	void paintItemSymbol(unsigned char type, Drawable drawable, GC mygc, int x, int y, int color);
+extern void paintItemSymbol(unsigned char type, Drawable drawable, GC mygc,
+			    int x, int y, int color);
 
-static void Dummy_newFrame(void) {}
-static void Dummy_endFrame(void) {}
+static void Dummy_newFrame(void)
+{
+}
+static void Dummy_endFrame(void)
+{
+}
 
 /*
  * X windows drawing
@@ -73,7 +77,7 @@ void Record_init(char *filename)
 {
     rd = Xdrawing;
     // if (filename != NULL && filename[0] != '\0') {
-	// record_filename = strdup(filename);
+    // record_filename = strdup(filename);
     // }
 }
 

@@ -34,23 +34,23 @@
 #define WINXTHREAD_H
 
 typedef struct {
-	HDC		hDC;
-	HDC		hBmpDC;
-	RECT	rect;
-	HWND	hWnd;
-	Window	w;
-	int		isDrawing;
-	HPALETTE	myPal;
+    HDC hDC;
+    HDC hBmpDC;
+    RECT rect;
+    HWND hWnd;
+    Window w;
+    int isDrawing;
+    HPALETTE myPal;
 
 
-	HANDLE	eventDraw;
-	HANDLE	eventNotDrawing;
-	HANDLE	eventKillServerThread;
-	HANDLE	eventServerThreadKilled;
+    HANDLE eventDraw;
+    HANDLE eventNotDrawing;
+    HANDLE eventKillServerThread;
+    HANDLE eventServerThreadKilled;
 } _dinfo;
 
-extern	_dinfo	dinfo;
+extern _dinfo dinfo;
 
-extern void winXTDraw(HDC hDC, Window xidno, RECT* rect);
+extern void winXTDraw(HDC hDC, Window xidno, RECT * rect);
 
 #endif

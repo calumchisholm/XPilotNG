@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -34,77 +33,77 @@ const char separators[] = " \t\n";
 
 CBSString::CBSString()
 {
-	this->CString::CString();
+    this->CString::CString();
 }
 
-CBSString::CBSString(const char* psz)
+CBSString::CBSString(const char *psz)
 {
-	this->CString::CString(psz);
+    this->CString::CString(psz);
 }
 
-CBSString::CBSString(const CBSString& stringSrc)
+CBSString::CBSString(const CBSString & stringSrc)
 {
-	this->CString::CString((const CString&)stringSrc);
+    this->CString::CString((const CString &) stringSrc);
 }
 
-CBSString::CBSString(const CString& stringSrc)
+CBSString::CBSString(const CString & stringSrc)
 {
-	this->CString::CString(stringSrc);
+    this->CString::CString(stringSrc);
 }
 
-CBSString::CBSString(const CBSString* cbs)
+CBSString::CBSString(const CBSString * cbs)
 {
-	this->CString::CString((const char*)cbs);
+    this->CString::CString((const char *) cbs);
 }
 
 CBSString CBSString::GetToken()
 {
-	CBSString	ct;
-	ct = SpanIncluding(separators);		// skip white space
-	if (ct.GetLength())
-		ct = Mid(ct.GetLength());
-	else
-		ct = (const char*)this[0];
-	ct = ct.SpanExcluding(separators);
-	return(ct);
+    CBSString ct;
+    ct = SpanIncluding(separators);	// skip white space
+    if (ct.GetLength())
+	ct = Mid(ct.GetLength());
+    else
+	ct = (const char *) this[0];
+    ct = ct.SpanExcluding(separators);
+    return (ct);
 }
+
 CBSString CBSString::SkipSpace()
 {
-	CBSString	ct;
-	ct = SpanIncluding(separators);		// skip white space
-	return(Right(GetLength() - ct.GetLength()));
+    CBSString ct;
+    ct = SpanIncluding(separators);	// skip white space
+    return (Right(GetLength() - ct.GetLength()));
 
 }
 
 CBSString CBSString::SkipToken()
 {
-	CBSString cs, ct;
-	cs = SkipSpace();
-	ct = cs.SpanExcluding(separators);
-	cs = cs.Right(cs.GetLength() - ct.GetLength());
-	return(cs);
+    CBSString cs, ct;
+    cs = SkipSpace();
+    ct = cs.SpanExcluding(separators);
+    cs = cs.Right(cs.GetLength() - ct.GetLength());
+    return (cs);
 }
 
 int CBSString::MatchToken(const char *list[])
 {
-	int i = 0;
-	while (*list != NULL)
-	{
-//		TRACE("MatchToken: <%s> <%s>\n", *list, (const char*)*this);
-		if (!strcmp((const char*)*list, (const char*)*this))
-//		if (this == *list)
-			return(i);
-		list++;
-		i++;
-	}
-	return(-1);
+    int i = 0;
+    while (*list != NULL) {
+//              TRACE("MatchToken: <%s> <%s>\n", *list, (const char*)*this);
+	if (!strcmp((const char *) *list, (const char *) *this))
+//              if (this == *list)
+	    return (i);
+	list++;
+	i++;
+    }
+    return (-1);
 }
 
 COLORREF CBSString::ParseColor()
 {
-	CBSString	cs, ct;
-	int			r,g,b;
-	
+    CBSString cs, ct;
+    int r, g, b;
+
     ct = GetToken();
     r = atoi(ct);
     cs = SkipToken();
@@ -114,36 +113,36 @@ COLORREF CBSString::ParseColor()
     ct = cs.GetToken();
     b = atoi(ct);
 //    TRACE("ParseColor: r/g/b = %d/%d/%d\n", r, g, b);
-    return(RGB(r,g,b));
+    return (RGB(r, g, b));
 }
 
-POINT	CBSString::ParsePoint()
+POINT CBSString::ParsePoint()
 {
-	CBSString	cs, ct;
+    CBSString cs, ct;
 
-	POINT	p;	
-	ct = GetToken();
-	p.x = atoi(ct);
-	cs = SkipToken();
-	ct = cs.GetToken();
-	p.y = atoi(ct);
-	return(p);
+    POINT p;
+    ct = GetToken();
+    p.x = atoi(ct);
+    cs = SkipToken();
+    ct = cs.GetToken();
+    p.y = atoi(ct);
+    return (p);
 }
 
-CRect	CBSString::ParseRect()
+CRect CBSString::ParseRect()
 {
-	CRect	r;
-	CBSString	cs, ct;
-	ct = GetToken();
-	r.left = atoi(ct);
-	cs = SkipToken();
-	ct = cs.GetToken();
-	r.top = atoi(ct);
-	cs = cs.SkipToken();
-	ct = cs.GetToken();
-	r.right = atoi(ct);
-	cs = cs.SkipToken();
-	ct = cs.GetToken();
-	r.bottom = atoi(ct);
-	return(r);	
+    CRect r;
+    CBSString cs, ct;
+    ct = GetToken();
+    r.left = atoi(ct);
+    cs = SkipToken();
+    ct = cs.GetToken();
+    r.top = atoi(ct);
+    cs = cs.SkipToken();
+    ct = cs.GetToken();
+    r.right = atoi(ct);
+    cs = cs.SkipToken();
+    ct = cs.GetToken();
+    r.bottom = atoi(ct);
+    return (r);
 }

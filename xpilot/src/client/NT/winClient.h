@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -38,32 +37,32 @@
 extern "C" {
 #endif
 
-extern	void		xpilotShutdown();
-extern	int			main(int argc, char** argv);
-extern	int			Net_fd(void);
-extern	int			Net_input(void);
-extern	void		Paint_frame(void);
-extern	void		PaintWinClient();
-extern	HINSTANCE	hInstance;
-extern	void		Client_cleanup();
+    extern void xpilotShutdown();
+    extern int main(int argc, char **argv);
+    extern int Net_fd(void);
+    extern int Net_input(void);
+    extern void Paint_frame(void);
+    extern void PaintWinClient();
+    extern HINSTANCE hInstance;
+    extern void Client_cleanup();
 
-extern	void		InitWinX(HWND m_hWnd);
-extern	void		WinXShutdown();
+    extern void InitWinX(HWND m_hWnd);
+    extern void WinXShutdown();
 
-extern	int			received_self;
+    extern int received_self;
 
-extern	const char*	winHelpFile;	/* used to determine .ini file locations */
+    extern const char *winHelpFile;	/* used to determine .ini file locations */
 
 /* requests from the xpilot "real code" to mfc */
-extern	void	_Trace(char* lpszFormat, ...);
-extern	const char* mfcDoTalkWindow();
-extern	char*	Get_xpilotini_file(int level);
+    extern void _Trace(char *lpszFormat, ...);
+    extern const char *mfcDoTalkWindow();
+    extern char *Get_xpilotini_file(int level);
 
 #ifdef	_DEBUG
-extern	void	xpmemShutdown();
+    extern void xpmemShutdown();
 #endif
 
-extern	void	Progress(const char* s, ...);
+    extern void Progress(const char *s, ...);
 
 #ifdef __cplusplus
 };

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -32,72 +31,72 @@
 /////////////////////////////////////////////////////////////////////////////
 // CCredits window
 
-class CCredits : public CStatic
-{
+class CCredits:public CStatic {
 // Construction
-public:
-	CCredits();
+  public:
+    CCredits();
 
 // Attributes
-public:
-	CFont	font;
-	BOOL	haveFont;
-	CRect	crRect;
-	int		scrollofs;
-	CBitmap	bm;
-	BOOL	timer;
-	BOOL	virgin;
+  public:
+    CFont font;
+    BOOL haveFont;
+    CRect crRect;
+    int scrollofs;
+    CBitmap bm;
+    BOOL timer;
+    BOOL virgin;
 
 // Operations
-public:
-	void	BuildBitmap(CDC* dc);
+  public:
+    void BuildBitmap(CDC * dc);
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CCredits)
-	public:
-	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
-	virtual BOOL DestroyWindow();
-	//}}AFX_VIRTUAL
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(CCredits)
+  public:
+     virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName,
+			 DWORD dwStyle, const RECT & rect,
+			 CWnd * pParentWnd, UINT nID,
+			 CCreateContext * pContext = NULL);
+    virtual BOOL DestroyWindow();
+    //}}AFX_VIRTUAL
 
 // Implementation
-public:
-	virtual ~CCredits();
+  public:
+     virtual ~ CCredits();
 
-	// Generated message map functions
-protected:
-	//{{AFX_MSG(CCredits)
-	afx_msg void OnPaint();
-	afx_msg void OnTimer(UINT nIDEvent);
-	//}}AFX_MSG
+    // Generated message map functions
+  protected:
+    //{{AFX_MSG(CCredits)
+     afx_msg void OnPaint();
+    afx_msg void OnTimer(UINT nIDEvent);
+    //}}AFX_MSG
 
-	DECLARE_MESSAGE_MAP()
+     DECLARE_MESSAGE_MAP()
 };
 
 ////////////////////////////////////////////////////////////////////////////
 
-class CAboutDlg : public CDialog
-{
-public:
-	CAboutDlg();
+class CAboutDlg:public CDialog {
+  public:
+    CAboutDlg();
 
 // Dialog Data
-	//{{AFX_DATA(CAboutDlg)
-	enum { IDD = IDD_ABOUTBOX };
-	CCredits	m_credits;
-	//}}AFX_DATA
+    //{{AFX_DATA(CAboutDlg)
+    enum { IDD = IDD_ABOUTBOX };
+    CCredits m_credits;
+    //}}AFX_DATA
 
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CAboutDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(CAboutDlg)
+  protected:
+     virtual void DoDataExchange(CDataExchange * pDX);	// DDX/DDV support
+    //}}AFX_VIRTUAL
 
 // Implementation
-protected:
-	//{{AFX_MSG(CAboutDlg)
-	virtual BOOL OnInitDialog();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+  protected:
+    //{{AFX_MSG(CAboutDlg)
+     virtual BOOL OnInitDialog();
+    //}}AFX_MSG
+     DECLARE_MESSAGE_MAP()
 };
-

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -28,32 +27,31 @@
 /////////////////////////////////////////////////////////////////////////////
 // CTalkWindow dialog
 
-class CTalkWindow : public CDialog
-{
+class CTalkWindow:public CDialog {
 // Construction
-public:
-	CTalkWindow(CWnd* pParent = NULL);   // standard constructor
+  public:
+    CTalkWindow(CWnd * pParent = NULL);	// standard constructor
 
 // Dialog Data
-	//{{AFX_DATA(CTalkWindow)
-	enum { IDD = IDD_TALKWINDOW };
-	CString	m_text;
-	//}}AFX_DATA
+    //{{AFX_DATA(CTalkWindow)
+    enum { IDD = IDD_TALKWINDOW };
+    CString m_text;
+    //}}AFX_DATA
 
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CTalkWindow)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(CTalkWindow)
+  protected:
+     virtual void DoDataExchange(CDataExchange * pDX);	// DDX/DDV support
+    //}}AFX_VIRTUAL
 
 // Implementation
-protected:
+  protected:
 
-	// Generated message map functions
-	//{{AFX_MSG(CTalkWindow)
-		// NOTE: the ClassWizard will add member functions here
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+    // Generated message map functions
+    //{{AFX_MSG(CTalkWindow)
+    // NOTE: the ClassWizard will add member functions here
+    //}}AFX_MSG
+     DECLARE_MESSAGE_MAP()
 };

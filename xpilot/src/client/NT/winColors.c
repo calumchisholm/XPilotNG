@@ -40,8 +40,8 @@ void Colors_init_style_colors(void);
 
 int Colors_init_block_bitmaps(void)
 {
-	Colors_init_style_colors();
-	return 0;
+    Colors_init_style_colors();
+    return 0;
 }
 
 void Colors_free_block_bitmaps(void)
@@ -54,26 +54,28 @@ void Colors_free_block_bitmaps(void)
  */
 void Colors_init_style_colors(void)
 {
-	int i, oldNum;
+    int i, oldNum;
 
-	if (!num_polygon_styles && !num_edge_styles) return;
+    if (!num_polygon_styles && !num_edge_styles)
+	return;
 
-	oldNum = myLogPal->palNumEntries;
+    oldNum = myLogPal->palNumEntries;
 
-	for (i = 0; i < num_polygon_styles; i++)
-		polygon_styles[i].color = 
-			Colors_get_palette_index(polygon_styles[i].rgb);
+    for (i = 0; i < num_polygon_styles; i++)
+	polygon_styles[i].color =
+	    Colors_get_palette_index(polygon_styles[i].rgb);
 
-	for (i = 0; i < num_edge_styles; i++)
-		edge_styles[i].color =
-			Colors_get_palette_index(edge_styles[i].rgb);
+    for (i = 0; i < num_edge_styles; i++)
+	edge_styles[i].color =
+	    Colors_get_palette_index(edge_styles[i].rgb);
 
-	if (myLogPal->palNumEntries != oldNum) {
-		DeleteObject(myPal);
-		myPal = CreatePalette(myLogPal);
-		if (!myPal) error("Can't create palette");
-		//ChangePalette(NULL);
-	}
+    if (myLogPal->palNumEntries != oldNum) {
+	DeleteObject(myPal);
+	myPal = CreatePalette(myLogPal);
+	if (!myPal)
+	    error("Can't create palette");
+	//ChangePalette(NULL);
+    }
 }
 
 
@@ -82,24 +84,25 @@ void Colors_init_style_colors(void)
  * palette. If the palette doesn't contain it, a new entry
  * will be added to myLogPal.
  */
-static int Colors_get_palette_index(int rgb) {
+static int Colors_get_palette_index(int rgb)
+{
 
-	int i;
+    int i;
 
-	for (i = 0; i < myLogPal->palNumEntries; i++)
-		if (myLogPal->palPalEntry[i].peRed == REDVAL(rgb)
-			&& myLogPal->palPalEntry[i].peGreen == GREENVAL(rgb)
-			&& myLogPal->palPalEntry[i].peBlue == BLUEVAL(rgb)) 
-			return i;
+    for (i = 0; i < myLogPal->palNumEntries; i++)
+	if (myLogPal->palPalEntry[i].peRed == REDVAL(rgb)
+	    && myLogPal->palPalEntry[i].peGreen == GREENVAL(rgb)
+	    && myLogPal->palPalEntry[i].peBlue == BLUEVAL(rgb))
+	    return i;
 
-	if (i == WINMAXCOLORS) 
-		error("Out of palette entries");
+    if (i == WINMAXCOLORS)
+	error("Out of palette entries");
 
-	myLogPal->palPalEntry[i].peFlags = PC_RESERVED;
-	myLogPal->palPalEntry[i].peRed = REDVAL(rgb);
-	myLogPal->palPalEntry[i].peGreen = GREENVAL(rgb);
-	myLogPal->palPalEntry[i].peBlue = BLUEVAL(rgb);
-	myLogPal->palNumEntries++;
+    myLogPal->palPalEntry[i].peFlags = PC_RESERVED;
+    myLogPal->palPalEntry[i].peRed = REDVAL(rgb);
+    myLogPal->palPalEntry[i].peGreen = GREENVAL(rgb);
+    myLogPal->palPalEntry[i].peBlue = BLUEVAL(rgb);
+    myLogPal->palNumEntries++;
 
-	return i;
+    return i;
 }

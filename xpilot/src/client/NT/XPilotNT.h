@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -26,44 +25,43 @@
 //
 
 #ifndef __AFXWIN_H__
-	#error include 'stdafx.h' before including this file for PCH
+#error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "resource.h"       // main symbols
+#include "resource.h"		// main symbols
 
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotApp:
 // See xpilot.cpp for the implementation of this class
 //
 
-class CXpilotApp : public CWinApp
-{
-public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	CXpilotApp();
+class CXpilotApp:public CWinApp {
+  public:
+    virtual BOOL PreTranslateMessage(MSG * pMsg);
+    CXpilotApp();
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CXpilotApp)
-	public:
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
-	//}}AFX_VIRTUAL
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(CXpilotApp)
+  public:
+    virtual BOOL InitInstance();
+    virtual int ExitInstance();
+    //}}AFX_VIRTUAL
 
 // Implementation
 
-	//{{AFX_MSG(CXpilotApp)
-	afx_msg void OnAppAbout();
-		// NOTE - the ClassWizard will add and remove member functions here.
-		//    DO NOT EDIT what you see in these blocks of generated code !
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+    //{{AFX_MSG(CXpilotApp)
+    afx_msg void OnAppAbout();
+    // NOTE - the ClassWizard will add and remove member functions here.
+    //    DO NOT EDIT what you see in these blocks of generated code !
+    //}}AFX_MSG
+     DECLARE_MESSAGE_MAP()
 };
 
-extern	CXpilotApp theApp;
+extern CXpilotApp theApp;
 
 #ifdef	_BETAEXPIRE
-extern	BOOL	betaexpired;
+extern BOOL betaexpired;
 #define	BETACHECK()	(betaexpired)
 #else
 #define	BETACHECK() (0)

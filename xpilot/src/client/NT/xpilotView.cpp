@@ -51,11 +51,11 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-extern "C" const char*	s_WindowMet = "Window Metrics";
-extern "C" const char*	s_L = "Left";
-extern "C" const char*	s_T = "Top";
-extern "C" const char*	s_R = "Right";
-extern "C" const char*	s_B = "Bottom";
+extern "C" const char *s_WindowMet = "Window Metrics";
+extern "C" const char *s_L = "Left";
+extern "C" const char *s_T = "Top";
+extern "C" const char *s_R = "Right";
+extern "C" const char *s_B = "Bottom";
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,144 +63,142 @@ extern "C" const char*	s_B = "Bottom";
 
 IMPLEMENT_DYNCREATE(CXpilotView, CView)
 
-BEGIN_MESSAGE_MAP(CXpilotView, CView)
-	//{{AFX_MSG_MAP(CXpilotView)
-	ON_WM_DESTROY()
-	ON_COMMAND(ID_FILE_NEW, OnFileNew)
-	ON_UPDATE_COMMAND_UI(ID_FILE_NEW, OnUpdateFileNew)
-	ON_WM_SHOWWINDOW()
-	ON_WM_CREATE()
-	ON_WM_KEYDOWN()
-	ON_WM_KEYUP()
-	ON_WM_SIZE()
-	//}}AFX_MSG_MAP
-
-	ON_MESSAGE(WSA_EVENT, OnWSA_EVENT)
-	//ON_MESSAGE(WSA_EVENT, OnWSA_EVENT)
-	//ON_MESSAGE(WSA_CONNECT, OnWSA_CONNECT)
-	//ON_MESSAGE(WSA_RESOLVEHOST, OnWSA_RESOLVEHOST)
-
-END_MESSAGE_MAP()
-
+    BEGIN_MESSAGE_MAP(CXpilotView, CView)
+    //{{AFX_MSG_MAP(CXpilotView)
+    ON_WM_DESTROY()
+    ON_COMMAND(ID_FILE_NEW, OnFileNew)
+    ON_UPDATE_COMMAND_UI(ID_FILE_NEW, OnUpdateFileNew)
+    ON_WM_SHOWWINDOW()
+    ON_WM_CREATE()
+    ON_WM_KEYDOWN()
+    ON_WM_KEYUP()
+    ON_WM_SIZE()
+    //}}AFX_MSG_MAP
+    ON_MESSAGE(WSA_EVENT, OnWSA_EVENT)
+    //ON_MESSAGE(WSA_EVENT, OnWSA_EVENT)
+    //ON_MESSAGE(WSA_CONNECT, OnWSA_CONNECT)
+    //ON_MESSAGE(WSA_RESOLVEHOST, OnWSA_RESOLVEHOST)
+    END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotView construction/destruction
-CXpilotView::CXpilotView()
+    CXpilotView::CXpilotView()
 {
-	// TODO: add construction code here
-	isVirgin = TRUE;
-	shuttingdown = FALSE;
+    // TODO: add construction code here
+    isVirgin = TRUE;
+    shuttingdown = FALSE;
 #ifdef	_BETAEXPIRE
-	extern void CheckBetaExpire();
-	CheckBetaExpire();
+    extern void CheckBetaExpire();
+    CheckBetaExpire();
 #endif
 }
 
 #ifdef	_XPMEM
-extern	"C" void	xpmemShutdown();
+extern "C" void xpmemShutdown();
 #endif
 
 CXpilotView::~CXpilotView()
 {
-//	Client_cleanup();
-	WinXShutdown();
-	CView::~CView();
+//      Client_cleanup();
+    WinXShutdown();
+    CView::~CView();
 #if defined(_XPMEM)
-	xpmemShutdown();
+    xpmemShutdown();
 #endif
 }
 
-BOOL CXpilotView::PreCreateWindow(CREATESTRUCT& cs)
+BOOL CXpilotView::PreCreateWindow(CREATESTRUCT & cs)
 {
-	// TODO: Modify the Window class or styles here by modifying
-	//  the CREATESTRUCT cs
+    // TODO: Modify the Window class or styles here by modifying
+    //  the CREATESTRUCT cs
 
 #ifdef	_BETAEXPIRE
-//	if (BETACHECK())		// if they wanna run old stuff, we warned them!
-//		return(0);
+//      if (BETACHECK())                // if they wanna run old stuff, we warned them!
+//              return(0);
 #endif
-	return CView::PreCreateWindow(cs);
+    return CView::PreCreateWindow(cs);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotView drawing
 //extern "C" void Make_table(void);
-CString* CheckFileOpts(char* file, int* argc, char** argv)
+CString *CheckFileOpts(char *file, int *argc, char **argv)
 {
-	FILE* fp;
-	if (_access(file, 2) != 0)
-		return(NULL);
-	if ((fp=fopen(file, "r")) == NULL)
-	{
-		CString e;
-		e.Format("Can't open file <%s> for reading", file);
-		AfxMessageBox(e);
-		return(NULL);
-	}
-	long	len = _filelength(_fileno(fp));
-	CString* cs = new CString((TCHAR)0, len);
+    FILE *fp;
+    if (_access(file, 2) != 0)
+	return (NULL);
+    if ((fp = fopen(file, "r")) == NULL) {
+	CString e;
+	e.Format("Can't open file <%s> for reading", file);
+	AfxMessageBox(e);
+	return (NULL);
+    }
+    long len = _filelength(_fileno(fp));
+    CString *cs = new CString((TCHAR) 0, len);
 
-	return(cs);
+    return (cs);
 }
 
-void CXpilotView::OnDraw(CDC* pDC)
+void CXpilotView::OnDraw(CDC * pDC)
 {
-	CXpilotDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
+    CXpilotDoc *pDoc = GetDocument();
+    ASSERT_VALID(pDoc);
 
-	if (isVirgin)
-	{
-		int		ret;
-		int		argc = 1;
-		char*	argv[256];
-		char	cs[1024];
+    if (isVirgin) {
+	int ret;
+	int argc = 1;
+	char *argv[256];
+	char cs[1024];
 
-		CString*	ccs[256];
-		int			args=0;
+	CString *ccs[256];
+	int args = 0;
 
-		isVirgin = FALSE;
-		GetParentFrame()->SetWindowText("XPilot");
-		strncpy(cs, theApp.m_lpCmdLine, 1024);
+	isVirgin = FALSE;
+	GetParentFrame()->SetWindowText("XPilot");
+	strncpy(cs, theApp.m_lpCmdLine, 1024);
 
-		argv[0] = "xpilot";
+	argv[0] = "xpilot";
 
-		argv[1] = strtok(cs, " \t\n\r\0");
-		if (argv[1])
-		{
-			if ((ccs[args] = CheckFileOpts(argv[1], &argc, argv)) != NULL)
-				args++;
-			argc++;
-			while ((argv[argc] = strtok(NULL, "\t\n\r\0")) != (char*)NULL)
-			{
-				if ((ccs[args] = CheckFileOpts(argv[1], &argc, argv)) != NULL)
-					args++;
-				argc++;
-			}
-		}
-		// Here is where we call xpilot proper.
-		// This gives Windows/MFC time to setup/settle down before we do fun things
-		TRACE("Eat Me\n");
-		notifyWnd = GetSafeHwnd();
-		ret = main(argc, argv);
-
-		for (int i=0; i<args; i++)
-			delete ccs[i];
-
-		if (!ret)
-		{
-			ret = WSAAsyncSelect(Net_fd(), this->m_hWnd, WSA_EVENT, FD_CLOSE|FD_READ);
-			if (ret)
-			{
-				char	s[256];
-				sprintf(s, "AsyncSelect error=%d (%s)",
-					WSAGetLastError(), GetWSockErrText(WSAGetLastError()));
-				AfxMessageBox(s);
-			}
-			Net_input();
-			ret = WSAAsyncSelect(Net_fd(), this->m_hWnd, WSA_EVENT, FD_CLOSE|FD_READ);
-
-		}
+	argv[1] = strtok(cs, " \t\n\r\0");
+	if (argv[1]) {
+	    if ((ccs[args] = CheckFileOpts(argv[1], &argc, argv)) != NULL)
+		args++;
+	    argc++;
+	    while ((argv[argc] =
+		    strtok(NULL, "\t\n\r\0")) != (char *) NULL) {
+		if ((ccs[args] =
+		     CheckFileOpts(argv[1], &argc, argv)) != NULL)
+		    args++;
+		argc++;
+	    }
 	}
+	// Here is where we call xpilot proper.
+	// This gives Windows/MFC time to setup/settle down before we do fun things
+	TRACE("Eat Me\n");
+	notifyWnd = GetSafeHwnd();
+	ret = main(argc, argv);
+
+	for (int i = 0; i < args; i++)
+	    delete ccs[i];
+
+	if (!ret) {
+	    ret =
+		WSAAsyncSelect(Net_fd(), this->m_hWnd, WSA_EVENT,
+			       FD_CLOSE | FD_READ);
+	    if (ret) {
+		char s[256];
+		sprintf(s, "AsyncSelect error=%d (%s)",
+			WSAGetLastError(),
+			GetWSockErrText(WSAGetLastError()));
+		AfxMessageBox(s);
+	    }
+	    Net_input();
+	    ret =
+		WSAAsyncSelect(Net_fd(), this->m_hWnd, WSA_EVENT,
+			       FD_CLOSE | FD_READ);
+
+	}
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -209,196 +207,205 @@ void CXpilotView::OnDraw(CDC* pDC)
 #ifdef _DEBUG
 void CXpilotView::AssertValid() const
 {
-	CView::AssertValid();
+    CView::AssertValid();
 }
 
-void CXpilotView::Dump(CDumpContext& dc) const
+void CXpilotView::Dump(CDumpContext & dc) const
 {
-	CView::Dump(dc);
+    CView::Dump(dc);
 }
 
-CXpilotDoc* CXpilotView::GetDocument() // non-debug version is inline
+CXpilotDoc *CXpilotView::GetDocument()	// non-debug version is inline
 {
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CXpilotDoc)));
-	return (CXpilotDoc*)m_pDocument;
+    ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CXpilotDoc)));
+    return (CXpilotDoc *) m_pDocument;
 }
-#endif //_DEBUG
+#endif				//_DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotView message handlers
 
-void CXpilotView::OnInitialUpdate() 
+void CXpilotView::OnInitialUpdate()
 {
-	CView::OnInitialUpdate();
-	InitWinX(this->m_hWnd);
+    CView::OnInitialUpdate();
+    InitWinX(this->m_hWnd);
 }
 
-BOOL CXpilotView::DestroyWindow() 
+BOOL CXpilotView::DestroyWindow()
 {
-	// TODO: Add your specialized code here and/or call the base class
-	return CView::DestroyWindow();
+    // TODO: Add your specialized code here and/or call the base class
+    return CView::DestroyWindow();
 }
 
 long CXpilotView::OnWSA_EVENT(WPARAM wParam, LPARAM lParam)
 {
-	if (shuttingdown)		// once, i received a winsock event after nuking
-		return(0);			// the network layer
-	Net_input();
-//	PaintWinClient();
-	return(0);
+    if (shuttingdown)		// once, i received a winsock event after nuking
+	return (0);		// the network layer
+    Net_input();
+//      PaintWinClient();
+    return (0);
 }
 
-void CXpilotView::OnSize(UINT /*nType*/, int cx, int cy)
+void CXpilotView::OnSize(UINT /*nType */ , int cx, int cy)
 {
-	if (!isVirgin)
-		Resize(top, cx, cy);
+    if (!isVirgin)
+	Resize(top, cx, cy);
 }
 
-void CXpilotView::OnUpdateFileNew(CCmdUI* pCmdUI) 
+void CXpilotView::OnUpdateFileNew(CCmdUI * pCmdUI)
 {
-	pCmdUI->Enable();	
+    pCmdUI->Enable();
 }
 
-void CXpilotView::OnFileNew() 
+void CXpilotView::OnFileNew()
 {
-	// TODO: Add your command handler code here
-	// Net_input();
-	
-}
-
-
-void CXpilotView::OnShowWindow(BOOL bShow, UINT nStatus) 
-{
-	CView::OnShowWindow(bShow, nStatus);
-	
-	// TODO: Add your message handler code here
-	if (bShow == FALSE)
-		return;
-}
-
-int CXpilotView::OnCreate(LPCREATESTRUCT lpCreateStruct) 
-{
-	// perform miscellaneous other WM_CREATE chores ....
-	if (CView::OnCreate(lpCreateStruct) == -1)
-		return -1;
-
-	CWnd* pWnd = GetParent();
-	GetParentFrame()->SetWindowText("XPilot");
-	winHelpFile = theApp.m_pszHelpFilePath;			// needed for finding .ini files
-
-	CRect rect;
-	rect.left = GetPrivateProfileInt(s_WindowMet, s_L, 0, Get_xpilotini_file(1));
-	rect.top = GetPrivateProfileInt(s_WindowMet, s_T, 0, Get_xpilotini_file(1));
-	rect.right = GetPrivateProfileInt(s_WindowMet, s_R, 0, Get_xpilotini_file(1));
-	rect.bottom = GetPrivateProfileInt(s_WindowMet, s_B, 0, Get_xpilotini_file(1));
-	if (rect.left != rect.right)	// only move window to valid coordinates
-		pWnd->MoveWindow(rect);
-
-	return(0);
-}
-
-void CXpilotView::OnDestroy() 
-{
-	shuttingdown = TRUE;
-	xpilotShutdown();
-	CView::OnDestroy();
+    // TODO: Add your command handler code here
+    // Net_input();
 
 }
 
 
-extern "C" void Key_event(XKeyEvent *event);
-
-void CXpilotView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void CXpilotView::OnShowWindow(BOOL bShow, UINT nStatus)
 {
-	XKeyEvent xk;
+    CView::OnShowWindow(bShow, nStatus);
 
-	if (nFlags & 0x4000)		// don't bother with auto-repeat
-		return;
-	xk.keycode = nFlags & 0x1FF;
-	xk.ascii = nChar;
-	xk.type = KeyPress;
-	TRACE("KeyDown: c=%04X k=%04X flags=%04X\n", xk.ascii, xk.keycode, nFlags);
-	Key_event(&xk);
+    // TODO: Add your message handler code here
+    if (bShow == FALSE)
+	return;
+}
+
+int CXpilotView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+    // perform miscellaneous other WM_CREATE chores ....
+    if (CView::OnCreate(lpCreateStruct) == -1)
+	return -1;
+
+    CWnd *pWnd = GetParent();
+    GetParentFrame()->SetWindowText("XPilot");
+    winHelpFile = theApp.m_pszHelpFilePath;	// needed for finding .ini files
+
+    CRect rect;
+    rect.left =
+	GetPrivateProfileInt(s_WindowMet, s_L, 0, Get_xpilotini_file(1));
+    rect.top =
+	GetPrivateProfileInt(s_WindowMet, s_T, 0, Get_xpilotini_file(1));
+    rect.right =
+	GetPrivateProfileInt(s_WindowMet, s_R, 0, Get_xpilotini_file(1));
+    rect.bottom =
+	GetPrivateProfileInt(s_WindowMet, s_B, 0, Get_xpilotini_file(1));
+    if (rect.left != rect.right)	// only move window to valid coordinates
+	pWnd->MoveWindow(rect);
+
+    return (0);
+}
+
+void CXpilotView::OnDestroy()
+{
+    shuttingdown = TRUE;
+    xpilotShutdown();
+    CView::OnDestroy();
 
 }
 
-void CXpilotView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags) 
-{
-	// TODO: Add your message handler code here and/or call default
-	
-	//CView::OnKeyUp(nChar, nRepCnt, nFlags);
-	XKeyEvent xk;
 
-	xk.keycode = nFlags & 0x1FF;
-	xk.ascii = nChar;
-	xk.type = KeyRelease;
-	TRACE("KeyUp:   c=%04X k=%04X flags=%04X\n", xk.ascii, xk.keycode, nFlags);
-	Key_event(&xk);
+extern "C" void Key_event(XKeyEvent * event);
+
+void CXpilotView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    XKeyEvent xk;
+
+    if (nFlags & 0x4000)	// don't bother with auto-repeat
+	return;
+    xk.keycode = nFlags & 0x1FF;
+    xk.ascii = nChar;
+    xk.type = KeyPress;
+    TRACE("KeyDown: c=%04X k=%04X flags=%04X\n", xk.ascii, xk.keycode,
+	  nFlags);
+    Key_event(&xk);
+
 }
 
-#if 0
-void CXpilotView::OnUpdateConfigureSysinfo(CCmdUI* pCmdUI) 
+void CXpilotView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	// TODO: Add your command update UI handler code here
-	pCmdUI->Enable();
-}
+    // TODO: Add your message handler code here and/or call default
 
-void CXpilotView::OnConfigureSysinfo() 
-{
-	// TODO: Add your command handler code here
-	CSysInfo	csi;
-	csi.DoModal();
-}
-#endif
+    //CView::OnKeyUp(nChar, nRepCnt, nFlags);
+    XKeyEvent xk;
 
-extern "C"
-void DoWinAboutBox()
-{
-	theApp.OnCmdMsg(ID_APP_ABOUT, 0, NULL, NULL);
-}
-
-extern "C"
-COLORREF	GetXPilotColor(int which, COLORREF defcolor)
-{
-	CString		key;
-	CBSString	cs;
-	COLORREF	newcolor;
-	key.Format("color%d", which);
-	cs = theApp.GetProfileString("Settings", key);
-	if (!cs.GetLength())
-		return(defcolor);
-	newcolor = cs.ParseColor();
-	return(newcolor);
-}
-
-extern "C"
-int		GetMaxColors()
-{
-	int	color;
-//	return(theApp.GetProfileInt("Settings", "maxColors", 0));
-	color = GetPrivateProfileInt("Settings", "maxColors", 0, Get_xpilotini_file(0));
-	if (!color)
-		color = GetPrivateProfileInt("Settings", "maxColors", 0, Get_xpilotini_file(1));
-	if (!color)
-		color = GetPrivateProfileInt("Settings", "maxColors", 0, Get_xpilotini_file(2));
-	return(color);
+    xk.keycode = nFlags & 0x1FF;
+    xk.ascii = nChar;
+    xk.type = KeyRelease;
+    TRACE("KeyUp:   c=%04X k=%04X flags=%04X\n", xk.ascii, xk.keycode,
+	  nFlags);
+    Key_event(&xk);
 }
 
 #if 0
-extern "C"
-int		GetScoreFontHeight()
+void CXpilotView::OnUpdateConfigureSysinfo(CCmdUI * pCmdUI)
 {
-	return(theApp.GetProfileInt("Settings", "scoreFontHeight", 0));
+    // TODO: Add your command update UI handler code here
+    pCmdUI->Enable();
+}
+
+void CXpilotView::OnConfigureSysinfo()
+{
+    // TODO: Add your command handler code here
+    CSysInfo csi;
+    csi.DoModal();
 }
 #endif
 
-extern "C" int	scoresChanged;
-
-void CXpilotView::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView) 
+extern "C" void DoWinAboutBox()
 {
-	// TODO: Add your specialized code here and/or call the base class
-	if (bActivate)
-		scoresChanged = 1;
+    theApp.OnCmdMsg(ID_APP_ABOUT, 0, NULL, NULL);
+}
 
-	CView::OnActivateView(bActivate, pActivateView, pDeactiveView);
+extern "C" COLORREF GetXPilotColor(int which, COLORREF defcolor)
+{
+    CString key;
+    CBSString cs;
+    COLORREF newcolor;
+    key.Format("color%d", which);
+    cs = theApp.GetProfileString("Settings", key);
+    if (!cs.GetLength())
+	return (defcolor);
+    newcolor = cs.ParseColor();
+    return (newcolor);
+}
+
+extern "C" int GetMaxColors()
+{
+    int color;
+//      return(theApp.GetProfileInt("Settings", "maxColors", 0));
+    color =
+	GetPrivateProfileInt("Settings", "maxColors", 0,
+			     Get_xpilotini_file(0));
+    if (!color)
+	color =
+	    GetPrivateProfileInt("Settings", "maxColors", 0,
+				 Get_xpilotini_file(1));
+    if (!color)
+	color =
+	    GetPrivateProfileInt("Settings", "maxColors", 0,
+				 Get_xpilotini_file(2));
+    return (color);
+}
+
+#if 0
+extern "C" int GetScoreFontHeight()
+{
+    return (theApp.GetProfileInt("Settings", "scoreFontHeight", 0));
+}
+#endif
+
+extern "C" int scoresChanged;
+
+void CXpilotView::OnActivateView(BOOL bActivate, CView * pActivateView,
+				 CView * pDeactiveView)
+{
+    // TODO: Add your specialized code here and/or call the base class
+    if (bActivate)
+	scoresChanged = 1;
+
+    CView::OnActivateView(bActivate, pActivateView, pDeactiveView);
 }

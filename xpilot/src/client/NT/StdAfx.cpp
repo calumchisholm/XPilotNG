@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -23,8 +22,7 @@
  */
 
 // stdafx.cpp : source file that includes just the standard includes
-//	xpilot.pch will be the pre-compiled header
-//	stdafx.obj will contain the pre-compiled type information
+//      xpilot.pch will be the pre-compiled header
+//      stdafx.obj will contain the pre-compiled type information
 
 #include "stdafx.h"
-

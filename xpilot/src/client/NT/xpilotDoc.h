@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -30,43 +29,41 @@
  * Windows MFC deals with a Document/View model.
  * XPilot does not.  This module is required but completely ignored.
  */
-class CXpilotDoc : public CDocument
-{
-protected: // create from serialization only
-	CXpilotDoc();
-	DECLARE_DYNCREATE(CXpilotDoc)
-
+class CXpilotDoc:public CDocument {
+  protected:			// create from serialization only
+    CXpilotDoc();
+    DECLARE_DYNCREATE(CXpilotDoc)
 // Attributes
-public:
+  public:
 
 // Operations
-public:
+  public:
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CXpilotDoc)
-	public:
-	virtual BOOL OnNewDocument();
-	virtual void Serialize(CArchive& ar);
-	//}}AFX_VIRTUAL
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(CXpilotDoc)
+  public:
+    virtual BOOL OnNewDocument();
+    virtual void Serialize(CArchive & ar);
+    //}}AFX_VIRTUAL
 
 // Implementation
-public:
-	virtual ~CXpilotDoc();
+  public:
+     virtual ~ CXpilotDoc();
 #ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
+    virtual void AssertValid() const;
+    virtual void Dump(CDumpContext & dc) const;
 #endif
 
-protected:
+  protected:
 
 // Generated message map functions
-protected:
-	//{{AFX_MSG(CXpilotDoc)
-		// NOTE - the ClassWizard will add and remove member functions here.
-		//    DO NOT EDIT what you see in these blocks of generated code !
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+  protected:
+    //{{AFX_MSG(CXpilotDoc)
+    // NOTE - the ClassWizard will add and remove member functions here.
+    //    DO NOT EDIT what you see in these blocks of generated code !
+    //}}AFX_MSG
+     DECLARE_MESSAGE_MAP()
 };
 
 /////////////////////////////////////////////////////////////////////////////

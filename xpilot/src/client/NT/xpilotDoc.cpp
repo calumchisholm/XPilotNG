@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -47,19 +46,17 @@ static char THIS_FILE[] = __FILE__;
 
 IMPLEMENT_DYNCREATE(CXpilotDoc, CDocument)
 
-BEGIN_MESSAGE_MAP(CXpilotDoc, CDocument)
-	//{{AFX_MSG_MAP(CXpilotDoc)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
+    BEGIN_MESSAGE_MAP(CXpilotDoc, CDocument)
+    //{{AFX_MSG_MAP(CXpilotDoc)
+    // NOTE - the ClassWizard will add and remove mapping macros here.
+    //    DO NOT EDIT what you see in these blocks of generated code!
+    //}}AFX_MSG_MAP
+    END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotDoc construction/destruction
-
-CXpilotDoc::CXpilotDoc()
+    CXpilotDoc::CXpilotDoc()
 {
-	// TODO: add one-time construction code here
+    // TODO: add one-time construction code here
 
 }
 
@@ -69,28 +66,25 @@ CXpilotDoc::~CXpilotDoc()
 
 BOOL CXpilotDoc::OnNewDocument()
 {
-	if (!CDocument::OnNewDocument())
-		return FALSE;
+    if (!CDocument::OnNewDocument())
+	return FALSE;
 
-	// TODO: add reinitialization code here
-	// (SDI documents will reuse this document)
+    // TODO: add reinitialization code here
+    // (SDI documents will reuse this document)
 
-	return TRUE;
+    return TRUE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotDoc serialization
 
-void CXpilotDoc::Serialize(CArchive& ar)
+void CXpilotDoc::Serialize(CArchive & ar)
 {
-	if (ar.IsStoring())
-	{
-		// TODO: add storing code here
-	}
-	else
-	{
-		// TODO: add loading code here
-	}
+    if (ar.IsStoring()) {
+	// TODO: add storing code here
+    } else {
+	// TODO: add loading code here
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -99,14 +93,14 @@ void CXpilotDoc::Serialize(CArchive& ar)
 #ifdef _DEBUG
 void CXpilotDoc::AssertValid() const
 {
-	CDocument::AssertValid();
+    CDocument::AssertValid();
 }
 
-void CXpilotDoc::Dump(CDumpContext& dc) const
+void CXpilotDoc::Dump(CDumpContext & dc) const
 {
-	CDocument::Dump(dc);
+    CDocument::Dump(dc);
 }
-#endif //_DEBUG
+#endif				//_DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CXpilotDoc commands

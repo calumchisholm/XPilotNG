@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -42,49 +41,48 @@
 /////////////////////////////////////////////////////////////////////////////
 //   Splash Screen class
 
-class CSplashWnd : public CWnd
-{
+class CSplashWnd:public CWnd {
 // Construction
-protected:
-	CSplashWnd();
+  protected:
+    CSplashWnd();
 
 // Attributes:
-public:
-	CBitmap m_bitmap;
+  public:
+    CBitmap m_bitmap;
 
 // Operations
-public:
-	static void EnableSplashScreen(BOOL bEnable = TRUE);
-	static void ShowSplashScreen(CWnd* pParentWnd = NULL);
-	static BOOL PreTranslateAppMessage(MSG* pMsg);
+  public:
+    static void EnableSplashScreen(BOOL bEnable = TRUE);
+    static void ShowSplashScreen(CWnd * pParentWnd = NULL);
+    static BOOL PreTranslateAppMessage(MSG * pMsg);
 
-	static void	ShowMessage(const CString& msg);
+    static void ShowMessage(const CString & msg);
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CSplashWnd)
-	//}}AFX_VIRTUAL
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(CSplashWnd)
+    //}}AFX_VIRTUAL
 
 // Implementation
-public:
-	~CSplashWnd();
-	virtual void PostNcDestroy();
+  public:
+    ~CSplashWnd();
+    virtual void PostNcDestroy();
 
 
-protected:
-	BOOL Create(CWnd* pParentWnd = NULL);
-	void HideSplashScreen();
-	static BOOL c_bShowSplashWnd;
-	static CSplashWnd* c_pSplashWnd;
+  protected:
+     BOOL Create(CWnd * pParentWnd = NULL);
+    void HideSplashScreen();
+    static BOOL c_bShowSplashWnd;
+    static CSplashWnd *c_pSplashWnd;
 
 // Generated message map functions
-protected:
-	//{{AFX_MSG(CSplashWnd)
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnPaint();
-	afx_msg void OnTimer(UINT nIDEvent);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+  protected:
+    //{{AFX_MSG(CSplashWnd)
+     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+    afx_msg void OnPaint();
+    afx_msg void OnTimer(UINT nIDEvent);
+    //}}AFX_MSG
+     DECLARE_MESSAGE_MAP()
 };
 
 

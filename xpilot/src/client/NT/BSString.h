@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -25,21 +24,20 @@
 // bsstring definition file
 
 
-class CBSString : public CString
-{
+class CBSString:public CString {
   public:
-  	CBSString();
-	CBSString(const char* psz);
-	CBSString(const CBSString& stringSrc);
-	CBSString(const CString& stringSrc);
-	CBSString(const CBSString* cbs);
+    CBSString();
+    CBSString(const char *psz);
+     CBSString(const CBSString & stringSrc);
+     CBSString(const CString & stringSrc);
+     CBSString(const CBSString * cbs);
 
-	CBSString GetToken();
-	CBSString SkipToken();
-	CBSString SkipSpace();
-	
-	int			MatchToken(const char *list[]);
-	COLORREF	ParseColor();
-	POINT		ParsePoint();
-	CRect		ParseRect();
+    CBSString GetToken();
+    CBSString SkipToken();
+    CBSString SkipSpace();
+
+    int MatchToken(const char *list[]);
+    COLORREF ParseColor();
+    POINT ParsePoint();
+    CRect ParseRect();
 };

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -39,29 +38,28 @@ static char THIS_FILE[] = __FILE__;
 // CTalkWindow dialog
 
 
-CTalkWindow::CTalkWindow(CWnd* pParent /*=NULL*/)
-	: CDialog(CTalkWindow::IDD, pParent)
+CTalkWindow::CTalkWindow(CWnd * pParent /*=NULL*/ )
+:  CDialog(CTalkWindow::IDD, pParent)
 {
-	//{{AFX_DATA_INIT(CTalkWindow)
-	m_text = _T("");
-	//}}AFX_DATA_INIT
+    //{{AFX_DATA_INIT(CTalkWindow)
+    m_text = _T("");
+    //}}AFX_DATA_INIT
 }
 
 
-void CTalkWindow::DoDataExchange(CDataExchange* pDX)
+void CTalkWindow::DoDataExchange(CDataExchange * pDX)
 {
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CTalkWindow)
-	DDX_Text(pDX, IDC_EDIT1, m_text);
-	//}}AFX_DATA_MAP
+    CDialog::DoDataExchange(pDX);
+    //{{AFX_DATA_MAP(CTalkWindow)
+    DDX_Text(pDX, IDC_EDIT1, m_text);
+    //}}AFX_DATA_MAP
 }
 
 
 BEGIN_MESSAGE_MAP(CTalkWindow, CDialog)
-	//{{AFX_MSG_MAP(CTalkWindow)
-		// NOTE: the ClassWizard will add message map macros here
-	//}}AFX_MSG_MAP
+    //{{AFX_MSG_MAP(CTalkWindow)
+    // NOTE: the ClassWizard will add message map macros here
+    //}}AFX_MSG_MAP
 END_MESSAGE_MAP()
-
 /////////////////////////////////////////////////////////////////////////////
 // CTalkWindow message handlers

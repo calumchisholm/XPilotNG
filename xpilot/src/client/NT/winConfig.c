@@ -39,15 +39,14 @@
 #include "winClient.h"
 #include "winXXPilot.h"
 #ifndef	lint
-static char sourceid[] =
-    "@(#)";
+static char sourceid[] = "@(#)";
 #endif
 
 
-extern  char    **Argv;
-extern  int     Argc;
+extern char **Argv;
+extern int Argc;
 
-const char*	winHelpFile;
+const char *winHelpFile;
 
 
 void Config_get_name(char *name)
@@ -71,32 +70,29 @@ void Config_get_team(int *my_team)
 }
 
 
-void Config_save_resource(FILE *fp, const char *resource, char *value)
+void Config_save_resource(FILE * fp, const char *resource, char *value)
 {
     WritePrivateProfileString("Settings",
-			      resource,
-			      value,
-			      Get_xpilotini_file(1));
+			      resource, value, Get_xpilotini_file(1));
 }
 
 
 /* save our window's position */
 void Config_save_window_positions(void)
 {
-    WINDOWPLACEMENT	wp;
+    WINDOWPLACEMENT wp;
     Window w;
     RECT rect;
-    char	s[50];
+    char s[50];
     w = WinXGetParent(top);
     WinXGetWindowRect(w, &rect);
     WinXGetWindowPlacement(w, &wp);
-    if (wp.showCmd != SW_SHOWMINIMIZED)
-    {
-	extern	const char* s_WindowMet;
-	extern	const char* s_L;
-	extern	const char* s_T;
-	extern	const char* s_R;
-	extern	const char* s_B;
+    if (wp.showCmd != SW_SHOWMINIMIZED) {
+	extern const char *s_WindowMet;
+	extern const char *s_L;
+	extern const char *s_T;
+	extern const char *s_R;
+	extern const char *s_B;
 	itoa(rect.left, s, 10);
 	WritePrivateProfileString(s_WindowMet, s_L,
 				  itoa(rect.left, s, 10),
@@ -114,17 +110,13 @@ void Config_save_window_positions(void)
 }
 
 
-void Config_get_profile_string(
-	const char* key,
-	const char* def,
-	char* result,
-	int size)
+void Config_get_profile_string(const char *key,
+			       const char *def, char *result, int size)
 {
-    int		i;
+    int i;
 
-    for (i = 0; i < 3; i++)
-    {
-	GetPrivateProfileString("Settings", key, "", result, size, 
+    for (i = 0; i < 3; i++) {
+	GetPrivateProfileString("Settings", key, "", result, size,
 				Get_xpilotini_file(i));
 	if (result[0] != '\0')
 	    return;
@@ -133,36 +125,30 @@ void Config_get_profile_string(
 }
 
 
-void Config_get_resource(
-	const char *resource,
-	char *result,
-	unsigned size,
-	int* index)
+void Config_get_resource(const char *resource,
+			 char *result, unsigned size, int *index)
 {
-    unsigned		hash = String_hash(resource);
-	int	i;
+    unsigned hash = String_hash(resource);
+    int i;
 
-    for (i = 0;;)
-	{
-		if (!strcmp(resource, options[i].name))
-		{
-			*index = i;
-			break;
-		}
-		if (++i >= optionsCount)
-		{
-			errno = 0;
-			error("BUG: Can't find option \"%s\"", resource);
-			exit(1);
-		}
+    for (i = 0;;) {
+	if (!strcmp(resource, options[i].name)) {
+	    *index = i;
+	    break;
+	}
+	if (++i >= optionsCount) {
+	    errno = 0;
+	    error("BUG: Can't find option \"%s\"", resource);
+	    exit(1);
+	}
     }
     Config_get_profile_string(resource, options[i].fallback, result, size);
 
 #if 0
-    GetPrivateProfileString("Settings", resource, "", result, size, 
+    GetPrivateProfileString("Settings", resource, "", result, size,
 			    Get_xpilotini_file(1));
     if (result[0] == '\0') {
-	GetPrivateProfileString("Settings", resource, "", result, size, 
+	GetPrivateProfileString("Settings", resource, "", result, size,
 				Get_xpilotini_file(2));
 	if (result[0] == '\0') {
 	    strncpy(result, options[*index].fallback, size);

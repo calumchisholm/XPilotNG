@@ -40,8 +40,7 @@
 char talk_version[] = VERSION;
 
 #ifndef	lint
-static char sourceid[] =
-    "@(#)";
+static char sourceid[] = "@(#)";
 #endif
 
 
@@ -60,26 +59,26 @@ static char sourceid[] =
 /*
  * Globals.
  */
-bool			talk_mapped;
+bool talk_mapped;
 
-static bool		talk_created;
-static char		talk_str[MAX_CHARS];
+static bool talk_created;
+static char talk_str[MAX_CHARS];
 static struct {
-    bool		visible;
-    short		offset;
-    short		point;
+    bool visible;
+    short offset;
+    short point;
 } talk_cursor;
 
 /* position in history when browsing in the talk window */
-static int		history_pos = 0;
+static int history_pos = 0;
 
 /* faster cursor movement in talk window after pressing a key for some time */
 #define CRS_START_HOPPING	7
 #define CRS_HOP			4
 
 /* selections in draw and talk window */
-selection_t		selection;
-bool			save_talk_str	 = false; /* see Get_msg_from_history */
+selection_t selection;
+bool save_talk_str = false;	/* see Get_msg_from_history */
 
 /* if a cut doesn't suceed, leave the selection in appropriate state */
 #define SET_SELECTION_STATE			\
@@ -88,11 +87,11 @@ if (selection.len > 0)				\
 else						\
     selection.draw.state = SEL_NONE;
 
-extern keys_t Lookup_key(XEvent *event, KeySym ks, bool reset);
+extern keys_t Lookup_key(XEvent * event, KeySym ks, bool reset);
 extern void Add_pending_messages(void);
 
-extern message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
-extern char		*HistoryMsg[MAX_HIST_MSGS];
+extern message_t *TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
+extern char *HistoryMsg[MAX_HIST_MSGS];
 
 static void Talk_create_window(void)
 {
@@ -106,7 +105,7 @@ void Talk_cursor(bool visible)
 
 void Talk_map_window(bool map)
 {
-    
+
 }
 
 /*
@@ -115,22 +114,24 @@ void Talk_map_window(bool map)
  * thus selection.talk.state == SEL_SELECTED indicates that it
  * should not be drawn emphasized
  */
-void Talk_refresh() {
+void Talk_refresh()
+{
 }
 
 /*
  * add a line to the history.
  */
-void Add_msg_to_history(char *message) {
+void Add_msg_to_history(char *message)
+{
     char *tmp;
     char **msg_set;
     int i;
 
-    /*always*/
+    /*always */
     save_talk_str = false;
 
     if (!selectionAndHistory || strlen(message) == 0) {
-	return; /* unexpected. nothing to add */
+	return;			/* unexpected. nothing to add */
     }
 
     msg_set = HistoryMsg;
@@ -139,7 +140,7 @@ void Add_msg_to_history(char *message) {
     for (i = maxLinesInHistory - 1; i > 0; i--) {
 	msg_set[i] = msg_set[i - 1];
     }
-    msg_set[0] = tmp; /* memory recycling */
+    msg_set[0] = tmp;		/* memory recycling */
 
     strcpy(msg_set[0], message);
     history_pos = 0;
@@ -161,17 +162,20 @@ void Add_msg_to_history(char *message) {
  * (thus save_talk not as parameter here)
  *
  */
-char *Get_msg_from_history(int* pos, char *message, keys_t direction) {
+char *Get_msg_from_history(int *pos, char *message, keys_t direction)
+{
     int i;
     char **msg_set;
 
     if (!selectionAndHistory
-	|| (direction != KEY_TALK_CURSOR_UP && direction != KEY_TALK_CURSOR_DOWN
+	|| (direction != KEY_TALK_CURSOR_UP
+	    && direction != KEY_TALK_CURSOR_DOWN
 	    && direction != KEY_DUMMY)) {
 	return NULL;
     }
 
-    if (direction == KEY_DUMMY && (*pos < 0 || *pos > maxLinesInHistory-1)) {
+    if (direction == KEY_DUMMY
+	&& (*pos < 0 || *pos > maxLinesInHistory - 1)) {
 	*pos = 0;
     }
 
@@ -184,31 +188,32 @@ char *Get_msg_from_history(int* pos, char *message, keys_t direction) {
 	save_talk_str = false;
 	return NULL;
     }
- 
+
     /* search for the next message, return it */
-    for (i=0; i < maxLinesInHistory; i++) {
+    for (i = 0; i < maxLinesInHistory; i++) {
 	if (direction == KEY_TALK_CURSOR_UP) {
-            (*pos)++;
-            if (*pos >= maxLinesInHistory) {
-                *pos = 0; /* wrap */
-            }
+	    (*pos)++;
+	    if (*pos >= maxLinesInHistory) {
+		*pos = 0;	/* wrap */
+	    }
 	} else if (direction == KEY_TALK_CURSOR_DOWN) {
 	    (*pos)--;
 	    if (*pos < 0) {
-		*pos = maxLinesInHistory - 1; /*wrap*/
+		*pos = maxLinesInHistory - 1;	/*wrap */
 	    }
 	}
 	if (strlen(msg_set[*pos]) > 0) {
 	    return (msg_set[*pos]);
 	}
     }
-    return NULL; /* no history */
+    return NULL;		/* no history */
 }
 
 /*
  * Print all available messages to stdout.
  */
-void Print_messages_to_stdout(void) {
+void Print_messages_to_stdout(void)
+{
 }
 
 /*
@@ -216,13 +221,14 @@ void Print_messages_to_stdout(void) {
  * substitutes this text, means: delete the text before inserting the
  * new character and place the character at this `gap'.
  */
-void Talk_delete_emphasized_text() {
+void Talk_delete_emphasized_text()
+{
 
-    int		oldlen, newlen;
-    int		onewidth = XTextWidth(talkFont, talk_str, 1);
-    char	new_str[MAX_CHARS];
+    int oldlen, newlen;
+    int onewidth = XTextWidth(talkFont, talk_str, 1);
+    char new_str[MAX_CHARS];
 
-    if (! (selectionAndHistory && selection.talk.state == SEL_EMPHASIZED)) {
+    if (!(selectionAndHistory && selection.talk.state == SEL_EMPHASIZED)) {
 	return;
     }
 
@@ -286,22 +292,24 @@ void Talk_delete_emphasized_text() {
  *
  * Return the number of pasted characters.
  */
-int Talk_paste(char *data, int data_len, bool overwrite) {
+int Talk_paste(char *data, int data_len, bool overwrite)
+{
 
-    int str_len;			/* current length */
-    int max_len    = MAX_CHARS - 2;	/* absolute max */
-    int new_len;			/* after pasting */
+    int str_len;		/* current length */
+    int max_len = MAX_CHARS - 2;	/* absolute max */
+    int new_len;		/* after pasting */
     int char_width = XTextWidth(talkFont, talk_str, 1);
-    int max_width  = (TALK_WINDOW_WIDTH - 2*TALK_INSIDE_BORDER - 5);
- 
-    int accept_len;			/* for still matching the window */
-    char paste_buf[MAX_CHARS -2];	/* gets the XBuffer */
+    int max_width = (TALK_WINDOW_WIDTH - 2 * TALK_INSIDE_BORDER - 5);
+
+    int accept_len;		/* for still matching the window */
+    char paste_buf[MAX_CHARS - 2];	/* gets the XBuffer */
     char tmp_str[MAX_CHARS - 2];
     char talk_backup[MAX_CHARS - 2];	/* no `collision' with data */
     bool cursor_visible = false;
     int i;
- 
-    if (!selectionAndHistory || !data || data_len == 0 || strlen(data) == 0) {
+
+    if (!selectionAndHistory || !data || data_len == 0
+	|| strlen(data) == 0) {
 	return 0;
     }
 
@@ -328,7 +336,7 @@ int Talk_paste(char *data, int data_len, bool overwrite) {
 	/* not the whole string required to paste */
 	accept_len = data_len;
     }
-    strncpy(paste_buf, data , accept_len);
+    strncpy(paste_buf, data, accept_len);
     paste_buf[accept_len] = '\0';
 
     /*
@@ -337,19 +345,20 @@ int Talk_paste(char *data, int data_len, bool overwrite) {
      *   final '\0' to be converted, but we have only text selections anyway)
      */
     /* don't convert a final newline to space */
-    if (paste_buf[accept_len-1] == '\n' || paste_buf[accept_len-1] == '\r') {
-	paste_buf[accept_len-1] = '\0';
+    if (paste_buf[accept_len - 1] == '\n'
+	|| paste_buf[accept_len - 1] == '\r') {
+	paste_buf[accept_len - 1] = '\0';
 	accept_len--;
     }
-    for(i = 0; i<accept_len; i++) {
-        if (	  ((unsigned char)paste_buf[i] <   33
-		/* && (unsigned char)paste_buf[i] != '\0' */)
-	    ||    ((unsigned char)paste_buf[i] >  126
-		&& (unsigned char)paste_buf[i] <  161) ) {
-            paste_buf[i] = ' ';
-        }
+    for (i = 0; i < accept_len; i++) {
+	if (((unsigned char) paste_buf[i] < 33
+	     /* && (unsigned char)paste_buf[i] != '\0' */ )
+	    || ((unsigned char) paste_buf[i] > 126
+		&& (unsigned char) paste_buf[i] < 161)) {
+	    paste_buf[i] = ' ';
+	}
     }
- 
+
     if (overwrite) {
 	strncpy(tmp_str, paste_buf, accept_len);
 	tmp_str[accept_len] = '\0';
@@ -362,7 +371,7 @@ int Talk_paste(char *data, int data_len, bool overwrite) {
 	       &talk_backup[talk_cursor.point]);
 	new_len = str_len + accept_len;
     }
- 
+
 
     /*
      * graphics
@@ -373,7 +382,7 @@ int Talk_paste(char *data, int data_len, bool overwrite) {
 	XDrawString(dpy, talk_w, talkGC,
 		    TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
-		    tmp_str, accept_len );
+		    tmp_str, accept_len);
     } else {
 	if (selection.talk.state == SEL_EMPHASIZED) {
 	    /* redraw unemphasized */
@@ -386,7 +395,8 @@ int Talk_paste(char *data, int data_len, bool overwrite) {
 	     */
 	    XSetForeground(dpy, talkGC, colors[BLACK].pixel);
 	    XDrawString(dpy, talk_w, talkGC,
-			talk_cursor.point * char_width + TALK_INSIDE_BORDER,
+			talk_cursor.point * char_width +
+			TALK_INSIDE_BORDER,
 			talkFont->ascent + TALK_INSIDE_BORDER,
 			&talk_backup[talk_cursor.point],
 			str_len - talk_cursor.point);
@@ -411,7 +421,7 @@ int Talk_paste(char *data, int data_len, bool overwrite) {
     }
     Talk_cursor(cursor_visible);
 
-    return accept_len; 
+    return accept_len;
 }
 
 
@@ -429,14 +439,14 @@ void Clear_talk_selection()
     selection.talk.state = SEL_NONE;
     selection.talk.incl_nl = false;
 }
-     
+
 void Clear_draw_selection()
 {
     selection.draw.x1 = selection.draw.x2
 	= selection.draw.y1 = selection.draw.y2 = 0;
     selection.draw.state = SEL_NONE;
 }
-    
+
 /*
  * show that someone else owns the selection now
  */
@@ -464,7 +474,8 @@ void Clear_selection()
  * string indices of start and end (selection.draw.x1/2)
  * call Talk_place_cursor() to place the cursor.
  */
-void Talk_window_cut(XButtonEvent* xbutton) {
+void Talk_window_cut(XButtonEvent * xbutton)
+{
 }
 
 /*
@@ -478,11 +489,13 @@ void Talk_window_cut(XButtonEvent* xbutton) {
  * while the cut is pending, the state of Talk+GameMsg[] is `freezed'
  * in Paint_message(). thus call Add_pending_messages() here after this.
  */
-void Talk_cut_from_messages(XButtonEvent* xbutton) {
+void Talk_cut_from_messages(XButtonEvent * xbutton)
+{
 
 }
 
-void Talk_reverse_cut() {
+void Talk_reverse_cut()
+{
     /*
      * think twice: it can't work (yet) without hacking all the
      * c&p stuff even more. thus only unemphasize:
