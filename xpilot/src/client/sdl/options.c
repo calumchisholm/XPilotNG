@@ -78,6 +78,9 @@ extern char conf_soundfile_string[];
 extern keys_t keyMap[SDLK_LAST];   /* maps SDLKeys to keys_t */
 extern keys_t buttonMap[5];        /* maps mouse buttons to keys_t */
 
+/* from sdlinit.c */
+extern int draw_width;
+extern int draw_height;
 
 /*
  * Structure to store all the client options.
@@ -3348,6 +3351,14 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "maxVolume", &maxVolume);
     Get_resource(rDB, "audioServer", audioServer, sizeof audioServer);
 #endif
+
+    Get_string_resource(rDB, "geometry", resValue, sizeof resValue);
+    {
+	int dummy;
+	draw_width = 1024;
+	draw_height = 768;
+	XParseGeometry(resValue, &dummy, &dummy, &draw_width, &draw_height);
+    }
 
     /*
      * Key bindings

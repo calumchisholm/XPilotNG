@@ -17,8 +17,6 @@ int Init_playing_windows(void)
 
     atexit(SDL_Quit);
 
-    draw_width=1024;
-    draw_height=768;
     draw_depth=24;
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
