@@ -10,7 +10,6 @@
 
 set -x
 # mkdir config
-touch NEWS README AUTHORS ChangeLog
 # aclocal -I config
 aclocal
 autoheader
