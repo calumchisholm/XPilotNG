@@ -679,18 +679,15 @@ static void Robot_talks(enum robot_talk_t says_what,
 }
 
 
-static void Robot_create(void)
+static void Robot_create(world_t *world)
 {
-    player_t		*robot;
-    robot_t		*rob;
-    int			i,
-			num;
-    int			most_used,
-			least_used;
-    robot_data_t	*data, *new_data;
-    robot_type_t	*rob_type;
-    char		msg[MSG_LEN];
-    world_t *world = &World;
+    player_t *robot;
+    robot_t *rob;
+    team_t *teamp;
+    int i, num, most_used, least_used;
+    robot_data_t *data, *new_data;
+    robot_type_t *rob_type;
+    char msg[MSG_LEN];
 
     if (peek_ID() == 0)
 	return;
@@ -756,8 +753,10 @@ static void Robot_create(void)
     robot->check = 0;
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	robot->team = Pick_team(PickForRobot);
-	world->teams[robot->team].NumMembers++;
-	world->teams[robot->team].NumRobots++;
+	teamp = Teams(world, robot->team);
+	assert(teamp); /* if teamplay, can't have TEAM_NOT_SET */
+	teamp->NumMembers++;
+	teamp->NumRobots++;
     }
     if (robot->mychar != 'W')
 	robot->mychar = 'R';
@@ -777,10 +776,10 @@ static void Robot_create(void)
     NumRobots++;
 
     if (BIT(world->rules->mode, TEAM_PLAY) && options.teamShareScore) {
-	if (world->teams[robot->team].NumMembers == 1)
+	if (teamp->NumMembers == 1)
 	    /* reset team score on first player */
-	    world->teams[robot->team].score = 0.0;
-	Team_score(robot->team, 0.0);
+	    teamp->score = 0.0;
+	Team_score(world, robot->team, 0.0);
     }
 
     for (i = 0; i < NumPlayers - 1; i++) {
@@ -820,8 +819,7 @@ static void Robot_create(void)
 void Robot_destroy(player_t *pl)
 {
     (*robot_types[pl->robot_data_ptr->robot_types_ind].destroy)(pl);
-    free(pl->robot_data_ptr);
-    pl->robot_data_ptr = NULL;
+    XFREE(pl->robot_data_ptr);
 }
 
 void Robot_delete(player_t *pl, bool kicked)
@@ -930,6 +928,7 @@ void Robot_war(player_t *pl, player_t *kp)
 	if (Robot_war_on_player(kp) == pl->id) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->conn != NULL)
 		    Send_war(pl_i->conn, kp->id, NO_ID);
 	    }
@@ -979,8 +978,8 @@ void Robot_go_home(player_t *pl)
  */
 void Robot_message(player_t *pl, const char *message)
 {
-    robot_type_t	*rob_type =
-			    &robot_types[pl->robot_data_ptr->robot_types_ind];
+    robot_type_t *rob_type =
+	&robot_types[pl->robot_data_ptr->robot_types_ind];
 
     (*rob_type->message)(pl, message);
 }
@@ -1002,8 +1001,8 @@ static void Robot_play(player_t *pl)
  */
 static int Robot_check_leave(player_t *pl)
 {
-    char		msg[MSG_LEN];
-    world_t *world = &World;
+    char msg[MSG_LEN];
+    world_t *world = pl->world;
 
     if (options.robotsLeave
 	&& pl->life > 0
@@ -1059,14 +1058,13 @@ static void Tank_play(player_t *pl)
 	CLR_BIT(pl->status, THRUSTING);
 }
 
-void Robot_update(void)
+void Robot_update(world_t *world)
 {
     int i;
     static double new_robot_delay;
     int num_playing_ships, num_any_ships;
     bool tick_this_update = false;
     static int ticks_per_second = 0;
-    world_t *world = &World;
 
     num_any_ships = NumPlayers + login_in_progress;
     num_playing_ships = num_any_ships - NumPseudoPlayers;
@@ -1082,7 +1080,7 @@ void Robot_update(void)
 
 	new_robot_delay += timeStep;
 	if (new_robot_delay >= ROBOT_CREATE_DELAY) {
-	    Robot_create();
+	    Robot_create(world);
 	    new_robot_delay = 0;
 	}
     }

@@ -36,7 +36,8 @@ static list_t	Asteroid_list = NULL;
 /*
  * Prototypes.
  */
-static void Make_asteroid(clpos_t pos, int size, int dir, double speed);
+static void Make_asteroid(world_t *world, clpos_t pos,
+			  int size, int dir, double speed);
 
 
 /*
@@ -68,8 +69,8 @@ static bool Asteroid_add_to_list(wireobject_t *ast)
 
 static bool Asteroid_remove_from_list(wireobject_t *ast)
 {
-    list_iter_t		list_pos;
-    bool		result = false;
+    list_iter_t list_pos;
+    bool result = false;
 
     if (Asteroid_list != NULL) {
 	list_pos = List_find(Asteroid_list, ast);
@@ -92,14 +93,13 @@ static bool Asteroid_remove_from_list(wireobject_t *ast)
  * the wreckage and the debris should be about equal to the mass
  * of the original asteroid.
  */
-void Break_asteroid(wireobject_t *asteroid)
+void Break_asteroid(world_t *world, wireobject_t *asteroid)
 {
-    double	mass, mass3;
-    double	speed, speed1, speed2, radius;
-    double	velx1, vely1, velx2, vely2, dir;
-    int		dir1, dir2, split_dir;
-    clpos_t	pos1, pos2;
-    world_t *world = &World;
+    double mass, mass3;
+    double speed, speed1, speed2, radius;
+    double velx1, vely1, velx2, vely2, dir;
+    int dir1, dir2, split_dir;
+    clpos_t pos1, pos2;
 
     if (asteroid->size == 1) {
 	mass = asteroid->mass / 2;
@@ -159,8 +159,8 @@ void Break_asteroid(wireobject_t *asteroid)
 	pos2.cx = asteroid->pos.cx - tcos(split_dir) * radius;
 	pos2.cy = asteroid->pos.cy - tsin(split_dir) * radius;
 	pos2 = World_wrap_clpos(world, pos2);
-	Make_asteroid(pos1, asteroid->size - 1, dir1, speed1);
-	Make_asteroid(pos2, asteroid->size - 1, dir2, speed2);
+	Make_asteroid(world, pos1, asteroid->size - 1, dir1, speed1);
+	Make_asteroid(world, pos2, asteroid->size - 1, dir2, speed2);
 	Make_wreckage(world,
 		      asteroid->pos,
 		      asteroid->vel,
@@ -192,12 +192,11 @@ void Break_asteroid(wireobject_t *asteroid)
 
     if ((options.asteroidMaxItems > 0)
 	&& (rfrac() < options.asteroidItemProb)) {
-	int	nitems = (int)(rfrac() * options.asteroidMaxItems) + 1;
-	int	i;
-	vector_t	vel;
-	int	item, item_dir, num_per_pack;
-	double	item_speed;
-	long	status;
+	int nitems = (int)(rfrac() * options.asteroidMaxItems) + 1;
+	vector_t vel;
+	int i, item, item_dir, num_per_pack;
+	double item_speed;
+	long status;
 
 	for (i = 0; i < nitems; i++) {
 	    item = Choose_random_item(world);
@@ -233,11 +232,11 @@ void Break_asteroid(wireobject_t *asteroid)
 /*
  * Creates an asteroid with the given characteristics.
  */
-static void Make_asteroid(clpos_t pos, int size, int dir, double speed)
+static void Make_asteroid(world_t *world, clpos_t pos,
+			  int size, int dir, double speed)
 {
     wireobject_t *asteroid;
     double radius;
-    world_t *world = &World;
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
 	return;
@@ -298,16 +297,14 @@ static void Make_asteroid(clpos_t pos, int size, int dir, double speed)
  * Calls Make_asteroid() to actually create the new asteroid
  */
 /* kps - change this to use polygon based is_inside code */
-static void Place_asteroid(void)
+static void Place_asteroid(world_t *world)
 {
-    int			place_count;
-    int			dir, dist;
-    unsigned		space;
-    int			okay;
-    asteroid_concentrator_t	*con;
-    clpos_t		pos;
-    blkpos_t		bpos;
-    world_t *world = &World;
+    int place_count, dir, dist;
+    unsigned space;
+    bool okay = false;
+    asteroid_concentrator_t *con;
+    clpos_t pos;
+    blkpos_t bpos;
 
     space = SPACE_BLOCKS;
     space &= ~(BASE_BIT | WORMHOLE_BIT);
@@ -324,8 +321,7 @@ static void Place_asteroid(void)
      * We bail out after some unsuccessful attempts to avoid wasting
      * too much time on crowded maps.
      */
-    okay = false;
-    for (place_count = 0; okay != true; place_count++) {
+    for (place_count = 0; !okay; place_count++) {
 	if (place_count >= 10)
 	    return;
 
@@ -351,6 +347,7 @@ static void Place_asteroid(void)
 
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl = Players(i);
+
 		if (Player_is_human(pl)) {
 		    dpx = WRAP_DCX(pos.cx - pl->pos.cx);
 		    dpy = WRAP_DCY(pos.cy - pl->pos.cy);
@@ -364,8 +361,8 @@ static void Place_asteroid(void)
 	    }
 	}
     }
-    if (okay == true)
-	Make_asteroid(pos,
+    if (okay)
+	Make_asteroid(world, pos,
 		      (int)(1 + rfrac() * ASTEROID_MAX_SIZE),
 		      (int)(rfrac() * RES),
 		      (double)ASTEROID_START_SPEED);
@@ -446,9 +443,10 @@ void Asteroid_update(world_t *world)
     /* place new asteroid if room left */
     if (world->asteroids.chance > 0) {
 	int incr = (1 << (ASTEROID_MAX_SIZE - 1));
+
 	if (world->asteroids.num + incr < world->asteroids.max) {
 	    if ((rfrac() * world->asteroids.chance) < 1.0)
-		Place_asteroid();
+		Place_asteroid(world);
 	}
     }
 }

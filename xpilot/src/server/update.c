@@ -1200,7 +1200,7 @@ void Update_objects(world_t *world)
 	time_to_update += 1;
     }
 
-    Robot_update();
+    Robot_update(world);
 
     /*
      * Fast aim:

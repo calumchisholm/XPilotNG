@@ -655,7 +655,7 @@ void remove_temp_wormhole(world_t *world, int ind);
 /*
  * Prototypes for asteroid.c
  */
-void Break_asteroid(wireobject_t *asteroid);
+void Break_asteroid(world_t *world, wireobject_t *asteroid);
 void Asteroid_update(world_t *world);
 list_t Asteroid_get_list(void);
 
@@ -832,7 +832,7 @@ void Parse_robot_file(void);
 void Robot_init(void);
 void Robot_delete(player_t *robot, bool kicked);
 void Robot_destroy(player_t *robot);
-void Robot_update(void);
+void Robot_update(world_t *world);
 void Robot_invite(player_t *robot, player_t *inviter);
 void Robot_war(player_t *robot, player_t *killer);
 void Robot_reset_war(player_t *robot);

@@ -406,6 +406,8 @@ static inline friction_area_t *FrictionAreas(world_t *world, int ind)
 
 static inline team_t *Teams(world_t *world, int team)
 {
+    if (team == TEAM_NOT_SET)
+	return NULL;
     return &world->teams[team];
 }
 

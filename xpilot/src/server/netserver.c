@@ -1119,13 +1119,15 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	}
 	Rank_get_saved_score(pl);
 	if (pl->team != TEAM_NOT_SET && pl->home_base != NULL) {
-	    world->teams[pl->team].NumMembers++;
+	    team_t *teamp = Teams(world, pl->team);
+
+	    teamp->NumMembers++;
 	    if (options.teamShareScore) {
-		if (world->teams[pl->team].NumMembers == 1)
+		if (teamp->NumMembers == 1)
 		    /* reset team score on first player */
-		    world->teams[pl->team].score = 0;
+		    teamp->score = 0;
 	    }
-	    Team_score(pl->team, pl->score);
+	    Team_score(world, pl->team, pl->score);
 	}
 	NumPlayers++;
 	request_ID();

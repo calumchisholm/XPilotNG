@@ -1186,11 +1186,11 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg)
 	Set_message(msg);
 	if (pl->home_base) {
 	    world->teams[pl->team].NumMembers--;
-	    Team_score(pl->team, -(pl->score));
+	    Team_score(world, pl->team, -(pl->score));
 	}
 	pl->team = team;
 	world->teams[pl->team].NumMembers++;
-	Team_score(pl->team, pl->score);
+	Team_score(world, pl->team, pl->score);
 	Set_swapper_state(pl);
 	if (pl->home_base == NULL) {
 	    Pick_startpos(pl);
@@ -1221,8 +1221,8 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg)
 		xteam2 = pl2->team;
 		pl2->team = xteam;
 		pl2->home_base = xbase;
-		Team_score(xteam2, -(pl2->score));
-		Team_score(pl2->team, pl2->score);
+		Team_score(world, xteam2, -(pl2->score));
+		Team_score(world, pl2->team, pl2->score);
 		Set_swapper_state(pl2);
 		Send_info_about_player(pl2);
 		/* This can send a huge amount of data if several
@@ -1236,8 +1236,8 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg)
 	    xteam = pl->team;
 	    pl->team = team;
 	    pl->home_base = xbase;
-	    Team_score(xteam, -(pl->score));
-	    Team_score(pl->team, pl->score);
+	    Team_score(world, xteam, -(pl->score));
+	    Team_score(world, pl->team, pl->score);
 	    Set_swapper_state(pl);
 	    Send_info_about_player(pl);
 	    sprintf(msg, "Some players swapped teams.");
@@ -1254,12 +1254,12 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg)
 	    && (pl2->team == team) && pl2->home_base != NULL) {
 	    base_t *temp;
 
-	    Team_score(pl->team, -(pl->score));
-	    Team_score(pl2->team, -(pl2->score));
+	    Team_score(world, pl->team, -(pl->score));
+	    Team_score(world, pl2->team, -(pl2->score));
 	    pl2->team = pl->team;
 	    pl->team = team;
-	    Team_score(pl->team, pl->score);
-	    Team_score(pl2->team, pl2->score);
+	    Team_score(world, pl->team, pl->score);
+	    Team_score(world, pl2->team, pl2->score);
 	    temp = pl2->home_base;
 	    pl2->home_base = pl->home_base;
 	    pl->home_base = temp;

@@ -1235,7 +1235,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		Score(pl, -sc, pl->pos, "Cannon");
 		if (BIT(world->rules->mode, TEAM_PLAY)
 		    && pl->team != obj->team)
-		    Team_score(obj->team, sc);
+		    Team_score(world, obj->team, sc);
 	    } else if (obj->id == NO_ID || kp->id == pl->id)
 		Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
 	    else {

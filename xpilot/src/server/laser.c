@@ -35,10 +35,10 @@ char laser_version[] = VERSION;
  */
 void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 {
-    player_t		*kp;
-    double		sc;
-    char		msg[MSG_LEN];
-    world_t *world = &World;
+    player_t *kp;
+    double sc;
+    char msg[MSG_LEN];
+    world_t *world = pl->world;
 
     kp = Player_by_id(pulse->id);
 
@@ -119,7 +119,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 		Score(pl, -sc, pl->pos, "Cannon");
 		if (BIT(world->rules->mode, TEAM_PLAY)
 		    && pl->team != pulse->team)
-		    Team_score(pulse->team, sc);
+		    Team_score(world, pulse->team, sc);
 		sprintf(msg,
 			"%s got roasted alive by cannonfire.",
 			pl->name);

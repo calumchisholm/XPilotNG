@@ -595,15 +595,15 @@ void Update_score_table(world_t *world)
     }
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < MAX_TEAMS; j++) {
-	    team_t *team = Teams(world, j);
+	    team_t *teamp = Teams(world, j);
 
-	    if (team->score != team->prev_score) {
-		team->prev_score = team->score;
+	    if (teamp->score != teamp->prev_score) {
+		teamp->prev_score = teamp->score;
 		for (i = 0; i < NumPlayers; i++) {
 		    player_t *pl_i = Players(i);
 
 		    if (pl_i->conn != NULL)
-			Send_team_score(pl_i->conn, j, team->score);
+			Send_team_score(pl_i->conn, j, teamp->score);
 		}
 	    }
 	}
@@ -700,10 +700,11 @@ void Reset_all_players(world_t *world)
 
 	/* Reset the teams */
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    team_t *team = Teams(world, i);
+	    team_t *teamp = Teams(world, i);
 
-	    team->TreasuresDestroyed = 0;
-	    team->TreasuresLeft = team->NumTreasures - team->NumEmptyTreasures;
+	    teamp->TreasuresDestroyed = 0;
+	    teamp->TreasuresLeft
+		= teamp->NumTreasures - teamp->NumEmptyTreasures;
 	}
 
 	if (options.endOfRoundReset) {
@@ -1687,6 +1688,7 @@ void Delete_player(player_t *pl)
     int ind = GetInd(pl->id), i, j, id = pl->id;
     object_t *obj;
     world_t *world = pl->world;
+    team_t *teamp = Teams(world, pl->team);
 
     /* call before important player structures are destroyed */
     Leave_alliance(pl);
@@ -1696,6 +1698,7 @@ void Delete_player(player_t *pl)
 
     if (Player_is_robot(pl))
 	Robot_destroy(pl);
+
     if (pl->isoperator) {
 	if (!--NumOperators && game_lock) {
 	    game_lock = false;
@@ -1708,10 +1711,11 @@ void Delete_player(player_t *pl)
     for (i = MAX_TEAMS - 1; i >= 0; i--)
 	if (world->teams[i].SwapperId == id)
 	    world->teams[i].SwapperId = -1;
+
 #if 0 /* kps - why "if 0" ? */
-    if (pl->team != TEAM_NOT_SET)
+    if (teamp)
 	/* Swapping a queued player might be better */
-	world->teams[pl->team].SwapperId = -1;
+	teamp->SwapperId = NO_ID;
 #endif
 
     /* Delete remaining shots */
@@ -1783,11 +1787,11 @@ void Delete_player(player_t *pl)
    	}
     }
 
-    if (pl->team != TEAM_NOT_SET && !Player_is_tank(pl) && pl->home_base) {
-	world->teams[pl->team].NumMembers--;
-	Team_score(pl->team, -(pl->score));	/* recalculate teamscores */
+    if (teamp && !Player_is_tank(pl) && pl->home_base) {
+	teamp->NumMembers--;
+	Team_score(world, pl->team, -(pl->score));
 	if (Player_is_robot(pl))
-	    world->teams[pl->team].NumRobots--;
+	    teamp->NumRobots--;
     }
 
     if (Player_is_robot(pl))

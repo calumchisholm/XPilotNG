@@ -1114,7 +1114,7 @@ void Delete_shot(world_t *world, int ind)
 	break;
 
     case OBJ_ASTEROID:
-	Break_asteroid(WIRE_PTR(shot));
+	Break_asteroid(world, WIRE_PTR(shot));
 	break;
 
     case OBJ_BALL:
@@ -1127,6 +1127,7 @@ void Delete_shot(world_t *world, int ind)
 	     */
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->ball == ball)
 		    pl_i->ball = NULL;
 	    }
