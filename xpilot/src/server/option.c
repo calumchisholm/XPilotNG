@@ -498,6 +498,11 @@ void Option_set_value(
 	}
     }
 
+    if (opt_origin == OPT_MAP && np == NULL) {
+	warn("Server does not support option '%s'", name);
+	return;
+    }
+
     if (!value)
 	return;
 
