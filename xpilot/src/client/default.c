@@ -27,6 +27,10 @@
 
 #include "xpclient.h"
 
+#ifndef PATH_MAX
+# define PATH_MAX	1023
+#endif
+
 char default_version[] = VERSION;
 
 char myName[] = "xpilot";
@@ -34,12 +38,77 @@ char myClass[] = "XPilot";
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
+static void Set_option(char *option, char *value)
+{
+    printf("setting option '%s' to '%s'\n", option, value);
+}
+
+
+static void Parse_xpilotrc_line(char *line)
+{
+    char *s;
+
+    /*printf("parsing xpilotrc line \"%s\"\n", line);*/
+    /*
+     * Ignore lines that don't start with xpilot. or
+     * xpilot*
+     */
+    if (!(strncasecmp(line, "xpilot.", 7) == 0
+	  || strncasecmp(line, "xpilot*", 7) == 0))
+	/* not interested */
+	return;
+
+    /*printf("-> line is now \"%s\"\n", line);*/
+    line += 7;
+    /*printf("-> line is now \"%s\"\n", line);*/
+    if (!(s = strchr(line, ':'))) {
+	/* no colon on line with xpilot. or xpilot* */
+	/* warn("line missing colon"); */
+	return;
+    }
+    
+    /*
+     * Zero the colon, advance to next char, remove leading whitespace
+     * from option value.
+     */
+    *s++ = '\0';
+    while (isspace(*s))
+	s++;
+
+    Set_option(line, s);
+}
+
+
 void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		   int *my_team, bool *text, bool *list,
 		   bool *join, bool *noLocalMotd,
 		   char *nickName, char *dispName, char *hostName,
 		   char *shut_msg)
 {
+    char path[PATH_MAX + 1];
+    char buf[BUFSIZ];
+    FILE *fp;
+
+    Get_xpilotrc_file(path, sizeof(path));
+    if (strlen(path) > 0
+	&& ((fp = fopen(path, "r")) != NULL)) {
+	while (fgets(buf, sizeof buf, fp)) {
+	    char *cp;
+	    /* kps - remove NL and CR, does this work in windows ? */
+	    cp = strchr(buf, '\n');
+	    if (cp)
+		*cp = '\0';
+	    cp = strchr(buf, '\r');
+	    if (cp)
+		*cp = '\0';
+	    Parse_xpilotrc_line(buf);
+	}
+	fclose(fp);
+    }
+
+
+
+    
 }
 
 char *Get_keyHelpString(keys_t key)
@@ -72,7 +141,20 @@ void Get_xpilotrc_file(char *path, unsigned size)
     } else
 	strlcpy(path, "", size);
 }
+#else
+void Get_xpilotrc_file(char *path, unsigned size)
+{
+    /* kps - some windows pro implement this */
+}
 #endif
+
+void Read_xpilotrc_file(FILE *file)
+{
+
+
+}
+
+
 
 
 #else
