@@ -78,15 +78,6 @@ static int Picture_find_path(const char *filename, char *path,
 	return false;
 
     /*
-     * Always try the plain filename first,
-     * without using the texturePath.
-     */
-    if (access(filename, 4) == 0) {
-	strlcpy(path, filename, path_size);
-	return true;
-    }
-
-    /*
      * If filename doesn't contain a slash
      * then we also try the texturePath, if it exists.
      */
@@ -104,7 +95,8 @@ static int Picture_find_path(const char *filename, char *path,
 		if (path[len - 1] != PATHNAME_SEP)
 		    path[len++] = PATHNAME_SEP;
 		strlcpy(&path[len], filename, path_size - len);
-		if (access(path, 4) == 0)
+		/* kps - #ifndef R_OK #define R_OK 4 #endif */
+		if (access(path, R_OK) == 0)
 		    return true;
 	    }
 	}
