@@ -1235,12 +1235,10 @@ void Gui_paint_world_polygons(Pixmap wallTile)
   static XPoint poly[5000 / 4];
 
   SET_FG(colors[wallColor].pixel);
-  XSetLineAttributes(dpy, gc, WINSCALE(4), 0, LineSolid, CapButt, JoinMiter);
+  XSetLineAttributes(dpy, gc, WINSCALE(4), LineSolid, CapButt, JoinMiter);
   if (wallTile != None && BIT(instruments, SHOW_TEXTURED_WALLS)) texture = 1;
   if (BIT(instruments, SHOW_FILLED_WORLD))
     filled = 1;
-  printf("%d\n", filled);
-
 
   /* 
    * The map is drawn 9 times into different locations
