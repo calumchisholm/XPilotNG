@@ -329,11 +329,13 @@ void Gui_paint_fastshot(int color, int x, int y)
     }
 }
 
-void Gui_paint_teamshot(int color, int x, int y)
+void Gui_paint_teamshot(int x, int y)
 {
-    if (!texturedObjects) {
+    if (teamShotColor == 0)
+	return;
+
+    if (!texturedObjects)
 	Gui_paint_nastyshot(teamShotColor, x, y, shot_size/2);
-    }
     else {
 	int s_size = (teamshot_size > 8) ? 8 : shot_size ;
 	int z = s_size / 2;

@@ -464,7 +464,7 @@ static void Paint_fastshots(int i, int x_areas, int y_areas, int areas)
 
 static void Paint_teamshots(int i, int t_, int x_areas, int y_areas, int areas)
 {
-    int		x, y, j, color;
+    int		x, y, j /*, color */;
 
     /*
      * Teamshots are in range DEBRIS_TYPES to DEBRIS_TYPES*2-1 in fastshot.
@@ -474,9 +474,10 @@ static void Paint_teamshots(int i, int t_, int x_areas, int y_areas, int areas)
 
 	x = BASE_X(i);
 	y = BASE_Y(i);
-	color = COLOR(i);
+	/*color = COLOR(i);*/
 	for (j = 0; j < num_fastshot[t_]; j++) {
-	Gui_paint_teamshot(color, x + fastshot_ptr[t_][j].x, y - fastshot_ptr[t_][j].y);
+	    Gui_paint_teamshot(x + fastshot_ptr[t_][j].x,
+			       y - fastshot_ptr[t_][j].y);
 	}
 	RELEASE(fastshot_ptr[t_], num_fastshot[t_], max_fastshot[t_]);
     }
