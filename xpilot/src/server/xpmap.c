@@ -31,11 +31,11 @@ char xpmap_version[] = VERSION;
 
 static int Compress_map(unsigned char *map, size_t size);
 
-static void Xpmap_treasure_to_polygon(int treasure_ind);
-static void Xpmap_target_to_polygon(int target_ind);
-static void Xpmap_cannon_to_polygon(int cannon_ind);
-static void Xpmap_wormhole_to_polygon(int wormhole_ind);
-static void Xpmap_friction_area_to_polygon(int fa_ind);
+static void Xpmap_treasure_to_polygon(world_t *world, int treasure_ind);
+static void Xpmap_target_to_polygon(world_t *world, int target_ind);
+static void Xpmap_cannon_to_polygon(world_t *world, int cannon_ind);
+static void Xpmap_wormhole_to_polygon(world_t *world, int wormhole_ind);
+static void Xpmap_friction_area_to_polygon(world_t *world, int fa_ind);
 
 static bool		compress_maps = true;
 
@@ -749,57 +749,53 @@ void Xpmap_tags_to_internal_data(world_t *world, bool create)
 void Xpmap_find_map_object_teams(world_t *world)
 {
     int i;
+    clpos_t pos = { 0, 0 };
+
+    if (!BIT(world->rules->mode, TEAM_PLAY))
+	return;
+
+    /* This could return -1 */
+    if (Find_closest_team(world, pos) == TEAM_NOT_SET) {
+	warn("Broken map: Couldn't find teams for map objects.");
+	return;
+    }
 
     /*
-     * Determine which team a treasure belongs to.
+     * Determine which team a stuff belongs to.
      */
-    if (BIT(world->rules->mode, TEAM_PLAY)) {
-	int team = TEAM_NOT_SET;
+    for (i = 0; i < world->NumTreasures; i++) {
+	treasure_t *treasure = Treasures(world, i);
+	team_t *teamp;
 
-	for (i = 0; i < world->NumTreasures; i++) {
-	    treasure_t *treasure = Treasures(world, i);
+	treasure->team = Find_closest_team(world, treasure->pos);
+	teamp = Teams(world, treasure->team);
+	assert(teamp != NULL);
 
-	    team = Find_closest_team(world, treasure->pos);
-	    treasure->team = team;
-	    if (team == TEAM_NOT_SET)
-		warn("Couldn't find a matching team for the treasure.");
-	    else {
-		world->teams[team].NumTreasures++;
-		if (!treasure->empty)
-		    world->teams[team].TreasuresLeft++;
-		else
-		    world->teams[team].NumEmptyTreasures++;
-	    }
+	teamp->NumTreasures++;
+	if (treasure->empty)
+	    teamp->NumEmptyTreasures++;
+	else
+	    teamp->TreasuresLeft++;
+    }
+
+    for (i = 0; i < world->NumTargets; i++) {
+	target_t *targ = Targets(world, i);
+
+	targ->team = Find_closest_team(world, targ->pos);
+    }
+
+    if (options.teamCannons) {
+	for (i = 0; i < world->NumCannons; i++) {
+	    cannon_t *cannon = Cannons(world, i);
+
+	    cannon->team = Find_closest_team(world, cannon->pos);
 	}
+    }
 
-	for (i = 0; i < world->NumTargets; i++) {
-	    target_t *targ = Targets(world, i);
+    for (i = 0; i < world->NumFuels; i++) {
+	fuel_t *fs = Fuels(world, i);
 
-	    team = Find_closest_team(world, targ->pos);
-	    if (team == TEAM_NOT_SET)
-		warn("Couldn't find a matching team for the target.");
-	    targ->team = team;
-	}
-
-	if (options.teamCannons) {
-	    for (i = 0; i < world->NumCannons; i++) {
-		cannon_t *cannon = Cannons(world, i);
-
-		team = Find_closest_team(world, cannon->pos);
-		if (team == TEAM_NOT_SET)
-		    warn("Couldn't find a matching team for the cannon.");
-		cannon->team = team;
-	    }
-	}
-
-	for (i = 0; i < world->NumFuels; i++) {
-	    fuel_t *fs = Fuels(world, i);
-
-	    team = Find_closest_team(world, fs->pos);
-	    if (team == TEAM_NOT_SET)
-		warn("Couldn't find a matching team for fuelstation.");
-	    fs->team = team;
-	}
+	fs->team = Find_closest_team(world, fs->pos);
     }
 }
 
@@ -901,12 +897,11 @@ void Xpmap_find_base_direction(world_t *world)
 
 /* number of vertices in polygon */
 #define N (2 + 12)
-static void Xpmap_treasure_to_polygon(int treasure_ind)
+static void Xpmap_treasure_to_polygon(world_t *world, int treasure_ind)
 {
     int cx, cy, i, r, n;
     double angle;
     int polystyle, edgestyle;
-    world_t *world = &World;
     treasure_t *treasure = Treasures(world, treasure_ind);
     clpos_t pos[N + 1];
 
@@ -980,10 +975,9 @@ static void Xpmap_block_polygon(clpos_t bpos, int polystyle, int edgestyle)
 }
 
 
-static void Xpmap_target_to_polygon(int target_ind)
+static void Xpmap_target_to_polygon(world_t *world, int target_ind)
 {
     int ps, es;
-    world_t *world = &World;
     target_t *targ = Targets(world, target_ind);
 
     ps = P_get_poly_id("target_ps");
@@ -1046,9 +1040,8 @@ static void Xpmap_cannon_polygon(cannon_t *cannon,
 }
 
 
-static void Xpmap_cannon_to_polygon(int cannon_ind)
+static void Xpmap_cannon_to_polygon(world_t *world, int cannon_ind)
 {
-    world_t *world = &World;
     int ps, es;
     cannon_t *cannon = Cannons(world, cannon_ind);
 
@@ -1061,9 +1054,8 @@ static void Xpmap_cannon_to_polygon(int cannon_ind)
 }
 
 #define N 12
-static void Xpmap_wormhole_to_polygon(int wormhole_ind)
+static void Xpmap_wormhole_to_polygon(world_t *world, int wormhole_ind)
 {
-    world_t *world = &World;
     int ps, es, i, r;
     double angle;
     wormhole_t *wormhole = Wormholes(world, wormhole_ind);
@@ -1094,10 +1086,9 @@ static void Xpmap_wormhole_to_polygon(int wormhole_ind)
     P_end_wormhole();
 }
 
-static void Xpmap_friction_area_to_polygon(int fa_ind)
+static void Xpmap_friction_area_to_polygon(world_t *world, int fa_ind)
 {
     int ps, es;
-    world_t *world = &World;
     friction_area_t *fa = FrictionAreas(world, fa_ind);
 
     ps = P_get_poly_id("fa_ps");
@@ -1332,19 +1323,19 @@ void Xpmap_blocks_to_polygons(world_t *world)
 	is_polygon_map = true;
 
     for (i = 0; i < world->NumTreasures; i++)
-	Xpmap_treasure_to_polygon(i);
+	Xpmap_treasure_to_polygon(world, i);
 
     for (i = 0; i < world->NumTargets; i++)
-	Xpmap_target_to_polygon(i);
+	Xpmap_target_to_polygon(world, i);
 
     for (i = 0; i < world->NumCannons; i++)
-	Xpmap_cannon_to_polygon(i);
+	Xpmap_cannon_to_polygon(world, i);
 
     for (i = 0; i < world->NumWormholes; i++)
-	Xpmap_wormhole_to_polygon(i);
+	Xpmap_wormhole_to_polygon(world, i);
 
     for (i = 0; i < world->NumFrictionAreas; i++)
-	Xpmap_friction_area_to_polygon(i);
+	Xpmap_friction_area_to_polygon(world, i);
 
     /*xpprintf("Created %d polygons.\n", num_polys);*/
 }
