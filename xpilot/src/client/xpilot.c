@@ -21,7 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "xpclient.h"
+#include "xpclient_x11.h"
 
 char xpilot_version[] = VERSION;
 
@@ -118,7 +118,9 @@ int main(int argc, char *argv[])
     IFWINDOWS( conpar->disp_name[0] = '\0' );
 
 #ifdef OPTIONHACK
+    Set_key_binding_callback(Key_binding_callback);
     Store_default_options();
+    Store_key_options();
     Store_x_options();
 #endif
 

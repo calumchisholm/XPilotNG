@@ -129,12 +129,6 @@ xp_option_t default_options[] = {
 	NULL,
 	"Should your own shipshape be displayed or not.\n"),
 
-    XP_KEY_OPTION(
-	"keyLoadLock4",
-	"8",
-	KEY_LOAD_LOCK_4,
-	NULL,
-	"Load player lock from bank 4.\n"),
 
 };
 
@@ -1741,6 +1735,9 @@ cl_option_t options[] = {
 	"The default weapon modifier values for the fourth modifier bank.\n",
 	0
     },
+
+
+    /* handled in event.c */
     {
 	"keyTurnLeft",
 	NULL,
@@ -2356,6 +2353,9 @@ cl_option_t options[] = {
 	"Toggle pointer control.\n",
 	0
     },
+    /* / handled in event.c */
+
+
     {
 	"pointerButton1",
 	NULL,

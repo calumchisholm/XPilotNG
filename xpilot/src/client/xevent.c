@@ -284,6 +284,41 @@ void Talk_event(XEvent *event)
 	Talk_set_state(false);
 }
 
+static int num_keydefs = 0;
+static int max_keydefs = 0;
+static keydefs_t *keydefs = NULL;
+
+/*
+ * The option code calls this callback when key options are processed.
+ */
+bool Key_binding_callback(keys_t key, const char *str)
+{
+    KeySym ks;
+    keydefs_t keydef;
+    int i;
+
+    assert(key != KEY_DUMMY);
+    assert(str);
+
+    if ((ks = XStringToKeysym(str)) == NoSymbol)
+	/* Invalid keysym */
+	return false;
+
+    for (i = 0; i < max_keydefs; i++) {
+	if (keydefs[i].keysym == ks
+	    && keydefs[i].key == key)
+	    /* This binding exists already. */
+	    return true;
+    }
+
+    keydef.keysym = ks;
+    keydef.key = key;
+
+    STORE(keydefs_t, keydefs, num_keydefs, max_keydefs, keydef);
+
+    return true;
+}
+
 
 int	talk_key_repeating;
 XEvent	talk_key_repeat_event;

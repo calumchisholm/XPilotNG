@@ -50,6 +50,13 @@ typedef void (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
 typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
 typedef bool (*xp_key_option_setfunc_t)    (xp_option_t *opt, const char *val);
 
+typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
+
+/*
+ * Client implementations should call this function to set a callback for
+ * handling key option bindings.
+ */
+extern void Set_key_binding_callback(xp_key_binding_callback_t callback);
 
 struct xp_option {
     xp_option_type_t type;

@@ -62,6 +62,11 @@ extern char *Get_xpilotini_file(int level);
 #endif
 
 /*
+ * event.c
+ */
+extern void Store_key_options(void);
+
+/*
  * join.c
  */
 extern int Join(char *server_addr, char *server_name, int port,

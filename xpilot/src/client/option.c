@@ -202,6 +202,48 @@ static void Set_string_option(xp_option_t *opt, const char *value)
     printf("Value of option %s is now \"%s\"\n", opt->name, opt->str_ptr);
 }
 
+static xp_key_binding_callback_t key_binding_callback = NULL;
+
+void Set_key_binding_callback(xp_key_binding_callback_t callback)
+{
+    key_binding_callback = callback;
+}
+
+
+static void Set_key_option(xp_option_t *opt, const char *value)
+{
+    assert(opt);
+    assert(opt->name);
+    assert(opt->type == xp_key_option);
+    assert(value);
+
+    if (opt->key_setfunc)
+	opt->key_setfunc(opt, value);
+    else {
+	char *str, *valcpy = xp_safe_strdup(value);
+
+	for (str = strtok(valcpy, " \t\r\n");
+	     str != NULL;
+	     str = strtok(NULL, " \t\r\n")) {
+	    bool ok;
+	    /*
+	     * The platform specific code must register a callback for us to register
+	     * keys.
+	     */
+	    assert(key_binding_callback != NULL);
+	    ok = (*key_binding_callback)(opt->key, str);
+	    if (!ok)
+		warn("Invalid keysym \"%s\" for key \"%s\".\n",
+		     str, opt->name);
+	    else
+		printf("Keysym \"%s\" was successfully bound to key \"%s\".\n",
+		       str, opt->name);
+	}
+
+	xp_free(valcpy);
+    }
+}
+
 /*
  * This could also be used from a client '\set' command, e.g.
  * "\set scalefactor 1.5"
@@ -230,6 +272,9 @@ void Set_option(const char *name, const char *value)
     case xp_string_option:
 	Set_string_option(opt, value);
 	break;
+    case xp_key_option:
+	Set_key_option(opt, value);
+	break;
     default:
 	warn("FOO");
 	assert(0);
@@ -251,7 +296,10 @@ void Store_option(xp_option_t *opt)
     assert(strlen(opt->help) > 0);
 
     /* Let's not allow several options with the same name */
-    assert(Find_option(opt->name) == NULL);
+    if (Find_option(opt->name) != NULL) {
+	warn("Trying to store duplicate option \"%s\"", opt->name);
+	assert(0);
+    }
 
     memcpy(&option, opt, sizeof(xp_option_t));
 
@@ -272,10 +320,16 @@ void Store_option(xp_option_t *opt)
 	Set_double_option(opt, opt->dbl_defval);
 	break;
     case xp_string_option:
+	assert(opt->str_defval);
 	Set_string_option(opt, opt->str_defval);
 	break;
+    case xp_key_option:
+	assert(opt->key_defval);
+	Set_key_option(opt, opt->key_defval);
+	break;
     default:
-	warn("FOO");
+	warn("Could not set default value for option %s", opt->name);
+	break;
     }
 
 }
