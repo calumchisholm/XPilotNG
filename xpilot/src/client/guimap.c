@@ -325,24 +325,20 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	 * Hacks to support Mara's base warning on new servers and
 	 * the red "meter" basewarning on old servers.
 	 */
-	if (version >= 0x4F12) {
-	    if (loops <= base->appeartime)
-		do_basewarning = true;
-	} else {
-	    if (loops <= base->appeartime) {
-		do_basewarning = true;
-		if (baseWarningType & 1) {
-		    int count = (360 * (base->appeartime - loops))
-			/ (3 * clientFPS);
-		    LIMIT(count, 0, 360);
-		    /* red box basewarning */
-		    if (count > 0 && (baseWarningType & 1))
-			Gui_paint_appearing(x + BLOCK_SZ / 2, y + BLOCK_SZ / 2,
-					    id, count);
-		}
+	if (loops < base->appeartime)
+	    do_basewarning = true;
+
+	if (version < 0x4F12 && do_basewarning) {
+	    if (baseWarningType & 1) {
+		/* We assume the ship will appear after 3 seconds. */
+		int count = 360 * (base->appeartime - loops) / (3 * clientFPS);
+		LIMIT(count, 0, 360);
+		/* red box basewarning */
+		if (count > 0 && (baseWarningType & 1))
+		    Gui_paint_appearing(x + BLOCK_SZ / 2, y + BLOCK_SZ / 2,
+					id, count);
 	    }
 	}
-
     }
 
     /* Mara's flashy basewarning */
