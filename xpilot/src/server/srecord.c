@@ -293,11 +293,9 @@ void Handle_recording_buffers(void)
     if (recordMode != 1)
 	return;
 
-    if (recordMode == 1) {
-	for (i = 0; i < num_types; i++)
-	    if ((char *)*bufs[i].curp - (char *)bufs[i].start
-		> bufs[i].threshold)
-		Dump_data();
-	return;
-    }
+    for (i = 0; i < num_types; i++)
+	if ((char*)*bufs[i].curp - (char*)bufs[i].start > bufs[i].threshold) {
+	    Dump_data();
+	    break;
+	}
 }
