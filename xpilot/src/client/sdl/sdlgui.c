@@ -55,14 +55,14 @@ double hudRadarScale = 2.0;
 float hudRadarMapScale;
 int hudRadarDotSize = 6;
 int meterBorderColor   	    = 0x0000ff55;
-int fuelMeterColor   	    = 0x0000ff55;
-int powerMeterColor   	    = 0x0000ff55;
-int turnSpeedMeterColor     = 0x0000ff55;
-int packetSizeMeterColor    = 0x0000ff55;
-int packetLossMeterColor    = 0x0000ff55;
-int packetDropMeterColor    = 0x0000ff55;
-int packetLagMeterColor     = 0x0000ff55;
-int temporaryMeterColor     = 0x0000ff55;
+int fuelMeterColor   	    = 0xff000055;
+int powerMeterColor   	    = 0xff000055;
+int turnSpeedMeterColor     = 0xff000055;
+int packetSizeMeterColor    = 0xff000055;
+int packetLossMeterColor    = 0xff000055;
+int packetDropMeterColor    = 0xff000055;
+int packetLagMeterColor     = 0xff000055;
+int temporaryMeterColor     = 0xff000055;
 
 int dirPtrColor   	    = 0x0000ff44;
 int hudHLineColor   	    = 0x0000ff44;
@@ -776,10 +776,10 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max,
 
     set_alphacolor(meter_color);
     glBegin( GL_POLYGON );
-    	glVertex2i(x+2,y+2);
-    	glVertex2i(x+2,y+2+meterHeight-3);
-    	glVertex2i(x+2+(int)(((meterWidth-3)*val)/(max?max:1)),y+2+meterHeight-3);
-    	glVertex2i(x+2+(int)(((meterWidth-3)*val)/(max?max:1)),y+2);
+    	glVertex2i(x-2,y);
+    	glVertex2i(x-2,y+2+meterHeight-3);
+    	glVertex2i(x-2+(int)(((meterWidth)*val)/(max?max:1)),y+2+meterHeight-3);
+    	glVertex2i(x-2+(int)(((meterWidth)*val)/(max?max:1)),y);
     glEnd();
     
     
