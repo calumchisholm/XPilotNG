@@ -55,30 +55,30 @@ extern "C" {
 
 /* Vertical line */
 
-    DLLINTERFACE int vlineColor(SDL_Surface * dst, Sint16 x, Sint16 y1, Sint16 y2, Uint32 color);
-    DLLINTERFACE int vlineRGBA(SDL_Surface * dst, Sint16 x, Sint16 y1, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+    DLLINTERFACE int vlineColor(SDL_Surface * dst, Sint16 x, Sint16 y_1, Sint16 y2, Uint32 color);
+    DLLINTERFACE int vlineRGBA(SDL_Surface * dst, Sint16 x, Sint16 y_1, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* Rectangle */
 
-    DLLINTERFACE int rectangleColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
-    DLLINTERFACE int rectangleRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y1,
+    DLLINTERFACE int rectangleColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color);
+    DLLINTERFACE int rectangleRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y_1,
 				   Sint16 x2, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* Filled rectangle (Box) */
 
-    DLLINTERFACE int boxColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
-    DLLINTERFACE int boxRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2,
+    DLLINTERFACE int boxColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color);
+    DLLINTERFACE int boxRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2,
 			     Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* Line */
 
-    DLLINTERFACE int lineColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
-    DLLINTERFACE int lineRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y1,
+    DLLINTERFACE int lineColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color);
+    DLLINTERFACE int lineRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y_1,
 			      Sint16 x2, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* AA Line */
-    DLLINTERFACE int aalineColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
-    DLLINTERFACE int aalineRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y1,
+    DLLINTERFACE int aalineColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color);
+    DLLINTERFACE int aalineRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y_1,
 				Sint16 x2, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* Circle */
@@ -124,20 +124,20 @@ extern "C" {
 
 /* Trigon */
 
-    DLLINTERFACE int trigonColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, Uint32 color);
-    DLLINTERFACE int trigonRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
+    DLLINTERFACE int trigonColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, Uint32 color);
+    DLLINTERFACE int trigonRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
 				 Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* AA-Trigon */
 
-    DLLINTERFACE int aatrigonColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, Uint32 color);
-    DLLINTERFACE int aatrigonRGBA(SDL_Surface * dst,  Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
+    DLLINTERFACE int aatrigonColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, Uint32 color);
+    DLLINTERFACE int aatrigonRGBA(SDL_Surface * dst,  Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
 				   Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* Filled Trigon */
 
-    DLLINTERFACE int filledTrigonColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, int color);
-    DLLINTERFACE int filledTrigonRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
+    DLLINTERFACE int filledTrigonColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, int color);
+    DLLINTERFACE int filledTrigonRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
 				       Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 /* Polygon */
