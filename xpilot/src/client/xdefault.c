@@ -260,6 +260,7 @@ static void X_after(Display *display)
 {
     static int		n;
 
+    (void)display;
     if (n < 1000)
 	printf("_X_ %4d\n", n++);
 }

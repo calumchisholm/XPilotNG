@@ -30,6 +30,7 @@ extern int Startup_server_motd(void);
 
 char client_version[] = VERSION;
 
+char	*geometry;
 xp_args_t xpArgs;
 Connect_param_t connectParam;
 

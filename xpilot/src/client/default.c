@@ -36,7 +36,6 @@ keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 #ifdef OPTIONHACK
 
-char *mygeometry = NULL;
 char myshipshapefile[PATH_MAX + 1];
 char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 { NULL, NULL, NULL, NULL, NULL };
@@ -59,17 +58,17 @@ static char *getTexturePath(xp_option_t *opt)
 static bool setGeometry(xp_option_t *opt, const char *value)
 {
     (void)opt;
-    if (mygeometry)
-	xp_free(mygeometry);
+    if (geometry)
+	xp_free(geometry);
 
-    mygeometry = xp_safe_strdup(value);
+    geometry = xp_safe_strdup(value);
     return true;
 }
 
 static char *getGeometry(xp_option_t *opt)
 {
     (void)opt;
-    return mygeometry;
+    return geometry;
 }
 
 static inline int pointer_button_index_by_option(xp_option_t *opt)

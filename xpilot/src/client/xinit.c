@@ -74,7 +74,6 @@ Atom			ProtocolAtom, KillAtom;
 bool			quitting = false;
 unsigned		top_width, top_height;
 unsigned		players_width, players_height;
-char			*geometry;
 bool			radar_score_mapped;
 Cursor			pointerControlCursor;
 bool			ignoreWindowManager;

@@ -435,6 +435,7 @@ typedef struct {
 } message_t;
 /* typedefs end */
 
+extern char		*geometry;
 extern xp_args_t	xpArgs;
 extern Connect_param_t	connectParam;
 extern message_t	*TalkMsg[];
