@@ -66,20 +66,22 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < NumPlayers; i++) {
+	    player *pl_i = Players(i);
+
 	    if (IS_TANK_IND(i)
-		|| (BIT(Players(i)->status, PAUSE) && Players(i)->count <= 0)
-		|| (BIT(Players(i)->status, GAME_OVER)
-		    && Players(i)->mychar == 'W'))
+		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
+		|| (BIT(pl_i->status, GAME_OVER)
+		    && pl_i->mychar == 'W'))
 		continue;
-	    if (Players(i)->team == td->team) {
-		lose_score += Players(i)->score;
+	    if (pl_i->team == td->team) {
+		lose_score += pl_i->score;
 		lose_team_members++;
-		if (BIT(Players(i)->status, GAME_OVER) == 0) {
+		if (BIT(pl_i->status, GAME_OVER) == 0) {
 		    somebody_flag = 1;
 		}
 	    }
-	    else if (Players(i)->team == pl->team) {
-		win_score += Players(i)->score;
+	    else if (pl_i->team == pl->team) {
+		win_score += pl_i->score;
 		win_team_members++;
 	    }
 	}
@@ -104,32 +106,34 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
     por = (sc * lose_team_members) / (2 * win_team_members + 1);
 
     for (i = 0; i < NumPlayers; i++) {
+	player *pl_i = Players(i);
+
 	if (IS_TANK_IND(i)
-	    || (BIT(Players(i)->status, PAUSE)
-		&& Players(i)->count <= 0)
-	    || (BIT(Players(i)->status, GAME_OVER)
-		&& Players(i)->mychar == 'W'))
+	    || (BIT(pl_i->status, PAUSE)
+		&& pl_i->count <= 0)
+	    || (BIT(pl_i->status, GAME_OVER)
+		&& pl_i->mychar == 'W'))
 	    continue;
-	if (Players(i)->team == td->team) {
+	if (pl_i->team == td->team) {
 	    SCORE(i, -sc, cx, cy, "Treasure: ");
-	    Rank_LostBall(Players(i));
+	    Rank_LostBall(pl_i);
 	    if (treasureKillTeam)
-		SET_BIT(Players(i)->status, KILLED);
+		SET_BIT(pl_i->status, KILLED);
 	}
-	else if (Players(i)->team == pl->team &&
-		 (Players(i)->team != TEAM_NOT_SET || i == ind)) {
+	else if (pl_i->team == pl->team &&
+		 (pl_i->team != TEAM_NOT_SET || i == ind)) {
 	    if (lose_team_members > 0) {
 		if (i == ind) {
-		    Rank_CashedBall(Players(i));
+		    Rank_CashedBall(pl_i);
 		}
-		Rank_WonBall(Players(i));
+		Rank_WonBall(pl_i);
 	    }
 	    SCORE(i, (i == ind ? 3*por : 2*por), cx, cy, "Treasure: ");
 	}
     }
 
     if (treasureKillTeam) {
-	Rank_AddKill(Players(ind));
+	Rank_AddKill(pl);
     }
 
     updateScores = true;
@@ -261,7 +265,7 @@ void Ball_is_destroyed(ballobject *ball)
 {
     char msg[MSG_LEN];
     int frames = (1e6 - ball->life) / timeStep + .5;
-    int ind = GetInd(ball->owner);
+    player *pl = Player_by_id(ball->owner);
     DFLOAT seconds = ((DFLOAT)frames) / framesPerSecond;
 
     if (timeStep != 1.0) {
@@ -269,13 +273,13 @@ void Ball_is_destroyed(ballobject *ball)
 
 	sprintf(msg," < The ball was loose for %d frames (best %d) "
 		"/ %.2f frames @ 12fps / %.2fs >",
-		frames, Rank_GetBestBall(Players(ind)), frames12, seconds);
+		frames, Rank_GetBestBall(pl), frames12, seconds);
     } else {
 	sprintf(msg," < The ball was loose for %d frames (best %d) / %.2fs >",
-		frames, Rank_GetBestBall(Players(ind)), seconds);
+		frames, Rank_GetBestBall(pl), seconds);
     }
     Set_message(msg);
-    Rank_BallRun(Players(ind), frames);
+    Rank_BallRun(pl, frames);
 }
 
 
