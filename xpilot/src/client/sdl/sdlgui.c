@@ -2342,8 +2342,8 @@ static const char *get_rgba_color_option(xp_option_t *opt)
 
 static xp_option_t sdlgui_options[] = {
 
-    COLOR(messagesColorRGBA, "#00aaaa88", "messages"),
-    COLOR(oldmessagesColorRGBA, "#00888888", "old messages"),
+    COLOR(messagesColorRGBA, "#00aaaaff", "messages"),
+    COLOR(oldmessagesColorRGBA, "#008888ff", "old messages"),
     COLOR(msgScanBallColorRGBA, "#ff0000ff", "ball warning"),
     COLOR(msgScanSafeColorRGBA, "#00ff00ff", "ball safe announcement"),
     COLOR(msgScanCoverColorRGBA, "#4e7cffff", "cover request"),
@@ -2365,14 +2365,14 @@ static xp_option_t sdlgui_options[] = {
     COLOR(fuelColorRGBA, "#ffffff7f", "fuel cells"),
     COLOR(wallColorRGBA, "#0000ffff", "walls on blockmaps"),
     COLOR(decorColorRGBA, "#bb7700ff", "decorations on blockmaps"),
-    COLOR(baseNameColorRGBA, "#0000ff88", "base name"),
-    COLOR(shipNameColorRGBA, "#0000ff88", "ship name"),
+    COLOR(baseNameColorRGBA, "#77bbffff", "base name"),
+    COLOR(shipNameColorRGBA, "#77bbffff", "ship name"),
     COLOR(scoreObjectColorRGBA, "#00ff0088", "score objects"),
 
     COLOR(hudColorRGBA, "#ff000088", "the HUD"),
     COLOR(hudHLineColorRGBA, "#0000ff44", "horizontal HUD line"),
     COLOR(hudVLineColorRGBA, "#0000ff44", "vertical HUD line"),
-    COLOR(hudItemsColorRGBA, "#0000ff88", "hud items"),
+    COLOR(hudItemsColorRGBA, "#0080ffaa", "hud items"),
     COLOR(hudRadarEnemyColorRGBA, "#ff000088", "enemy on HUD radar"),
     COLOR(hudRadarOtherColorRGBA, "#0000ff88", "friend on HUD radar"),
     COLOR(hudRadarObjectColorRGBA, "#00000000", "small object on HUD radar"),
