@@ -387,21 +387,91 @@ char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
 
 static inline int pointer_button_index_by_option(xp_option_t *opt)
 {
-    return atoi(Get_option_name(opt) + strlen("pointerButton")) - 1;
+    return atoi(Option_get_name(opt) + strlen("pointerButton")) - 1;
 }
+
+static int numButtonDefs[MAX_POINTER_BUTTONS] = { 0, 0, 0, 0, 0 };
+
+int Num_buttonDefs(int ind)
+{
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+    return numButtonDefs[ind];
+}
+
+static void Clear_buttonDefs(int ind)
+{
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+    numButtonDefs[ind] = 0;
+}
+
+static void Bind_key_to_pointer_button(keys_t key, int ind)
+{
+    int num_defs;
+
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+    assert(key != KEY_DUMMY);
+
+    num_defs = Num_buttonDefs(ind);
+    if (num_defs == MAX_BUTTON_DEFS) {
+	warn("Can only have %d keys bound to pointer button %d",
+	     MAX_BUTTON_DEFS, ind + 1);
+	return;
+    }
+
+    buttonDefs[ind][num_defs] = key;
+    numButtonDefs[ind]++;
+}
+
+
 
 static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
 {
     int ind = pointer_button_index_by_option(opt);
+    char *ptr, *valcpy;
+    int j;
 
     assert(ind >= 0);
     assert(ind < MAX_POINTER_BUTTONS);
+    assert(value);
     if (pointerButtonBindings[ind])
 	xp_free(pointerButtonBindings[ind]);
 
-    pointerButtonBindings[ind] = xp_safe_strdup(value);
+    Clear_buttonDefs(ind);
 
-    /* kps: TODO */
+    pointerButtonBindings[ind] = xp_safe_strdup(value);
+    valcpy = xp_safe_strdup(value);
+
+    /*warn("bindings for pointerbutton %d is %s",
+      ind + 1, pointerButtonBindings[ind]);*/
+
+    for (ptr = strtok(valcpy, " \t\r\n");
+	 ptr != NULL;
+	 ptr = strtok(NULL, " \t\r\n")) {
+	if (!strncasecmp(ptr, "key", 3))
+	    ptr += 3;
+	for (j = 0; j < num_options; j++) {
+	    xp_option_t *opt_j = Option_by_index(j);
+	    const char *opt_j_name;
+	    keys_t opt_j_key;
+
+	    assert(opt_j);
+	    opt_j_name = Option_get_name(opt_j);
+	    opt_j_key = Option_get_key(opt_j);
+	    if (opt_j_key != KEY_DUMMY
+		&& (!strcasecmp(ptr, opt_j_name + 3))) {
+		Bind_key_to_pointer_button(opt_j_key, ind);
+		break;
+	    }
+	}
+	if (j == num_options)
+	    warn("Unknown key \"%s\" for pointer button %d", ptr, ind + 1);
+    }
+
+    xp_free(valcpy);
+
     return true;
 }
 

@@ -378,7 +378,7 @@ int Talk_macro(int i)
 
 static inline int index_by_option(xp_option_t *opt)
 {
-    return atoi(Get_option_name(opt) + strlen("msg")) - 1;
+    return atoi(Option_get_name(opt) + strlen("msg")) - 1;
 }
 
 static bool Set_talk_macro(xp_option_t *opt, const char *value)

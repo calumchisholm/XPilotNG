@@ -24,17 +24,6 @@
 #ifndef OPTION_H
 #define OPTION_H
 
-extern void Parse_options(int *argcp, char **argvp);
-
-extern void Get_xpilotrc_file(char *, unsigned);
-
-extern bool Set_option(const char *name, const char *value);
-extern void Set_command(const char *command);
-
-extern void Usage(void);
-extern const char *Get_keyHelpString(keys_t key);
-extern const char *Get_keyResourceString(keys_t key);
-
 typedef enum {
     xp_noarg_option,
     xp_bool_option,
@@ -47,6 +36,7 @@ typedef enum {
 
 typedef struct xp_option xp_option_t;
 
+
 typedef bool (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
 typedef bool (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
 typedef bool (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
@@ -54,11 +44,6 @@ typedef bool (*xp_string_option_setfunc_t) (xp_option_t *opt, const char *val);
 typedef char *(*xp_string_option_getfunc_t)(xp_option_t *opt);
 typedef bool (*xp_key_binding_callback_t)  (keys_t key, const char *str);
 
-/*
- * Client implementations should call this function to set a callback for
- * handling key option bindings.
- */
-extern void Set_key_binding_callback(xp_key_binding_callback_t callback);
 
 /*
  * NOTE: DON'T ACCESS THIS STRUCTURE DIRECTLY, USE THE INITIALIZER MACROS,
@@ -132,6 +117,64 @@ struct xp_option {
     /* ... */
 
 };
+
+
+/* number of options in global option array */
+extern int num_options;
+#ifdef OPTIONHACK
+extern xp_option_t *options;
+#endif
+
+
+extern void Parse_options(int *argcp, char **argvp);
+
+extern void Get_xpilotrc_file(char *, unsigned);
+
+extern bool Set_option(const char *name, const char *value);
+extern xp_option_t *Find_option(const char *name);
+extern void Set_command(const char *command);
+
+extern void Usage(void);
+extern const char *Get_keyHelpString(keys_t key);
+extern const char *Get_keyResourceString(keys_t key);
+
+/*
+ * Client implementations should call this function to set a callback for
+ * handling key option bindings.
+ */
+extern void Set_key_binding_callback(xp_key_binding_callback_t callback);
+
+
+void Store_option(xp_option_t *);
+
+#define STORE_OPTIONS(option_array) \
+{ \
+    int ii; \
+    for (ii = 0; ii < NELEM(option_array); ii++) \
+	Store_option(& (option_array) [ii]); \
+} \
+
+#ifdef OPTIONHACK
+static inline const char *Option_get_name(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->name;
+}
+
+static inline keys_t Option_get_key(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->key;
+}
+
+static inline xp_option_t *Option_by_index(int ind)
+{
+    if (ind < 0 || ind >= num_options)
+	return NULL;
+    return &options[ind];
+}
+#endif
+
 
 
 
@@ -230,21 +273,6 @@ struct xp_option {
 	XP_STRING_OPTION_DUMMY,\
 	defval,\
 	key,\
-}
-
-void Store_option(xp_option_t *);
-
-#define STORE_OPTIONS(option_array) \
-{ \
-    int ii; \
-    for (ii = 0; ii < NELEM(option_array); ii++) \
-	Store_option(& (option_array) [ii]); \
-} \
-
-static inline const char *Get_option_name(xp_option_t *opt)
-{
-    assert(opt);
-    return opt->name;
 }
 
 #endif

@@ -34,14 +34,7 @@ int max_options = 0;
 xp_option_t *options = NULL;
 
 
-static inline xp_option_t *Option_by_index(int ind)
-{
-    if (ind < 0 || ind >= num_options)
-	return NULL;
-    return &options[ind];
-}
-
-static inline xp_option_t *Find_option(const char *name)
+xp_option_t *Find_option(const char *name)
 {
     int i;
 

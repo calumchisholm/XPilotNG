@@ -110,7 +110,13 @@ typedef struct {
 					   than this */
 #define MAX_POINTER_BUTTONS	5
 #define MAX_BUTTON_DEFS		3
-#define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
+
+#ifdef OPTIONHACK
+extern int Num_buttonDefs(int ind);
+#  define NUM_BUTTON_DEFS(i) Num_buttonDefs(i)
+#else
+#  define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
+#endif
 extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 /*
