@@ -52,7 +52,6 @@
 #endif
 
 #include "bitmaps.h"
-#include "configure.h"
 #include "dbuff.h"
 #include "paintdata.h"
 #include "record.h"

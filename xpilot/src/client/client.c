@@ -24,9 +24,7 @@
 
 #include "xpclient.h"
 
-/* kps - hack */
-
-extern int Key_init(void);
+/* kps - move to some header */
 extern int Bitmap_add(char *filename, int count, bool scalable);
 extern int Startup_server_motd(void);
 

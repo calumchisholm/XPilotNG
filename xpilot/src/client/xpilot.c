@@ -196,6 +196,7 @@ extern char datagram_version[];
 extern char dbuff_version[];
 extern char default_version[];
 extern char error_version[];
+extern char event_version[];
 extern char gfx2d_version[];
 extern char guimap_version[];
 extern char guiobjects_version[];
@@ -250,6 +251,7 @@ static void Check_client_versions(void)
 	{ "dbuff", dbuff_version },
 	{ "default", default_version },
 	{ "error", error_version },
+	{ "event", event_version },
 	{ "gfx2d", gfx2d_version },
 	{ "guimap", guimap_version },
 	{ "guiobjects", guiobjects_version },

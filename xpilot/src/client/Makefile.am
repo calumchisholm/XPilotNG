@@ -9,6 +9,7 @@ xpilot_SOURCES = \
 	colors.c configure.c configure.h connectparam.h \
 	datagram.c datagram.h dbuff.c dbuff.h \
 	debugaudio.c default.c default.h \
+	event.c \
 	gfx2d.c gfx2d.h \
 	guimap.c guimap.h guiobjects.c guiobjects.h \
 	icon.h \

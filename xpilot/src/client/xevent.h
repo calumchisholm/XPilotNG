@@ -35,14 +35,7 @@ extern char* Get_keyHelpString(keys_t key);
 extern const char *Get_keyResourceString(keys_t key);
 
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset);
-void Pointer_control_set_state(int on);
-int Key_init(void);
-int Key_update(void);
-bool Key_press(keys_t key);
-bool Key_release(keys_t key);
 void Key_event(XEvent *event);
-void Set_auto_shield(int on);
-void Set_toggle_shield(int on);
 void Talk_event(XEvent *event);
 void xevent_keyboard(int queued);
 void xevent_pointer(void);

@@ -631,11 +631,27 @@ extern long		time_left;
 extern bool roundend;
 extern bool played_this_round;
 
+/* event.c */
+void Pointer_control_set_state(int on);
+int Key_init(void);
+int Key_update(void);
+bool Key_press(keys_t key);
+bool Key_release(keys_t key);
+bool Key_press_pointer_control(void);
+bool Key_press_swap_scalefactor(void);
+bool Key_press_talk(void);
+bool Key_press_toggle_radar_score(void);
+bool Key_press_toggle_record(void);
+void Set_auto_shield(int on);
+void Set_toggle_shield(int on);
+void Talk_set_state(bool on);
+
 int Alloc_msgs(void);
 void Free_msgs(void);
 void Add_message(const char *message);
 void Add_pending_messages(void);
 void Add_roundend_messages(other_t **order);
+void Print_messages_to_stdout(void);
 double Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, double *damage);
 int Target_by_index(int ind, int *xp, int *yp, int *dead_time, double *damage);

@@ -56,6 +56,7 @@
 #include "client.h"
 #include "clientcommand.h"
 #include "clientrank.h"
+#include "configure.h"
 #include "connectparam.h"
 #include "datagram.h"
 #include "default.h"

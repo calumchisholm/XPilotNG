@@ -297,41 +297,6 @@ static char *Get_msg_from_history(int* pos, char *message, keys_t direction)
 }
 
 /*
- * Print all available messages to stdout.
- */
-void Print_messages_to_stdout(void)
-{
-    int i, k;
-    int direction, offset;
-
-    if (!selectionAndHistory)
-	return;
-
-    if (instruments.showReverseScroll) {
-	direction = -1;
-	offset = maxMessages - 1;
-    } else {
-	direction = 1;
-	offset = 0;
-    }
-
-    xpprintf("[talk messages]\n");
-    for (k = 0; k < maxMessages; k++) {
-	i = direction * k + offset;
-	if (TalkMsg[i] && TalkMsg[i]->len > 0)
-	    xpprintf("  %s\n", TalkMsg[i]->txt);
-    }
-
-    xpprintf("[server messages]\n");
-    for (k = maxMessages - 1; k >= 0; k--) {
-	i = direction * k + offset;
-	if (GameMsg[i] && GameMsg[i]->len > 0)
-	    xpprintf("  %s\n", GameMsg[i]->txt);
-    }
-    xpprintf("\n");
-}
-
-/*
  * Pressing a key while there is an emphasized text in the talk window
  * substitutes this text, means: delete the text before inserting the
  * new character and place the character at this `gap'.
