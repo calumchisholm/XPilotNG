@@ -798,7 +798,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "shots"))
 		rank->shots = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "deadliest"))
-		rank->shots = atoi(*(attr + 1));
+		rank->deadliest = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "ballssaved"))
 		rank->ballsSaved = atoi(*(attr + 1));
 	    if (!strcasecmp(*attr, "ballslost"))
