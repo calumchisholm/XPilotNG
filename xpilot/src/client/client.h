@@ -449,7 +449,6 @@ extern int		maxLinesInHistory;	/* lines to save in history */
 extern selection_t	selection;		/* in talk/draw window */
 extern int		maxMessages;
 extern int		messagesToStdout;
-extern bool		selectionAndHistory;
 
 extern char		*talk_fast_msgs[];	/* talk macros */
 

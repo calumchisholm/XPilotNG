@@ -591,11 +591,7 @@ int Init_playing_windows(void)
      */
     XSelectInput(dpy, radarWindow, ExposureMask);
     XSelectInput(dpy, playersWindow, ExposureMask);
-
-    if (!selectionAndHistory)
-	XSelectInput(dpy, drawWindow, 0);
-    else
-	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
+    XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 
     /*
      * Initialize misc. pixmaps if we're not color switching.

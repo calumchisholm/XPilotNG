@@ -135,8 +135,6 @@ static void Selection_send(const XSelectionRequestEvent *rq)
 
 void SelectionNotify_event(XEvent *event)
 {
-    if (selectionAndHistory)
-
     Selection_paste(event->xselection.requestor,
 		    event->xselection.property, True);
 }
@@ -275,7 +273,7 @@ void ButtonPress_event(XEvent *event)
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
 	    Pointer_button_pressed((int)event->xbutton.button);
-	else if (selectionAndHistory) {
+	else {
 	    switch (event->xbutton.button) {
 	    case Button1:
 	        if (!talk_mapped)
@@ -303,7 +301,6 @@ void ButtonPress_event(XEvent *event)
 	    default:
 	        break;
 	    } /* switch */
-	      /* end of selectionAndHistory */
 	}
 	return;
     }
@@ -336,8 +333,6 @@ int ButtonRelease_event(XEvent *event)
 	    && !talk_mapped
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
 	    Pointer_button_released((int)event->xbutton.button);
-	else if (!selectionAndHistory)
-	    return 0;
 
 	if (!talk_mapped && event->xbutton.button == 1)
 	    /*

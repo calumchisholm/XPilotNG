@@ -39,7 +39,6 @@ static	char		*HistoryBlock = NULL;
 int			maxLinesInHistory;
 int	maxMessages;		/* Max. number of messages to display */
 int	messagesToStdout;	/* Send messages to standard output */
-bool	selectionAndHistory;
 
 bool ball_shout = false;
 bool need_cover = false;
@@ -661,46 +660,42 @@ static bool Msg_is_from_our_team(const char *message, const char **msg2)
 
 int Alloc_msgs(void)
 {
-    message_t		*x, *x2 = NULL;
-    int			i;
+    message_t *x, *x2 = NULL;
+    int i;
 
-    if ((x = XMALLOC(message_t, 2 * MAX_MSGS)) == NULL) {
+    x = XMALLOC(message_t, 2 * MAX_MSGS);
+    if (x == NULL) {
 	error("No memory for messages");
 	return -1;
     }
 
-    if (selectionAndHistory &&
-	((x2 = XMALLOC(message_t, 2 * MAX_MSGS)) == NULL)) {
+    x2 = XMALLOC(message_t, 2 * MAX_MSGS);
+    if (x2 == NULL) {
 	error("No memory for history messages");
 	free(x);
 	return -1;
     }
-    if (selectionAndHistory)
-	MsgBlock_pending = x2;
 
+    MsgBlock_pending = x2;
     MsgBlock = x;
 
     for (i = 0; i < 2 * MAX_MSGS; i++) {
 	if (i < MAX_MSGS) {
 	    TalkMsg[i] = x;
-	    if (selectionAndHistory)
-		TalkMsg_pending[i] = x2;
+	    TalkMsg_pending[i] = x2;
 	} else {
 	    GameMsg[i - MAX_MSGS] = x;
-	    if (selectionAndHistory)
-		GameMsg_pending[i - MAX_MSGS] = x2;
+	    GameMsg_pending[i - MAX_MSGS] = x2;
 	}
 	x->txt[0] = '\0';
 	x->len = 0;
 	x->lifeTime = 0.0;
 	x++;
 
-	if (selectionAndHistory) {
-	    x2->txt[0] = '\0';
-	    x2->len = 0;
-	    x2->lifeTime = 0.0;
-	    x2++;
-	}
+	x2->txt[0] = '\0';
+	x2->len = 0;
+	x2->lifeTime = 0.0;
+	x2++;
     }
     return 0;
 }
@@ -747,18 +742,17 @@ void Free_selectionAndHistory(void)
  */
 void Add_message(const char *message)
 {
-    int			i;
-    message_t		*msg, **msg_set;
-    bool		is_game_msg = false;
-    msg_bms_t		bmsinfo = BmsNone;
-    const char		*msg2;
-    bool		is_drawn_talk_message	= false; /* not pending */
-    int			last_msg_index;
-    bool		scrolling		= false; /* really moving */
+    int i, last_msg_index;
+    message_t *msg, **msg_set;
+    msg_bms_t bmsinfo = BmsNone;
+    const char *msg2;
+    bool is_game_msg = false;
+    bool is_drawn_talk_message	= false; /* not pending */
+    bool scrolling = false; /* really moving */
 
     is_game_msg = Msg_is_game_msg(message);
     if (!is_game_msg) {
-	if (selectionAndHistory && selection.draw.state == SEL_PENDING) {
+	if (selection.draw.state == SEL_PENDING) {
 	    /* the buffer for the pending messages */
 	    msg_set = TalkMsg_pending;
 	} else {
@@ -766,7 +760,7 @@ void Add_message(const char *message)
 	    is_drawn_talk_message = true;
 	}
     } else {
-	if (selectionAndHistory && selection.draw.state == SEL_PENDING)
+	if (selection.draw.state == SEL_PENDING)
 	    msg_set = GameMsg_pending;
 	else
 	    msg_set = GameMsg;
@@ -783,7 +777,7 @@ void Add_message(const char *message)
 	     && Msg_is_from_our_team(message, &msg2))
 	bmsinfo = Msg_do_bms(msg2);
 
-    if (selectionAndHistory && is_drawn_talk_message) {
+    if (is_drawn_talk_message) {
 	/* how many talk messages */
         last_msg_index = 0;
         while (last_msg_index < maxMessages
@@ -816,7 +810,7 @@ void Add_message(const char *message)
     /*
      * scroll also the emphasizing
      */
-    if (selectionAndHistory && is_drawn_talk_message
+    if (is_drawn_talk_message
 	&& selection.draw.state == SEL_EMPHASIZED ) {
 
 	if ((scrolling && selection.draw.y2 == 0)
@@ -869,11 +863,8 @@ void Add_newbie_message(const char *message)
  */
 static void Delete_pending_messages(void)
 {
-    message_t* msg;
+    message_t *msg;
     int i;
-
-    if (!selectionAndHistory)
-	return;
 
     for (i = 0; i < maxMessages; i++) {
 	msg = TalkMsg_pending[i];
@@ -896,10 +887,8 @@ static void Delete_pending_messages(void)
  */
 void Add_pending_messages(void)
 {
-    int			i;
+    int i;
 
-    if (!selectionAndHistory)
-	return;
     /* just through all messages */
     for (i = maxMessages-1; i >= 0; i--) {
 	if (TalkMsg_pending[i]->len > 0)
@@ -926,13 +915,13 @@ static void Roundend(void)
 
 void Add_roundend_messages(other_t **order)
 {
-    static char		hackbuf[MSG_LEN];
-    static char		hackbuf2[MSG_LEN];
-    static char		kdratio[16];
-    static char		killsperround[16];
-    char		*s;
-    int			i;
-    other_t		*other;
+    static char hackbuf[MSG_LEN];
+    static char hackbuf2[MSG_LEN];
+    static char kdratio[16];
+    static char killsperround[16];
+    char *s;
+    int i;
+    other_t *other;
 
     Roundend();
 
@@ -1003,9 +992,6 @@ void Add_roundend_messages(other_t **order)
 void Print_messages_to_stdout(void)
 {
     int i;
-
-    if (!selectionAndHistory)
-	return;
 
     xpprintf("[talk messages]\n");
     for (i = 0; i < maxMessages; i++) {

@@ -85,10 +85,7 @@ void Pointer_control_set_state(bool on)
 	pointerControl = false;
 	XUngrabPointer(dpy, CurrentTime);
 	XDefineCursor(dpy, drawWindow, None);
-	if (!selectionAndHistory)
-	    XSelectInput(dpy, drawWindow, 0);
-	else
-	    XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
+	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 	XFlush(dpy);
     }
 }
@@ -102,9 +99,8 @@ void Talk_set_state(bool on)
 	    initialPointerControl = true;
 	    Pointer_control_set_state(false);
 	}
-	if (selectionAndHistory)
-	    XSelectInput(dpy, drawWindow, PointerMotionMask
-			 | ButtonPressMask | ButtonReleaseMask);
+	XSelectInput(dpy, drawWindow,
+		     PointerMotionMask | ButtonPressMask | ButtonReleaseMask);
 	Talk_map_window(true);
     }
     else {
@@ -374,8 +370,7 @@ int x_event(int new_input)
 	    break;
 
 	case SelectionClear:
-	    if (selectionAndHistory)
-		Clear_selection();
+	    Clear_selection();
 	    break;
 
 	case MapNotify:

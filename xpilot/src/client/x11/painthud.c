@@ -752,12 +752,10 @@ void Paint_messages(void)
     bot_y = WINSCALE(ext_view_height) - messageFont->descent - BORDER;
 
     /* get number of player messages */
-    if (selectionAndHistory) {
-	while (last_msg_index < maxMessages
-		&& TalkMsg[last_msg_index]->len != 0)
-	    last_msg_index++;
-	last_msg_index--; /* make it an index */
-    }
+    while (last_msg_index < maxMessages
+	   && TalkMsg[last_msg_index]->len != 0)
+	last_msg_index++;
+    last_msg_index--; /* make it an index */
 
     for (i = 0; i < 2 * maxMessages; i++) {
 	if (i < maxMessages)
@@ -773,7 +771,6 @@ void Paint_messages(void)
 	 * anymore.
 	 */
 	if (msg->lifeTime > MSG_FLASH_TIME
-	    || !selectionAndHistory
 	    || (selection.draw.state != SEL_PENDING
 		&& selection.draw.state != SEL_EMPHASIZED)) {
 	    if ((msg->lifeTime -= timePerFrame) <= 0.0) {
@@ -832,7 +829,7 @@ void Paint_messages(void)
 	/*
 	 * it's an emphasized talk message
 	 */
-	if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED
+	if (selection.draw.state == SEL_EMPHASIZED
 	    && i < maxMessages
 	    && i >= selection.draw.y1
 	    && i <= selection.draw.y2) {

@@ -225,8 +225,7 @@ static bool Key_press_show_messages(void)
 
 static bool Key_press_msgs_stdout(void)
 {
-    if (selectionAndHistory)
-	Print_messages_to_stdout();
+    Print_messages_to_stdout();
     return false;	/* server doesn't need to know */
 }
 

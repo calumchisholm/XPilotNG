@@ -1045,15 +1045,6 @@ xp_option_t default_options[] = {
 	"1: Only player messages.\n"
 	"2: Player and status messages.\n"),
 
-    XP_BOOL_OPTION(
-	"selectionAndHistory",
-	true,
-	&selectionAndHistory,
-	NULL,
-	XP_OPTFLAG_DEFAULT,
-	"Provide cut&paste for the player messages and the talk window and\n"
-	"a `history' for the talk window.\n"),
-
     XP_INT_OPTION(
 	"maxLinesInHistory",
 	32,
