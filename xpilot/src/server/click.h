@@ -123,9 +123,6 @@ typedef struct {
     click_t		cx, cy;
 } clvec;
 
-#define INSIDE_MAP(cx, cy) \
-((cx) >= 0 && (cx) < World.cwidth && (cy) >= 0 && (cy) < World.cheight)
-
 /*
  * Return the block position this click position is in.
  */

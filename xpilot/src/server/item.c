@@ -193,7 +193,7 @@ void Place_item(player *pl, int item)
 	}
 	pos.cx = WRAP_XCLICK(pos.cx);
 	pos.cy = WRAP_YCLICK(pos.cy);
-	if (!INSIDE_MAP(pos.cx, pos.cy))
+	if (!World_contains_clpos(world, pos))
 	    return;
 	/*if (!BIT(1U << world->block[bx][by], SPACE_BLOCKS))*/
 	if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL)
@@ -237,7 +237,7 @@ void Place_item(player *pl, int item)
 		pos.cy = con->pos.cy + dist * tsin(dir);
 		pos.cx = WRAP_XCLICK(pos.cx);
 		pos.cy = WRAP_YCLICK(pos.cy);
-		if (!INSIDE_MAP(pos.cx, pos.cy))
+		if (!World_contains_clpos(world, pos))
 		    continue;
 	    } else {
 		pos.cx = (int)(rfrac() * world->cwidth);
@@ -297,7 +297,7 @@ void Make_item(clpos pos, vector vel,
     object *obj;
     world_t *world = &World;
 
-    if (!INSIDE_MAP(pos.cx, pos.cy))
+    if (!World_contains_clpos(world, pos))
 	return;
 
     if (world->items[item].num >= world->items[item].max)

@@ -908,7 +908,7 @@ static void Do_warping(player *pl)
 		ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
 		ballpos.cx = WRAP_XCLICK(ballpos.cx);
 		ballpos.cy = WRAP_YCLICK(ballpos.cy);
-		if (!INSIDE_MAP(ballpos.cx, ballpos.cy)) {
+		if (!World_contains_clpos(world, ballpos)) {
 		    b->life = 0.0;
 		    continue;
 		}

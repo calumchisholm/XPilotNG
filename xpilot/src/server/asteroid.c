@@ -238,7 +238,7 @@ static void Make_asteroid(clpos pos, int size, int dir, double speed)
 
     pos.cx = WRAP_XCLICK(pos.cx);
     pos.cy = WRAP_YCLICK(pos.cy);
-    if (!INSIDE_MAP(pos.cx, pos.cy))
+    if (!World_contains_clpos(world, pos))
 	return;
 
     /*
@@ -328,7 +328,7 @@ static void Place_asteroid(void)
 	    pos.cy = con->pos.cy + dist * tsin(dir);
 	    pos.cx = WRAP_XCLICK(pos.cx);
 	    pos.cy = WRAP_YCLICK(pos.cy);
-	    if (!INSIDE_MAP(pos.cx, pos.cy))
+	    if (!World_contains_clpos(world, pos))
 		continue;
 	} else {
 	    pos.cx = (int)(rfrac() * world->cwidth);

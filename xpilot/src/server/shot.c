@@ -1390,9 +1390,10 @@ void Fire_general_laser(player *pl, int team, clpos pos,
 {
     int			life;
     pulseobject		*pulse;
+    world_t *world = &World;
 
-    if (!INSIDE_MAP(pos.cx, pos.cy)) {
-	warn("Fire_general_laser: not inside map.\n");
+    if (!World_contains_clpos(world, pos)) {
+	warn("Fire_general_laser: outside world.\n");
 	return;
     }
 

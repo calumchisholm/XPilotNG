@@ -223,10 +223,11 @@ void Make_debris(
     int			i;
     double		life;
     modifiers		mods;
+    world_t *world = &World;
 
     pos.cx = WRAP_XCLICK(pos.cx);
     pos.cy = WRAP_YCLICK(pos.cy);
-    if (!INSIDE_MAP(pos.cx, pos.cy))
+    if (!World_contains_clpos(world, pos))
 	return;
 
     if (max_life < min_life)

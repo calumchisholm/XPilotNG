@@ -28,7 +28,9 @@ char objpos_version[] = VERSION;
 
 void Object_position_set_clpos(object *obj, clpos pos)
 {
-    if (!INSIDE_MAP(pos.cx, pos.cy)) {
+    world_t *world = &World;
+
+    if (!World_contains_clpos(world, pos)) {
 	if (0) {
 	    printf("BUG!  Illegal object position %d,%d\n", pos.cx, pos.cy);
 	    printf("      Type = %d (%s)\n", obj->type, Object_typename(obj));
@@ -57,7 +59,9 @@ void Player_position_restore(player *pl)
 
 void Player_position_set_clpos(player *pl, clpos pos)
 {
-    if (!INSIDE_MAP(pos.cx, pos.cy)) {
+    world_t *world = &World;
+
+    if (!World_contains_clpos(world, pos)) {
 	if (0) {
 	    printf("BUG!  Illegal player position %d,%d\n", pos.cx, pos.cy);
 	    *(double *)(-1) = 4321.0;

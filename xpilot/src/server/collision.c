@@ -198,7 +198,7 @@ static void PlayerCollision(void)
 	if (!Player_is_playing(pl))
 	    continue;
 
-	if (!INSIDE_MAP(pl->pos.cx, pl->pos.cy)) {
+	if (!World_contains_clpos(world, pl->pos)) {
 	    SET_BIT(pl->status, KILLED);
 	    sprintf(msg, "%s left the known universe.", pl->name);
 	    Set_message(msg);
@@ -1320,6 +1320,7 @@ static void AsteroidCollision(void)
     list_iter_t	iter;
     double	damage = 0.0;
     bool	sound = false;
+    world_t *world = &World;
 
     list = Asteroid_get_list();
     if (!list)
@@ -1333,7 +1334,7 @@ static void AsteroidCollision(void)
 	if (ast->life <= 0.0)
 	    continue;
 
-	assert(INSIDE_MAP(ast->pos.cx, ast->pos.cy));
+	assert(World_contains_clpos(world, ast->pos));
 
 	Cell_get_objects(OBJ_X_IN_BLOCKS(ast), OBJ_Y_IN_BLOCKS(ast),
 			 ast->pl_radius / BLOCK_SZ + 1, 300,

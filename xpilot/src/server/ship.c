@@ -466,13 +466,14 @@ void Make_wreckage(
     double		life;
     modifiers		mods;
     double		mass, sum_mass = 0.0;
+    world_t *world = &World;
 
     if (!useWreckage)
 	return;
 
     pos.cx = WRAP_XCLICK(pos.cx);
     pos.cy = WRAP_YCLICK(pos.cy);
-    if (!INSIDE_MAP(pos.cx, pos.cy))
+    if (!World_contains_clpos(world, pos))
 	return;
 
     if (max_life < min_life)

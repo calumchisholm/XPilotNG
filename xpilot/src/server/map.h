@@ -273,11 +273,18 @@ typedef struct {
 
 static inline void World_set_block(world_t *world, blpos blk, int type)
 {
-    if (blk.bx < 0 || blk.bx >= world->x || blk.by < 0 || blk.by >= world->y) {
-	assert(0);
+    if (blk.bx < 0 || blk.bx >= world->x || blk.by < 0 || blk.by >= world->y)
 	return;
-    }
     world->block[blk.bx][blk.by] = type;
+}
+
+static inline bool World_contains_clpos(world_t *world, clpos pos)
+{
+    if (pos.cx < 0 || pos.cx >= world->cwidth)
+	return false;
+    if (pos.cy < 0 || pos.cy >= world->cheight)
+	return false;
+    return true;
 }
 
 #endif

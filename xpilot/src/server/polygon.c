@@ -137,7 +137,7 @@ void P_start_polygon(clpos pos, int style)
     poly_t t;
     world_t *world = &World;
 
-    if (!INSIDE_MAP(pos.cx, pos.cy)) {
+    if (!World_contains_clpos(world, pos)) {
 	warn("Polygon start point (%d, %d) is not inside the map"
 	     "(0 <= x < %d, 0 <= y < %d)",
 	     pos.cx, pos.cy, world->cwidth, world->cheight);
