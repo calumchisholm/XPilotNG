@@ -28,16 +28,16 @@
 
 /* stuff from xpilots 3.0 source */
 enum valType { valInt, valReal, valBool, valIPos, valString };
- 
+
 typedef struct {
-   char                  *name;
-   char                  *commandLineOption;
-   char                  *helpLine;
-   char                  *defaultValue;
-   void *variable;
-   enum valType type;
+    char *name;
+    char *commandLineOption;
+    char *helpLine;
+    char *defaultValue;
+    void *variable;
+    enum valType type;
 } optionDesc;
 
-extern                   Window            filepromptwin;
-extern char              *StrToFloat();
-extern char              oldmap[90];
+extern Window filepromptwin;
+extern char *StrToFloat();
+extern char oldmap[90];

@@ -27,12 +27,12 @@
  */
 
 typedef struct undo_t {
-   int                   x,y;
-   char                  icon;
-   struct undo_t         *next;
+    int x, y;
+    char icon;
+    struct undo_t *next;
 } undo_t;
 
-extern undo_t            *undolist;
-extern Window            changedwin;
-extern int               selectfrom_x,selectfrom_y,selectto_x,selectto_y;
-extern int               prefx, prefy;
+extern undo_t *undolist;
+extern Window changedwin;
+extern int selectfrom_x, selectfrom_y, selectto_x, selectto_y;
+extern int prefx, prefy;

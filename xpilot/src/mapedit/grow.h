@@ -28,7 +28,6 @@
 
 
 typedef struct grow_t {
-   int                   x,y;
-   struct grow_t         *next;
+    int x, y;
+    struct grow_t *next;
 } grow_t;
-

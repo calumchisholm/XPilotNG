@@ -26,5 +26,5 @@
  * $Id$
  */
 
-extern Window            helpwin;
-extern int               helppage,helpscreens,helpsel;
+extern Window helpwin;
+extern int helppage, helpscreens, helpsel;

@@ -33,137 +33,137 @@
 #include                 <X11/keysym.h>
 #include                 <stdio.h>
 #include                 <ctype.h>
- 
+
 #include                 "main.h"
 
-int                      grow_minx,grow_miny,grow_maxx,grow_maxy,
-                         grow_w,grow_h,grow_centerx, grow_centery,
-                         grow_filled = 0;
-double                   grow_xa = 1.0, grow_ya = 1.0;
-grow_t                   *grow = NULL;
+int grow_minx, grow_miny, grow_maxx, grow_maxy,
+    grow_w, grow_h, grow_centerx, grow_centery, grow_filled = 0;
+double grow_xa = 1.0, grow_ya = 1.0;
+grow_t *grow = NULL;
 
 
 int GrowMapArea(HandlerInfo info)
 {
-   grow_t                *next, *delgrow;
-   int                   i,j,growat;
-   long                  seed;
-   int                   angle;
-   float                 x,y,dx,dy;
+    grow_t *next, *delgrow;
+    int i, j, growat;
+    long seed;
+    int angle;
+    float x, y, dx, dy;
 
-   if ( info.count == 0) {
-      RoundMapArea(info);
-      DrawSelectArea();
-      /* free grow structure */
-      next = grow;
-      while ( next != NULL) {
-         delgrow = next->next;
-         free(next);
-         next = delgrow;
-      }
-      grow = NULL;
-      return 0;
-   }
+    if (info.count == 0) {
+	RoundMapArea(info);
+	DrawSelectArea();
+	/* free grow structure */
+	next = grow;
+	while (next != NULL) {
+	    delgrow = next->next;
+	    free(next);
+	    next = delgrow;
+	}
+	grow = NULL;
+	return 0;
+    }
 
-   if ( info.count == 1) {
-      DrawSelectArea();
-      ClearUndo();
+    if (info.count == 1) {
+	DrawSelectArea();
+	ClearUndo();
 
-      grow_xa = grow_ya = 1.0;
+	grow_xa = grow_ya = 1.0;
 
-      if ( selectfrom_x < 0 ) {   /* no area selected, do entire screen */
-         grow_minx = map.view_x;
-         grow_miny = map.view_y;
-         grow_maxx = map.view_x + (mapwin_width-TOOLSWIDTH)/map.view_zoom;
-         grow_maxy = map.view_y + mapwin_height/map.view_zoom;
-      } else {
-         if (selectfrom_x < selectto_x) {
-            grow_minx = selectfrom_x+map.view_x;
-            grow_maxx = selectto_x+map.view_x;
-         } else {
-            grow_minx = selectto_x+map.view_x;
-            grow_maxx = selectfrom_x+map.view_x;
-         }
-         if (selectfrom_y < selectto_y) {
-            grow_miny = selectfrom_y+map.view_y;
-            grow_maxy = selectto_y+map.view_y;
-         } else {
-            grow_miny = selectto_y+map.view_y;
-            grow_maxy = selectfrom_y+map.view_y;
-         }
-      }
-      grow_w = grow_maxx-grow_minx;
-      grow_h = grow_maxy-grow_miny;
-      grow_centerx = (grow_minx+grow_maxx)/2;
-      grow_centery = (grow_miny+grow_maxy)/2;
+	if (selectfrom_x < 0) {	/* no area selected, do entire screen */
+	    grow_minx = map.view_x;
+	    grow_miny = map.view_y;
+	    grow_maxx =
+		map.view_x + (mapwin_width - TOOLSWIDTH) / map.view_zoom;
+	    grow_maxy = map.view_y + mapwin_height / map.view_zoom;
+	} else {
+	    if (selectfrom_x < selectto_x) {
+		grow_minx = selectfrom_x + map.view_x;
+		grow_maxx = selectto_x + map.view_x;
+	    } else {
+		grow_minx = selectto_x + map.view_x;
+		grow_maxx = selectfrom_x + map.view_x;
+	    }
+	    if (selectfrom_y < selectto_y) {
+		grow_miny = selectfrom_y + map.view_y;
+		grow_maxy = selectto_y + map.view_y;
+	    } else {
+		grow_miny = selectto_y + map.view_y;
+		grow_maxy = selectfrom_y + map.view_y;
+	    }
+	}
+	grow_w = grow_maxx - grow_minx;
+	grow_h = grow_maxy - grow_miny;
+	grow_centerx = (grow_minx + grow_maxx) / 2;
+	grow_centery = (grow_miny + grow_maxy) / 2;
 
-      grow_filled = 0;
-      for (i=grow_minx;i<grow_maxx;i++) {
-         for (j=grow_miny;j<grow_maxy;j++) {
-            if (MapData(i,j) != MAP_FILLED) {
-               ChangeMapData(i,j,' ',1);
-            } else {
-               grow_filled++;
-               next = grow;
-               grow = (grow_t *) malloc(sizeof(grow_t));
-               grow->x = i;
-               grow->y = j;
-               grow->next = next;
-            }
-         }
-      }
+	grow_filled = 0;
+	for (i = grow_minx; i < grow_maxx; i++) {
+	    for (j = grow_miny; j < grow_maxy; j++) {
+		if (MapData(i, j) != MAP_FILLED) {
+		    ChangeMapData(i, j, ' ', 1);
+		} else {
+		    grow_filled++;
+		    next = grow;
+		    grow = (grow_t *) malloc(sizeof(grow_t));
+		    grow->x = i;
+		    grow->y = j;
+		    grow->next = next;
+		}
+	    }
+	}
 
-      /* place a square in the center if there are none */
-      if (grow == NULL) {
-         ChangeMapData(grow_centerx,grow_centery,MAP_FILLED,1);
-         grow = (grow_t *) malloc(sizeof(grow_t));
-         grow->x = grow_centerx;
-         grow->y = grow_centery;
-         grow->next = NULL;
-         grow_filled=1;
-         if (grow_w > grow_h) {
-            grow_ya = ((double) grow_h)/ ((double) grow_w);
-         } else {
-            grow_xa = ((double) grow_w)/ ((double) grow_h);
-         }
-      }
+	/* place a square in the center if there are none */
+	if (grow == NULL) {
+	    ChangeMapData(grow_centerx, grow_centery, MAP_FILLED, 1);
+	    grow = (grow_t *) malloc(sizeof(grow_t));
+	    grow->x = grow_centerx;
+	    grow->y = grow_centery;
+	    grow->next = NULL;
+	    grow_filled = 1;
+	    if (grow_w > grow_h) {
+		grow_ya = ((double) grow_h) / ((double) grow_w);
+	    } else {
+		grow_xa = ((double) grow_w) / ((double) grow_h);
+	    }
+	}
 
-      time(&seed);
-      srand((unsigned int)seed);
-   }
+	time(&seed);
+	srand((unsigned int) seed);
+    }
 
-   if (grow_filled > 1) {
-      growat = rand() % (grow_filled-1);
-      next = grow;
-      while ( (next != NULL) && (growat != 0) ) {
-         next = next->next;
-         growat--;
-      }
-   } else {
-      next = grow;
-   }
+    if (grow_filled > 1) {
+	growat = rand() % (grow_filled - 1);
+	next = grow;
+	while ((next != NULL) && (growat != 0)) {
+	    next = next->next;
+	    growat--;
+	}
+    } else {
+	next = grow;
+    }
 
-   angle = rand() % 1000;
+    angle = rand() % 1000;
 
-   dx = grow_xa * cos ( 2*3.14*angle/1000 );
-   dy = grow_ya * sin ( 2*3.14*angle/1000 );
-   x = next->x + dx;
-   y = next->y + dy;
-   while (MapData((int) x, (int) y) == MAP_FILLED) {
-      x += dx;
-      y += dy;
-   }
-   if (  ((int) x > grow_maxx) || ((int) y > grow_maxy) ||
-        ((int) x < grow_minx) || ((int) y < grow_miny) ) {
-      return 1;
-   }
-   ChangeMapData((int) x,(int) y,MAP_FILLED,1);
-   next = grow;
-   grow = (grow_t *) malloc(sizeof(grow_t));
-   grow->x = (int) x;
-   grow->y = (int) y;
-   grow->next = next;
-   grow_filled++;
+    dx = grow_xa * cos(2 * 3.14 * angle / 1000);
+    dy = grow_ya * sin(2 * 3.14 * angle / 1000);
+    x = next->x + dx;
+    y = next->y + dy;
+    while (MapData((int) x, (int) y) == MAP_FILLED) {
+	x += dx;
+	y += dy;
+    }
+    if (((int) x > grow_maxx) || ((int) y > grow_maxy) ||
+	((int) x < grow_minx) || ((int) y < grow_miny)) {
+	return 1;
+    }
+    ChangeMapData((int) x, (int) y, MAP_FILLED, 1);
+    next = grow;
+    grow = (grow_t *) malloc(sizeof(grow_t));
+    grow->x = (int) x;
+    grow->y = (int) y;
+    grow->next = next;
+    grow_filled++;
 
-   return 0;
+    return 0;
 }

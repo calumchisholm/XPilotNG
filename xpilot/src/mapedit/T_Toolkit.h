@@ -34,7 +34,7 @@
 #include                 <stdio.h>
 #include                 <stdlib.h>
 #include                 <string.h>
- 
+
 #include                 "T_Form.h"
 #include                 "T_Popup.h"
 #include                 "T_Handler.h"
@@ -57,14 +57,12 @@
 #define                  BKGR            T_Back_GC
 #endif
 
-typedef char             max_str_t[255];
+typedef char max_str_t[255];
 
-extern int               screennum, root_width, root_height;
-extern Display           *display;
-extern GC                T_Back_GC, T_Fore_GC, T_Hlgt_GC, T_Shdw_GC;
-extern XFontStruct       *T_Font;
-extern char              *T_Background,*T_Foreground,*T_Shadow,*T_Highlight;
-extern Atom              ProtocolAtom;
-extern Atom              KillAtom;
-
-
+extern int screennum, root_width, root_height;
+extern Display *display;
+extern GC T_Back_GC, T_Fore_GC, T_Hlgt_GC, T_Shdw_GC;
+extern XFontStruct *T_Font;
+extern char *T_Background, *T_Foreground, *T_Shadow, *T_Highlight;
+extern Atom ProtocolAtom;
+extern Atom KillAtom;

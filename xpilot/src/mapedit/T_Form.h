@@ -42,31 +42,31 @@
 
 
 typedef struct T_Field_t {
-   char                  *name, *label;
-   short                 type, active;
-   short                 x,y,width,height,x2,y2;
-   int                   (*handler)();
-   int                   *intvar;
-   char                  *charvar;
-   int                   charvar_length;
-   short                 null;
-   struct T_Field_t      *next;
+    char *name, *label;
+    short type, active;
+    short x, y, width, height, x2, y2;
+    int (*handler) ();
+    int *intvar;
+    char *charvar;
+    int charvar_length;
+    short null;
+    struct T_Field_t *next;
 } T_Field_t;
 
 typedef struct T_Form_t {
-   Window                window;
-   T_Field_t             *field;
-   T_Field_t             *entry;
-   int                   entry_cursor, entry_pos;
-   char                  *entry_restore;
-   struct T_Form_t       *next;
+    Window window;
+    T_Field_t *field;
+    T_Field_t *entry;
+    int entry_cursor, entry_pos;
+    char *entry_restore;
+    struct T_Form_t *next;
 } T_Form_t;
 
 typedef struct {
-   T_Form_t              *form;
-   T_Field_t             *field;
-   unsigned int          button;
-   int                   x,y,count;
+    T_Form_t *form;
+    T_Field_t *field;
+    unsigned int button;
+    int x, y, count;
 } HandlerInfo;
 
-extern T_Form_t          *T_Form;
+extern T_Form_t *T_Form;

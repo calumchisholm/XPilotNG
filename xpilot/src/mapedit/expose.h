@@ -27,21 +27,21 @@
  */
 
 typedef struct {
-   int                   color;
-   int                   num_points;
-   float                 x[5],y[5];
+    int color;
+    int num_points;
+    float x[5], y[5];
 } segment_t;
 
 typedef struct {
-   float                 x,y,width,height;
-   int                   start,end;
+    float x, y, width, height;
+    int start, end;
 } arc_t;
 
-extern segment_t         mapicon_seg[35];
-extern segment_t         mapicondet_seg[4];
-extern int               mapicon_ptr[91];
-extern char              iconmenu[36];
+extern segment_t mapicon_seg[35];
+extern segment_t mapicondet_seg[4];
+extern int mapicon_ptr[91];
+extern char iconmenu[36];
 
 
-extern int               smlmap_x, smlmap_y, smlmap_width, smlmap_height;
-extern float             smlmap_xscale, smlmap_yscale;
+extern int smlmap_x, smlmap_y, smlmap_width, smlmap_height;
+extern float smlmap_xscale, smlmap_yscale;

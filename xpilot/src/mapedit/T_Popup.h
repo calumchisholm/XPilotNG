@@ -30,8 +30,8 @@
 #define                  POPUPBTNHEIGHT    30
 
 typedef struct T_Popup_t {
-   Window                window;
-   struct T_Popup_t      *next;
+    Window window;
+    struct T_Popup_t *next;
 } T_Popup_t;
 
-extern T_Popup_t         *T_Popup;
+extern T_Popup_t *T_Popup;

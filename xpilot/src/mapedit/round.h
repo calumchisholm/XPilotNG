@@ -31,4 +31,3 @@
  * July 20, 1993
  * Adapted from code writted by Bert Gijsbers for xmapedit v0.00
  */
- 
