@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -25,7 +24,7 @@
 #ifndef	METASERVER_H
 #define	METASERVER_H
 
-#define META_PORT	5500
+#define META_PORT	5500	/* for server-metaserver communication */
 #define META_HOST	"meta.xpilot.org"
 #define META_HOST_TWO	"meta2.xpilot.org"
 #define META_IP		"129.242.13.151"
