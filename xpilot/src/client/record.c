@@ -849,12 +849,12 @@ void Record_toggle(void)
 {
 #if !(defined(_WINDOWS) && defined(PENS_OF_PLENTY))
     /* No recording available with PEN_OF_PLENTY under Windows. */
-    if (record_filename != NULL) {
+    if (record_filename != NULL && strlen(record_filename) > 0) {
 	if (!record_start) {
 	    record_start = true;
 	    if (!recordFP) {
 		if ((recordFP = fopen(record_filename, "w")) == NULL) {
-		    perror("Unable to open record file");
+		    warn("%s: %s", record_filename, strerror(errno));
 		    free(record_filename);
 		    record_filename = NULL;
 		    record_start = false;
@@ -901,26 +901,23 @@ void Record_cleanup(void)
 void Record_init(const char *filename)
 {
     rd = Xdrawing;
-    if (filename && strlen(filename))
-	record_filename = xp_safe_strdup(filename);
+    assert(filename != NULL);
+    if (record_filename)
+	xp_free(record_filename);
+    record_filename = xp_safe_strdup(filename);
 }
 
 
 #ifdef OPTIONHACK
 
-static char *recordFileName = NULL;
-
-/* kps - TODO */
 static bool setRecordFile(xp_option_t *opt, const char *value)
 {
     (void)opt;
-    if (strlen(value) == 0)
-	return true;
 
-    if (recordFileName)
-	return true;
-
-    recordFileName = xp_safe_strdup(value);
+    assert(value);
+    /* Don't allow changing record file after file has been opened. */
+    if (recordFP != NULL)
+	return false;
     Record_init(value);
     return true;
 }
@@ -928,7 +925,7 @@ static bool setRecordFile(xp_option_t *opt, const char *value)
 static char *getRecordFile(xp_option_t *opt)
 {
     (void)opt;
-    return recordFileName;
+    return record_filename;
 }
 
 xp_option_t record_options[] = {
