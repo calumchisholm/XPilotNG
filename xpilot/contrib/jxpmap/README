@@ -1,0 +1,44 @@
+jXPMap - A map editor for the new XPilot map format
+
+Copyright © 2001 by Juha Lindström
+
+1. Overview
+
+This is a simple map editor for editing the XML based map files 
+used in the new xpilot server by Uoti Urpala. The new server
+allows the map to be defined in terms of arbitrary polygons and
+the new client supprts map-specific textures, so the new maps can
+be visually a lot nicer compared to the old maps. This editor is
+supposed to support all the new stuff so that people could easily
+experiment with the new map format.
+
+2. Requirements
+
+The editor is implemented in java and it requires the Java Runtime 
+Environment (JRE) 1.3. It might also work with 1.2 but I haven't 
+tested that. In order to compile it you need also a java compiler, 
+so if you wan't to use this editor and have nothing java related 
+installed, you'd better download the whole Java2 SDK 1.3 from 
+http://java.sun.com/j2se.
+
+The editor uses JAXP 1.0.1 XML parser from Sun. You can download it
+from http://java.sun.com/xml.
+
+3. Installation
+
+Before you can use the editor you need to build it. In the current 
+directory give a command like the following:
+
+% javac -classpath .:<jaxp-dir>/parser.jar:<jaxp-dir>/jaxp.jar org/xpilot/jxpmap/*.java
+
+Substitute <jaxp-dir> with the directory you installed JAXP to.
+
+After the compilation is finished you should be able to run it with
+command like:
+
+% java -classpath .:<jaxp-dir>/parser.jar:<jaxp-dir>/jaxp.jar org.xpilot.jxpmap.MainFrame
+
+4. Other issues
+
+In case you have any questions, suggestions, etc. feel free to mail me to 
+juhal@users.sourceforge.net.
