@@ -127,6 +127,7 @@ static int Config_create_texturedWalls(int widget_desc, int *height);
 static int Config_create_texturedObjects(int widget_desc, int *height);
 static int Config_create_fullColor(int widget_desc, int *height);
 static int Config_create_slidingRadar(int widget_desc, int *height);
+static int Config_create_showItems(int widget_desc, int *height);
 static int Config_create_showItemsTime(int widget_desc, int *height);
 static int Config_create_showScoreDecimals(int widget_desc, int *height);
 static int Config_create_backgroundPointDist(int widget_desc, int *height);
@@ -315,6 +316,7 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_fullColor,
     Config_create_texturedObjects,
     Config_create_slidingRadar,
+    Config_create_showItems,
     Config_create_showItemsTime,
     Config_create_showScoreDecimals,
     Config_create_backgroundPointDist,
@@ -1011,6 +1013,15 @@ static int Config_create_backgroundPointDist(int widget_desc, int *height)
     return Config_create_int(widget_desc, height,
 			     "backgroundPointDist", &map_point_distance, 0, 10,
 			     Config_update_dots, NULL);
+}
+
+static int Config_create_showItems(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "showItems",
+			    BIT(instruments, SHOW_ITEMS)
+				? true : false,
+			    Config_update_instruments,
+			    (void *) SHOW_ITEMS);
 }
 
 static int Config_create_showItemsTime(int widget_desc, int *height)
@@ -2014,6 +2025,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "showMyShipShape", BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE));
     Config_save_bool(fp, "ballMsgScan", BIT(hackedInstruments, BALL_MSG_SCAN));
     Config_save_bool(fp, "slidingRadar", BIT(instruments, SHOW_SLIDING_RADAR));
+    Config_save_bool(fp, "showItems", BIT(instruments, SHOW_ITEMS));
     Config_save_float(fp, "showItemsTime", showItemsTime);
     Config_save_int(fp, "showScoreDecimals", showScoreDecimals);
     Config_save_bool(fp, "outlineWorld", BIT(instruments, SHOW_OUTLINE_WORLD));

@@ -741,12 +741,19 @@ option options[] = {
 	"Should messages appear on screen.\n"
     },
     {
+	"showItems",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should owned items be displayed permanently on the HUD?\n"
+    },
+    {
 	"showItemsTime",
 	NULL,
 	"3.0",
 	KEY_DUMMY,
-	"The time in seconds to display item information on the HUD when\n"
-	"it has changed.\n"
+	"If showItems is false, the time in seconds to display item\n"
+	"information on the HUD when it has changed.\n"
     },
     {
 	"showScoreDecimals",
@@ -3269,6 +3276,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "treatZeroSpecial", &hackedInstruments,
 		     TREAT_ZERO_SPECIAL);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
+    Get_bit_resource(rDB, "showItems", &instruments, SHOW_ITEMS);
     Get_bit_resource(rDB, "clockAMPM", &instruments, SHOW_CLOCK_AMPM_FORMAT);
     Get_bit_resource(rDB, "outlineWorld", &instruments, SHOW_OUTLINE_WORLD);
     Get_bit_resource(rDB, "filledWorld", &instruments, SHOW_FILLED_WORLD);

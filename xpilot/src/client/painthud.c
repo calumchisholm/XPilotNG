@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -505,14 +504,19 @@ void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	if (i == ITEM_FUEL)
 	    continue;
 
-	if (num != lastNumItems[i]) {
-	    /* kps - change */
-	    numItemsTime[i] = (int)(showItemsTime * (float)FPS);
+	if (BIT(instruments, SHOW_ITEMS)) {
 	    lastNumItems[i] = num;
-	}
-	if (numItemsTime[i]-- <= 0) {
-	    numItemsTime[i] = 0;
-	    num = -1;
+	    if (num <= 0)
+		num = -1;
+	} else {
+	    if (num != lastNumItems[i]) {
+		numItemsTime[i] = (int)(showItemsTime * (DFLOAT)FPS);
+		lastNumItems[i] = num;
+	    }
+	    if (numItemsTime[i]-- <= 0) {
+		numItemsTime[i] = 0;
+		num = -1;
+	    }
 	}
 
 	if (num >= 0) {

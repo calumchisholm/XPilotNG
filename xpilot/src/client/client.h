@@ -46,6 +46,7 @@
 
 
 #define SHOW_SLIDING_RADAR	(1L << 8)
+#define SHOW_ITEMS		(1L << 14)
 #define SHOW_MESSAGES		(1L << 15)
 
 #define SHOW_OUTLINE_WORLD	(1L << 17)

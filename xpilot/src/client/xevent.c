@@ -442,20 +442,7 @@ bool Key_press_talk(keys_t key)
 
 bool Key_press_show_items(keys_t key)
 {
-    /*TOGGLE_BIT(instruments, SHOW_ITEMS);*/
-    /* kps fix - see painthud.c, lines 450- */
-    int i;
-
-    /*
-     * kps hack - change lastNumItems value for all
-     * item types, this will force a redraw of the
-     * items drawn on HUD.
-     */
-    for (i = 0; i < NUM_ITEMS; i++) {
-	if (numItems[i] != 0)
-	    lastNumItems[i]++;
-    }
-
+    TOGGLE_BIT(instruments, SHOW_ITEMS);
     return false;	/* server doesn't need to know */
 }
 
