@@ -745,7 +745,7 @@ static void Robot_create(world_t *world)
     robot->power_s = MAX_PLAYER_POWER;
     robot->check = 0;
     if (BIT(world->rules->mode, TEAM_PLAY)) {
-	robot->team = Pick_team(PickForRobot);
+	robot->team = Pick_team(PL_TYPE_ROBOT);
 	teamp = Team_by_index(world, robot->team);
 	assert(teamp); /* if teamplay, can't have TEAM_NOT_SET */
 	teamp->NumMembers++;

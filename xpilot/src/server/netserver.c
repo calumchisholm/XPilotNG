@@ -1014,7 +1014,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		connp->team = TEAM_NOT_SET;
 	}
 	if (connp->team == TEAM_NOT_SET)
-	    connp->team = Pick_team(PickForHuman);
+	    connp->team = Pick_team(PL_TYPE_HUMAN);
     } else
 	connp->team = TEAM_NOT_SET;
 

@@ -383,7 +383,7 @@ int Pick_team(int pick_for_type)
 
     /* If game_lock is on, can't join playing teams (might be able to join
      * paused). */
-    if (game_lock && pick_for_type == PickForHuman)
+    if (game_lock && pick_for_type == PL_TYPE_HUMAN)
 	return TEAM_NOT_SET;
 
     for (i = 0; i < MAX_TEAMS; i++) {
@@ -393,7 +393,7 @@ int Pick_team(int pick_for_type)
 	available_teams[i] = 0;
     }
     if (options.restrictRobots) {
-	if (pick_for_type == PickForRobot) {
+	if (pick_for_type == PL_TYPE_ROBOT) {
 	    if (free_bases[options.robotTeam] > 0)
 		return options.robotTeam;
 	    else
@@ -401,7 +401,7 @@ int Pick_team(int pick_for_type)
 	}
     }
     if (options.reserveRobotTeam) {
-	if (pick_for_type != PickForRobot)
+	if (pick_for_type != PL_TYPE_ROBOT)
 	    free_bases[options.robotTeam] = 0;
     }
 

@@ -111,15 +111,6 @@ static inline double SHOT_MULT(object_t *obj)
     return 1.0;
 }
 
-
-enum TeamPickType {
-    PickForHuman	= 1,
-    PickForRobot	= 2
-};
-
-
-
-
 #ifndef	_WINDOWS
 #define	APPNAME	"xpilot-ng-server"
 #else

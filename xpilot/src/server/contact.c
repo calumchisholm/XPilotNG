@@ -744,12 +744,12 @@ void Queue_loop(world_t *world)
 			    qp->team = TEAM_NOT_SET;
 		    }
 		    if (qp->team == TEAM_NOT_SET) {
-			qp->team = Pick_team(PickForHuman);
+			qp->team = Pick_team(PL_TYPE_HUMAN);
 			if (qp->team == TEAM_NOT_SET && !game_lock) {
 			    if (NumRobots
 				> world->teams[options.robotTeam].NumRobots) {
 				Kick_robot_players(world, TEAM_NOT_SET);
-				qp->team = Pick_team(PickForHuman);
+				qp->team = Pick_team(PL_TYPE_HUMAN);
 			    }
 			}
 		    }
