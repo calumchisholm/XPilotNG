@@ -28,6 +28,7 @@ xpilotsound_DATA = \
 	sstart.wav \
 	success.wav \
 	waiting.wav \
-	zap.wav
+	zap.wav \
+	thrust.wav
 
 EXTRA_DIST = $(xpilotsound_DATA)
