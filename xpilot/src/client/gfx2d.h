@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -33,27 +32,27 @@ typedef unsigned int RGB_COLOR;
 #define BLUE_VALUE(col) (((col) >>16) &255)
 
 /*
-    Purpose: bounding box for one image or a set of images.
-    The xmin and ymin elements give the lowest coordinate which
-    has a non-black color value.  The xmax and ymax elements
-    give the highest coordinate which has a non-black color.
-    The number of pixels covered by one box is given by:
-	(xmax + 1 - xmin, ymax + 1 - ymin).
-*/
+ * Purpose: bounding box for one image or a set of images.
+ * The xmin and ymin elements give the lowest coordinate which
+ * has a non-black color value.  The xmax and ymax elements
+ * give the highest coordinate which has a non-black color.
+ * The number of pixels covered by one box is given by:
+ * (xmax + 1 - xmin, ymax + 1 - ymin).
+ */
 typedef struct {
-    int		xmin, ymin;
-    int		xmax, ymax;
+    int xmin, ymin;
+    int xmax, ymax;
 } bbox_t;
 
 
 /*
-    Purpose: A device/os independent structure to do keep 24bit images in.
-    an instance of xp_picture_t can contain more than 1 image, 
-    This feature is  useful for structural identical bitmaps (example: items), 
-    and rotated images. When dealing with rotated images, the first image
-    in the xp_picture_t structure is used as texture for the transformation of the 
-    others.
-*/
+ * Purpose: A device/os independent structure to do keep 24bit images in.
+ * an instance of xp_picture_t can contain more than 1 image, 
+ * This feature is  useful for structural identical bitmaps (example: items), 
+ * and rotated images. When dealing with rotated images, the first image
+ * in the xp_picture_t structure is used as texture for the transformation of
+ * the others.
+ */
 
 typedef struct {
     int		width, height;
@@ -63,7 +62,6 @@ typedef struct {
     bbox_t	*bbox;
 } xp_picture_t;
 
-/*int Picture_init(xp_picture_t *picture, int height, int width, int images);*/
 int Picture_init(xp_picture_t *picture, const char *filename, int count);
 int Picture_load( xp_picture_t *picture, const char *path);
 int Picture_rotate(xp_picture_t *picture);
