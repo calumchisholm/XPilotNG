@@ -53,9 +53,41 @@ char robotdef_version[] = VERSION;
 #define TARGET_KILL		(1 << 1)
 #define NEED_FUEL		(1 << 2)
 
+static bool Empty_space_for_ball(int bx, int by)
+{
+    int group;
+    hitmask_t hitmask = BALL_BIT; /* kps - ok ? */
+    clpos_t pos;
+
+    pos.cx = BLOCK_CENTER(bx);
+    pos.cy = BLOCK_CENTER(by);
+    group = shape_is_inside(pos.cx, pos.cy,
+			    hitmask, NULL, &filled_wire, 0);
+    if (group == NO_GROUP)
+	return true;
+    return false;
+}
+
 /*
  * Map objects a robot can fly through without damage.
  */
+static bool Really_empty_space(player_t *pl, int bx, int by)
+{
+    int group;
+    hitmask_t hitmask = NONBALL_BIT; /* kps - ok ? */
+    clpos_t pos;
+
+    UNUSED_PARAM(pl);
+
+    pos.cx = BLOCK_CENTER(bx);
+    pos.cy = BLOCK_CENTER(by);
+    group = shape_is_inside(pos.cx, pos.cy,
+			    hitmask, NULL, &filled_wire, 0);
+    if (group == NO_GROUP)
+	return true;
+    return false;
+}
+
 
 
 /*
@@ -340,86 +372,6 @@ static void Robot_default_invite(player_t *pl, player_t *inviter)
 	Accept_alliance(pl, inviter);
     else
 	Refuse_alliance(pl, inviter);
-}
-
-
-
-static bool Really_empty_space(player_t *pl, int x, int y)
-{
-    int group, cx, cy, i, j;
-    int delta = BLOCK_CLICKS / 4;
-    int inside = 0, outside = 0;
-    hitmask_t hitmask = NONBALL_BIT; /* kps - ok ? */
-
-    UNUSED_PARAM(pl);
-    /*
-     * kps hack - check a few positions inside the block, if none of them
-     * are inside, assume it is empty
-     */
-    cx = BLOCK_CENTER(x);
-    cy = BLOCK_CENTER(y);
-
-    for (i = -1; i <= 1; i++) {
-	for (j = -1; j <= 1; j++) {
-	    group = is_inside(cx + i * delta, cy + j * delta, hitmask, NULL);
-	    if (group != NO_GROUP)
-		inside++;
-	    else
-		outside++;
-	}
-    }
-
-    if (inside > 0)
-	return false;
-    return true;
-
-
-    /* blockbased:
-
-       int	type = world->block[x][y];
-
-    if (EMPTY_SPACE(type))
-	return true;
-    switch (type) {
-    case FILLED:
-    case REC_LU:
-    case REC_LD:
-    case REC_RU:
-    case REC_RD:
-    case FUEL:
-    case TREASURE:
-	return false;
-
-    case WORMHOLE:
-	if (!options.wormholeVisible
-	    || world->wormHoles[Map_get_itemid(x, y)].type == WORM_OUT) {
-	    return true;
-	} else {
-	    return false;
-	}
-
-    case TARGET:
-	if (!options.targetTeamCollision
-	    && BIT(world->rules->mode, TEAM_PLAY)
-	    && world->targets[Map_get_itemid(x, y)].team == pl->team) {
-	    return true;
-	} else {
-	    return false;
-	}
-
-    case CANNON:
-	if (options.teamImmunity
-	    && BIT(world->rules->mode, TEAM_PLAY)
-	    && world->cannon[Map_get_itemid(x, y)].team == pl->team) {
-	    return true;
-	} else {
-	    return false;
-	}
-
-    default:
-	break;
-    }
-    return false;*/
 }
 
 static inline int decide_travel_dir(player_t *pl)
@@ -1420,7 +1372,7 @@ static bool Ball_handler(player_t *pl)
 		clear_path = false;
 		continue;
 	    }
-	    if (!BIT(1U << world->block[dx][dy], SPACE_BLOCKS)) {
+	    if (!Empty_space_for_ball(dx, dy)) {
 		clear_path = false;
 		continue;
 	    }

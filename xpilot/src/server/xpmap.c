@@ -107,17 +107,14 @@ static void Create_blockmap_from_polygons(world_t *world)
     int i, h, type;
     blkpos_t blk;
     clpos_t pos;
-    shape_t f_wire, r_wire, u_wire, l_wire, d_wire;
-    shapepos_t f_coords[4], r_coords[3], u_coords[3], l_coords[3], d_coords[3];
+    shape_t r_wire, u_wire, l_wire, d_wire;
+    shapepos_t r_coords[3], u_coords[3], l_coords[3], d_coords[3];
 
-    f_wire.num_points = 4;
     r_wire.num_points = 3;
     u_wire.num_points = 3;
     l_wire.num_points = 3;
     d_wire.num_points = 3;
 
-    for (i = 0; i < 4; i++)
-	f_wire.pts[i] = &f_coords[i];
     for (i = 0; i < 3; i++)
 	r_wire.pts[i] = &r_coords[i];
     for (i = 0; i < 3; i++)
@@ -141,16 +138,6 @@ static void Create_blockmap_from_polygons(world_t *world)
      */
 
     h = BLOCK_CLICKS / 2;
-
-    /* whole (filled) block */
-    f_coords[0].clk.cx = -h;
-    f_coords[0].clk.cy = -h;
-    f_coords[1].clk.cx = h - 1;
-    f_coords[1].clk.cy = -h;
-    f_coords[2].clk.cx = h - 1;
-    f_coords[2].clk.cy = h - 1;
-    f_coords[3].clk.cx = -h;
-    f_coords[3].clk.cy = h - 1;
 
     /* right part of block */
     r_coords[0].clk.cx = 0;
@@ -267,7 +254,7 @@ static void Create_blockmap_from_polygons(world_t *world)
 
 	    pos = Block_get_center_clpos(blk);
 	    group = shape_is_inside(pos.cx, pos.cy,
-				    BALL_BIT, NULL, &f_wire, 0);
+				    BALL_BIT, NULL, &filled_wire, 0);
 	    if (group == NO_GROUP || group == 0)
 		continue;
 	    gp = groupptr_by_id(group);

@@ -339,6 +339,31 @@ int World_place_friction_area(world_t *world, clpos_t pos, double fric)
     return ind;
 }
 
+shape_t filled_wire;
+shapepos_t filled_coords[4];
+
+static void Filled_wire_init(void)
+{
+    int i, h;
+
+    filled_wire.num_points = 4;
+
+    for (i = 0; i < 4; i++)
+	filled_wire.pts[i] = &filled_coords[i];
+
+    h = BLOCK_CLICKS / 2;
+
+    /* whole (filled) block */
+    filled_coords[0].clk.cx = -h;
+    filled_coords[0].clk.cy = -h;
+    filled_coords[1].clk.cx = h - 1;
+    filled_coords[1].clk.cy = -h;
+    filled_coords[2].clk.cx = h - 1;
+    filled_coords[2].clk.cy = h - 1;
+    filled_coords[3].clk.cx = -h;
+    filled_coords[3].clk.cy = h - 1;
+}
+
 void World_init(world_t *world)
 {
     int i;
@@ -347,6 +372,8 @@ void World_init(world_t *world)
 
     for (i = 0; i < MAX_TEAMS; i++)
 	Team_by_index(world, i)->SwapperId = NO_ID;
+
+    Filled_wire_init();
 }
 
 void World_free(world_t *world)

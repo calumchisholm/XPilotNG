@@ -109,7 +109,6 @@ extern double		friction;
 extern int		roundtime;
 extern int		roundsPlayed;
 extern long		KILLING_SHOTS;
-extern unsigned		SPACE_BLOCKS;
 extern double		timeStep;
 extern double		timePerFrame;
 extern double		ecmSizeFactor;
@@ -404,11 +403,7 @@ extern struct options {
 } options;
 
 
-extern shape_t		ball_wire;
-extern shape_t		wormhole_wire;
-
-/* determine if a block is one of SPACE_BLOCKS */
-#define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
+extern shape_t ball_wire, wormhole_wire, filled_wire;
 
 static inline vector_t World_gravity(world_t *world, clpos_t pos)
 {

@@ -305,15 +305,9 @@ static void Make_asteroid(world_t *world, clpos_t pos,
 static void Place_asteroid(world_t *world)
 {
     int place_count, dir, dist, i;
-    unsigned space;
     bool okay = false;
     asteroid_concentrator_t *con;
     clpos_t pos;
-
-    space = SPACE_BLOCKS;
-    space &= ~(BASE_BIT | WORMHOLE_BIT);
-    space |= FRICTION_BIT;
-    /* would be dubious: space |= CANNON_BIT; */
 
     if (world->NumAsteroidConcs > 0
 	&& rfrac() < options.asteroidConcentratorProb)

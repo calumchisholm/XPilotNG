@@ -29,16 +29,6 @@
 
 char walls_version[] = VERSION;
 
-/* kps - remove when all code has been polygonized */
-unsigned SPACE_BLOCKS = (
-	SPACE_BIT | BASE_BIT | WORMHOLE_BIT |
-	POS_GRAV_BIT | NEG_GRAV_BIT | CWISE_GRAV_BIT | ACWISE_GRAV_BIT |
-	UP_GRAV_BIT | DOWN_GRAV_BIT | RIGHT_GRAV_BIT | LEFT_GRAV_BIT |
-	DECOR_LU_BIT | DECOR_LD_BIT | DECOR_RU_BIT | DECOR_RD_BIT |
-	DECOR_FILLED_BIT | CHECK_BIT | ITEM_CONCENTRATOR_BIT |
-	FRICTION_BIT | ASTEROID_CONCENTRATOR_BIT
-    );
-
 struct move_parameters mp;
 double wallBounceExplosionMult;
 static char msg[MSG_LEN];
