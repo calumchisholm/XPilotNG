@@ -63,7 +63,7 @@ static void Print_default_value(xp_option_t *opt)
 	printf("        The default value is: %d.\n", opt->int_defval);
 	break;
     case xp_double_option:
-	printf("        The default value is: %f.\n", opt->dbl_defval);
+	printf("        The default value is: %.3lf.\n", opt->dbl_defval);
 	break;
     case xp_string_option:
 	if (opt->str_defval && strlen(opt->str_defval) > 0)
@@ -245,9 +245,9 @@ typedef struct {
     keys_t key;
 } xp_keydefs_t;
 
-xp_keydefs_t *xpkeydefs = NULL;
-int num_xpkeydefs = 0;
-int max_xpkeydefs = 0;
+static xp_keydefs_t *xpkeydefs = NULL;
+static int num_xpkeydefs = 0;
+static int max_xpkeydefs = 0;
 
 keys_t Generic_lookup_key(xp_keysym_t ks, bool reset)
 {
@@ -383,58 +383,6 @@ static bool Set_key_option(xp_option_t *opt, const char *value)
     xp_free(valcpy);
     return true;
 }
-
-#if 0
-static xp_key_binding_callback_t key_binding_callback = NULL;
-
-void Set_key_binding_callback(xp_key_binding_callback_t callback)
-{
-    key_binding_callback = callback;
-}
-
-
-static bool Set_key_option(xp_option_t *opt, const char *value)
-{
-    bool retval = true;
-    char *str, *valcpy;
-
-    assert(opt);
-    assert(opt->name);
-    assert(opt->type == xp_key_option);
-    assert(value);
-
-    valcpy = xp_safe_strdup(value);
-    if (opt->key_string)
-	xp_free(opt->key_string);
-    opt->key_string = xp_safe_strdup(value);
-
-    /*
-     * No setfunc supported, rather a key binding callback is used.
-     */
-    for (str = strtok(valcpy, " \t\r\n");
-	 str != NULL;
-	 str = strtok(NULL, " \t\r\n")) {
-	bool ok;
-	/*
-	 * The platform specific code must register a callback
-	 * for us to bind keys.
-	 */
-	assert(key_binding_callback != NULL);
-	ok = (*key_binding_callback) (opt->key, str);
-	if (!ok)
-	    warn("Invalid keysym \"%s\" for key \"%s\".\n",
-		 str, opt->name);
-	/*
-	 * else printf("Keysym \"%s\" was successfully bound to key
-	 * \"%s\".\n", str, opt->name); 
-	 */
-    }
-
-    xp_free(valcpy);
-    /* not currently returning false even if keysyms are invalid */
-    return retval;
-}
-#endif
 
 static bool is_legal_value(xp_option_type_t type, const char *value)
 {
