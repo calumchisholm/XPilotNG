@@ -35,7 +35,6 @@ static int	playerArrayNumber;
  */
 player *Players(int ind)
 {
-    /* Players(-1) evaluates to NULL */
     if (ind == -1)
 	return NULL;
 
@@ -52,6 +51,15 @@ player *Players(int ind)
  */
 int GetInd(int id)
 {
+    if (id == NO_ID)
+	return -1;
+
+    /*
+     * kps - in some places where we look at the id we don't
+     * bother about observers (maybe observers should be
+     * renamed to spectators).
+     * This should be cleaned up in general.
+     */
     if (id < 0 || id >= NUM_IDS + MAX_OBSERVERS + 1) {
 	warn("GetInd: id = %d, array size = %d\n",
 	     id, NUM_IDS + MAX_OBSERVERS + 1);
