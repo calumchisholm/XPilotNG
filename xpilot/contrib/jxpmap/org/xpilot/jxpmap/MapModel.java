@@ -207,11 +207,23 @@ public class MapModel extends ModelObject {
     public Object[] validateModel () {
         for (Iterator i = objects.iterator(); i.hasNext();) {
             MapObject o = (MapObject)i.next();
-            Rectangle b = o.getBounds();
-            if (b.x < 0 || b.x >= options.size.width
-            || b.y < 0 || b.y >= options.size.height) {
-                return new Object[] {
-                o, "Object is located outside map bounds." };
+            if (o instanceof MapPolygon) {
+                Polygon p = ((MapPolygon)o).getPolygon();
+                if (p.npoints < 1) continue;
+                int x = p.xpoints[0];
+                int y = p.ypoints[0];
+                if (x < 0 || x >= options.size.width
+                || y < 0 || y >= options.size.height) {
+                    return new Object[] {
+                    o, "Polygon is located outside map bounds." };
+                }                
+            } else {
+                Rectangle b = o.getBounds();
+                if (b.x < 0 || b.x >= options.size.width
+                || b.y < 0 || b.y >= options.size.height) {
+                    return new Object[] {
+                    o, "Object is located outside map bounds." };
+                }
             }
         }
         return null;
