@@ -63,6 +63,7 @@ typedef struct {
 
 #define FPS		framesPerSecond
 #define NumObjs		(ObjCount + 0)
+#define MAX_SPECTATORS	8
 
 extern player		**PlayersArray;
 extern object		*Obj[];
@@ -71,9 +72,9 @@ extern trans_t		*Transporters[];
 extern long		frame_loops;
 extern long		frame_loops_slow;
 extern double		frame_time;
-extern int		observerStart;
+extern int		spectatorStart;
 extern int		NumPlayers;
-extern int		NumObservers;
+extern int		NumSpectators;
 extern int		NumOperators;
 extern int		NumPseudoPlayers;
 extern int		NumQueuedPlayers;

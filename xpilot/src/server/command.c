@@ -104,10 +104,10 @@ static void Send_info_about_player(player * pl)
 {
     int			i;
 
-    for (i = 0; i < observerStart + NumObservers; i++) {
+    for (i = 0; i < spectatorStart + NumSpectators; i++) {
 	player *pl_i;
 	if (i == NumPlayers) {
-	    i = observerStart - 1;
+	    i = spectatorStart - 1;
 	    continue;
 	}
 	pl_i = Players(i);

@@ -117,8 +117,6 @@ do { \
 #define OLD_MAX_CHECKS		26
 #define MAX_TEAMS		10
 
-#define MAX_OBSERVERS		8
-
 #define EXPIRED_MINE_ID		4096   /* assume no player has this id */
 
 #define MAX_CHARS		80

@@ -200,7 +200,7 @@ void Pause_player(player *pl, bool on)
 		    Send_team(pl_i->conn, pl->id, 0);
 		}
 	    }
-	    for (i = observerStart; i < observerStart + NumObservers; i++) {
+	    for (i = spectatorStart; i < spectatorStart + NumSpectators; i++) {
 		Send_base(Players(i)->conn, -1, pl->home_base->ind);
 		Send_team(Players(i)->conn, pl->id, 0);
 	    }
@@ -527,8 +527,8 @@ int Handle_keyboard(player *pl)
 		    if (pl_i->conn != NULL)
 			Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 		}
-		for (i = 0; i < NumObservers; i++) {
-		    Send_base(Players(i + observerStart)->conn,
+		for (i = 0; i < NumSpectators; i++) {
+		    Send_base(Players(i + spectatorStart)->conn,
 			      pl->id, pl->home_base->ind);
  		}
 		break;

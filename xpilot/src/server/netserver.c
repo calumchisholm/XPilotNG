@@ -305,7 +305,7 @@ int Setup_net_server(void)
      * the contact socket, and the socket for the resolver library routines.
      */
     max_connections = MIN((int)MAX_SELECT_FD - 5,
-			  playerLimit_orig + MAX_OBSERVERS * !!rplayback);
+			  playerLimit_orig + MAX_SPECTATORS * !!rplayback);
     size = max_connections * sizeof(*Conn);
     if ((Conn = (connection_t *) malloc(size)) == NULL) {
 	error("Cannot allocate memory for connections");
@@ -1082,9 +1082,9 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	}
 	pl = Players(NumPlayers);
     } else {
-	if (!Init_player(observerStart + NumObservers, connp->ship))
+	if (!Init_player(spectatorStart + NumSpectators, connp->ship))
 	    return -1;
-	pl = Players(observerStart + NumObservers);
+	pl = Players(spectatorStart + NumSpectators);
     }
     pl->rectype = connp->rectype;
 
@@ -1126,7 +1126,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	NumPlayers++;
 	request_ID();
     } else {
-	pl->id = NUM_IDS + 1 + connp->ind - observerStart;
+	pl->id = NUM_IDS + 1 + connp->ind - spectatorStart;
 	Add_spectator(pl);
     }
 
@@ -1154,7 +1154,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		     -1);
 	else
 	    xpprintf("%s spectator %s (%d) starts.\n", showtime(), pl->name,
-		     NumObservers);
+		     NumSpectators);
     }
 
     /*
@@ -1168,12 +1168,12 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     /*
      * And tell him about all the others.
      */
-    for (i = 0; i < observerStart + NumObservers - 1; i++) {
+    for (i = 0; i < spectatorStart + NumSpectators - 1; i++) {
 	player *pl_i;
 	if (i == NumPlayers - 1 && pl->rectype != 2)
 	    break;
 	if (i == NumPlayers) {
-	    i = observerStart - 1;
+	    i = spectatorStart - 1;
 	    continue;
 	}
 	pl_i = Players(i);
@@ -1195,11 +1195,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     /*
      * And tell all the others about him.
      */
-    for (i = 0; i < observerStart + NumObservers - 1; i++) {
+    for (i = 0; i < spectatorStart + NumSpectators - 1; i++) {
 	player *pl_i;
 
 	if (i == NumPlayers - 1) {
-	    i = observerStart - 1;
+	    i = spectatorStart - 1;
 	    continue;
 	}
 	pl_i = Players(i);

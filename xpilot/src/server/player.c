@@ -29,7 +29,7 @@ char player_version[] = VERSION;
 bool		updateScores = true;
 
 static int	playerArrayNumber;
-static int	GetIndArray[NUM_IDS + MAX_OBSERVERS + 1];
+static int	GetIndArray[NUM_IDS + MAX_SPECTATORS + 1];
 
 /*
  * Get player with index 'ind' from Players array.
@@ -57,13 +57,12 @@ int GetInd(int id)
 
     /*
      * kps - in some places where we look at the id we don't
-     * bother about observers (maybe observers should be
-     * renamed to spectators).
+     * bother about spectators.
      * This should be cleaned up in general.
      */
-    if (id < 0 || id >= NUM_IDS + MAX_OBSERVERS + 1) {
+    if (id < 0 || id >= NUM_IDS + MAX_SPECTATORS + 1) {
 	warn("GetInd: id = %d, array size = %d\n",
-	     id, NUM_IDS + MAX_OBSERVERS + 1);
+	     id, NUM_IDS + MAX_SPECTATORS + 1);
 	return -1;
     }
     return GetIndArray[id];
@@ -145,11 +144,11 @@ void Pick_startpos(player *pl)
 			      BIT(world->rules->mode, TIMING) ?
 			      world->baseorder[i].base_idx : i);
 	if (ind < NumPlayers) {
-	    for (i = 0; i < observerStart + NumObservers; i++) {
+	    for (i = 0; i < spectatorStart + NumSpectators; i++) {
 		player *pl_i;
 
 		if (i == NumPlayers) {
-		    i = observerStart - 1;
+		    i = spectatorStart - 1;
 		    continue;
 		}
 		pl_i = Players(i);
@@ -642,8 +641,8 @@ void Update_score_table(void)
 		    Send_score(pl_i->conn, pl->id, pl->score, (int)pl->life,
 			       pl->mychar, pl->alliance);
 	    }
-	    for (i = 0; i < NumObservers; i++)
-		Send_score(Players(i + observerStart)->conn, pl->id,
+	    for (i = 0; i < NumSpectators; i++)
+		Send_score(Players(i + spectatorStart)->conn, pl->id,
 			   pl->score, (int)pl->life, pl->mychar, pl->alliance);
 	}
 	if (BIT(world->rules->mode, TIMING)) {
@@ -1157,10 +1156,10 @@ void Race_game_over(void)
 	    pl = Players(order[i]);
 	    if (pl->home_base->ind != world->baseorder[i].base_idx) {
 		pl->home_base = Bases(world, world->baseorder[i].base_idx);
-		for (j = 0; j < observerStart + NumObservers; j++) {
+		for (j = 0; j < spectatorStart + NumSpectators; j++) {
 		    if (j == NumPlayers) {
-			if (NumObservers)
-			    j = observerStart;
+			if (NumSpectators)
+			    j = spectatorStart;
 			else
 			    break;
 		    }
@@ -1920,8 +1919,8 @@ void Delete_player(player *pl)
 	}
     }
 
-    for (i = NumObservers - 1; i >= 0; i--)
-	Send_leave(Players(i + observerStart)->conn, id);
+    for (i = NumSpectators - 1; i >= 0; i--)
+	Send_leave(Players(i + spectatorStart)->conn, id);
 
     release_ID(id);
 }
@@ -1930,28 +1929,28 @@ void Add_spectator(player *pl)
 {
     pl->home_base = NULL;
     pl->team = 0;
-    GetIndArray[pl->id] = observerStart + NumObservers;
+    GetIndArray[pl->id] = spectatorStart + NumSpectators;
     pl->score = -6666;
     pl->mychar = 'S';
-    NumObservers++;
+    NumSpectators++;
 }
 
 void Delete_spectator(player *pl)
 {
     int i, ind = GetInd(pl->id);
 
-    NumObservers--;
-    pl = Players(observerStart + NumObservers); /* Swap leaver last */
-    PlayersArray[observerStart + NumObservers] = Players(ind);
+    NumSpectators--;
+    pl = Players(spectatorStart + NumSpectators); /* Swap leaver last */
+    PlayersArray[spectatorStart + NumSpectators] = Players(ind);
     PlayersArray[ind] = pl;
-    pl = Players(observerStart + NumObservers);
+    pl = Players(spectatorStart + NumSpectators);
 
     GetIndArray[Players(ind)->id] = ind;
-    GetIndArray[pl->id] = observerStart + NumObservers;
+    GetIndArray[pl->id] = spectatorStart + NumSpectators;
 
     Free_ship_shape(pl->ship);
-    for (i = NumObservers - 1; i >= 0; i--)
-	Send_leave(Players(i + observerStart)->conn, pl->id);
+    for (i = NumSpectators - 1; i >= 0; i--)
+	Send_leave(Players(i + spectatorStart)->conn, pl->id);
 }
 
 void Detach_ball(player *pl, ballobject *ball)

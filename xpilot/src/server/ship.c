@@ -438,9 +438,9 @@ void Tank_handle_detach(player *pl)
 	}
     }
 
-    for (i = 0; i < NumObservers - 1; i++) {
-	Send_player(Players(i + observerStart)->conn, dummy->id);
-	Send_score(Players(i + observerStart)->conn, dummy->id, dummy->score,
+    for (i = 0; i < NumSpectators - 1; i++) {
+	Send_player(Players(i + spectatorStart)->conn, dummy->id);
+	Send_score(Players(i + spectatorStart)->conn, dummy->id, dummy->score,
 		   (int)dummy->life, dummy->mychar, dummy->alliance);
     }
 }

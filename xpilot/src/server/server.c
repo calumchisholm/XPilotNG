@@ -34,9 +34,9 @@ char xpilots_versionid[] = "@(#)$" TITLE " $";
  */
 int			NumPlayers = 0;
 int			NumAlliances = 0;
-int			NumObservers = 0;
+int			NumSpectators = 0;
 int			NumOperators = 0;
-int			observerStart;
+int			spectatorStart;
 player			**PlayersArray;
 server			Server;
 char			*serverAddr;
@@ -103,8 +103,8 @@ int main(int argc, char **argv)
     Walls_init();
 
     /* Allocate memory for players, shots and messages */
-    Alloc_players(world->NumBases + MAX_PSEUDO_PLAYERS + MAX_OBSERVERS);
-    observerStart = world->NumBases + MAX_PSEUDO_PLAYERS;
+    Alloc_players(world->NumBases + MAX_PSEUDO_PLAYERS + MAX_SPECTATORS);
+    spectatorStart = world->NumBases + MAX_PSEUDO_PLAYERS;
     Alloc_shots(MAX_TOTAL_SHOTS);
     Alloc_cells();
 
@@ -311,8 +311,8 @@ int End_game(void)
     }
 
     record = playback = 0;
-    while (NumObservers > 0) {
-	pl = Players(observerStart + NumObservers - 1);
+    while (NumSpectators > 0) {
+	pl = Players(spectatorStart + NumSpectators - 1);
 	Destroy_connection(pl->conn, msg);
     }
     record = rrecord;

@@ -1151,8 +1151,8 @@ void Frame_update(void)
 	}
     }
 
-    for (i = 0; i < observerStart + NumObservers; i++) {
-	if (i >= num_player_shuffle && i < observerStart)
+    for (i = 0; i < spectatorStart + NumSpectators; i++) {
+	if (i >= num_player_shuffle && i < spectatorStart)
 	    continue;
 	pl = Players(i);
 	conn = pl->conn;
@@ -1257,8 +1257,8 @@ void Set_message(const char *message)
 	    if (pl->conn != NULL)
 		Send_message(pl->conn, msg);
 	}
-    for (i = 0; i < NumObservers; i++) {
-	pl = Players(i + observerStart);
+    for (i = 0; i < NumSpectators; i++) {
+	pl = Players(i + spectatorStart);
 	Send_message(pl->conn, msg);
     }
 }
