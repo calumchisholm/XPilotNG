@@ -570,8 +570,8 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 		const char	*sep = (!i) ? " with help from "
 					    : (i < num_pushers - 1) ? ", "
 					    : " and ";
-		int		sep_len = strlen(sep);
-		int		name_len = strlen(pusher->name);
+		size_t		sep_len = strlen(sep);
+		size_t		name_len = strlen(pusher->name);
 
 		if (msg_len + sep_len + name_len + 2 < sizeof msg) {
 		    strcpy(msg_ptr, sep);

@@ -171,6 +171,7 @@ static void Player_collides_with_asteroid(player *pl, wireobject *obj);
 static void Player_collides_with_killing_shot(player *pl, object *obj);
 static void Player_pass_checkpoint(player *pl);
 
+extern shape_t ball_wire;
 
 
 void Check_collision(void)
@@ -183,6 +184,7 @@ void Check_collision(void)
 
     AsteroidCollision();
 }
+
 
 static void PlayerCollision(void)
 {
@@ -413,7 +415,6 @@ static void PlayerCollision(void)
 		    {
 			/* The ball might already be inside the team's ball
 			 * target. */
-			extern shape_t ball_wire;
 			group = shape_is_inside(ball->pos.cx,
 						ball->pos.cy,
 						BALL_BIT | HITMASK(pl->team),

@@ -105,7 +105,7 @@ void Place_general_mine(player *pl, int team, long status,
     else if (BIT(status, FROMCANNON))
 	life = CANNON_SHOT_LIFE;
     else
-	life = (mineLife ? mineLife : MINE_LIFETIME);
+	life = (mineLife ? mineLife : (int)MINE_LIFETIME);
 
     if (!BIT(mods.warhead, CLUSTER))
 	mods.velocity = 0;

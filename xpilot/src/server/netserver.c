@@ -569,7 +569,7 @@ int Setup_net_server(void)
      * the select(2) call minus those for stdin, stdout, stderr,
      * the contact socket, and the socket for the resolver library routines.
      */
-    max_connections = MIN(MAX_SELECT_FD - 5,
+    max_connections = MIN((int)MAX_SELECT_FD - 5,
 			  playerLimit_orig + MAX_OBSERVERS * !!rplayback);
     size = max_connections * sizeof(*Conn);
     if ((Conn = (connection_t *) malloc(size)) == NULL) {

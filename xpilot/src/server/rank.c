@@ -485,7 +485,7 @@ void Rank_init_saved_scores(void)
 		goto init_tail;
 	    }
 
-	    for (i = 0; i < rank_head.entries; i++) {
+	    for (i = 0; i < (int)rank_head.entries; i++) {
 		RankInfo *node = &scores[i];
 		actual = fread(&node->entry, sizeof(node->entry), 1, file);
 		if (actual != 1) {
@@ -585,10 +585,10 @@ void Rank_write_score_file(void)
     if (!xpilotscorefile)
 	return;
     actual = snprintf(tmp_file, sizeof(tmp_file), "%s-new", xpilotscorefile);
-    if (actual < strlen(xpilotscorefile) || actual > sizeof(tmp_file)) {
+    if (actual < (int)strlen(xpilotscorefile)
+	|| actual > (int)sizeof(tmp_file))
 	/* Use a shorter path-name and be happy... */
 	return;
-    }
 
     file = fopen(tmp_file, "w");
     if (file == NULL)
@@ -604,7 +604,7 @@ void Rank_write_score_file(void)
 	remove(tmp_file);
 	return;
     }
-    for (i = 0; i < rank_head.entries; i++) {
+    for (i = 0; i < (int)rank_head.entries; i++) {
 	RankEntry entry;
 	int idx = rankedplayer[i];
 

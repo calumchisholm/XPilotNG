@@ -96,7 +96,7 @@ static void catch_timer(int signum)
     if (timer_count >= (unsigned)timerResolution) {
 	timer_count -= timerResolution;
 	timer_ticks++;
-	if (timer_count >= timerResolution)
+	if (timer_count >= (unsigned)timerResolution)
 	    /* Don't let timer_count grow boundlessly with timerResolution 0
 	     * now that timerResolution can be changed at runtime. */
 	    timer_count = 0;

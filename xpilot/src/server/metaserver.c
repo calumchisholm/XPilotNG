@@ -124,7 +124,8 @@ void Meta_update(int change)
 #define GIVE_META_SERVER_A_HINT	180
 
     char 		string[MAX_STR_LEN];
-    int			i, j, len;
+    int			i, j;
+    size_t		len;
     int			num_active_players;
     bool		first = true;
     time_t		currentTime;
