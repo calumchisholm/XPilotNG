@@ -557,16 +557,11 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
 	    BIT(p_style.flags, STYLE_TEXTURED | STYLE_FILLED)) {
 	if (BIT(p_style.flags, STYLE_TEXTURED)
-	    && instruments.showTexturedWalls) {
-
+	        && instruments.showTexturedWalls) {
 	    Image_use_texture(p_style.texture);
 	    glCallList(polyListBase + i);
 	    Image_no_texture();
-	} else if (BIT(p_style.flags, STYLE_FILLED)
-		   || instruments.showFilledWorld
-		   || (BIT(p_style.flags, STYLE_TEXTURED)
-		       && !instruments.showTexturedWalls)) {
-
+	} else {
 	    set_alphacolor((p_style.rgb << 8) | 0xff);
 	    glCallList(polyListBase + i);
 	}
