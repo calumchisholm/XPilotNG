@@ -48,6 +48,12 @@
 
 char shipshape_s_version[] = VERSION;
 
+#ifdef SSHACK
+bool do_sshack = true;
+#else
+bool do_sshack = false;
+#endif
+
 extern void	Make_table(void);
 
 void Rotate_point(shapepos pt[RES])
@@ -74,6 +80,7 @@ shipobj *Default_ship(void)
 
     if (!sh.num_points) {
 	sh.num_points = 3;
+	sh.num_orig_points = 3;
 	sh.pts[0] = &pts[0][0];
 	sh.pts[0][0].clk.cx = 15;
 	sh.pts[0][0].clk.cy = 0;
