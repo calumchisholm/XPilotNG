@@ -47,7 +47,7 @@
 #define PLIST_HEADER_BG 0xff0000ff
 #define PLIST_ITEM_FG 0xffff00ff
 #define PLIST_ITEM_BG 0x000070ff
-#define ROW_HEIGHT 20
+#define ROW_HEIGHT 19
 #define VERSION_WIDTH 100
 #define COUNT_WIDTH 20
 #define META_WIDTH 837
@@ -163,9 +163,9 @@ static void SetBounds_PlayerListWidget(GLWidget *widget, SDL_Rect *b)
     y = b->y + ROW_HEIGHT;
     for (row = widget->children; row; row = row->next) {
 	if (row->WIDGET == LABELWIDGET && row != info->header) {
-	    rb.x = b->x;
+	    rb.x = b->x + 1;
 	    rb.y = y;
-	    rb.w = b->w - 10;
+	    rb.w = b->w - 11;
 	    rb.h = ROW_HEIGHT;
 	    SetBounds_GLWidget(row, &rb);
 	    y += ROW_HEIGHT;
@@ -442,9 +442,9 @@ static void SelectRow_MetaWidget(GLWidget *widget, MetaRowWidget *row)
 	Close_Widget(&(meta->status));
 	meta->status = NULL;
     }
-    status_bounds.x = widget->bounds.x + 21;
-    status_bounds.y = widget->bounds.y + 594;
-    status_bounds.w = 794 * 3 / 5;
+    status_bounds.x = widget->bounds.x + 22;
+    status_bounds.y = widget->bounds.y + 598;
+    status_bounds.w = 792 * 3 / 5;
     status_bounds.h = ROW_HEIGHT * STATUS_ROWS;
     if ((meta->status = Init_StatusWidget(row->sip))) {
 	SetBounds_GLWidget(meta->status, &status_bounds);
@@ -460,7 +460,7 @@ static void SelectRow_MetaWidget(GLWidget *widget, MetaRowWidget *row)
     plist_bounds.x = status_bounds.x + status_bounds.w;
     plist_bounds.y = status_bounds.y;
     plist_bounds.h = status_bounds.h;
-    plist_bounds.w = 794 - status_bounds.w;
+    plist_bounds.w = 792 - status_bounds.w;
     if ((meta->players = Init_PlayerListWidget(row->sip))) {
 	SetBounds_GLWidget(meta->players, &plist_bounds);
 	AppendGLWidgetList(&(widget->children), meta->players);
