@@ -1,6 +1,10 @@
 TODO
 ----
 
+If you see a (free) task you would like to do, put your name under the task
+and just do it. If your favourite feature is missing, go ahead and add a task 
+for it.
+
 Task:
   Implement the Gui_* methods in sdlgui.c. Most of those are probably easy
   to implement by just painting the appropriate image.
