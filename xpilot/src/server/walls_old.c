@@ -1517,14 +1517,11 @@ static void Cannon_dies_old(move_state_t *ms)
 #endif
 
 
-void Object_hits_target(target_t *targ, object *obj, long player_cost);
+void Object_hits_target(int ind, object *obj, long player_cost);
 
 static void Object_hits_target_old(move_state_t *ms, long player_cost)
 {
-    target_t		*targ = &World.targets[ms->target];
-    object		*obj = ms->mip->obj;
-
-    Object_hits_target(targ, obj, player_cost);
+    Object_hits_target(ms->target, ms->mip->obj, player_cost);
 }
 
 

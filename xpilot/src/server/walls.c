@@ -289,7 +289,7 @@ void Cannon_dies(int ind, player *pl)
     int			cy = cannon->pos.cy;
     int			killer = -1;
 
-    Remove_cannon_from_map(ind);
+    Cannon_remove_from_map(ind);
     Cannon_throw_items(ind);
     Cannon_init(ind);
     sound_play_sensors(cx, cy, CANNON_EXPLOSION_SOUND);
@@ -341,10 +341,10 @@ void Cannon_dies(int ind, player *pl)
 }
 
 
-void Object_hits_target(target_t *targ, object *obj, long player_cost)
+void Object_hits_target(int ind, object *obj, long player_cost)
 {
+    target_t		*targ = &World.targets[ind];
     int			j,
-			x, y,
 			killer;
     DFLOAT		sc, por,
 			win_score = 0,
@@ -421,17 +421,7 @@ void Object_hits_target(target_t *targ, object *obj, long player_cost)
     if (targ->damage > 0)
 	return;
 
-    targ->update_mask = (unsigned) -1;
-    targ->damage = TARGET_DAMAGE;
-    targ->dead_time = targetDeadTime * TIME_FACT;
-
-    /*
-     * Destroy target.
-     * Turn it into a space to simplify other calculations.
-     */
-    x = targ->pos.cx / BLOCK_CLICKS;
-    y = targ->pos.cy / BLOCK_CLICKS;
-    World.block[x][y] = SPACE;
+    Target_remove_from_map(ind);
 
     Make_debris(
 	/* pos.cx, pos.cy   */ targ->pos.cx, targ->pos.cy,
@@ -572,7 +562,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 
     case CrashTarget:
 	obj->life = 0;
-	Object_hits_target(&World.targets[item_id], obj, -1);
+	Object_hits_target(item_id, obj, -1);
 	break;
 
     case CrashWall:
@@ -654,8 +644,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	/*Object_hits_target_old(ms, -1);*/
-	Object_hits_target(&World.targets[item_id], (object *)pl, -1);
+	Object_hits_target(item_id, (object *)pl, -1);
 	break;
 
     case CrashTreasure:
@@ -860,7 +849,8 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 
     /* kps hack */
     if (type == TARGET) {
-	Object_hits_target(&World.targets[item_id], obj, -1);
+	obj->life = 0;
+	Object_hits_target(item_id, obj, -1);
 	return 0;
     }
     /* kps hack */
@@ -964,7 +954,6 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     }
     /* kps hack - fix this */
     if (type == TARGET) {
-	/*Object_hits_target(&World.targets[item_id], obj, -1);*/
 	Player_crash(pl, move, CrashTarget, item_id, 1);
 	return;
     }

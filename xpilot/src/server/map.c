@@ -249,12 +249,6 @@ int Map_place_treasure(int cx, int cy, int team, bool empty)
     return ind;
 }
 
-
-/* kps - fix this like balltarget */
-/*
- * note: for ng support, we need code in Polys_to_client in walls.c
- * and parse_new() in netclient.c
- */
 int Map_place_target(int cx, int cy, int team)
 {
     target_t t;
@@ -263,8 +257,8 @@ int Map_place_target(int cx, int cy, int team)
     t.pos.cx = cx;
     t.pos.cy = cy;
     /*
-     * Determining which team it belongs to is done later,
-     * in Find_closest_team().
+     * If we have a block based map, the team is determined in
+     * in Xpmap_find_map_object_teams().
      */
     t.team = team;
     t.dead_time = 0;

@@ -44,6 +44,7 @@
 #include "objpos.h"
 #include "click.h"
 #include "object.h"
+#include "walls.h" /* for move_parameters */
 
 char play_version[] = VERSION;
 
@@ -351,31 +352,35 @@ bool Balltarget_hit_func(struct group *group, struct move *move)
 }
 
 
-void Restore_cannon_on_map(int ind)
+void Cannon_restore_on_map(int ind)
 {
-    cannon_t *cannon = World.cannon + ind;
-    int bx, by;
+    cannon_t		*cannon = &World.cannon[ind];
+    int			bx, by;
 
     bx = CLICK_TO_BLOCK(cannon->pos.cx);
     by = CLICK_TO_BLOCK(cannon->pos.cy);
     World.block[bx][by] = CANNON;
+
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
     cannon->dead_time = 0;
 }
 
-void Remove_cannon_from_map(int ind)
+void Cannon_remove_from_map(int ind)
 {
     cannon_t		*cannon = &World.cannon[ind];
+    int			bx, by;
 
     cannon->dead_time = cannonDeadTime * TIME_FACT;
     cannon->conn_mask = 0;
-    World.block
-	[CLICK_TO_BLOCK(cannon->pos.cx)]
-	[CLICK_TO_BLOCK(cannon->pos.cy)] = SPACE;
+
+    bx = CLICK_TO_BLOCK(cannon->pos.cx);
+    by = CLICK_TO_BLOCK(cannon->pos.cy);
+    World.block[bx][by] = SPACE;
 }
 
-static unsigned long cannon_mask;
+
+extern struct move_parameters mp;
 /*
  * This function is called when something would hit a cannon.
  *
@@ -386,6 +391,7 @@ bool Cannon_hit_func(struct group *group, struct move *move)
     object *obj = NULL;
     int ind = group->item_id;
     cannon_t *cannon = &World.cannon[ind];
+    unsigned long cannon_mask;
 
     /* cannon is dead ? */
     if (cannon->dead_time != 0)
@@ -395,15 +401,7 @@ bool Cannon_hit_func(struct group *group, struct move *move)
 	return true;
     obj = move->obj;
 
-    /* check cannon mask */
-    cannon_mask =
-	OBJ_PLAYER | (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT |
-	OBJ_PULSE | OBJ_SMART_SHOT | OBJ_TORPEDO | OBJ_HEAT_SHOT |
-	OBJ_ASTEROID;
-
-    if (cannonsUseItems)
-	cannon_mask |= OBJ_ITEM;
-
+    cannon_mask = mp.obj_cannon_mask | OBJ_PLAYER;
     if (!BIT(cannon_mask, obj->type))
 	return false;
 
@@ -430,6 +428,59 @@ bool Cannon_hit_func(struct group *group, struct move *move)
 }
 
 
+void Target_restore_on_map(int ind)
+{
+    target_t		*targ = &World.targets[ind];
+    int			bx, by;
 
+    bx = CLICK_TO_BLOCK(targ->pos.cx);
+    by = CLICK_TO_BLOCK(targ->pos.cy);
+    World.block[bx][by] = TARGET;
 
+    targ->conn_mask = 0;
+    targ->update_mask = (unsigned)-1;
+    targ->last_change = frame_loops;
+    targ->dead_time = 0;
+    targ->damage = TARGET_DAMAGE;
+}
 
+void Target_remove_from_map(int ind)
+{
+    target_t		*targ = &World.targets[ind];
+    int			bx, by;
+
+    targ->update_mask = (unsigned) -1;
+    /* is this necessary? (done also in Target_restore_on_map() ) */
+    targ->damage = TARGET_DAMAGE;
+    targ->dead_time = targetDeadTime * TIME_FACT;
+
+    /*
+     * Destroy target.
+     * Turn it into a space to simplify other calculations.
+     */
+    bx = CLICK_TO_BLOCK(targ->pos.cx);
+    by = CLICK_TO_BLOCK(targ->pos.cy);
+    World.block[bx][by] = SPACE;
+}
+
+bool Target_hit_func(struct group *group, struct move *move)
+{
+    object *obj = NULL;
+    int ind = group->item_id;
+    target_t *targ = &World.targets[ind];
+    unsigned long target_mask;
+
+    /* target is dead ? */
+    if (targ->dead_time != 0)
+	return false;
+
+    if (move->obj == NULL)
+	return true;
+    obj = move->obj;
+
+    target_mask = mp.obj_target_mask | OBJ_PLAYER;
+    if (!BIT(target_mask, obj->type))
+	return false;
+
+    return true;
+}

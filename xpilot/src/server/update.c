@@ -652,7 +652,7 @@ void Update_objects(void)
 	cannon_t *cannon = World.cannon + i;
 	if (cannon->dead_time > 0) {
 	    if ((cannon->dead_time -= timeStep) <= 0)
-		Restore_cannon_on_map(i);
+		Cannon_restore_on_map(i);
 	    continue;
 	} else {
 	    /* don't check too often, because this gets quite expensive
@@ -729,27 +729,14 @@ void Update_objects(void)
     for (i = 0; i < World.NumTargets; i++) {
 	if (World.targets[i].dead_time > 0) {
 	    if ((World.targets[i].dead_time -= timeStep) <= 0) {
-		World.block[World.targets[i].pos.cx / BLOCK_CLICKS]
-		    [World.targets[i].pos.cy / BLOCK_CLICKS] = TARGET;
-		World.targets[i].conn_mask = 0;
-		World.targets[i].update_mask = (unsigned)-1;
-		World.targets[i].last_change = frame_loops;
-		World.targets[i].dead_time = 0;
+		Target_restore_on_map(i);
 
 		if (targetSync) {
 		    unsigned short team = World.targets[i].team;
 
 		    for (j = 0; j < World.NumTargets; j++) {
-			if (World.targets[j].team == team) {
-			    World.block[World.targets[j].pos.cx / BLOCK_CLICKS]
-				       [World.targets[j].pos.cy / BLOCK_CLICKS]
-				= TARGET;
-			    World.targets[j].conn_mask = 0;
-			    World.targets[j].update_mask = (unsigned)-1;
-			    World.targets[j].last_change = frame_loops;
-			    World.targets[j].dead_time = 0;
-			    World.targets[j].damage = TARGET_DAMAGE;
-			}
+			if (World.targets[j].team == team)
+			    Target_restore_on_map(j);
 		    }
 		}
 	    }

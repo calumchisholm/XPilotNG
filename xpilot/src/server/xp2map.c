@@ -279,20 +279,24 @@ static void tagstart(void *data, const char *el, const char **attr)
 	ind = Map_place_cannon(cx, cy, dir, team);
 	P_start_cannon(team, ind);
 	return;
-    }    
-    
+    }
+
     if (!strcasecmp(el, "Target")) {
-	int team = TEAM_NOT_SET, ind = -1;
+	int team = TEAM_NOT_SET, cx = -1, cy = -1, ind = -1;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
 		team = atoi(*(attr + 1));
+	    else if (!strcasecmp(*attr, "x"))
+		cx = atoi(*(attr + 1)) * scale;
+	    else if (!strcasecmp(*attr, "y"))
+		cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	/* ind = ... */
+	ind = Map_place_target(cx, cy, team);
 	P_start_target(team, ind);
 	return;
-    }    
+    }
 
     if (!strcasecmp(el, "ItemConcentrator")) {
 	int cx = -1, cy = -1;

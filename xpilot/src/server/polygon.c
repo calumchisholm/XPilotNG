@@ -242,7 +242,7 @@ void P_start_target(int team, int ind)
     groups[current_group].type = TARGET;
     groups[current_group].team = team;
     groups[current_group].hit_mask = HITMASK(team);
-    groups[current_group].hit_func = NULL;
+    groups[current_group].hit_func = Target_hit_func;
     groups[current_group].item_id = ind;
 }
 

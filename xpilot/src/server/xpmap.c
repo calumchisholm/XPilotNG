@@ -738,9 +738,6 @@ static void Xpmap_target_to_polygon(int ind)
     int cx, cy, ps, es;
     target_t *targ = &World.targets[ind];
 
-    /* too buggy currently */
-    return ;
-
     ps = P_get_poly_id("target_ps");
     es = P_get_edge_id("target_es");
 
