@@ -120,7 +120,7 @@ void Handle_Scoring(scoretype_t st, player_t *killer, player_t *victim, void *ex
     
     if (killer)
     	world = killer->world;
-    else if (victim)
+    else
     	world = victim->world;
     
     switch(st) {
