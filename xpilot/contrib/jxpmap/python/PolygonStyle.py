@@ -4,7 +4,7 @@ class PolygonStyle:
     def __init__(self):
         self.visible = 1
         self.visibleInRadar = 1
-        self.color = None
+        self.color = 0xFFFFFF
         self.texture = None
         self.filled = 0
         self.textured = 0
