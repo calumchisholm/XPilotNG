@@ -214,7 +214,7 @@ static ipos_t Grid_get(grid_t *grid_p)
     return pos;
 }
 
-static inline bool Grid_is_ready(grid_t *grid_p)
+static bool Grid_is_ready(grid_t *grid_p)
 {
     return (grid_p->done >= grid_p->todo) ? true : false;
 }
