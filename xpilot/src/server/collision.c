@@ -1573,7 +1573,7 @@ static void Player_pass_checkpoint(int ind)
 
 static void AsteroidCollision(void)
 {
-    int		j, radius, obj_count;
+    int		j, radius, obj_count, hit;
     object	*ast;
     object	*obj = NULL, **obj_list;
     list_t	list;
@@ -1586,7 +1586,6 @@ static void AsteroidCollision(void)
 	return;
     }
 
-    /* kps - use new acd here too, as in PlayerObjectCollision */
     for (iter = List_begin(list); iter != List_end(list); LI_FORWARD(iter)) {
 	ast = LI_DATA(iter);
 
@@ -1608,8 +1607,13 @@ static void AsteroidCollision(void)
 	for (j = 0; j < obj_count; j++) {
 	    obj = obj_list[j];
 	    assert(obj != NULL);
-	    if (obj->life <= 0)
-		continue;
+
+	    if (is_polygon_map || !useOldCode) {
+		;
+	    } else {
+		if (obj->life <= 0)
+		    continue;
+	    }
 
 	    /* asteroids don't hit these objects */
 	    if (BIT(obj->type, OBJ_ITEM|OBJ_DEBRIS|OBJ_SPARK|OBJ_WRECKAGE)
@@ -1630,12 +1634,44 @@ static void AsteroidCollision(void)
 		continue;
 
 	    radius = ast->pl_radius + obj->pl_radius;
-	    if (!in_range_acd_old(ast->prevpos.cx, ast->prevpos.cy,
-				  ast->pos.cx, ast->pos.cy,
-				  obj->prevpos.cx, obj->prevpos.cy,
-				  obj->pos.cx, obj->pos.cy,
-				  radius * CLICK)) {
-		continue;
+	    if (is_polygon_map || !useOldCode) {
+		switch (obj->collmode) {
+		case 0:
+		    hit = in_range_simple(ast->pos.cx, ast->pos.cy,
+					  obj->pos.cx, obj->pos.cy,
+					  radius * CLICK);
+		    break;
+		case 1:
+		    hit = in_range_acd(ast->prevpos.cx - obj->prevpos.cx,
+				       ast->prevpos.cy - obj->prevpos.cy,
+				       ast->extmove.cx - obj->extmove.cx,
+				       ast->extmove.cy - obj->extmove.cy,
+				       radius * CLICK);
+		    break;
+		case 2:
+		    hit = in_range_partial(ast->prevpos.cx - obj->prevpos.cx,
+					   ast->prevpos.cy - obj->prevpos.cy,
+					   ast->extmove.cx - obj->extmove.cx,
+					   ast->extmove.cy - obj->extmove.cy,
+					   radius * CLICK, obj->wall_time);
+		    break;
+		case 3:
+		default:
+#if 0
+		    warn("Unimplemented collision mode %d", obj->collmode);
+#endif
+		    continue;
+		}
+		if (!hit)
+		    continue;
+	    } else {
+		if (!in_range_acd_old(ast->prevpos.cx, ast->prevpos.cy,
+				      ast->pos.cx, ast->pos.cy,
+				      obj->prevpos.cx, obj->prevpos.cy,
+				      obj->pos.cx, obj->pos.cy,
+				      radius * CLICK)) {
+		    continue;
+		}
 	    }
 
 	    switch (obj->type) {
