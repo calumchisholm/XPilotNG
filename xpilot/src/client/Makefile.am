@@ -1,14 +1,13 @@
-
 bin_PROGRAMS = xpilot-ng-x11
 AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" -I$(top_srcdir)/src/common
 xpilot_ng_x11_SOURCES = \
 	about.c \
 	bitmaps.c bitmaps.h \
-	caudio.c caudio.h client.c client.h \
+	client.c client.h \
 	clientcommand.c clientcommand.h clientrank.c clientrank.h \
 	colors.c configure.c configure.h connectparam.h \
 	datagram.c datagram.h dbuff.c dbuff.h \
-	debugaudio.c default.c \
+	default.c \
 	event.c \
 	gfx2d.c gfx2d.h \
 	guimap.c guimap.h guiobjects.c guiobjects.h \
@@ -26,6 +25,11 @@ xpilot_ng_x11_SOURCES = \
 	welcome.c widget.c widget.h \
 	xdefault.c xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
 	xinit.c xinit.h xpaint.c xpaint.h xpclient.h xpclient_x11.h xpilot.c
+# juhal - If xpilot-ng-x11 was linked with libxpclient.a,
+# this wouldn't be needed here..
+if COND_SOUND
+xpilot_ng_x11_SOURCES += caudio.c caudio.h oalaudio.c
+endif
 
 noinst_LIBRARIES = libxpclient.a
 libxpclient_a_SOURCES = \
@@ -33,9 +37,13 @@ libxpclient_a_SOURCES = \
 	datagram.c meta.c mapdata.c gfx2d.c messages.c clientrank.c \
 	talkmacros.c clientcommand.c paint.c paintmap.c paintobjects.c \
 	option.c default.c
+if COND_SOUND
+libxpclient_a_SOURCES += caudio.c caudio.h oalaudio.c
+endif
+
 
 #xpilot_CFLAGS = @X_CFLAGS@
-xpilot_ng_x11_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11
+xpilot_ng_x11_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ -lX11 @SOUND_LIBS@
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
 
 # From section Conditional subdirectories with AM_CONDITIONAL

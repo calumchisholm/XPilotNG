@@ -322,6 +322,9 @@
    release 3. */
 #undef SETVBUF_REVERSED
 
+/* "Client sound enabled." */
+#undef SOUND
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 

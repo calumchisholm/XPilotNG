@@ -27,15 +27,14 @@
  * client audio
  */
 
+#define _CAUDIO_C_
 #include "xpclient.h"
 
 char caudio_version[] = VERSION;
 
-#ifdef SOUND
-
 #define	MAX_RANDOM_SOUNDS	6
 
-static int	audioEnabled;
+static int	audioEnabled = 0;
 
 static struct {
     char	**filenames;
@@ -90,8 +89,8 @@ void audioInit(char *display)
 		    }
 		    j++;
 		    ifile = strtok(NULL, " \t\n|");
-		    table[i].nsounds = j;
 		}
+		table[i].nsounds = j;
 		break;
 	    }
 
@@ -108,12 +107,15 @@ void audioInit(char *display)
 void audioCleanup(void)
 {
     /* release malloc'ed memory here */
-    int i;
+    int i, j;
 
     for (i = 0; i < MAX_SOUNDS; i++) {
+	for (j = 0; j < table[i].nsounds; j++)
+	    audioDeviceFree(table[i].private[j]);
 	XFREE(table[i].filenames);
 	XFREE(table[i].private);
     }
+    audioDeviceClose();
 }
 
 void audioEvents(void)
@@ -158,4 +160,3 @@ int Handle_audio(int type, int volume)
     return 0;
 }
 
-#endif /* SOUND */

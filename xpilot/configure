@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE SOUND_LIBS COND_SOUND_TRUE COND_SOUND_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -867,6 +867,7 @@ Optional Features:
   --enable-sdl-client     enable SDL/OpenGL client
   --enable-sdl-gameloop   enable sdl gameloop in sdl client (otherwise use
                           gameloop optimised for X11)
+  --enable-sound          enable OpenAL sound
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-sdltest       Do not try to compile and run a test SDL program
@@ -1960,6 +1961,12 @@ _ACEOF
 fi
 fi;
 
+# Check whether --enable-sound or --disable-sound was given.
+if test "${enable_sound+set}" = set; then
+  enableval="$enable_sound"
+
+fi;
+
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3021,14 +3028,9 @@ else
        grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
-      # or remarks (even with -Werror).  So we grep stderr for any message
-      # that says an option was ignored or not supported.
-      # When given -MP, icc 7.0 and 7.1 complain thusly:
-      #   icc: Command line warning: ignoring option '-M'; no argument required
-      # The diagnosis changed in icc 8.0:
-      #   icc: Command line remark: option '-MP' not supported
-      if (grep 'ignoring option' conftest.err ||
-          grep 'not supported' conftest.err) >/dev/null 2>&1; then :; else
+      # (even with -Werror).  So we grep stderr for any message
+      # that says an option was ignored.
+      if grep 'ignoring option' conftest.err >/dev/null 2>&1; then :; else
         am_cv_CC_dependencies_compiler_type=$depmode
         break
       fi
@@ -5894,6 +5896,99 @@ else
 fi
 
 
+if test x$enable_sound = xyes; then
+	have_openal=no
+	echo "$as_me:$LINENO: checking for alutInit in -lopenal" >&5
+echo $ECHO_N "checking for alutInit in -lopenal... $ECHO_C" >&6
+if test "${ac_cv_lib_openal_alutInit+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopenal  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char alutInit ();
+int
+main ()
+{
+alutInit ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_openal_alutInit=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_openal_alutInit=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_openal_alutInit" >&5
+echo "${ECHO_T}$ac_cv_lib_openal_alutInit" >&6
+if test $ac_cv_lib_openal_alutInit = yes; then
+  have_openal=yes
+fi
+
+	if test x$have_openal = xyes; then
+		SOUND_LIBS=-lopenal
+
+cat >>confdefs.h <<\_ACEOF
+#define SOUND 1
+_ACEOF
+
+	else
+		echo "*** Client sound disabled. Check that you have OpenAL installed."
+	fi
+
+fi
+
+
+
+if test x$have_openal = xyes; then
+  COND_SOUND_TRUE=
+  COND_SOUND_FALSE='#'
+else
+  COND_SOUND_TRUE='#'
+  COND_SOUND_FALSE=
+fi
+
+
 echo "$as_me:$LINENO: checking whether time.h and sys/time.h may both be included" >&5
 echo $ECHO_N "checking whether time.h and sys/time.h may both be included... $ECHO_C" >&6
 if test "${ac_cv_header_time+set}" = set; then
@@ -8482,7 +8577,7 @@ fi
 done
 
 
-                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/common/NT/Makefile src/common/NT/bindist/Makefile src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/client/NT/Makefile src/client/NT/res/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
+                                                                                                                                                                                                                            ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile lib/sound/Makefile src/Makefile src/common/Makefile src/common/version.h src/common/NT/Makefile src/common/NT/bindist/Makefile src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/client/NT/Makefile src/client/NT/res/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8607,6 +8702,13 @@ if test -z "${COND_SDL_GAMELOOP_TRUE}" && test -z "${COND_SDL_GAMELOOP_FALSE}"; 
   { { echo "$as_me:$LINENO: error: conditional \"COND_SDL_GAMELOOP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COND_SDL_GAMELOOP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${COND_SOUND_TRUE}" && test -z "${COND_SOUND_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COND_SOUND\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COND_SOUND\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -9062,6 +9164,7 @@ do
   "lib/fonts/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/fonts/Makefile" ;;
   "lib/maps/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/maps/Makefile" ;;
   "lib/textures/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/textures/Makefile" ;;
+  "lib/sound/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/sound/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/common/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/common/Makefile" ;;
   "src/common/version.h" ) CONFIG_FILES="$CONFIG_FILES src/common/version.h" ;;
@@ -9235,6 +9338,9 @@ s,@COND_SDL_CLIENT_TRUE@,$COND_SDL_CLIENT_TRUE,;t t
 s,@COND_SDL_CLIENT_FALSE@,$COND_SDL_CLIENT_FALSE,;t t
 s,@COND_SDL_GAMELOOP_TRUE@,$COND_SDL_GAMELOOP_TRUE,;t t
 s,@COND_SDL_GAMELOOP_FALSE@,$COND_SDL_GAMELOOP_FALSE,;t t
+s,@SOUND_LIBS@,$SOUND_LIBS,;t t
+s,@COND_SOUND_TRUE@,$COND_SOUND_TRUE,;t t
+s,@COND_SOUND_FALSE@,$COND_SOUND_FALSE,;t t
 s,@EGREP@,$EGREP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@POW_LIB@,$POW_LIB,;t t

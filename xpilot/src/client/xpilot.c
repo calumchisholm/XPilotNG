@@ -161,9 +161,9 @@ int main(int argc, char *argv[])
 extern char about_version[];
 #ifdef SOUND
 extern char audio_version[];
+extern char caudio_version[];
 #endif
 extern char bitmaps_version[];
-extern char caudio_version[];
 extern char checknames_version[];
 extern char client_version[];
 extern char clientcommand_version[];
@@ -219,9 +219,9 @@ static void Check_client_versions(void)
 	{ "about", about_version },
 #ifdef SOUND
 	{ "audio", audio_version },
+	{ "caudio", caudio_version },
 #endif
 	{ "bitmaps", bitmaps_version },
-	{ "caudio", caudio_version },
 	{ "checknames", checknames_version },
 	{ "client", client_version },
 	{ "clientcommand", clientcommand_version },

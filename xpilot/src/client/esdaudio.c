@@ -59,3 +59,13 @@ void audioDeviceEvents(void)
 {
     /* printf("esound audio: events\n"); */
 }
+
+void audioDeviceFree(void *private) 
+{
+    /* TODO */
+}
+
+void audioDeviceClose() 
+{
+    /* TODO */
+}

@@ -1323,7 +1323,6 @@ xp_option_t default_options[] = {
 	"",
 	audioServer, sizeof audioServer,
 	NULL, NULL, NULL,
-	KEY_DUMMY,
 	XP_OPTFLAG_DEFAULT,
 	"Specifies the audio server to use.\n"),
 #endif

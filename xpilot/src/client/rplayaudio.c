@@ -82,3 +82,13 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
 void audioDeviceEvents(void)
 {
 }
+
+void audioDeviceFree(void *private) 
+{
+    /* TODO */
+}
+
+void audioDeviceClose() 
+{
+    /* TODO */
+}

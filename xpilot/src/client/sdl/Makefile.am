@@ -17,6 +17,6 @@ else
   xpilot_ng_sdl_SOURCES += gameloop_x.c
 endif
 
-xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
+xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11 @SOUND_LIBS@
 
 EXTRA_DIST = win32hacks.c xpilot.rc xpilot_sdl.dsp xpilot_sdl.dsw
