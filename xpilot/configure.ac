@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT(XPilot, 4.5.4X-1, ksoderbl@cc.hut.fi, xpilot)
+AC_INIT(XPilot, 4.5.4X2, ksoderbl@cc.hut.fi, xpilot)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
 AM_INIT_AUTOMAKE
