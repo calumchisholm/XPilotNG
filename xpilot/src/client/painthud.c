@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -155,7 +155,7 @@ static void Paint_meter(int xoff, int y, const char *title, int val, int max)
 	Segment_add(meterColor2, x+mw3_4, y-1,	x+mw3_4, y+meterHeight+1);
     } else {
 	/*int width = WINSCALE((int)(((meterWidth-3)*val)/(max?max:1)));*/
-	
+
 	printf("TODO: implement paint meter\n");
 	/*PaintMeter(p_draw, BM_METER,
 	  WINSCALE(x), WINSCALE(y),
@@ -206,7 +206,7 @@ void Paint_score_objects(void)
 
     for (i = 0; i < MAX_SCORE_OBJECTS; i++) {
 	score_object_t*	sobj = &score_objects[i];
-	if (sobj->hud_msg_len > 0) {
+	if (sobj->life_time > 0) {
 	    if (loopsSlow % 3) {
 		x = sobj->x * BLOCK_SZ + BLOCK_SZ/2;
 		y = sobj->y * BLOCK_SZ + BLOCK_SZ/2;
@@ -317,14 +317,14 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 
     /* lives left is a better info than distance in team games MM */
     if (BIT(Setup->mode, LIMITED_LIVES)) {
-	sprintf(str, "%03d", target->life); 
+	sprintf(str, "%03d", target->life);
     } else {
 	sprintf(str, "%03d", lock_dist / BLOCK_SZ);
     }
 
     if (BIT(Setup->mode, LIMITED_LIVES) || lock_dist !=0) {
 
- 	if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0) 
+ 	if (BIT(Setup->mode, LIMITED_LIVES) && target->life == 0)
 	    SET_FG(colors[RED].pixel);
 	else
 	    SET_FG(colors[hudColor].pixel);
@@ -371,7 +371,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 			 WINSCALE(size), WINSCALE(size), 0, 64*360);
 		Erase_rectangle(WINSCALE(x), WINSCALE(y),
 				 WINSCALE(size), WINSCALE(size));
-		SET_FG(colors[hudColor].pixel);       
+		SET_FG(colors[hudColor].pixel);
 	    }
 	}
     }
@@ -395,18 +395,18 @@ void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit, int sz)
 	    x += hrw;
 	else if (x > hrw / 2)
 	    x -= hrw;
-	
+
 	if (y < -hrh / 2)
 	    y += hrh;
 	else if (y > hrh / 2)
 	    y -= hrh;
-	
+
 	if (!((x <= xlimit) && (x >= -xlimit)
 	      && (y <= ylimit) && (y >= -ylimit))) {
-	    
+
  	    x = x + ext_view_width / 2 - sz / 2;
  	    y = -y + ext_view_height / 2 - sz / 2;
-	    
+
 	    if (radar_ptr[i].color == WHITE) {
 		if (hudRadarEnemyColor >= 1)
 		    Arc_add(hudRadarEnemyColor, x, y, sz, sz, 0, 64 * 360);
@@ -585,9 +585,9 @@ void Paint_HUD(void)
 	    int len, width;
 
 	    /* Paint item symbol */
-	    Paint_item_symbol((u_byte)i, p_draw, gc, 
+	    Paint_item_symbol((u_byte)i, p_draw, gc,
 			horiz_pos - ITEM_SIZE,
-			vert_pos, 
+			vert_pos,
 			ITEM_HUD);
 
 	    if (i == lose_item) {
@@ -595,7 +595,7 @@ void Paint_HUD(void)
 		    if (lose_item_active < 0) {
 			lose_item_active++;
 		    }
-		    rd.drawRectangle(dpy, p_draw, gc, 
+		    rd.drawRectangle(dpy, p_draw, gc,
 				horiz_pos-ITEM_SIZE-2,
 				vert_pos-2, ITEM_SIZE+2, ITEM_SIZE+2);
 		}
@@ -755,9 +755,9 @@ void Paint_HUD(void)
 	return;
 
     rd.drawRectangle(dpy, p_draw, gc,
-		  WINSCALE(hud_pos_x + hudSize - HUD_OFFSET 
+		  WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET) - 1,
-		  WINSCALE(hud_pos_y - hudSize + HUD_OFFSET 
+		  WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET) - 1,
 		  WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)) + 3,
 		  WINSCALE(HUD_FUEL_GAUGE_SIZE) + 3);
@@ -770,15 +770,15 @@ void Paint_HUD(void)
 
     size = (HUD_FUEL_GAUGE_SIZE * fuelSum) / fuelMax;
     rd.fillRectangle(dpy, p_draw, gc,
-                   WINSCALE(hud_pos_x + hudSize - HUD_OFFSET 
+                   WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET) + 1,
-                   WINSCALE(hud_pos_y - hudSize + HUD_OFFSET 
+                   WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size) + 1,
 		   WINSCALE(HUD_OFFSET - (2*FUEL_GAUGE_OFFSET)),
 		   WINSCALE(size));
-    Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET 
+    Erase_rectangle(WINSCALE(hud_pos_x + hudSize - HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET),
-                    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET 
+                    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET
 			+ FUEL_GAUGE_OFFSET + HUD_FUEL_GAUGE_SIZE - size),
                     HUD_OFFSET - (2*FUEL_GAUGE_OFFSET) + 1, size + 1);
 
@@ -836,7 +836,7 @@ void Paint_messages(void)
 		msg->lifeTime = 0.0;
 		continue;
 	    }
-	} 
+	}
 #ifdef _WINDOWS
 	else if ((msg->lifeTime -= timePerFrame) <= 0.0) {
 		msg->txt[0] = '\0';
@@ -845,7 +845,7 @@ void Paint_messages(void)
 		continue;
 	    }
 #endif
-	
+
 	if (i < maxMessages) {
 	    x = BORDER;
 	    y = top_y;
@@ -869,7 +869,7 @@ void Paint_messages(void)
 
 #ifndef _WINDOWS
 	/*
-	 * it's an emphasized talk message 
+	 * it's an emphasized talk message
 	 */
 	if (selectionAndHistory && selection.draw.state == SEL_EMPHASIZED
 	    && i < maxMessages
@@ -957,7 +957,7 @@ void Paint_messages(void)
 		    l3 = len - selection.draw.x2 - 1;
 		}
 	    } /* last line */
-		
+
 
 	    if (ptr) {
 		XSetForeground(dpy, messageGC, colors[msg_color].pixel);
@@ -1221,7 +1221,7 @@ static void Msg_parse(char *message, size_t len)
     /* handle death array */
     if (victim != NULL) {
 	other = Other_by_name(victim);
-	
+
 	/*for safety... could possibly happen with
 	  loss or parser bugs =) */
 	if (other != NULL)
@@ -1230,7 +1230,7 @@ static void Msg_parse(char *message, size_t len)
 	DP(printf("*** [%s] was not found in the players array! ***\n",
 		  victim));
     }
-    
+
     if (victim2 != NULL) {
 	other = Other_by_name(victim);
 	if (other != NULL)
@@ -1250,7 +1250,7 @@ static void Msg_parse(char *message, size_t len)
     if (BIT(hackedInstruments, CLIENT_RANKER)) {
 	/*static char tauntstr[MAX_CHARS];
 	  int kills, deaths; */
-	
+
 	/* handle case where there is a victim and a killer */
 	if (killer != NULL && victim != NULL) {
 	    if (i_am_killer && !i_am_victim) {
@@ -1374,7 +1374,7 @@ void Msg_do_bms(char *message)
 	    strstr(message, pop_text2) ||
 	    strstr(message, pop_text3)))
 	pop = true;
-    
+
     if (!safe && !cover && !pop
 	&& (strstr(message, ball_text1) ||
 	    strstr(message, ball_text2) ||
@@ -1384,7 +1384,7 @@ void Msg_do_bms(char *message)
 	ball = true;
 
     *bracket = '[';
-    
+
     /*check first 'ball popped' etc. */
     if (cover || pop)
 	need_cover = cover;
@@ -1401,11 +1401,11 @@ static bool Msg_is_team_msg(char *message)
 
     if (self == NULL)
 	return false;
- 
+
     sprintf(end, "]:[%i]", self->team);
     endlen = strlen(end);
     len = strlen(message);
-    
+
     if (len < endlen)
 	return false;
     if (!strcmp(&message[len - endlen], end))
@@ -1520,7 +1520,7 @@ void Add_message(char *message)
 	if (show_reverse_scroll && last_msg_index == maxMessages - 1) {
 	    scrolling = true;
 	}
-	
+
 	/*
 	 * keep the emphasizing (`jumping' from talk window to talk messages)
 	 */
@@ -1562,7 +1562,7 @@ void Add_message(char *message)
 	     * the emphasizing vanishes, as it's `last' line
 	     * is `scrolled away'
 	     */
-	    selection.draw.state = SEL_SELECTED;	
+	    selection.draw.state = SEL_SELECTED;
 	} else {
 	    if (scrolling) {
 		selection.draw.y2--;
@@ -1692,5 +1692,3 @@ void Paint_client_fps(void)
     Erase_rectangle( x - 1,  WINSCALE(200),
 			 w+2, gameFont->ascent + gameFont->descent);
 }
-
-
