@@ -27,23 +27,21 @@
 char score_version[] = VERSION;
 
 
-void Score(player *pl, DFLOAT points, int cx, int cy, const char *msg)
+void Score(player *pl, DFLOAT points, clpos pos, const char *msg)
 {
     if (BIT(World.rules->mode, TEAM_PLAY)) {
-	if (!teamShareScore) {
+	if (!teamShareScore)
 	    Rank_AddScore(pl, points);
-	}
 	TEAM_SCORE(pl->team, points);
     } else {
-	if (pl->alliance != ALLIANCE_NOT_SET && teamShareScore) {
+	if (pl->alliance != ALLIANCE_NOT_SET && teamShareScore)
 	    Alliance_score(pl->alliance, points);
-	} else {
+	else
 	    Rank_AddScore(pl, points);
-	}
     }
 
     if (pl->conn != NULL)
-	Send_score_object(pl->conn, points, cx, cy, msg);
+	Send_score_object(pl->conn, points, pos.cx, pos.cy, msg);
 
     updateScores = true;
 }
@@ -59,9 +57,8 @@ void TEAM_SCORE(int team, DFLOAT points)
 	DFLOAT share = World.teams[team].score / World.teams[team].NumMembers;
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
-	    if (pl_i->team == team) {
+	    if (pl_i->team == team)
 		Rank_SetScore(pl_i, share);
-	    }
 	}
     }
 
@@ -76,9 +73,8 @@ void Alliance_score(int id, DFLOAT points)
 
     for (i = 0; i < NumPlayers; i++) {
 	player *pl_i = Players(i);
-	if (pl_i->alliance == id) {
+	if (pl_i->alliance == id)
 	    Rank_AddScore(pl_i, share);
-	}
     }
 }
 
@@ -121,8 +117,6 @@ void Score_players(player *winner_pl, DFLOAT winner_score, char *winner_msg,
 	if (loser_score > 0)
 	    loser_score = -loser_score;
     }
-    Score(winner_pl, winner_score, loser_pl->pos.cx, loser_pl->pos.cy,
-	  winner_msg);
-    Score(loser_pl, loser_score, loser_pl->pos.cx, loser_pl->pos.cy,
-	  loser_msg);
+    Score(winner_pl, winner_score, loser_pl->pos, winner_msg);
+    Score(loser_pl, loser_score, loser_pl->pos, loser_msg);
 }

@@ -319,7 +319,7 @@ void Object_hits_target(object *obj, target_t *targ, long player_cost)
 	sc = Rate(kp->score, CANNON_SCORE)/4;
 	sc = sc * (targets_total - targets_remaining) / (targets_total + 1);
 	if (sc >= 0.01)
-	    Score(kp, sc, targ->pos.cx, targ->pos.cy, "Target: ");
+	    Score(kp, sc, targ->pos, "Target: ");
 	/*
 	 * If players can't collide with their own targets, we
 	 * assume there are many used as shields.  Don't litter
@@ -327,7 +327,7 @@ void Object_hits_target(object *obj, target_t *targ, long player_cost)
 	 */
 	if (targetTeamCollision && targets_total < 10) {
 	    sprintf(msg, "%s blew up one of team %d's targets.",
-		    kp->name, (int) targ->team);
+		    kp->name, targ->team);
 	    Set_message(msg);
 	}
 	return;
@@ -361,11 +361,11 @@ void Object_hits_target(object *obj, target_t *targ, long player_cost)
 		&& targets_remaining == 0
 		&& !BIT(pl->status, KILLED|PAUSE|GAME_OVER))
 		SET_BIT(pl->status, KILLED);
-	    Score(pl, -sc, targ->pos.cx, targ->pos.cy, "Target: ");
+	    Score(pl, -sc, targ->pos, "Target: ");
 	}
 	else if (pl->team == kp->team &&
 		 (pl->team != TEAM_NOT_SET || pl->id == kp->id))
-	    Score(pl, por, targ->pos.cx, targ->pos.cy, "Target: ");
+	    Score(pl, por, targ->pos, "Target: ");
     }
 }
 
@@ -555,7 +555,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	}
 	if (num_pushers == 0) {
 	    sc = Rate(WALL_SCORE, pl->score);
-	    Score(pl, -sc, pl->pos.cx, pl->pos.cy, hudmsg);
+	    Score(pl, -sc, pl->pos, hudmsg);
 	    strcat(msg, ".");
 	    Set_message(msg);
 	}
@@ -583,13 +583,13 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 		}
 		sc = cnt[i] * Rate(pusher->score, pl->score)
 				    * shoveKillScoreMult / total_pusher_count;
-		Score(pusher, sc, pl->pos.cx, pl->pos.cy, pl->name);
+		Score(pusher, sc, pl->pos, pl->name);
 		if (i >= num_pushers - 1)
 		    Rank_AddKill(pusher);
 	    }
 	    sc = Rate(average_pusher_score, pl->score)
 		* shoveKillScoreMult;
-	    Score(pl, -sc, pl->pos.cx, pl->pos.cy, "[Shove]");
+	    Score(pl, -sc, pl->pos, "[Shove]");
 
 	    strcpy(msg_ptr, ".");
 	    Set_message(msg);

@@ -912,8 +912,7 @@ void Update_objects(void)
 		if (BIT(pl->status, SELF_DESTRUCT)) {
 		    if (selfDestructScoreMult != 0) {
 			DFLOAT sc = Rate(0, pl->score) * selfDestructScoreMult;
-			Score(pl, -sc, pl->pos.cx, pl->pos.cy,
-			      "Self-Destruct");
+			Score(pl, -sc, pl->pos, "Self-Destruct");
 		    }
 		    SET_BIT(pl->status, KILLED);
 		    sprintf(msg, "%s has committed suicide.", pl->name);

@@ -26,7 +26,7 @@
 char play_version[] = VERSION;
 
 
-static int Punish_team(player *pl, treasure_t *td, int cx, int cy)
+static int Punish_team(player *pl, treasure_t *td, clpos pos)
 {
     static char		msg[MSG_LEN];
     int			i;
@@ -67,14 +67,13 @@ static int Punish_team(player *pl, treasure_t *td, int cx, int cy)
     Set_message(msg);
 
     if (!somebody_flag) {
-	Score(pl, Rate(pl->score, CANNON_SCORE)/2, cx, cy, "Treasure:");
+	Score(pl, Rate(pl->score, CANNON_SCORE)/2, pos, "Treasure:");
 	return 0;
     }
 
     td->destroyed++;
     World.teams[td->team].TreasuresLeft--;
     World.teams[pl->team].TreasuresDestroyed++;
-
 
     sc  = 3 * Rate(win_score, lose_score);
     por = (sc * lose_team_members) / (2 * win_team_members + 1);
@@ -89,7 +88,7 @@ static int Punish_team(player *pl, treasure_t *td, int cx, int cy)
 		&& pl_i->mychar == 'W'))
 	    continue;
 	if (pl_i->team == td->team) {
-	    Score(pl_i, -sc, cx, cy, "Treasure: ");
+	    Score(pl_i, -sc, pos, "Treasure: ");
 	    Rank_LostBall(pl_i);
 	    if (treasureKillTeam)
 		SET_BIT(pl_i->status, KILLED);
@@ -97,19 +96,17 @@ static int Punish_team(player *pl, treasure_t *td, int cx, int cy)
 	else if (pl_i->team == pl->team &&
 		 (pl_i->team != TEAM_NOT_SET || pl_i->id == pl->id)) {
 	    if (lose_team_members > 0) {
-		if (pl_i->id == pl->id) {
+		if (pl_i->id == pl->id)
 		    Rank_CashedBall(pl_i);
-		}
 		Rank_WonBall(pl_i);
 	    }
 	    Score(pl_i, (pl_i->id == pl->id ? 3*por : 2*por),
-		  cx, cy, "Treasure: ");
+		  pos, "Treasure: ");
 	}
     }
 
-    if (treasureKillTeam) {
+    if (treasureKillTeam)
 	Rank_AddKill(pl);
-    }
 
     updateScores = true;
 
@@ -221,7 +218,7 @@ void Ball_is_replaced(ballobject *ball)
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 
-    Score(pl, 5, ball->pos.cx, ball->pos.cy, "Treasure: ");
+    Score(pl, 5, ball->pos, "Treasure: ");
     sprintf(msg, " < %s (team %d) has replaced the treasure >",
 	    pl->name, pl->team);
     Set_message(msg);
@@ -291,7 +288,7 @@ void Ball_hits_goal(ballobject *ball, struct group *gp)
 	    sprintf(msg, " < The treasure must be safe before you "
 		    "can cash an opponent's! >");
 	    Set_message(msg);
-	} else if (Punish_team(owner, td, ball->pos.cx, ball->pos.cy))
+	} else if (Punish_team(owner, td, ball->pos))
 	    CLR_BIT(ball->status, RECREATE);
 	return;
     }

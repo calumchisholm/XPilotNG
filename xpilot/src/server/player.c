@@ -862,7 +862,7 @@ static void Give_best_player_bonus(DFLOAT average_score,
 		bp->name,
 		bp->kills, bp->deaths);
 	points = best_ratio * Rate(bp->score, average_score);
-	Score(bp, points, bp->pos.cx, bp->pos.cy, "[Deadliest]");
+	Score(bp, points, bp->pos, "[Deadliest]");
     } else {
 	msg[0] = '\0';
 	for (i = 0; i < num_best_players; i++) {
@@ -883,7 +883,7 @@ static void Give_best_player_bonus(DFLOAT average_score,
 	    }
 	    strcat(msg, bp->name);
 	    points = (int) (best_ratio * score);
-	    Score(bp, points, bp->pos.cx, bp->pos.cy, "[Deadly]");
+	    Score(bp, points, bp->pos, "[Deadly]");
 	}
 	if (strlen(msg) + 64 >= sizeof(msg)) {
 	    Set_message(msg);
@@ -903,7 +903,7 @@ static void Give_individual_bonus(player *pl, DFLOAT average_score)
 
     ratio = (DFLOAT) pl->kills / (pl->deaths + 1);
     points = ratio * Rate(pl->score, average_score);
-    Score(pl, points, pl->pos.cx, pl->pos.cy, "[Winner]");
+    Score(pl, points, pl->pos, "[Winner]");
 }
 
 
@@ -1179,7 +1179,7 @@ void Race_game_over(void)
 			(num_best_players == 1) ? "had" : "shares",
 			(DFLOAT) bestlap / FPS);
 		Set_message(msg);
-		Score(pl, 5 + num_active_players, pl->pos.cx, pl->pos.cy,
+		Score(pl, 5 + num_active_players, pl->pos,
 		      (num_best_players == 1)
 		      ? "[Fastest lap]" : "[Joint fastest lap]");
 	    }
@@ -1429,7 +1429,7 @@ void Compute_game_status(void)
 			Set_message(msg);
 			sprintf(msg, "[Position %d%s]", position,
 				(num_finished_players == 1) ? "" : " (jointly)");
-			Score(pl, pts, pl->pos.cx, pl->pos.cy, msg);
+			Score(pl, pts, pl->pos, msg);
 		    }
 		    else {
 			sprintf(msg,
