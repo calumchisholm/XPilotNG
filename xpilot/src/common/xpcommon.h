@@ -73,6 +73,10 @@
 #   define HAVE_SYS_FILIO_H 1
 #   define HAVE_SYS_SOCKIO_H 1
 #  endif
+#  ifdef VMS
+#   define HAVE_SOCKET_H
+#   define HAVE_IN_H
+#  endif
 # endif /* _WINDOWS */
 #endif
 
@@ -197,8 +201,11 @@
 #endif
 
 /* VMS hacks. */
-#ifdef VMS
+#ifdef HAVE_SOCKET_H
 # include <socket.h>
+#endif
+
+#ifdef HAVE_IN_H
 # include <in.h>
 #endif
 
