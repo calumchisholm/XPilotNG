@@ -48,6 +48,8 @@ xpilottextures_DATA = \
 	sdlmetabg.png \
 	shield.ppm \
 	ship.ppm \
+	ship_enemy.ppm \
+	ship_friend.ppm \
 	ship_blue.ppm \
 	ship_red.ppm \
 	ship_red2.ppm \
