@@ -668,7 +668,7 @@ static inline bool is_noarg_option(const char *name)
     return true;
 }
 
-void Xpilotrc_read(const char *path)
+bool Xpilotrc_read(const char *path)
 {
     char buf[BUFSIZ];
     FILE *fp;
@@ -676,14 +676,12 @@ void Xpilotrc_read(const char *path)
     /*
      * Read options from xpilotrc.
      */
-    warn("Reading options from xpilotrc file %s.\n", path);
+    assert(path);
+    xpprintf("Reading options from xpilotrc file %s.\n", path);
     if (strlen(path) > 0 && ((fp = fopen(path, "r")) != NULL)) {
 	while (fgets(buf, sizeof buf, fp)) {
-	    char *cp;
-	    /*
-	     * kps - remove NL and CR, does this work in windows ? 
-	     */
-	    cp = strchr(buf, '\n');
+	    char *cp = strchr(buf, '\n');
+
 	    if (cp)
 		*cp = '\0';
 	    cp = strchr(buf, '\r');
@@ -692,23 +690,69 @@ void Xpilotrc_read(const char *path)
 	    Parse_xpilotrc_line(buf);
 	}
 	fclose(fp);
+	return true;
     }
+    return false;
 }
 
-void Xpilotrc_write(void)
+
+#define TABSIZE 8
+static void Xpilotrc_write_resource(FILE *fp,
+				    const char *resource, const char *value)
 {
+    char		buf[256];
+    int			len, numtabs, i;
+ 
+    sprintf(buf, "xpilot.%s:", resource);
+    len = (int) strlen(buf);
 
+    /* assume tabs are max size of TABSIZE */
+    numtabs = ((5 * TABSIZE - 1) - len) / TABSIZE;
+    for (i = 0; i < numtabs; i++)
+	strcat(buf, "\t");
+    fprintf(fp, "%s", buf);
+    fprintf(fp, "%s\n", value);
 }
+#undef TABSIZE
 
+bool Xpilotrc_write(const char *path)
+{
+    FILE *fp;
+    int i;
 
+    assert(path);
+    if (strlen(path) == 0) {
+	warn("Xpilotrc_write: Zero length filename.");
+	return false;
+    }
+
+    fp = fopen(path, "w");
+    if (fp == NULL) {
+	error("Xpilotrc_write: Failed to write file \"%s\"", path);
+	return false;
+    }
+    
+    for (i = 0; i < num_options; i++) {
+	xp_option_t *opt = Option_by_index(i);
+
+	Xpilotrc_write_resource(fp,
+				Option_get_name(opt),
+				Option_value_to_string(opt));
+    }
+
+    fclose(fp);
+
+    return true;
+}
+ 
 
 void Parse_options(int *argcp, char **argvp)
 {
     int arg_ind, num_remaining_args, num_servers = 0, i;
-    char path[PATH_MAX + 1];
+    char *filename;
 
-    Get_xpilotrc_file(path, sizeof(path));
-    Xpilotrc_read(path);
+    filename = Xpilotrc_get_filename();
+    Xpilotrc_read(filename);
 
     /*
      * Here we step trough argc - 1 arguments, leaving
@@ -829,24 +873,31 @@ void defaultCleanup(void)
 }
 
 #ifndef _WINDOWS
-void Get_xpilotrc_file(char *path, unsigned size)
+const char *Xpilotrc_get_filename(void)
 {
+    static char path[PATH_MAX + 1];
     const char *home = getenv("HOME");
     const char *defaultFile = ".xpilotrc";
     const char *optionalFile = getenv("XPILOTRC");
 
     if (optionalFile != NULL)
-	strlcpy(path, optionalFile, size);
+	strlcpy(path, optionalFile, sizeof(path));
     else if (home != NULL) {
-	strlcpy(path, home, size);
-	strlcat(path, "/", size);
-	strlcat(path, defaultFile, size);
+	strlcpy(path, home, sizeof(path));
+	strlcat(path, "/", sizeof(path));
+	strlcat(path, defaultFile, sizeof(path));
     } else
-	strlcpy(path, "", size);
+	strlcpy(path, "", sizeof(path));
+
+    return path;
 }
 #else
-void Get_xpilotrc_file(char *path, unsigned size)
+const char *Xpilotrc_get_filename(void)
 {
-	strlcpy(path, ".xpilotrc", size);
+    static char path[PATH_MAX + 1];
+
+    /* kps - wouldn't xpilotrc.txt be a better name ? */
+    strlcpy(path, ".xpilotrc", sizeof path);
+    return path;
 }
 #endif /* _WINDOWS */

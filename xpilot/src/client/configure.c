@@ -569,6 +569,8 @@ static void Config_save_failed(const char *reason, const char **strptr)
     *strptr = "Saving failed...";
 }
 
+#if 0
+
 #ifndef _WINDOWS
 static int Xpilotrc_add(char *line)
 {
@@ -640,60 +642,9 @@ static void Xpilotrc_use(char *line)
 }
 #endif
 
-
-#ifndef _WINDOWS
-static void Config_save_resource(FILE *fp, const char *resource, char *value)
-{
-    char		buf[256];
-    int			len, numtabs, i;
-
-    sprintf(buf, "xpilot.%s:", resource);
-    len = (int) strlen(buf);
-#define TABSIZE 8
-    /* assume tabs are max size of TABSIZE */
-    numtabs = ((5 * TABSIZE - 1) - len) / TABSIZE;
-    for (i = 0; i < numtabs; i++)
-	strcat(buf, "\t");
-    sprintf(buf + strlen(buf), "%s\n", value);
-#if 0
-    sprintf(buf, "xpilot.%s:\t\t%s\n", resource, value);
-#endif
-    Xpilotrc_use(buf);
-    fprintf(fp, "%s", buf);
-}
 #endif
 
 #if 0
-static void Config_save_comment(FILE *fp, const char *comment)
-{
-    IFNWINDOWS(fprintf(fp, "%s", comment));
-}
-
-static void Config_save_float(FILE *fp, const char *resource, double value)
-{
-    char		buf[40];
-
-    sprintf(buf, "%.3f", value);
-    Config_save_resource(fp, resource, buf);
-}
-
-static void Config_save_int(FILE *fp, const char *resource, int value)
-{
-    char		buf[20];
-
-    sprintf(buf, "%d", value);
-    Config_save_resource(fp, resource, buf);
-}
-
-static void Config_save_bool(FILE *fp, const char *resource, int value)
-{
-    char		buf[20];
-
-    sprintf(buf, "%s", (value != 0) ? "True" : "False");
-    Config_save_resource(fp, resource, buf);
-}
-#endif
-
 /*
  * Find a key in keydefs[].
  * On success set output pointer to index into keydefs[] and return true.
@@ -750,12 +701,27 @@ static void Config_save_keys(FILE *fp)
 	}
     }
 }
+#endif
 
 static int Config_save(int widget_desc, void *button_str, const char **strptr)
 {
 #if 1
+    const char *filename;
 
-    Add_message("Config_save() is currently broken. [*Client notice*]");
+    *strptr = "Saving...";
+    Widget_draw(widget_desc);
+    XFlush(dpy);
+
+    filename = Xpilotrc_get_filename();
+    Xpilotrc_write(filename);
+
+    if (config_save_confirm_desc != NO_WIDGET) {
+	Widget_destroy(config_save_confirm_desc);
+	config_save_confirm_desc = NO_WIDGET;
+    }
+
+    *strptr = (char *) button_str;
+ 
     return 1;
 
 #else
