@@ -41,8 +41,8 @@ int hudColor		    = 0xff000088;
 int connColor	    	    = 0xff880088;
 int scoreObjectColor 	    = 0x00ff0088;
 int fuelColor 	    	    = 0xff000088;
-int messagesColor   	    = 0xff00ff88;
-int oldMessagesColor   	    = 0xff00ff44;
+int messagesColor   	    = 0xff00ffff;
+int oldMessagesColor   	    = 0xff00ff88;
 int msgScanBallColor   	    = 0xff000088;
 int msgScanSafeColor   	    = 0x00ff0088;
 int msgScanCoverColor  	    = 0xaaaa0088;
@@ -123,7 +123,7 @@ void Circle(int color,
 	    int x, int y,
 	    int radius)
 {
-    float i,resolution = 64;
+    float i,resolution = 32;
     set_alphacolor(color);
     glBegin( GL_LINE_LOOP );
     	/* Silly resolution */
