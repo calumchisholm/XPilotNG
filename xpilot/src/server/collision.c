@@ -1317,12 +1317,12 @@ static void Player_pass_checkpoint(player *pl)
 
 static void AsteroidCollision(void)
 {
-    int		j, obj_count;
+    int		j, radius, obj_count;
     object	*ast;
     object	*obj = NULL, **obj_list;
     list_t	list;
     list_iter_t	iter;
-    double	damage = 0.0, radius;
+    double	damage = 0.0;
     bool	sound = false;
 
     list = Asteroid_get_list();
@@ -1365,7 +1365,7 @@ static void AsteroidCollision(void)
 		continue;
 
 	    radius = (ast->pl_radius + obj->pl_radius) * CLICK;
-	    if (!in_range(OBJ_PTR(ast), obj, radius))
+	    if (!in_range(OBJ_PTR(ast), obj, (double)radius))
 		continue;
 
 	    switch (obj->type) {
@@ -1510,7 +1510,7 @@ static void BallCollision(void)
 			 4, 300, &obj_list, &obj_count);
 
 	for (j = 0; j < obj_count; j++) {
-	    double radius;
+	    int radius;
 
 	    obj = obj_list[j];
 
@@ -1522,7 +1522,7 @@ static void BallCollision(void)
 		continue;
 
 	    radius = (ball->pl_radius + obj->pl_radius) * CLICK;
-	    if (!in_range(OBJ_PTR(ball), obj, radius))
+	    if (!in_range(OBJ_PTR(ball), obj, (double)radius))
 		continue;
 
 	    /* bang! */
