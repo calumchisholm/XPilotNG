@@ -25,6 +25,7 @@
 #ifndef PAINT_H
 #define PAINT_H
 
+#include <time.h>
 
 /* includes begin */
 #ifndef TYPES_H

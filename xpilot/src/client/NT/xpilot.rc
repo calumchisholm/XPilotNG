@@ -67,7 +67,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON    DISCARDABLE     "res\\xpilot.ico"
 IDR_XPILOTTYPE          ICON    DISCARDABLE     "res\\xpilot.ico"
-IDI_XPILOTS             ICON    DISCARDABLE     "..\\..\\server\\NT\\res\\xpilots.ico"
+//IDI_XPILOTS             ICON    DISCARDABLE     "..\\..\\server\\NT\\res\\xpilots.ico"
 IDI_ICON1               ICON    DISCARDABLE     "res\\xpilot.ico"
 
 /////////////////////////////////////////////////////////////////////////////
