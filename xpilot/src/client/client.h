@@ -50,6 +50,7 @@
 #endif
 
 typedef struct {
+    bool	talking;	/* Some talk window is open? */
     double	clientLag;
     double	scaleFactor;
     double	scale;
@@ -669,6 +670,7 @@ int Bitmap_add(const char *filename, int count, bool scalable);
  * Platform specific code needs to implement these.
  */
 void Pointer_control_set_state(bool on);
+void Talk_set_state(bool on);
 void Record_toggle(void);
 void Toggle_fullscreen(void);
 void Toggle_radar_and_scorelist(void);
@@ -686,10 +688,8 @@ int Key_update(void);
 void Key_clear_counts(void);
 bool Key_press(keys_t key);
 bool Key_release(keys_t key);
-bool Key_press_talk(void);
 void Set_auto_shield(bool on);
 void Set_toggle_shield(bool on);
-void Talk_set_state(bool on);
 
 /*
  * messages.c

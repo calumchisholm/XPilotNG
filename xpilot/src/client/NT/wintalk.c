@@ -37,8 +37,6 @@
 /*
  * Globals.
  */
-bool talk_mapped;
-
 static bool talk_created;
 static char talk_str[MAX_CHARS];
 static struct {
@@ -421,7 +419,7 @@ void Clear_draw_selection()
  */
 void Clear_selection()
 {
-    if (talk_mapped && selection.talk.state == SEL_EMPHASIZED) {
+    if (clData.talking && selection.talk.state == SEL_EMPHASIZED) {
 	/* trick to unemphasize */
 	selection.talk.state = SEL_SELECTED;
 	Talk_refresh();

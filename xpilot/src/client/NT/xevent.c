@@ -91,9 +91,12 @@ void Pointer_control_set_state(bool on)
     }
 }
 
-static void Talk_set_state(bool on)
+void Talk_set_state(bool on)
 {
     char *wintalkstr;
+
+    if (clData.talking == on)
+	return;
 
     if (pointerControl) {
 	initialPointerControl = true;
@@ -110,12 +113,6 @@ static void Talk_set_state(bool on)
     }
 
     scoresChanged = true;
-}
-
-bool Key_press_talk(void)
-{
-    Talk_set_state((talk_mapped == false) ? true : false);
-    return false;	/* server doesn't need to know */
 }
 
 void Toggle_radar_and_scorelist(void)
@@ -211,7 +208,7 @@ static void Handle_talk_key_repeat(void)
 	    Talk_event(&talk_key_repeat_event);
 	    talk_key_repeating = 2;
 	    talk_key_repeat_time = time_now;
-	    if (!talk_mapped)
+	    if (!clData.talking)
 		talk_key_repeating = 0;
 	}
     }
@@ -226,7 +223,7 @@ void xevent_pointer(void)
 {
     POINT point;
 
-    if (!pointerControl || talk_mapped)
+    if (!pointerControl || clData.talking)
 	return;
 
     GetCursorPos(&point);

@@ -178,7 +178,7 @@ void FocusIn_event(XEvent *event)
     if (!gotFocus)
         time(&back_in_play_since);
 #endif
-    if (initialPointerControl && !talk_mapped) {
+    if (initialPointerControl && !clData.talking) {
 	initialPointerControl = false;
 	Pointer_control_set_state(true);
     }
@@ -251,7 +251,7 @@ void KeyChanged_event(XEvent *event)
 	    talk_key_repeating = 0;
 
 	Talk_event(event);
-	if (!talk_mapped)
+	if (!clData.talking)
 	    talk_key_repeating = 0;
     }
 	/* else : here we can add widget.c key uses. */
@@ -262,7 +262,7 @@ void ButtonPress_event(XEvent *event)
     if (event->xbutton.window == drawWindow
 	|| event->xbutton.window == talkWindow) {
         if (pointerControl
-	    && !talk_mapped
+	    && !clData.talking
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
 	    Pointer_button_pressed((int)event->xbutton.button);
 
@@ -277,7 +277,7 @@ void MotionNotify_event(XEvent *event)
 {
     if (event->xmotion.window == drawWindow) {
         if (pointerControl) {
-	    if (!talk_mapped) {
+	    if (!clData.talking) {
 	        if (!event->xmotion.send_event)
 		    mouseMovement += event->xmotion.x - mousePosition.x;
 	    }
@@ -294,7 +294,7 @@ int ButtonRelease_event(XEvent *event)
 	|| event->xbutton.window == talkWindow) {
 
         if (pointerControl
-	    && !talk_mapped
+	    && !clData.talking
 	    && event->xbutton.button <= MAX_POINTER_BUTTONS)
 	    Pointer_button_released((int)event->xbutton.button);
 
@@ -340,7 +340,7 @@ void Expose_event(XEvent *event)
     else if (event->xexpose.window == talkWindow) {
 	if (event->xexpose.count == 0) {
 	    Talk_event(event);
-	    if (!talk_mapped)
+	    if (!clData.talking)
 		talk_key_repeating = 0;
 	}
     }

@@ -228,6 +228,22 @@ static bool Key_press_decrease_turnspeed(void)
     return false;	/* server doesn't see these keypresses anymore */
 }
 
+static bool Key_press_talk(void)
+{
+    int i;
+
+    /*
+     * this releases mouse in x11 client, so we clear the mouse buttons
+     * so they don't lock on
+     */
+    if (pointerControl)
+	for (i = 0; i < MAX_POINTER_BUTTONS; i++)
+	    Pointer_button_released(i);
+
+    Talk_set_state(!clData.talking);
+    return false;	/* server doesn't need to know */
+}
+
 static bool Key_press_show_items(void)
 {
     instruments.showItems = !instruments.showItems;
@@ -485,14 +501,6 @@ bool Key_press(keys_t key)
 	return Key_press_decrease_turnspeed();
 
     case KEY_TALK:
-    	/*
-	 * this releases mouse in x11 client, so we clear the mouse buttons
-	 * so they don't lock on
-	 */
-	if (pointerControl)
-	    for (i = 0; i < MAX_POINTER_BUTTONS; i++)
-		Pointer_button_released(i);
-
 	return Key_press_talk();
 
     case KEY_TOGGLE_OWNED_ITEMS:

@@ -184,7 +184,7 @@ void FocusIn_event(XEvent *event)
     if (!gotFocus)
 	time(&back_in_play_since);
 #endif
-    if (initialPointerControl && !talk_mapped) {
+    if (initialPointerControl && !clData.talking) {
 	initialPointerControl = false;
 	Pointer_control_set_state(true);
     }
@@ -257,7 +257,7 @@ void KeyChanged_event(XEvent *event)
 	    talk_key_repeating = 0;
 
 	Talk_event(event);
-	if (!talk_mapped)
+	if (!clData.talking)
 	    talk_key_repeating = 0;
     }
 	/* else : here we can add widget.c key uses. */
@@ -268,7 +268,7 @@ void ButtonPress_event(XEvent *event)
     XButtonEvent *xbutton = &(event->xbutton);
 
     if (pointerControl) {
-	assert(!talk_mapped);
+	assert(!clData.talking);
 	Pointer_button_pressed((int)xbutton->button);
 	return;
     }
@@ -279,12 +279,12 @@ void ButtonPress_event(XEvent *event)
 	    if (Talk_cut_area_hit(xbutton))
 		/* start cutting from the talk messages */
 		Talk_cut_from_messages(xbutton);
-	    else if (!talk_mapped)
+	    else if (!clData.talking)
 		Pointer_control_set_state(true);
 	    break;
 
 	case Button2:
-	    if (talk_mapped)
+	    if (clData.talking)
 		Selection_request();
 	    break;
 
@@ -295,7 +295,7 @@ void ButtonPress_event(XEvent *event)
     }
 
     if (xbutton->window == talkWindow) {
-	assert(talk_mapped);
+	assert(clData.talking);
 	switch (xbutton->button) {
 	case Button1:
 	    /* start cutting from the talk window */
@@ -322,7 +322,7 @@ void MotionNotify_event(XEvent *event)
 {
     if (event->xmotion.window == drawWindow) {
 	if (pointerControl) {
-	    if (!talk_mapped) {
+	    if (!clData.talking) {
 		if (!event->xmotion.send_event)
 		    mouseMovement += event->xmotion.x - mousePosition.x;
 	    }
@@ -338,13 +338,13 @@ int ButtonRelease_event(XEvent *event)
     XButtonEvent *xbutton = &(event->xbutton);
 
     if (pointerControl) {
-	assert(!talk_mapped);
+	assert(!clData.talking);
 	Pointer_button_released((int)xbutton->button);
     }
 
     if (xbutton->window == drawWindow) {
 	if (xbutton->button == Button1) {
-	    if (!talk_mapped)
+	    if (!clData.talking)
 		/*
 		 * finish a cut from the talk messages
 		 */
@@ -364,7 +364,7 @@ int ButtonRelease_event(XEvent *event)
     }
 
     if (xbutton->window == talkWindow) {
-	assert(talk_mapped);
+	assert(clData.talking);
 	if (xbutton->button == Button1) {
 	    /*
 	     * finish a cut from the talk window
@@ -416,7 +416,7 @@ void Expose_event(XEvent *event)
     else if (event->xexpose.window == talkWindow) {
 	if (event->xexpose.count == 0) {
 	    Talk_event(event);
-	    if (!talk_mapped)
+	    if (!clData.talking)
 		talk_key_repeating = 0;
 	}
     }

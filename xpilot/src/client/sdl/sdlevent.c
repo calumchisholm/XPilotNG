@@ -40,10 +40,13 @@ GLWidget *hovertarget = NULL;
 
 int Process_event(SDL_Event *evt);
 
-bool Key_press_talk(void)
+
+void Talk_set_state(bool on)
 {
+    if (clData.talking == on)
+	return;
+
     Console_show();
-    return false;	/* server doesn't need to know */
 }
 
 void Pointer_control_set_state(bool on)

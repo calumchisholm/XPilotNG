@@ -92,11 +92,13 @@ void Console_show(void)
 {
     CON_Show(console);
     Console_refresh();
+    clData.talking = true;
 }
 
 void Console_hide(void)
 {
     CON_Hide(console);
+    clData.talking = false;
 }
 
 int Console_isVisible(void)

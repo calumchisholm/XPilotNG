@@ -1287,7 +1287,6 @@ XID GetFreeXid()
 * dialogs differently... I should revisit these to use   *
 * these new APIs.                                        *
 \*------------------------------------------------------*/
-bool talk_mapped = FALSE;
 void Talk_resize(void)
 {
 }

@@ -80,7 +80,6 @@ extern Window	about_close_b;		/* About close button */
 extern Window	about_next_b;		/* About next page button */
 extern Window	about_prev_b;		/* About prev page button */
 extern Window	talkWindow;		/* Talk window */
-extern bool	talk_mapped;		/* Is talk window visible */
 extern XColor	colors[MAX_COLORS];	/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */

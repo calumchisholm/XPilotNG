@@ -25,7 +25,7 @@
 
 #include "xpclient.h"
 
-client_data_t	clData;
+client_data_t	clData = { 0, };
 
 char	*geometry;
 xp_args_t xpArgs;

@@ -42,7 +42,6 @@
 /*
  * Globals.
  */
-bool			talk_mapped;
 
 static bool		talk_created;
 static char		talk_str[MAX_CHARS];
@@ -82,7 +81,7 @@ static void Talk_create_window(void)
 
 void Talk_cursor(bool visible)
 {
-    if (talk_mapped == false || visible == talk_cursor.visible)
+    if (clData.talking == false || visible == talk_cursor.visible)
 	return;
 
     if (visible == false) {
@@ -145,7 +144,7 @@ void Talk_map_window(bool map)
 	    talk_created = true;
 	}
 	XMapWindow(dpy, talkWindow);
-	talk_mapped = true;
+	clData.talking = true;
 
 	XQueryPointer(dpy, DefaultRootWindow(dpy),
 		      &root, &child, &root_x, &root_y, &win_x, &win_y,
@@ -160,7 +159,7 @@ void Talk_map_window(bool map)
 	XUnmapWindow(dpy, talkWindow);
 	XWarpPointer(dpy, None, root, 0, 0, 0, 0, root_x, root_y);
 	XFlush(dpy);	/* warp pointer ASAP. */
-	talk_mapped = false;
+	clData.talking = false;
 	/* reset browsing */
 	history_pos = -1;
     }
@@ -177,7 +176,7 @@ static void Talk_refresh(void)
 {
     size_t len;
 
-    if (!talk_mapped)
+    if (!clData.talking)
 	return;
 
     len = strlen(talk_str);
@@ -1065,7 +1064,7 @@ static void Selection_set_state(void)
  */
 void Clear_selection(void)
 {
-    if (talk_mapped && selection.talk.state == SEL_EMPHASIZED) {
+    if (clData.talking && selection.talk.state == SEL_EMPHASIZED) {
 	/* trick to unemphasize */
 	selection.talk.state = SEL_SELECTED;
 	Talk_refresh();

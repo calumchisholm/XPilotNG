@@ -308,7 +308,7 @@ void Paint_frame(void)
     }
 
 #ifndef _WINDOWS
-    if (talk_mapped) {
+    if (clData.talking) {
 	static bool toggle;
 	static long last_toggled;
 
