@@ -1469,9 +1469,8 @@ static int Robot_default_play_check_map(player *pl)
 	    && (dy = (CLICK_TO_PIXEL(fs->pos.cy - pl->pos.cy)),
 		dy = WRAP_DY(dy), ABS(dy)) < fuel_dist
 	    && (distance = LENGTH(dx, dy)) < fuel_dist) {
-	    int bx = CLICK_TO_BLOCK(fs->pos.cx);
-	    int by = CLICK_TO_BLOCK(fs->pos.cy);
-	    if (World.block[bx][by] == FUEL) {
+	    blpos bpos = Clpos_to_blpos(fs->pos);
+	    if (World.block[bpos.bx][bpos.by] == FUEL) {
 		fuel_i = j;
 		fuel_dist = distance;
 	    }

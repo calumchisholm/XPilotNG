@@ -371,11 +371,9 @@ static void Cannon_set_hitmask(int group, cannon_t *cannon)
 
 void Cannon_restore_on_map(cannon_t *cannon)
 {
-    int			bx, by;
+    blpos bpos = Clpos_to_blpos(cannon->pos);
 
-    bx = CLICK_TO_BLOCK(cannon->pos.cx);
-    by = CLICK_TO_BLOCK(cannon->pos.cy);
-    World.block[bx][by] = CANNON;
+    World.block[bpos.bx][bpos.by] = CANNON;
 
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
@@ -386,14 +384,12 @@ void Cannon_restore_on_map(cannon_t *cannon)
 
 void Cannon_remove_from_map(cannon_t *cannon)
 {
-    int			bx, by;
+    blpos bpos = Clpos_to_blpos(cannon->pos);
 
     cannon->dead_time = cannonDeadTime;
     cannon->conn_mask = 0;
 
-    bx = CLICK_TO_BLOCK(cannon->pos.cx);
-    by = CLICK_TO_BLOCK(cannon->pos.cy);
-    World.block[bx][by] = SPACE;
+    World.block[bpos.bx][bpos.by] = SPACE;
 
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
@@ -476,11 +472,9 @@ void Target_init(void)
 
 void Target_restore_on_map(target_t *targ)
 {
-    int			bx, by;
+    blpos bpos = Clpos_to_blpos(targ->pos);
 
-    bx = CLICK_TO_BLOCK(targ->pos.cx);
-    by = CLICK_TO_BLOCK(targ->pos.cy);
-    World.block[bx][by] = TARGET;
+    World.block[bpos.bx][bpos.by] = TARGET;
 
     targ->conn_mask = 0;
     targ->update_mask = (unsigned)-1;
@@ -493,7 +487,7 @@ void Target_restore_on_map(target_t *targ)
 
 void Target_remove_from_map(target_t *targ)
 {
-    int			bx, by;
+    blpos bpos = Clpos_to_blpos(targ->pos);
 
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
@@ -504,9 +498,7 @@ void Target_remove_from_map(target_t *targ)
      * Destroy target.
      * Turn it into a space to simplify other calculations.
      */
-    bx = CLICK_TO_BLOCK(targ->pos.cx);
-    by = CLICK_TO_BLOCK(targ->pos.cy);
-    World.block[bx][by] = SPACE;
+    World.block[bpos.bx][bpos.by] = SPACE;
 
     /*P_set_hitmask(targ->group, ALL_BITS);*/
     P_set_hitmask(targ->group, Target_hitmask(targ));
@@ -531,6 +523,12 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
     warn("Wormhole_hitfunc: wormhole %p hit by a %s",
 	 wormhole, Object_typename(move->obj));
 #endif
+    if (obj->type == OBJ_PLAYER) {
+	player *pl = (player *)obj;
+	if (pl->wormHoleHit == gp->mapobj_ind)
+	    return false;
+    }
+
     return true;
 
 #if 0
@@ -572,12 +570,9 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
 
 void Wormhole_remove_from_map(wormhole_t *wormhole)
 {
-    int			bx, by;
+    blpos bpos = Clpos_to_blpos(wormhole->pos);
 
-    bx = CLICK_TO_BLOCK(wormhole->pos.cx);
-    by = CLICK_TO_BLOCK(wormhole->pos.cy);
-    World.block[bx][by] = wormhole->lastblock;
-    /*Map_set_itemid(bx, by, wormhole->lastID);*/
+    World.block[bpos.bx][bpos.by] = wormhole->lastblock;
 }
 
 extern void Describe_group(int group);

@@ -126,4 +126,17 @@ typedef struct {
 #define INSIDE_MAP(cx, cy) \
 ((cx) >= 0 && (cx) < World.cwidth && (cy) >= 0 && (cy) < World.cheight)
 
+/*
+ * Return the block position this click position is in.
+ */
+static inline blpos Clpos_to_blpos(clpos pos)
+{
+    blpos bpos;
+
+    bpos.bx = CLICK_TO_BLOCK(pos.cx);
+    bpos.by = CLICK_TO_BLOCK(pos.cy);
+
+    return bpos;
+}
+
 #endif

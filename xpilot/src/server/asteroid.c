@@ -291,12 +291,12 @@ static void Make_asteroid(clpos pos, int size, int dir, double speed)
 static void Place_asteroid(void)
 {
     int			place_count;
-    int			bx, by;
     int			dir, dist;
     unsigned		space;
     int			okay;
     asteroid_concentrator_t	*con;
     clpos		pos;
+    blpos		bpos;
 
     space = SPACE_BLOCKS;
     space &= ~(BASE_BIT | WORMHOLE_BIT);
@@ -331,11 +331,10 @@ static void Place_asteroid(void)
 	    pos.cx = (int)(rfrac() * World.cwidth);
 	    pos.cy = (int)(rfrac() * World.cheight);
 	}
-	bx = CLICK_TO_BLOCK(pos.cx);
-	by = CLICK_TO_BLOCK(pos.cy);
+	bpos = Clpos_to_blpos(pos);
 
 	/* kps - World.block must be removed */
-	if (BIT(1U << World.block[bx][by], space)) {
+	if (BIT(1U << World.block[bpos.bx][bpos.by], space)) {
 	    int i, dpx, dpy;
 
 	    okay = true;

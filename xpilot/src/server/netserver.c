@@ -411,8 +411,9 @@ static int Init_setup_old(void)
 		break;
 	    case CHECK:
 		for (i = 0; i < World.NumChecks; i++) {
-		    if (x != CLICK_TO_BLOCK(Checks(i)->pos.cx)
-			|| y != CLICK_TO_BLOCK(Checks(i)->pos.cy))
+		    check_t *check = Checks(i);
+		    blpos bpos = Clpos_to_blpos(check->pos);
+		    if (x != bpos.bx || y != bpos.by)
 			continue;
 		    *mapptr = SETUP_CHECK + i;
 		    break;
@@ -2161,7 +2162,7 @@ int Send_fuel(connection_t *connp, int num, double fuel)
 int Send_score_object(connection_t *connp, double score, clpos pos,
 		      const char *string)
 {
-    int			bx, by;
+    blpos bpos = Clpos_to_blpos(pos);
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for base info (%d,%d)",
@@ -2169,17 +2170,14 @@ int Send_score_object(connection_t *connp, double score, clpos pos,
 	return 0;
     }
 
-    bx = CLICK_TO_BLOCK(pos.cx);
-    by = CLICK_TO_BLOCK(pos.cy);
-
     if (!FEATURE(connp, F_FLOATSCORE))
 	return Packet_printf(&connp->c, "%c%hd%hu%hu%s", PKT_SCORE_OBJECT,
 			     (int)(score + (score > 0 ? 0.5 : -0.5)),
-			     bx, by, string);
+			     bpos.bx, bpos.by, string);
     else
 	return Packet_printf(&connp->c, "%c%d%hu%hu%s", PKT_SCORE_OBJECT,
 			     (int)(score * 100 + (score > 0 ? 0.5 : -0.5)),
-			     bx, by, string);
+			     bpos.bx, bpos.by, string);
 }
 
 int Send_cannon(connection_t *connp, int num, int dead_time)

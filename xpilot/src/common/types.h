@@ -47,6 +47,8 @@ typedef vector			position;
 typedef struct { int x, y; }	ivec;
 typedef ivec			ipos;
 typedef struct { int x, y, w, h;} irec;
+typedef struct { int bx, by; }	blvec;
+typedef blvec			blpos;
 
 #ifdef _WINDOWS
 # define strncasecmp(__s, __t, __l)	strnicmp(__s, __t, __l)
