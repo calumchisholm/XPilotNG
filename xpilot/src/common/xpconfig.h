@@ -24,6 +24,10 @@
 #ifndef XPCONFIG_H
 #define XPCONFIG_H
 
+#ifndef PACKAGE
+#    define PACKAGE "xpilot"
+#endif
+
 #ifndef LOCALGURU
 #    define LOCALGURU "ksoderbl@cc.hut.fi"
 #endif
