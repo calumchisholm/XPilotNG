@@ -309,31 +309,31 @@ static int Cannon_select_weapon(cannon_t *c)
  */
 static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 {
-    int		speed = ShotsSpeed;
-    int		range = CANNON_SHOT_LIFE_MAX * speed;
-    int		visualrange = (int)(CANNON_DISTANCE
+    double	speed = ShotsSpeed;
+    double	range = CANNON_SHOT_LIFE_MAX * speed;
+    double	visualrange = (CANNON_DISTANCE
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
     bool	found = false, ready = false;
-    int		closest = range, i;
-    int		ddir;
+    double	closest = range;
+    int		ddir, i;
 
     switch (weapon) {
     case CW_MINE:
-	speed = (int)(speed * 0.5 + 0.1 * cannonSmartness);
-	range = (int)(range * 0.5 + 0.1 * cannonSmartness);
+	speed = speed * 0.5 + 0.1 * cannonSmartness;
+	range = range * 0.5 + 0.1 * cannonSmartness;
 	break;
     case CW_LASER:
 	speed = pulseSpeed;
-	range = (int)(CANNON_PULSE_LIFE * speed);
+	range = CANNON_PULSE_LIFE * speed;
 	break;
     case CW_ECM:
 	/* smarter cannons wait a little longer before firing an ECM */
 	if (cannonSmartness > 1)
-	    range = (int)((ECM_DISTANCE / cannonSmartness
-		     + (int)(rfrac() * (int)(ECM_DISTANCE
-				       - ECM_DISTANCE / cannonSmartness))));
+	    range = ((ECM_DISTANCE / cannonSmartness
+		      + (rfrac() * (int)(ECM_DISTANCE
+					 - ECM_DISTANCE / cannonSmartness))));
 	else
-	    range = (int)ECM_DISTANCE;
+	    range = ECM_DISTANCE;
 	break;
     case CW_TRACTORBEAM:
 	range = TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]);
@@ -343,12 +343,12 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	   target is out of range */
 	if (cannonSmartness > 2
 	    || (int)(rfrac() * sqr(cannonSmartness + 1)))
-	    range = (int)TRANSPORTER_DISTANCE;
+	    range = TRANSPORTER_DISTANCE;
 	break;
     case CW_GASJET:
 	if (c->item[ITEM_EMERGENCY_THRUST]) {
-	    speed *= 2;
-	    range *= 2;
+	    speed *= 2.0;
+	    range *= 2.0;
 	}
 	break;
     default:
@@ -358,7 +358,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 
     for (i = 0; i < NumPlayers && !ready; i++) {
 	player *pl = Players(i);
-	int tdist, tdx, tdy;
+	double tdist, tdx, tdy;
 
 	tdx = WRAP_DCX(pl->pos.cx - c->pos.cx) / CLICK;
 	if (ABS(tdx) >= visualrange)
@@ -366,7 +366,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	tdy = WRAP_DCY(pl->pos.cy - c->pos.cy) / CLICK;
 	if (ABS(tdy) >= visualrange)
 	    continue;
-	tdist = (int)LENGTH(tdx, tdy);
+	tdist = LENGTH(tdx, tdy);
 	if (tdist > visualrange)
 	    continue;
 
@@ -393,7 +393,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	    break;
 	case 2:
 	    if (tdist < closest) {
-		*dir = (int)findDir(tdx, tdy);
+		*dir = findDir(tdx, tdy);
 		found = true;
 	    }
 	    break;
@@ -410,11 +410,11 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 
 		tdx = WRAP_DCX(npx - c->pos.cx) / CLICK;
 		tdy = WRAP_DCY(npy - c->pos.cy) / CLICK;
-		tdir = (int)findDir(tdx, tdy);
+		tdir = findDir(tdx, tdy);
 		ddir = MOD2(tdir - c->dir, RES);
 		if ((ddir < (CANNON_SPREAD * 0.5)
 		     || ddir > RES - (CANNON_SPREAD * 0.5))
-		    && (int)LENGTH(tdx, tdy) < closest) {
+		    && LENGTH(tdx, tdy) < closest) {
 		    *dir = tdir;
 		    found = true;
 		}
@@ -462,7 +462,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
     modifiers	mods;
     bool	played = false;
     int		i;
-    int		speed = ShotsSpeed;
+    double	speed = ShotsSpeed;
     vector	zero_vel = { 0.0, 0.0 };
 
     CLEAR_MODS(mods);
@@ -487,7 +487,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 		mods.mini = (int)(rfrac() * MODS_MINI_MAX) + 1;
 		mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
 	    }
-	    speed = (int)(speed * 0.5 + 0.1 * cannonSmartness);
+	    speed = speed * 0.5 + 0.1 * cannonSmartness;
 	    vel.x = tcos(dir) * speed;
 	    vel.y = tsin(dir) * speed;
 	    Place_general_mine(NULL, c->team, GRAVITY|FROMCANNON, c->pos,
@@ -548,9 +548,8 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 	/* stun and blinding lasers are very dangerous,
 	   so we don't use them often */
 	if (BIT(World.rules->mode, ALLOW_LASER_MODIFIERS)
-	    && (rfrac() * (8 - cannonSmartness)) >= 1) {
+	    && (rfrac() * (8 - cannonSmartness)) >= 1)
 	    mods.laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
-	}
 	Fire_general_laser(NULL, c->team, c->pos, dir, mods);
 	sound_play_sensors(c->pos, FIRE_LASER_SOUND);
 	played = true;
@@ -584,38 +583,36 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
     case CW_GASJET:
 	/* use emergency thrusts to make extra big jets */
 	if ((rfrac() * (c->item[ITEM_EMERGENCY_THRUST] + 1)) >= 1) {
-	    Make_debris(
-		/* pos */	c->pos,
-		/* vel */	zero_vel,
-		/* id */	NO_ID,
-		/* team */	c->team,
-		/* type */	OBJ_SPARK,
-		/* mass */	THRUST_MASS,
-		/* status */	GRAVITY|FROMCANNON,
-		/* color */	RED,
-		/* radius */	8,
-		/* number */	300 + 400 * rfrac(),
-		/* dir */	dir - 4 * (4 - cannonSmartness),
-				dir + 4 * (4 - cannonSmartness),
-		/* speed */	0.1, speed * 4,
-		/* life */	3, 20);
+	    Make_debris(c->pos,
+			zero_vel,
+			NO_ID,
+			c->team,
+			OBJ_SPARK,
+			THRUST_MASS,
+			GRAVITY|FROMCANNON,
+			RED,
+			8,
+			(int)(300 + 400 * rfrac()),
+			dir - 4 * (4 - cannonSmartness),
+			dir + 4 * (4 - cannonSmartness),
+			0.1, speed * 4,
+			3.0, 20.0);
 	    c->item[ITEM_EMERGENCY_THRUST]--;
 	} else {
-	    Make_debris(
-		/* pos */	c->pos,
-		/* vel */	zero_vel,
-		/* id */	NO_ID,
-		/* team */	c->team,
-		/* type */	OBJ_SPARK,
-		/* mass */	THRUST_MASS,
-		/* status */	GRAVITY|FROMCANNON,
-		/* color */	RED,
-		/* radius */	8,
-		/* number */	150 + 200 * rfrac(),
-		/* dir */	dir - 3 * (4 - cannonSmartness),
-				dir + 3 * (4 - cannonSmartness),
-		/* speed */	0.1, speed * 2,
-		/* life */	3, 20);
+	    Make_debris(c->pos,
+			zero_vel,
+			NO_ID,
+			c->team,
+			OBJ_SPARK,
+			THRUST_MASS,
+			GRAVITY|FROMCANNON,
+			RED,
+			8,
+			(int)(150 + 200 * rfrac()),
+			dir - 3 * (4 - cannonSmartness),
+			dir + 3 * (4 - cannonSmartness),
+			0.1, speed * 2,
+			3.0, 20.0);
 	}
 	c->item[ITEM_FUEL]--;
 	sound_play_sensors(c->pos, THRUST_SOUND);
@@ -649,8 +646,9 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
     }
 
     /* finally, play sound effect */
-    if (!played)
+    if (!played) {
 	sound_play_sensors(c->pos, CANNON_FIRE_SOUND);
+    }
 }
 
 
@@ -662,35 +660,31 @@ void Cannon_dies(cannon_t *c, player *pl)
     Cannon_throw_items(c);
     Cannon_init(c);
     sound_play_sensors(c->pos, CANNON_EXPLOSION_SOUND);
-    Make_debris(
-	/* pos            */ c->pos,
-	/* vel            */ zero_vel,
-	/* owner id       */ NO_ID,
-	/* owner team	  */ c->team,
-	/* kind           */ OBJ_DEBRIS,
-	/* mass           */ 4.5,
-	/* status         */ GRAVITY,
-	/* color          */ RED,
-	/* radius         */ 6,
-	/* num debris     */ 20 + 20 * rfrac(),
-	/* min,max dir    */ (int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
-	/* min,max speed  */ 20, 50,
-	/* min,max life   */ 8, 68
-	);
-    Make_wreckage(
-	/* pos            */ c->pos,
-	/* vel            */ zero_vel,
-	/* owner id       */ NO_ID,
-	/* owner team	  */ c->team,
-	/* min,max mass   */ 3.5, 23,
-	/* total mass     */ 28,
-	/* status         */ GRAVITY,
-	/* color          */ WHITE,
-	/* max wreckage   */ 10,
-	/* min,max dir    */ (int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
-	/* min,max speed  */ 10, 25,
-	/* min,max life   */ 8, 68
-	);
+    Make_debris(c->pos,
+		zero_vel,
+		NO_ID,
+		c->team,
+		OBJ_DEBRIS,
+		4.5,
+		GRAVITY,
+		RED,
+		6,
+		(int)(20 + 20 * rfrac()),
+		(int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
+		20.0, 50.0,
+		8.0, 68.0);
+    Make_wreckage(c->pos,
+		  zero_vel,
+		  NO_ID,
+		  c->team,
+		  3.5, 23.0,
+		  28.0,
+		  GRAVITY,
+		  WHITE,
+		  10,
+		  (int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
+		  10.0, 25.0,
+		  8.0, 68.0);
 
     if (pl) {
 	if (cannonPoints > 0) {
