@@ -37,8 +37,6 @@ typedef struct ranknode {
     char user[MAX_NAME_LEN];
     char host[MAX_HOST_LEN];
 
-    char logout[32];
-
     time_t timestamp;
 
     int kills, deaths;
@@ -50,13 +48,6 @@ typedef struct ranknode {
     double score;
     player_t *pl;
 } ranknode_t;
-
-
-static inline void Rank_set_logout_message(player_t *pl, const char *msg)
-{
-    if (pl->rank)
-	strlcpy(pl->rank->logout, msg, sizeof(pl->rank->logout));
-}
 
 void Rank_get_stats(player_t *pl, char *buf);
 ranknode_t *Rank_get_by_name(char *name);
