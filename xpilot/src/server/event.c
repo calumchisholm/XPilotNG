@@ -180,7 +180,8 @@ void Pause_player(player *pl, bool on)
     if (on && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    World.teams[pl->team].SwapperId = -1;
-	pl->count = 10 * FPS;
+	/* Minimum pause time is 10 seconds at gamespeed 12. */
+	pl->count = 10 * 12;
 	pl->updateVisibility = 1;
 	CLR_BIT(pl->status, SELF_DESTRUCT|PLAYING);
 	SET_BIT(pl->status, PAUSE);
@@ -253,7 +254,8 @@ void Pause_player(player *pl, bool on)
 
 int Handle_keyboard(player *pl)
 {
-    int	    	i, j, k, key, pressed, cx, cy, dx, dy;
+    int	    	i, j, k, key, pressed, dx, dy;
+    clpos	pos;
     double  	minv;
     int	    	ind = GetInd(pl->id);
 
@@ -741,12 +743,11 @@ int Handle_keyboard(player *pl)
 		else if (BIT(pl->status, HOVERPAUSE))
 		    i = HOVERPAUSE;
 		else {
-		    cx = pl->home_base->pos.cx;
-		    cy = pl->home_base->pos.cy;
-		    dx = ABS(CENTER_XCLICK(pl->pos.cx - cx));
-		    dy = ABS(CENTER_YCLICK(pl->pos.cy - cy));
+		    pos = pl->home_base->pos;
+		    dx = ABS(CENTER_XCLICK(pl->pos.cx - pos.cx));
+		    dy = ABS(CENTER_YCLICK(pl->pos.cy - pos.cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
-			minv = 3.0f;
+			minv = 3.0;
 			i = PAUSE;
 		    } else {
 			/*
@@ -755,7 +756,7 @@ int Handle_keyboard(player *pl)
 			 */
 			if (dx < 2 * BLOCK_CLICKS && dy < 2 * BLOCK_CLICKS)
 			    break;
-			minv = 5.0f;
+			minv = 5.0;
 			i = HOVERPAUSE;
 		    }
 		    minv += VECTOR_LENGTH(World_gravity(pl->pos));
@@ -788,7 +789,7 @@ int Handle_keyboard(player *pl)
 			/*
 			 * Turn hover pause on, together with shields.
 			 */
-			pl->count = 5 * FPS;
+			pl->count = 5 * 12;
 			CLR_BIT(pl->status, SELF_DESTRUCT);
 			SET_BIT(pl->status, HOVERPAUSE);
 
