@@ -912,6 +912,12 @@ void Paint_messages(void)
 		continue;
 	    }
 #endif
+	if (msg->lifeTime > MSG_FLASH_TIME)
+	    msg_color = messagesColor;
+	else
+	    msg_color = oldMessagesColor;
+	if (!msg_color)
+	    continue;
 
 	if (i < maxMessages) {
 	    x = BORDER;
@@ -927,12 +933,6 @@ void Paint_messages(void)
 	}
 	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
 	len = MIN(msg->len, len);
-	if (msg->lifeTime > MSG_FLASH_TIME) {
-	    msg_color = messagesColor;
-	}
-	else {
-	    msg_color = oldMessagesColor;
-	}
 
 #ifndef _WINDOWS
 	/*
