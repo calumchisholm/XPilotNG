@@ -156,9 +156,7 @@ void Pick_startpos(player_t *pl)
 		if (pl_i->conn != NULL)
 		    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	    }
-	    if (BIT(pl->status, PLAYING) == 0)
-		pl->count = RECOVERY_DELAY;
-	    else if (BIT(pl->status, PAUSE|GAME_OVER))
+	    if (BIT(pl->status, PAUSE|GAME_OVER))
 		Go_home(pl);
 	}
     }

@@ -63,17 +63,6 @@ Fixed by:
 Files affected:
 
 -----------------------------------------------------------------
-Problem : If someone in your team died and is recovering, you can
-	  take his base and then he will be swapped to have some other
-	  base, but with full recovery delay. This way you can keep
-	  a team member from recovering if you take his base all the time.
-Found by: Throat
-Solution:
-Fixed by:
-Files 
-affected:
-
------------------------------------------------------------------
 Problem : If you put logo.ppm in your current dirctory and start the X
           client, this file will be used in the score list. More generally
 	  the client should take the textures first from texturedir.
@@ -107,6 +96,17 @@ affected:
 
 
 FIXED:
+
+-----------------------------------------------------------------
+Problem : If someone in your team died and is recovering, you can
+	  take his base and then he will be swapped to have some other
+	  base, but with full recovery delay. This way you can keep
+	  a team member from recovering if you take his base all the time.
+Found by: Throat
+Solution: Don't set pl->count to RECOVERY_DELAY in Pick_startpos().
+Fixed by: kps
+Files 
+affected: src/server/player.c
 
 -----------------------------------------------------------------
 Problem: X client crashes in Talk_delete_emphasized_text() in talk.c.
