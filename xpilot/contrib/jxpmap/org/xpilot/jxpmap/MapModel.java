@@ -211,9 +211,10 @@ public class MapModel {
                     poly.style = atts.getValue("style");
                     poly.points = new ArrayList();
                     
-                    poly.points.add(new Point
+                    poly.points.add(new PolyPoint
                         (Integer.parseInt(atts.getValue("x")), 
-                         Integer.parseInt(atts.getValue("y"))));
+                         Integer.parseInt(atts.getValue("y")), 
+                         null));
 
                     if (ballAreaTeam != -1) {
                         poly.type = MapPolygon.TYPE_BALLAREA;
@@ -225,9 +226,12 @@ public class MapModel {
                     
                 } else if (name.equalsIgnoreCase("offset")) {
                     
-                    poly.points.add(new Point
+                    String es = atts.getValue("style");
+                    if (es != null) poly.hasSpecialEdges = true;
+                    poly.points.add(new PolyPoint
                         (Integer.parseInt(atts.getValue("x")), 
-                         Integer.parseInt(atts.getValue("y"))));
+                         Integer.parseInt(atts.getValue("y")),
+                         es));
                     
                 } else if (name.equalsIgnoreCase("edgestyle")) {
                     
@@ -254,7 +258,7 @@ public class MapModel {
                         col = new Color(Integer.parseInt(cstr));
                     }
                     
-                    pstyles.put(id, new Pstyle
+                    pstyles.put(id, new PolyStyle
                         (id, col,
                          atts.getValue("texture"),
                          atts.getValue("defedge"),
@@ -279,8 +283,8 @@ public class MapModel {
 
                 } else if (name.equalsIgnoreCase("fuel")) {
 
-                    int x = Integer.parseInt(atts.getValue("x")); // >> 6;
-                    int y = Integer.parseInt(atts.getValue("y")); // >> 6;
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
                     MapFuel o = new MapFuel(x, y);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
@@ -288,8 +292,8 @@ public class MapModel {
 
                 } else if (name.equalsIgnoreCase("ball")) {
 
-                    int x = Integer.parseInt(atts.getValue("x")); // >> 6;
-                    int y = Integer.parseInt(atts.getValue("y")); // >> 6;
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
                     int team = Integer.parseInt(atts.getValue("team"));
                     MapBall o = new MapBall(x, y, team);
                     Rectangle r = o.getBounds();
@@ -298,8 +302,8 @@ public class MapModel {
 
                 } else if (name.equalsIgnoreCase("base")) {
 
-                    int x = Integer.parseInt(atts.getValue("x")); // >> 6;
-                    int y = Integer.parseInt(atts.getValue("y")); // >> 6;
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
                     int dir = Integer.parseInt(atts.getValue("dir"));
                     int team = Integer.parseInt(atts.getValue("team"));
                     MapBase o = new MapBase(x, y, dir, team);
@@ -309,8 +313,8 @@ public class MapModel {
 
                 } else if (name.equalsIgnoreCase("check")) {
 
-                    int x = Integer.parseInt(atts.getValue("x")); // >> 6;
-                    int y = Integer.parseInt(atts.getValue("y")); // >> 6;
+                    int x = Integer.parseInt(atts.getValue("x"));
+                    int y = Integer.parseInt(atts.getValue("y"));
                     MapCheckPoint o = new MapCheckPoint(x, y);
                     Rectangle r = o.getBounds();
                     o.moveTo(r.x - r.width / 2, r.y - r.height / 2);
@@ -362,7 +366,7 @@ public class MapModel {
                 for (Iterator iter = pstyles.values().iterator(); 
                      iter.hasNext();) {
 
-                    Pstyle ps = (Pstyle)iter.next();
+                    PolyStyle ps = (PolyStyle)iter.next();
 
                     PolygonStyle style = new PolygonStyle();
                     style.setId(ps.id);
@@ -397,28 +401,33 @@ public class MapModel {
 
                     PolygonStyle style = null;
                     if (p.style != null) {
-                        Pstyle ps = (Pstyle)pstyles.get(p.style);
+                        PolyStyle ps = (PolyStyle)pstyles.get(p.style);
                         if (ps != null) style = ps.ref;
                     }
                     if (style == null) style = defPolyStyle;
-
+                    
+                    ArrayList edges = p.hasSpecialEdges ? 
+                        new ArrayList() : null;
 
                     Polygon awtp = new Polygon();
                     
                     Iterator i2 = p.points.iterator();
-                    Point pnt = (Point)i2.next();
-                    int x = pnt.x; // >> 6;
-                    int y = pnt.y; // >> 6;
+                    PolyPoint pnt = (PolyPoint)i2.next();
+                    int x = pnt.x;
+                    int y = pnt.y;
                     awtp.addPoint(x, y);
                     
                     while (i2.hasNext()) {
-                        pnt = (Point)i2.next();
-                        x += pnt.x; // >> 6;
-                        y += pnt.y; // >> 6;
+                        pnt = (PolyPoint)i2.next();
+                        x += pnt.x;
+                        y += pnt.y;
                         awtp.addPoint(x, y);
+                        if (edges != null) 
+                            edges.add(pnt.style != null ? 
+                                      estyles.get(pnt.style) : null);
                     }
 
-                    MapPolygon mp = new MapPolygon(awtp, style, null);
+                    MapPolygon mp = new MapPolygon(awtp, style, edges);
                     mp.setType(p.type);
                     mp.setTeam(p.team);
                     
@@ -438,13 +447,26 @@ public class MapModel {
         private class Poly {
             String style;
             List points;
-            List edges;
             int type;
             int team;
+            boolean hasSpecialEdges;
         }
 
 
-        private class Pstyle {
+        private class PolyPoint {
+            int x;
+            int y;
+            String style;
+
+            PolyPoint (int x, int y, String style) {
+                this.x = x;
+                this.y = y;
+                this.style = style;
+            }
+        }
+
+
+        private class PolyStyle {
             String id;
             Color color;
             String textureId;
@@ -452,7 +474,7 @@ public class MapModel {
             int flags;
             PolygonStyle ref;
 
-            Pstyle (String id, Color color, String textureId, 
+            PolyStyle (String id, Color color, String textureId, 
                     String defEdgeId, int flags) {
                 this.id = id;
                 this.color = color;

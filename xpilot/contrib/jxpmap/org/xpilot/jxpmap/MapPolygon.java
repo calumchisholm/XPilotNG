@@ -175,7 +175,10 @@ public class MapPolygon extends MapObject {
                 while (i < p.npoints - 1 && getEdgeStyle(i) == ls) i++;
                 
                 if (ls == null) ls = style.getDefaultEdgeStyle();
-                
+
+                if (i == p.npoints - 2 && ls == style.getDefaultEdgeStyle())
+                    edgeStyles = null; // use the other branch next time
+
                 if (ls.getStyle() != LineStyle.STYLE_HIDDEN) {
                     g.setColor(ls.getColor());
                     g.setStroke(ls.getStroke(scale));
@@ -239,13 +242,8 @@ public class MapPolygon extends MapObject {
                          pl.ypoints[i]) < 25 * 64 * 64) {
                         
                         if (canvas.isErase()) {
-                            int pc = pl.npoints - 1;
-                            int[] xps = remove(pl.xpoints, i);
-                            int[] yps = remove(pl.ypoints, i);
-                            
-                            polygon = new Polygon(xps, yps, pc);
+                            removePoint(i);
                             canvas.repaint();
-                            
                         } else {
                             canvas.setCanvasEventHandler
                                 (new PolygonPointMoveHandler(me, i));
@@ -270,13 +268,8 @@ public class MapPolygon extends MapObject {
                              InputEvent.BUTTON1_MASK) != 0) {
                             
                             if (me.getID() == me.MOUSE_PRESSED) {
-                            
-                                int pc = pl.npoints + 1;
-                                int xps[] = insert(p.x, pl.xpoints, i + 1);
-                                int yps[] = insert(p.y, pl.ypoints, i + 1);
-                                
-                                polygon = new Polygon(xps, yps, pc);
-                                
+                                insertPoint(i + 1, p);
+                                canvas.repaint();
                                 canvas.setCanvasEventHandler
                                     (new PolygonPointMoveHandler(me, i + 1));
                                 return true;
@@ -299,6 +292,42 @@ public class MapPolygon extends MapObject {
         }
 
         return super.checkAwtEvent(canvas, evt);
+    }
+
+
+    public void removePoint (int i) {
+
+        int pc = polygon.npoints - 1;
+        int[] xps = remove(polygon.xpoints, i);
+        int[] yps = remove(polygon.ypoints, i);
+        
+        polygon = new Polygon(xps, yps, pc);
+        
+        if (edgeStyles != null) {
+            int pi = i - 1;
+            if (pi < 0) pi += polygon.npoints;
+            if (edgeStyles.size() > pi) 
+                edgeStyles.remove(pi);
+        }
+    }
+
+    
+    public void insertPoint (int i, Point p) {
+        int pc = polygon.npoints + 1;
+        int xps[] = insert(p.x, polygon.xpoints, i);
+        int yps[] = insert(p.y, polygon.ypoints, i);
+        
+        polygon = new Polygon(xps, yps, pc);
+        
+        if (edgeStyles != null) {
+            LineStyle es = getEdgeStyle(i - 1);
+            if (i - 1 < edgeStyles.size()) {
+                edgeStyles.add(i - 1, es);
+            } else {
+                if (es != null && es != getStyle().getDefaultEdgeStyle()) 
+                    setEdgeStyle(i - 1, es);
+            }
+        }
     }
 
 
