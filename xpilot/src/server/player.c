@@ -369,12 +369,16 @@ int Init_player(int ind, wireobj *ship)
     pl->fuel.sum        = World.items[ITEM_FUEL].initial << FUEL_SCALE_BITS;
     Player_init_fuel(ind, pl->fuel.sum);
 
+
+    /* !@# Disallow shapes until the shape requirements are rewritten. */
+#if 0
     if (allowShipShapes == true && ship) {
 	pl->ship = ship;
     }
-    else {
+    else
+#endif
 	pl->ship = Default_ship();
-    }
+
 
     pl->power			= 45.0;
     pl->turnspeed		= 30.0;
