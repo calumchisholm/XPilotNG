@@ -2720,9 +2720,17 @@ void Move_player(player *pl)
 	fric = friction;
     }
 
-    oldv = pl->vel;
-    pl->vel.x = (1.0f - fric) * (oldv.x * cor_cos + oldv.y * cor_sin);
-    pl->vel.y = (1.0f - fric) * (oldv.y * cor_cos - oldv.x * cor_sin);
+    /* Velocity vector might change as a result of friction and coriolis. */
+    if (coriolis != 0.0) {
+	oldv = pl->vel;
+	pl->vel.x = oldv.x * coriolisCosine + oldv.y * coriolisSine;
+	pl->vel.y = oldv.y * coriolisCosine - oldv.x * coriolisSine;
+    }
+
+    if (fric != 0.0) {
+	pl->vel.x *= (1.0 - fric);
+	pl->vel.y *= (1.0 - fric);
+    }
 
     Player_position_remember(pl);
 

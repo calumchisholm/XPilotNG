@@ -255,7 +255,7 @@ double		blockFriction;		/* friction in friction blocks */
 bool		blockFrictionVisible;	/* if yes, friction blocks are decor; */
 					/* if no, friction blocks are space */
 double		coriolis;		/* angle velocity turns each time unit */
-double		cor_cos, cor_sin;	/* cosine and sine of cor. angle */
+double		coriolisCosine, coriolisSine;	/* cosine and sine of cor. angle */
 double		checkpointRadius;      	/* in blocks */
 int		raceLaps;		/* how many laps per race */
 bool		lockOtherTeam;		/* lock ply from other teams when dead? */
@@ -3786,8 +3786,8 @@ void Timing_setup(void)
 
 	cor_angle = coriolis * PI / 180.0;
 
-	cor_cos = cos(cor_angle / timeStep);
-	cor_sin = sin(cor_angle / timeStep);
+	coriolisCosine = cos(cor_angle / timeStep);
+	coriolisSine = sin(cor_angle / timeStep);
     }
 
     install_timer_tick(NULL, timerResolution ? timerResolution : FPS);
