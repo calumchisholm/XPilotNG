@@ -199,7 +199,7 @@ int Check_view_dimensions(void)
 	ext_view_height = height_wanted;
 	ext_view_y_offset = (height_wanted - active_view_height) / 2;
     } else {
-	ext_view_width = active_view_width;
+	ext_view_height = active_view_height;
     }
     return 0;
 }
