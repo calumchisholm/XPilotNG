@@ -235,11 +235,14 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	World.NumBases = 0;
 	World.NumTreasures = 0;
+	World.NumFuels = 0;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "bases"))
 		World.NumBases = atoi(*(attr + 1));
 	    else if (!strcasecmp(*attr, "balls"))
 		World.NumTreasures = atoi(*(attr + 1));
+	    else if (!strcasecmp(*attr, "fuels"))
+		World.NumFuels = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	if (World.NumBases > 0) {
@@ -255,6 +258,39 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    error("Out of memory - treasures");
 	    exit(-1);
 	}
+	if (World.NumFuels > 0
+	    && (World.fuel = (fuel_t *)
+		malloc(World.NumFuels * sizeof(fuel_t))) == NULL) {
+	    error("Out of memory - fuel depots");
+	    exit(-1);
+	}
+    }
+
+    if (!strcasecmp(el, "Fuel")) {
+	static int fuelnum;
+	int team, x, y;
+
+	if (fuelnum >= World.NumFuels) {
+	    error("Given fuel count incorrect (too small).\n");
+	    exit(1);
+	}
+	team = TEAM_NOT_SET;
+	while (*attr) {
+	    if (!strcasecmp(*attr, "team"))
+		team = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "x"))
+		x = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "y"))
+		y = atoi(*(attr + 1));
+	    attr += 2;
+	}
+	World.fuel[fuelnum].clk_pos.x = x;
+	World.fuel[fuelnum].clk_pos.y = y;
+	World.fuel[fuelnum].fuel = START_STATION_FUEL;
+	World.fuel[fuelnum].conn_mask = (unsigned)-1;
+	World.fuel[fuelnum].last_change = frame_loops;
+	World.fuel[fuelnum].team = TEAM_NOT_SET;
+	fuelnum++;
     }
 
     if (!strcasecmp(el, "Base")) {

@@ -252,7 +252,8 @@ extern DFLOAT		tbl_cos[];
 #define FUEL_SCALE_FACT         (1<<FUEL_SCALE_BITS)
 #define FUEL_MASS(f)            ((f)*0.005/FUEL_SCALE_FACT)
 #define MAX_STATION_FUEL	(500<<FUEL_SCALE_BITS)
-#define START_STATION_FUEL	(20<<FUEL_SCALE_BITS)
+/* changed the default to max to avoid sending lots of fuel ACKs */
+#define START_STATION_FUEL      MAX_STATION_FUEL
 #define STATION_REGENERATION	(0.06*FUEL_SCALE_FACT)
 #define MAX_PLAYER_FUEL		(2600<<FUEL_SCALE_BITS)
 #define MIN_PLAYER_FUEL		(350<<FUEL_SCALE_BITS)

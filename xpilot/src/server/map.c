@@ -90,7 +90,6 @@ void Print_map(void)			/* Debugging only. */
 
 void Init_map(void)
 {
-    World.NumFuels	= 0;
     World.NumGravs	= 0;
     World.NumCannons	= 0;
     World.NumWormholes	= 0;
@@ -157,7 +156,6 @@ void Alloc_map(void)
 	(vector **)malloc(sizeof(vector *)*World.x
 			  + World.x*sizeof(vector)*World.y);
     World.grav = NULL;
-    World.fuel = NULL;
     World.cannon = NULL;
     World.wormHoles = NULL;
     World.itemConcentrators = NULL;
@@ -219,9 +217,6 @@ static void Map_error(int line_num)
 
 void Grok_map(void)
 {
-    int i, x, y, c;
-    char *s;
-
     Init_map();
 
     if (mapWidth > MAX_MAP_SIZE || mapHeight > MAX_MAP_SIZE) {
@@ -244,9 +239,6 @@ void Grok_map(void)
 
     Alloc_map();
 
-    x = -1;
-    y = World.y - 1;
-
     Set_world_rules();
     Set_world_items();
 
@@ -267,6 +259,12 @@ void Grok_map(void)
 }
 
 #if 0
+    int i, x, y, c;
+    char *s;
+
+    x = -1;
+    y = World.y - 1;
+
     s = mapData;
     while (y >= 0) {
 
@@ -354,12 +352,6 @@ void Grok_map(void)
 	&& (World.cannon = (cannon_t *)
 	    malloc(World.NumCannons * sizeof(cannon_t))) == NULL) {
 	error("Out of memory - cannons");
-	exit(-1);
-    }
-    if (World.NumFuels > 0
-	&& (World.fuel = (fuel_t *)
-	    malloc(World.NumFuels * sizeof(fuel_t))) == NULL) {
-	error("Out of memory - fuel depots");
 	exit(-1);
     }
     if (World.NumGravs > 0
@@ -498,20 +490,6 @@ void Grok_map(void)
 		    World.cannon[World.NumCannons].team = TEAM_NOT_SET;
 		    Cannon_init(World.NumCannons);
 		    World.NumCannons++;
-		    break;
-
-		case '#':
-		    line[y] = FUEL;
-		    itemID[y] = World.NumFuels;
-		    World.fuel[World.NumFuels].blk_pos.x = x;
-		    World.fuel[World.NumFuels].blk_pos.y = y;
-		    World.fuel[World.NumFuels].clk_pos.x=(x+0.5f)*BLOCK_CLICKS;
-		    World.fuel[World.NumFuels].clk_pos.y=(y+0.5f)*BLOCK_CLICKS;
-		    World.fuel[World.NumFuels].fuel = START_STATION_FUEL;
-		    World.fuel[World.NumFuels].conn_mask = (unsigned)-1;
-		    World.fuel[World.NumFuels].last_change = frame_loops;
-		    World.fuel[World.NumFuels].team = TEAM_NOT_SET;
-		    World.NumFuels++;
 		    break;
 
 		case '*':

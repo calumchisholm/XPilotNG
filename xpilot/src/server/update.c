@@ -855,8 +855,6 @@ void Update_objects(void)
 	    if ((Wrap_length(pl->pos.cx - World.fuel[pl->fs].clk_pos.x,
 			      pl->pos.cy - World.fuel[pl->fs].clk_pos.y) > 90.0 * CLICK)
 		|| (pl->fuel.sum >= pl->fuel.max)
-		|| (World.block[World.fuel[pl->fs].blk_pos.x]
-			       [World.fuel[pl->fs].blk_pos.y] != FUEL)
 		|| BIT(pl->used, OBJ_PHASING_DEVICE)
 		|| (BIT(World.rules->mode, TEAM_PLAY)
 		    && teamFuel

@@ -156,6 +156,14 @@ def inside(x, y, poly, width, height):
     mindir = mindir or lastdir
     return mindir > 0
 
+def closestteam(loc, bases):
+    maxd = 30000 * 30000
+    for bs in bases:
+	if loc.dist2(bs.loc) < maxd:
+	    maxd = loc.dist2(bs.loc)
+	    ans = bs.team
+    return ans
+
 def convert(options):
     height = int(options['mapheight'])
     width = int(options['mapwidth'])
@@ -172,6 +180,7 @@ def convert(options):
     done = Map([[0] * width for i in range(height)], width, height)
     bases = []
     balls = []
+    fuels = []
     polys = []
     for loc in [map.coords(x, y) for x in range(width) for y in range(height)]:
 	if map[loc] in '_0123456789':
@@ -188,9 +197,15 @@ def convert(options):
 	if map[loc] == '*':
 	    ball = Struct()
 	    ball.x = loc.x * BCLICKS + BCLICKS / 2
-	    ball.y = (height - loc.y - 1) % height * BCLICKS + 640;
+	    ball.y = (height - loc.y - 1) % height * BCLICKS + 640
 	    ball.loc = loc.copy()
 	    balls.append(ball)
+	if map[loc] == '#':
+	    fuel = Struct()
+	    fuel.x = loc.x * BCLICKS + BCLICKS / 2
+	    fuel.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
+	    fuel.loc = loc.copy()
+	    fuels.append(fuel)
 	if done[loc]:
 	    continue
 	if map[loc] in FILLED and map[loc.l()] not in FILLED + REC_RD + REC_RU:
@@ -222,12 +237,14 @@ def convert(options):
 	polys.append(poly)
     mxc = BCLICKS * width
     myc = BCLICKS * height
-    for bl in balls:
-	maxd = 30000 * 30000
-	for bs in bases:
-	    if bl.loc.dist2(bs.loc) < maxd:
-		maxd = bl.loc.dist2(bs.loc)
-		bl.team = bs.team
+    for ball in balls:
+	ball.team = closestteam(ball.loc, bases)
+    if options.get('teamfuel') in ['yes', 'on', 'true']: #default off
+	for fuel in fuels:
+	    fuel.team = closestteam(fuel.loc, bases)
+    else:
+	for fuel in fuels:
+	    fuel.team = -1
     polys2 = []
     for p in polys:
 	polys2.append([[q[0] * BCLICKS, q[1] * BCLICKS, q[2]] for q in p])
@@ -325,7 +342,8 @@ def convert(options):
 
     print "<XPilotMap>"
 
-    print '<Featurecount bases="%d" balls="%d"/>' % (len(bases), len(balls))
+    print '<Featurecount bases="%d" balls="%d" fuels="%d"/>' % (
+	len(bases), len(balls), len(fuels))
     mapd = options['mapdata']
     del options['mapdata']
     print '<GeneralOptions>'
@@ -356,6 +374,11 @@ def convert(options):
     for base in bases:
 	print '<Base team="%d" x="%d" y="%d" dir = "%d"/>' % \
 	      (base.team, base.x, base.y, base.dir)
+    for fuel in fuels:
+	print ('<Fuel x="%d" y="%d"' % (fuel.x, fuel.y)),
+	if fuel.team != -1:
+	    print (' team="%d"' % fuel.team),
+	print '/>'
     print "</XPilotMap>"
 
 if __name__ == '__main__':

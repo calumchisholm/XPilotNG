@@ -73,15 +73,6 @@ typedef struct {
 					   coordinates before adjustment... */
 } pixel_visibility_t;
 
-/*
- * Structure with player position info measured in blocks instead of pixels.
- * Used for map state info updating.
- */
-typedef struct {
-    ipos		world;
-    ipos		realWorld;
-} block_visibility_t;
-
 typedef struct {
     unsigned char	x, y;
 } debris_t;
@@ -101,8 +92,6 @@ static int		num_radar, max_radar;
 static pixel_visibility_t pv;
 static int		view_width,
 			view_height,
-			horizontal_blocks,
-			vertical_blocks,
 			debris_x_areas,
 			debris_y_areas,
 			debris_areas,
@@ -147,14 +136,6 @@ static unsigned		fastshot_num[DEBRIS_TYPES * 2],
 	 || ((x_) > pv.realWorld.x && (x_) < pv.realWorld.x + view_width))	\
      && (   ((y_) > pv.world.y && (y_) < pv.world.y + view_height)		\
 	 || ((y_) > pv.realWorld.y && (y_) < pv.realWorld.y + view_height)))
-
-static int block_inview(block_visibility_t *bv, int x, int y)
-{
-    return ((x > bv->world.x && x < bv->world.x + horizontal_blocks)
-	    || (x > bv->realWorld.x && x < bv->realWorld.x + horizontal_blocks))
-	&& ((y > bv->world.y && y < bv->world.y + vertical_blocks)
-	    || (y > bv->realWorld.y && y < bv->realWorld.y + vertical_blocks));
-}
 
 #define DEBRIS_STORE(xd,yd,color,offset) \
     int			i;						  \
@@ -463,45 +444,19 @@ static int Frame_status(int conn, int ind)
 static void Frame_map(int conn, int ind)
 {
     player		*pl = Players[ind];
-    int			i,
-			x,
-			y,
-			conn_bit = (1 << conn);
-    block_visibility_t	bv;
-
-    x = pl->pos.bx;
-    y = pl->pos.by;
-    bv.world.x = x - (horizontal_blocks >> 1);
-    bv.world.y = y - (vertical_blocks >> 1);
-    bv.realWorld = bv.world;
-    if (BIT(World.rules->mode, WRAP_PLAY)) {
-	if (bv.world.x < 0 && bv.world.x + horizontal_blocks < World.x) {
-	    bv.world.x += World.x;
-	}
-	else if (bv.world.x > 0 && bv.world.x + horizontal_blocks > World.x) {
-	    bv.realWorld.x -= World.x;
-	}
-	if (bv.world.y < 0 && bv.world.y + vertical_blocks < World.y) {
-	    bv.world.y += World.y;
-	}
-	else if (bv.world.y > 0 && bv.world.y + vertical_blocks > World.y) {
-	    bv.realWorld.y -= World.y;
-	}
-    }
+    int			i, conn_bit = (1 << conn);
 
     for (i = 0; i < World.NumFuels; i++) {
 	if (BIT(World.fuel[i].conn_mask, conn_bit) == 0) {
-	    if (World.block[World.fuel[i].blk_pos.x]
-			   [World.fuel[i].blk_pos.y] == FUEL) {
-		if (block_inview(&bv,
-				 World.fuel[i].blk_pos.x,
-				 World.fuel[i].blk_pos.y)) {
-		    Send_fuel(conn, i, (int) World.fuel[i].fuel);
-		}
-	    }
+	    if ((CENTER_XCLICK(World.fuel[i].clk_pos.x - pl->pos.cx) <
+		 (view_width << CLICK_SHIFT) + BLOCK_CLICKS) &&
+		(CENTER_YCLICK(World.fuel[i].clk_pos.y - pl->pos.cy) <
+		 (view_height << CLICK_SHIFT) + BLOCK_CLICKS))
+		Send_fuel(conn, i, (int) World.fuel[i].fuel);
 	}
     }
 
+#if 0
     for (i = 0; i < World.NumCannons; i++) {
 	if (block_inview(&bv,
 			 World.cannon[i].blk_pos.x,
@@ -521,6 +476,7 @@ static void Frame_map(int conn, int ind)
 	    Send_target(conn, i, targ->dead_time, targ->damage);
 	}
     }
+#endif
 }
 
 static void Frame_shuffle(void)
@@ -957,8 +913,6 @@ static void Frame_parameters(int conn, int ind)
     debris_x_areas = (view_width + 255) >> 8;
     debris_y_areas = (view_height + 255) >> 8;
     debris_areas = debris_x_areas * debris_y_areas;
-    horizontal_blocks = (view_width + (BLOCK_SZ - 1)) / BLOCK_SZ;
-    vertical_blocks = (view_height + (BLOCK_SZ - 1)) / BLOCK_SZ;
 
     pv.world.x = pl->pos.px - view_width / 2;	/* Scroll */
     pv.world.y = pl->pos.py - view_height / 2;

@@ -101,7 +101,6 @@
 #define DIR_DOWN		(3*RES/4)
 
 typedef struct {
-    ipos	blk_pos;
     ipos	clk_pos;
     long	fuel;
     unsigned	conn_mask;

@@ -498,6 +498,25 @@ int Net_setup(void)
 		bases[i].type = SETUP_BASE_RIGHT;
 	    ptr++;
 	}
+	num_fuels = *ptr++;
+	if (num_fuels != 0) {
+	    fuels = (fuelstation_t *)malloc(num_fuels * sizeof(fuelstation_t));
+	    if (fuels == NULL) {
+		error("No memory for Map fuels (%d)", num_fuels);
+		exit(1);
+	    }
+	}
+	for (i = 0; i < num_fuels; i++) {
+	    cx = *ptr++ << 8;
+	    cx += (unsigned char)*ptr++;
+	    cy = *ptr++ << 8;
+	    cy += (unsigned char)*ptr++;
+	    fuels[i].fuel = MAX_STATION_FUEL;
+            fuels[i].bounds.x = cx - BLOCK_SZ / 2;
+            fuels[i].bounds.y = cy - BLOCK_SZ / 2;
+            fuels[i].bounds.w = BLOCK_SZ;
+            fuels[i].bounds.h = BLOCK_SZ;
+	}
     }
 
     if (Setup->map_order != SETUP_MAP_UNCOMPRESSED) {

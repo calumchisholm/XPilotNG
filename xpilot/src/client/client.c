@@ -907,10 +907,6 @@ static int Map_init(void)
 	case 1:
 	    fuels[num_fuels].pos = i;
 	    fuels[num_fuels].fuel = MAX_STATION_FUEL;
-            fuels[num_fuels].bounds.x = (i / Setup->y) * BLOCK_SZ;
-            fuels[num_fuels].bounds.y = (i % Setup->y) * BLOCK_SZ;
-            fuels[num_fuels].bounds.w = BLOCK_SZ;
-            fuels[num_fuels].bounds.h = BLOCK_SZ;
 	    num_fuels++;
 	    break;
 	case 2:

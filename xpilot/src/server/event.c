@@ -72,16 +72,12 @@ static void Refuel(int ind)
 
     CLR_BIT(pl->used, OBJ_REFUEL);
     for (i=0; i<World.NumFuels; i++) {
-	if (World.block[World.fuel[i].blk_pos.x]
-		       [World.fuel[i].blk_pos.y] == FUEL) {
-	    l = Wrap_length(pl->pos.cx - World.fuel[i].clk_pos.x,
-			     pl->pos.cy - World.fuel[i].clk_pos.y) / CLICK;
-	    if (BIT(pl->used, OBJ_REFUEL) == 0
-		|| l < dist) {
-		SET_BIT(pl->used, OBJ_REFUEL);
-		pl->fs = i;
-		dist = l;
-	    }
+	l = Wrap_length(pl->pos.cx - World.fuel[i].clk_pos.x,
+			pl->pos.cy - World.fuel[i].clk_pos.y) / CLICK;
+	if (BIT(pl->used, OBJ_REFUEL) == 0 || l < dist) {
+	    SET_BIT(pl->used, OBJ_REFUEL);
+	    pl->fs = i;
+	    dist = l;
 	}
     }
 }
