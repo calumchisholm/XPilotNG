@@ -12,6 +12,7 @@
  * (top left atm, EVEN sub-widgets so you MUST use the SetBounds_GLWidget
  * function)
  */
+/* if this structure is changed, make sure that the generic functions below still work! */
 typedef struct glwidget_struct GLWidget;
 struct glwidget_struct {
     int     	    WIDGET;
@@ -30,21 +31,31 @@ struct glwidget_struct {
     void    	    (*hover)( int over, Uint16 x , Uint16 y , void *data );
     void    	    *hoverdata;
 
+    GLWidget	    **list;
     GLWidget	    *children;
     GLWidget	    *next;   /* use to build widget lists */
 };
 
-extern GLWidget *MainWidgetList;
+GLWidget *Init_EmptyBaseGLWidget( void );
+/*GLWidget *Init_BaseGLWidget( int WIDGET, void *wid_info, SDL_Rect bounds,
+    	    	    	    void (*Draw)( GLWidget *widget ), void (*Close)( GLWidget *widget ),
+			    void (*SetBounds)( GLWidget *widget, SDL_Rect *b ),
+			    void (*button)( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data ), void *buttondata,
+			    void (*motion)( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void *data ), void *motiondata,
+			    void (*hover)( int over, Uint16 x , Uint16 y , void *data ), void *hoverdata,
+			    GLWidget *children, GLWidget *next
+			     );*/
+
+extern GLWidget *MainWidget;
 
 /* Two Methods Needed for widget management */
 /* new types need to implement theese methods */
     
 /* should free any resources committed by the init_foo function */
-void Close_Widget (GLWidget *widget);
-void Close_WidgetTree ( GLWidget *widget );
+void Close_Widget ( GLWidget **widget );
+void Close_WidgetTree ( GLWidget **widget );
 /* to reshape the widget, and automagically reshape and place sub-widgets */
 void SetBounds_GLWidget(GLWidget *wid, SDL_Rect *b);
-/* Eventually this will be the only visible initializer I guess */
 /* Initializes the appropriate config widget (if implemented), returns NULL otherwise */
 GLWidget *Init_OptionWidget( font_data *font, xp_option_t *opt);
 
@@ -204,21 +215,48 @@ GLWidget *Init_DoubleChooserWidget( font_data *font, xp_option_t *opt);
 /* Begin: RadarWidget */
 /**********************/
 #define RADARWIDGET 7
-typedef struct {
-} RadarWidget;
 
 extern GLWidget *Init_RadarWidget( int x, int y, int w, int h );
 /********************/
 /* End: RadarWidget */
 /********************/
 
-/**********************/
+/**************************/
 /* Begin: ScorelistWidget */
-/**********************/
+/**************************/
 #define SCORELISTWIDGET 8
-/************************/
-/* End:Scorelist Widget */
-/************************/
+
 extern GLWidget *Init_ScorelistWidget(void);
+/************************/
+/* End: ScorelistWidget */
+/************************/
+
+/**********************/
+/* Begin: MainWidget  */
+/**********************/
+#define MAINWIDGET 9
+typedef struct {
+    GLWidget *confmenu;
+    font_data *font;
+} WrapperWidget;
+
+GLWidget *Init_MainWidget( font_data *font );
+/*******************/
+/* End: MainWidget */
+/*******************/
+
+/**************************/
+/* Begin: ConfMenuWidget  */
+/**************************/
+#define CONFMENUWIDGET 10
+typedef struct {
+    int     	list_height;
+    GLWidget *scrollbar;
+} ConfMenuWidget;
+
+GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );
+/***********************/
+/* End: ConfMenuWidget */
+/***********************/
 
 #endif

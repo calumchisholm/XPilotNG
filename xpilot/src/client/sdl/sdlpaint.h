@@ -33,8 +33,6 @@ int paintSetupMode;
 void setupPaint_stationary(void);
 void setupPaint_moving(void);
 void setupPaint_HUD(void);
-int InitConfMenu(void);
-void CloseConfMenu(void);
 
 /* helper function in sdlgui.c, some may be removed soon */
 extern int nullRGBA;

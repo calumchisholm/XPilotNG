@@ -255,6 +255,21 @@ void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
     ((GLWidget *)data)->bounds.y += yrel;
 }
 
+void button( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )
+{
+    GLWidget *widget = (GLWidget *)data;
+    if (state == SDL_PRESSED) {
+    	if (button == 1) {
+    	    if (DelGLWidgetListItem( widget->list, widget ))
+	    	AppendGLWidgetList( widget->list, widget );
+    	}
+    	if (button == 2) {
+    	    if (DelGLWidgetListItem( widget->list, widget ))
+	    	PrependGLWidgetList( widget->list, widget );
+	}
+    }
+}
+
 /*
  * The radar is drawn so that first the walls are painted to an offscreen
  * SDL surface. This surface is then converted into an OpenGL texture.
@@ -263,7 +278,7 @@ void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
  */
 GLWidget *Init_RadarWidget(int x, int y, int w, int h)
 {
-    GLWidget *tmp	= malloc(sizeof(GLWidget));
+    GLWidget *tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc in Init_RadarWidget");
 	return NULL;
@@ -299,18 +314,12 @@ GLWidget *Init_RadarWidget(int x, int y, int w, int h)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST);
 
-    tmp->wid_info   	= NULL;
     tmp->Draw	    	= Radar_paint;
     tmp->Close	    	= Radar_cleanup;
-    tmp->SetBounds  	= NULL;
-    tmp->button     	= NULL;
-    tmp->buttondata 	= NULL;
+    tmp->button     	= button;
+    tmp->buttondata 	= tmp;
     tmp->motion     	= move;
     tmp->motiondata 	= tmp;
-    tmp->hover	    	= NULL;
-    tmp->hoverdata  	= NULL;
-    tmp->children   	= NULL;
-    tmp->next	    	= NULL;
     
     return tmp;
 }

@@ -120,12 +120,8 @@ int Init_playing_windows(void)
     sdl_init_colors();
     Init_spark_colors();
     */
-    if ( !AppendGLWidgetList(&MainWidgetList,Init_RadarWidget(10,10,200,200)) ) {
-	error("radar initialization failed");
-	return -1;
-    }
-    if ( !AppendGLWidgetList(&MainWidgetList,Init_ScorelistWidget()) ) {
-	error("scorelist initialization failed");
+    if ( !AppendGLWidgetList(&MainWidget,Init_MainWidget(&gamefont)) ) {
+	error("widget initialization failed");
 	return -1;
     }
     if (Console_init()) {
@@ -137,14 +133,12 @@ int Init_playing_windows(void)
 	return -1;
     }
 
-    //InitConfMenu();
-    
     return 0;
 }
 
 void Quit(void) 
 {
-    Close_WidgetTree(MainWidgetList);
+    Close_WidgetTree(&MainWidget);
     Gui_cleanup();
     Console_cleanup();
     fontclean(&gamefont);

@@ -51,9 +51,7 @@ static sdl_window_t scoreListWin;
 static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
 static bool         scoreListMoving;
 
-static GLWidget *ConfMenu;
-static GLWidget *testWidget[4];
-GLWidget *MainWidgetList = NULL;
+GLWidget *MainWidget = NULL;
 
 /*void select_button(Uint8 button,Uint8 state,Uint16 x,Uint16 y, void *data)
 {
@@ -90,9 +88,12 @@ void select_move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
 int Resize_Window( int width, int height )
 {
     extern int videoFlags;
+    SDL_Rect b = {0,0,0,0};
     
-    draw_width = width;
-    draw_height = height;
+    b.w = draw_width = width;
+    b.h = draw_height = height;
+    
+    SetBounds_GLWidget(MainWidget,&b);
     
     if (!SDL_SetVideoMode( width,
 			   height,
@@ -121,10 +122,17 @@ int Resize_Window( int width, int height )
 
 void Scorelist_button(Uint8 button, Uint8 state, Uint16 x, Uint16 y, void *data)
 {
+    GLWidget *widget = (GLWidget *)data;
     if (state == SDL_PRESSED) {
-    	if (button == 1)
+    	if (button == 1) {
 	    scoreListMoving = true;
-	
+    	    if (DelGLWidgetListItem( widget->list, widget ))
+	    	AppendGLWidgetList( widget->list, widget );
+	}
+    	if (button == 2) {
+    	    if (DelGLWidgetListItem( widget->list, widget ))
+	    	PrependGLWidgetList( widget->list, widget );
+	}
     }
     
     if (state == SDL_RELEASED) {
@@ -193,11 +201,12 @@ void Scorelist_paint(GLWidget *widget)
 
 GLWidget *Init_ScorelistWidget(void)
 {
-    GLWidget *tmp	= malloc(sizeof(GLWidget));
+    GLWidget *tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc in Init_ScorelistWidget");
 	return NULL;
     }
+
     tmp->WIDGET     	= SCORELISTWIDGET;
     tmp->bounds.x   	= 10;
     tmp->bounds.y   	= 240;
@@ -207,77 +216,24 @@ GLWidget *Init_ScorelistWidget(void)
     scoreListFont = TTF_OpenFont(scoreListFontName, 11);
     if (scoreListFont == NULL) {
 	error("opening font %s failed", scoreListFontName);
+	free(tmp);
 	return NULL;
     }
     if (sdl_window_init(&scoreListWin, tmp->bounds.x, tmp->bounds.y, tmp->bounds.w, tmp->bounds.h)) {
 	error("failed to init scorelist window");
+	free(tmp);
 	return NULL;
     }
-    tmp->wid_info   	= NULL;
     tmp->Draw	    	= Scorelist_paint;
     tmp->Close	    	= Scorelist_cleanup;
-    tmp->SetBounds  	= NULL;
     tmp->button     	= Scorelist_button;
     tmp->buttondata 	= tmp;
     tmp->motion     	= Scorelist_move;
     tmp->motiondata 	= tmp;
-    tmp->hover	    	= NULL;
-    tmp->hoverdata  	= NULL;
-    tmp->children   	= NULL;
-    tmp->next	    	= NULL;
 
     return tmp;
 }
 
-#ifndef _WINDOWS
-void ConfMenu_poschange( GLfloat pos , void *data);
-void ConfMenu_poschange( GLfloat pos , void *data) {
-    printf("ConfMenu_poschange %f\n", pos);
-}
-
-int InitConfMenu(void)
-{
-    SDL_Rect bounds;
-
-    if ( (testWidget[0] = Init_OptionWidget(&gamefont, Find_option("maxFPS"))) ) {
-    	bounds.x = 500;
-    	bounds.y = 0;
-    	bounds.w = testWidget[0]->bounds.w;
-    	bounds.h = testWidget[0]->bounds.h;
-    	SetBounds_GLWidget(testWidget[0],&bounds);
-    	AppendGLWidgetList(&MainWidgetList,testWidget[0]);
-    }
-
-    if ( (testWidget[1] = Init_OptionWidget(&gamefont, Find_option("scaleFactor"))) ) {
-    	bounds.x = 500;
-    	bounds.y = testWidget[0]->bounds.h+1;
-    	bounds.w = testWidget[1]->bounds.w;
-    	bounds.h = testWidget[1]->bounds.h;
-    	SetBounds_GLWidget(testWidget[1],&bounds);
-    	AppendGLWidgetList(&MainWidgetList,testWidget[1]);
-    }
-
-    if ( (testWidget[2] = Init_OptionWidget(&gamefont, Find_option("texturedWalls"))) ) {
-    	bounds.x = 500;
-    	bounds.y = testWidget[1]->bounds.y+testWidget[1]->bounds.h+1;
-    	bounds.w = testWidget[2]->bounds.w;
-    	bounds.h = testWidget[2]->bounds.h;
-    	SetBounds_GLWidget(testWidget[2],&bounds);
-    	AppendGLWidgetList(&MainWidgetList,testWidget[2]);
-    }
-
-    if ( (testWidget[3] = Init_ScrollbarWidget(false, 0.0f, 0.3f, SB_HORISONTAL,ConfMenu_poschange,NULL)) ) {
-    	bounds.x = 500;
-    	bounds.y = testWidget[2]->bounds.y+testWidget[2]->bounds.h+1;
-    	bounds.w = testWidget[2]->bounds.w;
-    	bounds.h = testWidget[2]->bounds.h;
-    	SetBounds_GLWidget(testWidget[3],&bounds);
-    	AppendGLWidgetList(&MainWidgetList,testWidget[3]);
-    }
-   
-    return 0;
-}
-#endif
 bool Set_scaleFactor(xp_option_t *opt, double val)
 {
     scaleFactor = val;
