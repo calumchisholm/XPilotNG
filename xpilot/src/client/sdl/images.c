@@ -43,9 +43,7 @@ static int Image_init(image_t *img)
     if (img->state != IMG_STATE_UNINITIALIZED) 
 	return -1;
 	
-    if (Picture_init(&pic,
-					 img->filename,
-					 img->num_frames * (img->rotate ? 1 : -1)) == -1) {
+    if (Picture_init(&pic, img->filename, img->num_frames * (img->rotate ? 1 : -1)) == -1) {
 		img->state = IMG_STATE_ERROR;
 		return -1;
     }

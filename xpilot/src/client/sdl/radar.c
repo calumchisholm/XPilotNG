@@ -323,8 +323,18 @@ static void Radar_paint_checkpoint(GLWidget *radar)
 
 static void move(Sint16 xrel,Sint16 yrel,Uint16 x,Uint16 y, void *data)
 {
-    ((GLWidget *)data)->bounds.x += xrel;
-    ((GLWidget *)data)->bounds.y += yrel;
+    char buf[40];
+    SDL_Rect *b;
+    
+    b = &(((GLWidget *)data)->bounds);
+    b->x += xrel;
+    b->y += yrel;
+    sprintf(buf, "%dx%d+%d+%d", 
+	    radar_bounds.w, 
+	    radar_bounds.h,
+	    b->x,
+	    b->y);
+    Set_string_option(Find_option("radarGeometry"), buf, xp_option_origin_config);
 }
 
 static void button( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *data )

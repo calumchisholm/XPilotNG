@@ -311,9 +311,7 @@ static int Bitmap_init(int img)
 	pixmaps[img].bitmaps[j].rgb = -1;
     }
 
-    if (Picture_init
-	(&pixmaps[img].picture,
-	 pixmaps[img].filename, pixmaps[img].count) == -1) {
+    if (Picture_init (&pixmaps[img].picture, pixmaps[img].filename, pixmaps[img].count) == -1) {
 	pixmaps[img].state = BMS_ERROR;
 	return -1;
     }
