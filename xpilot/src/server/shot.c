@@ -1138,10 +1138,10 @@ void Delete_shot(int ind)
 		/* status         */ GRAVITY,
 		/* color          */ RED,
 		/* radius         */ 8,
-		/* num debris     */ 10 + 10 * rfrac(),
+		/* num debris     */ (int)(10 + 10 * rfrac()),
 		/* min,max dir    */ 0, RES-1,
-		/* min,max speed  */ 10, 50,
-		/* min,max life   */ 10, 54
+		/* min,max speed  */ 10.0, 50.0,
+		/* min,max life   */ 10.0, 54.0
 		);
 
 	}
@@ -1689,9 +1689,8 @@ void Update_missile(missileobject *shot)
 			pl->pos.cy - shot->pos.cy) / CLICK;
     x_dif += pl->vel.x * (range / shot_speed);
     y_dif += pl->vel.y * (range / shot_speed);
-    theta = (int)
-	Wrap_cfindDir(pl->pos.cx + PIXEL_TO_CLICK(x_dif) - shot->pos.cx,
-		      pl->pos.cy + PIXEL_TO_CLICK(y_dif) - shot->pos.cy);
+    theta = Wrap_cfindDir(pl->pos.cx + PIXEL_TO_CLICK(x_dif) - shot->pos.cx,
+			  pl->pos.cy + PIXEL_TO_CLICK(y_dif) - shot->pos.cy);
 
     {
 	double x, y, vx, vy;
@@ -1794,10 +1793,11 @@ void Update_missile(missileobject *shot)
 
 	if (angle >= 0) {
 	    i = angle&7;
-	    theta = (int)Wrap_findDir((yi + sur[i].dy) * BLOCK_SZ
-			    - (CLICK_TO_PIXEL(shot->pos.cy) + 2 * shot->vel.y),
-			    (xi + sur[i].dx) * BLOCK_SZ
-			    - (CLICK_TO_PIXEL(shot->pos.cx) - 2 * shot->vel.x));
+	    theta = Wrap_findDir(
+		(yi + sur[i].dy) * BLOCK_SZ - (CLICK_TO_PIXEL(shot->pos.cy)
+					       + 2 * shot->vel.y),
+		(xi + sur[i].dx) * BLOCK_SZ - (CLICK_TO_PIXEL(shot->pos.cx)
+					       - 2 * shot->vel.x));
 #ifdef SHOT_EXTRA_SLOWDOWN
 	    if (!foundw && range > (SHOT_LOOK_AH-i) * BLOCK_SZ) {
 		if (shot_speed
