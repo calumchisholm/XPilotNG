@@ -189,6 +189,10 @@ void Pause_player(player_t *pl, bool on)
     world_t *world = pl->world;
     int i;
 
+    /* kps - add support for pausing robots ? */
+    if (!Player_is_human(pl))
+	return;
+
     if (on && !Player_is_paused(pl)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    world->teams[pl->team].SwapperId = -1;
@@ -219,7 +223,42 @@ void Pause_player(player_t *pl, bool on)
 	    pl->home_base = NULL;
 	}
 	updateScores = true;
-	Player_pause_reset(pl);
+
+	Detach_ball(pl, NULL);
+	if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->pl_status, HOVERPAUSE)) {
+	    CLR_BIT(pl->pl_status, HOVERPAUSE);
+	    Autopilot(pl, false);
+	}
+
+	pl->vel.x		= pl->vel.y	= 0.0;
+	pl->acc.x		= pl->acc.y	= 0.0;
+
+	pl->obj_status	&= ~(KILL_OBJ_BITS);
+
+#if 0
+	/*
+	 * kps - possibly add option to make items reset
+	 * to initial when pausing
+	 */
+	if (options.pauseResetsItems) {
+	    world_t *world = pl->world;
+	    int i;
+
+	    for (i = 0; i < NUM_ITEMS; i++) {
+		if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
+		    pl->item[i] = world->items[i].initial;
+	    }
+	}
+#endif
+
+	pl->forceVisible	= 0;
+	pl->ecmcount		= 0;
+	pl->self_destruct_count = 0;
+	pl->damaged 		= 0;
+	pl->stunned		= 0;
+	pl->lock.distance	= 0;
+	pl->used		= DEF_USED;
+
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (world->teams[i].SwapperId == pl->id)
 		world->teams[i].SwapperId = -1;
@@ -233,7 +272,6 @@ void Pause_player(player_t *pl, bool on)
 	}
 	if (pl->pause_count <= 0) {
 	    pl->idleTime = 0;
-	    CLR_BIT(pl->pl_status, PAUSE);
 	    updateScores = true;
 	    if (BIT(world->rules->mode, LIMITED_LIVES)) {
 		/* too late, wait for next round */

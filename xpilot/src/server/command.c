@@ -958,7 +958,7 @@ static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	Set_message(msg);
 	strlcpy(msg, "", size);
     } else {
-	snprintf(msg, size, "Robots can't be paused.");
+	snprintf(msg, size, "Robots and tanks can't be paused.");
 	return CMD_RESULT_ERROR;
     }
 
@@ -1154,7 +1154,7 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	Set_swapper_state(pl);
 	if (pl->home_base == NULL) {
 	    Pick_startpos(pl);
-	    Pause_player(pl, 0);
+	    Pause_player(pl, false);
 	}
 	else
 	    Pick_startpos(pl);

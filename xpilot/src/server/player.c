@@ -1588,50 +1588,6 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->used	&= pl->have;
 }
 
-void Player_pause_reset(player_t *pl)
-{
-    if (Player_is_tank(pl)) {
-	Delete_player(pl);
-	return;
-    }
-
-    Detach_ball(pl, NULL);
-    if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->pl_status, HOVERPAUSE)) {
-	CLR_BIT(pl->pl_status, HOVERPAUSE);
-	Autopilot(pl, false);
-    }
-
-    pl->vel.x		= pl->vel.y	= 0.0;
-    pl->acc.x		= pl->acc.y	= 0.0;
-
-    pl->obj_status	&= ~(KILL_OBJ_BITS);
-    pl->pl_status	&= ~(KILL_PL_BITS);
-
-#if 0
-    /*
-     * kps - possibly add option to make items reset to initial when pausing
-     */
-    if (options.pauseResetsItems) {
-	world_t *world = pl->world;
-	int i;
-
-	for (i = 0; i < NUM_ITEMS; i++) {
-	    if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-		pl->item[i] = world->items[i].initial;
-	}
-    }
-#endif
-
-    pl->forceVisible	= 0;
-    pl->ecmcount	= 0;
-    pl->self_destruct_count = 0;
-    pl->damaged 	= 0;
-    pl->stunned		= 0;
-    pl->lock.distance	= 0;
-
-    pl->used		= DEF_USED;
-}
-
 /* determines if two players are immune to eachother */
 bool Team_immune(int id1, int id2)
 {
@@ -1718,7 +1674,7 @@ void Player_set_state(player_t *pl, int state)
 
     switch (state) {
     case PL_STATE_WAITING:
-	Player_set_mychar(pl,'W');
+	Player_set_mychar(pl, 'W');
 	SET_BIT(pl->pl_status, GAME_OVER);
 	break;
     case PL_STATE_APPEARING:
@@ -1735,12 +1691,13 @@ void Player_set_state(player_t *pl, int state)
 	SET_BIT(pl->pl_status, KILLED);
 	break;
     case PL_STATE_DEAD:
-	Player_set_mychar(pl,'D');
+	Player_set_mychar(pl, 'D');
 	SET_BIT(pl->pl_status, GAME_OVER);
 	break;
     case PL_STATE_PAUSED:
-	Player_set_mychar(pl,'P');
+	Player_set_mychar(pl, 'P');
 	SET_BIT(pl->pl_status, PAUSE);
+	CLR_BIT(pl->pl_status, PLAYING|GAME_OVER|KILLED);
 	break;
     case PL_STATE_GAME_OVER:
 	break;
