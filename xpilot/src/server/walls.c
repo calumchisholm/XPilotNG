@@ -304,16 +304,14 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     /* a normal shot or a direct mine hit work, cannons don't */
     /* KK: should shots/mines by cannons of opposing teams work? */
     /* also players suiciding on target will cause damage */
-    if (!BIT(obj->type, KILLING_SHOTS|OBJ_MINE|OBJ_PULSE|OBJ_PLAYER)) {
+    if (!BIT(obj->type, KILLING_SHOTS|OBJ_MINE|OBJ_PULSE|OBJ_PLAYER))
 	return;
-    }
-    if (obj->id <= 0) {
+    if (obj->id <= 0)
 	return;
-    }
+
     killer = GetInd[obj->id];
-    if (targ->team == obj->team) {
+    if (targ->team == obj->team)
 	return;
-    }
 
     switch(obj->type) {
     case OBJ_SHOT:
@@ -416,9 +414,8 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	    }
 	}
     }
-    if (!somebody_flag) {
+    if (!somebody_flag)
 	return;
-    }
 
     sound_play_sensors(targ->pos.cx, targ->pos.cy, DESTROY_TARGET_SOUND);
 
@@ -447,9 +444,8 @@ void Object_hits_target(int ind, object *obj, long player_cost)
 	    (targets_total > 1) ? "last " : "");
     Set_message(msg);
 
-    if (targetKillTeam) {
+    if (targetKillTeam)
 	Rank_AddTargetKill(Players[killer]);
-    }
 
     sc  = Rate(win_score, lose_score);
     por = (sc*lose_team_members)/win_team_members;
@@ -888,6 +884,7 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     DFLOAT fx, fy;
     DFLOAT c, s;
     int group, type, item_id;
+    int ind = GetInd[pl->id];
 
     if (line >= num_lines) {
 	DFLOAT x, y, l2;
@@ -909,12 +906,6 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	Player_crash(pl, move, CrashTreasure, NO_ID, 1);
 	return;
     }
-    /* kps hack - fix this */
-    if (type == TARGET) {
-	Player_crash(pl, move, CrashTarget, item_id, 1);
-	return;
-    }
-    /* kps hack */
 
     /* kps hack */
     if (type == WORMHOLE) {
@@ -945,8 +936,21 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	    == (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 	    max_speed = 100;
 	}
+
+	/* only use armor if neccessary */
+	if (speed > max_speed
+	    && max_speed < maxShieldedWallBounceSpeed
+	    && !BIT(pl->used, HAS_SHIELD)
+	    && BIT(pl->have, HAS_ARMOR)) {
+	    max_speed = maxShieldedWallBounceSpeed;
+	    Player_hit_armor(ind);
+	}
+
 	if (speed > max_speed) {
-	    Player_crash(pl, move, CrashWallSpeed, NO_ID, 1);
+	    if (type == TARGET)
+		Player_crash(pl, move, CrashTarget, item_id, 1);
+	    else
+		Player_crash(pl, move, CrashWallSpeed, NO_ID, 1);
 	    return;
 	}
 
@@ -960,42 +964,43 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	    != (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 	    Add_fuel(&pl->fuel, (long)(-((cost << FUEL_SCALE_BITS)
 					 * wallBounceFuelDrainMult)));
-	    Item_damage(GetInd[pl->id], wallBounceDestroyItemProb);
+	    Item_damage(ind, wallBounceDestroyItemProb);
 	}
 	if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
-	    Player_crash(pl, move, CrashWallNoFuel, NO_ID, 1);
+	    if (type == TARGET) 
+		Player_crash(pl, move, CrashTarget, item_id, 1);
+	    else
+		Player_crash(pl, move, CrashWallNoFuel, NO_ID, 1);
 	    return;
 	}
-/* !@# I didn't implement wall direction calculation yet. */
+	/* !@# I didn't implement wall direction calculation yet. */
+	/* kps - neither did I */
 	if (cost) {
 #if 0
 	    int intensity = (int)(cost * wallBounceExplosionMult);
 	    Make_debris(
-			/* pos.cx, pos.cy   */ pl->pos.cx, pl->pos.cy,
-			/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
-			/* owner id       */ pl->id,
-			/* owner team	  */ pl->team,
-			/* kind           */ OBJ_SPARK,
-			/* mass           */ 3.5,
-			/* status         */ GRAVITY | OWNERIMMUNE | FROMBOUNCE,
-			/* color          */ RED,
-			/* radius         */ 1,
-			/* min,max debris */ intensity>>1, intensity,
-			/* min,max dir    */ wall_dir - (RES/4), wall_dir + (RES/4),
-			/* min,max speed  */ 20, 20 + (intensity>>2),
-			/* min,max life   */ 10, 10 + (intensity>>1)
-					     );
+		/* pos.cx, pos.cy */ pl->pos.cx, pl->pos.cy,
+		/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
+		/* owner id       */ pl->id,
+		/* owner team	  */ pl->team,
+		/* kind           */ OBJ_SPARK,
+		/* mass           */ 3.5,
+		/* status         */ GRAVITY | OWNERIMMUNE | FROMBOUNCE,
+		/* color          */ RED,
+		/* radius         */ 1,
+		/* num max debris */ (intensity>>1) + (intensity>>1) * rfrac(),
+		/* min,max dir    */ wall_dir - (RES/4), wall_dir + (RES/4),
+		/* min,max speed  */ 20, 20 + (intensity >> 2),
+		/* min,max life   */ 10, 10 + (intensity >> 1)
+		);
 #endif
 	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 			       PLAYER_BOUNCED_SOUND);
-#if 0
-	    /* I'll leave this here until i implement targets */
-	    if (ms[worst].target >= 0) {
+	    if (type == TARGET) {
 		cost <<= FUEL_SCALE_BITS;
 		cost = (long)(cost * (wallBounceFuelDrainMult / 4.0));
-		Object_hits_target_old(&ms[worst], cost);
+		Object_hits_target(item_id, (object *)pl, cost);
 	    }
-#endif
 	}
     }
     fx = move->delta.cx * c + move->delta.cy * s;
