@@ -202,7 +202,7 @@ typedef struct {
     const char *name;
     const char *abbrev;
     const char *help;
-    int oper_only;
+    bool oper_only;
     int (*cmd)(char *arg, player_t *pl, int oper, char *msg, size_t size);
 } Command_info;
 
@@ -216,7 +216,7 @@ static Command_info commands[] = {
 	"addr",
 	"/addr <player name or ID number>. Show IP-address of player.  "
 	"(operator)",
-	1,
+	true,
 	Cmd_addr
     },
     {
@@ -224,7 +224,7 @@ static Command_info commands[] = {
 	"ad",
 	"/advance <name of player in the queue>. "
 	"Move the player to the front of the queue.  (operator)",
-	1,
+	true,
 	Cmd_advance
     },
     {
@@ -232,21 +232,21 @@ static Command_info commands[] = {
 	"al",
 	"/ally {invite|cancel|refuse|accept|leave|list} [<player name>]. "
 	"Manages alliances and invitations for them.",
-	0,
+	false,
 	Cmd_ally
     },
     {
 	"get",
 	"g",
 	"/get <option>.  Gets a server option.",
-	0,
+	false,
 	Cmd_get
     },
     {
 	"help",
 	"h",
 	"Print command list.  /help <command> gives more info.",
-	0,
+	false,
 	Cmd_help
     },
     {
@@ -254,7 +254,7 @@ static Command_info commands[] = {
 	"k",
 	"/kick <player name or ID number>.  Remove a player from game.  "
 	"(operator)",
-	1,
+	true,
 	Cmd_kick
     },
     {
@@ -262,7 +262,7 @@ static Command_info commands[] = {
 	"l",
 	"Just /lock tells lock status.  /lock 1 locks, /lock 0 unlocks.  "
 	"(operator)",
-	0,      /* checked in the function */
+	false,      /* checked in the function */
 	Cmd_lock
     },
     {
@@ -270,7 +270,7 @@ static Command_info commands[] = {
 	"maxturns",
 	"/maxturnsps <number> set max amount of turns per second.  "
 	"(EXPERIMENTAL FEATURE)",
-	0,
+	false,
 	Cmd_maxturnsps
     },
     {
@@ -278,7 +278,7 @@ static Command_info commands[] = {
 	"m",
 	"Just /mute 1 mutes, /mute 0 unmutes paused players WITHOUT BASE.  "
 	"(operator)",
-	0,      /* checked in the function */
+	false,      /* checked in the function */
 	Cmd_mutepaused
     },
     {
@@ -286,7 +286,7 @@ static Command_info commands[] = {
 	"o",
 	"/op <command> [player name or ID number]. Operator commands.  "
 	"(operator)",
-	1,
+	true,
 	Cmd_op
     },
     {
@@ -294,28 +294,28 @@ static Command_info commands[] = {
 	"pas",
 	"/password <string>.  If string matches -password option "
 	"gives operator status.",
-	0,
+	false,
 	Cmd_password
     },
     {
 	"pause",
 	"pau",
 	"/pause <player name or ID number>.  Pauses player.  (operator)",
-	1,
+	true,
 	Cmd_pause
     },
     {
 	"plinfo",
 	"pl",
 	"/plinfo <player name or ID number>.  Show misc. player info.",
-	0,
+	false,
 	Cmd_plinfo
     },
     {
 	"queue",
 	"q",
 	"/queue.  Show the names of players waiting to enter.",
-	0,
+	false,
 	Cmd_queue
     },
     {
@@ -323,21 +323,21 @@ static Command_info commands[] = {
 	"r",
 	"Just /reset re-starts the round. "
 	"/reset.  Resets all scores to 0.  (operator)",
-	1,
+	true,
 	Cmd_reset
     },
     {
 	"set",
 	"s",
 	"/set <option> <value>.  Sets a server option.  (operator)",
-	1,
+	true,
 	Cmd_set
     },
     {
 	"stats",
 	"st",
 	"/stats [player name or ID number].  Show player ranking info.",
-	0,
+	false,
 	Cmd_stats
     },
     {
@@ -345,14 +345,14 @@ static Command_info commands[] = {
 	"t",
 	"/team <team number> [name] swaps you to given team. "
 	"Can be used with full teams too.",
-	0,
+	false,
 	Cmd_team
     },
     {
 	"version",
 	"v",
 	"Print server version.",
-	0,
+	false,
 	Cmd_version
     },
 };
@@ -385,10 +385,6 @@ void Handle_player_command(player_t *pl, char *cmd)
 	    args++;
     }
 
-    /*
-     * Command matching changed so that setpass command can be
-     * given.
-     */
     for (i = 0; i < NELEM(commands); i++) {
 	size_t len1 = strlen(commands[i].abbrev);
 	size_t len2 = strlen(cmd);
@@ -650,15 +646,32 @@ static int Cmd_help(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
     if (!*arg) {
 	strlcpy(msg, "Commands: ", size);
-	for(i = 0; i < NELEM(commands); i++) {
-	    strlcat(msg, commands[i].name, size);
-	    strlcat(msg, " ", size);
+	for (i = 0; i < NELEM(commands); i++) {
+	    if (!commands[i].oper_only) {
+		strlcat(msg, commands[i].name, size);
+		strlcat(msg, " ", size);
+	    }
+	}
+
+	if (pl->isoperator) {
+	    strlcat(msg, " [*Server reply*]", size);
+	    Set_player_message(pl, msg);
+
+	    strlcpy(msg, "Operator commands: ", size);
+	    for (i = 0; i < NELEM(commands); i++) {
+		if (commands[i].oper_only) {
+		    strlcat(msg, commands[i].name, size);
+		    strlcat(msg, " ", size);
+		}
+	    }
 	}
     }
     else {
 	for (i = 0; i < NELEM(commands); i++) {
-	    if (!strncasecmp(arg, commands[i].name,
-			     strlen(commands[i].abbrev)))
+	    size_t len1 = strlen(commands[i].abbrev);
+	    size_t len2 = strlen(arg);
+
+	    if (!strncasecmp(arg, commands[i].name, MAX(len1, len2)))
 		break;
 	}
 	if (i == NELEM(commands))
