@@ -803,7 +803,7 @@ static int Config_create_reverseScroll(int widget_desc, int *height)
 }
 
 #define CONFIG_CREATE_COLOR(c) \
-Config_create_int(widget_desc, height, #c , & c, 0, maxColors - 1, NULL, NULL)
+Config_create_int(widget_desc, height, #c , &c, 0, maxColors - 1, NULL, NULL)
 
 static int Config_create_messagesColor(int widget_desc, int *height)
 {

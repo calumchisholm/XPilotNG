@@ -499,9 +499,9 @@ int Init_top(void)
     COLORCHECK(baseNameColor, BLUE);
     COLORCHECK(mineNameColor, BLUE);
     COLORCHECK(ballColor, WHITE);
-    COLORCHECK(connColor, WHITE);
-    COLORCHECK(windowColor, BLUE);
-    COLORCHECK(buttonColor, RED);
+    COLORCHECK(connColor, BLUE);
+    COLORCHECK(windowColor, 8);
+    COLORCHECK(buttonColor, BLUE);
     COLORCHECK(borderColor, WHITE);
     COLORCHECK(scoreColor, WHITE);
     COLORCHECK(scoreSelfColor, RED);
