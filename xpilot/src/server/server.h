@@ -392,8 +392,6 @@ extern bool		polygonMode;
 /* determine if a block is one of SPACE_BLOCKS */
 #define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
 
-#define Player_by_id(id)	Players(GetInd(id))
-
 static inline vector World_gravity(clpos pos)
 {
     return World.gravity[CLICK_TO_BLOCK(pos.cx)][CLICK_TO_BLOCK(pos.cy)];
@@ -664,15 +662,44 @@ player *Get_player_by_name(char *str, int *errcode, const char **errorstr_p);
  */
 player *Players(int ind);
 int GetInd(int id);
+
+static inline player *Player_by_id(int id)
+{
+    return Players(GetInd(id));
+}
+
+static inline bool Player_is_playing(player *pl)
+{
+    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
+	return true;
+    return false;
+}
+
+static inline bool Player_is_active(player *pl)
+{
+    if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
+	return true;
+    return false;
+}
+
+static inline bool Player_is_waiting(player *pl)
+{
+    if (BIT(pl->status, GAME_OVER) && pl->mychar == 'W')
+	return true;
+    return false;
+}
+
 void Pick_startpos(player *pl);
 void Go_home(player *pl);
 void Compute_sensor_range(player *pl);
 void Player_add_tank(player *pl, double tank_fuel);
 void Player_remove_tank(player *pl, int which_tank);
+
 static inline void Player_add_fuel(player *pl, double amount)
 {
     Add_fuel(&(pl->fuel), amount);
 }
+
 static inline bool Player_used_emergency_shield(player *pl)
 {
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) ==
@@ -680,6 +707,7 @@ static inline bool Player_used_emergency_shield(player *pl)
 	return true;
     return false;
 }
+
 void Player_hit_armor(player *pl);
 void Player_used_kill(player *pl);
 void Player_set_mass(player *pl);

@@ -1002,11 +1002,10 @@ void Team_game_over(int winning_team, const char *reason)
 	    if (IS_TANK_PTR(pl_i)
 		|| (BIT(pl_i->status, PAUSE)
 		    && pl_i->count <= 0)
-		|| (BIT(pl_i->status, GAME_OVER)
-		    && pl_i->mychar == 'W'
-		    && pl_i->score == 0)) {
+		|| (Player_is_waiting(pl_i)
+		    && pl_i->score == 0))
 		continue;
-	    }
+
 	    for (j = 0; j < num_best_players; j++) {
 		if (i == best_players[j])
 		    break;
@@ -1123,7 +1122,7 @@ void Race_game_over(void)
 	    if (IS_TANK_PTR(pl))
 		continue;
 	    if (BIT(pl->status, PAUSE)
-		|| (BIT(pl->status, GAME_OVER) && pl->mychar == 'W')
+		|| Player_is_waiting(pl)
 		|| pl->best_lap <= 0)
 		j = i;
 	    else {
@@ -1133,8 +1132,7 @@ void Race_game_over(void)
 			break;
 
 		    if (BIT(pl_j->status, PAUSE)
-			|| (BIT(pl_j->status, GAME_OVER)
-			    && pl_j->mychar == 'W'))
+			|| Player_is_waiting(pl_j))
 			break;
 		}
 	    }
@@ -1168,7 +1166,7 @@ void Race_game_over(void)
 	pl = Players(i);
 	CLR_BIT(pl->status, RACE_OVER | FINISH);
 	if (BIT(pl->status, PAUSE)
-	    || (BIT(pl->status, GAME_OVER) && pl->mychar == 'W')
+	    || Player_is_waiting(pl)
 	    || IS_TANK_PTR(pl))
 	    continue;
 	num_active_players++;
@@ -1196,7 +1194,7 @@ void Race_game_over(void)
 	for (i = 0; i < NumPlayers; i++)  {
 	    pl = Players(i);
 	    if (BIT(pl->status, PAUSE)
-		|| (BIT(pl->status, GAME_OVER) && pl->mychar == 'W')
+		|| Player_is_waiting(pl)
 		|| IS_TANK_PTR(pl))
 		continue;
 
@@ -1439,7 +1437,7 @@ void Compute_game_status(void)
 	    for (i = 0; i < NumPlayers; i++)  {
 		pl = Players(i);
 		if (BIT(pl->status, PAUSE)
-		    || (BIT(pl->status, GAME_OVER) && pl->mychar == 'W')
+		    || Player_is_waiting(pl)
 		    || IS_TANK_PTR(pl))
 		    continue;
 

@@ -128,8 +128,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
 
 	    if (IS_TANK_PTR(pl_i)
 		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
-		|| (BIT(pl_i->status, GAME_OVER)
-		    && pl_i->mychar == 'W'))
+		|| Player_is_waiting(pl_i))
 		continue;
 	    if (pl_i->team == td->team) {
 		lose_score += pl_i->score;
@@ -167,8 +166,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
 	if (IS_TANK_PTR(pl_i)
 	    || (BIT(pl_i->status, PAUSE)
 		&& pl_i->count <= 0)
-	    || (BIT(pl_i->status, GAME_OVER)
-		&& pl_i->mychar == 'W'))
+	    || Player_is_waiting(pl_i))
 	    continue;
 	if (pl_i->team == td->team) {
 	    Score(pl_i, -sc, pos, "Treasure: ");

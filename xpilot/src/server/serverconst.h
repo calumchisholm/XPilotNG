@@ -136,13 +136,6 @@
 	&& ((t)->lock.pl_id != NO_ID) \
 	&& ((t)->lock.pl_id == (pl)->id))
 
-#define Player_is_playing(pl) \
-(BIT((pl)->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
-
-#define Player_is_active(pl) \
-(BIT((pl)->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
-
-
 #define RECOVERY_DELAY		(12 * 3)
 #define ROBOT_CREATE_DELAY	(12 * 2)
 

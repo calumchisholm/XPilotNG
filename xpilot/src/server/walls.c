@@ -285,11 +285,10 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	    if (IS_TANK_PTR(pl_j)
 		|| (BIT(pl_j->status, PAUSE)
 		    && pl_j->count <= 0)
-		|| (BIT(pl_j->status, GAME_OVER)
-		    && pl_j->mychar == 'W'
-		    && pl_j->score == 0)) {
+		|| (Player_is_waiting(pl_j)
+		    && pl_j->score == 0))
 		continue;
-	    }
+
 	    if (pl_j->team == targ->team) {
 		lose_score += pl_j->score;
 		lose_team_members++;
@@ -350,8 +349,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	if (IS_TANK_PTR(pl)
 	    || (BIT(pl->status, PAUSE)
 		&& pl->count <= 0)
-	    || (BIT(pl->status, GAME_OVER)
-		&& pl->mychar == 'W'
+	    || (Player_is_waiting(pl)
 		&& pl->score == 0)) {
 	    continue;
 	}
