@@ -1157,7 +1157,7 @@ xp_option_t hud_options[] = {
 
     COLOR_INDEX_OPTION(
 	"packetDropMeterColor",
-	0,
+	3,
 	&packetDropMeterColor,
 	"Which color number to use for drawing the packet drop meter.\n"
 	"This gives the percentage of dropped frames due to display\n"
