@@ -545,18 +545,25 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glScalef(scale, scale, 0);
 #endif
 
-    if (instruments.showTexturedWalls
-	|| instruments.showFilledWorld) {
-	if (instruments.showTexturedWalls) {
+    if (!instruments.showOutlineWorld) {
+
+	if (BIT(p_style.flags, STYLE_TEXTURED)
+	    && instruments.showTexturedWalls) {
+
 	    Image_use_texture(p_style.texture);
-	} else {
-	    set_alphacolor((p_style.rgb << 8) | 0xff);
-	}
-	glCallList(polyListBase + i);	
-	if (instruments.showTexturedWalls) {
+	    glCallList(polyListBase + i);
 	    Image_no_texture();
-	}
+
+	} else if (BIT(p_style.flags, STYLE_FILLED)
+		   || instruments.showFilledWorld
+		   || (BIT(p_style.flags, STYLE_TEXTURED) 
+		       && !instruments.showTexturedWalls)) {
+
+	    set_alphacolor((p_style.rgb << 8) | 0xff);
+	    glCallList(polyListBase + i);
+	} 
     }
+
     set_alphacolor((e_style.rgb << 8) | 0xff);
     glLineWidth(e_style.width * scale);
     glEnable(GL_BLEND);
