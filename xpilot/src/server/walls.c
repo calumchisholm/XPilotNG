@@ -992,6 +992,19 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     pl->vel.y = fy * playerWallBrakeFactor;
 }
 
+/* Try to move one click away from a line after a collision. Needed because
+ * otherwise we could keep hitting it even though direction of movement
+ * was away from the line. Example case:
+ * XXX
+ *   1*XX
+ *     34XXX
+ *       56 XXX
+ *         78  XXX
+ * Line (marked with 'X') and path of object (marked with numbers) collide
+ * at '*' because of discreteness even though the object is moving away
+ * from the line.
+ * Return -1 if successful, number of another line blocking movement
+ * otherwise (the number of the line is not used when writing this). */
 static int Away(struct move *move, int line)
 {
     int i, dx, dy, lsx, lsy, res;
@@ -1068,6 +1081,8 @@ static int Away(struct move *move, int line)
     return -1;
 }
 
+
+/* Move shape by 1 click. Used in Shape_away. */
 static int Shape_move1(int dx, int dy, struct move *move,
 		       const shipobj *shape, int dir, int *line, int *point)
 {
@@ -1079,7 +1094,7 @@ static int Shape_move1(int dx, int dy, struct move *move,
     for (p = 0; p < shape->num_points; p++) {
 	lines = blockline[block].lines;
 	/* Can use the same block for all points because the block of the
-	   center point contains lines for their start & end positions. */
+	 * center point contains lines for their start & end positions. */
 	while ( (i = *lines++) != 65535) {
 	    if (linet[i].group
 		&& (!can_hit(&groups[linet[i].group], move)))
@@ -1161,6 +1176,9 @@ static int Shape_move1(int dx, int dy, struct move *move,
     return 1;
 }
 
+
+/* Move a shape away from a line after a collision. Needed for the same
+ * reason as 'Away' above. */
 static int Shape_away(struct move *move, const shipobj *shape,
 		      int dir, int line, int *rline, int *rpoint)
 {
@@ -1177,6 +1195,9 @@ static int Shape_away(struct move *move, const shipobj *shape,
     return Shape_move1(dx, dy, move, shape, dir, rline, rpoint);
 }
 
+
+/* Used internally by the movement routines to find the first line 
+ * (in the list given by *lines) that the given trajectory hits. */
 static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 		       const unsigned short *lines, int chx, int chy,
 		       int chxy, const struct move *move, int *minline,
@@ -1224,8 +1245,6 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 	    continue;
 	if (0 > lsy + (ldy < 0 ? 0 : ldy))
 	    continue;
-
-	lsx = CENTER_XCLICK(lsx);
 
 	if (ldx < 0) {
 	    lsx += ldx;
@@ -1303,9 +1322,32 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
     return hit;
 }
 
+
+/* Try to move a pointlike object along the path determined by *move.
+ * The amount moved is returned in *answer. If the movement hits a line
+ * the number of that line is included. The 'point' parameter in
+ * struct collans is not relevant to this function. Even if the movement
+ * doesn't hit a line, the amount moved can be less than the requested
+ * amount (so that this function needs to be called again for the rest).
+ * If the movement hits several lines at the same click, the line returned
+ * in collans will be such that it is hit "from the outside" if possible.
+ * Example:
+ * X
+ * X inside of polygon
+ * X
+ * *YYYYYYYYYY
+ *  3
+ *   2
+ *    1
+ * Here the lines X and Y meet at click *, and the movement marked with
+ * numbers hits the common point. The function will return line Y as the
+ * one that was hit, because it was hit "from the outside" as opposed to
+ * line X which was hit from the side facing the inside of the polygon.
+ * See  the comments for function 'Away' to see how the trajectory can
+ * hit a line even though it is moving away from the line. */
 /* Do not call this with no movement. */
 /* May not be called with point already on top of line.
-   Maybe I should change that to allow lines that could be crossed. */
+ * Maybe I should change that to allow lines that could be crossed. */
 static void Move_point(const struct move *move, struct collans *answer)
 {
     int minline, mindone, minheight;
@@ -1389,13 +1431,22 @@ static void Move_point(const struct move *move, struct collans *answer)
     return;
 }
 
+
+/* Similar to Move_point above, except that it gets the shape parameter
+ * (and direction of that shape), and in case of collision, the 'point'
+ * field in struct collans is used. A corner in the shape can hit a map
+ * line, or a corner in the map can hit a shape line. The 'line' field
+ * will contain the line, the 'point' field the corner (given as a line
+ * whose first point is that corner - that is always possible because
+ * polygons are closed and there is at least one line ending at and one
+ * line starting from a given point). */
 /* Do not call this with no movement. */
 /* May not be called with point already on top of line.
    maybe I should change that to allow lines which could be
    crossed. */
 /* This could be sped up by a lot in several ways if needed.
  * For example, there's no need to consider all the points
- * separately if the ship is not close to a wall.
+ * separately if the shape is not close to a wall.
  */
 static void Shape_move(const struct move *move, const shipobj *shape,
 		       int dir, struct collans *answer)
@@ -1521,6 +1572,14 @@ static void Shape_move(const struct move *move, const shipobj *shape,
 }
 
 
+/* Check whether there is room at the given position (x, y) to change
+ * from the shape shape1/dir1 to shape shape2/dir2. The shapes must have
+ * the same number of points. The morphing of the shapes happens linearly
+ * for each point. This should work correctly even if the intermediate
+ * shapes are degenerate or illegal shapes (the intermediate stages are
+ * not explicitly constructed in the algorithm). Return the number of a group
+ * that would be hit during morphing or NO_GROUP if there is enough room. */
+/* This might be useful elsewhere in the code, need not be kept static */
 static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
 		       int dir2, int hitmask, const object *obj, int x, int y)
 {
@@ -1618,8 +1677,28 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
 }
 
 
+/* Used internally to get a point out of a tight corner where there is
+ * no room to move it. Situation like this:
+ * E***X
+ *     Y***XX
+ *         YY**XXX
+ *             YYY*XXXX
+ *                 YYYYXXXXX
+ *                     YYYY XXXXX
+ *                         YYYY  XXXXX
+ *                             YYYY   XXXXX
+ *                                 YYYY !  XXXXX
+ *                                     YYYY     XXXXX
+ *                                         YYYY      XXXXX
+ *                                             YYYY       XXXXX
+ * X and Y are lines meeting at E. '*' is where lines overlap. An object
+ * can get to position !, but is hard to move out of there (and the situation
+ * can be worse than shown here - the angles of the lines don't need to
+ * differ so much that the gap would get 1 click bigger for each step of
+ * the y coordinate). This function is used to move the object a bit
+ * outwards from the corner so discreteness doesn't make moving it so hard. */
 /* This function should get called only rarely, so it doesn't need to
-   be too efficient. */
+ * be too efficient. */
 static int Clear_corner(struct move *move, object *obj, int l1, int l2)
 {
     int x, y, xm, ym, s1, s2;
@@ -1823,6 +1902,10 @@ struct templine {
 };
 
 
+/* Check whether the given position (cx, cy) is such that it is inside
+ * a polygon belonging to a group that could be hit by the given
+ * hit_mask/object.
+ * Return the number of a group that would be hit or NO_GROUP. */
 int is_inside(int cx, int cy, int hit_mask, const object *obj)
 {
     short *ptr;
@@ -1901,6 +1984,8 @@ int is_inside(int cx, int cy, int hit_mask, const object *obj)
 }
 
 
+/* Similar to the above, except check whether any part of the shape
+ * (edge or inside) would hit the group. */
 int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
 		    const shipobj *shape, int dir)
 {
@@ -1912,6 +1997,12 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
 	for (i = 0; i < MAX_SHIP_PTS; i++)
 	    zeroshape.pts[i] = &zeropos;
     }
+
+    /* Implemented by first checking whether the middle point of the
+     * shape is on top of something. If not, check whether it is possible
+     * to enlarge a degenerate shape where all points are on top of each
+     * other (at the middle point) to the given one. (So it relies on the
+     * rule that the shape must contain the middle point. */
 
     if ( (group = is_inside(cx, cy, hitmask, obj)) != NO_GROUP)
 	return group;
@@ -2570,13 +2661,29 @@ void Walls_init_new(void)
 
     mapx = (World.cwidth + B_MASK) >> B_SHIFT;
     mapy = (World.cheight + B_MASK) >> B_SHIFT;
+
+    /* Break polygons down to a list of separate lines. */
     Poly_to_lines();
+
+    /* For each B_CLICKS x B_CLICKS rectangle on the map, find a list of
+     * nearby lines that need to be checked for collision when moving
+     * in that area. */
     Distance_init();
+
+    /* Like above, except list the map corners that could be hit by the
+     * sides of a moving polygon shape. */
     Corner_init();
+
     Ball_line_init();
+
+    /* Initialize the data structures used when determining whether a given
+     * arbitrary point on the map is inside something. */
     Inside_init();
+
     groups[0].type = FILLED;
 
+    /* Precalculate the .c and .s values used when calculating a bounce
+     * from the line. */
     for (i = 0; i < num_lines; i++) {
 	x = linet[i].delta.cx;
 	y = linet[i].delta.cy;
@@ -2586,8 +2693,6 @@ void Walls_init_new(void)
     }
 }
 
-
-/* end */
 
 static char msg[MSG_LEN];
 
