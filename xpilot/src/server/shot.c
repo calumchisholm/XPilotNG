@@ -69,7 +69,7 @@ void Place_mine(player_t *pl)
 	return;
     }
 
-    Place_general_mine(pl->world, pl, pl->team, GRAVITY, pl->pos,
+    Place_general_mine(pl->world, pl, NULL, pl->team, GRAVITY, pl->pos,
 		       zero_vel, pl->mods);
 }
 
@@ -93,12 +93,13 @@ void Place_moving_mine(player_t *pl)
 	}
     }
 
-    Place_general_mine(pl->world, pl, pl->team, GRAVITY, pl->pos,
+    Place_general_mine(pl->world, pl, NULL, pl->team, GRAVITY, pl->pos,
 		       vel, pl->mods);
 }
 
-void Place_general_mine(world_t *world, player_t *pl, int team, int status,
-			clpos_t pos, vector_t vel, modifiers_t mods)
+void Place_general_mine(world_t *world, player_t *pl, cannon_t *cannon,
+			int team, int status, clpos_t pos, vector_t vel,
+			modifiers_t mods)
 {
     int used, i, minis;
     double life, drain, mass;
@@ -112,7 +113,7 @@ void Place_general_mine(world_t *world, player_t *pl, int team, int status,
     if (pl && Player_is_killed(pl))
 	life = rfrac() * 12;
     else if (BIT(status, FROMCANNON))
-	life = CANNON_SHOT_LIFE;
+	life = Cannon_shot_life(cannon);
     else
 	life = options.mineLife;
 
@@ -469,10 +470,9 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 
     if (cannon) {
 	mass = CANNON_SHOT_MASS;
-	life = CANNON_SHOT_LIFE;
+	life = Cannon_shot_life(cannon);
 	SET_BIT(status, FROMCANNON);
     }
-
 
     switch (type) {
     default:
@@ -1348,7 +1348,7 @@ void Delete_shot(world_t *world, int ind)
 	    long gravity_status = ((rfrac() < 0.5) ? GRAVITY : 0);
 	    vector_t zero_vel = { 0.0, 0.0 };
 
-	    Place_general_mine(world, NULL, TEAM_NOT_SET, gravity_status,
+	    Place_general_mine(world, NULL, NULL, TEAM_NOT_SET, gravity_status,
 			       shot->pos, zero_vel, mods);
 	}
 	else if (addHeat)

@@ -1230,6 +1230,30 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"minCannonShotLife",
+	"minCannonShotLife",
+	"8.0",
+	&options.minCannonShotLife,
+	valReal,
+	tuner_mincannonshotlife,
+	"Minimum life of cannon shots, measured in ticks.\n"
+	"If this is set to a value greater than maxCannonShotLife, then\n"
+	"maxCannonShotLife will be set to that same value.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxCannonShotLife",
+	"maxCannonShotLife",
+	"32.0",
+	&options.maxCannonShotLife,
+	valReal,
+	tuner_maxcannonshotlife,
+	"Maximum life of cannon shots, measured in ticks.\n"
+	"If this is set to a value less than minCannonShotLife, then\n"
+	"minCannonShotLife will be set to that same value.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"keepShots",
 	"keepShots",
 	"no",

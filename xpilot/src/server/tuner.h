@@ -41,6 +41,8 @@ void tuner_worldlives(world_t *world);
 void tuner_cannonsmartness(world_t *world);
 void tuner_teamcannons(world_t *world);
 void tuner_cannonsuseitems(world_t *world);
+void tuner_mincannonshotlife(world_t *world);
+void tuner_maxcannonshotlife(world_t *world);
 void tuner_wormhole_stable_ticks(world_t *world);
 void tuner_modifiers(world_t *world);
 void tuner_gameduration(world_t *world);

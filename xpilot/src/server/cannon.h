@@ -75,9 +75,9 @@ extern long CANNON_USE_ITEM;
 #define CANNON_MINE_MASS	(MINE_MASS * 0.6)
 #define CANNON_SHOT_MASS	0.4
 /* lifetime in ticks (frames) of shots, missiles and mines */
-#define CANNON_SHOT_LIFE	(8 + (randomMT() % 24))
+/* #define CANNON_SHOT_LIFE	(8 + (randomMT() % 24)) */
 /* maximum lifetime (only used in aiming) */
-#define CANNON_SHOT_LIFE_MAX	(8 + 24)
+/* #define CANNON_SHOT_LIFE_MAX	(8 + 24) */
 /* number of laser pulses used in calculation of pulse lifetime */
 #define CANNON_PULSES		1
 
@@ -96,5 +96,32 @@ void Cannon_set_hitmask(int group, cannon_t *cannon);
 bool Cannon_hitfunc(group_t *groupptr, move_t *move);
 void World_restore_cannon(world_t *world, cannon_t *cannon);
 void World_remove_cannon(world_t *world, cannon_t *cannon);
+
+
+static inline int Cannon_get_smartness(cannon_t *c)
+{
+    return options.cannonSmartness;
+}
+
+static inline int Cannon_get_min_shot_life(cannon_t *c)
+{
+    return options.minCannonShotLife;
+}
+
+static inline int Cannon_get_max_shot_life(cannon_t *c)
+{
+    return options.maxCannonShotLife;
+}
+
+static inline double Cannon_shot_life(cannon_t *cannon)
+{
+    double minlife, maxlife, d;
+
+    minlife = Cannon_get_min_shot_life(cannon);
+    maxlife = Cannon_get_max_shot_life(cannon);
+    d = maxlife - minlife;
+
+    return minlife + rfrac() * d;
+}
 
 #endif

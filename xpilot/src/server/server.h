@@ -258,8 +258,9 @@ void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
 			  int items, player_t *victim, bool pressor);
 void Place_mine(player_t *pl);
 void Place_moving_mine(player_t *pl);
-void Place_general_mine(world_t *world, player_t *pl, int team, int status,
-			clpos_t pos, vector_t vel, modifiers_t mods);
+void Place_general_mine(world_t *world, player_t *pl, cannon_t *cannon,
+			int team, int status, clpos_t pos, vector_t vel,
+			modifiers_t mods);
 void Detonate_mines(player_t *pl);
 char *Describe_shot(int type, int status, modifiers_t mods, int hit);
 void Fire_ecm(player_t *pl);

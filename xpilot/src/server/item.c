@@ -401,7 +401,7 @@ void Detonate_items(player_t *pl)
 
 	    vel.x = pl->vel.x + speed * tcos(dir);
 	    vel.y = pl->vel.y + speed * tsin(dir);
-	    Place_general_mine(world, owner_pl, pl->team, GRAVITY,
+	    Place_general_mine(world, owner_pl, NULL, pl->team, GRAVITY,
 			       pl->pos, vel, mods);
 	}
     }

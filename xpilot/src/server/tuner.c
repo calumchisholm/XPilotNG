@@ -182,6 +182,20 @@ void tuner_cannonsuseitems(world_t *world)
     }
 }
 
+void tuner_mincannonshotlife(world_t *world)
+{
+    UNUSED_PARAM(world);
+    LIMIT(options.minCannonShotLife, 0, FLT_MAX);
+    LIMIT(options.maxCannonShotLife, options.minCannonShotLife, FLT_MAX);
+}
+
+void tuner_maxcannonshotlife(world_t *world)
+{
+    UNUSED_PARAM(world);
+    LIMIT(options.maxCannonShotLife, 0, FLT_MAX);
+    LIMIT(options.minCannonShotLife, 0, options.maxCannonShotLife);
+}
+
 void tuner_wormhole_stable_ticks(world_t *world)
 {
     int i;

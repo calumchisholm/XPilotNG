@@ -50,11 +50,6 @@ long CANNON_USE_ITEM = (ITEM_BIT_FUEL|ITEM_BIT_WIDEANGLE
 			|ITEM_BIT_TRACTOR_BEAM|ITEM_BIT_MISSILE
 			|ITEM_BIT_PHASING);
 
-static inline int Cannon_get_smartness(cannon_t *c)
-{
-    return options.cannonSmartness;
-}
-
 void Cannon_update(world_t *world, bool do_less_frequent_update)
 {
     int i;
@@ -407,7 +402,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 {
     world_t *world = c->world;
     double speed = options.shotSpeed;
-    double range = CANNON_SHOT_LIFE_MAX * speed;
+    double range = Cannon_get_max_shot_life(c) * speed;
     double visualrange = (CANNON_DISTANCE
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
     bool found = false, ready = false;
@@ -577,7 +572,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
 	}
 	if (rfrac() < 0.5) {	/* place mine in front of cannon */
-	    Place_general_mine(world, NULL, c->team, FROMCANNON,
+	    Place_general_mine(world, NULL, c, c->team, FROMCANNON,
 			       c->pos, zero_vel, mods);
 	    sound_play_sensors(c->pos, DROP_MINE_SOUND);
 	    played = true;
@@ -591,7 +586,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 	    speed = speed * 0.5 + 0.1 * smartness;
 	    vel.x = tcos(dir) * speed;
 	    vel.y = tsin(dir) * speed;
-	    Place_general_mine(world, NULL, c->team, GRAVITY|FROMCANNON,
+	    Place_general_mine(world, NULL, c, c->team, GRAVITY|FROMCANNON,
 			       c->pos, vel, mods);
 	    sound_play_sensors(c->pos, DROP_MOVING_MINE_SOUND);
 	    played = true;
