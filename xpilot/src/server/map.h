@@ -291,7 +291,7 @@ typedef struct {
     int style;
     int group;
     int *edges;
-    int x, y;
+    int cx, cy;
     int num_points;
     int estyles_start;
     int num_echanges;

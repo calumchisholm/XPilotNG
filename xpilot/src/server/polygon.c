@@ -151,8 +151,8 @@ void P_start_polygon(int cx, int cy, int style)
     ptscount = 0;
     P_cv.cx = cx;
     P_cv.cy = cy;
-    t.x = cx;
-    t.y = cy;
+    t.cx = cx;
+    t.cy = cy;
     t.group = current_group;
     t.edges = edges;
     t.style = style;
@@ -196,7 +196,7 @@ void P_end_polygon(void)
 {
     if (ptscount < 3) {
 	warn("Polygon with less than 3 edges?? (start %d, %d)",
-	     pdata[num_polys - 1].x, pdata[num_polys - 1].y);
+	     pdata[num_polys - 1].cx, pdata[num_polys - 1].cy);
 	exit(-1);
     }
     pdata[num_polys - 1].num_points = ptscount;
