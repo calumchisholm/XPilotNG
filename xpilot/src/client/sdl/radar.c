@@ -489,3 +489,8 @@ void Paint_world_radar(void)
 {
     return;
 }
+
+void Radar_show_target(int x, int y) {}
+
+void Radar_hide_target(int x, int y) {}
+

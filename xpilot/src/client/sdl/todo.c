@@ -8,10 +8,6 @@ void Play_beep(void)
     fprintf(stderr, "\aBEEP\n");
 }
 
-void Radar_show_target(int x, int y) {}
-
-void Radar_hide_target(int x, int y) {}
-
 int Startup_server_motd(void)
 {
     return 0;
