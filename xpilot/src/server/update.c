@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -81,7 +81,7 @@ static void Transport_to_home(int ind)
     /*
      * Transport a corpse from the place where it died back to its homebase,
      * or if in race mode, back to the last passed check point.
-     * 
+     *
      * During the first part of the distance we give it a positive constant
      * acceleration G, during the second part we make this a negative one -G.
      * This results in a visually pleasing take off and landing.
@@ -556,7 +556,6 @@ void Update_objects(void)
 	    if (World.items[i].num < World.items[i].max
 		&& World.items[i].chance > 0
 		&& (rfrac() * World.items[i].chance) < 1.0f) {
-		
 		Place_item(i, -1);
 	    }
     }
@@ -726,7 +725,6 @@ void Update_objects(void)
 	}
 	if (cannon->phasing_left > 0) {
 	    if ((cannon->phasing_left -= timeStep) <= 0) {
-		
 		CLR_BIT(cannon->used, HAS_PHASING_DEVICE);
 	        sound_play_sensors(cannon->pos.cx, cannon->pos.cy,
 				   PHASING_OFF_SOUND);
@@ -784,12 +782,6 @@ void Update_objects(void)
 
 	pl = Players[i];
 
-	/* Limits. */
-	LIMIT(pl->power, MIN_PLAYER_POWER, MAX_PLAYER_POWER);
-	LIMIT(pl->turnspeed, MIN_PLAYER_TURNSPEED, MAX_PLAYER_TURNSPEED);
-	LIMIT(pl->turnresistance, MIN_PLAYER_TURNRESISTANCE,
-				  MAX_PLAYER_TURNRESISTANCE);
-
 	if ((pl->damaged -= timeStep) <= 0)
 	    pl->damaged = 0;
 
@@ -832,7 +824,6 @@ void Update_objects(void)
 	    } else {
 		pl->count = -1;
 		if (!BIT(pl->status, PLAYING)) {
-		    
 		    if (pl->idleCount >= IDLETHRESHOLD) { /* idle */
 			if (!game_lock && Team_zero_pausing_available()) {
 			    sprintf(msg,
@@ -983,7 +974,7 @@ void Update_objects(void)
 	}
 
 
-	pl->float_dir	+= pl->turnvel;
+	pl->float_dir += pl->turnvel;
 
 	while (pl->float_dir < 0)
 	    pl->float_dir += RES;
@@ -1460,4 +1451,3 @@ void Update_objects(void)
     if (updateScores && frame_loops % UPDATE_SCORE_DELAY == 0)
 	Update_score_table();
 }
-

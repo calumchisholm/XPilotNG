@@ -2709,30 +2709,36 @@ static int Receive_power(int ind)
 
     switch (ch) {
     case PKT_POWER:
+	LIMIT(power, MIN_PLAYER_POWER, MAX_PLAYER_POWER);
 	if (autopilot)
 	    pl->auto_power_s = power;
 	else
 	    pl->power = power;
 	break;
     case PKT_POWER_S:
+	LIMIT(power, MIN_PLAYER_POWER, MAX_PLAYER_POWER);
 	pl->power_s = power;
 	break;
     case PKT_TURNSPEED:
+	LIMIT(power, MIN_PLAYER_TURNSPEED, MAX_PLAYER_TURNSPEED);
 	if (autopilot)
 	    pl->auto_turnspeed_s = power;
 	else
 	    pl->turnspeed = power;
 	break;
     case PKT_TURNSPEED_S:
+	LIMIT(power, MIN_PLAYER_TURNSPEED, MAX_PLAYER_TURNSPEED);
 	pl->turnspeed_s = power;
 	break;
     case PKT_TURNRESISTANCE:
+	LIMIT(power, MIN_PLAYER_TURNRESISTANCE, MAX_PLAYER_TURNRESISTANCE);
 	if (autopilot)
 	    pl->auto_turnresistance_s = power;
 	else
 	    pl->turnresistance = power;
 	break;
     case PKT_TURNRESISTANCE_S:
+	LIMIT(power, MIN_PLAYER_TURNRESISTANCE, MAX_PLAYER_TURNRESISTANCE);
 	pl->turnresistance_s = power;
 	break;
     default:
@@ -3621,13 +3627,13 @@ static int Receive_pointer_move(int ind)
     if (pl->turnresistance)
 	LIMIT(turnspeed, MIN_PLAYER_TURNSPEED, MAX_PLAYER_TURNSPEED);
       /* Minimum amount of turning if you want to turn at all?
-	And the only effect of that maximum is making
-        finding the correct settings harder for new mouse players,
-        because the limit is checked BEFORE multiplying by turnres!
-        Kept here to avoid changing the feeling for old players who
-        are already used to this odd behavior. New players should set
-        turnresistance to 0.
-      */
+       * And the only effect of that maximum is making
+       * finding the correct settings harder for new mouse players,
+       * because the limit is checked BEFORE multiplying by turnres!
+       * Kept here to avoid changing the feeling for old players who
+       * are already used to this odd behavior. New players should set
+       * turnresistance to 0.
+       */
     else
 	LIMIT(turnspeed, 0, 5*RES);
 
