@@ -445,7 +445,7 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
     int				aux_dir;
     int				px[3], py[3];
     long			dist;
-    vector			*gravity;
+    vector			grav;
     int				gravity_dir;
     long			dx, dy;
     double			velocity;
@@ -483,12 +483,18 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 
     for (dist = 0; dist < stop_dist + BLOCK_SZ / 2; dist += BLOCK_SZ / 2) {
 	for (i = 0; i < 3; i++) {
+	    clpos d;
+	    blpos dblkpos;
+
 	    dx = (long)((px[i] + dist * tcos(travel_dir)) / BLOCK_SZ);
 	    dy = (long)((py[i] + dist * tsin(travel_dir)) / BLOCK_SZ);
 
 	    dx = WRAP_XBLOCK(dx);
 	    dy = WRAP_YBLOCK(dy);
-	    if (dx < 0 || dx >= world->x || dy < 0 || dy >= world->y) {
+	    d.cx = BLOCK_CENTER(dx);
+	    d.cy = BLOCK_CENTER(dy);
+
+	    if (!World_contains_clpos(world, d)) {
 		evade = true;
 		if (i == 1)
 		    left_ok = false;
@@ -496,6 +502,8 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 		    right_ok = false;
 		continue;
 	    }
+	    dblkpos.bx = dx;
+	    dblkpos.by = dy;
 	    if (!Really_empty_space(pl, dx, dy)) {
 		evade = true;
 		if (i == 1)
@@ -505,10 +513,10 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 		continue;
 	    }
 	    /* Watch out for strong gravity */
-	    gravity = &world->gravity[dx][dy];
-	    if (sqr(gravity->x) + sqr(gravity->y) >= 0.5) {
-		gravity_dir = findDir(gravity->x - CLICK_TO_PIXEL(pl->pos.cx),
-				      gravity->y - CLICK_TO_PIXEL(pl->pos.cy));
+	    grav = World_gravity(world, d);
+	    if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
+		gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
+				      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
 		if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
 		    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4) {
 		    evade = true;
@@ -567,12 +575,17 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 	left_ok = true;
 	aux_dir = MOD2(travel_dir + delta_dir, RES);
 	for (dist = 0; dist < stop_dist + BLOCK_SZ / 2; dist += BLOCK_SZ / 2) {
+	    clpos d;
+
 	    dx = (long)((px[0] + dist * tcos(aux_dir)) / BLOCK_SZ);
 	    dy = (long)((py[0] + dist * tsin(aux_dir)) / BLOCK_SZ);
 
 	    dx = WRAP_XBLOCK(dx);
 	    dy = WRAP_YBLOCK(dy);
-	    if (dx < 0 || dx >= world->x || dy < 0 || dy >= world->y) {
+	    d.cx = BLOCK_CENTER(dx);
+	    d.cy = BLOCK_CENTER(dy);
+
+	    if (!World_contains_clpos(world, d)) {
 		left_ok = false;
 		continue;
 	    }
@@ -581,12 +594,10 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 		continue;
 	    }
 	    /* watch out for strong gravity */
-	    gravity = &world->gravity[dx][dy];
-	    if (sqr(gravity->x) + sqr(gravity->y) >= 0.5) {
-		gravity_dir = Wrap_cfindDir(PIXEL_TO_CLICK(gravity->x)
-					    - pl->pos.cx,
-					    PIXEL_TO_CLICK(gravity->y)
-					    - pl->pos.cy);
+	    grav = World_gravity(world, d);
+	    if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
+		gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
+				      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
 		if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
 		    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4) {
 
@@ -599,12 +610,17 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 	right_ok = true;
 	aux_dir = MOD2(travel_dir - delta_dir, RES);
 	for (dist = 0; dist < stop_dist + BLOCK_SZ / 2; dist += BLOCK_SZ / 2) {
+	    clpos d;
+
 	    dx = (long)((px[0] + dist * tcos(aux_dir)) / BLOCK_SZ);
 	    dy = (long)((py[0] + dist * tsin(aux_dir)) / BLOCK_SZ);
 
 	    dx = WRAP_XBLOCK(dx);
 	    dy = WRAP_YBLOCK(dy);
-	    if (dx < 0 || dx >= world->x || dy < 0 || dy >= world->y) {
+	    d.cx = BLOCK_CENTER(dx);
+	    d.cy = BLOCK_CENTER(dy);
+
+	    if (!World_contains_clpos(world, d)) {
 		right_ok = false;
 		continue;
 	    }
@@ -613,12 +629,10 @@ static bool Check_robot_evade(player *pl, int mine_i, int ship_i)
 		continue;
 	    }
 	    /* watch out for strong gravity */
-	    gravity = &world->gravity[dx][dy];
-	    if (sqr(gravity->x) + sqr(gravity->y) >= 0.5) {
-		gravity_dir = Wrap_cfindDir(PIXEL_TO_CLICK(gravity->x)
-					    - pl->pos.cx,
-					    PIXEL_TO_CLICK(gravity->y)
-					    - pl->pos.cy);
+	    grav = World_gravity(world, d);
+	    if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
+		gravity_dir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
+				      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
 		if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
 		    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4) {
 
