@@ -20,7 +20,7 @@ public class MapBase extends MapObject {
 
 
     public MapBase () {
-        this(0, 0, 32, 1);
+        this(0, 0, 32, 0);
     }
 
 
@@ -51,7 +51,7 @@ public class MapBase extends MapObject {
 
 
     public void setTeam (int team) {
-        if (team < 1 || team > 10)
+        if (team < 0 || team > 10)
             throw new IllegalArgumentException
                 ("illegal team: " + team);
         this.team = team;
@@ -98,7 +98,7 @@ public class MapBase extends MapObject {
 
             cmbTeam = new JComboBox();
             for (int i = 0; i < 10; i++) 
-                cmbTeam.addItem(new Integer(i + 1));
+                cmbTeam.addItem(new Integer(i));
             cmbTeam.setSelectedIndex(getTeam() - 1);
             
             cmbDir = new JComboBox();
@@ -120,7 +120,7 @@ public class MapBase extends MapObject {
         
         
         public boolean apply () {
-            int newTeam = cmbTeam.getSelectedIndex() + 1;
+            int newTeam = cmbTeam.getSelectedIndex();
             int newDir = cmbDir.getSelectedIndex() * 32;
             if (newTeam != getTeam() || newDir != getDir())
                 canvas.setBaseProperties(MapBase.this, newTeam, newDir);

@@ -352,6 +352,23 @@ public class MapCanvas extends JComponent {
             });
     }
 
+    public void setCannonProperties (final Cannon c, 
+                                     final int newTeam,
+                                     final int newDir) {
+        final int oldTeam = c.getTeam();
+        final int oldDir = c.getDir();
+        doEdit(new MapEdit() {
+                public void unedit () {
+                    c.setTeam(oldTeam);
+                    c.setDir(oldDir);
+                }
+                public void edit () {
+                    c.setTeam(newTeam);
+                    c.setDir(newDir);
+                }
+            });
+    }
+
     public void removeMapObject (final MapObject o) {
         final int i = getModel().indexOf(o);
         if (i == -1) return;

@@ -22,6 +22,7 @@ public class MapModel extends ModelObject {
     float defaultScale;
     LineStyle defEdgeStyle;
     PolygonStyle defPolygonStyle;
+    PolygonStyle cannonStyle;
 
     public Object deepClone (Map context) {
 
@@ -60,9 +61,12 @@ public class MapModel extends ModelObject {
         edgeStyles = new ArrayList();
         options = new MapOptions();
 
-        LineStyle ls;
+        LineStyle ls, cannonLineStyle;
         ls = new LineStyle("internal", 0, Color.black, LineStyle.STYLE_HIDDEN);
         edgeStyles.add(ls);
+        ls = new LineStyle("cannon", 0, Color.lightGray, LineStyle.STYLE_SOLID);
+        edgeStyles.add(ls);
+        cannonLineStyle = ls;
         ls = new LineStyle("default", 0, Color.blue, LineStyle.STYLE_SOLID);
         edgeStyles.add(ls);
         defEdgeStyle = ls;
@@ -73,9 +77,18 @@ public class MapModel extends ModelObject {
         ps.setVisible(true);
         ps.setVisibleInRadar(true);
         ps.setFillStyle(PolygonStyle.FILL_NONE);
-        ps.setDefaultEdgeStyle(ls);
+        ps.setDefaultEdgeStyle(defEdgeStyle);
         polyStyles.add(ps);
         defPolygonStyle = ps;
+        ps = new PolygonStyle();
+        ps.setId("cannon");
+        ps.setVisible(true);
+        ps.setVisibleInRadar(true);
+        ps.setFillStyle(PolygonStyle.FILL_COLOR);
+        ps.setColor(Color.gray);
+        ps.setDefaultEdgeStyle(cannonLineStyle);
+        polyStyles.add(ps);
+        cannonStyle = ps;
     }
 
 
@@ -97,6 +110,16 @@ public class MapModel extends ModelObject {
     public void setDefaultEdgeStyle (LineStyle style) {
         this.defEdgeStyle = style;
 
+    }
+
+
+    public PolygonStyle getCannonStyle () {
+        return cannonStyle;
+    }
+    
+    
+    public void setCannontyle (PolygonStyle style) {
+        this.cannonStyle = style;
     }
 
 

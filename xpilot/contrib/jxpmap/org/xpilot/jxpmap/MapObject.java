@@ -148,7 +148,6 @@ public abstract class MapObject extends ModelObject {
     
 
     public void paint (Graphics2D g, float scale) {
-
         if (img != null) {
             Rectangle r = getBounds();
             AffineTransform at = AffineTransform.getTranslateInstance
@@ -209,6 +208,7 @@ public abstract class MapObject extends ModelObject {
             MapCanvas c = (MapCanvas)evt.getSource();
             MapObject.this.moveTo(evt.getX() - offset.x, 
                                   evt.getY() - offset.y);
+            c.addMapObject(MapObject.this);
             c.setCanvasEventHandler(null);
             if (cmd != null) cmd.run();
         }

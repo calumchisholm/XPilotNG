@@ -14,6 +14,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private JToggleButton btnNewFuel;
     private JToggleButton btnNewBase;
     private JToggleButton btnNewBall;
+    private JToggleButton btnNewCannon;
     private JToggleButton btnNewCheckPoint;
     private JToggleButton btnErase;
     private JButton btnUndo;
@@ -31,7 +32,7 @@ public class MainFrame extends JFrame implements ActionListener {
         buildActionMap();
         buildInputMap();
         setSize(800, 600);
-	setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(ss.width / 2 - 400, ss.height / 2 - 300);
     }
@@ -131,6 +132,10 @@ public class MainFrame extends JFrame implements ActionListener {
         btnNewBall = createToggle
             ("newBall", "/images/ballicon.gif", "New ball");
         toolBar.add(btnNewBall);
+
+        btnNewCannon = createToggle
+            ("newCannon", "/images/ballicon.gif", "New cannon");
+        toolBar.add(btnNewCannon);
 
         btnNewCheckPoint = createToggle
             ("newCheckPoint", "/images/checkicon.gif", "New checkpoint");
@@ -336,6 +341,21 @@ public class MainFrame extends JFrame implements ActionListener {
                 (new ToggleCommand(btnNewBall)));
     }
 
+    private void newCannon () {
+
+        if (!btnNewCannon.isSelected()) {
+            canvas.repaint();
+            canvas.setCanvasEventHandler(null);
+            return;
+        }
+
+        updateToggles(btnNewCannon);
+
+        canvas.setErase(false);
+        canvas.setCanvasEventHandler
+            (new Cannon(canvas.getModel().getCannonStyle()).getCreateHandler
+                (new ToggleCommand(btnNewCannon)));
+    }
 
     private void newCheckPoint () {
 
@@ -508,6 +528,8 @@ public class MainFrame extends JFrame implements ActionListener {
         if (boss != btnNewPoly) btnNewPoly.setSelected(false);
         if (boss != btnNewFuel) btnNewFuel.setSelected(false);
         if (boss != btnNewBase) btnNewBase.setSelected(false);
+        if (boss != btnNewBall) btnNewBall.setSelected(false);
+        if (boss != btnNewCannon) btnNewCannon.setSelected(false);
         if (boss != btnNewCheckPoint) btnNewCheckPoint.setSelected(false);
         if (boss != btnErase) btnErase.setSelected(false);
     }
