@@ -1,3 +1,584 @@
+2004-03-25 19:22  darelcullen
+
+	* src/client/: xevent.c, xdefault.c: Option to turn off or on in
+	  game mouse acceleration
+
+2004-03-25 14:37  kps
+
+	* src/client/xpilot.c: Removed leftover scrap.
+
+2004-03-25 14:30  kps
+
+	* doc/man/: .cvsignore, xpilot-ng-replay.man, xpilot-ng-sdl.man,
+	  xpilot-ng-server.man, xpilot-ng-x11.man: Added man pages created
+	  with help2man.
+
+2004-03-25 14:28  kps
+
+	* Makefile.in, configure, configure.ac, doc/man/Makefile.in,
+	  doc/man/README, doc/man/help2man.sh,
+	  doc/man/xpilot-ng-replay.man.old,
+	  doc/man/xpilot-ng-server.man.old, doc/man/xpilot-ng-x11.man.old,
+	  src/client/client.h, src/client/option.c, src/client/xpilot.c,
+	  src/client/sdl/main.c, src/replay/xp-replay.c: Created man pages
+	  for xpilot-ng-x11, xpilot-ng-sdl, xpilot-ng-server and
+	  xpilot-ng-replay using help2man.
+
+2004-03-25 13:24  kps
+
+	* src/replay/xp-replay.c: Print usage data to stdout (previously
+	  stderr), add support for --version.
+
+2004-03-25 00:52  kps
+
+	* Makefile.in, configure, configure.ac, doc/Makefile.in,
+	  doc/man/Makefile.in, lib/Makefile.in, lib/fonts/Makefile.in,
+	  lib/maps/Makefile.in, lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/version.h.in, src/replay/Makefile.in,
+	  src/replay/tools/Makefile.in, src/server/Makefile.in: Remove
+	  unecessary XP_TITLE configure variable because PACKAGE_STRING
+	  contains the same data.
+
+2004-03-25 00:49  kps
+
+	* src/server/metaserver.c: Use the string VERSION "ng" (e.g.
+	  4.6.0ng) as the version to send to meta on all platforms.
+
+2004-03-24 23:45  kps
+
+	* src/: client/default.c, client/option.c, common/config.c: Use
+	  warn() instead of xpprintf() when printing out some stuff so that
+	  when you use -help or -version, that stdout wouldn't contain a
+	  lot of rubbish (goes to stderr).
+
+2004-03-24 23:41  kps
+
+	* src/server/parser.c: Changed names of man pages in help text (e.g
+	  xpilots(6) -> xpilot-ng-server(6)).
+
+2004-03-24 20:52  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/MapModel.java: fixed map
+	  validation to allow polybloods
+
+2004-03-24 18:14  kps
+
+	* src/server/: cannon.c, cannon.h, map.c, map.h, update.c: Added
+	  world pointer to cannon structure.
+
+2004-03-24 16:09  kps
+
+	* src/server/: asteroid.c, cannon.c, command.c, contact.c, item.c,
+	  objpos.c, objpos.h, play.c, robot.c, server.c, server.h, ship.c,
+	  shot.c, update.c, walls.c: Added world argument to
+	  Object_position_{set,init}_* functions.
+
+2004-03-24 15:50  kps
+
+	* src/server/: cannon.c, item.c, server.h, shot.c, update.c: Added
+	  world argument to "general" fireing functions, e.g.
+	  Fire_general_shot().
+
+2004-03-24 15:20  kps
+
+	* src/server/frame.c: Removed references to global variable World.
+
+2004-03-24 14:48  kps
+
+	* src/server/: asteroid.c, cannon.c, cell.c, collision.c, frame.c,
+	  item.c, object.c, play.c, player.c, robot.c, robotdef.c,
+	  server.c, server.h, ship.c, shot.c, update.c, walls.c: Added
+	  world argument to Cell functions.
+
+2004-03-24 14:17  kps
+
+	* src/server/xpmap.c: Cleaned up Xpmap_find_map_object_teams() a
+	  bit.	Added world argument to functions creating polygons out of
+	  map objects.
+
+2004-03-24 12:26  kps
+
+	* src/server/: asteroid.c, cannon.c, collision.c, command.c,
+	  laser.c, map.h, netserver.c, player.c, robot.c, score.c, score.h,
+	  server.h, shot.c, update.c: Added world argument to a few more
+	  functions.
+
+2004-03-23 21:48  kps
+
+	* src/server/: asteroid.c, collision.c, frame.c, item.c, server.h,
+	  update.c: Removed more direct accesses to World.
+
+2004-03-23 21:07  kps
+
+	* src/server/: asteroid.c, cannon.c, command.c, event.c,
+	  netserver.c, object.h, play.c, player.c, robot.c, robot.h,
+	  robotdef.c, rules.c, server.c, server.h, ship.c, shot.c, tuner.c,
+	  update.c, walls.c: Removed some accesses to global World
+	  structure.
+
+2004-03-23 18:58  kps
+
+	* src/server/: cmdline.c, contact.c, defaults.h, map.c, map.h,
+	  parser.c, play.c, rules.c, server.c, server.h, srecord.c,
+	  tuner.c, tuner.h, walls.c, xpmap.c: Added world argument to
+	  tuners.
+
+2004-03-23 17:31  kps
+
+	* src/server/xpmap.c: Removed redundant Xpmap_get_clpos.
+
+2004-03-23 17:08  kps
+
+	* src/server/fileparser.c: Whitespace changes, use XFREE where
+	  appropriate.
+
+2004-03-23 13:14  kps
+
+	* src/server/: map.c, server.c, server.h: Moved Compute_gravity and
+	  Find_base_direction calls from main() to Grok_map().
+
+2004-03-23 13:13  kps
+
+	* src/server/robotdef.c: Print out unknown item type in rank item
+	  value function.
+
+2004-03-22 21:52  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: Ball.java, MapCanvas.java:
+	  fixed polygon popup bug and invisible ball after creating bug
+
+2004-03-22 19:57  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/MapObject.java: hopefully fixed
+	  popup problem on windows
+
+2004-03-22 18:18  kps
+
+	* src/client/option.c: Allow giving 2 minuses in options, e.g.
+	  --version instead of -version.  No support yet for
+	  --option=value.
+
+2004-03-22 17:44  kps
+
+	* doc/man/xpilot-ng-replay.man.in, doc/man/xpilot-ng-sdl.man.in,
+	  doc/man/xpilot-ng-server.man.in, doc/man/xpilot-ng-x11.man.in,
+	  src/replay/xp-replay.c: Updated xpilot-ng-replay man page. Small
+	  updates in other man pages.
+
+2004-03-22 16:54  kps
+
+	* Makefile.in, configure, configure.ac, doc/Makefile.in,
+	  doc/man/Makefile.am, doc/man/Makefile.in,
+	  doc/man/xpilot-ng-sdl.man.in, doc/man/xpilot-ng-server.man.in,
+	  doc/man/xpilot-ng-x11.man.in, lib/Makefile.in,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/xpconfig.h, src/replay/Makefile.in,
+	  src/replay/tools/Makefile.in, src/server/Makefile.in: Make
+	  manpages install correctly.
+
+2004-03-22 16:06  kps
+
+	* lib/Makefile.am, lib/Makefile.in, lib/fonts/Makefile.am,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.am,
+	  lib/maps/Makefile.in, lib/textures/Makefile.am,
+	  lib/textures/Makefile.in, src/client/Makefile.am,
+	  src/client/Makefile.in, src/client/sdl/Makefile.am,
+	  src/client/sdl/Makefile.in, src/common/Makefile.am,
+	  src/common/Makefile.in, src/common/config.c,
+	  src/common/xpconfig.h, src/replay/Makefile.am,
+	  src/replay/Makefile.in, src/server/Makefile.am,
+	  src/server/Makefile.in, src/server/parser.c: Put data in
+	  $prefix/share/xpilot-ng instead of $prefix/lib/xpilot-ng.
+
+2004-03-22 15:41  kps
+
+	* aclocal.m4, lib/Makefile.am, lib/Makefile.in, lib/defaults,
+	  lib/defaults.txt, lib/password, lib/password.txt, lib/robots,
+	  lib/robots.txt, lib/shipshapes, lib/shipshapes.txt, lib/sounds,
+	  lib/sounds-simpsons, lib/sounds-simpsons.README, lib/sounds.txt,
+	  src/common/xpconfig.h: Now all platforms use file extension txt
+	  for config files (previously there was no file extension on Unix
+	  config files).
+
+2004-03-22 13:44  kps
+
+	* src/client/sdl/Makefile.hack: Makefile.hack removed, ./configure
+	  --enable-sdl-client ... to build SDL client.
+
+2004-03-21 11:19  darelcullen
+
+	* src/client/xdefault.c: Update to pointer control for windows..
+
+2004-03-20 23:45  kps
+
+	* src/server/: cannon.c, collision.c, command.c, event.c, laser.c,
+	  netserver.c, play.c, player.c, rank.c, rank.h, robot.c, score.c,
+	  score.h, shot.c, walls.c: Added more different types of kills
+	  recognized in Rank interface (correct function is called
+	  depending on kill type).  Changed TEAM_SCORE to Team_score.
+	  Changed macros in rank.h to inline functions.
+
+2004-03-20 23:29  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: MapModel.java,
+	  MapPolygon.java: added support for downloading images when
+	  importing an xp2 file
+
+2004-03-20 21:38  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: MainFrame.java, init.bsh:
+	  added support for accessing bsh scripts from the menu
+
+2004-03-20 20:06  darelcullen
+
+	* src/client/xdefault.c: Set the default Acceleration to 0 , the
+	  default denom to 1, and the default threshold to 0 , might not
+	  work for some sun machines, and setting threshold > 0 when accel
+	  is 0 seems to cause some problems for other people also..
+
+2004-03-20 19:48  darelcullen
+
+	* src/client/: xdefault.c, xevent.c, xinit.c: embedded mouse
+	  acceleration support
+
+2004-03-20 18:03  kps
+
+	* src/client/: client.h, option.h, xdefault.c, sdl/sdlkeys.c: Small
+	  cleanup after Baron's mfc fixes.
+
+2004-03-20 17:37  juhal
+
+	* src/: client/bitmaps.c, client/bitmaps.h, client/client.h,
+	  client/join.c, client/option.h, client/painthud.c,
+	  client/paintradar.c, client/record.c, client/xdefault.c,
+	  client/xinit.c, client/xpaint.c, client/xpclient.h,
+	  client/xpilot.c, client/NT/winBitmap.c, client/NT/winClient.h,
+	  client/NT/winColors.c, client/NT/winConfig.c,
+	  client/NT/wintalk.c, client/NT/xpilot.dsp,
+	  client/NT/xpilotView.cpp, common/NT/winX.c, common/NT/winX.h,
+	  common/NT/winX11.c: mfc client builds now
+
+2004-03-20 13:23  kps
+
+	* src/server/: player.c, update.c: Make flooding count start at 0
+	  instead of -1.
+
+2004-03-20 13:17  kps
+
+	* src/server/player.c: Memset player structure to 0 in
+	  Init_player().
+
+2004-03-20 10:33  kps
+
+	* src/server/: cmdline.c, ship.c: Fixed bug where tank would only
+	  fly straight up (was due to assignment of tank->float_dir;
+	  Player_set_float_dir() should be used so that the cosine and sine
+	  are correctly precalculated). Put back old tank ship shape.
+	  Option defaultShipShape updated to Mara's triangle ship.
+
+2004-03-20 09:15  kps
+
+	* src/server/cell.c: Simplified some freeing code, changed one
+	  unsigned to size_t.
+
+2004-03-19 20:20  kps
+
+	* .cvsignore, doc/man/.cvsignore, lib/fonts/.cvsignore,
+	  src/client/.cvsignore, src/client/items/.cvsignore,
+	  src/client/sdl/.cvsignore, src/common/.cvsignore,
+	  src/replay/.cvsignore, src/replay/tools/.cvsignore,
+	  src/server/.cvsignore: Updated .cvsignore files.
+
+2004-03-19 19:44  kps
+
+	* BUGS, src/server/rank.c, src/server/rank.h: Rank code now handles
+	  nicks in case insensitive way. Removed old scorenode.
+
+2004-03-19 18:48  darelcullen
+
+	* src/client/paint.h: windows fixes (strange characters)
+
+2004-03-18 21:00  kps
+
+	* configure, configure.ac, doc/man/Makefile.am,
+	  doc/man/Makefile.in, doc/man/xp-replay.man.in,
+	  doc/man/xpilot-ng-replay.man.in, doc/man/xpilot-ng-sdl.man.in,
+	  doc/man/xpilot-ng-server.man.in, doc/man/xpilot-ng-x11.man.in,
+	  doc/man/xpilot.man.in, doc/man/xpilots.man.in: Changed names of
+	  manpages for xpilot ng version 4.6.0.  Man page of sdl client is
+	  currently the same as for x11 one.
+
+2004-03-18 20:34  kps
+
+	* Makefile.in, configure, configure.ac, doc/Makefile.in,
+	  doc/man/Makefile.am, doc/man/Makefile.in,
+	  doc/man/xp-mapedit.man.in, lib/Makefile.in,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/version.h, src/common/version.h.in,
+	  src/replay/Makefile.in, src/replay/tools/Makefile.in,
+	  src/server/Makefile.in: NG doesn't have winversion any more.
+	  Removed xp-mapedit man page.
+
+2004-03-18 20:18  kps
+
+	* src/mapedit/: COPYRIGHT, Makefile, Makefile.dist, README,
+	  README.UPDATE, TODO, T_Form.c, T_Form.h, T_Handler.c,
+	  T_Handler.h, T_Popup.c, T_Popup.h, T_Toolkit.c, T_Toolkit.h,
+	  T_proto.h, default_colors.h, defaults.h, events.c, events.h,
+	  expose.c, expose.h, file.c, file.h, forms.c, forms.h, grow.c,
+	  grow.h, help.c, help.h, main.c, main.h, map.h, proto.h, round.c,
+	  round.h, tools.c, tools.h: Removed old block map editor (get a
+	  copy from xpilot.org if needed).
+
+2004-03-18 19:33  kps
+
+	* Makefile.in, README, configure, configure.ac,
+	  src/client/Makefile.am, src/client/Makefile.in,
+	  src/client/sdl/Makefile.am, src/client/sdl/Makefile.in,
+	  src/common/Makefile.am, src/common/Makefile.in,
+	  src/common/version.h, src/replay/Makefile.am,
+	  src/replay/Makefile.in, src/server/Makefile.am,
+	  src/server/Makefile.in, src/server/metaserver.c: Xpilot-ng
+	  version numbers are now independent of xpilot.org version
+	  numbers.  Version is now 4.6.0.  Binary names change: xpilot
+	  -> xpilot-ng-x11 xpilot_sdl -> xpilot-ng-sdl xpilots	  ->
+	  xpilot-ng-server xp-replay  -> xpilot-ng-replay NG servers have
+	  an ng "extraversion" in meta server list.
+
+2004-03-17 12:43  kps
+
+	* Makefile.in, aclocal.m4, configure, doc/Makefile.in,
+	  doc/man/Makefile.in, lib/Makefile.in, lib/fonts/Makefile.in,
+	  lib/maps/Makefile.in, lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/NT/Makefile.in, src/common/NT/bindist/Makefile.in,
+	  src/replay/Makefile.in, src/replay/tools/Makefile.in,
+	  src/server/Makefile.in: Generated files with automake 1.8.3.
+
+2004-03-16 21:31  kps
+
+	* src/server/: item.c, walls.c: Don't cast intermediate results to
+	  long type.
+
+2004-03-16 20:56  kps
+
+	* src/client/: client.c, client.h, default.c: Added option
+	  'newbie', true by default.
+
+2004-03-16 20:22  kps
+
+	* src/server/: event.c, netserver.c, object.h, player.c: Removed
+	  pl->idleCount (only pl->idleTime is used now).
+
+2004-03-16 20:12  kps
+
+	* src/server/robot.c: Don't use pl->count.
+
+2004-03-16 19:59  kps
+
+	* src/server/: command.c, event.c, frame.c, object.h, play.c,
+	  player.c, update.c, walls.c: Separated pl->count into
+	  pl->recovery_count and pl->pause_count, made player idling max
+	  time adapt to FPS changes.
+
+2004-03-16 14:22  kps
+
+	* BUGS: \ingore doesn't handle ball warnings correctly.
+
+2004-03-16 13:05  kps
+
+	* src/server/: cmdline.c, event.c, object.h, player.c, server.h,
+	  update.c: Option maxPauseTime now adapts to FPS changes. Added
+	  pauseTime and idleTime members in player_t. Added variable
+	  timePerFrame which tells how much real time (seconds) passes each
+	  frame.
+
+2004-03-16 11:36  kps
+
+	* src/server/: cmdline.c, server.h, update.c: Added maxIdleTime
+	  option.
+
+2004-03-15 23:32  kps
+
+	* src/server/robot.c: Trivial changes.
+
+2004-03-15 23:05  kps
+
+	* BUGS, src/server/player.c: Fixed bug where recovery restarts when
+	  someone in your team takes your base.
+
+2004-03-15 21:40  kps
+
+	* BUGS: Added bug about painting internal edges in sdl client.
+
+2004-03-15 21:37  kps
+
+	* src/server/player.c: Fixed bug where server would crash when
+	  num_best_players is 0 in Give_best_player_bonus(). This could
+	  happen for example if one player was pausing on a server (had
+	  paused more than 10 seconds) and another joined the server.
+
+2004-03-14 18:41  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: MainFrame.java,
+	  MapCanvas.java, MapModel.java: added simple map validity check
+
+2004-03-14 09:35  juhal
+
+	* contrib/jxpmap/manifest.mf: added Main-Class attribute
+
+2004-03-13 18:41  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: Ball.java, MainFrame.java,
+	  MapCanvas.java, MapModel.java, MapObject.java, MapPolygon.java,
+	  PixmapEditor.java, PolygonStyle.java, defopts: new stuff - ball
+	  styles - selecting objects - highlighting the vertices of the
+	  selected polygon fixed stuff - new default options - map version
+	  is 1.1 - default directory is current working directory in file
+	  dialogs - textured polygons stay visible in radar (hopefully)
+
+2004-03-13 18:27  juhal
+
+	* contrib/jxpmap/images/ball.gif: added support for ball styles
+
+2004-03-12 21:59  kps
+
+	* lib/textures/: Makefile.am, Makefile.in: Baron added some
+	  buttons.
+
+2004-03-12 21:50  juhal
+
+	* lib/textures/metabtndown.png, lib/textures/metabtnup.png,
+	  src/client/sdl/glwidgets.c, src/client/sdl/glwidgets.h,
+	  src/client/sdl/main.c, src/client/sdl/sdlmeta.c: added a few
+	  buttons to meta interface
+
+2004-03-12 20:55  darelcullen
+
+	* src/client/sdl/sdlmeta.c: Change fullscreen to F11
+
+2004-03-12 20:51  darelcullen
+
+	* src/client/sdl/sdlmeta.c: Add some keypress stuff
+
+2004-03-11 20:07  kps
+
+	* src/client/option.c: Xpilotrc name change on windows: new name
+	  xpilotrc.txt.
+
+2004-03-10 23:38  kps
+
+	* src/client/sdl/sdlgui.c: Always display RGBA color options with 8
+	  hex digits.
+
+2004-03-09 11:59  kps
+
+	* src/server/: cmdline.c, defaults.h, option.c, parser.c, update.c:
+	  Removed option type valSec (it doesn't work right when server FPS
+	  can change).
+
+2004-03-08 21:47  kps
+
+	* src/server/: cmdline.c, map.c, server.h, serverconst.h, tuner.c,
+	  tuner.h, update.c: Replaced option wormTime with
+	  wormholeStableTicks.	Note that both static and temporary
+	  wormholes are broken.
+
+2004-03-08 21:01  kps
+
+	* src/server/: cmdline.c, server.h, shot.c: Changed option
+	  mineFuseTime to mineFuseTicks.
+
+2004-03-08 20:32  kps
+
+	* src/server/: cannon.c, cmdline.c, event.c, frame.c, map.c, map.h,
+	  netserver.c, netserver.h, play.c, player.c, robotdef.c, server.h,
+	  update.c, walls.c: Changed options: cannonDeadTime ->
+	  cannonDeadTicks targetDeadTime -> targetDeadTicks Fixed target
+	  repair to be gamespeed aware.
+
+2004-03-08 20:02  kps
+
+	* src/server/robotdef.c: Use Wrap_length() instead of ugly hacks to
+	  calculate distances.
+
+2004-03-08 19:51  juhal
+
+	* src/client/sdl/sdlmeta.c: added some cleanup code
+
+2004-03-08 18:27  juhal
+
+	* src/client/sdl/sdlmeta.c: fixed some layout issues
+
+2004-03-08 18:16  darelcullen
+
+	* src/client/sdl/xpilot_sdl.dsp: This is the build file for windows
+	  WARNING YOU WILL NEED TO CHANGE TO MATCH THE LOCATION OF YOUR
+	  SDL_image, SDL_ttf , zlib etc in the include and lib settings
+
+2004-03-08 18:10  darelcullen
+
+	* src/client/sdl/sdlmeta.c: Update to work with windows, and remove
+	  some unused stuff
+
+2004-03-07 21:58  darelcullen
+
+	* src/client/welcome.c: problems with commas in nicknames, oops
+
+2004-03-07 21:48  kps
+
+	* lib/textures/: Makefile.am, Makefile.in: Install baron's
+	  excellent png stuff.
+
+2004-03-07 21:31  juhal
+
+	* src/client/sdl/sdlmeta.c: added background image to meta
+	  interface
+
+2004-03-07 21:30  juhal
+
+	* lib/textures/sdlmetabg.png: added background for sdl meta
+	  interface
+
+2004-03-07 21:22  kps
+
+	* configure, configure.ac: Make sure both SDL_ttf and SDL_image are
+	  present in the linking stage.
+
+2004-03-07 21:09  kps
+
+	* config.h.in, configure, configure.ac: Check for optional SDL
+	  image library.
+
+2004-03-07 16:30  juhal
+
+	* src/client/sdl/sdlmeta.c: added status widget and player list
+	  widget
+
+2004-03-06 18:06  kps
+
+	* src/server/: click.h, frame.c, play.c: updated copyright stuff
+
+2004-03-06 17:54  kps
+
+	* src/: common/math.c, common/setup.h, server/alliance.c,
+	  server/collision.c, server/event.c, server/item.c, server/map.c,
+	  server/map.h, server/sched.c, server/score.c, server/score.h,
+	  server/server.c, server/update.c: More copyright info.
+
+2004-03-06 17:36  darelcullen
+
+	* ChangeLog: ChangeLog updated
+
 2004-03-06 17:06  kps
 
 	* src/server/: auth.c, auth.h, cmdline.c, command.c, polygon.c,
