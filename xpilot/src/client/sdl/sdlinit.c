@@ -330,8 +330,7 @@ static const char* Get_geometry(xp_option_t *opt)
 static bool Set_fontName(xp_option_t *opt, const char *value)
 {
     UNUSED_PARAM(opt);
-    if (gamefontname)
-	xp_free(gamefontname);
+    XFREE(gamefontname);
     gamefontname = xp_safe_strdup(value);
 
     return true;

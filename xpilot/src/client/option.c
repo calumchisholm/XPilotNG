@@ -435,8 +435,7 @@ static bool Set_key_option(xp_option_t *opt, const char *value,
     /*
      * First remove the old setting.
      */
-    if (opt->key_string)
-	xp_free(opt->key_string);
+    XFREE(opt->key_string);
     Remove_key_from_keydefs(opt->key);
 
     /*
@@ -466,7 +465,7 @@ static bool Set_key_option(xp_option_t *opt, const char *value,
 
     /* in fact if we only get invalid keysyms we should return false */
     opt->origin = origin;
-    xp_free(valcpy);
+    XFREE(valcpy);
     return true;
 }
 
@@ -586,7 +585,7 @@ void Set_command(const char *args)
     }
 
  out:
-    xp_free(valcpy);
+    XFREE(valcpy);
 }
 
 const char *Option_value_to_string(xp_option_t *opt)
@@ -657,7 +656,7 @@ void Get_command(const char *args)
 	Add_message(msg);
     }
 
-    xp_free(valcpy);
+    XFREE(valcpy);
 }
 
 /*
@@ -844,7 +843,7 @@ static void Parse_xpilotrc_line(const char *line)
     STORE(xpilotrc_line_t,
 	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
     num_ok_options++;
-    xp_free(lcpy);
+    XFREE(lcpy);
     return;
 
  line_is_comment:
@@ -857,7 +856,7 @@ static void Parse_xpilotrc_line(const char *line)
     t.comment = xp_safe_strdup(line);
     STORE(xpilotrc_line_t,
 	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
-    xp_free(lcpy);
+    XFREE(lcpy);
 }
 
 static inline bool is_noarg_option(const char *name)

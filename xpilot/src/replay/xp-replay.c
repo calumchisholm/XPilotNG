@@ -594,7 +594,7 @@ static char *RReadString(FILE *fp)
     size_t		len;
 
     len = RReadUShort(fp);
-    s = MyMalloc(len + 1, MEM_STRING);
+    s = (char *)MyMalloc(len + 1, MEM_STRING);
     s[len] = '\0';
     for (i = 0; i < (int)len; i++)
 	s[i] = getc(fp);
@@ -646,7 +646,7 @@ static int RReadHeader(struct xprc *rc)
 	rc->fps = fps;
     rc->recorddate = RReadString(rc->fp);
     rc->maxColors = (unsigned char) getc(rc->fp);
-    rc->colors = MyMalloc(rc->maxColors * sizeof(XColor), MEM_MISC);
+    rc->colors = (XColor *)MyMalloc(rc->maxColors * sizeof(XColor), MEM_MISC);
     for (i = 0; i < rc->maxColors; i++) {
 	rc->colors[i].pixel = RReadULong(rc->fp);
 	rc->colors[i].red = RReadUShort(rc->fp);
@@ -712,7 +712,7 @@ static Pixmap RReadTile(struct xprc *rc)
 	fprintf(stderr, "Can't create XImage %ux%u", width, height);
 	exit(1);
     }
-    img->data = MyMalloc(img->bytes_per_line * height, MEM_GC);
+    img->data = (char *)MyMalloc(img->bytes_per_line * height, MEM_GC);
     for (y = 0; y < img->height; y++) {
 	for (x = 0; x < img->width; x++) {
 	    ch = RReadByte(rc->fp);
@@ -728,7 +728,7 @@ static Pixmap RReadTile(struct xprc *rc)
     XPutImage(dpy, tile, rc->gc, img, 0, 0, 0, 0, width, height);
     XDestroyImage(img);
 
-    if (!(lptr = malloc(sizeof(tile_list_t)))) {
+    if (!(lptr = XMALLOC(tile_list_t, 1))) {
 	perror("memory");
 	exit(1);
     }
@@ -795,7 +795,7 @@ static struct rGC *RReadGCValues(struct xprc *rc)
 	    if (gc.num_dashes == 0) {
 		gc.dash_list = NULL;
 	    } else {
-		gc.dash_list = MyMalloc(gc.num_dashes, MEM_GC);
+		gc.dash_list = (char *)MyMalloc(gc.num_dashes, MEM_GC);
 		for (i = 0; i < gc.num_dashes; i++)
 		    gc.dash_list[i] = RReadByte(rc->fp);
 	    }
@@ -854,7 +854,7 @@ static struct rGC *RReadGCValues(struct xprc *rc)
 	}
 	return gcp;
     }
-    gcp = MyMalloc(sizeof(*gcp), MEM_GC);
+    gcp = (struct rGC *)MyMalloc(sizeof(*gcp), MEM_GC);
     memcpy(gcp, &gc, sizeof(*gcp));
     gcp->next = gclist;
     gclist = gcp;
@@ -1104,7 +1104,7 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 	case RC_DRAWARCS:
 	case RC_DRAWSEGMENTS:
 	case RC_DAMAGED:
-	    newshp = MyMalloc(sizeof(struct shape), MEM_SHAPE);
+	    newshp = (struct shape *)MyMalloc(sizeof(struct shape), MEM_SHAPE);
 	    newshp->next = NULL;
 	    newshp->type = 0;
 	    if ((newshp->gc = RReadGCValues(rc)) == NULL) {
@@ -1137,7 +1137,7 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 	    case RC_DRAWLINES:
 		shp->shape.lines.npoints = c = RReadUShort(rc->fp);
 		shp->shape.lines.points = xpp =
-		    MyMalloc(sizeof(XPoint) * c, MEM_POINT);
+		    (XPoint *)MyMalloc(sizeof(XPoint) * c, MEM_POINT);
 		while (c--) {
 		    xpp->x = RReadShort(rc->fp);
 		    xpp->y = RReadShort(rc->fp);
@@ -1167,7 +1167,7 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 		shp->shape.string.font = RReadByte(rc->fp);
 		shp->shape.string.length = c = RReadUShort(rc->fp);
 		shp->shape.string.string
-		    = cp = MyMalloc((size_t)c, MEM_STRING);
+		    = cp = (char *)MyMalloc((size_t)c, MEM_STRING);
 		while (c--)
 		    *cp++ = getc(rc->fp);
 		break;
@@ -1175,7 +1175,7 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 	    case RC_FILLPOLYGON:
 		shp->shape.polygon.npoints = c = RReadUShort(rc->fp);
 		shp->shape.polygon.points = xpp =
-		    MyMalloc(sizeof(XPoint) * c, MEM_POINT);
+		    (XPoint *)MyMalloc(sizeof(XPoint) * c, MEM_POINT);
 		while (c--) {
 		    xpp->x = RReadShort(rc->fp);
 		    xpp->y = RReadShort(rc->fp);
@@ -1194,7 +1194,7 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 	    case RC_FILLRECTANGLES:
 		shp->shape.rectangles.nrectangles = c = RReadUShort(rc->fp);
 		shp->shape.rectangles.rectangles = xrp =
-		    MyMalloc(sizeof(XRectangle) * c, MEM_POINT);
+		    (XRectangle *)MyMalloc(sizeof(XRectangle) * c, MEM_POINT);
 		while (c--) {
 		    xrp->x = RReadShort(rc->fp);
 		    xrp->y = RReadShort(rc->fp);
@@ -1207,7 +1207,7 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 	    case RC_DRAWARCS:
 		shp->shape.arcs.narcs = c = RReadUShort(rc->fp);
 		shp->shape.arcs.arcs = xap =
-		    MyMalloc(sizeof(XArc) * c, MEM_POINT);
+		    (XArc *)MyMalloc(sizeof(XArc) * c, MEM_POINT);
 		while (c--) {
 		    xap->x = RReadShort(rc->fp);
 		    xap->y = RReadShort(rc->fp);
@@ -1222,7 +1222,7 @@ static int readFrameData(struct xprc *rc, struct frame *f)
 	    case RC_DRAWSEGMENTS:
 		shp->shape.segments.nsegments = c = RReadUShort(rc->fp);
 		shp->shape.segments.segments = xsp =
-		    MyMalloc(sizeof(XSegment) * c, MEM_POINT);
+		    (XSegment *)MyMalloc(sizeof(XSegment) * c, MEM_POINT);
 		while (c--) {
 		    xsp->x1 = RReadShort(rc->fp);
 		    xsp->y1 = RReadShort(rc->fp);
@@ -1289,7 +1289,7 @@ static int readNewFrame(struct xprc *rc)
 	rc->eof = True;
 	return -1;
     }
-    f = MyMalloc(sizeof(struct frame), MEM_FRAME);
+    f = (struct frame *)MyMalloc(sizeof(struct frame), MEM_FRAME);
     f->width = RReadUShort(rc->fp);
     f->height = RReadUShort(rc->fp);
     f->shapes = NULL;
@@ -1376,7 +1376,8 @@ static void allocViewColors(struct xprc *rc)
     XColor		*cp, *cp2, myColor;
     int			i, j;
 
-    rc->pixels = MyMalloc(2 * rc->maxColors * sizeof(*rc->pixels), MEM_MISC);
+    rc->pixels = (unsigned long *)
+	MyMalloc(2 * rc->maxColors * sizeof(*rc->pixels), MEM_MISC);
 
     for (i = 0; i < rc->maxColors; i++) {
 	cp = &rc->colors[i];
@@ -1693,7 +1694,8 @@ static void Init_wm_prop(Window win,
 
 static struct recordwin *Init_recordwindow(unsigned long bg, void *data)
 {
-    struct recordwin	*rwin = MyMalloc(sizeof(struct recordwin), MEM_UI);
+    struct recordwin	*rwin = (struct recordwin *)
+	MyMalloc(sizeof(struct recordwin), MEM_UI);
     int			x, y;
     unsigned		w, h;
     XWindowChanges	values;
@@ -1860,7 +1862,8 @@ static void closeErrorWindow(void *data)
 
 static struct errorwin *Init_errorwindow(unsigned long bg)
 {
-    struct errorwin *ewin = MyMalloc(sizeof(struct errorwin), MEM_UI);
+    struct errorwin *ewin = (struct errorwin *)
+	MyMalloc(sizeof(struct errorwin), MEM_UI);
     int x, y;
     unsigned w, h;
     union button_image image;
@@ -2005,7 +2008,8 @@ static void Init_topmain(struct xui *ui, struct xprc *rc)
 	x += buttonInit[i].width+BUTTON_BORDER+BUTTON_SPACING;
     }
 
-    ui->labels = MyMalloc(NUM_LABELS * sizeof(struct label), MEM_UI);
+    ui->labels = (struct label *)
+	MyMalloc(NUM_LABELS * sizeof(struct label), MEM_UI);
     memset(ui->labels, 0, NUM_LABELS * sizeof(struct label));
     ui->labels[0].name = "Position";
     ui->labels[0].type = LABEL_TIME;
@@ -2245,11 +2249,11 @@ static void ScalePPM(unsigned char *rgbdata, unsigned cols, unsigned rows,
     size_newxelrow = 3 * newcols;
     size_tempxelrow = 3 * cols;
     size_rsgsbs = cols * sizeof(long);
-    newxelrow = MyMalloc(size_newxelrow, MEM_MISC);
-    tempxelrow = MyMalloc(size_tempxelrow, MEM_MISC);
-    rs = MyMalloc(size_rsgsbs, MEM_MISC);
-    gs = MyMalloc(size_rsgsbs, MEM_MISC);
-    bs = MyMalloc(size_rsgsbs, MEM_MISC);
+    newxelrow = (unsigned char *)MyMalloc(size_newxelrow, MEM_MISC);
+    tempxelrow = (unsigned char *)MyMalloc(size_tempxelrow, MEM_MISC);
+    rs = (long *)MyMalloc(size_rsgsbs, MEM_MISC);
+    gs = (long *)MyMalloc(size_rsgsbs, MEM_MISC);
+    bs = (long *)MyMalloc(size_rsgsbs, MEM_MISC);
     fracrowtofill = SCALE;
     fracrowleft = syscale;
     for (col = 0; col < cols; col++)
@@ -2420,11 +2424,12 @@ static void SaveFramesPPM(struct xprc *rc)
 	return;
     }
     if (rc->scale > 0) {
-	rgbdata = MyMalloc((size_t)(3 * rc->view_width * rc->view_height),
-			   MEM_MISC);
+	rgbdata = (unsigned char *)
+	    MyMalloc((size_t)(3 * rc->view_width * rc->view_height), MEM_MISC);
 	line = NULL;
     } else {
-	line = MyMalloc((size_t)(3 * rc->view_width), MEM_MISC);
+	line = (unsigned char *)
+	    MyMalloc((size_t)(3 * rc->view_width), MEM_MISC);
 	rgbdata = NULL;
     }
 
@@ -3430,10 +3435,10 @@ int main(int argc, char **argv)
 	exit(1);
     }
 
-    ui = MyMalloc(sizeof(*ui), MEM_UI);
+    ui = (struct xui *)MyMalloc(sizeof(*ui), MEM_UI);
     memset(ui, 0, sizeof(*ui));
 
-    rc = MyMalloc(sizeof(*rc), MEM_MISC);
+    rc = (struct xprc *)MyMalloc(sizeof(*rc), MEM_MISC);
     memset(rc, 0, sizeof(*rc));
     rc->filename = filename;
     rc->fp = fp;

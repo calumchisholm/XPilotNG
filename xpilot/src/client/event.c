@@ -545,8 +545,7 @@ static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
     assert(ind >= 0);
     assert(ind < MAX_POINTER_BUTTONS);
     assert(value);
-    if (pointerButtonBindings[ind])
-	xp_free(pointerButtonBindings[ind]);
+    XFREE(pointerButtonBindings[ind]);
 
     Clear_buttonDefs(ind);
 
@@ -576,7 +575,7 @@ static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
 	    warn("Unknown key \"%s\" for %s.", ptr, Option_get_name(opt));
     }
 
-    xp_free(valcpy);
+    XFREE(valcpy);
 
     return true;
 }

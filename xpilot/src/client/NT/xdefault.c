@@ -80,9 +80,7 @@ static char keyboardName[MAX_DISP_LEN];
 static bool Set_geometry(xp_option_t *opt, const char *value)
 {
     UNUSED_PARAM(opt);
-    if (geometry)
-	xp_free(geometry);
-
+    XFREE(geometry);
     geometry = xp_safe_strdup(value);
     return true;
 }
@@ -220,12 +218,12 @@ static bool Set_fontName(xp_option_t *opt, const char *val)
     
     fontname = strtok(tmpval, " \t\r\n");
     if (!fontname) {
-	xp_free(tmpval);
+	XFREE(tmpval);
 	return false;
     }
 
     strlcpy(buf, fontname, FONT_LEN);
-    xp_free(tmpval);
+    XFREE(tmpval);
 
     return true;
 }

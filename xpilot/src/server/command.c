@@ -647,7 +647,7 @@ static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	break;
     }
 
-    xp_free(valcpy);
+    XFREE(valcpy);
 
     return retval;
 }
@@ -811,7 +811,7 @@ static int Cmd_mute(char *arg, player_t *pl, int oper,
 	new_mute = 1;
     else if (!strcmp(arg, "0"))
 	new_mute = 0;
-    else if (mutee = Get_player_by_name(arg,NULL,&errorstr)) {
+    else if ((mutee = Get_player_by_name(arg,NULL,&errorstr)) != NULL) {
     	mutee->muted = (mutee->muted == 0);
 	snprintf(msg, size, "Player %s is now %s.",mutee->name,mutee->muted ? "muted" : "unmuted");
     	return CMD_RESULT_SUCCESS;

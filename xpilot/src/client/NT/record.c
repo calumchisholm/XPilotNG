@@ -906,8 +906,7 @@ void Record_init(const char *filename)
 {
     rd = Xdrawing;
     assert(filename != NULL);
-    if (record_filename)
-	xp_free(record_filename);
+    XFREE(record_filename);
     record_filename = xp_safe_strdup(filename);
 }
 

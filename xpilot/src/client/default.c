@@ -161,9 +161,7 @@ static bool Set_team(xp_option_t *opt, int value)
 static bool Set_texturePath(xp_option_t *opt, const char *value)
 {
     UNUSED_PARAM(opt);
-    if (texturePath)
-	xp_free(texturePath);
-
+    XFREE(texturePath);
     texturePath = xp_safe_strdup(value);
     return true;
 }
@@ -197,8 +195,7 @@ static void tryToSetShipShape(void)
      * Let's allow overriding shipshape with another. E.g the first
      * one is from xpilotrc, the other from command line.
      */
-    if (shipShape)
-	xp_free(shipShape);
+    XFREE(shipShape);
 
     /* If there is no shipShapeSetting, there is nothing we can do. */
     if (shipShapeSetting == NULL || strlen(shipShapeSetting) == 0)
@@ -266,7 +263,7 @@ static void tryToSetShipShape(void)
 	warn("Ship shape \"%s\" is now in use.\n", shipShapeSetting);
 	shipShape = ss_candidate;
     } else {
-	xp_free(ss_candidate);
+	XFREE(ss_candidate);
 	warn("Your shipShape \"%s\" isn't valid. Please fix it.",
 	     shipShapeSetting);
     }
@@ -278,10 +275,8 @@ static void tryToSetShipShape(void)
 static bool Set_shipShape(xp_option_t *opt, const char *value)
 {
     UNUSED_PARAM(opt);
-    if (shipShapeSetting)
-	xp_free(shipShapeSetting);
+    XFREE(shipShapeSetting);
     shipShapeSetting = xp_safe_strdup(value);
-
     tryToSetShipShape();
 
     return true;
@@ -296,10 +291,8 @@ static const char *Get_shipShape(xp_option_t *opt)
 static bool Set_shipShapeFile(xp_option_t *opt, const char *value)
 {
     UNUSED_PARAM(opt);
-    if (shipShapeFile)
-	xp_free(shipShapeFile);
+    XFREE(shipShapeFile);
     shipShapeFile = xp_safe_strdup(value);
-
     tryToSetShipShape();
 
     return true;

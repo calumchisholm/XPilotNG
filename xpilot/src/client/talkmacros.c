@@ -393,9 +393,7 @@ static bool Set_talk_macro(xp_option_t *opt, const char *value)
     assert(i >= 0);
     assert(i < TALK_FAST_NR_OF_MSGS);
 
-    if (talk_fast_msgs[i])
-	xp_free(talk_fast_msgs[i]);
-
+    XFREE(talk_fast_msgs[i]);
     talk_fast_msgs[i] = xp_safe_strdup(value);
 
     return true;
