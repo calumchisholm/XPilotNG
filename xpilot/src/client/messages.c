@@ -195,7 +195,7 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *nm)
 
 
 /* Needed by base warning hack */
-void Msg_scan_death(int id)
+static void Msg_scan_death(int id)
 {
     int i;
 
@@ -447,7 +447,7 @@ static bool Msg_scan_for_ball_destruction(char *message)
 }
 
 /* Mara's ball message scan */
-void Msg_do_bms(char *message)
+static void Msg_do_bms(char *message)
 {
     static char ball_text1[] = "BALL";
     static char ball_text2[] = "Ball";
