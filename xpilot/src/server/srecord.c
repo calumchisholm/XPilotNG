@@ -31,9 +31,8 @@ int   rrecord;
 int   rplayback;
 int   recOpt;
 
-static enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, OPTTOUT, NOMORE};
+enum bufs {INTS, ERRNOS, SHORTS, DATA, SCHED, EI, ES, OPTTOUT, NOMORE};
 static char *threshold[NOMORE];
-static int notfirst[NOMORE];
 static char *readto[NOMORE];
 static char **startb[NOMORE] = {&playback_ints_start, &playback_errnos_start,
         &playback_shorts_start, &playback_data_start, &playback_sched_start,
@@ -42,28 +41,16 @@ static char **curb[NOMORE] = {&playback_ints, &playback_errnos,
         &playback_shorts, &playback_data, &playback_sched, &playback_ei,
         &playback_es, &playback_opttout};
 
-static int next_type;
-static int next_len;
-
 static FILE *recf1;
-static FILE *recf2;
 
 static void Write_data(int type)
 {
-    FILE *f;
     int len;
     char *startc = *startb[type], *curc = *curb[type];
 
-    if (notfirst[type])
-	f = recf2;
-    else {
-	f = recf1;
-	notfirst[type] = 1;
-    }
     len = curc - startc;
-    putc(type, f);
-    fwrite(&len, sizeof(int), 1, f);
-    fwrite(startc, 1, len, f);
+    fwrite(&len, sizeof(int), 1, recf1);
+    fwrite(startc, 1, len, recf1);
     *curb[type] = *startb[type];
 }
 
@@ -74,18 +61,44 @@ static void Read_data(int type, int len)
 
     startc = *startb[type];
     curc = *curb[type];
-    num = (char *)readto[type] - curc;
-    memmove(startc, curc, num);
-    readto[type] = startc + num;
+    num = readto[type] - curc;
+    if (num != 0) {
+	errno = 0;
+	error("Recording out of sync");
+	exit(1);
+    }
     *curb[type] = *startb[type];
-    fread(readto[type], 1, len, recf1);
-    readto[type] += len;
+    fread(*startb[type], 1, len, recf1);
+    readto[type] = startc + len;
+}
+
+static void Dump_data(void)
+{
+    int i;
+
+    *playback_sched++ = 127;
+    for (i = 0; i < NOMORE; i++)
+	Write_data(i);
+    errno = 0;
+    error("dumping");
+}
+
+void Get_recording_data(void)
+{
+    int i, len;
+
+    for (i = 0; i < NOMORE; i++) {
+	fread(&len, sizeof(int), 1, recf1);
+	Read_data(i, len);
+    }
+    *(int*)readto[EI] = INT_MAX;
+    *(int*)readto[OPTTOUT] = INT_MAX;
 }
 
 void Init_recording(void)
 {
     static int oldMode = 0;
-    int i, j;
+    int i;
 
     recOpt = 1; /* Less robust but produces smaller files. */
     if (oldMode == 0) {
@@ -93,7 +106,6 @@ void Init_recording(void)
 	if (recordMode == 1) {
 	    record = rrecord = 1;
 	    recf1 = fopen("/tmp/serverrec", "wb");
-	    recf2 = fopen("/tmp/serverrec2", "wb");
 	    for (i = 0; i < NOMORE; i++) {
 		/* These sizes are not sensible,
 		   different buffers should have
@@ -112,18 +124,7 @@ void Init_recording(void)
 		threshold[i] = *startb[i] + 100000;
 	    }
 	    recf1 = fopen("/tmp/serverrec", "rb");
-	    while (1) {
-		i = getc(recf1);
-		if (i == NOMORE)
-		    break;
-		fread(&j, sizeof(int), 1, recf1);
-		Read_data(i, j);
-	    }
-	    fclose(recf1);
-	    recf1 = fopen("/tmp/serverrec2", "rb");
-	    next_type = getc(recf1);
-	    if (next_type != NOMORE)
-		fread(&next_len, sizeof(int), 1, recf1);
+	    Get_recording_data();
 	    return;
 	} else if (recordMode == 0)
 	    return;
@@ -139,19 +140,15 @@ void Init_recording(void)
 	exit(1);
     }
     if (oldMode == 11) {
-	*playback_opttout++ = INT_MAX;
-	*playback_ei++ = INT_MAX;
-	for (i = 0; i < NOMORE; i++)
-	    Write_data(i);
-	putc(NOMORE, recf1);
-	putc(NOMORE, recf2);
+	Dump_data();
 	fclose(recf1);
-	fclose(recf2);
 	oldMode = 10;
     }
     if (oldMode == 12) {
 	oldMode = 10;
-	while(1); /* There might be better ways to stop playback? */
+	errno = 0;
+	error("End of playback.");
+	exit(1); /* There might be better ways to stop playback? */
     }
 }
 
@@ -159,30 +156,13 @@ void Handle_recording_buffers(void)
 {
     int i;
 
-    if (!recordMode)
+    if (recordMode != 1)
 	return;
+
     if (recordMode == 1) {
 	for (i = 0; i < NOMORE; i++)
 	    if (*curb[i] >= threshold[i])
-		Write_data(i);
+		Dump_data();
 	return;
     }
-
-    if (recordMode == 2) {
-	if (next_type == NOMORE)
-	    return;
-	do {
-	    if (next_len < *curb[next_type] - *startb[next_type] + threshold[next_type] - readto[next_type]) {
-		Read_data(next_type, next_len);
-		next_type = getc(recf1);
-		if (next_type != NOMORE) {
-		    fread(&next_len, sizeof(int), 1, recf1);
-		    continue;
-		}
-	    }
-	} while (0);
-	return;
-    }
-    error("Wrong recordMode");
-    exit(1);
 }

@@ -627,9 +627,15 @@ void sched(void)
 	    tvp = &tv;
 	    if (playback) {
 		while (*playback_sched) {
-		    struct io_handler *ioh;
-		    ioh = &record_handlers[*playback_sched++ - 1];
-		    (*(ioh->func))(ioh->fd, ioh->arg);
+		    if (*playback_sched == 127) {
+			playback_sched++;
+			Get_recording_data();
+		    }
+		    else {
+			struct io_handler *ioh;
+			ioh = &record_handlers[*playback_sched++ - 1];
+			(*(ioh->func))(ioh->fd, ioh->arg);
+		    }
 		}
 		playback_sched++;
 	    }
@@ -674,6 +680,11 @@ void sched(void)
 
 			record = playback = 0;
 			if (rrecord && (i - min_fd > 0)) {
+			    if (i - min_fd + 1 > 126) { /* 127 reserved */
+				errno = 0;
+				error("recording: this shouldn't happen");
+				exit(1);
+			    }
 			    *playback_sched++ = i - min_fd + 1;
 			    record = 1;
 			}
