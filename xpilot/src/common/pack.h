@@ -27,7 +27,6 @@
 #define CAP_LETTER(c)	((c) = ((c)>='a' && (c)<='z') ? (c)-'a'+'A' : (c))
 
 #define SERVER_PORT	15345		/* Port which server listens to. */
-#define SERVER_PORT_STR	"15345"		/* ASCII version of server port. */
 
 /*
  * Magic contact word.
