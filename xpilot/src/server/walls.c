@@ -498,12 +498,12 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
     mapobj_ind = groups[group].mapobj_ind;
 
     if (obj->collmode == 1) {
-	fx = ABS(obj->vel.x) + ABS(obj->vel.y);
-	/* If fx<1, there is practically no movement. Object
+	fx = ABS(obj->extmove.cx) + ABS(obj->extmove.cy);
+	/* If fx <= 64, there is practically no movement. Object
 	   collision detection can ignore the bounce. */
-	if (fx > 1) {
+	if (fx > 64) {
 	    obj->wall_time = 1 -
-		CLICK_TO_FLOAT(ABS(move->delta.cx) + ABS(move->delta.cy)) / fx;
+		(ABS(move->delta.cx) + ABS(move->delta.cy)) / fx;
 	    obj->collmode = 2;
 	}
     }
