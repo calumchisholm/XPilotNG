@@ -1007,7 +1007,7 @@ static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size)
     const char *errorstr;
     player_t *pl2;
 
-    UNUSED_PARAM(oper);
+    UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
     if (!arg || !*arg)
 	return CMD_RESULT_NO_NAME;
@@ -1025,8 +1025,8 @@ static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size)
 
     snprintf(msg, size,
 	     "%-15s Ver: 0x%x  MaxFPS: %d  Turnspeed: %.2f  Turnres: %.2f",
-	     pl->name, pl->version,
-	     pl->player_fps, pl->turnspeed, pl->turnresistance);
+	     pl2->name, pl2->version,
+	     pl2->player_fps, pl2->turnspeed, pl2->turnresistance);
 
     return CMD_RESULT_SUCCESS;
 }
