@@ -52,6 +52,7 @@ void WriteItemList(FILE *, itemlist *, int);
 
 /*errors.c*/
 void ErrorHandler(char *, ...);
+void StatusUpdate(char *, ...);
 
 /*geometry.c*/
 int CreateItem(LPMAPDOCUMENT, int, int, int, int, int, int);
@@ -66,7 +67,10 @@ void ReversePolygonOrientation(polygonlist *);
 int FindClosestVertex(LPMAPDOCUMENT, polygonlist *, int, int);
 double Wrap_length(LPMAPDOCUMENT, double, double);
 void DeleteVertex(polygonlist **, int);
+int MoveVertex(polygonlist **, int, int, int);
 int CountEdgesOfType(polygonlist **, int);
+void ReorderItemTo(itemlist **, itemlist **, int num);
+int FindClosestItemInList(LPMAPDOCUMENT, int, int, itemlist **);
 
 /*draw.c*/
 void DrawMapEntire(LPMAPDOCUMENT);

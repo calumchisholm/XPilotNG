@@ -71,6 +71,7 @@ extern int iSelectionShipSyms;
 extern int fDrawing;
 extern int fCreatingPolygon;
 extern int fDragging;
+extern int fReordering;
 
 extern unsigned char *xpilotmap_dir;
 

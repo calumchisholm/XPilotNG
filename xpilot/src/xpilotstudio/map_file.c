@@ -225,6 +225,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 			0, 0, variant, IDM_MAP_CIRCULAR_GRAVITY);
 		return;
     }
+
 	if (!strcasecmp(el, "Wormhole")) {
 		while (*attr) {
 			if (!strcasecmp(*attr, "x"))
@@ -320,12 +321,9 @@ int Load_lines(int fd)
 /***************************************************************************/
 int LoadMap(LPMAPDOCUMENT lpMapDocument, char *pstrFileName) 
 {
-	
-	FILE                  *ifile = NULL;
-	int                   corrupted=0;
-   int		fd;
-
-	
+	FILE	*ifile = NULL;
+	int		corrupted=0;
+	int		fd;
 
 	if (NULL == (ifile = fopen (pstrFileName, "rb")))
 	{
@@ -656,7 +654,7 @@ int AddOption(LPMAPDOCUMENT lpMapDocument, char *name, char *value, int output, 
 int YesNo(char *val)
 {
 	if ( (tolower(val[0]) == 'y') || (tolower(val[0]) == 't') )
-		return 1;
+	return 1;
 
 	return 0;
 }
@@ -680,7 +678,6 @@ char *StrToNum(char *string, int len, int type)
 	{
 		if ( (string[0] == '-') || ((string[0] >= '0') && (string[0] <= '9')) )
 			sprintf(returnval,"%s%c",returnval,string[0]);
-		
 	}
 	else if ( (string[0] == '-') || ((string[0] >= '0') &&
         (string[0] <= '9')) || (string[0] == '.') ) 
@@ -699,7 +696,6 @@ char *StrToNum(char *string, int len, int type)
 	}
 	return (char *) returnval;
 }
-
 /***************************************************************************/
 /* LoadMapData                                                             */
 /* Arguments :                                                             */
@@ -844,8 +840,6 @@ void WritePolygonList(FILE *ofile, polygonlist *pglp, int type)
 /***************************************************************************/
 void WriteItemList(FILE *ofile, itemlist *itmlp, int type)
 {
-
-
 	while (itmlp != NULL)
 	{
 		switch (type){

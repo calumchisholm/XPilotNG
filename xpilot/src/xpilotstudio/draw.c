@@ -159,8 +159,6 @@ void DrawMapEntire(LPMAPDOCUMENT lpMapDocument)
 		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x, lpMapDocument->view_y+lpMapDocument->height);
 		DrawItemList(lpMapDocument, itmlp, itemdrawlist[i].type, lpMapDocument->view_x+lpMapDocument->width, lpMapDocument->view_y+lpMapDocument->height);
 #ifdef _WINDOWS
-//		SelectObject(mapDC, GetStockObject(BLACK_PEN));
-//		DeleteObject(hPenCurrent);
 		DeleteObject(SelectObject(mapDC, GetStockObject(BLACK_PEN)));
 #endif
 	}
@@ -168,6 +166,7 @@ void DrawMapEntire(LPMAPDOCUMENT lpMapDocument)
 #ifdef _WINDOWS
 	SelectObject(mapDC, GetStockObject(BLACK_PEN));
 	DeleteObject(hPenSelected);
+	DeleteObject(hPenHidden);
 	DeleteZoomFont(mapDC, storeFont);
 	ReleaseDC(hwndTemp,mapDC);
 #endif
@@ -184,7 +183,6 @@ void DrawPolygonList(LPMAPDOCUMENT lpMapDocument, polygonlist *pglp, int type,
 					 int offsx, int offsy)
 {
 	polygonlist *pglptemp;
-//	vertexlist *vlp;
 	char strng[2];
 	int x = 0, y = 0, i;
 	int startx = 0, starty = 0;
@@ -229,13 +227,14 @@ void DrawPolygonList(LPMAPDOCUMENT lpMapDocument, polygonlist *pglp, int type,
 				break;
 			case IDM_MAP_HIDDEN:
 				if (!pglptemp->selected)
+#ifdef _WINDOWS
 					SelectObject(mapDC, htempPen);
+#endif
 				break;
 			}
 
 		}
 		
-#ifdef _WINDOWS
 		if (fDrawing || pglptemp->selected)
 		{
 #ifdef _WINDOWS
@@ -245,6 +244,7 @@ void DrawPolygonList(LPMAPDOCUMENT lpMapDocument, polygonlist *pglp, int type,
 				startx-offsx,starty-offsy);
 #endif
 		}
+
 		if (pglptemp->selected)
 #ifdef _WINDOWS
 			Arc(mapDC, pglptemp->vertex[lpMapDocument->numselvert].x-4-offsx,lpMapDocument->height-pglptemp->vertex[lpMapDocument->numselvert].y-4-offsy,
@@ -254,8 +254,10 @@ void DrawPolygonList(LPMAPDOCUMENT lpMapDocument, polygonlist *pglp, int type,
 #endif
 
 		if (fDrawing || pglptemp->selected)
+#ifdef _WINDOWS
 			SelectObject(mapDC, hstorePen);
 #endif
+
 		//Then label the polygon with the teamnumber if it should be done.
 		if (type != IDM_MAP_WALL && type != IDM_MAP_DECOR)
 		{
@@ -282,7 +284,7 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 	int x = 0, y = 0;
 	int x2 = 0, y2 = 0;
 	char strng[2];
-	int picnum, i;
+	int picnum, i, numcheck=1;
 	double angle; //The angle to draw at.
 	double zoom = lpMapDocument->view_zoom; //The current map zoom.
 	
@@ -373,11 +375,11 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 		switch (type)
 		{
 		case IDM_MAP_FUEL: //This should actually be drawn with a fillRect GDI command.
+#ifdef _WINDOWS
 			rect.left = points[0].x+1;
 			rect.top = points[0].y+1;
 			rect.right = points[2].x-1;
 			rect.bottom = points[2].y-1;
-#ifdef _WINDOWS
 			FillRect(mapDC, &rect, hBrushFuel);
 #endif
 		case IDM_MAP_WORMHOLE: if (picnum==20) //No vectors to draw if normal type.
@@ -481,7 +483,8 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 			draw = TRUE;
 			break;
 		case IDM_MAP_CHECKPOINT:
-			sprintf(strng, "%d\0", item.variant);
+			sprintf(strng, "%d\0", numcheck);
+			numcheck++;
 			tofsx = -3;
 			tofsy = -6;
 			draw = TRUE;
@@ -499,8 +502,8 @@ void DrawItemList(LPMAPDOCUMENT lpMapDocument, itemlist *itmlp, int type,
 #endif
 ////////
 
-#ifdef _WINDOWS
 	if (item.selected && lpMapDocument->selectedbool)
+#ifdef _WINDOWS
 		SelectObject(mapDC, hstorePen);
 #endif
 	itmlp = itmlp->next;

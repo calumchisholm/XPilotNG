@@ -247,40 +247,16 @@ typedef struct {
 	int variant; //The type of line this is. Only changes up to the x,y point.
 } XP_POINT;
 
-/*This creates a pointer list of vertexes, which should form a single entity,
-such as a polygon. This polygon is owned by a particular team, but
-this team number is ignored for some objects.*/
-//typedef struct vertexlist {
-//	XP_POINT *vertex;
-//	int num_verts;
-//	unsigned short team;
-//	int selected;
-//} vertexlist;
-
 /*This creates a list of polygons, and should be used for simple
 un owned polygons such as walls and decorations.*/
 typedef struct polygonlist {
-//	vertexlist *vlist;
 	XP_POINT *vertex;
 	int num_verts;
 	unsigned short team;
 	int selected;
 	struct polygonlist *next;
 } polygonlist;
-/*
-typedef struct blockitem {
-	XP_POINT pos;
-	unsigned short team;
-	unsigned short direction;
-	unsigned short variant;
-	int selected;
-} blockitem;
 
-typedef struct itemlist {
-	blockitem item;
-	struct itemlist *next;
-} itemlist;
-*/
 typedef struct itemlist {
 	XP_POINT pos;
 	unsigned short team;
@@ -336,7 +312,6 @@ typedef struct {
 	int view_x;  //The current X scroll location.
 	int view_y; //The current Y scroll location.
 	int changed; //Has the current map changed?
-//	vertexlist *selectedpoly; //The selected polygon.
 	polygonlist *selectedpoly; //The selected polygon.
 	int numselvert; //The number of the selected vertex.
 	itemlist *selecteditem; //The selected Item

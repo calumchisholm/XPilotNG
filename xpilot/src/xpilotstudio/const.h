@@ -100,6 +100,8 @@
 #define IDM_MOVEITEM			853
 #define IDM_DELETEITEM			854
 #define IDM_UPDATE_ITEM_PARAMS	855
+#define IDM_MOVEVERTEX			856
+#define IDM_REORDERCHECKPOINT	857
 
 /*All the ship symbol types*/
 #define IDM_VERTEX				900

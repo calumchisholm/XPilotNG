@@ -51,3 +51,27 @@ void ErrorHandler(char *szMessage, ...)
 	;/*Unix Messaging routine here...something similar to MessageBox!*/
 #endif
 } 
+/***************************************************************************/
+/* StatusUpdate                                                            */
+/* Arguments :                                                             */
+/*   szMessage - error messge to be output                                 */
+/*   ... - variable number of arguments, subsituted for %s, %d, etc.       */
+/* Purpose : Display an Error notification box with the specified message  */
+/***************************************************************************/
+void StatusUpdate(char *szMessage, ...)
+{
+	va_list marker; 
+	char szBuffer[512];
+	
+	// Figure through the extra arguments.
+	va_start(marker, szMessage);
+	vsprintf(szBuffer, szMessage, marker);
+	va_end(marker);              
+	
+	// Put the error message in the status window..
+#ifdef _WINDOWS
+	SendMessage(hwndStatusBar, SB_SETTEXT, 0, (LPARAM) (LPSTR) szBuffer);
+#else
+	;/*Unix Messaging routine here...something similar to MessageBox!*/
+#endif
+} 

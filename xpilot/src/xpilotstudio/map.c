@@ -36,6 +36,7 @@ int iSelectionMapModify = 0;
 int fDrawing = 0;
 int fCreatingPolygon;
 int fDragging = 0;
+int fReordering = 0;
 
 int teamSet = 0;
 int dirSet = 32;
@@ -100,6 +101,7 @@ void Setup_default_server_options(LPMAPDOCUMENT lpMapDocument)
 int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMapModify)
 {
 	XP_POINT *vert = NULL;
+	static itemlist *itmlp = NULL;
 	static int startx, starty, deltax, deltay;
 	int i;
 
@@ -135,6 +137,30 @@ int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMap
 		else
 			SelectItem(lpMapDocument, x, y);		
 		break;
+	case IDM_MOVEVERTEX:
+		if (lpMapDocument->selectedpoly)
+		{
+			if (!fDragging)
+			{
+				startx = x;
+				starty = y;
+				fDragging = TRUE;
+			}
+			else
+			{
+				deltax = x - startx;
+				deltay = y - starty;
+				if (MoveVertex(&lpMapDocument->selectedpoly, lpMapDocument->numselvert, deltax, deltay))
+				{
+					StatusUpdate("Couldn't move vertex!");
+				}
+				fDragging = FALSE;
+			}
+		}
+		else
+			SelectItem(lpMapDocument, x, y);		
+		break;
+
 	case IDM_MOVEITEM:
 		if (lpMapDocument->selectedpoly || lpMapDocument->selecteditem)
 		{
@@ -165,6 +191,27 @@ int DoModifyCommand(LPMAPDOCUMENT lpMapDocument, int x, int y, int iSelectionMap
 				}
 				fDragging = FALSE;
 			}
+		}
+		else
+			SelectItem(lpMapDocument, x, y);		
+		break;
+	case IDM_REORDERCHECKPOINT:
+		if (lpMapDocument->selecteditem && lpMapDocument->selectedtype == IDM_MAP_CHECKPOINT)
+		{
+//			if (!fReordering)
+//			{
+//				itmlp = lpMapDocument->selecteditem;
+//				fReordering = TRUE;
+//			}
+//			else
+//			{
+				i = FindClosestItemInList(lpMapDocument, x, y, &lpMapDocument->MapGeometry.checkpoints);
+				ReorderItemTo(&lpMapDocument->MapGeometry.checkpoints, &lpMapDocument->selecteditem, i);
+				lpMapDocument->selecteditem = NULL;
+//				ErrorHandler("%d", i);
+//				fReordering = FALSE;
+//				itmlp = NULL;
+//			}
 		}
 		else
 			SelectItem(lpMapDocument, x, y);		

@@ -211,7 +211,7 @@ int AddItemToItemlist(itemlist **varitmlp, int x, int y,
 	case IDM_MAP_WORMHOLE:
 	case IDM_MAP_CIRCULAR_GRAVITY:
 	case IDM_MAP_GRAVITY:
-	case IDM_MAP_CHECKPOINT:
+//	case IDM_MAP_CHECKPOINT:
 		item->variant = variant;
 		break;
 	default:
@@ -328,6 +328,11 @@ int AddItemToPolygonlist(LPMAPDOCUMENT lpMapDocument, polygonlist **varpglp, int
 	//Then we have nothing valuable to contribute so return to CreateItem.
 	if ((vert->delta_x == 0 && vert->delta_y == 0) || (hypot(vert->delta_x, vert->delta_y) > MAX_LINE_LEN))
 	{
+		if (closing)
+		{
+			ErrorHandler("Polygon Must Be Closable!");
+			fCreatingPolygon = TRUE;
+		}
 		free(vert);
 		return TRUE;
 	}
@@ -383,6 +388,12 @@ int AddVertexToList(polygonlist *polygon, XP_POINT *vert)
 /***************************************************************************/
 int InsidePolygon(XP_POINT *plygn, int N, int x, int y)
 {
+	//This Function Creates an new point array and
+	//calculates the x,y coordinates of each point from the
+	//delta values specified in the original points.
+	//The new x,y coords are NOT wrapped, as this would
+	//Invalidate the polygon.
+	//The new values are not stored, merely used for checking.
 	int counter = 0;
 	int i;
 	double xinters;
@@ -807,7 +818,7 @@ void DeleteMapItem(LPMAPDOCUMENT lpMapDocument)
 /* Return :                                                                */
 /*   number of closest vertex if one is close enough                       */
 /*   0 if no vertex is close enough                                        */
-/* Purpose : Determine whether the specified coordinates are in  a polygon */
+/* Purpose : Find the vertex closest to x,y in a given polygon.            */
 /***************************************************************************/
 int FindClosestVertex(LPMAPDOCUMENT lpMapDocument, polygonlist *polygon, int x, int y)
 {
@@ -889,6 +900,86 @@ void DeleteVertex(polygonlist **polygon, int num)
 	free(vert);
 }
 /***************************************************************************/
+/* MoveVertex                                                              */
+/* Arguments :                                                             */
+/*    lpMapDocument - pointer to map document.                             */
+/*	polygon: a list of points                                              */
+/*	num: the vertex to delete                                              */
+/*	deltax: the change along the x axis                                    */
+/*	deltay: the change along the y axis                                    */
+/* Purpose : Move the specified vertex the specified distance              */
+/***************************************************************************/
+int MoveVertex(polygonlist **polygon, int num, int deltax, int deltay)
+{
+	int tempdx, tempdy;
+	polygonlist *pglp;
+	pglp = *polygon;
+	
+	if ((num != 0) && (num!=pglp->num_verts-1))
+	{
+		//Make sure the new point wont be too far away from the previous(chain)
+		//point.
+		tempdx = pglp->vertex[num].delta_x + deltax;
+		tempdy = pglp->vertex[num].delta_y + deltay;
+		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
+		{
+			return TRUE;
+		}
+		
+		//Make sure the new point wont be too far away from the next
+		//point.
+		tempdx = pglp->vertex[num+1].delta_x-deltax;
+		tempdy = pglp->vertex[num+1].delta_y-deltay;
+		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
+		{
+			return TRUE;
+		}
+	}
+	else
+	{
+		//If we're the first point make sure the new point will be
+		//valid.
+		tempdx = pglp->vertex[pglp->num_verts-1].delta_x+deltax;
+		tempdy = pglp->vertex[pglp->num_verts-1].delta_y+deltay;
+		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
+		{
+			return TRUE;
+		}
+		//Check against the second point.
+		tempdx = pglp->vertex[1].delta_x-deltax;
+		tempdy = pglp->vertex[1].delta_y-deltay;
+		if ((hypot(tempdx, tempdy) > MAX_LINE_LEN))
+		{
+			return TRUE;
+		}
+
+	}
+
+	if((num != 0) && (num != pglp->num_verts-1))
+	{
+		pglp->vertex[num].x += deltax;
+		pglp->vertex[num].y += deltay;
+		pglp->vertex[num].delta_x += deltax;
+		pglp->vertex[num].delta_y += deltay;
+		
+		pglp->vertex[num+1].delta_x = pglp->vertex[num+1].delta_x-deltax;
+		pglp->vertex[num+1].delta_y = pglp->vertex[num+1].delta_y-deltay;
+	}
+	else
+	{
+		pglp->vertex[0].x += deltax;
+		pglp->vertex[0].y += deltay;
+		pglp->vertex[1].delta_x -= deltax;
+		pglp->vertex[1].delta_y -= deltay;
+		pglp->vertex[pglp->num_verts-1].x += deltax;
+		pglp->vertex[pglp->num_verts-1].y += deltay;
+		pglp->vertex[pglp->num_verts-1].delta_x += deltax;
+		pglp->vertex[pglp->num_verts-1].delta_y += deltay;
+	}
+
+	return FALSE;
+}
+/***************************************************************************/
 /* CountEdgesOfType                                                        */
 /* Arguments :                                                             */
 /*    lpMapDocument - pointer to map document.                             */
@@ -910,4 +1001,150 @@ int CountEdgesOfType(polygonlist **polygon, int type)
 			count++;
 	}
 	return count;
+}
+/***************************************************************************/
+/* ReorderItemTo	     	                                               */
+/* Arguments :                                                             */
+/*	iteml: a list of items                                                  */
+/*  num: the new number for the checkpoint.                                */
+/* Purpose : Delete the selected polygon.                                  */
+/***************************************************************************/
+void ReorderItemTo(itemlist **iteml, itemlist **item, int num)
+{
+	itemlist *itmlp = NULL;
+	itemlist *item2 = *item;
+	itemlist *tmp = NULL;
+	int i, count;
+
+	itmlp = *iteml;
+
+/* 	count=0;
+	while (itmlp->next != NULL)
+	{
+		count++;
+		itmlp = itmlp->next;
+	}
+
+	itmlp = *iteml;
+	i = 0;
+	//We're not reordering or replacing the first or last points right?
+	if ((num != 0) && (num != count) && (*iteml != *item))
+	{
+		tmp = item2->next;
+		while (itmlp->next != NULL)
+		{
+			if (itmlp->next == item2)
+				itmlp->next = tmp;
+			else
+			{
+			if (i == num-1)
+				{
+					item2->next = itmlp->next;
+					itmlp->next = item2;
+				}
+			}
+			i++;
+			itmlp = itmlp->next;
+		}
+	}
+	//Okay, we are reordering or replacing, which requires some special shuffling
+	else
+	{
+		//We're replacing the first item
+		if (num == 0)
+		{
+			tmp = item2->next;
+			//We're swapping the first and second items
+			if (itmlp->next == item2)
+			{
+				item2->next = *iteml;
+				*iteml = item2;
+				while (itmlp->next != NULL)
+				{
+					if (itmlp->next == item2)
+						itmlp->next = tmp;
+					i++;
+					itmlp = itmlp->next;
+				}
+
+			}
+			//We're moving a later item into the first's spot and shifting
+			//everything else down.
+			else
+			{				
+				while (itmlp->next != NULL)
+				{
+					if (itmlp->next == item2)
+						itmlp->next = tmp;
+					else
+					{
+						if (i == 0)
+						{
+							item2->next = *iteml;
+							*iteml = item2;
+						}
+					}
+					i++;
+					itmlp = itmlp->next;
+				}
+			}
+		}
+		//We're moving the first item to a later position
+		else
+		{
+			if (*item == itmlp->next)
+				return;
+			*iteml = itmlp->next;
+			while (itmlp->next != NULL)
+			{
+				if (i == num-1)
+				{
+					item2->next = itmlp->next;
+					itmlp->next = item2;
+				}
+				i++;
+				itmlp = itmlp->next;
+			}
+		}
+	}*/
+
+}
+/***************************************************************************/
+/* FindClosestItemInList                                                   */
+/* Arguments :                                                             */
+/*    lpMapDocument - pointer to map document.                             */
+/*	x: the xcoord to check                                                 */
+/*	y: the ycoord to check                                                 */
+/*	item: a list of items                                                  */
+/* Return :                                                                */
+/*   number of closest vertex if one is close enough                       */
+/*   0 if no vertex is close enough                                        */
+/* Purpose : Find the closest item in an item list                         */
+/***************************************************************************/
+int FindClosestItemInList(LPMAPDOCUMENT lpMapDocument, int x, int y, itemlist **item)
+{
+	itemlist *itmlp;
+	int n = 0;
+	int i, l, delta, closest;
+
+	delta = lpMapDocument->width;
+	itmlp = *item;
+
+	i = 0;
+	while (itmlp != NULL)
+	{
+		l = Wrap_length(lpMapDocument, (x - itmlp->pos.x),
+			(y - itmlp->pos.y));
+		if (l <= delta)
+		{
+			delta = l;
+			closest = i;
+		}
+		i++;
+		itmlp = itmlp->next;
+	}
+//	if (delta < 50)
+		return closest; //Return this point, cause we're within range
+//	else
+//		return 0; //Just let the first point be selected.
 }
