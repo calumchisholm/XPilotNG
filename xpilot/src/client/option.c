@@ -400,14 +400,14 @@ static bool is_legal_value(xp_option_type_t type, const char *value)
     if (type == xp_int_option) {
 	int foo;
 
-	if (!sscanf(value, "%d", &foo))
+	if (sscanf(value, "%d", &foo) <= 0)
 	    return false;
 	return true;
     }
     if (type == xp_double_option) {
 	double foo;
 
-	if (!sscanf(value, "%lf", &foo))
+	if (sscanf(value, "%lf", &foo) <= 0)
 	    return false;
 	return true;
     }
@@ -1115,56 +1115,6 @@ const char *Xpilotrc_get_filename(void)
 
 #if 0
 
-
-
-
-static int Find_resource(XrmDatabase db, const char *resource,
-			 char *result, unsigned size, int *ind)
-{
-#ifndef _WINDOWS
-    int			i;
-    size_t		len;
-    char		str_name[80],
-			str_class[80],
-			*str_type[10];
-    XrmValue		rmValue;
-    unsigned		hash = String_hash(resource);
-
-    for (i = 0;;) {
-	if (hash == options[i].hash && !strcmp(resource, options[i].name)) {
-	    *ind = i;
-	    break;
-	}
-	if (++i >= NELEM(options)) {
-	    warn("BUG: Can't find option \"%s\"", resource);
-	    exit(1);
-	}
-    }
-    sprintf(str_name, "%s.%s", myName, resource);
-    sprintf(str_class, "%s.%c%s", myClass, toupper(*resource), resource + 1);
-
-    if (XrmGetResource(db, str_name, str_class, str_type, &rmValue) == True) {
-	if (rmValue.addr == NULL)
-	    len = 0;
-	else {
-	    len = MIN(rmValue.size, size - 1);
-	    memcpy(result, rmValue.addr, len);
-	}
-	result[len] = '\0';
-	return 1;
-    }
-    strlcpy(result, options[*ind].fallback, size);
-
-    return 0;
-
-#else	/* _WINDOWS */
-    Config_get_resource(resource, result, size, ind);
-
-    return 1;
-#endif
-}
-
-
 static int Get_string_resource(XrmDatabase db,
 			       const char *resource, char *result,
 			       unsigned size)
@@ -1174,10 +1124,10 @@ static int Get_string_resource(XrmDatabase db,
 
     val = Find_resource(db, resource, result, size, &ind);
     src = dst = result;
-    while ((*src & 0x7f) == *src && isgraph(*src) == 0 && *src != '\0')
+    while ((*src & 0x7f) == *src && !isgraph(*src) && *src != '\0')
 	src++;
 
-    while ((*src & 0x7f) != *src || isgraph(*src) != 0)
+    while ((*src & 0x7f) != *src || isgraph(*src))
 	*dst++ = *src++;
 
     *dst = '\0';
