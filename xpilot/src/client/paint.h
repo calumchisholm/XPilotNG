@@ -333,6 +333,6 @@ int Team_color(int);
 int Life_color(other_t *other);
 int Life_color_by_life(int life);
 void Play_beep(void);
-int Check_view_dimensions();
+int Check_view_dimensions(void);
 
 #endif
