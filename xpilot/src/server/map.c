@@ -500,7 +500,7 @@ static void Verify_wormhole_consistency(void)
 
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
 	for (i = 0; i < World.NumWormholes; i++)
-	    Wormhole_remove_from_map(i);
+	    Wormhole_remove_from_map(&World.wormHoles[i]);
 	World.NumWormholes = 0;
     }
 
@@ -1014,7 +1014,7 @@ void add_temp_wormholes(int xin, int yin, int xout, int yout)
 
 void remove_temp_wormhole(int ind)
 {
-    Wormhole_remove_from_map(ind);
+    Wormhole_remove_from_map(&World.wormHoles[ind]);
 
     World.NumWormholes--;
     if (ind != World.NumWormholes) {

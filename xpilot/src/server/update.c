@@ -596,14 +596,13 @@ static void Target_update(void)
 
 	if (targ->dead_time > 0) {
 	    if ((targ->dead_time -= timeStep) <= 0) {
-		Target_restore_on_map(i);
+		Target_restore_on_map(targ);
 
 		if (targetSync) {
-		    unsigned short team = targ->team;
-
 		    for (j = 0; j < World.NumTargets; j++) {
-			if (World.targets[j].team == team)
-			    Target_restore_on_map(j);
+			target_t *t = &World.targets[j];
+			if (t->team == targ->team)
+			    Target_restore_on_map(t);
 		    }
 		}
 	    }

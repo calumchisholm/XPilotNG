@@ -232,12 +232,12 @@ void Cannon_remove_from_map(cannon_t *cannon);
 
 int Target_hitmask(target_t *targ);
 void Target_init(void);
-void Target_restore_on_map(int ind);
-void Target_remove_from_map(int ind);
+void Target_restore_on_map(target_t *targ);
+void Target_remove_from_map(target_t *targ);
 
 int Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(struct group *group, struct move *move);
-void Wormhole_remove_from_map(int ind);
+void Wormhole_remove_from_map(wormhole_t *wormhole);
 
 void Team_immunity_init(void);
 void Groups_init(void);

@@ -443,9 +443,8 @@ void Target_init(void)
     P_grouphack(TARGET, Target_set_hitmask);
 }
 
-void Target_restore_on_map(int ind)
+void Target_restore_on_map(target_t *targ)
 {
-    target_t		*targ = &World.targets[ind];
     int			bx, by;
 
     bx = CLICK_TO_BLOCK(targ->pos.cx);
@@ -461,9 +460,8 @@ void Target_restore_on_map(int ind)
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
-void Target_remove_from_map(int ind)
+void Target_remove_from_map(target_t *targ)
 {
-    target_t		*targ = &World.targets[ind];
     int			bx, by;
 
     targ->update_mask = (unsigned) -1;
@@ -559,9 +557,8 @@ bool Wormhole_hitfunc(struct group *group, struct move *move)
     return true;
 }
 
-void Wormhole_remove_from_map(int ind)
+void Wormhole_remove_from_map(wormhole_t *wormhole)
 {
-    wormhole_t		*wormhole = &World.wormHoles[ind];
     int			bx, by;
 
     bx = CLICK_TO_BLOCK(wormhole->pos.cx);

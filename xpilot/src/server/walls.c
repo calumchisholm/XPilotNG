@@ -326,7 +326,7 @@ void Object_hits_target(int ind, object *obj, long player_cost)
     if (targ->damage > 0)
 	return;
 
-    Target_remove_from_map(ind);
+    Target_remove_from_map(targ);
 
     Make_debris(
 	/* pos.cx, pos.cy   */ targ->pos.cx, targ->pos.cy,

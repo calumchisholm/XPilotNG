@@ -751,9 +751,10 @@ void Reset_all_players(void)
 	if (endOfRoundReset) {
 	    /* Reset the targets */
 	    for (i = 0; i < World.NumTargets; i++) {
-		if (World.targets[i].damage != TARGET_DAMAGE
-		    || World.targets[i].dead_time > 0) {
-		    Target_restore_on_map(i);
+		target_t *targ = &World.targets[i];
+		if (targ->damage != TARGET_DAMAGE
+		    || targ->dead_time > 0) {
+		    Target_restore_on_map(targ);
 		}
 	    }
 	}
