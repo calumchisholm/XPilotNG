@@ -279,8 +279,8 @@ void Gui_paint_fuel(int x, int y, int fuel)
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     int color = 0;
-	int lifeColor = 0;
-	int previousLifeColor = 0;
+    int lifeColor = 0;
+    int previousLifeColor = 0;
     const int BORDER = 4;		/* in pixels */
     int size = 0, size2 = 0;
     other_t *other;
@@ -291,14 +291,15 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     other = Other_by_id(id);
     base = Homebase_by_id(id);
-	if (lifeColor = Life_color(other)) /* If life coloring is valid we get something here (Mara)*/
-		previousLifeColor = Life_color_by_life((other->life)+1); /* otherwise we skip this */
-
+    /* If life coloring is valid we get something here (Mara)*/
+    if ((lifeColor = Life_color(other)) != 0)
+	previousLifeColor = Life_color_by_life((other->life)+1);
+    
     if (baseNameColor) {
-		if (!(color = lifeColor)) /* if lifeColor == 0 lets use baseNameColor instead */
-	    	color = baseNameColor;
+	if (!(color = lifeColor))
+	    color = baseNameColor;
     } else
-		color = WHITE;
+	color = WHITE;
 
     if (base != NULL) {
 	/*
@@ -306,9 +307,9 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	 * the red "meter" basewarning on old servers.
 	 */
 	if (version >= 0x4F12) {
-		/*
-		 * Since this is the next (displayed) frame add FPSDivisor
-		 */
+	    /*
+	     * Since this is the next (displayed) frame add FPSDivisor
+	     */
 	    if (loops <= base->deathtime + FPSDivisor)
 		do_basewarning = true;
 	} else {
@@ -331,18 +332,19 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     /* Mara's flashy basewarning */
     if (do_basewarning && (baseWarningType & 2)) {
-		if (lifeColor == previousLifeColor) {/* If this is the case it won't flash properly */
-			lifeColor = WHITE;
-			previousLifeColor = RED;
-		}	
-		if (loopsSlow & 1) {
-			if (!(color = lifeColor))
-	    		color = baseNameColor;
-			if (!color)
-				color = WHITE;
-		} else
-			if (!(color = previousLifeColor))
-		    	color = RED;
+	/* If same color it won't flash properly */
+	if (lifeColor == previousLifeColor) {
+	    lifeColor = WHITE;
+	    previousLifeColor = RED;
+	}
+	if (loopsSlow & 1) {
+	    if (!(color = lifeColor))
+		color = baseNameColor;
+	    if (!color)
+		color = WHITE;
+	} else
+	    if (!(color = previousLifeColor))
+		color = RED;
     }
 
     SET_FG(colors[color].pixel);

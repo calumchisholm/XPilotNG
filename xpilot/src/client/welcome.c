@@ -228,7 +228,7 @@ static void Welcome_process_exposure_events(Connect_param_t * conpar)
  * 1 means middle
  * 2 means bottom.
  */
-static int Welcome_create_label(int position, const char *label_text)
+static int Welcome_create_label(int pos, const char *label_text)
 {
     int label_x, label_y, label_width, label_height;
     int subform_width = 0;
@@ -243,7 +243,7 @@ static int Welcome_create_label(int position, const char *label_text)
     label_height = textFont->ascent + textFont->descent;
     label_x = (subform_width - label_width) / 2;
 
-    switch (position) {
+    switch (pos) {
     default:
     case 0:
 	label_y = 10;
@@ -510,15 +510,15 @@ static void string_to_lower(char *s)
  * From a hostname return the part after the last dot.
  * E.g.: Vincent.CS.Berkeley.EDU will return EDU.
  */
-static char *Get_domain_from_hostname(char *hostname)
+static char *Get_domain_from_hostname(char *host_name)
 {
     static char last_domain[] = "\x7E\x7E";
     char *dom;
 
-    if ((dom = strrchr(hostname, '.')) != NULL) {
+    if ((dom = strrchr(host_name, '.')) != NULL) {
 	if (dom[1] == '\0') {
 	    dom[0] = '\0';
-	    dom = strrchr(hostname, '.');
+	    dom = strrchr(host_name, '.');
 	}
     }
     if (dom && !isdigit(dom[1]) && strlen(dom + 1) >= 2)

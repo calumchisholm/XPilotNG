@@ -376,12 +376,11 @@ static void Paint_world_radar_old(void)
 	    for (yi = 0; yi < Setup->y; yi++) {
 		visibleColorChange = 0;
 		type = Setup->map_data[xioff + yi];
-		if (type >= SETUP_TARGET && type < SETUP_TARGET + 10) {
+		if (type >= SETUP_TARGET && type < SETUP_TARGET + 10)
 		    vis = (Target_alive(xi, yi, &damage) == 0);
-		}
-		else {
+		else
 		    vis = visible[type];
-		}
+
 		if (vis) {
 		    yp = (int)(yi * ys + 0.5);
 		    if (start == -1) {
@@ -548,8 +547,8 @@ static void Paint_world_radar_old(void)
 		      AllPlanes & ~(dpl_2[0] | dpl_2[1]));
 
     for (i = 0;; i++) {
-	int dead_time, damage;
-	if (Target_by_index(i, &xi, &yi, &dead_time, &damage) == -1)
+	int dead_time, targ_damage;
+	if (Target_by_index(i, &xi, &yi, &dead_time, &targ_damage) == -1)
 	    break;
 	if (dead_time)
 	    continue;

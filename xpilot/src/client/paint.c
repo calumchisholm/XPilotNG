@@ -508,9 +508,7 @@ void Paint_score_start(void)
 }
 
 
-void Paint_score_entry(int entry_num,
-		       other_t* other,
-		       bool is_team)
+void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 {
     static char		raceStr[8], teamStr[4], lifeStr[8], label[MSG_LEN];
     static int		lineSpacing = -1, firstLine;
@@ -627,8 +625,7 @@ void Paint_score_entry(int entry_num,
      * Underline the teams
      */
     if (is_team) {
-	int color = (windowColor != BLUE ? BLUE : BLACK);
-
+	color = (windowColor != BLUE ? BLUE : BLACK);
 	XSetForeground(dpy, scoreListGC, colors[color].pixel);
 	gcv.line_style = LineSolid;
 	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);

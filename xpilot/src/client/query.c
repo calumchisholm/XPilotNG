@@ -125,10 +125,10 @@ static int Query_fudged(sock_t *sock, int port, char *msg, int msglen)
     struct sockaddr_in	addr, subnet;
     struct hostent	*h;
     unsigned long	addrmask, netmask;
-    char		hostname[64];
+    char		host_name[64];
 
-    gethostname(hostname, sizeof(hostname));
-    if ((h = gethostbyname(hostname)) == NULL) {
+    gethostname(host_name, sizeof(host_name));
+    if ((h = gethostbyname(host_name)) == NULL) {
 	error("gethostbyname");
 	return -1;
     }

@@ -1192,9 +1192,9 @@ void Talk_window_cut(XButtonEvent* xbutton)
 
 	/* swap order, if necessary */
 	if (selection.talk.x1 > selection.talk.x2) {
-	    int tmp = selection.talk.x2;
+	    int tmp2 = selection.talk.x2;
 	    selection.talk.x2 = selection.talk.x1;
-	    selection.talk.x1 = tmp;
+	    selection.talk.x1 = tmp2;
 	}
 
 	/*
