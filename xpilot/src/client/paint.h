@@ -263,7 +263,8 @@ extern double	scaleFactor;	/* scale the draw (main playfield) window */
 extern double	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);
-#define	WINSCALE(__n)	((__n) >= 0 ? scaleArray[(__n)] : -scaleArray[-(__n)])
+#define	WINSCALE(x)	((x) >= 0 ? scaleArray[(x)] : -scaleArray[-(x)])
+#define	UWINSCALE(x)	(scaleArray[(x)])
 
 /* macros begin */
 
