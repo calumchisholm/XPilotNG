@@ -40,7 +40,7 @@ int wallColorRGBA   	    	= 0x0000ffff;
 int hudColorRGBA    	    	= 0xff000088;
 int connColorRGBA   	    	= 0x00ff0088;
 int scoreObjectColorRGBA    	= 0x00ff0088;
-int fuelColorRGBA   	    	= 0xff000044;
+int fuelColorRGBA   	    	= 0xffffff44;
 int messagesColorRGBA	    	= 0x00aaaa88;
 int oldmessagesColorRGBA    	= 0x00888888;
 int msgScanBallColorRGBA    	= 0xff000088;
@@ -250,16 +250,16 @@ void Gui_paint_cannon(int x, int y, int type)
 {
     switch (type) {
     case SETUP_CANNON_UP:
-        Image_paint(IMG_CANNON_DOWN, x, y, 0,255);
+        Image_paint(IMG_CANNON_DOWN, x, y, 0, whiteRGBA);
         break;
     case SETUP_CANNON_DOWN:
-        Image_paint(IMG_CANNON_UP, x, y + 1, 0,255);
+        Image_paint(IMG_CANNON_UP, x, y + 1, 0, whiteRGBA);
         break;
     case SETUP_CANNON_LEFT:
-        Image_paint(IMG_CANNON_RIGHT, x, y, 0,255);
+        Image_paint(IMG_CANNON_RIGHT, x, y, 0, whiteRGBA);
         break;
     case SETUP_CANNON_RIGHT:
-        Image_paint(IMG_CANNON_LEFT, x - 1, y, 0,255);
+        Image_paint(IMG_CANNON_LEFT, x - 1, y, 0, whiteRGBA);
         break;
     default:
         errno = 0;
@@ -291,7 +291,7 @@ void Gui_paint_fuel(int x, int y, double fuel)
 
     size = (BLOCK_SZ - 2 * FUEL_BORDER) * fuel / MAX_STATION_FUEL;
 
-    Image_paint(IMG_FUELCELL, x, y, 0, get_alpha(fuelColorRGBA));
+    Image_paint(IMG_FUELCELL, x, y, 0, fuelColorRGBA);
 
     area.x = 0;
     area.y = (BLOCK_SZ - 2 * FUEL_BORDER) * (1 - fuel / MAX_STATION_FUEL);
@@ -302,23 +302,23 @@ void Gui_paint_fuel(int x, int y, double fuel)
 		     y + FUEL_BORDER,
 		     frame,
 		     &area,
-		     get_alpha(fuelColorRGBA));
+		     fuelColorRGBA);
 }
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     switch (type) {
     case SETUP_BASE_UP:
-        Image_paint(IMG_BASE_DOWN, x, y, 0,255);
+        Image_paint(IMG_BASE_DOWN, x, y, 0, whiteRGBA);
         break;
     case SETUP_BASE_DOWN:
-        Image_paint(IMG_BASE_UP, x, y + 1, 0,255);
+        Image_paint(IMG_BASE_UP, x, y + 1, 0, whiteRGBA);
         break;
     case SETUP_BASE_LEFT:
-        Image_paint(IMG_BASE_RIGHT, x, y, 0,255);
+        Image_paint(IMG_BASE_RIGHT, x, y, 0, whiteRGBA);
         break;
     case SETUP_BASE_RIGHT:
-        Image_paint(IMG_BASE_LEFT, x - 1, y, 0,255);
+        Image_paint(IMG_BASE_LEFT, x - 1, y, 0, whiteRGBA);
         break;
     default:
         errno = 0;
@@ -489,7 +489,7 @@ void Gui_paint_setup_target(int x, int y, int team, double damage, bool own)
 
 void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 {
-    Image_paint(own ? IMG_HOLDER_FRIEND : IMG_HOLDER_ENEMY, x, y, 0,255);
+    Image_paint(own ? IMG_HOLDER_FRIEND : IMG_HOLDER_ENEMY, x, y, 0, whiteRGBA);
 }
 
 void Gui_paint_walls(int x, int y, int type)
@@ -603,7 +603,7 @@ void Gui_paint_item_object(int type, int x, int y)
 
 void Gui_paint_ball(int x, int y)
 {
-    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0,255);
+    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0, whiteRGBA);
 }
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)
@@ -658,7 +658,7 @@ void Gui_paint_fastshot(int color, int x, int y)
     Image_paint(IMG_BULLET,
 		x + world.x - 3,
 		world.y - 6 + ext_view_height - y,
-		5,255);
+		5, whiteRGBA);
 }
 
 void Gui_paint_teamshot(int x, int y)
@@ -666,7 +666,7 @@ void Gui_paint_teamshot(int x, int y)
     Image_paint(IMG_BULLET_OWN,
 		x + world.x - 3,
 		world.y - 6 + ext_view_height - y,
-		5,255);
+		5, whiteRGBA);
 }
 
 void Gui_paint_missiles_begin(void)
@@ -698,7 +698,7 @@ void Gui_paint_paused(int x, int y, int count)
     Image_paint(IMG_PAUSED,
 		x - BLOCK_SZ / 2,
 		y - BLOCK_SZ / 2,
-		(count <= 0 || loopsSlow % 10 >= 5) ? 1 : 0,128);
+		(count <= 0 || loopsSlow % 10 >= 5) ? 1 : 0, whiteRGBA);
 }
 
 void Gui_paint_appearing(int x, int y, int id, int count)
@@ -963,6 +963,10 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 
     ship = Ship_by_id(id);
     if (!(other = Other_by_id(id))) return;
+    
+    if (shield) {
+	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, blueRGBA - 128);
+    }
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -35,11 +35,11 @@ static int Image_init(image_t *img)
     img->frame_width = img->width / img->num_frames;
     img->data_width = pow2_ceil(img->width);
     img->data_height = pow2_ceil(img->height);
-    /*
+
     printf("Loaded image %s: w=%d, h=%d, fw=%d, dw=%d, dh=%d\n",
 	   img->filename, img->width, img->height, img->frame_width,
 	   img->data_width, img->data_height);
-    */
+
     img->data = calloc(img->data_width * img->data_height, sizeof(unsigned int));
     if (img->data == NULL) {
         error("Failed to allocate memory for: %s size %dx%d",
@@ -126,13 +126,13 @@ void Image_no_texture()
     glDisable(GL_TEXTURE_2D);
 }
 
-void Image_paint(int ind, int x, int y, int frame, GLubyte alpha)
+void Image_paint(int ind, int x, int y, int frame, int c)
 {
-    Image_paint_area(ind, x, y, frame, NULL, alpha);
+    Image_paint_area(ind, x, y, frame, NULL, c);
 }
 
 
-void Image_paint_area(int ind, int x, int y, int frame, irec *r, GLubyte alpha)
+void Image_paint_area(int ind, int x, int y, int frame, irec *r, int c)
 {
     image_t *img;
     irec    whole;
@@ -159,7 +159,7 @@ void Image_paint_area(int ind, int x, int y, int frame, irec *r, GLubyte alpha)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4ub(255, 255, 255, alpha);
+    set_alphacolor(c);
 
     glBegin(GL_QUADS);
     glTexCoord2f(tx1, ty1); glVertex2i(x    	, y 	    );
@@ -208,6 +208,7 @@ int Images_init(void)
     DEF_IMG("checkpoint.ppm", -2);
     DEF_IMG("meter.ppm", -2);
     DEF_IMG("asteroidconcentrator.ppm", 32);
+    DEF_IMG("shield.ppm", 1);
 
     first_texture = num_images;
 
@@ -231,6 +232,9 @@ void Images_cleanup(void)
 int Bitmap_add(char *filename, int count, bool scalable)
 {
     image_t img;
+
+    printf("adding image: %s, %d, %d @ %d\n", 
+	   filename, count, scalable, num_images);
 
     img.filename   = xp_strdup(filename);
     img.num_frames = ABS(count);

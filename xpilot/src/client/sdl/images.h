@@ -63,15 +63,13 @@ typedef struct {
 #define IMG_CHECKPOINT	  28
 #define IMG_METER	  29
 #define IMG_ASTEROIDCONC  30
-#define IMG_WALL_TEXTURE  31
-#define IMG_DECOR_TEXTURE 32
-#define IMG_BALL_TEXTURE  33
+#define IMG_SHIELD        31
 
 int Images_init(void);
 void Images_cleanup(void);
 int Bitmap_add(char *filename, int count, bool scalable);
-void Image_paint(int ind, int x, int y, int frame, GLubyte alpha);
-void Image_paint_area(int ind, int x, int y, int frame, irec *r, GLubyte alpha);
+void Image_paint(int ind, int x, int y, int frame, int c);
+void Image_paint_area(int ind, int x, int y, int frame, irec *r, int c);
 image_t *Image_get(int ind);
 image_t *Image_get_texture(int ind);
 void Image_use_texture(int ind);
