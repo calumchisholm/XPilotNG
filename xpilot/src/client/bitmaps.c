@@ -26,7 +26,7 @@
 #include "../common/NT/winX.h"
 #include "NT/winbitmap.h"
 #include "NT/winClient.h"
-#endif 
+#endif
 #ifndef _WINDOWS
 #include <stdlib.h>
 #include <X11/Xlib.h>
@@ -121,14 +121,14 @@ int Add_object_bitmaps (void)
  * Defines the standard texture bitmaps specified in the standard_textures
  * array into global pixmaps array.
  */
-int Add_default_textures (void) 
+int Add_default_textures (void)
 {
     xp_pixmap_t pixmap;
     pixmap.filename="rock4.xpm";
     pixmap.count=1;
     pixmap.scalable=false;
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
-    // this is for decor
+    /* this is for decor */
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
 
     pixmap.filename="ball.xpm";
@@ -144,7 +144,7 @@ int Add_default_textures (void)
  * Adds a new bitmap needed by the current map into global pixmaps.
  * Returns the index of the newly added bitmap in the array.
  */
-int Add_bitmap (char *filename, int count, bool scalable) 
+int Add_bitmap (char *filename, int count, bool scalable)
 {
     xp_pixmap_t pixmap;
     pixmap.count = count;
@@ -154,7 +154,7 @@ int Add_bitmap (char *filename, int count, bool scalable)
 }
 
 
-/* 
+/*
  * Purpose: initialize the bitmaps, currently i call it after
  * item bitmaps has been created.
  * i hacked the rotations member, it's really #images, but it can also
@@ -182,14 +182,14 @@ int Bitmaps_init (void)
             return -1;
         }
 
-        for (j = 0; j < count; j++) 
-            pixmaps[i].bitmaps[j].bitmap = 
+        for (j = 0; j < count; j++)
+            pixmaps[i].bitmaps[j].bitmap =
                 pixmaps[i].bitmaps[j].mask = None;
 
         if (Picture_init
-            (&pixmaps[i].picture, 
-             pixmaps[i].filename, 
-             pixmaps[i].count) == -1) 
+            (&pixmaps[i].picture,
+             pixmaps[i].filename,
+             pixmaps[i].count) == -1)
             return -1;
 
         pixmaps[i].width = pixmaps[i].picture.width;
@@ -221,14 +221,14 @@ int Bitmaps_create (Drawable d)
  * Purpose: create a device/OS dependent bitmap.
  * The windows version need to create and lock a device context.
  * I got no clue what the unix version needs before and after drawing the
- * picture to the pixmap. 
+ * picture to the pixmap.
  * (the windows version just need the Drawable as parameter, the unix version
  * might need more)
  */
 static void Bitmap_create (Drawable d, xp_pixmap_t *pixmap, int bmp)
 {
     Bitmap_create_begin(d, pixmap, bmp);
-    
+
     if (pixmap->height == pixmap->picture.height &&
         pixmap->width == pixmap->picture.width) {
 	/* exactly same size as original */
@@ -243,13 +243,13 @@ static void Bitmap_create (Drawable d, xp_pixmap_t *pixmap, int bmp)
 
 
 
-/* 
- * Purpose: Take a device independent picture and create a 
- * device/os dependent image. 
+/*
+ * Purpose: Take a device independent picture and create a
+ * device/os dependent image.
  * This is only used in the scalefactor 1.0 special case.
- * 
+ *
  * Actually this function could be killed, but it's very fast
- * and it uses the intended original image. 
+ * and it uses the intended original image.
  */
 static void Bitmap_picture_copy (xp_pixmap_t *xp_pixmap, int image)
 {
@@ -270,12 +270,12 @@ static void Bitmap_picture_copy (xp_pixmap_t *xp_pixmap, int image)
 
 /*
  * Purpose: Take a device independent picture and create a
- * scaled device/os dependent image. 
+ * scaled device/os dependent image.
  * This is for some of us the general case.
- * The trick is for each pixel in the target image 
+ * The trick is for each pixel in the target image
  * to find the area it responds to in the original image, and then
  * find an average of the colors in this area.
- */    
+ */
 static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image)
 {
     int		x, y;
@@ -284,7 +284,7 @@ static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image)
     double      dx_scaled, dy_scaled;
     double	orig_height, orig_width;
     int		height, width;
-    
+
     orig_height = xp_pixmap->picture.height;
     orig_width = xp_pixmap->picture.width;
     height = xp_pixmap->height;
@@ -297,11 +297,11 @@ static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image)
     for (y = 0; y < height; y++) {
 	x_scaled = 0;
 	for (x=0; x < width; x++) {
-	    color = 
+	    color =
                 Picture_get_pixel_area
-                (&(xp_pixmap->picture), image, 
+                (&(xp_pixmap->picture), image,
                  x_scaled, y_scaled, dx_scaled, dy_scaled);
-            
+
 	    Bitmap_set_pixel(xp_pixmap, image, x, y, color);
 	    x_scaled += dx_scaled;
 	}
@@ -315,9 +315,9 @@ static void Bitmap_picture_scale (xp_pixmap_t *xp_pixmap, int image)
 
 	dst->xmin = (int)((width * src->xmin) / orig_width);
 	dst->ymin = (int)((height * src->ymin) / orig_height);
-	dst->xmax = (int)(((width * src->xmax) + (orig_width - 1 )) / 
+	dst->xmax = (int)(((width * src->xmax) + (orig_width - 1 )) /
                           orig_width);
-	dst->ymax = (int)(((height * src->ymax) + (orig_height - 1 )) / 
+	dst->ymax = (int)(((height * src->ymax) + (orig_height - 1 )) /
                           orig_height);
     }
 }
@@ -343,7 +343,6 @@ static void Bitmap_create_begin(Drawable d, xp_pixmap_t *pm, int bmp)
 {
     Drawable pixmap;
 
-    
     if (pm->bitmaps[bmp].bitmap) {
 	XFreePixmap(dpy, pm->bitmaps[bmp].bitmap);
 	pm->bitmaps[bmp].bitmap = None;
@@ -369,13 +368,13 @@ static void Bitmap_create_begin(Drawable d, xp_pixmap_t *pm, int bmp)
     if (!maskGC) {
 	XGCValues	xgc;
 	unsigned long	values;
-        
+
 	xgc.line_width = 0;
 	xgc.line_style = LineSolid;
 	xgc.cap_style = CapButt;
 	xgc.join_style = JoinMiter;
 	xgc.graphics_exposures = False;
-	values = 
+	values =
 	    GCLineWidth|GCLineStyle|GCCapStyle|GCJoinStyle|GCGraphicsExposures;
 	maskGC = XCreateGC(dpy, pixmap, values, &xgc);
     }
