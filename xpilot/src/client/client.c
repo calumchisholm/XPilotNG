@@ -1294,11 +1294,15 @@ int Handle_score_object(DFLOAT score, int x, int y, char *msg)
     return 0;
 }
 
+/* kps - does this info exist somewhere else ? */
+static int rounds_played = 0;
+
 static void Print_roundend_messages(other_t **order)
 {
     static char		hackbuf[MSG_LEN];
     static char		hackbuf2[MSG_LEN];
     static char		kdratio[16];
+    static char		killsperround[16];
     char		*s;
     int			i;
     other_t		*other;
@@ -1313,9 +1317,24 @@ static void Print_roundend_messages(other_t **order)
 	sprintf(kdratio, "%.2f",
 		(DFLOAT)killratio_totalkills / killratio_totaldeaths);
 
-    sprintf(hackbuf, "Kill ratio - Round: %d/%d, Total: %d/%d (%s)",
+    if (rounds_played == 0)
+	sprintf(killsperround, "0");
+    else
+	sprintf(killsperround, "%.2f",
+		(DFLOAT)killratio_totalkills / rounds_played);
+
+    sprintf(hackbuf, "Kill ratio - Round: %d/%d Total: %d/%d (%s) "
+	    "Rounds played: %d Avg. kills/round: %s",
 	    killratio_kills, killratio_deaths,
-	    killratio_totalkills, killratio_totaldeaths, kdratio);
+	    killratio_totalkills, killratio_totaldeaths, kdratio,
+	    rounds_played, killsperround);
+
+    /*
+     * kps - this is ugly, is there some decent way of finding out
+     * if a player played this round ???
+     */
+    if (self && !strchr("PTW", self->mychar))
+	rounds_played++;
     killratio_kills = 0;
     killratio_deaths = 0;
     Add_message(hackbuf);
