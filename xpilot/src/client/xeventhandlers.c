@@ -366,7 +366,8 @@ int ButtonRelease_event(XEvent *event)
 	}
 	return 0;
     }
-    Expose_button_window(RED, event->xbutton.window);
+    Expose_button_window(buttonColor ? buttonColor: RED,
+			 event->xbutton.window);
     if (event->xbutton.window == about_close_b)
 	About(about_close_b);
     else if (event->xbutton.window == about_next_b)
@@ -403,6 +404,7 @@ void Expose_event(XEvent *event)
     }
     else if (Widget_event(event) == 0) {
 	if (event->xexpose.count == 0)
-	    Expose_button_window(RED, event->xexpose.window);
+	    Expose_button_window(buttonColor ? buttonColor : RED,
+				 event->xexpose.window);
     }
 }
