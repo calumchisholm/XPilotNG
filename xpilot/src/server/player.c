@@ -1476,7 +1476,7 @@ void Delete_player(player_t *pl)
 	if (BIT(pl_i->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
 	    && (pl_i->lock.pl_id == id || NumPlayers <= 1)) {
 	    CLR_BIT(pl_i->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE);
-	    CLR_BIT(pl_i->used, HAS_TRACTOR_BEAM);
+	    CLR_BIT(pl_i->used, USES_TRACTOR_BEAM);
 	}
 	if (Player_is_robot(pl_i)
 	    && Robot_war_on_player(pl_i) == id)

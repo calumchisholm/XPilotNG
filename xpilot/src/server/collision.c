@@ -902,8 +902,6 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_TRACTOR_BEAM:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
-	if (pl->item[item_index] > 0)
-	    SET_BIT(pl->have, HAS_TRACTOR_BEAM);
 	sound_play_sensors(pl->pos, TRACTOR_BEAM_PICKUP_SOUND);
 	break;
     case ITEM_AUTOPILOT:

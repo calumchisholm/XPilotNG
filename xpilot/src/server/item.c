@@ -59,8 +59,6 @@ static void Item_update_flags(player_t *pl)
 	    }
 	}
     }
-    if (pl->item[ITEM_TRACTOR_BEAM] <= 0)
-	CLR_BIT(pl->have, HAS_TRACTOR_BEAM);
     if (pl->item[ITEM_AUTOPILOT] <= 0) {
 	if (BIT(pl->used, HAS_AUTOPILOT))
 	    Autopilot(pl, false);
@@ -440,13 +438,13 @@ void Tractor_beam(player_t *pl)
 	|| pl->lock.distance >= maxdist
 	|| BIT(pl->used, HAS_PHASING_DEVICE)
 	|| BIT(locked_pl->used, HAS_PHASING_DEVICE)) {
-	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
+	CLR_BIT(pl->used, USES_TRACTOR_BEAM);
 	return;
     }
     percent = TRACTOR_PERCENT(pl->lock.distance, maxdist);
     cost = TRACTOR_COST(percent);
     if (pl->fuel.sum < -cost) {
-	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
+	CLR_BIT(pl->used, USES_TRACTOR_BEAM);
 	return;
     }
     General_tractor_beam(pl->world, pl->id, pl->pos,
@@ -743,8 +741,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
         break;
     case ITEM_TRACTOR_BEAM:
 	what = "a tractor beam";
-	if (!victim->item[item])
-	    CLR_BIT(victim->have, HAS_TRACTOR_BEAM);
         break;
     case ITEM_AUTOPILOT:
 	what = "an autopilot";
@@ -825,7 +821,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	SET_BIT(pl->have, HAS_EMERGENCY_SHIELD);
 	break;
     case ITEM_TRACTOR_BEAM:
-	SET_BIT(pl->have, HAS_TRACTOR_BEAM);
 	break;
     case ITEM_AUTOPILOT:
 	SET_BIT(pl->have, HAS_AUTOPILOT);

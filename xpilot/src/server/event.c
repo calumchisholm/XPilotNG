@@ -968,16 +968,16 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_PRESSOR_BEAM:
-		if (BIT(pl->have, HAS_TRACTOR_BEAM)) {
+		if (pl->item[ITEM_TRACTOR_BEAM] > 0) {
 		    pl->tractor_is_pressor = true;
-		    SET_BIT(pl->used, HAS_TRACTOR_BEAM);
+		    SET_BIT(pl->used, USES_TRACTOR_BEAM);
 		}
 		break;
 
 	    case KEY_TRACTOR_BEAM:
-		if (BIT(pl->have, HAS_TRACTOR_BEAM)) {
+		if (pl->item[ITEM_TRACTOR_BEAM] > 0) {
 		    pl->tractor_is_pressor = false;
-		    SET_BIT(pl->used, HAS_TRACTOR_BEAM);
+		    SET_BIT(pl->used, USES_TRACTOR_BEAM);
 		}
 		break;
 
@@ -1065,7 +1065,7 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_TRACTOR_BEAM:
 	    case KEY_PRESSOR_BEAM:
-		CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
+		CLR_BIT(pl->used, USES_TRACTOR_BEAM);
 		break;
 
 	    case KEY_SHIELD:

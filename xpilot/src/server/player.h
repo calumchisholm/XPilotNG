@@ -89,7 +89,7 @@ extern bool		updateScores;
  */
 #define HAS_EMERGENCY_THRUST	(1U<<30)
 #define HAS_AUTOPILOT		(1U<<29)
-#define HAS_TRACTOR_BEAM	(1U<<28)
+#define USES_TRACTOR_BEAM	(1U<<28)
 #define HAS_LASER		(1U<<27)
 #define HAS_CLOAKING_DEVICE	(1U<<26)
 #define HAS_SHIELD		(1U<<25)

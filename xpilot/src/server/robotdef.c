@@ -655,7 +655,7 @@ static void Choose_weapon_modifier(player_t *pl, int weapon_type)
     Mods_clear(&mods);
 
     switch (weapon_type) {
-    case HAS_TRACTOR_BEAM:
+    case USES_TRACTOR_BEAM:
 	Robot_check_new_modifiers(pl, mods);
 	return;
 
@@ -812,7 +812,7 @@ static void Robotdef_do_tractor_beam(player_t *pl)
 {
     robot_default_data_t *my_data = Robot_default_get_data(pl);
 
-    CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
+    CLR_BIT(pl->used, USES_TRACTOR_BEAM);
     pl->tractor_is_pressor = false;
 
     if (BIT(pl->lock.tagged, LOCK_PLAYER)
@@ -840,14 +840,14 @@ static void Robotdef_do_tractor_beam(player_t *pl)
 	if (pl->velocity <= my_data->robot_normal_speed) {
 	    if (pl->lock.distance < (SHIP_SZ * 4)
 		|| (!away && vel > my_data->robot_attack_speed)) {
-		SET_BIT(pl->used, HAS_TRACTOR_BEAM);
+		SET_BIT(pl->used, USES_TRACTOR_BEAM);
 		pl->tractor_is_pressor = true;
 	    } else if (away
 		       && vel < my_data->robot_max_speed
 		       && vel > my_data->robot_normal_speed)
-		SET_BIT(pl->used, HAS_TRACTOR_BEAM);
+		SET_BIT(pl->used, USES_TRACTOR_BEAM);
 	}
-	if (BIT(pl->used, HAS_TRACTOR_BEAM))
+	if (BIT(pl->used, USES_TRACTOR_BEAM))
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
     }
 }
@@ -1033,7 +1033,7 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 		 && pl->fuel.sum + ED_LASER > my_data->fuel_l3
 		 && new_mode == RM_ATTACK)
 	    Robotdef_fire_laser(pl);
-	else if (BIT(pl->have, HAS_TRACTOR_BEAM))
+	else if (pl->item[ITEM_TRACTOR_BEAM] > 0)
 	    Robotdef_do_tractor_beam(pl);
 
 	if (BIT(pl->used, HAS_LASER)) {
@@ -1203,7 +1203,7 @@ static bool Detect_ship(player_t *pl, player_t *ship)
 			HAS_REFUEL|
 			HAS_REPAIR|
 			HAS_CONNECTOR|
-			HAS_TRACTOR_BEAM))
+			USES_TRACTOR_BEAM))
 	return true;
 
     if (BIT(ship->have, HAS_BALL))

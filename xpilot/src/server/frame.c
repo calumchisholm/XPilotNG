@@ -897,7 +897,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 		Send_refuel(conn, pl_i->pos, targ->pos);
 	}
 
-	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
+	if (BIT(pl_i->used, USES_TRACTOR_BEAM)) {
 	    player_t *t = Player_by_id(pl_i->lock.pl_id);
 
 	    if (clpos_inview(&cv, t->pos)) {

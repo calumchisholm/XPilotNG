@@ -109,7 +109,7 @@ void Phasing(player_t *pl, bool on)
 	CLR_BIT(pl->used, HAS_REPAIR);
 	if (BIT(pl->used, HAS_CONNECTOR))
 	    pl->ball = NULL;
-	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
+	CLR_BIT(pl->used, USES_TRACTOR_BEAM);
 	CLR_BIT(pl->obj_status, GRAVITY);
 	sound_play_sensors(pl->pos, PHASING_ON_SOUND);
     } else {
@@ -1206,7 +1206,7 @@ void Update_objects(world_t *world)
 		pl->updateVisibility = true;
 	}
 
-	if (BIT(pl->used, HAS_TRACTOR_BEAM))
+	if (BIT(pl->used, USES_TRACTOR_BEAM))
 	    Tractor_beam(pl);
 
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
