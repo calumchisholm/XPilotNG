@@ -96,7 +96,7 @@ typedef struct {
     int			(*war_on_player)(player *robot);
     void		(*message)(player *robot, const char *str);
     void		(*destroy)(player *robot);
-    void		(*invite)(player *robot, int inv_ind);
+    void		(*invite)(player *robot, player *inviter);
 } robot_type_t;
 
 /*

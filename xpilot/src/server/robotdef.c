@@ -98,7 +98,7 @@ static void Robot_default_set_war(player *pl, int victim_id);
 static int Robot_default_war_on_player(player *pl);
 static void Robot_default_message(player *pl, const char *str);
 static void Robot_default_destroy(player *pl);
-static void Robot_default_invite(player *pl, int inv_ind);
+static void Robot_default_invite(player *pl, player *inviter);
        int Robot_default_setup(robot_type_t *type_ptr);
 
 
@@ -306,9 +306,8 @@ static void Robot_default_destroy(player *pl)
 /*
  * A default robot is asked to join an alliance
  */
-static void Robot_default_invite(player *pl, int inv_ind)
+static void Robot_default_invite(player *pl, player *inviter)
 {
-    player			*inviter = Players(inv_ind);
     int				war_id = Robot_default_war_on_player(pl);
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
     int				i;
@@ -320,7 +319,7 @@ static void Robot_default_invite(player *pl, int inv_ind)
 	   let robots refuse in this case */
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl_i = Players(i);
-	    if (IS_HUMAN_IND(i) && ALLIANCE(pl, pl_i)) {
+	    if (IS_HUMAN_PTR(pl_i) && ALLIANCE(pl, pl_i)) {
 		accept = 0;
 		break;
 	    }

@@ -894,9 +894,9 @@ void Robot_delete(player *pl, bool kicked)
 /*
  * Ask a robot for an alliance
  */
-void Robot_invite(player *pl, int inv_ind)
+void Robot_invite(player *pl, player *inviter)
 {
-    (*robot_types[pl->robot_data_ptr->robot_types_ind].invite)(pl, inv_ind);
+    (*robot_types[pl->robot_data_ptr->robot_types_ind].invite)(pl, inviter);
 }
 
 /*
