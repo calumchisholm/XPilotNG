@@ -110,10 +110,6 @@ Task: Add support for more map objects in mapconvert.py. Also possibly add
 a default texture file for these converted maps.
 Developer: kps
 
-Task: When server op does total reset to start a new match, don't clear scores
-of pausing players.
-Developer: kps
-
 Task: Improve audio support. Add support for "3D" sound where info about
 the sound sources' positions and velocities are sent to clients so that
 stuff like Doppler effect can be done. Note that there should be some

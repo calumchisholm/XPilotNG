@@ -1026,8 +1026,12 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size)
 	return CMD_RESULT_NOT_OPERATOR;
 
     if (arg && !strcasecmp(arg, "all")) {
-	for (i = NumPlayers - 1; i >= 0; i--)
-	    Rank_set_score(Player_by_index(i), 0.0);
+	for (i = NumPlayers - 1; i >= 0; i--) {
+	    player_t *pl_i = Player_by_index(i);
+
+	    if (!Player_is_paused(pl_i))
+		Rank_set_score(pl_i, 0.0);
+	}
 	Reset_all_players(world);
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
