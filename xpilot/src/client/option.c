@@ -71,7 +71,7 @@ static const char *Option_default_value_to_string(xp_option_t *opt)
 	strcpy(buf, "");
 	break;
     case xp_bool_option:
-	sprintf(buf, "%s", opt->bool_defval == true ? "yes" : "no");
+	sprintf(buf, "%s", opt->bool_defval ? "yes" : "no");
 	break;
     case xp_int_option:
 	sprintf(buf, "%d", opt->int_defval);
@@ -594,10 +594,10 @@ const char *Option_value_to_string(xp_option_t *opt)
 
     switch (opt->type) {
     case xp_noarg_option:
-	sprintf(buf, "%s", *opt->noarg_ptr == true ? "yes" : "no");
+	sprintf(buf, "%s", *opt->noarg_ptr ? "yes" : "no");
 	break;
     case xp_bool_option:
-	sprintf(buf, "%s", *opt->bool_ptr == true ? "yes" : "no");
+	sprintf(buf, "%s", *opt->bool_ptr ? "yes" : "no");
 	break;
     case xp_int_option:
 	sprintf(buf, "%d", *opt->int_ptr);
@@ -944,7 +944,7 @@ static void Config_save_keys(FILE *fp)
 	key = keydefs[i].key;
 
 	/* try and see if we have already saved this key. */
-	if (Config_find_key(key, 0, i, &j) == true)
+	if (Config_find_key(key, 0, i, &j))
 	    /* yes, saved this one before.  skip it now. */
 	    continue;
 
@@ -955,7 +955,7 @@ static void Config_save_keys(FILE *fp)
 	    strlcpy(buf, str, sizeof(buf));
 	    /* find all other keysyms which map to the same key. */
 	    j = i;
-	    while (Config_find_key(key, j + 1, num_keydefs, &j) == true) {
+	    while (Config_find_key(key, j + 1, num_keydefs, &j)) {
 		ks = keydefs[j].keysym;
 		if ((str = XKeysymToString(ks)) != NULL) {
 		    strlcat(buf, " ", sizeof(buf));

@@ -425,7 +425,7 @@ static void Option_change_node(
 	}
     }
 
-    if (set_ok == true) {
+    if (set_ok) {
 	if (node->value == NULL) {
 	    node->value = Option_allocate_value(value, NULL, opt_origin);
 	    if (node->value == NULL)

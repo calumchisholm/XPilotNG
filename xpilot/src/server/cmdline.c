@@ -3774,7 +3774,7 @@ void Free_options(void)
     int			i;
     int			option_count = NELEM(opts);
 
-    if (options_inited == true) {
+    if (options_inited) {
 	options_inited = false;
 	for (i = 0; i < option_count; i++) {
 	    if (opts[i].type == valString) {

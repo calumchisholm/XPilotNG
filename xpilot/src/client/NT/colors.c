@@ -444,7 +444,7 @@ int Colors_init(void)
     if (visual->map_entries < 16)
 	colorSwitch = false;
 
-    if (colorSwitch == true) {
+    if (colorSwitch) {
 	maxColors = (maxColors >= 16 && visual->map_entries >= 256) ? 16
 	    : (maxColors >= 8 && visual->map_entries >= 64) ? 8
 	    : 4;
@@ -667,7 +667,7 @@ int Colors_init_bitmaps(void)
 
     Colors_init_style_colors();
 
-    return (fullColor == true) ? 0 : -1;
+    return (fullColor) ? 0 : -1;
 }
 
 

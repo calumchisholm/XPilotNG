@@ -340,7 +340,7 @@ bool Parser(int argc, char **argv, world_t *world)
 	return false;
 
     for (i = 1; i < argc; i++) {
-	if (Parse_check_info_request(argv, i) == true)
+	if (Parse_check_info_request(argv, i))
 	    return false;
 
 	if (argv[i][0] == '-' || argv[i][0] == '+') {

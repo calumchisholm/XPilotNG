@@ -156,7 +156,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
      * not removed in the same frame that its life ends ?? */
     pulse->life = 0;
     if ((Mods_get(pulse->mods, ModsLaser) & MODS_LASER_STUN)
-	|| (options.laserIsStunGun == true
+	|| (options.laserIsStunGun
 	    && options.allowLaserModifiers == false)) {
 	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
 	    || Player_is_thrusting(pl)) {

@@ -69,7 +69,7 @@ static void Dummy_paintItemSymbol(int type, Drawable drawable,
 
 /*
  * Miscellaneous recording functions.
- * These are only called when (recording == true).
+ * These are only called when (recording).
  */
 static void RWriteByte(int value)
 {

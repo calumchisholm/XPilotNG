@@ -312,7 +312,7 @@ void Paint_frame(void)
     }
 
 #ifndef _WINDOWS
-    if (talk_mapped == true) {
+    if (talk_mapped) {
 	static bool toggle;
 	static long last_toggled;
 

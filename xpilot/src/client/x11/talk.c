@@ -138,7 +138,7 @@ void Talk_map_window(bool map)
     static Window	root;
     static int		root_x, root_y;
 
-    if (map == true) {
+    if (map) {
 	Window child;
 	int win_x, win_y;
 	unsigned int keys_buttons;
@@ -159,7 +159,7 @@ void Talk_map_window(bool map)
 		     (int)TALK_WINDOW_HEIGHT / 2);
 	XFlush(dpy);	/* warp pointer ASAP. */
     }
-    else if (talk_created == true) {
+    else if (talk_created) {
 	XUnmapWindow(dpy, talkWindow);
 	XWarpPointer(dpy, None, root, 0, 0, 0, 0, root_x, root_y);
 	XFlush(dpy);	/* warp pointer ASAP. */
@@ -377,7 +377,7 @@ int Talk_do_event(XEvent *event)
 		    talk_str, (int)strlen(talk_str));
 	if (selection.talk.state == SEL_EMPHASIZED)
 	    Talk_refresh();
-	if (cursor_visible == true) {
+	if (cursor_visible) {
 	    talk_cursor.visible = false;
 	    Talk_cursor(cursor_visible);
 	}

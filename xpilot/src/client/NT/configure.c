@@ -194,7 +194,7 @@ static void Create_config(void)
     for (i = 0; i < Nelem_config_creator(); i++) {
 	xp_option_t *opt = Config_creator_option(i);
 
-	if (full == true) {
+	if (full) {
 	    full = false;
 	    num++;
 	    config_widget_desc[num]
@@ -624,8 +624,8 @@ void Config_destroy(void)
 {
     int			i;
 
-    if (config_created == true) {
-	if (config_mapped == true) {
+    if (config_created) {
+	if (config_mapped) {
 	    Widget_unmap(config_widget_desc[config_page]);
 	    config_mapped = false;
 	}
@@ -643,9 +643,9 @@ void Config_resize(void)
 {
     bool		mapped = config_mapped;
 
-    if (config_created == true) {
+    if (config_created) {
 	Config_destroy();
-	if (mapped == true)
+	if (mapped)
 	    Config(mapped, config_what);
     }
 }

@@ -514,7 +514,7 @@ static void Widget_draw_arrow(widget_t *widget)
     if (widget->type == WIDGET_BUTTON_ARROW_RIGHT) {
 	int tmp = left; left = right; right = tmp;
     }
-    if (arroww->pressed == true && arroww->inside == true) {
+    if (arroww->pressed && arroww->inside) {
 	fg = BLACK;
 	bg = buttonColor;
     } else {
@@ -715,7 +715,7 @@ static void Widget_draw_expose(int widget_desc, XExposeEvent *expose)
 	boolw = (widget_bool_t *) widget->sub;
 	Widget_draw_button(widget,
 			   (boolw->pressed && boolw->inside) ? true : false,
-			   (boolw->state == true) ? "Yes" : "No");
+			   (boolw->state) ? "Yes" : "No");
 	break;
 
     case WIDGET_BUTTON_MENU:
@@ -979,7 +979,7 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 	    break;
 
 	if (pressed == false)
-	    boolw->state = (boolw->state == true) ? false : true;
+	    boolw->state = (boolw->state) ? false : true;
 
 	Widget_draw(widget_desc);
 	if (pressed == false) {
@@ -1006,7 +1006,7 @@ static void Widget_button(XEvent *event, int widget_desc, bool pressed)
 	    warn("Pulldown not a form");
 	    break;
 	}
-	if (pressed == true) {
+	if (pressed) {
 	    XMoveWindow(dpy, pulldown_widget->window,
 			event->xbutton.x_root - event->xbutton.x - 1,
 			event->xbutton.y_root - event->xbutton.y
@@ -1202,20 +1202,20 @@ static void Widget_inside(XEvent *event, int widget_desc, bool inside)
     case WIDGET_BUTTON_BOOL:
 	boolw = (widget_bool_t *) widget->sub;
 	boolw->inside = inside;
-	if (boolw->pressed == true)
+	if (boolw->pressed)
 	    Widget_draw(widget_desc);
 	break;
     case WIDGET_BUTTON_ACTIVATE:
 	activw = (widget_activate_t *) widget->sub;
 	activw->inside = inside;
-	if (activw->pressed == true)
+	if (activw->pressed)
 	    Widget_draw(widget_desc);
 	break;
     case WIDGET_BUTTON_ARROW_RIGHT:
     case WIDGET_BUTTON_ARROW_LEFT:
 	arroww = (widget_arrow_t *) widget->sub;
 	arroww->inside = inside;
-	if (arroww->pressed == true)
+	if (arroww->pressed)
 	    Widget_draw(widget_desc);
 	break;
     default:
@@ -1250,21 +1250,21 @@ int Widget_event(XEvent *event)
 		switch (widget->type) {
 		case WIDGET_BUTTON_BOOL:
 		    boolw = (widget_bool_t *) widget->sub;
-		    if (boolw->pressed == true) {
+		    if (boolw->pressed) {
 			count++;
 			Widget_button(event, i, false);
 		    }
 		    break;
 		case WIDGET_BUTTON_ACTIVATE:
 		    activw = (widget_activate_t *) widget->sub;
-		    if (activw->pressed == true) {
+		    if (activw->pressed) {
 			count++;
 			Widget_button(event, i, false);
 		    }
 		    break;
 		case WIDGET_BUTTON_MENU:
 		    menuw = (widget_menu_t *) widget->sub;
-		    if (menuw->pressed == true) {
+		    if (menuw->pressed) {
 			count++;
 			Widget_button(event, i, false);
 		    }
@@ -1272,7 +1272,7 @@ int Widget_event(XEvent *event)
 		case WIDGET_BUTTON_ARROW_RIGHT:
 		case WIDGET_BUTTON_ARROW_LEFT:
 		    arroww = (widget_arrow_t *) widget->sub;
-		    if (arroww->pressed == true) {
+		    if (arroww->pressed) {
 			count++;
 			Widget_button(event, i, false);
 		    }
@@ -1280,7 +1280,7 @@ int Widget_event(XEvent *event)
 		case WIDGET_SLIDER_HORI:
 		case WIDGET_SLIDER_VERT:
 		    sliderw = (widget_slider_t *) widget->sub;
-		    if (sliderw->pressed == true) {
+		    if (sliderw->pressed) {
 			count++;
 			Widget_button(event, i, false);
 		    }

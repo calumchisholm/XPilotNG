@@ -102,7 +102,7 @@ static bool Set_fullColor(xp_option_t *opt, bool val)
     if (val == fullColor)
 	return true;
 
-    if (val == true) {
+    if (val) {
 	/* see if we can use fullColor at all. */
 	fullColor = true;
 	if (Colors_init_bitmaps() == -1) {
@@ -127,7 +127,7 @@ static bool Set_texturedObjects(xp_option_t *opt, bool val)
     if (val == texturedObjects)
 	return true;
 
-    if (val == true) {
+    if (val) {
 	/* Can't use texturedObjects without fullColor */
 	texturedObjects = true;
 	if (!fullColor) {

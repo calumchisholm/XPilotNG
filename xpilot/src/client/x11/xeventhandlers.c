@@ -380,7 +380,7 @@ int ButtonRelease_event(XEvent *event)
     }
 
     if (Widget_event(event) != 0) {
-	if (quitting == true) {
+	if (quitting) {
 	    quitting = false;
 	    printf("Quit\n");
 	    return -1;

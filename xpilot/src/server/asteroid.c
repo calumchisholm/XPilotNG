@@ -286,7 +286,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
     asteroid->obj_status = GRAVITY;
     Mods_clear(&asteroid->mods);
 
-    if (Asteroid_add_to_list(asteroid) == true) {
+    if (Asteroid_add_to_list(asteroid)) {
 	world->asteroids.num += 1 << (size - 1);
 	Cell_add_object(world, OBJ_PTR(asteroid));
     }
