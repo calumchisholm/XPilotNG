@@ -1286,7 +1286,7 @@ static void LegalizeName(char *string, bool hack)
 {
     char *s = string;
     static char allowed_chars[] =
-	" !#%&'()-.0123456789="
+	" !#%&'()-.0123456789"
 	"@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	"_abcdefghijklmnopqrstuvwxyz";
 
