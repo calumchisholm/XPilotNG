@@ -298,8 +298,6 @@ void Gui_paint_fuel(int x, int y, double fuel)
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
     int color = 0;
-    int lifeColor = 0;
-    int previousLifeColor = 0;
     const int BORDER = 4;		/* in pixels */
     int size = 0, size2 = 0;
     other_t *other;
@@ -310,12 +308,9 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     other = Other_by_id(id);
     base = Homebase_by_id(id);
-    /* If life coloring is valid we get something here (Mara)*/
-    if ((lifeColor = Life_color(other)) != 0)
-	previousLifeColor = Life_color_by_life((other->life)+1);
-    
+
     if (baseNameColor) {
-	if (!(color = lifeColor))
+	if (!(color = Life_color(other)))
 	    color = baseNameColor;
     } else
 	color = WHITE;
@@ -343,19 +338,12 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
     /* Mara's flashy basewarning */
     if (do_basewarning && (baseWarningType & 2)) {
-	/* If same color it won't flash properly */
-	if (lifeColor == previousLifeColor) {
-	    lifeColor = WHITE;
-	    previousLifeColor = RED;
-	}
 	if (loopsSlow & 1) {
-	    if (!(color = lifeColor))
-		color = baseNameColor;
-	    if (!color)
+	    if (color != WHITE)
 		color = WHITE;
-	} else
-	    if (!(color = previousLifeColor))
-		color = RED;
+	    else
+		color = BLUE;
+	}
     }
 
     SET_FG(colors[color].pixel);
