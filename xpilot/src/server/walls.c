@@ -715,7 +715,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 	&& pl->score < 0
 	&& IS_ROBOT_PTR(pl)) {
 	pl->home_base = 0;
-	Pick_startpos(ind);
+	Pick_startpos(pl);
     }
 }
 

@@ -675,14 +675,16 @@ void Destroy_connection(int ind, const char *reason)
     Conn_set_state(connp, CONN_FREE, CONN_FREE);
 
     if (connp->id != NO_ID) {
+	player *pl;
 	id = connp->id;
 	connp->id = NO_ID;
-	Player_by_id(id)->conn = NOT_CONNECTED;
-	if (Player_by_id(id)->rectype != 2)
-	    Delete_player(GetInd(id));
+	pl = Player_by_id(id);
+	pl->conn = NOT_CONNECTED;
+	if (pl->rectype != 2)
+	    Delete_player(pl);
 	else {
+	    /* kps - write a Delete_observer() function */
 	    int i, ind = GetInd(id);
-	    player *pl;
 
 	    NumObservers--;
 	    pl = Players(observerStart + NumObservers); /* Swap leaver last */
@@ -1329,13 +1331,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	    return -1;
 	}
     }
-#if 1 /* player passwords currently disabled */
-    if (Init_player(NumPlayers, connp->ship) <= 0) {
-	strlcpy(errmsg, "Init_player failed: no free ID", errsize);
-	return -1;
-    }
-    pl = Players(NumPlayers);
-#else
+#if 0 /* player passwords currently disabled */
     r = PASSWD_OK;
     if (allowPlayerPasswords)
 	r = Check_player_password(connp->nick, "");
@@ -1369,6 +1365,8 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 		break;
 	}
     }
+#endif
+    /* kps - fix */
     if (connp->rectype < 2) {
 	if (!Init_player(NumPlayers, connp->ship)) {
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
@@ -1381,7 +1379,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	pl = Players(observerStart + NumObservers);
     }
     pl->rectype = connp->rectype;
-#endif
+
     /*strlcpy(pl->rawname, connp->nick, MAX_CHARS);*/
     strlcpy(pl->name, connp->nick, MAX_CHARS);
     strlcpy(pl->auth_nick, old_nick, MAX_CHARS);
@@ -1399,8 +1397,8 @@ static int Handle_login(int ind, char *errmsg, int errsize)
     pl->version = connp->version;
 
     if (pl->rectype < 2) {
-	Pick_startpos(NumPlayers);
-	Go_home(NumPlayers);
+	Pick_startpos(pl /*NumPlayers*/);
+	Go_home(pl /*NumPlayers*/);
 	Rank_get_saved_score(pl);
 	if (pl->team != TEAM_NOT_SET) {
 	    World.teams[pl->team].NumMembers++;
@@ -1429,8 +1427,11 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 
     Conn_set_state(connp, CONN_READY, CONN_PLAYING);
 
+    /* kps - this was buggy, Pause_player was given an id,
+     * even though it should be given and ind (now pl)
+     */
     if (teamZeroPausing && pl->team == 0)
-	Pause_player(GetInd(pl->id), 1);
+	Pause_player(pl, true);
 
     if (Send_reply(ind, PKT_PLAY, PKT_SUCCESS) <= 0) {
 	strlcpy(errmsg, "Cannot send play reply", errsize);
@@ -2618,8 +2619,8 @@ static int Receive_keyboard(int ind)
 	pl = Player_by_id(connp->id);
 	memcpy(pl->last_keyv, connp->r.ptr, size);
 	connp->r.ptr += size;
-	Player_by_id(connp->id)->idleCount = 0; /* idle */
-	Handle_keyboard(GetInd(connp->id));
+	pl->idleCount = 0; /* idle */
+	Handle_keyboard(pl);
     }
     if (connp->num_keyboard_updates++ && (connp->state & CONN_PLAYING)) {
 	Destroy_connection(ind, "no macros");
@@ -3609,7 +3610,7 @@ static int Receive_pointer_move(int ind)
 	return 1;
 
     if (BIT(pl->used, HAS_AUTOPILOT))
-	Autopilot(GetInd(connp->id), 0);
+	Autopilot(pl, false);
     turnspeed = movement * pl->turnspeed / MAX_PLAYER_TURNSPEED;
     if (turnspeed < 0) {
 	turndir = -1.0;

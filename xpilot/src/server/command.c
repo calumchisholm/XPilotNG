@@ -124,10 +124,8 @@ static void Send_info_about_player(player * pl)
 
 static void Set_swapper_state(player * pl)
 {
-    int ind = GetInd(pl->id);
-
     if (BIT(pl->have, HAS_BALL))
-	Detach_ball(ind, -1);
+	Detach_ball(pl, -1);
     if (BIT(World.rules->mode, LIMITED_LIVES)) {
 	int i;
 
@@ -684,15 +682,16 @@ static int Cmd_auth(char *arg, player *pl, int oper, char *msg)
     Queue_kick(pl->auth_nick);
 
     for (i = 0; i < NumPlayers; i++) {
-	if (pl != Players(i) &&
-	    !strcasecmp(Players(i)->auth_nick, pl->auth_nick))
+	player *pl_i = Players_i;
+	if (pl != pl_i &&
+	    !strcasecmp(pl_i->auth_nick, pl->auth_nick))
 	{
 	    sprintf(msg, "%s has been kicked out (nick collision).",
-		    Players(i)->name);
-	    if (Players(i)->conn == NOT_CONNECTED)
-		Delete_player(i);
+		    pl_i)->name);
+	    if (pl_i->conn == NOT_CONNECTED)
+		Delete_player(pl_i);
 	    else
-		Destroy_connection(Players(i)->conn,
+		Destroy_connection(pl_i->conn,
 				   "kicked out (someone else authenticated "
 				   "for the same nick)");
 	    warn(msg);
@@ -792,13 +791,14 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
 
     i = Get_player_index_by_name(arg);
     if (i >= 0) {
+	player *pl_i = Players(i);
 	sprintf(msg, "%s kicked %s out! [*Server notice*]",
-		pl->name, Players(i)->name);
-	if (Players(i)->conn == NOT_CONNECTED) {
-	    Delete_player(i);
+		pl->name, pl_i->name);
+	if (pl_i->conn == NOT_CONNECTED) {
+	    Delete_player(pl_i);
 	}
 	else {
-	    Destroy_connection(Players(i)->conn, "kicked out");
+	    Destroy_connection(pl_i->conn, "kicked out");
 	}
 	Set_message(msg);
 	strcpy(msg, "");
@@ -1057,14 +1057,14 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 
 	if (pl_i->conn != NOT_CONNECTED) {
 	    if (Player_is_playing(pl_i))
-		Kill_player(i, false);
+		Kill_player(pl_i, false);
 	    if (Team_zero_pausing_available()) {
 		sprintf(msg, "%s was pause-swapped by %s.",
 			pl_i->name, pl->name);
 		/* apparently Handle_player_command busts it */
 		Handle_player_command(pl_i, "team 0");
 	    } else {
-		Pause_player(i, 1);
+		Pause_player(pl_i, true);
 		sprintf(msg, "%s was paused by %s.",
 			pl_i->name, pl->name);
 	    }
@@ -1238,12 +1238,12 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	World.teams[pl->team].NumMembers++;
 	TEAM_SCORE(pl->team, pl->score);
 	Set_swapper_state(pl);
-	Pick_startpos(ind);
+	Pick_startpos(pl);
 	Send_info_about_player(pl);
 	strcpy(msg, "");
 
 	if (teamZeroPausing)
-	    Pause_player(ind, pl->team == 0);
+	    Pause_player(pl, pl->team == 0);
 
 	return CMD_RESULT_SUCCESS;
     }
@@ -1266,8 +1266,13 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 		TEAM_SCORE(xteam2, -(pl2->score));
 		TEAM_SCORE(pl2->team, pl2->score);
 		Set_swapper_state(pl2);
+		/*
+		 * kps - previously this was Pause_player(pl2->id, ..)
+		 * which was buggy, since Pause_player took a player
+		 * index as argument. (1)
+		 */
 		if (teamZeroPausing)
-		    Pause_player(pl2->id, pl2->team == 0);
+		    Pause_player(pl2, pl2->team == 0);
 		Send_info_about_player(pl2);
 		/* This can send a huge amount of data if several
 		 * players swap. Unfortunately all player data, even
@@ -1283,8 +1288,9 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	    TEAM_SCORE(xteam, -(pl->score));
 	    TEAM_SCORE(pl->team, pl->score);
 	    Set_swapper_state(pl);
+	    /* kps - same bug was here as above (1) */
 	    if (teamZeroPausing)
-		Pause_player(pl->id, pl->team == 0);
+		Pause_player(pl, pl->team == 0);
 	    Send_info_about_player(pl);
 	    sprintf(msg, "Some players swapped teams.");
 	    Set_message(msg);

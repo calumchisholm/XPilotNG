@@ -118,10 +118,8 @@ static void Transport_to_home(int ind)
 /*
  * Turn phasing on or off.
  */
-void Phasing(int ind, int on)
+void Phasing(player *pl, int on)
 {
-    player	*pl = Players(ind);
-
     if (on) {
 	if (pl->phasing_left <= 0) {
 	    pl->phasing_left = PHASING_TIME;
@@ -157,17 +155,15 @@ void Phasing(int ind, int on)
 /*
  * Turn cloak on or off.
  */
-void Cloak(int ind, int on)
+void Cloak(player *pl, int on)
 {
-    player	*pl = Players(ind);
-
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
 	    if (!cloakedShield) {
 		if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
-		    Emergency_shield(ind, false);
+		    Emergency_shield(pl, false);
 		if (BIT(pl->used, HAS_DEFLECTOR))
-		    Deflector(ind, false);
+		    Deflector(pl, false);
 		CLR_BIT(pl->used, HAS_SHIELD);
 		CLR_BIT(pl->have, HAS_SHIELD);
 	    }
@@ -186,7 +182,7 @@ void Cloak(int ind, int on)
 	if (!cloakedShield) {
 	    if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
 		SET_BIT(pl->have, HAS_SHIELD);
-		Emergency_shield(ind, true);
+		Emergency_shield(pl, true);
 	    }
 	    if (BIT(DEF_HAVE, HAS_SHIELD) && !BIT(pl->have, HAS_SHIELD))
 		SET_BIT(pl->have, HAS_SHIELD);
@@ -199,10 +195,8 @@ void Cloak(int ind, int on)
 /*
  * Turn deflector on or off.
  */
-void Deflector(int ind, int on)
+void Deflector(player *pl, int on)
 {
-    player	*pl = Players(ind);
-
     if (on) {
 	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
 	    if (!cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
@@ -223,10 +217,8 @@ void Deflector(int ind, int on)
 /*
  * Turn emergency thrust on or off.
  */
-void Emergency_thrust (int ind, int on)
+void Emergency_thrust(player *pl, int on)
 {
-    player	*pl = Players(ind);
-
     if (on) {
 	if (pl->emergency_thrust_left <= 0) {
 	    pl->emergency_thrust_left = EMERGENCY_THRUST_TIME;
@@ -251,10 +243,8 @@ void Emergency_thrust (int ind, int on)
 /*
  * Turn emergency shield on or off.
  */
-void Emergency_shield (int ind, int on)
+void Emergency_shield (player *pl, int on)
 {
-    player	*pl = Players(ind);
-
     if (on) {
 	if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
 	    if (pl->emergency_shield_left <= 0) {
@@ -292,10 +282,8 @@ void Emergency_shield (int ind, int on)
  * automatic pilot mode any changes to the current power, turnacc, turnspeed
  * and turnresistance settings will be temporary.
  */
-void Autopilot (int ind, int on)
+void Autopilot(player *pl, int on)
 {
-    player	*pl = Players(ind);
-
     CLR_BIT(pl->status, THRUSTING);
     if (on) {
 	pl->auto_power_s = pl->power;
@@ -599,7 +587,7 @@ static void Cannon_update(void)
 			     tpl->pos.cy - c->pos.cy)
 		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
 		&& Player_is_playing(tpl)) {
-		General_tractor_beam(-1, c->pos.cx, c->pos.cy,
+		General_tractor_beam(NULL, c->pos.cx, c->pos.cy,
 				     c->item[ITEM_TRACTOR_BEAM], ind,
 				     c->tractor_is_pressor);
 		if ((c->tractor_count -= timeStep) <= 0)
@@ -708,10 +696,8 @@ static void Player_turns(void)
     }
 }
 
-static void Use_items(int i)
+static void Use_items(player *pl)
 {
-    player *pl = Players(i);
-
     if (pl->shield_time > 0) {
 	if ((pl->shield_time -= timeStep) <= 0) {
 	    pl->shield_time = 0;
@@ -728,9 +714,9 @@ static void Use_items(int i)
     if (BIT(pl->used, HAS_PHASING_DEVICE)) {
 	if ((pl->phasing_left -= timeStep) <= 0) {
 	    if (pl->item[ITEM_PHASING])
-		Phasing(i, 1);
+		Phasing(pl, true);
 	    else
-		Phasing(i, 0);
+		Phasing(pl, false);
 	}
     }
 
@@ -739,9 +725,9 @@ static void Use_items(int i)
 	    && BIT(pl->status, THRUSTING)
 	    && (pl->emergency_thrust_left -= timeStep) <= 0) {
 	    if (pl->item[ITEM_EMERGENCY_THRUST])
-		Emergency_thrust(i, true);
+		Emergency_thrust(pl, true);
 	    else
-		Emergency_thrust(i, false);
+		Emergency_thrust(pl, false);
 	}
     }
 
@@ -750,14 +736,14 @@ static void Use_items(int i)
 	    && BIT(pl->used, HAS_SHIELD)
 	    && ((pl->emergency_shield_left -= timeStep) <= 0)) {
 	    if (pl->item[ITEM_EMERGENCY_SHIELD])
-		Emergency_shield(i, true);
+		Emergency_shield(pl, true);
 	    else
-		Emergency_shield(i, false);
+		Emergency_shield(pl, false);
 	}
     }
 
     if (do_update_this_frame && BIT(pl->used, HAS_DEFLECTOR))
-	Do_deflector(i);	/* !@# no real need for do_update_this_frame */
+	Do_deflector(pl);	/* !@# no real need for do_update_this_frame */
 
     /*
      * Compute energy drainage
@@ -835,7 +821,7 @@ void Update_objects(void)
 	    if (pl->item[ITEM_LASER] <= 0 || BIT(pl->used, HAS_PHASING_DEVICE))
 		CLR_BIT(pl->used, HAS_LASER);
 	    else
-		Fire_laser(i);
+		Fire_laser(pl);
 	}
 	pl->did_shoot = false;
     }
@@ -848,7 +834,7 @@ void Update_objects(void)
 	    if (World.items[i].num < World.items[i].max
 		&& World.items[i].chance > 0
 		&& (rfrac() * World.items[i].chance) < 1.0f)
-		Place_item(i, -1);
+		Place_item(NULL, i);
     }
 
     Fuel_update();
@@ -917,7 +903,7 @@ void Update_objects(void)
 		    if ( NumPlayers - 1 > NumPseudoPlayers + NumRobots ) {
 			/* Kill player, he/she will be paused when returned
 			   to base, unless he/she wakes up. */
-			Kill_player(i, false);
+			Kill_player(pl, false);
 		    } else
 			pl->idleCount = 0;
 		}
@@ -946,7 +932,7 @@ void Update_objects(void)
 				    pl->name);
 			    Handle_player_command(pl, "team 0");
 			} else {
-			    Pause_player(i, 1);
+			    Pause_player(pl, true);
 			    sprintf(msg, "%s was paused for idling.",
 				    pl->name);
 			}
@@ -955,7 +941,7 @@ void Update_objects(void)
 		    }
 
 		    SET_BIT(pl->status, PLAYING);
-		    Go_home(i);
+		    Go_home(pl);
 		}
 		if (BIT(pl->status, SELF_DESTRUCT)) {
 		    if (selfDestructScoreMult != 0) {
@@ -966,8 +952,8 @@ void Update_objects(void)
 		    SET_BIT(pl->status, KILLED);
 		    sprintf(msg, "%s has committed suicide.", pl->name);
 		    Set_message(msg);
-		    Throw_items(i);
-		    Kill_player(i, true);
+		    Throw_items(pl);
+		    Kill_player(pl, true);
 		    updateScores = true;
 		}
 	    }
@@ -979,7 +965,7 @@ void Update_objects(void)
 	if (round_delay > 0)
 	    continue;
 
-	Use_items(i);
+	Use_items(pl);
 
 #define UPDATE_RATE 100
 
@@ -1335,7 +1321,7 @@ void Update_objects(void)
 	}
 
 	if (BIT(pl->used, HAS_TRACTOR_BEAM))
-	    Tractor_beam(i);
+	    Tractor_beam(pl);
 
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
 	    player *lpl = Player_by_id(pl->lock.pl_id);
@@ -1361,11 +1347,11 @@ void Update_objects(void)
 	if (Player_is_playing(pl))
 	    Update_tanks(&(pl->fuel));
 	if (BIT(pl->status, KILLED)) {
-	    Throw_items(i);
+	    Throw_items(pl);
 
-	    Detonate_items(i);
+	    Detonate_items(pl);
 
-	    Kill_player(i, true);
+	    Kill_player(pl, true);
 
 	    if (IS_HUMAN_PTR(pl)) {
 		if (frame_loops - pl->frame_last_busy > 60 * FPS) {
@@ -1375,7 +1361,7 @@ void Update_objects(void)
 				    "idling.", pl->name);
 			    Handle_player_command(pl, "team 0");
 			} else {
-			    Pause_player(i, 1);
+			    Pause_player(pl, true);
 			    sprintf(msg, "%s was paused for idling.",
 				    pl->name);
 	    		}

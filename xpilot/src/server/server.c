@@ -365,7 +365,7 @@ int End_game(void)
     while (NumPlayers > 0) {	/* Kick out all remaining players */
 	pl = Players(NumPlayers - 1);
 	if (pl->conn == NOT_CONNECTED) {
-	    Delete_player(NumPlayers - 1);
+	    Delete_player(pl);
 	} else {
 	    Destroy_connection(pl->conn, msg);
 	}

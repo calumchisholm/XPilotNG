@@ -85,9 +85,9 @@ int GetInd1(int id, char *file, int line)
  * Functions on player array.
  */
 
-void Pick_startpos(int ind)
+void Pick_startpos(player *pl)
 {
-    player	*pl = Players(ind);
+    int		ind = GetInd(pl->id);
     int		i, num_free;
     int		pick = 0, seen = 0;
     static int	prev_num_bases = 0;
@@ -181,16 +181,16 @@ void Pick_startpos(int ind)
 		pl->count = RECOVERY_DELAY;
 	    }
 	    else if (BIT(pl->status, PAUSE|GAME_OVER)) {
-		Go_home(ind);
+		Go_home(pl);
 	    }
 	}
     }
 }
 
 
-void Go_home(int ind)
+void Go_home(player *pl)
 {
-    player		*pl = Players(ind);
+    int			ind = GetInd(pl->id);
     int			i, cx, cy, dir, check;
     DFLOAT		vx, vy, velo;
 
@@ -232,7 +232,7 @@ void Go_home(int ind)
     pl->turnacc = pl->turnvel = 0.0;
     memset(pl->last_keyv, 0, sizeof(pl->last_keyv));
     memset(pl->prev_keyv, 0, sizeof(pl->prev_keyv));
-    Emergency_shield(ind, 0);
+    Emergency_shield(pl, false);
     Player_used_kill(pl);
 
     if (playerStartsShielded != 0) {
@@ -242,7 +242,7 @@ void Go_home(int ind)
 	    SET_BIT(pl->have, HAS_SHIELD);
 	}
 	if (BIT(pl->have, HAS_DEFLECTOR)) {
-	    Deflector(ind, true);
+	    Deflector(pl, true);
 	}
     }
     CLR_BIT(pl->status, THRUSTING);
@@ -299,9 +299,8 @@ void Compute_sensor_range(player *pl)
 /*
  * Give ship one more tank, if possible.
  */
-void Player_add_tank(int ind, long tank_fuel)
+void Player_add_tank(player *pl, long tank_fuel)
 {
-    player		*pl = Players(ind);
     long		tank_cap, add_fuel;
 
     if (pl->fuel.num_tanks < MAX_TANKS) {
@@ -320,9 +319,8 @@ void Player_add_tank(int ind, long tank_fuel)
 /*
  * Remove a tank from a ship, if possible.
  */
-void Player_remove_tank(int ind, int which_tank)
+void Player_remove_tank(player *pl, int which_tank)
 {
-    player		*pl = Players(ind);
     int			i, tank_ind;
     long		tank_fuel, tank_cap;
 
@@ -367,9 +365,8 @@ void Player_used_kill(player *pl)
  * Give player the initial number of tanks and amount of fuel.
  * Upto the maximum allowed.
  */
-static void Player_init_fuel(int ind, long total_fuel)
+static void Player_init_fuel(player *pl, long total_fuel)
 {
-    player		*pl = Players(ind);
     long		fuel = total_fuel;
     int			i;
 
@@ -384,7 +381,7 @@ static void Player_init_fuel(int ind, long total_fuel)
     fuel -= pl->fuel.sum;
 
     for (i = 1; i <= World.items[ITEM_TANK].initial; i++) {
-	Player_add_tank(ind, fuel);
+	Player_add_tank(pl, fuel);
 	fuel -= pl->fuel.tank[i];
     }
 }
@@ -413,7 +410,7 @@ int Init_player(int ind, shipobj *ship)
     }
 
     pl->fuel.sum        = World.items[ITEM_FUEL].initial << FUEL_SCALE_BITS;
-    Player_init_fuel(ind, pl->fuel.sum);
+    Player_init_fuel(pl, pl->fuel.sum);
 
     /*
      * If you don't want to allow shipshapes because the shape
@@ -700,9 +697,9 @@ void Reset_all_players(void)
 	pl = Players(i);
 	if (endOfRoundReset) {
 	    if (BIT(pl->status, PAUSE)) {
-		Player_death_reset(i, false);
+		Player_death_reset(pl, false);
 	    } else {
-		Kill_player(i, false);
+		Kill_player(pl, false);
 		if (pl != Players(i)) {
 		    /* kps - fix */
 		    /* UGLY HACK - player was deleted. */
@@ -1194,7 +1191,7 @@ void Race_game_over(void)
 		    }
 		}
 		if (BIT(pl->status, PAUSE)) {
-		    Go_home(order[i]);
+		    Go_home(pl);
 		}
 	    }
 	}
@@ -1213,9 +1210,9 @@ void Race_game_over(void)
 
 	/* Kill any remaining players */
 	if (!BIT(pl->status, GAME_OVER))
-	    Kill_player(i, false);
+	    Kill_player(pl, false);
 	else
-	    Player_death_reset(i, false);
+	    Player_death_reset(pl, false);
 
 	if (pl != Players(i)) {
 	    continue;
@@ -1340,7 +1337,7 @@ void Compute_game_status(void)
 	    }
 	    pl->last_lap = pl->time;
 	    if (pl->round > raceLaps) {
-		Player_death_reset(i);
+		Player_death_reset(pl);
 		pl->mychar = 'D';
 		SET_BIT(pl->status, GAME_OVER);
 		sprintf(msg, "%s finished the race. Last lap time: %.2fs. "
@@ -1398,7 +1395,7 @@ void Compute_game_status(void)
 		    if (!Player_is_active(pl))
 			continue;
 		    if (pl->round < pl_i->round) {
-			Player_death_reset(i);
+			Player_death_reset(pl);
 			pl->mychar = 'D';
 			SET_BIT(pl->status, GAME_OVER);
 			if (count == 1) {
@@ -1812,9 +1809,9 @@ void Compute_game_status(void)
 
 extern int game_lock;
 
-void Delete_player(int ind)
+void Delete_player(player *pl)
 {
-    player		*pl = Players(ind);
+    int			ind = GetInd(pl->id);
     object		*obj;
     int			i, j,
 			id = pl->id;
@@ -1951,7 +1948,7 @@ void Delete_player(int ind)
 	    if (keepShots) {
 		pl_i->lock.pl_id = NO_ID;
 	    } else {
-		Delete_player(i);
+		Delete_player(pl_i);
 	    }
 	    continue;
 	}
@@ -1982,7 +1979,7 @@ void Delete_player(int ind)
 	}
 	else if (IS_TANK_IND(i)) {
 	    if (pl_i->lock.pl_id == id) {
-		Delete_player(i);
+		Delete_player(pl_i);
 	    }
 	}
     }
@@ -1993,10 +1990,9 @@ void Delete_player(int ind)
     release_ID(id);
 }
 
-void Detach_ball(int ind, int obj)
+void Detach_ball(player *pl, int obj)
 {
     int			i, cnt;
-    player		*pl = Players(ind);
 
     if (obj == -1 || BALL_PTR(Obj[obj]) == pl->ball) {
 	pl->ball = NULL;
@@ -2022,33 +2018,31 @@ void Detach_ball(int ind, int obj)
     }
 }
 
-void Kill_player(int ind, bool add_rank_death)
+void Kill_player(player *pl, bool add_rank_death)
 {
-    player		*pl = Players(ind);
     /* Don't create an explosion if the player is being transported back
      * to home base after being killed. */
     if (BIT(pl->status, PLAYING)) {
-	Explode_fighter(ind);
+	Explode_fighter(pl);
     }
-    Player_death_reset(ind, add_rank_death);
+    Player_death_reset(pl, add_rank_death);
 }
 
-void Player_death_reset(int ind, bool add_rank_death)
+void Player_death_reset(player *pl, bool add_rank_death)
 {
-    player		*pl = Players(ind);
     long		minfuel;
-    int			i;
+    int			i, ind = GetInd(pl->id);
 
 
     if (IS_TANK_PTR(pl)) {
-	Delete_player(ind);
+	Delete_player(pl);
 	return;
     }
 
-    Detach_ball(ind, -1);
+    Detach_ball(pl, -1);
     if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->status, HOVERPAUSE)) {
 	CLR_BIT(pl->status, HOVERPAUSE);
-	Autopilot (ind, 0);
+	Autopilot(pl, false);
     }
 
     pl->vel.x		= pl->vel.y	= 0.0;
@@ -2081,7 +2075,7 @@ void Player_death_reset(int ind, bool add_rank_death)
     minfuel		= (World.items[ITEM_FUEL].initial * FUEL_SCALE_FACT);
     minfuel		+= (int)(rfrac() * (1 + minfuel) * 0.2f);
     pl->fuel.sum	= MAX(pl->fuel.sum, minfuel);
-    Player_init_fuel(ind, pl->fuel.sum);
+    Player_init_fuel(pl, pl->fuel.sum);
 
     /*-BA Handle the combination of limited life games and
      *-BA robotLeaveLife by making a robot leave iff it gets

@@ -590,7 +590,7 @@ void Contact(int fd, void *arg)
 			"of the game.", pl_found->name);
 		Set_message(msg);
 		if (pl_found->conn == NOT_CONNECTED) {
-		    Delete_player(found);
+		    Delete_player(pl_found);
 		} else {
 		    Destroy_connection(pl_found->conn, "kicked out");
 		}

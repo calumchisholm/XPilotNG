@@ -92,7 +92,7 @@ static void Item_update_flags(player *pl)
 	CLR_BIT(pl->have, HAS_TRACTOR_BEAM);
     if (pl->item[ITEM_AUTOPILOT] <= 0) {
 	if (BIT(pl->used, HAS_AUTOPILOT))
-	    Autopilot (GetInd(pl->id), 0);
+	    Autopilot(pl, false);
 	CLR_BIT(pl->have, HAS_AUTOPILOT);
     }
     if (pl->item[ITEM_ARMOR] <= 0)
@@ -154,7 +154,7 @@ int Choose_random_item(void)
     return i;
 }
 
-void Place_item(int item, int ind)
+void Place_item(player *pl, int item)
 {
     int			num_lose, num_per_pack,
 			bx, by,
@@ -165,7 +165,6 @@ void Place_item(int item, int ind)
     int			cx, cy;
     DFLOAT		vx, vy;
     item_concentrator_t	*con;
-    player		*pl = Players(ind);
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
 	if (pl && !BIT(pl->status, KILLED)) {
@@ -384,10 +383,9 @@ void Make_item(int cx, int cy,
     Cell_add_object(obj);
 }
 
-void Throw_items(int ind)
+void Throw_items(player *pl)
 {
     int			num_items_to_throw, remain, item;
-    player		*pl = Players(ind);
 
     if (!dropItemOnKillProb || !pl)
 	return;
@@ -399,7 +397,7 @@ void Throw_items(int ind)
 		if (num_items_to_throw <= 0) {
 		    break;
 		}
-		Place_item(item, ind);
+		Place_item(pl, item);
 		remain = pl->item[item] - World.items[item].initial;
 	    } while (remain > 0 && remain < num_items_to_throw);
 	}
@@ -413,9 +411,9 @@ void Throw_items(int ind)
  * a random direction with a small life time (ie. magazine has
  * gone off).
  */
-void Detonate_items(int ind)
+void Detonate_items(player *pl)
 {
-    player		*pl = Players(ind), *owner_pl;
+    player		*owner_pl;
     int			i;
     modifiers		mods;
 
@@ -494,9 +492,8 @@ void Detonate_items(int ind)
     }
 }
 
-void Tractor_beam(int ind)
+void Tractor_beam(player *pl)
 {
-    player	*pl = Players(ind);
     DFLOAT	maxdist, percent;
     long	cost;
 
@@ -517,16 +514,15 @@ void Tractor_beam(int ind)
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
     }
-    General_tractor_beam(ind, pl->pos.cx, pl->pos.cy,
+    General_tractor_beam(pl, pl->pos.cx, pl->pos.cy,
 			 pl->item[ITEM_TRACTOR_BEAM],
 			 GetInd(pl->lock.pl_id), pl->tractor_is_pressor);
 }
 
-void General_tractor_beam(int ind, int cx, int cy,
+void General_tractor_beam(player *pl, int cx, int cy,
 			  int items, int target, bool pressor)
 {
-    player	*pl = Players(ind),
-		*victim = Players(target);
+    player	*victim = Players(target);
     DFLOAT	maxdist = TRACTOR_MAX_RANGE(items),
 		maxforce = TRACTOR_MAX_FORCE(items),
 		percent, force, dist;
@@ -559,9 +555,8 @@ void General_tractor_beam(int ind, int cx, int cy,
 }
 
 
-void Do_deflector(int ind)
+void Do_deflector(player *pl)
 {
-    player	*pl = Players(ind);
     DFLOAT	range = (pl->item[ITEM_DEFLECTOR] * 0.5 + 1) * BLOCK_CLICKS;
     DFLOAT	maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
     object	*obj, **obj_list;
@@ -571,7 +566,7 @@ void Do_deflector(int ind)
 
     if (pl->fuel.sum < -ED_DEFLECTOR) {
 	if (BIT(pl->used, HAS_DEFLECTOR)) {
-	    Deflector(ind, false);
+	    Deflector(pl, false);
 	}
 	return;
     }
@@ -628,9 +623,9 @@ void Do_deflector(int ind)
     }
 }
 
-void Do_transporter(int ind)
+void Do_transporter(player *pl)
 {
-    player	*pl = Players(ind), *p;
+    player	*p;
     int		i, target = -1;
     DFLOAT	dist, closest = TRANSPORTER_DISTANCE * CLICK;
 
@@ -665,14 +660,13 @@ void Do_transporter(int ind)
     }
 
     /* victim found */
-    Do_general_transporter(ind, pl->pos.cx, pl->pos.cy, target, NULL, NULL);
+    Do_general_transporter(pl, pl->pos.cx, pl->pos.cy, target, NULL, NULL);
 }
 
-void Do_general_transporter(int ind, int cx, int cy, int target,
+void Do_general_transporter(player *pl, int cx, int cy, int target,
 			    int *itemp, long *amountp)
 {
-    player		*pl = Players(ind),
-			*victim = Players(target);
+    player		*victim = Players(target);
     char		msg[MSG_LEN];
     const char		*what = NULL;
     int			i;
@@ -740,7 +734,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
 	what = "a cloaking device";
 	victim->updateVisibility = 1;
 	if (!victim->item[item]) {
-	    Cloak(target, false);
+	    Cloak(victim, false);
 	}
         break;
     case ITEM_WIDEANGLE:
@@ -775,7 +769,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
     case ITEM_DEFLECTOR:
 	what = "a deflector";
 	if (!victim->item[item]) {
-	    Deflector(target, false);
+	    Deflector(victim, false);
 	}
         break;
     case ITEM_HYPERJUMP:
@@ -785,7 +779,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
 	what = "a phasing device";
 	if (!victim->item[item]) {
 	    if (BIT(victim->used, HAS_PHASING_DEVICE))
-		Phasing(target, 0);
+		Phasing(victim, false);
 	    CLR_BIT(victim->have, HAS_PHASING_DEVICE);
 	}
         break;
@@ -796,7 +790,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
 	what = "an emergency thrust";
 	if (!victim->item[item]) {
 	    if (BIT(victim->used, HAS_EMERGENCY_THRUST))
-		Emergency_thrust(target, 0);
+		Emergency_thrust(victim, false);
 	    CLR_BIT(victim->have, HAS_EMERGENCY_THRUST);
 	}
         break;
@@ -804,7 +798,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
 	what = "an emergency shield";
 	if (!victim->item[item]) {
 	    if (BIT(victim->used, HAS_EMERGENCY_SHIELD))
-		Emergency_shield(target, false);
+		Emergency_shield(victim, false);
 	    CLR_BIT(victim->have, HAS_EMERGENCY_SHIELD);
 	    if (!BIT(DEF_HAVE, HAS_SHIELD)) {
 		CLR_BIT(victim->have, HAS_SHIELD);
@@ -821,7 +815,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
 	what = "an autopilot";
 	if (!victim->item[item]) {
 	    if (BIT(victim->used, HAS_AUTOPILOT))
-		Autopilot(target, 0);
+		Autopilot(victim, false);
 	    CLR_BIT(victim->have, HAS_AUTOPILOT);
 	}
         break;
@@ -830,7 +824,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
 	what = "a tank";
 	i = (int)(rfrac() * victim->fuel.num_tanks) + 1;
 	amount = victim->fuel.tank[i];
-	Player_remove_tank(target, i);
+	Player_remove_tank(victim, i);
         break;
     case ITEM_FUEL:
 	{
@@ -910,7 +904,7 @@ void Do_general_transporter(int ind, int cx, int cy, int target,
     case ITEM_TANK:
 	/* for tanks, amount is the amount of fuel in the stolen tank */
 	if (pl->fuel.num_tanks < MAX_TANKS)
-	    Player_add_tank(ind, amount);
+	    Player_add_tank(pl, amount);
 	break;
     case ITEM_FUEL:
 	Add_fuel(&(pl->fuel), amount);
@@ -928,10 +922,9 @@ void do_hyperjump(player *pl)
     pl->wormHoleHit = -1;
 }
 
-void do_lose_item(int ind)
+void do_lose_item(player *pl)
 {
     int		item;
-    player	*pl = Players(ind);
 
     if (!pl)
 	return;
@@ -948,7 +941,7 @@ void do_lose_item(int ind)
     }
 
     if (loseItemDestroys == false && !BIT(pl->used, HAS_PHASING_DEVICE)) {
-	Place_item(item, ind);
+	Place_item(pl, item);
     }
     else {
 	pl->item[item]--;
@@ -958,7 +951,7 @@ void do_lose_item(int ind)
 }
 
 
-void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
+void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
 {
     object		*shot;
     mineobject		*closest_mine = NULL;
@@ -967,8 +960,9 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
     DFLOAT		closest_mine_range = World.hypotenuse;
     int			i, j, owner;
     DFLOAT		range, perim, damage;
-    player		*pl = Players(ind), *p;
+    player		*p;
     ecm_t		*ecm;
+    int			ind = GetInd(pl->id);
 
     if (NumEcms >= MAX_TOTAL_ECMS) {
 	return;
@@ -1180,7 +1174,7 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 			ballobject *ball = BALL_PTR(shot);
 			if (ball->owner == p->id) {
 			    if ((int)(rfrac() * 100.0f) < ((int)(20*range)+5)) {
-				Detach_ball(i, j);
+				Detach_ball(p, j);
 			    }
 			}
 		    }
@@ -1211,8 +1205,9 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
 		     */
 		    Robot_program(i, pl->lock.pl_id);
 		    for (j = 0; j < NumPlayers; j++) {
-			if (Players(j)->conn != NOT_CONNECTED) {
-			    Send_seek(Players(j)->conn, pl->id,
+			player *pl_j = Players(j);
+			if (pl_j->conn != NOT_CONNECTED) {
+			    Send_seek(pl_j->conn, pl->id,
 				      p->id, pl->lock.pl_id);
 			}
 		    }
@@ -1222,15 +1217,13 @@ void Fire_general_ecm(int ind, unsigned short team, int cx, int cy)
     }
 }
 
-void Fire_ecm(int ind)
+void Fire_ecm(player *pl)
 {
-    player		*pl = Players(ind);
-
     if (pl->item[ITEM_ECM] == 0
 	|| pl->fuel.sum <= -ED_ECM
 	|| pl->ecmcount >= MAX_PLAYER_ECMS
 	|| BIT(pl->used, HAS_PHASING_DEVICE))
 	return;
 
-    Fire_general_ecm(ind, pl->team, pl->pos.cx, pl->pos.cy);
+    Fire_general_ecm(pl, pl->team, pl->pos.cx, pl->pos.cy);
 }

@@ -577,12 +577,12 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    && (rfrac() * (8 - cannonSmartness)) >= 1) {
 	    mods.laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
 	}
-	Fire_general_laser(-1, c->team, cx, cy, dir, mods);
+	Fire_general_laser(NULL, c->team, cx, cy, dir, mods);
 	sound_play_sensors(cx, cy, FIRE_LASER_SOUND);
 	played = true;
 	break;
     case CW_ECM:
-	Fire_general_ecm(-1, c->team, cx, cy);
+	Fire_general_ecm(NULL, c->team, cx, cy);
 	c->item[ITEM_ECM]--;
 	sound_play_sensors(cx, cy, ECM_SOUND);
 	played = true;
@@ -599,7 +599,7 @@ static void Cannon_fire(int ind, int weapon, int target, int dir)
 	    < TRANSPORTER_DISTANCE * CLICK) {
 	    int item = -1;
 	    long amount = 0;
-	    Do_general_transporter(-1, cx, cy, target, &item, &amount);
+	    Do_general_transporter(NULL, cx, cy, target, &item, &amount);
 	    if (item != -1)
 		Cannon_add_item(ind, item, amount);
 	} else {

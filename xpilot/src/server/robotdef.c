@@ -150,7 +150,7 @@ static bool Check_robot_evade(int ind, int mine_i, int ship_i);
 static bool Check_robot_target(int ind, int item_cx, int item_cy, int new_mode);
 static bool Detect_hunt(int ind, int j);
 static int Rank_item_value(int ind, long itemtype);
-static bool Ball_handler(int ind);
+static bool Ball_handler(player *pl);
 
 
 /*
@@ -999,12 +999,12 @@ static bool Check_robot_target(int ind,
 	    && new_mode == RM_NAVIGATE)) {
 	if (pl->item[ITEM_ECM] > 0
 	    && item_dist < ECM_DISTANCE / 4) {
-	    Fire_ecm(ind);
+	    Fire_ecm(pl);
 	}
 	else if (pl->item[ITEM_TRANSPORTER] > 0
 		 && item_dist < TRANSPORTER_DISTANCE
 		 && pl->fuel.sum > -ED_TRANSPORTER) {
-	    Do_transporter(ind);
+	    Do_transporter(pl);
 	}
 	else if (pl->item[ITEM_LASER] > pl->num_pulses
 		 && pl->fuel.sum + ED_LASER > pl->fuel.l3
@@ -1380,10 +1380,10 @@ static int Rank_item_value(int ind, long itemtype)
     return ROBOT_HANDY_ITEM;
 }
 
-static bool Ball_handler(int ind)
+static bool Ball_handler(player *pl)
 {
-    player	*pl = Players(ind);
-    int		i,
+    int		ind = GetInd(pl->id),
+		i,
 		closest_t = -1,
 		closest_nt = -1,
 		dist,
@@ -1474,7 +1474,7 @@ static bool Ball_handler(int ind)
 	    && dist_np > closest_t_dist
 	    && clear_path
 	    && sqr(ball->vel.x) + sqr(ball->vel.y) > 60) {
-	    Detach_ball(ind, -1);
+	    Detach_ball(pl, -1);
 	    CLR_BIT(pl->used, HAS_CONNECTOR);
 	    my_data->last_thrown_ball = my_data->robot_count;
 	    CLR_BIT(my_data->longterm_mode, FETCH_TREASURE);
@@ -1875,11 +1875,11 @@ static void Robot_default_play_check_objects(int ind,
 	}
 	if (BIT(shot->type, OBJ_SMART_SHOT)) {
 	    if (*mine_dist < ECM_DISTANCE / 4)
-		Fire_ecm(ind);
+		Fire_ecm(pl);
 	}
 	if (BIT(shot->type, OBJ_MINE)) {
 	    if (*mine_dist < ECM_DISTANCE / 2)
-		Fire_ecm(ind);
+		Fire_ecm(pl);
 	}
 	if (BIT(shot->type, OBJ_HEAT_SHOT)) {
 	    CLR_BIT(pl->status, THRUSTING);
@@ -1942,7 +1942,7 @@ static void Robot_default_play(int ind)
     CLR_BIT(pl->used, HAS_SHOT | HAS_SHIELD | HAS_CLOAKING_DEVICE | HAS_LASER);
     if (BIT(pl->have, HAS_EMERGENCY_SHIELD)
 	&& !BIT(pl->used, HAS_EMERGENCY_SHIELD)) {
-	Emergency_shield(ind, true);
+	Emergency_shield(pl, true);
     }
     harvest_checked = false;
     evade_checked = false;
@@ -1959,11 +1959,11 @@ static void Robot_default_play(int ind)
 
     if (BIT(pl->have, HAS_EMERGENCY_THRUST)
 	&& !BIT(pl->used, HAS_EMERGENCY_THRUST)) {
-	Emergency_thrust(ind, 1);
+	Emergency_thrust(pl, true);
     }
 
     if (BIT(pl->have, HAS_DEFLECTOR) && !BIT(World.rules->mode, TIMING)) {
-	Deflector(ind, true);
+	Deflector(pl, true);
     }
 
     if (pl->fuel.sum <= (BIT(World.rules->mode, TIMING) ? 0 : pl->fuel.l1)) {
@@ -2302,7 +2302,7 @@ static void Robot_default_play(int ind)
 	&& !navigate_checked
 	&& !BIT(my_data->longterm_mode, TARGET_KILL|NEED_FUEL)) {
 	navigate_checked = true;
-	if (Ball_handler(ind))
+	if (Ball_handler(pl))
 	    return;
     }
     if (item_i >= 0

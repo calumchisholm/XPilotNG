@@ -227,10 +227,8 @@ bool Team_zero_pausing_available(void)
 	    && World.teams[0].NumBases > World.teams[0].NumMembers);
 }
 
-void Pause_player(int ind, int on)
+void Pause_player(player *pl, int on)
 {
-    player		*pl = Players(ind);
-
     if (on && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
 	    World.teams[pl->team].SwapperId = -1;
@@ -242,7 +240,7 @@ void Pause_player(int ind, int on)
 	updateScores = true;
 	strcpy(pl->rank->entry.logout, "paused");
 	if (BIT(pl->have, HAS_BALL))
-	    Detach_ball(ind, -1);
+	    Detach_ball(pl, -1);
     }
     else if (!on && BIT(pl->status, PAUSE)) { /* Turn pause mode off */
 	if (pl->count <= 0) {
@@ -262,7 +260,7 @@ void Pause_player(int ind, int on)
 		SET_BIT(pl->status, GAME_OVER);
 	    } else {
 		pl->mychar = ' ';
-		Go_home(ind);
+		Go_home(pl);
 		SET_BIT(pl->status, PLAYING);
 		if (BIT(World.rules->mode, LIMITED_LIVES)) {
 		    pl->life = World.rules->lives;
@@ -281,12 +279,11 @@ void Pause_player(int ind, int on)
 }
 
 
-int Handle_keyboard(int ind)
+int Handle_keyboard(player *pl)
 {
-    player  	*pl = Players(ind);
     int	    	i, j, k, key, pressed, cx, cy, dx, dy, xi, yi;
     DFLOAT  	minv;
-
+    int	    	ind = GetInd(pl->id);
 
     for (key = 0; key < NUM_KEYS; key++) {
 	if (pl->last_keyv[key / BITV_SIZE] == pl->prev_keyv[key / BITV_SIZE]) {
@@ -541,21 +538,24 @@ int Handle_keyboard(int ind)
 			break;
 		    }
 		}
-		for (i=0; i<NumPlayers; i++)
+		for (i = 0; i < NumPlayers; i++) {
+		    player *pl_i = Players(i);
 		    if (i != ind
 			&& !IS_TANK_IND(i)
-			&& pl->home_base == Players(i)->home_base) {
-			Pick_startpos(i);
+			&& pl->home_base == pl_i->home_base) {
+			Pick_startpos(pl_i);
 			sprintf(msg, "%s has taken over %s's home base.",
-				pl->name, Players(i)->name);
+				pl->name, pl_i->name);
 		    }
+		}
 		if (msg[0]) {
 		    sound_play_all(CHANGE_HOME_SOUND);
 		    Set_message(msg);
 		}
 		for (i = 0; i < NumPlayers; i++) {
-		    if (Players(i)->conn != NOT_CONNECTED) {
-			Send_base(Players(i)->conn,
+		    player *pl_i = Players(i);
+		    if (pl_i->conn != NOT_CONNECTED) {
+			Send_base(pl_i->conn,
 				  pl->id,
 				  pl->home_base);
 		    }
@@ -574,7 +574,7 @@ int Handle_keyboard(int ind)
 		break;
 
 	    case KEY_DROP_BALL:
-		Detach_ball(ind, -1);
+		Detach_ball(pl, -1);
 		break;
 
 	    case KEY_FIRE_SHOT:
@@ -732,17 +732,19 @@ int Handle_keyboard(int ind)
 
 	    case KEY_TOGGLE_AUTOPILOT:
 		if (BIT(pl->have, HAS_AUTOPILOT))
-		    Autopilot(ind, !BIT(pl->used, HAS_AUTOPILOT));
+		    Autopilot(pl, !BIT(pl->used, HAS_AUTOPILOT));
 		break;
 
 	    case KEY_EMERGENCY_THRUST:
 		if (BIT(pl->have, HAS_EMERGENCY_THRUST))
-		    Emergency_thrust(ind,!BIT(pl->used, HAS_EMERGENCY_THRUST));
+		    Emergency_thrust(pl,
+				     !BIT(pl->used, HAS_EMERGENCY_THRUST));
 		break;
 
 	    case KEY_EMERGENCY_SHIELD:
 		if (BIT(pl->have, HAS_EMERGENCY_SHIELD))
-		    Emergency_shield(ind,!BIT(pl->used, HAS_EMERGENCY_SHIELD));
+		    Emergency_shield(pl,
+				     !BIT(pl->used, HAS_EMERGENCY_SHIELD));
 		break;
 
 	    case KEY_DROP_MINE:
@@ -760,7 +762,7 @@ int Handle_keyboard(int ind)
 	    case KEY_TURN_LEFT:
 	    case KEY_TURN_RIGHT:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(ind, 0);
+		    Autopilot(pl, 0);
 		pl->turnacc = 0;
 #if 0
 		if (frame_loops % 50 == 0)
@@ -822,19 +824,19 @@ int Handle_keyboard(int ind)
 			break;
 
 		    if (BIT(pl->used, HAS_AUTOPILOT))
-			Autopilot(ind, 0);
+			Autopilot(pl, 0);
 
 		    /* toggle pause mode */
 		    /* team 0 pausing */
 		    if (teamZeroPausing && (pl->team == 0)) {
-			Pause_player(ind, 1);
+			Pause_player(pl, true);
 		    } else {
 			/* allow players who get idlepaused to unpause */
 			if (Team_zero_pausing_available()
 			    && !BIT(pl->status, PAUSE)) {
 			    Handle_player_command(pl, "team 0");
 			} else {
-			    Pause_player(ind, !BIT(pl->status, PAUSE));
+			    Pause_player(pl, !BIT(pl->status, PAUSE));
 			}
 		    }
 		    /* end team 0 pausing */
@@ -859,16 +861,16 @@ int Handle_keyboard(int ind)
 			SET_BIT(pl->status, HOVERPAUSE);
 
 			if (BIT(pl->used, HAS_EMERGENCY_THRUST))
-			    Emergency_thrust(ind, false);
+			    Emergency_thrust(pl, false);
 
 			if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
-			    Emergency_shield(ind, false);
+			    Emergency_shield(pl, false);
 
 			if (!BIT(pl->used, HAS_AUTOPILOT))
-			    Autopilot(ind, true);
+			    Autopilot(pl, true);
 
 			if (BIT(pl->used, HAS_PHASING_DEVICE))
-			    Phasing(ind, false);
+			    Phasing(pl, false);
 
 			/*
 			 * Don't allow firing while paused. Similar
@@ -880,7 +882,7 @@ int Handle_keyboard(int ind)
 			if (BIT(pl->have, HAS_SHIELD))
 			    SET_BIT(pl->used, HAS_SHIELD);
 		    } else if (pl->count <= 0) {
-			Autopilot(ind, 0);
+			Autopilot(pl, 0);
 			CLR_BIT(pl->status, HOVERPAUSE);
 			if (!BIT(pl->have, HAS_SHIELD)) {
 			    CLR_BIT(pl->used, HAS_SHIELD);
@@ -930,27 +932,27 @@ int Handle_keyboard(int ind)
 
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(ind, 0);
+		    Autopilot(pl, 0);
 		SET_BIT(pl->status, THRUSTING);
 		break;
 
 	    case KEY_CLOAK:
 		if (pl->item[ITEM_CLOAK] > 0) {
-		    Cloak(ind, !BIT(pl->used, HAS_CLOAKING_DEVICE));
+		    Cloak(pl, !BIT(pl->used, HAS_CLOAKING_DEVICE));
 		}
 		break;
 
 	    case KEY_ECM:
-		Fire_ecm(ind);
+		Fire_ecm(pl);
 		break;
 
 	    case KEY_TRANSPORTER:
-		Do_transporter(ind);
+		Do_transporter(pl);
 		break;
 
 	    case KEY_DEFLECTOR:
 		if (pl->item[ITEM_DEFLECTOR] > 0) {
-		    Deflector(ind, !BIT(pl->used, HAS_DEFLECTOR));
+		    Deflector(pl, !BIT(pl->used, HAS_DEFLECTOR));
 		}
 		break;
 
@@ -964,7 +966,7 @@ int Handle_keyboard(int ind)
 
 	    case KEY_PHASING:
 		if (BIT(pl->have, HAS_PHASING_DEVICE)) {
-		    Phasing(ind, !BIT(pl->used, HAS_PHASING_DEVICE));
+		    Phasing(pl, !BIT(pl->used, HAS_PHASING_DEVICE));
 		}
 		break;
 
@@ -985,7 +987,7 @@ int Handle_keyboard(int ind)
 		break;
 
 	    case KEY_LOSE_ITEM:
-		do_lose_item(ind);
+		do_lose_item(pl);
 		break;
 
 	    default:
@@ -997,7 +999,7 @@ int Handle_keyboard(int ind)
 	    case KEY_TURN_LEFT:
 	    case KEY_TURN_RIGHT:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(ind, 0);
+		    Autopilot(pl, 0);
 		pl->turnacc = 0;
 		if (BITV_ISSET(pl->last_keyv, KEY_TURN_LEFT)) {
 		    pl->turnacc += pl->turnspeed;
@@ -1047,7 +1049,7 @@ int Handle_keyboard(int ind)
 
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(ind, 0);
+		    Autopilot(pl, 0);
 		CLR_BIT(pl->status, THRUSTING);
 		break;
 

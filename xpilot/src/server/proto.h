@@ -96,9 +96,9 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id);
 /*
  * Prototypes for event.c
  */
-int Handle_keyboard(int);
+int Handle_keyboard(player *pl);
 bool Team_zero_pausing_available(void);
-void Pause_player(int ind, int on);
+void Pause_player(player *pl, int on);
 int Player_lock_closest(int ind, int next);
 bool team_dead(int team);
 void filter_mods(modifiers *mods);
@@ -191,10 +191,10 @@ void Item_damage(player *pl, DFLOAT prob);
 void Tank_handle_detach(player *pl);
 void Add_fuel(pl_fuel_t*, long);
 void Update_tanks(pl_fuel_t *);
-void Place_item(int type, int ind);
+void Place_item(player *pl, int type);
 int Choose_random_item(void);
-void Tractor_beam(int ind);
-void General_tractor_beam(int ind, int cx, int cy,
+void Tractor_beam(player *pl);
+void General_tractor_beam(player *pl, int cx, int cy,
 			  int items, int target, bool pressor);
 void Place_mine(player *pl);
 void Place_moving_mine(player *pl);
@@ -202,8 +202,8 @@ void Place_general_mine(player *pl, unsigned short team, long status,
 			int cx, int cy, DFLOAT vx, DFLOAT vy, modifiers mods);
 void Detonate_mines(player *pl);
 char *Describe_shot(int type, long status, modifiers mods, int hit);
-void Fire_ecm(int ind);
-void Fire_general_ecm(int ind, unsigned short team, int cx, int cy);
+void Fire_ecm(player *pl);
+void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy);
 void Connector_force(int ind);
 void Fire_shot(player *pl, int type, int dir);
 void Fire_general_shot(player *pl, unsigned short team, bool cannon,
@@ -242,15 +242,15 @@ void Wormhole_remove_from_map(int ind);
 void Team_immunity_init(void);
 void Groups_init(void);
 void Delete_shot(int ind);
-void Fire_laser(int ind);
-void Fire_general_laser(int ind, unsigned short team, int cx, int cy, int dir,
-			modifiers mods);
-void Do_deflector(int ind);
-void Do_transporter(int ind);
-void Do_general_transporter(int ind, int cx, int cy, int target,
+void Fire_laser(player *pl);
+void Fire_general_laser(player *pl, unsigned short team, int cx, int cy,
+			int dir, modifiers mods);
+void Do_deflector(player *pl);
+void Do_transporter(player *pl);
+void Do_general_transporter(player *pl, int cx, int cy, int target,
 			    int *item, long *amount);
 void do_hyperjump(player *pl);
-void do_lose_item(int ind);
+void do_lose_item(player *pl);
 void Move_smart_shot(int ind);
 void Move_mine(int ind);
 void Make_debris(
@@ -286,10 +286,10 @@ void Make_item(int cx, int cy,
 	       int vx, int vy,
 	       int item, int num_per_pack,
 	       long status);
-void Explode(int ind);
-void Explode_fighter(int ind);
-void Throw_items(int ind);
-void Detonate_items(int ind);
+/*void Explode(int ind);*/
+void Explode_fighter(player *pl);
+void Throw_items(player *pl);
+void Detonate_items(player *pl);
 void add_temp_wormholes(int xin, int yin, int xout, int yout);
 void remove_temp_wormhole(int ind);
 
@@ -326,11 +326,11 @@ int Get_player_index_by_name(char *name);
 /*player *Players(int ind);*/
 player *Players1(int ind, char *file, int line);
 int GetInd1(int id, char *file, int line);
-void Pick_startpos(int ind);
-void Go_home(int ind);
-void Compute_sensor_range(player *);
-void Player_add_tank(int ind, long tank_fuel);
-void Player_remove_tank(int ind, int which_tank);
+void Pick_startpos(player *pl);
+void Go_home(player *pl);
+void Compute_sensor_range(player *pl);
+void Player_add_tank(player *pl, long tank_fuel);
+void Player_remove_tank(player *pl, int which_tank);
 void Player_hit_armor(player *pl);
 void Player_used_kill(player *pl);
 int Init_player(int ind, shipobj *ship);
@@ -340,10 +340,10 @@ void Update_score_table(void);
 void Reset_all_players(void);
 void Check_team_members(int);
 void Compute_game_status(void);
-void Delete_player(int ind);
-void Detach_ball(int ind, int ball);
-void Kill_player(int ind, bool add_rank_death);
-void Player_death_reset(int ind, bool add_rank_death);
+void Delete_player(player *pl);
+void Detach_ball(player *pl, int ball);
+void Kill_player(player *pl, bool add_rank_death);
+void Player_death_reset(player *pl, bool add_rank_death);
 void Team_game_over(int winning_team, const char *reason);
 void Individual_game_over(int winner);
 void Race_game_over(void);
@@ -421,14 +421,13 @@ void Set_player_message(player *pl, const char *message);
 /*
  * Prototypes for update.c
  */
-void Update_radar_target(int);
 void Update_objects(void);
-void Autopilot(int ind, int on);
-void Cloak(int ind, int on);
-void Deflector(int ind, int on);
-void Emergency_thrust(int ind, int on);
-void Emergency_shield(int ind, int on);
-void Phasing(int ind, int on);
+void Autopilot(player *pl, int on);
+void Cloak(player *pl, int on);
+void Deflector(player *pl, int on);
+void Emergency_thrust(player *pl, int on);
+void Emergency_shield(player *pl, int on);
+void Phasing(player *pl, int on);
 
 /*
  * Prototypes for option.c

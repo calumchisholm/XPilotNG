@@ -1150,7 +1150,7 @@ void Delete_shot(int ind)
     case OBJ_BALL:
 	ball = BALL_PTR(shot);
 	if (ball->id != NO_ID)
-	    Detach_ball(GetInd(ball->id), ind);
+	    Detach_ball(Player_by_id(ball->id), ind);
 	else {
 	    /*
 	     * Maybe some player is still busy trying to connect to this ball.
@@ -1411,9 +1411,8 @@ void Delete_shot(int ind)
     }
 }
 
-void Fire_laser(int ind)
+void Fire_laser(player *pl)
 {
-    player	*pl = Players(ind);
     int		cx, cy;
     double	laserRepeatRate = 2;
     clpos	m_gun;
@@ -1432,15 +1431,14 @@ void Fire_laser(int ind)
 	    cy = pl->pos.cy + m_gun.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    cx = WRAP_XCLICK(cx);
 	    cy = WRAP_YCLICK(cy);
-	    Fire_general_laser(ind, pl->team, cx, cy, pl->dir, pl->mods);
+	    Fire_general_laser(pl, pl->team, cx, cy, pl->dir, pl->mods);
 	}
     }
 }
 
-void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
+void Fire_general_laser(player *pl, unsigned short team, int cx, int cy,
 			int dir, modifiers mods)
 {
-    player		*pl = Players(ind);
     int			life;
     pulseobject		*pulse;
 
@@ -1545,7 +1543,7 @@ void Connector_force(int ind)
      */
 
     ballobject		*ball = BALL_IND(ind);
-    player		*pl = Players( GetInd(ball->id) );
+    player		*pl = Player_by_id(ball->id);
     vector		D;
     DFLOAT		length, force, ratio, accell, damping;
     /* const DFLOAT		k = 1500.0, b = 2.0; */
@@ -1575,7 +1573,7 @@ void Connector_force(int ind)
 
     /* if the tether is too long or too short, release it */
     if (ABS(ratio) > maxBallConnectorRatio) {
-	Detach_ball(GetInd(ball->id), ind);
+	Detach_ball(pl, ind);
 	return;
     }
 

@@ -372,7 +372,7 @@ void Tank_handle_detach(player *pl)
 			    : NULL);
     /* Released tanks don't have tanks... */
     while (dummy->fuel.num_tanks > 0) {
-	Player_remove_tank(NumPlayers, dummy->fuel.num_tanks);
+	Player_remove_tank(dummy, dummy->fuel.num_tanks);
     }
     SET_BIT(dummy->type_ext, OBJ_EXT_TANK);
     Player_position_init_clicks(dummy, pl->pos.cx, pl->pos.cy);
@@ -453,7 +453,7 @@ void Tank_handle_detach(player *pl)
     }
 
     /* Remove tank, fuel and mass from myself */
-    Player_remove_tank(GetInd(pl->id), ct);
+    Player_remove_tank(pl, ct);
 
     for (i = 0; i < NumPlayers - 1; i++) {
 	player *pl_i = Players(i);
@@ -585,9 +585,8 @@ void Make_wreckage(
 }
 
 /* Explode a fighter */
-void Explode_fighter(int ind)
+void Explode_fighter(player *pl)
 {
-    player *pl = Players(ind);
     int min_debris;
     DFLOAT debris_range;
 

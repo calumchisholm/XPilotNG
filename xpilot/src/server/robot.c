@@ -796,11 +796,11 @@ static void Robot_create(void)
     robot->fuel.l2 = 200 * FUEL_SCALE_FACT;
     robot->fuel.l3 = 500 * FUEL_SCALE_FACT;
 
-    Pick_startpos(NumPlayers);
+    Pick_startpos(robot);
 
     (*rob_type->create)(NumPlayers, rob->config);
 
-    Go_home(NumPlayers);
+    Go_home(robot);
 
     request_ID();
     NumPlayers++;
@@ -887,12 +887,13 @@ void Robot_delete(int ind, int kicked)
     }
 
     if (ind >= 0) {
+	player *pl = Players(ind);
 	if (kicked) {
 	    sprintf(msg, "\"%s\" upset the gods and was kicked out "
-		    "of the game.", Players(ind)->name);
+		    "of the game.", pl->name);
 	    Set_message(msg);
 	}
-	Delete_player(ind);
+	Delete_player(pl);
     }
 }
 

@@ -1136,7 +1136,7 @@ static void Player_collides_with_item(int ind, object *obj)
 	 */
 	if (!BIT(old_have, HAS_SHIELD | HAS_EMERGENCY_SHIELD)
 	    && pl->item[ITEM_EMERGENCY_SHIELD] == 1) {
-	    Emergency_shield(ind, true);
+	    Emergency_shield(pl, true);
 	}
 	break;
     case ITEM_TRACTOR_BEAM:
@@ -1158,7 +1158,7 @@ static void Player_collides_with_item(int ind, object *obj)
 
     case ITEM_TANK:
 	if (pl->fuel.num_tanks < World.items[ITEM_TANK].limit) {
-	    Player_add_tank(ind, TANK_FUEL(pl->fuel.num_tanks + 1));
+	    Player_add_tank(pl, TANK_FUEL(pl->fuel.num_tanks + 1));
 	} else {
 	    Add_fuel(&(pl->fuel), TANK_FUEL(MAX_TANKS));
 	}
@@ -1537,7 +1537,7 @@ static void Player_pass_checkpoint(int ind)
 		    }
 		}
 	    }
-	    Player_death_reset(ind, false);
+	    Player_death_reset(pl, false);
 	    pl->mychar = 'D';
 	    SET_BIT(pl->status, GAME_OVER|FINISH);
 	    sprintf(msg,
