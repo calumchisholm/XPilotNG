@@ -575,9 +575,9 @@ int Handle_phasingtime(int count, int max)
 
 int Handle_rounddelay(int count, int max)
 {
-	roundDelay = count;
-	roundDelayMax = max;
-	return(0);
+    roundDelay = count;
+    roundDelayMax = max;
+    return 0;
 }
 
 int Handle_refuel(int x0, int y0, int x1, int y1)
