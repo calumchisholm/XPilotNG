@@ -1104,7 +1104,7 @@ void Robot_update(void)
 {
     player		*pl;
     int			i;
-    static int		new_robot_delay;
+    static DFLOAT	new_robot_delay;
     int			num_playing_ships;
     int			num_any_ships;
 
