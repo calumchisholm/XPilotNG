@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     xpprintf("  " COPYRIGHT ".\n"
 	   "  " TITLE " comes with ABSOLUTELY NO WARRANTY; "
 	      "for details see the\n"
-	   "  provided LICENSE file.\n\n");
+	   "  provided COPYING file.\n\n");
 
     init_error(argv[0]);
     Check_server_versions();

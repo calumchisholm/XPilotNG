@@ -190,7 +190,7 @@ SOURCE=..\..\..\INSTALL.txt
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\LICENSE
+SOURCE=..\..\..\COPYING
 # End Source File
 # Begin Source File
 

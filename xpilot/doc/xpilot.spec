@@ -77,7 +77,7 @@ gzip -fnq9 /usr/X11R6/man/man6/xp-mapedit.6
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%doc LICENSE
+%doc COPYING
 %doc README.txt
 %doc doc/CREDITS
 %doc doc/ChangeLog

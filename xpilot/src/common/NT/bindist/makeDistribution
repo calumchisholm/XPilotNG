@@ -1,5 +1,4 @@
 #!/bin/bash
-# $Id$
 # makeDistribution - a script to move things to a directory to make the build script
 #                    and then call makensis to build a Windows binary distribution for
 #                    XPilot, a multiplayer gravity war game.  
@@ -271,7 +270,7 @@ echo "OutFile $TITLE" >$XDIR/outfilename.txt
 #
 $ECHO_ON	# thanks for looking.
 cd $BASE
-cp -p LICENSE $XDIR/License.txt
+cp -p COPYING $XDIR/License.txt
 
 cd $BASE/src/client/NT
 cp -p XPilot.shp		$XDIR
