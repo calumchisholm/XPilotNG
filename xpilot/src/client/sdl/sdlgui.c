@@ -721,7 +721,6 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     if (smoothLines) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	/* this is about half the cost of drawing objects...*/
 	glEnable(GL_LINE_SMOOTH);
     }
     glCallList(polyEdgeListBase + i);

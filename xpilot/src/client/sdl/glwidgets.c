@@ -63,6 +63,8 @@ GLWidget *Init_EmptyBaseGLWidget( void )
  */
 static void Close_WidgetTree ( GLWidget **widget )
 {
+    int i;
+    
     if (!widget) return;
     if (!(*widget)) return;
     
@@ -70,6 +72,10 @@ static void Close_WidgetTree ( GLWidget **widget )
     Close_WidgetTree ( &((*widget)->children) );
         
     if ((*widget)->Close) (*widget)->Close(*widget);
+
+    /*for (i=0;i<NUM_MOUSE_BUTTONS;++i)
+    	if (*widget == target[i]) target[i]=NULL;
+    if (*widget == hovertarget) hovertarget=NULL;*/
 
     if ((*widget)->wid_info) free((*widget)->wid_info);
     free(*widget);
@@ -3458,9 +3464,9 @@ GLWidget *Init_ImageButtonWidget(const char *text,
     surface = IMG_Load(imagePath);
     if (surface) {
 	info->imageUp = SDL_GL_LoadTexture(surface, &(info->txcUp));
-	SDL_FreeSurface(surface);
 	if (width < surface->w) width = surface->w;
 	if (height < surface->h) height = surface->h;
+	SDL_FreeSurface(surface);
     } else {
 	error("Failed to load button image %s", imagePath);
     }
@@ -3468,9 +3474,9 @@ GLWidget *Init_ImageButtonWidget(const char *text,
     surface = IMG_Load(imagePath);
     if (surface) {
 	info->imageDown = SDL_GL_LoadTexture(surface, &(info->txcDown));
-	SDL_FreeSurface(surface);
 	if (width < surface->w) width = surface->w;
 	if (height < surface->h) height = surface->h;
+	SDL_FreeSurface(surface);
     } else {
 	error("Failed to load button image %s", imagePath);
     }

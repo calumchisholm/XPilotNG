@@ -495,7 +495,7 @@ void CON_Free(ConsoleInformation * console)
     }
     free(console->ConsoleLines);
     free(console->CommandLines);
-
+    free(console->Prompt);
     console->ConsoleLines = NULL;
     console->CommandLines = NULL;
     free(console);

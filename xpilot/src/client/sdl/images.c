@@ -97,6 +97,10 @@ static void Image_free(image_t *img) {
 	free(img->filename);
 	img->filename = NULL;
     }
+    if (img->filename != NULL) {
+	free(img->filename);
+	img->filename = NULL;
+    }
     if (img->state == IMG_STATE_READY) {
 	glDeleteTextures(1, &img->name);
 	/* this causes a Segmentation Fault for some reason
