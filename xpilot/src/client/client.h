@@ -322,6 +322,7 @@ extern bool	showRealName;		/* Show realname instead of nickname */
 extern char	nickname[MAX_CHARS];	/* Nick-name of player */
 extern char	realname[MAX_CHARS];	/* Real name of player */
 extern char	servername[MAX_CHARS];	/* Name of server connecting to */
+extern char	hostname[];		/* Local hostname */
 extern unsigned	version;		/* Version of the server */
 extern bool	scoresChanged;
 extern bool	toggle_shield;		/* Are shields toggled by a press? */

@@ -67,52 +67,50 @@ static void Dummy_paintItemSymbol(unsigned char type, Drawable drawable,
 				  GC mygc, int x, int y, int color) {}
 #endif
 
-extern char	hostname[];
-
 
 /*
  * Miscellaneous recording functions.
  * These are only called when (recording == true).
  */
-static void RWriteByte(unsigned char i)
+static void RWriteByte(uint8_t value)
 {
-    putc(i, recordFP);
+    putc(value, recordFP);
 }
 
-static void RWriteShort(short i)
+static void RWriteShort(int16_t value)
 {
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
 }
 
-static void RWriteUShort(unsigned short i)
+static void RWriteUShort(uint16_t value)
 {
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
 }
 
-static void RWriteLong(long i)
+static void RWriteLong(int32_t value)
 {
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
 }
 
-static void RWriteULong(unsigned long i)
+static void RWriteULong(uint32_t value)
 {
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
-    i >>= 8;
-    putc(i, recordFP);
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
+    value >>= 8;
+    putc(value, recordFP);
 }
 
 static void RWriteString(char *str)
