@@ -39,12 +39,6 @@ or rather better than it used to work on low fps. This should work on all maps,
 not just on maps that have oldthrust option not equal to zero etc.
 Developer: kps
 
-Task: Extend xpilot ng network protocol so that polygon styles can be changed
-during the game. Current idea is to send to the client the polygon index and
-the new style index for that polygon. This feature can then be used to make
-e.g. polygon cannons disappear.
-Developer: kps
-
 Task: Make wormholes warp other objects than players.
 Developer: kps
 
@@ -115,14 +109,6 @@ Developer: kps
 Task: Add support for more map objects in mapconvert.py. Also possibly add
 a default texture file for these converted maps.
 Developer: kps
-
-Task: Fix pausing so that player state is reset properly when pausing.
-E.g. your ship should not continue fireing when paused, you should be able
-to use all your items after unpausing etc.
-Developer: kps
-
-Task: Code to make ship push it self away from a wall when turning, "turnpush".
-Developer: throat
 
 Task: When server op does total reset to start a new match, don't clear scores
 of pausing players.
