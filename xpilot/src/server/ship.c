@@ -52,7 +52,7 @@ void Make_thrust_sparks(player_t *pl)
 
     sound_play_sensors(pl->pos, THRUST_SOUND);
 
-    afterburners = (BIT(pl->used, HAS_EMERGENCY_THRUST)
+    afterburners = (Player_uses_emergency_thrust(pl)
 		    ? MAX_AFTERBURNER
 		    : pl->item[ITEM_AFTERBURNER]);
     alt_sparks = tot_sparks * afterburners * (1. / (MAX_AFTERBURNER + 1));

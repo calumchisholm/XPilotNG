@@ -87,7 +87,7 @@ extern bool		updateScores;
  * Different types of attributes a player can have.
  * These are the bits of the player->have and player->used fields.
  */
-#define HAS_EMERGENCY_THRUST	(1U<<30)
+#define USES_EMERGENCY_THRUST	(1U<<30)
 #define HAS_AUTOPILOT		(1U<<29)
 #define USES_TRACTOR_BEAM	(1U<<28)
 #define HAS_LASER		(1U<<27)
@@ -524,6 +524,29 @@ static inline bool Player_uses_emergency_shield(player_t *pl)
     return false;
 }
 
+static inline bool Player_has_emergency_thrust(player_t *pl)
+{
+    if (pl->item[ITEM_EMERGENCY_THRUST] > 0
+	|| pl->emergency_thrust_left > 0.0)
+	return true;
+    return false;
+}
+
+static inline bool Player_uses_emergency_thrust(player_t *pl)
+{
+    if (BIT(pl->used, USES_EMERGENCY_THRUST))
+	return true;
+    return false;
+}
+
+static inline bool Player_has_phasing_device(player_t *pl)
+{
+    if (pl->item[ITEM_PHASING] > 0
+	|| pl->phasing_left > 0.0)
+	return true;
+    return false;
+}
+
 static inline bool Player_is_phasing(player_t *pl)
 {
     if (BIT(pl->used, USES_PHASING_DEVICE))
@@ -534,14 +557,6 @@ static inline bool Player_is_phasing(player_t *pl)
 static inline bool Player_is_cloaked(player_t *pl)
 {
     if (BIT(pl->used, USES_CLOAKING_DEVICE))
-	return true;
-    return false;
-}
-
-static inline bool Player_has_phasing_device(player_t *pl)
-{
-    if (pl->item[ITEM_PHASING] > 0
-	|| pl->phasing_left > 0.0)
 	return true;
     return false;
 }

@@ -178,18 +178,14 @@ void Emergency_thrust(player_t *pl, bool on)
 	    pl->emergency_thrust_left = EMERGENCY_THRUST_TIME;
 	    pl->item[ITEM_EMERGENCY_THRUST]--;
 	}
-	if (!BIT(pl->used, HAS_EMERGENCY_THRUST)) {
-	    SET_BIT(pl->used, HAS_EMERGENCY_THRUST);
+	if (!Player_uses_emergency_thrust(pl)) {
+	    SET_BIT(pl->used, USES_EMERGENCY_THRUST);
 	    sound_play_sensors(pl->pos, EMERGENCY_THRUST_ON_SOUND);
 	}
     } else {
-	if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
-	    CLR_BIT(pl->used, HAS_EMERGENCY_THRUST);
+	if (Player_uses_emergency_thrust(pl)) {
+	    CLR_BIT(pl->used, USES_EMERGENCY_THRUST);
 	    sound_play_sensors(pl->pos, EMERGENCY_THRUST_OFF_SOUND);
-	}
-	if (pl->emergency_thrust_left <= 0) {
-	    if (pl->item[ITEM_EMERGENCY_THRUST] <= 0)
-		CLR_BIT(pl->have, HAS_EMERGENCY_THRUST);
 	}
     }
 }
@@ -289,7 +285,7 @@ static void do_Autopilot (player_t *pl)
     if (pl->item[ITEM_AUTOPILOT])
 	delta *= pl->item[ITEM_AUTOPILOT];
 
-    if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
+    if (Player_uses_emergency_thrust(pl)) {
 	afterburners = MAX_AFTERBURNER;
 	if (delta < emergency_thrust_settings_delta)
 	    delta = emergency_thrust_settings_delta;
@@ -647,11 +643,11 @@ static void Use_items(player_t *pl)
 	}
     }
 
-    if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
+    if (Player_uses_emergency_thrust(pl)) {
 	if (pl->fuel.sum > 0
 	    && Player_is_thrusting(pl)
 	    && (pl->emergency_thrust_left -= timeStep) <= 0) {
-	    if (pl->item[ITEM_EMERGENCY_THRUST])
+	    if (pl->item[ITEM_EMERGENCY_THRUST] > 0)
 		Emergency_thrust(pl, true);
 	    else
 		Emergency_thrust(pl, false);
@@ -939,7 +935,7 @@ static void Update_players(world_t *world)
 	if (Player_is_thrusting(pl)) {
 	    double power = pl->power;
 	    double f = pl->power * 0.0008;	/* 1/(FUEL_SCALE*MIN_POWER) */
-	    int a = (BIT(pl->used, HAS_EMERGENCY_THRUST)
+	    int a = (Player_uses_emergency_thrust(pl)
 		     ? MAX_AFTERBURNER
 		     : pl->item[ITEM_AFTERBURNER]);
 	    double inert = pl->mass;

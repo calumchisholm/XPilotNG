@@ -383,7 +383,7 @@ static int Frame_status(connection_t *conn, player_t *pl)
     if (n <= 0)
 	return 0;
 
-    if (BIT(pl->used, HAS_EMERGENCY_THRUST))
+    if (Player_uses_emergency_thrust(pl))
 	Send_thrusttime(conn,
 			(int) pl->emergency_thrust_left,
 			EMERGENCY_THRUST_TIME);

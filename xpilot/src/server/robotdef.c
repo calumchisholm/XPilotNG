@@ -1853,8 +1853,8 @@ static void Robot_default_play(player_t *pl)
 	&& pl->fuel.sum > my_data->fuel_l2)
 	SET_BIT(pl->used, USES_CLOAKING_DEVICE);
 
-    if (BIT(pl->have, HAS_EMERGENCY_THRUST)
-	&& !BIT(pl->used, HAS_EMERGENCY_THRUST))
+    if (Player_has_emergency_thrust(pl)
+	&& !Player_uses_emergency_thrust(pl))
 	Emergency_thrust(pl, true);
 
     if (pl->item[ITEM_DEFLECTOR] > 0

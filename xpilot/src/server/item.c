@@ -37,10 +37,6 @@ static void Item_update_flags(player_t *pl)
 {
     if (pl->item[ITEM_CLOAK] <= 0)
 	pl->updateVisibility = true;
-    if (pl->item[ITEM_EMERGENCY_THRUST] <= 0
-	&& !BIT(pl->used, HAS_EMERGENCY_THRUST)
-	&& pl->emergency_thrust_left <= 0)
-	CLR_BIT(pl->have, HAS_EMERGENCY_THRUST);
     if (pl->item[ITEM_EMERGENCY_SHIELD] <= 0
 	&& !BIT(pl->used, HAS_EMERGENCY_SHIELD)
 	&& pl->emergency_shield_left <= 0) {
@@ -712,11 +708,8 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
         break;
     case ITEM_EMERGENCY_THRUST:
 	what = "an emergency thrust";
-	if (!victim->item[item]) {
-	    if (BIT(victim->used, HAS_EMERGENCY_THRUST))
-		Emergency_thrust(victim, false);
-	    CLR_BIT(victim->have, HAS_EMERGENCY_THRUST);
-	}
+	if (!Player_has_emergency_thrust(victim))
+	    Emergency_thrust(victim, false);
         break;
     case ITEM_EMERGENCY_SHIELD:
 	what = "an emergency shield";
@@ -804,7 +797,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     case ITEM_PHASING:
 	break;
     case ITEM_EMERGENCY_THRUST:
-	SET_BIT(pl->have, HAS_EMERGENCY_THRUST);
 	break;
     case ITEM_EMERGENCY_SHIELD:
 	SET_BIT(pl->have, HAS_EMERGENCY_SHIELD);
