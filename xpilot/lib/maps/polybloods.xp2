@@ -47,6 +47,7 @@
 <Option name="shotswallbounce" value="no"/>
 <Option name="dataURL" value="http://xpilot.sourceforge.net/maps/polybloods.xpd"/>
 <Option name="kineticenergyfueldrain" value="no"/>
+<Option name="ballstyles" value="false"/>
 </GeneralOptions>
 <BmpStyle id="tx3.ppm" filename="tx3.ppm" flags="1"/>
 <BmpStyle id="tx8.ppm" filename="tx8.ppm" flags="1"/>
@@ -78,8 +79,8 @@
 <Polystyle id="xpyellow" color="FFBB11" defedge="xpyellowhidden" flags="1"/>
 <Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>
 <Polystyle id="emptywhite" color="FF" defedge="white" flags="0"/>
-<Polystyle id="t2ball" color="88FF88" defedge="dummy"/>
-<Polystyle id="t4ball" color="FFFF88" defedge="dummy"/>
+<Polystyle id="t2ball" color="00FF88" defedge="dummy"/>
+<Polystyle id="t4ball" color="FFFF00" defedge="dummy"/>
 <Polygon x="87757" y="0" style="tex47rock">
 <Offset x="141" y="-282"/>
 <Offset x="3787" y="-3786"/>
