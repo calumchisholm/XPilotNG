@@ -1,0 +1,30 @@
+Problem: Lasers can sometimes shoot through walls. appears to be due to the fact
+	 that the drawing of the lasers start inside a wall.
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files affected:
+
+Problem: op command can take a + sign with no argument
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files affected:
+
+Problem :Bouncing laser shots dont kill yourself possibly make your own lasers deadly to your self	   or atleast an option that stipulates that, along with an option for laserfirerepeatrate l	     Like shots so you can have a solid laser beam.
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files affected:
+
+Problem: 
+Found by:
+Solution:
+Fixed by:
+Files affected:
+
+Problem: 
+Found by:
+Solution:
+Fixed by:
+Files affected:
