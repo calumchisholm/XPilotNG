@@ -1,7 +1,7 @@
 
 
 Following are the installation instructions for the 
-UNIX version of XPilot.  For the Windows version
+UNIX version of Improved XPilot.  For the Windows version
 see contrib/NT/README.txt for instructions.
 
 To compile XPilot, you'll need at least:
@@ -41,40 +41,23 @@ are installed in the same way:
    - for expat the variable to change is EXPATDIR
    - for zlib the variable is ZLIBDIR
 
-NEW STYLE INSTALLATION
+RPM INSTALLATION
 
 The doc subdirectory contains an RPM spec file which you can use
-to build an XPilot RPM file.  The doc subdirectory also contains
-a patch with preferred settings for Local.config under Linux.
+to build an XPilot RPM file. (kps - needs to be updated for ng)
 
-OLD STYLE INSTALLATION
+INSTALLATION FROM SOURCE
 
 The rest of the installation just requires three steps -- geez, how easy
 can it be? :)
 
-1. Edit configuration files:
+1. Configure:
 
-   Two possibilities:
+   First run
 
-   A.) If you do have Imake:
+        ./configure --help
 
-       You must first edit Local.config to suit your environment.
-       Then issue the following command
-
-	    xmkmf -a
-
-       or, if that fails,
-
-	    xmkmf ; make Makefiles ; make includes ; make depend
-
-   B.) If you don't have Imake:
-
-       You will have to manage with src/Makefile.std.
-       Therefore cd to the src subdirectory.
-       Copy Makefile.std to Makefile and
-       edit common/config.h to suit your environment.
-       The build process will also have to be initiated
-       from the src subdirectory with make.
+   Then run configure again with your favorite options.
 
 2. Compile:
 
@@ -98,10 +81,6 @@ can it be? :)
 
         make install
 
-   and to install the manual pages, run
-
-        make install.man
-
    If you have logging enabled you will have to touch a file called
    log in the INSTLIBDIR and give other users write permission to it.
    This is necessary since xpilot isn't, and shouldn't be, set[ug]id.
@@ -111,7 +90,7 @@ can it be? :)
 
     Start a server first:
 
-        xpilots -map teamcup.xp2
+        xpilots
 
     Then start a client in another window:
 
