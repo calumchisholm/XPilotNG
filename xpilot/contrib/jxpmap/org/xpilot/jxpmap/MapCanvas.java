@@ -116,7 +116,7 @@ public class MapCanvas extends JComponent {
 
     public void setCopy(boolean copy) {
         this.copy = copy;
-    }    
+    }
 
     public void paint(Graphics _g) {
 

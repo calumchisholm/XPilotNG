@@ -400,6 +400,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
     private void saveMap () {
+        if (!validateMap()) return;
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (mapFile != null) fc.setSelectedFile(mapFile);
         if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
@@ -453,6 +454,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
     
     private void exportXml () {
+        if (!validateMap()) return;
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
@@ -580,6 +582,18 @@ public class MainFrame extends JFrame implements ActionListener {
         if (canvas.getUndoManager().canRedo())
             canvas.getUndoManager().redo();
         canvas.repaint();            
+    }
+    
+    
+    private boolean validateMap () {
+        Object[] error = canvas.getModel().validateModel();
+        if (error == null) return true;
+        canvas.setSelectedObject((MapObject)error[0]);
+        JOptionPane.showMessageDialog
+            (this, error[1], "Map validation failed",
+             JOptionPane.INFORMATION_MESSAGE);
+        canvas.repaint();             
+        return false;
     }
 
 

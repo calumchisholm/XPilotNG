@@ -200,6 +200,19 @@ public class MapModel extends ModelObject {
     public void removeObject (int index) {
         objects.remove(index);
     }
+    
+    public Object[] validateModel () {
+        for (Iterator i = objects.iterator(); i.hasNext();) {
+            MapObject o = (MapObject)i.next();
+            Rectangle b = o.getBounds();
+            if (b.x < 0 || b.x >= options.size.width
+            || b.y < 0 || b.y >= options.size.height) {
+                return new Object[] {
+                o, "Object is located outside map bounds." };
+            }
+        }
+        return null;
+    }
 
 
     public void load (String name) 
