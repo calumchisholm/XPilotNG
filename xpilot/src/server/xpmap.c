@@ -260,6 +260,13 @@ static void Create_blockmap_from_polygons(world_t *world)
 	World_set_block(world, blk, ITEM_CONCENTRATOR);
     }
 
+    for (i = 0; i < world->NumWormholes; i++) {
+	wormhole_t *wh = Wormhole_by_index(world, i);
+
+	blk = Clpos_to_blkpos(wh->pos);
+	World_set_block(world, blk, WORMHOLE);
+    }
+
     /* find balltargets */
     for (blk.by = 0; blk.by < world->y; blk.by++) {
 	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {

@@ -632,6 +632,7 @@ def convert(options):
 	thing.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
 	thing.loc = loc
 	thing.team = -1
+	thing.type = ''
 	if block == ASTEROIDCONC:
 	    asteroidconcs.append(thing)
 	elif block in BASES:
@@ -676,8 +677,13 @@ def convert(options):
 	elif block == TARGET:
 	    targets.append(thing)
 	elif block in WORMHOLES:
-	    print >>sys.stderr, "WARNING: can't yet convert wormholes."
-	    continue
+	    if map[loc] == '@':
+		thing.type = 'normal'
+	    elif map[loc] == '(':
+		thing.type = 'in'
+	    elif map[loc] == ')':
+		thing.type = 'out'
+	    wormholes.append(thing)
     if not bases:
 	print >>sys.stderr, "Map has no bases???"
 	sys.exit(1)
@@ -862,6 +868,16 @@ def convert(options):
 	print '</Polygon></Cannon>'
     for iconc in itemconcs:
 	print '<ItemConcentrator x="%d" y="%d"/>' % (iconc.x, iconc.y)
+    for wormhole in wormholes:
+	print '<Wormhole x="%d" y="%d" type="%s">' % \
+		(wormhole.x, wormhole.y, wormhole.type)
+	if wormhole.type != 'out':
+	    print '<Polygon x="%d" y="%d" style="xpblue">' % \
+		(wormhole.x - 1120, wormhole.y - 1120)
+	    print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
+	    print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
+	    print '</Polygon>'
+	print '</Wormhole>'
     print "</XPilotMap>"
     print >> sys.stderr, "done."
 
