@@ -756,12 +756,12 @@ int Contact_servers(int count, char **servers,
 {
     int			connected = false;
     const int		max_retries = 2;
-    int			i;
+    int			i, ret;
     int			status;
     sock_t		sock;
     int			retries;
     int			contacted;
-    int			compat_mode = 0 /* kps - had not default value */, ret;
+    bool		compat_mode = false;
     sockbuf_t		sbuf;			/* contact buffer */
 
 
@@ -777,7 +777,7 @@ int Contact_servers(int count, char **servers,
     if (!count) {
 	retries = 0;
 	contacted = 0;
-	compat_mode = 0;
+	compat_mode = false;
 	do {
 	    Sockbuf_clear(&sbuf);
 	    Packet_printf(&sbuf, "%u%s%hu%c", MAGIC, conpar->user_name,
@@ -823,9 +823,8 @@ int Contact_servers(int count, char **servers,
 						  auto_shutdown,
 						  shutdown_reason,
 						  conpar);
-		    if (connected != 0) {
+		    if (connected)
 			break;
-		    }
 		}
 	    }
 	} while (!contacted && retries++ < max_retries);
@@ -859,10 +858,10 @@ int Contact_servers(int count, char **servers,
 		    IFWINDOWS( Progress("Retrying %s...", servers[i]) );
 		}
 		ret = Get_contact_message(&sbuf, servers[i], conpar);
-		if (ret == 2 && compat_mode == 0) {
+		if (ret == 2 && !compat_mode) {
 		    printf("Trying compatibility version %04x\n",
 			   MAGIC2VERSION(COMPATIBILITY_MAGIC));
-		    compat_mode = 1;
+		    compat_mode = true;
 		    retries--;	/* a bit ugly, cancels the loop ++ */
 		    continue;
 		}
@@ -873,7 +872,7 @@ int Contact_servers(int count, char **servers,
 						  auto_shutdown,
 						  shutdown_reason,
 						  conpar);
-		    if (connected != 0)
+		    if (connected)
 			break;
 		}
 	    } while (!contacted && retries++ < max_retries);
