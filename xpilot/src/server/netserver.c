@@ -2187,7 +2187,7 @@ int Send_debris(int ind, int type, unsigned char *p, int n)
     return n;
 }
 
-int Send_wreckage(int ind, int x, int y, u_byte wrtype, u_byte size, u_byte rot)
+int Send_wreckage(int ind, int cx, int cy, u_byte wrtype, u_byte size, u_byte rot)
 {
     if (wreckageCollisionMayKill && Conn[ind].version > 0x4201) {
 	/* Set the highest bit when wreckage is deadly. */
@@ -2197,12 +2197,15 @@ int Send_wreckage(int ind, int x, int y, u_byte wrtype, u_byte size, u_byte rot)
     }
 
     return Packet_printf(&Conn[ind].w, "%c%hd%hd%c%c%c", PKT_WRECKAGE,
-			 x, y, wrtype, size, rot);
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
+			 wrtype, size, rot);
 }
 
-int Send_asteroid(int ind, int x, int y, u_byte type, u_byte size, u_byte rot)
+int Send_asteroid(int ind, int cx, int cy, u_byte type, u_byte size, u_byte rot)
 {
     u_byte	type_size;
+    int		x = CLICK_TO_PIXEL(cx),
+    		y = CLICK_TO_PIXEL(cy);
 
     if (Conn[ind].version < 0x4400) {
 	return Send_ecm(ind, x, y, 2 * (int) ASTEROID_RADIUS(size) / CLICK);
@@ -2241,22 +2244,24 @@ int Send_fastshot(int ind, int type, unsigned char *p, int n)
     return n;
 }
 
-int Send_missile(int ind, int x, int y, int len, int dir)
+int Send_missile(int ind, int cx, int cy, int len, int dir)
 {
-    return Packet_printf(&Conn[ind].w, "%c%hd%hd%c%c",
-			 PKT_MISSILE, x, y, len, dir);
+    return Packet_printf(&Conn[ind].w, "%c%hd%hd%c%c", PKT_MISSILE,
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), len, dir);
 }
 
-int Send_ball(int ind, int x, int y, int id)
+int Send_ball(int ind, int cx, int cy, int id)
 {
-    return Packet_printf(&Conn[ind].w, "%c%hd%hd%hd", PKT_BALL, x, y, id);
+    return Packet_printf(&Conn[ind].w, "%c%hd%hd%hd", PKT_BALL,
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id);
 }
 
-int Send_mine(int ind, int x, int y, int teammine, int id)
+int Send_mine(int ind, int cx, int cy, int teammine, int id)
 {
     connection_t	*connp = &Conn[ind];
 
-    return Packet_printf(&connp->w, "%c%hd%hd%c%hd", PKT_MINE, x, y,
+    return Packet_printf(&connp->w, "%c%hd%hd%c%hd", PKT_MINE,
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
 			 teammine, id);
 }
 
@@ -2266,8 +2271,11 @@ int Send_target(int ind, int num, int dead_time, int damage)
 			 num, dead_time, damage);
 }
 
-int Send_wormhole(int ind, int x, int y)
+int Send_wormhole(int ind, int cx, int cy)
 {
+    int		x = CLICK_TO_PIXEL(cx),
+    		y = CLICK_TO_PIXEL(cy);
+
     if (Conn[ind].version < 0x4501
 	|| (Conn[ind].version >= 0x4F09 && Conn[ind].version < 0x4F11)) {
 	const int wormStep = 5;
@@ -2289,33 +2297,37 @@ int Send_wormhole(int ind, int x, int y)
     return Packet_printf(&Conn[ind].w, "%c%hd%hd", PKT_WORMHOLE, x, y);
 }
 
-int Send_item(int ind, int x, int y, int type)
+int Send_item(int ind, int cx, int cy, int type)
 {
-    return Packet_printf(&Conn[ind].w, "%c%hd%hd%c", PKT_ITEM, x, y, type);
+    return Packet_printf(&Conn[ind].w, "%c%hd%hd%c", PKT_ITEM,
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), type);
 }
 
-int Send_paused(int ind, int x, int y, int count)
+int Send_paused(int ind, int cx, int cy, int count)
 {
-    return Packet_printf(&Conn[ind].w, "%c%hd%hd%hd", PKT_PAUSED, x, y, count);
+    return Packet_printf(&Conn[ind].w, "%c%hd%hd%hd", PKT_PAUSED,
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), count);
 }
 
-int Send_ecm(int ind, int x, int y, int size)
+int Send_ecm(int ind, int cx, int cy, int size)
 {
-    return Packet_printf(&Conn[ind].w, "%c%hd%hd%hd", PKT_ECM, x, y, size);
+    return Packet_printf(&Conn[ind].w, "%c%hd%hd%hd", PKT_ECM,
+			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), size);
 }
 
-int Send_trans(int ind, int x1, int y1, int x2, int y2)
+int Send_trans(int ind, int cx1, int cy1, int cx2, int cy2)
 {
-    return Packet_printf(&Conn[ind].w,"%c%hd%hd%hd%hd",
-			 PKT_TRANS, x1, y1, x2, y2);
+    return Packet_printf(&Conn[ind].w,"%c%hd%hd%hd%hd", PKT_TRANS,
+			 CLICK_TO_PIXEL(cx1), CLICK_TO_PIXEL(cy1),
+			 CLICK_TO_PIXEL(cx2), CLICK_TO_PIXEL(cy2));
 }
 
-int Send_ship(int ind, int x, int y, int id, int dir,
+int Send_ship(int ind, int cx, int cy, int id, int dir,
 	      int shield, int cloak, int emergency_shield, int phased, int deflector)
 {
     return Packet_printf(&Conn[ind].w,
 			 "%c%hd%hd%hd" "%c" "%c",
-			 PKT_SHIP, x, y, id,
+			 PKT_SHIP, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id,
 			 dir,
 			 (shield != 0)
 			 | ((cloak != 0) << 1)
@@ -2325,28 +2337,33 @@ int Send_ship(int ind, int x, int y, int id, int dir,
 			);
 }
 
-int Send_refuel(int ind, int x0, int y0, int x1, int y1)
+int Send_refuel(int ind, int cx0, int cy0, int cx1, int cy1)
 {
     return Packet_printf(&Conn[ind].w,
 			 "%c%hd%hd%hd%hd",
-			 PKT_REFUEL, x0, y0, x1, y1);
+			 PKT_REFUEL,
+			 CLICK_TO_PIXEL(cx0), CLICK_TO_PIXEL(cy0),
+			 CLICK_TO_PIXEL(cx1), CLICK_TO_PIXEL(cy1));
 }
 
-int Send_connector(int ind, int x0, int y0, int x1, int y1, int tractor)
+int Send_connector(int ind, int cx0, int cy0, int cx1, int cy1, int tractor)
 {
     connection_t *connp = &Conn[ind];
 
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd%hd%c",
-			 PKT_CONNECTOR, x0, y0, x1, y1, tractor);
+			 PKT_CONNECTOR,
+			 CLICK_TO_PIXEL(cx0), CLICK_TO_PIXEL(cy0),
+			 CLICK_TO_PIXEL(cx1), CLICK_TO_PIXEL(cy1), tractor);
 }
 
-int Send_laser(int ind, int color, int x, int y, int len, int dir)
+int Send_laser(int ind, int color, int cx, int cy, int len, int dir)
 {
     connection_t *connp = &Conn[ind];
 
     return Packet_printf(&connp->w, "%c%c%hd%hd%hd%c", PKT_LASER,
-			 color, x, y, len, dir);
+			 color, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
+			 CLICK_TO_PIXEL(len), dir);
 }
 
 int Send_radar(int ind, int x, int y, int size)

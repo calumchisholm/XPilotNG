@@ -640,9 +640,7 @@ static void Frame_map(int conn, int ind)
 	    int	x = (worm->pos.x * BLOCK_SZ) + BLOCK_SZ / 2,
 		y = (worm->pos.y * BLOCK_SZ) + BLOCK_SZ / 2;
 #endif
-	    int	x = CLICK_TO_PIXEL(worm->pos.cx),
-		y = CLICK_TO_PIXEL(worm->pos.cy);
-	    Send_wormhole(conn, x, y);
+	    Send_wormhole(conn, worm->pos.cx, worm->pos.cy);
 	    pl->last_wormhole_update = i;
 	    bytes_left -= max_packet * wormhole_packet_size;
 	    if (++packet_count >= max_packet) {
@@ -738,7 +736,6 @@ static void Frame_shuffle(void)
 static void Frame_shots(int conn, int ind)
 {
     player			*pl = Players[ind];
-    register int		x, y;
     int				cx, cy;
     int				i, k, color;
     int				fuzz = 0, teamshot, len;
@@ -764,8 +761,6 @@ static void Frame_shots(int conn, int ind)
 	if (!click_inview(&cv, cx, cy)) {
 	    continue;
 	}
-	x = CLICK_TO_PIXEL(cx);
-	y = CLICK_TO_PIXEL(cy);
 	if ((color = shot->color) == BLACK) {
 	    xpprintf("black %d,%d\n", shot->type, shot->id);
 	    color = WHITE;
@@ -824,14 +819,14 @@ static void Frame_shots(int conn, int ind)
 	case OBJ_WRECKAGE:
 	    if (spark_rand != 0 || wreckageCollisionMayKill) {
 		wireobject *wreck = WIRE_PTR(shot);
-		Send_wreckage(conn, x, y, (u_byte)wreck->info,
+		Send_wreckage(conn, cx, cy, (u_byte)wreck->info,
 			      wreck->size, wreck->rotation);
 	    }
 	    break;
 
 	case OBJ_ASTEROID: {
 		wireobject *ast = WIRE_PTR(shot);
-		Send_asteroid(conn, x, y,
+		Send_asteroid(conn, cx, cy,
 			      (u_byte)ast->info, ast->size, ast->rotation);
 	    }
 	    break;
@@ -864,18 +859,18 @@ static void Frame_shots(int conn, int ind)
 
 	case OBJ_TORPEDO:
 	    len =(distinguishMissiles ? TORPEDO_LEN : MISSILE_LEN);
-	    Send_missile(conn, x, y, len, shot->missile_dir);
+	    Send_missile(conn, cx, cy, len, shot->missile_dir);
 	    break;
 	case OBJ_SMART_SHOT:
 	    len =(distinguishMissiles ? SMART_SHOT_LEN : MISSILE_LEN);
-	    Send_missile(conn, x, y, len, shot->missile_dir);
+	    Send_missile(conn, cx, cy, len, shot->missile_dir);
 	    break;
 	case OBJ_HEAT_SHOT:
 	    len =(distinguishMissiles ? HEAT_SHOT_LEN : MISSILE_LEN);
-	    Send_missile(conn, x, y, len, shot->missile_dir);
+	    Send_missile(conn, cx, cy, len, shot->missile_dir);
 	    break;
 	case OBJ_BALL:
-	    Send_ball(conn, x, y, shot->id);
+	    Send_ball(conn, cx, cy, shot->id);
 	    break;
 	case OBJ_MINE:
 	    {
@@ -908,7 +903,7 @@ static void Frame_shots(int conn, int ind)
 			laid_by_team = (rfrac() < 0.5f);
 		    }
 		}
-		Send_mine(conn, x, y, laid_by_team, id);
+		Send_mine(conn, cx, cy, laid_by_team, id);
 	    }
 	    break;
 
@@ -920,7 +915,7 @@ static void Frame_shots(int conn, int ind)
 		    item_type = Choose_random_item();
 		}
 
-		Send_item(conn, x, y, item_type);
+		Send_item(conn, cx, cy, item_type);
 	    }
 	    break;
 
@@ -969,22 +964,19 @@ static void Frame_ships(int conn, int ind)
 	} else {
 	    color = RED;
 	}
-	Send_laser(conn, color, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
-		   CLICK_TO_PIXEL(pulse->len), dir);
+	Send_laser(conn, color, cx, cy, pulse->len, dir);
     }
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];
-	int x = CLICK_TO_PIXEL(ecm->pos.cx),
-	    y = CLICK_TO_PIXEL(ecm->pos.cy);
-	Send_ecm(conn, x, y, ecm->size);
+	Send_ecm(conn, ecm->pos.cx, ecm->pos.cy, ecm->size);
     }
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
 	player 	*victim = Players[GetInd[trans->target]],
 		*pl = (trans->id == NO_ID ? NULL : Players[GetInd[trans->id]]);
-	int 	x = CLICK_TO_PIXEL(pl ? pl->pos.cx : trans->pos.cx),
-		y = CLICK_TO_PIXEL(pl ? pl->pos.cy : trans->pos.cy);
-	Send_trans(conn, victim->pos.px, victim->pos.py, x, y);
+	int 	cx = (pl ? pl->pos.cx : trans->pos.cx),
+		cy = (pl ? pl->pos.cy : trans->pos.cy);
+	Send_trans(conn, victim->pos.cx, victim->pos.cy, cx, cy);
     }
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = World.cannon + i;
@@ -994,10 +986,10 @@ static void Frame_ships(int conn, int ind)
 		int j;
 		for (j = 0; j < 3; j++) {
 		    Send_connector(conn,
-				   CLICK_TO_PIXEL(t->pos.cx + t->ship->pts[j][t->dir].cx),
-				   CLICK_TO_PIXEL(t->pos.cy + t->ship->pts[j][t->dir].cy),
-				   CLICK_TO_PIXEL(cannon->pos.cx),
-				   CLICK_TO_PIXEL(cannon->pos.cy), 1);
+				   t->pos.cx + t->ship->pts[j][t->dir].cx,
+				   t->pos.cy + t->ship->pts[j][t->dir].cy,
+				   cannon->pos.cx,
+				   cannon->pos.cy, 1);
 		}
 	    }
 	}
@@ -1017,8 +1009,8 @@ static void Frame_ships(int conn, int ind)
 	}
 	if (BIT(pl_i->status, PAUSE)) {
 	    Send_paused(conn,
-			pl_i->pos.px,
-			pl_i->pos.py,
+			pl_i->pos.cx,
+			pl_i->pos.cy,
 			pl_i->count >> TIME_BITS);
 	    continue;
 	}
@@ -1032,8 +1024,8 @@ static void Frame_ships(int conn, int ind)
 	     * Transmit ship information
 	     */
 	    Send_ship(conn,
-		      pl_i->pos.px,
-		      pl_i->pos.py,
+		      pl_i->pos.cx,
+		      pl_i->pos.cy,
 		      pl_i->id,
 		      pl_i->dir,
 		      BIT(pl_i->used, HAS_SHIELD) != 0,
@@ -1053,18 +1045,18 @@ static void Frame_ships(int conn, int ind)
 			     World.fuel[pl_i->fs].pos.cx,
 			     World.fuel[pl_i->fs].pos.cy)) {
 		Send_refuel(conn,
-			    CLICK_TO_PIXEL(World.fuel[pl_i->fs].pos.cx),
-			    CLICK_TO_PIXEL(World.fuel[pl_i->fs].pos.cy),
-			    pl_i->pos.px,
-			    pl_i->pos.py);
+			    World.fuel[pl_i->fs].pos.cx,
+			    World.fuel[pl_i->fs].pos.cy,
+			    pl_i->pos.cx,
+			    pl_i->pos.cy);
 	    }
 	}
 	if (BIT(pl_i->used, HAS_REPAIR)) {
-	    int x = World.targets[pl_i->repair_target].pos.cx / CLICK;
-	    int y = World.targets[pl_i->repair_target].pos.cy / CLICK;
+	    int cx = World.targets[pl_i->repair_target].pos.cx,
+		cy = World.targets[pl_i->repair_target].pos.cy;
 	    if (click_inview(&cv, cx, cy)) {
 		/* same packet as refuel */
-		Send_refuel(conn, pl_i->pos.px, pl_i->pos.py, x, y);
+		Send_refuel(conn, pl_i->pos.cx, pl_i->pos.cy, cx, cy);
 	    }
 	}
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
@@ -1074,10 +1066,10 @@ static void Frame_ships(int conn, int ind)
 
 		for (j = 0; j < 3; j++) {
 		    Send_connector(conn,
-				   CLICK_TO_PIXEL(t->pos.cx + t->ship->pts[j][t->dir].cx),
-				   CLICK_TO_PIXEL(t->pos.cy + t->ship->pts[j][t->dir].cy),
-				   pl_i->pos.px,
-				   pl_i->pos.py, 1);
+				   t->pos.cx + t->ship->pts[j][t->dir].cx,
+				   t->pos.cy + t->ship->pts[j][t->dir].cy,
+				   pl_i->pos.cx,
+				   pl_i->pos.cy, 1);
 		}
 	    }
 	}
@@ -1085,10 +1077,10 @@ static void Frame_ships(int conn, int ind)
 	if (pl_i->ball != NULL
 	    && click_inview(&cv, pl_i->ball->pos.cx, pl_i->ball->pos.cy)) {
 	    Send_connector(conn,
-			   pl_i->ball->pos.px,
-			   pl_i->ball->pos.py,
-			   pl_i->pos.px,
-			   pl_i->pos.py, 0);
+			   pl_i->ball->pos.cx,
+			   pl_i->ball->pos.cy,
+			   pl_i->pos.cx,
+			   pl_i->pos.cy, 0);
 	}
     }
 }
