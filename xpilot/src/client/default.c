@@ -312,6 +312,56 @@ xp_option_t default_options[] = {
 	"Draws only the outline of all the wall blocks\n"
 	"on block based maps.\n"),
 
+    XP_INT_OPTION(
+	"shotSize",
+	5,
+	MIN_SHOT_SIZE,
+	MAX_SHOT_SIZE,
+	&shot_size,
+	NULL,
+	"The size of shots in pixels.\n"),
+
+    XP_INT_OPTION(
+	"teamShotSize",
+	3,
+	MIN_TEAMSHOT_SIZE,
+	MAX_TEAMSHOT_SIZE,
+	&teamshot_size,
+	NULL,
+	"The size of team shots in pixels.\n"
+	"Note that team shots are drawn in teamShotColor.\n"),
+
+    XP_INT_OPTION(
+	"charsPerSecond",
+	100,
+	10,
+	255,
+	&charsPerSecond,
+	NULL,
+	"Rate at which messages appear on screen in characters per second.\n"),
+	
+    XP_INT_OPTION(
+	"maxMessages",
+	8,
+	1,
+	MAX_MSGS,
+	&maxMessages,
+	NULL,
+	"The maximum number of messages to display at the same time.\n"),
+
+    XP_INT_OPTION(
+	"messagesToStdout",
+	0,
+	0,
+	2,
+	&messagesToStdout,
+	NULL,
+	"Send messages to standard output.\n"
+	"0: Don't.\n"
+	"1: Only player messages.\n"
+	"2: Player and status messages.\n"),
+
+
     /* fuel warning limits */
 
     XP_DOUBLE_OPTION(
@@ -397,6 +447,7 @@ xp_option_t default_options[] = {
 	getTexturePath,
 	"Search path for texture files.\n"
 	"This is a list of one or more directories separated by colons.\n"),
+
 
 
 
@@ -538,14 +589,7 @@ xp_option_t default_options[] = {
 	"Size of sparks in pixels.\n",
 	0
     },
-    {
-	"charsPerSecond",
-	NULL,
-	"100",
-	KEY_DUMMY,
-	"Speed in which messages appear on screen in characters per second.\n",
-	0
-    },
+
     {
 	"clockAMPM",
 	NULL,
@@ -565,25 +609,7 @@ xp_option_t default_options[] = {
 	"Also see the pointerButton options for use of the mouse buttons.\n",
 	0
     },
-    {
-	"maxMessages",
-	NULL,
-	"8",
-	KEY_DUMMY,
-	"The maximum number of messages to display.\n",
-	0
-    },
-    {
-	"messagesToStdout",
-	NULL,
-	"0",
-	KEY_DUMMY,
-	"Send messages to standard output.\n"
-	"0: Don't.\n"
-	"1: Only player messages.\n"
-	"2: Player and status messages.\n",
-	0
-    },
+
     {
 	"reverseScroll",
 	NULL,
@@ -612,24 +638,6 @@ xp_option_t default_options[] = {
 	0
     },
 #endif
-    {
-	"shotSize",
-	NULL,
-	"5",
-	KEY_DUMMY,
-	"The size of shots in pixels.\n",
-	0
-    },
-    {
-	"teamShotSize",
-	NULL,
-	"3",
-	KEY_DUMMY,
-	"The size of team shots in pixels.\n"
-	"Note that team shots are drawn in teamShotColor.\n",
-	0
-    },
-
 
     {
 	"backgroundPointDist",
