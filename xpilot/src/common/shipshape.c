@@ -276,7 +276,7 @@ int shape2wire(char *ship_shape_str, shipobj *w)
 				 teststr);
 		    break;
 		}
-		if (w->num_orig_points >= MAX_SHIP_PTS) {
+		if (w->num_points >= MAX_SHIP_PTS) {
 		    if (verboseShapeParsing)
 			xpprintf("Too many ship shape coordinates\n");
 		} else {
