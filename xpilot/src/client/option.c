@@ -105,8 +105,8 @@ void Usage(void)
 {
     int i;
 
-    printf("Usage: xpilot [-options ...] [server]\n"
-	   "Where options include:\n" "\n");
+    printf("Usage: %s [-options ...] [server]\n"
+	   "Where options include:\n" "\n", Program_name());
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
 
@@ -137,6 +137,11 @@ void Usage(void)
     exit(1);
 }
 
+static void Version(void)
+{
+    printf("%s %s\n", Program_name(), VERSION);
+    exit(0);
+}
 
 bool Set_noarg_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 {
@@ -970,10 +975,8 @@ void Parse_options(int *argcp, char **argvp)
     if (xpArgs.help)
 	Usage();
 
-    if (xpArgs.version) {
-	puts(TITLE);
-	exit(0);
-    }
+    if (xpArgs.version)
+	Version();
 
 }
 

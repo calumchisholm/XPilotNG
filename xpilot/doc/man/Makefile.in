@@ -36,18 +36,14 @@ POST_UNINSTALL = :
 host_triplet = @host@
 subdir = doc/man
 DIST_COMMON = README $(dist_man6_MANS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/xpilot-ng-replay.man.in \
-	$(srcdir)/xpilot-ng-sdl.man.in \
-	$(srcdir)/xpilot-ng-server.man.in \
-	$(srcdir)/xpilot-ng-x11.man.in
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = xpilot-ng-sdl.man xpilot-ng-x11.man \
-	xpilot-ng-server.man xpilot-ng-replay.man
+CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
 man6dir = $(mandir)/man6
@@ -197,14 +193,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-xpilot-ng-sdl.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-sdl.man.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-xpilot-ng-x11.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-x11.man.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-xpilot-ng-server.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-server.man.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-xpilot-ng-replay.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-replay.man.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 uninstall-info-am:
 install-man6: $(man6_MANS) $(man_MANS)
 	@$(NORMAL_INSTALL)

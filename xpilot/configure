@@ -8430,7 +8430,7 @@ fi
 done
 
 
-                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile doc/man/xpilot-ng-sdl.man doc/man/xpilot-ng-x11.man doc/man/xpilot-ng-server.man doc/man/xpilot-ng-replay.man lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
+                                                                                                                                                                          ac_config_files="$ac_config_files Makefile README doc/Makefile doc/man/Makefile lib/Makefile lib/fonts/Makefile lib/maps/Makefile lib/textures/Makefile src/Makefile src/common/Makefile src/common/version.h src/client/Makefile src/client/items/Makefile src/client/sdl/Makefile src/server/Makefile src/replay/Makefile src/replay/tools/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8999,10 +8999,6 @@ do
   "README" ) CONFIG_FILES="$CONFIG_FILES README" ;;
   "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
   "doc/man/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/man/Makefile" ;;
-  "doc/man/xpilot-ng-sdl.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xpilot-ng-sdl.man" ;;
-  "doc/man/xpilot-ng-x11.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xpilot-ng-x11.man" ;;
-  "doc/man/xpilot-ng-server.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xpilot-ng-server.man" ;;
-  "doc/man/xpilot-ng-replay.man" ) CONFIG_FILES="$CONFIG_FILES doc/man/xpilot-ng-replay.man" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "lib/fonts/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/fonts/Makefile" ;;
   "lib/maps/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/maps/Makefile" ;;

@@ -56,6 +56,11 @@ static void sigcatch(int signum)
 
 }
 
+char *Program_name(void)
+{
+    return "xpilot-ng-sdl";
+}
+
 int main(int argc, char *argv[])
 {
     bool auto_shutdown = false;

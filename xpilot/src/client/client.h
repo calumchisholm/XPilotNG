@@ -653,6 +653,11 @@ extern bool roundend;
 extern bool played_this_round;
 
 /*
+ * somewhere
+ */
+char *Program_name(void);
+
+/*
  * event.c
  */
 void Pointer_control_set_state(bool on);
