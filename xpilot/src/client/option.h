@@ -197,6 +197,12 @@ static inline xp_option_flags_t Option_get_flags(xp_option_t *opt)
     return opt->flags;
 }
 
+static inline const char *Option_get_help(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->help;
+}
+
 static inline xp_option_origin_t Option_get_origin(xp_option_t *opt)
 {
     assert(opt);
