@@ -41,6 +41,10 @@
 # define HAVE_STRING_H 1
 # define HAVE_SYS_STAT_H 1
 # define HAVE_SYS_TYPES_H 1
+# define HAVE_STRCASECMP 1
+# define HAVE_STRNCASECMP 1
+# define HAVE_LIBZ 1
+# define PACKAGE "xpilot"
 #endif
 
 #include <stdio.h>
@@ -240,6 +244,7 @@ static void Win_show_error(char *errmsg);
 # define write(x__, y__, z__) send(x__, y__, z__,0)
   /* Windows some more hacks: */
 # define getpid() _getpid()
+typedef int socklen_t;
 #endif
 
 /* Common XPilot header files. */

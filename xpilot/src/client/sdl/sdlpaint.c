@@ -25,12 +25,12 @@
     #include <sys/time.h>
 #endif
 
+#include "xpclient.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
 #include "SDL_ttf.h"
 #include "SDL_gfxPrimitives.h"
-#include "xpclient.h"
 #include "sdlpaint.h"
 #include "images.h"
 #include "console.h"
@@ -216,7 +216,7 @@ static void Scorelist_paint(widget_list_t *LI)
 static int Scorelist_init(void)
 {
     static SDL_Rect r = { 10, 240, 200, 100 };
-    scoreListFont = TTF_OpenFont(scoreListFontName, 12);
+    scoreListFont = TTF_OpenFont(scoreListFontName, 11);
     if (scoreListFont == NULL) {
 	error("opening font %s failed", scoreListFontName);
 	return -1;
@@ -228,7 +228,7 @@ static int Scorelist_init(void)
     ScoreList_widgetItem = AppendListItem(MainList,Scorelist_paint,NULL,Scorelist_reg,&r,NULL,NULL);
     return 0;
 }
-
+#ifndef _WINDOWS
 int InitConfMenu(void)
 {
     SDL_Rect bounds;
@@ -274,7 +274,7 @@ void CloseConfMenu(void)
     Close_Widget(testWidget[0]);
     Close_Widget(testWidget[1]);
 }
-
+#endif
 bool Set_scaleFactor(xp_option_t *opt, double val)
 {
     scaleFactor = val;
@@ -292,6 +292,7 @@ int Paint_init(void)
 {
     extern bool players_exposed; /* paint.c */
     int i;
+	SDL_Rect bounds;
 
     if (TTF_Init()) {
 	error("SDL_ttf initialization failed: %s", SDL_GetError());
@@ -309,7 +310,9 @@ int Paint_init(void)
 	return -1;
 
     select_bounds = NULL;
-    SDL_Rect bounds = {0,0,draw_width,draw_height};
+    bounds.x = bounds.y = 0;
+	bounds.w = draw_width;
+	bounds.h = draw_height;
     window_guiarea = register_guiarea(bounds,select_button,NULL,select_move,NULL,NULL,NULL);
 
     for (i=0;i<MAX_SCORE_OBJECTS;++i)
@@ -626,6 +629,7 @@ void Paint_score_start(void)
 {
     char	headingStr[MSG_LEN];
     SDL_Surface *header;
+	SDL_Color fg;
 
     if (showUserName)
 	strlcpy(headingStr, "NICK=USER@HOST", sizeof(headingStr));
@@ -641,10 +645,11 @@ void Paint_score_start(void)
 	    strlcat(headingStr, "LIFE", sizeof(headingStr));
 	strlcat(headingStr, " NAME", sizeof(headingStr));
     }
-    SDL_Color fg = {	(scoreColorRGBA >> 24) & 255 ,
-    	    	    	(scoreColorRGBA >> 16) & 255 ,
-    	    	    	(scoreColorRGBA >> 8) & 255  ,
-    	    	    	 scoreColorRGBA & 255 	    };
+	
+    fg.r = (scoreColorRGBA >> 24) & 255;
+	fg.g = (scoreColorRGBA >> 16) & 255;
+	fg.b = (scoreColorRGBA >> 8) & 255;
+	fg.unused = scoreColorRGBA & 255;
     SDL_FillRect(scoreListWin.surface, NULL, 0);
     header = TTF_RenderText_Blended(scoreListFont, headingStr, fg);
     if (header == NULL) {
@@ -668,6 +673,7 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
     static int		lineSpacing = -1, firstLine;
     char		scoreStr[16];
     SDL_Surface         *line;
+	SDL_Color fg;
     int     	    	color;
 
     /*
@@ -764,10 +770,10 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 	    }
 	}
     }
-    SDL_Color fg = {	(color >> 24) & 255 ,
-    	    	    	(color >> 16) & 255 ,
-    	    	    	(color >> 8) & 255  ,
-    	    	    	color & 255 	    };
+    fg.r = (color >> 24) & 255;
+	fg.g = (color >> 16) & 255;
+	fg.b = (color >> 8) & 255;
+	fg.unused = color & 255;
     line = TTF_RenderText_Blended(scoreListFont, label, fg);
     if (line == NULL) {
 	error("scorelist rendering failed: %s", SDL_GetError());

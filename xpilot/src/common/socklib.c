@@ -77,7 +77,9 @@ static int sock_set_error(sock_t *sock, int err, sock_call_t call, int line)
 {
     DEB(printf("set error %d, %d, %d.  \"%s\"\n",
 	       err, call, line, strerror(err)));
-
+#ifdef _WINDOWS
+	DEB(printf("WSAGetLastError: %d\n", WSAGetLastError()));
+#endif
     sock->error.error = err;
     sock->error.call = call;
     sock->error.line = line;
@@ -752,7 +754,7 @@ static struct hostent *sock_get_host_by_name(const char *name)
      * If you aren't connected to the net, then gethostbyname()
      * can take many minutes to time out.  WSACancelBlockingCall()
      * doesn't affect it.
-     */
+     *
     
     static char     chp[MAXGETHOSTSTRUCT+1];
     struct hostent* hp = (struct hostent*)&chp;
@@ -771,6 +773,8 @@ static struct hostent *sock_get_host_by_name(const char *name)
     }
     WSACancelAsyncRequest(h);
     return NULL;
+	*/
+	return gethostbyname(name);
 
 #endif
 }

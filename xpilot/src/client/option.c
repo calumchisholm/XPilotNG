@@ -847,7 +847,6 @@ void Get_xpilotrc_file(char *path, unsigned size)
 #else
 void Get_xpilotrc_file(char *path, unsigned size)
 {
-    /* kps - some windows pro implement this */
-#error "Function Get_xpilotrc_file() not implemented."
+	strlcpy(path, ".xpilotrc", size);
 }
 #endif /* _WINDOWS */

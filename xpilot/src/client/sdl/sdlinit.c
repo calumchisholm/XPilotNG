@@ -1,7 +1,7 @@
+#include "xpclient.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
-#include "xpclient.h"
 #include "text.h"
 #include "console.h"
 #include "sdlkeys.h"
@@ -54,7 +54,11 @@ int Init_playing_windows(void)
     videoFlags  = SDL_OPENGL;          /* Enable OpenGL in SDL          */
     videoFlags |= SDL_GL_DOUBLEBUFFER; /* Enable double buffering       */
     videoFlags |= SDL_HWPALETTE;       /* Store the palette in hardware */
+#ifndef _WINDOWS
     videoFlags |= SDL_RESIZABLE;       /* Enable window resizing        */
+#else
+	videoFlags |= SDL_FULLSCREEN;
+#endif
 
     /** This checks to see if surfaces can be stored in memory */
     if ( videoInfo->hw_available )
@@ -96,7 +100,7 @@ int Init_playing_windows(void)
     
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
-    
+
     if (fontinit(&gamefont,testfont,gamefontsize)) {
     	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
 	if (fontinit(&gamefont,defaultfont,gamefontsize))
@@ -112,7 +116,7 @@ int Init_playing_windows(void)
 	if (fontinit(&mapfont,defaultfont,mapfontsize))
 	    error("Default font failed! messagefont not available!");
     }
-        
+ 
     /*
     sdl_init_colors();
     Init_spark_colors();
@@ -174,7 +178,7 @@ static const char* Get_geometry(xp_option_t *opt)
 static xp_option_t sdlinit_options[] = {
     XP_STRING_OPTION(
 	"geometry",
-	"1024x768",
+	"1280x1024",
 	NULL,
 	0,
 	Set_geometry, NULL, Get_geometry,

@@ -15,7 +15,7 @@
 #define M_PI	3.141592654
 #endif
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -33,7 +33,7 @@ extern "C" {
 #ifdef BUILD_DLL
 #define DLLINTERFACE __declspec(dllexport)
 #else
-#define DLLINTERFACE __declspec(dllimport)
+#define DLLINTERFACE
 #endif
 #else
 #define DLLINTERFACE

@@ -51,6 +51,8 @@
 # define R_OK 4
 # define X_OK 0
 # define mkdir(A,B) _mkdir(A)
+typedef unsigned short uint16_t; /* e.g. in client.c */
+extern bool threadedDraw; /* default.c */
 #endif
 
 #include "client.h"

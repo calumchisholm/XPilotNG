@@ -1,7 +1,7 @@
+#include "xpclient.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
-#include "xpclient.h"
 #include "sdlpaint.h"
 #include "SDL_gfxPrimitives.h"
 #include "radar.h"
@@ -354,13 +354,15 @@ void Radar_guiUnReg(widget_list_t *LI)
  */
 static void Radar_paint(widget_list_t *LI)
 {
+	float xf, yf;
+
     radar_bounds.x = ((SDL_Rect *)LI->DrawData)->x;
     radar_bounds.y = ((SDL_Rect *)LI->DrawData)->y;
     radar_bounds.w = ((SDL_Rect *)LI->DrawData)->w;
     radar_bounds.h = ((SDL_Rect *)LI->DrawData)->h;
-    
-    const float	xf = (float)radar_bounds.w / (float)Setup->width;
-    const float yf = (float)radar_bounds.h / (float)Setup->height;
+
+    xf = (float)radar_bounds.w / (float)Setup->width;
+    yf = (float)radar_bounds.h / (float)Setup->height;
 
     if (instruments.showSlidingRadar) {
 

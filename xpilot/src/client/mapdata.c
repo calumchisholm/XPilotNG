@@ -88,10 +88,10 @@ int Mapdata_setup(const char *urlstr)
 	
 	if (strlen(home) == 0)
 	    sprintf(buf, "%s", DATADIR);
-	else if (home[strlen(home) - 1] == '/') 
+	else if (home[strlen(home) - 1] == PATHNAME_SEP) 
 	    sprintf(buf, "%s%s", home, DATADIR);
 	else
-	    sprintf(buf, "%s%c%s", home, '/', DATADIR);
+	    sprintf(buf, "%s%c%s", home, PATHNAME_SEP, DATADIR);
 
 	if (access(buf, F_OK) != 0) {
 	    if (mkdir(buf, S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
@@ -105,10 +105,10 @@ int Mapdata_setup(const char *urlstr)
     
     if (strlen(dir) == 0)
 	sprintf(path, "%s", name);
-    else if (dir[strlen(dir) - 1] == '/') 
+    else if (dir[strlen(dir) - 1] == PATHNAME_SEP) 
 	sprintf(path, "%s%s", dir, name);
     else
-	sprintf(path, "%s%c%s", dir, '/', name);
+	sprintf(path, "%s%c%s", dir, PATHNAME_SEP, name);
 
     if (strrchr(path, '.') == NULL) {
 	error("no extension in file name %s.", name);
@@ -209,7 +209,7 @@ static int Mapdata_extract (const char *name)
 	    return 0;
 	}
 
-	sprintf(fname, "%s%c", dir, '/');
+	sprintf(fname, "%s%c", dir, PATHNAME_SEP);
 
 	if (sscanf(buf, "%s\n%ld\n", fname + strlen(dir) + 1, &size) != 2) {
 	    error("failed to parse file info %s", buf);
@@ -218,7 +218,7 @@ static int Mapdata_extract (const char *name)
 	}
 
 	/* security check */
-	if (strchr(fname + strlen(dir) + 1, '/') != NULL) {
+	if (strchr(fname + strlen(dir) + 1, PATHNAME_SEP) != NULL) {
 	    error("file name %s is illegal", fname);
 	    gzclose(in);
 	    return 0;

@@ -163,6 +163,12 @@ void Store_option(xp_option_t *);
 	Store_option(& (option_array) [ii]); \
 } \
 
+/* For some reason VC++ 6.0 does not like inline in the following
+ * function definitions, so I'll just get rid of it.  */
+#ifdef _WINDOWS
+#define inline
+#endif
+
 static inline const char *Option_get_name(xp_option_t *opt)
 {
     assert(opt);

@@ -26,9 +26,7 @@
  *  Modified for xpilot: Juha Lindström <juhal@users.sourceforge.net>
  */
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "xpclient.h"
 #include "SDL.h"
 #include "DT_drawtext.h"
 
@@ -36,7 +34,11 @@
   #include "SDL_image.h"
 #endif
 
+#ifdef _WINDOWS
+#define __FUNCTION__ ""
+#endif
 #define PRINT_ERROR(X) fprintf(stderr, "ERROR in %s:%s(): %s\n", __FILE__, __FUNCTION__, X)
+
 
 static BitFont *BitFonts = NULL;	/* Linked list of fonts */
 

@@ -1,6 +1,6 @@
+#include "xpclient.h"
 #include <GL/gl.h>
 #include "SDL.h"
-#include "xpclient.h"
 #include "images.h"
 #include "sdlpaint.h"
 

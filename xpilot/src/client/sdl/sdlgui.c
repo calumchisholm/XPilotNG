@@ -21,10 +21,10 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "xpclient.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
-#include "xpclient.h"
 #include "sdlpaint.h"
 #include "images.h"
 #include "text.h"
@@ -158,7 +158,10 @@ void Circle(int color,
     glEnd();
 }
 
-static void vertex_callback(ipos *p, image_t *texture)
+#ifndef CALLBACK
+#define CALLBACK
+#endif
+static void CALLBACK vertex_callback(ipos *p, image_t *texture)
 {
     if (texture != NULL) {
 	glTexCoord2f(p->x / (GLfloat)texture->frame_width,
@@ -184,7 +187,6 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
 
     if (BIT(p_style.flags, STYLE_TEXTURED))
 	texture = Image_get_texture(p_style.texture);
-
     glNewList(polyListBase + i,  GL_COMPILE);
     gluTessBeginPolygon(tess, texture);
     gluTessVertex(tess, v, &p[0]);
@@ -195,6 +197,7 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
     }
     gluTessEndPolygon(tess);
     glEndList();
+
     glNewList(polyEdgeListBase + i,  GL_COMPILE);
     glBegin(GL_LINE_LOOP);
     x = y = 0;
@@ -228,9 +231,10 @@ int Gui_init(void)
 	return -1;
     }
 
-    gluTessCallback(tess, GLU_TESS_BEGIN, (_GLUfuncptr)glBegin);
-    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (_GLUfuncptr)vertex_callback);
-    gluTessCallback(tess, GLU_TESS_END, (_GLUfuncptr)glEnd);
+    gluTessCallback(tess, GLU_TESS_BEGIN, glBegin);
+	/* TODO: figure out proper casting here */
+    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (void*)vertex_callback);
+    gluTessCallback(tess, GLU_TESS_END, glEnd);
 
     for (i = 0; i < num_polygons; i++) {
 	tessellate_polygon(tess, i);
@@ -309,6 +313,11 @@ void Gui_paint_fuel(int x, int y, double fuel)
 
 void Gui_paint_base(int x, int y, int id, int team, int type)
 {
+    int color;
+    homebase_t *base = NULL;
+    other_t *other;
+    bool do_basewarning = false;
+
     switch (type) {
     case SETUP_BASE_UP:
         Image_paint(IMG_BASE_DOWN, x, y, 0, whiteRGBA);
@@ -327,11 +336,6 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
         error("Bad base dir.");
         return;
     }
-
-    int color;
-    homebase_t *base = NULL;
-    other_t *other;
-    bool do_basewarning = false;
 
     if (!(other = Other_by_id(id))) return;
 
@@ -2020,7 +2024,7 @@ static bool set_rgba_color_option(xp_option_t *opt, const char *val)
     int c = 0;
     assert(val);
     if (*val != '#') return false;
-    c = strtoll(val + 1, NULL, 16) & 0xffffffff;
+    c = strtoul(val + 1, NULL, 16) & 0xffffffff;
     *((int*)Option_get_private_data(opt)) = c;
     return true;
 }

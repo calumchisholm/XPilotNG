@@ -21,10 +21,9 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <math.h>
+#include "xpclient.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "xpclient.h"
 #include "sdlpaint.h"
 #include "images.h"
 #include "text.h"

@@ -39,6 +39,10 @@
 #include "SDL_image.h"
 #endif
 
+#ifdef _WINDOWS
+# define __FUNCTION__ ""
+# define vsnprintf _vsnprintf
+#endif
 #define PRINT_ERROR(X) fprintf(stderr, "ERROR in %s:%s(): %s\n", __FILE__, __FUNCTION__, X)
 
 /* This contains a pointer to the "topmost" console. The console that
@@ -87,9 +91,9 @@ SDL_Event *CON_Events(SDL_Event * event)
 	    default:
 		return event;
 	    }
-	} else if (event->key.keysym.mod & KMOD_ALT) {
-	    /* the console does not handle ALT combinations! */
-	    return event;
+/*	} else if (event->key.keysym.mod & KMOD_ALT) {
+	    /* the console does not handle ALT combinations! *
+	    return event;*/
 	} else {
 	    /* first of all, check if the console hide key was pressed */
 	    if (event->key.keysym.sym == Topmost->HideKey) {

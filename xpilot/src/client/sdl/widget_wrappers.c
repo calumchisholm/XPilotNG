@@ -114,8 +114,8 @@ widget_list_t *AppendListItem( widget_list_t *list,
 				void (*GuiReg)(widget_list_t *LI), void *GuiRegData,
 				void (*GuiUnReg)(widget_list_t *LI), void *GuiUnRegData )
 {
+	static widget_list_t **curr;
     if (!list) return NULL;
-    static widget_list_t **curr;
     curr = &list;
     while (*curr) {
     	curr = &((*curr)->next);
@@ -126,9 +126,9 @@ widget_list_t *AppendListItem( widget_list_t *list,
 /* do we want theese following two functions to call GuiUnReg() ? */
 int DelListItem( widget_list_t *list, widget_list_t *item )
 {
+    widget_list_t **curr = &list;
     if (!list) return 0;
     
-    widget_list_t **curr = &list;
     while (*curr) {
     	if ((*curr) == item) {
 	    widget_list_t *tmp = *curr;
@@ -143,8 +143,8 @@ int DelListItem( widget_list_t *list, widget_list_t *item )
 
 void CleanList( widget_list_t *list )
 {
-    if (!list) return;
     widget_list_t **curr = &list;
+    if (!list) return;
     while (*curr) {
     	widget_list_t *tmp = *curr;
     	*curr = (*curr)->next;
@@ -155,8 +155,8 @@ void CleanList( widget_list_t *list )
 
 void AddListGuiAreas( widget_list_t *list )
 {
-    if (!list) return;
     widget_list_t *curr = list;
+    if (!list) return;
     while (curr) {
     	if (curr->GuiReg) {
 	    curr->GuiReg(curr);
@@ -168,8 +168,8 @@ void AddListGuiAreas( widget_list_t *list )
 /* Might want this to call the last object first instead */
 void DelListGuiAreas( widget_list_t *list )
 {
-    if (!list) return;
     widget_list_t *curr = list;
+    if (!list) return;
     while (curr) {
     	if (curr->GuiUnReg) curr->GuiUnReg(curr);
 	curr = curr->next;
@@ -178,8 +178,8 @@ void DelListGuiAreas( widget_list_t *list )
 
 void DrawWidgetList( widget_list_t *list )
 {
-    if (!list) return;
     widget_list_t *curr = list;
+    if (!list) return;
     while (curr) {
     	if (curr->Draw) curr->Draw(curr);
 	curr = curr->next;

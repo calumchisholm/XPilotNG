@@ -143,9 +143,8 @@ void dumpcore(const char *fmt, ...)
 static void Win_show_error(char *s)
 {
     static int inerror = FALSE;
-    IFWINDOWS( Trace("Error: %s\n", s) );
-    if (inerror)
-	return;
+    Trace("Error: %s\n", s);
+    if (inerror) return;
     inerror = TRUE;
     {
 #ifdef   _XPILOTNTSERVER_
@@ -155,6 +154,7 @@ static void Win_show_error(char *s)
 	*/
 	xpprintf("%s %s\n", showtime(), s);
 #else
+	/*
 	if (MessageBox(NULL, s, "Error", MB_OKCANCEL | MB_TASKMODAL)
 	    == IDCANCEL) {
 # ifdef   _XPMON_
@@ -162,6 +162,7 @@ static void Win_show_error(char *s)
 # endif
 	    ExitProcess(1);
 	}
+	*/
 #endif
     }
     /* kps - moved out from ifdef block, seems to be a better idea. */

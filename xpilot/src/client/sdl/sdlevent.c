@@ -110,6 +110,7 @@ static bool find_size(int *w, int *h)
     return true;
 }
 
+#ifndef _WINDOWS
 bool Key_press_toggle_fullscreen(void)
 {
     extern int videoFlags;
@@ -140,6 +141,13 @@ bool Key_press_toggle_fullscreen(void)
     Add_message("Failed to change video mode [*Client reply*]");
     return false;
 }
+#else
+bool Key_press_toggle_fullscreen(void)
+{
+	Add_message("Changing mode does not work in windows [*Client reply*]");
+	return false;
+}
+#endif
 
 int Process_event(SDL_Event *evt)
 {

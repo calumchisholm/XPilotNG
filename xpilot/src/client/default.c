@@ -1228,7 +1228,7 @@ xp_option_t default_options[] = {
     XP_BOOL_OPTION(
 	"threadedDraw",
 	false,
-	&threadedDraw,
+	&ThreadedDraw,
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Tell Windows to do the heavy BitBlt in another thread\n"),

@@ -4,11 +4,21 @@
 extern void Game_loop(void);
 extern void Options_cleanup(void);
 extern void Store_sdlinit_options(void);
+extern void Store_sdlgui_options(void);
+
+#ifdef _WINDOWS
+/* from win32hacks.c */
+extern int Winsock_init();
+extern void Winsock_cleanup();
+#endif
 
 static void Main_shutdown(void)
 {
     Net_cleanup();
     Client_cleanup();
+#ifdef _WINDOWS
+	Winsock_cleanup();
+#endif
 }
 
 static void sigcatch(int signum)
@@ -22,7 +32,6 @@ static void sigcatch(int signum)
 
 int main(int argc, char *argv[])
 {
-    char *cp;
     bool auto_shutdown = false;
 
     init_error(argv[0]);
@@ -44,6 +53,13 @@ int main(int argc, char *argv[])
 
     /* CLIENTRANK */
     Init_saved_scores();
+
+#ifdef _WINDOWS
+	if (Winsock_init()) {
+		error("failed to initialize windows networking");
+		exit(1);
+	}
+#endif
 
     if (!Contact_servers(argc - 1, &argv[1],
 			 xpArgs.auto_connect, xpArgs.list_servers,
