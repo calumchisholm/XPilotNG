@@ -51,7 +51,7 @@ static bool in_range_acd(double dx, double dy, double dvx, double dvy,
 	return false;
 }
 
-static bool in_range_simple(int px, int py, int qx, int qy, int r)
+static bool in_range_simple(int px, int py, int qx, int qy, double r)
 {
     int dx = px - qx, dy = py - qy;
 
@@ -130,17 +130,17 @@ static bool in_range(object *obj1, object *obj2, double range)
 			      range);
 	break;
     case 1:
-	hit = in_range_acd(obj1->prevpos.cx - obj2->prevpos.cx,
-			   obj1->prevpos.cy - obj2->prevpos.cy,
-			   obj1->extmove.cx - obj2->extmove.cx,
-			   obj1->extmove.cy - obj2->extmove.cy,
+	hit = in_range_acd((double)(obj1->prevpos.cx - obj2->prevpos.cx),
+			   (double)(obj1->prevpos.cy - obj2->prevpos.cy),
+			   (double)(obj1->extmove.cx - obj2->extmove.cx),
+			   (double)(obj1->extmove.cy - obj2->extmove.cy),
 			   range);
 	break;
     case 2:
-	hit = in_range_partial(obj1->prevpos.cx - obj2->prevpos.cx,
-			       obj1->prevpos.cy - obj2->prevpos.cy,
-			       obj1->extmove.cx - obj2->extmove.cx,
-			       obj1->extmove.cy - obj2->extmove.cy,
+	hit = in_range_partial((double)(obj1->prevpos.cx - obj2->prevpos.cx),
+			       (double)(obj1->prevpos.cy - obj2->prevpos.cy),
+			       (double)(obj1->extmove.cx - obj2->extmove.cx),
+			       (double)(obj1->extmove.cy - obj2->extmove.cy),
 			       range, obj2->wall_time);
 	break;
     case 3:
@@ -163,7 +163,7 @@ static void PlayerObjectCollision(player *pl);
 static void AsteroidCollision(void);
 static void BallCollision(void);
 static void MineCollision(void);
-static void Player_collides_with_ball(player *pl, object *obj, int radius);
+static void Player_collides_with_ball(player *pl, object *obj);
 static void Player_collides_with_item(player *pl, object *obj);
 static void Player_collides_with_mine(player *pl, object *obj);
 static void Player_collides_with_debris(player *pl, object *obj);
@@ -214,7 +214,7 @@ static void PlayerCollision(void)
 	if (BIT(World.rules->mode, CRASH_WITH_PLAYER | BOUNCE_WITH_PLAYER)) {
 	    for (j = i + 1; j < NumPlayers; j++) {
 		player *pl_j = Players(j);
-		int range;
+		double range;
 
 		if (!Player_is_playing(pl_j))
 		    continue;
@@ -535,7 +535,8 @@ int CountDefensiveItems(player *pl)
 
 static void PlayerObjectCollision(player *pl)
 {
-    int		j, range, radius, obj_count;
+    int		j, obj_count;
+    double	range, radius;
     object	*obj, **obj_list;
 
     /*
@@ -634,7 +635,7 @@ static void PlayerObjectCollision(player *pl)
 	case OBJ_BALL:
 	    if (!hit)
 		continue;
-	    Player_collides_with_ball(pl, obj, radius);
+	    Player_collides_with_ball(pl, obj);
 	    if (BIT(pl->status, KILLED))
 		return;
 	    continue;
@@ -695,7 +696,7 @@ static void PlayerObjectCollision(player *pl)
 }
 
 
-static void Player_collides_with_ball(player *pl, object *obj, int radius)
+static void Player_collides_with_ball(player *pl, object *obj)
 {
     player	*kp;
     double	sc;
@@ -723,7 +724,7 @@ static void Player_collides_with_ball(player *pl, object *obj, int radius)
     }
     if (ball->owner == NO_ID) {
 	sprintf(msg, "%s was killed by a ball.", pl->name);
-	sc = Rate(0, pl->score)
+	sc = Rate(0.0, pl->score)
 		* ballKillScoreMult
 		* unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "Ball");
@@ -735,7 +736,7 @@ static void Player_collides_with_ball(player *pl, object *obj, int radius)
 
 	if (kp->id == pl->id) {
 	    strcat(msg, "  How strange!");
-	    sc = Rate(0, pl->score)
+	    sc = Rate(0.0, pl->score)
 		   * ballKillScoreMult
 		   * selfKillScoreMult;
 	    Score(pl, -sc, pl->pos, kp->name);
@@ -1020,7 +1021,7 @@ static void Player_collides_with_debris(player *pl, object *obj)
 	}
 	Set_message(msg);
 	if (!kp || kp->id == pl->id) {
-	    sc = Rate(0, pl->score)
+	    sc = Rate(0.0, pl->score)
 		   * explosionKillScoreMult
 		   * selfKillScoreMult;
 	    Score(pl, -sc, pl->pos, (kp == NULL) ? "[Explosion]" : pl->name);
@@ -1071,7 +1072,7 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 	else
 	    sprintf(msg, "%s was hit by an asteroid.", pl->name);
 	Set_message(msg);
-	sc = Rate(0, pl->score) * unownedKillScoreMult;
+	sc = Rate(0.0, pl->score) * unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "[Asteroid]");
 	if (IS_TANK_PTR(pl) && asteroidPoints > 0) {
 	    player *owner_pl = Player_by_id(pl->lock.pl_id);
@@ -1194,7 +1195,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 		sprintf(msg, "%s was killed by %s.", pl->name,
 			Describe_shot(obj->type, obj->status,
 				      obj->mods, 1));
-		sc = Rate(0, pl->score) * unownedKillScoreMult;
+		sc = Rate(0.0, pl->score) * unownedKillScoreMult;
 	    } else {
 		kp = Player_by_id(obj->id);
 		sprintf(msg, "%s was killed by %s from %s.", pl->name,
@@ -1204,7 +1205,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 		if (kp->id == pl->id) {
 		    sound_play_sensors(pl->pos, PLAYER_SHOT_THEMSELF_SOUND);
 		    strcat(msg, "  How strange!");
-		    sc = Rate(0, pl->score) * selfKillScoreMult;
+		    sc = Rate(0.0, pl->score) * selfKillScoreMult;
 		} else {
 		    Rank_AddKill(kp);
 		    sc = Rate(kp->score, pl->score);
