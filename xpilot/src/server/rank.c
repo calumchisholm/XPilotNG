@@ -25,8 +25,6 @@ char rank_version[] = VERSION;
 /* MAX_SCORES = how many players we remember */
 #define MAX_SCORES 250
 
-#define XPILOTSCOREFILE		"XPILOTSCOREFILE"
-#define XPILOTNOJSRANKINGPAGE	"XPILOTNOJSRANKINGPAGE"
 #define RANKING_SERVER		"Ranking server"
 
 #define PAGEHEAD \
@@ -114,7 +112,7 @@ static void SortRankings(void)
 	rankinfo_t *score = &scores[k];
 	double attenuation, kills, sc, kd, kr, hf;
 
-	if (score->name[0] == '\0')
+	if (strlen(score->name) == 0)
 	    continue;
 
 	/* The attenuation affects players with less than 300 rounds. */
@@ -179,19 +177,19 @@ static void SortRankings(void)
 	const double factorKD = (highKD != 0.0) ? (100.0 / highKD) : 0.0;
 	const double factorKR = (highKR != 0.0) ? (100.0 / highKR) : 0.0;
 	const double factorHF = (highHF != 0.0) ? (100.0 / highHF) : 0.0;
-	int ranked_players = 0;
 	int i;
 
+	rank_entries = 0;
 	for (i = 0; i < MAX_SCORES; i++) {
 	    rankinfo_t *score = &scores[i];
 	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf;
 
 	    rank_base[i].ind = i;
-	    if (score->name[0] == '\0') {
+	    if (strlen(score->name) == 0) {
 		rank_base[i].ratio = -1;
 		continue;
 	    }
-	    ranked_players++;
+	    rank_entries++;
 
 	    sc = sc_table[i];
 	    kd = kd_table[i];
@@ -206,10 +204,9 @@ static void SortRankings(void)
 	    rank_base[i].ratio
 		= 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
 	}
-	rank_entries = ranked_players;
 
 	/* And finally we sort the ranks, wheee! */
-	qsort(rank_base, ranked_players, sizeof(rank_t), rank_cmp);
+	qsort(rank_base, MAX_SCORES, sizeof(rank_t), rank_cmp);
     }
 }
 
@@ -246,57 +243,58 @@ void Rank_write_webpage(void)
 	"<hr>%s<BR>\n\n"	/* <-- Insert time here. */
 	"</body></html>";
 
+    char *filename;
+    FILE *file;
+    int i;
+
     SortRankings();
 
-    if (getenv(XPILOTNOJSRANKINGPAGE) != NULL) {
-	FILE *const file = fopen(getenv(XPILOTNOJSRANKINGPAGE), "w");
+    filename = getenv("XPILOTNOJSRANKINGPAGE");
+    if (!filename)
+	return;
 
-	if (file != NULL) {
-	    int i;
-
-	    fprintf(file, "%s", headernojs);
-	    for (i = 0; i < MAX_SCORES; i++) {
-		const int j = rank_base[i].ind;
-		const rankinfo_t *score = &scores[j];
-
-		if (score->name[0] != '\0') {
-		    fprintf(file,
-			    "<tr><td align=left><tt>%d</tt>"
-			    "<td align=left><b>%s</b>"
-			    "<td align=right>%.1f"
-			    "<td align=right>%u"
-			    "<td align=right>%u"
-			    "<td align=right>%u"
-			    "<td align=right>%u"
-			    "<td align=center>%u/%u/%u/%u/%.2f"
-			    "<td align=right>%.1f"
-			    "<td align=right>%s"
-			    "<td align=left>%s"
-			    "<td align=center>%s\n"
-			    "</tr>\n",
-			    i + 1,
-			    score->name,
-			    score->score,
-			    score->kills,
-			    score->deaths,
-			    score->rounds,
-			    score->shots,
-			    score->ballsCashed,
-			    score->ballsSaved,
-			    score->ballsWon,
-			    score->ballsLost,
-			    score->bestball,
-			    rank_base[i].ratio,
-			    score->user,
-			    score->host,
-			    score->logout);
-		}
-	    }
-	    fprintf(file, footer, rank_showtime());
-	    fclose(file);
-	} else
-	    error("Could not open the rank file.");
+    file = fopen(filename, "w");
+    if (!file) {
+	error("Couldn't open ranking file \"%s\" for writing", filename);
+	return;
     }
+
+    fprintf(file, "%s", headernojs);
+
+    for (i = 0; i < MAX_SCORES; i++) {
+	const int j = rank_base[i].ind;
+	const rankinfo_t *score = &scores[j];
+
+	if (strlen(score->name) == 0)
+	    continue;
+
+	fprintf(file,
+		"<tr><td align=left><tt>%d</tt>"
+		"<td align=left><b>%s</b>"
+		"<td align=right>%.1f"
+		"<td align=right>%u"
+		"<td align=right>%u"
+		"<td align=right>%u"
+		"<td align=right>%u"
+		"<td align=center>%u/%u/%u/%u/%.2f"
+		"<td align=right>%.2f"
+		"<td align=right>%s"
+		"<td align=left>%s"
+		"<td align=center>%s\n"
+		"</tr>\n",
+		i + 1,
+		score->name, score->score,
+		score->kills, score->deaths,
+		score->rounds, score->shots,
+		score->ballsCashed, score->ballsSaved,
+		score->ballsWon, score->ballsLost,
+		score->bestball,
+		rank_base[i].ratio,
+		score->user, score->host,
+		score->logout);
+    }
+    fprintf(file, footer, rank_showtime());
+    fclose(file);
 }
 
 /* Return a line with the ranking status of the specified player. */
@@ -306,14 +304,10 @@ void Rank_get_stats(player_t * pl, char *buf)
 
     sprintf(buf, "%-15s  %4d/%4d, R: %3d, S: %5d, %d/%d/%d/%d/%.2f",
 	    pl->name,
-	    score->kills,
-	    score->deaths,
-	    score->rounds,
-	    score->shots,
-	    score->ballsCashed,
-	    score->ballsSaved,
-	    score->ballsWon,
-	    score->ballsLost,
+	    score->kills, score->deaths,
+	    score->rounds, score->shots,
+	    score->ballsCashed, score->ballsSaved,
+	    score->ballsWon, score->ballsLost,
 	    score->bestball);
 }
 
@@ -330,7 +324,7 @@ void Rank_show_ranks(void)
     for (i = 0; i < MAX_SCORES; i++) {
 	rankinfo_t *score = &scores[rank_base[i].ind];
 
-	if (score->name[0] != '\0')
+	if (strlen(score->name) > 0)
 	    numranks++;
 
 	if (score->pl != NULL) {
@@ -356,12 +350,12 @@ void Rank_show_ranks(void)
     for (i = 0; i < MAX_SCORES; i++) {
 	rankinfo_t *score = &scores[rank_base[i].ind];
 
-	if (score->name[0] == '\0')
+	if (strlen(score->name) == 0)
 	    continue;
 
 	if (num > 0)
 	    strlcat(msg, ", ", sizeof(msg));
-	snprintf(tmpbuf, sizeof(tmpbuf), "%d. %s (%.1f)",
+	snprintf(tmpbuf, sizeof(tmpbuf), "%d. %s (%.2f)",
 		 num + 1, score->name, rank_base[i].ratio);
 	strlcat(msg, tmpbuf, sizeof(msg));
 	num++;
@@ -421,13 +415,15 @@ void Rank_init_saved_scores(void)
 	memset(rank, 0, sizeof(rankinfo_t));
     }
 
-    xpilotscorefile = getenv(XPILOTSCOREFILE);
+    xpilotscorefile = getenv("XPILOTSCOREFILE");
     if (!xpilotscorefile)
 	return;
 
     file = fopen(xpilotscorefile, "r");
-    if (!file)
+    if (!file) {
+	error("Couldn't open score file \"%s\"", xpilotscorefile);
 	return;
+    }
 
     Rank_parse_scorefile(file);
 
@@ -520,7 +516,7 @@ void Rank_write_score_file(void)
 	int idx = rank_base[i].ind;
 	rankinfo_t *rank = &scores[idx];
 
-	if (rank->name[0] == '\0')
+	if (strlen(rank->name) == 0)
 	    continue;
 
 	if (fprintf(file,
