@@ -30,16 +30,11 @@ bool		initialPointerControl = false;
 bool		pointerControl = false;
 extern Cursor	pointerControlCursor;
 
-#if 0
-int num_keydefs = 0;
-int max_keydefs = 0;
-keydefs_t *keydefs = NULL;
-#endif
-
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
     keys_t ret = Generic_lookup_key((xp_keysym_t)ks, reset);
 
+    (void)event;
     IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
 
 #ifdef DEVELOPMENT
