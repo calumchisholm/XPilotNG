@@ -58,7 +58,7 @@
 #define WARNING_DISTANCE	(VISIBILITY_DISTANCE*0.8)
 
 #define MSG_LIFE_TIME		120.0	/* Seconds */
-#define MSG_FLASH_TIME		110.0	/* Old messages have life time less
+#define MSG_FLASH_TIME		105.0	/* Old messages have life time less
 					   than this */
 
 #define TITLE_DELAY		500	/* Should probably change to seconds */
