@@ -284,14 +284,9 @@ void Talk_event(XEvent *event)
 	Talk_set_state(false);
 }
 
-
-
-#ifndef _WINDOWS
-
-void xevent_keyboard(int queued)
+static void Handle_talk_key_repeat(void)
 {
-    int i, n;
-    XEvent event;
+    int i;
 
     if (talk_key_repeating) {
 	gettimeofday(&time_now, NULL);
@@ -305,6 +300,16 @@ void xevent_keyboard(int queued)
 		talk_key_repeating = 0;
 	}
     }
+}
+
+#ifndef _WINDOWS
+
+void xevent_keyboard(int queued)
+{
+    int i, n;
+    XEvent event;
+
+    Handle_talk_key_repeat();
 
     if (kdpy) {
 	n = XEventsQueued(kdpy, queued);
@@ -491,20 +496,7 @@ int x_event(int new_input)
 
 void xevent_keyboard(int queued)
 {
-    int i;
-
-    if (talk_key_repeating) {
-	gettimeofday(&time_now, NULL);
-	i = 1000000 * (time_now.tv_sec - talk_key_repeat_time.tv_sec) +
-	    time_now.tv_usec - talk_key_repeat_time.tv_usec;
-	if ((talk_key_repeating > 1 && i > 50000) || i > 500000) {
-	    Talk_event(&talk_key_repeat_event);
-	    talk_key_repeating = 2;
-	    talk_key_repeat_time = time_now;
-	    if (!talk_mapped)
-		talk_key_repeating = 0;
-	}
-    }
+    Handle_talk_key_repeat();
 }
 
 void xevent_pointer(void)
