@@ -128,14 +128,13 @@ int Choose_random_item(world_t *world)
     return i;
 }
 
-void Place_item(player_t *pl, int item)
+void Place_item(world_t *world, player_t *pl, int item)
 {
     int num_lose, num_per_pack, place_count, dist;
     long grav, rand_item;
     clpos_t pos;
     vector_t vel;
     item_concentrator_t	*con;
-    world_t *world = pl ? pl->world : &World;
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
 	if (pl && !BIT(pl->status, KILLED))
@@ -342,7 +341,7 @@ void Throw_items(player_t *pl)
 		    = pl->item[item] - world->items[item].initial;
 		if (num_items_to_throw <= 0)
 		    break;
-		Place_item(pl, item);
+		Place_item(world, pl, item);
 		remain = pl->item[item] - world->items[item].initial;
 	    } while (remain > 0 && remain < num_items_to_throw);
 	}
@@ -402,7 +401,7 @@ void Detonate_items(player_t *pl)
 
 	    vel.x = pl->vel.x + speed * tcos(dir);
 	    vel.y = pl->vel.y + speed * tsin(dir);
-	    Place_general_mine(owner_pl, pl->team, GRAVITY,
+	    Place_general_mine(world, owner_pl, pl->team, GRAVITY,
 			       pl->pos, vel, mods);
 	}
     }
@@ -431,7 +430,7 @@ void Detonate_items(player_t *pl)
 		&& pl->item[ITEM_MISSILE] < options.nukeMinSmarts)
 		CLR_BIT(mods.nuclear, NUCLEAR);
 
-	    Fire_general_shot(owner_pl, 0, pl->team, pl->pos,
+	    Fire_general_shot(world, owner_pl, 0, pl->team, pl->pos,
 			      type, (int)(rfrac() * RES), mods, NO_ID);
 	}
     }
@@ -458,22 +457,23 @@ void Tractor_beam(player_t *pl)
 	CLR_BIT(pl->used, HAS_TRACTOR_BEAM);
 	return;
     }
-    General_tractor_beam(pl, pl->pos, pl->item[ITEM_TRACTOR_BEAM],
+    General_tractor_beam(pl->world, pl, pl->pos, pl->item[ITEM_TRACTOR_BEAM],
 			 locked_pl, pl->tractor_is_pressor);
 }
 
-void General_tractor_beam(player_t *pl, clpos_t pos,
+void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
 			  int items, player_t *victim, bool pressor)
 {
-    double	maxdist = TRACTOR_MAX_RANGE(items),
-		maxforce = TRACTOR_MAX_FORCE(items),
-		percent, force, dist, cost;
-    int		theta;
+    double maxdist = TRACTOR_MAX_RANGE(items),
+	maxforce = TRACTOR_MAX_FORCE(items),
+	percent, force, dist, cost;
+    int theta;
 
     dist = Wrap_length(pos.cx - victim->pos.cx,
 		       pos.cy - victim->pos.cy) / CLICK;
     if (dist > maxdist)
 	return;
+
     percent = TRACTOR_PERCENT(dist, maxdist);
     cost = TRACTOR_COST(percent);
     force = TRACTOR_FORCE(pressor, percent, maxforce);
@@ -563,9 +563,9 @@ void Do_deflector(player_t *pl)
 
 void Do_transporter(player_t *pl)
 {
-    player_t	*victim = NULL;
-    int		i;
-    double	dist, closest = TRANSPORTER_DISTANCE * CLICK;
+    player_t *victim = NULL;
+    int i;
+    double dist, closest = TRANSPORTER_DISTANCE * CLICK;
 
     /* if not available, fail silently */
     if (!pl->item[ITEM_TRANSPORTER]
@@ -600,17 +600,16 @@ void Do_transporter(player_t *pl)
     }
 
     /* victim found */
-    Do_general_transporter(pl, pl->pos, victim, NULL, NULL);
+    Do_general_transporter(pl->world, pl, pl->pos, victim, NULL, NULL);
 }
 
-void Do_general_transporter(player_t *pl, clpos_t pos, player_t *victim,
-			    int *itemp, double *amountp)
+void Do_general_transporter(world_t *world, player_t *pl, clpos_t pos,
+			    player_t *victim, int *itemp, double *amountp)
 {
     char msg[MSG_LEN];
     const char *what = NULL;
     int i, item = ITEM_FUEL;
     double amount;
-    world_t *world = pl ? pl->world : &World;
 
     /* choose item type to steal */
     for (i = 0; i < 50; i++) {
@@ -867,10 +866,11 @@ bool Initiate_hyperjump(player_t *pl)
 
 void do_lose_item(player_t *pl)
 {
-    int		item;
+    int item;
 
     if (!pl)
 	return;
+
     item = pl->lose_item;
     if (item < 0 || item >= NUM_ITEMS) {
 	error("BUG: do_lose_item %d", item);
@@ -884,7 +884,7 @@ void do_lose_item(player_t *pl)
 
     if (options.loseItemDestroys == false
 	&& !BIT(pl->used, HAS_PHASING_DEVICE))
-	Place_item(pl, item);
+	Place_item(pl->world, pl, item);
     else
 	pl->item[item]--;
 
@@ -892,23 +892,22 @@ void do_lose_item(player_t *pl)
 }
 
 
-void Fire_general_ecm(player_t *pl, int team, clpos_t pos)
+void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 {
-    object_t		*shot;
-    mineobject_t	*closest_mine = NULL;
-    smartobject_t	*smart;
-    mineobject_t	*mine;
-    world_t		*world = pl ? pl->world : &World;
-    double		closest_mine_range = world->hypotenuse;
-    int			i, j;
-    double		range, perim, damage;
-    player_t		*p;
-    ecm_t		*ecm;
+    object_t *shot;
+    mineobject_t *closest_mine = NULL;
+    smartobject_t *smart;
+    mineobject_t *mine;
+    double closest_mine_range = world->hypotenuse;
+    int i, j;
+    double range, perim, damage;
+    player_t *p;
+    ecm_t *ecm;
 
     if (NumEcms >= MAX_TOTAL_ECMS)
 	return;
 
-    Ecms[NumEcms] = (ecm_t *)malloc(sizeof(ecm_t));
+    Ecms[NumEcms] = malloc(sizeof(ecm_t));
     if (Ecms[NumEcms] == NULL)
 	return;
 
@@ -1046,6 +1045,7 @@ void Fire_general_ecm(player_t *pl, int team, clpos_t pos)
     if (BIT(world->rules->mode, TEAM_PLAY) || pl) {
 	for (i = 0; i < world->NumCannons; i++) {
 	    cannon_t *c = Cannons(world, i);
+
 	    if (BIT(world->rules->mode, TEAM_PLAY)
 		&& c->team == team)
 		continue;
@@ -1149,6 +1149,7 @@ void Fire_general_ecm(player_t *pl, int team, clpos_t pos)
 		    Robot_program(p, pl->lock.pl_id);
 		    for (j = 0; j < NumPlayers; j++) {
 			player_t *pl_j = Players(j);
+
 			if (pl_j->conn != NULL) {
 			    Send_seek(pl_j->conn, pl->id,
 				      p->id, pl->lock.pl_id);
@@ -1168,5 +1169,5 @@ void Fire_ecm(player_t *pl)
 	|| BIT(pl->used, HAS_PHASING_DEVICE))
 	return;
 
-    Fire_general_ecm(pl, pl->team, pl->pos);
+    Fire_general_ecm(pl->world, pl, pl->team, pl->pos);
 }

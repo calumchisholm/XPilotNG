@@ -48,7 +48,7 @@ char shot_version[] = VERSION;
 
 void Place_mine(player_t *pl)
 {
-    vector_t	zero_vel = { 0.0, 0.0 };
+    vector_t zero_vel = { 0.0, 0.0 };
 
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
@@ -60,13 +60,14 @@ void Place_mine(player_t *pl)
 	return;
     }
 
-    Place_general_mine(pl, pl->team, 0, pl->pos, zero_vel, pl->mods);
+    Place_general_mine(pl->world, pl, pl->team, 0, pl->pos,
+		       zero_vel, pl->mods);
 }
 
 
 void Place_moving_mine(player_t *pl)
 {
-    vector_t	vel = pl->vel;
+    vector_t vel = pl->vel;
 
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
@@ -85,10 +86,11 @@ void Place_moving_mine(player_t *pl)
 	}
     }
 
-    Place_general_mine(pl, pl->team, GRAVITY, pl->pos, vel, pl->mods);
+    Place_general_mine(pl->world, pl, pl->team, GRAVITY, pl->pos,
+		       vel, pl->mods);
 }
 
-void Place_general_mine(player_t *pl, int team, long status,
+void Place_general_mine(world_t *world, player_t *pl, int team, long status,
 			clpos_t pos, vector_t vel, modifiers_t mods)
 {
     char msg[MSG_LEN];
@@ -96,7 +98,6 @@ void Place_general_mine(player_t *pl, int team, long status,
     double life, drain, mass;
     int i, minis;
     vector_t mv;
-    world_t *world = pl ? pl->world : &World;
 
     if (NumObjs + mods.mini >= MAX_TOTAL_SHOTS)
 	return;
@@ -404,7 +405,8 @@ void Fire_main_shot(player_t *pl, int type, int dir)
     pos.cx = pl->pos.cx + m_gun.cx;
     pos.cy = pl->pos.cy + m_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+		      dir, pl->mods, NO_ID);
 }
 
 void Fire_shot(player_t *pl, int type, int dir)
@@ -413,7 +415,8 @@ void Fire_shot(player_t *pl, int type, int dir)
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
-    Fire_general_shot(pl, pl->team, 0, pl->pos, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl->world, pl, pl->team, 0, pl->pos, type,
+		      dir, pl->mods, NO_ID);
 }
 
 void Fire_left_shot(player_t *pl, int type, int dir, int gun)
@@ -428,7 +431,8 @@ void Fire_left_shot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + l_gun.cx;
     pos.cy = pl->pos.cy + l_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+		      dir, pl->mods, NO_ID);
 }
 
 void Fire_right_shot(player_t *pl, int type, int dir, int gun)
@@ -443,7 +447,8 @@ void Fire_right_shot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + r_gun.cx;
     pos.cy = pl->pos.cy + r_gun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+		      dir, pl->mods, NO_ID);
 }
 
 void Fire_left_rshot(player_t *pl, int type, int dir, int gun)
@@ -458,7 +463,8 @@ void Fire_left_rshot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + l_rgun.cx;
     pos.cy = pl->pos.cy + l_rgun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+		      dir, pl->mods, NO_ID);
 }
 
 void Fire_right_rshot(player_t *pl, int type, int dir, int gun)
@@ -473,39 +479,24 @@ void Fire_right_rshot(player_t *pl, int type, int dir, int gun)
     pos.cx = pl->pos.cx + r_rgun.cx;
     pos.cy = pl->pos.cy + r_rgun.cy;
 
-    Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
+    Fire_general_shot(pl->world, pl, pl->team, 0, pos, type,
+		      dir, pl->mods, NO_ID);
 }
 
-void Fire_general_shot(player_t *pl, int team, bool cannon,
+void Fire_general_shot(world_t *world, player_t *pl, int team, bool cannon,
 		       clpos_t pos, int type, int dir,
 		       modifiers_t mods, int target_id)
 {
-    char		msg[MSG_LEN];
-    int			used,
-			fuse = 0,
-			lock = 0,
-			status = GRAVITY,
-			i, ldir, minis,
-			pl_range,
-			pl_radius,
-			rack_no = 0,
-			racks_left = 0,
-			r,
-			on_this_rack = 0,
-			side = 0,
-			fired = 0;
-    double		drain,
-    			mass = options.shotMass,
-			life = options.shotLife,
-			speed = options.shotSpeed,
-			turnspeed = 0,
-			max_speed = SPEED_LIMIT,
-			angle,
-			spread;
-    vector_t		mv;
-    clpos_t		shotpos;
-    object_t		*mini_objs[MODS_MINI_MAX + 1];
-    world_t		*world = pl ? pl->world : &World;
+    char msg[MSG_LEN];
+    int used, fuse = 0, lock = 0, status = GRAVITY, i, ldir, minis,
+	pl_range, pl_radius, rack_no = 0, racks_left = 0, r, on_this_rack = 0,
+	side = 0, fired = 0;
+    double drain, mass = options.shotMass, life = options.shotLife,
+	speed = options.shotSpeed, turnspeed = 0, max_speed = SPEED_LIMIT,
+	angle, spread;
+    vector_t mv;
+    clpos_t shotpos;
+    object_t *mini_objs[MODS_MINI_MAX + 1];
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
 	return;
@@ -1361,11 +1352,11 @@ void Delete_shot(world_t *world, int ind)
 	    long gravity_status = ((rfrac() < 0.5) ? GRAVITY : 0);
 	    vector_t zero_vel = { 0.0, 0.0 };
 
-	    Place_general_mine(NULL, TEAM_NOT_SET, gravity_status,
+	    Place_general_mine(world, NULL, TEAM_NOT_SET, gravity_status,
 			       shot->pos, zero_vel, mods);
 	}
 	else if (addHeat)
-	    Fire_general_shot(NULL, TEAM_NOT_SET, 0, shot->pos,
+	    Fire_general_shot(world, NULL, TEAM_NOT_SET, 0, shot->pos,
 			      OBJ_HEAT_SHOT, (int)(rfrac() * RES),
 			      mods, NO_ID);
     }
@@ -1399,17 +1390,16 @@ void Fire_laser(player_t *pl)
 	    if (is_inside(pos.cx, pos.cy, NONBALL_BIT | NOTEAM_BIT, NULL)
 		!= NO_GROUP)
 		return;
-	    Fire_general_laser(pl, pl->team, pos, pl->dir, pl->mods);
+	    Fire_general_laser(pl->world, pl, pl->team, pos, pl->dir, pl->mods);
 	}
     }
 }
 
-void Fire_general_laser(player_t *pl, int team, clpos_t pos,
+void Fire_general_laser(world_t *world, player_t *pl, int team, clpos_t pos,
 			int dir, modifiers_t mods)
 {
     double life;
     pulseobject_t *pulse;
-    world_t *world = pl ? pl->world : &World;
 
     if (!World_contains_clpos(world, pos)) {
 	warn("Fire_general_laser: outside world.\n");

@@ -1239,7 +1239,7 @@ void Update_objects(world_t *world)
 	    if (world->items[i].num < world->items[i].max
 		&& world->items[i].chance > 0
 		&& (rfrac() * world->items[i].chance) < 1.0f)
-		Place_item(NULL, i);
+		Place_item(world, NULL, i);
     }
 
     Fuel_update(world);
