@@ -1,8 +1,6 @@
 /* 
  * XPilotNG, an XPilot-like multiplayer space war game.
  *
- * Copyright (C) 2003-2004 Kristian Söderblom <kps@users.sourceforge.net>
- *
  * Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -25,50 +23,4 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef XPSERVER_H
-#define XPSERVER_H
-
-#define SERVER
-#include "xpcommon.h"
-
-#ifdef HAVE_LIBEXPAT
-#  include <expat.h>
-#else
-#  error "Header expat.h missing. Please install expat."
-#endif
-
-#ifdef PLOCKSERVER
-#  ifdef HAVE_SYS_MMAN_H
-#    include <sys/mman.h>
-#  elif defined HAVE_SYS_LOCK_H
-#    include <sys/lock.h>
-#  endif
-#endif
-
-#include "asteroid.h"
-#include "auth.h"
-#include "cannon.h"
-#include "click.h"
-#include "connection.h"
-#include "defaults.h"
-#include "map.h"
-#include "netserver.h"
-#include "objpos.h"
-#include "packet.h"
-#include "rank.h"
-#include "recwrap.h"
-#include "robot.h"
-#include "saudio.h"
-#include "sched.h"
-#include "setup.h"
-#include "score.h"
-#include "server.h"
-#include "serverconst.h"
-#include "srecord.h"
-#include "target.h"
-#include "teamcup.h"
-#include "tuner.h"
-#include "walls.h"
-#include "wormhole.h"
-
-#endif /* XPSERVER_H */
+#include "xpserver.h"

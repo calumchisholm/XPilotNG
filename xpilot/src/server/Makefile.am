@@ -18,9 +18,9 @@ xpilot_ng_server_SOURCES = \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
-	teamcup.h teamcup.c tuner.c tuner.h \
+	target.c target.h teamcup.h teamcup.c tuner.c tuner.h \
 	update.c \
-	walls.c walls.h \
+	walls.c walls.h wormhole.c wormhole.h \
 	xp2map.c xpmap.c xpserver.h
 
 xpilot_ng_server_LDADD =  $(top_builddir)/src/common/libxpcommon.a @X_EXTRA_LIBS@
