@@ -97,6 +97,7 @@ static void Clear_buttonDefs(int ind)
 int Key_init(void)
 {
     int i;
+
     if (sizeof(keyv) != KEYBOARD_SIZE) {
 	warn("%s, %d: keyv size %d, KEYBOARD_SIZE is %d",
 	     __FILE__, __LINE__,
@@ -104,7 +105,7 @@ int Key_init(void)
 	exit(1);
     }
     memset(keyv, 0, sizeof keyv);
-    for (i=0; i < NUM_KEYS; ++i)
+    for (i = 0; i < NUM_KEYS; i++)
     	keyv_new[i] = 0;
     
     BITV_SET(keyv, KEY_SHIELD);
@@ -270,7 +271,7 @@ static bool Key_press_msgs_stdout(void)
 static bool Key_press_select_lose_item(void)
 {
     if (lose_item_active == 1)
-        lose_item_active = 2;
+	lose_item_active = 2;
     else
 	lose_item_active = 1;
     return true;
@@ -297,12 +298,17 @@ static bool Key_press_no(void)
 static bool Key_press_exit(void)
 {
     int i;
+
     /* exit pointer control if exit key pressed in pointer control mode */
     if (pointerControl) {
-    	/* this releases mouse, so we clear the mouse buttons so they don't lock on */
-	for (i=0;i<MAX_POINTER_BUTTONS;++i)
+    	/*
+	 * this releases mouse, so we clear the mouse buttons so
+	 * they don't lock on
+	 */
+	for (i = 0; i < MAX_POINTER_BUTTONS; i++)
 	    Pointer_button_released(i);
 	Pointer_control_newbie_message();
+
 	return Key_press_pointer_control();
     }
 
@@ -319,26 +325,36 @@ static bool Key_press_exit(void)
 
 int Key_get_count(keys_t key)
 {
-   if (key >= NUM_KEYS) return -1;
-   else return keyv_new[key];
+   if (key >= NUM_KEYS)
+       return -1;
+
+   return keyv_new[key];
 }
 
 bool Key_inc_count(keys_t key)
 {
-    if (key >= NUM_KEYS) return false;
-    if (keyv_new[key]<255) {
+    if (key >= NUM_KEYS)
+	return false;
+
+    if (keyv_new[key] < 255) {
     	++keyv_new[key];
 	return true;
-    } else return false;
+    }
+
+    return false;
 }
 
 bool Key_dec_count(keys_t key)
 {
-    if (key >= NUM_KEYS) return false;
-    if (keyv_new[key]>0) {
+    if (key >= NUM_KEYS)
+	return false;
+
+    if (keyv_new[key] > 0) {
     	--keyv_new[key];
 	return true;
-    } else return false;
+    }
+
+    return false;
 }
 
 void Key_clear_counts(void)
@@ -346,7 +362,7 @@ void Key_clear_counts(void)
     int i;
     bool change = false;
 
-    for (i=0; i < NUM_KEYS; ++i) {
+    for (i = 0; i < NUM_KEYS; i++) {
     	if (keyv_new[i] > 0) {
 	    /* set to one so that Key_release(i) will trigger */
     	    keyv_new[i] = 1;
@@ -381,13 +397,18 @@ bool Key_press(keys_t key)
     countchange = Key_inc_count(key);
     keycount = Key_get_count(key);
     
-    /* keycount -1 means this was a client only key, we don't count those */
-    if ( keycount != -1 ) { 
-        /* if countchange is false it means that Key_<inc|dec>_count() failed to
-         * change the count due to being at the end of the range (should be very rare)
-         * keycount != 1 means that this key was already pressed (multiple key mappings)
-         */
-        if ((!countchange) || (keycount != 1)) return true;
+    /*
+     * keycount -1 means this was a client only key, we don't count those
+     */
+    if (keycount != -1) { 
+	/*
+	 * if countchange is false it means that Key_<inc|dec>_count()
+	 * failed to change the count due to being at the end of the range
+	 * (should be very rare) keycount != 1 means that this key was
+	 * already pressed (multiple key mappings)
+	 */
+	if ((!countchange) || (keycount != 1))
+	    return true;
     }
 
     Key_check_talk_macro(key);
@@ -462,10 +483,14 @@ bool Key_press(keys_t key)
 	return Key_press_decrease_turnspeed();
 
     case KEY_TALK:
-    	/* this releases mouse in x11 client, so we clear the mouse buttons so they don't lock on */
+    	/*
+	 * this releases mouse in x11 client, so we clear the mouse buttons
+	 * so they don't lock on
+	 */
 	if (pointerControl)
-            for (i=0;i<MAX_POINTER_BUTTONS;++i)
-                Pointer_button_released(i);
+	    for (i = 0; i < MAX_POINTER_BUTTONS; i++)
+		Pointer_button_released(i);
+
 	return Key_press_talk();
 
     case KEY_TOGGLE_OWNED_ITEMS:
@@ -475,11 +500,16 @@ bool Key_press(keys_t key)
 	return Key_press_show_messages();
 
     case KEY_POINTER_CONTROL:
-    	/* this releases mouse, so we clear the mouse buttons so they don't lock on */
+    	/*
+	 * this releases mouse, so we clear the mouse buttons so they
+	 * don't lock on
+	 */
     	if (pointerControl)
-    	    for (i=0;i<MAX_POINTER_BUTTONS;++i)
+    	    for (i = 0; i < MAX_POINTER_BUTTONS; i++)
     	    	Pointer_button_released(i);
+
 	Pointer_control_newbie_message();
+
 	return Key_press_pointer_control();
 
     case KEY_TOGGLE_RECORD:
@@ -524,13 +554,17 @@ bool Key_release(keys_t key)
     countchange = Key_dec_count(key);
     keycount = Key_get_count(key);
 
-    if ( keycount != -1 ) { /* -1 means this was a client only key, we don't count those */
-        /* if countchange is false it means that Key_<inc|dec>_count() failed to
-         * change the count due to being at the end of the range (happens to most key releases
-	 * let through from talk mode)
-         * keycount != 0 means that some physical keys remain pressed that map to this xpilot key 
-         */
-        if ((!countchange) || (keycount != 0)) return true;
+    /* -1 means this was a client only key, we don't count those */
+    if (keycount != -1) {
+	/*
+	 * if countchange is false it means that Key_<inc|dec>_count()
+	 * failed to change the count due to being at the end of the range
+	 * (happens to most key releases let through from talk mode)
+	 * keycount != 0 means that some physical keys remain pressed
+	 * that map to this xpilot key 
+	 */
+	if ((!countchange) || (keycount != 0))
+	    return true;
     }
 
 
@@ -583,7 +617,7 @@ bool Key_release(keys_t key)
 	    lose_item_active = 1;
 	else
 	    lose_item_active = -(int)(clientFPS + 0.5);
-        break;
+	break;
 
     default:
 	break;
@@ -932,10 +966,10 @@ xp_option_t key_options[] = {
 	"These are the power, turn speed and turn resistance settings.\n"),
 
     XP_KEY_OPTION(
-        "keySwapScaleFactor",
-        "",
-        KEY_SWAP_SCALEFACTOR,
-        "Swap scalefactor settings.\n"),
+	"keySwapScaleFactor",
+	"",
+	KEY_SWAP_SCALEFACTOR,
+	"Swap scalefactor settings.\n"),
 
     XP_KEY_OPTION(
 	"keyChangeHome",
@@ -1191,16 +1225,16 @@ xp_option_t key_options[] = {
 	"Toggle recording of session (see recordFile).\n"),
 
     XP_KEY_OPTION(
-        "keyToggleRadarScore",
-        "F11",
-        KEY_TOGGLE_RADAR_SCORE,
-        "Toggles the radar and score windows on and off.\n"),
+	"keyToggleRadarScore",
+	"F11",
+	KEY_TOGGLE_RADAR_SCORE,
+	"Toggles the radar and score windows on and off.\n"),
 
     XP_KEY_OPTION(
-        "keyToggleFullScreen",
-        "F11",
-        KEY_TOGGLE_FULLSCREEN,
-        "Toggles between fullscreen mode and window mode.\n"),
+	"keyToggleFullScreen",
+	"F11",
+	KEY_TOGGLE_FULLSCREEN,
+	"Toggles between fullscreen mode and window mode.\n"),
 
     XP_KEY_OPTION(
 	"keySelectItem",
