@@ -46,7 +46,7 @@ typedef struct {
  */
 setup_t			*Setup = NULL;
 display_t               server_display;
-int			receive_window_size;
+int			receive_window_size = 3;
 long			last_loops;
 bool                    packetMeasurement;
 #ifdef _WINDOWS

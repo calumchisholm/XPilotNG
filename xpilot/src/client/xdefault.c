@@ -70,7 +70,7 @@ static bool testxcolors = false;
 static char displayName[MAX_DISP_LEN];
 static char keyboardName[MAX_DISP_LEN];
 
-
+/* kps - this is quite useless currently */
 static bool Set_geometry(xp_option_t *opt, const char *value)
 {
     UNUSED_PARAM(opt);
@@ -83,8 +83,10 @@ static bool Set_geometry(xp_option_t *opt, const char *value)
 
 static const char *Get_geometry(xp_option_t *opt)
 {
+    static char buf[20]; /* should be enough */
     UNUSED_PARAM(opt);
-    return geometry;
+    snprintf(buf, sizeof(buf), "%dx%d", top_width, top_height);
+    return buf;
 }
 
 static bool Set_texturedObjects(xp_option_t *opt, bool val);
@@ -237,7 +239,7 @@ xp_option_t xdefault_options[] = {
 	displayName,
 	sizeof displayName,
 	NULL, NULL, NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Set the X display.\n"),
 
     XP_STRING_OPTION(
@@ -246,7 +248,7 @@ xp_option_t xdefault_options[] = {
 	keyboardName,
 	sizeof keyboardName,
 	NULL, NULL, NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Set the X keyboard input if you want keyboard input from\n"
 	"another display.  The default is to use the keyboard input from\n"
 	"the X display.\n"),
@@ -257,7 +259,7 @@ xp_option_t xdefault_options[] = {
 	visualName,
 	sizeof visualName,
 	NULL, NULL, NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Specify which visual to use for allocating colors.\n"
 	"To get a listing of all possible visuals on your dislay\n"
 	"set the argument for this option to list.\n"),
@@ -267,7 +269,7 @@ xp_option_t xdefault_options[] = {
 	true,
 	&colorSwitch,
 	NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Use color buffering or not.\n"
 	"Usually color buffering is faster, especially on 8-bit\n"
 	"PseudoColor displays.\n"),
@@ -420,25 +422,25 @@ xp_option_t xdefault_options[] = {
     XP_NOARG_OPTION(
         "testxsync",
 	&testxsync,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
         "Test XSynchronize() ?\n"),
 
     XP_NOARG_OPTION(
         "testxdebug",
 	&testxdebug,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
         "Test X_error_handler() ?\n"),
 
     XP_NOARG_OPTION(
         "testxafter",
 	&testxafter,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
         "Test XAfterFunction ?\n"),
 
     XP_NOARG_OPTION(
         "testxcolors",
 	&testxcolors,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
         "Do Colors_debug() ?\n"),
 #endif
 

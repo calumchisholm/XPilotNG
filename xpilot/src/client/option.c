@@ -1047,13 +1047,27 @@ int Xpilotrc_write(const char *path)
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
 	xp_option_origin_t origin;
+	xpilotrc_line_t t;
 	const char *os;
+	int j;
+	bool was_in_xpilotrc = false;
+
+	for (j = 0; j < num_xpilotrc_lines; j++) {
+	    xpilotrc_line_t *lp = &xpilotrc_lines[j];
+
+	    if (lp->opt == opt)
+		was_in_xpilotrc = true;
+	}
+
+	if (was_in_xpilotrc)
+	    continue;
 
 	/* Let's not save these */
-	if (Option_get_type(opt) == xp_noarg_option)
+	if (Option_get_flags(opt) & XP_OPTFLAG_NO_SAVE)
 	    continue;
 
 	origin = Option_get_origin(opt);
+	assert(origin != xp_option_origin_xpilotrc);
 #if 0
 	switch (origin) {
 	case xp_option_origin_default:  os = "default";  break;
@@ -1067,11 +1081,20 @@ int Xpilotrc_write(const char *path)
 	warn("option %s origin is %s.", Option_get_name(opt), os);
 #endif
 
-	if (origin == xp_option_origin_xpilotrc)
-	    /* exists already in the xpilotrc data struct */
+	if (origin == xp_option_origin_default)
+	    t.comment = xp_safe_strdup("; " PACKAGE_STRING " default");
+	if (origin == xp_option_origin_cmdline)
 	    continue;
+	if (origin == xp_option_origin_env)
+	    continue;
+	if (origin == xp_option_origin_config)
+	    t.comment = xp_safe_strdup("; from config menu");
+	if (origin == xp_option_origin_setcmd)
+	    t.comment = xp_safe_strdup("; from set command");
+	t.opt = opt;
 
-	
+	STORE(xpilotrc_line_t,
+	      xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
     }
 
     for (i = 0; i < num_xpilotrc_lines; i++) {

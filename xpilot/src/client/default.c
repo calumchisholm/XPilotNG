@@ -501,32 +501,32 @@ xp_option_t default_options[] = {
     XP_NOARG_OPTION(
 	"help",
 	&xpArgs.help,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Display this help message.\n"),
 
     XP_NOARG_OPTION(
 	"version",
 	&xpArgs.version,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Show the source code version.\n"),
 
     XP_NOARG_OPTION(
 	"join",
 	&xpArgs.auto_connect,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Join the game immediately, no questions asked.\n"),
 
     XP_NOARG_OPTION(
 	"text",
 	&xpArgs.text,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Use the simple text interface to contact a server\n"
 	"instead of the graphical user interface.\n"),
 
     XP_NOARG_OPTION(
 	"list",
 	&xpArgs.list_servers,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"List all servers running on the local network.\n"),
 
     XP_STRING_OPTION(
@@ -535,7 +535,7 @@ xp_option_t default_options[] = {
 	xpArgs.shutdown_reason,
 	sizeof xpArgs.shutdown_reason,
 	NULL, NULL, NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Shutdown the server with a message.\n"
 	"The message used is the first argument to this option.\n"),
 
@@ -544,7 +544,7 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_nickName, NULL, Get_nickName,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Set the nickname.\n"),
 
     XP_STRING_OPTION(
@@ -552,7 +552,7 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_userName, NULL, Get_userName,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Set the username.\n"),
 
     XP_STRING_OPTION(
@@ -560,7 +560,7 @@ xp_option_t default_options[] = {
 	"",
 	NULL, 0,
 	Set_hostName, NULL, Get_hostName,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Set the hostname.\n"),
 
     XP_INT_OPTION(
@@ -570,7 +570,7 @@ xp_option_t default_options[] = {
 	TEAM_NOT_SET,
 	&connectParam.team,
 	Set_team,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Set the team to join.\n"),
 
     XP_INT_OPTION(
@@ -580,7 +580,7 @@ xp_option_t default_options[] = {
 	65535,
 	&connectParam.contact_port,
 	NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Set the port number of the server.\n"
 	"Almost all servers use the default port, which is the recommended\n"
 	"policy.  You can find out about which port is used by a server by\n"
@@ -593,7 +593,7 @@ xp_option_t default_options[] = {
 	65535,
 	&clientPortStart,
 	NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"
 	/* TODO: describe what value 0 means */),
 
@@ -604,7 +604,7 @@ xp_option_t default_options[] = {
 	65535,
 	&clientPortEnd,
 	NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"),
 
 
@@ -1124,6 +1124,7 @@ xp_option_t default_options[] = {
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"The number of decimals to use when displaying scores.\n"),
 
+#if 0
     /* kps - remove option later */
     XP_INT_OPTION(
 	"receiveWindowSize",
@@ -1134,6 +1135,7 @@ xp_option_t default_options[] = {
 	NULL,
 	XP_OPTFLAG_DEFAULT,
 	"Too complicated.  Keep it on 3.\n"),
+#endif
 
     /* eye candy stuff */
     XP_BOOL_OPTION(
@@ -1217,7 +1219,7 @@ xp_option_t default_options[] = {
 	CONF_TEXTUREDIR,
 	NULL, 0,
 	Set_texturePath, NULL, Get_texturePath,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_NO_SAVE,
 	"Search path for texture files.\n"
 	"This is a list of one or more directories separated by colons.\n"),
 
