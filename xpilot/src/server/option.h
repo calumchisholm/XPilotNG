@@ -302,7 +302,7 @@ extern struct options {
     char	*recordFileName;
     double	gameSpeed;
     bool	ngControls;
-    double  	turnPushPersistance;
+    double  	turnPushPersistence;
     double  	turnGrip;
     double	thrustWidth;
     double	thrustMass;

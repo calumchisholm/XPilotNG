@@ -3706,10 +3706,10 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"turnPushPersistance",
+	"turnPushPersistence",
 	"pushPersist",
 	"0.0",
-	&options.turnPushPersistance,
+	&options.turnPushPersistence,
 	valReal,
 	tuner_dummy,
 	"How much of the turnpush to remain as player velocity. (0.0-1.0)\n",
@@ -3722,8 +3722,8 @@ static option_desc opts[] = {
 	&options.turnGrip,
 	valReal,
 	tuner_dummy,
-	"How much of of the turnPush should pull the ship sideways by gripping\n"
-	"to the friction of the wall?. (0.0-1.0)\n",
+	"How much of of the turnPush should pull the ship sideways by\n"
+	"gripping to the friction of the wall?. (0.0-1.0)\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3733,7 +3733,7 @@ static option_desc opts[] = {
 	&options.thrustWidth,
 	valReal,
 	tuner_dummy,
-	"Width of thrust spark spray 0.0-1.0 where 1.0 means 180 degree bounds\n",
+	"Width of thrust spark spray 0.0-1.0 where 1.0 means 180 degrees.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3743,7 +3743,7 @@ static option_desc opts[] = {
 	&options.thrustMass,
 	valReal,
 	tuner_dummy,
-	"Weight of thrust sparks\n",
+	"Weight of thrust sparks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3753,7 +3753,7 @@ static option_desc opts[] = {
 	&options.sparkSpeed,
 	valReal,
 	tuner_dummy,
-	"Multiplier affecting avg. speed (relative ship) of thrust sparks\n",
+	"Multiplier affecting avg. speed (relative ship) of thrust sparks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

@@ -2998,8 +2998,8 @@ void Turn_player(player_t *pl, bool push)
      	    pl->vel.x = velon * cln + options.turnGrip * velot * cl;
     	    pl->vel.y = velon * sln + options.turnGrip * velot * sl;	    
 	    Move_player(pl);
- 	    pl->vel.x = x + options.turnPushPersistance * pl->vel.x;
-	    pl->vel.y = y + options.turnPushPersistance * pl->vel.y;
+ 	    pl->vel.x = x + options.turnPushPersistence * pl->vel.x;
+	    pl->vel.y = y + options.turnPushPersistence * pl->vel.y;
 	    
 	    break;
 	}
