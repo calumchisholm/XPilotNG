@@ -684,15 +684,16 @@ static void PlayerObjectCollision(player_t *pl)
 	    break;
 	}
 	/* KHS Let cannon dodgers shots survive collision */
-	if(obj->type !=OBJ_CANNON_SHOT || options.survivalScore == 0.0)
-	obj->life = 0;
+	if (obj->type != OBJ_CANNON_SHOT
+	    || options.survivalScore == 0.0)
+	    obj->life = 0;
 
 	if (BIT(OBJ_TYPEBIT(obj->type), KILLING_SHOTS)) {
 	    Player_collides_with_killing_shot(pl, obj);
 	    if (Player_is_killed(pl))
 		return;
 	    else
-	       obj->life = 0;
+		obj->life = 0;
 	    /* KHS except when player is shielded - shot would */
             /* stay with player and kill him anyways, then */
 	}
@@ -1195,16 +1196,16 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		/* fixed percentage of score */		
 
 	        if (options.survivalScore != 0.0)
-                   sc = pl->score * 0.02; 
+		    sc = pl->score * 0.02; 
 		else
-		  if (cannon != NULL)
-		    sc = Rate(cannon->score, pl->score)
-		      * options.cannonKillScoreMult;
-		  else {
-		    assert(obj->id == NO_ID);
-		    sc = Rate(UNOWNED_SCORE, pl->score)
-		      * options.cannonKillScoreMult;
-		  }
+		    if (cannon != NULL)
+			sc = Rate(cannon->score, pl->score)
+			    * options.cannonKillScoreMult;
+		    else {
+			assert(obj->id == NO_ID);
+			sc = Rate(UNOWNED_SCORE, pl->score)
+			    * options.cannonKillScoreMult;
+		    }
 
 	    } else if (obj->id == NO_ID) {
 		Set_message_f("%s was killed by %s.", pl->name,
@@ -1257,30 +1258,31 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		Robot_war(pl, kp);
 	    }
-	    if(options.survivalScore != 0.0
-	       && (pl->survival_time > 10 
-                  || pl->survival_time > Rank_get_max_survival_time(pl))){
-              player_t *record_pl;
-	      Set_message_f(" < %s has survived %.1f seconds (%.1f)>",
-			    pl->name, 
-                            pl->survival_time,
-                            pl->rank->max_survival_time
-                            );
 
-	    Rank_survival(pl, pl->survival_time);
+	    /* survival */
+	    if (options.survivalScore != 0.0
+		&& (pl->survival_time > 10 
+		    || pl->survival_time > Rank_get_max_survival_time(pl))) {
 
-               world_t *world = pl->world;
-              if(!BIT(world->rules->mode, LIMITED_LIVES)){
-	         Rank_add_round(pl); 
-		 /* if there are no rounds in survival mode */
-		 /* deaths act like rounds                  */
+		Set_message_f(" < %s has survived %.1f seconds (%.1f)>",
+			      pl->name, 
+			      pl->survival_time,
+			      Rank_get_max_survival_time(pl));
 
-              }
-	    Rank_write_webpage();
-            Rank_write_rankfile();
-	    Rank_show_ranks();
+		Rank_survival(pl, pl->survival_time);
+
+		/* if there are no rounds in survival mode */
+		/* deaths act like rounds                  */
+		if (!BIT(world->rules->mode, LIMITED_LIVES))
+		    Rank_add_round(pl); 
+
+		Rank_write_webpage();
+		Rank_write_rankfile();
+		Rank_show_ranks();
 	    }
-	    pl->survival_time=0;
+	    pl->survival_time = 0;
+	    /* survival */
+
 	    Player_set_state(pl, PL_STATE_KILLED);
 	    return;
 
