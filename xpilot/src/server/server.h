@@ -85,7 +85,7 @@ extern int		robotLeaveScore, robotLeaveRatio;
 extern int		robotTeam;
 extern bool		restrictRobots, reserveRobotTeam;
 extern int 		robotTicksPerSecond;
-extern World_map	World;
+extern world_t		World;
 extern server		Server;
 extern list_t		expandList;
 extern double		ShotsMass, ShipMass, ShotsSpeed, Gravity;

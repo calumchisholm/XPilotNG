@@ -44,7 +44,7 @@ int max_asteroidconcs = 0, max_bases = 0, max_cannons = 0, max_checks = 0,
 /*
  * Globals.
  */
-World_map World;
+world_t World;
 bool is_polygon_map = false;
 
 /*static void Generate_random_map(void);*/

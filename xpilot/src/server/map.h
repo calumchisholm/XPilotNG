@@ -269,7 +269,7 @@ typedef struct {
     item_concentrator_t		*itemConcs;
     int		NumAsteroidConcs;
     asteroid_concentrator_t	*asteroidConcs;
-} World_map;
+} world_t;
 
 /* kps change 100, 30 etc to something sane */
 struct polystyle {
