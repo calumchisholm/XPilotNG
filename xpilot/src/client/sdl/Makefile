@@ -8,7 +8,7 @@ CFLAGS=-DCONF_LIBDIR=dummy -DOPTIONHACK -DHAVE_CONFIG_H -DHAVE_LIBZ -g -Wall -Wm
 
 LDFLAGS=-lm -lz `sdl-config --libs` -lGL -lGLU -lSDL_ttf
 
-xpilot_sdl: $(OBJS)
+xpilot_sdl: $(OBJS) ../../client/libxpclient.a  ../../common/libxpcommon.a
 	gcc $(LDFLAGS) -o xpilot_sdl $(OBJS) ../../client/libxpclient.a  ../../common/libxpcommon.a
 %.o: %.c
 	gcc $(CFLAGS) -c -o $@ $<
