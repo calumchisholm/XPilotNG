@@ -1,9 +1,14 @@
-#include <stdio.h>
+#ifdef	_WINDOWS
+#include "NT/winClient.h"
+#else
+#include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#endif
+
 #include <zlib.h>
 
 #include "../common/socklib.h"
