@@ -1,0 +1,9 @@
+#! /bin/sh
+
+set -x
+touch NEWS README AUTHORS ChangeLog
+#aclocal -I config
+aclocal
+autoheader
+automake --gnu --add-missing --copy
+autoconf
