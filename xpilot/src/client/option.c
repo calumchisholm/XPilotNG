@@ -54,10 +54,6 @@ xp_option_t *Find_option(const char *name)
     int i;
     unsigned hash = String_hash(name);
 
-    /*
-     * This could be speeded up with a hash table or just by
-     * hashing the option name.
-     */
     for (i = 0; i < num_options; i++) {
 	if (hash == options[i].hash && !strcasecmp(name, options[i].name))
 	    return &options[i];
@@ -66,27 +62,59 @@ xp_option_t *Find_option(const char *name)
     return NULL;
 }
 
+static const char *Option_default_value_to_string(xp_option_t *opt)
+{
+    static char buf[4096];
+
+    switch (opt->type) {
+    case xp_noarg_option:
+	strcpy(buf, "");
+	break;
+    case xp_bool_option:
+	sprintf(buf, "%s", opt->bool_defval == true ? "yes" : "no");
+	break;
+    case xp_int_option:
+	sprintf(buf, "%d", opt->int_defval);
+	break;
+    case xp_double_option:
+	sprintf(buf, "%.3f", opt->dbl_defval);
+	break;
+    case xp_string_option:
+	if (opt->str_defval && strlen(opt->str_defval) > 0)
+	    strlcpy(buf, opt->str_defval, sizeof(buf));
+	else
+	    strcpy(buf, "");
+	break;
+    case xp_key_option:
+	if (opt->key_defval && strlen(opt->key_defval) > 0)
+	    strlcpy(buf, opt->key_defval, sizeof(buf));
+	else
+	    strcpy(buf, "");
+	break;
+    default:
+	assert(0 && "Unknown option type");
+    }
+    return buf;
+}
+
+
 static void Print_default_value(xp_option_t *opt)
 {
+    const char *defval = Option_default_value_to_string(opt);
+
     switch (opt->type) {
     case xp_noarg_option:
 	break;
     case xp_bool_option:
-	printf("        The default value is: %s.\n",
-	       opt->bool_defval == true ? "yes" : "no");
-	break;
     case xp_int_option:
-	printf("        The default value is: %d.\n", opt->int_defval);
-	break;
     case xp_double_option:
-	printf("        The default value is: %.3f.\n", opt->dbl_defval);
-	break;
     case xp_string_option:
-	if (opt->str_defval && strlen(opt->str_defval) > 0)
-	    printf("        The default value is: %s.\n", opt->str_defval);
+	if (strlen(defval) > 0)
+	    printf("        The default value is: %s.\n", defval);
 	else
 	    printf("        There is no default value for this option.\n");
 	break;
+
     case xp_key_option:
 	if (opt->key_defval && strlen(opt->key_defval) > 0)
 	    printf("        The default %s: %s.\n",
@@ -96,8 +124,7 @@ static void Print_default_value(xp_option_t *opt)
 	    printf("        There is no default value for this option.\n");
 	break;
     default:
-	assert(0 && "TODO");
-	break;
+	assert(0 && "Unknown option type");
     }
 }
 
