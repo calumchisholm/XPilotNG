@@ -145,31 +145,16 @@ void Quit(void)
     SDL_Quit();
 }
 
-static bool Set_geometry(xp_option_t *opt, const char *val)
+static bool Set_geometry(xp_option_t *opt, const char *s)
 {
-    int len, w, h;
-    char s[20];
-    char *p1, *p2;
+    int w, h;
 
-    if (val == NULL) return false;
-    len = strlen(val);
-    if (len == 0 || len > 19) return false;
-    strcpy(s, val);
-    
-    p1 = s;
-    if (s[0] == '=') p1 = s + 1;
-    p2 = strchr(p1, 'x');
-    if (p2 == NULL) p2 = strchr(p1, 'X');
-    if (p2 == NULL) return false;
-    *p2 = '\0';
-    w = atoi(p1);
-    if (w == 0) return false;
-    p1 = p2 = p2 + 1;
-    while(isdigit(*p2)) p2++;
-    *p2 = '\0';
-    h = atoi(p1);
-    if (h == 0) return false;
-
+    if (s[0] == '=') {
+	sscanf(s, "%*c%d%*c%d", &w, &h);
+    } else {
+	sscanf(s, "%d%*c%d", &w, &h);
+    }
+    if (w == 0 || h == 0) return false;
     if (MainSDLSurface != NULL) {
 	Resize_Window(w, h);
     } else {
