@@ -87,9 +87,8 @@ void Item_damage(player *pl, DFLOAT prob)
 	    if (!BIT(1U << i, ITEM_BIT_FUEL|ITEM_BIT_TANK)) {
 		if (pl->item[i]) {
 		    DFLOAT f = rfrac();
-		    if (f < loss) {
+		    if (f < loss)
 			pl->item[i] = (int)(pl->item[i] * loss + 0.5f);
-		    }
 		}
 	    }
 	}
@@ -103,22 +102,19 @@ int Choose_random_item(void)
     int		i;
     DFLOAT	item_prob_sum = 0;
 
-    for (i = 0; i < NUM_ITEMS; i++) {
+    for (i = 0; i < NUM_ITEMS; i++)
 	item_prob_sum += World.items[i].prob;
-    }
 
     if (item_prob_sum > 0.0) {
 	DFLOAT sum = item_prob_sum * rfrac();
 
 	for (i = 0; i < NUM_ITEMS; i++) {
 	    sum -= World.items[i].prob;
-	    if (sum <= 0) {
+	    if (sum <= 0)
 		break;
-	    }
 	}
-	if (i >= NUM_ITEMS) {
+	if (i >= NUM_ITEMS)
 	    i = ITEM_FUEL;
-        }
     }
 
     return i;
@@ -340,10 +336,10 @@ void Throw_items(player *pl)
     for (item = 0; item < NUM_ITEMS; item++) {
 	if (!BIT(1U << item, ITEM_BIT_FUEL | ITEM_BIT_TANK)) {
 	    do {
-		num_items_to_throw = pl->item[item] - World.items[item].initial;
-		if (num_items_to_throw <= 0) {
+		num_items_to_throw
+		    = pl->item[item] - World.items[item].initial;
+		if (num_items_to_throw <= 0)
 		    break;
-		}
 		Place_item(pl, item);
 		remain = pl->item[item] - World.items[item].initial;
 	    } while (remain > 0 && remain < num_items_to_throw);
@@ -368,11 +364,10 @@ void Detonate_items(player *pl)
 	return;
 
     /* ZE: Detonated items on tanks should belong to the tank's owner. */
-    if (IS_TANK_PTR(pl)) {
+    if (IS_TANK_PTR(pl))
 	owner_pl = Player_by_id(pl->lock.pl_id);
-    } else {
+    else
 	owner_pl = pl;
-    }
 
     /*
      * These are always immune to detonation.
@@ -430,9 +425,9 @@ void Detonate_items(player *pl)
 
 	    mods = pl->mods;
 	    if (BIT(mods.nuclear, NUCLEAR)
-		&& pl->item[ITEM_MISSILE] < nukeMinSmarts) {
+		&& pl->item[ITEM_MISSILE] < nukeMinSmarts)
 		CLR_BIT(mods.nuclear, NUCLEAR);
-	    }
+
 	    Fire_general_shot(owner_pl, 0, pl->team, pl->pos,
 			      type, (int)(rfrac() * RES), mods, NO_ID);
 	}
@@ -511,9 +506,8 @@ void Do_deflector(player *pl)
     DFLOAT	dist;
 
     if (pl->fuel.sum < -ED_DEFLECTOR) {
-	if (BIT(pl->used, HAS_DEFLECTOR)) {
+	if (BIT(pl->used, HAS_DEFLECTOR))
 	    Deflector(pl, false);
-	}
 	return;
     }
     Add_fuel(&(pl->fuel), (long)ED_DEFLECTOR);
@@ -878,19 +872,16 @@ void do_lose_item(player *pl)
 	error("BUG: do_lose_item %d", item);
 	return;
     }
-    if (BIT(1U << pl->lose_item, ITEM_BIT_FUEL | ITEM_BIT_TANK)) {
+    if (BIT(1U << pl->lose_item, ITEM_BIT_FUEL | ITEM_BIT_TANK))
 	return;
-    }
-    if (pl->item[item] <= 0) {
-	return;
-    }
 
-    if (loseItemDestroys == false && !BIT(pl->used, HAS_PHASING_DEVICE)) {
+    if (pl->item[item] <= 0)
+	return;
+
+    if (loseItemDestroys == false && !BIT(pl->used, HAS_PHASING_DEVICE))
 	Place_item(pl, item);
-    }
-    else {
+    else
 	pl->item[item]--;
-    }
 
     Item_update_flags(pl);
 }
@@ -1011,7 +1002,8 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	     *  50		10		6
 	     *	 0 (closest)	15		10
 	     */
-	    if (range <= 0 || (int)(rfrac() * 100.0f) < ((int)(10*(1-range)) + 5)) {
+	    if (range <= 0
+		|| (int)(rfrac() * 100.0f) < ((int)(10*(1-range)) + 5)) {
 		mine->life = 0;
 		break;
 	    }
@@ -1122,13 +1114,14 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	    }
 
 	    /* ECM damages sensitive equipment like lasers */
-	    if (p->item[ITEM_LASER] > 0) {
-		p->item[ITEM_LASER] -= (int)(range * p->item[ITEM_LASER] + 0.5);
-	    }
+	    if (p->item[ITEM_LASER] > 0)
+		p->item[ITEM_LASER]
+		    -= (int)(range * p->item[ITEM_LASER] + 0.5);
 
 	    if (!IS_ROBOT_PTR(p) || !ecmsReprogramRobots || !pl) {
 		/* player is blinded by light flashes. */
-		long duration = (int)(damage * pow(0.75, p->item[ITEM_SENSOR]));
+		long duration
+		    = (long)(damage * pow(0.75, p->item[ITEM_SENSOR]));
 		p->damaged += duration;
 		if (pl)
 		    Record_shove(p, pl, frame_loops + duration);
