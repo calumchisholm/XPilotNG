@@ -606,7 +606,7 @@ static void Target_update(void)
     int i, j;
 
     for (i = 0; i < World.NumTargets; i++) {
-	target_t *targ = &World.targets[i];
+	target_t *targ = Targets(i);
 
 	if (targ->dead_time > 0) {
 	    if ((targ->dead_time -= timeStep) <= 0) {
@@ -614,7 +614,7 @@ static void Target_update(void)
 
 		if (targetSync) {
 		    for (j = 0; j < World.NumTargets; j++) {
-			target_t *t = &World.targets[j];
+			target_t *t = Targets(j);
 			if (t->team == targ->team)
 			    Target_restore_on_map(t);
 		    }
@@ -1013,7 +1013,7 @@ void Update_objects(void)
 
 	/* target repair */
 	if (BIT(pl->used, HAS_REPAIR)) {
-	    target_t *targ = &World.targets[pl->repair_target];
+	    target_t *targ = Targets(pl->repair_target);
 
 	    if ((Wrap_length(pl->pos.cx - targ->pos.cx,
 			     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
@@ -1368,9 +1368,8 @@ void Update_objects(void)
      * Compute general game status, do we have a winner?
      * (not called after Game_Over() )
      */
-    if (gameDuration >= 0.0 || maxRoundTime > 0) {
+    if (gameDuration >= 0.0 || maxRoundTime > 0)
 	Compute_game_status();
-    }
 
     /*
      * Now update labels if need be.

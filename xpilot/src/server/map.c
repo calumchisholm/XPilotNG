@@ -131,7 +131,7 @@ int Map_place_cannon(int cx, int cy, int dir, int team)
     t.conn_mask = (unsigned)-1;
     t.group = -1;
     STORE(cannon_t, World.cannons, World.NumCannons, max_cannons, t);
-    cannon = &World.cannons[ind];
+    cannon = Cannons(ind);
     Cannon_init(cannon);
     return ind;
 }
@@ -446,16 +446,17 @@ static void Verify_wormhole_consistency(void)
 
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
 	for (i = 0; i < World.NumWormholes; i++)
-	    Wormhole_remove_from_map(&World.wormholes[i]);
+	    Wormhole_remove_from_map(Wormholes(i));
 	World.NumWormholes = 0;
     }
 
     if (!wormTime) {
 	for (i = 0; i < World.NumWormholes; i++) {
 	    int j = (int)(rfrac() * World.NumWormholes);
-	    while (World.wormholes[j].type == WORM_IN)
+
+	    while (Wormholes(j)->type == WORM_IN)
 		j = (int)(rfrac() * World.NumWormholes);
-	    World.wormholes[i].lastdest = j;
+	    Wormholes(i)->lastdest = j;
 	}
     }
 }
@@ -540,12 +541,12 @@ bool Grok_map(void)
 	CLR_BIT(World.rules->mode, TIMING);
     }
 
-    if (maxRobots == -1) {
+    if (maxRobots == -1)
 	maxRobots = World.NumBases;
-    }
-    if (minRobots == -1) {
+
+    if (minRobots == -1)
 	minRobots = maxRobots;
-    }
+
     if (BIT(World.rules->mode, TIMING)) {
 	Find_base_order();
     }
@@ -588,9 +589,8 @@ bool Grok_map_options(void)
 	errno = 0;
 	error("Generating random map");
 	Generate_random_map();
-	if (!mapData) {
+	if (!mapData)
 	    return false;
-	}
     }
 #else
     if (!Grok_map_size())
@@ -647,9 +647,7 @@ unsigned short Find_closest_team(int cx, int cy)
 	if (base->team == TEAM_NOT_SET)
 	    continue;
 
-	l = Wrap_length((cx - base->pos.cx),
-			(cy - base->pos.cy));
-
+	l = Wrap_length(cx - base->pos.cx, cy - base->pos.cy);
 	if (l < closest) {
 	    team = base->team;
 	    closest = l;
@@ -693,19 +691,18 @@ static void Find_base_order(void)
 	exit(-1);
     }
 
-    cx = World.checks[0].cx;
-    cy = World.checks[0].cy;
+    cx = Checks(0)->cx;
+    cy = Checks(0)->cy;
     for (i = 0; i < n; i++) {
-	dist = Wrap_length(World.bases[i].pos.cx - cx,
-			   World.bases[i].pos.cy - cy) / CLICK;
+	clpos bpos = Bases(i)->pos;
+	dist = Wrap_length(bpos.cx - cx, bpos.cy - cy) / CLICK;
 	for (j = 0; j < i; j++) {
-	    if (World.baseorder[j].dist > dist) {
+	    if (World.baseorder[j].dist > dist)
 		break;
-	    }
 	}
-	for (k = i - 1; k >= j; k--) {
+	for (k = i - 1; k >= j; k--)
 	    World.baseorder[k + 1] = World.baseorder[k];
-	}
+
 	World.baseorder[j].base_idx = i;
 	World.baseorder[j].dist = dist;
     }
@@ -961,12 +958,12 @@ void add_temp_wormholes(int xin, int yin, int xout, int yout)
 
 void remove_temp_wormhole(int ind)
 {
-    Wormhole_remove_from_map(&World.wormholes[ind]);
+    Wormhole_remove_from_map(Wormholes(ind));
 
     World.NumWormholes--;
-    if (ind != World.NumWormholes) {
+    if (ind != World.NumWormholes)
 	World.wormholes[ind] = World.wormholes[World.NumWormholes];
-    }
+
     World.wormholes = (wormhole_t *)realloc(World.wormholes,
 					    World.NumWormholes
 					    * sizeof(wormhole_t));

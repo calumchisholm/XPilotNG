@@ -487,7 +487,7 @@ static void Frame_map(connection_t *conn, player *pl)
 	target_t *targ;
 	if (++i >= World.NumTargets)
 	    i = 0;
-	targ = &World.targets[i];
+	targ = Targets(i);
 	if (BIT(targ->update_mask, conn_bit)
 	    || (BIT(targ->conn_mask, conn_bit) == 0
 		&& click_inview(&cv, targ->pos.cx, targ->pos.cy))) {

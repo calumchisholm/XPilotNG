@@ -1303,39 +1303,38 @@ static int Rank_item_value(player *pl, long itemtype)
 static bool Ball_handler(player *pl)
 {
     int		i,
-		closest_t = -1,
-		closest_nt = -1,
+		closest_tr = -1,
+		closest_ntr = -1,
 		dist,
-		closest_t_dist = INT_MAX,
-		closest_nt_dist = INT_MAX,
+		closest_tr_dist = INT_MAX,
+		closest_ntr_dist = INT_MAX,
 		bdir,
 		tdir;
     bool	clear_path = true;
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
 
     for (i = 0; i < World.NumTreasures; i++) {
-	treasure_t *treasure = &World.treasures[i];
+	treasure_t *treasure = Treasures(i);
 
 	if ((BIT(pl->have, HAS_BALL) || pl->ball)
 	    && treasure->team == pl->team) {
-	    dist = (int)Wrap_length(
-		treasure->pos.cx - pl->pos.cx,
-		treasure->pos.cy - pl->pos.cy) / CLICK;
-	    if (dist < closest_t_dist) {
-		closest_t = i;
-		closest_t_dist = dist;
+	    dist = (int)Wrap_length(treasure->pos.cx - pl->pos.cx,
+				    treasure->pos.cy - pl->pos.cy) / CLICK;
+	    if (dist < closest_tr_dist) {
+		closest_tr = i;
+		closest_tr_dist = dist;
 	    }
 	} else if (treasure->team != pl->team
-		   && World.teams[treasure->team].NumMembers > 0
+		   && Teams(treasure->team)->NumMembers > 0
 		   && !BIT(pl->have, HAS_BALL)
 		   && !pl->ball
 		   && treasure->have) {
 	    dist = (int)Wrap_length(
 		treasure->pos.cx - pl->pos.cx,
 		treasure->pos.cy - pl->pos.cy) / CLICK;
-	    if (dist < closest_nt_dist) {
-		closest_nt = i;
-		closest_nt_dist = dist;
+	    if (dist < closest_ntr_dist) {
+		closest_ntr = i;
+		closest_ntr_dist = dist;
 	    }
 	}
     }
@@ -1344,6 +1343,8 @@ static bool Ball_handler(player *pl)
 	int dist_np = INT_MAX;
 	int xdist, ydist;
 	int dx, dy;
+	treasure_t *closest_treasure;
+
 	if (pl->ball)
 	    ball = pl->ball;
 	else {
@@ -1363,18 +1364,19 @@ static bool Ball_handler(player *pl)
 		&& dist < dist_np)
 		dist_np = dist;
 	}
+	closest_treasure = Treasures(closest_tr);
 	bdir = (int)findDir(ball->vel.x, ball->vel.y);
 	tdir = (int)Wrap_cfindDir(
-	    World.treasures[closest_t].pos.cx - ball->pos.cx,
-	    World.treasures[closest_t].pos.cy - ball->pos.cy);
-	xdist = (World.treasures[closest_t].pos.cx / BLOCK_CLICKS)
-		- OBJ_X_IN_BLOCKS(ball);
-	ydist = (World.treasures[closest_t].pos.cy / BLOCK_CLICKS)
-		- OBJ_Y_IN_BLOCKS(ball);
+	    closest_treasure->pos.cx - ball->pos.cx,
+	    closest_treasure->pos.cy - ball->pos.cy);
+	xdist = (closest_treasure->pos.cx / BLOCK_CLICKS)
+	    - OBJ_X_IN_BLOCKS(ball);
+	ydist = (closest_treasure->pos.cy / BLOCK_CLICKS)
+	    - OBJ_Y_IN_BLOCKS(ball);
 	for (dist = 0;
-	     clear_path && dist < (closest_t_dist - BLOCK_SZ);
+	     clear_path && dist < (closest_tr_dist - BLOCK_SZ);
 	     dist += BLOCK_SZ / 2) {
-	    DFLOAT fraction = (DFLOAT)dist / closest_t_dist;
+	    DFLOAT fraction = (DFLOAT)dist / closest_tr_dist;
 	    dx = (int)((fraction * xdist) + OBJ_X_IN_BLOCKS(ball));
 	    dy = (int)((fraction * ydist) + OBJ_Y_IN_BLOCKS(ball));
 
@@ -1390,7 +1392,7 @@ static bool Ball_handler(player *pl)
 	    }
 	}
 	if (tdir == bdir
-	    && dist_np > closest_t_dist
+	    && dist_np > closest_tr_dist
 	    && clear_path
 	    && sqr(ball->vel.x) + sqr(ball->vel.y) > 60) {
 	    Detach_ball(pl, NULL);
@@ -1400,13 +1402,13 @@ static bool Ball_handler(player *pl)
 	} else {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
 	    return (Check_robot_target(pl,
-				       World.treasures[closest_t].pos.cx,
-				       World.treasures[closest_t].pos.cy,
+				       World.treasures[closest_tr].pos.cx,
+				       World.treasures[closest_tr].pos.cy,
 				       RM_NAVIGATE));
 	}
     } else {
 	int	ball_dist;
-	int	closest_ball_dist = closest_nt_dist;
+	int	closest_ball_dist = closest_ntr_dist;
 	int	closest_ball = -1;
 
 	for (i = 0; i < NumObjs; i++) {
@@ -1425,11 +1427,11 @@ static bool Ball_handler(player *pl)
 	    }
 	}
 	if (closest_ball == -1
-	    && closest_nt_dist < (my_data->robot_count / 10) * BLOCK_SZ) {
+	    && closest_ntr_dist < (my_data->robot_count / 10) * BLOCK_SZ) {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
 	    return (Check_robot_target(pl,
-				       World.treasures[closest_nt].pos.cx,
-				       World.treasures[closest_nt].pos.cy,
+				       World.treasures[closest_ntr].pos.cx,
+				       World.treasures[closest_ntr].pos.cy,
 				       RM_NAVIGATE));
 	} else if (closest_ball_dist < (my_data->robot_count / 10) * BLOCK_SZ
 		   && closest_ball_dist > ballConnectorLength) {
@@ -1487,12 +1489,12 @@ static int Robot_default_play_check_map(player *pl)
     }
 
     for (j = 0; j < World.NumTargets; j++) {
-	target_t *targ = &World.targets[j];
+	target_t *targ = Targets(j);
 
 	/* Ignore dead or owned targets */
 	if (targ->dead_time > 0
 	    || pl->team == targ->team
-	    || World.teams[targ->team].NumMembers == 0)
+	    || Teams(targ->team)->NumMembers == 0)
 	    continue;
 
 	if ((dx = CLICK_TO_PIXEL(targ->pos.cx - pl->pos.cx),
@@ -1913,7 +1915,7 @@ static void Robot_default_play(player *pl)
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < World.NumTargets; j++) {
-	    target_t *targ = &World.targets[j];
+	    target_t *targ = Targets(j);
 
 	    if (targ->team == pl->team
 		&& targ->damage < TARGET_DAMAGE
@@ -2160,9 +2162,8 @@ static void Robot_default_play(player *pl)
 			 * (ABS(dy - pl->pos.cy) /
 			    my_data->robot_normal_speed));
 
-	    if (Check_robot_target(pl, dx, dy, RM_HARVEST)) {
+	    if (Check_robot_target(pl, dx, dy, RM_HARVEST))
 		return;
-	    }
 	}
     }
     if (BIT(pl->lock.tagged, LOCK_PLAYER) &&
@@ -2237,7 +2238,8 @@ static void Robot_default_play(player *pl)
     x_speed = pl->vel.x - 2 * World.gravity[x][y].x;
     y_speed = pl->vel.y - 2 * World.gravity[x][y].y;
 
-    if (y_speed < (-my_data->robot_normal_speed) || (my_data->robot_count % 64) < 32) {
+    if (y_speed < (-my_data->robot_normal_speed)
+	|| (my_data->robot_count % 64) < 32) {
 
 	my_data->robot_mode = RM_ROBOT_CLIMB;
 	pl->turnspeed = MAX_PLAYER_TURNSPEED / 2;

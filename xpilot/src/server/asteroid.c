@@ -313,7 +313,7 @@ static void Place_asteroid(void)
     /* would be dubious: space |= CANNON_BIT; */
 
     if (World.NumAsteroidConcs > 0 && rfrac() < asteroidConcentratorProb)
-	con = &World.asteroidConcs[(int)(rfrac() * World.NumAsteroidConcs)];
+	con = AsteroidConcs((int)(rfrac() * World.NumAsteroidConcs));
     else
 	con = NULL;
 

@@ -139,8 +139,8 @@ void Pick_startpos(player *pl)
 	      ind, World.NumBases, num_free, pick, seen);
 	End_game();
     } else {
-	pl->home_base = &World.bases[BIT(World.rules->mode, TIMING) ?
-			World.baseorder[i].base_idx : i];
+	pl->home_base = Bases(BIT(World.rules->mode, TIMING) ?
+			      World.baseorder[i].base_idx : i);
 	if (ind < NumPlayers) {
 	    for (i = 0; i < observerStart + NumObservers; i++) {
 		player *pl_i;
@@ -255,11 +255,10 @@ void Compute_sensor_range(player *pl)
 	if (World.items[ITEM_FUEL].initial > 0.0) {
 	    EnergyRangeFactor = minVisibilityDistance /
 		(World.items[ITEM_FUEL].initial
-		    * (1.0 + ((DFLOAT)World.items[ITEM_SENSOR].initial * 0.25)));
+		 * (1.0 + ((DFLOAT)World.items[ITEM_SENSOR].initial * 0.25)));
 	    EnergyRangeFactor /= FUEL_SCALE_FACT;
-	} else {
+	} else
 	    EnergyRangeFactor = ENERGY_RANGE_FACTOR;
-	}
 	init = 1;
     }
 
@@ -447,9 +446,8 @@ int Init_player(int ind, shipobj *ship)
     pl->have		= DEF_HAVE;
     pl->used		= DEF_USED;
 
-    if (pl->item[ITEM_CLOAK] > 0) {
+    if (pl->item[ITEM_CLOAK] > 0)
 	SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
-    }
 
     CLEAR_MODS(pl->mods);
     for (i = 0; i < NUM_MODBANKS; i++)
@@ -670,16 +668,10 @@ void Reset_all_players(void)
 	    else {
 		Kill_player(pl, false);
 		if (pl != Players(i)) {
-		    /* kps - fix */
-		    /* UGLY HACK - player was deleted. */
-		    /* Please don't change loop index inside a for loop!!! */
 		    i--;
 		    continue;
 		}
 	    }
-	    /* kps - I have absolutely no idea why this was here */
-	    /*if (!(teamZeroPausing && pl->team == 0))
-	      Rank_IgnoreLastDeath(pl);*/
 	}
 	CLR_BIT(pl->status, GAME_OVER);
 	CLR_BIT(pl->have, HAS_BALL);
@@ -727,7 +719,7 @@ void Reset_all_players(void)
 
 	/* Reset the treasures */
 	for (i = 0; i < World.NumTreasures; i++) {
-	    treasure_t *treasure = &World.treasures[i];
+	    treasure_t *treasure = Treasures(i);
 
 	    treasure->destroyed = 0;
 	    treasure->have = false;
@@ -736,7 +728,7 @@ void Reset_all_players(void)
 
 	/* Reset the teams */
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    team_t *team = &World.teams[i];
+	    team_t *team = Teams(i);
 
 	    team->TreasuresDestroyed = 0;
 	    team->TreasuresLeft = team->NumTreasures - team->NumEmptyTreasures;
@@ -745,7 +737,8 @@ void Reset_all_players(void)
 	if (endOfRoundReset) {
 	    /* Reset the targets */
 	    for (i = 0; i < World.NumTargets; i++) {
-		target_t *targ = &World.targets[i];
+		target_t *targ = Targets(i);
+
 		if (targ->damage != TARGET_DAMAGE || targ->dead_time > 0)
 		    Target_restore_on_map(targ);
 	    }
@@ -789,6 +782,7 @@ void Reset_all_players(void)
 void Check_team_members(int team)
 {
     player		*pl;
+    team_t		*teamp;
     int			members, i;
 
     if (!BIT(World.rules->mode, TEAM_PLAY))
@@ -799,16 +793,17 @@ void Check_team_members(int team)
 	if (!IS_TANK_PTR(pl) && pl->team == team && pl->home_base != NULL)
 	    members++;
     }
-    if (World.teams[team].NumMembers != members) {
+    teamp = Teams(team);
+    if (teamp->NumMembers != members) {
 	warn("Server has reset team %d members from %d to %d",
-	       team, World.teams[team].NumMembers, members);
+	     team, teamp->NumMembers, members);
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
 	    if (!IS_TANK_PTR(pl) && pl->team == team && pl->home_base != NULL)
 		warn("Team %d currently has player %d: \"%s\"",
-		       team, i+1, pl->name);
+		     team, i+1, pl->name);
 	}
-	World.teams[team].NumMembers = members;
+	teamp->NumMembers = members;
     }
 }
 

@@ -276,6 +276,7 @@ typedef struct {
 #define Wormholes(ind)		(&World.wormholes[(ind)])
 #define AsteroidConcs(ind)	(&World.asteroidConcs[(ind)])
 #define ItemConcs(ind)		(&World.itemConcs[(ind)])
+#define Teams(team)		(&World.teams[(team)])
 
 
 /* kps change 100, 30 etc to something sane */
