@@ -1213,7 +1213,8 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     points[j].y = points[0].y;
 
     did_fill = 0;
-    if (filled || textured) {
+    if ((filled || textured) && (BIT(style.flags,
+				     STYLE_TEXTURED | STYLE_FILLED))) {
         if (textured && BIT(style.flags, STYLE_TEXTURED)) {
 	    xp_bitmap_t *bmp = Bitmap_get(p_draw, style.texture, 0);
 	    if (bmp == NULL)
