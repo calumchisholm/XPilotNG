@@ -351,7 +351,7 @@ static int Parse_colors(Colormap cmap)
 	    char cname[MAX_COLOR_LEN], *tmp;
 
 	    strlcpy(cname, color_names[i], sizeof(cname));
-	    tmp = strtok(cname, " \t");
+	    tmp = strtok(cname, " \t\r\n");
 
 	    if (tmp && XParseColor(dpy, cmap, tmp, &colors[i]))
 		continue;
@@ -1075,7 +1075,7 @@ static bool Set_maxColors (xp_option_t *opt, int val)
     return true;
 }
 
-static bool Set_color (xp_option_t *opt, const char *val)
+static bool Set_color(xp_option_t *opt, const char *val)
 {
     char *buf = Option_get_private_data(opt);
 

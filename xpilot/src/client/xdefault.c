@@ -39,6 +39,14 @@ int pre_acc_denom, new_acc_denom = 1;
 int pre_threshold, new_threshold = 0; 
 bool mouseAccelInClient = false;
 
+char	gameFontName[FONT_LEN];	/* The fonts used in the game */
+char	messageFontName[FONT_LEN];
+char	scoreListFontName[FONT_LEN];
+char	buttonFontName[FONT_LEN];
+char	textFontName[FONT_LEN];
+char	talkFontName[FONT_LEN];
+char	motdFontName[FONT_LEN];
+
 #ifdef DEVELOPMENT
 static bool testxsync = false;
 static bool testxdebug = false;
@@ -202,6 +210,28 @@ static bool Set_mouseAccelThresh(xp_option_t *opt, int value)
     }
 }
 
+static bool Set_fontName(xp_option_t *opt, const char *val)
+{
+    char *buf = Option_get_private_data(opt);
+    char *tmpval, *fontname;
+
+    assert(val != NULL);
+
+    /* remove whitespace from font specification */
+    tmpval = xp_safe_strdup(val);
+    
+    fontname = strtok(tmpval, " \t\r\n");
+    if (!fontname) {
+	xp_free(tmpval);
+	return false;
+    }
+
+    strlcpy(buf, fontname, FONT_LEN);
+    xp_free(tmpval);
+
+    return true;
+}
+
 xp_option_t xdefault_options[] = {
     XP_BOOL_OPTION(
 	"fullColor",
@@ -309,7 +339,7 @@ xp_option_t xdefault_options[] = {
 	GAME_FONT,
 	gameFontName,
 	sizeof gameFontName,
-	NULL, NULL, NULL,
+	Set_fontName, gameFontName, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The font used on the HUD and for most other text.\n"),
 
@@ -318,7 +348,7 @@ xp_option_t xdefault_options[] = {
 	SCORE_LIST_FONT,
 	scoreListFontName,
 	sizeof scoreListFontName,
-	NULL, NULL, NULL,
+	Set_fontName, scoreListFontName, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The font used on the score list.\n"
 	"This must be a non-proportional font.\n"),
@@ -328,7 +358,7 @@ xp_option_t xdefault_options[] = {
 	BUTTON_FONT,
 	buttonFontName,
 	sizeof buttonFontName,
-	NULL, NULL, NULL,
+	Set_fontName, buttonFontName, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The font used on all buttons.\n"),
 
@@ -337,7 +367,7 @@ xp_option_t xdefault_options[] = {
 	TEXT_FONT,
 	textFontName,
 	sizeof textFontName,
-	NULL, NULL, NULL,
+	Set_fontName, textFontName, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The font used in the help and about windows.\n"),
 
@@ -346,7 +376,7 @@ xp_option_t xdefault_options[] = {
 	TALK_FONT,
 	talkFontName,
 	sizeof talkFontName,
-	NULL, NULL, NULL,
+	Set_fontName, talkFontName, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The font used in the talk window.\n"),
 
@@ -355,7 +385,7 @@ xp_option_t xdefault_options[] = {
 	MOTD_FONT,
 	motdFontName,
 	sizeof motdFontName,
-	NULL, NULL, NULL,
+	Set_fontName, motdFontName, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The font used in the MOTD window and key list window.\n"
 	"This must be a non-proportional font.\n"),
@@ -365,7 +395,7 @@ xp_option_t xdefault_options[] = {
 	MESSAGE_FONT,
 	messageFontName,
 	sizeof messageFontName,
-	NULL, NULL, NULL,
+	Set_fontName, messageFontName, NULL,
 	XP_OPTFLAG_DEFAULT,
 	"The font used for drawing messages.\n"),
 

@@ -57,6 +57,14 @@ extern unsigned		players_width, players_height;
 extern bool		ignoreWindowManager;
 extern bool		quitting;
 
+/* XPilot Mouse settings */
+extern bool mouseAccelInClient;
+extern int new_acc_num, new_acc_denom, new_threshold;
+extern Cursor	pointerControlCursor;
+/* For restoring the mouse back to normal */
+extern bool pre_exists;
+extern int pre_acc_num, pre_acc_denom, pre_threshold;
+
 /*
  * xdefault.c
  */

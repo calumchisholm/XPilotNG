@@ -32,21 +32,6 @@ char xpaint_version[] = VERSION;
 /*
  * Globals.
  */
-XFontStruct* gameFont;		/* The fonts used in the game */
-XFontStruct* messageFont;
-XFontStruct* scoreListFont;
-XFontStruct* buttonFont;
-XFontStruct* textFont;
-XFontStruct* talkFont;
-XFontStruct* motdFont;
-char	gameFontName[FONT_LEN];	/* The fonts used in the game */
-char	messageFontName[FONT_LEN];
-char	scoreListFontName[FONT_LEN];
-char	buttonFontName[FONT_LEN];
-char	textFontName[FONT_LEN];
-char	talkFontName[FONT_LEN];
-char	motdFontName[FONT_LEN];
-
 Display		*dpy;		/* Display of player (pointer) */
 Display		*kdpy;		/* Keyboard display */
 short		about_page;	/* Which page is the player on? */

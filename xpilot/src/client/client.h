@@ -828,6 +828,7 @@ extern void Store_key_options(void);
  * join.c
  */
 extern int Join(Connect_param_t *conpar);
+extern void xpilotShutdown(void);
 
 /*
  * mapdata.c

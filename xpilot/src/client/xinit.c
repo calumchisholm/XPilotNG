@@ -80,9 +80,13 @@ bool			radar_score_mapped;
 Cursor			pointerControlCursor;
 bool			ignoreWindowManager;
 
-/* For restoring the mouse back to normal */
-extern int pre_acc_num, pre_acc_denom, pre_threshold;
-extern bool pre_exists;
+XFontStruct* gameFont;		/* The fonts used in the game */
+XFontStruct* messageFont;
+XFontStruct* scoreListFont;
+XFontStruct* buttonFont;
+XFontStruct* textFont;
+XFontStruct* talkFont;
+XFontStruct* motdFont;
 
 /*static char myName[] = "xpilot";*/
 static char myClass[] = "XPilot";
