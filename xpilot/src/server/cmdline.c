@@ -1911,7 +1911,7 @@ static option_desc opts[] = {
 	valBool,
 	tuner_dummy,
 	"Use Zero sum scoring or not.\n",
-	OPT_COMMAND | OPT_DEFAULTS
+	OPT_COMMAND | OPT_VISIBLE
     },
     {
 	"rankFileName",
