@@ -1,7 +1,7 @@
-/*
+/* 
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
- *      BjÃ¸rn Stabell        <bjoern@xpilot.org>
+ *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
  *      Bert Gijsbers        <bert@xpilot.org>
  *      Dick Balaska         <dick@xpilot.org>
@@ -20,8 +20,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+
 #include "xpclient.h"
 
+char meta_version[] = VERSION;
 
 static struct Meta metas[NUM_METAS] = {
     {META_HOST,     META_IP,     META_INIT_SOCK, MetaConnecting},

@@ -119,7 +119,7 @@ void  Add_meta_line(char *meta_line);
 void  Meta_connect(int *connections_ptr, int *maxfd_ptr);
 void  Meta_dns_lookup(void);
 void  Ping_servers(void);
-int   Get_meta_data(char *error);
+int   Get_meta_data(char *err);
 
 #endif
 
