@@ -96,7 +96,6 @@ extern bool		updateScores;
 #define HAS_REFUEL		(1U<<24)
 #define HAS_REPAIR		(1U<<23)
 #define HAS_COMPASS		(1U<<22)
-#define HAS_AFTERBURNER		(1U<<21)
 #define HAS_CONNECTOR		(1U<<20)
 #define HAS_EMERGENCY_SHIELD	(1U<<19)
 #define HAS_DEFLECTOR		(1U<<18)

@@ -44,8 +44,6 @@ static void Item_update_flags(player_t *pl)
 	CLR_BIT(pl->have, HAS_MIRROR);
     if (pl->item[ITEM_DEFLECTOR] <= 0)
 	CLR_BIT(pl->have, HAS_DEFLECTOR);
-    if (pl->item[ITEM_AFTERBURNER] <= 0)
-	CLR_BIT(pl->have, HAS_AFTERBURNER);
     if (pl->item[ITEM_PHASING] <= 0
 	&& !BIT(pl->used, HAS_PHASING_DEVICE)
 	&& pl->phasing_left <= 0)
@@ -667,8 +665,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     switch (item) {
     case ITEM_AFTERBURNER:
 	what = "an afterburner";
-	if (victim->item[item] == 0)
-	    CLR_BIT(victim->have, HAS_AFTERBURNER);
 	break;
     case ITEM_MISSILE:
 	amount = (double)MIN(victim->item[item], 3);
@@ -810,7 +806,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	pl->item[item] += (int)amount;
     switch(item) {
     case ITEM_AFTERBURNER:
-	SET_BIT(pl->have, HAS_AFTERBURNER);
 	LIMIT(pl->item[item], 0, MAX_AFTERBURNER);
 	break;
     case ITEM_CLOAK:
