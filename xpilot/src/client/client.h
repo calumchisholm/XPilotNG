@@ -441,6 +441,7 @@ typedef struct {
 } message_t;
 /* typedefs end */
 
+extern bool		newbie;
 extern char		*geometry;
 extern xp_args_t	xpArgs;
 extern Connect_param_t	connectParam;

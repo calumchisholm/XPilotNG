@@ -484,6 +484,14 @@ static bool Set_showDecor(xp_option_t *opt, bool val)
 
 xp_option_t default_options[] = {
 
+    XP_BOOL_OPTION(
+	"newbie",
+	true,
+	&newbie,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Enable newbie help.\n"),
+
     XP_NOARG_OPTION(
 	"help",
 	&xpArgs.help,
