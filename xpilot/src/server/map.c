@@ -560,41 +560,6 @@ static void Verify_wormhole_consistency(void)
 }
 
 
-static bool Grok_map_old(void)
-{
-    if (is_polygon_map)
-	return true;
-
-    if (!Grok_map_options())
-	return false;
-
-    Xpmap_grok_map_data();
-
-    Xpmap_allocate_checks();
-
-    /*
-     * Now reset all counters since we will recount everything
-     * and reuse these counters while inserting the objects
-     * into structures.
-     */
-    Reset_map_object_counters();
-    Reset_itemid_array();
-    Xpmap_tags_to_internal_data(true);
-
-    Verify_wormhole_consistency();
-    
-    if (BIT(World.rules->mode, TIMING) && World.NumChecks == 0) {
-	xpprintf("No checkpoints found while race mode (timing) was set.\n");
-	xpprintf("Turning off race mode.\n");
-	CLR_BIT(World.rules->mode, TIMING);
-    }
-
-    Xpmap_find_map_object_teams();
-
-    return true;
-}
-
-
 /*
  * This function can be called after the map options have been read.
  */
@@ -653,10 +618,28 @@ static bool Grok_map_size(void)
     return true;
 }
 
+
 bool Grok_map(void)
 {
-    if (!Grok_map_old())
-	return false;
+    if (!is_polygon_map) {
+	if (!Grok_map_options())
+	    return false;
+
+	Xpmap_grok_map_data();
+	Xpmap_allocate_checks();
+	Reset_map_object_counters();
+	Reset_itemid_array();
+	Xpmap_tags_to_internal_data(true);
+	Xpmap_find_map_object_teams();
+    }
+
+    Verify_wormhole_consistency();
+    
+    if (BIT(World.rules->mode, TIMING) && World.NumChecks == 0) {
+	xpprintf("No checkpoints found while race mode (timing) was set.\n");
+	xpprintf("Turning off race mode.\n");
+	CLR_BIT(World.rules->mode, TIMING);
+    }
 
     if (maxRobots == -1) {
 	maxRobots = World.NumBases;
