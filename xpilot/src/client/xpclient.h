@@ -59,7 +59,6 @@
 #include "configure.h"
 #include "connectparam.h"
 #include "datagram.h"
-#include "default.h"
 #include "gfx2d.h"
 #include "guimap.h"      /* guimap.c depends on X11 */
 #include "guiobjects.h"

@@ -47,11 +47,9 @@
 /* need Connect_param_t */
 #include "connectparam.h"
 #endif
-#ifndef OLD_OPTIONS
 #ifndef OPTION_H
 /* need xp_keysym_t */
 #include "option.h"
-#endif
 #endif
 
 typedef struct {
@@ -117,12 +115,8 @@ typedef struct {
 #define MAX_POINTER_BUTTONS	5
 #define MAX_BUTTON_DEFS		3
 
-#ifndef OLD_OPTIONS
 extern int Num_buttonDefs(int ind);
-#  define NUM_BUTTON_DEFS(i) Num_buttonDefs(i)
-#else
-#  define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
-#endif
+#define NUM_BUTTON_DEFS(i) Num_buttonDefs(i)
 extern keys_t	buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 /*
@@ -666,10 +660,9 @@ extern bool played_this_round;
 void Pointer_control_set_state(bool on);
 void Pointer_button_pressed(int button);
 void Pointer_button_released(int button);
-#ifndef OLD_OPTIONS
 void Keyboard_button_pressed(xp_keysym_t ks);
 void Keyboard_button_released(xp_keysym_t ks);
-#endif
+
 int Key_init(void);
 int Key_update(void);
 bool Key_press(keys_t key);

@@ -47,6 +47,7 @@ extern void Colors_init_style_colors(void);
 /*
  * default.c
  */
+extern void Store_default_options(void);
 extern void defaultCleanup(void);			/* memory cleanup */
 
 extern bool Set_scaleFactor(xp_option_t *opt, double val);

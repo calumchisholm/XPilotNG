@@ -120,10 +120,7 @@ struct xp_option {
 
 /* number of options in global option array */
 extern int num_options;
-#ifndef OLD_OPTIONS
 extern xp_option_t *options;
-#endif
-
 
 extern void Parse_options(int *argcp, char **argvp);
 
@@ -148,7 +145,6 @@ void Store_option(xp_option_t *);
 	Store_option(& (option_array) [ii]); \
 } \
 
-#ifndef OLD_OPTIONS
 static inline const char *Option_get_name(xp_option_t *opt)
 {
     assert(opt);
@@ -173,8 +169,6 @@ static inline xp_option_t *Option_by_index(int ind)
 	return NULL;
     return &options[ind];
 }
-#endif
-
 
 
 
