@@ -218,7 +218,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
 		exit(1);
 	    }
 	}
-	p_draw = state->mbx.mbx_draw[state->colormap_index];
+	drawPixmap = state->mbx.mbx_draw[state->colormap_index];
     }
 #endif
 #ifdef DBE
@@ -234,7 +234,7 @@ void dbuff_init_buffer(dbuff_state_t *state)
 		exit(1);
 	    }
 	}
-	p_draw = state->dbe.dbe_draw;
+	drawPixmap = state->dbe.dbe_draw;
     }
 #endif
 }
@@ -244,7 +244,7 @@ void dbuff_switch(dbuff_state_t *state)
 {
 #ifdef MBX
     if (state->type == MULTIBUFFER)
-	p_draw = state->mbx.mbx_draw[state->colormap_index];
+	drawPixmap = state->mbx.mbx_draw[state->colormap_index];
 #endif
 
     state->colormap_index ^= 1;
