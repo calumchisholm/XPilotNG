@@ -174,7 +174,7 @@ int Player_lock_closest(player *pl, int next)
 }
 
 
-void Pause_player(player *pl, int on)
+void Pause_player(player *pl, bool on)
 {
     int i;
 

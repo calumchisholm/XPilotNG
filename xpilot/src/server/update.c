@@ -96,7 +96,7 @@ static void Transport_to_home(player *pl)
 /*
  * Turn phasing on or off.
  */
-void Phasing(player *pl, int on)
+void Phasing(player *pl, bool on)
 {
     if (on) {
 	if (pl->phasing_left <= 0) {
@@ -134,7 +134,7 @@ void Phasing(player *pl, int on)
 /*
  * Turn cloak on or off.
  */
-void Cloak(player *pl, int on)
+void Cloak(player *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
@@ -174,7 +174,7 @@ void Cloak(player *pl, int on)
 /*
  * Turn deflector on or off.
  */
-void Deflector(player *pl, int on)
+void Deflector(player *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
@@ -196,7 +196,7 @@ void Deflector(player *pl, int on)
 /*
  * Turn emergency thrust on or off.
  */
-void Emergency_thrust(player *pl, int on)
+void Emergency_thrust(player *pl, bool on)
 {
     if (on) {
 	if (pl->emergency_thrust_left <= 0) {
@@ -222,7 +222,7 @@ void Emergency_thrust(player *pl, int on)
 /*
  * Turn emergency shield on or off.
  */
-void Emergency_shield (player *pl, int on)
+void Emergency_shield (player *pl, bool on)
 {
     if (on) {
 	if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
@@ -259,7 +259,7 @@ void Emergency_shield (player *pl, int on)
  * automatic pilot mode any changes to the current power, turnacc, turnspeed
  * and turnresistance settings will be temporary.
  */
-void Autopilot(player *pl, int on)
+void Autopilot(player *pl, bool on)
 {
     CLR_BIT(pl->status, THRUSTING);
     if (on) {

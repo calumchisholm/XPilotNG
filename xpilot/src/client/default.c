@@ -2690,13 +2690,14 @@ static void Get_float_resource(XrmDatabase db,
 }
 
 
-static void Get_bool_resource(XrmDatabase db, const char *resource, int *result)
+static void Get_bool_resource(XrmDatabase db, const char *resource,
+			      bool *result)
 {
     int			index;
     char		resValue[MAX_CHARS];
 
     Find_resource(db, resource, resValue, sizeof resValue, &index);
-    *result = (ON(resValue) != 0);
+    *result = (ON(resValue) ? true : false);
 }
 
 
@@ -2869,10 +2870,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		   char *nickName, char *dispName, char *hostName,
 		   char *shut_msg)
 {
-    char		*ptr;
-    char		*str;
-    int			i;
-    int			j;
+    char		*ptr, *str;
+    int			i, j;
     int			num;
     int			firstKeyDef;
     keys_t		key;
@@ -2892,9 +2891,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
      * Construct a Xrm Option table from our options array.
      */
     size = sizeof(*xopt) * NELEM(options);
-    for (i = 0; i < NELEM(options); i++) {
+    for (i = 0; i < NELEM(options); i++)
 	size += 2 * (strlen(options[i].name) + 2);
-    }
+
     if ((ptr = (char *)malloc(size)) == NULL) {
 	error("No memory for options");
 	exit(1);
@@ -2929,17 +2928,15 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
      */
     for (i = 1; i < *argcp; i++) {
 	if (argvp[i][0] == '-' || argvp[i][0] == '+') {
-	    errno = 0;
-	    error("Unknown or incomplete option '%s'", argvp[i]);
-	    error("Type: %s -help to see a list of options", argvp[0]);
+	    warn("Unknown or incomplete option '%s'", argvp[i]);
+	    warn("Type: %s -help to see a list of options", argvp[0]);
 	    exit(1);
 	}
 	/* The rest of the arguments are hostnames of servers. */
     }
 
-    if (Get_resource(argDB, "help", resValue, sizeof resValue) != 0) {
+    if (Get_resource(argDB, "help", resValue, sizeof resValue) != 0)
 	Usage();
-    }
 
     if (Get_resource(argDB, "version", resValue, sizeof resValue) != 0) {
 	puts(TITLE);
@@ -2950,11 +2947,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     if (Get_string_resource(argDB, "display", dispName, MAX_DISP_LEN) == 0
 	|| dispName[0] == '\0') {
-	if ((ptr = getenv(DISPLAY_ENV)) != NULL) {
+	if ((ptr = getenv(DISPLAY_ENV)) != NULL)
 	    strlcpy(dispName, ptr, MAX_DISP_LEN);
-	} else {
+	else
 	    strlcpy(dispName, DISPLAY_DEF, MAX_DISP_LEN);
-	}
     }
     if ((dpy = XOpenDisplay(dispName)) == NULL) {
 	error("Can't open display '%s'", dispName);
@@ -2979,9 +2975,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     if (Get_string_resource(argDB, "keyboard", resValue, MAX_DISP_LEN) == 0
 	|| resValue[0] == '\0') {
-	if ((ptr = getenv(KEYBOARD_ENV)) != NULL) {
+	if ((ptr = getenv(KEYBOARD_ENV)) != NULL)
 	    strlcpy(resValue, ptr, MAX_DISP_LEN);
-	}
     }
     if (resValue[0] == '\0') {
 	kdpy = NULL;

@@ -92,7 +92,7 @@ void Object_crash(object *obj, struct move *move, int crashtype,
  * Prototypes for event.c
  */
 int Handle_keyboard(player *pl);
-void Pause_player(player *pl, int on);
+void Pause_player(player *pl, bool on);
 int Player_lock_closest(player *pl, int next);
 bool team_dead(int team);
 void filter_mods(modifiers *mods);
@@ -366,7 +366,7 @@ void Server_info(char *str, unsigned max_size);
 void Log_game(const char *heading);
 void Game_Over(void);
 void Server_log_admin_message(player *pl, const char *str);
-int plock_server(int on);
+int plock_server(bool on);
 void Main_loop(void);
 
 
@@ -402,12 +402,12 @@ void Set_player_message(player *pl, const char *message);
  * Prototypes for update.c
  */
 void Update_objects(void);
-void Autopilot(player *pl, int on);
-void Cloak(player *pl, int on);
-void Deflector(player *pl, int on);
-void Emergency_thrust(player *pl, int on);
-void Emergency_shield(player *pl, int on);
-void Phasing(player *pl, int on);
+void Autopilot(player *pl, bool on);
+void Cloak(player *pl, bool on);
+void Deflector(player *pl, bool on);
+void Emergency_thrust(player *pl, bool on);
+void Emergency_shield(player *pl, bool on);
+void Phasing(player *pl, bool on);
 
 /*
  * Prototypes for option.c

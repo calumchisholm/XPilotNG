@@ -40,6 +40,7 @@ typedef unsigned char	u_byte;
 
 #ifndef	_XPMONNT_
 #define bool	int
+/*typedef enum { false = 0, true = 1 } bool;*/
 #endif
 
 /*
