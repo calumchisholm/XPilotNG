@@ -165,6 +165,9 @@ SDL_Event *CON_Events(SDL_Event * event)
 		    Clear_Command(Topmost);
 		    Topmost->CommandScrollBack = -1;
 		}
+		else
+		    /* deactivate Console if return is pressed on empty line */
+		    CON_Hide(Topmost);
 		break;
 	    case SDLK_ESCAPE:
 		/* deactivate Console */
