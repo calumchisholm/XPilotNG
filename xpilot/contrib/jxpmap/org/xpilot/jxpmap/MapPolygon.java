@@ -244,10 +244,12 @@ public class MapPolygon extends MapObject {
                 
             } else if (style.getFillStyle() == PolygonStyle.FILL_TEXTURED) {
                 BufferedImage img = style.getTexture().getImage();
-                Rectangle b = polygon.getBounds();
-                g.setPaint(new TexturePaint(img, new Rectangle
-                    (b.x, b.y, img.getWidth() * 64, -img.getHeight() * 64)));
-                g.fill(p);
+                if (img != null) {
+                    Rectangle b = polygon.getBounds();
+                    g.setPaint(new TexturePaint(img, new Rectangle(
+                        b.x, b.y, img.getWidth() * 64, -img.getHeight() * 64)));
+                    g.fill(p);
+                }
             }
         }
 

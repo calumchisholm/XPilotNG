@@ -13,7 +13,9 @@ import java.io.StringWriter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.BufferedInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +25,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+import javax.swing.JOptionPane;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -278,6 +281,57 @@ public class MapModel extends ModelObject {
     }
     
     
+    private String downloadImages() throws IOException {
+        String urlStr = (String)options.get("dataurl");
+        if (urlStr == null) {
+            JOptionPane.showMessageDialog(null,
+                "The map has no dataURL option");
+            return "";
+        }
+        File tmpDir = File.createTempFile("jxpmap", null);
+        // JDK seems to create an actual file
+        // I need to delete it before it can be used as a dir
+        tmpDir.delete();
+        if (!tmpDir.mkdir())
+            throw new IOException("unable to create temporary directory: " 
+                + tmpDir.getAbsolutePath());
+        tmpDir.deleteOnExit();
+        URL url = new URL(urlStr);
+        File xpdFile = new File(tmpDir, new File(url.getPath()).getName());        
+        InputStream in = url.openStream();
+        try {
+            FileOutputStream out = new FileOutputStream(xpdFile);
+            try {
+                byte buf[] = new byte[2048];
+                for (int c = in.read(buf); c != -1; c = in.read(buf))
+                    out.write(buf, 0, c);
+            } finally {
+                out.close();
+            }
+        } finally {
+            in.close();
+        }
+        try {
+            XPDFile xpd = XPDFile.load(xpdFile);
+            xpdFile.delete();
+            for (Iterator i = xpd.iterator(); i.hasNext();) {
+                XPDFile.Part p = (XPDFile.Part)i.next();
+                File pf = new File(tmpDir, p.name);
+                FileOutputStream out = new FileOutputStream(pf);
+                try {
+                    out.write(p.data);
+                } finally {
+                    out.close();
+                }
+                pf.deleteOnExit();
+            }
+            return tmpDir.getAbsolutePath() + "/";
+        } catch (XPDFile.ParseException pe) {
+            throw new IOException("corrupted xpd file");
+        }
+    }
+    
+    
     public void importXml(String xml)
     throws IOException, SAXException, ParserConfigurationException {
         edgeStyles.clear();
@@ -289,15 +343,28 @@ public class MapModel extends ModelObject {
 
         readXml(xml);
 
+        boolean asked = false;
+        String tmpDir = "";
         for (Iterator i = pixmaps.iterator(); i.hasNext();) {
             Pixmap pixmap = (Pixmap)i.next();
-            InputStream in = new BufferedInputStream(
-                new FileInputStream(
-                    pixmap.getFileName()));
-            try {
-                pixmap.load(in);
-            } finally {
-                in.close();
+            File f = new File(tmpDir + pixmap.getFileName());
+            if (!asked && !f.exists()) {
+                asked = true;
+                if (JOptionPane.showConfirmDialog(null,
+                    "Download the images used by this map?") 
+                    == JOptionPane.YES_OPTION) {
+                    tmpDir = downloadImages();
+                    f = new File(tmpDir + pixmap.getFileName());
+                }
+            }
+            if (f.exists()) {
+                InputStream in = new BufferedInputStream(
+                    new FileInputStream(f));
+                try {
+                    pixmap.load(in);
+                } finally {
+                    in.close();
+                }
             }
         }
 
