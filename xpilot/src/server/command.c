@@ -657,12 +657,12 @@ static int Cmd_auth(char *arg, player *pl, int oper, char *msg)
     Queue_kick(pl->auth_nick);
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players_i;
+	player *pl_i = Players(i);
 	if (pl != pl_i &&
 	    !strcasecmp(pl_i->auth_nick, pl->auth_nick))
 	{
 	    sprintf(msg, "%s has been kicked out (nick collision).",
-		    pl_i)->name);
+		    pl_i->name);
 	    if (pl_i->conn == NOT_CONNECTED)
 		Delete_player(pl_i);
 	    else
