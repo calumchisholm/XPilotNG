@@ -196,9 +196,9 @@ void Grok_map(void)
     }
 
 #ifndef	SILENT
-    xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d\nTeam play: %s\n",
-	   World.name, World.NumBases, World.x, World.y,
-	   BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
+    xpprintf("World....: %s\nBases....: %d\nMapsize..: %dx%d pixels\n"
+	     "Team play: %s\n", World.name, World.NumBases, World.width,
+	     World.height, BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
 #endif
     return;
 }
