@@ -538,7 +538,7 @@ extern double	turnresistance_s;	/* Saved (see above) */
 extern double	displayedPower;		/* What the server is sending us */
 extern double	displayedTurnspeed;	/* What the server is sending us */
 extern double	displayedTurnresistance;/* What the server is sending us */
-extern double	spark_prob;		/* Sparkling effect configurable */
+extern double	sparkProb;		/* Sparkling effect configurable */
 extern int	charsPerSecond;		/* Message output speed (config) */
 
 extern double	hud_move_fact;		/* scale the hud-movement (speed) */

@@ -3212,8 +3212,8 @@ void Parse_options(int *argcp, char **argvp)
     Get_float_resource(rDB, "altTurnSpeed", &turnspeed_s);
     Get_float_resource(rDB, "altTurnResistance", &turnresistance_s);
 
-    Get_float_resource(rDB, "sparkProb", &spark_prob);
-    spark_rand = (int)(spark_prob * MAX_SPARK_RAND + 0.5f);
+    Get_float_resource(rDB, "sparkProb", &sparkProb);
+    spark_rand = (int)(sparkProb * MAX_SPARK_RAND + 0.5f);
     Get_int_resource(rDB, "charsPerSecond", &charsPerSecond);
 
     Get_int_resource(rDB, "backgroundPointDist", &map_point_distance);

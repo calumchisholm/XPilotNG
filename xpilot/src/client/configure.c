@@ -1023,7 +1023,7 @@ static int Config_create_sparkSize(int widget_desc, int *height)
 static int Config_create_sparkProb(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
-			       "sparkProb", &spark_prob,
+			       "sparkProb", &sparkProb,
 			       0.0, 1.0,
 			       Config_update_sparkProb, NULL);
 }
@@ -1650,7 +1650,7 @@ static int Config_update_altTurnResistance(int widget_desc, void *data,
 static int Config_update_sparkProb(int widget_desc, void *data, double *val)
 {
     (void)widget_desc; (void)data; (void)val;
-    spark_rand = (int)(spark_prob * MAX_SPARK_RAND + 0.5f);
+    spark_rand = (int)(sparkProb * MAX_SPARK_RAND + 0.5f);
     Check_view_dimensions();
     return 0;
 }
@@ -2009,7 +2009,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "backgroundPointDist", map_point_distance);
     Config_save_int(fp, "backgroundPointSize", map_point_size);
     Config_save_int(fp, "sparkSize", spark_size);
-    Config_save_float(fp, "sparkProb", spark_prob);
+    Config_save_float(fp, "sparkProb", sparkProb);
     Config_save_int(fp, "shotSize", shot_size);
     Config_save_int(fp, "teamShotSize", teamshot_size);
     Config_save_bool(fp, "showNastyShots", showNastyShots);

@@ -332,6 +332,15 @@ static bool Set_maxFPS(xp_option_t *opt, int val)
     return true;
 }
 
+static bool Set_sparkProb(xp_option_t *opt, double val)
+{
+    (void)opt;
+    sparkProb = val;
+    spark_rand = (int)(sparkProb * MAX_SPARK_RAND + 0.5);
+    Check_view_dimensions();
+    return true;
+}
+
 /* steering stuff ends */
 
 xp_option_t default_options[] = {
@@ -562,12 +571,12 @@ xp_option_t default_options[] = {
 
     XP_DOUBLE_OPTION(
 	"sparkProb",
-	0.25,
+	0.4,
 	0.0,
 	1.0,
-	&spark_prob,
-	NULL,  /* put something here */
-	"The chance that sparks are drawn or not.\n"
+	&sparkProb,
+	Set_sparkProb,
+	"The probablilty that sparks are drawn.\n"
 	"This gives a sparkling effect.\n"
 	"Valid values are in the range [0.0-1.0]\n"),
 
@@ -4349,8 +4358,8 @@ void Parse_options(int *argcp, char **argvp)
     Get_float_resource(rDB, "altTurnSpeed", &turnspeed_s);
     Get_float_resource(rDB, "altTurnResistance", &turnresistance_s);
 
-    Get_float_resource(rDB, "sparkProb", &spark_prob);
-    spark_rand = (int)(spark_prob * MAX_SPARK_RAND + 0.5f);
+    Get_float_resource(rDB, "sparkProb", &sparkProb);
+    spark_rand = (int)(sparkProb * MAX_SPARK_RAND + 0.5f);
     Get_int_resource(rDB, "charsPerSecond", &charsPerSecond);
     Get_bool_resource(rDB, "markingLights", &markingLights);
 

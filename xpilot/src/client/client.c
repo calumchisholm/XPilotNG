@@ -110,7 +110,7 @@ double	turnresistance_s;	/* Saved (see above) */
 double	displayedPower;		/* What the server is sending us */
 double	displayedTurnspeed;	/* What the server is sending us */
 double	displayedTurnresistance;/* What the server is sending us */
-double	spark_prob;		/* Sparkling effect user configurable */
+double	sparkProb;		/* Sparkling effect user configurable */
 int     charsPerSecond;         /* Message output speed (configurable) */
 
 double	hud_move_fact;		/* scale the hud-movement (speed) */
