@@ -185,6 +185,25 @@ xp_option_t default_options[] = {
 	"policy.  You can find out about which port is used by a server by\n"
 	"querying the XPilot Meta server.\n"),
 
+    XP_INT_OPTION(
+	"clientPortStart",
+	0,
+	0,
+	65535,
+	&clientPortStart,
+	NULL,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"
+	/* TODO: describe what value 0 means */),
+
+    XP_INT_OPTION(
+	"clientPortEnd",
+	0,
+	0,
+	65535,
+	&clientPortEnd,
+	NULL,
+	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n"),
+
     XP_STRING_OPTION(
 	"geometry",
 	"1024x768",
@@ -404,6 +423,30 @@ xp_option_t default_options[] = {
 	"Paint remaining lives next to ships.\n"),
 
     XP_BOOL_OPTION(
+	"showMessages",
+	true,
+	&instruments.showMessages,
+	NULL,
+	"Should game messages appear on screen.\n"),
+
+    XP_BOOL_OPTION(
+	"showItems",
+	true,
+	&instruments.showItems,
+	NULL,
+	"Should owned items be displayed permanently on the HUD?\n"),
+
+    XP_DOUBLE_OPTION(
+	"showItemsTime",
+	5.0,
+	MIN_SHOW_ITEMS_TIME,
+	MAX_SHOW_ITEMS_TIME,
+	&showItemsTime,
+	NULL,
+	"If showItems is false, the time in seconds to display item\n"
+	"information on the HUD when it has changed.\n"),
+
+    XP_BOOL_OPTION(
 	"filledWorld",
 	false,
 	&instruments.showFilledWorld,
@@ -427,6 +470,42 @@ xp_option_t default_options[] = {
 	NULL,
 	"Draws only the outline of all the wall blocks\n"
 	"on block based maps.\n"),
+
+    XP_BOOL_OPTION(
+	"showDecor",
+	true,
+	&instruments.showDecor,
+	NULL,
+	"Should decorations be displayed on the screen and radar?\n"),
+
+    XP_BOOL_OPTION(
+	"outlineDecor",
+	false,
+	&instruments.showOutlineDecor,
+	NULL,
+	"Draws only the outline of the map decoration.\n"),
+
+    XP_BOOL_OPTION(
+	"filledDecor",
+	false,
+	&instruments.showFilledDecor,
+	NULL,
+	"Draws filled decorations.\n"),
+
+    XP_BOOL_OPTION(
+	"texturedDecor",
+	false,
+	&instruments.showTexturedDecor,
+	NULL,
+	"Draws the map decoration filled with a texture pattern.\n"),
+
+
+    XP_BOOL_OPTION(
+	"clockAMPM",
+	false,
+	&instruments.useAMPMFormatClock,
+	NULL,
+	"Use AMPM format for clock display instead of 24 hour format.\n"),
 
     /* stuff drawn on map */
 
@@ -519,6 +598,24 @@ xp_option_t default_options[] = {
 	"1: Only player messages.\n"
 	"2: Player and status messages.\n"),
 
+    XP_BOOL_OPTION(
+	"selectionAndHistory",
+	true,
+	&selectionAndHistory,
+	NULL,
+	"Provide cut&paste for the player messages and the talk window and\n"
+	"a `history' for the talk window.\n"),
+
+    XP_INT_OPTION(
+	"maxLinesInHistory",
+	32,
+	1,
+	MAX_HIST_MSGS,
+	&maxLinesInHistory,
+	NULL,
+	"Number of your messages saved in the `history' of the talk window.\n"
+	"`history' is accessible with `keyTalkCursorUp/Down'.\n"),
+
     /* stuff you should not have to touch */
 
     XP_DOUBLE_OPTION(
@@ -565,6 +662,25 @@ xp_option_t default_options[] = {
 	&ptr_move_fact,
     	NULL,
 	"Uses a red line to indicate the current velocity and direction.\n"),
+
+    XP_INT_OPTION(
+	"showScoreDecimals",
+	1,
+	0,
+	2,
+	&showScoreDecimals,
+	NULL,
+	"The number of decimals to use when displaying scores.\n"),
+
+    /* kps - remove option later */
+    XP_INT_OPTION(
+	"receiveWindowSize",
+	3,
+	MIN_RECEIVE_WINDOW_SIZE,
+	MAX_RECEIVE_WINDOW_SIZE,
+	&receive_window_size,
+	NULL,
+	"Too complicated.  Keep it on 3.\n"),
 
     /* eye candy stuff */
     XP_BOOL_OPTION(
@@ -684,16 +800,6 @@ xp_option_t default_options[] = {
 
 
 
-
-
-    {
-	"clockAMPM",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"12 or 24 hour format for clock display.\n",
-	0
-    },
     {
 	"pointerControl",
 	NULL,
@@ -715,24 +821,7 @@ xp_option_t default_options[] = {
 	0
     },
 #ifndef _WINDOWS
-    {
-	"selectionAndHistory",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Provide cut&paste for the player messages and the talk window and\n"
-	"a `history' for the talk window.\n",
-	0
-    },
-    {
-	"maxLinesInHistory",
-	NULL,
-	"32",
-	KEY_DUMMY,
-	"Number of your messages saved in the `history' of the talk window.\n"
-	"`history' is accessible with `keyTalkCursorUp/Down'.\n",
-	0
-    },
+
 #endif
 
 
@@ -772,56 +861,7 @@ xp_option_t default_options[] = {
 	"automatically for your particular display system.\n",
 	0
     },
-    {
-	"showMessages",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should messages appear on screen.\n",
-	0
-    },
-    {
-	"showItems",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should owned items be displayed permanently on the HUD?\n",
-	0
-    },
-    {
-	"showItemsTime",
-	NULL,
-	"3.0",
-	KEY_DUMMY,
-	"If showItems is false, the time in seconds to display item\n"
-	"information on the HUD when it has changed.\n",
-	0
-    },
-    {
-	"showScoreDecimals",
-	NULL,
-	"1",
-	KEY_DUMMY,
-	"The number of decimals to use when displaying scores.\n",
-	0
-    },
-    {
-	"receiveWindowSize",
-	NULL,
-	"3",
-	KEY_DUMMY,
-	"Too complicated.  Keep it on 3.\n",
-	0
-    },
 
-    {
-	"showDecor",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should decorations be displayed on the screen and radar?\n",
-	0
-    },
 
     {
 	"clientRanker",
@@ -831,31 +871,6 @@ xp_option_t default_options[] = {
 	"Scan messages and make personal kill/death ranking.\n",
 	0
     },
-    {
-	"outlineDecor",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Draws only the outline of the map decoration.\n",
-	0
-    },
-    {
-	"filledDecor",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Draws filled decorations.\n",
-	0
-    },
-    {
-	"texturedDecor",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Draws the map decoration filled with a texture pattern.\n",
-	0
-    },
-
 
     {
 	"pointerButton1",
@@ -933,22 +948,7 @@ xp_option_t default_options[] = {
 	"published in HTML format, w/o JavaScript. \n",
 	0
     },
-    {
-	"clientPortStart",
-	NULL,
-	"0",
-	KEY_DUMMY,
-	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n",
-	0
-    },
-    {
-	"clientPortEnd",
-	NULL,
-	"0",
-	KEY_DUMMY,
-	"Use UDP ports clientPortStart - clientPortEnd (for firewalls).\n",
-	0
-    },
+
 #ifdef _WINDOWS
     {
 	"threadedDraw",
