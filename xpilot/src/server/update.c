@@ -615,10 +615,9 @@ void Update_objects(void)
 	/* laserhack */
 	if (obj->type == OBJ_PULSE) {
 	    pulseobject *pulse = PULSE_PTR(obj);
-	    /* kps - maybe pulse->len should be in pixels  */
-	    pulse->len += pulseSpeed * timeStep2 * CLICK;
-	    if (pulse->len > pulseLength * CLICK)
-		pulse->len = pulseLength * CLICK;
+	    pulse->len += pulseSpeed * timeStep2;
+	    if (pulse->len > pulseLength)
+		pulse->len = pulseLength;
 	}
 
 	if (!BIT(obj->type, OBJ_ASTEROID)) {

@@ -775,8 +775,8 @@ static void Frame_shots(int conn, int ind)
 		lcy = cy;
 		ldir = MOD2(pulse->dir + RES/2, RES);
 	    } else {
-		lcx = WRAP_XCLICK(cx - tcos(pulse->dir) * pulse->len);
-		lcy = WRAP_YCLICK(cy - tsin(pulse->dir) * pulse->len);
+		lcx = WRAP_XCLICK(cx - tcos(pulse->dir) * pulse->len * CLICK);
+		lcy = WRAP_YCLICK(cy - tsin(pulse->dir) * pulse->len * CLICK);
 		ldir = pulse->dir;
 		if (!click_inview(&cv, lcx, lcy))
 		    continue;

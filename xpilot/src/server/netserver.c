@@ -2446,7 +2446,7 @@ int Send_laser(int ind, int color, int cx, int cy, int len, int dir)
 
     return Packet_printf(&connp->w, "%c%c%hd%hd%hd%c", PKT_LASER,
 			 color, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
-			 CLICK_TO_PIXEL(len), dir);
+			 len, dir);
 }
 
 int Send_radar(int ind, int x, int y, int size)

@@ -1442,8 +1442,10 @@ void Fire_laser(int ind)
 	if (pl->fuel.sum < -ED_LASER) {
 	    CLR_BIT(pl->used, HAS_LASER);
 	} else {
-	    cx = pl->pos.cx + pl->ship->m_gun[pl->dir].cx;
-	    cy = pl->pos.cy + pl->ship->m_gun[pl->dir].cy;
+	    cx = pl->pos.cx + pl->ship->m_gun[pl->dir].cx
+		+ PIXEL_TO_CLICK(pl->vel.x * timeStep2);
+	    cy = pl->pos.cy + pl->ship->m_gun[pl->dir].cy
+		+ PIXEL_TO_CLICK(pl->vel.y * timeStep2);
 	    cx = WRAP_XCLICK(cx);
 	    cy = WRAP_YCLICK(cy);
 	    if (INSIDE_MAP(cx, cy))
