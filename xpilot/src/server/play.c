@@ -434,7 +434,7 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 /*
  * Cannon specific functions
  */
-int Cannon_hitmask(cannon_t *cannon)
+hitmask_t Cannon_hitmask(cannon_t *cannon)
 {
     if (cannon->dead_time > 0)
 	return ALL_BITS;
@@ -519,7 +519,7 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
 /*
  * Target specific functions
  */
-int Target_hitmask(target_t *targ)
+hitmask_t Target_hitmask(target_t *targ)
 {
     /* target is destroyed - nothing hits */
     if (targ->dead_time > 0)
@@ -596,7 +596,7 @@ void Target_remove_from_map(target_t *targ)
 /*
  * Wormhole specific functions
  */
-int Wormhole_hitmask(wormhole_t *wormhole)
+hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
 {
     if (wormhole->type == WORM_OUT)
 	return ALL_BITS;

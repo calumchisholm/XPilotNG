@@ -1305,7 +1305,7 @@ static void Shape_move(const move_t *move, const shape_t *s,
  * that would be hit during morphing or NO_GROUP if there is enough room. */
 /* This might be useful elsewhere in the code, need not be kept static */
 static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
-		       int dir2, int hitmask, const object *obj, int x, int y)
+		       int dir2, hitmask_t hitmask, const object *obj, int x, int y)
 {
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
@@ -1763,7 +1763,7 @@ struct templine {
  * a polygon belonging to a group that could be hit by the given
  * hitmask/object.
  * Return the number of a group that would be hit or NO_GROUP. */
-int is_inside(int cx, int cy, int hitmask, const object *obj)
+int is_inside(int cx, int cy, hitmask_t hitmask, const object *obj)
 {
     short *ptr;
     int inside, cx1, cx2, cy1, cy2, s;
@@ -1842,7 +1842,7 @@ int is_inside(int cx, int cy, int hitmask, const object *obj)
 
 /* Similar to the above, except check whether any part of the shape
  * (edge or inside) would hit the group. */
-int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
+int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object *obj,
 		    const shape_t *s, int dir)
 {
     static shapepos zeropos;
@@ -2819,7 +2819,8 @@ void Move_player(player *pl)
 void Turn_player(player *pl)
 {
     int		new_dir = MOD2((int)(pl->float_dir + 0.5), RES);
-    int		next_dir, sign, hitmask;
+    int		next_dir, sign;
+    hitmask_t hitmask;
 
     if (recOpt) {
 	if (record)

@@ -172,8 +172,6 @@ static void Player_collides_with_asteroid(player *pl, wireobject *obj);
 static void Player_collides_with_killing_shot(player *pl, object *obj);
 static void Player_pass_checkpoint(player *pl);
 
-extern shape_t ball_wire;
-
 
 void Check_collision(void)
 {

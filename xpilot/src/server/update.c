@@ -109,7 +109,7 @@ void Phasing(player *pl, bool on)
 	CLR_BIT(pl->status, GRAVITY);
 	sound_play_sensors(pl->pos, PHASING_ON_SOUND);
     } else {
-	int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
+	hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 	int group;
 
 	CLR_BIT(pl->used, HAS_PHASING_DEVICE);
@@ -840,7 +840,7 @@ static void Do_warping(player *pl)
 
     } else { /* wormHoleHit == -1 */
 	int counter;
-	int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
+	hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 
 	/* try to find empty space to hyperjump to */
 	for (counter = 20; counter > 0; counter--) {
@@ -893,18 +893,21 @@ static void Do_warping(player *pl)
 	    object *b = Obj[k];
 	    if (BIT(b->type, OBJ_BALL) && b->id == pl->id) {
 		clpos ballpos;
+		hitmask_t hitmask = BALL_BIT|HITMASK(pl->team);
+
 		ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
 		ballpos.cy = b->pos.cy + dest.cy - pl->pos.cy;
 		ballpos.cx = WRAP_XCLICK(ballpos.cx);
 		ballpos.cy = WRAP_YCLICK(ballpos.cy);
 		if (!INSIDE_MAP(ballpos.cx, ballpos.cy)) {
-		    b->life = 0;
+		    b->life = 0.0;
 		    continue;
 		}
-		/*
-		 * kps - use shape is inside here to check if ball
-		 * is inside wall
-		 */
+		if (shape_is_inside(ballpos.cx, ballpos.cy, hitmask,
+				    (object *)b, &ball_wire, 0) != NO_GROUP) {
+		    b->life = 0.0;
+		    continue;
+		}
 		Object_position_set_clicks(b, ballpos.cx, ballpos.cy);
 		Object_position_remember(b);
 		b->vel.x *= WORM_BRAKE_FACTOR;

@@ -284,8 +284,8 @@ extern double 		dropItemOnKillProb;
 extern double		detonateItemOnKillProb;
 extern double 		movingItemProb;
 extern double		randomItemProb;
-extern double            rogueHeatProb;
-extern double            rogueMineProb;
+extern double		rogueHeatProb;
+extern double		rogueMineProb;
 extern double		itemProbMult;
 extern double		cannonItemProbMult;
 extern double		asteroidItemProb;
@@ -377,6 +377,8 @@ extern bool		ngControls;
 extern bool		ignoreMaxFPS;
 extern bool		polygonMode;
 
+extern shape_t		ball_wire;
+
 #define Bases(ind)		(&World.bases[(ind)])
 #define Fuels(ind)		(&World.fuels[(ind)])
 #define Cannons(ind)		(&World.cannons[(ind)])
@@ -445,8 +447,8 @@ void Move_init(void);
 void Move_object(object *obj);
 void Move_player(player *pl);
 void Turn_player(player *pl);
-int is_inside(int x, int y, int hitmask, const object *obj);
-int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
+int is_inside(int x, int y, hitmask_t hitmask, const object *obj);
+int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object *obj,
 		    const shape_t *s, int dir);
 int Polys_to_client(unsigned char **);
 void Ball_line_init(void);
@@ -561,17 +563,17 @@ void Ball_is_destroyed(ballobject *ball);
 
 bool Balltarget_hitfunc(group_t *groupptr, move_t *move);
 
-int Cannon_hitmask(cannon_t *cannon);
+hitmask_t Cannon_hitmask(cannon_t *cannon);
 bool Cannon_hitfunc(group_t *groupptr, move_t *move);
 void Cannon_restore_on_map(cannon_t *cannon);
 void Cannon_remove_from_map(cannon_t *cannon);
 
-int Target_hitmask(target_t *targ);
+hitmask_t Target_hitmask(target_t *targ);
 void Target_init(void);
 void Target_restore_on_map(target_t *targ);
 void Target_remove_from_map(target_t *targ);
 
-int Wormhole_hitmask(wormhole_t *wormhole);
+hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
 void Wormhole_remove_from_map(wormhole_t *wormhole);
 
@@ -903,7 +905,7 @@ int P_get_bmp_id(const char *s);
 int P_get_edge_id(const char *s);
 int P_get_poly_id(const char *s);
 /*void P_grouphack(int type, void (*f)(int group, void *mapobj));*/
-void P_set_hitmask(int group, int hitmask);
+void P_set_hitmask(int group, hitmask_t hitmask);
 
 /*
  * Prototypes for showtime.c

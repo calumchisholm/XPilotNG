@@ -51,7 +51,7 @@ static void Check_groupcount(void)
     }
 }
 
-static int Create_group(int type, int team, int hitmask,
+static int Create_group(int type, int team, hitmask_t hitmask,
 			bool (*hitfunc)(group_t *gp, move_t *move),
 			int mapobj_ind)
 {
@@ -386,7 +386,7 @@ void P_grouphack(int type, void (*f)(int, void *))
 }
 #endif
 
-void P_set_hitmask(int group, int hitmask)
+void P_set_hitmask(int group, hitmask_t hitmask)
 {
     assert(group >= 0);
     assert(group < num_groups);

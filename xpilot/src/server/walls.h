@@ -134,10 +134,12 @@ typedef struct {
     int is_decor;
 } poly_t;
 
+typedef uint32_t hitmask_t;
+
 typedef struct move {
     clvec start;
     clvec delta;
-    int hitmask;
+    hitmask_t hitmask;
     object *obj;
 } move_t;
 
@@ -146,7 +148,7 @@ typedef struct group group_t;
 struct group {
     int type;
     int team;
-    int hitmask;
+    hitmask_t hitmask;
     bool (*hitfunc)(group_t *groupptr, move_t *move);
     int mapobj_ind;
 };

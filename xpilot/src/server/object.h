@@ -160,11 +160,11 @@ typedef struct {
 /*
  * Hitmasks are 32 bits.
  */
-#define ALL_BITS		0xffffffff
-#define BALL_BIT		(1 << 11)
-#define NONBALL_BIT		(1 << 12)
-#define NOTEAM_BIT		(1 << 10)
-#define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1 << (team))
+#define ALL_BITS		0xffffffffU
+#define BALL_BIT		(1U << 11)
+#define NONBALL_BIT		(1U << 12)
+#define NOTEAM_BIT		(1U << 10)
+#define HITMASK(team) ((team) == TEAM_NOT_SET ? NOTEAM_BIT : 1U << (team))
 
 /*
  * Object position is non-modifiable, except at one place.
