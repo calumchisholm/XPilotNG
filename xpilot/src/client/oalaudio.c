@@ -44,14 +44,19 @@ typedef struct {
     ALboolean loop;
 } sample_t;
 
-typedef struct {
-    sample_t *sample;
-    int      volume;
-    long     updated;
+typedef struct sound {
+    sample_t     *sample;
+    int          volume;
+    long         updated;
+    ALuint       source;
+    struct sound *next;
 } sound_t;
 
-static ALuint  source[MAX_SOUNDS];
+static sound_t *ring;
+static sound_t *looping;
 static sound_t sound[MAX_SOUNDS];
+static ALuint  source[MAX_SOUNDS];
+
 
 static void sample_parse_info(char *filename, sample_t *sample)
 {
@@ -126,8 +131,8 @@ static void sample_free(sample_t *sample)
 
 int audioDeviceInit(char *display)
 {
-    ALenum err;
     int    i;
+    ALenum err;
 
     alutInit (NULL, 0);
     alListenerf(AL_GAIN, 1.0);
@@ -140,6 +145,15 @@ int audioDeviceInit(char *display)
 	      err, alGetString(err));
 	return -1;
     }
+    for (i = 0; i < MAX_SOUNDS; i++) {
+	sound[i].sample = NULL;
+	sound[i].volume = 0;
+	sound[i].updated = 0;
+	sound[i].source = source[i];
+	sound[i].next = &sound[(i + 1) % MAX_SOUNDS];
+    }
+    ring = sound;
+    looping = NULL;
 
     return 0;
 }
@@ -147,7 +161,7 @@ int audioDeviceInit(char *display)
 void audioDevicePlay(char *filename, int type, int volume, void **private)
 {
     int      i, free;
-    ALenum   state;
+    sound_t  *iter, *next;
     sample_t *sample = (sample_t *)(*private);
 
     if (!sample) {
@@ -159,39 +173,44 @@ void audioDevicePlay(char *filename, int type, int volume, void **private)
 	*private = sample;
     }
 
-    free = -1;
-    for (i = 0; i < MAX_SOUNDS; i++) {
-	if (free == -1) {
-	    alGetSourcei(source[i], AL_SOURCE_STATE, &state);
-	    if (state != AL_PLAYING) {
-		free = i;
-		if (!sample->loop) 
-		    break;
-	    }
-	}
-	if (sample->loop
-	    && sound[i].sample == sample
-	    && sound[i].updated < loops
-	    && ABS(sound[i].volume - volume) < VOL_THRESHOLD) {
-	    alGetSourcei(source[i], AL_SOURCE_STATE, &state);
-	    if (state == AL_PLAYING) {
-		alSourcef(source[i], AL_GAIN, sample->gain * volume / 100.0f);
-		sound[i].updated = loops;
+    /* if the sample is a looping one, first try to find a matching
+     * sound from the list of looping sounds already playing. */
+    if (sample->loop) {
+	for (iter = looping; iter; iter = iter->next) {
+	    if (iter->sample == sample
+		&& ABS(iter->volume - volume) < VOL_THRESHOLD) {
+		alSourcef(iter->source, AL_GAIN, 
+			  sample->gain * volume / 100.0f);
+		iter->volume = volume;
+		iter->updated = loops;
 		return;
 	    }
 	}
     }
 
-    if (free != -1) {    
-	sound[free].sample  = sample;
-	sound[free].volume  = volume;
-	sound[free].updated = loops;
-	
-	alSourcef(source[free], AL_GAIN, sample->gain * volume / 100.0f);
-	alSourcei(source[free], AL_BUFFER, sample->buffer);
-	alSourcei(source[free], AL_LOOPING, sample->loop);
-	alSourcePlay(source[free]);
+    if (ring->next == ring) 
+	return; /* only one sound left in the ring */
+
+    /* Pick the next sound from the ring and play the sample with it.
+     * If it is a looping sound move it away from the ring to the
+     * looping list. Else move it to the end of the ring. */
+    next = ring->next;    
+    if (sample->loop) {
+	ring->next = next->next;
+	next->next = looping;
+	looping = next;
+    } else {
+	ring = next;
     }
+    
+    next->sample  = sample;
+    next->volume  = volume;
+    next->updated = loops;
+	
+    alSourcef(next->source, AL_GAIN, sample->gain * volume / 100.0f);
+    alSourcei(next->source, AL_BUFFER, sample->buffer);
+    alSourcei(next->source, AL_LOOPING, sample->loop);
+    alSourcePlay(next->source);
 }
 
 void audioDeviceEvents(void)
@@ -200,12 +219,25 @@ void audioDeviceEvents(void)
 
 void audioDeviceUpdate(void)
 {
-    int i;
-    for (i = 0; i < MAX_SOUNDS; i++)
-	if (sound[i].sample 
-	    && sound[i].sample->loop
-	    && sound[i].updated < loops - 1)
-	    alSourceStop(source[i]);
+    sound_t *iter, *prev, *tmp;
+
+    /* Go through the looping list and stop all those sounds
+     * that haven't been updated during this frame. The stopped
+     * sounds are moved back to the ring. */
+    for (prev = NULL, iter = looping; iter;) {
+	if (iter->updated < loops - 1) {
+	    alSourceStop(iter->source);
+	    if (prev) prev->next = iter->next;
+	    else looping = iter->next;
+	    tmp = iter;
+	    iter = iter->next;
+	    tmp->next = ring->next;
+	    ring->next = tmp;
+	} else {
+	    prev = iter;
+	    iter = iter->next;
+	}
+    }
 }
 
 void audioDeviceFree(void *private) 
