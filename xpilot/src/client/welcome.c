@@ -103,6 +103,37 @@ static list_iter_t server_it;
 
 static bool joining;
 
+/*
+ * Label Headings
+ */
+static char next_text[] = "Next Server Page >>>";
+static char first_text[] = "<< First Server Page";
+static char ping_text[] = "Ping Servers";
+
+struct Label {
+  const char *label;
+  int commas;
+  int yoff;
+  int height;
+};
+    
+struct Label labels[] = {
+	/*  0 */ {"server", 0, 0, 0},
+	/*  1 */ {"version", 0, 0, 0},
+	/*  2 */ {"users", 0, 0, 0},
+	/*  3 */ {"map name", 0, 0, 0},
+	/*  4 */ {"map size", 0, 0, 0},
+	/*  5 */ {"map author", 0, 0, 0},
+	/*  6 */ {"status", 0, 0, 0},
+	/*  7 */ {"bases", 0, 0, 0},
+	/*  8 */ {"teambases", 0, 0, 0},
+	/*  9 */ {"free bases", 0, 0, 0},
+	/* 10 */ {"queued players", 0, 0, 0},
+	/* 11 */ {"FPS", 0, 0, 0},
+	/* 12 */ {"sound", 0, 0, 0},
+	/* 13 */ {"timing", 0, 0, 0},
+	/* 14 */ {"playlist", 1, 0, 0}
+    };
 
 /*
  * Some widgets.
@@ -1286,29 +1317,6 @@ static int Internet_server_show_cb(int widget, void *user_data,
     char *playslist = xp_strdup(sip->playlist);
     static char longest_text[] = "                                 ";
 
-    struct Label {
-	const char *label;
-	int commas;
-	int yoff;
-	int height;
-    };
-    struct Label labels[] = {
-	/*  0 */ {"server", 0, 0, 0},
-	/*  1 */ {"version", 0, 0, 0},
-	/*  2 */ {"users", 0, 0, 0},
-	/*  3 */ {"map name", 0, 0, 0},
-	/*  4 */ {"map size", 0, 0, 0},
-	/*  5 */ {"map author", 0, 0, 0},
-	/*  6 */ {"status", 0, 0, 0},
-	/*  7 */ {"bases", 0, 0, 0},
-	/*  8 */ {"teambases", 0, 0, 0},
-	/*  9 */ {"free bases", 0, 0, 0},
-	/* 10 */ {"queued players", 0, 0, 0},
-	/* 11 */ {"FPS", 0, 0, 0},
-	/* 12 */ {"sound", 0, 0, 0},
-	/* 13 */ {"timing", 0, 0, 0},
-	/* 14 */ {"playlist", 1, 0, 0}
-    };
     char *s;
 
     global_sip = sip;
@@ -1668,9 +1676,7 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
     int all_offset = 0;
     server_info_t *sip;
     list_iter_t start_server_it = server_it;
-    static char next_text[] = "Next Server Page >>>";
-    static char first_text[] = "<< First Server Page";
-    static char ping_text[] = "Ping Servers";
+
 
     int next_border, first_border, next_width, first_width;
     int pingw_width, next_height, first_height;
