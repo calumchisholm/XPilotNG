@@ -31,6 +31,7 @@ list_t		expandList;		/* List of predefined settings. */
 double		Gravity;		/* Power of gravity */
 double		ShipMass;		/* Default mass of ship */
 double		ballMass;		/* Default mass of balls */
+double		minItemMass;		/* Minimum mass of each item */
 double		ShotsMass;		/* Default mass of shots */
 double		ShotsSpeed;		/* Default speed of shots */
 double		ShotsLife;		/* Default number of ticks */
@@ -296,7 +297,8 @@ char		*defaultShipShape;	/* What ship shape is used for players */
 					/* who do not define their own? */
 char		*tankShipShape;		/* What ship shape is used for tanks? */
 int		maxPauseTime;		/* Max. time you can stay paused for */
-
+int		maxClientsPerIP;	/* Max. number of clients that can
+					   login from the same IP */
 
 extern char	conf_logfile_string[];	/* Default name of log file */
 
@@ -319,6 +321,7 @@ bool		polygonMode;		/* Run server in polygon mode even
 					   with block based (.xp) mapfile */
 bool		ignoreMaxFPS;		/* Temporary hack */
 bool		baselessPausing;
+double		pauseTax;		/* Tax for pausers */
 bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
 bool		ngControls;		/* Kps improved steering and shooting */
 int		pausedFPS;		/* Limited FPS for pausers */
@@ -414,6 +417,16 @@ static option_desc options[] = {
 	valReal,
 	tuner_ballmass,
 	"Mass of balls.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"minItemMass",
+	"minItemMass",
+	"0.1",		/* kps - 4.5.5beta has default of 1.0 */
+	&minItemMass,
+	valReal,
+	tuner_dummy,
+	"The minimum mass per item when carried by a ship.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3214,6 +3227,16 @@ static option_desc options[] = {
  	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"pauseTax",
+	"pauseTax",
+	"0.0",
+	&pauseTax,
+	valReal,
+	tuner_dummy,
+	"How many points to subract from pausing players each second.\n",
+ 	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"friction",
 	"friction",
 	"0.0",
@@ -3444,6 +3467,21 @@ static option_desc options[] = {
 	"After being paused this long, the player will be kicked off.\n"
 	"Setting this option to 0 disables the feature.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maxClientsPerIP",
+	"maxPerIP",
+	"3",		/* if more try to join they get "game locked" */
+	&maxClientsPerIP,
+	valInt,
+	tuner_dummy,
+	"Maximum number of clients per IP address allowed to connect.\n"
+	"This prevents unfriendly players from occupying all the bases, \n"
+	"effectively \"kicking\" paused players and denying other players\n"
+	"to join.\n"
+	"Setting this to 0 means any number of clients from the same IP\n"
+	"address can join.\n",
+	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
 #if 0
     {

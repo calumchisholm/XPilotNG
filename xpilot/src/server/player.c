@@ -331,6 +331,36 @@ void Player_used_kill(player *pl)
 }
 
 /*
+ * Calculate the mass of a player.
+ */
+void Player_set_mass(player *pl)
+{
+    double		sum_item_mass = 0.0;
+    double		item_mass;
+    int			item;
+
+    for (item = 0; item < NUM_ITEMS; item++) {
+	switch (item) {
+	case ITEM_FUEL:
+	case ITEM_TANK:
+	    item_mass = 0.0;
+	    break;
+	case ITEM_ARMOR:
+	    item_mass = pl->item[ITEM_ARMOR] * ARMOR_MASS;
+	    break;
+	default:
+	    item_mass = pl->item[item] * minItemMass;
+	    break;
+	}
+	sum_item_mass += item_mass;
+    }
+
+    pl->mass = pl->emptymass
+	+ FUEL_MASS(pl->fuel.sum)
+	+ sum_item_mass;
+}
+
+/*
  * Give player the initial number of tanks and amount of fuel.
  * Upto the maximum allowed.
  */

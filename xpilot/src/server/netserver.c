@@ -3546,3 +3546,23 @@ static int Receive_audio_request(connection_t *connp)
 
     return 1;
 }
+
+int Check_max_clients_per_IP(char *host_addr)
+{
+    int			i, clients_per_ip = 0;
+    connection_t	*connp;
+
+    if (maxClientsPerIP <= 0)
+	return 0;
+
+    for (i = 0; i < max_connections; i++) {
+	connp = &Conn[i];
+	if (connp->state != CONN_FREE && !strcasecmp(connp->addr, host_addr))
+	    clients_per_ip++;
+    }
+
+    if (clients_per_ip >= maxClientsPerIP)
+	return 1;
+
+    return 0;
+}

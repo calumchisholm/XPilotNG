@@ -175,7 +175,8 @@ void Deflector(player *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
-	    if (!cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
+	    /* only allow deflector when cloaked shielding or not cloaked */
+	    if (cloakedShield || !BIT(pl->used, HAS_CLOAKING_DEVICE)) {
 		SET_BIT(pl->used, HAS_DEFLECTOR);
 		sound_play_player(pl, DEFLECTOR_SOUND);
 	    }
@@ -946,6 +947,13 @@ static void Update_players(void)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
 
+	if (BIT(pl->status, PAUSE)) {
+	    if (pauseTax > 0.0 && (frame_loops % FPS) == 0) {
+		pl->score -= pauseTax;
+		updateScores = true;
+	    }
+	}
+
 	if ((pl->damaged -= timeStep) <= 0)
 	    pl->damaged = 0;
 
@@ -1088,10 +1096,7 @@ static void Update_players(void)
 	} else
 	    pl->acc.x = pl->acc.y = 0.0;
 
-	pl->mass = pl->emptymass
-		   + FUEL_MASS(pl->fuel.sum)
-		   + pl->item[ITEM_ARMOR] * ARMOR_MASS;
-
+	Player_set_mass(pl);
 
 	/* Wormholes and warping */
 	if (BIT(pl->status, WARPING))

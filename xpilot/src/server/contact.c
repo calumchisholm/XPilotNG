@@ -907,6 +907,8 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 	return E_GAME_FULL;
     if (game_lock && !rplayback && !baselessPausing)
 	return E_GAME_LOCKED;
+    if (Check_max_clients_per_IP(addr))
+	return E_GAME_LOCKED;
 
     qp = (struct queued_player *)malloc(sizeof(struct queued_player));
     if (!qp)

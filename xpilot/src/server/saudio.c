@@ -48,19 +48,25 @@ static void queue_audio(player * pl, int index, int volume)
 {
     AudioQPtr a, p, prev;
 
+    p = prev = (AudioQPtr) pl->audio;
+
+    while (p) {
+	if (p->index == index) {	/* same sound already in queue */
+	    if (p->volume < volume)	/* weaker version: replace volume */
+		p->volume = volume;
+	    return;
+	}
+	prev = p;
+	p = p->next;
+    }
+
+    /* not found in queue: add to end */
     if (!(a = (AudioQPtr) malloc(sizeof(AudioQRec))))
 	return;
 
     a->index = index;
     a->volume = volume;
     a->next = NULL;
-
-    p = prev = (AudioQPtr) pl->audio;
-
-    while (p) {
-	prev = p;
-	p = p->next;
-    }
 
     if (prev)
 	prev->next = a;

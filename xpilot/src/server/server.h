@@ -90,6 +90,7 @@ extern server		Server;
 extern list_t		expandList;
 extern double		ShotsMass, ShipMass, ShotsSpeed, Gravity;
 extern double		ballMass;
+extern double		minItemMass;
 extern int		ShotsMax;
 extern double		ShotsLife;
 extern double		pulseSpeed, pulseLength;
@@ -283,6 +284,7 @@ extern int		asteroidConcentratorRadius;
 extern double		asteroidConcentratorProb;
 extern double		gameDuration;
 extern bool		baselessPausing;
+extern double		pauseTax;
 extern int		pausedFPS;
 extern int		waitingFPS;
 extern int		game_lock;
@@ -337,6 +339,7 @@ extern int		clientPortStart;
 extern int		clientPortEnd;
 
 extern int		maxPauseTime;
+extern int		maxClientsPerIP;
 
 extern long		KILLING_SHOTS;
 extern unsigned		SPACE_BLOCKS;
@@ -661,6 +664,7 @@ static inline bool Player_used_emergency_shield(player *pl)
 }
 void Player_hit_armor(player *pl);
 void Player_used_kill(player *pl);
+void Player_set_mass(player *pl);
 int Init_player(int ind, shipshape_t *ship);
 void Alloc_players(int number);
 void Free_players(void);

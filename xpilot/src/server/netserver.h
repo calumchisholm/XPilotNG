@@ -98,6 +98,7 @@ int Get_player_id(connection_t *connp);
 const char *Player_get_addr(player *pl);
 const char *Player_get_dpy(player *pl);
 int Send_shape(connection_t *connp, int shape);
+int Check_max_clients_per_IP(char *host_addr);
 #define FEATURE(connp, feature)	((connp)->features & (feature))
 #define F_POLY			(1 << 0)
 #define F_FLOATSCORE		(1 << 1)

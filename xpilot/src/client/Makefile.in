@@ -138,7 +138,7 @@ xpilot_SOURCES = \
 	guimap.c guimap.h guiobjects.c guiobjects.h \
 	icon.h \
 	join.c \
-	mapdata.c messages.c \
+	meta.c meta.h mapdata.c messages.c \
 	netclient.c netclient.h \
 	option.c option.h \
 	paint.c paint.h paintdata.c paintdata.h painthud.c \
@@ -155,8 +155,9 @@ xpilot_SOURCES = \
 noinst_LIBRARIES = libxpclient.a
 libxpclient_a_SOURCES = \
 	netclient.c client.c event.c usleep.c query.c textinterface.c \
-	datagram.c mapdata.c gfx2d.c messages.c clientrank.c talkmacros.c \
-	clientcommand.c paint.c paintmap.c paintobjects.c option.c default.c
+	datagram.c meta.c mapdata.c gfx2d.c messages.c clientrank.c \
+	talkmacros.c clientcommand.c paint.c paintmap.c paintobjects.c \
+	option.c default.c
 
 
 #xpilot_CFLAGS = @X_CFLAGS@
@@ -174,11 +175,11 @@ libxpclient_a_AR = $(AR) cru
 libxpclient_a_LIBADD =
 am_libxpclient_a_OBJECTS = netclient.$(OBJEXT) client.$(OBJEXT) \
 	event.$(OBJEXT) usleep.$(OBJEXT) query.$(OBJEXT) \
-	textinterface.$(OBJEXT) datagram.$(OBJEXT) mapdata.$(OBJEXT) \
-	gfx2d.$(OBJEXT) messages.$(OBJEXT) clientrank.$(OBJEXT) \
-	talkmacros.$(OBJEXT) clientcommand.$(OBJEXT) paint.$(OBJEXT) \
-	paintmap.$(OBJEXT) paintobjects.$(OBJEXT) option.$(OBJEXT) \
-	default.$(OBJEXT)
+	textinterface.$(OBJEXT) datagram.$(OBJEXT) meta.$(OBJEXT) \
+	mapdata.$(OBJEXT) gfx2d.$(OBJEXT) messages.$(OBJEXT) \
+	clientrank.$(OBJEXT) talkmacros.$(OBJEXT) \
+	clientcommand.$(OBJEXT) paint.$(OBJEXT) paintmap.$(OBJEXT) \
+	paintobjects.$(OBJEXT) option.$(OBJEXT) default.$(OBJEXT)
 libxpclient_a_OBJECTS = $(am_libxpclient_a_OBJECTS)
 bin_PROGRAMS = xpilot$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
@@ -188,15 +189,15 @@ am_xpilot_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) caudio.$(OBJEXT) \
 	colors.$(OBJEXT) configure.$(OBJEXT) datagram.$(OBJEXT) \
 	dbuff.$(OBJEXT) debugaudio.$(OBJEXT) default.$(OBJEXT) \
 	event.$(OBJEXT) gfx2d.$(OBJEXT) guimap.$(OBJEXT) \
-	guiobjects.$(OBJEXT) join.$(OBJEXT) mapdata.$(OBJEXT) \
-	messages.$(OBJEXT) netclient.$(OBJEXT) option.$(OBJEXT) \
-	paint.$(OBJEXT) paintdata.$(OBJEXT) painthud.$(OBJEXT) \
-	paintmap.$(OBJEXT) paintobjects.$(OBJEXT) paintradar.$(OBJEXT) \
-	query.$(OBJEXT) record.$(OBJEXT) talk.$(OBJEXT) \
-	talkmacros.$(OBJEXT) textinterface.$(OBJEXT) usleep.$(OBJEXT) \
-	welcome.$(OBJEXT) widget.$(OBJEXT) xdefault.$(OBJEXT) \
-	xevent.$(OBJEXT) xeventhandlers.$(OBJEXT) xinit.$(OBJEXT) \
-	xpaint.$(OBJEXT) xpilot.$(OBJEXT)
+	guiobjects.$(OBJEXT) join.$(OBJEXT) meta.$(OBJEXT) \
+	mapdata.$(OBJEXT) messages.$(OBJEXT) netclient.$(OBJEXT) \
+	option.$(OBJEXT) paint.$(OBJEXT) paintdata.$(OBJEXT) \
+	painthud.$(OBJEXT) paintmap.$(OBJEXT) paintobjects.$(OBJEXT) \
+	paintradar.$(OBJEXT) query.$(OBJEXT) record.$(OBJEXT) \
+	talk.$(OBJEXT) talkmacros.$(OBJEXT) textinterface.$(OBJEXT) \
+	usleep.$(OBJEXT) welcome.$(OBJEXT) widget.$(OBJEXT) \
+	xdefault.$(OBJEXT) xevent.$(OBJEXT) xeventhandlers.$(OBJEXT) \
+	xinit.$(OBJEXT) xpaint.$(OBJEXT) xpilot.$(OBJEXT)
 xpilot_OBJECTS = $(am_xpilot_OBJECTS)
 xpilot_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilot_LDFLAGS =
@@ -214,10 +215,10 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/gfx2d.Po ./$(DEPDIR)/guimap.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/guiobjects.Po ./$(DEPDIR)/join.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/mapdata.Po ./$(DEPDIR)/messages.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/netclient.Po ./$(DEPDIR)/option.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/paint.Po ./$(DEPDIR)/paintdata.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/painthud.Po ./$(DEPDIR)/paintmap.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/paintobjects.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/meta.Po ./$(DEPDIR)/netclient.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/option.Po ./$(DEPDIR)/paint.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/paintdata.Po ./$(DEPDIR)/painthud.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/paintmap.Po ./$(DEPDIR)/paintobjects.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/paintradar.Po ./$(DEPDIR)/query.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/record.Po ./$(DEPDIR)/talk.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/talkmacros.Po \
@@ -312,6 +313,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/join.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mapdata.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/messages.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/meta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netclient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/option.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paint.Po@am__quote@

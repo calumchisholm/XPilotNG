@@ -141,7 +141,8 @@ DIST_COMMON = README $(dist_pkgdata_DATA) $(srcdir)/Makefile.in \
 	$(srcdir)/configure AUTHORS COPYING ChangeLog INSTALL \
 	Makefile.am NEWS README.in TODO aclocal.m4 config.h.in \
 	config/depcomp config/install-sh config/missing \
-	config/mkinstalldirs configure configure.ac
+	config/mkinstalldirs configure configure.ac install-sh missing \
+	mkinstalldirs
 DIST_SUBDIRS = $(SUBDIRS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
