@@ -505,8 +505,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 		edgestyle = get_edge_id(*(attr + 1));
 	    attr += 2;
 	}
-	if (ABS(x) > 32767 || ABS(y) > 32767) {
-	    error("Offset component absolute value exceeds 32767 (x=%d, y=%d)",
+	if (ABS(x) > 30000 || ABS(y) > 30000) {
+	    error("Offset component absolute value exceeds 30000 (x=%d, y=%d)",
 		  x, y);
 	    exit(1);
 	}
