@@ -1681,9 +1681,20 @@ void Move_smart_shot(int ind)
     else if (shot->type == OBJ_SMART_SHOT) {
 	smartobject *smart = SMART_PTR(shot);
 
+	/*
+	 * kps - this can cause Arithmetic Exception (division by zero)
+	 * since CONFUSED_UPDATE_GRANULARITY / gameSpeed is most often
+	 * < 1 and when it is cast to int it will be 0, and then
+	 * we get frameloops % 0, which is not good.
+	 */
+	/*if (BIT(smart->status, CONFUSED)
+	  && (!(frame_loops % (int)(CONFUSED_UPDATE_GRANULARITY / gameSpeed)
+	  || smart->count == CONFUSED_TIME))) {*/
+	/* not going to fix now, I'll just remove the '/ gamespeed' part */
+
 	if (BIT(smart->status, CONFUSED)
-	    && (!(frame_loops % (int)(CONFUSED_UPDATE_GRANULARITY / gameSpeed)
-		|| smart->count == CONFUSED_TIME))) {
+	    && (!(frame_loops % CONFUSED_UPDATE_GRANULARITY)
+		|| smart->count == CONFUSED_TIME)) {
 
 	    if (smart->count > 0) {
 		smart->info = Players((int)(rfrac() * NumPlayers))->id;
