@@ -291,7 +291,7 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 		int newFuelSum, int newFuelMax, int newPacketSize);
 int Handle_self_items(u_byte *newNumItems);
 int Handle_modifiers(char *m);
-int Handle_damaged(int damaged);
+int Handle_damaged(int dam);
 int Handle_destruct(int count);
 int Handle_shutdown(int count, int delay);
 int Handle_thrusttime(int count, int max);
@@ -303,7 +303,8 @@ int Handle_connector(int x_0, int y_0, int x_1, int y_1, int tractor);
 int Handle_laser(int color, int x, int y, int len, int dir);
 int Handle_missile(int x, int y, int dir, int len);
 int Handle_ball(int x, int y, int id);
-int Handle_ship(int x, int y, int id, int dir, int shield, int cloak, int eshield, int phased, int deflector);
+int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
+		int eshield, int phased, int deflector);
 int Handle_mine(int x, int y, int teammine, int id);
 int Handle_item(int x, int y, int type);
 int Handle_fastshot(int type, u_byte *p, int n);
