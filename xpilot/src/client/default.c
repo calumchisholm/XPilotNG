@@ -22,10 +22,10 @@
  */
 
 #ifdef OPTIONHACK
-
-/* kps tries to make this work without Xrm */
-
-#include "xpclient.h"
+#  include "xpclient.h"
+#else
+#  include "xpclient_x11.h"
+#endif
 
 #ifndef PATH_MAX
 # define PATH_MAX	1023
@@ -37,6 +37,11 @@ char myName[] = "xpilot";
 char myClass[] = "XPilot";
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
+
+
+#ifdef OPTIONHACK
+
+/* kps tries to make this work without Xrm */
 
 option options[] = {
     {
@@ -260,20 +265,11 @@ void Get_xpilotrc_file(char *path, unsigned size)
 #else /* OPTIONHACK */
 
 
-#include "xpclient_x11.h"
-
-
-char default_version[] = VERSION;
-
-
 
 #define DISPLAY_ENV	"DISPLAY"
 #define DISPLAY_DEF	":0.0"
 #define KEYBOARD_ENV	"KEYBOARD"
 
-#ifndef PATH_MAX
-#define PATH_MAX	1023
-#endif
 
 /*
  * Default fonts
@@ -288,19 +284,12 @@ char default_version[] = VERSION;
 #define MOTD_FONT	"-*-courier-bold-r-*--14-*-*-*-*-*-iso8859-1"
 
 
-char			myName[] = "xpilot";
-char			myClass[] = "XPilot";
-
-
 extern char *talk_fast_msgs[];	/* talk macros */
 char talk_fast_temp_buf[7];		/* can handle up to 999 fast msgs */
 char *talk_fast_temp_buf_big;
 
 
 static void Get_test_resources(XrmDatabase rDB);
-
-
-keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
 /* from common/config.c */
 extern char conf_ship_file_string[];
