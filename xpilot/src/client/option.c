@@ -1003,7 +1003,7 @@ static void Xpilotrc_create_line(char *buf, size_t size,
     assert(buf != NULL);
 
     if (comment_whole_line) {
-	char *s = ";";
+	const char *s = "; ";
 
 	assert(size > strlen(s));
 	strlcpy(buf, s, size);
