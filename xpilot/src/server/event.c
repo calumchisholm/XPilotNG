@@ -100,9 +100,12 @@ bool team_dead(int team)
 static bool Player_lock_allowed(player *pl, player *lock_pl)
 {
     /* we can never lock on ourselves, nor on NULL. */
-    if (lock_pl == NULL || pl->id == lock_pl->id) {
+    if (lock_pl == NULL || pl->id == lock_pl->id)
 	return false;
-    }
+
+    /* Spectators can watch freely */
+    if (pl->rectype == 2)
+	return true;
 
     /* if we are actively playing then we can lock since we are not viewing. */
     if (Player_is_active(pl))
@@ -128,22 +131,6 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
     return false;
 }
 
-/*
- * Sven Mascheck:
- * If all _opponents are paused, then even LOCK_NEXT (ot LOCK_PREV)
- * might not lock_next (or lock_prev), as Player_lock_closest() might
- * be called  [ "event.c" line 466 ] :
- * This happens when the player is not locked on any one anymore -
- * and this happens if he tried to lock_closest before (if all
- * opponents are paused).
- * Player_lock_closest() is called with (ind, 0) and that means that
- * the lock is cleared in _any case_ with the current code - that could
- * be done without calling Player_lock_closest().
- * (btw, code in Player_lock_closest() looks like 'evolutionary code :)
- * I am not sure where to fix that locking problem
- * ( in "case KEY_LOCK_NEXT" or in Player_lock_closest() ).
- * I tried to find a solution but now i am bit screwed up..  :)
- */
 int Player_lock_closest(player *pl, int next)
 {
     int i;
@@ -420,31 +407,27 @@ int Handle_keyboard(player *pl)
 
 	    case KEY_LOCK_NEXT:
 	    case KEY_LOCK_PREV:
-		j = i = GetInd(pl->lock.pl_id);
-		if (!BIT(pl->lock.tagged, LOCK_PLAYER)
-		    || j < 0 || j >= NumPlayers) {
-		    /* better jump to KEY_LOCK_CLOSE... */
-		    Player_lock_closest(pl, 0);
+		if (NumPlayers == 0) /* Spectator? */
 		    break;
-		}
+		j = i = GetInd(pl->lock.pl_id);
+		if (!BIT(pl->lock.tagged, LOCK_PLAYER))
+		    i = j = ind;
+		if (j < 0 || j >= NumPlayers)
+		    fatal("Illegal player lock target");
 		do {
 		    if (key == KEY_LOCK_PREV) {
-			if (--i < 0) {
+			if (--i < 0)
 			    i = NumPlayers - 1;
-			}
 		    } else {
-			if (++i >= NumPlayers) {
+			if (++i >= NumPlayers)
 			    i = 0;
-			}
 		    }
 		    if (i == j)
 			break;
-		} while (i == ind
-			 || BIT(Players(i)->status, GAME_OVER|PAUSE)
+		} while (i == ind || BIT(Players(i)->status, GAME_OVER|PAUSE)
 			 || !Player_lock_allowed(pl, Players(i)));
-		if (i == ind) {
+		if (i == ind)
 		    CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
-		}
 		else {
 		    pl->lock.pl_id = Players(i)->id;
 		    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
