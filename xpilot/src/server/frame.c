@@ -192,7 +192,7 @@ static void debris_store(int cx, int cy, int color)
 #undef max_
 }
 
-static void fastshot_end(int conn)
+static void fastshot_end(connection_t *conn)
 {
     int			i;
 
@@ -206,7 +206,7 @@ static void fastshot_end(int conn)
     }
 }
 
-static void debris_end(int conn)
+static void debris_end(connection_t *conn)
 {
     int			i;
 
@@ -236,7 +236,7 @@ static void Frame_radar_buffer_add(int cx, int cy, int s)
     p->size = s;
 }
 
-static void Frame_radar_buffer_send(int conn)
+static void Frame_radar_buffer_send(connection_t *conn)
 {
     int			i;
     int			dest;
@@ -266,7 +266,7 @@ static void Frame_radar_buffer_send(int conn)
 	radar_shuffle[i] = i;
     }
 
-    if (conn < World.NumBases) {
+    if (conn->ind < World.NumBases) {
 	/* permute. */
 	for (i = 0; i < num_radar; i++) {
 #if 1
@@ -358,7 +358,7 @@ static int num2str(int num, char *str, int i)
     return i + digits;
 }
 
-static int Frame_status(int conn, player *pl)
+static int Frame_status(connection_t *conn, player *pl)
 {
     static char		mods[MAX_CHARS];
     int			n,
@@ -489,11 +489,11 @@ static int Frame_status(int conn, player *pl)
     return 1;
 }
 
-static void Frame_map(int conn, player *pl)
+static void Frame_map(connection_t *conn, player *pl)
 {
     int			i,
 			k,
-			conn_bit = (1 << conn);
+			conn_bit = (1 << conn->ind);
     const int		fuel_packet_size = 5;
     const int		cannon_packet_size = 5;
     const int		target_packet_size = 7;
@@ -696,7 +696,7 @@ static void Frame_shuffle(void)
     }
 }
 
-static void Frame_shots(int conn, player *pl)
+static void Frame_shots(connection_t *conn, player *pl)
 {
     int				cx, cy;
     int				lcx = -1, lcy = -1, ldir = 0;
@@ -749,14 +749,10 @@ static void Frame_shots(int conn, player *pl)
 	case OBJ_SPARK:
 	case OBJ_DEBRIS:
 	    if ((fuzz >>= 7) < 0x40) {
-#if 0
-		fuzz = randomMT(); /* old,  but ng wants: */
-#else
-		if (conn < World.NumBases)  /* if not pl-> */
+		if (conn->ind < World.NumBases)
 		    fuzz = randomMT();
 		else
 		    fuzz = 0;
-#endif
 	    }
 	    if ((fuzz & 0x7F) >= spark_rand) {
 		/*
@@ -915,7 +911,7 @@ static void Frame_shots(int conn, player *pl)
     }
 }
 
-static void Frame_ships(int conn, player *pl)
+static void Frame_ships(connection_t *conn, player *pl)
 {
     player			*pl_i;
     int				i, k;
@@ -1035,7 +1031,7 @@ static void Frame_ships(int conn, player *pl)
     }
 }
 
-static void Frame_radar(int conn, player *pl)
+static void Frame_radar(connection_t *conn, player *pl)
 {
     int			i, k, mask, shownuke, size;
     object		*shot;
@@ -1146,7 +1142,7 @@ static void Frame_radar(int conn, player *pl)
 static void Frame_lose_item_state(player *pl)
 {
     if (pl->lose_item_state != 0) {
-	Send_loseitem(pl->lose_item, pl->conn);
+	Send_loseitem(pl->conn, pl->lose_item);
 	if (pl->lose_item_state == 1)
 	    pl->lose_item_state = -5;
 	if (pl->lose_item_state < 0)
@@ -1154,7 +1150,7 @@ static void Frame_lose_item_state(player *pl)
     }
 }
 
-static void Frame_parameters(int conn, player *pl)
+static void Frame_parameters(connection_t *conn, player *pl)
 {
     Get_display_parameters(conn, &view_width, &view_height,
 			   &debris_colors, &spark_rand);
@@ -1188,8 +1184,8 @@ static void Frame_parameters(int conn, player *pl)
 void Frame_update(void)
 {
     int			i,
-			conn,
 			ind;
+    connection_t        *conn;
     player		*pl, *pl2;
     time_t		newTimeLeft = 0;
     static time_t	oldTimeLeft;
@@ -1224,7 +1220,7 @@ void Frame_update(void)
 	    continue;
 	pl = Players(i);
 	conn = pl->conn;
-	if (conn == NOT_CONNECTED) {
+	if (conn == NULL) {
 	    continue;
 	}
 	playback = (pl->rectype == 1);
@@ -1337,7 +1333,7 @@ void Set_message(const char *message)
     if (!rplayback || playback)
 	for (i = 0; i < NumPlayers; i++) {
 	    pl = Players(i);
-	    if (pl->conn != NOT_CONNECTED) {
+	    if (pl->conn != NULL) {
 		Send_message(pl->conn, msg);
 	    }
 	}
@@ -1365,7 +1361,7 @@ void Set_player_message(player *pl, const char *message)
     } else {
 	msg = message;
     }
-    if (pl->conn != NOT_CONNECTED) {
+    if (pl->conn != NULL) {
 	Send_message(pl->conn, msg);
     }
     else if (IS_ROBOT_PTR(pl)) {

@@ -1162,7 +1162,7 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
 		    Robot_program(p, pl->lock.pl_id);
 		    for (j = 0; j < NumPlayers; j++) {
 			player *pl_j = Players(j);
-			if (pl_j->conn != NOT_CONNECTED) {
+			if (pl_j->conn != NULL) {
 			    Send_seek(pl_j->conn, pl->id,
 				      p->id, pl->lock.pl_id);
 			}

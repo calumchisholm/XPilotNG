@@ -433,7 +433,7 @@ void Tank_handle_detach(player *pl)
     for (i = 0; i < NumPlayers - 1; i++) {
 	player *pl_i = Players(i);
 
-	if (pl_i->conn != NOT_CONNECTED) {
+	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, dummy->id);
 	    Send_score(pl_i->conn, dummy->id,
 		       dummy->score, dummy->life,

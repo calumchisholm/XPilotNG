@@ -787,7 +787,7 @@ static void Robot_create(void)
 
     for (i = 0; i < NumPlayers - 1; i++) {
 	player *pl_i = Players(i);
-	if (pl_i->conn != NOT_CONNECTED) {
+	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, robot->id);
 	    Send_base(pl_i->conn, robot->id, robot->home_base);
 	}
@@ -932,7 +932,7 @@ void Robot_war(player *pl, player *kp)
 	if (Robot_war_on_player(kp) == pl->id)
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->conn != NOT_CONNECTED) {
+		if (pl_i->conn != NULL) {
 		    Send_war(pl_i->conn, kp->id, NO_ID);
 		}
 	    }
@@ -955,7 +955,7 @@ void Robot_war(player *pl, player *kp)
 	if (Robot_war_on_player(pl) != kp->id) {
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->conn != NOT_CONNECTED) {
+		if (pl_i->conn != NULL) {
 		    Send_war(pl_i->conn, pl->id, kp->id);
 		}
 	    }

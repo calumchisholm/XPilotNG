@@ -159,7 +159,7 @@ static void Send_info_about_player(player * pl)
 	    }
 	}
 	pl_i = Players(i);
-	if (pl_i->conn != NOT_CONNECTED) {
+	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, pl->id);
 	    Send_score(pl_i->conn, pl->id, pl->score, pl->life,
 		       pl->mychar, pl->alliance);
@@ -717,7 +717,7 @@ static int Cmd_auth(char *arg, player *pl, int oper, char *msg)
 	{
 	    sprintf(msg, "%s has been kicked out (nick collision).",
 		    pl_i->name);
-	    if (pl_i->conn == NOT_CONNECTED)
+	    if (pl_i->conn == NULL)
 		Delete_player(pl_i);
 	    else
 		Destroy_connection(pl_i->conn,
@@ -821,7 +821,7 @@ static int Cmd_kick(char *arg, player *pl, int oper, char *msg)
     if (kicked_pl) {
 	sprintf(msg, "%s kicked %s out! [*Server notice*]",
 		pl->name, kicked_pl->name);
-	if (kicked_pl->conn == NOT_CONNECTED)
+	if (kicked_pl->conn == NULL)
 	    Delete_player(kicked_pl);
 	else
 	    Destroy_connection(kicked_pl->conn, "kicked out");
@@ -1071,7 +1071,7 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_ERROR;
     }
 
-    if (pl2->conn != NOT_CONNECTED) {
+    if (pl2->conn != NULL) {
 	if (Player_is_playing(pl2))
 	    Kill_player(pl2, false);
 	if (Team_zero_pausing_available()) {
@@ -1161,11 +1161,11 @@ static int Cmd_stats(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_ERROR;
     }
 
-    if (pl2->conn == NOT_CONNECTED) {
+    if (pl2->conn == NULL) {
 	sprintf(msg, "Robots don't have ranking stats.");
 	return CMD_RESULT_ERROR;
     }
-	
+
     Rank_get_stats(pl2, msg);
 
     return CMD_RESULT_SUCCESS;
@@ -1309,7 +1309,7 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
     if (!teamZeroPausing || team != 0) {
 	for (i = NumPlayers - 1; i >= 0; i--) {
 	    player *pl2 = Players(i);
-	    if (pl2->conn != NOT_CONNECTED && BIT(pl2->status, PAUSE)
+	    if (pl2->conn != NULL && BIT(pl2->status, PAUSE)
 		&& (pl2->team == team)) {
 		pl2->team = pl->team;
 		pl->team = team;

@@ -504,7 +504,7 @@ int Handle_keyboard(player *pl)
 		}
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
-		    if (pl_i->conn != NOT_CONNECTED) {
+		    if (pl_i->conn != NULL) {
 			Send_base(pl_i->conn,
 				  pl->id,
 				  pl->home_base);
@@ -671,7 +671,7 @@ int Handle_keyboard(player *pl)
 			*l = pl->lock.pl_id;
 		    }
 		} else {
-		    if (*l != NOT_CONNECTED
+		    if (*l != -1
 			    && Player_lock_allowed(pl, Player_by_id(*l))) {
 			pl->lock.pl_id = *l;
 			SET_BIT(pl->lock.tagged, LOCK_PLAYER);

@@ -158,7 +158,7 @@ void Pick_startpos(player *pl)
 			break;
 		}
 		pl_i = Players(i);
-		if (pl_i->conn != NOT_CONNECTED) {
+		if (pl_i->conn != NULL) {
 		    Send_base(pl_i->conn,
 			      pl->id,
 			      pl->home_base);
@@ -470,7 +470,7 @@ int Init_player(int ind, shipobj *ship)
     for (i = 0; i < NUM_MODBANKS; i++)
 	CLEAR_MODS(pl->modbank[i]);
     for (i = 0; i < LOCKBANK_MAX; i++)
-	pl->lockbank[i] = NOT_CONNECTED;
+	pl->lockbank[i] = -1;
 
     {
 	static unsigned short	pseudo_team_no = 0;
@@ -522,7 +522,7 @@ int Init_player(int ind, shipobj *ship)
 
     pl->id		= peek_ID();
     GetIndArray[pl->id]	= ind;
-    pl->conn		= NOT_CONNECTED;
+    pl->conn		= NULL;
     pl->audio		= NULL;
 
     pl->lose_item	= 0;
@@ -620,7 +620,7 @@ void Update_score_table(void)
 	    pl->prev_alliance = pl->alliance;
 	    for (i = 0; i < NumPlayers; i++) {
 		player *pl_i = Players(i);
-		if (pl_i->conn != NOT_CONNECTED) {
+		if (pl_i->conn != NULL) {
 		    Send_score(pl_i->conn, pl->id,
 			       pl->score, pl->life,
 			       pl->mychar, pl->alliance);
@@ -643,7 +643,7 @@ void Update_score_table(void)
 				: (pl->check - 1);
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
-		    if (pl_i->conn != NOT_CONNECTED) {
+		    if (pl_i->conn != NULL) {
 			Send_timing(pl_i->conn, pl->id, check, pl->round);
 		    }
 		}
@@ -658,7 +658,7 @@ void Update_score_table(void)
 		team->prev_score = team->score;
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
-		    if (pl_i->conn != NOT_CONNECTED) {
+		    if (pl_i->conn != NULL) {
 			Send_team_score(pl_i->conn, j, team->score);
 		    }
 		}
@@ -1171,7 +1171,7 @@ void Race_game_over(void)
 			else
 			    break;
 		    }
-		    if (Players(j)->conn != NOT_CONNECTED) {
+		    if (Players(j)->conn != NULL) {
 			Send_base(Players(j)->conn,
 				  pl->id,
 				  pl->home_base);
@@ -1950,7 +1950,7 @@ void Delete_player(player *pl)
 	}
 	for (j = 0; j < LOCKBANK_MAX; j++) {
 	    if (pl_i->lockbank[j] == id)
-		pl_i->lockbank[j] = NOT_CONNECTED;
+		pl_i->lockbank[j] = -1;
 	}
 	for (j = 0; j < MAX_RECORDED_SHOVES; j++) {
 	    if (pl_i->shove_record[j].pusher_id == id) {
@@ -1961,7 +1961,7 @@ void Delete_player(player *pl)
 
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player *pl_i = Players(i);
-	if (pl_i->conn != NOT_CONNECTED) {
+	if (pl_i->conn != NULL) {
 	    Send_leave(pl_i->conn, id);
 	}
 	else if (IS_TANK_PTR(pl_i)) {

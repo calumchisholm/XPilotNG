@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -85,6 +85,7 @@
  * All the player connection state info.
  */
 typedef struct {
+    int                 ind;                    /* index of connection */
     int			state;			/* state of connection */
     int			drain_state;		/* state after draining done */
     unsigned		magic;			/* magic cookie */
@@ -126,4 +127,3 @@ typedef struct {
 } connection_t;
 
 #endif
-

@@ -161,8 +161,6 @@ typedef struct {
 					/* and client input checked */
 #define LOCKBANK_MAX		4	/* Maximum number of locks in bank */
 
-#define NOT_CONNECTED		(-1)
-
 /*
  * Hitmasks are 32 bits.
  */
@@ -622,7 +620,7 @@ struct player {
 
     int		ecmcount;		/* number of active ecms */
 
-    int		conn;			/* connection index, -1 if robot */
+    connection_t *conn;                 /* connection index, NULL if robot */
     unsigned	version;		/* XPilot version number of client */
 
     BITV_DECL(last_keyv, NUM_KEYS);	/* Keyboard state */

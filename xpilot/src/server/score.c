@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -42,7 +42,7 @@ void Score(player *pl, DFLOAT points, int cx, int cy, const char *msg)
 	}
     }
 
-    if (pl->conn != NOT_CONNECTED)
+    if (pl->conn != NULL)
 	Send_score_object(pl->conn, points, cx, cy, msg);
 
     updateScores = true;
@@ -52,7 +52,7 @@ void TEAM_SCORE(int team, DFLOAT points)
 {
     if (team == TEAM_NOT_SET)	/* could happen if teamCannons is off */
 	return;
-    
+
     World.teams[team].score += points;
     if (teamShareScore) {
 	int i;
@@ -126,4 +126,3 @@ void Score_players(player *winner_pl, DFLOAT winner_score, char *winner_msg,
     Score(loser_pl, loser_score, loser_pl->pos.cx, loser_pl->pos.cy,
 	  loser_msg);
 }
-

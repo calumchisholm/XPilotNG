@@ -164,7 +164,7 @@ static int do_kick(int team, int nonlast)
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player *pl_i = Players(i);
 
-	if (pl_i->conn != NOT_CONNECTED
+	if (pl_i->conn != NULL
 	    && BIT(pl_i->status, PAUSE)
 	    && (team == TEAM_NOT_SET || pl_i->team == team)
 	    && !(pl_i->privs & PRIV_NOAUTOKICK)
@@ -549,7 +549,7 @@ void Contact(int fd, void *arg)
 			"\"%s\" upset the gods and was kicked out "
 			"of the game.", pl_found->name);
 		Set_message(msg);
-		if (pl_found->conn == NOT_CONNECTED) {
+		if (pl_found->conn == NULL) {
 		    Delete_player(pl_found);
 		} else {
 		    Destroy_connection(pl_found->conn, "kicked out");
