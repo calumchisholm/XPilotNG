@@ -273,8 +273,11 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     char	str[50];
     static int	mapdiag = 0;
 
-    if (mapdiag == 0)
-	mapdiag = (int)LENGTH(Setup->width, Setup->height);
+    if (mapdiag == 0) {
+	double d = LENGTH(Setup->width, Setup->height);
+
+	mapdiag = (int) d;
+    }
 
     /*
      * Display direction arrow and miscellaneous target information.
