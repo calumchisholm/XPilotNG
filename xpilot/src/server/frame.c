@@ -642,8 +642,14 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 
     hori_blocks = (view_width + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
     vert_blocks = (view_height + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
-    Cell_get_objects(world, pl->pos, MAX(hori_blocks, vert_blocks),
-		     num_object_shuffle, &obj_list, &obj_count);
+    if (ObjCount >= options.cellGetObjectsThreshold)
+	Cell_get_objects(world, pl->pos, MAX(hori_blocks, vert_blocks),
+			 num_object_shuffle, &obj_list, &obj_count);
+    else {
+	obj_list = Obj;
+	obj_count = ObjCount;
+    }
+
     for (k = 0; k < num_object_shuffle; k++) {
 	i = object_shuffle_ptr[k];
 	if (i >= obj_count)

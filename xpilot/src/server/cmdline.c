@@ -3490,7 +3490,7 @@ static option_desc opts[] = {
     {
 	"ngControls",
 	"ngControls",
-	"true",
+	"false",
 	&options.ngControls,
 	valBool,
 	tuner_dummy,
@@ -3644,7 +3644,17 @@ static option_desc opts[] = {
 	"Duration of last Main_loop() function call (in milliseconds).\n"
 	"This option is read only.\n",
 	OPT_COMMAND | OPT_VISIBLE
-    }
+    },
+    {
+	"cellGetObjectsThreshold",
+	"cellThreshold",
+	"500",
+	&options.cellGetObjectsThreshold,
+	valInt,
+	tuner_dummy,
+	"Use Cell_get_objects if there is this many objects or more.\n",
+	OPT_COMMAND | OPT_VISIBLE
+    },
 };
 
 

@@ -515,8 +515,13 @@ void Do_deflector(player_t *pl)
     }
     Player_add_fuel(pl, ED_DEFLECTOR);
 
-    Cell_get_objects(pl->world, pl->pos, (int)(range / BLOCK_CLICKS + 1), 200,
-		     &obj_list, &obj_count);
+    if (ObjCount >= options.cellGetObjectsThreshold)
+	Cell_get_objects(pl->world, pl->pos, (int)(range / BLOCK_CLICKS + 1),
+			 200, &obj_list, &obj_count);
+    else {
+	obj_list = Obj;
+	obj_count = ObjCount;
+    }
 
     for (i = 0; i < obj_count; i++) {
 	obj = obj_list[i];

@@ -538,8 +538,13 @@ static void PlayerObjectCollision(player_t *pl)
     if (!Player_is_playing(pl))
 	return;
 
-    Cell_get_objects(world, pl->pos, 4, 500, &obj_list, &obj_count);
-
+    if (ObjCount >= options.cellGetObjectsThreshold)
+	Cell_get_objects(world, pl->pos, 4, 500, &obj_list, &obj_count);
+    else {
+	obj_list = Obj;
+	obj_count = ObjCount;
+    }
+   
     for (j = 0; j < obj_count; j++) {
 	bool hit;
 
@@ -1261,8 +1266,13 @@ static void AsteroidCollision(world_t *world)
 
 	assert(World_contains_clpos(world, ast->pos));
 
-	Cell_get_objects(world, ast->pos, ast->pl_radius / BLOCK_SZ + 1, 300,
-			 &obj_list, &obj_count);
+	if (ObjCount >= options.cellGetObjectsThreshold)
+	    Cell_get_objects(world, ast->pos, ast->pl_radius / BLOCK_SZ + 1,
+			     300, &obj_list, &obj_count);
+	else {
+	    obj_list = Obj;
+	    obj_count = ObjCount;
+	}
 
 	for (j = 0; j < obj_count; j++) {
 	    obj = obj_list[j];
@@ -1433,8 +1443,13 @@ static void BallCollision(world_t *world)
 	if (!options.ballCollisions)
 	    continue;
 
-	Cell_get_objects(world, ball->pos, 4, 300, &obj_list, &obj_count);
-
+	if (ObjCount >= options.cellGetObjectsThreshold)
+	    Cell_get_objects(world, ball->pos, 4, 300, &obj_list, &obj_count);
+	else {
+	    obj_list = Obj;
+	    obj_count = ObjCount;
+	}
+	    
 	for (j = 0; j < obj_count; j++) {
 	    int radius;
 
@@ -1517,7 +1532,12 @@ static void MineCollision(world_t *world)
 	    mine->life <= 0.0)		/* dying mine */
 	    continue;
 
-	Cell_get_objects(world, mine->pos, 4, 300, &obj_list, &obj_count);
+	if (ObjCount >= options.cellGetObjectsThreshold)
+	    Cell_get_objects(world, mine->pos, 4, 300, &obj_list, &obj_count);
+	else {
+	    obj_list = Obj;
+	    obj_count = ObjCount;
+	}
 
 	for (j = 0; j < obj_count; j++) {
 	    double radius;

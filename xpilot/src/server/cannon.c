@@ -283,8 +283,13 @@ static int Cannon_in_danger(cannon_t *c)
     if (options.cannonSmartness == 0)
 	return false;
 
-    Cell_get_objects(world, c->pos, range, max_objs,
-		     &obj_list, &obj_count);
+    if (ObjCount >= options.cellGetObjectsThreshold)
+	Cell_get_objects(world, c->pos, range, max_objs,
+			 &obj_list, &obj_count);
+    else {
+	obj_list = Obj;
+	obj_count = ObjCount;
+    }
 
     for (i = 0; (i < obj_count) && !danger; i++) {
 	shot = obj_list[i];

@@ -1629,8 +1629,13 @@ static void Robot_default_play_check_objects(player_t *pl,
     if (options.asteroidCollisionMayKill)
 	killing_shots |= OBJ_ASTEROID_BIT;
 
-    Cell_get_objects(world, pl->pos, (int)(Visibility_distance / BLOCK_SZ),
-		     max_objs, &obj_list, &obj_count);
+    if (ObjCount >= options.cellGetObjectsThreshold)
+	Cell_get_objects(world, pl->pos, (int)(Visibility_distance / BLOCK_SZ),
+			 max_objs, &obj_list, &obj_count);
+    else {
+	obj_list = Obj;
+	obj_count = ObjCount;
+    }
 
     for (j = 0; j < obj_count; j++) {
 	int dx, dy;

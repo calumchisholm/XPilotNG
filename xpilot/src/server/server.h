@@ -404,6 +404,7 @@ extern struct options {
     int		teamcupMatchNumber;
 
     double	mainLoopTime;
+    int		cellGetObjectsThreshold;  
 } options;
 
 
