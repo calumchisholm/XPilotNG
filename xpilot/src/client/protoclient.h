@@ -55,18 +55,12 @@ void Colors_debug(void);
 /*
  * default.c
  */
-extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
-			  int *my_team, bool *text, bool *list,
-			  bool *join, bool *noLocalMotd,
-			  char *nickName, char *dispName, char *hostName,
-			  char *shut_msg);
-extern void defaultCleanup(void);				/* memory cleanup */
+extern void defaultCleanup(void);			/* memory cleanup */
 
-#ifndef _WINDOWS
-extern void Get_xpilotrc_file(char *, unsigned);
-#else
-extern	char* Get_xpilotini_file(int level);
+#ifdef _WINDOWS
+extern char *Get_xpilotini_file(int level);
 #endif
+
 /*
  * join.c
  */

@@ -16,6 +16,7 @@ xpilot_SOURCES = \
 	join.c \
 	mapdata.c messages.c \
 	netclient.c netclient.h \
+	option.c option.h \
 	paint.c paint.h paintdata.c paintdata.h painthud.c \
 	paintmap.c paintobjects.c paintradar.c protoclient.h \
 	query.c \
@@ -23,7 +24,7 @@ xpilot_SOURCES = \
 	talk.c talk.h talkmacros.c textinterface.c \
 	usleep.c \
 	welcome.c widget.c widget.h \
-	xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
+	xdefault.c xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
 	xinit.c xinit.h xpaint.c xpaint.h xpclient.h xpclient_x11.h xpilot.c
 
 #xpilot_CFLAGS = @X_CFLAGS@

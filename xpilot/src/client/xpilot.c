@@ -205,6 +205,7 @@ extern char math_version[];
 extern char messages_version[];
 extern char net_version[];
 extern char netclient_version[];
+extern char option_version[];
 extern char paint_version[];
 extern char paintdata_version[];
 extern char painthud_version[];
@@ -221,6 +222,7 @@ extern char talkmacros_version[];
 extern char textinterface_version[];
 extern char welcome_version[];
 extern char widget_version[];
+extern char xdefault_version[];
 extern char xevent_version[];
 extern char xeventhandlers_version[];
 extern char xinit_version[];
@@ -260,6 +262,7 @@ static void Check_client_versions(void)
 	{ "messages", messages_version },
 	{ "net", net_version },
 	{ "netclient", netclient_version },
+	{ "option", option_version },
 	{ "paint", paint_version },
 	{ "paintdata", paintdata_version },
 	{ "painthud", painthud_version },
@@ -276,6 +279,7 @@ static void Check_client_versions(void)
 	{ "textinterface", textinterface_version },
 	{ "welcome", welcome_version },
 	{ "widget", widget_version },
+	{ "xdefault", xdefault_version },
 	{ "xevent", xevent_version },
 	{ "xeventhandlers", xeventhandlers_version },
 	{ "xinit", xinit_version },

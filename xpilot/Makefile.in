@@ -136,7 +136,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = README $(dist_pkgdata_DATA) $(srcdir)/Makefile.in \
 	$(srcdir)/configure AUTHORS COPYING ChangeLog INSTALL \
-	Makefile.am NEWS README.in aclocal.m4 config.h.in \
+	Makefile.am NEWS README.in TODO aclocal.m4 config.h.in \
 	config/depcomp config/install-sh config/missing \
 	config/mkinstalldirs configure configure.ac
 DIST_SUBDIRS = $(SUBDIRS)
