@@ -2,7 +2,7 @@
 
 Summary: 	A multiuser gravity war game client
 Name: 		xpilot-ng-x11
-Version: 	4.6.0
+Version: 	4.6.5
 Release: 	1
 Packager: 	darel.cullen@bostream.nu
 Url: 		http://xpilot.sf.net
@@ -123,8 +123,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/local/bin/xpilot-ng-x11
 /usr/local/bin/xpilot-ng-server
 /usr/local/bin/xpilot-ng-replay
-/usr/local/share/xpilot-ng/fonts/ConsoleFont.bmp
-/usr/local/share/xpilot-ng/fonts/Test.ttf
 /usr/local/share/xpilot-ng/fonts/VeraMoBd.ttf
 /usr/local/share/xpilot-ng/fonts/defaultfont.bmp
 /usr/local/share/xpilot-ng/fonts
@@ -204,10 +202,41 @@ rm -rf $RPM_BUILD_ROOT
 /usr/local/share/xpilot-ng/robots.txt
 /usr/local/share/xpilot-ng/sounds.txt
 /usr/local/share/xpilot-ng/mapconvert.py
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/bfire.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/bloop.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/buzzer.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/confirm.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/corkpop.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/done.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/doorchimes.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/Drop01.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/explo2.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/failure.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/finished.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/flare.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/gundead.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/launch1.18.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/lboom.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/magic.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/MusicaDefault.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/popclick.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/RobotzDefault.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/RobotzQuestion.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sboom.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sbounce.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sounds.txt
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sstart.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/success.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/UtopiaClose.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/waiting.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/zap.wav
 
 
 
 %changelog
+* Sun Jun 6 2004 Darel <darelcullen@sf.net>
+- Split into sdl and x11, add sound lots of other stuff
 * Mon Sep 15 2003 Darel <darelcullen@sf.net>
 - Initial build.
 

@@ -2,7 +2,7 @@
 
 Summary: 	An sdl client to xpilot the gravity war game
 Name: 		xpilot-ng-sdl
-Version: 	4.6.0
+Version: 	4.6.5
 Release: 	1
 Packager: 	Darel Cullen <darel.cullen@bostream.nu>
 Url: 		http://xpilot.sf.net
@@ -94,7 +94,7 @@ echo otherwise you will find that this client runs too slowly.
 
 
 %build
-./configure --prefix=/usr/local --datadir=/usr/local/share/xpilot-ng-sdl --enable-sdl-client
+./configure --prefix=/usr/local --datadir=/usr/local/share/xpilot-ng-sdl --enable-sdl-client --enable-sound
 make
 
 %install
@@ -121,9 +121,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS doc/BUGS doc/ChangeLog doc/CREDITS doc/FAQ doc/FIXED FEATURES INSTALL NEWS README TODO
 /usr/local/bin/xpilot-ng-sdl
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts/ConsoleFont.bmp
-/usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts/Test.ttf
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts/VeraMoBd.ttf
-/usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts/defaultfont.bmp
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/fonts
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/textures/acwise_grav.ppm
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/textures/allitems.ppm
@@ -192,9 +190,39 @@ rm -rf $RPM_BUILD_ROOT
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/textures/wormhole.ppm
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/textures/asteroid.ppm
 /usr/local/share/xpilot-ng-sdl/xpilot-ng/textures
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/bfire.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/bloop.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/buzzer.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/confirm.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/corkpop.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/done.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/doorchimes.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/Drop01.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/explo2.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/failure.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/finished.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/flare.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/gundead.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/launch1.18.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/lboom.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/magic.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/MusicaDefault.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/popclick.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/RobotzDefault.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/RobotzQuestion.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sboom.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sbounce.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sounds.txt
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/sstart.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/success.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/UtopiaClose.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/waiting.wav
+/usr/local/share/xpilot-ng-sdl/xpilot-ng/sound/zap.wav
+
 
 %changelog
+* Sun Jun 6 2004 Darel <darelcullen@sf.net>
+- Split into sdl and x11, add sound lots of other stuff
 * Mon Sep 15 2003 Darel <darelcullen@sf.net>
 - Initial build.
-
-
