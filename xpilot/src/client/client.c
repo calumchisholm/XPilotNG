@@ -1505,7 +1505,7 @@ static int Team_score_table(int entrynum, int teamnum,
     }
 
     if (drawn)
-	entrynum++;
+	entrynum += 2;
     return entrynum;
 }
 
