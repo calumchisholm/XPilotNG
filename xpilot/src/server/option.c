@@ -485,6 +485,7 @@ void Option_set_value(
 	    && atoi(value) == 0) {
 	    warn("WARNING: '%s: %s' in map.", name, value);
 	    warn("This is an obsolete way to set the default value.");
+	    warn("It will cause the weapon to detonate at once.");
 	    warn("To fix, remove the option from the map file.");
 	}
     }
