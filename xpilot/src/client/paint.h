@@ -78,10 +78,6 @@ extern int	team6Color;		/* Preferred color index for team 6 */
 extern int	team7Color;		/* Preferred color index for team 7 */
 extern int	team8Color;		/* Preferred color index for team 8 */
 extern int	team9Color;		/* Preferred color index for team 9 */
-extern int	msgScanBallColor;	/* Color index for ball msg */
-extern int	msgScanSafeColor;	/* Color index for safe msg */
-extern int	msgScanCoverColor;	/* Color index for cover msg */
-extern int	msgScanPopColor;	/* Color index for pop msg */
 extern int	selfLWColor;		/* Color index for selfLifeWarning */
 extern int	enemyLWColor;		/* Color index for enemyLifeWarning */
 extern int	teamLWColor;		/* Color index for teamLifeWarning */
@@ -109,8 +105,6 @@ extern int	targetRadarColor;	/* Color index for targets on radar */
 extern int	decorColor;		/* Color index for decoration drawing */
 extern int	decorRadarColor;	/* Color index for decorations on radar */
 extern int	visibilityBorderColor;	/* Color index for visibility border drawing */
-extern int	messagesColor;		/* Color index for message strings */
-extern int	oldMessagesColor;	/* Color index for old message strings */
 extern int	clockColor;		/* Clock color index */
 extern int	scoreColor;		/* Score list color index */
 extern int	scoreSelfColor;		/* Score list own score color index */

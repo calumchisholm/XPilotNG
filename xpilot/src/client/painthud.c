@@ -34,6 +34,12 @@ int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 int	hudLockColor;		/* Color index for lock on HUD drawing */
 int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 int	dirPtrColor;		/* Color index for dirptr drawing */
+int	messagesColor;		/* Color index for messages */
+int	oldMessagesColor;	/* Color index for old messages */
+int	msgScanBallColor;	/* Color index for ball msg */
+int	msgScanSafeColor;	/* Color index for safe msg */
+int	msgScanCoverColor;	/* Color index for cover msg */
+int	msgScanPopColor;	/* Color index for pop msg */
 
 int	hudRadarDotSize;	/* Size for hudradar dot drawing */
 double	hudRadarScale;		/* Scale for hudradar drawing */
@@ -1043,6 +1049,43 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	&dirPtrColor,
 	"Which color number to use for drawing the direction pointer hack.\n"),
 
+    COLOR_INDEX_OPTION(
+	"messagesColor",
+	12,
+	&messagesColor,
+	"Which color number to use for drawing messages.\n"),
+
+    COLOR_INDEX_OPTION(
+	"oldMessagesColor",
+	13,
+	&oldMessagesColor,
+	"Which color number to use for drawing old messages.\n"),
+
+    COLOR_INDEX_OPTION(
+	"msgScanBallColor",
+	3,
+	&msgScanBallColor,
+	"Which color number to use for drawing ball message warning.\n"),
+
+    COLOR_INDEX_OPTION(
+	"msgScanSafeColor",
+	4,
+	&msgScanSafeColor,
+	"Which color number to use for drawing safe message.\n"),
+
+    COLOR_INDEX_OPTION(
+	"msgScanCoverColor",
+	2,
+	&msgScanCoverColor,
+	"Which color number to use for drawing cover message.\n"),
+
+    COLOR_INDEX_OPTION(
+	"msgScanPopColor",
+	11,
+	&msgScanPopColor,
+	"Which color number to use for drawing pop message.\n"),
+
+
 };
 
 
@@ -1050,3 +1093,4 @@ void Store_hud_options(void)
 {
     STORE_OPTIONS(hud_options);
 }
+

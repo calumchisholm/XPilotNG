@@ -88,12 +88,6 @@ int	spark_color[MAX_COLORS];
 int	buttonColor;		/* Color index for button drawing */
 int	windowColor;		/* Color index for window drawing */
 int	borderColor;		/* Color index for border drawing */
-int	msgScanBallColor;	/* Color index for ball msg */
-int	msgScanSafeColor;	/* Color index for safe msg */
-int	msgScanCoverColor;	/* Color index for cover msg */
-int	msgScanPopColor;	/* Color index for pop msg */
-int	messagesColor;		/* Color index for messages */
-int	oldMessagesColor;	/* Color index for old messages */
 int	fuelMeterColor;		/* Color index for fuel meter */
 int	powerMeterColor;	/* Color index for power meter */
 int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
@@ -1303,18 +1297,6 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	"Which color number to use for drawing decorations.\n"),
 
     COLOR_INDEX_OPTION(
-	"messagesColor",
-	12,
-	&messagesColor,
-	"Which color number to use for drawing messages.\n"),
-
-    COLOR_INDEX_OPTION(
-	"oldMessagesColor",
-	13,
-	&oldMessagesColor,
-	"Which color number to use for drawing old messages.\n"),
-
-    COLOR_INDEX_OPTION(
 	"backgroundPointColor",
 	2,
 	&backgroundPointColor,
@@ -1455,30 +1437,6 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	&meterBorderColor,
 	"Which color number to use for drawing borders of meters.\n"),
 
-
-    COLOR_INDEX_OPTION(
-	"msgScanBallColor",
-	3,
-	&msgScanBallColor,
-	"Which color number to use for drawing ball message warning.\n"),
-
-    COLOR_INDEX_OPTION(
-	"msgScanSafeColor",
-	4,
-	&msgScanSafeColor,
-	"Which color number to use for drawing safe message.\n"),
-
-    COLOR_INDEX_OPTION(
-	"msgScanCoverColor",
-	2,
-	&msgScanCoverColor,
-	"Which color number to use for drawing cover message.\n"),
-
-    COLOR_INDEX_OPTION(
-	"msgScanPopColor",
-	11,
-	&msgScanPopColor,
-	"Which color number to use for drawing pop message.\n"),
 
     COLOR_INDEX_OPTION(
 	"zeroLivesColor",
