@@ -2171,20 +2171,20 @@ static void redrawError(struct errorwin *ewin)
     }
 }
 
-static void BuildGamma(unsigned char tbl[256], double gamma)
+static void BuildGamma(unsigned char tbl[256], double gamma_val)
 {
     int			i, v;
     double		one_over_gamma, ind;
     /* extern double	pow(double, double); */
 
-    one_over_gamma = 1.0 / gamma;
+    one_over_gamma = 1.0 / gamma_val;
     for (i = 0 ; i <= 255; i++) {
 	ind = (double) i / 255.0;
 	v = (int)((255.0 * pow(ind, one_over_gamma)) + 0.5);
 	tbl[i] = (v > 255) ? 255 : v;
     }
     if (debug) {
-	printf("gamma table for gamma correction factor %f:\n", gamma);
+	printf("gamma table for gamma correction factor %f:\n", gamma_val);
 	for (i = 0 ; i <= 255; i++) {
 	    printf("%02x  ", tbl[i]);
 	    if (!((i + 1) & 0x0F))
@@ -2203,7 +2203,7 @@ static void GammaCorrect(unsigned char *data, int size, unsigned char tbl[256])
 }
 
 static void ScalePPM(unsigned char *rgbdata, int cols, int rows,
-		     double scale, double gamma, FILE *fp)
+		     double scale, double gamma_val, FILE *fp)
 {
 #define SCALE		4096
 #define HALFSCALE	2048
@@ -2227,8 +2227,8 @@ static void ScalePPM(unsigned char *rgbdata, int cols, int rows,
     size_t		size_tempxelrow, size_newxelrow, size_rsgsbs;
     unsigned char	gammatbl[256];
 
-    if (gamma > 0)
-	BuildGamma(gammatbl, gamma);
+    if (gamma_val > 0)
+	BuildGamma(gammatbl, gamma_val);
 
     newcols = (int) (cols * scale + 0.999);
     newrows = (int) (rows * scale + 0.999);
@@ -2358,7 +2358,7 @@ static void ScalePPM(unsigned char *rgbdata, int cols, int rows,
 	    *nxP++ = g;
 	    *nxP++ = b;
 	}
-	if (gamma > 0)
+	if (gamma_val > 0)
 	    GammaCorrect(newxelrow, 3 * newcols, gammatbl);
 	fwrite(newxelrow, 1, 3 * newcols, fp);
     }
@@ -3337,7 +3337,7 @@ int main(int argc, char **argv)
     struct xui		*ui;
     int			fps = 0;
     double		scale = 0;
-    double		gamma = 0;
+    double		gamma_val = 0;
 
     Argc = argc;
     Argv = argv;
@@ -3368,12 +3368,12 @@ int main(int argc, char **argv)
 		scale = 0;
 	}
 	else if (!strcmp(argv[argi], "-gamma")) {
-	    if (++argi == argc || sscanf(argv[argi], "%lf", &gamma) != 1)
+	    if (++argi == argc || sscanf(argv[argi], "%lf", &gamma_val) != 1)
 		usage();
-	    if (gamma < 0.1 || gamma > 100)
+	    if (gamma_val < 0.1 || gamma_val > 100)
 		usage();
-	    if (gamma == 1.0)
-		gamma = 0;
+	    if (gamma_val == 1.0)
+		gamma_val = 0;
 	}
 	else if (!strcmp(argv[argi], "-play"))
 	    currentSpeed = 1;
@@ -3423,7 +3423,7 @@ int main(int argc, char **argv)
     rc->fp = fp;
     rc->fps = fps;
     rc->scale = scale;
-    rc->gamma = gamma;
+    rc->gamma = gamma_val;
     TestInput(rc);
     purge_argument = rc;
     if (RReadHeader(rc) >= 0) {

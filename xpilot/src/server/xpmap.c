@@ -271,7 +271,7 @@ static void Xpmap_place_target(int x, int y, bool create)
 	Map_place_target(Xpmap_get_clpos(x, y), TEAM_NOT_SET);
 }
 
-static void Xpmap_place_check(int x, int y, int index, bool create)
+static void Xpmap_place_check(int x, int y, int ind, bool create)
 {
     if (!BIT(World.rules->mode, TIMING)) {
 	World.block[x][y] = SPACE;
@@ -280,7 +280,7 @@ static void Xpmap_place_check(int x, int y, int index, bool create)
 
     World.block[x][y] = CHECK;
     if (create)
-	Map_place_check(Xpmap_get_clpos(x, y), index);
+	Map_place_check(Xpmap_get_clpos(x, y), ind);
 }
 
 static void Xpmap_place_item_concentrator(int x, int y, bool create)

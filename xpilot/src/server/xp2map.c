@@ -377,18 +377,16 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "FrictionArea")) {
-	DFLOAT friction = 0.0; /* kps - other default ??? */
+	DFLOAT fric = 0.0; /* kps - other default ??? */
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "friction"))
-		friction = atof(*(attr + 1));
+		fric = atof(*(attr + 1));
 	    attr += 2;
 	}
 	/*Map_place_...(team);*/
 	return;
     }
-
-    /* end of kps extensions */
 
     if (!strcasecmp(el, "Option")) {
 	const char *name = NULL, *value = NULL;

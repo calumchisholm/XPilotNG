@@ -494,6 +494,7 @@ static void Misc_object_update(void)
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {
 	    wireobject *wireobj = WIRE_PTR(obj);
+	    /* kps - fix */
 	    wireobj->rotation =
 		(wireobj->rotation + (int) (wireobj->turnspeed * RES)) % RES;
 	}
@@ -860,7 +861,6 @@ void Update_objects(void)
 
 	/* kps - fix these */
 	if (pl->flooding > FPS + 1) {
-	    char msg[MSG_LEN];
 	    sprintf(msg, "%s was kicked out because of flooding.", pl->name);
 	    Destroy_connection(pl->conn, "flooding");
 	    i--;
@@ -967,7 +967,7 @@ void Update_objects(void)
 		    && fs->team != pl->team)) {
 		CLR_BIT(pl->used, HAS_REFUEL);
 	    } else {
-		int i = pl->fuel.num_tanks;
+		int n = pl->fuel.num_tanks;
 		int ct = pl->fuel.current;
 
 		do {
@@ -988,7 +988,7 @@ void Update_objects(void)
 			pl->fuel.current = 0;
 		    else
 			pl->fuel.current += 1;
-		} while (i--);
+		} while (n--);
 		pl->fuel.current = ct;
 	    }
 	}
@@ -1004,7 +1004,7 @@ void Update_objects(void)
 		|| BIT(pl->used, HAS_PHASING_DEVICE))
 		CLR_BIT(pl->used, HAS_REPAIR);
 	    else {
-		int i = pl->fuel.num_tanks;
+		int n = pl->fuel.num_tanks;
 		int ct = pl->fuel.current;
 
 		do {
@@ -1025,7 +1025,7 @@ void Update_objects(void)
 			pl->fuel.current = 0;
 		    else
 			pl->fuel.current += 1;
-		} while (i--);
+		} while (n--);
 		pl->fuel.current = ct;
 	    }
 	}
@@ -1268,7 +1268,7 @@ void Update_objects(void)
 
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl = Players(i);
+	pl = Players(i);
 
 	pl->updateVisibility = 0;
 
@@ -1302,7 +1302,7 @@ void Update_objects(void)
      * Update tanks, Kill players that ought to be killed.
      */
     for (i = NumPlayers - 1; i >= 0; i--) {
-	player *pl = Players(i);
+	pl = Players(i);
 
 	if (Player_is_playing(pl))
 	    Update_tanks(&(pl->fuel));
