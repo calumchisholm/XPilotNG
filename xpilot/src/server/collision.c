@@ -1702,9 +1702,3 @@ static void MineCollision(void)
 	}
     }
 }
-
-
-int wormXY(int x, int y)
-{
-    return Map_get_itemid(x, y);
-}

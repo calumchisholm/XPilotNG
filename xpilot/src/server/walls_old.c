@@ -2168,3 +2168,9 @@ void Turn_player_old(player *pl)
     }
 
 }
+
+
+int wormXY(int x, int y)
+{
+    return Map_get_itemid(x, y);
+}

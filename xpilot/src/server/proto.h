@@ -58,7 +58,6 @@ void Cell_get_objects(int x, int y, int r, int max, object ***list, int *count);
  * Prototypes for collision.c
  */
 void Check_collision(void);
-int wormXY(int x, int y);
 int IsOffensiveItem(enum Item i);
 int IsDefensiveItem(enum Item i);
 int CountOffensiveItems(player *pl);
