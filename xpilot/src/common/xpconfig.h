@@ -36,7 +36,7 @@
 #endif
 
 #ifndef CONF_LOCALGURU
-#  define CONF_LOCALGURU		"kps@users.sourceforge.net"
+#  define CONF_LOCALGURU		PACKAGE_BUGREPORT
 #endif
 
 #ifndef CONF_DEFAULT_MAP
@@ -120,9 +120,6 @@
 
 #endif /* _WINDOWS */
 
-/* Please don't change this one. */
-#define CONF_CONTACTADDRESS		"xpilot@xpilot.org"
-
 /*
  * Uncomment this if your machine doesn't use
  * two's complement negative numbers.
@@ -193,7 +190,6 @@ char *Conf_texturedir(void);
 char *Conf_sounddir(void);
 char *Conf_soundfile(void);
 char *Conf_localguru(void);
-char *Conf_contactaddress(void);
 char *Conf_robotfile(void);
 char *Conf_zcat_ext(void);
 char *Conf_zcat_format(void);

@@ -127,13 +127,6 @@ char *Conf_localguru(void)
     return conf;
 }
 
-char *Conf_contactaddress(void)
-{
-    static char conf[] = CONF_CONTACTADDRESS;
-
-    return conf;
-}
-
 char *Conf_robotfile(void)
 {
     static char conf[] = CONF_ROBOTFILE;
@@ -190,7 +183,6 @@ void Conf_print(void)
 #endif
 
     warn("Conf_localguru()          = %s", Conf_localguru());
-    warn("Conf_contactaddress()     = %s", Conf_contactaddress());
     warn("Conf_datadir()            = %s", Conf_datadir());
     warn("Conf_defaults_file_name() = %s", Conf_defaults_file_name());
     warn("Conf_password_file_name() = %s", Conf_password_file_name());
