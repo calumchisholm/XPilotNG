@@ -277,10 +277,8 @@ static void Object_hits_target(object_t *obj, target_t *targ, double player_cost
 	    player_t *pl_j = Players(j);
 
 	    if (Player_is_tank(pl_j)
-		|| (BIT(pl_j->status, PAUSE)
-		    && pl_j->count <= 0)
-		|| (Player_is_waiting(pl_j)
-		    && pl_j->score == 0))
+		|| (BIT(pl_j->status, PAUSE) && pl_j->count <= 0)
+		|| Player_is_waiting(pl_j))
 		continue;
 
 	    if (pl_j->team == targ->team) {
@@ -341,12 +339,10 @@ static void Object_hits_target(object_t *obj, target_t *targ, double player_cost
 	player_t *pl = Players(j);
 
 	if (Player_is_tank(pl)
-	    || (BIT(pl->status, PAUSE)
-		&& pl->count <= 0)
-	    || (Player_is_waiting(pl)
-		&& pl->score == 0)) {
+	    || (BIT(pl->status, PAUSE) && pl->count <= 0)
+	    || Player_is_waiting(pl))
 	    continue;
-	}
+
 	if (pl->team == targ->team) {
 	    if (options.targetKillTeam
 		&& targets_remaining == 0
@@ -370,6 +366,7 @@ static void Object_hits_wormhole(object_t *obj, int ind)
 
     if (BIT(obj->type, OBJ_PLAYER)) {
 	player_t *pl = (player_t *)obj;
+
 	warn("Player %s hits wormhole %d.", pl->name, ind);
     }
 
@@ -416,6 +413,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
     case CrashCannon:
         {
 	    cannon_t *c = Cannons(world, mapobj_ind);
+
 	    obj->life = 0;
 	    if (BIT(obj->type, OBJ_ITEM))
 		Cannon_add_item(c, obj->info, obj->count);
@@ -498,6 +496,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
     case CrashCannon:
         {
 	    cannon_t *cannon = Cannons(world, mapobj_ind);
+
 	    if (!Player_used_emergency_shield(pl)) {
 		howfmt = "%s smashed%s against a cannon";
 		hudmsg = "[Cannon]";
@@ -766,6 +765,7 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 
     if (line >= num_lines) {
 	double x, y, l2;
+
 	x = linet[line].delta.cx;
 	y = linet[line].delta.cy;
 	l2 = (x*x + y*y);
@@ -813,6 +813,7 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 
     if (line >= num_lines) {
 	double x, y, l2;
+
 	x = linet[line].delta.cx;
 	y = linet[line].delta.cy;
 	l2 = (x*x + y*y);
@@ -1321,8 +1322,9 @@ static void Shape_move(const move_t *move, const shape_t *s,
  * not explicitly constructed in the algorithm). Return the number of a group
  * that would be hit during morphing or NO_GROUP if there is enough room. */
 /* This might be useful elsewhere in the code, need not be kept static */
-static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
-		       int dir2, hitmask_t hitmask, const object_t *obj, int x, int y)
+static int Shape_morph(const shape_t *shape1, int dir1,
+		       const shape_t *shape2, int dir2,
+		       hitmask_t hitmask, const object_t *obj, int x, int y)
 {
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
@@ -1377,6 +1379,7 @@ static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
     points = blockline[(x >> B_SHIFT) + mapx * (y >> B_SHIFT)].points;
     while ( (p = *points++) != 65535) {
 	clpos_t pto1, ptn1;
+
 	if (linet[p].group
 	    && (!can_hit(&groups[linet[p].group], &mv)))
 	    continue;
@@ -2078,6 +2081,7 @@ static double edge_distance(int bx, int by, int ox, int oy, int dx, int dy,
     int last_width = (world->cwidth - 1) % B_CLICKS + 1;
     int last_height = (world->cheight - 1) % B_CLICKS + 1;
     double xdist, ydist, dist;
+
     ox = CENTER_XCLICK(ox - bx * B_CLICKS);
     oy = CENTER_YCLICK(oy - by * B_CLICKS);
     if (dx > 0)

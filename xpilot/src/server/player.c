@@ -1019,10 +1019,8 @@ void Team_game_over(int winning_team, const char *reason)
 		continue;
 
 	    if (Player_is_tank(pl_i)
-		|| (BIT(pl_i->status, PAUSE)
-		    && pl_i->count <= 0)
-		|| (Player_is_waiting(pl_i)
-		    && pl_i->score == 0))
+		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
+		|| Player_is_waiting(pl_i))
 		continue;
 
 	    for (j = 0; j < num_best_players; j++) {
@@ -1350,6 +1348,7 @@ void Compute_game_status(void)
 	    for (;;) {
 		int pli, count = 0, lap = INT_MAX;
 		player_t *pl_i;
+
 		for (i = 0; i < NumPlayers; i++) {
 		    pl = Players(i);
 		    if (BIT(pl->status, FINISH) && pl->round < lap) {
@@ -1644,6 +1643,7 @@ void Compute_game_status(void)
 
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (BIT(pl_i->status, PAUSE) || Player_is_tank(pl_i))
 		    continue;
 		team_score[pl_i->team] += pl_i->score;
