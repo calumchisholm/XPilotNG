@@ -67,8 +67,6 @@ int	backgroundPointColor;	/* Color index for background point drawing */
 int	visibilityBorderColor;	/* Color index for visibility border drawing */
 
 unsigned	draw_width, draw_height;
-char	sparkColors[MSG_LEN];
-int	spark_color[MAX_COLORS];
 int	num_spark_colors;
 
 

@@ -140,7 +140,9 @@ int main(int argc, char *argv[])
 
 #ifdef OPTIONHACK
     /*Usage();*/
+
 extern void Handle_x_options(void);
+
     Handle_x_options();
 #endif
     

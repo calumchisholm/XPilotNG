@@ -51,6 +51,7 @@ void Colors_free_bitmaps(void);
 void Colors_init_style_colors(void);
 void Colors_cleanup(void);
 void Colors_debug(void);
+void Init_spark_colors(void);
 void Store_color_options(void);
 
 /*

@@ -82,6 +82,9 @@ int		maxColors;	/* Max. number of colors to use */
 XColor		colors[MAX_COLORS];
 Colormap	colormap;	/* Private colormap */
 
+char		sparkColors[MSG_LEN];
+int		spark_color[MAX_COLORS];
+
 #ifndef _WINDOWS
 
 /*
@@ -978,8 +981,70 @@ void Colors_debug(void)
 
 #endif	/* _WINDOWS */
 
+/*
+ * Convert a string of color numbers into an array
+ * of "colors[]" indices stored by "spark_color[]".
+ * Initialize "num_spark_colors".
+ */
+void Init_spark_colors(void)
+{
+    char		buf[MSG_LEN];
+    char		*src, *dst;
+    unsigned		col;
+    int			i;
+
+    num_spark_colors = 0;
+    /*
+     * The sparkColors specification may contain
+     * any possible separator.  Only look at numbers.
+     */
+
+     /* hack but protocol will allow max 9 (MM) */ 
+    for (src = sparkColors; *src && (num_spark_colors < 9); src++) {
+	if (isascii(*src) && isdigit(*src)) {
+	    dst = &buf[0];
+	    do {
+		*dst++ = *src++;
+	    } while (*src &&
+		     isascii(*src) &&
+		     isdigit(*src) &&
+		     ((size_t)(dst - buf) < (sizeof(buf) - 1)));
+	    *dst = '\0';
+	    src--;
+	    if (sscanf(buf, "%u", &col) == 1) {
+		if (col < (unsigned)maxColors)
+		    spark_color[num_spark_colors++] = col;
+	    }
+	}
+    }
+    if (num_spark_colors == 0) {
+	if (maxColors <= 8) {
+	    /* 3 colors ranging from 5 up to 7 */
+	    for (i = 5; i < maxColors; i++)
+		spark_color[num_spark_colors++] = i;
+	}
+	else {
+	    /* 7 colors ranging from 5 till 11 */
+	    for (i = 5; i < 12; i++)
+		spark_color[num_spark_colors++] = i;
+	}
+	/* default spark colors always include RED. */
+	spark_color[num_spark_colors++] = RED;
+    }
+    for (i = num_spark_colors; i < MAX_COLORS; i++)
+	spark_color[i] = spark_color[num_spark_colors - 1];
+}
+
 
 #ifdef OPTIONHACK
+
+static bool Spark_colors_setfunc (xp_option_t *opt, const char *val)
+{
+    strlcpy(sparkColors, val, sizeof sparkColors);
+    Init_spark_colors();
+    /* might fail to set what we wanted, but return ok nonetheless */
+    return true;
+}
 
 xp_option_t color_options[] = {
 
@@ -991,6 +1056,15 @@ xp_option_t color_options[] = {
 	&maxColors,
 	NULL,
 	"The number of colors to use.  Valid values are 4, 8 and 16.\n"),
+
+    XP_BOOL_OPTION(
+	"fullColor",
+	true,
+	&fullColor,
+	NULL,            /* kps - need a setfunc here */
+	"Whether to use a colors as close as possible to the specified ones\n"
+	"or use a few standard colors for everything. May require more\n"
+	"resources from your system.\n"),
 
     /* 16 user definable color values */
     XP_STRING_OPTION(
@@ -1132,6 +1206,441 @@ xp_option_t color_options[] = {
 	NULL, NULL,
 	"The color value for the sixteenth color.\n"
 	"This is only used if maxColors is set to 16.\n"),
+
+
+    XP_STRING_OPTION(
+	"sparkColors",
+	"5,6,7,3",
+	sparkColors,
+	sizeof sparkColors,
+	Spark_colors_setfunc, NULL,
+	"Which color numbers to use for spark and debris particles.\n"),
+
+#define COLOR_INDEX_OPTION(name, defval, valptr, help) \
+XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
+
+    COLOR_INDEX_OPTION(
+	"wallColor",
+	2,
+	&wallColor,
+	"Which color number to use for drawing walls.\n"),
+
+    COLOR_INDEX_OPTION(
+	"fuelColor",
+	3,
+	&fuelColor,
+	"Which color number to use for drawing fuel stations.\n"),
+
+    COLOR_INDEX_OPTION(
+	"decorColor",
+	6,
+	&decorColor,
+	"Which color number to use for drawing decorations.\n"),
+
+    COLOR_INDEX_OPTION(
+	"messagesColor",
+	12,
+	&messagesColor,
+	"Which color number to use for drawing messages.\n"),
+
+    COLOR_INDEX_OPTION(
+	"oldMessagesColor",
+	13,
+	&oldMessagesColor,
+	"Which color number to use for drawing old messages.\n"),
+
+    COLOR_INDEX_OPTION(
+	"backgroundPointColor",
+	2,
+	&backgroundPointColor,
+	"Which color number to use for drawing background points.\n"),
+
+
+    COLOR_INDEX_OPTION(
+	"hudColor",
+	2,
+	&hudColor,
+	"Which color number to use for drawing the HUD.\n"),
+
+    COLOR_INDEX_OPTION(
+	"hudHLineColor",
+	2,
+	&hudHLineColor,
+	"Which color number to use for drawing the horizontal lines\n"),
+
+    COLOR_INDEX_OPTION(
+	"hudVLineColor",
+	0,
+	&hudVLineColor,
+	"Which color number to use for drawing the vertical lines\n"
+	"in the HUD.\n"),
+
+    COLOR_INDEX_OPTION(
+	"hudItemsColor",
+	2,
+	&hudItemsColor,
+	"Which color number to use for drawing owned items on the HUD.\n"),
+
+    COLOR_INDEX_OPTION(
+	"hudRadarEnemyColor",
+	1,
+	&hudRadarEnemyColor,
+	"Which color number to use for drawing hudradar dots\n"
+	"that represent enemy ships.\n"),
+
+    COLOR_INDEX_OPTION(
+	"hudRadarOtherColor",
+	2,
+	&hudRadarOtherColor,
+	"Which color number to use for drawing hudradar dots\n"
+	"that represent friendly ships or other objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"teamShotColor",
+	2,
+	&teamShotColor,
+	"Which color number to use for drawing harmless shots.\n"),
+
+    COLOR_INDEX_OPTION(
+	"dirPtrColor",
+	0,
+	&dirPtrColor,
+	"Which color number to use for drawing the direction pointer hack.\n"),
+
+    COLOR_INDEX_OPTION(
+	"shipShapesHackColor",
+	0,
+	&shipShapesHackColor,
+	"Which color number to use for drawing the shipshapes hack.\n"),
+
+    COLOR_INDEX_OPTION(
+	"hudLockColor",
+	0,
+	&hudLockColor,
+	"Which color number to use for drawing the lock on the HUD.\n"),
+
+    COLOR_INDEX_OPTION(
+	"visibilityBorderColor",
+	2,
+	&visibilityBorderColor,
+	"Which color number to use for drawing the visibility border.\n"),
+
+    COLOR_INDEX_OPTION(
+	"fuelGaugeColor",
+	0,
+	&fuelGaugeColor,
+	"Which color number to use for drawing the fuel gauge.\n"),
+
+    COLOR_INDEX_OPTION(
+	"clockColor",
+	1,
+	&clockColor,
+	"Which color number to use for drawing the clock.\n"
+	"The clock is displayed in the top right of the score window.\n"),
+
+    COLOR_INDEX_OPTION(
+	"ballColor",
+	1,
+	&ballColor,
+	"Which color number to use for drawing balls.\n"),
+
+    COLOR_INDEX_OPTION(
+	"connColor",
+	2,
+	&connColor,
+	"Which color number to use for drawing connectors.\n"),
+
+    COLOR_INDEX_OPTION(
+	"windowColor",
+	8,
+	&windowColor,
+	"Which color number to use for drawing windows.\n"),
+
+    COLOR_INDEX_OPTION(
+	"buttonColor",
+	2,
+	&buttonColor,
+	"Which color number to use for drawing buttons.\n"),
+
+    COLOR_INDEX_OPTION(
+	"borderColor",
+	1,
+	&borderColor,
+	"Which color number to use for drawing borders.\n"),
+
+    COLOR_INDEX_OPTION(
+	"wallRadarColor",
+	8,
+	&wallRadarColor,
+	"Which color number to use for drawing walls on the radar.\n"
+	"Valid values all even numbers smaller than maxColors.\n"),
+
+    COLOR_INDEX_OPTION(
+	"decorRadarColor",
+	6,
+	&decorRadarColor,
+	"Which color number to use for drawing decorations on the radar.\n"
+	"Valid values are all even numbers smaller than maxColors.\n"),
+
+    COLOR_INDEX_OPTION(
+	"targetRadarColor",
+	4,
+	&targetRadarColor,
+	"Which color number to use for drawing targets on the radar.\n"
+	"Valid values are all even numbers smaller than maxColors.\n"),
+
+    COLOR_INDEX_OPTION(
+	"fuelMeterColor",
+	0,
+	&fuelMeterColor,
+	"Which color number to use for drawing the fuel meter.\n"),
+
+    COLOR_INDEX_OPTION(
+	"powerMeterColor",
+	0,
+	&powerMeterColor,
+	"Which color number to use for drawing the power meter.\n"),
+
+    COLOR_INDEX_OPTION(
+	"turnSpeedMeterColor",
+	0,
+	&turnSpeedMeterColor,
+	"Which color number to use for drawing the turn speed meter.\n"),
+
+    COLOR_INDEX_OPTION(
+	"packetSizeMeterColor",
+	0,
+	&packetSizeMeterColor,
+	"Which color number to use for drawing the packet size meter.\n"
+	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"),
+
+    COLOR_INDEX_OPTION(
+	"packetLossMeterColor",
+	3,
+	&packetLossMeterColor,
+	"Which color number to use for drawing the packet loss meter.\n"
+	"This gives the percentage of lost frames due to network failure.\n"),
+
+    COLOR_INDEX_OPTION(
+	"packetDropMeterColor",
+	0,
+	&packetDropMeterColor,
+	"Which color number to use for drawing the packet drop meter.\n"
+	"This gives the percentage of dropped frames due to display\n"
+	"slowness.\n"),
+
+    COLOR_INDEX_OPTION(
+	"packetLagMeterColor",
+	0,
+	&packetLagMeterColor,
+	"Which color number to use for drawing the packet lag meter.\n"
+	"This gives the amount of lag in frames over the past one second.\n"),
+
+    COLOR_INDEX_OPTION(
+	"temporaryMeterColor",
+	3,
+	&temporaryMeterColor,
+	"Which color number to use for drawing temporary meters.\n"),
+
+    COLOR_INDEX_OPTION(
+	"meterBorderColor",
+	2,
+	&meterBorderColor,
+	"Which color number to use for drawing borders of meters.\n"),
+
+
+    COLOR_INDEX_OPTION(
+	"msgScanBallColor",
+	3,
+	&msgScanBallColor,
+	"Which color number to use for drawing ball message warning.\n"),
+
+    COLOR_INDEX_OPTION(
+	"msgScanSafeColor",
+	4,
+	&msgScanSafeColor,
+	"Which color number to use for drawing safe message.\n"),
+
+    COLOR_INDEX_OPTION(
+	"msgScanCoverColor",
+	2,
+	&msgScanCoverColor,
+	"Which color number to use for drawing cover message.\n"),
+
+    COLOR_INDEX_OPTION(
+	"msgScanPopColor",
+	11,
+	&msgScanPopColor,
+	"Which color number to use for drawing pop message.\n"),
+
+    COLOR_INDEX_OPTION(
+	"zeroLivesColor",
+	1,
+	&zeroLivesColor,
+	"Which color to associate with ships with zero lives left.\n"
+	"This can be used to paint for example ship and base names.\n"),
+
+    COLOR_INDEX_OPTION(
+	"oneLifeColor",
+	3,
+	&oneLifeColor,
+	"Which color to associate with ships with one life left.\n"
+	"This can be used to paint for example ship and base names.\n"),
+
+    COLOR_INDEX_OPTION(
+	"twoLivesColor",
+	11,
+	&twoLivesColor,
+	"Which color to associate with ships with two lives left.\n"
+	"This can be used to paint for example ship and base names.\n"),
+
+    COLOR_INDEX_OPTION(
+	"manyLivesColor",
+	4,
+	&manyLivesColor,
+	"Which color to associate with ships with more than two lives left.\n"
+	"This can be used to paint for example ship and base names.\n"),
+
+    COLOR_INDEX_OPTION(
+	"selfLWColor",
+	1,
+	&selfLWColor,
+	"Which color to use to paint your ship in when on last life.\n"
+	"Original color for this is red.\n"),
+
+    COLOR_INDEX_OPTION(
+	"enemyLWColor",
+	1,
+	&enemyLWColor,
+	"Which color to use to paint enemy ships in when on last life.\n"
+	"Original color for this is red.\n"),
+
+    COLOR_INDEX_OPTION(
+	"teamLWColor",
+	2,
+	&teamLWColor,
+	"Which color to use to paint teammate ships in when on last life.\n"
+	"Original color for this is green.\n"),
+
+    COLOR_INDEX_OPTION(
+	"shipNameColor",
+	2,
+	&shipNameColor,
+	"Which color number to use for drawing names of ships.\n"),
+
+    COLOR_INDEX_OPTION(
+	"baseNameColor",
+	1,
+	&baseNameColor,
+	"Which color number to use for drawing names of bases.\n"),
+
+    COLOR_INDEX_OPTION(
+	"mineNameColor",
+	2,
+	&mineNameColor,
+	"Which color number to use for drawing names of mines.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreColor",
+	1,
+	&scoreColor,
+	"Which color number to use for drawing score list entries.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreSelfColor",
+	3,
+	&scoreSelfColor,
+	"Which color number to use for drawing your own score.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreInactiveColor",
+	12,
+	&scoreInactiveColor,
+	"Which color number to use for drawing inactive players's scores.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreInactiveSelfColor",
+	12,
+	&scoreInactiveSelfColor,
+	"Which color number to use for drawing your score when inactive.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreOwnTeamColor",
+	4,
+	&scoreOwnTeamColor,
+	"Which color number to use for drawing your own team score.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreEnemyTeamColor",
+	11,
+	&scoreEnemyTeamColor,
+	"Which color number to use for drawing enemy team score.\n"),
+
+    COLOR_INDEX_OPTION(
+	"scoreObjectColor",
+	4,
+	&scoreObjectColor,
+	"Which color number to use for drawing score objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team0Color",
+	0,
+	&team0Color,
+	"Which color number to use for drawing team 0 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team1Color",
+	0,
+	&team1Color,
+	"Which color number to use for drawing team 1 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team2Color",
+	0,
+	&team2Color,
+	"Which color number to use for drawing team 2 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team3Color",
+	0,
+	&team3Color,
+	"Which color number to use for drawing team 3 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team4Color",
+	0,
+	&team4Color,
+	"Which color number to use for drawing team 4 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team5Color",
+	0,
+	&team5Color,
+	"Which color number to use for drawing team 5 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team6Color",
+	0,
+	&team6Color,
+	"Which color number to use for drawing team 6 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team7Color",
+	0,
+	&team7Color,
+	"Which color number to use for drawing team 7 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team8Color",
+	0,
+	&team8Color,
+	"Which color number to use for drawing team 8 objects.\n"),
+
+    COLOR_INDEX_OPTION(
+	"team9Color",
+	0,
+	&team9Color,
+	"Which color number to use for drawing team 9 objects.\n"),
 };
 
 
