@@ -5,12 +5,6 @@ these tasks, ask that developer first, so you can agree on how to proceed.
 TASKS FOR XPILOT NG 4.7.0
 -------------------------
 
-Task: Include circle cannon dodgers map in distro
-Developer: throat
-
-Task: Related to cannon dodgers: scoring by survival time.
-Developer: throat / kps
-
 Task: Related to cannon dodgers: add working ranking for maps where
 surivial time
 Developer: throat / kps
@@ -121,10 +115,6 @@ Task: Make it so that no defaultsFile is used in server by default.
 Developer: kps
 
 Task: Write a "getting started" webpage for newbies.
-Developer: kps
-
-Task: Make ballrun counter work like in old xpilot when legacymode server
-option is true.
 Developer: kps
 
 Task: Add an option to use old walls in Blood's Music games. This is useful
