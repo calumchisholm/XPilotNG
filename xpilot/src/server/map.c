@@ -91,7 +91,7 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
     t.pos = pos;
     t.dir = dir;
     t.team = team;
-    t.dead_time = 0;
+    t.dead_ticks = 0;
     t.conn_mask = (unsigned)-1;
     t.group = NO_GROUP;
     STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
@@ -173,7 +173,7 @@ int World_place_target(world_t *world, clpos_t pos, int team)
      * in Xpmap_find_map_object_teams().
      */
     t.team = team;
-    t.dead_time = 0;
+    t.dead_ticks = 0;
     t.damage = TARGET_DAMAGE;
     t.conn_mask = (unsigned)-1;
     t.update_mask = 0;

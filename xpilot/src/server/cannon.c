@@ -58,8 +58,8 @@ void Cannon_update(bool do_less_frequent_update)
     for (i = 0; i < world->NumCannons; i++) {
 	cannon_t *c = Cannons(world, i);
 
-	if (c->dead_time > 0) {
-	    if ((c->dead_time -= timeStep) <= 0)
+	if (c->dead_ticks > 0) {
+	    if ((c->dead_ticks -= timeStep) <= 0)
 		World_restore_cannon(world, c);
 	    continue;
 	} else {

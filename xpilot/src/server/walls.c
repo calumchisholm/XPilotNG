@@ -299,9 +299,11 @@ static void Object_hits_target(object_t *obj, target_t *targ, double player_cost
     }
     if (somebody_flag) {
 	for (j = 0; j < world->NumTargets; j++) {
-	    if (world->targets[j].team == targ->team) {
+	    target_t *t = Targets(world, j);
+
+	    if (t->team == targ->team) {
 		targets_total++;
-		if (world->targets[j].dead_time <= 0)
+		if (t->dead_ticks <= 0)
 		    targets_remaining++;
 	    }
 	}

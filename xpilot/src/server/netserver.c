@@ -1297,7 +1297,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	/*
 	 * The client assumes at startup that all cannons are active.
 	 */
-	if (cannon->dead_time == 0)
+	if (cannon->dead_ticks == 0)
 	    SET_BIT(cannon->conn_mask, conn_bit);
 	else
 	    CLR_BIT(cannon->conn_mask, conn_bit);
@@ -1317,7 +1317,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	/*
 	 * The client assumes at startup that all targets are not damaged.
 	 */
-	if (targ->dead_time == 0
+	if (targ->dead_ticks == 0
 	    && targ->damage == TARGET_DAMAGE) {
 	    SET_BIT(targ->conn_mask, conn_bit);
 	    CLR_BIT(targ->update_mask, conn_bit);
@@ -1874,11 +1874,11 @@ int Send_score_object(connection_t *connp, double score, clpos_t pos,
 			     bpos.bx, bpos.by, string);
 }
 
-int Send_cannon(connection_t *connp, int num, int dead_time)
+int Send_cannon(connection_t *connp, int num, int dead_ticks)
 {
     if (FEATURE(connp, F_POLY))
 	return 0;
-    return Packet_printf(&connp->w, "%c%hu%hu", PKT_CANNON, num, dead_time);
+    return Packet_printf(&connp->w, "%c%hu%hu", PKT_CANNON, num, dead_ticks);
 }
 
 int Send_destruct(connection_t *connp, int count)
@@ -2016,12 +2016,12 @@ int Send_mine(connection_t *connp, clpos_t pos, int teammine, int id)
 			 teammine, id);
 }
 
-int Send_target(connection_t *connp, int num, int dead_time, double damage)
+int Send_target(connection_t *connp, int num, int dead_ticks, double damage)
 {
     if (FEATURE(connp, F_POLY))
 	return 0;
     return Packet_printf(&connp->w, "%c%hu%hu%hu", PKT_TARGET,
-			 num, dead_time, (int)(damage * 256.0));
+			 num, dead_ticks, (int)(damage * 256.0));
 }
 
 int Send_wormhole(connection_t *connp, clpos_t pos)

@@ -504,7 +504,7 @@ static void Frame_map(connection_t *conn, player_t *pl)
 	if (BIT(targ->update_mask, conn_bit)
 	    || (BIT(targ->conn_mask, conn_bit) == 0
 		&& clpos_inview(&cv, targ->pos))) {
-	    Send_target(conn, i, (int)targ->dead_time, targ->damage);
+	    Send_target(conn, i, (int)targ->dead_ticks, targ->damage);
 	    pl->last_target_update = i;
 	    bytes_left -= target_packet_size;
 	    if (++packet_count >= max_packet)
@@ -523,7 +523,7 @@ static void Frame_map(connection_t *conn, player_t *pl)
 	cannon = Cannons(world, i);
 	if (clpos_inview(&cv, cannon->pos)) {
 	    if (BIT(cannon->conn_mask, conn_bit) == 0) {
-		Send_cannon(conn, i, (int)cannon->dead_time);
+		Send_cannon(conn, i, (int)cannon->dead_ticks);
 		pl->last_cannon_update = i;
 		bytes_left -= max_packet * cannon_packet_size;
 		if (++packet_count >= max_packet)

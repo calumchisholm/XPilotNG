@@ -775,7 +775,7 @@ void Reset_all_players(void)
 	    for (i = 0; i < world->NumTargets; i++) {
 		target_t *targ = Targets(world, i);
 
-		if (targ->damage != TARGET_DAMAGE || targ->dead_time > 0)
+		if (targ->damage != TARGET_DAMAGE || targ->dead_ticks > 0)
 		    World_restore_target(world, targ);
 	    }
 	}

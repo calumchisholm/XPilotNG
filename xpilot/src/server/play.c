@@ -448,7 +448,7 @@ hitmask_t Cannon_hitmask(cannon_t *cannon)
 {
     world_t *world = &World;
 
-    if (cannon->dead_time > 0)
+    if (cannon->dead_ticks > 0)
 	return ALL_BITS;
     if (BIT(world->rules->mode, TEAM_PLAY) && options.teamImmunity)
 	return HITMASK(cannon->team);
@@ -471,7 +471,7 @@ void World_restore_cannon(world_t *world, cannon_t *cannon)
 
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
-    cannon->dead_time = 0;
+    cannon->dead_ticks = 0;
 
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
@@ -480,7 +480,7 @@ void World_remove_cannon(world_t *world, cannon_t *cannon)
 {
     blkpos_t blk = Clpos_to_blkpos(cannon->pos);
 
-    cannon->dead_time = options.cannonDeadTime;
+    cannon->dead_ticks = options.cannonDeadTicks;
     cannon->conn_mask = 0;
 
     World_set_block(world, blk, SPACE);
@@ -503,7 +503,7 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
     unsigned long cannon_mask;
 
     /* this should never happen if hitmasks are ok */
-    assert (! (cannon->dead_time > 0));
+    assert (! (cannon->dead_ticks > 0));
 
     /* if cannon is phased nothing will hit it */
     if (BIT(cannon->used, HAS_PHASING_DEVICE))
@@ -535,7 +535,7 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
 hitmask_t Target_hitmask(target_t *targ)
 {
     /* target is destroyed - nothing hits */
-    if (targ->dead_time > 0)
+    if (targ->dead_ticks > 0)
 	return ALL_BITS;
 
     /* everything hits targets that don't belong to a team */
@@ -582,7 +582,7 @@ void World_restore_target(world_t *world, target_t *targ)
     targ->conn_mask = 0;
     targ->update_mask = (unsigned)-1;
     targ->last_change = frame_loops;
-    targ->dead_time = 0;
+    targ->dead_ticks = 0;
     targ->damage = TARGET_DAMAGE;
 
     P_set_hitmask(targ->group, Target_hitmask(targ));
@@ -595,7 +595,7 @@ void World_remove_target(world_t *world, target_t *targ)
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
     targ->damage = TARGET_DAMAGE;
-    targ->dead_time = options.targetDeadTime;
+    targ->dead_ticks = options.targetDeadTicks;
 
     /*
      * Destroy target.

@@ -203,7 +203,7 @@ extern struct options {
     bool	cannonsUseItems;
     bool	cannonsDefend;
     bool	cannonFlak;
-    int		cannonDeadTime;
+    double	cannonDeadTicks;
     bool	keepShots;
     bool	teamImmunity;
     bool	teamShareScore;
@@ -275,7 +275,7 @@ extern struct options {
     bool	laserIsStunGun;
     bool	targetKillTeam;
     bool	targetSync;
-    int		targetDeadTime;
+    double	targetDeadTicks;
     bool	reportToMetaServer;
     bool	searchDomainForXPilot;
     char	*denyHosts;

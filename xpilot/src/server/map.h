@@ -147,7 +147,7 @@ typedef struct cannon {
     bool	tractor_is_pressor;
     int		team;
     long	used;
-    double	dead_time;
+    double	dead_ticks;
     double	damaged;
     double	tractor_count;
     double	emergency_shield_left;
@@ -203,7 +203,7 @@ typedef struct treasure {
 typedef struct target {
     clpos_t	pos;
     int		team;
-    double	dead_time;
+    double	dead_ticks;
     double	damage;
     unsigned	conn_mask;
     unsigned 	update_mask;

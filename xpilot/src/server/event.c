@@ -79,7 +79,7 @@ static void Repair(player_t *pl)
     for (i = 0; i < world->NumTargets; i++) {
 	targ = Targets(world, i);
 	if (targ->team == pl->team
-	    && targ->dead_time <= 0) {
+	    && targ->dead_ticks <= 0) {
 	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
 			    pl->pos.cy - targ->pos.cy);
 	    if (BIT(pl->used, HAS_REPAIR) == 0 || l < dist) {

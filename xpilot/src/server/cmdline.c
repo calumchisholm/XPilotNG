@@ -1147,13 +1147,14 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"cannonDeadTime",
-	"cannonDeadTime",
-	"72",
-	&options.cannonDeadTime,
-	valSec,
+	"cannonDeadTicks",
+	"cannonDeadTicks",
+	"864.0",		/* 72 seconds at gamespeed 12 */
+	&options.cannonDeadTicks,
+	valReal,
 	tuner_dummy,
-	"How many seconds do cannons stay dead?\n",
+	"How many seconds do cannons stay dead?\n"
+	"Replaces option cannonDeadTime.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1239,13 +1240,14 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"targetDeadTime",
-	"targetDeadTime",
-	"60",
-	&options.targetDeadTime,
-	valSec,
+	"targetDeadTicks",
+	"targetDeadTicks",
+	"720.0",		/* 60 seconds at gamespeed 12 */
+	&options.targetDeadTicks,
+	valReal,
 	tuner_dummy,
-	"How man seconds do targets stay destroyed?\n",
+	"How many ticks do targets stay destroyed?\n"
+	"Replaces option targetDeadTime.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

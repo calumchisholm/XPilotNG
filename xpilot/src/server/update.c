@@ -527,8 +527,8 @@ static void Target_update(void)
     for (i = 0; i < world->NumTargets; i++) {
 	target_t *targ = Targets(world, i);
 
-	if (targ->dead_time > 0) {
-	    if ((targ->dead_time -= timeStep) <= 0) {
+	if (targ->dead_ticks > 0) {
+	    if ((targ->dead_ticks -= timeStep) <= 0) {
 		World_restore_target(world, targ);
 
 		if (options.targetSync) {
@@ -755,7 +755,7 @@ static void Do_repair(player_t *pl)
     if ((Wrap_length(pl->pos.cx - targ->pos.cx,
 		     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
 	|| targ->damage >= TARGET_DAMAGE
-	|| targ->dead_time > 0
+	|| targ->dead_ticks > 0
 	|| BIT(pl->used, HAS_PHASING_DEVICE))
 	CLR_BIT(pl->used, HAS_REPAIR);
     else {
@@ -765,7 +765,7 @@ static void Do_repair(player_t *pl)
 	do {
 	    if (pl->fuel.tank[pl->fuel.current]
 		> REFUEL_RATE * timeStep) {
-		targ->damage += TARGET_FUEL_REPAIR_PER_FRAME;
+		targ->damage += TARGET_FUEL_REPAIR_PER_FRAME * timeStep;
 		targ->conn_mask = 0;
 		targ->last_change = frame_loops;
 		Player_add_fuel(pl, -REFUEL_RATE * timeStep);

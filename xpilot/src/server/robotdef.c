@@ -1511,7 +1511,7 @@ static int Robot_default_play_check_map(player_t *pl)
 	target_t *targ = Targets(world, j);
 
 	/* Ignore dead or owned targets */
-	if (targ->dead_time > 0
+	if (targ->dead_ticks > 0
 	    || pl->team == targ->team
 	    || Teams(world, targ->team)->NumMembers == 0)
 	    continue;
@@ -1549,7 +1549,7 @@ static int Robot_default_play_check_map(player_t *pl)
     for (j = 0; j < world->NumCannons; j++) {
 	cannon_t *cannon = Cannons(world, j);
 
-	if (cannon->dead_time > 0)
+	if (cannon->dead_ticks > 0)
 	    continue;
 
 	if (BIT(world->rules->mode, TEAM_PLAY)
@@ -1915,7 +1915,7 @@ static void Robot_default_play(player_t *pl)
 
 	    if (targ->team == pl->team
 		&& targ->damage < TARGET_DAMAGE
-		&& targ->dead_time >= 0) {
+		&& targ->dead_ticks >= 0) {
 
 		if (Wrap_length(pl->pos.cx - targ->pos.cx,
 				pl->pos.cy - targ->pos.cy) <= 90.0 * CLICK) {
