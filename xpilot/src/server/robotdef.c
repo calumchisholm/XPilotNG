@@ -148,7 +148,7 @@ int Robot_default_setup(robot_type_t *type_ptr)
  */
 static bool Check_robot_evade(player *pl, int mine_i, int ship_i);
 static bool Check_robot_target(player *pl, int item_cx, int item_cy, int new_mode);
-static bool Detect_hunt(player *pl, int j);
+static bool Detect_hunt(player *pl, player *ship);
 static int Rank_item_value(player *pl, long itemtype);
 static bool Ball_handler(player *pl);
 
@@ -1100,7 +1100,7 @@ static bool Check_robot_target(player *pl,
 	    case 3:			type = OBJ_HEAT_SHOT; break;
 	    default:			type = OBJ_TORPEDO; break;
 	    }
-	    if (Detect_hunt(pl, GetInd(pl->lock.pl_id))
+	    if (Detect_hunt(pl, Player_by_id(pl->lock.pl_id))
 		&& !pl->visibility[GetInd(pl->lock.pl_id)].canSee)
 		type = OBJ_HEAT_SHOT;
 	    if (type == OBJ_SMART_SHOT && !allowSmartMissiles)
@@ -1169,10 +1169,9 @@ static bool Check_robot_hunt(player *pl)
 	return false;
     if (pl->fuel.sum < pl->fuel.l3 /*MAX_PLAYER_FUEL/2*/)
 	return false;
-    if (!Detect_hunt(pl, GetInd(my_data->robot_lock_id)))
-	return false;
-
     ship = Player_by_id(my_data->robot_lock_id);
+    if (!Detect_hunt(pl, ship))
+	return false;
 
     ship_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
 				  ship->pos.cy - pl->pos.cy);
@@ -1221,9 +1220,8 @@ static bool Check_robot_hunt(player *pl)
     return true;
 }
 
-static bool Detect_hunt(player *pl, int j)
+static bool Detect_hunt(player *pl, player *ship)
 {
-    player	*ship = Players(j);
     int		dx, dy;
 
     if (!Player_is_playing(ship))
@@ -1232,7 +1230,7 @@ static bool Detect_hunt(player *pl, int j)
     if (BIT(ship->used, HAS_PHASING_DEVICE))
 	return false;		/* can't do anything with phased ships */
 
-    if (pl->visibility[j].canSee)
+    if (pl->visibility[GetInd(ship->id)].canSee)
 	return true;		/* trivial */
 
     /* can't see it, so it must be cloaked
@@ -2059,35 +2057,33 @@ static void Robot_default_play(player *pl)
 	ship_dist = 0;
 
     if (BIT(my_data->robot_lock, LOCK_PLAYER)) {
-	j = GetInd(my_data->robot_lock_id);
-	ship = Players(j);
+	ship = Player_by_id(my_data->robot_lock_id);
+	j = GetInd(ship->id);
 
-	if (Player_is_active(ship)) {
+	if (Player_is_active(ship)
+	    && Detect_hunt(pl, ship)) {
 
-	    if (Detect_hunt(pl, j)) {
+	    if (BIT(my_data->robot_lock, LOCK_PLAYER)
+		&& my_data->robot_lock_id == ship->id) {
+		my_data->lock_last_seen = my_data->robot_count;
+		my_data->lock_last_pos.x = CLICK_TO_PIXEL(ship->pos.cx);
+		my_data->lock_last_pos.y = CLICK_TO_PIXEL(ship->pos.cy);
+	    }
 
-		if (BIT(my_data->robot_lock, LOCK_PLAYER)
-		    && my_data->robot_lock_id == ship->id) {
-		    my_data->lock_last_seen = my_data->robot_count;
-		    my_data->lock_last_pos.x = CLICK_TO_PIXEL(ship->pos.cx);
-		    my_data->lock_last_pos.y = CLICK_TO_PIXEL(ship->pos.cy);
-		}
+	    dx = CLICK_TO_PIXEL(ship->pos.cx - pl->pos.cx);
+	    dx = WRAP_DX(dx);
+	    dy = CLICK_TO_PIXEL(ship->pos.cy - pl->pos.cy);
+	    dy = WRAP_DY(dy);
+	    distance = LENGTH(dx, dy);
 
-		dx = CLICK_TO_PIXEL(ship->pos.cx - pl->pos.cx);
-		dx = WRAP_DX(dx);
-		dy = CLICK_TO_PIXEL(ship->pos.cy - pl->pos.cy);
-		dy = WRAP_DY(dy);
-		distance = LENGTH(dx, dy);
+	    if (distance < ship_dist) {
+		ship_i = GetInd(my_data->robot_lock_id);
+		ship_dist = distance;
+	    }
 
-		if (distance < ship_dist) {
-		    ship_i = GetInd(my_data->robot_lock_id);
-		    ship_dist = distance;
-		}
-
-		if (distance < enemy_dist) {
-		    enemy_i = j;
-		    enemy_dist = distance;
-		}
+	    if (distance < enemy_dist) {
+		enemy_i = j;
+		enemy_dist = distance;
 	    }
 	}
     }
@@ -2101,7 +2097,7 @@ static void Robot_default_play(player *pl)
 		|| Team_immune(pl->id, ship->id))
 		continue;
 
-	    if (!Detect_hunt(pl, j))
+	    if (!Detect_hunt(pl, ship))
 		continue;
 
 	    dx = CLICK_TO_PIXEL(ship->pos.cx - pl->pos.cx), dx = WRAP_DX(dx);
@@ -2176,7 +2172,7 @@ static void Robot_default_play(player *pl)
 		&& my_data->robot_lock_id != pl->lock.pl_id
 		&& BIT(Player_by_id(my_data->robot_lock_id)->status,
 		       PLAYING|PAUSE|GAME_OVER) == PLAYING)
-	    || !Detect_hunt(pl, GetInd(ship->id))
+	    || !Detect_hunt(pl, ship)
 	    || (pl->fuel.sum <= pl->fuel.l3
 		&& !BIT(World.rules->mode, TIMING))
 	    || (BIT(World.rules->mode, TIMING)
@@ -2259,7 +2255,7 @@ static void Robot_default_play(player *pl)
 	}
     }
     if (BIT(pl->lock.tagged, LOCK_PLAYER) &&
-	Detect_hunt(pl, GetInd(pl->lock.pl_id))) {
+	Detect_hunt(pl, Player_by_id(pl->lock.pl_id))) {
 
 	ship = Player_by_id(pl->lock.pl_id);
 	shoot_time = (int)(pl->lock.distance / (ShotsSpeed + 1));
