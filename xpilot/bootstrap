@@ -5,9 +5,10 @@
 #
 
 set -x
-mkdir config
+# mkdir config
 touch NEWS README AUTHORS ChangeLog
-aclocal -I config
+# aclocal -I config
+aclocal
 autoheader
 automake --gnu --add-missing --copy
 autoconf

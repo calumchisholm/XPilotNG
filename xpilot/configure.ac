@@ -4,7 +4,7 @@ AC_INIT(xpilot, 4.5.4X)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
-AC_CONFIG_AUX_DIR(config)
+dnl AC_CONFIG_AUX_DIR(config)
 dnl AC_CANONICAL_HOST
 
 dnl  Checks for programs.
