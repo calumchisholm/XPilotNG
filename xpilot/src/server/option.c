@@ -195,8 +195,7 @@ static int get_bmp_id(const char *s)
     for (i = 0; i < num_bstyles; i++)
 	if (!strcmp(bstyles[i].id, s))
 	    return i;
-    errno = 0;
-    error("Undeclared bmpstyle %s", s);
+    warn("Undeclared bmpstyle %s", s);
     return 0;
 }
 
@@ -208,8 +207,7 @@ static int get_edge_id(const char *s)
     for (i = 0; i < num_estyles; i++)
 	if (!strcmp(estyles[i].id, s))
 	    return i;
-    errno = 0;
-    error("Undeclared edgestyle %s", s);
+    warn("Undeclared edgestyle %s", s);
     return -1;
 }
 
@@ -221,8 +219,7 @@ static int get_poly_id(const char *s)
     for (i = 0; i < num_pstyles; i++)
 	if (!strcmp(pstyles[i].id, s))
 	    return i;
-    errno = 0;
-    error("Undeclared polystyle %s", s);
+    warn("Undeclared polystyle %s", s);
     return 0;
 }
 
@@ -231,7 +228,7 @@ static int get_poly_id(const char *s)
     if (N >= M && ((M <= 0)						\
 	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
 	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
-	error("No memory");						\
+	warn("No memory");						\
 	exit(1);							\
     } else								\
 	(P[N++] = V)
@@ -250,23 +247,21 @@ static void tagstart(void *data, const char *el, const char **attr)
 		version = atof(*(attr + 1));
 	    attr += 2;
 	}
-	errno = 0;
 	if (version == 0) {
-	    error("Old(?) map file with no version number");
-	    error("Not guaranteed to work");
+	    warn("Old(?) map file with no version number");
+	    warn("Not guaranteed to work");
 	}
 	else if (version < 1)
-	    error("Impossible version in map file");
+	    warn("Impossible version in map file");
 	else if (version > 1) {
-	    error("Map file has newer version than this server recognizes.");
-	    error("The map file might use unsupported features.");
+	    warn("Map file has newer version than this server recognizes.");
+	    warn("The map file might use unsupported features.");
 	}
 	xptag = 1;
 	return;
     }
 
     if (!xptag) {
-	errno = 0;
 	fatal("This doesn't look like a map file "
 	      " (XPilotMap must be first tag).");
 	return; /* not reached */
@@ -294,8 +289,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	if (pstyles[num_pstyles].defedge_id == 0) {
-	    errno = 0;
-	    error("Polygon default edgestyle cannot be omitted or set "
+	    warn("Polygon default edgestyle cannot be omitted or set "
 		  "to 'internal'!");
 	    exit(1);
 	}
@@ -348,7 +342,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Scale")) { /* "Undocumented feature" */
 	if (!*attr || strcasecmp(*attr, "value"))
-	    error("Invalid Scale");
+	    warn("Invalid Scale");
 	else
 	    scale = atof(*(attr + 1));
 	return;
@@ -395,14 +389,13 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	if (x < 0 || x >= World.cwidth || y < 0 || y > World.cheight) {
-	    error("Polygon start point (%d, %d) is not inside the map"
+	    warn("Polygon start point (%d, %d) is not inside the map"
 		  "(0 <= x < %d, 0 <= y < %d)",
 		  x, y, World.cwidth, World.cheight);
 	    exit(1);
 	}
 	if (style == -1) {
-	    errno = 0;
-	    error("Currently you must give polygon style, no default");
+	    warn("Currently you must give polygon style, no default");
 	    exit(1);
 	}
 	ptscount = 0;
@@ -475,7 +468,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	if (team < 0 || team >= MAX_TEAMS) {
-	    error("Illegal team number in base tag.\n");
+	    warn("Illegal team number in base tag.\n");
 	    exit(1);
 	}
 
@@ -543,7 +536,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	if (ABS(x) > 30000 || ABS(y) > 30000) {
-	    error("Offset component absolute value exceeds 30000 (x=%d, y=%d)",
+	    warn("Offset component absolute value exceeds 30000 (x=%d, y=%d)",
 		  x, y);
 	    exit(1);
 	}
@@ -561,7 +554,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     if (!strcasecmp(el, "GeneralOptions"))
 	return;
 
-    error("Unknown map tag: \"%s\"", el);
+    warn("Unknown map tag: \"%s\"", el);
     return;
 }
 
@@ -594,7 +587,7 @@ int Load_lines(int fd)
     XML_Parser p = XML_ParserCreate(NULL);
 
     if (!p) {
-	error("Creating Expat instance for map parsing failed.\n");
+	warn("Creating Expat instance for map parsing failed.\n");
 	exit(1);
     }
     XML_SetElementHandler(p, tagstart, tagend);
@@ -605,8 +598,7 @@ int Load_lines(int fd)
 	    return false;
 	}
 	if (!XML_Parse(p, buff, len, !len)) {
-	    errno = 0;
-	    error("Parse error reading map at line %d:\n%s\n",
+	    warn("Parse error reading map at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));
 	    exit(1);
@@ -939,8 +931,7 @@ void parseOptions(void)
     if ((fpsstr = getOption("framesPerSecond")) != NULL)
 	framesPerSecond = atoi(fpsstr);
     if (FPS <= 0) {
-	errno = 0;
-	error("Can't run with %d frames per second, should be positive\n",
+	warn("Can't run with %d frames per second, should be positive\n",
 	    FPS);
 	End_game();
     }
@@ -951,8 +942,7 @@ void parseOptions(void)
 	    if ((desc = (optionDesc *)tmp->def) != NULL) {
 		if (tmp->origin != OPT_DEFAULT &&
 		    !(tmp->origin & desc->flags)) {
-		    errno = 0;
-		    error("%s may not be set in map file", desc->name);
+		    warn("%s may not be set in map file", desc->name);
 		    exit(1); /* Can't continue since the default value was
 			      * lost. This could be fixed with some extra
 			      * tricks if needed. */
@@ -992,7 +982,7 @@ void parseOptions(void)
 				     || !strcasecmp(tmp->value, "false"))
 				*ptr = false;
 			    else {
-				error("Invalid boolean value for %s - %s\n",
+				warn("Invalid boolean value for %s - %s\n",
 				      desc->name, tmp->value);
 			    }
 			    break;
@@ -1005,7 +995,7 @@ void parseOptions(void)
 
 			    s = strchr(tmp->value, ',');
 			    if (!s) {
-				error("Invalid coordinate pair for %s - %s\n",
+				warn("Invalid coordinate pair for %s - %s\n",
 				      desc->name, tmp->value);
 				break;
 			    }

@@ -2618,8 +2618,7 @@ int Parser(int argc, char **argv)
 				break;
 			} else {
 			if (i + 1 == argc) {
-			    errno = 0;
-			    error("Option '%s' needs an argument",
+			    warn("Option '%s' needs an argument",
 				  options[j].commandLineOption);
 			} else
 			    addOption(options[j].name,
@@ -2632,8 +2631,7 @@ int Parser(int argc, char **argv)
 		continue;
 	    }
 	}
-	errno = 0;
-	error("Unknown option '%s'", argv[i]);
+	warn("Unknown option '%s'", argv[i]);
     }
 
     /*
@@ -2644,8 +2642,7 @@ int Parser(int argc, char **argv)
 	    xpprintf("Unable to read %s, trying to open %s\n", fname, Conf_default_map());
 	    if (!parseMapFile(Conf_default_map())) {
 		xpprintf("Unable to read %s\n", Conf_default_map());
-		errno = 0;
-		error("Unable to read any map. Exiting.");
+		warn("Unable to read any map. Exiting.");
 		exit(1);
 	    }
 	}
@@ -2653,8 +2650,7 @@ int Parser(int argc, char **argv)
 	xpprintf("Map not specified, trying to open %s\n", Conf_default_map());
 	if (!parseMapFile(Conf_default_map())) {
 	    xpprintf("Unable to read %s\n", Conf_default_map());
-	    errno = 0;
-	    error("Unable to read any map. Exiting.");
+	    warn("Unable to read any map. Exiting.");
 	    exit(1);
 	}
     }

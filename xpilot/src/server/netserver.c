@@ -489,8 +489,7 @@ void Destroy_connection(int ind, const char *reason)
     char		pkt[MAX_CHARS];
 
     if (connp->state == CONN_FREE) {
-	errno = 0;
-	error("Cannot destroy empty connection (\"%s\")", reason);
+	warn("Cannot destroy empty connection (\"%s\")", reason);
 	return;
     }
 
@@ -962,8 +961,7 @@ static int Handle_login(int ind)
     char		msg[MSG_LEN];
 
     if (NumPlayers - NumPseudoPlayers >= World.NumBases) {
-	errno = 0;
-	error("Not enough bases for players");
+	warn("Not enough bases for players");
 	return -1;
     }
     if (BIT(World.rules->mode, TEAM_PLAY)) {
@@ -983,8 +981,7 @@ static int Handle_login(int ind)
 	if (connp->team == TEAM_NOT_SET) {
 	    connp->team = Pick_team();
 	    if (connp->team == TEAM_NOT_SET) {
-		errno = 0;
-		error("Can't pick team");
+		warn("Can't pick team");
 		return -1;
 	    }
 	}
@@ -993,8 +990,7 @@ static int Handle_login(int ind)
     }
     for (i = 0; i < NumPlayers; i++) {
 	if (strcasecmp(Players[i]->name, connp->nick) == 0) {
-	    errno = 0;
-	    error("Name already in use %s", connp->nick);
+	    warn("Name already in use %s", connp->nick);
 	    return -1;
 	}
     }
@@ -1504,8 +1500,7 @@ int Send_leave(int ind, int id)
     connection_t	*connp = &Conn[ind];
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for leave info (%d,%d)",
+	warn("Connection not ready for leave info (%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -1525,8 +1520,7 @@ int Send_player(int ind, int id)
     int			sbuf_len = connp->c.len;
 
     if (!BIT(connp->state, CONN_PLAYING|CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for player info (%d,%d)",
+	warn("Connection not ready for player info (%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -1554,8 +1548,7 @@ int Send_score(int ind, int id, int score, int life, int mychar)
     connection_t	*connp = &Conn[ind];
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for score(%d,%d)",
+	warn("Connection not ready for score(%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
@@ -1571,8 +1564,7 @@ int Send_timing(int ind, int id, int check, int round)
     connection_t	*connp = &Conn[ind];
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for timing(%d,%d)",
+	warn("Connection not ready for timing(%d,%d)",
 	      connp->state, connp->id);
 	return 0;
     }
@@ -1588,8 +1580,7 @@ int Send_base(int ind, int id, int num)
     connection_t	*connp = &Conn[ind];
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for base info (%d,%d)",
+	warn("Connection not ready for base info (%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
@@ -1612,8 +1603,7 @@ int Send_score_object(int ind, int score, int x, int y, const char *string)
     x /= BLOCK_CLICKS;
     y /= BLOCK_CLICKS;
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for base info (%d,%d)",
+	warn("Connection not ready for base info (%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
@@ -1664,8 +1654,7 @@ int Send_debris(int ind, int type, unsigned char *p, int n)
     sockbuf_t		*w = &Conn[ind].w;
 
     if ((n & 0xFF) != n) {
-	errno = 0;
-	error("Bad number of debris %d", n);
+	warn("Bad number of debris %d", n);
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 2;
@@ -1703,8 +1692,7 @@ int Send_fastshot(int ind, int type, unsigned char *p, int n)
     sockbuf_t		*w = &Conn[ind].w;
 
     if ((n & 0xFF) != n) {
-	errno = 0;
-	error("Bad number of fastshot %d", n);
+	warn("Bad number of fastshot %d", n);
 	return 0;
     }
     avail = w->size - w->len - SOCKBUF_WRITE_SPARE - 3;
@@ -1850,8 +1838,7 @@ int Send_message(int ind, const char *msg)
     connection_t	*connp = &Conn[ind];
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
-	errno = 0;
-	error("Connection not ready for message (%d,%d)",
+	warn("Connection not ready for message (%d,%d)",
 	    connp->state, connp->id);
 	return 0;
     }
@@ -1869,8 +1856,7 @@ int Send_start_of_frame(int ind)
 
     if (connp->state != CONN_PLAYING) {
 	if (connp->state != CONN_READY) {
-	    errno = 0;
-	    error("Connection not ready for frame (%d,%d)",
+	    warn("Connection not ready for frame (%d,%d)",
 		connp->state, connp->id);
 	}
 	return -1;
@@ -1983,14 +1969,12 @@ static int Receive_play(int ind)
     int			n;
 
     if ((n = Packet_scanf(&connp->r, "%c", &ch)) != 1) {
-	errno = 0;
-	error("Cannot receive play packet");
+	warn("Cannot receive play packet");
 	Destroy_connection(ind, "receive error");
 	return -1;
     }
     if (ch != PKT_PLAY) {
-	errno = 0;
-	error("Packet is not of play type");
+	warn("Packet is not of play type");
 	Destroy_connection(ind, "not play");
 	return -1;
     }
@@ -2000,8 +1984,7 @@ static int Receive_play(int ind)
 		connp->r.ptr = connp->r.buf + connp->r.len;
 		return 0;
 	    }
-	    errno = 0;
-	    error("Connection not in login state (%02x)", connp->state);
+	    warn("Connection not in login state (%02x)", connp->state);
 	    Destroy_connection(ind, "not login");
 	    return -1;
 	}
@@ -2071,8 +2054,7 @@ static int Receive_power(int ind)
 	pl->turnresistance_s = power;
 	break;
     default:
-	errno = 0;
-	error("Not a power packet (%d,%02x)", ch, connp->state);
+	warn("Not a power packet (%d,%02x)", ch, connp->state);
 	Destroy_connection(ind, "not power");
 	return -1;
     }
@@ -2221,14 +2203,12 @@ static int Receive_ack(int ind)
 
     if ((n = Packet_scanf(&connp->r, "%c%ld%ld",
 			  &ch, &rel, &rel_loops)) <= 0) {
-	errno = 0;
-	error("Cannot read ack packet (%d)", n);
+	warn("Cannot read ack packet (%d)", n);
 	Destroy_connection(ind, "read error");
 	return -1;
     }
     if (ch != PKT_ACK) {
-	errno = 0;
-	error("Not an ack packet (%d)", ch);
+	warn("Not an ack packet (%d)", ch);
 	Destroy_connection(ind, "not ack");
 	return -1;
     }
@@ -2283,8 +2263,7 @@ static int Receive_ack(int ind)
     diff = rel - connp->reliable_offset;
     if (diff > connp->c.len) {
 	/* Impossible to ack data that has not been send */
-	errno = 0;
-	error("Bad ack (diff=%ld,cru=%ld,c=%ld,len=%d)",
+	warn("Bad ack (diff=%ld,cru=%ld,c=%ld,len=%d)",
 	    diff, rel, connp->reliable_offset, connp->c.len);
 	Destroy_connection(ind, "bad ack");
 	return -1;
@@ -2327,8 +2306,7 @@ static int Receive_discard(int ind)
 {
     connection_t	*connp = &Conn[ind];
 
-    errno = 0;
-    error("Discarding packet %d while in state %02x",
+    warn("Discarding packet %d while in state %02x",
 	  connp->r.ptr[0], connp->state);
     connp->r.ptr = connp->r.buf + connp->r.len;
 
@@ -2339,8 +2317,7 @@ static int Receive_undefined(int ind)
 {
     connection_t	*connp = &Conn[ind];
 
-    errno = 0;
-    error("Unknown packet type (%d,%02x)", connp->r.ptr[0], connp->state);
+    warn("Unknown packet type (%d,%02x)", connp->r.ptr[0], connp->state);
     Destroy_connection(ind, "undefined packet");
     return -1;
 }

@@ -119,7 +119,7 @@ static unsigned		fastshot_num[DEBRIS_TYPES * 2],
 	    P = (T *) realloc(P, (M) * sizeof(T));			\
 	}								\
 	if (P == NULL) {						\
-	    error("No memory");						\
+	    warn("No memory");						\
 	    N = M = 0;							\
 	    return;	/* ! */						\
 	}								\
@@ -161,7 +161,7 @@ static unsigned		fastshot_num[DEBRIS_TYPES * 2],
 	    ptr_ = (debris_t *) realloc(ptr_, (max_ += max_) * sizeof(*ptr_)); \
 	}								  \
 	if (ptr_ == 0) {							  \
-	    error("No memory for debris");				  \
+	    warn("No memory for debris");				  \
 	    num_ = 0;							  \
 	    return;							  \
 	}								  \
@@ -642,7 +642,7 @@ static void Frame_shots(int conn, int ind)
 	    Send_item(conn, x, y, shot->info);
 	    break;
 	default:
-	    error("Frame_shots: Shot type %d not defined.", shot->type);
+	    warn("Frame_shots: Shot type %d not defined.", shot->type);
 	    break;
 	}
     }
@@ -1054,8 +1054,7 @@ void Set_message(const char *message)
 
     if ((i = strlen(message)) >= MSG_LEN) {
 #ifndef SILENT
-	errno = 0;
-	error("Max message len exceed (%d,%s)", i, message);
+	warn("Max message len exceed (%d,%s)", i, message);
 #endif
 	strncpy(tmp, message, MSG_LEN - 1);
 	tmp[MSG_LEN - 1] = '\0';
@@ -1086,8 +1085,7 @@ void Set_player_message(player *pl, const char *message)
 	return;
     if ((i = strlen(message)) >= MSG_LEN) {
 #ifndef SILENT
-	errno = 0;
-	error("Max message len exceed (%d,%s)", i, message);
+	warn("Max message len exceed (%d,%s)", i, message);
 #endif
 	strncpy(tmp, message, MSG_LEN - 1);
 	tmp[MSG_LEN - 1] = '\0';

@@ -160,7 +160,7 @@ static char msg[MSG_LEN];
 static void *ralloc(void *ptr, size_t size)
 {
     if (!(ptr = realloc(ptr, size))) {
-	error("Realloc failed.");
+	warn("Realloc failed.");
 	exit(1);
     }
     return ptr;
@@ -294,8 +294,7 @@ static void Player_crash(player *pl, struct move *move, int crashtype)
 
     default:
     case NotACrash:
-	errno = 0;
-	error("Unrecognized crash %d", crashtype);
+	warn("Unrecognized crash %d", crashtype);
 	exit(1);
 
 	/*  !@# target too */
@@ -1356,7 +1355,7 @@ struct templine {
     if (N >= M && ((M <= 0)						\
 	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
 	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
-	error("No memory");						\
+	warn("No memory");						\
 	exit(1);							\
     } else								\
 	(P[N++] = V)
@@ -1979,8 +1978,7 @@ static void Corner_init(void)
 	blockline[block].points = ptr;
 	i = temp[block * DISIZE];
 	if (i > DISIZE - 1) {
-	    errno = 0;
-	    error("Not enough corner space in walls.c, add more.");
+	    warn("Not enough corner space in walls.c, add more.");
 	    exit(1);
 	}
 	while (i > 0) {
@@ -2050,8 +2048,7 @@ static void Poly_to_lines(void)
 	    dy += *edges++;
 	}
 	if (dx || dy) {
-	    errno = 0;
-	    error("Polygon %d (%d points) doesn't start and end at the same place", i + 1, np);
+	    warn("Polygon %d (%d points) doesn't start and end at the same place", i + 1, np);
 	    exit(1);
 	}
     }
@@ -3510,8 +3507,7 @@ void Move_object(int ind)
     while (move.delta.x || move.delta.y) {
 	if (!trycount--) {
 	    sprintf(msg, "COULDN'T MOVE OBJECT!!!! Type = %d, x = %d, y = %d. Object was DELETED. [*DEBUG*]", obj->type, move.start.x, move.start.y);
-	    errno = 0;
-	    error(msg);
+	    warn(msg);
 	    Set_message(msg);
 	    obj->life = 0;
 	    return;

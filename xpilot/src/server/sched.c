@@ -264,7 +264,7 @@ static void setup_timer(void)
      * Install a real-time timer.
      */
     if (timer_freq <= 0 || timer_freq > 100) {
-	error("illegal timer frequency: %ld", timer_freq);
+	warn("illegal timer frequency: %ld", timer_freq);
 	exit(1);
     }
 
@@ -368,7 +368,7 @@ static struct to_handler *to_alloc(void)
 
     to_fill();
     if (!to_free_list) {
-	error("Not enough memory for timeouts");
+	warn("Not enough memory for timeouts");
 	exit(1);
     }
 
@@ -515,11 +515,11 @@ void install_input(void (*func)(int, void *), int fd, void *arg)
 	xpprintf("install_input: fd %d min_fd=%d\n", fd, min_fd);
 #endif
     if (!playback && (fd < min_fd || fd >= min_fd + NUM_SELECT_FD)) {
-	error("install illegal input handler fd %d (%d)", fd, min_fd);
+	warn("install illegal input handler fd %d (%d)", fd, min_fd);
 	ServerExit();
     }
     if (!playback && FD_ISSET(fd, &input_mask)) {
-	error("input handler %d busy", fd);
+	warn("input handler %d busy", fd);
 	ServerExit();
     }
     handlers[fd - min_fd].fd = fd;
@@ -537,7 +537,7 @@ void remove_input(int fd)
 {
     if (!playback) {
 	if (fd < min_fd || fd >= min_fd + NUM_SELECT_FD) {
-	    error("remove illegal input handler fd %d (%d)", fd, min_fd);
+	    warn("remove illegal input handler fd %d (%d)", fd, min_fd);
 	    ServerExit();
 	}
 	if (FD_ISSET(fd, &input_mask) || playback) {
@@ -590,7 +590,7 @@ void sched(void)
 
 #ifndef _WINDOWS
     if (sched_running) {
-	error("sched already running");
+	warn("sched already running");
 	exit(1);
     }
 
@@ -680,8 +680,7 @@ void sched(void)
 			record = playback = 0;
 			if (rrecord && (i - min_fd > 0)) {
 			    if (i - min_fd + 1 > 126) { /* 127 reserved */
-				errno = 0;
-				error("recording: this shouldn't happen");
+				warn("recording: this shouldn't happen");
 				exit(1);
 			    }
 			    *playback_sched++ = i - min_fd + 1;

@@ -189,7 +189,7 @@ void Alloc_cells(void)
     size = sizeof(object ***) * World.x;
     size += sizeof(object **) * World.x * World.y;
     if (!(Cells = (object ***) malloc(size))) {
-	error("No Cell mem");
+	warn("No Cell mem");
 	End_game();
     }
     objp = (object **) &Cells[World.x];
@@ -718,7 +718,7 @@ static void PlayerObjectCollision(int ind)
 	    break;
 	default:
 #if 0
-	    error("Unimplemented collision mode %d", obj->collmode);
+	    warn("Unimplemented collision mode %d", obj->collmode);
 #endif
 	    continue;
 	}
@@ -785,7 +785,7 @@ static void PlayerObjectCollision(int ind)
 				       radius * CLICK, obj->wall_time);
 		break;
 	    default:
-		error("Unimplemented collision mode %d", obj->collmode);
+		warn("Unimplemented collision mode %d", obj->collmode);
 		continue;
 	    }
 	}

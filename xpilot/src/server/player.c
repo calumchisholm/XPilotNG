@@ -78,7 +78,7 @@ void Pick_startpos(int ind)
 	}
 	free_bases = (char *) malloc(World.NumBases * sizeof(*free_bases));
 	if (free_bases == NULL) {
-	    error("Can't allocate memory for free_bases");
+	    warn("Can't allocate memory for free_bases");
 	    End_game();
 	}
     }
@@ -123,7 +123,7 @@ void Pick_startpos(int ind)
     }
 
     if (i == World.NumBases) {
-	error("Can't pick startpos (ind=%d,num=%d,free=%d,pick=%d,seen=%d)",
+	warn("Can't pick startpos (ind=%d,num=%d,free=%d,pick=%d,seen=%d)",
 	      ind, World.NumBases, num_free, pick, seen);
 	End_game();
     } else {
@@ -160,7 +160,7 @@ void Go_home(int ind)
     if (IS_TANK_PTR(pl)) {
 	/*NOTREACHED*/
 	/* Tanks have no homebase. */
-	error("BUG: gohome tank");
+	warn("BUG: gohome tank");
 	return;
     }
 
@@ -902,7 +902,7 @@ void Team_game_over(int winning_team, const char *reason)
     char		msg[MSG_LEN];
 
     if (!(best_players = (int *)malloc(NumPlayers * sizeof(int)))) {
-	error("no mem");
+	warn("no mem");
 	End_game();
     }
 
@@ -974,7 +974,7 @@ void Individual_game_over(int winner)
     char		msg[MSG_LEN];
 
     if (!(best_players = (int *)malloc(NumPlayers * sizeof(int)))) {
-	error("no mem");
+	warn("no mem");
 	End_game();
     }
 

@@ -95,7 +95,7 @@ static void Convert_from_host(void *start, int len, int type)
 	}
 	return;
     default:
-	error("BUG");
+	warn("BUG");
 	exit(1);
     }
 }
@@ -138,15 +138,14 @@ static void Convert_to_host(void *start, int len, int type)
 	    case 2:
 		err = EINTR;
 	    default:
-		errno = 0;
-		error("Unrecognized errno code in recording");
+		warn("Unrecognized errno code in recording");
 		exit(1);
 	    }
 	    *iptr++ = err;
 	}
 	return;
     default:
-	error("BUG");
+	warn("BUG");
 	exit(1);
     }
 }
@@ -190,13 +189,11 @@ void Get_recording_data(void)
 	}
 	len = ntohl(len);
 	if (len > bufs[i].size - 4) {
-	    errno = 0;
-	    error("Incorrect chunk length reading recording");
+	    warn("Incorrect chunk length reading recording");
 	    exit(1);
 	}
 	if ((char*)*bufs[i].curp - (char*)bufs[i].start != bufs[i].num_read) {
-	    errno = 0;
-	    error("Recording out of sync");
+	    warn("Recording out of sync");
 	    exit(1);
 	}
 	fread(bufs[i].start, 1, len, recf1);
@@ -215,22 +212,19 @@ void Init_recording(void)
     int i;
 
     if (!recordFileName) {
-	errno = 0;
 	if (recordMode != 0)
-	    error("Can't do anything with recordings when recordFileName "
+	    warn("Can't do anything with recordings when recordFileName "
 		  "isn't specified.");
 	recordMode = 0;
 	return;
     }
     if (sizeof(int) != 4 || sizeof(short) != 2) {
-	errno = 0;
-	error("Recordings won't work on this machine.");
-	error("This code assumes sizeof(int) == 4 && sizeof(short) == 2");
+	warn("Recordings won't work on this machine.");
+	warn("This code assumes sizeof(int) == 4 && sizeof(short) == 2");
 	return;
     }
     if (EWOULDBLOCK != EAGAIN) {
-	errno = 0;
-	error("This system has weird error codes");
+	warn("This system has weird error codes");
 	return;
     }
 
@@ -266,8 +260,7 @@ void Init_recording(void)
 	} else if (recordMode == 0)
 	    return;
 	else {
-	    errno = 0;
-	    error("Trying to start recording or playback when the server is\n"
+	    warn("Trying to start recording or playback when the server is\n"
 		  "already running, impossible.");
 	    return;
 	}
@@ -283,8 +276,7 @@ void Init_recording(void)
     }
     if (oldMode == 12) {
 	oldMode = 10;
-	errno = 0;
-	error("End of playback.");
+	warn("End of playback.");
 	End_game();
     }
 }

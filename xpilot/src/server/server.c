@@ -173,8 +173,7 @@ int main(int argc, char **argv)
 
 	addr = sock_get_addr_by_name(serverHost);
 	if (addr == NULL) {
-	    errno = 0;
-	    error("Failed name lookup on serverHost:%s", serverHost);
+	    warn("Failed name lookup on serverHost:%s", serverHost);
 #ifndef _WINDOWS
 	    exit(1);
 #else
@@ -291,7 +290,7 @@ void Main_loop(void)
 	    End_game();
 	}
 	if (serverTime + 5*60 < time(NULL)) {
-	    error("First player has yet to show his butt, I'm bored... Bye!");
+	    warn("First player has yet to show his butt, I'm bored... Bye!");
 	    Log_game("NOSHOW");
 	    End_game();
 	}
@@ -334,8 +333,7 @@ void End_game(void)
     record = rrecord;
     playback = rplayback; /* Could be called from signal handler */
     if (ShutdownServer == 0) {
-	errno = 0;
-	error("Shutting down...");
+	warn("Shutting down...");
 	sprintf(msg, "shutting down: %s", ShutdownReason);
     } else {
 	sprintf(msg, "server exiting");
@@ -525,8 +523,7 @@ void Server_info(char *str, unsigned max_size)
 	    NumPlayers, World.NumBases);
 
     if (strlen(str) >= max_size) {
-	errno = 0;
-	error("Server_info string overflow (%d)", max_size);
+	warn("Server_info string overflow (%d)", max_size);
 	str[max_size - 1] = '\0';
 	return;
     }
@@ -543,7 +540,7 @@ void Server_info(char *str, unsigned max_size)
     strcat(str, msg);
 
     if ((order = (player **) malloc(NumPlayers * sizeof(player *))) == NULL) {
-	error("No memory for order");
+	warn("No memory for order");
 	return;
     }
     for (i=0; i<NumPlayers; i++) {
@@ -590,8 +587,6 @@ void Server_info(char *str, unsigned max_size)
 
 static void Handle_signal(int sig_no)
 {
-    errno = 0;
-
 #ifndef _WINDOWS
     switch (sig_no) {
 
@@ -600,20 +595,20 @@ static void Handle_signal(int sig_no)
 	    signal(SIGHUP, SIG_IGN);
 	    return;
 	}
-	error("Caught SIGHUP, terminating.");
+	warn("Caught SIGHUP, terminating.");
 	End_game();
 	break;
     case SIGINT:
-	error("Caught SIGINT, terminating.");
+	warn("Caught SIGINT, terminating.");
 	End_game();
 	break;
     case SIGTERM:
-	error("Caught SIGTERM, terminating.");
+	warn("Caught SIGTERM, terminating.");
 	End_game();
 	break;
 
     default:
-	error("Caught unkown signal: %d", sig_no);
+	warn("Caught unkown signal: %d", sig_no);
 	End_game();
 	break;
     }
@@ -645,7 +640,7 @@ void Log_game(const char *heading)
 	    World.name,
 	    heading);
 
-    if ((fp = fopen(Conf_logfile(), "a")) == NULL) {	/* Couldn't open file */
+    if ((fp = fopen(Conf_logfile(), "a")) == NULL) {   /* Couldn't open file */
 	error("Couldn't open log file, contact %s", Conf_localguru());
 	return;
     }
@@ -814,7 +809,7 @@ static void Check_server_versions(void)
     for (i = 0; i < NELEM(file_versions); i++) {
 	if (strcmp(VERSION, file_versions[i].versionstr)) {
 	    oops++;
-	    error("Source file %s.c (\"%s\") is not compiled "
+	    warn("Source file %s.c (\"%s\") is not compiled "
 		  "for the current version (\"%s\")!",
 		  file_versions[i].filename,
 		  file_versions[i].versionstr,
@@ -822,8 +817,8 @@ static void Check_server_versions(void)
 	}
     }
     if (oops) {
-	error("%d version inconsistency errors, cannot continue.", oops);
-	error("Please recompile this program properly.");
+	warn("%d version inconsistency errors, cannot continue.", oops);
+	warn("Please recompile this program properly.");
 	exit(1);
     }
 }

@@ -193,22 +193,19 @@ int Sockbuf_flushRec(sockbuf_t *sbuf)
 	i;
 
     if (BIT(sbuf->state, SOCKBUF_WRITE) == 0) {
-	errno = 0;
-	error("No flush on non-writable socket buffer");
-	error("(state=%02x,buf=%08x,ptr=%08x,size=%d,len=%d,sock=%d)",
+	warn("No flush on non-writable socket buffer");
+	warn("(state=%02x,buf=%08x,ptr=%08x,size=%d,len=%d,sock=%d)",
 	      sbuf->state, sbuf->buf, sbuf->ptr, sbuf->size, sbuf->len,
 	      sbuf->sock);
 	return -1;
     }
     if (BIT(sbuf->state, SOCKBUF_LOCK) != 0) {
-	errno = 0;
-	error("No flush on locked socket buffer (0x%02x)", sbuf->state);
+	warn("No flush on locked socket buffer (0x%02x)", sbuf->state);
 	return -1;
     }
     if (sbuf->len <= 0) {
 	if (sbuf->len < 0) {
-	    errno = 0;
-	    error("Write socket buffer length negative");
+	    warn("Write socket buffer length negative");
 	    sbuf->len = 0;
 	    sbuf->ptr = sbuf->buf;
 	}
@@ -277,8 +274,7 @@ int Sockbuf_readRec(sockbuf_t *sbuf)
 	len;
 
     if (BIT(sbuf->state, SOCKBUF_READ) == 0) {
-	errno = 0;
-	error("No read from non-readable socket buffer (%d)", sbuf->state);
+	warn("No read from non-readable socket buffer (%d)", sbuf->state);
 	return -1;
     }
     if (BIT(sbuf->state, SOCKBUF_LOCK) != 0) {
@@ -290,8 +286,7 @@ int Sockbuf_readRec(sockbuf_t *sbuf)
     if ((max = sbuf->size - sbuf->len) <= 0) {
 	static int before;
 	if (before++ == 0) {
-	    errno = 0;
-	    error("Read socket buffer not big enough (%d,%d)",
+	    warn("Read socket buffer not big enough (%d,%d)",
 		  sbuf->size, sbuf->len);
 	}
 	return -1;
@@ -357,14 +352,12 @@ int Sockbuf_readRec(sockbuf_t *sbuf)
 int Sockbuf_writeRec(sockbuf_t *sbuf, char *buf, int len)
 {
     if (BIT(sbuf->state, SOCKBUF_WRITE) == 0) {
-	errno = 0;
-	error("No write to non-writable socket buffer");
+	warn("No write to non-writable socket buffer");
 	return -1;
     }
     if (sbuf->size - sbuf->len < len) {
 	if (BIT(sbuf->state, SOCKBUF_LOCK | SOCKBUF_DGRAM) != 0) {
-	    errno = 0;
-	    error("No write to locked socket buffer (%d,%d,%d,%d)",
+	    warn("No write to locked socket buffer (%d,%d,%d,%d)",
 		  sbuf->state, sbuf->size, sbuf->len, len);
 	    return -1;
 	}
