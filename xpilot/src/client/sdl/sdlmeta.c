@@ -924,7 +924,7 @@ void handleKeyPress(GLWidget *meta, SDL_keysym *keysym )
       /* ESC key was pressed */
       exit(0);
       break;
-    case SDLK_F1:
+    case SDLK_F11:
       /* F1 key was pressed
        * this toggles fullscreen mode
        */
