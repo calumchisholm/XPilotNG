@@ -33,6 +33,16 @@
 #define ROW_BG2 0x000070ff
 #define HEADER_FG 0xffff00ff
 #define HEADER_BG 0xff0000ff
+#define STATUS_ROWS 7
+#define STATUS_COLS 4
+#define STATUS_FIELD_FG 0xffff00ff
+#define STATUS_FIELD_BG 0xff0000ff
+#define STATUS_VALUE_FG 0xffff00ff
+#define STATUS_VALUE_BG 0x000070ff
+#define PLIST_HEADER_FG 0xffff00ff
+#define PLIST_HEADER_BG 0xff0000ff
+#define PLIST_ITEM_FG 0xffff00ff
+#define PLIST_ITEM_BG 0x000070ff
 #define ROW_HEIGHT 20
 #define VERSION_WIDTH 100
 #define COUNT_WIDTH 20
@@ -44,9 +54,19 @@
 #define METAROWWIDGET     102
 #define METAHEADERWIDGET  103
 #define STATUSWIDGET      104
+#define PLAYERLISTWIDGET  105
+
+static int status_column_widths[] = { 100, 0, 100, 70 };
+
+typedef struct {
+    GLWidget *table;
+    GLWidget *status;
+    GLWidget *players;
+} MetaWidget;
 
 typedef struct {
     list_t                server_list;
+    GLWidget              *meta;
     GLWidget	          *scrollbar;
     GLWidget              *header;
     struct _MetaRowWidget *selected;
@@ -55,7 +75,6 @@ typedef struct {
 typedef struct _MetaRowWidget {
     Uint32          fg;
     Uint32          bg;
-    char            count_str[3];
     MetaTableWidget *table;
     server_info_t   *sip;
     bool            is_selected;
@@ -67,10 +86,386 @@ typedef struct {
 } MetaHeaderWidget;
 
 typedef struct {
+    Uint32         name_fg, name_bg, value_fg, value_bg;
+    char           address_str[22];
+    char           fps_str[4];
     server_info_t  *sip;
 } StatusWidget;
 
+typedef struct {
+    Uint32   header_fg, header_bg, item_fg, item_bg;
+    GLWidget *header;
+    GLWidget *scrollbar;
+    list_t   players;
+    char     *players_str;
+} PlayerListWidget;
+
 extern GLWidget *FindGLWidgeti( GLWidget *widget, Uint16 x, Uint16 y );
+
+
+static void Scroll_PlayerListWidget(GLfloat pos, void *data)
+{
+    PlayerListWidget *info;
+    GLWidget *widget, *row;
+    SDL_Rect b;
+    int y;
+    
+    widget = (GLWidget*)data;
+    if (widget->WIDGET != PLAYERLISTWIDGET) {
+	error("expected PLAYERLISTWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
+
+    info = (PlayerListWidget*)widget->wid_info;
+    y = widget->bounds.y + ROW_HEIGHT
+	- (int)(List_size(info->players) * ROW_HEIGHT * pos);
+
+    for (row = widget->children; row; row = row->next) {
+	if (row->WIDGET == LABELWIDGET && row != info->header) {
+	    b = row->bounds;
+	    b.y = y;
+	    SetBounds_GLWidget(row, &b);
+	    y += ROW_HEIGHT;
+	}
+    }
+}
+
+static void SetBounds_PlayerListWidget(GLWidget *widget, SDL_Rect *b)
+{
+    int y;
+    GLWidget *row;
+    PlayerListWidget *info;
+    GLfloat list_height;
+    SDL_Rect *wb, sb, rb, hb;
+
+    if (widget->WIDGET != PLAYERLISTWIDGET) {
+	error("expected PLAYERLISTWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
+
+    widget->bounds = *b;
+    info = (PlayerListWidget*)widget->wid_info;
+    list_height = List_size(info->players) * ROW_HEIGHT;
+
+    if (info->scrollbar != NULL) {
+	DelGLWidgetListItem(&(widget->children), info->scrollbar);
+	Close_Widget(&(info->scrollbar));
+	info->scrollbar = NULL;
+    }
+
+    y = b->y + ROW_HEIGHT;
+    for (row = widget->children; row; row = row->next) {
+	if (row->WIDGET == LABELWIDGET && row != info->header) {
+	    rb.x = b->x;
+	    rb.y = y;
+	    rb.w = b->w - 10;
+	    rb.h = ROW_HEIGHT;
+	    SetBounds_GLWidget(row, &rb);
+	    y += ROW_HEIGHT;
+	}
+    }
+
+    if (list_height > b->h) {
+	info->scrollbar = 
+	    Init_ScrollbarWidget(false, 0.0f, ((GLfloat)b->h) / list_height, 
+				 SB_VERTICAL, Scroll_PlayerListWidget, widget);
+	if (info->scrollbar != NULL) {
+	    wb = &(widget->bounds);
+	    sb.x = wb->x + wb->w - 10;
+	    sb.y = wb->y + ROW_HEIGHT; 
+	    sb.w = 10;
+	    sb.h = wb->h - ROW_HEIGHT;
+	    SetBounds_GLWidget(info->scrollbar, &sb);
+	    AppendGLWidgetList(&(widget->children), info->scrollbar);
+	} else {
+	    error("failed to create a scroll bar for player list");
+	    return;
+	}
+    }
+    if (info->header != NULL) {
+	hb.x = widget->bounds.x + 1;
+	hb.y = widget->bounds.y - 1;
+	hb.w = widget->bounds.w - 10;
+	hb.h = ROW_HEIGHT;
+	SetBounds_GLWidget(info->header, &hb);
+    }
+}
+
+static list_t create_player_list(char *players_str)
+{
+    list_t players;
+    char *t;
+
+    if (!(players = List_new())) return NULL;
+    for (t = strtok(players_str, ","); t; t = strtok(NULL, ","))
+	if (!(List_push_back(players, t))) 
+	    break;
+    
+    return players;
+}
+
+static void Close_PlayerListWidget(GLWidget *widget) 
+{
+    PlayerListWidget *info;
+
+    if (widget->WIDGET != PLAYERLISTWIDGET) {
+	error("expected PLAYERLISTWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
+    
+    info = (PlayerListWidget*)widget->wid_info;
+    if (info->players_str) free(info->players_str);
+    if (info->players) List_delete(info->players);
+    info->players_str = NULL;
+    info->players = NULL;
+}
+
+static void Paint_PlayerListWidget(GLWidget *widget)
+{
+    SDL_Rect *b = &(widget->bounds);
+    set_alphacolor(PLIST_ITEM_BG);
+    glBegin(GL_QUADS);
+    glVertex2i(b->x, b->y);
+    glVertex2i(b->x + b->w - 10, b->y);
+    glVertex2i(b->x + b->w - 10, b->y + b->h);
+    glVertex2i(b->x, b->y + b->h);
+    glEnd();
+}
+
+static GLWidget *Init_PlayerListWidget(server_info_t *sip)
+{
+    char *player, *players_str;
+    list_t players;
+    list_iter_t iter;
+    GLWidget *tmp, *header, *row;
+    PlayerListWidget *info;
+
+    if (!(players_str = strdup(sip->playlist))) {
+	error("out of memory");
+	return NULL;
+    }
+    if (!(players = create_player_list(players_str))) {
+	error("failed to create players list");
+	free(players_str);
+	return NULL;
+    }
+    if (!(tmp = Init_EmptyBaseGLWidget())) {
+        error("Widget init failed");
+	free(players_str);
+	List_delete(players);
+	return NULL;
+    }
+    if (!(info = (PlayerListWidget*)malloc(sizeof(PlayerListWidget)))) {
+        error("out of memory");
+	free(players_str);
+	List_delete(players);
+	free(tmp);
+	return NULL;
+    }
+    if (!(header = 
+	  Init_LabelWidget("Players", 
+			   &(info->header_bg), 
+			   &(info->header_fg)))) {
+	error("failed to create header for player list");
+	free(players_str);
+	List_delete(players);
+	free(tmp);
+	free(info);
+	return NULL;
+    }
+
+    info->players_str   = players_str;
+    info->players       = players;
+    info->scrollbar     = NULL;
+    info->header        = header;
+    info->header_fg     = PLIST_HEADER_FG;
+    info->header_bg     = PLIST_HEADER_BG;
+    info->item_fg       = PLIST_ITEM_FG;
+    info->item_bg       = PLIST_ITEM_BG;
+
+    tmp->wid_info       = info;
+    tmp->WIDGET     	= PLAYERLISTWIDGET;
+    tmp->SetBounds      = SetBounds_PlayerListWidget;
+    tmp->Draw           = Paint_PlayerListWidget;
+    tmp->Close          = Close_PlayerListWidget;
+
+    for (iter = List_begin(players); 
+	 iter != List_end(players); 
+	 LI_FORWARD(iter)) {
+	player = (char*)SI_DATA(iter);
+	row = Init_LabelWidget(player,
+			       &(info->item_bg),
+			       &(info->item_fg));
+	((LabelWidget*)row->wid_info)->align = LEFT;
+	if (!row) break;
+	AppendGLWidgetList(&(tmp->children), row);
+    }
+    AppendGLWidgetList(&(tmp->children), header);
+
+    return tmp;
+}
+
+static void compute_layout(SDL_Rect *wb, int *width, int *xoff)
+{
+    int i, x, w, free_space, num_dynamic, w_dynamic;
+
+    num_dynamic = 0;
+    free_space = wb->w;
+    for (i = 0; i < STATUS_COLS; i++) {
+	w = status_column_widths[i];
+	if (w > 5) {
+	    free_space -= w;
+	} else {
+	    num_dynamic++;
+	}
+    }
+    w_dynamic = free_space / num_dynamic - 5;
+    x = 0;
+    for (i = 0; i < STATUS_COLS; i++) {
+	w = status_column_widths[i];
+	xoff[i] = x;
+	width[i] = w > 5 ? w - 5 : w_dynamic;
+	x += width[i] + 5;
+    }
+}
+
+static void SetBounds_StatusWidget(GLWidget *widget, SDL_Rect *wb)
+{
+    int i, c, rowc, rowi, colc, coli;
+    int col_width[4];
+    int col_xoff[4];
+    SDL_Rect b;
+    GLWidget *w;
+    
+    widget->bounds = *wb;
+    compute_layout(wb, col_width, col_xoff);
+    
+    for (c = 0, w = widget->children; w; w = w->next) c++;
+
+    rowc = STATUS_ROWS;
+    colc = STATUS_COLS;
+    b.h = ROW_HEIGHT;
+
+    for (i = 0, w = widget->children; w && i < colc * rowc; w = w->next) {
+	coli = (i % 2) + (i / 2 / rowc) * 2;
+	rowi = (i / 2) % rowc;
+	b.w = col_width[coli];
+	b.x = wb->x + col_xoff[coli];
+	b.y = wb->y + rowi * ROW_HEIGHT;
+	SetBounds_GLWidget(w, &b);
+	i++;
+    }
+}
+
+static void add_status_entry(char *name, char *value, GLWidget *parent)
+{
+    GLWidget *name_label, *value_label;
+    StatusWidget *info;
+
+    info = (StatusWidget*)parent->wid_info;
+    
+    if ((name_label = 
+	 Init_LabelWidget(name, 
+			  &(info->name_bg), 
+			  &(info->name_fg)))) {
+	((LabelWidget*)name_label->wid_info)->align = LEFT;
+	AppendGLWidgetList(&(parent->children), name_label);
+    }
+    if ((value_label = 
+	 Init_LabelWidget(value, 
+			  &(info->value_bg), 
+			  &(info->value_fg)))) {
+	((LabelWidget*)value_label->wid_info)->align = LEFT;
+	AppendGLWidgetList(&(parent->children), value_label);
+    }
+}
+
+static GLWidget *Init_StatusWidget(server_info_t *sip)
+{
+    GLWidget *tmp;
+    StatusWidget *info;
+
+    if (!(tmp = Init_EmptyBaseGLWidget())) {
+        error("Widget init failed");
+	return NULL;
+    }
+    if (!(info = (StatusWidget*)malloc(sizeof(StatusWidget)))) {
+        error("out of memory");
+	free(tmp);
+	return NULL;
+    }
+    sprintf(info->address_str, "%s:%u", sip->ip_str, sip->port);
+    sprintf(info->fps_str, "%u", sip->fps);
+    info->sip           = sip;
+    info->name_fg       = STATUS_FIELD_FG;
+    info->name_bg       = STATUS_FIELD_BG;
+    info->value_fg      = STATUS_VALUE_FG;
+    info->value_bg      = STATUS_VALUE_BG;
+    tmp->wid_info       = info;
+    tmp->WIDGET     	= STATUSWIDGET;
+    tmp->SetBounds      = SetBounds_StatusWidget;
+
+    add_status_entry(" Server", sip->hostname, tmp);
+    add_status_entry(" Address", info->address_str, tmp);
+    add_status_entry(" Version", sip->version, tmp);
+    add_status_entry(" Map name", sip->mapname, tmp);
+    add_status_entry(" Map size", sip->mapsize, tmp);
+    add_status_entry(" Map author", sip->author, tmp);
+    add_status_entry(" Status", sip->status, tmp);
+    add_status_entry(" Bases", sip->bases_str, tmp);
+    add_status_entry(" Teams", sip->teambases_str, tmp);
+    add_status_entry(" Free bases", sip->freebases, tmp);
+    add_status_entry(" Queue", sip->queue_str, tmp);
+    add_status_entry(" FPS", info->fps_str, tmp);
+    add_status_entry(" Sound", sip->sound, tmp);
+    add_status_entry(" Timing", sip->timing, tmp);
+
+    return tmp;
+}
+
+static void SelectRow_MetaWidget(GLWidget *widget, MetaRowWidget *row)
+{
+    MetaWidget *meta;
+    MetaTableWidget *table;
+    SDL_Rect status_bounds, plist_bounds;
+    
+    meta = (MetaWidget*)widget->wid_info;
+    if (meta->status != NULL) {
+	DelGLWidgetListItem(&(widget->children), meta->status);
+	Close_Widget(&(meta->status));
+	meta->status = NULL;
+    }
+    status_bounds.x = widget->bounds.x;
+    status_bounds.y = widget->bounds.y + meta->table->bounds.h + 10;
+    status_bounds.w = widget->bounds.w * 3 / 5;
+    status_bounds.h = ROW_HEIGHT * STATUS_ROWS;
+    if ((meta->status = Init_StatusWidget(row->sip))) {
+	SetBounds_GLWidget(meta->status, &status_bounds);
+	AppendGLWidgetList(&(widget->children), meta->status);
+    } else {
+	error("failed to create a status widget");
+    }
+    if (meta->players != NULL) {
+	DelGLWidgetListItem(&(widget->children), meta->players);
+	Close_Widget(&(meta->players));
+	meta->players = NULL;
+    }
+    plist_bounds.x = status_bounds.x + status_bounds.w + 5;
+    plist_bounds.y = status_bounds.y;
+    plist_bounds.h = status_bounds.h;
+    plist_bounds.w = widget->bounds.w - status_bounds.w - 5;
+    if ((meta->players = Init_PlayerListWidget(row->sip))) {
+	SetBounds_GLWidget(meta->players, &plist_bounds);
+	AppendGLWidgetList(&(widget->children), meta->players);
+    } else {
+	error("failed to create a player list widget");
+    }
+    row->is_selected = true;
+    table = (MetaTableWidget*)meta->table->wid_info;
+    if (table->selected)
+	table->selected->is_selected = false;
+    table->selected = row;
+}
 
 static void Paint_MetaRowWidget(GLWidget *widget)
 {
@@ -148,9 +543,36 @@ static void Button_MetaRowWidget(Uint8 button, Uint8 state, Uint16 x,
 	evt.user.data1 = row->sip;
 	SDL_PushEvent(&evt);
     } else {
-	row->table->selected->is_selected = false;
-	row->table->selected = row;
-	row->is_selected = true;
+	SelectRow_MetaWidget(row->table->meta, row);
+#if 0
+	printf("version: %s\n", row->sip->version);
+	printf("hostname: %s\n", row->sip->hostname);
+	printf("users_str: %s\n", row->sip->users_str);
+	printf("mapname: %s\n", row->sip->mapname);
+	printf("mapsize: %s\n", row->sip->mapsize);
+	printf("author: %s\n", row->sip->author);
+	printf("status: %s\n", row->sip->status);
+	printf("bases_str: %s\n", row->sip->bases_str);
+	printf("fps_str: %s\n", row->sip->fps_str);
+	printf("playlist: %s\n", row->sip->playlist);
+	printf("sound: %s\n", row->sip->sound);
+	printf("teambases_str: %s\n", row->sip->teambases_str);
+	printf("timing: %s\n", row->sip->timing);
+	printf("ip_str: %s\n", row->sip->ip_str);
+	printf("freebases: %s\n", row->sip->freebases);
+	printf("queue_str: %s\n", row->sip->queue_str);
+	printf("domain: %s\n", row->sip->domain);
+	printf("pingtime_str: %s\n", row->sip->pingtime_str);
+	printf("port: %u\n", row->sip->port);
+	printf("ip: %u\n", row->sip->ip);
+	printf("users: %u\n", row->sip->users);
+	printf("bases: %u\n", row->sip->bases);
+	printf("fps: %u\n", row->sip->fps);
+	printf("uptime: %u\n", row->sip->uptime);
+	printf("queue: %u\n", row->sip->queue);
+	printf("pingtime: %u\n", row->sip->pingtime);
+	printf("serial: %c\n", row->sip->serial);
+#endif
     }
 }
 
@@ -171,7 +593,6 @@ static GLWidget *Init_MetaRowWidget(server_info_t *sip,
 	free(tmp);
 	return NULL;
     }
-    sprintf(row->count_str, "%u", sip->users);
     row->fg             = ROW_FG;
     row->bg             = bg;
     row->sip            = sip;
@@ -194,7 +615,7 @@ static GLWidget *Init_MetaRowWidget(server_info_t *sip,
     COLUMN(sip->hostname);
     COLUMN(sip->mapname);
     COLUMN(sip->version);
-    COLUMN(row->count_str);
+    COLUMN(sip->users_str);
 #undef COLUMN
 
     return tmp;
@@ -279,22 +700,21 @@ static void SetBounds_MetaTableWidget(GLWidget *widget, SDL_Rect *b)
     table_height = List_size(info->server_list) * ROW_HEIGHT;
 
     if (info->scrollbar != NULL) {
-	Close_Widget(&(info->scrollbar));
 	DelGLWidgetListItem(&(widget->children), info->scrollbar);
-    }
-    if (info->header != NULL) {
-	Close_Widget(&(info->header));
-	DelGLWidgetListItem(&(widget->children), info->header);
+	Close_Widget(&(info->scrollbar));
+	info->scrollbar = NULL;
     }
 
     y = b->y + ROW_HEIGHT;
     for (row = widget->children; row; row = row->next) {
-	rb.x = b->x;
-	rb.y = y;
-	rb.w = b->w - 10;
-	rb.h = ROW_HEIGHT;
-	SetBounds_GLWidget(row, &rb);
-	y += ROW_HEIGHT;
+	if (row->WIDGET == METAROWWIDGET) {
+	    rb.x = b->x;
+	    rb.y = y;
+	    rb.w = b->w - 10;
+	    rb.h = ROW_HEIGHT;
+	    SetBounds_GLWidget(row, &rb);
+	    y += ROW_HEIGHT;
+	}
     }
 
     if (table_height > b->h) {
@@ -314,21 +734,16 @@ static void SetBounds_MetaTableWidget(GLWidget *widget, SDL_Rect *b)
 	    return;
 	}
     }
-    info->header = Init_MetaHeaderWidget();
     if (info->header != NULL) {
 	hb.x = widget->bounds.x;
 	hb.y = widget->bounds.y - 1; /* don't ask why */
 	hb.w = widget->bounds.w - 10;
 	hb.h = ROW_HEIGHT;
 	SetBounds_GLWidget(info->header, &hb);
-	AppendGLWidgetList(&(widget->children), info->header);
-    } else {
-	error("failed to create a header for meta table");
-	return;
     }
 }
 
-static GLWidget *Init_MetaTableWidget(list_t servers)
+static GLWidget *Init_MetaTableWidget(GLWidget *meta, list_t servers)
 {
     GLWidget *tmp, *row;
     list_iter_t iter;
@@ -345,6 +760,7 @@ static GLWidget *Init_MetaTableWidget(list_t servers)
 	free(tmp);
 	return NULL;
     }
+    info->meta          = meta;
     info->server_list   = servers;
     info->scrollbar     = NULL;
     info->header        = NULL;
@@ -353,18 +769,20 @@ static GLWidget *Init_MetaTableWidget(list_t servers)
     tmp->wid_info       = info;
     tmp->WIDGET     	= METATABLEWIDGET;
     tmp->SetBounds      = SetBounds_MetaTableWidget;
-
+    
     for (iter = List_begin(servers); 
 	 iter != List_end(servers); 
 	 LI_FORWARD(iter)) {
 	sip = SI_DATA(iter);
-	row = Init_MetaRowWidget(sip, info, !info->selected,
-				 bg ? ROW_BG1 : ROW_BG2);
+	row = Init_MetaRowWidget(sip, info, false, bg ? ROW_BG1 : ROW_BG2);
 	if (!row) break;
-	if (!info->selected) 
-	    info->selected = (MetaRowWidget*)row->wid_info;
 	AppendGLWidgetList(&(tmp->children), row);
 	bg = !bg;
+    }
+    if ((info->header = Init_MetaHeaderWidget())) {
+	AppendGLWidgetList(&(tmp->children), info->header);
+    } else {
+	error("failed to create a header row for meta table");
     }
 
     return tmp;
@@ -372,30 +790,40 @@ static GLWidget *Init_MetaTableWidget(list_t servers)
 
 static GLWidget *Init_MetaWidget(list_t servers)
 {
-    GLWidget *tmp, *table;
+    GLWidget *tmp;
+    MetaWidget *info;
     SDL_Rect table_bounds;
 
     if (!(tmp = Init_EmptyBaseGLWidget())) {
         error("Widget init failed");
 	return NULL;
     }
+    if (!(info = (MetaWidget*)malloc(sizeof(MetaWidget)))) {
+	error("out of memory");
+	free(tmp);
+	return NULL;
+    }
+    info->table         = NULL;
+    info->status        = NULL;
+    info->players       = NULL;
     tmp->WIDGET     	= METAWIDGET;
     tmp->bounds.x   	= (draw_width - META_WIDTH) / 2;
     tmp->bounds.y   	= (draw_height - META_HEIGHT) / 2;
     tmp->bounds.w       = META_WIDTH;
     tmp->bounds.h       = META_HEIGHT;
+    tmp->wid_info       = info;
 
-    if (!(table = Init_MetaTableWidget(servers))) {
+    if (!(info->table = Init_MetaTableWidget(tmp, servers))) {
 	free(tmp);
 	return NULL;
     }
-    table_bounds.x = tmp->bounds.x + 10;
-    table_bounds.y = tmp->bounds.y + 10;
-    table_bounds.w = tmp->bounds.w - 2*10;
-    table_bounds.h = tmp->bounds.h - 3*10 - 30;
-    SetBounds_GLWidget(table, &table_bounds);
+    table_bounds.x = tmp->bounds.x;
+    table_bounds.y = tmp->bounds.y;
+    table_bounds.w = tmp->bounds.w;
+    table_bounds.h = tmp->bounds.h - (10 + ROW_HEIGHT * STATUS_ROWS);
+    SetBounds_GLWidget(info->table, &table_bounds);
+    AppendGLWidgetList(&(tmp->children), info->table);
 
-    AppendGLWidgetList(&(tmp->children), table);   
     return tmp;
 }
 
