@@ -94,6 +94,7 @@ Uint32 zeroLivesColorRGBA;
 
 Uint32 hudRadarEnemyColorRGBA;
 Uint32 hudRadarOtherColorRGBA;
+Uint32 hudRadarObjectColorRGBA;
 
 Uint32 scoreInactiveSelfColorRGBA;
 Uint32 scoreInactiveColorRGBA;
@@ -106,7 +107,12 @@ Uint32 selectionColorRGBA;
 
 static int meterWidth	= 60;
 static int meterHeight	= 10;
+
 float hudRadarMapScale;
+int   hudRadarEnemyShape;
+int   hudRadarOtherShape;
+int   hudRadarObjectShape;
+float hudRadarDotScale;
 
 static double shipLineWidth;
 static bool smoothLines;
@@ -1490,9 +1496,40 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 
 }
 
+static void Paint_hudradar_dot(int x, int y, Uint32 col, int shape, int sz)
+{
+    if (col == 0 || shape < 2 || sz == 0) return;
+    set_alphacolor(col);
+
+    switch(shape) {
+    case 2:
+    case 3:
+	Circle(col, x, y, sz, shape == 2 ? 1 : 0);
+	break;
+    case 4:
+    case 5:
+	glBegin(shape == 4 ? GL_QUADS : GL_LINE_LOOP);
+	glVertex2i(x - sz, y - sz);
+	glVertex2i(x - sz, y + sz);
+	glVertex2i(x + sz, y + sz);
+	glVertex2i(x + sz, y - sz);
+	glEnd();
+	break;
+    case 6:
+    case 7:
+	glBegin(shape == 6 ? GL_TRIANGLES : GL_LINE_LOOP);
+	glVertex2i(x - sz, y + sz);
+	glVertex2i(x, y - sz);
+	glVertex2i(x + sz, y + sz);
+	glEnd();
+	break;
+    }
+}
+
 static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
 {
-    int i, x, y;
+    Uint32 c;
+    int i, x, y, shape, size;
     int hrw = hrscale * 256;
     int hrh = hrscale * RadarHeight;
     double xf = (double) hrw / (double) Setup->width;
@@ -1521,12 +1558,21 @@ static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
  	    y = -y + draw_height / 2;
 
 	    if (radar_ptr[i].type == normal) {
-		if (hudRadarEnemyColorRGBA)
-		    Circle(hudRadarEnemyColorRGBA, x, y, sz, 1);
+		c = hudRadarEnemyColorRGBA;
+		shape = hudRadarEnemyShape;
 	    } else {
-		if (hudRadarOtherColorRGBA)
-		    Circle(hudRadarOtherColorRGBA, x, y, sz, 1);
+		c = hudRadarOtherColorRGBA;
+		shape = hudRadarOtherShape;
 	    }
+	    size = sz;
+	    if (radar_ptr[i].size == 0) {
+		size >>= 1;
+		if (hudRadarObjectColorRGBA)
+		    c = hudRadarObjectColorRGBA;
+		if (hudRadarObjectShape)
+		    shape = hudRadarObjectShape;
+	    }
+	    Paint_hudradar_dot(x, y, c, shape, size);
 	}
     }
 }
@@ -1578,7 +1624,9 @@ void Paint_HUD(void)
     /* This should be done in a nicer way now (using radar.c maybe) */
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (hudRadarEnemyColorRGBA || hudRadarOtherColorRGBA) {
+    if (hudRadarEnemyColorRGBA 
+	|| hudRadarOtherColorRGBA 
+	|| hudRadarObjectColorRGBA) {
 	hudRadarMapScale = (double) Setup->width / (double) 256;
 	Paint_hudradar(
 	    hudRadarScale,
@@ -1986,6 +2034,8 @@ static xp_option_t sdlgui_options[] = {
     COLOR(hudItemsColorRGBA, "#0000ff44", "hud items"),
     COLOR(hudRadarEnemyColorRGBA, "#ff000088", "enemy on HUD radar"),
     COLOR(hudRadarOtherColorRGBA, "#0000ff88", "friend on HUD radar"),
+    COLOR(hudRadarObjectColorRGBA, "#00000000", "small object on HUD radar"),
+
     COLOR(dirPtrColorRGBA, "#0000ff22", "direction pointer"),
     COLOR(selectionColorRGBA, "#ff0000ff", "selection"),
 
@@ -2045,8 +2095,31 @@ static xp_option_t sdlgui_options[] = {
 	&smoothLines,
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Use antialized smooth lines.\n")
+	"Use antialized smooth lines.\n"),
 
+    XP_INT_OPTION(
+        "hudRadarEnemyShape",
+	2, 1, 7,
+	&hudRadarEnemyShape,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"The shape of enemy ships on hud radar.\n"),
+
+    XP_INT_OPTION(
+        "hudRadarOtherShape",
+	2, 1, 7,
+	&hudRadarOtherShape,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"The shape of friendly ships on hud radar.\n"),
+
+    XP_INT_OPTION(
+        "hudRadarObjectShape",
+	0, 0, 7,
+	&hudRadarObjectShape,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"The shape of small objects on hud radar.\n")
 };
 
 void Store_sdlgui_options(void)
