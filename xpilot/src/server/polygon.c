@@ -205,7 +205,7 @@ void P_end_polygon(void)
     STORE(int, estyleptr, ecount, max_echanges, INT_MAX);
 }
 
-void P_start_ballarea(void)
+int P_start_ballarea(void)
 {
     current_group = ++num_groups;
     groups[current_group].type = TREASURE;
@@ -213,6 +213,7 @@ void P_start_ballarea(void)
     groups[current_group].hit_mask = BALL_BIT;
     groups[current_group].hit_func = NULL;
     groups[current_group].item_id = -1;
+    return current_group;
 }
 
 void P_end_ballarea(void)
@@ -220,7 +221,7 @@ void P_end_ballarea(void)
     current_group = 0;
 }
 
-void P_start_balltarget(int team)
+int P_start_balltarget(int team)
 {
     current_group = ++num_groups;
     groups[current_group].type = TREASURE;
@@ -229,6 +230,7 @@ void P_start_balltarget(int team)
     /*= NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));*/
     groups[current_group].hit_func = Balltarget_hit_func;
     groups[current_group].item_id = -1;
+    return current_group;
 }
 
 void P_end_balltarget(void)
@@ -236,7 +238,7 @@ void P_end_balltarget(void)
     current_group = 0;
 }
 
-void P_start_target(int team, int ind)
+int P_start_target(int team, int ind)
 {
     current_group = ++num_groups;
     groups[current_group].type = TARGET;
@@ -244,6 +246,7 @@ void P_start_target(int team, int ind)
     groups[current_group].hit_mask = HITMASK(team);
     groups[current_group].hit_func = Target_hit_func;
     groups[current_group].item_id = ind;
+    return current_group;
 }
 
 void P_end_target(void)
@@ -251,7 +254,7 @@ void P_end_target(void)
     current_group = 0;
 }
 
-void P_start_cannon(int team, int ind)
+int P_start_cannon(int team, int ind)
 {
     current_group = ++num_groups;
     groups[current_group].type = CANNON;
@@ -259,6 +262,7 @@ void P_start_cannon(int team, int ind)
     groups[current_group].hit_mask = 0 /*HITMASK(team)*/;
     groups[current_group].hit_func = Cannon_hit_func;
     groups[current_group].item_id = ind;
+    return current_group;
 }
 
 void P_end_cannon(void)
@@ -266,7 +270,7 @@ void P_end_cannon(void)
     current_group = 0;
 }
 
-void P_start_wormhole(int ind)
+int P_start_wormhole(int ind)
 {
     current_group = ++num_groups;
     groups[current_group].type = WORMHOLE;
@@ -274,6 +278,7 @@ void P_start_wormhole(int ind)
     groups[current_group].hit_mask = 0;
     groups[current_group].hit_func = NULL;
     groups[current_group].item_id = ind;
+    return current_group;
 }
 
 void P_end_wormhole(void)
@@ -281,7 +286,7 @@ void P_end_wormhole(void)
     current_group = 0;
 }
 
-void P_start_frictionarea(void)
+int P_start_frictionarea(void)
 {
     current_group = ++num_groups;
     groups[current_group].type = FRICTION;
@@ -289,6 +294,7 @@ void P_start_frictionarea(void)
     groups[current_group].hit_mask = 0xFFFFFFFF; /* kps - hack */
     groups[current_group].hit_func = NULL;
     groups[current_group].item_id = -1;
+    return current_group;
 }
 
 void P_end_frictionarea(void)
