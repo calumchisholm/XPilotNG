@@ -24,20 +24,27 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
+#include "SDL_ttf.h"
 #include "xpclient.h"
 #include "sdlpaint.h"
 #include "images.h"
 #include "console.h"
 #include "radar.h"
+#include "sdlwindow.h"
+
+#define SCORE_BORDER 5
 
 char sdlpaint_version[] = VERSION;
 
 /*
  * Globals.
  */
-static double   time_counter = 0.0;
-
 double	        hudRadarLimit;		/* Limit for hudradar drawing */
+
+static double       time_counter = 0.0;
+static TTF_Font     *scoreListFont;
+static char         *scoreListFontName = "VeraMoBd.ttf";
+static sdl_window_t scoreListWin;
 
 /* function to reset our viewport after a window resize */
 int Resize_Window( int width, int height )
@@ -72,8 +79,35 @@ int Resize_Window( int width, int height )
     return 0;
 }
 
+static int Scorelist_init(void)
+{
+    scoreListFont = TTF_OpenFont(scoreListFontName, 12);
+    if (scoreListFont == NULL) {
+	error("opening font %s failed", scoreListFontName);
+	return -1;
+    }
+    if (sdl_window_init(&scoreListWin, 10, 240, 200, 500)) {
+	error("failed to init scorelist window");
+	return -1;
+    }
+    return 0;
+}
+
+static void Scorelist_cleanup(void)
+{
+    TTF_CloseFont(scoreListFont);
+    sdl_window_destroy(&scoreListWin);
+}
+
 int Paint_init(void)
 {
+    extern bool players_exposed; /* paint.c */
+ 
+    if (TTF_Init()) {
+	error("SDL_ttf initialization failed: %s", SDL_GetError());
+	return -1;
+    }
+
     if (Init_wreckage() == -1)
 	return -1;
     
@@ -83,17 +117,24 @@ int Paint_init(void)
     if (Images_init() == -1) 
 	return -1;
 
+    if (Scorelist_init() == -1)
+	return -1;
+
     //    scale = 1.171875;
     scale = 0.7;
     scaleFactor = 1.0 / scale;
     scaleFactor_s = 1.0;
+    scoresChanged = true;
+    players_exposed = true;
 
     return 0;
 }
 
 void Paint_cleanup(void)
 {
+    Scorelist_cleanup();
     Images_cleanup();
+    TTF_Quit();
 }
 
 /* kps - can we rather use Check_view_dimensions in paint.c ? */
@@ -271,6 +312,11 @@ void Paint_frame(void)
     	Paint_messages();       
 	Radar_paint();
 	Console_paint();
+	if (scoresChanged) {
+	    Paint_score_table();
+	    sdl_window_refresh(&scoreListWin);
+	}
+	sdl_window_paint(&scoreListWin);
 	glPopMatrix();
     }
 
@@ -280,11 +326,147 @@ void Paint_frame(void)
 
 void Paint_score_start(void)
 {
+    char	headingStr[MSG_LEN];
+    SDL_Surface *header;
+    SDL_Color   fg  = { 0, 255, 0, 255 };
+    SDL_Rect    dst = { SCORE_BORDER, SCORE_BORDER, 0, 0 };
+
+    if (showRealName)
+	strlcpy(headingStr, "NICK=USER@HOST", sizeof(headingStr));
+    else if (BIT(Setup->mode, TEAM_PLAY))
+	strlcpy(headingStr, "  SCORE NAME           LIFE", sizeof(headingStr));
+    else {
+	strlcpy(headingStr, "  ", sizeof(headingStr));
+	if (BIT(Setup->mode, TIMING))
+	    strcat(headingStr, "LAP ");
+	strlcpy(headingStr, " AL ", sizeof(headingStr));
+	strcat(headingStr, "  SCORE  ");
+	if (BIT(Setup->mode, LIMITED_LIVES))
+	    strlcat(headingStr, "LIFE", sizeof(headingStr));
+	strlcat(headingStr, " NAME", sizeof(headingStr));
+    }
+    SDL_FillRect(scoreListWin.surface, NULL, 0);
+    header = TTF_RenderText_Solid(scoreListFont, headingStr, fg);
+    if (header == NULL) {
+	error("scorelist rendering failed: %s", SDL_GetError());
+	return;
+    }
+    SDL_BlitSurface(header, NULL, scoreListWin.surface, &dst);
+    SDL_FreeSurface(header);
 }
 
 void Paint_score_entry(int entry_num, other_t *other, bool is_team)
 {
-    printf("%c %.1f %s %d\n", 
-	   other->mychar, other->score, other->name, other->life);
+    static char		raceStr[8], teamStr[4], lifeStr[8], label[MSG_LEN];
+    static int		lineSpacing = -1, firstLine;
+    char		scoreStr[16];
+    SDL_Surface         *line;
+    SDL_Color           fg  = { 0, 255, 0, 255 };
+    SDL_Rect            dst = { SCORE_BORDER, 0, 0, 0 };
+
+    /*
+     * First time we're here, set up miscellaneous strings for
+     * efficiency and calculate some other constants.
+     */
+    if (lineSpacing == -1) {
+	memset(raceStr, 0, sizeof raceStr);
+	memset(teamStr, 0, sizeof teamStr);
+	memset(lifeStr, 0, sizeof lifeStr);
+	teamStr[1] = ' ';
+	raceStr[2] = ' ';
+
+	lineSpacing = TTF_FontLineSkip(scoreListFont);
+	firstLine = lineSpacing;
+
+    }
+    dst.y = firstLine + lineSpacing * entry_num;
+
+    /*
+     * Setup the status line
+     */
+    if (showRealName)
+	sprintf(label, "%s=%s@%s", other->name, other->real, other->host);
+    else {
+	other_t *war = Other_by_id(other->war_id);
+
+	if (BIT(Setup->mode, TIMING)) {
+	    raceStr[0] = ' ';
+	    raceStr[1] = ' ';
+	    if ((other->mychar == ' ' || other->mychar == 'R')
+		&& other->round + other->check > 0) {
+		if (other->round > 99)
+		    sprintf(raceStr, "%3d", other->round);
+		else
+		    sprintf(raceStr, "%d.%c",
+			    other->round, other->check + 'a');
+	    }
+	}
+	if (BIT(Setup->mode, TEAM_PLAY))
+	    teamStr[0] = other->team + '0';
+	else
+	    sprintf(teamStr, "%c", other->alliance);
+
+	if (BIT(Setup->mode, LIMITED_LIVES))
+	    sprintf(lifeStr, " %3d", other->life);
+
+	if (Using_score_decimals())
+	    sprintf(scoreStr, "%*.*f",
+		    7 - showScoreDecimals, showScoreDecimals,
+		    other->score);
+	else {
+	    int sc = rint(other->score);
+	    sprintf(scoreStr, "%6d", sc);
+	}
+
+	if (BIT(Setup->mode, TEAM_PLAY))
+	    sprintf(label, "%c%s %-15s%s",
+		    other->mychar, scoreStr, other->name, lifeStr);
+	else {
+	    sprintf(label, "%c %s%s%s%s  %s",
+		    other->mychar, raceStr, teamStr,
+		    scoreStr, lifeStr,
+		    other->name);
+	    if (war) {
+		if (strlen(label) + strlen(war->name) + 5 < sizeof(label))
+		    sprintf(label + strlen(label), " (%s)", war->name);
+	    }
+	}
+    }
+
+#if 0
+    /*
+     * Draw the line
+     * e94_msu eKthHacks
+     */
+    if (!is_team && strchr("DPW", other->mychar)) {
+	if (other->id == self->id)
+	    color = scoreInactiveSelfColor;
+	else
+	    color = scoreInactiveColor;
+    } else {
+	if (!is_team) {
+	    if (other->id == self->id)
+		color = scoreSelfColor;
+	    else
+		color = scoreColor;
+	} else {
+	    color = Team_color(other->team);
+	    if (!color) {
+		if (other->team == self->team)
+		    color = scoreOwnTeamColor;
+		else
+		    color = scoreEnemyTeamColor;
+	    }
+	}
+    }
+#endif
+
+    line = TTF_RenderText_Solid(scoreListFont, label, fg);
+    if (line == NULL) {
+	error("scorelist rendering failed: %s", SDL_GetError());
+	return;
+    }
+    SDL_BlitSurface(line, NULL, scoreListWin.surface, &dst);
+    SDL_FreeSurface(line);
 }
 
