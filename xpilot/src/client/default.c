@@ -116,6 +116,75 @@ xp_option_t default_options[] = {
 	NULL, NULL,
 	"Set the nickname.\n"),
 
+    /*
+     * kps - steering stuff, note that set functions might have to be
+     * specified here.
+     */
+
+    XP_DOUBLE_OPTION(
+	"power",
+	55.0,
+	MIN_PLAYER_POWER,
+	MAX_PLAYER_POWER,
+	&power,
+	NULL,
+	"Set the engine power.\n"
+	"Valid values are in the range 5-55.\n"),
+
+    XP_DOUBLE_OPTION(
+	"turnSpeed",
+	35.0,
+	MIN_PLAYER_TURNSPEED,
+	MAX_PLAYER_TURNSPEED,
+	&turnspeed,
+	NULL,
+	"Set the ship's turn speed.\n"
+	"Valid values are in the range 4-64.\n"
+	"See also turnResistance.\n"),
+
+    XP_DOUBLE_OPTION(
+	"turnResistance",
+	0.0,
+	MIN_PLAYER_TURNRESISTANCE,
+	MAX_PLAYER_TURNRESISTANCE,
+	&turnresistance,
+	NULL,
+	"Set the ship's turn resistance.\n"
+	"This determines the speed at which a ship stops turning.\n"
+	"Valid values are in the range 0.0-1.0.\n"
+	"This should always be 0, other values are for compatibility.\n"
+	"See also turnSpeed.\n"),
+
+    XP_DOUBLE_OPTION(
+	"altPower",
+	35.0,
+	MIN_PLAYER_POWER,
+	MAX_PLAYER_POWER,
+	&power_s,
+	NULL,
+	"Set the ship's alternate engine power.\n"
+	"See also the keySwapSettings option.\n"),
+
+    XP_DOUBLE_OPTION(
+	"altTurnSpeed",
+	25.0,
+	MIN_PLAYER_TURNSPEED,
+	MAX_PLAYER_TURNSPEED,
+	&turnspeed_s,
+	NULL,
+	"Set the ship's alternate turn speed.\n"
+	"See also the keySwapSettings option.\n"),
+
+    XP_DOUBLE_OPTION(
+	"altTurnResistance",
+	0.0,
+	MIN_PLAYER_TURNRESISTANCE,
+	MAX_PLAYER_TURNRESISTANCE,
+	&turnresistance,
+	NULL,
+	"Set the ship's alternate turn resistance.\n"
+	"See also the keySwapSettings option.\n"),
+
     XP_BOOL_OPTION(
 	"showShipShapes",
 	true,
@@ -338,64 +407,7 @@ xp_option_t default_options[] = {
 	/* shipshopshapshepshit getting nuts from all these shpshp-s. */,
 	0
     },
-    {
-	"power",
-	NULL,
-	"55.0",
-	KEY_DUMMY,
-	"Set the engine power.\n"
-	"Valid values are in the range 5-55.\n",
-	0
-    },
-    {
-	"turnSpeed",
-	NULL,
-	"35.0",
-	KEY_DUMMY,
-	"Set the ship's turn speed.\n"
-	"Valid values are in the range 4-64.\n"
-	"See also turnResistance.\n",
-	0
-    },
-    {
-	"turnResistance",
-	NULL,
-	"0",
-	KEY_DUMMY,
-	"Set the ship's turn resistance.\n"
-	"This determines the speed at which a ship stops turning.\n"
-	"Valid values are in the range 0.0-1.0.\n"
-	"This should always be 0, other values are for compatibility.\n"
-	"See also turnSpeed.\n",
-	0
-    },
-    {
-	"altPower",
-	NULL,
-	"35.0",
-	KEY_DUMMY,
-	"Set the alternate engine power.\n"
-	"See also the keySwapSettings option.\n",
-	0
-    },
-    {
-	"altTurnSpeed",
-	NULL,
-	"25.0",
-	KEY_DUMMY,
-	"Set the alternate ship's turn speed.\n"
-	"See also the keySwapSettings option.\n",
-	0
-    },
-    {
-	"altTurnResistance",
-	NULL,
-	"0",
-	KEY_DUMMY,
-	"Set the alternate ship's turn resistance.\n"
-	"See also the keySwapSettings option.\n",
-	0
-    },
+
     {
 	"mapRadar",
 	NULL,
