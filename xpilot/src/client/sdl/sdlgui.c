@@ -442,7 +442,6 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	}
     }
 
-    color |= 0x000000ff;
     switch (type) {
     case SETUP_BASE_UP:
 	mapprint(&mapfont,color,CENTER,DOWN ,(x)    	    	,(y - BLOCK_SZ / 2),other->nick_name);
@@ -991,16 +990,7 @@ void Gui_paint_ecm(int x, int y, int size)
 
 void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
 {
-    /*if (texturedObjects) return;*/
     int stipple = 4;
-    /*int off = 2*stipple;
-    float tmpx,tmpy,len;
-
-    tmpx = x_0 - x_1;
-    tmpy = y_0 - y_1;
-    len = sqrt(tmpx*tmpx + tmpy*tmpy);
-    tmpx = (off -1-loops % (off))*tmpx/len;
-    tmpy = (off -1-loops % (off))*tmpy/len;*/
 
     set_alphacolor(fuelColorRGBA);
     glEnable(GL_BLEND);
@@ -1008,10 +998,8 @@ void Gui_paint_refuel(int x_0, int y_0, int x_1, int y_1)
     glLineStipple(stipple, 0xAAAA);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
-    /*glVertex2i(x_1 + tmpx, y_1 + tmpy);*/
     glVertex2i(x_0, y_0);
     glVertex2i(x_1, y_1);
-    /*glVertex2i(x_1 + tmpx, y_1 + tmpy);*/
     glEnd();
     glDisable(GL_LINE_STIPPLE);
 }
@@ -1490,12 +1478,6 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 		  hud_pos_y -(- hudSize + HUD_OFFSET - BORDER),
 		  strlen(target->id_string),target->id_string);
 
-	/*rd.drawString(dpy, drawPixmap, gameGC,
-		      WINSCALE(hud_pos_x) - target->name_width / 2,
-		      WINSCALE(hud_pos_y - hudSize + HUD_OFFSET - BORDER )
-		      - gameFont->descent ,
-		      target->id_string, target->name_len);*/
-
     }
 
 
@@ -1558,8 +1540,6 @@ void Paint_HUD(void)
     static char		autopilot[] = "Autopilot";
     int tempx,tempy,tempw,temph;
     static hud_text_t 	hud_texts[MAX_HUD_TEXS+MAX_SCORE_OBJECTS];
-
-bool newcode = true;
 
     fontbounds dummy;
     tex_index = 0;
@@ -1660,7 +1640,6 @@ bool newcode = true;
     if (hudColorRGBA && (fuelTime > 0.0 || fuelSum < fuelNotify)) {
 	did_fuel = 1;
 	/* TODO fix this */
-	if (newcode) {
 	sprintf(str, "%04d", (int)fuelSum);
 	tex_index=0;
 	if (strcmp(str,hud_texts[tex_index])!=0) {
@@ -1674,11 +1653,6 @@ bool newcode = true;
 	    	    ,hud_pos_x + hudSize-HUD_OFFSET+BORDER
 		    ,hud_pos_y - (hudSize-HUD_OFFSET+BORDER)
 		    ,true   );
-	} else
-	    HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
-	    	hud_pos_x + hudSize-HUD_OFFSET+BORDER,
-		hud_pos_y - (hudSize-HUD_OFFSET+BORDER),
-		"%04d", (int)fuelSum);
 
 	if (numItems[ITEM_TANK]) {
 	    if (fuelCurrent == 0)
@@ -1686,7 +1660,6 @@ bool newcode = true;
 	    else
 		sprintf(str, "T%d", fuelCurrent);
 
-	    if (newcode) {
 	    tex_index=1;
 	    if (strcmp(str,hud_texts[tex_index])!=0) {
     	    	if (HUD_texs[tex_index].texture)
@@ -1700,12 +1673,6 @@ bool newcode = true;
 		    ,hud_pos_y - hudSize-HUD_OFFSET + BORDER
 		    ,true   );
 
-	    /* TODO fix this */
-	    } else
-	    	HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
-	    	    hud_pos_x + hudSize-HUD_OFFSET + BORDER,
-		    hud_pos_y - hudSize-HUD_OFFSET + BORDER,
-		    str);
 	}
     }
 
@@ -1725,7 +1692,6 @@ bool newcode = true;
 		    (did_fuel || hudVLineColorRGBA))
 		    ++j;
 
-	    	if (newcode) {
 		tex_index=MAX_HUD_TEXS+i;
 		if (strcmp(sobj->hud_msg,hud_texts[tex_index])!=0) {
     	    	    if (HUD_texs[tex_index].texture)
@@ -1739,17 +1705,11 @@ bool newcode = true;
 	    	    ,hud_pos_x
 		    ,hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * HUD_texs[tex_index].height)
 		    ,true   );
-		} else
-		    HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
-		    	hud_pos_x,
-			hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * dummy.height),
-			sobj->hud_msg);
 		j++;
 	    }
 	}
 
 	if (time_left > 0) {
-    	    if (newcode) {
 	    sprintf(str, "%3d:%02d", (int)(time_left / 60), (int)(time_left % 60));
 	    tex_index=3;
 	    if (strcmp(str,hud_texts[tex_index])!=0) {
@@ -1763,17 +1723,10 @@ bool newcode = true;
 	    	    ,hud_pos_x - hudSize+HUD_OFFSET - BORDER
 		    ,hud_pos_y + hudSize+HUD_OFFSET + BORDER
 		    ,true   );
-	    } else
-	    	HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,
-		    hud_pos_x - hudSize+HUD_OFFSET - BORDER,
-		    hud_pos_y + hudSize+HUD_OFFSET + BORDER,
-		    "%3d:%02d",
-		    (int)(time_left / 60), (int)(time_left % 60));
 	}
 
 	/* Update the modifiers */
 	modlen = strlen(mods);
-    	if (newcode) {
 	tex_index=4;
 	if (strcmp(mods,hud_texts[tex_index])!=0) {
     	    if (HUD_texs[tex_index].texture)
@@ -1792,10 +1745,8 @@ bool newcode = true;
 		    	hud_pos_x - hudSize+HUD_OFFSET-BORDER,
 		    	hud_pos_y - hudSize+HUD_OFFSET-BORDER,
 		    	mods);
-	}
 
 	if (autopilotLight) {
-    	    if (newcode) {
 	    tex_index=5;
 	    if (strcmp(autopilot,hud_texts[tex_index])!=0) {
     	    	if (HUD_texs[tex_index].texture)
@@ -1808,14 +1759,6 @@ bool newcode = true;
 	    	    ,hud_pos_x
 		    ,hud_pos_y + hudSize+HUD_OFFSET + BORDER + HUD_texs[tex_index].height*2
 		    ,true   );
-	    } else {
-	    	dummy = printsize(&gamefont,autopilot);
-	    	HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
-			  hud_pos_x,
-			  hud_pos_y + hudSize+HUD_OFFSET + BORDER
-			  + dummy.height*2,
-			  autopilot);
-	    }
 	}
     }
 
@@ -2007,10 +1950,10 @@ static xp_option_t sdlgui_options[] = {
 
     COLOR(messagesColorRGBA, "#00aaaa88", "messages"),
     COLOR(oldmessagesColorRGBA, "#00888888", "old messages"),
-    COLOR(msgScanBallColorRGBA, "#ff000088", "ball warning"),
-    COLOR(msgScanSafeColorRGBA, "#00ff0088", "ball safe announcement"),
-    COLOR(msgScanCoverColorRGBA, "#4e7cff88", "cover request"),
-    COLOR(msgScanPopColorRGBA, "#ffbb1188", "ball pop announcement"),
+    COLOR(msgScanBallColorRGBA, "#ff0000ff", "ball warning"),
+    COLOR(msgScanSafeColorRGBA, "#00ff00ff", "ball safe announcement"),
+    COLOR(msgScanCoverColorRGBA, "#4e7cffff", "cover request"),
+    COLOR(msgScanPopColorRGBA, "#ffbb11ff", "ball pop announcement"),
 
     COLOR(meterBorderColorRGBA, "#0000ff55", "meter borders"),
     COLOR(fuelMeterColorRGBA, "#ff000055", "fuel meter"),
@@ -2071,7 +2014,7 @@ static xp_option_t sdlgui_options[] = {
 	60, 0, 600,
 	&meterWidth,
 	NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the width of the meters.\n"),
 
     XP_INT_OPTION(
@@ -2079,7 +2022,7 @@ static xp_option_t sdlgui_options[] = {
 	10, 0, 100,
 	&meterHeight,
 	NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the height of a meter.\n"),
 
     XP_DOUBLE_OPTION(
@@ -2087,7 +2030,7 @@ static xp_option_t sdlgui_options[] = {
 	1.0, 1.0, 10.0,
 	&shipLineWidth,
 	NULL,
-	XP_OPTFLAG_DEFAULT,
+	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Set the line width of ships.\n"),
 
     XP_BOOL_OPTION(

@@ -35,7 +35,7 @@ bool            pointerControl = false;
 static int	movement;	/* horizontal mouse movement. */
 
 GLWidget *target[NUM_MOUSE_BUTTONS];
-GLWidget *hovertarget;
+GLWidget *hovertarget = NULL;
 
 int Process_event(SDL_Event *evt);
 

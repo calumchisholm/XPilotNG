@@ -1871,6 +1871,12 @@ static void Paint_ColorChooserWidget( GLWidget *widget )
     	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
     	glEnd();
     }
+    set_alphacolor(blackRGBA);
+    glBegin(GL_TRIANGLES);
+    	glVertex2i(wid_info->button->bounds.x ,wid_info->button->bounds.y);
+    	glVertex2i(wid_info->button->bounds.x ,wid_info->button->bounds.y + wid_info->button->bounds.y);
+    	glVertex2i(wid_info->button->bounds.x +wid_info->button->bounds.w ,wid_info->button->bounds.y + wid_info->button->bounds.h);
+    glEnd();
 }
 
 static void action_ColorChooserWidget(void *data)
