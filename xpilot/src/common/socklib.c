@@ -639,7 +639,7 @@ int sock_get_port(sock_t *sock)
 int sock_get_error(sock_t *sock)
 {
     int			err;
-    socklen_t		size = sizeof(error);
+    socklen_t		size = sizeof(err);
 
     if (getsockopt(sock->fd, SOL_SOCKET, SO_ERROR,
 		   (void *)&err, &size) < 0) {
