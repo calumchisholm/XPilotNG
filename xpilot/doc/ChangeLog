@@ -3,8 +3,33 @@
 ====                         XPilot Change Log                             ====
 ===============================================================================
 
-This is a summary of changes of release 4.5.4X compared to release 4.5.4.
-	
+This is a summary of changes of release 4.5.5 compared to release 4.5.4.
+
+When more than one instance of a sound was generated in a frame, all those
+instances would be sent to the client, causing unnecessary network load and
+deafening playback. This has been fixed by eliminating duplicate sounds in
+single frames.
+
+Added client support for playing sound through the Esound daemon.
+
+Added a new server option -minItemMass.  This option gives
+the mass per carried item for a player.  It's default value is 1.0.
+This makes your ship really heavy when carrying lots of items.
+Therefore player must become careful which items they pick up
+and which ones to drop when they become too heavy.
+
+Jarno van der Kolk submitted a new server option -maxClientsPerIP
+which limits the number of clients for one IP address to 2.
+
+Now there is a pause tax of 0.01 point per frame.  This is
+to discourage the long pausing of players who have accumulated
+a high score.
+
+When the server option cloakedShield was on then deflectors could
+not be turned on while being cloaked.  Fixed.  Thanks go to Paul Forman.
+
+Kristian Söderblom contributed several important bugfixes.
+
 
 ===============================================================================
 
@@ -645,35 +670,6 @@ Since at least version 4.2.1 there was a bug in saving keys to the XPilot
 client config file.  This has now been fixed.
 
 Paul Alexander Drees submitted an updated robots file.
-
-===============================================================================
-
-This is a summary of changes of release 4.3.1X compared to release 4.3.1.
-
-An evil buffer overflow bug has been fixed in the server.
-
-VMS is no longer supported since nobody took care of it.
-The default installation path has been changed.
-
-Two new client options (user, host). Patch by Paul Alexander Drees. This
-allows you to specify the user@host on the command line or in your .xpilotrc.
-
-New client option messagesToStdout for players that want player messages (and
-optionally status messages) to go to standard output. (Thorsten Kroeger)
-
-Player passwords support. Several new server options: allowPlayerPasswords
-(-PlayerPasswords), playerPasswordsFileName and playerPasswordsFileSizeLimit
-(-playerPasswordsFile and -playerPasswordsLimit). Passwords are disabled by
-default. Default file name is LIBDIR/player_passwords. Default limit is
-1 megabyte (file may grow a little bigger than the limit!). (Thorsten Kroeger)
-
-Regarding the player passwords support, have a look at the new commands
-/setpass and /auth.
-
-A minor bug has been fixed that would cause the client not to work properly
-if it fixed the nick name at startup. It also wouldn't work correctly with
-the newly implemented password support. This fix implies a new MAGIC version.
-(Thorsten)
 
 ===============================================================================
 This is a summary of changes of release 4.3.1 compared to release 4.3.0.
@@ -1824,6 +1820,6 @@ Guido Koopman contributed more bug fixes:
     - man pages are outdated
 
 ===============================================================================
-==== 
+==== $Id$
 ===============================================================================
 

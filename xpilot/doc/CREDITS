@@ -20,12 +20,14 @@ Release 4.5 credits:
     Paul Alexander Drees    Asteroid Concentrators.
     Kimiko Koopman          Ball racing, kinetic energy in
                             shot hits, scores as floats,
-                            alliances, cannon defense.
+                            alliances, cannon defense,
+                            Esound support.
     Austin Donnelly         Auto-kick of paused players.
     Paul Alexander Drees    Bugfixes, sensitive mines,
                             asteroid concentrators, lag meter.
-    Thorsten Kroeger        Messages to standard output.
+    Thorsten Kroeger        Messages to standard output,
                             server security fix.
+    Kristian Söderblom      Several bugfixes.
 
 Release 4.4 credits:
 
@@ -40,16 +42,7 @@ Release 4.4 credits:
     Jarno van der Kolk      More server tuning, Windows XPreplay.
                             Windows NSIS Install script.
     Bob Glickstein          Flak.
-    Juha Lindström          radar on HUD.
-
-Release 4.3X credits:
-
-    Ben Jackson             Several fixes.
-    Thorsten Kroeger        Server security fix, player passwords,
-                            numerous other patches.
-    Paul Alexander Drees    user/host client options.
-
-Release 4.3 credits:
+    Juha Lindström          radar on HUD.Release 4.3 credits:
 
     Claus Leth Gregersen    Several patches, graphics look.
     Marcus Sundberg         Radar color fix + localnet fix.
