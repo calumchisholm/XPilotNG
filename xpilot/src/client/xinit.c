@@ -78,6 +78,9 @@ bool			radar_score_mapped;
 Cursor			pointerControlCursor;
 bool			ignoreWindowManager;
 
+/*static char myName[] = "xpilot";*/
+static char myClass[] = "XPilot";
+
 /*
  * NB!  Is dependent on the order of the items in item.h!
  */
@@ -250,7 +253,6 @@ static XFontStruct* Set_font(Display* display, GC gc,
 #ifndef _WINDOWS
 extern char		**Argv;
 extern int		Argc;
-extern char		myClass[];
 
 static void Init_disp_prop(Display *d, Window win,
 			   unsigned w, unsigned h, int x, int y,

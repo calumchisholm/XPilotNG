@@ -25,9 +25,6 @@
 
 char default_version[] = VERSION;
 
-char myName[] = "xpilot";
-char myClass[] = "XPilot";
-
 int	baseWarningType;	/* Which type of base warning you prefer */
 int	hudRadarDotSize;	/* Size for hudradar dot drawing */
 double	hudRadarScale;		/* Scale for hudradar drawing */
@@ -168,74 +165,101 @@ static const char *Get_texturePath(xp_option_t *opt)
     return texturePath;
 }
 
+
+/*
+ * Ship shape option handling.
+ */
+static char *shipShapeSetting = NULL;
+static char *shipShapeFile = NULL;
+
 /*
  * This function trys to set the shipShape variable.
  *
- * First it looks if ship_shape would be a suitable value.
- * If not, it assumes ship_shape is the name of a shape
- * to be loaded from ship_shape_file.
+ * First it looks if shipShapeSetting would be a suitable value.
+ * If not, it assumes shipShapeSetting is the name of a shape
+ * to be loaded from shipShapeFile.
  */
-static bool tryToSetShipShape(char *ship_shape, char *ship_shape_file)
+static void tryToSetShipShape(void)
 {
-    int retval;
+    bool is_shape = false, valid;
+    FILE *fp;
+    char *ptr, *str, line[1024], *ss_candidate = NULL;
 
-    if (!ship_shape)
-	return false;
+    /* If there is already a ship shape, let's not change that. */
+    if (shipShape)
+	return;
 
-    if (!strchr(ship_shape, '(' )) {
-	FILE *fp;
-	if (!ship_shape_file || strlen(ship_shape_file) == 0)
-	    return false;
+    /* If there is no shipShapeSetting, there is nothing we can do. */
+    if (shipShapeSetting == NULL || strlen(shipShapeSetting) == 0)
+	return;
 
-	/*
-	 * Ok, now we assume ship_shape is the name of the shipshape
-	 * and ship_shape_file contains it.
-	 */
-	fp = fopen(ship_shape_file, "r");
-	if (!fp)
-	    warn("%s: %s", ship_shape_file, strerror(errno));
-	else {
-	    char *ptr;
-	    char *str;
-	    char line[1024];
+    /*
+     * Let's determine if shipShapeSetting is the actual ship shape or
+     * its name.
+     */
+    if (strchr(shipShapeSetting, '(' ))
+	is_shape = true;
 
-	    /*
-	     * kps - this probably does not work if the ship name is
-	     * at the border of two 1024 byte blocks.
-	     */
-	    while (fgets(line, sizeof line, fp)) {
-		if ((str = strstr(line, "(name:" )) != NULL
-		    || (str = strstr(line, "(NM:" )) != NULL) {
-		    str = strchr(str, ':');
-		    while (*++str == ' ');
-		    if ((ptr = strchr(str, ')' )) != NULL)
-			*ptr = '\0';
-		    /* kps - don't bother about case in shipnames. */
-		    if (!strcasecmp(str, ship_shape)) {
-			/* Gotcha */
-			if (ptr != NULL)
-			    *ptr = ')';
-			ship_shape = str;
-			break;
-		    }
-		}
+    if (is_shape) {
+	valid = Validate_shape_str(shipShapeSetting);
+	if (valid) {
+	    shipShape = shipShapeSetting;
+	    xpprintf("Your shipShape was valid. Have a nice day.\n");
+	} else
+	    warn("Your shipShape wasn't valid. Please fix.");
+	return;
+    }
+
+    /*
+     * shipShapeSetting is the name of the shipshape. Without a
+     * shipShapeFile we can't proceed.
+     */
+    if (!shipShapeFile || strlen(shipShapeFile) == 0)
+	return;
+
+    fp = fopen(shipShapeFile, "r");
+    if (!fp) {
+	error("Can't open shipShapeFile %s", shipShapeFile);
+	return;
+    }
+
+    while (fgets(line, sizeof line, fp)) {
+	if ((str = strstr(line, "(name:" )) != NULL
+	    || (str = strstr(line, "(NM:" )) != NULL) {
+
+	    str = strchr(str, ':');
+
+	    while (*++str == ' ');
+
+	    if ((ptr = strchr(str, ')' )) != NULL)
+		*ptr = '\0';
+	    if (!strcmp(str, shipShapeSetting)) {
+		/* Gotcha */
+		if (ptr != NULL)
+		    *ptr = ')';
+		ss_candidate = xp_safe_strdup(line);
+		break;
 	    }
-	    fclose(fp);
 	}
     }
+    fclose(fp);
 
-    /* shape definition */
-    retval = Validate_shape_str(ship_shape);
-    /* free previous ship shape ? */
-    if (retval) {
-	shipShape = ship_shape;
-	return true;
+    if (!ss_candidate) {
+	warn("Could not find your ship \"%s\" in shipShapeFile %s.",
+	     shipShapeSetting, shipShapeFile);
+	return;
     }
-    return false;
-}
 
-static char *shipShapeSetting = NULL;
-static char *shipShapeFileSetting = NULL;
+    valid = Validate_shape_str(ss_candidate);
+    if (valid) {
+	xpprintf("Ship shape \"%s\" is now in use.\n", shipShapeSetting);
+	shipShape = ss_candidate;
+    } else {
+	xp_free(ss_candidate);
+	warn("Your shipShape \"%s\" wasn't valid. Please fix.",
+	     shipShapeSetting);
+    }
+}
 
 /*
  * Shipshape options.
@@ -245,9 +269,9 @@ static bool Set_shipShape(xp_option_t *opt, const char *value)
     (void)opt;
     if (shipShapeSetting)
 	xp_free(shipShapeSetting);
-    shipShapeSetting = xp_strdup(value);
+    shipShapeSetting = xp_safe_strdup(value);
 
-    tryToSetShipShape(shipShapeSetting, shipShapeFileSetting);
+    tryToSetShipShape();
 
     return true;
 }
@@ -261,12 +285,11 @@ static const char *Get_shipShape(xp_option_t *opt)
 static bool Set_shipShapeFile(xp_option_t *opt, const char *value)
 {
     (void)opt;
-   if (shipShapeFileSetting)
-	xp_free(shipShapeFileSetting);
-    shipShapeFileSetting = xp_strdup(value);
+    if (shipShapeFile)
+	xp_free(shipShapeFile);
+    shipShapeFile = xp_safe_strdup(value);
 
-    if (shipShapeSetting)
-	tryToSetShipShape(shipShapeSetting, shipShapeFileSetting);
+    tryToSetShipShape();
 
     return true;
 }
@@ -274,7 +297,7 @@ static bool Set_shipShapeFile(xp_option_t *opt, const char *value)
 static const char *Get_shipShapeFile(xp_option_t *opt)
 {
     (void)opt;
-    return shipShapeFileSetting;
+    return shipShapeFile;
 }
 
 static bool Set_power(xp_option_t *opt, double val)
