@@ -476,10 +476,9 @@ bool Set_option(const char *name, const char *value, xp_option_origin_t origin)
     xp_option_t *opt;
 
     opt = Find_option(name);
-    if (!opt) {
-	/*warn("Could not find option \"%s\"\n", name);*/
+    if (!opt)
+	/* unknown */
 	return false;
-    }
 
     if (!is_legal_value(opt->type, value)) {
 	if (origin != xp_option_origin_setcmd)
@@ -526,6 +525,7 @@ void Set_command(const char *args)
 {
     char *name, *value, *valcpy;
     xp_option_t *opt;
+    char msg[MSG_LEN];
 
     assert(args);
 
@@ -536,10 +536,21 @@ void Set_command(const char *args)
 
     opt = Find_option(name);
 
-    if (opt && value) {
+    if (!opt) {
+	snprintf(msg, sizeof(msg),
+		 "Unknown option \"%s\". [*Client reply*]", name);
+	Add_message(msg);
+	goto out;
+    }
+
+    if (!value) {
+	Add_message("Set command needs an option and a value. "
+		    "[*Client reply*]");
+	goto out;
+    }
+    else {
 	const char *newvalue;
 	const char *nm = Option_get_name(opt);
-	char msg[MSG_LEN];
 
 	Set_option(name, value, xp_option_origin_setcmd);
 
@@ -548,13 +559,9 @@ void Set_command(const char *args)
 		 "The value of %s is now %s. [*Client reply*]",
 		 nm, newvalue);
 	Add_message(msg);
-    } else {
-	Add_message("Boring... [*Client reply*]");
-	/*
-	 * usage, e.g. return false 
-	 */
     }
 
+ out:
     xp_free(valcpy);
 }
 
@@ -622,7 +629,7 @@ void Get_command(const char *args)
 	Add_message(msg);
     } else {
 	snprintf(msg, sizeof(msg),
-		 "No client option named \"%s\". [*Client reply*]",	name);
+		 "No client option named \"%s\". [*Client reply*]", name);
 	Add_message(msg);
     }
 
@@ -1062,28 +1069,6 @@ const char *Get_keyResourceString(keys_t key)
     }
 
     return NULL;
-}
-
-void defaultCleanup(void)
-{
-#if 0
-    if (keydefs) {
-	free(keydefs);
-	keydefs = NULL;
-    }
-    if (texturePath) {
-	free(texturePath);
-	texturePath = NULL;
-    }
-    if (shipShape) {
-	free(shipShape);
-	shipShape = NULL;
-    }
-#endif
-
-#ifdef SOUND
-    audioCleanup();
-#endif /* SOUND */
 }
 
 #ifndef _WINDOWS

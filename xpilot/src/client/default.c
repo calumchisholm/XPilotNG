@@ -489,6 +489,16 @@ static bool Set_showDecor(xp_option_t *opt, bool val)
     return true;
 }
 
+void defaultCleanup(void)
+{
+    XFREE(keydefs);
+    XFREE(texturePath);
+    XFREE(shipShape);
+
+#ifdef SOUND
+    audioCleanup();
+#endif /* SOUND */
+}
 
 xp_option_t default_options[] = {
 
