@@ -1444,8 +1444,8 @@ void Fire_laser(int ind)
 	    CLR_BIT(pl->used, HAS_LASER);
 	else {
 	    m_gun = Ship_get_m_gun_clpos(pl->ship, pl->dir);
-	    cx = pl->pos.cx + m_gun.cx;
-	    cy = pl->pos.cy + m_gun.cy;
+	    cx = pl->pos.cx + m_gun.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
+	    cy = pl->pos.cy + m_gun.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
 	    cx = WRAP_XCLICK(cx);
 	    cy = WRAP_YCLICK(cy);
 	    Fire_general_laser(ind, pl->team, cx, cy, pl->dir, pl->mods);
