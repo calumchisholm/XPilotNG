@@ -3,9 +3,9 @@
  *
  * Copyright (C) 2000-2004 by
  *
- *      Uoti Urpala        <uau@users.sourceforge.net>
- *      Juha Lindström     <juhal@users.sourceforge.net>
- *      Kristian Söderblom <kps@users.sourceforge.net>
+ *      Uoti Urpala          <uau@users.sourceforge.net>
+ *      Juha Lindström       <juhal@users.sourceforge.net>
+ *      Kristian Söderblom   <kps@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
