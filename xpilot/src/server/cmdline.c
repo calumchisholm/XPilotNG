@@ -29,11 +29,11 @@ char cmdline_version[] = VERSION;
 
 double		laserRepeatRate = 2;	/* Ticks per laser fire (0=off) */
 #if 0
-char		*playerPasswordsFileName;	/* Name of player passwords file... */
-int		playerPasswordsFileSizeLimit;	/* Limit on player passwords file size */
+char		*playerPasswordsFileName;
+int		playerPasswordsFileSizeLimit;
 #endif
-double		friction;		/* friction only affects ships */
-double		coriolisCosine, coriolisSine;	/* cosine and sine of cor. angle */
+double		friction;
+double		coriolisCosine, coriolisSine;	/* cos and sin of cor. angle */
 int		roundsPlayed;		/* # of rounds played sofar. */
 extern char	conf_logfile_string[];	/* Default name of log file */
 
@@ -57,7 +57,7 @@ static void Tune_robot_user_name(void) { Fix_user_name(options.robotUserName); }
 static void Tune_robot_host_name(void) { Fix_host_name(options.robotHostName); }
 static void Tune_tank_user_name(void)  { Fix_user_name(options.tankUserName); }
 static void Tune_tank_host_name(void)  { Fix_host_name(options.tankHostName); }
-static void Tune_tagGame(void)         { if (!options.tagGame) tagItPlayerId = NO_ID; }
+static void Tune_tagGame(void) { if (!options.tagGame) tagItPlayerId = NO_ID; }
 static void Check_baseless(void);
 
 static option_desc opts[] = {
@@ -116,7 +116,11 @@ static option_desc opts[] = {
     {
 	"shipMass",
 	"shipMass",
-	"20.0",
+	"18.0",			/*
+				 * kps - "optimal" value for fps=50 and gs=12.5.
+				 * Should be changed back to 20.0 when high fps
+				 * "inertia" issue is sorted out.
+				 */
 	&options.ShipMass,
 	valReal,
 	tuner_shipmass,
@@ -286,7 +290,7 @@ static option_desc opts[] = {
 	&options.robotLeaveLife,
 	valInt,
 	tuner_dummy,
-	"Max life per robot (0=off).\n",
+	"Max number of lives per robot (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -414,7 +418,9 @@ static option_desc opts[] = {
     {
 	"defaultShipShape",
 	"defaultShipShape",
-	"(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)" "(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)" "(MR: 15,0)",
+	"(NM:Default)(AU:Unknown)(SH: 15,0 -9,8 -9,-8)(MG: 15,0)(LG: 15,0)"
+	"(RG: 15,0)(EN: -9,0)(LR: -9,8)(RR: -9,-8)(LL: -9,8)(RL: -9,-8)"
+	"(MR: 15,0)",
 	&options.defaultShipShape,
 	valString,
 	tuner_none,
@@ -425,7 +431,9 @@ static option_desc opts[] = {
     {
 	"tankShipShape",
 	"tankShipShape",
-	"(NM:fueltank)" "(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 " "9,-8 14,-5)" "(EN: -15,0)(MG: 15,0)",
+	"(NM:fueltank)"
+	"(SH: 15,0 14,5 9,8 -9,8 -14,5 -15,0 -14,-5 -9,-8 9,-8 14,-5)"
+	"(EN: -15,0)(MG: 15,0)",
 	&options.tankShipShape,
 	valString,
 	tuner_none,
@@ -439,7 +447,7 @@ static option_desc opts[] = {
 	&options.ShotsMax,
 	valInt,
 	tuner_dummy,
-	"Maximum allowed bullets per player.\n",
+	"Maximum number of shots visible at the same time per player.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -449,7 +457,7 @@ static option_desc opts[] = {
 	&options.ShotsGravity,
 	valBool,
 	tuner_dummy,
-	"Are bullets afflicted by gravity.\n",
+	"Are shots affected by gravity.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -486,11 +494,7 @@ static option_desc opts[] = {
     {
 	"noQuit",
 	"noQuit",
-#ifdef _WINDOWS
 	"true",
-#else
-	"false",
-#endif
 	&options.NoQuit,
 	valBool,
 	tuner_dummy,
@@ -562,6 +566,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"mapData",
+	"mapData",
+	NULL,
+	&options.mapData,
+	valString,
+	tuner_none,
+	"Block map topology.\n",
+	OPT_MAP
+    },
+    {
 	"contactPort",
 	"port",
 	"15345",
@@ -590,16 +604,6 @@ static option_desc opts[] = {
 	tuner_dummy,
 	"Short greeting string for players when they login to server.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"mapData",
-	"mapData",
-	NULL,
-	&options.mapData,
-	valString,
-	tuner_none,
-	"Block map topology.\n",
-	OPT_MAP
     },
     {
 	"allowPlayerCrashes",
@@ -728,7 +732,8 @@ static option_desc opts[] = {
 	&options.sparksWallBounce,
 	valBool,
 	Move_init,
-	"Do thrust spark particles bounce off walls to give reactive thrust?\n",
+	"Do thrust spark particles bounce off walls to give reactive \n"
+	"thrust?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -798,7 +803,7 @@ static option_desc opts[] = {
 	&options.maxShieldedWallBounceSpeed,
 	valReal,
 	Move_init,
-	"The maximum allowed speed for a shielded player to bounce off walls.\n",
+	"The max allowed speed for a shielded player to bounce off walls.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -808,7 +813,7 @@ static option_desc opts[] = {
 	&options.maxUnshieldedWallBounceSpeed,
 	valReal,
 	Move_init,
-	"Maximum allowed speed for an unshielded player to bounce off walls.\n",
+	"Max allowed speed for an unshielded player to bounce off walls.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -818,7 +823,7 @@ static option_desc opts[] = {
 	&options.playerWallBrakeFactor,
 	valReal,
 	Move_init,
-	"Factor to slow down players when they hit the wall (between 0 and 1).\n",
+	"Factor to slow down players when they hit the wall (0 to 1).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -828,7 +833,7 @@ static option_desc opts[] = {
 	&options.objectWallBrakeFactor,
 	valReal,
 	Move_init,
-	"Factor to slow down objects when they hit the wall (between 0 and 1).\n",
+	"Factor to slow down objects when they hit the wall (0 to 1).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -838,7 +843,7 @@ static option_desc opts[] = {
 	&options.objectWallBounceLifeFactor,
 	valReal,
 	Move_init,
-	"Factor to reduce the life of objects after bouncing (between 0 and 1).\n",
+	"Factor to reduce the life of objects after bouncing (0 to 1).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -890,7 +895,7 @@ static option_desc opts[] = {
 	valString,
 	Set_deny_hosts,
 	"List of network addresses of computers which are denied service.\n"
-	"Each address may optionally be followed by a slash and a network mask.\n",
+	"Addresses may be followed by a slash and a network mask.\n",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
@@ -1030,13 +1035,24 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"lockOtherTeam",
+	"lockOtherTeam",
+	"true",
+	&options.lockOtherTeam,
+	valBool,
+	tuner_dummy,
+	"Can you watch opposing players when rest of your team is \n"
+	"still alive?\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"teamFuel",
 	"teamFuel",
 	"no",
 	&options.teamFuel,
 	valBool,
 	tuner_dummy,
-	"Are fuelstations only available to team members?\n",
+	"Do fuelstations belong to teams?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1046,7 +1062,7 @@ static option_desc opts[] = {
 	&options.teamCannons,
 	valBool,
 	tuner_teamcannons,
-	"Do cannons choose sides in teamPlay?\n",
+	"Do cannons belong to teams?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1275,7 +1291,7 @@ static option_desc opts[] = {
 	&options.connectorIsString,
 	valBool,
 	tuner_dummy,
-	"Is the ball connector made of string?\n",
+	"Can the connector get shorter?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1372,7 +1388,7 @@ static option_desc opts[] = {
 	&options.timing,
 	valBool,
 	tuner_none,
-	"Is the map a race mode map?\n",
+	"Enable race mode?\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1404,7 +1420,7 @@ static option_desc opts[] = {
 	&options.edgeWrap,
 	valBool,
 	tuner_none,
-	"Wrap around edges.\n",
+	"Do objects wrap when they cross the edge of the Universe?.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1414,7 +1430,7 @@ static option_desc opts[] = {
 	&options.edgeBounce,
 	valBool,
 	tuner_dummy,
-	"Players and bullets bounce when they hit the (non-wrapping) edge.\n",
+	"Do objects bounce when they hit the edge of the Universe?.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1424,7 +1440,7 @@ static option_desc opts[] = {
 	&options.extraBorder,
 	valBool,
 	tuner_none,
-	"Give map an extra border of solid rock.\n",
+	"Give map an extra border of wall blocks?.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1435,7 +1451,7 @@ static option_desc opts[] = {
 	valIPos,
 	Compute_gravity,
 	"If the gravity is a point source where does that gravity originate?\n"
-	"Specify the point int the form: x,y.\n",
+	"Specify the point in the form: x,y.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1585,7 +1601,7 @@ static option_desc opts[] = {
     {
 	"adminMessageFileSizeLimit",
 	"adminMessageLimit",
-	"20202",
+	"20202", /* kps - ??? */
 	&options.adminMessageFileSizeLimit,
 	valInt,
 	tuner_none,
@@ -1865,7 +1881,7 @@ static option_desc opts[] = {
 	&options.mineFuseTime,
 	valSec,
 	tuner_dummy,
-	"Number of seconds after which owned mines become deadly, zero means never.\n",
+	"Number of seconds after which owned mines become deadly (0=never).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -1905,7 +1921,7 @@ static option_desc opts[] = {
 	&options.baseMineRange,
 	valInt,
 	tuner_dummy,
-	"Range within which mines/bombs are not allowed.\n",
+	"Minimum distance from base mines may be used.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2199,7 +2215,7 @@ static option_desc opts[] = {
 	&options.itemProbMult,
 	valReal,
 	Tune_item_probs,
-	"Item Probability Multiplication Factor scales all item probabilities.\n",
+	"Item Probability Factor scales all item probabilities.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -2997,7 +3013,8 @@ static option_desc opts[] = {
 	&options.blockFriction,
 	valReal,
 	tuner_dummy,
-	"Fraction of velocity ship loses each frame when it is in friction blocks.\n",
+	"Fraction of velocity ship loses each frame when it is in friction \n"
+	"blocks.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3008,7 +3025,8 @@ static option_desc opts[] = {
 	valBool,
 	tuner_none,
 	"Are friction blocks visible?\n"
-	"If true, friction blocks show up as decor; if false, they don't show up at all.\n",
+	"If true, friction blocks show up as decor; if false, they don't \n"
+	"show up at all.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3018,7 +3036,8 @@ static option_desc opts[] = {
 	&options.coriolis,
 	valReal,
 	Timing_setup,
-	"The clockwise angle (in degrees) a ship's velocity turns each time unit.\n",
+	"The clockwise angle (in degrees) a ship's velocity turns each \n"
+	"time unit.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3038,17 +3057,7 @@ static option_desc opts[] = {
 	&options.raceLaps,
 	valInt,
 	tuner_racelaps,
-	"How many laps a race is run over.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"lockOtherTeam",
-	"lockOtherTeam",
-	"true",
-	&options.lockOtherTeam,
-	valBool,
-	tuner_dummy,
-	"Can you watch opposing players when rest of your team is still alive?\n",
+	"How many laps per race.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3339,7 +3348,7 @@ static option_desc opts[] = {
 	&options.dataURL,
 	valString,
 	tuner_dummy,
-	"URL where the client can get extra data for this map\n",
+	"URL where the client can get extra data for this map.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3373,7 +3382,7 @@ static option_desc opts[] = {
 	&options.ngControls,
 	valBool,
 	tuner_dummy,
-	"Enable double precision steering and aiming of main gun.\n",
+	"Enable improved precision steering and aiming of main gun.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3560,7 +3569,8 @@ void Check_playerlimit(void)
 	options.playerLimit = world->NumBases + 10;
 
     if (options.playerLimit_orig == 0)
-	options.playerLimit_orig = MAX(options.playerLimit, world->NumBases + 10);
+	options.playerLimit_orig = MAX(options.playerLimit,
+				       world->NumBases + 10);
 
     if (options.playerLimit > options.playerLimit_orig)
 	options.playerLimit = options.playerLimit_orig;
@@ -3580,10 +3590,12 @@ void Timing_setup(void)
 	FPS = 100;
     if (FPS < 1)
 	FPS = 1;
+
     if (options.timerResolution > 100)
 	options.timerResolution = 100;
     if (options.timerResolution < 0)
 	options.timerResolution = 0;
+
     if (options.gameSpeed > FPS)
 	options.gameSpeed = FPS;
     if (options.gameSpeed < 0.0)
@@ -3609,7 +3621,6 @@ void Timing_setup(void)
     /* ecm size used to be halved every update on old servers */
     ecmSizeFactor = pow(0.5, timeStep);
 
-    /* options.coriolis stuff */
     {
 	double cor_angle;
 
@@ -3623,5 +3634,6 @@ void Timing_setup(void)
 	options.robotTicksPerSecond = FPS;
     LIMIT(options.robotTicksPerSecond, 1, FPS);
 
-    install_timer_tick(NULL, options.timerResolution ? options.timerResolution : FPS);
+    install_timer_tick(NULL, options.timerResolution ? options.timerResolution
+		       : FPS);
 }
