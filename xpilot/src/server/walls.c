@@ -2131,12 +2131,7 @@ static void Inside_init(void)
 	    for (j = 0; j < num_points; j++) {
 		if (((startx >> B_SHIFT) != bx)
 		    || ((starty >> B_SHIFT) != by)) {
-		    printf("startx = %d, startx >> B_SHIFT = %d, bx = %d\n",
-			   startx, startx >> B_SHIFT, bx);
-		    printf("starty = %d, starty >> B_SHIFT = %d, by = %d\n",
-			   starty, starty >> B_SHIFT, by);
-		    printf("going into infinite loop...\n");
-		    /* hmm ??? */
+		    warn("Inside_init: went into infinite loop...");
 		    while (1);
 		}
 		ox = startx & B_MASK;
