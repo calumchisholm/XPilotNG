@@ -99,6 +99,8 @@ extern void	Init_scale_array(void);
 
 #define X(co)	((int) ((co) - world.x))
 #define Y(co)	((int) (world.y + ext_view_height - (co)))
+#define Xf(co)	((double) ((co) - world.x))
+#define Yf(co)	((double) (world.y + ext_view_height - (co)))
 
 #define SCALEX(co) ((int) (WINSCALE(co) - WINSCALE(world.x)))
 #define SCALEY(co) ((int) (WINSCALE(world.y + ext_view_height) - WINSCALE(co)))

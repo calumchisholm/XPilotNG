@@ -937,18 +937,17 @@ static void Set_drawstyle_dashed(int ship_color)
 static int set_shipshape(int world_x, int world_y,
 			 int dir, shipshape_t *ship, XPoint *points)
 {
-    int			cnt;
-    position_t		ship_point_pos;
-    XPoint		*xpts = points;
-    int			window_x;
-    int			window_y;
+    int cnt;
+    position_t ship_point_pos;
+    XPoint *xpts = points;
+    double window_x, window_y;
 
     for (cnt = 0; cnt < ship->num_points; cnt++) {
 	ship_point_pos = Ship_get_point_position(ship, cnt, dir);
-	window_x = X(world_x + ship_point_pos.x);
-	window_y = Y(world_y + ship_point_pos.y);
-	xpts->x = WINSCALE(window_x);
-	xpts->y = WINSCALE(window_y);
+	window_x = Xf(world_x + ship_point_pos.x);
+	window_y = Yf(world_y + ship_point_pos.y);
+	xpts->x = window_x / scaleFactor;
+	xpts->y = window_y / scaleFactor;
 	xpts++;
     }
     points[cnt++] = points[0];
