@@ -469,6 +469,7 @@ void General_tractor_beam(world_t *world, player_t *pl, clpos_t pos,
 	percent, force, dist, cost;
     int theta;
 
+    UNUSED_PARAM(world);
     dist = Wrap_length(pos.cx - victim->pos.cx,
 		       pos.cy - victim->pos.cy) / CLICK;
     if (dist > maxdist)

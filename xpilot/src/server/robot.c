@@ -548,6 +548,7 @@ void Robot_init(world_t *world)
 {
     int i, result, n;
 
+    UNUSED_PARAM(world);
     /*
      * For each robot driver call its initialization function.
      * If this function returns 0 then remember this robot driver.

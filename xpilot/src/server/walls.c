@@ -2469,6 +2469,7 @@ void Ball_line_init(world_t *world)
     int i;
     static shapepos_t coords[MAX_SHIP_PTS];
 
+    UNUSED_PARAM(world);
     LIMIT(options.ballRadius, 0, BALL_RADIUS);
     ball_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {

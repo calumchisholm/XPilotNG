@@ -57,28 +57,33 @@ struct options options;
  * The tuner_dummy can be specified if it is OK to modify the option
  * during runtime and no follow up action is needed.
  */
-void tuner_none(world_t *world)  {}
-void tuner_dummy(world_t *world) {}
+void tuner_none(world_t *world)  { UNUSED_PARAM(world); }
+void tuner_dummy(world_t *world) { UNUSED_PARAM(world); }
 
 
 static void Tune_robot_user_name(world_t *world)
 {
+    UNUSED_PARAM(world);
     Fix_user_name(options.robotUserName);
 }
 static void Tune_robot_host_name(world_t *world)
 {
+    UNUSED_PARAM(world);
     Fix_host_name(options.robotHostName);
 }
 static void Tune_tank_user_name(world_t *world)
 {
+    UNUSED_PARAM(world);
     Fix_user_name(options.tankUserName);
 }
 static void Tune_tank_host_name(world_t *world)
 {
+    UNUSED_PARAM(world);
     Fix_host_name(options.tankHostName);
 }
 static void Tune_tagGame(world_t *world)
 {
+    UNUSED_PARAM(world);
     if (!options.tagGame)
 	tagItPlayerId = NO_ID;
 }

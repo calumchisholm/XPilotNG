@@ -57,10 +57,10 @@ static int rank_entries = 0;
 
 static int rank_cmp(const void *p1, const void *p2)
 {
-    rank_t *r1, *r2;
+    const rank_t *r1, *r2;
 
-    r1 = (rank_t *)p1;
-    r2 = (rank_t *)p2;
+    r1 = (const rank_t *)p1;
+    r2 = (const rank_t *)p2;
 
     /*
      * Function qsort(3) normally sorts array elements into ascending order.
@@ -370,7 +370,7 @@ void Rank_show_ranks(void)
 
 
 static void Init_ranknode(ranknode_t *rank,
-			  char *name, char *user, char *host)
+			  const char *name, const char *user, const char *host)
 {
     memset(rank, 0, sizeof(ranknode_t));
     strlcpy(rank->name, name, sizeof(rank->name));

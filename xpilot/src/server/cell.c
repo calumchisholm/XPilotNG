@@ -58,6 +58,7 @@ static size_t cell_dist_size;
 
 static void Free_cell_dist(world_t *world)
 {
+    UNUSED_PARAM(world);
     XFREE(cell_dist);
 }
 
@@ -173,6 +174,8 @@ void Alloc_cells(world_t *world)
 
 void Cell_init_object(world_t *world, object_t *obj)
 {
+    UNUSED_PARAM(world);
+
     /* put obj on list with only itself. */
     obj->cell.next = &(obj->cell);
     obj->cell.prev = &(obj->cell);
@@ -219,6 +222,7 @@ void Cell_remove_object(world_t *world, object_t *obj)
     cell_node_t *obj_node_ptr;
     cell_node_t *next, *prev;
 
+    UNUSED_PARAM(world);
     obj_node_ptr = &(obj->cell);
     next = obj_node_ptr->next;
     prev = obj_node_ptr->prev;

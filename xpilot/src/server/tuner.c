@@ -29,6 +29,8 @@ char tuner_version[] = VERSION;
 
 void tuner_plock(world_t *world)
 {
+    UNUSED_PARAM(world);
+
     options.pLockServer
 	= (plock_server(options.pLockServer) == 1) ? true : false;
 }
@@ -36,6 +38,8 @@ void tuner_plock(world_t *world)
 void tuner_shipmass(world_t *world)
 {
     int i;
+
+    UNUSED_PARAM(world);
 
     for (i = 0; i < NumPlayers; i++)
 	Players(i)->emptymass = options.shipMass;
@@ -45,6 +49,8 @@ void tuner_ballmass(world_t *world)
 {
     int i;
 
+    UNUSED_PARAM(world);
+
     for (i = 0; i < NumObjs; i++) {
 	if (BIT(Obj[i]->type, OBJ_BALL))
 	    Obj[i]->mass = options.ballMass;
@@ -53,6 +59,8 @@ void tuner_ballmass(world_t *world)
 
 void tuner_maxrobots(world_t *world)
 {
+    UNUSED_PARAM(world);
+
     if (options.maxRobots < 0)
 	options.maxRobots = world->NumBases;
 
@@ -65,6 +73,8 @@ void tuner_maxrobots(world_t *world)
 
 void tuner_minrobots(world_t *world)
 {
+    UNUSED_PARAM(world);
+
     if (options.minRobots < 0)
 	options.minRobots = options.maxRobots;
 
@@ -104,6 +114,8 @@ void tuner_playershielding(world_t *world)
 
 void tuner_playerstartsshielded(world_t *world)
 {
+    UNUSED_PARAM(world);
+
     if (options.playerShielding)
 	/* Doesn't make sense to turn off when shields are on. */
 	options.playerStartsShielded = true;
@@ -125,6 +137,7 @@ void tuner_worldlives(world_t *world)
 
 void tuner_cannonsmartness(world_t *world)
 {
+    UNUSED_PARAM(world);
     LIMIT(options.cannonSmartness, 0, 3);
 }
 
@@ -192,6 +205,7 @@ void tuner_modifiers(world_t *world)
 
 void tuner_gameduration(world_t *world)
 {
+    UNUSED_PARAM(world);
     if (options.gameDuration <= 0.0)
 	gameOverTime = time(NULL);
     else
@@ -218,5 +232,6 @@ void tuner_allowalliances(world_t *world)
 
 void tuner_announcealliances(world_t *world)
 {
+    UNUSED_PARAM(world);
     updateScores = true;
 }
