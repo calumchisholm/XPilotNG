@@ -46,7 +46,6 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
     keys_t ret = Generic_lookup_key((xp_keysym_t)ks, reset);
 
     UNUSED_PARAM(event);
-    IFWINDOWS( Trace("Lookup_key: got key ks=%04X ret=%d\n", ks, ret) );
   
 #ifdef DEVELOPMENT
     if (reset && ret == KEY_DUMMY) {
@@ -94,8 +93,6 @@ void Pointer_control_set_state(bool on)
     }
 }
 
-#ifndef _WINDOWS
-
 void Talk_set_state(bool on)
 {
 
@@ -120,32 +117,6 @@ void Talk_set_state(bool on)
     }
 }
 
-#else
-
-static void Talk_set_state(bool on)
-{
-    char *wintalkstr;
-
-    if (pointerControl) {
-	initialPointerControl = true;
-	Pointer_control_set_state(false);
-    }
-
-    wintalkstr = (char *)mfcDoTalkWindow();
-    if (*wintalkstr)
-	Net_talk(wintalkstr);
-
-    if (initialPointerControl) {
-	initialPointerControl = false;
-	Pointer_control_set_state(true);
-    }
-
-    scoresChanged = true;
-}
-#endif
-
-#ifndef _WINDOWS
-
 bool Key_press_pointer_control(void)
 {
     if (mouseAccelInClient) {    
@@ -161,17 +132,6 @@ bool Key_press_pointer_control(void)
     
     return false;	/* server doesn't need to know */
 }
-
-#else
-
-bool Key_press_pointer_control(void)
-{
-    Pointer_control_set_state(!pointerControl);
-    
-    return false;	/* server doesn't need to know */
-}
-
-#endif
 
 bool Key_press_swap_scalefactor(void)
 {
@@ -301,8 +261,6 @@ static void Handle_talk_key_repeat(void)
 	}
     }
 }
-
-#ifndef _WINDOWS
 
 void xevent_keyboard(int queued)
 {
@@ -488,84 +446,3 @@ int x_event(int new_input)
     xevent_pointer();
     return 0;
 }
-
-#else  /* _WINDOWS */
-
-void xevent_keyboard(int queued)
-{
-    Handle_talk_key_repeat();
-}
-
-void xevent_pointer(void)
-{
-    POINT point;
-
-    if (!pointerControl || talk_mapped)
-	return;
-
-    GetCursorPos(&point);
-    mouseMovement = point.x - draw_width/2;
-    XWarpPointer(dpy, None, drawWindow,
-		 0, 0, 0, 0,
-		 draw_width/2, draw_height/2);
-
-    if (mouseMovement != 0) {
-	Send_pointer_move(mouseMovement);
-	delta.x = draw_width / 2 - mousePosition.x;
-	delta.y = draw_height / 2 - mousePosition.y;
-	if (ABS(delta.x) > 3 * draw_width / 8
-	    || ABS(delta.y) > 1 * draw_height / 8)
-	    XFlush(dpy);
-    }
-}
-
-int win_xevent(XEvent event)
-{
-    int queued = 0;
-
-#ifdef SOUND
-    audioEvents();
-#endif /* SOUND */
-
-    mouseMovement = 0;
-
-    switch (event.type) {
-    case KeyPress:
-	talk_key_repeating = 0;
-	/* FALLTHROUGH */
-    case KeyRelease:
-	KeyChanged_event(&event);
-	break;
-
-    case ButtonPress:
-	ButtonPress_event(&event);
-	break;
-
-    case MotionNotify:
-	MotionNotify_event(&event);
-	break;
-
-    case ButtonRelease:
-	if (ButtonRelease_event(&event) == -1)
-	    return -1;
-	break;
-
-    case Expose:
-	Expose_event(&event);
-	break;
-
-    case EnterNotify:
-    case LeaveNotify:
-	Widget_event(&event);
-	break;
-
-    default:
-	break;
-    }
-
-    xevent_keyboard(queued);
-    xevent_pointer();
-    return 0;
-}
-
-#endif /* _WINDOWS */

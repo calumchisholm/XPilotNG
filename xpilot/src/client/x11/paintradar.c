@@ -51,7 +51,6 @@ static int decorRadarColor;	/* Color index for decorations on radar. */
 
 static void Copy_static_radar(void)
 {
-#ifndef _WINDOWS
     if (radarPixmap2 != radarPixmap) {
 	/* Draw static radar onto radar */
 	XCopyArea(dpy, radarPixmap2, radarPixmap, gameGC,
@@ -62,45 +61,8 @@ static void Copy_static_radar(void)
 	XFillRectangle(dpy, radarPixmap,
 		       radarGC, 0, 0, 256, RadarHeight);
     }
-#else
-    WinXBltPixToWin(radarPixmap2, radarWindow, 0, 0, 256, RadarHeight, 0, 0);
-    radarPixmap = radarWindow;
-#endif
     XSetForeground(dpy, radarGC, colors[WHITE].pixel);
 }
-
-
-#ifdef _WINDOWS
-static void Windows_copy_sliding_radar(double xf, double yf)
-{
-    slidingradar_x = (int)((selfPos.x * xf + 0.5) + 128) % 256;
-    slidingradar_y = (RadarHeight - (int)(selfPos.y * yf + 0.5)
-		      - 1 + RadarHeight/2) % RadarHeight;
-
-    /*
-     * Draw slidingradar in four chunks onto the screen.
-     */
-    WinXBltPixToWin(radarPixmap2, radarWindow,
-		    slidingradar_x , slidingradar_y,
-		    256-slidingradar_x, RadarHeight-slidingradar_y,
-		    0, 0);
-    WinXBltPixToWin(radarPixmap2, radarWindow,
-		    0, slidingradar_y,
-		    slidingradar_x, RadarHeight-slidingradar_y,
-		    256-slidingradar_x, 0);
-    WinXBltPixToWin(radarPixmap2, radarWindow,
-		    slidingradar_x, 1,
-		    256-slidingradar_x, slidingradar_y
-		    , 0,
-		    RadarHeight-slidingradar_y);
-    WinXBltPixToWin(radarPixmap2, radarWindow,
-		    0, 1,
-		    slidingradar_x, slidingradar_y,
-		    256-slidingradar_x, RadarHeight-slidingradar_y);
-    radarPixmap = radarWindow;
-}
-#endif
-
 
 static void Paint_checkpoint_radar(double xf, double yf)
 {
@@ -236,17 +198,7 @@ void Paint_radar(void)
     slidingradar_x = 0;
     slidingradar_y = 0;
 
-#ifdef _WINDOWS
-    if (instruments.slidingRadar)
-	/*
-	 * Hack to fix slidingradar in windows.
-	 */
-	Windows_copy_sliding_radar(xf, yf);
-    else
-	Copy_static_radar();
-#else
     Copy_static_radar();
-#endif
 
     /* Checkpoints */
     Paint_checkpoint_radar(xf, yf);
@@ -691,14 +643,10 @@ static void Paint_world_radar_new(void)
 
 void Paint_world_radar(void)
 {
-    IFWINDOWS(xid[radarGC].hgc.xidhwnd = radarPixmap2);
-    
     if (oldServer)
 	Paint_world_radar_old();
     else
 	Paint_world_radar_new();
-	
-    IFWINDOWS(xid[radarGC].hgc.xidhwnd = radarWindow);
 }
 
 void Radar_show_target(int x, int y)

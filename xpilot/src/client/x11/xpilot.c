@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     /*strcpy(clientname,connectParam.nick_name); */
 
     Config_init();
-    IFNWINDOWS(Handle_X_options();)
+    Handle_X_options();
     
     /* CLIENTRANK */
     Init_saved_scores();
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
      */
     printfile(Conf_localmotdfile());
 
-    if (xpArgs.text || xpArgs.auto_connect || argv[1] || is_this_windows()) {
+    if (xpArgs.text || xpArgs.auto_connect || argv[1]) {
 	if (xpArgs.list_servers)
 	    printf("LISTING AVAILABLE SERVERS:\n");
 
@@ -140,9 +140,8 @@ int main(int argc, char *argv[])
 				 0, NULL, NULL, NULL, NULL,
 				 conpar);
     }
-    else {
-	IFNWINDOWS(result = Welcome_screen(conpar));
-    }
+    else
+	result = Welcome_screen(conpar);
 
     if (result == 1)
 	retval = Join(conpar);
@@ -212,7 +211,6 @@ extern char xpaint_version[];
 
 static void Check_client_versions(void)
 {
-#ifndef _WINDOWS	/* gotta put this back in before source released */
     static struct file_version {
 	char		filename[16];
 	char		*versionstr;
@@ -286,6 +284,5 @@ static void Check_client_versions(void)
 	error("Please recompile this program properly.");
 	exit(1);
     }
-#endif
 }
 

@@ -23,22 +23,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* kps - this file could be made X11 independent easily. */
-
 #include "xpclient_x11.h"
 
 char join_version[] = VERSION;
 
 static int Handle_input(int new_input)
 {
-#ifndef _WINDOWS
     return x_event(new_input);
-#else
-    return 0;
-#endif
 }
 
-#ifndef _WINDOWS
 static void Input_loop(void)
 {
     fd_set rfds, tfds;
@@ -140,9 +133,7 @@ static void Input_loop(void)
 	}
     }
 }
-#endif	/* _WINDOWS */
 
-/* MFC client needs this to be global */
 void xpilotShutdown(void)
 {
     Net_cleanup();
@@ -167,23 +158,16 @@ int Join(Connect_param_t *conpar)
 {
     signal(SIGINT, sigcatch);
     signal(SIGTERM, sigcatch);
-#ifndef _WINDOWS
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
-#endif
 
-    IFWINDOWS( received_self = FALSE );
-    IFWINDOWS( Progress("Client_init") );
     if (Client_init(conpar->server_name, conpar->server_version) == -1)
 	return -1;
 
-    IFWINDOWS( Progress("Net_init %s", conpar->server_addr) );
     if (Net_init(conpar->server_addr, conpar->login_port) == -1) {
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Net_verify '%s'= '%s'",
-			conpar->nick_name, conpar->user_name) );
     if (Net_verify(conpar->user_name,
 		   conpar->nick_name,
 		   conpar->disp_name) == -1) {
@@ -191,26 +175,22 @@ int Join(Connect_param_t *conpar)
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Net_setup") );
     if (Net_setup() == -1) {
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Client_setup") );
     if (Client_setup() == -1) {
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Net_start") );
     if (Net_start() == -1) {
 	warn("Network start failed");
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
     }
-    IFWINDOWS( Progress("Client_start") );
     if (Client_start() == -1) {
 	warn("Window init failed");
 	Net_cleanup();
@@ -218,10 +198,8 @@ int Join(Connect_param_t *conpar)
 	return -1;
     }
 
-#ifndef _WINDOWS	/* windows continues to run at this point */
     Input_loop();
     xpilotShutdown();
-#endif
 
     return 0;
 }

@@ -60,18 +60,12 @@ static int		record_dash_dirty = 0;	/* Has dashes list changed? */
 static void Dummy_newFrame(void) {}
 static void Dummy_endFrame(void) {}
 
-#ifdef _WINDOWS
-extern void paintItemSymbol(int type, Drawable drawable, GC mygc,
-			    int x, int y, int color);
-#else
 static void Dummy_paintItemSymbol(int type, Drawable drawable,
 				  GC mygc, int x, int y, int color)
 {
     UNUSED_PARAM(type); UNUSED_PARAM(drawable); UNUSED_PARAM(mygc);
     UNUSED_PARAM(x); UNUSED_PARAM(y); UNUSED_PARAM(color);
 }
-#endif
-
 
 /*
  * Miscellaneous recording functions.
@@ -186,18 +180,9 @@ static void RWriteHeader(void)
     putc(maxColors, recordFP);
     for (i = 0; i < maxColors; i++) {
 	RWriteULong(colors[i].pixel);
-#ifdef _WINDOWS
-	{
-	    COLORREF col = WinXPColour(colors[i].pixel);
-	    RWriteUShort(256*GetRValue(col));
-	    RWriteUShort(256*GetGValue(col));
-	    RWriteUShort(256*GetBValue(col));
-	}
-#else
 	RWriteUShort(colors[i].red);
 	RWriteUShort(colors[i].green);
 	RWriteUShort(colors[i].blue);
-#endif
     }
     RWriteString(gameFontName);
     RWriteString(messageFontName);
@@ -226,7 +211,6 @@ static int RGetPixelIndex(unsigned long pixel)
     return WHITE;
 }
 
-#ifndef _WINDOWS
 static XImage *Image_from_pixmap(Pixmap pixmap)
 {
     XImage		*img;
@@ -251,11 +235,9 @@ static XImage *Image_from_pixmap(Pixmap pixmap)
     }
     return img;
 }
-#endif
 
 static void RWriteTile(Pixmap tile)
 {
-#ifndef _WINDOWS
     typedef struct tile_list {
 	struct tile_list	*next;
 	Pixmap			tile;
@@ -313,7 +295,6 @@ static void RWriteTile(Pixmap tile)
     XDestroyImage(img);
 
     next_tile_id++;
-#endif
 }
 
 static void RWriteGC(GC gc, unsigned long req_mask)
@@ -667,11 +648,7 @@ static int RFillPolygon(Display *display, Drawable drawable, GC gc,
 static void RPaintItemSymbol(int type, Drawable drawable, GC mygc,
 			     int x, int y, int color)
 {
-#ifdef _WINDOWS
-    paintItemSymbol(type, drawable, mygc, x, y, color);
-#else
     UNUSED_PARAM(mygc); UNUSED_PARAM(color);
-#endif
     if (drawable == drawPixmap) {
 	putc(RC_PAINTITEMSYMBOL, recordFP);
 	RWriteGC(gameGC, GCForeground | GCBackground);
@@ -793,11 +770,7 @@ static struct recordable_drawing Xdrawing = {
     (draw_string_proto_t)XDrawString,
     XFillArc,
     XFillPolygon,
-#ifdef _WINDOWS
-    paintItemSymbol,
-#else
     Dummy_paintItemSymbol,
-#endif
     XFillRectangle,
     XFillRectangles,
     XDrawArcs,
@@ -851,21 +824,16 @@ long Record_size(void)
  */
 void Record_toggle(void)
 {
-#if !(defined(_WINDOWS) && defined(PENS_OF_PLENTY))
-    /* No recording available with PEN_OF_PLENTY under Windows. */
     if (record_filename != NULL && strlen(record_filename) > 0) {
 	if (!record_start) {
 	    record_start = true;
 	    if (!recordFP) {
 		if ((recordFP = fopen(record_filename, "w")) == NULL) {
 		    warn("%s: %s", record_filename, strerror(errno));
-		    free(record_filename);
-		    record_filename = NULL;
+		    XFREE(record_filename);
 		    record_start = false;
-		} else {
+		} else
 		    setvbuf(recordFP, NULL, _IOFBF, (size_t)(8 * 1024));
-		    IFWINDOWS(setmode(fileno(recordFP), O_BINARY));
-		}
 	    }
 	} else
 	    record_start = false;
@@ -877,7 +845,6 @@ void Record_toggle(void)
 	    recording = false;
 	}
     }
-#endif
 }
 
 /*

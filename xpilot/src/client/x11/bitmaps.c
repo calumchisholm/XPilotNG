@@ -85,12 +85,9 @@ int num_pixmaps = 0, max_pixmaps = 0;
 static int Bitmap_init(int img);
 static void Bitmap_picture_copy(xp_pixmap_t * xp_pixmap, int image);
 static void Bitmap_picture_scale(xp_pixmap_t * xp_pixmap, int image);
-
-#ifndef _WINDOWS
 static int Bitmap_create_begin(Drawable d, xp_pixmap_t * pm, int bmp);
 static int Bitmap_create_end(Drawable d);
 static void Bitmap_set_pixel(xp_pixmap_t *, int, int, int, RGB_COLOR);
-#endif
 
 /*
  * Adds the standard images into global pixmaps array.
@@ -455,7 +452,6 @@ void Bitmap_paint_blended(Drawable d, int img, int x, int y, int rgb)
 }
 
 
-#ifndef _WINDOWS
 /*
  * Maybe move this part to a sperate file.
  */
@@ -555,5 +551,3 @@ void Bitmap_paint_area(Drawable d, xp_bitmap_t * bit, int x, int y,
 	      (unsigned)r->w, (unsigned)r->h, x, y);
     XSetClipMask(dpy, gameGC, None);
 }
-
-#endif

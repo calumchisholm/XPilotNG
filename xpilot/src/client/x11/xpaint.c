@@ -49,16 +49,6 @@ XGCValues	gcv;
 Window	topWindow;		/* Top-level window (topshell) */
 Window	drawWindow;		/* Main play window */
 Window	keyboardWindow;		/* Keyboard window */
-#ifdef _WINDOWS
-/*
- * Windows needs some dummy windows (size 0,0)
- * so we can store the active fonts.
- */
-				/* supports 1 active font per window */
-Window	textWindow;		/* for the GC into the config window */
-Window	msgWindow;		/* for messages into the playfield */
-Window	buttonWindow;		/* to calculate size of buttons */
-#endif
 
 Pixmap	drawPixmap;		/* Saved pixmap for the drawing */
 				/* area (monochromes use this) */
@@ -111,12 +101,6 @@ void Paint_frame(void)
     static int		prev_damaged = 0;
     static int		prev_prev_damaged = 0;
 
-#ifdef _WINDOWS
-    /* give any outgoing data a head start to the server */
-    /* send anything to the server before returning to Windows */
-    Net_flush();
-#endif
-
     Paint_frame_start();
     Paint_score_table();
 
@@ -131,15 +115,7 @@ void Paint_frame(void)
 	    XStoreName(dpy, topWindow, TITLE);
     }
 
-    /* This seems to have a bug (in Windows) 'cause last frame we ended
-       with an XSetForeground(white) confusing SET_FG */
     SET_FG(colors[BLACK].pixel);
-
-#ifdef _WINDOWS
-    drawPixmap = drawWindow;		/* let's try this */
-    XSetForeground(dpy, gameGC, colors[BLACK].pixel);
-    XFillRectangle(dpy, drawPixmap, gameGC, 0, 0, draw_width, draw_height);
-#endif
 
     rd.newFrame();
 
@@ -222,13 +198,8 @@ void Paint_frame(void)
     if (radarPixmap != radarWindow && radar_exposures > 0) {
 	if (!instruments.slidingRadar
 	    || BIT(Setup->mode, WRAP_PLAY) == 0) {
-#ifndef _WINDOWS
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 		      0, 0, 256, RadarHeight, 0, 0);
-#else
-	    WinXBltPixToWin(radarPixmap, radarWindow,
-			    0, 0, 256, RadarHeight, 0, 0);
-#endif
 	} else {
 	    int x, y;
 	    double xp, yp, xo, yo;
@@ -262,7 +233,6 @@ void Paint_frame(void)
 	    h2 = RadarHeight - h1;
 	    w2 = 256 - w1;
 
-#ifndef _WINDOWS
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 		      0, (int)h2, w1, h1, (int)w2, 0);
 	    if (w2 > 0)
@@ -274,15 +244,11 @@ void Paint_frame(void)
 	    if (w2 > 0 && h2 > 0)
 		XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
 			  (int)w1, 0, w2, h2, 0, (int)h1);
-#else
-	    Paint_world_radar();
-#endif
 	}
     }
     else if (radar_exposures > 2)
 	Paint_world_radar();
 
-#ifndef _WINDOWS
     if (dbuf_state->type == PIXMAP_COPY)
 	XCopyArea(dpy, drawPixmap, drawWindow, gameGC,
 		  0, 0, draw_width, draw_height, 0, 0);
@@ -293,7 +259,6 @@ void Paint_frame(void)
 	XSetPlaneMask(dpy, gameGC, dbuf_state->drawing_planes);
 	XSetPlaneMask(dpy, messageGC, dbuf_state->drawing_planes);
     }
-#endif
 
     if (!damaged) {
 	/* Prepare invisible buffer for next frame by clearing. */
@@ -302,16 +267,13 @@ void Paint_frame(void)
 	 * DBE's XdbeBackground switch option is
 	 * probably faster than XFillRectangle.
 	 */
-#ifndef _WINDOWS
 	if (dbuf_state->multibuffer_type != MULTIBUFFER_DBE) {
 	    SET_FG(colors[BLACK].pixel);
 	    XFillRectangle(dpy, drawPixmap, gameGC,
 			   0, 0, draw_width, draw_height);
 	}
-#endif
     }
 
-#ifndef _WINDOWS
     if (talk_mapped == true) {
 	static bool toggle;
 	static long last_toggled;
@@ -322,12 +284,6 @@ void Paint_frame(void)
 	}
 	Talk_cursor(toggle);
     }
-#endif
-
-#ifdef _WINDOWS
-    Paint_score_table();
-    PaintWinClient();
-#endif
 
     Paint_clock(false);
 
@@ -349,9 +305,6 @@ static void Paint_score_background(void)
 
 	bgh = pixmaps[BM_SCORE_BG].height;
 	lh = pixmaps[BM_LOGO].height;
-
-	IFWINDOWS( XFillRectangle(dpy, playersWindow, scoreListGC,
-				  0, 0, players_width, players_height) );
 
 	Bitmap_paint(playersWindow, BM_SCORE_BG, 0, 0, 0);
 	if (players_height > bgh + lh)
@@ -563,10 +516,9 @@ static void Paint_clock(bool redraw)
     if (!clockColor) {
 	if (width != 0) {
 	    XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
-	    /* kps - Vato does not want this to be done on windows */
-	    IFNWINDOWS(XFillRectangle(dpy, playersWindow, scoreListGC,
-				      256 - (int)(width + 2 * border), 0,
-				      width + 2 * border, height));
+	    XFillRectangle(dpy, playersWindow, scoreListGC,
+			   256 - (int)(width + 2 * border), 0,
+			   width + 2 * border, height);
 	    width = 0;
 	}
 	return;
@@ -594,10 +546,9 @@ static void Paint_clock(bool redraw)
     }
     width = XTextWidth(scoreListFont, buf, (int)strlen(buf));
     XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
-    /* kps - Vato does not want this to be done on windows */ 
-    IFNWINDOWS(XFillRectangle(dpy, playersWindow, scoreListGC,
-			      256 - (int)(width + 2 * border), 0,
-			      width + 2 * border, height));
+    XFillRectangle(dpy, playersWindow, scoreListGC,
+		   256 - (int)(width + 2 * border), 0,
+		   width + 2 * border, height);
     ShadowDrawString(dpy, playersWindow, scoreListGC,
 		     256 - (int)(width + border),
 		     scoreListFont->ascent + 4,

@@ -153,14 +153,9 @@ static bool Set_mouseAccelNum(xp_option_t *opt, int value)
 	return false;
     } else {
 	new_acc_num = value;
-	if (dpy) {
-#ifndef _WINDOWS
-	    if (mouseAccelInClient) {
-		XChangePointerControl(dpy, True, True, value,
-				      new_acc_denom, new_threshold);
-	    }
-#endif
-	}
+	if (dpy && mouseAccelInClient)
+	    XChangePointerControl(dpy, True, True, value,
+				  new_acc_denom, new_threshold);
 	return true;
     }
   
@@ -175,14 +170,9 @@ static bool Set_mouseAccelDenom(xp_option_t *opt, int value)
 	return false;
     } else {
 	new_acc_denom = value;
-	if (dpy) {
-#ifndef _WINDOWS
-	    if (mouseAccelInClient) {
-		XChangePointerControl(dpy, True, True, new_acc_num,
-				      value, new_threshold);
-	    }
-#endif
-	}
+	if (dpy && mouseAccelInClient)
+	    XChangePointerControl(dpy, True, True, new_acc_num,
+				  value, new_threshold);
 	return true;
     }  
 }     
@@ -196,14 +186,9 @@ static bool Set_mouseAccelThresh(xp_option_t *opt, int value)
 	return false;
     } else {    
 	new_threshold = value;
-	if (dpy) {
-#ifndef _WINDOWS
-	    if (mouseAccelInClient) {
-		XChangePointerControl(dpy, True, True, new_acc_num,
-				      new_acc_denom, value);
-	    }
-#endif
-	}
+	if (dpy && mouseAccelInClient)
+	    XChangePointerControl(dpy, True, True, new_acc_num,
+				  new_acc_denom, value);
 	return true;
     }
 }
@@ -507,7 +492,6 @@ static void X_after(Display *display)
 }
 #endif /* DEVELOPMENT */
 
-#ifndef _WINDOWS
 void Handle_X_options(void)
 {
     char *ptr;
@@ -575,8 +559,6 @@ void Handle_X_options(void)
 #endif
 
 }
-#endif /* _WINDOWS */
-
 
 bool Set_scaleFactor(xp_option_t *opt, double val)
 {

@@ -32,9 +32,6 @@
 
 char welcome_version[] = VERSION;
 
-#ifndef _WINDOWS
-
-
 /*
  * Are we in the process of quitting, or joining a game.
  */
@@ -1412,7 +1409,6 @@ static int Welcome_process_one_event(XEvent * event,
 	}
 	break;
 
-#ifndef _WINDOWS
     case MapNotify:
 	if (ignoreWindowManager == 1) {
 	    XSetInputFocus(dpy, topWindow, RevertToParent, CurrentTime);
@@ -1489,7 +1485,6 @@ static int Welcome_process_one_event(XEvent * event,
 	    Widget_event(event);
 	}
 	break;
-#endif
 
     default:
 	Widget_event(event);
@@ -1597,12 +1592,3 @@ int Welcome_screen(Connect_param_t * conpar)
 
     return result;
 }
-
-#else
-
-int Welcome_screen(Connect_param_t * conpar)
-{
-    return 0;
-}
-
-#endif

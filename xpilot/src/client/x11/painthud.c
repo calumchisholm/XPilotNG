@@ -769,7 +769,6 @@ void Paint_messages(void)
 	 * of a message if it is not drawn "flashed" (not in oldMessagesColor)
 	 * anymore.
 	 */
-#ifndef _WINDOWS
 	if (msg->lifeTime > MSG_FLASH_TIME
 	    || !selectionAndHistory
 	    || (selection.draw.state != SEL_PENDING
@@ -781,14 +780,6 @@ void Paint_messages(void)
 		continue;
 	    }
 	}
-#else
-	if ((msg->lifeTime -= timePerFrame) <= 0.0) {
-	    msg->txt[0] = '\0';
-	    msg->len = 0;
-	    msg->lifeTime = 0.0;
-	    continue;
-	}
-#endif
 
 	if (msg->lifeTime <= MSG_FLASH_TIME)
 	    msg_color = oldMessagesColor;
@@ -835,7 +826,6 @@ void Paint_messages(void)
 	len = charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime);
 	len = MIN(msg->len, len);
 
-#ifndef _WINDOWS
 	/*
 	 * it's an emphasized talk message
 	 */
@@ -946,7 +936,6 @@ void Paint_messages(void)
 	    }
 
 	} else /* not emphasized */
-#endif
 	{
 	    XSetForeground(dpy, messageGC, colors[msg_color].pixel);
 	    rd.drawString(dpy, drawPixmap, messageGC, x, y,

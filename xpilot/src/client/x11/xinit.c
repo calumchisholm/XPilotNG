@@ -32,9 +32,6 @@
  * If you add an item here then please make sure you also add
  * the item in the proper place in ../replay/xp-replay.c.
  */
-#ifdef _WINDOWS
-#pragma warning(disable : 4305)
-#endif
 #include "items/itemRocketPack.xbm"
 #include "items/itemCloakingDevice.xbm"
 #include "items/itemEnergyPack.xbm"
@@ -208,11 +205,8 @@ static struct {
 	"absorbs shots in the absence of shields"
     },
 };
-#ifdef _WINDOWS
-Pixmap	itemBitmaps[NUM_ITEMS][2];	/* Bitmaps for the items in 2 colors */
-#else
+
 Pixmap	itemBitmaps[NUM_ITEMS];		/* Bitmaps for the items */
-#endif
 
 char dashes[NUM_DASHES];
 char cdashes[NUM_CDASHES];
@@ -242,17 +236,12 @@ static XFontStruct* Set_font(Display* display, GC gc,
 {
     XFontStruct*	font;
 
-#ifndef _WINDOWS
     if ((font = XLoadQueryFont(display, fontName)) == NULL) {
 	error("Couldn't find font '%s' for %s, using default font",
 	      fontName, resName);
 	font = XQueryFont(display, XGContextFromGC(gc));
     } else
 	XSetFont(display, gc, font->fid);
-#else
-    font = WinXLoadFont(fontName);
-    XSetFont(display, gc, font->fid);
-#endif
 
     return font;
 }
@@ -260,7 +249,6 @@ static XFontStruct* Set_font(Display* display, GC gc,
 /*
  * Initialize miscellaneous window hints and properties.
  */
-#ifndef _WINDOWS
 extern char		**Argv;
 extern int		Argc;
 
@@ -328,7 +316,6 @@ static void Init_disp_prop(Display *d, Window win,
     XSetWMProtocols(d, win, &KillAtom, 1);
     XSetIOErrorHandler(FatalError);
 }
-#endif
 
 
 /*
@@ -339,7 +326,6 @@ static void Init_disp_prop(Display *d, Window win,
 int Init_top(void)
 {
     int					top_x, top_y;
-#ifndef _WINDOWS
     int					i;
     int					x, y;
     unsigned				w, h;
@@ -354,14 +340,12 @@ int Init_top(void)
 
     if (Colors_init() == -1)
 	return -1;
-#endif
 
     radarDrawRectanglePtr = XFillRectangle;
 
     /*
      * Get toplevel geometry.
      */
-#ifndef _WINDOWS
     top_flags = 0;
     if (geometry != NULL && geometry[0] != '\0')
 	mask = XParseGeometry(geometry, &x, &y, &w, &h);
@@ -450,14 +434,7 @@ int Init_top(void)
 	Init_disp_prop(kdpy, keyboardWindow, top_width, top_height,
 		       top_x, top_y, top_flags);
     }
-#else	/* _WINDOWS */
-	/* Bucko seems to use 0 as the topWindow index */
-	topWindow = 0;
-	top_x = top_y = 0;
-	WinXParseGeometry(geometry, &top_width, &top_height);
-#endif	/* _WINDOWS */
 
-#ifndef _WINDOWS
     /*
      * Create item bitmaps
      */
@@ -530,8 +507,6 @@ int Init_top(void)
     if (dbuf_state->type == COLOR_SWITCH)
 	XSetPlaneMask(dpy, gameGC, dbuf_state->drawing_planes);
 
-#endif
-
     return 0;
 }
 
@@ -542,13 +517,9 @@ int Init_top(void)
  */
 int Init_playing_windows(void)
 {
-#ifndef _WINDOWS
     unsigned			w, h;
     Pixmap			pix;
     GC				cursorGC;
-#else
-    int				i;
-#endif
 
     if (!topWindow) {
 	if (Init_top())
@@ -559,68 +530,13 @@ int Init_playing_windows(void)
 
     draw_width = top_width - (256 + 2);
     draw_height = top_height;
-#ifdef  _WINDOWS
-    /*
-     * What follows is poor code.  WinX needs to know beforehand if its
-     * dealing with draw because it might want to create 2 bitmaps for it.
-     * Since i know draw is the first window created (after top),
-     * i can cheat it.
-     */
-    drawWindow = 1;
-#endif
     drawWindow = XCreateSimpleWindow(dpy, topWindow, 258, 0,
 				     draw_width, draw_height,
 				     0, 0, colors[BLACK].pixel);
-    IFWINDOWS( if (drawWindow != 1) error("draw != 1") );
     radarWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
 				      256, RadarHeight, 0, 0,
 				      colors[BLACK].pixel);
     radar_score_mapped = true;
-
-#ifdef _WINDOWS
-    WinXSetEventMask(drawWindow, NoEventMask);
-    radar_exposures = 1;
-    radarGC = WinXCreateWinDC(radarWindow);
-    gameGC = WinXCreateWinDC(drawWindow);
-
-    textWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
-				     0, 0, 0, 0,
-				     colors[BLACK].pixel);
-    textGC = WinXCreateWinDC(textWindow);
-
-    msgWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
-				    0, 0, 0, 0,
-				    colors[BLACK].pixel);
-    messageGC = WinXCreateWinDC(msgWindow);
-    motdGC = WinXCreateWinDC(topWindow);
-
-    for (i = 0; i < MAX_COLORS; i++)
-	colors[i].pixel = i;
-
-    players_exposed = 1;
-    /* radarPixmap = XCreatePixmap(dpy, radar, 256, RadarHeight, dispDepth); */
-    radarPixmap2 = XCreatePixmap(dpy, radarWindow, 256, RadarHeight, dispDepth);
-    /*
-     * Create item bitmaps AFTER the windows
-     */
-    WinXCreateItemBitmaps();
-    /* create the fonts AFTER the windows */
-    gameFont
-	= Set_font(dpy, gameGC, gameFontName, "gameFont");
-    messageFont
-	= Set_font(dpy, messageGC, messageFontName, "messageFont");
-    textFont
-	= Set_font(dpy, textGC, textFontName, "textFont");
-    motdFont
-	= Set_font(dpy, motdGC, motdFontName, "motdFont");
-
-    buttonWindow = XCreateSimpleWindow(dpy, topWindow, 0, 0,
-				       0, 0, 0, 0,
-				       colors[BLACK].pixel);
-    buttonGC = WinXCreateWinDC(buttonWindow);
-    buttonFont
-	= Set_font(dpy, buttonGC, buttonFontName, "buttonFont");
-#endif
 
     /* Create buttons */
 #define BUTTON_WIDTH	84
@@ -658,10 +574,6 @@ int Init_playing_windows(void)
 			      "PLAYER", Player_callback, NULL);
     Widget_add_pulldown_entry(menu_button,
 			      "MOTD", Motd_callback, NULL);
-#ifdef _WINDOWS
-    Widget_add_pulldown_entry(menu_button,
-			      "CREDITS", Credits_callback, NULL);
-#endif
     Widget_map_sub(button_form);
 
     /* Create score list window */
@@ -673,18 +585,13 @@ int Init_playing_windows(void)
 			      players_width, players_height,
 			      0, 0,
 			      colors[windowColor].pixel);
-#ifdef _WINDOWS
-    scoreListGC = WinXCreateWinDC(playersWindow);
-    scoreListFont
-	= Set_font(dpy, scoreListGC, scoreListFontName, "scoreListFont");
-#endif
 
     /*
      * Selecting the events we can handle.
      */
     XSelectInput(dpy, radarWindow, ExposureMask);
     XSelectInput(dpy, playersWindow, ExposureMask);
-#ifndef _WINDOWS
+
     if (!selectionAndHistory)
 	XSelectInput(dpy, drawWindow, 0);
     else
@@ -754,38 +661,11 @@ int Init_playing_windows(void)
 	XMapWindow(kdpy, keyboardWindow);
 	XSync(kdpy, False);
     }
-#else
-    /* WinXSetEvent(players, WM_PAINT, WinXPaintPlayers); */
-    pointerControlCursor = !None;
-#endif
 
     Init_spark_colors();
 
     return 0;
 }
-
-#ifdef _WINDOWS
-void WinXCreateItemBitmaps(void)
-{
-    int			i;
-	extern int hudColor;
-
-    for (i = 0; i < NUM_ITEMS; i++) {
-	itemBitmaps[i][ITEM_HUD]
-	    = WinXCreateBitmapFromData(dpy, drawWindow,
-				       (char *)itemBitmapData[i].data,
-				       ITEM_SIZE, ITEM_SIZE,
-				       colors[hudColor].pixel);
-	itemBitmaps[i][ITEM_PLAYFIELD]
-	    = WinXCreateBitmapFromData(dpy, drawWindow,
-				       (char *)itemBitmapData[i].data,
-				       ITEM_SIZE, ITEM_SIZE,
-				       colors[RED].pixel);
-    }
-    Colors_init_bitmaps();
-    
-}
-#endif
 
 static int Config_callback(int widget_desc, void *data, const char **str)
 {
@@ -857,19 +737,14 @@ void Resize(Window w, unsigned width, unsigned height)
     Check_view_dimensions();
     Net_flush();
     XResizeWindow(dpy, drawWindow, draw_width, draw_height);
-#ifndef _WINDOWS
     if (dbuf_state->type == PIXMAP_COPY) {
 	XFreePixmap(dpy, drawPixmap);
 	drawPixmap = XCreatePixmap(dpy, drawWindow, draw_width, draw_height,
 				   dispDepth);
     }
-#endif
     players_height = top_height - (RadarHeight + ButtonHeight + 2);
     XResizeWindow(dpy, playersWindow,
 		  players_width, players_height);
-#ifdef _WINDOWS
-    WinXResize();
-#endif
     Talk_resize();
     Config_resize();
 }
@@ -880,17 +755,14 @@ void Resize(Window w, unsigned width, unsigned height)
  */
 void Quit(void)
 {
-#ifndef _WINDOWS
-
-  /* Here we restore the mouse to its former self */
-  /* the option may have been toggled in game to  */
-  /* off so we cant trust that                    */
+    /* Here we restore the mouse to its former self */
+    /* the option may have been toggled in game to  */
+    /* off so we cant trust that                    */
 
     if (dpy != NULL) {
-      if (pre_exists) {
-	XChangePointerControl(dpy, True, True, pre_acc_num,
-			      pre_acc_denom, pre_threshold);
-      }
+	if (pre_exists)
+	    XChangePointerControl(dpy, True, True, pre_acc_num,
+				  pre_acc_denom, pre_threshold);
 	XAutoRepeatOn(dpy);
 	Colors_cleanup();
 	XCloseDisplay(dpy);
@@ -901,12 +773,6 @@ void Quit(void)
 	    kdpy = NULL;
 	}
     }
-#else
-    if (button_form) {
-	Widget_destroy(button_form);
-	button_form = 0;
-    }
-#endif
     Widget_cleanup();
 }
 

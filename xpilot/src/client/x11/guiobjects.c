@@ -102,9 +102,6 @@ int Init_asteroids(void)
 void Gui_paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int c)
 {
     if (!texturedObjects) {
-#ifdef _WINDOWS
-	rd.paintItemSymbol(type, d, mygc, x, y, c);
-#else
 	gcv.stipple = itemBitmaps[type];
 	gcv.fill_style = FillStippled;
 	gcv.ts_x_origin = x;
@@ -116,7 +113,6 @@ void Gui_paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int c)
 	XFillRectangle(dpy, d, mygc, x, y, ITEM_SIZE, ITEM_SIZE);
 	gcv.fill_style = FillSolid;
 	XChangeGC(dpy, mygc, GCFillStyle, &gcv);
-#endif
     } else
 	Bitmap_paint(d, BM_ALL_ITEMS, x, y, type);
 }

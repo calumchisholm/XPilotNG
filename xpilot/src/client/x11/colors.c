@@ -94,8 +94,6 @@ int	wallColor;		/* Color index for wall drawing */
 int	decorColor;		/* Color index for decoration drawing */
 
 
-#ifndef _WINDOWS
-
 /*
  * Dimensions of color cubes in decreasing
  * total number of colors used.
@@ -995,9 +993,6 @@ void Colors_debug(void)
     exit(1);
 }
 #endif	/* DEVELOPMENT */
-
-
-#endif	/* _WINDOWS */
 
 /*
  * Convert a string of color numbers into an array
