@@ -387,27 +387,31 @@ void Set_toggle_shield(bool on)
 void Pointer_button_pressed(int button)
 {
     int i, b_index = button - 1;
+    bool key_change = false;
 
     if (button < 1 || button > MAX_POINTER_BUTTONS)
 	return;
 
-    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++) {
-	if (Key_press(buttonDefs[b_index][i]))
-	    Net_key_change();
-    }
+    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++)
+	key_change |= Key_press(buttonDefs[b_index][i]);
+
+    if (key_change)
+	Net_key_change();
 }
 
 void Pointer_button_released(int button)
 {
     int i, b_index = button - 1;
+    bool key_change = false;
 
     if (button < 1 || button > MAX_POINTER_BUTTONS)
 	return;
 
-    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++) {
-	if (Key_release(buttonDefs[b_index][i]))
-	    Net_key_change();
-    }
+    for (i = 0; i < (int)NUM_BUTTON_DEFS(b_index); i++)
+	key_change |= Key_release(buttonDefs[b_index][i]);
+
+    if (key_change)
+	Net_key_change();
 }
 
 
