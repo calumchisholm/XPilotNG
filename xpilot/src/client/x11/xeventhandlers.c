@@ -342,9 +342,7 @@ int ButtonRelease_event(XEvent *event)
 	Pointer_button_released((int)xbutton->button);
     }
 
-    if (xbutton->window == drawWindow
-	|| xbutton->window == talkWindow) {
-
+    if (xbutton->window == drawWindow) {
 	if (!talk_mapped && xbutton->button == 1)
 	    /*
 	     * finish a cut from the talk messages
@@ -360,8 +358,30 @@ int ButtonRelease_event(XEvent *event)
 	    else if (selection.talk.state == SEL_PENDING)
 		Talk_window_cut(xbutton);
 	}
+
 	return 0;
     }
+
+    if (xbutton->window == talkWindow) {
+	if (!talk_mapped && xbutton->button == 1)
+	    /*
+	     * finish a cut from the talk messages
+	     */
+	    Talk_cut_from_messages(xbutton);
+	else if (talk_mapped && xbutton->button == 1) {
+	    /*
+	     * finish a cut from ...
+	     */
+	    if (xbutton->window == drawWindow
+		&& selection.draw.state == SEL_PENDING)
+		Talk_cut_from_messages(xbutton);
+	    else if (selection.talk.state == SEL_PENDING)
+		Talk_window_cut(xbutton);
+	}
+
+	return 0;
+    }
+
     if (Widget_event(event) != 0) {
 	if (quitting == true) {
 	    quitting = false;
