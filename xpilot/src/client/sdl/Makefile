@@ -4,7 +4,7 @@ OBJS=sdlevent.o sdlkeys.o todo.o main.o gameloop_x.o sdlinit.o sdlpaint.o sdlgui
 # Currently the SDL client files (in this directory) doesn't use any of
 # the CONF_ defines explicitly, so we can define CONF_LIBDIR to dummy.
 #
-CFLAGS=-DCONF_LIBDIR=dummy -DOPTIONHACK -DHAVE_CONFIG_H -DHAVE_LIBZ -g -Wall -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations -Wredundant-decls  -Wshadow -I ../../.. -I ../../common -I ../ -I . -I ./console `sdl-config --cflags`
+CFLAGS=-DCONF_LIBDIR=dummy -DHAVE_CONFIG_H -DHAVE_LIBZ -g -Wall -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations -Wredundant-decls  -Wshadow -I ../../.. -I ../../common -I ../ -I . -I ./console `sdl-config --cflags`
 
 LDFLAGS=-lm -lz `sdl-config --libs` -lGL -lGLU -lSDL_ttf
 
