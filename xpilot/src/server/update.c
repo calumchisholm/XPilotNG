@@ -534,11 +534,12 @@ static void Misc_object_update(void)
     }
 }
 
-static void Cannon_update(int do_update_this_frame)
+static void Cannon_update(void)
 {
     int i;
     for (i = 0; i < World.NumCannons; i++) {
-	cannon_t *cannon = World.cannon + i;
+	cannon_t *cannon = &World.cannon[i];
+
 	if (cannon->dead_time > 0) {
 	    if ((cannon->dead_time -= timeStep) <= 0)
 		Cannon_restore_on_map(i);
@@ -569,7 +570,7 @@ static void Cannon_update(int do_update_this_frame)
 		if (World.items[item].cannonprob > 0
 		    && cannonItemProbMult > 0
 		    && (int)(rfrac() * (60 * 12))
-			< (cannonItemProbMult * World.items[item].cannonprob)) {
+		    < (cannonItemProbMult * World.items[item].cannonprob)) {
 		    Cannon_add_item(i, item, (item == ITEM_FUEL ?
 					ENERGY_PACK_FUEL >> FUEL_SCALE_BITS
 					: 1));
@@ -580,9 +581,10 @@ static void Cannon_update(int do_update_this_frame)
 	    cannon->damaged = 0;
 	if (cannon->tractor_count > 0) {
 	    int ind = GetInd[cannon->tractor_target];
-	    if (Wrap_length(Players[ind]->pos.cx - cannon->pos.cx,
+
+	    if ((Wrap_length(Players[ind]->pos.cx - cannon->pos.cx,
 			    Players[ind]->pos.cy - cannon->pos.cy)
-		< TRACTOR_MAX_RANGE(cannon->item[ITEM_TRACTOR_BEAM]) * CLICK
+		 < TRACTOR_MAX_RANGE(cannon->item[ITEM_TRACTOR_BEAM]) * CLICK)
 		&& BIT(Players[ind]->status, PLAYING|GAME_OVER|KILLED|PAUSE)
 		   == PLAYING) {
 		General_tractor_beam(-1, cannon->pos.cx, cannon->pos.cy,
@@ -616,12 +618,14 @@ static void Target_update(void)
     int i, j;
 
     for (i = 0; i < World.NumTargets; i++) {
-	if (World.targets[i].dead_time > 0) {
-	    if ((World.targets[i].dead_time -= timeStep) <= 0) {
+	target_t *targ = &World.targets[i];
+
+	if (targ->dead_time > 0) {
+	    if ((targ->dead_time -= timeStep) <= 0) {
 		Target_restore_on_map(i);
 
 		if (targetSync) {
-		    unsigned short team = World.targets[i].team;
+		    unsigned short team = targ->team;
 
 		    for (j = 0; j < World.NumTargets; j++) {
 			if (World.targets[j].team == team)
@@ -631,14 +635,14 @@ static void Target_update(void)
 	    }
 	    continue;
 	}
-	else if (World.targets[i].damage == TARGET_DAMAGE) {
+	else if (targ->damage == TARGET_DAMAGE) {
 	    continue;
 	}
 
-	World.targets[i].damage += TARGET_REPAIR_PER_FRAME * timeStep;
-	if (World.targets[i].damage >= TARGET_DAMAGE)
-	    World.targets[i].damage = TARGET_DAMAGE;
-	else if (World.targets[i].last_change + TARGET_UPDATE_DELAY
+	targ->damage += TARGET_REPAIR_PER_FRAME * timeStep;
+	if (targ->damage >= TARGET_DAMAGE)
+	    targ->damage = TARGET_DAMAGE;
+	else if (targ->last_change + TARGET_UPDATE_DELAY
 		 < frame_loops) {
 	    /*
 	     * We don't send target info to the clients every frame
@@ -646,8 +650,8 @@ static void Target_update(void)
 	     */
 	    continue;
 	}
-	World.targets[i].conn_mask = 0;
-	World.targets[i].last_change = frame_loops;
+	targ->conn_mask = 0;
+	targ->last_change = frame_loops;
     }
 }
 
@@ -865,7 +869,7 @@ void Update_objects(void)
 	}
     }
 
-    Cannon_update(do_update_this_frame);
+    Cannon_update();
     Target_update();
 
     if (!fastAim)
@@ -977,43 +981,37 @@ void Update_objects(void)
 		pl->visibility[j].lastChange = frame_loops;
 		pl->visibility[j].canSee
 		    = (rfrac() * (pl->item[ITEM_SENSOR] + 1))
-			> (rfrac() * (Players[j]->item[ITEM_CLOAK] + 1));
+		    > (rfrac() * (Players[j]->item[ITEM_CLOAK] + 1));
 	    }
 	}
 
 	if (BIT(pl->used, HAS_REFUEL)) {
-	    if ((Wrap_length(pl->pos.cx - World.fuel[pl->fs].pos.cx,
-			     pl->pos.cy - World.fuel[pl->fs].pos.cy)
+	    fuel_t *fs = &World.fuel[pl->fs];
+
+	    if ((Wrap_length(pl->pos.cx - fs->pos.cx,
+			     pl->pos.cy - fs->pos.cy)
 		 > 90.0 * CLICK)
 		|| (pl->fuel.sum >= pl->fuel.max)
-#if 0
-		/* kps - ng wants this World.block part removed, currently
-		 * it crashes a poly server if enabled since the World.block
-		 * array is not initialized.
-		 */
-		|| (World.block[World.fuel[pl->fs].blk_pos.x]
-			       [World.fuel[pl->fs].blk_pos.y] != FUEL)
-#endif
 		|| BIT(pl->used, HAS_PHASING_DEVICE)
 		|| (BIT(World.rules->mode, TEAM_PLAY)
 		    && teamFuel
-		    && World.fuel[pl->fs].team != pl->team)) {
+		    && fs->team != pl->team)) {
 		CLR_BIT(pl->used, HAS_REFUEL);
 	    } else {
 		int i = pl->fuel.num_tanks;
 		int ct = pl->fuel.current;
 
 		do {
-		    if (World.fuel[pl->fs].fuel > REFUEL_RATE * timeStep) {
-			World.fuel[pl->fs].fuel -= REFUEL_RATE * timeStep;
-			World.fuel[pl->fs].conn_mask = 0;
-			World.fuel[pl->fs].last_change = frame_loops;
+		    if (fs->fuel > REFUEL_RATE * timeStep) {
+			fs->fuel -= REFUEL_RATE * timeStep;
+			fs->conn_mask = 0;
+			fs->last_change = frame_loops;
 			Add_fuel(&(pl->fuel), REFUEL_RATE * timeStep);
 		    } else {
-			Add_fuel(&(pl->fuel), World.fuel[pl->fs].fuel);
-			World.fuel[pl->fs].fuel = 0;
-			World.fuel[pl->fs].conn_mask = 0;
-			World.fuel[pl->fs].last_change = frame_loops;
+			Add_fuel(&(pl->fuel), fs->fuel);
+			fs->fuel = 0;
+			fs->conn_mask = 0;
+			fs->last_change = frame_loops;
 			CLR_BIT(pl->used, HAS_REFUEL);
 			break;
 		    }
@@ -1029,9 +1027,9 @@ void Update_objects(void)
 	/* target repair */
 	if (BIT(pl->used, HAS_REPAIR)) {
 	    target_t *targ = &World.targets[pl->repair_target];
-	    int cx = targ->pos.cx;
-	    int cy = targ->pos.cy;
-	    if (Wrap_length(pl->pos.cx - cx, pl->pos.cy - cy) > 90.0 * CLICK
+
+	    if ((Wrap_length(pl->pos.cx - targ->pos.cx,
+			     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
 		|| targ->damage >= TARGET_DAMAGE
 		|| targ->dead_time > 0
 		|| BIT(pl->used, HAS_PHASING_DEVICE)) {
