@@ -942,47 +942,46 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     /*MARA evil hack*/
 
     i = sizeof(shapepos) * RES;
-    if (!(ship->pts[0] = (shapepos*)malloc(ship->num_points * i))
+    if (!(ship->pts[0] = (shapepos*)malloc((size_t)ship->num_points * i))
 	|| (ship->num_l_gun
-	    && !(ship->l_gun[0] = (shapepos*)malloc(ship->num_l_gun * i)))
+	    && !(ship->l_gun[0]
+		 = (shapepos*)malloc((size_t)ship->num_l_gun * i)))
 	|| (ship->num_r_gun
-	    && !(ship->r_gun[0] = (shapepos*)malloc(ship->num_r_gun * i)))
+	    && !(ship->r_gun[0]
+		 = (shapepos*)malloc((size_t)ship->num_r_gun * i)))
 	|| (ship->num_l_rgun
-	    && !(ship->l_rgun[0] = (shapepos*)malloc(ship->num_l_rgun * i)))
+	    && !(ship->l_rgun[0]
+		 = (shapepos*)malloc((size_t)ship->num_l_rgun * i)))
 	|| (ship->num_r_rgun
-	    && !(ship->r_rgun[0] = (shapepos*)malloc(ship->num_r_rgun * i)))
+	    && !(ship->r_rgun[0]
+		 = (shapepos*)malloc((size_t)ship->num_r_rgun * i)))
 	|| (ship->num_l_light
-	    && !(ship->l_light[0] = (shapepos*)malloc(ship->num_l_light * i)))
+	    && !(ship->l_light[0]
+		 = (shapepos*)malloc((size_t)ship->num_l_light * i)))
 	|| (ship->num_r_light
-	    && !(ship->r_light[0] = (shapepos*)malloc(ship->num_r_light * i)))
+	    && !(ship->r_light[0]
+		 = (shapepos*)malloc((size_t)ship->num_r_light * i)))
 	|| (ship->num_m_rack
-	    && !(ship->m_rack[0] = (shapepos*)malloc(ship->num_m_rack * i)))
+	    && !(ship->m_rack[0]
+		 = (shapepos*)malloc((size_t)ship->num_m_rack * i)))
 	) {
 	error("Not enough memory for ship shape");
-	if (ship->pts[0]) {
+	if (ship->pts[0])
 	    free(ship->pts[0]);
-	    if (ship->l_gun[0]) {
-		free(ship->l_gun[0]);
-		if (ship->r_gun[0]) {
-		    free(ship->r_gun[0]);
-		    if (ship->l_rgun[0]) {
-			free(ship->l_rgun[0]);
-			if (ship->r_rgun[0]) {
-			    free(ship->r_rgun[0]);
-			    if (ship->l_light[0]) {
-				free(ship->l_light[0]);
-				if (ship->r_light[0]) {
-				    free(ship->r_light[0]);
-				    if (ship->m_rack[0]) {
-					free(ship->m_rack[0]);
-				    }
-				}
-			    }
-			}
-		    }
-		}
-	    }
-	}
+	if (ship->l_gun[0])
+	    free(ship->l_gun[0]);
+	if (ship->r_gun[0])
+	    free(ship->r_gun[0]);
+	if (ship->l_rgun[0])
+	    free(ship->l_rgun[0]);
+	if (ship->r_rgun[0])
+	    free(ship->r_rgun[0]);
+	if (ship->l_light[0])
+	    free(ship->l_light[0]);
+	if (ship->r_light[0])
+	    free(ship->r_light[0]);
+	if (ship->m_rack[0])
+	    free(ship->m_rack[0]);
 	return -1;
     }
 
@@ -1400,7 +1399,7 @@ void Calculate_shield_radius(shipshape_t *ship)
 	if (radius2 > max_radius)
 	    max_radius = radius2;
     }
-    max_radius = (int)(2.0 * sqrt(max_radius));
+    max_radius = (int)(2.0 * sqrt((double)max_radius));
     ship->shield_radius = (max_radius + 2 <= 34)
 			? 34
 			: (max_radius + 2 - (max_radius & 1));
