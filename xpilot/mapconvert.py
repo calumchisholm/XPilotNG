@@ -390,8 +390,6 @@ def convert(options):
 
     print "<XPilotMap>"
 
-    print '<Featurecount bases="%d" balls="%d" fuels="%d" checks="%d"/>' % (
-	len(bases), len(balls), len(fuels), checks.index(None))
     mapd = options['mapdata']
     del options['mapdata']
     print '<GeneralOptions>'

@@ -1,5 +1,4 @@
 <XPilotMap>
-<Featurecount bases="8" balls="2" fuels="72" checks="0"/>
 <GeneralOptions>
 <Option name="shotswallbounce" value="no"/>
 <Option name="initialmines" value="0"/>

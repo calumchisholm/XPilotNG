@@ -189,6 +189,7 @@ struct bmpstyle  bstyles[256];
 struct polydata  pdata[1000];
 
 int num_pstyles, num_estyles, num_bstyles;
+int max_bases, max_balls, max_fuels, max_checks;
 
 
 static int get_bmp_id(const char *s)
@@ -225,6 +226,17 @@ static int get_poly_id(const char *s)
     error("Undeclared polystyle %s", s);
     return 0;
 }
+
+
+#define STORE(T,P,N,M,V)						\
+    if (N >= M && ((M <= 0)						\
+	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
+	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
+	error("No memory");						\
+	exit(1);							\
+    } else								\
+	(P[N++] = V)
+/* !@# add a final realloc later to free wasted memory */
 
 
 static void tagstart(void *data, const char *el, const char **attr)
@@ -350,64 +362,10 @@ static void tagstart(void *data, const char *el, const char **attr)
 	return;
     }
 
-    if (!strcasecmp(el, "Featurecount")) {
-	int i;
-	for (i = 0; i < MAX_TEAMS; i++) {
-	    World.teams[i].NumMembers = 0;
-	    World.teams[i].NumBases = 0;
-	    World.teams[i].NumTreasures = 0;
-	    World.teams[i].TreasuresDestroyed = 0;
-	    World.teams[i].TreasuresLeft = 0;
-	    World.teams[i].SwapperId = -1;
-	}
-	World.NumBases = 0;
-	World.NumTreasures = 0;
-	World.NumFuels = 0;
-	World.NumChecks = 0;
-	while (*attr) {
-	    if (!strcasecmp(*attr, "bases"))
-		World.NumBases = atoi(*(attr + 1));
-	    else if (!strcasecmp(*attr, "balls"))
-		World.NumTreasures = atoi(*(attr + 1));
-	    else if (!strcasecmp(*attr, "fuels"))
-		World.NumFuels = atoi(*(attr + 1));
-	    else if (!strcasecmp(*attr, "checks"))
-		World.NumChecks = atoi(*(attr + 1));
-	    attr += 2;
-	}
-	if (World.NumBases > 0) {
-	    if ((World.base = (base_t *) malloc(World.NumBases * sizeof(base_t))) == NULL) {
-		error("Out of memory - bases");
-		exit(-1);
-	    }
-	} else
-	    error("WARNING: map has no bases!");
-	if (World.NumTreasures > 0
-	    && (World.treasures = (treasure_t *)
-		malloc(World.NumTreasures * sizeof(treasure_t))) == NULL) {
-	    error("Out of memory - treasures");
-	    exit(-1);
-	}
-	if (World.NumFuels > 0
-	    && (World.fuel = malloc(World.NumFuels * sizeof(fuel_t))) ==NULL) {
-	    error("Out of memory - fuel depots");
-	    exit(-1);
-	}
-	if (World.NumChecks > 0
-	    && (World.check = malloc(World.NumChecks * sizeof(ipos))) ==NULL) {
-	    error("Out of memory - checkpoints");
-	    exit(-1);
-	}
-    }
-
     if (!strcasecmp(el, "Check")) {
-	static int checknum;
+	ipos t;
 	int x, y;
 
-	if (checknum > World.NumChecks) {
-	    error("Given checkpoint count incorrect (too small).\n");
-	    exit(1);
-	}
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
 		x = atoi(*(attr + 1)) * scale;
@@ -415,19 +373,15 @@ static void tagstart(void *data, const char *el, const char **attr)
 		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	World.check[checknum].x = x;
-	World.check[checknum].y = y;
-	checknum++;
+	t.x = x;
+	t.y = y;
+	STORE(ipos, World.check, World.NumChecks, max_checks, t);
     }
 
     if (!strcasecmp(el, "Fuel")) {
-	static int fuelnum;
+	fuel_t t;
 	int team, x, y;
 
-	if (fuelnum >= World.NumFuels) {
-	    error("Given fuel count incorrect (too small).\n");
-	    exit(1);
-	}
 	team = TEAM_NOT_SET;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -438,23 +392,19 @@ static void tagstart(void *data, const char *el, const char **attr)
 		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	World.fuel[fuelnum].clk_pos.x = x;
-	World.fuel[fuelnum].clk_pos.y = y;
-	World.fuel[fuelnum].fuel = START_STATION_FUEL;
-	World.fuel[fuelnum].conn_mask = (unsigned)-1;
-	World.fuel[fuelnum].last_change = frame_loops;
-	World.fuel[fuelnum].team = TEAM_NOT_SET;
-	fuelnum++;
+	t.clk_pos.x = x;
+	t.clk_pos.y = y;
+	t.fuel = START_STATION_FUEL;
+	t.conn_mask = (unsigned)-1;
+	t.last_change = frame_loops;
+	t.team = team;
+	STORE(fuel_t, World.fuel, World.NumFuels, max_fuels, t);
     }
 
     if (!strcasecmp(el, "Base")) {
-	static int basenum;
-	int team, x, y, dir;
+	base_t	t;
+	int	team, x, y, dir;
 
-	if (basenum >= World.NumBases) {
-	    error("Given base count incorrect (too small).\n");
-	    exit(1);
-	}
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
 		team = atoi(*(attr + 1));
@@ -471,34 +421,24 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    exit(1);
 	}
 
-	World.base[basenum].pos.x = x;
-	World.base[basenum].pos.y = y;
-	/*
-	 * The direction of the base should be so that it points
-	 * up with respect to the gravity in the region.  This
-	 * is fixed in Find_base_dir() when the gravity has
-	 * been computed.
-	 */
-	World.base[basenum].dir = dir;
+	t.pos.x = x;
+	t.pos.y = y;
+	t.dir = dir;
 	if (BIT(World.rules->mode, TEAM_PLAY)) {
-	    World.base[basenum].team = team;
+	    t.team = team;
 	    World.teams[team].NumBases++;
 	    if (World.teams[team].NumBases == 1)
 		World.NumTeamBases++;
 	} else {
-	    World.base[basenum].team = TEAM_NOT_SET;
+	    t.team = TEAM_NOT_SET;
 	}
-	basenum++;
+	STORE(base_t, World.base, World.NumBases, max_bases, t);
     }
 
     if (!strcasecmp(el, "Ball")) {
-	static int ballnum;
+    	treasure_t t;
 	int team, x, y;
 
-	if (ballnum >= World.NumTreasures) {
-	    error("Given ball count incorrect (too small).\n");
-	    exit(1);
-	}
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
 		team = atoi(*(attr + 1));
@@ -508,14 +448,14 @@ static void tagstart(void *data, const char *el, const char **attr)
 		y = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	World.treasures[ballnum].pos.x = x;
-	World.treasures[ballnum].pos.y = y;
-	World.treasures[ballnum].have = false;
-	World.treasures[ballnum].destroyed = 0;
-	World.treasures[ballnum].team = team;
+	t.pos.x = x;
+	t.pos.y = y;
+	t.have = false;
+	t.destroyed = 0;
+	t.team = team;
 	World.teams[team].NumTreasures++;
 	World.teams[team].TreasuresLeft++;
-	ballnum++;
+	STORE(treasure_t, World.treasures, World.NumTreasures, max_balls, t);
     }
 
     if (!strcasecmp(el, "Option")) {

@@ -63,6 +63,25 @@ World_map World;
 
 void Init_map(void)
 {
+    int i;
+    for (i = 0; i < MAX_TEAMS; i++) {
+	World.teams[i].NumMembers = 0;
+	World.teams[i].NumBases = 0;
+	World.teams[i].NumTreasures = 0;
+	World.teams[i].TreasuresDestroyed = 0;
+	World.teams[i].TreasuresLeft = 0;
+	World.teams[i].SwapperId = -1;
+    }
+    World.NumBases = 0;
+    World.NumTreasures = 0;
+    World.NumFuels = 0;
+    World.NumChecks = 0;
+
+    if (World.NumChecks > 0
+	&& (World.check = malloc(World.NumChecks * sizeof(ipos))) ==NULL) {
+	error("Out of memory - checkpoints");
+	exit(-1);
+    }
     World.NumGravs	= 0;
     World.NumCannons	= 0;
     World.NumWormholes	= 0;
