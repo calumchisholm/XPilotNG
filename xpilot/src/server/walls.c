@@ -629,10 +629,8 @@ void Player_crash(player *pl, int crashtype, int item_id, int pt)
 	}
     }
 
-    if (BIT(pl->status, KILLED)
-	&& pl->score < 0
-	&& IS_ROBOT_PTR(pl)) {
-	pl->home_base = 0;
+    if (BIT(pl->status, KILLED) && pl->score < 0 && IS_ROBOT_PTR(pl)) {
+	pl->home_base = &World.base[0];
 	Pick_startpos(pl);
     }
 }

@@ -189,9 +189,9 @@ int Map_place_base(int cx, int cy, int dir, int team)
 	World.teams[team].NumBases++;
 	if (World.teams[team].NumBases == 1)
 	    World.NumTeamBases++;
-    } else {
+    } else
 	t.team = TEAM_NOT_SET;
-    }
+    t.ind = World.NumBases;
     STORE(base_t, World.base, World.NumBases, max_bases, t);
     Map_set_itemid(CLICK_TO_BLOCK(cx), CLICK_TO_BLOCK(cy), ind);
     return ind;

@@ -118,9 +118,10 @@ typedef struct {
     int		type;
 } grav_t;
 
-typedef struct {
+typedef struct base_t {
     clpos		pos;
     int			dir;
+    int			ind;
     unsigned short	team;
 } base_t;
 

@@ -789,7 +789,7 @@ static void Robot_create(void)
 	player *pl_i = Players(i);
 	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, robot->id);
-	    Send_base(pl_i->conn, robot->id, robot->home_base);
+	    Send_base(pl_i->conn, robot->id, robot->home_base->ind);
 	}
     }
 
@@ -798,7 +798,7 @@ static void Robot_create(void)
 #ifndef	SILENT
     if (logRobots)
 	xpprintf("%s %s (%d, %s) starts at startpos %d.\n",
-	   showtime(), robot->name, NumPlayers, robot->realname, robot->home_base);
+	   showtime(), robot->name, NumPlayers, robot->realname, robot->home_base->ind);
 #endif
 
     if (round_delay > 0 || NumPlayers == 1) {

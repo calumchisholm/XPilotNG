@@ -81,15 +81,14 @@ void Pick_startpos(player *pl)
     static char	*free_bases = NULL;
 
     if (IS_TANK_PTR(pl)) {
-	pl->home_base = 0;
+	pl->home_base = &World.base[0];
 	return;
     }
 
     if (prev_num_bases != World.NumBases) {
 	prev_num_bases = World.NumBases;
-	if (free_bases != NULL) {
+	if (free_bases != NULL)
 	    free(free_bases);
-	}
 	free_bases = (char *) malloc(World.NumBases * sizeof(*free_bases));
 	if (free_bases == NULL) {
 	    error("Can't allocate memory for free_bases");
@@ -102,9 +101,8 @@ void Pick_startpos(player *pl)
 	if (World.base[i].team == pl->team) {
 	    num_free++;
 	    free_bases[i] = 1;
-	} else {
+	} else
 	    free_bases[i] = 0;	/* other team */
-	}
     }
 
     for (i = 0; i < NumPlayers; i++) {
@@ -112,8 +110,8 @@ void Pick_startpos(player *pl)
 
 	if (pl_i->id != pl->id
 	    && !IS_TANK_PTR(pl_i)
-	    && free_bases[pl_i->home_base]) {
-	    free_bases[pl_i->home_base] = 0;	/* occupado */
+	    && free_bases[pl_i->home_base->ind]) {
+	    free_bases[pl_i->home_base->ind] = 0;	/* occupado */
 	    num_free--;
 	}
     }
@@ -121,20 +119,18 @@ void Pick_startpos(player *pl)
     if (BIT(World.rules->mode, TIMING)) {	/* pick first free base */
 	for (i = 0; i < World.NumBases; i++) {
 	    /* kps - ng wants no base orders => change to if (free_bases[i]) */
-	    if (free_bases[World.baseorder[i].base_idx]) {
+	    if (free_bases[World.baseorder[i].base_idx])
 		break;
-	    }
 	}
     } else {
 	pick = (int)(rfrac() * num_free);
 	seen = 0;
 	for (i = 0; i < World.NumBases; i++) {
 	    if (free_bases[i] != 0) {
-		if (seen < pick) {
+		if (seen < pick)
 		    seen++;
-		} else {
+		else
 		    break;
-		}
 	    }
 	}
     }
@@ -144,8 +140,8 @@ void Pick_startpos(player *pl)
 	      ind, World.NumBases, num_free, pick, seen);
 	End_game();
     } else {
-	pl->home_base = BIT(World.rules->mode, TIMING) ?
-			World.baseorder[i].base_idx : i;
+	pl->home_base = &World.base[BIT(World.rules->mode, TIMING) ?
+			World.baseorder[i].base_idx : i];
 	if (ind < NumPlayers) {
 	    for (i = 0; i < observerStart + NumObservers; i++) {
 		player *pl_i;
@@ -158,18 +154,13 @@ void Pick_startpos(player *pl)
 			break;
 		}
 		pl_i = Players(i);
-		if (pl_i->conn != NULL) {
-		    Send_base(pl_i->conn,
-			      pl->id,
-			      pl->home_base);
-		}
+		if (pl_i->conn != NULL)
+		    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	    }
-	    if (BIT(pl->status, PLAYING) == 0) {
+	    if (BIT(pl->status, PLAYING) == 0)
 		pl->count = RECOVERY_DELAY;
-	    }
-	    else if (BIT(pl->status, PAUSE|GAME_OVER)) {
+	    else if (BIT(pl->status, PAUSE|GAME_OVER))
 		Go_home(pl);
-	    }
 	}
     }
 }
@@ -203,9 +194,9 @@ void Go_home(player *pl)
 	dir = pl->last_check_dir;
 	dir = MOD2(dir + (int)((rfrac() - 0.5) * (RES / 8)), RES);
     } else {
-	cx = World.base[pl->home_base].pos.cx;
-	cy = World.base[pl->home_base].pos.cy;
-	dir = World.base[pl->home_base].dir;
+	cx = pl->home_base->pos.cx;
+	cy = pl->home_base->pos.cy;
+	dir = pl->home_base->dir;
 	vx = vy = velo = 0;
     }
 
@@ -239,9 +230,8 @@ void Go_home(player *pl)
 	Players(i)->visibility[ind].lastChange = 0;
     }
 
-    if (IS_ROBOT_PTR(pl)) {
+    if (IS_ROBOT_PTR(pl))
 	Robot_go_home(pl);
-    }
 }
 
 /*
@@ -320,12 +310,11 @@ void Player_remove_tank(player *pl, int which_tank)
 	pl->fuel.max -= tank_cap;
 	pl->fuel.sum -= tank_fuel;
 	pl->fuel.num_tanks--;
-	if (pl->fuel.current > pl->fuel.num_tanks) {
+	if (pl->fuel.current > pl->fuel.num_tanks)
 	    pl->fuel.current = 0;
-	} else {
-	    for (i = tank_ind; i <= pl->fuel.num_tanks; i++) {
+	else {
+	    for (i = tank_ind; i <= pl->fuel.num_tanks; i++)
 		pl->fuel.tank[i] = pl->fuel.tank[i + 1];
-	    }
 	}
 	pl->item[ITEM_TANK] = pl->fuel.num_tanks;
     }
@@ -343,9 +332,8 @@ void Player_hit_armor(player *pl)
 void Player_used_kill(player *pl)
 {
     pl->used &= ~USED_KILL;
-    if (!BIT(DEF_HAVE, HAS_SHIELD)) {
+    if (!BIT(DEF_HAVE, HAS_SHIELD))
 	CLR_BIT(pl->have, HAS_SHIELD);
-    }
 }
 
 /*
@@ -391,9 +379,8 @@ int Init_player(int ind, shipobj *ship)
     pl->emptymass	= ShipMass;
 
     for (i = 0; i < NUM_ITEMS; i++) {
-	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK)) {
+	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
 	    pl->item[i] = World.items[i].initial;
-	}
     }
 
     pl->fuel.sum        = World.items[ITEM_FUEL].initial << FUEL_SCALE_BITS;
@@ -529,9 +516,8 @@ int Init_player(int ind, shipobj *ship)
     pl->lose_item_state	= 0;
 
     pl->shove_next = 0;
-    for (i = 0; i < MAX_RECORDED_SHOVES; i++) {
+    for (i = 0; i < MAX_RECORDED_SHOVES; i++)
 	pl->shove_record[i].pusher_id = NO_ID;
-    }
 
     pl->frame_last_busy	= frame_loops;
 
@@ -643,9 +629,8 @@ void Update_score_table(void)
 				: (pl->check - 1);
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
-		    if (pl_i->conn != NULL) {
+		    if (pl_i->conn != NULL)
 			Send_timing(pl_i->conn, pl->id, check, pl->round);
-		    }
 		}
 	    }
 	}
@@ -658,9 +643,8 @@ void Update_score_table(void)
 		team->prev_score = team->score;
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
-		    if (pl_i->conn != NULL) {
+		    if (pl_i->conn != NULL)
 			Send_team_score(pl_i->conn, j, team->score);
-		    }
 		}
 	    }
 	}
@@ -683,9 +667,9 @@ void Reset_all_players(void)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
 	if (endOfRoundReset) {
-	    if (BIT(pl->status, PAUSE)) {
+	    if (BIT(pl->status, PAUSE))
 		Player_death_reset(pl, false);
-	    } else {
+	    else {
 		Kill_player(pl, false);
 		if (pl != Players(i)) {
 		    /* kps - fix */
@@ -760,10 +744,8 @@ void Reset_all_players(void)
 	    /* Reset the targets */
 	    for (i = 0; i < World.NumTargets; i++) {
 		target_t *targ = &World.targets[i];
-		if (targ->damage != TARGET_DAMAGE
-		    || targ->dead_time > 0) {
+		if (targ->damage != TARGET_DAMAGE || targ->dead_time > 0)
 		    Target_restore_on_map(targ);
-		}
 	    }
 	}
     }
@@ -776,17 +758,15 @@ void Reset_all_players(void)
 			       |OBJ_HEAT_SHOT|OBJ_ITEM)) {
 		obj->life = 0;
 		if (BIT(obj->type, OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_HEAT_SHOT
-				   |OBJ_CANNON_SHOT|OBJ_MINE)) {
+				   |OBJ_CANNON_SHOT|OBJ_MINE))
 		    /* Take care that no new explosions are made. */
 		    obj->mass = 0;
-		}
 	    }
 	}
     }
 
-    if (round_delay_send > 0) {
+    if (round_delay_send > 0)
 	round_delay_send--;
-    }
     if (roundDelaySeconds) {
 	/* Hold your horses! The next round will start in a few moments. */
 	round_delay = roundDelaySeconds * FPS;
@@ -797,9 +777,8 @@ void Reset_all_players(void)
 		roundDelaySeconds,
 		(BIT(World.rules->mode, TIMING)? "race" : "round"));
 	Set_message(msg);
-    } else {
+    } else
 	roundtime = maxRoundTime * FPS;
-    }
 
     Update_score_table();
 }
@@ -886,9 +865,8 @@ static void Give_best_player_bonus(DFLOAT average_score,
     char		msg[MSG_LEN];
 
 
-    if (best_ratio == 0) {
+    if (best_ratio == 0)
 	sprintf(msg, "There is no Deadly Player");
-    }
     else if (num_best_players == 1) {
 	player *bp = Players(best_players[0]);
 
@@ -1127,7 +1105,7 @@ void Race_game_over(void)
     char		msg[MSG_LEN];
 
     /*
-     * Reassign players's starting posisitions based upon
+     * Reassign players's starting positions based upon
      * personal best lap times.
      */
     if ((order = (int *)malloc(NumPlayers * sizeof(int))) != NULL) {
@@ -1162,8 +1140,8 @@ void Race_game_over(void)
 	}
 	for (i = 0; i < num_ordered_players; i++) {
 	    pl = Players(order[i]);
-	    if (pl->home_base != World.baseorder[i].base_idx) {
-		pl->home_base = World.baseorder[i].base_idx;
+	    if (pl->home_base->ind != World.baseorder[i].base_idx) {
+		pl->home_base = &World.base[World.baseorder[i].base_idx];
 		for (j = 0; j < observerStart + NumObservers; j++) {
 		    if (j == NumPlayers) {
 			if (NumObservers)
@@ -1171,15 +1149,11 @@ void Race_game_over(void)
 			else
 			    break;
 		    }
-		    if (Players(j)->conn != NULL) {
-			Send_base(Players(j)->conn,
-				  pl->id,
-				  pl->home_base);
-		    }
+		    if (Players(j)->conn != NULL)
+			Send_base(Players(j)->conn, pl->id,pl->home_base->ind);
 		}
-		if (BIT(pl->status, PAUSE)) {
+		if (BIT(pl->status, PAUSE))
 		    Go_home(pl);
-		}
 	    }
 	}
 	free(order);

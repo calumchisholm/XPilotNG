@@ -73,8 +73,8 @@ static void Transport_to_home(player *pl)
 	cx = World.check[check].cx;
 	cy = World.check[check].cy;
     } else {
-	cx = World.base[pl->home_base].pos.cx;
-	cy = World.base[pl->home_base].pos.cy;
+	cx = pl->home_base->pos.cx;
+	cy = pl->home_base->pos.cy;
     }
     dx = WRAP_DCX(cx - pl->pos.cx);
     dy = WRAP_DCY(cy - pl->pos.cy);

@@ -1434,7 +1434,7 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 
 #ifndef	SILENT
     xpprintf("%s %s (%d) starts at startpos %d.\n", showtime(),
-	   pl->name, NumPlayers, pl->home_base);
+	   pl->name, NumPlayers, pl->home_base->ind);
 #endif
 
     /*
@@ -1443,7 +1443,7 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
     Send_player(pl->conn, pl->id);
     Send_score(pl->conn, pl->id, pl->score,
 	       pl->life, pl->mychar, pl->alliance);
-    Send_base(pl->conn, pl->id, pl->home_base);
+    Send_base(pl->conn, pl->id, pl->home_base->ind);
     /*
      * And tell him about all the others.
      */
@@ -1461,18 +1461,16 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	Send_player(pl->conn, pl_i->id);
 	Send_score(pl->conn, pl_i->id, pl_i->score,
 		   pl_i->life, pl_i->mychar, pl_i->alliance);
-	if (!IS_TANK_PTR(pl_i)) {
-	    Send_base(pl->conn, pl_i->id, pl_i->home_base);
-	}
+	if (!IS_TANK_PTR(pl_i))
+	    Send_base(pl->conn, pl_i->id, pl_i->home_base->ind);
     }
     /*
      * And about all the teams.
      */
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < MAX_TEAMS; i++) {
-	    if (World.teams[i].NumMembers > 0) {
+	    if (World.teams[i].NumMembers > 0)
 		Send_team_score(pl->conn, i, World.teams[i].score);
-	    }
 	}
     }
     /*
@@ -1482,11 +1480,10 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	player *pl_i;
 	/* hack alert */
 	if (i == NumPlayers - 1) {
-	    if (!NumObservers) {
+	    if (!NumObservers)
 		break;
-	    } else {
+	    else
 		i = observerStart;
-	    }
 	}
 	pl_i = Players(i);
 	if (pl_i->rectype == 1 && pl->rectype == 2)
@@ -1495,28 +1492,26 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	    Send_player(pl_i->conn, pl->id);
 	    Send_score(pl_i->conn, pl->id, pl->score,
 		       pl->life, pl->mychar, pl->alliance);
-	    Send_base(pl_i->conn, pl->id, pl->home_base);
+	    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
 	/*
 	 * And tell him about the relationships others have with eachother.
 	 */
 	else if (IS_ROBOT_PTR(pl_i)) {
-	    if ((war_on_id = Robot_war_on_player(pl_i)) != NO_ID) {
+	    if ((war_on_id = Robot_war_on_player(pl_i)) != NO_ID)
 		Send_war(pl->conn, pl_i->id, war_on_id);
-	    }
 	}
     }
 
-    if (NumPlayers == 1) {
+    if (NumPlayers == 1)
 	sprintf(msg, "Welcome to \"%s\", made by %s.",
 		World.name, World.author);
-    } else if (BIT(World.rules->mode, TEAM_PLAY)) {
+    else if (BIT(World.rules->mode, TEAM_PLAY))
 	sprintf(msg, "%s (%s, team %d) has entered \"%s\", made by %s.",
 		pl->name, pl->realname, pl->team, World.name, World.author);
-    } else {
+    else
 	sprintf(msg, "%s (%s) has entered \"%s\", made by %s.",
 		pl->name, pl->realname, World.name, World.author);
-    }
 
     if (pl->rectype < 2)
 	Set_message(msg);

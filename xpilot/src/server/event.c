@@ -471,18 +471,17 @@ int Handle_keyboard(player *pl)
 		cx = pl->pos.cx;
 		cy = pl->pos.cy;
 		msg[0] = '\0';
-		for (i=0; i<World.NumBases; i++) {
-		    dx = ABS(CENTER_XCLICK(World.base[i].pos.cx - cx));
-		    dy = ABS(CENTER_YCLICK(World.base[i].pos.cy - cy));
+		for (i = 0; i < World.NumBases; i++) {
+		    base_t *base = &World.base[i];
+		    dx = ABS(CENTER_XCLICK(base->pos.cx - cx));
+		    dy = ABS(CENTER_YCLICK(base->pos.cy - cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
-
-			if (i == pl->home_base) {
+			if (base == pl->home_base)
 			    break;
-			}
-			if (World.base[i].team != TEAM_NOT_SET
-			    && World.base[i].team != pl->team)
+			if (base->team != TEAM_NOT_SET
+			    && base->team != pl->team)
 			    break;
-			pl->home_base = i;
+			pl->home_base = base;
 			sprintf(msg, "%s has changed home base.",
 				pl->name);
 			break;
@@ -504,15 +503,12 @@ int Handle_keyboard(player *pl)
 		}
 		for (i = 0; i < NumPlayers; i++) {
 		    player *pl_i = Players(i);
-		    if (pl_i->conn != NULL) {
-			Send_base(pl_i->conn,
-				  pl->id,
-				  pl->home_base);
-		    }
+		    if (pl_i->conn != NULL)
+			Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 		}
 		for (i = 0; i < NumObservers; i++) {
 		    Send_base(Players(i + observerStart)->conn,
-			      pl->id, pl->home_base);
+			      pl->id, pl->home_base->ind);
  		}
 		break;
 
@@ -744,8 +740,8 @@ int Handle_keyboard(player *pl)
 		    i = HOVERPAUSE;
 		}
 		else {
-		    cx = World.base[pl->home_base].pos.cx;
-		    cy = World.base[pl->home_base].pos.cy;
+		    cx = pl->home_base->pos.cx;
+		    cy = pl->home_base->pos.cy;
 		    dx = ABS(CENTER_XCLICK(pl->pos.cx - cx));
 		    dy = ABS(CENTER_YCLICK(pl->pos.cy - cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {

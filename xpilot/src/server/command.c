@@ -163,7 +163,7 @@ static void Send_info_about_player(player * pl)
 	    Send_player(pl_i->conn, pl->id);
 	    Send_score(pl_i->conn, pl->id, pl->score, pl->life,
 		       pl->mychar, pl->alliance);
-	    Send_base(pl_i->conn, pl->id, pl->home_base);
+	    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	}
     }
 }
@@ -1261,7 +1261,8 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	    i = World.teams[i].SwapperId;
 	else {
 	    /* Found a cycle, now change the teams */
-	    int xbase = pl->home_base, xteam = pl->team, xbase2, xteam2;
+	    base_t *xbase = pl->home_base, *xbase2;
+	    int xteam = pl->team, xteam2;
 	    player *pl2 = pl;
 	    do {
 		pl2 = Player_by_id(World.teams[xteam].SwapperId);
@@ -1310,12 +1311,13 @@ static int Cmd_team(char *arg, player *pl, int oper, char *msg)
 	for (i = NumPlayers - 1; i >= 0; i--) {
 	    player *pl2 = Players(i);
 	    if (pl2->conn != NULL && BIT(pl2->status, PAUSE)
-		&& (pl2->team == team)) {
+			&& (pl2->team == team)) {
+		base_t *temp;
 		pl2->team = pl->team;
 		pl->team = team;
-		team = pl2->home_base;
+		temp = pl2->home_base;
 		pl2->home_base = pl->home_base;
-		pl->home_base = team;
+		pl->home_base = temp;
 		TEAM_SCORE(pl2->team, -(pl->score));
 		TEAM_SCORE(pl->team, -(pl2->score));
 		TEAM_SCORE(pl2->team, pl2->score);

@@ -568,7 +568,7 @@ struct player {
     int		last_check_dir;		/* player dir at last checkpoint */
     long	last_wall_touch;	/* last time player touched a wall */
 
-    int		home_base;		/* Num of home base */
+    struct base_t *home_base;
     struct {
 	int	    tagged;		/* Flag, what is tagged? */
 	int	    pl_id;		/* Tagging player id */
