@@ -52,7 +52,7 @@ bool                    packetMeasurement;
 pointer_move_t		pointer_moves[MAX_POINTER_MOVES];
 int			pointer_move_next;
 long			last_keyboard_ack;
-bool			client_dir_prediction;
+bool			dirPrediction;
 #ifdef _WINDOWS
 int			received_self = FALSE;
 #endif
@@ -2561,7 +2561,7 @@ int Send_pointer_move(int movement)
     old_tv = tv;
 #endif
 
-    if (client_dir_prediction) {
+    if (dirPrediction) {
 	pointer_moves[pointer_move_next].movement = movement;
 	pointer_moves[pointer_move_next].turnspeed = turnspeed;
 	pointer_moves[pointer_move_next].id = last_keyboard_change + 1;
@@ -2579,7 +2579,7 @@ int Send_pointer_move(int movement)
     if (Packet_printf(&wbuf, "%c%hd", PKT_POINTER_MOVE, movement) == -1)
 	return -1;
     
-    if (client_dir_prediction)
+    if (dirPrediction)
 	Net_key_change();	
     
     return 0;

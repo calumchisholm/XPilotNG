@@ -1860,7 +1860,7 @@ int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
     t.x = x;
     t.y = y;
     t.id = id;
-    if (client_dir_prediction && self && self->id == id)
+    if (dirPrediction && self && self->id == id)
         t.dir = predict_self_dir(dir);
     else
         t.dir = dir;

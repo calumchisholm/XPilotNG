@@ -483,22 +483,21 @@ static bool Set_showDecor(xp_option_t *opt, bool val)
     return true;
 }
 
-static bool Set_client_dir_prediction(xp_option_t *opt, bool val)
+static bool Set_dirPrediction(xp_option_t *opt, bool val)
 {
     UNUSED_PARAM(opt);
     if (val) {
-        if (!client_dir_prediction) {
+        if (!dirPrediction) {
 	    /* reset pointer movements */
             int m;
-            for (m=0; m < MAX_POINTER_MOVES; m++)
+            for (m = 0; m < MAX_POINTER_MOVES; m++)
                 pointer_moves[m].id = -1;
             pointer_move_next = 0;
             last_keyboard_ack = 0;
-	    client_dir_prediction = true;
+	    dirPrediction = true;
 	}
-    } else {
-        client_dir_prediction = false;
-    }
+    } else
+        dirPrediction = false;
     
     return true;
 }
@@ -810,13 +809,15 @@ xp_option_t default_options[] = {
 	"around it.  Note that this requires a fast graphics system.\n"),
 
     XP_BOOL_OPTION(
-	"clientDirPrediction",
+	"dirPrediction",
 	false,
-	&client_dir_prediction,
-	Set_client_dir_prediction,
+	&dirPrediction,
+	Set_dirPrediction,
 	XP_OPTFLAG_CONFIG_DEFAULT,
-	"Client paints the wanted direction of your ship instead of what the\n"
-	"server sent you. Possible differences are corrected in roundtrip time.\n"),
+	"Client paints the wanted direction of your ship instead of what\n"
+	"the server sent you. Possible differences are corrected in\n"
+	"roundtrip time.\n"),
+
     XP_BOOL_OPTION(
 	"showShipShapes",
 	true,
