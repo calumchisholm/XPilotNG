@@ -1542,34 +1542,37 @@ static void Tbox_hack(void)
 #endif
 
 
-/* !@# Should separate the 2 uses of this size.
-   1. include DITBLSZ closest lines or all closer than CUTOFF (whichever
-   is less) in the line table for this block.
-   2. maximum number of lines close to the block allowed without exit()
-   */
+/* Include NCLLIN - 1 closest lines or all closer than CUTOFF (whichever
+ * is less) in the line table for this block.
+ * Include all lines closer than DICLOSE, however many there are.
+ * If LINSIZE is not big enough for them all to fit in the allocated
+ * temporary memory, print error and exit.
+ */
 
-#define DICLOSE CLICK
-#define DITBLSZ (29 + 1)
+#define DICLOSE (5 * CLICK)
+#define LINSIZE 100
+#define NCLLIN (10 + 1)
 static void Distance_init(void)
 {
     int cx,cy;
     int *lineno, *dis;
     int lsx, lsy, ldx, ldy, temp, dist, n, i, bx, by, j, k;
     int base, height2, by2, width, height;
+    int distbound;
     unsigned short *lptr;
 
     /* max line delta 32767 */
 
     blockline = ralloc(NULL, mapx * mapy * sizeof(struct blockinfo));
-    llist = ralloc(NULL, mapx * mapy * DITBLSZ * sizeof(short));
-    lineno = ralloc(NULL, mapx * mapy * DITBLSZ * sizeof(int));
-    dis = ralloc(NULL, mapx * mapy * DITBLSZ * sizeof(int));
+    llist = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(short));
+    lineno = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
+    dis = ralloc(NULL, mapx * mapy * LINSIZE * sizeof(int));
     lptr = llist;
     for (bx = 0; bx < mapx; bx++)
 	for (by = 0; by < mapy; by++)
-	    for (i = 0; i < DITBLSZ; i++) {
-		dis[(by * mapx + bx) * DITBLSZ + i] = MAX_MOVE + B_CLICKS / 2;
-		lineno[(by * mapx + bx) * DITBLSZ +i] = 65535;
+	    for (i = 0; i < LINSIZE; i++) {
+		dis[(by * mapx + bx) * LINSIZE + i] = MAX_MOVE + B_CLICKS / 2;
+		lineno[(by * mapx + bx) * LINSIZE +i] = 65535;
 	    }
     for (i = 0; i < linec; i++) {
 	bx = linet[i].start.x;
@@ -1604,7 +1607,7 @@ static void Distance_init(void)
 	    for (by = by2, height = height2; height -- > 0; by = by == mapy - 1? 0 : by + 1) {
 		cx = bx * B_CLICKS + B_CLICKS / 2;
 		cy = by * B_CLICKS + B_CLICKS / 2;
-		base = (by * mapx + bx) * DITBLSZ;
+		base = (by * mapx + bx) * LINSIZE;
 		lsx = CENTER_XCLICK(linet[i].start.x - cx);
 		if (ABS(lsx) > 32767 + MAX_MOVE + B_CLICKS / 2)
 		    continue;
@@ -1652,13 +1655,17 @@ static void Distance_init(void)
 		dist--;
 		/* Room for one extra click of movement after main collision
 		   detection. Used to get away from a line after a bounce. */
-		if (dist < CUTOFF + B_CLICKS / 2)
-		    for (j = 1; j < DITBLSZ; j++) {
+		if (dist < CUTOFF + B_CLICKS / 2) {
+		    if (dist < B_CLICKS / 2 + DICLOSE)
+			distbound = LINSIZE;
+		    else
+			distbound = NCLLIN;
+		    for (j = 1; j < distbound; j++) {
 			if (dis[base + j] <= dist)
 			    continue;
 			k = dis[base + j];
 			n = j;
-			for (j++; j < DITBLSZ; j++)
+			for (j++; j < distbound; j++)
 			    if (dis[base + j] > k) {
 				k = dis[base + j];
 				n = j;
@@ -1669,6 +1676,7 @@ static void Distance_init(void)
 			lineno[base + n] = i;
 			goto stored;
 		    }
+		}
 		if (dist < dis[base + 0])
 		    dis[base + 0] = dist;
 		if (dist < B_CLICKS / 2 + DICLOSE) {
@@ -1681,7 +1689,7 @@ static void Distance_init(void)
 	}
     for (bx = 0; bx < mapx; bx++)
 	for (by = 0; by < mapy; by++) {
-	    base = (by * mapx + bx) * DITBLSZ;
+	    base = (by * mapx + bx) * LINSIZE;
 	    k = bx + mapx * by;
 	    blockline[k].distance = dis[base + 0] - B_CLICKS / 2;
 	    blockline[k].lines = lptr;
