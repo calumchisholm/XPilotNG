@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, generators
 
-KEEP_MAPDATA = 0
+KEEP_MAPDATA = 1
 
 # Requires python 2.2 or newer
 
@@ -137,6 +137,7 @@ REC_DL = 'w'
 REC_DR = 'q'
 WALL = FILLED + REC_UL + REC_UR + REC_DL + REC_DR
 ATTRACT = '$'
+
 BCLICKS = 35 * 64
 MAXLEN = 30000
 
@@ -591,12 +592,14 @@ def convert(options):
     bases = []
     balls = []
     fuels = []
+    cannons = []
     checks = [None] * 27  # 1 extra so it always ends with None
     BASES = '_0123456789'
     BALL = '*'
     FUEL = '#'
+    CANNONS = 'rdfc'
     CHECKPOINTS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    ALL = BASES + BALL + FUEL + CHECKPOINTS
+    ALL = BASES + BALL + FUEL + CHECKPOINTS + CANNONS
     for x, y in map.ncoords():
         block = map.data[y][x]
         if block not in ALL:
@@ -639,6 +642,13 @@ def convert(options):
 	    check.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
 	    check.loc = loc.copy()
 	    checks[ord(map[loc]) - ord('A')] = check
+        elif block in CANNONS:
+            cannon = Struct()
+            cannon.x = loc.x * BCLICKS + BCLICKS // 2
+            cannon.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS // 2
+            cannon.loc = loc.copy()
+            cannon.dir = 'frdc'.index(block) * 32
+            cannons.append(cannon)
     if not bases:
         print >>sys.stderr, "Map has no bases???"
         sys.exit(1)
@@ -662,6 +672,12 @@ def convert(options):
     else:
 	for fuel in fuels:
 	    fuel.team = -1
+    if options.get('teamcannons') in ['yes', 'on', 'true']: #default off
+	for cannon in cannons:
+	    cannon.team = closestteam(cannon.loc, bases)
+    else:
+	for cannon in cannons:
+	    cannon.team = -1
 
     print >> sys.stderr, "done."
     print >> sys.stderr, "Creating polygons:"
@@ -696,9 +712,11 @@ def convert(options):
     print '<Edgestyle id="xpbluehidden" width="-1" color="4E7CFF" style="0"/>'
     print '<Edgestyle id="xpredhidden" width="-1" color="FF3A27" style="0"/>'
     print '<Edgestyle id="yellow" width="2" color="FFFF00" style="0"/>'
+    print '<Edgestyle id="white" width="2" color="FFFFFF" style="0"/>'
     print '<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluehidden" flags="1"/>'
     print '<Polystyle id="xpred" color="FF3A27" defedge="xpredhidden" flags="1"/>'
     print '<Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>'
+    print '<Polystyle id="emptywhite" color="FF" defedge="white" flags="0"/>'
 
     def printedge(dx, dy, prevh, curh):
         if curh and not prevh:
@@ -764,6 +782,22 @@ def convert(options):
 	if not check:
 	    break
 	print '<Check x="%d" y="%d"/>' % (check.x, check.y)
+    for cannon in cannons:
+        offsets = ((-373, 0), (-747, 1120), (0, -2240), (747, 1120))
+        for i in range(cannon.dir // 32):
+            offsets = [(-y, x) for x, y in offsets]
+        cannon.x += offsets[0][0]
+        cannon.y += offsets[0][1]
+	print ('<Cannon x="%d" y="%d" dir="%d"' % \
+               (cannon.x, cannon.y, cannon.dir)),
+        sys.stdout.softspace = 0
+	if cannon.team != -1:
+	    print (' team="%d"' % cannon.team),
+	print '>\n<Polygon x="%d" y="%d" style="emptywhite">' % \
+              (cannon.x, cannon.y)
+        for x, y in offsets[1:]:
+            print '<Offset x="%d" y="%d"/>' % (x, y)
+        print '</Polygon></Cannon>'
     print "</XPilotMap>"
     print >> sys.stderr, "done."
 
