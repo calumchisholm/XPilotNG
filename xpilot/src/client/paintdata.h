@@ -37,11 +37,6 @@
 
 extern unsigned long	current_foreground;
 
-static inline void RESET_FG(void)
-{
-    current_foreground = -1;
-}
-
 static inline void SET_FG(unsigned long fg)
 {
     if (fg != current_foreground)
