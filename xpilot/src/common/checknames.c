@@ -21,23 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <ctype.h>
-
-#ifndef	_WINDOWS
-#include <unistd.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "commonproto.h"
-#include "const.h"
-#include "error.h"
-#include "pack.h"
-#include "checknames.h"
+#include "xpcommon.h"
 
 char checknames_version[] = VERSION;
 

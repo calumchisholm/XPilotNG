@@ -25,34 +25,7 @@
  * This file contains function wrappers around OS specific services.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-
-#if !defined(_WINDOWS)
-# include <unistd.h>
-# include <pwd.h>
-#endif
-
-#ifdef PLOCKSERVER
-# if defined(__linux__)
-#  include <sys/mman.h>
-# else
-#  include <sys/lock.h>
-# endif
-#endif
-
-#ifdef _WINDOWS
-# include <windows.h>
-# include <process.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "portability.h"
-#include "commonproto.h"
-
+#include "xpcommon.h"
 
 char portability_version[] = VERSION;
 

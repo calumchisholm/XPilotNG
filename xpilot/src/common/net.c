@@ -21,42 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/types.h>
-#include <time.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <netdb.h>
-#endif
-
-#ifdef __sgi
-# include <bstring.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winNet.h"
-# undef	va_start		/* there are bad versions in windows.h's "stdarg.h" */
-# undef	va_end
-# include <varargs.h>
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "net.h"
-#include "packet.h"
-#include "bit.h"
-#include "socklib.h"
+#include "xpcommon.h"
 
 char net_version[] = VERSION;
 

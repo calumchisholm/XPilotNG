@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -26,9 +25,7 @@
  * A double linked list similar to the STL list, but implemented in C.
  */
 
-#include <stdlib.h>
-
-#include "list.h"
+#include "xpcommon.h"
 
 /* store a list node. */
 struct ListNode {

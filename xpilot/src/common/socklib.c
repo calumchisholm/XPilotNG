@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -22,71 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <signal.h>
-#include <setjmp.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# ifdef _AIX
-#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
-# endif
-# include <sys/param.h>
-# include <sys/ioctl.h>
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <netinet/tcp.h>
-# include <arpa/inet.h>
-# include <netdb.h>
-#endif
-
-#ifdef SVR4
-# include <sys/filio.h>
-#endif
-
-#ifdef _SEQUENT_
-# include <sys/fcntl.h>
-#else
-# include <fcntl.h>
-#endif
-
-#ifdef __sun__
-# include <arpa/nameser.h>
-# include <resolv.h>
-#endif
-
-#ifdef _WINDOWS
-# include "NT/winNet.h"
-#include "../server/NT/winServer.h"
-  /* Windows needs specific system calls for sockets: */
-# undef close
-# define close(x__) closesocket(x__)
-# undef ioctl
-# define ioctl(x__, y__, z__) ioctlsocket(x__, y__, z__)
-# undef read
-# define read(x__, y__, z__) recv(x__, y__, z__,0)
-# undef write
-# define write(x__, y__, z__) send(x__, y__, z__,0)
-#endif
-
-#ifdef TERMNET
-/* support for running clients over term, but not servers please. */
-#include "termnet.h"
-#endif
-
-/* Socklib Includes And Definitions */
-#include "version.h"
-#include "socklib.h"
-#include "commonproto.h"
+#include "xpcommon.h"
 
 /* Debug macro */
 #ifdef DEBUG
@@ -99,8 +34,6 @@
 # define timerclear(tvp)   ((tvp)->tv_sec = (tvp)->tv_usec = 0)
 #endif
 
-
-
 #define SOCK_GETHOST_TIMEOUT	6
 
 
@@ -111,7 +44,8 @@ static jmp_buf		env;
 
 
 static struct hostent *sock_get_host_by_name(const char *name);
-static struct hostent *sock_get_host_by_addr(const char *addr, int len, int type);
+static struct hostent *sock_get_host_by_addr(const char *addr,
+					     int len, int type);
 
 
 static void sock_flags_add(sock_t *sock, unsigned bits)
@@ -141,7 +75,8 @@ static int sock_flags_test_any(sock_t *sock, unsigned bits)
 
 static int sock_set_error(sock_t *sock, int error, sock_call_t call, int line)
 {
-    DEB(printf("set error %d, %d, %d.  \"%s\"\n", error, call, line, strerror(error));)
+    DEB(printf("set error %d, %d, %d.  \"%s\"\n",
+	       error, call, line, strerror(error)));
 
     sock->error.error = error;
     sock->error.call = call;
@@ -392,11 +327,13 @@ int sock_open_tcp_connected_non_blocking(sock_t *sock, char *host, int port)
 	    return SOCK_IS_ERROR;
 	}
 
-	dest.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
+	dest.sin_addr.s_addr
+	    = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
     }
 
 #ifndef _WINDOWS
-    if (connect(sock->fd, (struct sockaddr *)&dest, sizeof(struct sockaddr_in)) < 0
+    if (connect(sock->fd, (struct sockaddr *)&dest,
+		sizeof(struct sockaddr_in)) < 0
 	&& errno != EINPROGRESS)
     {
 	sock_set_error(sock, errno, SOCK_CALL_CONNECT, __LINE__);
@@ -453,7 +390,8 @@ int sock_connect(sock_t *sock, char *host, int port)
 	    return SOCK_IS_ERROR;
 	}
 
-	dest.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
+	dest.sin_addr.s_addr
+	    = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
     }
 
     if (connect(sock->fd, (struct sockaddr *)&dest, sizeof(dest)) < 0) {
@@ -549,7 +487,8 @@ int sock_receive_any(sock_t *sock, char *buf, int len)
 	return SOCK_IS_ERROR;
     }
     addrlen = sizeof(struct sockaddr_in);
-    count = recvfrom(sock->fd, buf, len, 0, (struct sockaddr *)(sock->lastaddr), &addrlen);
+    count = recvfrom(sock->fd, buf, len, 0,
+		     (struct sockaddr *)(sock->lastaddr), &addrlen);
     if (count < 0) {
 	sock_set_error(sock, errno, SOCK_CALL_IO, __LINE__);
     }
@@ -570,13 +509,16 @@ int sock_send_dest(sock_t *sock, char *host, int port, char *buf, int len)
     if ((dest.sin_addr.s_addr & 0xFFFFFFFF) == 0xFFFFFFFF) {
 	errno = 0;
 	if ((hp = sock_get_host_by_name(host)) == NULL) {
-	    return sock_set_error(sock, errno, SOCK_CALL_GETHOSTBYNAME, __LINE__);
+	    return sock_set_error(sock, errno, SOCK_CALL_GETHOSTBYNAME,
+				  __LINE__);
 	}
 
-	dest.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
+	dest.sin_addr.s_addr
+	    = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
     }
 
-    count = sendto(sock->fd, buf, len, 0, (struct sockaddr *) &dest, sizeof(dest));
+    count = sendto(sock->fd, buf, len, 0,
+		   (struct sockaddr *) &dest, sizeof(dest));
     if (count < 0) {
 	sock_set_error(sock, errno, SOCK_CALL_IO, __LINE__);
     }
@@ -642,7 +584,8 @@ void sock_get_local_hostname(char *name, unsigned size,
 	&& he->h_addrtype == AF_INET) {
 	struct in_addr in;
 	memcpy((void *)&in, he->h_addr_list[0], sizeof(in));
-	if ((he = sock_get_host_by_addr((char *)&in, sizeof(in), AF_INET)) != NULL
+	if ((he = sock_get_host_by_addr((char *)&in, sizeof(in), AF_INET))
+	    != NULL
 	    && strchr(he->h_name, '.') != NULL) {
 	    strlcpy(name, he->h_name, size);
 	}
@@ -728,7 +671,8 @@ int sock_get_error(sock_t *sock)
     int			error;
     int			size = sizeof(error);
 
-    if (getsockopt(sock->fd, SOL_SOCKET, SO_ERROR, (void *)&error, &size) < 0) {
+    if (getsockopt(sock->fd, SOL_SOCKET, SO_ERROR,
+		   (void *)&error, &size) < 0) {
 	sock_set_error(sock, errno, SOCK_CALL_GETSOCKOPT, __LINE__);
 	return SOCK_IS_ERROR;
     }
@@ -850,7 +794,8 @@ static struct hostent *sock_get_host_by_name(const char *name)
         chp, MAXGETHOSTSTRUCT);
     
     for(i = 0; i < SOCK_GETHOST_TIMEOUT; i++) {
-        if (PeekMessage(&msg, NULL, WM_GETHOSTNAME, WM_GETHOSTNAME, PM_REMOVE)) {
+        if (PeekMessage(&msg, NULL, WM_GETHOSTNAME,
+			WM_GETHOSTNAME, PM_REMOVE)) {
             return (WSAGETASYNCERROR(msg.lParam)) ? NULL : hp;
         }
         Sleep(1000);
@@ -861,7 +806,8 @@ static struct hostent *sock_get_host_by_name(const char *name)
 #endif
 }
 
-static struct hostent *sock_get_host_by_addr(const char *addr, int len, int type)
+static struct hostent *sock_get_host_by_addr(const char *addr,
+					     int len, int type)
 {
 #ifndef _WINDOWS
 

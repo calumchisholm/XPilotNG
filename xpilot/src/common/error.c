@@ -1,5 +1,4 @@
 /* 
- *
  * Adapted from 'The UNIX Programming Environment' by Kernighan & Pike
  * and an example from the manualpage for vprintf by
  * Gaute Nessan, University of Tromsoe (gaute@staff.cs.uit.no).
@@ -7,42 +6,7 @@
  * Modified by Bjoern Stabell <bjoern@xpilot.org>.
  * Windows mods and memory leak detection by Dick Balaska <dick@xpilot.org>.
  */
-
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-
-#if defined(_WINDOWS)
-#	ifdef	_XPILOTNTSERVER_
-#		include "../server/NT/winServer.h"
-		extern char *showtime(void);
-#	elif !defined(_XPMONNT_)
-#		include "NT/winX.h"
-#		include "../client/NT/winClient.h"
-#	endif
-	static void Win_show_error(char *errmsg);
-#endif
-
-#include "version.h"
-#include "xpconfig.h"
-#include "const.h"
-#include "error.h"
-#include "portability.h"
-#include "commonproto.h"
-
-
-#undef HAVE_STDARG
-#undef HAVE_VARARG
-#ifndef _WINDOWS
-# if (defined(__STDC__) && !defined(__sun__) || defined(__cplusplus))
-#  define HAVE_STDARG 1
-# else
-#  define HAVE_VARARG 1
-# endif
-#endif
-
+#include "xpcommon.h"
 
 char error_version[] = VERSION;
 
@@ -284,26 +248,28 @@ static void Win_show_error(char *s)
 {
     static int inerror = FALSE;
     IFWINDOWS( Trace("Error: %s\n", s) );
-    if (inerror) return;
+    if (inerror)
+	return;
     inerror = TRUE;
     {
-#       ifdef   _XPILOTNTSERVER_
+#ifdef   _XPILOTNTSERVER_
 	/* putting up a message box on the server is a bad thing.
 	   It kinda halts the server, which is a bad thing to do for
 	   the simple info messages (nick in use) that call this routine
 	*/
 	xpprintf("%s %s\n", showtime(), s);
-#       else
-	if (MessageBox(NULL, s, "Error", MB_OKCANCEL | MB_TASKMODAL) == IDCANCEL)
-	{
-#           ifdef   _XPMON_
-		xpmemShutdown();
-#           endif
+#else
+	if (MessageBox(NULL, s, "Error", MB_OKCANCEL | MB_TASKMODAL)
+	    == IDCANCEL) {
+# ifdef   _XPMON_
+	    xpmemShutdown();
+# endif
 	    ExitProcess(1);
 	}
-	inerror = FALSE;
-#       endif
+#endif
     }
+    /* kps - moved out from ifdef block, seems to be a better idea. */
+    inerror = FALSE;
 }
 
 

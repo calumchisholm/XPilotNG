@@ -21,18 +21,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
-#include "version.h"
-#include "xpconfig.h"
-
-#ifdef _WINDOWS
-/* #include "NT/winClient.h" */
-/* #include "NT/winAudio.h" */
-#endif /* _WINDOWS */
-
+#include "xpcommon.h"
 
 /*
  * Configure these, that's what they're here for.
