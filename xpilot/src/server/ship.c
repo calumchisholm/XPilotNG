@@ -65,10 +65,10 @@ void Thrust(player *pl)
 	/* status         */ GRAVITY | OWNERIMMUNE,
 	/* color          */ RED,
 	/* radius         */ 8,
-	/* num debris     */ (tot_sparks-alt_sparks) + rfrac(),
+	/* num debris     */ (int)((tot_sparks-alt_sparks) + rfrac()),
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3, max_life
+	/* min,max life   */ 3.0, max_life
 	);
 
     Make_debris(
@@ -81,10 +81,10 @@ void Thrust(player *pl)
 	/* status         */ GRAVITY | OWNERIMMUNE,
 	/* color          */ BLUE,
 	/* radius         */ 8,
-	/* num debris     */ alt_sparks + rfrac(),
+	/* num debris     */ (int)(alt_sparks + rfrac()),
 	/* min,max dir    */ min_dir, max_dir,
 	/* min,max speed  */ 1.0, max_speed,
-	/* min,max life   */ 3, max_life
+	/* min,max life   */ 3.0, max_life
 	);
 }
 
@@ -175,7 +175,7 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
 
     force = MIN(force, 10);
 
-    obj_theta = (int)findDir(xd, yd);
+    obj_theta = findDir(xd, yd);
 
     dm = obj1->mass / obj2->mass;
     dvx2 = tcos(obj_theta) * force * dm;
@@ -433,7 +433,7 @@ void Tank_handle_detach(player *pl)
 	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, dummy->id);
 	    Send_score(pl_i->conn, dummy->id,
-		       dummy->score, dummy->life,
+		       dummy->score, (int)dummy->life,
 		       dummy->mychar, dummy->alliance);
 	}
     }
@@ -441,7 +441,7 @@ void Tank_handle_detach(player *pl)
     for (i = 0; i < NumObservers - 1; i++) {
 	Send_player(Players(i + observerStart)->conn, dummy->id);
 	Send_score(Players(i + observerStart)->conn, dummy->id, dummy->score,
-		   dummy->life, dummy->mychar, dummy->alliance);
+		   (int)dummy->life, dummy->mychar, dummy->alliance);
     }
 }
 
@@ -577,10 +577,10 @@ void Explode_fighter(player *pl)
 	/* status         */ GRAVITY,
 	/* color          */ RED,
 	/* radius         */ 8,
-	/* num debris     */ min_debris + debris_range * rfrac(),
+	/* num debris     */ (int)(min_debris + debris_range * rfrac()),
 	/* min,max dir    */ 0, RES-1,
-	/* min,max speed  */ 20.0, 20 + (((int)(pl->mass))>>1),
-	/* min,max life   */ 5, 5 + (pl->mass * 1.5)
+	/* min,max speed  */ 20.0, 20.0 + pl->mass * 0.5,
+	/* min,max life   */ 5.0, 5.0 + pl->mass * 1.5
 	);
 
     if (!BIT(pl->status, KILLED))
@@ -597,8 +597,8 @@ void Explode_fighter(player *pl)
 	/* color            */ WHITE,
 	/* max wreckage     */ 10,
 	/* min,max dir      */ 0, RES-1,
-	/* min,max speed    */ 10.0, 10 + (((int)(pl->mass))>>1),
-	/* min,max life     */ 5,5 + (pl->mass * 1.5)
+	/* min,max speed    */ 10.0, 10.0 + pl->mass * 0.5,
+	/* min,max life     */ 5.0, 5.0 + pl->mass * 1.5
 	);
 
 }
