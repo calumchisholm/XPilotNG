@@ -1736,28 +1736,29 @@ void Update_missile(missileobject *shot)
 	    if (xi < 0 || xi >= world->x || yi < 0 || yi >= world->y)
 		break;
 
-	    /* kps - fix */
-	    if (!is_polygon_map) {
-		switch(world->block[xi][yi]) {
-		case TARGET:
-		case TREASURE:
-		case FUEL:
-		case FILLED:
-		case REC_LU:
-		case REC_RU:
-		case REC_LD:
-		case REC_RD:
-		case CANNON:
-		    if (range
-			> (SMART_SHOT_LOOK_AH-i)*(BLOCK_SZ/BLOCK_PARTS)) {
-			if (shot_speed > SMART_SHOT_MIN_SPEED)
-			    shot_speed -= acc * (SMART_SHOT_DECFACT+1);
-		    }
-		    foundw = 1;
-		    break;
-		default:
-		    break;
+	    /*
+	     * kps -
+	     * Someone please write polygon based missile navigation code.
+	     */
+
+	    switch(world->block[xi][yi]) {
+	    case TARGET:
+	    case TREASURE:
+	    case FUEL:
+	    case FILLED:
+	    case REC_LU:
+	    case REC_RU:
+	    case REC_LD:
+	    case REC_RD:
+	    case CANNON:
+		if (range > (SMART_SHOT_LOOK_AH-i)*(BLOCK_SZ/BLOCK_PARTS)) {
+		    if (shot_speed > SMART_SHOT_MIN_SPEED)
+			shot_speed -= acc * (SMART_SHOT_DECFACT+1);
 		}
+		foundw = 1;
+		break;
+	    default:
+		break;
 	    }
 	}
 
@@ -1772,26 +1773,27 @@ void Update_missile(missileobject *shot)
 		xt = xi + sur[(i+j+si)&7].dx;
 		yt = yi + sur[(i+j+si)&7].dy;
 
-		if (xt >= 0 && xt < world->x && yt >= 0 && yt < world->y)
-		    if (!is_polygon_map) {
-			switch (world->block[xt][yt]) {
-			case TARGET:
-			case TREASURE:
-			case FUEL:
-			case FILLED:
-			case REC_LU:
-			case REC_RU:
-			case REC_LD:
-			case REC_RD:
-			case CANNON:
-			    if (!si)
-				k = -32;
-			    break;
-			default:
-			    ++k;
-			    break;
-			}
+		if (xt >= 0 && xt < world->x && yt >= 0 && yt < world->y) {
+
+		    switch (world->block[xt][yt]) {
+		    case TARGET:
+		    case TREASURE:
+		    case FUEL:
+		    case FILLED:
+		    case REC_LU:
+		    case REC_RU:
+		    case REC_LD:
+		    case REC_RD:
+		    case CANNON:
+			if (!si)
+			    k = -32;
+			break;
+		    default:
+			++k;
+			break;
 		    }
+		}
+		
 	    }
 	    if (k > freemax
 		|| (k == freemax
