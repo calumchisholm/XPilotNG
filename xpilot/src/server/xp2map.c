@@ -391,7 +391,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 	    attr += 2;
 	}
-	/*Map_place_...(cx, cy, force, type);*/
+	Map_place_wormhole(cx, cy, type);
 	return;
     }
 
