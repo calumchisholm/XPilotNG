@@ -389,14 +389,9 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     x = SCALEX(x);
     y = SCALEY(y);
 
-    if (other) {
-	if (other->name_width == 0) {
-	    other->name_len = strlen(other->id_string);
-	    other->name_width =
-		2 + XTextWidth(gameFont, other->id_string,
-			       other->name_len);
-	}
-    }
+    if (other)
+	FIND_NAME_WIDTH(other);
+
     if (BIT(Setup->mode, TEAM_PLAY)) {
 	s[0] = '0' + team;
 	if (other) {

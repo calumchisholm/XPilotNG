@@ -112,7 +112,7 @@ static inline void FIND_NAME_WIDTH(other_t *other)
 	if (maxCharsInNames >= 0 && maxCharsInNames < len)
 	    other->id_string[maxCharsInNames] = '\0';
 	other->name_len = strlen(other->id_string);                 
-        other->name_width
+	other->name_width
 	    = 2 + XTextWidth(gameFont, other->id_string, other->name_len);
 	other->max_chars_in_names = maxCharsInNames;
     }
