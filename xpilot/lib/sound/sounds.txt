@@ -1,4 +1,4 @@
-afterburner_pickup		waiting.wav
+heyafterburner_pickup		waiting.wav
 armor_pickup			waiting.wav
 asteroid_hit			failure.wav
 asteroid_break			popclick.wav
@@ -73,7 +73,7 @@ tank_detach 			launch1.18.wav
 tank_pickup 			waiting.wav
 #team_draw				gong.au
 #team_win				whistle.au
-thrust					zap.wav,0.01
+thrust					thrust.wav,0.05,1
 #tractor_beam			beep_robotic.au
 tractor_beam_pickup 	waiting.wav
 transporter_fail		buzzer.wav
