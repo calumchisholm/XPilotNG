@@ -1334,17 +1334,19 @@ void Update_objects(void)
 	    }
 	}
 
-	/* kps - if FPS changes, this doesn't work quite right */
-	if (options.maxPauseTime > 0
-	    && Player_is_human(pl)
-	    && BIT(pl->status, PAUSE)
-	    && frame_loops - pl->frame_last_busy
-	    > options.maxPauseTime * FPS) {
-	    sprintf(msg, "%s was auto-kicked for pausing too long "
-		    "[*Server notice*]", pl->name);
-	    Set_message(msg);
-	    Destroy_connection(pl->conn, "auto-kicked: paused too long");
+	if (BIT(pl->status, PAUSE)) {
+	    pl->pauseTime += timePerFrame;
+	    if (Player_is_human(pl)
+		&& options.maxPauseTime > 0
+		&& pl->pauseTime > options.maxPauseTime) {
+		sprintf(msg, "%s was auto-kicked for pausing too long "
+			"[*Server notice*]", pl->name);
+		Set_message(msg);
+		Destroy_connection(pl->conn, "auto-kicked: paused too long");
+	    }
 	}
+	else
+	    pl->pauseTime = 0;
     }
 
 #if 0

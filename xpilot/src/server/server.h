@@ -109,6 +109,7 @@ extern int		roundsPlayed;
 extern long		KILLING_SHOTS;
 extern unsigned		SPACE_BLOCKS;
 extern double		timeStep;
+extern double		timePerFrame;
 extern double		ecmSizeFactor;
 extern char		*playerPasswordsFileName;
 extern int		playerPasswordsFileSizeLimit;

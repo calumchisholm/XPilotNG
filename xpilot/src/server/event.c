@@ -198,19 +198,26 @@ void Pause_player(player_t *pl, bool on)
 	CLR_BIT(pl->status, PLAYING);
 	Player_self_destruct(pl, false);
 	SET_BIT(pl->status, PAUSE);
+	/* kps - can this happen ??? */
+	if (pl->pauseTime != 0)
+	    warn("Pause_player: pl pausetime was != 0 (%.3f)", pl->pauseTime);
+	pl->pauseTime = 0;
 	if (options.baselessPausing) {
 	    world->teams[pl->team].NumMembers--;
 	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
 		player_t *pl_i = Players(i);
+
 		if (pl_i->conn != NULL) {
 		    Send_base(pl_i->conn, -1, pl->home_base->ind);
 		    Send_team(pl_i->conn, pl->id, 0);
 		}
 	    }
 	    for (i = spectatorStart; i < spectatorStart + NumSpectators; i++) {
-		Send_base(Players(i)->conn, -1, pl->home_base->ind);
-		Send_team(Players(i)->conn, pl->id, 0);
+		player_t *pl_i = Players(i);
+
+		Send_base(pl_i->conn, -1, pl->home_base->ind);
+		Send_team(pl_i->conn, pl->id, 0);
 	    }
 	    pl->home_base = NULL;
 	}

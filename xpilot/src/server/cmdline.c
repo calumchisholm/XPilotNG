@@ -45,6 +45,7 @@ int		roundsPlayed;		/* # of rounds played sofar. */
 extern char	conf_logfile_string[];	/* Default name of log file */
 
 double		timeStep;		/* Game time step per frame */
+double		timePerFrame;		/* Real time elapsed per frame */
 double		ecmSizeFactor;		/* Factor for ecm size update */
 struct options options;
 
@@ -3692,6 +3693,11 @@ void Timing_setup(void)
      * Calculate amount of game time that elapses per frame.
      */
     timeStep = options.gameSpeed / FPS;
+
+    /*
+     * Calculate amount of real time that elapses per frame.
+     */
+    timePerFrame = 1.0 / FPS;
 
     /*
      * EXPERIMENTAL FEATURE:
