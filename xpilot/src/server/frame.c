@@ -380,9 +380,12 @@ static int Frame_status(connection_t *conn, player_t *pl)
 	    && (options.playersOnRadar
 		|| clpos_inview(&cv, lock_pl->pos))
 	    && pl->lock.distance != 0) {
+	    double a;
+
 	    SET_BIT(pl->lock.tagged, LOCK_VISIBLE);
-	    lock_dir = (int)Wrap_cfindDir(lock_pl->pos.cx - pl->pos.cx,
-					  lock_pl->pos.cy - pl->pos.cy);
+	    a = Wrap_cfindDir(lock_pl->pos.cx - pl->pos.cx,
+			      lock_pl->pos.cy - pl->pos.cy);
+	    lock_dir = (int) a;
 	    lock_dist = (int)pl->lock.distance;
 	}
     }
