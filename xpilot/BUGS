@@ -84,6 +84,16 @@ Files
 affected:
 
 -----------------------------------------------------------------
+Problem : score/ranking is case sensitive, the test, if a player is
+          already in the game is not i.e. Banzai and BanZai cannot play at the
+          same time, but get different scores
+Found by: Throat
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
 Problem :
 Found by:
 Solution:
