@@ -1,3 +1,481 @@
+2004-04-25 01:16  kps
+
+	* doc/man/: xpilot-ng-sdl.man, xpilot-ng-x11.man: defaults changed,
+	  receivewindowsize option disabled.
+
+2004-04-25 01:03  kps
+
+	* src/client/: default.c, netclient.c, option.c, option.h,
+	  xdefault.c: Define flag for options that shall not be saved in
+	  xpilotrc if they don't exist there from before
+	  (XP_OPTFLAG_NO_SAVE).  Save options in xpilotrc that wasn't in
+	  xpilotrc at start and which originate in defaults, config menu or
+	  set command.	Fixed saving of geometry in X11 client.
+
+2004-04-24 23:21  maximan
+
+	* src/client/sdl/: sdlgui.c, sdlinit.c, text.c, text.h: tweaks, and
+	  fixes... new options gameFontSize, mapFontSize, they don't change
+	  during session however.
+
+	  /virus
+
+2004-04-24 22:12  kps
+
+	* src/client/: event.c, talkmacros.c: Esc is quit now. Added more
+	  newbie messages.
+
+2004-04-24 21:50  kps
+
+	* src/client/sdl/sdlgui.c: Paint newbie help with white.
+
+2004-04-24 20:56  kps
+
+	* src/client/event.c: Added newbie message that mouse steering is
+	  superior.
+
+2004-04-24 20:46  kps
+
+	* src/client/event.c: Put kbd steering on arrow keys.  Added
+	  message which is printed if newbie option is true "Mouse steering
+	  enabled. Press space to disable it." when enabling pointer
+	  control.
+
+2004-04-24 20:35  kps
+
+	* src/client/default.c: Default turnspeed is now 16.
+
+2004-04-24 20:34  kps
+
+	* src/client/: client.h, messages.c, painthud.c: Added
+	  Add_newbie_message function.
+
+2004-04-24 20:31  kps
+
+	* src/client/guimap.c: Use loopsSlow when painting some textured
+	  objects.
+
+2004-04-24 19:52  darelcullen
+
+	* src/client/sdl/sdlinit.c: quick kludge to prevent a crash with no
+	  make install
+
+2004-04-24 15:07  kps
+
+	* doc/man/: xpilot-ng-sdl.man, xpilot-ng-x11.man: Option
+	  pointerControl was removed. Don't print default localguru to man
+	  page.
+
+2004-04-24 15:06  kps
+
+	* src/: client/xpilot.c, common/config.c, common/xpconfig.h:
+	  Removed Conf_contactaddress() because it was unused. Made default
+	  localguru to be PACKAGE_BUGREPORT.
+
+2004-04-24 14:01  kps
+
+	* src/client/option.c: Removed some unused code.
+
+2004-04-24 13:15  juhal
+
+	* src/client/sdl/sdlinit.c: font initialization failure is
+	  considered fatal i.e. client refuses to start if fonts are not
+	  properly initiailzed
+
+2004-04-24 12:41  kps
+
+	* src/client/default.c: Remove pointerControl option. It only
+	  worked in X11 client if connecting to server with text interface.
+	  Easier to just press the keyPointerControl to enable mouse
+	  steering.
+
+2004-04-24 12:03  kps
+
+	* src/client/option.c: Added Xpilotrc_write_line function, fixed
+	  bug in xpilotrc parse line.
+
+2004-04-23 20:51  kps
+
+	* src/client/: option.c, option.h: Store option origin in option
+	  structure.
+
+2004-04-23 19:02  kps
+
+	* src/client/option.c: Added function
+	  Option_default_value_to_string().
+
+2004-04-23 16:09  kps
+
+	* src/client/option.c: Tell for which option value wasn't given.
+
+2004-04-23 15:55  kps
+
+	* src/client/option.c: Slightly improved xpilotrc parsing which
+	  stores comments and unknown options.
+
+2004-04-23 12:44  kps
+
+	* Makefile.in, doc/man/xpilot-ng-sdl.man,
+	  doc/man/xpilot-ng-server.man, doc/man/xpilot-ng-x11.man:
+	  Generated new files with automake 1.8.3-3 and new man pages.
+
+2004-04-22 23:44  kps
+
+	* src/client/option.c: Fix warnings. Boolean options are now "yes"
+	  and "no" when turned to strings.
+
+2004-04-22 23:43  kps
+
+	* src/client/colors.c: Updated maxColors help text.
+
+2004-04-22 21:31  kps
+
+	* src/client/: client.h, default.c, messages.c, painthud.c,
+	  sdl/sdlgui.c: Hardcode ballMsgScan and mapRadar to true.
+
+2004-04-22 20:42  kps
+
+	* src/: client/client.h, client/default.c, client/messages.c,
+	  client/paint.h, client/painthud.c, client/talk.c, client/talk.h,
+	  client/NT/wintalk.c, client/sdl/console.c,
+	  client/sdl/glwidgets.c, client/sdl/sdlgui.c, server/target.c:
+	  Removed reverseScroll option.
+
+2004-04-22 18:51  kps
+
+	* src/client/: about.c, xeventhandlers.c: Added an about page for
+	  XPilot NG, about buttons painted in buttonColor.
+
+2004-04-22 14:51  kps
+
+	* src/client/: about.c, client.c, client.h, default.c, xinit.h:
+	  Removed useless option autoServerMotdPopup.  Change non-uppercase
+	  letter chars in nick name to 'X', instead of exiting.
+
+2004-04-22 14:14  kps
+
+	* src/client/xdefault.c: Indent some code, fix warnings.
+
+2004-04-22 13:59  kps
+
+	* src/client/: welcome.c, textinterface.c: Search for XPilot
+	  servers, not for "xpilots". Program is XPilot NG, not improved
+	  xpilot.
+
+2004-04-22 13:55  kps
+
+	* src/client/: client.h, xpilot.c, sdl/main.c: Program_name()
+	  returns const char * now.
+
+2004-04-21 19:32  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h: ColorChooserWidgets
+	  now shrink back into their oneline version if you click the
+	  button again (the one right of the name of the color)
+
+	  /virus
+
+2004-04-21 11:39  kps
+
+	* src/client/: default.c, option.c: Moved defaultCleanup to
+	  default.c, get rid of "Boring..." client reply in set command.
+
+2004-04-21 11:36  kps
+
+	* src/client/caudio.c: Use XFREE macro where appropriate.
+
+2004-04-21 10:56  kps
+
+	* src/server/robotdef.c: Handle some more items in Rank_item_value
+	  during racemode.
+
+2004-04-21 00:03  kps
+
+	* src/server/robotdef.c: Handle mirror item in Rank_item_value
+	  during racemode.
+
+2004-04-20 23:55  kps
+
+	* src/server/xpmap.c: Improved poly to block conversion for maps
+	  with no mapdata.  Conversion tries to make it so that there is
+	  not invisible walls, that is it covers the polygon walls in the
+	  map with filled and diagonal blocks in such a way that there is
+	  no polygon wall part that is outside a block wall.
+
+2004-04-20 22:18  kps
+
+	* src/server/xpmap.c: Moved code creating block approximation of
+	  polygon map to function Create_blockmap_from_polygons.
+
+2004-04-20 20:56  kps
+
+	* src/client/clientcommand.c: Removed some unecessary stuff.
+
+2004-04-20 20:52  kps
+
+	* src/client/: client.c, client.h, clientcommand.c,
+	  clientcommand.h, netclient.c, option.c: Make client not crash on
+	  commands \set or \get (without argument).  Other trivial changes.
+
+2004-04-20 20:50  kps
+
+	* src/client/textinterface.c: Removed unused variable 'max_robots'.
+
+2004-04-20 15:55  kps
+
+	* src/client/talk.c: "crash in talk history" bugfix by C R Johnson
+	  (Cluster).
+
+	  "Up-arrow history for talk causes a crash in 454 and ng ( and
+	  maybe xp5) on linux with some fonts because XTextWidth may return
+	  zero.  For example I use the SGI habefix  font on linux and it
+	  causes this."
+
+2004-04-20 13:31  kps
+
+	* src/client/option.c: Limit value to range [min, max] instead of
+	  setting default value for int and double options, when setting
+	  them with client \set command.  Removed some old unused code.
+
+2004-04-19 20:46  kps
+
+	* README, configure, configure.ac, src/common/version.h: Version is
+	  now 4.6.2 due to format string problem in 4.6.1 (and late
+	  snapshots of 4.6.0). Failure to find X now results in a fatal
+	  error in configure.
+
+2004-04-19 19:27  kps
+
+	* src/server/: rank.c, rank.h: Added copyright infos.
+
+2004-04-19 19:26  kps
+
+	* src/server/cmdline.c: Added help text to explain resetting of
+	  ranking.
+
+2004-04-19 18:27  kps
+
+	* doc/README.rank: Updated for recent versions of XPilot NG. Added
+	  Marcus Sundberg's changelog.
+
+2004-04-19 14:01  kps
+
+	* src/server/collision.c: In_range help functions are now inline.
+	  Use Set_message_f in some places.
+
+2004-04-19 13:29  kps
+
+	* src/server/player.c: Use Set_message_f in some places.
+
+2004-04-19 12:05  kps
+
+	* src/server/: contact.c, frame.c, laser.c, netserver.c, robot.c,
+	  server.h, target.c, treasure.c, update.c: Fix formatting string
+	  related bug.	Set_message and Set_player_message now works as
+	  before, they don't take a format string. Set_message_f and
+	  Set_player_message_f take a format string.  Note that the format
+	  string must always be specifed in the code, that is the user
+	  should never be allowed to specify the format string, which can
+	  happen in a call like this: Set_message_f(msg);
+
+2004-04-15 19:17  maximan
+
+	* src/client/sdl/: sdlinit.c, sdlpaint.c: hardly noticable bugs
+	  fixed
+
+2004-04-15 13:58  kps
+
+	* BUGS: more explanations about throat's shotsize problem
+
+2004-04-15 13:53  kps
+
+	* src/server/wormhole.c: Assertion that wormhole hitfunction would
+	  never be called for out wormholes was apparently wrong.
+	  Hitfunction now returns false (no hit) always for out wormholes.
+
+2004-04-15 13:51  kps
+
+	* BUGS: Throat says shotsize works wrong with texturedObjects.
+
+2004-04-15 12:26  kps
+
+	* README, configure, configure.ac, doc/man/xpilot-ng-sdl.man,
+	  doc/man/xpilot-ng-server.man, doc/man/xpilot-ng-x11.man,
+	  src/common/version.h: XPilot NG version is now 4.6.1.  -SDL
+	  client is more stable -server generates block map data from
+	  polygons and map objects -polybloods map doesn't contain block
+	  map data any more (version of it is 8.1)
+
+2004-04-15 12:08  kps
+
+	* lib/maps/polybloods.xp2: Removed block mapdata (server can
+	  generate it). Version is now 8.1.
+
+2004-04-15 12:04  kps
+
+	* src/server/xpmap.c: Look at 9 points instead of 1 for each block
+	  when looking for balltargets in the polymap -> blockmap
+	  conversion.
+
+2004-04-15 11:25  kps
+
+	* src/server/xpmap.c: Put treasure boxes in block map data in
+	  places where there is a balltarget in the polygon map data.
+
+2004-04-15 10:07  kps
+
+	* src/client/sdl/sdlkeys.c: Added keys Print, Prior, Next,
+	  KP_Insert, KP_Delete to sdlkeys array.  Changed Down to be
+	  SDLK_DOWN (was SDLK_HOME for some reason).
+
+2004-04-15 10:04  kps
+
+	* src/client/event.c: Removed use of Linefeed and Select as default
+	  keys.  Added code to print out keysyms (code disabled with #if
+	  0).
+
+2004-04-15 01:06  maximan
+
+	* src/client/sdl/sdlgui.c: bugfix
+
+2004-04-14 23:35  kps
+
+	* src/client/option.c: Allow writing "none" (case insensitively) in
+	  xpilotrc for keys that should be disabled. E.g. if you want no
+	  keyTurnLeft you can write in xpilotrc xpilot.keyTurnLeft: None
+	  Removed "could not find option blah blah" warning.
+
+2004-04-14 23:33  kps
+
+	* src/client/default.c: Disabled some unnecessary warnings.
+
+2004-04-14 22:59  kps
+
+	* Makefile.in: new version of automake
+
+2004-04-14 19:32  maximan
+
+	* src/client/sdl/glwidgets.c: bugfixes
+
+2004-04-14 19:28  kps
+
+	* src/server/walls.c: Reduced DISIZE to 350. This seems to be
+	  enough even for a 100x100 block map filled with tragets.
+
+2004-04-14 19:21  maximan
+
+	* src/client/sdl/glwidgets.c: [no log message]
+
+2004-04-14 19:17  maximan
+
+	* src/client/sdl/: SDL_console.c, glwidgets.c, images.c, sdlgui.c:
+	  bugfixes
+
+2004-04-14 18:58  kps
+
+	* src/server/: map.c, server.h, xpmap.c: Slightly better polygon to
+	  block map conversion for xp2 maps with no mapdata option.
+
+2004-04-14 14:37  kps
+
+	* src/server/robotdef.c: Explicitly handle wideangle item in race
+	  mode in Rank_item_value().
+
+2004-04-14 11:25  kps
+
+	* doc/man/: xpilot-ng-replay.man, xpilot-ng-sdl.man,
+	  xpilot-ng-server.man, xpilot-ng-x11.man: Update after remove of
+	  server option roundDelay.
+
+2004-04-14 11:15  kps
+
+	* src/server/: cmdline.c, collision.c, event.c, frame.c,
+	  netserver.c, netserver.h, player.c, robot.c, server.h, update.c:
+	  Removed option roundDelaySeconds aka roundDelay.
+
+2004-04-13 21:53  kps
+
+	* src/server/laser.c: Use improved Set_message().
+
+2004-04-13 21:29  kps
+
+	* src/server/contact.c: Use improved Set_message().
+
+2004-04-13 20:32  maximan
+
+	* src/client/sdl/: glwidgets.c, sdlevent.c, sdlgui.c: [no log
+	  message]
+
+2004-04-13 17:59  kps
+
+	* src/server/shot.c: Ugly hacks to fix segfaults, since
+	  Player_by_id() can return NULL.
+
+2004-04-13 17:51  kps
+
+	* src/server/robot.c: Use improved Set_message().
+
+2004-04-13 15:24  darelcullen
+
+	* src/client/sdl/xpilot.rc: Add an .rc file to give an icon and
+	  other stuff if we want oit
+
+2004-04-13 15:24  kps
+
+	* src/server/treasure.c: Use improved Set_message().
+
+2004-04-13 15:17  kps
+
+	* src/server/target.c: Use improved Set_message().
+
+2004-04-13 14:32  kps
+
+	* src/server/: frame.c, update.c: Use improved Set_message in
+	  update.c, make message arrays static in frame.c.
+
+2004-04-13 14:18  kps
+
+	* src/server/: frame.c, server.h: Set_message and
+	  Set_player_message now uses printf style argument list.
+
+2004-04-13 12:19  kps
+
+	* src/server/: server.h, shot.c, update.c: Disabled an assert in
+	  update.c. Added world argument to some update functions.
+
+2004-04-12 19:49  darelcullen
+
+	* BUGS: undo bug
+
+2004-04-12 18:58  juhal
+
+	* src/client/sdl/sdlgui.c: added support for wreckage
+
+2004-04-12 17:09  darelcullen
+
+	* doc/xpilot-ng-sdl.spec: sdl textures have their own subdir now..
+
+2004-04-12 16:40  darelcullen
+
+	* doc/xpilot-ng-sdl.spec: updates
+
+2004-04-12 12:58  darelcullen
+
+	* doc/: xpilot-ng-sdl.spec, xpilot-ng-x11.spec: Updates to spec
+	  file
+
+2004-04-12 12:10  darelcullen
+
+	* doc/xpilot-4.5.4-x2.spec: removed. not needed anymore
+
+2004-04-12 12:00  darelcullen
+
+	* ChangeLog: Updated ChangeLog
+
+2004-04-12 11:59  darelcullen
+
+	* BUGS: bug report
+
 2004-04-12 11:32  darelcullen
 
 	* doc/xpilot-ng-x11.spec: Add an ng x11 target rpm
