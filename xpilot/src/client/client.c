@@ -1039,9 +1039,9 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 {
     other_t		*other;
 
-    if ((BIT(Setup->mode, TEAM_PLAY) && player_team < 0)
-		|| player_team >= MAX_TEAMS) {
-	warn("Illegal team %d for received player, setting to 0");
+    if (BIT(Setup->mode, TEAM_PLAY) && (player_team < 0
+					|| player_team >= MAX_TEAMS)) {
+	warn("Illegal team %d for received player, setting to 0", player_team);
 	player_team = 0;
     }
     if ((other = Other_by_id(id)) == NULL) {
@@ -1108,7 +1108,7 @@ int Handle_team(int id, int pl_team)
 	warn("Received packet to change team for nonexistent id %d", id);
 	return 0;
     }
-    if ((BIT(Setup->mode, TEAM_PLAY) && pl_team < 0) || pl_team >= MAX_TEAMS) {
+    if (BIT(Setup->mode, TEAM_PLAY) && (pl_team < 0 || pl_team >= MAX_TEAMS)) {
 	warn("Illegal team %d received for player id %d", pl_team, id);
 	return 0;
     }
