@@ -8,7 +8,7 @@ xpilot-ng-x11 \- X11 client for multiplayer space war game.
 .SH DESCRIPTION
 .IP
 Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson.
-XPilotNG 4.6.1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilotNG 4.6.2 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .IP
 kps@users.sourceforge.net is responsible for the local installation.
@@ -18,7 +18,7 @@ Where options include:
 \fB\-newbie\fR <value>
 .IP
 Enable newbie help.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-help\fR
 .IP
@@ -178,53 +178,42 @@ A value of 2 makes the base name flash when a ship is appearing.
 A value of 3 combines the effects of values 1 and 2.
 The default value is: 3.
 .HP
-\fB\-mapRadar\fR <value>
-.IP
-Paint radar dots' positions on the map.
-The default value is: True.
-.HP
 \fB\-slidingRadar\fR <value>
 .IP
 If the game is in edgewrap mode then the radar will keep your
 position on the radar in the center and raw the rest of the radar
 around it.  Note that this requires a fast graphics system.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-showShipShapes\fR <value>
 .IP
 Should others' shipshapes be displayed or not.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-showMyShipShape\fR <value>
 .IP
 Should your own shipshape be displayed or not.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-showShipShapesHack\fR <value>
 .IP
 Should the ship shapes hack be displayed or not.
-The default value is: False.
-.HP
-\fB\-ballMsgScan\fR <value>
-.IP
-Scan messages for BALL, SAFE, COVER and POP and paint
-warning circles inside ship.
-The default value is: True.
+The default value is: no.
 .HP
 \fB\-showLivesByShip\fR <value>
 .IP
 Paint remaining lives next to ships.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-showMessages\fR <value>
 .IP
 Should game messages appear on screen.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-showItems\fR <value>
 .IP
 Should owned items be displayed permanently on the HUD?
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-showItemsTime\fR <value>
 .IP
@@ -237,49 +226,49 @@ The default value is: 5.000.
 Draws the walls solid, filled with one color,
 unless overridden by texture.
 Be warned that this option needs fast graphics.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-texturedWalls\fR <value>
 .IP
 Allows drawing polygon bitmaps specified by the (new-style) map.
 Be warned that this needs a reasonably fast graphics system.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-outlineWorld\fR <value>
 .IP
 Draws only the outline of all the wall blocks
 on block based maps.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-showDecor\fR <value>
 .IP
 Should decorations be displayed on the screen and radar?
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-outlineDecor\fR <value>
 .IP
 Draws only the outline of the map decoration.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-filledDecor\fR <value>
 .IP
 Draws filled decorations.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-texturedDecor\fR <value>
 .IP
 Draws the map decoration filled with a texture pattern.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-clientRanker\fR <value>
 .IP
 Scan messages and make personal kill/death ranking.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-clockAMPM\fR <value>
 .IP
 Use AMPM format for clock display instead of 24 hour format.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-shotSize\fR <value>
 .IP
@@ -324,7 +313,7 @@ This allows ship direction control by
 moving the mouse to the left for an anti-clockwise turn and
 moving the mouse to the right for a clockwise turn.
 Also see the pointerButton options for use of the mouse buttons.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-charsPerSecond\fR <value>
 .IP
@@ -335,11 +324,6 @@ The default value is: 100.
 .IP
 The maximum number of messages to display at the same time.
 The default value is: 8.
-.HP
-\fB\-reverseScroll\fR <value>
-.IP
-Reverse scroll direction of messages.
-The default value is: False.
 .HP
 \fB\-messagesToStdout\fR <value>
 .IP
@@ -353,7 +337,7 @@ The default value is: 0.
 .IP
 Provide cut&paste for the player messages and the talk window and
 a `history' for the talk window.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-maxLinesInHistory\fR <value>
 .IP
@@ -364,17 +348,12 @@ The default value is: 32.
 \fB\-toggleShield\fR <value>
 .IP
 Are shields toggled by a keypress only?
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-autoShield\fR <value>
 .IP
 Are shields lowered automatically for weapon fire?
-The default value is: True.
-.HP
-\fB\-autoServerMotdPopup\fR <value>
-.IP
-Automatically popup the MOTD of the server on startup.
-The default value is: False.
+The default value is: yes.
 .HP
 \fB\-fuelNotify\fR <value>
 .IP
@@ -416,7 +395,7 @@ The default value is: 3.
 \fB\-markingLights\fR <value>
 .IP
 Should the fighters have marking lights, just like airplanes?
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-modifierBank1\fR <value>
 .IP
@@ -497,7 +476,7 @@ There is no default value for this option.
 Whether to use a colors as close as possible to the specified ones
 or use a few standard colors for everything. May require more
 resources from your system.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-texturedObjects\fR <value>
 .IP
@@ -505,7 +484,7 @@ Whether to draw certain game objects with textures.
 Be warned that this requires more graphics speed.
 fullColor must be on for this to work.
 You may also need to enable multibuffering or double-buffering.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-geometry\fR <value>
 .IP
@@ -537,12 +516,12 @@ There is no default value for this option.
 Use color buffering or not.
 Usually color buffering is faster, especially on 8-bit
 PseudoColor displays.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-multibuffer\fR <value>
 .IP
 Use the X windows multibuffer extension if present.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-ignoreWindowManager\fR <value>
 .IP
@@ -551,14 +530,14 @@ This can be handy if you want to have your XPilot window on a
 preferred position without window manager borders.
 Also sometimes window managers may interfere when switching
 colormaps. This option may prevent that.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-titleFlip\fR <value>
 .IP
 Should the title bar change or not.
 Some window managers like twm may have problems with
 flipping title bars.  Hence this option to turn it off.
-The default value is: True.
+The default value is: yes.
 .HP
 \fB\-gameFont\fR <value>
 .IP
@@ -601,12 +580,12 @@ The default value is: -*-fixed-medium-r-*--13-*-*-*-c-*-iso8859-1.
 .IP
 Use the new Nasty Looking Shots or the original rectangle shots,
 You will probably want to increase your shotSize if you use this.
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-mouseAccelInClient\fR <value>
 .IP
 Set to true if you want to set the mouse turn rates to be linear
-The default value is: False.
+The default value is: no.
 .HP
 \fB\-mouseAccelNum\fR <value>
 .IP
@@ -1570,10 +1549,9 @@ If this file is undefined then recording isn't possible.
 There is no default value for this option.
 .HP
 \fB\-maxColors\fR <value>
-.TP
-The number of colors to use.
-Valid values are 4, 8 and 16.
 .IP
+The number of colors to use.
+Use value 16. Other values are not actively supported.
 The default value is: 16.
 .HP
 \fB\-color0\fR <value>
@@ -1693,12 +1671,12 @@ one key may be used by multiple key options.
 If no server is specified on the command line, xpilot will
 display a welcome screen where you can select a server.
 .IP
-XPilotNG 4.6.1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilotNG 4.6.2 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .IP
 kps@users.sourceforge.net is responsible for the local installation.
 .PP
-xpilot-ng-x11 4.6.1
+xpilot-ng-x11 4.6.2
 .SH "SEE ALSO"
 The full documentation for
 .B xpilot-ng-x11

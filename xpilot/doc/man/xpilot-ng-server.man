@@ -8,7 +8,7 @@ xpilot-ng-server \- server for multiplayer space war game.
 .SH DESCRIPTION
 .IP
 Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson.
-XPilotNG 4.6.1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilotNG 4.6.2 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
 Option flags specify where an option can be used and whether it
@@ -717,6 +717,7 @@ The maximum size in bytes of the admin message file.
 \fB\-rankFileName\fR <string>
 .IP
 The filename for the XML file to hold server ranking data.
+To reset the ranking, delete this file.
 [ Flags: command, defaults, invisible ]
 .HP
 \fB\-rankWebpageFileName\fR or rankWebpage <string>
@@ -1523,10 +1524,10 @@ Boolean options are turned off by using +<option>.
 Please refer to the manual pages, xpilot-ng-server(6),
 xpilot-ng-x11(6) and xpilot-ng-sdl(6) for more specific help.
 .IP
-XPilotNG 4.6.1 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilotNG 4.6.2 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
-XPilotNG 4.6.1
+XPilotNG 4.6.2
 .SH "SEE ALSO"
 The full documentation for
 .B xpilot-ng-server
