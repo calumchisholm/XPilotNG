@@ -346,13 +346,11 @@ static void Make_asteroid(int cx, int cy,
  * Tries to place a new asteroid on the map.
  * Calls Make_asteroid() to actually create the new asteroid
  */
-/* kps - change to use clicks instead of pixels  */
 static void Place_asteroid(void)
 {
     int			place_count;
-    int			px = 0, py = 0;
     int			bx, by;
-    int			cx = 0, cy = 0;
+    int			cx, cy;
     int			dir, dist;
     unsigned		space;
     int			okay;
@@ -379,31 +377,24 @@ static void Place_asteroid(void)
 
 	if (con) {
 	    dir = (int)(rfrac() * RES);
-	    dist = (int)(rfrac() * ((asteroidConcentratorRadius * BLOCK_SZ) + 1));
-	    /*px = (int)((con->pos.x + 0.5) * BLOCK_SZ + dist * tcos(dir));
-	      py = (int)((con->pos.y + 0.5) * BLOCK_SZ + dist * tsin(dir));*/
-	    px = (int)(CLICK_TO_PIXEL(con->pos.cx) + dist * tcos(dir));
-	    py = (int)(CLICK_TO_PIXEL(con->pos.cy) + dist * tsin(dir));
+	    dist = (int)(rfrac() * ((asteroidConcentratorRadius * BLOCK_CLICKS) + 1));
+	    cx = con->pos.cx + dist * tcos(dir);
+	    cy = con->pos.cy + dist * tsin(dir);
+	    cx = WRAP_XCLICK(cx);
+	    cy = WRAP_YCLICK(cy);
 
-	    if (BIT(World.rules->mode, WRAP_PLAY)) {
-		if (px < 0) px += World.width;
-		if (py < 0) py += World.height;
-		if (px > World.width) px -= World.width;
-		if (py > World.height) py -= World.height;
-	    }
-	    if (px < 0 || px > World.width
-		|| py < 0 || py > World.height) {
+	    if (cx < 0 || cx > World.cwidth
+		|| cy < 0 || cy > World.cheight) {
 		continue;
 	    }
 	} else {
-	    px = (int)(rfrac() * World.width);
-	    py = (int)(rfrac() * World.height);
+	    cx = (int)(rfrac() * World.cwidth);
+	    cy = (int)(rfrac() * World.cheight);
 	}
-	bx = px / BLOCK_SZ;
-	by = py / BLOCK_SZ;
-	cx = px * CLICK;
-	cy = py * CLICK;
+	bx = CLICK_TO_BLOCK(cx);
+	by = CLICK_TO_BLOCK(cy);
 
+	/* kps - World.block must be removed */
 	if (BIT(1U << World.block[bx][by], space)) {
 	    int i, dpx, dpy, ox, oy;
 
@@ -411,11 +402,12 @@ static void Place_asteroid(void)
 
 	    for (i = 0; i < NumPlayers; i++) {
 		if (IS_HUMAN_IND(i)) {
-		    ox = Players[i]->pos.px;
-		    oy = Players[i]->pos.py;
-		    dpx = WRAP_DX(px - ox);
-		    dpy = WRAP_DY(py - oy);
-		    if (sqr(dpx) + sqr(dpy) < sqr(ASTEROID_MIN_DIST)) {
+		    ox = Players[i]->pos.cx;
+		    oy = Players[i]->pos.cy;
+		    dpx = WRAP_DCX(cx - ox);
+		    dpy = WRAP_DCY(cy - oy);
+		    if (QUICK_LENGTH(dpx, dpy) < 2 * ASTEROID_MIN_DIST
+			&& sqr(dpx) + sqr(dpy) < sqr(ASTEROID_MIN_DIST)) {
 			/* too close to player */
 			okay = false;
 			break;

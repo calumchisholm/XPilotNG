@@ -49,7 +49,7 @@
 /* initial speed of asteroid */
 #define ASTEROID_START_SPEED	(8 + rfrac() * 10)
 /* minimum distance asteroids start away from any player */
-#define ASTEROID_MIN_DIST	(5 * BLOCK_SZ)
+#define ASTEROID_MIN_DIST	(5 * BLOCK_CLICKS)
 /* radius of asteroid size n */
 #define ASTEROID_RADIUS(size)	((0.8 * SHIP_SZ * (size)) * CLICK)
 
