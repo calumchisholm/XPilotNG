@@ -62,19 +62,6 @@ typedef struct {
 xp_option_t *options = NULL;
 
 
-xp_option_t xxx[] = {
-    XP_DOUBLE_OPTION(
-	"power",
-	&power,
-	55.0,
-	MIN_PLAYER_POWER,
-	MAX_PLAYER_POWER,
-	NULL,
-	"Set the engine power.\n"
-	"Valid values are in the range 5-55.\n"
-	),
-};
-
 static inline xp_option_t *Option_by_index(int ind)
 {
     if (ind < 0 || ind >= num_options)

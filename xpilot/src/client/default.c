@@ -95,6 +95,49 @@ void Usage(void)
 
 #ifdef OPTIONHACK
 
+xp_option_t default_options[] = {
+
+#if 0
+    XP_NOARG_OPTION(
+	"help",
+	"Display this help message.\n"),
+
+    XP_NOARG_OPTION(
+	"version",
+	"Show the source code version.\n"),
+#endif
+
+    XP_STRING_OPTION(
+	"name",
+	nickname,
+	sizeof nickname,
+	"",
+	NULL,
+	"Set the nickname.\n"),
+
+    XP_BOOL_OPTION(
+	"showShipShapes",
+	&instruments.showShipShapes,
+	true,
+	NULL,
+	"Should others' shipshapes be displayed or not.\n"),
+
+    XP_BOOL_OPTION(
+	"showMyShipShape",
+	&instruments.showMyShipShape,
+	true,
+	NULL,
+	"Should your own shipshape be displayed or not.\n"),
+
+    XP_KEY_OPTION(
+	"keyLoadLock4",
+	"8",
+	KEY_LOAD_LOCK_4,
+	NULL,
+	"Load player lock from bank 4.\n"),
+
+};
+
 
 
 
