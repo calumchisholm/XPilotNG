@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB W32_LIBS CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_WINDOWS_TRUE COND_WINDOWS_FALSE COND_SERVER_ONLY_TRUE COND_SERVER_ONLY_FALSE COND_REPLAY_TRUE COND_REPLAY_FALSE COND_XP_MAPEDIT_TRUE COND_XP_MAPEDIT_FALSE COND_X11_CLIENT_TRUE COND_X11_CLIENT_FALSE COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE SOUND_LIBS COND_SOUND_TRUE COND_SOUND_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT XP_AUTHORS XP_COPYRIGHTDATE XP_COPYRIGHT XP_RELEASEDATE XP_DATADIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE RANLIB ac_ct_RANLIB W32_LIBS CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS X_EXTENSIONS_LIB SDL_CONFIG SDL_CFLAGS SDL_LIBS SDL_EXTRA_LIBS GL_LIBS COND_CLIENT_TRUE COND_CLIENT_FALSE COND_WINDOWS_TRUE COND_WINDOWS_FALSE COND_REPLAY_TRUE COND_REPLAY_FALSE COND_XP_MAPEDIT_TRUE COND_XP_MAPEDIT_FALSE COND_X11_CLIENT_TRUE COND_X11_CLIENT_FALSE COND_SDL_CLIENT_TRUE COND_SDL_CLIENT_FALSE COND_SDL_GAMELOOP_TRUE COND_SDL_GAMELOOP_FALSE SOUND_LIBS COND_SOUND_TRUE COND_SOUND_FALSE EGREP LIBOBJS POW_LIB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -867,12 +867,11 @@ Optional Features:
   --enable-select-sched   enable new server scheduling most useful on Linux
                           2.6
   --disable-replay        disable building of replay program
-  --enable-xp-mapedit     disable building of xp-mapedit program
+  --disable-xp-mapedit    disable building of xp-mapedit program
   --disable-x11-client    disable X11 client
   --disable-sdl-client    disable SDL/OpenGL client
   --enable-sdl-gameloop   enable sdl gameloop in sdl client (otherwise use
                           gameloop optimised for X11)
-  --enable-server-only    build only the server
   --enable-sound          enable OpenAL sound
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
@@ -1981,7 +1980,7 @@ if test "${enable_x11_client+set}" = set; then
   enableval="$enable_x11_client"
 
 else
-  enable_x11_client=yes; need_x=yes
+  enable_x11_client=yes; need_x=yes; need_libxpclient=yes
 fi;
 
 # Check whether --enable-sdl_client or --disable-sdl_client was given.
@@ -1989,7 +1988,7 @@ if test "${enable_sdl_client+set}" = set; then
   enableval="$enable_sdl_client"
 
 else
-  enable_sdl_client=yes; need_x=yes
+  enable_sdl_client=yes; need_x=yes; need_libxpclient=yes
 fi;
 if test x$enable_sdl_client = xyes; then
 
@@ -2003,19 +2002,6 @@ fi
 if test "${enable_sdl_gameloop+set}" = set; then
   enableval="$enable_sdl_gameloop"
 
-fi;
-
-# Check whether --enable-server_only or --disable-server_only was given.
-if test "${enable_server_only+set}" = set; then
-  enableval="$enable_server_only"
-  if test x$enable_server_only = xyes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define SERVER_ONLY 1
-_ACEOF
-
-	need_x=no
-fi
 fi;
 
 # Check whether --enable-sound or --disable-sound was given.
@@ -6033,22 +6019,22 @@ fi
 
 
 
+if test x$need_libxpclient = xyes; then
+  COND_CLIENT_TRUE=
+  COND_CLIENT_FALSE='#'
+else
+  COND_CLIENT_TRUE='#'
+  COND_CLIENT_FALSE=
+fi
+
+
+
 if test x$windows_target = xyes; then
   COND_WINDOWS_TRUE=
   COND_WINDOWS_FALSE='#'
 else
   COND_WINDOWS_TRUE='#'
   COND_WINDOWS_FALSE=
-fi
-
-
-
-if test x$enable_server_only = xyes; then
-  COND_SERVER_ONLY_TRUE=
-  COND_SERVER_ONLY_FALSE='#'
-else
-  COND_SERVER_ONLY_TRUE='#'
-  COND_SERVER_ONLY_FALSE=
 fi
 
 
@@ -8896,17 +8882,17 @@ echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${COND_CLIENT_TRUE}" && test -z "${COND_CLIENT_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COND_CLIENT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COND_CLIENT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${COND_WINDOWS_TRUE}" && test -z "${COND_WINDOWS_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COND_WINDOWS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"COND_WINDOWS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${COND_SERVER_ONLY_TRUE}" && test -z "${COND_SERVER_ONLY_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COND_SERVER_ONLY\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COND_SERVER_ONLY\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -9581,10 +9567,10 @@ s,@SDL_CFLAGS@,$SDL_CFLAGS,;t t
 s,@SDL_LIBS@,$SDL_LIBS,;t t
 s,@SDL_EXTRA_LIBS@,$SDL_EXTRA_LIBS,;t t
 s,@GL_LIBS@,$GL_LIBS,;t t
+s,@COND_CLIENT_TRUE@,$COND_CLIENT_TRUE,;t t
+s,@COND_CLIENT_FALSE@,$COND_CLIENT_FALSE,;t t
 s,@COND_WINDOWS_TRUE@,$COND_WINDOWS_TRUE,;t t
 s,@COND_WINDOWS_FALSE@,$COND_WINDOWS_FALSE,;t t
-s,@COND_SERVER_ONLY_TRUE@,$COND_SERVER_ONLY_TRUE,;t t
-s,@COND_SERVER_ONLY_FALSE@,$COND_SERVER_ONLY_FALSE,;t t
 s,@COND_REPLAY_TRUE@,$COND_REPLAY_TRUE,;t t
 s,@COND_REPLAY_FALSE@,$COND_REPLAY_FALSE,;t t
 s,@COND_XP_MAPEDIT_TRUE@,$COND_XP_MAPEDIT_TRUE,;t t
