@@ -638,13 +638,12 @@ static void Paint_world_radar_new(void)
     ipos_t min, max;
     static XPoint poly[10000];
     
-#define DBG if(0) printf
-	   
     /* what the heck is this? */
     radar_exposures = 2;
-    
+
     if (radarPixmap2 == radarPixmap)
 	XSetPlaneMask(dpy, radarGC, AllPlanes & (~(dpl_1[0] | dpl_1[1])));
+
     if (radarPixmap2 != radarWindow) {
 	/* Clear radar */
 	XSetForeground(dpy, radarGC, colors[BLACK].pixel);
@@ -659,38 +658,31 @@ static void Paint_world_radar_new(void)
 	Compute_radar_bounds(&min, &max, &polygons[i].bounds);
 	for (xoff = min.x; xoff <= max.x; xoff++) {
 	    for (yoff = min.y; yoff <= max.y; yoff++) {
-		/*DBG("%d %d %d\n", i, xoff, yoff);*/
-		
-		/* location of current polygon */
-		int x = polygons[i].points[0].x + xoff * Setup->width;
-		int y = - polygons[i].points[0].y + (1-yoff) * Setup->height;
-		
+
 		if (BIT(polygon_styles[polygons[i].style].flags,
 			STYLE_INVISIBLE_RADAR)) continue;
-		
-		poly[0].x = (x * 256) / Setup->width;
-		poly[0].y = (y * RadarHeight) / Setup->height;
+
+		int x = xoff * Setup->width;
+		int y = yoff * Setup->height;
 		
 		/* loop through the points in the current polygon */
-		for (j = 1; j < polygons[i].num_points; j++) {
-		    
+		for (j = 0; j < polygons[i].num_points; j++) {		    
 		    x += polygons[i].points[j].x;
-		    y -= polygons[i].points[j].y;
-		    
+		    y += polygons[i].points[j].y;
 		    poly[j].x = (x * 256) / Setup->width;
-		    poly[j].y = (y * RadarHeight) / Setup->height;
+		    poly[j].y = RadarHeight 
+			- ((y * RadarHeight) / Setup->height);
 		}
 
 		XSetForeground(dpy, radarGC, fullColor ?
 			       polygon_styles[polygons[i].style].color :
 			       colors[wallRadarColor].pixel);
-		XFillPolygon(dpy, radarPixmap2, radarGC, poly, polygons[i].num_points,
+		XFillPolygon(dpy, radarPixmap2, radarGC, poly,
+			     polygons[i].num_points,
 			     Nonconvex, CoordModeOrigin);
 	    }
 	}
     }
-    
-#undef DBG
     
     if (radarPixmap2 == radarPixmap)
 	XSetPlaneMask(dpy, radarGC, AllPlanes & (~(dpl_2[0] | dpl_2[1])));
