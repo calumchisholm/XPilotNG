@@ -436,7 +436,6 @@ void About(Window w)
 	    about_page = NUM_ABOUT_PAGES-1;
 	Expose_about_window();
     }
-    WinXFlush(aboutWindow);
 }
 
 

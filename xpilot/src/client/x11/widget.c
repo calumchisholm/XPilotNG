@@ -1253,7 +1253,6 @@ int Widget_event(XEvent *event)
 		    if (boolw->pressed == true) {
 			count++;
 			Widget_button(event, i, false);
-			WinXFlush(event->xany.window);
 		    }
 		    break;
 		case WIDGET_BUTTON_ACTIVATE:
@@ -1261,7 +1260,6 @@ int Widget_event(XEvent *event)
 		    if (activw->pressed == true) {
 			count++;
 			Widget_button(event, i, false);
-			WinXFlush(event->xany.window);
 		    }
 		    break;
 		case WIDGET_BUTTON_MENU:
@@ -1269,7 +1267,6 @@ int Widget_event(XEvent *event)
 		    if (menuw->pressed == true) {
 			count++;
 			Widget_button(event, i, false);
-			WinXFlush(event->xany.window);
 		    }
 		    break;
 		case WIDGET_BUTTON_ARROW_RIGHT:
@@ -1286,7 +1283,6 @@ int Widget_event(XEvent *event)
 		    if (sliderw->pressed == true) {
 			count++;
 			Widget_button(event, i, false);
-			WinXFlush(event->xany.window);
 		    }
 		    break;
 		default:
@@ -1307,21 +1303,17 @@ int Widget_event(XEvent *event)
 		    Widget_draw_expose(i, &event->xexpose);
 		    break;
 		case ButtonPress:
-		    if (event->xbutton.button == Button1) {
+		    if (event->xbutton.button == Button1)
 			Widget_button(event, i, true);
-			WinXFlush(event->xany.window);
-		    }
 		    break;
 		case MotionNotify:
 		    Widget_button_motion(event, i);
 		    break;
 		case EnterNotify:
 		    Widget_inside(event, i, true);
-			WinXFlush(event->xany.window);
 		    break;
 		case LeaveNotify:
 		    Widget_inside(event, i, false);
-			WinXFlush(event->xany.window);
 		    break;
 		case ConfigureNotify:
 		    if (widgets[i].name != NULL

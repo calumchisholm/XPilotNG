@@ -906,13 +906,4 @@ extern void Widget_cleanup(void);
 extern	void WinXCreateItemBitmaps();
 #endif
 
-/*
- * winX - The Windows X emulator
- */
-#ifdef _WINDOWS
-#define	WinXFlush(__w)	WinXFlush(__w)
-#else
-#define	WinXFlush(__w)
-#endif
-
 #endif
