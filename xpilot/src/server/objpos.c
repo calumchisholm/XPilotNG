@@ -137,23 +137,27 @@ void Player_position_debug(player *pl, const char *msg)
     printf("\tB %d, %d, P %d, %d, C %d, %d, O %d, %d\n",
 	   pl->pos.bx,
 	   pl->pos.by,
-	   pl->pos.x,
-	   pl->pos.y,
+	   pl->pos.px,
+	   pl->pos.py,
 	   pl->pos.cx,
 	   pl->pos.cy,
-	   pl->prevpos.x,
-	   pl->prevpos.y);
+	   pl->prevpos.cx,
+	   pl->prevpos.cy);
     for (i = 0; i < pl->ship->num_points; i++) {
 	printf("\t%2d\tB %d, %d, P %d, %d, C %d, %d, O %d, %d\n",
 		i,
-	       (int)((pl->pos.x + pl->ship->pts[i][pl->dir].x) / BLOCK_SZ),
-	       (int)((pl->pos.y + pl->ship->pts[i][pl->dir].y) / BLOCK_SZ),
-	       (int)(pl->pos.x + pl->ship->pts[i][pl->dir].x),
-	       (int)(pl->pos.y + pl->ship->pts[i][pl->dir].y),
-	       (int)(pl->pos.cx + FLOAT_TO_CLICK(pl->ship->pts[i][pl->dir].x)),
-	       (int)(pl->pos.cy + FLOAT_TO_CLICK(pl->ship->pts[i][pl->dir].y)),
-	       (int)(pl->prevpos.x + pl->ship->pts[i][pl->dir].x),
-	       (int)(pl->prevpos.y + pl->ship->pts[i][pl->dir].y));
+	       (int)((pl->pos.bx
+		      + CLICK_TO_BLOCK(pl->ship->pts[i][pl->dir].cx))),
+	       (int)((pl->pos.by
+		      + CLICK_TO_BLOCK(pl->ship->pts[i][pl->dir].cy))),
+	       (int)(pl->pos.px
+		     + CLICK_TO_PIXEL(pl->ship->pts[i][pl->dir].cx)),
+	       (int)(pl->pos.py
+		     + CLICK_TO_PIXEL(pl->ship->pts[i][pl->dir].cy)),
+	       (int)(pl->pos.cx + pl->ship->pts[i][pl->dir].cx),
+	       (int)(pl->pos.cy + pl->ship->pts[i][pl->dir].cy),
+	       (int)(pl->prevpos.cx + pl->ship->pts[i][pl->dir].cx),
+	       (int)(pl->prevpos.cy + pl->ship->pts[i][pl->dir].cy));
     }
 #endif
 }

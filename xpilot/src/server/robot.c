@@ -416,10 +416,6 @@ static robot_t	*Robots;	/* array of robot parameters. */
  */
 extern int Robot_default_setup(robot_type_t *type_ptr);
 
-#if defined(DEVELOPMENT) || defined(ALLBOTS)
-extern int Stratbot_setup(robot_type_t *type_ptr);
-#endif
-
 /*
  * Array to store function pointers to robot type setup routines.
  * The default robot type should be first.
@@ -430,9 +426,6 @@ static struct robot_setup {
 } robot_type_setups[] = {
     { Robot_default_setup },
 
-#if defined(DEVELOPMENT) || defined(ALLBOTS)
-    { Stratbot_setup },
-#endif
 };
 
 /*
