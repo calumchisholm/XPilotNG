@@ -454,7 +454,7 @@ void expandKeyword(const char *keyword);
  * Prototypes for laser.c
  */
 void Laser_pulse_collision(void);
-void Player_collides_with_laser_pulse(int ind, pulseobject *pulse);
+void Laser_pulse_hits_player(int ind, pulseobject *pulse);
 
 /*
  * Prototypes for alliance.c

@@ -761,7 +761,6 @@ static void PlayerObjectCollision(int ind)
 		else if (selfImmunity) {
 		    continue;
 		}
-		/* changed from team to self immunity by kps */
 	    } else if (selfImmunity &&
 		       IS_TANK_PTR(pl) &&
 		       (pl->lock.pl_id == obj->id)) {
@@ -913,7 +912,7 @@ static void PlayerObjectCollision(int ind)
 
 	    /* laserhack */
 	case OBJ_PULSE:
-	    Player_collides_with_laser_pulse(ind, PULSE_PTR(obj));
+	    Laser_pulse_hits_player(ind, PULSE_PTR(obj));
 	    if (BIT(pl->status, KILLED)) {
 		return;
 	    }

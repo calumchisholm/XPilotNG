@@ -152,142 +152,11 @@ static void Laser_pulse_find_victims(
 }
 #endif
 
-#if 0 /* laserhack */
-/*
- * Do what needs to be done when a laser pulse
- * actually hits a player.
- * If the pulse was reflected by a mirror
- * then set "refl" to true.
- */
-static void Laser_pulse_hits_player(
-	pulse_t *pulse,
-	object *obj,
-	int cx,
-	int cy,
-	victim_t *victim,
-	bool *refl)
-{
-    player		*pl;
-    player		*vicpl;
-    int			ind;
-    DFLOAT		sc;
-    char		msg[MSG_LEN];
-
-    if (pulse->id != NO_ID) {
-	ind = GetInd[pulse->id];
-	pl = Players[ind];
-    } else {
-	ind = -1;
-	pl = NULL;
-    }
-
-    vicpl = Players[victim->ind];
-    vicpl->forceVisible += TIME_FACT;
-    if (BIT(vicpl->have, HAS_MIRROR)
-	&& (rfrac() * (2 * vicpl->item[ITEM_MIRROR])) >= 1) {
-	pulse->pos.cx = cx - tcos(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;
-	pulse->pos.cy = cy - tsin(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;
-	pulse->dir = (int)Wrap_cfindDir(vicpl->pos.cx - pulse->pos.cx,
-					vicpl->pos.cy - pulse->pos.cy)
-		     * 2 - RES / 2 - pulse->dir;
-	pulse->dir = MOD2(pulse->dir, RES);
-	pulse->life += vicpl->item[ITEM_MIRROR];
-	pulse->len = PULSE_LENGTH;
-	pulse->refl = true;
-	*refl = true;
-	return;
-    }
-
-    sound_play_sensors(vicpl->pos.cx, vicpl->pos.cy,
-		       PLAYER_EAT_LASER_SOUND);
-    if (BIT(vicpl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	== (HAS_SHIELD|HAS_EMERGENCY_SHIELD))
-	return;
-    if (!BIT(obj->type, KILLING_SHOTS))
-	return;
-    if (BIT(pulse->mods.laser, STUN)
-	|| (laserIsStunGun == true
-	    && allowLaserModifiers == false)) {
-	if (BIT(vicpl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
-	    || BIT(vicpl->status, THRUSTING)) {
-	    if (pl) {
-		sprintf(msg,
-		    "%s got paralysed by %s's stun laser.",
-		    vicpl->name, pl->name);
-		if (vicpl->id == pl->id)
-		    strcat(msg, " How strange!");
-	    } else {
-		sprintf(msg,
-		    "%s got paralysed by a stun laser.",
-		    vicpl->name);
-	    }
-	    Set_message(msg);
-	    CLR_BIT(vicpl->used,
-		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
-	    CLR_BIT(vicpl->status, THRUSTING);
-	    vicpl->stunned += 5 * TIME_FACT;
-	}
-    } else if (BIT(pulse->mods.laser, BLIND)) {
-	vicpl->damaged += (12 + 6) * TIME_FACT;
-	vicpl->forceVisible += (12 + 6) * TIME_FACT;
-	if (pl)
-	    Record_shove(vicpl, pl, frame_loops + 12 + 6);
-    } else {
-	Add_fuel(&(vicpl->fuel), (long)ED_LASER_HIT);
-	if (!BIT(vicpl->used, HAS_SHIELD)
-	    && !BIT(vicpl->have, HAS_ARMOR)) {
-	    SET_BIT(vicpl->status, KILLED);
-	    if (pl) {
-		sprintf(msg,
-		    "%s got roasted alive by %s's laser.",
-		    vicpl->name, pl->name);
-		if (vicpl->id == pl->id) {
-		    sc = Rate(0, pl->score)
-			   * laserKillScoreMult
-			   * selfKillScoreMult;
-		    SCORE(victim->ind, -sc, vicpl->pos.cx, vicpl->pos.cy,
-			  vicpl->name);
-		    strcat(msg, " How strange!");
-		} else {
-		    sc = Rate(pl->score,
-					 vicpl->score)
-			 * laserKillScoreMult;
-		    Score_players(ind, sc, vicpl->name,
-				  victim->ind, -sc,
-				  pl->name);
-		}
-	    } else {
-		sc = Rate(CANNON_SCORE, vicpl->score) / 4;
-		SCORE(victim->ind, -sc, vicpl->pos.cx, vicpl->pos.cy,
-		      "Cannon");
-		if (BIT(World.rules->mode, TEAM_PLAY)
-		    && vicpl->team != pulse->team)
-		    TEAM_SCORE(pulse->team, sc);
-		sprintf(msg,
-		    "%s got roasted alive by cannonfire.",
-		    vicpl->name);
-	    }
-	    sound_play_sensors(vicpl->pos.cx, vicpl->pos.cy,
-			       PLAYER_ROASTED_SOUND);
-	    Set_message(msg);
-	    if (pl && pl->id != vicpl->id) {
-		Rank_AddLaserKill(pl);
-		Robot_war(victim->ind, ind);
-	    }
-	}
-	if (!BIT(vicpl->used, HAS_SHIELD)
-	    && BIT(vicpl->have, HAS_ARMOR)) {
-	    Player_hit_armor(victim->ind);
-	}
-    }
-}
-#endif
-
 /*
  * Do what needs to be done when a laser pulse
  * actually hits a player.
  */
-void Player_collides_with_laser_pulse(int ind, pulseobject *pulse)
+void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 {
     player		*pl;
     player		*vicpl = Players[ind];
@@ -315,6 +184,7 @@ void Player_collides_with_laser_pulse(int ind, pulseobject *pulse)
 	pulse->life += vicpl->item[ITEM_MIRROR];
 	pulse->len = PULSE_LENGTH;
 	pulse->refl = true;
+	/**refl = true;*/
 	return;
     }
 
@@ -781,18 +651,17 @@ static void LaserCollision(void)
 	    for (j = 0; j < NumPlayers; j++) {
 		vic = Players[j];
 		/* removed check for playing */
-		if (BIT(vic->used, OBJ_PHASING_DEVICE)) {
-		    continue;
-		}
-		if (BIT(World.rules->mode, TEAM_PLAY)
+		/* Team_immune handles this */
+		/*if (BIT(World.rules->mode, TEAM_PLAY)
 		    && teamImmunity
 		    && vic->team == pulse->team
 		    && vic->id != pulse->id) {
 		    continue;
-		}
-		if (vic->id == pulse->id && !pulse->refl) {
-		    continue;
-		}
+		    }*/
+		/* checked */
+		/*if (vic->id == pulse->id && !pulse->refl) {
+		  continue;
+		  }*/
 		if (Wrap_length(vic->pos.cx - pulse->pos.x, vic->pos.cy - pulse->pos.y)
 		    > pulse->len + PIXEL_TO_CLICK(SHIP_SZ)) {
 		    continue;
@@ -814,17 +683,7 @@ static void LaserCollision(void)
 			continue;
 		vic->forceVisible += TIME_FACT;
 		pulse->len = PULSE_LENGTH - 1;
-#if 0
-		/* Mirrors don't work at the moment. */
-		if (BIT(vic->have, OBJ_MIRROR)
-		    && (rfrac() * (2 * vic->item[ITEM_MIRROR])) >= 1) {
-		    /* STUFF REMOVED */
-		    pulse->life += vic->item[ITEM_MIRROR];
-		    pulse->len = PULSE_LENGTH;
-		    pulse->refl = true;
-		    continue;
-		}
-#endif
+		/* removed broken mirrors */
 		/* removed laser pulse hits player stuff */
 	    }
 	}
