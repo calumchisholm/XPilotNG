@@ -858,6 +858,7 @@ int End_game(void);
 int Pick_team(int pick_for_type);
 void Server_info(char *str, size_t max_size);
 void Log_game(const char *heading);
+const char *Describe_game_status(void);
 void Game_Over(void);
 void Server_log_admin_message(player_t *pl, const char *str);
 int plock_server(bool on);

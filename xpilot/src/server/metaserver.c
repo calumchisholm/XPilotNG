@@ -118,19 +118,15 @@ void Meta_update(int change)
 {
 #define GIVE_META_SERVER_A_HINT	180
 
-    char 		string[MAX_STR_LEN];
-    int			i, j;
-    size_t		len;
-    int			num_active_players;
-    bool		first = true;
-    time_t		currentTime;
-    const char		*game_mode;
-    char		freebases[120];
-    int			active_per_team[MAX_TEAMS];
-    static time_t	lastMetaSendTime = 0;
-    static int		queue_length = 0;
+    char string[MAX_STR_LEN], freebases[120];
+    int i, j, num_active_players, active_per_team[MAX_TEAMS];
+    size_t len;
+    bool first = true;
+    time_t currentTime;
+    const char *game_mode;
+    static time_t lastMetaSendTime = 0;
+    static int queue_length = 0;
     world_t *world = &World;
-
 
     if (!options.reportToMetaServer)
 	return;
@@ -160,10 +156,7 @@ void Meta_update(int change)
 	}
     }
 
-    game_mode = (game_lock && ShutdownServer == -1) ? "locked"
-		: (!game_lock && ShutdownServer != -1) ? "shutting down"
-		: (game_lock && ShutdownServer != -1) ? "locked and shutting down"
-		: "ok";
+    game_mode = Describe_game_status();
 
     /* calculate number of available homebases per team. */
     freebases[0] = '\0';

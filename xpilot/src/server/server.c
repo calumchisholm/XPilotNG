@@ -467,6 +467,13 @@ int Pick_team(int pick_for_type)
     return TEAM_NOT_SET;
 }
 
+const char *Describe_game_status(void)
+{
+    return (game_lock && ShutdownServer == -1) ? "locked"
+	: (!game_lock && ShutdownServer != -1) ? "shutting down"
+	: (game_lock && ShutdownServer != -1) ? "locked and shutting down"
+	: "ok";
+}
 
 /*
  * Return status for server
@@ -493,10 +500,7 @@ void Server_info(char *str, size_t max_size)
 	     "http://xpilot.sourceforge.net/\n"
 	     "\n",
 	     server_version,
-	     (game_lock && ShutdownServer == -1) ? "locked" :
-	     (!game_lock && ShutdownServer != -1) ? "shutting down" :
-	     (game_lock && ShutdownServer != -1) ?
-	     "locked and shutting down" : "ok",
+	     Describe_game_status(),
 	     FPS,
 	     world->name, world->author, world->width, world->height,
 	     NumPlayers, world->NumBases);
