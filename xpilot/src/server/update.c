@@ -385,8 +385,17 @@ static void do_Autopilot (player *pl)
      */
     if ((vel = VECTOR_LENGTH(pl->vel)) < auto_pilot_dead_velocity) {
 	pl->vel.x = pl->vel.y = vel = 0.0;
-	/* kps - ng wants the Player_position_restore call to be removed */
-	Player_position_restore(pl);
+	/*
+	 * http://www.ben.com/XPilot/todo.html
+	 *
+	 * Autopilot code contains a call to Player_position_restore().
+	 * This shouldn't be used since it only restores the position
+	 * approximately and can move the ship inside a wall. See the
+	 * xpilot-hacks post "Using autopilot near walls can destroy
+	 * your ship". I think this can be fixed by just removing the
+	 * call. Does anyone see why it would be needed?
+	 */
+	/*Player_position_restore(pl);*/
     }
 
     /*
