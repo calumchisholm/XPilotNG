@@ -57,8 +57,8 @@
 #define SHOW_PACKET_SIZE_METER	(1L << 10)
 #define SHOW_PACKET_LOSS_METER	(1L << 11)
 #define SHOW_PACKET_DROP_METER	(1L << 12)
-#define SHOW_CLOCK		(1L << 13)
-#define SHOW_ITEMS		(1L << 14)
+/*#define SHOW_CLOCK		(1L << 13)*/
+/*#define SHOW_ITEMS		(1L << 14)*/
 #define SHOW_MESSAGES		(1L << 15)
 
 #define SHOW_OUTLINE_WORLD	(1L << 17)
@@ -101,7 +101,7 @@
 #define MIN_TEAMSHOT_SIZE	1
 
 #define MIN_SHOW_ITEMS_TIME	0.0
-#define MAX_SHOW_ITEMS_TIME	10.0
+#define MAX_SHOW_ITEMS_TIME	60.0
 
 #define MIN_SCALEFACTOR		0.2
 #define MAX_SCALEFACTOR		8.0

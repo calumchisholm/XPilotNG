@@ -72,6 +72,7 @@ extern XGCValues	gcv;
 int	hudColor;		/* Color index for HUD drawing */
 int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
 int	hudVLineColor;		/* Color index for vert. HUD line drawing */
+int	hudItemsColor;		/* Color index for HUD items drawing */
 int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
 int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 int	hudRadarDotSize;	/* Size for hudradar dot drawing */
@@ -420,20 +421,106 @@ void Paint_hudradar(DFLOAT hrscale, DFLOAT xlimit, DFLOAT ylimit, int sz)
 }
 
 
-void Paint_HUD(void)
+void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 {
     const int		BORDER = 3;
-    int			vert_pos, horiz_pos, size;
     char		str[50];
-    int			hud_pos_x;
-    int			hud_pos_y;
-    int			did_fuel = 0;
+    int			vert_pos, horiz_pos;
     int			i, j, maxWidth = -1,
 			rect_x, rect_y, rect_width, rect_height;
     static int		vertSpacing = -1;
-    static char		autopilot[] = "Autopilot";
 
-    int modlen = 0;
+    SET_FG(colors[hudItemsColor].pixel);
+
+    /* Special itemtypes */
+    if (vertSpacing < 0)
+	vertSpacing = MAX(ITEM_SIZE, gameFont->ascent + gameFont->descent) + 1;
+    /* find the scaled location, then work in pixels */
+    vert_pos = WINSCALE(hud_pos_y - hudSize+HUD_OFFSET + BORDER);
+    horiz_pos = WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER);
+    rect_width = 0;
+    rect_height = 0;
+    rect_x = horiz_pos;
+    rect_y = vert_pos;
+
+    for (i = 0; i < NUM_ITEMS; i++) {
+	int num = numItems[i];
+
+	if (i == ITEM_FUEL)
+	    continue;
+
+	if (num != lastNumItems[i]) {
+	    numItemsTime[i] = (int)(showItemsTime * (float)FPS);
+	    lastNumItems[i] = num;
+	}
+	if (numItemsTime[i]-- <= 0) {
+	    numItemsTime[i] = 0;
+	    num = -1;
+	}
+
+	if (num >= 0) {
+	    int len, width;
+
+	    /* Paint item symbol */
+	    Paint_item_symbol((u_byte)i, p_draw, gc,
+			horiz_pos - ITEM_SIZE,
+			vert_pos,
+			ITEM_HUD);
+
+	    if (i == lose_item) {
+		if (lose_item_active != 0) {
+		    if (lose_item_active < 0) {
+			lose_item_active++;
+		    }
+		    rd.drawRectangle(dpy, p_draw, gc,
+				horiz_pos-ITEM_SIZE-2,
+				vert_pos-2, ITEM_SIZE+2, ITEM_SIZE+2);
+		}
+	    }
+
+	    /* Paint item count */
+	    sprintf(str, "%d", num);
+	    len = strlen(str);
+	    width = XTextWidth(gameFont, str, len);
+	    rd.drawString(dpy, p_draw, gc,
+			horiz_pos - ITEM_SIZE - BORDER - width,
+			vert_pos + ITEM_SIZE/2 + gameFont->ascent/2,
+			str, len);
+
+	    maxWidth = MAX(maxWidth, width + BORDER + ITEM_SIZE);
+	    vert_pos += vertSpacing;
+
+	    if (vert_pos+vertSpacing > WINSCALE(hud_pos_y+hudSize-HUD_OFFSET-BORDER)) {
+		rect_width += maxWidth + 2*BORDER;
+		rect_height = MAX(rect_height, vert_pos - rect_y);
+		horiz_pos -= maxWidth + 2*BORDER;
+		vert_pos = WINSCALE(hud_pos_y - hudSize+HUD_OFFSET + BORDER);
+		maxWidth = -1;
+	    }
+	}
+    }
+    if (maxWidth != -1) {
+	rect_width += maxWidth + BORDER;
+    }
+    if (rect_width > 0) {
+	if (rect_height == 0) {
+	    rect_height = vert_pos - rect_y;
+	}
+	rect_x -= rect_width;
+	Erase_rectangle(rect_x - 1, rect_y - 4,
+			rect_width + 2, rect_height + 8);
+    }
+
+}
+
+void Paint_HUD(void)
+{
+    const int		BORDER = 3;
+    char		str[50];
+    int			hud_pos_x, hud_pos_y, size;
+    int			did_fuel = 0;
+    int			i, j, modlen = 0;
+    static char		autopilot[] = "Autopilot";
 
     /*
      * Show speed pointer
@@ -550,90 +637,9 @@ void Paint_HUD(void)
     XChangeGC(dpy, gc, GCLineStyle, &gcv);
     SET_FG(colors[hudColor].pixel);
 
-    /* Special itemtypes */
-    if (vertSpacing < 0)
-	vertSpacing = MAX(ITEM_SIZE, gameFont->ascent + gameFont->descent) + 1;
-    /* find the scaled location, then work in pixels */
-    vert_pos = WINSCALE(hud_pos_y - hudSize+HUD_OFFSET + BORDER);
-    horiz_pos = WINSCALE(hud_pos_x - hudSize+HUD_OFFSET - BORDER);
-    rect_width = 0;
-    rect_height = 0;
-    rect_x = horiz_pos;
-    rect_y = vert_pos;
-
-    for (i = 0; i < NUM_ITEMS; i++) {
-	int num = numItems[i];
-
-	if (i == ITEM_FUEL)
-	    continue;
-
-	if (BIT(instruments, SHOW_ITEMS)) {
-	    lastNumItems[i] = num;
-	    if (num <= 0)
-		num = -1;
-	} else {
-	    if (num != lastNumItems[i]) {
-		numItemsTime[i] = (int)(showItemsTime * (float)FPS);
-		lastNumItems[i] = num;
-	    }
-	    if (numItemsTime[i]-- <= 0) {
-		numItemsTime[i] = 0;
-		num = -1;
-	    }
-	}
-
-	if (num >= 0) {
-	    int len, width;
-
-	    /* Paint item symbol */
-	    Paint_item_symbol((u_byte)i, p_draw, gc,
-			horiz_pos - ITEM_SIZE,
-			vert_pos,
-			ITEM_HUD);
-
-	    if (i == lose_item) {
-		if (lose_item_active != 0) {
-		    if (lose_item_active < 0) {
-			lose_item_active++;
-		    }
-		    rd.drawRectangle(dpy, p_draw, gc,
-				horiz_pos-ITEM_SIZE-2,
-				vert_pos-2, ITEM_SIZE+2, ITEM_SIZE+2);
-		}
-	    }
-
-	    /* Paint item count */
-	    sprintf(str, "%d", num);
-	    len = strlen(str);
-	    width = XTextWidth(gameFont, str, len);
-	    rd.drawString(dpy, p_draw, gc,
-			horiz_pos - ITEM_SIZE - BORDER - width,
-			vert_pos + ITEM_SIZE/2 + gameFont->ascent/2,
-			str, len);
-
-	    maxWidth = MAX(maxWidth, width + BORDER + ITEM_SIZE);
-	    vert_pos += vertSpacing;
-
-	    if (vert_pos+vertSpacing > WINSCALE(hud_pos_y+hudSize-HUD_OFFSET-BORDER)) {
-		rect_width += maxWidth + 2*BORDER;
-		rect_height = MAX(rect_height, vert_pos - rect_y);
-		horiz_pos -= maxWidth + 2*BORDER;
-		vert_pos = WINSCALE(hud_pos_y - hudSize+HUD_OFFSET + BORDER);
-		maxWidth = -1;
-	    }
-	}
-    }
-    if (maxWidth != -1) {
-	rect_width += maxWidth + BORDER;
-    }
-    if (rect_width > 0) {
-	if (rect_height == 0) {
-	    rect_height = vert_pos - rect_y;
-	}
-	rect_x -= rect_width;
-	Erase_rectangle(rect_x - 1, rect_y - 4,
-			rect_width + 2, rect_height + 8);
-    }
+    if (hudItemsColor)
+	Paint_HUD_items(hud_pos_x, hud_pos_y);
+    SET_FG(colors[hudColor].pixel);
 
     /* Fuel notify, HUD meter on */
     if (fuelCount || fuelSum < fuelLevel3) {

@@ -798,20 +798,12 @@ option options[] = {
 	"Should messages appear on screen.\n"
     },
     {
-	"showItems",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should owned items be displayed permanently on the HUD,\n"
-	"or only when their amount has changed?\n"
-    },
-    {
 	"showItemsTime",
 	NULL,
-	"2.0",
+	"3.0",
 	KEY_DUMMY,
-	"The time in seconds to display item information when\n"
-	"it has changed and the showItems option is turned on.\n"
+	"The time in seconds to display item information on the HUD when\n"
+	"it has changed.\n"
     },
     {
 	"showScoreDecimals",
@@ -1048,6 +1040,13 @@ option options[] = {
 	"in the HUD.\n"
     },
     {
+	"hudItemsColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing owned items on the HUD.\n"
+    },
+    {
 	"hudRadarEnemyColor",
 	NULL,
 	"3",
@@ -1213,11 +1212,18 @@ option options[] = {
 	"Which color number to use for drawing borders.\n"
     },
     {
+	"clockColor",
+	NULL,
+	"1",
+	KEY_DUMMY,
+	"Which color number to use for drawing the clock.\n"
+    },
+    {
 	"scoreColor",
 	NULL,
 	"1",
 	KEY_DUMMY,
-	"Which color number to use for drawing Score entries.\n"
+	"Which color number to use for drawing score list entries.\n"
     },
     {
 	"scoreSelfColor",
@@ -3067,6 +3073,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "hudColor", &hudColor);
     Get_int_resource(rDB, "hudHLineColor", &hudHLineColor);
     Get_int_resource(rDB, "hudVLineColor", &hudVLineColor);
+    Get_int_resource(rDB, "hudItemsColor", &hudItemsColor);
     Get_int_resource(rDB, "hudRadarEnemyColor", &hudRadarEnemyColor);
     Get_int_resource(rDB, "hudRadarOtherColor", &hudRadarOtherColor);
     Get_int_resource(rDB, "hudRadarDotSize", &hudRadarDotSize);
@@ -3090,6 +3097,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "windowColor", &windowColor);
     Get_int_resource(rDB, "buttonColor", &buttonColor);
     Get_int_resource(rDB, "borderColor", &borderColor);
+    Get_int_resource(rDB, "clockColor", &clockColor);
     Get_int_resource(rDB, "scoreColor", &scoreColor);
     Get_int_resource(rDB, "scoreSelfColor", &scoreSelfColor);
     Get_int_resource(rDB, "scoreInactiveColor", &scoreInactiveColor);
@@ -3132,8 +3140,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "packetDropMeter", &instruments, SHOW_PACKET_DROP_METER);
     Get_bit_resource(rDB, "packetLagMeter", &instruments, SHOW_PACKET_LAG_METER);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
-    Get_bit_resource(rDB, "showItems", &instruments, SHOW_ITEMS);
-    Get_bit_resource(rDB, "clock", &instruments, SHOW_CLOCK);
     Get_bit_resource(rDB, "clockAMPM", &instruments, SHOW_CLOCK_AMPM_FORMAT);
     Get_bit_resource(rDB, "outlineWorld", &instruments, SHOW_OUTLINE_WORLD);
     Get_bit_resource(rDB, "filledWorld", &instruments, SHOW_FILLED_WORLD);

@@ -40,9 +40,6 @@
 
 extern Atom		ProtocolAtom, KillAtom;
 extern int		buttonColor, windowColor, borderColor;
-extern int		scoreColor, scoreSelfColor, scoreInactiveColor;
-extern int		scoreInactiveSelfColor, scoreZeroColor;
-extern int		scoreObjectColor;
 extern int		ButtonHeight;
 extern char		visualName[MAX_VISUAL_NAME];
 extern Visual		*visual;

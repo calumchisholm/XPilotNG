@@ -110,9 +110,6 @@ extern int		RadarHeight;
 int			ButtonHeight;
 Atom			ProtocolAtom, KillAtom;
 int			buttonColor, windowColor, borderColor;
-int			scoreColor, scoreSelfColor, scoreInactiveColor;
-int			scoreInactiveSelfColor, scoreZeroColor;
-int			scoreObjectColor;
 int			quitting = false;
 int			top_width, top_height, top_x, top_y, top_posmask;
 int			draw_width, draw_height;
@@ -488,6 +485,7 @@ int Init_top(void)
     COLORCHECK(hudColor, 2);
     COLORCHECK(hudHLineColor, 2);
     COLORCHECK(hudVLineColor, 0);
+    COLORCHECK(hudItemsColor, 2);
     COLORCHECK(hudLockColor, 2);
     COLORCHECK(hudRadarEnemyColor, 3);
     COLORCHECK(hudRadarOtherColor, 2);
@@ -506,6 +504,7 @@ int Init_top(void)
     COLORCHECK(connColor, 2);
     COLORCHECK(buttonColor, 2);
     COLORCHECK(borderColor, 1);
+    COLORCHECK(clockColor, 1);
     COLORCHECK(scoreColor, 1);
     COLORCHECK(scoreSelfColor, 3);
     COLORCHECK(scoreObjectColor, hudColor);

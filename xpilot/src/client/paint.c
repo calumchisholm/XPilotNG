@@ -172,6 +172,13 @@ static DFLOAT	time_counter = 0.0;
 
 int	cacheShips = 0;		/* cache some ship bitmaps every frame */
 
+int	clockColor;		/* Clock color index */
+int	scoreColor;		/* Score list color index */
+int	scoreSelfColor;		/* Score list own score color index */
+int	scoreInactiveColor;	/* Score list inactive player color index */
+int	scoreInactiveSelfColor;	/* Score list inactive self color index */
+int	scoreZeroColor;		/* Score list team zero color index */
+int	scoreObjectColor;	/* Color index for map score objects */
 
 static void Paint_clock(int redraw);
 
@@ -685,7 +692,7 @@ static void Paint_clock(int redraw)
     static long		prev_loops;
     static int		width;
 
-    if (BIT(instruments, SHOW_CLOCK) == 0) {
+    if (!clockColor) {
 	if (width != 0) {
 	    XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
 	    XFillRectangle(dpy, players, scoreListGC,
@@ -733,7 +740,7 @@ static void Paint_clock(int redraw)
 		     256 - (width + border),
 		     scoreListFont->ascent + 4,
 		     buf,
-		     colors[WHITE].pixel,
+		     colors[clockColor].pixel,
 		     colors[BLACK].pixel);
 }
 

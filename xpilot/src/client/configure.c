@@ -128,7 +128,6 @@ static int Config_create_texturedWalls(int widget_desc, int *height);
 static int Config_create_texturedObjects(int widget_desc, int *height);
 static int Config_create_fullColor(int widget_desc, int *height);
 static int Config_create_slidingRadar(int widget_desc, int *height);
-static int Config_create_showItems(int widget_desc, int *height);
 static int Config_create_showItemsTime(int widget_desc, int *height);
 static int Config_create_showScoreDecimals(int widget_desc, int *height);
 static int Config_create_backgroundPointDist(int widget_desc, int *height);
@@ -145,6 +144,7 @@ static int Config_create_showNastyShots(int widget_desc, int *height);
 static int Config_create_hudColor(int widget_desc, int *height);
 static int Config_create_hudHLineColor(int widget_desc, int *height);
 static int Config_create_hudVLineColor(int widget_desc, int *height);
+static int Config_create_hudItemsColor(int widget_desc, int *height);
 static int Config_create_hudRadarEnemyColor(int widget_desc, int *height);
 static int Config_create_hudRadarOtherColor(int widget_desc, int *height);
 static int Config_create_hudRadarDotSize(int widget_desc, int *height);
@@ -165,6 +165,7 @@ static int Config_create_connColor(int widget_desc, int *height);
 static int Config_create_windowColor(int widget_desc, int *height);
 static int Config_create_buttonColor(int widget_desc, int *height);
 static int Config_create_borderColor(int widget_desc, int *height);
+static int Config_create_clockColor(int widget_desc, int *height);
 static int Config_create_scoreColor(int widget_desc, int *height);
 static int Config_create_scoreSelfColor(int widget_desc, int *height);
 static int Config_create_scoreInactiveColor(int widget_desc, int *height);
@@ -201,7 +202,6 @@ static int Config_create_packetSizeMeter(int widget_desc, int *height);
 static int Config_create_packetLossMeter(int widget_desc, int *height);
 static int Config_create_packetDropMeter(int widget_desc, int *height);
 static int Config_create_packetLagMeter(int widget_desc, int *height);
-static int Config_create_clock(int widget_desc, int *height);
 static int Config_create_clockAMPM(int widget_desc, int *height);
 static int Config_create_markingLights(int widget_desc, int *height);
 #ifdef _WINDOWS
@@ -300,7 +300,6 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_fullColor,
     Config_create_texturedObjects,
     Config_create_slidingRadar,
-    Config_create_showItems,
     Config_create_showItemsTime,
     Config_create_showScoreDecimals,
     Config_create_backgroundPointDist,
@@ -336,7 +335,6 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_packetLossMeter,
     Config_create_packetDropMeter,
     Config_create_packetLagMeter,
-    Config_create_clock,
     Config_create_clockAMPM,
 #ifdef _WINDOWS
     Config_create_threadedDraw,
@@ -353,6 +351,7 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_hudColor,
     Config_create_hudHLineColor,
     Config_create_hudVLineColor,
+    Config_create_hudItemsColor,
     Config_create_hudRadarEnemyColor,
     Config_create_hudRadarOtherColor,
     Config_create_hudLockColor,
@@ -372,6 +371,7 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_windowColor,
     Config_create_buttonColor,
     Config_create_borderColor,
+    Config_create_clockColor,
     Config_create_scoreColor,
     Config_create_scoreSelfColor,
     Config_create_scoreInactiveColor,
@@ -983,15 +983,6 @@ static int Config_create_backgroundPointDist(int widget_desc, int *height)
 			     Config_update_dots, NULL);
 }
 
-static int Config_create_showItems(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "showItems",
-			    BIT(instruments, SHOW_ITEMS)
-				? true : false,
-			    Config_update_instruments,
-			    (void *) SHOW_ITEMS);
-}
-
 static int Config_create_showItemsTime(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
@@ -1097,6 +1088,11 @@ static int Config_create_hudHLineColor(int widget_desc, int *height)
 static int Config_create_hudVLineColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(hudVLineColor);
+}
+
+static int Config_create_hudItemsColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(hudItemsColor);
 }
 
 static int Config_create_hudRadarEnemyColor(int widget_desc, int *height)
@@ -1223,6 +1219,11 @@ static int Config_create_buttonColor(int widget_desc, int *height)
 static int Config_create_borderColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(borderColor);
+}
+
+static int Config_create_clockColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(clockColor);
 }
 
 static int Config_create_scoreColor(int widget_desc, int *height)
@@ -1398,15 +1399,6 @@ static int Config_create_packetLagMeter(int widget_desc, int *height)
 				  ? true : false,
 			      Config_update_instruments,
 			      (void *) SHOW_PACKET_LAG_METER);
-}
-
-static int Config_create_clock(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "clock",
-			      BIT(instruments, SHOW_CLOCK)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_CLOCK);
 }
 
 static int Config_create_clockAMPM(int widget_desc, int *height)
@@ -1956,7 +1948,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "packetDropMeter", BIT(instruments, SHOW_PACKET_DROP_METER));
     Config_save_bool(fp, "packetLagMeter", BIT(instruments, SHOW_PACKET_LAG_METER));
     Config_save_bool(fp, "slidingRadar", BIT(instruments, SHOW_SLIDING_RADAR));
-    Config_save_bool(fp, "showItems", BIT(instruments, SHOW_ITEMS));
     Config_save_float(fp, "showItemsTime", showItemsTime);
     Config_save_int(fp, "showScoreDecimals", showScoreDecimals);
     Config_save_bool(fp, "outlineWorld", BIT(instruments, SHOW_OUTLINE_WORLD));
@@ -1964,7 +1955,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "texturedWalls", BIT(instruments, SHOW_TEXTURED_WALLS));
     Config_save_bool(fp, "fullColor", fullColor);
     Config_save_bool(fp, "texturedObjects", texturedObjects);
-    Config_save_bool(fp, "clock", BIT(instruments, SHOW_CLOCK));
     Config_save_bool(fp, "clockAMPM", BIT(instruments, SHOW_CLOCK_AMPM_FORMAT));
     Config_save_int(fp, "backgroundPointDist", map_point_distance);
     Config_save_int(fp, "backgroundPointSize", map_point_size);
@@ -2015,6 +2005,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "hudColor", hudColor);
     Config_save_int(fp, "hudHLineColor", hudHLineColor);
     Config_save_int(fp, "hudVLineColor", hudVLineColor);
+    Config_save_int(fp, "hudItemsColor", hudItemsColor);
     Config_save_int(fp, "hudRadarEnemyColor", hudRadarEnemyColor);
     Config_save_int(fp, "hudRadarOtherColor", hudRadarOtherColor);
     Config_save_int(fp, "hudLockColor", hudLockColor);
@@ -2034,6 +2025,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "windowColor", windowColor);
     Config_save_int(fp, "buttonColor", buttonColor);
     Config_save_int(fp, "borderColor", borderColor);
+    Config_save_int(fp, "clockColor", clockColor);
     Config_save_int(fp, "scoreColor", scoreColor);
     Config_save_int(fp, "scoreSelfColor", scoreSelfColor);
     Config_save_int(fp, "scoreInactiveColor", scoreInactiveColor);

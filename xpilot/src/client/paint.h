@@ -161,6 +161,7 @@ extern int	maxColors;		/* Max. number of colors to use */
 extern int	hudColor;		/* Color index for HUD drawing */
 extern int	hudHLineColor;		/* Color index for horiz. HUD line */
 extern int	hudVLineColor;		/* Color index for vert. HUD line */
+extern int	hudItemsColor;		/* Color index for HUD items drawing */
 extern int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
 extern int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 extern int	hudRadarDotSize;	/* Size for hudradar dot drawing */
@@ -193,6 +194,14 @@ extern int	decorColor;		/* Color index for decoration drawing */
 extern int	decorRadarColor;	/* Color index for decorations on radar */
 extern int	messagesColor;		/* Color index for message strings */
 extern int	oldMessagesColor;	/* Color index for old message strings */
+extern int	clockColor;		/* Clock color index */
+extern int	scoreColor;		/* Score list color index */
+extern int	scoreSelfColor;		/* Score list own score color index */
+extern int	scoreInactiveColor;	/* Score list inactive player color index */
+extern int	scoreInactiveSelfColor;	/* Score list inactive self color index */
+extern int	scoreZeroColor;		/* Score list team zero color index */
+extern int	scoreObjectColor;	/* Color index for map score objects */
+
 extern bool	gotFocus;		/* Do we have the mouse pointer */
 extern bool	talk_mapped;		/* Is talk window visible */
 extern bool     radar_score_mapped;     /* Is the radar and score window mapped */
