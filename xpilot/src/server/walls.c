@@ -127,7 +127,7 @@ unsigned short *llist;
 unsigned short *plist;
 int num_lines = 0;
 int num_polys = 0;
-int num_groups = 0;
+int num_groups = 1;
 int mapx, mapy;
 
 #if 0

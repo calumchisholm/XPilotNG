@@ -73,7 +73,7 @@ static int Create_group(int type, int team, int hitmask,
 	warn("Broken map: map object defined inside another.");
 	exit(1);
     }
-    current_group = ++num_groups;
+    current_group = num_groups++;
     Check_groupcount();
     groups[current_group].type = type;
     groups[current_group].team = team;
@@ -373,7 +373,7 @@ void P_grouphack(int type, void (*f)(int, void *))
 {
     int group;
 
-    for (group = 0; group <= num_groups; group++) {
+    for (group = 0; group < num_groups; group++) {
 	struct group *gp = groupptr_by_id(group);
 
 	if (gp->type == type)
@@ -385,6 +385,6 @@ void P_grouphack(int type, void (*f)(int, void *))
 void P_set_hitmask(int group, int hitmask)
 {
     assert(group >= 0);
-    assert(group <= num_groups);
+    assert(group < num_groups);
     groups[group].hitmask = hitmask;
 }

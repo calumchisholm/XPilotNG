@@ -541,7 +541,7 @@ void Target_init(void)
 {
     int group;
 
-    for (group = 0; group <= num_groups; group++) {
+    for (group = 0; group < num_groups; group++) {
 	struct group *gp = groupptr_by_id(group);
 
 	if (gp->type == TARGET)
@@ -668,7 +668,7 @@ void Team_immunity_init(void)
 {
     int group;
 
-    for (group = 0; group <= num_groups; group++) {
+    for (group = 0; group < num_groups; group++) {
 	struct group *gp = groupptr_by_id(group);
 
 	if (gp->type == CANNON) {
