@@ -486,9 +486,6 @@ bool Parser(int argc, char **argv)
 	xpprintf("Converting blocks to polygons...\n");
 	Xpmap_blocks_to_polygons();
 	xpprintf("Done creating polygons.\n");
-	/* force treatBallAsPoint on */
-	treatBallAsPoint = true;
-	Ball_line_init();
     }
 
     return status;
