@@ -117,6 +117,7 @@ float hudRadarDotScale;
 static double shipLineWidth;
 static bool smoothLines;
 static bool texturedBalls;
+static bool texturedShips;
 static GLuint polyListBase = 0;
 static GLuint polyEdgeListBase = 0;
 static GLuint asteroid = 0;
@@ -1229,7 +1230,7 @@ static void Gui_paint_ship_name(int x, int y, other_t *other)
 void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 		    int shield, int deflector, int eshield)
 {
-    int i, color;
+    int i, color, img;
     shipshape_t *ship;
     position_t point;
     other_t *other;
@@ -1242,28 +1243,40 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     if (shield) {
     	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, (color & 0xffffff00) + ((color & 0x000000ff)/2));
     }
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_LINE_SMOOTH);
-    glLineWidth(shipLineWidth);
-    set_alphacolor(color);
-
-    glBegin(GL_LINE_LOOP);
-    for (i = 0; i < ship->num_points; i++) {
-	point = Ship_get_point_position(ship, i, dir);
-	glVertex2d(x + point.x, y + point.y);
-    }
-    glEnd();
-
-    glLineWidth(1);
-    glDisable(GL_LINE_SMOOTH);
-    glDisable(GL_BLEND);
-
+	if (texturedShips) {
+		if (BIT(Setup->mode, TEAM_PLAY)
+			&& other != NULL
+			&& self != NULL
+			&& self->team == other->team) {
+			img = IMG_SHIP_FRIEND;
+		} else if (self != NULL && self->id != id) {
+			img = IMG_SHIP_ENEMY;
+		} else {
+			img = IMG_SHIP_SELF;
+		}
+		Image_paint(img, x - 16, y - 16, dir>>1, color);
+	} else {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_LINE_SMOOTH);
+		glLineWidth(shipLineWidth);
+		set_alphacolor(color);
+		
+		glBegin(GL_LINE_LOOP);
+		for (i = 0; i < ship->num_points; i++) {
+			point = Ship_get_point_position(ship, i, dir);
+			glVertex2d(x + point.x, y + point.y);
+		}
+		glEnd();
+	
+		glLineWidth(1);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_BLEND);
+	}
     if (self != NULL
     	&& self->id != id
     	&& other != NULL)
-    	    Gui_paint_ship_name(x,y,other);
+		Gui_paint_ship_name(x,y,other);
 }
 
 void Paint_score_objects(void)
@@ -2124,6 +2137,14 @@ static xp_option_t sdlgui_options[] = {
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
 	"Draw balls with textures.\n"),
+
+    XP_BOOL_OPTION(
+        "texturedShips",
+        true,
+	&texturedShips,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Draw ships with textures.\n"),
 
     XP_INT_OPTION(
         "hudRadarEnemyShape",
