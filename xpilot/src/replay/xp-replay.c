@@ -452,6 +452,7 @@ static long	mem_program_used;		/* max. size of malloced mem */
 static long	mem_all_types_used;		/* frame memory in use */
 static long	mem_typed_used[NUM_MEMTYPES];	/* debugging & analysis */
 static long	max_mem = 8 * 1024 * 1024;	/* memory limit (soft) */
+static int	loopAtEnd;
 
 static void openErrorWindow(struct errorwin *, const char *, ...);
 
@@ -3226,6 +3227,14 @@ static void dox(struct xui *ui, struct xprc *rc)
 
 	}
 
+	/*
+	 * for "-loop" option, act like z was pressed
+	 */
+	if (rc->eof == True && loopAtEnd) {
+	    rc->eof = False;
+	    frameStep = -rc->cur->number;
+	}
+
 	gettimeofday(&tv1, NULL);
 	if (frameStep != 0) {
 	    tv0 = tv1;
@@ -3388,6 +3397,10 @@ static void usage(void)
 "               Valid gamma correction factors are in the range [0.1 - 10].\n"
 "        -compress\n"
 "               Save frames compressed using the \"compress\" program.\n"
+"        -loop\n"
+"               Loop after playing\n"
+"        -play\n"
+"               Start playing immediately\n"
 "        -debug\n"
 "        -verbose\n"
 "        -help\n"
@@ -3453,6 +3466,12 @@ int main(int argc, char **argv)
 	    if (gamma == 1.0) {
 		gamma = 0;
 	    }
+	}
+	else if (!strcmp(argv[argi], "-play")) {
+	    currentSpeed = 1;
+	}
+	else if (!strcmp(argv[argi], "-loop")) {
+	    loopAtEnd = 1;
 	}
 	else {
 	    if (!strncmp(argv[argi], "-h", 2) ||
