@@ -1247,34 +1247,41 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, (color & 0xffffff00) + ((color & 0x000000ff)/2));
     }
 	if (texturedShips) {
-		if (BIT(Setup->mode, TEAM_PLAY)
+    	    if (BIT(Setup->mode, TEAM_PLAY)
 			&& other != NULL
 			&& self != NULL
 			&& self->team == other->team) {
 			img = IMG_SHIP_FRIEND;
-		} else if (self != NULL && self->id != id) {
+    	    } else if (self != NULL && self->id != id) {
 			img = IMG_SHIP_ENEMY;
-		} else {
+    	    } else {
 			img = IMG_SHIP_SELF;
-		}
-		Image_paint(img, x - 16, y - 16, dir>>1, color);
+    	    }
+    	    Image_paint(img, x - 16, y - 16, dir>>1, color);
 	} else {
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_LINE_SMOOTH);
-		glLineWidth(shipLineWidth);
-		set_alphacolor(color);
+    	    glEnable(GL_BLEND);
+    	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    	    glEnable(GL_LINE_SMOOTH);
+    	    glLineWidth(shipLineWidth);
+    	    set_alphacolor(color);
 		
-		glBegin(GL_LINE_LOOP);
-		for (i = 0; i < ship->num_points; i++) {
-			point = Ship_get_point_position(ship, i, dir);
-			glVertex2d(x + point.x, y + point.y);
-		}
-		glEnd();
+    	    if (cloak || phased ) {
+    	    	glEnable(GL_LINE_STIPPLE);
+    	    	glLineStipple( 3, 0xAAAA );
+	    }
+	    
+    	    glBegin(GL_LINE_LOOP);
+    	    	for (i = 0; i < ship->num_points; i++) {
+    	    	    point = Ship_get_point_position(ship, i, dir);
+    	    	    glVertex2d(x + point.x, y + point.y);
+    	    	}
+    	    glEnd();
+	    
+    	    if (cloak || phased ) glDisable(GL_LINE_STIPPLE);
 	
-		glLineWidth(1);
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_BLEND);
+    	    glLineWidth(1);
+    	    glDisable(GL_LINE_SMOOTH);
+    	    glDisable(GL_BLEND);
 	}
     if (self != NULL
     	&& self->id != id
