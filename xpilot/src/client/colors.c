@@ -1005,7 +1005,7 @@ void Colors_cleanup(void)
 void Colors_debug(void)
 {
     int			i, n, r, g, b;
-    XColor		colors[256];
+    XColor		cols[256];
     FILE		*fp = fopen("rgb", "w");
 
     if (!color_cube) {
@@ -1022,7 +1022,7 @@ void Colors_debug(void)
 	b = rgb_cube_sizes[i].b;
 	n = r * g * b;
 
-	Fill_color_cube(r, g, b, colors);
+	Fill_color_cube(r, g, b, cols);
 
 	fprintf(fp, "\n\n  RGB  %d %d %d\n\n", r, g, b);
 	i = 0;
@@ -1030,7 +1030,7 @@ void Colors_debug(void)
 	    for (g = 0; g < color_cube->greens; g++) {
 		for (b = 0; b < color_cube->blues; b++, i++)
 		    fprintf(fp, "color %4d    %04X  %04X  %04X\n",
-			    i, colors[i].red, colors[i].green, colors[i].blue);
+			    i, cols[i].red, cols[i].green, cols[i].blue);
 	    }
 	}
 	fprintf(fp,
@@ -1111,6 +1111,7 @@ void Init_spark_colors(void)
 
 static bool Spark_colors_setfunc (xp_option_t *opt, const char *val)
 {
+    (void)opt;
     strlcpy(sparkColors, val, sizeof sparkColors);
     Init_spark_colors();
     /* might fail to set what we wanted, but return ok nonetheless */
