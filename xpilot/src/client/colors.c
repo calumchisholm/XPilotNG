@@ -1310,7 +1310,7 @@ static xp_option_t color_options[] = {
 
     COLOR_INDEX_OPTION(
 	"zeroLivesColor",
-	4,
+	3,
 	&zeroLivesColor,
 	"Which color to associate with ships with zero lives left.\n"
 	"This can be used to paint for example ship and base names.\n"),
