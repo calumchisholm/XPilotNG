@@ -231,11 +231,13 @@ static void Choose_visual(void)
     visual_class = -1;
     if (visualName[0] != '\0') {
 	if (strncmp(visualName, "0x", 2) == 0) {
-	    if (sscanf(visualName, "%x", &visual_id) < 1) {
-		errno = 0;
-		error("Bad visual id \"%s\", using default\n", visualName);
+	    unsigned int vid;
+
+	    if (sscanf(visualName, "%x", &vid) < 1) {
+		warn("Bad visual id \"%s\", using default\n", visualName);
 		visual_id = -1;
-	    }
+	    } else
+		visual_id = vid;
 	} else {
 	    for (i = 0; i < MAX_VISUAL_CLASS; i++) {
 		if (strncasecmp(visualName, visual_class_names[i].visual_name,
