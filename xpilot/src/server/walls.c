@@ -33,15 +33,8 @@ static char msg[MSG_LEN];
 
 /* kps compatibility hacks - plz remove if you can */
 void Walls_init_old(void);
-void Move_object_old(object *obj);
-void Move_player_old(player *pl);
-void Turn_player_old(player *pl);
 
 static void Walls_init_new(void);
-static void Move_object_new(object *obj);
-static void Move_player_new(player *pl);
-static void Turn_player_new(player *pl);
-
 
 /* polygon map related stuff */
 
@@ -221,32 +214,6 @@ void Move_init(void)
     mp.obj_target_mask = mp.obj_cannon_mask | OBJ_BALL | OBJ_SPARK;
     mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL | OBJ_PULSE;
 }
-
-void Move_object(object *obj)
-{
-    if (is_polygon_map || !useOldCode)
-	Move_object_new(obj);
-    else
-	Move_object_old(obj);
-}
-
-void Move_player(player *pl)
-{
-    if (is_polygon_map || !useOldCode)
-	Move_player_new(pl);
-    else
-	Move_player_old(pl);
-}
-
-void Turn_player(player *pl)
-{
-    if (is_polygon_map || !useOldCode)
-	Turn_player_new(pl);
-    else
-	Turn_player_old(pl);
-}
-
-
 
 void Object_hits_target(object *obj, target_t *targ, long player_cost)
 {
@@ -1393,7 +1360,7 @@ static int Shape_morph(const shape *shape1, int dir1, const shape *shape2,
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
     unsigned short *points;
     struct move mv;
-    shapepos *pts1, *pts2;
+    /*shapepos *pts1, *pts2;*/
     int num_points;
 
     mv.hitmask = hitmask;
@@ -2702,7 +2669,7 @@ static void Move_ball(object *obj)
 
 /* kps- collision.c has a move_object call in ng */
 /* used to have ind argument in ng */
-static void Move_object_new(object *obj)
+void Move_object(object *obj)
 {
     int t;
     struct move mv;
@@ -2774,7 +2741,7 @@ static void Move_object_new(object *obj)
 }
 
 
-static void Move_player_new(player *pl)
+void Move_player(player *pl)
 {
     clpos  pos;
     struct move mv;
@@ -2881,7 +2848,7 @@ static void Move_player_new(player *pl)
 }
 
 
-static void Turn_player_new(player *pl)
+void Turn_player(player *pl)
 {
     int		new_dir = MOD2((int)(pl->float_dir + 0.5f), RES);
     int		next_dir, sign, hitmask;
