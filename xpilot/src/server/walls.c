@@ -2210,7 +2210,7 @@ static void Corner_init(void)
     int block, size = mapx * mapy;
     int height, height2, width, by2;
 
-#define DISIZE 200
+#define DISIZE 500
     temp = ralloc(NULL, mapx * mapy * DISIZE * sizeof(short)); /* !@# */
     for (i = 0; i < mapx * mapy; i++)
 	temp[i * DISIZE] = 0;
@@ -2381,11 +2381,6 @@ void Treasure_init(world_t *world)
     for (i = 0; i < world->NumTreasures; i++)
 	Make_treasure_ball(world, Treasures(world, i));
 }
-
-extern shape_t asteroid_wire1;
-extern shape_t asteroid_wire2;
-extern shape_t asteroid_wire3;
-extern shape_t asteroid_wire4;
 
 
 static void Move_asteroid(object_t *obj)
