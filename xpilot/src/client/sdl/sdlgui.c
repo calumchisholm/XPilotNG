@@ -2107,7 +2107,7 @@ static bool set_rgba_color_option(xp_option_t *opt, const char *val)
 static const char *get_rgba_color_option(xp_option_t *opt)
 {
     static char buf[10];
-    sprintf(buf, "#%X", *((int*)Option_get_private_data(opt)));
+    sprintf(buf, "#%08X", *((int*)Option_get_private_data(opt)));
     return buf;
 }
 
