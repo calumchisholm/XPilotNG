@@ -285,7 +285,7 @@ bool Key_press_increase_power(keys_t key)
 bool Key_press_decrease_power(keys_t key)
 {
     (void)key;
-    power = power * 0.90;
+    power = power / 1.10;
     power = MAX(power, MIN_PLAYER_POWER);
     Send_power(power);
 
@@ -309,7 +309,7 @@ bool Key_press_increase_turnspeed(keys_t key)
 bool Key_press_decrease_turnspeed(keys_t key)
 {
     (void)key;
-    turnspeed = turnspeed * 0.95;
+    turnspeed = turnspeed / 1.05;
     turnspeed = MAX(turnspeed, MIN_PLAYER_TURNSPEED);
     Send_turnspeed(turnspeed);
 
