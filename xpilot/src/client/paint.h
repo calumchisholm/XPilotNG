@@ -26,6 +26,11 @@
 #ifndef PAINT_H
 #define PAINT_H
 
+#ifdef _WINDOWS
+#include "types.h"
+#include "client.h"
+#endif
+
 /* constants begin */
 #define MAX_COLORS		16	/* Max. switched colors ever */
 #define MAX_COLOR_LEN		32	/* Max. length of a color name */
