@@ -1,6 +1,10 @@
 /* 
  * XPilotNG, an XPilot-like multiplayer space war game.
  *
+ * Copyright (C) 2003-2004 by
+ *
+ *      Kristian Söderblom   <kps@users.sourceforge.net>
+ *
  * Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>

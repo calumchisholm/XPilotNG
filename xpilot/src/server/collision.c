@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2000-2004 by
  *
- *      Uoti Urpala        <uau@users.sourceforge.net>
- *      Kristian Söderblom <kps@users.sourceforge.net>
+ *      Uoti Urpala          <uau@users.sourceforge.net>
+ *      Kristian Söderblom   <kps@users.sourceforge.net>
  *
  * Copyright (C) 1991-2001 by
  *
