@@ -700,6 +700,7 @@ void Gui_paint_spark(int color, int x, int y)
     glColor3ub(255 * (color + 1) / 8,
 	       255 * color * color / 64,
 	       0);
+    glPointSize(spark_size);
     glBegin(GL_POINTS);
     glVertex2i(x + world.x, world.y + ext_view_height - y);
     glEnd();
@@ -2020,4 +2021,109 @@ if (newcode) {
 	else
 	    width = message_texs[i_2].width;
     }
+}
+
+static bool set_rgba_color_option(xp_option_t *opt, const char *val)
+{
+    int c = 0;
+    assert(val);
+    if (*val != '#') return false;
+    c = strtoll(val + 1, NULL, 16) & 0xffffffff;
+    *((int*)Option_get_private_data(opt)) = c;
+    return true;
+}
+
+static const char *get_rgba_color_option(xp_option_t *opt)
+{
+    static char buf[10];
+    sprintf(buf, "#%X", *((int*)Option_get_private_data(opt)));
+    return buf;
+}
+
+#define COLOR(variable, defval, description) \
+    XP_STRING_OPTION(#variable, \
+		     defval, \
+                     NULL, \
+		     0, \
+		     set_rgba_color_option, \
+		     &variable, \
+		     get_rgba_color_option, \
+		     "The color of " description ".\n")
+    
+
+static xp_option_t sdlgui_options[] = {
+
+    COLOR(wallColorRGBA, "#0000ffff", "walls on blockmaps"),
+    COLOR(hudColorRGBA, "#ff000088", "the HUD"),
+    COLOR(connColorRGBA, "#00ff0088", "the ball connector"),
+    COLOR(scoreObjectColorRGBA, "#00ff0088", "score objects"),
+    COLOR(fuelColorRGBA, "#ffffff7f", "fuel cells"),
+    COLOR(messagesColorRGBA, "#00aaaa88", "messages"),
+    COLOR(oldmessagesColorRGBA, "#00888888", "old messages"),
+    COLOR(msgScanBallColorRGBA, "#ff000088", "ball warning"),
+    COLOR(msgScanSafeColorRGBA, "#00ff0088", "ball safe announcement"),
+    COLOR(msgScanCoverColorRGBA, "#4e7cff88", "cover request"),
+    COLOR(msgScanPopColorRGBA, "#ffbb1188", "ball pop announcement"),
+    COLOR(meterBorderColorRGBA, "#0000ff55", "meter borders"),
+    COLOR(fuelMeterColorRGBA, "#ff000055", "fuel meter"),
+    COLOR(powerMeterColorRGBA, "#ff000055", "power meter"),
+    COLOR(turnSpeedMeterColorRGBA, "#ff000055", "turn speed meter"),
+    COLOR(packetSizeMeterColorRGBA, "#ff000055", "packet size meter"),
+    COLOR(packetLossMeterColorRGBA, "#ff000055", "packet loss meter"),
+    COLOR(packetDropMeterColorRGBA, "#ff000055", "drop meter"),
+    COLOR(packetLagMeterColorRGBA, "#ff000055", "lag meter"),
+    COLOR(temporaryMeterColorRGBA, "#ff000055", "time meter"),
+    COLOR(dirPtrColorRGBA, "#0000ff22", "direction pointer"),
+    COLOR(hudHLineColorRGBA, "#0000ff44", "horizontal HUD line"),
+    COLOR(hudVLineColorRGBA, "#0000ff44", "vertical HUD line"),
+    COLOR(hudItemsColorRGBA, "#0000ff44", "hud items"),
+    COLOR(fuelGaugeColorRGBA, "#0000ff44", "fuel gauge"),
+    COLOR(selfLWColorRGBA, "#ff0000ff", "my ship on last life"),
+    COLOR(teamLWColorRGBA, "#ff00ffff", "team ship on last life"),
+    COLOR(enemyLWColorRGBA, "#ffff00ff", "enemy ship on last life"),
+    COLOR(team0ColorRGBA, "#00000000", "team 0"),
+    COLOR(team1ColorRGBA, "#00000000", "team 1"),
+    COLOR(team2ColorRGBA, "#00000000", "team 2"),
+    COLOR(team3ColorRGBA, "#00000000", "team 3"),
+    COLOR(team4ColorRGBA, "#00000000", "team 4"),
+    COLOR(team5ColorRGBA, "#00000000", "team 5"),
+    COLOR(team6ColorRGBA, "#00000000", "team 6"),
+    COLOR(team7ColorRGBA, "#00000000", "team 7"),
+    COLOR(team8ColorRGBA, "#00000000", "team 8"),
+    COLOR(team9ColorRGBA, "#00000000", "team 9"),
+    COLOR(shipNameColorRGBA, "#00000000", "ship name"),
+    COLOR(baseNameColorRGBA, "#00000000", "base name"),
+    COLOR(manyLivesColorRGBA, "#00000000", "name of ship with many lives"),
+    COLOR(twoLivesColorRGBA, "#00000000", "name of ship with two lives"),
+    COLOR(oneLifeColorRGBA, "#00000000", "name of ship with one life"),
+    COLOR(zeroLivesColorRGBA, "#00000000", "name of ship with no lives"),
+    COLOR(hudRadarEnemyColorRGBA, "#ff000088", "enemy on HUD radar"),
+    COLOR(hudRadarOtherColorRGBA, "#0000ff88", "friend on HUD radar"),
+    COLOR(scoreInactiveSelfColorRGBA, "#88008888", "my score when inactive"),
+    COLOR(scoreInactiveColorRGBA, "#8800aa88", "score when inactive"),
+    COLOR(scoreSelfColorRGBA, "#ffff00ff", "my score"),
+    COLOR(scoreColorRGBA, "#888800ff", "score"),
+    COLOR(scoreOwnTeamColorRGBA, "#0000ffff", "my team score"),
+    COLOR(scoreEnemyTeamColorRGBA, "#ff0000ff", "enemy team score"),
+    COLOR(selectionColorRGBA, "#ff0000ff", "selection"),
+    
+    XP_INT_OPTION(
+        "meterWidth",
+	60, 0, 600,
+	&meterWidth,
+	NULL,
+	"Set the width of the meters.\n"),
+
+    XP_INT_OPTION(
+        "meterHeight",
+	10, 0, 100,
+	&meterHeight,
+	NULL,
+	"Set the height of a meter.\n"),
+
+};
+
+void Store_sdlgui_options(void)
+{
+    STORE_OPTIONS(sdlgui_options);
 }
