@@ -1381,9 +1381,9 @@ void Compute_game_status(void)
 	for (i = 0; i < NumPlayers; i++)  {
 	    pl = Players(i);
 	    if (BIT(pl->status, PAUSE)
-		|| IS_TANK_PTR(pl)) {
+		|| IS_TANK_PTR(pl))
 		continue;
-	    }
+
 	    if (!BIT(pl->status, GAME_OVER))
 		num_alive_players++;
 	    else if (pl->mychar == 'W') {
@@ -1401,9 +1401,8 @@ void Compute_game_status(void)
 		else
 		    CLR_BIT(pl->status, FINISH);
 	    }
-	    else if (!BIT(pl->status, GAME_OVER)) {
+	    else if (!BIT(pl->status, GAME_OVER))
 		alive = pl;
-	    }
 
 	    /*
 	     * An active player is one who is:
