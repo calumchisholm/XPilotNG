@@ -268,6 +268,8 @@
 
 #define ENERGY_RANGE_FACTOR	(2.5/FUEL_SCALE_FACT)
 
+/* kps - 7x7 is the smallest map I've seen */
+#define MIN_MAP_SIZE		7
 /* map dimension limitation: ((0x7FFF - 1280) / 35) */
 #define MAX_MAP_SIZE		900
 

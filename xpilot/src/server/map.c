@@ -565,9 +565,9 @@ static bool Grok_map_size(void)
 	h *= BLOCK_SZ;
     }
 
-    if (w < BLOCK_SZ) {
-	warn("mapWidth too small, minimum is 1 block (%d pixels).\n",
-	     BLOCK_SZ);
+    if (w < MIN_MAP_SIZE * BLOCK_SZ) {
+	warn("mapWidth too small, minimum is %d blocks (%d pixels).\n",
+	     MIN_MAP_SIZE, MIN_MAP_SIZE * BLOCK_SZ);
 	bad = true;
     }
     if (w > MAX_MAP_SIZE * BLOCK_SZ) {
@@ -575,9 +575,9 @@ static bool Grok_map_size(void)
 	    MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
 	bad = true;
     }
-    if (h < BLOCK_SZ) {
-	warn("mapHeight too small, minimum is 1 block (%d pixels).\n",
-	     BLOCK_SZ);
+    if (h < MIN_MAP_SIZE * BLOCK_SZ) {
+	warn("mapHeight too small, minimum is %d blocks (%d pixels).\n",
+	     MIN_MAP_SIZE, MIN_MAP_SIZE * BLOCK_SZ);
 	bad = true;
     }
     if (h > MAX_MAP_SIZE * BLOCK_SZ) {
