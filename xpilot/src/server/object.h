@@ -145,13 +145,11 @@ struct cell_node {
     vector_t		acc;		/* acceleration in x,y */	\
     float		mass;		/* mass in unigrams */		\
     double		life;		/* No of ticks left to live */	\
-/* Item pack count is kept in the 'count' field, float now, change !@# */ \
-/*    float		count;	*/	/* Misc snafus */		\
     modifiers_t		mods;		/* Modifiers to this object */	\
     uint8_t		type;		/* one of OBJ_XXX */		\
     uint8_t		color;		/* Color of object */		\
-    uint8_t		missile_dir;	/* missile direction */		\
     uint8_t		collmode;	/* collision checking mode */	\
+    uint8_t		missile_dir;	/* missile direction */		\
     short		wormHoleHit;	\
     short		wormHoleDest;	\
     uint16_t		obj_status;	/* gravity, etc. */		\
@@ -162,7 +160,6 @@ struct cell_node {
     cell_node_t		cell;		/* node in cell linked list */	\
     short		pl_range;	/* distance for collision */	\
     short		pl_radius;	/* distance for hit */		\
-   /* long		info;*/		/* Miscellaneous info */	\
     double		fusetime;	/* Frame when considered fused */ \
 
 /* up to here all object types are the same. */
@@ -193,9 +190,9 @@ struct xp_mineobject {
     OBJECT_EXTEND
 
     float		mine_count;	/* Misc snafus */
-    float		ecm_range;	/* Range from last ecm center */
-    float		spread_left;	/* how much spread time left */
-    short 		owner;		/* Who's object is this ? */
+    float		mine_ecm_range;	/* Range from last ecm center */
+    float		mine_spread_left;	/* how much spread time left */
+    short 		mine_owner;		/* Who's object is this ? */
 
 #define MINE_IND(ind)	((mineobject_t *)Obj[(ind)])
 #define MINE_PTR(ptr)	((mineobject_t *)(ptr))
@@ -203,8 +200,9 @@ struct xp_mineobject {
 
 
 #define MISSILE_EXTEND		\
-    float		max_speed;	/* speed limitation */		\
-    float		turnspeed;	/* how fast to turn */
+    float		missile_max_speed;	/* speed limitation */	\
+    float		missile_turnspeed;	/* how fast to turn */
+
 
 /* up to here all missiles types are the same. */
 
@@ -237,11 +235,10 @@ struct xp_smartobject {
 
     MISSILE_EXTEND
 
+    float		smart_ecm_range;	/* Range from last ecm center*/
     float		smart_count;	/* Misc snafus */
-    long		smart_info;	/* snafu */
-    int			new_info;	/* smart re-lock id */
-
-    float		ecm_range;	/* Range from last ecm center */
+    short		smart_lock_id;	/* snafu */
+    short		smart_relock_id;	/* smart re-lock id */
 
 #define SMART_IND(ind)	((smartobject_t *)Obj[(ind)])
 #define SMART_PTR(ptr)	((smartobject_t *)(ptr))
@@ -260,7 +257,7 @@ struct xp_torpobject {
 
     MISSILE_EXTEND
 
-    float		spread_left;	/* how much spread time left */
+    float		torp_spread_left;	/* how much spread time left */
     float		torp_count;	/* Misc snafus */
 
 #define TORP_IND(ind)	((torpobject_t *)Obj[(ind)])
@@ -281,7 +278,7 @@ struct xp_heatobject {
     MISSILE_EXTEND
 
     float		heat_count;	/* Misc snafus */
-    float		heat_info;	/* snafu */
+    short		heat_lock_id;	/* snafu */
 
 #define HEAT_IND(ind)	((heatobject_t *)Obj[(ind)])
 #define HEAT_PTR(ptr)	((heatobject_t *)(ptr))
@@ -299,9 +296,9 @@ struct xp_ballobject {
     OBJECT_EXTEND
 
     float		ball_count;	/* Misc snafus */
-    treasure_t		*treasure;	/* treasure for ball */
-    short 		owner;		/* Who's object is this ? */
-    short		style;		/* What polystyle to use */
+    treasure_t		*ball_treasure;	/* treasure for ball */
+    short 		ball_owner;	/* Who's object is this ? */
+    short		ball_style;	/* What polystyle to use */
 
 #define BALL_IND(ind)	((ballobject_t *)Obj[(ind)])
 #define BALL_PTR(obj)	((ballobject_t *)(obj))
@@ -318,12 +315,11 @@ struct xp_wireobject {
 
     OBJECT_EXTEND
 
-    long		wire_info;	/* Miscellaneous info */
+    float		wire_turnspeed;	/* how fast to turn */
 
-    float		turnspeed;	/* how fast to turn */
-
-    uint8_t		size;		/* Size of object (wreckage) */
-    uint8_t		rotation;	/* Rotation direction */
+    uint8_t		wire_type;	/* Type of object */
+    uint8_t		wire_size;	/* Size of object */
+    uint8_t		wire_rotation;	/* Rotation direction */
 
 #define WIRE_IND(ind)	((wireobject_t *)Obj[(ind)])
 #define WIRE_PTR(obj)	((wireobject_t *)(obj))
@@ -340,12 +336,9 @@ struct xp_pulseobject {
 
     OBJECT_EXTEND
 
-    float		pulse_count;	/* Misc snafus */
-    long		pulse_info;	/* snafu */
-
-    float		len;		/* Length of the pulse */
-    uint8_t		dir;		/* Direction of the pulse */
-    bool		refl;		/* Pulse was reflected ? */
+    float		pulse_len;	/* Length of the pulse */
+    uint8_t		pulse_dir;	/* Direction of the pulse */
+    bool		pulse_refl;	/* Pulse was reflected ? */
 
 #define PULSE_IND(ind)	((pulseobject_t *)Obj[(ind)])
 #define PULSE_PTR(obj)	((pulseobject_t *)(obj))
@@ -362,7 +355,7 @@ struct xp_itemobject {
 
     OBJECT_EXTEND
 
-    long		item_info;	/* Miscellaneous info */
+    int			item_type;	/* One of ITEM_* */
     int			item_count;	/* Misc snafus */
 
 #define ITEM_IND(ind)	((itemobject_t *)Obj[(ind)])

@@ -470,16 +470,16 @@ static void Misc_object_update(world_t *world)
 	else if (obj->type == OBJ_WRECKAGE) {
 	    wireobject_t *wireobj = WIRE_PTR(obj);
 
-	    wireobj->rotation =
-		(wireobj->rotation
-		 + (int) (wireobj->turnspeed * timeStep * RES)) % RES;
+	    wireobj->wire_rotation =
+		(wireobj->wire_rotation
+		 + (int) (wireobj->wire_turnspeed * timeStep * RES)) % RES;
 	}
 
 	else if (obj->type == OBJ_PULSE) {
 	    pulseobject_t *pulse = PULSE_PTR(obj);
 
-	    pulse->len += options.pulseSpeed * timeStep;
-	    LIMIT(pulse->len, 0, options.pulseLength);
+	    pulse->pulse_len += options.pulseSpeed * timeStep;
+	    LIMIT(pulse->pulse_len, 0, options.pulseLength);
 	}
 
 	update_object_speed(world, obj);

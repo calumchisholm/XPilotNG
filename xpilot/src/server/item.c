@@ -307,7 +307,7 @@ void Make_item(world_t *world, clpos_t pos, vector_t vel,
 	return;
 
     item->type = OBJ_ITEM;
-    item->item_info = type;
+    item->item_type = type;
     item->color = RED;
     item->obj_status = status;
     item->id = NO_ID;
@@ -963,7 +963,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 		}
 		if (shot->type == OBJ_SMART_SHOT) {
 		    smart = SMART_PTR(shot);
-		    if (smart->smart_info != owner_pl->id)
+		    if (smart->smart_lock_id != owner_pl->id)
 			continue;
 		}
 	    } else if ((pl && Team_immune(pl->id, owner_pl->id))
@@ -980,16 +980,16 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 	     */
 	    smart = SMART_PTR(shot);
 	    SET_BIT(smart->obj_status, CONFUSED);
-	    smart->ecm_range = range;
+	    smart->smart_ecm_range = range;
 	    smart->smart_count = CONFUSED_TIME;
 	    if (pl
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
 		&& (pl->lock.distance <= pl->sensor_range
 		    || !BIT(world->rules->mode, LIMITED_VISIBILITY))
 		&& pl->visibility[GetInd(pl->lock.pl_id)].canSee)
-		smart->new_info = pl->lock.pl_id;
+		smart->smart_relock_id = pl->lock.pl_id;
 	    else
-		smart->new_info
+		smart->smart_relock_id
 		    = Player_by_index((int)(rfrac() * NumPlayers))->id;
 	    /* Can't redirect missiles to team mates. */
 	    /* So let the missile keep on following this unlucky player. */
@@ -1003,7 +1003,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 
 	case OBJ_MINE:
 	    mine = MINE_PTR(shot);
-	    mine->ecm_range = range;
+	    mine->mine_ecm_range = range;
 
 	    /*
 	     * perim is distance from the mine to its detonation perimeter
@@ -1130,7 +1130,7 @@ void Fire_general_ecm(world_t *world, player_t *pl, int team, clpos_t pos)
 		    if (shot->type == OBJ_BALL) {
 			ballobject_t *ball = BALL_PTR(shot);
 
-			if (ball->owner == p->id) {
+			if (ball->ball_owner == p->id) {
 			    if ((int)(rfrac() * 100.0) < ((int)(20*range)+5))
 				Detach_ball(p, ball);
 			}

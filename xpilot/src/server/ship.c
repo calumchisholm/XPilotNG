@@ -426,10 +426,10 @@ void Tank_handle_detach(player_t *pl)
 	if (obj->type == OBJ_HEAT_SHOT) {
 	    heatobject_t *heat = HEAT_PTR(obj);
 
-	    if (heat->heat_info > 0
-		&& Player_by_id(heat->heat_info) == pl)
+	    if (heat->heat_lock_id > 0
+		&& Player_by_id(heat->heat_lock_id) == pl)
 		/* kps - is this right ? */
-		heat->heat_info = NumPlayers - 1;
+		heat->heat_lock_id = NumPlayers - 1;
 	}
     }
 
@@ -542,15 +542,15 @@ void Make_wreckage(world_t *world,
 	wreckage->fusetime = 0;
 
 	/* Wreckage type, rotation, and size */
-	wreckage->turnspeed = 0.02 + rfrac() * 0.35;
-	wreckage->rotation = (int)(rfrac() * RES);
+	wreckage->wire_turnspeed = 0.02 + rfrac() * 0.35;
+	wreckage->wire_rotation = (int)(rfrac() * RES);
 	size = (int) ( 256.0 * 1.5 * mass / total_mass );
 	if (size > 255)
 	    size = 255;
-	wreckage->size = size;
-	wreckage->wire_info = (int)(rfrac() * 256);
+	wreckage->wire_size = size;
+	wreckage->wire_type = (uint8_t)(rfrac() * 256);
 
-	radius = wreckage->size * 16 / 256;
+	radius = wreckage->wire_size * 16 / 256;
 	if (radius < 8)
 	    radius = 8;
 

@@ -81,15 +81,16 @@ void Cannon_update(world_t *world, bool do_less_frequent_update)
 		     && options.cannonsUseItems
 		     && options.itemProbMult > 0
 		     && options.cannonItemProbMult > 0) {
-		int item = (int)(rfrac() * NUM_ITEMS);
+		int item_type = (int)(rfrac() * NUM_ITEMS);
 		/* this gives the cannon an item about once every minute */
-		if (world->items[item].cannonprob > 0
+		if (world->items[item_type].cannonprob > 0
 		    && options.cannonItemProbMult > 0
 		    && (int)(rfrac() * (60 * 12))
 		    < (options.cannonItemProbMult
-		       * world->items[item].cannonprob))
-		    Cannon_add_item(c, item, (item == ITEM_FUEL
-					      ?  ENERGY_PACK_FUEL : 1));
+		       * world->items[item_type].cannonprob))
+		    Cannon_add_item(c, item_type,
+				    (item_type == ITEM_FUEL
+				     ?  ENERGY_PACK_FUEL : 1));
 	    }
 	}
 	if ((c->damaged -= timeStep) <= 0)
@@ -129,11 +130,11 @@ void Cannon_update(world_t *world, bool do_less_frequent_update)
 /* adds the given amount of an item to the cannon's inventory. the number of
    tanks is taken to be 1. amount is then the amount of fuel in that tank.
    fuel is given in 'units', but is stored in fuelpacks. */
-void Cannon_add_item(cannon_t *c, int item, double amount)
+void Cannon_add_item(cannon_t *c, int item_type, int amount)
 {
     world_t *world = c->world;
 
-    switch (item) {
+    switch (item_type) {
     case ITEM_TANK:
 	c->item[ITEM_TANK]++;
 	LIMIT(c->item[ITEM_TANK], 0, world->items[ITEM_TANK].limit);
@@ -145,8 +146,8 @@ void Cannon_add_item(cannon_t *c, int item, double amount)
 	      (int)(world->items[ITEM_FUEL].limit / ENERGY_PACK_FUEL + 0.5));
 	break;
     default:
-	c->item[item] += (int)amount;
-	LIMIT(c->item[item], 0, world->items[item].limit);
+	c->item[item_type] += amount;
+	LIMIT(c->item[item_type], 0, world->items[item_type].limit);
 	break;
     }
 }
@@ -171,7 +172,7 @@ void Cannon_throw_items(cannon_t *c)
 		&& (item = ITEM_PTR(Object_allocate())) != NULL) {
 
 		item->type = OBJ_ITEM;
-		item->item_info = i;
+		item->item_type = i;
 		item->color = RED;
 		item->obj_status = GRAVITY;
 		dir = (int)(c->dir

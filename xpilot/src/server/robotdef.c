@@ -212,7 +212,7 @@ int Robot_default_setup(robot_type_t *type_ptr)
 static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i);
 static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode);
 static bool Detect_ship(player_t *pl, player_t *ship);
-static int Rank_item_value(player_t *pl, long itemtype);
+static int Rank_item_value(player_t *pl, enum Item itemtype);
 static bool Ball_handler(player_t *pl);
 
 
@@ -1227,7 +1227,7 @@ static bool Detect_ship(player_t *pl, player_t *ship)
 #define ROBOT_IGNORE_ITEM	0	/* ignore */
 /*
  */
-static int Rank_item_value(player_t *pl, long itemtype)
+static int Rank_item_value(player_t *pl, enum Item itemtype)
 {
     robot_default_data_t *my_data = Robot_default_get_data(pl);
     world_t *world = pl->world;
@@ -1236,9 +1236,9 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	return ROBOT_IGNORE_ITEM;		/* never useful for robots */
     if (pl->item[itemtype] >= world->items[itemtype].limit)
 	return ROBOT_IGNORE_ITEM;		/* already full */
-    if ((IsDefensiveItem((enum Item)itemtype)
+    if ((IsDefensiveItem(itemtype)
 	 && CountDefensiveItems(pl) >= options.maxDefensiveItems)
-	|| (IsOffensiveItem((enum Item)itemtype)
+	|| (IsOffensiveItem(itemtype)
 	 && CountOffensiveItems(pl) >= options.maxOffensiveItems))
 	return ROBOT_IGNORE_ITEM;
     if (itemtype == ITEM_FUEL) {
@@ -1439,7 +1439,7 @@ static bool Ball_handler(player_t *pl)
 		ballobject_t *ball = BALL_IND(i);
 
 		if ((ball->id == NO_ID)
-		    ? (ball->owner != NO_ID)
+		    ? (ball->ball_owner != NO_ID)
 		    : (Player_by_id(ball->id)->team != pl->team)) {
 		    ball_dist = LENGTH(pl->pos.cx - ball->pos.cx,
 				       pl->pos.cy - ball->pos.cy) / CLICK;
@@ -1685,7 +1685,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 			/* It doesn't know what it is, so get it if it can */
 			imp = ROBOT_HANDY_ITEM;
 		    else
-			imp = Rank_item_value(pl, item->item_info);
+			imp = Rank_item_value(pl, (enum Item)item->item_type);
 
 		    if (imp > ROBOT_IGNORE_ITEM && imp >= *item_imp) {
 			*item_imp = imp;
@@ -1712,7 +1712,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 	    pulseobject_t *pulse = PULSE_PTR(shot);
 
 	    if (pulse->id == pl->id
-		&& !pulse->refl)
+		&& !pulse->pulse_refl)
 		continue;
 	}
 
@@ -1794,13 +1794,16 @@ static void Robot_default_play_check_objects(player_t *pl,
 	}
 	if (shot->type == OBJ_ASTEROID) {
 	    int delta_dir = 0;
-	    if (*mine_dist > (WIRE_PTR(shot)->size == 1 ? 2 : 4) * BLOCK_SZ
+	    wireobject_t *wire = WIRE_PTR(shot);
+
+	    if (*mine_dist
+		> (wire->wire_size == 1 ? 2 : 4) * BLOCK_SZ
 		&& *mine_dist < 8 * BLOCK_SZ
 		&& (delta_dir = (pl->dir
 				 - Wrap_cfindDir(shot->pos.cx - pl->pos.cx,
 						 shot->pos.cy - pl->pos.cy))
-		    < WIRE_PTR(shot)->size * (RES / 10)
-		    || delta_dir > RES - WIRE_PTR(shot)->size * (RES / 10)))
+		    < wire->wire_size * (RES / 10)
+		    || delta_dir > RES - wire->wire_size * (RES / 10)))
 		SET_BIT(pl->used, HAS_SHOT);
 	}
     }
@@ -2091,8 +2094,8 @@ static void Robot_default_play(player_t *pl)
 	&& item_dist < 12*BLOCK_SZ
 	&& !BIT(my_data->longterm_mode, FETCH_TREASURE)
 	&& (!BIT(my_data->longterm_mode, NEED_FUEL)
-	    || item->item_info == ITEM_FUEL
-	    || item->item_info == ITEM_TANK)) {
+	    || item->item_type == ITEM_FUEL
+	    || item->item_type == ITEM_TANK)) {
 
 	if (item_imp != ROBOT_IGNORE_ITEM) {
 	    clpos_t d = item->pos;

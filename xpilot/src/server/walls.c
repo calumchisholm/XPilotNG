@@ -218,7 +218,7 @@ void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 	    if (obj->type == OBJ_ITEM) {
 		itemobject_t *item = ITEM_PTR(obj);
 
-		Cannon_add_item(c, item->item_info, item->item_count);
+		Cannon_add_item(c, item->item_type, item->item_count);
 	    }
 	    else {
 		player_t *pl = Player_by_id(obj->id);
@@ -603,9 +603,9 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
     if (obj->type == OBJ_PULSE) {
 	pulseobject_t *pulse = PULSE_PTR(obj);
 
-	pulse->dir = (int)Wrap_findDir(pulse->vel.x, pulse->vel.y);
-	pulse->len = 0;
-	pulse->refl = true;
+	pulse->pulse_dir = (int)Wrap_findDir(pulse->vel.x, pulse->vel.y);
+	pulse->pulse_len = 0;
+	pulse->pulse_refl = true;
     }
 
     return 1;
@@ -2564,7 +2564,7 @@ static void Move_asteroid(object_t *obj)
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
     while (mv.delta.cx || mv.delta.cy) {
-	shape_t *shape = Asteroid_get_shape_by_size(asteroid->size);
+	shape_t *shape = Asteroid_get_shape_by_size(asteroid->wire_size);
 
 	assert(shape);
 	Shape_move(&mv, shape, 0, &ans);
@@ -2624,7 +2624,7 @@ static void Move_ball(object_t *obj)
 	Cell_add_object(world, obj);
 	return;
     }
-    owner = BALL_PTR(obj)->owner;
+    owner = BALL_PTR(obj)->ball_owner;
     if (owner == NO_ID)
 	mv.hitmask = BALL_BIT | NOTEAM_BIT;
     else

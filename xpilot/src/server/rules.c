@@ -130,7 +130,7 @@ void Tune_item_probs(world_t *world)
 		if (obj->type == OBJ_ITEM) {
 		    itemobject_t *item = ITEM_PTR(obj);
 
-		    if (item->item_info == i) {
+		    if (item->item_type == i) {
 			Delete_shot(world, j);
 			j--;
 			if (--excess == 0)

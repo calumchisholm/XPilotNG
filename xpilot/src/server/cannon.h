@@ -31,6 +31,10 @@
 # include "map.h"
 #endif
 
+#ifndef WALLS_H
+# include "walls.h"
+#endif
+
 extern long CANNON_USE_ITEM;
 
 /* the different weapons a cannon can use.
@@ -80,6 +84,17 @@ extern long CANNON_USE_ITEM;
 /* sector in which cannonfire is possible */
 #define CANNON_SPREAD		(RES / 3)
 
-extern void Cannon_update(world_t *world, bool do_less_frequent_update);
+void Cannon_update(world_t *world, bool do_less_frequent_update);
+void Cannon_init(cannon_t *cannon);
+void Cannon_add_item(cannon_t *cannon, int type, int amount);
+void Cannon_throw_items(cannon_t *cannon);
+void Cannon_check_defense(cannon_t *cannon);
+void Cannon_check_fire(cannon_t *cannon);
+void Cannon_dies(cannon_t *cannon, player_t *pl);
+hitmask_t Cannon_hitmask(cannon_t *cannon);
+void Cannon_set_hitmask(int group, cannon_t *cannon);
+bool Cannon_hitfunc(group_t *groupptr, move_t *move);
+void World_restore_cannon(world_t *world, cannon_t *cannon);
+void World_remove_cannon(world_t *world, cannon_t *cannon);
 
 #endif

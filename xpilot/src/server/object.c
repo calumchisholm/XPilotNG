@@ -128,7 +128,8 @@ void Alloc_shots(world_t *world, int number)
     objArray = x;
     for (i = 0; i < number; i++) {
 	Obj[i] = &(x->obj);
-	MINE_PTR(Obj[i])->owner = NO_ID;
+	/* kps - shouldn't be necessary */
+	/*MINE_PTR(Obj[i])->mine_owner = NO_ID;*/
 	Cell_init_object(world, Obj[i]);
 	x++;
     }

@@ -41,17 +41,17 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
     pl->forceVisible += 1;
     if (BIT(pl->have, HAS_MIRROR)
 	&& (rfrac() * (2 * pl->item[ITEM_MIRROR])) >= 1) {
-	pulse->dir = (int)(Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
-					 pl->pos.cy - pulse->pos.cy)
-			   * 2 - RES / 2 - pulse->dir);
-	pulse->dir = MOD2(pulse->dir, RES);
+	pulse->pulse_dir = (int)(Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
+					       pl->pos.cy - pulse->pos.cy)
+				 * 2 - RES / 2 - pulse->pulse_dir);
+	pulse->pulse_dir = MOD2(pulse->pulse_dir, RES);
 
-	pulse->vel.x = options.pulseSpeed * tcos(pulse->dir);
-	pulse->vel.y = options.pulseSpeed * tsin(pulse->dir);
+	pulse->vel.x = options.pulseSpeed * tcos(pulse->pulse_dir);
+	pulse->vel.y = options.pulseSpeed * tsin(pulse->pulse_dir);
 
 	pulse->life += pl->item[ITEM_MIRROR];
-	pulse->len = 0 /*PULSE_LENGTH*/;
-	pulse->refl = true;
+	pulse->pulse_len = 0 /*PULSE_LENGTH*/;
+	pulse->pulse_refl = true;
 	return;
     }
 

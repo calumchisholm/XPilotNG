@@ -420,8 +420,8 @@ void Player_pass_checkpoint(player_t *pl)
 		    if (Obj[j]->type == OBJ_BALL) {
 			ballobject_t *ball = BALL_PTR(Obj[j]);
 
-			if (ball->owner == pl->id)
-			    ball->owner = NO_ID;
+			if (ball->ball_owner == pl->id)
+			    ball->ball_owner = NO_ID;
 		    }
 		}
 	    }

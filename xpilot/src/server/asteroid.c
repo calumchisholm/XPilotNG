@@ -101,7 +101,7 @@ void Break_asteroid(world_t *world, wireobject_t *asteroid)
     int dir1, dir2, split_dir;
     clpos_t pos1, pos2;
 
-    if (asteroid->size == 1) {
+    if (asteroid->wire_size == 1) {
 	mass = asteroid->mass / 2;
 	Make_wreckage(world,
 		      asteroid->pos,
@@ -136,7 +136,7 @@ void Break_asteroid(world_t *world, wireobject_t *asteroid)
 	speed = VECTOR_LENGTH(asteroid->vel);
 	dir = findDir(asteroid->vel.x, asteroid->vel.y);
 	mass3 = asteroid->mass * ASTEROID_DUST_FACT;
-	mass = ASTEROID_MASS(asteroid->size - 1);
+	mass = ASTEROID_MASS(asteroid->wire_size - 1);
 	dir1 = MOD2((int)(dir
 			  - ASTEROID_DELTA_DIR / 4
 			  - (rfrac() * ASTEROID_DELTA_DIR / 4)), RES);
@@ -152,15 +152,15 @@ void Break_asteroid(world_t *world, wireobject_t *asteroid)
 	velx2 = tcos(dir2) * speed2;
 	vely2 = tsin(dir2) * speed2;
 	split_dir = MOD2((int)dir - RES/4, RES);
-	radius = ASTEROID_RADIUS(asteroid->size - 1);
+	radius = ASTEROID_RADIUS(asteroid->wire_size - 1);
 	pos1.cx = (click_t)(asteroid->pos.cx + tcos(split_dir) * radius);
 	pos1.cy = (click_t)(asteroid->pos.cy + tsin(split_dir) * radius);
 	pos1 = World_wrap_clpos(world, pos1);
 	pos2.cx = (click_t)(asteroid->pos.cx - tcos(split_dir) * radius);
 	pos2.cy = (click_t)(asteroid->pos.cy - tsin(split_dir) * radius);
 	pos2 = World_wrap_clpos(world, pos2);
-	Make_asteroid(world, pos1, asteroid->size - 1, dir1, speed1);
-	Make_asteroid(world, pos2, asteroid->size - 1, dir2, speed2);
+	Make_asteroid(world, pos1, asteroid->wire_size - 1, dir1, speed1);
+	Make_asteroid(world, pos2, asteroid->wire_size - 1, dir2, speed2);
 	Make_wreckage(world,
 		      asteroid->pos,
 		      asteroid->vel,
@@ -222,7 +222,7 @@ void Break_asteroid(world_t *world, wireobject_t *asteroid)
 
     sound_play_sensors(asteroid->pos, ASTEROID_BREAK_SOUND);
 
-    world->asteroids.num -= 1 << (asteroid->size - 1);
+    world->asteroids.num -= 1 << (asteroid->wire_size - 1);
 
     Asteroid_remove_from_list(asteroid);
 }
@@ -277,10 +277,10 @@ static void Make_asteroid(world_t *world, clpos_t pos,
     asteroid->acc.x = asteroid->acc.y = 0;
     asteroid->mass = ASTEROID_MASS(size);
     asteroid->life = ASTEROID_LIFE;
-    asteroid->turnspeed = 0.02 + rfrac() * 0.05;
-    asteroid->rotation = (int)(rfrac() * RES);
-    asteroid->size = size;
-    asteroid->wire_info = (int)(rfrac() * 256);
+    asteroid->wire_turnspeed = 0.02 + rfrac() * 0.05;
+    asteroid->wire_rotation = (int)(rfrac() * RES);
+    asteroid->wire_size = size;
+    asteroid->wire_type = (uint8_t)(rfrac() * 256);
     radius = ASTEROID_RADIUS(size) / CLICK;
     asteroid->pl_range = (int)radius;
     asteroid->pl_radius = (int)radius;
@@ -367,8 +367,9 @@ static void Asteroid_move(wireobject_t *wireobj)
 
 static void Asteroid_rotate(wireobject_t *wireobj)
 {
-    wireobj->rotation =
-	(wireobj->rotation + (int)(wireobj->turnspeed * timeStep * RES)) % RES;
+    wireobj->wire_rotation =
+	(wireobj->wire_rotation
+	 + (int)(wireobj->wire_turnspeed * timeStep * RES)) % RES;
 }
 
 
@@ -403,7 +404,7 @@ void Asteroid_update(world_t *world)
 		asteroid = (wireobject_t *) LI_DATA(iter);
 		if (asteroid->life > 0) {
 		    asteroid->life = 0;
-		    if (asteroid->size == 1)
+		    if (asteroid->wire_size == 1)
 			num--;
 		}
 		if (num <= world->asteroids.max)

@@ -646,7 +646,7 @@ void Reset_all_players(world_t *world)
 		 * why not -1 ???
 		 * naive question, obviously yet another dirty hack
 		 */
-		ball->owner = 0;
+		ball->ball_owner = 0;
 		CLR_BIT(ball->obj_status, RECREATE);
 		Delete_shot(world, j);
 	    }
@@ -1297,7 +1297,7 @@ void Delete_player(player_t *pl)
 	if (obj->id == id) {
 	    if (obj->type == OBJ_BALL) {
 		Delete_shot(world, i);
-		BALL_PTR(obj)->owner = NO_ID;
+		BALL_PTR(obj)->ball_owner = NO_ID;
 	    }
 	    else if (obj->type == OBJ_DEBRIS
 		     || obj->type == OBJ_SPARK)
@@ -1314,15 +1314,15 @@ void Delete_player(player_t *pl)
 		}
 	        obj->id = NO_ID;
 		if (obj->type == OBJ_MINE)
-		    MINE_PTR(obj)->owner = NO_ID;
+		    MINE_PTR(obj)->mine_owner = NO_ID;
 	    }
 	}
 	else {
 	    if (obj->type == OBJ_MINE) {
 		mineobject_t *mine = MINE_PTR(obj);
 
-		if (mine->owner == id) {
-		    mine->owner = NO_ID;
+		if (mine->mine_owner == id) {
+		    mine->mine_owner = NO_ID;
 		    if (!options.keepShots) {
 			obj->life = 0;
 			obj->mass = 0;
@@ -1332,8 +1332,8 @@ void Delete_player(player_t *pl)
 	    else if (obj->type == OBJ_BALL) {
 		ballobject_t *ball = BALL_PTR(obj);
 
-		if (ball->owner == id)
-		    ball->owner = NO_ID;
+		if (ball->ball_owner == id)
+		    ball->ball_owner = NO_ID;
 	    }
 	}
     }

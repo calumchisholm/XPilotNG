@@ -54,7 +54,7 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->acc.y = 0;
     Object_position_init_clpos(world, OBJ_PTR(ball), pos);
     ball->id = NO_ID;
-    ball->owner = NO_ID;
+    ball->ball_owner = NO_ID;
     ball->team = t->team;
     ball->type = OBJ_BALL;
     ball->color = WHITE;
@@ -63,8 +63,8 @@ void Make_treasure_ball(world_t *world, treasure_t *t)
     ball->pl_radius = BALL_RADIUS;
     CLEAR_MODS(ball->mods);
     ball->obj_status = RECREATE;
-    ball->treasure = t;
-    ball->style = t->ball_style;
+    ball->ball_treasure = t;
+    ball->ball_style = t->ball_style;
     Cell_add_object(world, OBJ_PTR(ball));
 
     t->have = true;
@@ -87,7 +87,7 @@ void Treasure_init(world_t *world)
  */
 void Ball_is_replaced(ballobject_t *ball)
 {
-    player_t *pl = Player_by_id(ball->owner);
+    player_t *pl = Player_by_id(ball->ball_owner);
 
     ball->life = 0;
     SET_BIT(ball->obj_status, (NOEXPLOSION|RECREATE));
@@ -105,7 +105,7 @@ void Ball_is_replaced(ballobject_t *ball)
  */
 void Ball_is_destroyed(ballobject_t *ball)
 {
-    player_t *pl = Player_by_id(ball->owner);
+    player_t *pl = Player_by_id(ball->ball_owner);
     double ticks = 1e6 - ball->life;
     int frames = (int)(ticks / timeStep + .5);
     double seconds = ticks / options.gameSpeed;
@@ -210,7 +210,7 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
     /*
      * Player already quit ?
      */
-    if (ball->owner == NO_ID) {
+    if (ball->ball_owner == NO_ID) {
 	SET_BIT(ball->obj_status, (NOEXPLOSION|RECREATE));
 	return;
     }
@@ -220,8 +220,8 @@ void Ball_hits_goal(ballobject_t *ball, group_t *gp)
     if (!BIT(world->rules->mode, TEAM_PLAY))
 	return;
 
-    td = ball->treasure;
-    owner = Player_by_id(ball->owner);
+    td = ball->ball_treasure;
+    owner = Player_by_id(ball->ball_owner);
     if (td->team == gp->team && td->team == owner->team) {
 	Ball_is_replaced(ball);
 	return;
@@ -316,7 +316,7 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 
     ball = BALL_PTR(move->obj);
 
-    if (ball->owner == NO_ID)
+    if (ball->ball_owner == NO_ID)
 	return true;
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
@@ -325,9 +325,9 @@ bool Balltarget_hitfunc(group_t *gp, move_t *move)
 	 * the ball and the target are of the same team, but the
 	 * owner is not.
 	 */
-	if (ball->treasure->team != options.specialBallTeam 
-	    && ball->treasure->team == gp->team
-	    && Player_by_id(ball->owner)->team != gp->team)
+	if (ball->ball_treasure->team != options.specialBallTeam 
+	    && ball->ball_treasure->team == gp->team
+	    && Player_by_id(ball->ball_owner)->team != gp->team)
 	    return false;
 	return true;
     }

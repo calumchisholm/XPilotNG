@@ -400,11 +400,11 @@ static void PlayerCollision(world_t *world)
 		     * not the team the ball belongs to. the latter is
 		     * found through the ball's treasure */
 		    ball->team = pl->team;
-		    if (ball->treasure->have)
+		    if (ball->ball_treasure->have)
 			ball->life = 1e6;  /* for frame counter */
-		    ball->owner = pl->id;
+		    ball->ball_owner = pl->id;
 		    SET_BIT(ball->obj_status, GRAVITY);
-		    ball->treasure->have = false;
+		    ball->ball_treasure->have = false;
 		    SET_BIT(pl->have, HAS_BALL);
 		    pl->ball = NULL;
 		    sound_play_sensors(pl->pos, CONNECT_BALL_SOUND);
@@ -448,8 +448,8 @@ static void PlayerCollision(world_t *world)
 			 * considered bad gamesmanship.
 			 */
 			if (BIT(world->rules->mode, TEAM_PLAY)
-			    && ball->treasure->have
-			    && pl->team == ball->treasure->team)
+			    && ball->ball_treasure->have
+			    && pl->team == ball->ball_treasure->team)
 			    continue;
 			pl->ball = ball;
 			mindist = dist;
@@ -604,7 +604,7 @@ static void PlayerObjectCollision(player_t *pl)
 	else if (obj->type == OBJ_PULSE) {
 	    pulseobject_t *pulse = PULSE_PTR(obj);
 
-	    if (pl->id == pulse->id && !pulse->refl)
+	    if (pl->id == pulse->id && !pulse->pulse_refl)
 		continue;
 	}
 	/*
@@ -721,14 +721,14 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 	    return;
 	}
     }
-    if (ball->owner == NO_ID) {
+    if (ball->ball_owner == NO_ID) {
 	Set_message_f("%s was killed by a ball.", pl->name);
 	sc = Rate(0.0, pl->score)
 		* options.ballKillScoreMult
 		* options.unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "Ball");
     } else {
-	player_t *kp = Player_by_id(ball->owner);
+	player_t *kp = Player_by_id(ball->ball_owner);
 
 	Set_message_f("%s was killed by a ball owned by %s.%s",
 		      pl->name, kp->name,
@@ -753,10 +753,10 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 {
     int old_have;
-    enum Item item_index;
+    enum Item item_index = (enum Item) item->item_type;
     world_t *world = pl->world;
 
-    if (IsOffensiveItem((enum Item) item->item_info)) {
+    if (IsOffensiveItem(item_index)) {
 	int off_items = CountOffensiveItems(pl);
 
 	if (off_items >= options.maxOffensiveItems) {
@@ -768,7 +768,7 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 		 && off_items + item->item_count > options.maxOffensiveItems)
 	    item->item_count = options.maxOffensiveItems - off_items;
     }
-    else if (IsDefensiveItem((enum Item) item->item_info)) {
+    else if (IsDefensiveItem(item_index)) {
 	int def_items = CountDefensiveItems(pl);
 
 	if (def_items >= options.maxDefensiveItems) {
@@ -781,8 +781,6 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
 		 && def_items + item->item_count > options.maxDefensiveItems)
 	    item->item_count = options.maxDefensiveItems - def_items;
     }
-
-    item_index = (enum Item) item->item_info;
 
     switch (item_index) {
     case ITEM_WIDEANGLE:
@@ -942,20 +940,20 @@ static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
     double sc;
 
     sound_play_sensors(pl->pos, PLAYER_HIT_MINE_SOUND);
-    if (mine->id == NO_ID && mine->owner == NO_ID)
+    if (mine->id == NO_ID && mine->mine_owner == NO_ID)
 	Set_message_f("%s hit %s.",
 		      pl->name,
 		      Describe_shot(mine->type, mine->obj_status,
 				    mine->mods, 1));
-    else if (mine->owner == mine->id) {
-	kp = Player_by_id(mine->owner);
+    else if (mine->mine_owner == mine->id) {
+	kp = Player_by_id(mine->mine_owner);
 	Set_message_f("%s hit %s %s by %s.", pl->name,
 		      Describe_shot(mine->type, mine->obj_status,
 				    mine->mods, 1),
 		      BIT(mine->obj_status, GRAVITY) ? "thrown " : "dropped ",
 		      kp->name);
     }
-    else if (mine->owner == NO_ID) {
+    else if (mine->mine_owner == NO_ID) {
 	const char *reprogrammer_name = "some jerk";
 
 	if (mine->id != NO_ID) {
@@ -980,7 +978,7 @@ static void Player_collides_with_mine(player_t *pl, mineobject_t *mine)
 		      Describe_shot(mine->type, mine->obj_status,
 				    mine->mods, 1),
 		      BIT(mine->obj_status, GRAVITY) ? "thrown " : "dropped ",
-		      Player_by_id(mine->owner)->name,
+		      Player_by_id(mine->mine_owner)->name,
 		      reprogrammer_name);
     }
     if (kp) {
@@ -1046,7 +1044,7 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
     double cost = collision_cost(ast->mass, v);
     double sc;
 
-    ast->life += ASTEROID_FUEL_HIT(ED_PL_CRASH, ast->size);
+    ast->life += ASTEROID_FUEL_HIT(ED_PL_CRASH, ast->wire_size);
     if (ast->life < 0.0)
 	ast->life = 0.0;
     if (ast->life == 0.0) {
@@ -1315,7 +1313,7 @@ static void AsteroidCollision(world_t *world)
 	    case OBJ_ASTEROID:
 		obj->life -= ASTEROID_FUEL_HIT(
 		    collision_cost(ast->mass, VECTOR_LENGTH(ast->vel)),
-		    WIRE_PTR(obj)->size);
+		    WIRE_PTR(obj)->wire_size);
 		damage = -collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
 		Delta_mv_elastic(ast, obj);
 		/* avoid doing collision twice */
@@ -1367,7 +1365,8 @@ static void AsteroidCollision(world_t *world)
 	    if (ast->life > 0.0) {
 		/* kps - this is some strange sort of hack - fix it*/
 		/*if (ast->life <= ast->fuselife) {*/
-		ast->life += ASTEROID_FUEL_HIT(damage, WIRE_PTR(ast)->size);
+		ast->life += ASTEROID_FUEL_HIT(damage,
+					       WIRE_PTR(ast)->wire_size);
 		/*}*/
 		if (sound)
 		    sound_play_sensors(ast->pos, ASTEROID_HIT_SOUND);
@@ -1376,9 +1375,9 @@ static void AsteroidCollision(world_t *world)
 		if (ast->life == 0.0) {
 		    if ((obj->id != NO_ID
 			 || (obj->type == OBJ_BALL
-			     && BALL_PTR(obj)->owner != NO_ID))) {
+			     && BALL_PTR(obj)->ball_owner != NO_ID))) {
 			int owner_id = ((obj->type == OBJ_BALL)
-					? BALL_PTR(obj)->owner
+					? BALL_PTR(obj)->ball_owner
 					: obj->id);
 			player_t *pl = Player_by_id(owner_id);
 			double sc = Rate(pl->score, ASTEROID_SCORE)
@@ -1422,14 +1421,14 @@ static void BallCollision(world_t *world)
 	    (ball->id != NO_ID
 	     && BIT(Player_by_id(ball->id)->used, HAS_PHASING_DEVICE)) ||
 					/* phased ball */
-	    ball->treasure->have)	/* safe in a treasure */
+	    ball->ball_treasure->have)	/* safe in a treasure */
 	    continue;
 
 	/* Ball - checkpoint */
 	if (BIT(world->rules->mode, TIMING)
 	    && options.ballrace
-	    && ball->owner != NO_ID) {
-	    player_t *owner = Player_by_id(ball->owner);
+	    && ball->ball_owner != NO_ID) {
+	    player_t *owner = Player_by_id(ball->ball_owner);
 
 	    if (!options.ballrace_connect || ball->id == owner->id) {
 		clpos_t cpos = Check_by_index(world, owner->check)->pos;
@@ -1476,7 +1475,7 @@ static void BallCollision(world_t *world)
 		 * the treasure: */
 		{
 		    ballobject_t *b2 = BALL_PTR(obj);
-		    if (b2->treasure->have)
+		    if (b2->ball_treasure->have)
 			break;
 
 		    if (b2->id != NO_ID

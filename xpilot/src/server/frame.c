@@ -662,14 +662,14 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 
 	    /* check if either end of laser pulse is in view */
 	    if (clpos_inview(&cv, pos))
-		ldir = MOD2(pulse->dir + RES/2, RES);
+		ldir = MOD2(pulse->pulse_dir + RES/2, RES);
 	    else {
 		pos.cx = (click_t)(pos.cx
-				   - tcos(pulse->dir) * pulse->len * CLICK);
+			  - tcos(pulse->pulse_dir) * pulse->pulse_len * CLICK);
 		pos.cy = (click_t)(pos.cy
-				   - tsin(pulse->dir) * pulse->len * CLICK);
+			  - tsin(pulse->pulse_dir) * pulse->pulse_len * CLICK);
 		pos = World_wrap_clpos(world, pos);
-		ldir = pulse->dir;
+		ldir = pulse->pulse_dir;
 		if (!clpos_inview(&cv, pos))
 		    continue;
 	    }
@@ -726,15 +726,15 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	case OBJ_WRECKAGE:
 	    if (spark_rand != 0 || options.wreckageCollisionMayKill) {
 		wireobject_t *wreck = WIRE_PTR(shot);
-		Send_wreckage(conn, pos, (u_byte)wreck->wire_info,
-			      wreck->size, wreck->rotation);
+		Send_wreckage(conn, pos, wreck->wire_type,
+			      wreck->wire_size, wreck->wire_rotation);
 	    }
 	    break;
 
 	case OBJ_ASTEROID: {
 		wireobject_t *ast = WIRE_PTR(shot);
-		Send_asteroid(conn, pos,
-			      (u_byte)ast->wire_info, ast->size, ast->rotation);
+		Send_asteroid(conn, pos, ast->wire_type,
+			      ast->wire_size, ast->wire_rotation);
 	    }
 	    break;
 
@@ -766,22 +766,22 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 
 	case OBJ_TORPEDO:
 	    len = options.distinguishMissiles ? TORPEDO_LEN : MISSILE_LEN;
-	    Send_missile(conn, pos, len, shot->missile_dir);
+	    Send_missile(conn, pos, len, MISSILE_PTR(shot)->missile_dir);
 	    break;
 	case OBJ_SMART_SHOT:
 	    len = options.distinguishMissiles ? SMART_SHOT_LEN : MISSILE_LEN;
-	    Send_missile(conn, pos, len, shot->missile_dir);
+	    Send_missile(conn, pos, len, MISSILE_PTR(shot)->missile_dir);
 	    break;
 	case OBJ_HEAT_SHOT:
 	    len = options.distinguishMissiles ? HEAT_SHOT_LEN : MISSILE_LEN;
-	    Send_missile(conn, pos, len, shot->missile_dir);
+	    Send_missile(conn, pos, len, MISSILE_PTR(shot)->missile_dir);
 	    break;
 	case OBJ_BALL:
 	    {
 		ballobject_t *ball = BALL_PTR(shot);
 
 		Send_ball(conn, pos, ball->id,
-			  options.ballStyles ? ball->style : 0xff);
+			  options.ballStyles ? ball->ball_style : 0xff);
 		break;
 	    }
 	    break;
@@ -810,7 +810,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		} else {
 		    laid_by_team = (Team_immune(mine->id, pl->id)
 				    || (BIT(mine->obj_status, OWNERIMMUNE)
-					&& mine->owner == pl->id));
+					&& mine->mine_owner == pl->id));
 		    if (confused) {
 			id = 0;
 			laid_by_team = (rfrac() < 0.5);
@@ -822,9 +822,10 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 
 	case OBJ_ITEM:
 	    {
-		int item_type = ITEM_PTR(shot)->item_info;
+		itemobject_t *item = ITEM_PTR(shot);
+		int item_type = item->item_type;
 
-		if (BIT(shot->obj_status, RANDOM_ITEM))
+		if (BIT(item->obj_status, RANDOM_ITEM))
 		    item_type = Choose_random_item(world);
 
 		Send_item(conn, pos, item_type);
@@ -841,7 +842,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		    color = BLUE;
 		else
 		    color = RED;
-		Send_laser(conn, color, pos, (int)pulse->len, ldir);
+		Send_laser(conn, color, pos, (int)pulse->pulse_len, ldir);
 	    }
 	break;
 	default:
@@ -1020,7 +1021,7 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 	    } else if (shot->type == OBJ_BALL) {
 		size = 2;
 	    } else if (shot->type == OBJ_ASTEROID) {
-		size = WIRE_PTR(shot)->size + 1;
+		size = WIRE_PTR(shot)->wire_size + 1;
 		size |= 0x80;
 	    } else {
 		if (!options.missilesOnRadar && !shownuke)
