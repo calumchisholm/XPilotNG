@@ -323,23 +323,17 @@ void Ball_is_destroyed(ballobject_t *ball)
 {
     char msg[MSG_LEN];
     player_t *pl = Player_by_id(ball->owner);
-    double frames = (1e6 - ball->life) / timeStep + .5;
-    double seconds = frames / options.framesPerSecond;
+    double ticks = 1e6 - ball->life;
+    int frames = ticks / timeStep + .5;
+    double seconds = ticks / options.gameSpeed;
 
-    if (timeStep != 1.0) {
-	double normalized = frames * timeStep;
-
-	sprintf(msg," < The ball was loose for %d frames "
-		"/ %.2f frames at gamespeed=FPS (best %d) / %.2fs >",
-		(int)frames, normalized, Rank_get_best_ballrun(pl), seconds);
-	Rank_ballrun(pl, (int)(normalized + 0.5));
-    } else {
-	sprintf(msg," < The ball was loose for %d frames / %.2fs >",
-		(int)frames, seconds);
-	Rank_ballrun(pl, (int)frames);
-    }
+    sprintf(msg," < The ball was loose for %d frames / "
+	    "%.2f ticks (best %.2f) / %.2fs >",
+	    frames, ticks, Rank_get_best_ballrun(pl), seconds);
+    Rank_ballrun(pl, (int)(ticks + 0.5));
     Set_message(msg);
 }
+
 
 
 

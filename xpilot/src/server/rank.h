@@ -168,9 +168,9 @@ static inline void Rank_ballrun(player_t *pl, int tim)
 	pl->rank->entry.bestball = tim;
 }
 
-static inline int Rank_get_best_ballrun(player_t *pl)
+static inline double Rank_get_best_ballrun(player_t *pl)
 {
-    return (pl->rank ? pl->rank->entry.bestball : 65535);
+    return (double)(pl->rank ? pl->rank->entry.bestball : 65535);
 }
 
 static inline void Rank_add_ball_kill(player_t *pl)      { Rank_add_kill(pl); }
