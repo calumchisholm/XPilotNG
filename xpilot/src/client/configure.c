@@ -29,6 +29,7 @@
 
 char configure_version[] = VERSION;
 
+static int Config_creator(xp_option_t *opt, int widget_desc, int *height);
 static int Config_create_save(int widget_desc, int *height);
 static int Config_close(int widget_desc, void *data, const char **strptr);
 static int Config_next(int widget_desc, void *data, const char **strptr);
@@ -133,9 +134,6 @@ static int Update_double_option(int widget_desc, void *data, double *val)
 
     return 0;
 }
-
-static int config_creator_new(xp_option_t *opt, int widget_desc, int *height);
-
 
 static void Create_config(void)
 {
@@ -258,7 +256,7 @@ static void Create_config(void)
 	    assert(0);
 
 	if ((config_widget_ids[i] =
-	     config_creator_new(opt, config_widget_desc[num], &height)) == 0) {
+	     Config_creator(opt, config_widget_desc[num], &height)) == 0) {
 	    i--;
 	    full = true;
 	    if (height == config_space)
@@ -518,7 +516,7 @@ static int Config_create_save(int widget_desc, int *height)
 }
 
 
-static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
+static int Config_creator(xp_option_t *opt, int widget_desc, int *height)
 {
     if (opt == NULL)
 	return Config_create_save(widget_desc, height);
@@ -914,7 +912,7 @@ void Config_resize(void)
     if (config_created == true) {
 	Config_destroy();
 	if (mapped == true)
-	    Config(mapped, CONFIG_NONE);
+	    Config(mapped, config_what);
     }
 }
 
@@ -938,7 +936,6 @@ void Config_init(void)
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
 
-	/* kps - temporary hack */
 	if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_COLORS) {
 	    STORE(int, color_option_indices,
 		  num_color_options, max_color_options, i);
@@ -950,7 +947,6 @@ void Config_init(void)
 
     /* +1 is for the save widget */
     max_ids = MAX(num_color_options, num_default_options) + 1;
-
     config_widget_ids = malloc(max_ids * sizeof(int));
     if (config_widget_ids == NULL) {
 	error("Config_init: not enough memory.");
