@@ -120,7 +120,7 @@ extern char motdFontName[FONT_LEN];
 extern Display	*dpy;			/* Display of player (pointer) */
 extern Display	*kdpy;			/* Keyboard display */
 extern short	about_page;		/* Which page is the player on? */
-extern unsigned short	team;		/* What team is the player on? */
+extern uint16_t	myTeam;			/* What team is the player on? */
 extern bool	players_exposed;	/* Is score window exposed? */
 extern int	radar_exposures;	/* Is radar window exposed? */
 
@@ -133,8 +133,8 @@ extern Pixmap	itemBitmaps[][2];
 extern Pixmap	itemBitmaps[];
 #endif
 
-extern GC	gameGC, messageGC, radarGC, buttonGC, scoreListGC, textGC, talkGC;
-extern GC	motdGC;
+extern GC	gameGC, messageGC, radarGC, buttonGC;
+extern GC	scoreListGC, textGC, talkGC, motdGC;
 extern XGCValues gcv;
 extern Window	top, draw, keyboard, radar, players;
 #ifdef _WINDOWS				/* see paint.c for details */

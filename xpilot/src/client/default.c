@@ -3015,7 +3015,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     if (*my_team < 0 || *my_team > 9)
 	*my_team = TEAM_NOT_SET;
-    team = *my_team;
+    myTeam = *my_team;
 
     Get_int_resource(rDB, "port", port);
     Get_bool_resource(rDB, "text", text);

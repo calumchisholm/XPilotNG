@@ -55,26 +55,29 @@ char	textFontName[FONT_LEN];
 char	talkFontName[FONT_LEN];
 char	motdFontName[FONT_LEN];
 
-Display	*dpy;			/* Display of player (pointer) */
-Display	*kdpy;			/* Keyboard display */
-short	about_page;		/* Which page is the player on? */
-unsigned short	team;		/* What team is the player on? */
+Display		*dpy;		/* Display of player (pointer) */
+Display		*kdpy;		/* Keyboard display */
+short		about_page;	/* Which page is the player on? */
+uint16_t	myTeam;		/* What team is the player on? */
 
-GC	gameGC;			/* GC for the game area */
-GC	messageGC;		/* GC for messages in the game area */
-GC	radarGC;		/* GC for the radar */
-GC	buttonGC;		/* GC for the buttons */
-GC	scoreListGC;		/* GC for the player list */
-GC	textGC;			/* GC for the info text */
-GC	talkGC;			/* GC for the message window */
-GC	motdGC;			/* GC for the motd text */
+GC		gameGC;		/* GC for the game area */
+GC		messageGC;	/* GC for messages in the game area */
+GC		radarGC;	/* GC for the radar */
+GC		buttonGC;	/* GC for the buttons */
+GC		scoreListGC;	/* GC for the player list */
+GC		textGC;		/* GC for the info text */
+GC		talkGC;		/* GC for the message window */
+GC		motdGC;		/* GC for the motd text */
 XGCValues	gcv;
 
 Window	top;			/* Top-level window (topshell) */
 Window	draw;			/* Main play window */
 Window	keyboard;		/* Keyboard window */
-#ifdef _WINDOWS	/* Windows needs some dummy windows (size 0,0) */
-		/* so we can store the active fonts.  Windows only */
+#ifdef _WINDOWS
+/*
+ * Windows needs some dummy windows (size 0,0)
+ * so we can store the active fonts.
+ */
 				/* supports 1 active font per window */
 Window	textWindow;		/* for the GC into the config window */
 Window	msgWindow;		/* for meesages into the playfield */
@@ -114,7 +117,7 @@ bool	useErase;		/* use Erase hack for slow X */
 int		maxKeyDefs;
 keydefs_t	*keyDefs = NULL;
 
-other_t	*self;			/* player info */
+other_t		*self;		/* player info */
 
 long		loops = 0;
 

@@ -109,7 +109,7 @@ typedef struct {
     DFLOAT	ratio;
     DFLOAT	score;
     short	id;
-    short	team;
+    uint16_t	team;
     short	check;
     short	round;
     long	timing_loops;
@@ -136,8 +136,8 @@ typedef struct {
 
 typedef struct {
     int		pos;		/* Block index */
-    short	id,		/* Id of owner or -1 */
-		team;		/* Team this base belongs to */
+    short	id;		/* Id of owner or -1 */
+    uint16_t	team;		/* Team this base belongs to */
     irec	bounds;		/* Location on map */
     int		type;		/* orientation */
     int		deathtime;	/* For base warning */

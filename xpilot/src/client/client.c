@@ -608,7 +608,7 @@ void Map_blue(int startx, int starty, int width, int height)
     blue[BLUE_BIT|BLUE_CLOSED|BLUE_BELOW|BLUE_DOWN] =
     blue[BLUE_BIT|BLUE_CLOSED|BLUE_BELOW|BLUE_LEFT|BLUE_DOWN] =
 	blue[SETUP_REC_LD];
-    for (i = BLUE_BIT; i < sizeof blue; i++) {
+    for (i = BLUE_BIT; i < (int)(sizeof blue); i++) {
 	if ((i & BLUE_FUEL) == BLUE_FUEL
 	    || (i & (BLUE_OPEN|BLUE_CLOSED)) == 0)
 	    blue[i] = blue[SETUP_FILLED];
@@ -1073,7 +1073,7 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 	    other = &Others[0];
 	}
 	self = other;
-	team = player_team;
+	myTeam = player_team;
     }
     other->id = id;
     other->team = player_team;
@@ -1115,7 +1115,7 @@ int Handle_team(int id, int pl_team)
     }
     other->team = pl_team;
     if (other == self)
-	team = pl_team;
+	myTeam = pl_team;
     return 0;
 }
 

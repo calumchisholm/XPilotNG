@@ -123,7 +123,8 @@ typedef struct {
     short		width;			/* width in pixels */
     short		height;			/* height in pixels */
     short		frames_per_second;	/* FPS */
-    short		map_order;		/* OLD row major or col major */
+    short		map_order;		/* OLD row or col major */
+    short		unused1;		/* padding */
     char		name[MAX_CHARS];	/* name of map */
     char		author[MAX_CHARS];	/* name of author of map */
     char		data_url[MSG_LEN];	/* location where client

@@ -625,7 +625,7 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 		retries;
     time_t	last;
 
-    team = my_team;
+    myTeam = my_team;
 
     for (retries = 0;;) {
 	if (retries == 0 || time(NULL) - last >= 3) {
@@ -634,7 +634,7 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 		return -1;
 	    }
 	    Sockbuf_clear(&wbuf);
-/*		IFWINDOWS( Trace("Verifying to sock=%d\n", wbuf.sock) ); */
+	    /* IFWINDOWS( Trace("Verifying to sock=%d\n", wbuf.sock) ); */
 	    n = Packet_printf(&wbuf, "%c%s%s%s", PKT_VERIFY, real, nick, disp);
 	    if (n <= 0 || Sockbuf_flush(&wbuf) <= 0) {
 		error("Can't send verify packet");
