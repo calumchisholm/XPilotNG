@@ -222,7 +222,6 @@ extern char widget_version[];
 extern char xevent_version[];
 extern char xeventhandlers_version[];
 extern char xinit_version[];
-extern char xpmread_version[];
 
 
 static void Check_client_versions(void)
@@ -276,7 +275,6 @@ static void Check_client_versions(void)
 	{ "xeventhandlers", xeventhandlers_version },
 	{ "xinit", xinit_version },
 	{ "xpilot", xpilot_version },
-	{ "xpmread", xpmread_version },
     };
     int			i;
     int			oops = 0;

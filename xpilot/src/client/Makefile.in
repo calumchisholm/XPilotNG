@@ -134,7 +134,7 @@ xpilot_SOURCES = \
 	usleep.c \
 	welcome.c widget.c widget.h \
 	xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
-	xinit.c xinit.h xpclient.h xpclient_x11.h xpilot.c xpmread.c xpmread.h
+	xinit.c xinit.h xpclient.h xpclient_x11.h xpilot.c
 
 
 #xpilot_CFLAGS = @X_CFLAGS@
@@ -161,8 +161,7 @@ am_xpilot_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) caudio.$(OBJEXT) \
 	record.$(OBJEXT) talk.$(OBJEXT) talkmacros.$(OBJEXT) \
 	textinterface.$(OBJEXT) texture.$(OBJEXT) usleep.$(OBJEXT) \
 	welcome.$(OBJEXT) widget.$(OBJEXT) xevent.$(OBJEXT) \
-	xeventhandlers.$(OBJEXT) xinit.$(OBJEXT) xpilot.$(OBJEXT) \
-	xpmread.$(OBJEXT)
+	xeventhandlers.$(OBJEXT) xinit.$(OBJEXT) xpilot.$(OBJEXT)
 xpilot_OBJECTS = $(am_xpilot_OBJECTS)
 xpilot_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilot_LDFLAGS =
@@ -190,7 +189,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/usleep.Po ./$(DEPDIR)/welcome.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/widget.Po ./$(DEPDIR)/xevent.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/xeventhandlers.Po ./$(DEPDIR)/xinit.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xpilot.Po ./$(DEPDIR)/xpmread.Po
+@AMDEP_TRUE@	./$(DEPDIR)/xpilot.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -288,7 +287,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xeventhandlers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xinit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpilot.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpmread.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \

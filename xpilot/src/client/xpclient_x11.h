@@ -68,7 +68,6 @@
 #include "xevent.h"
 #include "xeventhandlers.h"
 #include "xinit.h"
-#include "xpmread.h"
 
 #endif /* XPCLIENT_X11_H */
 

@@ -224,6 +224,31 @@ static int RGetPixelIndex(unsigned long pixel)
     return WHITE;
 }
 
+static XImage *Image_from_pixmap(Pixmap pixmap)
+{
+    XImage		*img;
+    Window		rootw;
+    int			x, y;
+    unsigned		width, height, border_width, depth;
+
+    if (!XGetGeometry(dpy, pixmap, &rootw,
+		      &x, &y,
+		      &width, &height,
+		      &border_width, &depth)) {
+	error("Can't get pixmap geometry");
+	return NULL;
+    }
+    img = XGetImage(dpy, pixmap,
+		    0, 0,
+		    width, height,
+		    AllPlanes, ZPixmap);
+    if (!img) {
+	error("Can't get Image from Pixmap");
+	return NULL;
+    }
+    return img;
+}
+
 static void RWriteTile(Pixmap tile)
 {
 #ifndef _WINDOWS
@@ -260,7 +285,7 @@ static void RWriteTile(Pixmap tile)
     lptr->tile_id = next_tile_id;
     list = lptr;
 
-    if (!(img = xpm_image_from_pixmap(tile))) {
+    if (!(img = Image_from_pixmap(tile))) {
 	RWriteByte(RC_TILE);
 	RWriteByte(0);
 	lptr->tile_id = 0;
@@ -455,9 +480,8 @@ static void RWriteGC(GC gc, unsigned long req_mask)
 	    RWriteLong(values.ts_x_origin);
 	if (write_mask & GCTileStipYOrigin)
 	    RWriteLong(values.ts_y_origin);
-	if (write_mask & GCTile) {
+	if (write_mask & GCTile)
 	    RWriteTile(values.tile);
-	}
     }
 }
 
