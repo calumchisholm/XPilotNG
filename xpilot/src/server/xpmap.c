@@ -29,7 +29,7 @@ char xpmap_version[] = VERSION;
 static void Xpmap_treasure_to_polygon(int);
 static void Xpmap_target_to_polygon(int);
 static void Xpmap_cannon_to_polygon(int);
-static void Xpmap_wormhole_to_polygon(int);
+/*static void Xpmap_wormhole_to_polygon(int);*/
 
 #ifdef DEBUG
 void Xpmap_print(void)			/* Debugging only. */
@@ -787,7 +787,7 @@ static void Xpmap_cannon_to_polygon(int ind)
     P_end_cannon();
 }
 
-
+#if 0
 #define N 12
 static void Xpmap_wormhole_to_polygon(int ind)
 {
@@ -821,7 +821,7 @@ static void Xpmap_wormhole_to_polygon(int ind)
     P_end_polygon();
     P_end_wormhole();
 }
-
+#endif
 
 
 
@@ -1042,8 +1042,10 @@ void Xpmap_blocks_to_polygons(void)
     P_edgestyle("cannon_es", 3, 0xFFFFFF, 0);
     P_polystyle("cannon_ps", 0xFFFFFF, 2, P_get_edge_id("cannon_es"), 0);
 
+#if 0
     P_edgestyle("wormhole_es", 2, 0x00FFFF, 0);
     P_polystyle("wormhole_ps", 0x00FFFF, 2, P_get_edge_id("wormhole_es"), 0);
+#endif
 
     Xpmap_walls_to_polygons();
 
@@ -1059,8 +1061,10 @@ void Xpmap_blocks_to_polygons(void)
     for (i = 0; i < World.NumCannons; i++)
 	Xpmap_cannon_to_polygon(i);
 
+#if 0
     for (i = 0; i < World.NumWormholes; i++)
 	Xpmap_wormhole_to_polygon(i);
+#endif
 
     xpprintf("Created %d polygons.\n", num_polys);
 }

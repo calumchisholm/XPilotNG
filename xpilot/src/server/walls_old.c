@@ -1450,11 +1450,11 @@ static void Move_segment(move_state_t *ms)
     }
 }
 
-void Object_hits_target(int ind, object *obj, long player_cost);
+extern void Object_hits_target(object *obj, target_t *targ, long player_cost);
 
 static void Object_hits_target_old(move_state_t *ms, long player_cost)
 {
-    Object_hits_target(ms->target, ms->mip->obj, player_cost);
+    Object_hits_target(ms->mip->obj, &World.targets[ms->target], player_cost);
 }
 
 

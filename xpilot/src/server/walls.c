@@ -248,9 +248,8 @@ void Turn_player(player *pl)
 
 
 
-void Object_hits_target(int ind, object *obj, long player_cost)
+void Object_hits_target(object *obj, target_t *targ, long player_cost)
 {
-    target_t		*targ = &World.targets[ind];
     int			j;
     player		*kp;
     DFLOAT		sc, por,
@@ -461,7 +460,7 @@ void Object_crash(object *obj, struct move *move, int crashtype, int item_id)
 
     case CrashTarget:
 	obj->life = 0;
-	Object_hits_target(item_id, obj, -1);
+	Object_hits_target(obj, &World.targets[item_id], -1);
 	break;
 
     case CrashWall:
@@ -550,7 +549,7 @@ void Player_crash(player *pl, struct move *move, int crashtype,
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	Object_hits_target(item_id, (object *)pl, -1);
+	Object_hits_target((object *)pl, &World.targets[item_id], -1);
 	break;
 
     case CrashTreasure:
@@ -768,7 +767,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
     /* kps hack */
     if (type == TARGET) {
 	obj->life = 0;
-	Object_hits_target(item_id, obj, -1);
+	Object_hits_target(obj, &World.targets[item_id], -1);
 	return 0;
     }
     /* kps hack */
@@ -975,9 +974,11 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
 			       PLAYER_BOUNCED_SOUND);
 	    if (type == TARGET) {
+		target_t *targ = &World.targets[item_id];
+
 		cost <<= FUEL_SCALE_BITS;
 		cost = (long)(cost * (wallBounceFuelDrainMult / 4.0));
-		Object_hits_target(item_id, (object *)pl, cost);
+		Object_hits_target((object *)pl, targ, cost);
 	    }
 	}
     }

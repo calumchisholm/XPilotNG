@@ -273,6 +273,7 @@ void P_end_cannon(void)
     current_group = 0;
 }
 
+#if 0
 int P_start_wormhole(int item_id)
 {
     wormhole_t *wormhole = &World.wormHoles[item_id];
@@ -286,11 +287,14 @@ int P_start_wormhole(int item_id)
     groups[current_group].item_id = item_id;
     return current_group;
 }
+#endif
 
+#if 0
 void P_end_wormhole(void)
 {
     current_group = 0;
 }
+#endif
 
 int P_start_frictionarea(void)
 {
