@@ -212,7 +212,10 @@ int Process_event(SDL_Event *evt)
     switch (evt->type) {
 	
     case SDL_QUIT:
-	return 0;
+        Net_cleanup(); 
+        Quit();
+	exit(0);
+        break;
 	
     case SDL_KEYDOWN:
 	if (Console_isVisible()) break;
