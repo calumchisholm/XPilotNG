@@ -1084,7 +1084,6 @@ static int Away(struct move *move, int line)
 	if (i == line)
 	    continue;
 	if (linet[i].group
-	    /*&& (groups[linet[i].group].hit_mask & move->hit_mask))*/
 	    && (!can_hit(&groups[linet[i].group], move)))
 	    continue;
 
@@ -1142,7 +1141,6 @@ static int Shape_move1(int dx, int dy, struct move *move,
 	   center point contains lines for their start & end positions. */
 	while ( (i = *lines++) != 65535) {
 	    if (linet[i].group
-		/*&& (groups[linet[i].group].hit_mask & move->hit_mask))*/
 		&& (!can_hit(&groups[linet[i].group], move)))
 		continue;
 	    lsx = linet[i].start.cx - move->start.cx - shape->pts[p][dir].cx;
@@ -1180,7 +1178,6 @@ static int Shape_move1(int dx, int dy, struct move *move,
     points = blockline[block].points;
     while ( (p = *points++) != 65535) {
 	if (linet[p].group
-	    /*&& (groups[linet[p].group].hit_mask & move->hit_mask))*/
 	    && (!can_hit(&groups[linet[p].group], move)))
 	    continue;
 	lines = Shape_lines(shape, dir);
@@ -1249,7 +1246,6 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 
     while ( (i = *lines++) != 65535) {
 	if (linet[i].group
-	    /*&& (groups[linet[i].group].hit_mask & move->hit_mask))*/
 	    && (!can_hit(&groups[linet[i].group], (struct move *)move)))
 	    continue;
 	lsx = linet[i].start.cx;
@@ -1547,7 +1543,6 @@ static void Shape_move(const struct move *move, const shipobj *shape,
     x = -1;
     while ( ( p = *points++) != 65535) {
 	if (linet[p].group
-	    /*&& (groups[linet[p].group].hit_mask & move->hit_mask))*/
 	    && (!can_hit(&groups[linet[p].group], (struct move *)move)))
 	    continue;
 	msx = move->start.cx - linet[p].start.cx;
@@ -1617,7 +1612,6 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
     points = blockline[(x >> B_SHIFT) + mapx * (y >> B_SHIFT)].points;
     while ( (p = *points++) != 65535) {
 	if (linet[p].group
-	    /*&& (groups[linet[p].group].hit_mask & hitmask))*/
 	    && (!can_hit(&groups[linet[p].group], &mv)))
 	    continue;
 	xp = CENTER_XCLICK(linet[p].start.cx - x);
@@ -1902,7 +1896,6 @@ int is_inside(int cx, int cy, int hit_mask, const object *obj)
 	return -1;
     do {
 	if (gblock->group
-	    /*&& (groups[gblock->group].hit_mask & hit_mask)) {*/
 	    && (!can_hit(&groups[gblock->group], &mv))) {
 	    gblock = gblock->next;
 	    continue;
