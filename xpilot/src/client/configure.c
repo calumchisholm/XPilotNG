@@ -148,6 +148,7 @@ static int Config_create_maxFPS(int widget_desc, int *height);
 static int Config_create_maxMessages(int widget_desc, int *height);
 static int Config_create_messagesToStdout(int widget_desc, int *height);
 static int Config_create_reverseScroll(int widget_desc, int *height);
+static int Config_create_oldMessagesColor(int widget_desc, int *height);
 #ifdef SOUND
 static int Config_create_maxVolume(int widget_desc, int *height);
 #endif
@@ -237,6 +238,7 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_maxMessages,
     Config_create_messagesToStdout,
     Config_create_reverseScroll,
+    Config_create_oldMessagesColor,
     Config_create_showHUD,
     Config_create_showHR,
     Config_create_horizontalHUDLine,
@@ -693,6 +695,15 @@ static int Config_create_reverseScroll(int widget_desc, int *height)
 			    Config_update_instruments,
 			    (void *) SHOW_REVERSE_SCROLL);
 }
+
+static int Config_create_oldMessagesColor(int widget_desc, int *height)
+{
+    return Config_create_int(widget_desc, height,
+			     "oldMessagesColor", &oldMessagesColor,
+			     0, maxColors - 1,
+			     NULL, NULL);
+}
+
 
 static int Config_create_showHUD(int widget_desc, int *height)
 {
@@ -1562,6 +1573,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "showMessages", BIT(instruments, SHOW_MESSAGES));
     Config_save_int(fp, "maxMessages", maxMessages);
     Config_save_int(fp, "messagesToStdout", messagesToStdout);
+    Config_save_int(fp, "oldMessagesColor", oldMessagesColor);
     Config_save_bool(fp, "reverseScroll", BIT(instruments, SHOW_REVERSE_SCROLL));
     Config_save_bool(fp, "showHUD", BIT(instruments, SHOW_HUD_INSTRUMENTS));
     Config_save_bool(fp, "showHR", BIT(instruments, SHOW_HR));

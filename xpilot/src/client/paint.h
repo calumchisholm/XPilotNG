@@ -135,8 +135,8 @@ extern int	wallRadarColor;		/* Color index for walls on radar */
 extern int	targetRadarColor;	/* Color index for targets on radar */
 extern int	decorColor;		/* Color index for decoration drawing */
 extern int	decorRadarColor;	/* Color index for decorations on radar */
+extern int	oldMessagesColor;	/* Color index for old message strings */
 extern bool	gotFocus;
-extern int      oldTextColor;
 extern bool	talk_mapped;
 extern short	view_width, view_height;	/* Visible area from server */
 extern int	real_view_width;	/* Width of map area displayed. */

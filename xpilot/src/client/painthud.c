@@ -73,7 +73,7 @@ int	hrColor2;		/* Color index for hudradar drawing */
 int	hrSize;		/* Size for hudradar drawing */
 float	hrScale;		/* Scale for hudradar drawing */
 int	hudLockColor;		/* Color index for lock on HUD drawing */
-int     oldTextColor;
+int	oldMessagesColor;	/* Color index for old messages */
 DFLOAT	charsPerTick = 0.0;	/* Output speed of messages */
 
 message_t	*TalkMsg[MAX_MSGS], *GameMsg[MAX_MSGS];
@@ -819,7 +819,7 @@ void Paint_messages(void)
 	if (msg->life > MSG_FLASH)
 	    msg_color = RED;
 	else
-	    msg_color = oldTextColor;
+	    msg_color = oldMessagesColor;
 
 #ifndef _WINDOWS
 	/*

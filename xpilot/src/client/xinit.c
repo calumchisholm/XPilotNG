@@ -503,8 +503,9 @@ int Init_top(void)
 	/* should be & 5? !@# */
 	targetRadarColor = BLUE;
     }
-    if (oldTextColor >= maxColors || oldTextColor < 0)
-	oldTextColor = WHITE;
+    if (oldMessagesColor >= maxColors || oldMessagesColor < 0) {
+	oldMessagesColor = WHITE;
+    }
     if (decorColor >= maxColors || decorColor <= 0) {
 	decorColor = RED;
     }

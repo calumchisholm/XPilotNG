@@ -1074,11 +1074,11 @@ struct option {
 	"Valid values are all even numbers smaller than maxColors.\n"
     },
     {
-	"oldTextColor",
+	"oldMessagesColor",
 	NULL,
 	"4",
 	KEY_DUMMY,
-	"Which color number to use for drawing old text strings.\n"
+	"Which color number to use for drawing old messages.\n"
     },
     {
 	"outlineDecor",
@@ -2887,7 +2887,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "decorColor", &decorColor);
     Get_int_resource(rDB, "decorRadarColor", &decorRadarColor);
     Get_int_resource(rDB, "targetRadarColor", &targetRadarColor);
-    Get_int_resource(rDB, "oldTextColor", &oldTextColor);
+    Get_int_resource(rDB, "oldMessagesColor", &oldMessagesColor);
     Get_resource(rDB, "sparkColors", sparkColors, MSG_LEN);
 
     instruments = 0;
