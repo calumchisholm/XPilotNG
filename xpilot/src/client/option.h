@@ -37,6 +37,15 @@ typedef enum {
 
 typedef struct xp_option xp_option_t;
 
+typedef enum {
+    xp_option_origin_default,	/* originates in code */
+    xp_option_origin_cmdline,	/* command line */
+    xp_option_origin_env,	/* environment variable */
+    xp_option_origin_xpilotrc,	/* xpilotrc file */
+    xp_option_origin_config,	/* config menu or such */
+    xp_option_origin_setcmd,	/* set client command */
+} xp_option_origin_t;
+
 typedef bool (*xp_bool_option_setfunc_t)   (xp_option_t *opt, bool val);
 typedef bool (*xp_int_option_setfunc_t)    (xp_option_t *opt, int val);
 typedef bool (*xp_double_option_setfunc_t) (xp_option_t *opt, double val);
@@ -141,12 +150,18 @@ extern const char *Xpilotrc_get_filename(void);
 extern int Xpilotrc_read(const char *path);
 extern int Xpilotrc_write(const char *path);
 
-extern bool Set_option(const char *name, const char *value);
-extern bool Set_noarg_option(xp_option_t *opt, bool value);
-extern bool Set_bool_option(xp_option_t *opt, bool value);
-extern bool Set_int_option(xp_option_t *opt, int value);
-extern bool Set_double_option(xp_option_t *opt, double value);
-extern bool Set_string_option(xp_option_t *opt, const char *value);
+extern bool Set_option(const char *name, const char *value,
+		       xp_option_origin_t origin);
+extern bool Set_noarg_option(xp_option_t *opt, bool value,
+			     xp_option_origin_t origin);
+extern bool Set_bool_option(xp_option_t *opt, bool value,
+			    xp_option_origin_t origin);
+extern bool Set_int_option(xp_option_t *opt, int value,
+			   xp_option_origin_t origin);
+extern bool Set_double_option(xp_option_t *opt, double value,
+			      xp_option_origin_t origin);
+extern bool Set_string_option(xp_option_t *opt, const char *value,
+			      xp_option_origin_t origin);
 
 extern xp_option_t *Find_option(const char *name);
 extern void Set_command(const char *command);

@@ -136,7 +136,7 @@ void Usage(void)
 }
 
 
-bool Set_noarg_option(xp_option_t *opt, bool value)
+bool Set_noarg_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 {
     assert(opt);
     assert(opt->type == xp_noarg_option);
@@ -151,7 +151,7 @@ bool Set_noarg_option(xp_option_t *opt, bool value)
 }
 
 
-bool Set_bool_option(xp_option_t *opt, bool value)
+bool Set_bool_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 {
     bool retval = true;
 
@@ -170,7 +170,7 @@ bool Set_bool_option(xp_option_t *opt, bool value)
     return retval;
 }
 
-bool Set_int_option(xp_option_t *opt, int value)
+bool Set_int_option(xp_option_t *opt, int value, xp_option_origin_t origin)
 {
     bool retval = true;
 
@@ -197,7 +197,8 @@ bool Set_int_option(xp_option_t *opt, int value)
     return retval;
 }
 
-bool Set_double_option(xp_option_t *opt, double value)
+bool Set_double_option(xp_option_t *opt, double value,
+		       xp_option_origin_t origin)
 {
     bool retval = true;
 
@@ -225,7 +226,8 @@ bool Set_double_option(xp_option_t *opt, double value)
     return retval;
 }
 
-bool Set_string_option(xp_option_t *opt, const char *value)
+bool Set_string_option(xp_option_t *opt, const char *value,
+		       xp_option_origin_t origin)
 {
     bool retval = true;
 
@@ -341,7 +343,8 @@ static void Remove_key_from_keydefs(keys_t key)
     }
 }
 
-static bool Set_key_option(xp_option_t *opt, const char *value)
+static bool Set_key_option(xp_option_t *opt, const char *value,
+			   xp_option_origin_t origin)
 {
     /*bool retval = true;*/
     char *str, *valcpy;
@@ -415,7 +418,7 @@ static bool is_legal_value(xp_option_type_t type, const char *value)
 }
 
 
-bool Set_option(const char *name, const char *value)
+bool Set_option(const char *name, const char *value, xp_option_origin_t origin)
 {
     xp_option_t *opt;
 
@@ -432,17 +435,17 @@ bool Set_option(const char *name, const char *value)
 
     switch (opt->type) {
     case xp_noarg_option:
-	return Set_noarg_option(opt, ON(value) ? true : false);
+	return Set_noarg_option(opt, ON(value) ? true : false, origin);
     case xp_bool_option:
-	return Set_bool_option(opt, ON(value) ? true : false);
+	return Set_bool_option(opt, ON(value) ? true : false, origin);
     case xp_int_option:
-	return Set_int_option(opt, atoi(value));
+	return Set_int_option(opt, atoi(value), origin);
     case xp_double_option:
-	return Set_double_option(opt, atof(value));
+	return Set_double_option(opt, atof(value), origin);
     case xp_string_option:
-	return Set_string_option(opt, value);
+	return Set_string_option(opt, value, origin);
     case xp_key_option:
-	return Set_key_option(opt, value);
+	return Set_key_option(opt, value, origin);
     default:
 	assert(0 && "BUG: Unknown option type");
     }
@@ -476,7 +479,7 @@ void Set_command(const char *args)
 	const char *nm = Option_get_name(opt);
 	char msg[MSG_LEN];
 
-	Set_option(name, value);
+	Set_option(name, value, xp_option_origin_setcmd);
 
 	newvalue = Option_value_to_string(opt);
 	snprintf(msg, sizeof(msg),
@@ -603,26 +606,26 @@ void Store_option(xp_option_t *opt)
     /* Set the default value. */
     switch (opt->type) {
     case xp_noarg_option:
-	Set_noarg_option(opt, false);
+	Set_noarg_option(opt, false, xp_option_origin_default);
 	break;
     case xp_bool_option:
-	Set_bool_option(opt, opt->bool_defval);
+	Set_bool_option(opt, opt->bool_defval, xp_option_origin_default);
 	break;
     case xp_int_option:
-	Set_int_option(opt, opt->int_defval);
+	Set_int_option(opt, opt->int_defval, xp_option_origin_default);
 	break;
     case xp_double_option:
-	Set_double_option(opt, opt->dbl_defval);
+	Set_double_option(opt, opt->dbl_defval, xp_option_origin_default);
 	break;
     case xp_string_option:
 	assert(opt->str_defval);
 	assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
-	Set_string_option(opt, opt->str_defval);
+	Set_string_option(opt, opt->str_defval, xp_option_origin_default);
 	break;
     case xp_key_option:
 	assert(opt->key_defval);
 	assert(opt->key != KEY_DUMMY);
-	Set_key_option(opt, opt->key_defval);
+	Set_key_option(opt, opt->key_defval, xp_option_origin_default);
 	break;
     default:
 	warn("Could not set default value for option %s", opt->name);
@@ -668,7 +671,7 @@ static void Parse_xpilotrc_line(const char *line)
     while (isspace(*s))
 	s++;
 
-    Set_option(line, s);
+    Set_option(line, s, xp_option_origin_xpilotrc);
 }
 
 
@@ -974,7 +977,7 @@ void Parse_options(int *argcp, char **argvp)
 
 	    /* Add GNU style option support e.g. --wallcolor=1 ??? */
 	    if (is_noarg_option(arg)) {
-		Set_option(arg, "true");
+		Set_option(arg, "true",xp_option_origin_cmdline );
 		num_remaining_args--;
 		for (i = 0; i < num_remaining_args; i++)
 		    argvp[arg_ind + i] = argvp[arg_ind + i + 1];
@@ -982,7 +985,8 @@ void Parse_options(int *argcp, char **argvp)
 		bool ok = false;
 
 		if (num_remaining_args >= 2) {
-		    ok = Set_option(arg, argvp[arg_ind + 1]);
+		    ok = Set_option(arg, argvp[arg_ind + 1],
+				    xp_option_origin_cmdline);
 		    if (ok) {
 			num_remaining_args -= 2;
 			for (i = 0; i < num_remaining_args; i++)
@@ -1169,15 +1173,6 @@ static void Get_float_resource(XrmDatabase db,
 }
 
 
-static void Get_bool_resource(XrmDatabase db, const char *resource,
-			      bool *result)
-{
-    int			ind;
-    char		resValue[MAX_CHARS];
-
-    Find_resource(db, resource, resValue, sizeof resValue, &ind);
-    *result = (ON(resValue) ? true : false);
-}
 
 static void Get_shipshape_resource(XrmDatabase db, char **ship_shape)
 {

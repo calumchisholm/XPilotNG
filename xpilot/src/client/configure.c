@@ -99,7 +99,7 @@ static int Update_bool_option(int widget_desc, void *data, bool *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
-    Set_bool_option(opt, *val);
+    Set_bool_option(opt, *val, xp_option_origin_config);
 
     return 0;
 }
@@ -109,7 +109,7 @@ static int Update_int_option(int widget_desc, void *data, int *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
-    Set_int_option(opt, *val);
+    Set_int_option(opt, *val, xp_option_origin_config);
 
     return 0;
 }
@@ -119,7 +119,7 @@ static int Update_double_option(int widget_desc, void *data, double *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
-    Set_double_option(opt, *val);
+    Set_double_option(opt, *val, xp_option_origin_config);
 
     return 0;
 }

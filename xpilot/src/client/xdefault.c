@@ -372,9 +372,9 @@ void Handle_X_options(void)
     assert(displayName);
     if (strlen(displayName) == 0) {
 	if ((ptr = getenv(DISPLAY_ENV)) != NULL)
-	    Set_option("display", ptr);
+	    Set_option("display", ptr, xp_option_origin_env);
 	else
-	    Set_option("display", DISPLAY_DEF);
+	    Set_option("display", DISPLAY_DEF, xp_option_origin_default);
     }
 
     if ((dpy = XOpenDisplay(displayName)) == NULL)
@@ -384,7 +384,7 @@ void Handle_X_options(void)
     assert(keyboardName);
     if (strlen(keyboardName) == 0) {
 	if ((ptr = getenv(KEYBOARD_ENV)) != NULL)
-	    Set_option("keyboard", ptr);
+	    Set_option("keyboard", ptr, xp_option_origin_env);
     }
 
     if (strlen(keyboardName) == 0)
