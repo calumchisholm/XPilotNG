@@ -534,16 +534,14 @@ void Paint_frame(void)
 	
 	glPopMatrix();
     }
-    //glDrawBuffer(GL_COLOR_BUFFER_BIT);
     SDL_GL_SwapBuffers();
-    glFlush();	
 	
     if (timing) gettimeofday(&timed[16][1],NULL);
 
     if (timing) {
 	for (i=16;i>0;--i)
 	    timed[i][1].tv_usec = timed[i][1].tv_usec - timed[i-1][1].tv_usec
-	    	    	    	+ ((timed[i][1].tv_sec - timed[i-1][1].tv_sec)<<10);
+	    	    	    	+ ((timed[i][1].tv_sec - timed[i-1][1].tv_sec)*1000000);
 	for (i=0;i<17;++i)
 	    timed[i][0].tv_usec += timed[i][1].tv_usec;
     	
