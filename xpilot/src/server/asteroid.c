@@ -337,8 +337,8 @@ static void Place_asteroid(void)
 
 	bpos = Clpos_to_blpos(pos);
 
-	/* kps - world->block must be removed */
-	if (BIT(1U << world->block[bpos.bx][bpos.by], space)) {
+	/* kps - don't use world blocks here. */
+	if (BIT(1U << World_get_block(world, bpos), space)) {
 	    int i, dpx, dpy;
 
 	    okay = true;

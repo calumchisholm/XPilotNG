@@ -391,6 +391,7 @@ extern struct options {
 
 
 extern shape_t		ball_wire;
+extern shape_t		wormhole_wire;
 
 static inline base_t *Bases(world_t *world, int ind)
 {
@@ -527,6 +528,9 @@ int World_place_treasure(world_t *world, clpos pos, int team, bool empty);
 int World_place_wormhole(world_t *world, clpos pos, wormType type);
 int World_place_item_concentrator(world_t *world, clpos pos);
 int World_place_asteroid_concentrator(world_t *world, clpos pos);
+
+void World_add_temporary_wormholes(world_t *world, clpos pos1, clpos pos2);
+void Wormhole_line_init(void);
 
 void Find_base_direction(world_t *world);
 void Compute_gravity(void);

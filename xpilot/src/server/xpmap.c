@@ -152,10 +152,9 @@ setup_t *Xpmap_init_setup(world_t *world)
     size_t		size, numblocks;
     setup_t		*setup;
 
-    if (is_polygon_map && world->block) {
-	free(world->block);
-	world->block = NULL;
-    }
+    if (is_polygon_map && world->block)
+	XFREE(world->block);
+
     if (world->block == NULL)
 	Xpmap_setup(world);
 

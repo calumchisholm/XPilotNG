@@ -452,6 +452,7 @@ bool Grok_map(world_t *world)
     }
 
     Verify_wormhole_consistency(world);
+    Wormhole_line_init();
 
     if (BIT(world->rules->mode, TIMING) && world->NumChecks == 0) {
 	xpprintf("No checkpoints found while race mode (timing) was set.\n");
@@ -787,6 +788,23 @@ void Compute_gravity(void)
     Compute_local_gravity(world);
 }
 
+#define WORMHOLE_RADIUS ((BLOCK_CLICKS / 2) - 1)
+shape_t		wormhole_wire;
+
+void Wormhole_line_init(void)
+{
+    int i;
+    static shapepos coords[MAX_SHIP_PTS];
+
+    wormhole_wire.num_points = MAX_SHIP_PTS;
+    for (i = 0; i < MAX_SHIP_PTS; i++) {
+	wormhole_wire.pts[i] = coords + i;
+	coords[i].clk.cx = cos(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
+	coords[i].clk.cy = sin(i * 2 * PI / MAX_SHIP_PTS) * WORMHOLE_RADIUS;
+    }
+
+    return;
+}
 
 void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 {
@@ -837,4 +855,46 @@ void remove_temp_wormhole(world_t *world, int ind)
 
     world->wormholes = realloc(world->wormholes,
 			      world->NumWormholes * sizeof(wormhole_t));
+}
+
+void World_add_temporary_wormholes(world_t *world, clpos pos1, clpos pos2)
+{
+
+#if 0
+
+#if 0 /* kps - temporary wormholes disabled currently */
+    if (counter
+	&& options.wormTime
+	&& BIT(1U << world->block[OBJ_X_IN_BLOCKS(pl)]
+	       [OBJ_Y_IN_BLOCKS(pl)],
+	       SPACE_BIT)
+	&& BIT(1U << world->block[CLICK_TO_BLOCK(dest.cx)]
+	       [CLICK_TO_BLOCK(dest.cy)],
+	       SPACE_BIT))
+	add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
+			   OBJ_Y_IN_BLOCKS(pl),
+			   CLICK_TO_BLOCK(dest.cx),
+			   CLICK_TO_BLOCK(dest.cy));
+#endif
+
+
+    if (is_polygon_map) {
+	;
+    } else {
+	blpos blk1, blk2;
+	int type1, type2;
+
+	blk1 = Clpos_to_blpos(pos1);
+	type1 = World_get_block(blk1);
+
+	blk2 = Clpos_to_blpos(pos2);
+	type2 = World_get_block(blk2);
+
+	if (!(type1 == SPACE && type2 == SPACE)) {
+	    warn("World_add_temporary_wormholes: could not add tmp wormholes: "
+		 "type1 = %d, type2 = %d", type1, type2);
+	    return;
+	}
+    }
+#endif
 }

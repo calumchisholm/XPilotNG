@@ -194,7 +194,7 @@ void Place_item(player *pl, int item)
 	pos = World_wrap_clpos(world, pos);
 	if (!World_contains_clpos(world, pos))
 	    return;
-	/*if (!BIT(1U << world->block[bx][by], SPACE_BLOCKS))*/
+
 	if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL)
 	    != NO_GROUP)
 	    return;
@@ -240,8 +240,6 @@ void Place_item(player *pl, int item)
 	    } else
 		pos = World_get_random_clpos(world);
 
-
-	    /*if (BIT(1U << world->block[bx][by], SPACE_BLOCKS|CANNON_BIT))*/
 	    if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL)
 		== NO_GROUP)
 		break;

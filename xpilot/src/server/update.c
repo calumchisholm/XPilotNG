@@ -828,8 +828,6 @@ static void Traverse_wormhole(player *pl)
     int wh_dest, wcx, wcy, nearestFront, nearestRear;
     double proximity, proxFront, proxRear;
     world_t *world = &World;
-
-
     wormhole_t *wh_hit = Wormholes(world, pl->wormHoleHit);
 
     if (wh_hit->countdown > 0)
@@ -918,7 +916,7 @@ static void Hyperjump(player *pl)
     int counter;
     hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 
-    /* try to find empty space to hyperjump to */
+    /* Try to find empty space to hyperjump to. */
     for (counter = 20; counter > 0; counter--) {
 	dest = World_get_random_clpos(world);
 	if (shape_is_inside(dest.cx, dest.cy, hitmask,
@@ -928,24 +926,13 @@ static void Hyperjump(player *pl)
 	    break;
     }
 
-    /* can't find an empty space, hyperjump failed */
+    /* We can't find an empty space, hyperjump failed. */
     if (!counter)
 	dest = pl->pos;
 
-#if 0 /* kps - temporary wormholes disabled currently */
-    if (counter
-	&& options.wormTime
-	&& BIT(1U << world->block[OBJ_X_IN_BLOCKS(pl)]
-	       [OBJ_Y_IN_BLOCKS(pl)],
-	       SPACE_BIT)
-	&& BIT(1U << world->block[CLICK_TO_BLOCK(dest.cx)]
-	       [CLICK_TO_BLOCK(dest.cy)],
-	       SPACE_BIT))
-	add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
-			   OBJ_Y_IN_BLOCKS(pl),
-			   CLICK_TO_BLOCK(dest.cx),
-			   CLICK_TO_BLOCK(dest.cy));
-#endif
+    if (counter && options.wormTime)
+	World_add_temporary_wormholes(world, pl->pos, dest);
+
     /* hack */
     wh_dest = -2;
     sound_play_sensors(pl->pos, HYPERJUMP_SOUND);

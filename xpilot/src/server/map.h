@@ -65,7 +65,7 @@
 #define RIGHT_GRAV		25
 #define LEFT_GRAV		26
 #define FRICTION		27
-#define ASTEROID_CONCENTRATOR		28
+#define ASTEROID_CONCENTRATOR	28
 #define BASE_ATTRACTOR		127
 
 #define SPACE_BIT		(1 << SPACE)
@@ -273,9 +273,16 @@ typedef struct {
 
 static inline void World_set_block(world_t *world, blpos blk, int type)
 {
-    if (blk.bx < 0 || blk.bx >= world->x || blk.by < 0 || blk.by >= world->y)
-	return;
+    assert (! (blk.bx < 0 || blk.bx >= world->x
+	       || blk.by < 0 || blk.by >= world->y));
     world->block[blk.bx][blk.by] = type;
+}
+
+static inline int World_get_block(world_t *world, blpos blk)
+{
+    assert (! (blk.bx < 0 || blk.bx >= world->x
+	       || blk.by < 0 || blk.by >= world->y));
+    return world->block[blk.bx][blk.by];
 }
 
 static inline bool World_contains_clpos(world_t *world, clpos pos)
