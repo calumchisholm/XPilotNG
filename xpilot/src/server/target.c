@@ -286,10 +286,11 @@ void Target_init(world_t *world)
 void World_restore_target(world_t *world, target_t *targ)
 {
     blkpos_t blk = Clpos_to_blkpos(targ->pos);
+
+#if 0
     object_t *obj, **obj_list;
     int obj_count, i;
 
-#if 0
     /* check for objects that are where the target appears */
     Cell_get_objects(world, targ->pos, 4, /* should depend on target size */
 		     300, &obj_list, &obj_count);

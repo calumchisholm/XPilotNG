@@ -1013,11 +1013,11 @@ static void LegalizeHost(char *string)
  */
 static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 {
-    player_t		*pl;
-    int			i, war_on_id, conn_bit /*, nick_mod = 0*/;
-    char		msg[MSG_LEN];
-    char		old_nick[MAX_NAME_LEN] /*, *p */;
-    const char		sender[] = "[*Server notice*]";
+    player_t *pl;
+    int i, war_on_id, conn_bit /*, nick_mod = 0*/;
+    char msg[MSG_LEN];
+    /*char old_nick[MAX_NAME_LEN], *p; */
+    const char sender[] = "[*Server notice*]";
     world_t *world = &World;
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {

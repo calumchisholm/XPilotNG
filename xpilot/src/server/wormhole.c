@@ -27,18 +27,19 @@
 
 void Object_hits_wormhole(object_t *obj, int ind)
 {
-    world_t *world = &World;
-    wormhole_t *wormhole = Wormholes(world, ind);
+    /*world_t *world = &World;
+      wormhole_t *wormhole = Wormholes(world, ind);*/
 
     SET_BIT(obj->status, WARPING);
     obj->wormHoleHit = ind;
 
+#if 0
     if (BIT(obj->type, OBJ_PLAYER)) {
 	player_t *pl = (player_t *)obj;
 
 	warn("Player %s hits wormhole %d.", pl->name, ind);
     }
-
+#endif
 }
 
 

@@ -302,7 +302,6 @@ static void Make_asteroid(world_t *world, clpos_t pos,
  * Tries to place a new asteroid on the map.
  * Calls Make_asteroid() to actually create the new asteroid
  */
-/* kps - change this to use polygon based is_inside code */
 static void Place_asteroid(world_t *world)
 {
     int place_count, dir, dist, i;
@@ -310,7 +309,6 @@ static void Place_asteroid(world_t *world)
     bool okay = false;
     asteroid_concentrator_t *con;
     clpos_t pos;
-    blkpos_t bpos;
 
     space = SPACE_BLOCKS;
     space &= ~(BASE_BIT | WORMHOLE_BIT);
@@ -344,7 +342,7 @@ static void Place_asteroid(world_t *world)
 	    pos = World_get_random_clpos(world);
 
 	okay = true;
-#if 0
+
 	for (i = 0; i < NumPlayers; i++) {
 	    player_t *pl = Players(i);
 
@@ -358,7 +356,6 @@ static void Place_asteroid(world_t *world)
 		break;
 	    }
 	}
-#endif
     }
     if (okay)
 	Make_asteroid(world, pos,
