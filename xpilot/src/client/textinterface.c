@@ -134,7 +134,7 @@ static int Get_contact_message(sockbuf_t *sbuf,
 		/*
 		 * Found one which we can talk to.
 		 */
-		warn("Using protocol version %04x.", server_version);
+		xpinfo("Using protocol version 0x%04x.", server_version);
 		conpar->server_version = server_version;
 		readable = 1;
 	    }

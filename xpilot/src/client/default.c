@@ -210,7 +210,7 @@ static void tryToSetShipShape(void)
 	valid = Validate_shape_str(shipShapeSetting);
 	if (valid) {
 	    shipShape = xp_safe_strdup(shipShapeSetting);
-	    warn("Your shipShape is valid. Have a nice day.\n");
+	    xpinfo("Your shipShape is valid. Have a nice day.\n");
 	} else
 	    warn("Your shipShape isn't valid. Please fix it.");
 	return;
@@ -258,7 +258,7 @@ static void tryToSetShipShape(void)
 
     valid = Validate_shape_str(ss_candidate);
     if (valid) {
-	warn("Ship shape \"%s\" is now in use.\n", shipShapeSetting);
+	xpinfo("Ship shape \"%s\" is now in use.\n", shipShapeSetting);
 	shipShape = ss_candidate;
     } else {
 	XFREE(ss_candidate);
