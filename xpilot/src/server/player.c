@@ -430,7 +430,7 @@ int Init_player(int ind, shipshape_t *ship)
     pl->fs		= 0;
     pl->repair_target	= 0;
     pl->name[0]		= '\0';
-    pl->auth_nick[0]	= 0;
+    /*pl->auth_nick[0]	= 0;*/
     pl->num_pulses	= 0;
     pl->emergency_thrust_left = 0;
     pl->emergency_shield_left = 0;

@@ -1337,7 +1337,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     /*strlcpy(pl->rawname, connp->nick, MAX_CHARS);*/
     strlcpy(pl->name, connp->nick, MAX_CHARS);
-    strlcpy(pl->auth_nick, old_nick, MAX_CHARS);
+    /*strlcpy(pl->auth_nick, old_nick, MAX_CHARS);*/
     strlcpy(pl->realname, connp->real, MAX_CHARS);
     strlcpy(pl->hostname, connp->host, MAX_CHARS);
     /* kps - what about auth_nick ? */
