@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -25,7 +24,7 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-enum Item {
+typedef enum Item {
     ITEM_FUEL			= 0,
     ITEM_WIDEANGLE		= 1,
     ITEM_REARSHOT		= 2,
@@ -48,7 +47,7 @@ enum Item {
     ITEM_MIRROR			= 19,
     ITEM_ARMOR			= 20,
     NUM_ITEMS			= 21
-};
+} Item_t;
 
 #define ITEM_BIT_FUEL			(1U << ITEM_FUEL)
 #define ITEM_BIT_WIDEANGLE		(1U << ITEM_WIDEANGLE)
