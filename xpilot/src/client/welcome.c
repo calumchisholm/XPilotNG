@@ -2261,7 +2261,7 @@ static int Welcome_process_one_event(XEvent * event,
 	break;
 
     case ConfigureNotify:
-
+      
 	conf = &event->xconfigure;
 	if (conf->window == topWindow) {
 	    if ((top_width == conf->width) && (top_height == conf->height)) {
@@ -2276,17 +2276,15 @@ static int Welcome_process_one_event(XEvent * event,
 	    switch (welcome_mode) {
 	    case ModeInternet:
 	    case ModeStatus:
-	      	Welcome_destroy_windows(); 
-
-	      	if (Welcome_create_windows(conpar) == -1)
-		    return -1;
+	      Welcome_destroy_windows(); 
+		
+	      if (Welcome_create_windows(conpar) == -1)
+		return -1;
 	      
 	      Welcome_set_mode(ModeInternet); 
 	      server_it = List_begin(server_list);
 	      Welcome_show_server_list(conpar);
-	      /*
-		}
-		break; */
+	      
 	      break;
 	    case ModeLocalnet:
 		Welcome_destroy_windows();
@@ -2301,6 +2299,12 @@ static int Welcome_process_one_event(XEvent * event,
 		break;
 	    case ModeQuit:
 		break;
+	    case ModeWaiting:
+	      Welcome_destroy_windows();
+	      if (Welcome_create_windows(conpar) == -1)
+		return -1;
+	      Welcome_set_mode(ModeWaiting);
+	      
 	    default:
 		break;
 	    }
@@ -2349,10 +2353,10 @@ static int Welcome_input_loop(Connect_param_t * conpar)
     int result;
     XEvent event;
 
-    Welcome_set_mode(ModeInternet);
+    Welcome_set_mode(ModeWaiting);
 
     /* Start main loop */
-    Welcome_create_label(1, "Welcome to improved XPilot!");
+    Welcome_create_label(1, "Welcome to Improved XPilot!");
 
     while (!quitting && !joining) {
 	XNextEvent(dpy, &event);
