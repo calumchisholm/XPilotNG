@@ -277,7 +277,7 @@ The default value is: 3.
 \fB\-sparkSize\fR <value>
 .IP
 Size of sparks in pixels.
-The default value is: 1.
+The default value is: 2.
 .HP
 \fB\-backgroundPointDist\fR <value>
 .IP
@@ -689,7 +689,7 @@ The default keys are: f Control_L Control_R.
 \fB\-keyDropBall\fR <value>
 .IP
 Drop a ball.
-The default keys are: d Delete BackSpace.
+The default keys are: d Shift_R.
 .HP
 \fB\-keyTankNext\fR <value>
 .IP
@@ -889,7 +889,7 @@ The default key is: KP_5.
 \fB\-keyToggleRadarScore\fR <value>
 .IP
 Toggles the radar and score windows on and off.
-There is no default value for this option.
+The default key is: F11.
 .HP
 \fB\-keyToggleFullScreen\fR <value>
 .IP
@@ -1073,8 +1073,13 @@ The default value is: 16.
 .HP
 \fB\-mapFontSize\fR <value>
 .IP
-Height of font used for message strings.
+Height of font used for strings painted on the map.
 The default value is: 16.
+.HP
+\fB\-TTFont\fR <value>
+.IP
+Set the font to use.
+The default value is: /usr/local/share/xpilot-ng/fonts/FreeSansBoldOblique.ttf.
 .HP
 \fB\-messagesColorRGBA\fR <value>
 .IP

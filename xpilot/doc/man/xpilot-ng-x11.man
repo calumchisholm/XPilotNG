@@ -8,7 +8,7 @@ xpilot-ng-x11 \- X11 client for multiplayer space war game.
 .SH DESCRIPTION
 .IP
 Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson.
-XPilotNG 4.6.2 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.6.3 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
 Where options include:
@@ -282,7 +282,7 @@ The default value is: 3.
 \fB\-sparkSize\fR <value>
 .IP
 Size of sparks in pixels.
-The default value is: 1.
+The default value is: 2.
 .HP
 \fB\-backgroundPointDist\fR <value>
 .IP
@@ -555,7 +555,7 @@ The default value is: -*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1.
 \fB\-messageFont\fR <value>
 .IP
 The font used for drawing messages.
-The default value is: -*-fixed-medium-r-*--13-*-*-*-c-*-iso8859-1.
+The default value is: -*-times-*-*-*--14-*-*-*-*-*-iso8859-1.
 .HP
 \fB\-showNastyShots\fR <value>
 .IP
@@ -566,7 +566,7 @@ The default value is: no.
 \fB\-mouseAccelInClient\fR <value>
 .IP
 Set to true if you want to set the mouse turn rates to be linear
-The default value is: no.
+The default value is: yes.
 .HP
 \fB\-mouseAccelNum\fR <value>
 .IP
@@ -1151,7 +1151,7 @@ The default keys are: f Control_L Control_R.
 \fB\-keyDropBall\fR <value>
 .IP
 Drop a ball.
-The default keys are: d Delete BackSpace.
+The default keys are: d Shift_R.
 .HP
 \fB\-keyTankNext\fR <value>
 .IP
@@ -1351,7 +1351,7 @@ The default key is: KP_5.
 \fB\-keyToggleRadarScore\fR <value>
 .IP
 Toggles the radar and score windows on and off.
-There is no default value for this option.
+The default key is: F11.
 .HP
 \fB\-keyToggleFullScreen\fR <value>
 .IP
@@ -1652,10 +1652,10 @@ one key may be used by multiple key options.
 If no server is specified on the command line, xpilot will
 display a welcome screen where you can select a server.
 .IP
-XPilotNG 4.6.2 comes with ABSOLUTELY NO WARRANTY; for details see the
+XPilot NG 4.6.3 comes with ABSOLUTELY NO WARRANTY; for details see the
 provided COPYING file.
 .PP
-xpilot-ng-x11 4.6.2
+xpilot-ng-x11 4.6.3
 .SH "SEE ALSO"
 The full documentation for
 .B xpilot-ng-x11

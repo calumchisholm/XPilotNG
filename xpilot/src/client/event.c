@@ -306,15 +306,14 @@ bool Key_press(keys_t key)
 	    if (strlen(val) == 0)
 	    	break;
 
-	    if(!pointerControl) {
+	    if(!pointerControl)
 		snprintf(msg, sizeof(msg),
 			 "Mouse steering enabled. "
-			 "Disable with one of: %s.", val);
-	    } else {
+			 "Key(s) to disable it: %s.", val);
+	    else
 		snprintf(msg, sizeof(msg),
 			 "Mouse steering disabled. "
-			 "Enable with one of: %s.", val);
-	    }
+			 "Key(s) to disable it: %s.", val);
 
     	    Add_newbie_message(msg);
 	}

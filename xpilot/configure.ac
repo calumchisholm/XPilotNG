@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT(XPilotNG, 4.6.2, kps@users.sourceforge.net, xpilot-ng)
+AC_INIT([XPilot NG], 4.6.3, kps@users.sourceforge.net, xpilot-ng)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
 
@@ -23,7 +23,7 @@ AC_SUBST([XP_COPYRIGHTDATE])
 XP_COPYRIGHT="Copyright © $XP_COPYRIGHTDATE by $XP_AUTHORS"
 AC_SUBST([XP_COPYRIGHT])
 
-AC_SUBST([XP_RELEASEDATE],["Apr 19, 2004"])
+AC_SUBST([XP_RELEASEDATE],["Apr 25, 2004"])
 AC_SUBST([XP_DATADIR],"$prefix/share/xpilot-ng")
 
 
@@ -261,9 +261,11 @@ AC_CHECK_HEADERS([ \
 	X11/keysym.h \
 	X11/Xatom.h \
 	X11/Xmd.h \
-	X11/extensions/Xdbe.h \
-	X11/extensions/multibuf.h \
 	])
+
+dnl 	X11/extensions/Xdbe.h \
+dnl	X11/extensions/multibuf.h \
+
 
 dnl  Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
