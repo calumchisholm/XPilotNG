@@ -26,7 +26,7 @@
 char rank_version[] = VERSION;
 
 /* MAX_SCORES = how many players we remember */
-#define MAX_SCORES 400
+#define MAX_SCORES 200
 
 #define XPILOTSCOREFILE		"XPILOTSCOREFILE"
 #define XPILOTNOJSRANKINGPAGE	"XPILOTNOJSRANKINGPAGE"
@@ -51,7 +51,7 @@ static double kr_table[MAX_SCORES];
 static double kd_table[MAX_SCORES];
 static double hf_table[MAX_SCORES];
 
-static void swap2(int *i1, int *i2, double *d1, double *d2)
+static inline void swap2(int *i1, int *i2, double *d1, double *d2)
 {
     int i;
     double d;
@@ -216,7 +216,8 @@ static void SortRankings(void)
 "<td align=right><h1><u><b>Shots</b></u></h1></td>" \
 "<td align=center><h1><u><b>Balls</b></u></h1></td>" \
 "<td align=right><h1><u><b>Ratio</b></u></h1></td>" \
-"<td align=center><h1><u><b>User @ Host</b></u></h1></td>" \
+"<td align=right><h1><u><b>User</b></u></h1></td>" \
+"<td align=left><h1><u><b>Host</b></u></h1></td>" \
 "<td align=center><h1><u><b>Logout</b></u></h1></td>" \
 "</tr>\n"
 
@@ -259,7 +260,8 @@ void Rank_write_webpage(void)
 			    "<td align=right>%u"
 			    "<td align=center>%u/%u/%u/%u/%u"
 			    "<td align=right>%.1f"
-			    "<td align=center>%s@%s"
+			    "<td align=right>%s"
+			    "<td align=left>%s"
 			    "<td align=center>%s\n"
 			    "</tr>\n",
 			    i + 1,
