@@ -275,6 +275,9 @@
 /* support for X Multibuffer Extension in client */
 #undef MBX
 
+/* enable new server scheduling most useful on Linux 2.6 */
+#undef NEWSCHED
+
 /* Name of package */
 #undef PACKAGE
 

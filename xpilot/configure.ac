@@ -57,6 +57,14 @@ AC_ARG_ENABLE(development,
 	AC_DEFINE([DEVELOPMENT], 1, [enable development code])
 fi])
 
+AC_ARG_ENABLE(newsched,
+	AC_HELP_STRING([--enable-newsched],
+		[enable new server scheduling most useful on Linux 2.6]),
+[if test x$enable_newsched = xyes; then
+	AC_DEFINE([NEWSCHED], 1,
+		[enable new server scheduling most useful on Linux 2.6])
+fi])
+
 AC_ARG_ENABLE(sdl_client,
 	AC_HELP_STRING([--enable-sdl-client],
 			[enable SDL/OpenGL client]),

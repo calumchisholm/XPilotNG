@@ -26,11 +26,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef NEWSCHED
-
 #include "xpserver.h"
 
 char sched_version[] = VERSION;
+
+#ifdef NEWSCHED
 
 bool sched_running = false;
 
@@ -298,11 +298,6 @@ void sched(void)
 }
 
 #else /* NEWSCHED */
-
-
-#include "xpserver.h"
-
-char sched_version[] = VERSION;
 
 int sched_running = false;
 
@@ -896,7 +891,5 @@ void sched(void)
 }
 
 #endif /* _WINDOWS */
-
-
 
 #endif /* NEWSCHED */

@@ -864,6 +864,8 @@ Optional Features:
   --enable-mbx            support for X Multibuffer Extension in client
   --enable-plockserver    lock the xpilot-ng server into memory
   --enable-development    enable development code
+  --enable-newsched       enable new server scheduling most useful on Linux
+                          2.6
   --enable-sdl-client     enable SDL/OpenGL client
   --enable-sdl-gameloop   enable sdl gameloop in sdl client (otherwise use
                           gameloop optimised for X11)
@@ -1944,6 +1946,18 @@ if test "${enable_development+set}" = set; then
 
 cat >>confdefs.h <<\_ACEOF
 #define DEVELOPMENT 1
+_ACEOF
+
+fi
+fi;
+
+# Check whether --enable-newsched or --disable-newsched was given.
+if test "${enable_newsched+set}" = set; then
+  enableval="$enable_newsched"
+  if test x$enable_newsched = xyes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define NEWSCHED 1
 _ACEOF
 
 fi
