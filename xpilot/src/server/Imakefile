@@ -37,7 +37,8 @@ DEFS_DEBUG = -DDEVELOPMENT
 DEFINES = \
        $(DEFS_LOG) $(DEFS_TURN_THRUST) $(DEFS_SILENT) $(DEFS_SERVER_SOUND) \
        $(DEFS_PLOCKSERVER) $(DEFS_OTHER) $(DEFS_DEBUG)
-INCLUDES = $(AUDIOINC) -I$(COMMON) -I../lib/
+INCLUDES = $(AUDIOINC) -I$(COMMON) $(EXPATINC)
+LOCAL_LDFLAGS = $(EXPATLIBD)
 
 # keep this variable consistent with its counterpart in ../Makefile.std
 SRCS = \
@@ -59,5 +60,5 @@ DEPLIBS = $(COMMON)libxpcommon.a
 
 PROGRAMS = xpilots
 
-ProgramTarget(xpilots,$(COMMON)libxpcommon.a,$(MATHLIB) $(EXTRALIB))
+ProgramTarget(xpilots,$(COMMON)libxpcommon.a,$(MATHLIB) $(EXPATLIB) $(EXTRALIB))
 CtagFiles(*.[ch] $(COMMON)*.[ch])
