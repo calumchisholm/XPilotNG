@@ -1676,48 +1676,47 @@ void Paint_messages(void)
     	    /* TODO: make it possible to actually divide this per character
 	     * meanwhile just ballpark guess to a fraction of the width... ;)
 	     */
-	    
 	    if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
 	    if (ptr) {
-		/*HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);*/
-	    	if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
+		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);
+	    	/*if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
 	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
 	    	    	    	,(float)( (int)&ptr-(int)&msg->txt  	)/msg->len
 	    	    	    	,(float)( (int)&ptr-(int)&msg->txt + l	)/msg->len
 	    	    	    	,0.0f
 	    	    	    	,1.0f
-		    	    	,true);
+		    	    	,true);*/
 	    }
 	    if (ptr2) {
-		/*HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);*/
-	    	if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
+		HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);
+	    	/*if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
 	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
 	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt 	    )/msg->len
 	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt + l2    )/msg->len
 	    	    	    	,0.0f
 	    	    	    	,1.0f
-		    	    	,true);
+		    	    	,true);*/
 	    }
 	    if (ptr3) {
-		/*HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);*/
-	    	if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
+		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);
+	    	/*if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
 	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
 	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt 	    )/msg->len
 	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt + l3    )/msg->len
 	    	    	    	,0.0f
 	    	    	    	,1.0f
-		    	    	,true);
+		    	    	,true);*/
 	    }
 
 	} else {
-	    /*	HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);*/
-	    if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
+	    	HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);
+	    /*if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
 	    disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
 	    	    	    ,0.0f
 	    	    	    ,(float)len/msg->len
 	    	    	    ,0.0f
 	    	    	    ,1.0f
-			    ,true);
+			    ,true);*/
 	}
 
 	width = nprintsize(&messagefont,MIN(len, msg->len),msg->txt).width; /*this is not accurate*/
