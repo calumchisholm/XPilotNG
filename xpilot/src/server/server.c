@@ -94,9 +94,8 @@ int main(int argc, char **argv)
     /*seedMT((unsigned)time((time_t *)0) * Get_process_id());*/
     /* Removed seeding random number generator because of server recordings. */
 
-    if (Parser(argc, argv) == false) {
+    if (Parser(argc, argv) == false)
 	exit(1);
-    }
 
     Init_recording();
     plock_server(pLockServer);           /* Lock the server into memory */
@@ -129,8 +128,7 @@ int main(int argc, char **argv)
     if (serverHost) {
 	addr = sock_get_addr_by_name(serverHost);
 	if (addr == NULL) {
-	    errno = 0;
-	    error("Failed name lookup on: %s", serverHost);
+	    warn("Failed name lookup on: %s", serverHost);
 #ifndef _WINDOWS
 	    exit(1);
 #else
@@ -139,11 +137,10 @@ int main(int argc, char **argv)
 	}
 	serverAddr = xp_strdup(addr);
 	strlcpy(Server.host, serverHost, sizeof(Server.host));
-    } else {
+    } else
 	sock_get_local_hostname(Server.host, sizeof Server.host,
 				(reportToMetaServer != 0 &&
 				 searchDomainForXPilot != 0));
-    }
 
     Get_login_name(Server.owner, sizeof Server.owner);
 
@@ -163,11 +160,10 @@ int main(int argc, char **argv)
     if (Setup_net_server() == -1)
 	End_game();
 #ifndef _WINDOWS
-    if (NoQuit) {
+    if (NoQuit)
 	signal(SIGHUP, SIG_IGN);
-    } else {
+    else
 	signal(SIGHUP, Handle_signal);
-    }
     signal(SIGTERM, Handle_signal);
     signal(SIGINT, Handle_signal);
     signal(SIGPIPE, SIG_IGN);
@@ -185,12 +181,11 @@ int main(int argc, char **argv)
 	     showtime(), framesPerSecond);
 #endif
 
-    if (timerResolution > 0) {
+    if (timerResolution > 0)
 	timer_tick_rate = timerResolution;
-    }
-    else {
+    else
 	timer_tick_rate = FPS;
-    }
+
 #ifdef _WINDOWS
     /* Windows returns here, we let the worker thread call sched() */
     install_timer_tick(ServerThreadTimerProc, timer_tick_rate);
@@ -209,10 +204,8 @@ void Main_loop(void)
 {
     main_loops++;
 
-    /* kps - xxx */
-    if ((main_loops & 0x3F) == 0) {
+    if ((main_loops & 0x3F) == 0)
 	Meta_update(0);
-    }
 
     /*
      * Check for possible shutdown, the server will
@@ -220,12 +213,10 @@ void Main_loop(void)
      * If the counter is < 0 then no shutdown is in progress.
      */
     if (ShutdownServer >= 0) {
-	if (ShutdownServer == 0) {
+	if (ShutdownServer == 0)
 	    End_game();
-	}
-	else {
+	else
 	    ShutdownServer--;
-	}
     }
 
     Input();
@@ -236,17 +227,18 @@ void Main_loop(void)
 	    if (NumPlayers > NumRobots + NumPseudoPlayers) {
 		NoPlayersEnteredYet = false;
 		if (gameDuration > 0.0) {
-		    xpprintf("%s Server will stop in %g minutes.\n", showtime(), gameDuration);
-		    gameOverTime = (time_t)(gameDuration * 60) + time((time_t *)NULL);
+		    xpprintf("%s Server will stop in %g minutes.\n",
+			     showtime(), gameDuration);
+		    gameOverTime
+			= (time_t)(gameDuration * 60) + time((time_t *)NULL);
 		}
 	    }
 	}
 
 	Update_objects();
 
-	if ((main_loops % UPDATES_PR_FRAME) == 0) {
+	if ((main_loops % UPDATES_PR_FRAME) == 0)
 	    Frame_update();
-	}
     }
 
     if (!NoQuit
@@ -254,9 +246,9 @@ void Main_loop(void)
 	&& !login_in_progress
 	&& !NumQueuedPlayers) {
 
-	if (!NoPlayersEnteredYet) {
+	if (!NoPlayersEnteredYet)
 	    End_game();
-	}
+
 	if (serverTime + 5*60 < time(NULL)) {
 	    error("First player has yet to show his butt, I'm bored... Bye!");
 	    Log_game("NOSHOW");
@@ -301,12 +293,10 @@ int End_game(void)
     record = rrecord;
     playback = rplayback; /* Could be called from signal handler */
     if (ShutdownServer == 0) {
-	errno = 0;
-	error("Shutting down...");
+	warn("Shutting down...");
 	sprintf(msg, "shutting down: %s", ShutdownReason);
-    } else {
+    } else
 	sprintf(msg, "server exiting");
-    }
 
     while (NumPlayers > 0) {	/* Kick out all remaining players */
 	pl = Players(NumPlayers - 1);
@@ -505,7 +495,8 @@ void Server_info(char *str, unsigned max_size)
 	    server_version,
 	    (game_lock && ShutdownServer == -1) ? "locked" :
 	    (!game_lock && ShutdownServer != -1) ? "shutting down" :
-	    (game_lock && ShutdownServer != -1) ? "locked and shutting down" : "ok",
+	    (game_lock && ShutdownServer != -1) ?
+	    "locked and shutting down" : "ok",
 	    FPS,
 	    World.name, World.author, World.width, World.height,
 	    NumPlayers, World.NumBases);
@@ -516,16 +507,15 @@ void Server_info(char *str, unsigned max_size)
 	str[max_size - 1] = '\0';
 	return;
     }
-    if (NumPlayers <= 0) {
+    if (NumPlayers <= 0)
 	return;
-    }
 
     sprintf(msg, "\n"
 	   "NO:  TM: NAME:             LIFE:   SC:    PLAYER:\n"
 	   "-------------------------------------------------\n");
-    if (strlen(msg) + strlen(str) >= max_size) {
+    if (strlen(msg) + strlen(str) >= max_size)
 	return;
-    }
+
     strlcat(str, msg, max_size);
 
     if ((order = (player **) malloc(NumPlayers * sizeof(player *))) == NULL) {
@@ -534,11 +524,11 @@ void Server_info(char *str, unsigned max_size)
     }
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
-	if (BIT(World.rules->mode, LIMITED_LIVES)) {
+	if (BIT(World.rules->mode, LIMITED_LIVES))
 	    ratio = (DFLOAT) pl->score;
-	} else {
+	else
 	    ratio = (DFLOAT) pl->score / (pl->life + 1);
-	}
+
 	if ((best == NULL
 		|| ratio > best_ratio)
 	    && !BIT(pl->status, PAUSE)) {
@@ -547,9 +537,8 @@ void Server_info(char *str, unsigned max_size)
 	}
 	for (j = 0; j < i; j++) {
 	    if (order[j]->score < pl->score) {
-		for (k = i; k > j; k--) {
+		for (k = i; k > j; k--)
 		    order[k] = order[k - 1];
-		}
 		break;
 	    }
 	}
@@ -562,9 +551,8 @@ void Server_info(char *str, unsigned max_size)
 	    if ((k = Robot_war_on_player(pl)) != NO_ID) {
 		sprintf(name + strlen(name), " (%s)",
 			Player_by_id(k)->name);
-		if (strlen(name) >= 19) {
+		if (strlen(name) >= 19)
 		    strcpy(&name[17], ")");
-		}
 	    }
 	}
 	sprintf(lblstr, "%c%c %-19s%03d%6d",
@@ -641,7 +629,7 @@ void Log_game(const char *heading)
 	    World.name,
 	    heading);
 
-    if ((fp = fopen(Conf_logfile(), "a")) == NULL) {	/* Couldn't open file */
+    if ((fp = fopen(Conf_logfile(), "a")) == NULL) {
 	error("Couldn't open log file, contact %s", Conf_localguru());
 	return;
     }
@@ -670,9 +658,9 @@ void Game_Over(void)
 	minsc = 32767;
 	win = lose = -1;
 
-	for (i = 0; i < MAX_TEAMS; i++) {
+	for (i = 0; i < MAX_TEAMS; i++)
 	    teamscore[i] = 1234567; /* These teams are not used... */
-	}
+
 	for (i = 0; i < NumPlayers; i++) {
 	    player *pl = Players(i);
 	    int team;
@@ -945,24 +933,21 @@ int plock_server(int on)
 #ifdef PLOCKSERVER
     int			op;
 
-    if (on) {
+    if (on)
 	op = PROCLOCK;
-    }
-    else {
+    else
 	op = UNLOCK;
-    }
+
     if (plock(op) == -1) {
 	static int num_plock_errors;
-	if (++num_plock_errors <= 3) {
+	if (++num_plock_errors <= 3)
 	    error("Can't plock(%d)", op);
-	}
 	return -1;
     }
     return on;
 #else
-    if (on) {
+    if (on)
 	xpprintf("Can't plock: Server was not compiled with plock support\n");
-    }
     return 0;
 #endif
 }
