@@ -25,6 +25,9 @@
 
 char xdefault_version[] = VERSION;
 
+bool	showNastyShots = false;	/* show original flavor shots or the new 
+				   "nasty shots" */
+
 #ifdef OPTIONHACK
 
 
@@ -169,6 +172,13 @@ xp_option_t xdefault_options[] = {
 	NULL, NULL,
 	"The font used for drawing messages.\n"),
 
+    XP_BOOL_OPTION(
+	"showNastyShots",
+	false,
+	&showNastyShots,
+	NULL,
+	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
+	"You will probably want to increase your shotSize if you use this.\n"),
 
 };
 

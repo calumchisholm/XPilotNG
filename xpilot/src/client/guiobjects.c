@@ -29,27 +29,6 @@ static bool texturedShips = false; /* Turned this off because the images drawn
 				    * don't match the actual shipshape used
 				    * for wall collisions by the server. */
 
-int selfLWColor;
-int enemyLWColor;
-int teamLWColor;
-int shipNameColor;
-int baseNameColor;
-int mineNameColor;
-int ballColor;
-int connColor;
-int teamShotColor;
-int shipShapesHackColor;
-int team0Color;
-int team1Color;
-int team2Color;
-int team3Color;
-int team4Color;
-int team5Color;
-int team6Color;
-int team7Color;
-int team8Color;
-int team9Color;
-
 void Gui_paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int c)
 {
     if (!texturedObjects) {

@@ -31,9 +31,6 @@ Pixmap	radarPixmap, radarPixmap2;
 				/* the planes hack on the radar for */
 				/* monochromes) */
 long	dpl_1[2], dpl_2[2];	/* Used by radar hack */
-int	wallRadarColor;		/* Color index for walls on radar. */
-int	targetRadarColor;	/* Color index for targets on radar. */
-int	decorRadarColor;	/* Color index for decorations on radar. */
 int	radar_exposures;
 int	(*radarDrawRectanglePtr)	/* Function to draw player on radar */
 	(Display *disp, Drawable d, GC gc,

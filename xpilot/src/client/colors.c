@@ -82,8 +82,79 @@ int		maxColors;	/* Max. number of colors to use */
 XColor		colors[MAX_COLORS];
 Colormap	colormap;	/* Private colormap */
 
-char		sparkColors[MSG_LEN];
-int		spark_color[MAX_COLORS];
+char	sparkColors[MSG_LEN];
+int	spark_color[MAX_COLORS];
+
+int	buttonColor;		/* Color index for button drawing */
+int	windowColor;		/* Color index for window drawing */
+int	borderColor;		/* Color index for border drawing */
+int	hudColor;		/* Color index for HUD drawing */
+int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
+int	hudVLineColor;		/* Color index for vert. HUD line drawing */
+int	hudItemsColor;		/* Color index for HUD items drawing */
+int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
+int	hudRadarOtherColor;	/* Color index for other hudradar dots */
+int	hudLockColor;		/* Color index for lock on HUD drawing */
+int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
+int	dirPtrColor;		/* Color index for dirptr drawing */
+int	msgScanBallColor;	/* Color index for ball msg */
+int	msgScanSafeColor;	/* Color index for safe msg */
+int	msgScanCoverColor;	/* Color index for cover msg */
+int	msgScanPopColor;	/* Color index for pop msg */
+int	messagesColor;		/* Color index for messages */
+int	oldMessagesColor;	/* Color index for old messages */
+int	fuelMeterColor;		/* Color index for fuel meter */
+int	powerMeterColor;	/* Color index for power meter */
+int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
+int	packetSizeMeterColor;	/* Color index for packet size meter */
+int	packetLossMeterColor;	/* Color index for packet loss meter */
+int	packetDropMeterColor;	/* Color index for packet drop meter */
+int	packetLagMeterColor;	/* Color index for packet lag meter */
+int	temporaryMeterColor;	/* Color index for temporary meter drawing */
+int	meterBorderColor;	/* Color index for meter border drawing */
+int	clockColor;		/* Clock color index */
+int	scoreColor;		/* Score list color index */
+int	scoreSelfColor;		/* Score list own score color index */
+int	scoreInactiveColor;	/* Score list inactive player color index */
+int	scoreInactiveSelfColor;	/* Score list inactive self color index */
+int	scoreOwnTeamColor;	/* Score list own team color index */
+int	scoreEnemyTeamColor;	/* Score list enemy team color index */
+int	scoreObjectColor;	/* Color index for map score objects */
+int	zeroLivesColor;		/* Color to associate with 0 lives */
+int	oneLifeColor;		/* Color to associate with 1 life */
+int	twoLivesColor;		/* Color to associate with 2 lives */
+int	manyLivesColor;		/* Color to associate with >2 lives */
+int	wallColor;		/* Color index for wall drawing */
+int	fuelColor;		/* Color index for fuel station drawing */
+int	decorColor;		/* Color index for decoration drawing */
+int	backgroundPointColor;	/* Color index for background point drawing */
+int	visibilityBorderColor;	/* Color index for visibility border drawing */
+int	wallRadarColor;		/* Color index for walls on radar. */
+int	targetRadarColor;	/* Color index for targets on radar. */
+int	decorRadarColor;	/* Color index for decorations on radar. */
+int	selfLWColor;
+int	enemyLWColor;
+int	teamLWColor;
+int	shipNameColor;
+int	baseNameColor;
+int	mineNameColor;
+int	ballColor;
+int	connColor;
+int	teamShotColor;
+int	shipShapesHackColor;
+int	team0Color;
+int	team1Color;
+int	team2Color;
+int	team3Color;
+int	team4Color;
+int	team5Color;
+int	team6Color;
+int	team7Color;
+int	team8Color;
+int	team9Color;		/* We have too many color options. */
+
+
+
 
 #ifndef _WINDOWS
 

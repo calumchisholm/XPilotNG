@@ -32,6 +32,8 @@ extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 extern void Get_xpilotrc_file(char *, unsigned);
 
+extern void Set_option(const char *name, const char *value);
+
 typedef enum {
     xp_noarg_option,
     xp_bool_option,

@@ -25,12 +25,6 @@
 
 char painthud_version[] = VERSION;
 
-int	hudColor;		/* Color index for HUD drawing */
-int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
-int	hudVLineColor;		/* Color index for vert. HUD line drawing */
-int	hudItemsColor;		/* Color index for HUD items drawing */
-int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
-int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 int	hudRadarDotSize;	/* Size for hudradar dot drawing */
 double	hudRadarScale;		/* Scale for hudradar drawing */
 double	hudRadarMapScale;		/* Scale for mapradar drawing */
@@ -38,15 +32,6 @@ double	hudRadarLimit;		/* Hudradar dots are not drawn if closer to
 				   your ship than this factor of visible
 				   range */
 int	hudSize;		/* Size for HUD drawing */
-int	hudLockColor;		/* Color index for lock on HUD drawing */
-int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
-int	dirPtrColor;		/* Color index for dirptr drawing */
-int	msgScanBallColor;	/* Color index for ball msg */
-int	msgScanSafeColor;	/* Color index for safe msg */
-int	msgScanCoverColor;	/* Color index for cover msg */
-int	msgScanPopColor;	/* Color index for pop msg */
-int	messagesColor;		/* Color index for messages */
-int	oldMessagesColor;	/* Color index for old messages */
 int	baseWarningType;	/* Which type of base warning you prefer */
 
 radar_t	*old_radar_ptr;
@@ -54,16 +39,6 @@ int	old_num_radar, old_max_radar;
 
 static int meterWidth = 60;
 static int meterHeight = 10;
-
-int	fuelMeterColor;		/* Color index for fuel meter */
-int	powerMeterColor;	/* Color index for power meter */
-int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
-int	packetSizeMeterColor;	/* Color index for packet size meter */
-int	packetLossMeterColor;	/* Color index for packet loss meter */
-int	packetDropMeterColor;	/* Color index for packet drop meter */
-int	packetLagMeterColor;	/* Color index for packet lag meter */
-int	temporaryMeterColor;	/* Color index for temporary meter drawing */
-int	meterBorderColor;	/* Color index for meter border drawing */
 
 /*
  * Draw a meter of some kind on screen.

@@ -486,7 +486,7 @@ extern int	map_point_size;		/* size of navigation points */
 extern int	spark_size;		/* size of sparks and debris */
 extern int	shot_size;		/* size of shot */
 extern int	teamshot_size;		/* size of team shot */
-extern bool	showNastyShots;		/* show original flavor shots or the new "nasty shots" */
+
 extern double	controlTime;		/* Display control for how long? */
 extern u_byte	spark_rand;		/* Sparkling effect */
 extern u_byte	old_spark_rand;		/* previous value of spark_rand */

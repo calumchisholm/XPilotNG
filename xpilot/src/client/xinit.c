@@ -71,7 +71,6 @@ char xinit_version[] = VERSION;
  */
 int			ButtonHeight;
 Atom			ProtocolAtom, KillAtom;
-int			buttonColor, windowColor, borderColor;
 bool			quitting = false;
 unsigned		top_width, top_height;
 unsigned		players_width, players_height;

@@ -630,15 +630,7 @@ xp_option_t default_options[] = {
 	0
     },
 
-    {
-	"showNastyShots",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
-	"You will probably want to increase your shotSize if you use this.\n",
-	0
-    },
+
     {
 	"backgroundPointDist",
 	NULL,

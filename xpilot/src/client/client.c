@@ -84,8 +84,6 @@ int	map_point_size;		/* size of navigation points */
 int	spark_size;		/* size of debris and spark */
 int	shot_size;		/* size of shot */
 int	teamshot_size;		/* size of team shot */
-bool	showNastyShots = false;	/* show original flavor shots or the new 
-				   "nasty shots" */
 double	controlTime;		/* Display control for how long? */
 u_byte	spark_rand;		/* Sparkling effect */
 u_byte	old_spark_rand;		/* previous value of spark_rand */

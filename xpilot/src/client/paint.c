@@ -46,26 +46,6 @@ long	loops = 0;
 long	loopsSlow = 0;	/* Proceeds slower than loops */
 double	timePerFrame = 0.0;
 
-int	clockColor;		/* Clock color index */
-int	scoreColor;		/* Score list color index */
-int	scoreSelfColor;		/* Score list own score color index */
-int	scoreInactiveColor;	/* Score list inactive player color index */
-int	scoreInactiveSelfColor;	/* Score list inactive self color index */
-int	scoreOwnTeamColor;	/* Score list own team color index */
-int	scoreEnemyTeamColor;	/* Score list enemy team color index */
-int	scoreObjectColor;	/* Color index for map score objects */
-
-int	zeroLivesColor;		/* Color to associate with 0 lives */
-int	oneLifeColor;		/* Color to associate with 1 life */
-int	twoLivesColor;		/* Color to associate with 2 lives */
-int	manyLivesColor;		/* Color to associate with >2 lives */
-
-int	wallColor;		/* Color index for wall drawing */
-int	fuelColor;		/* Color index for fuel station drawing */
-int	decorColor;		/* Color index for decoration drawing */
-int	backgroundPointColor;	/* Color index for background point drawing */
-int	visibilityBorderColor;	/* Color index for visibility border drawing */
-
 unsigned	draw_width, draw_height;
 int	num_spark_colors;
 
