@@ -182,6 +182,8 @@ void P_start_polygon(int cx, int cy, int style)
 
 void P_offset(int offcx, int offcy, int edgestyle)
 {
+    int i;
+
     if (offcx == 0 && offcy == 0) {
 	warn("Edge with zero length");
 	if (edgestyle != -1 && edgestyle != current_estyle) {
@@ -191,22 +193,23 @@ void P_offset(int offcx, int offcy, int edgestyle)
 	return;
     }
 
-    if (ABS(offcx) > POLYGON_MAX_OFFSET || ABS(offcy) > POLYGON_MAX_OFFSET) {
-	warn("Offset component absolute value exceeds %d (x=%d, y=%d)",
-	     POLYGON_MAX_OFFSET, offcx, offcy);
-	exit(1);
-    }
-
-    STORE(int, edgeptr, num_edges, max_edges, offcx);
-    STORE(int, edgeptr, num_edges, max_edges, offcy);
     if (edgestyle != -1 && edgestyle != current_estyle) {
 	STORE(int, estyleptr, ecount, max_echanges, ptscount);
 	STORE(int, estyleptr, ecount, max_echanges, edgestyle);
 	current_estyle = edgestyle;
     }
-    ptscount++;
+
     P_cv.cx += offcx;
     P_cv.cy += offcy;
+
+    i = (MAX(ABS(offcx), ABS(offcy)) - 1) / POLYGON_MAX_OFFSET + 1;
+    for (;i > 0;i--) {
+	STORE(int, edgeptr, num_edges, max_edges, offcx / i);
+	STORE(int, edgeptr, num_edges, max_edges, offcy / i);
+	offcx -= offcx / i;
+	offcy -= offcy / i;
+	ptscount++;
+    }
 }
 
 void P_vertex(int cx, int cy, int edgestyle)

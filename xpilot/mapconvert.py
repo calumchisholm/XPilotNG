@@ -139,7 +139,6 @@ WALL = FILLED + REC_UL + REC_UR + REC_DL + REC_DR
 ATTRACT = '$'
 
 BCLICKS = 35 * 64
-MAXLEN = 30000
 
 dirs = ((1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1))
 
@@ -697,7 +696,7 @@ def convert(options):
 		l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
 
     print >> sys.stderr, "Writing converted map...",
-    print '<XPilotMap version="1.0">'
+    print '<XPilotMap version="1.1">'
 
     if not KEEP_MAPDATA:
         del options['mapdata']
@@ -729,11 +728,7 @@ def convert(options):
             sstr = ' style="xpbluehidden"'
         else:
             sstr = ''
-        for i in range((max(abs(dx), abs(dy)) + MAXLEN - 1) // MAXLEN, 0, -1):
-            print '<Offset x="%d" y="%d"%s/>' % (dx // i, dy // i, sstr)
-            sstr= ''
-            dx -= dx // i
-            dy -= dy // i
+        print '<Offset x="%d" y="%d"%s/>' % (dx, dy, sstr)
 
     for p in polys:
         while p[-1][2][0] * p[0][2][1] == p[-1][2][1] * p[0][2][0]:
@@ -788,7 +783,7 @@ def convert(options):
 	print '<Check x="%d" y="%d"/>' % (check.x, check.y)
     for cannon in cannons:
         offsets = ((-373, 0), (-747, 1120), (0, -2240), (747, 1120))
-        for i in range(cannon.dir // 32):
+        for _ in range(cannon.dir // 32):
             offsets = [(-y, x) for x, y in offsets]
         cannon.x += offsets[0][0]
         cannon.y += offsets[0][1]

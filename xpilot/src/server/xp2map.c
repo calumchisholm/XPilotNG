@@ -75,7 +75,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	else if (version < 1)
 	    warn("Impossible version in map file");
-	else if (version > 1) {
+	else if (version > 1.1) {
 	    warn("Map file has newer version than this server recognizes.");
 	    warn("The map file might use unsupported features.");
 	}
@@ -92,7 +92,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     if (!strcasecmp(el, "Polystyle")) {
 	char id[100];
 	int color = 0, texture_id = 0, defedge_id = 0, flags = 0;
-	
+
 	while (*attr) {
 	    if (!strcasecmp(*attr, "id"))
 		strlcpy(id, *(attr + 1), sizeof(id));
@@ -364,7 +364,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	if (type == SPACE) {
 	    warn("Illegal type in grav tag.\n");
 	    exit(1);
-	}	
+	}
 	Map_place_grav(cx, cy, force, type);
 	return;
     }
@@ -405,7 +405,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	/*Map_place_...(team);*/
 	return;
-    }    
+    }
 
     /* end of kps extensions */
 
@@ -521,5 +521,3 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin)
     } while (len);
     return true;
 }
-
-
