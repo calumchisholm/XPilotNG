@@ -157,7 +157,10 @@ static bool Msg_match_fmt(char *msg, char *fmt, msgnames_t *mn)
     return false;
 }
 
-
+/*
+ * A total reset is most often done when a new match is starting.
+ * If we see a total reset message we clear the statistics.
+ */
 static bool Msg_scan_for_total_reset(char *message)
 {
     static char total_reset[] = "Total reset";
@@ -220,10 +223,6 @@ static bool Msg_scan_for_ball_destruction(char *message)
     msgnames_t mn;
 
     if (!self)
-	return false;
-
-    /* don't bother to count if we are not playing */
-    if (strchr("PTW", self->mychar))
 	return false;
 
     memset(&mn, 0, sizeof(mn));
@@ -294,6 +293,10 @@ static void Msg_scan_game_msg(char *message)
     other_t *other = NULL;
 
     DP(printf("MESSAGE: \"%s\"\n", message));
+
+    /* don't bother to scan messages if not playing */
+    if (num_others < 2 || !self || strchr("PW", self->mychar))
+	return;
 
     /*
      * First check if it is a message indicating end of round.
@@ -486,11 +489,16 @@ static bool Msg_is_in_angle_brackets(char *message)
 
 static void Msg_scan_angle_bracketed_msg(char *message)
 {
+    if (Msg_scan_for_total_reset(message))
+	return;
+
+    /* don't bother to scan messages if not playing */
+    if (num_others < 2 || !self || strchr("PW", self->mychar))
+	return;
+
     if (Msg_scan_for_ball_destruction(message))
 	return;
     if (Msg_scan_for_replace_treasure(message))
-	return;
-    if (Msg_scan_for_total_reset(message))
 	return;
 }
 
@@ -658,9 +666,11 @@ void Add_message(char *message)
 	Msg_scan_angle_bracketed_msg(message);
 
     else if (BIT(hackedInstruments, BALL_MSG_SCAN)
-	&& !is_game_msg
-	&& BIT(Setup->mode, TEAM_PLAY)
-	&& Msg_is_from_our_team(message, &bracket))
+	     && !is_game_msg
+	     && BIT(Setup->mode, TEAM_PLAY)
+	     && num_others >= 2
+	     && self && !strchr("PW", self->mychar)
+	     && Msg_is_from_our_team(message, &bracket))
 	bmsinfo = Msg_do_bms(message, bracket);
 
 #ifndef _WINDOWS
