@@ -9,6 +9,37 @@ AM_CONFIG_HEADER(config.h)
 dnl AC_CONFIG_AUX_DIR(config)
 dnl AC_CANONICAL_HOST
 
+
+dnl  Checks for options.
+AC_ARG_ENABLE(dbe,
+	AC_HELP_STRING([--enable-dbe],
+			[support for X Doublebuffer Extension in client]))
+
+AC_ARG_ENABLE(mbx,
+	AC_HELP_STRING([--enable-mbx],
+			[support for X Multibuffer Extension in client]))
+
+AC_ARG_ENABLE(sparccmaphack,
+	AC_HELP_STRING([--enable-sparccmaphack],
+			[support for SPARC colormap hack in client]))
+
+AC_ARG_ENABLE(log,
+	AC_HELP_STRING([--enable-log],
+			[Try to log every server start to log file]))
+
+AC_ARG_ENABLE(silent,
+	AC_HELP_STRING([--enable-silent],
+			[Makes the server real silent]))
+
+AC_ARG_ENABLE(serversound,
+	AC_HELP_STRING([--enable-serversound],
+			[Turns on sound support in the server (not client)]))
+
+AC_ARG_ENABLE(plockserver,
+	AC_HELP_STRING([--enable-plockserver],
+			[lock the xpilot server (xpilots) into memory]))
+
+
 dnl  Checks for programs.
 AC_PROG_CC
 dnl AC_PROG_GCC_TRADITIONAL
@@ -30,7 +61,8 @@ dnl  Checks for header files.
 dnl AC_HEADER_STDC
 AC_HEADER_TIME
 dnl AC_HEADER_STDBOOL
-AC_CHECK_HEADERS([arpa/inet.h \
+AC_CHECK_HEADERS([ \
+	arpa/inet.h \
 	arpa/nameser.h \
 	bstring.h \
 	fcntl.h \
@@ -43,6 +75,7 @@ AC_CHECK_HEADERS([arpa/inet.h \
 	pwd.h \
 	resolv.h \
 	setjmp.h \
+	stddef.h \
 	sys/file.h \
 	sys/filio.h \
 	sys/fcntl.h \
@@ -51,6 +84,7 @@ AC_CHECK_HEADERS([arpa/inet.h \
 	sys/param.h \
 	sys/socket.h \
 	sys/sockio.h \
+	sys/time.h \
 	values.h \
 	])
 
@@ -73,7 +107,8 @@ AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm \
+AC_CHECK_FUNCS([ \
+	alarm \
 	floor \
 	gethostbyaddr \
 	gethostbyname \
@@ -103,7 +138,8 @@ AC_CHECK_FUNCS([alarm \
 	strtoul \
 	])
 
-AC_CONFIG_FILES([Makefile \
+AC_CONFIG_FILES([ \
+	Makefile \
 	lib/Makefile \
 	lib/maps/Makefile \
 	lib/textures/Makefile \
