@@ -3264,7 +3264,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bool_resource(rDB, "filledDecor", &instruments.showFilledDecor);
     Get_bool_resource(rDB, "texturedDecor", &instruments.showTexturedDecor);
     Get_bool_resource(rDB, "reverseScroll", &instruments.showReverseScroll);
-    Get_bool_resource(rDB, "showID", &instruments.showShipId);
 
     Get_bool_resource(rDB, "pointerControl", &initialPointerControl);
     Get_float_resource(rDB, "showItemsTime", &showItemsTime);
