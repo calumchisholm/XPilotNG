@@ -187,7 +187,7 @@ extern unsigned long	current_foreground;
 
 #define ERASE_INITIALIZED	(1 << 0)
 
-#define MAX_LINE_WIDTH	4
+#define MAX_LINE_WIDTH	10
 
 typedef struct {
     int			flags;

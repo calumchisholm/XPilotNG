@@ -39,6 +39,7 @@
 
 #include "winX.h"
 
+#define WINMAXCOLORS 256
 #define	WINXFILELENGTH	32
 #define	XID_HEAD \
 	int		type; \
@@ -62,12 +63,6 @@ struct	XID_HWND {
 	HBITMAP	hBmpa[2];		// 2 bitmaps for ThreadedDraw
 	BOOL	filling;		// which bitmap ThreadedDraw is filling
 	BOOL	notmine;		// This window was not created by winX, and shouldn't be destroyed. (like top)
-#ifdef PENS_OF_PLENTY
-	int		cur_color;
-	int		line_style;
-	int		line_width;
-	BOOL	nodash;
-#endif
 };
 typedef struct XID_HWND XID_HWND;
 
@@ -75,7 +70,7 @@ struct	XID_GC {
 	XID_HEAD
 	int		xidhwnd;
 	HFONT	hfont;
-	Font	font;
+	XGCValues xgcv;
 };
 typedef struct	XID_GC XID_GC;
 
@@ -120,42 +115,16 @@ typedef	union	XIDTYPE	XIDTYPE;
 
 extern	XIDTYPE	xid[MAX_XIDS];
 
-//#define	GetTophWnd()	xid[0].hwnd.hWnd
-
-#ifdef PENS_OF_PLENTY
-struct winXobj {
-	HPEN		pen;
-	HPEN		dashpen;
-	HPEN		cdashpen;
-	HPEN		fatpen;
-	HBRUSH		brush;
-	COLORREF	color;
-	HBITMAP		bitmask;
-};
-#else
-struct winXobj {
-	HPEN		pen;
-	HBRUSH		brush;
-	COLORREF	color;
-//	HBITMAP		bitmask;	not used
-};
-#endif
-typedef	struct	winXobj winXobj;
-extern	winXobj objs[];
-
 extern	HINSTANCE		hInstance;
 extern	BOOL			bWinNT;				// need this 'cause Win95 can't draw a simple circle
 extern	HFONT			hFixedFont;
-//extern	unsigned int	max_xid;		// point to next free one in array
-extern	BOOL			bHasPal;			// Are we palette or colour based?
 extern	HPALETTE		myPal;
-extern	int				cur_color;
+extern	LOGPALETTE*		myLogPal;
 
 extern	Window			rootWindow;
 
 extern	BOOL AngleArc2(HDC hdc, int X, int Y, DWORD dwRadius,
 				       double fStartDegrees, double fSweepDegrees, BOOL bFilled);
-extern	COLORREF WinXPColour(int ColourNo);
 
 // Scaling window stuff
 #define	SCALEPREC	100
@@ -168,8 +137,12 @@ extern	COLORREF WinXPColour(int ColourNo);
 // Score window colour
 #define	SCOREWIN		2
 
-extern	XID	GetFreeXid();
-extern	void WinXFree(XID xid);
+extern XID GetFreeXid();
+extern void WinXFree(XID xid);
+extern void WinXSelectPen(int gc);
+extern void WinXSelectBrush(int gc);
+extern COLORREF WinXPColour(int index);
+extern HBRUSH WinXGetBrush(ULONG col);
 
 #endif	/* _WINX__H_ */
 

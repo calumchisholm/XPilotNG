@@ -278,17 +278,29 @@ typedef	struct XColor XColor;
 #define Nonconvex		1	/* no paths intersect, but not convex */
 #define Convex			2	/* wholly convex */
 
-
-#define	GCLineWidth			(1L<<4)
-#define	GCLineStyle			(1L<<5)
-#define	GCCapStyle			(1L<<6)
-#define	GCJoinStyle			(1L<<7)
-#define GCFillStyle			(1L<<8)
-#define GCStipple			(1L<<11)
-#define GCTileStipXOrigin	(1L<<12)
-#define GCTileStipYOrigin	(1L<<13)
-#define	GCGraphicsExposures	(1L<<16)
-#define	GCDashOffset		(1L<<20)
+#define GCFunction              (1L<<0)
+#define GCPlaneMask             (1L<<1)
+#define GCForeground            (1L<<2)
+#define GCBackground            (1L<<3)
+#define GCLineWidth             (1L<<4)
+#define GCLineStyle             (1L<<5)
+#define GCCapStyle              (1L<<6)
+#define GCJoinStyle             (1L<<7)
+#define GCFillStyle             (1L<<8)
+#define GCFillRule              (1L<<9) 
+#define GCTile                  (1L<<10)
+#define GCStipple               (1L<<11)
+#define GCTileStipXOrigin       (1L<<12)
+#define GCTileStipYOrigin       (1L<<13)
+#define GCFont                  (1L<<14)
+#define GCSubwindowMode         (1L<<15)
+#define GCGraphicsExposures     (1L<<16)
+#define GCClipXOrigin           (1L<<17)
+#define GCClipYOrigin           (1L<<18)
+#define GCClipMask              (1L<<19)
+#define GCDashOffset            (1L<<20)
+#define GCDashList              (1L<<21)
+#define GCArcMode               (1L<<22)
 
 /* CoordinateMode for drawing routines */
 

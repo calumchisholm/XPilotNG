@@ -61,29 +61,17 @@ HINSTANCE	hInstance;
 HPALETTE	myPal;
 LOGPALETTE*	myLogPal;
 HFONT		hFixedFont;
-HHOOK		mousehook = NULL;
 
 HDC			itemsDC;		// for blitting items onto the screen
-#define		WINMAXCOLORS	16
-
-int			winmaxcolors;
-int			TotalPens = 0;
-
 XIDTYPE	xid[MAX_XIDS];
-//unsigned int	max_xid = 0;			// point to next free one in array
 
 BOOL	bWinNT = 0;				// need this 'cause Win95 can't draw a simple circle
-BOOL	bHasPal = TRUE;			// Are we palette or colour based?
 BOOL	drawPending = FALSE;	// try to throttle the deadly frame backup syndrome
 
-#ifdef PENS_OF_PLENTY
-DWORD	dwdashes[NUM_DASHES+1] = { NUM_DASHES, 8, 4 };
-DWORD	dwcdashes[NUM_CDASHES+1] = { NUM_CDASHES, 3, 9 };
-winXobj	objs[WINMAXCOLORS];
-#else
-int		cur_color;
-winXobj objs[WINMAXCOLORS+FUNKCOLORS];
-#endif
+
+#define MAX_LINE_WIDTH 10
+HPEN pens[WINMAXCOLORS][MAX_LINE_WIDTH][3];
+HBRUSH brushes[WINMAXCOLORS];
 
 // We need to parse and setup the colors during Windows screen init which happens
 // before XPilot window init.
@@ -113,11 +101,8 @@ static void WinXSetupRadarWindow()
 				HDC hNewDC = GetDC(xid[radar].hwnd.hWnd);
 				xid[radar].hwnd.hSaveDC = xid[radar].hwnd.hBmpDC;
 				xid[radar].hwnd.hBmpDC = hNewDC;
-				if (bHasPal)
-				{
-					SelectPalette(hNewDC, myPal, FALSE);
-					RealizePalette(hNewDC);
-				}
+				SelectPalette(hNewDC, myPal, FALSE);
+				RealizePalette(hNewDC);
 			}
 		}
 	}
@@ -161,26 +146,6 @@ static void WinXDeleteDraw(int xidno)
 	xid[xidno].hwnd.hBmp = NULL;
 }
 
-#if 0
-static void WinXScaled(HDC hDC, int cx, int cy)
-{
-	if (iScaleFactor != SCALEPREC)
-	{
-		SetMapMode(hDC, MM_ANISOTROPIC);
-	
-		SetWindowExtEx(hDC, WinXUnscale(cx), WinXUnscale(cy), NULL);
-		SetWindowOrgEx(hDC, 0, 0, NULL);
-		SetViewportExtEx(hDC, cx, cy, NULL);
-		SetViewportOrgEx(hDC, 0, 0, NULL);
-	}
-	else SetMapMode(hDC, MM_TEXT);
-}
-
-static void WinXUnscaled(HDC hDC)
-{
-	SetMapMode(hDC, MM_TEXT);
-}
-#endif
 
 static void WinXCreateBitmapForXid(HWND hwnd, XID xidno, int cx, int cy)
 {
@@ -218,11 +183,8 @@ static void WinXCreateBitmapForXid(HWND hwnd, XID xidno, int cx, int cy)
 //		WinXScaled(hBmpDC, cx, cy);
 
 
-	if (bHasPal)
-	{
-		SelectPalette(hBmpDC, myPal, FALSE);
-		RealizePalette(hBmpDC);
-	}
+	SelectPalette(hBmpDC, myPal, FALSE);
+	RealizePalette(hBmpDC);
 	SetBkMode(hBmpDC, TRANSPARENT);
 	r.left = 0; r.top = 0;
 	r.right = cx; r.bottom = cy;
@@ -503,7 +465,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			if (hBmpDC)
 			{
 				Trace("WM_ERASEBKGND %d color=%d %d/%d %d/%d\n", xidno, xid[xidno].hwnd.bgcolor, rect.left, rect.top, rect.right, rect.bottom);
-				FillRect(hBmpDC, &rect, objs[xid[xidno].hwnd.bgcolor].brush);
+				FillRect(hBmpDC, &rect, (HBRUSH)WinXGetBrush(xid[xidno].hwnd.bgcolor));
 			}
 		}
 		return(0);
@@ -549,11 +511,9 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 							Trace("Expose %d %s:%d\n", xidno, xid[xidno].any.file, xid[xidno].any.line);
 							xevent(event);
 						}
-						if (bHasPal)
-						{
-							SelectPalette(hDC, myPal, FALSE);
-							RealizePalette(hDC);
-						}
+						SelectPalette(hDC, myPal, FALSE);
+						RealizePalette(hDC);
+
 						if (xidno == (int)draw)
 						{
 						//	RECT r;
@@ -593,30 +553,8 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 COLORREF WinXPColour(int ColourNo)
 {
-	if (bHasPal)
-		return PALETTEINDEX(ColourNo);
-	return objs[ColourNo].color;
+	return PALETTEINDEX(ColourNo);
 }
-
-#if 0
-LRESULT CALLBACK MouseHook(int nCode, WPARAM wParam, LPARAM lParam)
-{
-	XEvent event;
-	XMotionEvent* me = (XMotionEvent*)&event;
-	if (nCode < 0)
-		return(CallNextHookEx(mousehook, nCode, wParam, lParam));
-	if (!pointerControl)
-		return(0);
-	me->type = MotionNotify;
-	me->window = draw;
-	me->x = ((MOUSEHOOKSTRUCT*)lParam)->pt.x;
-	me->y = ((MOUSEHOOKSTRUCT*)lParam)->pt.y;
-	xevent(event);
-
-	return(1);
-
-}
-#endif
 
 static void InitWinXClass()
 {
@@ -642,117 +580,52 @@ void InitWinX(HWND hWnd)
 	int		i;
 	char	s[80];
 	HDC		tDC = GetDC(hWnd);
-//	TEXTMETRIC tm;
 
-	memset(&xid, 0, sizeof(xid));
+	COLORREF cols[] = {
+	RGB(0x00,0x00,0x00),
+	RGB(0xFF,0xFF,0xFF),
+	RGB(0x4E,0x7C,0xFF),
+	RGB(0xFF,0x3A,0x27),
+	RGB(0x33,0xBB,0x44),
+	RGB(0x99,0x22,0x00),
+	RGB(0xBB,0x77,0x00),
+	RGB(0xEE,0x99,0x00),
+	RGB(0x77,0x00,0x00),
+	RGB(0xCC,0x44,0x00),
+	RGB(0xDD,0x88,0x00),
+	RGB(0xFF,0xBB,0x11),
+	RGB(0x9F,0x9F,0x9F),
+	RGB(0x5F,0x5F,0x5F),
+	RGB(0xDF,0xDF,0xDF),
+	RGB(0x20,0x20,0x20)};
+
 	InitWinXClass();
 	xid[0].hwnd.hWnd = hWnd;
 	xid[0].type = XIDTYPE_HWND;
-//	max_xid = 1;
 
 	itemsDC = NULL;
 
 	bWinNT = GetVersion() & 0x80000000 ? FALSE : TRUE;
 
-	myLogPal = malloc(sizeof(LOGPALETTE) + sizeof(PALETTEENTRY)*16);
+	maxColors = 16;
+
+	myLogPal = malloc(sizeof(LOGPALETTE) + sizeof(PALETTEENTRY) * WINMAXCOLORS);
 	myLogPal->palVersion = 0x300;
-//    "#000000", "#FFFFFF", "#4E7CFF", "#FF3A27",
-//    "#33BB44", "#992200", "#BB7700", "#EE9900",
-//    "#770000", "#CC4400", "#DD8800", "#FFBB11",
-//    "#9f9f9f", "#5f5f5f", "#dfdfdf", "#202020"
-	objs[0].color = GetXPilotColor ( 0, RGB(0x00,0x00,0x00));
-	objs[1].color = GetXPilotColor ( 1, RGB(0xFF,0xFF,0xFF));
-	objs[2].color = GetXPilotColor ( 2, RGB(0x4E,0x7C,0xFF));
-	objs[3].color = GetXPilotColor ( 3, RGB(0xFF,0x3A,0x27));
-	objs[4].color = GetXPilotColor ( 4, RGB(0x33,0xBB,0x44));
-	objs[5].color = GetXPilotColor ( 5, RGB(0x99,0x22,0x00));
-	objs[6].color = GetXPilotColor ( 6, RGB(0xBB,0x77,0x00));
-	objs[7].color = GetXPilotColor ( 7, RGB(0xEE,0x99,0x00));
-	objs[8].color = GetXPilotColor ( 8, RGB(0x77,0x00,0x00));
-	objs[9].color = GetXPilotColor ( 9, RGB(0xCC,0x44,0x00));
-	objs[10].color = GetXPilotColor(10, RGB(0xDD,0x88,0x00));
-	objs[11].color = GetXPilotColor(11, RGB(0xFF,0xBB,0x11));
-	objs[12].color = GetXPilotColor(12, RGB(0x9F,0x9F,0x9F));
-	objs[13].color = GetXPilotColor(13, RGB(0x5F,0x5F,0x5F));
-	objs[14].color = GetXPilotColor(14, RGB(0xDF,0xDF,0xDF));
-	objs[15].color = GetXPilotColor(15, RGB(0x20,0x20,0x20));
-
-	winmaxcolors = GetMaxColors();
-	//bHasPal = (GetDeviceCaps(tDC, RASTERCAPS) & RC_PALETTE) != 0;
-	if (!winmaxcolors)
-		winmaxcolors = 8;
-	if (winmaxcolors < 4)
-		error("I can't allocate 4 (colors or pens or brushes).  XPilot is probably not going to look very nice on this display");
-	else if (winmaxcolors < 8)
-		winmaxcolors = 4;
-	else if (winmaxcolors < 16)
-		winmaxcolors = 8;
-	else
-		winmaxcolors = 16;
-	maxColors = winmaxcolors;
-	myLogPal->palNumEntries = winmaxcolors;
-	for (i=0; i<winmaxcolors; i++)
-	{
+	myLogPal->palNumEntries = maxColors;
+	for (i = 0; i < maxColors; i++) {
 		myLogPal->palPalEntry[i].peFlags = PC_RESERVED;
-//		myLogPal->palPalEntry[i].peFlags = PC_EXPLICIT;
-		myLogPal->palPalEntry[i].peRed =   GetRValue(objs[i].color);
-		myLogPal->palPalEntry[i].peGreen = GetGValue(objs[i].color);
-		myLogPal->palPalEntry[i].peBlue =  GetBValue(objs[i].color);
-
-#ifdef PENS_OF_PLENTY
-		objs[i].brush = CreateSolidBrush(WinXPColour(i));
-		if (!objs[i].brush)
-			{ sprintf(s, "maxcolors=%d can't create brush %d", winmaxcolors, i); error(s); }
-#else
-		objs[i].pen = CreatePen(PS_SOLID, 1, WinXPColour(i));
-		if (!objs[i].pen)
-			{ sprintf(s, "maxcolors=%d can't create pen %d", winmaxcolors, i); error(s); }
-		objs[i].brush = CreateSolidBrush(WinXPColour(i));
-		if (!objs[i].brush)
-			{ sprintf(s, "maxcolors=%d can't create brush %d", winmaxcolors, i); error(s); }
-		Trace("%d: pen=%08X brush=%08X\n", i, objs[i].pen, objs[i].brush);
-#endif
+		myLogPal->palPalEntry[i].peRed = GetRValue(cols[i]);
+		myLogPal->palPalEntry[i].peGreen = GetGValue(cols[i]);
+		myLogPal->palPalEntry[i].peBlue = GetBValue(cols[i]);
 	}
-	
-#ifndef PENS_OF_PLENTY
-	objs[WHITE+CLOAKCOLOROFS].color = objs[WHITE].color;
-	objs[WHITE+CLOAKCOLOROFS].brush = objs[WHITE].brush;
-	objs[WHITE+CLOAKCOLOROFS].pen = CreatePen(PS_DOT, 1, WinXPColour(WHITE));
-	if (!objs[WHITE+CLOAKCOLOROFS].pen)
-		{ sprintf(s, "maxcolors=%d can't create pen %d", winmaxcolors, WHITE+CLOAKCOLOROFS); error(s); }
-	objs[BLUE+CLOAKCOLOROFS].color = objs[BLUE].color;
-	objs[BLUE+CLOAKCOLOROFS].brush = objs[BLUE].brush;
-	objs[BLUE+CLOAKCOLOROFS].pen = CreatePen(PS_DOT, 1, WinXPColour(BLUE));
-	if (!objs[BLUE+CLOAKCOLOROFS].pen)
-		{ sprintf(s, "maxcolors=%d can't create pen %d", winmaxcolors, BLUE+CLOAKCOLOROFS); error(s); }
-	objs[LASERCOLOR].color = objs[RED].color;
-	objs[LASERCOLOR].brush = objs[RED].brush;
-	objs[LASERCOLOR].pen = CreatePen(PS_SOLID, 2, WinXPColour(RED));
-	if (!objs[LASERCOLOR].pen)
-		{ sprintf(s, "maxcolors=%d can't create pen %d", winmaxcolors, LASERCOLOR); error(s); }
-	objs[MISSILECOLOR].color = objs[RED].color;
-	objs[MISSILECOLOR].brush = objs[RED].brush;
-	objs[MISSILECOLOR].pen = CreatePen(PS_SOLID, 2, WinXPColour(WHITE));
-	if (!objs[MISSILECOLOR].pen)
-		{ sprintf(s, "maxcolors=%d can't create pen %d", winmaxcolors, MISSILECOLOR); error(s); }
-	objs[LASERTEAMCOLOR].color = objs[BLUE].color;
-	objs[LASERTEAMCOLOR].brush = objs[BLUE].brush;
-	objs[LASERTEAMCOLOR].pen = CreatePen(PS_SOLID, 2, WinXPColour(BLUE));
-	if (!objs[LASERTEAMCOLOR].pen)
-		{ sprintf(s, "maxcolors=%d can't create pen %d", winmaxcolors, LASERTEAMCOLOR); error(s); }
-#endif
-
 	myPal = CreatePalette(myLogPal);
-	SelectPalette(tDC, myPal, FALSE);
-	if (!myPal)
-		error("Can't create palette");
+	if (!myPal) error("Can't create palette");
 
     for (i=0; i<NUM_ITEMS; i++)
 	{
 		itemBitmaps[i][ITEM_HUD] = XIDTYPE_UNUSED;
 		itemBitmaps[i][ITEM_PLAYFIELD] = XIDTYPE_UNUSED;
 	}
-//	mousehook = SetWindowsHookEx(WH_MOUSE, MouseHook, NULL, GetCurrentThreadId());
 }
 void WinXFree(XID i)
 {
@@ -775,105 +648,72 @@ void WinXFree(XID i)
 void WinXShutdown()
 {
 	XID		i;
+	int j, k;
 
-	if (mousehook)
-		UnhookWindowsHookEx(mousehook);
 	free(myLogPal);
 	for (i=0; i<MAX_XIDS; i++)
 	{
 		WinXFree(i);
 	}
 
-	for (i=0; i<(unsigned)maxColors; i++)
+	for (i = 0; i < WINMAXCOLORS; i++)
 	{
-#ifdef PENS_OF_PLENTY
-		if (objs[i].pen != NULL)
-			DeleteObject(objs[i].pen);
-		if (objs[i].dashpen != NULL)
-			DeleteObject(objs[i].dashpen);
-		if (objs[i].cdashpen != NULL)
-			DeleteObject(objs[i].cdashpen);
-		if (objs[i].fatpen != NULL)
-			DeleteObject(objs[i].fatpen);
-		if (objs[i].brush != NULL)
-			DeleteObject(objs[i].brush);
-#else
-		if (objs[i].pen)
-			DeleteObject(objs[i].pen);
-		if (objs[i].brush)
-			DeleteObject(objs[i].brush);
+		if (brushes[i]) DeleteObject(brushes[i]);
 
-#endif
+		for (j = 0; j < MAX_LINE_WIDTH; j++) {
+			for (k = 0; k < 3; k++) {
+				if (pens[i][j][k]) DeleteObject(pens[i][j][k]);
+			}
+		}
 	}
 }
 
-#ifdef PENS_OF_PLENTY
-static HPEN WinXMakePen(int cur_color, int Style, int Width)
+void WinXSelectPen(int gc)
 {
-	HPEN	hPen;
+	XGCValues *xgcv;
+	HDC hDC;
+	HPEN hPen;
 
-	if (bWinNT && Style != PS_SOLID)
-	{
-		LOGBRUSH lb;
-		DWORD	*dshs;
-	
-		lb.lbStyle = BS_SOLID;
-		lb.lbColor = WinXPColour(cur_color);
-		lb.lbHatch = 0;
+	xgcv = &xid[gc].hgc.xgcv;
+	hDC = xid[xid[gc].hgc.xidhwnd].hwnd.hBmpDC;
+	hPen = pens[xgcv->foreground][xgcv->line_width][xgcv->line_style];
 
-		if (Style = PS_DASH)
-			dshs = dwdashes;
-		else
-			dshs = dwcdashes;
-		hPen = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, Width, &lb, dshs[0], &dshs[1]);
+	if (!hPen) {
+
+		int styleMap[] = { PS_SOLID, PS_DASH, PS_DASHDOT };
+
+		hPen = CreatePen(
+			styleMap[xgcv->line_style], 
+			xgcv->line_width, 
+			WinXPColour(xgcv->foreground));
+
+		if (!hPen) hPen = (HPEN)GetStockObject(WHITE_PEN);
+
+		pens[xgcv->foreground][xgcv->line_width][xgcv->line_style] = hPen;
 	}
-	else hPen = CreatePen(Style, Width, WinXPColour(cur_color));
 
-	TotalPens += 1;
-
-	return hPen;
+	SelectObject(hDC, hPen);
 }
-				
-static void WinXSetPen(int xidno)
+
+HBRUSH WinXGetBrush(ULONG color) {
+
+	HBRUSH hBrush = brushes[color];
+
+	if (!hBrush) {
+		hBrush = CreateSolidBrush(WinXPColour(color));
+		if (!hBrush) hBrush= (HBRUSH)GetStockObject(BLACK_BRUSH);
+		brushes[color] = hBrush;
+	}
+	return hBrush;
+}
+
+void WinXSelectBrush(int gc)
 {
-	HDC		hDC = xid[xidno].hwnd.hBmpDC;
-	HPEN	hPen = NULL;
-	int		cur_color = xid[xidno].hwnd.cur_color;
-	
-	if (xid[xidno].hwnd.line_style == LineSolid)
-	{
-		if (xid[xidno].hwnd.line_width > 2)
-		{
-			if (objs[cur_color].fatpen == NULL)
-				objs[cur_color].fatpen = WinXMakePen(WinXPColour(cur_color), PS_SOLID, 3);
-			hPen = objs[cur_color].fatpen;
-		}
-		else
-		{
-			if (objs[cur_color].pen == NULL)
-				objs[cur_color].pen = WinXMakePen(WinXPColour(cur_color), PS_SOLID, 0);
-			hPen = objs[cur_color].pen;
-		}
-	}
-	else
-	{
-		if (xid[xidno].hwnd.nodash)
-		{
-			if (objs[cur_color].cdashpen == NULL)
-				objs[cur_color].cdashpen = WinXMakePen(cur_color, PS_DOT, 0);
-			hPen = objs[cur_color].cdashpen;	
-		}
-		else
-		{
-			if (objs[cur_color].dashpen == NULL)
-				objs[cur_color].dashpen = WinXMakePen(cur_color, PS_DASH, 0);
-			hPen = objs[cur_color].dashpen;
-		}
-	}
-	if (hPen)
-		SelectObject(hDC, hPen);
+	SelectObject(xid[xid[gc].hgc.xidhwnd].hwnd.hBmpDC,
+		WinXGetBrush(xid[gc].hgc.xgcv.foreground));
 }
-#endif
+
+
 
 ////////////////////////////////////////////////////////
 // These are for SysInfo, we hide the details from him
@@ -1044,11 +884,8 @@ Pixmap WinXCreateBitmapFromData(Display* dpy, Drawable d, char* data,
 	
 	hbm = CreateCompatibleBitmap(hDC, width, height);
 	SelectObject(hDCb, hbm);
-	if (bHasPal)
-	{
-		SelectPalette(hDCb, myPal, FALSE);
-		RealizePalette(hDCb);
-	}
+	SelectPalette(hDCb, myPal, FALSE);
+	RealizePalette(hDCb);
 	
 	FillRect(hDCb, &rect, GetStockObject(BLACK_BRUSH));
 	if (!hbm)
@@ -1102,41 +939,8 @@ void WinXResize(void)
 	}
 }
 
-void	PaintWinClient()
+void PaintWinClient()
 {
-#if 0
-	RECT	rect;
-	static int updates = 0;
-	
-	if (drawPending)
-		return;				// bogus dude.
-
-	if (!itemsDC)
-		itemsDC = CreateCompatibleDC(NULL);
-
-	WinXSetupRadarWindow();
-
-//	Paint_frame();
-
-	GetClientRect(xid[draw].hwnd.hWnd, &rect);
-	InvalidateRect(xid[draw].hwnd.hWnd, &rect, FALSE);
-	drawPending = TRUE;
-
-	if (instruments & SHOW_SLIDING_RADAR)
-	{
-		GetClientRect(xid[radar].hwnd.hWnd, &rect);
-		InvalidateRect(xid[radar].hwnd.hWnd, &rect, FALSE);
-	}
-
-	// One time stuff for score window update
-	if (updates == 0)
-	{
-		GetClientRect(xid[players].hwnd.hWnd, &rect);
-		InvalidateRect(xid[players].hwnd.hWnd, &rect, FALSE);
-		UpdateWindow(xid[players].hwnd.hWnd);
-	}
-	updates += 1;
-#else
 	RECT	rect;
 	static int updates = 0;
 	if (!itemsDC)
@@ -1176,7 +980,6 @@ void	PaintWinClient()
 			0, 0, SRCCOPY);
 		ReleaseDC(xid[draw].hwnd.hWnd, realDC);
 	}
-#endif
 }
 
 void MarkPlayersForRedraw()
@@ -1193,11 +996,8 @@ void paintItemSymbol(unsigned char type, Drawable d, GC gc, int x, int y, int co
 	HDC		hDC = xid[d].hwnd.hBmpDC;
 
 	SelectObject(itemsDC, (HBITMAP)itemBitmaps[type][color]);
-	if (bHasPal)
-	{
-		SelectPalette(itemsDC, myPal, FALSE);
-		RealizePalette(itemsDC);
-	}
+	SelectPalette(itemsDC, myPal, FALSE);
+	RealizePalette(itemsDC);
 	BitBlt(hDC, x, y, 16, 16, itemsDC, 0, 0, SRCPAINT);
 }
 
@@ -1221,11 +1021,8 @@ void WinXBltWinToPix(Window src, Pixmap dest,
 	HDC		hDCd = CreateCompatibleDC(NULL);
 	int		ret;
 	SelectObject(hDC, hbm);
-	if (bHasPal)
-	{
-		SelectPalette(hDC, myPal, FALSE);
-		RealizePalette(hDC);
-	}
+	SelectPalette(hDC, myPal, FALSE);
+	RealizePalette(hDC);
 	ret = BitBlt(hDC, dest_x, dest_y, width, height, hDC, src_x, src_y, BLACKNESS);
 	DeleteDC(hDCd);
 

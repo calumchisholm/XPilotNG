@@ -337,7 +337,8 @@ void Paint_world_radar_old(void)
     radar_exposures = 2;
 
 #ifdef _WINDOWS
-    XSetForeground(dpy, s_radar, colors[BLACK].pixel);
+    XSetForeground(dpy, radarGC, colors[BLACK].pixel);
+	XSetForeground(dpy, s_radar, colors[BLACK].pixel);
     XFillRectangle(dpy, s_radar, radarGC, 0, 0, 256, RadarHeight);
 #else
     if (s_radar == p_radar) {

@@ -140,13 +140,11 @@ static int Picture_find_path(const char *filename, char *path)
 	}
     }
 #ifdef _WINDOWS
-	/*
-	 * This should be fixed by someone who understands how
-	 * Windows client works
-	 */
-    exit(1);
-#endif
+	Trace("Can't find PPM file \"%s\"", filename);
+#else
     error("Can't find PPM file \"%s\"", filename);
+#endif
+
 	return FALSE;
 }
 
@@ -219,24 +217,17 @@ int Picture_load(xp_picture_t *picture, const char *filename)
     int			width, height, maxval, count;
     char		path[PATH_MAX + 1];
 
-    if (!Picture_find_path(filename, path)) {
-	error("Cannot find picture file \"%s\"", filename);
-	return -1;
-    }
+    if (!Picture_find_path(filename, path)) return -1;
 
-    if (strcmp("xpm", filename + strlen(filename) - 3) == 0) {
 #ifndef _WINDOWS
+    if (strcmp("xpm", filename + strlen(filename) - 3) == 0) {
         if (!xpm_picture_from_file(picture, path)) {
             error("Failed to load XPM bitmap \"%s\"", path);
             return -1;
         }
         return 0;
-#else
-		return -1;
+    } 
 #endif
-
-    }
-
 
     if ((f = fopen(path, "rb")) == NULL) {
 	error("Cannot open \"%s\"", path);

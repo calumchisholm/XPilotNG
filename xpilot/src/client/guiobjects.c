@@ -340,11 +340,7 @@ void Gui_paint_teamshot(int color, int x, int y)
 
 void Gui_paint_missiles_begin(void)
 {
-#if defined(_WINDOWS) && !defined(PENS_OF_PLENTY)
-    SET_FG(MISSILECOLOR);
-#else
     SET_FG(colors[WHITE].pixel);
-#endif
     XSetLineAttributes(dpy, gc, 4,
 		       LineSolid, CapButt, JoinMiter);
 
@@ -396,11 +392,7 @@ void Gui_paint_laser(int color, int x1, int y1, int len, int dir)
     if ((unsigned)(color) >= NUM_COLORS) {
 	color = WHITE;
     }
-#if !defined(_WINDOWS) || defined(PENS_OF_PLENTY)
     SET_FG(colors[color].pixel);
-#else
-    SET_FG((unsigned)(color == BLUE ? LASERTEAMCOLOR : LASERCOLOR));
-#endif
     rd.drawLine(dpy, p_draw, gc,
 	      WINSCALE(X(x1)), WINSCALE(Y(y1)),
 	      WINSCALE(X(x2)), WINSCALE(Y(y2)));
@@ -466,9 +458,6 @@ void Gui_paint_refuel(int x0, int y0, int x1, int y1)
 {
     if (!blockBitmaps) {
 
-#ifdef _WINDOWS
-	SET_FG(colors[WHITE].pixel+CLOAKCOLOROFS);	/* dashed line */
-#endif
 	rd.drawLine(dpy, p_draw, gc,
 		    WINSCALE(X(x0)), WINSCALE(Y(y0)),
 		    WINSCALE(X(x1)), WINSCALE(Y(y1)));
@@ -499,15 +488,9 @@ void Gui_paint_refuel(int x0, int y0, int x1, int y1)
 void Gui_paint_connector(int x0, int y0, int x1, int y1, int tractor)
 {
     if (tractor) {
-#ifdef _WINDOWS
-	SET_FG(colors[WHITE].pixel);
-#endif
-	rd.setDashes(dpy, gc, 0, cdashes, NUM_CDASHES);
+		rd.setDashes(dpy, gc, 0, cdashes, NUM_CDASHES);
     } else {
-#ifdef _WINDOWS
-	SET_FG(colors[WHITE].pixel+CLOAKCOLOROFS);	/* dashed line */
-#endif
-	rd.setDashes(dpy, gc, 0, dashes, NUM_DASHES);
+		rd.setDashes(dpy, gc, 0, dashes, NUM_DASHES);
     }
     rd.drawLine(dpy, p_draw, gc,
 	      WINSCALE(X(x0)), WINSCALE(Y(y0)),
@@ -522,10 +505,6 @@ void Gui_paint_connector(int x0, int y0, int x1, int y1, int tractor)
 
 void Gui_paint_transporter(int x0, int y0, int x1, int y1)
 {
-#ifdef _WINDOWS
-    SET_FG(colors[WHITE].pixel+CLOAKCOLOROFS);	/* dashed line */
-#endif
-
     rd.drawLine(dpy, p_draw, gc,
 	      WINSCALE(X(x0)), WINSCALE(Y(y0)),
 		  WINSCALE(X(x1)), WINSCALE(Y(y1)));
@@ -779,11 +758,7 @@ void Set_drawstyle_dashed(int ship_color, int cloak)
 #endif
 	XChangeGC(dpy, gc, mask, &gcv);
     }
-#if !defined(_WINDOWS) || defined(PENS_OF_PLENTY)
     SET_FG(colors[ship_color].pixel);
-#else
-    SET_FG(colors[ship_color].pixel+(cloak ? CLOAKCOLOROFS : 0));
-#endif
 }
 
 

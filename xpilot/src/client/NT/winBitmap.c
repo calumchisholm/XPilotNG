@@ -46,13 +46,6 @@ HDC hDC;
 xp_picture_t radar_colors;
 
 extern int blockBitmaps;
-int Colors_init_block_bitmaps(void)
-{
-	return 0;
-}
-void Colors_free_block_bitmaps(void)
-{
-}
 
 void delete_bitmaps()
 {
@@ -81,11 +74,8 @@ int Bitmap_create_begin(Drawable d,xp_pixmap_t *pm, int bmp)
     
     hbm = CreateCompatibleBitmap(hDC, pm->width, pm->height);
     SelectObject(hDCb, hbm);
-    if (bHasPal)
-    {
-        SelectPalette(hDCb, myPal, FALSE);
-        RealizePalette(hDCb);
-    }
+	SelectPalette(hDCb, myPal, FALSE);
+    RealizePalette(hDCb);
     
     if (!hbm) {
 		error("Can't create item bitmaps");
@@ -112,11 +102,8 @@ void Bitmap_paint_area(Drawable d, xp_bitmap_t *bit, int x, int y, irec *r)
     HDC		hDC = xid[d].hwnd.hBmpDC;
 
     SelectObject(itemsDC, (HBITMAP)bit->bitmap);
-    
-    if (bHasPal) {
-		SelectPalette(itemsDC, myPal, FALSE);
-		RealizePalette(itemsDC);
-    }
+	SelectPalette(itemsDC, myPal, FALSE);
+	RealizePalette(itemsDC);
     BitBlt(hDC, x, y, r->w, r->h, itemsDC, r->x, r->y, SRCPAINT);
 }
 

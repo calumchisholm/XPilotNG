@@ -504,8 +504,8 @@ static void parse_new(void)
 #ifndef _WINDOWS
     if (Setup->data_url[0])
 	Mapdata_setup(Setup->data_url);
-    Colors_init_style_colors();
 #endif
+	Colors_init_style_colors();
 }
 
 
