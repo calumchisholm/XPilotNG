@@ -714,6 +714,16 @@ send these messages by writing to god.
 The maximum size in bytes of the admin message file.
 [ Flags: command, defaults, invisible ]
 .HP
+\fB\-rankFileName\fR <string>
+.IP
+The filename for the XML file to hold server ranking data.
+[ Flags: command, defaults, invisible ]
+.HP
+\fB\-rankWebpageFileName\fR or rankWebpage <string>
+.IP
+The filename for the webpage with the server ranking list.
+[ Flags: command, defaults, invisible ]
+.HP
 \fB\-framesPerSecond\fR or FPS <integer>
 .IP
 The number of frames per second the server should strive for.
