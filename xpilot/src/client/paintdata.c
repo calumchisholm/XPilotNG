@@ -172,10 +172,7 @@ void Init_scale_array(void)
 
     if (scaleFactor == 0.0)
 	scaleFactor = 1.0;
-    if (scaleFactor < 0.1)
-	scaleFactor = 0.1;
-    if (scaleFactor > 10.0)
-	scaleFactor = 10.0;
+    LIMIT(scaleFactor, MIN_SCALEFACTOR, MAX_SCALEFACTOR);
     scaleMultFactor = 1.0 / scaleFactor;
 
     scaleArray[0] = 0;

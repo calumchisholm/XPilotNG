@@ -324,6 +324,28 @@ void Handle_x_options(void)
 
 }
 
+
+
+bool setScaleFactor(xp_option_t *opt, double val)
+{
+    (void)opt;
+    scaleFactor = val;
+    Init_scale_array();
+    /* Resize removed because it is not needed here */
+    Scale_dashes();
+    Bitmap_update_scale();
+}
+bool setAltScaleFactor(xp_option_t *opt, double val)
+{
+    (void)opt;
+    scaleFactor_s = val;
+    return true;
+}
+
+
+
+
+
 #endif
 
 

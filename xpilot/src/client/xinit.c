@@ -1033,6 +1033,9 @@ int FatalError(Display *display)
 
 void Scale_dashes(void)
 {
+    if (dpy == NULL)
+	return;
+
     dashes[0] = WINSCALE(8);
     dashes[1] = WINSCALE(4);
 

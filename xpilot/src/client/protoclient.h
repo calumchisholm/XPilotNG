@@ -25,6 +25,7 @@
 #define	PROTOCLIENT_H
 
 #include "connectparam.h"
+#include "option.h"
 
 /*
  * about.c
@@ -47,6 +48,9 @@ extern void Colors_init_style_colors(void);
  * default.c
  */
 extern void defaultCleanup(void);			/* memory cleanup */
+
+extern bool setScaleFactor(xp_option_t *opt, double val);
+extern bool setAltScaleFactor(xp_option_t *opt, double val);
 
 #ifdef _WINDOWS
 extern char *Get_xpilotini_file(int level);

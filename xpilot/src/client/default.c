@@ -173,6 +173,50 @@ static char *getShipShapeFile(xp_option_t *opt)
     return shipShapeSetting;
 }
 
+static bool setPower(xp_option_t *opt, double val)
+{
+    (void)opt;
+    Send_power(val);
+    controlTime = CONTROL_TIME;
+    return true;
+}
+static bool setTurnSpeed(xp_option_t *opt, double val)
+{
+    (void)opt;
+    Send_turnspeed(val);
+    controlTime = CONTROL_TIME;
+    return true;
+}
+static bool setTurnResistance(xp_option_t *opt, double val)
+{
+    (void)opt;
+    Send_turnresistance(val);
+    return true;
+}
+
+static bool setAltPower(xp_option_t *opt, double val)
+{
+    (void)opt;
+    Send_power_s(val);
+    controlTime = CONTROL_TIME;
+    return true;
+}
+static bool setAltTurnSpeed(xp_option_t *opt, double val)
+{
+    (void)opt;
+    Send_turnspeed_s(val);
+    controlTime = CONTROL_TIME;
+    return true;
+}
+static bool setAltTurnResistance(xp_option_t *opt, double val)
+{
+    (void)opt;
+    Send_turnresistance_s(val);
+    return true;
+}
+
+/* steering stuff ends */
+
 xp_option_t default_options[] = {
 
     XP_NOARG_OPTION(
@@ -327,7 +371,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_POWER,
 	MAX_PLAYER_POWER,
 	&power,
-	NULL,
+	setPower,
 	"Set the engine power.\n"
 	"Valid values are in the range 5-55.\n"),
 
@@ -337,7 +381,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_TURNSPEED,
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed,
-	NULL,
+	setTurnSpeed,
 	"Set the ship's turn speed.\n"
 	"Valid values are in the range 4-64.\n"
 	"See also turnResistance.\n"),
@@ -348,7 +392,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_TURNRESISTANCE,
 	MAX_PLAYER_TURNRESISTANCE,
 	&turnresistance,
-	NULL,
+	setTurnResistance,
 	"Set the ship's turn resistance.\n"
 	"This determines the speed at which a ship stops turning.\n"
 	"Valid values are in the range 0.0-1.0.\n"
@@ -361,7 +405,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_POWER,
 	MAX_PLAYER_POWER,
 	&power_s,
-	NULL,
+	setAltPower,
 	"Set the ship's alternate engine power.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -371,7 +415,7 @@ xp_option_t default_options[] = {
 	MIN_PLAYER_TURNSPEED,
 	MAX_PLAYER_TURNSPEED,
 	&turnspeed_s,
-	NULL,
+	setAltTurnSpeed,
 	"Set the ship's alternate turn speed.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -380,8 +424,8 @@ xp_option_t default_options[] = {
 	0.0,
 	MIN_PLAYER_TURNRESISTANCE,
 	MAX_PLAYER_TURNRESISTANCE,
-	&turnresistance,
-	NULL,
+	&turnresistance_s,
+	setAltTurnResistance,
 	"Set the ship's alternate turn resistance.\n"
 	"See also the keySwapSettings option.\n"),
 
@@ -391,7 +435,7 @@ xp_option_t default_options[] = {
 	MIN_SCALEFACTOR,
 	MAX_SCALEFACTOR,
 	&scaleFactor,
-	NULL,
+	setScaleFactor,
 	"Specifies scaling factor for the drawing window.\n"),
 
     XP_DOUBLE_OPTION(
@@ -400,7 +444,7 @@ xp_option_t default_options[] = {
 	MIN_SCALEFACTOR,
 	MAX_SCALEFACTOR,
 	&scaleFactor_s,
-	NULL,
+	setAltScaleFactor,
         "Specifies alternative scaling factor for the drawing window.\n"),
 
     XP_INT_OPTION(
