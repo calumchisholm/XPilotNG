@@ -141,8 +141,8 @@ static void Input_loop(void)
 	    if (newSecond) {
 		gettimeofday(&tv2, NULL);
 
-		t1 = timeval_to_seconds(tv1);
-		t2 = timeval_to_seconds(tv2);
+		t1 = timeval_to_seconds(&tv1);
+		t2 = timeval_to_seconds(&tv2);
 
 		clData.clientLag = (t2 - t1) * 1e3;
 	    }

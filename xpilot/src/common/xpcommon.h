@@ -259,9 +259,9 @@ typedef int socklen_t;
 #endif
 #endif
 
-static inline double timeval_to_seconds(struct timeval tv)
+static inline double timeval_to_seconds(struct timeval *tvp)
 {
-    return (double)tv.tv_sec + tv.tv_usec * 1e-6;
+    return (double)tvp->tv_sec + tvp->tv_usec * 1e-6;
 }
 
 static inline struct timeval seconds_to_timeval(double t)
