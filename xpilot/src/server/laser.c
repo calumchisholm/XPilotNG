@@ -34,17 +34,10 @@ char laser_version[] = VERSION;
 void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 {
     player		*kp;
-    int			killer;
     DFLOAT		sc;
     char		msg[MSG_LEN];
 
-    if (pulse->id != NO_ID) {
-	killer = GetInd(pulse->id);
-	kp = Players(killer);
-    } else {
-	killer = -1;
-	kp = NULL;
-    }
+    kp = Player_by_id(pulse->id);
 
     pl->forceVisible += 1;
     if (BIT(pl->have, HAS_MIRROR)
