@@ -30,7 +30,7 @@
 /****************************************************/
 
 static void option_callback( void *opt, const char *value );
-static void confmenu_callback( GLWidget *widget, xp_option_t *opt );
+static void confmenu_callback( void );
 
 GLWidget *Init_EmptyBaseGLWidget( void )
 {
@@ -1823,8 +1823,8 @@ static void action_ColorChooserWidget(void *data);
 
 static void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
 {
-    ColorChooserWidget *tmp;
-    GLWidget *tmp2;
+    ColorChooserWidget *wid_info;
+    GLWidget *name,*button,*mod;
     SDL_Rect b2;
     
     if (!widget) return;
@@ -1833,29 +1833,43 @@ static void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
     	error("Wrong widget type for SetBounds_ColorChooserWidget [%i]",widget->WIDGET);
 	return;
     }
+    if (!(wid_info = (ColorChooserWidget *)(widget->wid_info) )) {
+    	error("SetBounds_ColorChooserWidget: wid_info missing");
+	return;
+    }
+    
+    name = ((ColorChooserWidget *)(widget->wid_info))->name;
+    button = ((ColorChooserWidget *)(widget->wid_info))->button;
+    mod = ((ColorChooserWidget *)(widget->wid_info))->mod;
     
     widget->bounds.x = b->x;
     widget->bounds.y = b->y;
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
 
-    tmp = (ColorChooserWidget *)(widget->wid_info);
-    
-    b2.h = widget->bounds.h - 2;
-    b2.w = b2.h;
-    b2.x = widget->bounds.x + widget->bounds.w - 2 - b2.w;
-    b2.y = widget->bounds.y;
-	    
-    SetBounds_GLWidget(tmp->button,&b2);
-
-    tmp2 = ((ColorChooserWidget *)(widget->wid_info))->name;
-    
-    b2.h = widget->bounds.h;
-    b2.w = tmp2->bounds.w;
+    b2.h = name->bounds.h;
+    b2.w = name->bounds.w;
     b2.x = widget->bounds.x + 2;
     b2.y = widget->bounds.y;
 	    
-    SetBounds_GLWidget(tmp2,&b2);
+    SetBounds_GLWidget(name,&b2);
+
+    b2.h = name->bounds.h - 4;
+    b2.w = b2.h;
+    b2.x = widget->bounds.x + widget->bounds.w - 2 - b2.w;
+    b2.y = widget->bounds.y + 2;
+	    
+    SetBounds_GLWidget(button,&b2);
+
+    if (wid_info->expanded && mod) {
+    	
+    	b2.h = mod->bounds.h;
+    	b2.w = widget->bounds.w;
+    	b2.x = widget->bounds.x;
+    	b2.y = widget->bounds.y + name->bounds.h;
+	    
+    	SetBounds_GLWidget(mod,&b2);
+   }
 }
 
 static void Paint_ColorChooserWidget( GLWidget *widget )
@@ -1878,15 +1892,15 @@ static void Paint_ColorChooserWidget( GLWidget *widget )
     	set_alphacolor(*(wid_info->bgcolor));
     	glBegin(GL_QUADS);
     	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
-    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
-    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w    ,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w    ,widget->bounds.y+widget->bounds.h	);
     	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
     	glEnd();
     }
     set_alphacolor(blackRGBA);
     glBegin(GL_TRIANGLES);
     	glVertex2i(wid_info->button->bounds.x ,wid_info->button->bounds.y);
-    	glVertex2i(wid_info->button->bounds.x ,wid_info->button->bounds.y + wid_info->button->bounds.y);
+    	glVertex2i(wid_info->button->bounds.x ,wid_info->button->bounds.y + wid_info->button->bounds.h);
     	glVertex2i(wid_info->button->bounds.x +wid_info->button->bounds.w ,wid_info->button->bounds.y + wid_info->button->bounds.h);
     glEnd();
 }
@@ -1913,7 +1927,26 @@ static void action_ColorChooserWidget(void *data)
 	return;
     }
     
-    confmenu_callback(widget,(xp_option_t *)(wid_info->data));
+    if (wid_info->expanded) {
+    	if (wid_info->mod) {
+    	    DelGLWidgetListItem(&(widget->children),wid_info->mod);
+	    widget->bounds.h -= wid_info->mod->bounds.h;
+    	    Close_Widget(&(wid_info->mod));
+    	} else error("action_ColorChooserWidget: Color mod widget mysteriously missing!");
+	wid_info->expanded = false;
+    } else {
+    	if (!(wid_info->mod)) {
+	    wid_info->mod = Init_ColorModWidget(wid_info->value,wid_info->fgcolor,&nullRGBA,wid_info->callback,wid_info->data);
+    	    if (!(wid_info->mod)) {
+	    	error("action_ColorChooserWidget: Failed to Init_ColorModWidget!");
+	    }
+	    widget->bounds.h += wid_info->mod->bounds.h;
+	    AppendGLWidgetList(&(widget->children),wid_info->mod);
+    	} else error("action_ColorChooserWidget: Color mod widget mysteriously present!");
+	wid_info->expanded = true;
+    }
+    
+    confmenu_callback();
 }
 
 GLWidget *Init_ColorChooserWidget( const char *name, Uint32 *value, Uint32 *fgcolor, Uint32 *bgcolor,
@@ -1953,6 +1986,8 @@ GLWidget *Init_ColorChooserWidget( const char *name, Uint32 *value, Uint32 *fgco
     wid_info->bgcolor 	= bgcolor;
     wid_info->callback 	= callback;
     wid_info->data 	= data;
+    wid_info->expanded 	= false;
+    wid_info->mod 	= NULL;
     
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(name,fgcolor,&nullRGBA,LEFT,CENTER))) ) {
     	Close_Widget(&tmp);
@@ -2004,19 +2039,10 @@ static void SetBounds_ColorModWidget( GLWidget *widget, SDL_Rect *b )
     widget->bounds.w = b->w;
     widget->bounds.h = b->h;
 
-    tmp2 = wi->name;
-    
-    b2.h = tmp2->bounds.h;
-    b2.w = widget->bounds.w;
-    b2.x = widget->bounds.x;
-    b2.y = widget->bounds.y;
-	    
-    SetBounds_GLWidget(tmp2,&b2);
-
     tmp2 = wi->redpick;
     
     b2.x = widget->bounds.x + 2;
-    b2.y += b2.h;
+    b2.y = widget->bounds.y;
     b2.h = tmp2->bounds.h;
     b2.w = tmp2->bounds.w;
 	    
@@ -2087,7 +2113,7 @@ static void Paint_ColorModWidget( GLWidget *widget )
     }
     
     b.x = wid_info->redpick->bounds.x + wid_info->redpick->bounds.w + 16;
-    b.y = widget->bounds.y + wid_info->name->bounds.h + 2;
+    b.y = widget->bounds.y + 2;
     b.w = widget->bounds.x + widget->bounds.w - 2 - b.x;
     b.h = widget->bounds.y + widget->bounds.h - 2 - b.y;
     
@@ -2130,12 +2156,12 @@ static void Callback_ColorModWidget(void *tmp, const char *value)
     char str[10];
 
     if (!(widget = (GLWidget *)tmp)) {
-    	error("Paint_ColorModWidget: argument is NULL!");
+    	error("Callback_ColorModWidget: argument is NULL!");
 	return;
     }
 
     if ( widget->WIDGET != COLORMODWIDGET ) {
-    	error("Paint_ColorModWidget: widget is not a ColorModWidget!");
+    	error("Callback_ColorModWidget: widget is not a ColorModWidget!");
 	return;
     }
     
@@ -2155,7 +2181,7 @@ static void Callback_ColorModWidget(void *tmp, const char *value)
     if (wid_info->callback) wid_info->callback(wid_info->data,str);
 }
 
-GLWidget *Init_ColorModWidget( const char *name, Uint32 *value, Uint32 *fgcolor, Uint32 *bgcolor,
+GLWidget *Init_ColorModWidget( Uint32 *value, Uint32 *fgcolor, Uint32 *bgcolor,
     	    	    	    	    void (*callback)(void *tmp, const char *value), void *data )
 {
     GLWidget *tmp;
@@ -2166,11 +2192,6 @@ GLWidget *Init_ColorModWidget( const char *name, Uint32 *value, Uint32 *fgcolor,
     	error("Faulty parameter to Init_ColorModWidget: value is a NULL pointer!");
 	return NULL;
     }
-    if (!(name) || !strlen(name) ) {
-    	error("name misssing for Init_ColorModWidget.");
-	return NULL;
-    }
-
     tmp = Init_EmptyBaseGLWidget();
     if ( !tmp ) {
         error("Failed to malloc in Init_ColorModWidget.");
@@ -2198,30 +2219,24 @@ GLWidget *Init_ColorModWidget( const char *name, Uint32 *value, Uint32 *fgcolor,
     wid_info->callback 	= callback;
     wid_info->data 	= data;
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(name,fgcolor,&nullRGBA,CENTER,CENTER))) ) {
-    	Close_Widget(&tmp);
-    	error("Init_ColorChooserWidget: Failed to initialize label [%s]",name);
-	return NULL;
-    }
-
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->redpick = Init_IntChooserWidget("Red",&(wid_info->red),0,255,fgcolor,&nullRGBA,Callback_ColorModWidget,tmp))) ) {
     	Close_Widget(&tmp);
-    	error("Init_ColorChooserWidget: Failed to initialize label [%s]","Red");
+    	error("Init_ColorModWidget: Failed to initialize label [%s]","Red");
 	return NULL;
     }
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->greenpick = Init_IntChooserWidget("Green",&(wid_info->green),0,255,fgcolor,&nullRGBA,Callback_ColorModWidget,tmp))) ) {
     	Close_Widget(&tmp);
-    	error("Init_ColorChooserWidget: Failed to initialize label [%s]","Green");
+    	error("Init_ColorModWidget: Failed to initialize label [%s]","Green");
 	return NULL;
     }
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->bluepick = Init_IntChooserWidget("Blue",&(wid_info->blue),0,255,fgcolor,&nullRGBA,Callback_ColorModWidget,tmp))) ) {
     	Close_Widget(&tmp);
-    	error("Init_ColorChooserWidget: Failed to initialize label [%s]","Blue");
+    	error("Init_ColorModWidget: Failed to initialize label [%s]","Blue");
 	return NULL;
     }
     if ( !AppendGLWidgetList(&(tmp->children),(wid_info->alphapick = Init_IntChooserWidget("Alpha",&(wid_info->alpha),0,255,fgcolor,&nullRGBA,Callback_ColorModWidget,tmp))) ) {
     	Close_Widget(&tmp);
-    	error("Init_ColorChooserWidget: Failed to initialize label [%s]","Alpha");
+    	error("Init_ColorModWidget: Failed to initialize label [%s]","Alpha");
 	return NULL;
     }
 
@@ -2235,12 +2250,11 @@ GLWidget *Init_ColorModWidget( const char *name, Uint32 *value, Uint32 *fgcolor,
     wid_info->bluepick->bounds.w = maxwidth;
     wid_info->alphapick->bounds.w = maxwidth;
 
-    tmp->bounds.h   = wid_info->name->bounds.h
-    	    	    + wid_info->redpick->bounds.h
+    tmp->bounds.h   = wid_info->redpick->bounds.h
     	    	    + wid_info->greenpick->bounds.h
     	    	    + wid_info->bluepick->bounds.h
 		    + wid_info->alphapick->bounds.h;
-    tmp->bounds.w   = MAX(2 + wid_info->name->bounds.w + 2,2 + maxwidth + 16 + tmp->bounds.h + 2);
+    tmp->bounds.w   = 2 + maxwidth + 16 + tmp->bounds.h + 2;
 
     return tmp;
 }
@@ -2778,15 +2792,15 @@ static void SetBounds_ScrollPaneWidget(GLWidget *widget, SDL_Rect *b )
     }
     
     if (wid_info->content) {
-    	pos = ((ScrollbarWidget *)(wid_info->scroller->wid_info))->pos;
-    	bounds.y = widget->bounds.y - pos*(wid_info->content->bounds.h);
     	bounds.h = wid_info->content->bounds.h;
-	
-	ScrollbarWidget_SetSlideSize(wid_info->scroller,MIN(((GLfloat)widget->bounds.h)/((GLfloat)bounds.h),1.0f));
-	
     	bounds.w = widget->bounds.w - wid_info->scroller->bounds.w;
     	bounds.x = widget->bounds.x;
     
+	ScrollbarWidget_SetSlideSize(wid_info->scroller,MIN(((GLfloat)widget->bounds.h)/((GLfloat)bounds.h),1.0f));
+
+    	pos = MIN( ((ScrollbarWidget *)(wid_info->scroller->wid_info))->pos, 1.0f - ((ScrollbarWidget *)(wid_info->scroller->wid_info))->size);
+    	bounds.y = widget->bounds.y - pos*(wid_info->content->bounds.h);
+	
     	SetBounds_GLWidget(wid_info->content,&bounds);
     }
 }
@@ -2867,7 +2881,6 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
     GLWidget *widget;
     WrapperWidget *wid_info;
     SDL_Rect b;
-    int i;
     
     widget = (GLWidget *)data;
     wid_info = ((WrapperWidget *)widget->wid_info);
@@ -2882,9 +2895,11 @@ static void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, 
 		SetBounds_GLWidget(wid_info->confmenu,&b);
 	    } else {
     	    	DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
-    	    	for (i=0;i<NUM_MOUSE_BUTTONS;++i)
+    	    	/*pointless really
+		for (i=0;i<NUM_MOUSE_BUTTONS;++i)
     	    	    if (wid_info->confmenu == target[i]) target[i]=NULL;
     	    	if (wid_info->confmenu == hovertarget) hovertarget=NULL;
+		*/
     
  	    }
 	}
@@ -3044,28 +3059,12 @@ static void ConfMenuWidget_Quit( void *data );
 static void ConfMenuWidget_Save( void *data );
 static void ConfMenuWidget_Close( void *data );
 
-static void confmenu_callback( GLWidget *widget, xp_option_t *opt )
+static void confmenu_callback( void )
 {
     GLWidget *list;
-    ColorChooserWidget *wi;
     WrapperWidget *mw;
     ConfMenuWidget *cm;
     ScrollPaneWidget *sp;
-    
-    if (!widget) {
-    	error("confmenu_callback: argument is NULL!");
-	return;
-    }
-    
-    if (widget->WIDGET != COLORCHOOSERWIDGET) {
-    	error("confmenu_callback: wrong type widget!");
-	return;
-    }
-    
-    if ( !(wi = (ColorChooserWidget *)(widget->wid_info)) ) {
-    	error("confmenu_callback: wid_info missing!");
-	return;
-    }
     
     if ( !(mw = (WrapperWidget *)(MainWidget->wid_info)) ) {
     	error("confmenu_callback: MainWidget missing!");
@@ -3084,10 +3083,8 @@ static void confmenu_callback( GLWidget *widget, xp_option_t *opt )
     	error("confmenu_callback: list missing!");
 	return;
     }
-    
-    ListWidget_Insert(list,widget,Init_ColorModWidget(Option_get_name(opt),wi->value,wi->fgcolor,wi->bgcolor,wi->callback,wi->data));
-    ListWidget_Remove(list,widget);
-    
+
+    SetBounds_GLWidget(list,&(list->bounds));
     SetBounds_GLWidget(mw->confmenu,&(mw->confmenu->bounds));
 }
 
@@ -3108,7 +3105,6 @@ static void ConfMenuWidget_Save( void *data )
 
 static void ConfMenuWidget_Close( void *data )
 {
-    int i;
     GLWidget *widget;
     WrapperWidget *wid_info;
     
@@ -3127,9 +3123,10 @@ static void ConfMenuWidget_Close( void *data )
     
     DelGLWidgetListItem(&(widget->children), wid_info->confmenu);
     
+    /*pointless really 
     for (i=0;i<NUM_MOUSE_BUTTONS;++i)
     	if (wid_info->confmenu == target[i]) target[i]=NULL;
-    if (wid_info->confmenu == hovertarget) hovertarget=NULL;
+    if (wid_info->confmenu == hovertarget) hovertarget=NULL;*/
     
     wid_info->showconf = false;
     /*Close_Widget(&(wid_info->confmenu));*/
