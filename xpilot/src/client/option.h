@@ -137,8 +137,8 @@ extern xp_option_t *options;
 extern void Parse_options(int *argcp, char **argvp);
 
 extern const char *Xpilotrc_get_filename(void);
-extern bool Xpilotrc_read(const char *path);
-extern bool Xpilotrc_write(const char *path);
+extern int Xpilotrc_read(const char *path);
+extern int Xpilotrc_write(const char *path);
 
 extern bool Set_option(const char *name, const char *value);
 extern bool Set_noarg_option(xp_option_t *opt, bool value);

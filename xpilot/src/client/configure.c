@@ -38,14 +38,6 @@ static int Config_save(int widget_desc, void *data, const char **strptr);
 static int Config_save_confirm_callback(int widget_desc, void *popup_desc,
 					const char **strptr);
 
-typedef struct xpilotrc {
-    char	*line;
-    size_t	size;
-} xpilotrc_t;
-
-static xpilotrc_t	*xpilotrc_ptr;
-static int		num_xpilotrc, max_xpilotrc;
-
 static int num_default_options = 0;
 static int max_default_options = 0;
 static int *default_option_indices = NULL;
@@ -107,7 +99,6 @@ static int Update_bool_option(int widget_desc, void *data, bool *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
-    /*warn("Update_bool_option called for %s.", Option_get_name(opt));*/
     Set_bool_option(opt, *val);
 
     return 0;
@@ -118,7 +109,6 @@ static int Update_int_option(int widget_desc, void *data, int *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
-    /*warn("Update_int_option called for %s.", Option_get_name(opt));*/
     Set_int_option(opt, *val);
 
     return 0;
@@ -129,7 +119,6 @@ static int Update_double_option(int widget_desc, void *data, double *val)
     xp_option_t *opt = data;
 
     (void)widget_desc;
-    /*warn("Update_double_option called for %s.", Option_get_name(opt));*/
     Set_double_option(opt, *val);
 
     return 0;
@@ -440,8 +429,6 @@ static int Config_create_color(int widget_desc, int *height, int color,
     return colw;
 }
  
-
-
 static int Config_create_double(int widget_desc, int *height,
 				const char *str, double *val,
 				double min, double max,
@@ -515,7 +502,6 @@ static int Config_create_save(int widget_desc, int *height)
     return 1;
 }
 
-
 static int Config_creator(xp_option_t *opt, int widget_desc, int *height)
 {
     if (opt == NULL)
@@ -569,143 +555,9 @@ static void Config_save_failed(const char *reason, const char **strptr)
     *strptr = "Saving failed...";
 }
 
-#if 0
-
-#ifndef _WINDOWS
-static int Xpilotrc_add(char *line)
-{
-    int			size;
-    char		*str;
-
-    if (strncmp(line, "XPilot", 6) != 0 && strncmp(line, "xpilot", 6) != 0)
-	return 0;
-    if (line[6] != '.' && line[6] != '*')
-	return 0;
-    if ((str = strchr(line + 7, ':')) == NULL)
-	return 0;
-
-    size = str - (line + 7);
-    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL) {
-	num_xpilotrc = 0;
-	max_xpilotrc = 75;
-	if ((xpilotrc_ptr = (xpilotrc_t *)
-		malloc(max_xpilotrc * sizeof(xpilotrc_t))) == NULL) {
-	    max_xpilotrc = 0;
-	    return -1;
-	}
-    }
-    if (num_xpilotrc >= max_xpilotrc) {
-	max_xpilotrc *= 2;
-	if ((xpilotrc_ptr = (xpilotrc_t *) realloc(xpilotrc_ptr,
-		max_xpilotrc * sizeof(xpilotrc_t))) == NULL) {
-	    max_xpilotrc = 0;
-	    return -1;
-	}
-    }
-    if ((str = xp_strdup(line)) == NULL)
-	return -1;
-
-    xpilotrc_ptr[num_xpilotrc].line = str;
-    xpilotrc_ptr[num_xpilotrc].size = size;
-    num_xpilotrc++;
-    return 0;
-}
-
-static void Xpilotrc_end(FILE *fp)
-{
-    int			i;
-
-    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL)
-	return;
-
-    for (i = 0; i < num_xpilotrc; i++) {
-	fprintf(fp, "%s", xpilotrc_ptr[i].line);
-	free(xpilotrc_ptr[i].line);
-    }
-    free(xpilotrc_ptr);
-    xpilotrc_ptr = NULL;
-    max_xpilotrc = 0;
-    num_xpilotrc = 0;
-}
-
-static void Xpilotrc_use(char *line)
-{
-    int			i;
-
-    for (i = 0; i < num_xpilotrc; i++) {
-	if (strncmp(xpilotrc_ptr[i].line + 7, line + 7,
-		    xpilotrc_ptr[i].size + 1) == 0) {
-	    free(xpilotrc_ptr[i].line);
-	    xpilotrc_ptr[i--] = xpilotrc_ptr[--num_xpilotrc];
-	}
-    }
-}
-#endif
-
-#endif
-
-#if 0
-/*
- * Find a key in keydefs[].
- * On success set output pointer to index into keydefs[] and return true.
- * On failure return false.
- */
-static int Config_find_key(keys_t key, int start, int end, int *key_index)
-{
-    int			i;
-
-    for (i = start; i < end; i++) {
-	if (keydefs[i].key == key) {
-	    *key_index = i;
-	    return true;
-	}
-    }
-
-    return false;
-}
-
-static void Config_save_keys(FILE *fp)
-{
-    int			i, j;
-    KeySym		ks;
-    keys_t		key;
-    const char		*str,
-			*res;
-    char		buf[512];
-
-    buf[0] = '\0';
-    for (i = 0; i < num_keydefs; i++) {
-	ks = keydefs[i].keysym;
-	key = keydefs[i].key;
-
-	/* try and see if we have already saved this key. */
-	if (Config_find_key(key, 0, i, &j) == true)
-	    /* yes, saved this one before.  skip it now. */
-	    continue;
-
-	if ((str = XKeysymToString(ks)) == NULL)
-	    continue;
-
-	if ((res = Get_keyResourceString(key)) != NULL) {
-	    strlcpy(buf, str, sizeof(buf));
-	    /* find all other keysyms which map to the same key. */
-	    j = i;
-	    while (Config_find_key(key, j + 1, num_keydefs, &j) == true) {
-		ks = keydefs[j].keysym;
-		if ((str = XKeysymToString(ks)) != NULL) {
-		    strlcat(buf, " ", sizeof(buf));
-		    strlcat(buf, str, sizeof(buf));
-		}
-	    }
-	    Config_save_resource(fp, res, buf);
-	}
-    }
-}
-#endif
-
 static int Config_save(int widget_desc, void *button_str, const char **strptr)
 {
-#if 1
+    int retval;
     const char *filename;
 
     *strptr = "Saving...";
@@ -713,7 +565,17 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     XFlush(dpy);
 
     filename = Xpilotrc_get_filename();
-    Xpilotrc_write(filename);
+    retval = Xpilotrc_write(filename);
+
+    if (retval == -1) {
+	Config_save_failed("Can't find .xpilotrc file", strptr);
+	return 1;
+    }
+
+    if (retval == -2) {
+	Config_save_failed("Can't open file to save to.", strptr);
+	return 1;
+    }
 
     if (config_save_confirm_desc != NO_WIDGET) {
 	Widget_destroy(config_save_confirm_desc);
@@ -723,104 +585,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     *strptr = (char *) button_str;
  
     return 1;
-
-#else
-    int			i;
-    FILE		*fp = NULL;
-    char		buf[512];
-#ifndef _WINDOWS	/* Windows does no file handling on its own. */
-    char		oldfile[PATH_MAX + 1],
-			newfile[PATH_MAX + 1];
-
-
-    *strptr = "Saving...";
-    Widget_draw(widget_desc);
-    XFlush(dpy);
-
-    Get_xpilotrc_file(oldfile, sizeof(oldfile));
-    if (oldfile[0] == '\0') {
-	Config_save_failed("Can't find .xpilotrc file", strptr);
-	return 1;
-    }
-    if ((fp = fopen(oldfile, "r")) != NULL) {
-	while (fgets(buf, sizeof buf, fp))
-	    Xpilotrc_add(buf);
-	fclose(fp);
-    }
-    sprintf(newfile, "%s.new", oldfile);
-    unlink(newfile);
-    if ((fp = fopen(newfile, "w")) == NULL) {
-	Config_save_failed("Can't open file to save to.", strptr);
-	return 1;
-    }
-#endif
-
-    Config_save_comment(fp,
-			";\n"
-			"; Config\n"
-			";\n"
-			"; General configuration options\n"
-			";\n");
-    /*Config_save_resource(fp, "name", connectParam.nick_name);
-      Config_save_bool(fp, "autoShield", auto_shield);
-      Config_save_int(fp, "clientPortStart", clientPortStart);
-      Config_save_float(fp, "scaleFactor", scaleFactor);*/
-
-    /* colors */
-    Config_save_comment(fp,
-			";\n"
-			"; Colors\n"
-			";\n"
-			"; The value 0 means transparent for the color "
-			"options.\n"
-			";\n");
-    /*Config_save_int(fp, "team9Color", team9Color);*/
-
-    Config_save_comment(fp,
-			";\n"
-			"; Keys\n"
-			";\n"
-			"; The X Window System program xev can be used to\n"
-			"; find out the names of keyboard keys.\n"
-			";\n");
-    Config_save_keys(fp);
-
-    Config_save_comment(fp,
-			";\n"
-			"; Modifiers\n"
-			";\n"
-			"; These modify how your weapons work.\n"
-			";\n");
-    for (i = 0; i < NUM_MODBANKS; i++) {
-	sprintf(buf, "modifierBank%d", i + 1);
-	Config_save_resource(fp, buf, modBankStr[i]);
-    }
-
-    Config_save_comment(fp,
-			";\n"
-			"; Other options\n"
-			";\n");
-
-
-#ifndef _WINDOWS
-    Xpilotrc_end(fp);
-    fclose(fp);
-    sprintf(newfile, "%s.bak", oldfile);
-    rename(oldfile, newfile);
-    unlink(oldfile);
-    sprintf(newfile, "%s.new", oldfile);
-    rename(newfile, oldfile);
-#endif
-
-    if (config_save_confirm_desc != NO_WIDGET) {
-	Widget_destroy(config_save_confirm_desc);
-	config_save_confirm_desc = NO_WIDGET;
-    }
-
-    *strptr = (char *) button_str;
-    return 1;
-
-#endif
 }
 
 static int Config_save_confirm_callback(int widget_desc, void *popup_desc,
@@ -836,7 +600,7 @@ static int Config_save_confirm_callback(int widget_desc, void *popup_desc,
 
 int Config(bool doit, int what)
 {
-    /* kps - get rid of the old widgets, it's the most easy way */
+    /* get rid of the old widgets, it's the most easy way */
     Config_destroy();
     if (doit == false)
 	return false;
@@ -893,8 +657,6 @@ void Config_redraw(void)
 	Widget_draw(config_widget_ids[i]);
 }
 
-
-
 void Config_init(void)
 {
     int i, max_ids;
@@ -919,4 +681,3 @@ void Config_init(void)
 	exit(1);
     }
 }
-

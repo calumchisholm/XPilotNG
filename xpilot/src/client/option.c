@@ -620,7 +620,9 @@ void Store_option(xp_option_t *opt)
 
 }
 
-
+/*
+<SynrG> kps: would be nice if not only it saved options known to other clients, but also comments in the original
+*/
 
 static void Parse_xpilotrc_line(const char *line)
 {
@@ -668,33 +670,182 @@ static inline bool is_noarg_option(const char *name)
     return true;
 }
 
-bool Xpilotrc_read(const char *path)
+
+typedef struct xpilotrc {
+    char	*line;
+    size_t	size;
+} xpilotrc_t;
+
+static xpilotrc_t	*xpilotrc_ptr;
+static int		num_xpilotrc, max_xpilotrc;
+
+
+
+static int Xpilotrc_add(char *line)
+{
+    int			size;
+    char		*str;
+
+    if (strncmp(line, "XPilot", 6) != 0 && strncmp(line, "xpilot", 6) != 0)
+	return 0;
+    if (line[6] != '.' && line[6] != '*')
+	return 0;
+    if ((str = strchr(line + 7, ':')) == NULL)
+	return 0;
+
+    size = str - (line + 7);
+    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL) {
+	num_xpilotrc = 0;
+	max_xpilotrc = 75;
+	if ((xpilotrc_ptr = (xpilotrc_t *)
+		malloc(max_xpilotrc * sizeof(xpilotrc_t))) == NULL) {
+	    max_xpilotrc = 0;
+	    return -1;
+	}
+    }
+    if (num_xpilotrc >= max_xpilotrc) {
+	max_xpilotrc *= 2;
+	if ((xpilotrc_ptr = (xpilotrc_t *) realloc(xpilotrc_ptr,
+		max_xpilotrc * sizeof(xpilotrc_t))) == NULL) {
+	    max_xpilotrc = 0;
+	    return -1;
+	}
+    }
+    if ((str = xp_strdup(line)) == NULL)
+	return -1;
+
+    xpilotrc_ptr[num_xpilotrc].line = str;
+    xpilotrc_ptr[num_xpilotrc].size = size;
+    num_xpilotrc++;
+    return 0;
+}
+
+static void Xpilotrc_end(FILE *fp)
+{
+    int			i;
+
+    if (max_xpilotrc <= 0 || xpilotrc_ptr == NULL)
+	return;
+
+    for (i = 0; i < num_xpilotrc; i++) {
+	fprintf(fp, "%s", xpilotrc_ptr[i].line);
+	free(xpilotrc_ptr[i].line);
+    }
+    free(xpilotrc_ptr);
+    xpilotrc_ptr = NULL;
+    max_xpilotrc = 0;
+    num_xpilotrc = 0;
+}
+
+static void Xpilotrc_use(char *line)
+{
+    int			i;
+
+    for (i = 0; i < num_xpilotrc; i++) {
+	if (strncmp(xpilotrc_ptr[i].line + 7, line + 7,
+		    xpilotrc_ptr[i].size + 1) == 0) {
+	    free(xpilotrc_ptr[i].line);
+	    xpilotrc_ptr[i--] = xpilotrc_ptr[--num_xpilotrc];
+	}
+    }
+}
+
+
+int Xpilotrc_read(const char *path)
 {
     char buf[BUFSIZ];
     FILE *fp;
 
-    /*
-     * Read options from xpilotrc.
-     */
     assert(path);
-    xpprintf("Reading options from xpilotrc file %s.\n", path);
-    if (strlen(path) > 0 && ((fp = fopen(path, "r")) != NULL)) {
-	while (fgets(buf, sizeof buf, fp)) {
-	    char *cp = strchr(buf, '\n');
-
-	    if (cp)
-		*cp = '\0';
-	    cp = strchr(buf, '\r');
-	    if (cp)
-		*cp = '\0';
-	    Parse_xpilotrc_line(buf);
-	}
-	fclose(fp);
-	return true;
+    if (strlen(path) == 0) {
+	warn("Xpilotrc_read: Zero length filename.");
+	return -1;
     }
+
+    fp = fopen(path, "r");
+    if (fp == NULL) {
+	error("Xpilotrc_read: Failed to open file \"%s\"", path);
+	return -2;
+    }
+
+    xpprintf("Reading options from xpilotrc file %s.\n", path);
+
+    while (fgets(buf, sizeof buf, fp)) {
+	char *cp;
+
+	cp = strchr(buf, '\n');
+	if (cp)
+	    *cp = '\0';
+	cp = strchr(buf, '\r');
+	if (cp)
+	    *cp = '\0';
+	Parse_xpilotrc_line(buf);
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+
+
+#if 0
+/*
+ * Find a key in keydefs[].
+ * On success set output pointer to index into keydefs[] and return true.
+ * On failure return false.
+ */
+static int Config_find_key(keys_t key, int start, int end, int *key_index)
+{
+    int			i;
+
+    for (i = start; i < end; i++) {
+	if (keydefs[i].key == key) {
+	    *key_index = i;
+	    return true;
+	}
+    }
+
     return false;
 }
 
+static void Config_save_keys(FILE *fp)
+{
+    int			i, j;
+    KeySym		ks;
+    keys_t		key;
+    const char		*str,
+			*res;
+    char		buf[512];
+
+    buf[0] = '\0';
+    for (i = 0; i < num_keydefs; i++) {
+	ks = keydefs[i].keysym;
+	key = keydefs[i].key;
+
+	/* try and see if we have already saved this key. */
+	if (Config_find_key(key, 0, i, &j) == true)
+	    /* yes, saved this one before.  skip it now. */
+	    continue;
+
+	if ((str = XKeysymToString(ks)) == NULL)
+	    continue;
+
+	if ((res = Get_keyResourceString(key)) != NULL) {
+	    strlcpy(buf, str, sizeof(buf));
+	    /* find all other keysyms which map to the same key. */
+	    j = i;
+	    while (Config_find_key(key, j + 1, num_keydefs, &j) == true) {
+		ks = keydefs[j].keysym;
+		if ((str = XKeysymToString(ks)) != NULL) {
+		    strlcat(buf, " ", sizeof(buf));
+		    strlcat(buf, str, sizeof(buf));
+		}
+	    }
+	    Config_save_resource(fp, res, buf);
+	}
+    }
+}
+#endif
 
 #define TABSIZE 8
 static void Xpilotrc_write_resource(FILE *fp,
@@ -715,7 +866,7 @@ static void Xpilotrc_write_resource(FILE *fp,
 }
 #undef TABSIZE
 
-bool Xpilotrc_write(const char *path)
+int Xpilotrc_write(const char *path)
 {
     FILE *fp;
     int i;
@@ -723,13 +874,13 @@ bool Xpilotrc_write(const char *path)
     assert(path);
     if (strlen(path) == 0) {
 	warn("Xpilotrc_write: Zero length filename.");
-	return false;
+	return -1;
     }
 
     fp = fopen(path, "w");
     if (fp == NULL) {
-	error("Xpilotrc_write: Failed to write file \"%s\"", path);
-	return false;
+	error("Xpilotrc_write: Failed to open file \"%s\"", path);
+	return -2;
     }
     
     for (i = 0; i < num_options; i++) {
@@ -746,7 +897,48 @@ bool Xpilotrc_write(const char *path)
 
     fclose(fp);
 
-    return true;
+#if 0
+    int			i;
+    FILE		*fp = NULL;
+    char		buf[512];
+
+    char		oldfile[PATH_MAX + 1],
+			newfile[PATH_MAX + 1];
+
+    if ((fp = fopen(oldfile, "r")) != NULL) {
+	while (fgets(buf, sizeof buf, fp))
+	    Xpilotrc_add(buf);
+	fclose(fp);
+    }
+    sprintf(newfile, "%s.new", oldfile);
+    unlink(newfile);
+    if ((fp = fopen(newfile, "w")) == NULL) {
+	Config_save_failed("Can't open file to save to.", strptr);
+	return 1;
+    }
+
+    Config_save_comment(fp,
+			";\n"
+			"; Keys\n"
+			";\n"
+			"; The X Window System program xev can be used to\n"
+			"; find out the names of keyboard keys.\n"
+			";\n");
+    Config_save_keys(fp);
+
+#ifndef _WINDOWS
+    Xpilotrc_end(fp);
+    fclose(fp);
+    sprintf(newfile, "%s.bak", oldfile);
+    rename(oldfile, newfile);
+    unlink(oldfile);
+    sprintf(newfile, "%s.new", oldfile);
+    rename(newfile, oldfile);
+#endif
+#endif
+
+
+    return 0;
 }
  
 
