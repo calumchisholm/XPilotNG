@@ -171,7 +171,7 @@ shipshape_t *Default_ship(void)
 typedef struct {
     int todo, done;
     unsigned char pt[32][32];
-    unsigned char chk[32*32][2];
+    ipos_t chk[32*32];
 } grid_t;
 
 /*
@@ -182,22 +182,46 @@ static void Grid_reset(grid_t *grid_p)
     memset(grid_p, 0, sizeof(grid_t));
 }
 
-static void Grid_set_point(grid_t *grid_p, int x, int y, int value)
+static void Grid_set_value(grid_t *grid_p, int x, int y, int value)
 {
     assert(! (x < -15 || x > 15 || y < -15 || y > 15));
     grid_p->pt[x + 15][y + 15] = value;
 }
 
-static int Grid_get_point(grid_t *grid_p, int x, int y)
+static int Grid_get_value(grid_t *grid_p, int x, int y)
 {
     if (x < -15 || x > 15 || y < -15 || y > 15)
 	return 2;
     return grid_p->pt[x + 15][y + 15];
 }
 
+static void Grid_add(grid_t *grid_p, int x, int y)
+{
+    Grid_set_value(grid_p, x, y, 2);
+    grid_p->chk[grid_p->todo].x = x + 15;
+    grid_p->chk[grid_p->todo].y = y + 15;
+    grid_p->todo++;
+}
+
+static ipos_t Grid_get(grid_t *grid_p)
+{
+    ipos_t pos;
+
+    pos.x = (int)grid_p->chk[grid_p->done].x - 15;
+    pos.y = (int)grid_p->chk[grid_p->done].y - 15;
+    grid_p->done++;
+
+    return pos;
+}
+
+static inline bool Grid_is_ready(grid_t *grid_p)
+{
+    return (grid_p->done >= grid_p->todo) ? true : false;
+}
+
 static bool Grid_point_is_outside_ship(grid_t *grid_p, ipos_t pt)
 {
-    int value = Grid_get_point(grid_p, pt.x, pt.y);
+    int value = Grid_get_value(grid_p, pt.x, pt.y);
 
     if (value == 2)
 	return true;
@@ -240,15 +264,6 @@ static void Grid_print(grid_t *grid_p)
 
 static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 {
-#define GRID_ADD(x,y)	(Grid_set_point(&grid, x, y, 2), \
-			 grid.chk[grid.todo][0] = (x) + 15, \
-			 grid.chk[grid.todo][1] = (y) + 15, \
-			 grid.todo++)
-#define GRID_GET(x,y)	((x) = (int)grid.chk[grid.done][0] - 15, \
-			 (y) = (int)grid.chk[grid.done][1] - 15, \
-			 grid.done++)
-#define GRID_READY()	(grid.done >= grid.todo)
-
     grid_t grid;
     int i, j, x, y, dx, dy, max, shape_version = 0;
     ipos_t pt[MAX_SHIP_PTS2], in, engine, m_gun;
@@ -751,7 +766,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 	    if (j == ship->num_points)
 		j = 0;
 
-	    Grid_set_point(&grid, pt[i].x, pt[i].y, 1);
+	    Grid_set_value(&grid, pt[i].x, pt[i].y, 1);
 
 	    dx = pt[j].x - pt[i].x;
 	    dy = pt[j].y - pt[i].y;
@@ -759,24 +774,24 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 		if (dx > 0) {
 		    for (x = pt[i].x + 1; x < pt[j].x; x++) {
 			y = pt[i].y + (dy * (x - pt[i].x)) / dx;
-			Grid_set_point(&grid, x, y, 1);
+			Grid_set_value(&grid, x, y, 1);
 		    }
 		} else {
 		    for (x = pt[j].x + 1; x < pt[i].x; x++) {
 			y = pt[j].y + (dy * (x - pt[j].x)) / dx;
-			Grid_set_point(&grid, x, y, 1);
+			Grid_set_value(&grid, x, y, 1);
 		    }
 		}
 	    } else {
 		if (dy > 0) {
 		    for (y = pt[i].y + 1; y < pt[j].y; y++) {
 			x = pt[i].x + (dx * (y - pt[i].y)) / dy;
-			Grid_set_point(&grid, x, y, 1);
+			Grid_set_value(&grid, x, y, 1);
 		    }
 		} else {
 		    for (y = pt[j].y + 1; y < pt[i].y; y++) {
 			x = pt[j].x + (dx * (y - pt[j].y)) / dy;
-			Grid_set_point(&grid, x, y, 1);
+			Grid_set_value(&grid, x, y, 1);
 		    }
 		}
 	    }
@@ -785,22 +800,25 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 	/* Check the borders of the grid for blank points. */
 	for (y = -15; y <= 15; y++) {
 	    for (x = -15; x <= 15; x += (y == -15 || y == 15) ? 1 : 2*15) {
-		if (Grid_get_point(&grid, x, y) == 0)
-		    GRID_ADD(x, y);
+		if (Grid_get_value(&grid, x, y) == 0)
+		    Grid_add(&grid, x, y);
 	    }
 	}
 
 	/* Check from the borders of the grid to the centre. */
-	while (!GRID_READY()) {
-	    GRID_GET(x, y);
-	    if (x <  15 && Grid_get_point(&grid, x + 1, y) == 0)
-		GRID_ADD(x + 1, y);
-	    if (x > -15 && Grid_get_point(&grid, x - 1, y) == 0)
-		GRID_ADD(x - 1, y);
-	    if (y <  15 && Grid_get_point(&grid, x, y + 1) == 0)
-		GRID_ADD(x, y + 1);
-	    if (y > -15 && Grid_get_point(&grid, x, y - 1) == 0)
-		GRID_ADD(x, y - 1);
+	while (!Grid_is_ready(&grid)) {
+	    ipos_t pos = Grid_get(&grid);
+
+	    x = pos.x;
+	    y = pos.y;
+	    if (x <  15 && Grid_get_value(&grid, x + 1, y) == 0)
+		Grid_add(&grid, x + 1, y);
+	    if (x > -15 && Grid_get_value(&grid, x - 1, y) == 0)
+		Grid_add(&grid, x - 1, y);
+	    if (y <  15 && Grid_get_value(&grid, x, y + 1) == 0)
+		Grid_add(&grid, x, y + 1);
+	    if (y > -15 && Grid_get_value(&grid, x, y - 1) == 0)
+		Grid_add(&grid, x, y - 1);
 	}
 
 #ifdef GRID_PRINT
@@ -884,7 +902,7 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 	if (debugShapeParsing) {
 	    for (i = -15; i <= 15; i++) {
 		for (j = -15; j <= 15; j++) {
-		    switch (Grid_get_point(&grid, j, i)) {
+		    switch (Grid_get_value(&grid, j, i)) {
 		    case 0: putchar(' '); break;
 		    case 1: putchar('*'); break;
 		    case 2: putchar('.'); break;
