@@ -1,5 +1,4 @@
 /*
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -54,8 +53,15 @@ unsigned String_hash(const char *s);
 size_t strlcpy(char *dest, const char *src, size_t size);
 size_t strlcat(char *dest, const char *src, size_t size);
 
-/* xpmemory.c */
+/* strcasecmp.c */
+#ifndef HAVE_STRCASECMP
+int strcasecmp(const char *str1, const char *str2);
+#endif
+#ifndef HAVE_STRNCASECMP
+int strncasecmp(const char *str1, const char *str2, size_t n);
+#endif
 
+/* xpmemory.c */
 void *xp_malloc(size_t size);
 void *xp_realloc(void *oldptr, size_t size);
 void *xp_calloc(size_t nmemb, size_t size);

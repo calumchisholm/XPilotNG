@@ -23,11 +23,7 @@
 
 #include "xpcommon.h"
 
-/* prototypes to shut up strict compiler. */
-int strcasecmp(const char *str1, const char *str2);
-int strncasecmp(const char *str1, const char *str2, size_t n);
-
-
+#ifndef HAVE_STRCASECMP
 /*
  * By Ian Malcom Brown.
  * Changes by BG: prototypes with const,
@@ -38,7 +34,6 @@ int strcasecmp(const char *str1, const char *str2)
 {
     int	c1, c2;
 
-
     do {
 	c1 = *str1++;
 	c2 = *str2++;
@@ -48,7 +43,9 @@ int strcasecmp(const char *str1, const char *str2)
 
     return (c1 - c2);
 }
+#endif
 
+#ifndef HAVE_STRNCASECMP
 /*
  * By Bert Gijsbers, derived from Ian Malcom Brown's strcasecmp().
  */
@@ -57,9 +54,8 @@ int strncasecmp(const char *str1, const char *str2, size_t n)
     int	c1, c2;
 
     do {
-	if (n-- <= 0) {
+	if (n-- <= 0)
 	    return 0;
-	}
 	c1 = *str1++;
 	c2 = *str2++;
 	c1 = tolower(c1);
@@ -68,3 +64,5 @@ int strncasecmp(const char *str1, const char *str2, size_t n)
 
     return (c1 - c2);
 }
+#endif
+
