@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
      */
     Store_default_options();
     Store_hud_options();
+    Store_guimap_options();
     Store_talk_macro_options();
     Store_key_options();
     Store_X_options();

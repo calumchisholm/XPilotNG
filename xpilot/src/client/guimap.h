@@ -55,4 +55,6 @@ void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y);
 
 void Gui_paint_polygon(int i, int xoff, int yoff);
 
+void Store_guimap_options(void);
+
 #endif

@@ -1040,11 +1040,6 @@ static bool Set_packetLagMeterColor(xp_option_t *opt, int value)
 
 
 xp_option_t hud_options[] = {
-#define COLOR_INDEX_OPTION(name, defval, valptr, help) \
-XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
-
-#define COLOR_INDEX_OPTION_WITH_SETFUNC(name, defval, valptr, setfunc, help) \
-XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, help)
 
     COLOR_INDEX_OPTION(
 	"hudColor",

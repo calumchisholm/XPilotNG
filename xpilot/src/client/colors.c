@@ -101,10 +101,7 @@ int	oneLifeColor;		/* Color to associate with 1 life */
 int	twoLivesColor;		/* Color to associate with 2 lives */
 int	manyLivesColor;		/* Color to associate with >2 lives */
 int	wallColor;		/* Color index for wall drawing */
-int	fuelColor;		/* Color index for fuel station drawing */
 int	decorColor;		/* Color index for decoration drawing */
-int	backgroundPointColor;	/* Color index for background point drawing */
-int	visibilityBorderColor;	/* Color index for visibility border drawing */
 int	wallRadarColor;		/* Color index for walls on radar. */
 int	targetRadarColor;	/* Color index for targets on radar. */
 int	decorRadarColor;	/* Color index for decorations on radar. */
@@ -1105,6 +1102,8 @@ static bool Set_maxColors (xp_option_t *opt, int val)
 	maxColors = MAX_COLORS;
     return true;
 }
+
+
 xp_option_t color_options[] = {
 
     XP_INT_OPTION(
@@ -1266,9 +1265,6 @@ xp_option_t color_options[] = {
 	Set_sparkColors, NULL, NULL,
 	"Which color numbers to use for spark and debris particles.\n"),
 
-#define COLOR_INDEX_OPTION(name, defval, valptr, help) \
-XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
-
     COLOR_INDEX_OPTION(
 	"wallColor",
 	2,
@@ -1276,22 +1272,10 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	"Which color number to use for drawing walls.\n"),
 
     COLOR_INDEX_OPTION(
-	"fuelColor",
-	5,
-	&fuelColor,
-	"Which color number to use for drawing fuel stations.\n"),
-
-    COLOR_INDEX_OPTION(
 	"decorColor",
 	6,
 	&decorColor,
 	"Which color number to use for drawing decorations.\n"),
-
-    COLOR_INDEX_OPTION(
-	"backgroundPointColor",
-	2,
-	&backgroundPointColor,
-	"Which color number to use for drawing background points.\n"),
 
     COLOR_INDEX_OPTION(
 	"teamShotColor",
@@ -1304,12 +1288,6 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 	0,
 	&shipShapesHackColor,
 	"Which color number to use for drawing the shipshapes hack.\n"),
-
-    COLOR_INDEX_OPTION(
-	"visibilityBorderColor",
-	2,
-	&visibilityBorderColor,
-	"Which color number to use for drawing the visibility border.\n"),
 
     COLOR_INDEX_OPTION(
 	"clockColor",

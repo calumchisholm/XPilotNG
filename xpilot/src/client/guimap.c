@@ -26,6 +26,9 @@
 
 char guimap_version[] = VERSION;
 
+int	backgroundPointColor;	/* Color index for background point drawing */
+int	fuelColor;		/* Color index for fuel station drawing */
+int	visibilityBorderColor;	/* Color index for visibility border drawing */
 
 void Gui_paint_walls(int x, int y, int type)
 {
@@ -671,13 +674,15 @@ static void Gui_paint_rectangle(int x, int y, int xi, int yi, int color)
 }
 
 
-void Gui_paint_visible_border(int x, int y, int xi, int yi) {
+void Gui_paint_visible_border(int x, int y, int xi, int yi)
+{
     if (visibilityBorderColor)
 	Gui_paint_rectangle(x, y, xi, yi, visibilityBorderColor);
 }
 
 
-void Gui_paint_hudradar_limit(int x, int y, int xi, int yi) {
+void Gui_paint_hudradar_limit(int x, int y, int xi, int yi)
+{
     Gui_paint_rectangle(x, y, xi, yi, BLUE);
 }
 
@@ -1264,4 +1269,29 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
         }
     }
     XSetLineAttributes(dpy, gameGC, 0, LineSolid, CapButt, JoinMiter);
+}
+
+xp_option_t guimap_options[] = {
+    COLOR_INDEX_OPTION(
+	"backgroundPointColor",
+	2,
+	&backgroundPointColor,
+	"Which color number to use for drawing background points.\n"),
+
+    COLOR_INDEX_OPTION(
+	"fuelColor",
+	5,
+	&fuelColor,
+	"Which color number to use for drawing fuel stations.\n"),
+
+    COLOR_INDEX_OPTION(
+	"visibilityBorderColor",
+	2,
+	&visibilityBorderColor,
+	"Which color number to use for drawing the visibility border.\n"),
+};
+
+void Store_guimap_options(void)
+{
+    STORE_OPTIONS(guimap_options);
 }

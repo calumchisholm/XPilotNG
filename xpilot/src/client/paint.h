@@ -75,13 +75,11 @@ extern int	ballColor;		/* Color index for ball drawing */
 extern int	connColor;		/* Color index for connector drawing */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	wallColor;		/* Color index for wall drawing */
-extern int	fuelColor;		/* Color index for fuel box drawing */
-extern int	backgroundPointColor;	/* Color index for background point drawing */
+
 extern int	wallRadarColor;		/* Color index for walls on radar */
 extern int	targetRadarColor;	/* Color index for targets on radar */
 extern int	decorColor;		/* Color index for decoration drawing */
 extern int	decorRadarColor;	/* Color index for decorations on radar */
-extern int	visibilityBorderColor;	/* Color index for visibility border drawing */
 extern int	clockColor;		/* Clock color index */
 extern int	scoreColor;		/* Score list color index */
 extern int	scoreSelfColor;		/* Score list own score color index */
