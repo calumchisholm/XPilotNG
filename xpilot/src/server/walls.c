@@ -2881,23 +2881,17 @@ static void Turn_player_new(int ind)
 	hitmask = NONBALL_BIT | 1 << pl->team;
     else
 	hitmask = NONBALL_BIT | NOTEAM_BIT;
-#if 1
+
     while (pl->dir != new_dir) {
 	next_dir = MOD2(pl->dir + sign, RES);
 	if (Shape_morph(pl->ship, pl->dir, pl->ship, next_dir, hitmask,
 			(object *)pl, pl->pos.cx, pl->pos.cy) != NO_GROUP) {
-	    pl->float_dir = pl->dir;
+	    if (!maraTurnqueue)
+		pl->float_dir = pl->dir;
 	    break;
 	}
 	pl->dir = next_dir;
     }
-#else
-    /* Mara's experimental "turnqueue" hack  */
-    while (pl->dir != new_dir
-	   && (Shape_turn1(pl->ship, &mv, pl->pos.cx, pl->pos.cy,
-			   pl->dir, sign) /*|| (pl->float_dir = pl->dir, 0)*/))
-	pl->dir = MOD2(pl->dir + sign, RES);
-#endif
 
     return;
 }

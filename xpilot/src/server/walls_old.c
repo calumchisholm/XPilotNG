@@ -2238,12 +2238,8 @@ void Turn_player_old(int ind)
     }
 
     if (blocked) {
-#if 1
-	pl->float_dir = (DFLOAT) pl->dir;
-#else
-	/* Mara's experimental "turnqueue" hack */
-	/*pl->float_dir = (DFLOAT) pl->dir;*/
-#endif
+	if (!maraTurnqueue)
+	    pl->float_dir = (DFLOAT) pl->dir;
 	pl->last_wall_touch = frame_loops;
     }
 

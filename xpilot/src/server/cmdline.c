@@ -344,6 +344,7 @@ bool		polygonMode;		/* Run server in polygon mode even
 bool		fastAim;		/* Turn before shooting in frame */
 bool		ignoreMaxFPS;		/* Temporary hack */
 bool		teamZeroPausing;
+bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
 
 /*
 ** Two functions which can be used if an option
@@ -3602,12 +3603,26 @@ static option_desc options[] = {
     {
 	"fastAim",
 	"fastAim",
-	"false",
+	"true",
 	&fastAim,
 	valBool,
 	tuner_dummy,
 	"When calculating a frame, turn the ship before firing.\n"
 	"This means you can change aim one frame faster.\n"
+	"Added this option to see how much difference changing the order\n"
+	"would make.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maraTurnqueue",
+	"maraTurnqueue",
+	"false",
+	&maraTurnqueue,
+	valBool,
+	tuner_dummy,
+	"This is a temporary option to test Mara's \"turnqueue\" hack.\n"
+	"The idea is that if a ship is turning when it hits the wall,\n"
+	"the turn will be completed after the bounce..\n"
 	"Added this option to see how much difference changing the order\n"
 	"would make.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
