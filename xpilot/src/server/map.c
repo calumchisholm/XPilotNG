@@ -535,8 +535,6 @@ static void Verify_wormhole_consistency(void)
 	: (worm_in) ? (worm_out < 1)
 	: (worm_out > 0)) {
 	
-	int i;
-	
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
 	for (i = 0; i < World.NumWormholes; i++)
 	    Wormhole_remove_from_map(i);
