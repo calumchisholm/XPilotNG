@@ -3292,7 +3292,7 @@ static void usage(void)
 "               Valid gamma correction factors are in the range [0.1 - 10].\n"
 "        -compress\n"
 "               Save frames compressed using the \"compress\" program.\n"
-"        -fps \"value\"\n"
+"        -fps \"value\", -FPS \"value\"\n"
 "               Set the number of frames per second used for replay and\n"
 "               recording.\n"
 "        -loop\n"
@@ -3341,7 +3341,7 @@ int main(int argc, char **argv)
 	    verbose = 1;
 	else if (!strcmp(argv[argi], "-compress"))
 	    compress = 1;
-	else if (!strcmp(argv[argi], "-fps")) {
+	else if (!strcmp(argv[argi], "-fps") || !strcmp(argv[argi], "-FPS")) {
 	    if (++argi == argc || sscanf(argv[argi], "%d", &fps) != 1)
 		usage();
 	    if (fps < 0)
