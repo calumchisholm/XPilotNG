@@ -3083,7 +3083,12 @@ static int Receive_display(int ind)
     if (record && recOpt && connp->view_width == width &&
 	connp->view_height == height && connp->debris_colors == debris_colors &&
 	connp->spark_rand == spark_rand) {
-	recSpecial = 1;   /* buggy 4.1.0 clients might send every frame */
+	/* This probably isn't that useful any more, but when this code
+	 * was part of a server compatible with old clients, version
+	 * 4.1.0 had a bug that could cause clients to send unnecessary
+	 * packets like this every frame. Left here as an example of how
+	 * recSpecial can be used. */
+	recSpecial = 1;
     }
     connp->view_width = width;
     connp->view_height = height;
