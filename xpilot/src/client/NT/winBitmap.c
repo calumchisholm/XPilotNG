@@ -153,9 +153,9 @@ int radar_light(int *radar, int x, int y)
 }
 
 
-void Winpaint_world_radar()
+void Winpaint_world_radar(void)
 {
-    HDC hDC = xid[s_radar].hwnd.hBmpDC;
+    HDC hDC = xid[radarPixmap2].hwnd.hBmpDC;
     int radar[256 * 300];
     int cr, cg, cb;
     int i, xi, yi, xm, ym, xp, yp = 0, xmoff;

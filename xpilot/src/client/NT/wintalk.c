@@ -260,7 +260,7 @@ void Talk_delete_emphasized_text()
      */
     if (newlen < oldlen) {
 	XSetForeground(dpy, talkGC, colors[BLACK].pixel);
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    talk_cursor.point * onewidth + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    &talk_str[talk_cursor.point],
@@ -268,7 +268,7 @@ void Talk_delete_emphasized_text()
 	XSetForeground(dpy, talkGC, colors[WHITE].pixel);
     }
     if (talk_cursor.point < newlen) {
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    talk_cursor.point * onewidth + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    &new_str[talk_cursor.point],
@@ -377,9 +377,9 @@ int Talk_paste(char *data, int data_len, bool overwrite)
      * graphics
      */
     if (overwrite) {
-	XClearWindow(dpy, talk_w);
+	XClearWindow(dpy, talkWindow);
 	XSetForeground(dpy, talkGC, colors[WHITE].pixel);
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    tmp_str, accept_len);
@@ -394,7 +394,7 @@ int Talk_paste(char *data, int data_len, bool overwrite)
 	     * erase from the point of insertion on
 	     */
 	    XSetForeground(dpy, talkGC, colors[BLACK].pixel);
-	    XDrawString(dpy, talk_w, talkGC,
+	    XDrawString(dpy, talkWindow, talkGC,
 			talk_cursor.point * char_width +
 			TALK_INSIDE_BORDER,
 			talkFont->ascent + TALK_INSIDE_BORDER,
@@ -404,7 +404,7 @@ int Talk_paste(char *data, int data_len, bool overwrite)
 	}
 
 	/* the new part of the line */
-	XDrawString(dpy, talk_w, talkGC,
+	XDrawString(dpy, talkWindow, talkGC,
 		    talk_cursor.point * char_width + TALK_INSIDE_BORDER,
 		    talkFont->ascent + TALK_INSIDE_BORDER,
 		    &tmp_str[talk_cursor.point],
