@@ -210,10 +210,6 @@ void Make_debris(
 
     if (max_life < min_life)
 	max_life = min_life;
-    if (min_speed * max_life > World.hypotenuse)
-	min_speed = World.hypotenuse / max_life;
-    if (max_speed * min_life > World.hypotenuse)
-	max_speed = World.hypotenuse / min_life;
     if (max_speed < min_speed)
 	max_speed = min_speed;
 
@@ -253,9 +249,6 @@ void Make_debris(
 	debris->mass = mass;
 	debris->type = type;
 	life = (int)(min_life + rfrac() * (max_life - min_life) + 1);
-	if (life * speed > World.hypotenuse) {
-	    life = (long)(World.hypotenuse / speed);
-	}
 	debris->life = life;
 	debris->fuseframe = 0;
 	debris->spread_left = 0;

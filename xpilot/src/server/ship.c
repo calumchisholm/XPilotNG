@@ -477,10 +477,6 @@ void Make_wreckage(
     if (max_life < min_life)
 	max_life = min_life;
 
-    if (min_speed * max_life > World.hypotenuse)
-	min_speed = World.hypotenuse / max_life;
-    if (max_speed * min_life > World.hypotenuse)
-	max_speed = World.hypotenuse / min_life;
     if (max_speed < min_speed)
 	max_speed = min_speed;
 
@@ -527,9 +523,6 @@ void Make_wreckage(
 
 	/* Lifespan  */
 	life = (int)(min_life + rfrac() * (max_life - min_life) + 1);
-	if (life * speed > World.hypotenuse) {
-	    life = (long)(World.hypotenuse / speed);
-	}
 	wreckage->life = life;
 	wreckage->fuseframe = 0;
 
