@@ -2127,7 +2127,7 @@ int Send_fuel(connection_t *connp, int num, double fuel)
 			 num, (int)(fuel + 0.5));
 }
 
-int Send_score_object(connection_t *connp, double score, int cx, int cy,
+int Send_score_object(connection_t *connp, double score, clpos pos,
 		      const char *string)
 {
     int			bx, by;
@@ -2138,8 +2138,8 @@ int Send_score_object(connection_t *connp, double score, int cx, int cy,
 	return 0;
     }
 
-    bx = CLICK_TO_BLOCK(cx);
-    by = CLICK_TO_BLOCK(cy);
+    bx = CLICK_TO_BLOCK(pos.cx);
+    by = CLICK_TO_BLOCK(pos.cy);
 
     if (!FEATURE(connp, F_FLOATSCORE))
 	return Packet_printf(&connp->c, "%c%hd%hu%hu%s", PKT_SCORE_OBJECT,
@@ -2212,7 +2212,7 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, unsigned n)
     return n;
 }
 
-int Send_wreckage(connection_t *connp, int cx, int cy,
+int Send_wreckage(connection_t *connp, clpos pos,
 		  int wrtype, int size, int rot)
 {
     if (wreckageCollisionMayKill)
@@ -2222,19 +2222,19 @@ int Send_wreckage(connection_t *connp, int cx, int cy,
 	wrtype &= ~0x80;
 
     return Packet_printf(&connp->w, "%c%hd%hd%c%c%c", PKT_WRECKAGE,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
 			 wrtype, size, rot);
 }
 
-int Send_asteroid(connection_t *connp, int cx, int cy,
+int Send_asteroid(connection_t *connp, clpos pos,
 		  int type, int size, int rot)
 {
     u_byte	type_size;
-    int		x = CLICK_TO_PIXEL(cx),
-    		y = CLICK_TO_PIXEL(cy);
+    int		x = CLICK_TO_PIXEL(pos.cx),
+    		y = CLICK_TO_PIXEL(pos.cy);
 
     if (!FEATURE(connp, F_ASTEROID))
-	return Send_ecm(connp, x, y, 2 * (int) ASTEROID_RADIUS(size) / CLICK);
+	return Send_ecm(connp, pos, 2 * (int) ASTEROID_RADIUS(size) / CLICK);
 
     type_size = ((type & 0x0F) << 4) | (size & 0x0F);
 
@@ -2267,22 +2267,23 @@ int Send_fastshot(connection_t *connp, int type, unsigned char *p, unsigned n)
     return n;
 }
 
-int Send_missile(connection_t *connp, int cx, int cy, int len, int dir)
+int Send_missile(connection_t *connp, clpos pos, int len, int dir)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%c%c", PKT_MISSILE,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), len, dir);
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
+			 len, dir);
 }
 
-int Send_ball(connection_t *connp, int cx, int cy, int id)
+int Send_ball(connection_t *connp, clpos pos, int id)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_BALL,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id);
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), id);
 }
 
-int Send_mine(connection_t *connp, int cx, int cy, int teammine, int id)
+int Send_mine(connection_t *connp, clpos pos, int teammine, int id)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%c%hd", PKT_MINE,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
 			 teammine, id);
 }
 
@@ -2292,66 +2293,52 @@ int Send_target(connection_t *connp, int num, int dead_time, double damage)
 			 num, dead_time, (int)(damage * 256.0));
 }
 
-int Send_wormhole(connection_t *connp, int cx, int cy)
+int Send_wormhole(connection_t *connp, clpos pos)
 {
-    int		x = CLICK_TO_PIXEL(cx),
-    		y = CLICK_TO_PIXEL(cy);
+    int		x = CLICK_TO_PIXEL(pos.cx),
+    		y = CLICK_TO_PIXEL(pos.cy);
 
-    if (!FEATURE(connp, F_TEMPWORM)) {
-	const int wormStep = 5;
-	int wormAngle = (frame_loops & 7) * (RES / 8);
-
-	return Send_ecm(connp,
-			x,
-			y,
-			BLOCK_SZ - 2) +
-	       Send_ecm(connp,
-			(int) (x + wormStep * tcos(wormAngle)),
-			(int) (y + wormStep * tsin(wormAngle)),
-			BLOCK_SZ - 2 - 2 * wormStep) +
-	       Send_ecm(connp,
-			(int) (x + 2 * wormStep * tcos(wormAngle)),
-			(int) (y + 2 * wormStep * tsin(wormAngle)),
-			BLOCK_SZ - 2 - 4 * wormStep);
-    }
+    if (!FEATURE(connp, F_TEMPWORM))
+	return Send_ecm(connp, pos, BLOCK_SZ - 2);
     return Packet_printf(&connp->w, "%c%hd%hd", PKT_WORMHOLE, x, y);
 }
 
-int Send_item(connection_t *connp, int cx, int cy, int type)
+int Send_item(connection_t *connp, clpos pos, int type)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%c", PKT_ITEM,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), type);
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), type);
 }
 
-int Send_paused(connection_t *connp, int cx, int cy, int count)
+int Send_paused(connection_t *connp, clpos pos, int count)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_PAUSED,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), count);
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), count);
 }
 
-int Send_appearing(connection_t *connp, int cx, int cy, int id, int count)
+int Send_appearing(connection_t *connp, clpos pos, int id, int count)
 {
     if (!FEATURE(connp, F_SHOW_APPEARING))
 	return 0;
 
     return Packet_printf(&connp->w, "%c%hd%hd%hd%hd", PKT_APPEARING,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id, count);
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
+			 id, count);
 }
 
-int Send_ecm(connection_t *connp, int cx, int cy, int size)
+int Send_ecm(connection_t *connp, clpos pos, int size)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_ECM,
-			 CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), size);
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), size);
 }
 
-int Send_trans(connection_t *connp, int cx1, int cy1, int cx2, int cy2)
+int Send_trans(connection_t *connp, clpos pos1, clpos pos2)
 {
     return Packet_printf(&connp->w,"%c%hd%hd%hd%hd", PKT_TRANS,
-			 CLICK_TO_PIXEL(cx1), CLICK_TO_PIXEL(cy1),
-			 CLICK_TO_PIXEL(cx2), CLICK_TO_PIXEL(cy2));
+			 CLICK_TO_PIXEL(pos1.cx), CLICK_TO_PIXEL(pos1.cy),
+			 CLICK_TO_PIXEL(pos2.cx), CLICK_TO_PIXEL(pos2.cy));
 }
 
-int Send_ship(connection_t *connp, int cx, int cy, int id, int dir,
+int Send_ship(connection_t *connp, clpos pos, int id, int dir,
 	      int shield, int cloak, int emergency_shield, int phased,
 	      int deflector)
 {
@@ -2359,7 +2346,8 @@ int Send_ship(connection_t *connp, int cx, int cy, int id, int dir,
 	cloak |= phased;
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd" "%c" "%c",
-			 PKT_SHIP, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy), id,
+			 PKT_SHIP,
+			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), id,
 			 128 * dir / RES,
 			 (shield != 0)
 			 | ((cloak != 0) << 1)
@@ -2369,29 +2357,30 @@ int Send_ship(connection_t *connp, int cx, int cy, int id, int dir,
 			);
 }
 
-int Send_refuel(connection_t *connp, int cx0, int cy0, int cx1, int cy1)
+int Send_refuel(connection_t *connp, clpos pos1, clpos pos2)
 {
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd%hd",
 			 PKT_REFUEL,
-			 CLICK_TO_PIXEL(cx0), CLICK_TO_PIXEL(cy0),
-			 CLICK_TO_PIXEL(cx1), CLICK_TO_PIXEL(cy1));
+			 CLICK_TO_PIXEL(pos1.cx), CLICK_TO_PIXEL(pos1.cy),
+			 CLICK_TO_PIXEL(pos2.cx), CLICK_TO_PIXEL(pos2.cy));
 }
 
-int Send_connector(connection_t *connp, int cx0, int cy0, int cx1, int cy1,
+int Send_connector(connection_t *connp, clpos pos1, clpos pos2,
 		   int tractor)
 {
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd%hd%c",
 			 PKT_CONNECTOR,
-			 CLICK_TO_PIXEL(cx0), CLICK_TO_PIXEL(cy0),
-			 CLICK_TO_PIXEL(cx1), CLICK_TO_PIXEL(cy1), tractor);
+			 CLICK_TO_PIXEL(pos1.cx), CLICK_TO_PIXEL(pos1.cy),
+			 CLICK_TO_PIXEL(pos2.cx), CLICK_TO_PIXEL(pos2.cy),
+			 tractor);
 }
 
-int Send_laser(connection_t *connp, int color, int cx, int cy, int len, int dir)
+int Send_laser(connection_t *connp, int color, clpos pos, int len, int dir)
 {
     return Packet_printf(&connp->w, "%c%c%hd%hd%hd%c", PKT_LASER,
-			 color, CLICK_TO_PIXEL(cx), CLICK_TO_PIXEL(cy),
+			 color, CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
 			 len, dir);
 }
 

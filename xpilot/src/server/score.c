@@ -41,7 +41,7 @@ void Score(player *pl, double points, clpos pos, const char *msg)
     }
 
     if (pl->conn != NULL)
-	Send_score_object(pl->conn, points, pos.cx, pos.cy, msg);
+	Send_score_object(pl->conn, points, pos, msg);
 
     updateScores = true;
 }

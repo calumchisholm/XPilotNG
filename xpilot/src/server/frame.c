@@ -558,7 +558,7 @@ static void Frame_map(connection_t *conn, player *pl)
 	    && (worm->type == WORM_IN
 		|| worm->type == WORM_NORMAL)
 	    && clpos_inview(&cv, worm->pos)) {
-	    Send_wormhole(conn, worm->pos.cx, worm->pos.cy);
+	    Send_wormhole(conn, worm->pos);
 	    pl->last_wormhole_update = i;
 	    bytes_left -= max_packet * wormhole_packet_size;
 	    if (++packet_count >= max_packet)
@@ -738,14 +738,14 @@ static void Frame_shots(connection_t *conn, player *pl)
 	case OBJ_WRECKAGE:
 	    if (spark_rand != 0 || wreckageCollisionMayKill) {
 		wireobject *wreck = WIRE_PTR(shot);
-		Send_wreckage(conn, pos.cx, pos.cy, (u_byte)wreck->info,
+		Send_wreckage(conn, pos, (u_byte)wreck->info,
 			      wreck->size, wreck->rotation);
 	    }
 	    break;
 
 	case OBJ_ASTEROID: {
 		wireobject *ast = WIRE_PTR(shot);
-		Send_asteroid(conn, pos.cx, pos.cy,
+		Send_asteroid(conn, pos,
 			      (u_byte)ast->info, ast->size, ast->rotation);
 	    }
 	    break;
@@ -777,18 +777,18 @@ static void Frame_shots(connection_t *conn, player *pl)
 
 	case OBJ_TORPEDO:
 	    len =(distinguishMissiles ? TORPEDO_LEN : MISSILE_LEN);
-	    Send_missile(conn, pos.cx, pos.cy, len, shot->missile_dir);
+	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_SMART_SHOT:
 	    len =(distinguishMissiles ? SMART_SHOT_LEN : MISSILE_LEN);
-	    Send_missile(conn, pos.cx, pos.cy, len, shot->missile_dir);
+	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_HEAT_SHOT:
 	    len =(distinguishMissiles ? HEAT_SHOT_LEN : MISSILE_LEN);
-	    Send_missile(conn, pos.cx, pos.cy, len, shot->missile_dir);
+	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_BALL:
-	    Send_ball(conn, pos.cx, pos.cy, shot->id);
+	    Send_ball(conn, pos, shot->id);
 	    break;
 	case OBJ_MINE:
 	    {
@@ -821,7 +821,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 			laid_by_team = (rfrac() < 0.5);
 		    }
 		}
-		Send_mine(conn, pos.cx, pos.cy, laid_by_team, id);
+		Send_mine(conn, pos, laid_by_team, id);
 	    }
 	    break;
 
@@ -832,7 +832,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 		if (BIT(shot->status, RANDOM_ITEM))
 		    item_type = Choose_random_item();
 
-		Send_item(conn, pos.cx, pos.cy, item_type);
+		Send_item(conn, pos, item_type);
 	    }
 	    break;
 
@@ -846,7 +846,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 		    color = BLUE;
 		else
 		    color = RED;
-		Send_laser(conn, color, pos.cx, pos.cy, (int)pulse->len, ldir);
+		Send_laser(conn, color, pos, (int)pulse->len, ldir);
 	    }
 	break;
 	default:
@@ -862,29 +862,31 @@ static void Frame_ships(connection_t *conn, player *pl)
 
     for (i = 0; i < NumEcms; i++) {
 	ecm_t *ecm = Ecms[i];
-	Send_ecm(conn, ecm->pos.cx, ecm->pos.cy, (int)ecm->size);
+
+	Send_ecm(conn, ecm->pos, (int)ecm->size);
     }
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
 	player 	*victim = trans->victim,
 		*tpl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
-	int 	cx = (tpl ? tpl->pos.cx : trans->pos.cx),
-		cy = (tpl ? tpl->pos.cy : trans->pos.cy);
-	Send_trans(conn, victim->pos.cx, victim->pos.cy, cx, cy);
+	clpos	pos = (tpl ? tpl->pos : trans->pos);
+
+	Send_trans(conn, victim->pos, pos);
     }
     for (i = 0; i < World.NumCannons; i++) {
 	cannon_t *cannon = Cannons(i);
 	if (cannon->tractor_count > 0) {
 	    player *t = cannon->tractor_target_pl;
+
 	    if (clpos_inview(&cv, t->pos)) {
 		int j;
+
 		for (j = 0; j < 3; j++) {
-		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir);
-		    Send_connector(conn,
-				   t->pos.cx + pts.cx,
-				   t->pos.cy + pts.cy,
-				   cannon->pos.cx,
-				   cannon->pos.cy, 1);
+		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir), pos;
+
+		    pos.cx = t->pos.cx + pts.cx;
+		    pos.cy = t->pos.cy + pts.cy;
+		    Send_connector(conn, pos, cannon->pos, 1);
 		}
 	    }
 	}
@@ -903,11 +905,9 @@ static void Frame_ships(connection_t *conn, player *pl)
 	    if (!clpos_inview(&cv, pl_i->home_base->pos))
 		continue;
 	    if (BIT(pl_i->status, PAUSE))
-		Send_paused(conn, pl_i->home_base->pos.cx,
-			    pl_i->home_base->pos.cy, (int)pl_i->count);
+		Send_paused(conn, pl_i->home_base->pos, (int)pl_i->count);
 	    else
-		Send_appearing(conn, pl_i->home_base->pos.cx,
-			       pl_i->home_base->pos.cy,
+		Send_appearing(conn, pl_i->home_base->pos,
 			       pl_i->id, (int)(pl_i->count * 10));
 	    continue;
 	}
@@ -923,8 +923,7 @@ static void Frame_ships(connection_t *conn, player *pl)
 	     * Transmit ship information
 	     */
 	    Send_ship(conn,
-		      pl_i->pos.cx,
-		      pl_i->pos.cy,
+		      pl_i->pos,
 		      pl_i->id,
 		      pl_i->dir,
 		      BIT(pl_i->used, HAS_SHIELD) != 0,
@@ -938,16 +937,14 @@ static void Frame_ships(connection_t *conn, player *pl)
 	if (BIT(pl_i->used, HAS_REFUEL)) {
 	    fuel_t *fs = Fuels(pl_i->fs);
 	    if (clpos_inview(&cv, fs->pos))
-		Send_refuel(conn, fs->pos.cx, fs->pos.cy,
-			    pl_i->pos.cx, pl_i->pos.cy);
+		Send_refuel(conn, fs->pos, pl_i->pos);
 	}
 
 	if (BIT(pl_i->used, HAS_REPAIR)) {
 	    target_t *targ = Targets(pl_i->repair_target);
 	    if (clpos_inview(&cv, targ->pos))
 		/* same packet as refuel */
-		Send_refuel(conn, pl_i->pos.cx, pl_i->pos.cy,
-			    targ->pos.cx, targ->pos.cy);
+		Send_refuel(conn, pl_i->pos, targ->pos);
 	}
 
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
@@ -956,23 +953,18 @@ static void Frame_ships(connection_t *conn, player *pl)
 		int j;
 
 		for (j = 0; j < 3; j++) {
-		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir);
-		    Send_connector(conn,
-				   t->pos.cx + pts.cx,
-				   t->pos.cy + pts.cy,
-				   pl_i->pos.cx,
-				   pl_i->pos.cy, 1);
+		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir), pos;
+
+		    pos.cx = t->pos.cx + pts.cx;
+		    pos.cy = t->pos.cy + pts.cy;
+		    Send_connector(conn, pos, pl_i->pos, 1);
 		}
 	    }
 	}
 
 	if (pl_i->ball != NULL
 	    && clpos_inview(&cv, pl_i->ball->pos)) {
-	    Send_connector(conn,
-			   pl_i->ball->pos.cx,
-			   pl_i->ball->pos.cy,
-			   pl_i->pos.cx,
-			   pl_i->pos.cy, 0);
+	    Send_connector(conn, pl_i->ball->pos, pl_i->pos, 0);
 	}
     }
 }
