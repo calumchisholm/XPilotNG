@@ -1020,9 +1020,11 @@ static bool Check_robot_target(int ind,
 		ship_dist = Wrap_length(PIXEL_TO_CLICK(x3 - x1),
 					PIXEL_TO_CLICK(y3 - y1)) / CLICK;
 
+		/* kps -
+		   changed PULSE_LIFE(pl->item[ITEM_LASER]) to pulseLife */
 		if (ship_dist
-		    < CLICK_TO_PIXEL(PULSE_SPEED)
-		    * PULSE_LIFE(pl->item[ITEM_LASER]) / TIME_FACT
+		    < pulseSpeed
+		    * pulseLife / TIME_FACT
 		    + SHIP_SZ) {
 		    dir3 = Wrap_findDir(x3 - x1, y3 - y1);
 		    x4 = x3 + tcos(MOD2((int)(dir3 - RES/4), RES)) * SHIP_SZ;

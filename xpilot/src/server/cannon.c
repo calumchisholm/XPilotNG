@@ -351,8 +351,8 @@ static void Cannon_aim(int ind, int weapon, int *target, int *dir)
 	range = (int)(range * 0.5 + 0.1 * cannonSmartness);
 	break;
     case CW_LASER:
-	speed = CLICK_TO_PIXEL(PULSE_SPEED);
-	range = (int)((PULSE_LIFE(CANNON_PULSES) / TIME_FACT) * speed);
+	speed = pulseSpeed;
+	range = (int)((CANNON_PULSE_LIFE / TIME_FACT) * speed);
 	break;
     case CW_ECM:
 	/* smarter cannons wait a little longer before firing an ECM */

@@ -1477,7 +1477,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
 	life = pulseLife;
 	/*Rank_FireLaser(pl);*/
     } else {
-	life = (int)PULSE_LIFE(CANNON_PULSES);
+	life = (int)CANNON_PULSE_LIFE;
     }
 
     pulse->id		= (pl ? pl->id : NO_ID);

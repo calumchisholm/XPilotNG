@@ -244,11 +244,14 @@
 #define HEAT_SHOT_LEN		15
 #define TORPEDO_LEN		18
 
+#if 0
 #define PULSE_SPEED		(90 * CLICK)
 #define PULSE_SAMPLE_DISTANCE	(5 * CLICK)
 #define PULSE_LENGTH		(PULSE_SPEED - PULSE_SAMPLE_DISTANCE)
 #define PULSE_MIN_LIFE		(4.5 * TIME_FACT)
 #define PULSE_LIFE(lasers)	(PULSE_MIN_LIFE + ((lasers) / 4) * TIME_FACT)
+#endif
+#define CANNON_PULSE_LIFE	(4.75 * TIME_FACT)
 
 #define TRACTOR_MAX_RANGE(items)  (200 + (items) * 50)
 #define TRACTOR_MAX_FORCE(items)  (-40 + (items) * -20)
