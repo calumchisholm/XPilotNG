@@ -506,77 +506,6 @@ static void Misc_object_update(void)
     }
 }
 
-static void Cannon_update(void)
-{
-    int i;
-    for (i = 0; i < World.NumCannons; i++) {
-	cannon_t *c = Cannons(i);
-
-	if (c->dead_time > 0) {
-	    if ((c->dead_time -= timeStep) <= 0)
-		Cannon_restore_on_map(c);
-	    continue;
-	} else {
-	    /* don't check too often, because this gets quite expensive
-	       on maps with many cannons with defensive items */
-	    if (do_update_this_frame
-		&& cannonsUseItems
-		&& cannonsDefend
-		&& rfrac() < 0.65)
-		Cannon_check_defense(c);
-
-	    if (do_update_this_frame
-		&& !BIT(c->used, HAS_EMERGENCY_SHIELD)
-		&& !BIT(c->used, HAS_PHASING_DEVICE)
-		&& (c->damaged <= 0)
-		&& (c->tractor_count <= 0)
-		&& rfrac() * 16 < 1)
-		Cannon_check_fire(c);
-	    else if (do_update_this_frame
-		     && cannonsUseItems
-		     && itemProbMult > 0
-		     && cannonItemProbMult > 0) {
-		int item = (int)(rfrac() * NUM_ITEMS);
-		/* this gives the cannon an item about once every minute */
-		if (World.items[item].cannonprob > 0
-		    && cannonItemProbMult > 0
-		    && (int)(rfrac() * (60 * 12))
-		    < (cannonItemProbMult * World.items[item].cannonprob))
-		    Cannon_add_item(c, item, (item == ITEM_FUEL
-					      ?  ENERGY_PACK_FUEL : 1));
-	    }
-	}
-	if ((c->damaged -= timeStep) <= 0)
-	    c->damaged = 0;
-	if (c->tractor_count > 0) {
-	    player *tpl = c->tractor_target_pl;
-
-	    if ((Wrap_length(tpl->pos.cx - c->pos.cx,
-			     tpl->pos.cy - c->pos.cy)
-		 < TRACTOR_MAX_RANGE(c->item[ITEM_TRACTOR_BEAM]) * CLICK)
-		&& Player_is_playing(tpl)) {
-		General_tractor_beam(NULL, c->pos, c->item[ITEM_TRACTOR_BEAM],
-				     tpl, c->tractor_is_pressor);
-		if ((c->tractor_count -= timeStep) <= 0)
-		    c->tractor_count = 0;
-	    } else
-		c->tractor_count = 0;
-	}
-	if (c->emergency_shield_left > 0) {
-	    if ((c->emergency_shield_left -= timeStep) <= 0) {
-		CLR_BIT(c->used, HAS_EMERGENCY_SHIELD);
-		sound_play_sensors(c->pos, EMERGENCY_SHIELD_OFF_SOUND);
-	    }
-	}
-	if (c->phasing_left > 0) {
-	    if ((c->phasing_left -= timeStep) <= 0) {
-		CLR_BIT(c->used, HAS_PHASING_DEVICE);
-	        sound_play_sensors(c->pos, PHASING_OFF_SOUND);
-	    }
-	}
-    }
-}
-
 static void Target_update(void)
 {
     int i, j;
@@ -859,7 +788,7 @@ static void Do_warping(player *pl)
 
 	if (wh_hit->countdown > 0)
 	    j = wh_hit->lastdest;
-	else if (rfrac() < 0.10f) {
+	else if (rfrac() < 0.1) {
 	    do
 		j = (int)(rfrac() * World.NumWormholes);
 	    while (World.wormholes[j].type == WORM_IN
@@ -1256,7 +1185,7 @@ void Update_objects(void)
     Asteroid_update();
     Ecm_update();
     Transporter_update();
-    Cannon_update();
+    Cannon_update(do_update_this_frame);
     Target_update();
     Update_players();
 

@@ -75,4 +75,6 @@ extern long CANNON_USE_ITEM;
 /* sector in which cannonfire is possible */
 #define CANNON_SPREAD		(RES / 3)
 
+extern void Cannon_update(bool do_less_frequent_update);
+
 #endif
