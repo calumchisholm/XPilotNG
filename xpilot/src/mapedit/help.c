@@ -30,9 +30,9 @@
 #include                 "main.h"
 
 Window helpwin;
-int helppage = 0, helpsel, helpscreens = 3;
+static int helppage = 0, helpsel, helpscreens = 3;
 
-char *iconlabel[36] = {
+const char *iconlabel[36] = {
     "Space",
     "Block", "Block", "Block", "Block", "Block",
     "Decor", "Decor", "Decor", "Decor", "Decor",

@@ -44,9 +44,7 @@
 #include                 "map.h"
 #include                 "proto.h"
 #include                 "tools.h"
-#include                 "expose.h"
 #include                 "file.h"
-#include                 "help.h"
 
 #define MAPWIDTH         0
 #define MAPHEIGHT        1
@@ -336,7 +334,7 @@ typedef struct {
 
 extern char *progname;
 
-extern Window mapwin, prefwin;
+extern Window mapwin, prefwin, helpwin;
 
 extern Window mapinfo, robots, visibility, cannons, rounds;
 extern Window inititems, maxitems, probs, scoring;
@@ -364,3 +362,9 @@ typedef struct {
 
 extern int numprefs;
 extern prefs_t prefs[260];
+
+/* expose.c */
+extern int mapicon_ptr[91];
+extern char iconmenu[36];
+extern int smlmap_x, smlmap_y, smlmap_width, smlmap_height;
+extern float smlmap_xscale, smlmap_yscale;

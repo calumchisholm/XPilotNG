@@ -28,6 +28,18 @@
 
 #include                 "main.h"
 
+
+typedef struct {
+    int color;
+    int num_points;
+    float x[5], y[5];
+} segment_t;
+
+typedef struct {
+    float x, y, width, height;
+    int start, end;
+} arc_t;
+
 int smlmap_x, smlmap_y, smlmap_width, smlmap_height;
 float smlmap_xscale, smlmap_yscale;
 
@@ -82,7 +94,8 @@ segment_t mapicondet_seg[4] = {
     {0, 5, {0.35, 0.65, 0.65, 0.35, 0.35}, {0.60, 0.60, 0.30, 0.30, 0.60}},	/* 3:& ASTEROID_CONC (DETAIL) */
 };
 
-int mapicon_ptr[91] = { 20, 19, 0, 5, 26,	/* ascii char -32 */
+int mapicon_ptr[91] = {
+    20, 19, 0, 5, 26,	/* ascii char -32 */
     27, 34, 0, 15, 14,
     16, 11, 0, 12, 0,
     0, 10, 10, 10, 10,
