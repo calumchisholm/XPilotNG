@@ -1621,7 +1621,7 @@ static option_desc options[] = {
 	&ignore20MaxFPS,
 	valBool,
 	tuner_dummy,
-	"Ignore client maxFPS request if it is 20 (the default setting).\n",
+	"Ignore client maxFPS request if it is 20 (old default, too low).\n",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
     {
