@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -124,11 +123,10 @@ void Gui_paint_ball(int x, int y)
 	}
     }
     else {
-
-	x = X(x);
-	y = Y(y);
-	Bitmap_paint(p_draw, BM_BALL, WINSCALE(x - BALL_RADIUS),
-                     WINSCALE(y - BALL_RADIUS), 0);
+	x = SCALEX(x);
+	y = SCALEY(y);
+	Bitmap_paint(p_draw, BM_BALL, x - WINSCALE(BALL_RADIUS),
+                     y - WINSCALE(BALL_RADIUS), 0);
     }
 }
 

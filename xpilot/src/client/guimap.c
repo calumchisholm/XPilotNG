@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -61,7 +60,6 @@ char guimap_version[] = VERSION;
 
 #define X(co)  ((int) ((co) - world.x))
 #define Y(co)  ((int) (world.y + view_height - (co)))
-
 
 /* XXX better include a header. */
 extern int	wallColor;		/* Color index for wall drawing */
@@ -242,18 +240,17 @@ void Gui_paint_fuel(int x, int y, long fuel)
 
 	static DFLOAT		lastScaleFactor;
 
-	if (!text_width || lastScaleFactor != scaleFactor)
-	{
+	if (!text_width || lastScaleFactor != scaleFactor) {
 	    lastScaleFactor = scaleFactor;
 	    text_width = XTextWidth(gameFont, s, 1);
 	    text_is_bigger = text_width+4 > WINSCALE(BLOCK_SZ)+1 ||
-			    (gameFont->ascent + gameFont->descent) > WINSCALE(BLOCK_SZ) + 2;
+		(gameFont->ascent + gameFont->descent) >WINSCALE(BLOCK_SZ) + 2;
 	}
 	SET_FG(colors[RED].pixel);
 	size = (BLOCK_SZ - 2*FUEL_BORDER) * fuel / MAX_STATION_FUEL;
 	if (useErase) {
 	/* speedup for slow old cheap graphics cards like cg3.
-	    or Xterminals with slow connection */
+	 * or Xterminals with slow connection */
 	    rd.drawLine(dpy, p_draw, gc,
 			WINSCALE(X(x + FUEL_BORDER)),
 			WINSCALE(Y(y + FUEL_BORDER + size)),
@@ -261,8 +258,8 @@ void Gui_paint_fuel(int x, int y, long fuel)
 			WINSCALE(Y(y + FUEL_BORDER + size)));
 	} else {
 	    rd.fillRectangle(dpy, p_draw, gc,
-			     WINSCALE(X(x + FUEL_BORDER)),
-			     WINSCALE(Y(y + FUEL_BORDER + size)),
+			     SCALEX(x + FUEL_BORDER),
+			     SCALEY(y + FUEL_BORDER + size),
 			     WINSCALE(BLOCK_SZ - 2*FUEL_BORDER + 1),
 			     WINSCALE(size + 1));
 	}
@@ -275,8 +272,8 @@ void Gui_paint_fuel(int x, int y, long fuel)
 	/* Draw F in fuel cells */
 	XSetFunction(dpy, gc, GXxor);
 	SET_FG(colors[BLACK].pixel ^ colors[RED].pixel);
-	x = WINSCALE(X(x + BLOCK_SZ/2)) - text_width/2,
-	y = WINSCALE(Y(y + BLOCK_SZ/2)) + gameFont->ascent/2,
+	x = SCALEX(x + BLOCK_SZ/2) - text_width/2,
+	y = SCALEY(y + BLOCK_SZ/2) + gameFont->ascent/2,
 	rd.drawString(dpy, p_draw, gc, x, y, s, 1);
 	XSetFunction(dpy, gc, GXcopy);
 
@@ -309,9 +306,7 @@ void Gui_paint_fuel(int x, int y, long fuel)
 
 	size = (BLOCK_SZ - 2 * BITMAP_FUEL_BORDER) * fuel / MAX_STATION_FUEL;
 
-	Bitmap_paint(p_draw, BM_FUELCELL, WINSCALE(X(x)),
-                     WINSCALE(Y(y + BLOCK_SZ)), 0);
-
+	Bitmap_paint(p_draw, BM_FUELCELL, SCALEX(x), SCALEY(y + BLOCK_SZ), 0);
 
 	bit = Bitmap_get(p_draw, BM_FUEL, image);
         if (bit != NULL) {
@@ -321,11 +316,10 @@ void Gui_paint_fuel(int x, int y, long fuel)
             area.w = WINSCALE(BLOCK_SZ - 2 * BITMAP_FUEL_BORDER);
             area.h = WINSCALE(size);
 
-            Bitmap_paint_area
-                (p_draw, bit,
-                 WINSCALE(X(x + BITMAP_FUEL_BORDER)),
-                 WINSCALE(Y(y + size + BITMAP_FUEL_BORDER)),
-                 &area);
+            Bitmap_paint_area(p_draw, bit,
+			      SCALEX(x + BITMAP_FUEL_BORDER),
+			      SCALEY(y + size + BITMAP_FUEL_BORDER),
+			      &area);
 
             Erase_rectangle(WINSCALE(X(x)) - 1,
                             WINSCALE(Y(y + BLOCK_SZ)) - 1,
@@ -375,8 +369,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	if (!BIT(instruments, SHOW_SHIP_NAME)) return;
 
 	/* operate in pixels from here out */
-	x = WINSCALE(X(x));
-	y = WINSCALE(Y(y));
+	x = SCALEX(x);
+	y = SCALEY(y);
 
 	if ((other = Other_by_id(id)) != NULL) {
 	    if (other->name_width == 0) {
@@ -442,20 +436,20 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 
 	switch (type) {
 	case SETUP_BASE_UP:
-	    Bitmap_paint(p_draw, BM_BASE_DOWN, WINSCALE(X(x)),
-                         WINSCALE(Y(y + BLOCK_SZ)), 0);
+	    Bitmap_paint(p_draw, BM_BASE_DOWN, SCALEX(x),
+                         SCALEY(y + BLOCK_SZ), 0);
 	    break;
 	case SETUP_BASE_DOWN:
-	    Bitmap_paint(p_draw, BM_BASE_UP, WINSCALE(X(x)),
-			WINSCALE(Y(y + BLOCK_SZ - 1)), 0);
+	    Bitmap_paint(p_draw, BM_BASE_UP, SCALEX(x),
+			SCALEY(y + BLOCK_SZ - 1), 0);
 	    break;
 	case SETUP_BASE_LEFT:
-	    Bitmap_paint(p_draw, BM_BASE_RIGHT, WINSCALE(X(x)),
-			WINSCALE(Y(y + BLOCK_SZ)), 0);
+	    Bitmap_paint(p_draw, BM_BASE_RIGHT, SCALEX(x),
+			SCALEY(y + BLOCK_SZ), 0);
 	    break;
 	case SETUP_BASE_RIGHT:
-	    Bitmap_paint(p_draw, BM_BASE_LEFT, WINSCALE(X(x - 1)),
-			WINSCALE(Y(y + BLOCK_SZ)), 0);
+	    Bitmap_paint(p_draw, BM_BASE_LEFT, SCALEX(x - 1),
+			SCALEY(y + BLOCK_SZ), 0);
 	    break;
 	default:
 	    errno = 0;
@@ -466,8 +460,8 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	if (!BIT(instruments, SHOW_SHIP_NAME)) return;
 
 	/* operate in pixels from here out */
-	x = WINSCALE(X(x));
-	y = WINSCALE(Y(y));
+	x = SCALEX(x);
+	y = SCALEY(y);
 
 	if ((other = Other_by_id(id)) != NULL) {
 	    if (other->name_width == 0) {

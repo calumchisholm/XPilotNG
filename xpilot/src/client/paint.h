@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -161,6 +160,9 @@ extern DFLOAT	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);
 #define	WINSCALE(__n)	((__n) >= 0 ? scaleArray[(__n)] : -scaleArray[-(__n)])
+#define SCALEX(co) ((int) (WINSCALE(co) - WINSCALE(world.x)))
+#define SCALEY(co) ((int) (WINSCALE(world.y + view_height) - WINSCALE(co)))
+
 
 /*
  * Prototypes from the paint*.c files.
