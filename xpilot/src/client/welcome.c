@@ -474,25 +474,26 @@ static int Localnet_cb(int widget, void *user_data, const char **text)
 	    button_y =
 		label_y * 2 + label_height + i * (button_height + label_y);
 	    button =
-	      Widget_create_label(subform_widget, button_x, button_y,
-				  button_width, button_height, true, 1,
-				  localnet_conpars[i].server_name);
+	      Widget_create_colored_label(subform_widget, button_x, button_y,
+				          button_width, button_height, true, 1,
+					  2, 0,
+				           localnet_conpars[i].server_name);
 	    
 
-	    button2_x = button_x + button_width + button_x;
-	    button2_y = button_y;
-	    button2_width = XTextWidth(buttonFont, "Status", 6) + 40;
-	    button2_height = buttonFont->ascent + buttonFont->descent + 10;
-	    button2 =
-	      Widget_create_activate(subform_widget,
-				     button2_x, button2_y,
-				     button2_width, button2_height,
-				     1, "Status",
-				     Local_status_cb,
-				     (void *) &localnet_conpars[i]);
+	    /* button2_x = button_x + button_width + button_x;
+	    /* button2_y = button_y;
+	    /* button2_width = XTextWidth(buttonFont, "Status", 6) + 40;
+	    /* button2_height = buttonFont->ascent + buttonFont->descent + 10;
+	    /* button2 =
+	    /*  Widget_create_activate(subform_widget,
+	    /*			     button2_x, button2_y,
+	    /*			     button2_width, button2_height,
+	    /*	 		     1, "Status",
+	    /*			     Local_status_cb,
+	    /* 			     (void *) &localnet_conpars[i]);  */
 
-	    button3_x = button2_x + button2_width + button_x;
-	    button3_y = button2_y;
+	    button3_x = button_x + button_width + button_x;
+	    button3_y = button_y;
 	    button3_width = XTextWidth(buttonFont, "Join game", 7) + 40;
 	    button3_height = buttonFont->ascent + buttonFont->descent + 10;
 	    button3 =
@@ -1980,6 +1981,21 @@ static int Internet_cb(int widget, void *user_data, const char **text)
     return 0;
 }
 
+
+/*
+ * User pressed the Configure button.
+ */
+static int Configure_cb(int widget, void *user_data, const char **text)
+{
+    Connect_param_t *conpar = (Connect_param_t *) user_data;
+
+    (void)widget; (void)text;
+
+    Config(true, CONFIG_DEFAULT);
+
+    return 0;
+}
+
 /*
  * User pressed the Server button.
  */
@@ -2055,6 +2071,7 @@ static int Welcome_create_windows(Connect_param_t * conpar)
     struct MyButton my_buttons[] = {
 	{"Local", Localnet_cb},
 	{"Internet", Internet_cb},
+	/*	{"Config", Configure_cb}, */
 #if 0
 /* XXX TODO add server page to select a map and start a server. */
 	{"Server", Server_cb},
@@ -2124,6 +2141,8 @@ static int Welcome_create_windows(Connect_param_t * conpar)
     if (subform_widget == NO_WIDGET)
 	return -1;
     Widget_set_background(subform_widget, BLACK);
+
+   
 
     Widget_map_sub(form_widget);
     XMapSubwindows(dpy, topWindow);
@@ -2265,24 +2284,18 @@ static int Welcome_process_one_event(XEvent * event,
 	    switch (welcome_mode) {
 	    case ModeInternet:
 	    case ModeStatus:
-		Welcome_destroy_windows();
-		Delete_server_list();
-		if (Welcome_create_windows(conpar) == -1)
+	      	Welcome_destroy_windows(); 
+
+	      	if (Welcome_create_windows(conpar) == -1)
 		    return -1;
-
-		Welcome_set_mode(ModeInternet);
-
-		/* Popup an initial server list */
-		if (Get_meta_data() > 0) {
-
-		    if (Welcome_sort_server_list() == -1) {
-			Welcome_create_label(1, "Not enough memory.");
-		    }
-		    server_it = List_begin(server_list);
-		    Welcome_show_server_list(conpar);
+	      
+	      Welcome_set_mode(ModeInternet); 
+	      server_it = List_begin(server_list);
+	      Welcome_show_server_list(conpar);
+	      /*
 		}
-		break;
-
+		break; */
+	      break;
 	    case ModeLocalnet:
 		Welcome_destroy_windows();
 		Delete_server_list();
@@ -2346,18 +2359,8 @@ static int Welcome_input_loop(Connect_param_t * conpar)
 
     Welcome_set_mode(ModeInternet);
 
-    /* Popup an initial server list */
-    if (Get_meta_data() > 0) {
-
-	if (Welcome_sort_server_list() == -1) {
-	    Delete_server_list();
-	    Welcome_create_label(1, "Not enough memory.");
-	}
-	server_it = List_begin(server_list);
-	Welcome_show_server_list(conpar);
-    }
-
     /* Start main loop */
+    Welcome_create_label(1, "Welcome to improved XPilot!");
 
     while (!quitting && !joining) {
 	XNextEvent(dpy, &event);
