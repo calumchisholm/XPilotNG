@@ -316,12 +316,9 @@ static void Player_toggle_compass(player_t *pl)
 {
     int i, k, ind = GetInd(pl->id);
 
-    if (!BIT(pl->have, HAS_COMPASS))
-	return;
+    TOGGLE_BIT(pl->used, USES_COMPASS);
 
-    TOGGLE_BIT(pl->used, HAS_COMPASS);
-
-    if (!BIT(pl->used, HAS_COMPASS))
+    if (!Player_uses_compass(pl))
 	return;
 
     /*
@@ -398,15 +395,8 @@ void Pause_player(player_t *pl, bool on)
 	 * kps - possibly add option to make items reset
 	 * to initial when pausing
 	 */
-	if (options.pauseResetsItems) {
-	    world_t *world = pl->world;
-	    int i;
-
-	    for (i = 0; i < NUM_ITEMS; i++) {
-		if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
-		    pl->item[i] = world->items[i].initial;
-	    }
-	}
+	if (options.pauseResetsItems)
+	    Player_init_items(pl);
 #endif
 
 	pl->forceVisible	= 0;
@@ -419,13 +409,6 @@ void Pause_player(player_t *pl, bool on)
 	pl->stunned		= 0;
 	pl->lock.distance	= 0;
 	pl->used		= DEF_USED;
-
-#if 0
-	pl->have	= DEF_HAVE;
-	pl->used	|= DEF_USED;
-	pl->used	&= ~(USED_KILL);
-	pl->used	&= pl->have;
-#endif
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (world->teams[i].SwapperId == pl->id)

@@ -95,7 +95,7 @@ extern bool		updateScores;
 #define HAS_SHIELD		(1U<<25)
 #define USES_REFUEL		(1U<<24)
 #define USES_REPAIR		(1U<<23)
-#define HAS_COMPASS		(1U<<22)
+#define USES_COMPASS		(1U<<22)
 #define USES_CONNECTOR		(1U<<20)
 #define HAS_EMERGENCY_SHIELD	(1U<<19)
 #define USES_DEFLECTOR		(1U<<18)
@@ -533,6 +533,13 @@ static inline bool Players_are_allies(player_t *pl1, player_t *pl2)
 static inline bool Player_uses_autopilot(player_t *pl)
 {
     if (BIT(pl->used, USES_AUTOPILOT))
+	return true;
+    return false;
+}
+
+static inline bool Player_uses_compass(player_t *pl)
+{
+    if (BIT(pl->used, USES_COMPASS))
 	return true;
     return false;
 }

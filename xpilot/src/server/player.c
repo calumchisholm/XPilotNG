@@ -1637,7 +1637,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->have	= DEF_HAVE;
     pl->used	|= DEF_USED;
     pl->used	&= ~(USED_KILL);
-    pl->used	&= pl->have;
+    /*pl->used	&= pl->have;*/
 }
 
 /* determines if two players are immune to eachother */

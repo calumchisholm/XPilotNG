@@ -335,7 +335,8 @@ static int Frame_status(connection_t *conn, player_t *pl)
      */
 
     CLR_BIT(pl->lock.tagged, LOCK_VISIBLE);
-    if (BIT(pl->lock.tagged, LOCK_PLAYER) && BIT(pl->used, HAS_COMPASS)) {
+    if (BIT(pl->lock.tagged, LOCK_PLAYER)
+	&& Player_uses_compass(pl)) {
 	player_t *lock_pl = Player_by_id(pl->lock.pl_id);
 
 	lock_id = pl->lock.pl_id;
@@ -1008,7 +1009,7 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 		&& Wrap_length(pl->pos.cx - pos.cx,
 			       pl->pos.cy - pos.cy) > pl->sensor_range * CLICK)
 		continue;
-	    if (BIT(pl->used, HAS_COMPASS)
+	    if (Player_uses_compass(pl)
 		&& BIT(pl->lock.tagged, LOCK_PLAYER)
 		&& GetInd(pl->lock.pl_id) == i
 		&& frame_loops_slow % 5 >= 3)
