@@ -15,8 +15,8 @@ AM_CONFIG_HEADER(config.h)
 
 dnl  Copyright & stuff.
 AC_SUBST([XP_AUTHORS],["Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
-AC_SUBST([XP_COPYRIGHTDATE],["1991-2003"])
-AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2003 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
+AC_SUBST([XP_COPYRIGHTDATE],["1991-2004"])
+AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2004 by Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
 AC_SUBST([XP_RELEASEDATE],["Sep 4, 2003"])
 AC_SUBST([XP_INSTLIBDIR],$prefix/lib/xpilot)
 AC_SUBST([XP_TITLE],["XPilot 4.5.4X2"])
