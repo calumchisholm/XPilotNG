@@ -2258,10 +2258,10 @@ int Send_mine(connection_t *connp, int cx, int cy, int teammine, int id)
 			 teammine, id);
 }
 
-int Send_target(connection_t *connp, int num, int dead_time, int damage)
+int Send_target(connection_t *connp, int num, int dead_time, double damage)
 {
     return Packet_printf(&connp->w, "%c%hu%hu%hu", PKT_TARGET,
-			 num, dead_time, damage);
+			 num, dead_time, (int)damage);
 }
 
 int Send_wormhole(connection_t *connp, int cx, int cy)

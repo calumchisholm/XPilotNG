@@ -252,8 +252,7 @@ static void PlayerCollision(void)
 			Player_add_fuel(pl, ED_PL_CRASH);
 			Item_damage(pl, destroyItemInCollisionProb);
 		    }
-		    if (BIT(pl_j->used, (HAS_SHIELD|
-					       HAS_EMERGENCY_SHIELD)) !=
+		    if (BIT(pl_j->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) !=
 			(HAS_SHIELD|HAS_EMERGENCY_SHIELD)) {
 			Player_add_fuel(pl_j, ED_PL_CRASH);
 			Item_damage(pl_j, destroyItemInCollisionProb);
@@ -985,10 +984,8 @@ static void Player_collides_with_mine(player *pl, object *obj)
 	 * for a low-scored-player hitting a high-scored-player's mine.
 	 * Maybe not.
 	 */
-	sc = Rate(kp->score, pl->score)
-		   * mineScoreMult;
-	Score_players(kp, sc, pl->name,
-		      pl, -sc, kp->name);
+	sc = Rate(kp->score, pl->score) * mineScoreMult;
+	Score_players(kp, sc, pl->name, pl, -sc, kp->name);
     }
     Set_message(msg);
 }

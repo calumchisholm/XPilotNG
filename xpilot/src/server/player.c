@@ -334,9 +334,9 @@ void Player_used_kill(player *pl)
  * Give player the initial number of tanks and amount of fuel.
  * Upto the maximum allowed.
  */
-static void Player_init_fuel(player *pl, long total_fuel)
+static void Player_init_fuel(player *pl, double total_fuel)
 {
-    long		fuel = total_fuel;
+    double		fuel = total_fuel;
     int			i;
 
     pl->fuel.num_tanks  = 0;
@@ -1924,7 +1924,7 @@ void Kill_player(player *pl, bool add_rank_death)
 
 void Player_death_reset(player *pl, bool add_rank_death)
 {
-    long		minfuel;
+    double		minfuel;
     int			i;
 
 
@@ -1964,7 +1964,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
     pl->warped		= 0;
     pl->lock.distance	= 0;
 
-    pl->fuel.sum       	= (long)(pl->fuel.sum*0.90);	/* Loose 10% of fuel */
+    pl->fuel.sum       	= pl->fuel.sum * 0.90;	/* Loose 10% of fuel */
     minfuel		= (World.items[ITEM_FUEL].initial * FUEL_SCALE_FACT);
     minfuel		+= (int)(rfrac() * (1 + minfuel) * 0.2f);
     pl->fuel.sum	= MAX(pl->fuel.sum, minfuel);

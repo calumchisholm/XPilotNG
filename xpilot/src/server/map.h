@@ -200,7 +200,7 @@ struct target {
     uint16_t	team;
     uint16_t	pad[1];
     double	dead_time;
-    int		damage;
+    double	damage;
     unsigned	conn_mask;
     unsigned 	update_mask;
     long	last_change;
