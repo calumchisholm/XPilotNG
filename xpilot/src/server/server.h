@@ -611,7 +611,7 @@ void World_remove_target(world_t *world, target_t *targ);
 
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, move_t *move);
-void Wormhole_remove_from_map(wormhole_t *wormhole);
+void World_remove_wormhole(world_t *world, wormhole_t *wormhole);
 
 void Team_immunity_init(void);
 void Hitmasks_init(void);

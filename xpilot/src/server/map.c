@@ -363,7 +363,7 @@ static void Verify_wormhole_consistency(world_t *world)
 
 	xpprintf("Inconsistent use of wormholes, removing them.\n");
 	for (i = 0; i < world->NumWormholes; i++)
-	    Wormhole_remove_from_map(Wormholes(world, i));
+	    World_remove_wormhole(world, Wormholes(world, i));
 	world->NumWormholes = 0;
     }
 
@@ -597,8 +597,6 @@ double Wrap_findDir(double dx, double dy)
 
 double Wrap_cfindDir(int dcx, int dcy)
 {
-    world_t *world = &World;
-
     dcx = WRAP_DCX(dcx);
     dcy = WRAP_DCY(dcy);
     return findDir((double)dcx, (double)dcy);
@@ -606,8 +604,6 @@ double Wrap_cfindDir(int dcx, int dcy)
 
 double Wrap_length(int dcx, int dcy)
 {
-    world_t *world = &World;
-
     dcx = WRAP_DCX(dcx);
     dcy = WRAP_DCY(dcy);
     return LENGTH(dcx, dcy);
@@ -835,7 +831,7 @@ void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout)
 
 void remove_temp_wormhole(world_t *world, int ind)
 {
-    Wormhole_remove_from_map(Wormholes(world, ind));
+    World_remove_wormhole(world, Wormholes(world, ind));
 
     world->NumWormholes--;
     if (ind != world->NumWormholes)

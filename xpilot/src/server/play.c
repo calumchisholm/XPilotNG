@@ -669,15 +669,13 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 #endif
 }
 
-void Wormhole_remove_from_map(wormhole_t *wormhole)
+void World_remove_wormhole(world_t *world, wormhole_t *wormhole)
 {
-    world_t *world = &World;
     blpos blk = Clpos_to_blpos(wormhole->pos);
 
     World_set_block(world, blk, wormhole->lastblock);
 }
 
-extern void Describe_group(int group);
 /*
  * Handling of group properties
  */
