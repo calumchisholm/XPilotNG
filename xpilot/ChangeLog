@@ -1,3 +1,514 @@
+2004-05-25 19:57  kps
+
+	* README, configure, configure.ac, doc/man/xpilot-ng-replay.man,
+	  doc/man/xpilot-ng-sdl.man, doc/man/xpilot-ng-server.man,
+	  doc/man/xpilot-ng-x11.man, src/common/version.h: Version is now
+	  4.6.5.  Changes compared to 4.6.4:
+
+	  Common: - shipshape bug that could crash server or client or
+	  allow bad shapes fixed
+
+	  Client:
+
+	  - bug fixed in xpilotrc parsing, e.g. in 4.6.4 this xpilotrc line
+	  could not   be parsed properly:   xpilot.msg2:#=[#t|2|/team
+	  4|/team 2] - SDL client fixes: quit button works on windows,
+	  configure menu fix - xp5 style OpenAL sound support
+
+	  Server:
+
+	  - "shots from empty space" bug fixed by uau - server ranking
+	  related changes: stats command can now show stats   of players
+	  not playing (requires giving whole nick to stats command),
+	  logout messages in rank webpage now work even after server
+	  restart
+
+2004-05-25 13:34  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h: changes to intchooser
+	  and doublechooser widgets tap (button 2) on doublechoosers should
+	  give 0.01 now always intchooser widgets scrolling function from
+	  button 1 press should be more easy to use
+
+2004-05-24 19:13  kps
+
+	* src/server/rank.h: Rank_nuke_score is gone.
+
+2004-05-24 17:17  kps
+
+	* src/server/: command.c, rank.c: Stats command now allows
+	  abbreviated nicks for players that are currently on the server.
+	  Removed nuke command. Proper implementation would be something
+	  like /setscore or /setstats command.
+
+2004-05-23 21:24  juhal
+
+	* src/client/oalaudio.c: removed some cleanup calls (on linux)
+	  which caused hang/segfault
+
+2004-05-23 20:47  darelcullen
+
+	* src/client/xinit.c: oops forgot to check dpy when calling Change
+	  pointer control
+
+2004-05-23 17:38  kps
+
+	* src/server/shot.c: Make dropped mines be affected by gravity.
+
+2004-05-23 17:37  kps
+
+	* src/server/option.c: Add some more warnings about obsolete
+	  options.
+
+2004-05-23 00:52  uau
+
+	* src/server/event.c: Reset player state properly when pausing.
+
+2004-05-23 00:40  kps
+
+	* src/server/shot.c: Added Player_can_place_mine() inline function.
+	  Note that previously players could lay mines while phased if
+	  shieldedMining is true. Player_can_place_mine() doesn't allow
+	  that.
+
+2004-05-22 23:47  kps
+
+	* src/server/shot.c: Added Player_can_fire_shot().
+
+2004-05-22 22:36  kps
+
+	* src/server/: command.c, contact.c, server.h: Use
+	  Get_player_by_name() when kicking players in text interface.
+
+2004-05-22 00:36  kps
+
+	* src/server/robotdef.c: New Wrap_length_min() to make code a bit
+	  nicer looking and more efficient.  Use it in
+	  Robot_default_play_check_map().
+
+2004-05-21 21:52  kps
+
+	* src/server/: command.c, rank.c, rank.h: Make stats command work
+	  for players who aren't playing at the moment.  Change makes it
+	  necessary to type the whole player nick to get the stats,
+	  previously one could specify the player by an unique substring of
+	  the nick.
+
+2004-05-21 19:23  kps
+
+	* src/client/option.c: Print warning for valid looking xpilotrc
+	  lines that lack a colon.  Removed old Parse_xpilotrc_line().
+
+2004-05-21 17:27  kps
+
+	* src/server/: event.c, rank.c, rank.h: Remove
+	  Rank_set_logout_message(). Instead of setting the logout message
+	  in miscellaneous places we determine what logout message to use
+	  at the time we are saving the webpage.
+
+2004-05-21 01:02  kps
+
+	* lib/maps/polybloods.xp2, lib/maps/sadistic_bastard_v2.xp2,
+	  lib/maps/teamcup.xp, src/server/cmdline.c: Use value .5 for
+	  oldthrust (constantspeed) for Blood's style fighting.
+
+2004-05-20 23:28  uau
+
+	* src/server/: cmdline.c, option.c: Fixed default value of a float
+	  option from 0 to "0", added an assert that should catch such
+	  mistakes.
+
+2004-05-20 22:13  uau
+
+	* src/server/: cmdline.c, server.h, update.c: constantSpeed option
+
+2004-05-20 21:21  uau
+
+	* src/server/: asteroid.c, cmdline.c, item.c, server.h, update.c,
+	  walls.c: Reverted unnecessarily messy oldThrust patch, will
+	  implement essentially the same functionality in another way soon
+
+2004-05-20 18:41  kps
+
+	* src/client/option.c: New implementation of Parse_xpilotrc_line,
+	  which doesn't use strtok().  The old implementation was buggy,
+	  e.g. it could not handle this line correctly:
+	  xpilot.msg2:#=[#t|2|/team 4|/team 2]
+
+2004-05-20 16:02  darelcullen
+
+	* src/client/sdl/sdlevent.c: Quit button fix.
+
+2004-05-20 15:45  darelcullen
+
+	* src/client/oalaudio.c: Windows sound support.
+
+2004-05-19 18:35  darelcullen
+
+	* src/client/sdl/sdlevent.c: Make the quit button work with the sdl
+	  even tloop
+
+2004-05-19 12:53  kps
+
+	* Makefile.in, aclocal.m4, doc/Makefile.in, doc/man/Makefile.in,
+	  lib/Makefile.in, lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/sound/Makefile.in, lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/NT/Makefile.in,
+	  src/client/NT/res/Makefile.in, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/NT/Makefile.in, src/common/NT/bindist/Makefile.in,
+	  src/replay/Makefile.in, src/replay/tools/Makefile.in,
+	  src/server/Makefile.in: Generated files with automake 1.8.5.
+
+2004-05-19 12:48  kps
+
+	* lib/sound/.cvsignore: cvs should ignore Makefile.
+
+2004-05-18 19:38  maximan
+
+	* src/server/: Makefile.in, asteroid.c, cmdline.c, item.c,
+	  server.h, update.c, walls.c: option:oldAcceleration/oldThrust
+	  todo:double&triple check all stuff concerning speeds of objects
+
+2004-05-18 17:59  kps
+
+	* src/common/shipshape.c: Removed use of inline (to make a certain
+	  compiler happy).
+
+2004-05-17 21:59  kps
+
+	* src/client/: esdaudio.c, rplayaudio.c: only audio we support now
+	  is openal.
+
+2004-05-17 18:51  kps
+
+	* Makefile.in, aclocal.m4, config.h.in, configure, doc/Makefile.in,
+	  doc/man/Makefile.in, lib/Makefile.in, lib/fonts/Makefile.in,
+	  lib/maps/Makefile.in, lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.am, src/client/Makefile.in,
+	  src/client/NT/Makefile.in, src/client/NT/res/Makefile.in,
+	  src/client/items/Makefile.in, src/client/sdl/Makefile.in,
+	  src/common/Makefile.in, src/common/NT/Makefile.in,
+	  src/common/NT/bindist/Makefile.in, src/replay/Makefile.in,
+	  src/replay/tools/Makefile.in, src/server/Makefile.in:
+	  xpilot-ng-x11 now links to libxpclient.a.
+
+2004-05-17 18:50  kps
+
+	* src/client/option.c: Wrote some comments about
+	  Parse_xpilotrc_line().
+
+2004-05-16 20:16  juhal
+
+	* lib/sound/sounds.txt: decreased thrust volume because it is
+	  horrible at 50 fps
+
+2004-05-16 15:50  juhal
+
+	* src/client/oalaudio.c: added support for OpenAL sound
+
+2004-05-16 15:42  juhal
+
+	* Makefile.in, aclocal.m4, config.h.in, configure, configure.ac,
+	  doc/Makefile.in, doc/man/Makefile.in, lib/Makefile.am,
+	  lib/Makefile.in, lib/sounds.txt, lib/fonts/Makefile.in,
+	  lib/maps/Makefile.in, lib/sound/Drop01.wav,
+	  lib/sound/Makefile.am, lib/sound/Makefile.in,
+	  lib/sound/MusicaDefault.wav, lib/sound/RobotzDefault.wav,
+	  lib/sound/RobotzQuestion.wav, lib/sound/UtopiaClose.wav,
+	  lib/sound/bfire.wav, lib/sound/bloop.wav, lib/sound/buzzer.wav,
+	  lib/sound/confirm.wav, lib/sound/corkpop.wav, lib/sound/done.wav,
+	  lib/sound/doorchimes.wav, lib/sound/explo2.wav,
+	  lib/sound/failure.wav, lib/sound/finished.wav,
+	  lib/sound/flare.wav, lib/sound/gundead.wav,
+	  lib/sound/launch1.18.wav, lib/sound/lboom.wav,
+	  lib/sound/magic.wav, lib/sound/popclick.wav, lib/sound/sboom.wav,
+	  lib/sound/sbounce.wav, lib/sound/sounds.txt,
+	  lib/sound/sstart.wav, lib/sound/success.wav,
+	  lib/sound/waiting.wav, lib/sound/zap.wav,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.am, src/client/Makefile.in,
+	  src/client/caudio.c, src/client/debugaudio.c,
+	  src/client/default.c, src/client/esdaudio.c,
+	  src/client/rplayaudio.c, src/client/xpilot.c,
+	  src/client/NT/Makefile.in, src/client/NT/res/Makefile.in,
+	  src/client/items/Makefile.in, src/client/sdl/Makefile.am,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/NT/Makefile.in, src/common/NT/bindist/Makefile.in,
+	  src/replay/Makefile.in, src/replay/tools/Makefile.in,
+	  src/server/Makefile.in: added support for OpenAL sound
+
+2004-05-13 15:26  kps
+
+	* src/common/shipshape.c: Changed remaining GRID macros to
+	  functions.
+
+2004-05-13 13:37  kps
+
+	* src/server/walls.c: Try to make shoves live longer when fps >
+	  gamespeed.
+
+2004-05-12 21:21  kps
+
+	* src/common/shipshape.c: Improved some warning messages. Changed
+	  some macros to functions.
+
+2004-05-12 19:51  kps
+
+	* src/common/shipshape.c: Fixed bug which could crash client or
+	  server if some point defined in shipshape was outside the grid
+	  defined in the code.
+
+2004-05-11 18:00  kps
+
+	* src/server/update.c: Code to measure distance travelled (have to
+	  turn if(0) to if(1) to use).	Code will be removed after ship
+	  thrust issues have been investigated.
+
+2004-05-11 17:57  kps
+
+	* src/server/cmdline.c: Set default shipMass back to 20.
+
+2004-05-07 21:37  kps
+
+	* src/common/shipshape.c: Disable shipshapes due to bug.
+
+2004-05-04 11:48  kps
+
+	* src/server/: cmdline.c, server.h, serverconst.h: Added option
+	  which can be used to modify afterburner power.
+
+2004-04-29 12:20  maximan
+
+	* src/client/sdl/sdlevent.c: [no log message]
+
+2004-04-28 20:29  maximan
+
+	* src/client/: default.c, netclient.h, xevent.c, sdl/sdlevent.c:
+	  bugfixes and maxMouseTurnsPF is now maxMouseTurnsPS (max turns
+	  per second) set to 0 to work as normal)
+
+2004-04-28 20:06  maximan
+
+	* src/client/: xevent.c, sdl/gameloop.c, sdl/sdlevent.c: [no log
+	  message]
+
+2004-04-28 18:38  maximan
+
+	* src/client/: default.c, join.c, meta.c, netclient.h, xevent.c,
+	  xevent.h, sdl/gameloop.c, sdl/gameloop_x.c, sdl/sdlevent.c: new
+	  option maxMouseTurnsPF (client) set to 0 things work as normal.
+	  otherwise the client will only send mouse events every
+	  1/(maxMouseTurnsPF*MIN(maxFPS,FPS) seconds.  (limits outgoing
+	  traffic alot, useful on modem)
+
+2004-04-28 02:09  uau
+
+	* src/client/netclient.c: Changed keyboard state resends so that
+	  the state is only resent max once per frame received from server.
+	  Before it was resent every time another packet was sent until the
+	  server acked it, and mouse control can create lots of small
+	  packets.
+
+2004-04-27 23:41  maximan
+
+	* src/: client/sdl/glwidgets.c, server/play.c: Save button now only
+	  appears when you press 'config' on the menu.
+
+2004-04-27 00:40  kps
+
+	* Makefile.in, README, aclocal.m4, configure, configure.ac,
+	  doc/Makefile.in, doc/man/Makefile.in, lib/Makefile.in,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/NT/Makefile.in,
+	  src/client/NT/res/Makefile.in, src/client/items/Makefile.in,
+	  src/client/sdl/Makefile.in, src/common/Makefile.in,
+	  src/common/version.h, src/common/NT/Makefile.in,
+	  src/common/NT/bindist/Makefile.in, src/replay/Makefile.in,
+	  src/replay/tools/Makefile.in, src/server/Makefile.in: Generated
+	  files with automake 1.8.4-1
+
+2004-04-27 00:26  kps
+
+	* doc/man/: xpilot-ng-sdl.man, xpilot-ng-x11.man: Changes for
+	  4.6.4.
+
+2004-04-27 00:18  kps
+
+	* src/client/event.c: more setting changes, e.g. a and s don't turn
+	  any more.
+
+2004-04-27 00:12  kps
+
+	* src/client/NT/res/.cvsignore: Ignore Makefile
+
+2004-04-27 00:01  kps
+
+	* src/client/default.c: Moved alt settings close to the end with
+	  other useless options.
+
+2004-04-26 23:30  kps
+
+	* src/client/NT/.cvsignore: ignore Makefile
+
+2004-04-26 22:18  kps
+
+	* src/client/option.c: Add space after comment char in commented
+	  options.
+
+2004-04-26 21:27  kps
+
+	* src/client/widget.c: Callback should be called, even for color
+	  widgets.
+
+2004-04-26 20:52  darelcullen
+
+	* src/client/bitmaps.c: fixed mfc errors.
+
+2004-04-26 19:44  kps
+
+	* src/common/xpcommon.h: Define PACKAGE_BUGREPORT on windoze.
+
+2004-04-25 21:34  kps
+
+	* Makefile.am, Makefile.in, configure, configure.ac,
+	  src/client/Makefile.am, src/client/Makefile.in,
+	  src/client/NT/Makefile.am, src/client/NT/Makefile.in,
+	  src/client/NT/res/Makefile.am, src/client/NT/res/Makefile.in,
+	  src/client/sdl/Makefile.am, src/client/sdl/Makefile.in,
+	  src/common/Makefile.am, src/common/Makefile.in,
+	  src/common/NT/Makefile.am, src/common/NT/Makefile.in,
+	  src/common/NT/bindist/Makefile.am,
+	  src/common/NT/bindist/Makefile.in: Added windoze sources and
+	  stuff to EXTRA_DIST.
+
+2004-04-25 20:07  kps
+
+	* Makefile.in, README, aclocal.m4, config.h.in, configure,
+	  configure.ac, doc/Makefile.in, doc/man/Makefile.in,
+	  doc/man/xpilot-ng-sdl.man, doc/man/xpilot-ng-server.man,
+	  doc/man/xpilot-ng-x11.man, lib/Makefile.in,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/event.c,
+	  src/client/items/Makefile.in, src/client/sdl/Makefile.in,
+	  src/common/Makefile.in, src/common/version.h,
+	  src/replay/Makefile.in, src/replay/tools/Makefile.in,
+	  src/server/Makefile.in: Version is now 4.6.3.  Changes compared
+	  to 4.6.2: - new option loading and saving code.  - A lot of
+	  changed options, e.g.    - quit on Esc    - kbd steering on arrow
+	  keys	- newbie help messages if option newbie is true - SDL
+	  client changes, including new fonts - bugfixes, e.g. clusters
+	  talk bug fix - polybloods has less "glue" on walls now
+	  (playerwallbrake option 0.5 changed to 0.6)
+
+2004-04-25 19:32  maximan
+
+	* Makefile.in, aclocal.m4, config.h.in, configure, doc/Makefile.in,
+	  doc/man/Makefile.in, lib/Makefile.in, lib/fonts/Makefile.in,
+	  lib/maps/Makefile.in, lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.in, src/client/items/Makefile.in,
+	  src/common/Makefile.in, src/replay/Makefile.in,
+	  src/replay/tools/Makefile.in, src/server/Makefile.in: [no log
+	  message]
+
+2004-04-25 19:30  maximan
+
+	* src/client/sdl/: Makefile.in, sdlinit.c: stupid bugfix, info
+	  string of mapFontSize was wrong
+
+2004-04-25 18:49  juhal
+
+	* lib/fonts/: Makefile.am, Test.ttf, defaultfont.bmp: removed
+	  unused fonts
+
+2004-04-25 18:39  juhal
+
+	* src/client/sdl/sdlinit.c: changed default font
+
+2004-04-25 18:34  juhal
+
+	* lib/fonts/FreeSansBoldOblique.ttf: this replaces the Test.ttf
+	  that might have licensing problems
+
+2004-04-25 17:59  kps
+
+	* AUTHORS: Change Improved XPilot to XPilot NG.
+
+2004-04-25 17:55  maximan
+
+	* src/client/: event.c, sdl/glwidgets.c, sdl/glwidgets.h,
+	  sdl/sdlevent.c, sdl/sdlgui.c, sdl/sdlinit.c, sdl/text.h:
+	  Bugfixes, tweaks.  new option '-TTFont <string>' for user
+	  specified font. (reverts to default font) conf menu
+	  appears/disappears with pointercontrol now instead of clicking
+	  the background.
+
+2004-04-25 17:54  kps
+
+	* src/client/option.c: Save default values as commented when saving
+	  xpilotrc.  Use CR LF when saving on windows.
+
+2004-04-25 16:31  kps
+
+	* lib/maps/polybloods.xp2: Remove some glue from walls.
+
+2004-04-25 15:56  kps
+
+	* src/client/option.c: Do audioInit at end of Parse_options.
+	  Removed some unused code.
+
+2004-04-25 15:45  kps
+
+	* src/client/option.c: Call set function even if option value is
+	  empty, remove cluttering comments for saved option values.
+
+2004-04-25 15:43  kps
+
+	* src/client/event.c: Set F11 to be keyToggleRadarScore, Shift_R to
+	  keyDropBall.
+
+2004-04-25 15:17  kps
+
+	* src/client/: default.c, xdefault.c: Changed some defaults:
+	  mouseAccelInClient->true, sparkSize->2 (looks cooler),
+	  messageFont back to old default.
+
+2004-04-25 14:45  kps
+
+	* src/client/: client.h, colors.c, xdefault.c, xevent.c, xinit.c,
+	  xinit.h, xpaint.c: Added Set_fontName function which removes
+	  whitespace from font specifications.	Moved externs to header
+	  files.
+
+2004-04-25 14:43  kps
+
+	* src/client/option.c: Fix warning.
+
+2004-04-25 14:40  kps
+
+	* src/server/: asteroid.c, netserver.c, target.c, wormhole.c: Fix
+	  warnings. Don't place new asteroids too close to player.
+
+2004-04-25 14:00  kps
+
+	* src/client/: colors.c, xinit.h: Make color_names static.
+
+2004-04-25 13:55  kps
+
+	* src/client/colors.c: Remove whitespace from color definition in
+	  Parse_colors, not in Set_color.
+
+2004-04-25 13:37  kps
+
+	* src/client/colors.c: Remove whitespace from color values because
+	  X functions don't like it.
+
+2004-04-25 01:26  darelcullen
+
+	* ChangeLog:  Changelog updates
+
 2004-04-25 01:16  kps
 
 	* doc/man/: xpilot-ng-sdl.man, xpilot-ng-x11.man: defaults changed,
