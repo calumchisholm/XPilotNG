@@ -54,12 +54,12 @@
 <Option name="sparkswallbounce" value="yes"/>
 
 </GeneralOptions>
-<Edgestyle id="xpbluehidden" width="-1" color="4E7CFF" style="0"/>
+<Edgestyle id="xpblue" width="2" color="4E7CFF" style="0"/>
 <Edgestyle id="xpredhidden" width="-1" color="FF3A27" style="0"/>
 <Edgestyle id="yellow" width="2" color="FFFF00" style="0"/>
 <Edgestyle id="white" width="2" color="FFFFFF" style="0"/>
 <Edgestyle id="invisiedge" width="-1" color="0" style="0"/>
-<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluehidden" flags="1"/>
+<Polystyle id="xpblue" color="4E7CFF" defedge="xpblue" flags="1"/>
 <Polystyle id="xpred" color="FF3A27" defedge="xpredhidden" flags="1"/>
 <Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>
 <Polystyle id="emptywhite" color="FF" defedge="white" flags="0"/>
@@ -69,12 +69,12 @@
 <Offset x="-2240" y="2240"/>
 <Offset x="0" y="42560"/>
 <Offset x="-163520" y="0" style="internal"/>
-<Offset x="0" y="-42560" style="xpbluehidden"/>
+<Offset x="0" y="-42560" style="xpblue"/>
 <Offset x="-2240" y="-2240"/>
 <Offset x="0" y="-154560" style="internal"/>
-<Offset x="2240" y="-2240" style="xpbluehidden"/>
+<Offset x="2240" y="-2240" style="xpblue"/>
 <Offset x="163520" y="0" style="internal"/>
-<Offset x="2240" y="2240" style="xpbluehidden"/>
+<Offset x="2240" y="2240" style="xpblue"/>
 <Offset x="33600" y="0"/>
 <Offset x="0" y="154560" style="internal"/>
 </Polygon>
