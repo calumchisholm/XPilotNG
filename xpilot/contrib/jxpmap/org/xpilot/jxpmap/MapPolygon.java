@@ -98,12 +98,16 @@ public class MapPolygon extends MapObject {
 
     public boolean isCounterClockwise () {
 
-        long area = 0;
+        long xi,yi,xj,yj,area = 0;
         int i, j;
 
-        for (i = polygon.npoints - 1, j = 0; j < polygon.npoints; i = j, j++)
-            area += polygon.xpoints[i] * polygon.ypoints[j] -
-                polygon.xpoints[j] * polygon.ypoints[i];
+        for (i = polygon.npoints - 1, j = 0; j < polygon.npoints; i = j, j++) {
+            xi = polygon.xpoints[i];
+            xj = polygon.xpoints[j];
+            yi = polygon.ypoints[i];
+            yj = polygon.ypoints[j];
+            area += xi * yj - xj * yi;
+        }
 
         return (area > 0);
     }
