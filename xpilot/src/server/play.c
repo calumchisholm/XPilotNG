@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -68,13 +68,10 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
     if (BIT(World.rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < NumPlayers; i++) {
 	    if (IS_TANK_IND(i)
-		|| (BIT(Players[i]->status, PAUSE)
-		    && Players[i]->count <= 0)
+		|| (BIT(Players[i]->status, PAUSE) && Players[i]->count <= 0)
 		|| (BIT(Players[i]->status, GAME_OVER)
-		    && Players[i]->mychar == 'W'
-		    && Players[i]->score == 0)) {
+		    && Players[i]->mychar == 'W'))
 		continue;
-	    }
 	    if (Players[i]->team == td->team) {
 		lose_score += Players[i]->score;
 		lose_team_members++;
@@ -112,10 +109,8 @@ int Punish_team(int ind, int t_destroyed, int cx, int cy)
 	    || (BIT(Players[i]->status, PAUSE)
 		&& Players[i]->count <= 0)
 	    || (BIT(Players[i]->status, GAME_OVER)
-		&& Players[i]->mychar == 'W'
-		&& Players[i]->score == 0)) {
+		&& Players[i]->mychar == 'W'))
 	    continue;
-	}
 	if (Players[i]->team == td->team) {
 	    SCORE(i, -sc, cx, cy, "Treasure: ");
 	    Rank_LostBall(Players[i]);
@@ -250,7 +245,7 @@ void Ball_is_replaced(ballobject *ball)
 
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
-    
+
     SCORE(GetInd[pl->id], 5, ball->pos.cx, ball->pos.cy, "Treasure: ");
     sprintf(msg, " < %s (team %d) has replaced the treasure >",
 	    pl->name, pl->team);
@@ -575,4 +570,3 @@ void Groups_init(void)
     Target_init();
     Team_immunity_init();
 }
-
