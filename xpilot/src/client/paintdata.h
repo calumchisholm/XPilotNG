@@ -35,12 +35,18 @@
 #define MAX_COLOR_LEN 32 /* Max. length of a color name */
 #endif
 
-#define RESET_FG()	(current_foreground = -1)
-#define SET_FG(PIXEL)				\
-    if ((PIXEL) == current_foreground) ;	\
-    else XSetForeground(dpy, gameGC, current_foreground = (PIXEL))
-
 extern unsigned long	current_foreground;
+
+static inline void RESET_FG(void)
+{
+    current_foreground = -1;
+}
+
+static inline void SET_FG(unsigned long fg)
+{
+    if (fg != current_foreground)
+	XSetForeground(dpy, gameGC, current_foreground = fg);
+}
 
 extern XRectangle	*rect_ptr[MAX_COLORS];
 extern int		num_rect[MAX_COLORS], max_rect[MAX_COLORS];
