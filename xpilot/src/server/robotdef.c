@@ -139,8 +139,10 @@ static inline bool Gravity_is_strong(player_t *pl, clpos_t pos, int travel_dir)
 
     grav = World_gravity(world, pos);
     if (sqr(grav.x) + sqr(grav.y) >= 0.5) {
-	gravity_dir = (int)findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
-				   grav.y - CLICK_TO_PIXEL(pl->pos.cy));
+	double gdir = findDir(grav.x - CLICK_TO_PIXEL(pl->pos.cx),
+			      grav.y - CLICK_TO_PIXEL(pl->pos.cy));
+
+	gravity_dir = MOD2((int) (gdir + 0.5), RES);
 	if (MOD2(gravity_dir - travel_dir, RES) <= RES / 4 ||
 	    MOD2(gravity_dir - travel_dir, RES) >= 3 * RES / 4)
 	    return true;
@@ -405,13 +407,16 @@ static void Robot_default_invite(player_t *pl, player_t *inviter)
 static inline int decide_travel_dir(player_t *pl)
 {
     world_t *world = pl->world;
+    double gdir;
 
     if (pl->velocity <= 0.2) {
 	vector_t grav = World_gravity(world, pl->pos);
 
-	return (int)findDir(grav.x, grav.y);
-    }
-    return (int)findDir(pl->vel.x, pl->vel.y);
+	gdir = findDir(grav.x, grav.y);
+    } else
+	gdir = findDir(pl->vel.x, pl->vel.y);
+
+    return MOD2((int) (gdir + 0.5), RES);
 }
 
 
@@ -494,11 +499,14 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
     }
 
     if (mine_i >= 0) {
+	double adir;
+
 	shot = Obj[mine_i];
-	aux_dir = (int)Wrap_cfindDir(shot->pos.cx + PIXEL_TO_CLICK(shot->vel.x)
-				     - pl->pos.cx,
-				     shot->pos.cy + PIXEL_TO_CLICK(shot->vel.y)
-				     - pl->pos.cy);
+	adir = Wrap_cfindDir(shot->pos.cx + PIXEL_TO_CLICK(shot->vel.x)
+			     - pl->pos.cx,
+			     shot->pos.cy + PIXEL_TO_CLICK(shot->vel.y)
+			     - pl->pos.cy);
+	aux_dir = MOD2((int) (adir + 0.5), RES);
 	delta_dir = MOD2(aux_dir - travel_dir, RES);
 	if (delta_dir < RES / 4) {
 	    left_ok = false;
@@ -510,11 +518,14 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 	}
     }
     if (ship_i >= 0) {
+	double adir;
+
 	ship = Player_by_index(ship_i);
-	aux_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx
-				     + PIXEL_TO_CLICK(ship->vel.x * 2),
-				     ship->pos.cy - pl->pos.cy
-				     + PIXEL_TO_CLICK(ship->vel.y * 2));
+	adir = Wrap_cfindDir(ship->pos.cx - pl->pos.cx
+			     + PIXEL_TO_CLICK(ship->vel.x * 2),
+			     ship->pos.cy - pl->pos.cy
+			     + PIXEL_TO_CLICK(ship->vel.y * 2));
+	aux_dir = (int) (adir + 0.5);
 	delta_dir = MOD2(aux_dir - travel_dir, RES);
 	if (delta_dir < RES / 4) {
 	    left_ok = false;
@@ -850,7 +861,7 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 {
     int item_dir, travel_dir, delta_dir;
     int dx, dy;
-    double dist, item_dist;
+    double dist, item_dist, idir;
     bool clear_path, slowing;
     robot_default_data_t *my_data = Robot_default_get_data(pl);
     world_t *world = pl->world;
@@ -862,10 +873,15 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 
     if (dx == 0 && dy == 0) {
 	vector_t grav = World_gravity(world, pl->pos);
-	item_dir = (int)findDir(grav.x, grav.y);
+
+	idir = findDir(grav.x, grav.y);
+	item_dir = (int) (idir + 0.5);
 	item_dir = MOD2(item_dir + RES/2, RES);
-    } else
-	item_dir = (int)findDir((double)dx, (double)dy);
+    } else {
+	idir = findDir((double)dx, (double)dy);
+	item_dir = (int) (idir + 0.5);
+	item_dir = MOD2(item_dir, RES);
+    }
 
     if (new_mode == RM_REFUEL)
 	item_dist = item_dist - 90;
@@ -1101,6 +1117,7 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 static bool Check_robot_hunt(player_t *pl)
 {
     player_t *ship;
+    double sdir;
     int ship_dir, travel_dir, delta_dir, adj_dir, toofast, tooslow;
     robot_default_data_t *my_data = Robot_default_get_data(pl);
 
@@ -1115,8 +1132,9 @@ static bool Check_robot_hunt(player_t *pl)
     if (!Detect_ship(pl, ship))
 	return false;
 
-    ship_dir = (int)Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
-				  ship->pos.cy - pl->pos.cy);
+    sdir = Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
+			 ship->pos.cy - pl->pos.cy);
+    ship_dir = MOD2((int) (sdir + 0.5), RES);
 
     travel_dir = decide_travel_dir(pl);
 
@@ -1311,7 +1329,7 @@ static int Rank_item_value(player_t *pl, long itemtype)
 static bool Ball_handler(player_t *pl)
 {
     int i, closest_tr = NO_IND, closest_ntr = NO_IND;
-    double closest_tr_dist = 1e19, closest_ntr_dist = 1e19, dist;
+    double closest_tr_dist = 1e19, closest_ntr_dist = 1e19, dist, dbdir, dtdir;
     int bdir, tdir;
     bool clear_path = true;
     robot_default_data_t *my_data = Robot_default_get_data(pl);
@@ -1369,9 +1387,11 @@ static bool Ball_handler(player_t *pl)
 		dist_np = dist;
 	}
 	closest_treasure = Treasure_by_index(world, closest_tr);
-	bdir = (int)findDir(ball->vel.x, ball->vel.y);
-	tdir = (int)Wrap_cfindDir(closest_treasure->pos.cx - ball->pos.cx,
-				  closest_treasure->pos.cy - ball->pos.cy);
+	dbdir = findDir(ball->vel.x, ball->vel.y);
+	dtdir = Wrap_cfindDir(closest_treasure->pos.cx - ball->pos.cx,
+			      closest_treasure->pos.cy - ball->pos.cy);
+	bdir = MOD2((int) (dbdir + 0.5), RES);
+	tdir = MOD2((int) (dtdir + 0.5), RES);
 	bbpos = Clpos_to_blkpos(ball->pos);
 	xdist = (closest_treasure->pos.cx / BLOCK_CLICKS) - bbpos.bx;
 	ydist = (closest_treasure->pos.cy / BLOCK_CLICKS) - bbpos.by;
