@@ -8,10 +8,6 @@
  * Windows mods and memory leak detection by Dick Balaska <dick@xpilot.org>.
  */
 
-#ifndef	lint
-static char sourceid[] =
-    "@(#)$Id$";
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,13 +15,14 @@ static char sourceid[] =
 #include <errno.h>
 
 #if defined(_WINDOWS)
-#	ifdef _XPILOTNTSERVER_
+#	ifdef	_XPILOTNTSERVER_
 #		include "../server/NT/winServer.h"
 		extern char *showtime(void);
 #	elif !defined(_XPMONNT_)
 #		include "NT/winX.h"
 #		include "../client/NT/winClient.h"
 #	endif
+	static void Win_show_error(char *errmsg);
 #endif
 
 #include "version.h"
@@ -33,6 +30,18 @@ static char sourceid[] =
 #include "const.h"
 #include "error.h"
 #include "portability.h"
+#include "commonproto.h"
+
+
+#undef HAVE_STDARG
+#undef HAVE_VARARG
+#ifndef _WINDOWS
+# if (defined(__STDC__) && !defined(__sun__) || defined(__cplusplus))
+#  define HAVE_STDARG 1
+# else
+#  define HAVE_VARARG 1
+# endif
+#endif
 
 
 char error_version[] = VERSION;
@@ -49,11 +58,25 @@ char error_version[] = VERSION;
 
 
 /*
- * Global data.
+ * File local static data.
  */
-#define	MAX_PROG_LENGTH	256
+#define	MAX_PROG_LENGTH	32
 static char		progname[MAX_PROG_LENGTH];
 
+
+
+static const char* prog_basename(const char *prog)
+{
+#ifndef _WINDOWS
+    char *p;
+
+    p = strrchr(prog, '/');
+
+    return (p != NULL) ? (p + 1) : prog;
+#else
+    return "xpilot";
+#endif
+}
 
 
 /*
@@ -61,87 +84,107 @@ static char		progname[MAX_PROG_LENGTH];
  */
 void init_error(const char *prog)
 {
-#ifndef _WINDOWS
-#ifdef VMS
-    char *p = strrchr(prog, ']');
-#else
-    char *p = strrchr(prog, '/');
-#endif
+    const char *p = prog_basename(prog);   /* Beautify arv[0] */
 
-    strncpy(progname, p ? p+1 : prog, MAX_PROG_LENGTH);   /* Beautify arv[0] */
-#else
-	strcpy(progname, "xpilot");
-#endif
+    strlcpy(progname, p, MAX_PROG_LENGTH);
 }
 
 
 
-#if defined(__STDC__) && !defined(__sun__) || defined(__cplusplus) || defined (_WINDOWS)
+#if HAVE_STDARG
 /*
  * Ok, let's do it the ANSI C way.
  */
 void error(const char *fmt, ...)
 {
-    va_list	 ap;			/* Argument pointer */
-    int		 e = errno;		/* Store errno */
-#ifdef _WINDOWS
-	char	s[512];
-#endif
-#ifdef VMS
-    if (e == EVMSERR)
-	e = 0/*__gnu_vaxc_errno__*/;
-#endif
+    va_list	 ap;
+    int		 e = errno;
 
     va_start(ap, fmt);
 
-    if (progname[0] != '\0')
+    if (progname[0] != '\0') {
 	fprintf(stderr, "%s: ", progname);
+    }
 
-#ifdef _WINDOWS
-    vsprintf(s, fmt, ap);
-#else
     vfprintf(stderr, fmt, ap);
-#endif
 
-    if (e != 0)
-	fprintf(stderr, " (%s)", strerror(e));
-
-
-#ifdef _WINDOWS
-	IFWINDOWS( Trace("Error: %s\n", s); )
-/*	inerror = TRUE; */
-	{
-#		ifdef _XPILOTNTSERVER_
-		/* putting up a message box on the server is a bad thing.
-		   It kinda halts the server, which is a bad thing to do for
-		   the simple info messages (nick in use) that call this routine
-		*/
-		xpprintf("%s %s\n", showtime(), s);
-#		else
- 		if (MessageBox(NULL, s, "Error", MB_OKCANCEL | MB_TASKMODAL) == IDCANCEL)
-		{
-#			ifdef _XPMON_
-				xpmemShutdown();
-#			endif
-			ExitProcess(1);
-		}
-#		endif
-	}
-#else
+    if (e != 0) {
+	fprintf(stderr, ": (%s)", strerror(e));
+    }
     fprintf(stderr, "\n");
-#endif
+
     va_end(ap);
 }
 
-#else
+void warn(const char *fmt, ...)
+{
+    int		len;
+    va_list	ap;
 
+    va_start(ap, fmt);
+
+    if (progname[0] != '\0') {
+	fprintf(stderr, "%s: ", progname);
+    }
+
+    vfprintf(stderr, fmt, ap);
+
+    len = strlen(fmt);
+    if (len == 0 || fmt[len - 1] != '\n') {
+	fprintf(stderr, "\n");
+    }
+
+    va_end(ap);
+}
+
+void fatal(const char *fmt, ...)
+{
+    va_list	 ap;
+
+    va_start(ap, fmt);
+
+    if (progname[0] != '\0') {
+	fprintf(stderr, "%s: ", progname);
+    }
+
+    vfprintf(stderr, fmt, ap);
+
+    fprintf(stderr, "\n");
+
+    va_end(ap);
+
+    exit(1);
+}
+
+void dumpcore(const char *fmt, ...)
+{
+    va_list	 ap;
+
+    va_start(ap, fmt);
+
+    if (progname[0] != '\0') {
+	fprintf(stderr, "%s: ", progname);
+    }
+
+    vfprintf(stderr, fmt, ap);
+
+    fprintf(stderr, "\n");
+
+    va_end(ap);
+
+    abort();
+}
+
+#endif
+
+
+#if HAVE_VARARG
 /*
  * Hm, we'd better stick to the K&R way.
  */
 void
     error(va_alist)
-va_dcl		/* Note that the format argument cannot be separately	*
-		 * declared because of the definition of varargs.	*/
+va_dcl
 {
     va_list	 args;
     int		 e = errno;		/* Store errno */
@@ -166,141 +209,159 @@ va_dcl		/* Note that the format argument cannot be separately	*
     va_end(args);
 }
 
+void
+    warn(va_alist)
+va_dcl
+{
+    va_list	 args;
+    char	*fmt;
+
+
+    va_start(args);
+
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: ", progname);
+
+    fmt = va_arg(args, char *);
+    (void) vfprintf(stderr, fmt, args);
+
+    fprintf(stderr, "\n");
+
+    va_end(args);
+}
+
+void
+    fatal(va_alist)
+va_dcl
+{
+    va_list	 args;
+    char	*fmt;
+
+
+    va_start(args);
+
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: ", progname);
+
+    fmt = va_arg(args, char *);
+    (void) vfprintf(stderr, fmt, args);
+
+    fprintf(stderr, "\n");
+
+    va_end(args);
+
+    exit(1);
+}
+
+void
+    dumpcore(va_alist)
+va_dcl
+{
+    va_list	 args;
+    char	*fmt;
+
+
+    va_start(args);
+
+    if (progname[0] != '\0')
+	fprintf(stderr, "%s: ", progname);
+
+    fmt = va_arg(args, char *);
+    (void) vfprintf(stderr, fmt, args);
+
+    fprintf(stderr, "\n");
+
+    va_end(args);
+
+    abort();
+}
+
 #endif
 
-/***************************************************************************\
-* memory management stuff - i.e. debug leak detection						*
-\***************************************************************************/
-#if	defined(_DEBUG)
-#define	MAXMEMPOD	1000				/* number of entries in each list */
-typedef struct	mempod {
-	void*	mem;	/* address returned */
-	size_t	size;	/* size of request */
-	char*	file;	/* file that malloced the memory */
-	int		line;	/* line number of the malloc */
-} mempod;
 
-typedef	struct memlink memlink;
-typedef struct memlink {
-	memlink*	nextlink;
-	int			nextslot;
-	mempod		mem[MAXMEMPOD];
-};
-
-memlink*	memanchor = NULL;
-memlink*	curmemblock = NULL;
-
-#undef	malloc
-#undef	realloc
-#undef	free
-#undef	strdup
-
-void*	xpmalloc(size_t amount, char* file, int line)
+#ifdef _WINDOWS
+static void Win_show_error(char *s)
 {
-	void*	tptr;
-	tptr = malloc(amount);
-
-	if (!memanchor)
+    IFWINDOWS( Trace("Error: %s\n", s); )
+/*  inerror = TRUE; */
+    {
+#       ifdef   _XPILOTNTSERVER_
+	/* putting up a message box on the server is a bad thing.
+	   It kinda halts the server, which is a bad thing to do for
+	   the simple info messages (nick in use) that call this routine
+	*/
+	xpprintf("%s %s\n", showtime(), s);
+#       else
+	if (MessageBox(NULL, s, "Error", MB_OKCANCEL | MB_TASKMODAL) == IDCANCEL)
 	{
-		memanchor = malloc(sizeof(memlink));
-		curmemblock = memanchor;
-		memset(curmemblock, 0, sizeof(memlink));
+#           ifdef   _XPMON_
+		xpmemShutdown();
+#           endif
+	    ExitProcess(1);
 	}
-	if (curmemblock->nextslot == MAXMEMPOD)
-	{
-		xpprintf("Mallocing mempod block\n");
-		curmemblock->nextlink = malloc(sizeof(memlink));
-		memset(curmemblock, 0, sizeof(memlink));
-	}
-	curmemblock->mem[curmemblock->nextslot].mem  = tptr;
-	curmemblock->mem[curmemblock->nextslot].size = amount;
-	curmemblock->mem[curmemblock->nextslot].file = file;
-	curmemblock->mem[curmemblock->nextslot].line = line;
-
-	_Trace("malloc: %p %5d bytes from %4d of %s\n",
-		curmemblock->mem[curmemblock->nextslot].mem,
-		curmemblock->mem[curmemblock->nextslot].size,
-		curmemblock->mem[curmemblock->nextslot].line,
-		curmemblock->mem[curmemblock->nextslot].file);
-	curmemblock->nextslot++;
-	return(tptr);
+#       endif
+    }
 }
 
-void*  xprealloc(void* tptr, size_t size, char* file, int line)
+
+void error(const char *fmt, ...)
 {
-	memlink*	l = curmemblock;
-	int			i;
-	while(l)
-	{
-		for (i=0; i<l->nextslot; i++)
-		{
-			if (l->mem[i].mem == tptr)
-			{
-				tptr = realloc(tptr, size);
-				l->mem[i].mem  = tptr;
-				l->mem[i].size = size;
-				l->mem[i].file = file;
-				l->mem[i].line = line;
-				_Trace("realloc: %p %5d bytes from %4d of %s\n",
-					l->mem[i].mem, l->mem[i].size, l->mem[i].line, l->mem[i].file);
-				return (tptr);
-			}
-		}
-		l = l->nextlink;
-	}
-	error("Can't match memblock %p", tptr);
-	return(NULL);
+    va_list	ap;
+    char	s[512];
+
+    va_start(ap, fmt);
+
+    vsprintf(s, fmt, ap);
+
+    Win_show_error(s);
+
+    va_end(ap);
 }
 
-void*	xpcalloc(size_t size, size_t amount, char* file, int line)
+void warn(const char *fmt, ...)
 {
-	void*	t = xpmalloc(size*amount, file, line);
-	return(t);
+    va_list	ap;
+    char	s[512];
+
+    va_start(ap, fmt);
+
+    vsprintf(s, fmt, ap);
+
+    Win_show_error(s);
+
+    va_end(ap);
 }
 
-void	xpfree(void* tptr, char* file, int line)
+void fatal(const char *fmt, ...)
 {
-	memlink*	l = curmemblock;
-	int			i;
-	while(l)
-	{
-		for (i=0; i<l->nextslot; i++)
-		{
-			if (l->mem[i].mem == tptr)
-			{
-				l->mem[i].mem = NULL;
-				free(tptr);
-				return;
-			}
-		}
-		l = l->nextlink;
-	}
+    va_list	ap;
+    char	s[512];
+
+    va_start(ap, fmt);
+
+    vsprintf(s, fmt, ap);
+
+    Win_show_error(s);
+
+    va_end(ap);
+
+    exit(1);
 }
 
-char*	xpstrdup(const char* s, char* file, int line)
+void dumpcore(const char *fmt, ...)
 {
-	char*	t = xpmalloc(strlen(s)+1, file, line);
-	strcpy(t, s);
-	return(t);
-}
+    va_list	ap;
+    char	s[512];
 
-void	xpmemShutdown()
-{
-	memlink*	l = curmemblock;
-	int			i;
-	int			hits = 0;
-	while(l)
-	{
-		for (i=0; i<l->nextslot; i++)
-		{
-			if (l->mem[i].mem)
-				_Trace("leak: %p %5d bytes from %4d of %s\n",
-					l->mem[i].mem, l->mem[i].size, l->mem[i].line, l->mem[i].file);
-		}
-		hits += l->nextslot;
-		l = l->nextlink;
-	}
-	IFWINDOWS( Trace("xpmem tracked %d mallocs\n", hits); )
+    va_start(ap, fmt);
+
+    vsprintf(s, fmt, ap);
+
+    Win_show_error(s);
+
+    va_end(ap);
+
+    exit(1);
 }
 
 #endif

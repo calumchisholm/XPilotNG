@@ -1,6 +1,6 @@
 /* $Id$
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,12 +30,36 @@
 #include "types.h"
 #endif
 
+/* randommt.c */
 extern void seedMT(unsigned int seed);
 extern unsigned int reloadMT(void);
 extern unsigned int randomMT(void);
 
+/* math.c */
 extern DFLOAT rfrac(void);
-
 extern int mod(int x, int y);
+extern void Make_table(void);
+
+/* strdup.c */
+extern char *xp_strdup(const char *);
+extern char *xp_safe_strdup(const char *old_string);
+
+/* default.c */
+unsigned String_hash(const char *s);
+
+/* strlcpy.c */
+size_t strlcpy(char *dest, const char *src, size_t size);
+size_t strlcat(char *dest, const char *src, size_t size);
+
+/* xpmemory.c */
+
+void *xp_malloc(size_t size);
+void *xp_realloc(void *oldptr, size_t size);
+void *xp_calloc(size_t nmemb, size_t size);
+void xp_free(void *p);
+void *xp_safe_malloc(size_t size);
+void *xp_safe_realloc(void *oldptr, size_t size);
+void *xp_safe_calloc(size_t nmemb, size_t size);
+void xp_safe_free(void *p);
 
 #endif

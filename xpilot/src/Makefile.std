@@ -254,10 +254,12 @@ INCS = $(AUDIOINC) -I../common -I../client -I../../lib
 # Common library libxpcommon.a
 #
 OBJS0 = checknames.o config.o cmw.o error.o list.o math.o net.o \
-	portability.o randommt.o socklib.o strcasecmp.o strdup.o
+	portability.o randommt.o socklib.o strcasecmp.o strdup.o \
+	strlcpy.o xpmemory.o
 
 SRCS0 = checknames.c config.c cmw.c error.c list.c math.c net.c \
-	portability.c randommt.c socklib.c strcasecmp.c strdup.c
+	portability.c randommt.c socklib.c strcasecmp.c strdup.c \
+	strlcpy.c xpmemory.c
 
 #
 # Client program xpilot
