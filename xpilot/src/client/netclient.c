@@ -301,39 +301,114 @@ static int get_32bit(char **ptr)
 }
 
 
-static int parse_new(void)
+static void parse_styles(char **callptr)
 {
-    int i, j, startx, starty, polyc, hidcount, nexthid;
-    int dx, dy, cx, cy, pc, num_bmaps;
+    int i, num_bmaps;
+    char *ptr;
+
+    ptr = *callptr;
+    num_polygon_styles = *ptr++;
+    num_edge_styles = *ptr++;
+    num_bmaps = *ptr++;
+
+    polygon_styles =
+	malloc(MAX(1, num_polygon_styles) * sizeof(polygon_style_t));
+    if (polygon_styles == NULL) {
+	error("no memory for polygon styles");
+	exit(1);
+    }
+
+    edge_styles = malloc(MAX(1, num_edge_styles) * sizeof(edge_style_t));
+    if (edge_styles == NULL) {
+	error("no memory for edge styles");
+	exit(1);
+    }
+
+    for (i = 0; i < num_polygon_styles; i++) {
+	int flags;
+	polygon_styles[i].color = wallColor;
+	polygon_styles[i].rgb = get_32bit(&ptr);
+	polygon_styles[i].texture = 46 + (*ptr++);
+	polygon_styles[i].def_edge_style = *ptr++;
+	flags = *ptr++;
+	/*
+	  polygon_styles[i].method = (fill_style_t)(flags & 3);
+	  polygon_styles[i].visible = ((flags & (1 << 3)) != 0);
+	  polygon_styles[i].visible_in_radar =
+	  ((flags & (1 << 4)) != 0);
+	*/
+	polygon_styles[i].visible = true;
+	polygon_styles[i].visible_in_radar = true;
+	polygon_styles[i].method = TEXTURED;
+    }
+
+    if (num_polygon_styles == 0) {
+	/* default polygon style */
+	polygon_styles[0].visible = true;
+	polygon_styles[0].visible_in_radar = true;
+	polygon_styles[0].method = NOFILL;
+	polygon_styles[0].def_edge_style = 0;
+	num_polygon_styles = 1;
+    }
+
+    for (i = 0; i < num_edge_styles; i++) {
+	edge_styles[i].width = *ptr++;
+	edge_styles[i].color = wallColor;
+	edge_styles[i].rgb = get_32bit(&ptr);
+	edge_styles[i].style = *ptr++;
+    }
+
+    for (i = 0; i < num_bmaps; i++) {
+	char fname[30];
+	int flags;
+	strncpy(fname, ptr, 30 - 1);
+	fname[30 - 1] = 0;
+	ptr += strlen(fname) + 1;
+	flags = *ptr++;
+	Bitmap_add(fname, 1, flags);
+    }
+    *callptr = ptr;
+}
+
+
+static void parse_new(void)
+{
+    int i, j, startx, starty, polyc, ecount, edgechange, current_estyle;
+    int dx, dy, cx, cy, pc;
     int *styles;
     xp_polygon_t poly;
     ipos *points, min, max;
-    char *ptr, *hidptr;
+    char *ptr, *edgeptr;
 
     oldServer = 0;
     ptr = Setup->map_data;
 
+    parse_styles(&ptr);
+
     polyc = get_ushort(&ptr);
+
     for (i = 0; i < polyc; i++) {
+	poly.style = *ptr++;
+	current_estyle = polygon_styles[poly.style].def_edge_style;
 	dx = 0;
 	dy = 0;
-	hidcount = get_ushort(&ptr);
-	hidptr = ptr;
-	if (hidcount) {
-	    nexthid = get_ushort(&hidptr);
+	ecount = get_ushort(&ptr);
+	edgeptr = ptr;
+	if (ecount) {
+	    edgechange = get_ushort(&edgeptr);
 	}
 	else
-	    nexthid = INT_MAX;
-	ptr += hidcount * 2;
+	    edgechange = INT_MAX;
+	ptr += ecount * 2;
 	pc = get_ushort(&ptr);
 	if ((points = malloc(pc * sizeof(ipos))) == NULL) {
 	    error("no memory for points");
-	    return -1;
+	    exit(1);
 	}
-	if (hidcount) {
+	if (ecount) {
 	    if ((styles = malloc(pc * sizeof(int))) == NULL) {
 		error("no memory for special edges");
-		return -1;
+		exit(1);
 	    }
 	} else {
 	    styles = NULL;
@@ -343,16 +418,15 @@ static int parse_new(void)
 	points[0].x = cx = min.x = max.x = startx;
 	points[0].y = cy = min.y = max.y = starty;
 
-	if (!nexthid) {
-	    styles[0] = get_ushort(&hidptr);
-	    hidcount--;
-	    if (hidcount) {
-		nexthid = get_ushort(&hidptr);
+	if (!edgechange) {
+	    current_estyle = get_ushort(&edgeptr);
+	    ecount--;
+	    if (ecount) {
+		edgechange = get_ushort(&edgeptr);
 	    }
 	}
-	else {
-	    if (styles) styles[0] = -1;
-	}
+	if (styles)
+	    styles[0] = current_estyle;
 
 	for (j = 1; j < pc; j++) {
 	    dx = get_short(&ptr);
@@ -366,20 +440,18 @@ static int parse_new(void)
 	    points[j].x = dx;
 	    points[j].y = dy;
 
-	    if (nexthid == j) {
-		styles[j] = get_ushort(&hidptr);
-		hidcount--;
-		if (hidcount) {
-		    nexthid = get_ushort(&hidptr);
+	    if (edgechange == j) {
+		current_estyle = get_ushort(&edgeptr);
+		ecount--;
+		if (ecount) {
+		    edgechange = get_ushort(&edgeptr);
 		}
 	    }
-	    else {
-		if (styles) styles[j] = 1;
-	    }
+	    if (styles)
+		styles[j] = current_estyle;
 	}
 	poly.points = points;
 	poly.edge_styles = styles;
-	poly.style = 0;
 	poly.num_points = pc;
 	poly.bounds.x = min.x;
 	poly.bounds.y = min.y;
@@ -450,75 +522,8 @@ static int parse_new(void)
 	checks[i].bounds.h = BLOCK_SZ;
     }
 
-    num_polygon_styles = *ptr++;
-    num_edge_styles = *ptr++;
-    num_bmaps = *ptr++;
-
-    polygon_styles =
-	malloc(MAX(1, num_polygon_styles) * sizeof(polygon_style_t));
-    if (polygon_styles == NULL) {
-	error("no memory for polygon styles");
-	return -1;
-    }
-
-    edge_styles = malloc(MAX(1, num_edge_styles) * sizeof(edge_style_t));
-    if (edge_styles == NULL) {
-	error("no memory for edge styles");
-	return -1;
-    }
-
-    for (i = 0; i < num_polygon_styles; i++) {
-	int flags;
-	polygon_styles[i].color = wallColor;
-	polygon_styles[i].rgb = get_32bit(&ptr);
-	polygon_styles[i].texture = 46 + (*ptr++);
-	polygon_styles[i].def_edge_style = *ptr++;
-	flags = *ptr++;
-	/*
-	  polygon_styles[i].method = (fill_style_t)(flags & 3);
-	  polygon_styles[i].visible = ((flags & (1 << 3)) != 0);
-	  polygon_styles[i].visible_in_radar =
-	  ((flags & (1 << 4)) != 0);
-	*/
-	polygon_styles[i].visible = true;
-	polygon_styles[i].visible_in_radar = true;
-	polygon_styles[i].method = TEXTURED;
-    }
-
-    if (num_polygon_styles == 0) {
-	/* default polygon style */
-	polygon_styles[0].visible = true;
-	polygon_styles[0].visible_in_radar = true;
-	polygon_styles[0].method = NOFILL;
-	polygon_styles[0].def_edge_style = 0;
-	num_polygon_styles = 1;
-    }
-
-    for (i = 0; i < num_edge_styles; i++) {
-	edge_styles[i].width = *ptr++;
-	edge_styles[i].color = wallColor;
-	edge_styles[i].rgb = get_32bit(&ptr);
-	edge_styles[i].style = *ptr++;
-    }
-
-    for (i = 0; i < num_bmaps; i++) {
-	char fname[30];
-	int flags;
-	strncpy(fname, ptr, 30 - 1);
-	fname[30 - 1] = 0;
-	ptr += strlen(fname) + 1;
-	flags = *ptr++;
-	Bitmap_add(fname, 1, flags);
-    }
-
-    for (i = 0; i < num_polygons; i++) {
-	polygons[i].style = *ptr++;
-    }
-
     if (Setup->data_url[0])
 	Mapdata_setup(Setup->data_url);
-
-    return 0;
 }
 
 
@@ -679,7 +684,8 @@ int Net_setup(void)
 	}
 	return 0;
     }
-    return parse_new();
+    parse_new();
+    return 0;
 }
 
 

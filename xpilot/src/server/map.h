@@ -252,15 +252,15 @@ typedef struct {
     int *edges;
     int x, y;
     int num_points;
-    int hidden;
-    int num_hidden;
+    int estyles_start;
+    int num_echanges;
 } poly_t;
 
 extern struct polystyle pstyles[256];
 extern struct edgestyle estyles[256];
 extern struct bmpstyle  bstyles[256];
 extern poly_t *pdata;
-extern int *hidptr;
+extern int *estyleptr;
 
 extern int num_pstyles, num_estyles, num_bstyles;
 #endif

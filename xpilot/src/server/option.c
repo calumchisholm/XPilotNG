@@ -178,8 +178,8 @@ extern int groupc;
 extern struct {int type; unsigned int hit_mask; int team;} groups[];
 
 int *edges = edg;
-int *hidptr;
-int ptscount, hidcount;
+int *estyleptr;
+int ptscount, ecount;
 char *mapd;
 
 struct polystyle pstyles[256];
@@ -189,8 +189,8 @@ struct bmpstyle  bstyles[256];
 poly_t *pdata;
 
 int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
-static int max_bases, max_balls, max_fuels, max_checks, max_polys, max_hidden;
-
+static int max_bases, max_balls, max_fuels, max_checks, max_polys,max_echanges;
+static int current_estyle;
 
 static int get_bmp_id(const char *s)
 {
@@ -369,7 +369,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 	t.group = groupc;
 	t.edges = edges;
 	t.style = style;
-	t.hidden = hidcount;
+	t.estyles_start = ecount;
+	current_estyle = pstyles[style].defedge_id;
 	STORE(poly_t, pdata, polyc, max_polys, t);
 	return;
     }
@@ -496,9 +497,10 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	*edges++ = x;
 	*edges++ = y;
-	if (edgestyle != -1) {
-	    STORE(int, hidptr, hidcount, max_hidden, ptscount);
-	    STORE(int, hidptr, hidcount, max_hidden, edgestyle);
+	if (edgestyle != -1 && edgestyle != current_estyle) {
+	    STORE(int, estyleptr, ecount, max_echanges, ptscount);
+	    STORE(int, estyleptr, ecount, max_echanges, edgestyle);
+	    current_estyle = edgestyle;
 	}
 	ptscount++;
 	return;
@@ -512,8 +514,8 @@ static void tagend(void *data, const char *el)
     void cmdhack(void);
     if (!strcasecmp(el, "Polygon")) {
 	pdata[polyc - 1].num_points = ptscount;
-	pdata[polyc - 1].num_hidden = hidcount - pdata[polyc - 1].hidden;
-	STORE(int, hidptr, hidcount, max_hidden, INT_MAX);
+	pdata[polyc - 1].num_echanges = ecount -pdata[polyc - 1].estyles_start;
+	STORE(int, estyleptr, ecount, max_echanges, INT_MAX);
     }
     if (!strcasecmp(el, "GeneralOptions")) {
 	cmdhack(); /* !@# */

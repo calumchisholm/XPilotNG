@@ -104,7 +104,7 @@ void Gui_paint_walls(int x, int y, int type, int xi, int yi)
 	}
 
 	if ((type & BLUE_FUEL) == BLUE_FUEL) {
-	} 
+	}
 	else if (type & BLUE_OPEN) {
 	    Segment_add(wallColor,
 			X(x),
@@ -120,7 +120,7 @@ void Gui_paint_walls(int x, int y, int type, int xi, int yi)
 			Y(y));
 	}
     }
-    else { 
+    else {
 
 	if (type & BLUE_LEFT) {
 	    Bitmap_paint(p_draw, BM_WALL_LEFT, WINSCALE(X(x - 1)),
@@ -298,22 +298,22 @@ void Gui_paint_fuel(int x, int y, long fuel)
         bbox_t *box;
 	xp_bitmap_t *bit;
 
-	/* x + x * y will give a pseudo random number, 
+	/* x + x * y will give a pseudo random number,
 	so different fuelcells will not be displayed with the same image-frame.*/
-	int image = ( (loops + x + x * y) % (fuel_images * 2) ); 
+	int image = ( (loops + x + x * y) % (fuel_images * 2) );
 
 	/* the animation is played from image 0-15 then back again from image 15-0 */
 
-	if (image >= fuel_images) 
+	if (image >= fuel_images)
 	    image = (2 * fuel_images - 1) - image;
 
 
 	size = (BLOCK_SZ - 2 * BITMAP_FUEL_BORDER) * fuel / MAX_STATION_FUEL;
 
-	Bitmap_paint(p_draw, BM_FUELCELL, WINSCALE(X(x)), 
+	Bitmap_paint(p_draw, BM_FUELCELL, WINSCALE(X(x)),
                      WINSCALE(Y(y + BLOCK_SZ)), 0);
 
-	
+
 	bit = Bitmap_get(p_draw, BM_FUEL, image);
         box = &bit->bbox;
         area.x = 0;
@@ -323,8 +323,8 @@ void Gui_paint_fuel(int x, int y, long fuel)
 
         Bitmap_paint_area
             (p_draw, bit,
-             WINSCALE(X(x + BITMAP_FUEL_BORDER)), 
-             WINSCALE(Y(y + size + BITMAP_FUEL_BORDER)), 
+             WINSCALE(X(x + BITMAP_FUEL_BORDER)),
+             WINSCALE(Y(y + size + BITMAP_FUEL_BORDER)),
              &area);
 
 	Erase_rectangle(WINSCALE(X(x)) - 1,
@@ -379,7 +379,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	y = WINSCALE(Y(y));
 
 	if ((other = Other_by_id(id)) != NULL) {
-	    if (other->name_width == 0) {					
+	    if (other->name_width == 0) {
 		other->name_len = strlen(other->id_string);
 		other->name_width = 2 + XTextWidth(gameFont, other->id_string,
 						   other->name_len);
@@ -736,11 +736,11 @@ void Gui_paint_setup_check(int x, int y, bool isNext)
 	}
     } else {
         if (isNext) {
-	    Bitmap_paint(p_draw, BM_CHECKPOINT, WINSCALE(X(x)), 
+	    Bitmap_paint(p_draw, BM_CHECKPOINT, WINSCALE(X(x)),
                          WINSCALE(Y(y + BLOCK_SZ)), 1);
-	
+
 	} else {
-	    Bitmap_paint(p_draw, BM_CHECKPOINT, WINSCALE(X(x)), 
+	    Bitmap_paint(p_draw, BM_CHECKPOINT, WINSCALE(X(x)),
                          WINSCALE(Y(y + BLOCK_SZ)), 0);
 
 	}
@@ -834,7 +834,7 @@ void Gui_paint_setup_pos_grav(int x, int y)
 		X(x+BLOCK_SZ-5),
 		Y(y+BLOCK_SZ/2));
     } else {
-	Bitmap_paint(p_draw, BM_PLUSGRAVITY, WINSCALE(X(x)), 
+	Bitmap_paint(p_draw, BM_PLUSGRAVITY, WINSCALE(X(x)),
                      WINSCALE(Y(y + BLOCK_SZ)), 0);
     }
 }
@@ -855,7 +855,7 @@ void Gui_paint_setup_neg_grav(int x, int y)
 		    X(x+BLOCK_SZ-5),
 		    Y(y+BLOCK_SZ/2));
     } else {
-	Bitmap_paint(p_draw, BM_MINUSGRAVITY, WINSCALE(X(x)), 
+	Bitmap_paint(p_draw, BM_MINUSGRAVITY, WINSCALE(X(x)),
                      WINSCALE(Y(y + BLOCK_SZ)), 0);
     }
 }
@@ -962,20 +962,20 @@ void Gui_paint_setup_worm(int x, int y, int wormDrawCount)
     #define _O	wormOffset[wormDrawCount]
 
 	SET_FG(colors[RED].pixel);
-	Arc_add(RED, 
-		X(x) + 0, Y(y + BLOCK_SZ) + 0, 
+	Arc_add(RED,
+		X(x) + 0, Y(y + BLOCK_SZ) + 0,
 		INSIDE_BL - 0, INSIDE_BL - 0, 0, 64 * 360);
 
-	Arc_add(RED, 
-		X(x) + _O[0], Y(y + BLOCK_SZ) + _O[1], 
+	Arc_add(RED,
+		X(x) + _O[0], Y(y + BLOCK_SZ) + _O[1],
 		INSIDE_BL - _O[2], INSIDE_BL - _O[2], 0, 64 * 360);
 
-	Arc_add(RED, 
-		X(x) + _O[0] * 2, Y(y + BLOCK_SZ) + _O[1] * 2, 
+	Arc_add(RED,
+		X(x) + _O[0] * 2, Y(y + BLOCK_SZ) + _O[1] * 2,
 		INSIDE_BL - _O[2] * 2, INSIDE_BL - _O[2] * 2, 0, 64 * 360);
     }
     else {
-	Bitmap_paint(p_draw, BM_WORMHOLE, WINSCALE(X(x)), 
+	Bitmap_paint(p_draw, BM_WORMHOLE, WINSCALE(X(x)),
                      WINSCALE(Y(y + BLOCK_SZ)), wormDrawCount);
     }
 }
@@ -1016,7 +1016,7 @@ void Gui_paint_setup_item_concentrator(int x, int y)
 	}
 	for (i = 0; i < NELEM(tris); i++) {
 	    /* I'll bet you didn't know that floating point math
-	       is faster than integer math on a pentium 
+	       is faster than integer math on a pentium
 	       (and for some reason the UNIX way rounds off too much) */
 	    rdir = MOD2(rot_dir + tris[i].dir_off, RES);
 	    cx = (int)(X(x + BLOCK_SZ / 2)
@@ -1034,8 +1034,8 @@ void Gui_paint_setup_item_concentrator(int x, int y)
 			  * tcos(MOD2(tdir + 2*RES/3, RES))));
 	    pts[2].y = WINSCALE(cy + (int)(tris[i].radius
 			  * tsin(MOD2(tdir + 2*RES/3, RES))));
-	    /* Trace("DC: %d cx=%d/%d %d/%d %d/%d %d/%d %d/%d\n", 
-		    i, cx, cy, pts[0].x, pts[0].y, 
+	    /* Trace("DC: %d cx=%d/%d %d/%d %d/%d %d/%d %d/%d\n",
+		    i, cx, cy, pts[0].x, pts[0].y,
 		    pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y); */
 
 	    pts[3] = pts[0];
@@ -1044,7 +1044,7 @@ void Gui_paint_setup_item_concentrator(int x, int y)
 	    Erase_points(0, pts, NELEM(pts));
 	}
     } else {
-	Bitmap_paint(p_draw, BM_CONCENTRATOR, WINSCALE(X(x)), 
+	Bitmap_paint(p_draw, BM_CONCENTRATOR, WINSCALE(X(x)),
                      WINSCALE(Y(y + BLOCK_SZ)), (loops + (x + x * y)) % 32);
 
     }
@@ -1065,7 +1065,7 @@ void Gui_paint_setup_target(int x, int y, int target, int damage, bool own)
     char    s[2];
 
     color = own ? BLUE : RED;
-	
+
     SET_FG(colors[color].pixel);
 
     a1 = X(x);
@@ -1156,14 +1156,11 @@ void Gui_paint_setup_treasure(int x, int y, int treasure, bool own)
     }
     else {
 	char    s[2];
-	int	    size;    
-	
-	int type;
-	int	    color;
+	int	size, type, color;
 
 	type = own ? BM_HOLDER_FRIEND : BM_HOLDER_ENEMY;
 
-	Bitmap_paint(p_draw, type, WINSCALE(X(x)), 
+	Bitmap_paint(p_draw, type, WINSCALE(X(x)),
                      WINSCALE(Y(y + BLOCK_SZ)), 0);
 
 	color = own ? BLUE : RED;
@@ -1179,13 +1176,12 @@ void Gui_paint_setup_treasure(int x, int y, int treasure, bool own)
 			- gameFont->ascent - 1,
 			size + 2,
 			gameFont->ascent+ gameFont->descent+ 2);
-
     }
 }
 
 
-void Gui_paint_polygon(int i, int xoff, int yoff) {
-
+void Gui_paint_polygon(int i, int xoff, int yoff)
+{
     static XPoint points[10000];
 
     int j,x,y;
@@ -1207,7 +1203,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
     y = yoff * Setup->height;
     ship.x = WINSCALE(world.x);
     ship.y = WINSCALE(world.y + view_height);
-    
+
     for (j = 0; j < polygon.num_points; j++) {
         x += polygon.points[j].x;
         y += polygon.points[j].y;
@@ -1216,21 +1212,20 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
     }
     points[j].x = points[0].x;
     points[j].y = points[0].y;
-    
 
     if (!outline && (filled || textured || style.method != NOFILL)) {
         if (textured || style.method == TEXTURED) {
-	    xp_bitmap_t *bmp = 
-		Bitmap_get(p_draw, 
+	    xp_bitmap_t *bmp =
+		Bitmap_get(p_draw,
 			   textured ? BM_WALL_TEXTURE : style.texture, 0);
 	    if (bmp != NULL) {
 		XSetTile(dpy, gc, bmp->bitmap);
                 /*
-		XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x), 
+		XSetTSOrigin(dpy, gc, -WINSCALE(realWorld.x),
 			     WINSCALE(realWorld.y));
                 */
-                XSetTSOrigin(dpy, gc, WINSCALE(polygon.bounds.x) - ship.x, 
-                             ship.y - WINSCALE(polygon.bounds.y + 
+                XSetTSOrigin(dpy, gc, WINSCALE(polygon.bounds.x) - ship.x,
+                             ship.y - WINSCALE(polygon.bounds.y +
                                                polygon.bounds.h));
 		XSetFillStyle(dpy, gc, FillTiled);
 	    }
@@ -1240,9 +1235,8 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
         }
 	rd.fillPolygon(dpy, p_draw, gc, points, polygon.num_points,
                        Nonconvex, CoordModeOrigin);
-    }    
+    }
     XSetFillStyle(dpy, gc, FillSolid);
-
 
     if (!filled) {
         int sindex = style.def_edge_style;
@@ -1252,17 +1246,16 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
 
             if (edge_styles[sindex].width != -1) {
 
-                XSetLineAttributes
-                    (dpy, gc, WINSCALE(edge_styles[sindex].width),
-                     edge_styles[sindex].style, CapButt, JoinMiter);
+                XSetLineAttributes(
+		    dpy, gc, WINSCALE(edge_styles[sindex].width),
+		    edge_styles[sindex].style, CapButt, JoinMiter);
 
-                if (blockBitmaps) 
+                if (blockBitmaps)
                     SET_FG(edge_styles[sindex].color);
                 else
                     SET_FG(colors[wallColor].pixel);
 
-                rd.drawLines
-                    (dpy, p_draw, gc, points, 
+                rd.drawLines(dpy, p_draw, gc, points,
                      polygon.num_points + 1, CoordModeOrigin);
             }
 
@@ -1270,32 +1263,29 @@ void Gui_paint_polygon(int i, int xoff, int yoff) {
             /* This polygon has special edges */
 
             int begin;
-        
+
             for (j = 0; j < polygon.num_points;) {
-                
                 begin = j;
                 sindex = polygon.edge_styles[j++];
-                
+
                 while ((polygon.edge_styles[j] == sindex)
                        && (j < polygon.num_points - 1)) j++;
-                
+
                 if (sindex == -1) sindex = style.def_edge_style;
 
 		/* Style 0 means internal edges which are never shown */
                 if (sindex != 0 && edge_styles[sindex].width != -1) {
-
-                    XSetLineAttributes
-                        (dpy, gc, 
-                         WINSCALE(edge_styles[sindex].width), 
+                    XSetLineAttributes(dpy, gc,
+                         WINSCALE(edge_styles[sindex].width),
                          edge_styles[sindex].style, CapButt, JoinMiter);
 
-                    if (blockBitmaps) 
+                    if (blockBitmaps)
                         SET_FG(edge_styles[sindex].color);
                     else
                         SET_FG(colors[wallColor].pixel);
-                
+
                     rd.drawLines
-                        (dpy, p_draw, gc, 
+                        (dpy, p_draw, gc,
                          points + begin, j + 1 - begin,
                          CoordModeOrigin);
                 }

@@ -45,8 +45,7 @@
 	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
 	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
 	error("No memory");						\
-	N = M = 0;							\
-	return -1;							\
+	exit(1);							\
     } else								\
 	(P[N++] = V)
 

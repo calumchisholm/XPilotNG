@@ -1299,17 +1299,35 @@ static void store_32bit(char **ptr, int i)
 
 int Polys_to_client(char *ptr)
 {
-    int i, j, startx, starty, dx, dy, group, hid;
+    int i, j, startx, starty, dx, dy;
     int *edges;
     char *start = ptr;
 
+    *ptr++ = num_pstyles;
+    *ptr++ = num_estyles;
+    *ptr++ = num_bstyles;
+    for (i = 0; i < num_pstyles; i++) {
+	store_32bit(&ptr, pstyles[i].color);
+	*ptr++ = pstyles[i].texture_id;
+	*ptr++ = pstyles[i].defedge_id;
+	*ptr++ = pstyles[i].flags;
+    }
+    for (i = 0; i < num_estyles; i++) {
+	*ptr++ = estyles[i].width;
+	store_32bit(&ptr, estyles[i].color);
+	*ptr++ = estyles[i].style;
+    }
+    for (i = 0; i < num_bstyles; i++) {
+	strcpy(ptr, bstyles[i].filename);
+	ptr += strlen(ptr) + 1;
+	*ptr++ = bstyles[i].flags;
+    }
     store_short(&ptr, polyc);
     for (i = 0; i < polyc; i++) {
-	group = pdata[i].group;
+	*ptr++ = pdata[i].style;
 	j = pdata[i].num_points;
-	hid = pdata[i].num_hidden;
-	store_short(&ptr, hid);
-	edges = hidptr + pdata[i].hidden;
+	store_short(&ptr, pdata[i].num_echanges);
+	edges = estyleptr + pdata[i].estyles_start;
 	while (*edges != INT_MAX)
 	    store_short(&ptr, *edges++);
 	dx = 0;
@@ -1352,30 +1370,6 @@ int Polys_to_client(char *ptr)
     for (i = 0; i < World.NumChecks; i++) {
 	store_short(&ptr, World.check[i].x >> CLICK_SHIFT);
 	store_short(&ptr, World.check[i].y >> CLICK_SHIFT);
-    }
-    {
-	*ptr++ = num_pstyles;
-	*ptr++ = num_estyles;
-	*ptr++ = num_bstyles;
-	for (i = 0; i < num_pstyles; i++) {
-	    store_32bit(&ptr, pstyles[i].color);
-	    *ptr++ = pstyles[i].texture_id;
-	    *ptr++ = pstyles[i].defedge_id;
-	    *ptr++ = pstyles[i].flags;
-	}
-	for (i = 0; i < num_estyles; i++) {
-	    *ptr++ = estyles[i].width;
-	    store_32bit(&ptr, estyles[i].color);
-	    *ptr++ = estyles[i].style;
-	}
-	for (i = 0; i < num_bstyles; i++) {
-	    strcpy(ptr, bstyles[i].filename);
-	    ptr += strlen(ptr) + 1;
-	    *ptr++ = bstyles[i].flags;
-	}
-	for (i = 0; i < polyc; i++) {
-	    *ptr++ = pdata[i].style;
-	}
     }
     return ptr - start;
 }
@@ -1828,22 +1822,26 @@ static void Ball_line_init(void)
 
 static void Poly_to_lines()
 {
-    int i, np, j, startx, starty, dx, dy, group, *hid;
+    int i, np, j, startx, starty, dx, dy, group, *styleptr, style;
     int *edges;
 
     linec = 0;
     for (i = 0; i < polyc; i++) {
 	group = pdata[i].group;
 	np = pdata[i].num_points;
-	hid = hidptr + pdata[i].hidden;
+	styleptr = estyleptr + pdata[i].estyles_start;
+	style = pstyles[pdata[i].style].defedge_id;
 	dx = 0;
 	dy = 0;
 	startx = pdata[i].x;
 	starty = pdata[i].y;
 	edges = pdata[i].edges;
 	for (j = 0; j < np; j++) {
-	    if (j == *hid) {
-		hid++;
+	    if (j == *styleptr) {
+		styleptr++;
+		style = *styleptr++;
+	    }
+	    if (style == 0) {
 		dx += *edges++;
 		dy += *edges++;
 		continue;

@@ -90,8 +90,8 @@
 <Option name="allowshields" value="no"/>
 <Option name="initialmissiles" value="0"/>
 </GeneralOptions>
-<Edgestyle id="xpbluethin" width="0" color="0x4E7CFF" style="0"/>
-<Polystyle id="xpblue" color="0x4E7CFF" defedge="xpbluethin"/>
+<Edgestyle id="xpbluethin" width="0" color="4E7CFF" style="0"/>
+<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluethin"/>
 <Polygon x="17920" y="190400" style="xpblue">
 <Offset x="-2240" y="0"/>
 <Offset x="-2240" y="-2240"/>

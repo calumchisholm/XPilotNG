@@ -197,7 +197,7 @@ def convert(options):
 	width += 2
 	map = [' ' + line + ' ' for line in map]
 	map = [' ' * width] + map + [' ' * width]
-    
+
 	options['mapdata'] = "\n".join(map)+'\n'
     options['mapwidth'] = `width * 35`
     options['mapheight'] = `height * 35`
@@ -400,8 +400,8 @@ def convert(options):
     for name, value in options.items():
 	print '<Option name="%s" value="%s"/>' % (name, encode(value))
     print '</GeneralOptions>'
-    print '<Edgestyle id="xpbluethin" width="0" color="0x4E7CFF" style="0"/>'
-    print '<Polystyle id="xpblue" color="0x4E7CFF" defedge="xpbluethin"/>'
+    print '<Edgestyle id="xpbluethin" width="0" color="4E7CFF" style="0"/>'
+    print '<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluethin"/>'
 
     for p in polys2:
 	print '<Polygon x="%d" y="%d" style="xpblue">' % tuple(p[-1][:2])
@@ -411,20 +411,24 @@ def convert(options):
 	curx = 0
 	cury = 0
 	curh = h
+        prevh = 0
+        sstr = ''
 	for c in p:
 	    dx = center(c[0] - x, mxc)
 	    dy = center(c[1] - y, myc)
 	    if dx * cury != dy * curx or curh != h:
-		if curh:
+                if curh and not prevh:
 		    sstr = ' style="internal"'
-		else:
-		    sstr = ''
+		elif prevh and not curh:
+                    sstr = ' style="xpbluethin"'
 		for i in range((max(abs(curx), abs(cury)) + MAXLEN - 1) / MAXLEN, 0, -1):
 		    print '<Offset x="%d" y="%d"%s/>' % (curx / i, cury / i, sstr)
+                    sstr= ''
 		    curx -= curx / i
 		    cury -= cury / i
 		curx = dx
 		cury = dy
+                prevh = curh
 		curh = h
 	    else:
 		curx += dx
