@@ -389,6 +389,10 @@ static void Talk_delete_emphasized_text(void)
     newlen = oldlen;
 
     if (oldlen > 0) {
+	/*
+	 * kps - the following line caused a segmentation fault when testing.
+	 * Consider debugging later.
+	 */
 	strncpy(&new_str[selection.talk.x1], &new_str[selection.talk.x2],
 		oldlen - selection.talk.x2);
 	new_str[selection.talk.x1 + oldlen - selection.talk.x2] = '\0';
