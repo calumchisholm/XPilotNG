@@ -138,6 +138,7 @@ extern void Get_command(const char *command);
 extern void Usage(void);
 extern const char *Get_keyHelpString(keys_t key);
 extern const char *Get_keyResourceString(keys_t key);
+extern const char *Option_value_to_string(xp_option_t *opt);
 
 /*
  * Client implementations should call this function to set a callback for

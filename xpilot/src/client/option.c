@@ -227,7 +227,7 @@ static bool Set_string_option(xp_option_t *opt, const char *value)
 
     assert(opt);
     assert(opt->type == xp_string_option);
-    assert(opt->str_ptr || opt->str_setfunc);
+    assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
     assert(value); /* allow NULL ? */
 
     /*
@@ -360,12 +360,14 @@ bool Set_option(const char *name, const char *value)
 
 
 /* kps - these commands need some fine tuning. */
+/* TODO - unset a value, i.e. set it to empty */
 /*
  * \set client command
  */
 void Set_command(const char *args)
 {
     char *name, *value, *valcpy;
+    xp_option_t *opt;
 
     assert(args);
 
@@ -374,21 +376,66 @@ void Set_command(const char *args)
     name = strtok(valcpy, " \t\r\n");
     value = strtok(NULL, "");
 
-    if (name && value) {
-	warn("Calling Set_option(\"%s\", \"%s\")", name, value);
+    opt = Find_option(name);
+
+    if (opt && value) {
+	const char *newvalue;
+	const char *nm = Option_get_name(opt);
+	char msg[MSG_LEN];
+
 	Set_option(name, value);
+
+	newvalue = Option_value_to_string(opt);
+	snprintf(msg, sizeof(msg),
+		 "The value of %s is now %s. [*Client reply*]", nm, newvalue);
+	Add_message(msg);
     } else {
-	;
+	Add_message("Boring... [*Client reply*]");
 	/* usage, e.g. return false */
     }
 
     xp_free(valcpy);
 }
-char *Option_value_to_string(xp_option_t *opt);
-char *Option_value_to_string(xp_option_t *opt)
+
+const char *Option_value_to_string(xp_option_t *opt)
 {
-    (void)opt;
-    return "unknown at this time";
+    static char buf[MSG_LEN];
+
+    switch (opt->type) {
+    case xp_noarg_option:
+    {
+	sprintf(buf, "%s", *opt->noarg_ptr == true ? "true" : "false");
+	break;
+    }
+    case xp_bool_option:
+    {
+	sprintf(buf, "%s", *opt->bool_ptr == true ? "true" : "false");
+	break;
+    }
+    case xp_int_option:
+    {
+	sprintf(buf, "%d", *opt->int_ptr);
+	break;
+    }
+    case xp_double_option:
+    {
+	sprintf(buf, "%.3lf", *opt->dbl_ptr);
+	break;
+    }
+    case xp_string_option:
+    {
+	if (opt->str_ptr)
+	    return opt->str_ptr;
+	else
+	    return opt->str_getfunc(opt);
+    }
+    case xp_key_option:
+	/* kps TODO */
+	return "currently unknown";
+    default:
+	assert(0 && "Unknown option type");
+    }
+    return buf;
 }
 
 
@@ -409,8 +456,13 @@ void Get_command(const char *args)
     opt = Find_option(name);
 
     if (opt) {
-	snprintf(msg, sizeof(msg), "The value of %s is %s. [*Client reply*]",
-		 Option_get_name(opt), Option_value_to_string(opt));
+	const char *val = Option_value_to_string(opt);
+	const char *nm = Option_get_name(opt);
+	if (val && strlen(val) > 0)
+	    snprintf(msg, sizeof(msg),
+		     "The value of %s is %s. [*Client reply*]", nm, val);
+	else
+	    sprintf(msg, "The option %s has no value. [*Client reply*]", nm);
 	Add_message(msg);
     } else {
 	sprintf(msg, "No client option named %s. [*Client reply*]", name);
