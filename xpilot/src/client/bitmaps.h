@@ -105,7 +105,7 @@ typedef struct {
     const char		*filename;     /* the file containing the image */
     int			count;         /* amount of images (see above) */
     int			state;         /* the state of the image (BMS_*) */
-    int                 width, height; /* the (scaled) dimensions */
+    unsigned		width, height; /* the (scaled) dimensions */
     bool		scalable;      /* should this image be scaled */
     xp_bitmap_t		*bitmaps;      /* platform dependent image data */
     xp_picture_t	picture;       /* the image data in RGB format */

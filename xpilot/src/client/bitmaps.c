@@ -357,8 +357,7 @@ void Bitmap_paint(Drawable d, int img, int x, int y, int bmp)
  * Maybe move this part to a sperate file.
  */
 
-extern unsigned long (*RGB) (unsigned char r, unsigned char g,
-			     unsigned char b);
+extern unsigned long (*RGB) (int r, int g, int b);
 static GC maskGC;
 
 
@@ -426,7 +425,7 @@ static void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
 			     int bmp, int x, int y, RGB_COLOR color)
 {
     unsigned long pixel;
-    unsigned char r, g, b;
+    int r, g, b;
 
     r = RED_VALUE(color);
     g = GREEN_VALUE(color);
@@ -449,7 +448,8 @@ void Bitmap_paint_area(Drawable d, xp_bitmap_t * bit, int x, int y,
 {
     XSetClipOrigin(dpy, gameGC, x - r->x, y - r->y);
     XSetClipMask(dpy, gameGC, bit->mask);
-    XCopyArea(dpy, bit->bitmap, d, gameGC, r->x, r->y, r->w, r->h, x, y);
+    XCopyArea(dpy, bit->bitmap, d, gameGC, r->x, r->y,
+	      (unsigned)r->w, (unsigned)r->h, x, y);
     XSetClipMask(dpy, gameGC, None);
 }
 
