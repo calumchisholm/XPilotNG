@@ -1,5 +1,5 @@
 -----------------------------------------------------------------
-Problem :When TreasureCollisionDestroys is set to false it doesnt bounce off the ship it sticks to it.
+Problem :When TreasureCollisionDestroys is set to false it doesnt bounce off the ship it sticks to it.basically the server doesn't have a bounce routine that could be used for non-destructive collisions between objects
 Found by:Throat
 Solution:
 Fixed by:
