@@ -67,7 +67,7 @@ char szTbStrings[] ="New\0Open\0Save\0Cut\0Copy\0Paste\0Undo\0Pen\0Modify Item\0
 "Fuel Block\0Target\0Ball Area\0Ball Target\0Ball\0Item Concentrator\0"
 "Push/Pull Gravities\0Circular Gravity\0"
 "Wormhole\0I\\O Wormhole\0Out Wormhole\0In Wormhole\0Current\0Decoration Wall\0"
-"Positive\0Negative\0Normal\0Hidden\0Check Map\0View Source\0Launch Map\0Next Check Point\0"
+"Positive\0Negative\0Hidden\0Check Map\0View Source\0Launch Map\0Next Check Point\0"
 "Pick Item\0Add Vertex\0Delete Vertex\0Move Vertex\0Move Item\0Reorder Checkpoint\0Delete Item\0"
 "Vertex\0Engine\0Main Gun\0Left Front Gun\0Right Front Gun\0Left Rear Gun\0"
 "Right Rear Gun\0Missile Rack\0Left Light\0Right Light\0";
@@ -135,8 +135,7 @@ TBBUTTON tbpolarity[] =
 } ;
 TBBUTTON tbwalltype[] = 
 {
-	0, IDM_MAP_NORMAL, TBSTATE_ENABLED, TBSTYLE_CHECKGROUP, 0, 0, 0, 0,
-	1, IDM_MAP_HIDDEN, TBSTATE_ENABLED, TBSTYLE_CHECKGROUP, 0, 0, 0, 0,
+	0, IDM_MAP_HIDDEN, TBSTATE_ENABLED, TBSTYLE_CHECK, 0, 0, 0, 0,
 } ;
 
 //TO DO: Get all mapsyms acceptable or removed so none are INDETERMINATE.
@@ -204,7 +203,7 @@ IDM_CYCLEVNEG,IDM_PROPERTIES,IDM_MAP_WALL,IDM_MAP_CANNON,
 IDM_MAP_BASE,IDM_MAP_FUEL,IDM_MAP_TARGET,IDM_MAP_BALLAREA,IDM_MAP_BALLTARGET,
 IDM_MAP_BALL,IDM_MAP_ITEM_CONC,IDM_MAP_GRAVITY,IDM_MAP_CIRCULAR_GRAVITY,
 IDM_MAP_WORMHOLE,IDM_MAP_WORM_NORMAL,IDM_MAP_WORM_OUT,IDM_MAP_WORM_IN,
-IDM_MAP_CURRENT,IDM_MAP_DECOR,IDM_MAP_POSITIVE,IDM_MAP_NEGATIVE,IDM_MAP_NORMAL,IDM_MAP_HIDDEN,
+IDM_MAP_CURRENT,IDM_MAP_DECOR,IDM_MAP_POSITIVE,IDM_MAP_NEGATIVE,IDM_MAP_HIDDEN,
 IDM_CHECKMAP,IDM_MAPSOURCE,
 IDM_LAUNCHMAP,IDM_MAP_CHECKPOINT,
 IDM_PICKITEM,IDM_ADDVERTEX,IDM_DELVERTEX,IDM_MOVEVERTEX,IDM_MOVEITEM,IDM_REORDERCHECKPOINT,IDM_DELETEITEM,
@@ -245,7 +244,7 @@ int InitToolBars (HWND hwndParent)
 		{&tbmapmodify[0], &hwndMapModifyToolBar, dwToolBarStyles | CCS_NORESIZE, 7, hInst, IDB_MAPMODIFYTOOLBAR, 0, 54, 24, 160, &iSelectionMapModify, IDM_PICKITEM},
 		{&tbwormhole[0], &hwndWormholeToolBar, dwToolBarStyles | CCS_NOMOVEY | CCS_NORESIZE, 3, hInst, IDB_WORMHOLESUBBAR, 0, 220, TOOLSWIDTH, 40, &iSelectionWormhole, IDM_MAP_WORM_NORMAL},
 		{&tbpolarity[0], &hwndPolarityToolBar, dwToolBarStyles | CCS_NOMOVEY | CCS_NORESIZE, 2, hInst, IDB_POLARITYSUBBAR, 0, 220, TOOLSWIDTH, 40, &iSelectionPolarity, IDM_MAP_POSITIVE},
-		{&tbwalltype[0], &hwndWallTypeToolBar, dwToolBarStyles | CCS_NOMOVEY | CCS_NORESIZE, 2, hInst, IDB_WALLTYPESUBBAR, 0, 220, TOOLSWIDTH, 40, &iSelectionWallType, IDM_MAP_NORMAL},
+		{&tbwalltype[0], &hwndWallTypeToolBar, dwToolBarStyles | CCS_NOMOVEY | CCS_NORESIZE, 1, hInst, IDB_WALLTYPESUBBAR, 0, 220, TOOLSWIDTH, 40, NULL, IDM_MAP_NORMAL},
 		{&tbshiptools[0], &hwndShipToolsToolBar, dwToolBarStyles | CCS_NOMOVEY | TBSTYLE_FLAT, 10, hInst, IDB_SHIPTOOLSTOOLBAR, 0, 28, 120, 120, &iSelectionShipTools, IDM_PEN},
 		{&tbshipsyms[0], &hwndShipSymsToolBar, dwToolBarStyles | CCS_NORESIZE, 10, hInst, IDB_SHIPSYMSTOOLBAR, 0, 54, 24, 300, &iSelectionShipSyms, IDM_VERTEX}
 	};
@@ -263,13 +262,19 @@ int InitToolBars (HWND hwndParent)
 			0, 0, 16, 16,
 			sizeof (TBBUTTON)) ;		
 		
-		if (i > 0)
+		if (i > 0 && *toolbars[i].hwndToolbar != hwndWallTypeToolBar)
 		{
 			SetWindowPos (*toolbars[i].hwndToolbar, HWND_TOP, toolbars[i].posx, toolbars[i].posy,
 			toolbars[i].width, toolbars[i].height, 0);
 
 			*toolbars[i].iSelection = toolbars[i].select;
 			SendMessage(*toolbars[i].hwndToolbar, TB_CHECKBUTTON, toolbars[i].select, TRUE);
+		}
+		else if (*toolbars[i].hwndToolbar == hwndWallTypeToolBar)
+		{
+			SetWindowPos (*toolbars[i].hwndToolbar, HWND_TOP, toolbars[i].posx, toolbars[i].posy,
+			toolbars[i].width, toolbars[i].height, 0);
+//			SendMessage(*toolbars[i].hwndToolbar, TB_CHECKBUTTON, toolbars[i].select, TRUE);
 		}
 	}
 	return FALSE ;

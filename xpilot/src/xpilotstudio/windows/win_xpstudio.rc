@@ -233,7 +233,7 @@ IDI_MAINICON            ICON    DISCARDABLE     "res\\mainicon.ico"
 IDD_SCRMULT DIALOGEX 0, 0, 382, 151
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Scoring Options"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     EDITTEXT        IDC_SHOTKILLSCOREMULT,92,0,60,12,ES_RIGHT | 
                     ES_AUTOHSCROLL,WS_EX_STATICEDGE
@@ -287,6 +287,9 @@ BEGIN
                     SS_CENTERIMAGE
     LTEXT           "MineKillScoreMultiplier:",IDC_STATIC,152,24,92,12,
                     SS_CENTERIMAGE
+    CONTROL         "Constant Scoring?",IDC_CONSTANTSCORING,"Button",
+                    BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | WS_TABSTOP,
+                    213,48,91,12
 END
 
 IDD_PROBS DIALOGEX 0, 0, 382, 151
@@ -437,10 +440,6 @@ BEGIN
                     ES_NUMBER,WS_EX_STATICEDGE
     EDITTEXT        IDC_MAXARMOR,310,0,60,12,ES_RIGHT | ES_AUTOHSCROLL | 
                     ES_NUMBER,WS_EX_STATICEDGE
-    EDITTEXT        IDC_MAXOFFENSIVEITEMS,310,11,60,12,ES_RIGHT | 
-                    ES_AUTOHSCROLL | ES_NUMBER,WS_EX_STATICEDGE
-    EDITTEXT        IDC_MAXDEFENSIVEITEMS,310,23,60,12,ES_RIGHT | 
-                    ES_AUTOHSCROLL | ES_NUMBER,WS_EX_STATICEDGE
     LTEXT           "Max Fuel:",IDC_STATIC,0,0,60,12,SS_CENTERIMAGE
     LTEXT           "Max Tanks:",IDC_STATIC,0,12,60,12,SS_CENTERIMAGE
     LTEXT           "Max ECMs:",IDC_STATIC,0,24,60,12,SS_CENTERIMAGE
@@ -466,8 +465,6 @@ BEGIN
     LTEXT           "Max Emrg'y Shlds:",IDC_STATIC,125,96,60,12,
                     SS_CENTERIMAGE
     LTEXT           "Max Mirrors:",IDC_STATIC,125,108,60,12,SS_CENTERIMAGE
-    LTEXT           "Max OffItems:",IDC_STATIC,250,11,60,12,SS_CENTERIMAGE
-    LTEXT           "Max DefItems:",IDC_STATIC,250,23,60,12,SS_CENTERIMAGE
     LTEXT           "Max Armor:",IDC_STATIC,250,0,60,12,SS_CENTERIMAGE
     EDITTEXT        IDC_MAXITEMDENSITY,311,48,59,12,ES_RIGHT | 
                     ES_AUTOHSCROLL,WS_EX_STATICEDGE
@@ -503,9 +500,6 @@ BEGIN
                     WS_EX_STATICEDGE
     EDITTEXT        IDC_DEFAULTSFILENAME,60,60,60,12,ES_RIGHT | 
                     ES_AUTOHSCROLL | WS_GROUP,WS_EX_STATICEDGE
-    CONTROL         "One Player Only?",IDC_ONEPLAYERONLY,"Button",
-                    BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | WS_TABSTOP,38,
-                    76,82,12
     CONTROL         "Limited Lives?",IDC_LIMITEDLIVES,"Button",
                     BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | WS_TABSTOP,60,
                     101,60,12
@@ -574,12 +568,15 @@ BEGIN
     RTEXT           "Gravity Angle:",IDC_STATIC,139,23,46,12,SS_CENTERIMAGE
     RTEXT           "Gravity Point:",IDC_STATIC,139,37,46,12,SS_CENTERIMAGE
     GROUPBOX        "Shot Options",IDC_STATIC,257,12,123,92
+    EDITTEXT        IDC_PLAYERLIMIT,60,82,60,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER,WS_EX_STATICEDGE
+    RTEXT           "Player Limit:",IDC_STATIC,0,82,60,12,SS_CENTERIMAGE
 END
 
 IDD_MAPDATA5 DIALOGEX 0, 0, 382, 151
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Rounds, Connection opts..."
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     EDITTEXT        IDC_MAXROUNDTIME,65,17,59,12,ES_RIGHT | ES_AUTOHSCROLL | 
                     ES_NUMBER,WS_EX_STATICEDGE
@@ -597,11 +594,6 @@ BEGIN
                     ES_NUMBER,WS_EX_STATICEDGE
     EDITTEXT        IDC_ITEMCONCENTRATORRADIUS,215,17,60,12,ES_RIGHT | 
                     ES_AUTOHSCROLL,WS_EX_STATICEDGE
-    CONTROL         "Use Wreckage?",IDC_USEWRECKAGE,"Button",BS_AUTOCHECKBOX | 
-                    BS_LEFTTEXT | BS_RIGHT | WS_TABSTOP,41,129,82,12
-    CONTROL         "Analytical Collision Detection?",
-                    IDC_ANALYTICALCOLLISIONDETECTION,"Button",
-                    BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,170,30,106,12
     CONTROL         "Report To Meta Server?",IDC_REPORTTOMETASERVER,"Button",
                     BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | WS_TABSTOP,
                     143,49,91,12
@@ -649,11 +641,16 @@ BEGIN
     LTEXT           "Timer Resolution:",IDC_STATIC,241,133,60,12,
                     SS_CENTERIMAGE
     GROUPBOX        "Round Options",IDC_STATIC,1,5,125,69
-    GROUPBOX        "Race Options",IDC_STATIC,1,75,124,50
+    GROUPBOX        "Race Options",IDC_STATIC,1,75,124,64
     GROUPBOX        "Running Options",IDC_STATIC,127,41,242,107
     CONTROL         "Search Domain for Xpilot?",IDC_SEARCHDOMAINFORXPILOT,
                     "Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | 
                     WS_TABSTOP,137,64,97,12
+    EDITTEXT        IDC_RECORDMODE,303,47,60,12,ES_RIGHT | ES_AUTOHSCROLL,
+                    WS_EX_STATICEDGE
+    LTEXT           "Record Mode:",IDC_STATIC,241,47,60,12,SS_CENTERIMAGE
+    CONTROL         "Elimination?",IDC_ELIMINATION,"Button",BS_AUTOCHECKBOX | 
+                    BS_LEFTTEXT | BS_RIGHT | WS_TABSTOP,67,124,56,12
 END
 
 IDD_MAPDATA4 DIALOGEX 0, 0, 382, 151

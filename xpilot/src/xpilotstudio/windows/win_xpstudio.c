@@ -353,9 +353,8 @@ LRESULT CALLBACK MainWndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam
 				InvalidateRect(hwndActive, NULL, TRUE);
 			}
 			return 0;
-		case IDM_MAP_NORMAL :
 		case IDM_MAP_HIDDEN :
-			iSelectionWallType = LOWORD (wParam);
+			bSegHidden = !bSegHidden;
 			SendMessage(hwnd, WM_COMMAND, (WPARAM) UPDATE_COMMANDS, 0);
 			if (IsWindow (hwndActive))
 			{
