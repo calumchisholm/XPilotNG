@@ -127,9 +127,8 @@ static void Receive_init(void)
     receive_tbl[PKT_WRECKAGE]	= Receive_wreckage;
     receive_tbl[PKT_ASTEROID]	= Receive_asteroid;
     receive_tbl[PKT_WORMHOLE]	= Receive_wormhole;
-    for (i = 0; i < DEBRIS_TYPES; i++) {
+    for (i = 0; i < DEBRIS_TYPES; i++)
 	receive_tbl[PKT_DEBRIS + i] = Receive_debris;
-    }
 
     reliable_tbl[PKT_MOTD]	= Receive_motd;
     reliable_tbl[PKT_MESSAGE]	= Receive_message;
@@ -352,9 +351,8 @@ static void parse_new(void)
 	if (!edgechange) {
 	    current_estyle = get_ushort(&edgeptr);
 	    ecount--;
-	    if (ecount) {
+	    if (ecount)
 		edgechange = get_ushort(&edgeptr);
-	    }
 	}
 	if (styles)
 	    styles[0] = current_estyle;
@@ -873,13 +871,13 @@ int Net_flush(void)
 	wbuf.ptr = wbuf.buf;
 	return 0;
     }
-    if (last_keyboard_ack != last_keyboard_change) {
+    if (last_keyboard_ack != last_keyboard_change)
 	/*
 	 * Since 3.2.10: just call Key_update to add our keyboard vector.
 	 * Key_update will call Send_keyboard to flush our buffer.
 	 */
 	return Key_update();
-    }
+
     Send_talk();
     if (Sockbuf_flush(&wbuf) == -1)
 	return -1;
@@ -1074,10 +1072,9 @@ static int Net_packet(void)
 	}
 	else if ((result = (*receive_tbl[type])()) <= 0) {
 	    if (result == -1) {
-		if (type != PKT_QUIT) {
+		if (type != PKT_QUIT)
 		    warn("Processing packet type (%d, %d) failed",
 			 type, prev_type);
-		}
 		return -1;
 	    }
 	    /* Drop rest of incomplete packet */
@@ -1090,9 +1087,8 @@ static int Net_packet(void)
 	type = (*cbuf.ptr & 0xFF);
 	if (type == PKT_REPLY) {
 	    if ((result = Receive_reply(&replyto, &status)) <= 0) {
-		if (result == 0) {
+		if (result == 0)
 		    break;
-		}
 		return -1;
 	    }
 	    /* should do something more appropriate than this with the reply */
@@ -1276,14 +1272,14 @@ static int Net_read(frame_buf_t *frame)
 	}
 	/*IFWINDOWS( Trace("Net_read: read %d bytes type=%d\n",
 	  frame->sbuf.len, frame->sbuf.ptr[0]) ); */
-	if (frame->sbuf.ptr[0] != PKT_START) {
+	if (frame->sbuf.ptr[0] != PKT_START)
 	    /*
 	     * Don't know which type of packet this is
 	     * and if it contains a frame at all (not likely).
 	     * It could be a quit packet.
 	     */
 	    return 1;
-	}
+
 	/* Peek at the frame loop number. */
 	n = Packet_scanf(&frame->sbuf, "%c%ld", &ch, &loop);
 	/*IFWINDOWS( Trace("Net_read: frame # %d\n", loop) );*/
@@ -1430,13 +1426,12 @@ int Net_input(void)
 		 */
 		num_buffered_packets++;
 		continue;
-	    } else {
+	    } else
 		/*
 		 * Empty.  The rest should be empty too,
 		 * because we have taken care not to have gaps.
 		 */
 		break;
-	    }
 	}
 	else {
 	    num_buffered_packets++;
@@ -1497,14 +1492,13 @@ int Net_input(void)
 	|| last_loops - last_send_anything > 5 * clientFPS) {
 	Key_update();
 	last_send_anything = last_loops;
-    } else {
+    } else
 	/*
 	 * 4.5.4a2: flush if non-empty
 	 * This should help speedup the map update speed
 	 * for maps with large number of targets or cannons.
 	 */
 	Net_flush();
-    }
 
     return num_buffered_packets;
 }
@@ -1522,9 +1516,9 @@ int Receive_start(void)
 
     if ((n = Packet_scanf(&rbuf,
 			  "%c%ld%ld",
-			  &ch, &loops, &key_ack)) <= 0) {
+			  &ch, &loops, &key_ack)) <= 0)
 	return n;
-    }
+
     if (last_loops >= loops) {
 	/*
 	 * Packet is duplicate or out of order.
@@ -1544,9 +1538,8 @@ int Receive_start(void)
 	     */
 	    return 0;
 	}
-	else {
+	else
 	    last_keyboard_ack = key_ack;
-	}
     }
     Net_lag_measurement(key_ack);
     if ((n = Handle_start(loops)) == -1)
@@ -1712,9 +1705,9 @@ int Receive_self_items(void)
     u_byte		num_items[NUM_ITEMS];
 
     n = Packet_scanf(&rbuf, "%c%u", &ch, &mask);
-    if (n <= 0) {
+    if (n <= 0)
 	return n;
-    }
+
     memset(num_items, 0, sizeof num_items);
     for (i = 0; mask != 0; i++) {
 	if (mask & (1 << i)) {
@@ -1750,8 +1743,7 @@ int Receive_self(void)
 		     "%c"
 		     "%hd%hd%hd%hd%c"
 		     "%c%c%c"
-		     "%hd%hd%c%c"
-		     ,
+		     "%hd%hd%c%c",
 		     &ch,
 		     &x, &y, &vx, &vy, &heading,
 		     &power, &turnspeed, &turnresistance,
@@ -1765,8 +1757,8 @@ int Receive_self(void)
 	n = Packet_scanf(&rbuf,
 			 "%c%c%c%c%c"
 			 "%c%c%c%c%c"
-			 "%c%c%c%c"
-			 ,
+			 "%c%c%c%c",
+
 			 &(num_items[ITEM_CLOAK]),
 			 &(num_items[ITEM_SENSOR]),
 			 &(num_items[ITEM_MINE]),
@@ -1789,8 +1781,8 @@ int Receive_self(void)
     n = Packet_scanf(&rbuf,
 		     "%c%hd%hd"
 		     "%hd%hd%c"
-		     "%c%c"
-		     ,
+		     "%c%c",
+
 		     &currentTank, &fuelSum, &fuelMax,
 		     &ext_view_width, &ext_view_height, &debris_colors,
 		     &stat, &autopilotLight
@@ -1924,9 +1916,10 @@ int Receive_missile(void)
     short	x, y;
     u_byte	ch, dir, len;
 
-    if ((n = Packet_scanf(&rbuf, "%c%hd%hd%c%c", &ch, &x, &y, &len, &dir)) <= 0) {
+    if ((n = Packet_scanf(&rbuf, "%c%hd%hd%c%c", &ch, &x, &y, &len, &dir))
+	<= 0)
 	return n;
-    }
+
     if ((n = Handle_missile(x, y, len, dir)) == -1)
 	return -1;
     return 1;
@@ -1962,7 +1955,8 @@ int Receive_ship(void)
     phased = ((flags & 8) != 0);
     deflector = ((flags & 0x10) != 0);
 
-    if ((n = Handle_ship(x, y, id, dir, shield, cloak, eshield, phased, deflector)) == -1)
+    if ((n = Handle_ship(x, y, id, dir, shield,
+			 cloak, eshield, phased, deflector)) == -1)
 	return -1;
     return 1;
 }
