@@ -1431,49 +1431,24 @@ void Fire_laser(int ind)
     player	*pl = Players[ind];
     int		cx, cy;
 
-    if (pl->item[ITEM_LASER] > pl->num_pulses
-	&& pl->velocity < CLICK_TO_PIXEL(PULSE_LENGTH)) {
-	if (pl->fuel.sum < -ED_LASER) {
-	    CLR_BIT(pl->used, HAS_LASER);
-	} else {
-	    /* kps - ng does not want to add the velocity here */
-	    cx = pl->pos.cx + pl->ship->m_gun[pl->dir].cx
-		+ PIXEL_TO_CLICK(pl->vel.x) * timeStep2;
-	    cy = pl->pos.cy + pl->ship->m_gun[pl->dir].cy
-		+ PIXEL_TO_CLICK(pl->vel.y) * timeStep2;
-	    cx = WRAP_XCLICK(cx);
-	    cy = WRAP_YCLICK(cy);
-	    if (INSIDE_MAP(cx, cy))
-		Fire_general_laser(ind, pl->team, cx, cy, pl->dir, pl->mods);
-	}
-    }
-
-#if 0 /* laserhack */
-    player	*pl = Players[ind];
-    int		cx, cy;
-
     if (frame_time < pl->laser_time + laserRepeatRate) {
  	return;
     }
     pl->laser_time = frame_time;
 
     if (pl->item[ITEM_LASER] > pl->num_pulses
-	&& pl->velocity < CLICK_TO_PIXEL(PULSE_LENGTH)) {
-	if (pl->fuel.sum <= -ED_LASER) {
+	&& pl->velocity < pulseSpeed) {
+	if (pl->fuel.sum < -ED_LASER) {
 	    CLR_BIT(pl->used, HAS_LASER);
 	} else {
-	    /* kps - ng does not want to add the velocity here */
-	    cx = pl->pos.cx + pl->ship->m_gun[pl->dir].cx
-		+ PIXEL_TO_CLICK(pl->vel.x) * timeStep2;
-	    cy = pl->pos.cy + pl->ship->m_gun[pl->dir].cy
-		+ PIXEL_TO_CLICK(pl->vel.y) * timeStep2;
+	    cx = pl->pos.cx + pl->ship->m_gun[pl->dir].cx;
+	    cy = pl->pos.cy + pl->ship->m_gun[pl->dir].cy;
 	    cx = WRAP_XCLICK(cx);
 	    cy = WRAP_YCLICK(cy);
 	    if (INSIDE_MAP(cx, cy))
 		Fire_general_laser(ind, pl->team, cx, cy, pl->dir, pl->mods);
 	}
     }
-#endif
 }
 
 void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
@@ -1497,7 +1472,9 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     if (pl) {
 	Add_fuel(&(pl->fuel), (long)ED_LASER);
 	sound_play_sensors(cx, cy, FIRE_LASER_SOUND);
-	life = (int)PULSE_LIFE(pl->item[ITEM_LASER]);
+	/* kps - hmm ??? */
+	/*life = (int)PULSE_LIFE(pl->item[ITEM_LASER]);*/
+	life = pulseLife;
 	/*Rank_FireLaser(pl);*/
     } else {
 	life = (int)PULSE_LIFE(CANNON_PULSES);
@@ -1506,14 +1483,12 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     pulse->id		= (pl ? pl->id : NO_ID);
     pulse->team 	= team;
     Object_position_init_clicks(OBJ_PTR(pulse), cx, cy);
-#define PulseSpeed 90.0
-#define PulseLength PULSE_LENGTH
-    pulse->vel.x 	= PulseSpeed * tcos(dir);
-    pulse->vel.y 	= PulseSpeed * tsin(dir);
+    pulse->vel.x 	= pulseSpeed * tcos(dir);
+    pulse->vel.y 	= pulseSpeed * tsin(dir);
     pulse->acc.x 	= 0;
     pulse->acc.y 	= 0;
     pulse->mass	 	= 0;
-    pulse->life 	= 5*life; /* kps */
+    pulse->life 	= life;
     pulse->status 	= (pl ? 0 : FROMCANNON);
     pulse->type 	= OBJ_PULSE;
     pulse->count 	= 0;
@@ -1526,7 +1501,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     pulse->pl_radius 	= 0;
 
     pulse->dir  	= dir;
-    pulse->len  	= PulseLength;
+    pulse->len  	= pulseLength * CLICK;
     pulse->refl 	= false;
 
     Cell_add_object(OBJ_PTR(pulse));

@@ -78,12 +78,17 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 	&& (rfrac() * (2 * vicpl->item[ITEM_MIRROR])) >= 1) {
 	/*pulse->pos.cx = cx - tcos(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;
 	  pulse->pos.cy = cy - tsin(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;*/
+	/* is this ok ? */
 	pulse->dir = (int)Wrap_cfindDir(vicpl->pos.cx - pulse->pos.cx,
 					vicpl->pos.cy - pulse->pos.cy)
 		     * 2 - RES / 2 - pulse->dir;
 	pulse->dir = MOD2(pulse->dir, RES);
+	
+	pulse->vel.x = pulseSpeed * tcos(pulse->dir);
+	pulse->vel.y = pulseSpeed * tsin(pulse->dir);
+
 	pulse->life += vicpl->item[ITEM_MIRROR];
-	pulse->len = PULSE_LENGTH;
+	/*pulse->len = PULSE_LENGTH;*/
 	pulse->refl = true;
 	/**refl = true;*/
 	return;

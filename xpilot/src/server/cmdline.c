@@ -58,7 +58,15 @@ DFLOAT		ShotsSpeed;		/* Default speed of shots */
 int		ShotsLife;		/* Default number of ticks */
 					/* each shot will live */
 static DFLOAT	ShotsLifeSetting;	/* Above is set through this */
+
 bool		shotHitFuelDrainUsesKineticEnergy;	/* see option name */
+
+DFLOAT		pulseSpeed;		/* Default speed of laser pulse */
+DFLOAT		pulseLength;		/* Max length of laser pulse */
+int		pulseLife;		/* Default number of ticks */
+					/* each pulse will live */
+static DFLOAT	pulseLifeSetting;	/* Above is set through this */
+
 int		maxRobots;		/* How many robots should enter */
 int		minRobots;		/* the game? */
 char		*robotFile;		/* Filename for robot parameters */
@@ -72,9 +80,9 @@ bool		restrictRobots;		/* Restrict robots to robotTeam? */
 bool		reserveRobotTeam;	/* Allow only robots in robotTeam? */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
-int		fireRepeatRate;		/* Frames per autorepeat fire (0=off) */
+int		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
 static DFLOAT	fireRepeatRateSetting;	/* Above is set through this */
-int		laserRepeatRate;	/* Frames per autorepeat laser (0=off) */
+int		laserRepeatRate;	/* Ticks per autorepeat laser (0=off) */
 static DFLOAT	laserRepeatRateSetting;	/* Above is set through this */
 
 bool		RawMode;		/* Let robots live and calculate
@@ -486,17 +494,49 @@ static option_desc options[] = {
 	&fireRepeatRateSetting,
 	valReal,
 	Timing_setup,
-	"Number of frames per automatic fire (0=off).\n",
+	"Number of ticks per automatic fire (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"pulseSpeed",
+	"pulseSpeed",
+	"90.0",
+	&pulseSpeed,
+	valReal,
+	tuner_dummy,
+	"Speed of laser pulses.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"pulseLife",
+	"pulseLife",
+	"6.0", /* kps - ok ??? */
+	&pulseLifeSetting,
+	valReal,
+	Timing_setup,
+	"Life of laser pulses shot by players, in ticks.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"pulseLength",
+	"pulseLength",
+	"85.0",
+	&pulseLength,
+	valReal,
+	tuner_dummy,
+	"Max length of laser pulse.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    /* kps - change to pulseRepeatRate ??? */
+    /* kps - does this work with value == 0 ? */
+    {
 	"laserRepeatRate",
 	"laserRepeat",
-	"2.0",
+	"1.0",
 	&laserRepeatRateSetting,
 	valReal,
 	Timing_setup,
-	"Number of frames per automatic laser pulse (0=off).\n",
+	"Number of ticks per automatic laser pulse (0=off).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3735,6 +3775,7 @@ void Timing_setup(void)
     ShotsLife = ShotsLifeSetting * TIME_FACT;
     fireRepeatRate = fireRepeatRateSetting * TIME_FACT;
     laserRepeatRate = laserRepeatRateSetting * TIME_FACT;
+    pulseLife = pulseLifeSetting * TIME_FACT;
 
     friction = frictionSetting;
 

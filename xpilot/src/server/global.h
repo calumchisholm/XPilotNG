@@ -102,6 +102,8 @@ extern list_t		expandList;
 extern DFLOAT		ShotsMass, ShipMass, ShotsSpeed, Gravity;
 extern DFLOAT		ballMass;
 extern int		ShotsMax, ShotsLife;
+extern DFLOAT		pulseSpeed, pulseLength;
+extern int		pulseLife;
 extern bool		ShotsGravity;
 extern bool		shotHitFuelDrainUsesKineticEnergy;
 extern int		fireRepeatRate;
