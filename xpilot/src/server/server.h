@@ -388,7 +388,6 @@ extern struct options {
     char	*dataURL;
     char	*recordFileName;
     double	gameSpeed;
-    bool	maraTurnqueue;
     bool	ngControls;
     double	constantSpeed;
     bool	ballStyles;

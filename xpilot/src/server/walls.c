@@ -2759,8 +2759,7 @@ void Turn_player(player_t *pl)
 	if (Shape_morph((shape_t *)pl->ship, pl->dir, (shape_t *)pl->ship,
 			next_dir, hitmask, OBJ_PTR(pl),
 			pl->pos.cx, pl->pos.cy) != NO_GROUP) {
-	    if (!options.maraTurnqueue)
-		Player_set_float_dir(pl, (double)pl->dir);
+	    Player_set_float_dir(pl, (double)pl->dir);
 	    break;
 	}
 	pl->dir = next_dir;

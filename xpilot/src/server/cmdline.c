@@ -3462,18 +3462,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"maraTurnqueue",
-	"maraTurnqueue",
-	"false",
-	&options.maraTurnqueue,
-	valBool,
-	tuner_dummy,
-	"This is a temporary option to test Mara's \"turnqueue\" hack.\n"
-	"The idea is that if a ship is turning when it hits the wall,\n"
-	"the turn will be completed after the bounce.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"ngControls",
 	"ngControls",
 	"true",
