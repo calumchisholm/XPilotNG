@@ -3468,6 +3468,19 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"fastAim",
+	"fastAim",
+	"false",
+	&options.fastAim,
+	valBool,
+	tuner_dummy,
+	"When calculating a frame, turn the ship before firing.\n"
+	"This means you can change aim one frame faster.\n"
+	"Added this option to see how much difference changing the order\n"
+	"would make.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"ngControls",
 	"ngControls",
 	"false",

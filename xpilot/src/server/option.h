@@ -310,6 +310,7 @@ extern struct options {
     bool	ballStyles;
     bool	ignoreMaxFPS;
     bool	polygonMode;
+    bool	fastAim;
     bool	teamcup;
     char	*teamcupStatServer;
     int		teamcupStatPort;

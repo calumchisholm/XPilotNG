@@ -1087,7 +1087,8 @@ void Update_objects(world_t *world)
      * When calculating a frame, turn the ship before firing.
      * This means you can change aim one frame faster.
      */
-    Players_turn();
+    if (options.fastAim)
+	Players_turn();
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
@@ -1129,6 +1130,8 @@ void Update_objects(world_t *world)
     Transporter_update(world);
     Cannon_update(world, do_update_this_frame);
     Target_update(world);
+    if (!options.fastAim)
+	Players_turn();
     Update_players(world);
 
     for (i = world->NumWormholes - 1; i >= 0; i--) {
