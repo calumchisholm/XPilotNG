@@ -185,11 +185,12 @@ void Place_general_mine(int ind, unsigned short team, long status,
 	}
 	if (baseMineRange) {
 	    for (i = 0; i < NumPlayers; i++) {
+		player *pl_i = Players(i);
 		if (i != ind
-		    && !Team_immune(Players(i)->id, pl->id)
+		    && !Team_immune(pl_i->id, pl->id)
 		    && !IS_TANK_IND(i)) {
-		    int dx = cx - World.base[Players(i)->home_base].pos.cx;
-		    int dy = cy - World.base[Players(i)->home_base].pos.cy;
+		    int dx = cx - World.base[pl_i->home_base].pos.cx;
+		    int dy = cy - World.base[pl_i->home_base].pos.cy;
 		    if (Wrap_length(dx, dy) <= baseMineRange * BLOCK_CLICKS) {
 			Set_player_message(pl, "No base mining!");
 			return;
@@ -1173,8 +1174,9 @@ void Delete_shot(int ind)
 	     * Maybe some player is still busy trying to connect to this ball.
 	     */
 	    for (i = 0; i < NumPlayers; i++) {
-		if (Players(i)->ball == ball) {
-		    Players(i)->ball = NULL;
+		player *pl_i = Players(i);
+		if (pl_i->ball == ball) {
+		    pl_i->ball = NULL;
 		}
 	    }
 	}
@@ -1646,14 +1648,14 @@ void Move_smart_shot(int ind)
 	if (shot->info >= 0) {
 	    clpos engine;
 	    /* Get player and set min to distance */
-	    pl = Players( GetInd(shot->info) );
+	    pl = Player_by_id(shot->info);
 	    engine = Ship_get_engine_clpos(pl->ship, pl->dir);
 	    range = Wrap_length(pl->pos.cx + engine.cx - shot->pos.cx,
 				pl->pos.cy + engine.cy - shot->pos.cy)
 		/ CLICK;
 	} else {
 	    /* No player. Number of moves so that new target is searched */
-	    pl = 0;
+	    pl = NULL;
 	    shot->count = HEAT_WIDE_TIMEOUT + HEAT_WIDE_ERROR;
 	}
 	if (pl && BIT(pl->status, THRUSTING)) {
@@ -1680,33 +1682,33 @@ void Move_smart_shot(int ind)
 		int i;
 
 		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
-		for (i=0; i<NumPlayers; i++) {
-		    player *p = Players(i);
+		for (i = 0; i < NumPlayers; i++) {
+		    player *pl_i = Players(i);
 		    clpos engine;
 
-		    if (!BIT(p->status, THRUSTING))
+		    if (!BIT(pl_i->status, THRUSTING))
 			continue;
 
-		    engine = Ship_get_engine_clpos(p->ship, p->dir);
-		    l = Wrap_length(p->pos.cx + engine.cx - shot->pos.cx,
-				    p->pos.cy + engine.cy - shot->pos.cy)
+		    engine = Ship_get_engine_clpos(pl_i->ship, pl_i->dir);
+		    l = Wrap_length(pl_i->pos.cx + engine.cx - shot->pos.cx,
+				    pl_i->pos.cy + engine.cy - shot->pos.cy)
 			/ CLICK;
 		    /*
 		     * After burners can be detected easier;
 		     * so scale the length:
 		     */
-		    l *= MAX_AFTERBURNER + 1 - p->item[ITEM_AFTERBURNER];
+		    l *= MAX_AFTERBURNER + 1 - pl_i->item[ITEM_AFTERBURNER];
 		    l /= MAX_AFTERBURNER + 1;
-		    if (BIT(p->have, HAS_AFTERBURNER))
-			l *= 16 - p->item[ITEM_AFTERBURNER];
+		    if (BIT(pl_i->have, HAS_AFTERBURNER))
+			l *= 16 - pl_i->item[ITEM_AFTERBURNER];
 		    if (l < range) {
-			shot->info = Players(i)->id;
+			shot->info = pl_i->id;
 			range = l;
 			shot->count =
 			    l < HEAT_CLOSE_RANGE ?
 				HEAT_CLOSE_ERROR : l < HEAT_MID_RANGE ?
 				    HEAT_MID_ERROR : HEAT_WIDE_ERROR;
-			pl = p;
+			pl = pl_i;
 		    }
 		}
 	    }
