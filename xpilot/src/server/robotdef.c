@@ -1162,22 +1162,27 @@ static bool Detect_ship(player_t *pl, player_t *ship)
 {
     double distance;
 
+    /* can't go after non-playing ships */
     if (!Player_is_playing(ship))
-	return false;		/* can't go after non-playing ships */
+	return false;
 
+    /* can't do anything with phased ships */
     if (BIT(ship->used, HAS_PHASING_DEVICE))
-	return false;		/* can't do anything with phased ships */
+	return false;
 
+    /* trivial */
     if (pl->visibility[GetInd(ship->id)].canSee)
-	return true;		/* trivial */
+	return true;
 
-    /* can't see it, so it must be cloaked
-	maybe we can detect it's presence from other clues? */
-
+    /*
+     * can't see it, so it must be cloaked
+     * maybe we can detect it's presence from other clues?
+     */
     distance = Wrap_length(ship->pos.cx - pl->pos.cx,
 			   ship->pos.cy - pl->pos.cy) / CLICK;
+    /* can't detect ships beyond visual range */
     if (distance > Visibility_distance)
-	return false;		/* can't detect ships beyond visual range */
+	return false;
 
     if (BIT(ship->status, THRUSTING) && options.cloakedExhaust)
 	return true;
@@ -1193,7 +1198,8 @@ static bool Detect_ship(player_t *pl, player_t *ship)
     if (BIT(ship->have, HAS_BALL))
 	return true;
 
-    return false;		/* the sky seems clear.. */
+    /* the sky seems clear.. */
+    return false;
 }
 
 /*
@@ -1400,9 +1406,9 @@ static bool Ball_handler(player_t *pl)
 	    CLR_BIT(my_data->longterm_mode, FETCH_TREASURE);
 	} else {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
-	    return (Check_robot_target(pl,
-				       world->treasures[closest_tr].pos,
-				       RM_NAVIGATE));
+	    return Check_robot_target(pl,
+				      world->treasures[closest_tr].pos,
+				      RM_NAVIGATE);
 	}
     } else {
 	int ball_dist;
@@ -1428,15 +1434,15 @@ static bool Ball_handler(player_t *pl)
 	if (closest_ball == -1
 	    && closest_ntr_dist < (my_data->robot_count / 10) * BLOCK_SZ) {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
-	    return (Check_robot_target(pl,
-				       world->treasures[closest_ntr].pos,
-				       RM_NAVIGATE));
+	    return Check_robot_target(pl,
+				      world->treasures[closest_ntr].pos,
+				      RM_NAVIGATE);
 	} else if (closest_ball_dist < (my_data->robot_count / 10) * BLOCK_SZ
 		   && closest_ball_dist > options.ballConnectorLength) {
 	    SET_BIT(my_data->longterm_mode, FETCH_TREASURE);
-	    return (Check_robot_target(pl,
-				       Obj[closest_ball]->pos,
-				       RM_NAVIGATE));
+	    return Check_robot_target(pl,
+				      Obj[closest_ball]->pos,
+				      RM_NAVIGATE);
 	}
     }
     return false;
@@ -1577,7 +1583,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 {
     int j;
     object_t *shot, **obj_list;
-    int distance, obj_count, dx, dy, shield_range;
+    int distance, obj_count, shield_range;
     long killing_shots;
     robot_default_data_t *my_data = Robot_default_get_data(pl);
     world_t *world = pl->world;
@@ -1609,17 +1615,13 @@ static void Robot_default_play_check_objects(player_t *pl,
 		     max_objs, &obj_list, &obj_count);
 
     for (j = 0; j < obj_count; j++) {
+	int dx, dy;
 
 	shot = obj_list[j];
 
 	/* Get rid of the most common object types first for speed. */
 	if (BIT(shot->type, OBJ_DEBRIS|OBJ_SPARK))
 	    continue;
-
-	dx = CLICK_TO_PIXEL(shot->pos.cx - pl->pos.cx);
-	dy = CLICK_TO_PIXEL(shot->pos.cy - pl->pos.cy);
-	dx = WRAP_DX(dx);
-	dy = WRAP_DX(dy);
 
 	if (BIT(shot->type, OBJ_BALL)
 	    && !WITHIN(my_data->last_thrown_ball,
@@ -1633,27 +1635,10 @@ static void Robot_default_play_check_objects(player_t *pl,
 	    && BIT(pl->used, HAS_SHIELD))
 	    continue;
 
-	/*-BA This code shouldn't be executed for `friendly` shots
-	 *-BA Moved down 2 paragraphs
-	 *	if (BIT(shot->type, OBJ_SMART_SHOT|OBJ_HEAT_SHOT|OBJ_MINE)) {
-	 *	    fx = shot->pos.x - pl->pos.x;
-	 *	    fy = shot->pos.y - pl->pos.y;
-	 *	    if ((dx = fx, dx = WRAP_DX(dx), ABS(dx)) < mine_dist
-	 *		&& (dy = fy, dy = WRAP_DY(dy), ABS(dy)) < mine_dist
-	 *		&& (distance = LENGTH(dx, dy)) < mine_dist) {
-	 *		mine_i = j;
-	 *		mine_dist = distance;
-	 *	    }
-	 *	    if ((dx = fx + (shot->vel.x - pl->vel.x) * ROB_LOOK_AH,
-	 *		    dx = WRAP_DX(dx), ABS(dx)) < mine_dist
-	 *		&& (dy = fy + (shot->vel.y - pl->vel.y) * ROB_LOOK_AH,
-	 *		    dy = WRAP_DY(dy), ABS(dy)) < mine_dist
-	 *		&& (distance = LENGTH(dx, dy)) < mine_dist) {
-	 *		mine_i = j;
-	 *		mine_dist = distance;
-	 *	    }
-	 *	}
-	 */
+	dx = CLICK_TO_PIXEL(shot->pos.cx - pl->pos.cx);
+	dy = CLICK_TO_PIXEL(shot->pos.cy - pl->pos.cy);
+	dx = WRAP_DX(dx);
+	dy = WRAP_DY(dy);
 
 	/*
 	 * The only thing left to do regarding objects is to check if
@@ -1977,9 +1962,8 @@ static void Robot_default_play(player_t *pl)
 	}
     }
 
-    if (ship_dist < 3*SHIP_SZ && BIT(pl->have, HAS_SHIELD)) {
+    if (ship_dist < 3*SHIP_SZ && BIT(pl->have, HAS_SHIELD))
 	SET_BIT(pl->used, HAS_SHIELD);
-    }
 
     if (ship_dist <= 10*BLOCK_SZ && pl->fuel.sum <= my_data->fuel_l3
 	&& !BIT(world->rules->mode, TIMING)) {
@@ -2037,14 +2021,12 @@ static void Robot_default_play(player_t *pl)
 	if (Check_robot_evade(pl, mine_i, ship_i)) {
 	    if (!options.allowShields
 		&& options.playerStartsShielded
-		&& BIT(pl->have, HAS_SHIELD)) {
+		&& BIT(pl->have, HAS_SHIELD))
 		SET_BIT(pl->used, HAS_SHIELD);
-	    }
 	    else if (options.maxShieldedWallBounceSpeed >
 		    options.maxUnshieldedWallBounceSpeed
-		&& BIT(pl->have, HAS_SHIELD)) {
+		&& BIT(pl->have, HAS_SHIELD))
 		SET_BIT(pl->used, HAS_SHIELD);
-	    }
 	    return;
 	}
     }
@@ -2141,9 +2123,8 @@ static void Robot_default_play(player_t *pl)
     if (Check_robot_hunt(pl)) {
 	if (!options.allowShields
 	    && options.playerStartsShielded
-	    && BIT(pl->have, HAS_SHIELD)) {
+	    && BIT(pl->have, HAS_SHIELD))
 	    SET_BIT(pl->used, HAS_SHIELD);
-	}
 	return;
     }
 
@@ -2152,9 +2133,8 @@ static void Robot_default_play(player_t *pl)
 
     if (!options.allowShields
 	&& options.playerStartsShielded
-	&& BIT(pl->have, HAS_SHIELD)) {
+	&& BIT(pl->have, HAS_SHIELD))
 	SET_BIT(pl->used, HAS_SHIELD);
-    }
 
     x_speed = pl->vel.x - 2 * World_gravity(world, pl->pos).x;
     y_speed = pl->vel.y - 2 * World_gravity(world, pl->pos).y;
