@@ -1060,8 +1060,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     if (pl->rectype < 2) {
 	if (BIT(world->rules->mode, TEAM_PLAY) && pl->team == TEAM_NOT_SET) {
-	    SET_BIT(pl->pl_status, PAUSE);
-	    pl->mychar = 'P';
+	    Player_set_state(pl, PL_STATE_PAUSED);
 	    pl->home_base = NULL;
 	    pl->team = 0;
 	}

@@ -197,7 +197,7 @@ void Pause_player(player_t *pl, bool on)
 	/* player might have paused when recovering */
 	pl->recovery_count = 0;
 	pl->updateVisibility = 1;
-	SET_BIT(pl->pl_status, PAUSE);
+	Player_set_state(pl, PL_STATE_PAUSED);
 	/* kps - can this happen ??? */
 	if (pl->pauseTime != 0)
 	    warn("Pause_player: pl pausetime was != 0 (%.3f)", pl->pauseTime);
@@ -221,7 +221,6 @@ void Pause_player(player_t *pl, bool on)
 	    }
 	    pl->home_base = NULL;
 	}
-	pl->mychar = 'P';
 	updateScores = true;
 	Player_pause_reset(pl);
 	for (i = 0; i < MAX_TEAMS ; i++) {
@@ -242,8 +241,7 @@ void Pause_player(player_t *pl, bool on)
 	    if (BIT(world->rules->mode, LIMITED_LIVES)) {
 		/* too late, wait for next round */
 		pl->life = 0;
-		pl->mychar = 'W';
-		SET_BIT(pl->pl_status, GAME_OVER);
+		Player_set_state(pl, PL_STATE_WAITING);
 	    } else {
 		pl->mychar = ' ';
 		Go_home(pl);

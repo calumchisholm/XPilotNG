@@ -155,7 +155,7 @@ static int do_kick(int team, int nonlast)
 	player_t *pl_i = Player_by_index(i);
 
 	if (pl_i->conn != NULL
-	    && BIT(pl_i->pl_status, PAUSE)
+	    && Player_is_paused(pl_i)
 	    && (team == TEAM_NOT_SET || (pl_i->team == team &&
 					 pl_i->home_base != NULL))
 	    && !(pl_i->privs & PRIV_NOAUTOKICK)

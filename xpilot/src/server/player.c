@@ -30,7 +30,7 @@ char player_version[] = VERSION;
 
 bool		updateScores = true;
 
-int	playerArrayNumber;
+int		playerArrayNumber;
 player_t	**PlayersArray;
 static int	GetIndArray[NUM_IDS + MAX_SPECTATORS + 1];
 
@@ -468,10 +468,9 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
      * there was a round reset when the first player joined. -uau
      */
     if (BIT(world->rules->mode, LIMITED_LIVES) && NumPlayers > 0) {
-	pl->mychar = 'W';
+	Player_set_state(pl, PL_STATE_WAITING);
 	pl->prev_life = 0;
 	pl->life = 0.0;
-	SET_BIT(pl->pl_status, GAME_OVER);
     }
 
     pl->team		= TEAM_NOT_SET;
@@ -1578,9 +1577,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 		    }
 		}
 		pl->life = 0;
-		SET_BIT(pl->pl_status, GAME_OVER);
-		if (pl->mychar != 'W')
-		    pl->mychar = 'D';
+		if (!Player_is_waiting(pl))
+		    Player_set_state(pl, PL_STATE_DEAD);
 		Player_lock_closest(pl, false);
 	    }
 	}

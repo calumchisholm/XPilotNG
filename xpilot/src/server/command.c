@@ -157,11 +157,13 @@ static void Set_swapper_state(player_t *pl)
 	    if (!Players_are_teammates(pl, pl_i) &&
 		!Player_is_paused(pl_i)) {
 		/* put team swapping player waiting mode. */
-		if (pl->mychar == ' ')
-		    pl->mychar = 'W';
+		/* kps - there used to be a if (pl->mychar == ' ') here,
+		 * not sure what that was good for.
+		 */
+		Player_set_state(pl, PL_STATE_WAITING);
 		pl->prev_life = 0;
 		pl->life = 0.0;
-		SET_BIT(pl->pl_status, GAME_OVER | PLAYING);
+		SET_BIT(pl->pl_status, PLAYING);
 		Player_self_destruct(pl, false);
 		pl->pause_count = 0;
 		pl->recovery_count = 0;

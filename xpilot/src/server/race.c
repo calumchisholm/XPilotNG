@@ -75,8 +75,7 @@ void Race_compute_game_status(world_t *world)
 	pl->last_lap = pl->time;
 	if (pl->round > options.raceLaps) {
 	    Player_death_reset(pl);
-	    pl->mychar = 'D';
-	    SET_BIT(pl->pl_status, GAME_OVER);
+	    Player_set_state(pl, PL_STATE_DEAD);
 	    sprintf(msg, "%s finished the race. Last lap time: %.2fs. "
 		    "Personal race best lap time: %.2fs.",
 		    pl->name,
@@ -132,8 +131,7 @@ void Race_compute_game_status(world_t *world)
 		    continue;
 		if (pl->round < pl_i->round) {
 		    Player_death_reset(pl);
-		    pl->mychar = 'D';
-		    SET_BIT(pl->pl_status, GAME_OVER);
+		    Player_set_state(pl, PL_STATE_DEAD);
 		    if (count == 1) {
 			sprintf(msg, "%s was the last to complete lap "
 				"%d and is out of the race.",
@@ -429,8 +427,8 @@ void Player_pass_checkpoint(player_t *pl)
 		}
 	    }
 	    Player_death_reset(pl, false);
-	    pl->mychar = 'D';
-	    SET_BIT(pl->pl_status, GAME_OVER|FINISH);
+	    Player_set_state(pl, PL_STATE_DEAD);
+	    SET_BIT(pl->pl_status, FINISH);
 	    Set_message_f("%s finished the race. Last lap time: %.2fs. "
 			  "Personal race best lap time: %.2fs.",
 			  pl->name,

@@ -70,7 +70,25 @@
 #define PL_TYPE_ROBOT		1
 #define PL_TYPE_TANK		2
 
-#define PL_STATE_KILLED		1
+/*
+ * These values are set in the player->pl_state field.
+ */
+/* pl_status = {GAME_OVER, [PLAYING]},    mychar = 'W' */
+#define PL_STATE_WAITING	0
+/* pl_status = {},                        mychar = ' ' */
+#define PL_STATE_APPEARING	1
+/* pl_status = {PLAYING},                 mychar = ' ' */
+#define PL_STATE_PLAYING	2
+/* pl_status = {KILLED, ...},             mychar = ... */
+/* killed this frame */
+#define PL_STATE_KILLED		3
+/* pl_status = {GAME_OVER, [PLAYING]},    mychar = 'D' */
+/* dead, waiting for next round */
+#define PL_STATE_DEAD 		4
+/* pl_status = {PAUSE},                   mychar = 'P' */
+#define PL_STATE_PAUSED 	5
+/* pl_status = {GAME_OVER, [PLAYING]},    mychar = ' ' */
+#define PL_STATE_GAME_OVER	6
 
 /*
  * Different types of attributes a player can have.
@@ -101,7 +119,7 @@
  * so the first 8 bitvalues are reserved for that purpose,
  * those are defined in common/rules.h.
  */
-#define KILLED			(1U<<8)
+#define KILLED			(1U<<8)		/* Killed this frame */
 #define HOVERPAUSE		(1U<<9)		/* Hovering pause */
 #define REPROGRAM		(1U<<10)	/* Player reprogramming */
 #define FINISH			(1U<<11)	/* Finished a lap this frame */
@@ -178,7 +196,8 @@ struct player {
     /* up to here the player type should be the same as an object. */
 
     int		pl_type;		/* extended type info (tank, robot) */
-    uint16_t	pl_status;		/* playing, etc. */
+    uint16_t	pl_status;		/* PLAYING, etc. */
+    uint16_t	pl_state;		/* one of PL_STATE_* */
 
     double	turnspeed;		/* How fast player acc-turns */
     double	velocity;		/* Absolute speed */
@@ -186,8 +205,8 @@ struct player {
     int		kills;			/* Number of kills this round */
     int		deaths;			/* Number of deaths this round */
 
-    long	used;			/** Items you use **/
-    long	have;			/** Items you have **/
+    long	used;			/* Items you use */
+    long	have;			/* Items you have */
 
     double	shield_time;		/* Shields if no options.playerShielding */
     pl_fuel_t	fuel;			/* ship tanks and the stored fuel */
@@ -357,24 +376,61 @@ static inline player_t *Player_by_id(int id)
     return Player_by_index(GetInd(id));
 }
 
+#ifdef USE_PL_STATE
+static inline bool Player_is_waiting(player_t *pl)
+{
+    return pl->pl_state == PL_STATE_WAITING ? true : false;
+}
+#else
 static inline bool Player_is_waiting(player_t *pl)
 {
     if (BIT(pl->pl_status, GAME_OVER) && pl->mychar == 'W')
 	return true;
     return false;
 }
+#endif
 
+#ifdef USE_PL_STATE
+static inline bool Player_is_paused(player_t *pl)
+{
+    return pl->pl_state == PL_STATE_PAUSED ? true : false;
+}
+#else
 static inline bool Player_is_paused(player_t *pl)
 {
     if (BIT(pl->pl_status, PAUSE))
 	return true;
     return false;
 }
+#endif
 
 static inline void Player_set_state(player_t *pl, int state)
 {
-    if (state == PL_STATE_KILLED)
+    pl->pl_state = state;
+
+    switch (state) {
+    case PL_STATE_KILLED:
 	SET_BIT(pl->pl_status, KILLED);
+	break;
+    case PL_STATE_PAUSED:
+	pl->mychar = 'P';
+	SET_BIT(pl->pl_status, PAUSE);
+	break;
+    case PL_STATE_WAITING:
+	pl->mychar = 'W';
+	SET_BIT(pl->pl_status, GAME_OVER);
+	break;
+    case PL_STATE_DEAD:
+	pl->mychar = 'D';
+	SET_BIT(pl->pl_status, GAME_OVER);
+	break;
+
+    case PL_STATE_APPEARING:
+    case PL_STATE_PLAYING:
+    case PL_STATE_GAME_OVER:
+    default:
+	break;
+    }
 }
 
 static inline bool Player_is_self_destructing(player_t *pl)
