@@ -75,6 +75,7 @@ Uint32 fuelGaugeColorRGBA;
 Uint32 selfLWColorRGBA;
 Uint32 teamLWColorRGBA;
 Uint32 enemyLWColorRGBA;
+Uint32 teamShipColorRGBA;
 Uint32 team0ColorRGBA;
 Uint32 team1ColorRGBA;
 Uint32 team2ColorRGBA;
@@ -1153,7 +1154,7 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	    && (other->life == 0))
 	    ship_color = teamLWColorRGBA;
 	else
-	    ship_color = blueRGBA;
+	    ship_color = teamShipColorRGBA;
     }
 
     if (eyes != NULL
@@ -1166,7 +1167,7 @@ static int Gui_calculate_ship_color(int id, other_t *other)
 	    && (other->life == 0))
 	    ship_color = teamLWColorRGBA;
 	else
-	    ship_color = blueRGBA;
+	    ship_color = teamShipColorRGBA;
     }
 
     if (Gui_is_my_tank(other))
@@ -2081,6 +2082,7 @@ static xp_option_t sdlgui_options[] = {
     COLOR(scoreOwnTeamColorRGBA, "#0000ffff", "my team score"),
     COLOR(scoreEnemyTeamColorRGBA, "#ff0000ff", "enemy team score"),
 
+    COLOR(teamShipColorRGBA, "#0000ffff", "teammate color"),
     COLOR(team0ColorRGBA, "#00000000", "team 0"),
     COLOR(team1ColorRGBA, "#00000000", "team 1"),
     COLOR(team2ColorRGBA, "#00000000", "team 2"),
