@@ -292,10 +292,11 @@ static void Init_receive(void)
 int Setup_net_server(void)
 {
     size_t	size;
+    world_t *world = &World;
 
     Init_receive();
 
-    if (Init_setup(&World) == -1)
+    if (Init_setup(world) == -1)
 	return -1;
     /*
      * The number of connections is limited by the number of bases

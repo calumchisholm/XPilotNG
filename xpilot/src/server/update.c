@@ -1207,7 +1207,7 @@ void Update_objects(void)
 	    wh->countdown = 0;
 
 	if (wh->temporary && wh->countdown <= 0)
-	    remove_temp_wormhole(&World, i);
+	    remove_temp_wormhole(world, i);
     }
 
 

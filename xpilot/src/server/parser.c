@@ -336,8 +336,9 @@ bool Parser(int argc, char **argv)
     bool		status;
     char		*fname;
     option_desc		*desc;
+    world_t *world = &World;
 
-    memset(&World, 0, sizeof(World));
+    memset(world, 0, sizeof(world_t));
     mapData = NULL;
     mapWidth = 0;
     mapHeight = 0;
@@ -425,7 +426,7 @@ bool Parser(int argc, char **argv)
     /*
      * Construct the World structure from the options.
      */
-    status = Grok_map(&World);
+    status = Grok_map(world);
 
     return status;
 }

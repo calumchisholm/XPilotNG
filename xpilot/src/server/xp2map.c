@@ -429,6 +429,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 
 static void tagend(void *data, const char *el)
 {
+    world_t *world = &World;
+
     (void)data;
     if (!strcasecmp(el, "Decor"))
 	P_end_decor();
@@ -449,7 +451,7 @@ static void tagend(void *data, const char *el)
 	/* ok, got to the end of options */
 	Options_parse();
 	/* kps - this can fail - fix */
-	Grok_map_options(&World);
+	Grok_map_options(world);
     }
     return;
 }
