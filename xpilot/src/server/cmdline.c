@@ -3608,7 +3608,8 @@ static option_desc options[] = {
 	valInt,
 	tuner_dummy,
 	"Maximum FPS shown to players waiting for a new round to start.\n"
-	"0 means full framerate. Can be used to limit bandwidth used.\n"
+	"0 means full framerate. Can be used to limit bandwidth used.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
 };
 
