@@ -301,45 +301,6 @@ int Handle_keyboard(player_t *pl)
 	    pl->idleTime = 0;	/* due to client auto-shield */
 
 	/*
-	 * Allow these functions before a round has started.
-	 */
-	if (round_delay > 0 && pressed) {
-	    switch (key) {
-	    case KEY_LOCK_NEXT:
-	    case KEY_LOCK_PREV:
-	    case KEY_LOCK_CLOSE:
-	    case KEY_TOGGLE_NUCLEAR:
-	    case KEY_PAUSE:
-	    case KEY_TANK_NEXT:
-	    case KEY_TANK_PREV:
-	    case KEY_TOGGLE_VELOCITY:
-	    case KEY_TOGGLE_CLUSTER:
-	    case KEY_SWAP_SETTINGS:
-	    case KEY_LOCK_NEXT_CLOSE:
-	    case KEY_TOGGLE_COMPASS:
-	    case KEY_TOGGLE_MINI:
-	    case KEY_TOGGLE_SPREAD:
-	    case KEY_TOGGLE_POWER:
-	    case KEY_TOGGLE_LASER:
-	    case KEY_CLEAR_MODIFIERS:
-	    case KEY_LOAD_MODIFIERS_1:
-	    case KEY_LOAD_MODIFIERS_2:
-	    case KEY_LOAD_MODIFIERS_3:
-	    case KEY_LOAD_MODIFIERS_4:
-	    case KEY_SELECT_ITEM:
-	    case KEY_TOGGLE_IMPLOSION:
-	    case KEY_REPROGRAM:
-	    case KEY_LOAD_LOCK_1:
-	    case KEY_LOAD_LOCK_2:
-	    case KEY_LOAD_LOCK_3:
-	    case KEY_LOAD_LOCK_4:
-		break;
-	    default:
-		continue;
-	    }
-	}
-
-	/*
 	 * Allow these functions while you're 'dead'.
 	 */
 	if (BIT(pl->status, PLAYING|GAME_OVER|PAUSE|HOVERPAUSE) != PLAYING) {
@@ -978,10 +939,10 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_SHIELD:
-		if (BIT(pl->used, HAS_SHIELD) && round_delay == 0) {
+		if (BIT(pl->used, HAS_SHIELD)) {
 		    CLR_BIT(pl->used, HAS_SHIELD|HAS_LASER);
 		    /*
-		     * Insert the default options.fireRepeatRate between lowering
+		     * Insert the default fireRepeatRate between lowering
 		     * shields and firing in order to prevent macros
 		     * and hacked clients.
 		     */

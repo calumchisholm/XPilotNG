@@ -461,8 +461,6 @@ static int Frame_status(connection_t *conn, player_t *pl)
 			 PHASING_TIME);
     if (ShutdownServer != -1)
 	Send_shutdown(conn, ShutdownServer, ShutdownDelay);
-    if (round_delay_send > 0)
-	Send_rounddelay(conn, round_delay, options.roundDelaySeconds * FPS);
 
     return 1;
 }

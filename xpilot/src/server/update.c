@@ -32,8 +32,6 @@
 
 char update_version[] = VERSION;
 
-int	round_delay = 0;	/* delay until start of next round */
-int	round_delay_send = 0;	/* number of frames to send round_delay */
 int	roundtime = -1;		/* time left this round */
 static double time_to_update = 1;	/* time before less frequent updates */
 static bool do_update_this_frame = false; /* less frequent update this frame */
@@ -858,9 +856,6 @@ static void Update_players(world_t *world)
 	}
 
 	if (!Player_is_active(pl))
-	    continue;
-
-	if (round_delay > 0)
 	    continue;
 
 	Use_items(pl);

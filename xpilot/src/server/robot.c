@@ -797,16 +797,12 @@ static void Robot_create(world_t *world)
 		 showtime(), robot->name, NumPlayers, robot->username,
 		 robot->home_base->ind);
 
-    if (round_delay > 0 || NumPlayers == 1) {
-	round_delay = options.roundDelaySeconds * FPS;
-	round_delay_send = round_delay + FPS;  /* delay him an extra second */
-	if (options.maxRoundTime > 0
-	    && options.roundDelaySeconds == 0)
+    if (NumPlayers == 1) {
+	if (options.maxRoundTime > 0)
 	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
-	Set_message("Player entered. Delaying %d seconds until next %s.",
-		    options.roundDelaySeconds,
+	Set_message("Player entered. Delaying 0 seconds until next %s.",
 		    (BIT(world->rules->mode, TIMING) ? "race" : "round"));
     }
 
@@ -1167,9 +1163,6 @@ void Robot_update(world_t *world)
 	    i--;
 	    continue;
 	}
-
-	if (round_delay > 0)
-	    continue;
 
 	/*
 	 * Let the robot code control this robot.

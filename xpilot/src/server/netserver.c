@@ -1340,8 +1340,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     num_logins++;
 
     if (options.resetOnHuman > 0
-	&& (NumPlayers - NumPseudoPlayers - NumRobots) <= options.resetOnHuman
-	&& !round_delay) {
+	&& ((NumPlayers - NumPseudoPlayers - NumRobots)
+	    <= options.resetOnHuman)) {
 	if (BIT(world->rules->mode, TIMING))
 	    Race_game_over(world);
 	else if (BIT(world->rules->mode, TEAM_PLAY))
@@ -1350,22 +1350,19 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    Individual_game_over(world, -1);
     }
 
-    /* if the next round is delayed, delay it again */
-    if (round_delay > 0 || NumPlayers == 1) {
-	round_delay = options.roundDelaySeconds * FPS;
-	if (options.maxRoundTime > 0 && options.roundDelaySeconds == 0)
+    if (NumPlayers == 1) {
+	if (options.maxRoundTime > 0)
 	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
-	sprintf(msg, "Player entered. Delaying %d seconds until next %s.",
-		options.roundDelaySeconds, (BIT(world->rules->mode, TIMING) ?
-			     "race" : "round"));
-	Set_message(msg);
+	Set_message("Player entered. Delaying 0 seconds until next %s.",
+		    (BIT(world->rules->mode, TIMING) ? "race" : "round"));
     }
 
     /* kps - is this correct ? */
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Players(i);
+
 	if (pl_i->mychar == ' ')
 	    pl_i->idleTime = 0;
     }
@@ -1913,11 +1910,6 @@ int Send_shieldtime(connection_t *connp, int count, int max)
 int Send_phasingtime(connection_t *connp, int count, int max)
 {
     return Packet_printf(&connp->w, "%c%hd%hd", PKT_PHASINGTIME, count, max);
-}
-
-int Send_rounddelay(connection_t *connp, int count, int max)
-{
-    return Packet_printf(&connp->w, "%c%hd%hd", PKT_ROUNDDELAY, count, max);
 }
 
 int Send_debris(connection_t *connp, int type, unsigned char *p, unsigned n)

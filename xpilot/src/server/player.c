@@ -619,7 +619,6 @@ void Reset_all_players(world_t *world)
 {
     player_t *pl;
     int i, j;
-    char msg[MSG_LEN];
 
     updateScores = true;
 
@@ -734,20 +733,7 @@ void Reset_all_players(world_t *world)
 	}
     }
 
-    if (round_delay_send > 0)
-	round_delay_send--;
-    if (options.roundDelaySeconds) {
-	/* Hold your horses! The next round will start in a few moments. */
-	round_delay = options.roundDelaySeconds * FPS;
-	/* Send him an extra seconds worth to be sure he gets the 0. */
-	round_delay_send = round_delay+FPS;
-	roundtime = -1;
-	sprintf(msg, "Delaying %d seconds until start of next %s.",
-		options.roundDelaySeconds,
-		(BIT(world->rules->mode, TIMING)? "race" : "round"));
-	Set_message(msg);
-    } else
-	roundtime = options.maxRoundTime * FPS;
+    roundtime = options.maxRoundTime * FPS;
 
     Update_score_table(world);
 }
@@ -1173,23 +1159,6 @@ void Compute_game_status(world_t *world)
     int i;
     player_t *pl;
     char msg[MSG_LEN];
-
-    if (round_delay_send > 0)
-	round_delay_send--;
-
-    if (round_delay > 0) {
-	if (!--round_delay) {
-	    sprintf(msg, "%s starts now.",
-		    (BIT(world->rules->mode, TIMING) ? "Race" : "Round"));
-	    Set_message(msg);
-	    roundtime = options.maxRoundTime * FPS;
-	    /*
-	     * Make sure players get the full amount of allowed idle time.
-	     */
-	    for (i = 0; i < NumPlayers; i++)
-		Players(i)->idleTime = 0;
-	}
-    }
 
     if (roundtime > 0)
 	roundtime--;

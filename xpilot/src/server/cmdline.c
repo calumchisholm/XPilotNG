@@ -3180,16 +3180,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
-	"roundDelay",
-	"roundDelaySeconds",
-	"0",
-	&options.roundDelaySeconds,
-	valInt,
-	tuner_dummy,
-	"Delay before start of each round, in seconds.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
 	"maxRoundTime",
 	"maxRoundTime",
 	"0",

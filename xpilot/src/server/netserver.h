@@ -64,7 +64,6 @@ int Send_shutdown(connection_t *connp, int count, int delay);
 int Send_thrusttime(connection_t *connp, int count, int max);
 int Send_shieldtime(connection_t *connp, int count, int max);
 int Send_phasingtime(connection_t *connp, int count, int max);
-int Send_rounddelay(connection_t *connp, int count, int max);
 int Send_debris(connection_t *connp, int type, unsigned char *p, unsigned n);
 int Send_wreckage(connection_t *connp, clpos_t pos, int wrtype, int size, int rot);
 int Send_asteroid(connection_t *connp, clpos_t pos, int type, int size, int rot);

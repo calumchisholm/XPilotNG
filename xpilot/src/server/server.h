@@ -106,8 +106,6 @@ extern int		game_lock;
 extern int		mute_baseless;
 extern time_t		gameOverTime;
 extern double		friction;
-extern int		round_delay;
-extern int		round_delay_send;
 extern int		roundtime;
 extern int		roundsPlayed;
 extern long		KILLING_SHOTS;
@@ -354,7 +352,6 @@ extern struct options {
     bool	sound;
     int		timerResolution;
 
-    int		roundDelaySeconds;
     int		maxRoundTime;
     int		roundsToPlay;
 

@@ -184,10 +184,7 @@ void Check_collision(world_t *world)
 {
     BallCollision(world);
     MineCollision(world);
-
-    if (round_delay == 0)
-	PlayerCollision(world);
-
+    PlayerCollision(world);
     AsteroidCollision(world);
 }
 
