@@ -73,9 +73,11 @@ bool Key_press_pointer_control(void)
     }
     
 #ifdef HAVE_XF86MISC
-    SDL_SysWMinfo info;
-    SDL_GetWMInfo(&info);
-    Disable_emulate3buttons(pointerControl, info.info.x11.display);
+    {
+	SDL_SysWMinfo info;
+	SDL_GetWMInfo(&info);
+	Disable_emulate3buttons(pointerControl, info.info.x11.display);
+    }
 #endif    
     
     return false;	/* server doesn't need to know */
