@@ -132,7 +132,6 @@ LINUX_LPLUS = $(LINUX_CFLAGS)
 #                    WARNING: WILL NOT WORK ON ANY OTHER HARDWARE
 #                    CAUTION: dangerous if you don't know
 #                    what it does and how it works.
-#  JOYSTICK        - joystick support for Linux 1.0, needs joystick-0.7.
 #  PLOCKSERVER     - Use the plock(2) system call to lock the xpilots
 #                    server into memory to inhibit paging/swapping.
 #                    This probably only makes sense in conjunction with

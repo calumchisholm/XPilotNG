@@ -66,9 +66,6 @@ DEFS_MBX = -DMBX
 #ifdef DoublebufferExtension
 DEFS_DBE = -DDBE
 #endif
-#ifdef Joystick
-DEFS_JOYSTICK = -DJOYSTICK
-#endif
 #ifdef XPilotDevelopment
 DEFS_DEBUG = -DDEVELOPMENT
 #endif
@@ -85,8 +82,7 @@ DEFS_DEBUG = -DDEVELOPMENT
  */
 DEFINES = \
        $(DEFS_ERASE) $(DEFS_SPARC_CMAP_HACK) $(DEFS_MBX) $(DEFS_DBE) \
-       $(DEFS_JOYSTICK) $(AUDIODEF) $(DEFS_SCALING) \
-       $(DEFS_OTHER) $(DEFS_DEBUG)
+       $(AUDIODEF) $(DEFS_OTHER) $(DEFS_DEBUG)
 INCLUDES = $(AUDIOINC) -I$(COMMON) -I../../lib/ $(ZLIBINC)
 LOCAL_LDFLAGS = $(ZLIBD)
 
