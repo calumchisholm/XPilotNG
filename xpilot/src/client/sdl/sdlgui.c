@@ -27,6 +27,15 @@
 #include "xpclient.h"
 #include "sdlpaint.h"
 
+int wallColor = 0x000000ff;
+
+static void set_color(int color)
+{
+    glColor3ub((color >> 16) & 255,
+	       (color >> 8) & 255,
+	       color & 255);
+}
+
 /* Map painting */
 
 void Gui_paint_cannon(int x, int y, int type)
@@ -120,14 +129,72 @@ void Gui_paint_setup_treasure(int x, int y, int team, bool own)
 
 void Gui_paint_walls(int x, int y, int type)
 {
+    set_color(wallColor);
+    glBegin(GL_LINES);
+
+    if (type & BLUE_LEFT) {
+	glVertex2i(x, y);
+	glVertex2i(x, y + BLOCK_SZ);
+    }
+    if (type & BLUE_DOWN) {
+	glVertex2i(x, y);
+	glVertex2i(x + BLOCK_SZ, y);
+    }
+    if (type & BLUE_RIGHT) {
+	glVertex2i(x + BLOCK_SZ, y);
+	glVertex2i(x + BLOCK_SZ, y + BLOCK_SZ);
+    }
+    if (type & BLUE_UP) {
+	glVertex2i(x, y + BLOCK_SZ);
+	glVertex2i(x + BLOCK_SZ, y + BLOCK_SZ);
+    }
+    if ((type & BLUE_FUEL) == BLUE_FUEL) {
+    } else if (type & BLUE_OPEN) {
+	glVertex2i(x, y);
+	glVertex2i(x + BLOCK_SZ, y + BLOCK_SZ);
+    } else if (type & BLUE_CLOSED) {
+	glVertex2i(x, y + BLOCK_SZ);
+	glVertex2i(x + BLOCK_SZ, y);
+    }
+    glEnd();
 }
 
 void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y)
 {
+    set_color(wallColor);
+    glBegin(GL_QUADS);
+    glVertex2i(bl, y);
+    glVertex2i(tl, y + BLOCK_SZ);
+    glVertex2i(tr, y + BLOCK_SZ);
+    glVertex2i(br, y);
+    glEnd();
 }
 
 void Gui_paint_polygon(int i, int xoff, int yoff)
 {
+    xp_polygon_t    polygon;
+    polygon_style_t style;
+    int             x, y, j;
+
+    polygon = polygons[i];
+    style = polygon_styles[polygon.style];
+
+    if (BIT(style.flags, STYLE_INVISIBLE)) return;
+    set_color(style.rgb);
+
+    x = xoff * Setup->width;
+    y = yoff * Setup->height;
+
+    glBegin(GL_LINE_STRIP);
+    glVertex2i(x, y);
+    
+    for (j = 0; j < polygon.num_points; j++) {
+        x += polygon.points[j].x;
+        y += polygon.points[j].y;
+	glVertex2i(x,y);
+    }
+
+    glEnd();
 }
 
 
