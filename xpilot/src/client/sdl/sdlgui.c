@@ -94,7 +94,7 @@ float hudRadarMapScale;
 int hudRadarDotSize = 6;
 int baseWarningType = 1;
 
-static GLuint polyListBase;
+static GLuint polyListBase = 0;
 
 int Gui_init(void);
 void Gui_cleanup(void);
@@ -187,6 +187,8 @@ int Gui_init(void)
 {
     int i;
     GLUtriangulatorObj *tess;
+
+    if (num_polygons == 0) return 0;
 
     polyListBase = glGenLists(num_polygons);
     if (!polyListBase) {
