@@ -2965,10 +2965,8 @@ void Turn_player(player_t *pl)
 	      Set_message(msg);
 #endif	      
 		    /* velocity to push player away from wall */
-		    pl->vel.x += linet[ans.line].delta.cy / length
-			* options.turnPush;
-		    pl->vel.y -= linet[ans.line].delta.cx / length
-			* options.turnPush;
+		    pl->vel.x += linet[ans.line].delta.cy *fact / length;
+		    pl->vel.y -= linet[ans.line].delta.cx *fact / length;
 		}
 		/*
 		 * khs
