@@ -799,8 +799,8 @@ static int Handle_listening(int ind)
     connection_t	*connp = &Conn[ind];
     unsigned char	type;
     int			n;
-    char		nick[MAX_NAME_LEN],
-			real[MAX_NAME_LEN];
+    char		nick[MAX_CHARS],
+			real[MAX_CHARS];
 
     if (connp->state != CONN_LISTENING) {
 	Destroy_connection(ind, "not listening");
