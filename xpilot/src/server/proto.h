@@ -314,6 +314,7 @@ void Cannon_dies(cannon_t *cannon, player *pl);
  */
 void Handle_player_command(player *pl, char *cmd);
 int Get_player_index_by_name(char *name);
+player *Get_player_by_name(char *str, int *error, char **errorstr_p);
 
 /*
  * Prototypes for player.c
