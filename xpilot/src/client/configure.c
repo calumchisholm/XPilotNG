@@ -483,7 +483,7 @@ static void Create_config(void)
 	    height = config_height - config_space - config_button_height;
 	    width = 2 * config_button_space + XTextWidth(buttonFont,
 							  "PREV", 4);
-	    offset = config_width - width - config_space;
+	    offset = (config_width - width) / 2;
 	    widget_desc =
 		Widget_create_activate(config_widget_desc[num],
 				       offset, height,
@@ -495,7 +495,7 @@ static void Create_config(void)
 	    }
 	    width = 2 * config_button_space + XTextWidth(buttonFont,
 							  "NEXT", 4);
-	    offset = (config_width - width) / 2;
+	    offset = config_width - width - config_space;
 	    widget_desc =
 		Widget_create_activate(config_widget_desc[num],
 				       offset, height,
