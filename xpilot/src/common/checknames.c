@@ -31,14 +31,13 @@ int Check_real_name(char *name)
 
     if (strlen(name) > MAX_NAME_LEN - 1)
 	return NAME_ERROR;
-    if (!*name) {
+    if (!*name)
 	return NAME_ERROR;
-    }
+
     str = (unsigned char *) name;
     for (; *str; str++) {
-	if (!isgraph(*str)) {
+	if (!isgraph(*str))
 	    return NAME_ERROR;
-	}
     }
 
     return NAME_OK;
@@ -56,9 +55,8 @@ void Fix_real_name(char *name)
     }
     str = (unsigned char *) name;
     for (; *str; str++) {
-	if (!isgraph(*str)) {
+	if (!isgraph(*str))
 	    *str = 'x';
-	}
     }
 }
 
@@ -68,22 +66,20 @@ int Check_nick_name(char *name)
 
     if (strlen(name) > MAX_NAME_LEN - 1)
 	return NAME_ERROR;
-    if (!*name) {
+    if (!*name)
 	return NAME_ERROR;
-    }
+
     str = (unsigned char *) name;
-    if (!isupper(*str)) {
+    if (!isupper(*str))
 	return NAME_ERROR;
-    }
+
     for (; *str; str++) {
-	if (!isprint(*str) || *str == PROT_EXT) {
+	if (!isprint(*str) || *str == PROT_EXT)
 	    return NAME_ERROR;
-	}
     }
     --str;
-    if (isspace(*str)) {
+    if (isspace(*str))
 	return NAME_ERROR;
-    }
 
     return NAME_OK;
 }
@@ -101,33 +97,30 @@ void Fix_nick_name(char *name)
     }
     str = (unsigned char *) name;
     if (!isupper(*str)) {
-	if (islower(*str)) {
+	if (islower(*str))
 	    *str = toupper(*str);
-	} else {
+	else
 	    *str = 'X';
-	}
     }
     for (; *str; str++) {
-	if (!isprint(*str) || *str == PROT_EXT) {
+	if (!isprint(*str) || *str == PROT_EXT)
 	    *str = 'x';
-	}
     }
     --str;
-    while (isspace(*str)) {
+    while (isspace(*str))
 	*str-- = '\0';
-    }
 }
 
 /* isalnum() depends on locale. */
-static int is_alpha_numeric(unsigned char c)
+static bool is_alpha_numeric(int c)
 {
     if (c >= 'A' && c <= 'Z')
-	return 1;
+	return true;
     if (c >= 'a' && c <= 'z')
-	return 1;
+	return true;
     if (c >= '0' && c <= '9')
-	return 1;
-    return 0;
+	return true;
+    return false;
 }
 
 int Check_host_name(char *name)
@@ -137,18 +130,15 @@ int Check_host_name(char *name)
     if (strlen(name) > MAX_HOST_LEN - 1)
 	return NAME_ERROR;
     str = (unsigned char *) name;
-    if (!is_alpha_numeric(*str)) {
+    if (!is_alpha_numeric(*str))
 	return NAME_ERROR;
-    }
     for (; *str; str++) {
 	if (!is_alpha_numeric(*str)) {
 	    if (*str == '.' || *str == '-') {
-		if (str[1] == '.' || str[1] == '-' || !str[1]) {
+		if (str[1] == '.' || str[1] == '-' || !str[1])
 		    return NAME_ERROR;
-		}
-	    } else {
+	    } else
 		return NAME_ERROR;
-	    }
 	}
     }
     return NAME_OK;
@@ -168,12 +158,10 @@ void Fix_host_name(char *name)
     for (; *str; str++) {
 	if (!is_alpha_numeric(*str)) {
 	    if (*str == '.' || *str == '-') {
-		if (str[1] == '.' || str[1] == '-' || !str[1]) {
+		if (str[1] == '.' || str[1] == '-' || !str[1])
 		    *str = 'x';
-		}
-	    } else {
+	    } else
 		*str = 'x';
-	    }
 	}
     }
 }
@@ -188,9 +176,8 @@ int Check_disp_name(char *name)
 	return NAME_ERROR;
     str = (unsigned char *) name;
     for (; *str; str++) {
-	if (!isgraph(*str)) {
+	if (!isgraph(*str))
 	    return NAME_ERROR;
-	}
     }
     return NAME_OK;
 }
@@ -203,8 +190,7 @@ void Fix_disp_name(char *name)
 	name[MAX_DISP_LEN - 1] = 0;
     str = (unsigned char *) name;
     for (; *str; str++) {
-	if (!isgraph(*str)) {
+	if (!isgraph(*str))
 	    *str = 'x';
-	}
     }
 }
