@@ -328,14 +328,21 @@ static int Init_setup_old(void)
 	    case DOWN_GRAV:	*mapptr = SETUP_DOWN_GRAV; break;
 	    case RIGHT_GRAV:	*mapptr = SETUP_RIGHT_GRAV; break;
 	    case LEFT_GRAV:	*mapptr = SETUP_LEFT_GRAV; break;
-	    case ITEM_CONCENTRATOR: *mapptr = SETUP_ITEM_CONCENTRATOR; break;
-	    case ASTEROID_CONCENTRATOR:	*mapptr = SETUP_ASTEROID_CONCENTRATOR; break;
+	    case ITEM_CONCENTRATOR:
+		*mapptr = SETUP_ITEM_CONCENTRATOR; break;
+	    case ASTEROID_CONCENTRATOR:
+		*mapptr = SETUP_ASTEROID_CONCENTRATOR; break;
 	    case DECOR_FILLED:	*mapptr = SETUP_DECOR_FILLED; break;
 	    case DECOR_RU:	*mapptr = SETUP_DECOR_RU; break;
 	    case DECOR_RD:	*mapptr = SETUP_DECOR_RD; break;
 	    case DECOR_LU:	*mapptr = SETUP_DECOR_LU; break;
 	    case DECOR_LD:	*mapptr = SETUP_DECOR_LD; break;
 	    case WORMHOLE:
+		if (wormhole >= World.NumWormholes) {
+		    warn("Too many wormholes in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
 		switch (World.wormholes[wormhole++].type) {
 		case WORM_NORMAL: *mapptr = SETUP_WORM_NORMAL; break;
 		case WORM_IN:     *mapptr = SETUP_WORM_IN; break;
@@ -347,12 +354,27 @@ static int Init_setup_old(void)
 		}
 		break;
 	    case TREASURE:
+		if (treasure >= World.NumTreasures) {
+		    warn("Too many treasures in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
 		*mapptr = SETUP_TREASURE + World.treasures[treasure++].team;
 		break;
 	    case TARGET:
+		if (target >= World.NumTargets) {
+		    warn("Too many targets in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
 		*mapptr = SETUP_TARGET + World.targets[target++].team;
 		break;
 	    case BASE:
+		if (base >= World.NumBases) {
+		    warn("Too many bases in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
 		if (World.bases[base].team == TEAM_NOT_SET)
 		    team = 0;
 		else
@@ -369,6 +391,11 @@ static int Init_setup_old(void)
 		}
 		break;
 	    case CANNON:
+		if (cannon >= World.NumCannons) {
+		    warn("Too many cannons in block mapdata.");
+		    *mapptr = SETUP_SPACE;
+		    break;
+		}
 		switch (World.cannons[cannon++].dir) {
 		case DIR_UP:	*mapptr = SETUP_CANNON_UP; break;
 		case DIR_RIGHT:	*mapptr = SETUP_CANNON_RIGHT; break;
@@ -383,9 +410,8 @@ static int Init_setup_old(void)
 	    case CHECK:
 		for (i = 0; i < World.NumChecks; i++) {
 		    if (x != CLICK_TO_BLOCK(Checks(i)->pos.cx)
-			|| y != CLICK_TO_BLOCK(Checks(i)->pos.cy)) {
+			|| y != CLICK_TO_BLOCK(Checks(i)->pos.cy))
 			continue;
-		    }
 		    *mapptr = SETUP_CHECK + i;
 		    break;
 		}
@@ -730,9 +756,8 @@ int Check_connection(char *real, char *nick, char *dpy, char *addr)
 	    if (strcasecmp(connp->nick, nick) == 0) {
 		if (!strcmp(real, connp->real)
 		    && !strcmp(dpy, connp->dpy)
-		    && !strcmp(addr, connp->addr)) {
+		    && !strcmp(addr, connp->addr))
 		    return connp->my_port;
-		}
 		return -1;
 	    }
 	}
