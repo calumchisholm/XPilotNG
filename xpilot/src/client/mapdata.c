@@ -326,19 +326,46 @@ static int Mapdata_download(const URL *url, const char *filePath)
 	return false;
     }
 
-    header = 1;
+    header = 2;
     c = 0;
 
     for(;;) {
-	if ((len = sock_read(&s, buf, sizeof buf)) == -1) {
-	    error("socket read failed");
-	    rv = false;
-	    break;
+	len = 0;
+	while (len < 100) {
+	    if ((i = sock_read(&s, buf + len, sizeof(buf) - len)) == -1) {
+		error("socket read failed");
+		rv = false;
+		goto done;
+	    }
+	    if (i == 0)
+		break;
+	    len += i;
 	}
 
 	if (len == 0) {
 	    rv = !header;
 	    break;
+	}
+
+	if (header == 2) {
+	    if (strncmp(buf, "HTTP", 4)) {
+		rv = false;
+		break;
+	    }
+	    i = 0;
+	    while (buf[i] != ' ') {
+		i++;
+		if (i >= len - 1) {
+		    rv = false;
+		    goto done;
+		}
+	    }
+	    i++;
+	    if (buf[i] != '2') {   /* HTTP status code starts with 2 */
+		rv = false;
+		break;
+	    }
+	    header = 1;
 	}
 
 	printf("#");
@@ -373,6 +400,7 @@ static int Mapdata_download(const URL *url, const char *filePath)
 	    }
 	}
     }
+ done:
     printf("\n");
     fclose(f);
     sock_close(&s);
