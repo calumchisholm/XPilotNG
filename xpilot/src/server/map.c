@@ -438,16 +438,17 @@ static bool Grok_map_size(void)
 }
 
 
-bool Grok_map(void)
+bool Grok_map(world_t *world)
 {
     if (!is_polygon_map) {
 	if (!Grok_map_options())
 	    exit(1);
 
-	Xpmap_grok_map_data();
-	Xpmap_allocate_checks();
-	Xpmap_tags_to_internal_data(true);
-	Xpmap_find_map_object_teams();
+	Xpmap_grok_map_data(world, mapData);
+	XFREE(mapData);
+	Xpmap_allocate_checks(world);
+	Xpmap_tags_to_internal_data(world, true);
+	Xpmap_find_map_object_teams(world);
     }
 
     Verify_wormhole_consistency();
@@ -482,7 +483,7 @@ bool Grok_map(void)
 		 BIT(World.rules->mode, TEAM_PLAY) ? "on" : "off");
 
     if (!is_polygon_map)
-	Xpmap_blocks_to_polygons();
+	Xpmap_blocks_to_polygons(world);
 
     return true;
 }
@@ -541,7 +542,7 @@ void Find_base_direction(void)
 {
     /* kps - this might go wrong if we run in -polygonMode ? */
     if (!is_polygon_map)
-	Xpmap_find_base_direction();
+	Xpmap_find_base_direction(&World);
 }
 
 /*

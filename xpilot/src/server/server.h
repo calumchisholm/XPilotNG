@@ -470,7 +470,7 @@ void filter_mods(modifiers *mods);
  * Prototypes for map.c
  */
 void Free_map(void);
-bool Grok_map(void);
+bool Grok_map(world_t *world);
 bool Grok_map_options(void);
 
 int Map_place_base(clpos pos, int dir, int team);
@@ -497,12 +497,12 @@ int Find_closest_team(clpos pos);
  */
 setup_t *Xpmap_init_setup(world_t *world);
 void Xpmap_print(void);
-void Xpmap_grok_map_data(void);
-void Xpmap_allocate_checks(void);
-void Xpmap_tags_to_internal_data(bool create_objects);
-void Xpmap_find_map_object_teams(void);
-void Xpmap_find_base_direction(void);
-void Xpmap_blocks_to_polygons(void);
+void Xpmap_grok_map_data(world_t *world, char *map_data);
+void Xpmap_allocate_checks(world_t *world);
+void Xpmap_tags_to_internal_data(world_t *world, bool create_objects);
+void Xpmap_find_map_object_teams(world_t *world);
+void Xpmap_find_base_direction(world_t *world);
+void Xpmap_blocks_to_polygons(world_t *world);
 
 
 /*

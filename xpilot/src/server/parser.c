@@ -425,7 +425,7 @@ bool Parser(int argc, char **argv)
     /*
      * Construct the World structure from the options.
      */
-    status = Grok_map();
+    status = Grok_map(&World);
 
     return status;
 }
