@@ -304,6 +304,11 @@ static void Msg_parse(char *message, size_t len)
 	killer = mn.name[0];
 	victim = mn.name[1];
 
+    } else if (Msg_match_fmt
+	       (message, "%n was hit by cannonfire.", &mn)) {
+	DP(printf("hit by cannonfire:\n"));
+	victim = mn.name[0];
+
     } else {
 	/* none of the above, nothing to do */
 	return;
