@@ -952,7 +952,7 @@ xp_option_t default_options[] = {
 
     XP_INT_OPTION(
 	"sparkSize",
-	1,
+	2,
 	MIN_SPARK_SIZE,
 	MAX_SPARK_SIZE,
 	&spark_size,

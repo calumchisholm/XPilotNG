@@ -63,8 +63,8 @@ static bool testxcolors = false;
  */
 #define GAME_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
 /*"-*-times-*-*-*--18-*-*-*-*-*-iso8859-1"*/
-#define MESSAGE_FONT	"-*-fixed-medium-r-*--13-*-*-*-c-*-iso8859-1"
-/*"-*-times-*-*-*--14-*-*-*-*-*-iso8859-1"*/
+#define MESSAGE_FONT	"-*-times-*-*-*--14-*-*-*-*-*-iso8859-1"
+/* "-*-fixed-medium-r-*--13-*-*-*-c-*-iso8859-1" */
 #define SCORE_LIST_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
 #define BUTTON_FONT	"-*-fixed-bold-*-*--13-*-*-*-c-*-iso8859-1"
 /*"-*-*-bold-o-*--14-*-*-*-*-*-iso8859-1"*/
@@ -410,7 +410,7 @@ xp_option_t xdefault_options[] = {
     
     XP_BOOL_OPTION(
         "mouseAccelInClient",
-	false,
+	true,
 	&mouseAccelInClient,
 	NULL,
 	XP_OPTFLAG_CONFIG_DEFAULT,
