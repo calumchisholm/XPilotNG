@@ -271,4 +271,13 @@ typedef struct {
     asteroid_concentrator_t	*asteroidConcs;
 } world_t;
 
+static inline void World_set_block(world_t *world, blpos blk, int type)
+{
+    if (blk.bx < 0 || blk.bx >= world->x || blk.by < 0 || blk.by >= world->y) {
+	assert(0);
+	return;
+    }
+    world->block[blk.bx][blk.by] = type;
+}
+
 #endif

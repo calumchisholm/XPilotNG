@@ -453,9 +453,9 @@ static void Cannon_set_hitmask(int group, cannon_t *cannon)
 
 void Cannon_restore_on_map(cannon_t *cannon)
 {
-    blpos bpos = Clpos_to_blpos(cannon->pos);
+    blpos blk = Clpos_to_blpos(cannon->pos);
 
-    World.block[bpos.bx][bpos.by] = CANNON;
+    World_set_block(&World, blk, CANNON);
 
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
@@ -466,12 +466,12 @@ void Cannon_restore_on_map(cannon_t *cannon)
 
 void Cannon_remove_from_map(cannon_t *cannon)
 {
-    blpos bpos = Clpos_to_blpos(cannon->pos);
+    blpos blk = Clpos_to_blpos(cannon->pos);
 
     cannon->dead_time = cannonDeadTime;
     cannon->conn_mask = 0;
 
-    World.block[bpos.bx][bpos.by] = SPACE;
+    World_set_block(&World, blk, SPACE);
 
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
@@ -561,9 +561,9 @@ void Target_init(void)
 
 void Target_restore_on_map(target_t *targ)
 {
-    blpos bpos = Clpos_to_blpos(targ->pos);
+    blpos blk = Clpos_to_blpos(targ->pos);
 
-    World.block[bpos.bx][bpos.by] = TARGET;
+    World_set_block(&World, blk, TARGET);
 
     targ->conn_mask = 0;
     targ->update_mask = (unsigned)-1;
@@ -576,7 +576,7 @@ void Target_restore_on_map(target_t *targ)
 
 void Target_remove_from_map(target_t *targ)
 {
-    blpos bpos = Clpos_to_blpos(targ->pos);
+    blpos blk = Clpos_to_blpos(targ->pos);
 
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
@@ -587,7 +587,7 @@ void Target_remove_from_map(target_t *targ)
      * Destroy target.
      * Turn it into a space to simplify other calculations.
      */
-    World.block[bpos.bx][bpos.by] = SPACE;
+    World_set_block(&World, blk, SPACE);
 
     /*P_set_hitmask(targ->group, ALL_BITS);*/
     P_set_hitmask(targ->group, Target_hitmask(targ));
@@ -661,9 +661,9 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 
 void Wormhole_remove_from_map(wormhole_t *wormhole)
 {
-    blpos bpos = Clpos_to_blpos(wormhole->pos);
+    blpos blk = Clpos_to_blpos(wormhole->pos);
 
-    World.block[bpos.bx][bpos.by] = wormhole->lastblock;
+    World_set_block(&World, blk, wormhole->lastblock);
 }
 
 extern void Describe_group(int group);

@@ -72,6 +72,7 @@ void Xpmap_grok_map_data(void)
 {
     int x, y, c;
     char *s;
+    blpos blk;
 
     x = -1;
     y = World.y - 1;
@@ -121,8 +122,9 @@ void Xpmap_grok_map_data(void)
 	    }
 	    continue;
 	}
-
-	World.block[x][y] = c;
+	blk.bx = x;
+	blk.by = y;
+	World_set_block(&World, blk, c);
     }
 
     free(mapData);
@@ -154,8 +156,7 @@ void Xpmap_allocate_checks(void)
 	}
     }
 
-    if ((World.checks = (check_t *)
-	 malloc(OLD_MAX_CHECKS * sizeof(check_t))) == NULL) {
+    if ((World.checks = malloc(OLD_MAX_CHECKS * sizeof(check_t))) == NULL) {
 	error("Out of memory - checks");
 	exit(-1);
     }
@@ -166,26 +167,26 @@ void Xpmap_allocate_checks(void)
  * Determining which team these belong to is done later,
  * in Find_closest_team().
  */
-static void Xpmap_place_cannon(int x, int y, int dir, bool create)
+static void Xpmap_place_cannon(blpos blk, int dir, bool create)
 {
     clpos pos;
 
     switch (dir) {
     case DIR_UP:
-	pos.cx = (x + 0.5) * BLOCK_CLICKS;
-	pos.cy = (y + 0.333) * BLOCK_CLICKS;
+	pos.cx = (blk.bx + 0.5) * BLOCK_CLICKS;
+	pos.cy = (blk.by + 0.333) * BLOCK_CLICKS;
 	break;
     case DIR_LEFT:
-	pos.cx = (x + 0.667) * BLOCK_CLICKS;
-	pos.cy = (y + 0.5) * BLOCK_CLICKS;
+	pos.cx = (blk.bx + 0.667) * BLOCK_CLICKS;
+	pos.cy = (blk.by + 0.5) * BLOCK_CLICKS;
 	break;
     case DIR_RIGHT:
-	pos.cx = (x + 0.333) * BLOCK_CLICKS;
-	pos.cy = (y + 0.5) * BLOCK_CLICKS;
+	pos.cx = (blk.bx + 0.333) * BLOCK_CLICKS;
+	pos.cy = (blk.by + 0.5) * BLOCK_CLICKS;
 	break;
     case DIR_DOWN:
-	pos.cx = (x + 0.5) * BLOCK_CLICKS;
-	pos.cy = (y + 0.667) * BLOCK_CLICKS;
+	pos.cx = (blk.bx + 0.5) * BLOCK_CLICKS;
+	pos.cy = (blk.by + 0.667) * BLOCK_CLICKS;
 	break;
     default:
  	/* can't happen */
@@ -193,7 +194,7 @@ static void Xpmap_place_cannon(int x, int y, int dir, bool create)
 	break;
     }
 
-    World.block[x][y] = CANNON;
+    World_set_block(&World, blk, CANNON);
     if (create)
 	Map_place_cannon(pos, dir, TEAM_NOT_SET);
 }
@@ -204,87 +205,87 @@ static void Xpmap_place_cannon(int x, int y, int dir, bool create)
  * is fixed in Find_base_dir() when the gravity has
  * been computed.
  */
-static clpos Xpmap_get_clpos(int x, int y)
+static clpos Xpmap_get_clpos(blpos blk)
 {
     clpos pos;
 
-    pos.cx = BLOCK_CENTER(x);
-    pos.cy = BLOCK_CENTER(y);
+    pos.cx = BLOCK_CENTER(blk.bx);
+    pos.cy = BLOCK_CENTER(blk.by);
 
     return pos;
 }
 
-static void Xpmap_place_base(int x, int y, int team, bool create)
+static void Xpmap_place_base(blpos blk, int team, bool create)
 {
-    World.block[x][y] = BASE;
+    World_set_block(&World, blk, BASE);
     if (create)
-	Map_place_base(Xpmap_get_clpos(x, y), DIR_UP, team);
+	Map_place_base(Xpmap_get_clpos(blk), DIR_UP, team);
 }
 
-static void Xpmap_place_fuel(int x, int y, bool create)
+static void Xpmap_place_fuel(blpos blk, bool create)
 {
-    World.block[x][y] = FUEL;
+    World_set_block(&World, blk, FUEL);
     if (create)
-	Map_place_fuel(Xpmap_get_clpos(x, y), TEAM_NOT_SET);
+	Map_place_fuel(Xpmap_get_clpos(blk), TEAM_NOT_SET);
 }
 
-static void Xpmap_place_treasure(int x, int y, bool empty, bool create)
+static void Xpmap_place_treasure(blpos blk, bool empty, bool create)
 {
-    World.block[x][y] = TREASURE;
+    World_set_block(&World, blk, TREASURE);
     if (create)
-	Map_place_treasure(Xpmap_get_clpos(x, y), TEAM_NOT_SET, empty);
+	Map_place_treasure(Xpmap_get_clpos(blk), TEAM_NOT_SET, empty);
 }
 
-static void Xpmap_place_wormhole(int x, int y, wormType type, bool create)
+static void Xpmap_place_wormhole(blpos blk, wormType type, bool create)
 {
-    World.block[x][y] = WORMHOLE;
+    World_set_block(&World, blk, WORMHOLE);
     if (create)
-	Map_place_wormhole(Xpmap_get_clpos(x, y), type);
+	Map_place_wormhole(Xpmap_get_clpos(blk), type);
 }
 
-static void Xpmap_place_target(int x, int y, bool create)
+static void Xpmap_place_target(blpos blk, bool create)
 {
-    World.block[x][y] = TARGET;
+    World_set_block(&World, blk, TARGET);
     if (create)
-	Map_place_target(Xpmap_get_clpos(x, y), TEAM_NOT_SET);
+	Map_place_target(Xpmap_get_clpos(blk), TEAM_NOT_SET);
 }
 
-static void Xpmap_place_check(int x, int y, int ind, bool create)
+static void Xpmap_place_check(blpos blk, int ind, bool create)
 {
     if (!BIT(World.rules->mode, TIMING)) {
-	World.block[x][y] = SPACE;
+	World_set_block(&World, blk, SPACE);
 	return;
     }
 
-    World.block[x][y] = CHECK;
+    World_set_block(&World, blk, CHECK);
     if (create)
-	Map_place_check(Xpmap_get_clpos(x, y), ind);
+	Map_place_check(Xpmap_get_clpos(blk), ind);
 }
 
-static void Xpmap_place_item_concentrator(int x, int y, bool create)
+static void Xpmap_place_item_concentrator(blpos blk, bool create)
 {
-    World.block[x][y] = ITEM_CONCENTRATOR;
+    World_set_block(&World, blk, ITEM_CONCENTRATOR);
     if (create)
-	Map_place_item_concentrator(Xpmap_get_clpos(x, y));
+	Map_place_item_concentrator(Xpmap_get_clpos(blk));
 }
 
-static void Xpmap_place_asteroid_concentrator(int x, int y, bool create)
+static void Xpmap_place_asteroid_concentrator(blpos blk, bool create)
 {
-    World.block[x][y] = ASTEROID_CONCENTRATOR;
+    World_set_block(&World, blk, ASTEROID_CONCENTRATOR);
     if (create)
-	Map_place_asteroid_concentrator(Xpmap_get_clpos(x, y));
+	Map_place_asteroid_concentrator(Xpmap_get_clpos(blk));
 }
 
-static void Xpmap_place_grav(int x, int y, double force, int type, bool create)
+static void Xpmap_place_grav(blpos blk, double force, int type, bool create)
 {
-    World.block[x][y] = type;
+    World_set_block(&World, blk, type);
     if (create)
-	Map_place_grav(Xpmap_get_clpos(x, y), force, type);
+	Map_place_grav(Xpmap_get_clpos(blk), force, type);
 }
 
-static void Xpmap_place_block(int x, int y, int type)
+static void Xpmap_place_block(blpos blk, int type)
 {
-    World.block[x][y] = type;
+    World_set_block(&World, blk, type);
 }
 
 /*
@@ -299,106 +300,111 @@ void Xpmap_tags_to_internal_data(bool create)
 
 	for (y = 0; y < World.y; y++) {
 
+	    blpos blk;
+
+	    blk.bx = x;
+	    blk.by = y;
+
 	    c = World.block[x][y];
 	    
 	    switch (c) {
 	    case ' ':
 	    case '.':
 	    default:
-		Xpmap_place_block(x, y, SPACE);
+		Xpmap_place_block(blk, SPACE);
 		break;
 		
 	    case 'x':
-		Xpmap_place_block(x, y, FILLED);
+		Xpmap_place_block(blk, FILLED);
 		break;
 	    case 's':
-		Xpmap_place_block(x, y, REC_LU);
+		Xpmap_place_block(blk, REC_LU);
 		break;
 	    case 'a':
-		Xpmap_place_block(x, y, REC_RU);
+		Xpmap_place_block(blk, REC_RU);
 		break;
 	    case 'w':
-		Xpmap_place_block(x, y, REC_LD);
+		Xpmap_place_block(blk, REC_LD);
 		break;
 	    case 'q':
-		Xpmap_place_block(x, y, REC_RD);
+		Xpmap_place_block(blk, REC_RD);
 		break;
 		    
 	    case 'r':
-		Xpmap_place_cannon(x, y, DIR_UP, create);
+		Xpmap_place_cannon(blk, DIR_UP, create);
 		break;
 	    case 'd':
-		Xpmap_place_cannon(x, y, DIR_LEFT, create);
+		Xpmap_place_cannon(blk, DIR_LEFT, create);
 		break;
 	    case 'f':
-		Xpmap_place_cannon(x, y, DIR_RIGHT, create);
+		Xpmap_place_cannon(blk, DIR_RIGHT, create);
 		break;
 	    case 'c':
-		Xpmap_place_cannon(x, y, DIR_DOWN, create);
+		Xpmap_place_cannon(blk, DIR_DOWN, create);
 		break;
 
 	    case '#':
-		Xpmap_place_fuel(x, y, create);
+		Xpmap_place_fuel(blk, create);
 		break;
 	    case '*':
-		Xpmap_place_treasure(x, y, false, create);
+		Xpmap_place_treasure(blk, false, create);
 		break;
 	    case '^':
-		Xpmap_place_treasure(x, y, true, create);
+		Xpmap_place_treasure(blk, true, create);
 		break;
 	    case '!':
-		Xpmap_place_target(x, y, create);
+		Xpmap_place_target(blk, create);
 		break;
 	    case '%':
-		Xpmap_place_item_concentrator(x, y, create);
+		Xpmap_place_item_concentrator(blk, create);
 		break;
 	    case '&':
-		Xpmap_place_asteroid_concentrator(x, y, create);
+		Xpmap_place_asteroid_concentrator(blk, create);
 		break;
 	    case '$':
-		Xpmap_place_block(x, y, BASE_ATTRACTOR);
+		Xpmap_place_block(blk, BASE_ATTRACTOR);
 		break;
 	    case '_':
-		Xpmap_place_base(x, y, TEAM_NOT_SET, create);
+		Xpmap_place_base(blk, TEAM_NOT_SET, create);
 		break;
 	    case '0': case '1': case '2': case '3': case '4':
 	    case '5': case '6': case '7': case '8': case '9':
-		Xpmap_place_base(x, y, (int) (c - '0'), create);
+		Xpmap_place_base(blk, (int) (c - '0'), create);
 		break;
 		
 	    case '+':
-		Xpmap_place_grav(x, y, -GRAVS_POWER, POS_GRAV, create);
+		Xpmap_place_grav(blk, -GRAVS_POWER, POS_GRAV, create);
 		break;
 	    case '-':
-		Xpmap_place_grav(x, y, GRAVS_POWER, NEG_GRAV, create);
+		Xpmap_place_grav(blk, GRAVS_POWER, NEG_GRAV, create);
 		break;
 	    case '>':
-		Xpmap_place_grav(x, y, GRAVS_POWER, CWISE_GRAV, create);
+		Xpmap_place_grav(blk, GRAVS_POWER, CWISE_GRAV, create);
 		break;
 	    case '<':
-		Xpmap_place_grav(x, y, -GRAVS_POWER, ACWISE_GRAV, create);
+		Xpmap_place_grav(blk, -GRAVS_POWER, ACWISE_GRAV, create);
 		break;
 	    case 'i':
-		Xpmap_place_grav(x, y, GRAVS_POWER, UP_GRAV, create);
+		Xpmap_place_grav(blk, GRAVS_POWER, UP_GRAV, create);
 		break;
 	    case 'm':
-		Xpmap_place_grav(x, y, -GRAVS_POWER, DOWN_GRAV, create);
+		Xpmap_place_grav(blk, -GRAVS_POWER, DOWN_GRAV, create);
 		break;
 	    case 'k':
-		Xpmap_place_grav(x, y, GRAVS_POWER, RIGHT_GRAV, create);
+		Xpmap_place_grav(blk, GRAVS_POWER, RIGHT_GRAV, create);
 		break;
 	    case 'j':
-		Xpmap_place_grav(x, y, -GRAVS_POWER, LEFT_GRAV, create);
+		Xpmap_place_grav(blk, -GRAVS_POWER, LEFT_GRAV, create);
 		break;
 		
 	    case '@':
-		Xpmap_place_wormhole(x, y, WORM_NORMAL, create);
+		Xpmap_place_wormhole(blk, WORM_NORMAL, create);
 		break;
 	    case '(':
-		Xpmap_place_wormhole(x, y, WORM_IN, create);
+		Xpmap_place_wormhole(blk, WORM_IN, create);
 		break;
 	    case ')':
-		Xpmap_place_wormhole(x, y, WORM_OUT, create);
+		Xpmap_place_wormhole(blk, WORM_OUT, create);
 		break;
 		
 	    case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
@@ -406,27 +412,27 @@ void Xpmap_tags_to_internal_data(bool create)
 	    case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
 	    case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
 	    case 'Y': case 'Z':
-		Xpmap_place_check(x, y, (int) (c - 'A'), create);
+		Xpmap_place_check(blk, (int) (c - 'A'), create);
 		break;
 		
 	    case 'z':
-		Xpmap_place_block(x, y, FRICTION);
+		Xpmap_place_block(blk, FRICTION);
 		break;
 		
 	    case 'b':
-		Xpmap_place_block(x, y, DECOR_FILLED);
+		Xpmap_place_block(blk, DECOR_FILLED);
 		break;
 	    case 'h':
-		Xpmap_place_block(x, y, DECOR_LU);
+		Xpmap_place_block(blk, DECOR_LU);
 		break;
 	    case 'g':
-		Xpmap_place_block(x, y, DECOR_RU);
+		Xpmap_place_block(blk, DECOR_RU);
 		break;
 	    case 'y':
-		Xpmap_place_block(x, y, DECOR_LD);
+		Xpmap_place_block(blk, DECOR_LD);
 		break;
 	    case 't':
-		Xpmap_place_block(x, y, DECOR_RD);
+		Xpmap_place_block(blk, DECOR_RD);
 		break;
 	    }
 	}
@@ -575,8 +581,11 @@ void Xpmap_find_base_direction(void)
     for (i = 0; i < World.x; i++) {
 	int j;
 	for (j = 0; j < World.y; j++) {
+	    blpos blk;
+	    blk.bx = i;
+	    blk.by = j;
 	    if (World.block[i][j] == BASE_ATTRACTOR)
-		World.block[i][j] = SPACE;
+		World_set_block(&World, blk, SPACE);
 	}
     }
 }
@@ -642,22 +651,22 @@ static void Xpmap_treasure_to_polygon(int treasure_ind)
 #undef N
 
 
-static void Xpmap_block_polygon(int cx, int cy, int polystyle, int edgestyle)
+static void Xpmap_block_polygon(clpos bpos, int polystyle, int edgestyle)
 {
     clpos pos[5];
     int i;
 
-    cx = CLICK_TO_BLOCK(cx) * BLOCK_CLICKS;
-    cy = CLICK_TO_BLOCK(cy) * BLOCK_CLICKS;
+    bpos.cx = CLICK_TO_BLOCK(bpos.cx) * BLOCK_CLICKS;
+    bpos.cy = CLICK_TO_BLOCK(bpos.cy) * BLOCK_CLICKS;
 
-    pos[0].cx = cx;
-    pos[0].cy = cy;
-    pos[1].cx = cx + (BLOCK_CLICKS - 1);
-    pos[1].cy = cy;
-    pos[2].cx = cx + (BLOCK_CLICKS - 1);
-    pos[2].cy = cy + (BLOCK_CLICKS - 1);
-    pos[3].cx = cx;
-    pos[3].cy = cy + (BLOCK_CLICKS - 1);
+    pos[0].cx = bpos.cx;
+    pos[0].cy = bpos.cy;
+    pos[1].cx = bpos.cx + (BLOCK_CLICKS - 1);
+    pos[1].cy = bpos.cy;
+    pos[2].cx = bpos.cx + (BLOCK_CLICKS - 1);
+    pos[2].cy = bpos.cy + (BLOCK_CLICKS - 1);
+    pos[3].cx = bpos.cx;
+    pos[3].cy = bpos.cy + (BLOCK_CLICKS - 1);
     pos[4] = pos[0];
 
     P_start_polygon(pos[0], polystyle);
@@ -677,7 +686,7 @@ static void Xpmap_target_to_polygon(int target_ind)
 
     /* create target polygon */
     P_start_target(target_ind);
-    Xpmap_block_polygon(targ->pos.cx, targ->pos.cy, ps, es);
+    Xpmap_block_polygon(targ->pos, ps, es);
     P_end_target();
 }
 
@@ -685,40 +694,38 @@ static void Xpmap_target_to_polygon(int target_ind)
 static void Xpmap_cannon_polygon(cannon_t *cannon,
 				 int polystyle, int edgestyle)
 {
-    clpos pos[4];
-    int cx = cannon->pos.cx;
-    int cy = cannon->pos.cy;
+    clpos pos[4], cpos = cannon->pos;
     int i;
 
     pos[0] = cannon->pos;
 
-    cx = CLICK_TO_BLOCK(cx) * BLOCK_CLICKS;
-    cy = CLICK_TO_BLOCK(cy) * BLOCK_CLICKS;
+    cpos.cx = CLICK_TO_BLOCK(cpos.cx) * BLOCK_CLICKS;
+    cpos.cy = CLICK_TO_BLOCK(cpos.cy) * BLOCK_CLICKS;
 
     switch (cannon->dir) {
     case DIR_RIGHT:
-	pos[1].cx = cx;
-	pos[1].cy = cy + (BLOCK_CLICKS - 1);
-	pos[2].cx = cx;
-	pos[2].cy = cy;
+	pos[1].cx = cpos.cx;
+	pos[1].cy = cpos.cy + (BLOCK_CLICKS - 1);
+	pos[2].cx = cpos.cx;
+	pos[2].cy = cpos.cy;
 	break;
     case DIR_UP:
-	pos[1].cx = cx;
-	pos[1].cy = cy;
-	pos[2].cx = cx + (BLOCK_CLICKS - 1);
-	pos[2].cy = cy;
+	pos[1].cx = cpos.cx;
+	pos[1].cy = cpos.cy;
+	pos[2].cx = cpos.cx + (BLOCK_CLICKS - 1);
+	pos[2].cy = cpos.cy;
 	break;
     case DIR_LEFT:
-	pos[1].cx = cx + (BLOCK_CLICKS - 1);
-	pos[1].cy = cy;
-	pos[2].cx = cx + (BLOCK_CLICKS - 1);
-	pos[2].cy = cy + (BLOCK_CLICKS - 1);
+	pos[1].cx = cpos.cx + (BLOCK_CLICKS - 1);
+	pos[1].cy = cpos.cy;
+	pos[2].cx = cpos.cx + (BLOCK_CLICKS - 1);
+	pos[2].cy = cpos.cy + (BLOCK_CLICKS - 1);
 	break;
     case DIR_DOWN:
-	pos[1].cx = cx + (BLOCK_CLICKS - 1);
-	pos[1].cy = cy + (BLOCK_CLICKS - 1);
-	pos[2].cx = cx;
-	pos[2].cy = cy + (BLOCK_CLICKS - 1);
+	pos[1].cx = cpos.cx + (BLOCK_CLICKS - 1);
+	pos[1].cy = cpos.cy + (BLOCK_CLICKS - 1);
+	pos[2].cx = cpos.cx;
+	pos[2].cy = cpos.cy + (BLOCK_CLICKS - 1);
 	break;
     default:
  	/* can't happen */
@@ -750,10 +757,10 @@ static void Xpmap_cannon_to_polygon(int cannon_ind)
 #define N 12
 static void Xpmap_wormhole_to_polygon(int wormhole_ind)
 {
-    int cx, cy, ps, es, i, r;
+    int ps, es, i, r;
     double angle;
     wormhole_t *wormhole = Wormholes(wormhole_ind);
-    clpos pos[N + 1];
+    clpos pos[N + 1], wpos;
 
     /* don't make a polygon for an out wormhole */
     if (wormhole->type == WORM_OUT)
@@ -762,14 +769,13 @@ static void Xpmap_wormhole_to_polygon(int wormhole_ind)
     ps = P_get_poly_id("wormhole_ps");
     es = P_get_edge_id("wormhole_es");
 
-    cx = wormhole->pos.cx;
-    cy = wormhole->pos.cy;
+    wpos = wormhole->pos;
     r = (BLOCK_CLICKS / 2) - 1;
 
     for (i = 0; i < N; i++) {
 	angle = (((double)i)/ N) * 2 * PI;
-	pos[i].cx = cx + r * cos(angle);
-	pos[i].cy = cy + r * sin(angle);
+	pos[i].cx = wpos.cx + r * cos(angle);
+	pos[i].cy = wpos.cy + r * sin(angle);
     }
     pos[N] = pos[0];
 
