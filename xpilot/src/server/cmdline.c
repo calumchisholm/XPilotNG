@@ -865,7 +865,18 @@ static option_desc opts[] = {
 	&options.playerWallBrakeFactor,
 	valReal,
 	Move_init,
-	"Factor to slow down players when they hit the wall (0 to 1).\n",
+	"Factor to slow down ship in direction perpendicular to the wall\n"
+	"when a wall is hit (0 to 1).\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"playerWallFriction",
+	"playerWallFriction",
+	"0.5",
+	&options.playerWallFriction,
+	valReal,
+	Move_init,
+	"Player-wall friction (0 to 1).\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3490,6 +3501,22 @@ static option_desc opts[] = {
 	valBool,
 	tuner_dummy,
 	"Enable improved precision steering and aiming of main gun.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"maraWallBounce",
+	"maraWallBounce",
+	"true",
+	&options.maraWallBounce,
+	valBool,
+	tuner_dummy,
+	"Use mara's suggestion for the speed change in the direction\n"
+	"parallel to the wall.\n"
+	"Vtangent2 = (1-Vnormal1/Vtotal1*wallfriction)*Vtangent1\n"
+	"If not, uau's suggestion is used:\n"
+	"change the parallel one by\n"
+	"MIN(C1*perpendicular_change, C2*parallel_speed)\n"
+	"if you assume the wall has a coefficient of friction C1.\n.",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

@@ -147,6 +147,7 @@ void Move_init(world_t *world)
     LIMIT(options.maxUnshieldedWallBounceSpeed, 0, world->hypotenuse);
 
     LIMIT(options.playerWallBrakeFactor, 0, 1);
+    LIMIT(options.playerWallFriction, 0, 1);
     LIMIT(options.objectWallBrakeFactor, 0, 1);
     LIMIT(options.objectWallBounceLifeFactor, 0, 1);
     LIMIT(options.wallBounceFuelDrainMult, 0, 1000);
@@ -614,26 +615,22 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 
 static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 {
-    double fx, fy;
-    double c, s;
+    double c, s;		/* cosine and sine of 2 times line angle */
+    double cl, sl;		/* cosine and sine of line angle */
+    double x, y, l2, l;
     int group, type, mapobj_ind;
     world_t *world = &World;
 
-    if (line >= num_lines) {
-	double x, y, l2;
+    x = linet[line].delta.cx;
+    y = linet[line].delta.cy;
+    l2 = (x*x + y*y);
+    c = (x*x - y*y) / l2;
+    s = 2*x*y / l2;
+    l = sqrt(l2);
+    cl = x / l;
+    sl = y / l;
 
-	x = linet[line].delta.cx;
-	y = linet[line].delta.cy;
-	l2 = (x*x + y*y);
-	c = (x*x - y*y) / l2;
-	s = 2*x*y / l2;
-	group = linet[point].group;
-    }
-    else {
-	group = linet[line].group;
-	c = linet[line].c;
-	s = linet[line].s;
-    }
+    group = linet[line >= num_lines ? point : line].group;
     type = groups[group].type;
     mapobj_ind = groups[group].mapobj_ind;
     if (type == TREASURE) {
@@ -728,14 +725,97 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	    }
 	}
     }
-    fx = move->delta.cx * c + move->delta.cy * s;
-    fy = move->delta.cx * s - move->delta.cy * c;
-    move->delta.cx = fx * options.playerWallBrakeFactor;
-    move->delta.cy = fy * options.playerWallBrakeFactor;
-    fx = pl->vel.x * c + pl->vel.y * s;
-    fy = pl->vel.x * s - pl->vel.y * c;
-    pl->vel.x = fx * options.playerWallBrakeFactor;
-    pl->vel.y = fy * options.playerWallBrakeFactor;
+
+#if 1
+    /*
+     * Determine new velocity vector and move->delta after bounce.
+     * The vector move->delta is the remaining amount left to move
+     * in this frame.
+     */
+
+    {
+	vector_t vel, vel1, mvd, mvd1;
+
+	/*
+	 * i. Rotate velocity and move->delta clockwise by line angle.
+	 */
+	vel.x = pl->vel.x *   cl  + pl->vel.y * sl;
+	vel.y = pl->vel.x * (-sl) + pl->vel.y * cl;
+	vel1 = vel;
+	mvd.x = move->delta.cx *   cl  + move->delta.cy * sl;
+	mvd.y = move->delta.cx * (-sl) + move->delta.cy * cl;
+	mvd1 = mvd;
+
+	/* ii. Reverse direction of perpendicular component. */
+	vel.y = -vel.y;
+	mvd.y = -mvd.y;
+
+	/*
+	 * iii. Determine how much perpendicular and parallel components
+	 * change.
+	 */
+	vel.y *= options.playerWallBrakeFactor;
+	mvd.y *= options.playerWallBrakeFactor;
+
+	if (options.maraWallBounce) {
+	    double vtotal1 = VECTOR_LENGTH(vel1);
+	    double vnormal1 = ABS(vel1.y);
+	    double wallfriction = options.playerWallFriction;
+	    double factor = 1.0 - vnormal1 / vtotal1 * wallfriction;
+	    /*
+	     * mara:
+	     * Vtangent2 = (1-Vnormal1/Vtotal1*wallfriction)*Vtangent1;
+	     */
+	    vel.x *= factor;
+	    mvd.x *= factor;
+	}
+	else {
+	    double change;
+	    double C1 = options.playerWallFriction, C2 = 0.5; /* 0.5 ??? */
+	    double perpendicular_change, parallel_speed;
+	    /*
+	     * uau:
+	     * change the parallel one by
+	     * MIN(C1*perpendicular_change, C2*parallel_speed)
+	     * if you assume the wall has a coefficient of friction C1
+	     */
+	    perpendicular_change = ABS(vel1.y - vel.y);
+	    parallel_speed = ABS(vel.x);
+	    change = MIN(C1*perpendicular_change, C2*parallel_speed);
+	    if (vel.x > 0)
+		vel.x -= change;
+	    else
+		vel.x += change;
+
+	    perpendicular_change = ABS(mvd1.y - mvd.y);
+	    parallel_speed = ABS(mvd.x);
+	    change = MIN(C1*perpendicular_change, C2*parallel_speed);
+	    if (mvd.x > 0)
+		mvd.x -= change;
+	    else
+		mvd.x += change;
+	}
+
+	/* iv. Rotate the whole thing anti-clockwise. */
+	pl->vel.x = vel.x * cl + vel.y * (-sl);
+	pl->vel.y = vel.x * sl + vel.y *   cl;
+	move->delta.cx = mvd.x * cl + mvd.y * (-sl);
+	move->delta.cy = mvd.x * sl + mvd.y *   cl;
+    }
+#else
+    {
+	double fx, fy;
+
+	fx = move->delta.cx * c + move->delta.cy * s;
+	fy = move->delta.cx * s - move->delta.cy * c;
+	move->delta.cx = fx * options.playerWallBrakeFactor;
+	move->delta.cy = fy * options.playerWallBrakeFactor;
+	fx = pl->vel.x * c + pl->vel.y * s;
+	fy = pl->vel.x * s - pl->vel.y * c;
+	pl->vel.x = fx * options.playerWallBrakeFactor;
+	pl->vel.y = fy * options.playerWallBrakeFactor;
+    }
+#endif
 }
 
 

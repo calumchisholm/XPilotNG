@@ -185,6 +185,7 @@ extern struct options {
     double	maxShieldedWallBounceSpeed;
     double	maxUnshieldedWallBounceSpeed;
     double	playerWallBrakeFactor;
+    double	playerWallFriction;
     double	objectWallBrakeFactor;
     double	objectWallBounceLifeFactor;
     double	wallBounceFuelDrainMult;
@@ -391,6 +392,7 @@ extern struct options {
     char	*recordFileName;
     double	gameSpeed;
     bool	ngControls;
+    bool	maraWallBounce;
     double	constantSpeed;
     bool	ballStyles;
     bool	ignoreMaxFPS;
