@@ -100,7 +100,7 @@ Button CreateButton(Display *display, Window parent,
 	    SetButtonFont(display);
 	if (width == 0)
 	    width = XTextWidth(buttonFont, image.string,
-			       strlen(image.string)) + 10;
+			       (int)strlen(image.string)) + 10;
 	if (height == 0)
 	    height = buttonFont->ascent + buttonFont->descent + 10;
     }
@@ -227,6 +227,7 @@ void RedrawButton(Button b)
 {
     static GC gc = 0;
     static Pixmap grey = 0;
+    int bh = b->height, bw = b->width;
 
     if (gc == 0) {
 	gc = XCreateGC(b->display, b->window, 0, NULL);
@@ -249,21 +250,23 @@ void RedrawButton(Button b)
 
     if (b->flags & BUTTON_TEXT)
  	XDrawString(b->display, b->window, gc, 5, 5 + buttonFont->ascent,
-		    b->image.string, strlen(b->image.string));
+		    b->image.string, (int)strlen(b->image.string));
     else if (b->image.icon != None) {
-	int x, y, w, h;
+	int x, y;
+	unsigned w, h;
 	
 	w = (b->imagewidth);
-	if (w > (int)b->width)
+	if (w > b->width)
 	    w = b->width;
 	h = (b->imageheight);
-	if (h > (int)b->height)
+	if (h > b->height)
 	    h = b->height;
-	x = (b->width-w)>>1;
-	y = (b->height-h)>>1;
+	x = (b->width - w) >> 1;
+	y = (b->height - h) >> 1;
 	XCopyPlane(b->display, b->image.icon, b->window, gc,
-		   (b->imagewidth-w)>>1, (b->imageheight-h)>>1, w, h,
-		   x, y, 1);
+		   (int)((b->imagewidth-w) >> 1),
+		   (int)((b->imageheight-h) >> 1),
+		   w, h, x, y, 1);
     }
 
     if (b->flags & BUTTON_DISABLED) {
@@ -275,40 +278,31 @@ void RedrawButton(Button b)
 
     if (b->flags & BUTTON_PRESSED) {
 	XSetForeground(b->display, gc, black);
-	XDrawRectangle(b->display, b->window, gc, 0, 0, b->width-1,
-		       b->height-1);
-	XDrawRectangle(b->display, b->window, gc, 1, 1, b->width-3,
-		       b->height-3);
+	XDrawRectangle(b->display, b->window, gc,
+		       0, 0, b->width-1, b->height-1);
+	XDrawRectangle(b->display, b->window, gc,
+		       1, 1, b->width-3, b->height-3);
     } else {
 	XSetForeground(b->display, gc, bottomshadow);
-	XDrawLine(b->display, b->window, gc, 0, b->height-1, b->width-1,
-		  b->height-1);
-	XDrawLine(b->display, b->window, gc, b->width-1, b->height-1,
-		  b->width-1, 0);
+	XDrawLine(b->display, b->window, gc, 0, bh-1, bw-1, bh-1);
+	XDrawLine(b->display, b->window, gc, bw-1, bh-1, bw-1, 0);
 	XSetForeground(b->display, gc, topshadow);
-	XDrawLine(b->display, b->window, gc, 0, 0,
-		  b->width-1, 0);
-	XDrawLine(b->display, b->window, gc, 0, 0, 0, b->height-1);
+	XDrawLine(b->display, b->window, gc, 0, 0, bw-1, 0);
+	XDrawLine(b->display, b->window, gc, 0, 0, 0, bh-1);
 	XSetForeground(b->display, gc, bottomshadow);
-	XDrawLine(b->display, b->window, gc, 1, b->height-2, b->width-2,
-		  b->height-2);
-	XDrawLine(b->display, b->window, gc, b->width-2, b->height-2,
-		  b->width-2, 1);
+	XDrawLine(b->display, b->window, gc, 1, bh-2, bw-2, bh-2);
+	XDrawLine(b->display, b->window, gc, bw-2, bh-2, bw-2, 1);
 	XSetForeground(b->display, gc, topshadow);
-	XDrawLine(b->display, b->window, gc, 1, 1,
-		  b->width-2, 1);
-	XDrawLine(b->display, b->window, gc, 1, 1, 1, b->height-2);
+	XDrawLine(b->display, b->window, gc, 1, 1, bw-2, 1);
+	XDrawLine(b->display, b->window, gc, 1, 1, 1, bh-2);
     }
 
     XSetForeground(b->display, gc, bottomshadow);
-    XDrawLine(b->display, b->window, gc, 2, b->height-3, b->width-3,
-	      b->height-3);
-    XDrawLine(b->display, b->window, gc, b->width-3, b->height-3,
-	      b->width-3, 2);
+    XDrawLine(b->display, b->window, gc, 2, bh-3, bw-3, bh-3);
+    XDrawLine(b->display, b->window, gc, bw-3, bh-3, bw-3, 2);
     XSetForeground(b->display, gc, topshadow);
-    XDrawLine(b->display, b->window, gc, 2, 2,
-	      b->width-3, 2);
-    XDrawLine(b->display, b->window, gc, 2, 2, 2, b->height-3);
+    XDrawLine(b->display, b->window, gc, 2, 2, bw-3, 2);
+    XDrawLine(b->display, b->window, gc, 2, 2, 2, bh-3);
 
 }
 
