@@ -3753,17 +3753,10 @@ void Timing_setup(void)
 
     friction = frictionSetting;
 
-#if 0 
-    /* kps - changed ng code so the above works */
-    /* ng wants this - requires other changes elsewhere */
-    friction = 1 - frictionSetting;
-
-
     /* If friction < 0, the result is silly - allow such settings but
      * don't bother making it "FPSMultiplier independent" */
     if (friction > 0)
-	friction = pow(friction, 1. / FPSMultiplier);
-#endif
+	friction = 1. - pow(1. - friction, 1. / FPSMultiplier);
 
 #if 0
     xpprintf(__FILE__ ": gameSpeed         = %f\n", gameSpeed);
