@@ -167,7 +167,7 @@ void Go_home(player *pl)
     int			ind = GetInd(pl->id);
     int			i, dir, check;
     double		vx, vy, velo;
-    clpos		pos;
+    clpos		pos, initpos;
 
     if (IS_TANK_PTR(pl)) {
 	/*NOTREACHED*/
@@ -198,8 +198,9 @@ void Go_home(player *pl)
 
     pl->dir = dir;
     Player_set_float_dir(pl, (double)dir);
-    Player_position_init_clicks(
-	pl, (int)(pos.cx + CLICK * vx),	(int)(pos.cy + CLICK * vy));
+    initpos.cx = pos.cx + CLICK * vx;
+    initpos.cy = pos.cy + CLICK * vy;
+    Player_position_init_clpos(pl, initpos);
     pl->vel.x = vx;
     pl->vel.y = vy;
     pl->velocity = velo;

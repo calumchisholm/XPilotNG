@@ -348,7 +348,7 @@ void Tank_handle_detach(player *pl)
 	Player_remove_tank(dummy, dummy->fuel.num_tanks);
 
     SET_BIT(dummy->type_ext, OBJ_EXT_TANK);
-    Player_position_init_clicks(dummy, pl->pos.cx, pl->pos.cy);
+    Player_position_init_clpos(dummy, pl->pos);
     dummy->vel		= pl->vel;
     dummy->acc		= pl->acc;
     dummy->dir		= pl->dir;
@@ -510,7 +510,7 @@ void Make_wreckage(
 	wreckage->type = OBJ_WRECKAGE;
 
 	/* Position */
-	Object_position_init_clicks(OBJ_PTR(wreckage), pos.cx, pos.cy);
+	Object_position_init_clpos(OBJ_PTR(wreckage), pos);
 
 	/* Direction */
 	dir = MOD2(min_dir + (int)(rfrac() * MOD2(max_dir - min_dir, RES)),

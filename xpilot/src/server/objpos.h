@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -25,17 +24,37 @@
 #ifndef OBJPOS_H
 #define OBJPOS_H
 
-void Object_position_set_clicks(object *obj, int cx, int cy);
-void Object_position_init_clicks(object *obj, int cx, int cy);
+void Object_position_set_clpos(object *obj, clpos pos);
+void Object_position_init_clpos(object *obj, clpos pos);
 void Player_position_restore(player *pl);
-void Player_position_set_clicks(player *pl, int cx, int cy);
-void Player_position_init_clicks(player *pl, int cx, int cy);
+void Player_position_set_clpos(player *pl, clpos pos);
+void Player_position_init_clpos(player *pl, clpos pos);
 void Player_position_limit(player *pl);
 void Player_position_debug(player *pl, const char *msg);
 
-#define Object_position_remember(o_) \
-	((o_)->prevpos.cx = (o_)->pos.cx, \
-	 (o_)->prevpos.cy = (o_)->pos.cy)
-#define Player_position_remember(p_) Object_position_remember(p_)
+static inline void Object_position_remember(object *obj)
+{
+    obj->prevpos = obj->pos;
+}
+
+static inline void Player_position_remember(player *pl)
+{
+    Object_position_remember((object *)pl);
+}
+
+static inline void Object_position_set_clvec(object *obj, clvec vec)
+{
+    clpos pos;
+
+    pos.cx = vec.cx;
+    pos.cy = vec.cy;
+
+    Object_position_set_clpos(obj, pos);
+}
+
+static inline void Player_position_set_clvec(player *pl, clvec vec)
+{
+    Object_position_set_clvec((object *)pl, vec);
+}
 
 #endif

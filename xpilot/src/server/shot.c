@@ -191,7 +191,7 @@ void Place_general_mine(player *pl, int team, long status,
 	mine->id = (pl ? pl->id : NO_ID);
 	mine->team = team;
 	mine->owner = mine->id;
-	Object_position_init_clicks(OBJ_PTR(mine), pos.cx, pos.cy);
+	Object_position_init_clpos(OBJ_PTR(mine), pos);
 	if (minis > 1) {
 	    int		space = RES/minis;
 	    int		dir;
@@ -278,11 +278,10 @@ void Detonate_mines(player *pl)
 void Make_treasure_ball(treasure_t *t)
 {
     ballobject *ball;
-    int cx = t->pos.cx;
-    int cy = t->pos.cy;
+    clpos pos = t->pos;
 
     if (!is_polygon_map)
-	cy += (10 * PIXEL_CLICKS - BLOCK_CLICKS / 2);
+	pos.cy += (10 * PIXEL_CLICKS - BLOCK_CLICKS / 2);
 
     if (t->empty)
 	return;
@@ -303,7 +302,7 @@ void Make_treasure_ball(treasure_t *t)
     ball->vel.y = 0;		/* longer to the ground */
     ball->acc.x = 0;
     ball->acc.y = 0;
-    Object_position_init_clicks(OBJ_PTR(ball), cx, cy);
+    Object_position_init_clpos(OBJ_PTR(ball), pos);
     ball->id = NO_ID;
     ball->owner = NO_ID;
     ball->team = t->team;
@@ -921,7 +920,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	}
 	shotpos.cx = WRAP_XCLICK(shotpos.cx);
 	shotpos.cy = WRAP_YCLICK(shotpos.cy);
-	Object_position_init_clicks(shot, shotpos.cx, shotpos.cy);
+	Object_position_init_clpos(shot, shotpos);
 
 	if (type == OBJ_SHOT || !pl)
 	    angle = 0.0;
@@ -1411,7 +1410,7 @@ void Fire_general_laser(player *pl, int team, clpos pos,
 
     pulse->id		= (pl ? pl->id : NO_ID);
     pulse->team 	= team;
-    Object_position_init_clicks(OBJ_PTR(pulse), pos.cx, pos.cy);
+    Object_position_init_clpos(OBJ_PTR(pulse), pos);
     pulse->vel.x 	= pulseSpeed * tcos(dir);
     pulse->vel.y 	= pulseSpeed * tsin(dir);
     pulse->acc.x 	= 0;

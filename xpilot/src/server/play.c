@@ -253,7 +253,7 @@ void Make_debris(
 	debris->color = color;
 	debris->id = id;
 	debris->team = team;
-	Object_position_init_clicks(debris, pos.cx, pos.cy);
+	Object_position_init_clpos(debris, pos);
 	dir = MOD2(min_dir + (int)(rfrac() * (max_dir - min_dir)), RES);
 	dirplus = MOD2(dir + 1, RES);
 	diroff = rfrac();

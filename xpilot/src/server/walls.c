@@ -2566,18 +2566,19 @@ static void Move_ball(object *obj)
 
     if (obj->id != NO_ID
 	&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE)) {
+	clpos pos;
 
-	int cx = obj->pos.cx + mv.delta.cx;
-	int cy = obj->pos.cy + mv.delta.cy;
-	while (cx >= World.cwidth)
-	    cx -= World.cwidth;
-	while (cx < 0)
-	    cx += World.cwidth;
-	while (cy >= World.cheight)
-	    cy -= World.cheight;
-	while (cy < 0)
-	    cy += World.cheight;
-	Object_position_set_clicks(obj, cx, cy);
+	pos.cx = obj->pos.cx + mv.delta.cx;
+	pos.cy = obj->pos.cy + mv.delta.cy;
+	while (pos.cx >= World.cwidth)
+	    pos.cx -= World.cwidth;
+	while (pos.cx < 0)
+	    pos.cx += World.cwidth;
+	while (pos.cy >= World.cheight)
+	    pos.cy -= World.cheight;
+	while (pos.cy < 0)
+	    pos.cy += World.cheight;
+	Object_position_set_clpos(obj, pos);
 	Cell_add_object(obj);
 	return;
     }
@@ -2616,7 +2617,7 @@ static void Move_ball(object *obj)
 	    }
 	}
     }
-    Object_position_set_clicks(obj, mv.start.cx, mv.start.cy);
+    Object_position_set_clvec(obj, mv.start);
     Cell_add_object(obj);
     return;
 }
@@ -2688,7 +2689,7 @@ void Move_object(object *obj)
 	    }
 	}
     }
-    Object_position_set_clicks(obj, mv.start.cx, mv.start.cy);
+    Object_position_set_clvec(obj, mv.start);
     Cell_add_object(obj);
     return;
 }
@@ -2710,7 +2711,7 @@ void Move_player(player *pl)
 	    pos.cy = WRAP_YCLICK(pos.cy);
 	    if (pos.cx != pl->pos.cx || pos.cy != pl->pos.cy) {
 		Player_position_remember(pl);
-		Player_position_set_clicks(pl, pos.cx, pos.cy);
+		Player_position_set_clpos(pl, pos);
 	    }
 	}
 	pl->velocity = VECTOR_LENGTH(pl->vel);
@@ -2753,17 +2754,17 @@ void Move_player(player *pl)
 #endif
 
     if (BIT(pl->used, HAS_PHASING_DEVICE)) {
-	int cx = pl->pos.cx + mv.delta.cx;
-	int cy = pl->pos.cy + mv.delta.cy;
-	while (cx >= World.cwidth)
-	    cx -= World.cwidth;
-	while (cx < 0)
-	    cx += World.cwidth;
-	while (cy >= World.cheight)
-	    cy -= World.cheight;
-	while (cy < 0)
-	    cy += World.cheight;
-	Player_position_set_clicks(pl, cx, cy);
+	pos.cx = pl->pos.cx + mv.delta.cx;
+	pos.cy = pl->pos.cy + mv.delta.cy;
+	while (pos.cx >= World.cwidth)
+	    pos.cx -= World.cwidth;
+	while (pos.cx < 0)
+	    pos.cx += World.cwidth;
+	while (pos.cy >= World.cheight)
+	    pos.cy -= World.cheight;
+	while (pos.cy < 0)
+	    pos.cy += World.cheight;
+	Player_position_set_clpos(pl, pos);
     }
     else {
 	mv.hitmask = NONBALL_BIT | HITMASK(pl->team);
@@ -2805,7 +2806,7 @@ void Move_player(player *pl)
 		}
 	    }
 	}
-	Player_position_set_clicks(pl, mv.start.cx, mv.start.cy);
+	Player_position_set_clvec(pl, mv.start);
     }
     pl->velocity = VECTOR_LENGTH(pl->vel);
     /* !@# Better than ignoring collisions after wall touch for players,

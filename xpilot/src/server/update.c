@@ -908,7 +908,7 @@ static void Do_warping(player *pl)
 		    b->life = 0.0;
 		    continue;
 		}
-		Object_position_set_clicks(b, ballpos.cx, ballpos.cy);
+		Object_position_set_clpos(b, ballpos);
 		Object_position_remember(b);
 		b->vel.x *= WORM_BRAKE_FACTOR;
 		b->vel.y *= WORM_BRAKE_FACTOR;
@@ -918,7 +918,7 @@ static void Do_warping(player *pl)
     }
 
     pl->wormHoleDest = wh_dest;
-    Player_position_init_clicks(pl, dest.cx, dest.cy);
+    Player_position_init_clpos(pl, dest);
     pl->vel.x *= WORM_BRAKE_FACTOR;
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;

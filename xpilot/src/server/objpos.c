@@ -26,11 +26,11 @@
 char objpos_version[] = VERSION;
 
 
-void Object_position_set_clicks(object *obj, int cx, int cy)
+void Object_position_set_clpos(object *obj, clpos pos)
 {
-    if (!INSIDE_MAP(cx, cy)) {
+    if (!INSIDE_MAP(pos.cx, pos.cy)) {
 	if (0) {
-	    printf("BUG!  Illegal object position %d,%d\n", cx, cy);
+	    printf("BUG!  Illegal object position %d,%d\n", pos.cx, pos.cy);
 	    printf("      Type = %d (%s)\n", obj->type, Object_typename(obj));
 	    *(double *)(-1) = 4321.0;
 	    abort();
@@ -40,27 +40,26 @@ void Object_position_set_clicks(object *obj, int cx, int cy)
 	}
     }
 
-    obj->pos.cx = cx;
-    obj->pos.cy = cy;
+    obj->pos = pos;
 }
 
-void Object_position_init_clicks(object *obj, int cx, int cy)
+void Object_position_init_clpos(object *obj, clpos pos)
 {
-    Object_position_set_clicks(obj, cx, cy);
+    Object_position_set_clpos(obj, pos);
     Object_position_remember(obj);
     obj->collmode = 0;
 }
 
 void Player_position_restore(player *pl)
 {
-    Player_position_set_clicks(pl, pl->prevpos.cx, pl->prevpos.cy);
+    Player_position_set_clpos(pl, pl->prevpos);
 }
 
-void Player_position_set_clicks(player *pl, int cx, int cy)
+void Player_position_set_clpos(player *pl, clpos pos)
 {
-    if (!INSIDE_MAP(cx, cy)) {
+    if (!INSIDE_MAP(pos.cx, pos.cy)) {
 	if (0) {
-	    printf("BUG!  Illegal player position %d,%d\n", cx, cy);
+	    printf("BUG!  Illegal player position %d,%d\n", pos.cx, pos.cy);
 	    *(double *)(-1) = 4321.0;
 	    abort();
 	} else {
@@ -69,26 +68,24 @@ void Player_position_set_clicks(player *pl, int cx, int cy)
 	}
     }
 
-    pl->pos.cx = cx;
-    pl->pos.cy = cy;
+    pl->pos = pos;
 }
 
-void Player_position_init_clicks(player *pl, int cx, int cy)
+void Player_position_init_clpos(player *pl, clpos pos)
 {
-    Player_position_set_clicks(pl, cx, cy);
+    Player_position_set_clpos(pl, pos);
     Player_position_remember(pl);
     pl->collmode = 0;
 }
 
 void Player_position_limit(player *pl)
 {
-    int			cx = pl->pos.cx, ox = cx;
-    int			cy = pl->pos.cy, oy = cy;
+    clpos pos = pl->pos, oldpos = pos;
 
-    LIMIT(cx, 0, World.cwidth - 1);
-    LIMIT(cy, 0, World.cheight - 1);
-    if (cx != ox || cy != oy)
-	Player_position_set_clicks(pl, cx, cy);
+    LIMIT(pos.cx, 0, World.cwidth - 1);
+    LIMIT(pos.cy, 0, World.cheight - 1);
+    if (pos.cx != oldpos.cx || pos.cy != oldpos.cy)
+	Player_position_set_clpos(pl, pos);
 }
 
 #ifdef DEVELOPMENT

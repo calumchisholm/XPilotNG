@@ -309,7 +309,7 @@ void Make_item(clpos pos, vector vel,
     obj->status = status;
     obj->id = NO_ID;
     obj->team = TEAM_NOT_SET;
-    Object_position_init_clicks(obj, pos.cx, pos.cy);
+    Object_position_init_clpos(obj, pos);
     obj->vel = vel;
     obj->acc.x =
     obj->acc.y = 0.0;
