@@ -51,9 +51,8 @@ int Punish_team(player *pl, treasure_t *td, int cx, int cy)
 	    if (pl_i->team == td->team) {
 		lose_score += pl_i->score;
 		lose_team_members++;
-		if (BIT(pl_i->status, GAME_OVER) == 0) {
+		if (BIT(pl_i->status, GAME_OVER) == 0)
 		    somebody_flag = 1;
-		}
 	    }
 	    else if (pl_i->team == pl->team) {
 		win_score += pl_i->score;
@@ -159,21 +158,19 @@ void Make_debris(
 
     if (type == OBJ_SHOT) {
 	SET_BIT(mods.warhead, CLUSTER);
-	if (!ShotsGravity) {
+	if (!ShotsGravity)
 	    CLR_BIT(status, GRAVITY);
-	}
     }
 
-    if (num_debris > MAX_TOTAL_SHOTS - NumObjs) {
+    if (num_debris > MAX_TOTAL_SHOTS - NumObjs)
 	num_debris = MAX_TOTAL_SHOTS - NumObjs;
-    }
+
     for (i = 0; i < num_debris; i++) {
 	DFLOAT		speed, dx, dy, diroff;
 	int		dir, dirplus;
 
-	if ((debris = Object_allocate()) == NULL) {
+	if ((debris = Object_allocate()) == NULL)
 	    break;
-	}
 
 	debris->color = color;
 	debris->id = id;
@@ -194,9 +191,8 @@ void Make_debris(
 	    /* compensate so that m*v^2 is constant */
 	    DFLOAT sp_shotsp = speed / ShotsSpeed;
 	    debris->mass = mass / (sp_shotsp * sp_shotsp);
-	} else {
+	} else
 	    debris->mass = mass;
-	}
 	debris->type = type;
 	life = min_life + rfrac() * (max_life - min_life);
 	debris->life = life;
@@ -287,7 +283,7 @@ void Ball_hits_goal(ballobject *ball, struct group *groupptr)
     }
     owner = Player_by_id(ball->owner);
     if (groupptr->team == owner->team) {
-	treasure_t *tt = &World.treasures[groupptr->item_id];
+	treasure_t *tt = groupptr->mapobj;
 
 	Ball_is_destroyed(ball);
 
@@ -359,9 +355,9 @@ int Cannon_hitmask(cannon_t *cannon)
     return 0;
 }
 
-void Cannon_set_hitmask(int ind)
+void Cannon_set_hitmask(void *c)
 {
-    cannon_t *cannon = &World.cannon[ind];
+    cannon_t *cannon = c;
 
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
@@ -406,8 +402,7 @@ extern struct move_parameters mp;
 bool Cannon_hitfunc(struct group *groupptr, struct move *move)
 {
     object *obj = move->obj;
-    int ind = groupptr->item_id;
-    cannon_t *cannon = &World.cannon[ind];
+    cannon_t *cannon = groupptr->mapobj;
     unsigned long cannon_mask;
 
     /* this should never happen if hitmasks are ok */
@@ -449,9 +444,9 @@ int Target_hitmask(target_t *targ)
     return HITMASK(targ->team);
 }
 
-void Target_set_hitmask(int ind)
+void Target_set_hitmask(void *t)
 {
-    target_t *targ = &World.targets[ind];
+    target_t *targ = t;
 
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
@@ -512,8 +507,7 @@ int Wormhole_hitmask(wormhole_t *wormhole)
 bool Wormhole_hitfunc(struct group *groupptr, struct move *move)
 {
     object *obj = move->obj;
-    int ind = groupptr->item_id;
-    wormhole_t *wormhole = &World.wormHoles[ind];
+    wormhole_t *wormhole = groupptr->mapobj;
 
     /* this should never happen, because of the hitmask */
     if (wormhole->type == WORM_OUT) {
@@ -536,7 +530,8 @@ bool Wormhole_hitfunc(struct group *groupptr, struct move *move)
 	 */
 	if (pl->warped > 0
 	    && wormhole->type == WORM_NORMAL
-	    && pl->wormHoleDest == ind)
+	    /* kps - wormHoleDest is now pointer */
+	    /*&& pl->wormHoleDest == ind */)
 	    return false;
 
     } else {

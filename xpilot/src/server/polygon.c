@@ -206,7 +206,7 @@ int P_start_ballarea(void)
     groups[current_group].team = TEAM_NOT_SET;
     groups[current_group].hitmask = BALL_BIT;
     groups[current_group].hitfunc = NULL;
-    groups[current_group].item_id = -1;
+    groups[current_group].mapobj = NULL;
     return current_group;
 }
 
@@ -215,7 +215,7 @@ void P_end_ballarea(void)
     current_group = 0;
 }
 
-int P_start_balltarget(int team, int item_id)
+int P_start_balltarget(int team, treasure_t *t)
 {
     current_group = ++num_groups;
     Check_groupcount();
@@ -224,7 +224,7 @@ int P_start_balltarget(int team, int item_id)
     groups[current_group].hitmask = NONBALL_BIT;
     /*= NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));*/
     groups[current_group].hitfunc = Balltarget_hitfunc;
-    groups[current_group].item_id = item_id;
+    groups[current_group].mapobj = t;
     return current_group;
 }
 
@@ -233,17 +233,15 @@ void P_end_balltarget(void)
     current_group = 0;
 }
 
-int P_start_target(int team, int item_id)
+int P_start_target(int team, target_t *targ)
 {
-    target_t *targ = &World.targets[item_id];
-
     current_group = ++num_groups;
     Check_groupcount();
     groups[current_group].type = TARGET;
     groups[current_group].team = team;
     groups[current_group].hitmask = Target_hitmask(targ);
-    groups[current_group].hitfunc = NULL /*Target_hitfunc*/;
-    groups[current_group].item_id = item_id;
+    groups[current_group].hitfunc = NULL;
+    groups[current_group].mapobj = targ;
     targ->group = current_group;
     return current_group;
 }
@@ -253,17 +251,15 @@ void P_end_target(void)
     current_group = 0;
 }
 
-int P_start_cannon(int team, int item_id)
+int P_start_cannon(int team, cannon_t *cannon)
 {
-    cannon_t *cannon = &World.cannon[item_id];
-
     current_group = ++num_groups;
     Check_groupcount();
     groups[current_group].type = CANNON;
     groups[current_group].team = team;
     groups[current_group].hitmask = Cannon_hitmask(cannon);
     groups[current_group].hitfunc = Cannon_hitfunc;
-    groups[current_group].item_id = item_id;
+    groups[current_group].mapobj = cannon;
     cannon->group = current_group;
     return current_group;
 }
@@ -273,28 +269,22 @@ void P_end_cannon(void)
     current_group = 0;
 }
 
-#if 0
-int P_start_wormhole(int item_id)
+int P_start_wormhole(wormhole_t *wormhole)
 {
-    wormhole_t *wormhole = &World.wormHoles[item_id];
-
     current_group = ++num_groups;
     Check_groupcount();
     groups[current_group].type = WORMHOLE;
     groups[current_group].team = TEAM_NOT_SET;
     groups[current_group].hitmask = Wormhole_hitmask(wormhole);
     groups[current_group].hitfunc = Wormhole_hitfunc;
-    groups[current_group].item_id = item_id;
+    groups[current_group].mapobj = wormhole;
     return current_group;
 }
-#endif
 
-#if 0
 void P_end_wormhole(void)
 {
     current_group = 0;
 }
-#endif
 
 int P_start_frictionarea(void)
 {
@@ -302,9 +292,9 @@ int P_start_frictionarea(void)
     Check_groupcount();
     groups[current_group].type = FRICTION;
     groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hitmask = 0xFFFFFFFF; /* kps - hack */
+    groups[current_group].hitmask = ALL_BITS;
     groups[current_group].hitfunc = NULL;
-    groups[current_group].item_id = -1;
+    groups[current_group].mapobj = NULL;
     return current_group;
 }
 
@@ -359,20 +349,21 @@ int P_get_poly_id(const char *s)
 }
 
 /*
- * Call given function f with group item id as argument for
- * all groups of grouptype type.
+ * Call given function f with group map object pointer as argument for
+ * all groups of grouptype 'type'.
  *
  * kps - which group numbers are ok ???
  * Is it 1 to num_groups ???
  */
-void P_grouphack(int type, void (*f)(int))
+void P_grouphack(int type, void (*f)(void *))
 {
     int group;
 
     for (group = 0; group <= num_groups; group++) {
-	if (groups[group].type == type) {
-	    (*f)(groups[group].item_id);
-	}
+	struct group *gp = groupptr_by_id(group);
+
+	if (gp->type == type)
+	    (*f)(gp->mapobj);
     }
 }
 

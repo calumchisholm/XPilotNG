@@ -877,7 +877,7 @@ void Do_general_transporter(player *pl, int cx, int cy, int target,
 void do_hyperjump(player *pl)
 {
     SET_BIT(pl->status, WARPING);
-    pl->wormHoleHit = -1;
+    pl->wormHoleHit = NULL;
 }
 
 void do_lose_item(player *pl)

@@ -118,9 +118,9 @@ void hexdump(void *p, size_t size)
     printf("\n\n");
 }
 
-int Map_place_cannon(int cx, int cy, int dir, int team)
+cannon_t *Map_place_cannon(int cx, int cy, int dir, int team)
 {
-    cannon_t t;
+    cannon_t t, *cannon;
     int ind = World.NumCannons;
 
     t.pos.cx = cx;
@@ -131,11 +131,12 @@ int Map_place_cannon(int cx, int cy, int dir, int team)
     t.conn_mask = (unsigned)-1;
     t.group = -1;
     STORE(cannon_t, World.cannon, World.NumCannons, max_cannons, t);
-    Cannon_init(&World.cannon[ind]);
-    return ind;
+    cannon = &World.cannon[ind];
+    Cannon_init(cannon);
+    return cannon;
 }
 
-int Map_place_fuel(int cx, int cy, int team)
+fuel_t *Map_place_fuel(int cx, int cy, int team)
 {
     fuel_t t;
     int ind = World.NumFuels;
@@ -147,10 +148,10 @@ int Map_place_fuel(int cx, int cy, int team)
     t.last_change = frame_loops;
     t.team = team;
     STORE(fuel_t, World.fuel, World.NumFuels, max_fuels, t);
-    return ind;
+    return &World.fuel[ind];
 }
 
-int Map_place_base(int cx, int cy, int dir, int team)
+base_t *Map_place_base(int cx, int cy, int dir, int team)
 {
     base_t t;
     int ind = World.NumBases;
@@ -175,10 +176,10 @@ int Map_place_base(int cx, int cy, int dir, int team)
 	t.team = TEAM_NOT_SET;
     t.ind = World.NumBases;
     STORE(base_t, World.base, World.NumBases, max_bases, t);
-    return ind;
+    return &World.base[ind];
 }
 
-int Map_place_treasure(int cx, int cy, int team, bool empty)
+treasure_t *Map_place_treasure(int cx, int cy, int team, bool empty)
 {
     treasure_t t;
     int ind = World.NumTreasures;
@@ -194,10 +195,10 @@ int Map_place_treasure(int cx, int cy, int team, bool empty)
 	World.teams[team].TreasuresLeft++;
     }
     STORE(treasure_t, World.treasures, World.NumTreasures, max_treasures, t);
-    return ind;
+    return &World.treasures[ind];
 }
 
-int Map_place_target(int cx, int cy, int team)
+target_t *Map_place_target(int cx, int cy, int team)
 {
     target_t t;
     int ind = World.NumTargets;
@@ -216,10 +217,10 @@ int Map_place_target(int cx, int cy, int team)
     t.last_change = frame_loops;
     t.group = -1;
     STORE(target_t, World.targets, World.NumTargets, max_targets, t);
-    return ind;
+    return &World.targets[ind];
 }
 
-int Map_place_wormhole(int cx, int cy, wormType type)
+wormhole_t *Map_place_wormhole(int cx, int cy, wormType type)
 {
     wormhole_t t;
     int ind = World.NumWormholes;
@@ -233,31 +234,31 @@ int Map_place_wormhole(int cx, int cy, wormType type)
     t.lastblock = SPACE;
     t.lastID = -1;
     STORE(wormhole_t, World.wormHoles, World.NumWormholes, max_wormholes, t);
-    return ind;
+    return &World.wormHoles[ind];
 }
 
 /*
  * if 0 <= ind < OLD_MAX_CHECKS, the checkpoint is directly inserted
  * into the check array and it is assumed it has been allocated earlier
  */
-int Map_place_check(int cx, int cy, int ind)
+clpos *Map_place_check(int cx, int cy, int ind)
 {
     clpos t;
 
     if (ind >= 0 && ind < OLD_MAX_CHECKS) {
 	World.check[ind].cx = cx;
 	World.check[ind].cy = cy;
-	return ind;
+	return &World.check[ind];
     }
 
     ind = World.NumChecks;
     t.cx = cx;
     t.cy = cy;
     STORE(clpos, World.check, World.NumChecks, max_checks, t);
-    return ind;
+    return &World.check[ind];
 }
 
-int Map_place_item_concentrator(int cx, int cy)
+item_concentrator_t *Map_place_item_concentrator(int cx, int cy)
 {
     item_concentrator_t t;
     int ind = World.NumItemConcentrators;
@@ -266,10 +267,10 @@ int Map_place_item_concentrator(int cx, int cy)
     t.pos.cy = cy;
     STORE(item_concentrator_t, World.itemConcentrators,
 	  World.NumItemConcentrators, max_itemconcs, t);
-    return ind;
+    return &World.itemConcentrators[ind];
 }
 
-int Map_place_asteroid_concentrator(int cx, int cy)
+asteroid_concentrator_t *Map_place_asteroid_concentrator(int cx, int cy)
 {
     asteroid_concentrator_t t;
     int ind = World.NumAsteroidConcs;
@@ -278,10 +279,10 @@ int Map_place_asteroid_concentrator(int cx, int cy)
     t.pos.cy = cy;
     STORE(asteroid_concentrator_t, World.asteroidConcs,
 	  World.NumAsteroidConcs, max_asteroidconcs, t);
-    return ind;
+    return &World.asteroidConcs[ind];
 }
 
-int Map_place_grav(int cx, int cy, DFLOAT force, int type)
+grav_t *Map_place_grav(int cx, int cy, DFLOAT force, int type)
 {
     grav_t t;
     int ind = World.NumGravs;
@@ -291,9 +292,8 @@ int Map_place_grav(int cx, int cy, DFLOAT force, int type)
     t.force = force;
     t.type = type;
     STORE(grav_t, World.grav, World.NumGravs, max_gravs, t);
-    return ind;
+    return &World.grav[ind];
 }
-
 
 void Free_map(void)
 {

@@ -115,6 +115,7 @@ void Phasing(player *pl, int on)
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_ON_SOUND);
     } else {
 	int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
+	int group;
 
 	CLR_BIT(pl->used, HAS_PHASING_DEVICE);
 	if (pl->phasing_left <= 0) {
@@ -124,10 +125,11 @@ void Phasing(player *pl, int on)
 	SET_BIT(pl->status, GRAVITY);
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_OFF_SOUND);
 	/* kps - ok to have this check here ? */
-	if (shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-			    (object *)pl, (shape *)pl->ship, pl->dir)
+	if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
+				     OBJ_PTR(pl), (shape *)pl->ship, pl->dir))
 	    != NO_GROUP) {
-	    Player_crash(pl, CrashWall, NO_ID, 0);
+	    /* kps - check for crashes against targets etc ??? */
+	    Player_crash(pl, CrashWall, NULL, 0);
 	}
     }
 }
@@ -1084,6 +1086,8 @@ void Update_objects(void)
 		   + pl->item[ITEM_ARMOR] * ARMOR_MASS;
 
 
+#if 0
+
 	/*
 	 * Wormholes and warping
 	 */
@@ -1092,6 +1096,7 @@ void Update_objects(void)
 	    int wcx, wcy, nearestFront, nearestRear;
 	    DFLOAT proximity, proxFront, proxRear;
 
+	    /* kps - wormHoleHit is now a pointer */
 	    if (pl->wormHoleHit >= World.NumWormholes) {
 		/* could happen if the player hit a temporary wormhole
 		   that was removed while the player was warping */
@@ -1259,6 +1264,7 @@ void Update_objects(void)
 	    sound_play_sensors(pl->pos.cx, pl->pos.cy, WORM_HOLE_SOUND);
 	}
 	/* end of somewhat-supported warping stuff */
+#endif
 
 	update_object_speed(pl);	    /* New position */
 	Move_player(pl);

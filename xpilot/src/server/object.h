@@ -44,6 +44,10 @@
 /* need NUM_ITEMS */
 #include "item.h"
 #endif
+#ifndef MAP_H
+/* need wormhole_t */
+#include "map.h"
+#endif
 #ifndef CLICK_H
 /* need CLICK */
 #include "click.h"
@@ -606,7 +610,7 @@ struct player {
     DFLOAT	damaged;
     DFLOAT	stunned;
     int		updateVisibility;
-    int		wormHoleHit, wormHoleDest;
+    wormhole_t	*wormHoleHit, *wormHoleDest;
     DFLOAT	warped;			/* time player is immune to warped-to
 					   wormhole, replaces WARPED bit */
 

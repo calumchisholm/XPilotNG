@@ -140,11 +140,11 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    attr += 2;
 	}
 	/*
-	 * kps - Currently we don't know item id for balltargets,
+	 * kps - Currently we don't know mapobj for balltargets,
 	 * this means that captureTheFlag stuff does not work
 	 * on xp2 maps.
 	 */
-	P_start_balltarget(team, -1);
+	P_start_balltarget(team, NULL);
 	return;
     }
 
@@ -238,7 +238,8 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Cannon")) {
-	int team = TEAM_NOT_SET, cx = -1, cy = -1, dir = DIR_UP, ind = -1;
+	int team = TEAM_NOT_SET, cx = -1, cy = -1, dir = DIR_UP;
+	cannon_t *cannon;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -251,13 +252,14 @@ static void tagstart(void *data, const char *el, const char **attr)
 		dir = atoi(*(attr + 1));
 	    attr += 2;
 	}
-	ind = Map_place_cannon(cx, cy, dir, team);
-	P_start_cannon(team, ind);
+	cannon = Map_place_cannon(cx, cy, dir, team);
+	P_start_cannon(team, cannon);
 	return;
     }
 
     if (!strcasecmp(el, "Target")) {
-	int team = TEAM_NOT_SET, cx = -1, cy = -1, ind = -1;
+	int team = TEAM_NOT_SET, cx = -1, cy = -1;
+	target_t *targ;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -268,8 +270,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 		cy = atoi(*(attr + 1)) * scale;
 	    attr += 2;
 	}
-	ind = Map_place_target(cx, cy, team);
-	P_start_target(team, ind);
+	targ = Map_place_target(cx, cy, team);
+	P_start_target(team, targ);
 	return;
     }
 

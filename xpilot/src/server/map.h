@@ -300,15 +300,15 @@ struct move {
     clvec start;
     clvec delta;
     int hitmask;
-    object *obj;
+    struct _object *obj;
 };
 
 struct group {
     int type;
     int team;
-    int item_id;
     unsigned int hitmask;
-    bool (*hitfunc)(struct group *group, struct move *move);
+    bool (*hitfunc)(struct group *groupptr, struct move *move);
+    void *mapobj;
 };
 
 extern struct polystyle pstyles[256];
