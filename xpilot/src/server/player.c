@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -476,8 +476,6 @@ int Init_player(int ind, shipobj *ship)
     pl->ball 		= NULL;
 
     pl->player_fps	= 50; /* Client should send a value after startup */
-    pl->player_round	= 0;  /* kps - remove this later */
-    pl->player_count	= 0;  /* kps - remove this later */
 
     Rank_ClearKills(pl);
     Rank_ClearDeaths(pl);
@@ -712,7 +710,7 @@ void Reset_all_players(void)
 	/* This has already been changed to 'D' at this point*/
 	/* not always - kps */
 	/*xpprintf("%s %c \n", pl->name, pl->mychar);*/
-	
+
 	if (!BIT(pl->status, PAUSE) && pl->mychar != 'W')
 	    Rank_AddRound(pl);
 	pl->round = 0;
@@ -1456,7 +1454,7 @@ void Compute_game_status(void)
 	     * Ok, update positions. Everyone who finished the race in the last
 	     * frame gets the current position.
 	     */
-	    
+
 	    /* Only play the sound for the first person to cross the finish */
 	    if (position == 1)
 		sound_play_all(PLAYER_WIN_SOUND);
@@ -2091,7 +2089,7 @@ void Player_death_reset(int ind)
 
 	Rank_AddDeath(pl);
 
-	if (BIT(World.rules->mode, LIMITED_LIVES)) { 
+	if (BIT(World.rules->mode, LIMITED_LIVES)) {
 	    pl->life--;
 	    if (pl->life == -1) {
 		if (IS_ROBOT_PTR(pl)) {
@@ -2152,4 +2150,3 @@ int Team_immune(int id1, int id2)
 
     return 0;
 }
-

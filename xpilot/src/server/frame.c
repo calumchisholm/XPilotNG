@@ -1316,17 +1316,8 @@ void Frame_update(void)
 	}
 
 	/*
-	* Reduce frame rate to player's own rate.
-	*/
-#if 0
-	if (pl->player_count > 0) {
-	    pl->player_round++;
-	    if (pl->player_round >= pl->player_count) {
-		pl->player_round = 0;
-		continue;
-	    }
-	}
-#else
+	 * Reduce frame rate to player's own rate.
+	 */
 	if (pl->player_fps < FPS) {
 	    int divisor = (FPS - 1) / pl->player_fps + 1;
 	    /* Even combined with above pause check gives at least every
@@ -1334,7 +1325,6 @@ void Frame_update(void)
 	    if (frame_loops % divisor)
  		continue;
 	}
-#endif
 
 	if (Send_start_of_frame(conn) == -1) {
 	    continue;

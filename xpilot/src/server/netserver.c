@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -392,7 +392,7 @@ static int Init_setup(void)
 	    error("No memory for mapdata");
 	    return -1;
 	}
- 
+
 	size = Polys_to_client(mapdata);
 #ifndef SILENT
 	xpprintf("%s Server->client map transfer size is %d bytes.\n",
@@ -733,7 +733,7 @@ void Create_client_socket(sock_t *socket, int *port)
  error:
     sock_close(socket);
     socket->fd = -1;
-    return;   
+    return;
 }
 
 
@@ -816,12 +816,12 @@ int CheckAllowed(char *real, char *nick, char *addr, char *host)
     int i, allowed = 1;
     /*char *realnick = nick;*/
     char *mail = NULL;
-    
+
     nick = strdup(nick);
     addr = strdup(addr);
     dcase(nick);
     dcase(addr);
-    
+
     for (i = 0; restricted[i].nick != NULL; i++) {
 	if (strstr(nick, restricted[i].nick) != NULL) {
 	    if (strncmp(addr, restricted[i].addr, strlen(restricted[i].addr))
@@ -836,10 +836,10 @@ int CheckAllowed(char *real, char *nick, char *addr, char *host)
     if (!allowed) {
 	/* Do whatever you want here... */
     }
-    
+
     free(nick);
     free(addr);
-    
+
     return allowed;
 }
 #endif
@@ -1470,7 +1470,7 @@ static int Handle_login(int ind, char *errmsg, int errsize)
 	    Set_player_message(pl, msg);
 	    sprintf(msg,
 		    "Your client will work correctly once you "
-		    "authenticated. %s",
+		    "authenticate. %s",
 		sender);
 	    Set_player_message(pl, msg);
 	}
@@ -1878,17 +1878,16 @@ int Send_self(int ind,
 		      (int) (pl->turnresistance * 255.0 + 0.5),
 		      lock_id, lock_dist, lock_dir,
 		      pl->check,
-		      
+
 		      pl->fuel.current,
 		      pl->fuel.sum >> FUEL_SCALE_BITS,
 		      pl->fuel.max >> FUEL_SCALE_BITS,
-		      
+
 		      connp->view_width, connp->view_height,
 		      connp->debris_colors,
-		      
+
 		      stat,
 		      autopilotlight
-		      
 	);
     if (n <= 0) {
 	return n;
@@ -2318,7 +2317,7 @@ int Send_ship(int ind, int x, int y, int id, int dir,
 			 "%c%hd%hd%hd" "%c" "%c",
 			 PKT_SHIP, x, y, id,
 			 dir,
-			 (shield != 0) 
+			 (shield != 0)
 			 | ((cloak != 0) << 1)
 			 | ((emergency_shield != 0) << 2)
 			 | ((phased != 0) << 3)
@@ -3558,23 +3557,11 @@ static int Receive_fps_request(int ind)
     }
     if (connp->id != NO_ID) {
 	pl = Players[GetInd[connp->id]];
-#if 0
-	pl->player_fps = fps;
-	if (fps > FPS) pl->player_fps = FPS;
-	if (fps < (FPS / 2)) pl->player_fps = (FPS+1) / 2;
-	if (fps == 0) pl->player_fps = FPS;
-	if ((fps == 20) && ignore20MaxFPS) pl->player_fps = FPS;
-	n = FPS - pl->player_fps;
-	if (n <= 0) {
-	    pl->player_count = 0;
-	} else {
-	    pl->player_count = FPS / n;
-	}
-#else
 	if (fps == 0)
 	    fps = 1;
+	if ((fps == 20) && ignore20MaxFPS)
+	    fps = FPS;
  	pl->player_fps = fps;
-#endif
     }
 
     return 1;

@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -347,7 +347,7 @@ struct _ballobject {
     OBJECT_EXTEND
 
     int 		owner;		/* Who's object is this ? */
-    int			treasure;	/* treasure for ball */	
+    int			treasure;	/* treasure for ball */
     /*DFLOAT		length;*/	/* distance ball to player */
 
 #ifdef __cplusplus
@@ -621,9 +621,6 @@ struct player {
     void	*audio;			/* audio private data */
 
     int		player_fps;		/* FPS that this player can do */
-/* kps - ng does not want player_round and player_count */
-    int		player_round;		/* Divisor for player FPS calculation */
-    int		player_count;		/* Player's current frame count */
 
     int		isowner;		/* If player started this server. */
     int		isoperator;		/* If player has operator privileges. */
@@ -644,6 +641,3 @@ struct player {
 };
 
 #endif
-
-
-
