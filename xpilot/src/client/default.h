@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -22,8 +21,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef _DEFAULT_H_
-#define _DEFAULT_H_
+#ifndef DEFAULT_H
+#define DEFAULT_H
 
 typedef struct {
     const char		*name;		/* option name */
@@ -35,6 +34,6 @@ typedef struct {
 } option;
 
 extern option	options[];
-extern int		optionsCount;	/* NELEM(options) */
+extern int	optionsCount;	/* NELEM(options) */
 
 #endif
