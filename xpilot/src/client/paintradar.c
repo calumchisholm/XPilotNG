@@ -658,12 +658,13 @@ static void Paint_world_radar_new(void)
 	Compute_radar_bounds(&min, &max, &polygons[i].bounds);
 	for (xoff = min.x; xoff <= max.x; xoff++) {
 	    for (yoff = min.y; yoff <= max.y; yoff++) {
+		int x, y;
 
 		if (BIT(polygon_styles[polygons[i].style].flags,
 			STYLE_INVISIBLE_RADAR)) continue;
 
-		int x = xoff * Setup->width;
-		int y = yoff * Setup->height;
+		x = xoff * Setup->width;
+		y = yoff * Setup->height;
 		
 		/* loop through the points in the current polygon */
 		for (j = 0; j < polygons[i].num_points; j++) {		    
