@@ -163,7 +163,6 @@ static void Set_swapper_state(player_t *pl)
 		 * not sure what that was good for.
 		 */
 		Player_set_state(pl, PL_STATE_WAITING);
-		SET_BIT(pl->pl_status, FOO_PLAYING);
 		Player_self_destruct(pl, false);
 		pl->pause_count = 0;
 		pl->recovery_count = 0;

@@ -138,7 +138,9 @@ void Pick_startpos(player_t *pl)
 		if (pl_i->conn != NULL)
 		    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 	    }
-	    if (BIT(pl->pl_status, FOO_PAUSE|FOO_GAME_OVER))
+	    if (Player_is_paused(pl)
+		|| Player_is_waiting(pl)
+		|| Player_is_dead(pl))
 		Go_home(pl);
 	}
     }
@@ -160,7 +162,8 @@ void Go_home(player_t *pl)
 
     if (BIT(world->rules->mode, TIMING)
 	&& pl->round
-	&& !BIT(pl->pl_status, FOO_GAME_OVER)) {
+	&& !(Player_is_waiting(pl)
+	     || Player_is_dead(pl))) {
 	if (pl->check)
 	    check = pl->check - 1;
 	else
@@ -1030,7 +1033,8 @@ void Compute_game_status(world_t *world)
 		/* Ignore players with no treasure troves */
 		continue;
 #endif
-	    else if (BIT(pl_i->pl_status, FOO_GAME_OVER)) {
+	    else if (Player_is_waiting(pl_i)
+		     || Player_is_dead(pl_i)) {
 		if (team_state[pl_i->team] == TeamEmpty) {
 		    /* Assume all teammembers are dead. */
 		    num_dead_teams++;
@@ -1225,7 +1229,8 @@ void Compute_game_status(world_t *world)
 
 	    if (Player_is_paused(pl_i) || Player_is_tank(pl_i))
 		continue;
-	    if (!BIT(pl_i->pl_status, FOO_GAME_OVER)) {
+	    if (!(Player_is_waiting(pl_i)
+		  || Player_is_dead(pl_i))) {
 		num_alive_players++;
 		if (Player_is_robot(pl_i))
 		    num_alive_robots++;
