@@ -550,14 +550,16 @@ static void Players_turn(void)
  		continue;
 	}
 
-	/*
+    	/*
 	 * turnresistance is zero: client requests linear turning behaviour
 	 * when playing with pointer control.
 	 */
 	if (pl->turnresistance)
 	    pl->turnvel *= pl->turnresistance;
 
-	new_float_dir = pl->float_dir;
+	if (pl->turnqueue) new_float_dir = pl->wanted_float_dir;/*TURNQUEUE*/
+	else new_float_dir = pl->float_dir;
+	    
 	new_float_dir += pl->turnvel;
 
 	while (new_float_dir < 0)
@@ -566,7 +568,8 @@ static void Players_turn(void)
 	    new_float_dir -= RES;
 
 	Player_set_float_dir(pl, new_float_dir);
-
+    	if (pl->turnqueue) pl->wanted_float_dir = pl->float_dir;/*TURNQUEUE*/
+	
 	if (!pl->turnresistance)
 	    pl->turnvel = 0;
 

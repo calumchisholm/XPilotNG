@@ -185,7 +185,7 @@ static int Cmd_help(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_kick(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_mutepaused(char *arg, player_t *pl, int oper, char *msg, size_t size);
+static int Cmd_mute(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_op(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_password(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size);
@@ -195,6 +195,7 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size);
+static int Cmd_turnqueue(char *arg, player_t *pl, int oper, char *msg, size_t size);
 static int Cmd_version(char *arg, player_t *pl, int oper, char *msg, size_t size);
 
 
@@ -274,12 +275,12 @@ static Command_info commands[] = {
 	Cmd_maxturnsps
     },
     {
-	"mutepaused",
+	"mute",
 	"m",
-	"Just /mute 1 mutes, /mute 0 unmutes paused players WITHOUT BASE.  "
+	"Just /mute 1 mutes, /mute 0 unmutes paused players WITHOUT BASE /mute <name> toggles muting of player.  "
 	"(operator)",
 	false,      /* checked in the function */
-	Cmd_mutepaused
+	Cmd_mute
     },
     {
 	"op",
@@ -347,6 +348,13 @@ static Command_info commands[] = {
 	"Can be used with full teams too.",
 	false,
 	Cmd_team
+    },
+    {
+	"turnqueue",
+	"turnq",
+	"/turnqueue . Toggles turnqueue for player",
+	0,
+	Cmd_turnqueue
     },
     {
 	"version",
@@ -776,10 +784,12 @@ static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t s
     return CMD_RESULT_SUCCESS;
 }
 
-static int Cmd_mutepaused(char *arg, player_t *pl, int oper,
+static int Cmd_mute(char *arg, player_t *pl, int oper,
 			  char *msg, size_t size)
 {
     int new_mute;
+    player_t *mutee;
+    const char *errorstr;
 
     if (!arg || !*arg) {
 	snprintf(msg, size, "Baseless paused players are currently %s.",
@@ -794,9 +804,12 @@ static int Cmd_mutepaused(char *arg, player_t *pl, int oper,
 	new_mute = 1;
     else if (!strcmp(arg, "0"))
 	new_mute = 0;
-    else {
-	snprintf(msg, size, "Invalid argument '%s'.  Specify either 0 or 1.",
-		 arg);
+    else if (mutee = Get_player_by_name(arg,NULL,&errorstr)) {
+    	mutee->muted = (mutee->muted == 0);
+	snprintf(msg, size, "Player %s is now %s.",mutee->name,mutee->muted ? "muted" : "unmuted");
+    	return CMD_RESULT_SUCCESS;
+    } else {
+    	strlcpy(msg, errorstr, size);
 	return CMD_RESULT_ERROR;
     }
 
@@ -1201,6 +1214,31 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return CMD_RESULT_SUCCESS;
 }
 
+static int Cmd_turnqueue(char *arg, player_t *pl, int oper, char *msg, size_t size)
+{
+    UNUSED_PARAM(pl); UNUSED_PARAM(oper);
+
+    if (!arg || !*arg) {
+	snprintf(msg, size, "Turnqueue is %s.",
+		 pl->turnqueue ? "on" : "off");
+	return CMD_RESULT_SUCCESS;
+    }
+
+    if (!strcmp(arg, "1"))
+	pl->turnqueue = 1;
+    else if (!strcmp(arg, "0"))
+	pl->turnqueue = 0;
+    else {
+	snprintf(msg, size, "Invalid argument '%s'.  Specify either 0 or 1.",
+		 arg);
+	return CMD_RESULT_ERROR;
+    }
+
+    snprintf(msg, size, "Turnqueue is turned %s.",
+		  pl->turnqueue ? "on" : "off");
+
+    return CMD_RESULT_SUCCESS;
+}
 
 static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size)
 {

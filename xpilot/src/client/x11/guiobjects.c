@@ -940,14 +940,18 @@ static int set_shipshape(int world_x, int world_y,
     int cnt;
     position_t ship_point_pos;
     XPoint *xpts = points;
-    double window_x, window_y;
+    double off_x, off_y;
 
     for (cnt = 0; cnt < ship->num_points; cnt++) {
 	ship_point_pos = Ship_get_point_position(ship, cnt, dir);
-	window_x = Xf(world_x + ship_point_pos.x);
-	window_y = Yf(world_y + ship_point_pos.y);
-	xpts->x = window_x / scaleFactor;
-	xpts->y = window_y / scaleFactor;
+	off_x = ship_point_pos.x / scaleFactor;
+	if (off_x>0.0) off_x += 0.5;
+	else if (off_x<0.0) off_x -= 0.5;
+	off_y = ship_point_pos.y / scaleFactor;
+	if (off_y>0.0) off_y += 0.5;
+	else if (off_y<0.0) off_y -= 0.5;
+	xpts->x = ((world_x - world.x) / scaleFactor) + off_x;
+	xpts->y = ((world.y + ext_view_height - world_y) / scaleFactor) - off_y;
 	xpts++;
     }
     points[cnt++] = points[0];

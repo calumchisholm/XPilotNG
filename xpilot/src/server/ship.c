@@ -34,15 +34,18 @@ char ship_version[] = VERSION;
 
 void Thrust(player_t *pl)
 {
-    const int min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
-    const int max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
-    const double max_speed = 1 + (pl->power * 0.14);
+    static int min_dir, max_dir;
+    static double max_speed;
     const double max_life = 3 + pl->power * 0.35;
     clpos_t engine = Ship_get_engine_clpos(pl->ship, pl->dir);
     clpos_t pos;
     int afterburners;
     double tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
     double alt_sparks;
+
+    min_dir = (int)(pl->dir + RES/2 - (RES*0.2 + 1) * options.thrustWidth);
+    max_dir = (int)(pl->dir + RES/2 + (RES*0.2 + 1) * options.thrustWidth);
+    max_speed = (1 + (pl->power * 0.14)) * options.sparkSpeed;
 
     pos.cx = pl->pos.cx + engine.cx;
     pos.cy = pl->pos.cy + engine.cy;
@@ -62,7 +65,7 @@ void Thrust(player_t *pl)
 		pl->id,
 		pl->team,
 		OBJ_SPARK,
-		THRUST_MASS,
+		options.thrustMass,
 		GRAVITY | OWNERIMMUNE,
 		RED,
 		8,
@@ -77,7 +80,7 @@ void Thrust(player_t *pl)
 		pl->id,
 		pl->team,
 		OBJ_SPARK,
-		THRUST_MASS * ALT_SPARK_MASS_FACT,
+		options.thrustMass * ALT_SPARK_MASS_FACT,
 		GRAVITY | OWNERIMMUNE,
 		BLUE,
 		8,

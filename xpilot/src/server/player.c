@@ -181,6 +181,7 @@ void Go_home(player_t *pl)
 
     pl->dir = dir;
     Player_set_float_dir(pl, (double)dir);
+    pl->wanted_float_dir = pl->float_dir;/*TURNQUEUE*/
     initpos.cx = pos.cx + CLICK * vx;
     initpos.cy = pos.cy + CLICK * vy;
     Player_position_init_clpos(pl, initpos);
@@ -412,6 +413,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
 
     pl->power = pl->power_s = MAX_PLAYER_POWER;
     pl->turnspeed = pl->turnspeed_s = MIN_PLAYER_TURNSPEED;
+    pl->turnqueue = true;
 
     pl->type = OBJ_PLAYER;
 

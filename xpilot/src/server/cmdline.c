@@ -734,6 +734,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+       "turnPush",
+       "turnPush",
+       "0.25",
+       &options.turnPush,
+       valReal,
+       tuner_dummy,
+       "How strong will turning against a wall push the ship away?\n",
+       OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"minesWallBounce",
 	"minesWallBounce",
 	"no",
@@ -3433,24 +3443,54 @@ static option_desc opts[] = {
 	"if you assume the wall has a coefficient of friction C1.\n.",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
+     {
+       "constantSpeed",
+       "oldThrust",
+       "0",
+       &options.constantSpeed,
+       valReal,
+       tuner_dummy,
+       "Make ship move forward at a constant speed when thrust key is held\n"
+       "down, in addition to the normal acceleration. The constant speed\n"
+       "is proportional to the product of the acceleration of the ship\n"
+       "(varying with ship mass and afterburners) and the value of this\n"
+       "option. Note that this option is quite unphysical and can using it\n"
+       "can cause weird effects (with bounces for example).\n"
+       "Low values close to 0.5 (maybe in the range 0.3 to 1) for this\n"
+       "option can be used if you want to increase ship agility without\n"
+       "increasing speeds otherwise. This can improve gameplay for example\n"
+       "on the Blood's Music map. Higher values make the ship behaviour\n"
+       "visibly weird.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+     },
     {
-	"constantSpeed",
-	"oldThrust",
-	"0",
-	&options.constantSpeed,
+	"thrustWidth",
+	"sprayWidth",
+	"1.0",
+	&options.thrustWidth,
 	valReal,
 	tuner_dummy,
-	"Make ship move forward at a constant speed when thrust key is held\n"
-	"down, in addition to the normal acceleration. The constant speed\n"
-	"is proportional to the product of the acceleration of the ship\n"
-	"(varying with ship mass and afterburners) and the value of this\n"
-	"option. Note that this option is quite unphysical and can using it\n"
-	"can cause weird effects (with bounces for example).\n"
-	"Low values close to 0.5 (maybe in the range 0.3 to 1) for this\n"
-	"option can be used if you want to increase ship agility without\n"
-	"increasing speeds otherwise. This can improve gameplay for example\n"
-	"on the Blood's Music map. Higher values make the ship behaviour\n"
-	"visibly weird.\n",
+	"Width of thrust spark spray 0.0-1.0 where 1.0 means 180 degree bounds\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"thrustMass",
+	"sparkWeight",
+	"0.7",
+	&options.thrustMass,
+	valReal,
+	tuner_dummy,
+	"Weight of thrust sparks\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"sparkSpeed",
+	"sparkVel",
+	"1.0",
+	&options.sparkSpeed,
+	valReal,
+	tuner_dummy,
+	"Avg. speed (relative ship) of thrust sparks\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {

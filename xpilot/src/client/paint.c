@@ -120,8 +120,8 @@ void Paint_frame_start(void)
      */
     if (newSecond) {
 	/* kps - improve */
-	recordFPS = (int)(clientFPS + 0.5);
-	timePerFrame = 1.0 / clientFPS;
+	recordFPS = (int)(clientFPS+0.5);
+	timePerFrame = 1.0 / recordFPS;
 
 	/* TODO: move this somewhere else */
 	/* check once per second if we are playing */
@@ -135,7 +135,7 @@ void Paint_frame_start(void)
      * at high fps.
      */
     time_counter += timePerFrame;
-    if (time_counter >= 1.0 / 12) {
+    if (time_counter >= (1.0 / 12)) {
 	loopsSlow++;
 	time_counter -= (1.0 / 12);
     }

@@ -128,6 +128,7 @@ void Rotate_ship(shipshape_t *ship)
 
     for (i = 0; i < ship->num_points; i++)
 	Rotate_point(&ship->pts[i][0]);
+    
     Rotate_point(&ship->engine[0]);
     Rotate_point(&ship->m_gun[0]);
     for (i = 0; i < ship->num_l_gun; i++)

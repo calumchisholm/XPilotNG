@@ -1217,7 +1217,9 @@ static void Shape_move(const move_t *move, const shape_t *s,
 /* This might be useful elsewhere in the code, need not be kept static */
 static int Shape_morph(const shape_t *shape1, int dir1,
 		       const shape_t *shape2, int dir2,
-		       hitmask_t hitmask, const object_t *obj, int x, int y)
+		      hitmask_t hitmask, const object_t *obj, 
+		      int x, int y,
+		      struct collans *myanswer)
 {
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
@@ -1259,8 +1261,14 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	mv.start.cy = WRAP_YCLICK(mv.start.cy);
 	while (mv.delta.cx || mv.delta.cy) {
 	    Move_point(&mv, &answer);
-	    if (answer.line != -1)
-		return linet[answer.line].group;
+    	    if (answer.line != -1){
+	     /* report what lines/points/vectors caused the move to fail*/
+    	    	myanswer->line = answer.line;
+    	    	myanswer->point = i;
+    	    	myanswer->moved.cx = mv.delta.cx;
+    	    	myanswer->moved.cy = mv.delta.cy;       
+    	    	return linet[answer.line].group;
+    	    }
 	    mv.start.cx = WRAP_XCLICK(mv.start.cx + answer.moved.cx);
 	    mv.start.cy = WRAP_YCLICK(mv.start.cy + answer.moved.cy);
 	    mv.delta.cx -= answer.moved.cx;
@@ -1306,14 +1314,19 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	    yn2 = ptn2.cy - yp;
 
 #define TEMPFUNC(X1, Y1, X2, Y2)                                           \
+			  myanswer->line = -1;  			  \
+			  myanswer->point = i;  			  \
+			  myanswer->moved.cx = (X2) - (X1);		  \
+			  myanswer->moved.cy = (Y2) - (Y1);		  \
 	    if ((X1) < 0) {                                                \
 		if ((X2) >= 0) {                                           \
 		    if ((Y1) > 0 && (Y2) >= 0)                             \
 			t++;                                               \
 		    else if (((Y1) >= 0 || (Y2) >= 0) &&                   \
 			     (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) >= 0){\
-			if (s == 0)                                        \
-			    return linet[p].group;                         \
+		       if (s == 0){					  \
+     	    	    	    return linet[p].group;                         \
+	    	    	}   	    	    	    	    	    	    \
 			else                                               \
 			    t++;                                           \
 		    }                                                      \
@@ -1323,8 +1336,9 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 		if ((X2) <= 0) {                                           \
 		    if ((X2) == 0) {                                       \
 			if ((Y2)==0||((X1)==0 && (((Y1)<=0 && (Y2)>= 0) || \
-						 ((Y1) >= 0 && (Y2)<=0)))) \
+						((Y1) >= 0 && (Y2)<=0)))){\
 			    return linet[p].group;                         \
+                              		         }                         \
 		    }                                                      \
 		    else if ((Y1) > 0 && (Y2) >= 0)                        \
 			t++;                                               \
@@ -1343,8 +1357,13 @@ static int Shape_morph(const shape_t *shape1, int dir1,
 	    TEMPFUNC(xo2, yo2, xo1, yo1);
 #undef TEMPFUNC
 
-	    if (t & 1)
-		return linet[p].group;
+	   if (t & 1){
+	     myanswer->line = p;  /*p not a line, but point*/
+	     myanswer->point = i;			     
+	     myanswer->moved.cx = mv.delta.cx;  	     
+	     myanswer->moved.cy = mv.delta.cy;  	  
+	     return linet[p].group;
+	   }
 	    xo1 = xo2;
 	    yo1 = yo2;
 	    xn1 = xn2;
@@ -1761,6 +1780,7 @@ int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
     static clpos_t zeropos;
     static shape_t zeroshape;
     int i, group;
+    struct collans ans;
 
     /* Implemented by first checking whether the middle point of the
      * shape is on top of something. If not, check whether it is possible
@@ -1782,7 +1802,7 @@ int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
 	    zeroshape.pts[i] = &zeropos;
     }
 
-    return Shape_morph(&zeroshape, 0, s, dir, hitmask, obj, cx, cy);
+    return Shape_morph(&zeroshape, 0, s, dir, hitmask, obj, cx, cy, &ans);
 }
 
 
@@ -2814,6 +2834,8 @@ void Turn_player(player_t *pl)
     int		new_dir = MOD2((int)(pl->float_dir + 0.5), RES);
     int		next_dir, sign;
     hitmask_t hitmask;
+    struct collans ans;
+    double length;
 
     if (recOpt) {
 	if (record)
@@ -2827,6 +2849,7 @@ void Turn_player(player_t *pl)
 
     if (!Player_is_playing(pl)) {
 	/* kps - what is the point of this ??? */
+	/* virus - it prevents you from turning ship while ur dead ;) */
 	pl->dir = new_dir;
 	return;
     }
@@ -2842,10 +2865,36 @@ void Turn_player(player_t *pl)
 	next_dir = MOD2(pl->dir + sign, RES);
 	if (Shape_morph((shape_t *)pl->ship, pl->dir, (shape_t *)pl->ship,
 			next_dir, hitmask, OBJ_PTR(pl),
-			pl->pos.cx, pl->pos.cy) != NO_GROUP) {
+			pl->pos.cx, pl->pos.cy, &ans) != NO_GROUP) {
+
+
+	      /* velocity to push player away from wall */
+	   length = 0;
+
+	   if ( ans.line != -1 ) {
+	     length = Wrap_length(linet[ans.line].delta.cx,linet[ans.line].delta.cy);
+	     /*ans.moved.cx, ans.moved.cy);*/
+	     
+	     
+	     if( length != 0){
+	       pl->vel.x += linet[ans.line].delta.cy/length * options.turnPush;
+	       pl->vel.y -= linet[ans.line].delta.cx/length * options.turnPush;
+	     }
+	     /* khs code for handling corners could go here  for ans.line == -1*/
+	   }
 	    Player_set_float_dir(pl, (double)pl->dir);
-	    break;
-	}
+
+
+	      /* velocity to push player away from wall */
+
+       double length = Wrap_length(linet[ans.line].delta.cx,linet[ans.line].delta.cy);
+					 /*ans.moved.cx, ans.moved.cy);*/
+	   if( length != 0){
+	     pl->vel.x += linet[ans.line].delta.cy/length * options.turnPush;
+	     pl->vel.y -= linet[ans.line].delta.cx/length * options.turnPush;
+	   }
+	      break;
+	    }
 	pl->dir = next_dir;
     }
 

@@ -2613,7 +2613,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	|| strchr("-_~)(/\\}{[]", cp[1])	/* smileys are smileys */
 	) {
 	sprintf(msg, "%s [%s]", str, pl->name);
-	if (!(mute_baseless && pl->home_base == NULL))
+	if (!(mute_baseless && pl->home_base == NULL) && !pl->muted)
 	    Set_message(msg);
 	else {
 	    for (sent = i = 0; i < NumPlayers; i++) {

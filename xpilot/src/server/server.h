@@ -168,6 +168,7 @@ extern struct options {
     bool	shotsWallBounce;
     bool	ballsWallBounce;
     bool	ballCollisions;
+    double      turnPush;
     bool	ballSparkCollisions;
     bool	minesWallBounce;
     bool	itemsWallBounce;
@@ -387,6 +388,9 @@ extern struct options {
     double	gameSpeed;
     bool	ngControls;
     bool	maraWallBounce;
+    double	thrustWidth;
+    double	thrustMass;
+    double	sparkSpeed;
     double	constantSpeed;
     bool	ballStyles;
     bool	ignoreMaxFPS;

@@ -26,7 +26,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef NEWSCHED
+#if NEWSCHED
 
 #include "xpserver.h"
 
@@ -261,6 +261,7 @@ void sched(void)
 	    if (timer_handler)
 		(*timer_handler)();
 
+	    /*t_nextframe += frametime - 0.0000028571;*//*stable 50 fps as deity (2.6.x kernel)*/
 	    t_nextframe += frametime;
 	}
 	else {
