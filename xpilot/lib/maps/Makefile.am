@@ -1,8 +1,10 @@
 
 xpilotmapdir = $(pkglibdir)/maps
 xpilotmap_DATA = \
-	teamcup.xp \
-	polybloods.xp2
+	polybloods.xp2 \
+	sadistic_bastard_v2.xp2 \
+	teamcup.xp
+
 EXTRA_DIST = $(xpilotmap_DATA)
 
 
