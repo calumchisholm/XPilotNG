@@ -472,7 +472,8 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
      *
      * In individual games, make the new players appear after a small delay.
      */
-    if (NumPlayers > 0) {
+    if (NumPlayers > 0
+	&& !Player_is_tank(pl)) {
 	if (BIT(world->rules->mode, LIMITED_LIVES))
 	    Player_set_state(pl, PL_STATE_WAITING);
 	else
