@@ -71,8 +71,8 @@ player *Get_player_by_name(char *str, int *error, char **errorstr_p)
      * Check what players' name 'str' is a substring of (case insensitively).
      */
     for (i = 0; i < NumPlayers; i++) {
-	pl = Players(i);
 	int j;
+	pl = Players(i);
 
 	for (j = 0; j < 1 + (int)strlen(pl->name) - (int)len; j++) {
 	    if (!strncasecmp(pl->name + j, str, len)) {
