@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.math.BigDecimal;
@@ -30,6 +31,7 @@ public class MapCanvas extends JComponent {
     private Point offset;
     private UndoManager undoManager;
     private MapEdit currentEdit;
+    private boolean fastRendering;
 
     public MapCanvas() {
 
@@ -56,6 +58,14 @@ public class MapCanvas extends JComponent {
     public MapModel getModel() {
         return model;
     }
+    
+    public void setFastRendering(boolean value) {
+        this.fastRendering = value;
+    }
+    
+    public boolean isFastRendering() {
+        return this.fastRendering;
+    }
 
     public void setModel(MapModel m) {
         this.model = m;
@@ -71,6 +81,8 @@ public class MapCanvas extends JComponent {
     }
 
     public void setScale(float s) {
+        this.offset.x = (int)(this.offset.x * s / this.scale);
+        this.offset.y = (int)(this.offset.y * s / this.scale);
         this.scale = s;
         this.at = null;
         this.it = null;
@@ -100,6 +112,9 @@ public class MapCanvas extends JComponent {
             return;
 
         Graphics2D g = (Graphics2D) _g;
+        if (fastRendering)
+            g.setRenderingHint(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_SPEED);
         Dimension mapSize = model.options.size;
 
         g.setColor(Color.black);
@@ -175,18 +190,22 @@ public class MapCanvas extends JComponent {
         Rectangle view,
         Rectangle b,
         Dimension map) {
-        min.x = (view.x - (b.x + b.width)) / map.width;
-        if (view.x > b.x + b.width)
-            min.x++;
-        max.x = (view.x + view.width - b.x) / map.width;
-        if (view.x + view.width < b.x)
-            max.x--;
-        min.y = (view.y - (b.y + b.height)) / map.height;
-        if (view.y > b.y + b.height)
-            min.y++;
-        max.y = (view.y + view.height - b.y) / map.height;
-        if (view.y + view.height < b.y)
-            max.y--;
+        if (model.options.edgeWrap) {            
+            min.x = (view.x - (b.x + b.width)) / map.width;
+            if (view.x > b.x + b.width)
+                min.x++;
+            max.x = (view.x + view.width - b.x) / map.width;
+            if (view.x + view.width < b.x)
+                max.x--;
+            min.y = (view.y - (b.y + b.height)) / map.height;
+            if (view.y > b.y + b.height)
+                min.y++;
+            max.y = (view.y + view.height - b.y) / map.height;
+            if (view.y + view.height < b.y)
+                max.y--;
+        } else {
+            min.x = min.y = max.x = min.y = 0;
+        }
     }
 
     public Point[] computeWraps(Rectangle r, Point p) {
@@ -696,16 +715,20 @@ public class MapCanvas extends JComponent {
                     return;
                 }
             }
+            
+            setFastRendering(true);
         }
 
-        public void mouseReleased(MouseEvent evt) {
+        public void mouseReleased(MouseEvent evt) {           
             if (model == null)
-                return;
+                return;           
             if (eventHandler != null) {
                 transformEvent(evt);
                 eventHandler.mouseReleased(evt);
                 return;
             }
+            setFastRendering(false);
+            repaint();            
         }
 
         public void mouseDragged(MouseEvent evt) {

@@ -10,6 +10,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
+import java.awt.RenderingHints;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -231,16 +232,19 @@ public class MapPolygon extends MapObject {
 
         Polygon p = polygon;
 
-        if (style.getFillStyle() == PolygonStyle.FILL_COLOR) {
-            g.setColor(style.getColor());
-            g.fillPolygon(p);
-            
-        } else if (style.getFillStyle() == PolygonStyle.FILL_TEXTURED) {
-            BufferedImage img = style.getTexture().getImage();
-            Rectangle b = polygon.getBounds();
-            g.setPaint(new TexturePaint(img, new Rectangle
-                (b.x, b.y, img.getWidth() * 64, -img.getHeight() * 64)));
-            g.fill(p);
+        if (g.getRenderingHint(RenderingHints.KEY_RENDERING)
+        != RenderingHints.VALUE_RENDER_SPEED) {
+            if (style.getFillStyle() == PolygonStyle.FILL_COLOR) {
+                g.setColor(style.getColor());
+                g.fillPolygon(p);
+                
+            } else if (style.getFillStyle() == PolygonStyle.FILL_TEXTURED) {
+                BufferedImage img = style.getTexture().getImage();
+                Rectangle b = polygon.getBounds();
+                g.setPaint(new TexturePaint(img, new Rectangle
+                    (b.x, b.y, img.getWidth() * 64, -img.getHeight() * 64)));
+                g.fill(p);
+            }
         }
 
         if (edgeStyles == null) {

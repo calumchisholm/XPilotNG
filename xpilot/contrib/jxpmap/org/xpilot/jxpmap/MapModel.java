@@ -11,6 +11,9 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -203,13 +206,12 @@ public class MapModel extends ModelObject {
     throws IOException, SAXException, ParserConfigurationException, 
     XPDFile.ParseException {
             
-        System.out.println("loading map " + name);
-
         edgeStyles.clear();
         LineStyle ls;
         ls = new LineStyle("internal", 0, Color.black, LineStyle.STYLE_HIDDEN);
         edgeStyles.add(ls);
         polyStyles.clear();
+        pixmaps.clear();
 
         XPDFile xpd = XPDFile.load(new File(name));
         XPDFile.Part first = (XPDFile.Part)xpd.get(0);
@@ -229,12 +231,10 @@ public class MapModel extends ModelObject {
 
         defEdgeStyle = (LineStyle)edgeStyles.get(edgeStyles.size() - 1);
         defPolygonStyle = (PolygonStyle)polyStyles.get(polyStyles.size() - 1);
-
-        System.out.println("ready");
     }
     
     
-    public void readXml (String xml) 
+    private void readXml (String xml) 
     throws IOException, SAXException, ParserConfigurationException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setValidating(false);
@@ -246,32 +246,7 @@ public class MapModel extends ModelObject {
 
     public void save (File file) throws IOException {
         
-        StringWriter w = new StringWriter();
-        PrintWriter out = new PrintWriter(w);
-        out.println("<XPilotMap>");
-        
-        options.printXml(out);
-
-        for (Iterator iter = pixmaps.iterator(); iter.hasNext();) {
-            Pixmap p = (Pixmap)iter.next();
-            p.printXml(out);
-        }
-
-        for (Iterator iter = edgeStyles.iterator(); iter.hasNext();) {
-            LineStyle s = (LineStyle)iter.next();
-            s.printXml(out);
-        }
-
-        for (Iterator iter = polyStyles.iterator(); iter.hasNext();) {
-            PolygonStyle s = (PolygonStyle)iter.next();
-            s.printXml(out);
-        }
-
-        for (int i = objects.size() - 1; i >= 0; i--) {
-            ((MapObject)objects.get(i)).printXml(out);
-        }
-
-        out.println("</XPilotMap>");
+        String xml = exportXml();
         
         String xmlName = file.getName();
         int dot = xmlName.lastIndexOf('.');
@@ -279,7 +254,7 @@ public class MapModel extends ModelObject {
         xmlName += ".xp2";
         
         XPDFile xpd = new XPDFile();
-        xpd.add(new XPDFile.Part(xmlName, w.toString().getBytes("ISO8859_1")));
+        xpd.add(new XPDFile.Part(xmlName, xml.getBytes("ISO8859_1")));
         for (Iterator i = pixmaps.iterator(); i.hasNext();) {
             Pixmap pixmap = (Pixmap)i.next();
             xpd.add(new XPDFile.Part(pixmap.getFileName(), 
@@ -287,6 +262,61 @@ public class MapModel extends ModelObject {
         }
         
         xpd.save(file);
+    }
+    
+    
+    public void importXml(String xml)
+    throws IOException, SAXException, ParserConfigurationException {
+        edgeStyles.clear();
+        LineStyle ls;
+        ls = new LineStyle("internal", 0, Color.black, LineStyle.STYLE_HIDDEN);
+        edgeStyles.add(ls);
+        polyStyles.clear();
+        pixmaps.clear();
+
+        readXml(xml);
+
+        for (Iterator i = pixmaps.iterator(); i.hasNext();) {
+            Pixmap pixmap = (Pixmap)i.next();
+            InputStream in = new BufferedInputStream(
+                new FileInputStream(
+                    pixmap.getFileName()));
+            try {
+                pixmap.load(in);
+            } finally {
+                in.close();
+            }
+        }
+
+        defEdgeStyle = (LineStyle)edgeStyles.get(edgeStyles.size() - 1);
+        defPolygonStyle = (PolygonStyle)polyStyles.get(polyStyles.size() - 1);        
+    }
+    
+    public String exportXml() throws IOException {
+        
+        StringWriter w = new StringWriter();
+        PrintWriter out = new PrintWriter(w);
+        
+        out.println("<XPilotMap>");        
+        options.printXml(out);
+        for (Iterator iter = pixmaps.iterator(); iter.hasNext();) {
+            Pixmap p = (Pixmap)iter.next();
+            p.printXml(out);
+        }
+        for (Iterator iter = edgeStyles.iterator(); iter.hasNext();) {
+            LineStyle s = (LineStyle)iter.next();
+            s.printXml(out);
+        }
+        for (Iterator iter = polyStyles.iterator(); iter.hasNext();) {
+            PolygonStyle s = (PolygonStyle)iter.next();
+            s.printXml(out);
+        }
+        for (int i = objects.size() - 1; i >= 0; i--) {
+            ((MapObject)objects.get(i)).printXml(out);
+        }
+        out.println("</XPilotMap>");
+
+        return w.toString();        
     }
 
 

@@ -40,6 +40,11 @@ public class Pixmap extends ModelObject {
     }
     
     
+    public void setImage () {
+        this.image = image;
+    }
+    
+    
     public void load (InputStream in) throws IOException {
         image = 
             new PPMDecoder().decode

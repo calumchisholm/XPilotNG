@@ -71,11 +71,9 @@ public class PolygonStyleEditor extends EditorPanel implements ActionListener {
         for (Iterator iter = model.pixmaps.iterator(); iter.hasNext(); j++) {
             Pixmap p = (Pixmap)iter.next();
             cmbTexture.addItem(p.getFileName());
-            System.out.println(p + " ?= " + style.getTexture());
             if (style.getTexture() == p) i = j;
         }
         add(cmbTexture);
-        System.out.println("setting selected index to " + i);
         cmbTexture.setSelectedIndex(i);
         
         add(new JLabel("Edges:"));

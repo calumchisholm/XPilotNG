@@ -9,6 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.Reader;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -86,6 +89,16 @@ public class MainFrame extends JFrame implements ActionListener {
         menu.add(menuItem);
         menuItem.setActionCommand("saveMap");
         menuItem.addActionListener(this);
+        
+        menuItem = new JMenuItem("Import XML");
+        menu.add(menuItem);
+        menuItem.setActionCommand("importXml");
+        menuItem.addActionListener(this);
+
+        menuItem = new JMenuItem("Export XML");
+        menu.add(menuItem);
+        menuItem.setActionCommand("exportXml");
+        menuItem.addActionListener(this);
 
         menuItem = new JMenuItem("Exit");
         menu.add(menuItem);
@@ -149,6 +162,7 @@ public class MainFrame extends JFrame implements ActionListener {
         tb1.add(newToggle("newBallArea", "/images/ballareaicon.gif", "New ball area"));        
         tb1.add(newToggle("newBallTarget", "/images/balltargeticon.gif", "New ball target"));
         tb1.add(newToggle("newDecor", "/images/decoricon.gif", "New decoration"));
+        tb1.add(newToggle("newFriction", "/images/fricticon.gif", "New friction area"));
         tb1.add(newToggle("newTarget", "/images/targeticon.gif", "New target"));
         tb1.add(newToggle("newCannon", "/images/cannonicon.gif", "New cannon"));        
         tb1.add(newToggle("newFuel", "/images/fuelicon.gif", "New fuel station"));
@@ -290,6 +304,10 @@ public class MainFrame extends JFrame implements ActionListener {
         newMapObject(new Decoration());
     }
     
+    private void newFriction () {
+        newMapObject(new FrictionArea());
+    }    
+    
     private void newTarget () {
         newMapObject(new Target());
     }    
@@ -359,10 +377,9 @@ public class MainFrame extends JFrame implements ActionListener {
     
     private void openMap () {
         
-        JFileChooser fc = new JFileChooser();
+        JFileChooser fc = new JFileChooser(mapFile);
         if (mapFile != null) fc.setSelectedFile(mapFile);
-        int rv = fc.showOpenDialog(this);
-        if (rv != JFileChooser.APPROVE_OPTION) return;
+        if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
         
         File f = fc.getSelectedFile();
         if (f == null) return;
@@ -386,8 +403,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private void saveMap () {
         JFileChooser fc = new JFileChooser(mapFile);
         if (mapFile != null) fc.setSelectedFile(mapFile);
-        int rv = fc.showSaveDialog(this);
-        if (rv != JFileChooser.APPROVE_OPTION) return;
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
         File f = fc.getSelectedFile();
         if (f == null) return;
@@ -402,7 +418,63 @@ public class MainFrame extends JFrame implements ActionListener {
                  JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+    
+    private void importXml () {
+        JFileChooser fc = new JFileChooser(mapFile);
+        if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        File f = fc.getSelectedFile();
+        if (f == null) return;
+        
+        try {
+        
+            char buf[] = new char[1024];
+            StringBuffer xml = new StringBuffer();
+            Reader reader = new FileReader(f);
+            try {
+                while(true) {
+                    int len = reader.read(buf);
+                    if (len == -1) break;
+                    xml.append(buf, 0, len);
+                }
+            } finally {
+                reader.close();
+            }            
+            MapModel model = new MapModel();
+            model.importXml(xml.toString());
+            setModel(model);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog
+                (this, "Importing failed: " + e.getMessage(), "Error", 
+                 JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
+    
+    private void exportXml () {
+        JFileChooser fc = new JFileChooser(mapFile);
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
+        File f = fc.getSelectedFile();
+        if (f == null) return;
+        
+        try {
+            FileWriter writer = new FileWriter(f);
+            try {
+                writer.write(canvas.getModel().exportXml());
+            } finally {
+                writer.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog
+                (this, "Exporting failed: " + e.getMessage(), "Error", 
+                 JOptionPane.ERROR_MESSAGE);
+            return;
+        }            
+    }
 
     private void exitApp () {
         System.exit(0);
