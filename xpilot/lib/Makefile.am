@@ -1,3 +1,4 @@
 SUBDIRS = maps textures
-libdir = $(prefix)/lib/xpilot
-#lib_DATA = defaults password robots sounds
+## libdir = $(prefix)/lib/xpilot
+pkglib_DATA = defaults password robots sounds
+EXTRA_DIST = $(pkglib_DATA)
