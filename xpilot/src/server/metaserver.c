@@ -292,6 +292,18 @@ void Meta_update(bool change)
 	strlcpy(&string[len], status, max_size - len);
 	len += strlen(&string[len]);
     }
+#else
+    {
+	char status[MAX_STR_LEN];
+
+	strlcpy(status,
+		"\nadd status Use server text interface to query status.",
+		sizeof(status));
+	if (len + strlen(status) + 1 <= max_size) {
+	    strlcat(string, status, max_size);
+	    len += strlen(status);
+	}
+    }
 #endif
 
 #if 0
