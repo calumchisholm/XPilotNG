@@ -213,9 +213,10 @@ void Place_item(world_t *world, player_t *pl, int item)
 	else
 	    rand_item = 0;
 
-	if (world->NumItemConcs > 0 && rfrac() < options.itemConcentratorProb)
+	if (Num_itemConcs(world) > 0
+	    && rfrac() < options.itemConcentratorProb)
 	    con = ItemConc_by_index(world,
-				    (int)(rfrac() * world->NumItemConcs));
+				    (int)(rfrac() * Num_itemConcs(world)));
 	else
 	    con = NULL;
 	/*

@@ -303,10 +303,10 @@ static void Place_asteroid(world_t *world)
     asteroid_concentrator_t *con;
     clpos_t pos;
 
-    if (world->NumAsteroidConcs > 0
+    if (Num_asteroidConcs(world) > 0
 	&& rfrac() < options.asteroidConcentratorProb)
 	con = AsteroidConc_by_index(world,
-				    (int)(rfrac() * world->NumAsteroidConcs));
+				    (int)(rfrac() * Num_asteroidConcs(world)));
     else
 	con = NULL;
 

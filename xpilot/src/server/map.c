@@ -52,9 +52,9 @@ static void Check_map_object_counters(world_t *world)
     /*assert(world->NumTreasures == 0);*/
     /*assert(world->NumTargets == 0);*/
     /*assert(world->NumBases == 0);*/
-    assert(world->NumItemConcs == 0);
-    assert(world->NumAsteroidConcs == 0);
-    assert(world->NumFrictionAreas == 0);
+    /*assert(world->NumItemConcs == 0);
+      assert(world->NumAsteroidConcs == 0);
+      assert(world->NumFrictionAreas == 0);*/
     /*assert(world->NumEcms == 0);*/
     /*assert(world->NumTransporters == 0);*/
 
@@ -100,12 +100,12 @@ static void Realloc_map_objects(world_t *world)
       world->NumTreasures, world->MaxTreasures);*/
     /*SHRINK(target_t, world->targets, world->NumTargets, world->MaxTargets);*/
     /*SHRINK(base_t, world->bases, world->NumBases, world->MaxBases);*/
-    SHRINK(item_concentrator_t, world->itemConcs,
-	   world->NumItemConcs, world->MaxItemConcs);
-    SHRINK(asteroid_concentrator_t, world->asteroidConcs,
-	   world->NumAsteroidConcs, world->MaxAsteroidConcs);
-    SHRINK(friction_area_t, world->frictionAreas,
-	   world->NumFrictionAreas, world->MaxFrictionAreas);
+    /*SHRINK(item_concentrator_t, world->itemConcs,
+      world->NumItemConcs, world->MaxItemConcs);
+      SHRINK(asteroid_concentrator_t, world->asteroidConcs,
+      world->NumAsteroidConcs, world->MaxAsteroidConcs);
+      SHRINK(friction_area_t, world->frictionAreas,
+      world->NumFrictionAreas, world->MaxFrictionAreas);*/
 }
 
 int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
@@ -321,22 +321,22 @@ int World_place_check(world_t *world, clpos_t pos, int ind)
 int World_place_item_concentrator(world_t *world, clpos_t pos)
 {
     item_concentrator_t t;
-    int ind = world->NumItemConcs;
+    int ind = Num_itemConcs(world);
 
     t.pos = pos;
-    STORE(item_concentrator_t, world->itemConcs,
-	  world->NumItemConcs, world->MaxItemConcs, t);
+    Arraylist_add(world->itemConcs, &t);
+
     return ind;
 }
 
 int World_place_asteroid_concentrator(world_t *world, clpos_t pos)
 {
     asteroid_concentrator_t t;
-    int ind = world->NumAsteroidConcs;
+    int ind = Num_asteroidConcs(world);
 
     t.pos = pos;
-    STORE(asteroid_concentrator_t, world->asteroidConcs,
-	  world->NumAsteroidConcs, world->MaxAsteroidConcs, t);
+    Arraylist_add(world->asteroidConcs, &t);
+
     return ind;
 }
 
@@ -356,13 +356,13 @@ int World_place_grav(world_t *world, clpos_t pos, double force, int type)
 int World_place_friction_area(world_t *world, clpos_t pos, double fric)
 {
     friction_area_t t;
-    int ind = world->NumFrictionAreas;
+    int ind = Num_frictionAreas(world);
 
     t.pos = pos;
     t.friction_setting = fric;
     /*t.friction = ... ; handled in timing setup */
-    STORE(friction_area_t, world->frictionAreas,
-	  world->NumFrictionAreas, world->MaxFrictionAreas, t);
+    Arraylist_add(world->frictionAreas, &t);
+
     return ind;
 }
 
@@ -397,11 +397,22 @@ int World_init(world_t *world)
 
     memset(world, 0, sizeof(world_t));
 
+    if ((world->asteroidConcs
+	 = Arraylist_create(sizeof(asteroid_concentrator_t))) == NULL)
+	return -1;
     if ((world->bases = Arraylist_create(sizeof(base_t))) == NULL)
 	return -1;
     if ((world->cannons = Arraylist_create(sizeof(cannon_t))) == NULL)
 	return -1;
+    if ((world->ecms = Arraylist_create(sizeof(ecm_t))) == NULL)
+	return -1;
+    if ((world->frictionAreas
+	 = Arraylist_create(sizeof(friction_area_t))) == NULL)
+	return -1;
     if ((world->fuels = Arraylist_create(sizeof(fuel_t))) == NULL)
+	return -1;
+    if ((world->itemConcs
+	 = Arraylist_create(sizeof(item_concentrator_t))) == NULL)
 	return -1;
     if ((world->gravs = Arraylist_create(sizeof(grav_t))) == NULL)
 	return -1;
@@ -409,12 +420,10 @@ int World_init(world_t *world)
 	return -1;
     if ((world->treasures = Arraylist_create(sizeof(treasure_t))) == NULL)
 	return -1;
+    if ((world->transporters
+	 = Arraylist_create(sizeof(transporter_t))) == NULL)
+	return -1;
     if ((world->wormholes = Arraylist_create(sizeof(wormhole_t))) == NULL)
-	return -1;
-    if ((world->ecms = Arraylist_create(sizeof(ecm_t))) == NULL)
-	return -1;
-    if ((world->transporters = Arraylist_create(sizeof(transporter_t)))
-	== NULL)
 	return -1;
 
     for (i = 0; i < MAX_TEAMS; i++)
@@ -435,9 +444,9 @@ void World_free(world_t *world)
     XFREE(world->checks);
     /*XFREE(world->fuels);*/
     /*XFREE(world->wormholes);*/
-    XFREE(world->itemConcs);
+    /*XFREE(world->itemConcs);
     XFREE(world->asteroidConcs);
-    XFREE(world->frictionAreas);
+    XFREE(world->frictionAreas);*/
 }
 
 static bool World_alloc(world_t *world)
@@ -464,8 +473,8 @@ static bool World_alloc(world_t *world)
     /*assert(world->cannons == NULL);*/
     assert(world->checks == NULL);
     /*assert(world->wormholes == NULL);*/
-    assert(world->itemConcs == NULL);
-    assert(world->asteroidConcs == NULL);
+    /*assert(world->itemConcs == NULL);*/
+    /*assert(world->asteroidConcs == NULL);*/
 
     if (world->block == NULL || world->gravity == NULL) {
 	World_free(world);

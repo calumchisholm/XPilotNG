@@ -250,25 +250,21 @@ struct world {
 
     int		NumTeamBases;	/* How many 'different' teams are allowed */
 
+    arraylist_t	*asteroidConcs;
     arraylist_t	*bases;
     arraylist_t	*cannons;
+    arraylist_t	*ecms;
     arraylist_t	*fuels;
-    arraylist_t	*gravs;    
+    arraylist_t	*frictionAreas;
+    arraylist_t	*gravs;
+    arraylist_t	*itemConcs;
     arraylist_t	*targets;
+    arraylist_t	*transporters;
     arraylist_t	*treasures;
     arraylist_t	*wormholes;
 
     int		NumChecks, MaxChecks;
     check_t	*checks;
-    int		NumItemConcs, MaxItemConcs;
-    item_concentrator_t		*itemConcs;
-    int		NumAsteroidConcs, MaxAsteroidConcs;
-    asteroid_concentrator_t	*asteroidConcs;
-    int		NumFrictionAreas, MaxFrictionAreas;
-    friction_area_t		*frictionAreas;
-
-    arraylist_t	*ecms;
-    arraylist_t	*transporters;
 
     bool	have_options;
 };
@@ -336,24 +332,33 @@ static inline clpos_t World_wrap_clpos(world_t *world, clpos_t pos)
     return pos;
 }
 
-
+#define Num_asteroidConcs(w)	Arraylist_get_num_elements((w)->asteroidConcs)
 #define Num_bases(w)		Arraylist_get_num_elements((w)->bases)
-#define Base_by_index(w, i)	((base_t *)Arraylist_get((w)->bases, (i)))
 #define Num_cannons(w)		Arraylist_get_num_elements((w)->cannons)
-#define Cannon_by_index(w, i)	((cannon_t *)Arraylist_get((w)->cannons, (i)))
-#define Num_fuels(w)		Arraylist_get_num_elements((w)->fuels)
-#define Fuel_by_index(w, i)	((fuel_t *)Arraylist_get((w)->fuels, (i)))
-#define Num_gravs(w)		Arraylist_get_num_elements((w)->gravs)
-#define Grav_by_index(w, i)	((grav_t *)Arraylist_get((w)->gravs, (i)))
-#define Num_targets(w)		Arraylist_get_num_elements((w)->targets)
-#define Target_by_index(w, i)	((target_t *)Arraylist_get((w)->targets, (i)))
-#define Num_treasures(w)	Arraylist_get_num_elements((w)->treasures)
-#define Treasure_by_index(w, i)	((treasure_t *)Arraylist_get((w)->treasures, (i)))
-#define Num_wormholes(w)	Arraylist_get_num_elements((w)->wormholes)
-#define Wormhole_by_index(w, i)	((wormhole_t *)Arraylist_get((w)->wormholes, (i)))
 #define Num_ecms(w)		Arraylist_get_num_elements((w)->ecms)
-#define Ecm_by_index(w, i)	((ecm_t *)Arraylist_get((w)->ecms, (i)))
+#define Num_frictionAreas(w)	Arraylist_get_num_elements((w)->frictionAreas)
+#define Num_fuels(w)		Arraylist_get_num_elements((w)->fuels)
+#define Num_gravs(w)		Arraylist_get_num_elements((w)->gravs)
+#define Num_itemConcs(w)	Arraylist_get_num_elements((w)->itemConcs)
+#define Num_targets(w)		Arraylist_get_num_elements((w)->targets)
 #define Num_transporters(w)	Arraylist_get_num_elements((w)->transporters)
+#define Num_treasures(w)	Arraylist_get_num_elements((w)->treasures)
+#define Num_wormholes(w)	Arraylist_get_num_elements((w)->wormholes)
+
+#define AsteroidConc_by_index(w, i) \
+	((asteroid_concentrator_t *)Arraylist_get((w)->asteroidConcs, (i)))
+#define Base_by_index(w, i)	((base_t *)Arraylist_get((w)->bases, (i)))
+#define Cannon_by_index(w, i)	((cannon_t *)Arraylist_get((w)->cannons, (i)))
+#define Ecm_by_index(w, i)	((ecm_t *)Arraylist_get((w)->ecms, (i)))
+#define FrictionArea_by_index(w, i) \
+	((friction_area_t *)Arraylist_get((w)->frictionAreas, (i)))
+#define Fuel_by_index(w, i)	((fuel_t *)Arraylist_get((w)->fuels, (i)))
+#define Grav_by_index(w, i)	((grav_t *)Arraylist_get((w)->gravs, (i)))
+#define ItemConc_by_index(w, i) \
+	((item_concentrator_t *)Arraylist_get((w)->itemConcs, (i)))
+#define Target_by_index(w, i)	((target_t *)Arraylist_get((w)->targets, (i)))
+#define Treasure_by_index(w, i)	((treasure_t *)Arraylist_get((w)->treasures, (i)))
+#define Wormhole_by_index(w, i)	((wormhole_t *)Arraylist_get((w)->wormholes, (i)))
 #define Transporter_by_index(w, i) \
 	((transporter_t *)Arraylist_get((w)->transporters, (i)))
 
@@ -362,28 +367,6 @@ static inline check_t *Check_by_index(world_t *world, int ind)
 {
     if (ind >= 0 && ind < world->NumChecks)
 	return &world->checks[ind];
-    return NULL;
-}
-
-static inline asteroid_concentrator_t *AsteroidConc_by_index(world_t *world,
-							     int ind)
-{
-    if (ind >= 0 && ind < world->NumAsteroidConcs)
-	return &world->asteroidConcs[ind];
-    return NULL;
-}
-
-static inline item_concentrator_t *ItemConc_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumItemConcs)
-	return &world->itemConcs[ind];
-    return NULL;
-}
-
-static inline friction_area_t *FrictionArea_by_index(world_t *world, int ind)
-{
-    if (ind >= 0 && ind < world->NumFrictionAreas)
-	return &world->frictionAreas[ind];
     return NULL;
 }
 

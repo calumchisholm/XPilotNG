@@ -245,14 +245,14 @@ void Create_blockmap_from_polygons(world_t *world)
 	World_set_block(world, blk, FUEL);
     }
 
-    for (i = 0; i < world->NumAsteroidConcs; i++) {
+    for (i = 0; i < Num_asteroidConcs(world); i++) {
 	asteroid_concentrator_t *aconc = AsteroidConc_by_index(world, i);
 
 	blk = Clpos_to_blkpos(aconc->pos);
 	World_set_block(world, blk, ASTEROID_CONCENTRATOR);
     }
 
-    for (i = 0; i < world->NumItemConcs; i++) {
+    for (i = 0; i < Num_itemConcs(world); i++) {
 	item_concentrator_t *iconc = ItemConc_by_index(world, i);
 
 	blk = Clpos_to_blkpos(iconc->pos);
@@ -1569,7 +1569,7 @@ void Xpmap_blocks_to_polygons(world_t *world)
     for (i = 0; i < Num_wormholes(world); i++)
 	Xpmap_wormhole_to_polygon(world, i);
 
-    for (i = 0; i < world->NumFrictionAreas; i++)
+    for (i = 0; i < Num_frictionAreas(world); i++)
 	Xpmap_friction_area_to_polygon(world, i);
 
     /*xpprintf("Created %d polygons.\n", num_polys);*/

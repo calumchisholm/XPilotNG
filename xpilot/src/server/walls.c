@@ -2747,14 +2747,14 @@ void Move_player(player_t *pl)
     /* Figure out which friction to use. */
     if (Player_is_phasing(pl))
 	fric = friction;
-    else if (world->NumFrictionAreas > 0) {
+    else if (Num_frictionAreas(world) > 0) {
 	int group, i;
 
 	in_move_player = true;
 	
 	group = is_inside(pl->pos.cx, pl->pos.cy, NONBALL_BIT, (object_t *)pl);
 	if (group != NO_GROUP) {
-	    for (i = 0; i < world->NumFrictionAreas; i++) {
+	    for (i = 0; i < Num_frictionAreas(world); i++) {
 		friction_area_t *fa = FrictionArea_by_index(world, i);
 
 		if (fa->group == group) {
