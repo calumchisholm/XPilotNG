@@ -682,13 +682,15 @@ static struct timeval time_now;
 
 void xevent_keyboard(int queued)
 {
+    int			i;
 #ifndef _WINDOWS
-    int			i, n;
+    int			n;
     XEvent		event;
 #endif
 
     if (talk_key_repeating) {
-	gettimeofday(&time_now, NULL);
+	/* TODO: implement gettimeofday() for windows */
+	IFNWINDOWS(gettimeofday(&time_now, NULL));
 	i = 1000000 * (time_now.tv_sec - talk_key_repeat_time.tv_sec) +
 	    time_now.tv_usec - talk_key_repeat_time.tv_usec;
 	if ((talk_key_repeating > 1 && i > 50000) || i > 500000) {

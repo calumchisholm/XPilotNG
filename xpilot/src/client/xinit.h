@@ -37,6 +37,12 @@
 #define MAX_BUTTON_DEFS		3
 #define NUM_BUTTON_DEFS(i)	(buttonDefs[(i)][MAX_BUTTON_DEFS])
 
+#ifdef _WINDOWS
+# ifndef O_BINARY
+#  define O_BINARY		0 /* compability with MSDOS */
+# endif
+#endif
+
 extern Atom		ProtocolAtom, KillAtom;
 extern int		buttonColor, windowColor, borderColor;
 extern int		ButtonHeight;

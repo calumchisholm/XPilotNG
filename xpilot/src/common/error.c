@@ -53,6 +53,8 @@ void init_error(const char *prog)
     strlcpy(progname, p, MAX_PROG_LENGTH);
 }
 
+
+#ifndef _WINDOWS
 /*
  * Ok, let's do it the ANSI C way.
  */
@@ -135,6 +137,7 @@ void dumpcore(const char *fmt, ...)
 
     abort();
 }
+#endif /* _WINDOWS */
 
 #ifdef _WINDOWS
 static void Win_show_error(char *s)
