@@ -318,6 +318,7 @@ extern poly_t *pdata;
 extern int *estyleptr;
 extern int *edgeptr;
 extern struct group groups[];
+#define groupptr_by_id(group) (&groups[(group)])
 extern int num_pstyles, num_estyles, num_bstyles;
 
 #endif

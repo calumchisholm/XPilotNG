@@ -261,7 +261,7 @@ void Ball_is_destroyed(ballobject *ball)
 
 
 
-void Ball_hits_goal(ballobject *ball, int group)
+void Ball_hits_goal(ballobject *ball, struct group *groupptr)
 {
     player *owner;
     treasure_t *td;
@@ -281,13 +281,13 @@ void Ball_hits_goal(ballobject *ball, int group)
 	return;
 
     td = &World.treasures[ball->treasure];
-    if (td->team == groups[group].team) {
+    if (td->team == groupptr->team) {
 	Ball_is_replaced(ball);
 	return;
     }
     owner = Player_by_id(ball->owner);
-    if (groups[group].team == owner->team) {
-	treasure_t *tt = &World.treasures[groups[group].item_id];
+    if (groupptr->team == owner->team) {
+	treasure_t *tt = &World.treasures[groupptr->item_id];
 
 	Ball_is_destroyed(ball);
 

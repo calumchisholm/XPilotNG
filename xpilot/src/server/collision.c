@@ -456,7 +456,7 @@ static void PlayerCollision(void)
 						(object *)ball,
 						&ball_wire, 0);
 			if (group != NO_GROUP) {
-			    Ball_hits_goal(ball, group);
+			    Ball_hits_goal(ball, groupptr_by_id(group));
 			    ball->life = 0;
 			}
 		    }

@@ -709,7 +709,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 
     if (type == TREASURE) {
 	if (obj->type == OBJ_BALL)
-	    Ball_hits_goal(BALL_PTR(obj), group);
+	    Ball_hits_goal(BALL_PTR(obj), groupptr_by_id(group));
 	obj->life = 0;
 	return 0;
     }
