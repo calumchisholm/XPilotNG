@@ -239,9 +239,9 @@ void Paint_frame(void)
     SET_FG(colors[BLACK].pixel);
 
 #ifdef _WINDOWS
-    p_draw = draw;		/* let's try this */
+    drawPixmap = draw;		/* let's try this */
     XSetForeground(dpy, gameGC, colors[BLACK].pixel);
-    XFillRectangle(dpy, p_draw, gameGC, 0, 0, draw_width, draw_height);
+    XFillRectangle(dpy, drawPixmap, gameGC, 0, 0, draw_width, draw_height);
 #endif
 
     rd.newFrame();
