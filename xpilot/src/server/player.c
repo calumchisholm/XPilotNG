@@ -428,7 +428,9 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
 
     pl->color = WHITE;
     pl->obj_status = GRAVITY;
-    pl->pl_status = PLAYING;
+    assert(pl->pl_status == 0);
+    assert(pl->pl_state == PL_STATE_UNDEFINED);
+    Player_set_state(pl, PL_STATE_ALIVE);
     pl->have = DEF_HAVE;
     pl->used = DEF_USED;
 
@@ -447,7 +449,6 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
 
 	pl->pseudo_team = pseudo_team_no++;
     }
-    pl->mychar = ' ';
     pl->prev_mychar = pl->mychar;
     pl->life = world->rules->lives;
     pl->prev_life = (int)pl->life;
@@ -1728,6 +1729,9 @@ void Player_set_state(player_t *pl, int state)
     case PL_STATE_APPEARING:
 	break;
     case PL_STATE_ALIVE:
+	pl->mychar = ' ';
+	SET_BIT(pl->pl_status, PLAYING);
+	CLR_BIT(pl->pl_status, PAUSE|GAME_OVER|KILLED);
 	break;
     case PL_STATE_KILLED:
 	SET_BIT(pl->pl_status, KILLED);
