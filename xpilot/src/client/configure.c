@@ -162,6 +162,15 @@ static int Config_create_enemyLWColor(int widget_desc, int *height);
 static int Config_create_teamLWColor(int widget_desc, int *height);
 static int Config_create_ballColor(int widget_desc, int *height);
 static int Config_create_connColor(int widget_desc, int *height);
+static int Config_create_fuelMeterColor(int widget_desc, int *height);
+static int Config_create_powerMeterColor(int widget_desc, int *height);
+static int Config_create_turnSpeedMeterColor(int widget_desc, int *height);
+static int Config_create_packetSizeMeterColor(int widget_desc, int *height);
+static int Config_create_packetLossMeterColor(int widget_desc, int *height);
+static int Config_create_packetDropMeterColor(int widget_desc, int *height);
+static int Config_create_packetLagMeterColor(int widget_desc, int *height);
+static int Config_create_temporaryMeterColor(int widget_desc, int *height);
+static int Config_create_meterBorderColor(int widget_desc, int *height);
 static int Config_create_windowColor(int widget_desc, int *height);
 static int Config_create_buttonColor(int widget_desc, int *height);
 static int Config_create_borderColor(int widget_desc, int *height);
@@ -195,13 +204,6 @@ static int Config_create_shipNameColor(int widget_desc, int *height);
 static int Config_create_baseNameColor(int widget_desc, int *height);
 static int Config_create_mineNameColor(int widget_desc, int *height);
 
-static int Config_create_fuelMeter(int widget_desc, int *height);
-static int Config_create_powerMeter(int widget_desc, int *height);
-static int Config_create_turnSpeedMeter(int widget_desc, int *height);
-static int Config_create_packetSizeMeter(int widget_desc, int *height);
-static int Config_create_packetLossMeter(int widget_desc, int *height);
-static int Config_create_packetDropMeter(int widget_desc, int *height);
-static int Config_create_packetLagMeter(int widget_desc, int *height);
 static int Config_create_clockAMPM(int widget_desc, int *height);
 static int Config_create_markingLights(int widget_desc, int *height);
 #ifdef _WINDOWS
@@ -327,13 +329,6 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
 #ifdef SOUND
     Config_create_maxVolume,
 #endif
-    Config_create_fuelMeter,
-    Config_create_powerMeter,
-    Config_create_turnSpeedMeter,
-    Config_create_packetSizeMeter,
-    Config_create_packetLossMeter,
-    Config_create_packetDropMeter,
-    Config_create_packetLagMeter,
     Config_create_clockAMPM,
 #ifdef _WINDOWS
     Config_create_threadedDraw,
@@ -368,6 +363,15 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_mineNameColor,
     Config_create_ballColor,
     Config_create_connColor,
+    Config_create_fuelMeterColor,
+    Config_create_powerMeterColor,
+    Config_create_turnSpeedMeterColor,
+    Config_create_packetSizeMeterColor,
+    Config_create_packetLossMeterColor,
+    Config_create_packetDropMeterColor,
+    Config_create_packetLagMeterColor,
+    Config_create_temporaryMeterColor,
+    Config_create_meterBorderColor,
     Config_create_windowColor,
     Config_create_buttonColor,
     Config_create_borderColor,
@@ -381,7 +385,6 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_wallColor,
     Config_create_fuelColor,
     Config_create_decorColor,
-
     Config_create_save			/* must be last */
 };
 
@@ -1202,6 +1205,51 @@ static int Config_create_connColor(int widget_desc, int *height)
     return CONFIG_CREATE_COLOR(connColor);
 }
 
+static int Config_create_fuelMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(fuelMeterColor);
+}
+
+static int Config_create_powerMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(powerMeterColor);
+}
+
+static int Config_create_turnSpeedMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(turnSpeedMeterColor);
+}
+
+static int Config_create_packetSizeMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(packetSizeMeterColor);
+}
+
+static int Config_create_packetLossMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(packetLossMeterColor);
+}
+
+static int Config_create_packetDropMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(packetDropMeterColor);
+}
+
+static int Config_create_packetLagMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(packetLagMeterColor);
+}
+
+static int Config_create_temporaryMeterColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(temporaryMeterColor);
+}
+
+static int Config_create_meterBorderColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(meterBorderColor);
+}
+
 static int Config_create_windowColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(windowColor);
@@ -1334,69 +1382,6 @@ static int Config_create_maxFPS(int widget_desc, int *height)
 			     Config_update_maxFPS, NULL);
 }
 
-static int Config_create_fuelMeter(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "fuelMeter",
-			      BIT(instruments, SHOW_FUEL_METER)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_FUEL_METER);
-}
-
-static int Config_create_powerMeter(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "powerMeter",
-			      BIT(instruments, SHOW_POWER_METER)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_POWER_METER);
-}
-
-static int Config_create_turnSpeedMeter(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "turnSpeedMeter",
-			      BIT(instruments, SHOW_TURNSPEED_METER)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_TURNSPEED_METER);
-}
-
-static int Config_create_packetSizeMeter(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "packetSizeMeter",
-			      BIT(instruments, SHOW_PACKET_SIZE_METER)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_PACKET_SIZE_METER);
-}
-
-static int Config_create_packetLossMeter(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "packetLossMeter",
-			      BIT(instruments, SHOW_PACKET_LOSS_METER)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_PACKET_LOSS_METER);
-}
-
-static int Config_create_packetDropMeter(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "packetDropMeter",
-			      BIT(instruments, SHOW_PACKET_DROP_METER)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_PACKET_DROP_METER);
-}
-
-static int Config_create_packetLagMeter(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "packetLagMeter",
-			      BIT(instruments, SHOW_PACKET_LAG_METER)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_PACKET_LAG_METER);
-}
-
 static int Config_create_clockAMPM(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height, "clockAMPM",
@@ -1508,10 +1493,10 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 	    Map_blue(0, 0, Setup->x, Setup->y);
 	}
     }
-    if (BIT(bit, SHOW_PACKET_DROP_METER | SHOW_PACKET_LOSS_METER)) {
+    if (packetDropMeterColor || packetLossMeterColor) {
 	Net_init_measurement();
     }
-    if (BIT(bit, SHOW_PACKET_LAG_METER)) {
+    if (packetLagMeterColor) {
 	Net_init_lag_measurement();
     }
     if (BIT(bit, SHOW_REVERSE_SCROLL)) {
@@ -1935,13 +1920,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "showShipShapes", BIT(hackedInstruments, SHOW_SHIP_SHAPES));
     Config_save_bool(fp, "showMyShipShape", BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE));
     Config_save_bool(fp, "ballMsgScan", BIT(hackedInstruments, BALL_MSG_SCAN));
-    Config_save_bool(fp, "fuelMeter", BIT(instruments, SHOW_FUEL_METER));
-    Config_save_bool(fp, "turnSpeedMeter", BIT(instruments, SHOW_TURNSPEED_METER));
-    Config_save_bool(fp, "powerMeter", BIT(instruments, SHOW_POWER_METER));
-    Config_save_bool(fp, "packetSizeMeter", BIT(instruments, SHOW_PACKET_SIZE_METER));
-    Config_save_bool(fp, "packetLossMeter", BIT(instruments, SHOW_PACKET_LOSS_METER));
-    Config_save_bool(fp, "packetDropMeter", BIT(instruments, SHOW_PACKET_DROP_METER));
-    Config_save_bool(fp, "packetLagMeter", BIT(instruments, SHOW_PACKET_LAG_METER));
     Config_save_bool(fp, "slidingRadar", BIT(instruments, SHOW_SLIDING_RADAR));
     Config_save_float(fp, "showItemsTime", showItemsTime);
     Config_save_int(fp, "showScoreDecimals", showScoreDecimals);
@@ -2018,6 +1996,15 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "mineNameColor", mineNameColor);
     Config_save_int(fp, "ballColor", ballColor);
     Config_save_int(fp, "connColor", connColor);
+    Config_save_int(fp, "fuelMeterColor", fuelMeterColor);
+    Config_save_int(fp, "powerMeterColor", powerMeterColor);
+    Config_save_int(fp, "turnSpeedMeterColor", turnSpeedMeterColor);
+    Config_save_int(fp, "packetSizeMeterColor", packetSizeMeterColor);
+    Config_save_int(fp, "packetLossMeterColor", packetLossMeterColor);
+    Config_save_int(fp, "packetDropMeterColor", packetDropMeterColor);
+    Config_save_int(fp, "packetLagMeterColor", packetLagMeterColor);
+    Config_save_int(fp, "temporaryMeterColor", temporaryMeterColor);
+    Config_save_int(fp, "meterBorderColor", meterBorderColor);
     Config_save_int(fp, "windowColor", windowColor);
     Config_save_int(fp, "buttonColor", buttonColor);
     Config_save_int(fp, "borderColor", borderColor);

@@ -503,6 +503,15 @@ int Init_top(void)
     COLORCHECK(mineNameColor, 2);
     COLORCHECK(ballColor, 1);
     COLORCHECK(connColor, 2);
+    COLORCHECK(fuelMeterColor, 3);
+    COLORCHECK(powerMeterColor, 3);
+    COLORCHECK(turnSpeedMeterColor, 3);
+    COLORCHECK(packetSizeMeterColor, 3);
+    COLORCHECK(packetLossMeterColor, 3);
+    COLORCHECK(packetDropMeterColor, 3);
+    COLORCHECK(packetLagMeterColor, 3);
+    COLORCHECK(temporaryMeterColor, 3);
+    COLORCHECK(meterBorderColor, 2);
     COLORCHECK(buttonColor, 2);
     COLORCHECK(borderColor, 1);
     COLORCHECK(clockColor, 1);

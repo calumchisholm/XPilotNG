@@ -1142,12 +1142,12 @@ void Net_init_measurement(void)
     packet_loss = 0;
     packet_drop = 0;
     packet_loop = 0;
-    if (BIT(instruments, SHOW_PACKET_LOSS_METER|SHOW_PACKET_DROP_METER) != 0) {
+    if (packetLossMeterColor || packetDropMeterColor) {
 	if (packet_measure == NULL) {
 	    if ((packet_measure = (char *) malloc(FPS)) == NULL) {
 		error("No memory for packet measurement");
-		CLR_BIT(instruments,
-			SHOW_PACKET_LOSS_METER|SHOW_PACKET_DROP_METER);
+		packetLossMeterColor = 0;
+		packetDropMeterColor = 0;
 	    } else {
 		memset(packet_measure, PACKET_DRAW, FPS);
 	    }

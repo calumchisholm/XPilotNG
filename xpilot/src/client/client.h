@@ -45,14 +45,8 @@
 #include "item.h"
 #endif
 
-#define SHOW_FUEL_METER		(1L << 3)
-#define SHOW_TURNSPEED_METER	(1L << 5)
-#define SHOW_POWER_METER	(1L << 6)
 
 #define SHOW_SLIDING_RADAR	(1L << 8)
-#define SHOW_PACKET_SIZE_METER	(1L << 10)
-#define SHOW_PACKET_LOSS_METER	(1L << 11)
-#define SHOW_PACKET_DROP_METER	(1L << 12)
 #define SHOW_MESSAGES		(1L << 15)
 
 #define SHOW_OUTLINE_WORLD	(1L << 17)
@@ -66,7 +60,6 @@
 
 #define SHOW_REVERSE_SCROLL	(1L << 26)
 
-#define SHOW_PACKET_LAG_METER	(1L << 28)
 #define SHOW_SHIP_ID            (1L << 29)
 
 /* hacked instruments */

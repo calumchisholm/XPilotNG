@@ -354,13 +354,6 @@ option options[] = {
 	"See also the keySwapSettings option.\n"
     },
     {
-	"showHUD",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should the HUD be displayed or not.\n"
-    },
-    {
 	"mapRadar",
 	NULL,
 	"Yes",
@@ -437,59 +430,6 @@ option options[] = {
 	"0.0",
 	KEY_DUMMY,
 	"Uses a red line to indicate the current velocity and direction.\n"
-    },
-    {
-	"fuelMeter",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Determines if the fuel meter should be visible.\n"
-    },
-    {
-	"turnSpeedMeter",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the turn speed meter be visible at all times.\n"
-    },
-    {
-	"powerMeter",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the power meter be visible at all times.\n"
-    },
-    {
-	"packetSizeMeter",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the network packet size meter be visible at all times.\n"
-	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"
-    },
-    {
-	"packetLossMeter",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the packet loss meter be visible.\n"
-	"This gives the percentage of lossed frames due to network failure.\n"
-    },
-    {
-	"packetDropMeter",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the packet drop meter be visible.\n"
-	"This gives the percentage of dropped frames due to display slowness.\n"
-    },
-    {
-	"packetLagMeter",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the packet lag meter be visible.\n"
-	"This gives the amount of lag in frames over the past one second.\n"
     },
     {
 	"slidingRadar",
@@ -596,13 +536,6 @@ option options[] = {
 	"50",
 	KEY_DUMMY,
 	"Speed in which messages appear on screen in characters per second.\n"
-    },
-    {
-	"clock",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should a clock be displayed in the top right of the score window.\n"
     },
     {
 	"clockAMPM",
@@ -1198,6 +1131,73 @@ option options[] = {
 	"Which color number to use for drawing connectors.\n"
     },
     {
+	"fuelMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the fuel meter.\n"
+    },
+    {
+	"powerMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the power meter.\n"
+    },
+    {
+	"turnSpeedMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the turn speed meter.\n"
+    },
+    {
+	"packetSizeMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet size meter.\n"
+	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"
+    },
+    {
+	"packetLossMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet loss meter.\n"
+	"This gives the percentage of lost frames due to network failure.\n"
+    },
+    {
+	"packetDropMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet drop meter.\n"
+	"This gives the percentage of dropped frames due to display slowness.\n"
+    },
+    {
+	"packetLagMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing the packet lag meter.\n"
+	"This gives the amount of lag in frames over the past one second.\n"
+    },
+    {
+	"temporaryMeterColor",
+	NULL,
+	"3",
+	KEY_DUMMY,
+	"Which color number to use for drawing temporary meters.\n"
+    },
+    {
+	"meterBorderColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing borders of meters.\n"
+    },
+    {
 	"windowColor",
 	NULL,
 	"8",
@@ -1224,6 +1224,7 @@ option options[] = {
 	"1",
 	KEY_DUMMY,
 	"Which color number to use for drawing the clock.\n"
+	"The clock is displayed in the top right of the score window.\n"
     },
     {
 	"scoreColor",
@@ -3102,6 +3103,15 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "mineNameColor", &mineNameColor);
     Get_int_resource(rDB, "ballColor", &ballColor);
     Get_int_resource(rDB, "connColor", &connColor);
+    Get_int_resource(rDB, "fuelMeterColor", &fuelMeterColor);
+    Get_int_resource(rDB, "powerMeterColor", &powerMeterColor);
+    Get_int_resource(rDB, "turnSpeedMeterColor", &turnSpeedMeterColor);
+    Get_int_resource(rDB, "packetSizeMeterColor", &packetSizeMeterColor);
+    Get_int_resource(rDB, "packetLossMeterColor", &packetLossMeterColor);
+    Get_int_resource(rDB, "packetDropMeterColor", &packetDropMeterColor);
+    Get_int_resource(rDB, "packetLagMeterColor", &packetLagMeterColor);
+    Get_int_resource(rDB, "temporaryMeterColor", &temporaryMeterColor);
+    Get_int_resource(rDB, "meterBorderColor", &meterBorderColor);
     Get_int_resource(rDB, "windowColor", &windowColor);
     Get_int_resource(rDB, "buttonColor", &buttonColor);
     Get_int_resource(rDB, "borderColor", &borderColor);
@@ -3139,13 +3149,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		     SHOW_LIVES_BY_SHIP);
     Get_bit_resource(rDB, "treatZeroSpecial", &hackedInstruments,
 		     TREAT_ZERO_SPECIAL);
-    Get_bit_resource(rDB, "fuelMeter", &instruments, SHOW_FUEL_METER);
-    Get_bit_resource(rDB, "turnSpeedMeter", &instruments, SHOW_TURNSPEED_METER);
-    Get_bit_resource(rDB, "powerMeter", &instruments, SHOW_POWER_METER);
-    Get_bit_resource(rDB, "packetSizeMeter", &instruments, SHOW_PACKET_SIZE_METER);
-    Get_bit_resource(rDB, "packetLossMeter", &instruments, SHOW_PACKET_LOSS_METER);
-    Get_bit_resource(rDB, "packetDropMeter", &instruments, SHOW_PACKET_DROP_METER);
-    Get_bit_resource(rDB, "packetLagMeter", &instruments, SHOW_PACKET_LAG_METER);
     Get_bit_resource(rDB, "slidingRadar", &instruments, SHOW_SLIDING_RADAR);
     Get_bit_resource(rDB, "clockAMPM", &instruments, SHOW_CLOCK_AMPM_FORMAT);
     Get_bit_resource(rDB, "outlineWorld", &instruments, SHOW_OUTLINE_WORLD);

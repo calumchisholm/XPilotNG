@@ -169,6 +169,8 @@ extern int	hudRadarDotSize;	/* Size for hudradar dot drawing */
 extern DFLOAT	hudRadarScale;		/* Scale for hudradar drawing */
 extern DFLOAT	hudRadarLimit;		/* Limit for hudradar drawing */
 extern int	hudSize;		/* size for hud-drawing */
+extern int	hudLockColor;		/* Color index for lock on HUD drawing */
+extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 extern int	dirPtrColor;		/* Color index for dirptr-hack drawing */
 extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
 extern int	msgScanBallColor;	/* Color index for ball msg scan */
@@ -182,8 +184,15 @@ extern int	mineNameColor;		/* Color index for mine name drawing */
 extern int	teamShotColor;		/* Color index for harmless shot drawing */
 extern int	ballColor;		/* Color index for ball drawing */
 extern int	connColor;		/* Color index for connector drawing */
-extern int	hudLockColor;		/* Color index for lock on HUD drawing */
-extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
+extern int	fuelMeterColor;		/* Color index for fuel meter */
+extern int	powerMeterColor;	/* Color index for power meter */
+extern int	turnSpeedMeterColor;	/* Color index for turnspeed meter */
+extern int	packetSizeMeterColor;	/* Color index for packet size meter */
+extern int	packetLossMeterColor;	/* Color index for packet loss meter */
+extern int	packetDropMeterColor;	/* Color index for packet drop meter */
+extern int	packetLagMeterColor;	/* Color index for packet lag meter */
+extern int	temporaryMeterColor;	/* Color index for temporary meters */
+extern int	meterBorderColor;	/* Color index for meter borders */
 extern DFLOAT	scoreObjectTime;	/* how long score objects are flashed */
 extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	baseWarningFrames;	/* Duration of base warning */
