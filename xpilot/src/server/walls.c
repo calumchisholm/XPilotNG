@@ -561,6 +561,8 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	    char	*msg_ptr = &msg[msg_len];
 	    double	average_pusher_score
 		= total_pusher_score / total_pusher_count;
+ 	    bool	was_tagged = (tag == pl->id),
+			pusher_is_tagged = false;
 
 	    for (i = 0; i < num_pushers; i++) {
 		player		*pusher = pushers[i];
@@ -580,12 +582,28 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 		}
 		sc = cnt[i] * Rate(pusher->score, pl->score)
 				    * shoveKillScoreMult / total_pusher_count;
+		if (tagGame) {
+		    if (tag == pusher->id) {
+			sc *= 2;
+ 			pusher_is_tagged = 1;
+ 		    } else if (was_tagged && num_pushers == 1) {
+ 			sc *= 10;
+ 			Transfer_tag(pl, pusher);
+ 		    }
+ 		}
 		Score(pusher, sc, pl->pos, pl->name);
 		if (i >= num_pushers - 1)
 		    Rank_AddKill(pusher);
 	    }
 	    sc = Rate(average_pusher_score, pl->score)
 		* shoveKillScoreMult;
+	    /* kps - this is somewhat ugly */
+	    if (tagGame && num_pushers == 1) {
+ 		if (was_tagged)
+ 		    sc *= 10;
+		else if (pusher_is_tagged)
+ 		    sc *= 2;
+ 	    }
 	    Score(pl, -sc, pl->pos, "[Shove]");
 
 	    strcpy(msg_ptr, ".");

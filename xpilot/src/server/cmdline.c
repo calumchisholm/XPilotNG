@@ -123,6 +123,7 @@ bool		cannonsDefend;		/* Do cannons defend themselves? */
 bool		cannonFlak;		/* Do cannons fire flak? */
 int		cannonDeadTime;		/* How long do cannons stay dead? */
 bool		keepShots;		/* Keep shots when player leaves? */
+bool		tagGame;		/* Is this a game of tag? */
 bool		timing;			/* Is this a race? */
 bool		ballrace;		/* Do we race with balls? */
 bool		ballrace_connect;	/* Need to be connected to ball to pass
@@ -1620,6 +1621,19 @@ static option_desc options[] = {
 	tuner_dummy,
 	"Ignore client maxFPS request if it is 20 (old default, too low).\n",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
+    },
+    {
+	"tagGame",
+ 	"tag",
+ 	"no",
+ 	&tagGame,
+ 	valBool,
+ 	tuner_none,
+ 	"Are we going to play a game of tag?\n"
+ 	"One player is 'it' (is worth more points when killed than the\n"
+ 	"others). After this player is killed, the one who killed them\n"
+ 	"becomes 'it', and so on.\n",
+ 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"timing",

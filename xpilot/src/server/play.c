@@ -25,6 +25,89 @@
 
 char play_version[] = VERSION;
 
+int tag = NO_ID;	/* player who is 'it' */
+ 
+void Transfer_tag(player *oldtag_pl, player *newtag_pl)
+{
+    char	msg[MSG_LEN];
+ 
+    if (tag != oldtag_pl->id
+ 	|| oldtag_pl->id == newtag_pl->id)
+ 	return;
+     
+    tag = newtag_pl->id;
+    sprintf(msg, " < %s killed %s and gets to be 'it' now. >",
+	    newtag_pl->name, oldtag_pl->name);
+    Set_message(msg);
+}
+
+#if 0
+double Handle_tag(double sc, player *victim_pl, player *killer_pl)
+{
+    if (tag == killer_pl->id)
+	return 2.0 * sc;
+    else if (tag == victim_pl->id) {
+	Transfer_tag(victim_pl, killer_pl);
+	return 10.0 * sc;
+    }
+    return sc;
+}
+#endif
+
+static inline bool Player_can_be_tagged(player *pl)
+{
+    if (BIT(pl->status, PAUSE))
+	return false;
+    return true;
+}
+
+/*
+ * Called from update during tag game to check that a non-paused
+ * player is tagged.
+ */
+void Check_tag(void)
+{
+    int num = 0, n, i, candidate;
+    player *tag_pl = Player_by_id(tag);
+
+    if (tag_pl && !BIT(tag_pl->status, PAUSE))
+	return;
+
+    /* Find number of players that might get the tag */
+    for (i = 0; i < NumPlayers; i++) {
+	player *pl = Players(i);
+	if (Player_can_be_tagged(pl))
+	    num++;
+    }
+
+    if (num == 0) {
+	tag = NO_ID;
+	return;
+    }
+
+    /* select first candidate for tag */
+    candidate = (int)(rfrac() * num);
+    for (i = candidate; i < NumPlayers; i++) {
+	player *pl = Players(i);
+	if (Player_can_be_tagged(pl)) {
+	    tag = pl->id;
+	    break;
+	}
+    }
+
+    if (tag == NO_ID) {
+	for (i = 0; i < candidate; i++) {
+	    player *pl = Players(i);
+	    if (Player_can_be_tagged(pl)) {
+		tag = pl->id;
+		break;
+	    }
+	}
+    }
+
+    /* someone should be tagged by now */
+    assert(tag != NO_ID);
+}
 
 static int Punish_team(player *pl, treasure_t *td, clpos pos)
 {
@@ -518,6 +601,8 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
 {
     object *obj = move->obj;
     wormhole_t *wormhole = Wormholes(gp->mapobj_ind);
+
+    return false;
 
 #if 0
     warn("Wormhole_hitfunc: wormhole %p hit by a %s",

@@ -1275,6 +1275,19 @@ void Update_objects(void)
 	if ((Obj[i]->life -= timeStep) <= 0)
 	    Delete_shot(i);
 
+     /*
+      * In tag games, check if anyone is tagged. otherwise, tag someone.
+      */
+    if (tagGame) {
+	int oldtag = tag;
+
+	Check_tag();
+	if (tag != oldtag && tag != NO_ID) {
+	    sprintf(msg, " < %s is 'it' now. >", Player_by_id(tag)->name);
+	    Set_message(msg);
+	}
+    }
+
     /*
      * Compute general game status, do we have a winner?
      * (not called after Game_Over() )
@@ -1288,3 +1301,4 @@ void Update_objects(void)
     if (updateScores && frame_loops % UPDATE_SCORE_DELAY == 0)
 	Update_score_table();
 }
+

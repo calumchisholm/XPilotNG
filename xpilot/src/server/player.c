@@ -1754,6 +1754,9 @@ void Delete_player(player *pl)
     /* call before important player structures are destroyed */
     Leave_alliance(pl);
 
+    if (tagGame && tag == pl->id)
+	tag = NO_ID;
+
     if (IS_ROBOT_PTR(pl))
 	Robot_destroy(pl);
     if (pl->isoperator) {

@@ -172,6 +172,8 @@ extern bool		keepShots;
 extern bool		teamAssign;
 extern bool		teamImmunity;
 extern bool		teamShareScore;
+extern bool		tagGame;
+extern int		tag;
 extern bool		timing;
 extern bool		ballrace;
 extern bool		ballrace_connect;
@@ -564,6 +566,9 @@ void Wormhole_remove_from_map(wormhole_t *wormhole);
 
 void Team_immunity_init(void);
 void Groups_init(void);
+void Transfer_tag(player *oldtag_pl, player *newtag_pl);
+/*double Handle_tag(double score, player *victim_pl, player* killer_pl);*/
+void Check_tag(void);
 void Delete_shot(int ind);
 void Fire_laser(player *pl);
 void Fire_general_laser(player *pl, int team, clpos pos,

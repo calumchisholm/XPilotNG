@@ -117,6 +117,18 @@ void Score_players(player *winner_pl, double winner_score, char *winner_msg,
 	if (loser_score > 0)
 	    loser_score = -loser_score;
     }
+
+    if (tagGame && winner_score > 0.0) {
+	if (tag == winner_pl->id) {
+	    winner_score *= 2;
+	    loser_score *= 2;
+	} else if (tag == loser_pl->id) {
+	    winner_score *= 10;
+	    loser_score *= 10;
+	    Transfer_tag(loser_pl, winner_pl);
+	}
+    }
+
     Score(winner_pl, winner_score, loser_pl->pos, winner_msg);
     Score(loser_pl, loser_score, loser_pl->pos, loser_msg);
 }
