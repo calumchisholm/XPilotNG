@@ -1008,95 +1008,6 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
     pl->vel.y = fy * playerWallBrakeFactor;
 }
 
-/* Try to move one click away from a line after a collision. Needed because
- * otherwise we could keep hitting it even though direction of movement
- * was away from the line. Example case:
- * XXX
- *   1*XX
- *     34XXX
- *       56 XXX
- *         78  XXX
- * Line (marked with 'X') and path of object (marked with numbers) collide
- * at '*' because of discreteness even though the object is moving away
- * from the line.
- * Return -1 if successful, number of another line blocking movement
- * otherwise (the number of the line is not used when writing this). */
-static int Away(struct move *move, int line)
-{
-    int i, dx, dy, lsx, lsy, res;
-    unsigned short *lines;
-
-    lsx = linet[line].start.cx - move->start.cx;
-    lsy = linet[line].start.cy - move->start.cy;
-    lsx = CENTER_XCLICK(lsx);
-    lsy = CENTER_YCLICK(lsy);
-
-    if (ABS(linet[line].delta.cx) >= ABS(linet[line].delta.cy)) {
-	dx = 0;
-	dy = -SIGN(linet[line].delta.cx);
-    }
-    else {
-	dy = 0;
-	dx = SIGN(linet[line].delta.cy);
-    }
-
-    if ((ABS(lsx) > SEPARATION_DIST || ABS(lsy) > SEPARATION_DIST)
-	&& (ABS(lsx + linet[line].delta.cx) > SEPARATION_DIST
-	    || ABS(lsy + linet[line].delta.cy) > SEPARATION_DIST)) {
-	move->start.cx = WRAP_XCLICK(move->start.cx + dx);
-	move->start.cy = WRAP_YCLICK(move->start.cy + dy);
-	return -1;
-    }
-
-    lines = blockline[(move->start.cx >> B_SHIFT)
-		     + mapx * (move->start.cy >> B_SHIFT)].lines;
-    while ( (i = *lines++) != 65535) {
-	if (i == line)
-	    continue;
-	if (linet[i].group
-	    && (!can_hit(&groups[linet[i].group], move)))
-	    continue;
-
-	lsx = linet[i].start.cx - move->start.cx;
-	lsy = linet[i].start.cy - move->start.cy;
-	lsx = CENTER_XCLICK(lsx);
-	lsy = CENTER_YCLICK(lsy);
-
-	if ((ABS(lsx) > SEPARATION_DIST || ABS(lsy) > SEPARATION_DIST)
-	    && (ABS(lsx + linet[i].delta.cx) > SEPARATION_DIST
-		|| ABS(lsy + linet[i].delta.cy) > SEPARATION_DIST))
-	    continue;
-
-	if (lsx < dx && lsx + linet[i].delta.cx < dx)
-	    continue;
-	if (lsx > dx && lsx + linet[i].delta.cx > dx)
-	    continue;
-	if (lsy < dy && lsy + linet[i].delta.cy < dy)
-	    continue;
-	if (lsy > dy && lsy + linet[i].delta.cy > dy)
-	    continue;
-
-	if ((res = SIDE(lsx - dx, lsy - dy, i)) == 0
-	    || res > 0 != SIDE(lsx, lsy, i) > 0) {
-	    if (res) {
-		if (lsx < 0 && lsx + linet[i].delta.cx < 0)
-		    continue;
-		if (lsx > 0 && lsx + linet[i].delta.cx > 0)
-		    continue;
-		if (lsy < 0 && lsy + linet[i].delta.cy < 0)
-		    continue;
-		if (lsy > 0 && lsy + linet[i].delta.cy > 0)
-		    continue;
-	    }
-	    return i;
-	}
-    }
-
-    move->start.cx = WRAP_XCLICK(move->start.cx + dx);
-    move->start.cy = WRAP_YCLICK(move->start.cy + dy);
-    return -1;
-}
-
 
 /* Move shape by 1 click. Used in Shape_away. */
 static int Shape_move1(int dx, int dy, struct move *move,
@@ -1194,7 +1105,7 @@ static int Shape_move1(int dx, int dy, struct move *move,
 
 
 /* Move a shape away from a line after a collision. Needed for the same
- * reason as 'Away' above. */
+ * reason as Away(). */
 static int Shape_away(struct move *move, const shipobj *shape,
 		      int dir, int line, int *rline, int *rpoint)
 {
@@ -1325,10 +1236,10 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 	    }
 	}
 
+	/* delta components can be big, so (float) to avoid overflow */
 	if (start < *mindone
-	    || (start == *mindone
-		&& *minline != -1
-		&& SIDE(move->delta.cx, move->delta.cy, i) < 0)) {
+	    || (start == *mindone && *minline != -1
+	      && SIDE((float)move->delta.cx, (float)move->delta.cy, i) < 0)) {
 	    hit = 1;
 	    *mindone = start;
 	    *minline = i;
@@ -1690,6 +1601,58 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
 	}
     }
     return NO_GROUP;
+}
+
+
+/* Try to move one click away from a line after a collision. Needed because
+ * otherwise we could keep hitting it even though direction of movement
+ * was away from the line. Example case:
+ * XXX
+ *   1*XX
+ *     34XXX
+ *       56 XXX
+ *         78  XXX
+ * Line (marked with 'X') and path of object (marked with numbers) collide
+ * at '*' because of discreteness even though the object is moving away
+ * from the line.
+ * Return -1 if successful, number of another line blocking movement
+ * otherwise (the number of the line is not used when writing this). */
+static int Away(struct move *move, int line)
+{
+    int dx, dy, lsx, lsy;
+    clvec delta_saved;
+    struct collans ans;
+
+    lsx = linet[line].start.cx - move->start.cx;
+    lsy = linet[line].start.cy - move->start.cy;
+    lsx = CENTER_XCLICK(lsx);
+    lsy = CENTER_YCLICK(lsy);
+
+    if (ABS(linet[line].delta.cx) >= ABS(linet[line].delta.cy)) {
+	dx = 0;
+	dy = -SIGN(linet[line].delta.cx);
+    }
+    else {
+	dy = 0;
+	dx = SIGN(linet[line].delta.cy);
+    }
+
+    if ((ABS(lsx) > SEPARATION_DIST || ABS(lsy) > SEPARATION_DIST)
+	&& (ABS(lsx + linet[line].delta.cx) > SEPARATION_DIST
+	    || ABS(lsy + linet[line].delta.cy) > SEPARATION_DIST)) {
+	move->start.cx = WRAP_XCLICK(move->start.cx + dx);
+	move->start.cy = WRAP_YCLICK(move->start.cy + dy);
+	return -1;
+    }
+
+    delta_saved = move->delta;
+    move->delta.cx = dx;
+    move->delta.cy = dy;
+    Move_point(move, &ans);
+    move->start.cx = WRAP_XCLICK(move->start.cx + ans.moved.cx);
+    move->start.cy = WRAP_YCLICK(move->start.cy + ans.moved.cy);
+    move->delta = delta_saved;
+    return ans.line;
 }
 
 
@@ -2871,13 +2834,13 @@ static void Move_object_new(object *obj)
 	mv.start.cx = WRAP_XCLICK(mv.start.cx + ans.moved.cx);
 	mv.start.cy = WRAP_YCLICK(mv.start.cy + ans.moved.cy);
 	if (ans.line != -1) {
-	    if ( (t = Away(&mv, ans.line)) != -1) {
-		if (!Clear_corner(&mv, obj, ans.line, t))
-		    break;
-	    }
-	    else if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
+	    if (SIDE(obj->vel.x, obj->vel.y, ans.line) < 0) {
 		if (!Bounce_object(obj, &mv, ans.line, 0))
-		    break;
+		    break;	/* Object destroyed by bounce */
+	    }
+	    else if ( (t = Away(&mv, ans.line)) != -1) {
+		if (!Clear_corner(&mv, obj, ans.line, t))
+		    break;	/* Object destroyed by bounces */
 	    }
 	}
     }
@@ -2962,8 +2925,13 @@ static void Move_player_new(int ind)
 			Bounce_player(pl, &mv, line, point);
 		    else {
 			/* This case could be handled better,
-			   I'll write the code for that if this
-			   happens too often. */
+			 * I'll write the code for that if this
+			 * happens too often. */
+			/* At the moment it can be caused by illegal shipshapes
+			 * too, because they're not checked */
+			sprintf(msg, "%s got stuck (Illegal shape? "
+				"Shapes aren't checked) [*Notice*]", pl->name);
+			Set_message(msg);
 			mv.delta.cx = 0;
 			mv.delta.cy = 0;
 			pl->vel.x = 0;
