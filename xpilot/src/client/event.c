@@ -867,7 +867,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyFireShot",
-	"Control_L Control_R",
+	"Return Linefeed",
 	KEY_FIRE_SHOT,
 	"Fire shot.\n"
 	"Note that shields must be down to fire.\n"),
@@ -1303,7 +1303,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyPointerControl",
-	"Return KP_Enter",
+	"KP_Enter",
 	KEY_POINTER_CONTROL,
 	"Toggle pointer control.\n"),
 
