@@ -77,7 +77,6 @@
 #define DSIZE		    4	    /* Size of diamond (on radar) */
 
 #define	UPDATE_SCORE_DELAY	(FPS)
-#define CONTROL_DELAY		100
 
 /*
  * Polygon style flags
