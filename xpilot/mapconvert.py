@@ -214,9 +214,11 @@ def convert(options):
 	    base.x = loc.x * BCLICKS + BCLICKS / 2
 	    base.y = (height - loc.y - 1) % height * BCLICKS + BCLICKS / 2
 	    if map[loc] == '_':
-		base.team = 0
+		base.team = 9
 	    else:
 		base.team = ord(map[loc]) - ord('0')
+                if base.team == 0:
+                    base.team = 9
 	    base.dir = 32
 	    if map[loc.u()] in ATTRACT:
 		base.dir = 32
@@ -462,6 +464,7 @@ def convert(options):
 	      (base.team, base.x, base.y, base.dir)
     for fuel in fuels:
 	print ('<Fuel x="%d" y="%d"' % (fuel.x, fuel.y)),
+        sys.stdout.softspace = 0
 	if fuel.team != -1:
 	    print (' team="%d"' % fuel.team),
 	print '/>'
