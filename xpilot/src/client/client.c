@@ -103,14 +103,14 @@ double	controlTime;		/* Display control for how long? */
 u_byte	spark_rand;		/* Sparkling effect */
 u_byte	old_spark_rand;		/* previous value of spark_rand */
 
-long	fuelSum;		/* Sum of fuel in all tanks */
-long	fuelMax;		/* How much fuel can you take? */
+double	fuelSum;		/* Sum of fuel in all tanks */
+double	fuelMax;		/* How much fuel can you take? */
 short	fuelCurrent;		/* Number of currently used tank */
 short	numTanks;		/* Number of tanks */
 double	fuelTime;		/* Display fuel for how long? */
-int	fuelLevel1;		/* Fuel critical level */
-int	fuelLevel2;		/* Fuel warning level */
-int	fuelLevel3;		/* Fuel notify level */
+double	fuelLevel1;		/* Fuel critical level */
+double	fuelLevel2;		/* Fuel warning level */
+double	fuelLevel3;		/* Fuel notify level */
 
 char	*shipShape;		/* Shape of player's ship */
 double	power;			/* Force of thrust */
@@ -266,7 +266,7 @@ static fuelstation_t *Fuelstation_by_pos(int x, int y)
     return NULL;
 }
 
-int Fuel_by_pos(int x, int y)
+double Fuel_by_pos(int x, int y)
 {
     fuelstation_t	*fuelp;
 
@@ -308,7 +308,7 @@ int Target_alive(int x, int y, int *damage)
     return -1;
 }
 
-int Handle_fuel(int ind, int fuel)
+int Handle_fuel(int ind, double fuel)
 {
     if (ind < 0 || ind >= num_fuels) {
 	warn("Bad fuelstation index (%d)", ind);
@@ -1653,11 +1653,11 @@ int Handle_self_items(u_byte *newNumItems)
 }
 
 int Handle_self(int x, int y, int vx, int vy, int newHeading,
-		float newPower, float newTurnspeed, float newTurnresistance,
+		double newPower, double newTurnspeed, double newTurnresistance,
 		int newLockId, int newLockDist, int newLockBearing,
 		int newNextCheckPoint, int newAutopilotLight,
 		u_byte *newNumItems, int newCurrentTank,
-		int newFuelSum, int newFuelMax, int newPacketSize)
+		double newFuelSum, double newFuelMax, int newPacketSize)
 {
     FOOpos.x = x;
     FOOpos.y = y;
@@ -2091,7 +2091,7 @@ int Handle_vcannon(int x, int y, int type)
     return 0;
 }
 
-int Handle_vfuel(int x, int y, long fuel)
+int Handle_vfuel(int x, int y, double fuel)
 {
     vfuel_t	t;
 

@@ -373,7 +373,7 @@ option options[] = {
     {
 	"fuelNotify",
 	NULL,
-	"500",
+	"500.0",
 	KEY_DUMMY,
 	"The limit when the HUD fuel bar will become visible.\n",
 	0
@@ -381,7 +381,7 @@ option options[] = {
     {
 	"fuelWarning",
 	NULL,
-	"200",
+	"200.0",
 	KEY_DUMMY,
 	"The limit when the HUD fuel bar will start flashing.\n",
 	0
@@ -389,7 +389,7 @@ option options[] = {
     {
 	"fuelCritical",
 	NULL,
-	"100",
+	"100.0",
 	KEY_DUMMY,
 	"The limit when the HUD fuel bar will flash faster.\n",
 	0
@@ -3509,9 +3509,9 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
     Get_float_resource(rDB, "speedFactHUD", &hud_move_fact);
     Get_float_resource(rDB, "speedFactPTR", &ptr_move_fact);
-    Get_int_resource(rDB, "fuelNotify", &fuelLevel3);
-    Get_int_resource(rDB, "fuelWarning", &fuelLevel2);
-    Get_int_resource(rDB, "fuelCritical", &fuelLevel1);
+    Get_float_resource(rDB, "fuelNotify", &fuelLevel3);
+    Get_float_resource(rDB, "fuelWarning", &fuelLevel2);
+    Get_float_resource(rDB, "fuelCritical", &fuelLevel1);
 
     Get_resource(rDB, "gameFont", gameFontName, sizeof gameFontName);
     Get_resource(rDB, "messageFont", messageFontName, sizeof messageFontName);

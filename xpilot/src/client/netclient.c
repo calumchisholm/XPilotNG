@@ -1490,13 +1490,13 @@ int Receive_self(void)
 
     Game_over_action(sStat);
     Handle_self(x, y, vx, vy, sHeading,
-		(float) sPower,
-		(float) sTurnSpeed,
-		(float) sTurnResistance / 255.0F,
+		(double) sPower,
+		(double) sTurnSpeed,
+		(double) sTurnResistance / 255.0,
 		lockId, lockDist, lockDir,
 		sNextCheckPoint, sAutopilotLight,
 		num_items,
-		currentTank, sFuelSum, sFuelMax, rbuf.len);
+		currentTank, (double)sFuelSum, (double)sFuelMax, rbuf.len);
 
 #ifdef _WINDOWS
     received_self = TRUE;
@@ -2096,7 +2096,7 @@ int Receive_fuel(void)
 
     if ((n = Packet_scanf(&rbuf, "%c%hu%hu", &ch, &num, &fuel)) <= 0)
 	return n;
-    if ((n = Handle_fuel(num, fuel << FUEL_SCALE_BITS)) == -1)
+    if ((n = Handle_fuel(num, (double)fuel)) == -1)
 	return -1;
     if (wbuf.len < MAX_MAP_ACK_LEN)
 	Packet_printf(&wbuf, "%c%ld%hu", PKT_ACK_FUEL, last_loops, num);

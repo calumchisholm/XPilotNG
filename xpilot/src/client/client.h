@@ -183,7 +183,7 @@ typedef struct {
 
 typedef struct {
     int		pos;		/* Block index */
-    long	fuel;		/* Amount of fuel available */
+    double	fuel;		/* Amount of fuel available */
     irec	bounds;		/* Location on map */
 } fuelstation_t;
 
@@ -313,7 +313,7 @@ typedef struct {
 
 typedef struct {
     short		x, y;
-    long		fuel;
+    double		fuel;
 } vfuel_t;
 
 typedef struct {
@@ -445,14 +445,14 @@ extern double	controlTime;		/* Display control for how long? */
 extern u_byte	spark_rand;		/* Sparkling effect */
 extern u_byte	old_spark_rand;		/* previous value of spark_rand */
 
-extern long	fuelSum;		/* Sum of fuel in all tanks */
-extern long	fuelMax;		/* How much fuel can you take? */
+extern double	fuelSum;		/* Sum of fuel in all tanks */
+extern double	fuelMax;		/* How much fuel can you take? */
 extern short	fuelCurrent;		/* Number of currently used tank */
 extern short	numTanks;		/* Number of tanks */
 extern double	fuelTime;		/* Display fuel for how long? */
-extern int	fuelLevel1;		/* Fuel critical level */
-extern int	fuelLevel2;		/* Fuel warning level */
-extern int	fuelLevel3;		/* Fuel notify level */
+extern double	fuelLevel1;		/* Fuel critical level */
+extern double	fuelLevel2;		/* Fuel warning level */
+extern double	fuelLevel3;		/* Fuel notify level */
 
 extern char	*shipShape;		/* Shape of player's ship */
 extern double	power;			/* Force of thrust */
@@ -592,10 +592,10 @@ extern long		start_loops, end_loops;
 extern long		time_left;
 
 
-int Fuel_by_pos(int x, int y);
+double Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, int *damage);
 int Target_by_index(int ind, int *xp, int *yp, int *dead_time, int *damage);
-int Handle_fuel(int ind, int fuel);
+int Handle_fuel(int ind, double fuel);
 int Cannon_dead_time_by_pos(int x, int y, int *dot);
 int Handle_cannon(int ind, int dead_time);
 int Handle_target(int num, int dead_time, int damage);
@@ -621,11 +621,11 @@ int Handle_seek(int programmer_id, int robot_id, int sought_id);
 int Handle_start(long server_loops);
 int Handle_end(long server_loops);
 int Handle_self(int x, int y, int vx, int vy, int newHeading,
-		float newPower, float newTurnspeed, float newTurnresistance,
+		double newPower, double newTurnspeed, double newTurnresistance,
 		int newLockId, int newLockDist, int newLockBearing,
 		int newNextCheckPoint, int newAutopilotLight,
 		u_byte *newNumItems, int newCurrentTank,
-		int newFuelSum, int newFuelMax, int newPacketSize);
+		double newFuelSum, double newFuelMax, int newPacketSize);
 int Handle_self_items(u_byte *newNumItems);
 int Handle_modifiers(char *m);
 int Handle_damaged(int dam);
@@ -656,7 +656,7 @@ int Handle_appearing(int x, int y, int id, int count);
 int Handle_radar(int x, int y, int size);
 int Handle_fastradar(int x, int y, int size);
 int Handle_vcannon(int x, int y, int type);
-int Handle_vfuel(int x, int y, long fuel);
+int Handle_vfuel(int x, int y, double fuel);
 int Handle_vbase(int x, int y, int xi, int yi, int type);
 int Handle_vdecor(int x, int y, int xi, int yi, int type);
 int Handle_message(char *msg);

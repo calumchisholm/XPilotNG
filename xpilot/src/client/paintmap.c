@@ -93,7 +93,7 @@ void Paint_vdecor(void)
 
 static void Paint_background_dots(void)
 {
-    float dx, dy;
+    double dx, dy;
     int xi, yi;
     ipos min, max, count;
 
@@ -103,8 +103,8 @@ static void Paint_background_dots(void)
     count.x = Setup->width / (BLOCK_SZ * map_point_distance);
     count.y = Setup->height / (BLOCK_SZ * map_point_distance);
 
-    dx = (float)Setup->width / count.x;
-    dy = (float)Setup->height / count.y;
+    dx = (double)Setup->width / count.x;
+    dy = (double)Setup->height / count.y;
 
     min.x = world.x / dx;
     if (world.x > 0)
@@ -118,11 +118,9 @@ static void Paint_background_dots(void)
 
     for (yi = min.y; yi <= max.y; yi++) {
         for (xi = min.x; xi <= max.x; xi++) {
-
-            Gui_paint_decor_dot
-                (xi * dx - BLOCK_SZ / 2,
-                 yi * dy - BLOCK_SZ / 2,
-                 map_point_size);
+            Gui_paint_decor_dot((int)(xi * dx - BLOCK_SZ / 2),
+				(int)(yi * dy - BLOCK_SZ / 2),
+				map_point_size);
         }
     }
 }
@@ -241,7 +239,7 @@ void Paint_objects(void)
 
 void Paint_world(void)
 {
-    int			xi, yi, xb, yb, xe, ye, fuel;
+    int			xi, yi, xb, yb, xe, ye;
     int			rxb, ryb;
     int			x, y;
     int			type;
@@ -521,16 +519,12 @@ void Paint_world(void)
 		if (!BIT(instruments, SHOW_FILLED_WORLD|SHOW_TEXTURED_WALLS)) {
 		    Gui_paint_walls(x, y, type);
 
-		    if ((type & BLUE_FUEL) == BLUE_FUEL) {
-			fuel = Fuel_by_pos(xi, yi);
-			Handle_vfuel(x, y, fuel);
-		    }
+		    if ((type & BLUE_FUEL) == BLUE_FUEL)
+			Handle_vfuel(x, y, Fuel_by_pos(xi, yi));
 		}
 		else {
-		    if ((type & BLUE_FUEL) == BLUE_FUEL) {
-			fuel = Fuel_by_pos(xi, yi);
-			Handle_vfuel(x, y, fuel);
-		    }
+		    if ((type & BLUE_FUEL) == BLUE_FUEL)
+			Handle_vfuel(x, y, Fuel_by_pos(xi, yi));
 		    else if (type & BLUE_OPEN) {
 			if (type & BLUE_BELOW) {
 			    fill_top_left = x + BLOCK_SZ;

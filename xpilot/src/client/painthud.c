@@ -614,10 +614,10 @@ void Paint_HUD(void)
     if (hudVLineColor) {
 	SET_FG(colors[hudVLineColor].pixel);
 	rd.drawLine(dpy, drawPixmap, gameGC,
-		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
-		    WINSCALE(hud_pos_y -hudSize),
-		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
-		    WINSCALE(hud_pos_y +hudSize));
+		    WINSCALE(hud_pos_x - hudSize + HUD_OFFSET),
+		    WINSCALE(hud_pos_y - hudSize),
+		    WINSCALE(hud_pos_x - hudSize + HUD_OFFSET),
+		    WINSCALE(hud_pos_y + hudSize));
 	rd.drawLine(dpy, drawPixmap, gameGC,
 		    WINSCALE(hud_pos_x + hudSize - HUD_OFFSET),
 		    WINSCALE(hud_pos_y - hudSize),

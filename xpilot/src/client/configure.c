@@ -918,23 +918,23 @@ static int Config_create_speedFactPTR(int widget_desc, int *height)
 
 static int Config_create_fuelNotify(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			     "fuelNotify", &fuelLevel3, 0, 1000,
-			     NULL, NULL);
+    return Config_create_float(widget_desc, height,
+			       "fuelNotify", &fuelLevel3, 0.0, 1000.0,
+			       NULL, NULL);
 }
 
 static int Config_create_fuelWarning(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			     "fuelWarning", &fuelLevel2, 0, 1000,
-			     NULL, NULL);
+    return Config_create_float(widget_desc, height,
+			       "fuelWarning", &fuelLevel2, 0.0, 1000.0,
+			       NULL, NULL);
 }
 
 static int Config_create_fuelCritical(int widget_desc, int *height)
 {
-    return Config_create_int(widget_desc, height,
-			     "fuelCritical", &fuelLevel1, 0, 1000,
-			     NULL, NULL);
+    return Config_create_float(widget_desc, height,
+			       "fuelCritical", &fuelLevel1, 0.0, 1000.0,
+			       NULL, NULL);
 }
 
 static int Config_create_outlineWorld(int widget_desc, int *height)
