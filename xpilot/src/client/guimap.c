@@ -1231,12 +1231,15 @@ static int Polygon_visible(int index, int copy)
 
 void Gui_paint_world_polygons(Pixmap wallTile) 
 {
-  int i,j,k,x,y,texture=0;
+  int i,j,k,x,y,texture=0, filled = 0;
   static XPoint poly[5000 / 4];
 
   SET_FG(colors[wallColor].pixel);
-  XSetLineAttributes(dpy, gc, WINSCALE(4), LineSolid, CapButt, JoinMiter);
+  XSetLineAttributes(dpy, gc, WINSCALE(4), 0, LineSolid, CapButt, JoinMiter);
   if (wallTile != None && BIT(instruments, SHOW_TEXTURED_WALLS)) texture = 1;
+  if (BIT(instruments, SHOW_FILLED_WORLD))
+    filled = 1;
+  printf("%d\n", filled);
 
 
   /* 
@@ -1275,12 +1278,14 @@ void Gui_paint_world_polygons(Pixmap wallTile)
         poly[j].y = WINSCALE(y);
       }
 
-      if (texture) XSetFillStyle(dpy, gc, FillTiled);
-      rd.fillPolygon(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
-                     Nonconvex, CoordModeOrigin);
-
-      if (texture) XSetFillStyle(dpy, gc, FillSolid);
-      rd.drawLines(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
+      if (filled | texture) {
+	if (texture) XSetFillStyle(dpy, gc, FillTiled);
+	rd.fillPolygon(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
+		       Nonconvex, CoordModeOrigin);
+	if (texture) XSetFillStyle(dpy, gc, FillSolid);
+      }
+      if (texture || !filled)
+	rd.drawLines(dpy, p_draw, gc, poly, polygon_ptr[i].num_point, 
                    CoordModeOrigin);
     }
   }
