@@ -45,6 +45,7 @@ extern int		dispDepth;
 extern bool		mono;
 extern bool		useErase;
 extern bool		blockBitmaps;
+extern bool		fullColor;
 extern bool		colorSwitch;
 extern bool		multibuffer;
 extern char		color_names[MAX_COLORS][MAX_COLOR_LEN];

@@ -399,7 +399,7 @@ void Paint_frame(void)
 
 void Paint_score_background(int thisLine)
 {
-    if (!blockBitmaps) {
+    if (!fullColor) {
 	XClearWindow(dpy, players);
     } else {
 	int bgh, lh;
@@ -550,7 +550,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool best)
 	|| other->mychar == 'W')
 	&& !mono) {
 
-	if (!blockBitmaps) {
+	if (!fullColor) {
 	    XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
 	} else {
 	    /*

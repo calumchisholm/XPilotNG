@@ -88,7 +88,12 @@ int		dispDepth;
 bool		mono;
 bool		colorSwitch;
 bool		multibuffer;
-bool		blockBitmaps;	/* Whether to draw everything as bitmaps. */
+bool		fullColor;	/* Whether to try using colors as close to
+				 * the specified ones as possible, or just
+				 * use a few standard colors for everything. */
+bool		blockBitmaps; /* Whether to draw bitmaps for some objects.
+			       * Previously this variable determined
+			       * fullColor too. */
 
 #ifndef _WINDOWS
 
@@ -655,8 +660,9 @@ static int Colors_init_block_bitmap_colors(void)
 	/*FALLTHROUGH*/
 
     default:
-	printf("blockBitmaps not implemented for visual \"%s\"\n",
+	printf("fullColor not implemented for visual \"%s\"\n",
 		Visual_class_name(visual->class));
+	fullColor = false;
 	blockBitmaps = false;
 	break;
     }
@@ -672,7 +678,7 @@ static int Colors_init_block_bitmap_colors(void)
 void Colors_init_style_colors(void)
 {
     int i;
-    if (blockBitmaps && RGB) {
+    if (fullColor && RGB) {
         for (i = 0; i < num_polygon_styles; i++)
             polygon_styles[i].color =
                 RGB2COLOR(polygon_styles[i].rgb);
@@ -694,20 +700,22 @@ void Colors_init_style_colors(void)
 int Colors_init_block_bitmaps(void)
 {
     if (dbuf_state->type == COLOR_SWITCH) {
-	if (blockBitmaps) {
+	if (fullColor) {
 	    printf("Can't do blockBitmaps if colorSwitch\n");
+	    fullColor = false;
 	    blockBitmaps = false;
 	}
     }
-    if (blockBitmaps) {
+    if (fullColor) {
 	if (Colors_init_block_bitmap_colors() == -1) {
+	    fullColor = false;
 	    blockBitmaps = false;
 	}
     }
 
     Colors_init_style_colors();
 
-    return (blockBitmaps == true) ? 0 : -1;
+    return (fullColor == true) ? 0 : -1;
 }
 
 
@@ -967,10 +975,8 @@ void Colors_free_block_bitmaps(void)
     Colors_free_color_cube();
     Colors_free_true_color();
 
-    if (blockBitmaps) {
-
-	blockBitmaps = false;
-    }
+    fullColor = false;
+    blockBitmaps = false;
 }
 
 

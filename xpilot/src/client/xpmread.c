@@ -475,7 +475,7 @@ static int xpm_colors_to_pixels(XPM *xpm, enum XPM_key key,
 	    }
 	}
 	else {
-            if (!blockBitmaps) {
+            if (!fullColor) {
                 unsigned	dr, dg, db, dist, mindist = UINT_MAX;
 
                 for (j = 0; j < maxColors; j++) {

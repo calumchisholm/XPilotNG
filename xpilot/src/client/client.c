@@ -1482,6 +1482,12 @@ int Client_setup(void)
         Map_dots();
         Map_restore(0, 0, Setup->x, Setup->y);
         Map_blue(0, 0, Setup->x, Setup->y);
+	/* No one wants this on old-style maps anyway, so turn it off.
+	 * This allows people to turn it on in their .xpilotrc for new maps
+	 * without affecting old ones. It's still possible to turn in on
+	 * from the config menu during play for old maps.
+	 * -- But doesn't seem to work anyway if turned on? Well who cares */
+	CLR_BIT(instruments, SHOW_TEXTURED_WALLS);
     }
 
     RadarHeight = (RadarWidth * Setup->height) / Setup->width;

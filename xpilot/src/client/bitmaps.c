@@ -183,14 +183,14 @@ int Bitmap_create (Drawable d, int img)
 	    pix->state = BMS_ERROR;
 	    return -1;
 	}
-	
+
 	if (pix->height == pix->picture.height &&
 	    pix->width == pix->picture.width) {
 	    Bitmap_picture_copy(pix, j);
 	} else {
 	    Bitmap_picture_scale(pix, j);
 	}
-	
+
 	if (Bitmap_create_end(d) == -1) {
 	    pix->state = BMS_ERROR;
 	    return -1;
@@ -204,7 +204,7 @@ int Bitmap_create (Drawable d, int img)
 
 
 /**
- * Causes all scalable bitmaps to be rescaled (recreated actually) 
+ * Causes all scalable bitmaps to be rescaled (recreated actually)
  * next time needed.
  */
 void Bitmap_update_scale () {
@@ -217,7 +217,7 @@ void Bitmap_update_scale () {
 
     int i;
     for (i = 0; i < num_pixmaps; i++)
-	if (pixmaps[i].state == BMS_READY && pixmaps[i].scalable) 
+	if (pixmaps[i].state == BMS_READY && pixmaps[i].scalable)
 	    pixmaps[i].state = BMS_INITIALIZED;
 }
 
@@ -229,13 +229,12 @@ void Bitmap_update_scale () {
  * state.
  */
 xp_bitmap_t *Bitmap_get (Drawable d, int img, int bmp) {
-    
-    extern int blockBitmaps; /* i don't like this variable at all :( */
-    if (!blockBitmaps || img < 0 || img >= num_pixmaps) return NULL;
+    extern bool fullColor; /* i don't like this variable at all :( */
+    if (!fullColor || img < 0 || img >= num_pixmaps) return NULL;
     if (pixmaps[img].state != BMS_READY) {
 	if (Bitmap_create(d, img) == -1) return NULL;
     }
-    
+
     return &pixmaps[img].bitmaps[bmp];
 }
 
@@ -248,17 +247,17 @@ static int Bitmap_init (int img)
     int j, count;
 
     count = ABS(pixmaps[img].count);
-    
+
     if (!(pixmaps[img].bitmaps = malloc(count * sizeof(xp_bitmap_t)))) {
 	error("not enough memory for bitmaps");
 	pixmaps[img].state = BMS_ERROR;
 	return -1;
     }
-    
+
     for (j = 0; j < count; j++)
 	pixmaps[img].bitmaps[j].bitmap =
 	    pixmaps[img].bitmaps[j].mask = None;
-    
+
     if (Picture_init
 	(&pixmaps[img].picture,
 	 pixmaps[img].filename,
@@ -266,11 +265,11 @@ static int Bitmap_init (int img)
 	pixmaps[img].state = BMS_ERROR;
 	return -1;
     }
-    
+
     pixmaps[img].width = pixmaps[img].picture.width;
     pixmaps[img].height = pixmaps[img].picture.height;
     pixmaps[img].state = BMS_INITIALIZED;
-    
+
     return 0;
 }
 
@@ -392,7 +391,7 @@ static GC maskGC;
 
 /**
  * Allocates and prepares a pixmap for drawing in a platform
- * dependent (UNIX) way. 
+ * dependent (UNIX) way.
  */
 int Bitmap_create_begin (Drawable d, xp_pixmap_t *pm, int bmp)
 {
@@ -472,7 +471,7 @@ void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
  * Purpose: Paint an area r of xp_bitmap bit in a device dependent manner.
  */
 void Bitmap_paint_area(Drawable d, xp_bitmap_t *bit, int x, int y, irec *r)
-{   
+{
     XSetClipOrigin(dpy, gc, x - r->x, y - r->y);
     XSetClipMask(dpy, gc, bit->mask);
     XCopyArea(dpy, bit->bitmap, d, gc, r->x, r->y, r->w, r->h, x, y);

@@ -119,6 +119,7 @@ static int Config_create_outlineWorld(int widget_desc, int *height);
 static int Config_create_filledWorld(int widget_desc, int *height);
 static int Config_create_texturedWalls(int widget_desc, int *height);
 static int Config_create_texturedObjects(int widget_desc, int *height);
+static int Config_create_fullColor(int widget_desc, int *height);
 static int Config_create_slidingRadar(int widget_desc, int *height);
 static int Config_create_showItems(int widget_desc, int *height);
 static int Config_create_showItemsTime(int widget_desc, int *height);
@@ -186,6 +187,7 @@ static int Config_update_charsPerSecond(int widget_desc, void *data, int *val);
 static int Config_update_toggleShield(int widget_desc, void *data, bool *val);
 static int Config_update_autoShield(int widget_desc, void *data, bool *val);
 static int Config_update_maxFPS(int widget_desc, void *data, int *val);
+static int Config_update_fullColor(int widget_desc, void *data, bool *val);
 static int Config_update_texturedObjects(int widget_desc, void *data, bool *val);
 static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val);
 static int Config_close(int widget_desc, void *data, const char **strptr);
@@ -248,6 +250,7 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_outlineWorld,
     Config_create_filledWorld,
     Config_create_texturedWalls,
+    Config_create_fullColor,
     Config_create_texturedObjects,
     Config_create_slidingRadar,
     Config_create_showItems,
@@ -801,6 +804,13 @@ static int Config_create_texturedObjects(int widget_desc, int *height)
 			      NULL);
 }
 
+static int Config_create_fullColor(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "fullColor",
+			      (fullColor) ? true : false,
+			      Config_update_fullColor, NULL);
+}
+
 
 static int Config_create_slidingRadar(int widget_desc, int *height)
 {
@@ -1311,15 +1321,15 @@ static int Config_update_maxFPS(int widget_desc, void *data, int *val)
     return 0;
 }
 
-static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
+static int Config_update_fullColor(int widget_desc, void *data, bool *val)
 {
-    if ((*val != false) != blockBitmaps) {
-	if (blockBitmaps == false) {
-	    /* see if we can use blockBitmaps at all. */
-	    blockBitmaps = true;
+    if ((*val != false) != fullColor) {
+	if (fullColor == false) {
+	    /* see if we can use fullColor at all. */
+	    fullColor = true;
 	    if (Colors_init_block_bitmaps() == -1) {
-		/* no we can't have blockBitmaps. */
-		blockBitmaps = false;
+		/* no we can't have fullColor. */
+		fullColor = false;
 		/* and redraw our widget as false. */
 		*val = false;
 		return 1;
@@ -1327,8 +1337,29 @@ static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
 	}
 	else {
 	    Colors_free_block_bitmaps();
+	    fullColor = false;
 	    blockBitmaps = false;
 	}
+    }
+    return 0;
+}
+
+static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
+{
+    if ((*val != false) != blockBitmaps) {
+	if (blockBitmaps == false) {
+	    /* Can't use blockBitmaps without fullColor */
+	    blockBitmaps = true;
+	    if (!fullColor) {
+		/* no we can't have blockBitmaps. */
+		blockBitmaps = false;
+		/* and redraw our widget as false. */
+		*val = false;
+		return 1;
+	    }
+	}
+	else
+	    blockBitmaps = false;
     }
     return 0;
 }
@@ -1552,6 +1583,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "outlineWorld", BIT(instruments, SHOW_OUTLINE_WORLD));
     Config_save_bool(fp, "filledWorld", BIT(instruments, SHOW_FILLED_WORLD));
     Config_save_bool(fp, "texturedWalls", BIT(instruments, SHOW_TEXTURED_WALLS));
+    Config_save_bool(fp, "fullColor", fullColor);
     Config_save_bool(fp, "texturedObjects", blockBitmaps);
     Config_save_bool(fp, "clock", BIT(instruments, SHOW_CLOCK));
     Config_save_bool(fp, "clockAMPM", BIT(instruments, SHOW_CLOCK_AMPM_FORMAT));

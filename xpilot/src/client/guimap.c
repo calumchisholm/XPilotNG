@@ -1195,7 +1195,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 
     if (BIT(style.flags, STYLE_INVISIBLE)) return;
 
-    textured = BIT(instruments, SHOW_TEXTURED_WALLS) && blockBitmaps;
+    textured = BIT(instruments, SHOW_TEXTURED_WALLS) && fullColor;
     filled = BIT(instruments, SHOW_FILLED_WORLD);
 
     x = xoff * Setup->width;
@@ -1231,7 +1231,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
         } else {
 	notexture:
             XSetFillStyle(dpy, gc, FillSolid);
-            SET_FG(blockBitmaps ? style.color : colors[wallColor].pixel);
+            SET_FG(fullColor ? style.color : colors[wallColor].pixel);
         }
 	did_fill = 1;
 	rd.fillPolygon(dpy, p_draw, gc, points, polygon.num_points,
@@ -1249,7 +1249,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	    XSetLineAttributes(dpy, gc, WINSCALE(width),
 		edge_styles[sindex].style, CapButt, JoinMiter);
 
-	    if (blockBitmaps)
+	    if (fullColor)
 		SET_FG(edge_styles[sindex].color);
 	    else
 		SET_FG(colors[wallColor].pixel);
@@ -1278,7 +1278,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 		XSetLineAttributes(dpy, gc, WINSCALE(width),
 			      edge_styles[sindex].style, CapButt, JoinMiter);
 
-		if (blockBitmaps)
+		if (fullColor)
 		    SET_FG(edge_styles[sindex].color);
 		else
 		    SET_FG(colors[wallColor].pixel);

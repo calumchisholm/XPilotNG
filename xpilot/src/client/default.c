@@ -480,26 +480,28 @@ struct option {
     {
 	"filledWorld",
 	NULL,
-	"No",
+	"Yes",
 	KEY_DUMMY,
-	"Draws the walls solid, filled with one color.\n"
+	"Draws the walls solid, filled with one color,\n"
+	"unless overridden by texture.\n"
 	"Be warned that this option needs fast graphics.\n"
     },
     {
 	"texturedWalls",
 	NULL,
-	"No",
+	"yes",
 	KEY_DUMMY,
-	"Draws the walls filled with a texture pattern.\n"
+	"Allows drawing polygon bitmaps specified by the (new-style) map\n"
 	"See also the wallTextureFile option.\n"
-	"Be warned that this needs a very fast graphics system.\n"
+	"Be warned that this needs a reasonably fast graphics system.\n"
     },
     {
 	"wallTextureFile",
 	NULL,
 	"",
 	KEY_DUMMY,
-	"Specify a XPM format pixmap file to load the wall texture from.\n"
+	"Specify a XPM format pixmap file to load wall texture from.\n"
+	"(this only affects old-style maps, generally useless)\n"
     },
     {
 	"texturePath",
@@ -510,12 +512,22 @@ struct option {
 	"This is a list of one or more directories separated by colons.\n"
     },
     {
+	"fullColor",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Whether to use a colors as close as possible to the specified ones\n"
+	"or use a few standard colors for everything. May require more\n"
+	"resources from your system.\n"
+    },
+    {
 	"texturedObjects",
 	NULL,
 	"No",
 	KEY_DUMMY,
 	"Whether to draw ships, shots and walls with textures.\n"
-	"Be warned that this needs a very fast graphics system.\n"
+	"Be warned that this requires more graphics speed.\n"
+	"fullColor must be on for this to work.\n"
 	"You may also need to enable multibuffering or double-buffering.\n"
     },
     {
@@ -2914,7 +2926,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "reverseScroll", &instruments, SHOW_REVERSE_SCROLL);
     Get_bit_resource(rDB, "showID", &instruments, SHOW_SHIP_ID);
 
+    Get_bool_resource(rDB, "fullColor", &fullColor);
     Get_bool_resource(rDB, "texturedObjects", &blockBitmaps);
+    if (!fullColor)
+	blockBitmaps = 0;
     Get_bool_resource(rDB, "pointerControl", &initialPointerControl);
     Get_bool_resource(rDB, "erase", &useErase);
     Get_float_resource(rDB, "showItemsTime", &showItemsTime);
