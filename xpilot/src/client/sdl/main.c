@@ -4,7 +4,7 @@
 extern void Game_loop(void);
 extern void Options_cleanup(void);
 
-static void Main_shutdown()
+static void Main_shutdown(void)
 {
     Net_cleanup();
     Client_cleanup();

@@ -182,7 +182,7 @@ static void Radar_paint_world_polygons(SDL_Surface *s)
 /*
  * Paints objects (ships, etc.) visible in the radar.
  */
-static void Radar_paint_objects()
+static void Radar_paint_objects(void)
 {
     int	i, x, y, s;
     float fx, fy, sx, sy;

@@ -199,7 +199,7 @@ bool Key_press_toggle_record(void)
     return false;	/* server doesn't need to know */
 }
 
-bool Key_press_toggle_radar_score()
+bool Key_press_toggle_radar_score(void)
 {
     /* TODO */
     return false;
@@ -207,7 +207,7 @@ bool Key_press_toggle_radar_score()
 
 
 #ifndef _WINDOWS
-bool Key_press_msgs_stdout()
+bool Key_press_msgs_stdout(void)
 {
     /* TODO
     if (selectionAndHistory)
