@@ -425,7 +425,7 @@ typedef struct {
 } pl_fuel_t;
 
 typedef struct visibility {
-    int		canSee;
+    bool	canSee;
     long	lastChange;
 } visibility_t;
 

@@ -750,19 +750,22 @@ static inline void Update_visibility(player_t *pl, int ind)
 	player_t *pl_j = Players(j);
 
 	if (pl->forceVisible > 0)
-	    pl_j->visibility[ind].canSee = 1;
+	    pl_j->visibility[ind].canSee = true;
 
 	if (ind == j || !BIT(pl_j->used, HAS_CLOAKING_DEVICE))
-	    pl->visibility[j].canSee = 1;
+	    pl->visibility[j].canSee = true;
 	else if (pl->updateVisibility
 		 || pl_j->updateVisibility
 		 || (int)(rfrac() * UPDATE_RATE)
 		 < ABS(frame_loops - pl->visibility[j].lastChange)) {
 
 	    pl->visibility[j].lastChange = frame_loops;
-	    pl->visibility[j].canSee
-		= (rfrac() * (pl->item[ITEM_SENSOR] + 1))
-		> (rfrac() * (pl_j->item[ITEM_CLOAK] + 1));
+
+	    if ((rfrac() * (pl->item[ITEM_SENSOR] + 1))
+		> (rfrac() * (pl_j->item[ITEM_CLOAK] + 1)))
+		pl->visibility[j].canSee = true;
+	    else
+		pl->visibility[j].canSee = false;
 	}
     }
 }
@@ -855,12 +858,16 @@ static void Update_players(world_t *world)
 	    }
 	}
 
+	/*
+	 * kps - moved here so that visibility would be updated also
+	 * for e.g. waiting players.
+	 */
+	Update_visibility(pl, i);
+
 	if (!Player_is_active(pl))
 	    continue;
 
 	Use_items(pl);
-
-	Update_visibility(pl, i);
 
 	if (BIT(pl->used, HAS_REFUEL))
 	    Do_refuel(pl);
