@@ -2109,8 +2109,6 @@ static void Robot_default_play(player *pl)
 	    }
 	    else if (maxShieldedWallBounceSpeed >
 		    maxUnshieldedWallBounceSpeed
-		&& maxShieldedWallBounceAngle >=
-		    maxUnshieldedWallBounceAngle
 		&& BIT(pl->have, HAS_SHIELD)) {
 		SET_BIT(pl->used, HAS_SHIELD);
 		if (!cloakedShield)

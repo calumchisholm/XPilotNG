@@ -96,8 +96,6 @@ bool		ecmsReprogramRobots;	/* Do ecms reprogram robots? */
 DFLOAT		maxObjectWallBounceSpeed;	/* max object bounce speed */
 DFLOAT		maxShieldedWallBounceSpeed;	/* max shielded bounce speed */
 DFLOAT		maxUnshieldedWallBounceSpeed; /* max unshielded bounce speed */
-DFLOAT		maxShieldedWallBounceAngle;	/* max angle for landing */
-DFLOAT		maxUnshieldedWallBounceAngle;	/* max angle for landing */
 DFLOAT		playerWallBrakeFactor;	/* wall lowers speed if less than 1 */
 DFLOAT		objectWallBrakeFactor;	/* wall lowers speed if less than 1 */
 DFLOAT		objectWallBounceLifeFactor;	/* reduce object life */
@@ -321,17 +319,18 @@ bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
 int		pausedFPS;		/* Limited FPS for pausers */
 int		waitingFPS;		/* Limited FPS for waiters */
 
+bool		teamcup;		/* Is this a teamcup match? */
+char		*teamcupStatServer;	/* Status server to report to */
+int		teamcupStatPort;	/* Port to use on the status server */
+int		teamcupMatchNumber = 0;	/* The number of the match */
 /*
-** Two functions which can be used if an option
-** does not have its own function which should
-** be called after the option value has been
-** changed during runtime.  The tuner_none
-** function should be specified when an option
-** cannot be changed at all during runtime.
-** The tuner_dummy can be specified if it
-** is OK to modify the option during runtime
-** and no follow up action is needed.
-*/
+ * Two functions which can be used if an option does not have its own
+ * function which should be called after the option value has been
+ * changed during runtime.  The tuner_none function should be
+ * specified when an option cannot be changed at all during runtime.
+ * The tuner_dummy can be specified if it is OK to modify the option
+ * during runtime and no follow up action is needed.
+ */
 void tuner_none(void)  {}
 void tuner_dummy(void) {}
 
@@ -1028,7 +1027,7 @@ static option_desc options[] = {
 	"The maximum allowed speed for objects to bounce off walls.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    { /* kps - ng does not want these 2 */
+    {
 	"maxShieldedWallBounceSpeed",
 	"maxShieldedBounceSpeed",
 	"50",
@@ -1046,26 +1045,6 @@ static option_desc options[] = {
 	valReal,
 	Move_init,
 	"Maximum allowed speed for an unshielded player to bounce off walls.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"maxShieldedPlayerWallBounceAngle",
-	"maxShieldedBounceAngle",
-	"90",
-	&maxShieldedWallBounceAngle,
-	valReal,
-	Move_init,
-	"Maximum allowed angle for a shielded player to bounce off walls.\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"maxUnshieldedPlayerWallBounceAngle",
-	"maxUnshieldedBounceAngle",
-	"30",
-	&maxUnshieldedWallBounceAngle,
-	valReal,
-	Move_init,
-	"Maximum allowed angle for an unshielded player to bounce off walls.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3242,7 +3221,7 @@ static option_desc options[] = {
     {
 	"lockOtherTeam",
 	"lockOtherTeam",
-	"true", /* kps - ng wants false */
+	"true",
 	&lockOtherTeam,
 	valBool,
 	tuner_dummy,
@@ -3259,7 +3238,7 @@ static option_desc options[] = {
 	"Destroy item that player drops. Otherwise drop it.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    { /* kps - ng does not want usewreckage, max*siveitems */
+    {
 	"useWreckage",
 	"useWreckage",
 	"true",
@@ -3353,7 +3332,6 @@ static option_desc options[] = {
 	"Whether the server is prevented from being swapped out of memory.\n",
 	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
     },
-    /* kps - what to do about this ? */
     {
 	"timerResolution",
 	"timerResolution",
@@ -3623,9 +3601,8 @@ static bool options_inited = false;
 
 option_desc* Get_option_descs(int *count_ptr)
 {
-    if (options_inited != true) {
+    if (!options_inited)
 	dumpcore("options not initialized");
-    }
 
     *count_ptr = NELEM(options);
     return &options[0];
@@ -3636,29 +3613,24 @@ static void Init_default_options(void)
 {
     option_desc*	desc;
 
-    if ((desc = Find_option_by_name("mapFileName")) == NULL) {
+    if ((desc = Find_option_by_name("mapFileName")) == NULL)
 	dumpcore("Could not find map file option");
-    }
     desc->defaultValue = Conf_default_map();
 
-    if ((desc = Find_option_by_name("motdFileName")) == NULL) {
+    if ((desc = Find_option_by_name("motdFileName")) == NULL)
 	dumpcore("Could not find motd file option");
-    }
     desc->defaultValue = Conf_servermotdfile();
 
-    if ((desc = Find_option_by_name("robotFile")) == NULL) {
+    if ((desc = Find_option_by_name("robotFile")) == NULL)
 	dumpcore("Could not find robot file option");
-    }
     desc->defaultValue = Conf_robotfile();
 
-    if ((desc = Find_option_by_name("defaultsFileName")) == NULL) {
+    if ((desc = Find_option_by_name("defaultsFileName")) == NULL)
 	dumpcore("Could not find defaults file option");
-    }
     desc->defaultValue = Conf_defaults_file_name();
 
-    if ((desc = Find_option_by_name("passwordFileName")) == NULL) {
+    if ((desc = Find_option_by_name("passwordFileName")) == NULL)
 	dumpcore("Could not find password file option");
-    }
     desc->defaultValue = Conf_password_file_name();
 }
 
@@ -3668,16 +3640,14 @@ bool Init_options(void)
     int			i;
     int			option_count = NELEM(options);
 
-    if (options_inited != false) {
+    if (options_inited)
 	dumpcore("Can't init options twice.");
-    }
 
     Init_default_options();
 
     for (i = 0; i < option_count; i++) {
-	if (Option_add_desc(&options[i]) == false) {
+	if (Option_add_desc(&options[i]) == false)
 	    return false;
-	}
     }
 
     options_inited = true;
@@ -3715,9 +3685,7 @@ option_desc* Find_option_by_name(const char* name)
     for (j = 0; j < option_count; j++) {
 	if (!strcasecmp(options[j].commandLineOption, name)
 	    || !strcasecmp(options[j].name, name))
-	{
 	    return(&options[j]);
-	}
     }
     return NULL;
 }
@@ -3787,10 +3755,4 @@ void Timing_setup(void)
     }
 
     install_timer_tick(NULL, timerResolution ? timerResolution : FPS);
-
-#if 0
-    xpprintf(__FILE__ ": gameSpeed         = %f\n", gameSpeed);
-    xpprintf(__FILE__ ": timeStep          = %f\n", timeStep);
-    xpprintf(__FILE__ ": friction          = %f\n", friction);
-#endif
 }
