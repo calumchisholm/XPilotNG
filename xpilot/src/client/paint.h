@@ -73,18 +73,6 @@
  * Global objects.
  */
 
-extern bool roundend;
-extern int killratio_kills;
-extern int killratio_deaths;
-extern int killratio_totalkills;
-extern int killratio_totaldeaths;
-extern int ballstats_cashes;
-extern int ballstats_replaces;
-extern int ballstats_teamcashes;
-extern int ballstats_lostballs;
-extern bool played_this_round;
-extern int rounds_played;
-
 extern ipos	world;
 extern ipos	realWorld;
 
@@ -247,7 +235,7 @@ extern double	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);
 #define	WINSCALE(x)	((x) >= 0 ? scaleArray[(x)] : -scaleArray[-(x)])
-#define	UWINSCALE(x)	(scaleArray[(x)])
+#define	UWINSCALE(x)	((unsigned)(scaleArray[(x)]))
 
 /* macros begin */
 

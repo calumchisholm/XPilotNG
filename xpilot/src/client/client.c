@@ -38,6 +38,7 @@ extern int Init_playing_windows(void);
 extern void Quit(void);
 extern int Startup_server_motd(void);
 extern int Check_view_dimensions(void);
+extern void Reset_shields(void);
 
 char client_version[] = VERSION;
 
@@ -146,7 +147,6 @@ char	modBankStr[NUM_MODBANKS][MAX_CHARS]; /* modifier banks */
 
 int	maxFPS;			/* Maximum FPS player wants from server */
 int	oldMaxFPS;
-int	FPSDivisor = 1; /* default just in case, this is calced from FPS and maxFPS */
 int	clientFPS = 1;	        /* How many fps we actually get */
 time_t	currentTime;	        /* Current value of time() */
 bool	newSecond = false;      /* True if time() incremented this frame */
@@ -240,10 +240,8 @@ int                 num_playing_teams = 0;
 long		    time_left = -1;
 long		    start_loops, end_loops;
 
-#ifndef  _WINDOWS
 /* provide cut&paste and message history */
 static	char		*HistoryBlock = NULL;
-#endif
 bool			selectionAndHistory = false;
 int			maxLinesInHistory;
 
@@ -1022,7 +1020,7 @@ static int init_polymap(void)
 	    bases[i].type = SETUP_BASE_DOWN;
 	else
 	    bases[i].type = SETUP_BASE_RIGHT;
-	bases[i].deathtime = -10000; /* kps hack */
+	bases[i].appeartime = 0;
 	ptr++;
     }
     num_fuels = get_ushort(&ptr);
@@ -1173,7 +1171,7 @@ static int init_blockmap(void)
 	    bases[num_bases].id = -1;
 	    bases[num_bases].team = type % 10;
 	    bases[num_bases].type = type - (type % 10);
-	    bases[num_bases].deathtime = -10000; /* kps hack */
+	    bases[num_bases].appeartime = 0;
 	    num_bases++;
 	    Setup->map_data[i] = type - (type % 10);
 	    break;
@@ -1580,8 +1578,10 @@ int Handle_score_object(double score, int x, int y, char *msg)
     if (msg[0] != '\0') {
 	if (Using_score_decimals())
 	    sprintf(sobj->hud_msg, "%s %.*f", msg, showScoreDecimals, score);
-	else
-	    sprintf(sobj->hud_msg, "%s %d", msg, (int) rint(score));
+	else {
+	    int sc = rint(score);
+	    sprintf(sobj->hud_msg, "%s %d", msg, sc);
+	}
 	sobj->hud_msg_len = strlen(sobj->hud_msg);
 	sobj->hud_msg_width = -1;
     } else
@@ -1590,8 +1590,10 @@ int Handle_score_object(double score, int x, int y, char *msg)
     /* Initialize sobj->msg data (is shown on game area) */
     if (Using_score_decimals())
 	sprintf(sobj->msg, "%.*f", showScoreDecimals, score);
-    else
-	sprintf(sobj->msg, "%d", (int) rint(score));
+    else {
+	int sc = rint(score);
+	sprintf(sobj->msg, "%d", sc);
+    }
     sobj->msg_len = strlen(sobj->msg);
     sobj->msg_width = -1;
 
@@ -1669,9 +1671,9 @@ int Handle_self_items(u_byte *newNumItems)
     return 0;
 }
 
-static void update_status(u_byte status)
+static void update_status(int status)
 {
-    static u_byte old_status = 0;
+    static int old_status = 0;
 
     if (BIT(old_status, GAME_OVER) && !BIT(status, GAME_OVER)
 	&& !BIT(status,PAUSE))
@@ -2164,23 +2166,22 @@ int Handle_vdecor(int x, int y, int xi, int yi, int type)
     return 0;
 }
 
-#ifndef _WINDOWS
 static int Alloc_history(void)
 {
     char	*hist_ptr;
     int		i;
 
     /* maxLinesInHistory is a runtime constant */
-    if ((hist_ptr = (char *)malloc(maxLinesInHistory * MAX_CHARS)) == NULL) {
+    if ((hist_ptr = malloc((size_t)maxLinesInHistory * MAX_CHARS)) == NULL) {
 	error("No memory for history");
 	return -1;
     }
-    HistoryBlock	= hist_ptr;
+    HistoryBlock = hist_ptr;
 
     for (i = 0; i < maxLinesInHistory; i++) {
-	HistoryMsg[i]	= hist_ptr;
-	hist_ptr[0]	= '\0';
-	hist_ptr	+= MAX_CHARS;
+	HistoryMsg[i] = hist_ptr;
+	hist_ptr[0] = '\0';
+	hist_ptr += MAX_CHARS;
     }
     return 0;
 }
@@ -2196,16 +2197,6 @@ static void Free_selectionAndHistory(void)
 	selection.txt = NULL;
     }
 }
-#else
-static int Alloc_history(void)
-{
-    return 0;
-}
-
-static void Free_selectionAndHistory(void)
-{
-}
-#endif
 
 bool Using_score_decimals(void)
 {
@@ -2268,10 +2259,6 @@ int Client_fps_request(void)
 {
     LIMIT(maxFPS, 1, 200);
     oldMaxFPS = maxFPS;
-	if (maxFPS < FPS)
-		FPSDivisor = (int)ceil(((float)FPS)/(float)(maxFPS));
-	else
-		FPSDivisor = 1;
     return Send_fps_request(maxFPS);
 }
 
@@ -2435,10 +2422,6 @@ int Check_client_fps(void)
     if (oldMaxFPS != maxFPS) {
 	LIMIT(maxFPS, 1, 200);
 	oldMaxFPS = maxFPS;
-	if (maxFPS < FPS)
-		FPSDivisor = (int)ceil(((float)FPS)/(float)(maxFPS));
-	else
-		FPSDivisor = 1;
 	return Send_fps_request(maxFPS);
     }
     return 0;

@@ -443,28 +443,15 @@ void Gui_paint_appearing(int x, int y, int id, int count)
 	homebase_t *base = Homebase_by_id(id);
 	/* hack */
 	if (base != NULL)
-	    base->deathtime = loops + count;
+	    base->appeartime = loops + (count * clientFPS) / 120;
     }
 
-#if 1
     SET_FG(colors[RED].pixel);
     rd.fillRectangle(dpy, drawPixmap, gameGC,
 		     SCALEX(x - hsize),
 		     SCALEY(y - hsize + (int)(count / 180. * hsize + 1)),
 		     WINSCALE(2 * hsize + 1),
 		     WINSCALE((int)(count / 180. * hsize + 1)));
-#else
-    SET_FG(colors[RED].pixel);
-    rd.fillRectangle(dpy, drawPixmap, gameGC, SCALEX(x - hsize), SCALEY(y + hsize),
-		     WINSCALE(2 * hsize + 1), WINSCALE(2 * hsize + 1));
-    SET_FG(colors[WHITE].pixel);
-    count = 360 - count;
-    if (count < 0)
-	count = 0;
-    rd.fillRectangle(dpy, drawPixmap, gameGC, SCALEX(x - hsize), SCALEY(y + hsize),
-		     WINSCALE(2 * hsize + 1),
-		     WINSCALE((int)(count / 180. * hsize + 1)));
-#endif
 }
 
 

@@ -292,7 +292,7 @@ void Talk_delete_emphasized_text()
  *
  * Return the number of pasted characters.
  */
-int Talk_paste(char *data, int data_len, bool overwrite)
+int Talk_paste(char *data, size_t data_len, bool overwrite)
 {
 
     int str_len;		/* current length */

@@ -230,9 +230,9 @@ int Net_setup(void)
 {
     int		n,
 		len,
-		size,
 		done = 0,
 		retries;
+    size_t	size;
     long	todo = sizeof(setup_t);
     char	*ptr;
 
@@ -463,7 +463,7 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 int Net_init(char *server, int port)
 {
     int			i;
-    unsigned		size;
+    size_t		size;
     sock_t		sock;
 
     assert(server != NULL);

@@ -867,16 +867,16 @@ int Talk_do_event(XEvent *event)
  *
  * Return the number of pasted characters.
  */
-int Talk_paste(char *data, int data_len, bool overwrite)
+int Talk_paste(char *data, size_t data_len, bool overwrite)
 {
 
-    int str_len;			/* current length */
-    int max_len    = MAX_CHARS - 2;	/* absolute max */
-    int new_len;			/* after pasting */
-    int char_width = XTextWidth(talkFont, talk_str, 1);
-    int max_width  = (TALK_WINDOW_WIDTH - 2*TALK_INSIDE_BORDER - 5);
+    size_t str_len;			/* current length */
+    size_t max_len    = MAX_CHARS - 2;	/* absolute max */
+    size_t new_len;			/* after pasting */
+    size_t char_width = XTextWidth(talkFont, talk_str, 1);
+    size_t max_width  = (TALK_WINDOW_WIDTH - 2*TALK_INSIDE_BORDER - 5);
 
-    int accept_len;			/* for still matching the window */
+    size_t accept_len;			/* for still matching the window */
     char paste_buf[MAX_CHARS -2];	/* gets the XBuffer */
     char tmp_str[MAX_CHARS - 2];
     char talk_backup[MAX_CHARS - 2];	/* no `collision' with data */

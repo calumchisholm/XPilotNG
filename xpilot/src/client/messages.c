@@ -91,7 +91,7 @@ typedef struct {
 } msgnames_t;
 
 /* recursive descent parser for messages */
-static bool Msg_match_fmt(char *msg, const char *fmt, msgnames_t *mn)
+static bool Msg_match_fmt(const char *msg, const char *fmt, msgnames_t *mn)
 {
     char *fp;
     int i;
@@ -176,7 +176,7 @@ static bool Msg_match_fmt(char *msg, const char *fmt, msgnames_t *mn)
  * A total reset is most often done when a new match is starting.
  * If we see a total reset message we clear the statistics.
  */
-static bool Msg_scan_for_total_reset(char *message)
+static bool Msg_scan_for_total_reset(const char *message)
 {
     static char total_reset[] = "Total reset";
 
@@ -197,7 +197,7 @@ static bool Msg_scan_for_total_reset(char *message)
     return false;
 }
 
-static bool Msg_scan_for_replace_treasure(char *message)
+static bool Msg_scan_for_replace_treasure(const char *message)
 {
     msgnames_t mn;
 
@@ -233,7 +233,7 @@ static bool Msg_scan_for_replace_treasure(char *message)
     return false;
 }
 
-static bool Msg_scan_for_ball_destruction(char *message)
+static bool Msg_scan_for_ball_destruction(const char *message)
 {
     msgnames_t mn;
 
@@ -286,7 +286,7 @@ static void Msg_scan_death(int id)
 
     for (i = 0; i < num_bases; i++) {
 	if (bases[i].id == id) {
-	    bases[i].deathtime = end_loops;
+	    bases[i].appeartime = end_loops + 3 * clientFPS;
 	    break;
 	}
     }
@@ -297,6 +297,9 @@ static bool Want_msg_scan(void)
     int i;
     other_t *other;
     int num_playing = 0;
+
+    /* kps fix */
+    return true;
 
     /* if only player on server, let's not bother */
     if (num_others < 2)
@@ -319,14 +322,14 @@ static bool Want_msg_scan(void)
 }
 
 
-static bool Msg_is_game_msg(char *message)
+static bool Msg_is_game_msg(const char *message)
 {
     if (message[strlen(message) - 1] == ']' || strncmp(message, " <", 2) == 0)
 	return false;
     return true;
 }
 
-static void Msg_scan_game_msg(char *message)
+static void Msg_scan_game_msg(const char *message)
 {
     msgnames_t mn;
     char *killer = NULL, *victim = NULL, *victim2 = NULL;
@@ -516,7 +519,7 @@ static void Msg_scan_game_msg(char *message)
  * Checks if the message is in angle brackets, that is,
  * starts with " < " and ends with ">"
  */
-static bool Msg_is_in_angle_brackets(char *message)
+static bool Msg_is_in_angle_brackets(const char *message)
 {
     if (strncmp(message, " < ", 3))
 	return false;
@@ -525,7 +528,7 @@ static bool Msg_is_in_angle_brackets(char *message)
     return true;
 }
 
-static void Msg_scan_angle_bracketed_msg(char *message, bool want_scan)
+static void Msg_scan_angle_bracketed_msg(const char *message, bool want_scan)
 {
     /* let's scan for total reset even if not playing */
     if (Msg_scan_for_total_reset(message))
@@ -539,7 +542,7 @@ static void Msg_scan_angle_bracketed_msg(char *message, bool want_scan)
 }
 
 /* Mara's ball message scan */
-static msg_bms_t Msg_do_bms(char *message, char *bracket)
+static msg_bms_t Msg_do_bms(const char *message)
 {
     static char ball_text1[] = "BALL";
     static char ball_text2[] = "Ball";
@@ -557,20 +560,12 @@ static msg_bms_t Msg_do_bms(char *message, char *bracket)
     static char pop_text2[] = "Pop";
     static char pop_text3[] = "pop";
 
-    /* for safety */
-    if (bracket == NULL)
-	return BmsNone;
-
-    /* We don't want to scan the player name */
-    *bracket = '\0';
-
     /*check safe b4 ball */
     if (strstr(message, safe_text1) ||
 	strstr(message, safe_text2) ||
 	strstr(message, safe_text3) ||
 	strstr(message, safe_text4)) {
 	ball_shout = false;
-	*bracket = '[';
 	return BmsSafe;
     }
 
@@ -578,7 +573,6 @@ static msg_bms_t Msg_do_bms(char *message, char *bracket)
 	strstr(message, cover_text2) ||
 	strstr(message, cover_text3)) {
 	need_cover = true;
-	*bracket = '[';
 	return BmsCover;
     }
 
@@ -586,7 +580,6 @@ static msg_bms_t Msg_do_bms(char *message, char *bracket)
 	strstr(message, pop_text2) ||
 	strstr(message, pop_text3)) {
 	need_cover = false;
-	*bracket = '[';
 	return BmsPop;
     }
 
@@ -596,11 +589,9 @@ static msg_bms_t Msg_do_bms(char *message, char *bracket)
 	strstr(message, ball_text4) ||
 	strstr(message, ball_text5)) {
 	ball_shout = true;
-	*bracket = '[';
 	return BmsBall;
     }
 
-    *bracket = '[';
     return BmsNone;
 }
 
@@ -610,7 +601,7 @@ static msg_bms_t Msg_do_bms(char *message, char *bracket)
  * In 'bracket' we will store info about where the
  * player name starts so the bms does can ignore that.
  */
-static bool Msg_is_from_our_team(char *message, char **bracket)
+static bool Msg_is_from_our_team(const char *message, const char **msg2)
 {
     other_t *other;
     static char buf[MAX_CHARS + 8];
@@ -632,7 +623,8 @@ static bool Msg_is_from_our_team(char *message, char **bracket)
 	if (len < bufstrlen)
 	    continue;
 	if (!strcmp(&message[len - bufstrlen], buf)) {
-	    *bracket = &message[len - bufstrlen];
+	    *msg2 = buf;
+	    strlcpy(buf, message, len - bufstrlen - 1);
 	    return true;
 	}
 
@@ -642,7 +634,8 @@ static bool Msg_is_from_our_team(char *message, char **bracket)
 	if (len < bufstrlen)
 	    continue;
 	if (!strcmp(&message[len - bufstrlen], buf)) {
-	    *bracket = &message[len - bufstrlen];
+	    *msg2 = buf;
+	    strlcpy(buf, message, len - bufstrlen - 1);
 	    return true;
 	}
     }
@@ -651,51 +644,46 @@ static bool Msg_is_from_our_team(char *message, char **bracket)
 
 int Alloc_msgs(void)
 {
-    message_t		*x, *x2 = 0;
+    message_t		*x, *x2 = NULL;
     int			i;
 
-    if ((x = (message_t *)malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL){
+    if ((x = malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL){
 	error("No memory for messages");
 	return -1;
     }
 
-#ifndef _WINDOWS
     if (selectionAndHistory &&
-	((x2 = (message_t *)
-	  malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL)){
+	((x2 = malloc(2 * MAX_MSGS * sizeof(message_t))) == NULL)){
 	error("No memory for history messages");
 	free(x);
 	return -1;
     }
     if (selectionAndHistory)
 	MsgBlock_pending = x2;
-#endif
 
     MsgBlock = x;
 
     for (i = 0; i < 2 * MAX_MSGS; i++) {
 	if (i < MAX_MSGS) {
 	    TalkMsg[i] = x;
-	    IFNWINDOWS( if (selectionAndHistory)
-			TalkMsg_pending[i] = x2 );
+	    if (selectionAndHistory)
+		TalkMsg_pending[i] = x2;
 	} else {
 	    GameMsg[i - MAX_MSGS] = x;
-	    IFNWINDOWS( if (selectionAndHistory)
-			GameMsg_pending[i - MAX_MSGS] = x2 );
+	    if (selectionAndHistory)
+		GameMsg_pending[i - MAX_MSGS] = x2;
 	}
 	x->txt[0] = '\0';
 	x->len = 0;
 	x->lifeTime = 0.0;
 	x++;
 
-#ifndef _WINDOWS
 	if (selectionAndHistory) {
 	    x2->txt[0] = '\0';
 	    x2->len = 0;
 	    x2->lifeTime = 0.0;
 	    x2++;
 	}
-#endif
     }
     return 0;
 }
@@ -706,13 +694,10 @@ void Free_msgs(void)
 	free(MsgBlock);
 	MsgBlock = NULL;
     }
-
-#ifndef _WINDOWS
     if (MsgBlock_pending) {
 	free(MsgBlock_pending);
 	MsgBlock_pending = NULL;
     }
-#endif
 }
 
 
@@ -721,15 +706,13 @@ void Free_msgs(void)
  * however, buffer new messages if there is a pending selection.
  * Add_pending_messages() will be called later in Talk_cut_from_messages().
  */
-void Add_message(char *message)
+void Add_message(const char *message)
 {
     int			i;
     message_t		*msg, **msg_set;
     bool		is_game_msg = false, want_scan = false;
     msg_bms_t		bmsinfo = BmsNone;
-    char		*bracket = NULL;
-
-#ifndef _WINDOWS
+    const char		*msg2;
     bool		is_drawn_talk_message	= false; /* not pending */
     int			last_msg_index;
     bool		show_reverse_scroll	= false;
@@ -752,13 +735,6 @@ void Add_message(char *message)
 	else
 	    msg_set = GameMsg;
     }
-#else
-    is_game_msg = Msg_is_game_msg(message);
-    if (!is_game_msg)
-	msg_set = TalkMsg;
-    else
-	msg_set = GameMsg;
-#endif
 
     want_scan = Want_msg_scan();
     if (is_game_msg && want_scan)
@@ -771,10 +747,9 @@ void Add_message(char *message)
 	     && !is_game_msg
 	     && BIT(Setup->mode, TEAM_PLAY)
 	     && want_scan
-	     && Msg_is_from_our_team(message, &bracket))
-	bmsinfo = Msg_do_bms(message, bracket);
+	     && Msg_is_from_our_team(message, &msg2))
+	bmsinfo = Msg_do_bms(msg2);
 
-#ifndef _WINDOWS
     if (selectionAndHistory && is_drawn_talk_message) {
 	/* how many talk messages */
         last_msg_index = 0;
@@ -806,7 +781,6 @@ void Add_message(char *message)
 	    }
 	} /* talk window emphasized */
     } /* talk messages */
-#endif
 
     msg = msg_set[maxMessages - 1];
     for (i = maxMessages - 1; i > 0; i--)
@@ -818,7 +792,6 @@ void Add_message(char *message)
     msg->len = strlen(message);
     msg->bmsinfo = bmsinfo;
 
-#ifndef _WINDOWS
     /*
      * scroll also the emphasizing
      */
@@ -849,7 +822,6 @@ void Add_message(char *message)
 	    }
 	}
     }
-#endif
 
     /* Print messages to standard output.
      */
@@ -860,8 +832,6 @@ void Add_message(char *message)
 	xpprintf("%s\n", message);
 }
 
-
-#ifndef _WINDOWS
 /*
  * clear the buffer for the pending messages
  */
@@ -907,4 +877,3 @@ void Add_pending_messages(void)
     }
     Delete_pending_messages();
 }
-#endif

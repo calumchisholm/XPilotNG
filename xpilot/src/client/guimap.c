@@ -238,8 +238,8 @@ void Gui_paint_fuel(int x, int y, double fuel)
 	rd.fillRectangle(dpy, drawPixmap, gameGC,
 			 SCALEX(x + FUEL_BORDER),
 			 SCALEY(y + FUEL_BORDER + size),
-			 WINSCALE(BLOCK_SZ - 2*FUEL_BORDER + 1),
-			 WINSCALE(size + 1));
+			 (unsigned)WINSCALE(BLOCK_SZ - 2*FUEL_BORDER + 1),
+			 (unsigned)WINSCALE(size + 1));
 
 	/* Draw F in fuel cells */
 	XSetFunction(dpy, gameGC, GXxor);
@@ -326,17 +326,13 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	 * the red "meter" basewarning on old servers.
 	 */
 	if (version >= 0x4F12) {
-	    /*
-	     * Since this is the next (displayed) frame add FPSDivisor
-	     */
-	    if (loops <= base->deathtime + FPSDivisor)
+	    if (loops <= base->appeartime)
 		do_basewarning = true;
 	} else {
-	    if (base->deathtime > loops - 3 * clientFPS) {
+	    if (loops <= base->appeartime) {
 		do_basewarning = true;
 		if (baseWarningType & 1) {
-		    int count = (360
-				 * (base->deathtime + 3 * clientFPS - loops))
+		    int count = (360 * (base->appeartime - loops))
 			/ (3 * clientFPS);
 		    LIMIT(count, 0, 360);
 		    /* red box basewarning */
@@ -497,7 +493,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
     }
     /* Extra base info */
     if (size2)
-	rd.drawString(dpy, drawPixmap, gameGC, x, y, info, strlen(info));
+	rd.drawString(dpy, drawPixmap, gameGC, x, y, info, (int)strlen(info));
 }
 
 
@@ -1120,8 +1116,8 @@ void Gui_paint_setup_target(int x, int y, int team, double damage, bool own)
     rd.drawRectangle(dpy, drawPixmap, gameGC,
 		     WINSCALE(X(x+(BLOCK_SZ+2)/4)),
 		     WINSCALE(Y(y+3*BLOCK_SZ/4)),
-		     WINSCALE(BLOCK_SZ/2),
-		     WINSCALE(BLOCK_SZ/2));
+		     UWINSCALE(BLOCK_SZ/2),
+		     UWINSCALE(BLOCK_SZ/2));
 
     if (BIT(Setup->mode, TEAM_PLAY)) {
 	s[0] = '0' + team; s[1] = '\0';
@@ -1280,7 +1276,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 		width = 0;
             width = WINSCALE(width);
             if (width == 1) width = 0; 
-	    XSetLineAttributes(dpy, gameGC, width,
+	    XSetLineAttributes(dpy, gameGC, (unsigned)width,
 		edge_styles[sindex].style, CapButt, JoinMiter);
 
 	    if (fullColor)
@@ -1311,7 +1307,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 		    width = 0;
                 width = WINSCALE(width);
                 if (width == 1) width = 0;
-		XSetLineAttributes(dpy, gameGC, width,
+		XSetLineAttributes(dpy, gameGC, (unsigned)width,
 			      edge_styles[sindex].style, CapButt, JoinMiter);
 
 		if (fullColor)

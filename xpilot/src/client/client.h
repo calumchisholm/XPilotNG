@@ -201,7 +201,7 @@ typedef struct {
     uint16_t	team;		/* Team this base belongs to */
     irec	bounds;		/* Location on map */
     int		type;		/* orientation */
-    long	deathtime;	/* For base warning */
+    long	appeartime;	/* For base warning */
 } homebase_t;
 
 typedef struct {
@@ -396,8 +396,8 @@ typedef struct {
         int     y2;
     } draw;
     char	*txt;   /* allocated when needed */
-    int		txt_size;	/* size of txt buffer */
-    int		len;
+    size_t	txt_size;	/* size of txt buffer */
+    size_t	len;
     /* when a message `jumps' from talk window to the player messages: */
     bool	keep_emphasizing;
 } selection_t;
@@ -531,7 +531,6 @@ extern bool	initialPointerControl;	/* Start by using mouse for control? */
 extern bool	pointerControl;		/* current state of mouse ship flying */
 extern int	maxFPS;			/* Client's own FPS */
 extern int 	oldMaxFPS;
-extern int 	FPSDivisor;
 extern int	clientFPS;	        /* How many fps we actually get */
 extern time_t	currentTime;	        /* Current value of time() */
 extern bool	newSecond;              /* True if time() incremented this frame */
@@ -623,10 +622,22 @@ extern bool	        need_cover;
 extern long		start_loops, end_loops;
 extern long		time_left;
 
+extern bool roundend;
+extern int killratio_kills;
+extern int killratio_deaths;
+extern int killratio_totalkills;
+extern int killratio_totaldeaths;
+extern int ballstats_cashes;
+extern int ballstats_replaces;
+extern int ballstats_teamcashes;
+extern int ballstats_lostballs;
+extern bool played_this_round;
+extern int rounds_played;
+
 
 int Alloc_msgs(void);
 void Free_msgs(void);
-void Add_message(char *message);
+void Add_message(const char *message);
 void Add_pending_messages(void);
 double Fuel_by_pos(int x, int y);
 int Target_alive(int x, int y, double *damage);
