@@ -25,7 +25,7 @@ AC_PATH_X
 AC_PATH_XTRA
 
 dnl  Checks for header files.
-AC_HEADER_STDC
+dnl AC_HEADER_STDC
 AC_HEADER_TIME
 dnl AC_HEADER_STDBOOL
 AC_CHECK_HEADERS([arpa/inet.h \
@@ -34,7 +34,6 @@ AC_CHECK_HEADERS([arpa/inet.h \
 	fcntl.h \
 	float.h \
 	limits.h \
-	memory.h \
 	net/if.h \
 	netdb.h \
 	netinet/in.h \
@@ -42,9 +41,6 @@ AC_CHECK_HEADERS([arpa/inet.h \
 	pwd.h \
 	resolv.h \
 	setjmp.h \
-	stdint.h \
-	stdlib.h \
-	string.h \
 	sys/file.h \
 	sys/filio.h \
 	sys/fcntl.h \
@@ -53,8 +49,6 @@ AC_CHECK_HEADERS([arpa/inet.h \
 	sys/param.h \
 	sys/socket.h \
 	sys/sockio.h \
-	sys/time.h \
-	unistd.h \
 	values.h \
 	])
 

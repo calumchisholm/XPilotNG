@@ -54,7 +54,6 @@
 #   endif
 #  endif
 #  ifndef __hpux
-#   define HAVE_SYS_TIME_H 1
 #   define TIME_WITH_SYS_TIME 1
 #  endif
 #  ifdef __linux__
@@ -82,38 +81,70 @@
 # endif /* _WINDOWS */
 #endif
 
+#include <stdio.h>
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+#endif
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+
 #ifdef STDC_HEADERS
-# include <stdio.h>
 # include <assert.h>
 # include <ctype.h>
 # include <errno.h>
 # include <math.h>
 # include <signal.h>
+#endif
+
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
 # include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
 #endif
 
 #ifdef HAVE_SETJMP_H
 # include <setjmp.h>
 #endif
 
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
-
 #ifdef HAVE_LIMITS_H
 # include <limits.h>
 #endif
 
-#ifdef HAVE_STRING_H
-# include <string.h>
-#endif
-
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>
-#endif
-
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
 #endif
 
 #ifdef HAVE_PWD_H
@@ -138,26 +169,6 @@
 
 #ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
-#endif
-
-#ifdef HAVE_SYS_STAT_H
-# include <sys/stat.h>
-#endif
-
-#if defined(HAVE_SYS_TIME_H) && defined(TIME_WITH_SYS_TIME)
-# include <sys/time.h>
-#endif
-
-#ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-
-#ifdef HAVE_STDINT_H
-# include <stdint.h>
-#endif
-
-#ifdef HAVE_INTTYPES_H
-# include <inttypes.h>
 #endif
 
 #ifdef HAVE_SYS_INTTYPES_H
