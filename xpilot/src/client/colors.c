@@ -59,7 +59,6 @@ static const char	*gray_defaults[MAX_COLORS] = {
 char		visualName[MAX_VISUAL_NAME];
 Visual		*visual;
 int		dispDepth;
-bool		mono;
 bool		colorSwitch;
 bool		multibuffer;
 bool		fullColor;	/* Whether to try using colors as close to
@@ -329,39 +328,27 @@ static int Parse_colors(Colormap cmap)
     /*
      * Get the color definitions.
      */
-    if (mono == true) {
-	colors[0].red = colors[0].green = colors[0].blue = 0;
-	colors[0].flags = DoRed | DoGreen | DoBlue;
-	colors[1].red = colors[1].green = colors[1].blue = 0xFFFF;
-	colors[1].flags = DoRed | DoGreen | DoBlue;
-	colors[2] = colors[1];
-	colors[3] = colors[1];
-	return 0;
-    }
 
-    if (visual->class == StaticGray || visual->class == GrayScale) {
+    if (visual->class == StaticGray || visual->class == GrayScale)
 	def = &gray_defaults[0];
-    } else {
+    else
 	def = &color_defaults[0];
-    }
+
     for (i = 0; i < maxColors; i++) {
 	if (color_names[i][0] != '\0') {
-	    if (XParseColor(dpy, cmap, color_names[i], &colors[i])) {
+	    if (XParseColor(dpy, cmap, color_names[i], &colors[i]))
 		continue;
-	    }
 	    printf("Can't parse color %d \"%s\"\n", i, color_names[i]);
 	}
 	if (def[i] != NULL && def[i][0] != '\0') {
-	    if (XParseColor(dpy, cmap, def[i], &colors[i])) {
+	    if (XParseColor(dpy, cmap, def[i], &colors[i]))
 		continue;
-	    }
 	    printf("Can't parse default color %d \"%s\"\n", i, def[i]);
 	}
-	if (i < NUM_COLORS) {
+	if (i < NUM_COLORS)
 	    return -1;
-	} else {
+	else
 	    colors[i] = colors[i % NUM_COLORS];
-	}
     }
     return 0;
 }
@@ -441,17 +428,10 @@ int Colors_init(void)
 	visual->class == TrueColor) {
 	colorSwitch = false;
     }
-    if (visual->map_entries < 16) {
+    if (visual->map_entries < 16)
 	colorSwitch = false;
-	if (visual->map_entries < 4) {
-	    mono = true;
-	}
-    }
-    if (mono == true) {
-	colorSwitch = false;
-	maxColors = 4;
-    }
-    else if (colorSwitch == true) {
+
+    if (colorSwitch == true) {
 	maxColors = (maxColors >= 16 && visual->map_entries >= 256) ? 16
 	    : (maxColors >= 8 && visual->map_entries >= 64) ? 8
 	    : 4;
@@ -461,8 +441,7 @@ int Colors_init(void)
 	    : (maxColors >= 8 && visual->map_entries >= 8) ? 8
 	    : 4;
     }
-    num_planes = (mono == true) ? 1
-	: (maxColors == 16) ? 4
+    num_planes = (maxColors == 16) ? 4
 	: (maxColors == 8) ? 3
 	: 2;
 
@@ -688,19 +667,6 @@ int Colors_init_block_bitmaps(void)
 	    texturedObjects = false;
 	}
     }
-
-#if 0
-    /* kps - remove this in ng */
-    if (texturedObjects) {
-	if (Block_bitmaps_create() == -1) {
-	    /*
-	    ** not sure if this is possible after
-	    ** blockbitmap colors have been created.
-	    */
-	    texturedObjects = false;
-	}
-    } 
-#endif
 
     Colors_init_style_colors();
 

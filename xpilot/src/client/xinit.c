@@ -571,18 +571,18 @@ int Init_top(void)
 #undef OPTIONCHECK
 
     shieldDrawMode = shieldDrawMode ? LineSolid : LineOnOffDash;
-    radarDrawRectanglePtr = (mono ? XDrawRectangle : XFillRectangle);
+    radarDrawRectanglePtr = XFillRectangle;
 
     /*
      * Get toplevel geometry.
      */
 #ifndef _WINDOWS
     top_flags = 0;
-    if (geometry != NULL && geometry[0] != '\0') {
+    if (geometry != NULL && geometry[0] != '\0')
 	mask = XParseGeometry(geometry, &x, &y, &w, &h);
-    } else {
+    else
 	mask = 0;
-    }
+
     if ((mask & WidthValue) != 0) {
 	top_width = w;
 	top_flags |= USSize;
@@ -600,22 +600,20 @@ int Init_top(void)
     }
     LIMIT(top_height, MIN_TOP_HEIGHT, MAX_TOP_HEIGHT);
     if ((mask & XValue) != 0) {
-	if ((mask & XNegative) != 0) {
+	if ((mask & XNegative) != 0)
 	    top_x = DisplayWidth(dpy, DefaultScreen(dpy)) - top_width + x;
-	} else {
+	else
 	    top_x = x;
-	}
 	top_flags |= USPosition;
     } else {
 	top_x = (DisplayWidth(dpy, DefaultScreen(dpy)) - top_width) /2;
 	top_flags |= PPosition;
     }
     if ((mask & YValue) != 0) {
-	if ((mask & YNegative) != 0) {
+	if ((mask & YNegative) != 0)
 	    top_y = DisplayHeight(dpy, DefaultScreen(dpy)) - top_height + y;
-	} else {
+	else
 	    top_y = y;
-	}
 	top_flags |= USPosition;
     } else {
 	top_y = (DisplayHeight(dpy, DefaultScreen(dpy)) - top_height) /2;
@@ -757,17 +755,10 @@ int Init_top(void)
 	      BlackPixel(dpy, DefaultScreen(dpy)),
 	      GXcopy, AllPlanes);
 
-    if (dbuf_state->type == COLOR_SWITCH) {
+    if (dbuf_state->type == COLOR_SWITCH)
 	XSetPlaneMask(dpy, gc, dbuf_state->drawing_planes);
-    }
 
 #endif
-
-    if (mono) {
-	buttonColor = BLACK;
-	windowColor = BLACK;
-	borderColor = WHITE;
-    }
 
     return 0;
 }

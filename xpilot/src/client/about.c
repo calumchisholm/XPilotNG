@@ -369,15 +369,14 @@ void Expose_button_window(int color, Window w)
 	return;
     }
 
-    if (mono == false) {
-	XWindowAttributes	wattr;			/* Get window height */
+    {
+	XWindowAttributes	wattr;		/* Get window height */
 	XGetWindowAttributes(dpy, w, &wattr);	/* and width */
 
 	XSetForeground(dpy, buttonGC, colors[color].pixel);
 	XFillRectangle(dpy, w, buttonGC, 0, 0, wattr.width, wattr.height);
 	XSetForeground(dpy, buttonGC, colors[WHITE].pixel);
-    } else
-	XClearWindow(dpy, w);
+    }
 
     if (w == about_close_b)
 	ShadowDrawString(dpy, w, buttonGC,

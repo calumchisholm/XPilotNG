@@ -1382,9 +1382,6 @@ See the keyToggleRecord option for how to make recordings.
 Specifies which visual to use.  You can see which visuals your
 display supports by running: xpilot -visual list.
 .TP 12
-.B mono
-Turns on mono display type.
-.TP 12
 .B colorSwitch <true/false>
 Tells xpilot to use a color switching display technique or not.
 Default is true if your display hardware has enough colors available.

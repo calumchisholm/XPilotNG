@@ -728,13 +728,6 @@ option options[] = {
 	"set the argument for this option to list.\n"
     },
     {
-	"mono",
-	"Yes",
-	"",
-	KEY_DUMMY,
-	"Only use black and white (may be very slow).\n"
-    },
-    {
 	"erase",
 	"Yes",
 	"",
@@ -3153,8 +3146,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_resource(rDB, "modifierBank4", modBankStr[3], sizeof modBankStr[3]);
 
     Get_resource(rDB, "visual", visualName, sizeof visualName);
-    Get_bool_resource(rDB, "mono", &i);
-    mono = (i != 0) ? true : false;
     Get_bool_resource(rDB, "colorSwitch", &i);
     colorSwitch = (i != 0) ? true : false;
     Get_bool_resource(rDB, "multibuffer", &i);

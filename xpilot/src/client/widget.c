@@ -320,44 +320,24 @@ static void Widget_draw_button(widget_t *widget, bool inverse, const char *label
     int			x, y;
     unsigned long	fg, bg;
 
-    if (mono) {
-	if (inverse) {
-	    fg = colors[BLACK].pixel;
-	    bg = colors[WHITE].pixel;
-	} else {
-	    fg = colors[WHITE].pixel;
-	    bg = colors[BLACK].pixel;
-	}
+    if (inverse) {
+	fg = colors[buttonColor].pixel;
+	bg = colors[BLACK].pixel;
     } else {
-	if (inverse) {
-	    fg = colors[buttonColor].pixel;
-	    bg = colors[BLACK].pixel;
-	} else {
-	    fg = colors[BLACK].pixel;
-	    bg = colors[buttonColor].pixel;
-	}
+	fg = colors[BLACK].pixel;
+	bg = colors[buttonColor].pixel;
     }
     XSetForeground(dpy, buttonGC, bg);
     XFillRectangle(dpy, widget->window, buttonGC,
 		   0, 0, widget->width, widget->height);
     XSetForeground(dpy, buttonGC, colors[buttonColor].pixel);
 
-    if (mono) {
-	if (inverse) {
-	    fg = colors[BLACK].pixel;
-	    bg = colors[WHITE].pixel;
-	} else {
-	    fg = colors[WHITE].pixel;
-	    bg = colors[BLACK].pixel;
-	}
+    if (inverse) {
+	fg = colors[WHITE].pixel;
+	bg = colors[BLACK].pixel;
     } else {
-	if (inverse) {
-	    fg = colors[WHITE].pixel;
-	    bg = colors[BLACK].pixel;
-	} else {
-	    fg = colors[WHITE].pixel;
-	    bg = colors[BLACK].pixel;
-	}
+	fg = colors[WHITE].pixel;
+	bg = colors[BLACK].pixel;
     }
     y = (widget->height - (buttonFont->ascent + buttonFont->descent)) / 2;
     x = (widget->width - XTextWidth(buttonFont, label, strlen(label))) / 2;
@@ -537,21 +517,14 @@ static void Widget_viewer_draw_lines(widget_t *widget, int start, int end)
 			y = 20 + viewerw->font->ascent + start * text_height;
 
     for (i = start; i < end; i++) {
-	if (!mono) {
-	    XSetForeground(dpy, motdGC, colors[BLACK].pixel);
-	    XDrawString(dpy, widget->window, motdGC,
-			x+1, y+1,
-			(char *) viewerw->line[i].txt, viewerw->line[i].len);
-	    XSetForeground(dpy, motdGC, colors[WHITE].pixel);
-	    XDrawString(dpy, widget->window, motdGC,
-			x-1, y-1,
-			(char *) viewerw->line[i].txt, viewerw->line[i].len);
-	}
-	else {
-	    XDrawString(dpy, widget->window, motdGC,
-			x, y,
-			(char *) viewerw->line[i].txt, viewerw->line[i].len);
-	}
+	XSetForeground(dpy, motdGC, colors[BLACK].pixel);
+	XDrawString(dpy, widget->window, motdGC,
+		    x+1, y+1,
+		    (char *) viewerw->line[i].txt, viewerw->line[i].len);
+	XSetForeground(dpy, motdGC, colors[WHITE].pixel);
+	XDrawString(dpy, widget->window, motdGC,
+		    x-1, y-1,
+		    (char *) viewerw->line[i].txt, viewerw->line[i].len);
 	y += text_height;
     }
     XSetForeground(dpy, motdGC, colors[WHITE].pixel);

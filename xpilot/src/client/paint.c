@@ -509,7 +509,7 @@ void Paint_score_entry(int entry_num,
 {
     static char		raceStr[8], teamStr[4], lifeStr[8], label[MSG_LEN];
     static int		lineSpacing = -1, firstLine;
-    int			thisLine;
+    int			thisLine, color;
     char		scoreStr[16];
 
     /*
@@ -586,44 +586,36 @@ void Paint_score_entry(int entry_num,
      * Draw the line
      * e94_msu eKthHacks
      */
-    if (mono)
-	ShadowDrawString(dpy, players, scoreListGC, SCORE_BORDER, thisLine,
-			 label, colors[scoreColor].pixel, colors[BLACK].pixel);
-    else {
-	int color;
+    if (!is_team && strchr("DPW", other->mychar)) {
+	if (other->id == self->id)
+	    color = scoreInactiveSelfColor;
+	else
+	    color = scoreInactiveColor;
 
-	if (!is_team && strchr("DPW", other->mychar)) {
+	XSetForeground(dpy, scoreListGC, colors[color].pixel);
+	XDrawString(dpy, players, scoreListGC,
+		    SCORE_BORDER, thisLine,
+		    label, strlen(label));
+    } else {
+	if (!is_team) {
 	    if (other->id == self->id)
-		color = scoreInactiveSelfColor;
+		color = scoreSelfColor;
 	    else
-		color = scoreInactiveColor;
-
-	    XSetForeground(dpy, scoreListGC, colors[color].pixel);
-	    XDrawString(dpy, players, scoreListGC,
-			SCORE_BORDER, thisLine,
-			label, strlen(label));
+		color = scoreColor;
 	} else {
-	    if (!is_team) {
-		if (other->id == self->id)
-		    color = scoreSelfColor;
+	    color = Team_color(other->team);
+	    if (!color) {
+		if (other->team == self->team)
+		    color = scoreOwnTeamColor;
 		else
-		    color = scoreColor;
-	    } else {
-		color = Team_color(other->team);
-
-		if (!color) {
-		    if (other->team == self->team)
-			color = scoreOwnTeamColor;
-		    else
-			color = scoreEnemyTeamColor;
-		}
+		    color = scoreEnemyTeamColor;
 	    }
-
-	    ShadowDrawString(dpy, players, scoreListGC, SCORE_BORDER,
-			     thisLine, label,
-			     colors[color].pixel,
-			     colors[BLACK].pixel);
 	}
+
+	ShadowDrawString(dpy, players, scoreListGC, SCORE_BORDER,
+			 thisLine, label,
+			 colors[color].pixel,
+			 colors[BLACK].pixel);
     }
 
     /*
@@ -707,11 +699,9 @@ void ShadowDrawString(Display* dpy, Window w, GC gc,
 		      int x, int y, const char* str,
 		      unsigned long fg, unsigned long bg)
 {
-    if (!mono) {
-	XSetForeground(dpy, gc, bg);
-	XDrawString(dpy, w, gc, x+1, y+1, str, strlen(str));
-	x--; y--;
-    }
+    XSetForeground(dpy, gc, bg);
+    XDrawString(dpy, w, gc, x+1, y+1, str, strlen(str));
+    x--; y--;
     XSetForeground(dpy, gc, fg);
     XDrawString(dpy, w, gc, x, y, str, strlen(str));
 }

@@ -531,24 +531,16 @@ static XImage *xpm_convert_to_image(XPM *xpm)
     enum XPM_key	key;
     unsigned long	pixels[256];
 
-    if (mono) {
-	key = XPM_m;
-    }
-    else if (visual->class == GrayScale) {
-	if (maxColors == 4) {
+    if (visual->class == GrayScale) {
+	if (maxColors == 4)
 	    key = XPM_g4;
-	}
-	else {
+	else
 	    key = XPM_g;
-	}
-    }
-    else {
+    } else
 	key = XPM_c;
-    }
 
-    if (xpm_colors_to_pixels(xpm, key, pixels)) {
+    if (xpm_colors_to_pixels(xpm, key, pixels))
 	return NULL;
-    }
 
     img = XCreateImage(dpy, visual, dispDepth, ZPixmap,
 		       0, NULL, xpm->width, xpm->height,
@@ -645,20 +637,13 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
     memset(&xpm, 0, sizeof(xpm));
     if (xpm_read_xpm_from_file(filename, &xpm)) return false;
 
-    if (mono) {
-        key = XPM_m;
-    }
-    else if (visual->class == GrayScale) {
-        if (maxColors == 4) {
+    if (visual->class == GrayScale) {
+        if (maxColors == 4)
             key = XPM_g4;
-        }
-        else {
+        else
             key = XPM_g;
-        }
-    }
-    else {
+    } else
         key = XPM_c;
-    }
 
     for (i = 0; i < xpm.ncolors; i++) {
 	memset(&xcolor, 0, sizeof(xcolor));
