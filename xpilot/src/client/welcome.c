@@ -71,7 +71,7 @@ char welcome_version[] = VERSION;
 #define NUM_METAS		2
 #define META_HOST		"meta.xpilot.org"
 #define META_HOST_TWO		"meta2.xpilot.org"
-#define META_IP			"129.242.16.151"
+#define META_IP			"129.242.13.151"
 #define META_IP_TWO		"132.235.197.27"
 #define META_PROG_PORT		4401
 #define NUM_META_DATA_FIELDS	18
