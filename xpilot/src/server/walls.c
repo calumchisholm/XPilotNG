@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -86,10 +86,10 @@ static void Turn_player_new(int ind);
 /* start */
 
 /* Maximum line length 32767-B_CLICKS, 30000 used in checks
-   There's a minimum map size to avoid "too much wrapping". A bit smaller
-   than that would cause rare errors for fast-moving things. I haven't
-   bothered to figure out what the limit is. 80k x 80k clicks should
-   be more than enough (probably...). */
+ * There's a minimum map size to avoid "too much wrapping". A bit smaller
+ * than that would cause rare errors for fast-moving things. I haven't
+ * bothered to figure out what the limit is. 80k x 80k clicks should
+ * be more than enough (probably...). */
 #define B_SHIFT 11
 #define B_CLICKS (1 << B_SHIFT)
 #define B_MASK (B_CLICKS - 1)
@@ -97,7 +97,7 @@ static void Turn_player_new(int ind);
 #define MAX_MOVE 32000
 #define SEPARATION_DIST 64
 /* This must be increased if the ship corners are allowed to go farther
-   when turning! */
+ * when turning! */
 #define MAX_SHAPE_OFFSET (15 * CLICK)
 
 #if ((-3) / 2 != -1) || ((-3) % 2 != -1)
@@ -1325,7 +1325,7 @@ static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 	    bigger = prod > 0;
 	    ey = LINEY(mdx, mdy, mbase, end);
 	    if ( ABS(prod) >= ldx
-		 && ABS( (prod = (end - lsx) * ldy - (ey - lsy) * ldx) ) 
+		 && ABS( (prod = (end - lsx) * ldy - (ey - lsy) * ldx) )
 		 >= ldx && prod > 0 == bigger)
 		continue;
 	    {
@@ -1461,6 +1461,7 @@ static void Move_point(const struct move *move, struct collans *answer)
 
     return;
 }
+
 /* Do not call this with no movement. */
 /* May not be called with point already on top of line.
    maybe I should change that to allow lines which could be
@@ -1593,29 +1594,32 @@ static void Shape_move(const struct move *move, const shipobj *shape,
     return;
 }
 
-static int Shape_turn1(const shipobj *shape, struct move *move, int x, int y,
-		       int dir, int sign)
+
+static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
+		       int dir2, int hitmask, const object *obj, int x, int y)
 {
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
     unsigned short *points;
-    int newdir = MOD2(dir + sign, RES);
+    struct move mv;
 
-    for (i = 0; i < shape->num_points; i++) {
-	move->start.cx = x + shape->pts[i][dir].cx;
-	move->start.cy = y + shape->pts[i][dir].cy;
-	move->delta.cx = x + shape->pts[i][newdir].cx - move->start.cx;
-	move->delta.cy = y + shape->pts[i][newdir].cy - move->start.cy;
-	move->start.cx = WRAP_XCLICK(move->start.cx);
-	move->start.cy = WRAP_YCLICK(move->start.cy);
-	while (move->delta.cx || move->delta.cy) {
-	    Move_point(move, &answer);
+    mv.hit_mask = hitmask;
+    mv.obj = (object *)obj;
+    for (i = 0; i < shape1->num_points; i++) {
+	mv.start.cx = x + shape1->pts[i][dir1].cx;
+	mv.start.cy = y + shape1->pts[i][dir1].cy;
+	mv.delta.cx = x + shape2->pts[i][dir2].cx - mv.start.cx;
+	mv.delta.cy = y + shape2->pts[i][dir2].cy - mv.start.cy;
+	mv.start.cx = WRAP_XCLICK(mv.start.cx);
+	mv.start.cy = WRAP_YCLICK(mv.start.cy);
+	while (mv.delta.cx || mv.delta.cy) {
+	    Move_point(&mv, &answer);
 	    if (answer.line != -1)
-		return 0;
-	    move->start.cx = WRAP_XCLICK(move->start.cx + answer.moved.cx);
-	    move->start.cy = WRAP_YCLICK(move->start.cy + answer.moved.cy);
-	    move->delta.cx -= answer.moved.cx;
-	    move->delta.cy -= answer.moved.cy;
+		return linet[answer.line].group;
+	    mv.start.cx = WRAP_XCLICK(mv.start.cx + answer.moved.cx);
+	    mv.start.cy = WRAP_YCLICK(mv.start.cy + answer.moved.cy);
+	    mv.delta.cx -= answer.moved.cx;
+	    mv.delta.cy -= answer.moved.cy;
 	}
     }
 
@@ -1624,20 +1628,20 @@ static int Shape_turn1(const shipobj *shape, struct move *move, int x, int y,
     while ( (p = *points++) != 65535) {
 	if (linet[p].group
 	    /*&& (groups[linet[p].group].hit_mask & hitmask))*/
-	    && (!can_hit(&groups[linet[p].group], move)))
+	    && (!can_hit(&groups[linet[p].group], &mv)))
 	    continue;
 	xp = CENTER_XCLICK(linet[p].start.cx - x);
 	yp = CENTER_YCLICK(linet[p].start.cy - y);
-	xo1 = shape->pts[shape->num_points - 1][dir].cx - xp;
-	yo1 = shape->pts[shape->num_points - 1][dir].cy - yp;
-	xn1 = shape->pts[shape->num_points - 1][newdir].cx - xp;
-	yn1 = shape->pts[shape->num_points - 1][newdir].cy - yp;
+	xo1 = shape1->pts[shape1->num_points - 1][dir1].cx - xp;
+	yo1 = shape1->pts[shape1->num_points - 1][dir1].cy - yp;
+	xn1 = shape2->pts[shape1->num_points - 1][dir2].cx - xp;
+	yn1 = shape2->pts[shape1->num_points - 1][dir2].cy - yp;
 	t = 0;
-	for (i = 0; i < shape->num_points; i++) {
-	    xo2 = shape->pts[i][dir].cx - xp;
-	    yo2 = shape->pts[i][dir].cy - yp;
-	    xn2 = shape->pts[i][newdir].cx - xp;
-	    yn2 = shape->pts[i][newdir].cy - yp;
+	for (i = 0; i < shape1->num_points; i++) {
+	    xo2 = shape1->pts[i][dir1].cx - xp;
+	    yo2 = shape1->pts[i][dir1].cy - yp;
+	    xn2 = shape2->pts[i][dir2].cx - xp;
+	    yn2 = shape2->pts[i][dir2].cy - yp;
 
 #define TEMPFUNC(X1, Y1, X2, Y2)                                           \
 	    if ((X1) < 0) {                                                \
@@ -1647,7 +1651,7 @@ static int Shape_turn1(const shipobj *shape, struct move *move, int x, int y,
 		    else if (((Y1) >= 0 || (Y2) >= 0) &&                   \
 			     (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) >= 0){\
 			if (s == 0)                                        \
-			    return 0;                                      \
+			    return linet[p].group;                         \
 			else                                               \
 			    t++;                                           \
 		    }                                                      \
@@ -1658,14 +1662,14 @@ static int Shape_turn1(const shipobj *shape, struct move *move, int x, int y,
 		    if ((X2) == 0) {                                       \
 			if ((Y2)==0||((X1)==0 && (((Y1)<=0 && (Y2)>= 0) || \
 						 ((Y1) >= 0 && (Y2)<=0)))) \
-			    return 0;                                      \
+			    return linet[p].group;                         \
 		    }                                                      \
 		    else if ((Y1) > 0 && (Y2) >= 0)                        \
 			t++;                                               \
 		    else if (((Y1) >= 0 || (Y2) >= 0) &&                   \
 			     (s = (X1)*((Y1)-(Y2))-(Y1)*((X1)-(X2))) <= 0){\
 			if (s == 0)                                        \
-			    return 0;                                      \
+			    return linet[p].group;                         \
 			else                                               \
 			    t++;                                           \
 		    }                                                      \
@@ -1678,14 +1682,14 @@ static int Shape_turn1(const shipobj *shape, struct move *move, int x, int y,
 #undef TEMPFUNC
 
 	    if (t & 1)
-		return 0;
+		return linet[p].group;
 	    xo1 = xo2;
 	    yo1 = yo2;
 	    xn1 = xn2;
 	    yn1 = yn2;
 	}
     }
-    return 1;
+    return -1;
 }
 
 
@@ -1894,19 +1898,7 @@ struct templine {
 };
 
 
-#define STORE(T,P,N,M,V)						\
-    if (N >= M && ((M <= 0)						\
-	? (P = (T *) malloc((M = 1) * sizeof(*P)))			\
-	: (P = (T *) realloc(P, (M += M) * sizeof(*P)))) == NULL) {	\
-	warn("No memory");						\
-	exit(1);							\
-    } else								\
-	(P[N++] = V)
-
-
-#define POSMOD(x, y) ((x) >= 0 ? (x) % (y) : ((x) + 1) % (y) + (y) - 1)
-
-int is_inside(int cx, int cy, int hit_mask, object *obj)
+int is_inside(int cx, int cy, int hit_mask, const object *obj)
 {
     short *ptr;
     int inside, cx1, cx2, cy1, cy2, s;
@@ -1914,7 +1906,7 @@ int is_inside(int cx, int cy, int hit_mask, object *obj)
     struct move mv;
 
     mv.hit_mask = hit_mask;
-    mv.obj = obj;
+    mv.obj = (object *)obj;
     gblock = &inside_table[(cx >> B_SHIFT) + mapx * (cy >> B_SHIFT)];
     if (gblock->group == -1)
 	return -1;
@@ -1982,6 +1974,25 @@ int is_inside(int cx, int cy, int hit_mask, object *obj)
 	gblock = gblock->next;
     } while (gblock);
     return -1;
+}
+
+
+int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
+		    const shipobj *shape, int dir)
+{
+    static clpos zeropos;
+    static shipobj zeroshape;
+    int i, group;
+
+    if (zeroshape.pts[0] == NULL) {
+	for (i = 0; i < MAX_SHIP_PTS; i++)
+	    zeroshape.pts[i] = &zeropos;
+    }
+
+    if ( (group = is_inside(cx, cy, hitmask, obj)) != -1)
+	return group;
+    zeroshape.num_points = shape->num_points;
+    return Shape_morph(&zeroshape, 0, shape, dir, hitmask, obj, cx, cy);
 }
 
 
@@ -2141,7 +2152,7 @@ static void finish_inside(int block, int group)
 }
 
 
-static void init_inside(void)
+static void allocate_inside(void)
 {
     int i;
 
@@ -2208,7 +2219,8 @@ static double edge_distance(int bx, int by, int ox, int oy, int dx, int dy,
 }
 
 
-static void inside_test(void)
+#define POSMOD(x, y) ((x) >= 0 ? (x) % (y) : ((x) + 1) % (y) + (y) - 1)
+static void Inside_init(void)
 {
     int dx, dy, bx, by, ox, oy, startx, starty;
     int i, j, num_points, minx = -1, miny = -1, poly, group;
@@ -2216,7 +2228,7 @@ static void inside_test(void)
     double dist;
     int *edges;
 
-    init_inside();
+    allocate_inside();
     for (group = 0; group <= num_groups; group++) {
 	minx = -1;
 	for (poly = 0; poly < num_polys; poly++) {
@@ -2638,7 +2650,7 @@ void Walls_init_new(void)
     Distance_init();
     Corner_init();
     Ball_line_init();
-    inside_test();
+    Inside_init();
     groups[0].type = FILLED;
 
     for (i = 0; i < num_lines; i++) {
@@ -2734,7 +2746,7 @@ static void Move_ball_new(object *obj)
 
 /* kps- collision.c has a move_object call in ng */
 /* used to have ind argument in ng */
-void Move_object_new(object *obj)
+static void Move_object_new(object *obj)
 {
     int t;
     struct move mv;
@@ -2912,8 +2924,7 @@ static void Turn_player_new(int ind)
 {
     player	*pl = Players[ind];
     int		new_dir = MOD2((int)(pl->float_dir + 0.5f), RES);
-    int		sign;
-    struct move	mv;
+    int		next_dir, sign, hitmask;
 
     if (recOpt) {
 	if (record)
@@ -2935,15 +2946,19 @@ static void Turn_player_new(int ind)
 	sign = (pl->dir - new_dir <= RES + new_dir - pl->dir) ? -1 : 1;
 
     if (pl->team != TEAM_NOT_SET)
-	mv.hit_mask = NONBALL_BIT | 1 << pl->team;
+	hitmask = NONBALL_BIT | 1 << pl->team;
     else
-	mv.hit_mask = NONBALL_BIT | NOTEAM_BIT;
-    mv.obj = (object *)pl;
+	hitmask = NONBALL_BIT | NOTEAM_BIT;
 #if 1
-    while (pl->dir != new_dir
-	   && (Shape_turn1(pl->ship, &mv, pl->pos.cx, pl->pos.cy,
-			   pl->dir, sign) || (pl->float_dir = pl->dir, 0)))
-	pl->dir = MOD2(pl->dir + sign, RES);
+    while (pl->dir != new_dir) {
+	next_dir = MOD2(pl->dir + sign, RES);
+	if (Shape_morph(pl->ship, pl->dir, pl->ship, next_dir, hitmask,
+			(object *)pl, pl->pos.cx, pl->pos.cy) != -1) {
+	    pl->float_dir = pl->dir;
+	    break;
+	}
+	pl->dir = next_dir;
+    }
 #else
     /* Mara's experimental "turnqueue" hack  */
     while (pl->dir != new_dir

@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -85,7 +85,9 @@ void Move_init(void);
 void Move_object(object *obj);
 void Move_player(int ind);
 void Turn_player(int ind);
-int is_inside(int x, int y, int hit_mask, object *obj);
+int is_inside(int x, int y, int hit_mask, const object *obj);
+int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
+		    const shipobj *shape, int dir);
 int Polys_to_client(unsigned char *);
 void Ball_line_init(void);
 void Player_crash(player *pl, struct move *move, int crashtype,
@@ -525,4 +527,3 @@ void Rank_set_score(player *pl, DFLOAT points);
 void Rank_fire_shot(player *pl);
 
 #endif
-

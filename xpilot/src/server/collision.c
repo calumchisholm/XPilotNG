@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -60,7 +60,7 @@ char collision_version[] = VERSION;
 /*
  * The very first "analytical" collision patch, XPilot 3.6.2
  * Faster than other patches and accurate below half warp-speed
- * Trivial common subexpressions are eliminated by any reasonable compiler, 
+ * Trivial common subexpressions are eliminated by any reasonable compiler,
  * and kept here for readability.
  * Written by Pontus (Rakk, Kepler) pontus@ctrl-c.liu.se Jan 1998
  * Kudos to Svenske and Mad Gurka for beta testing, and Murx for
@@ -79,7 +79,7 @@ static int in_range_acd_old(
     bool	mpx, mpy, mqx, mqy;
 
     /*
-     * Get the wrapped coordinates straight 
+     * Get the wrapped coordinates straight
      */
     if (BIT(World.rules->mode, WRAP_PLAY)) {
 	if ((mpx = (ABS(p2x - p1x) > World.cwidth / 2))) {
@@ -141,7 +141,7 @@ static int in_range_acd_old(
     /* kps hack end */
 
     /*
-     * Do the detection 
+     * Do the detection
      */
     if ((p2x - q2x) * (p2x - q2x) + (p2y - q2y) * (p2y - q2y) < r * r)
 	return 1;
@@ -330,11 +330,11 @@ static void PlayerCollision(void)
 		    }
 		} else {
 		    if (!in_range_acd_old(pl->prevpos.cx, pl->prevpos.cy,
-					  pl->pos.cx, pl->pos.cy, 
+					  pl->pos.cx, pl->pos.cy,
 					  Players[j]->prevpos.cx,
-					  Players[j]->prevpos.cy, 
+					  Players[j]->prevpos.cy,
 					  Players[j]->pos.cx,
-					  Players[j]->pos.cy, 
+					  Players[j]->pos.cy,
 					  PIXEL_TO_CLICK(2*SHIP_SZ-6))) {
 			continue;
 		    }
@@ -535,16 +535,12 @@ static void PlayerCollision(void)
 		    pl->grabbedBallFrame = main_loops;
 		    if (is_polygon_map || !useOldCode) {
 			/* The ball might already be inside the team's ball
-			 * target. This is not a complete check as it only
-			 * checks the center of the ball, but at least it
-			 * should take care of the typical case where this
-			 * really matters on Bloods. Must fix this completely
-			 * later (once there's general code for shape/polygon
-			 * is-inside testing, which should be relatively easy
-			 * to add on top of current features). !@#*/
-			if ((group = is_inside(ball->pos.cx, ball->pos.cy,
-					       BALL_BIT | HITMASK(pl->team),
-					       (object *)ball)) != -1) {
+			 * target. */
+			extern shipobj ball_wire;
+			if ((group = shape_is_inside(ball->pos.cx,
+				       ball->pos.cy,
+				       BALL_BIT | HITMASK(pl->team),
+				       (object *)ball, &ball_wire, 0)) != -1) {
 			    Ball_hits_goal(ball, group);
 			    ball->life = 0;
 			}
@@ -623,7 +619,7 @@ int IsDefensiveItem(enum Item i)
     if (BIT(1 << i,
 	    ITEM_BIT_CLOAK |
 	    ITEM_BIT_ECM |
-	    ITEM_BIT_TRANSPORTER | 
+	    ITEM_BIT_TRANSPORTER |
 	    ITEM_BIT_TRACTOR_BEAM |
 	    ITEM_BIT_EMERGENCY_SHIELD |
 	    ITEM_BIT_MIRROR |
@@ -639,9 +635,9 @@ int IsDefensiveItem(enum Item i)
 
 int CountOffensiveItems(player *pl)
 {
-    return (pl->item[ITEM_WIDEANGLE] + pl->item[ITEM_REARSHOT] + 
-	    pl->item[ITEM_MINE] + pl->item[ITEM_MISSILE] + 
-	    pl->item[ITEM_LASER]); 
+    return (pl->item[ITEM_WIDEANGLE] + pl->item[ITEM_REARSHOT] +
+	    pl->item[ITEM_MINE] + pl->item[ITEM_MISSILE] +
+	    pl->item[ITEM_LASER]);
 }
 
 int CountDefensiveItems(player *pl)
@@ -649,7 +645,7 @@ int CountDefensiveItems(player *pl)
     int count;
 
     count = pl->item[ITEM_CLOAK] + pl->item[ITEM_ECM] + pl->item[ITEM_ARMOR] +
-	    pl->item[ITEM_TRANSPORTER] + pl->item[ITEM_TRACTOR_BEAM] + 
+	    pl->item[ITEM_TRANSPORTER] + pl->item[ITEM_TRACTOR_BEAM] +
 	    pl->item[ITEM_EMERGENCY_SHIELD] + pl->fuel.num_tanks +
 	    pl->item[ITEM_DEFLECTOR] + pl->item[ITEM_HYPERJUMP] +
 	    pl->item[ITEM_PHASING] + pl->item[ITEM_MIRROR];
@@ -999,19 +995,19 @@ static void Player_collides_with_item(int ind, object *obj)
 	    /* Set_player_message(pl, "No space left for offensive items."); */
 	    Delta_mv((object *)pl, obj);
 	    return;
-	} 
+	}
 	else if (obj->count > 1
 		 && off_items + obj->count > maxOffensiveItems) {
 	    obj->count = maxOffensiveItems - off_items;
 	}
-    } 
+    }
     else if (IsDefensiveItem((enum Item) obj->info)) {
 	int def_items = CountDefensiveItems(pl);
 	if (def_items >= maxDefensiveItems) {
 	    /* Set_player_message(pl, "No space for left for defensive items."); */
 	    Delta_mv((object *)pl, obj);
 	    return;
-	} 
+	}
 	else if (obj->count > 1
 		 && def_items + obj->count > maxDefensiveItems) {
 	    obj->count = maxDefensiveItems - def_items;
@@ -1534,7 +1530,6 @@ static void Player_pass_checkpoint(int ind)
 		for (j = 0; j < NumObjs; j++) {
 		    if (Obj[j]->type == OBJ_BALL) {
 			ballobject	*ball = BALL_PTR(Obj[j]);
-			
 			if (ball->owner == pl->id)
 			    ball->owner = NO_ID;
 		    }
@@ -1706,7 +1701,7 @@ static void AsteroidCollision(void)
 		/*}*/
 		if (sound) {
 		    sound_play_sensors(ast->pos.cx, ast->pos.cy,
-				       ASTEROID_HIT_SOUND);    
+				       ASTEROID_HIT_SOUND);
 		}
 		if (ast->life < 0) {
 		    ast->life = 0;
@@ -1774,7 +1769,7 @@ static void BallCollision(void)
 	    int owner_ind = GetInd[ball->owner];
 	    player *owner = Players[owner_ind];
 
-	    if (!ballrace_connect || ball->id == owner->id) { 
+	    if (!ballrace_connect || ball->id == owner->id) {
 		if (Wrap_length(ball->pos.cx - World.check[owner->check].cx,
 				ball->pos.cy - World.check[owner->check].cy)
 		    < checkpointRadius * BLOCK_CLICKS) {
@@ -1787,7 +1782,7 @@ static void BallCollision(void)
 	/* Ball - object */
 	if (!ballCollisions)
 	    continue;
-	
+
 	Cell_get_objects(OBJ_X_IN_BLOCKS(ball), OBJ_Y_IN_BLOCKS(ball),
 			 4, 300,
 			 &obj_list, &obj_count);
@@ -1830,7 +1825,7 @@ static void BallCollision(void)
 			break;
 		    }
 		}
-		
+
 		/* if the collision was too violent, destroy ball and object */
 		if ((sqr(ball->vel.x - obj->vel.x) +
 		     sqr(ball->vel.y - obj->vel.y)) >
@@ -1870,7 +1865,7 @@ static void MineCollision(void)
     object	*obj;
     mineobject	*mine;
     int		collide_object_types;
-    
+
     if (!mineShotDetonateDistance)
 	return;
 
@@ -1894,7 +1889,7 @@ static void MineCollision(void)
 	    mine->life <= 0) {		/* dying mine */
 	    continue;
 	}
-	
+
 	Cell_get_objects(OBJ_X_IN_BLOCKS(mine), OBJ_Y_IN_BLOCKS(mine),
 			 4, 300,
 			 &obj_list, &obj_count);
@@ -1930,5 +1925,3 @@ int wormXY(int x, int y)
 {
     return World.itemID[x][y];
 }
-
-
