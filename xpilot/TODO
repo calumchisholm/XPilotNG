@@ -5,13 +5,6 @@ these tasks, ask that developer first, so you can agree on how to proceed.
 TASKS FOR XPILOT NG 4.7.0
 -------------------------
 
-Task: Related to cannon dodgers: add working ranking for maps where
-surivial time
-Developer: throat / kps
-
-Task: Rename turnpush related options to longer names.
-Developer: throat / kps
-
 Task: Make cannons fire if a player is "anywhere near" and not paused
        (this could be a bit harder without breaking old behavior.)
 Developer: throat / kps
@@ -46,21 +39,6 @@ Developer: kps
 
 Task: Make wormholes warp other objects than players.
 Developer: kps
-
-Task: Select a few new default options for server. Probably we could use
-constantSpeed = 1 and afterburnerpower > 1 by default so that the ship
-would move a bit faster in high fps games.
-Developer: kps
-
-Task: Select new defaults for client. There will be no kbd steering by
-default. Players should learn to use the mouse at once. This requires
-there to be a message that tells players that they should press mouse
-button (or some other key (which?)) to activate mouse steering.
-Developer: kps
-
-Task: Sort out reported weirdness in quit mode and Mara's shield/multiple
-key release bug fixes.
-Developer: kps / virus
 
 Task: Rewrite INSTALL.txt for ng. Especially describe SDL client compiling.
 Developer: kps
@@ -112,10 +90,6 @@ Task: Make it so that no defaultsFile is used in server by default.
 Developer: kps
 
 Task: Write a "getting started" webpage for newbies.
-Developer: kps
-
-Task: Add an option to use old walls in Blood's Music games. This is useful
-for comparing the bahaviour of the walls codes.
 Developer: kps
 
 
@@ -233,11 +207,11 @@ Developer: kps
 Task: Turn the item images on the hud in sdl client the right way (upside down
 atm)
 
-Task: Add support for MinGW/MSys build environment and making console 
-server work under Windows
-Developer: marvn
-
 Task: Optimise Frame_radar() so that object list is not traversed if
 there are no objects that could be shown on radar. This can be implemented
 e.g. by keeping a count of nukes, missiles etc.
+Developer: kps
+
+Task: Add an option to use old walls in Blood's Music games. This is useful
+for comparing the bahaviour of the walls codes.
 Developer: kps
