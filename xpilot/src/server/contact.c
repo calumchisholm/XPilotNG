@@ -86,13 +86,15 @@ int Contact_init(void)
  */
 static int Kick_robot_players(world_t *world, int team)
 {
+    int i;
+
     if (NumRobots == 0)		/* no robots available for kicking */
 	return 0;
 
     if (team == TEAM_NOT_SET) {
 	if (BIT(world->rules->mode, TEAM_PLAY) && options.reserveRobotTeam) {
 	    /* kick robot with lowest score from any team but robot team */
-	    int low_score = INT_MAX, i;
+	    double low_score = FLT_MAX;
 	    player_t *low_pl = NULL;
 
 	    for (i = 0; i < NumPlayers; i++) {
@@ -118,7 +120,7 @@ static int Kick_robot_players(world_t *world, int team)
     } else {
 	if (world->teams[team].NumRobots > 0) {
 	    /* kick robot with lowest score from this team */
-	    int low_score = INT_MAX, i;
+	    double low_score = FLT_MAX;
 	    player_t *low_pl = NULL;
 
 	    for (i = 0; i < NumPlayers; i++) {
@@ -490,28 +492,14 @@ void Contact(int fd, void *arg)
 	/*
 	 * Kick someone from the game.
 	 */
-	int found = -1;
-
 	if (Packet_scanf(&ibuf, "%s", str) <= 0)
 	    status = E_INVAL;
 	else {
-	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl_i = Players(i);
-		/*
-		 * Kicking players by username is not a good idea,
-		 * because several players may have the same username.
-		 * E.g., system administrators joining as root...
-		 */
-		if (strcasecmp(str, pl_i->name) == 0
-		    || strcasecmp(str, pl_i->username) == 0) {
-		    found = i;
-		}
-	    }
-	    if (found == -1)
+	    player_t *pl_found = Get_player_by_name(str, NULL, NULL);
+
+	    if (!pl_found)
 		status = E_NOT_FOUND;
 	    else {
-		player_t *pl_found = Players(found);
-
 		Set_message_f("\"%s\" upset the gods and was kicked out "
 			      "of the game.", pl_found->name);
 		if (pl_found->conn == NULL)
@@ -1023,10 +1011,7 @@ void Set_deny_hosts(world_t *world)
 
     UNUSED_PARAM(world);
     num_addr_mask = 0;
-    if (addr_mask_list) {
-	free(addr_mask_list);
-	addr_mask_list = 0;
-    }
+    XFREE(addr_mask_list);
     if (!(list = xp_strdup(options.denyHosts)))
 	return;
 

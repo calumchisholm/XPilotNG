@@ -661,7 +661,8 @@ void World_remove_cannon(world_t *world, cannon_t *cannon);
  * Prototypes for command.c
  */
 void Handle_player_command(player_t *pl, char *cmd);
-player_t *Get_player_by_name(char *str, int *errcode, const char **errorstr_p);
+player_t *Get_player_by_name(const char *str,
+			     int *errcode, const char **errorstr_p);
 
 
 /*

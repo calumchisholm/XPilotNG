@@ -43,7 +43,8 @@ char command_version[] = VERSION;
  * and a string describing the error is stored in
  * 'errorstr_p' if that is not NULL.
  */
-player_t *Get_player_by_name(char *str, int *error_p, const char **errorstr_p)
+player_t *Get_player_by_name(const char *str,
+			     int *error_p, const char **errorstr_p)
 {
     int i, id;
     player_t *found_pl = NULL, *pl;
