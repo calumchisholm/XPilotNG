@@ -82,7 +82,6 @@ bool Key_press_toggle_radar_score(void)
     return false;
 }
 
-
 int Process_event(SDL_Event *evt)
 {
     int key_change = 0;

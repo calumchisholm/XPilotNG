@@ -3,7 +3,7 @@
 #include "SDL.h"
 #include "sdlkeys.h"
 
-void recursive_clean(keylist *list, int maxdepth);
+void iterative_clean(keylist *list, int maxdepth);
 
 typedef struct {
 	char*	name;
@@ -133,12 +133,12 @@ static sdlkey_t sdlkeys[] = {
    { "x",            SDLK_x },
    { "y",            SDLK_y },
    { "z",            SDLK_z },
-   { "bracketleft",  SDLK_LEFTBRACKET },
-   { "backslash",    SDLK_BACKSLASH },
-   { "bracketright", SDLK_RIGHTBRACKET },
-   { "grave",        SDLK_BACKQUOTE },
-   { "quoteleft",    SDLK_BACKQUOTE },
-   { NULL,            SDLK_UNKNOWN },
+   { "bracketleft", 	SDLK_LEFTBRACKET },
+   { "backslash",   	SDLK_BACKSLASH },
+   { "bracketright",	SDLK_RIGHTBRACKET },
+   { "grave",	    	SDLK_BACKQUOTE },
+   { "quoteleft",   	SDLK_BACKQUOTE },
+   { NULL,  	    	SDLK_UNKNOWN },
 };
 
 SDLKey Get_key_by_name(const char* name)
@@ -164,16 +164,15 @@ char *Get_name_by_key(SDLKey key)
     return NULL;
 }
 
-
-/* traverses to end of list, and frees memory on the way back
- * "up" the recursion list
- */
-void recursive_clean(keylist *list, int maxdepth)
+void iterative_clean(keylist *list, int maxdepth)
 {
-    if (list && maxdepth) {
-    	recursive_clean((keylist *)list->next ,maxdepth-1);
+    keylist *temp;
+    while (list) {
+    	temp = (keylist *)list->next;
 	free(list);
-    } else return;
+	list = temp;
+	if (!(--maxdepth)) return;
+    }
 }
 
 void freeKeyMap(void)
@@ -181,7 +180,7 @@ void freeKeyMap(void)
     int i;
     for( i = 0; i < SDLK_LAST ; ++i) {
     	/* TODO: this max depth number should be fixed */
-    	recursive_clean( keyMap[i] , SDLK_LAST);
+    	iterative_clean( keyMap[i] , SDLK_LAST);
     }
     /* for no reason whatsoever do: free(KeyMap); */
 }
