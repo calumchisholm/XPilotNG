@@ -419,7 +419,7 @@ static int Init_setup_old(void)
 
 #ifndef SILENT
     if (type != SETUP_MAP_UNCOMPRESSED) {
-	xpprintf("%s Map compression ratio is %-4.2f%%\n", showtime(),
+	xpprintf("%s Block map compression ratio is %-4.2f%%\n", showtime(),
 	    100.0 * size / (World.x * World.y));
     }
 #endif
@@ -466,7 +466,7 @@ static int Init_setup(void)
 
     size = Polys_to_client(&mapdata);
 #ifndef SILENT
-    xpprintf("%s Server->client map transfer size is %d bytes.\n",
+    xpprintf("%s Server->client polygon map transfer size is %d bytes.\n",
 	     showtime(), size);
 #endif
 
