@@ -1,3 +1,16 @@
+-------------------------------------------------------------------
+Problem : an empty texturePath in .xpilotrc leads to problems
+	  If you have xpilot.texturePath: in your .xpilotrc it
+	  gets set to an empty string, but then mapdata.c tags on 
+	  .xpilot_data/blah to it, if you hit save, then the texturePath
+	  option gets killed effectively. I dont know how the texturePath
+	  option ended up in my .xpilotrc
+Found by: Colonel Blood
+Solution:
+Fixed by:
+Files 
+affected: default.c mapdata.c
+
 ----------------------------------------------------------------------
 Problem : \ignore with textmask doesnt work properly - "ball" "safe"
 Found by: Throat
