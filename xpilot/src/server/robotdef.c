@@ -1244,12 +1244,14 @@ static int Rank_item_value(player_t *pl, long itemtype)
     }
     if (BIT(world->rules->mode, TIMING)) {
 	switch (itemtype) {
-	case ITEM_AFTERBURNER:	/* the more speed the better */
-	case ITEM_EMERGENCY_THRUST:	/* makes you go really fast */
-	case ITEM_TRANSPORTER:	/* steal fuel when you overtake someone */
+	case ITEM_FUEL:		/* less refuel stops */
 	case ITEM_REARSHOT:	/* shoot competitors behind you */
+	case ITEM_AFTERBURNER:	/* the more speed the better */
+	case ITEM_TRANSPORTER:	/* steal fuel when you overtake someone */
 	case ITEM_MINE:		/* blows others off the track */
 	case ITEM_ECM:		/* blinded players smash into walls */
+	case ITEM_EMERGENCY_THRUST:	/* makes you go really fast */
+	case ITEM_EMERGENCY_SHIELD:	/* could be useful when ramming */
 	    return ROBOT_MUST_HAVE_ITEM;
 	case ITEM_WIDEANGLE:	/* not important in racemode */
 	case ITEM_CLOAK:	/* not important in racemode */
@@ -1258,6 +1260,7 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	case ITEM_MISSILE:	/* likely to hit self */
 	case ITEM_LASER:	/* cost too much fuel */
 	case ITEM_TRACTOR_BEAM:	/* pushes/pulls owner off the track too */
+	case ITEM_AUTOPILOT:	/* probably not useful */
 	case ITEM_DEFLECTOR:	/* cost too much fuel */
 	case ITEM_HYPERJUMP:	/* likely to end up in wrong place */
 	case ITEM_PHASING:	/* robots don't know how to use them yet */
