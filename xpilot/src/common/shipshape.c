@@ -194,7 +194,6 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 
     int 		i, j, x, y, dx, dy,
 			inx, iny, max,
-			ofNum, ofLeft, ofRight,		/* old format */
 			shape_version = 0;
     ipos_t 		pt[MAX_SHIP_PTS2],
 			engine,
@@ -236,10 +235,9 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 
 	if (shape_version == 0) {
 	    if (isdigit(*str)) {
-		shape_version = 0x3100;
 		if (verboseShapeParsing)
-		    warn("ship shape is in old format\n");
-		break;
+		    warn("Ship shape is in obsolete 3.1 format.\n");
+		return -1;
 	    } else
 		shape_version = 0x3200;
 	}
@@ -514,56 +512,6 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 	     * about yet. */
 	    break;
 	}
-    }
-
-    if (shape_version == 0x3100) {
-	str = ship_shape_str;
-
-	if (sscanf(str, "(%d,%d,%d)", &ofNum, &ofLeft, &ofRight) != 3
-	    || ofNum < MIN_SHIP_PTS
-	    || ofNum > MAX_SHIP_PTS
-	    || ofLeft < 0
-	    || ofLeft >= ofNum
-	    || ofRight < 0
-	    || ofRight >= ofNum
-	    ) {
-	    if (verboseShapeParsing)
-		warn("Invalid ship shape header: \"%s\"\n", str);
-	    return -1;
-	}
-
-	for (i = 0; i < ofNum; i++) {
-	    str = strchr(str + 1, '(');
-	    if (!str) {
-		if (verboseShapeParsing)
-		    warn("Bad ship shape: "
-			 "only %d points defined, %d expected\n",
-			 i, ofNum);
-		return -1;
-	    }
-	    if (sscanf(str, "(%d,%d)", &inx, &iny) != 2) {
-		if (verboseShapeParsing)
-		    warn("Bad ship shape: format error in point %d\n", i);
-		return -1;
-	    }
-	    pt[i].x = inx;
-	    pt[i].y = iny;
-	}
-
-	ship->num_points = ofNum;
-
-	m_gun = pt[0];
-	mainGunSet = true;
-
-	l_light[0] = pt[ofLeft];
-	ship->num_l_light = 1;
-
-	r_light[0] = pt[ofRight];
-	ship->num_r_light = 1;
-
-	engine.x = (pt[ofLeft].x + pt[ofRight].x) / 2;
-	engine.y = (pt[ofLeft].y + pt[ofRight].y) / 2;
-	engineSet = true;
     }
 
     /* Check for some things being set, and give them defaults if not */
@@ -893,18 +841,6 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
 	    if (verboseShapeParsing)
 		warn("Engine outside of ship\n");
 	    invalid++;
-	    /* this could happen in case of an old format ship shape. */
-	    if (shape_version == 0x3100 && invalid == 1) {
-		/* move engine until it is legal. */
-		for (x = -15, y = 0; x <= 15; x++) {
-		    if (!GRID_CHK(x, y)) {
-			engine.x = x;
-			engine.y = y;
-			invalid--;
-			break;
-		    }
-		}
-	    }
 	}
 
 	if (debugShapeParsing) {
@@ -938,46 +874,31 @@ static int shape2wire(char *ship_shape_str, shipshape_t *ship)
     /*MARA evil hack*/
 
     i = sizeof(shapepos_t) * RES;
-    if (!(ship->pts[0] = (shapepos_t*)malloc((size_t)ship->num_points * i))
+    if (!(ship->pts[0] = malloc((size_t)ship->num_points * i))
 	|| (ship->num_l_gun
-	    && !(ship->l_gun[0]
-		 = (shapepos_t*)malloc((size_t)ship->num_l_gun * i)))
+	    && !(ship->l_gun[0] = malloc((size_t)ship->num_l_gun * i)))
 	|| (ship->num_r_gun
-	    && !(ship->r_gun[0]
-		 = (shapepos_t*)malloc((size_t)ship->num_r_gun * i)))
+	    && !(ship->r_gun[0] = malloc((size_t)ship->num_r_gun * i)))
 	|| (ship->num_l_rgun
-	    && !(ship->l_rgun[0]
-		 = (shapepos_t*)malloc((size_t)ship->num_l_rgun * i)))
+	    && !(ship->l_rgun[0] = malloc((size_t)ship->num_l_rgun * i)))
 	|| (ship->num_r_rgun
-	    && !(ship->r_rgun[0]
-		 = (shapepos_t*)malloc((size_t)ship->num_r_rgun * i)))
+	    && !(ship->r_rgun[0] = malloc((size_t)ship->num_r_rgun * i)))
 	|| (ship->num_l_light
-	    && !(ship->l_light[0]
-		 = (shapepos_t*)malloc((size_t)ship->num_l_light * i)))
+	    && !(ship->l_light[0] = malloc((size_t)ship->num_l_light * i)))
 	|| (ship->num_r_light
-	    && !(ship->r_light[0]
-		 = (shapepos_t*)malloc((size_t)ship->num_r_light * i)))
+	    && !(ship->r_light[0] =malloc((size_t)ship->num_r_light * i)))
 	|| (ship->num_m_rack
-	    && !(ship->m_rack[0]
-		 = (shapepos_t*)malloc((size_t)ship->num_m_rack * i)))
+	    && !(ship->m_rack[0] = malloc((size_t)ship->num_m_rack * i)))
 	) {
 	error("Not enough memory for ship shape");
-	if (ship->pts[0])
-	    free(ship->pts[0]);
-	if (ship->l_gun[0])
-	    free(ship->l_gun[0]);
-	if (ship->r_gun[0])
-	    free(ship->r_gun[0]);
-	if (ship->l_rgun[0])
-	    free(ship->l_rgun[0]);
-	if (ship->r_rgun[0])
-	    free(ship->r_rgun[0]);
-	if (ship->l_light[0])
-	    free(ship->l_light[0]);
-	if (ship->r_light[0])
-	    free(ship->r_light[0]);
-	if (ship->m_rack[0])
-	    free(ship->m_rack[0]);
+	XFREE(ship->pts[0]);
+	XFREE(ship->l_gun[0]);
+	XFREE(ship->r_gun[0]);
+	XFREE(ship->l_rgun[0]);
+	XFREE(ship->r_rgun[0]);
+	XFREE(ship->l_light[0]);
+	XFREE(ship->r_light[0]);
+	XFREE(ship->m_rack[0]);
 	return -1;
     }
 
@@ -1050,7 +971,7 @@ static shipshape_t *do_parse_shape(char *str)
 	    warn("shape str not set\n");
 	return Default_ship();
     }
-    if (!(ship = (shipshape_t *)malloc(sizeof(*ship)))) {
+    if (!(ship = malloc(sizeof(*ship)))) {
 	error("No mem for ship shape");
 	return Default_ship();
     }
@@ -1119,13 +1040,8 @@ int Validate_shape_str(char *str)
 void Convert_ship_2_string(shipshape_t *ship, char *buf, char *ext,
 			   unsigned shape_version)
 {
-    char		tmp[MSG_LEN];
-    int			i,
-			buflen,
-			extlen,
-			tmplen,
-			ll,
-			rl;
+    char tmp[MSG_LEN];
+    int i, buflen = 0, extlen, tmplen;
 
     ext[extlen = 0] = '\0';
 
@@ -1289,41 +1205,9 @@ void Convert_ship_2_string(shipshape_t *ship, char *buf, char *ext,
 		extlen += tmplen;
 	    }
 	}
-    } else {
-	/* 3.1 version had 16 points maximum.  just ignore the excess. */
-	int num_points = MIN(ship->num_points, 16);
-#if 0
-	if (num_points < ship->num_points) {
-	    printf("Truncating ship to 16 points for old 3.1 server\n");
-	}
-#endif
-	if (shape_version != 0x3100)
-	    warn("Unknown ship shape version: %x", shape_version);
+    } else
+	buf[0] = '\0';
 
-	for (i = 1, ll = rl = 0; i < num_points; i++) {
-	    position_t pti = Ship_get_point_position(ship, i, 0);
-	    position_t ptll = Ship_get_point_position(ship, i, 0);
-	    position_t ptrl = Ship_get_point_position(ship, i, 0);
-	    if (pti.y > ptll.y
-		|| (pti.y == ptll.y
-		    && pti.x < ptll.x)) {
-		ll = i;
-	    }
-	    if (pti.y < ptrl.y
-		|| (pti.y == ptrl.y
-		    && pti.x < ptrl.x)) {
-		rl = i;
-	    }
-	}
-	sprintf(buf, "(%d,%d,%d)", num_points, ll, rl);
-	buflen = strlen(buf);
-	for (i = 0; i < num_points; i++) {
-	    position_t pti = Ship_get_point_position(ship, i, 0);
-	    sprintf(&buf[buflen], "(%d,%d)",
-		    (int)pti.x, (int)pti.y);
-	    buflen += strlen(&buf[buflen]);
-	}
-    }
     if (buflen >= MSG_LEN || extlen >= MSG_LEN)
 	warn("BUG: convert ship: buffer overflow (%d,%d)", buflen, extlen);
 
