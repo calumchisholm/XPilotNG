@@ -513,7 +513,7 @@ void Xpmap_find_base_direction(void)
 	     */
 	    dir = DIR_UP;
 	else {
-	    dir = (int)findDir(-gravity.x, -gravity.y);
+	    dir = findDir(-gravity.x, -gravity.y);
 	    dir = ((dir + RES/8) / (RES/4)) * (RES/4);	/* round it */
 	    dir = MOD2(dir, RES);
 	}
@@ -802,8 +802,8 @@ static void Xpmap_wormhole_to_polygon(int wormhole_ind)
  * 3: upper right vertex
  * 4: upper left vertex, second time
  */
-static void Xpmap_wall_poly(int bx, int by, char startblock,
-			    char endblock, int numblocks,
+static void Xpmap_wall_poly(int bx, int by,
+			    int startblock, int endblock, int numblocks,
 			    int polystyle, int edgestyle)
 {
     int i;
@@ -880,7 +880,7 @@ static void Xpmap_walls_to_polygons(void)
     int x, y, x0 = 0;
     int numblocks = 0;
     int inside = false;
-    char startblock = 0, endblock = 0, block;
+    int startblock = 0, endblock = 0, block;
     int maxblocks = POLYGON_MAX_OFFSET / BLOCK_CLICKS;
     int ps, es;
 
