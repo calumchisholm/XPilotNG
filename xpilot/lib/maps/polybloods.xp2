@@ -18,7 +18,7 @@
 <Option name="itemmineprob" value="0.8"/>
 <Option name="identifymines" value="yes"/>
 <Option name="shieldedmining" value="yes"/>
-<Option name="initialafterburners" value="2"/>
+<Option name="initialafterburners" value="3"/>
 <Option name="pausedfps" value="0"/>
 <Option name="allowplayercrashes" value="yes"/>
 <Option name="playerstartsshielded" value="yes"/>
@@ -86,7 +86,7 @@
 <Option name="initialemergencythrusts" value="0"/>
 <Option name="allowplayerkilling" value="yes"/>
 <Option name="limitedvisibility" value="no"/>
-<Option name="mapname" value="Polygon Blood&apos;s Music v5"/>
+<Option name="mapname" value="Polygon Blood&apos;s Music v6"/>
 <Option name="laserisstungun" value="no"/>
 <Option name="itemtankprob" value="0.5"/>
 <Option name="missilesonradar" value="yes"/>
@@ -106,9 +106,9 @@
 <BmpStyle id="tex.ppm" filename="tex.ppm" flags="1"/>
 <BmpStyle id="tex27.ppm" filename="tex27.ppm" flags="1"/>
 <BmpStyle id="tex47.ppm" filename="tex47.ppm" flags="1"/>
-<Edgestyle id="texrock" width="1" color="676767" style="0"/>
-<Edgestyle id="tex27rock" width="1" color="467676" style="0"/>
-<Edgestyle id="tex47rock" width="1" color="767646" style="0"/>
+<Edgestyle id="texrock" width="2" color="676767" style="0"/>
+<Edgestyle id="tex27rock" width="2" color="467676" style="0"/>
+<Edgestyle id="tex47rock" width="2" color="767646" style="0"/>
 <Edgestyle id="ballarea2" width="2" color="009000" style="0"/>
 <Edgestyle id="ballarea4" width="2" color="909000" style="0"/>
 <Edgestyle id="balltarget" width="1" color="FF3A27" style="0"/>
