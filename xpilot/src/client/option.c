@@ -189,7 +189,7 @@ static void Set_double_option(xp_option_t *opt, double value)
     if (opt->dbl_setfunc)
 	opt->dbl_setfunc(opt, value);
 
-    printf("Value of option %s is now %f.\n", opt->name, *opt->dbl_ptr);
+    printf("Value of option %s is now %.3f.\n", opt->name, *opt->dbl_ptr);
 }
 
 static void Set_string_option(xp_option_t *opt, const char *value)
