@@ -4,20 +4,20 @@ Summary: 	An sdl client to xpilot the gravity war game
 Name: 		xpilot-ng-sdl
 Version: 	4.6.0
 Release: 	1
-Packager: 	darel.cullen@bostream.nu
+Packager: 	Darel Cullen <darel.cullen@bostream.nu>
 Url: 		http://xpilot.sf.net
 Source: 	%{name}-%{version}-%{release}.tar.gz
 License: 	GPL
 Group: 		Amusements/Games
 Vendor: 	XPilot
 AutoReq: 	0
-Requires: 	expat SDL SDL_image SDL_ttf
+Requires: 	expat SDL SDL_image SDL_ttf libpng
 %description
 FEATURES
 ========
 
 The xpilot polygon (also known as xpilot upgrade) package includes 
-the following differences from official xpilot (xpilot-4.5.4)
+the following differences from official xpilot.
 
 General:
 
@@ -94,7 +94,7 @@ echo otherwise you will find that this client runs too slowly.
 
 
 %build
-./configure --prefix=/usr/local --enable-sdl-client
+./configure --prefix=/usr/local --datadir=/usr/local/share/xpilot-ng-sdl --enable-sdl-client
 make
 
 %install
@@ -118,18 +118,13 @@ rm -rf $RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT
 
 %files
+%doc AUTHORS doc/BUGS doc/ChangeLog doc/CREDITS doc/FAQ doc/FIXED FEATURES INSTALL NEWS README TODO
 /usr/local/bin/xpilot-ng-sdl
-/usr/local/bin/xpilot-ng-server
-/usr/local/bin/xpilot-ng-replay
 /usr/local/share/xpilot-ng/fonts/ConsoleFont.bmp
 /usr/local/share/xpilot-ng/fonts/Test.ttf
 /usr/local/share/xpilot-ng/fonts/VeraMoBd.ttf
 /usr/local/share/xpilot-ng/fonts/defaultfont.bmp
 /usr/local/share/xpilot-ng/fonts
-/usr/local/share/xpilot-ng/maps/polybloods.xp2
-/usr/local/share/xpilot-ng/maps/sadistic_bastard_v2.xp2
-/usr/local/share/xpilot-ng/maps/teamcup.xp
-/usr/local/share/xpilot-ng/maps
 /usr/local/share/xpilot-ng/textures/acwise_grav.ppm
 /usr/local/share/xpilot-ng/textures/allitems.ppm
 /usr/local/share/xpilot-ng/textures/asteroid.ppm
@@ -197,12 +192,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/local/share/xpilot-ng/textures/wormhole.ppm
 /usr/local/share/xpilot-ng/textures/asteroid.ppm
 /usr/local/share/xpilot-ng/textures
-/usr/local/share/xpilot-ng/defaults.txt
-/usr/local/share/xpilot-ng/password.txt
-/usr/local/share/xpilot-ng/robots.txt
-/usr/local/share/xpilot-ng/sounds.txt
-
-
 
 %changelog
 * Mon Sep 15 2003 Darel <darelcullen@sf.net>
