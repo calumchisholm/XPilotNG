@@ -326,7 +326,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "BallArea")) {
 	int team;
-	current_group = num_groups++;
+	current_group = ++num_groups;
 	groups[current_group].type = TREASURE;
 	groups[current_group].team = team;
 	groups[current_group].hit_mask = BALL_BIT;
@@ -339,7 +339,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 		team = atoi(*(attr + 1));
 	    attr += 2;
 	}
-	current_group = num_groups++;
+	current_group = ++num_groups;
 	groups[current_group].type = TREASURE;
 	groups[current_group].team = team;
 	groups[current_group].hit_mask = NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));
