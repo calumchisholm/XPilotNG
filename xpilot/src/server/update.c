@@ -680,7 +680,7 @@ static void Player_turns(void)
 	    || (BIT(pl->status, HOVERPAUSE) && !pl->damaged))
 	    do_Autopilot(pl);
 
-	pl->turnvel += pl->turnacc;
+	pl->turnvel += pl->turnacc * timeStep;
 
 	/*
 	 * turnresistance is zero: client requests linear turning behaviour
