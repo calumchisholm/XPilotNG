@@ -1288,7 +1288,7 @@ void Update_objects(void)
 	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || cloakedExhaust)
 	    && !BIT(pl->used, HAS_PHASING_DEVICE)) {
 	    if (BIT(pl->status, THRUSTING))
-  		Thrust(i);
+  		Thrust(pl);
 	}
 
 	Compute_sensor_range(pl);

@@ -55,9 +55,8 @@ char ship_version[] = VERSION;
  * Functions for ship movement.
  */
 
-void Thrust(int ind)
+void Thrust(player *pl)
 {
-    player		*pl = Players(ind);
     const int		min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
     const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
     const DFLOAT	max_speed = 1 + (pl->power * 0.14);

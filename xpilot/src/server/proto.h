@@ -182,14 +182,14 @@ void Timing_setup(void);
 /*
  * Prototypes for play.c
  */
-void Thrust(int ind);
+void Thrust(player *pl);
 void Record_shove(player *pl, player *pusher, long time);
 void Delta_mv(object *ship, object *obj);
 void Delta_mv_elastic(object *obj1, object *obj2);
 void Obj_repel(object *obj1, object *obj2, int repel_dist);
 void Item_damage(player *pl, DFLOAT prob);
 void Tank_handle_detach(player *pl);
-void Add_fuel(pl_fuel_t*, long);
+void Add_fuel(pl_fuel_t *, long);
 void Update_tanks(pl_fuel_t *);
 void Place_item(player *pl, int type);
 int Choose_random_item(void);
