@@ -54,13 +54,6 @@ void Colors_cleanup(void);
 void Colors_debug(void);
 
 /*
- * datagram.c
- */
-int create_dgram_addr_socket(char *dotaddr, int port);
-int create_dgram_socket(int port);
-void close_dgram_socket(int fd);
-
-/*
  * default.c
  */
 extern void Parse_options(int *argcp, char **argvp, char *realName, int *port,
@@ -106,7 +99,9 @@ extern int Init_wreckage(void);
 /*
  * query.c
  */
-extern int Query_all(int sockfd, int port, char *msg, int msglen);
+#ifdef SOCKLIB_H
+extern int Query_all(sock_t *sockfd, int port, char *msg, int msglen);
+#endif
 
 #ifdef	LIMIT_ACCESS
 extern bool		Is_allowed(char *);
@@ -168,5 +163,3 @@ extern	void WinXCreateItemBitmaps();
 
 
 #endif	/* PROTOCLIENT_H */
-
-

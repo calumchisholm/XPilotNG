@@ -48,212 +48,154 @@
 #include "bit.h"
 #include "socklib.h"
 
-/* CreateDgramSocketRec(int port) */
 
-/* DgramClose */
-
-void DgramCloseRec(int fd)
+int sock_closeRec(sock_t *sock)
 {
-  if (playback)
-    return;
-  DgramClose(fd);
-  return;
+    return 0;  /* no recording code checks this value */
 }
 
-/* DgramConnect */
 
-int DgramConnectRec(int fd, char *host, int port)
+int sock_connectRec(sock_t *sock, char *host, int port)
 {
-  int i;
+    int i;
 
-  if (playback) {
-    i = *playback_ints++;
-    if (i < 0)
-      errno = *playback_errnos++;
+    if (playback) {
+	i = *playback_ints++;
+	if (i < 0)
+	    errno = *playback_errnos++;
+	return i;
+    }
+    i = sock_connect(sock, host, port);
+    if (record) {
+	*(playback_ints++) = i;
+	if (i<0)
+	    *playback_errnos++ = i;
+    }
     return i;
-  }
-  i = DgramConnect(fd, host, port);
-  if (record) {
-    *(playback_ints++) = i;
-    if (i<0)
-      *playback_errnos++ = i;
-  }
-  return i;
 }
 
-/* DgramLastaddr */
 
-/* DgramLastport */
-
-int DgramLastportRec(void)
+int sock_get_last_portRec(sock_t *sock)
 {
-  int i;
+    int i;
 
-  if (playback)
-    return *(playback_ints++);
-  i = DgramLastport();
-  if (record)
-    *playback_ints++ = i;
-  return i;
-}
-
-/* DgramReceiveAny */
-
-int DgramReceiveAnyRec(int fd, char *rbuf, int size)
-{
-  int i;
-
-  if (playback) {
-    i = *(playback_shorts++);
-    if (i > 0) {
-      memcpy(rbuf, playback_data, i);
-      playback_data += i;
-    }
-    else
-      errno = *playback_errnos++;
+    if (playback)
+	return *(playback_ints++);
+    i = sock_get_last_port(sock);
+    if (record)
+	*playback_ints++ = i;
     return i;
-  }
-  i = DgramReceiveAny(fd, rbuf, size);
-  if (record) {
-    *(playback_shorts++) = i;
-    if (i > 0) {
-      memcpy(playback_data, rbuf, i);
-      playback_data += i;
-    }
-    else
-      *playback_errnos++ = errno;
-  }
-  return i;
 }
 
-/* DgramRead */
 
-int DgramReadRec(int fd, char *rbuf, int size)
+int sock_receive_anyRec(sock_t *sock, char *rbuf, int size)
 {
-  int i;
+    int i;
 
-  if (playback) {
-    i = *(playback_shorts++);
-    if (i > 0) {
-      memcpy(rbuf, playback_data, i);
-      playback_data += i;
+    if (playback) {
+	i = *(playback_shorts++);
+	if (i > 0) {
+	    memcpy(rbuf, playback_data, i);
+	    playback_data += i;
+	}
+	else
+	    errno = *playback_errnos++;
+	return i;
     }
-    else
-      errno = *playback_errnos++;
+    i = sock_receive_any(sock, rbuf, size);
+    if (record) {
+	*(playback_shorts++) = i;
+	if (i > 0) {
+	    memcpy(playback_data, rbuf, i);
+	    playback_data += i;
+	}
+	else
+	    *playback_errnos++ = errno;
+    }
     return i;
-  }
-  i = DgramRead(fd, rbuf, size);
-  if (record) {
-    *(playback_shorts++) = i;
-    if (i > 0) {
-      memcpy(playback_data, rbuf, i);
-      playback_data += i;
-    }
-    else
-      *playback_errnos++ = errno;
-  }
-  return i;
 }
 
-/* DgramSend */
 
-/* DgramWrite */
-
-int DgramWriteRec(int fd, char *wbuf, int size)
+int sock_readRec(sock_t *sock, char *rbuf, int size)
 {
-  int i;
+    int i;
 
-  if (playback) {
-    return size;
+    if (playback) {
+	i = *(playback_shorts++);
+	if (i > 0) {
+	    memcpy(rbuf, playback_data, i);
+	    playback_data += i;
+	}
+	else
+	    errno = *playback_errnos++;
+	return i;
+    }
+    i = sock_read(sock, rbuf, size);
+    if (record) {
+	*(playback_shorts++) = i;
+	if (i > 0) {
+	    memcpy(playback_data, rbuf, i);
+	    playback_data += i;
+	}
+	else
+	    *playback_errnos++ = errno;
+    }
+    return i;
+}
+
+
+int sock_writeRec(sock_t *sock, char *wbuf, int size)
+{
+    int i;
+
+    if (playback) {
+	return size;
 /*
-    errno = *(playback_ints++);
-    return *(playback_ints++);
-    */
-  }
-  i = DgramWrite(fd, wbuf, size);
-  if (record) {
-  /*
-    *(playback_ints++) = errno;
-    *(playback_ints++) = i;
-    */
-  }
-  return i;
+  errno = *(playback_ints++);
+  return *(playback_ints++);
+*/
+    }
+    i = sock_write(sock, wbuf, size);
+    if (record) {
+	/*
+	 *(playback_ints++) = errno;
+	 *(playback_ints++) = i;
+	 */
+    }
+    if (record && i < size)
+	error("Warning: DgramWrite failed, recording doesn't handle this");
+    return i;
 }
 
-/* GetSocketError */
 
-int GetSocketErrorRec(int fd)
+int sock_get_errorRec(sock_t *sock)
 {
-  int i;
+    int i;
 
-  if (playback) {
-    errno = *(playback_errnos++);
-    return *(playback_ints++);
-  }
-  i = GetSocketError(fd);
-  if (record) {
-    *(playback_errnos++) = errno;
-    *(playback_ints++) = i;
-  }
-  return i;
+    if (playback) {
+	errno = *(playback_errnos++);
+	return *(playback_ints++);
+    }
+    i = sock_get_error(sock);
+    if (record) {
+	*(playback_errnos++) = errno;
+	*(playback_ints++) = i;
+    }
+    return i;
 }
 
-/* SetSocketNonBlocking */
-
-/* SetSocketSendBufferSize */
-
-/* SetSocketReceiveBufferSize */
-
-/* GetPortNum */
-
-int GetPortNumRec(int fd)
-{
-  int i;
-
-  if (playback)
-    return *playback_ints++;
-  i = GetPortNum(fd);
-  if (record)
-    *playback_ints++ = i;
-  return i;
-}
-
-/* send */
-
-int sendRec(int s, const void *msg, int len, unsigned int flags)
-{
-  int i;
-
-  if (playback) {
-    return len;
-    /*
-    errno = *(playback_ints++);
-    return *(playback_ints++);
-    */
-  }
-  i = send(s, msg, len, flags);
-  if (record) {
-/*
-    *(playback_ints++) = errno;
-    *(playback_ints++) = i;
-    */
-  }
-  return i;
-}
-
-/* Sockbuf_flush */
 
 int Sockbuf_flushRec(sockbuf_t *sbuf)
 {
     int			len,
-			i;
+	i;
 
     if (BIT(sbuf->state, SOCKBUF_WRITE) == 0) {
 	errno = 0;
 	error("No flush on non-writable socket buffer");
 	error("(state=%02x,buf=%08x,ptr=%08x,size=%d,len=%d,sock=%d)",
-	    sbuf->state, sbuf->buf, sbuf->ptr, sbuf->size, sbuf->len,
-	    sbuf->sock);
+	      sbuf->state, sbuf->buf, sbuf->ptr, sbuf->size, sbuf->len,
+	      sbuf->sock);
 	return -1;
     }
     if (BIT(sbuf->state, SOCKBUF_LOCK) != 0) {
@@ -270,11 +212,11 @@ int Sockbuf_flushRec(sockbuf_t *sbuf)
 	}
 	return 0;
     }
- 
+
     if (BIT(sbuf->state, SOCKBUF_DGRAM) != 0) {
 	errno = 0;
 	i = 0;
-	while ((len = sendRec(sbuf->sock, sbuf->buf, sbuf->len, 0)) <= 0) {
+	while ((len = sock_writeRec(&sbuf->sock, sbuf->buf, sbuf->len)) <= 0) {
 	    if (len == 0
 		|| errno == EWOULDBLOCK
 		|| errno == EAGAIN) {
@@ -291,12 +233,12 @@ int Sockbuf_flushRec(sockbuf_t *sbuf)
 		return -1;
 	    }
 	    { static int send_err;
-		if ((send_err++ & 0x3F) == 0) {
-		    error("send (%d)", i);
-		}
+	    if ((send_err++ & 0x3F) == 0) {
+		error("send (%d)", i);
 	    }
-	    if (GetSocketErrorRec(sbuf->sock) == -1) {
-		error("GetSocketError send");
+	    }
+	    if (sock_get_errorRec(&sbuf->sock) == -1) {
+		error("sock_get_error send");
 		return -1;
 	    }
 	    errno = 0;
@@ -308,7 +250,7 @@ int Sockbuf_flushRec(sockbuf_t *sbuf)
 	Sockbuf_clear(sbuf);
     } else {
 	errno = 0;
-	while ((len = DgramWriteRec(sbuf->sock, sbuf->buf, sbuf->len)) <= 0) {
+	while ((len = sock_writeRec(&sbuf->sock, sbuf->buf, sbuf->len)) <= 0) {
 	    if (errno == EINTR) {
 		errno = 0;
 		continue;
@@ -325,13 +267,12 @@ int Sockbuf_flushRec(sockbuf_t *sbuf)
     return len;
 }
 
-/* Sockbuf_read */
 
 int Sockbuf_readRec(sockbuf_t *sbuf)
 {
     int			max,
-			i,
-			len;
+	i,
+	len;
 
     if (BIT(sbuf->state, SOCKBUF_READ) == 0) {
 	errno = 0;
@@ -356,7 +297,7 @@ int Sockbuf_readRec(sockbuf_t *sbuf)
     if (BIT(sbuf->state, SOCKBUF_DGRAM) != 0) {
 	errno = 0;
 	i = 0;
-	while ((len = DgramReadRec(sbuf->sock, sbuf->buf + sbuf->len, max)) <= 0) {
+	while ((len = sock_readRec(&sbuf->sock, sbuf->buf + sbuf->len, max)) <= 0) {
 	    if (len == 0) {
 		return 0;
 	    }
@@ -376,12 +317,12 @@ int Sockbuf_readRec(sockbuf_t *sbuf)
 		return -1;
 	    }
 	    { static int recv_err;
-		if ((recv_err++ & 0x3F) == 0) {
-		    error("recv (%d)", i);
-		}
+	    if ((recv_err++ & 0x3F) == 0) {
+		error("recv (%d)", i);
 	    }
-	    if (GetSocketErrorRec(sbuf->sock) == -1) {
-		error("GetSocketError recv");
+	    }
+	    if (sock_get_errorRec(&sbuf->sock) == -1) {
+		error("sock_get_error recv");
 		return -1;
 	    }
 	    errno = 0;
@@ -389,7 +330,7 @@ int Sockbuf_readRec(sockbuf_t *sbuf)
 	sbuf->len += len;
     } else {
 	errno = 0;
-	while ((len = DgramReadRec(sbuf->sock, sbuf->buf + sbuf->len, max)) <= 0) {
+	while ((len = sock_readRec(&sbuf->sock, sbuf->buf + sbuf->len, max)) <= 0) {
 	    if (len == 0) {
 		return 0;
 	    }
@@ -410,7 +351,6 @@ int Sockbuf_readRec(sockbuf_t *sbuf)
     return sbuf->len;
 }
 
-/* Sockbuf_write */
 
 int Sockbuf_writeRec(sockbuf_t *sbuf, char *buf, int len)
 {
@@ -423,7 +363,7 @@ int Sockbuf_writeRec(sockbuf_t *sbuf, char *buf, int len)
 	if (BIT(sbuf->state, SOCKBUF_LOCK | SOCKBUF_DGRAM) != 0) {
 	    errno = 0;
 	    error("No write to locked socket buffer (%d,%d,%d,%d)",
-		sbuf->state, sbuf->size, sbuf->len, len);
+		  sbuf->state, sbuf->size, sbuf->len, len);
 	    return -1;
 	}
 	if (Sockbuf_flushRec(sbuf) == -1) {
@@ -438,10 +378,3 @@ int Sockbuf_writeRec(sockbuf_t *sbuf, char *buf, int len)
 
     return len;
 }
-
-
-/* GetInetAddr */
-
-/* GetLocalHost */
-
-/* GetAddrByName */

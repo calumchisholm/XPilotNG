@@ -103,7 +103,6 @@ int 			framesPerSecond = 18;
 long			main_loops = 0;		/* needed in events.c */
 int                     roundCounter = 1;
 
-static int		serverSocket;
 #ifdef LOG
 static bool		Log = true;
 #endif
@@ -174,7 +173,7 @@ int main(int argc, char **argv)
     /*
      * Get server's official name.
      */
-    GetLocalHostName(Server.host, sizeof Server.host,
+    sock_get_local_hostname(Server.host, sizeof Server.host,
 		     (reportToMetaServer != 0 && searchDomainForXPilot != 0));
 
     Get_login_name(Server.name, sizeof Server.name);
@@ -184,9 +183,9 @@ int main(int argc, char **argv)
      */
     Log_game("START");
 
-    serverSocket = Contact_init();
+    Contact_init();
 
-    Meta_init(serverSocket);
+    Meta_init();
 
     if (Setup_net_server() == -1) {
 	End_game();

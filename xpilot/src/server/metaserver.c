@@ -82,7 +82,7 @@ struct MetaServer	meta_servers[2] = {
     },
 };
 
-static int	Socket = -1;
+extern		sock_t contactSocket;
 static char	msg[MSG_LEN];
 
 extern int	NumPlayers, NumPseudoPlayers, NumQueuedPlayers;
@@ -99,9 +99,11 @@ void Meta_send(char *mesg, int len)
     }
 
     for (i = 0; i < NELEM(meta_servers); i++) {
-	if (DgramSend(Socket, meta_servers[i].addr, META_PORT, mesg, len) != len) {
-	    GetSocketError(Socket);
-	    DgramSend(Socket, meta_servers[i].addr, META_PORT, mesg, len);
+	if (sock_send_dest(&contactSocket, meta_servers[i].addr, META_PORT,
+			   mesg, len) != len) {
+	    sock_get_error(&contactSocket);
+	    sock_send_dest(&contactSocket, meta_servers[i].addr, META_PORT,
+			   mesg, len);
 	}
     }
 }
@@ -126,12 +128,10 @@ void Meta_gone(void)
     }
 }
 
-void Meta_init(int fd)
+void Meta_init(void)
 {
     int			i;
     char		*addr;
-
-    Socket = fd;
 
     if (!reportToMetaServer) {
 	return;
@@ -141,7 +141,7 @@ void Meta_init(int fd)
     xpprintf("%s Locating Internet Meta server... ", showtime()); fflush(stdout);
 #endif
     for (i = 0; i < NELEM(meta_servers); i++) {
-	addr = GetAddrByName(meta_servers[i].name);
+	addr = sock_get_addr_by_name(meta_servers[i].name);
 	if (addr) {
 	    strncpy(meta_servers[i].addr, addr,
 		    sizeof(meta_servers[i].addr));
@@ -289,4 +289,3 @@ void Meta_update(int change)
 
     Meta_send(string, strlen(string) + 1);
 }
-

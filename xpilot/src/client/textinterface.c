@@ -52,6 +52,7 @@
 #include "socklib.h"
 #include "net.h"
 #include "protoclient.h"
+#include "datagram.h"
 #include "portability.h"
 #include "checknames.h"
 #include "connectparam.h"
@@ -120,16 +121,16 @@ static bool Get_contact_message(sockbuf_t *sbuf,
     unsigned char	reply_to, status;
     bool		readable = false;
 
-    SetTimeout(2, 0);
-    while (readable == false && SocketReadable(sbuf->sock) > 0) {
+    sock_set_timeout(&sbuf->sock, 2, 0);
+    while (readable == false && sock_readable(&sbuf->sock) > 0) {
 
 	Sockbuf_clear(sbuf);
-	len = DgramReceiveAny(sbuf->sock, sbuf->buf, sbuf->size);
+	len = sock_receive_any(&sbuf->sock, sbuf->buf, sbuf->size);
 	if (len <= 0) {
 	    if (len == 0) {
 		continue;
 	    }
-	    error("DgramReceiveAny, contact message");
+	    error("sock_receive_any, contact message");
 	    /* exit(1);  no good since meta gui. */
 	    return false;
 	}
@@ -138,8 +139,8 @@ static bool Get_contact_message(sockbuf_t *sbuf,
 	/*
 	 * Get server's host and port.
 	 */
-	strcpy(conpar->server_addr, DgramLastaddr());
-	conpar->server_port = DgramLastport();
+	strcpy(conpar->server_addr, sock_get_last_addr(&sbuf->sock));
+	conpar->server_port = sock_get_last_port(&sbuf->sock);
 	/*
 	 * If the name of the server to contact is the same as its
 	 * IP address then we don't want to do a reverse lookup.
@@ -148,7 +149,7 @@ static bool Get_contact_message(sockbuf_t *sbuf,
 	if (!strcmp(conpar->server_addr, contact_server)) {
 	    strcpy(conpar->server_name, conpar->server_addr);
 	} else {
-	    strncpy(conpar->server_name, DgramLastname(),
+	    strncpy(conpar->server_name, sock_get_last_name(&sbuf->sock),
 		    sizeof(conpar->server_name) - 1);
 	    conpar->server_name[sizeof(conpar->server_name) - 1] = '\0';
 	}
@@ -196,9 +197,9 @@ static int Get_reply_message(sockbuf_t *ibuf,
     unsigned		magic;
 
 
-    if (SocketReadable(ibuf->sock)) {
+    if (sock_readable(&ibuf->sock)) {
 	Sockbuf_clear(ibuf);
-	if ((len = DgramRead(ibuf->sock, ibuf->buf, ibuf->size)) == -1) {
+	if ((len = sock_read(&ibuf->sock, ibuf->buf, ibuf->size)) == -1) {
 	    error("Can't read reply message from %s/%d",
 		  conpar->server_addr, conpar->server_port);
 	    exit(1);
@@ -270,7 +271,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 			     int auto_shutdown, char *shutdown_reason,
 			     Connect_param_t *conpar)
 {
-    int			i, len, retries, delay, max_robots;
+    int			i, len, retries, delay, max_robots, success;
     char		c, status, reply_to, str[MAX_LINE];
     unsigned short	port, qpos;
     int			has_credentials = 0;
@@ -329,38 +330,43 @@ static bool Process_commands(sockbuf_t *ibuf,
 	 * the socket to the server's address and destination port.
 	 * This assures us that we only get replies to the last command sent.
 	 */
-	if (ibuf->sock != -1) {
-	    close_dgram_socket(ibuf->sock);
-	    ibuf->sock = -1;
+	if (ibuf->sock.fd != SOCK_FD_INVALID) {
+	    close_dgram_socket(&ibuf->sock);
+	    ibuf->sock.fd = SOCK_FD_INVALID;
 	}
 
 	privileged_cmd = (strchr("DKLMOR", c) != NULL);
 	if (privileged_cmd) {
 	    if (!has_credentials) {
-		ibuf->sock = create_dgram_addr_socket(conpar->server_addr, 0);
-		if (ibuf->sock == -1) {
-		    printf("Server %s is not local, privileged command not possible.\n",
+		success = create_dgram_addr_socket(&ibuf->sock,
+						      conpar->server_addr, 0);
+		if (success == SOCK_IS_ERROR) {
+		    printf("Server %s is not local, "
+			   "privileged command not possible.\n",
 			   conpar->server_addr);
 		    continue;
 		}
-		close_dgram_socket(ibuf->sock);
+		close_dgram_socket(&ibuf->sock);
 	    }
-	    if ((ibuf->sock = create_dgram_addr_socket(localhost, 0)) == -1) {
+	    if ((success = create_dgram_addr_socket(&ibuf->sock, localhost, 0))
+		  == SOCK_IS_ERROR) {
 		error("Could not create localhost socket");
 		exit(1);
 	    }
-	    if (DgramConnect(ibuf->sock, localhost, conpar->server_port) == -1) {
+	    if (sock_connect(&ibuf->sock, localhost, conpar->server_port) ==
+		SOCK_IS_ERROR) {
 		error("Can't connect to local server %s on port %d\n",
 		      localhost, conpar->server_port);
 		return false;
 	    }
 	} else {
-	    if ((ibuf->sock = create_dgram_socket(0)) == -1) {
+	    if ((success = create_dgram_socket(&ibuf->sock, 0)) ==
+		SOCK_IS_ERROR) {
 		error("Could not create socket");
 		exit(1);
 	    }
-	    if (DgramConnect(ibuf->sock, conpar->server_addr, conpar->server_port) == -1
-		&& !dgram_one_socket) {
+	    if (sock_connect(&ibuf->sock, conpar->server_addr,
+		 conpar->server_port) == SOCK_IS_ERROR && !dgram_one_socket) {
 		error("Can't connect to server %s on port %d\n",
 		      conpar->server_addr, conpar->server_port);
 		return false;
@@ -369,7 +375,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 
 	Sockbuf_clear(ibuf);
 	Packet_printf(ibuf, "%u%s%hu", VERSION2MAGIC(conpar->server_version),
-		      conpar->real_name, GetPortNum(ibuf->sock));
+		      conpar->real_name, sock_get_port(&ibuf->sock));
 
 	if (privileged_cmd && !has_credentials) {
 	    Packet_printf(ibuf, "%c%ld", CREDENTIALS_pack, 0L);
@@ -554,12 +560,11 @@ static bool Process_commands(sockbuf_t *ibuf,
 	retries = (c == 'J' || c == 'S') ? 2 : 0;
 	for (i = 0; i <= retries; i++) {
 	    if (i > 0) {
-		SetTimeout(1, 0);
-		if (SocketReadable(ibuf->sock)) {
+		sock_set_timeout(&ibuf->sock, 1, 0);
+		if (sock_readable(&ibuf->sock))
 		    break;
-		}
 	    }
-	    if (DgramWrite(ibuf->sock, ibuf->buf, ibuf->len) != ibuf->len) {
+	    if (sock_write(&ibuf->sock, ibuf->buf, ibuf->len) != ibuf->len) {
 		error("Couldn't send request to server.");
 		exit(1);
 	    }
@@ -568,7 +573,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 	/*
 	 * Get reply message(s).  If we failed, return false (next server).
 	 */
-	SetTimeout(2, 0);
+	sock_set_timeout(&ibuf->sock, 2, 0);
 	do {
 	    Sockbuf_clear(ibuf);
 	    if (Get_reply_message(ibuf, conpar) <= 0) {
@@ -582,7 +587,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 		return false;
 	    }
 
-	    SetTimeout(0, 500*1000);
+	    sock_set_timeout(&ibuf->sock, 0, 500*1000);
 
 	    /*
 	     * Now try and interpret the result.
@@ -640,7 +645,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 			conpar->login_port = -1;
 		    } else {
 			conpar->login_port = port;
-			printf("*** Login allowed\n");
+			printf("*** Login allowed.\n");
 		    }
 		    break;
 
@@ -658,18 +663,19 @@ static bool Process_commands(sockbuf_t *ibuf,
 		    if (qsent + 10 <= time(NULL)) {
 			Sockbuf_clear(ibuf);
 			Packet_printf(ibuf, "%u%s%hu",
-				      VERSION2MAGIC(conpar->server_version),
-				      conpar->real_name, GetPortNum(ibuf->sock));
+				VERSION2MAGIC(conpar->server_version),
+				conpar->real_name, sock_get_port(&ibuf->sock));
 			Packet_printf(ibuf, "%c%s%s%s%d", ENTER_QUEUE_pack,
 				      conpar->nick_name, conpar->disp_name,
 				      hostname, conpar->team);
-			if (DgramWrite(ibuf->sock, ibuf->buf, ibuf->len) != ibuf->len) {
+			if (sock_write(&ibuf->sock, ibuf->buf, ibuf->len) !=
+				ibuf->len) {
 			    error("Couldn't send request to server.");
 			    exit(1);
 			}
 			time(&qsent);
 		    }
-		    SetTimeout(12, 0);
+		    sock_set_timeout(&ibuf->sock, 12, 0);
 		    max_replies = 2;
 		    break;
 
@@ -757,7 +763,7 @@ static bool Process_commands(sockbuf_t *ibuf,
 		}
 	    }
 
-	} while (--max_replies > 0 && SocketReadable(ibuf->sock));
+	} while (--max_replies > 0 && sock_readable(&ibuf->sock));
 
 	/*
 	 * Get next command.
@@ -781,7 +787,7 @@ int Connect_to_server(int auto_connect, int list_servers,
     sockbuf_t		ibuf;			/* info buffer */
     int			result;
 
-    if (Sockbuf_init(&ibuf, -1, CLIENT_RECV_SIZE,
+    if (Sockbuf_init(&ibuf, NULL, CLIENT_RECV_SIZE,
 		     SOCKBUF_READ | SOCKBUF_WRITE | SOCKBUF_DGRAM) == -1) {
 	error("No memory for info buffer");
 	exit(1);
@@ -790,8 +796,9 @@ int Connect_to_server(int auto_connect, int list_servers,
 			     auto_connect, list_servers,
 			     auto_shutdown, shutdown_reason,
 			     conpar);
-    if (ibuf.sock != -1) {
-	close_dgram_socket(ibuf.sock);
+    if (ibuf.sock.fd != SOCK_FD_INVALID) {
+	close_dgram_socket(&ibuf.sock);
+	ibuf.sock.fd = SOCK_FD_INVALID;
     }
     Sockbuf_cleanup(&ibuf);
 
@@ -806,20 +813,21 @@ int Contact_servers(int count, char **servers,
 		    char **server_addresses, char **server_names,
 		    Connect_param_t *conpar)
 {
-    int			connected = false;
-    const int		max_retries = 2;
-    int			i;
-    int			fd;
-    int			retries;
-    int			contacted;
-    sockbuf_t		sbuf;			/* contact buffer */
+    int		connected = false;
+    const int	max_retries = 2;
+    int		i;
+    int		status;
+    sock_t	sock;
+    int		retries;
+    int		contacted;
+    sockbuf_t	sbuf;			/* contact buffer */
 
 
-    if ((fd = create_dgram_socket(0)) == -1) {
+    if ((status = create_dgram_socket(&sock, 0)) == SOCK_IS_ERROR) {
 	error("Could not create connection socket");
 	exit(1);
     }
-    if (Sockbuf_init(&sbuf, fd, CLIENT_RECV_SIZE,
+    if (Sockbuf_init(&sbuf, &sock, CLIENT_RECV_SIZE,
 		     SOCKBUF_READ | SOCKBUF_WRITE | SOCKBUF_DGRAM) == -1) {
 	error("No memory for contact buffer");
 	exit(1);
@@ -830,8 +838,9 @@ int Contact_servers(int count, char **servers,
 	do {
 	    Sockbuf_clear(&sbuf);
 	    Packet_printf(&sbuf, "%u%s%hu%c", MAGIC,
-			  conpar->real_name, GetPortNum(sbuf.sock), CONTACT_pack);
-	    if (Query_all(sbuf.sock, conpar->contact_port, sbuf.buf, sbuf.len) == -1) {
+		conpar->real_name, sock_get_port(&sbuf.sock), CONTACT_pack);
+	    if (Query_all(&sbuf.sock, conpar->contact_port, sbuf.buf,
+			  sbuf.len) == -1) {
 		error("Couldn't send contact requests");
 		exit(1);
 	    }
@@ -878,11 +887,10 @@ int Contact_servers(int count, char **servers,
 		IFWINDOWS( Progress("Contacting server %s", servers[i]); )
 		Sockbuf_clear(&sbuf);
 		Packet_printf(&sbuf, "%u%s%hu%c", MAGIC,
-			      conpar->real_name, GetPortNum(sbuf.sock), CONTACT_pack);
-		if (DgramSend(sbuf.sock, servers[i],
-			      conpar->contact_port,
-			      sbuf.buf, sbuf.len) == -1) {
-		    if (sl_errno == SL_EHOSTNAME) {
+		   conpar->real_name, sock_get_port(&sbuf.sock), CONTACT_pack);
+		if (sock_send_dest(&sbuf.sock, servers[i],conpar->contact_port,
+				   sbuf.buf, sbuf.len) == -1) {
+		    if (sbuf.sock.error.call == SOCK_CALL_GETHOSTBYNAME) {
 			printf("Can't find %s\n", servers[i]);
 			IFWINDOWS( Progress("Can't find %s", servers[i]); )
 			break;
@@ -908,7 +916,7 @@ int Contact_servers(int count, char **servers,
 	}
     }
     Sockbuf_cleanup(&sbuf);
-    close_dgram_socket(fd);
+    close_dgram_socket(&sock);
 
     return connected ? true : false;
 }

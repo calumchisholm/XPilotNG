@@ -348,7 +348,7 @@ static void parse_styles(char **callptr)
 	edge_styles[i].width = *ptr++;
 	edge_styles[i].color = wallColor;
 	edge_styles[i].rgb = get_32bit(&ptr);
-        edge_styles[i].style = 
+        edge_styles[i].style =
             (*ptr == 1) ? LineOnOffDash :
             (*ptr == 2) ? LineDoubleDash :
             LineSolid;
@@ -655,8 +655,8 @@ int Net_setup(void)
 			  retries, todo, cbuf.len - (cbuf.ptr - cbuf.buf));
 		    return -1;
 		}
-		SetTimeout(2, 0);
-		while (SocketReadable(rbuf.sock) > 0) {
+		sock_set_timeout(&rbuf.sock, 2, 0);
+		while (sock_readable(&rbuf.sock) > 0) {
 		    Sockbuf_clear(&rbuf);
 		    if (Sockbuf_read(&rbuf) == -1) {
 			error("Can't read all setup data");
@@ -665,7 +665,7 @@ int Net_setup(void)
 		    if (rbuf.len > 0) {
 			break;
 		    }
-		    SetTimeout(0, 0);
+		    sock_set_timeout(&rbuf.sock, 0, 0);
 		}
 		if (rbuf.len > 0) {
 		    break;
@@ -730,10 +730,9 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 	    }
 #endif
 	}
-	SetTimeout(1, 0);
-	if (SocketReadable(rbuf.sock) == 0) {
+	sock_set_timeout(&rbuf.sock, 1, 0);
+	if (sock_readable(&rbuf.sock) == 0)
 	    continue;
-	}
 	Sockbuf_clear(&rbuf);
 	if (Sockbuf_read(&rbuf) == -1) {
 	    error("Can't read verify reply packet");
@@ -803,9 +802,10 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
  */
 int Net_init(char *server, int port)
 {
-    int			i,
-			sock;
-    unsigned		size;
+    int		i,
+		status;
+    unsigned	size;
+    sock_t	sock;
 
 #ifndef	_WINDOWS
     signal(SIGPIPE, SIG_IGN);
@@ -813,24 +813,24 @@ int Net_init(char *server, int port)
 
     Receive_init();
 
-    if ((sock = CreateDgramSocket(0)) == -1) {
+    if ((status = sock_open_udp(&sock, NULL, 0)) == -1) {
 	error("Can't create datagram socket");
 	return -1;
     }
-    if (DgramConnect(sock, server, port) == -1) {
+    if (sock_connect(&sock, server, port) == -1) {
 	error("Can't connect to server %s on port %d", server, port);
-	DgramClose(sock);
+	sock_close(&sock);
 	return -1;
     }
     wbuf.sock = sock;
-    if (SetSocketNonBlocking(sock, 1) == -1) {
+    if (sock_set_non_blocking(&sock, 1) == -1) {
 	error("Can't make socket non-blocking");
 	return -1;
     }
-    if (SetSocketSendBufferSize(sock, CLIENT_SEND_SIZE + 256) == -1) {
+    if (sock_set_send_buffer_size(&sock, CLIENT_SEND_SIZE + 256) == -1) {
 	error("Can't set send buffer size to %d", CLIENT_SEND_SIZE + 256);
     }
-    if (SetSocketReceiveBufferSize(sock, CLIENT_RECV_SIZE + 256) == -1) {
+    if (sock_set_receive_buffer_size(&sock, CLIENT_RECV_SIZE + 256) == -1) {
 	error("Can't set receive buffer size to %d", CLIENT_RECV_SIZE + 256);
     }
 
@@ -841,7 +841,7 @@ int Net_init(char *server, int port)
     }
     for (i = 0; i < receive_window_size; i++) {
 	Frames[i].loops = 0;
-	if (Sockbuf_init(&Frames[i].sbuf, sock, CLIENT_RECV_SIZE,
+	if (Sockbuf_init(&Frames[i].sbuf, &sock, CLIENT_RECV_SIZE,
 			 SOCKBUF_READ | SOCKBUF_DGRAM) == -1) {
 	    error("No memory for read buffer (%u)", CLIENT_RECV_SIZE);
 	    return -1;
@@ -849,14 +849,14 @@ int Net_init(char *server, int port)
     }
 
     /* reliable data buffer, not a valid socket filedescriptor needed */
-    if (Sockbuf_init(&cbuf, -1, CLIENT_RECV_SIZE,
+    if (Sockbuf_init(&cbuf, NULL, CLIENT_RECV_SIZE,
 		     SOCKBUF_WRITE | SOCKBUF_READ | SOCKBUF_LOCK) == -1) {
 	error("No memory for control buffer (%u)", CLIENT_RECV_SIZE);
 	return -1;
     }
 
     /* write buffer */
-    if (Sockbuf_init(&wbuf, sock, CLIENT_SEND_SIZE,
+    if (Sockbuf_init(&wbuf, &sock, CLIENT_SEND_SIZE,
 		     SOCKBUF_WRITE | SOCKBUF_DGRAM) == -1) {
 	error("No memory for write buffer (%u)", CLIENT_SEND_SIZE);
 	return -1;
@@ -883,15 +883,15 @@ int Net_init(char *server, int port)
  */
 void Net_cleanup(void)
 {
-    int		i,
-		sock = wbuf.sock;
+    int		i;
+    sock_t	sock = wbuf.sock;
     char	ch;
 
-    if (sock > 2) {
+    if (sock.fd > 2) {
 	ch = PKT_QUIT;
-	if (DgramWrite(sock, &ch, 1) != 1) {
-	    GetSocketError(sock);
-	    DgramWrite(sock, &ch, 1);
+	if (sock_write(&sock, &ch, 1) != 1) {
+	    sock_get_error(&sock);
+	    sock_write(&sock, &ch, 1);
 	}
 	micro_delay((unsigned)50*1000);
     }
@@ -912,18 +912,18 @@ void Net_cleanup(void)
 	free(Setup);
 	Setup = NULL;
     }
-    if (sock > 2) {
+    if (sock.fd > 2) {
 	ch = PKT_QUIT;
-	if (DgramWrite(sock, &ch, 1) != 1) {
-	    GetSocketError(sock);
-	    DgramWrite(sock, &ch, 1);
+	if (sock_write(&sock, &ch, 1) != 1) {
+	    sock_get_error(&sock);
+	    sock_write(&sock, &ch, 1);
 	}
 	micro_delay((unsigned)50*1000);
-	if (DgramWrite(sock, &ch, 1) != 1) {
-	    GetSocketError(sock);
-	    DgramWrite(sock, &ch, 1);
+	if (sock_write(&sock, &ch, 1) != 1) {
+	    sock_get_error(&sock);
+	    sock_write(&sock, &ch, 1);
 	}
-	DgramClose(sock);
+	sock_close(&sock);
     }
 }
 
@@ -967,7 +967,7 @@ int Net_flush(void)
  */
 int Net_fd(void)
 {
-    return rbuf.sock;
+    return rbuf.sock.fd;
 }
 
 /*
@@ -1013,9 +1013,9 @@ int Net_start(void)
 	if (cbuf.ptr > cbuf.buf) {
 	    Sockbuf_advance(&cbuf, cbuf.ptr - cbuf.buf);
 	}
-	SetTimeout(2, 0);
+	sock_set_timeout(&rbuf.sock, 2, 0);
 	while (cbuf.len <= 0
-	    && SocketReadable(rbuf.sock) != 0) {
+	    && sock_readable(&rbuf.sock) != 0) {
 	    Sockbuf_clear(&rbuf);
 	    if (Sockbuf_read(&rbuf) == -1) {
 		error("Error reading play reply");

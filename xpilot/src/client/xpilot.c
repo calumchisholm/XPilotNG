@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 	strncpy(hostname, cp, sizeof(hostname) - 1);
     }
     else {
-        GetLocalHostName(hostname, sizeof hostname, 0);
+        sock_get_local_hostname(hostname, sizeof hostname, 0);
     }
     if (Check_host_name(hostname) == NAME_ERROR) {
 	xpprintf("fixing host from \"%s\" ", hostname);

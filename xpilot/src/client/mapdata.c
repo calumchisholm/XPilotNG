@@ -11,9 +11,9 @@
 
 #include <zlib.h>
 
-#include "../common/socklib.h"
-#include "../common/const.h"
-#include "../common/error.h"
+#include "socklib.h"
+#include "const.h"
+#include "error.h"
 
 #define COPY_BUF_SIZE 8192
 
@@ -57,19 +57,19 @@ int Mapdata_setup (const char *urlstr) {
         error("Texture path is null");
         goto end;
     }
-    
+
     strncpy(path, texturePath, 1024 - 1);
     path[1024 - 1] = '\0';
 
     for (dir = strtok(texturePath, ":"); dir; dir = strtok(NULL, ":"))
-        if (access(dir, R_OK | W_OK | X_OK) == 0) 
+        if (access(dir, R_OK | W_OK | X_OK) == 0)
             break;
-    
+
     if (dir == NULL) {
         error("Couldn't access any directory in %s", path);
         goto end;
     }
-    
+
     sprintf(path, "%s%s", dir, name);
 
     if (strrchr(path, '.') == NULL) {
@@ -94,7 +94,7 @@ int Mapdata_setup (const char *urlstr) {
         free(texturePath);
         texturePath = temp;
     }
-    
+
     if (access(path, F_OK) == 0) {
         printf("Required bitmaps have already been downloaded.\n");
         rv = TRUE;
@@ -102,7 +102,7 @@ int Mapdata_setup (const char *urlstr) {
     }
     /* reset path so that it points to the package file name */
     *ptr = '.';
-    
+
     printf("Downloading map data from %s to %s\n", urlstr, path);
 
     if (!Mapdata_download(&url, path)) {
@@ -114,7 +114,7 @@ int Mapdata_setup (const char *urlstr) {
         error("Extracting map data failed");
         goto end;
     }
-    
+
     rv = TRUE;
 
  end:
@@ -140,7 +140,7 @@ static int Mapdata_extract (const char *name) {
         return 0;
     }
     *ptr = '\0';
-    
+
     if (mkdir(dir, S_IRWXU | S_IRWXG | S_IRWXO) == -1) {
         error("failed to create directory %s", dir);
         return 0;
@@ -161,7 +161,7 @@ static int Mapdata_extract (const char *name) {
         error("invalid header in %s", name);
         gzclose(in);
         return 0;
-    }    
+    }
 
     for (i = 0; i < count; i++) {
 
@@ -216,10 +216,10 @@ static int Mapdata_extract (const char *name) {
                 fclose(out);
                 return 0;
             }
-            
+
             size -= rlen;
         }
-        
+
         fclose(out);
     }
 
@@ -231,7 +231,8 @@ static int Mapdata_extract (const char *name) {
 static int Mapdata_download (const URL *url, const char *filePath)
 {
     char buf[1024];
-    int s, rv, header, c, i;
+    int rv, header, c, i;
+    sock_t s;
     FILE *f;
     size_t len;
 
@@ -244,42 +245,45 @@ static int Mapdata_download (const URL *url, const char *filePath)
         error("failed to open %s", filePath);
         return FALSE;
     }
-    
-    if ((s = CreateClientSocket(url->host, url->port)) == -1) {
-        error("failed to create a socket");
+
+    if (sock_open_tcp(&s) == SOCK_IS_ERROR) {
+	error("Failed to create a socket");
+	fclose(f);
+	return FALSE;
+    }
+    if (sock_connect(&s, url->host, url->port) == SOCK_IS_ERROR) {
+        error("Couldn't connect to download address");
+	sock_close(&s);
         fclose(f);
         return FALSE;
     }
 
     if (url->query) {
-        if (snprintf
-            (buf, 1024,
-             "GET %s?%s HTTP/1.1\r\nHost: %s:%d\r\nConnection: close\r\n\r\n", 
+        if (snprintf(buf, 1024,
+             "GET %s?%s HTTP/1.1\r\nHost: %s:%d\r\nConnection: close\r\n\r\n",
              url->path, url->query, url->host, url->port) == -1) {
-
             error("too long URL");
             fclose(f);
-            SocketClose(s);
+            sock_close(&s);
             return FALSE;
         }
 
     } else {
-        if (snprintf
-            (buf, 1024,
-             "GET %s HTTP/1.1\r\nHost: %s:%d\r\nConnection: close\r\n\r\n", 
+        if (snprintf(buf, 1024,
+             "GET %s HTTP/1.1\r\nHost: %s:%d\r\nConnection: close\r\n\r\n",
              url->path, url->host, url->port) == -1) {
 
             error("too long URL");
             fclose(f);
-            SocketClose(s);
+	    sock_close(&s);
             return FALSE;
         }
     }
 
-    if (SocketWrite(s, buf, strlen(buf)) == -1) {
+    if (sock_write(&s, buf, strlen(buf)) == -1) {
         error("socket write failed");
         fclose(f);
-        SocketClose(s);
+        sock_close(&s);
         return FALSE;
     }
 
@@ -287,7 +291,7 @@ static int Mapdata_download (const URL *url, const char *filePath)
     c = 0;
 
     for(;;) {
-        if ((len = read(s, buf, 1024)) == -1) {
+        if ((len = read(s.fd, buf, 1024)) == -1) {
             error("socket read failed");
             rv = FALSE;
             break;
@@ -328,12 +332,12 @@ static int Mapdata_download (const URL *url, const char *filePath)
     }
     printf("\n");
     fclose(f);
-    SocketClose(s);
+    sock_close(&s);
     return rv;
 }
 
 
-static int Url_parse (const char *urlstr, URL *url) 
+static int Url_parse (const char *urlstr, URL *url)
 {
     int len, i, beg, doPort;
     char *buf;
@@ -348,7 +352,7 @@ static int Url_parse (const char *urlstr, URL *url)
         error("no memory for URL");
         return FALSE;
     }
-    
+
     for (i = 0; i < len; i++) {
         if (buf[i] == ':') {
             buf[i] = '\0';
@@ -362,7 +366,7 @@ static int Url_parse (const char *urlstr, URL *url)
         free(buf);
         return FALSE;
     }
-    
+
     doPort = 0;
     for (i = beg; i < len; i++) {
         if (buf[i] == ':' || buf[i] == '/') {

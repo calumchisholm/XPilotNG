@@ -136,12 +136,12 @@ static void Paint_checkpoint_radar(float xf, float yf)
         if (oldServer) {
             Check_pos_by_index(nextCheckPoint, &x, &y);
             x = ((int)(x * BLOCK_SZ * xf + 0.5) ) - slidingradar_x;
-            y = (RadarHeight - (int)(y * BLOCK_SZ * yf + 0.5) + DSIZE - 1) - 
+            y = (RadarHeight - (int)(y * BLOCK_SZ * yf + 0.5) + DSIZE - 1) -
                 slidingradar_y;
         } else {
             irec b = checks[nextCheckPoint].bounds;
             x = (int)(b.x * xf + 0.5) - slidingradar_x;
-            y = (RadarHeight - (int)(b.y * yf + 0.5) + DSIZE - 1) - 
+            y = (RadarHeight - (int)(b.y * yf + 0.5) + DSIZE - 1) -
                 slidingradar_y;
         }
         if (x <= 0) {
@@ -264,8 +264,6 @@ void Paint_radar(void)
     slidingradar_x = 0;
     slidingradar_y = 0;
 
-    Copy_static_radar();
-
 #ifdef	_WINDOWS
     if (BIT(instruments, SHOW_SLIDING_RADAR) != 0) {
 	/*
@@ -273,6 +271,10 @@ void Paint_radar(void)
 	 */
 	Windows_copy_sliding_radar(xf, yf);
     }
+    else
+	Copy_static_radar();
+#else
+    Copy_static_radar();
 #endif
 
     /* Checkpoints */
@@ -677,7 +679,7 @@ void Paint_world_radar(void)
       int x = polygons[i].points[0].x + x_offset;
       int y = Setup->height - polygons[i].points[0].y + y_offset;
 
-      if (BIT(polygon_styles[polygons[i].style].flags, 
+      if (BIT(polygon_styles[polygons[i].style].flags,
               STYLE_INVISIBLE_RADAR)) continue;
 
       poly[0].x = (x * 256) / Setup->width;
@@ -770,4 +772,3 @@ void Paint_radar_block(int xi, int yi, int color)
 		      AllPlanes & ~(dpl_2[0] | dpl_2[1]));
     }
 }
-

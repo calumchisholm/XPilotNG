@@ -167,13 +167,13 @@ enum MetaState {
 struct Meta {
     char		name[MAX_HOST_LEN];
     char		addr[16];
-    int			fd;
+    sock_t		sock;
     enum MetaState	state;	/* connecting, readable, receiving */
 };
 static struct Meta	metas[NUM_METAS] = {
-			    { META_HOST,     META_IP,     -2, MetaConnecting },
-			    { META_HOST_TWO, META_IP_TWO, -2, MetaConnecting }
-			};
+			  { META_HOST,     META_IP,    {-2}, MetaConnecting },
+			  { META_HOST_TWO, META_IP_TWO,{-2}, MetaConnecting }
+};
 
 /*
  * Enum for different modes the welcome screen can be in.
@@ -304,7 +304,7 @@ static int Local_status_cb(int widget, void *user_data, const char **text)
     return 0;
 }
 
-/* 
+/*
  * Cleanup when leaving the mode ModeLocalnet.
  */
 static void Localnet_cleanup(void)
@@ -521,7 +521,7 @@ static int Welcome_sort_server_list(void)
     list_t		new_list = List_new();
     list_iter_t		it;
     int			delta;
-    void		*vp; 
+    void		*vp;
     server_info_t	*sip_old;
     server_info_t	*sip_new;
 
@@ -751,26 +751,27 @@ static void Add_meta_line(char *meta_line)
  */
 static void Meta_connect(int *connections_ptr, int *maxfd_ptr)
 {
-    int			i;
-    int			connections = 0;
-    int			max = -1;
-    char		buf[256];
+    int		i;
+    int		status;
+    int		connections = 0;
+    int		max = -1;
+    char	buf[256];
 
     for (i = 0; i < NUM_METAS; i++) {
-	if (metas[i].fd != -1) {
-	    close(metas[i].fd);
+	if (metas[i].sock.fd != SOCK_FD_INVALID) {
+	    sock_close(&metas[i].sock);
 	}
-	metas[i].fd = CreateClientSocketNonBlocking(metas[i].addr,
-						    META_PROG_PORT);
-	if (metas[i].fd == -1) {
+	status = sock_open_tcp_connected_non_blocking(&metas[i].sock,
+					metas[i].addr, META_PROG_PORT);
+	if (status == SOCK_IS_ERROR) {
 	    sprintf(buf, "Could not establish connection with %s",
 		    metas[i].name);
 	    error(buf);
 	    Welcome_create_label(1, buf);
 	} else {
 	    connections++;
-	    if (metas[i].fd > max) {
-		max = metas[i].fd;
+	    if (metas[i].sock.fd > max) {
+		max = metas[i].sock.fd;
 	    }
 	}
     }
@@ -792,11 +793,11 @@ static void Meta_dns_lookup(void)
     char		buf[256];
 
     for (i = 0; i < NUM_METAS; i++) {
-	if (metas[i].fd == -2) {
-	    metas[i].fd = -1;
+	if (metas[i].sock.fd == -2) {
+	    metas[i].sock.fd = SOCK_FD_INVALID;
 	    sprintf(buf, "Doing a DNS lookup on %s ... ", metas[i].name);
 	    Welcome_create_label(1, buf);
-	    addr = GetAddrByName(metas[i].name);
+	    addr = sock_get_addr_by_name(metas[i].name);
 	    if (addr) {
 		strcpy(metas[i].addr, addr);
 	    }
@@ -854,8 +855,8 @@ static int Get_meta_data(void)
     FD_ZERO(&wset_in);
     for (i = 0; i < NUM_METAS; i++) {
 	metas[i].state = MetaConnecting;
-	if (metas[i].fd != -1) {
-	    FD_SET(metas[i].fd, &wset_in);
+	if (metas[i].sock.fd != SOCK_FD_INVALID) {
+	    FD_SET(metas[i].sock.fd, &wset_in);
 	}
 	md[i].ptr = NULL;
 	md[i].end = NULL;
@@ -891,13 +892,13 @@ static int Get_meta_data(void)
 	    break;
 	}
 	for (i = 0; i < NUM_METAS; i++) {
-	    if (metas[i].fd == -1) {
+	    if (metas[i].sock.fd == SOCK_FD_INVALID) {
 		continue;
 	    }
-	    else if (FD_ISSET(metas[i].fd, &wset_out)) {
+	    else if (FD_ISSET(metas[i].sock.fd, &wset_out)) {
 		/* promote socket from writable to readable. */
-		FD_CLR(metas[i].fd, &wset_in);
-		FD_SET(metas[i].fd, &rset_in);
+		FD_CLR(metas[i].sock.fd, &wset_in);
+		FD_SET(metas[i].sock.fd, &rset_in);
 		metas[i].state = MetaReadable;
 		readers++;
 		if (!senders) {
@@ -907,7 +908,7 @@ static int Get_meta_data(void)
 		}
 		time(&start);
 	    }
-	    else if (FD_ISSET(metas[i].fd, &rset_out)) {
+	    else if (FD_ISSET(metas[i].sock.fd, &rset_out)) {
 		if (md[i].ptr == NULL && md[i].end == NULL) {
 		    md[i].ptr = md[i].buf;
 		    md[i].end = md[i].buf;
@@ -917,14 +918,14 @@ static int Get_meta_data(void)
 		    time(&start);
 		}
 		n = &md[i].buf[sizeof(md[i].buf)] - md[i].end;
-		n = read(metas[i].fd, md[i].end, n);
+		n = read(metas[i].sock.fd, md[i].end, n);
 		if (n <= 0) {
 		    if (n == -1) {
-			error("Error while reading data from meta %d\n", i + 1);
+			error("Error while reading data from meta %d\n",i + 1);
 		    }
-		    FD_CLR(metas[i].fd, &rset_in);
-		    close(metas[i].fd);
-		    metas[i].fd = -1;
+		    FD_CLR(metas[i].sock.fd, &rset_in);
+		    close(metas[i].sock.fd);
+		    metas[i].sock.fd = SOCK_FD_INVALID;
 		    --connections;
 		    --readers;
 		    if (metas[i].state == MetaReceiving) {
@@ -935,9 +936,9 @@ static int Get_meta_data(void)
 			     * to know and close down all other connections.
 			     */
 			    for (i = 0; i < NUM_METAS; i++) {
-				if (metas[i].fd != -1) {
-				    close(metas[i].fd);
-				    metas[i].fd = -1;
+				if (metas[i].sock.fd != SOCK_FD_INVALID) {
+				    close(metas[i].sock.fd);
+				    metas[i].sock.fd = SOCK_FD_INVALID;
 				}
 			    }
 			    connections = 0;
@@ -1428,7 +1429,7 @@ static int Welcome_show_server_list(Connect_param_t *conpar)
     return -1;
 }
 
-/* 
+/*
  * Cleanup when leaving the mode ModeLocalnet.
  */
 static void Internet_cleanup(void)
@@ -1872,4 +1873,3 @@ int Welcome_screen(Connect_param_t *conpar)
 
     return result;
 }
-

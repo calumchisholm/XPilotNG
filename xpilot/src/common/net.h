@@ -25,6 +25,8 @@
 #ifndef	NET_H
 #define	NET_H
 
+/* need sock_t */
+#include "socklib.h"
 
 #define MIN_SOCKBUF_SIZE	1024
 #define MAX_SOCKBUF_SIZE	(50*1024)
@@ -70,7 +72,7 @@
  * the number of network packets.
  */
 typedef struct {
-    int		sock;		/* socket filedescriptor */
+    sock_t	sock;		/* socket filedescriptor */
     char	*buf;		/* i/o data buffer */
     int		size;		/* size of buffer */
     int		len;		/* amount of data in buffer (writing/reading) */
@@ -78,7 +80,7 @@ typedef struct {
     int		state;		/* read/write/locked/error status flags */
 } sockbuf_t;
 
-int Sockbuf_init(sockbuf_t *sbuf, int sock, int size, int state);
+int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, int size, int state);
 int Sockbuf_cleanup(sockbuf_t *sbuf);
 int Sockbuf_clear(sockbuf_t *sbuf);
 int Sockbuf_advance(sockbuf_t *sbuf, int len);
@@ -104,4 +106,3 @@ int Sockbuf_copy(sockbuf_t *dest, sockbuf_t *src, int len);
 #endif
 
 #endif
-

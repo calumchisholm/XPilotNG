@@ -1176,7 +1176,7 @@ static int Config_update_instruments(int widget_desc, void *data, bool *val)
 	if (oldServer) Map_dots();
 	Paint_world_radar();
     }
-    
+
     if (BIT(bit, outline_mask) && oldServer) {
 	/* only do the map recalculations if really needed. */
 	if (!BIT(old_instruments, outline_mask)
@@ -1299,7 +1299,6 @@ static int Config_update_texturedObjects(int widget_desc, void *data, bool *val)
 #ifdef	WINDOWSCALING
 static int Config_update_scaleFactor(int widget_desc, void *data, DFLOAT *val)
 {
-    int i;
     Init_scale_array();
     Resize(top, top_width, top_height);
     Scale_dashes();

@@ -509,9 +509,8 @@ static void Conn_set_state(connection_t *connp, int state, int drain_state)
 void Destroy_connection(int ind, const char *reason)
 {
     connection_t	*connp = &Conn[ind];
-    int			id,
-			len,
-			sock;
+    int			id, len;
+    sock_t		*sock;
     char		pkt[MAX_CHARS];
 
     if (connp->state == CONN_FREE) {
@@ -520,16 +519,16 @@ void Destroy_connection(int ind, const char *reason)
 	return;
     }
 
-    sock = connp->w.sock;
-    remove_input(sock);
+    sock = &connp->w.sock;
+    remove_input(sock->fd);
 
     strncpy(&pkt[1], reason, sizeof(pkt) - 2);
     pkt[sizeof(pkt) - 1] = '\0';
     pkt[0] = PKT_QUIT;
     len = strlen(pkt) + 1;
-    if (DgramWriteRec(sock, pkt, len) != len) {
-	GetSocketErrorRec(sock);
-	DgramWriteRec(sock, pkt, len);
+    if (sock_writeRec(sock, pkt, len) != len) {
+	sock_get_errorRec(sock);
+	sock_writeRec(sock, pkt, len);
     }
 #ifndef SILENT
     xpprintf("%s Goodbye %s=%s@%s|%s (\"%s\")\n",
@@ -589,11 +588,11 @@ void Destroy_connection(int ind, const char *reason)
 
     num_logouts++;
 
-    if (DgramWriteRec(sock, pkt, len) != len) {
-	GetSocketErrorRec(sock);
-	DgramWriteRec(sock, pkt, len);
+    if (sock_writeRec(sock, pkt, len) != len) {
+	sock_get_errorRec(sock);
+	sock_writeRec(sock, pkt, len);
     }
-    DgramCloseRec(sock);
+    sock_closeRec(sock);
 }
 
 
@@ -619,46 +618,47 @@ int Check_connection(char *real, char *nick, char *dpy, char *addr)
 }
 
 
-void Create_client_socket(int *socket, int *port)
+void Create_client_socket(sock_t *socket, int *port)
 {
     int i;
 
     if (!clientPortStart || !clientPortEnd) {
-	if ((*socket = CreateDgramSocket(0)) == -1) {
-	    error("Cannot create datagram socket (%d)", sl_errno);
+	if (sock_open_udp(socket, NULL, 0) == SOCK_IS_ERROR) {
+	    error("Cannot create datagram socket (%d)", socket->error.error);
+	    socket->fd = -1;
 	    return;
 	}
     }
     else {
 	for (i = clientPortStart; i <= clientPortEnd; i++)
-	    if ( (*socket = CreateDgramSocket(i)) != -1)
+	    if (sock_open_udp(socket, NULL, i) != SOCK_IS_ERROR)
 		goto found;
 	error("Could not find a useable port in given port range");
-	*socket = -1;
+	socket->fd = -1;
 	return;
     }
 found:
-    if ( (*port = GetPortNum(*socket)) == -1) {
+    if ( (*port = sock_get_port(socket)) == -1) {
 	error("Cannot get port from socket");
 	goto error;
     }
-    if (SetSocketNonBlocking(*socket, 1) == -1) {
+    if (sock_set_non_blocking(socket, 1) == -1) {
 	error("Cannot make client socket non-blocking");
 	goto error;
     }
-    if (SetSocketReceiveBufferSize(*socket, SERVER_RECV_SIZE + 256) == -1) {
+    if (sock_set_receive_buffer_size(socket, SERVER_RECV_SIZE + 256) == -1) {
 	error("Cannot set receive buffer size to %d", SERVER_RECV_SIZE + 256);
 	goto error; /* Not strictly necessary */
     }
-    if (SetSocketSendBufferSize(*socket, SERVER_SEND_SIZE + 256) == -1) {
+    if (sock_set_send_buffer_size(socket, SERVER_SEND_SIZE + 256) == -1) {
 	error("Cannot set send buffer size to %d", SERVER_SEND_SIZE + 256);
 	goto error;
     }
     return;
 
 error:
-    DgramClose(*socket);
-    *socket = -1;
+    sock_close(socket);
+    socket->fd = -1;
     return;
 }
 
@@ -676,10 +676,9 @@ extern int min_fd;
 int Setup_connection(char *real, char *nick, char *dpy, int team,
 		     char *addr, char *host, unsigned version)
 {
-    int			i,
-			free_conn_index = max_connections,
-			my_port,
-			sock;
+    int			i, my_port,
+			free_conn_index = max_connections;
+    sock_t		sock;
     connection_t	*connp;
 
     if (rrecord) {
@@ -742,24 +741,26 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     if (!playback) {
 	Create_client_socket(&sock, &my_port);
 	if (rrecord) {
-	    *playback_ei++ = sock - min_fd;
+	    *playback_ei++ = sock.fd - min_fd;
 	    *playback_ei++ = my_port;
 	}
     }
     else {
-	sock = *playback_ei++;
+	sock_init(&sock);
+	sock.flags |= SOCK_FLAG_UDP;
+	sock.fd = *playback_ei++;
 	my_port = *playback_ei++;
     }
-    if (sock == -1)
+    if (sock.fd == -1)
 	return -1;
 
-    Sockbuf_init(&connp->w, sock, SERVER_SEND_SIZE,
+    Sockbuf_init(&connp->w, &sock, SERVER_SEND_SIZE,
 		 SOCKBUF_WRITE | SOCKBUF_DGRAM);
 
-    Sockbuf_init(&connp->r, sock, SERVER_RECV_SIZE,
+    Sockbuf_init(&connp->r, &sock, SERVER_RECV_SIZE,
 		 SOCKBUF_READ | SOCKBUF_DGRAM);
 
-    Sockbuf_init(&connp->c, -1, MAX_SOCKBUF_SIZE,
+    Sockbuf_init(&connp->c, NULL, MAX_SOCKBUF_SIZE,
 		 SOCKBUF_WRITE | SOCKBUF_READ | SOCKBUF_LOCK);
 
     connp->my_port = my_port;
@@ -772,7 +773,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
     connp->team = team;
     connp->version = version;
     connp->start = main_loops;
-    connp->magic = my_port + sock + team + main_loops; /* + rand */
+    connp->magic = my_port + sock.fd + team + main_loops; /* + rand */
     connp->id = -1;
     connp->timeout = LISTEN_TIMEOUT;
     connp->last_key_change = 0;
@@ -809,7 +810,7 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 	return -1;
     }
 
-    install_input(Handle_input, sock, (void *)free_conn_index);
+    install_input(Handle_input, sock.fd, (void *)free_conn_index);
 
     return my_port;
 }
@@ -831,7 +832,7 @@ static int Handle_listening(int ind)
     }
     Sockbuf_clear(&connp->r);
     errno = 0;
-    n = DgramReceiveAnyRec(connp->r.sock, connp->r.buf, connp->r.size);
+    n = sock_receive_anyRec(&connp->r.sock, connp->r.buf, connp->r.size);
     if (n <= 0) {
 	if (n == 0
 	    || errno == EWOULDBLOCK
@@ -844,19 +845,19 @@ static int Handle_listening(int ind)
 	return n;
     }
     connp->r.len = n;
-    connp->his_port = DgramLastportRec();
-    if (DgramConnectRec(connp->w.sock, connp->addr, connp->his_port) == -1) {
+    connp->his_port = sock_get_last_portRec(&connp->r.sock);
+    if (sock_connectRec(&connp->w.sock, connp->addr, connp->his_port) == -1) {
 	error("Cannot connect datagram socket (%s,%d,%d)",
-	      connp->addr, connp->his_port, sl_errno);
-	if (GetSocketErrorRec(connp->w.sock)) {
+	      connp->addr, connp->his_port, connp->w.sock.error.error);
+	if (sock_get_errorRec(&connp->w.sock)) {
 	    error("GetSocketError fails too, giving up");
 	    Destroy_connection(ind, "connect error");
 	    return -1;
 	}
 	errno = 0;
-	if (DgramConnectRec(connp->w.sock, connp->addr, connp->his_port) == -1) {
+	if (sock_connectRec(&connp->w.sock, connp->addr, connp->his_port) == -1) {
 	    error("Still cannot connect datagram socket (%s,%d,%d)",
-		  connp->addr, connp->his_port, sl_errno);
+		  connp->addr, connp->his_port, connp->w.sock.error.error);
 	    Destroy_connection(ind, "connect error");
 	    return -1;
 	}
@@ -865,9 +866,9 @@ static int Handle_listening(int ind)
     xpprintf("%s Welcome %s=%s@%s|%s (%s/%d)", showtime(), connp->nick,
 	   connp->real, connp->host, connp->dpy, connp->addr, connp->his_port);
     if (connp->version != MY_VERSION)
-		xpprintf(" (version %04x)\n", connp->version);
-	else
-		xpprintf("\n");
+	xpprintf(" (version %04x)\n", connp->version);
+    else
+	xpprintf("\n");
 #endif
     if (connp->r.ptr[0] != PKT_VERIFY) {
 	Send_reply(ind, PKT_VERIFY, PKT_FAILURE);

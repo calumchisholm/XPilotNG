@@ -65,7 +65,6 @@ bool team_dead(int team);
 /*
  * Prototypes for map.c
  */
-void Print_map(void)			/* Debugging only. */;
 void Init_map(void);
 void Free_map(void);
 void Alloc_map(void);
@@ -247,7 +246,7 @@ void Main_loop(void);
  * Prototypes for contact.c
  */
 void Contact_cleanup(void);
-int Contact_init(void);
+void Contact_init(void);
 void Contact(int fd, void *arg);
 void Queue_loop(void);
 void Set_deny_hosts(void);
@@ -258,7 +257,7 @@ void Set_deny_hosts(void);
 void Meta_send(char *mesg, int len);
 int Meta_from(char *addr, int port);
 void Meta_gone(void);
-void Meta_init(int fd);
+void Meta_init(void);
 void Meta_update(int change);
 
 /*

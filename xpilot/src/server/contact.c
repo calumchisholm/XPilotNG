@@ -71,7 +71,7 @@ int			NumQueuedPlayers = 0;
 int			MaxQueuedPlayers = 20;
 int			NumPseudoPlayers = 0;
 
-static int		contactSocket;
+sock_t			contactSocket;
 static sockbuf_t	ibuf;
 static char		msg[MSG_LEN];
 extern int		game_lock;
@@ -95,33 +95,32 @@ static int Check_address(char *addr);
 
 void Contact_cleanup(void)
 {
-    DgramClose(contactSocket);
-    contactSocket = -1;
+    sock_close(&contactSocket);
 }
 
-int Contact_init(void)
+void Contact_init(void)
 {
+    int status;
+
     /*
      * Create a socket which we can listen on.
      */
-    SetTimeout(0, 0);
-    if ((contactSocket = CreateDgramSocket(contactPort)) == -1) {
-	error("Could not create Dgram contactSocket");
+    if ((status = sock_open_udp(&contactSocket, NULL, contactPort)) ==
+	SOCK_IS_ERROR) {
 	End_game();
     }
-    if (SetSocketNonBlocking(contactSocket, 1) == -1) {
+    sock_set_timeout(&contactSocket, 0, 0);
+    if (sock_set_non_blocking(&contactSocket, 1) == SOCK_IS_ERROR) {
 	error("Can't make contact socket non-blocking");
 	End_game();
     }
-    if (Sockbuf_init(&ibuf, contactSocket, SERVER_SEND_SIZE,
+    if (Sockbuf_init(&ibuf, &contactSocket, SERVER_SEND_SIZE,
 		     SOCKBUF_READ | SOCKBUF_WRITE | SOCKBUF_DGRAM) == -1) {
 	error("No memory for contact buffer");
 	End_game();
     }
 
-    install_input(Contact, contactSocket, 0);
-
-    return contactSocket;
+    install_input(Contact, contactSocket.fd, &contactSocket);
 }
 
 
@@ -164,8 +163,9 @@ static int Reply(char *host_addr, int port)
     const int		max_send_retries = 3;
 
     for (i = 0; i < max_send_retries; i++) {
-	if ((result = DgramSend(ibuf.sock, host_addr, port, ibuf.buf, ibuf.len)) == -1) {
-	    GetSocketError(ibuf.sock);
+	if ((result = sock_send_dest(&ibuf.sock, host_addr, port, ibuf.buf,
+				     ibuf.len)) == -1) {
+	    sock_get_error(&ibuf.sock);
 	} else {
 	    break;
 	}
@@ -251,7 +251,7 @@ void Contact(int fd, void *arg)
      * Someone connected to us, now try and decipher the message :)
      */
     Sockbuf_clear(&ibuf);
-    if ((bytes = DgramReceiveAny(contactSocket, ibuf.buf, ibuf.size)) <= 8) {
+    if ((bytes = sock_receive_any(&contactSocket, ibuf.buf, ibuf.size)) <= 8) {
 	if (bytes < 0
 	    && errno != EWOULDBLOCK
 	    && errno != EAGAIN
@@ -259,13 +259,13 @@ void Contact(int fd, void *arg)
 	    /*
 	     * Clear the error condition for the contact socket.
 	     */
-	    GetSocketError(contactSocket);
+	    sock_get_error(&contactSocket);
 	}
 	return;
     }
     ibuf.len = bytes;
 
-    strcpy(host_addr, DgramLastaddr());
+    strcpy(host_addr, sock_get_last_addr(&contactSocket));
     if (Check_address(host_addr)) {
 	return;
     }
@@ -291,7 +291,7 @@ void Contact(int fd, void *arg)
     reply_to = (ch & 0xFF);	/* no sign extension. */
 
     /* ignore port for termified clients. */
-    port = DgramLastport();
+    port = sock_get_last_port(&contactSocket);
 
     /*
      * Now see if we have the same (or a compatible) version.
@@ -885,7 +885,7 @@ static int Check_address(char *str)
     unsigned long	addr;
     int			i;
 
-    addr = GetInetAddr(str);
+    addr = sock_get_inet_by_addr(str);
     if (addr == (unsigned long) -1 && strcmp(str, "255.255.255.255")) {
 	return -1;
     }
@@ -924,7 +924,7 @@ void Set_deny_hosts(void)
 	slash = strchr(tok, '/');
 	if (slash) {
 	    *slash = '\0';
-	    mask = GetInetAddr(slash + 1);
+	    mask = sock_get_inet_by_addr(slash + 1);
 	    if (mask == (unsigned long) -1 && strcmp(slash + 1, "255.255.255.255")) {
 		continue;
 	    }
@@ -934,7 +934,7 @@ void Set_deny_hosts(void)
 	} else {
 	    mask = 0xFFFFFFFF;
 	}
-	addr = GetInetAddr(tok);
+	addr = sock_get_inet_by_addr(tok);
 	if (addr == (unsigned long) -1 && strcmp(tok, "255.255.255.255")) {
 	    continue;
 	}
@@ -944,4 +944,3 @@ void Set_deny_hosts(void)
     }
     free(list);
 }
-
