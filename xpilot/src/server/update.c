@@ -880,7 +880,9 @@ static void Update_players(world_t *world)
 
 	/* ugly hack */
 	if (Player_is_human(pl)||Player_is_robot(pl))
-	    pl->rank->score =  Get_Score(pl);
+	    /* kps - keep only score in one place ???? */
+	    if (pl->rank != NULL)
+		pl->rank->score =  Get_Score(pl);
 
 	if (pl->pause_count > 0) {
 	    /*assert(Player_is_paused(pl)
