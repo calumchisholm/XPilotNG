@@ -72,6 +72,7 @@
 #define SHOW_TEXTURED_BALLS	(1L << 25)
 #define SHOW_REVERSE_SCROLL	(1L << 26)
 #define SHOW_SHIP_ID            (1L << 27)
+#define SHOW_HR	                (1L << 28)
 
 #define PACKET_LOSS		0
 #define PACKET_DROP		1

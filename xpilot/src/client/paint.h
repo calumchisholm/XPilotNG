@@ -117,6 +117,10 @@ extern XColor	colors[MAX_COLORS];		/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */
 extern int	hudColor;		/* Color index for HUD drawing */
+extern int	hrColor1;		/* Color index for hudradar-hack drawing */
+extern int	hrColor2;		/* Color index for hudradar-hack drawing */
+extern int	hrSize;		/* size for hudradar-hack drawing */
+extern float	hrScale;		/* scale for hudradar-hack drawing */
 extern int	hudLockColor;           /* Color index for lock on HUD drawing */
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	wallRadarColor;		/* Color index for walls on radar */

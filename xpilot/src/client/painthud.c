@@ -69,6 +69,10 @@ extern int		score_object;
 extern XGCValues	gcv;
 
 int	hudColor;		/* Color index for HUD drawing */
+int	hrColor1;		/* Color index for hudradar drawing */
+int	hrColor2;		/* Color index for hudradar drawing */
+int	hrSize;		/* Size for hudradar drawing */
+float	hrScale;		/* Scale for hudradar drawing */
 int	hudLockColor;		/* Color index for lock on HUD drawing */
 int     oldTextColor;
 DFLOAT	charsPerTick = 0.0;	/* Output speed of messages */
@@ -369,6 +373,59 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     }
 }
 
+void Paint_hudradar(void) {
+
+    int i;
+    float hrscale = hrScale;
+    int hrw = hrscale * 256;
+    int hrh = hrscale * RadarHeight;
+    int sz = hrSize;
+    float xf = (float)hrw / (float)Setup->width, 
+        yf = (float)hrh / (float)Setup->height;
+
+    for (i = 0; i < num_radar; i++) {
+
+        int x = radar_ptr[i].x * xf - 
+            (world.x + view_width / 2) * xf;
+
+        int y = radar_ptr[i].y * yf- 
+            (world.y + view_height / 2) * yf;
+
+
+        if (x < 0) {
+            if (-x > hrw/2) x += hrw;
+        } else {
+            if (x > hrw/2) x -= hrw;
+        }
+
+        if (y < 0) {
+            if (-y > hrh/2) y += hrh;
+        } else {
+            if (y > hrh/2) y -= hrh;
+        }
+
+        if (
+            !(
+              (x <= SHIP_SZ)&&
+              (x >= -SHIP_SZ)&& 
+              (y <= SHIP_SZ)&& 
+              (y >= -SHIP_SZ)
+              )
+            ) { 
+
+            x = x + view_width / 2 - sz / 2;
+            y = -y + view_height / 2 - sz / 2;
+
+            if (radar_ptr[i].color!=4) {
+                Arc_add(hrColor1, x, y, 
+                        sz, sz, 0, 64*360);
+            } else {
+                Arc_add(hrColor2, x, y, 
+                        sz, sz, 0, 64*360);
+            }
+        }
+    }
+}
 
 void Paint_HUD(void)
 {
@@ -397,6 +454,8 @@ void Paint_HUD(void)
 		    (int)(view_width / 2 - ptr_move_fact*vel.x),
 		    (int)(view_height / 2 + ptr_move_fact*vel.y));
     }
+
+    if (BIT(instruments, SHOW_HR)) Paint_hudradar();
 
     if (!BIT(instruments, SHOW_HUD_INSTRUMENTS)) {
 	return;

@@ -354,6 +354,13 @@ struct option {
 	"Should the HUD be displayed or not.\n"
     },
     {
+	"showHR",
+	NULL,
+	"Yes",
+	KEY_DUMMY,
+	"Should the hudradar be displayed or not.\n"
+    },
+    {
 	"fuelNotify",
 	NULL,
 	"500",
@@ -973,6 +980,34 @@ struct option {
 	"4",
 	KEY_DUMMY,
 	"Which color number to use for drawing the HUD.\n"
+    },
+    {
+	"hrColor1",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing the hudradar hack.\n"
+    },
+    {
+	"hrColor2",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which color number to use for drawing the hudradar hack.\n"
+    },
+    {
+	"hrSize",
+	NULL,
+	"4",
+	KEY_DUMMY,
+	"Which size to use for drawing the hudradar hack dots.\n"
+    },
+    {
+	"hrScale",
+	NULL,
+	"1.5",
+	KEY_DUMMY,
+	"Scales radar to hud filtering out everything but enemies.\n"
     },
     {
 	"hudLockColor",
@@ -2836,6 +2871,10 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	strcpy(color_names[i], resValue);
     }
     Get_int_resource(rDB, "hudColor", &hudColor);
+    Get_int_resource(rDB, "hrColor1", &hrColor1);
+    Get_int_resource(rDB, "hrColor2", &hrColor2);
+    Get_int_resource(rDB, "hrSize", &hrSize);
+    Get_float_resource(rDB, "hrScale", &hrScale);
     Get_int_resource(rDB, "hudLockColor", &hudLockColor);
     Get_int_resource(rDB, "wallColor", &wallColor);
     Get_int_resource(rDB, "wallRadarColor", &wallRadarColor);
@@ -2850,6 +2889,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_bit_resource(rDB, "showMineName", &instruments, SHOW_MINE_NAME);
     Get_bit_resource(rDB, "showMessages", &instruments, SHOW_MESSAGES);
     Get_bit_resource(rDB, "showHUD", &instruments, SHOW_HUD_INSTRUMENTS);
+    Get_bit_resource(rDB, "showHR", &instruments, SHOW_HR);
     Get_bit_resource(rDB, "verticalHUDLine", &instruments, SHOW_HUD_VERTICAL);
     Get_bit_resource(rDB, "horizontalHUDLine", &instruments, SHOW_HUD_HORIZONTAL);
     Get_bit_resource(rDB, "fuelMeter", &instruments, SHOW_FUEL_METER);

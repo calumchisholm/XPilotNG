@@ -106,6 +106,7 @@ static int Config_create_altTurnSpeed(int widget_desc, int *height);
 static int Config_create_altTurnResistance(int widget_desc, int *height);
 static int Config_create_showMessages(int widget_desc, int *height);
 static int Config_create_showHUD(int widget_desc, int *height);
+static int Config_create_showHR(int widget_desc, int *height);
 static int Config_create_horizontalHUDLine(int widget_desc, int *height);
 static int Config_create_verticalHUDLine(int widget_desc, int *height);
 static int Config_create_speedFactHUD(int widget_desc, int *height);
@@ -132,6 +133,10 @@ static int Config_create_shotSize(int widget_desc, int *height);
 static int Config_create_teamShotSize(int widget_desc, int *height);
 static int Config_create_showNastyShots(int widget_desc, int *height);
 static int Config_create_hudColor(int widget_desc, int *height);
+static int Config_create_hrColor1(int widget_desc, int *height);
+static int Config_create_hrColor2(int widget_desc, int *height);
+static int Config_create_hrSize(int widget_desc, int *height);
+static int Config_create_hrScale(int widget_desc, int *height);
 static int Config_create_hudLockColor(int widget_desc, int *height);
 static int Config_create_wallColor(int widget_desc, int *height);
 static int Config_create_decorColor(int widget_desc, int *height);
@@ -231,6 +236,7 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_maxMessages,
     Config_create_reverseScroll,
     Config_create_showHUD,
+    Config_create_showHR,
     Config_create_horizontalHUDLine,
     Config_create_verticalHUDLine,
     Config_create_speedFactHUD,
@@ -258,6 +264,10 @@ static int		(*config_creator[])(int widget_desc, int *height) = {
     Config_create_shotSize,
     Config_create_teamShotSize,
     Config_create_hudColor,
+    Config_create_hrColor1,
+    Config_create_hrColor2,
+    Config_create_hrSize,
+    Config_create_hrScale,
     Config_create_hudLockColor,
     Config_create_wallColor,
     Config_create_decorColor,
@@ -685,6 +695,15 @@ static int Config_create_showHUD(int widget_desc, int *height)
 			      (void *) SHOW_HUD_INSTRUMENTS);
 }
 
+static int Config_create_showHR(int widget_desc, int *height)
+{
+    return Config_create_bool(widget_desc, height, "showHR",
+			      BIT(instruments, SHOW_HR)
+				  ? true : false,
+			      Config_update_instruments,
+			      (void *) SHOW_HR);
+}
+
 static int Config_create_horizontalHUDLine(int widget_desc, int *height)
 {
     return Config_create_bool(widget_desc, height, "horizontalHUDLine",
@@ -895,6 +914,37 @@ static int Config_create_hudColor(int widget_desc, int *height)
 			   "hudColor", &hudColor,
 			   1, maxColors - 1,
 			   NULL, NULL);
+}
+
+static int Config_create_hrColor1(int widget_desc, int *height)
+{
+    return Config_create_int(widget_desc, height,
+			   "hrColor1", &hrColor1,
+			   1, maxColors - 1,
+			   NULL, NULL);
+}
+
+static int Config_create_hrColor2(int widget_desc, int *height)
+{
+    return Config_create_int(widget_desc, height,
+			   "hrColor2", &hrColor2,
+			   1, maxColors - 1,
+			   NULL, NULL);
+}
+
+static int Config_create_hrSize(int widget_desc, int *height)
+{
+    return Config_create_int(widget_desc, height,
+			   "hrSize", &hrSize,
+			   1, SHIP_SZ,
+			   NULL, NULL);
+}
+
+static int Config_create_hrScale(int widget_desc, int *height)
+{
+    return Config_create_float(widget_desc, height,
+			       "hrScale", &hrScale, 0.5, 4.0,
+			       NULL, NULL);
 }
 
 static int Config_create_hudLockColor(int widget_desc, int *height)
@@ -1486,6 +1536,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "maxMessages", maxMessages);
     Config_save_bool(fp, "reverseScroll", BIT(instruments, SHOW_REVERSE_SCROLL));
     Config_save_bool(fp, "showHUD", BIT(instruments, SHOW_HUD_INSTRUMENTS));
+    Config_save_bool(fp, "showHR", BIT(instruments, SHOW_HR));
     Config_save_bool(fp, "verticalHUDLine", BIT(instruments, SHOW_HUD_VERTICAL));
     Config_save_bool(fp, "horizontalHUDLine", BIT(instruments, SHOW_HUD_HORIZONTAL));
     Config_save_bool(fp, "fuelMeter", BIT(instruments, SHOW_FUEL_METER));
@@ -1512,6 +1563,10 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "teamShotSize", teamshot_size);
     Config_save_bool(fp, "showNastyShots", showNastyShots);
     Config_save_int(fp, "hudColor", hudColor);
+    Config_save_int(fp, "hrColor1", hrColor1);
+    Config_save_int(fp, "hrColor2", hrColor2);
+    Config_save_int(fp, "hrSize", hrSize);
+    Config_save_float(fp, "hrScale", hrScale);
     Config_save_int(fp, "hudLockColor", hudLockColor);
     Config_save_int(fp, "wallColor", wallColor);
     Config_save_int(fp, "decorColor", decorColor);
