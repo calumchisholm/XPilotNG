@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -613,7 +613,7 @@ static void Frame_map(int conn, int ind)
 		    break;
 		}
 	    }
-#endif    
+#endif
 	}
     }
 
@@ -679,7 +679,7 @@ static void Frame_shuffle_objects(void)
     for (i = 0; i < num_object_shuffle; i++) {
 	object_shuffle_ptr[i] = i;
     }
-    /* permute. */
+    /* permute. Not perfect distribution but probably doesn't matter here */
     for (i = num_object_shuffle - 1; i >= 0; --i) {
 	if (object_shuffle_ptr[i] == i) {
 	    int j = (int)(rfrac() * i);
@@ -689,11 +689,6 @@ static void Frame_shuffle_objects(void)
 	}
     }
 }
-
-/* kps - ng wants changes in shuffling like this:
--	    dest = (int)(rfrac() * NumObjs);
-+	    dest = (int)(rfrac() * (NumObjs - i)) + i;
-*/
 
 static void Frame_shuffle_players(void)
 {
@@ -723,7 +718,7 @@ static void Frame_shuffle_players(void)
     }
     /* permute. */
     for (i = 0; i < num_player_shuffle; i++) {
-	int j = (int)(rfrac() * num_player_shuffle);
+	int j = (int)(rfrac() * (num_player_shuffle - i) + i);
 	shuffle_t tmp = player_shuffle_ptr[j];
 	player_shuffle_ptr[j] = player_shuffle_ptr[i];
 	player_shuffle_ptr[i] = tmp;
@@ -1287,12 +1282,9 @@ void Frame_update(void)
 	    game_over_called = true;
 	}
     }
-    
-    /* kps - is this ok ? */
-    /*for (i = 0; i < num_player_shuffle; i++) {*/
-    for (i = 0; i < observerStart + MAX_OBSERVERS - 1; i++) {
-	if (i >= observerStart + NumObservers ||
-	    (i >= num_player_shuffle && i < observerStart))
+
+    for (i = 0; i < observerStart + NumObservers; i++) {
+	if (i >= num_player_shuffle && i < observerStart)
 	    continue;
 	pl = Players[i];
 	conn = pl->conn;
@@ -1384,8 +1376,8 @@ void Frame_update(void)
 		continue;
 	    }
 	    Frame_map(conn, ind);
-	    Frame_shots(conn, ind); /* kps - these 2 changed */
-	    Frame_ships(conn, ind); /* order in ng for some reason */
+	    Frame_shots(conn, ind);
+	    Frame_ships(conn, ind);
 	    Frame_radar(conn, ind);
 	    Frame_lose_item_state(i);
 	    debris_end(conn);
@@ -1454,4 +1446,3 @@ void Set_player_message(player *pl, const char *message)
 	Robot_message(GetInd[pl->id], msg);
     }
 }
-
