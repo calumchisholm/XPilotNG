@@ -88,9 +88,7 @@ static int sock_set_error(sock_t *sock, int error, sock_call_t call, int line)
 static int sock_check(sock_t *sock)
 {
     if (!sock_flags_test_all(sock, SOCK_FLAG_INIT))
-    {
 	return sock_set_error(sock, EINVAL, SOCK_CALL_ANY, __LINE__);
-    }
 
     return SOCK_IS_OK;
 }
@@ -99,12 +97,10 @@ static int sock_alloc_hostname(sock_t *sock)
 {
     if (!sock->hostname) {
 	sock->hostname = (char *) malloc(SOCK_HOSTNAME_LENGTH);
-	if (!sock->hostname) {
+	if (!sock->hostname)
 	    sock_set_error(sock, errno, SOCK_CALL_ANY, __LINE__);
-	}
-	else {
+	else
 	    sock->hostname[0] = '\0';
-	}
     }
 
     return (sock->hostname) ? SOCK_IS_OK : SOCK_IS_ERROR;
@@ -122,9 +118,8 @@ static int sock_alloc_lastaddr(sock_t *sock)
 {
     if (!sock->lastaddr) {
 	sock->lastaddr = (void *) calloc(1, sizeof(struct sockaddr_in));
-	if (!sock->lastaddr) {
+	if (!sock->lastaddr)
 	    sock_set_error(sock, errno, SOCK_CALL_ANY, __LINE__);
-	}
     }
 
     return (sock->lastaddr) ? SOCK_IS_OK : SOCK_IS_ERROR;
@@ -183,24 +178,20 @@ int sock_close(sock_t *sock)
 {
     sock_free_hostname(sock);
     sock_free_lastaddr(sock);
-    if (sock_flags_test_any(sock, SOCK_FLAG_UDP)) {
+    if (sock_flags_test_any(sock, SOCK_FLAG_UDP))
 	return sock_close_udp(sock);
-    }
-    if (sock_flags_test_any(sock, SOCK_FLAG_TCP)) {
+    if (sock_flags_test_any(sock, SOCK_FLAG_TCP))
 	return sock_close_tcp(sock);
-    }
     return sock_set_error(sock, EINVAL, SOCK_CALL_ANY, __LINE__);
 }
 
 int sock_open_tcp(sock_t *sock)
 {
-    if (sock_init(sock)) {
+    if (sock_init(sock))
 	return SOCK_IS_ERROR;
-    }
 
-    if ((sock->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((sock->fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	return sock_set_error(sock, errno, SOCK_CALL_SOCKET, __LINE__);
-    }
 
     sock_flags_add(sock, SOCK_FLAG_TCP);
 
@@ -258,36 +249,32 @@ int sock_set_non_blocking(sock_t *sock, int flag)
     char buf[128];
 
 #ifdef USE_FCNTL_FNDELAY
-    if (fcntl(sock->fd, F_SETFL, (flag != 0) ? FNDELAY : 0) != -1) {
+    if (fcntl(sock->fd, F_SETFL, (flag != 0) ? FNDELAY : 0) != -1)
 	return SOCK_IS_OK;
-    }
     sock_set_error(sock, errno, SOCK_CALL_FCNTL, __LINE__);
     sprintf(buf, "fcntl FNDELAY failed in socklib.c line %d", __LINE__);
     perror(buf);
 #endif
 
 #ifdef USE_IOCTL_FIONBIO
-    if (ioctl(sock->fd, FIONBIO, &flag) == 0) {
+    if (ioctl(sock->fd, FIONBIO, &flag) == 0)
 	return SOCK_IS_OK;
-    }
     sock_set_error(sock, errno, SOCK_CALL_FCNTL, __LINE__);
     sprintf(buf, "ioctl FIONBIO failed in socklib.c line %d", __LINE__);
     perror(buf);
 #endif
 
 #ifdef USE_FCNTL_O_NONBLOCK
-    if (fcntl(sock->fd, F_SETFL, (flag != 0) ? O_NONBLOCK : 0) != -1) {
+    if (fcntl(sock->fd, F_SETFL, (flag != 0) ? O_NONBLOCK : 0) != -1)
 	return SOCK_IS_OK;
-    }
     sock_set_error(sock, errno, SOCK_CALL_FCNTL, __LINE__);
     sprintf(buf, "fcntl O_NONBLOCK failed in socklib.c line %d", __LINE__);
     perror(buf);
 #endif
 
 #ifdef USE_FCNTL_O_NDELAY
-    if (fcntl(sock->fd, F_SETFL, (flag != 0) ? O_NDELAY : 0) != -1) {
+    if (fcntl(sock->fd, F_SETFL, (flag != 0) ? O_NDELAY : 0) != -1)
 	return SOCK_IS_OK;
-    }
     sock_set_error(sock, errno, SOCK_CALL_FCNTL, __LINE__);
     sprintf(buf, "fcntl O_NDELAY failed in socklib.c line %d", __LINE__);
     perror(buf);
@@ -301,9 +288,8 @@ int sock_open_tcp_connected_non_blocking(sock_t *sock, char *host, int port)
     struct sockaddr_in	dest;
     struct hostent	*hp;
 
-    if (sock_open_tcp(sock)) {
+    if (sock_open_tcp(sock))
 	return SOCK_IS_ERROR;
-    }
 
     /*
      * On error a message will have been printed
@@ -351,13 +337,11 @@ int sock_open_udp(sock_t *sock, char *dotaddr, int port)
 {
     struct sockaddr_in	addr;
 
-    if (sock_init(sock)) {
+    if (sock_init(sock))
 	return SOCK_IS_ERROR;
-    }
 
-    if ((sock->fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    if ((sock->fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 	return sock_set_error(sock, errno, SOCK_CALL_SOCKET, __LINE__);
-    }
 
     sock_flags_add(sock, SOCK_FLAG_UDP);
 
@@ -394,9 +378,8 @@ int sock_connect(sock_t *sock, char *host, int port)
 	    = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
     }
 
-    if (connect(sock->fd, (struct sockaddr *)&dest, sizeof(dest)) < 0) {
+    if (connect(sock->fd, (struct sockaddr *)&dest, sizeof(dest)) < 0)
 	return sock_set_error(sock, errno, SOCK_CALL_CONNECT, __LINE__);
-    }
 
     sock_flags_add(sock, SOCK_FLAG_CONNECT);
 
@@ -426,9 +409,8 @@ char * sock_get_last_addr(sock_t *sock)
     if (sock->lastaddr) {
 	lastaddr = (struct sockaddr_in *)(sock->lastaddr);
 	str = inet_ntoa(lastaddr->sin_addr);
-	if (sock_alloc_hostname(sock)) {
+	if (sock_alloc_hostname(sock))
 	    return str;
-	}
 	strlcpy(sock->hostname, str, SOCK_HOSTNAME_LENGTH);
 	return sock->hostname;
     }
@@ -449,14 +431,14 @@ char * sock_get_last_name(sock_t *sock)
 	lastaddr = (struct sockaddr_in *)(sock->lastaddr);
 	hp = sock_get_host_by_addr((char *)&(lastaddr->sin_addr),
 				   sizeof(lastaddr->sin_addr), AF_INET);
-	if (hp == NULL) {
+	if (hp == NULL)
 	    str = inet_ntoa(lastaddr->sin_addr);
-	} else {
+	else
 	    str = hp->h_name;
-	}
-	if (sock_alloc_hostname(sock)) {
+
+	if (sock_alloc_hostname(sock))
 	    return str;
-	}
+
 	strlcpy(sock->hostname, str, SOCK_HOSTNAME_LENGTH);
 	return sock->hostname;
     }
@@ -471,9 +453,8 @@ int sock_read(sock_t *sock, char *buf, int len)
     int			count;
 
     count = recv(sock->fd, buf, len, 0);
-    if (count < 0) {
+    if (count < 0)
 	sock_set_error(sock, errno, SOCK_CALL_IO, __LINE__);
-    }
 
     return count;
 }
@@ -481,17 +462,15 @@ int sock_read(sock_t *sock, char *buf, int len)
 int sock_receive_any(sock_t *sock, char *buf, int len)
 {
     int			count;
-    int			addrlen;
+    socklen_t		addrlen;
 
-    if (sock_alloc_lastaddr(sock)) {
+    if (sock_alloc_lastaddr(sock))
 	return SOCK_IS_ERROR;
-    }
     addrlen = sizeof(struct sockaddr_in);
     count = recvfrom(sock->fd, buf, len, 0,
 		     (struct sockaddr *)(sock->lastaddr), &addrlen);
-    if (count < 0) {
+    if (count < 0)
 	sock_set_error(sock, errno, SOCK_CALL_IO, __LINE__);
-    }
 
     return count;
 }
@@ -508,10 +487,9 @@ int sock_send_dest(sock_t *sock, char *host, int port, char *buf, int len)
     dest.sin_addr.s_addr = inet_addr(host);
     if ((dest.sin_addr.s_addr & 0xFFFFFFFF) == 0xFFFFFFFF) {
 	errno = 0;
-	if ((hp = sock_get_host_by_name(host)) == NULL) {
+	if ((hp = sock_get_host_by_name(host)) == NULL)
 	    return sock_set_error(sock, errno, SOCK_CALL_GETHOSTBYNAME,
 				  __LINE__);
-	}
 
 	dest.sin_addr.s_addr
 	    = ((struct in_addr *)(hp->h_addr_list[0]))->s_addr;
@@ -519,9 +497,8 @@ int sock_send_dest(sock_t *sock, char *host, int port, char *buf, int len)
 
     count = sendto(sock->fd, buf, len, 0,
 		   (struct sockaddr *) &dest, sizeof(dest));
-    if (count < 0) {
+    if (count < 0)
 	sock_set_error(sock, errno, SOCK_CALL_IO, __LINE__);
-    }
 
     return count;
 }
@@ -531,9 +508,8 @@ int sock_write(sock_t *sock, char *buf, int len)
     int			count;
 
     count = send(sock->fd, buf, len, 0);
-    if (count < 0) {
+    if (count < 0)
 	sock_set_error(sock, errno, SOCK_CALL_IO, __LINE__);
-    }
 
     return count;
 }
@@ -544,9 +520,8 @@ char *sock_get_addr_by_name(const char *name)
 
     hp = sock_get_host_by_name(name);
 
-    if (!hp) {
+    if (!hp)
 	return (char *) NULL;
-    }
 
     return inet_ntoa(*(struct in_addr *)(hp->h_addr_list[0]));
 }
@@ -569,9 +544,8 @@ void sock_get_local_hostname(char *name, unsigned size,
     static const char	xpilot[] = "xpilot";
 
     gethostname(name, size);
-    if ((he = sock_get_host_by_name(name)) == NULL) {
+    if ((he = sock_get_host_by_name(name)) == NULL)
 	return;
-    }
     strlcpy(name, he->h_name, size);
 
     /*
@@ -586,9 +560,8 @@ void sock_get_local_hostname(char *name, unsigned size,
 	memcpy((void *)&in, he->h_addr_list[0], sizeof(in));
 	if ((he = sock_get_host_by_addr((char *)&in, sizeof(in), AF_INET))
 	    != NULL
-	    && strchr(he->h_name, '.') != NULL) {
+	    && strchr(he->h_name, '.') != NULL)
 	    strlcpy(name, he->h_name, size);
-	}
 	else {
 	    /* Let's try to find the domain from /etc/resolv.conf. */
 	    FILE *fp = fopen("/etc/resolv.conf", "r");
@@ -613,17 +586,15 @@ void sock_get_local_hostname(char *name, unsigned size,
 	}
     }
 
-    if (search_domain_for_xpilot != 1) {
+    if (search_domain_for_xpilot != 1)
 	return;
-    }
 
 #ifndef _WINDOWS	/* the lookup of xpilot can take FOREVER! zzzz...  */
 
     /* if name starts with "xpilot" then we're done. */
     xpilot_len = strlen(xpilot);
-    if (!strncmp(name, xpilot, xpilot_len)) {
+    if (!strncmp(name, xpilot, xpilot_len))
 	return;
-    }
 
     /* Make a wild guess that a "xpilot" hostname or alias is in this domain */
     dot = name;
@@ -643,9 +614,8 @@ void sock_get_local_hostname(char *name, unsigned size,
 	}
 	++dot;
     }
-    if (xpilot_he != NULL) {
+    if (xpilot_he != NULL)
 	strlcpy(name, xpilot_hostname, size);
-    }
 
 #endif
 }
@@ -653,7 +623,7 @@ void sock_get_local_hostname(char *name, unsigned size,
 int sock_get_port(sock_t *sock)
 {
     struct sockaddr_in	addr;
-    int			len = sizeof(addr);
+    socklen_t		len = sizeof(addr);
     unsigned short	port;
 
     if (getsockname(sock->fd, (struct sockaddr *)&addr, &len) < 0) {
@@ -669,7 +639,7 @@ int sock_get_port(sock_t *sock)
 int sock_get_error(sock_t *sock)
 {
     int			error;
-    int			size = sizeof(error);
+    socklen_t		size = sizeof(error);
 
     if (getsockopt(sock->fd, SOL_SOCKET, SO_ERROR,
 		   (void *)&error, &size) < 0) {
@@ -740,9 +710,8 @@ int sock_readable(sock_t *sock)
 	return SOCK_IS_OK;
     }
 
-    if ((n > 0) && FD_ISSET(sock->fd, &readfds)) {
+    if ((n > 0) && FD_ISSET(sock->fd, &readfds))
 	return 1;
-    }
 
     return SOCK_IS_OK;
 }
@@ -795,9 +764,8 @@ static struct hostent *sock_get_host_by_name(const char *name)
     
     for(i = 0; i < SOCK_GETHOST_TIMEOUT; i++) {
         if (PeekMessage(&msg, NULL, WM_GETHOSTNAME,
-			WM_GETHOSTNAME, PM_REMOVE)) {
+			WM_GETHOSTNAME, PM_REMOVE))
             return (WSAGETASYNCERROR(msg.lParam)) ? NULL : hp;
-        }
         Sleep(1000);
     }
     WSACancelAsyncRequest(h);

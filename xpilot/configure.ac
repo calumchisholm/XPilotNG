@@ -125,6 +125,29 @@ AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
 AC_STRUCT_TM
 
+dnl Check for socklen_t (in Unix98)
+AC_MSG_CHECKING(for socklen_t)
+AC_TRY_COMPILE([
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	socklen_t x;
+], [],
+[
+	AC_MSG_RESULT(yes)
+], [
+	AC_TRY_COMPILE([
+		#include <sys/types.h>
+		#include <sys/socket.h>
+		int accept(int, struct sockaddr *, size_t *);
+	], [], [
+		AC_MSG_RESULT(size_t)
+		AC_DEFINE(socklen_t, size_t, [socklen_t size])
+	], [
+		AC_MSG_RESULT(int)
+		AC_DEFINE(socklen_t, int, [socklen_t size])
+	])
+])
+
 dnl  Checks for library functions.
 
 dnl We probably don't need GNU compatible malloc and realloc functions,
