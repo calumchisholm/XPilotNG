@@ -10,6 +10,7 @@
 <Option name="ballradius" value="0"/>
 <Option name="constantspeed" value="0"/>
 <Option name="legacymode" value="yes"/>
+<Option name="playerwallbouncetype" value="0"/>
 <Option name="baselesspausing" value="yes"/>
 
 <Option name="teamplay" value="yes"/>

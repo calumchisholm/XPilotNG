@@ -790,7 +790,7 @@ static option_desc opts[] = {
     {
 	"sparksWallBounce",
 	"sparksWallBounce",
-	"no",
+	"yes",
 	&options.sparksWallBounce,
 	valBool,
 	Move_init,
