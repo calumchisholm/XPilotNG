@@ -971,6 +971,35 @@ static void Hyperjump(player *pl)
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 }
 
+/* kps - UPDATE_RATE should depend on gamespeed */
+#define UPDATE_RATE 100
+static inline void Update_visibility(player *pl, int ind)
+{
+    int j;
+
+    for (j = 0; j < NumPlayers; j++) {
+	player *pl_j = Players(j);
+
+	if (pl->forceVisible > 0)
+	    pl_j->visibility[ind].canSee = 1;
+
+	if (ind == j || !BIT(pl_j->used, HAS_CLOAKING_DEVICE))
+	    pl->visibility[j].canSee = 1;
+	else if (pl->updateVisibility
+		 || pl_j->updateVisibility
+		 || (int)(rfrac() * UPDATE_RATE)
+		 < ABS(frame_loops - pl->visibility[j].lastChange)) {
+
+	    pl->visibility[j].lastChange = frame_loops;
+	    pl->visibility[j].canSee
+		= (rfrac() * (pl->item[ITEM_SENSOR] + 1))
+		> (rfrac() * (pl_j->item[ITEM_CLOAK] + 1));
+	}
+    }
+}
+#undef UPDATE_RATE
+
+
 
 /* * * * * *
  *
@@ -979,7 +1008,7 @@ static void Hyperjump(player *pl)
  */
 static void Update_players(void)
 {
-    int i, j;
+    int i;
     player *pl;
 
     for (i = 0; i < NumPlayers; i++) {
@@ -1069,27 +1098,7 @@ static void Update_players(void)
 
 	Use_items(pl);
 
-#define UPDATE_RATE 100
-
-	for (j = 0; j < NumPlayers; j++) {
-	    player *pl_j = Players(j);
-
-	    if (pl->forceVisible > 0)
-		pl_j->visibility[i].canSee = 1;
-
-	    if (i == j || !BIT(pl_j->used, HAS_CLOAKING_DEVICE))
-		pl->visibility[j].canSee = 1;
-	    else if (pl->updateVisibility
-		     || pl_j->updateVisibility
-		     || (int)(rfrac() * UPDATE_RATE)
-		     < ABS(frame_loops - pl->visibility[j].lastChange)) {
-
-		pl->visibility[j].lastChange = frame_loops;
-		pl->visibility[j].canSee
-		    = (rfrac() * (pl->item[ITEM_SENSOR] + 1))
-		    > (rfrac() * (pl_j->item[ITEM_CLOAK] + 1));
-	    }
-	}
+	Update_visibility(pl, i);
 
 	if (BIT(pl->used, HAS_REFUEL))
 	    Do_refuel(pl);
