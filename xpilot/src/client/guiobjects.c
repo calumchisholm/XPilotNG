@@ -1107,7 +1107,7 @@ static xp_option_t guiobject_options[] = {
 
     COLOR_INDEX_OPTION(
 	"manyLivesColor",
-	13,
+	0,
 	&manyLivesColor,
 	"Which color to associate with ships with more than two lives left.\n"
 	"This can be used to paint for example ship and base names.\n"),
