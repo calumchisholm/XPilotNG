@@ -84,7 +84,7 @@ int oneLifeColorRGBA  	    	= 0xaaaa00aa;
 int zeroLivesColorRGBA	    	= 0xff0000aa;
 
 int hudRadarEnemyColorRGBA  	= 0xff000088;
-int hudRadarOtherColorRGBA  	= 0x00ff0088;
+int hudRadarOtherColorRGBA  	= 0x0000ff88;
 
 int scoreInactiveSelfColorRGBA	= 0x88008888;
 int scoreInactiveColorRGBA	= 0x0000aa88;

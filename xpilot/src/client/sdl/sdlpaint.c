@@ -328,7 +328,6 @@ void Paint_score_start(void)
 {
     char	headingStr[MSG_LEN];
     SDL_Surface *header;
-    SDL_Color   fg  = { 0, 255, 0, 255 };
     SDL_Rect    dst = { SCORE_BORDER, SCORE_BORDER, 0, 0 };
 
     if (showRealName)
@@ -345,6 +344,10 @@ void Paint_score_start(void)
 	    strlcat(headingStr, "LIFE", sizeof(headingStr));
 	strlcat(headingStr, " NAME", sizeof(headingStr));
     }
+    SDL_Color fg = {	(scoreColorRGBA >> 24) & 255 ,
+    	    	    	(scoreColorRGBA >> 16) & 255 ,
+    	    	    	(scoreColorRGBA >> 8) & 255  ,
+    	    	    	 scoreColorRGBA & 255 	    };
     SDL_FillRect(scoreListWin.surface, NULL, 0);
     header = TTF_RenderText_Blended(scoreListFont, headingStr, fg);
     if (header == NULL) {
