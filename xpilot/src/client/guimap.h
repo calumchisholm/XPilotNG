@@ -43,7 +43,7 @@ void Gui_paint_setup_up_grav(int x, int y);
 void Gui_paint_setup_down_grav(int x, int y);
 void Gui_paint_setup_right_grav(int x, int y);
 void Gui_paint_setup_left_grav(int x, int y);
-void Gui_paint_setup_worm(int x, int y, int wormDrawCount);
+void Gui_paint_setup_worm(int x, int y);
 void Gui_paint_setup_item_concentrator(int x, int y);
 void Gui_paint_setup_asteroid_concentrator(int x, int y);
 void Gui_paint_decor_dot(int x, int y, int size);

@@ -21,10 +21,23 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "xpclient_x11.h"
+#include "xpclient.h"
 
 char paintobjects_version[] = VERSION;
 
+/* TODO: move these to some generic header */
+extern short	ext_view_width;		/* Width of extended visible area */
+extern short	ext_view_height;	/* Height of extended visible area */
+extern int	active_view_width;	/* Width of active map area displayed. */
+extern int	active_view_height;	/* Height of active map area displayed. */
+extern int	ext_view_x_offset;	/* Offset of ext_view_width */
+extern int	ext_view_y_offset;	/* Offset of ext_view_height */
+extern ipos	world;
+extern ipos	realWorld;
+extern int      num_spark_colors;
+
+#define X(co)   ((int) ((co) - world.x))
+#define Y(co)   ((int) (world.y + ext_view_height - (co)))
 
 #define COLOR(i)	(i / areas)
 #define BASE_X(i)	(((i % x_areas) << 8) + ext_view_x_offset)
@@ -71,64 +84,6 @@ static int wrap(int *xp, int *yp)
     return 1;
 }
 
-/* might want to move this one to gui_objects.c */
-
-/*db960828 added color parameter cause Windows needs to blt a different
-         bitmap based on the color. Unix ignores this parameter*/
-void Paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int color)
-{
-    if (!texturedObjects) {
-#ifdef _WINDOWS
-	rd.paintItemSymbol(type, d, mygc, x, y, color);
-#else
-	gcv.stipple = itemBitmaps[type];
-	gcv.fill_style = FillStippled;
-	gcv.ts_x_origin = x;
-	gcv.ts_y_origin = y;
-	XChangeGC(dpy, mygc,
-		  GCStipple|GCFillStyle|GCTileStipXOrigin|GCTileStipYOrigin,
-		  &gcv);
-	rd.paintItemSymbol(type, d, mygc, x, y, color);
-	XFillRectangle(dpy, d, mygc, x, y, ITEM_SIZE, ITEM_SIZE);
-	gcv.fill_style = FillSolid;
-	XChangeGC(dpy, mygc, GCFillStyle, &gcv);
-#endif
-    } else
-	Bitmap_paint(d, BM_ALL_ITEMS, x, y, type);
-}
-
-
-void Paint_item(int type, Drawable d, GC mygc, int x, int y)
-{
-    const int		SIZE = ITEM_TRIANGLE_SIZE;
-    XPoint		points[5];
-
-#ifndef NO_ITEM_TRIANGLES
-    points[0].x = x - SIZE;
-    points[0].y = y - SIZE;
-    points[1].x = x;
-    points[1].y = y + SIZE;
-    points[2].x = x + SIZE;
-    points[2].y = y - SIZE;
-    points[3] = points[0];
-    SET_FG(colors[BLUE].pixel);
-    rd.drawLines(dpy, d, mygc, points, 4, CoordModeOrigin);
-#endif
-
-    SET_FG(colors[RED].pixel);
-#if 0
-    str[0] = itemtype_ptr[i].type + '0';
-    str[1] = '\0';
-    rd.drawString(dpy, d, mygc,
-		  x - XTextWidth(gameFont, str, 1)/2,
-		  y + SIZE - 1,
-		  str, 1);
-#endif
-    Paint_item_symbol(type, d, mygc,
-		      x - ITEM_SIZE/2,
-		      y - SIZE + 2, ITEM_PLAYFIELD);
-}
-
 
 static void Paint_items(void)
 {
@@ -136,13 +91,11 @@ static void Paint_items(void)
 
     if (num_itemtype > 0) {
 
-	SET_FG(colors[RED].pixel);
 	for (i = 0; i < num_itemtype; i++) {
 	    x = itemtype_ptr[i].x;
 	    y = itemtype_ptr[i].y;
 	    if (wrap(&x, &y))
-		Paint_item(itemtype_ptr[i].type, drawPixmap, gameGC,
-			   WINSCALE(X(x)), WINSCALE(Y(y)));
+		Gui_paint_item_object(itemtype_ptr[i].type, x, y);
 	}
 	RELEASE(itemtype_ptr, num_itemtype, max_itemtype);
     }
@@ -206,19 +159,17 @@ static void Paint_mines(void)
 		 * We do not know who is safe for mines sent with id==0
 		 */
 		name = NULL;
-		if (mineNameColor) {
-		    if (mine_ptr[i].id != 0) {
-			other_t *other;
-			if (mine_ptr[i].id == EXPIRED_MINE_ID) {
-			    static char expired_name[] = "Expired";
-			    name = expired_name;
-			} else if ((other = Other_by_id(mine_ptr[i].id))
-				   != NULL)
-			    name = other->id_string;
-			else {
-			    static char unknown_name[] = "Not of this world!";
-			    name = unknown_name;
-			}
+		if (mine_ptr[i].id != 0) {
+		    other_t *other;
+		    if (mine_ptr[i].id == EXPIRED_MINE_ID) {
+			static char expired_name[] = "Expired";
+			name = expired_name;
+		    } else if ((other = Other_by_id(mine_ptr[i].id))
+			       != NULL)
+			name = other->id_string;
+		    else {
+			static char unknown_name[] = "Not of this world!";
+			name = unknown_name;
 		    }
 		}
 		Gui_paint_mine(x, y, mine_ptr[i].teammine, name);
@@ -324,7 +275,7 @@ static void Paint_wormholes(void)
 	    x = wormhole_ptr[i].x;
 	    y = wormhole_ptr[i].y;
 	    if (wrap(&x, &y))
-		Gui_paint_setup_worm(x, y, loops & 7);
+		Gui_paint_setup_worm(x, y);
 	}
 	RELEASE(wormhole_ptr, num_wormholes, max_wormholes);
     }

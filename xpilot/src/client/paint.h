@@ -298,5 +298,7 @@ int Life_color(other_t *other);
 int Life_color_by_life(int life);
 void Play_beep(void);
 int Check_view_dimensions(void);
+void Gui_paint_item_symbol(int type, Drawable d, GC mygc, int x, int y, int c);
+void Gui_paint_item(int type, Drawable d, GC mygc, int x, int y);
 
 #endif

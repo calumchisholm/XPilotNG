@@ -907,8 +907,9 @@ void Gui_paint_setup_left_grav(int x, int y)
 }
 
 
-void Gui_paint_setup_worm(int x, int y, int wormDrawCount)
+void Gui_paint_setup_worm(int x, int y)
 {
+    int wormDrawCount = loops & 7;
     if (!texturedObjects) {
 	static const int	INSIDE_BL = BLOCK_SZ - 2;
 	static int wormOffset[8][3] = {

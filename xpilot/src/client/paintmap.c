@@ -245,11 +245,8 @@ void Paint_world(void)
 			fill_top_right = -1,
 			fill_bottom_left = -1,
 			fill_bottom_right = -1;
-    static int		wormDrawCount;
     unsigned char	*mapptr, *mapbase;
     static double	oldHRLimit = -1.0;
-
-    wormDrawCount = (wormDrawCount + 1) & 7;
 
     if (!BIT(Setup->mode, WRAP_PLAY)) {
 	if (world.x <= 0)
@@ -393,7 +390,7 @@ void Paint_world(void)
 
 		case SETUP_WORM_IN:
 		case SETUP_WORM_NORMAL:
-		    Gui_paint_setup_worm(x, y, wormDrawCount);
+		    Gui_paint_setup_worm(x, y);
 		    break;
 
 		case SETUP_ITEM_CONCENTRATOR:

@@ -24,6 +24,7 @@
 #ifndef GUIOBJECTS_H
 #define GUIOBJECTS_H
 
+void Gui_paint_item_object(int type, int x, int y);
 void Gui_paint_ball(int x, int y);
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2);
 

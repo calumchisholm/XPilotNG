@@ -482,7 +482,7 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	    int len, width;
 
 	    /* Paint item symbol */
-	    Paint_item_symbol((u_byte)i, drawPixmap, gameGC,
+	    Gui_paint_item_symbol((u_byte)i, drawPixmap, gameGC,
 			horiz_pos - ITEM_SIZE,
 			vert_pos,
 			ITEM_HUD);
