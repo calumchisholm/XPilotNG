@@ -150,6 +150,10 @@ struct cannon {
     int		group;
 };
 
+struct check {
+    clpos	pos;
+};
+
 struct item {
     DFLOAT	prob;		/* Probability [0..1] for item to appear */
     int		max;		/* Max on world at a given time */
@@ -253,7 +257,7 @@ typedef struct {
     int		NumCannons;
     cannon_t	*cannons;
     int		NumChecks;
-    clpos	*checks;
+    check_t	*checks;
     int		NumWormholes;
     wormhole_t	*wormholes;
     int		NumTreasures;

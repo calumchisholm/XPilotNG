@@ -178,8 +178,8 @@ void Xpmap_allocate_checks(void)
 	}
     }
 
-    if ((World.checks = (clpos *)
-	 malloc(OLD_MAX_CHECKS * sizeof(clpos))) == NULL) {
+    if ((World.checks = (check_t *)
+	 malloc(OLD_MAX_CHECKS * sizeof(check_t))) == NULL) {
 	error("Out of memory - checks");
 	exit(-1);
     }

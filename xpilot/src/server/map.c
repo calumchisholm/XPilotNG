@@ -243,18 +243,18 @@ int Map_place_wormhole(int cx, int cy, wormType type)
  */
 int Map_place_check(int cx, int cy, int ind)
 {
-    clpos t;
+    check_t t;
 
     if (ind >= 0 && ind < OLD_MAX_CHECKS) {
-	World.checks[ind].cx = cx;
-	World.checks[ind].cy = cy;
+	World.checks[ind].pos.cx = cx;
+	World.checks[ind].pos.cy = cy;
 	return ind;
     }
 
     ind = World.NumChecks;
-    t.cx = cx;
-    t.cy = cy;
-    STORE(clpos, World.checks, World.NumChecks, max_checks, t);
+    t.pos.cx = cx;
+    t.pos.cy = cy;
+    STORE(check_t, World.checks, World.NumChecks, max_checks, t);
     return ind;
 }
 
@@ -541,15 +541,15 @@ bool Grok_map(void)
 	CLR_BIT(World.rules->mode, TIMING);
     }
 
+    /* kps - what are these doing here ? */
     if (maxRobots == -1)
 	maxRobots = World.NumBases;
 
     if (minRobots == -1)
 	minRobots = maxRobots;
 
-    if (BIT(World.rules->mode, TIMING)) {
+    if (BIT(World.rules->mode, TIMING))
 	Find_base_order();
-    }
 
     Realloc_map_objects();
 
@@ -608,7 +608,7 @@ bool Grok_map_options(void)
     Set_world_asteroids();
 
     if (BIT(World.rules->mode, TEAM_PLAY|TIMING) == (TEAM_PLAY|TIMING)) {
-	error("Cannot teamplay while in race mode -- ignoring teamplay");
+	warn("Cannot teamplay while in race mode -- ignoring teamplay");
 	CLR_BIT(World.rules->mode, TEAM_PLAY);
     }
 
@@ -674,14 +674,14 @@ static void Find_base_order(void)
 {
     int			i, j, k, n;
     DFLOAT		dist;
-    int			cx, cy;
+    clpos		chkpos;
 
     if (!BIT(World.rules->mode, TIMING)) {
 	World.baseorder = NULL;
 	return;
     }
     if ((n = World.NumBases) <= 0) {
-	error("Cannot support race mode in a map without bases");
+	warn("Cannot support race mode in a map without bases");
 	exit(-1);
     }
 
@@ -691,11 +691,10 @@ static void Find_base_order(void)
 	exit(-1);
     }
 
-    cx = Checks(0)->cx;
-    cy = Checks(0)->cy;
+    chkpos = Checks(0)->pos;
     for (i = 0; i < n; i++) {
 	clpos bpos = Bases(i)->pos;
-	dist = Wrap_length(bpos.cx - cx, bpos.cy - cy) / CLICK;
+	dist = Wrap_length(bpos.cx - chkpos.cx, bpos.cy - chkpos.cy) / CLICK;
 	for (j = 0; j < i; j++) {
 	    if (World.baseorder[j].dist > dist)
 		break;
@@ -827,18 +826,14 @@ static void Compute_local_gravity(void)
 	gy = CLICK_TO_BLOCK(World.gravs[g].pos.cy);
 	force = World.gravs[g].force;
 
-	if ((first_xi = gx - GRAV_RANGE) < min_xi) {
+	if ((first_xi = gx - GRAV_RANGE) < min_xi)
 	    first_xi = min_xi;
-	}
-	if ((last_xi = gx + GRAV_RANGE) > max_xi) {
+	if ((last_xi = gx + GRAV_RANGE) > max_xi)
 	    last_xi = max_xi;
-	}
-	if ((first_yi = gy - GRAV_RANGE) < min_yi) {
+	if ((first_yi = gy - GRAV_RANGE) < min_yi)
 	    first_yi = min_yi;
-	}
-	if ((last_yi = gy + GRAV_RANGE) > max_yi) {
+	if ((last_yi = gy + GRAV_RANGE) > max_yi)
 	    last_yi = max_yi;
-	}
 
 	gtype = World.gravs[g].type;
 
@@ -849,9 +844,9 @@ static void Compute_local_gravity(void)
 	    if (dx < 0) {
 		fx = -force;
 		ax = -dx;
-	    } else {
+	    } else
 		ax = dx;
-	    }
+
 	    mod_yi = (first_yi < 0) ? (first_yi + World.y) : first_yi;
 	    dy = gy - first_yi;
 	    grav = &World.gravity[mod_xi][mod_yi];
@@ -862,29 +857,27 @@ static void Compute_local_gravity(void)
 		    if (dy < 0) {
 			fy = -force;
 			ay = -dy;
-		    } else {
+		    } else
 			ay = dy;
-		    }
+
 		    v = &tab[ay];
 		    if (gtype == CWISE_GRAV || gtype == ACWISE_GRAV) {
 			grav->x -= fy * v->y;
 			grav->y += fx * v->x;
-		    } else if (gtype == UP_GRAV || gtype == DOWN_GRAV) {
+		    } else if (gtype == UP_GRAV || gtype == DOWN_GRAV)
 			grav->y += force * v->x;
-		    } else if (gtype == RIGHT_GRAV || gtype == LEFT_GRAV) {
+		    else if (gtype == RIGHT_GRAV || gtype == LEFT_GRAV)
 			grav->x += force * v->y;
-		    } else {
+		    else {
 			grav->x += fx * v->x;
 			grav->y += fy * v->y;
 		    }
 		}
 		else {
-		    if (gtype == UP_GRAV || gtype == DOWN_GRAV) {
+		    if (gtype == UP_GRAV || gtype == DOWN_GRAV)
 			grav->y += force;
-		    }
-		    else if (gtype == LEFT_GRAV || gtype == RIGHT_GRAV) {
+		    else if (gtype == LEFT_GRAV || gtype == RIGHT_GRAV)
 			grav->x += force;
-		    }
 		}
 		mod_yi++;
 		grav++;
@@ -893,9 +886,8 @@ static void Compute_local_gravity(void)
 		    grav = World.gravity[mod_xi];
 		}
 	    }
-	    if (++mod_xi >= World.x) {
+	    if (++mod_xi >= World.x)
 		mod_xi = 0;
-	    }
 	}
     }
     /*

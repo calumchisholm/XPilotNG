@@ -1730,8 +1730,8 @@ int Polys_to_client(unsigned char **start)
     }
     STORE1(World.NumChecks);
     for (i = 0; i < World.NumChecks; i++) {
-	STORE2(World.checks[i].cx >> CLICK_SHIFT);
-	STORE2(World.checks[i].cy >> CLICK_SHIFT);
+	STORE2(World.checks[i].pos.cx >> CLICK_SHIFT);
+	STORE2(World.checks[i].pos.cy >> CLICK_SHIFT);
     }
     return offset;
 }

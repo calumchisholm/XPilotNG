@@ -59,7 +59,7 @@ static void Transport_to_home(player *pl)
      * acceleration G, during the second part we make this a negative one -G.
      * This results in a visually pleasing take off and landing.
      */
-    int			cx, cy;
+    clpos		startpos;
     DFLOAT		dx, dy, t, m;
     const int		T = RECOVERY_DELAY;
 
@@ -76,14 +76,12 @@ static void Transport_to_home(player *pl)
 	    check = pl->check - 1;
 	else
 	    check = World.NumChecks - 1;
-	cx = Checks(check)->cx;
-	cy = Checks(check)->cy;
-    } else {
-	cx = pl->home_base->pos.cx;
-	cy = pl->home_base->pos.cy;
-    }
-    dx = WRAP_DCX(cx - pl->pos.cx);
-    dy = WRAP_DCY(cy - pl->pos.cy);
+	startpos = Checks(check)->pos;
+    } else
+	startpos = pl->home_base->pos;
+
+    dx = WRAP_DCX(startpos.cx - pl->pos.cx);
+    dy = WRAP_DCY(startpos.cy - pl->pos.cy);
     t = pl->count + 0.5f;
     if (2 * t <= T)
 	m = 2 / t;
@@ -127,10 +125,9 @@ void Phasing(player *pl, int on)
 	/* kps - ok to have this check here ? */
 	if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
 				     OBJ_PTR(pl), (shape *)pl->ship, pl->dir))
-	    != NO_GROUP) {
+	    != NO_GROUP)
 	    /* kps - check for crashes against targets etc ??? */
 	    Player_crash(pl, CrashWall, NO_IND, 0);
-	}
     }
 }
 
@@ -313,9 +310,8 @@ static void do_Autopilot (player *pl)
      * If the last movement touched a wall then we shouldn't
      * mess with the position (speed too?) settings.
      */
-    if (pl->last_wall_touch + 1 >= frame_loops) {
+    if (pl->last_wall_touch + 1 >= frame_loops)
 	return;
-    }
 
     /*
      * Having more autopilot items or using emergency thrust causes a much
@@ -331,9 +327,8 @@ static void do_Autopilot (player *pl)
 	afterburners = MAX_AFTERBURNER;
 	if (delta < emergency_thrust_settings_delta)
 	    delta = emergency_thrust_settings_delta;
-    } else {
+    } else
 	afterburners = pl->item[ITEM_AFTERBURNER];
-    }
 
     ix = OBJ_X_IN_BLOCKS(pl);
     iy = OBJ_Y_IN_BLOCKS(pl);
@@ -366,16 +361,15 @@ static void do_Autopilot (player *pl)
 	    vad = pl->dir;
 	else
 	    vad = (int)findDir(-gx, -gy);
-    } else {
+    } else
 	vad = (int)findDir(-pl->vel.x, -pl->vel.y);
-    }
+
     vad = MOD2(vad - pl->dir, RES);
     if (vad > RES/2) {
 	vad = RES - vad;
 	dir = -1;
-    } else {
+    } else
 	dir = 1;
-    }
 
     /*
      * Calculate turnspeed needed to change direction instantaneously by
@@ -409,9 +403,8 @@ static void do_Autopilot (player *pl)
     if (pl->turnspeed > (turnspeed*auto_pilot_turn_factor)) {
 	pl->turnacc = 0.0;
 	pl->turnvel = 0.0;
-    } else {
+    } else
 	pl->turnacc = dir * pl->turnspeed;
-    }
 
     /*
      * Change the power setting towards the perfect value, and limit
@@ -445,11 +438,10 @@ static void do_Autopilot (player *pl)
      * Only thrust if the power setting is correct or less than correct,
      * we don't want to over thrust.
      */
-    if (pl->power > power) {
+    if (pl->power > power)
 	CLR_BIT(pl->status, THRUSTING);
-    } else {
+    else
 	SET_BIT(pl->status, THRUSTING);
-    }
 }
 
 
@@ -472,13 +464,13 @@ static void Fuel_update(void)
 	    continue;
 	if ((fs->fuel += fuel) >= MAX_STATION_FUEL)
 	    fs->fuel = MAX_STATION_FUEL;
-	else if (fs->last_change + frames_per_update > frame_loops) {
+	else if (fs->last_change + frames_per_update > frame_loops)
 	    /*
 	     * We don't send fuelstation info to the clients every frame
 	     * if it wouldn't change their display.
 	     */
 	    continue;
-	}
+
 	fs->conn_mask = 0;
 	fs->last_change = frame_loops;
     }
@@ -540,17 +532,16 @@ static void Cannon_update(void)
 	    if (do_update_this_frame
 		&& cannonsUseItems
 		&& cannonsDefend
-		&& rfrac() < 0.65) {
+		&& rfrac() < 0.65)
 		Cannon_check_defense(c);
-	    }
+
 	    if (do_update_this_frame
 		&& !BIT(c->used, HAS_EMERGENCY_SHIELD)
 		&& !BIT(c->used, HAS_PHASING_DEVICE)
 		&& (c->damaged <= 0)
 		&& (c->tractor_count <= 0)
-		&& rfrac() * 16 < 1) {
+		&& rfrac() * 16 < 1)
 		Cannon_check_fire(c);
-	    }
 	    else if (do_update_this_frame
 		     && cannonsUseItems
 		     && itemProbMult > 0
@@ -560,11 +551,10 @@ static void Cannon_update(void)
 		if (World.items[item].cannonprob > 0
 		    && cannonItemProbMult > 0
 		    && (int)(rfrac() * (60 * 12))
-		    < (cannonItemProbMult * World.items[item].cannonprob)) {
+		    < (cannonItemProbMult * World.items[item].cannonprob))
 		    Cannon_add_item(c, item, (item == ITEM_FUEL ?
 					ENERGY_PACK_FUEL >> FUEL_SCALE_BITS
 					: 1));
-		}
 	    }
 	}
 	if ((c->damaged -= timeStep) <= 0)
@@ -622,21 +612,20 @@ static void Target_update(void)
 	    }
 	    continue;
 	}
-	else if (targ->damage == TARGET_DAMAGE) {
+	else if (targ->damage == TARGET_DAMAGE)
 	    continue;
-	}
 
 	targ->damage += TARGET_REPAIR_PER_FRAME * timeStep;
 	if (targ->damage >= TARGET_DAMAGE)
 	    targ->damage = TARGET_DAMAGE;
 	else if (targ->last_change + TARGET_UPDATE_DELAY
-		 < frame_loops) {
+		 < frame_loops)
 	    /*
 	     * We don't send target info to the clients every frame
 	     * if the latest repair wouldn't change their display.
 	     */
 	    continue;
-	}
+
 	targ->conn_mask = 0;
 	targ->last_change = frame_loops;
     }
@@ -1019,9 +1008,9 @@ void Update_objects(void)
 			     pl->pos.cy - targ->pos.cy) > 90.0 * CLICK)
 		|| targ->damage >= TARGET_DAMAGE
 		|| targ->dead_time > 0
-		|| BIT(pl->used, HAS_PHASING_DEVICE)) {
+		|| BIT(pl->used, HAS_PHASING_DEVICE))
 		CLR_BIT(pl->used, HAS_REPAIR);
-	    } else {
+	    else {
 		int i = pl->fuel.num_tanks;
 		int ct = pl->fuel.current;
 
@@ -1036,9 +1025,9 @@ void Update_objects(void)
 			    targ->damage = TARGET_DAMAGE;
 			    break;
 			}
-		    } else {
+		    } else
 			CLR_BIT(pl->used, HAS_REPAIR);
-		    }
+
 		    if (pl->fuel.current == pl->fuel.num_tanks)
 			pl->fuel.current = 0;
 		    else
@@ -1075,9 +1064,8 @@ void Update_objects(void)
 	    /* Decrement fuel */
 	    if (do_update_this_frame)
 		Add_fuel(&(pl->fuel), (long)(-f * FUEL_SCALE_FACT));
-	} else {
+	} else
 	    pl->acc.x = pl->acc.y = 0.0;
-	}
 
 	pl->mass = pl->emptymass
 		   + FUEL_MASS(pl->fuel.sum)
@@ -1105,9 +1093,9 @@ void Update_objects(void)
 	    if (pl->wormHoleHit != -1) {
 		wormhole_t *wh_hit = Wormholes(pl->wormHoleHit);
 
-		if (wh_hit->countdown > 0) {
+		if (wh_hit->countdown > 0)
 		    j = wh_hit->lastdest;
-		} else if (rfrac() < 0.10f) {
+		else if (rfrac() < 0.10f) {
 		    do
 			j = (int)(rfrac() * World.NumWormholes);
 		    while (World.wormholes[j].type == WORM_IN
@@ -1144,12 +1132,12 @@ void Update_objects(void)
 
 #define RANDOM_REAR_WORM 1
 
-		    if (! RANDOM_REAR_WORM) {
+		    if (! RANDOM_REAR_WORM)
 			j = nearestFront < 0 ? nearestRear : nearestFront;
-		    } else {
-			if (nearestFront >= 0) {
+		    else {
+			if (nearestFront >= 0)
 			    j = nearestFront;
-			} else {
+			else {
 			    do
 				j = (int)(rfrac() * World.NumWormholes);
 			    while (World.wormholes[j].type == WORM_IN
@@ -1177,10 +1165,8 @@ void Update_objects(void)
 		}
 
 		/* can't find an empty space, hyperjump failed */
-		if (!counter) {
-		    dest.cx = pl->pos.cx;
-		    dest.cy = pl->pos.cy;
-		}
+		if (!counter)
+		    dest.cx = pl->pos;
 
 #if 0 /* kps - temporary wormholes disabled currently */
 		if (counter
@@ -1190,12 +1176,11 @@ void Update_objects(void)
 			   SPACE_BIT)
 		    && BIT(1U << World.block[CLICK_TO_BLOCK(dest.cx)]
 					    [CLICK_TO_BLOCK(dest.cy)],
-			   SPACE_BIT)) {
+			   SPACE_BIT))
 		    add_temp_wormholes(OBJ_X_IN_BLOCKS(pl),
 				       OBJ_Y_IN_BLOCKS(pl),
 				       CLICK_TO_BLOCK(dest.cx),
 				       CLICK_TO_BLOCK(dest.cy));
-		}
 #endif
 		j = -2;
 		sound_play_sensors(pl->pos.cx, pl->pos.cy, HYPERJUMP_SOUND);

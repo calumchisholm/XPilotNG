@@ -43,6 +43,7 @@ typedef struct grav grav_t;
 typedef struct base base_t;
 typedef struct baseorder baseorder_t;
 typedef struct cannon cannon_t;
+typedef struct check check_t;
 typedef struct item item_t;
 typedef struct asteroid asteroid_t;
 typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;

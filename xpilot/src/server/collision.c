@@ -384,9 +384,9 @@ static void PlayerCollision(void)
 
 	/* Player picking up ball/treasure */
 	if (!BIT(pl->used, HAS_CONNECTOR)
-	    || BIT(pl->used, HAS_PHASING_DEVICE)) {
+	    || BIT(pl->used, HAS_PHASING_DEVICE))
 	    pl->ball = NULL;
-	} else if (pl->ball != NULL) {
+	else if (pl->ball != NULL) {
 	    ballobject *ball = pl->ball;
 
 	    if (ball->life <= 0 || ball->id != NO_ID)
@@ -470,8 +470,8 @@ static void PlayerCollision(void)
 	    if (pl->round != 0)
 		pl->time++;
 	    if (BIT(pl->status, PLAYING|KILLED) == PLAYING
-		&& Wrap_length(pl->pos.cx - Checks(pl->check)->cx,
-			       pl->pos.cy - Checks(pl->check)->cy)
+		&& Wrap_length(pl->pos.cx - Checks(pl->check)->pos.cx,
+			       pl->pos.cy - Checks(pl->check)->pos.cy)
 		    < checkpointRadius * BLOCK_CLICKS
 		&& !IS_TANK_PTR(pl)
 		&& !ballrace)
@@ -577,9 +577,8 @@ static void PlayerObjectCollision(player *pl)
 		   && teamImmunity
 		   && obj->team == pl->team
 		   /* allow players to destroy their team's unowned balls */
-		   && obj->type != OBJ_BALL) {
+		   && obj->type != OBJ_BALL)
 	    continue;
-	}
 
 	if (obj->type == OBJ_ITEM) {
 	    if (BIT(pl->used, HAS_SHIELD) && !shieldedItemPickup) {
@@ -950,11 +949,10 @@ static void Player_collides_with_mine(player *pl, object *obj)
 
     sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_MINE_SOUND);
     kp = NULL;
-    if (mine->id == NO_ID && mine->owner == NO_ID) {
+    if (mine->id == NO_ID && mine->owner == NO_ID)
 	sprintf(msg, "%s hit %s.",
 		pl->name,
 		Describe_shot(mine->type, mine->status, mine->mods, 1));
-    }
     else if (mine->owner == mine->id) {
 	kp = Player_by_id(mine->owner);
 	sprintf(msg, "%s hit %s %s by %s.", pl->name,
@@ -1173,7 +1171,7 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 			= ((rel_velocity * rel_velocity * ABS(obj->mass))
 			   / (ShotsSpeed * ShotsSpeed * ShotsMass));
 		} else
-		   drainfactor = 1.0f;
+		    drainfactor = 1.0f;
 		drain = (long)(ED_SHOT_HIT * drainfactor * SHOT_MULT(obj));
 		Add_fuel(&(pl->fuel), drain);
 	    }
@@ -1517,8 +1515,8 @@ static void BallCollision(void)
 	    player *owner = Player_by_id(ball->owner);
 
 	    if (!ballrace_connect || ball->id == owner->id) {
-		if (Wrap_length(ball->pos.cx - Checks(owner->check)->cx,
-				ball->pos.cy - Checks(owner->check)->cy)
+		if (Wrap_length(ball->pos.cx - Checks(owner->check)->pos.cx,
+				ball->pos.cy - Checks(owner->check)->pos.cy)
 		    < checkpointRadius * BLOCK_CLICKS)
 		    Player_pass_checkpoint(owner);
 	    }

@@ -165,8 +165,9 @@ void Pick_startpos(player *pl)
 void Go_home(player *pl)
 {
     int			ind = GetInd(pl->id);
-    int			i, cx, cy, dir, check;
+    int			i, dir, check;
     DFLOAT		vx, vy, velo;
+    clpos		pos;
 
     if (IS_TANK_PTR(pl)) {
 	/*NOTREACHED*/
@@ -182,24 +183,22 @@ void Go_home(player *pl)
 	    check = pl->check - 1;
 	else
 	    check = World.NumChecks - 1;
-	cx = Checks(check)->cx;
-	cy = Checks(check)->cy;
+	pos = Checks(check)->pos;
 	vx = (rfrac() - 0.5) * 0.1;
 	vy = (rfrac() - 0.5) * 0.1;
 	velo = LENGTH(vx, vy);
 	dir = pl->last_check_dir;
 	dir = MOD2(dir + (int)((rfrac() - 0.5) * (RES / 8)), RES);
     } else if (pl->home_base != NULL) {
-	cx = pl->home_base->pos.cx;
-	cy = pl->home_base->pos.cy;
+	pos = pl->home_base->pos;
 	dir = pl->home_base->dir;
 	vx = vy = velo = 0;
     } else
-	cx = cy = dir = vx = vy = velo = 0;
+	pos.cx = pos.cy = dir = vx = vy = velo = 0;
 
     pl->dir = dir;
     pl->float_dir = dir;
-    Player_position_init_clicks(pl, cx + CLICK * vx, cy + CLICK * vy);
+    Player_position_init_clicks(pl, pos.cx + CLICK * vx, pos.cy + CLICK * vy);
     pl->vel.x = vx;
     pl->vel.y = vy;
     pl->velocity = velo;
@@ -1744,10 +1743,9 @@ void Delete_player(player *pl)
 	if (World.teams[i].SwapperId == id)
 	    World.teams[i].SwapperId = -1;
 #if 0 /* kps - why "if 0" ? */
-    if (pl->team != TEAM_NOT_SET) {
+    if (pl->team != TEAM_NOT_SET)
 	/* Swapping a queued player might be better */
 	World.teams[pl->team].SwapperId = -1;
-    }
 #endif
 
     /* Delete remaining shots */

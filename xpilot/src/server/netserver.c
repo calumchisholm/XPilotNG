@@ -380,8 +380,8 @@ static int Init_setup_old(void)
 		break;
 	    case CHECK:
 		for (i = 0; i < World.NumChecks; i++) {
-		    if (x != CLICK_TO_BLOCK(World.checks[i].cx)
-			|| y != CLICK_TO_BLOCK(World.checks[i].cy)) {
+		    if (x != CLICK_TO_BLOCK(Checks(i)->pos.cx)
+			|| y != CLICK_TO_BLOCK(Checks(i)->pos.cy)) {
 			continue;
 		    }
 		    *mapptr = SETUP_CHECK + i;
@@ -777,12 +777,12 @@ void Create_client_socket(sock_t *socket, int *port)
 	error("Cannot make client socket non-blocking");
 	goto error;
     }
-    if (sock_set_receive_buffer_size(socket, SERVER_RECV_SIZE + 256) == -1) {
+    if (sock_set_receive_buffer_size(socket, SERVER_RECV_SIZE + 256) == -1)
 	error("Cannot set receive buffer size to %d", SERVER_RECV_SIZE + 256);
-    }
-    if (sock_set_send_buffer_size(socket, SERVER_SEND_SIZE + 256) == -1) {
+
+    if (sock_set_send_buffer_size(socket, SERVER_SEND_SIZE + 256) == -1)
 	error("Cannot set send buffer size to %d", SERVER_SEND_SIZE + 256);
-    }
+
     return;
  error:
     sock_close(socket);
@@ -951,18 +951,17 @@ int Setup_connection(char *real, char *nick, char *dpy, int team,
 	    if (connp->state == CONN_LISTENING
 		&& strcmp(real, connp->real) == 0
 		&& strcmp(dpy, connp->dpy) == 0
-		&& version == connp->version) {
+		&& version == connp->version)
 		/*
 		 * May happen for multi-homed hosts
 		 * and if previous packet got lost.
 		 */
 		return connp->my_port;
-	    } else {
+	    else
 		/*
 		 * Nick already in use.
 		 */
 		return -1;
-	    }
 	}
     }
 
@@ -1275,9 +1274,8 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	    Check_team_members(connp->team);
 	    if (World.teams[connp->team].NumMembers
 		- World.teams[connp->team].NumRobots
-		>= World.teams[connp->team].NumBases) {
+		>= World.teams[connp->team].NumBases)
 		connp->team = TEAM_NOT_SET;
-	    }
 	}
 	if (connp->team == TEAM_NOT_SET)
 	    connp->team = Pick_team(PickForHuman);
@@ -1367,10 +1365,9 @@ static int Handle_login(connection_t *connp, char *errmsg, int errsize)
 	if (pl->team != TEAM_NOT_SET && pl->home_base != NULL) {
 	    World.teams[pl->team].NumMembers++;
 	    if (teamShareScore) {
-		if (World.teams[pl->team].NumMembers == 1) {
+		if (World.teams[pl->team].NumMembers == 1)
 		    /* reset team score on first player */
 		    World.teams[pl->team].score = 0;
-		}
 	    }
 	    TEAM_SCORE(pl->team, pl->score);
 	}
@@ -1685,12 +1682,10 @@ static void Handle_input(int fd, void *arg)
 	playback_data += connp->r.len;
     }
 
-    if (connp->r.len <= 0) {
-	/*
-	 * No input.
-	 */
+    if (connp->r.len <= 0)
+	/* No input. */
 	return;
-    }
+
     while (connp->r.ptr < connp->r.buf + connp->r.len) {
 	char *pkt = connp->r.ptr;
 	type = (connp->r.ptr[0] & 0xFF);
