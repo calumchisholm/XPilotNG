@@ -85,6 +85,9 @@ called xpilot. There are always servers running if you check with the meta
 server, but if you for some reason do not want to join them, you'll have to
 start a server of your own (see man-page xpilots(6)).
 
+%post
+echo Ensure that you have OpenGL configured, and hardware acceleration 
+echo otherwise you will find that this client runs too slowly.
 
 %prep
 %setup -n %{name}-%{version}-%{release}
@@ -95,7 +98,18 @@ start a server of your own (see man-page xpilots(6)).
 make
 
 %install
-cd src/client/sdl
+cd src/client/sdl/
+make install
+cd ../../..
+cd src/server
+make install
+cd ../..
+cd src/replay
+make install
+cd ../..
+cd lib
+make install
+cd textures
 make install
 
 rm -rf $RPM_BUILD_ROOT
@@ -181,34 +195,17 @@ rm -rf $RPM_BUILD_ROOT
 /usr/local/share/xpilot-ng/textures/wall_ur.ppm
 /usr/local/share/xpilot-ng/textures/wall_url.ppm
 /usr/local/share/xpilot-ng/textures/wormhole.ppm
-/usr/local/share/xpilot-ng/textures/polybloods.xpd
-/usr/local/share/xpilot-ng/textures/polybloods/tex.ppm
-/usr/local/share/xpilot-ng/textures/polybloods/tex27.ppm
-/usr/local/share/xpilot-ng/textures/polybloods/tex47.ppm
-/usr/local/share/xpilot-ng/textures/polybloods/tx3.ppm
-/usr/local/share/xpilot-ng/textures/polybloods/tx8.ppm
-/usr/local/share/xpilot-ng/textures/polybloods
-/usr/local/share/xpilot-ng/textures/bk5.xpd
-/usr/local/share/xpilot-ng/textures/bk5/bk5.xp2
-/usr/local/share/xpilot-ng/textures/bk5/tex27.ppm
-/usr/local/share/xpilot-ng/textures/bk5/tx8.ppm
-/usr/local/share/xpilot-ng/textures/bk5/tex47.ppm
-/usr/local/share/xpilot-ng/textures/bk5/skull.ppm
-/usr/local/share/xpilot-ng/textures/bk5/mar004.ppm
-/usr/local/share/xpilot-ng/textures/bk5/misc134.ppm
-/usr/local/share/xpilot-ng/textures/bk5
 /usr/local/share/xpilot-ng/textures/asteroid.ppm
 /usr/local/share/xpilot-ng/textures
 /usr/local/share/xpilot-ng/defaults.txt
 /usr/local/share/xpilot-ng/password.txt
 /usr/local/share/xpilot-ng/robots.txt
 /usr/local/share/xpilot-ng/sounds.txt
-/usr/local/share/xpilot-ng/mapconvert.py
 
 
 
 %changelog
-* Mon Sep 15 2003 root <root@Darel.com>
+* Mon Sep 15 2003 Darel <darelcullen@sf.net>
 - Initial build.
 
 
