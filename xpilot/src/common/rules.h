@@ -73,7 +73,7 @@
 #define REPROGRAM		(1L<<20)	/* Player reprogramming */
 #define NOEXPLOSION		(1L<<21)	/* No ball recreate explosion */
 #define COLLISIONSHOVE		(1L<<22)	/* Collision counts as shove */
-#define FINISH			(1L<<23)	/* Reached race finish */
+#define FINISH			(1L<<23)	/* Finished a lap this frame */
 #define RACE_OVER		(1L<<24)	/* After finished and score. */
 
 typedef struct {

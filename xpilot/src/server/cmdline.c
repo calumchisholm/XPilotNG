@@ -214,6 +214,7 @@ int             numberOfRounds;         /* how many rounds to play */
 int             playerLimit;            /* allow less players than bases */
 int             recordMode;             /* 0=off, 1=record, 2=playback */
 int             constantScoring;        /* Fixed points for kills etc? */
+int             eliminationRace;        /* Last player drops each lap? */
 
 extern char	conf_default_map_string[];	/* from common/config.c */
 
@@ -2367,6 +2368,16 @@ static optionDesc options[] = {
 	valBool,
 	tuner_dummy,
 	"Whether the scores given from various things are fixed.\n",
+	MAP(NULL)
+    },
+    {
+	"elimination",
+	"elimination",
+	"no",
+	&eliminationRace,
+	valBool,
+	tuner_dummy,
+	"Race mode where the last player drops out each lap.\n",
 	MAP(NULL)
     }
 };

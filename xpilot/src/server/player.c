@@ -463,16 +463,14 @@ int Init_player(int ind, wireobj *ship)
      * If limited lives and if nobody has lost a life yet, you may enter
      * now, otherwise you will have to wait 'til everyone gets GAME OVER.
      */
-    if (BIT(pl->mode, LIMITED_LIVES)) {
-	for (i = 0; i < NumPlayers; i++) {
-	    /* If a non-team member has lost a life,
-	     * then it's too late to join.
-	     * But we don't know team here!
-	     * The TEAM macro referenced random values. Removed. -uau */
-	    if (Players[i]->life < World.rules->lives) {
-		too_late = true;
-		break;
-	    }
+    for (i = 0; i < NumPlayers; i++) {
+	/* If a non-team member has lost a life,
+	 * then it's too late to join.
+	 * But we don't know team here!
+	 * The TEAM macro referenced random values. Removed. -uau */
+	if (BIT(World.rules->mode, LIMITED_LIVES) && Players[i]->life < World.rules->lives || BIT(Players[i]->mode, GAME_OVER)) {
+	    too_late = true;
+	    break;
 	}
 	if (too_late) {
 	    pl->mychar	= 'W';
@@ -1079,11 +1077,12 @@ void Race_game_over(void)
 	    if (pl->home_base != i) {
 		pl->home_base = i;
 		for (j = 0; j < observerStart + NumObservers; j++) {
-		    if (j == NumPlayers)
+		    if (j == NumPlayers) {
 			if (NumObservers)
 			    j = observerStart;
 			else
 			    break;
+		    }
 		    if (Players[j]->conn != NOT_CONNECTED) {
 			Send_base(Players[j]->conn,
 				  pl->id,
@@ -1207,14 +1206,99 @@ void Compute_game_status(void)
 	 * fastest lap get points.
 	 */
 
-	player		*alive = NULL;
-	int		num_alive_players = 0,
-			num_active_players = 0,
-			num_finished_players = 0,
-			num_race_over_players = 0,
-			num_waiting_players = 0,
-			position = 1,
-			total_pts, pts;
+	player	*alive = NULL;
+	int	num_alive_players = 0,
+		num_active_players = 0,
+		num_finished_players = 0,
+		num_race_over_players = 0,
+		num_waiting_players = 0,
+		position = 1,
+		total_pts, pts;
+	
+
+	/* Handle finishing of laps */
+	for (i = 0; i < NumPlayers; i++) {
+	    pl = Players[i];
+	    if (!BIT(pl->status, FINISH))
+		continue;
+	    pl->last_lap_time = pl->time - pl->last_lap;
+	    if ((pl->best_lap > pl->last_lap_time || pl->best_lap == 0)
+		&& pl->time != 0 && pl->round != 1) {
+		pl->best_lap = pl->last_lap_time;
+	    }
+	    pl->last_lap = pl->time;
+	    if (pl->round > raceLaps) {
+		Player_death_reset(i);
+		pl->mychar = 'D';
+		SET_BIT(pl->status, GAME_OVER);
+		sprintf(msg, "%s finished the race. Last lap time: %.2fs. "
+			"Personal race best lap time: %.2fs.",
+			pl->name,
+			(DFLOAT) pl->last_lap_time / FPS,
+			(DFLOAT) pl->best_lap / FPS);
+	    }
+	    else if (pl->round > 1) {
+		sprintf(msg, "%s completes lap %d in %.2fs. "
+			"Personal race best lap time: %.2fs.",
+			pl->name,
+			pl->round-1,
+			(DFLOAT) pl->last_lap_time / FPS,
+			(DFLOAT) pl->best_lap / FPS);
+	    }
+	    else {
+		sprintf(msg, "%s starts lap 1 of %d", pl->name,
+			raceLaps);
+		CLR_BIT(pl->status, FINISH); /* no elimination from starting */
+	    }
+	    Set_message(msg);
+	}
+	if (eliminationRace) {
+	    for (;;) {
+		int pli, count = 0, lap = INT_MAX;;
+		for (i = 0; i < NumPlayers; i++) {
+		    pl = Players[i];
+		    if (BIT(pl->status, FINISH) && pl->round < lap) {
+			lap = pl->round;
+			pli = i;
+		    }
+		}
+		if (lap == INT_MAX)
+		    break;
+		CLR_BIT(Players[pli]->status, FINISH);
+		lap = 0;
+		for (i = 0; i < NumPlayers; i++) {
+		    pl = Players[i];
+		    if (BIT(pl->status, PAUSE|GAME_OVER|PLAYING) != PLAYING)
+			continue;
+		    if (pl->round < Players[pli]->round) {
+			count++;
+			if (pl->round > lap)
+			    lap = pl->round;
+		    }
+		}
+		if (Players[pli]->round < lap + count) {
+		    continue;
+		}
+		for (i = 0; i < NumPlayers; i++) {
+		    pl = Players[i];
+		    if (BIT(pl->status, PAUSE|GAME_OVER|PLAYING) != PLAYING)
+			continue;
+		    if (pl->round < Players[pli]->round) {
+			Player_death_reset(i);
+			pl->mychar = 'D';
+			SET_BIT(pl->status, GAME_OVER);
+			if (count == 1) {
+			    sprintf(msg, "%s was the last to complete lap %d and is out of the race.", pl->name, Players[pli]->round - 1);
+			    Set_message(msg);
+			}
+			else {
+			    sprintf(msg, "%s was the last to complete some lap between %d and %d.", pl->name, pl->round, Players[pli]->round - 1);
+			    Set_message(msg);
+			}
+		    }
+		}
+	    }
+	}
 
 	/* First count the players */
 	for (i = 0; i < NumPlayers; i++)  {
@@ -1236,7 +1320,10 @@ void Compute_game_status(void)
 		position++;
 	    }
 	    else if (BIT(pl->status, FINISH)) {
-		num_finished_players++;
+		if (pl->round > raceLaps)
+		    num_finished_players++;
+		else
+		    CLR_BIT(pl->status, FINISH);
 	    }
 	    else if (!BIT(pl->status, GAME_OVER)) {
 		alive = pl;
@@ -1328,12 +1415,12 @@ void Compute_game_status(void)
 		if (num_finished_players + num_race_over_players == 0) {
 		    return;
 		}
-		if (!alive || alive->round == 0) {
-		    return;
-		}
 	    }
 	}
-	else if (num_finished_players == 0) {
+	/* !@# fix
+	 * No meaningful messages / scores if someone wins by staying alive
+	 */
+	else if (num_finished_players == 0 || num_alive_players > 1) {
 	    return;
 	}
 

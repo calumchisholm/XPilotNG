@@ -236,6 +236,7 @@ extern int              numberOfRounds;
 extern int              playerLimit;
 extern int              recordMode;
 extern int              constantScoring;
+extern int              eliminationRace;
 
 #endif
 

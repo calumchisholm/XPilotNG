@@ -508,22 +508,6 @@ static void PlayerCollision(void)
 			continue;
 		}
 
-		/*
-		 * Here we can add code to do more accurate player against
-		 * player collision detection.
-		 * A new algorithm could be based on the following idea:
-		 *
-		 * - If we can draw an uninterupted line between two players:
-		 *   - Then test for both ships:
-		 *     - For the three points which make up a ship:
-		 *       - If we can draw a line between its previous
-		 *         position and its current position which does not
-		 *         cross the first line.
-		 * Then the ships have not collided even though they may be
-		 * very close to one another.
-		 * The choosing of the first line may not be easy however.
-		 */
-
 		if (TEAM_IMMUNE(i, j) || PSEUDO_TEAM(i, j)) {
 		    continue;
 		}
@@ -731,50 +715,18 @@ static void PlayerCollision(void)
 
 		if (pl->check == 0) {
 		    pl->round++;
-		    pl->last_lap_time = pl->time - pl->last_lap;
-		    if ((pl->best_lap > pl->last_lap_time
-			    || pl->best_lap == 0)
-			&& pl->time != 0
-			&& pl->round != 1) {
-			pl->best_lap = pl->last_lap_time;
-		    }
-		    pl->last_lap = pl->time;
-		    if (pl->round > raceLaps) {
-			Player_death_reset(i);
-			pl->mychar = 'D';
-			SET_BIT(pl->status, GAME_OVER|FINISH);
-			sprintf(msg,
-				"%s finished the race. Last lap time: %.2fs. "
-				"Personal race best lap time: %.2fs.",
-				pl->name,
-				(DFLOAT) pl->last_lap_time / FPS,
-				(DFLOAT) pl->best_lap / FPS);
-		    }
-		    else if (pl->round > 1) {
-			sprintf(msg,
-				"%s completes lap %d in %.2fs. "
-				"Personal race best lap time: %.2fs.",
-				pl->name,
-				pl->round-1,
-				(DFLOAT) pl->last_lap_time / FPS,
-				(DFLOAT) pl->best_lap / FPS);
-		    }
-		    else {
-			sprintf(msg, "%s starts lap 1 of %d", pl->name,
-				raceLaps);
-		    }
-		    Set_message(msg);
+		    SET_BIT(pl->status, FINISH);
+		    /* Rest done in Compute_game_status() */
 		}
-
 		if (++pl->check == World.NumChecks)
 		    pl->check = 0;
 		pl->last_check_dir = pl->dir;
-
 		updateScores = true;
 	    }
 	}
     }
 }
+
 
 static void PlayerObjectCollision(int ind)
 {
@@ -821,16 +773,12 @@ static void PlayerObjectCollision(int ind)
 	       were likely completely different from the end-of-frame values
 	       we have now.
 
-
 	    Different collision modes for players have not been implemented
 	    yet. It's supposed that they move in a straight line from
 	    prevpos to pos. This can lead to some erroneous hits.
 	*/
 
 	obj = obj_list[j];
-
-	if (obj->collmode == 3)
-	    continue;   /* IMPLEMENT THIS */
 
 	range = SHIP_SZ + obj->pl_range;
 	switch (obj->collmode) {
@@ -927,11 +875,13 @@ static void PlayerObjectCollision(int ind)
 
 	rel_velocity = LENGTH(pl->vel.x - obj->vel.x, pl->vel.y - obj->vel.y);
 
+#if 0
 	if (obj->collmode != 1) {
 	    char MSG[80];
 	    sprintf(MSG, "Collision type=%d, hit=%d, cm=%d, time=%f, frame=%ld [*DEBUG*]", obj->type, hit, obj->collmode, obj->wall_time, frame_loops);
 	    Set_message(MSG);
 	}
+#endif
 
 	/*
 	 * Object collision.
