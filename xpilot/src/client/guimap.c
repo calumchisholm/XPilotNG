@@ -26,9 +26,9 @@
 
 char guimap_version[] = VERSION;
 
-int	backgroundPointColor;	/* Color index for background point drawing */
-int	fuelColor;		/* Color index for fuel station drawing */
-int	visibilityBorderColor;	/* Color index for visibility border drawing */
+static int backgroundPointColor;	/* background point drawing */
+static int fuelColor;			/* fuel station drawing */
+static int visibilityBorderColor;	/* visibility border drawing */
 
 void Gui_paint_walls(int x, int y, int type)
 {
