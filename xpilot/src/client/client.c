@@ -1846,7 +1846,7 @@ static int predict_self_dir(int received_dir)
     new_dir = (received_dir - dir_delta);
     while (new_dir < 0)
 	new_dir += RES;
-    while (new_dir > RES)
+    while (new_dir >= RES)
 	new_dir -= RES;
 
     return new_dir;
