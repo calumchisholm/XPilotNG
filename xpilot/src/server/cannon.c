@@ -391,7 +391,7 @@ static int Cannon_select_weapon(cannon_t *c)
 static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 {
     world_t *world = &World;
-    double	speed = options.ShotsSpeed;
+    double	speed = options.shotSpeed;
     double	range = CANNON_SHOT_LIFE_MAX * speed;
     double	visualrange = (CANNON_DISTANCE
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
@@ -545,7 +545,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
     modifiers	mods;
     bool	played = false;
     int		i;
-    double	speed = options.ShotsSpeed;
+    double	speed = options.shotSpeed;
     vector	zero_vel = { 0.0, 0.0 };
 
     CLEAR_MODS(mods);

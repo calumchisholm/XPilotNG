@@ -381,7 +381,7 @@ static void Player_init_fuel(player *pl, double total_fuel)
     pl->fuel.max	= TANK_CAP(0);
     pl->fuel.sum	= MIN(fuel, pl->fuel.max);
     pl->fuel.tank[0]	= pl->fuel.sum;
-    pl->emptymass	= options.ShipMass;
+    pl->emptymass	= options.shipMass;
     pl->item[ITEM_TANK]	= pl->fuel.num_tanks;
 
     fuel -= pl->fuel.sum;
@@ -409,8 +409,8 @@ int Init_player(int ind, shipshape_t *ship)
     pl->turnvel		= 0.0;
     pl->oldturnvel	= 0.0;
     pl->turnacc		= 0.0;
-    pl->mass		= options.ShipMass;
-    pl->emptymass	= options.ShipMass;
+    pl->mass		= options.shipMass;
+    pl->emptymass	= options.shipMass;
 
     for (i = 0; i < NUM_ITEMS; i++) {
 	if (!BIT(1U << i, ITEM_BIT_FUEL | ITEM_BIT_TANK))
@@ -2010,7 +2010,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 
     pl->vel.x		= pl->vel.y	= 0.0;
     pl->acc.x		= pl->acc.y	= 0.0;
-    pl->emptymass	= pl->mass	= options.ShipMass;
+    pl->emptymass	= pl->mass	= options.shipMass;
     pl->status		|= DEF_BITS;
     pl->status		&= ~(KILL_BITS);
 

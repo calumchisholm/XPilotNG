@@ -28,7 +28,7 @@
 /* maximum size of asteroid */
 #define ASTEROID_MAX_SIZE	4
 /* mass of asteroid size 1 */
-#define ASTEROID_BASE_MASS	(options.ShipMass * 3)
+#define ASTEROID_BASE_MASS	(options.shipMass * 3)
 /* amount of mass lost in breaking, relative to asteroids size n - 1 */
 #define ASTEROID_DUST_MASS	0.25
 /* factor of above, relative to asteroid size n */

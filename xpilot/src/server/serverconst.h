@@ -139,10 +139,10 @@
  (((f)*((MAX_AFTERBURNER+1)+(n)*(ALT_FUEL_FACT-1)))/(MAX_AFTERBURNER+1.0))
 
 #define THRUST_MASS             0.7
-#define ARMOR_MASS		(options.ShipMass / 14)
+#define ARMOR_MASS		(options.shipMass / 14)
 
 #define MAX_TANKS               8
-#define TANK_MASS               (options.ShipMass/10)
+#define TANK_MASS               (options.shipMass / 10)
 #define TANK_CAP(n)             (!(n)?MAX_PLAYER_FUEL:(MAX_PLAYER_FUEL/3))
 #define TANK_FUEL(n)            ((TANK_CAP(n)*(5+(randomMT()&3)))/32)
 #define TANK_REFILL_LIMIT       (350.0/8.0)
@@ -203,7 +203,7 @@
 #define HEAT_WIDE_TIMEOUT       (8 * 12)
 #define HEAT_WIDE_ERROR         16
 
-#define CLUSTER_MASS_SHOTS(mass) ((mass) * 0.9 / options.ShotsMass)
+#define CLUSTER_MASS_SHOTS(mass) ((mass) * 0.9 / options.shotMass)
 #define CLUSTER_MASS_DRAIN(mass) (CLUSTER_MASS_SHOTS(mass)*ED_SHOT)
 
 #define SMART_SHOT_LEN		12

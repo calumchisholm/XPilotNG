@@ -107,7 +107,7 @@ static option_desc opts[] = {
 	"gravity",
 	"gravity",
 	"-0.14",
-	&options.Gravity,
+	&options.gravity,
 	valReal,
 	Compute_gravity,
 	"Gravity strength.\n",
@@ -116,12 +116,12 @@ static option_desc opts[] = {
     {
 	"shipMass",
 	"shipMass",
-	"18.0",			/*
-				 * kps - "optimal" value for fps=50 and gs=12.5.
-				 * Should be changed back to 20.0 when high fps
-				 * "inertia" issue is sorted out.
-				 */
-	&options.ShipMass,
+	"18.0",		/*
+			 * kps - "optimal" value for fps=50 and gs=12.5.
+			 * Should be changed back to 20.0 when high fps
+			 * "inertia" issue is sorted out.
+			 */
+	&options.shipMass,
 	valReal,
 	tuner_shipmass,
 	"Mass of fighters.\n",
@@ -151,7 +151,7 @@ static option_desc opts[] = {
 	"shotMass",
 	"shotMass",
 	"0.1",
-	&options.ShotsMass,
+	&options.shotMass,
 	valReal,
 	tuner_dummy,
 	"Mass of bullets.\n",
@@ -161,7 +161,7 @@ static option_desc opts[] = {
 	"shotSpeed",
 	"shotSpeed",
 	"21.0",
-	&options.ShotsSpeed,
+	&options.shotSpeed,
 	valReal,
 	tuner_dummy,
 	"Maximum speed of bullets.\n",
@@ -171,7 +171,7 @@ static option_desc opts[] = {
 	"shotLife",
 	"shotLife",
 	"60.0",
-	&options.ShotsLife,
+	&options.shotLife,
 	valReal,
 	Timing_setup,
 	"Life of bullets in ticks.\n",
@@ -444,7 +444,7 @@ static option_desc opts[] = {
 	"maxPlayerShots",
 	"shots",
 	"256",
-	&options.ShotsMax,
+	&options.maxPlayerShots,
 	valInt,
 	tuner_dummy,
 	"Maximum number of shots visible at the same time per player.\n",
@@ -454,7 +454,7 @@ static option_desc opts[] = {
 	"shotsGravity",
 	"shotsGravity",
 	"true",
-	&options.ShotsGravity,
+	&options.shotsGravity,
 	valBool,
 	tuner_dummy,
 	"Are shots affected by gravity.\n",

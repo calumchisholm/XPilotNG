@@ -382,7 +382,8 @@ void Tank_handle_detach(player *pl)
     dummy->fuel.num_tanks = 0;
 
     /* Mass is only tank + fuel */
-    dummy->mass = (dummy->emptymass = options.ShipMass) + FUEL_MASS(dummy->fuel.sum);
+    dummy->mass = (dummy->emptymass = options.shipMass)
+	+ FUEL_MASS(dummy->fuel.sum);
     dummy->power *= TANK_THRUST_FACT;
 
     /* Reset visibility. */

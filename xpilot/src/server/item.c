@@ -275,8 +275,8 @@ void Place_item(player *pl, int item)
 	} else {
 	    vector gravity = World_gravity(world, pos);
 
-	    vel.x -= options.Gravity * gravity.x;
-	    vel.y -= options.Gravity * gravity.y;
+	    vel.x -= options.gravity * gravity.x;
+	    vel.y -= options.gravity * gravity.y;
 	    vel.x += (int)(rfrac() * 8) - 3;
 	    vel.y += (int)(rfrac() * 8) - 3;
 	}
@@ -404,7 +404,7 @@ void Detonate_items(player *pl)
 	if (rfrac() < options.detonateItemOnKillProb) {
 	    int	type;
 
-	    if (pl->shots >= options.ShotsMax)
+	    if (pl->shots >= options.maxPlayerShots)
 		break;
 
 	    /*

@@ -37,7 +37,7 @@ void tuner_shipmass(void)
     int i;
 
     for (i = 0; i < NumPlayers; i++)
-	Players(i)->emptymass = options.ShipMass;
+	Players(i)->emptymass = options.shipMass;
 }
 
 void tuner_ballmass(void)

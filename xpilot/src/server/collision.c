@@ -1131,7 +1131,8 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
 						 pl->vel.y - obj->vel.y);
 		    drainfactor
 			= ((rel_velocity * rel_velocity * ABS(obj->mass))
-			   / (options.ShotsSpeed * options.ShotsSpeed * options.ShotsMass));
+			   / (options.shotSpeed * options.shotSpeed
+			      * options.shotMass));
 		} else
 		    drainfactor = 1.0;
 		drain = ED_SHOT_HIT * drainfactor * SHOT_MULT(obj);

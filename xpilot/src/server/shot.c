@@ -393,7 +393,7 @@ void Fire_main_shot(player *pl, int type, int dir)
 {
     clpos m_gun, pos;
 
-    if (pl->shots >= options.ShotsMax
+    if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
@@ -406,7 +406,7 @@ void Fire_main_shot(player *pl, int type, int dir)
 
 void Fire_shot(player *pl, int type, int dir)
 {
-    if (pl->shots >= options.ShotsMax
+    if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
@@ -417,7 +417,7 @@ void Fire_left_shot(player *pl, int type, int dir, int gun)
 {
     clpos l_gun, pos;
 
-    if (pl->shots >= options.ShotsMax
+    if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
@@ -432,7 +432,7 @@ void Fire_right_shot(player *pl, int type, int dir, int gun)
 {
     clpos r_gun, pos;
 
-    if (pl->shots >= options.ShotsMax
+    if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
@@ -447,7 +447,7 @@ void Fire_left_rshot(player *pl, int type, int dir, int gun)
 {
     clpos l_rgun, pos;
 
-    if (pl->shots >= options.ShotsMax
+    if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
@@ -462,7 +462,7 @@ void Fire_right_rshot(player *pl, int type, int dir, int gun)
 {
     clpos r_rgun, pos;
 
-    if (pl->shots >= options.ShotsMax
+    if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
 	return;
 
@@ -492,9 +492,9 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 			side = 0,
 			fired = 0;
     double		drain,
-    			mass = options.ShotsMass,
-			life = options.ShotsLife,
-			speed = options.ShotsSpeed,
+    			mass = options.shotMass,
+			life = options.shotLife,
+			speed = options.shotSpeed,
 			turnspeed = 0,
 			max_speed = SPEED_LIMIT,
 			angle,
@@ -535,7 +535,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 	    sound_play_sensors(pl->pos, FIRE_SHOT_SOUND);
 	    Rank_FireShot(pl);
 	}
-	if (!options.ShotsGravity)
+	if (!options.shotsGravity)
 	    CLR_BIT(status, GRAVITY);
 	break;
 
@@ -1195,7 +1195,7 @@ void Delete_shot(int ind)
 		color = Player_by_id(shot->id)->color;
 	    else
 		color = WHITE;
-	    mass = options.ShotsMass * 3;
+	    mass = options.shotMass * 3;
 	    modv = 1 << shot->mods.velocity;
 	    num_modv = 4;
 	    if (BIT(shot->mods.nuclear, NUCLEAR)) {

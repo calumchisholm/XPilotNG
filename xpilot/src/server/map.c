@@ -635,8 +635,8 @@ static void Compute_global_gravity(world_t *world)
 
     if (options.gravityPointSource == false) {
 	theta = (options.gravityAngle * PI) / 180.0;
-	xforce = cos(theta) * options.Gravity;
-	yforce = sin(theta) * options.Gravity;
+	xforce = cos(theta) * options.gravity;
+	yforce = sin(theta) * options.gravity;
 	for (xi = 0; xi < world->x; xi++) {
 	    grav = world->gravity[xi];
 
@@ -660,7 +660,7 @@ static void Compute_global_gravity(world_t *world)
 		    grav->y = 0.0;
 		    continue;
 		}
-		strength = options.Gravity / LENGTH(dx, dy);
+		strength = options.gravity / LENGTH(dx, dy);
 		if (options.gravityClockwise) {
 		    grav->x =  dy * strength;
 		    grav->y = -dx * strength;

@@ -214,7 +214,8 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	if (options.shotHitFuelDrainUsesKineticEnergy) {
 	    drainfactor = VECTOR_LENGTH(obj->vel);
 	    drainfactor = (drainfactor * drainfactor * ABS(obj->mass))
-			  / (options.ShotsSpeed * options.ShotsSpeed * options.ShotsMass);
+			  / (options.shotSpeed * options.shotSpeed
+			     * options.shotMass);
 	} else
 	    drainfactor = 1.0;
 	targ->damage += ED_SHOT_HIT * drainfactor * SHOT_MULT(obj);

@@ -127,18 +127,18 @@ extern struct options {
     bool	reserveRobotTeam;
     int 	robotTicksPerSecond;
     list_t	expandList;		/* Predefined settings. */
-    double	ShotsMass;
-    double	ShipMass;
-    double	ShotsSpeed;
-    double	Gravity;
+    double	shotMass;
+    double	shipMass;
+    double	shotSpeed;
+    double	gravity;
     double	ballMass;
     double	minItemMass;
-    int		ShotsMax;
-    double	ShotsLife;
+    int		maxPlayerShots;
+    double	shotLife;
     double	pulseSpeed;
     double	pulseLength;
     double	pulseLife;
-    bool	ShotsGravity;
+    bool	shotsGravity;
     bool	shotHitFuelDrainUsesKineticEnergy;
     double	fireRepeatRate;
     bool	Log;

@@ -239,7 +239,7 @@ void Make_debris(
 
     if (type == OBJ_SHOT) {
 	SET_BIT(mods.warhead, CLUSTER);
-	if (!options.ShotsGravity)
+	if (!options.shotsGravity)
 	    CLR_BIT(status, GRAVITY);
     }
 
@@ -270,7 +270,7 @@ void Make_debris(
 	if (options.shotHitFuelDrainUsesKineticEnergy
 	    && type == OBJ_SHOT) {
 	    /* compensate so that m*v^2 is constant */
-	    double sp_shotsp = speed / options.ShotsSpeed;
+	    double sp_shotsp = speed / options.shotSpeed;
 	    debris->mass = mass / (sp_shotsp * sp_shotsp);
 	} else
 	    debris->mass = mass;
