@@ -22,16 +22,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#ifndef _WINDOWS
-# include <unistd.h>
-# include <X11/Xlib.h>
-#endif
-
-#include "buttons.h"
 #include "xp-replay.h"
 
 #include "tools/grey.xbm"
@@ -67,8 +57,7 @@ void SetGlobalButtonAttributes(unsigned long bg,
     Button b;
     int flag = 0;
 
-    if (background != bg)
-    {
+    if (background != bg) {
 	for (b = buttonhead; b != NULL; b = b->next)
 	    XSetWindowBackground(b->display, b->window, bg);
 	background = bg;
@@ -107,8 +96,7 @@ Button CreateButton(Display *display, Window parent,
 
     b = (Button) MyMalloc(sizeof(struct button), MEM_UI);
 
-    if ((width == 0 || height == 0) && (flags & BUTTON_TEXT))
-    {
+    if ((width == 0 || height == 0) && (flags & BUTTON_TEXT)) {
 	if (buttonFont == NULL)
 	    SetButtonFont(display);
 	if (width == 0)
@@ -140,8 +128,7 @@ Button CreateButton(Display *display, Window parent,
 
     if (buttontail == NULL)
 	buttonhead = buttontail = b;
-    else
-    {
+    else {
 	buttontail->next = b;
 	buttontail = b;
     }
@@ -158,11 +145,10 @@ static void ReleaseButtons(Button b)
 {
     Button c;
 
-    if (b->group != 0)
-    {
+    if (b->group != 0) {
 	for (c = buttonhead; c != NULL; c = c->next)
-	    if (c->group == b->group && c != b && (c->flags & BUTTON_PRESSED))
-	    {
+	    if (c->group == b->group && c != b
+		&& (c->flags & BUTTON_PRESSED)) {
 		c->flags &= ~BUTTON_PRESSED;
 		RedrawButton(c);
 	    }
@@ -213,8 +199,7 @@ int CheckButtonEvent(XEvent *event)
     if (b == NULL)
 	return(0);
 
-    switch(event->type)
-    {
+    switch(event->type) {
     case Expose:
 	if (event->xexpose.count != 0)
 	    return(1);
@@ -241,16 +226,14 @@ void RedrawButton(Button b)
     static GC gc = 0;
     static Pixmap grey = 0;
 
-    if (gc == 0)
-    {
+    if (gc == 0) {
 	gc = XCreateGC(b->display, b->window, 0, NULL);
 	if (buttonFont == NULL)
 	    SetButtonFont(b->display);
 	XSetFont(b->display, gc, buttonFont->fid);
     }
 
-    if (grey == 0)
-    {
+    if (grey == 0) {
 	grey = XCreateBitmapFromData(b->display, b->window, (char *) grey_bits,
 				     grey_width, grey_height);
 	XSetStipple(b->display, gc, grey);
@@ -282,24 +265,20 @@ void RedrawButton(Button b)
 		   x, y, 1);
     }
 
-    if (b->flags & BUTTON_DISABLED)
-    {
+    if (b->flags & BUTTON_DISABLED) {
 	XSetForeground(b->display, gc, background);
 	    XSetFillStyle(b->display, gc, FillStippled);
 	XFillRectangle(b->display, b->window, gc, 0, 0, b->width, b->height);
 	XSetFillStyle(b->display, gc, FillSolid);
     }
 
-    if (b->flags & BUTTON_PRESSED)
-    {
+    if (b->flags & BUTTON_PRESSED) {
 	XSetForeground(b->display, gc, black);
 	XDrawRectangle(b->display, b->window, gc, 0, 0, b->width-1,
 		       b->height-1);
 	XDrawRectangle(b->display, b->window, gc, 1, 1, b->width-3,
 		       b->height-3);
-    }
-    else
-    {
+    } else {
 	XSetForeground(b->display, gc, bottomshadow);
 	XDrawLine(b->display, b->window, gc, 0, b->height-1, b->width-1,
 		  b->height-1);

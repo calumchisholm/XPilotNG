@@ -33,46 +33,6 @@
  * implied warranty.
  */
 
-#if !defined(_WINDOWS)
-# include <unistd.h>
-#endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <signal.h>
-#include <errno.h>
-#include <math.h>
-#include <time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#ifndef _WINDOWS
-# ifndef __hpux
-#  include <sys/time.h>
-# endif
-# ifdef _AIX
-#  include <sys/select.h> /* _BSD not defined in <sys/types.h>, so done by hand */
-# endif
-# include <stdarg.h>
-# include <X11/Xlib.h>
-# include <X11/Xutil.h>
-# if !defined(select) && defined(__linux__)
-#  define select(N, R, W, E, T)   select((N),             \
-        (fd_set*)(R), (fd_set*)(W), (fd_set*)(E), (T))
-# endif
-#endif
-
-#ifdef _SEQUENT_
-# include <sys/procstats.h>
-# define gettimeofday(T,X)	get_process_stats(T, PS_SELF, \
-					(struct process_stats *)NULL, \
-					(struct process_stats *)NULL)
-#endif
-
-#include "recordfmt.h"
-#include "item.h"
-#include "buttons.h"
 #include "xp-replay.h"
 
 #include "items/itemRocketPack.xbm"
