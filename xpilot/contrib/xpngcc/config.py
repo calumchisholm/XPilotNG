@@ -15,4 +15,7 @@ javaws = 'javaws'
 mapedit = 'xpilot-ng-xp-mapedit'
 irc_server = 'irc.freenode.net'
 irc_channel = '#xpilot'
-mapdir = '/usr/local/share/xpilot-ng/maps'
+if (sys.platform == "win32"):
+	mapdir = 'C:\\Program Files\\XPilotNG-SDL\\lib\\maps'
+else:
+	mapdir = '/usr/local/share/xpilot-ng/maps'
