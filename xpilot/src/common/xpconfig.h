@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -24,136 +24,74 @@
 #ifndef XPCONFIG_H
 #define XPCONFIG_H
 
-#ifndef PACKAGE
-#    define PACKAGE "xpilot"
-#endif
-
-#ifndef LOCALGURU
-#    define LOCALGURU "ksoderbl@cc.hut.fi"
-#endif
-
-#ifndef	DEFAULT_MAP
-#    ifdef _WINDOWS
-#         define DEFAULT_MAP		"polybloods.xp2"
-#    else
-#         define DEFAULT_MAP		"polybloods.xp2"
-#    endif
-#endif
-
 #ifndef LIBDIR
-#    if defined(_WINDOWS)
-#        define LIBDIR		"lib/"
-#    else
-#        define LIBDIR		"/usr/local/lib/xpilot/"
-#    endif
+#  ifndef _WINDOWS
+#    error "LIBDIR NOT DEFINED. GIVING UP."
+#  else
+#    define LIBDIR			"lib/"
+#  endif
 #endif
 
-#ifndef DEFAULTS_FILE_NAME
-#    if defined(_WINDOWS)
-#        define DEFAULTS_FILE_NAME	LIBDIR "defaults.txt"
-#    else
-#        define DEFAULTS_FILE_NAME	LIBDIR "defaults"
-#    endif
-#endif
+#define LOCALGURU			"kps@users.sourceforge.net"
+#define DEFAULT_MAP			"polybloods.xp2"
+#define MAPDIR				LIBDIR "maps/"
+#define TEXTUREDIR			LIBDIR "textures/"
+#define SOUNDDIR			LIBDIR "sound/"
+#define ZCAT_EXT			".gz"
+#define ZCAT_FORMAT 			"gzip -d -c < %s"
 
-#ifndef PLAYER_PASSWORDS_FILE_NAME
-#    if defined(_WINDOWS)
-#        define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords.txt"
-#    else
-#        define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords"
-#    endif
-#endif
+#ifndef _WINDOWS
 
-#ifndef PASSWORD_FILE_NAME
-#    if defined(_WINDOWS)
-#        define PASSWORD_FILE_NAME	LIBDIR "password.txt"
-#    else
-#        define PASSWORD_FILE_NAME	LIBDIR "password"
-#    endif
-#endif
-#ifndef ROBOTFILE
-#    if defined(_WINDOWS)
-#		 define	ROBOTFILE	LIBDIR "robots.txt"
-#    else
-#        define ROBOTFILE	LIBDIR "robots"
-#    endif
-#endif
-#ifndef SERVERMOTDFILE
-#    if defined(_WINDOWS)
-#	 define	SERVERMOTDFILE	LIBDIR "servermotd.txt"
-#    else
-#        define SERVERMOTDFILE	LIBDIR "servermotd"
-#    endif
-#endif
-#ifndef LOCALMOTDFILE
-#    if defined(_WINDOWS)
-#	 define	LOCALMOTDFILE	LIBDIR "localmotd.txt"
-#    else
-#        define LOCALMOTDFILE	LIBDIR "localmotd"
-#    endif
-#endif
-#ifndef LOGFILE
-#    if defined(_WINDOWS)
-#	 define	LOGFILE		LIBDIR "log.txt"
-#    else
-#        define LOGFILE		LIBDIR "log"
-#    endif
-#endif
-#ifndef MAPDIR
-#    define MAPDIR		LIBDIR "maps/"
-#endif
-#ifndef SHIP_FILE
-#    if defined(_WINDOWS)
-#	 define SHIP_FILE	"XPilot.shp"
-#    else
-#        define SHIP_FILE       ""
-#    endif
-#endif
-#ifndef TEXTUREDIR
-#    define TEXTUREDIR	LIBDIR "textures/"
-#endif
-#ifndef	SOUNDDIR
-#    define SOUNDDIR	LIBDIR "sound/"
-#endif
+#  define DEFAULTS_FILE_NAME		LIBDIR "defaults"
+#  define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords"
+#  define PASSWORD_FILE_NAME		LIBDIR "password"
+#  define ROBOTFILE			LIBDIR "robots"
+#  define SERVERMOTDFILE		LIBDIR "servermotd"
+#  define LOCALMOTDFILE			LIBDIR "localmotd"
+#  define LOGFILE			LIBDIR "log"
+#  define SHIP_FILE       		""
+#  define SOUNDFILE	  		SOUNDDIR "sounds"
+#  ifdef DEBUG
+#    define D(x)	x ;  fflush(stdout);
+#  else
+#    define D(x)
+#  endif
 
-#ifndef SOUNDFILE
-#    if defined(_WINDOWS)
-#        define SOUNDFILE	SOUNDDIR "sounds.txt"
-#    else
-#        define SOUNDFILE	SOUNDDIR "sounds"
-#    endif
-#endif
+#else /* _WINDOWS */
 
-#ifndef ZCAT_EXT
-#    define ZCAT_EXT	".gz"
-#endif
+#  define DEFAULTS_FILE_NAME		LIBDIR "defaults.txt"
+#  define PLAYER_PASSWORDS_FILE_NAME	LIBDIR "player_passwords.txt"
+#  define PASSWORD_FILE_NAME		LIBDIR "password.txt"
+#  define ROBOTFILE			LIBDIR "robots.txt"
+#  define SERVERMOTDFILE		LIBDIR "servermotd.txt"
+#  define LOCALMOTDFILE			LIBDIR "localmotd.txt"
+#  define LOGFILE			LIBDIR "log.txt"
+#  define SHIP_FILE			"XPilot.shp"
+#  define SOUNDFILE			SOUNDDIR "sounds.txt"
+#  ifdef _DEBUG
+#    define DEBUG	1
+#    define D(x)	x
+#  else
+#    define D(x)
+#  endif
 
-#ifndef ZCAT_FORMAT
-#    define ZCAT_FORMAT "gzip -d -c < %s"
-#endif
+#endif /* _WINDOWS */
 
-/*
- * Please don't change this one.
- */
-#ifndef CONTACTADDRESS
-#    define CONTACTADDRESS	"xpilot@xpilot.org"
-#endif
+/* Please don't change this one. */
+#define CONTACTADDRESS			"xpilot@xpilot.org"
 
 /*
  * Uncomment this if your machine doesn't use
  * two's complement negative numbers.
  */
-/* #define MOD2(x, m)	mod(x, m) */
-
+/* #define MOD2(x, m) mod(x, m) */
 
 /*
  * The following macros decide the speed of the game and
  * how often the server should draw a frame.  (Hmm...)
  */
 
-#ifndef	UPDATES_PR_FRAME
-#    define UPDATES_PR_FRAME	1
-#endif
+#define UPDATES_PR_FRAME	1
 
 /*
  * If COMPRESSED_MAPS is defined, the server will attempt to uncompress
@@ -162,54 +100,38 @@
  * ZCAT_EXT should define the proper compressed file extension.
  */
 
-#if defined(_WINDOWS)
-#    ifdef COMPRESSED_MAPS
-	/*
-	 * Couldn't find a popen(), also compress and gzip don't exist.
-	 */
-#        undef COMPRESSED_MAPS
-#    endif
+#ifndef _WINDOWS
+#  define COMPRESSED_MAPS
 #else
-#    define COMPRESSED_MAPS
-#endif
-
-#ifdef _WINDOWS
-#	ifdef	_DEBUG
-#		define	DEBUG	1
-#		define	D(x)	x
-#	else
-#		define	D(x)
-#	endif
-#else
-#	ifdef	DEBUG
-#		define D(x)	x ;  fflush(stdout);
-#	else
-#		define D(x)
-#	endif
-#endif
-
-/* Windows doesn't play with stdin/out well at all... */
-/* So for the client i route the "debug" printfs to the debug stream */
-/* The server gets 'real' messages routed to the messages window */
-#ifdef _WINDOWS
-#	ifdef	_XPILOTNTSERVER_
-#	define	xpprintf	xpprintfW
-/*#	define	xpprintf	_Trace */
-#	else
-#	define	xpprintf	_Trace
-#	endif
-#else
-#	define	xpprintf	printf
+/* Couldn't find a popen(), also compress and gzip don't exist. */
+#  undef COMPRESSED_MAPS
 #endif
 
 /*
- XPilot on Windows does lots of double to int conversions. So we have:
-warning C4244: 'initializing' : conversion from 'double ' to 'int ', possible loss of data
-a million times.  I used to fix each warning added by the Unix people, but
-this makes for harder to read code (and was tiring with each patch)
-*/
+ * Windows doesn't play with stdin/out well at all... 
+ * So for the client i route the "debug" printfs to the debug stream 
+ * The server gets 'real' messages routed to the messages window 
+ */
+#ifndef _WINDOWS
+#  define xpprintf	printf
+#else
+#  ifdef _XPILOTNTSERVER_
+#    define xpprintf	xpprintfW
+/* # define xpprintf _Trace  */
+#  else
+#    define xpprintf	_Trace
+#  endif
+#endif
+
+/*
+ * XPilot on Windows does lots of double to int conversions. So we have:
+ * warning C4244: 'initializing' : conversion from 'double ' to 'int ',
+ * possible loss of data a million times.  I used to fix each warning
+ * added by the Unix people, but this makes for harder to read code (and
+ * was tiring with each patch) 
+ */
 #ifdef	_WINDOWS
-#pragma warning (disable : 4244 4761)
+#  pragma warning (disable : 4244 4761)
 #endif
 
 void Conf_print(void);

@@ -1,5 +1,6 @@
 
 bin_PROGRAMS = xpilot
+AM_CPPFLAGS = -DLIBDIR=\"$(pkglibdir)/\"
 INCLUDES = -I$(top_srcdir)/src/common
 xpilot_SOURCES = \
 	about.c \
