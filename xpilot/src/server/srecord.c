@@ -213,8 +213,9 @@ void Init_recording(void)
 
     if (!recordFileName) {
 	errno = 0;
-	error("Can't do anything with recordings when recordFileName isn't "
-	      "specified.");
+	if (recordMode != 0)
+	    error("Can't do anything with recordings when recordFileName "
+		  "isn't specified.");
 	recordMode = 0;
 	return;
     }
