@@ -1455,7 +1455,7 @@ xp_option_t key_options[] = {
      */
     XP_STRING_OPTION(
 	"pointerButton1",
-	"keyFireShot",
+	"keyFireShot keyFireLaser",
 	NULL, 0,
 	setPointerButtonBinding, NULL, getPointerButtonBinding,
 	XP_OPTFLAG_DEFAULT,
