@@ -271,10 +271,10 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 	/* status         */ GRAVITY,
 	/* color          */ RED,
 	/* radius         */ 6,
-	/* num debris     */ 75 + 75 * rfrac(),
+	/* num debris     */ (int)(75 + 75 * rfrac()),
 	/* min,max dir    */ 0, RES-1,
-	/* min,max speed  */ 20, 70,
-	/* min,max life   */ 10, 100
+	/* min,max speed  */ 20.0, 70.0,
+	/* min,max life   */ 10.0, 100.0
 	);
 
     if (BIT(World.rules->mode, TEAM_PLAY)) {
@@ -371,8 +371,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 
 
 
-void Object_crash(object *obj, struct move *move, int crashtype,
-		  int mapobj_ind)
+void Object_crash(object *obj, int crashtype, int mapobj_ind)
 {
     switch (crashtype) {
 
@@ -391,7 +390,7 @@ void Object_crash(object *obj, struct move *move, int crashtype,
 
     case CrashTarget:
 	obj->life = 0;
-	Object_hits_target(obj, Targets(mapobj_ind), -1);
+	Object_hits_target(obj, Targets(mapobj_ind), -1.0);
 	break;
 
     case CrashWall:
@@ -476,7 +475,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	howfmt = "%s smashed%s against a target";
 	hudmsg = "[Target]";
 	sound_play_sensors(pl->pos, PLAYER_HIT_WALL_SOUND);
-	Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), -1);
+	Object_hits_target(OBJ_PTR(pl), Targets(mapobj_ind), -1.0);
 	break;
 
     case CrashTreasure:
@@ -562,8 +561,8 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 	else {
 	    int		msg_len = strlen(msg);
 	    char	*msg_ptr = &msg[msg_len];
-	    int		average_pusher_score = total_pusher_score
-						/ total_pusher_count;
+	    double	average_pusher_score
+		= total_pusher_score / total_pusher_count;
 
 	    for (i = 0; i < num_pushers; i++) {
 		player		*pusher = pushers[i];
@@ -688,17 +687,17 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 
     if (type == TARGET) {
 	obj->life = 0;
-	Object_hits_target(obj, Targets(mapobj_ind), -1);
+	Object_hits_target(obj, Targets(mapobj_ind), -1.0);
 	return 0;
     }
 
     if (type == CANNON) {
-	Object_crash(obj, move, CrashCannon, mapobj_ind);
+	Object_crash(obj, CrashCannon, mapobj_ind);
 	return 0;
     }
 
     if (type == WORMHOLE) {
-	Object_crash(obj, move, CrashWormHole, mapobj_ind);
+	Object_crash(obj, CrashWormHole, mapobj_ind);
 	return 0;
     }
 

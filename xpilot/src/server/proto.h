@@ -85,8 +85,7 @@ int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
 int Polys_to_client(unsigned char **);
 void Ball_line_init(void);
 void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt);
-void Object_crash(object *obj, struct move *move, int crashtype,
-		  int mapobj_ind);
+void Object_crash(object *obj, int crashtype, int mapobj_ind);
 
 /*
  * Prototypes for event.c
