@@ -361,7 +361,10 @@ static int Init_setup_old(void)
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		*mapptr = SETUP_TREASURE + World.treasures[treasure++].team;
+		team = World.treasures[treasure++].team;
+		if (team == TEAM_NOT_SET)
+		    team = 0;
+		*mapptr = SETUP_TREASURE + team;
 		break;
 	    case TARGET:
 		if (target >= World.NumTargets) {
