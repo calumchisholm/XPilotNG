@@ -1,4 +1,4 @@
-/* 
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -799,10 +799,8 @@ int Contact_servers(int count, char **servers,
 	compat_mode = 0;
 	do {
 	    Sockbuf_clear(&sbuf);
-	    Packet_printf(&sbuf, "%u%s%hu%c",
-			  compat_mode ? COMPATIBILITY_MAGIC : MAGIC,
-			  conpar->real_name, sock_get_port(&sbuf.sock),
-			  CONTACT_pack);
+	    Packet_printf(&sbuf, "%u%s%hu%c", MAGIC, conpar->real_name,
+			  sock_get_port(&sbuf.sock), CONTACT_pack);
 	    if (Query_all(&sbuf.sock, conpar->contact_port, sbuf.buf, sbuf.len) == -1) {
 		error("Couldn't send contact requests");
 		exit(1);
@@ -853,7 +851,8 @@ int Contact_servers(int count, char **servers,
 	    do {
 	      IFWINDOWS( Progress("Contacting server %s", servers[i]) );
 		Sockbuf_clear(&sbuf);
-		Packet_printf(&sbuf, "%u%s%hu%c", MAGIC,
+		Packet_printf(&sbuf, "%u%s%hu%c",
+			      compat_mode ? COMPATIBILITY_MAGIC : MAGIC,
 			      conpar->real_name, sock_get_port(&sbuf.sock), CONTACT_pack);
 		if (sock_send_dest(&sbuf.sock, servers[i],
 			      conpar->contact_port,
@@ -872,7 +871,8 @@ int Contact_servers(int count, char **servers,
 		}
 		ret = Get_contact_message(&sbuf, servers[i], conpar);
 		if (ret == 2 && compat_mode == 0) {
-		    printf("Trying compatibility version\n");
+		    printf("Trying compatibility version %04x\n",
+			   MAGIC2VERSION(COMPATIBILITY_MAGIC));
 		    compat_mode = 1;
 		    retries--;	/* a bit ugly, cancels the loop ++ */
 		    continue;
@@ -895,4 +895,3 @@ int Contact_servers(int count, char **servers,
 
     return connected ? true : false;
 }
-
