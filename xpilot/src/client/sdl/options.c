@@ -3032,9 +3032,7 @@ static void Get_file_defaults(XrmDatabase *rDBptr)
 #endif	/* _WINDOWS*/
 
 
-void Parse_options(int *argcp, char **argvp, char *realName,
-		   int *port, int *my_team,
-		   char *nickName, char *dispName, char *hostName)
+void Parse_options(int *argcp, char **argvp)
 {
     char		*ptr, *str;
     int			i, j;
@@ -3109,15 +3107,15 @@ void Parse_options(int *argcp, char **argvp, char *realName,
 	exit(0);
     }
 
-    if (Get_string_resource(argDB, "display", dispName, MAX_DISP_LEN) == 0
-	|| dispName[0] == '\0') {
+    if (Get_string_resource(argDB, "display", connectParam.disp_name, MAX_DISP_LEN) == 0
+	|| connectParam.disp_name[0] == '\0') {
 	if ((ptr = getenv(DISPLAY_ENV)) != NULL)
-	    strlcpy(dispName, ptr, MAX_DISP_LEN);
+	    strlcpy(connectParam.disp_name, ptr, MAX_DISP_LEN);
 	else
-	    strlcpy(dispName, DISPLAY_DEF, MAX_DISP_LEN);
+	    strlcpy(connectParam.disp_name, DISPLAY_DEF, MAX_DISP_LEN);
     }
-    if ((dpy = XOpenDisplay(dispName)) == NULL) {
-	error("Can't open display '%s'", dispName);
+    if ((dpy = XOpenDisplay(connectParam.disp_name)) == NULL) {
+	error("Can't open display '%s'", connectParam.disp_name);
 	exit(1);
     }
 
@@ -3146,52 +3144,52 @@ void Parse_options(int *argcp, char **argvp, char *realName,
 
     Get_resource(rDB, "user", resValue, MAX_NAME_LEN);
     if (resValue[0])
-	strlcpy(realName, resValue, MAX_NAME_LEN);
+	strlcpy(connectParam.real_name, resValue, MAX_NAME_LEN);
 
-    if (Check_real_name(realName) == NAME_ERROR) {
-	xpprintf("Fixing realname from \"%s\" ", realName);
-	Fix_real_name(realName);
-	xpprintf("to \"%s\".\n", realName);
+    if (Check_real_name(connectParam.real_name) == NAME_ERROR) {
+	xpprintf("Fixing realname from \"%s\" ", connectParam.real_name);
+	Fix_real_name(connectParam.real_name);
+	xpprintf("to \"%s\".\n", connectParam.real_name);
     }
 
     Get_resource(rDB, "host", resValue, MAX_HOST_LEN);
     if (resValue[0])
-	strlcpy(hostName, resValue, MAX_HOST_LEN);
+	strlcpy(hostname, resValue, MAX_HOST_LEN);
 
-    if (Check_host_name(hostName) == NAME_ERROR) {
-	xpprintf("Fixing host from \"%s\" ", hostName);
-	Fix_host_name(hostName);
-	xpprintf("to \"%s\".\n", hostName);
+    if (Check_host_name(hostname) == NAME_ERROR) {
+	xpprintf("Fixing host from \"%s\" ", hostname);
+	Fix_host_name(hostname);
+	xpprintf("to \"%s\".\n", hostname);
     }
 
 
-    Get_resource(rDB, "name", nickName, MAX_NAME_LEN);
-    if (!nickName[0])
-	strlcpy(nickName, realName, MAX_NAME_LEN);
-    CAP_LETTER(nickName[0]);
-    if (nickName[0] < 'A' || nickName[0] > 'Z') {
+    Get_resource(rDB, "name", connectParam.nick_name, MAX_NAME_LEN);
+    if (!connectParam.nick_name[0])
+	strlcpy(connectParam.nick_name, connectParam.real_name, MAX_NAME_LEN);
+    CAP_LETTER(connectParam.nick_name[0]);
+    if (connectParam.nick_name[0] < 'A' || connectParam.nick_name[0] > 'Z') {
 	warn("Your player name \"%s\" should start with an uppercase letter",
-	     nickName);
+	     connectParam.nick_name);
 	exit(1);
     }
-    if (Check_nick_name(nickName) == NAME_ERROR) {
-	xpprintf("Fixing nick from \"%s\" ", nickName);
-	Fix_nick_name(nickName);
-	xpprintf("to \"%s\".\n", nickName);
+    if (Check_nick_name(connectParam.nick_name) == NAME_ERROR) {
+	xpprintf("Fixing nick from \"%s\" ", connectParam.nick_name);
+	Fix_nick_name(connectParam.nick_name);
+	xpprintf("to \"%s\".\n", connectParam.nick_name);
     }
 
-    strlcpy(realname, realName, sizeof(realname));
-    strlcpy(nickname, nickName, sizeof(nickname));
+    strlcpy(realname, connectParam.real_name, sizeof(realname));
+    strlcpy(nickname, connectParam.nick_name, sizeof(nickname));
 
-    Get_int_resource(rDB, "team", my_team);
+    Get_int_resource(rDB, "team", &connectParam.team);
 
     IFWINDOWS( Config_get_name(nickname) );
-    IFWINDOWS( Config_get_team(my_team) );
+    IFWINDOWS( Config_get_team(&connectParam.team) );
 
-    if (*my_team < 0 || *my_team > 9)
-	*my_team = TEAM_NOT_SET;
+    if (connectParam.team < 0 || connectParam.team > 9)
+	connectParam.team = TEAM_NOT_SET;
 
-    Get_int_resource(rDB, "port", port);
+    Get_int_resource(rDB, "port", &connectParam.contact_port);
     Get_bool_resource(rDB, "text", &xpArgs.text);
     Get_bool_resource(rDB, "list", &xpArgs.list_servers);
     Get_bool_resource(rDB, "join", &xpArgs.auto_connect);
@@ -3378,7 +3376,7 @@ void Parse_options(int *argcp, char **argvp, char *realName,
 #endif
 
 #ifdef SOUND
-    audioInit(dispName);
+    audioInit(connectParam.disp_name);
 #endif /* SOUND */
 }
 

@@ -407,9 +407,7 @@ static void Parse_xpilotrc_line(const char *line)
 }
 
 
-void Parse_options(int *argcp, char **argvp, char *realName,
-		   int *port, int *my_team,
-		   char *nickName, char *dispName, char *hostName)
+void Parse_options(int *argcp, char **argvp)
 {
     char path[PATH_MAX + 1];
     char buf[BUFSIZ];

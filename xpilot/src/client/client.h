@@ -43,6 +43,10 @@
 /* need NUM_ITEMS */
 #include "item.h"
 #endif
+#ifndef CONNECTPARAM_H
+/* need Connect_param_t */
+#include "connectparam.h"
+#endif
 
 typedef struct {
     bool showShipShapes;
@@ -432,6 +436,7 @@ typedef struct {
 /* typedefs end */
 
 extern xp_args_t	xpArgs;
+extern Connect_param_t	connectParam;
 extern message_t	*TalkMsg[];
 extern message_t	*GameMsg[];
 extern message_t	*TalkMsg_pending[];	/* store incoming messages */

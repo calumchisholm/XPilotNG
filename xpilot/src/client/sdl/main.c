@@ -22,7 +22,6 @@ static void sigcatch(int signum)
 
 int main(int argc, char *argv[])
 {
-    Connect_param_t conpar;
     char *cp;
     bool auto_shutdown = false;
 
@@ -30,8 +29,9 @@ int main(int argc, char *argv[])
 
     seedMT((unsigned)time(NULL) ^ Get_process_id());
 
-    conpar.contact_port = SERVER_PORT;
-    conpar.team = TEAM_NOT_SET;
+    memset(&connectParam, 0, sizeof(Connect_param_t));
+    connectParam.contact_port = SERVER_PORT;
+    connectParam.team = TEAM_NOT_SET;
 
     *hostname = 0;
     cp = getenv("XPILOTHOST");
@@ -39,14 +39,11 @@ int main(int argc, char *argv[])
     else sock_get_local_hostname(hostname, sizeof hostname, 0);
 
     cp = getenv("XPILOTUSER");
-    if (cp) strlcpy(conpar.real_name, cp, sizeof(conpar.real_name));
-    else Get_login_name(conpar.real_name, sizeof(conpar.real_name) - 1);
+    if (cp) strlcpy(connectParam.real_name, cp, sizeof(connectParam.real_name));
+    else Get_login_name(connectParam.real_name, sizeof(connectParam.real_name) - 1);
 
     memset(&xpArgs, 0, sizeof(xp_args_t));
-    Parse_options(&argc, argv, conpar.real_name,
-		  &conpar.contact_port, &conpar.team,
-		  conpar.nick_name, conpar.disp_name,
-		  hostname);
+    Parse_options(&argc, argv);
 
     /* CLIENTRANK */
     Init_saved_scores();
@@ -55,23 +52,24 @@ int main(int argc, char *argv[])
 			 xpArgs.auto_connect, xpArgs.list_servers,
 			 auto_shutdown, xpArgs.shutdown_reason,
 			 0, 0, 0, 0,
-			 &conpar)) return 0;
+			 &connectParam)) return 0;
 
     /* If something goes wrong before Client_setup I'll leave the
      * cleanup to the OS because afaik Client_cleanup will clean
      * stuff initialized in Client_setup. */
 
-    if (Client_init(conpar.server_name, conpar.server_version)) {
+    if (Client_init(connectParam.server_name, connectParam.server_version)) {
 	error("failed to initialize client"); 
 	exit(1);
     }
-    if (Net_init(conpar.server_addr, conpar.login_port)) {
+
+    if (Net_init(connectParam.server_addr, connectParam.login_port)) {
 	error("failed to initialize networking"); 
 	exit(1);
     }
-    if (Net_verify(conpar.real_name, 
-		   conpar.nick_name, 
-		   conpar.disp_name)) {
+    if (Net_verify(connectParam.real_name, 
+		   connectParam.nick_name, 
+		   connectParam.disp_name)) {
 	error("failed to verify networking"); 
 	exit(1);
     }

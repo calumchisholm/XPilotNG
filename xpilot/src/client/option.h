@@ -24,9 +24,7 @@
 #ifndef OPTION_H
 #define OPTION_H
 
-extern void Parse_options(int *argcp, char **argvp, char *realName,
-			  int *port, int *my_team,
-			  char *nickName, char *dispName, char *hostName);
+extern void Parse_options(int *argcp, char **argvp);
 
 extern void Get_xpilotrc_file(char *, unsigned);
 

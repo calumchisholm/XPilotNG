@@ -60,8 +60,6 @@ int main(int argc, char *argv[])
     int				result, retval = 1;
     bool			auto_shutdown = false;
     char			*cp;
-    Connect_param_t		*conpar;
-    static char			shutdown_reason[MAX_CHARS];
 
     /*
      * --- Output copyright notice ---
@@ -90,13 +88,9 @@ int main(int argc, char *argv[])
 
     Check_client_versions();
 
-    conpar = calloc(1, sizeof(Connect_param_t));
-    if (!conpar) {
-	error("Not enough memory");
-	exit(1);
-    }
-    conpar->contact_port = SERVER_PORT;
-    conpar->team = TEAM_NOT_SET;
+    memset(&connectParam, 0, sizeof(Connect_param_t));
+    connectParam.contact_port = SERVER_PORT;
+    connectParam.team = TEAM_NOT_SET;
 
     *hostname = 0;
     cp = getenv("XPILOTHOST");
@@ -107,11 +101,11 @@ int main(int argc, char *argv[])
 
     cp = getenv("XPILOTUSER");
     if (cp)
-	strlcpy(conpar->real_name, cp, sizeof(conpar->real_name));
+	strlcpy(connectParam.real_name, cp, sizeof(connectParam.real_name));
     else
-	Get_login_name(conpar->real_name, sizeof(conpar->real_name) - 1);
+	Get_login_name(connectParam.real_name, sizeof(connectParam.real_name) - 1);
 
-    IFWINDOWS( conpar->disp_name[0] = '\0' );
+    IFWINDOWS( connectParam.disp_name[0] = '\0' );
 
 #ifdef OPTIONHACK
     Set_key_binding_callback(Key_binding_callback);
@@ -127,12 +121,9 @@ int main(int argc, char *argv[])
      * --- Check commandline arguments and resource files ---
      */
     memset(&xpArgs, 0, sizeof(xp_args_t));
-    Parse_options(&argc, argv, conpar->real_name,
-		  &conpar->contact_port, &conpar->team,
-		  conpar->nick_name, conpar->disp_name,
-		  hostname);
+    Parse_options(&argc, argv);
 
-    /*strcpy(clientname,conpar->nick_name); */
+    /*strcpy(clientname,connectParam.nick_name); */
 
 #ifdef OPTIONHACK
     /*Usage();*/
@@ -163,14 +154,14 @@ int main(int argc, char *argv[])
 				 xpArgs.auto_connect, xpArgs.list_servers,
 				 auto_shutdown, xpArgs.shutdown_reason,
 				 0, 0, 0, 0,
-				 conpar);
+				 &connectParam);
     }
     else {
-	IFNWINDOWS(result = Welcome_screen(conpar));
+	IFNWINDOWS(result = Welcome_screen(&connectParam));
     }
 
     if (result == 1)
-	retval = Join(conpar);
+	retval = Join(&connectParam);
     
     if (instruments.useClientRanker)
 	Print_saved_scores();
