@@ -117,6 +117,10 @@ int main(int argc, char *argv[])
 
     IFWINDOWS( conpar->disp_name[0] = '\0' );
 
+#ifdef OPTIONHACK
+    Store_default_options();
+#endif
+
     /*
      * --- Check commandline arguments and resource files ---
      */
@@ -128,6 +132,9 @@ int main(int argc, char *argv[])
 		  hostname, shutdown_reason);
 
     /*strcpy(clientname,conpar->nick_name); */
+#ifdef OPTIONHACK
+    Usage();
+#endif
     
     /* CLIENTRANK */
     Init_saved_scores();

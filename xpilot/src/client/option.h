@@ -208,6 +208,14 @@ struct xp_option {
 	setfunc,\
 }
 
+void Store_option(xp_option_t *);
+
+#define STORE_OPTIONS(option_array) \
+{ \
+    int ii; \
+    for (ii = 0; ii < NELEM(option_array); ii++) \
+	Store_option(& (option_array) [ii]); \
+} \
 
 
 

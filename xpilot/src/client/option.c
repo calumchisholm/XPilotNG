@@ -28,36 +28,8 @@ char option_version[] = VERSION;
 #ifdef OPTIONHACK
 
 
-#if 0
-bool power_setfunc(const char *name, const char *value, void *private)
-{
-    double dval;
-
-    assert(value);
-    dval = atof(value);
-    if (dval < MIN_PLAYER_POWER || dval > MAX_PLAYER_POWER)
-	return false;
-    power = dval;
-    warn("power is now %f\n", power);
-    return true;
-}
-#endif
-
 int num_options = 0;
 int max_options = 0;
-
-#if 0
-typedef struct {
-    const char		*name;		/* option name */
-    const char		*noArg;		/* value for non-argument options */
-    const char		*fallback;	/* default value */
-    keys_t		key;		/* key if not KEY_DUMMY */
-    const char		*help;		/* user help (multiline) */
-    unsigned		hash;		/* option name hashed. */
-    cl_option_setfunc_t	setfunc;
-    void		*private;	/* passed to set function */
-} cl_option_t;
-#endif
 
 xp_option_t *options = NULL;
 
@@ -85,56 +57,93 @@ static inline xp_option_t *Find_option(const char *name)
     return NULL;
 }
 
-
-/*
- * NOTE: Store option assumes the passed pointers will remain valid.
- */
-#if 0
-static void Store_option(const char *name,
-			 const char *value_to_set,
-			 const char *help,
-			 xp_option_setfunc_t setfunc,
-			 void *private)
-     
+static void Print_default_value(xp_option_t *opt)
 {
-    xp_option_t option;
-
-    assert(name);
-    assert(strlen(name) > 0);
-
-    /* Let's not allow several options with the same name */
-    assert(Find_option(name) == NULL);
-
-    option.name = name;
-    option.help = help;
-    option.setfunc = setfunc;
-    option.private = private;
-
-    STORE(xp_option_t, options, num_options, max_options, option);
-
-    /*
-     * If no setfunc, value can't be set.
-     */
-    if (option.setfunc) {
-	bool set_ok;
-	set_ok = option.setfunc(name, value_to_set, private);
-	/* Setting the default value must succeed */
-	if (!set_ok) {
-	    warn("Setting default value for option %s failed.", name);
-	    assert(0 && "Setting option default value must succeed.");
-	}
+    switch (opt->type) {
+    case xp_bool_option:
+	printf("        The default value is: %s.\n",
+	       opt->bool_defval == true ? "True" : "False");
+	break;
+    case xp_int_option:
+	printf("        The default value is: %d.\n", opt->int_defval);
+	break;
+    case xp_double_option:
+	printf("        The default value is: %f.\n", opt->dbl_defval);
+	break;
+    case xp_string_option:
+	if (opt->str_defval && strlen(opt->str_defval) > 0)
+	    printf("        The default value is: %s.\n", opt->str_defval);
+	break;
+    case xp_color_option:
+	assert(0 && "TODO");
+	break;
+    case xp_key_option:
+	if (opt->key_defval && strlen(opt->key_defval) > 0)
+	    printf("        The default %s: %s.\n", 
+		   (strchr(opt->key_defval, ' ') == NULL
+		    ? "key is"
+		    : "keys are"),
+		   opt->key_defval);
+	break;
+    default:
+	assert(0 && "TODO");
+	break;
     }
 }
 
-static void Store_option_struct(xp_option_t *opt)
+void Usage(void)
 {
-    Store_option(opt->name,
-		 opt->fallback,
-		 opt->help,
-		 opt->setfunc,
-		 opt->private);
-}
+    int			i;
+
+    printf(
+"Usage: xpilot [-options ...] [server]\n"
+"Where options include:\n"
+"\n"
+	  );
+    for (i = 0; i < num_options; i++) {
+	xp_option_t *opt = Option_by_index(i);
+
+	printf("    -%s %s\n", opt->name,
+	       (opt->type != xp_noarg_option) ? "<value>" : "");
+	if (opt->help && opt->help[0]) {
+	    const char *str;
+	    printf("        ");
+	    for (str = opt->help; *str; str++) {
+		putchar(*str);
+		if (*str == '\n' && str[1])
+		    printf("        ");
+	    }
+	    if (str[-1] != '\n')
+		putchar('\n');
+	}
+	Print_default_value(opt);
+#if 0
+	if (opt->fallback && opt->fallback[0]) {
+	    printf("        The default %s: %s.\n",
+		   (opt->key == KEY_DUMMY)
+		       ? "value is"
+		       : (strchr(opt->fallback, ' ') == NULL)
+			   ? "key is"
+			   : "keys are",
+		   opt->fallback);
+	}
 #endif
+
+	printf("\n");
+    }
+    printf(
+"Most of these options can also be set in the .xpilotrc file\n"
+"in your home directory.\n"
+"Each key option may have multiple keys bound to it and\n"
+"one key may be used by multiple key options.\n"
+"If no server is specified then xpilot will search\n"
+"for servers on your local network.\n"
+"For a listing of remote servers try: telnet meta.xpilot.org 4400 \n"
+	  );
+
+    exit(1);
+}
+
 
 static void Set_bool_option(xp_option_t *opt, bool value)
 {
@@ -169,8 +178,6 @@ static void Set_double_option(xp_option_t *opt, double value)
     else
 	*opt->dbl_ptr = value;
 }
-
-
 
 /*
  * This could also be used from a client '\set' command, e.g.
@@ -218,6 +225,96 @@ void Set_option(const char *name, const char *value)
     return set_ok;
 #endif
 }
+
+
+/*
+ * NOTE: Store option assumes the passed pointers will remain valid.
+ */
+void Store_option(xp_option_t *opt)
+{
+    xp_option_t option;
+
+    assert(opt->name);
+    assert(strlen(opt->name) > 0);
+    assert(opt->help);
+    assert(strlen(opt->help) > 0);
+
+    /* Let's not allow several options with the same name */
+    assert(Find_option(opt->name) == NULL);
+
+    memcpy(&option, opt, sizeof(xp_option_t));
+
+    STORE(xp_option_t, options, num_options, max_options, option);
+
+    opt = Find_option(opt->name);
+    assert(opt);
+
+    /* Set the default value */
+    switch (opt->type) {
+    case xp_bool_option:
+	Set_bool_option(opt, opt->bool_defval);
+	break;
+    case xp_int_option:
+	Set_int_option(opt, opt->int_defval);
+	break;
+    case xp_double_option:
+	Set_double_option(opt, opt->dbl_defval);
+	break;
+    default:
+	warn("FOO");
+    }
+
+}
+
+
+
+#if 0
+static void Store_option(const char *name,
+			 const char *value_to_set,
+			 const char *help,
+			 xp_option_setfunc_t setfunc,
+			 void *private)
+     
+{
+    xp_option_t option;
+
+    assert(name);
+    assert(strlen(name) > 0);
+
+    /* Let's not allow several options with the same name */
+    assert(Find_option(name) == NULL);
+
+    option.name = name;
+    option.help = help;
+    option.setfunc = setfunc;
+    option.private = private;
+
+    STORE(xp_option_t, options, num_options, max_options, option);
+
+    /*
+     * If no setfunc, value can't be set.
+     */
+    if (option.setfunc) {
+	bool set_ok;
+	set_ok = option.setfunc(name, value_to_set, private);
+	/* Setting the default value must succeed */
+	if (!set_ok) {
+	    warn("Setting default value for option %s failed.", name);
+	    assert(0 && "Setting option default value must succeed.");
+	}
+    }
+}
+
+static void Store_option_struct(xp_option_t *opt)
+{
+    Store_option(opt->name,
+		 opt->fallback,
+		 opt->help,
+		 opt->setfunc,
+		 opt->private);
+}
+#endif
+
 
 
 static void Parse_xpilotrc_line(const char *line)
@@ -369,11 +466,6 @@ void Get_xpilotrc_file(char *path, unsigned size)
 #error "Function Get_xpilotrc_file() not implemented."
 }
 #endif /* _WINDOWS */
-
-void Usage(void)
-{
-
-}
 
 #endif
 

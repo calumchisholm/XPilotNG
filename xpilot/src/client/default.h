@@ -24,6 +24,12 @@
 #ifndef DEFAULT_H
 #define DEFAULT_H
 
+#include "option.h"
+
+#ifdef OPTIONHACK
+void Store_default_options(void);
+#endif
+
 #ifndef OPTIONHACK
 typedef struct {
     const char		*name;		/* option name */
