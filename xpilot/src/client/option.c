@@ -325,7 +325,33 @@ void Set_option(const char *name, const char *value)
 	warn("FOO");
 	assert(0);
     }
+}
 
+/*
+ * \set client command
+ */
+void Set_command(const char *command)
+{
+#ifdef OPTIONHACK
+    char *name, *value, *valcpy;
+
+    if (!command) {
+	warn("foobar");
+	return;
+    }
+
+    valcpy = xp_safe_strdup(command);
+
+    name = strtok(valcpy, " \t\r\n");
+    value = strtok(NULL, " \t\r\n");
+
+    if (name && value) {
+	warn("Calling Set_option(\"%s\", \"%s\")", name, value);
+	Set_option(name, value);
+    }
+
+    xp_free(valcpy);
+#endif
 }
 
 

@@ -25,12 +25,13 @@
 
 char clientcommand_version[] = VERSION;
 
-#define NUMCOMMANDS 8
+#define NUMCOMMANDS 10
 const char c_commands[NUMCOMMANDS][16] = {
     "ignore", "i",
     "ignore!", "i!",
     "unignore", "u",
-    "help", "h"
+    "help", "h",
+    "set", "s"
 };
 
 static void print_ignorelist(void)
@@ -115,6 +116,11 @@ static void print_help(char *arg)
 	case 7:		/* h */
 	    Add_message("'\\help <command>' shows help about <command>. "
 			"Just '\\help' show avaiable commands "
+			"[*Client reply *]");
+	    break;
+	case 8:		/* set */
+	case 9:		/* s */
+	    Add_message("'\\set <option> <value>' sets an option value. "
 			"[*Client reply *]");
 	    break;
 	default:
@@ -203,6 +209,10 @@ void executeCommand(char *talk_str)
     case 6:			/* help */
     case 7:			/* h */
 	print_help(argument);
+	break;
+    case 8:			/* help */
+    case 9:			/* h */
+	Set_command(argument);
 	break;
     default:
 	warn("BUG: bad command num in executeCommand()");
