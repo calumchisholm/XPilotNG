@@ -91,6 +91,31 @@ public class MapModel extends ModelObject {
     }
 
 
+    public List getEdgeStyles() {
+        return edgeStyles;
+    }
+
+
+    public List getObjects() {
+        return objects;
+    }
+
+
+    public MapOptions getOptions() {
+        return options;
+    }
+
+
+    public List getPixmaps() {
+        return pixmaps;
+    }
+
+
+    public List getPolyStyles() {
+        return polyStyles;
+    }
+
+
     public float getDefaultScale () {
         return defaultScale;
     }

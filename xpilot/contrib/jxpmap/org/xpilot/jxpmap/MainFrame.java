@@ -6,7 +6,12 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -34,6 +39,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private ButtonGroup toggleGroup;
     private JLabel lblZoom;
     private File mapFile;
+    private BshConsole bshConsole;
 
     public MainFrame () {
 
@@ -121,6 +127,11 @@ public class MainFrame extends JFrame implements ActionListener {
         menuItem = new JMenuItem("Options");
         menu.add(menuItem);
         menuItem.setActionCommand("showOptions");
+        menuItem.addActionListener(this);
+        
+        menuItem = new JMenuItem("BeanShell");
+        menu.add(menuItem);
+        menuItem.setActionCommand("showBeanShellConsole");
         menuItem.addActionListener(this);
     }
 
@@ -434,6 +445,24 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
 
+    private void showBeanShellConsole () {
+        if (bshConsole == null) {
+            try {
+                Map vars = new HashMap();
+                vars.put("editor", canvas);
+                bshConsole = new BshConsole(vars);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                JOptionPane.showMessageDialog
+                    (this, "Cannot create BeanShell console: " + t.toString(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        if (bshConsole != null)
+            bshConsole.setVisible(true);
+    }
+
+
     private void quickSave () {
 
         if (mapFile == null) {
@@ -511,5 +540,23 @@ public class MainFrame extends JFrame implements ActionListener {
             mf.setModel(model);
             //mf.setZoom(-5);
         }
+    }
+}
+
+class BshConsole extends JFrame {
+    public BshConsole(Map variables) throws Exception {
+        super("BeanShell");
+        bsh.util.JConsole jc = new bsh.util.JConsole();
+        bsh.Interpreter interpreter = new bsh.Interpreter(jc);
+        for (Iterator i = variables.keySet().iterator(); i.hasNext();) {
+            String key = (String)i.next();
+            interpreter.set(key, variables.get(key));
+        }
+        int w = 600; int h = 500;
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds((d.width - w) / 2, (d.height - h) / 2, w, h);
+        getContentPane().add(jc);
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
+        new Thread(interpreter).start();
     }
 }

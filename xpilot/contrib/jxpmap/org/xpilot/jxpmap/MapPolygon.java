@@ -391,6 +391,11 @@ public class MapPolygon extends MapObject {
             else edgeStyles.remove(i - 1);
         }
     }
+    
+    
+    public int getNumPoints() {
+        return polygon.npoints;
+    }
 
 
     public Point getPoint (int i) {
