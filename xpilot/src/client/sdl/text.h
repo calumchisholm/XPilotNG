@@ -36,6 +36,7 @@ typedef struct {
     texcoord_t texcoords;
     int width;
     int height;
+    int font_height;
 } string_tex_t;
 
 int renderstyle;
@@ -109,7 +110,7 @@ name_tex_t *others_name_texs;*/
 
 #define MAX_METERS 12
 string_tex_t meter_texs[MAX_METERS];
-
-string_tex_t message_texs[24];
-
+string_tex_t message_texs[2*MAX_MSGS];
+#define MAX_HUD_TEXS 10 
+string_tex_t HUD_texs[MAX_HUD_TEXS+MAX_SCORE_OBJECTS];
 #endif

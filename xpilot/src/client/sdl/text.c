@@ -471,6 +471,7 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
     if (!(ft_font)) return false;
     if (!(ft_font->ttffont)) return false;
     if (!(string_tex)) return false;
+    if (!strlen(text)) return false;
         
     SDL_Color white = { 0xFF, 0xFF, 0xFF, 0x00 };
     SDL_Color *forecol;
@@ -478,6 +479,8 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
     forecol = &white;
     GLenum gl_error;
 	
+    string_tex->font_height = ft_font->h;
+    
     glyph = TTF_RenderText_Blended( ft_font->ttffont, text, *forecol );
 	
     if(glyph) {
@@ -553,7 +556,7 @@ void disp_text_fraq(string_tex_t *string_tex, int color, int XALIGN, int YALIGN,
     glBindTexture(GL_TEXTURE_2D, string_tex->texture);
     
     x -= string_tex->width/2.0f*XALIGN;
-    y -= string_tex->height/2.0f*YALIGN;
+    y += string_tex->height/2.0f*YALIGN - string_tex->height;
     
     if (onHUD) pushScreenCoordinateMatrix();
     glEnable(GL_TEXTURE_2D);
@@ -561,16 +564,16 @@ void disp_text_fraq(string_tex_t *string_tex, int color, int XALIGN, int YALIGN,
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBegin(GL_TRIANGLE_STRIP);
     	    glTexCoord2f(xstart*string_tex->texcoords.MaxX  , ystop*string_tex->texcoords.MaxY	);
-	    glVertex2i( x + xstart*string_tex->width	    , y  + ystart*string_tex->height 	);
+	    glVertex2f( x + xstart*string_tex->width	    , y  + ystart*string_tex->height 	);
 
      	    glTexCoord2f(xstop*string_tex->texcoords.MaxX   , ystop*string_tex->texcoords.MaxY	);
-	    glVertex2i( x + xstop*string_tex->width	    , y  + ystart*string_tex->height 	);
+	    glVertex2f( x + xstop*string_tex->width	    , y  + ystart*string_tex->height 	);
 
     	    glTexCoord2f(xstart*string_tex->texcoords.MaxX  , ystart*string_tex->texcoords.MaxY );
-	    glVertex2i( x + xstart*string_tex->width	    , y + ystop*string_tex->height	); 
+	    glVertex2f( x + xstart*string_tex->width	    , y + ystop*string_tex->height	); 
 
    	    glTexCoord2f(xstop*string_tex->texcoords.MaxX   , ystart*string_tex->texcoords.MaxY );
-	    glVertex2i( x + xstop*string_tex->width 	    , y + ystop*string_tex->height	); 
+	    glVertex2f( x + xstop*string_tex->width 	    , y + ystop*string_tex->height	); 
     glEnd();
     glDisable(GL_TEXTURE_2D);
     if (onHUD) pop_projection_matrix();

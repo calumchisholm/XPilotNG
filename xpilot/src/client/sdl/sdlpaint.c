@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+#include <sys/time.h>
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "SDL.h"
@@ -288,7 +290,7 @@ int Paint_init(void)
     	score_object_texs[i].texture = 0;
     for (i=0;i<MAX_METERS;++i)
     	meter_texs[i].texture = 0;
-    for (i=0;i<maxMessages;++i)
+    for (i=0;i<2*MAX_MSGS;++i)
     	message_texs[i].texture = 0;
     
     
@@ -317,6 +319,8 @@ void Paint_cleanup(void)
     	if (score_object_texs[i].texture) free_string_texture(&score_object_texs[i]);
     for (i=0;i<MAX_METERS;++i)
     	if (meter_texs[i].texture) free_string_texture(&meter_texs[i]);
+    for (i=0;i<2*MAX_MSGS;++i)
+    	if (message_texs[i].texture) free_string_texture(&message_texs[i]);
 }
 
 /* kps - can we rather use Check_view_dimensions in paint.c ? */
@@ -412,7 +416,10 @@ void setupPaint_HUD(void)
 void Paint_frame(void)
 {
     Check_view_dimensions();
+    static struct timeval timed[17][2];
+    static bool timing = false;
     int i;
+    int measuretime = 100;
 
     world.x = selfPos.x - (ext_view_width / 2);
     world.y = selfPos.y - (ext_view_height / 2);
@@ -456,9 +463,22 @@ void Paint_frame(void)
 	loopsSlow++;
 	time_counter -= (1.0 / 12);
     }
-    if (damaged <= 0) {
-    	glClear(GL_COLOR_BUFFER_BIT);
 
+    if (damaged <= 0) {
+	if (timing) gettimeofday(&timed[0][1],NULL);
+    	/*glClear(GL_COLOR_BUFFER_BIT);*/
+	/* on my machine this seems about 10 times faster
+	 * with seemingly the same result
+	 */
+	set_alphacolor(blackRGBA);
+	glBegin(GL_QUADS);
+	    glVertex2i(0,0);
+	    glVertex2i(draw_width,0);
+	    glVertex2i(draw_width,draw_height);
+	    glVertex2i(0,draw_height);
+	glEnd();
+
+	if (timing) gettimeofday(&timed[1][1],NULL);
 	glEnable(GL_BLEND);
     	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -468,6 +488,7 @@ void Paint_frame(void)
     	setupPaint_stationary();
 	
     	Paint_world();
+	if (timing) gettimeofday(&timed[2][1],NULL);
 
 	if (oldServer) {
 	    Paint_vfuel();
@@ -477,28 +498,67 @@ void Paint_frame(void)
 	} else
 	    Paint_objects();
 
+	if (timing) gettimeofday(&timed[3][1],NULL);
+
     	Paint_score_objects();
-		
+	
+	if (timing) gettimeofday(&timed[4][1],NULL);
+	
 	Paint_shots();
+	if (timing) gettimeofday(&timed[5][1],NULL);
 	setupPaint_moving();
 	Paint_ships();
+	if (timing) gettimeofday(&timed[6][1],NULL);
 
 	setupPaint_HUD();
 
+	if (timing) gettimeofday(&timed[7][1],NULL);
     	Paint_meters();
+	if (timing) gettimeofday(&timed[8][1],NULL);
     	Paint_HUD();
+	if (timing) gettimeofday(&timed[9][1],NULL);
     	Paint_client_fps();
+	if (timing) gettimeofday(&timed[10][1],NULL);
 
 	Paint_messages();       
+	if (timing) gettimeofday(&timed[11][1],NULL);
 	Radar_paint();
+	if (timing) gettimeofday(&timed[12][1],NULL);
 	Console_paint();
+	if (timing) gettimeofday(&timed[13][1],NULL);
 	Scorelist_paint();
+	if (timing) gettimeofday(&timed[14][1],NULL);
 	Paint_select();
-		
+    	if (timing) gettimeofday(&timed[15][1],NULL);
+	
+	
 	glPopMatrix();
     }
-
+    //glDrawBuffer(GL_COLOR_BUFFER_BIT);
     SDL_GL_SwapBuffers();
+    glFlush();	
+	
+    if (timing) gettimeofday(&timed[16][1],NULL);
+
+    if (timing) {
+	for (i=16;i>0;--i)
+	    timed[i][1].tv_usec = timed[i][1].tv_usec - timed[i-1][1].tv_usec
+	    	    	    	+ ((timed[i][1].tv_sec - timed[i-1][1].tv_sec)<<10);
+	for (i=0;i<17;++i)
+	    timed[i][0].tv_usec += timed[i][1].tv_usec;
+    	
+	if (!(loops%measuretime)) {
+	    xpprintf("----------Paint_foo times----------\n");
+	    for (i=1;i<17;++i)
+	    	xpprintf("<%li	%2i>\n",timed[i][0].tv_usec,i);
+	    for (i=1;i<16;++i)
+	    	timed[16][0].tv_usec += timed[i][0].tv_usec;
+	    xpprintf("**[ total %li µs over %i frames ]**\n",timed[16][0].tv_usec,measuretime);
+	for (i=0;i<17;++i)
+	    timed[i][0].tv_usec = 0;
+	    
+	}
+    }
     /*xpprintf("time for Paint_frame() = %i\n",SDL_GetTicks()-now);*/
 }
 

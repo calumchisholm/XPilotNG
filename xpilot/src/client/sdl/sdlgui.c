@@ -104,6 +104,7 @@ int hudRadarDotSize = 6;
 int baseWarningType = 1;
 
 static GLuint polyListBase = 0;
+static GLuint polyEdgeListBase = 0;
 
 int Gui_init(void);
 void Gui_cleanup(void);
@@ -143,7 +144,7 @@ void Circle(int color,
 	    int x, int y,
 	    int radius, int filled)
 {
-    float i,resolution = 32;
+    float i,resolution = 16;
     set_alphacolor(color);
     if (filled)
     	glBegin( GL_POLYGON );
@@ -151,7 +152,7 @@ void Circle(int color,
     	glBegin( GL_LINE_LOOP );
     	/* Silly resolution */
     	for (i = 0.0f; i < TABLE_SIZE; i=i+((float)TABLE_SIZE)/resolution)
-    	    glVertex2f((int)(x + tcos((int)i)*radius),(int)(y + tsin((int)i)*radius));
+    	    glVertex2f((x + tcos((int)i)*radius),(y + tsin((int)i)*radius));
     glEnd();
 }
 
@@ -167,6 +168,8 @@ static void vertex_callback(ipos *p, image_t *texture)
 static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
 {
     int j;
+    int x,y;
+    
     xp_polygon_t polygon;
     polygon_style_t p_style;
     image_t *texture = NULL;
@@ -190,6 +193,17 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
     }
     gluTessEndPolygon(tess);
     glEndList();
+    glNewList(polyEdgeListBase + i,  GL_COMPILE);
+    glBegin(GL_LINE_LOOP);
+    x = y = 0;
+    glVertex2i(x, y);
+    for (j = 1; j < polygon.num_points; j++) {
+	x += polygon.points[j].x;
+	y += polygon.points[j].y;
+	glVertex2i(x, y);
+    }
+    glEnd();
+    glEndList();
 }
 
 int Gui_init(void)
@@ -200,7 +214,8 @@ int Gui_init(void)
     if (num_polygons == 0) return 0;
 
     polyListBase = glGenLists(num_polygons);
-    if (!polyListBase) {
+    polyEdgeListBase = glGenLists(num_polygons);
+    if ((!polyListBase)||(!polyEdgeListBase)) {
 	error("failed to generate display lists");
 	return -1;
     }
@@ -526,7 +541,6 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     xp_polygon_t    polygon;
     polygon_style_t p_style;
     edge_style_t    e_style;
-    int             j, x, y;
 
     polygon = polygons[i];
     p_style = polygon_styles[polygon.style];
@@ -571,17 +585,9 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glLineWidth(e_style.width * scale);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_LINE_SMOOTH);
-    glBegin(GL_LINE_LOOP);
-    x = y = 0;
-    glVertex2i(x, y);
-    for (j = 1; j < polygon.num_points; j++) {
-	x += polygon.points[j].x;
-	y += polygon.points[j].y;
-	glVertex2i(x, y);
-    }
-    glEnd();
-    glDisable(GL_LINE_SMOOTH);
+    //glEnable(GL_LINE_SMOOTH);/* this is about half the cost of drawing objects...*/
+    glCallList(polyEdgeListBase + i);
+    //glDisable(GL_LINE_SMOOTH);
     /*glDisable(GL_BLEND);*/
     glLineWidth(1);
     glPopMatrix();
@@ -1114,7 +1120,7 @@ static void Paint_meter(int xoff, int y, string_tex_t *tex, int val, int max,
 	color = meter_color;
 
     /*HUDprint(&gamefont,color,x_alignment,UP,xstr,draw_height - y - meterHeight,title);*/
-    disp_text(tex,color,x_alignment,DOWN,xstr,draw_height - y - meterHeight,true);
+    disp_text(tex,color,x_alignment,UP,xstr,draw_height - y - meterHeight,true);
 }
 
 void Paint_meters(void)
@@ -1272,18 +1278,24 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 {
 }
 
+typedef char hud_text_t[50];
+
 void Paint_HUD(void)
 {
     const int		BORDER = 3;
     char		str[50];
     int			hud_pos_x, hud_pos_y, size;
     int			did_fuel = 0;
-    int			i, j, modlen = 0;
+    int			i, j, tex_index, modlen = 0;
     static char		autopilot[] = "Autopilot";
     int tempx,tempy,tempw,temph;
+    static hud_text_t 	hud_texts[MAX_HUD_TEXS+MAX_SCORE_OBJECTS];
+    
+bool newcode = true;
+
     fontbounds dummy;
     hudRadarLimit = 0.050;
-
+    tex_index = 0;
     glEnable(GL_BLEND);
     /*
      * Show speed pointer
@@ -1381,17 +1393,49 @@ void Paint_HUD(void)
     if (hudColorRGBA && (fuelTime > 0.0 || fuelSum < fuelLevel3)) {
 	did_fuel = 1;
 	/* TODO fix this */
-	HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
+	if (newcode) {
+	sprintf(str, "%04d", (int)fuelSum);
+	tex_index=0;
+	if (strcmp(str,hud_texts[tex_index])!=0) {
+    	    if (HUD_texs[tex_index].texture)
+	    	free_string_texture(&HUD_texs[tex_index]);    	    
+	    strlcpy(hud_texts[tex_index],str,50);
+	}
+	if (!HUD_texs[tex_index].texture)
+	    render_text(&gamefont, str, &HUD_texs[tex_index]);
+	disp_text(  &HUD_texs[tex_index],hudColorRGBA,LEFT,DOWN
+	    	    ,hud_pos_x + hudSize-HUD_OFFSET+BORDER
+		    ,hud_pos_y - (hudSize-HUD_OFFSET+BORDER)
+		    ,true   );
+	} else 
+	    HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
 	    	hud_pos_x + hudSize-HUD_OFFSET+BORDER,
 		hud_pos_y - (hudSize-HUD_OFFSET+BORDER),
 		"%04d", (int)fuelSum);
+
 	if (numItems[ITEM_TANK]) {
 	    if (fuelCurrent == 0)
 		strcpy(str,"M ");
 	    else
 		sprintf(str, "T%d", fuelCurrent);
+	    
+	    if (newcode) {
+	    tex_index=1;
+	    if (strcmp(str,hud_texts[tex_index])!=0) {
+    	    	if (HUD_texs[tex_index].texture)
+		    free_string_texture(&HUD_texs[tex_index]);    	    
+    	    	strlcpy(hud_texts[tex_index],str,50);
+	    }
+	    if (!HUD_texs[tex_index].texture)
+	    	render_text(&gamefont, str, &HUD_texs[tex_index]);
+	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,LEFT,DOWN
+	    	    ,hud_pos_x + hudSize-HUD_OFFSET + BORDER
+		    ,hud_pos_y - hudSize-HUD_OFFSET + BORDER
+		    ,true   );
+	    
 	    /* TODO fix this */
-	    HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
+	    } else
+	    	HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
 	    	    hud_pos_x + hudSize-HUD_OFFSET + BORDER,
 		    hud_pos_y - hudSize-HUD_OFFSET + BORDER,
 		    str);
@@ -1403,7 +1447,6 @@ void Paint_HUD(void)
 
     /* Draw last score on hud if it is an message attached to it */
     if (hudColorRGBA) {
-    	/* TODO: rewrite this to exploit the fact HUDprint handles newlines */
 	for (i = 0, j = 0; i < MAX_SCORE_OBJECTS; i++) {
 	    score_object_t*	sobj = &score_objects[(i+score_object)%MAX_SCORE_OBJECTS];
 	    if (sobj->hud_msg_len > 0) {
@@ -1414,7 +1457,23 @@ void Paint_HUD(void)
 		    sobj->hud_msg_width > 2*hudSize-HUD_OFFSET*2 &&
 		    (did_fuel || hudVLineColorRGBA))
 		    ++j;
-		HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
+	    	
+	    	if (newcode) {
+		tex_index=MAX_HUD_TEXS+i;
+		if (strcmp(sobj->hud_msg,hud_texts[tex_index])!=0) {
+    	    	    if (HUD_texs[tex_index].texture)
+		    	free_string_texture(&HUD_texs[tex_index]);    	    
+    	    	    strlcpy(hud_texts[tex_index],sobj->hud_msg,50);
+	    	}
+	    	if (!HUD_texs[tex_index].texture)
+	    	    render_text(&gamefont, sobj->hud_msg, &HUD_texs[tex_index]);
+	    	
+		disp_text(  &HUD_texs[tex_index],hudColorRGBA,CENTER,DOWN
+	    	    ,hud_pos_x
+		    ,hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * HUD_texs[tex_index].height)
+		    ,true   );
+		} else
+		    HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
 		    	hud_pos_x,
 			hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * dummy.height),
 			sobj->hud_msg);
@@ -1423,7 +1482,22 @@ void Paint_HUD(void)
 	}
 
 	if (time_left > 0) {
-	    HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,
+    	    if (newcode) {
+	    sprintf(str, "%3d:%02d", (int)(time_left / 60), (int)(time_left % 60));
+	    tex_index=3;
+	    if (strcmp(str,hud_texts[tex_index])!=0) {
+    	    	if (HUD_texs[tex_index].texture)
+		    free_string_texture(&HUD_texs[tex_index]);    	    
+    	    	strlcpy(hud_texts[tex_index],str,50);
+	    }
+	    if (!HUD_texs[tex_index].texture)
+	    	render_text(&gamefont, str, &HUD_texs[tex_index]);
+	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,DOWN
+	    	    ,hud_pos_x - hudSize+HUD_OFFSET - BORDER
+		    ,hud_pos_y + hudSize+HUD_OFFSET + BORDER
+		    ,true   );
+	    } else
+	    	HUDprint(&gamefont,hudColorRGBA,RIGHT,DOWN,
 		    hud_pos_x - hudSize+HUD_OFFSET - BORDER,
 		    hud_pos_y + hudSize+HUD_OFFSET + BORDER,
 		    "%3d:%02d",
@@ -1432,18 +1506,47 @@ void Paint_HUD(void)
 
 	/* Update the modifiers */
 	modlen = strlen(mods);
-	HUDprint(&gamefont,hudColorRGBA,RIGHT,UP,
+    	if (newcode) {
+	tex_index=4;
+	if (strcmp(mods,hud_texts[tex_index])!=0) {
+    	    if (HUD_texs[tex_index].texture)
+	    	free_string_texture(&HUD_texs[tex_index]);		
+    	    strlcpy(hud_texts[tex_index],mods,50);
+	}
+	if (!HUD_texs[tex_index].texture)
+	    render_text(&gamefont, mods, &HUD_texs[tex_index]);
+	disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,UP
+		,hud_pos_x - hudSize+HUD_OFFSET-BORDER
+	    	,hud_pos_y - hudSize+HUD_OFFSET-BORDER
+	    	,true	);
+	} else
+	    HUDprint(&gamefont,hudColorRGBA,RIGHT,UP,
 		hud_pos_x - hudSize+HUD_OFFSET-BORDER,
 		hud_pos_y - hudSize+HUD_OFFSET-BORDER,
 		mods);
 
 	if (autopilotLight) {
-	    dummy = printsize(&gamefont,autopilot);
-	    HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
+    	    if (newcode) {
+	    tex_index=5;
+	    if (strcmp(autopilot,hud_texts[tex_index])!=0) {
+    	    	if (HUD_texs[tex_index].texture)
+		    free_string_texture(&HUD_texs[tex_index]);    	    
+    	    	strlcpy(hud_texts[tex_index],autopilot,50);
+	    }
+	    if (!HUD_texs[tex_index].texture)
+	    	render_text(&gamefont, autopilot, &HUD_texs[tex_index]);
+	    disp_text(  &HUD_texs[tex_index],hudColorRGBA,RIGHT,DOWN
+	    	    ,hud_pos_x
+		    ,hud_pos_y + hudSize+HUD_OFFSET + BORDER + HUD_texs[tex_index].height*2
+		    ,true   );
+	    } else {
+	    	dummy = printsize(&gamefont,autopilot);
+	    	HUDprint(&gamefont,hudColorRGBA,CENTER,DOWN,
 			  hud_pos_x,
 			  hud_pos_y + hudSize+HUD_OFFSET + BORDER
 			  + dummy.height*2,
 			  autopilot);
+	    }
 	}
     }
 
@@ -1490,15 +1593,98 @@ void Paint_HUD(void)
     glDisable(GL_BLEND);
 }
 
+typedef char msg_txt_t[MSG_LEN];
+
 void Paint_messages(void)
 {
-    int		i, x, y, top_y, bot_y, width, len;
+    int		i, j, x, y, top_y, bot_y, width, len, i_2;
     const int	BORDER = 10,
 		SPACING = messagefont.linespacing;
     const int	BORDERx_bot = BORDER, BORDERx_top = 200 + BORDER;
     message_t	*msg;
     int		last_msg_index = 0, msg_color;
 
+    static msg_txt_t talk_texts[MAX_MSGS];
+    static msg_txt_t game_texts[MAX_MSGS];
+    static bool first_time = true;
+    int offset;    
+
+bool newcode = true;
+    
+    if (first_time) {
+    	for (j = 0 ; j < MAX_MSGS ; ++j) {
+	    strlcpy(talk_texts[i],"\0",MSG_LEN);
+	    strlcpy(game_texts[i],"\0",MSG_LEN);
+    	}
+    	first_time = false;
+    }
+    
+
+/* TODO: find a nicer solution for this, its a bit of a hack ;)
+ * couldn't think of one that didn't include changing client.h
+ * and messages.c
+ */
+if (newcode) {
+    
+    offset = 0;
+    for (j = maxMessages-1 ; j >= 0 ; --j) {
+    	if (!strlen(TalkMsg[j]->txt)) {
+	    strlcpy(talk_texts[j],"\0",MSG_LEN);
+	    if (message_texs[j].texture)
+	    	free_string_texture(&message_texs[j]);
+	} else {
+	    bool found_it = false;
+	    for (i = offset; i <= j; ++i) {
+		if ( (found_it = (strcmp(TalkMsg[j]->txt,talk_texts[j-i])==0))) {
+		    if (!i) break;
+		    if (j + i >= maxMessages)	
+			if (message_texs[j].texture)
+	    	    	    free_string_texture(&message_texs[j]);
+		    strlcpy(talk_texts[j],talk_texts[j-i],MSG_LEN);
+		    message_texs[j]=message_texs[j-i];
+		    break;
+		}
+	    }
+		
+    	    offset = i;
+	    
+    	    if (!found_it) {
+	    	strlcpy(talk_texts[j],TalkMsg[j]->txt,MSG_LEN);
+	    	message_texs[j].texture=0;
+	    }
+	}	
+    }
+    
+    offset = 0;
+    for (j = maxMessages-1 ; j >= 0 ; --j) {
+    	if (!strlen(GameMsg[j]->txt)) {
+	    strlcpy(game_texts[j],"\0",MSG_LEN);
+	    if (message_texs[j+MAX_MSGS].texture)
+	    	free_string_texture(&message_texs[j+MAX_MSGS]);
+	} else {
+	    bool found_it = false;
+	    for (i = offset; i <= j; ++i) {
+		if ( (found_it = (strcmp(GameMsg[j]->txt,game_texts[j-i])==0))) {
+		    if (!i) break;
+		    if (j + i >= maxMessages)	
+			if (message_texs[j+MAX_MSGS].texture)
+	    	    	    free_string_texture(&message_texs[j+MAX_MSGS]);
+		    strlcpy(game_texts[j],game_texts[j-i],MSG_LEN);
+		    message_texs[j+MAX_MSGS]=message_texs[j-i+MAX_MSGS];
+		    break;
+		}
+	    }
+		
+    	    offset = i;
+	    
+    	    if (!found_it) {
+	    	strlcpy(game_texts[j],GameMsg[j]->txt,MSG_LEN);
+	    	message_texs[j+MAX_MSGS].texture=0;
+	    }
+	}	
+    }
+}
+    	
     top_y = draw_height - messagefont.linespacing;
     bot_y = messagefont.linespacing;
 
@@ -1568,13 +1754,13 @@ void Paint_messages(void)
 	    y = bot_y;
 	    bot_y += SPACING;
 	}
+
+	i_2=(i<maxMessages)?i:(MAX_MSGS+i-maxMessages);
+	
 	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
 	
 	/* TODO: make sure this works! */
 	/* new message? */
-	if (!len) {
-	    if (message_texs[i].texture) free_string_texture(&(message_texs[i].texture));
-	}
 	len = MIN(msg->len, len);
 	/*
 	 * it's an emphasized talk message
@@ -1676,49 +1862,63 @@ void Paint_messages(void)
     	    /* TODO: make it possible to actually divide this per character
 	     * meanwhile just ballpark guess to a fraction of the width... ;)
 	     */
-	    /*if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);*/
+	    xpprintf("DO WE EVER GET HERE???\n");
+	    if (newcode)
+	    	if (!message_texs[i_2].texture) render_text(&gamefont,msg->txt,&message_texs[i_2]);
 	    if (ptr) {
-		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);
-	    	/*if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
-	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+		if (!newcode)
+		    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l,ptr);
+	    	else {
+		    disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
 	    	    	    	,(float)( (int)&ptr-(int)&msg->txt  	)/msg->len
 	    	    	    	,(float)( (int)&ptr-(int)&msg->txt + l	)/msg->len
 	    	    	    	,0.0f
 	    	    	    	,1.0f
-		    	    	,true);*/
+		    	    	,true);
+		}
 	    }
 	    if (ptr2) {
-		HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);
-	    	/*if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
-	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+		if (!newcode)
+		    HUDnprint(&gamefont,whiteRGBA,LEFT,CENTER,x,y,l2,ptr2);
+	    	else {
+		    disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
 	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt 	    )/msg->len
 	    	    	    	,(float)( (int)&ptr2-(int)&msg->txt + l2    )/msg->len
 	    	    	    	,0.0f
 	    	    	    	,1.0f
-		    	    	,true);*/
+		    	    	,true);
+		}
 	    }
 	    if (ptr3) {
-		HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);
-	    	/*if (!message_texs[i].texture) render_text(&gamefont,ptr,&message_texs[i]);
-	    	disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+		if (!newcode)
+		    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,l3,ptr2);
+	    	else {
+		    disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
 	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt 	    )/msg->len
 	    	    	    	,(float)( (int)&ptr3-(int)&msg->txt + l3    )/msg->len
 	    	    	    	,0.0f
 	    	    	    	,1.0f
-		    	    	,true);*/
+		    	    	,true);
+		}
 	    }
 
 	} else {
-    	    HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);
-	    /*if (!message_texs[i].texture) render_text(&gamefont,msg->txt,&message_texs[i]);
-	    disp_text_fraq(&message_texs[i],msg_color,LEFT,CENTER,x,y
+    	    if (!newcode)
+    	    	HUDnprint(&gamefont,msg_color,LEFT,CENTER,x,y,len,msg->txt);
+	    else {
+		if (!message_texs[i_2].texture) render_text(&gamefont,msg->txt,&message_texs[i_2]);
+	    	disp_text_fraq(&message_texs[i_2],msg_color,LEFT,CENTER,x,y
 	    	    	    ,0.0f
 	    	    	    ,(float)len/msg->len
 	    	    	    ,0.0f
 	    	    	    ,1.0f
-			    ,true);*/
+			    ,true);
+	    }
 	}
 
-	width = nprintsize(&messagefont,MIN(len, msg->len),msg->txt).width; /*this is not accurate*/
+    	if (!newcode)
+	    width = nprintsize(&messagefont,MIN(len, msg->len),msg->txt).width; /*this is not accurate*/
+	else
+	    width = message_texs[i_2].width;
     }
 }
