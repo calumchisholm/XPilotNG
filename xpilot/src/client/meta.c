@@ -132,7 +132,7 @@ int Welcome_sort_server_list(void)
 	}
     }
 
-    /*#if 0*/
+#if 0
     /* print for debugging */
     printf("\n");
     printf("Printing server list:\n");
@@ -152,7 +152,7 @@ int Welcome_sort_server_list(void)
 	printf("\n");
     }
     printf("\n");
-    /*#endif*/
+#endif
 
     List_delete(old_list);
     server_list = new_list;
