@@ -1502,7 +1502,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     pulse->pl_radius 	= 0;
 
     pulse->dir  	= dir;
-    pulse->len  	= pulseLength * CLICK;
+    pulse->len  	= 0 /*pulseLength * CLICK*/;
     pulse->refl 	= false;
 
     Cell_add_object(OBJ_PTR(pulse));

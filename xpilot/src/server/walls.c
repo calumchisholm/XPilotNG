@@ -876,6 +876,7 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
 	pulseobject *pulse = PULSE_PTR(obj);
 
 	pulse->dir = (int)Wrap_findDir(pulse->vel.x, pulse->vel.y);
+	pulse->len = 0;
     }
 
     return 1;

@@ -953,7 +953,7 @@ static void Frame_shots(int conn, int ind)
 		} else {
 		    color = RED;
 		}
-		Send_laser(conn, color, lcx, lcy, pulse->len, ldir);
+		Send_laser(conn, color, lcx, lcy, (int)pulse->len, ldir);
 	    }
 	break;
 	default:

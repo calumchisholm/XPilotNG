@@ -399,7 +399,7 @@ struct _pulseobject {
     OBJECT_EXTEND
 
     int			dir;		/* Direction of the pulse */
-    int			len;		/* Length of the pulse */
+    DFLOAT		len;		/* Length of the pulse */
     bool		refl;		/* Pulse was reflected ? */
 #ifdef __cplusplus
 			_pulseobject() {}

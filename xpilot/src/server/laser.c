@@ -88,7 +88,7 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 	pulse->vel.y = pulseSpeed * tsin(pulse->dir);
 
 	pulse->life += vicpl->item[ITEM_MIRROR];
-	/*pulse->len = PULSE_LENGTH;*/
+	pulse->len = 0 /*PULSE_LENGTH*/;
 	pulse->refl = true;
 	/**refl = true;*/
 	return;
