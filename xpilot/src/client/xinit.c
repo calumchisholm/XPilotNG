@@ -509,12 +509,13 @@ int Init_top(void)
     COLORCHECK(fuelColor, 3);
     COLORCHECK(messagesColor, 3);
     COLORCHECK(oldMessagesColor, 2);
-    COLORCHECK(decorColor, 3);
 
     if (maxColors > 4) {
+	COLORCHECK(decorColor, 6);
 	COLORCHECK(teamLWColor, 4);
 	COLORCHECK(scoreZeroColor, 4);
     } else {
+	COLORCHECK(decorColor, 3);
 	COLORCHECK(teamLWColor, 2);
 	COLORCHECK(scoreZeroColor, 1);
     }
