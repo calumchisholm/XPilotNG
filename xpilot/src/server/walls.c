@@ -870,6 +870,14 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
     obj->vel.y = fy * wall_brake_factor;
     if (obj->collmode == 2)
 	obj->collmode = 3;
+
+    /* laserhack */
+    if (obj->type == OBJ_PULSE) {
+	pulseobject *pulse = PULSE_PTR(obj);
+
+	pulse->dir = (int)Wrap_findDir(pulse->vel.x, pulse->vel.y);
+    }
+
     return 1;
 }
 

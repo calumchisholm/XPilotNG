@@ -206,13 +206,7 @@ void Laser_pulse_collision(void)
     for (p = NumPulses - 1; p >= 0; --p) {
 	pulse = Pulses[p];
 
-	/* check for end of pulse life */
-	/* kps - why check pulse->len here ??? */
-	if ((pulse->life -= timeStep) < 0 || pulse->len < PULSE_LENGTH) {
-	    Laser_pulse_destroy_one(p);
-	    continue;
-	}
-
+	/* check for end of pulse life removed (pulse->life and pulse->len) */
 	/* removed determination of pl and ind */
 
 	/* pulse moves every frame */

@@ -1513,7 +1513,7 @@ void Fire_general_laser(int ind, unsigned short team, int cx, int cy,
     pulse->acc.x 	= 0;
     pulse->acc.y 	= 0;
     pulse->mass	 	= 0;
-    pulse->life 	= life;
+    pulse->life 	= 5*life; /* kps */
     pulse->status 	= (pl ? 0 : FROMCANNON);
     pulse->type 	= OBJ_PULSE;
     pulse->count 	= 0;
