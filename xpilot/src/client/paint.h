@@ -120,7 +120,6 @@ extern char motdFontName[FONT_LEN];
 extern Display	*dpy;			/* Display of player (pointer) */
 extern Display	*kdpy;			/* Keyboard display */
 extern short	about_page;		/* Which page is the player on? */
-extern uint16_t	myTeam;			/* What team is the player on? */
 extern bool	players_exposed;	/* Is score window exposed? */
 extern int	radar_exposures;	/* Is radar window exposed? */
 

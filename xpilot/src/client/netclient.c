@@ -625,8 +625,6 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 		retries;
     time_t	last;
 
-    myTeam = my_team;
-
     for (retries = 0;;) {
 	if (retries == 0 || time(NULL) - last >= 3) {
 	    if (retries++ >= MAX_VERIFY_RETRIES) {

@@ -58,7 +58,6 @@ char	motdFontName[FONT_LEN];
 Display		*dpy;		/* Display of player (pointer) */
 Display		*kdpy;		/* Keyboard display */
 short		about_page;	/* Which page is the player on? */
-uint16_t	myTeam;		/* What team is the player on? */
 
 GC		gameGC;		/* GC for the game area */
 GC		messageGC;	/* GC for messages in the game area */

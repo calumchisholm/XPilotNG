@@ -1026,13 +1026,13 @@ int Handle_leave(int id)
 	    *other = other[1];
 	    other++;
 	}
-	scoresChanged = 1;
+	scoresChanged = true;
     }
     for (i = 0; i < num_others; i++) {
 	other = &Others[i];
 	if (other->war_id == id) {
 	    other->war_id = -1;
-	    scoresChanged = 1;
+	    scoresChanged = true;
 	}
     }
     return 0;
@@ -1073,7 +1073,6 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 	    other = &Others[0];
 	}
 	self = other;
-	myTeam = player_team;
     }
     other->id = id;
     other->team = player_team;
@@ -1092,7 +1091,7 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 	strlcpy(other->id_string, player_name, sizeof(other->id_string));
     strlcpy(other->real, real_name, sizeof(other->real));
     strlcpy(other->host, host_name, sizeof(other->host));
-    scoresChanged = 1;
+    scoresChanged = true;
     other->ship = Convert_shape_str(shape);
     other->ignorelevel = 0;
     Calculate_shield_radius(other->ship);
@@ -1114,8 +1113,7 @@ int Handle_team(int id, int pl_team)
 	return 0;
     }
     other->team = pl_team;
-    if (other == self)
-	myTeam = pl_team;
+
     return 0;
 }
 
@@ -1145,7 +1143,7 @@ int Handle_war(int robot_id, int killer_id)
     robot->war_id = killer_id;
     sprintf(msg, "%s declares war on %s.", robot->name, killer->name);
     Add_message(msg);
-    scoresChanged = 1;
+    scoresChanged = true;
 
     return 0;
 }
@@ -1168,7 +1166,7 @@ int Handle_seek(int programmer_id, int robot_id, int sought_id)
     sprintf(msg, "%s has programmed %s to seek %s.",
 	    programmer->name, robot->name, sought->name);
     Add_message(msg);
-    scoresChanged = 1;
+    scoresChanged = true;
 
 
     return 0;
@@ -1191,7 +1189,7 @@ int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance)
 	other->life = life;
 	other->mychar = mychar;
 	other->alliance = alliance;
-	scoresChanged = 1;
+	scoresChanged = true;
     }
 
     return 0;
@@ -1201,7 +1199,7 @@ int Handle_team_score(int team, DFLOAT score)
 {
     if (teamscores[team] != score) {
 	teamscores[team] = score;
-	scoresChanged = 1;
+	scoresChanged = true;
     }
 
     return 0;
@@ -1222,7 +1220,7 @@ int Handle_timing(int id, int check, int round)
 	other->round = round;
 	other->timing = round * num_checks + check;
 	other->timing_loops = last_loops;
-	scoresChanged = 1;
+	scoresChanged = true;
     }
 
     return 0;
@@ -1454,11 +1452,10 @@ static int Team_heading(int entrynum, int teamnum,
     strcpy(tmp.real, tmp.name);
     strcpy(tmp.host, "");
 #if 0
-    if (BIT(Setup->mode, LIMITED_LIVES) && teamlives == 0) {
+    if (BIT(Setup->mode, LIMITED_LIVES) && teamlives == 0)
 	tmp.mychar = 'D';
-    } else {
+    else
 	tmp.mychar = ' ';
-    }
 #else
     tmp.mychar = ' ';
 #endif
@@ -1509,15 +1506,12 @@ void Client_score_table(void)
 			**order;
     int			i, j, entrynum = 0;
 
-    if (scoresChanged == 0)
-	return;
-
-    if (players_exposed == false)
+    if (!scoresChanged || !players_exposed)
 	return;
 
     if (num_others < 1) {
 	Paint_score_start();
-	scoresChanged = 0;
+	scoresChanged = false;
 	return;
     }
 
@@ -1563,7 +1557,7 @@ void Client_score_table(void)
 
     IFWINDOWS( MarkPlayersForRedraw() );
 
-    scoresChanged = 0;
+    scoresChanged = false;
 }
 
 #ifndef _WINDOWS
