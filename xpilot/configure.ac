@@ -66,19 +66,19 @@ AC_ARG_ENABLE(replay,
 [], [enable_replay=yes; need_x=yes])
 
 AC_ARG_ENABLE(xp_mapedit,
-	AC_HELP_STRING([--enable-xp-mapedit],
+	AC_HELP_STRING([--disable-xp-mapedit],
 			[disable building of xp-mapedit program]),
 [], [enable_xp_mapedit=yes; need_x=yes])
 
 AC_ARG_ENABLE(x11_client,
 	AC_HELP_STRING([--disable-x11-client],
 			[disable X11 client]),
-[], [enable_x11_client=yes; need_x=yes])
+[], [enable_x11_client=yes; need_x=yes; need_libxpclient=yes])
 
 AC_ARG_ENABLE(sdl_client,
 	AC_HELP_STRING([--disable-sdl-client],
 			[disable SDL/OpenGL client]),
-[], [enable_sdl_client=yes; need_x=yes])
+[], [enable_sdl_client=yes; need_x=yes; need_libxpclient=yes])
 if test x$enable_sdl_client = xyes; then
 	AC_DEFINE([SDL_CLIENT], 1, [enable sdl client])
 fi
@@ -88,14 +88,6 @@ AC_ARG_ENABLE(sdl_gameloop,
 	AC_HELP_STRING([--enable-sdl-gameloop],
 			[enable sdl gameloop in sdl client
 			 (otherwise use gameloop optimised for X11)]))
-
-AC_ARG_ENABLE(server_only,
-	AC_HELP_STRING([--enable-server-only],
-			[build only the server]),
-[if test x$enable_server_only = xyes; then
-	AC_DEFINE([SERVER_ONLY], 1, [build only the server])
-	need_x=no
-fi])
 
 AC_ARG_ENABLE(sound,
 	AC_HELP_STRING([--enable-sound],
@@ -311,8 +303,8 @@ if test x$enable_sdl_client = xyes; then
 	CXXFLAGS="$CXXFLAGS_BAK"
 fi
 
+AM_CONDITIONAL([COND_CLIENT], [test x$need_libxpclient = xyes])
 AM_CONDITIONAL([COND_WINDOWS], [test x$windows_target = xyes])
-AM_CONDITIONAL([COND_SERVER_ONLY], [test x$enable_server_only = xyes])
 AM_CONDITIONAL([COND_REPLAY], [test x$enable_replay = xyes])
 AM_CONDITIONAL([COND_XP_MAPEDIT], [test x$enable_xp_mapedit = xyes])
 AM_CONDITIONAL([COND_X11_CLIENT], [test x$enable_x11_client = xyes])
