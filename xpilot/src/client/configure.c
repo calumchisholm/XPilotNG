@@ -761,6 +761,7 @@ static void Config_save_keys(FILE *fp)
     }
 }
 
+extern int team9Color;
 
 static int Config_save(int widget_desc, void *button_str, const char **strptr)
 {

@@ -64,20 +64,6 @@ extern double	hudRadarScale;		/* Scale for hudradar drawing */
 extern double 	hudRadarLimit;		/* Limit for hudradar drawing */
 extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
 extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
-extern int	zeroLivesColor;		/* Color to associate with 0 lives */
-extern int	oneLifeColor;		/* Color to associate with 1 life */
-extern int	twoLivesColor;		/* Color to associate with 2 lives */
-extern int	manyLivesColor;		/* Color to associate with >2 lives */
-extern int	team0Color;		/* Preferred color index for team 0 */
-extern int	team1Color;		/* Preferred color index for team 1 */
-extern int	team2Color;		/* Preferred color index for team 2 */
-extern int	team3Color;		/* Preferred color index for team 3 */
-extern int	team4Color;		/* Preferred color index for team 4 */
-extern int	team5Color;		/* Preferred color index for team 5 */
-extern int	team6Color;		/* Preferred color index for team 6 */
-extern int	team7Color;		/* Preferred color index for team 7 */
-extern int	team8Color;		/* Preferred color index for team 8 */
-extern int	team9Color;		/* Preferred color index for team 9 */
 extern int	selfLWColor;		/* Color index for selfLifeWarning */
 extern int	enemyLWColor;		/* Color index for enemyLifeWarning */
 extern int	teamLWColor;		/* Color index for teamLifeWarning */

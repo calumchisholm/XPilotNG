@@ -1613,3 +1613,52 @@ void Store_color_options(void)
 {
     STORE_OPTIONS(color_options);
 }
+
+
+/*
+ * Assume MAX_TEAMS is 10
+ */
+int Team_color(int team)
+{
+    switch (team) {
+    case 0:	return team0Color;
+    case 1:	return team1Color;
+    case 2:	return team2Color;
+    case 3:	return team3Color;
+    case 4:	return team4Color;
+    case 5:	return team5Color;
+    case 6:	return team6Color;
+    case 7:	return team7Color;
+    case 8:	return team8Color;
+    case 9:	return team9Color;
+    default:    break;
+    }
+    return 0;
+}
+
+int Life_color(other_t *other)
+{
+    int color = 0; /* default is 'no special color' */
+
+    if (other
+	&& (other->mychar == ' ' || other->mychar == 'R')
+	&& BIT(Setup->mode, LIMITED_LIVES))
+	color = Life_color_by_life(other->life);
+    return color;
+}
+
+int Life_color_by_life(int life)
+{
+    int color;
+	
+    if (life > 2)
+	color = manyLivesColor;
+    else if (life == 2)
+	color = twoLivesColor;
+    else if (life == 1)
+	color = oneLifeColor;
+    else /* we catch all */
+	color = zeroLivesColor;
+    return color;
+}
+
