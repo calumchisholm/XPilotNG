@@ -72,6 +72,8 @@ extern bool		updateScores;
 #define PL_TYPE_ROBOT		1
 #define PL_TYPE_TANK		2
 
+#define USE_PL_STATE
+
 /*
  * These values are set in the player->pl_state field.
  */
@@ -438,13 +440,9 @@ static inline bool Player_is_paused(player_t *pl)
 
 static inline bool Player_is_hoverpaused(player_t *pl)
 {
-#ifdef USE_PL_STATE
-    /* nothing here yet */
-#else
     if (BIT(pl->pl_status, HOVERPAUSE))
 	return true;
     return false;
-#endif
 }
 
 static inline void Player_add_score(player_t *pl, double points)
