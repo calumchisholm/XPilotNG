@@ -935,7 +935,7 @@ static int Config_create_hrColor1(int widget_desc, int *height)
 {
     return Config_create_int(widget_desc, height,
 			   "hrColor1", &hrColor1,
-			   1, maxColors - 1,
+			   0, maxColors - 1,
 			   NULL, NULL);
 }
 
@@ -943,7 +943,7 @@ static int Config_create_hrColor2(int widget_desc, int *height)
 {
     return Config_create_int(widget_desc, height,
 			   "hrColor2", &hrColor2,
-			   1, maxColors - 1,
+			   0, maxColors - 1,
 			   NULL, NULL);
 }
 
@@ -966,7 +966,7 @@ static int Config_create_hudLockColor(int widget_desc, int *height)
 {
     return Config_create_int(widget_desc, height,
 			   "hudLockColor", &hudLockColor,
-			   1, maxColors - 1,
+			   0, maxColors - 1,
 			   NULL, NULL);
 }
 

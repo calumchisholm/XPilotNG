@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -339,7 +338,7 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
     }
     SET_FG(colors[hudColor].pixel);
 
-    if (lock_dist != 0) {
+    if (lock_dist != 0 && hudLockColor != 0) {
 
 	if (lock_dist > WARNING_DISTANCE || warningCount++ % 2 == 0) {
 	    int size = MIN(mapdiag / lock_dist, 10);
@@ -380,16 +379,14 @@ void Paint_hudradar(void) {
     int hrw = hrscale * 256;
     int hrh = hrscale * RadarHeight;
     int sz = hrSize;
-    float xf = (float)hrw / (float)Setup->width, 
-        yf = (float)hrh / (float)Setup->height;
+    float xf = (float)hrw / (float)Setup->width;
+    float yf = (float)hrh / (float)Setup->height;
 
     for (i = 0; i < num_radar; i++) {
 
-        int x = radar_ptr[i].x * xf - 
-            (world.x + view_width / 2) * xf;
+        int x = radar_ptr[i].x * xf - (world.x + view_width / 2) * xf;
 
-        int y = radar_ptr[i].y * yf- 
-            (world.y + view_height / 2) * yf;
+        int y = radar_ptr[i].y * yf - (world.y + view_height / 2) * yf;
 
 
         if (x < 0) {
@@ -404,24 +401,16 @@ void Paint_hudradar(void) {
             if (y > hrh/2) y -= hrh;
         }
 
-        if (
-            !(
-              (x <= SHIP_SZ)&&
-              (x >= -SHIP_SZ)&& 
-              (y <= SHIP_SZ)&& 
-              (y >= -SHIP_SZ)
-              )
-            ) { 
-
+        if (!(x <= SHIP_SZ && x >= -SHIP_SZ && y <= SHIP_SZ && y >= -SHIP_SZ)){
             x = x + view_width / 2 - sz / 2;
             y = -y + view_height / 2 - sz / 2;
 
-            if (radar_ptr[i].color!=4) {
-                Arc_add(hrColor1, x, y, 
-                        sz, sz, 0, 64*360);
+            if (radar_ptr[i].color != 4) {
+		if (hrColor1 != 0)
+		    Arc_add(hrColor1, x, y, sz, sz, 0, 64*360);
             } else {
-                Arc_add(hrColor2, x, y, 
-                        sz, sz, 0, 64*360);
+		if (hrColor2 != 0)
+		    Arc_add(hrColor2, x, y, sz, sz, 0, 64*360);
             }
         }
     }

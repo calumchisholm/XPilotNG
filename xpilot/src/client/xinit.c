@@ -1,5 +1,4 @@
-/* $Id$
- *
+/*
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -477,10 +476,10 @@ int Init_top(void)
     if (hudColor >= maxColors || hudColor <= 0) {
 	hudColor = BLUE;
     }
-    if (hrColor1 >= maxColors || hrColor1 <= 0) {
+    if (hrColor1 >= maxColors || hrColor1 < 0) {
 	hrColor1 = RED;
     }
-    if (hrColor2 >= maxColors || hrColor2 <= 0) {
+    if (hrColor2 >= maxColors || hrColor2 < 0) {
 	hrColor2 = BLUE;
     }
     if (hrSize >= SHIP_SZ || hrSize <= 0) {
@@ -489,7 +488,7 @@ int Init_top(void)
     if (hrScale >= 4.0 || hrScale <= 0.5) {
 	hrScale = 1.5;
     }
-    if (hudLockColor >= maxColors || hudLockColor <= 0) {
+    if (hudLockColor >= maxColors || hudLockColor < 0) {
 	hudLockColor = hudColor;
     }
     if (wallColor >= maxColors || wallColor <= 0) {

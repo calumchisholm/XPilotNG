@@ -1004,7 +1004,7 @@ struct option {
     {
 	"hrColor1",
 	NULL,
-	"4",
+	"3",
 	KEY_DUMMY,
 	"Which color number to use for drawing the hudradar hack.\n"
     },
