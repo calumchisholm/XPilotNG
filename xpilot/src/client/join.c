@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -135,8 +134,7 @@ static void Input_loop(void)
 		continue;
 	    }
 	    else if (result <= 1) {
-		errno = 0;
-		error("No response from server");
+		warn("No response from server");
 		continue;
 	    }
 	}
@@ -151,8 +149,7 @@ static void Input_loop(void)
 	}
 	if (FD_ISSET(netfd, &rfds) || result > 1) {
 	    if ((result = Net_input()) == -1) {
-		errno = 0;
-		error("Bad net input.  Have a nice day!");
+		warn("Bad net input.  Have a nice day!");
 		return;
 	    }
 	    if (result > 0) {
@@ -246,16 +243,14 @@ int Join(char *server_addr, char *server_name, int port, char *real,
     }
     IFWINDOWS( Progress("Net_start") );
     if (Net_start() == -1) {
-	errno = 0;
-	error("Network start failed");
+	warn("Network start failed");
 	Net_cleanup();
 	Client_cleanup();
 	return -1;
     }
     IFWINDOWS( Progress("Client_start") );
     if (Client_start() == -1) {
-	errno = 0;
-	error("Window init failed");
+	warn("Window init failed");
 	Net_cleanup();
 	Client_cleanup();
 	return -1;

@@ -230,8 +230,7 @@ static int Uncompress_map(void)
 		count;
 
     if (Setup->map_order != SETUP_MAP_ORDER_XY) {
-	errno = 0;
-	error("Unknown map ordering in setup (%d)", Setup->map_order);
+	warn("Unknown map ordering in setup (%d)", Setup->map_order);
 	return -1;
     }
 
@@ -257,8 +256,7 @@ static int Uncompress_map(void)
 	while (p < cmp) {
 	    count = *cmp--;
 	    if (count < 2) {
-		errno = 0;
-		error("Map compress count error %d", count);
+		warn("Map compress count error %d", count);
 		return -1;
 	    }
 	    *cmp &= ~SETUP_COMPRESSED;
@@ -267,17 +265,15 @@ static int Uncompress_map(void)
 	    }
 	    cmp--;
 	    if (ump < cmp) {
-		errno = 0;
-		error("Map uncompression error (%d,%d)",
-		    cmp - Setup->map_data, ump - Setup->map_data);
+		warn("Map uncompression error (%d,%d)",
+		     cmp - Setup->map_data, ump - Setup->map_data);
 		return -1;
 	    }
 	}
     }
     if (ump != cmp) {
-	errno = 0;
-	error("map uncompress error (%d,%d)",
-	    cmp - Setup->map_data, ump - Setup->map_data);
+	warn("map uncompress error (%d,%d)",
+	     cmp - Setup->map_data, ump - Setup->map_data);
 	return -1;
     }
     Setup->map_order = SETUP_MAP_UNCOMPRESSED;
@@ -586,8 +582,7 @@ int Net_setup(void)
 				     Setup->data_url);
 		}
 		if (n <= 0) {
-		    errno = 0;
-		    error("Can't read setup info from reliable data buffer");
+		    warn("Can't read setup info from reliable data buffer");
 		    return -1;
 		}
 
@@ -599,15 +594,13 @@ int Net_setup(void)
 		    || Setup->height <= 0
 		    || (oldServer && Setup->map_data_len >
 			Setup->x * Setup->y)) {
-			  errno = 0;
-		    error("Got bad map specs from server (%d,%d,%d)",
-			Setup->map_data_len, Setup->width, Setup->height);
+		    warn("Got bad map specs from server (%d,%d,%d)",
+			 Setup->map_data_len, Setup->width, Setup->height);
 		    return -1;
 		}
 		if (oldServer && Setup->map_order != SETUP_MAP_ORDER_XY
 		    && Setup->map_order != SETUP_MAP_UNCOMPRESSED) {
-		    errno = 0;
-		    error("Unknown map order type (%d)", Setup->map_order);
+		    warn("Unknown map order type (%d)", Setup->map_order);
 		    return -1;
 		}
 		size = sizeof(setup_t) + Setup->map_data_len;
@@ -634,13 +627,11 @@ int Net_setup(void)
 	    if (rbuf.len > 0) {
 		if (rbuf.ptr[0] != PKT_RELIABLE) {
 		    if (rbuf.ptr[0] == PKT_QUIT) {
-			errno = 0;
-			error("Server closed connection");
+			warn("Server closed connection");
 			return -1;
 		    } else {
-			errno = 0;
-			error("Not a reliable packet (%d) in setup",
-			    rbuf.ptr[0]);
+			warn("Not a reliable packet (%d) in setup",
+			     rbuf.ptr[0]);
 			return -1;
 		    }
 		}
@@ -659,10 +650,9 @@ int Net_setup(void)
 	    }
 	    for (retries = 0;; retries++) {
 		if (retries >= 10) {
-		    errno = 0;
-		    error("Can't read setup after %d retries "
-			  "(todo=%d, left=%d)",
-			  retries, todo, cbuf.len - (cbuf.ptr - cbuf.buf));
+		    warn("Can't read setup after %d retries "
+			 "(todo=%d, left=%d)",
+			 retries, todo, cbuf.len - (cbuf.ptr - cbuf.buf));
 		    return -1;
 		}
 		sock_set_timeout(&rbuf.sock, 2, 0);
@@ -719,8 +709,7 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 	if (retries == 0
 	    || time(NULL) - last >= 3) {
 	    if (retries++ >= MAX_VERIFY_RETRIES) {
-		errno = 0;
-		error("Can't connect to server after %d retries", retries);
+		warn("Can't connect to server after %d retries", retries);
 		return -1;
 	    }
 	    Sockbuf_clear(&wbuf);
@@ -753,12 +742,10 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 	}
 	if (rbuf.ptr[0] != PKT_RELIABLE) {
 	    if (rbuf.ptr[0] == PKT_QUIT) {
-		errno = 0;
-		error("Server closed connection");
+		warn("Server closed connection");
 		return -1;
 	    } else {
-		errno = 0;
-		error("Bad packet type when verifying (%d)", rbuf.ptr[0]);
+		warn("Bad packet type when verifying (%d)", rbuf.ptr[0]);
 		return -1;
 	    }
 	}
@@ -772,18 +759,15 @@ int Net_verify(char *real, char *nick, char *disp, int my_team)
 	    continue;
 	}
 	if (Receive_reply(&type, &result) <= 0) {
-	    errno = 0;
-	    error("Can't receive verify reply packet");
+	    warn("Can't receive verify reply packet");
 	    return -1;
 	}
 	if (type != PKT_VERIFY) {
-	    errno = 0;
-	    error("Verify wrong reply type (%d)", type);
+	    warn("Verify wrong reply type (%d)", type);
 	    return -1;
 	}
 	if (result != PKT_SUCCESS) {
-	    errno = 0;
-	    error("Verification failed (%d)", result);
+	    warn("Verification failed (%d)", result);
 	    return -1;
 	}
 	if (Receive_magic() <= 0) {
@@ -1021,8 +1005,7 @@ int Net_start(void)
 	if (retries == 0
 	    || (time(NULL) - last) > 1) {
 	    if (retries++ >= 10) {
-		errno = 0;
-		error("Can't start play after %d retries", retries);
+		warn("Can't start play after %d retries", retries);
 		return -1;
 	    }
 	    Sockbuf_clear(&wbuf);
@@ -1060,8 +1043,7 @@ int Net_start(void)
 	    }
 	    if (rbuf.ptr[0] != PKT_RELIABLE) {
 		if (rbuf.ptr[0] == PKT_QUIT) {
-		    errno = 0;
-		    error("Server closed connection");
+		    warn("Server closed connection");
 		    return -1;
 		}
 		else if (rbuf.ptr[0] == PKT_START) {
@@ -1107,24 +1089,20 @@ int Net_start(void)
 	    continue;
 	}
 	if (cbuf.ptr[0] != PKT_REPLY) {
-	    errno = 0;
-	    error("Not a reply packet after play (%d,%d,%d)",
-		cbuf.ptr[0], cbuf.ptr - cbuf.buf, cbuf.len);
+	    warn("Not a reply packet after play (%d,%d,%d)",
+		 cbuf.ptr[0], cbuf.ptr - cbuf.buf, cbuf.len);
 	    return -1;
 	}
 	if (Receive_reply(&type, &result) <= 0) {
-	    errno = 0;
-	    error("Can't receive reply packet after play");
+	    warn("Can't receive reply packet after play");
 	    return -1;
 	}
 	if (type != PKT_PLAY) {
-	    errno = 0;
-	    error("Can't receive reply packet after play");
+	    warn("Can't receive reply packet after play");
 	    return -1;
 	}
 	if (result != PKT_SUCCESS) {
-	    errno = 0;
-	    error("Start play not allowed (%d)", result);
+	    warn("Start play not allowed (%d)", result);
 	    return -1;
 	}
 	break;
@@ -1187,17 +1165,16 @@ static int Net_packet(void)
 	type = (*rbuf.ptr & 0xFF);
 
 	if (receive_tbl[type] == NULL) {
-	    errno = 0;
-	    IFNWINDOWS(error("Received unknown packet type (%d, %d), dropping frame.",
-			type, prev_type);)
+	    warn("Received unknown packet type (%d, %d), "
+		 "dropping frame.", type, prev_type);
 	    Sockbuf_clear(&rbuf);
 	    break;
 	}
 	else if ((result = (*receive_tbl[type])()) <= 0) {
 	    if (result == -1) {
 		if (type != PKT_QUIT) {
-		    errno = 0;
-		    error("Processing packet type (%d, %d) failed", type, prev_type);
+		    warn("Processing packet type (%d, %d) failed",
+			 type, prev_type);
 		}
 		return -1;
 	    }
@@ -1217,14 +1194,13 @@ static int Net_packet(void)
 		return -1;
 	    }
 	    /* should do something more appropriate than this with the reply */
-	    errno = 0;
-	    error("Got reply packet (%d,%d)", replyto, status);
+	    warn("Got reply packet (%d,%d)", replyto, status);
 	}
 	else if (reliable_tbl[type] == NULL) {
 	    int i;
-	    errno = 0;
-	    IFNWINDOWS(error("Received unknown reliable data packet type (%d,%d,%d)",
-					type, cbuf.ptr - cbuf.buf, cbuf.len);)
+
+	    warn("Received unknown reliable data packet type (%d,%d,%d)",
+		 type, cbuf.ptr - cbuf.buf, cbuf.len);
 	    printf("\tdumping buffer for debugging:\n");
 	    for (i = 0; i < cbuf.len; i++) {
 		printf("%3d", cbuf.buf[i] & 0xFF);
@@ -1590,8 +1566,7 @@ int Net_input(void)
 	 * Couldn't find a non-empty packet.
 	 */
 	if (oldest_frame->loops > 0) {
-	    errno = 0;
-	    error("bug %s,%d", __FILE__, __LINE__);
+	    warn("bug %s,%d", __FILE__, __LINE__);
 	    oldest_frame->loops = 0;
 	}
 	return 0;
@@ -1806,13 +1781,11 @@ int Receive_motd(void)
 int Net_ask_for_motd(long offset, long maxlen)
 {
     if (offset < 0 || maxlen <= 0) {
-	errno = 0;
-	error("Bad motd request (%ld, %ld)", offset, maxlen);
+	warn("Bad motd request (%ld, %ld)", offset, maxlen);
 	return -1;
     }
     if (Packet_printf(&wbuf, "%c%ld%ld", PKT_MOTD, offset, maxlen) <= 0) {
-	errno = 0;
-	error("Can't ask motd");
+	warn("Can't ask motd");
 	return -1;
     }
 
@@ -2801,8 +2774,7 @@ int Receive_reliable(void)
 	return -1;
     }
     if (n == 0) {
-	errno = 0;
-	error("Incomplete reliable data packet");
+	warn("Incomplete reliable data packet");
 	return 0;
     }
 #if DEBUG
@@ -2812,14 +2784,12 @@ int Receive_reliable(void)
     }
 #endif
     if (len <= 0) {
-	errno = 0;
-	error("Bad reliable data length (%d)", len);
+	warn("Bad reliable data length (%d)", len);
 	return -1;
     }
     if (rbuf.ptr + len > rbuf.buf + rbuf.len) {
-	errno = 0;
-	error("Not all reliable data in packet (%d,%d,%d)",
-	      rbuf.ptr - rbuf.buf, len, rbuf.len);
+	warn("Not all reliable data in packet (%d,%d,%d)",
+	     rbuf.ptr - rbuf.buf, len, rbuf.len);
 	rbuf.ptr += len;
 	Sockbuf_advance(&rbuf, rbuf.ptr - rbuf.buf);
 	return -1;
@@ -2858,8 +2828,7 @@ int Receive_reliable(void)
 	Sockbuf_advance(&cbuf, cbuf.ptr - cbuf.buf);
     }
     if (Sockbuf_write(&cbuf, rbuf.ptr, len) != len) {
-	errno = 0;
-	error("Can't copy reliable data to buffer");
+	warn("Can't copy reliable data to buffer");
 	rbuf.ptr += len;
 	Sockbuf_advance(&rbuf, rbuf.ptr - rbuf.buf);
 	return -1;
@@ -3002,14 +2971,12 @@ int Receive_quit(void)
 	sbuf = &cbuf;
     }
     if (Packet_scanf(sbuf, "%c", &pkt) != 1) {
-	errno = 0;
-	error("Can't read quit packet");
+	warn("Can't read quit packet");
     } else {
 	if (Packet_scanf(sbuf, "%s", reason) <= 0) {
 	    strlcpy(reason, "unknown reason", MAX_CHARS);
 	}
-	errno = 0;
-	error("Got quit packet: \"%s\"", reason);
+	warn("Got quit packet: \"%s\"", reason);
     }
     return -1;
 }
