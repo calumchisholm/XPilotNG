@@ -280,7 +280,6 @@ static int Talk_macro_parse_mesg(char *outbuf, char *inbuf, long pos, long max)
 			pos = Talk_macro_parse_mesg (outbuf, tmpptr3, pos, max);
 		    }
 		    inbuf = nextpos;
-		    free (tmpptr);
 		    free (tmpptr1);
 		    free (tmpptr2);
 		    free (tmpptr3);
