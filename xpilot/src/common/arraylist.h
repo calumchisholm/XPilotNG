@@ -80,6 +80,9 @@ void Arraylist_trim(arraylist_t *alp);
 /* Make sure max elements is at least equal to this. */
 void Arraylist_ensure_capacity(arraylist_t *alp, int capacity);
 
+/* Returns true if this list contains the specified element. */
+bool Arraylist_contains(arraylist_t *alp, void *element);
+
 /* Sort arraylist entries, check qsort(3) for explanation of 'cmp'. */
 void Arraylist_sort(arraylist_t *alp, int (*cmp)(const void *, const void *));
 
