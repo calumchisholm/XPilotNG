@@ -1,3 +1,10 @@
+----------------------------------------------------------------------
+Problem : \ignore with textmask doesnt work properly - "ball" "safe"
+Found by: Throat
+Solution:
+Fixed by:
+Files 
+affected: clientcommand.c messages.c
 
 ----------------------------------------------------------------------
 Problem : Internal edges are painted in SDL client
