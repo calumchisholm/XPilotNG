@@ -1534,7 +1534,7 @@ static void Player_pass_checkpoint(int ind)
 		    }
 		}
 	    }
-	    Player_death_reset(ind);
+	    Player_death_reset(ind, false);
 	    pl->mychar = 'D';
 	    SET_BIT(pl->status, GAME_OVER|FINISH);
 	    sprintf(msg,

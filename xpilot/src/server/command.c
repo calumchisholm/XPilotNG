@@ -1049,7 +1049,7 @@ static int Cmd_pause(char *arg, player *pl, int oper, char *msg)
 	if (Players[i]->conn != NOT_CONNECTED) {
 	    if (BIT(Players[i]->status, PLAYING | PAUSE | GAME_OVER | KILLED)
 		== PLAYING) {
-		Kill_player(i);
+		Kill_player(i, false);
 	    }
 	    if (Team_zero_pausing_available()) {
 		sprintf(msg, "%s was pause-swapped by %s.",

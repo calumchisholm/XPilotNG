@@ -107,8 +107,8 @@ void Rank_nuke_score(RankInfo *rank);
 	{ (pl)->grabbedBallFrame = -1; }
 #define Rank_ClearKills(pl)	{ (pl)->kills = 0; }
 #define Rank_ClearDeaths(pl)	{ (pl)->deaths = 0; }
-#define Rank_IgnoreLastDeath(pl) \
-	{ if ((pl)->rank) (pl)->rank->entry.deaths--;}
+/*#define Rank_IgnoreLastDeath(pl) \
+  { if ((pl)->rank) (pl)->rank->entry.deaths--;}*/
 
 #define Rank_AddRound(pl) \
 	{ if ((pl)->rank) (pl)->rank->entry.rounds++; }

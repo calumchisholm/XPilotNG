@@ -685,18 +685,18 @@ void Reset_all_players(void)
 	pl = Players[i];
 	if (endOfRoundReset) {
 	    if (BIT(pl->status, PAUSE)) {
-		Player_death_reset(i);
+		Player_death_reset(i, false);
 	    } else {
-		Kill_player(i);
+		Kill_player(i, false);
 		if (pl != Players[i]) {
 		    /* player was deleted. */
 		    i--;
 		    continue;
 		}
 	    }
-	    /* kps - hacks upon hacks ;), consider removing ignorelastdeath */
-	    if (!(teamZeroPausing && pl->team == 0))
-		Rank_IgnoreLastDeath(pl);
+	    /* kps - I have absolutely no idea why this was here */
+	    /*if (!(teamZeroPausing && pl->team == 0))
+	      Rank_IgnoreLastDeath(pl);*/
 	}
 	CLR_BIT(pl->status, GAME_OVER);
 	CLR_BIT(pl->have, HAS_BALL);
@@ -1192,10 +1192,9 @@ void Race_game_over(void)
 
 	/* Kill any remaining players */
 	if (!BIT(pl->status, GAME_OVER))
-	    Kill_player(i);
+	    Kill_player(i, false);
 	else
-	    Player_death_reset(i);
-	Rank_IgnoreLastDeath(pl);
+	    Player_death_reset(i, false);
 
 	if (pl != Players[i]) {
 	    continue;
@@ -1989,17 +1988,17 @@ void Detach_ball(int ind, int obj)
     }
 }
 
-void Kill_player(int ind)
+void Kill_player(int ind, bool add_rank_death)
 {
     /* Don't create an explosion if the player is being transported back
      * to home base after being killed. */
     if (BIT(Players[ind]->status, PLAYING)) {
 	Explode_fighter(ind);
     }
-    Player_death_reset(ind);
+    Player_death_reset(ind, add_rank_death);
 }
 
-void Player_death_reset(int ind)
+void Player_death_reset(int ind, bool add_rank_death)
 {
     player		*pl = Players[ind];
     long		minfuel;
@@ -2064,7 +2063,8 @@ void Player_death_reset(int ind)
 
     if (!BIT(pl->status, PAUSE)) {
 
-	Rank_AddDeath(pl);
+	if (add_rank_death)
+	    Rank_AddDeath(pl);
 
 	if (BIT(World.rules->mode, LIMITED_LIVES)) {
 	    pl->life--;

@@ -901,8 +901,7 @@ void Update_objects(void)
 		    if ( NumPlayers - 1 > NumPseudoPlayers + NumRobots ) {
 			/* Kill player, he/she will be paused when returned
 			   to base, unless he/she wakes up. */
-			Kill_player(i);
-			Rank_IgnoreLastDeath(pl);
+			Kill_player(i, false);
 		    } else
 			pl->idleCount = 0;
 		}
@@ -948,7 +947,7 @@ void Update_objects(void)
 		    sprintf(msg, "%s has committed suicide.", pl->name);
 		    Set_message(msg);
 		    Throw_items(i);
-		    Kill_player(i);
+		    Kill_player(i, true);
 		    updateScores = true;
 		}
 	    }
@@ -1339,7 +1338,7 @@ void Update_objects(void)
 
 	    Detonate_items(i);
 
-	    Kill_player(i);
+	    Kill_player(i, true);
 
 	    if (IS_HUMAN_PTR(pl)) {
 		if (frame_loops - pl->frame_last_busy > 60 * FPS) {
