@@ -56,26 +56,31 @@ bool		updateScores = true;
 
 static int	playerArrayNumber;
 
-/* this can be changed to a macro for efficiency */
-player *Players1(int ind, char *file, int line)
+/*
+ * Get player with index 'ind' from Players array.
+ */
+player *Players(int ind)
 {
     /* Players(-1) evaluates to NULL */
     if (ind == -1)
 	return NULL;
 
     if (ind < 0 || ind >= playerArrayNumber) {
-	warn("%s: %d: Players: ind = %d, array size = %d\n",
-	     file, line, ind, playerArrayNumber);
+	warn("Players: ind = %d, array size = %d\n",
+	     ind, playerArrayNumber);
 	return NULL;
     }
     return PlayersArray[ind];
 }
 
-int GetInd1(int id, char *file, int line)
+/*
+ * Get index in Players array for player with id 'id'.
+ */
+int GetInd(int id)
 {
     if (id < 0 || id >= NUM_IDS + MAX_OBSERVERS + 1) {
-	warn("%s: %d: GetInd: id = %d, array size = %d\n",
-	     file, line, id, NUM_IDS + MAX_OBSERVERS + 1);
+	warn("GetInd: id = %d, array size = %d\n",
+	     id, NUM_IDS + MAX_OBSERVERS + 1);
 	return -1;
     }
     return GetIndArray[id];

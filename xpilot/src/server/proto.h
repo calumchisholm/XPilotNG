@@ -323,9 +323,8 @@ int Get_player_index_by_name(char *name);
 /*
  * Prototypes for player.c
  */
-/*player *Players(int ind);*/
-player *Players1(int ind, char *file, int line);
-int GetInd1(int id, char *file, int line);
+player *Players(int ind);
+int GetInd(int id);
 void Pick_startpos(player *pl);
 void Go_home(player *pl);
 void Compute_sensor_range(player *pl);
