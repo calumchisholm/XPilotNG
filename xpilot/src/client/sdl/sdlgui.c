@@ -302,10 +302,15 @@ int Gui_init(void)
 	return -1;
     }
 
+    /* TODO: figure out proper casting here do not use _GLUfuncptr */
+    /* it doesn't work on windows  or MAC OS X */
+#ifdef _MSC_VER 
+    gluTessCallback(tess, GLU_TESS_BEGIN, glBegin);
+    gluTessCallback(tess, GLU_TESS_VERTEX_DATA, vertex_callback);
+#else
     gluTessCallback(tess, GLU_TESS_BEGIN, (GLvoid (*)())glBegin);
-	/* TODO: figure out proper casting here do not use _GLUfuncptr */
-	/* it doesn't work on windows  or MAC OS X */
     gluTessCallback(tess, GLU_TESS_VERTEX_DATA, (GLvoid (*)())vertex_callback);
+#endif
     gluTessCallback(tess, GLU_TESS_END, glEnd);
 
     for (i = 0; i < num_polygons; i++) {

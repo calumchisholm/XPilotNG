@@ -219,8 +219,8 @@ void Xpmap_blocks_to_polygons(world_t *world);
 /*
  * Prototypes for xp2map.c
  */
-bool isXp2MapFile(int fd);
-bool parseXp2MapFile(int fd, optOrigin opt_origin, world_t *world);
+bool isXp2MapFile(FILE* ifile);
+bool parseXp2MapFile(char* fname, optOrigin opt_origin, world_t *world);
 
 
 /*

@@ -255,13 +255,21 @@ void teamcup_open_score_file(void)
     if (options.teamcupMatchNumber && !teamcup_have_fork) {
 	int mypipes[2];
 
+#ifndef _WINDOWS
 	if (pipe(mypipes) != 0) {
+#else
+	{
+#endif
 	    xpprintf("Unable to create pipes!\n");
 	    End_game();
 	}
 
 	teamcup_status_fd = mypipes[1];
+#ifndef _WINDOWS
 	teamcup_child_pid = fork();
+#else
+	teamcup_child_pid = -1;
+#endif
 	switch (teamcup_child_pid) {
 	case -1:
 	    teamcup_child_pid = 0;
@@ -442,8 +450,10 @@ void teamcup_round_end(int winning_team)
 
 void teamcup_kill_child(void)
 {
+#ifndef _WINDOWS
     if (teamcup_child_pid != 0)
 	kill(teamcup_child_pid, SIGINT);
+#endif
 }
 
 #if 0

@@ -46,22 +46,3 @@ void _Trace(char *fmt, ...)
 
 void Progress(char *fmt, ...) {}
 void MarkPlayersForRedraw(void) {}
-
-int Winsock_init(void)
-{
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	
-	/* I have no idea which version of winsock supports
-	 * the required socket stuff. */
-	wVersionRequested = MAKEWORD( 1, 0 );
-	if (WSAStartup( wVersionRequested, &wsaData ))
-		return -1;
-
-	return 0;
-}
-
-void Winsock_cleanup(void)
-{
-	WSACleanup();
-}

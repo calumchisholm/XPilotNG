@@ -489,13 +489,13 @@ static void tagend(void *data, const char *el)
 }
 
 
-bool isXp2MapFile(int fd)
+bool isXp2MapFile(FILE* ifile)
 {
     char start[] = "<XPilotMap";
     char buf[16];
     int n;
 
-    n = read(fd, buf, sizeof(buf));
+    n = fread(buf, 1, sizeof(buf), ifile);
     if (n < 0) {
 	error("Error reading map!");
 	return false;
@@ -504,7 +504,7 @@ bool isXp2MapFile(int fd)
 	return false;
 
     /* assume this works */
-    (void)lseek(fd, 0, SEEK_SET);
+    fseek(ifile, 0, SEEK_SET);
     /* gz magic from gzio.h */
     if (buf[0] == (char)0x1f && buf[1] == (char)0x8b)
 	return true;
@@ -513,26 +513,24 @@ bool isXp2MapFile(int fd)
     return false;
 }
 
-bool parseXp2MapFile(int fd, optOrigin opt_origin, world_t *world)
+bool parseXp2MapFile(char* fname, optOrigin opt_origin, world_t *world)
 {
     gzFile in;
-    struct stat info;
     char buff[8192];
-    int len;
-    unsigned int left;
+    int len, left, last_chunk;
     XML_Parser p = XML_ParserCreate(NULL);
 
     current_world = world;
-
+    
     UNUSED_PARAM(opt_origin);
     if (!p) {
 	warn("Creating Expat instance for map parsing failed.\n");
 	return false;
     }
     XML_SetElementHandler(p, tagstart, tagend);
-    /* dup used here because gzclose closes the fd */
-    fd = dup(fd);
-    if (fd == -1 || (in = gzdopen(fd, "rb")) == NULL) {
+    
+    in = gzopen(fname, "rb");
+    if (in == NULL) {
 	error("Error reading map!");
 	return false;
     }
@@ -541,6 +539,7 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin, world_t *world)
 	gzclose(in);
 	return false;
     }
+    left = 1 << 30;
     if (strncmp("XPD ", buff, 4) == 0) {
 	if (gzgets(in, buff, 8192) == Z_NULL
 	    || sscanf(buff, "%*s %u", &left) != 1) {
@@ -549,30 +548,29 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin, world_t *world)
 	    return false;
 	}
     } else {
-	if (gzrewind(in) == -1
-	    || 	fstat(fd, &info) == -1) {
+	if (gzrewind(in) == -1) {
 	    error("Error reading map!");
 	    gzclose(in);
 	    return false;
 	}
-	left = (unsigned int)info.st_size;
     }
     do {
-	len = gzread(in, buff, MIN(8192, left));
+        len = gzread(in, buff, MIN(8192, left));
 	if (len < 0) {
 	    error("Error reading map!");
 	    gzclose(in);
 	    return false;
 	}
 	left -= len;
-	if (!XML_Parse(p, buff, len, left == 0)) {
+	last_chunk = (left == 0 || len < 8192);
+	if (!XML_Parse(p, buff, len, last_chunk)) {
 	    warn("Parse error reading map at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));
 	    gzclose(in);
 	    return false;
 	}
-    } while (left);
+    } while (!last_chunk);
     gzclose(in);
     return true;
 }

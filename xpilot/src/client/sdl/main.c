@@ -34,9 +34,7 @@ static void Main_shutdown(void)
 {
     Net_cleanup();
     Client_cleanup();
-#ifdef _WINDOWS
-	Winsock_cleanup();
-#endif
+    sock_cleanup();
 }
 
 static void sigcatch(int signum)
@@ -80,12 +78,10 @@ int main(int argc, char *argv[])
     /* CLIENTRANK */
     Init_saved_scores();
 
-#ifdef _WINDOWS
-    if (Winsock_init()) {
-	error("failed to initialize windows networking");
+    if (sock_startup()) {
+	error("failed to initialize networking");
 	exit(1);
     }
-#endif
 
     if (xpArgs.text || xpArgs.auto_connect || argv[1]) {
 	if (!Contact_servers(argc - 1, &argv[1],

@@ -234,9 +234,9 @@
 #  include "../server/NT/winServer.h"
 #  include "../server/NT/winSvrThread.h"
 extern char *showtime(void);
-# elif !defined(_XPMONNT_)
+/*# elif !defined(_XPMONNT_)
 #  include "NT/winX.h"
-#  include "../client/NT/winClient.h"
+#  include "../client/NT/winClient.h"*/
 # endif
 static void Win_show_error(char *errmsg);
 # include <io.h>
@@ -253,7 +253,10 @@ static void Win_show_error(char *errmsg);
 # define write(x__, y__, z__) send(x__, y__, z__,0)
   /* Windows some more hacks: */
 # define getpid() _getpid()
+#ifdef _MSC_VER
 typedef int socklen_t;
+#define inline __inline
+#endif
 #endif
 
 static inline double timeval_to_seconds(struct timeval tv)

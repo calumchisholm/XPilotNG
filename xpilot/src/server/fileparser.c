@@ -333,13 +333,11 @@ static void parseLine(char **map_ptr, optOrigin opt_origin)
  */
 static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
 {
-    int fd, n;
+    int n;
     size_t map_offset, map_size;
     char *map_buf;
 
     LineNumber = 1;
-
-    fd = fileno(ifile);
 
     /*
      * In case first map fails and this is another 
@@ -349,9 +347,9 @@ static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
     /*
      * First try the xp2 map format 
      */
-    if (isXp2MapFile(fd)) {
+    if (isXp2MapFile(ifile)) {
 	is_polygon_map = true;
-	return parseXp2MapFile(fd, opt_origin, world);
+	return parseXp2MapFile(FileName, opt_origin, world);
     }
 
     /*
@@ -369,7 +367,7 @@ static bool parseOpenFile(FILE * ifile, optOrigin opt_origin, world_t *world)
     }
 
     for (;;) {
-	n = read(fd, &map_buf[map_offset], map_size - map_offset);
+	n = fread(&map_buf[map_offset], 1, map_size - map_offset, ifile);
 	if (n < 0) {
 	    error("Error reading map!");
 	    free(map_buf);

@@ -585,9 +585,6 @@ void Update_score_table(world_t *world)
 	}
     }
     updateScores = false;
-#ifdef _WINDOWS
-    SendDialogUpdate();
-#endif
 }
 
 

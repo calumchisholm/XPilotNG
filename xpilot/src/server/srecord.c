@@ -38,7 +38,7 @@ int   rrecord;
 int   rplayback;
 int   recOpt;
 
-enum types {CHAR, INT, SHORT, ERRNO };
+enum types {REC_CHAR, REC_INT, REC_SHORT, REC_ERRNO };
 #define BUF_INITIALIZER(p,t,s,tr,st,nr) { p, t, s, tr, st, nr }
 static struct buf {
     void ** const curp;
@@ -49,14 +49,14 @@ static struct buf {
     int num_read;
 } bufs[] =
 {
-    BUF_INITIALIZER((void **)&playback_ints, INT, 5000, 4000, NULL, 0),
-    BUF_INITIALIZER((void **)&playback_errnos, ERRNO, 5000, 4000, NULL, 0),
-    BUF_INITIALIZER((void **)&playback_shorts, SHORT, 25000, 23000, NULL, 0),
-    BUF_INITIALIZER((void **)&playback_data, CHAR, 200000, 100000, NULL, 0),
-    BUF_INITIALIZER((void **)&playback_sched, CHAR, 50000, 40000, NULL, 0),
-    BUF_INITIALIZER((void **)&playback_ei, INT, 2000, 1000, NULL, 0),
-    BUF_INITIALIZER((void **)&playback_es, CHAR, 5000, 4000, NULL, 0),
-    BUF_INITIALIZER((void **)&playback_opttout, INT, 2000, 100, NULL, 0)
+    BUF_INITIALIZER((void **)&playback_ints, REC_INT, 5000, 4000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_errnos, REC_ERRNO, 5000, 4000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_shorts, REC_SHORT, 25000, 23000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_data, REC_CHAR, 200000, 100000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_sched, REC_CHAR, 50000, 40000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_ei, REC_INT, 2000, 1000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_es, REC_CHAR, 5000, 4000, NULL, 0),
+    BUF_INITIALIZER((void **)&playback_opttout, REC_INT, 2000, 100, NULL, 0)
 };
 
 const int num_types = sizeof(bufs) / sizeof(struct buf);
@@ -70,9 +70,9 @@ static void Convert_from_host(void *start, int len, int type)
     short *sptr, *sendp;
 
     switch (type) {
-    case CHAR:
+    case REC_CHAR:
 	return;
-    case INT:
+    case REC_INT:
 	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
@@ -80,7 +80,7 @@ static void Convert_from_host(void *start, int len, int type)
 	    iptr++;
 	}
 	return;
-    case SHORT:
+    case REC_SHORT:
 	sptr = (short *)start;
 	sendp = sptr + len / 2;
 	while (sptr < sendp) {
@@ -88,7 +88,7 @@ static void Convert_from_host(void *start, int len, int type)
 	    sptr++;
 	}
 	return;
-    case ERRNO:
+    case REC_ERRNO:
 	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
@@ -115,9 +115,9 @@ static void Convert_to_host(void *start, int len, int type)
     short *sptr, *sendp;
 
     switch (type) {
-    case CHAR:
+    case REC_CHAR:
 	return;
-    case INT:
+    case REC_INT:
 	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
@@ -125,7 +125,7 @@ static void Convert_to_host(void *start, int len, int type)
 	    iptr++;
 	}
 	return;
-    case SHORT:
+    case REC_SHORT:
 	sptr = (short *)start;
 	sendp = sptr + len / 2;
 	while (sptr < sendp) {
@@ -133,7 +133,7 @@ static void Convert_to_host(void *start, int len, int type)
 	    sptr++;
 	}
 	return;
-    case ERRNO:
+    case REC_ERRNO:
 	iptr = (int *)start;
 	iend = iptr + len / 4;
 	while (iptr < iend) {
@@ -211,7 +211,7 @@ void Get_recording_data(void)
 	*bufs[i].curp = bufs[i].start;
 	Convert_to_host(bufs[i].start, len, bufs[i].type);
 	/* Some of the int buffers must be terminated with INT_MAX */
-	if (bufs[i].type == INT)
+	if (bufs[i].type == REC_INT)
 	    *(int *)((char *)bufs[i].start + len) = INT_MAX;
     }
 }

@@ -1145,7 +1145,7 @@ int Net_input(void)
 	    }
 	}
 	if ((i == receive_window_size - 1 && i > 0)
-#ifdef _WINDOWS
+#if 0
 	    || drawPending
 	    || (ThreadedDraw &&
 		!WaitForSingleObject(dinfo.eventNotDrawing, 0)

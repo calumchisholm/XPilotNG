@@ -28,6 +28,7 @@
 
 #ifdef _WINDOWS
 #  /* kps - what about this ???? */
+#  undef CONF_DATADIR
 #  define CONF_DATADIR			"lib/"
 #endif
 
@@ -157,7 +158,6 @@
 #    define xpprintf	xpprintfW
 /* # define xpprintf _Trace  */
 #  else
-#    define xpprintf	_Trace
 #  endif
 #endif
 

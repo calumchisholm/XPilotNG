@@ -30,10 +30,9 @@
 #define PORTABILITY_H
 
 #ifdef _WINDOWS
+
 #undef max
 #undef min
-
-#define	strncasecmp(__a, __b, __c)	strnicmp(__a, __b, __c)
 
 /* there are tons of "conversion from 'double ' to 'int '", stop warning us */
 #pragma warning (disable : 4244)
@@ -79,6 +78,7 @@ extern	int ServerKilled;
  */
 extern int Get_process_id(void);	/* getpid */
 extern void Get_login_name(char *buf, size_t size);
+extern int xpprintf (char* fmt, ...);
 
 /*
  * Prototypes for testing if we are running under a certain OS.
@@ -93,6 +93,11 @@ extern bool is_this_windows(void);
 double rint(double x);
 #endif
 
+#ifdef _MSC_VER
+typedef unsigned short uint16_t; /* e.g. in client.c */
+typedef unsigned int uint32_t;
+typedef int int32_t;
+#endif
 
 #ifdef _WINDOWS
 /*
@@ -127,39 +132,8 @@ struct timezone {
 
 
 #  ifndef HAVE_GETTIMEOFDAY
-__inline int gettimeofday(struct timeval *tv, struct timezone *tz)
-{
-    FILETIME        ft;
-    LARGE_INTEGER   li;
-    __int64         t;
-    static int      tzflag;
-
-    if (tv)
-    {
-        GetSystemTimeAsFileTime(&ft);
-        li.LowPart  = ft.dwLowDateTime;
-        li.HighPart = ft.dwHighDateTime;
-        t  = li.QuadPart;       /* In 100-nanosecond intervals */
-        t -= EPOCHFILETIME;     /* Offset to the Epoch time */
-        t /= 10;                /* In microseconds */
-        tv->tv_sec  = (long)(t / 1000000);
-        tv->tv_usec = (long)(t % 1000000);
-    }
-
-    if (tz)
-    {
-        if (!tzflag)
-        {
-            _tzset();
-            tzflag++;
-        }
-        tz->tz_minuteswest = _timezone / 60;
-        tz->tz_dsttime = _daylight;
-    }
-
-    return 0;
-
-}
+#define NEED_GETTIMEOFDAY
+extern gettimeofday(struct timeval *tv, struct timezone *tz);
 
 #  define HAVE_GETTIMEOFDAY 1
 

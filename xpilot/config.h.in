@@ -302,6 +302,9 @@
 /* Define to 1 if the C compiler supports function prototypes. */
 #undef PROTOTYPES
 
+/* enable replay program */
+#undef REPLAY
+
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
@@ -342,6 +345,9 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* enable x11 client */
+#undef X11_CLIENT
 
 /* Define to 1 if the X Window System is missing or not being used. */
 #undef X_DISPLAY_MISSING

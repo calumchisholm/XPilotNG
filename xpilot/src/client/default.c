@@ -1273,7 +1273,7 @@ xp_option_t default_options[] = {
 	"This is a list of one or more directories separated by colons.\n"),
 
     /* kps - these should not be needed in the SDL windows client. */
-#ifdef _WINDOWS
+#if 0
     XP_BOOL_OPTION(
 	"threadedDraw",
 	false,

@@ -66,27 +66,31 @@ fi])
 
 AC_ARG_ENABLE(newsched,
 	AC_HELP_STRING([--enable-newsched],
-		[enable new server scheduling most useful on Linux 2.6]),
-[if test x$enable_newsched = xyes; then
-	AC_DEFINE([NEWSCHED], 1,
-		[enable new server scheduling most useful on Linux 2.6])
-fi])
+		[enable new server scheduling most useful on Linux 2.6]))
+
+AC_ARG_ENABLE(replay,
+	AC_HELP_STRING([--disable-replay],
+			[disable building of replay program]),
+[], [enable_replay=yes])
+
+AC_ARG_ENABLE(x11_client,
+	AC_HELP_STRING([--disable-x11-client],
+			[disable X11 client]),
+[], [enable_x11_client=yes])
 
 AC_ARG_ENABLE(sdl_client,
-	AC_HELP_STRING([--enable-sdl-client],
-			[enable SDL/OpenGL client]),
-[if test x$enable_sdl_client = xyes; then
+	AC_HELP_STRING([--disable-sdl-client],
+			[disable SDL/OpenGL client]),
+[], [enable_sdl_client=yes])
+if test x$enable_sdl_client = xyes; then
 	AC_DEFINE([SDL_CLIENT], 1, [enable sdl client])
-fi])
+fi
 
 dnl  Do this if you want to use the gameloop without the X11 hack.
 AC_ARG_ENABLE(sdl_gameloop,
 	AC_HELP_STRING([--enable-sdl-gameloop],
 			[enable sdl gameloop in sdl client
-			 (otherwise use gameloop optimised for X11)]),
-[if test x$enable_sdl_gameloop = xyes; then
-	AC_DEFINE([SDL_GAMELOOP], 1, [enable sdl gameloop in sdl client])
-fi])
+			 (otherwise use gameloop optimised for X11)]))
 
 AC_ARG_ENABLE(sound,
 	AC_HELP_STRING([--enable-sound],
@@ -165,18 +169,32 @@ case "$target" in
 	;;
 esac
 
-dnl marvin - enable newsched and server-only when building for windows
 if test x$windows_target = xyes; then
 	W32_LIBS="-lmingw32 -lwsock32"
 	AC_SUBST(W32_LIBS)
 	AC_DEFINE([_WINDOWS], 1, [compiling for windows target])
-	
+
 	enable_newsched=yes
+	enable_sdl_gameloop=yes
+	enable_replay=no
+	enable_x11_client=no
+fi
+
+if test x$enable_sdl_gameloop = xyes; then
+  AC_DEFINE([SDL_GAMELOOP], 1, [enable sdl gameloop in sdl client])
+fi
+
+if test x$enable_x11_client = xyes; then
+	AC_DEFINE([X11_CLIENT], 1, [enable x11 client])
+fi
+
+if test x$enable_newsched = xyes; then
 	AC_DEFINE([NEWSCHED], 1,
 		[enable new server scheduling most useful on Linux 2.6])
-		
-	enable_server_only=yes
-	AC_DEFINE([SERVER_ONLY], 1, [build only the server])
+fi
+
+if test x$enable_replay = xyes; then
+	AC_DEFINE([REPLAY], 1, [enable replay program])
 fi
 
 dnl Stuff needed by SDL client.
@@ -189,6 +207,9 @@ if test x$enable_sdl_client = xyes; then
 		    :,
 		    AC_MSG_ERROR([*** SDL version $SDL_VERSION not found!])
 	)
+	
+	CFLAGS_BAK="$CFLAGS"
+	CXXFLAGS_BAK="$CXXFLAGS"
 	CFLAGS="$CFLAGS $SDL_CFLAGS"
 	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 
@@ -200,14 +221,14 @@ if test x$enable_sdl_client = xyes; then
 
 	dnl kps - hack to check for SDL_ttf
 	AC_MSG_CHECKING(for SDL_ttf)
-	have_libsdl_ttf=no
-	AC_TRY_COMPILE([
+	AC_COMPILE_IFELSE([
 	 #include "SDL.h"
 	 #include "SDL/SDL_ttf.h"
-	],[
+	 int main(int argc, char** argv) { return 0; }
 	],[
 	have_libsdl_ttf=yes
-	])
+	],[
+	have_libsdl_ttf=no])
 	AC_MSG_RESULT($have_libsdl_ttf)
 	if test x$have_libsdl_ttf = xyes; then
 	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_ttf"
@@ -218,14 +239,14 @@ if test x$enable_sdl_client = xyes; then
 
 	dnl kps - hack to check for SDL_image
 	AC_MSG_CHECKING(for SDL_image)
-	have_libsdl_image=no
-	AC_TRY_COMPILE([
+	AC_COMPILE_IFELSE([
 	 #include "SDL.h"
 	 #include "SDL/SDL_image.h"
-	],[
+	 int main(int argc, char** argv) { return 0; }
 	],[
 	have_libsdl_image=yes
-	])
+	],[
+	have_libsdl_image=no])
 	AC_MSG_RESULT($have_libsdl_image)
 	if test x$have_libsdl_image = xyes; then
 	    SDL_EXTRA_LIBS="$SDL_EXTRA_LIBS -lSDL_image"
@@ -238,14 +259,14 @@ if test x$enable_sdl_client = xyes; then
 
 	dnl Check for OpenGL
 	AC_MSG_CHECKING(for OpenGL support)
-	have_opengl=no
-	AC_TRY_COMPILE([
+	AC_COMPILE_IFELSE([
 	 #include <GL/gl.h>
 	 #include <GL/glu.h>
-	],[
+	 int main(int argc, char** argv) { return 0; } 
 	],[
 	have_opengl=yes
-	])
+	],[
+	have_opengl=no])
 	AC_MSG_RESULT($have_opengl)
 	if test x$have_opengl = xyes; then
 	    GL_LIBS="$SDL_LIBS $SYS_GL_LIBS"
@@ -253,9 +274,16 @@ if test x$enable_sdl_client = xyes; then
 	    AC_MSG_ERROR([*** Unable to find OpenGL headers and libraries!])
 	fi
 	AC_SUBST(GL_LIBS)
+	AC_SUBST(SDL_CFLAGS)
+	
+	CFLAGS="$CFLAGS_BAK"
+	CXXFLAGS="$CXXFLAGS_BAK"
 fi
 
+AM_CONDITIONAL([COND_WINDOWS], [test x$windows_target = xyes])
 AM_CONDITIONAL([COND_SERVER_ONLY], [test x$enable_server_only = xyes])
+AM_CONDITIONAL([COND_REPLAY], [test x$enable_replay = xyes])
+AM_CONDITIONAL([COND_X11_CLIENT], [test x$enable_x11_client = xyes])
 AM_CONDITIONAL([COND_SDL_CLIENT], [test x$enable_sdl_client = xyes])
 AM_CONDITIONAL([COND_SDL_GAMELOOP], [test x$enable_sdl_gameloop = xyes])
 

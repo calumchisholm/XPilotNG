@@ -64,6 +64,11 @@ int main(int argc, char **argv)
     char *addr;
     world_t *world = &World;
 
+    if (sock_startup() < 0) {
+    	xpprintf("Error initializing sockets\n");
+	return 1;
+    }
+
     World_init(world);
 
     /*
@@ -124,11 +129,7 @@ int main(int argc, char **argv)
 	addr = sock_get_addr_by_name(options.serverHost);
 	if (addr == NULL) {
 	    warn("Failed name lookup on: %s", options.serverHost);
-#ifndef _WINDOWS
 	    exit(1);
-#else
-	    return(1);
-#endif
 	}
 	serverAddr = xp_strdup(addr);
 	strlcpy(Server.host, options.serverHost, sizeof(Server.host));
@@ -354,10 +355,8 @@ int End_game(void)
 
     teamcup_kill_child();
 
-#ifndef _WINDOWS
+    sock_cleanup();
     exit (0);
-#endif
-    return(false); /* return false so windows bubbles out of the main loop */
 }
 
 /*

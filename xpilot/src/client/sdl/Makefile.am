@@ -1,7 +1,7 @@
 
 bin_PROGRAMS = xpilot-ng-sdl
 AM_CPPFLAGS = -DCONF_DATADIR=\"$(pkgdatadir)/\" \
-	-I$(top_srcdir)/src/common -I$(top_srcdir)/src/client
+	-I$(top_srcdir)/src/common -I$(top_srcdir)/src/client @SDL_CFLAGS@
 xpilot_ng_sdl_SOURCES = \
 	asteroid_data.h DT_drawtext.c DT_drawtext.h \
 	SDL_console.c SDL_console.h SDL_gfxPrimitives.c SDL_gfxPrimitives.h \
@@ -17,6 +17,10 @@ else
   xpilot_ng_sdl_SOURCES += gameloop_x.c
 endif
 
-xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11 @SOUND_LIBS@
+if COND_WINDOWS
+  xpilot_ng_sdl_SOURCES += win32hacks.c
+endif
 
-EXTRA_DIST = win32hacks.c xpilot.rc xpilot_sdl.dsp xpilot_sdl.dsw
+xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11 @SOUND_LIBS@ @W32_LIBS@
+
+EXTRA_DIST = xpilot.rc xpilot_sdl.dsp xpilot_sdl.dsw
