@@ -81,8 +81,7 @@ bool		restrictRobots;		/* Restrict robots to robotTeam? */
 bool		reserveRobotTeam;	/* Allow only robots in robotTeam? */
 int		ShotsMax;		/* Max shots pr. player */
 bool		ShotsGravity;		/* Shots affected by gravity */
-int		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
-static DFLOAT	fireRepeatRateSetting;	/* Above is set through this */
+DFLOAT		fireRepeatRate;		/* Ticks per autorepeat fire (0=off) */
 
 bool		RawMode;		/* Let robots live and calculate
 					   frames even if there are n
@@ -492,7 +491,7 @@ static option_desc options[] = {
 	"fireRepeatRate",
 	"fireRepeat",
 	"2.0",
-	&fireRepeatRateSetting,
+	&fireRepeatRate,
 	valReal,
 	Timing_setup,
 	"Number of ticks per automatic fire (0=off).\n",
@@ -3791,7 +3790,6 @@ void Timing_setup(void)
     timeStep2 = 1. / FPSMultiplier;
 
     ShotsLife = ShotsLifeSetting * TIME_FACT;
-    fireRepeatRate = fireRepeatRateSetting * TIME_FACT;
     pulseLife = pulseLifeSetting * TIME_FACT;
 
     friction = frictionSetting;
@@ -3810,7 +3808,6 @@ void Timing_setup(void)
     xpprintf(__FILE__ ": timeStep          = %d\n", timeStep);
     xpprintf(__FILE__ ": timeStep2         = %f\n", timeStep2);
     xpprintf(__FILE__ ": ShotsLife         = %d\n", ShotsLife);
-    xpprintf(__FILE__ ": fireRepeatRate    = %d\n", fireRepeatRate);
     xpprintf(__FILE__ ": friction          = %f\n", friction);
 #endif
 }

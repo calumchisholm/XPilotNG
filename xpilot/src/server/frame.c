@@ -99,7 +99,7 @@ typedef struct {
 
 extern time_t		gameOverTime;
 long			frame_loops = 1;
-unsigned long		frame_time = TIME_FACT;
+double			frame_time = 0;
 static long		last_frame_shuffle;
 static shuffle_t	*object_shuffle_ptr;
 static int		num_object_shuffle;
@@ -1250,11 +1250,7 @@ void Frame_update(void)
     static bool		game_over_called = false;
 
     frame_loops++;
-    frame_time += timeStep;
-    if (frame_time > ULONG_MAX - TIME_FACT) {
-	frame_loops = 0; /* This is likely to cause visible problems, but */
-	frame_time = 0;  /* maybe nothing fatal. Might happen after a ~month.*/
-    }
+    frame_time += timeStep2;
 
     Frame_shuffle();
 

@@ -1070,10 +1070,11 @@ void Fire_normal_shots(int ind)
     player		*pl = Players[ind];
     int			i, shot_angle;
 
-    if (frame_time < pl->shot_time + fireRepeatRate) {
+    /* Average non-integer repeat rates, so that smaller gap occurs first.
+     * 1e-3 "fudge factor" because "should be equal" cases return. */
+    if (frame_time <= pl->shot_time + fireRepeatRate - timeStep2 + 1e-3)
  	return;
-    }
-    pl->shot_time = frame_time;
+    pl->shot_time = MAX(frame_time, pl->shot_time + fireRepeatRate);
 
     shot_angle = MODS_SPREAD_MAX - pl->mods.spread;
 
@@ -1435,12 +1436,11 @@ void Fire_laser(int ind)
 {
     player	*pl = Players[ind];
     int		cx, cy;
-    int		laserRepeatRate = 1.5 * TIME_FACT;
+    double	laserRepeatRate = 2;
 
-    if (frame_time < pl->laser_time + laserRepeatRate) {
+    if (frame_time <= pl->laser_time + laserRepeatRate - timeStep2 + 1e-3)
  	return;
-    }
-    pl->laser_time = frame_time;
+    pl->laser_time = MAX(frame_time, pl->laser_time + laserRepeatRate);
 
     if (pl->item[ITEM_LASER] > pl->num_pulses
 	&& pl->velocity < pulseSpeed) {
