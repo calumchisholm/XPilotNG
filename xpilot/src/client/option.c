@@ -736,9 +736,8 @@ void Store_option(xp_option_t *opt)
 
 
 typedef struct xpilotrc_line {
-    const char *comment;
-    size_t size;
     xp_option_t *opt;
+    const char *comment;
 } xpilotrc_line_t;
 
 static xpilotrc_line_t	*xpilotrc_lines = NULL;
@@ -761,7 +760,7 @@ static void Parse_xpilotrc_line(const char *line)
     comment = strchr(l, ';');
     if (comment) {
 	/*warn("found comment on line \"%s\"\n", line);*/
-	t.comment = xp_safe_strdup(line);
+	t.comment = xp_safe_strdup(comment);
 	*comment = '\0';
     }
 
@@ -852,7 +851,6 @@ static void Parse_xpilotrc_line(const char *line)
 	}
 	else {
 	    /* line was like xpilot.wallColor: value */
-	    /*warn("YYY line is \"%s\"", line);*/
 	    value = strtok(NULL, "");
 	}
     }
@@ -1017,6 +1015,36 @@ static void Xpilotrc_write_resource(FILE *fp,
 }
 #undef TABSIZE
 
+#define TABSIZE 8
+static void Xpilotrc_write_line(FILE *fp, xpilotrc_line_t *lp)
+{
+    char buf[4096];
+    xp_option_t *opt = lp->opt;
+    int len, numtabs, i;
+
+    strcpy(buf, "");
+
+    if (opt) {
+	const char *value;
+
+	snprintf(buf, sizeof(buf), "xpilot.%s:", opt->name);
+	len = (int) strlen(buf);
+	/* assume tabs are max size of TABSIZE */
+	numtabs = ((5 * TABSIZE - 1) - len) / TABSIZE;
+	for (i = 0; i < numtabs; i++)
+	    strlcat(buf, "\t", sizeof(buf));
+	value = Option_value_to_string(opt);
+	if (value)
+	    strlcat(buf, value, sizeof(buf));
+    }
+
+    if (lp->comment)
+	strlcat(buf, lp->comment, sizeof(buf));
+
+    fprintf(fp, "%s\n", buf);
+}
+#undef TABSIZE
+
 int Xpilotrc_write(const char *path)
 {
     FILE *fp;
@@ -1034,19 +1062,42 @@ int Xpilotrc_write(const char *path)
 	return -2;
     }
 
-#if 0
+#if 1
     /* make sure all options are in the xpilotrc */
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
 	xp_option_origin_t origin;
+	const char *os;
 
 	/* Let's not save these */
 	if (Option_get_type(opt) == xp_noarg_option)
 	    continue;
 
 	origin = Option_get_origin(opt);
+#if 0
+	switch (origin) {
+	case xp_option_origin_default:  os = "default";  break;
+	case xp_option_origin_cmdline:  os = "cmdline";  break;
+	case xp_option_origin_env:      os = "env";      break;
+	case xp_option_origin_xpilotrc: os = "xpilotrc"; break;
+	case xp_option_origin_config:   os = "config";   break;
+	case xp_option_origin_setcmd:   os = "setcmd";   break;
+	default:                        os = "unknown";  break;
+	}
+	warn("option %s origin is %s.", Option_get_name(opt), os);
+#endif
+
+	if (origin == xp_option_origin_xpilotrc)
+	    /* exists already in the xpilotrc data struct */
+	    continue;
+
 	
-	
+    }
+
+    for (i = 0; i < num_xpilotrc_lines; i++) {
+	xpilotrc_line_t *lp = &xpilotrc_lines[i];
+
+	Xpilotrc_write_line(fp, lp);
     }
 
 #else
