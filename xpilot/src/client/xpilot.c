@@ -91,8 +91,9 @@ int main(int argc, char *argv[])
     Store_X_options();
     Store_hud_options();
     Store_paintradar_options();
-    Store_guimap_options();
     Store_xpaint_options();
+    Store_guimap_options();
+    Store_guiobject_options();
     Store_talk_macro_options();
     Store_key_options();
     Store_record_options();

@@ -67,4 +67,7 @@ void Gui_paint_ships_end(void);
 void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 		    int shield, int deflector, int eshield);
 
+void Store_guiobject_options(void);
+
 #endif
+

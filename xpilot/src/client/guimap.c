@@ -26,6 +26,7 @@
 
 char guimap_version[] = VERSION;
 
+static int baseNameColor;		/* Color index for base name drawing */
 static int backgroundPointColor;	/* background point drawing */
 static int fuelColor;			/* fuel station drawing */
 static int visibilityBorderColor;	/* visibility border drawing */
@@ -1272,6 +1273,13 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 }
 
 xp_option_t guimap_options[] = {
+    COLOR_INDEX_OPTION(
+	"baseNameColor",
+	2,
+	&baseNameColor,
+	"Which color number to use for drawing names of bases\n"
+	"(unless drawn in one of the life colors).\n"),
+
     COLOR_INDEX_OPTION(
 	"backgroundPointColor",
 	2,

@@ -55,6 +55,7 @@
 typedef struct {
     bool showShipShapes;
     bool showMyShipShape;
+    bool showShipShapesHack;
     bool showLivesByShip;
     bool showItems;
     bool showDecor;

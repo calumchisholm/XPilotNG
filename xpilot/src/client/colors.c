@@ -88,34 +88,8 @@ int	spark_color[MAX_COLORS];
 int	buttonColor;		/* Color index for button drawing */
 int	windowColor;		/* Color index for window drawing */
 int	borderColor;		/* Color index for border drawing */
-int	zeroLivesColor;		/* Color to associate with 0 lives */
-int	oneLifeColor;		/* Color to associate with 1 life */
-int	twoLivesColor;		/* Color to associate with 2 lives */
-int	manyLivesColor;		/* Color to associate with >2 lives */
 int	wallColor;		/* Color index for wall drawing */
 int	decorColor;		/* Color index for decoration drawing */
-int	selfLWColor;
-int	enemyLWColor;
-int	teamLWColor;
-int	shipNameColor;
-int	baseNameColor;
-int	mineNameColor;
-int	ballColor;
-int	connColor;
-int	teamShotColor;
-int	shipShapesHackColor;
-int	team0Color;
-int	team1Color;
-int	team2Color;
-int	team3Color;
-int	team4Color;
-int	team5Color;
-int	team6Color;
-int	team7Color;
-int	team8Color;
-int	team9Color;		/* We have too many color options. */
-
-
 
 
 #ifndef _WINDOWS
@@ -1285,30 +1259,6 @@ static xp_option_t color_options[] = {
 	"Which color number to use for drawing decorations.\n"),
 
     COLOR_INDEX_OPTION(
-	"teamShotColor",
-	2,
-	&teamShotColor,
-	"Which color number to use for drawing harmless shots.\n"),
-
-    COLOR_INDEX_OPTION(
-	"shipShapesHackColor",
-	0,
-	&shipShapesHackColor,
-	"Which color number to use for drawing the shipshapes hack.\n"),
-
-    COLOR_INDEX_OPTION(
-	"ballColor",
-	1,
-	&ballColor,
-	"Which color number to use for drawing balls.\n"),
-
-    COLOR_INDEX_OPTION(
-	"connColor",
-	2,
-	&connColor,
-	"Which color number to use for drawing connectors.\n"),
-
-    COLOR_INDEX_OPTION(
 	"windowColor",
 	8,
 	&windowColor,
@@ -1325,133 +1275,6 @@ static xp_option_t color_options[] = {
 	1,
 	&borderColor,
 	"Which color number to use for drawing borders.\n"),
-
-    COLOR_INDEX_OPTION(
-	"zeroLivesColor",
-	3,
-	&zeroLivesColor,
-	"Which color to associate with ships with zero lives left.\n"
-	"This can be used to paint for example ship and base names.\n"),
-
-    COLOR_INDEX_OPTION(
-	"oneLifeColor",
-	11,
-	&oneLifeColor,
-	"Which color to associate with ships with one life left.\n"
-	"This can be used to paint for example ship and base names.\n"),
-
-    COLOR_INDEX_OPTION(
-	"twoLivesColor",
-	4,
-	&twoLivesColor,
-	"Which color to associate with ships with two lives left.\n"
-	"This can be used to paint for example ship and base names.\n"),
-
-    COLOR_INDEX_OPTION(
-	"manyLivesColor",
-	13,
-	&manyLivesColor,
-	"Which color to associate with ships with more than two lives left.\n"
-	"This can be used to paint for example ship and base names.\n"),
-
-    COLOR_INDEX_OPTION(
-	"selfLWColor",
-	3,
-	&selfLWColor,
-	"Which color to use to paint your ship in when on last life.\n"
-	"Original color for this is red.\n"),
-
-    COLOR_INDEX_OPTION(
-	"enemyLWColor",
-	3,
-	&enemyLWColor,
-	"Which color to use to paint enemy ships in when on last life.\n"
-	"Original color for this is red.\n"),
-
-    COLOR_INDEX_OPTION(
-	"teamLWColor",
-	2,
-	&teamLWColor,
-	"Which color to use to paint teammate ships in when on last life.\n"
-	"Original color for this is green.\n"),
-
-    COLOR_INDEX_OPTION(
-	"shipNameColor",
-	2,
-	&shipNameColor,
-	"Which color number to use for drawing names of ships.\n"),
-
-    COLOR_INDEX_OPTION(
-	"baseNameColor",
-	2,
-	&baseNameColor,
-	"Which color number to use for drawing names of bases.\n"),
-
-    COLOR_INDEX_OPTION(
-	"mineNameColor",
-	2,
-	&mineNameColor,
-	"Which color number to use for drawing names of mines.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team0Color",
-	0,
-	&team0Color,
-	"Which color number to use for drawing team 0 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team1Color",
-	0,
-	&team1Color,
-	"Which color number to use for drawing team 1 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team2Color",
-	0,
-	&team2Color,
-	"Which color number to use for drawing team 2 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team3Color",
-	0,
-	&team3Color,
-	"Which color number to use for drawing team 3 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team4Color",
-	0,
-	&team4Color,
-	"Which color number to use for drawing team 4 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team5Color",
-	0,
-	&team5Color,
-	"Which color number to use for drawing team 5 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team6Color",
-	0,
-	&team6Color,
-	"Which color number to use for drawing team 6 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team7Color",
-	0,
-	&team7Color,
-	"Which color number to use for drawing team 7 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team8Color",
-	0,
-	&team8Color,
-	"Which color number to use for drawing team 8 objects.\n"),
-
-    COLOR_INDEX_OPTION(
-	"team9Color",
-	0,
-	&team9Color,
-	"Which color number to use for drawing team 9 objects.\n"),
 };
 
 
@@ -1460,51 +1283,4 @@ void Store_color_options(void)
     STORE_OPTIONS(color_options);
 }
 
-
-/*
- * Assume MAX_TEAMS is 10
- */
-int Team_color(int team)
-{
-    switch (team) {
-    case 0:	return team0Color;
-    case 1:	return team1Color;
-    case 2:	return team2Color;
-    case 3:	return team3Color;
-    case 4:	return team4Color;
-    case 5:	return team5Color;
-    case 6:	return team6Color;
-    case 7:	return team7Color;
-    case 8:	return team8Color;
-    case 9:	return team9Color;
-    default:    break;
-    }
-    return 0;
-}
-
-int Life_color(other_t *other)
-{
-    int color = 0; /* default is 'no special color' */
-
-    if (other
-	&& (other->mychar == ' ' || other->mychar == 'R')
-	&& BIT(Setup->mode, LIMITED_LIVES))
-	color = Life_color_by_life(other->life);
-    return color;
-}
-
-int Life_color_by_life(int life)
-{
-    int color;
-	
-    if (life > 2)
-	color = manyLivesColor;
-    else if (life == 2)
-	color = twoLivesColor;
-    else if (life == 1)
-	color = oneLifeColor;
-    else /* we catch all */
-	color = zeroLivesColor;
-    return color;
-}
 

@@ -62,17 +62,7 @@ extern int	hudSize;		/* Size for HUD drawing */
 extern int	hudRadarDotSize;	/* Size for hudradar dot drawing */
 extern double	hudRadarScale;		/* Scale for hudradar drawing */
 extern double 	hudRadarLimit;		/* Limit for hudradar drawing */
-extern int	fuelGaugeColor;		/* Color index for fuel gauge drawing */
-extern int	shipShapesHackColor;	/* Color index for shipshapes-hack drawing */
-extern int	selfLWColor;		/* Color index for selfLifeWarning */
-extern int	enemyLWColor;		/* Color index for enemyLifeWarning */
-extern int	teamLWColor;		/* Color index for teamLifeWarning */
-extern int	shipNameColor;		/* Color index for ship name drawing */
-extern int	baseNameColor;		/* Color index for base name drawing */
-extern int	mineNameColor;		/* Color index for mine name drawing */
-extern int	teamShotColor;		/* Color index for harmless shot drawing */
-extern int	ballColor;		/* Color index for ball drawing */
-extern int	connColor;		/* Color index for connector drawing */
+
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	decorColor;		/* Color index for decoration drawing */
 extern bool	gotFocus;		/* Do we have the mouse pointer */

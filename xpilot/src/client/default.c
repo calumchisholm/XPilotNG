@@ -807,6 +807,14 @@ xp_option_t default_options[] = {
 	"Should your own shipshape be displayed or not.\n"),
 
     XP_BOOL_OPTION(
+	"showShipShapesHack",
+	false,
+	&instruments.showShipShapesHack,
+	NULL,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Should the ship shapes hack be displayed or not.\n"),
+
+    XP_BOOL_OPTION(
 	"ballMsgScan",
 	true,
 	&instruments.useBallMessageScan,
