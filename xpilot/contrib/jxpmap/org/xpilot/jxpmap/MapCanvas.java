@@ -752,11 +752,18 @@ public class MapCanvas extends JComponent {
 
         public void mouseReleased(MouseEvent evt) {           
             if (model == null)
-                return;           
-            if (eventHandler != null) {
-                transformEvent(evt);
+                return;
+
+	    transformEvent(evt);
+	    if (eventHandler != null) {
                 eventHandler.mouseReleased(evt);
                 return;
+            }
+            for (Iterator iter = model.objects.iterator(); iter.hasNext();) {
+                MapObject o = (MapObject) iter.next();
+                if (o.checkAwtEvent(MapCanvas.this, evt)) {
+                    return;
+                }
             }
             setFastRendering(false);
             repaint();            

@@ -38,6 +38,7 @@ public class Ball extends MapObject {
         this.img = Toolkit.getDefaultToolkit().createImage(
             new FilteredImageSource(this.original.getSource(),
                 new BlendImageFilter(c)));
+	new javax.swing.ImageIcon(this.img); /* force image production */
     }
 
     
