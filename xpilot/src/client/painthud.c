@@ -1351,13 +1351,12 @@ static bool Msg_scan_for_ball_destruction(char *message)
 	/*int destroyed_team = atoi(mn.name[1]);*/
 	char *destroyer = mn.name[2];
 	
-	if (destroyer_team == self->team)
+	if (destroyer_team == self->team) {
 	    ballstats_teamcashes++;
-	else
+	    if (!strcmp(destroyer, self->name))
+		ballstats_cashes++;
+	} else
 	    ballstats_lostballs++;
-	if (!strcmp(destroyer, self->name)) {
-	    ballstats_cashes++;
-	}
 	return true;
     }
     return false;
