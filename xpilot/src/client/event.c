@@ -272,7 +272,14 @@ bool Key_press(keys_t key)
     case KEY_TOGGLE_MESSAGES:
 	return Key_press_show_messages();
 
+/* kps hack */
+#define DEFAULT_KEY_POINTER_CONTROL "space"
+
     case KEY_POINTER_CONTROL:
+	if (!pointerControl)
+	    Add_newbie_message("Mouse steering enabled. Press "
+			       DEFAULT_KEY_POINTER_CONTROL
+			       " to disable it.");
 	return Key_press_pointer_control();
 
     case KEY_TOGGLE_RECORD:
@@ -556,25 +563,25 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyTurnLeft",
-	"a",
+	"a Left",
 	KEY_TURN_LEFT,
 	"Turn left (anti-clockwise).\n"),
 
     XP_KEY_OPTION(
 	"keyTurnRight",
-	"s",
+	"s Right",
 	KEY_TURN_RIGHT,
 	"Turn right (clockwise).\n"),
 
     XP_KEY_OPTION(
 	"keyThrust",
-	"Shift_R Shift_L",
+	"Shift_R Shift_L Up",
 	KEY_THRUST,
 	"Thrust.\n"),
 
     XP_KEY_OPTION(
 	"keyShield",
-	"space Caps_Lock",
+	"Caps_Lock Down", /* was Caps_lock space */
 	KEY_SHIELD,
 	"Raise or toggle the shield.\n"),
 
@@ -629,25 +636,25 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockClose",
-	"Up",		/* Select removed */
+	"",		/* Select and Up removed */
 	KEY_LOCK_CLOSE,
 	"Lock on closest player.\n"),
 
     XP_KEY_OPTION(
 	"keyLockNextClose",
-	"Down",
+	"",		/* Down removed */
 	KEY_LOCK_NEXT_CLOSE,
 	"Lock on next closest player.\n"),
 
     XP_KEY_OPTION(
 	"keyLockNext",
-	"Next Right",
+	"Next",		/* a.k.a. Page Down */
 	KEY_LOCK_NEXT,
 	"Lock on next player.\n"),
 
     XP_KEY_OPTION(
 	"keyLockPrev",
-	"Prior Left",
+	"Prior",	/* a.k.a. Page Up */
 	KEY_LOCK_PREV,
 	"Lock on previous player.\n"),
 
@@ -716,7 +723,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyConnector",
-	"f Control_L",
+	"f Control_L Control_R",
 	KEY_CONNECTOR,
 	"Connect to a ball.\n"),
 
@@ -1016,7 +1023,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyPointerControl",
-	"KP_Enter",
+	"KP_Enter " DEFAULT_KEY_POINTER_CONTROL,
 	KEY_POINTER_CONTROL,
 	"Toggle pointer control.\n"),
 
