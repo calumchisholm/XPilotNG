@@ -33,6 +33,10 @@ bool	titleFlip;		/* Do special title bar flipping? */
 bool	showNastyShots = false;	/* show original flavor shots or the new 
 				   "nasty shots" */
 
+int pre_acc_num, new_acc_num;   /* pre are the Saved mouse settings */
+int pre_acc_denom, new_acc_denom; 
+int pre_threshold, new_threshold; 
+
 #ifdef DEVELOPMENT
 static bool testxsync = false;
 static bool testxdebug = false;
@@ -128,6 +132,50 @@ static bool Set_texturedObjects(xp_option_t *opt, bool val)
 	texturedObjects = false;
 
     return true;
+}
+
+bool Set_acc(xp_option_t *opt, int value)
+{
+  if (value < 0) {
+    return false;
+  } else {
+    new_acc_num = value;
+    if (dpy) {
+      XChangePointerControl(dpy, True, True, value,
+			    new_acc_denom, new_threshold);
+    }
+    return true;
+  }
+  
+}
+
+bool Set_accdenom(xp_option_t *opt, int value)
+{
+  if (value < 0) {
+    return false;
+  } else {
+    new_acc_denom = value;
+    if (dpy) {
+      XChangePointerControl(dpy, True, True, new_acc_num,
+			    value, new_threshold);
+    }
+    return true;
+  }
+  
+}     
+
+bool Set_accthresh(xp_option_t *opt, int value)
+{
+  if (value < 0) {
+    return false;
+  } else {    
+    new_threshold = value;
+    if (dpy) {
+      XChangePointerControl(dpy, True, True, new_acc_num,
+			    new_acc_denom, value);
+    }
+    return true;
+  }
 }
 
 xp_option_t xdefault_options[] = {
@@ -306,6 +354,37 @@ xp_option_t xdefault_options[] = {
 	"Use the new Nasty Looking Shots or the original rectangle shots,\n"
 	"You will probably want to increase your shotSize if you use this.\n"),
 
+    XP_INT_OPTION(
+        "mouseAccelNum",
+	0,
+	0,
+	10,
+	&new_acc_num,
+	Set_acc,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set the mouse acceleration\n"),
+
+    XP_INT_OPTION(
+        "mouseAccelDenom",
+	1,
+	1,
+	10,
+	&new_acc_denom,
+	Set_accdenom,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set the mouse acceleration denominator\n"),
+
+    XP_INT_OPTION(
+        "mouseAccelThresh",
+	1,
+	1,
+	10,
+	&new_threshold,
+	Set_accthresh,
+	XP_OPTFLAG_CONFIG_DEFAULT,
+	"Set the mouse acceleration threshold\n"),
+
+	
     /* X debug stuff */
 #ifdef DEVELOPMENT
     XP_NOARG_OPTION(
@@ -403,6 +482,16 @@ void Handle_X_options(void)
 	List_visuals();
 	exit(0);
     }
+    
+    /* handle mouse */
+
+    /* We know that we have the display open here and this is as early */
+    /* in the code as we can back up the existing mouse acceleration   */
+    /* we are going to overide these with xpilot settings, and want to */
+    /* restore these settings on exiting xpilot                        */
+    
+    XGetPointerControl(dpy, &pre_acc_num, &pre_acc_denom, &pre_threshold);
+    
 
 #ifdef DEVELOPMENT
     if (testxsync) {

@@ -80,6 +80,10 @@ bool			radar_score_mapped;
 Cursor			pointerControlCursor;
 bool			ignoreWindowManager;
 
+/* For restoring the mouse back to normal */
+extern int pre_acc_num, pre_acc_denom, pre_threshold;
+
+
 /*static char myName[] = "xpilot";*/
 static char myClass[] = "XPilot";
 
@@ -873,6 +877,11 @@ void Resize(Window w, unsigned width, unsigned height)
 void Quit(void)
 {
 #ifndef _WINDOWS
+
+  /* Here we restore the mouse to its former self */
+  XChangePointerControl(dpy, True, True, pre_acc_num,
+			pre_acc_denom, pre_threshold);
+
     if (dpy != NULL) {
 	XAutoRepeatOn(dpy);
 	Colors_cleanup();
