@@ -160,8 +160,7 @@ extern DFLOAT	scaleFactor;		/* scale the draw (main playfield) window */
 extern DFLOAT	scaleFactor_s;
 extern short	scaleArray[];
 extern void	Init_scale_array(void);
-#define	_WINSCALE(__n)	((__n) >= 0 ? scaleArray[(__n)] : -scaleArray[-(__n)])
-#define WINSCALE(X) ((int)((X) / scaleFactor))
+#define	WINSCALE(__n)	((__n) >= 0 ? scaleArray[(__n)] : -scaleArray[-(__n)])
 #else
 #define	WINSCALE(__n)	(__n)
 #endif
