@@ -85,7 +85,6 @@
  */
 /*#define TEAM_IMMUNE(pl1, pl2)	(options.teamImmunity && TEAM((pl1), (pl2)))*/
 
-#define NO_ID			(-1)
 /*
  * Used when we want to pass an index which is not in use.
  */
@@ -94,11 +93,21 @@
 #define RECOVERY_DELAY		(12 * 3)
 #define ROBOT_CREATE_DELAY	(12 * 2)
 
-#define NUM_IDS			256
-#define MAX_PSEUDO_PLAYERS      16
+/*
+ * ID values: In the network protocol these are 16 bit signed values.
+ */
+#define NO_ID			(-1)
 
-#define MIN_PASS_LEN		5
-#define MAX_PASS_LEN		16
+/* Currently there is 256 possible player IDs. */
+#define NUM_IDS			256
+#define MAX_PSEUDO_PLAYERS	16
+
+/* Expired mines have id EXPIRED_MINE_ID, defined in common/const.h */
+
+/* Cannon IDs. */
+#define NUM_CANNON_IDS		10000
+#define MIN_CANNON_ID		(EXPIRED_MINE_ID + 1)
+#define MAX_CANNON_ID		(EXPIRED_MINE_ID + NUM_CANNON_IDS)
 
 #define MAX_TOTAL_SHOTS		16384	/* must be <= 65536 */
 #define MAX_TOTAL_ECMS		64

@@ -113,7 +113,7 @@ void Place_general_mine(world_t *world, player_t *pl, cannon_t *cannon,
     if (pl && Player_is_killed(pl))
 	life = rfrac() * 12;
     else if (BIT(status, FROMCANNON))
-	life = Cannon_shot_life(cannon);
+	life = Cannon_get_shot_life(cannon);
     else
 	life = options.mineLife;
 
@@ -470,7 +470,8 @@ void Fire_general_shot(world_t *world, player_t *pl, cannon_t *cannon,
 
     if (cannon) {
 	mass = CANNON_SHOT_MASS;
-	life = Cannon_shot_life(cannon);
+	speed = Cannon_get_shot_speed(cannon);
+	life = Cannon_get_shot_life(cannon);
 	SET_BIT(status, FROMCANNON);
     }
 

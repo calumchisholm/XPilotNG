@@ -124,6 +124,7 @@ extern struct options {
     double	cannonDeadTicks;
     double	minCannonShotLife;
     double	maxCannonShotLife;
+    double	cannonShotSpeed;
     bool	keepShots;
     bool	teamImmunity;
     bool	tagGame;
@@ -172,6 +173,7 @@ extern struct options {
     double	selfKillScoreMult;
     double	selfDestructScoreMult;
     double	unownedKillScoreMult;
+    double	cannonKillScoreMult;
     double	tagItKillScoreMult;
     double	tagKillItScoreMult;
 

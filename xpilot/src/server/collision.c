@@ -1086,7 +1086,9 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 {
     player_t *kp = NULL;
+    cannon_t *cannon = NULL; 
     double sc, drainfactor, drain;
+    world_t *world = pl->world;
 
     /*
      * Player got hit by a potentially deadly object.
@@ -1179,9 +1181,18 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	case OBJ_SHOT:
 	case OBJ_CANNON_SHOT:
 	    if (BIT(obj->obj_status, FROMCANNON)) {
+		cannon = Cannon_by_id(world, obj->id);
+
 		sound_play_sensors(pl->pos, PLAYER_HIT_CANNONFIRE_SOUND);
 		Set_message_f("%s was hit by cannonfire.", pl->name);
-		sc = Rate(CANNON_SCORE, pl->score)/4;
+		if (cannon != NULL)
+		    sc = Rate(cannon->score, pl->score)
+			* options.cannonKillScoreMult;
+		else {
+		    assert(obj->id == NO_ID);
+		    sc = Rate(UNOWNED_SCORE, pl->score)
+			* options.cannonKillScoreMult;
+		}
 	    } else if (obj->id == NO_ID) {
 		Set_message_f("%s was killed by %s.", pl->name,
 			      Describe_shot(obj->type, obj->obj_status,

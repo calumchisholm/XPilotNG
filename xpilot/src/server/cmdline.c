@@ -1230,6 +1230,16 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"cannonShotSpeed",
+	"cannonShotSpeed",
+	"21.0",
+	&options.cannonShotSpeed,
+	valReal,
+	tuner_dummy,
+	"Speed of cannon shots.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"minCannonShotLife",
 	"minCannonShotLife",
 	"8.0",
@@ -2259,6 +2269,16 @@ static option_desc opts[] = {
 	tuner_dummy,
 	"Multiplication factor to scale score for being killed by asteroids\n"
 	"or other objects without an owner.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"cannonKillScoreMult",
+	"cannonKillScoreMult",
+	"0.25",
+	&options.cannonKillScoreMult,
+	valReal,
+	tuner_dummy,
+	"Multiplication factor to scale score for being killed by cannons.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3688,7 +3708,7 @@ static option_desc opts[] = {
 	valInt,
 	tuner_dummy,
 	"Use Cell_get_objects if there is this many objects or more.\n",
-	OPT_COMMAND | OPT_VISIBLE
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
 };
 

@@ -36,7 +36,12 @@ char laser_version[] = VERSION;
 void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 {
     player_t *kp = Player_by_id(pulse->id);
+    cannon_t *cannon = NULL;
     double sc;
+
+    if (kp == NULL)
+	/* Perhaps it was a cannon pulse? */
+	cannon = Cannon_by_id(pl->world, pulse->id);
 
     pl->forceVisible += 1;
     if (BIT(pl->have, HAS_MIRROR)
@@ -99,16 +104,27 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 			* options.laserKillScoreMult
 			* options.selfKillScoreMult;
 		    Score(kp, -sc, kp->pos, kp->name);
-		} else {
+		}
+		else {
 		    sc = Rate(kp->score, pl->score)
 			* options.laserKillScoreMult;
 		    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		}
-	    } else {
-		sc = Rate(CANNON_SCORE, pl->score) / 4;
+	    }
+	    else if (cannon != NULL) {
+		sc = Rate(cannon->score, pl->score)
+		    * options.cannonKillScoreMult;
 		Score(pl, -sc, pl->pos, "Cannon");
 		Set_message_f("%s got roasted alive by cannonfire.", pl->name);
 	    }
+	    else {
+		assert(pulse->id == NO_ID);
+		sc = Rate(UNOWNED_SCORE, pl->score)
+		    * options.unownedKillScoreMult;
+		Score(pl, -sc, pl->pos, "");
+		Set_message_f("%s got roasted alive.", pl->name);
+	    }
+
 	    sound_play_sensors(pl->pos, PLAYER_ROASTED_SOUND);
 	    if (kp && kp->id != pl->id) {
 		Rank_add_laser_kill(kp);

@@ -113,7 +113,7 @@ static inline int Cannon_get_max_shot_life(cannon_t *c)
     return options.maxCannonShotLife;
 }
 
-static inline double Cannon_shot_life(cannon_t *cannon)
+static inline double Cannon_get_shot_life(cannon_t *cannon)
 {
     double minlife, maxlife, d;
 
@@ -122,6 +122,21 @@ static inline double Cannon_shot_life(cannon_t *cannon)
     d = maxlife - minlife;
 
     return minlife + rfrac() * d;
+}
+
+static inline double Cannon_get_shot_speed(cannon_t *cannon)
+{
+    return options.cannonShotSpeed;
+}
+
+static inline cannon_t *Cannon_by_id(world_t *world, int id)
+{
+    int ind;
+
+    if (id < MIN_CANNON_ID || id > MAX_CANNON_ID)
+	return NULL;
+    ind = id - MIN_CANNON_ID;
+    return Cannon_by_index(world, ind);
 }
 
 #endif

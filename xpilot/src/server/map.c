@@ -119,9 +119,16 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
     t.dead_ticks = 0;
     t.conn_mask = (unsigned)-1;
     t.group = NO_GROUP;
+    t.score = CANNON_SCORE;
+    t.id = ind + MIN_CANNON_ID;
+    if (t.id > MAX_CANNON_ID) {
+	warn("The server supports only %d cannons per map.", NUM_CANNON_IDS);
+	exit(1);
+    }
     STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
     cannon = Cannon_by_index(world, ind);
     Cannon_init(cannon);
+    assert(Cannon_by_id(world, t.id) == cannon);
     return ind;
 }
 

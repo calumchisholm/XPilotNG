@@ -402,7 +402,7 @@ static int Cannon_select_weapon(cannon_t *c)
 static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 {
     world_t *world = c->world;
-    double speed = options.shotSpeed;
+    double speed = Cannon_get_shot_speed(c);
     double range = Cannon_get_max_shot_life(c) * speed;
     double visualrange = (CANNON_DISTANCE
 			      + 2 * c->item[ITEM_SENSOR] * BLOCK_SZ);
@@ -558,7 +558,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     modifiers_t	mods;
     bool played = false;
     int i, smartness = Cannon_get_smartness(c);
-    double speed = options.shotSpeed;
+    double speed = Cannon_get_shot_speed(c);
     vector_t zero_vel = { 0.0, 0.0 };
 
     CLEAR_MODS(mods);
@@ -789,7 +789,7 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 		  8.0, 68.0);
 
     if (pl) {
-	double sc = Rate(pl->score, CANNON_SCORE) / 4;
+	double sc = Rate(pl->score, c->score) * options.cannonKillScoreMult;
 
 	if (BIT(world->rules->mode, TEAM_PLAY)
 	    && pl->team == c->team)

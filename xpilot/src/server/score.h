@@ -35,6 +35,7 @@
 #define CANNON_SCORE	    	(-1436.0)
 #define TARGET_SCORE	    	(-1436.0)
 #define TREASURE_SCORE	    	(-1436.0)
+#define UNOWNED_SCORE	    	(-1436.0)
 #define WALL_SCORE	    	2000.0
 
 #define RATE_SIZE	    	20

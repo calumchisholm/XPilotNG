@@ -117,6 +117,8 @@ typedef struct cannon {
     double	emergency_shield_left;
     double	phasing_left;
     int		group;
+    double	score;
+    int		id;
 } cannon_t;
 
 typedef struct check {
