@@ -866,6 +866,18 @@ void Add_message(const char *message)
 	xpprintf("%s\n", message);
 }
 
+void Add_newbie_message(const char *message)
+{
+    char msg[MSG_LEN];
+
+    if (!newbie)
+	return;
+
+    snprintf(msg, sizeof(msg), "%s [*Newbie help*]", message);
+
+    Add_message(msg);
+}
+
 /*
  * clear the buffer for the pending messages
  */
