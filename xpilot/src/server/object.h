@@ -207,7 +207,8 @@ struct _cell_node {
     DFLOAT		count;		/* Misc timings */		\
     modifiers		mods;		/* Modifiers to this object */	\
     u_byte		color;		/* Color of object */		\
-    u_byte		missile_dir;	/* missile direction */	\
+    u_byte		missile_dir;	/* missile direction */		\
+    short		pad1;		/* align cell */		\
 /* up to here all object types are the same as all player types. */
 
 #define OBJECT_EXTEND	\
@@ -581,7 +582,7 @@ struct player {
      * A record of who's been pushing me (a circular buffer).
      */
     shove_t     shove_record[MAX_RECORDED_SHOVES];
-    int         shove_next;
+    int	 	shove_next;
 
     struct _visibility *visibility;
 
@@ -600,7 +601,7 @@ struct player {
 
     int		ecmcount;		/* number of active ecms */
 
-    connection_t *conn;                 /* connection index, NULL if robot */
+    connection_t *conn;			/* connection index, NULL if robot */
     unsigned	version;		/* XPilot version number of client */
 
     BITV_DECL(last_keyv, NUM_KEYS);	/* Keyboard state */
@@ -612,8 +613,8 @@ struct player {
 
     int		player_fps;		/* FPS that this player can do */
 
-    int		isowner;		/* If player started this server. */
-    int		isoperator;		/* If player has operator privileges. */
+    int		isowner;		/* player started this server? */
+    int		isoperator;		/* player has operator privileges? */
     int		rectype;		/* normal, saved or spectator */
     RankInfo	*rank;
 
