@@ -306,6 +306,7 @@ void Rank_show_ranks(void)
 	RankInfo *score = &scores[rankedplayer[i]];
 	if (score->pl != NULL) {
 	    char msg[MSG_LEN];
+
 	    sprintf(msg, "%s [%d], ", score->entry.nick, i + 1);
 	    strcat(buf, msg);
 	}
@@ -345,7 +346,7 @@ RankInfo *Rank_get_by_name(char *name)
 
     for (i = 0; i < MAX_SCORES; i++) {
 	score = &scores[i];
-	if (strcmp(name, score->entry.nick) == 0)
+	if (!strcasecmp(name, score->entry.nick))
 	    return score;
     }
 
@@ -446,7 +447,7 @@ void Rank_get_saved_score(player_t * pl)
 
     for (i = 0; i < MAX_SCORES; i++) {
 	score = &scores[i];
-	if (strcmp(pl->name, score->entry.nick) == 0) {
+	if (!strcasecmp(pl->name, score->entry.nick)) {
 	    if (score->pl == NULL) {
 		/* Ok, found it. */
 		score->pl = pl;

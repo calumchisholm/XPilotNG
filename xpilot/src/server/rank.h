@@ -28,34 +28,12 @@
 #include "object.h"
 #endif
 
-struct oldScoreNode {
-    char nick[MAX_CHARS];
-    char real[MAX_CHARS];
-    char host[MAX_CHARS];
-    char logout[MAX_CHARS];
-    int  timestamp;
-    short score;
-    uint16_t kills;
-    uint16_t deaths;
-    uint16_t rounds;
-    uint32_t firedShots;
-
-    uint16_t ballsSaved;
-    uint16_t ballsLost;
-    uint16_t ballsWon;
-    uint16_t ballsCashed;
-    uint16_t bestball;
-
-    char  futureextensions[6];
-    struct player_t *pl;
-};
-
-
 typedef struct RankHead {
 	char magic[4];
 	uint32_t version;
 	uint32_t entries;
 } RankHead;
+
 #define RANK_MAGIC		"rNk7"
 #define RANK_VER_MK(maj,min)	((((maj)&0xffff)<<16) | ((min)&0xffff))
 #define RANK_VER_MAJ(ver)	(((ver) >> 16)&0xffff)
