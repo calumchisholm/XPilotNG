@@ -67,7 +67,7 @@ static inline bool Player_can_be_tagged(player *pl)
  */
 void Check_tag(void)
 {
-    int num = 0, n, i, candidate;
+    int num = 0, i, candidate;
     player *tag_pl = Player_by_id(tag);
 
     if (tag_pl && !BIT(tag_pl->status, PAUSE))
