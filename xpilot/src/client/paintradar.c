@@ -677,6 +677,9 @@ void Paint_world_radar(void)
       int x = polygons[i].points[0].x + x_offset;
       int y = Setup->height - polygons[i].points[0].y + y_offset;
 
+      if (BIT(polygon_styles[polygons[i].style].flags, 
+              STYLE_INVISIBLE_RADAR)) continue;
+
       poly[0].x = (x * 256) / Setup->width;
       poly[0].y = (y * RadarHeight) / Setup->height;
 

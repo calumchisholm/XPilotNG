@@ -110,8 +110,14 @@ public class PolygonStyle {
 
     
     private int computeFlags () {
-        /* TODO: implement */
-        return 1;
+        int flags = 0;
+        if (fillStyle != FILL_NONE) {
+            if (color != null) flags |= 1;
+            if (texture != null) flags |= 2;
+        }
+        if (!isVisible()) flags |= 4;
+        if (!isVisibleInRadar()) flags |= 8;
+        return flags;
     }
 
     

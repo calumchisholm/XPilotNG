@@ -1193,7 +1193,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     polygon = polygons[i];
     style = polygon_styles[polygon.style];
 
-    if (!style.visible) return;
+    if (BIT(style.flags, STYLE_INVISIBLE)) return;
 
     textured = BIT(instruments, SHOW_TEXTURED_WALLS) && blockBitmaps;
     filled = BIT(instruments, SHOW_FILLED_WORLD);
@@ -1213,8 +1213,8 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     points[j].y = points[0].y;
 
     did_fill = 0;
-    if ((filled || textured) && style.method != NOFILL) {
-        if (textured && style.method == TEXTURED) {
+    if (filled || textured) {
+        if (textured && BIT(style.flags, STYLE_TEXTURED)) {
 	    xp_bitmap_t *bmp = Bitmap_get(p_draw, style.texture, 0);
 	    if (bmp == NULL)
 		goto notexture; /* Print an error here? */

@@ -325,28 +325,16 @@ static void parse_styles(char **callptr)
     }
 
     for (i = 0; i < num_polygon_styles; i++) {
-	int flags;
 	polygon_styles[i].color = wallColor;
 	polygon_styles[i].rgb = get_32bit(&ptr);
 	polygon_styles[i].texture = 46 + (*ptr++);
 	polygon_styles[i].def_edge_style = *ptr++;
-	flags = *ptr++;
-	/*
-	  polygon_styles[i].method = (fill_style_t)(flags & 3);
-	  polygon_styles[i].visible = ((flags & (1 << 3)) != 0);
-	  polygon_styles[i].visible_in_radar =
-	  ((flags & (1 << 4)) != 0);
-	*/
-	polygon_styles[i].visible = true;
-	polygon_styles[i].visible_in_radar = true;
-	polygon_styles[i].method = TEXTURED;
+	polygon_styles[i].flags = *ptr++;
     }
 
     if (num_polygon_styles == 0) {
 	/* default polygon style */
-	polygon_styles[0].visible = true;
-	polygon_styles[0].visible_in_radar = true;
-	polygon_styles[0].method = NOFILL;
+        polygon_styles[0].flags = 0;
 	polygon_styles[0].def_edge_style = 0;
 	num_polygon_styles = 1;
     }
