@@ -237,6 +237,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
 {
     wireobject_t *asteroid;
     double radius;
+    shape_t *shape;
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
 	return;
@@ -249,10 +250,15 @@ static void Make_asteroid(world_t *world, clpos_t pos,
 	return;
 
     /*
-     * kps - here we should check that the asteroid shape is not inside
-     * a polygon (or on top of an object?)
+     * kps - check that the asteroid shape is not on top of an object?)
      */
-    if (is_inside(pos.cx, pos.cy, NOTEAM_BIT | NONBALL_BIT, NULL) != NO_GROUP)
+    shape = Asteroid_get_shape_by_size(size);
+    assert(shape);
+    if (shape_is_inside(pos.cx, pos.cy,
+			NONBALL_BIT, /* kps - OK ??? */
+			NULL,
+			shape,
+			dir) != NO_GROUP)
 	return;
 
     asteroid = WIRE_PTR(Object_allocate());
@@ -299,7 +305,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
 /* kps - change this to use polygon based is_inside code */
 static void Place_asteroid(world_t *world)
 {
-    int place_count, dir, dist;
+    int place_count, dir, dist, i;
     unsigned space;
     bool okay = false;
     asteroid_concentrator_t *con;
@@ -337,29 +343,22 @@ static void Place_asteroid(world_t *world)
 	} else
 	    pos = World_get_random_clpos(world);
 
-	bpos = Clpos_to_blkpos(pos);
+	okay = true;
+#if 0
+	for (i = 0; i < NumPlayers; i++) {
+	    player_t *pl = Players(i);
 
-	/* kps - don't use world blocks here. */
-	if (BIT(1U << World_get_block(world, bpos), space)) {
-	    int i, dpx, dpy;
+	    if (!Player_is_playing(pl))
+		continue;
 
-	    okay = true;
-
-	    for (i = 0; i < NumPlayers; i++) {
-		player_t *pl = Players(i);
-
-		if (Player_is_human(pl)) {
-		    dpx = WRAP_DCX(pos.cx - pl->pos.cx);
-		    dpy = WRAP_DCY(pos.cy - pl->pos.cy);
-		    if (QUICK_LENGTH(dpx, dpy) < 2 * ASTEROID_MIN_DIST
-			&& sqr(dpx) + sqr(dpy) < sqr(ASTEROID_MIN_DIST)) {
-			/* too close to player */
-			okay = false;
-			break;
-		    }
-		}
+	    if (Wrap_length(pos.cx - pl->pos.cx,
+			    pos.cy - pl->pos.cy) < ASTEROID_MIN_DIST) {
+		/* too close to player */
+		okay = false;
+		break;
 	    }
 	}
+#endif
     }
     if (okay)
 	Make_asteroid(world, pos,
