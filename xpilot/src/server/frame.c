@@ -665,15 +665,6 @@ static void Frame_ships(int conn, int ind)
     int				i, j, k, color, dir;
     int 			x, y;
 
-#if 0
-    extern int linec;
-    extern struct {clvec start, delta; DFLOAT c,s; short group;} *linet;
-
-    for (i = 0; i < linec; i++)
-	if (rand() % 10 == 0 && inview(linet[i].start.x >> 6, linet[i].start.y >>6))
-	    Send_connector(conn, linet[i].start.x>>6, linet[i].start.y>>6, (linet[i].start.x + linet[i].delta.x)>>6, (linet[i].start.y + linet[i].delta.y)>>6, 0);
-#endif
-
     for (j = 0; j < NumPulses; j++) {
 	pulse = Pulses[j];
 	if (pulse->len <= 0) {
