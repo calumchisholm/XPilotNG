@@ -29,9 +29,6 @@
 #include "images.h"
 
 int wallColor = 0xff;
-extern unsigned long	loopsSlow;	        /* Proceeds slower than loops */
-extern ipos world;
-extern int active_view_height;
 
 static void set_color(int color)
 {

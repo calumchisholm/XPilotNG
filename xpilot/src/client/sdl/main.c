@@ -1,10 +1,8 @@
 #include <signal.h>
-#include "types.h"
-#include "error.h"
-#include "connectparam.h"
-#include "netclient.h"
+#include "xpclient.h"
 
 extern void Game_loop(void);
+extern void Options_cleanup(void);
 
 static void Main_shutdown()
 {

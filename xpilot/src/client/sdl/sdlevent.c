@@ -206,8 +206,10 @@ bool Key_press_toggle_radar_score()
 #ifndef _WINDOWS
 bool Key_press_msgs_stdout()
 {
+    /* TODO
     if (selectionAndHistory)
 	Print_messages_to_stdout();
+    */
     return false;	/* server doesn't need to know */
 }
 #endif

@@ -9,8 +9,6 @@ int num_spark_colors;
 
 int Init_playing_windows(void)
 {
-    const SDL_VideoInfo *info;
-    Uint8  video_bpp;
     Uint32 videoflags;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {

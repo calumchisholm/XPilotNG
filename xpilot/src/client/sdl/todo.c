@@ -8,8 +8,6 @@ void Play_beep(void)
     fprintf(stderr, "\aBEEP\n");
 }
 
-void Print_messages_to_stdout(void) {}
-
 void Radar_show_target(int x, int y) {}
 
 void Radar_hide_target(int x, int y) {}
@@ -22,6 +20,7 @@ int Startup_server_motd(void)
 int Handle_motd(long off, char *buf, int len, long filesize) 
 {
     fwrite(buf + off, 1, len, stdout);
+    return 0;
 }
 
 void Raise_window(void) {}
