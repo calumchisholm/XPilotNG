@@ -8,6 +8,17 @@ affected:
 
 
 -------------------------------------------------------------------
+Problem : Very thin walls are not displayed on radar. More of those
+          walls seem to be displayed in SDL client than in X11 client
+          but not all of them either 
+Found by: Throat
+Solution: 
+Fixed by:
+Files 
+affected:
+
+
+-------------------------------------------------------------------
 Problem : If you use \set geometry in windows sdl client all the
 textures are lost.
 Found by: Baron
@@ -39,8 +50,8 @@ Problem : shotsize 8 with texturedObjects works ok in the lg [old] client
           while it doesnt work in ng X11 client (in ng shotsize comes out
           too small)
 Found by: Throat
-Solution:
-Fixed by:
+Solution: New textures extend the limit of "maximum size" of a shot
+Fixed by: Throat
 Files 
 affected:
 
