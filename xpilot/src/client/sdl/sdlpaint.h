@@ -35,7 +35,7 @@ extern long		loops;
 extern unsigned long	loopsSlow;	    /* Proceeds slower than loops */
 extern double           timePerFrame;
 extern double	        hudRadarLimit;	    /* Limit for hudradar drawing */
-
+extern float            scale;              /* The scale factor */
 
 /* from the generic code ( paintmap.c and paintobjects.c ) */
 

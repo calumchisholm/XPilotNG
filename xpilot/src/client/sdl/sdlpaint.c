@@ -46,6 +46,7 @@ unsigned long	loopsSlow = 0;	        /* Proceeds slower than loops */
 static double   time_counter = 0.0;
 double          timePerFrame = 0.0;
 double	        hudRadarLimit;		/* Limit for hudradar drawing */
+float           scale;                  /* The scale factor */
 
 
 int Paint_init(void)
@@ -58,6 +59,8 @@ int Paint_init(void)
 
     if (Images_init() == -1) 
 	return -1;
+
+    scale = 0.7;
 
     return 0;
 }
@@ -77,8 +80,8 @@ int Check_view_dimensions(void)
     width_wanted = (int)(draw_width * scaleFactor + 0.5);
     height_wanted = (int)(draw_height * scaleFactor + 0.5);
     */
-    width_wanted = draw_width;
-    height_wanted = draw_height;
+    width_wanted = draw_width / scale;
+    height_wanted = draw_height / scale;
 
     srv_width = width_wanted;
     srv_height = height_wanted;
@@ -161,7 +164,8 @@ void Paint_frame(void)
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(-world.x, -world.y, 0);
+    glTranslatef(-world.x * scale, -world.y * scale, 0);
+    glScalef(scale, scale, scale);
 
     glClear(GL_COLOR_BUFFER_BIT);
 

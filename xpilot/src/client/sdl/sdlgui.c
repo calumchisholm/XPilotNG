@@ -312,17 +312,19 @@ void Gui_paint_asteroid(int x, int y, int type, int rot, int size)
  */
 void Gui_paint_fastshot(int color, int x, int y)
 {
+    /* not sure why i need that 7 to make it right */
+    /* that 2 seems to be the size/2 of the bullet */
     Image_paint(IMG_BULLET, 
-		x + world.x, 
-		active_view_height + world.y - y - 5, 
+		x + world.x - 2, 
+		world.y - 7 + ext_view_height - y, 
 		3);
 }
 
 void Gui_paint_teamshot(int x, int y)
 {
     Image_paint(IMG_BULLET_OWN, 
-		x + world.x, 
-		active_view_height + world.y - y, 
+		x + world.x - 2, 
+		world.y - 7 + ext_view_height - y, 
 		3);
 }
 
