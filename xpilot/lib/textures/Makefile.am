@@ -1,3 +1,3 @@
 
 libdir = $(prefix)/lib/xpilot/textures
-lib_DATA = *.ppm *.xpm
+#lib_DATA = *.ppm *.xpm
