@@ -758,10 +758,6 @@ static void Robot_create(world_t *world)
     if (robot->mychar != 'W')
 	robot->mychar = 'R';
 
-    robot->fuel.l1 = 100.0;
-    robot->fuel.l2 = 200.0;
-    robot->fuel.l3 = 500.0;
-
     Pick_startpos(robot);
 
     (*rob_type->create)(robot, rob->config);

@@ -419,9 +419,6 @@ typedef struct {
     int		current;		/* Number of currently used tank */
     int		num_tanks;		/* Number of tanks */
     double	tank[1 + MAX_TANKS];	/* main fixed tank + extra tanks. */
-    double	l1;			/* Fuel critical level */
-    double	l2;			/* Fuel warning level */
-    double	l3;			/* Fuel notify level */
 } pl_fuel_t;
 
 typedef struct visibility {
