@@ -295,6 +295,18 @@ void Gui_paint_mine(int x, int y, int teammine, char *name)
 
 void Gui_paint_spark(int color, int x, int y)
 {
+    /*
+    Image_paint(IMG_SPARKS, 
+		x + world.x, 
+		world.y + ext_view_height - y, 
+		color);
+    */
+    glColor3ub(255 * (color + 1) / 8, 
+	       255 * color * color / 64,
+	       0);
+    glBegin(GL_POINTS);
+    glVertex2i(x + world.x, world.y + ext_view_height - y);
+    glEnd();
 }
 
 void Gui_paint_wreck(int x, int y, bool deadly, int wtype, int rot, int size)
