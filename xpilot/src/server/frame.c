@@ -881,9 +881,9 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 		int j;
 
 		for (j = 0; j < 3; j++) {
-		    clpos_t pts = Ship_get_point_clpos(t->ship, j, t->dir);
-		    clpos_t pos;
+		    clpos_t pts, pos;
 
+		    pts = Ship_get_point_clpos(t->ship, j, t->dir);
 		    pos.cx = t->pos.cx + pts.cx;
 		    pos.cy = t->pos.cy + pts.cy;
 		    Send_connector(conn, pos, cannon->pos, 1);
@@ -897,13 +897,17 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 
 	i = player_shuffle_ptr[k];
 	pl_i = Players(i);
+
 	if (BIT(pl_i->status, GAME_OVER))
 	    continue;
+
 	if (!BIT(pl_i->status, PLAYING) || BIT(pl_i->status, PAUSE)) {
 	    if (pl_i->home_base == NULL)
 		continue;
+
 	    if (!clpos_inview(&cv, pl_i->home_base->pos))
 		continue;
+
 	    if (BIT(pl_i->status, PAUSE))
 		Send_paused(conn, pl_i->home_base->pos,
 			    (int)pl_i->pause_count);
@@ -912,6 +916,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 			       (int)(pl_i->recovery_count * 10));
 	    continue;
 	}
+
 	if (!clpos_inview(&cv, pl_i->pos))
 	    continue;
 
@@ -937,12 +942,14 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 
 	if (BIT(pl_i->used, HAS_REFUEL)) {
 	    fuel_t *fs = Fuels(world, pl_i->fs);
+
 	    if (clpos_inview(&cv, fs->pos))
 		Send_refuel(conn, fs->pos, pl_i->pos);
 	}
 
 	if (BIT(pl_i->used, HAS_REPAIR)) {
 	    target_t *targ = Targets(world, pl_i->repair_target);
+
 	    if (clpos_inview(&cv, targ->pos))
 		/* same packet as refuel */
 		Send_refuel(conn, pl_i->pos, targ->pos);
@@ -950,12 +957,14 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
 	    player_t *t = Player_by_id(pl_i->lock.pl_id);
+
 	    if (clpos_inview(&cv, t->pos)) {
 		int j;
 
 		for (j = 0; j < 3; j++) {
-		    clpos_t pts = Ship_get_point_clpos(t->ship, j, t->dir), pos;
+		    clpos_t pts, pos;
 
+		    pts = Ship_get_point_clpos(t->ship, j, t->dir);
 		    pos.cx = t->pos.cx + pts.cx;
 		    pos.cy = t->pos.cy + pts.cy;
 		    Send_connector(conn, pos, pl_i->pos, 1);
@@ -964,9 +973,8 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 	}
 
 	if (pl_i->ball != NULL
-	    && clpos_inview(&cv, pl_i->ball->pos)) {
+	    && clpos_inview(&cv, pl_i->ball->pos))
 	    Send_connector(conn, pl_i->ball->pos, pl_i->pos, 0);
-	}
     }
 }
 
