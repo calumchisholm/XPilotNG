@@ -123,9 +123,7 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = src/common/NT/bindist/README.txt \
-	src/common/NT/bindist/READMEbin.txt \
-	src/common/NT/bindist/ServerMOTD.txt
+CONFIG_CLEAN_FILES =
 DIST_SOURCES =
 
 RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
@@ -175,12 +173,6 @@ $(srcdir)/config.h.in:  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-src/common/NT/bindist/README.txt: $(top_builddir)/config.status $(top_srcdir)/src/common/NT/bindist/README.txt.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-src/common/NT/bindist/READMEbin.txt: $(top_builddir)/config.status $(top_srcdir)/src/common/NT/bindist/READMEbin.txt.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-src/common/NT/bindist/ServerMOTD.txt: $(top_builddir)/config.status $(top_srcdir)/src/common/NT/bindist/ServerMOTD.txt.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd

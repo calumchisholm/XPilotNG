@@ -224,6 +224,8 @@ AC_CONFIG_FILES([ \
 	src/Makefile \
 	src/common/Makefile \
 	src/common/version.h \
+	src/common/NT/Makefile \
+	src/common/NT/bindist/Makefile \
 	src/common/NT/bindist/README.txt \
 	src/common/NT/bindist/READMEbin.txt \
 	src/common/NT/bindist/ServerMOTD.txt \

@@ -1,4 +1,4 @@
-
+SUBDIRS = NT
 AM_CPPFLAGS = -DLIBDIR=\"$(pkglibdir)/\"
 noinst_LIBRARIES = libxpcommon.a
 libxpcommon_a_SOURCES = \
