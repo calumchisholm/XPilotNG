@@ -2521,8 +2521,8 @@ void Ball_line_init(void)
     ball_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	ball_wire.pts[i] = coords + i;
-	coords[i].clk.cx = cos(i * PI / MAX_SHIP_PTS) * ballRadius * CLICK;
-	coords[i].clk.cy = sin(i * PI / MAX_SHIP_PTS) * ballRadius * CLICK;
+	coords[i].clk.cx = cos(i * 2 * PI / MAX_SHIP_PTS) * ballRadius * CLICK;
+	coords[i].clk.cy = sin(i * 2 * PI / MAX_SHIP_PTS) * ballRadius * CLICK;
     }
 
     return;
