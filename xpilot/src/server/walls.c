@@ -1361,7 +1361,7 @@ struct templine {
 	(P[N++] = V)
 
 
-#define POSMOD(x, y) ((x) >= 0 ? (x) % (y) : (x) % (y) + (y))
+#define POSMOD(x, y) ((x) >= 0 ? (x) % (y) : ((x) + 1) % (y) + (y) - 1)
 
 
 int is_inside(int x, int y, int hit_mask)
