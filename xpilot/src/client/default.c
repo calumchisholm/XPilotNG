@@ -617,8 +617,10 @@ option options[] = {
 	NULL,
 	"0",
 	KEY_DUMMY,
-	"Send messages to standard output.\n0: Don't.\n1: Only player "
-	"messages.\n2: Player and status messages.\n"
+	"Send messages to standard output.\n"
+	"0: Don't.\n"
+	"1: Only player messages.\n"
+	"2: Player and status messages.\n"
     },
     {
 	"reverseScroll",
@@ -648,14 +650,14 @@ option options[] = {
     {
 	"shotSize",
 	NULL,
-	"3",
+	"5",
 	KEY_DUMMY,
 	"The size of shots in pixels.\n"
     },
     {
 	"teamShotSize",
 	NULL,
-	"2",
+	"3",
 	KEY_DUMMY,
 	"The size of team shots in pixels.\n"
 	"Note that team shots are drawn in teamShotColor.\n"
@@ -1051,12 +1053,12 @@ option options[] = {
 	NULL,
 	"2",
 	KEY_DUMMY,
-	"Which color number to use for drawing the visible border.\n"
+	"Which color number to use for drawing the visibility border.\n"
     },
     {
 	"fuelGaugeColor",
 	NULL,
-	"2",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the fuel gauge.\n"
     },
@@ -1091,23 +1093,26 @@ option options[] = {
     {
 	"selfLWColor",
 	NULL,
-	"3",
+	"1",
 	KEY_DUMMY,
 	"Which color to use to paint your ship in when on last life.\n"
+	"Original color for this is red.\n"
     },
     {
 	"enemyLWColor",
 	NULL,
-	"3",
+	"1",
 	KEY_DUMMY,
 	"Which color to use to paint enemy ships in when on last life.\n"
+	"Original color for this is red.\n"
     },
     {
 	"teamLWColor",
 	NULL,
-	"4",
+	"2",
 	KEY_DUMMY,
 	"Which color to use to paint teammate ships in when on last life.\n"
+	"Original color for this is green.\n"
     },
     {
 	"shipNameColor",
@@ -1147,28 +1152,28 @@ option options[] = {
     {
 	"fuelMeterColor",
 	NULL,
-	"3",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the fuel meter.\n"
     },
     {
 	"powerMeterColor",
 	NULL,
-	"3",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the power meter.\n"
     },
     {
 	"turnSpeedMeterColor",
 	NULL,
-	"3",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the turn speed meter.\n"
     },
     {
 	"packetSizeMeterColor",
 	NULL,
-	"3",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the packet size meter.\n"
 	"Each bar is equavalent to 1024 bytes, for a maximum of 4096 bytes.\n"
@@ -1184,7 +1189,7 @@ option options[] = {
     {
 	"packetDropMeterColor",
 	NULL,
-	"3",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the packet drop meter.\n"
 	"This gives the percentage of dropped frames due to display slowness.\n"
@@ -1192,7 +1197,7 @@ option options[] = {
     {
 	"packetLagMeterColor",
 	NULL,
-	"3",
+	"0",
 	KEY_DUMMY,
 	"Which color number to use for drawing the packet lag meter.\n"
 	"This gives the amount of lag in frames over the past one second.\n"
@@ -1354,14 +1359,14 @@ option options[] = {
     {
 	"messagesColor",
 	NULL,
-	"3",
+	"12",
 	KEY_DUMMY,
 	"Which color number to use for drawing messages.\n"
     },
     {
 	"oldMessagesColor",
 	NULL,
-	"2",
+	"13",
 	KEY_DUMMY,
 	"Which color number to use for drawing old messages.\n"
     },

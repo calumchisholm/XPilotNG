@@ -520,8 +520,6 @@ int Init_top(void)
     COLORCHECK(scoreObjectColor, hudColor);
     COLORCHECK(wallColor, 2);
     COLORCHECK(fuelColor, 3);
-    COLORCHECK(messagesColor, 3);
-    COLORCHECK(oldMessagesColor, 2);
     COLORCHECK(backgroundPointColor, 2);
 
     if (maxColors > 4) {
@@ -541,11 +539,15 @@ int Init_top(void)
 	COLORCHECK(windowColor, 8);
 	COLORCHECK(scoreInactiveColor, 12);
 	COLORCHECK(scoreInactiveSelfColor, 12);
+	COLORCHECK(messagesColor, 12);
+	COLORCHECK(oldMessagesColor, 13);
     } else {
 	COLORCHECK(msgScanPopColor, 1);
 	COLORCHECK(windowColor, 2);
 	COLORCHECK(scoreInactiveColor, 1);
 	COLORCHECK(scoreInactiveSelfColor, 1);
+	COLORCHECK(messagesColor, 3);
+	COLORCHECK(oldMessagesColor, 2);
     }
 
 #undef COLORCHECK
