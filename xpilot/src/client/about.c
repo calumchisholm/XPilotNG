@@ -431,7 +431,7 @@ void About(Window w)
 
 int About_callback(int widget_desc, void *data, const char **str)
 {
-    (void)widget_desc; (void)data; (void)str;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
     if (about_created == false) {
 	About_create_window();
 	about_created = true;
@@ -449,6 +449,8 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
     char	*buf = calloc(bufsize, 1), *end = buf, *str;
     const char	*help;
     int		i, len, maxkeylen = 0;
+
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(unused);
 
     for (i = 0; i < num_keydefs; i++) {
 	if ((str = XKeysymToString((KeySym)keydefs[i].keysym)) != NULL
@@ -508,7 +510,7 @@ static bool		motd_auto_popup;
 
 int Motd_callback(int widget_desc, void *data, const char **str)
 {
-    (void)widget_desc; (void)data; (void)str;
+    UNUSED_PARAM(widget_desc); UNUSED_PARAM(data); UNUSED_PARAM(str);
 
     /* always refresh motd */
     motd_auto_popup = false;

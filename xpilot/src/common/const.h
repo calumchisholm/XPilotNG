@@ -113,6 +113,9 @@ do { \
     if (ptr) { free(ptr);  ptr = NULL; } \
 } while (0)
 
+/* Use this to remove unused parameter warning. */
+#define UNUSED_PARAM(x) x = x;
+
 /* Do NOT change these! */
 #define OLD_MAX_CHECKS		26
 #define MAX_TEAMS		10
