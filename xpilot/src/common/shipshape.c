@@ -1444,3 +1444,43 @@ void Calculate_shield_radius(shipobj *w)
 }
 #endif
 
+shapepos Ship_get_point(shipobj *ship, int i, int dir)
+{
+    return ship->pts[i][dir];
+}
+shapepos Ship_get_engine(shipobj *ship, int dir)
+{
+    return ship->engine[dir];
+}
+shapepos Ship_get_m_gun(shipobj *ship, int dir)
+{
+    return ship->m_gun[dir];
+}
+shapepos Ship_get_l_gun(shipobj *ship, int gun, int dir)
+{
+    return ship->l_gun[gun][dir];
+}
+shapepos Ship_get_r_gun(shipobj *ship, int gun, int dir)
+{
+    return ship->r_gun[gun][dir];
+}
+shapepos Ship_get_l_rgun(shipobj *ship, int gun, int dir)
+{
+    return ship->l_rgun[gun][dir];
+}
+shapepos Ship_get_r_rgun(shipobj *ship, int gun, int dir)
+{
+    return ship->r_rgun[gun][dir];
+}
+shapepos Ship_get_l_light(shipobj *ship, int l, int dir)
+{
+    return ship->l_light[l][dir];
+}
+shapepos Ship_get_r_light(shipobj *ship, int l, int dir)
+{
+    return ship->r_light[l][dir];
+}
+shapepos Ship_get_m_rack(shipobj *ship, int rack, int dir)
+{
+    return ship->m_rack[rack][dir];
+}

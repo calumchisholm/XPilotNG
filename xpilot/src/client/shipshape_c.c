@@ -122,44 +122,54 @@ shapepos ipos2shapepos(ipos pos)
     return shpos;
 }
 
+
+
 position Ship_get_point_position(shipobj *ship, int i, int dir)
 {
-    return ((ship)->pts[i][dir].pxl);
-}
-position Ship_get_engine_position(shipobj *ship, int dir)
-{
-    return ((ship)->engine[dir].pxl);
-}
-position Ship_get_m_gun_position(shipobj *ship, int dir)
-{
-    return ((ship)->m_gun[dir].pxl);
-}
-position Ship_get_l_gun_position(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->l_gun[gun][dir].pxl);
-}
-position Ship_get_r_gun_position(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->r_gun[gun][dir].pxl);
-}
-position Ship_get_l_rgun_position(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->l_rgun[gun][dir].pxl);
-}
-position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->r_rgun[gun][dir].pxl);
-}
-position Ship_get_l_light_position(shipobj *ship, int l, int dir)
-{
-    return ((ship)->l_light[l][dir].pxl);
-}
-position Ship_get_r_light_position(shipobj *ship, int l, int dir)
-{
-    return ((ship)->r_light[l][dir].pxl);
-}
-position Ship_get_m_rack_position(shipobj *ship, int rack, int dir)
-{
-    return ((ship)->m_rack[rack][dir].pxl);
+    return Ship_get_point(ship, i, dir).pxl;
 }
 
+position Ship_get_engine_position(shipobj *ship, int dir)
+{
+    return Ship_get_engine(ship, dir).pxl;
+}
+
+position Ship_get_m_gun_position(shipobj *ship, int dir)
+{
+    return Ship_get_m_gun(ship, dir).pxl;
+}
+
+position Ship_get_l_gun_position(shipobj *ship, int gun, int dir)
+{
+    return Ship_get_l_gun(ship, gun, dir).pxl;
+}
+
+position Ship_get_r_gun_position(shipobj *ship, int gun, int dir)
+{
+    return Ship_get_r_gun(ship, gun, dir).pxl;
+}
+
+position Ship_get_l_rgun_position(shipobj *ship, int gun, int dir)
+{
+    return Ship_get_l_rgun(ship, gun, dir).pxl;
+}
+
+position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir)
+{
+    return Ship_get_r_rgun(ship, gun, dir).pxl;
+}
+
+position Ship_get_l_light_position(shipobj *ship, int l, int dir)
+{
+    return Ship_get_l_light(ship, l, dir).pxl;
+}
+
+position Ship_get_r_light_position(shipobj *ship, int l, int dir)
+{
+    return Ship_get_r_light(ship, l, dir).pxl;
+}
+
+position Ship_get_m_rack_position(shipobj *ship, int rack, int dir)
+{
+    return Ship_get_m_rack(ship, rack, dir).pxl;
+}

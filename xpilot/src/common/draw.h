@@ -160,6 +160,17 @@ extern void Rotate_ship(shipobj *w);
 extern shapepos ipos2shapepos(ipos pos);
 extern shapepos *Shape_get_points(shape *s, int dir);
 
+shapepos Ship_get_point(shipobj *ship, int i, int dir);
+shapepos Ship_get_engine(shipobj *ship, int dir);
+shapepos Ship_get_m_gun(shipobj *ship, int dir);
+shapepos Ship_get_l_gun(shipobj *ship, int gun, int dir);
+shapepos Ship_get_r_gun(shipobj *ship, int gun, int dir);
+shapepos Ship_get_l_rgun(shipobj *ship, int gun, int dir);
+shapepos Ship_get_r_rgun(shipobj *ship, int gun, int dir);
+shapepos Ship_get_l_light(shipobj *ship, int l, int dir);
+shapepos Ship_get_r_light(shipobj *ship, int l, int dir);
+shapepos Ship_get_m_rack(shipobj *ship, int rack, int dir);
+
 position Ship_get_point_position(shipobj *ship, int i, int dir);
 position Ship_get_engine_position(shipobj *ship, int dir);
 position Ship_get_m_gun_position(shipobj *ship, int dir);
@@ -170,17 +181,20 @@ position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir);
 position Ship_get_l_light_position(shipobj *ship, int l, int dir);
 position Ship_get_r_light_position(shipobj *ship, int l, int dir);
 position Ship_get_m_rack_position(shipobj *ship, int rack, int dir);
+
 #ifdef SERVER
-clpos Ship_get_point_clpos(shipobj *ship, int i, int dir);
-clpos Ship_get_engine_clpos(shipobj *ship, int dir);
-clpos Ship_get_m_gun_clpos(shipobj *ship, int dir);
-clpos Ship_get_l_gun_clpos(shipobj *ship, int gun, int dir);
-clpos Ship_get_r_gun_clpos(shipobj *ship, int gun, int dir);
-clpos Ship_get_l_rgun_clpos(shipobj *ship, int gun, int dir);
-clpos Ship_get_r_rgun_clpos(shipobj *ship, int gun, int dir);
-clpos Ship_get_l_light_clpos(shipobj *ship, int l, int dir);
-clpos Ship_get_r_light_clpos(shipobj *ship, int l, int dir);
-clpos Ship_get_m_rack_clpos(shipobj *ship, int rack, int dir);
+
+#define Ship_get_point_clpos(s, i, d)   (Ship_get_point(s, i, d).clk)
+#define Ship_get_engine_clpos(s, d)     (Ship_get_engine(s, d).clk)
+#define Ship_get_m_gun_clpos(s, d)      (Ship_get_m_gun(s, d).clk)
+#define Ship_get_l_gun_clpos(s, g, d)   (Ship_get_l_gun(s, g, d).clk)
+#define Ship_get_r_gun_clpos(s, g, d)   (Ship_get_r_gun(s, g, d).clk)
+#define Ship_get_l_rgun_clpos(s, g, d)  (Ship_get_l_rgun(s, g, d).clk)
+#define Ship_get_r_rgun_clpos(s, g, d)  (Ship_get_r_rgun(s, g, d).clk)
+#define Ship_get_l_light_clpos(s, l, d) (Ship_get_l_light(s, l, d).clk)
+#define Ship_get_r_light_clpos(s, l, d) (Ship_get_r_light(s, l, d).clk)
+#define Ship_get_m_rack_clpos(s, r, d)  (Ship_get_m_rack(s, r, d).clk)
+
 #endif
 
 extern DFLOAT rfrac(void);

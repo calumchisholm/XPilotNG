@@ -138,53 +138,10 @@ shapepos *Shape_get_points(shape *s, int dir)
 }
 
 
-clpos Ship_get_point_clpos(shipobj *ship, int i, int dir)
-{
-    return ((ship)->pts[i][dir].clk);
-}
-clpos Ship_get_engine_clpos(shipobj *ship, int dir)
-{
-    return ((ship)->engine[dir].clk);
-}
-clpos Ship_get_m_gun_clpos(shipobj *ship, int dir)
-{
-    return ((ship)->m_gun[dir].clk);
-}
-clpos Ship_get_l_gun_clpos(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->l_gun[gun][dir].clk);
-}
-clpos Ship_get_r_gun_clpos(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->r_gun[gun][dir].clk);
-}
-clpos Ship_get_l_rgun_clpos(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->l_rgun[gun][dir].clk);
-}
-clpos Ship_get_r_rgun_clpos(shipobj *ship, int gun, int dir)
-{
-    return ((ship)->r_rgun[gun][dir].clk);
-}
-clpos Ship_get_l_light_clpos(shipobj *ship, int l, int dir)
-{
-    return ((ship)->l_light[l][dir].clk);
-}
-clpos Ship_get_r_light_clpos(shipobj *ship, int l, int dir)
-{
-    return ((ship)->r_light[l][dir].clk);
-}
-clpos Ship_get_m_rack_clpos(shipobj *ship, int rack, int dir)
-{
-    return ((ship)->m_rack[rack][dir].clk);
-}
-
-
-
 position Ship_get_point_position(shipobj *ship, int i, int dir)
 {
     position pos;
-    clpos c = ((ship)->pts[i][dir].clk);
+    clpos c = Ship_get_point_clpos(ship, i, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -194,7 +151,7 @@ position Ship_get_point_position(shipobj *ship, int i, int dir)
 position Ship_get_engine_position(shipobj *ship, int dir)
 {
     position pos;
-    clpos c = ((ship)->engine[dir].clk);
+    clpos c = Ship_get_engine_clpos(ship, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -204,7 +161,7 @@ position Ship_get_engine_position(shipobj *ship, int dir)
 position Ship_get_m_gun_position(shipobj *ship, int dir)
 {
     position pos;
-    clpos c = ((ship)->m_gun[dir].clk);
+    clpos c = Ship_get_m_gun_clpos(ship, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -214,7 +171,7 @@ position Ship_get_m_gun_position(shipobj *ship, int dir)
 position Ship_get_l_gun_position(shipobj *ship, int gun, int dir)
 {
     position pos;
-    clpos c = ((ship)->l_gun[gun][dir].clk);
+    clpos c = Ship_get_l_gun_clpos(ship, gun, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -224,7 +181,7 @@ position Ship_get_l_gun_position(shipobj *ship, int gun, int dir)
 position Ship_get_r_gun_position(shipobj *ship, int gun, int dir)
 {
     position pos;
-    clpos c = ((ship)->r_gun[gun][dir].clk);
+    clpos c = Ship_get_r_gun_clpos(ship, gun, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -234,7 +191,7 @@ position Ship_get_r_gun_position(shipobj *ship, int gun, int dir)
 position Ship_get_l_rgun_position(shipobj *ship, int gun, int dir)
 {
     position pos;
-    clpos c = ((ship)->l_rgun[gun][dir].clk);
+    clpos c = Ship_get_l_rgun_clpos(ship, gun, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -244,7 +201,7 @@ position Ship_get_l_rgun_position(shipobj *ship, int gun, int dir)
 position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir)
 {
     position pos;
-    clpos c = ((ship)->r_rgun[gun][dir].clk);
+    clpos c = Ship_get_r_rgun_clpos(ship, gun, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -254,7 +211,7 @@ position Ship_get_r_rgun_position(shipobj *ship, int gun, int dir)
 position Ship_get_l_light_position(shipobj *ship, int l, int dir)
 {
     position pos;
-    clpos c = ((ship)->l_light[l][dir].clk);
+    clpos c = Ship_get_l_light_clpos(ship, l, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -264,7 +221,7 @@ position Ship_get_l_light_position(shipobj *ship, int l, int dir)
 position Ship_get_r_light_position(shipobj *ship, int l, int dir)
 {
     position pos;
-    clpos c = ((ship)->r_light[l][dir].clk);
+    clpos c = Ship_get_r_light_clpos(ship, l, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
@@ -274,7 +231,7 @@ position Ship_get_r_light_position(shipobj *ship, int l, int dir)
 position Ship_get_m_rack_position(shipobj *ship, int rack, int dir)
 {
     position pos;
-    clpos c = ((ship)->m_rack[rack][dir].clk);
+    clpos c = Ship_get_m_rack_clpos(ship, rack, dir);
 
     pos.x = CLICK_TO_FLOAT(c.cx);
     pos.y = CLICK_TO_FLOAT(c.cy);
