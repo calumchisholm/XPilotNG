@@ -374,7 +374,7 @@ def convert(options):
 
     for p in polys2:
 	internal = [i for i in range(len(p)) if p[i][2] == None]
-	sstr = '<Polygon x="%d" y="%d"' % tuple(p[0][:2])
+	sstr = '<Polygon x="%d" y="%d"' % tuple(p[-1][:2])
 	if internal:
 	    sstr += ' hidedges="%d"' % len(internal)
 	sstr += '>'
@@ -395,12 +395,12 @@ def convert(options):
 	print '<BallArea team="%d">' % ball.team
 	print '<Polygon x="%d" y="%d">' % (ball.x - 1120, ball.y - 640)
 	print '<Offset x="2240" y="0"/> <Offset x="0" y="2240"/>'
-	print '<Offset x="-2240" y="0"/>'
+	print '<Offset x="-2240" y="0"/> <Offset x="0" y="-2240"/>'
 	print '</Polygon></BallArea>'
 	print '<BallTarget team="%d">' % ball.team
 	print '<Polygon x="%d" y="%d">' % (ball.x - 480, ball.y)
 	print '<Offset x="960" y="0"/> <Offset x="0" y="960"/>'
-	print '<Offset x="-960" y="0"/>'
+	print '<Offset x="-960" y="0"/> <Offset x="0" y="-960"/>'
 	print '</Polygon></BallTarget>'
     for base in bases:
 	print '<Base team="%d" x="%d" y="%d" dir = "%d"/>' % \
