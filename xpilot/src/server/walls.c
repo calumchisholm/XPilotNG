@@ -174,16 +174,16 @@ int mapx, mapy;
 
 #if 1
 #define can_hit(groupptr, move) \
-(((groupptr)->hit_mask & (move)->hit_mask) ? false : \
- ((groupptr)->hit_func == NULL ? true : (groupptr)->hit_func(groupptr, move)))
+(((groupptr)->hitmask & (move)->hitmask) ? false : \
+ ((groupptr)->hitfunc == NULL ? true : (groupptr)->hitfunc(groupptr, move)))
 #else
 bool can_hit(struct group *groupptr, struct move *move)
 {
-    if (groupptr->hit_mask & move->hit_mask)
+    if (groupptr->hitmask & move->hitmask)
 	return false;
-    if (groupptr->hit_func == NULL)
+    if (groupptr->hitfunc == NULL)
 	return true;
-    return groupptr->hit_func(groupptr, move);
+    return groupptr->hitfunc(groupptr, move);
 }
 #endif
 
@@ -1413,7 +1413,7 @@ static int Shape_morph(const shipobj *shape1, int dir1, const shipobj *shape2,
     unsigned short *points;
     struct move mv;
 
-    mv.hit_mask = hitmask;
+    mv.hitmask = hitmask;
     mv.obj = (object *)obj;
     for (i = 0; i < shape1->num_points; i++) {
 	clpos pt1, pt2;
@@ -1832,16 +1832,16 @@ struct templine {
 
 /* Check whether the given position (cx, cy) is such that it is inside
  * a polygon belonging to a group that could be hit by the given
- * hit_mask/object.
+ * hitmask/object.
  * Return the number of a group that would be hit or NO_GROUP. */
-int is_inside(int cx, int cy, int hit_mask, const object *obj)
+int is_inside(int cx, int cy, int hitmask, const object *obj)
 {
     short *ptr;
     int inside, cx1, cx2, cy1, cy2, s;
     struct inside_block *gblock;
     struct move mv;
 
-    mv.hit_mask = hit_mask;
+    mv.hitmask = hitmask;
     mv.obj = (object *)obj;
     gblock = &inside_table[(cx >> B_SHIFT) + mapx * (cy >> B_SHIFT)];
     if (gblock->group == NO_GROUP)
@@ -2653,9 +2653,9 @@ static void Move_ball(object *obj)
     }
     owner = BALL_PTR(obj)->owner;
     if (owner == NO_ID || Players[GetInd[owner]]->team == TEAM_NOT_SET)
-	mv.hit_mask = BALL_BIT | NOTEAM_BIT;
+	mv.hitmask = BALL_BIT | NOTEAM_BIT;
     else
-	mv.hit_mask = BALL_BIT | 1 << Players[GetInd[owner]]->team;
+	mv.hitmask = BALL_BIT | 1 << Players[GetInd[owner]]->team;
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
     while (mv.delta.cx || mv.delta.cy) {
@@ -2719,18 +2719,18 @@ static void Move_object_new(object *obj)
 	    team =  Players[GetInd[obj->owner]].team;
 	else
 	    team = TEAM_NOT_SET;
-	mv.hit_mask = BALL_BIT;
+	mv.hitmask = BALL_BIT;
     }
     else
 #endif
 	{
-	    mv.hit_mask = NONBALL_BIT;
+	    mv.hitmask = NONBALL_BIT;
 	    team = obj->team;
 	}
     if (team == TEAM_NOT_SET)
-	mv.hit_mask |= NOTEAM_BIT;
+	mv.hitmask |= NOTEAM_BIT;
     else
-	mv.hit_mask |= 1 << team;
+	mv.hitmask |= 1 << team;
 
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
@@ -2824,9 +2824,9 @@ static void Move_player_new(int ind)
     }
     else {
 	if (pl->team != TEAM_NOT_SET)
-	    mv.hit_mask = NONBALL_BIT | 1 << pl->team;
+	    mv.hitmask = NONBALL_BIT | 1 << pl->team;
 	else
-	    mv.hit_mask = NONBALL_BIT | NOTEAM_BIT;
+	    mv.hitmask = NONBALL_BIT | NOTEAM_BIT;
 	mv.start.cx = pl->pos.cx;
 	mv.start.cy = pl->pos.cy;
 	while (mv.delta.cx || mv.delta.cy) {

@@ -236,8 +236,8 @@ int P_start_ballarea(void)
     Check_groupcount();
     groups[current_group].type = TREASURE;
     groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hit_mask = BALL_BIT;
-    groups[current_group].hit_func = NULL;
+    groups[current_group].hitmask = BALL_BIT;
+    groups[current_group].hitfunc = NULL;
     groups[current_group].item_id = -1;
     return current_group;
 }
@@ -253,9 +253,9 @@ int P_start_balltarget(int team)
     Check_groupcount();
     groups[current_group].type = TREASURE;
     groups[current_group].team = team;
-    groups[current_group].hit_mask = NONBALL_BIT;
+    groups[current_group].hitmask = NONBALL_BIT;
     /*= NONBALL_BIT | (((NOTEAM_BIT << 1) - 1) & ~(1 << team));*/
-    groups[current_group].hit_func = Balltarget_hit_func;
+    groups[current_group].hitfunc = Balltarget_hitfunc;
     groups[current_group].item_id = -1;
     return current_group;
 }
@@ -273,8 +273,8 @@ int P_start_target(int team, int ind)
     Check_groupcount();
     groups[current_group].type = TARGET;
     groups[current_group].team = team;
-    groups[current_group].hit_mask = Target_hitmask(targ);
-    groups[current_group].hit_func = NULL /*Target_hit_func*/;
+    groups[current_group].hitmask = Target_hitmask(targ);
+    groups[current_group].hitfunc = NULL /*Target_hitfunc*/;
     groups[current_group].item_id = ind;
     targ->group = current_group;
     return current_group;
@@ -293,8 +293,8 @@ int P_start_cannon(int team, int ind)
     Check_groupcount();
     groups[current_group].type = CANNON;
     groups[current_group].team = team;
-    groups[current_group].hit_mask = Cannon_hitmask(cannon);
-    groups[current_group].hit_func = Cannon_hit_func;
+    groups[current_group].hitmask = Cannon_hitmask(cannon);
+    groups[current_group].hitfunc = Cannon_hitfunc;
     groups[current_group].item_id = ind;
     cannon->group = current_group;
     return current_group;
@@ -311,8 +311,8 @@ int P_start_wormhole(int ind)
     Check_groupcount();
     groups[current_group].type = WORMHOLE;
     groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hit_mask = 0;
-    groups[current_group].hit_func = NULL;
+    groups[current_group].hitmask = 0;
+    groups[current_group].hitfunc = NULL;
     groups[current_group].item_id = ind;
     return current_group;
 }
@@ -328,8 +328,8 @@ int P_start_frictionarea(void)
     Check_groupcount();
     groups[current_group].type = FRICTION;
     groups[current_group].team = TEAM_NOT_SET;
-    groups[current_group].hit_mask = 0xFFFFFFFF; /* kps - hack */
-    groups[current_group].hit_func = NULL;
+    groups[current_group].hitmask = 0xFFFFFFFF; /* kps - hack */
+    groups[current_group].hitfunc = NULL;
     groups[current_group].item_id = -1;
     return current_group;
 }
@@ -408,5 +408,5 @@ void P_set_hitmask(int group, int hitmask)
 	xpprintf("P_set_hitmask: BUG: group out of range.\n");
 	return;
     }
-    groups[group].hit_mask = hitmask;
+    groups[group].hitmask = hitmask;
 }

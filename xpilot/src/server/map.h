@@ -303,7 +303,7 @@ typedef struct {
 struct move {
     clvec start;
     clvec delta;
-    int hit_mask;
+    int hitmask;
     object *obj;
 };
 
@@ -311,8 +311,8 @@ struct group {
     int type;
     int team;
     int item_id;
-    unsigned int hit_mask;
-    bool (*hit_func)(struct group *group, struct move *move);
+    unsigned int hitmask;
+    bool (*hitfunc)(struct group *group, struct move *move);
 };
 
 extern struct polystyle pstyles[256];

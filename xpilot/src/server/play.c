@@ -305,7 +305,7 @@ void Ball_hits_goal(ballobject *ball, int group)
  * This function is called when something would hit a balltarget.
  * The function determines if it hits or not.
  */
-bool Balltarget_hit_func(struct group *group, struct move *move)
+bool Balltarget_hitfunc(struct group *group, struct move *move)
 {
     ballobject *ball = NULL;
 
@@ -316,7 +316,7 @@ bool Balltarget_hit_func(struct group *group, struct move *move)
 
     /* can this happen ? */
     if (move->obj->type != OBJ_BALL) {
-	printf("Balltarget_hit_func: hit by a %s.\n",
+	printf("Balltarget_hitfunc: hit by a %s.\n",
 	       Object_typename(move->obj));
 	return true;
     }
@@ -401,7 +401,7 @@ extern struct move_parameters mp;
  *
  * Ideas stolen from Move_segment in walls_old.c
  */
-bool Cannon_hit_func(struct group *group, struct move *move)
+bool Cannon_hitfunc(struct group *group, struct move *move)
 {
     object *obj = NULL;
     int ind = group->item_id;
@@ -410,7 +410,7 @@ bool Cannon_hit_func(struct group *group, struct move *move)
 
     /* cannon is dead ? */
     if (cannon->dead_time > 0) {
-	warn("BUG: Cannon_hit_func called for dead cannon.\n");
+	warn("BUG: Cannon_hitfunc called for dead cannon.\n");
 	return false;
     }
 
@@ -434,7 +434,7 @@ bool Cannon_hit_func(struct group *group, struct move *move)
     if (BIT(World.rules->mode, TEAM_PLAY)
 	&& teamImmunity
 	&& obj->team == cannon->team) {
-	warn("BUG: Cannon_hit_func: hitmask bug.\n");
+	warn("BUG: Cannon_hitfunc: hitmask bug.\n");
 	return false;
     }
 
@@ -520,7 +520,7 @@ void Target_remove_from_map(int ind)
 }
 
 #if 0
-bool Target_hit_func(struct group *group, struct move *move)
+bool Target_hitfunc(struct group *group, struct move *move)
 {
     object *obj = NULL;
     int ind = group->item_id;
@@ -529,7 +529,7 @@ bool Target_hit_func(struct group *group, struct move *move)
 
     /* target is dead ? */
     if (targ->dead_time > 0) {
-	xpprintf("BUG: Target_hit_func called for dead target.\n");
+	xpprintf("BUG: Target_hitfunc called for dead target.\n");
 	return false;
     }
 
