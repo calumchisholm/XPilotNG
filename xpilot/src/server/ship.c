@@ -351,6 +351,7 @@ void Tank_handle_detach(player_t *pl)
 	Player_remove_tank(tank, tank->fuel.num_tanks);
 
     tank->pl_type = PL_TYPE_TANK;
+    tank->pl_type_mychar = 'T';
     Player_position_init_clpos(tank, pl->pos);
     tank->vel = pl->vel;
     tank->acc = pl->acc;
@@ -373,7 +374,6 @@ void Tank_handle_detach(player_t *pl)
     tank->pseudo_team = pl->pseudo_team;
     tank->alliance = ALLIANCE_NOT_SET;
     tank->invite = NO_ID;
-    tank->mychar = 'T';
     tank->score = pl->score - options.tankScoreDecrement;
 
     /* Fuel is the one from chosen tank */
@@ -412,7 +412,7 @@ void Tank_handle_detach(player_t *pl)
     /* The tank uses shield and thrust */
     tank->obj_status = GRAVITY;
     Player_thrust(tank, true);
-    tank->pl_status = PLAYING;
+    Player_set_state(tank, PL_STATE_ALIVE);
     tank->have = DEF_HAVE;
     tank->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
 

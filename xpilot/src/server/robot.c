@@ -734,6 +734,8 @@ static void Robot_create(world_t *world)
 
     robot = Player_by_index(NumPlayers);
     robot->pl_type = PL_TYPE_ROBOT;
+    robot->pl_type_mychar = 'R';
+    Player_set_state(robot, PL_STATE_ALIVE);
     robot->robot_data_ptr = new_data;
 
     strlcpy(robot->name, rob->name, MAX_CHARS);
@@ -755,8 +757,6 @@ static void Robot_create(world_t *world)
 	teamp->NumMembers++;
 	teamp->NumRobots++;
     }
-    if (robot->mychar != 'W')
-	robot->mychar = 'R';
 
     Pick_startpos(robot);
 

@@ -32,9 +32,9 @@
 
 char update_version[] = VERSION;
 
-int	roundtime = -1;		/* time left this round */
-static double time_to_update = 1;	/* time before less frequent updates */
-static bool do_update_this_frame = false; /* less frequent update this frame */
+int		roundtime = -1;		/* time left this round */
+static double	time_to_update = 1;	/* time before less frequent updates */
+static bool	do_update_this_frame = false; /* less frequent update this frame */
 
 static inline void update_object_speed(world_t *world, object_t *obj)
 {
@@ -781,6 +781,11 @@ static void Update_players(world_t *world)
     for (i = 0; i < NumPlayers; i++) {
 	pl = Player_by_index(i);
 
+#ifdef KPS_TEST
+	if ((frame_loops % FPS) == 0)
+	    Player_print_state(pl, "Update_players");
+#endif
+
 	if (Player_is_paused(pl)) {
 	    if (options.pauseTax > 0.0 && (frame_loops % FPS) == 0) {
 		pl->score -= options.pauseTax;
@@ -817,16 +822,12 @@ static void Update_players(world_t *world)
 	}
 
 	if (pl->recovery_count > 0) {
-	    /* this shouldn't happen */
-	    if (BIT(pl->pl_status, PLAYING))
-		warn("**** Player %s is playing, recovery count = %f",
-		     pl->name, pl->recovery_count);
-
+	    assert(!BIT(pl->pl_status, PLAYING));
 	    pl->recovery_count -= timeStep;
 	    if (pl->recovery_count <= 0) {
 		/* Player has recovered. */
 		pl->recovery_count = 0;
-		SET_BIT(pl->pl_status, PLAYING);
+		Player_set_state(pl, PL_STATE_ALIVE);
 		Go_home(pl); 
 	    }
 	    else {

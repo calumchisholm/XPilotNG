@@ -197,6 +197,7 @@ struct player {
     /* up to here the player type should be the same as an object. */
 
     int		pl_type;		/* extended type info (tank, robot) */
+    char	pl_type_mychar;		/* Special char for player type */
     uint16_t	pl_status;		/* PLAYING, etc. */
     uint16_t	pl_state;		/* one of PL_STATE_* */
 

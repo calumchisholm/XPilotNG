@@ -423,6 +423,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
      * Robots and tanks will change this field.
      */
     pl->pl_type = PL_TYPE_HUMAN;
+    pl->pl_type_mychar = ' ';
 
     Compute_sensor_range(pl);
 
@@ -622,24 +623,20 @@ void Reset_all_players(world_t *world)
 	    && !Player_is_waiting(pl))
 	    Rank_add_round(pl);
 
-	CLR_BIT(pl->pl_status, GAME_OVER);
 	CLR_BIT(pl->have, HAS_BALL);
 	Player_reset_timing(pl);
 
 	if (!Player_is_paused(pl)) {
-	    pl->mychar = ' ';
+	    assert(pl->recovery_count == RECOVERY_DELAY);
+	    Player_set_state(pl, PL_STATE_APPEARING);
 	    pl->idleTime = 0;
 	    pl->life = world->rules->lives;
 	    if (BIT(world->rules->mode, TIMING))
 		pl->recovery_count = RECOVERY_DELAY;
 	}
-	if (Player_is_tank(pl))
-	    pl->mychar = 'T';
-	else if (Player_is_robot(pl))
-	    pl->mychar = 'R';
     }
-    if (BIT(world->rules->mode, TEAM_PLAY)) {
 
+    if (BIT(world->rules->mode, TEAM_PLAY)) {
 	/* Detach any balls and kill ball */
 	/* We are starting all over again */
 	for (j = NumObjs - 1; j >= 0 ; j--) {
@@ -1727,9 +1724,11 @@ void Player_set_state(player_t *pl, int state)
 	SET_BIT(pl->pl_status, GAME_OVER);
 	break;
     case PL_STATE_APPEARING:
+	pl->mychar = pl->pl_type_mychar;
+	CLR_BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED);
 	break;
     case PL_STATE_ALIVE:
-	pl->mychar = ' ';
+	pl->mychar = pl->pl_type_mychar;
 	SET_BIT(pl->pl_status, PLAYING);
 	CLR_BIT(pl->pl_status, PAUSE|GAME_OVER|KILLED);
 	break;
