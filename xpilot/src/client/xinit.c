@@ -76,7 +76,6 @@ unsigned		top_width, top_height;
 unsigned		players_width, players_height;
 char			*geometry;
 bool			radar_score_mapped;
-bool			autoServerMotdPopup;
 Cursor			pointerControlCursor;
 bool			ignoreWindowManager;
 

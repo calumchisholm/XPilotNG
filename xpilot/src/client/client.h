@@ -547,6 +547,7 @@ extern int	clientPortEnd;		/* Last one (these are for firewalls) */
 extern byte	lose_item;		/* flag and index to drop item */
 extern int	lose_item_active;	/* one of the lose keys is pressed */
 
+extern bool	autoServerMotdPopup;
 
 #ifdef SOUND
 extern char 	sounds[MAX_CHARS];	/* audio mappings */

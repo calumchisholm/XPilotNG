@@ -146,6 +146,8 @@ int	lose_item_active;	/* one of the lose keys is pressed */
 double	scaleFactor;
 double	scaleFactor_s;
 
+bool	autoServerMotdPopup;
+
 #ifdef SOUND
 char 	sounds[MAX_CHARS];	/* audio mappings */
 char 	audioServer[MAX_CHARS];	/* audio server */

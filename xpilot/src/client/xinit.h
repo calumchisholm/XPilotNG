@@ -54,7 +54,6 @@ extern int		button_form;
 extern unsigned		top_width, top_height;
 extern unsigned		players_width, players_height;
 extern char		*geometry;
-extern bool		autoServerMotdPopup;
 extern bool		ignoreWindowManager;
 extern bool		quitting;
 

@@ -34,8 +34,6 @@ char myClass[] = "XPilot";
 
 keys_t buttonDefs[MAX_POINTER_BUTTONS][MAX_BUTTON_DEFS+1];
 
-
-
 #ifdef OPTIONHACK
 
 char mynickname[MAX_NAME_LEN];
