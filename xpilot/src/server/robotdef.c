@@ -1251,6 +1251,7 @@ static int Rank_item_value(player_t *pl, long itemtype)
 	case ITEM_MINE:		/* blows others off the track */
 	case ITEM_ECM:		/* blinded players smash into walls */
 	    return ROBOT_MUST_HAVE_ITEM;
+	case ITEM_WIDEANGLE:	/* not important in racemode */
 	case ITEM_CLOAK:	/* not important in racemode */
 	case ITEM_LASER:	/* cost too much fuel */
 	case ITEM_MISSILE:	/* likely to hit self */
