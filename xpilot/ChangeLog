@@ -1,3 +1,659 @@
+2004-02-28 23:27  kps
+
+	* lib/textures/: Makefile.am, Makefile.in: Added ball_gray16 to
+	  distro.
+
+2004-02-28 23:20  juhal
+
+	* src/client/bitmaps.c, src/client/bitmaps.h,
+	  src/client/guiobjects.c, lib/textures/ball_gray16.ppm: added
+	  support for colored ball images
+
+2004-02-28 21:20  kps
+
+	* src/: client/client.c, client/client.h, client/guiobjects.c,
+	  client/guiobjects.h, client/netclient.c, client/paintobjects.c,
+	  client/sdl/sdlgui.c, common/pack.h, server/frame.c, server/map.c,
+	  server/map.h, server/netserver.c, server/netserver.h,
+	  server/object.h, server/server.h, server/shot.c, server/xp2map.c,
+	  server/xpmap.c: Added support for transmitting polystyle in ball
+	  packets.
+
+2004-02-28 20:55  darelcullen
+
+	* src/common/socklib.c: meta windows updates
+
+2004-02-28 20:51  darelcullen
+
+	* src/client/: sdl/main.c, sdl/xpilot_sdl.dsp, meta.c: meta windows
+	  updates
+
+2004-02-28 18:54  maximan
+
+	* src/client/sdl/: glwidgets.c, sdlgui.c, sdlmeta.c: Trivial
+	  bugfix; return statement missing when you can't contact meta (sdl
+	  client)
+
+2004-02-28 15:48  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: MainFrame.java,
+	  MapCanvas.java, MapModel.java, MapPolygon.java, Pixmap.java,
+	  PixmapEditor.java, PolygonStyleEditor.java, FrictionArea.java:
+	  some enhancements and support for friction areas
+
+2004-02-28 15:47  juhal
+
+	* contrib/jxpmap/images/fricticon.gif: added support for friction
+	  areas
+
+2004-02-28 01:19  kps
+
+	* src/common/shipshape.c: Use memset to clear the shipshape
+	  structure in shape2wire.
+
+2004-02-28 01:03  kps
+
+	* src/common/shipshape.c: Trivial changes.
+
+2004-02-27 23:49  kps
+
+	* src/server/: rank.c, rank.h: Changed incorrect struct player_t ->
+	  player_t, time(0) -> time(NULL).
+
+2004-02-27 23:37  kps
+
+	* src/client/sdl/Makefile.in: Update due to adding sdl meta stuff.
+
+2004-02-27 23:32  darelcullen
+
+	* src/client/sdl/main.c: Meta bits a bit more friendly temporarily
+
+2004-02-27 23:26  darelcullen
+
+	* src/client/sdl/main.c: Changed initialisation for Meta Interface
+
+2004-02-27 23:25  darelcullen
+
+	* src/client/sdl/sdlinit.h: Added export for Meta Interface
+
+2004-02-27 23:24  darelcullen
+
+	* src/client/sdl/sdlinit.c: Changed initialisation for meta
+	  interface
+
+2004-02-27 23:24  darelcullen
+
+	* src/client/sdl/Makefile.am: Added sdlmeta sources
+
+2004-02-27 23:22  darelcullen
+
+	* src/client/sdl/sdlmeta.c: Added for sdl meta interface
+
+2004-02-27 23:21  darelcullen
+
+	* src/client/sdl/sdlmeta.h: Added for meta interface
+
+2004-02-27 22:15  kps
+
+	* src/common/shipshape.c: Dropped support for old (3.1) ship shape
+	  format.
+
+2004-02-27 21:58  juhal
+
+	* contrib/jxpmap/org/xpilot/jxpmap/: MapModel.java,
+	  PPMEncoder.java, Pixmap.java, PixmapEditor.java, XPDFile.java:
+	  added support for xpd files
+
+2004-02-27 20:33  kps
+
+	* src/: client/bitmaps.c, client/bitmaps.h, client/client.c,
+	  client/client.h, client/guimap.c, client/guiobjects.c,
+	  client/paint.c, client/paint.h, client/paintmap.c,
+	  client/paintobjects.c, client/paintradar.c, client/xevent.c,
+	  client/xevent.h, client/sdl/images.c, client/sdl/images.h,
+	  client/sdl/radar.c, client/sdl/sdlgui.c, client/sdl/sdlkeys.c,
+	  client/sdl/sdlpaint.h, common/astershape.h, common/draw.h,
+	  common/shipshape.c, common/types.h, common/wreckshape.h,
+	  server/alliance.c, server/asteroid.c, server/cannon.c,
+	  server/cell.c, server/click.h, server/collision.c,
+	  server/command.c, server/contact.c, server/event.c,
+	  server/frame.c, server/item.c, server/laser.c, server/map.c,
+	  server/map.h, server/metaserver.c, server/netserver.c,
+	  server/netserver.h, server/object.c, server/object.h,
+	  server/objpos.c, server/objpos.h, server/option.c,
+	  server/parser.c, server/play.c, server/player.c,
+	  server/polygon.c, server/rank.c, server/rank.h, server/robot.c,
+	  server/robot.h, server/robotdef.c, server/rules.c,
+	  server/score.c, server/score.h, server/server.c, server/server.h,
+	  server/ship.c, server/shot.c, server/teamcup.c, server/tuner.c,
+	  server/update.c, server/walls.c, server/walls.h, server/xp2map.c,
+	  server/xpmap.c: Changed some types to have _t prefix:
+
+	  player -> player_t *object -> *object_t ipos -> ipos_t position
+	  -> position_t clpos -> clpos_t blpos -> blkpos_t cell_node ->
+	  cell_node_t
+
+	  plus a few other.
+
+2004-02-27 17:13  kps
+
+	* src/server/robotdef.c: Use World_gravity() instead of
+	  world->gravity[][], changed some Wrap_cfindDir() to nonwarpping
+	  findDir().
+
+2004-02-27 17:11  kps
+
+	* src/server/click.h: Added Block_get_center_clpos() inline
+	  function.
+
+2004-02-27 17:05  kps
+
+	* src/server/xpmap.c: Moved comment.
+
+2004-02-26 21:55  juhal
+
+	* src/server/xp2map.c: added support for reading xml map files that
+	  are stored inside xpilot data archives (xpd) files
+
+2004-02-26 21:50  kps
+
+	* src/server/: cannon.c, cell.c, collision.c, frame.c, item.c,
+	  object.h, robotdef.c, server.h, shot.c: Removed underpowered and
+	  redunant OBX_{X,Y}_IN_BLOCKS macros.	Changed Cell_get_objects to
+	  take clpos instead of block x, y.
+
+2004-02-26 19:45  maximan
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, radar.c: [no log
+	  message]
+
+2004-02-26 00:20  kps
+
+	* src/client/: paintdata.c, paintdata.h: Added support for drawing
+	  fullcolor arcs.
+
+2004-02-25 22:57  kps
+
+	* lib/robots, src/server/robot.c: Converted robots to shipshape
+	  format 3.2.
+
+2004-02-25 18:48  kps
+
+	* src/client/: paintdata.c, paintdata.h: Made variables holding
+	  info about arcs, rectangles and segments static in paintdata.c.
+
+2004-02-25 18:11  kps
+
+	* src/common/const.h: Removed stray semicolon.
+
+2004-02-25 17:58  juhal
+
+	* src/client/paintmap.c: fixed support for non-wrapping edges
+
+2004-02-25 16:12  kps
+
+	* src/: client/bitmaps.c, client/colors.c, client/configure.c,
+	  client/dbuff.c, client/default.c, client/painthud.c,
+	  client/paintradar.c, client/record.c, client/welcome.c,
+	  client/widget.c, client/xdefault.c, client/xevent.c,
+	  client/xeventhandlers.c, client/xinit.c, common/socklib.c: Unused
+	  parameters are now maked with UNUSED_PARAM macro, not cast to
+	  void.
+
+2004-02-25 15:46  kps
+
+	* src/server/: command.c, contact.c, netserver.c, parser.c, play.c,
+	  robotdef.c, sched.c, xp2map.c: Use UNUSED_PARAM macro instead of
+	  void cast to mark unused parameters.
+
+2004-02-25 15:35  kps
+
+	* src/: client/about.c, common/const.h: Use UNUSED_PARAM(x) macro
+	  instead of (void) cast to remove unused parameter warning.
+
+2004-02-25 15:22  kps
+
+	* src/: common/rules.h, server/command.c, server/event.c,
+	  server/frame.c, server/object.h, server/player.c,
+	  server/robotdef.c, server/rules.c, server/server.h,
+	  server/update.c: Removed SELF_DESTRUCT status bit. Use
+	  pl->self_destruct_count instead of pl->count for self
+	  destructing.
+
+2004-02-25 12:38  kps
+
+	* src/server/: map.c, map.h, polygon.c, xp2map.c: Added group index
+	  to wormhole_t, shrink the memory area for old checkpoints.
+
+2004-02-24 22:59  kps
+
+	* src/: client/painthud.c, client/sdl/sdlgui.c, common/const.h,
+	  server/event.c, server/robotdef.c: Defined constant
+	  SELF_DESTRUCT_DELAY (should not be changed).
+
+2004-02-24 22:23  kps
+
+	* src/: client/default.c, common/config.c: Added printout of
+	  Conf_fontdir(). Removed some unecessary global variables.
+
+2004-02-24 18:57  kps
+
+	* src/client/textinterface.c: Removed stupid comment, trivial
+	  changes.
+
+2004-02-24 18:55  juhal
+
+	* src/client/sdl/xpilot_sdl.dsp: [no log message]
+
+2004-02-24 18:53  juhal
+
+	* src/client/sdl/glwidgets.c: fixes opening config window with my 3
+	  button mouse on win98
+
+2004-02-24 18:51  juhal
+
+	* src/client/sdl/gameloop.c: new windows Game_loop
+
+2004-02-24 17:22  kps
+
+	* src/server/: cmdline.c, option.c, serverconst.h: Deprecated
+	  behaviour where setting missileLife or mineLife to zero would
+	  mean "set the default", same for other life options. Added code
+	  to warn about such deprecated use in map files. Added decimal to
+	  all default values for options of type valReal.
+
+2004-02-24 14:33  kps
+
+	* src/server/: cmdline.c, rules.c, server.h, serverconst.h, shot.c:
+	  Added option nukeDebrisLife. Added tuners for shotLife,
+	  pulseLife, mineLife, missileLife, nukeDebrisLife. Defined default
+	  values SHOT_DEFAULT_LIFE, ..., NUKE_DEFAULT_DEBRIS_LIFE. Mines
+	  and missiles are now "improved": default life is is 7200 ticks
+	  for missiles, 2400 ticks for missiles.  Changed options
+	  robotLeaveScore, robotLeaveRatio, mineLife, baseMineRange,
+	  mineShotDetonateDistance, itemConcentratorRadius,
+	  asteroidConcentratorRadius, tankScoreDecrement from type int to
+	  type double.
+
+2004-02-23 18:32  uau
+
+	* mapconvert.py: Added some stuff to support targets, their actual
+	  shape is not printed yet
+
+2004-02-23 18:05  uau
+
+	* src/client/mapdata.c: When downloading textures, the client won't
+	  create the texture file on disk if there's some obvious error at
+	  the start of the download attempt.
+
+2004-02-22 14:05  uau
+
+	* src/client/default.c: Changed the default value and description
+	  of turnSpeed option
+
+2004-02-22 01:27  kps
+
+	* src/client/meta.c: Show current delay to server instead of
+	  minimum when doing Ping Servers.
+
+2004-02-22 01:02  kps
+
+	* src/server/: map.c, xpmap.c: Removed buggy
+	  Xpmap_allocate_checks() which would allow several checkpoints
+	  with the same letter for xp maps, getting a too high value for
+	  the number of checkpoints in the world. Improved
+	  World_place_check to handle this.
+
+2004-02-22 00:12  kps
+
+	* src/server/: play.c, server.h, ship.c, shot.c, walls.c: Removed
+	  annoying comments from Make_debris() and Make_wreckage() calls.
+
+2004-02-20 20:52  kps
+
+	* src/server/: cmdline.c, server.h, shot.c: Made laserRepeatRate an
+	  option again.
+
+2004-02-20 19:28  uau
+
+	* src/server/cmdline.c: Removed calls to Timing_setup() when
+	  certain options are changed, not needed any more in the current
+	  implementation.
+
+2004-02-20 19:16  kps
+
+	* src/server/: asteroid.h, cannon.c, cmdline.c, collision.c,
+	  item.c, map.c, play.c, player.c, robotdef.c, server.h,
+	  serverconst.h, ship.c, shot.c, tuner.c, walls.c: Changed some
+	  members of the options struct to have same names as the options.
+
+2004-02-19 22:09  kps
+
+	* BUGS: Fixed bug where nuke shots can last virtually for ever.
+
+2004-02-19 21:58  kps
+
+	* src/server/shot.c: Limit nuclear debris max life to 120, but
+	  allow smaller values.
+
+2004-02-19 21:55  kps
+
+	* src/server/shot.c: Limit nuclear debris life time to 120 (10
+	  seconds with gamespeed=12).
+
+2004-02-19 21:29  kps
+
+	* src/server/shot.c: Small cleanup, users of HP C A.09.19 get a
+	  decent compiler.
+
+2004-02-19 20:46  kps
+
+	* src/server/shot.c: Added code to print out shots in
+	  Delete_shot(). Printout is disabled with if 0.
+
+2004-02-19 19:06  kps
+
+	* src/server/shot.c: Removed too long lines, changed some floats to
+	  doubles.
+
+2004-02-19 17:57  kps
+
+	* src/server/cmdline.c: Trivial changes.
+
+2004-02-19 17:46  kps
+
+	* src/server/: cmdline.c, map.c, map.h, play.c, polygon.c,
+	  server.h, walls.c, xp2map.c, xpmap.c: Added support for friction
+	  blocks, changed frictionarea_t to friction_area_t.
+
+2004-02-19 17:45  kps
+
+	* src/server/option.c: Removed shadowing of global 'options'.
+
+2004-02-19 15:12  kps
+
+	* src/server/parser.c: Removed shadowing of global 'options'.
+
+2004-02-19 14:46  kps
+
+	* src/server/: collision.c, laser.c, score.c, score.h: Added bool
+	  transfer_tag to Score_players() arguments. Hitting a mine doesn't
+	  transfer the tag in tagGame.
+
+2004-02-18 19:43  kps
+
+	* src/server/: click.h, map.h, server.h: Ships now wrap around the
+	  map even if wrap play is off.
+
+2004-02-18 19:03  uau
+
+	* src/client/mapdata.c: Added some simple checks to see whether the
+	  reply from the HTTP server actually contains the requested file.
+
+2004-02-17 21:12  kps
+
+	* src/server/: cmdline.c, map.c, map.h, walls.c: Make friction area
+	  friction adjust depending on gameSpeed.  (otherwise higher fps
+	  would slow down more at same gamespeed).
+
+2004-02-17 20:38  kps
+
+	* src/server/: map.c, map.h, play.c, polygon.c, server.h, update.c,
+	  walls.c, xp2map.c: Added initial support for frictionarea.
+
+2004-02-17 14:01  kps
+
+	* src/server/update.c: Added Find_wormhole_dest().
+
+2004-02-17 14:00  kps
+
+	* src/server/play.c: Don't warn if wormhole "is hit by NULL".
+
+2004-02-17 00:48  kps
+
+	* src/server/update.c: Don't play wormhole sound or set WARPED bit
+	  after hyperjump.
+
+2004-02-17 00:29  kps
+
+	* src/server/update.c: New code to handle the case where a
+	  hyperjump fails.
+
+2004-02-16 22:36  kps
+
+	* src/server/update.c: Disable unecessary message.
+
+2004-02-16 22:32  kps
+
+	* src/server/: play.c, update.c, walls.c: Object doesn't hit
+	  wormhole if in WARPED or WARPING state.
+
+2004-02-16 22:06  kps
+
+	* src/server/: object.h, play.c, update.c, walls.c: Added
+	  Object_hits_wormhole().
+
+2004-02-16 20:20  kps
+
+	* src/server/: asteroid.c, item.c, map.c, map.h, server.h,
+	  update.c, xpmap.c: Wormhole related hacks.
+
+2004-02-16 19:32  darelcullen
+
+	* src/client/: meta.c, meta.h, welcome.c: copious bug fixes
+
+2004-02-16 15:58  kps
+
+	* src/server/update.c: Moved visibility updating into a separate
+	  inline function.
+
+2004-02-16 15:18  kps
+
+	* src/server/cmdline.c: Changed back default value of noQuit option
+	  to false because people are used to it.
+
+2004-02-16 13:43  kps
+
+	* src/server/: event.c, item.c, robotdef.c, server.h, update.c:
+	  Split up Do_warping() to Traverse_wormhole(), Hyperjump() and
+	  Warp_balls().  Renamed Do_hyperjump() to Initiate_hyperjump().
+
+2004-02-15 22:36  kps
+
+	* src/server/: asteroid.c, item.c, map.h, update.c: Added
+	  World_get_random_clpos().
+
+2004-02-15 21:12  juhal
+
+	* src/client/sdl/: glwidgets.c, glwidgets.h, main.c, radar.c: added
+	  radarGeometry option that allows setting the radar location and
+	  dimensions
+
+2004-02-15 20:38  kps
+
+	* src/client/: client.h, textinterface.c, welcome.c, xpilot.c,
+	  sdl/main.c: Applied Fishy's patch Client connects with wrong
+	  server version# from Local server list.
+
+2004-02-15 19:53  kps
+
+	* lib/textures/: Makefile.am, Makefile.in: Added ball_gray.ppm to
+	  Makefile.am.
+
+2004-02-15 19:41  kps
+
+	* BUGS: Nuke shots last too long.
+
+2004-02-15 19:34  juhal
+
+	* src/client/sdl/: images.c, sdlgui.c, TODO: added options
+	  smoothLines and ballColorRGBA and support for different shot
+	  sizes
+
+2004-02-15 19:32  juhal
+
+	* lib/textures/ball_gray.ppm: used by SDL client
+
+2004-02-15 19:26  kps
+
+	* src/server/: cmdline.c, server.h: Changed default shipmass to 18
+	  because it works better than 20 at high fps.
+
+2004-02-15 18:37  juhal
+
+	* src/client/sdl/: TODO, radar.c, todo.c: [no log message]
+
+2004-02-15 18:33  juhal
+
+	* src/client/sdl/radar.c: implemented Radar_paint_self and
+	  Radar_paint_checkpoint
+
+2004-02-15 17:16  uau
+
+	* src/server/: alliance.c, asteroid.c, asteroid.h, auth.c,
+	  cannon.c, cannon.h, cmdline.c, collision.c, command.c, contact.c,
+	  event.c, frame.c, item.c, laser.c, map.c, metaserver.c,
+	  netserver.c, object.h, option.c, parser.c, play.c, player.c,
+	  robot.c, robotdef.c, rules.c, sched.c, score.c, server.c,
+	  server.h, serverconst.h, ship.c, shot.c, srecord.c, teamcup.c,
+	  teamcup.h, tuner.c, update.c, walls.c, xp2map.c, xpmap.c: Moved
+	  most global option variables under a new options structure.
+
+2004-02-15 14:32  darelcullen
+
+	* BUGS: More bugs! - this time textures not being able to turn on
+	  and off in game
+
+2004-02-15 11:14  darelcullen
+
+	* src/client/meta.c: remove debug
+
+2004-02-15 09:38  uau
+
+	* src/server/cmdline.c: Fixed incorrect default option value (false
+	  vs "false"). This bug probably didn't cause visible problems.
+
+2004-02-15 00:09  kps
+
+	* Makefile.in, config.h.in, configure, configure.ac,
+	  doc/Makefile.in, doc/man/Makefile.in, lib/Makefile.in,
+	  lib/fonts/Makefile.in, lib/maps/Makefile.in,
+	  lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.am, src/client/Makefile.in,
+	  src/client/items/Makefile.in, src/client/sdl/Makefile.in,
+	  src/common/Makefile.in, src/common/NT/Makefile.in,
+	  src/common/NT/bindist/Makefile.in, src/replay/Makefile.in,
+	  src/replay/tools/Makefile.in, src/server/Makefile.in: Compile sdl
+	  client only if --enable-sdl-client is given to configure.
+
+2004-02-14 22:48  kps
+
+	* BUGS: Ross Venable reported about bugs related to target
+	  reappearing.
+
+2004-02-14 22:34  kps
+
+	* src/server/: cmdline.c, collision.c, command.c, laser.c, map.c,
+	  netserver.c, polygon.c, shot.c, update.c, walls.c, xp2map.c,
+	  xpmap.c: Removed unecessary stuff.
+
+2004-02-14 19:28  kps
+
+	* src/server/: player.c, server.c, server.h: PlayersArray is now
+	  static in player.c.
+
+2004-02-14 19:19  kps
+
+	* src/: common/const.h, server/command.c, server/event.c,
+	  server/frame.c, server/netserver.c, server/player.c,
+	  server/server.c, server/server.h, server/ship.c: Observers are
+	  called spectators now.
+
+2004-02-14 19:00  kps
+
+	* src/server/: netserver.c, player.c, server.c, server.h: Added
+	  Add_spectator() and Delete_spectator() functions, made
+	  GetIndArray static in player.c.
+
+2004-02-14 18:22  kps
+
+	* src/server/server.h: Removed redundant defines of MAX and MIN
+	  (common/const.h has them).
+
+2004-02-14 18:07  kps
+
+	* src/server/: map.c, play.c, server.h: Renamed
+	  Wormhole_remove_from_map() to World_remove_wormhole().
+
+2004-02-14 16:00  kps
+
+	* src/server/: asteroid.c, frame.c, item.c, map.h, play.c, ship.c,
+	  shot.c, update.c: Added World_wrap_xclick(), World_wrap_yclick()
+	  and World_wrap_clpos() inline functions. Use these instead of
+	  WRAP_XCLICK and WRAP_YCLICK in all places, except in the walls.c
+	  code.
+
+2004-02-14 13:59  uau
+
+	* src/server/: asteroid.c, cannon.c, click.h, collision.c, event.c,
+	  frame.c, item.c, map.c, map.h, play.c, ship.c, shot.c, update.c,
+	  walls.c: Reverted changes that added explicit "world" arguments
+	  to wrap macros
+
+2004-02-14 01:36  kps
+
+	* Makefile.in, configure, configure.ac, doc/Makefile.in,
+	  doc/man/Makefile.in, lib/Makefile.in, lib/fonts/Makefile.in,
+	  lib/maps/Makefile.in, lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.am, src/client/Makefile.in,
+	  src/client/items/Makefile.in, src/client/sdl/Makefile.in,
+	  src/common/Makefile.in, src/common/NT/Makefile.in,
+	  src/common/NT/bindist/Makefile.in, src/replay/Makefile.in,
+	  src/replay/tools/Makefile.in, src/server/Makefile.in: Configure
+	  changed so that if SDL is not found, SDL client will not be
+	  compiled, also SDL_ttf and OpenGL will be looked for only if SDL
+	  is found.
+
+2004-02-14 01:05  kps
+
+	* BUGS: ngControls break server recordings.
+
+2004-02-13 17:31  uau
+
+	* src/client/mapdata.c: When downloading textures, fail if the
+	  reply doesn't even contain \r\n\r\n to mark the end of HTTP
+	  headers (before such a reply was treated as an empty file).
+
+2004-02-12 20:28  kps
+
+	* src/server/: map.c, map.h, server.c: Put the maximum number of
+	  world objects of different type into the world_t.  These tell for
+	  how many objects space has been allocated.
+
+2004-02-12 18:52  kps
+
+	* src/server/: asteroid.c, cannon.c, click.h, collision.c, event.c,
+	  frame.c, item.c, map.c, map.h, play.c, ship.c, shot.c, update.c,
+	  walls.c: Added world argument to WRAP macros, added
+	  World_wrap_clpos() inline function.
+
+2004-02-12 17:23  kps
+
+	* src/: common/draw.h, server/click.h: Removed ugly dependency
+	  where common/draw.h needed server/click.h.  This was done by
+	  making the definition of clicks into common/draw.h.
+
+2004-02-12 00:18  kps
+
+	* src/: client/about.c, client/meta.c, client/option.c,
+	  client/option.h, server/shot.c: Removed mixed declations and
+	  code. Changed // C++ style comments to /* */ Fixed some other
+	  minor warnings.
+
+2004-02-11 22:50  darelcullen
+
+	* ChangeLog: update changelog
+
 2004-02-11 19:33  juhal
 
 	* src/client/sdl/TODO: [no log message]
@@ -24,7 +680,7 @@
 
 2004-02-10 19:24  kps
 
-	* src/client/sdl/Makefile.in: Added.
+	* lib/fonts/Makefile.in, src/client/sdl/Makefile.in: Added.
 
 2004-02-10 19:20  kps
 
@@ -35,8 +691,11 @@
 
 	* Makefile.in, aclocal.m4, configure, configure.ac,
 	  doc/Makefile.in, doc/man/Makefile.in, lib/Makefile.am,
-	  lib/Makefile.in, lib/maps/Makefile.in, lib/textures/Makefile.in,
-	  src/Makefile.in, src/client/Makefile.am, src/client/Makefile.in,
+	  lib/Makefile.in, lib/fonts/ConsoleFont.bmp,
+	  lib/fonts/Makefile.am, lib/fonts/Test.ttf,
+	  lib/fonts/VeraMoBd.ttf, lib/fonts/defaultfont.bmp,
+	  lib/maps/Makefile.in, lib/textures/Makefile.in, src/Makefile.in,
+	  src/client/Makefile.am, src/client/Makefile.in,
 	  src/client/items/Makefile.in, src/client/sdl/Makefile.am,
 	  src/client/sdl/console.c, src/client/sdl/sdlinit.c,
 	  src/client/sdl/sdlpaint.c, src/common/Makefile.in,
