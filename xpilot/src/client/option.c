@@ -389,18 +389,20 @@ static bool Set_key_option(xp_option_t *opt, const char *value,
     for (str = strtok(valcpy, " \t\r\n");
 	 str != NULL;
 	 str = strtok(NULL, " \t\r\n")) {
-	xp_keysym_t ks = String_to_xp_keysym(str);
+	xp_keysym_t ks;
 
+	/*
+	 * You can write "none" for keys in xpilotrc to disable the key.
+	 */
+	if (!strcasecmp(str, "none"))
+	    continue;
+
+	ks = String_to_xp_keysym(str);
 	if (ks == XP_KS_UNKNOWN) {
 	    warn("Invalid keysym \"%s\" for key \"%s\".\n", str, opt->name);
 	    continue;
 	}
 
-	/*
-	 * kps - here we should count how many succesful bindings we've done,
-	 * and if no successful bindings was done, the old setting should
-	 * be restored.
-	 */
 	Store_keydef(ks, opt->key);
     }
 
@@ -439,7 +441,7 @@ bool Set_option(const char *name, const char *value, xp_option_origin_t origin)
 
     opt = Find_option(name);
     if (!opt) {
-	warn("Could not find option \"%s\"\n", name);
+	/*warn("Could not find option \"%s\"\n", name);*/
 	return false;
     }
 
