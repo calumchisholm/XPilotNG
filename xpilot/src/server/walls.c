@@ -2718,16 +2718,13 @@ void Move_player(player_t *pl)
     world_t *world = pl->world;
 
     if (!Player_is_alive(pl)) {
-	if (!(Player_is_killed(pl)
-	      || Player_is_paused(pl))) {
-	    pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
-	    pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
-	    pos.cx = WRAP_XCLICK(pos.cx);
-	    pos.cy = WRAP_YCLICK(pos.cy);
-	    if (pos.cx != pl->pos.cx || pos.cy != pl->pos.cy) {
-		Player_position_remember(pl);
-		Player_position_set_clpos(pl, pos);
-	    }
+	pos.cx = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x * timeStep);
+	pos.cy = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y * timeStep);
+	pos.cx = WRAP_XCLICK(pos.cx);
+	pos.cy = WRAP_YCLICK(pos.cy);
+	if (pos.cx != pl->pos.cx || pos.cy != pl->pos.cy) {
+	    Player_position_remember(pl);
+	    Player_position_set_clpos(pl, pos);
 	}
 	pl->velocity = VECTOR_LENGTH(pl->vel);
 	return;
