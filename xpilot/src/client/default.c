@@ -45,6 +45,9 @@ int myteam;
 int myport;
 char *mygeometry = NULL;
 
+char *pointerButtonBindings[MAX_POINTER_BUTTONS] =
+{ NULL, NULL, NULL, NULL, NULL };
+
 static bool setTexturePath(xp_option_t *opt, const char *value)
 {
     (void)opt;
@@ -74,6 +77,36 @@ static char *getGeometry(xp_option_t *opt)
 {
     (void)opt;
     return mygeometry;
+}
+
+static inline int pointer_button_index_by_option(xp_option_t *opt)
+{
+    return atoi(Get_option_name(opt) + strlen("pointerButton")) - 1;
+}
+
+static bool setPointerButtonBinding(xp_option_t *opt, const char *value)
+{
+    int ind = pointer_button_index_by_option(opt);
+
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+    if (pointerButtonBindings[ind])
+	xp_free(pointerButtonBindings[ind]);
+
+    pointerButtonBindings[ind] = xp_safe_strdup(value);
+
+    /* kps: TODO */
+    return true;
+}
+
+static char *getPointerButtonBinding(xp_option_t *opt)
+{
+    int ind = pointer_button_index_by_option(opt);
+
+    assert(ind >= 0);
+    assert(ind < MAX_POINTER_BUTTONS);
+
+    return pointerButtonBindings[ind];
 }
 
 xp_option_t default_options[] = {
@@ -566,6 +599,58 @@ xp_option_t default_options[] = {
 	NULL,
 	"How many seconds score objects remain visible on the map.\n"),
 
+    /* mouse stuff */
+    XP_BOOL_OPTION(
+	"pointerControl",
+	false,
+	&pointerControl,
+	NULL,
+	"Enable mouse control.  This allows ship direction control by\n"
+	"moving the mouse to the left for an anti-clockwise turn and\n"
+	"moving the mouse to the right for a clockwise turn.\n"
+	"Also see the pointerButton options for use of the mouse buttons.\n"),
+
+    /* kps - fix these */
+    XP_STRING_OPTION(
+	"pointerButton1",
+	"keyFireShot",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the first mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton2",
+	"keyThrust",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the second mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton3",
+	"keyDropBall",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the third mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton4",
+	"",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the fourth mouse button.\n"),
+
+    XP_STRING_OPTION(
+	"pointerButton5",
+	"",
+	NULL, 0,
+	setPointerButtonBinding,
+	getPointerButtonBinding,
+	"The key to activate when pressing the fifth mouse button.\n"),
+
     /* message stuff */
 
     XP_INT_OPTION(
@@ -800,17 +885,7 @@ xp_option_t default_options[] = {
 
 
 
-    {
-	"pointerControl",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Enable mouse control.  This allows ship direction control by\n"
-	"moving the mouse to the left for an anti-clockwise turn and\n"
-	"moving the mouse to the right for a clockwise turn.\n"
-	"Also see the pointerButton options for use of the mouse buttons.\n",
-	0
-    },
+
 
     {
 	"reverseScroll",
@@ -872,46 +947,7 @@ xp_option_t default_options[] = {
 	0
     },
 
-    {
-	"pointerButton1",
-	NULL,
-	"keyFireShot",
-	KEY_DUMMY,
-	"The key to activate when pressing the first mouse button.\n",
-	0
-    },
-    {
-	"pointerButton2",
-	NULL,
-	"keyThrust",
-	KEY_DUMMY,
-	"The key to activate when pressing the second mouse button.\n",
-	0
-    },
-    {
-	"pointerButton3",
-	NULL,
-	"keyDropBall",
-	KEY_DUMMY,
-	"The key to activate when pressing the third mouse button.\n",
-	0
-    },
-    {
-	"pointerButton4",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The key to activate when pressing the fourth mouse button.\n",
-	0
-    },
-    {
-	"pointerButton5",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The key to activate when pressing the fifth mouse button.\n",
-	0
-    },
+
 
     {
 	"recordFile",
