@@ -397,7 +397,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 	}
 	if (x < 0 || x >= World.cwidth || y < 0 || y > World.cheight) {
 	    error("Polygon start point (%d, %d) is not inside the map"
-		  "(0 <= x < %d, 0 <= y < %d)", World.cwidth, World.cheight);
+		  "(0 <= x < %d, 0 <= y < %d)",
+		  x, y, World.cwidth, World.cheight);
 	    exit(1);
 	}
 	if (style == -1) {
