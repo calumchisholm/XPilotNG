@@ -130,6 +130,35 @@ xp_option_t default_options[] = {
 	NULL,
 	"Should your own shipshape be displayed or not.\n"),
 
+    /* modbanks */
+    XP_STRING_OPTION(
+	"modifierBank1",
+	"",
+	modBankStr[0], sizeof modBankStr[0],
+	NULL, NULL,
+	"The default weapon modifier values for the first modifier bank.\n"),
+
+    XP_STRING_OPTION(
+	"modifierBank2",
+	"",
+	modBankStr[1], sizeof modBankStr[1],
+	NULL, NULL,
+	"The default weapon modifier values for the second modifier bank.\n"),
+
+    XP_STRING_OPTION(
+	"modifierBank3",
+	"",
+	modBankStr[2], sizeof modBankStr[2],
+	NULL, NULL,
+	"The default weapon modifier values for the third modifier bank.\n"),
+
+    XP_STRING_OPTION(
+	"modifierBank4",
+	"",
+	modBankStr[3], sizeof modBankStr[3],
+	NULL, NULL,
+	"The default weapon modifier values for the fourth modifier bank.\n"),
+
 #if 0
     {
 	"help",
@@ -753,34 +782,7 @@ xp_option_t default_options[] = {
 	"Too complicated.  Keep it on 3.\n",
 	0
     },
-    {
-	"visual",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"Specify which visual to use for allocating colors.\n"
-	"To get a listing of all possible visuals on your dislay\n"
-	"set the argument for this option to list.\n",
-	0
-    },
-    {
-	"colorSwitch",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Use color buffering or not.\n"
-	"Usually color buffering is faster, especially on 8-bit\n"
-	"PseudoColor displays.\n",
-	0
-    },
-    {
-	"multibuffer",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Use the X windows multibuffer extension if present.\n",
-	0
-    },
+
     {
 	"maxColors",
 	NULL,
@@ -1577,38 +1579,6 @@ xp_option_t default_options[] = {
 	"5,6,7,3",
 	KEY_DUMMY,
 	"Which color numbers to use for spark and debris particles.\n",
-	0
-    },
-    {
-	"modifierBank1",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The default weapon modifier values for the first modifier bank.\n",
-	0
-    },
-    {
-	"modifierBank2",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The default weapon modifier values for the second modifier bank.\n",
-	0
-    },
-    {
-	"modifierBank3",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The default weapon modifier values for the third modifier bank.\n",
-	0
-    },
-    {
-	"modifierBank4",
-	NULL,
-	"",
-	KEY_DUMMY,
-	"The default weapon modifier values for the fourth modifier bank.\n",
 	0
     },
     {
