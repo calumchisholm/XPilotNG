@@ -1790,11 +1790,25 @@ static option_desc options[] = {
     {
 	"framesPerSecond",
 	"FPS",
-	"12",
+	"50",
 	&framesPerSecond,
 	valInt,
 	Timing_setup,
 	"The number of frames per second the server should strive for.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
+	"gameSpeed",
+	"gameSpeed",
+	"12.5",
+	&gameSpeed,
+	valReal,
+	Timing_setup,
+	"Rate at which game events happen. Allows using higher\n"
+	"FPS without making the game too fast.\n"
+	"A game speed of X means the game proceeds as fast as on a\n"
+	"version 4.5.4 server running at X FPS.\n"
+	"A value of 0 means the game speed is the same as FPS.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3496,20 +3510,6 @@ static option_desc options[] = {
 	valString,
 	tuner_dummy,
 	"URL where the client can get extra data for this map\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE
-    },
-    {
-	"gameSpeed",
-	"gameSpeed",
-	"0.0",
-	&gameSpeed,
-	valReal,
-	Timing_setup,
-	"Rate at which game events happen. Allows using higher\n"
-	"FPS without making the game too fast.\n"
-	"A game speed of X means the game proceeds as fast as on a\n"
-	"version 4.5.4 server running at X FPS.\n"
-	"A value of 0 means the game speed is the same as FPS.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
