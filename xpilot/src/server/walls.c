@@ -696,7 +696,6 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	pl->vel.y = fy * options.playerWallBounceBrakeFactor;
     }
     else {
-
 	/*
 	 * Determine new velocity vector and move->delta after bounce.
 	 * The vector move->delta is the remaining amount left to move
@@ -736,11 +735,16 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	    mvd.x *= factor;
 	}
 	else if (options.playerWallBounceType == 2) {
-
 	    double vtotal1 = VECTOR_LENGTH(vel1);
 	    double vnormal1 = ABS(vel1.y);
 	    double wallfriction = options.playerWallFriction;
-	    double factor = 1.0 - vnormal1 / vtotal1 * wallfriction;
+	    double factor;
+
+	    /* Avoid division by 0 */
+	    if (vtotal1 < 0.001)
+		factor = 1.0;
+	    else
+		factor = 1.0 - vnormal1 / vtotal1 * wallfriction;
 	    /*
 	     * mara:
 	     * Vtangent2 = (1-Vnormal1/Vtotal1*wallfriction)*Vtangent1;
@@ -2892,14 +2896,15 @@ void Turn_player(player_t *pl, bool push)
     while (pl->dir != new_dir) {
 	next_dir = MOD2(pl->dir + sign, RES);
 	group = Shape_morph((shape_t *)pl->ship, pl->dir, (shape_t *)pl->ship,
-			next_dir, hitmask, OBJ_PTR(pl), pl->pos.cx, pl->pos.cy, &ans);
+			    next_dir, hitmask, OBJ_PTR(pl),
+			    pl->pos.cx, pl->pos.cy, &ans);
 	if (group != NO_GROUP) {
-    	    double fact, velon, velot;
-    	    double cl, sl;  	    	/* cosine and sine of line angle    	    */
-    	    double cln, sln;	    	/* cosine and sine of line normal   	    */
-    	    double pc, ps;	    	/* cosine and sine of the points    	    */
-    	    double pdc, pds;	    	/* cosine and sine of the points direction  */
-    	    double x, y, l, v;
+    	    double /*fact,*/ velon /*, velot*/;
+    	    double cl, sl;  	/* cosine and sine of line angle    	    */
+    	    double cln, sln;	/* cosine and sine of line normal   	    */
+    	    double pc, ps;	/* cosine and sine of the points    	    */
+    	    double pdc, pds;	/* cosine and sine of the points direction  */
+    	    double x, y, l /*, v*/;
 	    double power = pl->power;
 	    int a = (BIT(pl->used, USES_EMERGENCY_THRUST)
 		     ? MAX_AFTERBURNER
@@ -2910,44 +2915,47 @@ void Turn_player(player_t *pl, bool push)
 
 	    Player_set_float_dir(pl, (double)pl->dir);
 
-	    if (!push) break;
+	    if (!push)
+		break;
 
-    	    p = Ship_get_point_clpos((shipshape_t *)pl->ship ,ans.point ,pl->dir);
-    	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship ,(ans.point+1)%(((shape_t *)pl->ship)->num_points) ,pl->dir);
+    	    p = Ship_get_point_clpos((shipshape_t *)pl->ship,
+				     ans.point, pl->dir);
+    	    p2 = Ship_get_point_clpos((shipshape_t *)pl->ship,
+			(ans.point + 1) % (((shape_t *)pl->ship)->num_points),
+			pl->dir);
 
 	    length = 0;
-	    	    
+
 	    if (ans.line != -1) {
 		length = Wrap_length(linet[ans.line].delta.cx,
 				     linet[ans.line].delta.cy);
     	    	if (length != 0) {
     	    	    x = linet[ans.line].delta.cx;
     	    	    y = linet[ans.line].delta.cy;
-		} else {
+		} else
 		    break;
-		}
 	    } else {
     	    	x = p2.cx - p.cx;
     	    	y = p2.cy - p.cy;
 	    }
-		
+
     	    l = sqrt(x*x + y*y);
     	    cl = x / l;
     	    sl = y / l;
-		    
+
     	    cln = sl;
     	    sln = -cl;
-    	    	    		    
+
 	    if (ans.line != -1) {
-    	    	l = sqrt(p.cx*p.cx + p.cy*p.cy);
-	    	pc = p.cx/l;
-    	    	ps = p.cy/l;
+    	    	l = sqrt(p.cx * p.cx + p.cy * p.cy);
+	    	pc = p.cx / l;
+    	    	ps = p.cy / l;
 	    } else {
 	    	cx = CENTER_XCLICK(linet[ans.moved.cx].start.cx - pl->pos.cx);
 	    	cy = CENTER_YCLICK(linet[ans.moved.cx].start.cy - pl->pos.cy);
-    	    	l = sqrt(cx*cx + cy*cy);
-    	    	pc = cx/l;
-    	    	ps = cy/l;
+    	    	l = sqrt(cx * cx + cy * cy);
+    	    	pc = cx / l;
+    	    	ps = cy / l;
 	    }
 		    
     	    if (sign == 1) {
@@ -2958,9 +2966,8 @@ void Turn_player(player_t *pl, bool push)
     	    	pds = -pc;
     	    }
     	    
-	    if (a) {
+	    if (a)
 		power = AFTER_BURN_POWER(power, a);
-	    }
 
     	    /*v = ( power / inert ) * options.turnPush;
 
@@ -2970,17 +2977,16 @@ void Turn_player(player_t *pl, bool push)
 	    fact = tanh((power / inert) / (velon) );
 	    velon *= fact;*/
 	    
-     	    velon = 2 * ( power / inert ) * timeStep;
+     	    velon = 2 * (power / inert) * timeStep;
     	    	    
     	    if ((pl->vel.x*cln + pl->vel.y*sln) <= 0) {
-    	    	if (ans.line != -1) {
-    	    	    Bounce_player(pl,&move,ans.line,0);
-		} else {
-    	    	    Bounce_player(pl,&move,ans.point,0);
-		}
+    	    	if (ans.line != -1)
+    	    	    Bounce_player(pl, &move, ans.line, 0);
+		else
+    	    	    Bounce_player(pl, &move, ans.point, 0);
 	    }
 
-    	    if ((pl->vel.x*cln + pl->vel.y*sln) <= 0) {
+    	    if ((pl->vel.x * cln + pl->vel.y * sln) <= 0) {
     	    	pl->vel.x -= velon * cln;
     	    	pl->vel.y -= velon * sln;
 	    } else {
@@ -2988,7 +2994,8 @@ void Turn_player(player_t *pl, bool push)
     	    	pl->vel.y += velon * sln;
 	    }
     	    
-	    /*velot = velon * options.playerWallFriction * ((-pdc) * cl + (-pds) * sl);
+	    /*velot = velon * options.playerWallFriction
+	     * ((-pdc) * cl + (-pds) * sl);
     	    pl->vel.x += velot * cl;
     	    pl->vel.y += velot * sl;*/
 	    
