@@ -41,7 +41,7 @@
 #endif
 
 #ifndef CONF_DEFAULT_MAP
-#  define CONF_DEFAULT_MAP		"polybloods.xp2"
+#  define CONF_DEFAULT_MAP		"ndh.xp2"
 #endif
 
 #ifndef CONF_MAPDIR
