@@ -107,25 +107,25 @@
 
 typedef struct {
     DFLOAT	ratio;
+    DFLOAT	score;
     short	id;
     short	team;
-    DFLOAT	score;
     short	check;
     short	round;
-    short	timing;
     long	timing_loops;
+    short	timing;
     short	life;
     short	mychar;
     short	alliance;
     short	war_id;
     short	name_width;	/* In pixels */
     short	name_len;	/* In bytes */
+    short	ignorelevel;
     shipshape_t	*ship;
     char	name[MAX_CHARS];
     char	real[MAX_CHARS];
     char	host[MAX_CHARS];
     char	id_string[MAX_CHARS];
-    short	ignorelevel;
 } other_t;
 
 typedef struct {
