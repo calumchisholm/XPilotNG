@@ -54,7 +54,6 @@
 <Option name="teamcupstatport" value="3749"/>
 <Option name="mineScoreMult" value="0.33"/>
 <Option name="initialAfterburners" value="1"/>
-<Option name="defaultsFileName" value="/usr/local/lib/xpilot/defaults"/>
 <Option name="asteroidmaxscore" value="100.0"/>
 <Option name="allowShields" value="no"/>
 <Option name="constantScoring" value="no"/>
@@ -71,7 +70,6 @@
 <Option name="minesWallBounce" value="no"/>
 <Option name="teamImmunity" value="yes"/>
 <Option name="distinguishMissiles" value="True"/>
-<Option name="reportToMetaServer" value="yes"/>
 <Option name="targetTeamCollision" value="yes"/>
 <Option name="asteroidpoints" value="1.0"/>
 <Option name="treasureKillTeam" value="no"/>
@@ -102,7 +100,7 @@
 <Option name="itemSensorProb" value="0"/>
 <Option name="shieldedMining" value="False"/>
 <Option name="shipMass" value="7"/>
-<Option name="treasureCollisionMayKill" value="no"/>
+<Option name="treasureCollisionMayKill" value="yes"/>
 <Option name="ballCollisions" value="no"/>
 <Option name="announceAlliances" value="no"/>
 <Option name="mapWidth" value="7000"/>
