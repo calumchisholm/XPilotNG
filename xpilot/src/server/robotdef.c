@@ -271,9 +271,9 @@ static void Robot_default_create(player_t *pl, char *str)
 	    = 30.0 + (my_data->attack / 50) - (my_data->defense / 50);
     }
 
-    my_data->fuel_l3 = 500.0 + 1.0 * (my_data->defense - my_data->attack);
-    my_data->fuel_l2 = 200.0 + 0.4 * (my_data->defense - my_data->attack);
-    my_data->fuel_l1 = 100.0 + 0.2 * (my_data->defense - my_data->attack);
+    my_data->fuel_l3 = 150.0;
+    my_data->fuel_l2 = 100.0;
+    my_data->fuel_l1 = 50.0;
 
     my_data->last_dropped_mine	= 0;
     my_data->last_fired_missile	= 0;

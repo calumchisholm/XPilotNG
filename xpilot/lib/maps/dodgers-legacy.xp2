@@ -10,8 +10,13 @@
 <Option name="robotsleave" value="no"/>
 <Option name="robotteam" value="1"/>
 
-<Option name="constantspeed" value="1"/>
+<Option name="framespersecond" value="12"/>
+<Option name="gamespeed" value="12"/>
+<Option name="ballradius" value="0"/>
+<Option name="constantspeed" value="0"/>
+<Option name="legacymode" value="yes"/>
 <Option name="kineticenergyfueldrain" value="no"/>
+<Option name="playerwallbouncetype" value="0"/>
 <Option name="baselesspausing" value="yes"/>
 
 <Option name="teamplay" value="yes"/>
@@ -32,7 +37,7 @@
 
 <Option name="initialafterburners" value="2"/>
 <Option name="initialautopilots" value="1"/>
-<Option name="initialfuel" value="300"/>
+<Option name="initialfuel" value="1000"/>
 
 <Option name="usewreckage" value="no"/>
 
@@ -49,27 +54,27 @@
 <Option name="sparkswallbounce" value="yes"/>
 
 </GeneralOptions>
-<Edgestyle id="darkgreen" width="2" color="467676" style="0"/>
+<Edgestyle id="xpbluehidden" width="-1" color="4E7CFF" style="0"/>
 <Edgestyle id="xpredhidden" width="-1" color="FF3A27" style="0"/>
 <Edgestyle id="yellow" width="2" color="FFFF00" style="0"/>
 <Edgestyle id="white" width="2" color="FFFFFF" style="0"/>
 <Edgestyle id="invisiedge" width="-1" color="0" style="0"/>
-<Polystyle id="darkgreen" color="467676" defedge="darkgreen" flags="1"/>
+<Polystyle id="xpblue" color="4E7CFF" defedge="xpbluehidden" flags="1"/>
 <Polystyle id="xpred" color="FF3A27" defedge="xpredhidden" flags="1"/>
 <Polystyle id="emptyyellow" color="FF" defedge="yellow" flags="0"/>
 <Polystyle id="emptywhite" color="FF" defedge="white" flags="0"/>
 <Polystyle id="invisible" color="0" defedge="invisiedge" flags="12"/>
-<Polygon x="17920" y="179200" style="darkgreen">
+<Polygon x="17920" y="179200" style="xpblue">
 <Offset x="-33600" y="0"/>
 <Offset x="-2240" y="2240"/>
 <Offset x="0" y="42560"/>
 <Offset x="-163520" y="0" style="internal"/>
-<Offset x="0" y="-42560" style="darkgreen"/>
+<Offset x="0" y="-42560" style="xpbluehidden"/>
 <Offset x="-2240" y="-2240"/>
 <Offset x="0" y="-154560" style="internal"/>
-<Offset x="2240" y="-2240" style="darkgreen"/>
+<Offset x="2240" y="-2240" style="xpbluehidden"/>
 <Offset x="163520" y="0" style="internal"/>
-<Offset x="2240" y="2240" style="darkgreen"/>
+<Offset x="2240" y="2240" style="xpbluehidden"/>
 <Offset x="33600" y="0"/>
 <Offset x="0" y="154560" style="internal"/>
 </Polygon>
