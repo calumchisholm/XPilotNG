@@ -905,7 +905,7 @@ void do_lose_item(player *pl)
 }
 
 
-void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
+void Fire_general_ecm(player *pl, int team, int cx, int cy)
 {
     object		*shot;
     mineobject		*closest_mine = NULL;

@@ -120,7 +120,7 @@ void Compute_gravity(void);
 DFLOAT Wrap_findDir(DFLOAT dx, DFLOAT dy);
 DFLOAT Wrap_cfindDir(int dx, int dy);
 DFLOAT Wrap_length(int dx, int dy);
-unsigned short Find_closest_team(int cx, int cy);
+int Find_closest_team(int cx, int cy);
 
 int Wildmap(
 	int width,
@@ -179,15 +179,15 @@ void General_tractor_beam(player *pl, int cx, int cy,
 			  int items, player *victim, bool pressor);
 void Place_mine(player *pl);
 void Place_moving_mine(player *pl);
-void Place_general_mine(player *pl, unsigned short team, long status,
+void Place_general_mine(player *pl, int team, long status,
 			int cx, int cy, DFLOAT vx, DFLOAT vy, modifiers mods);
 void Detonate_mines(player *pl);
 char *Describe_shot(int type, long status, modifiers mods, int hit);
 void Fire_ecm(player *pl);
-void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy);
+void Fire_general_ecm(player *pl, int team, int cx, int cy);
 void Update_connector_force(ballobject *ball);
 void Fire_shot(player *pl, int type, int dir);
-void Fire_general_shot(player *pl, unsigned short team, bool cannon,
+void Fire_general_shot(player *pl, int team, bool cannon,
 		       int cx, int cy, int type, int dir,
 		       modifiers mods, int target_id);
 void Fire_normal_shots(player *pl);
@@ -224,7 +224,7 @@ void Team_immunity_init(void);
 void Groups_init(void);
 void Delete_shot(int ind);
 void Fire_laser(player *pl);
-void Fire_general_laser(player *pl, unsigned short team, int cx, int cy,
+void Fire_general_laser(player *pl, int team, int cx, int cy,
 			int dir, modifiers mods);
 void Do_deflector(player *pl);
 void Do_transporter(player *pl);
@@ -237,9 +237,9 @@ void Update_missile(missileobject *shot);
 void Update_mine(mineobject *mine);
 void Make_debris(
 	    /* pos.x, pos.y   */ int    cx,          int   cy,
-	    /* vel.x, vel.y   */ DFLOAT  velx,       DFLOAT vely,
+	    /* vel.x, vel.y   */ DFLOAT velx,        DFLOAT vely,
 	    /* owner id       */ int    id,
-	    /* owner team     */ unsigned short team,
+	    /* owner team     */ int    team,
 	    /* type           */ int    type,
 	    /* mass           */ DFLOAT  mass,
 	    /* status         */ long   status,
@@ -254,7 +254,7 @@ void Make_wreckage(
 	    /* pos.x, pos.y   */ int    cx,         int    cy,
 	    /* vel.x, vel.y   */ DFLOAT velx,       DFLOAT vely,
 	    /* owner id       */ int    id,
-	    /* owner team     */ unsigned short team,
+	    /* owner team     */ int    team,
 	    /* min,max mass   */ DFLOAT min_mass,   DFLOAT max_mass,
 	    /* total mass     */ DFLOAT total_mass,
 	    /* status         */ long   status,

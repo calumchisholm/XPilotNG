@@ -625,10 +625,9 @@ static void Generate_random_map(void)
 /*
  * Return the team that is closest to this click position.
  */
-unsigned short Find_closest_team(int cx, int cy)
+int Find_closest_team(int cx, int cy)
 {
-    unsigned short team = TEAM_NOT_SET;
-    int i;
+    int team = TEAM_NOT_SET, i;
     DFLOAT closest = FLT_MAX, l;
 
     for (i = 0; i < World.NumBases; i++) {

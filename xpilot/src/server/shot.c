@@ -85,7 +85,7 @@ void Place_moving_mine(player *pl)
 		       pl->pos.cx, pl->pos.cy, vx, vy, pl->mods);
 }
 
-void Place_general_mine(player *pl, unsigned short team, long status,
+void Place_general_mine(player *pl, int team, long status,
 			int cx, int cy,
 			DFLOAT vx, DFLOAT vy, modifiers mods)
 {
@@ -477,7 +477,7 @@ void Fire_right_rshot(player *pl, int type, int dir, int gun)
     Fire_general_shot(pl, pl->team, 0, cx, cy, type, dir, pl->mods, NO_ID);
 }
 
-void Fire_general_shot(player *pl, unsigned short team, bool cannon,
+void Fire_general_shot(player *pl, int team, bool cannon,
 		       int cx, int cy,
 		       int type, int dir,
 		       modifiers mods, int target_id)
@@ -1232,23 +1232,23 @@ void Delete_shot(int ind)
 
 	if (BIT(shot->mods.nuclear, NUCLEAR)) {
 	    DFLOAT nuke_factor;
-	    if (shot->type == OBJ_MINE) {
+	    if (shot->type == OBJ_MINE)
 		nuke_factor = NUKE_MINE_EXPL_MULT * shot->mass / MINE_MASS;
-	    } else {
-		nuke_factor = NUKE_SMART_EXPL_MULT * shot->mass / MISSILE_MASS;
-	    }
-	    nuke_factor = (nuke_factor * (shot->mods.mini + 1)) / SHOT_MULT(shot);
+	    else
+		nuke_factor
+		    = NUKE_SMART_EXPL_MULT * shot->mass / MISSILE_MASS;
+
+	    nuke_factor
+		= (nuke_factor * (shot->mods.mini + 1)) / SHOT_MULT(shot);
 	    intensity = (int)(intensity * nuke_factor);
 	}
 
-	if (BIT(shot->mods.warhead, IMPLOSION)) {
+	if (BIT(shot->mods.warhead, IMPLOSION))
 	    /*intensity >>= 1;*/
 	    mass = -mass;
-	}
 
-	if (BIT(shot->type, OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_SMART_SHOT)) {
+	if (BIT(shot->type, OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_SMART_SHOT))
 	    intensity /= (1 + shot->mods.power);
-	}
 
 	Make_debris(
 	    /* pos.x, pos.y   */ shot->prevpos.cx, shot->prevpos.cy,
@@ -1343,30 +1343,25 @@ void Delete_shot(int ind)
 
     if (addMine | addHeat) {
 	CLEAR_MODS(mods);
-	if (BIT(World.rules->mode, ALLOW_CLUSTERS) && (rfrac() <= 0.333f)) {
+	if (BIT(World.rules->mode, ALLOW_CLUSTERS) && (rfrac() <= 0.333f))
 	    SET_BIT(mods.warhead, CLUSTER);
-	}
-	if (BIT(World.rules->mode, ALLOW_MODIFIERS) && (rfrac() <= 0.333f)) {
+	if (BIT(World.rules->mode, ALLOW_MODIFIERS) && (rfrac() <= 0.333f))
 	    SET_BIT(mods.warhead, IMPLOSION);
-	}
-	if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+	if (BIT(World.rules->mode, ALLOW_MODIFIERS))
 	    mods.velocity = (int)(rfrac() * (MODS_VELOCITY_MAX + 1));
-	}
-	if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+	if (BIT(World.rules->mode, ALLOW_MODIFIERS))
 	    mods.power = (int)(rfrac() * (MODS_POWER_MAX + 1));
-	}
 	if (addMine) {
 	    long gravity_status = ((rfrac() < 0.5f) ? GRAVITY : 0);
 	    Place_general_mine(NULL, TEAM_NOT_SET, gravity_status,
 			       shot->pos.cx, shot->pos.cy,
 			       0.0, 0.0, mods);
 	}
-	else if (addHeat) {
+	else if (addHeat)
 	    Fire_general_shot(NULL, TEAM_NOT_SET, 0,
 			      shot->pos.cx, shot->pos.cy,
 			      OBJ_HEAT_SHOT, (int)(rfrac() * RES),
 			      mods, NO_ID);
-	}
     }
     else if (addBall) {
 	ball = BALL_PTR(shot);
@@ -1399,7 +1394,7 @@ void Fire_laser(player *pl)
     }
 }
 
-void Fire_general_laser(player *pl, unsigned short team, int cx, int cy,
+void Fire_general_laser(player *pl, int team, int cx, int cy,
 			int dir, modifiers mods)
 {
     int			life;
@@ -1605,13 +1600,12 @@ void Update_missile(missileobject *shot)
 	     * Target is thrusting,
 	     * set number to moves to correct error value
 	     */
-	    if (range < HEAT_CLOSE_RANGE) {
+	    if (range < HEAT_CLOSE_RANGE)
 		shot->count = HEAT_CLOSE_ERROR;
-	    } else if (range < HEAT_MID_RANGE) {
+	    else if (range < HEAT_MID_RANGE)
 		shot->count = HEAT_MID_ERROR;
-	    } else {
+	    else
 		shot->count = HEAT_WIDE_ERROR;
-	    }
 	} else {
 	    shot->count += timeStep;
 	    /* Look for new target */
@@ -1700,9 +1694,8 @@ void Update_missile(missileobject *shot)
 		 *  50		75
 		 *   0		50
 		 */
-		if ((int)(rfrac() * 100) <= ((int)(range/2)+50)) {
+		if ((int)(rfrac() * 100) <= ((int)(range/2)+50))
 		    smart->info = smart->new_info;
-		}
 	    }
 	}
 	pl = Player_by_id(shot->info);
@@ -1843,16 +1836,14 @@ void Update_missile(missileobject *shot)
 	angle += RES;
     angle = angle - shot->missile_dir - RES/2;
 
-    if (angle < 0) {
+    if (angle < 0)
 	shot->missile_dir += (u_byte)(((-angle < shot->turnspeed)
 					? -angle
 					: shot->turnspeed));
-    }
-    else {
+    else
 	shot->missile_dir -= (u_byte)(((angle < shot->turnspeed)
 					? angle
 					: shot->turnspeed));
-    }
 
     shot->missile_dir = MOD2(shot->missile_dir, RES); /* NOTE!!!! */
 

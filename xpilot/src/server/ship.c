@@ -448,7 +448,7 @@ void Make_wreckage(
     /* pos.x, pos.y     */ int    cx,           int    cy,
     /* vel.x, vel.y     */ DFLOAT velx,         DFLOAT vely,
     /* owner id         */ int    id,
-    /* owner team	*/ unsigned short team,
+    /* owner team	*/ int    team,
     /* min,max mass     */ DFLOAT min_mass,     DFLOAT max_mass,
     /* total mass       */ DFLOAT total_mass,
     /* status           */ long   status,

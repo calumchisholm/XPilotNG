@@ -124,9 +124,9 @@ int Punish_team(player *pl, treasure_t *td, int cx, int cy)
 /* Create debris particles */
 void Make_debris(
     /* pos.x, pos.y   */ int    cx,          int   cy,
-    /* vel.x, vel.y   */ DFLOAT  velx,       DFLOAT vely,
+    /* vel.x, vel.y   */ DFLOAT velx,        DFLOAT vely,
     /* owner id       */ int    id,
-    /* owner team     */ unsigned short team,
+    /* owner team     */ int    team,
     /* type           */ int    type,
     /* mass           */ DFLOAT  mass,
     /* status         */ long   status,
