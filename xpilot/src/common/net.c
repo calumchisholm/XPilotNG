@@ -32,7 +32,7 @@ int Sockbuf_init(sockbuf_t *sbuf, sock_t *sock, size_t size, int state)
     if ((sbuf->buf = sbuf->ptr = malloc(size)) == NULL)
 	return -1;
 
-    if (sock != (sock_t *) NULL)
+    if (sock != NULL)
 	sbuf->sock = *sock;
     else
 	sock_init(&sbuf->sock);
@@ -178,10 +178,10 @@ int Sockbuf_flush(sockbuf_t *sbuf)
 		Sockbuf_clear(sbuf);
 		return -1;
 	    }
-	    { static int send_err;
-		if ((send_err++ & 0x3F) == 0) {
+	    {
+		static int send_err;
+		if ((send_err++ & 0x3F) == 0)
 		    error("send (%d)", i);
-		}
 	    }
 	    if (sock_get_error(&sbuf->sock) == -1) {
 		error("sock_get_error send");
@@ -200,8 +200,7 @@ int Sockbuf_flush(sockbuf_t *sbuf)
 		errno = 0;
 		continue;
 	    }
-	    if (errno != EWOULDBLOCK
-		&& errno != EAGAIN) {
+	    if (errno != EWOULDBLOCK && errno != EAGAIN) {
 		error("Can't write on socket");
 		return -1;
 	    }
@@ -279,8 +278,7 @@ int Sockbuf_read(sockbuf_t *sbuf)
 		errno = 0;
 		continue;
 	    }
-	    if (errno == EWOULDBLOCK
-		|| errno == EAGAIN) {
+	    if (errno == EWOULDBLOCK || errno == EAGAIN) {
 		return 0;
 	    }
 #if 0
@@ -321,8 +319,7 @@ int Sockbuf_read(sockbuf_t *sbuf)
 		errno = 0;
 		continue;
 	    }
-	    if (errno != EWOULDBLOCK
-		&& errno != EAGAIN) {
+	    if (errno != EWOULDBLOCK && errno != EAGAIN) {
 		error("Can't read on socket");
 		return -1;
 	    }
@@ -372,6 +369,12 @@ int Packet_printf(sockbuf_t *sbuf, const char *fmt, ...)
 			*buf,
 			*stop;
     va_list		ap;
+
+    /* kps hack - let's not segfault if sbuf was not initialized yet. */
+    assert(sbuf);
+    if (sbuf->buf == NULL)
+	return -1;
+    /* kps hack ends */
 
     va_start(ap, fmt);
 
@@ -477,11 +480,10 @@ int Packet_printf(sockbuf_t *sbuf, const char *fmt, ...)
 	    case 's':	/* Small strings */
 		max_str_size = (fmt[i] == 'S') ? MSG_LEN : MAX_CHARS;
 		str = va_arg(ap, char *);
-		if (buf + max_str_size >= end) {
+		if (buf + max_str_size >= end)
 		    stop = end;
-		} else {
+		else
 		    stop = buf + max_str_size;
-		}
 		/* Send the nul byte too */
 		do {
 		    if (buf >= stop)
@@ -502,10 +504,9 @@ int Packet_printf(sockbuf_t *sbuf, const char *fmt, ...)
 	if (failure == PRINTF_SIZE) {
 #if 0
 	    static int before;
-	    if ((before++ & 0x0F) == 0) {
+	    if ((before++ & 0x0F) == 0)
 		printf("Write socket buffer not big enough (%d,%d,\"%s\")\n",
-		    sbuf->size, sbuf->len, fmt);
-	    }
+		       sbuf->size, sbuf->len, fmt);
 #endif
 	    if (BIT(sbuf->state, SOCKBUF_DGRAM) != 0) {
 		count = 0;
