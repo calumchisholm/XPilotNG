@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.ArrayList;
 
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class MapPolygon extends MapObject {
 
     protected Polygon polygon;
     protected PolygonStyle style;
-    protected List edgeStyles;
+    protected ArrayList edgeStyles;
     protected int type;
     protected int team;
 
@@ -27,7 +28,7 @@ public class MapPolygon extends MapObject {
     public MapPolygon () {}
 
 
-    public MapPolygon (Polygon p, PolygonStyle style, List edgeStyles) {
+    public MapPolygon (Polygon p, PolygonStyle style, ArrayList edgeStyles) {
         this.polygon = p;
         this.style = style;
         this.edgeStyles = edgeStyles;
@@ -122,6 +123,12 @@ public class MapPolygon extends MapObject {
             out.print(polygon.xpoints[i] - polygon.xpoints[i - 1]);
             out.print("\" y=\"");
             out.print(polygon.ypoints[i] - polygon.ypoints[i - 1]);
+            
+            LineStyle es = getEdgeStyle(i - 1);
+            if (es != null && es != getStyle().getDefaultEdgeStyle()) {
+                out.print("\" style=\"");
+                out.print(es.getId());
+            }
             out.println("\"/>");
         }
 
@@ -161,12 +168,11 @@ public class MapPolygon extends MapObject {
                 g.draw(p);
             }
         } else {
-            for (int i = 1; i < p.npoints;) {
+            for (int i = 0; i < p.npoints - 1;) {
                 int begin = i;
                 LineStyle ls = (LineStyle)getEdgeStyle(i++);
                 
-                while ((getEdgeStyle(i) == ls) &&
-                       (i < p.npoints - 1)) i++;
+                while (i < p.npoints - 1 && getEdgeStyle(i) == ls) i++;
                 
                 if (ls == null) ls = style.getDefaultEdgeStyle();
                 
@@ -177,6 +183,7 @@ public class MapPolygon extends MapObject {
                     int nump = i + 1 - begin;
                     int[] xp = new int[nump];
                     int[] yp = new int[nump];
+
                     System.arraycopy(p.xpoints, begin, xp, 0, nump);
                     System.arraycopy(p.ypoints, begin, yp, 0, nump);
 
@@ -187,7 +194,14 @@ public class MapPolygon extends MapObject {
     }
 
 
-    private LineStyle getEdgeStyle (int index) {
+    public void setEdgeStyle (int index, LineStyle style) {
+        if (edgeStyles == null) edgeStyles = new ArrayList();
+        while (edgeStyles.size() < index + 1) edgeStyles.add(null);
+        edgeStyles.set(index, style);
+    }
+
+
+    public LineStyle getEdgeStyle (int index) {
         return 
             (edgeStyles == null || index > edgeStyles.size() - 1) ?
             style.getDefaultEdgeStyle() : 
@@ -202,15 +216,17 @@ public class MapPolygon extends MapObject {
 
     public boolean checkAwtEvent (MapCanvas canvas, AWTEvent evt) {
 
-        if (evt.getID() == MouseEvent.MOUSE_PRESSED) {
+        if (evt.getID() == MouseEvent.MOUSE_PRESSED ||
+            evt.getID() == MouseEvent.MOUSE_CLICKED) {
+
             MouseEvent me = (MouseEvent)evt;
+            Rectangle b = getBounds();
+            Point p = me.getPoint();
+            Polygon pl = polygon;
 
-            if ((me.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
 
-                Rectangle b = getBounds();
-                Point p = me.getPoint();
-                Polygon pl = polygon;
-                
+            if ((me.getModifiers() & InputEvent.BUTTON1_MASK) != 0
+                && me.getID() == me.MOUSE_PRESSED) {
                 
                 if (b.x - 20 * 64 > p.x
                     || b.y - 20 * 64 > p.y
@@ -237,28 +253,45 @@ public class MapPolygon extends MapObject {
                         return true;
                     }
                 }
+            }
                 
-                
-                if (!canvas.isErase()) {
+            if (!canvas.isErase()) {
                     
-                    for (int i = 0; i < pl.npoints; i++) {
+                for (int i = 0; i < pl.npoints; i++) {
                         
-                        int ni = (i + 1) % pl.npoints;
-                        if (Line2D.ptSegDistSq(pl.xpoints[i],
-                                               pl.ypoints[i],
-                                               pl.xpoints[ni],
-                                               pl.ypoints[ni],
-                                               p.x, p.y) < 25 * 64 * 64) {
+                    int ni = (i + 1) % pl.npoints;
+                    if (Line2D.ptSegDistSq(pl.xpoints[i],
+                                           pl.ypoints[i],
+                                           pl.xpoints[ni],
+                                           pl.ypoints[ni],
+                                           p.x, p.y) < 25 * 64 * 64) {
+
+                        if ((me.getModifiers() & 
+                             InputEvent.BUTTON1_MASK) != 0) {
                             
-                            int pc = pl.npoints + 1;
-                            int xps[] = insert(p.x, pl.xpoints, i + 1);
-                            int yps[] = insert(p.y, pl.ypoints, i + 1);
+                            if (me.getID() == me.MOUSE_PRESSED) {
                             
-                            polygon = new Polygon(xps, yps, pc);
-                            
-                            canvas.setCanvasEventHandler
-                                (new PolygonPointMoveHandler(me, i + 1));
-                            return true;                    
+                                int pc = pl.npoints + 1;
+                                int xps[] = insert(p.x, pl.xpoints, i + 1);
+                                int yps[] = insert(p.y, pl.ypoints, i + 1);
+                                
+                                polygon = new Polygon(xps, yps, pc);
+                                
+                                canvas.setCanvasEventHandler
+                                    (new PolygonPointMoveHandler(me, i + 1));
+                                return true;
+                            }
+
+                        } else {
+
+                            if (me.getID() == me.MOUSE_CLICKED) {
+                                EditorDialog.show
+                                    (canvas,
+                                     new EdgePropertyEditor(canvas, this, i),
+                                     true,
+                                     EditorDialog.OK_CANCEL);
+                                return true;
+                            }
                         }
                     }
                 }
