@@ -851,10 +851,21 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
     LIMIT(pl->item[item], 0, World.items[item].limit);
 }
 
-void do_hyperjump(player *pl)
+/*
+ * Returns true if warp status was achieved.
+ */
+bool Do_hyperjump(player *pl)
 {
+    if (pl->item[ITEM_HYPERJUMP] <= 0)
+	return false;
+    if (pl->fuel.sum < -ED_HYPERJUMP)
+	return false;
+    pl->item[ITEM_HYPERJUMP]--;
+    /*Player_add_fuel(pl, ED_HYPERJUMP);*/
+    Add_fuel(&(pl->fuel), ED_HYPERJUMP);
     SET_BIT(pl->status, WARPING);
     pl->wormHoleHit = -1;
+    return true;
 }
 
 void do_lose_item(player *pl)

@@ -1750,13 +1750,8 @@ static void Robot_default_play_check_objects(player *pl,
 				|OBJ_HEAT_SHOT|OBJ_MINE)
 		&& (pl->fuel.sum < pl->fuel.l3
 		    || !BIT(pl->have, HAS_SHIELD))) {
-		if (pl->item[ITEM_HYPERJUMP] > 0
-		    && pl->fuel.sum > -ED_HYPERJUMP) {
-		    pl->item[ITEM_HYPERJUMP]--;
-		    Add_fuel(&(pl->fuel), ED_HYPERJUMP);
-		    do_hyperjump(pl);
-		    break;
-		}
+	      if (Do_hyperjump(pl))
+		  break;
 	    }
 	}
 	if (BIT(shot->type, OBJ_SMART_SHOT)) {
@@ -2029,12 +2024,8 @@ static void Robot_default_play(player *pl)
 
     if (ship_dist <= 10*BLOCK_SZ && pl->fuel.sum <= pl->fuel.l3
 	&& !BIT(World.rules->mode, TIMING)) {
-	if (pl->item[ITEM_HYPERJUMP] > 0 && pl->fuel.sum > -ED_HYPERJUMP) {
-	    pl->item[ITEM_HYPERJUMP]--;
-	    Add_fuel(&(pl->fuel), ED_HYPERJUMP);
-	    do_hyperjump(pl);
+	if (Do_hyperjump(pl))
 	    return;
-	}
     }
 
     if (ship_i != -1

@@ -220,7 +220,7 @@ void Do_deflector(player *pl);
 void Do_transporter(player *pl);
 void Do_general_transporter(player *pl, clpos pos, player *victim,
 			    int *item, long *amount);
-void do_hyperjump(player *pl);
+bool Do_hyperjump(player *pl);
 void do_lose_item(player *pl);
 void Update_torpedo(torpobject *torp);
 void Update_missile(missileobject *shot);
