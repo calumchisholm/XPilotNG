@@ -322,7 +322,7 @@
    release 3. */
 #undef SETVBUF_REVERSED
 
-/* "Client sound enabled." */
+/* Define to 1 if you want OpenAL sound. */
 #undef SOUND
 
 /* Define to 1 if you have the ANSI C header files. */
