@@ -43,8 +43,8 @@
 #define ED_LASER_HIT		(-100.0*FUEL_SCALE_FACT)
 /* was 120 -> 80 -> 40 -> 50 -> 60 -> 100 */
 
-#define CANNON_SCORE	    	-1436
-#define WALL_SCORE	    	2000
+#define CANNON_SCORE	    	-1436.0
+#define WALL_SCORE	    	2000.0
 
 #define RATE_SIZE	    	20
 #define RATE_RANGE	    	1024

@@ -45,9 +45,9 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 	/*pulse->pos.cx = cx - tcos(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;
 	  pulse->pos.cy = cy - tsin(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;*/
 	/* is this ok ? */
-	pulse->dir = (int)Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
-					pl->pos.cy - pulse->pos.cy)
-		     * 2 - RES / 2 - pulse->dir;
+	pulse->dir = (int)(Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
+					 pl->pos.cy - pulse->pos.cy)
+			   * 2 - RES / 2 - pulse->dir);
 	pulse->dir = MOD2(pulse->dir, RES);
 	
 	pulse->vel.x = pulseSpeed * tcos(pulse->dir);
@@ -114,7 +114,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 			"%s got roasted alive by %s's laser.",
 			pl->name, kp->name);
 		if (pl->id == kp->id) {
-		    sc = Rate(0, kp->score)
+		    sc = Rate(0.0, kp->score)
 			* laserKillScoreMult
 			* selfKillScoreMult;
 		    Score(kp, -sc, kp->pos, kp->name);

@@ -495,7 +495,7 @@ static bool Grok_map_size(void)
 	World.width += 2 * BLOCK_SZ;
 	World.height += 2 * BLOCK_SZ;
     }
-    World.hypotenuse = (int) LENGTH(World.width, World.height);
+    World.hypotenuse = LENGTH(World.width, World.height);
 
     /* click sizes */
     World.cwidth = World.width * CLICK;
@@ -504,7 +504,7 @@ static bool Grok_map_size(void)
     /* block sizes */
     World.x = (World.width - 1) / BLOCK_SZ + 1; /* !@# */
     World.y = (World.height - 1) / BLOCK_SZ + 1;
-    World.diagonal = (int) LENGTH(World.x, World.y);
+    World.diagonal = LENGTH(World.x, World.y);
 
     return true;
 }
@@ -690,7 +690,7 @@ double Wrap_cfindDir(int dcx, int dcy)
 {
     dcx = WRAP_DCX(dcx);
     dcy = WRAP_DCY(dcy);
-    return findDir(dcx, dcy);
+    return findDir((double)dcx, (double)dcy);
 }
 
 double Wrap_length(int dcx, int dcy)

@@ -232,10 +232,10 @@ extern bool is_polygon_map;
 
 typedef struct {
     int		x, y;		/* Size of world in blocks */
-    int		diagonal;	/* Diagonal length in blocks */
+    double	diagonal;	/* Diagonal length in blocks */
     int		width, height;	/* Size of world in pixels (optimization) */
     int		cwidth, cheight;/* Size of world in clicks */
-    int		hypotenuse;	/* Diagonal length in pixels (optimization) */
+    double	hypotenuse;	/* Diagonal length in pixels (optimization) */
     rules_t	*rules;
     char	name[MAX_CHARS];
     char	author[MAX_CHARS];
