@@ -88,7 +88,7 @@ void Turn_player(int ind);
 int is_inside(int x, int y, int hit_mask, const object *obj);
 int shape_is_inside(int cx, int cy, int hitmask, const object *obj,
 		    const shipobj *shape, int dir);
-int Polys_to_client(unsigned char *);
+int Polys_to_client(unsigned char **);
 void Ball_line_init(void);
 void Player_crash(player *pl, struct move *move, int crashtype,
 		  int item_id, int pt);

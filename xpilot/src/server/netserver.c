@@ -464,13 +464,7 @@ static int Init_setup(void)
     if (!is_polygon_map)
 	return result;
 
-    /* This could be sized dynamically !@# */
-    if ( (mapdata = (unsigned char *) malloc(1000000)) == NULL) {
-	error("No memory for mapdata");
-	return -1;
-    }
-
-    size = Polys_to_client(mapdata);
+    size = Polys_to_client(&mapdata);
 #ifndef SILENT
     xpprintf("%s Server->client map transfer size is %d bytes.\n",
 	     showtime(), size);

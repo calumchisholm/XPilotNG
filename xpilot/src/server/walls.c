@@ -1213,7 +1213,7 @@ static int Shape_away(struct move *move, const shipobj *shape,
 }
 
 
-/* Used internally by the movement routines to find the first line 
+/* Used internally by the movement routines to find the first line
  * (in the list given by *lines) that the given trajectory hits. */
 static int Lines_check(int msx, int msy, int mdx, int mdy, int *mindone,
 		       const unsigned short *lines, int chx, int chy,
@@ -1816,94 +1816,114 @@ static int Clear_corner(struct move *move, object *obj, int l1, int l2)
     return 1;
 }
 
-
-static void store_short(unsigned char **ptr, int i)
+static void store_byte(int value, unsigned char **start, int *offset, int *sz)
 {
-    *(*ptr)++ = i >> 8;
-    *(*ptr)++ = i & 0xff;
+    (*start)[(*offset)++] = value;
+    if (*offset == *sz) {
+	*sz *= 2;
+	*start = ralloc(*start, *sz);
+    }
+}
+
+static void store_2byte(int value, unsigned char **start, int *offset, int *sz)
+{
+    store_byte(value >> 8, start, offset, sz);
+    store_byte(value & 0xff, start, offset, sz);
 }
 
 
-static void store_32bit(unsigned char **ptr, int i)
+static void store_4byte(int value, unsigned char **start, int *offset, int *sz)
 {
-    store_short(ptr, i >> 16);
-    store_short(ptr, i & 0xffff);
+    store_2byte(value >> 16, start, offset, sz);
+    store_2byte(value & 0xffff, start, offset, sz);
 }
 
 
-int Polys_to_client(unsigned char *ptr)
+int Polys_to_client(unsigned char **start)
 {
     int i, j, startx, starty, dx, dy;
     int *edges;
-    unsigned char *start = ptr;
+    int size, offset;
+#define STORE1(x) store_byte(x, start, &offset, &size)
+#define STORE2(x) store_2byte(x, start, &offset, &size)
+#define STORE4(x) store_4byte(x, start, &offset, &size)
 
-    *ptr++ = num_pstyles;
-    *ptr++ = num_estyles;
-    *ptr++ = num_bstyles;
+    *start = ralloc(NULL, 100);
+    size = 100;
+    offset = 0;
+
+    STORE1(num_pstyles);
+    STORE1(num_estyles);
+    STORE1(num_bstyles);
     for (i = 0; i < num_pstyles; i++) {
-	store_32bit(&ptr, pstyles[i].color);
-	*ptr++ = pstyles[i].texture_id;
-	*ptr++ = pstyles[i].defedge_id;
-	*ptr++ = pstyles[i].flags;
+	STORE4(pstyles[i].color);
+	STORE1(pstyles[i].texture_id);
+	STORE1(pstyles[i].defedge_id);
+	STORE1(pstyles[i].flags);
     }
     for (i = 0; i < num_estyles; i++) {
-	*ptr++ = estyles[i].width;
-	store_32bit(&ptr, estyles[i].color);
-	*ptr++ = estyles[i].style;
+	STORE1(estyles[i].width);
+	STORE4(estyles[i].color);
+	STORE1(estyles[i].style);
     }
     for (i = 0; i < num_bstyles; i++) {
-	strcpy((char *)ptr, bstyles[i].filename);
-	ptr += strlen((char *)ptr) + 1;
-	*ptr++ = bstyles[i].flags;
+	j = 0;
+	while (1) {
+	    STORE1(bstyles[i].filename[j]);
+	    if (!bstyles[i].filename[j])
+		break;
+	    j++;
+	}
+	STORE1(bstyles[i].flags);
     }
-    store_short(&ptr, num_polys);
+    STORE2(num_polys);
     for (i = 0; i < num_polys; i++) {
-	*ptr++ = pdata[i].style;
+	STORE1(pdata[i].style);
 	j = pdata[i].num_points;
-	store_short(&ptr, pdata[i].num_echanges);
+	STORE2(pdata[i].num_echanges);
 	edges = estyleptr + pdata[i].estyles_start;
 	while (*edges != INT_MAX)
-	    store_short(&ptr, *edges++);
+	    STORE2(*edges++);
 	startx = pdata[i].cx;
 	starty = pdata[i].cy;
 	edges = pdata[i].edges;
-	store_short(&ptr, j);
-	store_short(&ptr, startx >> CLICK_SHIFT);
-	store_short(&ptr, starty >> CLICK_SHIFT);
+	STORE2(j);
+	STORE2(startx >> CLICK_SHIFT);
+	STORE2(starty >> CLICK_SHIFT);
 	dx = startx;
 	dy = starty;
 	for (; j > 0; j--) {
 	    dx += *edges++;
 	    dy += *edges++;
 	    if (j != 1) {
-		store_short(&ptr, (dx >> CLICK_SHIFT) - (startx>>CLICK_SHIFT));
-		store_short(&ptr, (dy >> CLICK_SHIFT) - (starty>>CLICK_SHIFT));
+		STORE2((dx >> CLICK_SHIFT) - (startx>>CLICK_SHIFT));
+		STORE2((dy >> CLICK_SHIFT) - (starty>>CLICK_SHIFT));
 	    }
 	    startx = dx;
 	    starty = dy;
 	}
     }
-    *ptr++ = World.NumBases;
+    STORE1(World.NumBases);
     for (i = 0; i < World.NumBases; i++) {
 	if (World.base[i].team == TEAM_NOT_SET)
-	    *ptr++ = 0;
+	    STORE1(0);
 	else
-	    *ptr++ = World.base[i].team;
-	store_short(&ptr, World.base[i].pos.cx >> CLICK_SHIFT);
-	store_short(&ptr, World.base[i].pos.cy >> CLICK_SHIFT);
-	*ptr++ = World.base[i].dir;
+	    STORE1(World.base[i].team);
+	STORE2(World.base[i].pos.cx >> CLICK_SHIFT);
+	STORE2(World.base[i].pos.cy >> CLICK_SHIFT);
+	STORE1(World.base[i].dir);
     }
-    store_short(&ptr, World.NumFuels);
+    STORE2(World.NumFuels);
     for (i = 0; i < World.NumFuels; i++) {
-	store_short(&ptr, World.fuel[i].pos.cx >> CLICK_SHIFT);
-	store_short(&ptr, World.fuel[i].pos.cy >> CLICK_SHIFT);
+	STORE2(World.fuel[i].pos.cx >> CLICK_SHIFT);
+	STORE2(World.fuel[i].pos.cy >> CLICK_SHIFT);
     }
-    *ptr++ = World.NumChecks;
+    STORE1(World.NumChecks);
     for (i = 0; i < World.NumChecks; i++) {
-	store_short(&ptr, World.check[i].cx >> CLICK_SHIFT);
-	store_short(&ptr, World.check[i].cy >> CLICK_SHIFT);
+	STORE2(World.check[i].cx >> CLICK_SHIFT);
+	STORE2(World.check[i].cy >> CLICK_SHIFT);
     }
-    return ptr - start;
+    return offset;
 }
 
 
