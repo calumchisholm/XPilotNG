@@ -39,21 +39,6 @@ static void	(*timer_handler)(void);
 static double	frametime;	/* time between 2 frames in seconds */
 static double	t_nextframe;
 
-static inline double timeval_to_seconds(struct timeval tv)
-{
-    return (double)tv.tv_sec + tv.tv_usec * 1e-6;
-}
-
-static inline struct timeval seconds_to_timeval(double t)
-{
-    struct timeval tv;
-
-    tv.tv_sec = (unsigned)t;
-    tv.tv_usec = (unsigned)(((t - (double)tv.tv_sec) * 1e6) + 0.5);
-
-    return tv;
-}
-
 static void setup_timer(void)
 {
     struct timeval tv;
@@ -273,18 +258,8 @@ void sched(void)
 		*playback_sched++ = 0;
 	    /* RECORDING STUFF END */
 
-	    {
-		struct timeval tv1, tv2;
-		double t1, t2;
-
-		gettimeofday(&tv1, NULL);
-		if (timer_handler)
-		    (*timer_handler)();
-		gettimeofday(&tv2, NULL);
-		t1 = timeval_to_seconds(tv1);
-		t2 = timeval_to_seconds(tv2);
-		options.mainLoopTime = (t2 - t1) * 1e3;
-	    }
+	    if (timer_handler)
+		(*timer_handler)();
 
 	    t_nextframe += frametime;
 	}

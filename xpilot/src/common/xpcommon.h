@@ -256,6 +256,21 @@ static void Win_show_error(char *errmsg);
 typedef int socklen_t;
 #endif
 
+static inline double timeval_to_seconds(struct timeval tv)
+{
+    return (double)tv.tv_sec + tv.tv_usec * 1e-6;
+}
+
+static inline struct timeval seconds_to_timeval(double t)
+{
+    struct timeval tv;
+
+    tv.tv_sec = (unsigned)t;
+    tv.tv_usec = (unsigned)(((t - (double)tv.tv_sec) * 1e6) + 0.5);
+
+    return tv;
+}
+
 /* Common XPilot header files. */
 
 #include "version.h"

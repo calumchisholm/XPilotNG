@@ -32,10 +32,6 @@
 
 char server_version[] = VERSION;
 
-#ifndef	lint
-char xpilots_versionid[] = "@(#)$" TITLE " $";
-#endif
-
 /*
  * Global variables
  */
@@ -193,6 +189,10 @@ int main(int argc, char **argv)
 void Main_loop(void)
 {
     world_t *world = &World;
+    struct timeval tv1, tv2;
+    double t1, t2;
+
+    gettimeofday(&tv1, NULL);
 
     main_loops++;
 
@@ -272,6 +272,11 @@ void Main_loop(void)
 	j = *playback_ei++;
 	Setup_connection(a, b, c, i, d, e, j);
     }
+
+    gettimeofday(&tv2, NULL);
+    t1 = timeval_to_seconds(tv1);
+    t2 = timeval_to_seconds(tv2);
+    options.mainLoopTime = (t2 - t1) * 1e3;
 }
 
 
