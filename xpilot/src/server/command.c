@@ -179,26 +179,27 @@ static void Set_swapper_state(player_t *pl)
 #define CMD_RESULT_NO_NAME		(-3)
 
 
-static int Cmd_addr(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_advance(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_help(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_kick(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_mute(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_op(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_password(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_queue(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_turnqueue(char *arg, player_t *pl, int oper, char *msg, size_t size);
-static int Cmd_version(char *arg, player_t *pl, int oper, char *msg, size_t size);
+static int Cmd_addr(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_advance(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_ally(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_get(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_help(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_kick(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_lock(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_maxturnsps(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_mute(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_op(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_password(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_pause(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_plinfo(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_queue(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_set(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_shutdown(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_stats(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_team(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_turnqueue(char *arg, player_t *pl, bool oper, char *msg, size_t size);
+static int Cmd_version(char *arg, player_t *pl, bool oper, char *msg, size_t size);
 
 
 typedef struct {
@@ -206,7 +207,7 @@ typedef struct {
     const char *abbrev;
     const char *help;
     bool oper_only;
-    int (*cmd)(char *arg, player_t *pl, int oper, char *msg, size_t size);
+    int (*cmd)(char *arg, player_t *pl, bool oper, char *msg, size_t size);
 } Command_info;
 
 
@@ -325,7 +326,7 @@ static Command_info commands[] = {
 	"reset",
 	"r",
 	"Just /reset re-starts the round. "
-	"/reset.  Resets all scores to 0.  (operator)",
+	"'/reset all' also resets all scores to 0.  (operator)",
 	true,
 	Cmd_reset
     },
@@ -337,9 +338,18 @@ static Command_info commands[] = {
 	Cmd_set
     },
     {
+	"shutdown",
+	"shutd",
+	"/shutdown <delay in seconds> [reason].  Shutdown server. "
+	"Use delay <= 0 to cancel. (operator)  "
+	"Just /shutdown to query.",
+	false,      /* checked in the function */
+	Cmd_shutdown
+    },
+    {
 	"stats",
 	"st",
-	"/stats [player name or ID number].  Show player ranking info.",
+	"/stats <player name or ID number>.  Show player ranking info.",
 	false,
 	Cmd_stats
     },
@@ -355,7 +365,7 @@ static Command_info commands[] = {
 	"turnqueue",
 	"turnq",
 	"/turnqueue . Toggles turnqueue for player",
-	0,
+	false,
 	Cmd_turnqueue
     },
     {
@@ -454,7 +464,7 @@ void Handle_player_command(player_t *pl, char *cmd)
 
 
 
-static int Cmd_addr(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_addr(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     player_t *pl2 = NULL;
     const char *errorstr;
@@ -492,7 +502,7 @@ static int Cmd_addr(char *arg, player_t *pl, int oper, char *msg, size_t size)
  * around this, but not implemented now. Currently queue and advance
  * commands are disabled during recording.
  */
-static int Cmd_advance(char *arg, player_t *pl, int oper,
+static int Cmd_advance(char *arg, player_t *pl, bool oper,
 		       char *msg, size_t size)
 {
     int result;
@@ -520,7 +530,7 @@ static int Cmd_advance(char *arg, player_t *pl, int oper,
 }
 
 
-static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_ally(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     world_t *world = pl->world;
     char *command;
@@ -612,7 +622,7 @@ static int Cmd_ally(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return result;
 }
 
-static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_get(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     char value[MAX_CHARS];
     char *valcpy, *name;
@@ -654,7 +664,7 @@ static int Cmd_get(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 
-static int Cmd_help(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_help(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int			i;
 
@@ -700,7 +710,7 @@ static int Cmd_help(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 
-static int Cmd_kick(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_kick(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     player_t *kicked_pl;
     const char *errorstr;
@@ -729,7 +739,7 @@ static int Cmd_kick(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 
-static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_lock(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     bool new_lock;
 
@@ -768,7 +778,7 @@ static int Cmd_lock(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 /* temporary hack */
-static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_maxturnsps(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int new_maxturnsps;
 
@@ -792,7 +802,7 @@ static int Cmd_maxturnsps(char *arg, player_t *pl, int oper, char *msg, size_t s
     return CMD_RESULT_SUCCESS;
 }
 
-static int Cmd_mute(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_mute(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int new_mute;
     player_t *mutee;
@@ -836,7 +846,7 @@ static int Cmd_mute(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 /* kps - this one is a bit obscure, maybe clean it up a bit ? */
-static int Cmd_op(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_op(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     player_t *issuer = pl;
     char *origarg = arg;
@@ -905,7 +915,7 @@ static int Cmd_op(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 
-static int Cmd_password(char *arg, player_t *pl, int oper,
+static int Cmd_password(char *arg, player_t *pl, bool oper,
 			 char *msg, size_t size)
 {
     UNUSED_PARAM(oper);
@@ -930,7 +940,7 @@ static int Cmd_password(char *arg, player_t *pl, int oper,
 }
 
 
-static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_pause(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     const char *errorstr;
     player_t *pl2;
@@ -963,7 +973,7 @@ static int Cmd_pause(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return CMD_RESULT_SUCCESS;
 }
 
-static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_plinfo(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     const char *errorstr;
     player_t *pl2;
@@ -995,7 +1005,7 @@ static int Cmd_plinfo(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return CMD_RESULT_SUCCESS;
 }
 
-static int Cmd_queue(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_queue(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int result;
 
@@ -1016,7 +1026,7 @@ static int Cmd_queue(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 
-static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_reset(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int i;
     world_t *world = pl->world;
@@ -1058,7 +1068,7 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 
-static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_stats(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
@@ -1074,7 +1084,7 @@ static int Cmd_stats(char *arg, player_t *pl, int oper, char *msg, size_t size)
 }
 
 
-static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_team(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int i, team, swap_allowed;
     char *arg2;
@@ -1229,7 +1239,7 @@ static int Cmd_team(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return CMD_RESULT_SUCCESS;
 }
 
-static int Cmd_turnqueue(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_turnqueue(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     UNUSED_PARAM(pl); UNUSED_PARAM(oper);
 
@@ -1255,7 +1265,7 @@ static int Cmd_turnqueue(char *arg, player_t *pl, int oper, char *msg, size_t si
     return CMD_RESULT_SUCCESS;
 }
 
-static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size)
+static int Cmd_set(char *arg, player_t *pl, bool oper, char *msg, size_t size)
 {
     int i;
     char *option, *value;
@@ -1303,7 +1313,50 @@ static int Cmd_set(char *arg, player_t *pl, int oper, char *msg, size_t size)
     return CMD_RESULT_ERROR;
 }
 
-static int Cmd_version(char *arg, player_t *pl, int oper,
+static int Cmd_shutdown(char *arg, player_t *pl, bool oper,
+			char *msg, size_t size)
+{
+    int delay;
+    const char *delaystr, *reason;
+    bool is_shutting_down = (ShutdownServer == -1 ? false : true);
+
+    if (!arg || !*arg) {
+	if (is_shutting_down)
+	    snprintf(msg, size, "Shutting down in %d seconds: \"%s\"",
+		     ShutdownServer / FPS, ShutdownReason);
+	else
+	    strlcpy(msg, "The server is not shutting down.", size);
+	return CMD_RESULT_SUCCESS;
+    }
+
+    if (!oper)
+	return CMD_RESULT_NOT_OPERATOR;
+
+    if (!arg
+	|| !(delaystr = strtok(arg, " "))) {
+
+	snprintf(msg, size, "Usage: /shutdown <delay> [reason].");
+	return CMD_RESULT_ERROR;
+    }
+
+    reason = strtok(NULL, "");
+    if (reason == NULL)
+	reason = "";
+
+    delay = atoi(delaystr);
+
+    if (is_shutting_down || delay > 0) {
+	Server_shutdown(pl->name, delay, reason);
+	return CMD_RESULT_SUCCESS;
+    }
+    else
+	/* no need to cancel if not shutting down */
+	snprintf(msg, size, "The server is not shutting down.");
+
+    return CMD_RESULT_ERROR;
+}
+
+static int Cmd_version(char *arg, player_t *pl, bool oper,
 		       char *msg, size_t size)
 {
     UNUSED_PARAM(arg); UNUSED_PARAM(pl); UNUSED_PARAM(oper);
