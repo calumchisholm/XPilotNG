@@ -13,11 +13,15 @@ dnl AC_CANONICAL_HOST
 dnl  Checks for options.
 AC_ARG_ENABLE(dbe,
 	AC_HELP_STRING([--enable-dbe],
-			[support for X Doublebuffer Extension in client]))
+			[support for X Doublebuffer Extension in client]),
+[if test $enable_dbe = yes; then
+	AC_DEFINE([DBE], 1, [support for X Doublebuffer Extension in client])
+fi])
 
 AC_ARG_ENABLE(mbx,
 	AC_HELP_STRING([--enable-mbx],
 			[support for X Multibuffer Extension in client]))
+
 
 AC_ARG_ENABLE(sparccmaphack,
 	AC_HELP_STRING([--enable-sparccmaphack],
