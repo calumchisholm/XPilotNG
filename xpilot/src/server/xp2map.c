@@ -320,7 +320,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    else if (!strcasecmp(*attr, "force"))
 		force = atof(*(attr + 1));
 	    else if (!strcasecmp(*attr, "type")) {
-		char *s = (char *)*(attr + 1);
+		const char *s = *(attr + 1);
 
 		if (!strcasecmp(s, "pos"))
 		    type = POS_GRAV;
@@ -360,7 +360,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    else if (!strcasecmp(*attr, "y"))
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    else if (!strcasecmp(*attr, "type")) {
-		char *s = (char *)*(attr + 1);
+		const char *s = *(attr + 1);
 
 		if (!strcasecmp(s, "normal"))
 		    type = WORM_NORMAL;
