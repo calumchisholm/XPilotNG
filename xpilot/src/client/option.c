@@ -8,7 +8,7 @@
  *      Bert Gijsbers        <bert@xpilot.org>
  *      Dick Balaska         <dick@xpilot.org>
  *
- * Copyright (C) 2003 Kristian Söderblom <kps@users.sourceforge.net>
+ * Copyright (C) 2003-2004 Kristian Söderblom <kps@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ static void Print_default_value(xp_option_t *opt)
 	printf("        The default value is: %d.\n", opt->int_defval);
 	break;
     case xp_double_option:
-	printf("        The default value is: %.3lf.\n", opt->dbl_defval);
+	printf("        The default value is: %.3f.\n", opt->dbl_defval);
 	break;
     case xp_string_option:
 	if (opt->str_defval && strlen(opt->str_defval) > 0)
@@ -184,10 +184,28 @@ bool Set_int_option(xp_option_t *opt, int value, xp_option_origin_t origin)
     assert(opt->type == xp_int_option);
     assert(opt->int_ptr);
 
-    if (!(value >= opt->int_minval && value <= opt->int_maxval)) {
-	warn("Bad value %d for option \"%s\", using default...",
-	     value, opt->name);
-	value = opt->int_defval;
+    if (origin == xp_option_origin_setcmd) {
+	char msg[MSG_LEN];
+
+	if (value < opt->int_minval) {
+	    snprintf(msg, sizeof(msg),
+		     "Minumum value for option %s is %d. [*Client reply*]",
+		     opt->name, opt->int_minval);
+	    Add_message(msg);
+	}
+	if (value > opt->int_maxval) {
+	    snprintf(msg, sizeof(msg),
+		     "Maximum value for option %s is %d. [*Client reply*]",
+		     opt->name, opt->int_maxval);
+	    Add_message(msg);
+	}
+    }
+    else {
+	if (!(value >= opt->int_minval && value <= opt->int_maxval)) {
+	    warn("Bad value %d for option \"%s\", using default...",
+		 value, opt->name);
+	    value = opt->int_defval;
+	}
     }
 
     LIMIT(value, opt->int_minval, opt->int_maxval);
@@ -212,10 +230,28 @@ bool Set_double_option(xp_option_t *opt, double value,
     assert(opt->type == xp_double_option);
     assert(opt->dbl_ptr);
 
-    if (!(value >= opt->dbl_minval && value <= opt->dbl_maxval)) {
-	warn("Bad value %.3lf for option \"%s\", using default...",
-	     value, opt->name);
-	value = opt->dbl_defval;
+    if (origin == xp_option_origin_setcmd) {
+	char msg[MSG_LEN];
+
+	if (value < opt->dbl_minval) {
+	    snprintf(msg, sizeof(msg),
+		     "Minumum value for option %s is %.3f. [*Client reply*]",
+		     opt->name, opt->dbl_minval);
+	    Add_message(msg);
+	}
+	if (value > opt->dbl_maxval) {
+	    snprintf(msg, sizeof(msg),
+		     "Maximum value for option %s is %.3f. [*Client reply*]",
+		     opt->name, opt->dbl_maxval);
+	    Add_message(msg);
+	}
+    }
+    else {
+	if (!(value >= opt->dbl_minval && value <= opt->dbl_maxval)) {
+	    warn("Bad value %.3f for option \"%s\", using default...",
+		 value, opt->name);
+	    value = opt->dbl_defval;
+	}
     }
 
     LIMIT(value, opt->dbl_minval, opt->dbl_maxval);
@@ -226,7 +262,7 @@ bool Set_double_option(xp_option_t *opt, double value,
 	*opt->dbl_ptr = value;
 
     /*
-     * printf("Value of option %s is now %.3lf.\n", opt->name,
+     * printf("Value of option %s is now %.3f.\n", opt->name,
      * *opt->dbl_ptr); 
      */
     return retval;
@@ -446,7 +482,16 @@ bool Set_option(const char *name, const char *value, xp_option_origin_t origin)
     }
 
     if (!is_legal_value(opt->type, value)) {
-	warn("Bad value \"%s\" for option \"%s\"", value, opt->name);
+	if (origin != xp_option_origin_setcmd)
+	    warn("Bad value \"%s\" for option \"%s\".", value, opt->name);
+	else {
+	    char msg[MSG_LEN];
+	
+	    snprintf(msg, sizeof(msg),
+		     "Bad value \"%s\" for option \"%s\". [*Client reply*]",
+		     value, opt->name);
+	    Add_message(msg);
+	}
 	return false;
     }
 
@@ -500,7 +545,7 @@ void Set_command(const char *args)
 
 	newvalue = Option_value_to_string(opt);
 	snprintf(msg, sizeof(msg),
-		 "The value of %s is now \"%s\". [*Client reply*]",
+		 "The value of %s is now %s. [*Client reply*]",
 		 nm, newvalue);
 	Add_message(msg);
     } else {
@@ -528,7 +573,7 @@ const char *Option_value_to_string(xp_option_t *opt)
 	sprintf(buf, "%d", *opt->int_ptr);
 	break;
     case xp_double_option:
-	sprintf(buf, "%.3lf", *opt->dbl_ptr);
+	sprintf(buf, "%.3f", *opt->dbl_ptr);
 	break;
     case xp_string_option:
 	/*
@@ -567,14 +612,17 @@ void Get_command(const char *args)
     if (opt) {
 	const char *val = Option_value_to_string(opt);
 	const char *nm = Option_get_name(opt);
+
 	if (val && strlen(val) > 0)
 	    snprintf(msg, sizeof(msg),
-		     "The value of %s is \"%s\". [*Client reply*]", nm, val);
+		     "The value of %s is %s. [*Client reply*]", nm, val);
 	else
-	    sprintf(msg, "The option %s has no value. [*Client reply*]", nm);
+	    snprintf(msg, sizeof(msg),
+		     "The option %s has no value. [*Client reply*]", nm);
 	Add_message(msg);
     } else {
-	sprintf(msg, "No client option named \"%s\". [*Client reply*]",	name);
+	snprintf(msg, sizeof(msg),
+		 "No client option named \"%s\". [*Client reply*]",	name);
 	Add_message(msg);
     }
 
@@ -1088,39 +1136,6 @@ static int Get_string_resource(XrmDatabase db,
 }
 
 
-static void Get_int_resource(XrmDatabase db,
-			     const char *resource, int *result)
-{
-    int			ind;
-    char		resValue[MAX_CHARS];
-
-    Find_resource(db, resource, resValue, sizeof resValue, &ind);
-    if (sscanf(resValue, "%d", result) <= 0) {
-	warn("Bad value \"%s\" for option \"%s\", using default...",
-	     resValue, resource);
-	sscanf(options[ind].fallback, "%d", result);
-    }
-}
-
-
-static void Get_float_resource(XrmDatabase db,
-			       const char *resource, double *result)
-{
-    int			ind;
-    double		temp_result;
-    char		resValue[MAX_CHARS];
-
-    temp_result = 0.0;
-    Find_resource(db, resource, resValue, sizeof resValue, &ind);
-    if (sscanf(resValue, "%lf", &temp_result) <= 0) {
-	warn("Bad value \"%s\" for option \"%s\", using default...",
-	     resValue, resource);
-	sscanf(options[ind].fallback, "%lf", &temp_result);
-    }
-    *result = temp_result;
-}
-
-
 void Parse_options(int *argcp, char **argvp)
 {
     char		*ptr, *str;
@@ -1164,19 +1179,6 @@ void Parse_options(int *argcp, char **argvp)
     Get_string_resource(rDB, "geometry", resValue, sizeof resValue);
     geometry = xp_strdup(resValue);
 #endif
-
-    Get_shipshape_resource(rDB, &shipShape);
-    Validate_shape_str(shipShape);
-
-    Get_bool_resource(rDB, "fullColor", &fullColor);
-    Get_bool_resource(rDB, "texturedObjects", &texturedObjects);
-    if (!fullColor) {
-	texturedObjects = false;
-	instruments.showTexturedWalls = false;
-    }
-
-    Get_resource(rDB, "recordFile", resValue, sizeof resValue);
-    Record_init(resValue);
 
     Get_resource(rDB, "texturePath", resValue, sizeof resValue);
     texturePath = xp_strdup(resValue);
