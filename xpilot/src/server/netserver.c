@@ -3139,51 +3139,25 @@ static void Handle_talk(int ind, char *str)
 	Server_log_admin_message(pl, cp);
     }
     else {						/* Player message */
-	sent = -1;
-#if 0
-	/* first look for an exact match on player nickname. */
-	for (i = 0; i < NumPlayers; i++) {
-	    if (strcasecmp(pl_i->name, str) == 0) {
-		sent = i;
-		break;
-	    }
-	}
-	if (sent == -1) {
-	    /* now look for a partial match on both nick and realname. */
-	    for (sent = -1, i = 0; i < NumPlayers; i++) {
-		if (strncasecmp(pl_i->name, str, len) == 0
-		    || strncasecmp(pl_i->realname, str, len) == 0)
-		    sent = (sent == -1) ? i : -2;
-	    }
-	}
-#else
-	/* kps - also accepts ids */
-	sent = Get_player_index_by_name(str);
-#endif
-	switch (sent) {
-	case -2:
-	    sprintf(msg, "Message not sent, %s matches more than one player!",
-		    str);
+	char *errmsg;
+	player *other_pl = Get_player_by_name(str, NULL, &errmsg);
+
+	if (!other_pl) {
+	    sprintf(msg, "Message not sent. ");
+	    strcat(msg, errmsg);
 	    Set_player_message(pl, msg);
-	    break;
-	case -1:
-	    sprintf(msg, "Message not sent, %s does not match any player!",
-		    str);
-	    Set_player_message(pl, msg);
-	    break;
-	default:
-	    if (Players(sent) != pl) {
-		if (!(teamZeroPausing && mute_zero
-		      && pl->team == 0 && Players(sent)->team != 0)) {
-		    sprintf(msg + strlen(msg), ":[%s]", Players(sent)->name);
-		    Set_player_message(Players(sent), msg);
-		} else {
-		    sprintf(msg,
-			    "You may not send messages to active players!");
-		}
-		Set_player_message(pl, msg);
+	    return;
+	}
+
+	if (other_pl != pl) {
+	    if (!(teamZeroPausing && mute_zero
+		  && pl->team == 0 && other_pl->team != 0)) {
+		sprintf(msg + strlen(msg), ":[%s]", other_pl->name);
+		Set_player_message(other_pl, msg);
+	    } else {
+		sprintf(msg, "You may not send messages to active players!");
 	    }
-	    break;
+	    Set_player_message(pl, msg);
 	}
     }
 }
