@@ -1855,13 +1855,10 @@ static void Robot_default_play(player *pl)
     if (BIT(pl->have, HAS_DEFLECTOR) && !BIT(world->rules->mode, TIMING))
 	Deflector(pl, true);
 
-    if (pl->fuel.sum <= (BIT(world->rules->mode, TIMING) ? 0 : pl->fuel.l1)) {
-	if (!BIT(pl->status, SELF_DESTRUCT)) {
-	    SET_BIT(pl->status, SELF_DESTRUCT);
-	    pl->count = SELF_DESTRUCT_DELAY;
-	}
-    } else
-	CLR_BIT(pl->status, SELF_DESTRUCT);
+    if (pl->fuel.sum <= (BIT(world->rules->mode, TIMING) ? 0 : pl->fuel.l1))
+	Player_self_destruct(pl, true);
+    else
+	Player_self_destruct(pl, false);
 
     /* blinded by ECM. since we're not supposed to see anything,
        put up shields and return */

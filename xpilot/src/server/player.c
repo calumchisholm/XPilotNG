@@ -474,6 +474,7 @@ int Init_player(int ind, shipshape_t *ship)
     pl->emergency_thrust_left = 0;
     pl->emergency_shield_left = 0;
     pl->phasing_left	= 0;
+    pl->self_destruct_count = 0;
     pl->ecmcount	= 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
@@ -2028,6 +2029,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
     pl->emergency_thrust_left = 0;
     pl->emergency_shield_left = 0;
     pl->phasing_left	= 0;
+    pl->self_destruct_count = 0;
     pl->damaged 	= 0;
     pl->stunned		= 0;
     pl->lock.distance	= 0;

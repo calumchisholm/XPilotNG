@@ -1080,19 +1080,23 @@ static void Update_players(void)
 		    SET_BIT(pl->status, PLAYING);
 		    Go_home(pl);
 		}
-		if (BIT(pl->status, SELF_DESTRUCT)) {
-		    if (options.selfDestructScoreMult != 0) {
-			double sc = Rate(0.0, pl->score)
-			    * options.selfDestructScoreMult;
-			Score(pl, -sc, pl->pos, "Self-Destruct");
-		    }
-		    SET_BIT(pl->status, KILLED);
-		    sprintf(msg, "%s has committed suicide.", pl->name);
-		    Set_message(msg);
-		    Throw_items(pl);
-		    Kill_player(pl, true);
-		    updateScores = true;
+	    }
+	}
+
+	if (Player_is_self_destructing(pl)) {
+	    pl->self_destruct_count -= timeStep;
+	    if (pl->self_destruct_count <= 0) {
+		if (options.selfDestructScoreMult != 0) {
+		    double sc = Rate(0.0, pl->score)
+			* options.selfDestructScoreMult;
+		    Score(pl, -sc, pl->pos, "Self-Destruct");
 		}
+		SET_BIT(pl->status, KILLED);
+		sprintf(msg, "%s has committed suicide.", pl->name);
+		Set_message(msg);
+		Throw_items(pl);
+		Kill_player(pl, true);
+		updateScores = true;
 	    }
 	}
 

@@ -508,12 +508,13 @@ struct player {
     int		shots;			/* Number of active shots by player */
     int		missile_rack;		/* Next missile rack to be active */
 
-    int		num_pulses;		/* Number of laser pulses in the air. */
+    int		num_pulses;		/* Number of laser pulses "flying". */
 
     double	emergency_thrust_left;	/* how much emergency thrust left */
     double	emergency_shield_left;	/* how much emergency shield left */
 
     double	phasing_left;		/* how much time left */
+    double	self_destruct_count;	/* if > 0, ticks before boom */
 
     int		item[NUM_ITEMS];	/* for each item type how many */
     int		lose_item;		/* which item to drop */

@@ -188,7 +188,8 @@ void Pause_player(player *pl, bool on)
 	/* Minimum pause time is 10 seconds at gamespeed 12. */
 	pl->count = 10 * 12;
 	pl->updateVisibility = 1;
-	CLR_BIT(pl->status, SELF_DESTRUCT|PLAYING);
+	CLR_BIT(pl->status, PLAYING);
+	Player_self_destruct(pl, false);
 	SET_BIT(pl->status, PAUSE);
 	if (options.baselessPausing) {
 	    world->teams[pl->team].NumMembers--;
@@ -738,9 +739,10 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_SELF_DESTRUCT:
-		TOGGLE_BIT(pl->status, SELF_DESTRUCT);
-		if (BIT(pl->status, SELF_DESTRUCT))
-		    pl->count = SELF_DESTRUCT_DELAY;
+		if (Player_is_self_destructing(pl))
+		    Player_self_destruct(pl, false);
+		else
+		    Player_self_destruct(pl, true);
 		break;
 
 	    case KEY_PAUSE:
@@ -796,7 +798,7 @@ int Handle_keyboard(player *pl)
 			 * Turn hover pause on, together with shields.
 			 */
 			pl->count = 5 * 12;
-			CLR_BIT(pl->status, SELF_DESTRUCT);
+			Player_self_destruct(pl, false);
 			SET_BIT(pl->status, HOVERPAUSE);
 
 			if (BIT(pl->used, HAS_EMERGENCY_THRUST))

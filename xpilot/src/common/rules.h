@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -59,7 +58,6 @@
 #define PAUSE			(1L<<1) 	/* Must stay below 8 */
 #define GAME_OVER		(1L<<2)		/* Must stay below 8 */
 #define THRUSTING		(1L<<3)		/* not used by client? */
-#define SELF_DESTRUCT		(1L<<4)		/* not used by client? */
 #define WANT_AUDIO		(1L<<5)		/* whether client has SOUND */
 
 #define KILLED			(1L<<10)

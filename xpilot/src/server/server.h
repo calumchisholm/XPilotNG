@@ -696,25 +696,37 @@ static inline bool Player_is_waiting(player *pl)
     return false;
 }
 
-/* Replacement for macro IS_TANK_PTR */
+static inline bool Player_is_self_destructing(player *pl)
+{
+    return (pl->self_destruct_count > 0.0) ? true : false;
+}
+
+static inline void Player_self_destruct(player *pl, bool on)
+{
+    if (on) {
+	if (Player_is_self_destructing(pl))
+	    return;
+	pl->self_destruct_count = SELF_DESTRUCT_DELAY;
+    }
+    else
+	pl->self_destruct_count = 0.0;
+}
+
 static inline bool Player_is_tank(player *pl)
 {
     return (BIT(pl->type_ext, OBJ_EXT_TANK) == OBJ_EXT_TANK) ? true : false;
 }
 
-/* Replacement for macro IS_ROBOT_PTR */
 static inline bool Player_is_robot(player *pl)
 {
     return (BIT(pl->type_ext, OBJ_EXT_ROBOT) == OBJ_EXT_ROBOT) ? true : false;
 }
 
-/* Replacement for macro IS_HUMAN_PTR */
 static inline bool Player_is_human(player *pl)
 {
     return (!BIT(pl->type_ext, OBJ_EXT_TANK|OBJ_EXT_ROBOT)) ? true : false;
 }
 
-/* Replacement for macro OWNS_TANK */
 static inline bool Player_owns_tank(player *pl, player *tank)
 {
     if (Player_is_tank(tank)
