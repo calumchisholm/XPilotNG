@@ -119,7 +119,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 		Score(pl, -sc, pl->pos, "Cannon");
 		if (BIT(world->rules->mode, TEAM_PLAY)
 		    && pl->team != pulse->team)
-		    TEAM_SCORE(pulse->team, sc);
+		    Team_score(pulse->team, sc);
 		sprintf(msg,
 			"%s got roasted alive by cannonfire.",
 			pl->name);
@@ -127,7 +127,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    sound_play_sensors(pl->pos, PLAYER_ROASTED_SOUND);
 	    Set_message(msg);
 	    if (kp && kp->id != pl->id) {
-		Rank_AddLaserKill(kp);
+		Rank_add_laser_kill(kp);
 		Robot_war(pl, kp);
 	    }
 	}

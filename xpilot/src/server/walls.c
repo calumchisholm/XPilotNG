@@ -336,7 +336,7 @@ static void Object_hits_target(object_t *obj, target_t *targ, double player_cost
     Set_message(msg);
 
     if (options.targetKillTeam)
-	Rank_AddTargetKill(kp);
+	Rank_add_target_kill(kp);
 
     sc  = Rate(win_score, lose_score);
     por = (sc * lose_team_members) /win_team_members;
@@ -612,7 +612,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 
 		Score(pusher, sc, pl->pos, pl->name);
 		if (i >= num_pushers - 1)
-		    Rank_AddKill(pusher);
+		    Rank_add_shove_kill(pusher);
 	    }
 	    sc = Rate(average_pusher_score, pl->score)
 		* options.shoveKillScoreMult;

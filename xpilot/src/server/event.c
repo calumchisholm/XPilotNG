@@ -225,7 +225,7 @@ void Pause_player(player_t *pl, bool on)
 	}
 	pl->mychar = 'P';
 	updateScores = true;
-	strcpy(pl->rank->entry.logout, "paused");
+	Rank_set_logout_message(pl, "paused");
 	if (BIT(pl->have, HAS_BALL))
 	    Detach_ball(pl, NULL);
 	for (i = 0; i < MAX_TEAMS ; i++) {
@@ -249,7 +249,7 @@ void Pause_player(player_t *pl, bool on)
 		/* Its always too late */
 		toolate = true;
 
-	    strcpy(pl->rank->entry.logout, "playing");
+	    Rank_set_logout_message(pl, "playing");
 	    if (toolate) {
 		pl->life = 0;
 		pl->mychar = 'W';

@@ -436,13 +436,15 @@ void Rank_init_saved_scores(void)
     }
 }
 
-/* A player has logged in. Find his info or create new info by kicking
-   the player who hasn't played for the longest time. */
+/*
+ * A player has logged in. Find his info or create new info by kicking
+ * the player who hasn't played for the longest time.
+ */
 void Rank_get_saved_score(player_t * pl)
 {
     RankInfo *score;
-    int oldest = 0;
-    int i;
+    int oldest = 0, i;
+
     updateScores = true;
 
     for (i = 0; i < MAX_SCORES; i++) {
@@ -451,9 +453,9 @@ void Rank_get_saved_score(player_t * pl)
 	    if (score->pl == NULL) {
 		/* Ok, found it. */
 		score->pl = pl;
-		strcpy(score->entry.logout, "playing");
 		pl->score = score->score;
 		pl->rank = score;
+		Rank_set_logout_message(pl, "playing");
 		return;
 	    } else {
 		/* That scorenode is already in use by another player! */
@@ -470,21 +472,22 @@ void Rank_get_saved_score(player_t * pl)
     score = &scores[oldest];
 
     Init_scorenode(score, pl->name, pl->username, pl->hostname);
-    strcpy(score->entry.logout, "playing");
     score->pl = pl;
     score->entry.timestamp = time(NULL);
     pl->score = 0;
     pl->rank = score;
+    Rank_set_logout_message(pl, "playing");
 }
 
 /* A player has quit, save his info and mark him as not playing. */
-void Rank_save_score(const player_t * pl)
+void Rank_save_score(player_t * pl)
 {
-    RankInfo *score = pl->rank;
-    score->score = pl->score;
-    strlcpy(score->entry.logout, rank_showtime(), MAX_CHARS);
-    score->pl = NULL;
-    score->entry.timestamp = time(NULL);
+    RankInfo *rank = pl->rank;
+
+    rank->score = pl->score;
+    Rank_set_logout_message(pl, rank_showtime());
+    rank->pl = NULL;
+    rank->entry.timestamp = time(NULL);
 }
 
 /* Save the scores to disk (not the webpage). */

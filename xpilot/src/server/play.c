@@ -177,9 +177,10 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 	    || (BIT(pl_i->status, PAUSE) && pl_i->pause_count <= 0)
 	    || Player_is_waiting(pl_i))
 	    continue;
+
 	if (pl_i->team == td->team) {
 	    Score(pl_i, -sc, pos, "Treasure: ");
-	    Rank_LostBall(pl_i);
+	    Rank_lost_ball(pl_i);
 	    if (options.treasureKillTeam)
 		SET_BIT(pl_i->status, KILLED);
 	}
@@ -187,8 +188,8 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 		 (pl_i->team != TEAM_NOT_SET || pl_i->id == pl->id)) {
 	    if (lose_team_members > 0) {
 		if (pl_i->id == pl->id)
-		    Rank_CashedBall(pl_i);
-		Rank_WonBall(pl_i);
+		    Rank_cashed_ball(pl_i);
+		Rank_won_ball(pl_i);
 	    }
 	    Score(pl_i, (pl_i->id == pl->id ? 3*por : 2*por),
 		  pos, "Treasure: ");
@@ -196,7 +197,7 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
     }
 
     if (options.treasureKillTeam)
-	Rank_AddKill(pl);
+	Rank_add_treasure_kill(pl);
 
     updateScores = true;
 
@@ -310,7 +311,7 @@ void Ball_is_replaced(ballobject_t *ball)
     sprintf(msg, " < %s (team %d) has replaced the treasure >",
 	    pl->name, pl->team);
     Set_message(msg);
-    Rank_SavedBall(pl);
+    Rank_saved_ball(pl);
 }
 
 
@@ -330,12 +331,12 @@ void Ball_is_destroyed(ballobject_t *ball)
 
 	sprintf(msg," < The ball was loose for %d frames "
 		"/ %.2f frames at gamespeed=FPS (best %d) / %.2fs >",
-		(int)frames, normalized, Rank_GetBestBall(pl), seconds);
-	Rank_BallRun(pl, (int)(normalized + 0.5));
+		(int)frames, normalized, Rank_get_best_ballrun(pl), seconds);
+	Rank_ballrun(pl, (int)(normalized + 0.5));
     } else {
 	sprintf(msg," < The ball was loose for %d frames / %.2fs >",
 		(int)frames, seconds);
-	Rank_BallRun(pl, frames);
+	Rank_ballrun(pl, (int)frames);
     }
     Set_message(msg);
 }

@@ -38,13 +38,13 @@ void Score(player_t *pl, double points, clpos_t pos, const char *msg)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	if (!options.teamShareScore)
-	    Rank_AddScore(pl, points);
-	TEAM_SCORE(pl->team, points);
+	    Rank_add_score(pl, points);
+	Team_score(pl->team, points);
     } else {
 	if (pl->alliance != ALLIANCE_NOT_SET && options.teamShareScore)
 	    Alliance_score(pl->alliance, points);
 	else
-	    Rank_AddScore(pl, points);
+	    Rank_add_score(pl, points);
     }
 
     if (pl->conn != NULL)
@@ -53,21 +53,26 @@ void Score(player_t *pl, double points, clpos_t pos, const char *msg)
     updateScores = true;
 }
 
-void TEAM_SCORE(int team, double points)
+void Team_score(int team, double points)
 {
     world_t *world = &World;
+    team_t *t;
 
-    if (team == TEAM_NOT_SET)	/* could happen if options.teamCannons is off */
+    if (team == TEAM_NOT_SET)	/* could happen if teamCannons is off */
 	return;
 
-    world->teams[team].score += points;
+    t = Teams(world, team);
+    t->score += points;
+
     if (options.teamShareScore) {
 	int i;
-	double share = world->teams[team].score / world->teams[team].NumMembers;
+	double share = t->score / t->NumMembers;
+
 	for (i = 0; i < NumPlayers; i++) {
 	    player_t *pl_i = Players(i);
+
 	    if (pl_i->team == team)
-		Rank_SetScore(pl_i, share);
+		Rank_set_score(pl_i, share);
 	}
     }
 
@@ -76,14 +81,15 @@ void TEAM_SCORE(int team, double points)
 
 void Alliance_score(int id, double points)
 {
-    int		i;
-    int		member_count = Get_alliance_member_count(id);
-    double	share = points / member_count;
+    int i;
+    int member_count = Get_alliance_member_count(id);
+    double share = points / member_count;
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Players(i);
+
 	if (pl_i->alliance == id)
-	    Rank_AddScore(pl_i, share);
+	    Rank_add_score(pl_i, share);
     }
 }
 

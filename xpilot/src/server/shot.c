@@ -538,7 +538,7 @@ void Fire_general_shot(player_t *pl, int team, bool cannon,
 		return;
 	    Player_add_fuel(pl, ED_SHOT);
 	    sound_play_sensors(pl->pos, FIRE_SHOT_SOUND);
-	    Rank_FireShot(pl);
+	    Rank_fire_shot(pl);
 	}
 	if (!options.shotsGravity)
 	    CLR_BIT(status, GRAVITY);

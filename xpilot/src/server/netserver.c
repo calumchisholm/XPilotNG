@@ -1125,7 +1125,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 		    /* reset team score on first player */
 		    world->teams[pl->team].score = 0;
 	    }
-	    TEAM_SCORE(pl->team, pl->score);
+	    Team_score(pl->team, pl->score);
 	}
 	NumPlayers++;
 	request_ID();

@@ -333,13 +333,15 @@ static void PlayerCollision(void)
 			Set_message(msg);
 			sound_play_sensors(pl_j->pos,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			Rank_AddKill(pl);
-			if (Player_is_tank(pl))
+			if (Player_is_tank(pl)) {
+			    Rank_add_tank_kill(i_tank_owner_pl);
 			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
 				* options.tankKillScoreMult;
-			else
+			} else {
+			    Rank_add_runover_kill(pl);
 			    sc = Rate(pl->score, pl_j->score)
 				* options.runoverKillScoreMult;
+			}
 			Score_players(i_tank_owner_pl, sc, pl_j->name,
 				      pl_j, -sc, pl->name, true);
 		    }
@@ -360,13 +362,15 @@ static void PlayerCollision(void)
 			Set_message(msg);
 			sound_play_sensors(pl->pos,
 					   PLAYER_RAN_OVER_PLAYER_SOUND);
-			Rank_AddKill(pl_j);
-			if (Player_is_tank(pl_j))
+			if (Player_is_tank(pl_j)) {
+			    Rank_add_tank_kill(j_tank_owner_pl);
 			    sc = Rate(j_tank_owner_pl->score, pl->score)
 				* options.tankKillScoreMult;
-			else
+			} else {
+			    Rank_add_runover_kill(pl_j);
 			    sc = Rate(pl_j->score, pl->score)
 				* options.runoverKillScoreMult;
+			}
 
 			Score_players(j_tank_owner_pl, sc, pl->name,
 				      pl, -sc, pl_j->name, true);
@@ -742,7 +746,7 @@ static void Player_collides_with_ball(player_t *pl, object_t *obj)
 		   * options.selfKillScoreMult;
 	    Score(pl, -sc, pl->pos, kp->name);
 	} else {
-	    Rank_AddKill(kp);
+	    Rank_add_ball_kill(kp);
 	    sc = Rate(kp->score, pl->score) * options.ballKillScoreMult;
 	    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 	    Robot_war(pl, kp);
@@ -1025,7 +1029,7 @@ static void Player_collides_with_debris(player_t *pl, object_t *obj)
 		* options.explosionKillScoreMult * options.selfKillScoreMult;
 	    Score(pl, -sc, pl->pos, (kp == NULL) ? "[Explosion]" : pl->name);
 	} else {
-	    Rank_AddKill(kp);
+	    Rank_add_explosion_kill(kp);
 	    sc = Rate(kp->score, pl->score) * options.explosionKillScoreMult;
 	    Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 	}
@@ -1201,7 +1205,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		    strcat(msg, "  How strange!");
 		    sc = Rate(0.0, pl->score) * options.selfKillScoreMult;
 		} else {
-		    Rank_AddKill(kp);
+		    Rank_add_shot_kill(kp);
 		    sc = Rate(kp->score, pl->score);
 		}
 	    }
@@ -1232,7 +1236,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 		Score(pl, -sc, pl->pos, "Cannon");
 		if (BIT(world->rules->mode, TEAM_PLAY)
 		    && pl->team != obj->team)
-		    TEAM_SCORE(obj->team, sc);
+		    Team_score(obj->team, sc);
 	    } else if (obj->id == NO_ID || kp->id == pl->id)
 		Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
 	    else {

@@ -70,83 +70,118 @@ typedef struct RankInfo {
 } RankInfo;
 
 
-#define Rank_SetLogoutMessage(rank,msg) \
-	do { strcpy((rank)->entry.logout, (msg)); } while(0)
+static inline void Rank_set_logout_message(player_t *pl, const char *msg)
+{
+    if (pl->rank)
+	strlcpy(pl->rank->entry.logout, msg, sizeof(pl->rank->entry.logout));
+}
 
 void Rank_get_stats(player_t *pl, char *buf);
 RankInfo *Rank_get_by_name(char *name);
 void Rank_nuke_score(RankInfo *rank);
 void Rank_init_saved_scores(void);
 void Rank_get_saved_score(player_t *pl);
-void Rank_save_data(void);
-void Rank_web_scores(void);
-void Rank_save_score(const player_t *pl);
-void Rank_show_standings(void);
-void Rank_kill(player_t *pl);
-void Rank_lost_ball(player_t *pl);
-void Rank_cashed_ball(player_t *pl);
-void Rank_won_ball(player_t *pl);
-void Rank_saved_ball(player_t *pl);
-void Rank_death(player_t *pl);
-void Rank_add_score(player_t *pl, double points);
-void Rank_set_score(player_t *pl, double points);
-void Rank_fire_shot(player_t *pl);
+void Rank_save_score(player_t *pl);
 void Rank_write_score_file(void);
 void Rank_write_webpage(void);
 void Rank_show_ranks(void);
 
-
-/*
- * Converted from C++,
- * moved here from object.h and renamed to have Rank_ prefix
- */
-#define Rank_ClearKills(pl)	{ (pl)->kills = 0; }
-#define Rank_ClearDeaths(pl)	{ (pl)->deaths = 0; }
-
-#define Rank_AddRound(pl) \
-	{ if ((pl)->rank) (pl)->rank->entry.rounds++; }
-
-#define Rank_FireShot(pl) \
-	{ (pl)->shots++; if ((pl)->rank) (pl)->rank->entry.shots++; }
-
-#define Rank_SavedBall(pl) \
-	{ if ((pl)->rank) (pl)->rank->entry.ballsSaved++; }
-#define Rank_LostBall(pl) \
-	{ if ((pl)->rank) (pl)->rank->entry.ballsLost++; }
-#define Rank_CashedBall(pl) \
-	{ if ((pl)->rank) (pl)->rank->entry.ballsCashed++;}
-#define Rank_WonBall(pl) \
-	{ if ((pl)->rank) (pl)->rank->entry.ballsWon++; }
-#define Rank_BallRun(pl,tim)	{ \
-	 if ((pl)->rank && (tim) < (pl)->rank->entry.bestball) \
-		 (pl)->rank->entry.bestball = (tim); }
-
-#define Rank_AddDeath(pl) { \
-	(pl)->deaths++; \
-	if ((pl)->rank) (pl)->rank->entry.deaths++; \
+/* these 2 don't really touch the rank stuff */
+static inline void Rank_clear_kills(player_t *pl)
+{
+    pl->kills = 0;
 }
 
-#define Rank_AddKill(pl) { \
-	(pl)->kills++; \
-	if ((pl)->rank) (pl)->rank->entry.kills++; \
+static inline void Rank_clear_deaths(player_t *pl)
+{
+    pl->deaths = 0;
 }
 
-#define Rank_AddBallKill(pl) { Rank_AddKill(pl); }
-#define Rank_AddTargetKill(pl) { Rank_AddKill(pl); }
-#define Rank_AddLaserKill(pl) { Rank_AddKill(pl); }
-
-#define Rank_AddScore(pl,add) { \
-	(pl)->score += add; \
-	if ((pl)->rank) (pl)->rank->score += add; \
+static inline void Rank_add_score(player_t *pl, double points)
+{
+    pl->score += points;
+    if (pl->rank)
+	pl->rank->score += points;
 }
 
-#define Rank_SetScore(pl,newScore) { \
-	(pl)->score = newScore; \
-	if ((pl)->rank) (pl)->rank->score = newScore; \
+static inline void Rank_set_score(player_t *pl, double points)
+{
+    pl->score = points;
+    if (pl->rank)
+	pl->rank->score = points;
 }
 
-#define Rank_GetBestBall(pl) \
-	((pl)->rank ? (pl)->rank->entry.bestball : 65535)
+static inline void Rank_fire_shot(player_t *pl)
+{
+    pl->shots++;
+    if (pl->rank)
+	pl->rank->entry.shots++;
+}
+
+static inline void Rank_add_kill(player_t *pl)
+{
+    pl->kills++;
+    if (pl->rank)
+	pl->rank->entry.kills++;
+}
+
+static inline void Rank_add_death(player_t *pl)
+{
+    pl->deaths++;
+    if (pl->rank)
+	pl->rank->entry.deaths++;
+}
+
+static inline void Rank_add_round(player_t *pl)
+{
+    if (pl->rank)
+	pl->rank->entry.rounds++;
+}
+
+static inline void Rank_cashed_ball(player_t *pl)
+{
+    if (pl->rank)
+	pl->rank->entry.ballsCashed++;
+}
+
+static inline void Rank_saved_ball(player_t *pl)
+{
+    if (pl->rank)
+	pl->rank->entry.ballsSaved++;
+}
+
+static inline void Rank_won_ball(player_t *pl)
+{
+    if (pl->rank)
+	pl->rank->entry.ballsWon++;
+}
+
+static inline void Rank_lost_ball(player_t *pl)
+{
+    if (pl->rank)
+	pl->rank->entry.ballsLost++;
+}
+
+static inline void Rank_ballrun(player_t *pl, int tim)
+{
+    if (pl->rank && tim < pl->rank->entry.bestball)
+	pl->rank->entry.bestball = tim;
+}
+
+static inline int Rank_get_best_ballrun(player_t *pl)
+{
+    return (pl->rank ? pl->rank->entry.bestball : 65535);
+}
+
+static inline void Rank_add_ball_kill(player_t *pl)      { Rank_add_kill(pl); }
+static inline void Rank_add_explosion_kill(player_t *pl) { Rank_add_kill(pl); }
+static inline void Rank_add_laser_kill(player_t *pl)     { Rank_add_kill(pl); }
+static inline void Rank_add_runover_kill(player_t *pl)   { Rank_add_kill(pl); }
+static inline void Rank_add_shot_kill(player_t *pl)      { Rank_add_kill(pl); }
+static inline void Rank_add_shove_kill(player_t *pl)     { Rank_add_kill(pl); }
+static inline void Rank_add_tank_kill(player_t *pl)      { Rank_add_kill(pl); }
+static inline void Rank_add_target_kill(player_t *pl)    { Rank_add_kill(pl); }
+static inline void Rank_add_treasure_kill(player_t *pl)  { Rank_add_kill(pl); }
 
 
 #endif /* RANK_H */

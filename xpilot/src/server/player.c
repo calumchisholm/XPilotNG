@@ -466,8 +466,8 @@ int Init_player(int ind, shipshape_t *ship)
 
     pl->player_fps = 50; /* Client should send a value after startup */
 
-    Rank_ClearKills(pl);
-    Rank_ClearDeaths(pl);
+    Rank_clear_kills(pl);
+    Rank_clear_deaths(pl);
 
     /*
      * If limited lives you will have to wait 'til everyone gets GAME OVER.
@@ -639,8 +639,8 @@ void Reset_all_players(void)
 	    }
 	}
 
-	Rank_ClearKills(pl);
-	Rank_ClearDeaths(pl);
+	Rank_clear_kills(pl);
+	Rank_clear_deaths(pl);
 
 	/* kps - can this happen ? */
 	if (pl->mychar == 'W' && !BIT(pl->status, GAME_OVER))
@@ -648,7 +648,7 @@ void Reset_all_players(void)
 
 	if (!BIT(pl->status, PAUSE)
 	    && !Player_is_waiting(pl))
-	    Rank_AddRound(pl);
+	    Rank_add_round(pl);
 
 	CLR_BIT(pl->status, GAME_OVER);
 	CLR_BIT(pl->have, HAS_BALL);
@@ -1790,7 +1790,7 @@ void Delete_player(player_t *pl)
 
     if (pl->team != TEAM_NOT_SET && !Player_is_tank(pl) && pl->home_base) {
 	world->teams[pl->team].NumMembers--;
-	TEAM_SCORE(pl->team, -(pl->score));	/* recalculate teamscores */
+	Team_score(pl->team, -(pl->score));	/* recalculate teamscores */
 	if (Player_is_robot(pl))
 	    world->teams[pl->team].NumRobots--;
     }
@@ -1992,7 +1992,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     if (!BIT(pl->status, PAUSE)) {
 
 	if (add_rank_death)
-	    Rank_AddDeath(pl);
+	    Rank_add_death(pl);
 
 	if (BIT(world->rules->mode, LIMITED_LIVES)) {
 	    pl->life--;

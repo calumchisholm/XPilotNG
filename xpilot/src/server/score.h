@@ -40,7 +40,7 @@
 /* score.c */
 
 void Score(player_t *pl, double points, clpos_t pos, const char *msg);
-void TEAM_SCORE(int team, double points);
+void Team_score(int team, double points);
 void Alliance_score(int id, double points);
 double Rate(double winner, double loser);
 

@@ -780,7 +780,7 @@ static void Robot_create(void)
 	if (world->teams[robot->team].NumMembers == 1)
 	    /* reset team score on first player */
 	    world->teams[robot->team].score = 0.0;
-	TEAM_SCORE(robot->team, 0.0);
+	Team_score(robot->team, 0.0);
     }
 
     for (i = 0; i < NumPlayers - 1; i++) {
