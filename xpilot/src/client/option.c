@@ -723,7 +723,7 @@ int Xpilotrc_read(const char *path)
 	return -2;
     }
 
-    xpprintf("Reading options from xpilotrc file %s.\n", path);
+    warn("Reading options from xpilotrc file %s.\n", path);
 
     while (fgets(buf, sizeof buf, fp)) {
 	char *cp;

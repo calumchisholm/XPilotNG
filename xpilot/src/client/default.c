@@ -63,9 +63,12 @@ static bool Set_nickName(xp_option_t *opt, const char *value)
     }
 
     if (Check_nick_name(connectParam.nick_name) == NAME_ERROR) {
-	xpprintf("Fixing nick from \"%s\" ", connectParam.nick_name);
+	char nick[MAX_NAME_LEN];
+
+	strlcpy(nick, connectParam.nick_name, sizeof(nick));
 	Fix_nick_name(connectParam.nick_name);
-	xpprintf("to \"%s\".\n", connectParam.nick_name);
+	warn("Fixing nick from \"%s\" to \"%s\".\n",
+	     nick, connectParam.nick_name);
     }
 
     return true;
@@ -87,9 +90,12 @@ static bool Set_userName(xp_option_t *opt, const char *value)
 	strlcpy(connectParam.user_name, value, sizeof(connectParam.user_name));
 
     if (Check_user_name(connectParam.user_name) == NAME_ERROR) {
-	xpprintf("Fixing username from \"%s\" ", connectParam.user_name);
+	char user[MAX_NAME_LEN];
+
+	strlcpy(user, connectParam.user_name, sizeof(user));
 	Fix_user_name(connectParam.user_name);
-	xpprintf("to \"%s\".\n", connectParam.user_name);
+	warn("Fixing username from \"%s\" to \"%s\".\n",
+	     user, connectParam.user_name);
     }
 
     /* hack - if nickname is not set, set nickname to username */
@@ -117,9 +123,12 @@ static bool Set_hostName(xp_option_t *opt, const char *value)
 	strlcpy(connectParam.host_name, value, sizeof(connectParam.host_name));
 
     if (Check_host_name(connectParam.host_name) == NAME_ERROR) {
-	xpprintf("Fixing host from \"%s\" ", connectParam.host_name);
+	char host[SOCK_HOSTNAME_LENGTH];
+
+	strlcpy(host, connectParam.host_name, sizeof(host));
 	Fix_host_name(connectParam.host_name);
-	xpprintf("to \"%s\".\n", connectParam.host_name);
+	warn("Fixing host from \"%s\" to \"%s\".\n",
+	     host, connectParam.host_name);
     }
 
     return true;
@@ -211,7 +220,7 @@ static void tryToSetShipShape(void)
 	valid = Validate_shape_str(shipShapeSetting);
 	if (valid) {
 	    shipShape = xp_safe_strdup(shipShapeSetting);
-	    xpprintf("Your shipShape is valid. Have a nice day.\n");
+	    warn("Your shipShape is valid. Have a nice day.\n");
 	} else
 	    warn("Your shipShape isn't valid. Please fix it.");
 	return;
@@ -259,7 +268,7 @@ static void tryToSetShipShape(void)
 
     valid = Validate_shape_str(ss_candidate);
     if (valid) {
-	xpprintf("Ship shape \"%s\" is now in use.\n", shipShapeSetting);
+	warn("Ship shape \"%s\" is now in use.\n", shipShapeSetting);
 	shipShape = ss_candidate;
     } else {
 	xp_free(ss_candidate);

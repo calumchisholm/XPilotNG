@@ -172,40 +172,40 @@ char *Conf_soundfile(void)
 
 void Conf_print(void)
 {
-    xpprintf("============================================================\n");
-    xpprintf("VERSION                   = %s\n", VERSION);
-    xpprintf("PACKAGE                   = %s\n", PACKAGE);
+    warn("============================================================");
+    warn("VERSION                   = %s", VERSION);
+    warn("PACKAGE                   = %s", PACKAGE);
 
 #ifdef DBE
-    xpprintf("DBE\n");
+    warn("DBE");
 #endif
 #ifdef MBX
-    xpprintf("MBX\n");
+    warn("MBX");
 #endif
 #ifdef PLOCKSERVER
-    xpprintf("PLOCKSERVER\n");
+    warn("PLOCKSERVER");
 #endif
 #ifdef DEVELOPMENT
-    xpprintf("DEVELOPMENT\n");
+    warn("DEVELOPMENT");
 #endif
 
-    xpprintf("Conf_localguru()          = %s\n", Conf_localguru());
-    xpprintf("Conf_contactaddress()     = %s\n", Conf_contactaddress());
-    xpprintf("Conf_datadir()            = %s\n", Conf_datadir());
-    xpprintf("Conf_defaults_file_name() = %s\n", Conf_defaults_file_name());
-    xpprintf("Conf_password_file_name() = %s\n", Conf_password_file_name());
-    xpprintf("Conf_mapdir()             = %s\n", Conf_mapdir());
-    xpprintf("Conf_default_map()        = %s\n", Conf_default_map());
-    xpprintf("Conf_servermotdfile()     = %s\n", Conf_servermotdfile());
-    xpprintf("Conf_robotfile()          = %s\n", Conf_robotfile());
-    xpprintf("Conf_logfile()            = %s\n", Conf_logfile());
-    xpprintf("Conf_localmotdfile()      = %s\n", Conf_localmotdfile());
-    xpprintf("Conf_ship_file()          = %s\n", Conf_ship_file());
-    xpprintf("Conf_texturedir()         = %s\n", Conf_texturedir());
-    xpprintf("Conf_fontdir()            = %s\n", Conf_fontdir());
-    xpprintf("Conf_sounddir()           = %s\n", Conf_sounddir());
-    xpprintf("Conf_soundfile()          = %s\n", Conf_soundfile());
-    xpprintf("Conf_zcat_ext()           = %s\n", Conf_zcat_ext());
-    xpprintf("Conf_zcat_format()        = %s\n", Conf_zcat_format());
-    xpprintf("============================================================\n");
+    warn("Conf_localguru()          = %s", Conf_localguru());
+    warn("Conf_contactaddress()     = %s", Conf_contactaddress());
+    warn("Conf_datadir()            = %s", Conf_datadir());
+    warn("Conf_defaults_file_name() = %s", Conf_defaults_file_name());
+    warn("Conf_password_file_name() = %s", Conf_password_file_name());
+    warn("Conf_mapdir()             = %s", Conf_mapdir());
+    warn("Conf_default_map()        = %s", Conf_default_map());
+    warn("Conf_servermotdfile()     = %s", Conf_servermotdfile());
+    warn("Conf_robotfile()          = %s", Conf_robotfile());
+    warn("Conf_logfile()            = %s", Conf_logfile());
+    warn("Conf_localmotdfile()      = %s", Conf_localmotdfile());
+    warn("Conf_ship_file()          = %s", Conf_ship_file());
+    warn("Conf_texturedir()         = %s", Conf_texturedir());
+    warn("Conf_fontdir()            = %s", Conf_fontdir());
+    warn("Conf_sounddir()           = %s", Conf_sounddir());
+    warn("Conf_soundfile()          = %s", Conf_soundfile());
+    warn("Conf_zcat_ext()           = %s", Conf_zcat_ext());
+    warn("Conf_zcat_format()        = %s", Conf_zcat_format());
+    warn("============================================================");
 }
