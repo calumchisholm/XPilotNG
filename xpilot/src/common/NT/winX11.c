@@ -745,6 +745,7 @@ XSetForeground(Display* dpy, GC gc, unsigned long foreground)
 		WinXSelectBrush(gc);
 
 	} else {
+		// ouch, terrible hack, but fixing this properly would be difficult
 		HDC hDC;
 		extern HPEN pens[256][10][3];
 		extern HBRUSH brushes[256];

@@ -1250,7 +1250,7 @@ static int Net_read(frame_buf_t *frame)
 	    Sockbuf_clear(&frame->sbuf);
 	    return 0;
 	}
-	/*IFWINDOWS( Trace("Net_read: read %d bytes type=%d\n", frame->sbuf.len, frame->sbuf.ptr[0]); ) */
+	//IFWINDOWS( Trace("Net_read: read %d bytes type=%d\n", frame->sbuf.len, frame->sbuf.ptr[0]); )
 	if (frame->sbuf.ptr[0] != PKT_START) {
 	    /*
 	     * Don't know which type of packet this is
@@ -1261,7 +1261,7 @@ static int Net_read(frame_buf_t *frame)
 	}
 	/* Peek at the frame loop number. */
 	n = Packet_scanf(&frame->sbuf, "%c%ld", &ch, &loop);
-	/*IFWINDOWS( Trace("Net_read: frame # %d\n", loop); )*/
+	//IFWINDOWS( Trace("Net_read: frame # %d\n", loop); )
 	frame->sbuf.ptr = frame->sbuf.buf;
 	if (n <= 0) {
 	    if (n == -1) {
@@ -1282,7 +1282,7 @@ static int Net_read(frame_buf_t *frame)
 	     */
 	}
     }
-	/*IFWINDOWS( Trace("Net_read: wbuf->len=%d\n", wbuf.len); )*/
+	//IFWINDOWS( Trace("Net_read: wbuf->len=%d\n", wbuf.len); )
 }
 
 /*

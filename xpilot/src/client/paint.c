@@ -413,7 +413,7 @@ void Paint_score_background(int thisLine)
 
             IFWINDOWS( XFillRectangle(dpy, players, scoreListGC,
                                       0, 0,
-                                      players_width, bgh); )
+                                      players_width, players_height); )
 
                 Bitmap_paint(players, BM_SCORE_BG, 0, 0, 0);
             if (players_height > bgh + lh) {

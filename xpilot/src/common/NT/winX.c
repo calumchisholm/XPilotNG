@@ -680,7 +680,7 @@ void WinXSelectPen(int gc)
 
 	if (!hPen) {
 
-		int styleMap[] = { PS_SOLID, PS_DASH, PS_DASHDOT };
+		int styleMap[] = { PS_SOLID, PS_DOT, PS_DASHDOT };
 
 		hPen = CreatePen(
 			styleMap[xgcv->line_style], 
