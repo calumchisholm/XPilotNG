@@ -26,7 +26,7 @@
 #ifndef CLIENTCOMMAND_H
 #define CLIENTCOMMAND_H 1
 
-void executeCommand(char *talk_str);
+void executeCommand(const char *talk_str);
 void crippleTalk(char *msg);
 
 #endif

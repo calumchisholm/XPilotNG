@@ -1241,7 +1241,7 @@ other_t *Other_by_id(int id)
     return NULL;
 }
 
-other_t *Other_by_name(char *name, bool show_error_msg)
+other_t *Other_by_name(const char *name, bool show_error_msg)
 {
     int i;
     other_t *found_other = NULL, *other;

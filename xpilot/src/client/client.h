@@ -708,7 +708,7 @@ int Check_pos_by_index(int ind, int *xp, int *yp);
 int Check_index_by_pos(int x, int y);
 homebase_t *Homebase_by_id(int id);
 other_t *Other_by_id(int id);
-other_t *Other_by_name(char *name, bool show_error_msg);
+other_t *Other_by_name(const char *name, bool show_error_msg);
 shipshape_t *Ship_by_id(int id);
 int Handle_leave(int id);
 int Handle_player(int id, int team, int mychar,

@@ -483,12 +483,12 @@ bool Set_option(const char *name, const char *value, xp_option_origin_t origin)
 
     if (!is_legal_value(opt->type, value)) {
 	if (origin != xp_option_origin_setcmd)
-	    warn("Bad value \"%s\" for option \"%s\".", value, opt->name);
+	    warn("Bad value \"%s\" for option %s.", value, opt->name);
 	else {
 	    char msg[MSG_LEN];
 	
 	    snprintf(msg, sizeof(msg),
-		     "Bad value \"%s\" for option \"%s\". [*Client reply*]",
+		     "Bad value \"%s\" for option %s. [*Client reply*]",
 		     value, opt->name);
 	    Add_message(msg);
 	}
