@@ -2206,7 +2206,7 @@ static int Receive_power(connection_t *connp)
     }
     power = (double) tmp / 256.0F;
     pl = Player_by_id(connp->id);
-    autopilot = BIT(pl->used, HAS_AUTOPILOT);
+    autopilot = Player_uses_autopilot(pl) ? 1 : 0;
 
     switch (ch) {
     case PKT_POWER:
@@ -2983,7 +2983,7 @@ static int Receive_pointer_move(connection_t *connp)
 	movement = delta;
     }
 
-    if (BIT(pl->used, HAS_AUTOPILOT))
+    if (Player_uses_autopilot(pl))
 	Autopilot(pl, false);
     turnspeed = movement * pl->turnspeed / MAX_PLAYER_TURNSPEED;
     if (turnspeed < 0) {

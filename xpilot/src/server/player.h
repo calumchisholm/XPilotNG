@@ -88,7 +88,7 @@ extern bool		updateScores;
  * These are the bits of the player->have and player->used fields.
  */
 #define USES_EMERGENCY_THRUST	(1U<<30)
-#define HAS_AUTOPILOT		(1U<<29)
+#define USES_AUTOPILOT		(1U<<29)
 #define USES_TRACTOR_BEAM	(1U<<28)
 #define HAS_LASER		(1U<<27)
 #define USES_CLOAKING_DEVICE	(1U<<26)
@@ -512,6 +512,13 @@ static inline bool Players_are_allies(player_t *pl1, player_t *pl2)
 {
     if (pl1->alliance != ALLIANCE_NOT_SET
 	&& pl1->alliance == pl2->alliance)
+	return true;
+    return false;
+}
+
+static inline bool Player_uses_autopilot(player_t *pl)
+{
+    if (BIT(pl->used, USES_AUTOPILOT))
 	return true;
     return false;
 }

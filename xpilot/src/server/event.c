@@ -303,7 +303,7 @@ static void Player_repair(player_t *pl)
 static void Player_swap_settings(player_t *pl)
 {
     if (Player_is_hoverpaused(pl)
-	|| BIT(pl->used, HAS_AUTOPILOT))
+	|| Player_uses_autopilot(pl))
 	return;
 
     /* kps - turnacc == 0.0 ? */
@@ -386,7 +386,7 @@ void Pause_player(player_t *pl, bool on)
 	updateScores = true;
 
 	Detach_ball(pl, NULL);
-	if (BIT(pl->used, HAS_AUTOPILOT)
+	if (Player_uses_autopilot(pl)
 	    || Player_is_hoverpaused(pl)) {
 	    CLR_BIT(pl->pl_status, HOVERPAUSE);
 	    Autopilot(pl, false);
@@ -801,8 +801,8 @@ int Handle_keyboard(player_t *pl)
 	    }
 
 	    case KEY_TOGGLE_AUTOPILOT:
-		if (BIT(pl->have, HAS_AUTOPILOT))
-		    Autopilot(pl, !BIT(pl->used, HAS_AUTOPILOT));
+		if (pl->item[ITEM_AUTOPILOT] > 0)
+		    Autopilot(pl, !Player_uses_autopilot(pl));
 		break;
 
 	    case KEY_EMERGENCY_THRUST:
@@ -831,7 +831,7 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_TURN_LEFT:
 	    case KEY_TURN_RIGHT:
-		if (BIT(pl->used, HAS_AUTOPILOT))
+		if (Player_uses_autopilot(pl))
 		    Autopilot(pl, false);
 		pl->turnacc = 0;
 #if 0
@@ -886,7 +886,7 @@ int Handle_keyboard(player_t *pl)
 		    if (Player_is_hoverpaused(pl))
 			break;
 
-		    if (BIT(pl->used, HAS_AUTOPILOT))
+		    if (Player_uses_autopilot(pl))
 			Autopilot(pl, false);
 
 		    Pause_player(pl, !Player_is_paused(pl));
@@ -922,7 +922,7 @@ int Handle_keyboard(player_t *pl)
 			if (BIT(pl->used, HAS_EMERGENCY_SHIELD))
 			    Emergency_shield(pl, false);
 
-			if (!BIT(pl->used, HAS_AUTOPILOT))
+			if (!Player_uses_autopilot(pl))
 			    Autopilot(pl, true);
 
 			if (Player_is_phasing(pl))
@@ -982,7 +982,7 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_THRUST:
-		if (BIT(pl->used, HAS_AUTOPILOT))
+		if (Player_uses_autopilot(pl))
 		    Autopilot(pl, false);
 		Player_thrust(pl, true);
 		break;
@@ -1042,7 +1042,7 @@ int Handle_keyboard(player_t *pl)
 	    switch (key) {
 	    case KEY_TURN_LEFT:
 	    case KEY_TURN_RIGHT:
-		if (BIT(pl->used, HAS_AUTOPILOT))
+		if (Player_uses_autopilot(pl))
 		    Autopilot(pl, false);
 		pl->turnacc = 0;
 		if (BITV_ISSET(pl->last_keyv, KEY_TURN_LEFT))
@@ -1090,7 +1090,7 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_THRUST:
-		if (BIT(pl->used, HAS_AUTOPILOT))
+		if (Player_uses_autopilot(pl))
 		    Autopilot(pl, false);
 		Player_thrust(pl, false);
 		break;

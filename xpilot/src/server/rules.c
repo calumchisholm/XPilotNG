@@ -230,13 +230,10 @@ void Set_initial_resources(world_t *world)
 	LIMIT(world->items[i].initial, 0, world->items[i].limit);
 
     CLR_BIT(DEF_HAVE,
-	HAS_EMERGENCY_SHIELD |
-	HAS_AUTOPILOT);
+	    HAS_EMERGENCY_SHIELD);
 
     if (world->items[ITEM_EMERGENCY_SHIELD].initial > 0)
 	SET_BIT(DEF_HAVE, HAS_EMERGENCY_SHIELD);
-    if (world->items[ITEM_AUTOPILOT].initial > 0)
-	SET_BIT(DEF_HAVE, HAS_AUTOPILOT);
 }
 
 

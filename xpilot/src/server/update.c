@@ -100,31 +100,36 @@ static void Transport_to_home(player_t *pl)
 void Phasing(player_t *pl, bool on)
 {
     if (on) {
-	if (pl->phasing_left <= 0) {
-	    pl->phasing_left = PHASING_TIME;
-	    pl->item[ITEM_PHASING]--;
+	if (!Player_is_phasing(pl)
+	    && Player_has_phasing_device(pl)) {
+	    if (pl->phasing_left <= 0) {
+		pl->phasing_left = PHASING_TIME;
+		pl->item[ITEM_PHASING]--;
+	    }
+	    SET_BIT(pl->used, USES_PHASING_DEVICE);
+	    CLR_BIT(pl->used, HAS_REFUEL);
+	    CLR_BIT(pl->used, HAS_REPAIR);
+	    if (BIT(pl->used, HAS_CONNECTOR))
+		pl->ball = NULL;
+	    CLR_BIT(pl->used, USES_TRACTOR_BEAM);
+	    CLR_BIT(pl->obj_status, GRAVITY);
+	    sound_play_sensors(pl->pos, PHASING_ON_SOUND);
 	}
-	SET_BIT(pl->used, USES_PHASING_DEVICE);
-	CLR_BIT(pl->used, HAS_REFUEL);
-	CLR_BIT(pl->used, HAS_REPAIR);
-	if (BIT(pl->used, HAS_CONNECTOR))
-	    pl->ball = NULL;
-	CLR_BIT(pl->used, USES_TRACTOR_BEAM);
-	CLR_BIT(pl->obj_status, GRAVITY);
-	sound_play_sensors(pl->pos, PHASING_ON_SOUND);
     } else {
-	hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
-	int group;
+	if (Player_is_phasing(pl)) {
+	    hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps-? */
+	    int group;
 
-	CLR_BIT(pl->used, USES_PHASING_DEVICE);
-	SET_BIT(pl->obj_status, GRAVITY);
-	sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
-	/* kps - ok to have this check here ? */
-	if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-				     OBJ_PTR(pl), (shape_t *)pl->ship,
-				     pl->dir)) != NO_GROUP)
-	    /* kps - check for crashes against targets etc ??? */
-	    Player_crash(pl, CrashWall, NO_IND, 0);
+	    CLR_BIT(pl->used, USES_PHASING_DEVICE);
+	    SET_BIT(pl->obj_status, GRAVITY);
+	    sound_play_sensors(pl->pos, PHASING_OFF_SOUND);
+	    /* kps - ok to have this check here ? */
+	    if ((group = shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
+					 OBJ_PTR(pl), (shape_t *)pl->ship,
+					 pl->dir)) != NO_GROUP)
+		/* kps - check for crashes against targets etc ??? */
+		Player_crash(pl, CrashWall, NO_IND, 0);
+	}
     }
 }
 
@@ -230,22 +235,23 @@ void Emergency_shield (player_t *pl, bool on)
  */
 void Autopilot(player_t *pl, bool on)
 {
-    Player_thrust(pl, false);
     if (on) {
+	Player_thrust(pl, false);
 	pl->auto_power_s = pl->power;
 	pl->auto_turnspeed_s = pl->turnspeed;
 	pl->auto_turnresistance_s = pl->turnresistance;
-	SET_BIT(pl->used, HAS_AUTOPILOT);
+	SET_BIT(pl->used, USES_AUTOPILOT);
 	pl->power = (MIN_PLAYER_POWER+MAX_PLAYER_POWER)/2.0;
 	pl->turnspeed = (MIN_PLAYER_TURNSPEED+MAX_PLAYER_TURNSPEED)/2.0;
 	pl->turnresistance = 0.2;
 	sound_play_sensors(pl->pos, AUTOPILOT_ON_SOUND);
     } else {
+	Player_thrust(pl, false);
 	pl->power = pl->auto_power_s;
 	pl->turnacc = 0.0;
 	pl->turnspeed = pl->auto_turnspeed_s;
 	pl->turnresistance = pl->auto_turnresistance_s;
-	CLR_BIT(pl->used, HAS_AUTOPILOT);
+	CLR_BIT(pl->used, USES_AUTOPILOT);
 	sound_play_sensors(pl->pos, AUTOPILOT_OFF_SOUND);
     }
 }
@@ -572,7 +578,7 @@ static void Players_turn(void)
 	 * Only do autopilot code if switched on and player is not
 	 * damaged (ie. can see).
 	 */
-	if ((BIT(pl->used, HAS_AUTOPILOT)
+	if ((Player_uses_autopilot(pl)
 	     || Player_is_hoverpaused(pl))
 	    && !pl->damaged)
 	    do_Autopilot(pl);

@@ -48,11 +48,9 @@ static void Item_update_flags(player_t *pl)
 	    }
 	}
     }
-    if (pl->item[ITEM_AUTOPILOT] <= 0) {
-	if (BIT(pl->used, HAS_AUTOPILOT))
-	    Autopilot(pl, false);
-	CLR_BIT(pl->have, HAS_AUTOPILOT);
-    }
+    if (pl->item[ITEM_AUTOPILOT] <= 0
+	&& Player_uses_autopilot(pl))
+	Autopilot(pl, false);
 }
 
 /*
@@ -662,7 +660,7 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     case ITEM_CLOAK:
 	what = "a cloaking device";
 	victim->updateVisibility = true;
-	if (!victim->item[item])
+	if (victim->item[item] <= 0)
 	    Cloak(victim, false);
         break;
     case ITEM_WIDEANGLE:
@@ -692,7 +690,7 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	break;
     case ITEM_DEFLECTOR:
 	what = "a deflector";
-	if (!victim->item[item])
+	if (victim->item[item] <= 0)
 	    Deflector(victim, false);
         break;
     case ITEM_HYPERJUMP:
@@ -728,10 +726,9 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
         break;
     case ITEM_AUTOPILOT:
 	what = "an autopilot";
-	if (!victim->item[item]) {
-	    if (BIT(victim->used, HAS_AUTOPILOT))
+	if (victim->item[item] <= 0) {
+	    if (Player_uses_autopilot(victim))
 		Autopilot(victim, false);
-	    CLR_BIT(victim->have, HAS_AUTOPILOT);
 	}
         break;
     case ITEM_TANK:
@@ -804,7 +801,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
     case ITEM_TRACTOR_BEAM:
 	break;
     case ITEM_AUTOPILOT:
-	SET_BIT(pl->have, HAS_AUTOPILOT);
 	break;
     case ITEM_TANK:
 	/* for tanks, amount is the amount of fuel in the stolen tank */
