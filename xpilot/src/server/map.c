@@ -572,7 +572,7 @@ static bool Grok_map_size(void)
     }
     if (w > MAX_MAP_SIZE * BLOCK_SZ) {
 	warn("mapWidth too big, maximum is %d blocks (%d pixels).\n",
-	    MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
+	     MAX_MAP_SIZE, MAX_MAP_SIZE * BLOCK_SZ);
 	bad = true;
     }
     if (h < MIN_MAP_SIZE * BLOCK_SZ) {
