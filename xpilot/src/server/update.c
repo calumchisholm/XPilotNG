@@ -641,10 +641,6 @@ void Update_objects(void)
 	}
     }
 
-    /* kps - ng wants an if 0 here */
-    /* !@# turn back on after implemented */
-    /*#if 0*/
-
     /*
      * Updating cannons, maybe a little bit of fireworks too?
      */
@@ -761,8 +757,7 @@ void Update_objects(void)
 	World.targets[i].conn_mask = 0;
 	World.targets[i].last_change = frame_loops;
     }
-    /* kps - ng wants an endif here */
-    /*#endif*/ /* not-yet-supported cannons and targets */
+
 
     /* * * * * *
      *
