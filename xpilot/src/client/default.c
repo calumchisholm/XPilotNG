@@ -425,20 +425,6 @@ option options[] = {
 	"The limit when the HUD fuel bar will flash faster.\n"
     },
     {
-	"verticalHUDLine",
-	NULL,
-	"No",
-	KEY_DUMMY,
-	"Should the vertical lines in the HUD be drawn.\n"
-    },
-    {
-	"horizontalHUDLine",
-	NULL,
-	"Yes",
-	KEY_DUMMY,
-	"Should the horizontal lines in the HUD be drawn.\n"
-    },
-    {
 	"speedFactHUD",
 	NULL,
 	"0.0",
@@ -1051,6 +1037,22 @@ option options[] = {
 	"4",
 	KEY_DUMMY,
 	"Which color number to use for drawing the HUD.\n"
+    },
+    {
+	"hudHLineColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing the horizontal lines\n"
+	"in the HUD.\n"
+    },
+    {
+	"hudVLineColor",
+	NULL,
+	"0",
+	KEY_DUMMY,
+	"Which color number to use for drawing the vertical lines\n"
+	"in the HUD.\n"
     },
     {
 	"hudRadarEnemyColor",
@@ -3063,6 +3065,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     }
 
     Get_int_resource(rDB, "hudColor", &hudColor);
+    Get_int_resource(rDB, "hudHLineColor", &hudHLineColor);
+    Get_int_resource(rDB, "hudVLineColor", &hudVLineColor);
     Get_int_resource(rDB, "hudRadarEnemyColor", &hudRadarEnemyColor);
     Get_int_resource(rDB, "hudRadarOtherColor", &hudRadarOtherColor);
     Get_int_resource(rDB, "hudRadarDotSize", &hudRadarDotSize);
@@ -3119,8 +3123,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 		     SHOW_LIVES_BY_SHIP);
     Get_bit_resource(rDB, "treatZeroSpecial", &hackedInstruments,
 		     TREAT_ZERO_SPECIAL);
-    Get_bit_resource(rDB, "verticalHUDLine", &instruments, SHOW_HUD_VERTICAL);
-    Get_bit_resource(rDB, "horizontalHUDLine", &instruments, SHOW_HUD_HORIZONTAL);
     Get_bit_resource(rDB, "fuelMeter", &instruments, SHOW_FUEL_METER);
     Get_bit_resource(rDB, "fuelGauge", &instruments, SHOW_FUEL_GAUGE);
     Get_bit_resource(rDB, "turnSpeedMeter", &instruments, SHOW_TURNSPEED_METER);

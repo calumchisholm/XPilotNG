@@ -70,6 +70,8 @@ extern int		score_object;
 extern XGCValues	gcv;
 
 int	hudColor;		/* Color index for HUD drawing */
+int	hudHLineColor;		/* Color index for horiz. HUD line drawing */
+int	hudVLineColor;		/* Color index for vert. HUD line drawing */
 int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
 int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 int	hudRadarDotSize;	/* Size for hudradar dot drawing */
@@ -490,8 +492,6 @@ void Paint_HUD(void)
     /*
      * Display the HUD
      */
-    SET_FG(colors[hudColor].pixel);
-
     hud_pos_x = (int)(ext_view_width / 2 - hud_move_fact*vel.x);
     hud_pos_y = (int)(ext_view_height / 2 + hud_move_fact*vel.y);
 
@@ -499,7 +499,8 @@ void Paint_HUD(void)
     gcv.line_style = LineOnOffDash;
     XChangeGC(dpy, gc, GCLineStyle | GCDashOffset, &gcv);
 
-    if (BIT(instruments, SHOW_HUD_HORIZONTAL)) {
+    if (hudHLineColor) {
+	SET_FG(colors[hudHLineColor].pixel);
 	rd.drawLine(dpy, p_draw, gc,
 		    WINSCALE(hud_pos_x - hudSize),
 		    WINSCALE(hud_pos_y - hudSize + HUD_OFFSET),
@@ -521,7 +522,8 @@ void Paint_HUD(void)
 		      WINSCALE(hud_pos_x + hudSize),
 		      WINSCALE(hud_pos_y + hudSize - HUD_OFFSET));
     }
-    if (BIT(instruments, SHOW_HUD_VERTICAL)) {
+    if (hudVLineColor) {
+	SET_FG(colors[hudVLineColor].pixel);
 	rd.drawLine(dpy, p_draw, gc,
 		    WINSCALE(hud_pos_x -hudSize + HUD_OFFSET),
 		    WINSCALE(hud_pos_y -hudSize),
@@ -545,7 +547,7 @@ void Paint_HUD(void)
     }
     gcv.line_style = LineSolid;
     XChangeGC(dpy, gc, GCLineStyle, &gcv);
-
+    SET_FG(colors[hudColor].pixel);
 
     /* Special itemtypes */
     if (vertSpacing < 0)
@@ -674,7 +676,7 @@ void Paint_HUD(void)
 	if (sobj->hud_msg_len > 0) {
 	    if (j == 0 &&
 		sobj->hud_msg_width > WINSCALE(2*hudSize-HUD_OFFSET*2) &&
-	        (did_fuel || BIT(instruments, SHOW_HUD_VERTICAL)))
+	        (did_fuel || hudVLineColor))
 			++j;
 	    rd.drawString(dpy, p_draw, gc,
 			WINSCALE(hud_pos_x) - sobj->hud_msg_width/2,

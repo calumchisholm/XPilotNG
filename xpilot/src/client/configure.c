@@ -117,8 +117,6 @@ static int Config_create_showMyShipShape(int widget_desc, int *height);
 static int Config_create_ballMsgScan(int widget_desc, int *height);
 static int Config_create_showLivesByShip(int widget_desc, int *height);
 static int Config_create_treatZeroSpecial(int widget_desc, int *height);
-static int Config_create_horizontalHUDLine(int widget_desc, int *height);
-static int Config_create_verticalHUDLine(int widget_desc, int *height);
 static int Config_create_speedFactHUD(int widget_desc, int *height);
 static int Config_create_speedFactPTR(int widget_desc, int *height);
 static int Config_create_fuelNotify(int widget_desc, int *height);
@@ -146,6 +144,8 @@ static int Config_create_teamShotSize(int widget_desc, int *height);
 static int Config_create_teamShotColor(int widget_desc, int *height);
 static int Config_create_showNastyShots(int widget_desc, int *height);
 static int Config_create_hudColor(int widget_desc, int *height);
+static int Config_create_hudHLineColor(int widget_desc, int *height);
+static int Config_create_hudVLineColor(int widget_desc, int *height);
 static int Config_create_hudRadarEnemyColor(int widget_desc, int *height);
 static int Config_create_hudRadarOtherColor(int widget_desc, int *height);
 static int Config_create_hudRadarDotSize(int widget_desc, int *height);
@@ -289,8 +289,6 @@ static int	(*config_creator_default[])(int widget_desc, int *height) = {
     Config_create_ballMsgScan,
     Config_create_showLivesByShip,
     Config_create_treatZeroSpecial,
-    Config_create_horizontalHUDLine,
-    Config_create_verticalHUDLine,
     Config_create_speedFactHUD,
     Config_create_speedFactPTR,
     Config_create_fuelNotify,
@@ -354,6 +352,8 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_oldMessagesColor,
     Config_create_teamShotColor,
     Config_create_hudColor,
+    Config_create_hudHLineColor,
+    Config_create_hudVLineColor,
     Config_create_hudRadarEnemyColor,
     Config_create_hudRadarOtherColor,
     Config_create_hudLockColor,
@@ -887,24 +887,6 @@ static int Config_create_treatZeroSpecial(int widget_desc, int *height)
 			      (void *) TREAT_ZERO_SPECIAL);
 }
 
-static int Config_create_horizontalHUDLine(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "horizontalHUDLine",
-			      BIT(instruments, SHOW_HUD_HORIZONTAL)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_HUD_HORIZONTAL);
-}
-
-static int Config_create_verticalHUDLine(int widget_desc, int *height)
-{
-    return Config_create_bool(widget_desc, height, "verticalHUDLine",
-			      BIT(instruments, SHOW_HUD_VERTICAL)
-				  ? true : false,
-			      Config_update_instruments,
-			      (void *) SHOW_HUD_VERTICAL);
-}
-
 static int Config_create_speedFactHUD(int widget_desc, int *height)
 {
     return Config_create_float(widget_desc, height,
@@ -1114,6 +1096,16 @@ static int Config_create_showNastyShots(int widget_desc, int *height)
 static int Config_create_hudColor(int widget_desc, int *height)
 {
     return CONFIG_CREATE_COLOR(hudColor);
+}
+
+static int Config_create_hudHLineColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(hudHLineColor);
+}
+
+static int Config_create_hudVLineColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(hudVLineColor);
 }
 
 static int Config_create_hudRadarEnemyColor(int widget_desc, int *height)
@@ -1960,8 +1952,6 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_bool(fp, "showShipShapes", BIT(hackedInstruments, SHOW_SHIP_SHAPES));
     Config_save_bool(fp, "showMyShipShape", BIT(hackedInstruments, SHOW_MY_SHIP_SHAPE));
     Config_save_bool(fp, "ballMsgScan", BIT(hackedInstruments, BALL_MSG_SCAN));
-    Config_save_bool(fp, "verticalHUDLine", BIT(instruments, SHOW_HUD_VERTICAL));
-    Config_save_bool(fp, "horizontalHUDLine", BIT(instruments, SHOW_HUD_HORIZONTAL));
     Config_save_bool(fp, "fuelMeter", BIT(instruments, SHOW_FUEL_METER));
     Config_save_bool(fp, "fuelGauge", BIT(instruments, SHOW_FUEL_GAUGE));
     Config_save_bool(fp, "turnSpeedMeter", BIT(instruments, SHOW_TURNSPEED_METER));
@@ -2028,6 +2018,8 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "oldMessagesColor", oldMessagesColor);
     Config_save_int(fp, "teamShotColor", teamShotColor);
     Config_save_int(fp, "hudColor", hudColor);
+    Config_save_int(fp, "hudHLineColor", hudHLineColor);
+    Config_save_int(fp, "hudVLineColor", hudVLineColor);
     Config_save_int(fp, "hudRadarEnemyColor", hudRadarEnemyColor);
     Config_save_int(fp, "hudRadarOtherColor", hudRadarOtherColor);
     Config_save_int(fp, "hudLockColor", hudLockColor);

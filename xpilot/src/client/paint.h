@@ -159,6 +159,8 @@ extern XColor	colors[MAX_COLORS];	/* Colors */
 extern Colormap	colormap;		/* Private colormap */
 extern int	maxColors;		/* Max. number of colors to use */
 extern int	hudColor;		/* Color index for HUD drawing */
+extern int	hudHLineColor;		/* Color index for horiz. HUD line */
+extern int	hudVLineColor;		/* Color index for vert. HUD line */
 extern int	hudRadarEnemyColor;	/* Color index for enemy hudradar dots */
 extern int	hudRadarOtherColor;	/* Color index for other hudradar dots */
 extern int	hudRadarDotSize;	/* Size for hudradar dot drawing */
