@@ -362,7 +362,7 @@ bool Set_option(const char *name, const char *value)
 /* kps - these commands need some fine tuning. */
 /* TODO - unset a value, i.e. set it to empty */
 /*
- * \set client command
+ * Handler for \set client command.
  */
 void Set_command(const char *args)
 {
@@ -403,32 +403,22 @@ const char *Option_value_to_string(xp_option_t *opt)
 
     switch (opt->type) {
     case xp_noarg_option:
-    {
 	sprintf(buf, "%s", *opt->noarg_ptr == true ? "true" : "false");
 	break;
-    }
     case xp_bool_option:
-    {
 	sprintf(buf, "%s", *opt->bool_ptr == true ? "true" : "false");
 	break;
-    }
     case xp_int_option:
-    {
 	sprintf(buf, "%d", *opt->int_ptr);
 	break;
-    }
     case xp_double_option:
-    {
 	sprintf(buf, "%.3lf", *opt->dbl_ptr);
 	break;
-    }
     case xp_string_option:
-    {
 	if (opt->str_ptr)
 	    return opt->str_ptr;
 	else
 	    return opt->str_getfunc(opt);
-    }
     case xp_key_option:
 	/* kps TODO */
 	return "currently unknown";
@@ -440,7 +430,7 @@ const char *Option_value_to_string(xp_option_t *opt)
 
 
 /*
- * \set glient command
+ * Handler for \get client command.
  */
 void Get_command(const char *args)
 {
