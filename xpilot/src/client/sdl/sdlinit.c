@@ -6,7 +6,7 @@
 int draw_width;
 int draw_height;
 int draw_depth;
-int num_spark_colors;
+int num_spark_colors = 8;
 
 int Init_playing_windows(void)
 {
