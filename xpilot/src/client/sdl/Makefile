@@ -7,4 +7,4 @@ sdlclient: $(OBJS)
 %.o: %.c
 	gcc $(CFLAGS) -c -o $@ $<
 clean:
-	rm *.o sdlclient
+	rm -f *.o sdlclient
