@@ -178,7 +178,13 @@ bool Key_press_show_messages(void)
 bool Key_press_pointer_control(void)
 {
     pointerControl = !pointerControl;
-    SDL_WM_GrabInput(pointerControl ? SDL_GRAB_ON : SDL_GRAB_OFF);
+    if (pointerControl) {
+	SDL_WM_GrabInput(SDL_GRAB_ON);
+	SDL_ShowCursor(SDL_DISABLE);
+    } else {
+	SDL_WM_GrabInput(SDL_GRAB_OFF);
+	SDL_ShowCursor(SDL_ENABLE);
+    }
     return false;	/* server doesn't need to know */
 }
 
