@@ -34,15 +34,15 @@ char ship_version[] = VERSION;
 
 void Thrust(player_t *pl)
 {
-    const int		min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
-    const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
-    const double	max_speed = 1 + (pl->power * 0.14);
-    const double	max_life = 3 + pl->power * 0.35;
-    clpos_t		engine = Ship_get_engine_clpos(pl->ship, pl->dir);
-    clpos_t		pos;
-    int			afterburners;
-    double		tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
-    double		alt_sparks;
+    const int min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
+    const int max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
+    const double max_speed = 1 + (pl->power * 0.14);
+    const double max_life = 3 + pl->power * 0.35;
+    clpos_t engine = Ship_get_engine_clpos(pl->ship, pl->dir);
+    clpos_t pos;
+    int afterburners;
+    double tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
+    double alt_sparks;
 
     pos.cx = pl->pos.cx + engine.cx;
     pos.cy = pl->pos.cy + engine.cy;
@@ -56,7 +56,8 @@ void Thrust(player_t *pl)
 
     /* floor(tot_sparks + rfrac()) randomly rounds up or down to an integer,
      * so that the expectation value of the result is tot_sparks */
-    Make_debris(pos,
+    Make_debris(pl->world,
+		pos,
 		pl->vel,
 		pl->id,
 		pl->team,
@@ -70,7 +71,8 @@ void Thrust(player_t *pl)
 		1.0, max_speed,
 		3.0, max_life);
 
-    Make_debris(pos,
+    Make_debris(pl->world,
+		pos,
 		pl->vel,
 		pl->id,
 		pl->team,
@@ -311,6 +313,7 @@ void Update_tanks(pl_fuel_t *ft)
  */
 void Tank_handle_detach(player_t *pl)
 {
+    world_t *world = pl->world;
     player_t *tank;
     int i, ct;
 
@@ -338,9 +341,10 @@ void Tank_handle_detach(player_t *pl)
      * Player structures contain pointers to dynamic memory...
      */
 
-    Init_player(NumPlayers, (options.allowShipShapes)
-			    ? Parse_shape_str(options.tankShipShape)
-			    : NULL);
+    Init_player(world, NumPlayers,
+		options.allowShipShapes
+		? Parse_shape_str(options.tankShipShape) : NULL);
+
     /* Released tanks don't have tanks... */
     while (tank->fuel.num_tanks > 0)
 	Player_remove_tank(tank, tank->fuel.num_tanks);
@@ -448,25 +452,24 @@ void Tank_handle_detach(player_t *pl)
 }
 
 
-void Make_wreckage(clpos_t  pos,
+void Make_wreckage(world_t *world,
+		   clpos_t  pos,
 		   vector_t vel,
-		   int    owner_id,
-		   int    owner_team,
-		   double min_mass,     double max_mass,
-		   double total_mass,
-		   long   status,
-		   int    color,
-		   int    max_wreckage,
-		   int    min_dir,      int    max_dir,
-		   double min_speed,    double max_speed,
-		   double min_life,     double max_life)
+		   int      owner_id,
+		   int      owner_team,
+		   double   min_mass,     double max_mass,
+		   double   total_mass,
+		   long     status,
+		   int      color,
+		   int      max_wreckage,
+		   int      min_dir,      int    max_dir,
+		   double   min_speed,    double max_speed,
+		   double   min_life,     double max_life)
 {
-    wireobject_t	*wreckage;
-    int			i, size;
-    double		life;
-    modifiers_t		mods;
-    double		mass, sum_mass = 0.0;
-    world_t *world = &World;
+    wireobject_t *wreckage;
+    int i, size;
+    double life, mass, sum_mass = 0.0;
+    modifiers_t mods;
 
     if (!options.useWreckage)
 	return;
@@ -567,7 +570,8 @@ void Explode_fighter(player_t *pl)
     /* reduce debris since we also create wreckage objects */
     min_debris >>= 1; /* Removed *2.0 from range */
 
-    Make_debris(pl->pos,
+    Make_debris(pl->world,
+		pl->pos,
 		pl->vel,
 		pl->id,
 		pl->team,
@@ -584,7 +588,8 @@ void Explode_fighter(player_t *pl)
     if (!BIT(pl->status, KILLED))
 	return;
 
-    Make_wreckage(pl->pos,
+    Make_wreckage(pl->world,
+		  pl->pos,
 		  pl->vel,
 		  pl->id,
 		  pl->team,

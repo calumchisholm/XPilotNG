@@ -617,8 +617,11 @@ struct player {
     int	 	flooding;
 
     int		privs;			/* Player privileges */
+
 #define PRIV_NOAUTOKICK		1
 #define PRIV_AUTOKICKLAST	2
+
+    world_t	*world;			/* World player is in */
 
 #ifdef __cplusplus
 		player() {}

@@ -668,7 +668,8 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
     case CW_GASJET:
 	/* use emergency thrusts to make extra big jets */
 	if ((rfrac() * (c->item[ITEM_EMERGENCY_THRUST] + 1)) >= 1) {
-	    Make_debris(c->pos,
+	    Make_debris(world,
+			c->pos,
 			zero_vel,
 			NO_ID,
 			c->team,
@@ -684,7 +685,8 @@ static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 			3.0, 20.0);
 	    c->item[ITEM_EMERGENCY_THRUST]--;
 	} else {
-	    Make_debris(c->pos,
+	    Make_debris(world,
+			c->pos,
 			zero_vel,
 			NO_ID,
 			c->team,
@@ -746,7 +748,8 @@ void Cannon_dies(cannon_t *c, player_t *pl)
     Cannon_throw_items(c);
     Cannon_init(c);
     sound_play_sensors(c->pos, CANNON_EXPLOSION_SOUND);
-    Make_debris(c->pos,
+    Make_debris(world,
+		c->pos,
 		zero_vel,
 		NO_ID,
 		c->team,
@@ -759,7 +762,8 @@ void Cannon_dies(cannon_t *c, player_t *pl)
 		(int)(c->dir - (RES * 0.2)), (int)(c->dir + (RES * 0.2)),
 		20.0, 50.0,
 		8.0, 68.0);
-    Make_wreckage(c->pos,
+    Make_wreckage(world,
+		  c->pos,
 		  zero_vel,
 		  NO_ID,
 		  c->team,

@@ -260,7 +260,8 @@ static void Object_hits_target(object_t *obj, target_t *targ, double player_cost
 
     World_remove_target(world, targ);
 
-    Make_debris(targ->pos,
+    Make_debris(world,
+		targ->pos,
 		zero_vel,
 		NO_ID,
 		targ->team,
@@ -901,7 +902,8 @@ static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 	if (cost) {
 #if 0
 	    int intensity = (int)(cost * wallBounceExplosionMult);
-	    Make_debris(pl->pos,
+	    Make_debris(world,
+			pl->pos,
 			pl->vel,
 			pl->id,
 			pl->team,
@@ -2568,10 +2570,9 @@ void Walls_init(world_t *world)
     }
 }
 
-void Treasure_init(void)
+void Treasure_init(world_t *world)
 {
     int i;
-    world_t *world = &World;
 
     for (i = 0; i < world->NumTreasures; i++)
 	Make_treasure_ball(Treasures(world, i));

@@ -80,7 +80,7 @@ void Pick_startpos(player_t *pl)
     int ind = GetInd(pl->id), i, num_free, pick = 0, seen = 0;
     static int prev_num_bases = 0;
     static char	*free_bases = NULL;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
 	pl->home_base = Bases(world, 0);
@@ -170,7 +170,7 @@ void Go_home(player_t *pl)
     int ind = GetInd(pl->id), i, dir, check;
     double vx, vy, velo;
     clpos_t pos, initpos;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
 	/*NOTREACHED*/
@@ -243,7 +243,7 @@ void Compute_sensor_range(player_t *pl)
 {
     static int init = 0;
     static double EnergyRangeFactor;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (!init) {
 	if (options.minVisibilityDistance <= 0.0)
@@ -372,7 +372,7 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
 {
     double fuel = total_fuel;
     int i;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     pl->fuel.num_tanks  = 0;
     pl->fuel.current    = 0;
@@ -390,15 +390,15 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
     }
 }
 
-int Init_player(int ind, shipshape_t *ship)
+int Init_player(world_t *world, int ind, shipshape_t *ship)
 {
     player_t *pl = Players(ind);
-    world_t *world = &World;
     visibility_t *v = pl->visibility;
     int i;
 
     memset(pl, 0, sizeof(player_t));
     pl->visibility = v;
+    pl->world = world;
 
     /*
      * Make sure floats, doubles and pointers are correctly zeroed.
@@ -548,11 +548,10 @@ void Free_players(void)
 
 
 
-void Update_score_table(void)
+void Update_score_table(world_t *world)
 {
     int i, j, check;
     player_t *pl;
-    world_t *world = &World;
 
     for (j = 0; j < NumPlayers; j++) {
 	pl = Players(j);
@@ -616,12 +615,11 @@ void Update_score_table(void)
 }
 
 
-void Reset_all_players(void)
+void Reset_all_players(world_t *world)
 {
     player_t *pl;
     int i, j;
     char msg[MSG_LEN];
-    world_t *world = &World;
 
     updateScores = true;
 
@@ -687,7 +685,7 @@ void Reset_all_players(void)
 		 */
 		ball->owner = 0;
 		CLR_BIT(ball->status, RECREATE);
-		Delete_shot(j);
+		Delete_shot(world, j);
 	    }
 	}
 
@@ -750,16 +748,15 @@ void Reset_all_players(void)
     } else
 	roundtime = options.maxRoundTime * FPS;
 
-    Update_score_table();
+    Update_score_table(world);
 }
 
 
-void Check_team_members(int team)
+void Check_team_members(world_t *world, int team)
 {
     player_t *pl;
     team_t *teamp;
     int members, i;
-    world_t *world = &World;
 
     if (!BIT(world->rules->mode, TEAM_PLAY))
 	return;
@@ -910,7 +907,7 @@ static void Count_rounds(void)
 }
 
 
-void Team_game_over(int winning_team, const char *reason)
+void Team_game_over(world_t *world, int winning_team, const char *reason)
 {
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
@@ -969,7 +966,7 @@ void Team_game_over(int winning_team, const char *reason)
 
     teamcup_round_end(winning_team);
 
-    Reset_all_players();
+    Reset_all_players(world);
 
     Count_rounds();
 
@@ -981,7 +978,7 @@ void Team_game_over(int winning_team, const char *reason)
     Rank_show_ranks();
 }
 
-void Individual_game_over(int winner)
+void Individual_game_over(world_t *world, int winner)
 {
     int i, j, num_best_players, *best_players;
     double average_score, best_ratio;
@@ -1042,21 +1039,20 @@ void Individual_game_over(int winner)
 	}
     }
 
-    Reset_all_players();
+    Reset_all_players(world);
 
     Count_rounds();
 
     free(best_players);
 }
 
-void Race_game_over(void)
+void Race_game_over(world_t *world)
 {
     player_t *pl;
     int i, j, k,
 	bestlap = 0, num_best_players = 0,
 	num_active_players = 0, num_ordered_players = 0, *order;
     char msg[MSG_LEN];
-    world_t *world = &World;
 
     /*
      * Reassign players's starting positions based upon
@@ -1167,16 +1163,15 @@ void Race_game_over(void)
     /* kps - ng swapped these two for some reason*/
     Count_rounds();
 
-    Reset_all_players();
+    Reset_all_players(world);
 }
 
 
-void Compute_game_status(void)
+void Compute_game_status(world_t *world)
 {
     int i;
     player_t *pl;
     char msg[MSG_LEN];
-    world_t *world = &World;
 
     if (round_delay_send > 0)
 	round_delay_send--;
@@ -1421,7 +1416,7 @@ void Compute_game_status(void)
 	 */
 	if (options.maxRoundTime > 0 && roundtime == 0) {
 	    Set_message("Timer expired. Race ends now.");
-	    Race_game_over();
+	    Race_game_over(world);
 	    return;
 	}
 
@@ -1441,7 +1436,7 @@ void Compute_game_status(void)
 	else if (num_finished_players == 0 || num_alive_players > 1)
 	    return;
 
-	Race_game_over();
+	Race_game_over(world);
 
     } else if (BIT(world->rules->mode, TEAM_PLAY)) {
 
@@ -1559,7 +1554,7 @@ void Compute_game_status(void)
 	    }
 	    if (winners == 1) {
 		sprintf(msg, " by destroying %d treasures", max_destroyed);
-		Team_game_over(winning_team, msg);
+		Team_game_over(world, winning_team, msg);
 		return;
 	    }
 
@@ -1587,7 +1582,7 @@ void Compute_game_status(void)
 			" by destroying %d treasures"
 			" and successfully defending %d",
 			max_destroyed, max_left);
-		Team_game_over(winning_team, msg);
+		Team_game_over(world, winning_team, msg);
 		return;
 	    }
 
@@ -1604,7 +1599,7 @@ void Compute_game_status(void)
 		sprintf(msg, " by destroying %d treasures, saving %d, and "
 			"scoring %.2f points",
 			max_destroyed, max_left, max_score);
-		Team_game_over(winning_team, msg);
+		Team_game_over(world, winning_team, msg);
 		return;
 	    }
 
@@ -1619,14 +1614,14 @@ void Compute_game_status(void)
 	    }
 	    bp -= 2;
 	    *bp = '\0';
-	    Team_game_over(-1, msg);
+	    Team_game_over(world, -1, msg);
 
 	}
 	else if (num_dead_teams > 0) {
 	    if (num_alive_teams == 1)
-		Team_game_over(winning_team, " by staying alive");
+		Team_game_over(world, winning_team, " by staying alive");
 	    else
-		Team_game_over(-1, " as everyone died");
+		Team_game_over(world, -1, " as everyone died");
 	}
 	else {
 	    /*
@@ -1644,7 +1639,7 @@ void Compute_game_status(void)
 					- world->teams[j].NumEmptyTreasures
 					- world->teams[j].TreasuresLeft);
 	    if (treasures_destroyed)
-		Team_game_over(winning_team, " by staying in the game");
+		Team_game_over(world, winning_team, " by staying in the game");
 	}
 
     } else {
@@ -1673,16 +1668,16 @@ void Compute_game_status(void)
 	}
 
 	if (num_alive_players == 1 && num_active_players > 1)
-	    Individual_game_over(winner);
+	    Individual_game_over(world, winner);
 	else if (num_alive_players == 0 && num_active_players >= 1)
-	    Individual_game_over(-1);
+	    Individual_game_over(world, -1);
 	else if (num_alive_robots > 1
 		    && num_alive_players == num_alive_robots
 		    && num_active_humans > 0)
-	    Individual_game_over(-2);
+	    Individual_game_over(world, -2);
 	else if (options.maxRoundTime > 0 && roundtime == 0) {
 	    Set_message("Timer expired. Round ends now.");
-	    Individual_game_over(-1);
+	    Individual_game_over(world, -1);
 	}
     }
 }
@@ -1691,7 +1686,7 @@ void Delete_player(player_t *pl)
 {
     int ind = GetInd(pl->id), i, j, id = pl->id;
     object_t *obj;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     /* call before important player structures are destroyed */
     Leave_alliance(pl);
@@ -1724,7 +1719,7 @@ void Delete_player(player_t *pl)
 	obj = Obj[i];
 	if (obj->id == id) {
 	    if (obj->type == OBJ_BALL) {
-		Delete_shot(i);
+		Delete_shot(world, i);
 		BALL_PTR(obj)->owner = NO_ID;
 	    }
 	    else if (BIT(obj->type, OBJ_DEBRIS | OBJ_SPARK))
@@ -1812,7 +1807,7 @@ void Delete_player(player_t *pl)
     GetIndArray[Players(ind)->id] = ind;
     GetIndArray[Players(NumPlayers)->id] = NumPlayers;
 
-    Check_team_members(pl->team);
+    Check_team_members(world, pl->team);
 
     for (i = NumPlayers - 1; i >= 0; i--) {
 	player_t *pl_i = Players(i);
@@ -1931,7 +1926,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 {
     double minfuel;
     int i;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (Player_is_tank(pl)) {
 	Delete_player(pl);

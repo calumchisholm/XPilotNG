@@ -61,7 +61,7 @@ char robotdef_version[] = VERSION;
 /*
  * Prototypes for methods of the default robot type.
  */
-static void Robot_default_round_tick(void);
+static void Robot_default_round_tick(world_t *world);
 static void Robot_default_create(player_t *pl, char *str);
 static void Robot_default_go_home(player_t *pl);
 static void Robot_default_play(player_t *pl);
@@ -156,7 +156,8 @@ static void Robot_default_create(player_t *pl, char *str)
 	&& *str != '\0'
 	&& sscanf(str, " %d %d", &my_data->attack, &my_data->defense) != 2) {
 	if (str && *str) {
-	    xpprintf("%s invalid parameters for default robot: \"%s\"\n", showtime(), str);
+	    xpprintf("%s invalid parameters for default robot: \"%s\"\n",
+		     showtime(), str);
 	    my_data->attack = (int)(rfrac() * 99.5f);
 	    my_data->defense = 100 - my_data->attack;
 	}
@@ -423,7 +424,7 @@ static bool Really_empty_space(player_t *pl, int x, int y)
 
 static inline int decide_travel_dir(player_t *pl)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (pl->velocity <= 0.2) {
 	vector_t grav = World_gravity(world, pl->pos);
@@ -436,24 +437,18 @@ static inline int decide_travel_dir(player_t *pl)
 
 static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 {
-    int				i;
     object_t			*shot;
     player_t			*ship;
-    long			stop_dist;
-    bool			evade;
-    bool			left_ok, right_ok;
-    int				safe_width;
-    int				travel_dir;
-    int				delta_dir;
-    int				aux_dir;
+    long			stop_dist, dist;
+    bool			evade, left_ok, right_ok;
+    int				i, safe_width, travel_dir, delta_dir, aux_dir;
     int				px[3], py[3];
-    long			dist;
     vector_t			grav;
     int				gravity_dir;
     long			dx, dy;
     double			velocity;
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
-    world_t *world = &World;
+    world_t			*world = pl->world;
 
     safe_width = (my_data->defense / 200) * SHIP_SZ;
     /* Prevent overflow. */
@@ -683,7 +678,7 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 
 static void Robot_check_new_modifiers(player_t *pl, modifiers_t mods)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (!BIT(world->rules->mode, ALLOW_NUKES))
 	mods.nuclear = 0;
@@ -790,15 +785,12 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 {
     player_t			*ship;
     long			item_dist;
-    int				item_dir;
-    int				travel_dir;
-    int				delta_dir;
+    int				item_dir, travel_dir, delta_dir;
     long			dx, dy;
     long			dist;
-    bool			clear_path;
-    bool			slowing;
+    bool			clear_path, slowing;
     robot_default_data_t	*my_data = Robot_default_get_data(pl);
-    world_t *world = &World;
+    world_t			*world = pl->world;
 
     dx = CLICK_TO_PIXEL(item_pos.cx - pl->pos.cx), dx = WRAP_DX(dx);
     dy = CLICK_TO_PIXEL(item_pos.cy - pl->pos.cy), dy = WRAP_DY(dy);
@@ -1229,7 +1221,7 @@ static bool Detect_hunt(player_t *pl, player_t *ship)
  */
 static int Rank_item_value(player_t *pl, long itemtype)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (itemtype == ITEM_AUTOPILOT)
 	return ROBOT_IGNORE_ITEM;		/* never useful for robots */
@@ -1323,17 +1315,12 @@ static int Rank_item_value(player_t *pl, long itemtype)
 
 static bool Ball_handler(player_t *pl)
 {
-    int		i,
-		closest_tr = -1,
-		closest_ntr = -1,
-		dist,
-		closest_tr_dist = INT_MAX,
-		closest_ntr_dist = INT_MAX,
-		bdir,
-		tdir;
-    bool	clear_path = true;
-    robot_default_data_t	*my_data = Robot_default_get_data(pl);
-    world_t *world = &World;
+    int i, closest_tr = -1, closest_ntr = -1, dist;
+    int	closest_tr_dist = INT_MAX, closest_ntr_dist = INT_MAX;
+    int bdir, tdir;
+    bool clear_path = true;
+    robot_default_data_t *my_data = Robot_default_get_data(pl);
+    world_t *world = pl->world;
 
     for (i = 0; i < world->NumTreasures; i++) {
 	treasure_t *treasure = Treasures(world, i);
@@ -1465,13 +1452,11 @@ static bool Ball_handler(player_t *pl)
 
 static int Robot_default_play_check_map(player_t *pl)
 {
-    int				j;
-    int				cannon_i, fuel_i, target_i;
-    int				dx, dy;
-    int				distance, cannon_dist, fuel_dist, target_dist;
-    bool			fuel_checked;
-    robot_default_data_t	*my_data = Robot_default_get_data(pl);
-    world_t *world = &World;
+    int j, cannon_i, fuel_i, target_i;
+    int dx, dy, distance, cannon_dist, fuel_dist, target_dist;
+    bool fuel_checked;
+    robot_default_data_t *my_data = Robot_default_get_data(pl);
+    world_t *world = pl->world;
 
     fuel_checked = false;
 
@@ -1596,14 +1581,12 @@ static void Robot_default_play_check_objects(player_t *pl,
 					     int *item_imp,
 					     int *mine_i, int *mine_dist)
 {
-    int				j;
-    object_t			*shot, **obj_list;
-    int				distance, obj_count;
-    int				dx, dy;
-    int				shield_range;
-    long			killing_shots;
-    robot_default_data_t	*my_data = Robot_default_get_data(pl);
-    world_t *world = &World;
+    int j;
+    object_t *shot, **obj_list;
+    int distance, obj_count, dx, dy, shield_range;
+    long killing_shots;
+    robot_default_data_t *my_data = Robot_default_get_data(pl);
+    world_t *world = pl->world;
 
     /*-BA Neural overload - if NumObjs too high, only consider
      *-BA max_objs many objects - improves performance under nukes
@@ -1824,19 +1807,13 @@ static void Robot_default_play_check_objects(player_t *pl,
 
 static void Robot_default_play(player_t *pl)
 {
-    player_t			*ship;
-    double			distance, ship_dist,
-				enemy_dist,
-				speed, x_speed, y_speed;
-    int				item_dist, mine_dist;
-    int				item_i, mine_i;
-    int				j, ship_i, item_imp, enemy_i;
-    bool			harvest_checked;
-    bool			evade_checked;
-    bool			navigate_checked;
-    int				shoot_time;
-    robot_default_data_t	*my_data = Robot_default_get_data(pl);
-    world_t *world = &World;
+    player_t *ship;
+    double distance, ship_dist, enemy_dist, speed, x_speed, y_speed;
+    int item_dist, mine_dist, item_i, mine_i;
+    int j, ship_i, item_imp, enemy_i, shoot_time;
+    bool harvest_checked, evade_checked, navigate_checked;
+    robot_default_data_t *my_data = Robot_default_get_data(pl);
+    world_t *world = pl->world;
 
     if (my_data->robot_count <= 0)
 	my_data->robot_count = 1000 + (int)(rfrac() * 32);
@@ -2255,11 +2232,10 @@ static void Robot_default_play(player_t *pl)
  * This is called each round.
  * It allows us to adjust our file local parameters.
  */
-static void Robot_default_round_tick(void)
+static void Robot_default_round_tick(world_t *world)
 {
-    double		min_visibility = 256.0;
-    double		min_enemy_distance = 512.0;
-    world_t *world = &World;
+    double min_visibility = 256.0;
+    double min_enemy_distance = 512.0;
 
     /* reduce visibility when there are a lot of robots. */
     Visibility_distance = min_visibility

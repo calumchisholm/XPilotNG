@@ -1028,7 +1028,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	else if (world->teams[connp->team].NumBases <= 0)
 	    connp->team = TEAM_NOT_SET;
 	else {
-	    Check_team_members(connp->team);
+	    Check_team_members(world, connp->team);
 	    if (world->teams[connp->team].NumMembers
 		- world->teams[connp->team].NumRobots
 		>= world->teams[connp->team].NumBases)
@@ -1081,13 +1081,13 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     }
 #endif
     if (connp->rectype < 2) {
-	if (!Init_player(NumPlayers, connp->ship)) {
+	if (!Init_player(world, NumPlayers, connp->ship)) {
 	    strlcpy(errmsg, "Init_player failed: no free ID", errsize);
 	    return -1;
 	}
 	pl = Players(NumPlayers);
     } else {
-	if (!Init_player(spectatorStart + NumSpectators, connp->ship))
+	if (!Init_player(world, spectatorStart + NumSpectators, connp->ship))
 	    return -1;
 	pl = Players(spectatorStart + NumSpectators);
     }
@@ -1337,11 +1337,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	&& (NumPlayers - NumPseudoPlayers - NumRobots) <= options.resetOnHuman
 	&& !round_delay) {
 	if (BIT(world->rules->mode, TIMING))
-	    Race_game_over();
+	    Race_game_over(world);
 	else if (BIT(world->rules->mode, TEAM_PLAY))
-	    Team_game_over(-1, "");
+	    Team_game_over(world, -1, "");
 	else if (BIT(world->rules->mode, LIMITED_LIVES))
-	    Individual_game_over(-1);
+	    Individual_game_over(world, -1);
     }
 
     /* if the next round is delayed, delay it again */

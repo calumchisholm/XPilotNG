@@ -34,6 +34,10 @@
 # include "list.h"
 #endif
 
+#ifndef MAP_H
+# include "map.h"
+#endif
+
 #ifndef DEFAULTS_H
 # include "defaults.h"
 #endif
@@ -450,7 +454,7 @@ void release_ID(int id);
  */
 void Groups_init(void);
 void Walls_init(world_t *world);
-void Treasure_init(void);
+void Treasure_init(world_t *world);
 void Move_init(world_t *world);
 void Move_object(object_t *obj);
 void Move_player(player_t *pl);
@@ -470,7 +474,7 @@ int Handle_keyboard(player_t *pl);
 void Pause_player(player_t *pl, bool on);
 int Player_lock_closest(player_t *pl, bool next);
 bool team_dead(int team);
-void filter_mods(modifiers_t *mods);
+void filter_mods(world_t *world, modifiers_t *mods);
 
 /*
  * Prototypes for map.c
@@ -597,7 +601,7 @@ void Hitmasks_init(world_t *world);
 void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl);
 /*double Handle_tag(double score, player_t *victim_pl, player_t* killer_pl);*/
 void Check_tag(void);
-void Delete_shot(int ind);
+void Delete_shot(world_t *world, int ind);
 void Fire_laser(player_t *pl);
 void Fire_general_laser(player_t *pl, int team, clpos_t pos,
 			int dir, modifiers_t mods);
@@ -610,31 +614,33 @@ void do_lose_item(player_t *pl);
 void Update_torpedo(torpobject_t *torp);
 void Update_missile(missileobject_t *shot);
 void Update_mine(mineobject_t *mine);
-void Make_debris(clpos_t  pos,
+void Make_debris(world_t  *world,
+		 clpos_t  pos,
 		 vector_t vel,
-		 int    owner_id,
-		 int    owner_team,
-		 int    type,
-		 double mass,
-		 long   status,
-		 int    color,
-		 int    radius,
-		 int    num_debris,
-		 int    min_dir,    int    max_dir,
-		 double min_speed,  double max_speed,
-		 double min_life,   double max_life);
-void Make_wreckage(clpos_t  pos,
+		 int      owner_id,
+		 int      owner_team,
+		 int      type,
+		 double   mass,
+		 long     status,
+		 int      color,
+		 int      radius,
+		 int      num_debris,
+		 int      min_dir,    int    max_dir,
+		 double   min_speed,  double max_speed,
+		 double   min_life,   double max_life);
+void Make_wreckage(world_t  *world,
+		   clpos_t  pos,
 		   vector_t vel,
-		   int    owner_id,
-		   int    owner_team,
-		   double min_mass,   double max_mass,
-		   double total_mass,
-		   long   status,
-		   int    color,
-		   int    max_wreckage,
-		   int    min_dir,    int    max_dir,
-		   double min_speed,  double max_speed,
-		   double min_life,   double max_life);
+		   int      owner_id,
+		   int      owner_team,
+		   double   min_mass,   double max_mass,
+		   double   total_mass,
+		   long     status,
+		   int      color,
+		   int      max_wreckage,
+		   int      min_dir,    int    max_dir,
+		   double   min_speed,  double max_speed,
+		   double   min_life,   double max_life);
 void Make_item(clpos_t pos,
 	       vector_t vel,
 	       int item, int num_per_pack,
@@ -650,7 +656,7 @@ void remove_temp_wormhole(world_t *world, int ind);
  * Prototypes for asteroid.c
  */
 void Break_asteroid(wireobject_t *asteroid);
-void Asteroid_update(void);
+void Asteroid_update(world_t *world);
 list_t Asteroid_get_list(void);
 
 
@@ -791,22 +797,22 @@ static inline bool Player_used_emergency_shield(player_t *pl)
 void Player_hit_armor(player_t *pl);
 void Player_used_kill(player_t *pl);
 void Player_set_mass(player_t *pl);
-int Init_player(int ind, shipshape_t *ship);
+int Init_player(world_t *world, int ind, shipshape_t *ship);
 void Alloc_players(int number);
 void Free_players(void);
-void Update_score_table(void);
-void Reset_all_players(void);
-void Check_team_members(int);
-void Compute_game_status(void);
+void Update_score_table(world_t *world);
+void Reset_all_players(world_t *world);
+void Check_team_members(world_t *world, int);
+void Compute_game_status(world_t *world);
 void Delete_player(player_t *pl);
 void Add_spectator(player_t *pl);
 void Delete_spectator(player_t *pl);
 void Detach_ball(player_t *pl, ballobject_t *ball);
 void Kill_player(player_t *pl, bool add_rank_death);
 void Player_death_reset(player_t *pl, bool add_rank_death);
-void Team_game_over(int winning_team, const char *reason);
-void Individual_game_over(int winner);
-void Race_game_over(void);
+void Team_game_over(world_t *world, int winning_team, const char *reason);
+void Individual_game_over(world_t *world, int winner);
+void Race_game_over(world_t *world);
 bool Team_immune(int id1, int id2);
 
 static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
@@ -891,7 +897,7 @@ void Set_player_message(player_t *pl, const char *message);
 /*
  * Prototypes for update.c
  */
-void Update_objects(void);
+void Update_objects(world_t *world);
 void Autopilot(player_t *pl, bool on);
 void Cloak(player_t *pl, bool on);
 void Deflector(player_t *pl, bool on);

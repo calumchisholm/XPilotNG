@@ -1059,7 +1059,7 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg)
 	    Rank_set_score(Players(i), 0.0);
 	for (i = 0; i < MAX_TEAMS; i++)
 	    world->teams[i].score = 0;
-	Reset_all_players();
+	Reset_all_players(world);
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
 	roundsPlayed = 0;
@@ -1073,7 +1073,7 @@ static int Cmd_reset(char *arg, player_t *pl, int oper, char *msg)
 	teamcup_round_start();
     }
     else {
-	Reset_all_players();
+	Reset_all_players(world);
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
 

@@ -103,7 +103,8 @@ void Break_asteroid(wireobject_t *asteroid)
 
     if (asteroid->size == 1) {
 	mass = asteroid->mass / 2;
-	Make_wreckage(asteroid->pos,
+	Make_wreckage(world,
+		      asteroid->pos,
 		      asteroid->vel,
 		      NO_ID,
 		      TEAM_NOT_SET,
@@ -115,7 +116,8 @@ void Break_asteroid(wireobject_t *asteroid)
 		      0, RES-1,
 		      5.0, 10.0,
 		      3.0, 10.0);
-	Make_debris(asteroid->pos,
+	Make_debris(world,
+		    asteroid->pos,
 		    asteroid->vel,
 		    NO_ID,
 		    TEAM_NOT_SET,
@@ -159,7 +161,8 @@ void Break_asteroid(wireobject_t *asteroid)
 	pos2 = World_wrap_clpos(world, pos2);
 	Make_asteroid(pos1, asteroid->size - 1, dir1, speed1);
 	Make_asteroid(pos2, asteroid->size - 1, dir2, speed2);
-	Make_wreckage(asteroid->pos,
+	Make_wreckage(world,
+		      asteroid->pos,
 		      asteroid->vel,
 		      NO_ID,
 		      TEAM_NOT_SET,
@@ -171,7 +174,8 @@ void Break_asteroid(wireobject_t *asteroid)
 		      0, RES-1,
 		      5.0, 10.0,
 		      3.0, 10.0);
-	Make_debris(asteroid->pos,
+	Make_debris(world,
+		    asteroid->pos,
 		    asteroid->vel,
 		    NO_ID,
 		    TEAM_NOT_SET,
@@ -386,13 +390,12 @@ static void Asteroid_rotate(wireobject_t *wireobj)
  * related to asteroids including creation, destruction,
  * rotation and movement.
  */
-void Asteroid_update(void)
+void Asteroid_update(world_t *world)
 {
     int num;
     list_t list;
     list_iter_t iter;
     wireobject_t *asteroid;
-    world_t *world = &World;
 
     list = Asteroid_get_list();
     if (list) {

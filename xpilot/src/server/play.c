@@ -120,15 +120,14 @@ void Check_tag(void)
 
 static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 {
-    static char		msg[MSG_LEN];
-    int			i;
-    double		win_score = 0.0,lose_score = 0.0;
-    int			win_team_members = 0, lose_team_members = 0;
-    int			somebody_flag = 0;
-    double		sc, por;
-    world_t *world = &World;
+    static char msg[MSG_LEN];
+    int i;
+    double win_score = 0.0,lose_score = 0.0;
+    int win_team_members = 0, lose_team_members = 0, somebody_flag = 0;
+    double sc, por;
+    world_t *world = pl->world;
 
-    Check_team_members (td->team);
+    Check_team_members (world, td->team);
     if (td->team == pl->team)
 	return 0;
 
@@ -210,25 +209,25 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
  */
 
 /* Create debris particles */
-void Make_debris(clpos_t pos,
+void Make_debris(world_t  *world,
+		 clpos_t  pos,
 		 vector_t vel,
-		 int owner_id,
-		 int owner_team,
-		 int type,
-		 double mass,
-		 long status,
-		 int color,
-		 int radius,
-		 int num_debris,
-		 int min_dir, int max_dir,
-		 double min_speed, double max_speed,
-		 double min_life, double max_life)
+		 int      owner_id,
+		 int      owner_team,
+		 int      type,
+		 double   mass,
+		 long     status,
+		 int      color,
+		 int      radius,
+		 int      num_debris,
+		 int      min_dir,   int     max_dir,
+		 double   min_speed, double  max_speed,
+		 double   min_life,  double  max_life)
 {
-    object_t		*debris;
-    int			i;
-    double		life;
-    modifiers_t		mods;
-    world_t *world = &World;
+    object_t *debris;
+    int i;
+    double life;
+    modifiers_t mods;
 
     pos = World_wrap_clpos(world, pos);
     if (!World_contains_clpos(world, pos))

@@ -735,9 +735,9 @@ static void Robot_create(void)
     }
     rob_type = &robot_types[new_data->robot_types_ind];
 
-    Init_player(NumPlayers, (options.allowShipShapes)
-			    ? Parse_shape_str(rob->shape)
-			    : NULL);
+    Init_player(world, NumPlayers,
+		options.allowShipShapes ? Parse_shape_str(rob->shape) : NULL);
+
     robot = Players(NumPlayers);
     SET_BIT(robot->type_ext, OBJ_EXT_ROBOT);
     robot->robot_data_ptr = new_data;
@@ -1035,13 +1035,13 @@ static int Robot_check_leave(player_t *pl)
 /*
  * On each round we call the robot type round ticker.
  */
-static void Robot_round_tick(void)
+static void Robot_round_tick(world_t *world)
 {
     int			i;
 
     if (NumRobots > 0) {
 	for (i = 0; i < num_robot_types; i++)
-	    (*robot_types[i].round_tick)();
+	    (*robot_types[i].round_tick)(world);
     }
 }
 
@@ -1142,7 +1142,7 @@ void Robot_update(void)
 	return;
 
     ticks_per_second++;
-    Robot_round_tick();
+    Robot_round_tick(world);
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Players(i);

@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 
     Move_init(world);
     Robot_init();
-    Treasure_init();
+    Treasure_init(world);
     Hitmasks_init(world);
 
     Rank_init_saved_scores();
@@ -201,6 +201,8 @@ int main(int argc, char **argv)
 
 void Main_loop(void)
 {
+    world_t *world = &World;
+
     main_loops++;
 
     if ((main_loops & 0x3F) == 0)
@@ -234,7 +236,7 @@ void Main_loop(void)
 	    }
 	}
 
-	Update_objects();
+	Update_objects(world);
 
 	if ((main_loops % CONF_UPDATES_PR_FRAME) == 0)
 	    Frame_update();

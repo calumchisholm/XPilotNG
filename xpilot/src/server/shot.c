@@ -91,12 +91,12 @@ void Place_moving_mine(player_t *pl)
 void Place_general_mine(player_t *pl, int team, long status,
 			clpos_t pos, vector_t vel, modifiers_t mods)
 {
-    char		msg[MSG_LEN];
-    int			used;
-    double		life, drain, mass;
-    int			i, minis;
-    vector_t		mv;
-    world_t *world = &World;
+    char msg[MSG_LEN];
+    int used;
+    double life, drain, mass;
+    int i, minis;
+    vector_t mv;
+    world_t *world = pl ? pl->world : &World;
 
     if (NumObjs + mods.mini >= MAX_TOTAL_SHOTS)
 	return;
@@ -250,11 +250,9 @@ void Place_general_mine(player_t *pl, int team, long status,
  */
 void Detonate_mines(player_t *pl)
 {
-    world_t *world = &World;
-    int			i;
-    int			closest = -1;
-    double		dist;
-    double		min_dist = world->hypotenuse * CLICK + 1;
+    world_t *world = pl->world;
+    int i, closest = -1;
+    double dist, min_dist = world->hypotenuse * CLICK + 1;
 
     if (BIT(pl->used, HAS_PHASING_DEVICE))
 	return;
@@ -507,7 +505,7 @@ void Fire_general_shot(player_t *pl, int team, bool cannon,
     vector_t		mv;
     clpos_t		shotpos;
     object_t		*mini_objs[MODS_MINI_MAX + 1];
-    world_t *world = &World;
+    world_t		*world = pl ? pl->world : &World;
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
 	return;
@@ -1097,7 +1095,7 @@ void Fire_normal_shots(player_t *pl)
 
 
 /* Removes shot from array */
-void Delete_shot(int ind)
+void Delete_shot(world_t *world, int ind)
 {
     object_t *shot = Obj[ind];	/* Used when swapping places */
     ballobject_t *ball;
@@ -1107,7 +1105,6 @@ void Delete_shot(int ind)
     long status;
     int i, intensity, type, color, num_debris;
     double modv, speed_modv, life_modv, num_modv, mass, min_life, max_life;
-    world_t *world = &World;
 
     switch (shot->type) {
 
@@ -1155,7 +1152,8 @@ void Delete_shot(int ind)
 			  NONBALL_BIT | NOTEAM_BIT, OBJ_PTR(ball)) != NO_GROUP)
 		break;
 
-	    Make_debris(ball->prevpos,
+	    Make_debris(world,
+			ball->prevpos,
 			ball->vel,
 			ball->id,
 			ball->team,
@@ -1259,7 +1257,8 @@ void Delete_shot(int ind)
 	     intensity, num_debris, min_life, max_life);
 #endif
 
-	Make_debris(shot->prevpos,
+	Make_debris(world,
+		    shot->prevpos,
 		    shot->vel,
 		    shot->id,
 		    shot->team,
@@ -1377,8 +1376,8 @@ void Delete_shot(int ind)
 
 void Fire_laser(player_t *pl)
 {
-    clpos_t	m_gun, pos;
-    world_t *world = &World;
+    clpos_t m_gun, pos;
+    world_t *world = pl->world;
 
     if (frame_time
 	<= pl->laser_time + options.laserRepeatRate - timeStep + 1e-3)
@@ -1407,9 +1406,9 @@ void Fire_laser(player_t *pl)
 void Fire_general_laser(player_t *pl, int team, clpos_t pos,
 			int dir, modifiers_t mods)
 {
-    int			life;
-    pulseobject_t	*pulse;
-    world_t *world = &World;
+    double life;
+    pulseobject_t *pulse;
+    world_t *world = pl ? pl->world : &World;
 
     if (!World_contains_clpos(world, pos)) {
 	warn("Fire_general_laser: outside world.\n");
@@ -1580,13 +1579,10 @@ void Update_torpedo(torpobject_t *torp)
 
 void Update_missile(missileobject_t *shot)
 {
-    player_t		*pl;
-    int			angle, theta;
-    double		range = 0.0;
-    double		acc = SMART_SHOT_ACC;
-    double		x_dif = 0.0;
-    double		y_dif = 0.0;
-    double		shot_speed;
+    player_t *pl;
+    int angle, theta;
+    double range = 0.0, acc = SMART_SHOT_ACC;
+    double x_dif = 0.0, y_dif = 0.0, shot_speed;
     world_t *world = &World;
 
     if (shot->type == OBJ_HEAT_SHOT) {

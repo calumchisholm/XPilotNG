@@ -117,7 +117,7 @@ void tuner_worldlives(world_t *world)
     Set_world_rules(world);
 
     if (BIT(world->rules->mode, LIMITED_LIVES)) {
-	Reset_all_players();
+	Reset_all_players(world);
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
     }
@@ -187,7 +187,7 @@ void tuner_modifiers(world_t *world)
     Set_world_rules(world);
 
     for (i = 0; i < NumPlayers; i++)
-	filter_mods(&Players(i)->mods);
+	filter_mods(world, &Players(i)->mods);
 }
 
 void tuner_gameduration(world_t *world)
@@ -201,7 +201,7 @@ void tuner_gameduration(world_t *world)
 void tuner_racelaps(world_t *world)
 {
     if (BIT(world->rules->mode, TIMING)) {
-	Reset_all_players();
+	Reset_all_players(world);
 	if (options.gameDuration == -1)
 	    options.gameDuration = 0;
     }

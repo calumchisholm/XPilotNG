@@ -68,7 +68,7 @@ static void Transport_to_home(player_t *pl)
     clpos_t startpos;
     double dx, dy, t, m;
     const double T = RECOVERY_DELAY;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (pl->home_base == NULL) {
 	pl->vel.x = 0;
@@ -297,18 +297,15 @@ void Autopilot(player_t *pl, bool on)
  */
 static void do_Autopilot (player_t *pl)
 {
-    int		vad;	/* Velocity Away Delta */
-    int		dir;
-    int		afterburners;
-    vector_t	gravity;
-    double	acc, vel;
-    double	delta;
-    double	turnspeed, power;
-    const double	emergency_thrust_settings_delta = 150.0 / FPS;
-    const double	auto_pilot_settings_delta = 15.0 / FPS;
-    const double	auto_pilot_turn_factor = 2.5;
-    const double	auto_pilot_dead_velocity = 0.5;
-    world_t *world = &World;
+    int vad;	/* Velocity Away Delta */
+    int dir, afterburners;
+    vector_t gravity;
+    double acc, vel, delta, turnspeed, power;
+    const double emergency_thrust_settings_delta = 150.0 / FPS;
+    const double auto_pilot_settings_delta = 15.0 / FPS;
+    const double auto_pilot_turn_factor = 2.5;
+    const double auto_pilot_dead_velocity = 0.5;
+    world_t *world = pl->world;
 
     /*
      * If the last movement touched a wall then we shouldn't
@@ -446,12 +443,11 @@ static void do_Autopilot (player_t *pl)
 }
 
 
-static void Fuel_update(void)
+static void Fuel_update(world_t *world)
 {
     int i;
     double fuel;
     int frames_per_update;
-    world_t *world = &World;
 
     if (NumPlayers == 0)
 	return;
@@ -521,10 +517,9 @@ static void Misc_object_update(void)
     }
 }
 
-static void Target_update(void)
+static void Target_update(world_t *world)
 {
     int i, j;
-    world_t *world = &World;
 
     for (i = 0; i < world->NumTargets; i++) {
 	target_t *targ = Targets(world, i);
@@ -708,7 +703,7 @@ static void Use_items(player_t *pl)
  */
 static void Do_refuel(player_t *pl)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
     fuel_t *fs = Fuels(world, pl->fs);
 
     if ((Wrap_length(pl->pos.cx - fs->pos.cx,
@@ -751,7 +746,7 @@ static void Do_refuel(player_t *pl)
  */
 static void Do_repair(player_t *pl)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
     target_t *targ = Targets(world, pl->repair_target);
 
     if ((Wrap_length(pl->pos.cx - targ->pos.cx,
@@ -792,7 +787,7 @@ static void Do_repair(player_t *pl)
  */
 static void Warp_balls(player_t *pl, clpos_t dest)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     /*
      * Don't connect to balls while warping.
@@ -905,7 +900,7 @@ static void Traverse_wormhole(player_t *pl)
 {
     clpos_t dest;
     int wh_dest;
-    world_t *world = &World;
+    world_t *world = pl->world;
     wormhole_t *wh_hit = Wormholes(world, pl->wormHoleHit);
 
 #if 0
@@ -945,7 +940,7 @@ static void Traverse_wormhole(player_t *pl)
 static void Hyperjump(player_t *pl)
 {
     clpos_t dest;
-    world_t *world = &World;
+    world_t *world = pl->world;
     int counter;
     hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
 
@@ -1186,11 +1181,10 @@ static void Update_players(void)
 /********** **********
  * Updating objects and the like.
  */
-void Update_objects(void)
+void Update_objects(world_t *world)
 {
     int i;
     player_t *pl;
-    world_t *world = &World;
 
     /*
      * Since the amount per frame of some things could get too small to
@@ -1248,13 +1242,13 @@ void Update_objects(void)
 		Place_item(NULL, i);
     }
 
-    Fuel_update();
+    Fuel_update(world);
     Misc_object_update();
-    Asteroid_update();
+    Asteroid_update(world);
     Ecm_update();
     Transporter_update();
     Cannon_update(do_update_this_frame);
-    Target_update();
+    Target_update(world);
     Update_players();
 
     for (i = world->NumWormholes - 1; i >= 0; i--) {
@@ -1350,7 +1344,7 @@ void Update_objects(void)
      */
     for (i = NumObjs - 1; i >= 0; i--)
 	if ((Obj[i]->life -= timeStep) <= 0)
-	    Delete_shot(i);
+	    Delete_shot(world, i);
 
 #if 0
     warn("2. NumObjs = %d", NumObjs);
@@ -1375,11 +1369,11 @@ void Update_objects(void)
      * (not called after Game_Over() )
      */
     if (options.gameDuration >= 0.0 || options.maxRoundTime > 0)
-	Compute_game_status();
+	Compute_game_status(world);
 
     /*
      * Now update labels if need be.
      */
     if (updateScores && frame_loops % UPDATE_SCORE_DELAY == 0)
-	Update_score_table();
+	Update_score_table(world);
 }

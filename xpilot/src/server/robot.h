@@ -28,6 +28,10 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
+#ifndef MAP_H
+# include "map.h"
+#endif
+
 /*
  * We would like to support several different robot types.
  * Each robot type is defined by one name and is accessed
@@ -90,7 +94,7 @@
  */
 typedef struct {
     const char		*name;
-    void		(*round_tick)(void);
+    void		(*round_tick)(world_t *world);
     void		(*create)(player_t *robot, char *str);
     void		(*go_home)(player_t *robot);
     void		(*play)(player_t *robot);

@@ -46,7 +46,7 @@ static void Refuel(player_t *pl)
     int i;
     double l, dist = 1e19;
     fuel_t *fs;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (!BIT(pl->have, HAS_REFUEL))
 	return;
@@ -70,7 +70,7 @@ static void Repair(player_t *pl)
     int i;
     double l, dist = 1e19;
     target_t *targ;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (!BIT(pl->have, HAS_REPAIR))
 	return;
@@ -108,7 +108,7 @@ bool team_dead(int team)
  */
 static bool Player_lock_allowed(player_t *pl, player_t *lock_pl)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     /* we can never lock on ourselves, nor on NULL. */
     if (lock_pl == NULL || pl->id == lock_pl->id)
@@ -186,7 +186,7 @@ int Player_lock_closest(player_t *pl, bool next)
 
 void Pause_player(player_t *pl, bool on)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
     int i;
 
     if (on && !BIT(pl->status, PAUSE)) { /* Turn pause mode on */
@@ -280,7 +280,7 @@ int Handle_keyboard(player_t *pl)
     clpos_t pos;
     double minv;
     int ind = GetInd(pl->id);
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     for (key = 0; key < NUM_KEYS; key++) {
 	if (pl->last_keyv[key / BITV_SIZE] == pl->prev_keyv[key / BITV_SIZE]) {
@@ -686,7 +686,7 @@ int Handle_keyboard(player_t *pl)
 		    *m = pl->mods;
 		else {
 		    pl->mods = *m;
-		    filter_mods(&pl->mods);
+		    filter_mods(world, &pl->mods);
 		}
 		break;
 	    }
@@ -1022,10 +1022,8 @@ int Handle_keyboard(player_t *pl)
     return 1;
 }
 
-void filter_mods(modifiers_t * mods)
+void filter_mods(world_t *world, modifiers_t * mods)
 {
-    world_t *world = &World;
-
     if (!BIT(world->rules->mode, ALLOW_NUKES))
 	mods->nuclear = 0;
 
