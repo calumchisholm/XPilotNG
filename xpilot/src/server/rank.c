@@ -26,7 +26,7 @@
 char rank_version[] = VERSION;
 
 /* MAX_SCORES = how many players we remember */
-#define MAX_SCORES 200
+#define MAX_SCORES 250
 
 #define XPILOTSCOREFILE		"XPILOTSCOREFILE"
 #define XPILOTNOJSRANKINGPAGE	"XPILOTNOJSRANKINGPAGE"
