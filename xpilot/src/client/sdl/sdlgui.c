@@ -274,6 +274,11 @@ int Gui_init(void)
     int i;
     GLUtriangulatorObj *tess;
 
+    if (asteroid_init() == -1) {
+	error("failed to initialize asteroids");
+	return -1;
+    }
+    
     if (num_polygons == 0) return 0;
 
     polyListBase = glGenLists(num_polygons);
@@ -300,19 +305,14 @@ int Gui_init(void)
 
     gluDeleteTess(tess);
 
-    if (asteroid_init() == -1) {
-	error("failed to initialize asteroids");
-	return -1;
-    }
-    
     return 0;
 }
 
 void Gui_cleanup(void)
 {
-    asteroid_cleanup();
     if (polyListBase)
 	glDeleteLists(polyListBase, num_polygons);
+    asteroid_cleanup();
 }
 
 /* Map painting */
