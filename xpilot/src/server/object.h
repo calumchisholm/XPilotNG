@@ -592,7 +592,7 @@ struct player {
     double	damaged;
     double	stunned;
     int		updateVisibility;
-    wormhole_t	*wormHoleHit, *wormHoleDest;
+    int		wormHoleHit, wormHoleDest;
     double	warped;			/* time player is immune to warped-to
 					   wormhole, replaces WARPED bit */
 

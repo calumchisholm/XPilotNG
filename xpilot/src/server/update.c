@@ -1065,8 +1065,6 @@ void Update_objects(void)
 		   + pl->item[ITEM_ARMOR] * ARMOR_MASS;
 
 
-#if 0
-
 	/*
 	 * Wormholes and warping
 	 */
@@ -1151,7 +1149,7 @@ void Update_objects(void)
 		    dest.cx = (int)(rfrac() * World.cwidth);
 		    dest.cy = (int)(rfrac() * World.cheight);
 		    if (shape_is_inside(dest.cx, dest.cy, hitmask,
-					(object *)pl, (shape *)pl->ship,
+					(object *)pl, (shape_t *)pl->ship,
 					pl->dir)
 			== NO_GROUP)
 			break;
@@ -1159,7 +1157,7 @@ void Update_objects(void)
 
 		/* can't find an empty space, hyperjump failed */
 		if (!counter)
-		    dest.cx = pl->pos;
+		    dest = pl->pos;
 
 #if 0 /* kps - temporary wormholes disabled currently */
 		if (counter
@@ -1240,7 +1238,6 @@ void Update_objects(void)
 	    sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 	}
 	/* end of somewhat-supported warping stuff */
-#endif
 
 	update_object_speed(pl);	    /* New position */
 	Move_player(pl);

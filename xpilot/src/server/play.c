@@ -539,6 +539,7 @@ bool Wormhole_hitfunc(struct group *gp, struct move *move)
 	 */
 	if (pl->warped > 0
 	    && wormhole->type == WORM_NORMAL
+	    && wormhole == Wormholes(pl->wormHoleDest)
 	    /* kps - wormHoleDest is now pointer */
 	    /*&& pl->wormHoleDest == ind */)
 	    return false;
