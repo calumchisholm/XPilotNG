@@ -238,8 +238,8 @@ typedef struct {
 
 
 extern int      oldServer; /* Compatibility mode for old block-based servers */
-extern ipos	pos;
-extern ipos	vel;
+extern ipos	FOOpos;
+extern ipos	FOOvel;
 extern ipos	world;
 extern ipos	realWorld;
 extern short	heading;
@@ -269,8 +269,8 @@ extern short	shieldtimemax;
 extern short	phasingtime;
 extern short	phasingtimemax;
 
-extern int		roundDelay;
-extern int		roundDelayMax;
+extern int	roundDelay;
+extern int	roundDelayMax;
 
 extern int	RadarWidth;
 extern int	RadarHeight;

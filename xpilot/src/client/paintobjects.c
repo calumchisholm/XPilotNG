@@ -173,26 +173,22 @@ static void Paint_balls(void)
 	    if (wrap(&x, &y)) {
 		Gui_paint_ball(x, y);
 
-		if (id == -1) {
+		if (id == -1)
 		    continue;
-		}
 
 		for (j = 0; j < num_ship && ship_ptr[j].id != id; j++) {
-		    if (ship_ptr[j].id == id) {
+		    if (ship_ptr[j].id == id)
 			break;
-		    }
 		}
 
-		if (j >= num_ship) {
+		if (j >= num_ship)
 		    continue;
-		}
 
 		xs = ship_ptr[j].x;
 		ys = ship_ptr[j].y;
 
-		if (wrap(&xs, &ys)) {
+		if (wrap(&xs, &ys))
 		    Gui_paint_ball_connecter(x, y, xs, ys);
-		}
 	    }
 	}
 	RELEASE(ball_ptr, num_ball, max_ball);
@@ -226,9 +222,10 @@ static void Paint_mines(void)
 			if (mine_ptr[i].id == EXPIRED_MINE_ID) {
 			    static char expired_name[] = "Expired";
 			    name = expired_name;
-			} else if ((other = Other_by_id(mine_ptr[i].id)) != NULL) {
+			} else if ((other = Other_by_id(mine_ptr[i].id))
+				   != NULL)
 			    name = other->id_string;
-			} else {
+			else {
 			    static char unknown_name[] = "Not of this world!";
 			    name = unknown_name;
 			}
@@ -290,7 +287,8 @@ static void Paint_wreckages(void)
 	    if (wrap(&x, &y)) {
 		deadly = (wreckage_ptr[i].wrecktype & 0x80);
 
-		wtype = (wreckage_ptr[i].wrecktype & 0x7F) % NUM_WRECKAGE_SHAPES;
+		wtype = (wreckage_ptr[i].wrecktype & 0x7F)
+		    % NUM_WRECKAGE_SHAPES;
 		rot = wreckage_ptr[i].rotation;
 		size = wreckage_ptr[i].size;
 
@@ -334,9 +332,8 @@ static void Paint_wormholes(void)
 	for (i = 0; i < num_wormholes; i++) {
 	    x = wormhole_ptr[i].x;
 	    y = wormhole_ptr[i].y;
-	    if (wrap(&x, &y)) {
+	    if (wrap(&x, &y))
 		Gui_paint_setup_worm(x, y, loops & 7);
-	    }
 	}
 	RELEASE(wormhole_ptr, num_wormholes, max_wormholes);
     }
@@ -356,13 +353,11 @@ static void Paint_missiles(void)
 	    y = missile_ptr[i].y;
 	    dir = missile_ptr[i].dir;
 	    len = MISSILE_LEN;
-	    if (missile_ptr[i].len > 0) {
+	    if (missile_ptr[i].len > 0)
 		len = missile_ptr[i].len;
-	    }
 
-	    if (wrap(&x, &y)) {
+	    if (wrap(&x, &y))
 		Gui_paint_missile(x, y, len, dir);
-	    }
 	}
 	Gui_paint_missiles_end();
 	RELEASE(missile_ptr, num_missile, max_missile);
@@ -385,9 +380,8 @@ static void Paint_lasers(void)
 	    dir = laser_ptr[i].dir;
 	    color = laser_ptr[i].color;
 
-	    if (wrap(&x1, &y1)) {
+	    if (wrap(&x1, &y1))
 		Gui_paint_laser(color, x1, y1, len, dir);
-	    }
 	}
 	Gui_paint_lasers_end();
 
@@ -405,12 +399,12 @@ static void Paint_fastshots(int i, int x_areas, int y_areas, int areas)
 	x = BASE_X(i);
 	y = BASE_Y(i);
 	color = COLOR(i);
-	if (color != WHITE && color != BLUE) {
+	if (color != WHITE && color != BLUE)
 	    color = WHITE;
-	}
-	for (j = 0; j < num_fastshot[i]; j++) {
-	    Gui_paint_fastshot(color, x + fastshot_ptr[i][j].x , y - fastshot_ptr[i][j].y);
-	}
+	for (j = 0; j < num_fastshot[i]; j++)
+	    Gui_paint_fastshot(color,
+			       x + fastshot_ptr[i][j].x ,
+			       y - fastshot_ptr[i][j].y);
 	RELEASE(fastshot_ptr[i], num_fastshot[i], max_fastshot[i]);
     }
 }
@@ -429,10 +423,9 @@ static void Paint_teamshots(int i, int t_, int x_areas, int y_areas, int areas)
 	x = BASE_X(i);
 	y = BASE_Y(i);
 	/*color = COLOR(i);*/
-	for (j = 0; j < num_fastshot[t_]; j++) {
+	for (j = 0; j < num_fastshot[t_]; j++)
 	    Gui_paint_teamshot(x + fastshot_ptr[t_][j].x,
 			       y - fastshot_ptr[t_][j].y);
-	}
 	RELEASE(fastshot_ptr[t_], num_fastshot[t_], max_fastshot[t_]);
     }
 }
@@ -512,9 +505,8 @@ static void Paint_ecm(void)
 	    if ((size = ecm_ptr[i].size) > 0) {
 		x = ecm_ptr[i].x;
 		y = ecm_ptr[i].y;
-		if (wrap(&x, &y)) {
+		if (wrap(&x, &y))
 		    Gui_paint_ecm(x, y, size);
-		}
 	    }
 	}
 	RELEASE(ecm_ptr, num_ecm, max_ecm);
@@ -531,9 +523,8 @@ static void Paint_all_ships(void)
 	for (i = 0; i < num_ship; i++) {
 	    x = ship_ptr[i].x;
 	    y = ship_ptr[i].y;
-	    if (!wrap(&x, &y)) {
+	    if (!wrap(&x, &y))
 		continue;
-	    }
 
             /*
              * ship in the center? (svenska-hack)
@@ -571,9 +562,8 @@ static void Paint_refuel(void)
 	    y0 = refuel_ptr[i].y0;
 	    x1 = refuel_ptr[i].x1;
 	    y1 = refuel_ptr[i].y1;
-	    if (wrap(&x0, &y0) && wrap(&x1, &y1)) {
+	    if (wrap(&x0, &y0) && wrap(&x1, &y1))
 		Gui_paint_refuel(x0, y0, x1, y1);
-	    }
 	}
 	RELEASE(refuel_ptr, num_refuel, max_refuel);
     }
@@ -591,9 +581,8 @@ static void Paint_connectors(void)
 	    y0 = connector_ptr[i].y0;
 	    x1 = connector_ptr[i].x1;
 	    y1 = connector_ptr[i].y1;
-	    if (wrap(&x0, &y0) && wrap(&x1, &y1)) {
+	    if (wrap(&x0, &y0) && wrap(&x1, &y1))
 		Gui_paint_connector(x0, y0, x1, y1, connector_ptr[i].tractor);
-	    }
 	}
 	RELEASE(connector_ptr, num_connector, max_connector);
     }
@@ -611,9 +600,8 @@ static void Paint_transporters(void)
 	    y0 = trans_ptr[i].y1;
 	    x1 = trans_ptr[i].x2;
 	    y1 = trans_ptr[i].y2;
-	    if (wrap(&x0, &y0) && wrap(&x1, &y1)) {
+	    if (wrap(&x0, &y0) && wrap(&x1, &y1))
 		Gui_paint_transporter(x0, y0, x1, y1);
-	    }
 	}
 	RELEASE(trans_ptr, num_trans, max_trans);
     }

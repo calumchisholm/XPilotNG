@@ -725,27 +725,21 @@ int Net_init(char *server, int port)
 #endif
 
     Receive_init();
-    if (!clientPortStart || !clientPortEnd || (clientPortStart > clientPortEnd))
-    {
-	if (sock_open_udp(&sock, NULL, 0) == SOCK_IS_ERROR)
-	{
+    if (!clientPortStart || !clientPortEnd ||
+	(clientPortStart > clientPortEnd)) {
+	if (sock_open_udp(&sock, NULL, 0) == SOCK_IS_ERROR) {
 	    error("Cannot create datagram socket (%d)", sock.error.error);
 	    return -1;
 	}
-    }
-    else
-    {
+    } else {
 	int found_socket = 0;
-	for (i = clientPortStart; i <= clientPortEnd; i++)
-	{
-	    if (sock_open_udp(&sock, NULL, i) != SOCK_IS_ERROR)
-	    {
+	for (i = clientPortStart; i <= clientPortEnd; i++) {
+	    if (sock_open_udp(&sock, NULL, i) != SOCK_IS_ERROR) {
 		found_socket = 1;
 		break;
 	    }
 	}
-	if (found_socket == 0)
-	{
+	if (found_socket == 0) {
 	    error("Could not find a usable port in given port range");
 	    return -1;
 	}
@@ -762,12 +756,11 @@ int Net_init(char *server, int port)
 	error("Can't make socket non-blocking");
 	return -1;
     }
-    if (sock_set_send_buffer_size(&sock, CLIENT_SEND_SIZE + 256) == -1) {
+    if (sock_set_send_buffer_size(&sock, CLIENT_SEND_SIZE + 256) == -1)
 	error("Can't set send buffer size to %d", CLIENT_SEND_SIZE + 256);
-    }
-    if (sock_set_receive_buffer_size(&sock, CLIENT_RECV_SIZE + 256) == -1) {
+
+    if (sock_set_receive_buffer_size(&sock, CLIENT_RECV_SIZE + 256) == -1)
 	error("Can't set receive buffer size to %d", CLIENT_RECV_SIZE + 256);
-    }
 
     size = receive_window_size * sizeof(frame_buf_t);
     if ((Frames = (frame_buf_t *) malloc(size)) == NULL) {
@@ -2705,50 +2698,50 @@ int Send_shape(char *str)
     return 0;
 }
 
-int Send_power(DFLOAT power)
+int Send_power(DFLOAT pwr)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_POWER,
-		      (int) (power * 256.0)) == -1)
+		      (int) (pwr * 256.0)) == -1)
 	return -1;
     return 0;
 }
 
-int Send_power_s(DFLOAT power_s)
+int Send_power_s(DFLOAT pwr_s)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_POWER_S,
-		      (int)(power_s * 256.0)) == -1)
+		      (int)(pwr_s * 256.0)) == -1)
 	return -1;
     return 0;
 }
 
-int Send_turnspeed(DFLOAT turnspeed)
+int Send_turnspeed(DFLOAT turnspd)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNSPEED,
-		      (int) (turnspeed * 256.0)) == -1)
+		      (int) (turnspd * 256.0)) == -1)
 	return -1;
     return 0;
 }
 
-int Send_turnspeed_s(DFLOAT turnspeed_s)
+int Send_turnspeed_s(DFLOAT turnspd_s)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNSPEED_S,
-		      (int) (turnspeed_s * 256.0)) == -1)
+		      (int) (turnspd_s * 256.0)) == -1)
 	return -1;
     return 0;
 }
 
-int Send_turnresistance(DFLOAT turnresistance)
+int Send_turnresistance(DFLOAT turnres)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNRESISTANCE,
-		      (int) (turnresistance * 256.0)) == -1)
+		      (int) (turnres * 256.0)) == -1)
 	return -1;
     return 0;
 }
 
-int Send_turnresistance_s(DFLOAT turnresistance_s)
+int Send_turnresistance_s(DFLOAT turnres_s)
 {
     if (Packet_printf(&wbuf, "%c%hd", PKT_TURNRESISTANCE_S,
-		      (int) (turnresistance_s * 256.0)) == -1)
+		      (int) (turnres_s * 256.0)) == -1)
 	return -1;
     return 0;
 }

@@ -106,7 +106,7 @@ bool Grok_map_options(void);
 
 int Map_place_base(clpos pos, int dir, int team);
 int Map_place_cannon(clpos pos, int dir, int team);
-int Map_place_check(clpos pos, int index);
+int Map_place_check(clpos pos, int ind);
 int Map_place_fuel(clpos pos, int team);
 int Map_place_grav(clpos pos, DFLOAT force, int type);
 int Map_place_target(clpos pos, int team);
@@ -164,7 +164,7 @@ void Timing_setup(void);
  * Prototypes for play.c
  */
 void Thrust(player *pl);
-void Record_shove(player *pl, player *pusher, long time);
+void Record_shove(player *pl, player *pusher, long shove_time);
 void Delta_mv(object *ship, object *obj);
 void Delta_mv_elastic(object *obj1, object *obj2);
 void Obj_repel(object *obj1, object *obj2, int repel_dist);
@@ -422,7 +422,7 @@ void Convert_string_to_list(const char *value, list_t *list_ptr);
 /*
  * Prototypes for parser.c
  */
-int Parser_list_option(int *index, char *buf);
+int Parser_list_option(int *ind, char *buf);
 bool Parser(int argc, char **argv);
 int Tune_option(char *name, char *val);
 int Get_option_value(const char *name, char *value, unsigned size);

@@ -336,8 +336,8 @@ void Paint_frame(void)
 	    int x, y, w, h;
 	    float xp, yp, xo, yo;
 
-	    xp = (float) (pos.x * 256) / Setup->width;
-	    yp = (float) (pos.y * RadarHeight) / Setup->height;
+	    xp = (float) (FOOpos.x * 256) / Setup->width;
+	    yp = (float) (FOOpos.y * RadarHeight) / Setup->height;
 	    xo = (float) 256 / 2;
 	    yo = (float) RadarHeight / 2;
 	    if (xo <= xp)

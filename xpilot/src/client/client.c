@@ -34,8 +34,8 @@ int	RadarHeight = 0;
 int	RadarWidth = 256;	/* must always be 256! */
 
 int     oldServer;
-ipos	pos;
-ipos	vel;
+ipos	FOOpos;
+ipos	FOOvel;
 ipos	world;
 ipos	realWorld;
 short	heading;

@@ -2546,7 +2546,7 @@ static void Usage(void)
 
 
 static int Find_resource(XrmDatabase db, const char *resource,
-			 char *result, unsigned size, int *index)
+			 char *result, unsigned size, int *ind)
 {
 #ifndef _WINDOWS
     int			i;
@@ -2559,7 +2559,7 @@ static int Find_resource(XrmDatabase db, const char *resource,
 
     for (i = 0;;) {
 	if (hash == options[i].hash && !strcmp(resource, options[i].name)) {
-	    *index = i;
+	    *ind = i;
 	    break;
 	}
 	if (++i >= NELEM(options)) {
@@ -2580,12 +2580,12 @@ static int Find_resource(XrmDatabase db, const char *resource,
 	result[len] = '\0';
 	return 1;
     }
-    strlcpy(result, options[*index].fallback, size);
+    strlcpy(result, options[*ind].fallback, size);
 
     return 0;
 
 #else	/* _WINDOWS */
-    Config_get_resource(resource, result, size, index);
+    Config_get_resource(resource, result, size, ind);
 
     return 1;
 #endif
@@ -2595,9 +2595,9 @@ static int Find_resource(XrmDatabase db, const char *resource,
 static int Get_resource(XrmDatabase db,
 			const char *resource, char *result, unsigned size)
 {
-    int			index;
+    int			ind;
 
-    return Find_resource(db, resource, result, size, &index);
+    return Find_resource(db, resource, result, size, &ind);
 }
 
 
@@ -2606,9 +2606,9 @@ static int Get_string_resource(XrmDatabase db,
 			       unsigned size)
 {
     char		*src, *dst;
-    int			index, val;
+    int			ind, val;
 
-    val = Find_resource(db, resource, result, size, &index);
+    val = Find_resource(db, resource, result, size, &ind);
     src = dst = result;
     while ((*src & 0x7f) == *src && isgraph((int)*src) == 0 && *src != '\0')
 	src++;
@@ -2625,14 +2625,14 @@ static int Get_string_resource(XrmDatabase db,
 static void Get_int_resource(XrmDatabase db,
 			     const char *resource, int *result)
 {
-    int			index;
+    int			ind;
     char		resValue[MAX_CHARS];
 
-    Find_resource(db, resource, resValue, sizeof resValue, &index);
+    Find_resource(db, resource, resValue, sizeof resValue, &ind);
     if (sscanf(resValue, "%d", result) <= 0) {
 	warn("Bad value \"%s\" for option \"%s\", using default...",
 	     resValue, resource);
-	sscanf(options[index].fallback, "%d", result);
+	sscanf(options[ind].fallback, "%d", result);
     }
 }
 
@@ -2640,16 +2640,16 @@ static void Get_int_resource(XrmDatabase db,
 static void Get_float_resource(XrmDatabase db,
 			       const char *resource, DFLOAT *result)
 {
-    int			index;
+    int			ind;
     double		temp_result;
     char		resValue[MAX_CHARS];
 
     temp_result = 0.0;
-    Find_resource(db, resource, resValue, sizeof resValue, &index);
+    Find_resource(db, resource, resValue, sizeof resValue, &ind);
     if (sscanf(resValue, "%lf", &temp_result) <= 0) {
 	warn("Bad value \"%s\" for option \"%s\", using default...",
 	     resValue, resource);
-	sscanf(options[index].fallback, "%lf", &temp_result);
+	sscanf(options[ind].fallback, "%lf", &temp_result);
     }
     *result = (DFLOAT) temp_result;
 }
@@ -2658,10 +2658,10 @@ static void Get_float_resource(XrmDatabase db,
 static void Get_bool_resource(XrmDatabase db, const char *resource,
 			      bool *result)
 {
-    int			index;
+    int			ind;
     char		resValue[MAX_CHARS];
 
-    Find_resource(db, resource, resValue, sizeof resValue, &index);
+    Find_resource(db, resource, resValue, sizeof resValue, &ind);
     *result = (ON(resValue) ? true : false);
 }
 
@@ -2669,10 +2669,10 @@ static void Get_bool_resource(XrmDatabase db, const char *resource,
 static void Get_bit_resource(XrmDatabase db, const char *resource,
 			     long *mask, int bit)
 {
-    int			index;
+    int			ind;
     char		resValue[MAX_CHARS];
 
-    Find_resource(db, resource, resValue, sizeof resValue, &index);
+    Find_resource(db, resource, resValue, sizeof resValue, &ind);
     if (ON(resValue))
 	SET_BIT(*mask, bit);
 }

@@ -73,12 +73,12 @@ static int sock_flags_test_any(sock_t *sock, unsigned bits)
     return (sock->flags & bits) != 0;
 }
 
-static int sock_set_error(sock_t *sock, int error, sock_call_t call, int line)
+static int sock_set_error(sock_t *sock, int err, sock_call_t call, int line)
 {
     DEB(printf("set error %d, %d, %d.  \"%s\"\n",
-	       error, call, line, strerror(error)));
+	       err, call, line, strerror(err)));
 
-    sock->error.error = error;
+    sock->error.error = err;
     sock->error.call = call;
     sock->error.line = line;
 
@@ -638,15 +638,15 @@ int sock_get_port(sock_t *sock)
 
 int sock_get_error(sock_t *sock)
 {
-    int			error;
+    int			err;
     socklen_t		size = sizeof(error);
 
     if (getsockopt(sock->fd, SOL_SOCKET, SO_ERROR,
-		   (void *)&error, &size) < 0) {
+		   (void *)&err, &size) < 0) {
 	sock_set_error(sock, errno, SOCK_CALL_GETSOCKOPT, __LINE__);
 	return SOCK_IS_ERROR;
     }
-    errno = error;
+    errno = err;
     return SOCK_IS_OK;
 }
 

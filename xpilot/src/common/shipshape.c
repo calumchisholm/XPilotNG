@@ -644,12 +644,13 @@ static int shape2wire(char *ship_shape_str, shipobj *ship)
 			horMax = 15, verMax = 15, horMin = -15, verMin = -15,
 			minCount = 3, minSize = 22 + 16;
 	int		low = 0, hi = 0, left = 0, right = 0,
-			count = 0, change, max = 0,
+			count = 0, change,
 			lowest = 0, highest = 0,
 			leftmost = 0, rightmost = 0;
 	int		invalid = 0;
 	const int	checkWidthAgainstLongestAxis = 1;
 
+	max = 0;
 	for (i = 0; i < ship->num_points; i++) {
 	    x = pt[i].x;
 	    y = pt[i].y;

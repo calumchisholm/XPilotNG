@@ -51,6 +51,6 @@ void Gui_paint_setup_treasure(int x, int y, int team, bool own);
 
 void Gui_paint_walls(int x, int y, int type, int xi, int yi);
 
-void Gui_paint_polygon(int index, int xoff, int yoff);
+void Gui_paint_polygon(int i, int xoff, int yoff);
 
 #endif

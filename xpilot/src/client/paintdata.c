@@ -111,9 +111,8 @@ void Erase_do_start(void)
     }
     erp->num_rect = 0;
     erp->num_arc = 0;
-    for (i = 0; i <= MAX_LINE_WIDTH; i++) {
+    for (i = 0; i <= MAX_LINE_WIDTH; i++)
 	erp->num_seg[i] = 0;
-    }
 }
 
 void Erase_do_end(void)
@@ -128,11 +127,10 @@ void Erase_do_end(void)
 #ifndef _WINDOWS
     /* BG fix 2000-03-19 use same erase buffer if not color switching. */
     if (dbuf_state->type == COLOR_SWITCH) {
-	if (erp == &erase[0]) {
+	if (erp == &erase[0])
 	    erp = &erase[1];
-	} else {
+	else
 	    erp = &erase[0];
-	}
     }
 #endif
     SET_FG(colors[BLACK].pixel);
@@ -275,9 +273,8 @@ void Rectangle_start(void)
 {
     int i;
 
-    for (i = 0; i < maxColors; i++) {
+    for (i = 0; i < maxColors; i++)
 	num_rect[i] = 0;
-    }
 }
 
 void Rectangle_end(void)
@@ -311,9 +308,8 @@ void Arc_start(void)
 {
     int i;
 
-    for (i = 0; i < maxColors; i++) {
+    for (i = 0; i < maxColors; i++)
 	num_arc[i] = 0;
-    }
 }
 
 void Arc_end(void)
@@ -352,9 +348,8 @@ void Segment_start(void)
 {
     int i;
 
-    for (i = 0; i < maxColors; i++) {
+    for (i = 0; i < maxColors; i++)
 	num_seg[i] = 0;
-    }
 }
 
 void Segment_end(void)
@@ -405,9 +400,8 @@ int Handle_start(long server_loops)
     num_vfuel = 0;
     num_vbase = 0;
     num_vdecor = 0;
-    for (i = 0; i < DEBRIS_TYPES; i++) {
+    for (i = 0; i < DEBRIS_TYPES; i++)
 	num_debris[i] = 0;
-    }
 
     damaged = 0;
     destruct = 0;
@@ -442,10 +436,10 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
 		u_byte *newNumItems, int newCurrentTank,
 		int newFuelSum, int newFuelMax, int newPacketSize)
 {
-    pos.x = x;
-    pos.y = y;
-    vel.x = vx;
-    vel.y = vy;
+    FOOpos.x = x;
+    FOOpos.y = y;
+    FOOvel.x = vx;
+    FOOvel.y = vy;
     heading = newHeading;
     displayedPower = newPower;
     displayedTurnspeed = newTurnspeed;
@@ -457,34 +451,28 @@ int Handle_self(int x, int y, int vx, int vy, int newHeading,
     autopilotLight = newAutopilotLight;
     memcpy(numItems, newNumItems, NUM_ITEMS * sizeof(u_byte));
     fuelCurrent = newCurrentTank;
-    if (newFuelSum > fuelSum && selfVisible != 0) {
+    if (newFuelSum > fuelSum && selfVisible)
 	fuelTime = FUEL_NOTIFY_TIME;
-    }
     fuelSum = newFuelSum;
     fuelMax = newFuelMax;
     selfVisible = 0;
-    if (newPacketSize + 16 < packet_size) {
+    if (newPacketSize + 16 < packet_size)
 	packet_size -= 16;
-    } else {
+    else
 	packet_size = newPacketSize;
-    }
 
-    world.x = pos.x - (ext_view_width / 2);
-    world.y = pos.y - (ext_view_height / 2);
+    world.x = FOOpos.x - (ext_view_width / 2);
+    world.y = FOOpos.y - (ext_view_height / 2);
     realWorld = world;
     if (BIT(Setup->mode, WRAP_PLAY)) {
-	if (world.x < 0 && world.x + ext_view_width < Setup->width) {
+	if (world.x < 0 && world.x + ext_view_width < Setup->width)
 	    world.x += Setup->width;
-	}
-	else if (world.x > 0 && world.x + ext_view_width >= Setup->width) {
+	else if (world.x > 0 && world.x + ext_view_width >= Setup->width)
 	    realWorld.x -= Setup->width;
-	}
-	if (world.y < 0 && world.y + ext_view_height < Setup->height) {
+	if (world.y < 0 && world.y + ext_view_height < Setup->height)
 	    world.y += Setup->height;
-	}
-	else if (world.y > 0 && world.y + ext_view_height >= Setup->height) {
+	else if (world.y > 0 && world.y + ext_view_height >= Setup->height)
 	    realWorld.y -= Setup->height;
-	}
     }
     return 0;
 }
@@ -634,8 +622,10 @@ int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
      * BG: XXX there was a bug here.  self was dereferenced at "self->id"
      * while self could be NULL here.
      */
-    if (!selfVisible && ((x == pos.x && y == pos.y) || (self && id == self->id))) {
+    if (!selfVisible
+	&& ((x == FOOpos.x && y == FOOpos.y) || (self && id == self->id))) {
 	int radarx, radary;
+
         eyesId = id;
 	eyes = Other_by_id(eyesId);
 	if (eyes != NULL)
@@ -1070,35 +1060,34 @@ void Init_scale_array(void)
 
     for (i = 1; i < NELEM(scaleArray); i++) {
 	n = (int)floor(i * scaleMultFactor + 0.5);
-	if (n == 0) {
+	if (n == 0)
 	    /* keep values for non-zero indices at least 1. */
 	    scaleArray[i] = 1;
-	} else {
+	else
 	    break;
-	}
     }
     start = i;
 
     for (i = NELEM(scaleArray) - 1; i >= 0; i--) {
 	n = (int)floor(i * scaleMultFactor + 0.5);
-	if (n > 32767) {
+	if (n > 32767)
 	    /* keep values lower or equal to max short. */
 	    scaleArray[i] = 32767;
-	} else {
+	else
 	    break;
-	}
     }
     end = i;
 
-    for (i = start; i <= end; i++) {
+    for (i = start; i <= end; i++)
 	scaleArray[i] = (int)floor(i * scaleMultFactor + 0.5);
-    }
 
-    /* verify correct calculations, because of reported gcc optimization bugs. */
+    /*
+     * verify correct calculations, because of reported gcc optimization
+     * bugs.
+     */
     for (i = 1; i < NELEM(scaleArray); i++) {
-	if (scaleArray[i] < 1) {
+	if (scaleArray[i] < 1)
 	    break;
-	}
     }
 
     if (i != SCALE_ARRAY_SIZE) {

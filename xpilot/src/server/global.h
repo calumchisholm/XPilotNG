@@ -58,9 +58,6 @@ typedef struct {
  * Global data.
  */
 
-extern DFLOAT		tbl_sin[];
-extern DFLOAT		tbl_cos[];
-
 #ifdef SERVER
 #define FPS		framesPerSecond
 #define NumObjs		(ObjCount + 0)
