@@ -1943,14 +1943,12 @@ static void Config_save_keys(FILE *fp)
 	key = keyDefs[i].key;
 
 	/* try and see if we have already saved this key. */
-	if (Config_find_key(key, 0, i, &j) == true) {
+	if (Config_find_key(key, 0, i, &j) == true)
 	    /* yes, saved this one before.  skip it now. */
 	    continue;
-	}
 
-	if ((str = XKeysymToString(ks)) == NULL) {
+	if ((str = XKeysymToString(ks)) == NULL)
 	    continue;
-	}
 
 	if ((res = Get_keyResourceString(key)) != NULL) {
 	    strlcpy(buf, str, sizeof(buf));
@@ -1959,8 +1957,8 @@ static void Config_save_keys(FILE *fp)
 	    while (Config_find_key(key, j + 1, maxKeyDefs, &j) == true) {
 		ks = keyDefs[j].keysym;
 		if ((str = XKeysymToString(ks)) != NULL) {
-		    strcat(buf, " ");
-		    strcat(buf, str);
+		    strlcat(buf, " ", sizeof(buf));
+		    strlcat(buf, str, sizeof(buf));
 		}
 	    }
 	    Config_save_resource(fp, res, buf);
@@ -1975,7 +1973,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     FILE		*fp = NULL;
     char		buf[512];
 #ifndef _WINDOWS	/* Windows does no file handling on its own. */
-	char	oldfile[PATH_MAX + 1],
+    char		oldfile[PATH_MAX + 1],
 			newfile[PATH_MAX + 1];
 
     *strptr = "Saving...";
@@ -1988,9 +1986,8 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
 	return 1;
     }
     if ((fp = fopen(oldfile, "r")) != NULL) {
-	while (fgets(buf, sizeof buf, fp)) {
+	while (fgets(buf, sizeof buf, fp))
 	    Xpilotrc_add(buf);
-	}
 	fclose(fp);
     }
     sprintf(newfile, "%s.new", oldfile);
