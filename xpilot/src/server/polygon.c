@@ -246,7 +246,7 @@ int P_start_target(int team, int ind)
     groups[current_group].hit_mask = HITMASK(team);
     groups[current_group].hit_func = NULL /*Target_hit_func*/;
     groups[current_group].item_id = ind;
-    World.targets[ind].group_id = current_group;
+    World.targets[ind].group = current_group;
     return current_group;
 }
 
@@ -263,7 +263,7 @@ int P_start_cannon(int team, int ind)
     groups[current_group].hit_mask = 0 /*HITMASK(team)*/;
     groups[current_group].hit_func = Cannon_hit_func;
     groups[current_group].item_id = ind;
-    World.cannon[ind].group_id = current_group;
+    World.cannon[ind].group = current_group;
     return current_group;
 }
 
@@ -349,13 +349,26 @@ int P_get_poly_id(const char *s)
     return -1;
 }
 
+/* kps - which group numbers are ok ???
+ * Is it 1 to num_groups ???
+ */
 void P_grouphack(int type, void (*f)(int))
 {
-    int i;
+    int group;
 
-    for (i = 0; i <= num_groups; i++) {
-	if (groups[i].type == type) {
-	    (*f)(groups[i].item_id);
+    for (group = 0; group <= num_groups; group++) {
+	if (groups[group].type == type) {
+	    (*f)(groups[group].item_id);
 	}
     }
 }
+
+void P_set_hitmask(int group, int hitmask)
+{
+    if (group < 0 || group > num_groups) {
+	xpprintf("P_set_hitmask: BUG: group out of range.\n");
+	return;
+    }
+    groups[group].hit_mask = hitmask;
+}
+

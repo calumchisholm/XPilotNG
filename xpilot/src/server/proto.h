@@ -505,6 +505,7 @@ int P_get_bmp_id(const char *s);
 int P_get_edge_id(const char *s);
 int P_get_poly_id(const char *s);
 void P_grouphack(int type, void (*f)(int));
+void P_set_hitmask(int group, int hitmask);
 
 /*
  * Prototypes for showtime.c

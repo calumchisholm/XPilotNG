@@ -354,6 +354,8 @@ bool Balltarget_hit_func(struct group *group, struct move *move)
 
 int Cannon_hitmask(cannon_t *cannon)
 {
+    if (cannon->dead_time)
+	return ALL_BITS;
     return 0;
 }
 
@@ -366,11 +368,11 @@ void Cannon_restore_on_map(int ind)
     by = CLICK_TO_BLOCK(cannon->pos.cy);
     World.block[bx][by] = CANNON;
 
-    groups[cannon->group_id].hit_mask = Cannon_hitmask(cannon);
-
     cannon->conn_mask = 0;
     cannon->last_change = frame_loops;
     cannon->dead_time = 0;
+
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
 
 void Cannon_remove_from_map(int ind)
@@ -381,11 +383,11 @@ void Cannon_remove_from_map(int ind)
     cannon->dead_time = cannonDeadTime * TIME_FACT;
     cannon->conn_mask = 0;
 
-    groups[cannon->group_id].hit_mask = ALL_BITS;
-
     bx = CLICK_TO_BLOCK(cannon->pos.cx);
     by = CLICK_TO_BLOCK(cannon->pos.cy);
     World.block[bx][by] = SPACE;
+
+    P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
 
 
@@ -440,6 +442,8 @@ bool Cannon_hit_func(struct group *group, struct move *move)
 
 int Target_hitmask(target_t *targ)
 {
+    if (targ->dead_time)
+	return ALL_BITS;
     if (targetTeamCollision)
 	return 0;
     return HITMASK(targ->team);
@@ -449,7 +453,7 @@ void Target_set_hitmask(int ind)
 {
     target_t *targ = &World.targets[ind];
 
-    groups[targ->group_id].hit_mask = Target_hitmask(targ);
+    P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
 void Target_init(void)
@@ -466,13 +470,13 @@ void Target_restore_on_map(int ind)
     by = CLICK_TO_BLOCK(targ->pos.cy);
     World.block[bx][by] = TARGET;
 
-    groups[targ->group_id].hit_mask = Target_hitmask(targ);
-
     targ->conn_mask = 0;
     targ->update_mask = (unsigned)-1;
     targ->last_change = frame_loops;
     targ->dead_time = 0;
     targ->damage = TARGET_DAMAGE;
+
+    P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
 void Target_remove_from_map(int ind)
@@ -485,8 +489,6 @@ void Target_remove_from_map(int ind)
     targ->damage = TARGET_DAMAGE;
     targ->dead_time = targetDeadTime * TIME_FACT;
 
-    groups[targ->group_id].hit_mask = ALL_BITS;
-
     /*
      * Destroy target.
      * Turn it into a space to simplify other calculations.
@@ -494,6 +496,9 @@ void Target_remove_from_map(int ind)
     bx = CLICK_TO_BLOCK(targ->pos.cx);
     by = CLICK_TO_BLOCK(targ->pos.cy);
     World.block[bx][by] = SPACE;
+
+    /*P_set_hitmask(targ->group, ALL_BITS);*/
+    P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
 #if 0
