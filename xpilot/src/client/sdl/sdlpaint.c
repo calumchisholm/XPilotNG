@@ -346,11 +346,12 @@ void Paint_score_start(void)
 	strlcat(headingStr, " NAME", sizeof(headingStr));
     }
     SDL_FillRect(scoreListWin.surface, NULL, 0);
-    header = TTF_RenderText_Solid(scoreListFont, headingStr, fg);
+    header = TTF_RenderText_Blended(scoreListFont, headingStr, fg);
     if (header == NULL) {
 	error("scorelist header rendering failed: %s", SDL_GetError());
 	return;
     }
+    SDL_SetAlpha(header, 0, 0);
     SDL_BlitSurface(header, NULL, scoreListWin.surface, &dst);
     SDL_FreeSurface(header);
 }
@@ -462,12 +463,12 @@ void Paint_score_entry(int entry_num, other_t *other, bool is_team)
     	    	    	(color >> 16) & 255 ,
     	    	    	(color >> 8) & 255  ,
     	    	    	color & 255 	    };
-
-    line = TTF_RenderText_Solid(scoreListFont, label, fg);
+    line = TTF_RenderText_Blended(scoreListFont, label, fg);
     if (line == NULL) {
 	error("scorelist rendering failed: %s", SDL_GetError());
 	return;
     }
+    SDL_SetAlpha(line, 0, 0);
     SDL_BlitSurface(line, NULL, scoreListWin.surface, &dst);
     SDL_FreeSurface(line);
 }
