@@ -278,7 +278,6 @@ void Make_item(int cx, int cy,
 	       int vx, int vy,
 	       int item, int num_per_pack,
 	       long status);
-/*void Explode(int ind);*/
 void Explode_fighter(player *pl);
 void Throw_items(player *pl);
 void Detonate_items(player *pl);
@@ -310,7 +309,6 @@ void Cannon_dies(cannon_t *cannon, player *pl);
  * Prototypes for command.c
  */
 void Handle_player_command(player *pl, char *cmd);
-int Get_player_index_by_name(char *name);
 player *Get_player_by_name(char *str, int *error, char **errorstr_p);
 
 /*
