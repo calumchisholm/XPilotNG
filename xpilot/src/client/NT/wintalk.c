@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -42,7 +42,7 @@ char talk_version[] = VERSION;
 
 #ifndef	lint
 static char sourceid[] =
-    "@(#)$Id$";
+    "@(#)";
 #endif
 
 

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -23,7 +23,6 @@
  */
 #include "../../common/NT/winX.h"
 #include "../bitmaps.h"
-#include "winbitmap.h"
 
 #include "../gfx2d.h"
 #include "../../common/NT/winX_.h"
@@ -45,7 +44,7 @@ HDC hDC;
 
 xp_picture_t radar_colors;
 
-extern int blockBitmaps;
+extern int texturedObjects;
 
 void delete_bitmaps()
 {
@@ -256,5 +255,56 @@ void Winpaint_world_radar()
 	Paint_radar_block(xi, yi, targetRadarColor);
     }
 }
+
+void Block_bitmap_paint_fuel_slice(Drawable d, int type, int x, int y, int width, int height, int image, int size) 
+{
+
+    HDC		hDC = xid[d].hwnd.hBmpDC;
+
+    SelectObject(itemsDC, (HBITMAP)xp_pixmaps[type].bitmaps[image].bitmap);
+    
+    if (bHasPal)
+    {
+	SelectPalette(itemsDC, myPal, FALSE);
+	RealizePalette(itemsDC);
+    }
+    
+    BitBlt(hDC, x, y, width, size, itemsDC, 0, 0, SRCPAINT);
+    
+}
+
+
+void Block_bitmap_paint_meter(Drawable d, int type, int x, int y, int width, int height, int size) 
+{
+    HDC		hDC = xid[d].hwnd.hBmpDC;
+
+    SelectObject(itemsDC, (HBITMAP)xp_pixmaps[type].bitmaps[1].bitmap);
+
+    if (bHasPal)
+    {
+	SelectPalette(itemsDC, myPal, FALSE);
+	RealizePalette(itemsDC);
+    }
+    
+    BitBlt(hDC, x, y, size, height, itemsDC, 0, 0, SRCPAINT);
+
+    SelectObject(itemsDC, (HBITMAP)xp_pixmaps[type].bitmaps[0].bitmap);
+
+    if (bHasPal)
+    {
+	SelectPalette(itemsDC, myPal, FALSE);
+	RealizePalette(itemsDC);
+    }
+
+    BitBlt(hDC, x + size, y, width - size, height, itemsDC, size, 0, SRCPAINT);
+
+}
+/*
+void paintItemSymbol(unsigned char type, Drawable d, GC gc, int x, int y, int color)
+{
+    PaintBitmap(d, BM_ALL_ITEMS, x, y, WINSCALE(16), WINSCALE(16), type); 
+//    PaintBitmap(d, BM_ALL_ITEMS, x, y, 16, 16, type); 
+}
+*/
 
 #endif

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,7 +28,7 @@
 *  This file is the standard splash component from MSDEV enhanced to allow	*
 *  displaying progress messages in the lower left corner.					*
 *																			*
-*  $Id$							*
+*  							*
 \***************************************************************************/
 // CG: This file was added by the Splash Screen component.
 
@@ -248,6 +248,6 @@ void CSplashWnd::ShowMessage(const CString& cs)
 	c_pSplashWnd->ReleaseDC(dc);
 
 #ifdef	_DEBUG
-	Sleep(1000);
+//	Sleep(1000);
 #endif
 }

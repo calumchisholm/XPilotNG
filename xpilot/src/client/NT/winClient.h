@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -27,7 +27,7 @@
 *																			*
 *  interface from the MFC poo to the xpilot "C" source.						*
 *																			*
-*  $Id$						*
+*  						*
 \***************************************************************************/
 
 #ifndef	_INC_WINDOWS

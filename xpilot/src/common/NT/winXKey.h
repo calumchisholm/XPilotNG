@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,7 +28,7 @@
 *  This file contains X11 style kb definitions for Winodoze.				*
 *  These all come from Xutil.h												*
 *																			*
-*  $Id$							*
+*  							*
 \***************************************************************************/
 #ifndef	_WINXKEY_H_
 #define	_WINXKEY_H_

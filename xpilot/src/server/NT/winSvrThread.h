@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,7 +25,7 @@
 /***************************************************************************\
 *  winSvrThread.h - The worker thread for the XPilot server on NT			*
 *																			*
-*  $Id$					*
+*  					*
 \***************************************************************************/
 #ifndef	_WINSVRTHREAD_H_
 #define	_WINSVRTHREAD_H_
@@ -49,6 +49,7 @@ struct CServerThreadInfo
 #define	WM_MSGAVAILABLE		(WM_APP+1)
 #define	WM_UPDATESCORES		(WM_APP+2)
 #define	WM_STARTTIMER		(WM_APP+3)
+#define	WM_SERVERKILLED		(WM_APP+4)
 
 
 // Controlling function for the worker thread.

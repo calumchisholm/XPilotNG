@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,7 +28,7 @@
 *  This file is the private interface to the Winodoze -> X11 translator.	*
 *  Here we hide the gory Windoze details from X11							*
 *																			*
-*  $Id$							*
+*  							*
 \***************************************************************************/
 #ifndef	_WINX__H_
 #define	_WINX__H_
@@ -70,7 +70,7 @@ struct	XID_GC {
 	XID_HEAD
 	int		xidhwnd;
 	HFONT	hfont;
-	XGCValues xgcv;
+    XGCValues xgcv;
 };
 typedef struct	XID_GC XID_GC;
 
@@ -119,7 +119,7 @@ extern	HINSTANCE		hInstance;
 extern	BOOL			bWinNT;				// need this 'cause Win95 can't draw a simple circle
 extern	HFONT			hFixedFont;
 extern	HPALETTE		myPal;
-extern	LOGPALETTE*		myLogPal;
+extern  LOGPALETTE		*myLogPal;
 
 extern	Window			rootWindow;
 
@@ -137,8 +137,8 @@ extern	BOOL AngleArc2(HDC hdc, int X, int Y, DWORD dwRadius,
 // Score window colour
 #define	SCOREWIN		2
 
-extern XID GetFreeXid();
-extern void WinXFree(XID xid);
+extern	XID	GetFreeXid();
+extern	void WinXFree(XID xid);
 extern void WinXSelectPen(int gc);
 extern void WinXSelectBrush(int gc);
 extern COLORREF WinXPColour(int index);

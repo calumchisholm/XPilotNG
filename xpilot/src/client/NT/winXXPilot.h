@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -27,7 +27,7 @@
 *																			*
 *  This file contains the private winX definitions for the XPilot client	*
 *																			*
-*  $Id$							*
+*  							*
 \***************************************************************************/
 #ifndef	_WINXPILOT_H_
 #define	_WINXPILOT_H_

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,7 +25,7 @@
 /***************************************************************************\
 *  xpilotsDlg.cpp - The main dialog wrapper for xpilots						*
 *																			*
-*  $Id$				*
+*  				*
 \***************************************************************************/
 
 #include "stdafx.h"
@@ -149,6 +149,7 @@ void CXpilotsDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CXpilotsDlg)
 	DDX_Control(pDX, IDC_START_SERVER, m_start_server);
+	DDX_Control(pDX, IDC_CONNECT_CLIENT, m_connectClient);
 	//}}AFX_DATA_MAP
 }
 
@@ -159,6 +160,7 @@ BEGIN_MESSAGE_MAP(CXpilotsDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_CONFIGURE, OnConfigure)
 	ON_BN_CLICKED(IDC_START_SERVER, OnStartServer)
+	ON_BN_CLICKED(IDC_CONNECT_CLIENT, OnConnectClient)
 	ON_WM_SIZE()
 	ON_WM_CLOSE()
 	ON_WM_HELPINFO()
@@ -166,6 +168,7 @@ BEGIN_MESSAGE_MAP(CXpilotsDlg, CDialog)
 	ON_MESSAGE(WM_MSGAVAILABLE, OnMsgAvailable)
 	ON_MESSAGE(WM_UPDATESCORES, OnUpdateScores)
 	ON_MESSAGE(WM_STARTTIMER, OnStartTimer)
+	ON_MESSAGE(WM_SERVERKILLED, OnServerKilled)
 	ON_MESSAGE(WM_GETHOSTNAME, OnGetHostName)
 END_MESSAGE_MAP()
 
@@ -228,6 +231,7 @@ BOOL CXpilotsDlg::OnInitDialog()
 	if (!(rect.left = rect.right == -1))	// only move window to valid coordinates
 		MoveWindow(rect.left, rect.top, width, height);
 
+	m_connectClient.EnableWindow(FALSE);		// can't connect until we start the server
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -413,13 +417,28 @@ void CXpilotsDlg::OnStartServer()
 		m_pServerWorkerThread = NULL;
 		m_start_server.SetWindowText("&Start Server");
 		m_start_server.EnableWindow(FALSE);				/* can't restart yet... */
+		m_connectClient.EnableWindow(FALSE);		// can't connect to this server anymore
 		server_running = FALSE;
 
 	}
 
 }
 
+void CXpilotsDlg::OnConnectClient() 
+{
+	STARTUPINFO			si;
+	PROCESS_INFORMATION	pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
 
+	char	cline[] = "XPilot.exe 127.0.0.1";
+	if (!CreateProcess(NULL, cline, NULL, NULL, false,
+		NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi))
+	{
+		AfxMessageBox("Failed to create process for XPilot.exe");
+	}
+}
 
 BOOL CXpilotsDlg::DestroyWindow() 
 {
@@ -466,7 +485,7 @@ BOOL CXpilotsDlg::PreTranslateMessage(MSG* pMsg)
 extern "C" int MsgAvail0;
 extern "C" int MsgAvail1;
 extern "C" int NumPlayers;
-//extern "C" int NumRobots;
+extern "C" int NumRobots;
 extern "C" int NumPseudoPlayers;
 afx_msg LONG CXpilotsDlg::OnMsgAvailable(UINT which, LONG s)
 {
@@ -496,8 +515,8 @@ afx_msg LONG CXpilotsDlg::OnMsgAvailable(UINT which, LONG s)
 afx_msg LONG CXpilotsDlg::OnUpdateScores(UINT unused, LONG unused1)
 {
 	char	st[10];
-	sprintf(st, "%d", NumPlayers - /*NumRobots -*/ NumPseudoPlayers);
-	TRACE("OnUpdateScores <%s>\n", st);
+	sprintf(st, "%d", NumPlayers - NumRobots - NumPseudoPlayers);
+	//TRACE("OnUpdateScores <%s>\n", st);
 	SendDlgItemMessage(IDC_PLAYERCOUNT, WM_SETTEXT, 0, (LPARAM)st);
 	return(0);
 
@@ -507,9 +526,19 @@ afx_msg LRESULT CXpilotsDlg::OnGetHostName(WPARAM wParam, LPARAM lParam)
 	m_pServerWorkerThread->PostThreadMessage(WM_GETHOSTNAME, wParam, lParam);
 	return(0);
 }
+
 afx_msg LONG CXpilotsDlg::OnStartTimer(UINT unused, LONG fps)
 {
 	gTimer= ::SetTimer(NULL, 0, 1000/fps, (TIMERPROC)ServerThreadTimerProc);
+	m_connectClient.EnableWindow(TRUE);
+	return(0);
+}
+
+afx_msg LONG CXpilotsDlg::OnServerKilled(UINT, LONG)
+{
+	m_start_server.SetWindowText("&Start Server");
+	m_start_server.EnableWindow(FALSE);				/* can't restart yet... */
+	server_running = FALSE;
 	return(0);
 }
 

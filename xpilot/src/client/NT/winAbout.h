@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -26,10 +26,8 @@
 *  winAbout.h : CAboutDlg dialog used for XPilotNT About					*
 *																			*
 *  This file contains the Windows about dialog and scrolling credits box.	*
-*  $Id$						*
+*  						*
 \***************************************************************************/
-
-#include "resource.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CCredits window
@@ -98,6 +96,7 @@ public:
 // Implementation
 protected:
 	//{{AFX_MSG(CAboutDlg)
+	virtual BOOL OnInitDialog();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

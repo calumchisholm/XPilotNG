@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -31,9 +31,11 @@
 
 #include "winX.h"
 #include "winX_.h"
+#include "draw.h"
 
 #include "../error.h"
 #include "../../client/NT/winClient.h" 	/* This needs to be removed */
+
 const int	top = 0;
 /*****************************************************************************/
 XFillRectangle(Display* dpy, Drawable d, GC gc, int x, int y, 
@@ -96,7 +98,6 @@ XDrawLine(Display* dpy, Drawable d, GC gc, int x1, int y1, int x2, int y2)
 XDrawLines(Display* dpy, Drawable d, GC gc, XPoint* points,
 				   int npoints, int mode)
 {
-
 	int	i = 0;
 	HDC		hDC = xid[d].hwnd.hBmpDC;
 
@@ -124,7 +125,6 @@ XDrawLines(Display* dpy, Drawable d, GC gc, XPoint* points,
 			LineTo(hDC, points->x, points->y);
 		}
 	}
-
 	return(0);
 }
 
@@ -133,7 +133,7 @@ XDrawSegments(Display* dpy, Drawable d, GC gc,
 					  XSegment* segments, int nsegments)
 {
 	int i;
-	HDC hDC = xid[d].hwnd.hBmpDC;
+	HDC		hDC = xid[d].hwnd.hBmpDC;
 
 	for (i=0; i<nsegments; i++, segments++)
 	{
@@ -243,7 +243,7 @@ XDrawArc(Display* dpy, Drawable d, GC gc, int x, int y,
 				 unsigned int width, unsigned int height,
 				 int angle1, int angle2)
 {
-	HDC hDC = xid[d].hwnd.hBmpDC;
+	HDC		hDC = xid[d].hwnd.hBmpDC;
 	MoveToEx(hDC, x+width, y+height/2, NULL);
 	if (bWinNT)
 		AngleArc (hDC, x+width/2, y+height/2, width/2, (float)0.0, (float)(angle2/64.0));
@@ -352,7 +352,7 @@ XTextWidth(XFontStruct* font, const char* string, int length)
 XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
 {
 	XGCValues *xgcv;
-	if (xid[gc].type != XIDTYPE_HDC) return -1;
+	if (xid[gc].type != XIDTYPE_HDC) return 0;
 
 	xgcv = &xid[gc].hgc.xgcv;
 
@@ -380,7 +380,50 @@ XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values)
 
 	if (valuemask & (GCForeground | GCLineWidth | GCLineStyle)) WinXSelectPen(gc);
 
-	return(0);
+	return(1);
+}
+
+/*****************************************************************************/
+int XGetGCValues(Display *dpy, GC gc, unsigned long valuemask, XGCValues *values)
+{
+	XGCValues *xgcv;
+	if (xid[gc].type != XIDTYPE_HDC) return 0;
+
+	xgcv = &xid[gc].hgc.xgcv;
+
+	if (valuemask & GCFunction) values->function = xgcv->function;
+	if (valuemask & GCPlaneMask) values->plane_mask = xgcv->plane_mask;
+	if (valuemask & GCForeground) values->foreground= xgcv->foreground;
+	if (valuemask & GCBackground) values->background = xgcv->background;
+	if (valuemask & GCLineWidth) values->line_width = xgcv->line_width;
+	if (valuemask & GCLineStyle) values->line_style = xgcv->line_style;
+	if (valuemask & GCCapStyle) values->cap_style = xgcv->cap_style;
+	if (valuemask & GCJoinStyle) values->join_style = xgcv->join_style;
+	if (valuemask & GCFillStyle) values->fill_style = xgcv->fill_style;
+	if (valuemask & GCFillRule) values->fill_rule = xgcv->fill_rule;
+	if (valuemask & GCTile) values->tile = xgcv->tile;
+	if (valuemask & GCStipple) values->stipple = xgcv->stipple;
+	if (valuemask & GCTileStipXOrigin) values->ts_x_origin = xgcv->ts_x_origin;
+	if (valuemask & GCTileStipYOrigin) values->ts_y_origin = xgcv->ts_y_origin;
+	if (valuemask & GCFont) values->font = xgcv->font;
+	if (valuemask & GCSubwindowMode) values->subwindow_mode = xgcv->subwindow_mode;
+	if (valuemask & GCGraphicsExposures) values->graphics_exposures = xgcv->graphics_exposures;
+	if (valuemask & GCClipXOrigin) values->clip_x_origin = xgcv->clip_x_origin;
+	if (valuemask & GCClipYOrigin) values->clip_y_origin = xgcv->clip_y_origin;
+	if (valuemask & GCDashOffset) values->dash_offset = xgcv->dash_offset;
+	if (valuemask & GCArcMode) values->arc_mode = xgcv->arc_mode;
+
+
+	if(valuemask & GCFunction)
+	{
+		values->function = GXcopy;
+	}
+	if(valuemask & GCBackground)
+	{
+		values->background = BLACK; /* always black */
+	}
+
+	return 1;
 }
 
 /*****************************************************************************/
@@ -738,13 +781,12 @@ XSetForeground(Display* dpy, GC gc, unsigned long foreground)
 	}
 #endif
 #endif
+	//if (xid[gc].type == XIDTYPE_HDC) {
 
-	if (xid[gc].type == XIDTYPE_HDC) {
 		xid[gc].hgc.xgcv.foreground = foreground;
 		WinXSelectPen(gc);
 		WinXSelectBrush(gc);
-
-	} else {
+/*	} else {
 		// ouch, terrible hack, but fixing this properly would be difficult
 		HDC hDC;
 		extern HPEN pens[256][10][3];
@@ -753,7 +795,7 @@ XSetForeground(Display* dpy, GC gc, unsigned long foreground)
 		SelectObject(hDC, pens[foreground][0][0]);
 		SelectObject(hDC, brushes[foreground]);
 	}
-
+*/
 	return(0);
 }
 
@@ -945,5 +987,11 @@ XDefineCursor(Display* d, Window w, Cursor c)
 int	DefaultDepth(Display* d, int screen)
 {
 	return(8);		// assume 256 colors (bad assumption but OK for now)
+}
+
+/*****************************************************************************/
+int XSync(Display *display, Bool discard)
+{
+	return 0;
 }
 

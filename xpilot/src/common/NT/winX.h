@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,7 +28,7 @@
 *  This file is the public interface to the Winodoze -> X11 translator.		*
 *  Any function that has a unix man page belongs in this file.				*
 *																			*
-*  $Id$							*
+*  							*
 \***************************************************************************/
 #ifndef	_WINX_H_
 #define	_WINX_H_
@@ -278,6 +278,7 @@ typedef	struct XColor XColor;
 #define Nonconvex		1	/* no paths intersect, but not convex */
 #define Convex			2	/* wholly convex */
 
+
 #define GCFunction              (1L<<0)
 #define GCPlaneMask             (1L<<1)
 #define GCForeground            (1L<<2)
@@ -505,6 +506,7 @@ extern	XFillRectangle(Display* dpy, Drawable d, GC gc, int x, int y,
 extern	XFillRectangles(Display* dpy, Drawable d, GC gc, 
 						XRectangle* rects, int nrectangles);
 extern	XChangeGC(Display* dpy, GC gc, unsigned long valuemask, XGCValues* values);
+extern	int XGetGCValues(Display *display, GC gc, unsigned long valuemask, XGCValues *values_return);
 extern	XSetLineAttributes(Display* dpy, GC gc, unsigned int line_width,
 						   int line_style, int cap_style, int join_style);
 extern	XCopyArea(Display* dpy, Drawable src, Drawable dest, GC gc,
@@ -586,6 +588,11 @@ extern	XCheckMaskEvent(Display* d, long event_mask, XEvent* event_return);
 #define	DefaultScreen(_dpy)		(0)
 
 int		DefaultDepth(Display* d, int screen);
+
+#define ConnectionNumber(_dpy)		(0)
+
+extern XFlush(Display *display);
+extern XSync(Display *display, Bool discard);
 
 #ifdef	__cplusplus
 };

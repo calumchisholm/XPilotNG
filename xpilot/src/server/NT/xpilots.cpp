@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -30,6 +30,8 @@
 #include "stdafx.h"
 #include "xpilots.h"
 #include "xpilotsDlg.h"
+
+extern "C" bool Parser(int argc, char **argv);
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -67,6 +69,23 @@ CXpilotsApp theApp;
 
 BOOL CXpilotsApp::InitInstance()
 {
+	if (!strncmp(m_lpCmdLine, "/ServerOpts", 11))
+	{
+		char* s = strdup(m_lpCmdLine);
+		char* seps = " ,\t\n";
+		char* token = strtok(s, seps);	// skip the /ServerOpts
+		token = strtok(NULL, seps);		// get the file name
+		char* fname = "ServerOpts.txt";
+		if (token && strlen(token))
+			fname = token;
+		char* parms[2] = {"XPilotServer", "-help"};
+		FILE* fp = freopen(fname, "w", stdout);
+		Parser(2, parms);
+		fclose(fp);
+		free(s);
+		return(FALSE);
+
+	}
 	if (!AfxSocketInit())
 	{
 		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);

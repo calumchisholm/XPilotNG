@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -25,7 +25,7 @@
 /***************************************************************************\
 *  winNet.h - X11 to Windoze converter										*
 *																			*
-*  $Id$					*
+*  					*
 \***************************************************************************/
 
 #ifndef	_WINNET_H_

@@ -1,6 +1,6 @@
-/* $Id$
+/* 
  *
- * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-98 by
+ * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
@@ -28,7 +28,7 @@
 *  This file is mostly Win32 translations of the X calls that xpilot uses.	*
 *  Anything starting with WinX is a special wedge function that i needed	*
 *																			*
-*  $Id$						*
+*  						*
 \***************************************************************************/
 #include "winX.h"
 #include "windows.h"
@@ -36,6 +36,7 @@
 #include "winX_.h"
 #include "../../client/NT/winXThread.h"
 #include <math.h>
+#include <stdio.h>
 
 #include "../error.h"
 #include "../const.h"
@@ -63,11 +64,11 @@ LOGPALETTE*	myLogPal;
 HFONT		hFixedFont;
 
 HDC			itemsDC;		// for blitting items onto the screen
+
 XIDTYPE	xid[MAX_XIDS];
 
 BOOL	bWinNT = 0;				// need this 'cause Win95 can't draw a simple circle
 BOOL	drawPending = FALSE;	// try to throttle the deadly frame backup syndrome
-
 
 #define MAX_LINE_WIDTH 10
 HPEN pens[WINMAXCOLORS][MAX_LINE_WIDTH][3];
@@ -146,7 +147,6 @@ static void WinXDeleteDraw(int xidno)
 	xid[xidno].hwnd.hBmp = NULL;
 }
 
-
 static void WinXCreateBitmapForXid(HWND hwnd, XID xidno, int cx, int cy)
 {
 	HDC	hBmpDC, hDC = GetDC(hwnd);
@@ -181,6 +181,7 @@ static void WinXCreateBitmapForXid(HWND hwnd, XID xidno, int cx, int cy)
 	}
 //	if (xidno == (int)draw)
 //		WinXScaled(hBmpDC, cx, cy);
+
 
 
 	SelectPalette(hBmpDC, myPal, FALSE);
@@ -282,7 +283,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			button->x_root	= pt.x;
 			button->y_root	= pt.y;
 			button->button	= Button1;
-			xevent(event);
+			win_xevent(event);
 		}
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
@@ -301,7 +302,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			button->x		= LOWORD(lParam);
 			button->y		= HIWORD(lParam);
 			button->button	= Button1;
-			if (xevent(event) == -1)
+			if (win_xevent(event) == -1)
 			{
 				WinXExit();
 			}
@@ -329,7 +330,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			button->x_root	= pt.x;
 			button->y_root	= pt.y;
 			button->button	= Button2;
-			xevent(event);
+			win_xevent(event);
 		}
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
@@ -348,7 +349,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			button->x		= LOWORD(lParam);
 			button->y		= HIWORD(lParam);
 			button->button	= Button2;
-			if (xevent(event) == -1)
+			if (win_xevent(event) == -1)
 			{
 				WinXExit();
 			}
@@ -376,7 +377,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			button->x_root	= pt.x;
 			button->y_root	= pt.y;
 			button->button	= Button3;
-			xevent(event);
+			win_xevent(event);
 		}
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
@@ -395,7 +396,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			button->x		= LOWORD(lParam);
 			button->y		= HIWORD(lParam);
 			button->button	= Button3;
-			if (xevent(event) == -1)
+			if (win_xevent(event) == -1)
 			{
 				WinXExit();
 			}
@@ -410,8 +411,8 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		XID		i;
 		XAnyEvent*	enter = (XAnyEvent*)&event;
 
-		Trace("MouseMove in %d %d/%d %s:%d\n", xidno, 
-			LOWORD(lParam), HIWORD(lParam), xid[xidno].any.file, xid[xidno].any.line);
+		/* Trace("MouseMove in %d %d/%d %s:%d\n", xidno, 
+			LOWORD(lParam), HIWORD(lParam), xid[xidno].any.file, xid[xidno].any.line); */
 
 		enter->type			= LeaveNotify;
 		for (i=0; i<MAX_XIDS; i++)
@@ -421,7 +422,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			{
 				Trace("LeaveNotify %d %s:%d\n", xidno, xid[xidno].any.file, xid[xidno].any.line);
 				enter->window = i;
-				xevent(event);
+				win_xevent(event);
 				xid[i].hwnd.mouseover = FALSE;
 			}
 		}
@@ -434,7 +435,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			me->y = HIWORD(lParam);
 //			if (me->x != draw_width/2 && me->y != draw_height/2)
 			{
-				xevent(event);
+				win_xevent(event);
 //				SetCursorPos(draw_width/2, draw_height/2);
 			}
 		//	return(0);
@@ -446,7 +447,7 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 				Trace("EnterNotify %d %s:%d\n", xidno, xid[xidno].any.file, xid[xidno].any.line);
 				enter->type			= EnterNotify;
 				enter->window		= xidno;
-				xevent(event);
+				win_xevent(event);
 			}
 			xid[xidno].hwnd.mouseover = TRUE;
 		}
@@ -509,8 +510,9 @@ LRESULT	CALLBACK	WinXwindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 							expose->height	= rect.bottom-rect.top;
 							expose->count	= 0;
 							Trace("Expose %d %s:%d\n", xidno, xid[xidno].any.file, xid[xidno].any.line);
-							xevent(event);
+							win_xevent(event);
 						}
+
 						SelectPalette(hDC, myPal, FALSE);
 						RealizePalette(hDC);
 
@@ -578,26 +580,26 @@ static void InitWinXClass()
 void InitWinX(HWND hWnd)
 {
 	int		i;
-	char	s[80];
 	HDC		tDC = GetDC(hWnd);
 
-	COLORREF cols[] = {
-	RGB(0x00,0x00,0x00),
-	RGB(0xFF,0xFF,0xFF),
-	RGB(0x4E,0x7C,0xFF),
-	RGB(0xFF,0x3A,0x27),
-	RGB(0x33,0xBB,0x44),
-	RGB(0x99,0x22,0x00),
-	RGB(0xBB,0x77,0x00),
-	RGB(0xEE,0x99,0x00),
-	RGB(0x77,0x00,0x00),
-	RGB(0xCC,0x44,0x00),
-	RGB(0xDD,0x88,0x00),
-	RGB(0xFF,0xBB,0x11),
-	RGB(0x9F,0x9F,0x9F),
-	RGB(0x5F,0x5F,0x5F),
-	RGB(0xDF,0xDF,0xDF),
-	RGB(0x20,0x20,0x20)};
+    COLORREF cols[] = {
+	RGB(0x00, 0x00, 0x00),
+	RGB(0xFF, 0xFF, 0xFF),
+	RGB(0x4E, 0x7C, 0xFF),
+	RGB(0xFF, 0x3A, 0x27),
+	RGB(0x33, 0xBB, 0x44),
+	RGB(0x99, 0x22, 0x00),
+	RGB(0xBB, 0x77, 0x00),
+	RGB(0xEE, 0x99, 0x00),
+	RGB(0x77, 0x00, 0x00),
+	RGB(0xCC, 0x44, 0x00),
+	RGB(0xDD, 0x88, 0x00),
+	RGB(0xFF, 0xBB, 0x11),
+	RGB(0x9F, 0x9F, 0x9F),
+	RGB(0x5F, 0x5F, 0x5F),
+	RGB(0xDF, 0xDF, 0xDF),
+	RGB(0x20, 0x20, 0x20)
+    };
 
 	InitWinXClass();
 	xid[0].hwnd.hWnd = hWnd;
@@ -607,19 +609,20 @@ void InitWinX(HWND hWnd)
 
 	bWinNT = GetVersion() & 0x80000000 ? FALSE : TRUE;
 
-	maxColors = 16;
+    maxColors = 16;
 
-	myLogPal = malloc(sizeof(LOGPALETTE) + sizeof(PALETTEENTRY) * WINMAXCOLORS);
+    myLogPal = malloc(sizeof(LOGPALETTE) + sizeof(PALETTEENTRY) * WINMAXCOLORS);
 	myLogPal->palVersion = 0x300;
-	myLogPal->palNumEntries = maxColors;
-	for (i = 0; i < maxColors; i++) {
+    myLogPal->palNumEntries = maxColors;
+    for (i = 0; i < maxColors; i++) {
 		myLogPal->palPalEntry[i].peFlags = PC_RESERVED;
 		myLogPal->palPalEntry[i].peRed = GetRValue(cols[i]);
 		myLogPal->palPalEntry[i].peGreen = GetGValue(cols[i]);
 		myLogPal->palPalEntry[i].peBlue = GetBValue(cols[i]);
 	}
 	myPal = CreatePalette(myLogPal);
-	if (!myPal) error("Can't create palette");
+	if (!myPal)
+		error("Can't create palette");
 
     for (i=0; i<NUM_ITEMS; i++)
 	{
@@ -647,8 +650,8 @@ void WinXFree(XID i)
 
 void WinXShutdown()
 {
-	XID		i;
-	int j, k;
+	XID	i;
+	int	j, k;
 
 	free(myLogPal);
 	for (i=0; i<MAX_XIDS; i++)
@@ -656,13 +659,14 @@ void WinXShutdown()
 		WinXFree(i);
 	}
 
-	for (i = 0; i < WINMAXCOLORS; i++)
-	{
-		if (brushes[i]) DeleteObject(brushes[i]);
+	for (i = 0; i < WINMAXCOLORS; i++) {
+		if (brushes[i])
+			DeleteObject(brushes[i]);
 
 		for (j = 0; j < MAX_LINE_WIDTH; j++) {
 			for (k = 0; k < 3; k++) {
-				if (pens[i][j][k]) DeleteObject(pens[i][j][k]);
+				if (pens[i][j][k])
+					DeleteObject(pens[i][j][k]);
 			}
 		}
 	}
@@ -670,28 +674,27 @@ void WinXShutdown()
 
 void WinXSelectPen(int gc)
 {
-	XGCValues *xgcv;
-	HDC hDC;
-	HPEN hPen;
+    XGCValues *xgcv;
+    HDC hDC;
+	HPEN	hPen;
 
-	xgcv = &xid[gc].hgc.xgcv;
-	hDC = xid[xid[gc].hgc.xidhwnd].hwnd.hBmpDC;
-	hPen = pens[xgcv->foreground][xgcv->line_width][xgcv->line_style];
+    xgcv = &xid[gc].hgc.xgcv;
+    hDC = xid[xid[gc].hgc.xidhwnd].hwnd.hBmpDC;
+    hPen = pens[xgcv->foreground][xgcv->line_width][xgcv->line_style];
 
-	if (!hPen) {
+    if (!hPen) {
 
 		int styleMap[] = { PS_SOLID, PS_DOT, PS_DASHDOT };
 
 		hPen = CreatePen(
-			styleMap[xgcv->line_style], 
+			styleMap[xgcv->line_style],
 			xgcv->line_width, 
 			WinXPColour(xgcv->foreground));
 
-		if (!hPen) hPen = (HPEN)GetStockObject(WHITE_PEN);
+		if (!hPen) hPen = (HPEN) GetStockObject(WHITE_PEN);
 
 		pens[xgcv->foreground][xgcv->line_width][xgcv->line_style] = hPen;
 	}
-
 	SelectObject(hDC, hPen);
 }
 
@@ -712,7 +715,6 @@ void WinXSelectBrush(int gc)
 	SelectObject(xid[xid[gc].hgc.xidhwnd].hwnd.hBmpDC,
 		WinXGetBrush(xid[gc].hgc.xgcv.foreground));
 }
-
 
 
 ////////////////////////////////////////////////////////
@@ -939,7 +941,7 @@ void WinXResize(void)
 	}
 }
 
-void PaintWinClient()
+void	PaintWinClient()
 {
 	RECT	rect;
 	static int updates = 0;
