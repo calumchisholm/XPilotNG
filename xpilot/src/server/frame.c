@@ -562,7 +562,6 @@ static void Frame_map(connection_t *conn, player_t *pl)
 static void Frame_shuffle_objects(void)
 {
     int i;
-    size_t memsize;
 
     num_object_shuffle = MIN(NumObjs, MAX_VISIBLE_OBJECTS);
 

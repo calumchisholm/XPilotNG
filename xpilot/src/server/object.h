@@ -217,10 +217,6 @@ struct xp_object {
 
     OBJECT_EXTEND
 
-    /*#ifdef __cplusplus
-			_object() {}
-			#endif*/
-
 #define OBJ_IND(ind)	(Obj[(ind)])
 #define OBJ_PTR(ptr)	((object_t *)(ptr))
 };
@@ -240,10 +236,6 @@ struct xp_mineobject {
     int 		owner;		/* Who's object is this ? */
     float		ecm_range;	/* Range from last ecm center */
     float		spread_left;	/* how much spread time left */
-
-  /*#ifdef __cplusplus
-			_mineobject() {}
-			#endif*/
 
 #define MINE_IND(ind)	((mineobject_t *)Obj[(ind)])
 #define MINE_PTR(ptr)	((mineobject_t *)(ptr))
@@ -268,10 +260,6 @@ struct xp_missileobject {
 
     MISSILE_EXTEND
 
-    /*#ifdef __cplusplus
-			_missileobject() {}
-			#endif*/
-
 #define MISSILE_IND(ind)	((missileobject_t *)Obj[(ind)])
 #define MISSILE_PTR(ptr)	((missileobject_t *)(ptr))
 };
@@ -292,10 +280,6 @@ struct xp_smartobject {
     int			new_info;	/* smart re-lock id */
     float		ecm_range;	/* Range from last ecm center */
 
-  /*#ifdef __cplusplus
-			_smartobject() {}
-			#endif*/
-
 #define SMART_IND(ind)	((smartobject_t *)Obj[(ind)])
 #define SMART_PTR(ptr)	((smartobject_t *)(ptr))
 };
@@ -314,10 +298,6 @@ struct xp_torpobject {
     MISSILE_EXTEND
 
     float		spread_left;	/* how much spread time left */
-
-  /*#ifdef __cplusplus
-			_torpobject() {}
-			#endif*/
 
 #define TORP_IND(ind)	((torpobject_t *)Obj[(ind)])
 #define TORP_PTR(ptr)	((torpobject_t *)(ptr))
@@ -338,10 +318,6 @@ struct xp_ballobject {
     treasure_t		*treasure;	/* treasure for ball */
     int 		style;		/* What polystyle to use */
 
-  /*#ifdef __cplusplus
-			_ballobject() {}
-			#endif*/
-
 #define BALL_IND(ind)	((ballobject_t *)Obj[(ind)])
 #define BALL_PTR(obj)	((ballobject_t *)(obj))
 };
@@ -361,11 +337,6 @@ struct xp_wireobject {
 
     u_byte		size;		/* Size of object (wreckage) */
     short		rotation;	/* Rotation direction */
-    u_byte		pad[1];
-
-  /*#ifdef __cplusplus
-			_wireobject() {}
-			#endif*/
 
 #define WIRE_IND(ind)	((wireobject_t *)Obj[(ind)])
 #define WIRE_PTR(obj)	((wireobject_t *)(obj))
@@ -385,9 +356,6 @@ struct xp_pulseobject {
     int			dir;		/* Direction of the pulse */
     float		len;		/* Length of the pulse */
     bool		refl;		/* Pulse was reflected ? */
-  /*#ifdef __cplusplus
-			_pulseobject() {}
-			#endif*/
 
 #define PULSE_IND(ind)	((pulseobject_t *)Obj[(ind)])
 #define PULSE_PTR(obj)	((pulseobject_t *)(obj))
@@ -557,7 +525,6 @@ struct player {
     char	username[MAX_CHARS];	/* Real name of player */
     char	hostname[MAX_CHARS];	/* Hostname of client player uses */
     uint16_t	pseudo_team;		/* Which team for detaching tanks */
-    uint16_t	unused2;		/* padding for alignment */
     int		alliance;		/* Member of which alliance? */
     int		prev_alliance;		/* prev. alliance for score */
     int		invite;			/* Invitation for alliance */
@@ -595,8 +562,6 @@ struct player {
     BITV_DECL(last_keyv, NUM_KEYS);	/* Keyboard state */
     BITV_DECL(prev_keyv, NUM_KEYS);	/* Keyboard state */
 
-    uint16_t	unused3;		/* padding for alignment */
-
     long	frame_last_busy;	/* When player touched keyboard. */
 
     void	*audio;			/* audio private data */
@@ -621,10 +586,6 @@ struct player {
 #define PRIV_AUTOKICKLAST	2
 
     world_t	*world;			/* World player is in */
-
-  /*#ifdef __cplusplus
-		player() {}
-		#endif*/
 
 };
 

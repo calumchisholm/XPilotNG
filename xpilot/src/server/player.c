@@ -1328,12 +1328,6 @@ void Delete_player(player_t *pl)
 		    }
 		}
 	    }
-	    else if (BIT(obj->type, OBJ_CANNON_SHOT)) {
-		if (!options.keepShots) {
-		    obj->life = 0;
-		    obj->mass = 0;
-		}
-	    }
 	    else if (BIT(obj->type, OBJ_BALL)) {
 		ballobject_t *ball = BALL_PTR(obj);
 
