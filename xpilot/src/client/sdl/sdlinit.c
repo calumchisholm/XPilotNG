@@ -4,10 +4,7 @@
 #include "xpclient.h"
 #include "text.h"
 
-int draw_width;
-int draw_height;
 int draw_depth;
-int num_spark_colors = 8;
 
 int Init_playing_windows(void)
 {
@@ -23,6 +20,7 @@ int Init_playing_windows(void)
     atexit(SDL_Quit);
 
     draw_depth=24;
+    num_spark_colors=8;
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);

@@ -131,7 +131,7 @@ extern int	scoreObjectColor;	/* Color index for map score objects */
 extern bool	gotFocus;		/* Do we have the mouse pointer */
 extern bool	talk_mapped;		/* Is talk window visible */
 extern bool     radar_score_mapped;     /* Is the radar and score window mapped */
-extern int	draw_width, draw_height;
+extern unsigned	draw_width, draw_height;
 
 extern short	ext_view_width;		/* Width of extended visible area */
 extern short	ext_view_height;	/* Height of extended visible area */
@@ -150,7 +150,7 @@ extern int	num_spark_colors;
 
 extern int	maxKeyDefs;
 extern long	loops;
-extern unsigned long	loopsSlow;
+extern long	loopsSlow;
 extern double	timePerFrame;
 
 extern double	scaleFactor;	/* scale the draw (main playfield) window */

@@ -86,14 +86,6 @@ Colormap	colormap;	/* Private colormap */
 int	maxColors;		/* Max. number of colors to use */
 bool	gotFocus;
 bool	players_exposed;
-short	ext_view_width;		/* Width of extended visible area */
-short	ext_view_height;	/* Height of extended visible area */
-int	active_view_width;	/* Width of active map area displayed. */
-int	active_view_height;	/* Height of active map area displayed. */
-int	ext_view_x_offset;	/* Offset ext_view_width */
-int	ext_view_y_offset;	/* Offset ext_view_height */
-
-bool	titleFlip;		/* Do special title bar flipping? */
 int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */
 
 int		maxKeyDefs;
@@ -292,14 +284,13 @@ void Paint_frame(void)
 			    0, 0, 256, RadarHeight, 0, 0);
 #endif
 	} else {
-
 	    int x, y, w, h;
-	    float xp, yp, xo, yo;
+	    double xp, yp, xo, yo;
 
-	    xp = (float) (FOOpos.x * 256) / Setup->width;
-	    yp = (float) (FOOpos.y * RadarHeight) / Setup->height;
-	    xo = (float) 256 / 2;
-	    yo = (float) RadarHeight / 2;
+	    xp = (double) (FOOpos.x * 256) / Setup->width;
+	    yp = (double) (FOOpos.y * RadarHeight) / Setup->height;
+	    xo = (double) 256 / 2;
+	    yo = (double) RadarHeight / 2;
 	    if (xo <= xp)
 		x = (int) (xp - xo + 0.5);
 	    else
@@ -315,14 +306,17 @@ void Paint_frame(void)
 	    h = RadarHeight - y;
 
 #ifndef _WINDOWS
+	    if (x < 0 || y < 0 || w < 0 || h < 0)
+		warn("BUG: in radar paint x = %d, y = %d, w = %d, h = %d",
+		     x, y, w, h);
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      0, 0, x, y, w, h);
+		      0, 0, (unsigned)x, (unsigned)y, w, h);
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      x, 0, w, y, 0, h);
+		      x, 0, (unsigned)w, (unsigned)y, 0, h);
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      0, y, x, h, w, 0);
+		      0, y, (unsigned)x, (unsigned)h, w, 0);
 	    XCopyArea(dpy, radarPixmap, radarWindow, gameGC,
-		      x, y, w, h, 0, 0);
+		      x, y, (unsigned)w, (unsigned)h, 0, 0);
 #else
 	    Paint_world_radar();
 #endif
@@ -387,12 +381,12 @@ void Paint_frame(void)
 #define SCORE_BORDER		6
 
 
-static void Paint_score_background(int thisLine)
+static void Paint_score_background(void)
 {
     if (fullColor &&
 	Bitmap_get(playersWindow, BM_SCORE_BG, 0) != NULL &&
 	Bitmap_get(playersWindow, BM_LOGO, 0) != NULL) {
-	int bgh, lh;
+	unsigned bgh, lh;
 
 	XSetForeground(dpy, scoreListGC, colors[BLACK].pixel);
 
@@ -405,9 +399,9 @@ static void Paint_score_background(int thisLine)
 	Bitmap_paint(playersWindow, BM_SCORE_BG, 0, 0, 0);
 	if (players_height > bgh + lh)
 	    XFillRectangle(dpy, playersWindow, scoreListGC,
-			   0, bgh,
+			   0, (int)bgh,
 			   players_width, players_height - (bgh + lh));
-	Bitmap_paint(playersWindow, BM_LOGO, 0, players_height - lh, 0);
+	Bitmap_paint(playersWindow, BM_LOGO, 0, (int)(players_height - lh), 0);
 	XFlush(dpy);
     } else {
 	XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
@@ -439,7 +433,7 @@ void Paint_score_start(void)
 	    strlcat(headingStr, "LIFE", sizeof(headingStr));
 	strlcat(headingStr, " NAME", sizeof(headingStr));
     }
-    Paint_score_background(thisLine);
+    Paint_score_background();
 
     ShadowDrawString(dpy, playersWindow, scoreListGC,
 		     SCORE_BORDER, thisLine,
@@ -451,7 +445,7 @@ void Paint_score_start(void)
     XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
     XDrawLine(dpy, playersWindow, scoreListGC,
 	      SCORE_BORDER, thisLine,
-	      players_width - SCORE_BORDER, thisLine);
+	      (int)players_width - SCORE_BORDER, thisLine);
 
     gcv.line_style = LineOnOffDash;
     XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
@@ -472,9 +466,9 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
      * efficiency and calculate some other constants.
      */
     if (lineSpacing == -1) {
-	memset(raceStr, '\0', sizeof raceStr);
-	memset(teamStr, '\0', sizeof teamStr);
-	memset(lifeStr, '\0', sizeof lifeStr);
+	memset(raceStr, 0, sizeof raceStr);
+	memset(teamStr, 0, sizeof teamStr);
+	memset(lifeStr, 0, sizeof lifeStr);
 	teamStr[1] = ' ';
 	raceStr[2] = ' ';
 
@@ -491,7 +485,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
     if (showRealName)
 	sprintf(label, "%s=%s@%s", other->name, other->real, other->host);
     else {
-	other_t*	war = Other_by_id(other->war_id);
+	other_t *war = Other_by_id(other->war_id);
 
 	if (BIT(Setup->mode, TIMING)) {
 	    raceStr[0] = ' ';
@@ -517,8 +511,10 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 	    sprintf(scoreStr, "%*.*f",
 		    9 - showScoreDecimals, showScoreDecimals,
 		    other->score);
-	else
-	    sprintf(scoreStr, "%6d", (int) rint(other->score));
+	else {
+	    int sc = rint(other->score);
+	    sprintf(scoreStr, "%6d", sc);
+	}
 
 	if (BIT(Setup->mode, TEAM_PLAY))
 	    sprintf(label, "%c %s  %-18s%s",
@@ -548,7 +544,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 	XSetForeground(dpy, scoreListGC, colors[color].pixel);
 	XDrawString(dpy, playersWindow, scoreListGC,
 		    SCORE_BORDER, thisLine,
-		    label, strlen(label));
+		    label, (int)strlen(label));
     } else {
 	if (!is_team) {
 	    if (other->id == self->id)
@@ -581,7 +577,7 @@ void Paint_score_entry(int entry_num, other_t* other, bool is_team)
 	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
 	XDrawLine(dpy, playersWindow, scoreListGC,
 		  SCORE_BORDER, thisLine,
-		  players_width - SCORE_BORDER, thisLine);
+		  (int)players_width - SCORE_BORDER, thisLine);
 	gcv.line_style = LineOnOffDash;
 	XChangeGC(dpy, scoreListGC, GCLineStyle, &gcv);
     }
@@ -599,19 +595,19 @@ static void Paint_clock(bool redraw)
     int			second,
 			minute,
 			hour,
-			height = scoreListFont->ascent + scoreListFont->descent
-				+ 3,
 			border = 3;
     struct tm		*m;
     char		buf[16];
-    static int		width;
+    static unsigned	width;
+    unsigned		height = scoreListFont->ascent + scoreListFont->descent
+				+ 3;
 
     if (!clockColor) {
 	if (width != 0) {
 	    XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
 	    /* kps - Vato does not want this to be done on windows */
 	    IFNWINDOWS(XFillRectangle(dpy, playersWindow, scoreListGC,
-				      256 - (width + 2 * border), 0,
+				      256 - (int)(width + 2 * border), 0,
 				      width + 2 * border, height));
 	    width = 0;
 	}
@@ -642,10 +638,10 @@ static void Paint_clock(bool redraw)
     XSetForeground(dpy, scoreListGC, colors[windowColor].pixel);
     /* kps - Vato does not want this to be done on windows */ 
     IFNWINDOWS(XFillRectangle(dpy, playersWindow, scoreListGC,
-			      256 - (width + 2 * border), 0,
+			      256 - (int)(width + 2 * border), 0,
 			      width + 2 * border, height));
     ShadowDrawString(dpy, playersWindow, scoreListGC,
-		     256 - (width + border),
+		     256 - (int)(width + border),
 		     scoreListFont->ascent + 4,
 		     buf,
 		     colors[clockColor].pixel,
@@ -658,10 +654,10 @@ void ShadowDrawString(Display *display, Window w, GC gc,
 		      unsigned long fg, unsigned long bg)
 {
     XSetForeground(display, gc, bg);
-    XDrawString(display, w, gc, x+1, y+1, str, strlen(str));
+    XDrawString(display, w, gc, x+1, y+1, str, (int)strlen(str));
     x--; y--;
     XSetForeground(display, gc, fg);
-    XDrawString(display, w, gc, x, y, str, strlen(str));
+    XDrawString(display, w, gc, x, y, str, (int)strlen(str));
 }
 
 void Play_beep(void)

@@ -43,9 +43,9 @@ int	ext_view_y_offset;	/* Offset ext_view_height */
 
 bool	titleFlip;		/* Do special title bar flipping? */
 
-long		loops = 0;
-unsigned long	loopsSlow = 0;	/* Proceeds slower than loops */
-double          timePerFrame = 0.0;
+long	loops = 0;
+long	loopsSlow = 0;	/* Proceeds slower than loops */
+double	timePerFrame = 0.0;
 
 int	clockColor;		/* Clock color index */
 int	scoreColor;		/* Score list color index */
@@ -67,7 +67,7 @@ int	decorColor;		/* Color index for decoration drawing */
 int	backgroundPointColor;	/* Color index for background point drawing */
 int	visibilityBorderColor;	/* Color index for visibility border drawing */
 
-int	draw_width, draw_height;
+unsigned	draw_width, draw_height;
 char	sparkColors[MSG_LEN];
 int	spark_color[MAX_COLORS];
 int	num_spark_colors;
