@@ -42,6 +42,7 @@
 #include "objpos.h"
 #include "cannon.h"
 #include "click.h"
+#include "commonproto.h"
 
 extern unsigned SPACE_BLOCKS;
 
