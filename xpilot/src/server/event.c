@@ -253,11 +253,21 @@ void Pause_player(player_t *pl, bool on)
 
 	pl->forceVisible	= 0;
 	pl->ecmcount		= 0;
+	pl->emergency_thrust_left = 0;
+	pl->emergency_shield_left = 0;
+	pl->phasing_left	= 0;
 	pl->self_destruct_count = 0;
 	pl->damaged 		= 0;
 	pl->stunned		= 0;
 	pl->lock.distance	= 0;
 	pl->used		= DEF_USED;
+
+#if 0
+	pl->have	= DEF_HAVE;
+	pl->used	|= DEF_USED;
+	pl->used	&= ~(USED_KILL);
+	pl->used	&= pl->have;
+#endif
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (world->teams[i].SwapperId == pl->id)
@@ -277,7 +287,7 @@ void Pause_player(player_t *pl, bool on)
 		/* too late, wait for next round */
 		Player_set_state(pl, PL_STATE_WAITING);
 	    } else {
-		Player_set_state(pl, PL_STATE_ALIVE);
+		Player_set_state(pl, PL_STATE_APPEARING);
 		Go_home(pl);
 	    }
 	    Player_reset_timing(pl);

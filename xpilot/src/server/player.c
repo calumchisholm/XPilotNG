@@ -370,39 +370,6 @@ static void Player_init_fuel(player_t *pl, double total_fuel)
     }
 }
 
-static void Player_paused_reset(player_t *pl)
-{
-    Detach_ball(pl, NULL);
-    if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->pl_status, HOVERPAUSE)) {
-	CLR_BIT(pl->pl_status, HOVERPAUSE);
-	Autopilot(pl, false);
-    }
-
-    pl->vel.x		= pl->vel.y	= 0.0;
-    pl->acc.x		= pl->acc.y	= 0.0;
-    pl->emptymass	= pl->mass	= options.shipMass;
-    pl->obj_status	&= ~(KILL_OBJ_BITS);
-
-    pl->forceVisible	= 0;
-
-    /* don't allow unpause while other players haven't yet appeared */
-    pl->pause_count = MAX(RECOVERY_DELAY, pl->pause_count);
-
-    pl->ecmcount	= 0;
-    pl->emergency_thrust_left = 0;
-    pl->emergency_shield_left = 0;
-    pl->phasing_left	= 0;
-    pl->self_destruct_count = 0;
-    pl->damaged 	= 0;
-    pl->stunned		= 0;
-    pl->lock.distance	= 0;
-
-    pl->have	= DEF_HAVE;
-    pl->used	|= DEF_USED;
-    pl->used	&= ~(USED_KILL);
-    pl->used	&= pl->have;
-}
-
 int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 {
     player_t *pl = Player_by_index(ind);
@@ -655,12 +622,9 @@ void Reset_all_players(world_t *world)
 	Player_reset_timing(pl);
 
 	if (!Player_is_paused(pl)) {
-	    assert(pl->recovery_count == RECOVERY_DELAY);
 	    Player_set_state(pl, PL_STATE_APPEARING);
 	    pl->idleTime = 0;
 	    Player_set_life(pl, world->rules->lives);
-	    if (BIT(world->rules->mode, TIMING))
-		pl->recovery_count = RECOVERY_DELAY;
 	}
     }
 
@@ -1536,10 +1500,8 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 	return;
     }
 
-    if (Player_is_paused(pl)) {
-	Player_paused_reset(pl);
+    if (Player_is_paused(pl))
 	return;
-    }
 
     Detach_ball(pl, NULL);
     if (BIT(pl->used, HAS_AUTOPILOT) || BIT(pl->pl_status, HOVERPAUSE)) {
@@ -1711,6 +1673,7 @@ void Player_set_state(player_t *pl, int state)
 	Player_set_mychar(pl, pl->pl_type_mychar);
 	/*Player_set_mychar(pl, 'A');*/
 	CLR_BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED);
+	pl->recovery_count = RECOVERY_DELAY;
 	break;
     case PL_STATE_ALIVE:
 	Player_set_mychar(pl, pl->pl_type_mychar);
