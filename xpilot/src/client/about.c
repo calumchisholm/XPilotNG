@@ -57,7 +57,8 @@ int DrawShadowText(Display *display, Window w, GC gc,
 		   unsigned long fg, unsigned long bg)
 {
     XFontStruct		*font = XQueryFont(display, XGContextFromGC(gc));
-    int			y, x, tmp, count;
+    int			y, x, tmp;
+    int                 count = 1;
     XWindowAttributes	wattr;
 
     if (str == NULL || *str == '\0')
@@ -111,7 +112,7 @@ int DrawShadowText(Display *display, Window w, GC gc,
 
     XFreeFontInfo(NULL, font, count);
 
-    return y + font->descent + 1;
+    return y + tmp;
 }
 
 
