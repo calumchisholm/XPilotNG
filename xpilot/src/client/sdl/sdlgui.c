@@ -1856,17 +1856,17 @@ bool newcode = true;
 
 void Paint_messages(void)
 {
-    int j, i = 0;
-    Uint32 *msg_color;
-    /*const int BORDER = 10;*/
-    GLWidget *tmp = NULL;
-    GLWidget *tmp2 = NULL;
-    LabelWidget *wi;
     static int old_maxMessages = 0;
     static message_t **msgs[2];
     static bool revscroll = false;
     static GLWidget *msg_list[2] = {NULL,NULL};
     static bool showMessages = true;
+
+    int j, i = 0;
+    Uint32 *msg_color;
+    /*const int BORDER = 10;*/
+    GLWidget *tmp = NULL,*tmp2 = NULL;
+    LabelWidget *wi;
     message_t	*msg;
     
     msgs[0] = TalkMsg;
@@ -1991,7 +1991,7 @@ static const char *get_rgba_color_option(xp_option_t *opt)
 		     set_rgba_color_option, \
 		     &variable, \
 		     get_rgba_color_option, \
-		     XP_OPTFLAG_DEFAULT, \
+		     XP_OPTFLAG_CONFIG_COLORS, \
 		     "The color of " description ".\n")
 
 

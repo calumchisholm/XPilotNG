@@ -136,6 +136,9 @@ GLWidget *Init_OptionWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor 
 	    return Init_IntChooserWidget(opt,fgcolor,bgcolor);
     	case xp_double_option:
 	    return Init_DoubleChooserWidget(opt,fgcolor,bgcolor);
+    	case xp_string_option:
+	    if (Option_get_flags(opt) & XP_OPTFLAG_CONFIG_COLORS)
+	    	return Init_ColorChooserWidget(opt,fgcolor,bgcolor);
     	default:
 	    return NULL;
     }
@@ -1191,7 +1194,7 @@ GLWidget *Init_BoolChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgc
     
     wid_info = (BoolChooserWidget *)(tmp->wid_info);
     
-    if ( !(wid_info->name = Init_LabelWidget(opt->name,fgcolor,bgcolor,LEFT,CENTER)) ) {
+    if ( !(wid_info->name = Init_LabelWidget(opt->name,fgcolor,&nullRGBA,LEFT,CENTER)) ) {
     	error("Failed to make a LabelWidget for Init_BoolChooserWidget");
 	Close_Widget(&tmp);
 	return NULL;
@@ -1453,7 +1456,7 @@ GLWidget *Init_IntChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgco
     wid_info->bgcolor 	= bgcolor;
     
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(opt->name,fgcolor,bgcolor,LEFT,CENTER))) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(opt->name,fgcolor,&nullRGBA,LEFT,CENTER))) ) {
     	Close_Widget(&tmp);
     	error("Init_IntChooserWidget: Failed to initialize label [%s]",opt->name);
 	return NULL;
@@ -1657,11 +1660,11 @@ GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *b
 	return NULL;
     }
     if (opt->type != xp_double_option) {
-    	error("Faulty parameter to Init_DoubleChooserWidget: opt is not an double option!");
+    	error("Faulty parameter to Init_DoubleChooserWidget: opt is not a double option!");
 	return NULL;
     }
     if (!(opt->dbl_ptr)) {
-    	error("int misssing for Init_DoubleChooserWidget.");
+    	error("double misssing for Init_DoubleChooserWidget.");
 	return NULL;
     }
     if (!(opt->name) || !strlen(opt->name) ) {
@@ -1710,7 +1713,7 @@ GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *b
     wid_info->fgcolor 	= fgcolor;
     wid_info->bgcolor 	= bgcolor;
     
-    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(opt->name,fgcolor,bgcolor,LEFT,CENTER))) ) {
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(opt->name,fgcolor,&nullRGBA,LEFT,CENTER))) ) {
     	Close_Widget(&tmp);
     	error("Init_DoubleChooserWidget: Failed to initialize label [%s]",opt->name);
 	return NULL;
@@ -1741,6 +1744,169 @@ GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *b
 /****************************/
 /* End: DoubleChooserWidget */
 /****************************/
+
+/*****************************/
+/* Begin: ColorChooserWidget */
+/*****************************/
+void Paint_ColorChooserWidget( GLWidget *widget );
+void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b );
+void action_ColorChooserWidget(void *data);
+
+void SetBounds_ColorChooserWidget( GLWidget *widget, SDL_Rect *b )
+{
+    ColorChooserWidget *tmp;
+    GLWidget *tmp2;
+    SDL_Rect b2;
+    
+    if (!widget) return;
+    if (!b) return;
+    if (widget->WIDGET !=COLORCHOOSERWIDGET) {
+    	error("Wrong widget type for SetBounds_ColorChooserWidget [%i]",widget->WIDGET);
+	return;
+    }
+    
+    widget->bounds.x = b->x;
+    widget->bounds.y = b->y;
+    widget->bounds.w = b->w;
+    widget->bounds.h = b->h;
+
+    tmp = (ColorChooserWidget *)(widget->wid_info);
+    
+    b2.h = widget->bounds.h - 2;
+    b2.w = b2.h;
+    b2.x = widget->bounds.x + widget->bounds.w - 2 - b2.w;
+    b2.y = widget->bounds.y;
+	    
+    SetBounds_GLWidget(tmp->button,&b2);
+
+    tmp2 = ((ColorChooserWidget *)(widget->wid_info))->name;
+    
+    b2.h = widget->bounds.h;
+    b2.w = tmp2->bounds.w;
+    b2.x = widget->bounds.x + 2;
+    b2.y = widget->bounds.y;
+	    
+    SetBounds_GLWidget(tmp2,&b2);
+}
+
+void Paint_ColorChooserWidget( GLWidget *widget )
+{
+    ColorChooserWidget *wid_info;
+
+    if (!widget) {
+    	error("Paint_ColorChooserWidget: argument is NULL!");
+	return;
+    }
+    
+    wid_info = (ColorChooserWidget *)(widget->wid_info);
+
+    if (!wid_info) {
+    	error("Paint_ColorChooserWidget: wid_info missing");
+	return;
+    }
+
+    if ( (wid_info->bgcolor) && *(wid_info->bgcolor) ) {
+    	set_alphacolor(*(wid_info->bgcolor));
+    	glBegin(GL_QUADS);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y	    	    	);
+    	    glVertex2i(widget->bounds.x+widget->bounds.w,widget->bounds.y+widget->bounds.h	);
+    	    glVertex2i(widget->bounds.x 	    	    ,widget->bounds.y+widget->bounds.h	);
+    	glEnd();
+    }
+}
+
+void action_ColorChooserWidget(void *data)
+{
+    ColorChooserWidget *wid_info;
+    GLWidget *widget;
+
+    if (!(widget = (GLWidget *)data)) {
+    	error("action_ColorChooserWidget: argument is NULL!");
+	return;
+    }
+    
+    if (widget->WIDGET != COLORCHOOSERWIDGET) {
+    	error("action_ColorChooserWidget: wrong type widget!");
+	return;
+    }
+    
+    wid_info = (ColorChooserWidget *)(widget->wid_info);
+
+    if (!wid_info) {
+    	error("action_ColorChooserWidget: wid_info missing");
+	return;
+    }
+
+    xpprintf("action_ColorChooserWidget!\n");
+}
+
+GLWidget *Init_ColorChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor )
+{
+    GLWidget *tmp;
+    ColorChooserWidget *wid_info;
+    
+    if (!opt) {
+    	error("Faulty parameter to Init_ColorChooserWidget: opt is a NULL pointer!");
+	return NULL;
+    }
+    if ( opt->type != xp_string_option) {
+    	error("Faulty parameter to Init_ColorChooserWidget: opt is not a string option!");
+	return NULL;
+    }
+    if ( !(opt->flags & XP_OPTFLAG_CONFIG_COLORS)) {
+    	error("Faulty flags to Init_ColorChooserWidget: opt is not a color option!");
+	return NULL;
+    }
+    if (!(opt->private_data)) {
+    	error("private_data misssing for Init_ColorChooserWidget.");
+	return NULL;
+    }
+    if (!(opt->name) || !strlen(opt->name) ) {
+    	error("name misssing for Init_ColorChooserWidget.");
+	return NULL;
+    }
+
+    tmp = Init_EmptyBaseGLWidget();
+    if ( !tmp ) {
+        error("Failed to malloc in Init_ColorChooserWidget.");
+	return NULL;
+    }
+    tmp->wid_info   = malloc(sizeof(ColorChooserWidget));
+    if ( !(tmp->wid_info) ) {
+    	free(tmp);
+        error("Failed to malloc in Init_ColorChooserWidget.");
+	return NULL;
+    }
+    
+    wid_info = tmp->wid_info;
+
+    tmp->WIDGET     	= COLORCHOOSERWIDGET;
+    tmp->Draw	    	= Paint_ColorChooserWidget;
+    tmp->SetBounds  	= SetBounds_ColorChooserWidget;
+    wid_info->opt   	= opt;
+    wid_info->fgcolor 	= fgcolor;
+    wid_info->bgcolor 	= bgcolor;
+    
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->name = Init_LabelWidget(opt->name,fgcolor,&nullRGBA,LEFT,CENTER))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_ColorChooserWidget: Failed to initialize label [%s]",opt->name);
+	return NULL;
+    }
+    if ( !AppendGLWidgetList(&(tmp->children),(wid_info->button = Init_ButtonWidget( opt->private_data, &whiteRGBA, action_ColorChooserWidget, tmp ))) ) {
+    	Close_Widget(&tmp);
+    	error("Init_ColorChooserWidget: Failed to initialize label [%s]",opt->name);
+	return NULL;
+    }
+
+    tmp->bounds.w   = 2 + wid_info->name->bounds.w + 5 + wid_info->button->bounds.w + 2;
+    tmp->bounds.h   = wid_info->name->bounds.h;
+
+    return tmp;
+}
+/***************************/
+/* End: ColorChooserWidget */
+/***************************/
 
 /**********************/
 /* Begin: ListWidget  */
@@ -2377,9 +2543,9 @@ void button_MainWidget( Uint8 button, Uint8 state , Uint16 x , Uint16 y, void *d
 void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
 {
     WrapperWidget *wid_info;
-    SDL_Rect bounds = {0,0,0,0};
+    SDL_Rect bs = {0,0,0,0},*bw;
     GLWidget *subs[4];
-    int i;
+    int i,diff;
     bool change;
     
     if (!widget) return;
@@ -2399,35 +2565,37 @@ void SetBounds_MainWidget( GLWidget *widget, SDL_Rect *b )
     subs[2] = wid_info->chat_msgs;
     subs[3] = wid_info->game_msgs;
     
-    widget->bounds.x = b->x;
-    widget->bounds.w = b->w;
-    widget->bounds.y = b->y;
-    widget->bounds.h = b->h;
+    bw = &(widget->bounds);
     
     for ( i=0; i < 4 ; ++i) {
     	if (subs[i]) {
 	    change = false;
 	    
-    	    bounds.x = subs[i]->bounds.x;
-    	    bounds.w = subs[i]->bounds.w;
-    	    bounds.y = subs[i]->bounds.y;
-    	    bounds.h = subs[i]->bounds.h;
-
-	    if ( bounds.x + bounds.w + wid_info->BORDER > widget->bounds.x + widget->bounds.w ) {
-	    	bounds.x = widget->bounds.x + widget->bounds.w - (bounds.w + wid_info->BORDER);
-		change = true;
-	    }
-
-	    if ( bounds.y + bounds.h + wid_info->BORDER  > widget->bounds.y + widget->bounds.h ) {
-	    	bounds.y = widget->bounds.y + widget->bounds.h - (bounds.h + wid_info->BORDER);
-		change = true;
-	    }
-	
-	    if ( change )    
-    	    	SetBounds_GLWidget(subs[i],&bounds);
+    	    bs.x = subs[i]->bounds.x;
+    	    bs.w = subs[i]->bounds.w;
+    	    bs.y = subs[i]->bounds.y;
+    	    bs.h = subs[i]->bounds.h;
 	    
+	    if ( ABS(bs.x - bw->x) > ABS( diff = (bw->x+bw->w) - (bs.x+bs.w) ) ) {
+	    	bs.x = b->x + b->w - diff - bs.w;
+		change = true;
+	    }
+
+	    if ( ABS(bs.y - bw->y) > ABS( diff = (bw->y+bw->h) - (bs.y+bs.h) ) ) {
+	    	bs.y = b->y + b->h - diff - bs.h;
+		change = true;
+	    }
+
+	    if ( change )    
+    	    	SetBounds_GLWidget(subs[i],&bs);
     	}
     }
+    
+    widget->bounds.x = b->x;
+    widget->bounds.w = b->w;
+    widget->bounds.y = b->y;
+    widget->bounds.h = b->h;
+    
 }
 
 GLWidget *Init_MainWidget( font_data *font )

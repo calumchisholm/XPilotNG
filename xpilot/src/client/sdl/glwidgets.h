@@ -279,12 +279,29 @@ GLWidget *Init_DoubleChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *b
 /* End: DoubleChooserWidget */
 /****************************/
 
+/*****************************/
+/* Begin: ColorChooserWidget */
+/*****************************/
+#define COLORCHOOSERWIDGET 9
+typedef struct {
+    GLWidget	    *name;
+    GLWidget	    *button;
+    xp_option_t     *opt;
+    Uint32     	    *fgcolor;
+    Uint32     	    *bgcolor;
+} ColorChooserWidget;
+
+GLWidget *Init_ColorChooserWidget( xp_option_t *opt, Uint32 *fgcolor, Uint32 *bgcolor );
+/***************************/
+/* End: ColorChooserWidget */
+/***************************/
+
 /**********************/
 /* Begin: ListWidget  */
 /**********************/
 typedef enum {LW_DOWN, LW_UP} ListWidget_ver_dir_t;
 typedef enum {LW_RIGHT, LW_LEFT} ListWidget_hor_dir_t;
-#define LISTWIDGET 9
+#define LISTWIDGET 10
 typedef struct {
      int num_elements;
      Uint32 *bg;
@@ -322,7 +339,7 @@ GLWidget *ListWidget_GetItemByIndex( GLWidget *list, int i );
 /****************************/
 /* Begin: ScrollPaneWidget  */
 /****************************/
-#define SCROLLPANEWIDGET 10
+#define SCROLLPANEWIDGET 11
 typedef struct {
     GLWidget	*scroller;
     GLWidget	*masque;
@@ -338,7 +355,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content );
 /**********************/
 /* Begin: RadarWidget */
 /**********************/
-#define RADARWIDGET 11
+#define RADARWIDGET 12
 
 extern GLWidget *Init_RadarWidget( void );
 /********************/
@@ -348,7 +365,7 @@ extern GLWidget *Init_RadarWidget( void );
 /**************************/
 /* Begin: ScorelistWidget */
 /**************************/
-#define SCORELISTWIDGET 12
+#define SCORELISTWIDGET 13
 
 extern GLWidget *Init_ScorelistWidget( void );
 /************************/
@@ -358,7 +375,7 @@ extern GLWidget *Init_ScorelistWidget( void );
 /**********************/
 /* Begin: MainWidget  */
 /**********************/
-#define MAINWIDGET 13
+#define MAINWIDGET 14
 typedef struct {
     GLWidget	*confmenu;
     GLWidget	*radar;
@@ -377,7 +394,7 @@ GLWidget *Init_MainWidget( font_data *font );
 /**************************/
 /* Begin: ConfMenuWidget  */
 /**************************/
-#define CONFMENUWIDGET 14
+#define CONFMENUWIDGET 15
 typedef struct {
     GLWidget	*scrollpane;
 } ConfMenuWidget;
@@ -390,7 +407,7 @@ GLWidget *Init_ConfMenuWidget( font_data *font, Uint16 x, Uint16 y );
 /*****************************/
 /* Begin: ImageButtonWidget  */
 /*****************************/
-#define IMAGEBUTTONWIDGET 15
+#define IMAGEBUTTONWIDGET 16
 typedef struct {
     Uint32 fg;
     Uint32 bg;
