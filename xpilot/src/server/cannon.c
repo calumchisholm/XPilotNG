@@ -50,7 +50,7 @@ long CANNON_USE_ITEM = (ITEM_BIT_FUEL|ITEM_BIT_WIDEANGLE
 			|ITEM_BIT_TRACTOR_BEAM|ITEM_BIT_MISSILE
 			|ITEM_BIT_PHASING);
 
-void Cannon_update(world_t *world, bool do_less_frequent_update)
+void Cannon_update(world_t *world, bool tick)
 {
     int i;
 
@@ -61,24 +61,24 @@ void Cannon_update(world_t *world, bool do_less_frequent_update)
 	    if ((c->dead_ticks -= timeStep) <= 0)
 		World_restore_cannon(world, c);
 	    continue;
-	} else {
-	    /* don't check too often, because this gets quite expensive
-	       on maps with many cannons with defensive items */
-	    if (do_less_frequent_update
-		&& options.cannonsUseItems
+	}
+
+	/*
+	 * Call cannon "AI" routines only once per tick.
+	 */
+	if (tick) {
+	    if (options.cannonsUseItems
 		&& options.cannonsDefend
 		&& rfrac() < 0.65)
 		Cannon_check_defense(c);
 
-	    if (do_less_frequent_update
-		&& !BIT(c->used, HAS_EMERGENCY_SHIELD)
+	    if (!BIT(c->used, HAS_EMERGENCY_SHIELD)
 		&& !BIT(c->used, HAS_PHASING_DEVICE)
 		&& (c->damaged <= 0)
 		&& (c->tractor_count <= 0)
 		&& rfrac() * 16 < 1)
 		Cannon_check_fire(c);
-	    else if (do_less_frequent_update
-		     && options.cannonsUseItems
+	    else if (options.cannonsUseItems
 		     && options.itemProbMult > 0
 		     && options.cannonItemProbMult > 0) {
 		int item_type = (int)(rfrac() * NUM_ITEMS);
@@ -93,6 +93,7 @@ void Cannon_update(world_t *world, bool do_less_frequent_update)
 				     ?  ENERGY_PACK_FUEL : 1));
 	    }
 	}
+
 	if ((c->damaged -= timeStep) <= 0)
 	    c->damaged = 0;
 	if (c->tractor_count > 0) {

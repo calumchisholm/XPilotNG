@@ -84,7 +84,7 @@ extern long CANNON_USE_ITEM;
 /* sector in which cannonfire is possible */
 #define CANNON_SPREAD		(RES / 3)
 
-void Cannon_update(world_t *world, bool do_less_frequent_update);
+void Cannon_update(world_t *world, bool tick);
 void Cannon_init(cannon_t *cannon);
 void Cannon_add_item(cannon_t *cannon, int type, int amount);
 void Cannon_throw_items(cannon_t *cannon);
