@@ -156,6 +156,8 @@ static void *ralloc(void *ptr, size_t size)
     return ptr;
 }
 
+static DFLOAT wallBounceExplosionMult;
+
 static unsigned short *Shape_lines(const wireobj *shape, int dir)
 {
     int p;
@@ -310,6 +312,175 @@ static int Bounce_object(object *obj, struct move *move, int line, int point)
     return 1;
 }
 
+
+static void Player_crash(player *pl, struct move *move, int crashtype)
+{
+    int			ind = GetInd[pl->id];
+    const char		*howfmt = NULL;
+    const char          *hudmsg = NULL;
+
+    msg[0] = '\0';
+
+    switch (crashtype) {
+
+    default:
+    case NotACrash:
+	errno = 0;
+	error("Unrecognized crash %d", crashtype);
+	exit(1);
+
+	/*  !@# target too */
+#if 0
+    case CrashWormHole:
+	SET_BIT(pl->status, WARPING);
+	pl->wormHoleHit = ms->wormhole;
+	break;
+#endif
+
+    case CrashWall:
+	howfmt = "%s crashed against a wall";
+	hudmsg = "[Wall]";
+	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	break;
+
+    case CrashWallSpeed:
+	howfmt = "%s smashed against a wall";
+	hudmsg = "[Wall]";
+	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	break;
+
+    case CrashWallNoFuel:
+	howfmt = "%s smacked against a wall";
+	hudmsg = "[Wall]";
+	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	break;
+
+#if 0
+    case CrashTarget:
+	howfmt = "%s smashed against a target";
+	hudmsg = "[Target]";
+	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	Object_hits_target(ms, -1);
+	break;
+#endif
+
+    case CrashTreasure:
+	howfmt = "%s smashed against a treasure";
+	hudmsg = "[Treasure]";
+	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	break;
+
+#if 0
+    case CrashCannon:
+	if (BIT(pl->used, OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)
+	    != (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)) {
+	    howfmt = "%s smashed against a cannon";
+	    hudmsg = "[Cannon]";
+	    sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_CANNON_SOUND);
+	}
+	Cannon_dies(ms);
+	break;
+#endif
+
+    case CrashUniverse:
+	howfmt = "%s left the known universe";
+	hudmsg = "[Universe]";
+	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	break;
+
+    case CrashUnknown:
+	howfmt = "%s slammed into a programming error";
+	hudmsg = "[Bug]";
+	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
+	break;
+    }
+
+    if (howfmt && hudmsg) {
+	player		*pushers[MAX_RECORDED_SHOVES];
+	int		cnt[MAX_RECORDED_SHOVES];
+	int		num_pushers = 0;
+	int		total_pusher_count = 0;
+	int		total_pusher_score = 0;
+	int		i, j, sc;
+
+	SET_BIT(pl->status, KILLED);
+	move->delta.x = 0;
+	move->delta.y = 0;
+	sprintf(msg, howfmt, pl->name);
+
+	/* get a list of who pushed me */
+	for (i = 0; i < MAX_RECORDED_SHOVES; i++) {
+	    shove_t *shove = &pl->shove_record[i];
+	    if (shove->pusher_id == -1) {
+		continue;
+	    }
+	    if (shove->time < frame_loops - 20) {
+		continue;
+	    }
+	    for (j = 0; j < num_pushers; j++) {
+		if (shove->pusher_id == pushers[j]->id) {
+		    cnt[j]++;
+		    break;
+		}
+	    }
+	    if (j == num_pushers) {
+		pushers[num_pushers++] = Players[GetInd[shove->pusher_id]];
+		cnt[j] = 1;
+	    }
+	    total_pusher_count++;
+	    total_pusher_score += pushers[j]->score;
+	}
+	if (num_pushers == 0) {
+	    sc = Rate(WALL_SCORE, pl->score);
+	    SCORE(ind, -sc,
+		  OBJ_X_IN_BLOCKS(pl),
+		  OBJ_Y_IN_BLOCKS(pl),
+		  hudmsg);
+	    strcat(msg, ".");
+	    Set_message(msg);
+	}
+	else {
+	    int		msg_len = strlen(msg);
+	    char	*msg_ptr = &msg[msg_len];
+	    int		average_pusher_score = total_pusher_score
+						/ total_pusher_count;
+
+	    for (i = 0; i < num_pushers; i++) {
+		player		*pusher = pushers[i];
+		const char	*sep = (!i) ? " with help from "
+					    : (i < num_pushers - 1) ? ", "
+					    : " and ";
+		int		sep_len = strlen(sep);
+		int		name_len = strlen(pusher->name);
+
+		if (msg_len + sep_len + name_len + 2 < sizeof msg) {
+		    strcpy(msg_ptr, sep);
+		    msg_len += sep_len;
+		    msg_ptr += sep_len;
+		    strcpy(msg_ptr, pusher->name);
+		    msg_len += name_len;
+		    msg_ptr += name_len;
+		}
+		sc = cnt[i] * (int)floor(Rate(pusher->score, pl->score)
+				    * shoveKillScoreMult) / total_pusher_count;
+		SCORE(GetInd[pusher->id], sc,
+		      OBJ_X_IN_BLOCKS(pl),
+		      OBJ_Y_IN_BLOCKS(pl),
+		      pl->name);
+	    }
+	    sc = (int)floor(Rate(average_pusher_score, pl->score)
+		       * shoveKillScoreMult);
+	    SCORE(ind, -sc,
+		  OBJ_X_IN_BLOCKS(pl),
+		  OBJ_Y_IN_BLOCKS(pl),
+		  "[Shove]");
+	    strcpy(msg_ptr, ".");
+	    Set_message(msg);
+	}
+    }
+}
+
+
 static void Bounce_player(player *pl, struct move *move, int line, int point)
 {
     DFLOAT fx, fy;
@@ -330,8 +501,80 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 	c = linet[line].c;
 	s = linet[line].s;
     }
-    if (groups[group].type == TREASURE)
-	SET_BIT(pl->status, KILLED);
+    if (groups[group].type == TREASURE) {
+	Player_crash(pl, move, CrashTreasure);
+	return;
+    }
+
+    pl->last_wall_touch = frame_loops;
+    {
+	DFLOAT	speed = VECTOR_LENGTH(pl->vel); /* !@# yeah i know */
+	int	v = (int) speed >> 2;
+	int	m = (int) (pl->mass - pl->emptymass * 0.75f);
+	DFLOAT	b = 1 - 0.5f * playerWallBrakeFactor;
+	long	cost = (long) (b * m * v);
+	DFLOAT	max_speed = BIT(pl->used, OBJ_SHIELD)
+		? maxShieldedWallBounceSpeed
+		: maxUnshieldedWallBounceSpeed;
+
+	if (BIT(pl->used, (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD))
+	    == (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)) {
+	    max_speed = 100;
+	}
+	if (speed > max_speed) {
+	    Player_crash(pl, move, CrashWallSpeed);
+	    return;
+	}
+
+	/*
+	 * Small explosion and fuel loss if survived a hit on a wall.
+	 * This doesn't affect the player as the explosion is sparks
+	 * which don't collide with player.
+	 * Clumsy touches (head first) with wall are more costly.
+	 */
+	cost *= 1.5;
+	if (BIT(pl->used, (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD))
+	    != (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)) {
+	    Add_fuel(&pl->fuel, (long)(-((cost << FUEL_SCALE_BITS)
+					 * wallBounceFuelDrainMult)));
+	    Item_damage(GetInd[pl->id], wallBounceDestroyItemProb);
+	}
+	if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
+	    Player_crash(pl, move, CrashWallNoFuel);
+	    return;
+	}
+/* !@# I didn't implement wall direction calculation yet. */
+	if (cost) {
+#if 0
+	    int intensity = (int)(cost * wallBounceExplosionMult);
+	    Make_debris(
+			/* pos.x, pos.y   */ pl->pos.cx, pl->pos.cy,
+			/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
+			/* owner id       */ pl->id,
+			/* owner team	  */ pl->team,
+			/* kind           */ OBJ_SPARK,
+			/* mass           */ 3.5,
+			/* status         */ GRAVITY | OWNERIMMUNE | FROMBOUNCE,
+			/* color          */ RED,
+			/* radius         */ 1,
+			/* min,max debris */ intensity>>1, intensity,
+			/* min,max dir    */ wall_dir - (RES/4), wall_dir + (RES/4),
+			/* min,max speed  */ 20, 20 + (intensity>>2),
+			/* min,max life   */ 10, 10 + (intensity>>1)
+					     );
+#endif
+	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
+			       PLAYER_BOUNCED_SOUND);
+#if 0
+	    /* I'll leave this here until i implement targets */
+	    if (ms[worst].target >= 0) {
+		cost <<= FUEL_SCALE_BITS;
+		cost = (long)(cost * (wallBounceFuelDrainMult / 4.0));
+		Object_hits_target(&ms[worst], cost);
+	    }
+#endif
+	}
+    }
     fx = move->delta.x * c + move->delta.y * s;
     fy = move->delta.x * s - move->delta.y * c;
     move->delta.x = fx * playerWallBrakeFactor;
@@ -1499,7 +1742,6 @@ unsigned SPACE_BLOCKS = (
 	DECOR_FILLED_BIT | CHECK_BIT | ITEM_CONCENTRATOR_BIT
     );
 
-static DFLOAT wallBounceExplosionMult;
 static char msg[MSG_LEN];
 
 /*
@@ -1518,9 +1760,6 @@ void Move_init(void)
     LIMIT(objectWallBounceLifeFactor, 0, 1);
     LIMIT(wallBounceFuelDrainMult, 0, 1000);
     wallBounceExplosionMult = sqrt(wallBounceFuelDrainMult);
-
-    mp.max_shielded_angle = (int)(180 * RES / 360);  /* limits removed */
-    mp.max_unshielded_angle = (int)(180 * RES / 360);  /* limits removed */
 
     mp.obj_bounce_mask = 0;
     if (sparksWallBounce) {
@@ -1553,150 +1792,9 @@ void Move_init(void)
     mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL | OBJ_PULSE;
 }
 
-static void Bounce_edge(move_state_t *ms, move_bounce_t bounce)
-{
-    if (bounce == BounceHorLo) {
-	if (ms->mip->edge_bounce) {
-	    ms->todo.x = -ms->todo.x;
-	    ms->vel.x = -ms->vel.x;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(RES / 2 - ms->dir, RES);
-	    }
-	}
-	else {
-	    ms->todo.x = 0;
-	    ms->vel.x = 0;
-	    if (!ms->mip->pl) {
-		ms->dir = (ms->vel.y < 0) ? (3*RES/4) : RES/4;
-	    }
-	}
-    }
-    else if (bounce == BounceHorHi) {
-	if (ms->mip->edge_bounce) {
-	    ms->todo.x = -ms->todo.x;
-	    ms->vel.x = -ms->vel.x;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(RES / 2 - ms->dir, RES);
-	    }
-	}
-	else {
-	    ms->todo.x = 0;
-	    ms->vel.x = 0;
-	    if (!ms->mip->pl) {
-		ms->dir = (ms->vel.y < 0) ? (3*RES/4) : RES/4;
-	    }
-	}
-    }
-    else if (bounce == BounceVerLo) {
-	if (ms->mip->edge_bounce) {
-	    ms->todo.y = -ms->todo.y;
-	    ms->vel.y = -ms->vel.y;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(RES - ms->dir, RES);
-	    }
-	}
-	else {
-	    ms->todo.y = 0;
-	    ms->vel.y = 0;
-	    if (!ms->mip->pl) {
-		ms->dir = (ms->vel.x < 0) ? (RES/2) : 0;
-	    }
-	}
-    }
-    else if (bounce == BounceVerHi) {
-	if (ms->mip->edge_bounce) {
-	    ms->todo.y = -ms->todo.y;
-	    ms->vel.y = -ms->vel.y;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(RES - ms->dir, RES);
-	    }
-	}
-	else {
-	    ms->todo.y = 0;
-	    ms->vel.y = 0;
-	    if (!ms->mip->pl) {
-		ms->dir = (ms->vel.x < 0) ? (RES/2) : 0;
-	    }
-	}
-    }
-    ms->bounce = BounceEdge;
-}
-
 static void Bounce_wall(move_state_t *ms, move_bounce_t bounce)
 {
-    if (!ms->mip->wall_bounce) {
-	ms->crash = CrashWall;
-	return;
-    }
-    if (bounce == BounceHorLo) {
-	ms->todo.x = -ms->todo.x;
-	ms->vel.x = -ms->vel.x;
-	if (!ms->mip->pl) {
-	    ms->dir = MOD2(RES/2 - ms->dir, RES);
-	}
-    }
-    else if (bounce == BounceHorHi) {
-	ms->todo.x = -ms->todo.x;
-	ms->vel.x = -ms->vel.x;
-	if (!ms->mip->pl) {
-	    ms->dir = MOD2(RES/2 - ms->dir, RES);
-	}
-    }
-    else if (bounce == BounceVerLo) {
-	ms->todo.y = -ms->todo.y;
-	ms->vel.y = -ms->vel.y;
-	if (!ms->mip->pl) {
-	    ms->dir = MOD2(RES - ms->dir, RES);
-	}
-    }
-    else if (bounce == BounceVerHi) {
-	ms->todo.y = -ms->todo.y;
-	ms->vel.y = -ms->vel.y;
-	if (!ms->mip->pl) {
-	    ms->dir = MOD2(RES - ms->dir, RES);
-	}
-    }
-    else {
-	clvec t = ms->todo;
-	vector v = ms->vel;
-	if (bounce == BounceLeftDown) {
-	    ms->todo.x = -t.y;
-	    ms->todo.y = -t.x;
-	    ms->vel.x = -v.y;
-	    ms->vel.y = -v.x;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(3*RES/4 - ms->dir, RES);
-	    }
-	}
-	else if (bounce == BounceLeftUp) {
-	    ms->todo.x = t.y;
-	    ms->todo.y = t.x;
-	    ms->vel.x = v.y;
-	    ms->vel.y = v.x;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(RES/4 - ms->dir, RES);
-	    }
-	}
-	else if (bounce == BounceRightDown) {
-	    ms->todo.x = t.y;
-	    ms->todo.y = t.x;
-	    ms->vel.x = v.y;
-	    ms->vel.y = v.x;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(RES/4 - ms->dir, RES);
-	    }
-	}
-	else if (bounce == BounceRightUp) {
-	    ms->todo.x = -t.y;
-	    ms->todo.y = -t.x;
-	    ms->vel.x = -v.y;
-	    ms->vel.y = -v.x;
-	    if (!ms->mip->pl) {
-		ms->dir = MOD2(3*RES/4 - ms->dir, RES);
-	    }
-	}
-    }
-    ms->bounce = bounce;
+    /* This set ->dir too */
 }
 
 /*
@@ -1810,43 +1908,6 @@ static void Move_segment(move_state_t *ms)
     offset.x = enter.x - block.x * BLOCK_CLICKS;
     offset.y = enter.y - block.y * BLOCK_CLICKS;
     inside = 1;
-    if (offset.x == 0) {
-	inside = 0;
-	if (sign.x == -1 && (offset.x = BLOCK_CLICKS, --block.x < 0)) {
-	    if (mi->edge_wrap) {
-		block.x += World.x;
-	    }
-	    else {
-		Bounce_edge(ms, BounceHorLo);
-		return;
-	    }
-	}
-    }
-    else if (enter.x == mp.click_width - 1
-	     && !mi->edge_wrap
-	     && ms->vel.x > 0) {
-	Bounce_edge(ms, BounceHorHi);
-	return;
-    }
-    if (offset.y == 0) {
-	inside = 0;
-	if (sign.y == -1 && (offset.y = BLOCK_CLICKS, --block.y < 0)) {
-	    if (mi->edge_wrap) {
-		block.y += World.y;
-	    }
-	    else {
-		Bounce_edge(ms, BounceVerLo);
-		return;
-	    }
-	}
-    }
-    else if (enter.y == mp.click_height - 1
-	     && !mi->edge_wrap
-	     && ms->vel.y > 0) {
-	Bounce_edge(ms, BounceVerHi);
-	return;
-    }
-
     need_adjust = 0;
     if (sign.x == -1) {
 	if (offset.x + ms->todo.x < 0) {
@@ -3254,191 +3315,11 @@ void Move_object(int ind)
     }
 }
 
-static void Player_crash(move_state_t *ms, int pt, bool turning)
-{
-    player		*pl = ms->mip->pl;
-    int			ind = GetInd[pl->id];
-    const char		*howfmt = NULL;
-    const char          *hudmsg = NULL;
-
-    msg[0] = '\0';
-
-    switch (ms->crash) {
-
-    default:
-    case NotACrash:
-	errno = 0;
-	error("Player_crash not a crash %d", ms->crash);
-	break;
-
-    case CrashWormHole:
-	SET_BIT(pl->status, WARPING);
-	pl->wormHoleHit = ms->wormhole;
-	break;
-
-    case CrashWall:
-	howfmt = "%s crashed%s against a wall";
-	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	break;
-
-    case CrashWallSpeed:
-	howfmt = "%s smashed%s against a wall";
-	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	break;
-
-    case CrashWallNoFuel:
-	howfmt = "%s smacked%s against a wall";
-	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	break;
-
-    case CrashWallAngle:
-	howfmt = "%s was trashed%s against a wall";
-	hudmsg = "[Wall]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	break;
-
-    case CrashTarget:
-	howfmt = "%s smashed%s against a target";
-	hudmsg = "[Target]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	Object_hits_target(ms, -1);
-	break;
-
-    case CrashTreasure:
-	howfmt = "%s smashed%s against a treasure";
-	hudmsg = "[Treasure]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	break;
-
-    case CrashCannon:
-	if (BIT(pl->used, OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)
-	    != (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)) {
-	    howfmt = "%s smashed%s against a cannon";
-	    hudmsg = "[Cannon]";
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_CANNON_SOUND);
-	}
-	Cannon_dies(ms);
-	break;
-
-    case CrashUniverse:
-	howfmt = "%s left the known universe%s";
-	hudmsg = "[Universe]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	break;
-
-    case CrashUnknown:
-	howfmt = "%s slammed%s into a programming error";
-	hudmsg = "[Bug]";
-	sound_play_sensors(pl->pos.cx, pl->pos.cy, PLAYER_HIT_WALL_SOUND);
-	break;
-    }
-
-    if (howfmt && hudmsg) {
-	player		*pushers[MAX_RECORDED_SHOVES];
-	int		cnt[MAX_RECORDED_SHOVES];
-	int		num_pushers = 0;
-	int		total_pusher_count = 0;
-	int		total_pusher_score = 0;
-	int		i, j, sc;
-
-	SET_BIT(pl->status, KILLED);
-	sprintf(msg, howfmt, pl->name, (!pt) ? " head first" : "");
-
-	/* get a list of who pushed me */
-	for (i = 0; i < MAX_RECORDED_SHOVES; i++) {
-	    shove_t *shove = &pl->shove_record[i];
-	    if (shove->pusher_id == -1) {
-		continue;
-	    }
-	    if (shove->time < frame_loops - 20) {
-		continue;
-	    }
-	    for (j = 0; j < num_pushers; j++) {
-		if (shove->pusher_id == pushers[j]->id) {
-		    cnt[j]++;
-		    break;
-		}
-	    }
-	    if (j == num_pushers) {
-		pushers[num_pushers++] = Players[GetInd[shove->pusher_id]];
-		cnt[j] = 1;
-	    }
-	    total_pusher_count++;
-	    total_pusher_score += pushers[j]->score;
-	}
-	if (num_pushers == 0) {
-	    sc = Rate(WALL_SCORE, pl->score);
-	    SCORE(ind, -sc,
-		  OBJ_X_IN_BLOCKS(pl),
-		  OBJ_Y_IN_BLOCKS(pl),
-		  hudmsg);
-	    strcat(msg, ".");
-	    Set_message(msg);
-	}
-	else {
-	    int		msg_len = strlen(msg);
-	    char	*msg_ptr = &msg[msg_len];
-	    int		average_pusher_score = total_pusher_score
-						/ total_pusher_count;
-
-	    for (i = 0; i < num_pushers; i++) {
-		player		*pusher = pushers[i];
-		const char	*sep = (!i) ? " with help from "
-					    : (i < num_pushers - 1) ? ", "
-					    : " and ";
-		int		sep_len = strlen(sep);
-		int		name_len = strlen(pusher->name);
-
-		if (msg_len + sep_len + name_len + 2 < sizeof msg) {
-		    strcpy(msg_ptr, sep);
-		    msg_len += sep_len;
-		    msg_ptr += sep_len;
-		    strcpy(msg_ptr, pusher->name);
-		    msg_len += name_len;
-		    msg_ptr += name_len;
-		}
-		sc = cnt[i] * (int)floor(Rate(pusher->score, pl->score)
-				    * shoveKillScoreMult) / total_pusher_count;
-		SCORE(GetInd[pusher->id], sc,
-		      OBJ_X_IN_BLOCKS(pl),
-		      OBJ_Y_IN_BLOCKS(pl),
-		      pl->name);
-	    }
-	    sc = (int)floor(Rate(average_pusher_score, pl->score)
-		       * shoveKillScoreMult);
-	    SCORE(ind, -sc,
-		  OBJ_X_IN_BLOCKS(pl),
-		  OBJ_Y_IN_BLOCKS(pl),
-		  "[Shove]");
-	    strcpy(msg_ptr, ".");
-	    Set_message(msg);
-	}
-    }
-}
 
 void Move_player(int ind)
 {
     player		*pl = Players[ind];
-    int			nothing_done = 0;
-    int			i;
-    int			dist;
-    move_info_t		mi;
-    move_state_t	ms[RES];
-    int			worst = 0;
-    int			crash;
-    int			bounce;
-    int			moves_made = 0;
     clpos		pos;
-    clvec		todo;
-    clvec		done;
-    vector		vel;
-    vector		r[RES];
-    ivec		sign;		/* sign (-1 or 1) of direction */
-    ipos		block;		/* block index */
-    bool		pos_update = false;
 
 
     if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
@@ -3508,310 +3389,6 @@ void Move_player(int ind)
 	Player_position_set_clicks(pl, move.start.x, move.start.y);
 	pl->velocity = VECTOR_LENGTH(pl->vel);
 	return;
-    }
-
-    dist = walldist[pl->pos.bx][pl->pos.by];
-    if (dist > 3) {
-	int max = ((dist - 3) * BLOCK_SZ) >> 1;
-	if (max >= pl->velocity) {
-	    pos.x = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x);
-	    pos.y = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y);
-	    pos.x = WRAP_XCLICK(pos.x);
-	    pos.y = WRAP_YCLICK(pos.y);
-	    Player_position_set_clicks(pl, pos.x, pos.y);
-	    pl->velocity = VECTOR_LENGTH(pl->vel);
-	    return;
-	}
-    }
-
-    mi.pl = pl;
-    mi.obj = (object *) pl;
-    mi.edge_wrap = BIT(World.rules->mode, WRAP_PLAY);
-    mi.edge_bounce = 0; /* edgeBounce; removed */
-    mi.wall_bounce = true;
-    mi.cannon_crashes = true;
-    mi.treasure_crashes = true;
-    mi.target_crashes = true;
-    mi.wormhole_warps = true;
-    mi.phased = BIT(pl->used, OBJ_PHASING_DEVICE);
-
-    vel = pl->vel;
-    todo.x = FLOAT_TO_CLICK(vel.x);
-    todo.y = FLOAT_TO_CLICK(vel.y);
-    for (i = 0; i < pl->ship->num_points; i++) {
-	DFLOAT x = pl->ship->pts[i][pl->dir].x;
-	DFLOAT y = pl->ship->pts[i][pl->dir].y;
-	ms[i].pos.x = pl->pos.cx + FLOAT_TO_CLICK(x);
-	ms[i].pos.y = pl->pos.cy + FLOAT_TO_CLICK(y);
-	ms[i].vel = vel;
-	ms[i].todo = todo;
-	ms[i].dir = pl->dir;
-	ms[i].mip = &mi;
-	ms[i].target = -1;
-    }
-
-    for (;; moves_made++) {
-
-	pos.x = ms[0].pos.x - FLOAT_TO_CLICK(pl->ship->pts[0][ms[0].dir].x);
-	pos.y = ms[0].pos.y - FLOAT_TO_CLICK(pl->ship->pts[0][ms[0].dir].y);
-	pos.x = WRAP_XCLICK(pos.x);
-	pos.y = WRAP_YCLICK(pos.y);
-	block.x = pos.x / BLOCK_CLICKS;
-	block.y = pos.y / BLOCK_CLICKS;
-
-	if (walldist[block.x][block.y] > 3) {
-	    int maxcl = ((walldist[block.x][block.y] - 3) * BLOCK_CLICKS) >> 1;
-	    todo = ms[0].todo;
-	    sign.x = (todo.x < 0) ? -1 : 1;
-	    sign.y = (todo.y < 0) ? -1 : 1;
-	    if (maxcl >= sign.x * todo.x && maxcl >= sign.y * todo.y) {
-		/* entire movement is possible. */
-		done.x = todo.x;
-		done.y = todo.y;
-	    }
-	    else if (sign.x * todo.x > sign.y * todo.y) {
-		/* horizontal movement. */
-		done.x = sign.x * maxcl;
-		done.y = todo.y * maxcl / (sign.x * todo.x);
-	    }
-	    else {
-		/* vertical movement. */
-		done.x = todo.x * maxcl / (sign.y * todo.y);
-		done.y = sign.y * maxcl;
-	    }
-	    todo.x -= done.x;
-	    todo.y -= done.y;
-	    for (i = 0; i < pl->ship->num_points; i++) {
-		ms[i].pos.x += done.x;
-		ms[i].pos.y += done.y;
-		ms[i].todo = todo;
-		ms[i].crash = NotACrash;
-		ms[i].bounce = NotABounce;
-		if (mi.edge_wrap) {
-		    if (ms[i].pos.x < 0) {
-			ms[i].pos.x += mp.click_width;
-		    }
-		    else if (ms[i].pos.x >= mp.click_width) {
-			ms[i].pos.x -= mp.click_width;
-		    }
-		    if (ms[i].pos.y < 0) {
-			ms[i].pos.y += mp.click_height;
-		    }
-		    else if (ms[i].pos.y >= mp.click_height) {
-			ms[i].pos.y -= mp.click_height;
-		    }
-		}
-	    }
-	    nothing_done = 0;
-	    if (!(todo.x | todo.y)) {
-		break;
-	    }
-	    else {
-		continue;
-	    }
-	}
-
-	bounce = -1;
-	crash = -1;
-	for (i = 0; i < pl->ship->num_points; i++) {
-	    Move_segment(&ms[i]);
-	    pos_update |= (ms[i].crash | ms[i].bounce);
-	    if (ms[i].crash) {
-		crash = i;
-		break;
-	    }
-	    if (ms[i].bounce) {
-		if (bounce == -1) {
-		    bounce = i;
-		}
-		else if (ms[bounce].bounce != BounceEdge
-		    && ms[i].bounce == BounceEdge) {
-		    bounce = i;
-		}
-		else if ((ms[bounce].bounce == BounceEdge)
-		    == (ms[i].bounce == BounceEdge)) {
-		    if ((int)(rfrac() * (pl->ship->num_points - bounce)) == i) {
-			bounce = i;
-		    }
-		}
-		worst = bounce;
-	    }
-	}
-	if (crash != -1) {
-	    worst = crash;
-	    break;
-	}
-	else if (bounce != -1) {
-	    worst = bounce;
-	    pl->last_wall_touch = frame_loops;
-	    if (ms[worst].bounce != BounceEdge) {
-		DFLOAT	speed = VECTOR_LENGTH(ms[worst].vel);
-		int	v = (int) speed >> 2;
-		int	m = (int) (pl->mass - pl->emptymass * 0.75f);
-		DFLOAT	b = 1 - 0.5f * playerWallBrakeFactor;
-		long	cost = (long) (b * m * v);
-		int	delta_dir,
-			abs_delta_dir,
-			wall_dir;
-		DFLOAT	max_speed = BIT(pl->used, OBJ_SHIELD)
-				    ? maxShieldedWallBounceSpeed
-				    : maxUnshieldedWallBounceSpeed;
-		int	max_angle = BIT(pl->used, OBJ_SHIELD)
-				    ? mp.max_shielded_angle
-				    : mp.max_unshielded_angle;
-
-		if (BIT(pl->used, (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD))
-		    == (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)) {
-		    max_speed = 100;
-		    max_angle = RES;
-		}
-
-		ms[worst].vel.x *= playerWallBrakeFactor;
-		ms[worst].vel.y *= playerWallBrakeFactor;
-		ms[worst].todo.x = (int)(ms[worst].todo.x * playerWallBrakeFactor);
-		ms[worst].todo.y = (int)(ms[worst].todo.y * playerWallBrakeFactor);
-
-		if (speed > max_speed) {
-		    crash = worst;
-		    ms[worst].crash = (ms[worst].target >= 0 ? CrashTarget :
-				       CrashWallSpeed);
-		    break;
-		}
-
-		switch (ms[worst].bounce) {
-		case BounceHorLo: wall_dir = 4*RES/8; break;
-		case BounceHorHi: wall_dir = 0*RES/8; break;
-		case BounceVerLo: wall_dir = 6*RES/8; break;
-		default:
-		case BounceVerHi: wall_dir = 2*RES/8; break;
-		case BounceLeftDown: wall_dir = 1*RES/8; break;
-		case BounceLeftUp: wall_dir = 7*RES/8; break;
-		case BounceRightDown: wall_dir = 3*RES/8; break;
-		case BounceRightUp: wall_dir = 5*RES/8; break;
-		}
-		if (pl->dir >= wall_dir) {
-		    delta_dir = (pl->dir - wall_dir <= RES/2)
-				? -(pl->dir - wall_dir)
-				: (wall_dir + RES - pl->dir);
-		} else {
-		    delta_dir = (wall_dir - pl->dir <= RES/2)
-				? (wall_dir - pl->dir)
-				: -(pl->dir + RES - wall_dir);
-		}
-		abs_delta_dir = ABS(delta_dir);
-		if (abs_delta_dir > max_angle) {
-		    crash = worst;
-		    ms[worst].crash = (ms[worst].target >= 0 ? CrashTarget :
-				       CrashWallAngle);
-		    break;
-		}
-		if (abs_delta_dir <= RES/16) {
-		    pl->float_dir += (1.0f - playerWallBrakeFactor) * delta_dir;
-		    if (pl->float_dir >= RES) {
-			pl->float_dir -= RES;
-		    }
-		    else if (pl->float_dir < 0) {
-			pl->float_dir += RES;
-		    }
-		}
-
-		/*
-		 * Small explosion and fuel loss if survived a hit on a wall.
-		 * This doesn't affect the player as the explosion is sparks
-		 * which don't collide with player.
-		 * Clumsy touches (head first) with wall are more costly.
-		 */
-		cost = (cost * (RES/2 + abs_delta_dir)) / RES;
-		if (BIT(pl->used, (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD))
-		    != (OBJ_SHIELD|OBJ_EMERGENCY_SHIELD)) {
-		    Add_fuel(&pl->fuel, (long)(-((cost << FUEL_SCALE_BITS)
-					  * wallBounceFuelDrainMult)));
-		    Item_damage(ind, wallBounceDestroyItemProb);
-		}
-		if (!pl->fuel.sum && wallBounceFuelDrainMult != 0) {
-		    crash = worst;
-		    ms[worst].crash = (ms[worst].target >= 0 ? CrashTarget :
-				       CrashWallNoFuel);
-		    break;
-		}
-		if (cost) {
-		    int intensity = (int)(cost * wallBounceExplosionMult);
-		    Make_debris(
-			/* pos.x, pos.y   */ pl->pos.cx, pl->pos.cy,
-			/* vel.x, vel.y   */ pl->vel.x, pl->vel.y,
-			/* owner id       */ pl->id,
-			/* owner team	  */ pl->team,
-			/* kind           */ OBJ_SPARK,
-			/* mass           */ 3.5,
-			/* status         */ GRAVITY | OWNERIMMUNE | FROMBOUNCE,
-			/* color          */ RED,
-			/* radius         */ 1,
-			/* min,max debris */ intensity>>1, intensity,
-			/* min,max dir    */ wall_dir - (RES/4), wall_dir + (RES/4),
-			/* min,max speed  */ 20, 20 + (intensity>>2),
-			/* min,max life   */ 10, 10 + (intensity>>1)
-			);
-		    sound_play_sensors(pl->pos.cx, pl->pos.cy,
-				       PLAYER_BOUNCED_SOUND);
-		    if (ms[worst].target >= 0) {
-			cost <<= FUEL_SCALE_BITS;
-			cost = (long)(cost * (wallBounceFuelDrainMult / 4.0));
-			Object_hits_target(&ms[worst], cost);
-		    }
-		}
-	    }
-	}
-	else {
-	    for (i = 0; i < pl->ship->num_points; i++) {
-		r[i].x = (vel.x) ? (DFLOAT) ms[i].todo.x / vel.x : 0;
-		r[i].y = (vel.y) ? (DFLOAT) ms[i].todo.y / vel.y : 0;
-		r[i].x = ABS(r[i].x);
-		r[i].y = ABS(r[i].y);
-	    }
-	    worst = 0;
-	    for (i = 1; i < pl->ship->num_points; i++) {
-		if (r[i].x > r[worst].x || r[i].y > r[worst].y) {
-		    worst = i;
-		}
-	    }
-	}
-
-	if (!(ms[worst].done.x | ms[worst].done.y)) {
-	    if (++nothing_done >= 5) {
-		ms[worst].crash = CrashUnknown;
-		break;
-	    }
-	} else {
-	    nothing_done = 0;
-	    ms[worst].pos.x += ms[worst].done.x;
-	    ms[worst].pos.y += ms[worst].done.y;
-	}
-	if (!(ms[worst].todo.x | ms[worst].todo.y)) {
-	    break;
-	}
-
-	vel = ms[worst].vel;
-	for (i = 0; i < pl->ship->num_points; i++) {
-	    if (i != worst) {
-		ms[i].pos.x += ms[worst].done.x;
-		ms[i].pos.y += ms[worst].done.y;
-		ms[i].vel = vel;
-		ms[i].todo = ms[worst].todo;
-		ms[i].dir = ms[worst].dir;
-	    }
-	}
-    }
-
-    pos.x = ms[worst].pos.x - FLOAT_TO_CLICK(pl->ship->pts[worst][pl->dir].x);
-    pos.y = ms[worst].pos.y - FLOAT_TO_CLICK(pl->ship->pts[worst][pl->dir].y);
-    pos.x = WRAP_XCLICK(pos.x);
-    pos.y = WRAP_YCLICK(pos.y);
-    Player_position_set_clicks(pl, pos.x, pos.y);
-    pl->vel = ms[worst].vel;
-    pl->velocity = VECTOR_LENGTH(pl->vel);
-
-    if (ms[worst].crash) {
-	Player_crash(&ms[worst], worst, false);
     }
 }
 
