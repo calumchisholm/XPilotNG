@@ -180,13 +180,6 @@ if test x$need_x = xyes; then
 	
 	AC_PATH_XTRA
 
-	dnl kps - Hack to link with libXext if DBE or MBX is configured
-	if test x$enable_dbe = xyes || test x$enable_mbx = xyes; then
-		X_EXTENSIONS_LIB="-lXext"
-	else
-		X_EXTENSIONS_LIB=
-	fi
-
 	AC_MSG_CHECKING(for xf86misc extensions)
 	AC_COMPILE_IFELSE([
 	 #include <X11/X.h>
@@ -198,11 +191,19 @@ if test x$need_x = xyes; then
 	],[
 	have_xf86misc=no])
 	AC_MSG_RESULT($have_xf86misc)
+
+	dnl kps - Hack to link with libXext if DBE or MBX is configured
+	if test x$enable_dbe = xyes || test x$enable_mbx = xyes || test x$have_xf86misc = xyes; then
+		X_EXTENSIONS_LIB="-lXext"
+	else
+		X_EXTENSIONS_LIB=
+	fi
 	
 	if test x$have_xf86misc = xyes; then
-		X_EXTENSIONS_LIB="$X_EXTENTIONS_LIB -lXxf86misc"
+		X_EXTENSIONS_LIB="-lXxf86misc $X_EXTENSIONS_LIB"
 		AC_DEFINE([HAVE_XF86MISC], 1, [Define to 1 if you have the Xf86Misc library])
 	fi
+	
 	AC_SUBST(X_EXTENSIONS_LIB)
 fi
 
