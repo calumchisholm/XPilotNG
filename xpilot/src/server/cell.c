@@ -51,7 +51,7 @@ struct cell_offset_ {
 static cell_node **Cells;
 static int object_node_offset;
 static cell_dist_t *cell_dist;
-static int cell_dist_size;
+static size_t cell_dist_size;
 
 
 static void Free_cell_dist(void)
@@ -263,7 +263,7 @@ void Cell_get_objects(int x,
     wrap = (BIT(World.rules->mode, WRAP_PLAY) != 0);
     dist = (float) (range * SQRT2);
     count = 0;
-    for (i = 0; i < cell_dist_size && count < max_obj_count; i++) {
+    for (i = 0; i < (int)cell_dist_size && count < max_obj_count; i++) {
 	if (dist < cell_dist[i].dist)
 	    break;
 	else {
