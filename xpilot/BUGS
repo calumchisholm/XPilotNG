@@ -8,6 +8,15 @@ affected:
 
 
 -------------------------------------------------------------------
+Problem : ships get a turnpush even if they are phased
+Found by: 
+Solution:
+Fixed by:
+Files 
+affected:
+
+
+-------------------------------------------------------------------
 Problem : textures and map are downloaded more than once
           and put into deeper levels of .xpilot_data by the client.
           I.e. you will see a directory structure like:
