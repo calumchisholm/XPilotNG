@@ -78,7 +78,7 @@ extern	int ServerKilled;
  */
 extern int Get_process_id(void);	/* getpid */
 extern void Get_login_name(char *buf, size_t size);
-extern int xpprintf (char* fmt, ...);
+extern int xpprintf(const char* fmt, ...);
 
 /*
  * Prototypes for testing if we are running under a certain OS.

@@ -79,8 +79,8 @@ typedef struct sock_s {
 	(fd_set*)(R), (fd_set*)(W), (fd_set*)(E), (T))
 #endif
 
-int sock_startup();
-void sock_cleanup();
+int sock_startup(void);
+void sock_cleanup(void);
 int sock_init(sock_t *sock);
 int sock_close(sock_t *sock);
 int sock_set_non_blocking(sock_t *sock, int flag);

@@ -55,7 +55,7 @@ void Get_login_name(char *buf, size_t size)
 #endif
 }
 
-int xpprintf(char* fmt, ...)
+int xpprintf(const char* fmt, ...)
 {
     int result;
     va_list argp;
