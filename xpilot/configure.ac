@@ -11,6 +11,7 @@ dnl AC_CANONICAL_HOST
 
 
 dnl  Checks for options.
+dnl  We should have some general macro for these.
 AC_ARG_ENABLE(dbe,
 	AC_HELP_STRING([--enable-dbe],
 			[support for X Doublebuffer Extension in client]),
@@ -20,28 +21,52 @@ fi])
 
 AC_ARG_ENABLE(mbx,
 	AC_HELP_STRING([--enable-mbx],
-			[support for X Multibuffer Extension in client]))
-
+			[support for X Multibuffer Extension in client]),
+[if test $enable_dbe = yes; then
+	AC_DEFINE([MBX], 1, [support for X Multibuffer Extension in client])
+fi])
 
 AC_ARG_ENABLE(sparccmaphack,
 	AC_HELP_STRING([--enable-sparccmaphack],
-			[support for SPARC colormap hack in client]))
+			[support for SPARC colormap hack in client]),
+[if test $enable_sparccmaphack = yes; then
+	AC_DEFINE([SPARC_CMAP_HACK], 1, [support for SPARC colormap hack in client])
+fi])
 
 AC_ARG_ENABLE(log,
 	AC_HELP_STRING([--enable-log],
-			[Try to log every server start to log file]))
+			[Try to log every server start to log file]),
+[if test $enable_log = yes; then
+	AC_DEFINE([LOG], 1, [Try to log every server start to log file])
+fi])
 
 AC_ARG_ENABLE(silent,
 	AC_HELP_STRING([--enable-silent],
-			[Makes the server real silent]))
+			[Makes the server real silent]),
+[if test $enable_silent = yes; then
+	AC_DEFINE([SILENT], 1, [Makes the server real silent])
+fi])
 
 AC_ARG_ENABLE(serversound,
 	AC_HELP_STRING([--enable-serversound],
-			[Turns on sound support in the server (not client)]))
+			[Turns on sound support in the server (not client)]),
+[if test $enable_serversound = yes; then
+	AC_DEFINE([SERVER_SOUND], 1, [Turns on sound support in the server])
+fi])
 
 AC_ARG_ENABLE(plockserver,
 	AC_HELP_STRING([--enable-plockserver],
-			[lock the xpilot server (xpilots) into memory]))
+			[lock the xpilot server (xpilots) into memory]),
+[if test $enable_plockserver = yes; then
+	AC_DEFINE([PLOCKSERVER], 1, [lock the xpilot server (xpilots) into memory])
+fi])
+
+AC_ARG_ENABLE(development,
+	AC_HELP_STRING([--enable-development],
+			[enable development code]),
+[if test $enable_development = yes; then
+	AC_DEFINE([DEVELOPMENT], 1, [enable development code])
+fi])
 
 
 dnl  Checks for programs.
