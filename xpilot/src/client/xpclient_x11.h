@@ -48,7 +48,7 @@
 #  include <X11/Xmd.h>
 #endif
 
-#include "meta.h"
+/* X client specific headers */
 #include "bitmaps.h"
 #include "dbuff.h"
 #include "paintdata.h"

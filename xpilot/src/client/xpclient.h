@@ -55,7 +55,10 @@ typedef unsigned short uint16_t; /* e.g. in client.c */
 extern bool threadedDraw; /* default.c */
 #endif
 
-
+/*
+ * Client header files that are "generic", that is common to all client
+ * implementations.
+ */
 #include "client.h"
 #include "clientcommand.h"
 #include "clientrank.h"
@@ -63,14 +66,14 @@ extern bool threadedDraw; /* default.c */
 #include "connectparam.h"
 #include "datagram.h"
 #include "gfx2d.h"
-#include "guimap.h"      /* guimap.c depends on X11 */
+#include "guimap.h"
 #include "guiobjects.h"
 #include "meta.h"
 #include "netclient.h"
 #include "option.h"
 #include "paint.h"
 #include "recordfmt.h"
-#include "talk.h"        /* talk.c depends on X11 */
+#include "talk.h"
 
 #endif /* XPCLIENT_H */
 
