@@ -324,7 +324,7 @@ void Make_item(world_t *world, clpos_t pos, vector_t vel,
     obj->pl_radius = ITEM_SIZE/2;
 
     world->items[item].num++;
-    Cell_add_object(obj);
+    Cell_add_object(world, obj);
 }
 
 void Throw_items(player_t *pl)
@@ -498,11 +498,11 @@ void General_tractor_beam(player_t *pl, clpos_t pos,
 
 void Do_deflector(player_t *pl)
 {
-    double	range = (pl->item[ITEM_DEFLECTOR] * 0.5 + 1) * BLOCK_CLICKS;
-    double	maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
-    object_t	*obj, **obj_list;
-    int		i, obj_count;
-    double	dx, dy, dist;
+    double range = (pl->item[ITEM_DEFLECTOR] * 0.5 + 1) * BLOCK_CLICKS;
+    double maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
+    object_t *obj, **obj_list;
+    int i, obj_count;
+    double dx, dy, dist;
 
     if (pl->fuel.sum < -ED_DEFLECTOR) {
 	if (BIT(pl->used, HAS_DEFLECTOR))
@@ -511,7 +511,7 @@ void Do_deflector(player_t *pl)
     }
     Player_add_fuel(pl, ED_DEFLECTOR);
 
-    Cell_get_objects(pl->pos, (int)(range / BLOCK_CLICKS + 1), 200,
+    Cell_get_objects(pl->world, pl->pos, (int)(range / BLOCK_CLICKS + 1), 200,
 		     &obj_list, &obj_count);
 
     for (i = 0; i < obj_count; i++) {

@@ -553,7 +553,7 @@ void Make_wreckage(world_t *world,
 	wreckage->pl_radius = radius;
 	wreckage->status = status;
 	wreckage->mods = mods;
-	Cell_add_object(OBJ_PTR(wreckage));
+	Cell_add_object(world, OBJ_PTR(wreckage));
     }
 }
 

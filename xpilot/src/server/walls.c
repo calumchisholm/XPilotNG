@@ -2575,7 +2575,7 @@ void Treasure_init(world_t *world)
     int i;
 
     for (i = 0; i < world->NumTreasures; i++)
-	Make_treasure_ball(Treasures(world, i));
+	Make_treasure_ball(world, Treasures(world, i));
 }
 
 
@@ -2607,7 +2607,7 @@ static void Move_ball(object_t *obj)
 	while (pos.cy < 0)
 	    pos.cy += world->cheight;
 	Object_position_set_clpos(obj, pos);
-	Cell_add_object(obj);
+	Cell_add_object(world, obj);
 	return;
     }
     owner = BALL_PTR(obj)->owner;
@@ -2646,7 +2646,7 @@ static void Move_ball(object_t *obj)
 	}
     }
     Object_position_set_clvec(obj, mv.start);
-    Cell_add_object(obj);
+    Cell_add_object(world, obj);
     return;
 }
 
@@ -2658,6 +2658,7 @@ void Move_object(object_t *obj)
     struct collans ans;
     int trycount = 5000;
     int team;            /* !@# should make TEAM_NOT_SET 0 */
+    world_t *world = &World;
 
     mv.obj = obj;
     Object_position_remember(obj);
@@ -2717,7 +2718,7 @@ void Move_object(object_t *obj)
 	}
     }
     Object_position_set_clvec(obj, mv.start);
-    Cell_add_object(obj);
+    Cell_add_object(world, obj);
     return;
 }
 

@@ -695,7 +695,7 @@ void Reset_all_players(world_t *world)
 
 	    treasure->destroyed = 0;
 	    treasure->have = false;
-	    Make_treasure_ball(treasure);
+	    Make_treasure_ball(world, treasure);
 	}
 
 	/* Reset the teams */

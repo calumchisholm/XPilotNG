@@ -544,10 +544,9 @@ void Parse_robot_file(void)
 /*
  * First time initialization of all the robot stuff.
  */
-void Robot_init(void)
+void Robot_init(world_t *world)
 {
-    int         	i, result;
-    int			n;
+    int i, result, n;
 
     /*
      * For each robot driver call its initialization function.

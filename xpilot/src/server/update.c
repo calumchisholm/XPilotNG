@@ -822,7 +822,7 @@ static void Warp_balls(player_t *pl, clpos_t dest)
 		Object_position_remember(b);
 		b->vel.x *= WORM_BRAKE_FACTOR;
 		b->vel.y *= WORM_BRAKE_FACTOR;
-		Cell_add_object(b);
+		Cell_add_object(world, b);
 	    }
 	}
     }

@@ -236,7 +236,7 @@ void Place_general_mine(player_t *pl, int team, long status,
 	mine->mods = mods;
 	mine->pl_range = (int)(MINE_RANGE / minis);
 	mine->pl_radius = MINE_RADIUS;
-	Cell_add_object((object_t *) mine);
+	Cell_add_object(world, (object_t *) mine);
     }
 }
 
@@ -281,7 +281,7 @@ void Detonate_mines(player_t *pl)
     return;
 }
 
-void Make_treasure_ball(treasure_t *t)
+void Make_treasure_ball(world_t *world, treasure_t *t)
 {
     ballobject_t *ball;
     clpos_t pos = t->pos;
@@ -321,7 +321,7 @@ void Make_treasure_ball(treasure_t *t)
     ball->status = RECREATE;
     ball->treasure = t;
     ball->style = t->ball_style;
-    Cell_add_object(OBJ_PTR(ball));
+    Cell_add_object(world, OBJ_PTR(ball));
 
     t->have = true;
 }
@@ -1004,7 +1004,7 @@ void Fire_general_shot(player_t *pl, int team, bool cannon,
 	shot->mods  	= mods;
 	shot->pl_range  = pl_range;
 	shot->pl_radius = pl_radius;
-	Cell_add_object(shot);
+	Cell_add_object(world, shot);
 
 	mini_objs[fired] = shot;
 	fired++;
@@ -1340,7 +1340,7 @@ void Delete_shot(world_t *world, int ind)
 	break;
     }
 
-    Cell_remove_object(shot);
+    Cell_remove_object(world, shot);
     shot->life = 0;
     shot->type = 0;
     shot->mass = 0;
@@ -1371,7 +1371,7 @@ void Delete_shot(world_t *world, int ind)
     }
     else if (addBall) {
 	ball = BALL_PTR(shot);
-	Make_treasure_ball(ball->treasure);
+	Make_treasure_ball(world, ball->treasure);
     }
 }
 
@@ -1454,7 +1454,7 @@ void Fire_general_laser(player_t *pl, int team, clpos_t pos,
     pulse->len  	= 0 /*options.pulseLength * CLICK*/;
     pulse->refl 	= false;
 
-    Cell_add_object(OBJ_PTR(pulse));
+    Cell_add_object(world, OBJ_PTR(pulse));
 
     if (pl)
 	pl->num_pulses++;

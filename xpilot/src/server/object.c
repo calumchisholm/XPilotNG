@@ -97,7 +97,7 @@ void Object_free_ptr(object_t *obj)
 
 static anyobject_t *objArray;
 
-void Alloc_shots(int number)
+void Alloc_shots(world_t *world, int number)
 {
     anyobject_t		*x;
     int			i;
@@ -112,17 +112,14 @@ void Alloc_shots(int number)
     for (i = 0; i < number; i++) {
 	Obj[i] = &(x->obj);
 	MINE_PTR(Obj[i])->owner = NO_ID;
-	Cell_init_object(Obj[i]);
+	Cell_init_object(world, Obj[i]);
 	x++;
     }
 }
 
-void Free_shots(void)
+void Free_shots(world_t *world)
 {
-    if (objArray != NULL) {
-	free(objArray);
-	objArray = NULL;
-    }
+    XFREE(objArray);
 }
 
 

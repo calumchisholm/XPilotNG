@@ -426,12 +426,12 @@ enum TeamPickType {
 /*
  * Prototypes for cell.c
  */
-void Free_cells(void);
-void Alloc_cells(void);
-void Cell_init_object(object_t *obj);
-void Cell_add_object(object_t *obj);
-void Cell_remove_object(object_t *obj);
-void Cell_get_objects(clpos_t pos, int r, int max, object_t ***list, int *count);
+void Free_cells(world_t *world);
+void Alloc_cells(world_t *world);
+void Cell_init_object(world_t *world, object_t *obj);
+void Cell_add_object(world_t *world, object_t *obj);
+void Cell_remove_object(world_t *world, object_t *obj);
+void Cell_get_objects(world_t *world, clpos_t pos, int r, int max, object_t ***list, int *count);
 
 /*
  * Prototypes for collision.c
@@ -572,7 +572,7 @@ void Fire_left_shot(player_t *pl, int type, int dir, int gun);
 void Fire_right_shot(player_t *pl, int type, int dir, int gun);
 void Fire_left_rshot(player_t *pl, int type, int dir, int gun);
 void Fire_right_rshot(player_t *pl, int type, int dir, int gun);
-void Make_treasure_ball(treasure_t *t);
+void Make_treasure_ball(world_t *world, treasure_t *t);
 
 void Ball_hits_goal(ballobject_t *ball, group_t *groupptr);
 void Ball_is_replaced(ballobject_t *ball);
@@ -829,7 +829,7 @@ static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
  * Prototypes for robot.c
  */
 void Parse_robot_file(void);
-void Robot_init(void);
+void Robot_init(world_t *world);
 void Robot_delete(player_t *robot, bool kicked);
 void Robot_destroy(player_t *robot);
 void Robot_update(world_t *world);
@@ -958,8 +958,8 @@ void Alliance_player_list(player_t *pl);
 object_t *Object_allocate(void);
 void Object_free_ind(int ind);
 void Object_free_ptr(object_t *obj);
-void Alloc_shots(int number);
-void Free_shots(void);
+void Alloc_shots(world_t *world, int number);
+void Free_shots(world_t *world);
 const char *Object_typename(object_t *obj);
 
 /*

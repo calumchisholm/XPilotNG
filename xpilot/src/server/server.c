@@ -109,11 +109,11 @@ int main(int argc, char **argv)
     /* Allocate memory for players, shots and messages */
     Alloc_players(world->NumBases + MAX_PSEUDO_PLAYERS + MAX_SPECTATORS);
     spectatorStart = world->NumBases + MAX_PSEUDO_PLAYERS;
-    Alloc_shots(MAX_TOTAL_SHOTS);
-    Alloc_cells();
+    Alloc_shots(world, MAX_TOTAL_SHOTS);
+    Alloc_cells(world);
 
     Move_init(world);
-    Robot_init();
+    Robot_init(world);
     Treasure_init(world);
     Hitmasks_init(world);
 
@@ -334,9 +334,9 @@ int End_game(void)
     Rank_write_score_file();
 
     Free_players();
-    Free_shots();
+    Free_shots(world);
     World_free(world);
-    Free_cells();
+    Free_cells(world);
     Free_options();
     Log_game("END");			    /* options.Log end */
 

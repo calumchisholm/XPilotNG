@@ -285,7 +285,7 @@ static void Make_asteroid(world_t *world, clpos_t pos,
 
     if (Asteroid_add_to_list(asteroid) == true) {
 	world->asteroids.num += 1 << (size - 1);
-	Cell_add_object(OBJ_PTR(asteroid));
+	Cell_add_object(world, OBJ_PTR(asteroid));
     }
     else
 	Object_free_ptr(OBJ_PTR(asteroid));

@@ -192,7 +192,7 @@ void Cannon_throw_items(cannon_t *c)
 		obj->pl_range = ITEM_SIZE / 2;
 		obj->pl_radius = ITEM_SIZE / 2;
 		world->items[i].num++;
-		Cell_add_object(obj);
+		Cell_add_object(world, obj);
 	    }
 	    c->item[i] -= amount;
 	}
@@ -283,7 +283,7 @@ static int Cannon_in_danger(cannon_t *c)
     if (options.cannonSmartness == 0)
 	return false;
 
-    Cell_get_objects(c->pos, range, max_objs,
+    Cell_get_objects(world, c->pos, range, max_objs,
 		     &obj_list, &obj_count);
 
     for (i = 0; (i < obj_count) && !danger; i++) {

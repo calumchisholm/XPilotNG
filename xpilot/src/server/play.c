@@ -275,6 +275,7 @@ void Make_debris(world_t  *world,
 	    && type == OBJ_SHOT) {
 	    /* compensate so that m*v^2 is constant */
 	    double sp_shotsp = speed / options.shotSpeed;
+
 	    debris->mass = mass / (sp_shotsp * sp_shotsp);
 	} else
 	    debris->mass = mass;
@@ -286,7 +287,7 @@ void Make_debris(world_t  *world,
 	debris->pl_radius = radius;
 	debris->status = status;
 	debris->mods = mods;
-	Cell_add_object(debris);
+	Cell_add_object(world, debris);
     }
 }
 
