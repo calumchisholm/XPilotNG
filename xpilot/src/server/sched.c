@@ -271,8 +271,18 @@ void sched(void)
 		*playback_sched++ = 0;
 	    /* RECORDING STUFF END */
 
-	    if (timer_handler)
-		(*timer_handler)();
+	    {
+		struct timeval tv1, tv2;
+		double t1, t2;
+
+		gettimeofday(&tv1, NULL);
+		if (timer_handler)
+		    (*timer_handler)();
+		gettimeofday(&tv2, NULL);
+		t1 = timeval_to_seconds(tv1);
+		t2 = timeval_to_seconds(tv2);
+		options.mainLoopTime = (t2 - t1) * 1e3;
+	    }
 
 	    t_nextframe += frametime;
 	}

@@ -3623,8 +3623,18 @@ static option_desc opts[] = {
 	tuner_dummy,
 	"The number of the teamcup match.\n",
 	OPT_COMMAND | OPT_VISIBLE
+    },
+    {
+	"mainLoopTime",
+	"mainLoopTime",
+	"0",
+	&options.mainLoopTime,
+	valReal,
+	tuner_none,
+	"Duration of last Main_loop() function call (in milliseconds).\n"
+	"This option is read only.\n",
+	OPT_COMMAND | OPT_VISIBLE
     }
-    /* end of options.teamcup related options */
 };
 
 

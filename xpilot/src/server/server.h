@@ -400,6 +400,8 @@ extern struct options {
     char	*teamcupStatServer;
     int		teamcupStatPort;
     int		teamcupMatchNumber;
+
+    double	mainLoopTime;
 } options;
 
 
