@@ -823,14 +823,17 @@ static void Update_players(world_t *world)
 
 	if (pl->recovery_count > 0) {
 	    assert(!BIT(pl->pl_status, PLAYING));
+	    assert(Player_is_dead(pl) || Player_is_appearing(pl));
 	    pl->recovery_count -= timeStep;
 	    if (pl->recovery_count <= 0) {
 		/* Player has recovered. */
 		/* kps - unless he was killed on last life ... */
 		pl->recovery_count = 0;
-		if (BIT(world->rules->mode, LIMITED_LIVES))
+		if (BIT(world->rules->mode, LIMITED_LIVES)) {
+		    if (!Player_is_dead(pl))
+			Player_set_state(pl, PL_STATE_ALIVE);
 		    SET_BIT(pl->pl_status, PLAYING);
-		else
+		} else
 		    Player_set_state(pl, PL_STATE_ALIVE);
 		Go_home(pl); 
 	    }

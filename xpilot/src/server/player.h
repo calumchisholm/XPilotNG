@@ -385,8 +385,8 @@ static inline bool Player_is_appearing(player_t *pl)
 #ifdef USE_PL_STATE
     return pl->pl_state == PL_STATE_APPEARING ? true : false;
 #else
-    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED) == 0
-	&& pl->recovery_count > 0)
+    /* actually for a the undefined state this would return true also. */
+    if (BIT(pl->pl_status, PLAYING|PAUSE|GAME_OVER|KILLED) == 0)
 	return true;
     return false;
 #endif
