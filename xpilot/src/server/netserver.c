@@ -212,47 +212,49 @@ static int Compress_map(unsigned char *map, size_t size)
 }
 
 
-static void Setup_old_blockmap(void)
+static void Setup_old_blockmap(world_t *world)
 {
     int x;
     unsigned char *map_line;
     unsigned char **map_pointer;
 
-    World.block = (unsigned char **)malloc(sizeof(unsigned char *)*World.x
-				     + World.x*sizeof(unsigned char)*World.y);
-    if (World.block == NULL) {
+    world->block = (unsigned char **)
+	malloc(sizeof(unsigned char *) * world->x
+	       + world->x * sizeof(unsigned char) * world->y);
+
+    if (world->block == NULL) {
 	error("Couldn't allocate memory");
 	exit(-1);
     }
 
-    map_pointer = World.block;
-    map_line = (unsigned char*) ((unsigned char**)map_pointer + World.x);
+    map_pointer = world->block;
+    map_line = (unsigned char *) ((unsigned char **)map_pointer + world->x);
 
-    for (x=0; x<World.x; x++) {
+    for (x = 0; x < world->x; x++) {
 	*map_pointer = map_line;
 	map_pointer += 1;
-	map_line += World.y;
+	map_line += world->y;
     }
 
     /* Client will quit if it gets a nonexistent homebase, so create
      * some bases to make it happy. Of course it's impossible to play
      * with this, but at least we can tell the player what's wrong... */
     if (mapData == NULL) {
-	mapData = malloc((size_t)World.NumBases + 1);
+	mapData = malloc((size_t)world->NumBases + 1);
 	if (mapData == NULL) {
 	    error("Couldn't allocate memory");
 	    exit(-1);
 	}
-	for (x = 0; x < World.NumBases; x++)
+	for (x = 0; x < world->NumBases; x++)
 	    mapData[x] = '1';
-	mapData[World.NumBases] = 0;
+	mapData[world->NumBases] = 0;
     }
     Xpmap_grok_map_data();
     Xpmap_tags_to_internal_data(false);
 }
 
 
-static int Init_setup_old(void)
+static setup_t *Init_setup_old(world_t *world)
 {
     int			i, x, y, team, type = -1,
 			wormhole = 0,
@@ -262,25 +264,26 @@ static int Init_setup_old(void)
 			cannon = 0;
     unsigned char	*mapdata, *mapptr;
     size_t		size, numblocks;
+    setup_t		*setup;
 
-    if (is_polygon_map && World.block) {
-	free(World.block);
-	World.block = NULL;
+    if (is_polygon_map && world->block) {
+	free(world->block);
+	world->block = NULL;
     }
-    if (World.block == NULL)
-	Setup_old_blockmap(); /* Never freed as of now */
+    if (world->block == NULL)
+	Setup_old_blockmap(world);
 
-    numblocks = World.x * World.y;
+    numblocks = world->x * world->y;
     if ((mapdata = malloc(numblocks)) == NULL) {
 	error("No memory for mapdata");
-	return -1;
+	return NULL;
     }
     memset(mapdata, SETUP_SPACE, numblocks);
     mapptr = mapdata;
     errno = 0;
-    for (x = 0; x < World.x; x++) {
-	for (y = 0; y < World.y; y++, mapptr++) {
-	    type = World.block[x][y];
+    for (x = 0; x < world->x; x++) {
+	for (y = 0; y < world->y; y++, mapptr++) {
+	    type = world->block[x][y];
 	    switch (type) {
 	    case ACWISE_GRAV:
 	    case CWISE_GRAV:
@@ -340,53 +343,53 @@ static int Init_setup_old(void)
 	    case DECOR_LU:	*mapptr = SETUP_DECOR_LU; break;
 	    case DECOR_LD:	*mapptr = SETUP_DECOR_LD; break;
 	    case WORMHOLE:
-		if (wormhole >= World.NumWormholes) {
+		if (wormhole >= world->NumWormholes) {
 		    warn("Too many wormholes in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		switch (World.wormholes[wormhole++].type) {
+		switch (world->wormholes[wormhole++].type) {
 		case WORM_NORMAL: *mapptr = SETUP_WORM_NORMAL; break;
 		case WORM_IN:     *mapptr = SETUP_WORM_IN; break;
 		case WORM_OUT:    *mapptr = SETUP_WORM_OUT; break;
 		default:
 		    error("Bad wormhole (%d,%d).", x, y);
 		    free(mapdata);
-		    return -1;
+		    return NULL;
 		}
 		break;
 	    case TREASURE:
-		if (treasure >= World.NumTreasures) {
+		if (treasure >= world->NumTreasures) {
 		    warn("Too many treasures in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = World.treasures[treasure++].team;
+		team = world->treasures[treasure++].team;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
 		*mapptr = SETUP_TREASURE + team;
 		break;
 	    case TARGET:
-		if (target >= World.NumTargets) {
+		if (target >= world->NumTargets) {
 		    warn("Too many targets in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = World.targets[target++].team;
+		team = world->targets[target++].team;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
 		*mapptr = SETUP_TARGET + team;
 		break;
 	    case BASE:
-		if (base >= World.NumBases) {
+		if (base >= world->NumBases) {
 		    warn("Too many bases in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		team = World.bases[base].team;
+		team = world->bases[base].team;
 		if (team == TEAM_NOT_SET)
 		    team = 0;
-		switch (World.bases[base++].dir) {
+		switch (world->bases[base++].dir) {
 		case DIR_UP:    *mapptr = SETUP_BASE_UP + team; break;
 		case DIR_RIGHT: *mapptr = SETUP_BASE_RIGHT + team; break;
 		case DIR_DOWN:  *mapptr = SETUP_BASE_DOWN + team; break;
@@ -394,16 +397,16 @@ static int Init_setup_old(void)
 		default:
 		    error("Bad base at (%d,%d).", x, y);
 		    free(mapdata);
-		    return -1;
+		    return NULL;
 		}
 		break;
 	    case CANNON:
-		if (cannon >= World.NumCannons) {
+		if (cannon >= world->NumCannons) {
 		    warn("Too many cannons in block mapdata.");
 		    *mapptr = SETUP_SPACE;
 		    break;
 		}
-		switch (World.cannons[cannon++].dir) {
+		switch (world->cannons[cannon++].dir) {
 		case DIR_UP:	*mapptr = SETUP_CANNON_UP; break;
 		case DIR_RIGHT:	*mapptr = SETUP_CANNON_RIGHT; break;
 		case DIR_DOWN:	*mapptr = SETUP_CANNON_DOWN; break;
@@ -411,11 +414,11 @@ static int Init_setup_old(void)
 		default:
 		    error("Bad cannon at (%d,%d).", x, y);
 		    free(mapdata);
-		    return -1;
+		    return NULL;
 		}
 		break;
 	    case CHECK:
-		for (i = 0; i < World.NumChecks; i++) {
+		for (i = 0; i < world->NumChecks; i++) {
 		    check_t *check = Checks(i);
 		    blpos bpos = Clpos_to_blpos(check->pos);
 		    if (x != bpos.bx || y != bpos.by)
@@ -423,10 +426,10 @@ static int Init_setup_old(void)
 		    *mapptr = SETUP_CHECK + i;
 		    break;
 		}
-		if (i >= World.NumChecks) {
+		if (i >= world->NumChecks) {
 		    error("Bad checkpoint at (%d,%d).", x, y);
 		    free(mapdata);
-		    return -1;
+		    return NULL;
 		}
 		break;
 	    default:
@@ -445,11 +448,11 @@ static int Init_setup_old(void)
 	if (size <= 0 || size > numblocks) {
 	    warn("Map compression error (%d)", size);
 	    free(mapdata);
-	    return -1;
+	    return NULL;
 	}
 	if ((mapdata = (unsigned char *)realloc(mapdata, size)) == NULL) {
 	    error("Cannot reallocate mapdata");
-	    return -1;
+	    return NULL;
 	}
     }
 
@@ -460,26 +463,26 @@ static int Init_setup_old(void)
 	}
     }
 
-    if ((Oldsetup = malloc(sizeof(setup_t) + size)) == NULL) {
+    if ((setup = malloc(sizeof(setup_t) + size)) == NULL) {
 	error("No memory to hold oldsetup");
 	free(mapdata);
-	return -1;
+	return NULL;
     }
-    memset(Oldsetup, 0, sizeof(setup_t) + size);
-    memcpy(Oldsetup->map_data, mapdata, size);
+    memset(setup, 0, sizeof(setup_t) + size);
+    memcpy(setup->map_data, mapdata, size);
     free(mapdata);
-    Oldsetup->setup_size = ((char *) &Oldsetup->map_data[0]
-			    - (char *) Oldsetup) + size;
-    Oldsetup->map_data_len = size;
-    Oldsetup->map_order = type;
-    Oldsetup->lives = World.rules->lives;
-    Oldsetup->mode = World.rules->mode;
-    Oldsetup->x = World.x;
-    Oldsetup->y = World.y;
-    strlcpy(Oldsetup->name, World.name, sizeof(Oldsetup->name));
-    strlcpy(Oldsetup->author, World.author, sizeof(Oldsetup->author));
+    setup->setup_size = ((char *) &setup->map_data[0]
+			 - (char *) setup) + size;
+    setup->map_data_len = size;
+    setup->map_order = type;
+    setup->lives = world->rules->lives;
+    setup->mode = world->rules->mode;
+    setup->x = world->x;
+    setup->y = world->y;
+    strlcpy(setup->name, world->name, sizeof(setup->name));
+    strlcpy(setup->author, world->author, sizeof(setup->author));
 
-    return 0;
+    return setup;
 }
 
 
@@ -495,10 +498,14 @@ static int Init_setup(void)
     int			result;
     unsigned char	*mapdata;
 
-    result = Init_setup_old();
+    Oldsetup = Init_setup_old(&World);
 
-    if (!is_polygon_map)
-	return result;
+    if (!is_polygon_map) {
+	if (Oldsetup)
+	    return 0;
+	else
+	    return -1;
+    }
 
     size = Polys_to_client(&mapdata);
     if (!silent)
