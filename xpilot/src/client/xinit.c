@@ -338,28 +338,11 @@ int Init_top(void)
     XSetWindowAttributes		sattr;
     unsigned long			mask;
 
-    if (topWindow) {
-	error("Init_top called twice");
-	exit(1);
-    }
+    if (topWindow)
+	fatal("Init_top called twice");
 
     if (Colors_init() == -1)
 	return -1;
-
-    if (shieldDrawMode == -1) {
-	shieldDrawMode = 0;
-	/*
-	 * Default is solid for NCD X11 servers.  My NCD mono 19 inch
-	 * terminal, vendor release 2002 suffers from terrible slowness
-	 * when drawing dashed arcs with thick lines.
-	 */
-	if (strcmp (ServerVendor (dpy),
-		    "DECWINDOWS (Compatibility String) "
-		    "Network Computing Devices Inc.") == 0
-	    && ProtocolVersion (dpy) == 11)
-	    shieldDrawMode = 1;
-
-    }
 #endif
 
     /* check that colors have sane values, if not, set a default */
@@ -487,7 +470,6 @@ int Init_top(void)
     OPTIONCHECK(charsPerSecond,  >,  255,     <,  10,  "%d",   50);
 #undef OPTIONCHECK
 
-    shieldDrawMode = shieldDrawMode ? LineSolid : LineOnOffDash;
     radarDrawRectanglePtr = XFillRectangle;
 
     /*

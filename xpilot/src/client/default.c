@@ -916,17 +916,6 @@ xp_option_t default_options[] = {
 
 
     {
-	"shieldDrawSolid",
-	NULL,
-	"Default",
-	KEY_DUMMY,
-	"Are shields drawn in a solid line.\n"
-	"Not setting a value for this option will select the best value\n"
-	"automatically for your particular display system.\n",
-	0
-    },
-
-    {
 	"clientRanker",
 	NULL,
 	"No",
@@ -1750,16 +1739,6 @@ cl_option_t options[] = {
 	"Yes",
 	KEY_DUMMY,
 	"Are shields lowered automatically for weapon fire?\n",
-	0
-    },
-    {
-	"shieldDrawSolid",
-	NULL,
-	"Default",
-	KEY_DUMMY,
-	"Are shields drawn in a solid line.\n"
-	"Not setting a value for this option will select the best value\n"
-	"automatically for your particular display system.\n",
 	0
     },
     {
@@ -4325,15 +4304,6 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "teamShotColor", &teamShotColor);
     Get_bool_resource(rDB, "showNastyShots", &showNastyShots);
     Get_bool_resource(rDB, "titleFlip", &titleFlip);
-    /*
-     * This is a special value; default or not defined means choose depending
-     * on the display, otherwise its a boolean value.
-     */
-    Get_string_resource(rDB, "shieldDrawSolid", resValue, sizeof resValue);
-    if (strncasecmp(resValue, "default", 7) == 0)
-	shieldDrawMode = -1;
-    else
-	shieldDrawMode = ON(resValue);
     Get_bool_resource(rDB, "toggleShield", &toggle_shield);
     Get_bool_resource(rDB, "autoShield", &auto_shield);
 

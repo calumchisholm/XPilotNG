@@ -83,7 +83,6 @@ Window	keys_close_b;		/* Help window's close button */
 Window	talkWindow;
 bool	gotFocus;
 bool	players_exposed;
-int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */
 
 static double   time_counter = 0.0;
 

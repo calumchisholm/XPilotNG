@@ -140,7 +140,6 @@ extern int	active_view_height;	/* Height of active map area displayed. */
 extern int	ext_view_x_offset;	/* Offset of ext_view_width */
 extern int	ext_view_y_offset;	/* Offset of ext_view_height */
 extern bool	markingLights;		/* Marking lights on ships */
-extern int	shieldDrawMode;		/* How to draw players shield */
 
 extern char	sparkColors[MSG_LEN];
 extern int	spark_color[MAX_COLORS];
