@@ -146,11 +146,13 @@ static int Kick_robot_players(int team)
 	    int low_i = -1;
 	    int i;
 	    for (i = 0; i < NumPlayers; i++) {
-		if (!IS_ROBOT_IND(i) || Players(i)->team == robotTeam)
+		player *pl_i = Players(i);
+
+		if (!IS_ROBOT_IND(i) || pl_i->team == robotTeam)
 		    continue;
-		if (Players(i)->score < low_score) {
+		if (pl_i->score < low_score) {
 		    low_i = i;
-		    low_score = Players(i)->score;
+		    low_score = pl_i->score;
 		}
 	    }
 	    if (low_i >= 0) {
@@ -170,11 +172,13 @@ static int Kick_robot_players(int team)
 	    int low_i = -1;
 	    int i;
 	    for (i = 0; i < NumPlayers; i++) {
-		if (!IS_ROBOT_IND(i) || Players(i)->team != team)
+		player *pl_i = Players(i);
+
+		if (!IS_ROBOT_IND(i) || pl_i->team != team)
 		    continue;
-		if (Players(i)->score < low_score) {
+		if (pl_i->score < low_score) {
 		    low_i = i;
-		    low_score = Players(i)->score;
+		    low_score = pl_i->score;
 		}
 	    }
 	    if (low_i >= 0) {
@@ -198,26 +202,30 @@ static int do_kick(int team, int nonlast)
     int			num_unpaused = 0;
 
     for (i = NumPlayers - 1; i >= 0; i--) {
-	if (Players(i)->conn != NOT_CONNECTED
-	    && BIT(Players(i)->status, PAUSE)
-	    && (team == TEAM_NOT_SET || Players(i)->team == team)
-	    && !(Players(i)->privs & PRIV_NOAUTOKICK)
-	    && (!nonlast || !(Players(i)->privs & PRIV_AUTOKICKLAST))) {
+	player *pl_i = Players(i);
+
+	if (pl_i->conn != NOT_CONNECTED
+	    && BIT(pl_i->status, PAUSE)
+	    && (team == TEAM_NOT_SET || pl_i->team == team)
+	    && !(pl_i->privs & PRIV_NOAUTOKICK)
+	    && (!nonlast || !(pl_i->privs & PRIV_AUTOKICKLAST))) {
 
 	    /* team 0 pausers have special privileges =) */
-	    if (teamZeroPausing && Players(i)->team == 0)
+	    if (teamZeroPausing && pl_i->team == 0)
 		continue;
 
 	    if (team == TEAM_NOT_SET) {
 		sprintf(msg,
-			"The paused \"%s\" was kicked because the game is full.",
-			Players(i)->name);
-		Destroy_connection(Players(i)->conn, "no pause with full game");
+			"The paused \"%s\" was kicked because the "
+			"game is full.",
+			pl_i->name);
+		Destroy_connection(pl_i->conn, "no pause with full game");
 	    } else {
 		sprintf(msg,
-			"The paused \"%s\" was kicked because team %d is full.",
-			Players(i)->name, team);
-		Destroy_connection(Players(i)->conn, "no pause with full team");
+			"The paused \"%s\" was kicked because team %d "
+			"is full.",
+			pl_i->name, team);
+		Destroy_connection(pl_i->conn, "no pause with full team");
 	    }
 	    Set_message(msg);
 	    num_unpaused++;
@@ -246,7 +254,8 @@ static int Reply(char *host_addr, int port)
     const int		max_send_retries = 3;
 
     for (i = 0; i < max_send_retries; i++) {
-	if ((result = sock_send_dest(&ibuf.sock, host_addr, port, ibuf.buf, ibuf.len)) == -1) {
+	if ((result = sock_send_dest(&ibuf.sock, host_addr, port,
+				     ibuf.buf, ibuf.len)) == -1) {
 	    sock_get_error(&ibuf.sock);
 	} else {
 	    break;
@@ -284,8 +293,10 @@ static int Check_names(char *nick_name, char *real_name, char *host_name)
 	}
     }
     for (i = 0; i < NumPlayers; i++) {
-	if (strcasecmp(Players(i)->name, nick_name) == 0) {
-	    D(printf("%s %s\n", Players(i)->name, nick_name));
+	player *pl_i = Players(i);
+
+	if (strcasecmp(pl_i->name, nick_name) == 0) {
+	    D(printf("%s %s\n", pl_i->name, nick_name));
 	    return E_IN_USE;
 	}
     }
@@ -419,7 +430,8 @@ void Contact(int fd, void *arg)
 	}
 	if (reply_to == CREDENTIALS_pack) {
 	    Sockbuf_clear(&ibuf);
-	    Packet_printf(&ibuf, "%u%c%c%ld", my_magic, reply_to, SUCCESS, credentials);
+	    Packet_printf(&ibuf, "%u%c%c%ld", my_magic, reply_to, SUCCESS,
+			  credentials);
 	    Reply(host_addr, port);
 	    return;
 	}
@@ -557,28 +569,30 @@ void Contact(int fd, void *arg)
 	    status = E_INVAL;
 	}
 	else {
-	    for (i=0; i<NumPlayers; i++) {
+	    for (i = 0; i < NumPlayers; i++) {
+		player *pl_i = Players(i);
 		/*
 		 * Kicking players by realname is not a good idea,
 		 * because several players may have the same realname.
 		 * E.g., system administrators joining as root...
 		 */
-		if (strcasecmp(str, Players(i)->name) == 0
-		    || strcasecmp(str, Players(i)->realname) == 0) {
+		if (strcasecmp(str, pl_i->name) == 0
+		    || strcasecmp(str, pl_i->realname) == 0) {
 		    found = i;
 		}
 	    }
 	    if (found == -1) {
 		status = E_NOT_FOUND;
 	    } else {
+		player *pl_found = Players(found);
 		sprintf(msg,
-			"\"%s\" upset the gods and was kicked out of the game.",
-			 Players(found)->name);
+			"\"%s\" upset the gods and was kicked out "
+			"of the game.", pl_found->name);
 		Set_message(msg);
-		if (Players(found)->conn == NOT_CONNECTED) {
+		if (pl_found->conn == NOT_CONNECTED) {
 		    Delete_player(found);
 		} else {
-		    Destroy_connection(Players(found)->conn, "kicked out");
+		    Destroy_connection(pl_found->conn, "kicked out");
 		}
 		updateScores = true;
 	    }
@@ -841,11 +855,14 @@ void Queue_loop(void)
 	if (last_unqueued_loops + 2 + (FPS >> 2) < main_loops) {
 
 	    /* is there a homebase available? */
-	    if (NumPlayers - NumPseudoPlayers + login_in_progress < World.NumBases - playerLimit
+	    if (NumPlayers - NumPseudoPlayers + login_in_progress
+		< World.NumBases - playerLimit
 		|| (Kick_robot_players(TEAM_NOT_SET)
-		    && NumPlayers - NumPseudoPlayers + login_in_progress < World.NumBases - playerLimit)
+		    && NumPlayers - NumPseudoPlayers + login_in_progress
+		    < World.NumBases - playerLimit)
 		|| (Kick_paused_players(TEAM_NOT_SET)
-		    && NumPlayers - NumPseudoPlayers + login_in_progress < World.NumBases - playerLimit)) {
+		    && NumPlayers - NumPseudoPlayers + login_in_progress
+		    < World.NumBases - playerLimit)) {
 
 		/* find a team for this fellow. */
 		if (BIT(World.rules->mode, TEAM_PLAY)) {
@@ -1148,7 +1165,8 @@ void Set_deny_hosts(void)
     for (tok = strtok(list, list_sep); tok; tok = strtok(NULL, list_sep)) {
 	n++;
     }
-    addr_mask_list = (struct addr_plus_mask *)malloc(n * sizeof(*addr_mask_list));
+    addr_mask_list = (struct addr_plus_mask *)
+	malloc(n * sizeof(*addr_mask_list));
     num_addr_mask = n;
     strcpy(list, denyHosts);
     for (tok = strtok(list, list_sep); tok; tok = strtok(NULL, list_sep)) {
@@ -1156,7 +1174,8 @@ void Set_deny_hosts(void)
 	if (slash) {
 	    *slash = '\0';
 	    mask = sock_get_inet_by_addr(slash + 1);
-	    if (mask == (unsigned long) -1 && strcmp(slash + 1, "255.255.255.255")) {
+	    if (mask == (unsigned long) -1
+		&& strcmp(slash + 1, "255.255.255.255")) {
 		continue;
 	    }
 	    if (mask == 0) {
