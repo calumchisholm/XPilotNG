@@ -104,32 +104,14 @@ static int Compress_map(unsigned char *map, size_t size)
 
 static void Xpmap_setup(world_t *world)
 {
-    int x;
-    unsigned char *map_line;
-    unsigned char **map_pointer;
-
-    world->block = (unsigned char **)
-	malloc(sizeof(unsigned char *) * world->x
-	       + world->x * sizeof(unsigned char) * world->y);
-
-    if (world->block == NULL) {
-	error("Couldn't allocate memory");
-	exit(-1);
-    }
-
-    map_pointer = world->block;
-    map_line = (unsigned char *) ((unsigned char **)map_pointer + world->x);
-
-    for (x = 0; x < world->x; x++) {
-	*map_pointer = map_line;
-	map_pointer += 1;
-	map_line += world->y;
-    }
+    assert(world->block);
 
     /* Client will quit if it gets a nonexistent homebase, so create
      * some bases to make it happy. Of course it's impossible to play
      * with this, but at least we can tell the player what's wrong... */
     if (options.mapData == NULL) {
+	int x;
+
 	options.mapData = malloc((size_t)world->NumBases + 1);
 	if (options.mapData == NULL) {
 	    error("Couldn't allocate memory");
@@ -140,27 +122,19 @@ static void Xpmap_setup(world_t *world)
 	options.mapData[world->NumBases] = 0;
     }
     Xpmap_grok_map_data(world, options.mapData);
-    XFREE(options.mapData);
     Xpmap_tags_to_internal_data(world, false);
 }
 
 
 setup_t *Xpmap_init_setup(world_t *world)
 {
-    int			i, x, y, team, type = -1, dir, wtype,
-			wormhole = 0,
-			treasure = 0,
-			target = 0,
-			base = 0,
-			cannon = 0;
-    unsigned char	*mapdata, *mapptr;
-    size_t		size, numblocks;
-    setup_t		*setup;
+    int i, x, y, team, type = -1, dir, wtype;
+    int wormhole = 0, treasure = 0, target = 0, base = 0, cannon = 0;
+    unsigned char *mapdata, *mapptr;
+    size_t size, numblocks;
+    setup_t *setup;
 
-    if (is_polygon_map && world->block)
-	XFREE(world->block);
-
-    if (world->block == NULL)
+    if (is_polygon_map)
 	Xpmap_setup(world);
 
     numblocks = world->x * world->y;
@@ -404,14 +378,10 @@ setup_t *Xpmap_init_setup(world_t *world)
  */
 void Xpmap_grok_map_data(world_t *world, char *map_data)
 {
-    int x, y, c;
-    char *s;
+    int x = -1, y = world->y - 1, c;
+    char *s = map_data;
     blkpos_t blk;
 
-    x = -1;
-    y = world->y - 1;
-
-    s = map_data;
     while (y >= 0) {
 
 	x++;
@@ -460,6 +430,8 @@ void Xpmap_grok_map_data(world_t *world, char *map_data)
 	blk.by = y;
 	World_set_block(world, blk, c);
     }
+
+    XFREE(options.mapData);
 }
 
 

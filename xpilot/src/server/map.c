@@ -361,19 +361,23 @@ void World_free(world_t *world)
     XFREE(world->frictionAreas);
 }
 
-static void World_alloc(world_t *world)
+static bool World_alloc(world_t *world)
 {
     int x;
+    unsigned char *map_line;
+    unsigned char **map_pointer;
+    vector_t *grav_line;
+    vector_t **grav_pointer;
 
-    if (world->block || world->gravity)
-	World_free(world);
+    assert(world->block == NULL);
+    assert(world->gravity == NULL);
 
-    world->block =
-	(unsigned char **)malloc(sizeof(unsigned char *)*world->x
-				 + world->x*sizeof(unsigned char)*world->y);
-    world->gravity =
-	(vector_t **)malloc(sizeof(vector_t *)*world->x
-			  + world->x*sizeof(vector_t)*world->y);
+    world->block = (unsigned char **)
+	malloc(sizeof(unsigned char *) * world->x
+	       + world->x * sizeof(unsigned char) * world->y);
+    world->gravity = (vector_t **)
+	malloc(sizeof(vector_t *) * world->x
+	       + world->x * sizeof(vector_t) * world->y);
 
     assert(world->gravs == NULL);
     assert(world->bases == NULL);
@@ -386,28 +390,26 @@ static void World_alloc(world_t *world)
 
     if (world->block == NULL || world->gravity == NULL) {
 	World_free(world);
-	fatal("Couldn't allocate memory for map");
-    } else {
-	unsigned char *map_line;
-	unsigned char **map_pointer;
-	vector_t *grav_line;
-	vector_t **grav_pointer;
-
-	map_pointer = world->block;
-	map_line = (unsigned char*) ((unsigned char**)map_pointer + world->x);
-
-	grav_pointer = world->gravity;
-	grav_line = (vector_t*) ((vector_t**)grav_pointer + world->x);
-
-	for (x=0; x<world->x; x++) {
-	    *map_pointer = map_line;
-	    map_pointer += 1;
-	    map_line += world->y;
-	    *grav_pointer = grav_line;
-	    grav_pointer += 1;
-	    grav_line += world->y;
-	}
+	error("Couldn't allocate memory for map");
+	return false;
     }
+
+    map_pointer = world->block;
+    map_line = (unsigned char*) ((unsigned char**)map_pointer + world->x);
+
+    grav_pointer = world->gravity;
+    grav_line = (vector_t*) ((vector_t**)grav_pointer + world->x);
+
+    for (x = 0; x < world->x; x++) {
+	*map_pointer = map_line;
+	map_pointer += 1;
+	map_line += world->y;
+	*grav_pointer = grav_line;
+	grav_pointer += 1;
+	grav_line += world->y;
+    }
+
+    return true;
 }
 
 
@@ -528,7 +530,8 @@ bool Grok_map_options(world_t *world)
     strlcpy(world->author, options.mapAuthor, sizeof(world->author));
     strlcpy(world->dataURL, options.dataURL, sizeof(world->dataURL));
 
-    World_alloc(world);
+    if (!World_alloc(world))
+	return false;
 
     Set_world_rules(world);
     Set_world_items(world);
@@ -549,7 +552,6 @@ bool Grok_map(world_t *world)
 	    exit(1);
 
 	Xpmap_grok_map_data(world, options.mapData);
-	XFREE(options.mapData);
 	Xpmap_tags_to_internal_data(world, true);
 	Xpmap_find_map_object_teams(world);
     }
