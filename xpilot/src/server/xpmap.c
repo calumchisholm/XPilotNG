@@ -811,7 +811,7 @@ static void Xpmap_cannon_to_polygon(int ind)
     ps = P_get_poly_id("cannon_ps");
     es = P_get_edge_id("cannon_es");
 
-    P_start_cannon(c->pos.cx, c->pos.cy, c->dir, c->team, ind);
+    P_start_cannon(c->team, ind);
     /* we need a more general function for this purpose */
     Xpmap_cannon_polygon(c, ps, es);
     P_end_cannon();

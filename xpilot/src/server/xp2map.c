@@ -262,24 +262,22 @@ static void tagstart(void *data, const char *el, const char **attr)
 	return;
     }
 
-    /* kps extensions */
     if (!strcasecmp(el, "Cannon")) {
 	int team = TEAM_NOT_SET, cx = -1, cy = -1, dir = DIR_UP, ind = -1;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
 		team = atoi(*(attr + 1));
-	    if (!strcasecmp(*attr, "x"))
+	    else if (!strcasecmp(*attr, "x"))
 		cx = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "y"))
+	    else if (!strcasecmp(*attr, "y"))
 		cy = atoi(*(attr + 1)) * scale;
-	    if (!strcasecmp(*attr, "dir"))
+	    else if (!strcasecmp(*attr, "dir"))
 		dir = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	ind = Map_place_cannon(cx, cy, dir, team);
-	/* kps - check ind ? */
-	P_start_cannon(cx, cy, dir, team, ind);
+	P_start_cannon(team, ind);
 	return;
     }    
     

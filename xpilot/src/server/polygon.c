@@ -251,7 +251,7 @@ void P_end_target(void)
     current_group = 0;
 }
 
-void P_start_cannon(int cx, int cy, int dir, int team, int ind)
+void P_start_cannon(int team, int ind)
 {
     current_group = ++num_groups;
     groups[current_group].type = CANNON;

@@ -489,7 +489,7 @@ void P_start_balltarget(int team);
 void P_end_balltarget(void);
 void P_start_target(int team, int ind);
 void P_end_target(void);
-void P_start_cannon(int cx, int cy, int dir, int team, int ind);
+void P_start_cannon(int team, int ind);
 void P_end_cannon(void);
 void P_start_wormhole(int ind);
 void P_end_wormhole(void);
