@@ -341,7 +341,7 @@ void Meta_connect(int *connections_ptr, int *maxfd_ptr)
 						      metas[i].addr,
 						      META_PROG_PORT);
 	if (status == SOCK_IS_ERROR) {
-	  error(buf);
+	  error(metas[i].addr);
 	} else {
 	    connections++;
 	    if (metas[i].sock.fd > max)
@@ -573,8 +573,7 @@ int Get_meta_data(char *errorstr)
     fd_set rset_out, wset_out;
     struct timeval tv;
     char *newline;
-    char buf[MSG_LEN];
-
+ 
     /*
      * Buffer to hold data from a socket connection to a Meta.
      * The ptr points to the first byte of the unprocessed data.
@@ -594,13 +593,13 @@ int Get_meta_data(char *errorstr)
     /* connect asynchronously. */
     Meta_connect(&connections, &max);
     if (!connections) {
-	sprintf(buf, "Could not establish connections with any metaserver" \
+	sprintf(errorstr, "Could not establish connections with any metaserver" \
 		     ", either the meta is not responding or you have" \
 		     " network problems" );
 	return -1;
     }
 
-    sprintf(buf, "Establishing %s with %d metaserver%s ... ",
+    sprintf(errorstr, "Establishing %s with %d metaserver%s ... ",
 	    ((connections > 1) ? "connections" : "a connection"),
 	    connections, ((connections > 1) ? "s" : ""));
 
@@ -667,9 +666,7 @@ int Get_meta_data(char *errorstr)
 		bytes_read =
 		    read(metas[i].sock.fd, md[i].end, buffer_space);
 		if (bytes_read <= 0) {
-		  /* if (bytes_read == -1)
-		     error("Error while reading data from meta %d\n",i + 1);*/
-		    FD_CLR(metas[i].sock.fd, &rset_in);
+  		    FD_CLR(metas[i].sock.fd, &rset_in);
 		    close(metas[i].sock.fd);
 		    metas[i].sock.fd = SOCK_FD_INVALID;
 		    --connections;
@@ -740,13 +737,12 @@ int Get_meta_data(char *errorstr)
 	server_count = List_size(server_list);
 
     if (server_count > 0) {
-	sprintf(buf, "Received information about %d Internet servers",
+	sprintf(errorstr, "Received information about %d Internet servers",
 		server_count);
 	server_list_creation_time = time(NULL);
     } else
-	sprintf(buf, "Could not contact any Internet Meta server");
+	sprintf(errorstr, "Could not contact any Internet Meta server");
 
-    strcpy(errorstr ,buf);
 
     return server_count;
 }

@@ -135,7 +135,8 @@ static const char map_header[] = "Map Name";
 static const char server_header[] = "Server";
 static const char ping_header[] = "Ping";
 static const char stat_header[] = "Status";
-
+static char err[MSG_LEN] = {0};
+static char buf[MSG_LEN] = {0};
 /*
  * Other prototypes.
  */
@@ -795,7 +796,7 @@ static int Internet_first_page_cb(int widget, void *user_data,
 static int Internet_ping_cb(int widget, void *user_data, const char **text)
 {
     Connect_param_t *conpar = (Connect_param_t *) user_data;
-    char buf[MSG_LEN];
+   
     
     (void)widget; (void)text;
     
@@ -1110,8 +1111,7 @@ static void Internet_cleanup(void)
 static int Internet_cb(int widget, void *user_data, const char **text)
 {
     Connect_param_t *conpar = (Connect_param_t *) user_data;
-    char buf[MSG_LEN];
-    char err[MSG_LEN];
+    
 
     (void)widget; (void)text;
     Welcome_set_mode(ModeInternet);
