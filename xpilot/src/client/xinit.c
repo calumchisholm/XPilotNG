@@ -344,19 +344,6 @@ int Init_top(void)
 	return -1;
 #endif
 
-    if (wallRadarColor >= maxColors
-	|| ((wallRadarColor & 5) && colorSwitch))
-	wallRadarColor = BLUE;
-
-    if (targetRadarColor >= maxColors
-	|| ((targetRadarColor & 1) && colorSwitch))
-	/* should be & 5? !@# */
-	targetRadarColor = BLUE;
-
-    if (decorRadarColor >= maxColors
-	|| ((decorRadarColor & 5) && colorSwitch))
-	decorRadarColor = 2;
-
     radarDrawRectanglePtr = XFillRectangle;
 
     /*

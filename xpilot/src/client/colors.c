@@ -94,9 +94,6 @@ int	twoLivesColor;		/* Color to associate with 2 lives */
 int	manyLivesColor;		/* Color to associate with >2 lives */
 int	wallColor;		/* Color index for wall drawing */
 int	decorColor;		/* Color index for decoration drawing */
-int	wallRadarColor;		/* Color index for walls on radar. */
-int	targetRadarColor;	/* Color index for targets on radar. */
-int	decorRadarColor;	/* Color index for decorations on radar. */
 int	selfLWColor;
 int	enemyLWColor;
 int	teamLWColor;
@@ -1096,7 +1093,7 @@ static bool Set_maxColors (xp_option_t *opt, int val)
 }
 
 
-xp_option_t color_options[] = {
+static xp_option_t color_options[] = {
 
     XP_INT_OPTION(
 	"maxColors",
@@ -1310,27 +1307,6 @@ xp_option_t color_options[] = {
 	1,
 	&borderColor,
 	"Which color number to use for drawing borders.\n"),
-
-    COLOR_INDEX_OPTION(
-	"wallRadarColor",
-	8,
-	&wallRadarColor,
-	"Which color number to use for drawing walls on the radar.\n"
-	"Valid values all even numbers smaller than maxColors.\n"),
-
-    COLOR_INDEX_OPTION(
-	"decorRadarColor",
-	6,
-	&decorRadarColor,
-	"Which color number to use for drawing decorations on the radar.\n"
-	"Valid values are all even numbers smaller than maxColors.\n"),
-
-    COLOR_INDEX_OPTION(
-	"targetRadarColor",
-	4,
-	&targetRadarColor,
-	"Which color number to use for drawing targets on the radar.\n"
-	"Valid values are all even numbers smaller than maxColors.\n"),
 
     COLOR_INDEX_OPTION(
 	"zeroLivesColor",

@@ -37,8 +37,12 @@ int	(*radarDrawRectanglePtr)	/* Function to draw player on radar */
 	 int x, int y, unsigned width, unsigned height);
 
 
-static int	slidingradar_x;	/* sliding radar offsets for windows */
-static int	slidingradar_y;
+static int slidingradar_x;	/* sliding radar offsets for windows */
+static int slidingradar_y;
+
+static int wallRadarColor;	/* Color index for walls on radar. */
+static int targetRadarColor;	/* Color index for targets on radar. */
+static int decorRadarColor;	/* Color index for decorations on radar. */
 
 
 static void Copy_static_radar(void)
@@ -710,3 +714,69 @@ void Radar_hide_target(int x, int y)
     Paint_radar_block(x, y, BLACK);
 }
 
+
+static bool Set_wallRadarColor(xp_option_t *opt, int value)
+{
+    (void)opt;
+
+    wallRadarColor = value;
+    if ((wallRadarColor & 5) && colorSwitch)
+	wallRadarColor = BLUE;    
+
+    return true;
+}
+
+static bool Set_decorRadarColor(xp_option_t *opt, int value)
+{
+    (void)opt;
+
+    decorRadarColor = value;
+    if ((decorRadarColor & 5) && colorSwitch)
+	decorRadarColor = BLUE;    
+
+    return true;
+}
+
+static bool Set_targetRadarColor(xp_option_t *opt, int value)
+{
+    (void)opt;
+
+    targetRadarColor = value;
+    if ((targetRadarColor & 5) && colorSwitch)
+	targetRadarColor = BLUE;    
+
+    return true;
+}
+
+
+static xp_option_t paintradar_options[] = {
+
+    COLOR_INDEX_OPTION_WITH_SETFUNC(
+	"wallRadarColor",
+	8,
+	&wallRadarColor,
+	Set_wallRadarColor,
+	"Which color number to use for drawing walls on the radar.\n"
+	"Valid values all even numbers smaller than maxColors.\n"),
+
+    COLOR_INDEX_OPTION_WITH_SETFUNC(
+	"decorRadarColor",
+	6,
+	&decorRadarColor,
+	Set_decorRadarColor,
+	"Which color number to use for drawing decorations on the radar.\n"
+	"Valid values are all even numbers smaller than maxColors.\n"),
+
+    COLOR_INDEX_OPTION_WITH_SETFUNC(
+	"targetRadarColor",
+	4,
+	&targetRadarColor,
+	Set_targetRadarColor,
+	"Which color number to use for drawing targets on the radar.\n"
+	"Valid values are all even numbers smaller than maxColors.\n"),
+};
+
+void Store_paintradar_options(void)
+{
+    STORE_OPTIONS(paintradar_options);
+}
