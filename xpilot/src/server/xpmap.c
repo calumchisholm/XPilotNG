@@ -686,6 +686,7 @@ void Xpmap_grok_map_data(world_t *world)
 static void Xpmap_place_cannon(world_t *world, blkpos_t blk, int dir)
 {
     clpos_t pos;
+    int ind;
 
     switch (dir) {
     case DIR_UP:
@@ -711,7 +712,8 @@ static void Xpmap_place_cannon(world_t *world, blkpos_t blk, int dir)
     }
 
     World_set_block(world, blk, CANNON);
-    World_place_cannon(world, pos, dir, TEAM_NOT_SET);
+    ind = World_place_cannon(world, pos, dir, TEAM_NOT_SET);
+    Cannon_init(Cannon_by_index(world, ind));
 }
 
 /*

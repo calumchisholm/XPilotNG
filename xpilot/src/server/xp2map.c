@@ -492,6 +492,7 @@ static void tagend(void *data, const char *el)
 	P_end_balltarget();
     else if (!strcasecmp(el, "Cannon")) {
 	P_end_cannon();
+	Cannon_init(current_cannon);
 	current_cannon = NULL;
     } else if (!strcasecmp(el, "FrictionArea"))
 	P_end_friction_area();

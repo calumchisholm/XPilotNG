@@ -110,7 +110,7 @@ static void Realloc_map_objects(world_t *world)
 int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
 {
     cannon_t t, *cannon;
-    int ind = world->NumCannons;
+    int ind = world->NumCannons, i;
 
     t.world = world;
     t.pos = pos;
@@ -126,9 +126,10 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
 	warn("The server supports only %d cannons per map.", NUM_CANNON_IDS);
 	exit(1);
     }
+    for (i = 0; i < NUM_ITEMS; i++)
+	t.initial_items[i] = -1;
     STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
     cannon = Cannon_by_index(world, ind);
-    Cannon_init(cannon);
     assert(Cannon_by_id(world, t.id) == cannon);
     return ind;
 }

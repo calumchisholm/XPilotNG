@@ -164,21 +164,14 @@ void tuner_teamcannons(world_t *world)
 
 void tuner_cannonsuseitems(world_t *world)
 {
-    int i, j;
+    int i;
     cannon_t *c;
 
     Move_init(world);
 
     for (i = 0; i < world->NumCannons; i++) {
 	c = Cannon_by_index(world, i);
-	for (j = 0; j < NUM_ITEMS; j++) {
-	    c->item[j] = 0;
-
-	    if (options.cannonsUseItems)
-		Cannon_add_item(c, j,
-				(int)(rfrac()
-				      * (world->items[j].initial + 1)));
-	}
+	Cannon_init_items(c);
     }
 }
 

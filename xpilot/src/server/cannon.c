@@ -205,17 +205,8 @@ void Cannon_throw_items(cannon_t *c)
    items. */
 void Cannon_init(cannon_t *c)
 {
-    int i;
-    world_t *world = c->world;
-
+    Cannon_init_items(c);
     c->last_change = frame_loops;
-    for (i = 0; i < NUM_ITEMS; i++) {
-	c->item[i] = 0;
-	if (options.cannonsUseItems)
-	    Cannon_add_item(c, i,
-			    (double)(int)
-			    (rfrac() * (world->items[i].initial + 1)));
-    }
     c->damaged = 0;
     c->tractor_target_pl = NULL;
     c->tractor_count = 0;
@@ -223,6 +214,24 @@ void Cannon_init(cannon_t *c)
     c->used = 0;
     c->emergency_shield_left = 0;
     c->phasing_left = 0;
+}
+
+void Cannon_init_items(cannon_t *c)
+{
+    int i;
+    world_t *world = c->world;
+
+    for (i = 0; i < NUM_ITEMS; i++) {
+	c->item[i] = 0;
+	if (options.cannonsUseItems) {
+	    int amount = c->initial_items[i];
+
+	    if (amount < 0)
+		amount = (int)(rfrac() * (world->items[i].initial + 1));
+
+	    Cannon_add_item(c, i, amount);
+	}
+    }
 }
 
 void Cannon_check_defense(cannon_t *c)
@@ -926,4 +935,9 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
 void Cannon_set_option(cannon_t *cannon, const char *name, const char *value)
 {
     warn("setting cannon %p option %s to value %s", cannon, name, value);
+
+    if (!strcasecmp(name, "initialafterburners"))
+	cannon->initial_items[ITEM_AFTERBURNER] = atoi(value);
+    if (!strcasecmp(name, "initiallasers"))
+	cannon->initial_items[ITEM_LASER] = atoi(value);
 }

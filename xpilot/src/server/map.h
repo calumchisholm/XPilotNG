@@ -120,6 +120,7 @@ typedef struct cannon {
     int		group;
     double	score;
     int		id;
+    int		initial_items[NUM_ITEMS];
 } cannon_t;
 
 typedef struct check {
