@@ -522,6 +522,7 @@ int Init_top(void)
     COLORCHECK(fuelColor, 3);
     COLORCHECK(messagesColor, 3);
     COLORCHECK(oldMessagesColor, 2);
+    COLORCHECK(backgroundPointColor, 2);
 
     if (maxColors > 4) {
 	COLORCHECK(decorColor, 6);

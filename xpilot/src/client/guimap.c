@@ -1132,7 +1132,10 @@ void Gui_paint_setup_asteroid_concentrator(int x, int y)
 
 void Gui_paint_decor_dot(int x, int y, int size)
 {
-    Rectangle_add(BLUE, X(x + BLOCK_SZ / 2) - (map_point_size >> 1),
+    if (!backgroundPointColor)
+	return;
+    Rectangle_add(backgroundPointColor,
+		  X(x + BLOCK_SZ / 2) - (map_point_size >> 1),
 		  Y(y + BLOCK_SZ / 2) - (map_point_size >> 1),
 		  size, size);
 }

@@ -63,6 +63,7 @@ char paintmap_version[] = VERSION;
 int	wallColor;		/* Color index for wall drawing */
 int	fuelColor;		/* Color index for fuel station drawing */
 int	decorColor;		/* Color index for decoration drawing */
+int	backgroundPointColor;	/* Color index for background point drawing */
 int	visibilityBorderColor;	/* Color index for visibility border drawing */
 char	*wallTextureFile;	/* Filename of wall texture */
 char	*decorTextureFile;	/* Filename of decor texture */
@@ -73,6 +74,7 @@ extern XPoint *polys[500];
 extern int polyc;
 extern int polypc[500];
 
+static DFLOAT 	hrLimitTime = 0.0;
 
 void Paint_vcannon(void)
 {
@@ -145,7 +147,8 @@ static void Paint_background_dots(void)
     int xi, yi;
     ipos min, max, count;
 
-    if (map_point_distance == 0) return;
+    if (map_point_distance == 0)
+	return;
 
     count.x = Setup->width / (BLOCK_SZ * map_point_distance);
     count.y = Setup->height / (BLOCK_SZ * map_point_distance);
@@ -154,9 +157,11 @@ static void Paint_background_dots(void)
     dy = (float)Setup->height / count.y;
 
     min.x = world.x / dx;
-    if (world.x > 0) min.x++;
+    if (world.x > 0)
+	min.x++;
     min.y = world.y / dy;
-    if (world.y > 0) min.y++;
+    if (world.y > 0)
+	min.y++;
 
     max.x = (world.x + ext_view_width) / dx;
     max.y = (world.y + ext_view_height) / dy;
@@ -338,8 +343,21 @@ void Paint_world(void)
 				 visibilityBorderColor);
     }
 
-    /* kps - this should be drawn more than one frame if fps is high */
+    /* Paint a rectangle showing the HUD radar limit. */
+    if (hrLimitTime > 0.0) {
+	hrLimitTime -= timePerFrame;
+	if (hrLimitTime <= 0.0)
+	    hrLimitTime = 0.0;
+    }
+
+    if (oldHRLimit < 0.0)
+	oldHRLimit = hudRadarLimit;
     if (oldHRLimit != hudRadarLimit) {
+	oldHRLimit = hudRadarLimit;
+	hrLimitTime = 1.0;
+    }
+
+    if (hrLimitTime > 0.0) {
 	Gui_paint_visible_border(
 	    (int)(world.x + ext_view_width/2
 		  - hudRadarLimit * MAX_VIEW_SIZE/2),
@@ -349,12 +367,11 @@ void Paint_world(void)
 		  + hudRadarLimit * MAX_VIEW_SIZE/2),
 	    (int)(world.y + ext_view_height/2
 		  + hudRadarLimit * MAX_VIEW_SIZE/2),
-	    WHITE);
-	oldHRLimit = hudRadarLimit;
+	    BLUE);
     }
 
     if (!oldServer) {
-        Paint_background_dots();
+	Paint_background_dots();
         return;
     }
 

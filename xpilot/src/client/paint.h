@@ -198,6 +198,7 @@ extern int	baseWarningType;	/* Which type of base warning you prefer */
 extern int	baseWarningFrames;	/* Duration of base warning */
 extern int	wallColor;		/* Color index for wall drawing */
 extern int	fuelColor;		/* Color index for fuel box drawing */
+extern int	backgroundPointColor;	/* Color index for background point drawing */
 extern int	wallRadarColor;		/* Color index for walls on radar */
 extern int	targetRadarColor;	/* Color index for targets on radar */
 extern int	decorColor;		/* Color index for decoration drawing */

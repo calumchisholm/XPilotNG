@@ -186,6 +186,7 @@ static int Config_create_baseWarningType(int widget_desc, int *height);
 static int Config_create_wallColor(int widget_desc, int *height);
 static int Config_create_fuelColor(int widget_desc, int *height);
 static int Config_create_decorColor(int widget_desc, int *height);
+static int Config_create_backgroundPointColor(int widget_desc, int *height);
 static int Config_create_showDecor(int widget_desc, int *height);
 static int Config_create_outlineDecor(int widget_desc, int *height);
 static int Config_create_filledDecor(int widget_desc, int *height);
@@ -385,6 +386,7 @@ static int	(*config_creator_colors[])(int widget_desc, int *height) = {
     Config_create_wallColor,
     Config_create_fuelColor,
     Config_create_decorColor,
+    Config_create_backgroundPointColor,
     Config_create_save			/* must be last */
 };
 
@@ -1329,6 +1331,11 @@ static int Config_create_decorColor(int widget_desc, int *height)
     return CONFIG_CREATE_COLOR(decorColor);
 }
 
+static int Config_create_backgroundPointColor(int widget_desc, int *height)
+{
+    return CONFIG_CREATE_COLOR(backgroundPointColor);
+}
+
 static int Config_create_showDecor(int widget_desc, int *height)
 {
     /* kps - remove */
@@ -2018,6 +2025,7 @@ static int Config_save(int widget_desc, void *button_str, const char **strptr)
     Config_save_int(fp, "wallColor", wallColor);
     Config_save_int(fp, "fuelColor", fuelColor);
     Config_save_int(fp, "decorColor", decorColor);
+    Config_save_int(fp, "backgroundPointColor", backgroundPointColor);
 
     Config_save_comment(fp,
 			";\n"

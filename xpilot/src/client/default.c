@@ -1316,6 +1316,13 @@ option options[] = {
 	"Which color number to use for drawing decorations.\n"
     },
     {
+	"backgroundPointColor",
+	NULL,
+	"2",
+	KEY_DUMMY,
+	"Which color number to use for drawing background points.\n"
+    },
+    {
 	"showDecor",
 	NULL,
 	"Yes",
@@ -3129,6 +3136,7 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     Get_int_resource(rDB, "fuelColor", &fuelColor);
     Get_int_resource(rDB, "wallRadarColor", &wallRadarColor);
     Get_int_resource(rDB, "decorColor", &decorColor);
+    Get_int_resource(rDB, "backgroundPointColor", &backgroundPointColor);
     Get_int_resource(rDB, "decorRadarColor", &decorRadarColor);
     Get_int_resource(rDB, "targetRadarColor", &targetRadarColor);
     Get_int_resource(rDB, "messagesColor", &messagesColor);
