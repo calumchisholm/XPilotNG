@@ -2706,9 +2706,6 @@ static int Receive_power(int ind)
     power = (DFLOAT) tmp / 256.0F;
     pl = Players[GetInd[connp->id]];
     autopilot = BIT(pl->used, HAS_AUTOPILOT);
-    /* old client are going to send autopilot-mangled data, ignore it */
-    if (autopilot && pl->version < 0x4200)
-	return 1;
 
     switch (ch) {
     case PKT_POWER:
@@ -3660,7 +3657,7 @@ static int Receive_fps_request(int ind)
 	if (fps == 0)
 	    fps = 1;
 	if ((fps == 20) && ignore20MaxFPS)
-	    fps = FPS;
+	    fps = 100;
  	pl->player_fps = fps;
     }
 
