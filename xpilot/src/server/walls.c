@@ -2776,7 +2776,8 @@ static void Move_player_new(int ind)
     clpos  pos;
     struct move mv;
     struct collans ans;
-
+    DFLOAT fric;
+    vector oldv;
 
     if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) != PLAYING) {
 	if (!BIT(pl->status, KILLED|PAUSE)) {
@@ -2793,9 +2794,20 @@ static void Move_player_new(int ind)
 	return;
     }
 
-    /* kps - changed from  vel *= friction */
-    pl->vel.x *= (1.0f - friction);
-    pl->vel.y *= (1.0f - friction);
+    /* Figure out which friction to use. */
+    if (BIT(pl->used, HAS_PHASING_DEVICE))
+	fric = friction;
+    else {
+	/*
+	 * kps - insert code here which checks if we are on a
+	 * friction polygon and use it's friction?
+	 */
+	fric = friction;
+    }
+
+    oldv = pl->vel;
+    pl->vel.x = (1.0f - fric) * (oldv.x * cor_cos + oldv.y * cor_sin);
+    pl->vel.y = (1.0f - fric) * (oldv.y * cor_cos - oldv.x * cor_sin);
 
     Player_position_remember(pl);
 

@@ -1758,7 +1758,7 @@ void Move_player_old(int ind)
 	}
     }
 
-    cor_res = MOD2(coriolis * RES / 360, RES);
+    cor_res = MOD2(((int)coriolis) * RES / 360, RES);
     oldvx = pl->vel.x;
     oldvy = pl->vel.y;
     pl->vel.x = (1.0f - fric) * (oldvx * tcos(cor_res) + oldvy * tsin(cor_res));

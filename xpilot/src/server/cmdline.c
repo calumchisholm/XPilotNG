@@ -283,7 +283,8 @@ static DFLOAT	frictionSetting;	/* Above set through this */
 DFLOAT		blockFriction;		/* friction in friction blocks */
 bool		blockFrictionVisible;	/* if yes, friction blocks are decor; */
 					/* if no, friction blocks are space */
-int		coriolis;		/* angle velocity turns each frame */
+DFLOAT		coriolis;		/* angle velocity turns each time unit */
+DFLOAT		cor_cos, cor_sin;	/* cosine and sine of cor. angle */
 DFLOAT		checkpointRadius;      	/* in blocks */
 int		raceLaps;		/* how many laps per race */
 bool		lockOtherTeam;		/* lock ply from other teams when dead? */
@@ -3257,9 +3258,9 @@ static option_desc options[] = {
 	"coriolis",
 	"0",
 	&coriolis,
-	valInt,
-	tuner_dummy,
-	"The clockwise angle (in degrees) a ship's velocity turns each frame.\n",
+	valReal,
+	Timing_setup,
+	"The clockwise angle (in degrees) a ship's velocity turns each time unit.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
@@ -3783,7 +3784,19 @@ void Timing_setup(void)
 
     /* ecm size used to be halved every update on old servers */
     ecmSizeFactor = pow(0.5, timeStep);
+
+    /* coriolis stuff */
+    {
+	double cor_angle;
+
+	cor_angle = coriolis * PI / 180.0;
+
+	cor_cos = cos(cor_angle / timeStep);
+	cor_sin = sin(cor_angle / timeStep);
+    }
+
     install_timer_tick(NULL, timerResolution ? timerResolution : FPS);
+
 #if 0
     xpprintf(__FILE__ ": gameSpeed         = %f\n", gameSpeed);
     xpprintf(__FILE__ ": timeStep          = %f\n", timeStep);

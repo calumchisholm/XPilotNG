@@ -300,7 +300,7 @@ extern time_t		gameOverTime;
 extern DFLOAT		friction;
 extern DFLOAT		blockFriction;
 extern bool		blockFrictionVisible;
-extern int		coriolis;
+extern DFLOAT		coriolis, cor_cos, cor_sin;
 extern DFLOAT		checkpointRadius;
 extern int		raceLaps;
 extern bool		lockOtherTeam;
