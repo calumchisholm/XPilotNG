@@ -673,7 +673,16 @@ int GetInd(int id);
 
 static inline player_t *Player_by_id(int id)
 {
-    return Players(GetInd(id));
+    int ind = GetInd(id);
+
+#if 0
+    if (ind < 0 || ind >= NumPlayers) {
+	warn("ind = %d, (ind < 0 || ind >= NumPlayers)", ind);
+	return NULL;
+    }
+#endif
+
+    return Players(ind);
 }
 
 static inline bool Player_is_playing(player_t *pl)

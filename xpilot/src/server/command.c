@@ -45,12 +45,21 @@ char command_version[] = VERSION;
  */
 player_t *Get_player_by_name(char *str, int *error_p, const char **errorstr_p)
 {
-    int i;
+    int i, id;
     player_t *found_pl = NULL, *pl;
     size_t len;
 
     if (str == NULL || (len = strlen(str)) == 0)
 	goto match_none;
+
+    /* Get player by id */
+    id = atoi(str);
+    if (id > 0) {
+	found_pl = Player_by_id(id);
+	if (!found_pl)
+	    goto match_none;
+	return found_pl;
+    }
 
     /* Look for an exact match on player nickname. */
     for (i = 0; i < NumPlayers; i++) {

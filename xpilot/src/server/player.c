@@ -39,12 +39,12 @@ static int	GetIndArray[NUM_IDS + MAX_SPECTATORS + 1];
  */
 player_t *Players(int ind)
 {
-    if (ind == -1)
+    if (ind == NO_IND)
 	return NULL;
 
     if (ind < 0 || ind >= playerArrayNumber) {
-	warn("Players: ind = %d, array size = %d\n",
-	     ind, playerArrayNumber);
+	/*warn("Players: ind = %d, array size = %d\n",
+	  ind, playerArrayNumber);*/
 	return NULL;
     }
     return PlayersArray[ind];
@@ -56,17 +56,17 @@ player_t *Players(int ind)
 int GetInd(int id)
 {
     if (id == NO_ID)
-	return -1;
+	return NO_IND;
 
     /*
      * kps - in some places where we look at the id we don't
      * bother about spectators.
      * This should be cleaned up in general.
      */
-    if (id < 0 || id >= NUM_IDS + MAX_SPECTATORS + 1) {
-	warn("GetInd: id = %d, array size = %d\n",
-	     id, NUM_IDS + MAX_SPECTATORS + 1);
-	return -1;
+    if (id < 0 || id >= NELEM(GetIndArray)) {
+	/*warn("GetInd: id = %d, array size = %d\n",
+	  id, NUM_IDS + MAX_SPECTATORS + 1);*/
+	return NO_IND;
     }
     return GetIndArray[id];
 }
@@ -89,8 +89,7 @@ void Pick_startpos(player_t *pl)
 
     if (prev_num_bases != world->NumBases) {
 	prev_num_bases = world->NumBases;
-	if (free_bases != NULL)
-	    free(free_bases);
+	XFREE(free_bases);
 	free_bases = malloc(world->NumBases * sizeof(*free_bases));
 	if (free_bases == NULL) {
 	    error("Can't allocate memory for free_bases");
@@ -532,6 +531,10 @@ void Alloc_players(int number)
     }
 
     playerArrayNumber = number;
+
+    /* Initialize player id to index lookup table */
+    for (i = 0; i < NELEM(GetIndArray); i++)
+	GetIndArray[i] = NO_IND;
 }
 
 
@@ -1854,6 +1857,7 @@ void Delete_player(player_t *pl)
     for (i = NumSpectators - 1; i >= 0; i--)
 	Send_leave(Players(i + spectatorStart)->conn, id);
 
+    GetIndArray[id] = NO_IND;
     release_ID(id);
 }
 
