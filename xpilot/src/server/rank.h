@@ -28,7 +28,7 @@
 #include "object.h"
 #endif
 
-typedef struct rankinfo {
+typedef struct ranknode {
 
     char name[MAX_NAME_LEN];
     char user[MAX_NAME_LEN];
@@ -38,20 +38,15 @@ typedef struct rankinfo {
 
     time_t timestamp;
 
-    int shots;
-
-    int kills;
-    int deaths;
-    int rounds;
-    int ballsCashed;
-    int ballsSaved;
-    int ballsWon;
-    int ballsLost;
+    int kills, deaths;
+    int rounds, shots;
+    int ballsCashed, ballsSaved;
+    int ballsWon, ballsLost;
     double bestball;
 
     double score;
     player_t *pl;
-} rankinfo_t;
+} ranknode_t;
 
 
 static inline void Rank_set_logout_message(player_t *pl, const char *msg)
@@ -61,8 +56,8 @@ static inline void Rank_set_logout_message(player_t *pl, const char *msg)
 }
 
 void Rank_get_stats(player_t *pl, char *buf);
-rankinfo_t *Rank_get_by_name(char *name);
-void Rank_nuke_score(rankinfo_t *rank);
+ranknode_t *Rank_get_by_name(char *name);
+void Rank_nuke_score(ranknode_t *rank);
 void Rank_init_saved_scores(void);
 void Rank_get_saved_score(player_t *pl);
 void Rank_save_score(player_t *pl);

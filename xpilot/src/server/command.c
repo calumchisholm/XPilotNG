@@ -863,7 +863,7 @@ static int Cmd_mutepaused(char *arg, player_t *pl, int oper, char *msg)
 
 static int Cmd_nuke(char *arg, player_t *pl, int oper, char *msg)
 {
-    rankinfo_t *rank;
+    ranknode_t *rank;
     player_t *pl2;
 
     UNUSED_PARAM(pl);
