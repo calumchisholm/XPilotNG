@@ -65,7 +65,6 @@
 #include "netclient.h"
 #include "option.h"
 #include "paint.h"
-#include "protoclient.h" /* misc. hacks */
 #include "recordfmt.h"
 #include "talk.h"        /* talk.c depends on X11 */
 

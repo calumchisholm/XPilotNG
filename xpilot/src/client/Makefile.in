@@ -142,7 +142,7 @@ xpilot_SOURCES = \
 	netclient.c netclient.h \
 	option.c option.h \
 	paint.c paint.h paintdata.c paintdata.h painthud.c \
-	paintmap.c paintobjects.c paintradar.c protoclient.h \
+	paintmap.c paintobjects.c paintradar.c \
 	query.c \
 	record.c record.h recordfmt.h \
 	talk.c talk.h talkmacros.c textinterface.c \
