@@ -21,7 +21,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "SDL.h"
+#include "xpclient_sdl.h"
 
 int Console_init(void);
 void Console_paint(void);

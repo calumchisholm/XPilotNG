@@ -28,10 +28,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xpclient.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include "SDL.h"
+#include "xpclient_sdl.h"
+
 #include "sdlpaint.h"
 #include "images.h"
 #include "glwidgets.h"
@@ -1768,12 +1766,12 @@ bool newcode = true;
 
 void Paint_messages(void)
 {
-    int j,i,*msg_color;
-    const int BORDER = 10;
+    int j, i = 0, *msg_color;
+    /*const int BORDER = 10;*/
     GLWidget *tmp = NULL;
     GLWidget *tmp2 = NULL;
     LabelWidget *wi;
-    static old_maxMessages = 0;
+    static int old_maxMessages = 0;
     static message_t **msgs[2];
     static bool revscroll = false;
     static GLWidget *msg_list[2] = {NULL,NULL};
@@ -1801,11 +1799,13 @@ void Paint_messages(void)
     }
     
     if ( maxMessages < old_maxMessages ) {
-    	while (tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages)) {
+    	while ((tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages))
+	       != NULL) {
     	    ListWidget_Remove(msg_list[i],tmp);
 	    Close_Widget(&tmp);
     	}
-    	while (tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages)) {
+    	while ((tmp = ListWidget_GetItemByIndex(msg_list[i],maxMessages))
+	       != NULL) {
     	    ListWidget_Remove(msg_list[i],tmp);
 	    Close_Widget(&tmp);
     	}
@@ -1826,7 +1826,7 @@ void Paint_messages(void)
     	    msg->lifeTime = 0.0;
     	}
 	
-	if (tmp = ListWidget_GetItemByIndex(msg_list[i],j) ) {
+	if ((tmp = ListWidget_GetItemByIndex(msg_list[i],j) ) != NULL) {
 	    if ( !(wi = (LabelWidget *)tmp->wid_info) ) {
 	    	error("Paint_messages: ListWidget lacks a wid_info ptr!");
 		continue;

@@ -21,15 +21,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xpclient.h"
+#include "xpclient_sdl.h"
+
 #include "sdlmeta.h"
 #include "sdlwindow.h"
 #include "text.h"
 #include "glwidgets.h"
-
-#ifdef HAVE_SDL_IMAGE
-#include "SDL_image.h"
-#endif
 
 #define EVENT_JOIN 0
 #define EVENT_REFRESH 1
@@ -490,7 +487,7 @@ static server_info_t *GetSelectedServer_MetaWidget(GLWidget *widget)
 
     if (widget->WIDGET != METAWIDGET) {
 	error("expected METAWIDGET got [%d]", widget->WIDGET);
-	return;
+	return NULL;
     }
     meta = (MetaWidget*)widget->wid_info;
     return ((MetaTableWidget*)meta->table->wid_info)->selected->sip;
@@ -962,7 +959,7 @@ static bool join_server(Connect_param_t *conpar, server_info_t *sip)
 
 void handleKeyPress(GLWidget *meta, SDL_keysym *keysym )
 {
-    static unsigned int row = 1;
+    /*static unsigned int row = 1;*/
     SDL_Event evt;
     
     switch ( keysym->sym )

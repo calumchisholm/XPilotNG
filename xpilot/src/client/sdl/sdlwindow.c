@@ -18,25 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef _WINDOWS
-# include <windows.h>
-#endif
-#include <GL/gl.h>
-#include "SDL.h"
+#include "xpclient_sdl.h"
+
 #include "sdlwindow.h"
 #include "error.h"
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-#define RMASK 0xff000000
-#define GMASK 0x00ff0000
-#define BMASK 0x0000ff00
-#define AMASK 0x000000ff
-#else
-#define RMASK 0x000000ff
-#define GMASK 0x0000ff00
-#define BMASK 0x00ff0000
-#define AMASK 0xff000000
-#endif
 
 static int next_p2(int t) 
 {

@@ -26,18 +26,10 @@
  *  Modified for XPilotNG/SDL: Juha Lindström <juhal@users.sourceforge.net>
  */
 
-#include "SDL.h"
+#include "xpclient_sdl.h"
+
 #include "SDL_console.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
 #include "DT_drawtext.h"
-
-#ifdef HAVE_SDLIMAGE
-#include "SDL_image.h"
-#endif
 
 #ifdef _WINDOWS
 # define __FUNCTION__ ""
@@ -91,9 +83,11 @@ SDL_Event *CON_Events(SDL_Event * event)
 	    default:
 		return event;
 	    }
-/*	} else if (event->key.keysym.mod & KMOD_ALT) {
-	    /* the console does not handle ALT combinations! *
-	    return event;*/
+#if 0
+	} else if (event->key.keysym.mod & KMOD_ALT) {
+	    /* the console does not handle ALT combinations! */
+	    return event;
+#endif
 	} else {
 	    /* first of all, check if the console hide key was pressed */
 	    if (event->key.keysym.sym == Topmost->HideKey) {
@@ -389,8 +383,8 @@ ConsoleInformation *CON_Init(const char *FontName,
 	PRINT_ERROR("Couldn't create the ConsoleSurface\n");
 	return NULL;
     }
-    newinfo->ConsoleSurface = Temp;	//SDL_DisplayFormat(Temp);
-    //SDL_FreeSurface(Temp);
+    newinfo->ConsoleSurface = Temp;	/* SDL_DisplayFormat(Temp); */
+    /* SDL_FreeSurface(Temp); */
     SDL_FillRect(newinfo->ConsoleSurface, NULL,
 		 SDL_MapRGBA(newinfo->ConsoleSurface->format, 0, 20, 0,
 			     newinfo->ConsoleAlpha));
@@ -407,8 +401,8 @@ ConsoleInformation *CON_Init(const char *FontName,
 	PRINT_ERROR("Couldn't create the InputBackground\n");
 	return NULL;
     }
-    newinfo->InputBackground = Temp;	//SDL_DisplayFormat(Temp);
-    //SDL_FreeSurface(Temp);
+    newinfo->InputBackground = Temp;	/* SDL_DisplayFormat(Temp); */
+    /* SDL_FreeSurface(Temp); */
     SDL_FillRect(newinfo->InputBackground, NULL,
 		 SDL_MapRGBA(newinfo->ConsoleSurface->format, 0, 20, 0,
 			     SDL_ALPHA_OPAQUE));

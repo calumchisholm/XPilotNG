@@ -20,16 +20,11 @@
 	reflex-2000@gmx.net
 */
 
-#ifndef _CONSOLE_H_
-#define _CONSOLE_H_
+#ifndef SDL_CONSOLE_H
+#define SDL_CONSOLE_H
 
-#ifdef HAVE_CONFIG_H
-  #include <config.h>
-#endif
+#include "xpclient_sdl.h"
 
-
-#include "SDL_events.h"
-#include "SDL_video.h"
 #include "begin_code.h"
 
 /*! Number of visible characters in a line. Lines in the history, the commandline, or CON_Out strings cannot be longer
@@ -225,7 +220,7 @@ extern "C" {
 #endif
 #include "close_code.h"
 
-#endif /* _CONSOLE_H_ */
+#endif /* SDL_CONSOLE_H */
 
 /* end of SDL_console.h ... */
 

@@ -21,6 +21,8 @@
 #ifndef IMAGES_H
 #define IMAGES_H
 
+#include "xpclient_sdl.h"
+
 typedef enum {
     IMG_STATE_UNINITIALIZED,
     IMG_STATE_ERROR,
@@ -38,7 +40,7 @@ typedef enum {
  * corresponding to width and height respectively.
  */
 typedef struct {
-    int             name;         /* OpenGL texture "name" */
+    GLuint          name;         /* OpenGL texture "name" */
     char            *filename;    /* the name of the image file */
     int             num_frames;   /* the number of frames */
     bool            rotate;       /* should this image be rotated */

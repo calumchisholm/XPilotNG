@@ -21,9 +21,9 @@
 #ifndef GLWIDGETS_H
 #define GLWIDGETS_H
 
-#include <GL/gl.h>
+#include "xpclient_sdl.h"
+
 #include "sdlkeys.h"
-#include "SDL.h"
 #include "text.h"
 
 /****************************************************/
@@ -88,10 +88,11 @@ void PrependGLWidgetList( GLWidget **list, GLWidget *widget );
 bool DelGLWidgetListItem( GLWidget **list, GLWidget *widget );
 
 void DrawGLWidgets( void );
+void DrawGLWidgetsi( GLWidget *list, int x, int y, int w, int h);
 GLWidget *FindGLWidget( Uint16 x,Uint16 y );
 
-static GLWidget *target[NUM_MOUSE_BUTTONS];
-static GLWidget *hovertarget;
+extern GLWidget *target[NUM_MOUSE_BUTTONS];
+extern GLWidget *hovertarget;
 /****************************************************/
 /* END: Main GLWidget stuff 	    	    	    */
 /****************************************************/

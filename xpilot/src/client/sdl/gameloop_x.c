@@ -20,11 +20,7 @@
 
 #include <X11/Xlib.h>
 
-#include "SDL.h"
-#include "SDL_version.h"
-#include "SDL_syswm.h"
-
-#include "xpclient.h"
+#include "xpclient_sdl.h"
 
 extern int Process_event(SDL_Event *evt);
 

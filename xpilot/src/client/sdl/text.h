@@ -21,10 +21,8 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "xpclient_sdl.h"
 
-#include "xpclient.h"
 #include "sdlpaint.h"
 
 #define LEFT 0

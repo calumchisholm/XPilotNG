@@ -18,14 +18,44 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef SDLKEYS_H
-#define SDLKEYS_H
+#ifndef XPCLIENT_SDL_H
+#define XPCLIENT_SDL_H
 
-#include "xpclient_sdl.h"
-
-#define NUM_MOUSE_BUTTONS 5
-
-SDLKey Get_key_by_name(const char* name);
-char *Get_name_by_key(SDLKey key);
-
+#include "xpclient.h"
+#ifdef _WINDOWS
+# include <windows.h>
 #endif
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include "SDL.h"
+
+#include "SDL_events.h"
+#include "SDL_video.h"
+#include "SDL_version.h"
+#include "SDL_syswm.h"
+
+#ifdef HAVE_SDL_IMAGE
+# include "SDL_image.h"
+#endif
+
+#include "SDL_ttf.h"
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+#define RMASK 0xff000000
+#define GMASK 0x00ff0000
+#define BMASK 0x0000ff00
+#define AMASK 0x000000ff
+#else
+#define RMASK 0x000000ff
+#define GMASK 0x0000ff00
+#define BMASK 0x00ff0000
+#define AMASK 0xff000000
+#endif
+
+extern void Game_loop(void);
+extern void Options_cleanup(void);
+extern void Store_sdlinit_options(void);
+extern void Store_sdlgui_options(void);
+extern void Store_radar_options(void);
+
+#endif /* XPCLIENT_SDL_H */

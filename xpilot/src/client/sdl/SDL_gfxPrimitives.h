@@ -9,12 +9,11 @@
 #ifndef _SDL_gfxPrimitives_h
 #define _SDL_gfxPrimitives_h
 
-#include <math.h>
-#ifndef M_PI
-#define M_PI	3.141592654
-#endif
+#include "xpclient_sdl.h"
 
-#include "SDL.h"
+#ifndef M_PI
+# define M_PI	3.141592654
+#endif
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus

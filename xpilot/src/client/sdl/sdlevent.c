@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xpclient.h"
+#include "xpclient_sdl.h"
+
 #include "sdlkeys.h"
-#include "SDL.h"
 #include "console.h"
 #include "sdlpaint.h"
 #include "glwidgets.h"
@@ -33,6 +33,9 @@ bool            initialPointerControl = false;
 bool            pointerControl = false;
 
 static int	movement;	/* horizontal mouse movement. */
+
+GLWidget *target[NUM_MOUSE_BUTTONS];
+GLWidget *hovertarget;
 
 int Process_event(SDL_Event *evt);
 

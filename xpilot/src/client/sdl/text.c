@@ -64,12 +64,8 @@
 #  define GL_BGR 0x80E0 /* OpenGL 1.2, for which I did not have headers */
 # endif
 #endif
-#include <string.h>
-#include <stdarg.h>
-#include <GL/gl.h>
-#include "SDL.h"
 
-#include "SDL_ttf.h"
+#include "xpclient_sdl.h"
 
 #include "text.h"
 
@@ -155,17 +151,10 @@ GLuint SDL_GL_LoadTexture(SDL_Surface *surface, texcoord_t *texcoord)
     		    SDL_SWSURFACE,
     		    w, h,
     		    32,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
-			0x000000FF, 
-			0x0000FF00, 
-			0x00FF0000, 
-			0xFF000000
-#else
-			0xFF000000,
-			0x00FF0000, 
-			0x0000FF00, 
-			0x000000FF
-#endif
+		    RMASK,
+		    GMASK,
+		    BMASK,
+		    AMASK
     		   );
     if ( image == NULL ) {
     	    return 0;
@@ -218,7 +207,6 @@ int FTinit(font_data *font, const char * fontname, int ptsize)
     GLenum gl_error;
     texcoord_t texcoords;
     int minx = 0,miny = 0,maxx = 0,maxy = 0;
-    GLuint height;
 
     /* We might support changing theese later */
     /* Look for special rendering types */
@@ -246,6 +234,8 @@ int FTinit(font_data *font, const char * fontname, int ptsize)
 
     for( i = 0; i < NUMCHARS; i++ ) {
 	SDL_Surface *glyph = NULL;
+	GLuint height = 0; /* kps - added default value */
+
 	forecol = &white;
 	
     	glyph = TTF_RenderGlyph_Blended( font->ttffont, i, *forecol );
@@ -514,7 +504,7 @@ bool render_text(font_data *ft_font, const char *text, string_tex_t *string_tex)
     	SDL_FreeSurface(glyph);
 	
 	string_tex->text = (char *)malloc(sizeof(char)*(strlen(text)+1));
-	sprintf(string_tex->text,"%s\0",text);
+	sprintf(string_tex->text,"%s",text);
     
     } else {
     	printf("TTF_RenderText_Blended failed for [%s]\n",text);

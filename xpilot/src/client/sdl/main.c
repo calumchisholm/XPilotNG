@@ -18,17 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <signal.h>
-#include "xpclient.h"
+#include "xpclient_sdl.h"
+
 #include "sdlinit.h"
 #include "sdlmeta.h"
-
-
-extern void Game_loop(void);
-extern void Options_cleanup(void);
-extern void Store_sdlinit_options(void);
-extern void Store_sdlgui_options(void);
-
 
 #ifdef _WINDOWS
 /* from win32hacks.c */

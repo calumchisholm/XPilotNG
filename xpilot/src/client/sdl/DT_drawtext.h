@@ -23,9 +23,7 @@
 #ifndef Drawtext_h
 #define Drawtext_h
 
-#ifdef HAVE_CONFIG_H
-  #include <config.h>
-#endif
+#include "xpclient_sdl.h"
 
 
 #define TRANS_FONT 1

@@ -46,13 +46,9 @@
  *  Modified for xpilot: Juha Lindström <juhal@users.sourceforge.net>
  */
 
-#include "xpclient.h"
-#include "SDL.h"
-#include "DT_drawtext.h"
+#include "xpclient_sdl.h"
 
-#ifdef HAVE_SDLIMAGE
-  #include "SDL_image.h"
-#endif
+#include "DT_drawtext.h"
 
 #ifdef _WINDOWS
 #define __FUNCTION__ ""

@@ -18,8 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xpclient.h"
-#include "SDL.h"
+#include "xpclient_sdl.h"
 
 extern int Process_event(SDL_Event *evt);
 

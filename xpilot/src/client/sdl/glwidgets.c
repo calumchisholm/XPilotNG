@@ -18,17 +18,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xpclient.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "xpclient_sdl.h"
+
 #include "sdlpaint.h"
 #include "images.h"
 #include "text.h"
 #include "glwidgets.h"
-
-#ifdef HAVE_SDL_IMAGE
-#include "SDL_image.h"
-#endif
 
 /****************************************************/
 /* BEGIN: Main GLWidget stuff	    	    	    */
@@ -594,7 +589,7 @@ void motion_ScrollbarWidget( Sint16 xrel, Sint16 yrel, Uint16 x, Uint16 y, void 
     GLWidget *tmp;
     ScrollbarWidget *wid_info;
     GLWidget *slide;
-    Sint16 *coord1, coord2, min, max, size, move;
+    Sint16 *coord1, coord2 = 0, min, max, size, move;
     GLfloat oldpos;
 
     if (!data) return;
@@ -987,7 +982,7 @@ void BoolChooserWidget_SetValue( bool state, void *data )
 
 void Paint_BoolChooserWidget( GLWidget *widget )
 {
-    //static int bg_color     = 0x0000ff88;
+    /* static int bg_color     = 0x0000ff88; */
     static int name_color   = 0xffff66ff;
     BoolChooserWidget *wid_info;
 
@@ -1227,7 +1222,7 @@ void IntChooserWidget_Subtract( void *data )
 
 void Paint_IntChooserWidget( GLWidget *widget )
 {
-    //static int bg_color     = 0x0000ff88;
+    /* static int bg_color     = 0x0000ff88; */
     static int name_color   = 0xffff66ff;
     static int value_color  = 0x00ff00ff;
     IntChooserWidget *wid_info;
@@ -1473,7 +1468,7 @@ void DoubleChooserWidget_Subtract( void *data )
 
 void Paint_DoubleChooserWidget( GLWidget *widget )
 {
-    //static int bg_color     = 0x0000ff88;
+    /* static int bg_color     = 0x0000ff88; */
     static int name_color   = 0xffff66ff;
     static int value_color  = 0x00ff00ff;
     DoubleChooserWidget *wid_info;
@@ -1649,7 +1644,7 @@ bool ListWidget_Prepend( GLWidget *list, GLWidget *item )
 {
     GLWidget *curr;
     ListWidget *wid_info;
-    int y_rel;
+    /*int y_rel;*/
     
     if (!list) {
     	error("ListWidget_Prepend: *list is NULL!");
@@ -1793,7 +1788,7 @@ bool ListWidget_Remove( GLWidget *list, GLWidget *item )
 
 bool ListWidget_SetScrollorder( GLWidget *list, bool order )
 {
-    GLWidget **curr;
+    /*GLWidget **curr;*/
     ListWidget *wid_info;
     
     if (!list) {
@@ -2029,7 +2024,7 @@ void ScrollPaneWidget_poschange( GLfloat pos , void *data )
     GLWidget *widget;
     ScrollPaneWidget *wid_info;
     SDL_Rect bounds;
-    GLWidget *curr;
+    /*GLWidget *curr;*/
     
     if ( !data ) {
         error("NULL data to ScrollPaneWidget_poschange!");
@@ -2111,7 +2106,7 @@ GLWidget *Init_ScrollPaneWidget( GLWidget *content )
 {
     GLWidget *tmp;
     ScrollPaneWidget *wid_info;
-    SDL_Rect b;
+    /*SDL_Rect b;*/
     
     tmp	= Init_EmptyBaseGLWidget();
     if ( !tmp ) {

@@ -18,12 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xpclient.h"
-#include <GL/gl.h>
-#include "SDL.h"
-#include "sdlwindow.h"
-#include "SDL_console.h"
+#include "xpclient_sdl.h"
+
 #include "console.h"
+#include "SDL_console.h"
+#include "sdlwindow.h"
 
 static sdl_window_t console_window;
 static ConsoleInformation *console;

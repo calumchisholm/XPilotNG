@@ -6,10 +6,7 @@
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
+#include "xpclient_sdl.h"
 
 #include "SDL_gfxPrimitives.h"
 #include "SDL_gfxPrimitives_font.h"
@@ -1439,8 +1436,6 @@ int boxRGBA(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint
 /* Non-alpha line drawing code adapted from routine          */
 /* by Pete Shinners, pete@shinners.org                       */
 /* Originally from pygame, http://pygame.seul.org            */
-
-#define ABS(a) (((a)<0) ? -(a) : (a))
 
 int lineColor(SDL_Surface * dst, Sint16 x1, Sint16 y_1, Sint16 x2, Sint16 y2, Uint32 color)
 {
@@ -3034,7 +3029,7 @@ int filledpieColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 sta
     }
 
     /* Allocate vertex array */
-    vx = vy = (Uint16 *) malloc(2 * sizeof(Uint16) * numpoints);
+    vx = vy = (Sint16 *)malloc(2 * sizeof(Sint16) * numpoints);
     if (vx == NULL) {
 	return (-1);
     }
@@ -3276,7 +3271,7 @@ int filledPolygonColor(SDL_Surface * dst, Sint16 * vx, Sint16 * vy, int n, int c
 {
     int result;
     int i;
-    int x, y, xa, xb;
+    int /*x,*/ y, xa, xb;
     int miny, maxy;
     int x1, y_1;
     int x2, y2;

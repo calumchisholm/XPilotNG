@@ -20,11 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xpclient.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include "SDL.h"
-#include "SDL_ttf.h"
+#include "xpclient_sdl.h"
+
 #include "text.h"
 #include "console.h"
 #include "sdlkeys.h"
