@@ -839,7 +839,9 @@ static void Bounce_player(player *pl, struct move *move, int line, int point)
 
     if (type == CANNON) {
 	Player_crash(pl, move, CrashCannon, item_id, 1);
-	return;
+	if (BIT(pl->status, KILLED))
+	    return;
+	/* The player may bounce from the cannon if both have shields up. */
     }
 
     pl->last_wall_touch = frame_loops;
