@@ -168,6 +168,32 @@ void Conf_print(void)
     xpprintf("============================================================\n");
     xpprintf("VERSION                   = %s\n", VERSION);
     xpprintf("PACKAGE                   = %s\n", PACKAGE);
+
+#ifdef DBE
+    xpprintf("DBE\n");
+#endif
+#ifdef MBX
+    xpprintf("MBX\n");
+#endif
+#ifdef SPARC_CMAP_HACK
+    xpprintf("SPARC_CMAP_HACK\n");
+#endif
+#ifdef LOG
+    xpprintf("LOG\n");
+#endif
+#ifdef SILENT
+    xpprintf("SILENT\n");
+#endif
+#ifdef SERVER_SOUND
+    xpprintf("SERVER_SOUND\n");
+#endif
+#ifdef PLOCKSERVER
+    xpprintf("PLOCKSERVER\n");
+#endif
+#ifdef DEVELOPMENT
+    xpprintf("DEVELOPMENT\n");
+#endif
+
     xpprintf("Conf_libdir()             = %s\n", Conf_libdir());
     xpprintf("Conf_defaults_file_name() = %s\n", Conf_defaults_file_name());
     xpprintf("Conf_password_file_name() = %s\n", Conf_password_file_name());
@@ -189,3 +215,5 @@ void Conf_print(void)
     xpprintf("Conf_soundir()            = %s\n", Conf_sounddir());
     xpprintf("============================================================\n");
 }
+
+
