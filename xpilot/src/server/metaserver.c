@@ -114,6 +114,7 @@ void Meta_init(void)
     }
 }
 
+#if 0
 static void asciidump(void *p, size_t size)
 {
     int i;
@@ -131,6 +132,7 @@ static void asciidump(void *p, size_t size)
     }
     printf("\n\n");
 }
+#endif
 
 static char meta_update_string[MAX_STR_LEN];
 
@@ -180,11 +182,12 @@ void Meta_update(bool change)
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Players(i);
 
-	if (Player_is_human(pl) && !BIT(pl->status, PAUSE)) {
-	    num_active_players++;
-	    if (BIT(world->rules->mode, TEAM_PLAY))
-		active_per_team[pl->team]++;
-	}
+	if (!Player_is_human(pl) || BIT(pl->status, PAUSE))
+	    continue;
+
+	num_active_players++;
+	if (BIT(world->rules->mode, TEAM_PLAY))
+	    active_per_team[pl->team]++;
     }
 
     game_mode = Describe_game_status();
@@ -250,27 +253,34 @@ void Meta_update(bool change)
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Players(i);
+	char str[4 * MAX_CHARS];
+	char tstr[32];
 
-	if (Player_is_human(pl) && !BIT(pl->status, PAUSE)) {
-	    if ((len + (4 * MAX_CHARS)) < max_size) {
-		sprintf(string + len,
-			"%s%s=%s@%s",
-			(first) ? "add players " : ",",
-			pl->name,
-			pl->username,
-			pl->hostname);
-		len += strlen(&string[len]);
+	if (!Player_is_human(pl) || BIT(pl->status, PAUSE))
+	    continue;
 
-		if (BIT(world->rules->mode, TEAM_PLAY)) {
-		    sprintf(string + len,"{%d}", pl->team);
-		    len += strlen(&string[len]);
-		}
+	snprintf(str, sizeof(str),
+		 "%s%s=%s@%s",
+		 first ? "add players " : ",",
+		 pl->name,
+		 pl->username,
+		 pl->hostname);
 
-		first = false;
-	    }
+	if (BIT(world->rules->mode, TEAM_PLAY)) {
+	    snprintf(tstr, sizeof(tstr), "{%d}", pl->team);
+	    strlcat(str, tstr, sizeof(str));
 	}
+
+	if (len + strlen(str) + 1 > max_size)
+	    break;
+
+	strlcat(string, str, max_size);
+	len += strlen(str);
+	first = false;
     }
 
+#if 0
+    /* kps - don't bother to send status, it probably isn't useful */
     if (len + MSG_LEN < max_size) {
 	char status[MAX_STR_LEN];
 
@@ -282,9 +292,10 @@ void Meta_update(bool change)
 	strlcpy(&string[len], status, max_size - len);
 	len += strlen(&string[len]);
     }
+#endif
 
 #if 0
-    warn("Meta update string len is %d (option is %d)",
+    warn("Meta update string len is %d (limit is %d)",
 	 len, options.metaUpdateMaxSize);
 
     asciidump(string, len);
