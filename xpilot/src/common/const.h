@@ -53,7 +53,12 @@
 
 /* Not everyone has LINE_MAX either, *sigh* */
 #ifndef LINE_MAX
-#   define LINE_MAX 2048
+#   define LINE_MAX	2048
+#endif
+
+/* No comment. */
+#ifndef PATH_MAX
+#   define PATH_MAX	1023
 #endif
 
 #define RES		128
