@@ -770,6 +770,10 @@ public class MainFrame extends JFrame implements ActionListener {
     
     public static void main (String args[]) throws Exception {
         
+        try {
+            javax.swing.UIManager.setLookAndFeel(
+                "com.incors.plaf.kunststoff.KunststoffLookAndFeel");
+        } catch (Exception ex) { /* ignore */ }
         MainFrame mf = new MainFrame();
         mf.setVisible(true);
         
