@@ -26,10 +26,43 @@ Solution:
 Fixed by:
 Files 
 affected:
------------------------------------------------------------------
 
-Problem: 
-Found by:
+-----------------------------------------------------------------
+Problem: The wall textures are only drawn partially on the left side of
+	 the view in the X client. This problem only appears on some systems.
+Found by:kps (Tarzan reported this bug earlier)
 Solution:
 Fixed by:
 Files affected:
+
+-----------------------------------------------------------------
+Problem: X client crashes in Talk_delete_emphasized_text() in talk.c.
+ 	 To reproduce the bug:
+	 1. press m to write a message
+	 2. write some garbage into the message buffer
+	 3. use the mouse to select some text there from the
+      	  	middle of what you wrote
+     	 4. press escape to close the message window
+     	 5. press m again to write another message (the old message
+	    will be gone)
+	 6. start writing the new message and the client crashes
+Found by:kps
+Solution:
+Fixed by:
+Files affected:
+
+-----------------------------------------------------------------
+Problem :
+Found by:
+Solution:
+Fixed by:
+Files 
+affected:
+
+-----------------------------------------------------------------
+Problem :
+Found by:
+Solution:
+Fixed by:
+Files 
+affected:
