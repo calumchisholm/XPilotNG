@@ -554,6 +554,7 @@ static void Button_MetaRowWidget(Uint8 button, Uint8 state, Uint16 x,
     SDL_Event evt;
 
     if (state != SDL_PRESSED) return;
+    if (button != 1) return;
 
     widget = (GLWidget*)data;
     if (widget->WIDGET != METAROWWIDGET) {
