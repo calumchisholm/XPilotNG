@@ -33,70 +33,13 @@
 char event_version[] = VERSION;
 
 
-#define SWAP(a, b)	    {double tmp = a; a = b; b = tmp;}
-
-/*
- * Globals.
- */
-static char		msg[MSG_LEN];
-
-
-static void Refuel(player_t *pl)
-{
-    int i;
-    double l, dist = 1e19;
-    fuel_t *fs;
-    world_t *world = pl->world;
-
-    if (!BIT(pl->have, HAS_REFUEL))
-	return;
-
-    CLR_BIT(pl->used, HAS_REFUEL);
-    for (i = 0; i < world->NumFuels; i++) {
-	fs = Fuel_by_index(world, i);
-	l = Wrap_length(pl->pos.cx - fs->pos.cx,
-			pl->pos.cy - fs->pos.cy);
-	if (BIT(pl->used, HAS_REFUEL) == 0 || l < dist) {
-	    SET_BIT(pl->used, HAS_REFUEL);
-	    pl->fs = i;
-	    dist = l;
-	}
-    }
-}
-
-
-static void Repair(player_t *pl)
-{
-    int i;
-    double l, dist = 1e19;
-    target_t *targ;
-    world_t *world = pl->world;
-
-    if (!BIT(pl->have, HAS_REPAIR))
-	return;
-
-    CLR_BIT(pl->used, HAS_REPAIR);
-    for (i = 0; i < world->NumTargets; i++) {
-	targ = Target_by_index(world, i);
-	if (targ->team == pl->team
-	    && targ->dead_ticks <= 0) {
-	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
-			    pl->pos.cy - targ->pos.cy);
-	    if (BIT(pl->used, HAS_REPAIR) == 0 || l < dist) {
-		SET_BIT(pl->used, HAS_REPAIR);
-		pl->repair_target = i;
-		dist = l;
-	    }
-	}
-    }
-}
-
 bool team_dead(int team)
 {
     int i;
 
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl = Player_by_index(i);
+
 	if (pl->team == team && !BIT(pl->pl_status, PAUSE|GAME_OVER))
 	    return false;
     }
@@ -130,7 +73,7 @@ static bool Player_lock_allowed(player_t *pl, player_t *lock_pl)
     if (Players_are_teammates(pl, lock_pl))
 	return true;
 
-    /* if options.lockOtherTeam is true then we can always lock on other teams. */
+    /* if lockOtherTeam is true then we can always lock on other teams. */
     if (options.lockOtherTeam)
 	return true;
 
@@ -140,6 +83,47 @@ static bool Player_lock_allowed(player_t *pl, player_t *lock_pl)
 
     /* can't find any reason why this lock should be allowed. */
     return false;
+}
+
+static void Player_lock_next_or_prev(player_t *pl, int key)
+{
+    int i, j, ind = GetInd(pl->id);
+    player_t *pl_i;
+
+    if (NumPlayers == 0) /* Spectator? */
+	return;
+
+    j = i = GetInd(pl->lock.pl_id);
+    if (!BIT(pl->lock.tagged, LOCK_PLAYER))
+	i = j = 0;
+    if (j < 0 || j >= NumPlayers)
+	/* kps - handle this some other way */
+	fatal("Illegal player lock target");
+
+    do {
+	if (key == KEY_LOCK_PREV) {
+	    if (--i < 0)
+		i = NumPlayers - 1;
+	} else {
+	    if (++i >= NumPlayers)
+		i = 0;
+	}
+	if (i == j)
+	    return;
+
+	pl_i = Player_by_index(i);
+    } while (i == ind
+	     || Player_is_paused(pl_i)
+	     || Player_is_dead(pl_i)
+	     || Player_is_waiting(pl_i)
+	     || !Player_lock_allowed(pl, pl_i));
+
+    if (i == ind)
+	CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
+    else {
+	pl->lock.pl_id = pl_i->id;
+	SET_BIT(pl->lock.tagged, LOCK_PLAYER);
+    }
 }
 
 int Player_lock_closest(player_t *pl, bool next)
@@ -159,6 +143,7 @@ int Player_lock_closest(player_t *pl, bool next)
     best = FLT_MAX;
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Player_by_index(i);
+
 	if (pl_i == lock_pl
 	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(pl, pl_i)
@@ -183,6 +168,177 @@ int Player_lock_closest(player_t *pl, bool next)
     return 1;
 }
 
+static void Player_change_home(player_t *pl)
+{
+    bool change_home = false;
+    world_t *world = pl->world;
+    player_t *pl2 = NULL;
+    int i;
+
+    for (i = 0; i < world->NumBases; i++) {
+	base_t *base = Base_by_index(world, i);
+	int dx, dy;
+
+	dx = ABS(CENTER_XCLICK(base->pos.cx - pl->pos.cx));
+	dy = ABS(CENTER_YCLICK(base->pos.cy - pl->pos.cy));
+	if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
+	    if (base == pl->home_base)
+		break;
+	    if (base->team != TEAM_NOT_SET
+		&& base->team != pl->team)
+		break;
+	    pl->home_base = base;
+	    change_home = true;
+	    break;
+	}
+    }
+
+    if (!change_home)
+	return;
+
+    /* Make sure two teammates don't have the same base. */
+    for (i = 0; i < NumPlayers; i++) {
+	player_t *pl_i = Player_by_index(i);
+
+	if (pl_i->id != pl->id
+	    && !Player_is_tank(pl_i)
+	    && pl->home_base == pl_i->home_base) {
+	    Pick_startpos(pl_i);
+	    pl2 = pl_i;
+	    break;
+	}
+    }
+
+    sound_play_all(CHANGE_HOME_SOUND);
+
+    if (pl2)
+	Set_message_f("%s has taken over %s's home base.",
+		      pl->name, pl2->name);
+    else
+	Set_message_f("%s has changed home base.", pl->name);
+
+    /*
+     * Send info about new bases.
+     */
+    for (i = 0; i < NumPlayers; i++) {
+	player_t *pl_i = Player_by_index(i);
+
+	if (pl_i->conn != NULL)
+	    Send_base(pl_i->conn, pl->id, pl->home_base->ind);
+    }
+    for (i = 0; i < NumSpectators; i++)
+	Send_base(Player_by_index(i + spectatorStart)->conn,
+		  pl->id, pl->home_base->ind);
+
+    if (pl2) {
+	for (i = 0; i < NumPlayers; i++) {
+	    player_t *pl_i = Player_by_index(i);
+
+	    if (pl_i->conn != NULL)
+		Send_base(pl_i->conn, pl2->id, pl2->home_base->ind);
+	}
+	for (i = 0; i < NumSpectators; i++)
+	    Send_base(Player_by_index(i + spectatorStart)->conn,
+		      pl2->id, pl2->home_base->ind);
+    }
+}
+
+static void Player_refuel(player_t *pl)
+{
+    int i;
+    double l, dist = 1e19;
+    world_t *world = pl->world;
+
+    if (!BIT(pl->have, HAS_REFUEL))
+	return;
+
+    CLR_BIT(pl->used, HAS_REFUEL);
+    for (i = 0; i < world->NumFuels; i++) {
+	fuel_t *fs = Fuel_by_index(world, i);
+
+	l = Wrap_length(pl->pos.cx - fs->pos.cx,
+			pl->pos.cy - fs->pos.cy);
+	if (!BIT(pl->used, HAS_REFUEL) || l < dist) {
+	    SET_BIT(pl->used, HAS_REFUEL);
+	    pl->fs = i;
+	    dist = l;
+	}
+    }
+}
+
+/* Repair target or possibly something else. */
+static void Player_repair(player_t *pl)
+{
+    int i;
+    double l, dist = 1e19;
+    world_t *world = pl->world;
+
+    if (!BIT(pl->have, HAS_REPAIR))
+	return;
+
+    CLR_BIT(pl->used, HAS_REPAIR);
+    for (i = 0; i < world->NumTargets; i++) {
+	target_t *targ = Target_by_index(world, i);
+
+	if (targ->team == pl->team
+	    && targ->dead_ticks <= 0) {
+	    l = Wrap_length(pl->pos.cx - targ->pos.cx,
+			    pl->pos.cy - targ->pos.cy);
+	    if (!BIT(pl->used, HAS_REPAIR) || l < dist) {
+		SET_BIT(pl->used, HAS_REPAIR);
+		pl->repair_target = i;
+		dist = l;
+	    }
+	}
+    }
+}
+
+#define FOOBARSWAP(a, b)	    {double tmp = a; a = b; b = tmp;}
+
+static void Player_swap_settings(player_t *pl)
+{
+    if (BIT(pl->pl_status, HOVERPAUSE)
+	|| BIT(pl->used, HAS_AUTOPILOT))
+	return;
+
+    /* kps - turnacc == 0.0 ? */
+    if (pl->turnacc == 0.0) {
+	FOOBARSWAP(pl->power, pl->power_s);
+	FOOBARSWAP(pl->turnspeed, pl->turnspeed_s);
+	FOOBARSWAP(pl->turnresistance, pl->turnresistance_s);
+    }
+}
+#undef FOOBARSWAP
+
+
+static void Player_toggle_compass(player_t *pl)
+{
+    int i, k, ind = GetInd(pl->id);
+
+    if (!BIT(pl->have, HAS_COMPASS))
+	return;
+
+    TOGGLE_BIT(pl->used, HAS_COMPASS);
+
+    if (!BIT(pl->used, HAS_COMPASS))
+	return;
+
+    /*
+     * Verify if the lock has ever been initialized at all
+     * and if the lock is still valid.
+     */
+    if (BIT(pl->lock.tagged, LOCK_PLAYER)
+	&& NumPlayers > 1
+	&& (k = pl->lock.pl_id) > 0
+	&& (i = GetInd(k)) > 0
+	&& i < NumPlayers
+	&& Player_by_index(i)->id == k
+	&& i != ind)
+	return;
+
+    Player_lock_closest(pl, false);
+}
+
 
 void Pause_player(player_t *pl, bool on)
 {
@@ -195,7 +351,7 @@ void Pause_player(player_t *pl, bool on)
 
     if (on && !Player_is_paused(pl)) { /* Turn pause mode on */
 	if (pl->team != TEAM_NOT_SET)
-	    world->teams[pl->team].SwapperId = -1;
+	    world->teams[pl->team].SwapperId = NO_ID;
 	/* Minimum pause time is 10 seconds at gamespeed 12. */
 	pl->pause_count = 10 * 12;
 	/* player might have paused when recovering */
@@ -210,14 +366,14 @@ void Pause_player(player_t *pl, bool on)
 		player_t *pl_i = Player_by_index(i);
 
 		if (pl_i->conn != NULL) {
-		    Send_base(pl_i->conn, -1, pl->home_base->ind);
+		    Send_base(pl_i->conn, NO_ID, pl->home_base->ind);
 		    Send_team(pl_i->conn, pl->id, 0);
 		}
 	    }
 	    for (i = spectatorStart; i < spectatorStart + NumSpectators; i++) {
 		player_t *pl_i = Player_by_index(i);
 
-		Send_base(pl_i->conn, -1, pl->home_base->ind);
+		Send_base(pl_i->conn, NO_ID, pl->home_base->ind);
 		Send_team(pl_i->conn, pl->id, 0);
 	    }
 	    pl->home_base = NULL;
@@ -271,7 +427,7 @@ void Pause_player(player_t *pl, bool on)
 
 	for (i = 0; i < MAX_TEAMS ; i++) {
 	    if (world->teams[i].SwapperId == pl->id)
-		world->teams[i].SwapperId = -1;
+		world->teams[i].SwapperId = NO_ID;
 	}
     }
     else if (!on && Player_is_paused(pl)) { /* Turn pause mode off */
@@ -298,10 +454,9 @@ void Pause_player(player_t *pl, bool on)
 
 int Handle_keyboard(player_t *pl)
 {
-    int i, j, k, key, pressed, dx, dy;
+    int i, key, pressed, dx, dy;
     clpos_t pos;
     double minv;
-    int ind = GetInd(pl->id);
     world_t *world = pl->world;
 
     for (key = 0; key < NUM_KEYS; key++) {
@@ -433,54 +588,11 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_LOCK_NEXT:
 	    case KEY_LOCK_PREV:
-		if (NumPlayers == 0) /* Spectator? */
-		    break;
-		j = i = GetInd(pl->lock.pl_id);
-		if (!BIT(pl->lock.tagged, LOCK_PLAYER))
-		    i = j = 0;
-		if (j < 0 || j >= NumPlayers)
-		    fatal("Illegal player lock target");
-		do {
-		    if (key == KEY_LOCK_PREV) {
-			if (--i < 0)
-			    i = NumPlayers - 1;
-		    } else {
-			if (++i >= NumPlayers)
-			    i = 0;
-		    }
-		    if (i == j)
-			break;
-		} while (i == ind
-			 || BIT(Player_by_index(i)->pl_status, GAME_OVER|PAUSE)
-			 || !Player_lock_allowed(pl, Player_by_index(i)));
-		if (i == ind)
-		    CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
-		else {
-		    pl->lock.pl_id = Player_by_index(i)->id;
-		    SET_BIT(pl->lock.tagged, LOCK_PLAYER);
-		}
+		Player_lock_next_or_prev(pl, key);
 		break;
 
 	    case KEY_TOGGLE_COMPASS:
-		if (!BIT(pl->have, HAS_COMPASS))
-		    break;
-		TOGGLE_BIT(pl->used, HAS_COMPASS);
-		if (BIT(pl->used, HAS_COMPASS) == 0)
-		    break;
-		/*
-		 * Verify if the lock has ever been initialized at all
-		 * and if the lock is still valid.
-		 */
-		if (BIT(pl->lock.tagged, LOCK_PLAYER)
-		    && NumPlayers > 1
-		    && (k = pl->lock.pl_id) > 0
-		    && (i = GetInd(k)) > 0
-		    && i < NumPlayers
-		    && Player_by_index(i)->id == k
-		    && i != ind)
-		    break;
-
-		Player_lock_closest(pl, false);
+		Player_toggle_compass(pl);
 		break;
 
 	    case KEY_LOCK_NEXT_CLOSE:
@@ -493,49 +605,7 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_CHANGE_HOME:
-		msg[0] = '\0';
-		for (i = 0; i < world->NumBases; i++) {
-		    base_t *base = Base_by_index(world, i);
-
-		    dx = ABS(CENTER_XCLICK(base->pos.cx - pl->pos.cx));
-		    dy = ABS(CENTER_YCLICK(base->pos.cy - pl->pos.cy));
-		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
-			if (base == pl->home_base)
-			    break;
-			if (base->team != TEAM_NOT_SET
-			    && base->team != pl->team)
-			    break;
-			pl->home_base = base;
-			sprintf(msg, "%s has changed home base.",
-				pl->name);
-			break;
-		    }
-		}
-		for (i = 0; i < NumPlayers; i++) {
-		    player_t *pl_i = Player_by_index(i);
-
-		    if (pl_i->id != pl->id
-			&& !Player_is_tank(pl_i)
-			&& pl->home_base == pl_i->home_base) {
-			Pick_startpos(pl_i);
-			sprintf(msg, "%s has taken over %s's home base.",
-				pl->name, pl_i->name);
-		    }
-		}
-		if (msg[0]) {
-		    sound_play_all(CHANGE_HOME_SOUND);
-		    Set_message(msg);
-		}
-		for (i = 0; i < NumPlayers; i++) {
-		    player_t *pl_i = Player_by_index(i);
-
-		    if (pl_i->conn != NULL)
-			Send_base(pl_i->conn, pl->id, pl->home_base->ind);
-		}
-		for (i = 0; i < NumSpectators; i++) {
-		    Send_base(Player_by_index(i + spectatorStart)->conn,
-			      pl->id, pl->home_base->ind);
- 		}
+		Player_change_home(pl);
 		break;
 
 	    case KEY_SHIELD:
@@ -840,22 +910,15 @@ int Handle_keyboard(player_t *pl)
 		break;
 
 	    case KEY_SWAP_SETTINGS:
-		if (   BIT(pl->pl_status, HOVERPAUSE)
-		    || BIT(pl->used, HAS_AUTOPILOT))
-		    break;
-		if (pl->turnacc == 0.0) {
-		    SWAP(pl->power, pl->power_s);
-		    SWAP(pl->turnspeed, pl->turnspeed_s);
-		    SWAP(pl->turnresistance, pl->turnresistance_s);
-		}
+		Player_swap_settings(pl);
 		break;
 
 	    case KEY_REFUEL:
-		Refuel(pl);
+		Player_refuel(pl);
 		break;
 
 	    case KEY_REPAIR:
-		Repair(pl);
+		Player_repair(pl);
 		break;
 
 	    case KEY_CONNECTOR:
