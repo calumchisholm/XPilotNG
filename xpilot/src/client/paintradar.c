@@ -110,7 +110,7 @@ static void Paint_checkpoint_radar(double xf, double yf)
 	    y = (RadarHeight - (int) (y * BLOCK_SZ * yf + 0.5) + DSIZE -
 		 1) - slidingradar_y;
 	} else {
-	    irec b = checks[nextCheckPoint].bounds;
+	    irec_t b = checks[nextCheckPoint].bounds;
 	    x = (int) (b.x * xf + 0.5) - slidingradar_x;
 	    y = (RadarHeight - (int) (b.y * yf + 0.5) + DSIZE - 1) -
 		slidingradar_y;
@@ -616,7 +616,7 @@ static void Paint_world_radar_old(void)
 }
 
 
-static void Compute_radar_bounds(ipos *min, ipos *max, const irec *b)
+static void Compute_radar_bounds(ipos_t *min, ipos_t *max, const irec_t *b)
 {
     min->x = (0 - (b->x + b->w)) / Setup->width;
     if (0 > b->x + b->w) min->x++;
@@ -631,7 +631,7 @@ static void Compute_radar_bounds(ipos *min, ipos *max, const irec *b)
 static void Paint_world_radar_new(void)
 {
     int i, j, xoff, yoff;
-    ipos min, max;
+    ipos_t min, max;
     static XPoint poly[10000];
     
 #define DBG if(0) printf

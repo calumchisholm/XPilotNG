@@ -286,7 +286,7 @@ void Rank_write_webpage(void)
 }
 
 /* Return a line with the ranking status of the specified player. */
-void Rank_get_stats(player * pl, char *buf)
+void Rank_get_stats(player_t * pl, char *buf)
 {
     RankInfo *score = pl->rank;
 
@@ -440,7 +440,7 @@ void Rank_init_saved_scores(void)
 
 /* A player has logged in. Find his info or create new info by kicking
    the player who hasn't played for the longest time. */
-void Rank_get_saved_score(player * pl)
+void Rank_get_saved_score(player_t * pl)
 {
     RankInfo *score;
     int oldest = 0;
@@ -480,7 +480,7 @@ void Rank_get_saved_score(player * pl)
 }
 
 /* A player has quit, save his info and mark him as not playing. */
-void Rank_save_score(const player * pl)
+void Rank_save_score(const player_t * pl)
 {
     RankInfo *score = pl->rank;
     score->score = pl->score;

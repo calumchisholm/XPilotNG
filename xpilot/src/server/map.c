@@ -76,7 +76,7 @@ static void Realloc_map_objects(world_t *world)
 	   world->NumFrictionAreas, world->MaxFrictionAreas);
 }
 
-int World_place_cannon(world_t *world, clpos pos, int dir, int team)
+int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
 {
     cannon_t t, *cannon;
     int ind = world->NumCannons;
@@ -93,7 +93,7 @@ int World_place_cannon(world_t *world, clpos pos, int dir, int team)
     return ind;
 }
 
-int World_place_fuel(world_t *world, clpos pos, int team)
+int World_place_fuel(world_t *world, clpos_t pos, int team)
 {
     fuel_t t;
     int ind = world->NumFuels;
@@ -107,7 +107,7 @@ int World_place_fuel(world_t *world, clpos pos, int team)
     return ind;
 }
 
-int World_place_base(world_t *world, clpos pos, int dir, int team)
+int World_place_base(world_t *world, clpos_t pos, int dir, int team)
 {
     base_t t;
     int ind = world->NumBases;
@@ -134,7 +134,7 @@ int World_place_base(world_t *world, clpos pos, int dir, int team)
     return ind;
 }
 
-int World_place_treasure(world_t *world, clpos pos, int team, bool empty)
+int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty)
 {
     treasure_t t;
     int ind = world->NumTreasures;
@@ -153,7 +153,7 @@ int World_place_treasure(world_t *world, clpos pos, int team, bool empty)
     return ind;
 }
 
-int World_place_target(world_t *world, clpos pos, int team)
+int World_place_target(world_t *world, clpos_t pos, int team)
 {
     target_t t;
     int ind = world->NumTargets;
@@ -174,7 +174,7 @@ int World_place_target(world_t *world, clpos pos, int team)
     return ind;
 }
 
-int World_place_wormhole(world_t *world, clpos pos, wormType type)
+int World_place_wormhole(world_t *world, clpos_t pos, wormType type)
 {
     wormhole_t t;
     int ind = world->NumWormholes;
@@ -200,7 +200,7 @@ static void alloc_old_checks(world_t *world)
 {
     int i;
     check_t t;
-    clpos pos = { -1, -1 };
+    clpos_t pos = { -1, -1 };
 
     t.pos = pos;
 
@@ -211,7 +211,7 @@ static void alloc_old_checks(world_t *world)
     world->NumChecks = 0;
 }
 
-int World_place_check(world_t *world, clpos pos, int ind)
+int World_place_check(world_t *world, clpos_t pos, int ind)
 {
     check_t t;
 
@@ -253,7 +253,7 @@ int World_place_check(world_t *world, clpos pos, int ind)
     return ind;
 }
 
-int World_place_item_concentrator(world_t *world, clpos pos)
+int World_place_item_concentrator(world_t *world, clpos_t pos)
 {
     item_concentrator_t t;
     int ind = world->NumItemConcs;
@@ -264,7 +264,7 @@ int World_place_item_concentrator(world_t *world, clpos pos)
     return ind;
 }
 
-int World_place_asteroid_concentrator(world_t *world, clpos pos)
+int World_place_asteroid_concentrator(world_t *world, clpos_t pos)
 {
     asteroid_concentrator_t t;
     int ind = world->NumAsteroidConcs;
@@ -275,7 +275,7 @@ int World_place_asteroid_concentrator(world_t *world, clpos pos)
     return ind;
 }
 
-int World_place_grav(world_t *world, clpos pos, double force, int type)
+int World_place_grav(world_t *world, clpos_t pos, double force, int type)
 {
     grav_t t;
     int ind = world->NumGravs;
@@ -287,7 +287,7 @@ int World_place_grav(world_t *world, clpos pos, double force, int type)
     return ind;
 }
 
-int World_place_friction_area(world_t *world, clpos pos, double fric)
+int World_place_friction_area(world_t *world, clpos_t pos, double fric)
 {
     friction_area_t t;
     int ind = world->NumFrictionAreas;
@@ -326,8 +326,8 @@ static void World_alloc(world_t *world)
 	(unsigned char **)malloc(sizeof(unsigned char *)*world->x
 				 + world->x*sizeof(unsigned char)*world->y);
     world->gravity =
-	(vector **)malloc(sizeof(vector *)*world->x
-			  + world->x*sizeof(vector)*world->y);
+	(vector_t **)malloc(sizeof(vector_t *)*world->x
+			  + world->x*sizeof(vector_t)*world->y);
     world->gravs = NULL;
     world->bases = NULL;
     world->fuels = NULL;
@@ -342,14 +342,14 @@ static void World_alloc(world_t *world)
     } else {
 	unsigned char *map_line;
 	unsigned char **map_pointer;
-	vector *grav_line;
-	vector **grav_pointer;
+	vector_t *grav_line;
+	vector_t **grav_pointer;
 
 	map_pointer = world->block;
 	map_line = (unsigned char*) ((unsigned char**)map_pointer + world->x);
 
 	grav_pointer = world->gravity;
-	grav_line = (vector*) ((vector**)grav_pointer + world->x);
+	grav_line = (vector_t*) ((vector_t**)grav_pointer + world->x);
 
 	for (x=0; x<world->x; x++) {
 	    *map_pointer = map_line;
@@ -576,7 +576,7 @@ bool Grok_map_options(world_t *world)
 /*
  * Return the team that is closest to this click position.
  */
-int Find_closest_team(world_t *world, clpos pos)
+int Find_closest_team(world_t *world, clpos_t pos)
 {
     int team = TEAM_NOT_SET, i;
     double closest = FLT_MAX, l;
@@ -612,7 +612,7 @@ static void Find_base_order(world_t *world)
 {
     int			i, j, k, n;
     double		dist;
-    clpos		chkpos;
+    clpos_t		chkpos;
 
     if (!BIT(world->rules->mode, TIMING)) {
 	world->baseorder = NULL;
@@ -630,7 +630,7 @@ static void Find_base_order(world_t *world)
 
     chkpos = Checks(world, 0)->pos;
     for (i = 0; i < n; i++) {
-	clpos bpos = Bases(world, i)->pos;
+	clpos_t bpos = Bases(world, i)->pos;
 	dist = Wrap_length(bpos.cx - chkpos.cx, bpos.cy - chkpos.cy) / CLICK;
 	for (j = 0; j < i; j++) {
 	    if (world->baseorder[j].dist > dist)
@@ -672,7 +672,7 @@ static void Compute_global_gravity(world_t *world)
     int			xi, yi, dx, dy;
     double		xforce, yforce, strength;
     double		theta;
-    vector		*grav;
+    vector_t		*grav;
 
 
     if (options.gravityPointSource == false) {
@@ -721,7 +721,7 @@ static void Compute_global_gravity(world_t *world)
 }
 
 
-static void Compute_grav_tab(vector grav_tab[GRAV_RANGE+1][GRAV_RANGE+1])
+static void Compute_grav_tab(vector_t grav_tab[GRAV_RANGE+1][GRAV_RANGE+1])
 {
     int			x, y;
     double		strength;
@@ -739,12 +739,11 @@ static void Compute_grav_tab(vector grav_tab[GRAV_RANGE+1][GRAV_RANGE+1])
 
 static void Compute_local_gravity(world_t *world)
 {
-    int			xi, yi, g, gx, gy, ax, ay, dx, dy, gtype;
-    int			first_xi, last_xi, first_yi, last_yi, mod_xi, mod_yi;
-    int			min_xi, max_xi, min_yi, max_yi;
-    double		force, fx, fy;
-    vector		*v, *grav, *tab, grav_tab[GRAV_RANGE+1][GRAV_RANGE+1];
-
+    int xi, yi, g, gx, gy, ax, ay, dx, dy, gtype;
+    int first_xi, last_xi, first_yi, last_yi, mod_xi, mod_yi;
+    int min_xi, max_xi, min_yi, max_yi;
+    double force, fx, fy;
+    vector_t *v, *grav, *tab, grav_tab[GRAV_RANGE+1][GRAV_RANGE+1];
 
     Compute_grav_tab(grav_tab);
 
@@ -852,7 +851,7 @@ shape_t		wormhole_wire;
 void Wormhole_line_init(void)
 {
     int i;
-    static shapepos coords[MAX_SHIP_PTS];
+    static shapepos_t coords[MAX_SHIP_PTS];
 
     wormhole_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
@@ -915,7 +914,7 @@ void remove_temp_wormhole(world_t *world, int ind)
 			      world->NumWormholes * sizeof(wormhole_t));
 }
 
-void World_add_temporary_wormholes(world_t *world, clpos pos1, clpos pos2)
+void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2)
 {
 
 #if 0
@@ -942,10 +941,10 @@ void World_add_temporary_wormholes(world_t *world, clpos pos1, clpos pos2)
 	blpos blk1, blk2;
 	int type1, type2;
 
-	blk1 = Clpos_to_blpos(pos1);
+	blk1 = Clpos_to_blkpos(pos1);
 	type1 = World_get_block(blk1);
 
-	blk2 = Clpos_to_blpos(pos2);
+	blk2 = Clpos_to_blkpos(pos2);
 	type2 = World_get_block(blk2);
 
 	if (!(type1 == SPACE && type2 == SPACE)) {

@@ -65,7 +65,7 @@ static char msg[MSG_LEN];
 struct collans {
     int line;
     int point;
-    clvec moved;
+    clvec_t moved;
 };
 
 struct tl2 {
@@ -75,8 +75,8 @@ struct tl2 {
 };
 
 struct bline {
-    clvec start;
-    clvec delta;
+    clvec_t start;
+    clvec_t delta;
     double c;
     double s;
     short group;
@@ -178,10 +178,10 @@ void Move_init(void)
     mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL | OBJ_PULSE;
 }
 
-static void Object_hits_target(object *obj, target_t *targ, double player_cost)
+static void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 {
     int			j;
-    player		*kp;
+    player_t		*kp;
     double		sc, por,
 			win_score = 0.0,
 			lose_score = 0.0;
@@ -191,7 +191,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 			targets_remaining = 0,
 			targets_total = 0;
     double 		drainfactor;
-    vector 		zero_vel = {0.0, 0.0};
+    vector_t 		zero_vel = {0.0, 0.0};
     world_t *world = &World;
 
     /* a normal shot or a direct mine hit work, cannons don't */
@@ -274,7 +274,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (j = 0; j < NumPlayers; j++) {
-	    player *pl_j = Players(j);
+	    player_t *pl_j = Players(j);
 
 	    if (Player_is_tank(pl_j)
 		|| (BIT(pl_j->status, PAUSE)
@@ -338,7 +338,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     por = (sc * lose_team_members) /win_team_members;
 
     for (j = 0; j < NumPlayers; j++) {
-	player *pl = Players(j);
+	player_t *pl = Players(j);
 
 	if (Player_is_tank(pl)
 	    || (BIT(pl->status, PAUSE)
@@ -360,7 +360,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     }
 }
 
-static void Object_hits_wormhole(object *obj, int ind)
+static void Object_hits_wormhole(object_t *obj, int ind)
 {
     world_t *world = &World;
     wormhole_t *wormhole = Wormholes(world, ind);
@@ -369,7 +369,7 @@ static void Object_hits_wormhole(object *obj, int ind)
     obj->wormHoleHit = ind;
 
     if (BIT(obj->type, OBJ_PLAYER)) {
-	player *pl = (player *)obj;
+	player_t *pl = (player_t *)obj;
 	warn("Player %s hits wormhole %d.", pl->name, ind);
     }
 
@@ -377,7 +377,7 @@ static void Object_hits_wormhole(object *obj, int ind)
 
 
 
-void Object_crash(object *obj, int crashtype, int mapobj_ind)
+void Object_crash(object_t *obj, int crashtype, int mapobj_ind)
 {
     world_t *world = &World;
 
@@ -420,7 +420,7 @@ void Object_crash(object *obj, int crashtype, int mapobj_ind)
 	    if (BIT(obj->type, OBJ_ITEM))
 		Cannon_add_item(c, obj->info, obj->count);
 	    else {
-		player *pl = Player_by_id(obj->id);
+		player_t *pl = Player_by_id(obj->id);
 
 		if (!BIT(c->used, HAS_EMERGENCY_SHIELD)) {
 		    if (c->item[ITEM_ARMOR] > 0)
@@ -439,7 +439,7 @@ void Object_crash(object *obj, int crashtype, int mapobj_ind)
 }
 
 
-void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
+void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
 {
     const char		*howfmt = NULL;
     const char          *hudmsg = NULL;
@@ -527,7 +527,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
     }
 
     if (howfmt && hudmsg) {
-	player		*pushers[MAX_RECORDED_SHOVES];
+	player_t	*pushers[MAX_RECORDED_SHOVES];
 	int		cnt[MAX_RECORDED_SHOVES];
 	int		num_pushers = 0;
 	int		total_pusher_count = 0;
@@ -576,7 +576,7 @@ void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt)
 			pusher_is_tagged = false;
 
 	    for (i = 0; i < num_pushers; i++) {
-		player		*pusher = pushers[i];
+		player_t	*pusher = pushers[i];
 		const char	*sep = (!i) ? " with help from "
 					    : (i < num_pushers - 1) ? ", "
 					    : " and ";
@@ -655,7 +655,7 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
     static const shape_t *lastshape;
     static int lastdir;
     const int os = num_lines;
-    shapepos *pts;
+    shapepos_t *pts;
 
     /* linet[i].group MUST BE INITIALIZED TO 0 */
 
@@ -667,7 +667,7 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
 
     pts = Shape_get_points((shape_t *)s, dir);
     for (i = 0; i < s->num_points; i++) {
-	clpos pt = pts[i].clk;
+	clpos_t pt = pts[i].clk;
 
 	linet[i + os].start.cx = -pt.cx;
 	linet[i + os].start.cy = -pt.cy;
@@ -687,7 +687,7 @@ static unsigned short *Shape_lines(const shape_t *s, int dir)
 }
 
 
-static int Bounce_object(object *obj, move_t *move, int line, int point)
+static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 {
     double fx, fy;
     double c, s, wall_brake_factor = options.objectWallBrakeFactor;
@@ -792,7 +792,7 @@ static int Bounce_object(object *obj, move_t *move, int line, int point)
 
     /* find direction of pulse after bounce */
     if (obj->type == OBJ_PULSE) {
-	pulseobject *pulse = PULSE_PTR(obj);
+	pulseobject_t *pulse = PULSE_PTR(obj);
 
 	pulse->dir = (int)Wrap_findDir(pulse->vel.x, pulse->vel.y);
 	pulse->len = 0;
@@ -803,7 +803,7 @@ static int Bounce_object(object *obj, move_t *move, int line, int point)
 
 
 
-static void Bounce_player(player *pl, move_t *move, int line, int point)
+static void Bounce_player(player_t *pl, move_t *move, int line, int point)
 {
     double fx, fy;
     double c, s;
@@ -1196,7 +1196,7 @@ static void Shape_move(const move_t *move, const shape_t *s,
     int x, temp;
     unsigned short *lines;
     unsigned short *points;
-    shapepos *pts;
+    shapepos_t *pts;
 
     if (mdx < 0) {
 	mdx = -mdx;
@@ -1230,7 +1230,7 @@ static void Shape_move(const move_t *move, const shape_t *s,
 
     pts = Shape_get_points((shape_t *)s, dir);
     for (i = 0; i < s->num_points; i++) {
-	clpos pt = pts[i].clk;
+	clpos_t pt = pts[i].clk;
 
 	msx = WRAP_XCLICK(move->start.cx + pt.cx);
 	msy = WRAP_YCLICK(move->start.cy + pt.cy);
@@ -1321,13 +1321,13 @@ static void Shape_move(const move_t *move, const shape_t *s,
  * that would be hit during morphing or NO_GROUP if there is enough room. */
 /* This might be useful elsewhere in the code, need not be kept static */
 static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
-		       int dir2, hitmask_t hitmask, const object *obj, int x, int y)
+		       int dir2, hitmask_t hitmask, const object_t *obj, int x, int y)
 {
     struct collans answer;
     int i, p, xo1, xo2, yo1, yo2, xn1, xn2, yn1, yn2, xp, yp, s, t;
     unsigned short *points;
     move_t mv;
-    /*shapepos *pts1, *pts2;*/
+    /*shapepos_t *pts1, *pts2;*/
     int num_points;
 
     mv.hitmask = hitmask;
@@ -1342,8 +1342,8 @@ static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
     num_points = shape1->num_points;
 
     for (i = 0; i < num_points; i++) {
-	clpos pt1, pt2;
-	/*clpos ptx1, ptx2;
+	clpos_t pt1, pt2;
+	/*clpos_t ptx1, ptx2;
 
 	  ptx1 = pts1[i].clk;
 	  ptx2 = pts2[i].clk;*/
@@ -1375,7 +1375,7 @@ static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
     /* Convex shapes would be much easier. */
     points = blockline[(x >> B_SHIFT) + mapx * (y >> B_SHIFT)].points;
     while ( (p = *points++) != 65535) {
-	clpos pto1, ptn1;
+	clpos_t pto1, ptn1;
 	if (linet[p].group
 	    && (!can_hit(&groups[linet[p].group], &mv)))
 	    continue;
@@ -1396,7 +1396,7 @@ static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
 	t = 0;
 
 	for (i = 0; i < num_points; i++) {
-	    clpos pto2, ptn2;
+	    clpos_t pto2, ptn2;
 
 	    /*pto2 = pts1[i].clk;
 	      ptn2 = pts2[i].clk;*/
@@ -1474,7 +1474,7 @@ static int Shape_morph(const shape_t *shape1, int dir1, const shape_t *shape2,
 static int Away(move_t *move, int line)
 {
     int dx, dy, lsx, lsy;
-    clvec delta_saved;
+    clvec_t delta_saved;
     struct collans ans;
 
     lsx = linet[line].start.cx - move->start.cx;
@@ -1532,7 +1532,7 @@ static int Away(move_t *move, int line)
  * outwards from the corner so discreteness doesn't make moving it so hard. */
 /* This function should get called only rarely, so it doesn't need to
  * be too efficient. */
-static int Clear_corner(move_t *move, object *obj, int l1, int l2)
+static int Clear_corner(move_t *move, object_t *obj, int l1, int l2)
 {
     int x, y, xm, ym;
     int l1sx, l2sx, l1sy, l2sy;
@@ -1629,7 +1629,7 @@ static int Shape_away(move_t *move, const shape_t *s,
 		      int dir, int line, struct collans *ans)
 {
     int dx, dy;
-    clvec delta_saved;
+    clvec_t delta_saved;
 
     if (ABS(linet[line].delta.cx) >= ABS(linet[line].delta.cy)) {
 	dx = 0;
@@ -1779,7 +1779,7 @@ struct templine {
  * a polygon belonging to a group that could be hit by the given
  * hitmask/object.
  * Return the number of a group that would be hit or NO_GROUP. */
-int is_inside(int cx, int cy, hitmask_t hitmask, const object *obj)
+int is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj)
 {
     short *ptr;
     int inside, cx1, cx2, cy1, cy2, s;
@@ -1858,10 +1858,10 @@ int is_inside(int cx, int cy, hitmask_t hitmask, const object *obj)
 
 /* Similar to the above, except check whether any part of the shape
  * (edge or inside) would hit the group. */
-int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object *obj,
+int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
 		    const shape_t *s, int dir)
 {
-    static shapepos zeropos;
+    static shapepos_t zeropos;
     static shape_t zeroshape;
     int i, group;
 
@@ -2456,14 +2456,16 @@ static void Corner_init(void)
 void Ball_line_init(void)
 {
     int i;
-    static shapepos coords[MAX_SHIP_PTS];
+    static shapepos_t coords[MAX_SHIP_PTS];
 
     LIMIT(options.ballRadius, 0, BALL_RADIUS);
     ball_wire.num_points = MAX_SHIP_PTS;
     for (i = 0; i < MAX_SHIP_PTS; i++) {
 	ball_wire.pts[i] = coords + i;
-	coords[i].clk.cx = cos(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
-	coords[i].clk.cy = sin(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
+	coords[i].clk.cx
+	    = cos(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
+	coords[i].clk.cy
+	    = sin(i * 2 * PI / MAX_SHIP_PTS) * options.ballRadius * CLICK;
     }
 
     return;
@@ -2568,7 +2570,7 @@ void Treasure_init(void)
 }
 
 
-static void Move_ball(object *obj)
+static void Move_ball(object_t *obj)
 {
     move_t mv;
     struct collans ans;
@@ -2583,7 +2585,7 @@ static void Move_ball(object *obj)
 
     if (obj->id != NO_ID
 	&& BIT(Player_by_id(obj->id)->used, HAS_PHASING_DEVICE)) {
-	clpos pos;
+	clpos_t pos;
 
 	pos.cx = obj->pos.cx + mv.delta.cx;
 	pos.cy = obj->pos.cy + mv.delta.cy;
@@ -2640,7 +2642,7 @@ static void Move_ball(object *obj)
 }
 
 
-void Move_object(object *obj)
+void Move_object(object_t *obj)
 {
     int t;
     move_t mv;
@@ -2712,13 +2714,13 @@ void Move_object(object *obj)
 
 bool in_move_player = false;
 
-void Move_player(player *pl)
+void Move_player(player_t *pl)
 {
-    clpos  pos;
+    clpos_t  pos;
     move_t mv;
     struct collans ans;
     double fric = friction;
-    vector oldv;
+    vector_t oldv;
     world_t *world = &World;
 
     if (!Player_is_playing(pl)) {
@@ -2744,7 +2746,7 @@ void Move_player(player *pl)
 
 	in_move_player = true;
 	
-	group = is_inside(pl->pos.cx, pl->pos.cy, NONBALL_BIT, (object *)pl);
+	group = is_inside(pl->pos.cx, pl->pos.cy, NONBALL_BIT, (object_t *)pl);
 	if (group != NO_GROUP) {
 	    for (i = 0; i < world->NumFrictionAreas; i++) {
 		friction_area_t *fa = FrictionAreas(world, i);
@@ -2848,7 +2850,7 @@ void Move_player(player *pl)
 }
 
 
-void Turn_player(player *pl)
+void Turn_player(player_t *pl)
 {
     int		new_dir = MOD2((int)(pl->float_dir + 0.5), RES);
     int		next_dir, sign;

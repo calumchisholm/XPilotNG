@@ -37,7 +37,7 @@ int			NumAlliances = 0;
 int			NumSpectators = 0;
 int			NumOperators = 0;
 int			spectatorStart;
-server			Server;
+server_t		Server;
 char			*serverAddr;
 int			ShutdownServer = -1;
 int			ShutdownDelay = 1000;
@@ -286,7 +286,7 @@ void Main_loop(void)
  */
 int End_game(void)
 {
-    player		*pl;
+    player_t		*pl;
     char		msg[MSG_LEN];
     world_t *world = &World;
 
@@ -370,7 +370,7 @@ int Pick_team(int pick_for_type)
 			num_available_teams = 0,
 			playing_teams = 0,
 			losing_team;
-    player		*pl;
+    player_t		*pl;
     int			playing[MAX_TEAMS];
     int			free_bases[MAX_TEAMS];
     int			available_teams[MAX_TEAMS];
@@ -477,7 +477,7 @@ int Pick_team(int pick_for_type)
 void Server_info(char *str, size_t max_size)
 {
     int			i, j, k;
-    player		*pl, **order, *best = NULL;
+    player_t		*pl, **order, *best = NULL;
     double		ratio, best_ratio = -1e7;
     char		name[MAX_CHARS];
     char		lblstr[MAX_CHARS];
@@ -521,7 +521,8 @@ void Server_info(char *str, size_t max_size)
 
     strlcat(str, msg, max_size);
 
-    if ((order = (player **) malloc(NumPlayers * sizeof(player *))) == NULL) {
+    if ((order = (player_t **) malloc(NumPlayers * sizeof(player_t *)))
+	== NULL) {
 	error("No memory for order");
 	return;
     }
@@ -659,6 +660,7 @@ void Game_Over(void)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	int teamscore[MAX_TEAMS];
+
 	maxsc = -32767;
 	minsc = 32767;
 	win = lose = -1;
@@ -667,8 +669,9 @@ void Game_Over(void)
 	    teamscore[i] = 1234567; /* These teams are not used... */
 
 	for (i = 0; i < NumPlayers; i++) {
-	    player *pl = Players(i);
+	    player_t *pl = Players(i);
 	    int team;
+
 	    if (Player_is_human(pl)) {
 		team = pl->team;
 		if (teamscore[team] == 1234567)
@@ -708,7 +711,7 @@ void Game_Over(void)
     win = lose = -1;
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 
 	SET_BIT(pl_i->status, GAME_OVER);
 	if (Player_is_human(pl_i)) {
@@ -735,7 +738,7 @@ void Game_Over(void)
 }
 
 
-void Server_log_admin_message(player *pl, const char *str)
+void Server_log_admin_message(player_t *pl, const char *str)
 {
     /*
      * Only log the message if logfile already exists,

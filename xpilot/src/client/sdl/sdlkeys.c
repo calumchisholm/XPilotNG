@@ -5,7 +5,7 @@
 #include "sdlkeys.h"
 
 typedef struct {
-	char*	name;
+	const char *name;
 	SDLKey	key;
 } sdlkey_t;
 

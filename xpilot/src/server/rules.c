@@ -124,7 +124,8 @@ void Tune_item_probs(void)
 	excess = world->items[i].num - world->items[i].max;
 	if (excess > 0) {
 	    for (j = 0; j < NumObjs; j++) {
-		object *obj = Obj[j];
+		object_t *obj = Obj[j];
+
 		if (obj->type == OBJ_ITEM) {
 		    if (obj->info == i) {
 			Delete_shot(j);

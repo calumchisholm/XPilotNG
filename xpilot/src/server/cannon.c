@@ -29,8 +29,8 @@ char cannon_version[] = VERSION;
 
 static int Cannon_select_weapon(cannon_t *cannon);
 static void Cannon_aim(cannon_t *cannon, int weapon,
-		       player **pl_p, int *dir);
-static void Cannon_fire(cannon_t *cannon, int weapon, player *pl, int dir);
+		       player_t **pl_p, int *dir);
+static void Cannon_fire(cannon_t *cannon, int weapon, player_t *pl, int dir);
 static int Cannon_in_danger(cannon_t *cannon);
 static int Cannon_select_defense(cannon_t *cannon);
 static void Cannon_defend(cannon_t *cannon, int defense);
@@ -85,7 +85,8 @@ void Cannon_update(bool do_less_frequent_update)
 		if (world->items[item].cannonprob > 0
 		    && options.cannonItemProbMult > 0
 		    && (int)(rfrac() * (60 * 12))
-		    < (options.cannonItemProbMult * world->items[item].cannonprob))
+		    < (options.cannonItemProbMult
+		       * world->items[item].cannonprob))
 		    Cannon_add_item(c, item, (item == ITEM_FUEL
 					      ?  ENERGY_PACK_FUEL : 1));
 	    }
@@ -93,7 +94,7 @@ void Cannon_update(bool do_less_frequent_update)
 	if ((c->damaged -= timeStep) <= 0)
 	    c->damaged = 0;
 	if (c->tractor_count > 0) {
-	    player *tpl = c->tractor_target_pl;
+	    player_t *tpl = c->tractor_target_pl;
 
 	    if ((Wrap_length(tpl->pos.cx - c->pos.cx,
 			     tpl->pos.cy - c->pos.cy)
@@ -150,9 +151,9 @@ void Cannon_add_item(cannon_t *c, int item, double amount)
 
 void Cannon_throw_items(cannon_t *c)
 {
-    int		i, dir;
-    object	*obj;
-    double	velocity;
+    int i, dir;
+    object_t *obj;
+    double velocity;
     world_t *world = &World;
 
     for (i = 0; i < NUM_ITEMS; i++) {
@@ -230,7 +231,7 @@ void Cannon_check_defense(cannon_t *c)
 
 void Cannon_check_fire(cannon_t *c)
 {
-    player *pl = NULL;
+    player_t *pl = NULL;
     int	dir = 0,
 	weapon = Cannon_select_weapon(c);
 
@@ -267,16 +268,15 @@ static int Cannon_select_defense(cannon_t *c)
 static int Cannon_in_danger(cannon_t *c)
 {
     world_t *world = &World;
-    const int	range = 4 * BLOCK_SZ;
-    const long	kill_shots = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT
+    const int range = 4 * BLOCK_SZ;
+    const long kill_shots = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT
 	    			| OBJ_PULSE | OBJ_SMART_SHOT | OBJ_HEAT_SHOT
 				| OBJ_TORPEDO | OBJ_ASTEROID;
-    object	*shot, **obj_list;
-    const int	max_objs = 100;
-    int		obj_count, i, danger = false;
-    int		npx, npy, tdx, tdy;
-    int		cpx = CLICK_TO_PIXEL(c->pos.cx);
-    int		cpy = CLICK_TO_PIXEL(c->pos.cy);
+    object_t *shot, **obj_list;
+    const int max_objs = 100;
+    int obj_count, i, danger = false;
+    int npx, npy, tdx, tdy;
+    int cpx = CLICK_TO_PIXEL(c->pos.cx), cpy = CLICK_TO_PIXEL(c->pos.cy);
 
     if (options.cannonSmartness == 0)
 	return false;
@@ -387,7 +387,7 @@ static int Cannon_select_weapon(cannon_t *c)
    modes 1 and 2 only fire if a player is within range of the selected weapon.
    mode 3 only fires if a player will be in range when the shot is expected to hit.
  */
-static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
+static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 {
     world_t *world = &World;
     double	speed = options.shotSpeed;
@@ -438,7 +438,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
     }
 
     for (i = 0; i < NumPlayers && !ready; i++) {
-	player *pl = Players(i);
+	player_t *pl = Players(i);
 	double tdist, tdx, tdy;
 
 	tdx = WRAP_DCX(pl->pos.cx - c->pos.cx) / CLICK;
@@ -538,14 +538,14 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 
 /* does the actual firing. also determines in which way to use weapons that
    have more than one possible use. */
-static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
+static void Cannon_fire(cannon_t *c, int weapon, player_t *pl, int dir)
 {
     world_t *world = &World;
-    modifiers	mods;
-    bool	played = false;
-    int		i;
-    double	speed = options.shotSpeed;
-    vector	zero_vel = { 0.0, 0.0 };
+    modifiers_t	mods;
+    bool played = false;
+    int i;
+    double speed = options.shotSpeed;
+    vector_t zero_vel = { 0.0, 0.0 };
 
     CLEAR_MODS(mods);
     switch (weapon) {
@@ -564,7 +564,7 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 	    sound_play_sensors(c->pos, DROP_MINE_SOUND);
 	    played = true;
 	} else {		/* throw mine at player */
-	    vector vel;
+	    vector_t vel;
 	    if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
 		mods.mini = (int)(rfrac() * MODS_MINI_MAX) + 1;
 		mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
@@ -735,10 +735,10 @@ static void Cannon_fire(cannon_t *c, int weapon, player *pl, int dir)
 }
 
 
-void Cannon_dies(cannon_t *c, player *pl)
+void Cannon_dies(cannon_t *c, player_t *pl)
 {
     world_t *world = &World;
-    vector	zero_vel = { 0.0, 0.0 };
+    vector_t zero_vel = { 0.0, 0.0 };
 
     World_remove_cannon(world, c);
     Cannon_throw_items(c);

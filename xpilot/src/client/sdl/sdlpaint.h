@@ -55,7 +55,7 @@ extern void Segment_add(int color, int x_1, int y_1, int x_2, int y_2);
 extern void Circle(int color, int x, int y, int radius, int filled);
 extern void set_alphacolor(int color);
 
-irec *select_bounds;
+irec_t *select_bounds; /* kps - maybe extern this ? */
 extern void Paint_select(void);
 
 extern SDL_Surface  *MainSDLSurface;

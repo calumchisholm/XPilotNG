@@ -27,7 +27,7 @@ char play_version[] = VERSION;
 
 int tagItPlayerId = NO_ID;	/* player who is 'it' */
 
-void Transfer_tag(player *oldtag_pl, player *newtag_pl)
+void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl)
 {
     char	msg[MSG_LEN];
 
@@ -42,7 +42,7 @@ void Transfer_tag(player *oldtag_pl, player *newtag_pl)
 }
 
 #if 0
-double Handle_tag(double sc, player *victim_pl, player *killer_pl)
+double Handle_tag(double sc, player_t *victim_pl, player_t *killer_pl)
 {
     if (tagItPlayerId == killer_pl->id)
 	return tagItKillMult * sc;
@@ -54,7 +54,7 @@ double Handle_tag(double sc, player *victim_pl, player *killer_pl)
 }
 #endif
 
-static inline bool Player_can_be_tagged(player *pl)
+static inline bool Player_can_be_tagged(player_t *pl)
 {
     if (Player_is_tank(pl))
 	return false;
@@ -70,14 +70,14 @@ static inline bool Player_can_be_tagged(player *pl)
 void Check_tag(void)
 {
     int num = 0, i, candidate;
-    player *tag_pl = Player_by_id(tagItPlayerId);
+    player_t *tag_pl = Player_by_id(tagItPlayerId);
 
     if (tag_pl && Player_can_be_tagged(tag_pl))
 	return;
 
     /* Find number of players that might get the tag */
     for (i = 0; i < NumPlayers; i++) {
-	player *pl = Players(i);
+	player_t *pl = Players(i);
 	if (Player_can_be_tagged(pl))
 	    num++;
     }
@@ -90,7 +90,7 @@ void Check_tag(void)
     /* select first candidate for tag */
     candidate = (int)(rfrac() * num);
     for (i = candidate; i < NumPlayers; i++) {
-	player *pl = Players(i);
+	player_t *pl = Players(i);
 	if (Player_can_be_tagged(pl)) {
 	    tagItPlayerId = pl->id;
 	    break;
@@ -99,7 +99,7 @@ void Check_tag(void)
 
     if (tagItPlayerId == NO_ID) {
 	for (i = 0; i < candidate; i++) {
-	    player *pl = Players(i);
+	    player_t *pl = Players(i);
 	    if (Player_can_be_tagged(pl)) {
 		tagItPlayerId = pl->id;
 		break;
@@ -111,7 +111,7 @@ void Check_tag(void)
     assert(tagItPlayerId != NO_ID);
 }
 
-static int Punish_team(player *pl, treasure_t *td, clpos pos)
+static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
 {
     static char		msg[MSG_LEN];
     int			i;
@@ -127,7 +127,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
 
     if (BIT(world->rules->mode, TEAM_PLAY)) {
 	for (i = 0; i < NumPlayers; i++) {
-	    player *pl_i = Players(i);
+	    player_t *pl_i = Players(i);
 
 	    if (Player_is_tank(pl_i)
 		|| (BIT(pl_i->status, PAUSE) && pl_i->count <= 0)
@@ -164,7 +164,7 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
     por = (sc * lose_team_members) / (2 * win_team_members + 1);
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 
 	if (Player_is_tank(pl_i)
 	    || (BIT(pl_i->status, PAUSE)
@@ -203,8 +203,8 @@ static int Punish_team(player *pl, treasure_t *td, clpos pos)
  */
 
 /* Create debris particles */
-void Make_debris(clpos pos,
-		 vector vel,
+void Make_debris(clpos_t pos,
+		 vector_t vel,
 		 int owner_id,
 		 int owner_team,
 		 int type,
@@ -217,10 +217,10 @@ void Make_debris(clpos pos,
 		 double min_speed, double max_speed,
 		 double min_life, double max_life)
 {
-    object		*debris;
+    object_t		*debris;
     int			i;
     double		life;
-    modifiers		mods;
+    modifiers_t		mods;
     world_t *world = &World;
 
     pos = World_wrap_clpos(world, pos);
@@ -292,10 +292,10 @@ void Make_debris(clpos pos,
  * should be replaced into the hoop without exploding and
  * the player gets some points.
  */
-void Ball_is_replaced(ballobject *ball)
+void Ball_is_replaced(ballobject_t *ball)
 {
     char msg[MSG_LEN];
-    player *pl = Player_by_id(ball->owner);
+    player_t *pl = Player_by_id(ball->owner);
 
     ball->life = 0;
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
@@ -312,10 +312,10 @@ void Ball_is_replaced(ballobject *ball)
  * Ball has been brought back to home treasure.
  * The team should be punished.
  */
-void Ball_is_destroyed(ballobject *ball)
+void Ball_is_destroyed(ballobject_t *ball)
 {
     char msg[MSG_LEN];
-    player *pl = Player_by_id(ball->owner);
+    player_t *pl = Player_by_id(ball->owner);
     double frames = (1e6 - ball->life) / timeStep + .5;
     double seconds = frames / options.framesPerSecond;
 
@@ -336,9 +336,9 @@ void Ball_is_destroyed(ballobject *ball)
 
 
 
-void Ball_hits_goal(ballobject *ball, group_t *gp)
+void Ball_hits_goal(ballobject_t *ball, group_t *gp)
 {
-    player *owner;
+    player_t *owner;
     treasure_t *td;
     char msg[MSG_LEN];
     world_t *world = &World;
@@ -393,7 +393,7 @@ void Ball_hits_goal(ballobject *ball, group_t *gp)
  */
 bool Balltarget_hitfunc(group_t *gp, move_t *move)
 {
-    ballobject *ball = NULL;
+    ballobject_t *ball = NULL;
     world_t *world = &World;
 
     /* this can happen if is_inside is called for a balltarget with
@@ -458,7 +458,7 @@ static void Cannon_set_hitmask(int group, cannon_t *cannon)
 
 void World_restore_cannon(world_t *world, cannon_t *cannon)
 {
-    blpos blk = Clpos_to_blpos(cannon->pos);
+    blkpos_t blk = Clpos_to_blkpos(cannon->pos);
 
     World_set_block(world, blk, CANNON);
 
@@ -471,7 +471,7 @@ void World_restore_cannon(world_t *world, cannon_t *cannon)
 
 void World_remove_cannon(world_t *world, cannon_t *cannon)
 {
-    blpos blk = Clpos_to_blpos(cannon->pos);
+    blkpos_t blk = Clpos_to_blkpos(cannon->pos);
 
     cannon->dead_time = options.cannonDeadTime;
     cannon->conn_mask = 0;
@@ -490,7 +490,7 @@ extern struct move_parameters mp;
  */
 bool Cannon_hitfunc(group_t *gp, move_t *move)
 {
-    object *obj = move->obj;
+    object_t *obj = move->obj;
     world_t *world = &World;
     cannon_t *cannon = Cannons(world, gp->mapobj_ind);
     unsigned long cannon_mask;
@@ -568,7 +568,7 @@ void Target_init(void)
 
 void World_restore_target(world_t *world, target_t *targ)
 {
-    blpos blk = Clpos_to_blpos(targ->pos);
+    blkpos_t blk = Clpos_to_blkpos(targ->pos);
 
     World_set_block(world, blk, TARGET);
 
@@ -583,7 +583,7 @@ void World_restore_target(world_t *world, target_t *targ)
 
 void World_remove_target(world_t *world, target_t *targ)
 {
-    blpos blk = Clpos_to_blpos(targ->pos);
+    blkpos_t blk = Clpos_to_blkpos(targ->pos);
 
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */
@@ -612,7 +612,7 @@ hitmask_t Wormhole_hitmask(wormhole_t *wormhole)
 
 bool Wormhole_hitfunc(group_t *gp, move_t *move)
 {
-    object *obj = move->obj;
+    object_t *obj = move->obj;
     world_t *world = &World;
     wormhole_t *wormhole = Wormholes(world, gp->mapobj_ind);
 
@@ -632,7 +632,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 	 wormhole, Object_typename(move->obj));
 #endif
     if (obj->type == OBJ_PLAYER) {
-	player *pl = (player *)obj;
+	player_t *pl = (player_t *)obj;
 	if (pl->wormHoleHit == gp->mapobj_ind)
 	    return false;
     }
@@ -642,7 +642,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 #if 0
 
     if (obj->type == OBJ_PLAYER) {
-	player *pl = (player *)obj;
+	player_t *pl = (player_t *)obj;
 
 	if (BIT(pl->status, WARPING))
 	    return false;
@@ -670,7 +670,7 @@ bool Wormhole_hitfunc(group_t *gp, move_t *move)
 
 void World_remove_wormhole(world_t *world, wormhole_t *wormhole)
 {
-    blpos blk = Clpos_to_blpos(wormhole->pos);
+    blkpos_t blk = Clpos_to_blkpos(wormhole->pos);
 
     World_set_block(world, blk, wormhole->lastblock);
 }

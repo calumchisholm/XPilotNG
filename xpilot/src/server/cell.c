@@ -48,7 +48,7 @@ struct cell_offset {
 };
 
 
-static cell_node **Cells;
+static cell_node_t **Cells;
 static int object_node_offset;
 static cell_dist_t *cell_dist;
 static size_t cell_dist_size;
@@ -147,19 +147,19 @@ void Free_cells(void)
 void Alloc_cells(void)
 {
     unsigned size;
-    cell_node *cell_ptr;
+    cell_node_t *cell_ptr;
     int x, y;
     world_t *world = &World;
 
     Free_cells();
 
-    size = sizeof(cell_node *) * world->x;
-    size += sizeof(cell_node) * world->x * world->y;
-    if (!(Cells = (cell_node **) malloc(size))) {
+    size = sizeof(cell_node_t *) * world->x;
+    size += sizeof(cell_node_t) * world->x * world->y;
+    if (!(Cells = (cell_node_t **) malloc(size))) {
 	error("No Cell mem");
 	End_game();
     }
-    cell_ptr = (cell_node *) & Cells[world->x];
+    cell_ptr = (cell_node_t *) & Cells[world->x];
     for (x = 0; x < world->x; x++) {
 	Cells[x] = cell_ptr;
 	for (y = 0; y < world->y; y++) {
@@ -174,7 +174,7 @@ void Alloc_cells(void)
 }
 
 
-void Cell_init_object(object * obj)
+void Cell_init_object(object_t *obj)
 {
     /* put obj on list with only itself. */
     obj->cell.next = &(obj->cell);
@@ -185,11 +185,11 @@ void Cell_init_object(object * obj)
 }
 
 
-void Cell_add_object(object * obj)
+void Cell_add_object(object_t *obj)
 {
-    blpos bpos = Clpos_to_blpos(obj->pos);
-    cell_node *obj_node_ptr, *cell_node_ptr;
-    cell_node *prev, *next;
+    blkpos_t bpos = Clpos_to_blkpos(obj->pos);
+    cell_node_t *obj_node_ptr, *cell_node_ptr;
+    cell_node_t *prev, *next;
     world_t *world = &World;
 
     obj_node_ptr = &(obj->cell);
@@ -218,10 +218,10 @@ void Cell_add_object(object * obj)
 }
 
 
-void Cell_remove_object(object * obj)
+void Cell_remove_object(object_t *obj)
 {
-    cell_node *obj_node_ptr;
-    cell_node *next, *prev;
+    cell_node_t *obj_node_ptr;
+    cell_node_t *next, *prev;
 
     obj_node_ptr = &(obj->cell);
     next = obj_node_ptr->next;
@@ -240,20 +240,20 @@ void Cell_remove_object(object * obj)
 }
 
 
-void Cell_get_objects(clpos pos,
+void Cell_get_objects(clpos_t pos,
 		      int range,
 		      int max_obj_count,
-		      object *** obj_list, int *count_ptr)
+		      object_t *** obj_list, int *count_ptr)
 {
-    static object *ObjectList[MAX_TOTAL_SHOTS + 1];
+    static object_t *ObjectList[MAX_TOTAL_SHOTS + 1];
     int i, count;
     int x, y, xw, yw;
     int wrap;
-    object *obj;
-    cell_node *cell_node_ptr, *next;
+    object_t *obj;
+    cell_node_t *cell_node_ptr, *next;
     double dist;
     world_t *world = &World;
-    blpos bpos = Clpos_to_blpos(pos);
+    blkpos_t bpos = Clpos_to_blkpos(pos);
 
     x = bpos.bx;
     y = bpos.by;
@@ -292,7 +292,7 @@ void Cell_get_objects(clpos pos,
 	    cell_node_ptr = &Cells[xw][yw];
 	    next = cell_node_ptr->next;
 	    while (next != cell_node_ptr && count < max_obj_count) {
-		obj = (object *) ((char *) next - object_node_offset);
+		obj = (object_t *) ((char *) next - object_node_offset);
 		ObjectList[count++] = obj;
 		next = next->next;
 	    }

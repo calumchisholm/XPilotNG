@@ -34,7 +34,7 @@ static list_t	Asteroid_list = NULL;
 /*
  * Prototypes.
  */
-static void Make_asteroid(clpos pos, int size, int dir, double speed);
+static void Make_asteroid(clpos_t pos, int size, int dir, double speed);
 
 
 /*
@@ -46,7 +46,7 @@ list_t Asteroid_get_list(void)
 }
 
 
-static bool Asteroid_add_to_list(wireobject *ast)
+static bool Asteroid_add_to_list(wireobject_t *ast)
 {
     list_iter_t		list_pos;
     bool		result = false;
@@ -64,7 +64,7 @@ static bool Asteroid_add_to_list(wireobject *ast)
 }
 
 
-static bool Asteroid_remove_from_list(wireobject *ast)
+static bool Asteroid_remove_from_list(wireobject_t *ast)
 {
     list_iter_t		list_pos;
     bool		result = false;
@@ -90,13 +90,13 @@ static bool Asteroid_remove_from_list(wireobject *ast)
  * the wreckage and the debris should be about equal to the mass
  * of the original asteroid.
  */
-void Break_asteroid(wireobject *asteroid)
+void Break_asteroid(wireobject_t *asteroid)
 {
     double	mass, mass3;
     double	speed, speed1, speed2, radius;
     double	velx1, vely1, velx2, vely2, dir;
     int		dir1, dir2, split_dir;
-    clpos	pos1, pos2;
+    clpos_t	pos1, pos2;
     world_t *world = &World;
 
     if (asteroid->size == 1) {
@@ -188,7 +188,7 @@ void Break_asteroid(wireobject *asteroid)
 	&& (rfrac() < options.asteroidItemProb)) {
 	int	nitems = (int)(rfrac() * options.asteroidMaxItems) + 1;
 	int	i;
-	vector	vel;
+	vector_t	vel;
 	int	item, item_dir, num_per_pack;
 	double	item_speed;
 	long	status;
@@ -227,10 +227,10 @@ void Break_asteroid(wireobject *asteroid)
 /*
  * Creates an asteroid with the given characteristics.
  */
-static void Make_asteroid(clpos pos, int size, int dir, double speed)
+static void Make_asteroid(clpos_t pos, int size, int dir, double speed)
 {
-    wireobject	*asteroid;
-    double	radius;
+    wireobject_t *asteroid;
+    double radius;
     world_t *world = &World;
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
@@ -299,8 +299,8 @@ static void Place_asteroid(void)
     unsigned		space;
     int			okay;
     asteroid_concentrator_t	*con;
-    clpos		pos;
-    blpos		bpos;
+    clpos_t		pos;
+    blkpos_t		bpos;
     world_t *world = &World;
 
     space = SPACE_BLOCKS;
@@ -335,7 +335,7 @@ static void Place_asteroid(void)
 	} else
 	    pos = World_get_random_clpos(world);
 
-	bpos = Clpos_to_blpos(pos);
+	bpos = Clpos_to_blkpos(pos);
 
 	/* kps - don't use world blocks here. */
 	if (BIT(1U << World_get_block(world, bpos), space)) {
@@ -344,7 +344,7 @@ static void Place_asteroid(void)
 	    okay = true;
 
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl = Players(i);
+		player_t *pl = Players(i);
 		if (Player_is_human(pl)) {
 		    dpx = WRAP_DCX(pos.cx - pl->pos.cx);
 		    dpy = WRAP_DCY(pos.cy - pl->pos.cy);
@@ -366,13 +366,13 @@ static void Place_asteroid(void)
 }
 
 
-static void Asteroid_move(wireobject *wireobj)
+static void Asteroid_move(wireobject_t *wireobj)
 {
     Move_object(OBJ_PTR(wireobj));
 }
 
 
-static void Asteroid_rotate(wireobject *wireobj)
+static void Asteroid_rotate(wireobject_t *wireobj)
 {
     wireobj->rotation =
 	(wireobj->rotation + (int) (wireobj->turnspeed * RES)) % RES;
@@ -386,10 +386,10 @@ static void Asteroid_rotate(wireobject *wireobj)
  */
 void Asteroid_update(void)
 {
-    int		num;
-    list_t	list;
-    list_iter_t	iter;
-    wireobject	*asteroid;
+    int num;
+    list_t list;
+    list_iter_t iter;
+    wireobject_t *asteroid;
     world_t *world = &World;
 
     list = Asteroid_get_list();
@@ -408,7 +408,7 @@ void Asteroid_update(void)
 	    for (iter = List_begin(list);
 		 iter != List_end(list);
 		 LI_FORWARD(iter)) {
-		asteroid = (wireobject *) LI_DATA(iter);
+		asteroid = (wireobject_t *) LI_DATA(iter);
 		if (asteroid->life > 0) {
 		    asteroid->life = 0;
 		    if (asteroid->size == 1)
@@ -423,7 +423,7 @@ void Asteroid_update(void)
 	for (iter = List_begin(list);
 	     iter != List_end(list);
 	     LI_FORWARD(iter)) {
-	    asteroid = (wireobject *) LI_DATA(iter);
+	    asteroid = (wireobject_t *) LI_DATA(iter);
 	    if (asteroid->life > 0)
 		Asteroid_rotate(asteroid);
 	}
@@ -432,7 +432,7 @@ void Asteroid_update(void)
 	for (iter = List_begin(list);
 	     iter != List_end(list);
 	     LI_FORWARD(iter)) {
-	    asteroid = (wireobject *) LI_DATA(iter);
+	    asteroid = (wireobject_t *) LI_DATA(iter);
 	    if (asteroid->life > 0)
 		Asteroid_move(asteroid);
 	}

@@ -122,9 +122,9 @@ void P_bmpstyle(const char *id, const char *filename, int flags)
 }
 
 /* current vertex */
-static clpos P_cv;
+static clpos_t P_cv;
 
-void P_start_polygon(clpos pos, int style)
+void P_start_polygon(clpos_t pos, int style)
 {
     poly_t t;
     world_t *world = &World;
@@ -153,7 +153,7 @@ void P_start_polygon(clpos pos, int style)
 }
 
 
-void P_offset(clpos offset, int edgestyle)
+void P_offset(clpos_t offset, int edgestyle)
 {
     int i, offcx = offset.cx, offcy = offset.cy;
 
@@ -190,9 +190,9 @@ void P_offset(clpos offset, int edgestyle)
     }
 }
 
-void P_vertex(clpos pos, int edgestyle)
+void P_vertex(clpos_t pos, int edgestyle)
 {
-    clpos offset;
+    clpos_t offset;
 
     offset.cx = pos.cx - P_cv.cx;
     offset.cy = pos.cy - P_cv.cy;

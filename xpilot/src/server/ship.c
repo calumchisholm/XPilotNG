@@ -31,14 +31,14 @@ char ship_version[] = VERSION;
  * Functions for ship movement.
  */
 
-void Thrust(player *pl)
+void Thrust(player_t *pl)
 {
     const int		min_dir = (int)(pl->dir + RES/2 - RES*0.2 - 1);
     const int		max_dir = (int)(pl->dir + RES/2 + RES*0.2 + 1);
     const double	max_speed = 1 + (pl->power * 0.14);
     const double	max_life = 3 + pl->power * 0.35;
-    clpos		engine = Ship_get_engine_clpos(pl->ship, pl->dir);
-    clpos		pos;
+    clpos_t		engine = Ship_get_engine_clpos(pl->ship, pl->dir);
+    clpos_t		pos;
     int			afterburners;
     double		tot_sparks = (pl->power * 0.15 + 2.5) * timeStep;
     double		alt_sparks;
@@ -84,7 +84,7 @@ void Thrust(player *pl)
 		3.0, max_life);
 }
 
-void Record_shove(player *pl, player *pusher, long shove_time)
+void Record_shove(player_t *pl, player_t *pusher, long shove_time)
 {
     shove_t		*shove = &pl->shove_record[pl->shove_next];
 
@@ -100,7 +100,7 @@ void Record_shove(player *pl, player *pusher, long shove_time)
  * objects remain stuck together (same velocity and direction.
  * Use this function if one of the objects will die in the
  * collision. */
-void Delta_mv(object *ship, object *obj)
+void Delta_mv(object_t *ship, object_t *obj)
 {
     double	vx, vy, m;
 
@@ -110,8 +110,8 @@ void Delta_mv(object *ship, object *obj)
     if (ship->type == OBJ_PLAYER
 	&& obj->id != NO_ID
 	&& BIT(obj->status, COLLISIONSHOVE)) {
-	player *pl = (player *)ship;
-	player *pusher = Player_by_id(obj->id);
+	player_t *pl = (player_t *)ship;
+	player_t *pusher = Player_by_id(obj->id);
 	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
     }
@@ -125,7 +125,7 @@ void Delta_mv(object *ship, object *obj)
 /* And now for a completely elastic collision. Ie. the objects
  * will bounce off of eachother. Use this function if both
  * objects stay alive after the collision. */
-void Delta_mv_elastic(object *obj1, object *obj2)
+void Delta_mv_elastic(object_t *obj1, object_t *obj2)
 {
     double	m1 = (double)obj1->mass,
 		m2 = (double)obj2->mass,
@@ -146,15 +146,15 @@ void Delta_mv_elastic(object *obj1, object *obj2)
     if (obj1->type == OBJ_PLAYER
 	&& obj2->id != NO_ID
 	&& BIT(obj2->status, COLLISIONSHOVE)) {
-	player *pl = (player *)obj1;
-	player *pusher = Player_by_id(obj2->id);
+	player_t *pl = (player_t *)obj1;
+	player_t *pusher = Player_by_id(obj2->id);
 	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
     }
 }
 
 
-void Obj_repel(object *obj1, object *obj2, int repel_dist)
+void Obj_repel(object_t *obj1, object_t *obj2, int repel_dist)
 {
     double		xd, yd,
 			force, dm,
@@ -181,15 +181,15 @@ void Obj_repel(object *obj1, object *obj2, int repel_dist)
     dvy1 = -(tsin(obj_theta) * force / dm);
 
     if (obj1->type == OBJ_PLAYER && obj2->id != NO_ID) {
-	player *pl = (player *)obj1;
-	player *pusher = Player_by_id(obj2->id);
+	player_t *pl = (player_t *)obj1;
+	player_t *pusher = Player_by_id(obj2->id);
 	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
     }
 
     if (obj2->type == OBJ_PLAYER && obj1->id != NO_ID) {
-	player *pl = (player *)obj2;
-	player *pusher = Player_by_id(obj1->id);
+	player_t *pl = (player_t *)obj2;
+	player_t *pusher = Player_by_id(obj1->id);
 	if (pusher != pl)
 	    Record_shove(pl, pusher, frame_loops);
     }
@@ -308,9 +308,9 @@ void Update_tanks(pl_fuel_t *ft)
 /*
  * Use current tank as dummy target for heat seeking missles.
  */
-void Tank_handle_detach(player *pl)
+void Tank_handle_detach(player_t *pl)
 {
-    player		*dummy;
+    player_t		*dummy;
     int			i, ct;
 
     if (BIT(pl->used, HAS_PHASING_DEVICE))
@@ -319,9 +319,8 @@ void Tank_handle_detach(player *pl)
     /* Return, if no more players or no tanks */
     if (pl->fuel.num_tanks == 0
 	|| NumPseudoPlayers == MAX_PSEUDO_PLAYERS
-	|| peek_ID() == 0) {
+	|| peek_ID() == 0)
 	return;
-    }
 
     /* If current tank is main, use another one */
     if ((ct = pl->fuel.current) == 0)
@@ -425,7 +424,7 @@ void Tank_handle_detach(player *pl)
     Player_remove_tank(pl, ct);
 
     for (i = 0; i < NumPlayers - 1; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 
 	if (pl_i->conn != NULL) {
 	    Send_player(pl_i->conn, dummy->id);
@@ -443,8 +442,8 @@ void Tank_handle_detach(player *pl)
 }
 
 
-void Make_wreckage(clpos  pos,
-		   vector vel,
+void Make_wreckage(clpos_t  pos,
+		   vector_t vel,
 		   int    owner_id,
 		   int    owner_team,
 		   double min_mass,     double max_mass,
@@ -456,10 +455,10 @@ void Make_wreckage(clpos  pos,
 		   double min_speed,    double max_speed,
 		   double min_life,     double max_life)
 {
-    wireobject		*wreckage;
+    wireobject_t	*wreckage;
     int			i, size;
     double		life;
-    modifiers		mods;
+    modifiers_t		mods;
     double		mass, sum_mass = 0.0;
     world_t *world = &World;
 
@@ -550,7 +549,7 @@ void Make_wreckage(clpos  pos,
 }
 
 
-void Explode_fighter(player *pl)
+void Explode_fighter(player_t *pl)
 {
     int min_debris;
     double debris_range;

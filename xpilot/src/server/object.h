@@ -123,9 +123,9 @@ typedef struct {
     unsigned int	power	:2;	/* B# modifier */
     unsigned int	laser	:2;	/* LS LB modifier */
     unsigned int	spare	:18;	/* padding for alignment */
-} modifiers;
+} modifiers_t;
 
-#define CLEAR_MODS(mods)	memset(&(mods), 0, sizeof(modifiers))
+#define CLEAR_MODS(mods)	memset(&(mods), 0, sizeof(modifiers_t))
 
 #define MODS_NUCLEAR_MAX	2	/* - N FN */
 #define NUCLEAR			(1U<<0)
@@ -164,10 +164,10 @@ typedef struct {
 /*
  * Node within a Cell list.
  */
-typedef struct _cell_node cell_node;
-struct _cell_node {
-    cell_node		*next;
-    cell_node		*prev;
+typedef struct cell_node cell_node_t;
+struct cell_node {
+    cell_node_t		*next;
+    cell_node_t		*prev;
 };
 
 
@@ -175,20 +175,20 @@ struct _cell_node {
     short		id;		/* For shots => id of player */	\
     uint16_t		team;		/* Team of player or cannon */	\
 /* Object position pos must only be changed with the proper functions! */ \
-    clpos		pos;		/* World coordinates */		\
-    clpos		prevpos;	/* previous position */		\
-    clpos		extmove;	/* For collision detection */	\
+    clpos_t		pos;		/* World coordinates */		\
+    clpos_t		prevpos;	/* previous position */		\
+    clpos_t		extmove;	/* For collision detection */	\
     float		wall_time;	/* bounce/crash time within frame */ \
     int			collmode;	/* collision checking mode */	\
-    vector		vel;		/* speed in x,y */		\
-    vector		acc;		/* acceleration in x,y */	\
+    vector_t		vel;		/* speed in x,y */		\
+    vector_t		acc;		/* acceleration in x,y */	\
     float		mass;		/* mass in unigrams */		\
     double		life;		/* No of ticks left to live */	\
     long		status;		/* gravity, etc. */		\
     int			type;		/* one bit of OBJ_XXX */	\
 /* Item pack count is kept in the 'count' field, float now, change !@# */ \
     float		count;		/* Misc timings */		\
-    modifiers		mods;		/* Modifiers to this object */	\
+    modifiers_t		mods;		/* Modifiers to this object */	\
     u_byte		color;		/* Color of object */		\
     short		missile_dir;	/* missile direction */		\
     int		wormHoleHit, wormHoleDest; \
@@ -196,7 +196,7 @@ struct _cell_node {
 /* up to here all object types are the same as all player types. */
 
 #define OBJECT_EXTEND	\
-    cell_node		cell;		/* node in cell linked list */	\
+    cell_node_t		cell;		/* node in cell linked list */	\
     int			pl_range;	/* distance for collision */	\
     int			pl_radius;	/* distance for hit */		\
     long		info;		/* Miscellaneous info */	\
@@ -208,8 +208,8 @@ struct _cell_node {
 /*
  * Generic object
  */
-typedef struct _object object;
-struct _object {
+typedef struct xp_object object_t;
+struct xp_object {
 
     OBJECT_BASE
 
@@ -220,16 +220,16 @@ struct _object {
 #endif
 
 #define OBJ_IND(ind)	(Obj[(ind)])
-#define OBJ_PTR(ptr)	((object *)(ptr))
+#define OBJ_PTR(ptr)	((object_t *)(ptr))
 };
 
-typedef struct player player;
+typedef struct player player_t;
 
 /*
  * Mine object
  */
-typedef struct _mineobject mineobject;
-struct _mineobject {
+typedef struct xp_mineobject mineobject_t;
+struct xp_mineobject {
 
     OBJECT_BASE
 
@@ -243,8 +243,8 @@ struct _mineobject {
 			_mineobject() {}
 #endif
 
-#define MINE_IND(ind)	((mineobject *)Obj[(ind)])
-#define MINE_PTR(ptr)	((mineobject *)(ptr))
+#define MINE_IND(ind)	((mineobject_t *)Obj[(ind)])
+#define MINE_PTR(ptr)	((mineobject_t *)(ptr))
 };
 
 
@@ -257,8 +257,8 @@ struct _mineobject {
 /*
  * Generic missile object
  */
-typedef struct _missileobject missileobject;
-struct _missileobject {
+typedef struct xp_missileobject missileobject_t;
+struct xp_missileobject {
 
     OBJECT_BASE
 
@@ -270,16 +270,16 @@ struct _missileobject {
 			_missileobject() {}
 #endif
 
-#define MISSILE_IND(ind)	((missileobject *)Obj[(ind)])
-#define MISSILE_PTR(ptr)	((missileobject *)(ptr))
+#define MISSILE_IND(ind)	((missileobject_t *)Obj[(ind)])
+#define MISSILE_PTR(ptr)	((missileobject_t *)(ptr))
 };
 
 
 /*
  * Smart missile is a generic missile with extras.
  */
-typedef struct _smartobject smartobject;
-struct _smartobject {
+typedef struct xp_smartobject smartobject_t;
+struct xp_smartobject {
 
     OBJECT_BASE
 
@@ -294,16 +294,16 @@ struct _smartobject {
 			_smartobject() {}
 #endif
 
-#define SMART_IND(ind)	((smartobject *)Obj[(ind)])
-#define SMART_PTR(ptr)	((smartobject *)(ptr))
+#define SMART_IND(ind)	((smartobject_t *)Obj[(ind)])
+#define SMART_PTR(ptr)	((smartobject_t *)(ptr))
 };
 
 
 /*
  * Torpedo is a generic missile with extras
  */
-typedef struct _torpobject torpobject;
-struct _torpobject {
+typedef struct xp_torpobject torpobject_t;
+struct xp_torpobject {
 
     OBJECT_BASE
 
@@ -317,16 +317,16 @@ struct _torpobject {
 			_torpobject() {}
 #endif
 
-#define TORP_IND(ind)	((torpobject *)Obj[(ind)])
-#define TORP_PTR(ptr)	((torpobject *)(ptr))
+#define TORP_IND(ind)	((torpobject_t *)Obj[(ind)])
+#define TORP_PTR(ptr)	((torpobject_t *)(ptr))
 };
 
 
 /*
  * The ball object.
  */
-typedef struct _ballobject ballobject;
-struct _ballobject {
+typedef struct xp_ballobject ballobject_t;
+struct xp_ballobject {
 
     OBJECT_BASE
 
@@ -334,22 +334,21 @@ struct _ballobject {
 
     int 		owner;		/* Who's object is this ? */
     treasure_t		*treasure;	/* treasure for ball */
-    /*float		length;*/	/* distance ball to player */
 
 #ifdef __cplusplus
 			_ballobject() {}
 #endif
 
-#define BALL_IND(ind)	((ballobject *)Obj[(ind)])
-#define BALL_PTR(obj)	((ballobject *)(obj))
+#define BALL_IND(ind)	((ballobject_t *)Obj[(ind)])
+#define BALL_PTR(obj)	((ballobject_t *)(obj))
 };
 
 
 /*
  * Object with a wireframe representation.
  */
-typedef struct _wireobject wireobject;
-struct _wireobject {
+typedef struct xp_wireobject wireobject_t;
+struct xp_wireobject {
 
     OBJECT_BASE
 
@@ -365,16 +364,16 @@ struct _wireobject {
 			_wireobject() {}
 #endif
 
-#define WIRE_IND(ind)	((wireobject *)Obj[(ind)])
-#define WIRE_PTR(obj)	((wireobject *)(obj))
+#define WIRE_IND(ind)	((wireobject_t *)Obj[(ind)])
+#define WIRE_PTR(obj)	((wireobject_t *)(obj))
 };
 
 
 /*
  * Pulse object used for laser pulses.
  */
-typedef struct _pulseobject pulseobject;
-struct _pulseobject {
+typedef struct xp_pulseobject pulseobject_t;
+struct xp_pulseobject {
 
     OBJECT_BASE
 
@@ -387,24 +386,24 @@ struct _pulseobject {
 			_pulseobject() {}
 #endif
 
-#define PULSE_IND(ind)	((pulseobject *)Obj[(ind)])
-#define PULSE_PTR(obj)	((pulseobject *)(obj))
+#define PULSE_IND(ind)	((pulseobject_t *)Obj[(ind)])
+#define PULSE_PTR(obj)	((pulseobject_t *)(obj))
 };
 
 
 /*
  * Any object type should be part of this union.
  */
-typedef union _anyobject anyobject;
-union _anyobject {
-    object		obj;
-    ballobject		ball;
-    mineobject		mine;
-    missileobject	missile;
-    smartobject		smart;
-    torpobject		torp;
-    wireobject		wireobj;
-    pulseobject		pulse;
+typedef union xp_anyobject anyobject_t;
+union xp_anyobject {
+    object_t		obj;
+    ballobject_t	ball;
+    mineobject_t	mine;
+    missileobject_t	missile;
+    smartobject_t	smart;
+    torpobject_t	torp;
+    wireobject_t	wireobj;
+    pulseobject_t	pulse;
 };
 
 
@@ -422,15 +421,15 @@ typedef struct {
     double	l3;			/* Fuel notify level */
 } pl_fuel_t;
 
-struct _visibility {
+typedef struct visibility {
     int		canSee;
     long	lastChange;
-};
+} visibility_t;
 
 #define MAX_PLAYER_ECMS		8	/* Maximum simultaneous per player */
 typedef struct {
     double	size;
-    clpos	pos;
+    clpos_t	pos;
     int		id;
 } ecm_t;
 
@@ -438,8 +437,8 @@ typedef struct {
  * Transporter info.
  */
 typedef struct {
-    clpos	pos;
-    player	*victim;
+    clpos_t	pos;
+    player_t	*victim;
     int		id;
     double	count;
 } trans_t;
@@ -521,7 +520,7 @@ struct player {
 					/* power, turnspeed and */
     double	auto_turnspeed_s;	/* turnresistance settings. Restored */
     double	auto_turnresistance_s;	/* when autopilot turned off */
-    modifiers	modbank[NUM_MODBANKS];	/* useful modifier settings */
+    modifiers_t	modbank[NUM_MODBANKS];	/* useful modifier settings */
     bool	tractor_is_pressor;	/* on if tractor is pressor */
     double	shot_time;		/* Time of last shot fired by player */
     double	laser_time;		/* Time of last laser pulse fired by player */
@@ -560,7 +559,7 @@ struct player {
     int		alliance;		/* Member of which alliance? */
     int		prev_alliance;		/* prev. alliance for score */
     int		invite;			/* Invitation for alliance */
-    ballobject	*ball;
+    ballobject_t	*ball;
 
     /*
      * Pointer to robot private data (dynamically allocated).
@@ -574,7 +573,7 @@ struct player {
     shove_t     shove_record[MAX_RECORDED_SHOVES];
     int	 	shove_next;
 
-    struct _visibility *visibility;
+    visibility_t *visibility;
 
     double	forceVisible;
     double	damaged;

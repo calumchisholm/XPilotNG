@@ -94,10 +94,10 @@ static int Kick_robot_players(int team)
 	if (BIT(world->rules->mode, TEAM_PLAY) && options.reserveRobotTeam) {
 	    /* kick robot with lowest score from any team but options.robotTeam */
 	    int low_score = INT_MAX;
-	    player *low_pl = NULL;
+	    player_t *low_pl = NULL;
 	    int i;
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 
 		if (!Player_is_robot(pl_i) || pl_i->team == options.robotTeam)
 		    continue;
@@ -120,10 +120,10 @@ static int Kick_robot_players(int team)
 	if (world->teams[team].NumRobots > 0) {
 	    /* kick robot with lowest score from this team */
 	    int low_score = INT_MAX;
-	    player *low_pl = NULL;
+	    player_t *low_pl = NULL;
 	    int i;
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 
 		if (!Player_is_robot(pl_i) || pl_i->team != team)
 		    continue;
@@ -152,7 +152,7 @@ static int do_kick(int team, int nonlast)
     int			num_unpaused = 0;
 
     for (i = NumPlayers - 1; i >= 0; i--) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 
 	if (pl_i->conn != NULL
 	    && BIT(pl_i->status, PAUSE)
@@ -237,7 +237,7 @@ static int Check_names(char *nick_name, char *user_name, char *host_name)
 	    break;
     }
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 
 	if (strcasecmp(pl_i->name, nick_name) == 0) {
 	    D(printf("%s %s\n", pl_i->name, nick_name));
@@ -518,7 +518,7 @@ void Contact(int fd, void *arg)
 	    status = E_INVAL;
 	else {
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 		/*
 		 * Kicking players by username is not a good idea,
 		 * because several players may have the same username.
@@ -532,7 +532,7 @@ void Contact(int fd, void *arg)
 	    if (found == -1)
 		status = E_NOT_FOUND;
 	    else {
-		player *pl_found = Players(found);
+		player_t *pl_found = Players(found);
 		sprintf(msg,
 			"\"%s\" upset the gods and was kicked out "
 			"of the game.", pl_found->name);

@@ -42,9 +42,9 @@ char shot_version[] = VERSION;
  */
 
 
-void Place_mine(player *pl)
+void Place_mine(player_t *pl)
 {
-    vector	zero_vel = { 0.0, 0.0 };
+    vector_t	zero_vel = { 0.0, 0.0 };
 
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
@@ -60,9 +60,9 @@ void Place_mine(player *pl)
 }
 
 
-void Place_moving_mine(player *pl)
+void Place_moving_mine(player_t *pl)
 {
-    vector	vel = pl->vel;
+    vector_t	vel = pl->vel;
 
     if (pl->item[ITEM_MINE] <= 0
 	|| (BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE)
@@ -84,14 +84,14 @@ void Place_moving_mine(player *pl)
     Place_general_mine(pl, pl->team, GRAVITY, pl->pos, vel, pl->mods);
 }
 
-void Place_general_mine(player *pl, int team, long status,
-			clpos pos, vector vel, modifiers mods)
+void Place_general_mine(player_t *pl, int team, long status,
+			clpos_t pos, vector_t vel, modifiers_t mods)
 {
     char		msg[MSG_LEN];
     int			used;
     double		life, drain, mass;
     int			i, minis;
-    vector		mv;
+    vector_t		mv;
     world_t *world = &World;
 
     if (NumObjs + mods.mini >= MAX_TOTAL_SHOTS)
@@ -147,7 +147,7 @@ void Place_general_mine(player *pl, int team, long status,
 	}
 	if (options.baseMineRange) {
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 		if (pl_i->home_base == NULL)
 		    continue;
 		if (pl_i->id != pl->id
@@ -182,7 +182,7 @@ void Place_general_mine(player *pl, int team, long status,
     SET_BIT(status, OWNERIMMUNE);
 
     for (i = 0; i < minis; i++) {
-	mineobject *mine;
+	mineobject_t *mine;
 
 	if ((mine = MINE_PTR(Object_allocate())) == NULL)
 	    break;
@@ -232,7 +232,7 @@ void Place_general_mine(player *pl, int team, long status,
 	mine->mods = mods;
 	mine->pl_range = (int)(MINE_RANGE / minis);
 	mine->pl_radius = MINE_RADIUS;
-	Cell_add_object((object *) mine);
+	Cell_add_object((object_t *) mine);
     }
 }
 
@@ -244,7 +244,7 @@ void Place_general_mine(player *pl, int team, long status,
  *     Cause the mine which is closest to a player and owned
  *     by that player to detonate.
  */
-void Detonate_mines(player *pl)
+void Detonate_mines(player_t *pl)
 {
     world_t *world = &World;
     int			i;
@@ -256,7 +256,7 @@ void Detonate_mines(player *pl)
 	return;
 
     for (i = 0; i < NumObjs; i++) {
-	object *mine = Obj[i];
+	object_t *mine = Obj[i];
 
 	if (! BIT(mine->type, OBJ_MINE))
 	    continue;
@@ -281,8 +281,8 @@ void Detonate_mines(player *pl)
 
 void Make_treasure_ball(treasure_t *t)
 {
-    ballobject *ball;
-    clpos pos = t->pos;
+    ballobject_t *ball;
+    clpos_t pos = t->pos;
 
     if (!is_polygon_map)
 	pos.cy += (10 * PIXEL_CLICKS - BLOCK_CLICKS / 2);
@@ -329,7 +329,7 @@ void Make_treasure_ball(treasure_t *t)
  * non-zero this description is part of a collision, otherwise its part
  * of a launch message.
  */
-char *Describe_shot(int type, long status, modifiers mods, int hit)
+char *Describe_shot(int type, long status, modifiers_t mods, int hit)
 {
     const char		*name, *howmany = "a ", *plural = "";
     static char		msg[MSG_LEN];
@@ -389,9 +389,9 @@ char *Describe_shot(int type, long status, modifiers mods, int hit)
     return msg;
 }
 
-void Fire_main_shot(player *pl, int type, int dir)
+void Fire_main_shot(player_t *pl, int type, int dir)
 {
-    clpos m_gun, pos;
+    clpos_t m_gun, pos;
 
     if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
@@ -404,7 +404,7 @@ void Fire_main_shot(player *pl, int type, int dir)
     Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
-void Fire_shot(player *pl, int type, int dir)
+void Fire_shot(player_t *pl, int type, int dir)
 {
     if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
@@ -413,9 +413,9 @@ void Fire_shot(player *pl, int type, int dir)
     Fire_general_shot(pl, pl->team, 0, pl->pos, type, dir, pl->mods, NO_ID);
 }
 
-void Fire_left_shot(player *pl, int type, int dir, int gun)
+void Fire_left_shot(player_t *pl, int type, int dir, int gun)
 {
-    clpos l_gun, pos;
+    clpos_t l_gun, pos;
 
     if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
@@ -428,9 +428,9 @@ void Fire_left_shot(player *pl, int type, int dir, int gun)
     Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
-void Fire_right_shot(player *pl, int type, int dir, int gun)
+void Fire_right_shot(player_t *pl, int type, int dir, int gun)
 {
-    clpos r_gun, pos;
+    clpos_t r_gun, pos;
 
     if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
@@ -443,9 +443,9 @@ void Fire_right_shot(player *pl, int type, int dir, int gun)
     Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
-void Fire_left_rshot(player *pl, int type, int dir, int gun)
+void Fire_left_rshot(player_t *pl, int type, int dir, int gun)
 {
-    clpos l_rgun, pos;
+    clpos_t l_rgun, pos;
 
     if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
@@ -458,9 +458,9 @@ void Fire_left_rshot(player *pl, int type, int dir, int gun)
     Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
-void Fire_right_rshot(player *pl, int type, int dir, int gun)
+void Fire_right_rshot(player_t *pl, int type, int dir, int gun)
 {
-    clpos r_rgun, pos;
+    clpos_t r_rgun, pos;
 
     if (pl->shots >= options.maxPlayerShots
 	|| BIT(pl->used, HAS_SHIELD|HAS_PHASING_DEVICE))
@@ -473,9 +473,9 @@ void Fire_right_rshot(player *pl, int type, int dir, int gun)
     Fire_general_shot(pl, pl->team, 0, pos, type, dir, pl->mods, NO_ID);
 }
 
-void Fire_general_shot(player *pl, int team, bool cannon,
-		       clpos pos, int type, int dir,
-		       modifiers mods, int target_id)
+void Fire_general_shot(player_t *pl, int team, bool cannon,
+		       clpos_t pos, int type, int dir,
+		       modifiers_t mods, int target_id)
 {
     char		msg[MSG_LEN];
     int			used,
@@ -499,9 +499,9 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 			max_speed = SPEED_LIMIT,
 			angle,
 			spread;
-    vector		mv;
-    clpos		shotpos;
-    object		*mini_objs[MODS_MINI_MAX + 1];
+    vector_t		mv;
+    clpos_t		shotpos;
+    object_t		*mini_objs[MODS_MINI_MAX + 1];
     world_t *world = &World;
 
     if (NumObjs >= MAX_TOTAL_SHOTS)
@@ -891,7 +891,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
     }
 
     for (r = 0, i = 0; i < minis; i++, r++) {
-	object *shot;
+	object_t *shot;
 
 	if ((shot = Object_allocate()) == NULL)
 	    break;
@@ -913,7 +913,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 
 	shotpos = pos;
 	if (pl && type != OBJ_SHOT) {
-	    clpos m_rack;
+	    clpos_t m_rack;
 	    if (r == on_this_rack) {
 		/*
 		 * We've fired all the mini missiles for the current rack,
@@ -1025,7 +1025,7 @@ void Fire_general_shot(player *pl, int team, bool cannon,
 }
 
 
-void Fire_normal_shots(player *pl)
+void Fire_normal_shots(player_t *pl)
 {
     int			i, shot_angle;
 
@@ -1094,11 +1094,11 @@ void Fire_normal_shots(player *pl)
 /* Removes shot from array */
 void Delete_shot(int ind)
 {
-    object *shot = Obj[ind];	/* Used when swapping places */
-    ballobject *ball;
-    player *pl;
+    object_t *shot = Obj[ind];	/* Used when swapping places */
+    ballobject_t *ball;
+    player_t *pl;
     bool addMine = false, addHeat = false, addBall = false;
-    modifiers mods;
+    modifiers_t mods;
     long status;
     int i, intensity, type, color, num_debris;
     double modv, speed_modv, life_modv, num_modv, mass, min_life, max_life;
@@ -1124,7 +1124,7 @@ void Delete_shot(int ind)
 	     * Maybe some player is still busy trying to connect to this ball.
 	     */
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 		if (pl_i->ball == ball)
 		    pl_i->ball = NULL;
 	    }
@@ -1354,7 +1354,7 @@ void Delete_shot(int ind)
 	    mods.power = (int)(rfrac() * (MODS_POWER_MAX + 1));
 	if (addMine) {
 	    long gravity_status = ((rfrac() < 0.5) ? GRAVITY : 0);
-	    vector zero_vel = { 0.0, 0.0 };
+	    vector_t zero_vel = { 0.0, 0.0 };
 
 	    Place_general_mine(NULL, TEAM_NOT_SET, gravity_status,
 			       shot->pos, zero_vel, mods);
@@ -1370,9 +1370,9 @@ void Delete_shot(int ind)
     }
 }
 
-void Fire_laser(player *pl)
+void Fire_laser(player_t *pl)
 {
-    clpos	m_gun, pos;
+    clpos_t	m_gun, pos;
     world_t *world = &World;
 
     if (frame_time
@@ -1399,11 +1399,11 @@ void Fire_laser(player *pl)
     }
 }
 
-void Fire_general_laser(player *pl, int team, clpos pos,
-			int dir, modifiers mods)
+void Fire_general_laser(player_t *pl, int team, clpos_t pos,
+			int dir, modifiers_t mods)
 {
     int			life;
-    pulseobject		*pulse;
+    pulseobject_t	*pulse;
     world_t *world = &World;
 
     if (!World_contains_clpos(world, pos)) {
@@ -1501,10 +1501,10 @@ void Fire_general_laser(player *pl, int team, clpos pos,
  * Changed the value (max_spring_ratio) at which the string snaps
  * from 0.25 to 0.30.  Not sure if that helps enough, or too much.
  */
-void Update_connector_force(ballobject *ball)
+void Update_connector_force(ballobject_t *ball)
 {
-    player		*pl = Player_by_id(ball->id);
-    vector		D;
+    player_t		*pl = Player_by_id(ball->id);
+    vector_t		D;
     double		length, force, ratio, accell, damping;
     /* const double		k = 1500.0, b = 2.0; */
     /* const double		max_spring_ratio = 0.30; */
@@ -1554,7 +1554,7 @@ void Update_connector_force(ballobject *ball)
     ball->vel.y += -D.y * accell * timeStep;
 }
 
-void Update_torpedo(torpobject *torp)
+void Update_torpedo(torpobject_t *torp)
 {
     double		acc;
 
@@ -1573,9 +1573,9 @@ void Update_torpedo(torpobject *torp)
     torp->vel.y += acc * tsin(torp->missile_dir);
 }
 
-void Update_missile(missileobject *shot)
+void Update_missile(missileobject_t *shot)
 {
-    player		*pl;
+    player_t		*pl;
     int			angle, theta;
     double		range = 0.0;
     double		acc = SMART_SHOT_ACC;
@@ -1587,7 +1587,8 @@ void Update_missile(missileobject *shot)
     if (shot->type == OBJ_HEAT_SHOT) {
 	acc = SMART_SHOT_ACC * HEAT_SPEED_FACT;
 	if (shot->info >= 0) {
-	    clpos engine;
+	    clpos_t engine;
+
 	    /* Get player and set min to distance */
 	    pl = Player_by_id(shot->info);
 	    engine = Ship_get_engine_clpos(pl->ship, pl->dir);
@@ -1623,8 +1624,8 @@ void Update_missile(missileobject *shot)
 
 		range = HEAT_RANGE * (shot->count / HEAT_CLOSE_TIMEOUT);
 		for (i = 0; i < NumPlayers; i++) {
-		    player *pl_i = Players(i);
-		    clpos engine;
+		    player_t *pl_i = Players(i);
+		    clpos_t engine;
 
 		    if (!BIT(pl_i->status, THRUSTING))
 			continue;
@@ -1664,7 +1665,7 @@ void Update_missile(missileobject *shot)
 
     }
     else if (shot->type == OBJ_SMART_SHOT) {
-	smartobject *smart = SMART_PTR(shot);
+	smartobject_t *smart = SMART_PTR(shot);
 
 	/*
 	 * kps - this can cause Arithmetic Exception (division by zero)
@@ -1729,7 +1730,7 @@ void Update_missile(missileobject *shot)
 	} sur[8] = {
 	    {1,0}, {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1}, {0,-1}, {1,-1}
 	};
-	blpos sbpos;
+	blkpos_t sbpos;
 
 #define BLOCK_PARTS 2
 	vx = shot->vel.x;
@@ -1778,7 +1779,7 @@ void Update_missile(missileobject *shot)
 	}
 
 	i = ((int)(shot->missile_dir * 8 / RES)&7) + 8;
-	sbpos = Clpos_to_blpos(shot->pos);
+	sbpos = Clpos_to_blkpos(shot->pos);
 	xi = sbpos.bx;
 	yi = sbpos.by;
 
@@ -1870,7 +1871,7 @@ void Update_missile(missileobject *shot)
     shot->vel.y = tsin(shot->missile_dir) * shot_speed;
 }
 
-void Update_mine(mineobject *mine)
+void Update_mine(mineobject_t *mine)
 {
     if (BIT(mine->status, CONFUSED)) {
 	if ((mine->count -= timeStep) <= 0) {

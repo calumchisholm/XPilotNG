@@ -38,6 +38,6 @@
       {-10,0}, {-8, 7}, {-4, 9}, { 0,10}, { 5, 7}, { 6, 3}, \
       {10, 0}, { 9,-4}, { 7,-7}, {0,-10}, {-6,-9}, {-9,-7}
 
-extern position *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
+extern position_t *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
 
 #endif

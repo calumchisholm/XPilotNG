@@ -31,9 +31,9 @@ char laser_version[] = VERSION;
  * Do what needs to be done when a laser pulse
  * actually hits a player.
  */
-void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
+void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 {
-    player		*kp;
+    player_t		*kp;
     double		sc;
     char		msg[MSG_LEN];
     world_t *world = &World;

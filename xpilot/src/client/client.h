@@ -210,14 +210,14 @@ typedef struct {
 typedef struct {
     int		pos;		/* Block index */
     double	fuel;		/* Amount of fuel available */
-    irec	bounds;		/* Location on map */
+    irec_t	bounds;		/* Location on map */
 } fuelstation_t;
 
 typedef struct {
     int		pos;		/* Block index */
     short	id;		/* Id of owner or -1 */
     uint16_t	team;		/* Team this base belongs to */
-    irec	bounds;		/* Location on map */
+    irec_t	bounds;		/* Location on map */
     int		type;		/* orientation */
     long	appeartime;	/* For base warning */
 } homebase_t;
@@ -236,7 +236,7 @@ typedef struct {
 
 typedef struct {
     int		pos;		/* Block index */
-    irec	bounds;		/* Location on map */
+    irec_t	bounds;		/* Location on map */
 } checkpoint_t;
 
 typedef struct {
@@ -255,9 +255,9 @@ typedef struct {
 } polygon_style_t;
 
 typedef struct {
-    ipos *points;		/* points[0] is absolute, rest are relative */
+    ipos_t *points;		/* points[0] is absolute, rest are relative */
     int num_points;		/* number of points */
-    irec bounds;		/* bounding box for the polygon */
+    irec_t bounds;		/* bounding box for the polygon */
     int *edge_styles;		/* optional array of indexes to edge_styles */
     int style;			/* index to polygon_styles array */
 } xp_polygon_t;
@@ -459,8 +459,8 @@ extern score_object_t	score_objects[MAX_SCORE_OBJECTS];
 extern int		score_object;
 
 extern int      oldServer; /* Compatibility mode for old block-based servers */
-extern ipos	selfPos;
-extern ipos	selfVel;
+extern ipos_t	selfPos;
+extern ipos_t	selfVel;
 extern short	heading;
 extern short	nextCheckPoint;
 extern u_byte	numItems[NUM_ITEMS];

@@ -234,7 +234,7 @@ void Gui_paint_fuel(int x, int y, double fuel)
 
 	int fuel_images = ABS(pixmaps[BM_FUEL].count);
 	int size, image;
-	irec area;
+	irec_t area;
 	bbox_t *box;
 	xp_bitmap_t *bit;
 
@@ -1160,7 +1160,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     static XPoint points[10000];
 
     int j, x, y, sindex, width, did_fill;
-    ipos ship;
+    ipos_t ship;
     xp_polygon_t polygon;
     polygon_style_t style;
     bool textured, filled;

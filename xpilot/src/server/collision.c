@@ -119,7 +119,7 @@ static bool in_range_partial(double dx, double dy, double dvx, double dvy,
        yet. It's supposed that they move in a straight line from
        prevpos to pos. This can lead to some erroneous hits.
 */
-static bool in_range(object *obj1, object *obj2, double range)
+static bool in_range(object_t *obj1, object_t *obj2, double range)
 {
     bool hit;
 
@@ -159,18 +159,18 @@ static bool in_range(object *obj1, object *obj2, double range)
 static char msg[MSG_LEN];
 
 static void PlayerCollision(void);
-static void PlayerObjectCollision(player *pl);
-static void PlayerCheckpointCollision(player *pl);
+static void PlayerObjectCollision(player_t *pl);
+static void PlayerCheckpointCollision(player_t *pl);
 static void AsteroidCollision(void);
 static void BallCollision(void);
 static void MineCollision(void);
-static void Player_collides_with_ball(player *pl, object *obj);
-static void Player_collides_with_item(player *pl, object *obj);
-static void Player_collides_with_mine(player *pl, object *obj);
-static void Player_collides_with_debris(player *pl, object *obj);
-static void Player_collides_with_asteroid(player *pl, wireobject *obj);
-static void Player_collides_with_killing_shot(player *pl, object *obj);
-static void Player_pass_checkpoint(player *pl);
+static void Player_collides_with_ball(player_t *pl, object_t *obj);
+static void Player_collides_with_item(player_t *pl, object_t *obj);
+static void Player_collides_with_mine(player_t *pl, object_t *obj);
+static void Player_collides_with_debris(player_t *pl, object_t *obj);
+static void Player_collides_with_asteroid(player_t *pl, wireobject_t *obj);
+static void Player_collides_with_killing_shot(player_t *pl, object_t *obj);
+static void Player_pass_checkpoint(player_t *pl);
 
 
 void Check_collision(void)
@@ -187,9 +187,9 @@ void Check_collision(void)
 
 static void PlayerCollision(void)
 {
-    int			i, j;
-    double		sc, sc2;
-    player		*pl;
+    int i, j;
+    double sc, sc2;
+    player_t *pl;
     world_t *world = &World;
 
     /* Player - player, checkpoint, treasure, object and wall */
@@ -213,7 +213,7 @@ static void PlayerCollision(void)
 	/* Player - player */
 	if (BIT(world->rules->mode, CRASH_WITH_PLAYER | BOUNCE_WITH_PLAYER)) {
 	    for (j = i + 1; j < NumPlayers; j++) {
-		player *pl_j = Players(j);
+		player_t *pl_j = Players(j);
 		double range;
 
 		if (!Player_is_playing(pl_j))
@@ -256,7 +256,7 @@ static void PlayerCollision(void)
 		    }
 		    pl->forceVisible = 20;
 		    pl_j->forceVisible = 20;
-		    Obj_repel((object *)pl, (object *)pl_j,
+		    Obj_repel((object_t *)pl, (object_t *)pl_j,
 			      PIXEL_TO_CLICK(2*SHIP_SZ));
 		}
 		if (!BIT(world->rules->mode, CRASH_WITH_PLAYER))
@@ -292,15 +292,19 @@ static void PlayerCollision(void)
 				* options.crashScoreMult;
 			    Score_players(pl, -sc, pl_j->name,
 					  pl_j, -sc2, pl->name, false);
-			} else if (Player_is_tank(pl)) {
-			    player *i_tank_owner_pl
+			}
+			else if (Player_is_tank(pl)) {
+			    player_t *i_tank_owner_pl
 				= Player_by_id(pl->lock.pl_id);
+
 			    sc = Rate(i_tank_owner_pl->score, pl_j->score)
 				* options.tankKillScoreMult;
 			    Score_players(i_tank_owner_pl, sc, pl_j->name,
 					  pl_j, -sc, pl->name, true);
-			} else if (Player_is_tank(pl_j)) {
-			    player *j_tank_owner_pl
+			}
+			else if (Player_is_tank(pl_j)) {
+			    player_t *j_tank_owner_pl
+
 				= Player_by_id(pl_j->lock.pl_id);
 			    sc = Rate(j_tank_owner_pl->score, pl->score)
 				* options.tankKillScoreMult;
@@ -309,7 +313,8 @@ static void PlayerCollision(void)
 			} /* don't bother scoring two tanks */
 		    } else {
 			int i_tank_owner = i;
-			player *i_tank_owner_pl;
+			player_t *i_tank_owner_pl;
+
 			if (Player_is_tank(pl)) {
 			    i_tank_owner = GetInd(pl->lock.pl_id);
 			    if (i_tank_owner == j)
@@ -335,7 +340,8 @@ static void PlayerCollision(void)
 		} else {
 		    if (BIT(pl->status, KILLED)) {
 			int j_tank_owner = j;
-			player *j_tank_owner_pl;
+			player_t *j_tank_owner_pl;
+
 			if (Player_is_tank(pl_j)) {
 			    j_tank_owner = GetInd(pl_j->lock.pl_id);
 			    if (j_tank_owner == i)
@@ -384,7 +390,7 @@ static void PlayerCollision(void)
 	    || BIT(pl->used, HAS_PHASING_DEVICE))
 	    pl->ball = NULL;
 	else if (pl->ball != NULL) {
-	    ballobject *ball = pl->ball;
+	    ballobject_t *ball = pl->ball;
 
 	    if (ball->life <= 0.0 || ball->id != NO_ID)
 		pl->ball = NULL;
@@ -413,7 +419,7 @@ static void PlayerCollision(void)
 			group = shape_is_inside(ball->pos.cx,
 						ball->pos.cy,
 						BALL_BIT | HITMASK(pl->team),
-						(object *)ball,
+						(object_t *)ball,
 						&ball_wire, 0);
 			if (group != NO_GROUP) {
 			    Ball_hits_goal(ball, groupptr_by_id(group));
@@ -428,13 +434,16 @@ static void PlayerCollision(void)
 	     * the object list for balls.
 	     */
 	    int dist, mindist = options.ballConnectorLength * CLICK;
+
 	    for (j = 0; j < NumObjs; j++) {
-		object *obj = Obj[j];
+		object_t *obj = Obj[j];
+
 		if (BIT(obj->type, OBJ_BALL) && obj->id == NO_ID) {
 		    dist = Wrap_length(pl->pos.cx - obj->pos.cx,
 				       pl->pos.cy - obj->pos.cy);
 		    if (dist < mindist) {
-			ballobject *ball = BALL_PTR(obj);
+			ballobject_t *ball = BALL_PTR(obj);
+
 			/*
 			 * The treasure's team cannot connect before
 			 * somebody else has owned the ball.
@@ -488,14 +497,14 @@ int IsDefensiveItem(enum Item i)
     return false;
 }
 
-int CountOffensiveItems(player *pl)
+int CountOffensiveItems(player_t *pl)
 {
     return (pl->item[ITEM_WIDEANGLE] + pl->item[ITEM_REARSHOT] +
 	    pl->item[ITEM_MINE] + pl->item[ITEM_MISSILE] +
 	    pl->item[ITEM_LASER]);
 }
 
-int CountDefensiveItems(player *pl)
+int CountDefensiveItems(player_t *pl)
 {
     int count;
 
@@ -520,11 +529,11 @@ static inline double collision_cost(double mass, double speed)
     return ABS(mass * speed / 128.0);
 }
 
-static void PlayerObjectCollision(player *pl)
+static void PlayerObjectCollision(player_t *pl)
 {
-    int		j, obj_count;
-    double	range, radius;
-    object	*obj, **obj_list;
+    int j, obj_count;
+    double range, radius;
+    object_t *obj, **obj_list;
     world_t *world = &World;
 
     /*
@@ -569,7 +578,7 @@ static void PlayerObjectCollision(player *pl)
 	if (obj->type == OBJ_ITEM) {
 	    if (BIT(pl->used, HAS_SHIELD) && !options.shieldedItemPickup) {
 		SET_BIT(obj->status, GRAVITY);
-		Delta_mv((object *)pl, obj);
+		Delta_mv((object_t *)pl, obj);
 		continue;
 	    }
 	}
@@ -587,7 +596,8 @@ static void PlayerObjectCollision(player *pl)
 		continue;
 	}
 	else if (BIT(obj->type, OBJ_PULSE)) {
-	    pulseobject *pulse = PULSE_PTR(obj);
+	    pulseobject_t *pulse = PULSE_PTR(obj);
+
 	    if (pl->id == pulse->id && !pulse->refl)
 		continue;
 	}
@@ -647,7 +657,7 @@ static void PlayerObjectCollision(player *pl)
 	case OBJ_ASTEROID:
 	    if (hit) {
 		Player_collides_with_asteroid(pl, WIRE_PTR(obj));
-		Delta_mv_elastic((object *)pl, (object *)obj);
+		Delta_mv_elastic((object_t *)pl, (object_t *)obj);
 	    }
 	    if (BIT(pl->status, KILLED))
 		return;
@@ -677,22 +687,22 @@ static void PlayerObjectCollision(player *pl)
 	}
 
 	if (hit)
-	    Delta_mv((object *)pl, (object *)obj);
+	    Delta_mv((object_t *)pl, (object_t *)obj);
     }
 }
 
 
-static void Player_collides_with_ball(player *pl, object *obj)
+static void Player_collides_with_ball(player_t *pl, object_t *obj)
 {
-    double	sc;
-    ballobject	*ball = BALL_PTR(obj);
+    double sc;
+    ballobject_t *ball = BALL_PTR(obj);
 
     /*
      * The ball is special, usually players bounce off of it with
      * shields up, or die with shields down.  The treasure may
      * be destroyed.
      */
-    Delta_mv((object *)pl, obj);
+    Delta_mv((object_t *)pl, obj);
     if (!Player_used_emergency_shield(pl)) {
 	Player_add_fuel(pl, ED_BALL_HIT);
 	if (options.treasureCollisionDestroys)
@@ -713,7 +723,7 @@ static void Player_collides_with_ball(player *pl, object *obj)
 		* options.unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "Ball");
     } else {
-	player *kp = Player_by_id(ball->owner);
+	player_t *kp = Player_by_id(ball->owner);
 
 	sprintf(msg, "%s was killed by a ball owned by %s.",
 		pl->name, kp->name);
@@ -736,17 +746,18 @@ static void Player_collides_with_ball(player *pl, object *obj)
 }
 
 
-static void Player_collides_with_item(player *pl, object *obj)
+static void Player_collides_with_item(player_t *pl, object_t *obj)
 {
-    int		old_have;
-    enum Item	item_index;
+    int old_have;
+    enum Item item_index;
     world_t *world = &World;
 
     if (IsOffensiveItem((enum Item) obj->info)) {
 	int off_items = CountOffensiveItems(pl);
+
 	if (off_items >= options.maxOffensiveItems) {
 	    /* Set_player_message(pl, "No space left for offensive items."); */
-	    Delta_mv((object *)pl, obj);
+	    Delta_mv((object_t *)pl, obj);
 	    return;
 	}
 	else if (obj->count > 1
@@ -755,10 +766,11 @@ static void Player_collides_with_item(player *pl, object *obj)
     }
     else if (IsDefensiveItem((enum Item) obj->info)) {
 	int def_items = CountDefensiveItems(pl);
+
 	if (def_items >= options.maxDefensiveItems) {
 	    /* Set_player_message(pl,
 	       "No space for left for defensive items."); */
-	    Delta_mv((object *)pl, obj);
+	    Delta_mv((object_t *)pl, obj);
 	    return;
 	}
 	else if (obj->count > 1
@@ -920,11 +932,11 @@ static void Player_collides_with_item(player *pl, object *obj)
 }
 
 
-static void Player_collides_with_mine(player *pl, object *obj)
+static void Player_collides_with_mine(player_t *pl, object_t *obj)
 {
-    player	*kp = NULL;
-    double	sc;
-    mineobject	*mine = MINE_PTR(obj);
+    player_t *kp = NULL;
+    double sc;
+    mineobject_t *mine = MINE_PTR(obj);
 
     sound_play_sensors(pl->pos, PLAYER_HIT_MINE_SOUND);
     if (mine->id == NO_ID && mine->owner == NO_ID)
@@ -940,6 +952,7 @@ static void Player_collides_with_mine(player *pl, object *obj)
     }
     else if (mine->owner == NO_ID) {
 	const char *reprogrammer_name = "some jerk";
+
 	if (mine->id != NO_ID) {
 	    kp = Player_by_id(mine->id);
 	    reprogrammer_name = kp->name;
@@ -951,6 +964,7 @@ static void Player_collides_with_mine(player *pl, object *obj)
     }
     else {
 	const char *reprogrammer_name = "some jerk";
+
 	if (mine->id != NO_ID) {
 	    kp = Player_by_id(mine->id);
 	    reprogrammer_name = kp->name;
@@ -976,10 +990,10 @@ static void Player_collides_with_mine(player *pl, object *obj)
 }
 
 
-static void Player_collides_with_debris(player *pl, object *obj)
+static void Player_collides_with_debris(player_t *pl, object_t *obj)
 {
-    player		*kp = NULL;
-    double		cost, sc;
+    player_t *kp = NULL;
+    double cost, sc;
 
     cost = collision_cost(obj->mass, VECTOR_LENGTH(obj->vel));
 
@@ -1019,10 +1033,10 @@ static void Player_collides_with_debris(player *pl, object *obj)
 }
 
 
-static void Player_collides_with_asteroid(player *pl, wireobject *ast)
+static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 {
-    double	v = VECTOR_LENGTH(ast->vel);
-    double	cost = collision_cost(ast->mass, v);
+    double v = VECTOR_LENGTH(ast->vel);
+    double cost = collision_cost(ast->mass, v);
 
     ast->life += ASTEROID_FUEL_HIT(ED_PL_CRASH, ast->size);
     if (ast->life < 0.0)
@@ -1040,6 +1054,7 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 	    || (!BIT(pl->used, HAS_SHIELD)
 		&& !BIT(pl->have, HAS_ARMOR)))) {
 	double sc;
+
 	SET_BIT(pl->status, KILLED);
 	if (pl->velocity > v)
 	    /* player moves faster than asteroid */
@@ -1050,7 +1065,8 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 	sc = Rate(0.0, pl->score) * options.unownedKillScoreMult;
 	Score(pl, -sc, pl->pos, "[Asteroid]");
 	if (Player_is_tank(pl) && options.asteroidPoints > 0) {
-	    player *owner_pl = Player_by_id(pl->lock.pl_id);
+	    player_t *owner_pl = Player_by_id(pl->lock.pl_id);
+
 	    if (owner_pl->score <= options.asteroidMaxScore)
 		Score(owner_pl, options.asteroidPoints, ast->pos, "");
 	}
@@ -1063,10 +1079,10 @@ static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 }
 
 
-static void Player_collides_with_killing_shot(player *pl, object *obj)
+static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 {
-    player	*kp = NULL;
-    double	sc, drainfactor, drain;
+    player_t *kp = NULL;
+    double sc, drainfactor, drain;
     world_t *world = &World;
 
     /*
@@ -1226,9 +1242,9 @@ static void Player_collides_with_killing_shot(player *pl, object *obj)
     }
 }
 
-static void Player_pass_checkpoint(player *pl)
+static void Player_pass_checkpoint(player_t *pl)
 {
-    int		j;
+    int j;
     world_t *world = &World;
 
     if (pl->check == 0) {
@@ -1248,7 +1264,7 @@ static void Player_pass_checkpoint(player *pl)
 		   This way, they can be reused by other players */
 		for (j = 0; j < NumObjs; j++) {
 		    if (Obj[j]->type == OBJ_BALL) {
-			ballobject	*ball = BALL_PTR(Obj[j]);
+			ballobject_t *ball = BALL_PTR(Obj[j]);
 			if (ball->owner == pl->id)
 			    ball->owner = NO_ID;
 		    }
@@ -1289,7 +1305,7 @@ static void Player_pass_checkpoint(player *pl)
     updateScores = true;
 }
 
-static void PlayerCheckpointCollision(player *pl)
+static void PlayerCheckpointCollision(player_t *pl)
 {
     world_t *world = &World;
 
@@ -1309,13 +1325,13 @@ static void PlayerCheckpointCollision(player *pl)
 
 static void AsteroidCollision(void)
 {
-    int		j, radius, obj_count;
-    object	*ast;
-    object	*obj = NULL, **obj_list;
-    list_t	list;
-    list_iter_t	iter;
-    double	damage = 0.0;
-    bool	sound = false;
+    int j, radius, obj_count;
+    object_t *ast;
+    object_t *obj = NULL, **obj_list;
+    list_t list;
+    list_iter_t iter;
+    double damage = 0.0;
+    bool sound = false;
     world_t *world = &World;
 
     list = Asteroid_get_list();
@@ -1437,7 +1453,7 @@ static void AsteroidCollision(void)
 			int owner_id = ((obj->type == OBJ_BALL)
 					? BALL_PTR(obj)->owner
 					: obj->id);
-			player *pl = Player_by_id(owner_id);
+			player_t *pl = Player_by_id(owner_id);
 			if (pl->score <= options.asteroidMaxScore)
 			    Score(pl, options.asteroidPoints, ast->pos, "");
 		    }
@@ -1453,11 +1469,11 @@ static void AsteroidCollision(void)
 /* do ball - object and ball - checkpoint collisions */
 static void BallCollision(void)
 {
-    int         i, j, obj_count;
-    int		ignored_object_types;
-    object    **obj_list;
-    object     *obj;
-    ballobject *ball;
+    int i, j, obj_count;
+    int	ignored_object_types;
+    object_t **obj_list;
+    object_t *obj;
+    ballobject_t *ball;
     world_t *world = &World;
 
     /*
@@ -1485,11 +1501,13 @@ static void BallCollision(void)
 	if (BIT(world->rules->mode, TIMING)
 	    && options.ballrace
 	    && ball->owner != NO_ID) {
-	    player *owner = Player_by_id(ball->owner);
+	    player_t *owner = Player_by_id(ball->owner);
 
 	    if (!options.ballrace_connect || ball->id == owner->id) {
-		if (Wrap_length(ball->pos.cx - Checks(world, owner->check)->pos.cx,
-				ball->pos.cy - Checks(world, owner->check)->pos.cy)
+		clpos_t cpos = Checks(world, owner->check)->pos;
+
+		if (Wrap_length(ball->pos.cx - cpos.cx,
+				ball->pos.cy - cpos.cy)
 		    < options.checkpointRadius * BLOCK_CLICKS)
 		    Player_pass_checkpoint(owner);
 	    }
@@ -1524,7 +1542,7 @@ static void BallCollision(void)
 		/* Balls bounce off other balls that aren't safe in
 		 * the treasure: */
 		{
-		    ballobject *b2 = BALL_PTR(obj);
+		    ballobject_t *b2 = BALL_PTR(obj);
 		    if (b2->treasure->have)
 			break;
 
@@ -1567,11 +1585,11 @@ static void BallCollision(void)
 /* do mine - object collisions */
 static void MineCollision(void)
 {
-    int		i, j, obj_count;
-    object	**obj_list;
-    object	*obj;
-    mineobject	*mine;
-    int		collide_object_types;
+    int i, j, obj_count;
+    object_t **obj_list;
+    object_t *obj;
+    mineobject_t *mine;
+    int collide_object_types;
 
     if (!options.mineShotDetonateDistance)
 	return;
@@ -1605,7 +1623,8 @@ static void MineCollision(void)
 	    if (!BIT(obj->type, collide_object_types))
 		continue;
 
-	    radius = (options.mineShotDetonateDistance + obj->pl_radius) * CLICK;
+	    radius = (options.mineShotDetonateDistance + obj->pl_radius)
+		* CLICK;
 	    if (!in_range(OBJ_PTR(mine), obj, radius))
 		continue;
 

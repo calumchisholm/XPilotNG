@@ -26,7 +26,7 @@
 char objpos_version[] = VERSION;
 
 
-void Object_position_set_clpos(object *obj, clpos pos)
+void Object_position_set_clpos(object_t *obj, clpos_t pos)
 {
     world_t *world = &World;
 
@@ -45,19 +45,19 @@ void Object_position_set_clpos(object *obj, clpos pos)
     obj->pos = pos;
 }
 
-void Object_position_init_clpos(object *obj, clpos pos)
+void Object_position_init_clpos(object_t *obj, clpos_t pos)
 {
     Object_position_set_clpos(obj, pos);
     Object_position_remember(obj);
     obj->collmode = 0;
 }
 
-void Player_position_restore(player *pl)
+void Player_position_restore(player_t *pl)
 {
     Player_position_set_clpos(pl, pl->prevpos);
 }
 
-void Player_position_set_clpos(player *pl, clpos pos)
+void Player_position_set_clpos(player_t *pl, clpos_t pos)
 {
     world_t *world = &World;
 
@@ -75,16 +75,16 @@ void Player_position_set_clpos(player *pl, clpos pos)
     pl->pos = pos;
 }
 
-void Player_position_init_clpos(player *pl, clpos pos)
+void Player_position_init_clpos(player_t *pl, clpos_t pos)
 {
     Player_position_set_clpos(pl, pos);
     Player_position_remember(pl);
     pl->collmode = 0;
 }
 
-void Player_position_limit(player *pl)
+void Player_position_limit(player_t *pl)
 {
-    clpos pos = pl->pos, oldpos = pos;
+    clpos_t pos = pl->pos, oldpos = pos;
     world_t *world = &World;
 
     LIMIT(pos.cx, 0, world->cwidth - 1);
@@ -94,7 +94,7 @@ void Player_position_limit(player *pl)
 }
 
 #ifdef DEVELOPMENT
-void Player_position_debug(player *pl, const char *msg)
+void Player_position_debug(player_t *pl, const char *msg)
 {
     int			i;
 
@@ -111,8 +111,8 @@ void Player_position_debug(player *pl, const char *msg)
 	   pl->prevpos.cx,
 	   pl->prevpos.cy);
     for (i = 0; i < pl->ship->num_points; i++) {
-	clpos pts = Ship_get_point_clpos(pl->ship, i, pl->dir);
-	clpos pt;
+	clpos_t pts = Ship_get_point_clpos(pl->ship, i, pl->dir);
+	clpos_t pt;
 
 	pt.cx = pl->pos.cx + pts.cx;
 	pt.cy = pl->pos.cy + pts.cy;

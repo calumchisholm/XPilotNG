@@ -402,7 +402,7 @@ void Destroy_connection(connection_t *connp, const char *reason)
     Conn_set_state(connp, CONN_FREE, CONN_FREE);
 
     if (connp->id != NO_ID) {
-	player *pl;
+	player_t *pl;
 	id = connp->id;
 	connp->id = NO_ID;
 	pl = Player_by_id(id);
@@ -1008,7 +1008,7 @@ static void LegalizeHost(char *string)
  */
 static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 {
-    player		*pl;
+    player_t		*pl;
     int			i, war_on_id, conn_bit, nick_mod = 0;
     char		msg[MSG_LEN];
     char		old_nick[MAX_NAME_LEN] /*, *p */;
@@ -1167,7 +1167,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
      * And tell him about all the others.
      */
     for (i = 0; i < spectatorStart + NumSpectators - 1; i++) {
-	player *pl_i;
+	player_t *pl_i;
 	if (i == NumPlayers - 1 && pl->rectype != 2)
 	    break;
 	if (i == NumPlayers) {
@@ -1194,7 +1194,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
      * And tell all the others about him.
      */
     for (i = 0; i < spectatorStart + NumSpectators - 1; i++) {
-	player *pl_i;
+	player_t *pl_i;
 
 	if (i == NumPlayers - 1) {
 	    i = spectatorStart - 1;
@@ -1353,7 +1353,7 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 
     /* idle */
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 	if (pl_i->mychar == ' ')
 	    pl_i->idleCount = 0;
     }
@@ -1577,7 +1577,7 @@ static int Send_modifiers(connection_t *connp, char *mods)
  * receives counts for items it doesn't know about.
  * This is new since pack version 4203.
  */
-static int Send_self_items(connection_t *connp, player *pl)
+static int Send_self_items(connection_t *connp, player_t *pl)
 {
     unsigned		item_mask = 0;
     int			i, n;
@@ -1616,7 +1616,7 @@ static int Send_self_items(connection_t *connp, player *pl)
  * Send all frame data related to the player self and his HUD.
  */
 int Send_self(connection_t *connp,
-	      player *pl,
+	      player_t *pl,
 	      int lock_id,
 	      int lock_dist,
 	      int lock_dir,
@@ -1713,7 +1713,7 @@ int Send_seek(connection_t *connp, int programmer_id, int robot_id,
  */
 int Send_player(connection_t *connp, int id)
 {
-    player		*pl = Player_by_id(id);
+    player_t		*pl = Player_by_id(id);
     int			n;
     char		buf[MSG_LEN], ext[MSG_LEN];
     int			sbuf_len = connp->c.len;
@@ -1847,10 +1847,10 @@ int Send_fuel(connection_t *connp, int num, double fuel)
 			 num, (int)(fuel + 0.5));
 }
 
-int Send_score_object(connection_t *connp, double score, clpos pos,
+int Send_score_object(connection_t *connp, double score, clpos_t pos,
 		      const char *string)
 {
-    blpos bpos = Clpos_to_blpos(pos);
+    blkpos_t bpos = Clpos_to_blkpos(pos);
 
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for base info (%d,%d)",
@@ -1930,7 +1930,7 @@ int Send_debris(connection_t *connp, int type, unsigned char *p, unsigned n)
     return n;
 }
 
-int Send_wreckage(connection_t *connp, clpos pos,
+int Send_wreckage(connection_t *connp, clpos_t pos,
 		  int wrtype, int size, int rot)
 {
     if (options.wreckageCollisionMayKill)
@@ -1944,7 +1944,7 @@ int Send_wreckage(connection_t *connp, clpos pos,
 			 wrtype, size, rot);
 }
 
-int Send_asteroid(connection_t *connp, clpos pos,
+int Send_asteroid(connection_t *connp, clpos_t pos,
 		  int type, int size, int rot)
 {
     u_byte	type_size;
@@ -1985,20 +1985,20 @@ int Send_fastshot(connection_t *connp, int type, unsigned char *p, unsigned n)
     return n;
 }
 
-int Send_missile(connection_t *connp, clpos pos, int len, int dir)
+int Send_missile(connection_t *connp, clpos_t pos, int len, int dir)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%c%c", PKT_MISSILE,
 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
 			 len, dir);
 }
 
-int Send_ball(connection_t *connp, clpos pos, int id)
+int Send_ball(connection_t *connp, clpos_t pos, int id)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_BALL,
 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), id);
 }
 
-int Send_mine(connection_t *connp, clpos pos, int teammine, int id)
+int Send_mine(connection_t *connp, clpos_t pos, int teammine, int id)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%c%hd", PKT_MINE,
 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
@@ -2013,7 +2013,7 @@ int Send_target(connection_t *connp, int num, int dead_time, double damage)
 			 num, dead_time, (int)(damage * 256.0));
 }
 
-int Send_wormhole(connection_t *connp, clpos pos)
+int Send_wormhole(connection_t *connp, clpos_t pos)
 {
     int		x = CLICK_TO_PIXEL(pos.cx),
     		y = CLICK_TO_PIXEL(pos.cy);
@@ -2023,19 +2023,19 @@ int Send_wormhole(connection_t *connp, clpos pos)
     return Packet_printf(&connp->w, "%c%hd%hd", PKT_WORMHOLE, x, y);
 }
 
-int Send_item(connection_t *connp, clpos pos, int type)
+int Send_item(connection_t *connp, clpos_t pos, int type)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%c", PKT_ITEM,
 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), type);
 }
 
-int Send_paused(connection_t *connp, clpos pos, int count)
+int Send_paused(connection_t *connp, clpos_t pos, int count)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_PAUSED,
 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), count);
 }
 
-int Send_appearing(connection_t *connp, clpos pos, int id, int count)
+int Send_appearing(connection_t *connp, clpos_t pos, int id, int count)
 {
     if (!FEATURE(connp, F_SHOW_APPEARING))
 	return 0;
@@ -2045,20 +2045,20 @@ int Send_appearing(connection_t *connp, clpos pos, int id, int count)
 			 id, count);
 }
 
-int Send_ecm(connection_t *connp, clpos pos, int size)
+int Send_ecm(connection_t *connp, clpos_t pos, int size)
 {
     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_ECM,
 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), size);
 }
 
-int Send_trans(connection_t *connp, clpos pos1, clpos pos2)
+int Send_trans(connection_t *connp, clpos_t pos1, clpos_t pos2)
 {
     return Packet_printf(&connp->w,"%c%hd%hd%hd%hd", PKT_TRANS,
 			 CLICK_TO_PIXEL(pos1.cx), CLICK_TO_PIXEL(pos1.cy),
 			 CLICK_TO_PIXEL(pos2.cx), CLICK_TO_PIXEL(pos2.cy));
 }
 
-int Send_ship(connection_t *connp, clpos pos, int id, int dir,
+int Send_ship(connection_t *connp, clpos_t pos, int id, int dir,
 	      int shield, int cloak, int emergency_shield, int phased,
 	      int deflector)
 {
@@ -2077,7 +2077,7 @@ int Send_ship(connection_t *connp, clpos pos, int id, int dir,
 			);
 }
 
-int Send_refuel(connection_t *connp, clpos pos1, clpos pos2)
+int Send_refuel(connection_t *connp, clpos_t pos1, clpos_t pos2)
 {
     return Packet_printf(&connp->w,
 			 "%c%hd%hd%hd%hd",
@@ -2086,7 +2086,7 @@ int Send_refuel(connection_t *connp, clpos pos1, clpos pos2)
 			 CLICK_TO_PIXEL(pos2.cx), CLICK_TO_PIXEL(pos2.cy));
 }
 
-int Send_connector(connection_t *connp, clpos pos1, clpos pos2,
+int Send_connector(connection_t *connp, clpos_t pos1, clpos_t pos2,
 		   int tractor)
 {
     return Packet_printf(&connp->w,
@@ -2097,7 +2097,7 @@ int Send_connector(connection_t *connp, clpos pos1, clpos pos2,
 			 tractor);
 }
 
-int Send_laser(connection_t *connp, int color, clpos pos, int len, int dir)
+int Send_laser(connection_t *connp, int color, clpos_t pos, int len, int dir)
 {
     return Packet_printf(&connp->w, "%c%c%hd%hd%hd%c", PKT_LASER,
 			 color, CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
@@ -2237,7 +2237,7 @@ int Send_end_of_frame(connection_t *connp)
 
 static int Receive_keyboard(connection_t *connp)
 {
-    player		*pl;
+    player_t		*pl;
     long		change;
     u_byte		ch;
     size_t		size = KEYBOARD_SIZE;
@@ -2320,7 +2320,7 @@ static int Receive_play(connection_t *connp)
 
 static int Receive_power(connection_t *connp)
 {
-    player		*pl;
+    player_t		*pl;
     unsigned char	ch;
     short		tmp;
     int			n;
@@ -2713,7 +2713,7 @@ static int Receive_ack_target(connection_t *connp)
  */
 static void Handle_talk(connection_t *connp, char *str)
 {
-    player		*pl = Player_by_id(connp->id);
+    player_t		*pl = Player_by_id(connp->id);
     int			i, sent, team;
     unsigned int	len;
     char		*cp,
@@ -2730,7 +2730,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	    Set_message(msg);
 	else {
 	    for (sent = i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 		if (pl_i->home_base == NULL)
 		    Set_player_message (pl_i, msg);
 	    }
@@ -2747,7 +2747,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	sent = 0;
 	if (!(mute_baseless && pl->home_base == NULL)) {
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 		if (pl_i->team == team) {
 		    sent++;
 		    Set_player_message(pl_i, msg);
@@ -2769,7 +2769,7 @@ static void Handle_talk(connection_t *connp, char *str)
 	Server_log_admin_message(pl, cp);
     else {						/* Player message */
 	const char *errmsg;
-	player *other_pl = Get_player_by_name(str, NULL, &errmsg);
+	player_t *other_pl = Get_player_by_name(str, NULL, &errmsg);
 
 	if (!other_pl) {
 	    sprintf(msg, "Message not sent. ");
@@ -2867,12 +2867,12 @@ static int str2num (char **strp, int min, int max)
 
 static int Receive_modifier_bank(connection_t *connp)
 {
-    player		*pl;
+    player_t		*pl;
     unsigned char	bank;
     char		str[MAX_CHARS];
     unsigned char	ch;
     char		*cp;
-    modifiers		mods;
+    modifiers_t		mods;
     int			n;
     world_t *world = &World;
 
@@ -2956,14 +2956,14 @@ int Get_player_id(connection_t *connp)
     return connp->id;
 }
 
-const char *Player_get_addr(player *pl)
+const char *Player_get_addr(player_t *pl)
 {
     if (pl->conn != NULL)
 	return pl->conn->addr;
     return NULL;
 }
 
-const char *Player_get_dpy(player *pl)
+const char *Player_get_dpy(player_t *pl)
 {
     if (pl->conn != NULL)
 	return pl->conn->dpy;
@@ -3145,7 +3145,7 @@ static int Send_motd(connection_t *connp)
 
 static int Receive_pointer_move(connection_t *connp)
 {
-    player		*pl;
+    player_t		*pl;
     unsigned char	ch;
     short		movement;
     int			n;
@@ -3200,7 +3200,7 @@ static int Receive_pointer_move(connection_t *connp)
 
 static int Receive_fps_request(connection_t *connp)
 {
-    player		*pl;
+    player_t		*pl;
     int			n;
     unsigned char	ch;
     unsigned char	fps;
@@ -3224,7 +3224,7 @@ static int Receive_fps_request(connection_t *connp)
 
 static int Receive_audio_request(connection_t *connp)
 {
-    player		*pl;
+    player_t		*pl;
     int			n;
     unsigned char	ch;
     unsigned char	on;

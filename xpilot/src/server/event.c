@@ -34,7 +34,7 @@ char event_version[] = VERSION;
 static char		msg[MSG_LEN];
 
 
-static void Refuel(player *pl)
+static void Refuel(player_t *pl)
 {
     int i;
     double l, dist = 1e19;
@@ -58,7 +58,7 @@ static void Refuel(player *pl)
 }
 
 
-static void Repair(player *pl)
+static void Repair(player_t *pl)
 {
     int i;
     double l, dist = 1e19;
@@ -89,7 +89,7 @@ bool team_dead(int team)
     int i;
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl = Players(i);
+	player_t *pl = Players(i);
 	if (pl->team == team && !BIT(pl->status, PAUSE|GAME_OVER))
 	    return false;
     }
@@ -99,7 +99,7 @@ bool team_dead(int team)
 /*
  * Return true if a lock is allowed.
  */
-static bool Player_lock_allowed(player *pl, player *lock_pl)
+static bool Player_lock_allowed(player_t *pl, player_t *lock_pl)
 {
     world_t *world = &World;
 
@@ -135,11 +135,11 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
     return false;
 }
 
-int Player_lock_closest(player *pl, bool next)
+int Player_lock_closest(player_t *pl, bool next)
 {
     int i;
     double dist = 0.0, best, l;
-    player *lock_pl = NULL, *new_pl = NULL;
+    player_t *lock_pl = NULL, *new_pl = NULL;
 
     if (!next)
 	CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
@@ -151,7 +151,7 @@ int Player_lock_closest(player *pl, bool next)
     }
     best = FLT_MAX;
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 	if (pl_i == lock_pl
 	    || !Player_is_active(pl_i)
 	    || !Player_lock_allowed(pl, pl_i)
@@ -177,7 +177,7 @@ int Player_lock_closest(player *pl, bool next)
 }
 
 
-void Pause_player(player *pl, bool on)
+void Pause_player(player_t *pl, bool on)
 {
     world_t *world = &World;
     int i;
@@ -195,7 +195,7 @@ void Pause_player(player *pl, bool on)
 	    world->teams[pl->team].NumMembers--;
 	    pl->team = 0;
 	    for (i = 0; i < NumPlayers; i++) {
-		player *pl_i = Players(i);
+		player_t *pl_i = Players(i);
 		if (pl_i->conn != NULL) {
 		    Send_base(pl_i->conn, -1, pl->home_base->ind);
 		    Send_team(pl_i->conn, pl->id, 0);
@@ -258,10 +258,10 @@ void Pause_player(player *pl, bool on)
 }
 
 
-int Handle_keyboard(player *pl)
+int Handle_keyboard(player_t *pl)
 {
     int i, j, k, key, pressed, dx, dy;
-    clpos pos;
+    clpos_t pos;
     double minv;
     int ind = GetInd(pl->id);
     world_t *world = &World;
@@ -510,7 +510,7 @@ int Handle_keyboard(player *pl)
 		    }
 		}
 		for (i = 0; i < NumPlayers; i++) {
-		    player *pl_i = Players(i);
+		    player_t *pl_i = Players(i);
 		    if (pl_i->id != pl->id
 			&& !Player_is_tank(pl_i)
 			&& pl->home_base == pl_i->home_base) {
@@ -524,7 +524,7 @@ int Handle_keyboard(player *pl)
 		    Set_message(msg);
 		}
 		for (i = 0; i < NumPlayers; i++) {
-		    player *pl_i = Players(i);
+		    player_t *pl_i = Players(i);
 		    if (pl_i->conn != NULL)
 			Send_base(pl_i->conn, pl->id, pl->home_base->ind);
 		}
@@ -663,7 +663,7 @@ int Handle_keyboard(player *pl)
 	    case KEY_LOAD_MODIFIERS_2:
 	    case KEY_LOAD_MODIFIERS_3:
 	    case KEY_LOAD_MODIFIERS_4: {
-		modifiers *m = &(pl->modbank[key - KEY_LOAD_MODIFIERS_1]);
+		modifiers_t *m = &(pl->modbank[key - KEY_LOAD_MODIFIERS_1]);
 
 		if (BIT(pl->status, REPROGRAM))
 		    *m = pl->mods;
@@ -1005,7 +1005,7 @@ int Handle_keyboard(player *pl)
     return 1;
 }
 
-void filter_mods(modifiers * mods)
+void filter_mods(modifiers_t * mods)
 {
     world_t *world = &World;
 

@@ -162,7 +162,7 @@ void Circle(int color,
 #ifndef CALLBACK
 #define CALLBACK
 #endif
-static void CALLBACK vertex_callback(ipos *p, image_t *texture)
+static void CALLBACK vertex_callback(ipos_t *p, image_t *texture)
 {
     if (texture != NULL) {
 	glTexCoord2f(p->x / (GLfloat)texture->frame_width,
@@ -180,7 +180,7 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
     polygon_style_t p_style;
     image_t *texture = NULL;
     GLdouble v[3] = { 0, 0, 0 };
-    ipos p[MAX_VERTICES];
+    ipos_t p[MAX_VERTICES];
 
     polygon = polygons[i];
     p_style = polygon_styles[polygon.style];
@@ -280,7 +280,7 @@ void Gui_paint_fuel(int x, int y, double fuel)
 #define FUEL_BORDER 3
 
     int size, frame;
-    irec area;
+    irec_t area;
     image_t *img;
 
     img = Image_get(IMG_FUEL);
@@ -1082,7 +1082,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 {
     int i, color;
     shipshape_t *ship;
-    shapepos    point;
+    shapepos_t    point;
     other_t 	*other;
 
     ship = Ship_by_id(id);

@@ -52,8 +52,8 @@
  * Global objects.
  */
 
-extern ipos	world;
-extern ipos	realWorld;
+extern ipos_t	world;
+extern ipos_t	realWorld;
 
 extern char	dashes[NUM_DASHES];
 extern char	cdashes[NUM_CDASHES];

@@ -27,7 +27,7 @@
 char score_version[] = VERSION;
 
 
-void Score(player *pl, double points, clpos pos, const char *msg)
+void Score(player_t *pl, double points, clpos_t pos, const char *msg)
 {
     world_t *world = &World;
 
@@ -60,7 +60,7 @@ void TEAM_SCORE(int team, double points)
 	int i;
 	double share = world->teams[team].score / world->teams[team].NumMembers;
 	for (i = 0; i < NumPlayers; i++) {
-	    player *pl_i = Players(i);
+	    player_t *pl_i = Players(i);
 	    if (pl_i->team == team)
 		Rank_SetScore(pl_i, share);
 	}
@@ -76,7 +76,7 @@ void Alliance_score(int id, double points)
     double	share = points / member_count;
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 	if (pl_i->alliance == id)
 	    Rank_AddScore(pl_i, share);
     }
@@ -109,8 +109,8 @@ double Rate(double winner, double loser)
  * KK 28-4-98: Same for killing your own tank.
  * KK 7-11-1: And for killing a member of your alliance
  */
-void Score_players(player *winner_pl, double winner_score, char *winner_msg,
-		   player *loser_pl, double loser_score, char *loser_msg,
+void Score_players(player_t *winner_pl, double winner_score, char *winner_msg,
+		   player_t *loser_pl, double loser_score, char *loser_msg,
 		   bool transfer_tag)
 {
     if (Players_are_teammates(winner_pl, loser_pl)

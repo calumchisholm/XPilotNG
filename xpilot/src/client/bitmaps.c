@@ -337,7 +337,7 @@ void Bitmap_paint(Drawable d, int img, int x, int y, int bmp)
 {
     xp_bitmap_t *bit;
     bbox_t *box;
-    irec area;
+    irec_t area;
 
     if ((bit = Bitmap_get(d, img, bmp)) == NULL)
 	return;
@@ -444,7 +444,7 @@ static void Bitmap_set_pixel(xp_pixmap_t * xp_pixmap,
  * Purpose: Paint an area r of xp_bitmap bit in a device dependent manner.
  */
 void Bitmap_paint_area(Drawable d, xp_bitmap_t * bit, int x, int y,
-		       irec * r)
+		       irec_t * r)
 {
     XSetClipOrigin(dpy, gameGC, x - r->x, y - r->y);
     XSetClipMask(dpy, gameGC, bit->mask);

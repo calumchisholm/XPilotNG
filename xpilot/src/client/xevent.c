@@ -315,8 +315,8 @@ void xevent_keyboard(int queued)
 #endif
 }
 
-static ipos	delta;
-ipos	mousePosition;	/* position of mouse pointer. */
+static ipos_t	delta;
+ipos_t	mousePosition;	/* position of mouse pointer. */
 int	mouseMovement;	/* horizontal mouse movement. */
 
 

@@ -38,7 +38,7 @@ int			ObjCount = 0;
 int			NumPulses = 0;
 int			NumEcms = 0;
 int			NumTransporters = 0;
-object			*Obj[MAX_TOTAL_SHOTS];
+object_t		*Obj[MAX_TOTAL_SHOTS];
 ecm_t			*Ecms[MAX_TOTAL_ECMS];
 trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
 
@@ -53,9 +53,9 @@ static void Object_decr_count(void)
     ObjCount--;
 }
 
-object *Object_allocate(void)
+object_t *Object_allocate(void)
 {
-    object	*obj = OBJ_PTR(NULL);
+    object_t	*obj = OBJ_PTR(NULL);
 
     if (ObjCount < MAX_TOTAL_SHOTS) {
 	obj = Obj[ObjCount];
@@ -71,7 +71,7 @@ object *Object_allocate(void)
 void Object_free_ind(int ind)
 {
     if ((0 <= ind) && (ind < ObjCount) && (ObjCount <= MAX_TOTAL_SHOTS)) {
-	object *obj = Obj[ind];
+	object_t *obj = Obj[ind];
 	Object_decr_count();
 	Obj[ind] = Obj[ObjCount];
 	Obj[ObjCount] = obj;
@@ -80,7 +80,7 @@ void Object_free_ind(int ind)
 	     ind, ObjCount, MAX_TOTAL_SHOTS);
 }
 
-void Object_free_ptr(object *obj)
+void Object_free_ptr(object_t *obj)
 {
     int		i;
 
@@ -94,14 +94,14 @@ void Object_free_ptr(object *obj)
 	warn("Could NOT free object!");
 }
 
-static anyobject *objArray;
+static anyobject_t *objArray;
 
 void Alloc_shots(int number)
 {
-    anyobject		*x;
+    anyobject_t		*x;
     int			i;
 
-    x = (anyobject *) calloc((size_t)number, sizeof(anyobject));
+    x = (anyobject_t *) calloc((size_t)number, sizeof(anyobject_t));
     if (!x) {
 	error("Not enough memory for shots.");
 	exit(1);
@@ -126,7 +126,7 @@ void Free_shots(void)
 
 
 /* kps debug hack */
-const char *Object_typename(object *obj)
+const char *Object_typename(object_t *obj)
 {
     int type;
 

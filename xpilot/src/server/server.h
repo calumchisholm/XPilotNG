@@ -55,7 +55,7 @@
 typedef struct {
     char	owner[80];
     char	host[80];
-} server;
+} server_t;
 
 /*
  * Global data.
@@ -65,7 +65,7 @@ typedef struct {
 #define NumObjs		(ObjCount + 0)
 #define MAX_SPECTATORS	8
 
-extern object		*Obj[];
+extern object_t		*Obj[];
 extern ecm_t		*Ecms[];
 extern trans_t		*Transporters[];
 extern long		frame_loops;
@@ -86,7 +86,7 @@ extern int		login_in_progress;
 extern char		ShutdownReason[];
 extern sock_t		contactSocket;
 extern time_t		serverTime;
-extern server		Server;
+extern server_t		Server;
 extern char		*serverAddr;
 extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
 extern int		ShutdownServer, ShutdownDelay;
@@ -212,7 +212,7 @@ extern struct options {
     bool	edgeWrap;
     bool	edgeBounce;
     bool	extraBorder;
-    ipos	gravityPoint;
+    ipos_t	gravityPoint;
     double	gravityAngle;
     bool	gravityPointSource;
     bool	gravityClockwise;
@@ -396,7 +396,7 @@ extern shape_t		wormhole_wire;
 /* determine if a block is one of SPACE_BLOCKS */
 #define EMPTY_SPACE(s)	BIT(1U << (s), SPACE_BLOCKS)
 
-static inline vector World_gravity(world_t *world, clpos pos)
+static inline vector_t World_gravity(world_t *world, clpos_t pos)
 {
     return world->gravity[CLICK_TO_BLOCK(pos.cx)][CLICK_TO_BLOCK(pos.cy)];
 }
@@ -418,10 +418,10 @@ enum TeamPickType {
  */
 void Free_cells(void);
 void Alloc_cells(void);
-void Cell_init_object(object *obj);
-void Cell_add_object(object *obj);
-void Cell_remove_object(object *obj);
-void Cell_get_objects(clpos pos, int r, int max, object ***list, int *count);
+void Cell_init_object(object_t *obj);
+void Cell_add_object(object_t *obj);
+void Cell_remove_object(object_t *obj);
+void Cell_get_objects(clpos_t pos, int r, int max, object_t ***list, int *count);
 
 /*
  * Prototypes for collision.c
@@ -429,8 +429,8 @@ void Cell_get_objects(clpos pos, int r, int max, object ***list, int *count);
 void Check_collision(void);
 int IsOffensiveItem(enum Item i);
 int IsDefensiveItem(enum Item i);
-int CountOffensiveItems(player *pl);
-int CountDefensiveItems(player *pl);
+int CountOffensiveItems(player_t *pl);
+int CountDefensiveItems(player_t *pl);
 
 /*
  * Prototypes for id.c
@@ -446,25 +446,25 @@ void Groups_init(void);
 void Walls_init(void);
 void Treasure_init(void);
 void Move_init(void);
-void Move_object(object *obj);
-void Move_player(player *pl);
-void Turn_player(player *pl);
-int is_inside(int x, int y, hitmask_t hitmask, const object *obj);
-int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object *obj,
+void Move_object(object_t *obj);
+void Move_player(player_t *pl);
+void Turn_player(player_t *pl);
+int is_inside(int x, int y, hitmask_t hitmask, const object_t *obj);
+int shape_is_inside(int cx, int cy, hitmask_t hitmask, const object_t *obj,
 		    const shape_t *s, int dir);
 int Polys_to_client(unsigned char **);
 void Ball_line_init(void);
-void Player_crash(player *pl, int crashtype, int mapobj_ind, int pt);
-void Object_crash(object *obj, int crashtype, int mapobj_ind);
+void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt);
+void Object_crash(object_t *obj, int crashtype, int mapobj_ind);
 
 /*
  * Prototypes for event.c
  */
-int Handle_keyboard(player *pl);
-void Pause_player(player *pl, bool on);
-int Player_lock_closest(player *pl, bool next);
+int Handle_keyboard(player_t *pl);
+void Pause_player(player_t *pl, bool on);
+int Player_lock_closest(player_t *pl, bool next);
 bool team_dead(int team);
-void filter_mods(modifiers *mods);
+void filter_mods(modifiers_t *mods);
 
 /*
  * Prototypes for map.c
@@ -473,19 +473,19 @@ void World_free(world_t *world);
 bool Grok_map(world_t *world);
 bool Grok_map_options(world_t *world);
 
-int World_place_base(world_t *world, clpos pos, int dir, int team);
-int World_place_cannon(world_t *world, clpos pos, int dir, int team);
-int World_place_check(world_t *world, clpos pos, int ind);
-int World_place_fuel(world_t *world, clpos pos, int team);
-int World_place_grav(world_t *world, clpos pos, double force, int type);
-int World_place_target(world_t *world, clpos pos, int team);
-int World_place_treasure(world_t *world, clpos pos, int team, bool empty);
-int World_place_wormhole(world_t *world, clpos pos, wormType type);
-int World_place_item_concentrator(world_t *world, clpos pos);
-int World_place_asteroid_concentrator(world_t *world, clpos pos);
-int World_place_friction_area(world_t *world, clpos pos, double fric);
+int World_place_base(world_t *world, clpos_t pos, int dir, int team);
+int World_place_cannon(world_t *world, clpos_t pos, int dir, int team);
+int World_place_check(world_t *world, clpos_t pos, int ind);
+int World_place_fuel(world_t *world, clpos_t pos, int team);
+int World_place_grav(world_t *world, clpos_t pos, double force, int type);
+int World_place_target(world_t *world, clpos_t pos, int team);
+int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty);
+int World_place_wormhole(world_t *world, clpos_t pos, wormType type);
+int World_place_item_concentrator(world_t *world, clpos_t pos);
+int World_place_asteroid_concentrator(world_t *world, clpos_t pos);
+int World_place_friction_area(world_t *world, clpos_t pos, double fric);
 
-void World_add_temporary_wormholes(world_t *world, clpos pos1, clpos pos2);
+void World_add_temporary_wormholes(world_t *world, clpos_t pos1, clpos_t pos2);
 void Wormhole_line_init(void);
 
 void Find_base_direction(world_t *world);
@@ -493,7 +493,7 @@ void Compute_gravity(void);
 double Wrap_findDir(double dx, double dy);
 double Wrap_cfindDir(int dx, int dy);
 double Wrap_length(int dx, int dy);
-int Find_closest_team(world_t *world, clpos pos);
+int Find_closest_team(world_t *world, clpos_t pos);
 
 
 /*
@@ -529,44 +529,44 @@ void Timing_setup(void);
 /*
  * Prototypes for play.c
  */
-void Thrust(player *pl);
-void Record_shove(player *pl, player *pusher, long shove_time);
-void Delta_mv(object *ship, object *obj);
-void Delta_mv_elastic(object *obj1, object *obj2);
-void Obj_repel(object *obj1, object *obj2, int repel_dist);
-void Item_damage(player *pl, double prob);
-void Tank_handle_detach(player *pl);
+void Thrust(player_t *pl);
+void Record_shove(player_t *pl, player_t *pusher, long shove_time);
+void Delta_mv(object_t *ship, object_t *obj);
+void Delta_mv_elastic(object_t *obj1, object_t *obj2);
+void Obj_repel(object_t *obj1, object_t *obj2, int repel_dist);
+void Item_damage(player_t *pl, double prob);
+void Tank_handle_detach(player_t *pl);
 void Add_fuel(pl_fuel_t *, double);
 void Update_tanks(pl_fuel_t *);
-void Place_item(player *pl, int type);
+void Place_item(player_t *pl, int type);
 int Choose_random_item(void);
-void Tractor_beam(player *pl);
-void General_tractor_beam(player *pl, clpos pos,
-			  int items, player *victim, bool pressor);
-void Place_mine(player *pl);
-void Place_moving_mine(player *pl);
-void Place_general_mine(player *pl, int team, long status,
-			clpos pos, vector vel, modifiers mods);
-void Detonate_mines(player *pl);
-char *Describe_shot(int type, long status, modifiers mods, int hit);
-void Fire_ecm(player *pl);
-void Fire_general_ecm(player *pl, int team, clpos pos);
-void Update_connector_force(ballobject *ball);
-void Fire_shot(player *pl, int type, int dir);
-void Fire_general_shot(player *pl, int team, bool cannon,
-		       clpos pos, int type, int dir,
-		       modifiers mods, int target_id);
-void Fire_normal_shots(player *pl);
-void Fire_main_shot(player *pl, int type, int dir);
-void Fire_left_shot(player *pl, int type, int dir, int gun);
-void Fire_right_shot(player *pl, int type, int dir, int gun);
-void Fire_left_rshot(player *pl, int type, int dir, int gun);
-void Fire_right_rshot(player *pl, int type, int dir, int gun);
+void Tractor_beam(player_t *pl);
+void General_tractor_beam(player_t *pl, clpos_t pos,
+			  int items, player_t *victim, bool pressor);
+void Place_mine(player_t *pl);
+void Place_moving_mine(player_t *pl);
+void Place_general_mine(player_t *pl, int team, long status,
+			clpos_t pos, vector_t vel, modifiers_t mods);
+void Detonate_mines(player_t *pl);
+char *Describe_shot(int type, long status, modifiers_t mods, int hit);
+void Fire_ecm(player_t *pl);
+void Fire_general_ecm(player_t *pl, int team, clpos_t pos);
+void Update_connector_force(ballobject_t *ball);
+void Fire_shot(player_t *pl, int type, int dir);
+void Fire_general_shot(player_t *pl, int team, bool cannon,
+		       clpos_t pos, int type, int dir,
+		       modifiers_t mods, int target_id);
+void Fire_normal_shots(player_t *pl);
+void Fire_main_shot(player_t *pl, int type, int dir);
+void Fire_left_shot(player_t *pl, int type, int dir, int gun);
+void Fire_right_shot(player_t *pl, int type, int dir, int gun);
+void Fire_left_rshot(player_t *pl, int type, int dir, int gun);
+void Fire_right_rshot(player_t *pl, int type, int dir, int gun);
 void Make_treasure_ball(treasure_t *t);
 
-void Ball_hits_goal(ballobject *ball, group_t *groupptr);
-void Ball_is_replaced(ballobject *ball);
-void Ball_is_destroyed(ballobject *ball);
+void Ball_hits_goal(ballobject_t *ball, group_t *groupptr);
+void Ball_is_replaced(ballobject_t *ball);
+void Ball_is_destroyed(ballobject_t *ball);
 
 bool Balltarget_hitfunc(group_t *groupptr, move_t *move);
 
@@ -588,24 +588,24 @@ bool Friction_area_hitfunc(group_t *groupptr, move_t *move);
 
 void Team_immunity_init(void);
 void Hitmasks_init(void);
-void Transfer_tag(player *oldtag_pl, player *newtag_pl);
-/*double Handle_tag(double score, player *victim_pl, player* killer_pl);*/
+void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl);
+/*double Handle_tag(double score, player_t *victim_pl, player_t* killer_pl);*/
 void Check_tag(void);
 void Delete_shot(int ind);
-void Fire_laser(player *pl);
-void Fire_general_laser(player *pl, int team, clpos pos,
-			int dir, modifiers mods);
-void Do_deflector(player *pl);
-void Do_transporter(player *pl);
-void Do_general_transporter(player *pl, clpos pos, player *victim,
+void Fire_laser(player_t *pl);
+void Fire_general_laser(player_t *pl, int team, clpos_t pos,
+			int dir, modifiers_t mods);
+void Do_deflector(player_t *pl);
+void Do_transporter(player_t *pl);
+void Do_general_transporter(player_t *pl, clpos_t pos, player_t *victim,
 			    int *item, double *amount);
-bool Initiate_hyperjump(player *pl);
-void do_lose_item(player *pl);
-void Update_torpedo(torpobject *torp);
-void Update_missile(missileobject *shot);
-void Update_mine(mineobject *mine);
-void Make_debris(clpos  pos,
-		 vector vel,
+bool Initiate_hyperjump(player_t *pl);
+void do_lose_item(player_t *pl);
+void Update_torpedo(torpobject_t *torp);
+void Update_missile(missileobject_t *shot);
+void Update_mine(mineobject_t *mine);
+void Make_debris(clpos_t  pos,
+		 vector_t vel,
 		 int    owner_id,
 		 int    owner_team,
 		 int    type,
@@ -617,8 +617,8 @@ void Make_debris(clpos  pos,
 		 int    min_dir,    int    max_dir,
 		 double min_speed,  double max_speed,
 		 double min_life,   double max_life);
-void Make_wreckage(clpos  pos,
-		   vector vel,
+void Make_wreckage(clpos_t  pos,
+		   vector_t vel,
 		   int    owner_id,
 		   int    owner_team,
 		   double min_mass,   double max_mass,
@@ -629,13 +629,13 @@ void Make_wreckage(clpos  pos,
 		   int    min_dir,    int    max_dir,
 		   double min_speed,  double max_speed,
 		   double min_life,   double max_life);
-void Make_item(clpos pos,
-	       vector vel,
+void Make_item(clpos_t pos,
+	       vector_t vel,
 	       int item, int num_per_pack,
 	       long status);
-void Explode_fighter(player *pl);
-void Throw_items(player *pl);
-void Detonate_items(player *pl);
+void Explode_fighter(player_t *pl);
+void Throw_items(player_t *pl);
+void Detonate_items(player_t *pl);
 void add_temp_wormholes(world_t *world, int xin, int yin, int xout, int yout);
 void remove_temp_wormhole(world_t *world, int ind);
 
@@ -643,7 +643,7 @@ void remove_temp_wormhole(world_t *world, int ind);
 /*
  * Prototypes for asteroid.c
  */
-void Break_asteroid(wireobject *asteroid);
+void Break_asteroid(wireobject_t *asteroid);
 void Asteroid_update(void);
 list_t Asteroid_get_list(void);
 
@@ -656,52 +656,52 @@ void Cannon_add_item(cannon_t *cannon, int item, double amount);
 void Cannon_throw_items(cannon_t *cannon);
 void Cannon_check_defense(cannon_t *cannon);
 void Cannon_check_fire(cannon_t *cannon);
-void Cannon_dies(cannon_t *cannon, player *pl);
+void Cannon_dies(cannon_t *cannon, player_t *pl);
 
 /*
  * Prototypes for command.c
  */
-void Handle_player_command(player *pl, char *cmd);
-player *Get_player_by_name(char *str, int *errcode, const char **errorstr_p);
+void Handle_player_command(player_t *pl, char *cmd);
+player_t *Get_player_by_name(char *str, int *errcode, const char **errorstr_p);
 
 /*
  * Prototypes for player.c
  */
-player *Players(int ind);
+player_t *Players(int ind);
 int GetInd(int id);
 
-static inline player *Player_by_id(int id)
+static inline player_t *Player_by_id(int id)
 {
     return Players(GetInd(id));
 }
 
-static inline bool Player_is_playing(player *pl)
+static inline bool Player_is_playing(player_t *pl)
 {
     if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER|KILLED) == PLAYING)
 	return true;
     return false;
 }
 
-static inline bool Player_is_active(player *pl)
+static inline bool Player_is_active(player_t *pl)
 {
     if (BIT(pl->status, PLAYING|PAUSE|GAME_OVER) == PLAYING)
 	return true;
     return false;
 }
 
-static inline bool Player_is_waiting(player *pl)
+static inline bool Player_is_waiting(player_t *pl)
 {
     if (BIT(pl->status, GAME_OVER) && pl->mychar == 'W')
 	return true;
     return false;
 }
 
-static inline bool Player_is_self_destructing(player *pl)
+static inline bool Player_is_self_destructing(player_t *pl)
 {
     return (pl->self_destruct_count > 0.0) ? true : false;
 }
 
-static inline void Player_self_destruct(player *pl, bool on)
+static inline void Player_self_destruct(player_t *pl, bool on)
 {
     if (on) {
 	if (Player_is_self_destructing(pl))
@@ -712,22 +712,22 @@ static inline void Player_self_destruct(player *pl, bool on)
 	pl->self_destruct_count = 0.0;
 }
 
-static inline bool Player_is_tank(player *pl)
+static inline bool Player_is_tank(player_t *pl)
 {
     return (BIT(pl->type_ext, OBJ_EXT_TANK) == OBJ_EXT_TANK) ? true : false;
 }
 
-static inline bool Player_is_robot(player *pl)
+static inline bool Player_is_robot(player_t *pl)
 {
     return (BIT(pl->type_ext, OBJ_EXT_ROBOT) == OBJ_EXT_ROBOT) ? true : false;
 }
 
-static inline bool Player_is_human(player *pl)
+static inline bool Player_is_human(player_t *pl)
 {
     return (!BIT(pl->type_ext, OBJ_EXT_TANK|OBJ_EXT_ROBOT)) ? true : false;
 }
 
-static inline bool Player_owns_tank(player *pl, player *tank)
+static inline bool Player_owns_tank(player_t *pl, player_t *tank)
 {
     if (Player_is_tank(tank)
 	&& tank->lock.pl_id != NO_ID  /* kps - probably redundant */
@@ -740,7 +740,7 @@ static inline bool Player_owns_tank(player *pl, player *tank)
  * Used where we wish to know if a player is simply on the same team.
  * Replacement for TEAM
  */
-static inline bool Players_are_teammates(player *pl1, player *pl2)
+static inline bool Players_are_teammates(player_t *pl1, player_t *pl2)
 {
     world_t *world = &World;
 
@@ -755,7 +755,7 @@ static inline bool Players_are_teammates(player *pl1, player *pl2)
  * Used where we wish to know if two players are members of the same alliance.
  * Replacement for ALLIANCE
  */
-static inline bool Players_are_allies(player *pl1, player *pl2)
+static inline bool Players_are_allies(player_t *pl1, player_t *pl2)
 {
     if (pl1->alliance != ALLIANCE_NOT_SET
 	&& pl1->alliance == pl2->alliance)
@@ -763,18 +763,18 @@ static inline bool Players_are_allies(player *pl1, player *pl2)
     return false;
 }
 
-void Pick_startpos(player *pl);
-void Go_home(player *pl);
-void Compute_sensor_range(player *pl);
-void Player_add_tank(player *pl, double tank_fuel);
-void Player_remove_tank(player *pl, int which_tank);
+void Pick_startpos(player_t *pl);
+void Go_home(player_t *pl);
+void Compute_sensor_range(player_t *pl);
+void Player_add_tank(player_t *pl, double tank_fuel);
+void Player_remove_tank(player_t *pl, int which_tank);
 
-static inline void Player_add_fuel(player *pl, double amount)
+static inline void Player_add_fuel(player_t *pl, double amount)
 {
     Add_fuel(&(pl->fuel), amount);
 }
 
-static inline bool Player_used_emergency_shield(player *pl)
+static inline bool Player_used_emergency_shield(player_t *pl)
 {
     if (BIT(pl->used, (HAS_SHIELD|HAS_EMERGENCY_SHIELD)) ==
 	(HAS_SHIELD|HAS_EMERGENCY_SHIELD))
@@ -782,9 +782,9 @@ static inline bool Player_used_emergency_shield(player *pl)
     return false;
 }
 
-void Player_hit_armor(player *pl);
-void Player_used_kill(player *pl);
-void Player_set_mass(player *pl);
+void Player_hit_armor(player_t *pl);
+void Player_used_kill(player_t *pl);
+void Player_set_mass(player_t *pl);
 int Init_player(int ind, shipshape_t *ship);
 void Alloc_players(int number);
 void Free_players(void);
@@ -792,18 +792,18 @@ void Update_score_table(void);
 void Reset_all_players(void);
 void Check_team_members(int);
 void Compute_game_status(void);
-void Delete_player(player *pl);
-void Add_spectator(player *pl);
-void Delete_spectator(player *pl);
-void Detach_ball(player *pl, ballobject *ball);
-void Kill_player(player *pl, bool add_rank_death);
-void Player_death_reset(player *pl, bool add_rank_death);
+void Delete_player(player_t *pl);
+void Add_spectator(player_t *pl);
+void Delete_spectator(player_t *pl);
+void Detach_ball(player_t *pl, ballobject_t *ball);
+void Kill_player(player_t *pl, bool add_rank_death);
+void Player_death_reset(player_t *pl, bool add_rank_death);
 void Team_game_over(int winning_team, const char *reason);
 void Individual_game_over(int winner);
 void Race_game_over(void);
 bool Team_immune(int id1, int id2);
 
-static inline void Player_set_float_dir(player *pl, double new_float_dir)
+static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
 {
     if (options.ngControls && new_float_dir != pl->float_dir) {
 	pl->float_dir = new_float_dir;
@@ -818,16 +818,16 @@ static inline void Player_set_float_dir(player *pl, double new_float_dir)
  */
 void Parse_robot_file(void);
 void Robot_init(void);
-void Robot_delete(player *robot, bool kicked);
-void Robot_destroy(player *robot);
+void Robot_delete(player_t *robot, bool kicked);
+void Robot_destroy(player_t *robot);
 void Robot_update(void);
-void Robot_invite(player *robot, player *inviter);
-void Robot_war(player *robot, player *killer);
-void Robot_reset_war(player *robot);
-int Robot_war_on_player(player *robot);
-void Robot_go_home(player *robot);
-void Robot_program(player *robot, int victim_id);
-void Robot_message(player *robot, const char *message);
+void Robot_invite(player_t *robot, player_t *inviter);
+void Robot_war(player_t *robot, player_t *killer);
+void Robot_reset_war(player_t *robot);
+int Robot_war_on_player(player_t *robot);
+void Robot_go_home(player_t *robot);
+void Robot_program(player_t *robot, int victim_id);
+void Robot_message(player_t *robot, const char *message);
 
 /*
  * Prototypes for rules.c
@@ -849,7 +849,7 @@ int Pick_team(int pick_for_type);
 void Server_info(char *str, size_t max_size);
 void Log_game(const char *heading);
 void Game_Over(void);
-void Server_log_admin_message(player *pl, const char *str);
+void Server_log_admin_message(player_t *pl, const char *str);
 int plock_server(bool on);
 void Main_loop(void);
 
@@ -880,18 +880,18 @@ void Meta_update(int change);
  */
 void Frame_update(void);
 void Set_message(const char *message);
-void Set_player_message(player *pl, const char *message);
+void Set_player_message(player_t *pl, const char *message);
 
 /*
  * Prototypes for update.c
  */
 void Update_objects(void);
-void Autopilot(player *pl, bool on);
-void Cloak(player *pl, bool on);
-void Deflector(player *pl, bool on);
-void Emergency_thrust(player *pl, bool on);
-void Emergency_shield(player *pl, bool on);
-void Phasing(player *pl, bool on);
+void Autopilot(player_t *pl, bool on);
+void Cloak(player_t *pl, bool on);
+void Deflector(player_t *pl, bool on);
+void Emergency_thrust(player_t *pl, bool on);
+void Emergency_shield(player_t *pl, bool on);
+void Phasing(player_t *pl, bool on);
 
 /*
  * Prototypes for option.c
@@ -923,32 +923,32 @@ void expandKeyword(const char *keyword);
 /*
  * Prototypes for laser.c
  */
-void Laser_pulse_hits_player(player *pl, pulseobject *pulse);
+void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse);
 
 /*
  * Prototypes for alliance.c
  */
-int Invite_player(player *pl, player *ally);
-int Cancel_invitation(player *pl);
-int Refuse_alliance(player *pl, player *ally);
-int Refuse_all_alliances(player *pl);
-int Accept_alliance(player *pl, player *ally);
-int Accept_all_alliances(player *pl);
+int Invite_player(player_t *pl, player_t *ally);
+int Cancel_invitation(player_t *pl);
+int Refuse_alliance(player_t *pl, player_t *ally);
+int Refuse_all_alliances(player_t *pl);
+int Accept_alliance(player_t *pl, player_t *ally);
+int Accept_all_alliances(player_t *pl);
 int Get_alliance_member_count(int id);
-void Player_join_alliance(player *pl, player *ally);
+void Player_join_alliance(player_t *pl, player_t *ally);
 void Dissolve_all_alliances(void);
-int Leave_alliance(player *pl);
-void Alliance_player_list(player *pl);
+int Leave_alliance(player_t *pl);
+void Alliance_player_list(player_t *pl);
 
 /*
  * Prototypes for object.c
  */
-object *Object_allocate(void);
+object_t *Object_allocate(void);
 void Object_free_ind(int ind);
-void Object_free_ptr(object *obj);
+void Object_free_ptr(object_t *obj);
 void Alloc_shots(int number);
 void Free_shots(void);
-const char *Object_typename(object *obj);
+const char *Object_typename(object_t *obj);
 
 /*
  * Prototypes for polygon.c
@@ -957,9 +957,9 @@ void P_edgestyle(const char *id, int width, int color, int style);
 void P_polystyle(const char *id, int color, int texture_id, int defedge_id,
 		 int flags);
 void P_bmpstyle(const char *id, const char *filename, int flags);
-void P_start_polygon(clpos pos, int style);
-void P_offset(clpos offset, int edgestyle);
-void P_vertex(clpos pos, int edgestyle);
+void P_start_polygon(clpos_t pos, int style);
+void P_offset(clpos_t offset, int edgestyle);
+void P_vertex(clpos_t pos, int edgestyle);
 void P_end_polygon(void);
 int P_start_ballarea(void);
 void P_end_ballarea(void);

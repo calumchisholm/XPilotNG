@@ -26,7 +26,7 @@
 char item_version[] = VERSION;
 
 
-static void Item_update_flags(player *pl)
+static void Item_update_flags(player_t *pl)
 {
     if (pl->item[ITEM_CLOAK] <= 0
 	&& BIT(pl->have, HAS_CLOAKING_DEVICE)) {
@@ -74,21 +74,22 @@ static void Item_update_flags(player *pl)
  * The `prob' parameter gives the chance that items are lost
  * and, if they are lost, what percentage.
  */
-void Item_damage(player *pl, double prob)
+void Item_damage(player_t *pl, double prob)
 {
-    if (prob < 1.0f) {
+    if (prob < 1.0) {
 	int		i;
 	double		loss;
 
 	loss = prob;
-	LIMIT(loss, 0.0f, 1.0f);
+	LIMIT(loss, 0.0, 1.0);
 
 	for (i = 0; i < NUM_ITEMS; i++) {
 	    if (!BIT(1U << i, ITEM_BIT_FUEL|ITEM_BIT_TANK)) {
 		if (pl->item[i]) {
 		    double f = rfrac();
+
 		    if (f < loss)
-			pl->item[i] = (int)(pl->item[i] * loss + 0.5f);
+			pl->item[i] = (int)(pl->item[i] * loss + 0.5);
 		}
 	    }
 	}
@@ -121,12 +122,12 @@ int Choose_random_item(void)
     return i;
 }
 
-void Place_item(player *pl, int item)
+void Place_item(player_t *pl, int item)
 {
-    int			num_lose, num_per_pack, place_count, dist;
-    long		grav, rand_item;
-    clpos		pos;
-    vector		vel;
+    int num_lose, num_per_pack, place_count, dist;
+    long grav, rand_item;
+    clpos_t pos;
+    vector_t vel;
     item_concentrator_t	*con;
     world_t *world = &World;
 
@@ -273,7 +274,7 @@ void Place_item(player *pl, int item)
 		vel.y += tsin(dir) * v;
 	    }
 	} else {
-	    vector gravity = World_gravity(world, pos);
+	    vector_t gravity = World_gravity(world, pos);
 
 	    vel.x -= options.gravity * gravity.x;
 	    vel.y -= options.gravity * gravity.y;
@@ -285,11 +286,11 @@ void Place_item(player *pl, int item)
     Make_item(pos, vel, item, num_per_pack, grav | rand_item);
 }
 
-void Make_item(clpos pos, vector vel,
+void Make_item(clpos_t pos, vector_t vel,
 	       int item, int num_per_pack,
 	       long status)
 {
-    object *obj;
+    object_t *obj;
     world_t *world = &World;
 
     if (!World_contains_clpos(world, pos))
@@ -321,7 +322,7 @@ void Make_item(clpos pos, vector vel,
     Cell_add_object(obj);
 }
 
-void Throw_items(player *pl)
+void Throw_items(player_t *pl)
 {
     int			num_items_to_throw, remain, item;
     world_t *world = &World;
@@ -350,11 +351,11 @@ void Throw_items(player *pl)
  * a random direction with a small life time (ie. magazine has
  * gone off).
  */
-void Detonate_items(player *pl)
+void Detonate_items(player_t *pl)
 {
-    player		*owner_pl;
-    int			i;
-    modifiers		mods;
+    player_t *owner_pl;
+    int i;
+    modifiers_t mods;
     world_t *world = &World;
 
     if (!BIT(pl->status, KILLED))
@@ -387,7 +388,7 @@ void Detonate_items(player *pl)
 	if (rfrac() < options.detonateItemOnKillProb) {
 	    int dir = (int)(rfrac() * RES);
 	    double speed = rfrac() * 4.0f;
-	    vector vel;
+	    vector_t vel;
 
 	    mods = pl->mods;
 	    if (BIT(mods.nuclear, NUCLEAR)
@@ -431,10 +432,10 @@ void Detonate_items(player *pl)
     }
 }
 
-void Tractor_beam(player *pl)
+void Tractor_beam(player_t *pl)
 {
-    double	maxdist, percent, cost;
-    player	*locked_pl = Player_by_id(pl->lock.pl_id);
+    double maxdist, percent, cost;
+    player_t *locked_pl = Player_by_id(pl->lock.pl_id);
 
     maxdist = TRACTOR_MAX_RANGE(pl->item[ITEM_TRACTOR_BEAM]);
     if (BIT(pl->lock.tagged, LOCK_PLAYER|LOCK_VISIBLE)
@@ -456,8 +457,8 @@ void Tractor_beam(player *pl)
 			 locked_pl, pl->tractor_is_pressor);
 }
 
-void General_tractor_beam(player *pl, clpos pos,
-			  int items, player *victim, bool pressor)
+void General_tractor_beam(player_t *pl, clpos_t pos,
+			  int items, player_t *victim, bool pressor)
 {
     double	maxdist = TRACTOR_MAX_RANGE(items),
 		maxforce = TRACTOR_MAX_FORCE(items),
@@ -490,11 +491,11 @@ void General_tractor_beam(player *pl, clpos pos,
 }
 
 
-void Do_deflector(player *pl)
+void Do_deflector(player_t *pl)
 {
     double	range = (pl->item[ITEM_DEFLECTOR] * 0.5 + 1) * BLOCK_CLICKS;
     double	maxforce = pl->item[ITEM_DEFLECTOR] * 0.2;
-    object	*obj, **obj_list;
+    object_t	*obj, **obj_list;
     int		i, obj_count;
     double	dx, dy, dist;
 
@@ -555,9 +556,9 @@ void Do_deflector(player *pl)
     }
 }
 
-void Do_transporter(player *pl)
+void Do_transporter(player_t *pl)
 {
-    player	*victim = NULL;
+    player_t	*victim = NULL;
     int		i;
     double	dist, closest = TRANSPORTER_DISTANCE * CLICK;
 
@@ -569,7 +570,8 @@ void Do_transporter(player *pl)
 
     /* find victim */
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
+
 	if (pl_i == pl
 	    || !Player_is_active(pl_i)
 	    || Team_immune(pl->id, pl_i->id)
@@ -596,7 +598,7 @@ void Do_transporter(player *pl)
     Do_general_transporter(pl, pl->pos, victim, NULL, NULL);
 }
 
-void Do_general_transporter(player *pl, clpos pos, player *victim,
+void Do_general_transporter(player_t *pl, clpos_t pos, player_t *victim,
 			    int *itemp, double *amountp)
 {
     char		msg[MSG_LEN];
@@ -846,7 +848,7 @@ void Do_general_transporter(player *pl, clpos pos, player *victim,
 /*
  * Returns true if warp status was achieved.
  */
-bool Initiate_hyperjump(player *pl)
+bool Initiate_hyperjump(player_t *pl)
 {
     if (pl->item[ITEM_HYPERJUMP] <= 0)
 	return false;
@@ -859,7 +861,7 @@ bool Initiate_hyperjump(player *pl)
     return true;
 }
 
-void do_lose_item(player *pl)
+void do_lose_item(player_t *pl)
 {
     int		item;
 
@@ -886,17 +888,17 @@ void do_lose_item(player *pl)
 }
 
 
-void Fire_general_ecm(player *pl, int team, clpos pos)
+void Fire_general_ecm(player_t *pl, int team, clpos_t pos)
 {
-    object		*shot;
-    mineobject		*closest_mine = NULL;
-    smartobject		*smart;
-    mineobject		*mine;
+    object_t		*shot;
+    mineobject_t	*closest_mine = NULL;
+    smartobject_t	*smart;
+    mineobject_t	*mine;
     world_t *world = &World;
     double		closest_mine_range = world->hypotenuse;
     int			i, j;
     double		range, perim, damage;
-    player		*p;
+    player_t		*p;
     ecm_t		*ecm;
 
     if (NumEcms >= MAX_TOTAL_ECMS)
@@ -936,7 +938,8 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 	 * team members if team immunity is on.
 	 */
 	if (shot->id != NO_ID) {
-	    player *owner_pl = Player_by_id(shot->id);
+	    player_t *owner_pl = Player_by_id(shot->id);
+
 	    if (pl == owner_pl) {
 		if (shot->type == OBJ_MINE) {
 		    if (BIT(shot->status, OWNERIMMUNE))
@@ -1106,10 +1109,10 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 		for (j = 0; j < NumObjs; j++) {
 		    shot = Obj[j];
 		    if (BIT(shot->type, OBJ_BALL)) {
-			ballobject *ball = BALL_PTR(shot);
+			ballobject_t *ball = BALL_PTR(shot);
+
 			if (ball->owner == p->id) {
-			    if ((int)(rfrac() * 100.0f)
-				< ((int)(20*range)+5))
+			    if ((int)(rfrac() * 100.0) < ((int)(20*range)+5))
 				Detach_ball(p, ball);
 			}
 		    }
@@ -1141,7 +1144,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
 		     */
 		    Robot_program(p, pl->lock.pl_id);
 		    for (j = 0; j < NumPlayers; j++) {
-			player *pl_j = Players(j);
+			player_t *pl_j = Players(j);
 			if (pl_j->conn != NULL) {
 			    Send_seek(pl_j->conn, pl->id,
 				      p->id, pl->lock.pl_id);
@@ -1153,7 +1156,7 @@ void Fire_general_ecm(player *pl, int team, clpos pos)
     }
 }
 
-void Fire_ecm(player *pl)
+void Fire_ecm(player_t *pl)
 {
     if (pl->item[ITEM_ECM] == 0
 	|| pl->fuel.sum <= -ED_ECM

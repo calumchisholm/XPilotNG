@@ -112,19 +112,19 @@ typedef int click_t;
 
 typedef struct {
     click_t		cx, cy;
-} clpos;
+} clpos_t;
 #endif
 
 typedef struct {
     click_t		cx, cy;
-} clvec;
+} clvec_t;
 
 /*
  * Return the block position this click position is in.
  */
-static inline blpos Clpos_to_blpos(clpos pos)
+static inline blkpos_t Clpos_to_blkpos(clpos_t pos)
 {
-    blpos bpos;
+    blkpos_t bpos;
 
     bpos.bx = CLICK_TO_BLOCK(pos.cx);
     bpos.by = CLICK_TO_BLOCK(pos.cy);
@@ -135,9 +135,9 @@ static inline blpos Clpos_to_blpos(clpos pos)
 #define BLOCK_CENTER(B) ((int)((B) * BLOCK_CLICKS) + BLOCK_CLICKS / 2)
 
 /* calculate the clpos of the center of a block */
-static inline clpos Block_get_center_clpos(blpos bpos)
+static inline clpos_t Block_get_center_clpos(blkpos_t bpos)
 {
-    clpos pos;
+    clpos_t pos;
 
     pos.cx = (bpos.bx * BLOCK_CLICKS) + BLOCK_CLICKS / 2;
     pos.cy = (bpos.by * BLOCK_CLICKS) + BLOCK_CLICKS / 2;

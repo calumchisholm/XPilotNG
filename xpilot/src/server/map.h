@@ -105,7 +105,7 @@
 
 
 typedef struct fuel {
-    clpos	pos;
+    clpos_t	pos;
     double	fuel;
     unsigned	conn_mask;
     long	last_change;
@@ -113,13 +113,13 @@ typedef struct fuel {
 } fuel_t;
 
 typedef struct grav {
-    clpos	pos;
+    clpos_t	pos;
     double	force;
     int		type;
 } grav_t;
 
 typedef struct base {
-    clpos	pos;
+    clpos_t	pos;
     int		dir;
     int		ind;
     int		team;
@@ -131,7 +131,7 @@ typedef struct baseorder {
 } baseorder_t;
 
 typedef struct cannon {
-    clpos	pos;
+    clpos_t	pos;
     int		dir;
     unsigned	conn_mask;
     long	last_change;
@@ -149,7 +149,7 @@ typedef struct cannon {
 } cannon_t;
 
 typedef struct check {
-    clpos	pos;
+    clpos_t	pos;
 } check_t;
 
 typedef struct item {
@@ -174,7 +174,7 @@ typedef struct asteroid {
 typedef enum { WORM_NORMAL, WORM_IN, WORM_OUT } wormType;
 
 typedef struct wormhole {
-    clpos	pos;
+    clpos_t	pos;
     int		lastdest;	/* last destination wormhole */
     double	countdown;	/* >0 warp to lastdest else random */
     bool	temporary;	/* wormhole was left by hyperjump */
@@ -185,7 +185,7 @@ typedef struct wormhole {
 } wormhole_t;
 
 typedef struct treasure {
-    clpos	pos;
+    clpos_t	pos;
     bool	have;		/* true if this treasure has ball in it */
     int		team;		/* team of this treasure */
     int 	destroyed;	/* how often this treasure destroyed */
@@ -193,7 +193,7 @@ typedef struct treasure {
 } treasure_t;
 
 typedef struct target {
-    clpos	pos;
+    clpos_t	pos;
     int		team;
     double	dead_time;
     double	damage;
@@ -217,15 +217,15 @@ typedef struct team {
 } team_t;
 
 typedef struct item_concentrator {
-    clpos	pos;
+    clpos_t	pos;
 } item_concentrator_t;
 
 typedef struct asteroid_concentrator {
-    clpos	pos;
+    clpos_t	pos;
 } asteroid_concentrator_t;
 
 typedef struct friction_area {
-    clpos	pos;
+    clpos_t	pos;
     double	friction_setting;	/* Setting from map */
     double	friction;		/* Changes with gameSpeed */
     int		group;
@@ -246,7 +246,7 @@ typedef struct {
 
     u_byte	**block;	/* type of item in each block */
 
-    vector	**gravity;
+    vector_t	**gravity;
 
     item_t	items[NUM_ITEMS];
 
@@ -282,21 +282,21 @@ typedef struct {
 
 extern world_t		World;
 
-static inline void World_set_block(world_t *world, blpos blk, int type)
+static inline void World_set_block(world_t *world, blkpos_t blk, int type)
 {
     assert (! (blk.bx < 0 || blk.bx >= world->x
 	       || blk.by < 0 || blk.by >= world->y));
     world->block[blk.bx][blk.by] = type;
 }
 
-static inline int World_get_block(world_t *world, blpos blk)
+static inline int World_get_block(world_t *world, blkpos_t blk)
 {
     assert (! (blk.bx < 0 || blk.bx >= world->x
 	       || blk.by < 0 || blk.by >= world->y));
     return world->block[blk.bx][blk.by];
 }
 
-static inline bool World_contains_clpos(world_t *world, clpos pos)
+static inline bool World_contains_clpos(world_t *world, clpos_t pos)
 {
     if (pos.cx < 0 || pos.cx >= world->cwidth)
 	return false;
@@ -305,9 +305,9 @@ static inline bool World_contains_clpos(world_t *world, clpos pos)
     return true;
 }
 
-static inline clpos World_get_random_clpos(world_t *world)
+static inline clpos_t World_get_random_clpos(world_t *world)
 {
-    clpos pos;
+    clpos_t pos;
 
     pos.cx = (int)(rfrac() * world->cwidth);
     pos.cy = (int)(rfrac() * world->cheight);
@@ -335,7 +335,7 @@ static inline int World_wrap_yclick(world_t *world, int cy)
     return cy;
 }
 
-static inline clpos World_wrap_clpos(world_t *world, clpos pos)
+static inline clpos_t World_wrap_clpos(world_t *world, clpos_t pos)
 {
     pos.cx = World_wrap_xclick(world, pos.cx);
     pos.cy = World_wrap_yclick(world, pos.cy);

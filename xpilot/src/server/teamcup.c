@@ -340,7 +340,7 @@ void teamcup_round_end(int winning_team)
     int team_players[MAX_TEAMS];
     double best_score = (double)(-100000); /* hack */
     int best;
-    player *pl;
+    player_t *pl;
     double double_max;
 
     if (!options.teamcup)

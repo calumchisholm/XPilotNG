@@ -156,7 +156,7 @@ static void Radar_paint_world_blocks(GLWidget *radar, SDL_Surface *s)
 
 }
 
-static void Compute_bounds(ipos *min, ipos *max, const irec *b)
+static void Compute_bounds(ipos_t *min, ipos_t *max, const irec_t *b)
 {
     min->x = (0 - (b->x + b->w)) / Setup->width;
     if (0 > b->x + b->w) min->x++;
@@ -175,7 +175,7 @@ static void Compute_bounds(ipos *min, ipos *max, const irec *b)
 static void Radar_paint_world_polygons(GLWidget *radar, SDL_Surface *s)
 {
     int i, j, xoff, yoff;
-    ipos min, max;
+    ipos_t min, max;
     Sint16 vx[MAX_VERTICES], vy[MAX_VERTICES];
     color_t color;
 
@@ -285,7 +285,7 @@ static void Radar_paint_checkpoint(GLWidget *radar)
 	    x = x * BLOCK_SZ + BLOCK_SZ/2;
 	    y = y * BLOCK_SZ + BLOCK_SZ/2;
 	} else {
-	    irec b = checks[nextCheckPoint].bounds;
+	    irec_t b = checks[nextCheckPoint].bounds;
 	    x = b.x + b.w/2;
 	    y = b.y + b.h/2;
 	}

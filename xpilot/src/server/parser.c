@@ -253,8 +253,8 @@ int Parser_list_option(int *ind, char *buf)
 	break;
     case valIPos:
 	sprintf(buf, "%s:%d,%d", opts[i].name,
-		((ipos *)opts[i].variable)->x,
-		((ipos *)opts[i].variable)->y);
+		((ipos_t *)opts[i].variable)->x,
+		((ipos_t *)opts[i].variable)->y);
 	break;
     case valString:
 	sprintf(buf, "%s:%s", opts[i].name, *(char **)opts[i].variable);
@@ -532,8 +532,8 @@ int Get_option_value(const char *name, char *value, size_t size)
 	break;
     case valIPos:
 	sprintf(value, "%d, %d",
-		((ipos *)opt->variable)->x,
-		((ipos *)opt->variable)->y);
+		((ipos_t *)opt->variable)->x,
+		((ipos_t *)opt->variable)->y);
     default:
 	return -1;	/* Generic error. */
     }

@@ -132,10 +132,10 @@ void Image_paint(int ind, int x, int y, int frame, int c)
 }
 
 
-void Image_paint_area(int ind, int x, int y, int frame, irec *r, int c)
+void Image_paint_area(int ind, int x, int y, int frame, irec_t *r, int c)
 {
     image_t *img;
-    irec    whole;
+    irec_t    whole;
     float   tx1, ty1, tx2, ty2;
 
     img = Image_get(ind);
@@ -232,7 +232,7 @@ void Images_cleanup(void)
 }
 
 
-int Bitmap_add(char *filename, int count, bool scalable)
+int Bitmap_add(const char *filename, int count, bool scalable)
 {
     image_t img;
 

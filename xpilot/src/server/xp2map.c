@@ -157,7 +157,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Polygon")) {
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 	int style = -1;
 
 	while (*attr) {
@@ -174,7 +174,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Check")) {
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
@@ -189,7 +189,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Fuel")) {
 	int team = TEAM_NOT_SET;
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -206,7 +206,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Base")) {
 	int team = TEAM_NOT_SET, dir = DIR_UP;
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -229,7 +229,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Ball")) {
 	int team = TEAM_NOT_SET;
-	 clpos pos = DEFAULT_POS;
+	 clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -246,7 +246,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Cannon")) {
 	int team = TEAM_NOT_SET, dir = DIR_UP, cannon_ind;
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -266,7 +266,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Target")) {
 	int team = TEAM_NOT_SET, target_ind;
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -283,7 +283,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "ItemConcentrator")) {
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
@@ -297,7 +297,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "AsteroidConcentrator")) {
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))
@@ -311,7 +311,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Grav")) {
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 	double force = 0.0;
 	int type = SPACE;
 
@@ -354,7 +354,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Wormhole")) {
-	clpos pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
 	wormType type = WORM_NORMAL;
 	int wh_ind;
 
@@ -384,7 +384,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     if (!strcasecmp(el, "FrictionArea")) {
 	double fric = 0.0;
 	int area_ind;
-	clpos pos = { 0, 0 }; /* unused place holder */
+	clpos_t pos = { 0, 0 }; /* unused place holder */
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "friction"))
@@ -410,7 +410,7 @@ static void tagstart(void *data, const char *el, const char **attr)
     }
 
     if (!strcasecmp(el, "Offset")) {
-	clpos offset = DEFAULT_POS;
+	clpos_t offset = DEFAULT_POS;
 	int edgestyle = -1;
 	while (*attr) {
 	    if (!strcasecmp(*attr, "x"))

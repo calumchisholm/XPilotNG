@@ -39,9 +39,9 @@ typedef unsigned short shuffle_t;
  *	(world.cx >= realWorld.cx && world.cy >= realWorld.cy)
  */
 typedef struct {
-    clpos	world;			/* Lower left hand corner is this */
+    clpos_t	world;			/* Lower left hand corner is this */
 					/* world coordinate */
-    clpos	realWorld;		/* If the player is on the edge of
+    clpos_t	realWorld;		/* If the player is on the edge of
 					   the screen, these are the world
 					   coordinates before adjustment... */
 } click_visibility_t;
@@ -118,9 +118,9 @@ static unsigned		fastshot_num[DEBRIS_TYPES * 2],
  * which means that the center of a block has to be visible to be
  * in view.
  */
-static inline bool clpos_inview(click_visibility_t *v, clpos pos)
+static inline bool clpos_inview(click_visibility_t *v, clpos_t pos)
 {
-    clpos wpos = v->world, rwpos = v->realWorld;
+    clpos_t wpos = v->world, rwpos = v->realWorld;
 
     if (!((pos.cx > wpos.cx && pos.cx < wpos.cx + view_cwidth)
 	  || (pos.cx > rwpos.cx && pos.cx < rwpos.cx + view_cwidth)))
@@ -225,7 +225,7 @@ static void Frame_radar_buffer_reset(void)
     num_radar = 0;
 }
 
-static void Frame_radar_buffer_add(clpos pos, int s)
+static void Frame_radar_buffer_add(clpos_t pos, int s)
 {
     radar_t		*p;
 
@@ -346,7 +346,7 @@ static int num2str(int num, char *str, int i)
     return i + digits;
 }
 
-static int Frame_status(connection_t *conn, player *pl)
+static int Frame_status(connection_t *conn, player_t *pl)
 {
     world_t *world = &World;
     static char		mods[MAX_CHARS];
@@ -370,7 +370,7 @@ static int Frame_status(connection_t *conn, player *pl)
 
     CLR_BIT(pl->lock.tagged, LOCK_VISIBLE);
     if (BIT(pl->lock.tagged, LOCK_PLAYER) && BIT(pl->used, HAS_COMPASS)) {
-	player *lock_pl = Player_by_id(pl->lock.pl_id);
+	player_t *lock_pl = Player_by_id(pl->lock.pl_id);
 
 	lock_id = pl->lock.pl_id;
 	lock_ind = GetInd(lock_id);
@@ -472,7 +472,7 @@ static int Frame_status(connection_t *conn, player *pl)
     return 1;
 }
 
-static void Frame_map(connection_t *conn, player *pl)
+static void Frame_map(connection_t *conn, player_t *pl)
 {
     int			i,
 			k,
@@ -647,15 +647,15 @@ static void Frame_shuffle(void)
     }
 }
 
-static void Frame_shots(connection_t *conn, player *pl)
+static void Frame_shots(connection_t *conn, player_t *pl)
 {
-    clpos			pos;
+    clpos_t			pos;
     int				ldir = 0;
     int				i, k, color;
     int				fuzz = 0, teamshot, len;
     int				obj_count;
-    object			*shot;
-    object			**obj_list;
+    object_t			*shot;
+    object_t			**obj_list;
     int				hori_blocks, vert_blocks;
     world_t *world = &World;
 
@@ -674,7 +674,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 	    if (!clpos_inview(&cv, shot->pos))
 		continue;
 	} else {
-	    pulseobject *pulse = PULSE_PTR(shot);
+	    pulseobject_t *pulse = PULSE_PTR(shot);
 
 	    /* check if either end of laser pulse is in view */
 	    if (clpos_inview(&cv, pos))
@@ -739,14 +739,14 @@ static void Frame_shots(connection_t *conn, player *pl)
 
 	case OBJ_WRECKAGE:
 	    if (spark_rand != 0 || options.wreckageCollisionMayKill) {
-		wireobject *wreck = WIRE_PTR(shot);
+		wireobject_t *wreck = WIRE_PTR(shot);
 		Send_wreckage(conn, pos, (u_byte)wreck->info,
 			      wreck->size, wreck->rotation);
 	    }
 	    break;
 
 	case OBJ_ASTEROID: {
-		wireobject *ast = WIRE_PTR(shot);
+		wireobject_t *ast = WIRE_PTR(shot);
 		Send_asteroid(conn, pos,
 			      (u_byte)ast->info, ast->size, ast->rotation);
 	    }
@@ -798,7 +798,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 		int id = 0;
 		int laid_by_team = 0;
 		int confused = 0;
-		mineobject *mine = MINE_PTR(shot);
+		mineobject_t *mine = MINE_PTR(shot);
 
 		/* calculate whether ownership of mine can be determined */
 		if (options.identifyMines
@@ -841,7 +841,7 @@ static void Frame_shots(connection_t *conn, player *pl)
 
 	case OBJ_PULSE:
 	    {
-		pulseobject *pulse = PULSE_PTR(shot);
+		pulseobject_t *pulse = PULSE_PTR(shot);
 
 		if (Team_immune(pulse->id, pl->id))
 		    color = BLUE;
@@ -859,7 +859,7 @@ static void Frame_shots(connection_t *conn, player *pl)
     }
 }
 
-static void Frame_ships(connection_t *conn, player *pl)
+static void Frame_ships(connection_t *conn, player_t *pl)
 {
     int i, k;
     world_t *world = &World;
@@ -869,24 +869,28 @@ static void Frame_ships(connection_t *conn, player *pl)
 
 	Send_ecm(conn, ecm->pos, (int)ecm->size);
     }
+
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
-	player 	*victim = trans->victim,
-		*tpl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
-	clpos	pos = (tpl ? tpl->pos : trans->pos);
+	player_t *victim = trans->victim,
+	    *tpl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
+	clpos_t	pos = (tpl ? tpl->pos : trans->pos);
 
 	Send_trans(conn, victim->pos, pos);
     }
+
     for (i = 0; i < world->NumCannons; i++) {
 	cannon_t *cannon = Cannons(world, i);
+
 	if (cannon->tractor_count > 0) {
-	    player *t = cannon->tractor_target_pl;
+	    player_t *t = cannon->tractor_target_pl;
 
 	    if (clpos_inview(&cv, t->pos)) {
 		int j;
 
 		for (j = 0; j < 3; j++) {
-		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir), pos;
+		    clpos_t pts = Ship_get_point_clpos(t->ship, j, t->dir);
+		    clpos_t pos;
 
 		    pos.cx = t->pos.cx + pts.cx;
 		    pos.cy = t->pos.cy + pts.cy;
@@ -897,7 +901,7 @@ static void Frame_ships(connection_t *conn, player *pl)
     }
 
     for (k = 0; k < num_player_shuffle; k++) {
-	player *pl_i;
+	player_t *pl_i;
 
 	i = player_shuffle_ptr[k];
 	pl_i = Players(i);
@@ -952,12 +956,12 @@ static void Frame_ships(connection_t *conn, player *pl)
 	}
 
 	if (BIT(pl_i->used, HAS_TRACTOR_BEAM)) {
-	    player *t = Player_by_id(pl_i->lock.pl_id);
+	    player_t *t = Player_by_id(pl_i->lock.pl_id);
 	    if (clpos_inview(&cv, t->pos)) {
 		int j;
 
 		for (j = 0; j < 3; j++) {
-		    clpos pts = Ship_get_point_clpos(t->ship, j, t->dir), pos;
+		    clpos_t pts = Ship_get_point_clpos(t->ship, j, t->dir), pos;
 
 		    pos.cx = t->pos.cx + pts.cx;
 		    pos.cy = t->pos.cy + pts.cy;
@@ -973,11 +977,11 @@ static void Frame_ships(connection_t *conn, player *pl)
     }
 }
 
-static void Frame_radar(connection_t *conn, player *pl)
+static void Frame_radar(connection_t *conn, player_t *pl)
 {
-    int			i, k, mask, shownuke, size;
-    object		*shot;
-    clpos		pos;
+    int i, k, mask, shownuke, size;
+    object_t *shot;
+    clpos_t pos;
     world_t *world = &World;
 
     Frame_radar_buffer_reset();
@@ -1037,7 +1041,7 @@ static void Frame_radar(connection_t *conn, player *pl)
 	|| NumPseudoPlayers > 0
 	|| NumAlliances > 0) {
 	for (k = 0; k < num_player_shuffle; k++) {
-	    player *pl_i;
+	    player_t *pl_i;
 	    i = player_shuffle_ptr[k];
 	    pl_i = Players(i);
 	    /*
@@ -1078,7 +1082,7 @@ static void Frame_radar(connection_t *conn, player *pl)
     Frame_radar_buffer_send(conn);
 }
 
-static void Frame_lose_item_state(player *pl)
+static void Frame_lose_item_state(player_t *pl)
 {
     if (pl->lose_item_state != 0) {
 	Send_loseitem(pl->conn, pl->lose_item);
@@ -1089,7 +1093,7 @@ static void Frame_lose_item_state(player *pl)
     }
 }
 
-static void Frame_parameters(connection_t *conn, player *pl)
+static void Frame_parameters(connection_t *conn, player_t *pl)
 {
     world_t *world = &World;
 
@@ -1120,7 +1124,7 @@ void Frame_update(void)
 {
     int			i, ind, player_fps;
     connection_t        *conn;
-    player		*pl, *pl2;
+    player_t		*pl, *pl2;
     time_t		newTimeLeft = 0;
     static time_t	oldTimeLeft;
     static bool		game_over_called = false;
@@ -1234,7 +1238,7 @@ void Frame_update(void)
 
 void Set_message(const char *message)
 {
-    player		*pl;
+    player_t		*pl;
     int			i;
     const char		*msg;
     char		tmp[MSG_LEN];
@@ -1261,7 +1265,7 @@ void Set_message(const char *message)
     }
 }
 
-void Set_player_message(player *pl, const char *message)
+void Set_player_message(player_t *pl, const char *message)
 {
     int			i;
     const char		*msg;

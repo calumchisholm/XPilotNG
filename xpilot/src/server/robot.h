@@ -88,14 +88,14 @@
 typedef struct {
     const char		*name;
     void		(*round_tick)(void);
-    void		(*create)(player *robot, char *str);
-    void		(*go_home)(player *robot);
-    void		(*play)(player *robot);
-    void		(*set_war)(player *victim, int killer);
-    int			(*war_on_player)(player *robot);
-    void		(*message)(player *robot, const char *str);
-    void		(*destroy)(player *robot);
-    void		(*invite)(player *robot, player *inviter);
+    void		(*create)(player_t *robot, char *str);
+    void		(*go_home)(player_t *robot);
+    void		(*play)(player_t *robot);
+    void		(*set_war)(player_t *victim, int killer);
+    int			(*war_on_player)(player_t *robot);
+    void		(*message)(player_t *robot, const char *str);
+    void		(*destroy)(player_t *robot);
+    void		(*invite)(player_t *robot, player_t *inviter);
 } robot_type_t;
 
 /*
@@ -150,7 +150,7 @@ typedef struct robot_default_data {
     int		last_thrown_ball;	/* relative to robot_count */
     int		longterm_mode;		/* long term robot mode */
     int		lock_last_seen;		/* last time robot saw target */
-    position	lock_last_pos;		/* last known position of target */
+    position_t	lock_last_pos;		/* last known position of target */
 } robot_default_data_t;
 
 #endif

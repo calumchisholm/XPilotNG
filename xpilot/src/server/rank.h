@@ -27,7 +27,7 @@ struct oldScoreNode {
     uint16_t bestball;
 
     char  futureextensions[6];
-    struct player *pl;
+    struct player_t *pl;
 };
 
 
@@ -68,31 +68,31 @@ typedef struct RankEntry {
 typedef struct RankInfo {
     struct RankEntry entry;
     double score;
-    struct player *pl;
+    struct player_t *pl;
 } RankInfo;
 
 
 #define Rank_SetLogoutMessage(rank,msg) \
 	do { strcpy((rank)->entry.logout, (msg)); } while(0)
 
-void Rank_get_stats(player *pl, char *buf);
+void Rank_get_stats(player_t *pl, char *buf);
 RankInfo *Rank_get_by_name(char *name);
 void Rank_nuke_score(RankInfo *rank);
 void Rank_init_saved_scores(void);
-void Rank_get_saved_score(player *pl);
+void Rank_get_saved_score(player_t *pl);
 void Rank_save_data(void);
 void Rank_web_scores(void);
-void Rank_save_score(const player *pl);
+void Rank_save_score(const player_t *pl);
 void Rank_show_standings(void);
-void Rank_kill(player *pl);
-void Rank_lost_ball(player *pl);
-void Rank_cashed_ball(player *pl);
-void Rank_won_ball(player *pl);
-void Rank_saved_ball(player *pl);
-void Rank_death(player *pl);
-void Rank_add_score(player *pl, double points);
-void Rank_set_score(player *pl, double points);
-void Rank_fire_shot(player *pl);
+void Rank_kill(player_t *pl);
+void Rank_lost_ball(player_t *pl);
+void Rank_cashed_ball(player_t *pl);
+void Rank_won_ball(player_t *pl);
+void Rank_saved_ball(player_t *pl);
+void Rank_death(player_t *pl);
+void Rank_add_score(player_t *pl, double points);
+void Rank_set_score(player_t *pl, double points);
+void Rank_fire_shot(player_t *pl);
 void Rank_write_score_file(void);
 void Rank_write_webpage(void);
 void Rank_show_ranks(void);

@@ -84,7 +84,7 @@ static void Paint_background_dots(void)
 {
     double dx, dy;
     int xi, yi;
-    ipos min, max, count;
+    ipos_t min, max, count;
 
     if (map_point_distance == 0)
 	return;
@@ -116,7 +116,7 @@ static void Paint_background_dots(void)
 
 
 
-static void Compute_bounds(ipos *min, ipos *max, const irec *b)
+static void Compute_bounds(ipos_t *min, ipos_t *max, const irec_t *b)
 {
     if (BIT(Setup->mode, WRAP_PLAY)) {
 	min->x = (world.x - (b->x + b->w)) / Setup->width;
@@ -127,16 +127,15 @@ static void Compute_bounds(ipos *min, ipos *max, const irec *b)
 	if (world.y > b->y + b->h) min->y++;
 	max->y = (world.y + ext_view_height - b->y) / Setup->height;
 	if (world.y + ext_view_height < b->y) max->y--;
-    } else {
+    } else
 	min->x = min->y = max->x = max->y = 0;
-    }
 }
 
 
 void Paint_objects(void)
 {
     int i, xoff, yoff;
-    ipos min, max;
+    ipos_t min, max;
 
     for (i = 0; i < num_polygons; i++) {
 

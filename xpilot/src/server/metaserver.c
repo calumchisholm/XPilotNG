@@ -156,8 +156,10 @@ void Meta_update(int change)
     /* Find out the number of active players. */
     num_active_players = 0;
     memset(active_per_team, 0, sizeof active_per_team);
+
     for (i = 0; i < NumPlayers; i++) {
-	player *pl = Players(i);
+	player_t *pl = Players(i);
+
 	if (Player_is_human(pl) && !BIT(pl->status, PAUSE)) {
 	    num_active_players++;
 	    if (BIT(world->rules->mode, TEAM_PLAY))
@@ -224,7 +226,7 @@ void Meta_update(int change)
     len = strlen(string);
 
     for (i = 0; i < NumPlayers; i++) {
-	player *pl_i = Players(i);
+	player_t *pl_i = Players(i);
 
 	if (Player_is_human(pl_i) && !BIT(pl_i->status, PAUSE)) {
 	    if ((len + (4 * MAX_CHARS)) < sizeof(string)) {

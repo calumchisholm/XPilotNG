@@ -70,17 +70,17 @@ typedef struct {
     int			treasure_crashes;
     int			wormhole_warps;
     int			phased;
-    object		*obj;
-    player		*pl;
+    object_t		*obj;
+    player_t		*pl;
 } move_info_t;
 
 typedef struct {
     const move_info_t	*mip;
     move_crash_t	crash;
-    clpos		pos;
-    vector		vel;
-    clvec		todo;
-    clvec		done;
+    clpos_t		pos;
+    vector_t		vel;
+    clvec_t		todo;
+    clvec_t		done;
     int			dir;
     int			cannon;
     int			wormhole;
@@ -127,7 +127,7 @@ typedef struct {
     int style;
     int group;
     int edges;
-    clpos pos;
+    clpos_t pos;
     int num_points;
     int estyles_start;
     int num_echanges;
@@ -137,10 +137,10 @@ typedef struct {
 typedef uint32_t hitmask_t;
 
 typedef struct move {
-    clvec start;
-    clvec delta;
+    clvec_t start;
+    clvec_t delta;
     hitmask_t hitmask;
-    object *obj;
+    object_t *obj;
 } move_t;
 
 typedef struct group group_t;

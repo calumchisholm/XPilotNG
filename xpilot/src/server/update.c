@@ -33,12 +33,12 @@ static bool do_update_this_frame = false; /* less frequent update this frame */
 
 static char msg[MSG_LEN];
 
-static inline void update_object_speed(object *obj)
+static inline void update_object_speed(object_t *obj)
 {
     world_t *world = &World;
 
     if (BIT(obj->status, GRAVITY)) {
-	vector gravity = World_gravity(world, obj->pos);
+	vector_t gravity = World_gravity(world, obj->pos);
 
 	obj->vel.x += (obj->acc.x + gravity.x) * timeStep;
 	obj->vel.y += (obj->acc.y + gravity.y) * timeStep;
@@ -48,7 +48,7 @@ static inline void update_object_speed(object *obj)
     }
 }
 
-static void Transport_to_home(player *pl)
+static void Transport_to_home(player_t *pl)
 {
     /*
      * Transport a corpse from the place where it died back to its homebase,
@@ -58,7 +58,7 @@ static void Transport_to_home(player *pl)
      * acceleration G, during the second part we make this a negative one -G.
      * This results in a visually pleasing take off and landing.
      */
-    clpos		startpos;
+    clpos_t		startpos;
     double		dx, dy, t, m;
     const int		T = RECOVERY_DELAY;
     world_t *world = &World;
@@ -96,7 +96,7 @@ static void Transport_to_home(player *pl)
 /*
  * Turn phasing on or off.
  */
-void Phasing(player *pl, bool on)
+void Phasing(player_t *pl, bool on)
 {
     if (on) {
 	if (pl->phasing_left <= 0) {
@@ -134,7 +134,7 @@ void Phasing(player *pl, bool on)
 /*
  * Turn cloak on or off.
  */
-void Cloak(player *pl, bool on)
+void Cloak(player_t *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
@@ -174,7 +174,7 @@ void Cloak(player *pl, bool on)
 /*
  * Turn deflector on or off.
  */
-void Deflector(player *pl, bool on)
+void Deflector(player_t *pl, bool on)
 {
     if (on) {
 	if (!BIT(pl->used, HAS_DEFLECTOR) && pl->item[ITEM_DEFLECTOR] > 0) {
@@ -197,7 +197,7 @@ void Deflector(player *pl, bool on)
 /*
  * Turn emergency thrust on or off.
  */
-void Emergency_thrust(player *pl, bool on)
+void Emergency_thrust(player_t *pl, bool on)
 {
     if (on) {
 	if (pl->emergency_thrust_left <= 0) {
@@ -223,7 +223,7 @@ void Emergency_thrust(player *pl, bool on)
 /*
  * Turn emergency shield on or off.
  */
-void Emergency_shield (player *pl, bool on)
+void Emergency_shield (player_t *pl, bool on)
 {
     if (on) {
 	if (BIT(pl->have, HAS_EMERGENCY_SHIELD)) {
@@ -260,7 +260,7 @@ void Emergency_shield (player *pl, bool on)
  * automatic pilot mode any changes to the current power, turnacc, turnspeed
  * and turnresistance settings will be temporary.
  */
-void Autopilot(player *pl, bool on)
+void Autopilot(player_t *pl, bool on)
 {
     CLR_BIT(pl->status, THRUSTING);
     if (on) {
@@ -288,12 +288,12 @@ void Autopilot(player *pl, bool on)
  * cause the ship to come to a rest within a short period of time.
  * This code is fairly self contained.
  */
-static void do_Autopilot (player *pl)
+static void do_Autopilot (player_t *pl)
 {
     int		vad;	/* Velocity Away Delta */
     int		dir;
     int		afterburners;
-    vector	gravity;
+    vector_t	gravity;
     double	acc, vel;
     double	delta;
     double	turnspeed, power;
@@ -474,7 +474,7 @@ static void Fuel_update(void)
 static void Misc_object_update(void)
 {
     int i;
-    object *obj;
+    object_t *obj;
 
     for (i = 0; i < NumObjs; i++) {
 	obj = Obj[i];
@@ -492,14 +492,14 @@ static void Misc_object_update(void)
 	    Update_connector_force(BALL_PTR(obj));
 
 	else if (BIT(obj->type, OBJ_WRECKAGE)) {
-	    wireobject *wireobj = WIRE_PTR(obj);
+	    wireobject_t *wireobj = WIRE_PTR(obj);
 	    wireobj->rotation =
 		(wireobj->rotation
 		 + (int) (wireobj->turnspeed * timeStep * RES)) % RES;
 	}
 
 	else if (BIT(obj->type, OBJ_PULSE)) {
-	    pulseobject *pulse = PULSE_PTR(obj);
+	    pulseobject_t *pulse = PULSE_PTR(obj);
 	    pulse->len += options.pulseSpeed * timeStep;
 	    if (pulse->len > options.pulseLength)
 		pulse->len = options.pulseLength;
@@ -585,7 +585,7 @@ static void Transporter_update(void)
 static void Players_turn(void)
 {
     int i;
-    player *pl;
+    player_t *pl;
     double new_float_dir;
 
     for (i = 0; i < NumPlayers; i++) {
@@ -626,7 +626,7 @@ static void Players_turn(void)
     }
 }
 
-static void Use_items(player *pl)
+static void Use_items(player_t *pl)
 {
     if (pl->shield_time > 0) {
 	if ((pl->shield_time -= timeStep) <= 0) {
@@ -696,7 +696,7 @@ static void Use_items(player *pl)
 /*
  * Player is refueling.
  */
-static void Do_refuel(player *pl)
+static void Do_refuel(player_t *pl)
 {
     world_t *world = &World;
     fuel_t *fs = Fuels(world, pl->fs);
@@ -740,7 +740,7 @@ static void Do_refuel(player *pl)
 /*
  * Player is repairing a target.
  */
-static void Do_repair(player *pl)
+static void Do_repair(player_t *pl)
 {
     world_t *world = &World;
     target_t *targ = Targets(world, pl->repair_target);
@@ -781,7 +781,7 @@ static void Do_repair(player *pl)
 /*
  * Warp balls connected to warped player.
  */
-static void Warp_balls(player *pl, clpos dest)
+static void Warp_balls(player_t *pl, clpos_t dest)
 {
     world_t *world = &World;
 
@@ -799,9 +799,9 @@ static void Warp_balls(player *pl, clpos dest)
 	 */
 	int k;
 	for (k = 0; k < NumObjs; k++) {
-	    object *b = Obj[k];
+	    object_t *b = Obj[k];
 	    if (BIT(b->type, OBJ_BALL) && b->id == pl->id) {
-		clpos ballpos;
+		clpos_t ballpos;
 		hitmask_t hitmask = BALL_BIT|HITMASK(pl->team);
 
 		ballpos.cx = b->pos.cx + dest.cx - pl->pos.cx;
@@ -809,7 +809,7 @@ static void Warp_balls(player *pl, clpos dest)
 		ballpos = World_wrap_clpos(world, ballpos);
 		if (!World_contains_clpos(world, ballpos)
 		    || (shape_is_inside(ballpos.cx, ballpos.cy, hitmask,
-					(object *)b, &ball_wire, 0)
+					(object_t *)b, &ball_wire, 0)
 			!= NO_GROUP)) {
 		    b->life = 0.0;
 		    continue;
@@ -825,7 +825,7 @@ static void Warp_balls(player *pl, clpos dest)
 }
 
 
-static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player *pl)
+static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player_t *pl)
 {
     int wh_dest, wcx, wcy, nearestFront, nearestRear;
     double proximity, proxFront, proxRear;
@@ -892,9 +892,9 @@ static int Find_wormhole_dest(world_t *world, wormhole_t *wh_hit, player *pl)
 /*
  * Move player trough wormhole.
  */
-static void Traverse_wormhole(player *pl)
+static void Traverse_wormhole(player_t *pl)
 {
-    clpos dest;
+    clpos_t dest;
     int wh_dest;
     world_t *world = &World;
     wormhole_t *wh_hit = Wormholes(world, pl->wormHoleHit);
@@ -934,9 +934,9 @@ static void Traverse_wormhole(player *pl)
 /*
  * Player has used hyperjump item.
  */
-static void Hyperjump(player *pl)
+static void Hyperjump(player_t *pl)
 {
-    clpos dest;
+    clpos_t dest;
     world_t *world = &World;
     int counter;
     hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
@@ -945,7 +945,7 @@ static void Hyperjump(player *pl)
     for (counter = 20; counter > 0; counter--) {
 	dest = World_get_random_clpos(world);
 	if (shape_is_inside(dest.cx, dest.cy, hitmask,
-			    (object *)pl, (shape_t *)pl->ship,
+			    (object_t *)pl, (shape_t *)pl->ship,
 			    pl->dir)
 	    == NO_GROUP)
 	    break;
@@ -979,12 +979,12 @@ static void Hyperjump(player *pl)
 
 /* kps - UPDATE_RATE should depend on gamespeed */
 #define UPDATE_RATE 100
-static inline void Update_visibility(player *pl, int ind)
+static inline void Update_visibility(player_t *pl, int ind)
 {
     int j;
 
     for (j = 0; j < NumPlayers; j++) {
-	player *pl_j = Players(j);
+	player_t *pl_j = Players(j);
 
 	if (pl->forceVisible > 0)
 	    pl_j->visibility[ind].canSee = 1;
@@ -1015,7 +1015,7 @@ static inline void Update_visibility(player *pl, int ind)
 static void Update_players(void)
 {
     int i;
-    player *pl;
+    player_t *pl;
 
     for (i = 0; i < NumPlayers; i++) {
 	pl = Players(i);
@@ -1190,7 +1190,7 @@ static void Update_players(void)
 void Update_objects(void)
 {
     int i;
-    player *pl;
+    player_t *pl;
     world_t *world = &World;
 
     /*
@@ -1286,7 +1286,7 @@ void Update_objects(void)
 	    Tractor_beam(pl);
 
 	if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
-	    player *lpl = Player_by_id(pl->lock.pl_id);
+	    player_t *lpl = Player_by_id(pl->lock.pl_id);
 
 	    pl->lock.distance =
 		Wrap_length(pl->pos.cx - lpl->pos.cx,

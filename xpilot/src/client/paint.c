@@ -28,8 +28,8 @@ char paint_version[] = VERSION;
 /*
  * Globals.
  */
-ipos	world;
-ipos	realWorld;
+ipos_t	world;
+ipos_t	realWorld;
 
 bool	gotFocus;
 bool	players_exposed;

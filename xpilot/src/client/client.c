@@ -41,8 +41,8 @@ unsigned RadarHeight = 0;
 unsigned RadarWidth = 256;	/* radar width at the server */ 
 
 int     oldServer;
-ipos	selfPos;
-ipos	selfVel;
+ipos_t	selfPos;
+ipos_t	selfVel;
 short	heading;
 short	nextCheckPoint;
 
@@ -898,7 +898,7 @@ static int init_polymap(void)
     int dx, dy, cx, cy, pc;
     int *styles;
     xp_polygon_t *poly;
-    ipos *points, min, max;
+    ipos_t *points, min, max;
     char *ptr, *edgeptr;
 
     oldServer = 0;
@@ -927,7 +927,7 @@ static int init_polymap(void)
 	    edgechange = INT_MAX;
 	ptr += ecount * 2;
 	pc = get_ushort(&ptr);
-	if ((points = malloc(pc * sizeof(ipos))) == NULL) {
+	if ((points = malloc(pc * sizeof(ipos_t))) == NULL) {
 	    error("no memory for points");
 	    exit(1);
 	}

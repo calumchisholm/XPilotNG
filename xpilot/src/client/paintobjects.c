@@ -38,7 +38,7 @@ static int wreckageRawShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS][2] = {
 };
 
 
-position *wreckageShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS];
+position_t *wreckageShapes[NUM_WRECKAGE_SHAPES][NUM_WRECKAGE_POINTS];
 
 
 static int asteroidRawShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS][2] = {
@@ -47,7 +47,7 @@ static int asteroidRawShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS][2] = {
 };
 
 
-position *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
+position_t *asteroidShapes[NUM_ASTEROID_SHAPES][NUM_ASTEROID_POINTS];
 
 
 bool	markingLights;
@@ -579,7 +579,7 @@ int Init_wreckage(void)
     /*
      * Allocate memory for all the wreckage points.
      */
-    point_size = sizeof(position) * RES;
+    point_size = sizeof(position_t) * RES;
     total_size = point_size * NUM_WRECKAGE_POINTS * NUM_WRECKAGE_SHAPES;
     if ((dynmem = (char *) malloc(total_size)) == NULL) {
 	error("Not enough memory for wreckage shapes");
@@ -591,7 +591,7 @@ int Init_wreckage(void)
      */
     for ( shp = 0; shp < NUM_WRECKAGE_SHAPES; shp++ ) {
 	for ( i = 0; i < NUM_WRECKAGE_POINTS; i++ ) {
-	    wreckageShapes[shp][i] = (position *) dynmem;
+	    wreckageShapes[shp][i] = (position_t *) dynmem;
 	    dynmem += point_size;
 	    wreckageShapes[shp][i][0].x = wreckageRawShapes[shp][i][0];
 	    wreckageShapes[shp][i][0].y = wreckageRawShapes[shp][i][1];
@@ -613,7 +613,7 @@ int Init_asteroids(void)
     /*
      * Allocate memory for all the asteroid points.
      */
-    point_size = sizeof(position) * RES;
+    point_size = sizeof(position_t) * RES;
     total_size = point_size * NUM_ASTEROID_POINTS * NUM_ASTEROID_SHAPES;
     if ((dynmem = (char *) malloc(total_size)) == NULL) {
 	error("Not enough memory for asteroid shapes");
@@ -625,7 +625,7 @@ int Init_asteroids(void)
      */
     for ( shp = 0; shp < NUM_ASTEROID_SHAPES; shp++ ) {
 	for ( i = 0; i < NUM_ASTEROID_POINTS; i++ ) {
-	    asteroidShapes[shp][i] = (position *) dynmem;
+	    asteroidShapes[shp][i] = (position_t *) dynmem;
 	    dynmem += point_size;
 	    asteroidShapes[shp][i][0].x = asteroidRawShapes[shp][i][0];
 	    asteroidShapes[shp][i][0].y = asteroidRawShapes[shp][i][1];
