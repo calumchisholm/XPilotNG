@@ -855,7 +855,6 @@ static void Frame_shots(connection_t *conn, player *pl)
 
 static void Frame_ships(connection_t *conn, player *pl)
 {
-    player			*pl_i;
     int				i, k;
 
     for (i = 0; i < NumEcms; i++) {
@@ -865,9 +864,9 @@ static void Frame_ships(connection_t *conn, player *pl)
     for (i = 0; i < NumTransporters; i++) {
 	trans_t *trans = Transporters[i];
 	player 	*victim = trans->victim,
-		*pl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
-	int 	cx = (pl ? pl->pos.cx : trans->pos.cx),
-		cy = (pl ? pl->pos.cy : trans->pos.cy);
+		*tpl = (trans->id == NO_ID ? NULL : Player_by_id(trans->id));
+	int 	cx = (tpl ? tpl->pos.cx : trans->pos.cx),
+		cy = (tpl ? tpl->pos.cy : trans->pos.cy);
 	Send_trans(conn, victim->pos.cx, victim->pos.cy, cx, cy);
     }
     for (i = 0; i < World.NumCannons; i++) {
@@ -889,6 +888,8 @@ static void Frame_ships(connection_t *conn, player *pl)
     }
 
     for (k = 0; k < num_player_shuffle; k++) {
+	player *pl_i;
+
 	i = player_shuffle_ptr[k];
 	pl_i = Players(i);
 	if (BIT(pl_i->status, GAME_OVER))

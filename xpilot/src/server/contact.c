@@ -936,13 +936,13 @@ static int Queue_player(char *real, char *nick, char *disp, int team,
 /*
  * Move a player higher up in the list of waiting players.
  */
-int Queue_advance_player(char *name, char *msg)
+int Queue_advance_player(char *name, char *qmsg)
 {
     struct queued_player	*qp;
     struct queued_player	*prev, *first = NULL;
 
     if (strlen(name) >= MAX_NAME_LEN) {
-	strcpy(msg, "Name too long.");
+	strcpy(qmsg, "Name too long.");
 	return -1;
     }
 
@@ -950,9 +950,9 @@ int Queue_advance_player(char *name, char *msg)
 
 	if (!strcasecmp(qp->nick_name, name)) {
 	    if (!prev)
-		strcpy(msg, "Already first.");
+		strcpy(qmsg, "Already first.");
 	    else if (qp->login_port != -1)
-		strcpy(msg, "Already entering game.");
+		strcpy(qmsg, "Already entering game.");
 	    else {
 		/* Remove "qp" from list. */
 		prev->next = qp->next;
@@ -962,48 +962,46 @@ int Queue_advance_player(char *name, char *msg)
 		    /* Yes, so move "qp" after last entering player. */
 		    qp->next = first->next;
 		    first->next = qp;
-		}
-		else {
+		} else {
 		    /* No, so move "qp" to top of list. */
 		    qp->next = qp_list;
 		    qp_list = qp;
 		}
-		strcpy(msg, "Done.");
+		strcpy(qmsg, "Done.");
 	    }
 	    return 0;
 	}
-	else if (qp->login_port != -1) {
+	else if (qp->login_port != -1)
 	    first = qp;
-	}
     }
 
-    sprintf(msg, "Player \"%s\" not in queue.", name);
+    sprintf(qmsg, "Player \"%s\" not in queue.", name);
 
     return 0;
 }
 
 
-int Queue_show_list(char *msg)
+int Queue_show_list(char *qmsg)
 {
     int				len, count;
     struct queued_player	*qp = qp_list;
 
     if (!qp) {
-	strcpy(msg, "The queue is empty.");
+	strcpy(qmsg, "The queue is empty.");
 	return 0;
     }
 
-    strcpy(msg, "Queue: ");
-    len = strlen(msg);
+    strcpy(qmsg, "Queue: ");
+    len = strlen(qmsg);
     count = 1;
     do {
-	sprintf(msg + len, "%d. %s  ", count++, qp->nick_name);
-	len += strlen(msg + len);
+	sprintf(qmsg + len, "%d. %s  ", count++, qp->nick_name);
+	len += strlen(qmsg + len);
 	qp = qp->next;
     } while (qp != NULL && len + 32 < MSG_LEN);
 
     /* strip last 2 spaces. */
-    msg[len - 2] = '\0';
+    qmsg[len - 2] = '\0';
 
     return 0;
 }

@@ -122,10 +122,8 @@ int Choose_random_item(void)
 
 void Place_item(player *pl, int item)
 {
-    int			num_lose, num_per_pack,
-			place_count,
-			dir, dist;
-    long		grav, rand;
+    int			num_lose, num_per_pack, place_count, dist;
+    long		grav, rand_item;
     clpos		pos;
     vector		vel;
     item_concentrator_t	*con;
@@ -174,7 +172,7 @@ void Place_item(player *pl, int item)
 
     if (pl) {
 	grav = GRAVITY;
-	rand = 0;
+	rand_item = 0;
 	pos = pl->prevpos;
 	if (!BIT(pl->status, KILLED)) {
 	    /*
@@ -207,9 +205,9 @@ void Place_item(player *pl, int item)
 	    grav = 0;
 
 	if (rfrac() < randomItemProb)
-	    rand = RANDOM_ITEM;
+	    rand_item = RANDOM_ITEM;
 	else
-	    rand = 0;
+	    rand_item = 0;
 
 	if (World.NumItemConcs > 0 && rfrac() < itemConcentratorProb)
 	    con = ItemConcs((int)(rfrac() * World.NumItemConcs));
@@ -229,8 +227,8 @@ void Place_item(player *pl, int item)
 		return;
 
 	    if (con) {
-		/* change to use clicks */
-		dir = (int)(rfrac() * RES);
+		int dir = (int)(rfrac() * RES);
+
 		dist = (int)(rfrac() * ((itemConcentratorRadius
 					 * BLOCK_CLICKS) + 1));
 		pos.cx = con->pos.cx + dist * tcos(dir);
@@ -288,7 +286,7 @@ void Place_item(player *pl, int item)
 	}
     }
 
-    Make_item(pos, vel, item, num_per_pack, grav | rand);
+    Make_item(pos, vel, item, num_per_pack, grav | rand_item);
 }
 
 void Make_item(clpos pos, vector vel,

@@ -604,7 +604,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
     int            x, y, p, i, k, count;
     XPM            xpm;
     enum XPM_key   key;
-    RGB_COLOR      colors[256];
+    RGB_COLOR      color_array[256];
     XColor	   xcolor;
     char	   *color_name;
 
@@ -648,11 +648,11 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
 	if (!color_name) {
 	    if (xpm.colors[i].keys[XPM_s]
 		&& !strcmp(xpm.colors[i].keys[XPM_s], "None"))
-		colors[i] = 0;
+		color_array[i] = 0;
 	    else
 		return false;
 	} else
-            colors[i] =
+            color_array[i] =
                 RGB24(xcolor.red >> 8, xcolor.green >> 8, xcolor.blue >> 8);
     }
 
@@ -675,7 +675,7 @@ int xpm_picture_from_file(xp_picture_t *pic, char *filename)
         for (y = 0 ; y < pic->height ; y++) {
 	    for (x = 0; x < pic->width ; x++) {
                 i = x + p * pic->width + y * xpm.width;
-		Picture_set_pixel(pic, p, x, y, colors[xpm.pixels[i]]);
+		Picture_set_pixel(pic, p, x, y, color_array[xpm.pixels[i]]);
 	    }
 	}
     }

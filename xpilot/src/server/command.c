@@ -35,7 +35,7 @@ char command_version[] = VERSION;
  * and a string describing the error is stored in
  * 'errorstr_p' if that is not NULL.
  */
-player *Get_player_by_name(char *str, int *error, char **errorstr_p)
+player *Get_player_by_name(char *str, int *error_p, char **errorstr_p)
 {
     int i;
     player *found_pl = NULL, *pl;
@@ -85,15 +85,15 @@ player *Get_player_by_name(char *str, int *error, char **errorstr_p)
 	return found_pl;
 
  match_none:
-    if (error != NULL)
-	*error = -1;
+    if (error_p != NULL)
+	*error_p = -1;
     if (errorstr_p != NULL)
 	*errorstr_p = "Name does not match any player.";
     return NULL;
 
  match_several:
-    if (error != NULL)
-	*error = -2;
+    if (error_p != NULL)
+	*error_p = -2;
     if (errorstr_p != NULL)
 	*errorstr_p = "Name matches several players.";
     return NULL;
@@ -1258,10 +1258,10 @@ static int Cmd_set(char *arg, player *pl, int oper, char *msg)
 	if (!strcasecmp(option, "password"))
 	    sprintf(msg, "Operation successful.");
 	else {
-	    char value[MAX_CHARS];
-	    Get_option_value(option, value, sizeof(value));
+	    char val[MAX_CHARS];
+	    Get_option_value(option, val, sizeof(val));
 	    sprintf(msg, " < Option %s set to %s by %s. >",
-		    option, value, pl->name);
+		    option, val, pl->name);
 	    Set_message(msg);
 	    strcpy(msg, "");
 

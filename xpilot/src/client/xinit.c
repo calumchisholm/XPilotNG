@@ -76,7 +76,7 @@ int			ButtonHeight;
 Atom			ProtocolAtom, KillAtom;
 int			buttonColor, windowColor, borderColor;
 bool			quitting = false;
-int			top_width, top_height, top_x, top_y, top_posmask;
+int			top_width, top_height, /*top_x, top_y, */ top_posmask;
 int			draw_width, draw_height;
 int			players_width, players_height;
 char			*geometry;
@@ -673,12 +673,11 @@ int Init_top(void)
     /*
      * Create item bitmaps
      */
-    for (i = 0; i < NUM_ITEMS; i++) {
+    for (i = 0; i < NUM_ITEMS; i++)
 	itemBitmaps[i]
 	    = XCreateBitmapFromData(dpy, topWindow,
 				    (char *)itemBitmapData[i].data,
 				    ITEM_SIZE, ITEM_SIZE);
-    }
 
     /*
      * Creates and initializes the graphic contexts.

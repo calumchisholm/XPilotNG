@@ -399,13 +399,13 @@ static void Cannon_aim(cannon_t *c, int weapon, player **pl_p, int *dir)
 	    break;
 	case 3:
 	    if (tdist < range) {
-		DFLOAT time = tdist / speed;
+		DFLOAT t = tdist / speed; /* time */
 		int npx = (int)(pl->pos.cx
-				+ pl->vel.x * time * CLICK
-				+ pl->acc.x * time * time * CLICK);
+				+ pl->vel.x * t * CLICK
+				+ pl->acc.x * t * t * CLICK);
 		int npy = (int)(pl->pos.cy
-				+ pl->vel.y * time * CLICK
-				+ pl->acc.y * time * time * CLICK);
+				+ pl->vel.y * t * CLICK
+				+ pl->acc.y * t * t * CLICK);
 		int tdir;
 
 		tdx = WRAP_DCX(npx - c->pos.cx) / CLICK;
