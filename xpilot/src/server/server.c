@@ -64,6 +64,8 @@ int main(int argc, char **argv)
     char		*addr;
     world_t *world = &World;
 
+    memset(world, 0, sizeof(world_t));
+
     /*
      * Make output always linebuffered.  By default pipes
      * and remote shells cause stdout to be fully buffered.

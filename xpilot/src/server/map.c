@@ -27,10 +27,6 @@ char map_version[] = VERSION;
 
 #define GRAV_RANGE  10
 
-int max_asteroidconcs = 0, max_bases = 0, max_cannons = 0, max_checks = 0,
-    max_fuels = 0, max_gravs = 0, max_itemconcs = 0,
-    max_targets = 0, max_treasures = 0, max_wormholes = 0;
-
 /*
  * Globals.
  */
@@ -63,17 +59,19 @@ if ((M) > (N)) { \
 
 static void Realloc_map_objects(world_t *world)
 {
-    SHRINK(cannon_t, world->cannons, world->NumCannons, max_cannons);
-    SHRINK(fuel_t, world->fuels, world->NumFuels, max_fuels);
-    SHRINK(grav_t, world->gravs, world->NumGravs, max_gravs);
-    SHRINK(wormhole_t, world->wormholes, world->NumWormholes, max_wormholes);
-    SHRINK(treasure_t, world->treasures, world->NumTreasures, max_treasures);
-    SHRINK(target_t, world->targets, world->NumTargets, max_targets);
-    SHRINK(base_t, world->bases, world->NumBases, max_bases);
+    SHRINK(cannon_t, world->cannons, world->NumCannons, world->MaxCannons);
+    SHRINK(fuel_t, world->fuels, world->NumFuels, world->MaxFuels);
+    SHRINK(grav_t, world->gravs, world->NumGravs, world->MaxGravs);
+    SHRINK(wormhole_t, world->wormholes,
+	   world->NumWormholes, world->MaxWormholes);
+    SHRINK(treasure_t, world->treasures,
+	   world->NumTreasures, world->MaxTreasures);
+    SHRINK(target_t, world->targets, world->NumTargets, world->MaxTargets);
+    SHRINK(base_t, world->bases, world->NumBases, world->MaxBases);
     SHRINK(item_concentrator_t, world->itemConcs,
-	   world->NumItemConcs, max_itemconcs);
+	   world->NumItemConcs, world->MaxItemConcs);
     SHRINK(asteroid_concentrator_t, world->asteroidConcs,
-	   world->NumAsteroidConcs, max_asteroidconcs);
+	   world->NumAsteroidConcs, world->MaxAsteroidConcs);
 }
 
 int World_place_cannon(world_t *world, clpos pos, int dir, int team)
@@ -87,7 +85,7 @@ int World_place_cannon(world_t *world, clpos pos, int dir, int team)
     t.dead_time = 0;
     t.conn_mask = (unsigned)-1;
     t.group = -1;
-    STORE(cannon_t, world->cannons, world->NumCannons, max_cannons, t);
+    STORE(cannon_t, world->cannons, world->NumCannons, world->MaxCannons, t);
     cannon = Cannons(world, ind);
     Cannon_init(cannon);
     return ind;
@@ -103,7 +101,7 @@ int World_place_fuel(world_t *world, clpos pos, int team)
     t.conn_mask = (unsigned)-1;
     t.last_change = frame_loops;
     t.team = team;
-    STORE(fuel_t, world->fuels, world->NumFuels, max_fuels, t);
+    STORE(fuel_t, world->fuels, world->NumFuels, world->MaxFuels, t);
     return ind;
 }
 
@@ -130,7 +128,7 @@ int World_place_base(world_t *world, clpos pos, int dir, int team)
     } else
 	t.team = TEAM_NOT_SET;
     t.ind = world->NumBases;
-    STORE(base_t, world->bases, world->NumBases, max_bases, t);
+    STORE(base_t, world->bases, world->NumBases, world->MaxBases, t);
     return ind;
 }
 
@@ -148,7 +146,8 @@ int World_place_treasure(world_t *world, clpos pos, int team, bool empty)
 	world->teams[team].NumTreasures++;
 	world->teams[team].TreasuresLeft++;
     }
-    STORE(treasure_t, world->treasures, world->NumTreasures, max_treasures, t);
+    STORE(treasure_t, world->treasures, world->NumTreasures,
+	  world->MaxTreasures, t);
     return ind;
 }
 
@@ -169,7 +168,7 @@ int World_place_target(world_t *world, clpos pos, int team)
     t.update_mask = 0;
     t.last_change = frame_loops;
     t.group = -1;
-    STORE(target_t, world->targets, world->NumTargets, max_targets, t);
+    STORE(target_t, world->targets, world->NumTargets, world->MaxTargets, t);
     return ind;
 }
 
@@ -185,7 +184,8 @@ int World_place_wormhole(world_t *world, clpos pos, wormType type)
     t.type = type;
     t.lastblock = SPACE;
     t.lastID = -1;
-    STORE(wormhole_t, world->wormholes, world->NumWormholes, max_wormholes, t);
+    STORE(wormhole_t, world->wormholes,
+	  world->NumWormholes, world->MaxWormholes, t);
     return ind;
 }
 
@@ -204,7 +204,7 @@ int World_place_check(world_t *world, clpos pos, int ind)
 
     ind = world->NumChecks;
     t.pos = pos;
-    STORE(check_t, world->checks, world->NumChecks, max_checks, t);
+    STORE(check_t, world->checks, world->NumChecks, world->MaxChecks, t);
     return ind;
 }
 
@@ -215,7 +215,7 @@ int World_place_item_concentrator(world_t *world, clpos pos)
 
     t.pos = pos;
     STORE(item_concentrator_t, world->itemConcs,
-	  world->NumItemConcs, max_itemconcs, t);
+	  world->NumItemConcs, world->MaxItemConcs, t);
     return ind;
 }
 
@@ -226,7 +226,7 @@ int World_place_asteroid_concentrator(world_t *world, clpos pos)
 
     t.pos = pos;
     STORE(asteroid_concentrator_t, world->asteroidConcs,
-	  world->NumAsteroidConcs, max_asteroidconcs, t);
+	  world->NumAsteroidConcs, world->MaxAsteroidConcs, t);
     return ind;
 }
 
@@ -238,7 +238,7 @@ int World_place_grav(world_t *world, clpos pos, double force, int type)
     t.pos = pos;
     t.force = force;
     t.type = type;
-    STORE(grav_t, world->gravs, world->NumGravs, max_gravs, t);
+    STORE(grav_t, world->gravs, world->NumGravs, world->MaxGravs, t);
     return ind;
 }
 

@@ -248,26 +248,26 @@ typedef struct {
     team_t	teams[MAX_TEAMS];
 
     int		NumTeamBases;	/* How many 'different' teams are allowed */
-    int		NumBases;
+    int		NumBases, MaxBases;
     base_t	*bases;
     baseorder_t	*baseorder;
-    int		NumFuels;
+    int		NumFuels, MaxFuels;
     fuel_t	*fuels;
-    int		NumGravs;
+    int		NumGravs, MaxGravs;
     grav_t	*gravs;
-    int		NumCannons;
+    int		NumCannons, MaxCannons;
     cannon_t	*cannons;
-    int		NumChecks;
+    int		NumChecks, MaxChecks;
     check_t	*checks;
-    int		NumWormholes;
+    int		NumWormholes, MaxWormholes;
     wormhole_t	*wormholes;
-    int		NumTreasures;
+    int		NumTreasures, MaxTreasures;
     treasure_t	*treasures;
-    int		NumTargets;
+    int		NumTargets, MaxTargets;
     target_t	*targets;
-    int		NumItemConcs;
+    int		NumItemConcs, MaxItemConcs;
     item_concentrator_t		*itemConcs;
-    int		NumAsteroidConcs;
+    int		NumAsteroidConcs, MaxAsteroidConcs;
     asteroid_concentrator_t	*asteroidConcs;
 } world_t;
 
