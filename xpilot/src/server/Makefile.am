@@ -12,13 +12,13 @@ xpilot_ng_server_SOURCES = \
 	map.c map.h metaserver.c modifiers.c modifiers.h \
 	netserver.c netserver.h \
 	object.c object.h objpos.c objpos.h option.c option.h \
-	parser.c play.c player.c player.h polygon.c \
+	parser.c player.c player.h polygon.c \
 	race.c rank.c rank.h recwrap.c recwrap.h \
 	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
-	target.c target.h teamcup.h teamcup.c tuner.c tuner.h \
+	tag.c target.c target.h teamcup.h teamcup.c tuner.c tuner.h \
 	treasure.c update.c \
 	walls.c walls.h wormhole.c wormhole.h \
 	xp2map.c xpmap.c xpserver.h

@@ -59,15 +59,15 @@ am_xpilot_ng_server_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	id.$(OBJEXT) item.$(OBJEXT) laser.$(OBJEXT) map.$(OBJEXT) \
 	metaserver.$(OBJEXT) modifiers.$(OBJEXT) netserver.$(OBJEXT) \
 	object.$(OBJEXT) objpos.$(OBJEXT) option.$(OBJEXT) \
-	parser.$(OBJEXT) play.$(OBJEXT) player.$(OBJEXT) \
-	polygon.$(OBJEXT) race.$(OBJEXT) rank.$(OBJEXT) \
-	recwrap.$(OBJEXT) robot.$(OBJEXT) robotdef.$(OBJEXT) \
-	rules.$(OBJEXT) saudio.$(OBJEXT) sched.$(OBJEXT) \
-	score.$(OBJEXT) server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
-	showtime.$(OBJEXT) srecord.$(OBJEXT) target.$(OBJEXT) \
-	teamcup.$(OBJEXT) tuner.$(OBJEXT) treasure.$(OBJEXT) \
-	update.$(OBJEXT) walls.$(OBJEXT) wormhole.$(OBJEXT) \
-	xp2map.$(OBJEXT) xpmap.$(OBJEXT)
+	parser.$(OBJEXT) player.$(OBJEXT) polygon.$(OBJEXT) \
+	race.$(OBJEXT) rank.$(OBJEXT) recwrap.$(OBJEXT) \
+	robot.$(OBJEXT) robotdef.$(OBJEXT) rules.$(OBJEXT) \
+	saudio.$(OBJEXT) sched.$(OBJEXT) score.$(OBJEXT) \
+	server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
+	showtime.$(OBJEXT) srecord.$(OBJEXT) tag.$(OBJEXT) \
+	target.$(OBJEXT) teamcup.$(OBJEXT) tuner.$(OBJEXT) \
+	treasure.$(OBJEXT) update.$(OBJEXT) walls.$(OBJEXT) \
+	wormhole.$(OBJEXT) xp2map.$(OBJEXT) xpmap.$(OBJEXT)
 xpilot_ng_server_OBJECTS = $(am_xpilot_ng_server_OBJECTS)
 xpilot_ng_server_DEPENDENCIES =  \
 	$(top_builddir)/src/common/libxpcommon.a
@@ -218,13 +218,13 @@ xpilot_ng_server_SOURCES = \
 	map.c map.h metaserver.c modifiers.c modifiers.h \
 	netserver.c netserver.h \
 	object.c object.h objpos.c objpos.h option.c option.h \
-	parser.c play.c player.c player.h polygon.c \
+	parser.c player.c player.h polygon.c \
 	race.c rank.c rank.h recwrap.c recwrap.h \
 	robot.c robot.h robotdef.c rules.c \
 	saudio.c saudio.h sched.c sched.h score.c score.h \
 	server.c server.h serverconst.h ship.c shot.c \
 	showtime.c srecord.c srecord.h \
-	target.c target.h teamcup.h teamcup.c tuner.c tuner.h \
+	tag.c target.c target.h teamcup.h teamcup.c tuner.c tuner.h \
 	treasure.c update.c \
 	walls.c walls.h wormhole.c wormhole.h \
 	xp2map.c xpmap.c xpserver.h
@@ -318,7 +318,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objpos.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/option.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/play.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polygon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/race.Po@am__quote@
@@ -335,6 +334,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/showtime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srecord.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tag.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/target.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/teamcup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/treasure.Po@am__quote@

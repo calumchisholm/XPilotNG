@@ -25,6 +25,8 @@
 
 #include "xpserver.h"
 
+char treasure_version[] = VERSION;
+
 void Make_treasure_ball(world_t *world, treasure_t *t)
 {
     ballobject_t *ball;

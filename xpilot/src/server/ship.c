@@ -457,6 +457,101 @@ void Tank_handle_detach(player_t *pl)
 }
 
 
+
+
+
+
+/****************************
+ * Functions for explosions.
+ */
+
+/* Create debris particles */
+void Make_debris(world_t  *world,
+		 clpos_t  pos,
+		 vector_t vel,
+		 int      owner_id,
+		 int      owner_team,
+		 int      type,
+		 double   mass,
+		 int      status,
+		 int      color,
+		 int      radius,
+		 int      num_debris,
+		 int      min_dir,   int     max_dir,
+		 double   min_speed, double  max_speed,
+		 double   min_life,  double  max_life)
+{
+    object_t *debris;
+    int i;
+    double life;
+    modifiers_t mods;
+
+    if (!options.useDebris)
+	return;
+
+    pos = World_wrap_clpos(world, pos);
+    if (!World_contains_clpos(world, pos))
+	return;
+
+    if (max_life < min_life)
+	max_life = min_life;
+
+    if (max_speed < min_speed)
+	max_speed = min_speed;
+
+    Mods_clear(&mods);
+
+    if (type == OBJ_SHOT) {
+	Mods_set(&mods, ModsCluster, 1, world);
+	if (!options.shotsGravity)
+	    CLR_BIT(status, GRAVITY);
+    }
+
+    if (num_debris > MAX_TOTAL_SHOTS - NumObjs)
+	num_debris = MAX_TOTAL_SHOTS - NumObjs;
+
+    for (i = 0; i < num_debris; i++) {
+	double speed, dx, dy, diroff;
+	int dir, dirplus;
+
+	if ((debris = Object_allocate()) == NULL)
+	    break;
+
+	debris->color = color;
+	debris->id = owner_id;
+	debris->team = owner_team;
+	Object_position_init_clpos(world, debris, pos);
+	dir = MOD2(min_dir + (int)(rfrac() * (max_dir - min_dir)), RES);
+	dirplus = MOD2(dir + 1, RES);
+	diroff = rfrac();
+	dx = tcos(dir) + (tcos(dirplus) - tcos(dir)) * diroff;
+	dy = tsin(dir) + (tsin(dirplus) - tsin(dir)) * diroff;
+	speed = min_speed + rfrac() * (max_speed - min_speed);
+	debris->vel.x = vel.x + dx * speed;
+	debris->vel.y = vel.y + dy * speed;
+	debris->acc.x = 0;
+	debris->acc.y = 0;
+	if (options.shotHitFuelDrainUsesKineticEnergy
+	    && type == OBJ_SHOT) {
+	    /* compensate so that m*v^2 is constant */
+	    double sp_shotsp = speed / options.shotSpeed;
+
+	    debris->mass = mass / (sp_shotsp * sp_shotsp);
+	} else
+	    debris->mass = mass;
+	debris->type = type;
+	life = min_life + rfrac() * (max_life - min_life);
+	debris->life = life;
+	debris->fuse = 0;
+	debris->pl_range = radius;
+	debris->pl_radius = radius;
+	debris->obj_status = status;
+	debris->mods = mods;
+	Cell_add_object(world, debris);
+    }
+}
+
+
 void Make_wreckage(world_t *world,
 		   clpos_t  pos,
 		   vector_t vel,

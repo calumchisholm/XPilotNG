@@ -182,7 +182,6 @@ int Handle_keyboard(player_t *pl);
 void Pause_player(player_t *pl, bool on);
 int Player_lock_closest(player_t *pl, bool next);
 bool team_dead(int team);
-void filter_mods(world_t *world, modifiers_t *mods);
 
 /*
  * Prototypes for map.c
@@ -246,7 +245,7 @@ bool Init_options(void);
 void Free_options(void);
 
 /*
- * Prototypes for play.c
+ * Prototypes for player.c
  */
 void Thrust(player_t *pl);
 void Record_shove(player_t *pl, player_t *pusher, long shove_time);
@@ -292,13 +291,8 @@ bool Friction_area_hitfunc(group_t *groupptr, move_t *move);
 
 void Team_immunity_init(world_t *world);
 void Hitmasks_init(world_t *world);
-void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl);
 
-void Check_tag(void);
 void Delete_shot(world_t *world, int ind);
-void Fire_laser(player_t *pl);
-void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
-			int dir, modifiers_t mods);
 void Do_deflector(player_t *pl);
 void Do_transporter(player_t *pl);
 void Do_general_transporter(world_t *world, int id, clpos_t pos,
@@ -458,6 +452,9 @@ void expandKeyword(const char *keyword);
 /*
  * Prototypes for laser.c
  */
+void Fire_laser(player_t *pl);
+void Fire_general_laser(world_t *world, int id, int team, clpos_t pos,
+			int dir, modifiers_t mods);
 void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse);
 
 /*
@@ -528,6 +525,12 @@ char *showtime(void);
 void Init_recording(world_t *world);
 void Handle_recording_buffers(void);
 void Get_recording_data(void);
+
+/*
+ * Prototypes for tag.c
+ */
+void Transfer_tag(player_t *oldtag_pl, player_t *newtag_pl);
+void Check_tag(void);
 
 /*
  * Prototypes for target.c

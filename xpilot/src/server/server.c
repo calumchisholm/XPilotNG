@@ -801,7 +801,6 @@ extern char netserver_version[];
 extern char objpos_version[];
 extern char option_version[];
 extern char parser_version[];
-extern char play_version[];
 extern char player_version[];
 extern char polygon_version[];
 extern char portability_version[];
@@ -819,7 +818,10 @@ extern char shipshape_version[];
 extern char shot_version[];
 extern char socklib_version[];
 extern char srecord_version[];
+extern char tag_version[];
+extern char target_version[];
 extern char teamcup_version[];
+extern char treasure_version[];
 extern char tuner_version[];
 extern char update_version[];
 extern char walls_version[];
@@ -857,7 +859,6 @@ static void Check_server_versions(void)
 	{ "objpos", objpos_version },
 	{ "option", option_version },
 	{ "parser", parser_version },
-	{ "play", play_version },
 	{ "player", player_version },
 	{ "polygon", polygon_version },
 	{ "portability", portability_version },
@@ -876,7 +877,10 @@ static void Check_server_versions(void)
 	{ "shot", shot_version },
 	{ "socklib", socklib_version },
 	{ "srecord", srecord_version },
+	{ "tag", tag_version },
+	{ "target", target_version },
 	{ "teamcup", teamcup_version },
+	{ "treasure", treasure_version },
 	{ "tuner", tuner_version },
 	{ "update", update_version },
 	{ "walls", walls_version },
@@ -952,3 +956,48 @@ int plock_server(bool on)
     return 0;
 #endif
 }
+
+
+/* kps - this is really ugly */
+extern bool in_move_player;
+
+bool Friction_area_hitfunc(group_t *groupptr, move_t *move)
+{
+    UNUSED_PARAM(groupptr); UNUSED_PARAM(move);
+
+    if (in_move_player)
+	return true;
+    return false;
+}
+
+/*
+ * Handling of group properties
+ */
+void Team_immunity_init(world_t *world)
+{
+    int group;
+
+    for (group = 0; group < num_groups; group++) {
+	group_t *gp = groupptr_by_id(group);
+
+	if (gp->type == CANNON) {
+	    cannon_t *cannon = Cannon_by_index(world, gp->mapobj_ind);
+
+	    assert(cannon->group == group);
+	    Cannon_set_hitmask(group, cannon);
+	}
+    }
+
+#if 0
+    /* change hitmask of all cannons */
+    P_grouphack(CANNON, Cannon_set_hitmask);
+#endif
+}
+
+/* kps - called at server startup to initialize hit masks */
+void Hitmasks_init(world_t *world)
+{
+    Target_init(world);
+    Team_immunity_init(world);
+}
+
