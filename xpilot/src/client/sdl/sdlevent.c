@@ -31,7 +31,6 @@
 
 /* TODO: remove these from client.h and put them in *event.h */
 bool            initialPointerControl = false;
-bool            pointerControl = false;
 
 static int	mouseMovement;	/* horizontal mouse movement. */
 
@@ -51,7 +50,7 @@ void Talk_set_state(bool on)
 
 void Pointer_control_set_state(bool on)
 {
-    if (pointerControl == on)
+    if (clData.pointerControl == on)
 	return;
 
     if (on) {
@@ -73,7 +72,8 @@ void Pointer_control_set_state(bool on)
     }
 #endif
 
-    pointerControl = on;
+    clData.pointerControl = on;
+    Pointer_control_newbie_message();
 }
 
 void Record_toggle(void)
@@ -151,7 +151,7 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_MOUSEBUTTONDOWN:
 	button = evt->button.button;
-	if (!pointerControl) {
+	if (!clData.pointerControl) {
 	    if ( (clicktarget[button-1] = FindGLWidget(MainWidget,evt->button.x,evt->button.y)) ) {
 	    	if (clicktarget[button-1]->button) {
 		    clicktarget[button-1]->button(button,evt->button.state,
@@ -166,7 +166,7 @@ int Process_event(SDL_Event *evt)
 	break;
 	
     case SDL_MOUSEMOTION:
-	if (pointerControl) {
+	if (clData.pointerControl) {
 	    mouseMovement += evt->motion.xrel;
 	} else {
 	    /*xpprintf("mouse motion xrel=%i yrel=%i\n",evt->motion.xrel,evt->motion.yrel);*/
@@ -195,7 +195,7 @@ int Process_event(SDL_Event *evt)
 	
     case SDL_MOUSEBUTTONUP:
 	button = evt->button.button;
-	if (pointerControl) {
+	if (clData.pointerControl) {
 	    Pointer_button_released(button);
 	} else {
 	    if ( clicktarget[button-1] ) {

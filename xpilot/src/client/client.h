@@ -51,6 +51,8 @@
 
 typedef struct {
     bool	talking;	/* Some talk window is open? */
+    bool	pointerControl;	/* Pointer (mouse) control is on? */
+    bool	quitMode;	/* Client is in quit mode? */
     double	clientLag;
     double	scaleFactor;
     double	scale;
@@ -558,7 +560,7 @@ extern bool	toggle_shield;		/* Are shields toggled by a press? */
 extern bool	shields;		/* When shields are considered up */
 extern bool	auto_shield;            /* drops shield for fire */
 extern bool	initialPointerControl;	/* Start by using mouse for control? */
-extern bool	pointerControl;		/* current state of mouse ship flying */
+
 extern int	maxFPS;			/* Max FPS player wants from server */
 extern int 	oldMaxFPS;
 extern double	clientFPS;		/* FPS client is drawing at */
@@ -665,6 +667,7 @@ extern bool played_this_round;
  */
 const char *Program_name(void);
 int Bitmap_add(const char *filename, int count, bool scalable);
+void Pointer_control_newbie_message(void);
 
 /*
  * Platform specific code needs to implement these.

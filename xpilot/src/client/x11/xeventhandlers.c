@@ -195,7 +195,7 @@ void FocusIn_event(XEvent *event)
 void UnmapNotify_event(XEvent *event)
 {
     UNUSED_PARAM(event);
-    if (pointerControl) {
+    if (clData.pointerControl) {
 	initialPointerControl = true;
 	Pointer_control_set_state(false);
     }
@@ -267,7 +267,7 @@ void ButtonPress_event(XEvent *event)
 {
     XButtonEvent *xbutton = &(event->xbutton);
 
-    if (pointerControl) {
+    if (clData.pointerControl) {
 	assert(!clData.talking);
 	Pointer_button_pressed((int)xbutton->button);
 	return;
@@ -321,7 +321,7 @@ void ButtonPress_event(XEvent *event)
 void MotionNotify_event(XEvent *event)
 {
     if (event->xmotion.window == drawWindow) {
-	if (pointerControl) {
+	if (clData.pointerControl) {
 	    if (!clData.talking) {
 		if (!event->xmotion.send_event)
 		    mouseMovement += event->xmotion.x - mousePosition.x;
@@ -337,7 +337,7 @@ int ButtonRelease_event(XEvent *event)
 {
     XButtonEvent *xbutton = &(event->xbutton);
 
-    if (pointerControl) {
+    if (clData.pointerControl) {
 	assert(!clData.talking);
 	Pointer_button_released((int)xbutton->button);
     }

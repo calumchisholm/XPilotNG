@@ -26,7 +26,6 @@
 #include "xpclient_x11.h"
 
 bool		initialPointerControl = false;
-bool		pointerControl = false;
 
 int	talk_key_repeating;
 XEvent	talk_key_repeat_event;
@@ -68,11 +67,10 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 
 void Pointer_control_set_state(bool on)
 {
-    if (pointerControl == on)
+    if (clData.pointerControl == on)
 	return;
 
     if (on) {
-	pointerControl = true;
 	XGrabPointer(dpy, drawWindow, true, 0, GrabModeAsync,
 		     GrabModeAsync, drawWindow, pointerControlCursor,
 		     CurrentTime);
@@ -83,12 +81,14 @@ void Pointer_control_set_state(bool on)
 	XSelectInput(dpy, drawWindow,
 		     PointerMotionMask | ButtonPressMask | ButtonReleaseMask);
     } else {
-	pointerControl = false;
 	XUngrabPointer(dpy, CurrentTime);
 	XDefineCursor(dpy, drawWindow, None);
 	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 	XFlush(dpy);
     }
+
+    clData.pointerControl = on;
+    Pointer_control_newbie_message();
 }
 
 void Talk_set_state(bool on)
@@ -98,7 +98,7 @@ void Talk_set_state(bool on)
     if (clData.talking == on)
 	return;
 
-    if (pointerControl) {
+    if (clData.pointerControl) {
 	initialPointerControl = true;
 	Pointer_control_set_state(false);
     }
@@ -223,7 +223,7 @@ void xevent_pointer(void)
 {
     POINT point;
 
-    if (!pointerControl || clData.talking)
+    if (!clData.pointerControl || clData.talking)
 	return;
 
     GetCursorPos(&point);

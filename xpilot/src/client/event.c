@@ -41,9 +41,9 @@ static int Key_get_count(keys_t key);
 static bool Key_inc_count(keys_t key);
 static bool Key_dec_count(keys_t key);
 
-static void Pointer_control_newbie_message(void)
+void Pointer_control_newbie_message(void)
 {
-    xp_option_t *opt = Find_option("keyPointerControl");
+    xp_option_t *opt = Find_option("keyExit");
     char msg[MSG_LEN];
     const char *val;
 
@@ -57,14 +57,14 @@ static void Pointer_control_newbie_message(void)
     if (strlen(val) == 0)
 	return;
 
-    if(!pointerControl)
+    if (clData.pointerControl)
 	snprintf(msg, sizeof(msg),
 		 "Mouse steering enabled. "
 		 "Key(s) to disable it: %s.", val);
     else
 	snprintf(msg, sizeof(msg),
 		 "Mouse steering disabled. "
-		 "Key(s) to enable it: %s.", val);
+		 "Click background with left mouse button to enable it.");
 
     Add_newbie_message(msg);
 }
@@ -236,7 +236,7 @@ static bool Key_press_talk(void)
      * this releases mouse in x11 client, so we clear the mouse buttons
      * so they don't lock on
      */
-    if (pointerControl)
+    if (clData.pointerControl)
 	for (i = 0; i < MAX_POINTER_BUTTONS; i++)
 	    Pointer_button_released(i);
 
@@ -258,7 +258,7 @@ static bool Key_press_show_messages(void)
 
 static bool Key_press_pointer_control(void)
 {
-    Pointer_control_set_state(!pointerControl);
+    Pointer_control_set_state(!clData.pointerControl);
     return false;	/* server doesn't need to know */
 }
 
@@ -295,21 +295,16 @@ static bool Key_press_select_lose_item(void)
     return true;
 }
 
-static bool quit_mode = false;
-
 static bool Key_press_yes(void)
 {
-    if (quit_mode)
-	Client_exit(0);
+    /* Handled in other code */
+    assert(!clData.quitMode);
+
     return false;	/* server doesn't need to know */
 }
 
 static bool Key_press_no(void)
 {
-    if (quit_mode) {
-	Clear_alert_messages();
-	quit_mode = false;
-    }
     return false;	/* server doesn't need to know */
 }
 
@@ -318,25 +313,20 @@ static bool Key_press_exit(void)
     int i;
 
     /* exit pointer control if exit key pressed in pointer control mode */
-    if (pointerControl) {
-    	/*
+    if (clData.pointerControl) {
+	/*
 	 * this releases mouse, so we clear the mouse buttons so
 	 * they don't lock on
 	 */
 	for (i = 0; i < MAX_POINTER_BUTTONS; i++)
 	    Pointer_button_released(i);
-	Pointer_control_newbie_message();
 
-	return Key_press_pointer_control();
+	Pointer_control_set_state(false);
+	return false;	/* server doesn't need to know */
     }
 
-    if (quit_mode)
-	/* pressing exit button again exits quit mode */
-	Key_press_no();
-    else {
-	quit_mode = true;
-    	Add_alert_message("Really Quit (y/n) ?",0.0);
-    }
+    clData.quitMode = true;
+    Add_alert_message("Really Quit (y/n) ?", 0.0);
 
     return false;	/* server doesn't need to know */
 }
@@ -392,26 +382,30 @@ void Key_clear_counts(void)
 	Net_key_change();
 }
 
+/* Remember which key we used to exit quit mode. */
+static keys_t quit_mode_exit_key = KEY_DUMMY;
+
+static bool Quit_mode_key_press(keys_t key)
+{
+    if (key == KEY_YES)
+	Client_exit(0);
+
+    /* all other keys exit quit mode */
+    clData.quitMode = false;
+    Clear_alert_messages();
+    quit_mode_exit_key = key;
+	
+    return false;
+}
+
 bool Key_press(keys_t key)
 {
-    static bool thrusthelp = false;
     bool countchange;
     int keycount, i;
-    
-    /* in quit mode only these keys can be used */
-    if (quit_mode) {
-	switch (key) {
-	case KEY_EXIT:
-	    return Key_press_exit();
-	case KEY_YES:
-	    return Key_press_yes();
-	case KEY_NO:
-	    return Key_press_no();
-	default:
-	    return false;
-	}
-    }
-    
+
+    if (clData.quitMode)
+	return Quit_mode_key_press(key);
+
     countchange = Key_inc_count(key);
     keycount = Key_get_count(key);
     
@@ -432,27 +426,6 @@ bool Key_press(keys_t key)
     Key_check_talk_macro(key);
 
     switch (key) {
-    case KEY_THRUST:
-	if (newbie && !thrusthelp && !pointerControl) {
-	    xp_option_t *opt = Find_option("keyPointerControl");
-	    char msg[MSG_LEN];
-	    const char *val;
-
-	    if (!opt)
-		break;
-	    val = Option_value_to_string(opt);
-	    if (strlen(val) == 0)
-		break;
-
-	    snprintf(msg, sizeof(msg),
-		     "Steering with mouse is superior. "
-		     "Key(s) to enable mouse steering: %s.", val);
-
-	    Add_newbie_message(msg);
-	    thrusthelp = true;
-	}
-	break;
-
     case KEY_ID_MODE:
 	return Key_press_id_mode();
 
@@ -514,11 +487,9 @@ bool Key_press(keys_t key)
 	 * this releases mouse, so we clear the mouse buttons so they
 	 * don't lock on
 	 */
-    	if (pointerControl)
+    	if (clData.pointerControl)
     	    for (i = 0; i < MAX_POINTER_BUTTONS; i++)
     	    	Pointer_button_released(i);
-
-	Pointer_control_newbie_message();
 
 	return Key_press_pointer_control();
 
@@ -560,7 +531,17 @@ bool Key_release(keys_t key)
 {
     bool countchange;
     int keycount;
-    
+
+    /*
+     * Make sure nothing is done when we release the button we used
+     * to exit quit mode with.
+     */
+    if (key == quit_mode_exit_key) {
+	assert(key != KEY_DUMMY);
+	quit_mode_exit_key = KEY_DUMMY;
+	return false;
+    }
+
     countchange = Key_dec_count(key);
     keycount = Key_get_count(key);
 
