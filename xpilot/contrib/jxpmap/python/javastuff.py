@@ -6,7 +6,8 @@ import gdkpixbuf
 # libraries used in the original Java version, and some additional
 # utility stuff.
 
-PIXMAP_PATH = "/home/uau/reiser/xpilot/contrib/jxpmap/images/"
+PIXMAP_PATH = ["/home/uau/reiser/xpilot/contrib/jxpmap/images/",
+               "/home/uau/games/lib/xpilot/textures/rtc/"]
 
 class Rectangle:
     def __init__(self, x, y, w, h):
@@ -207,13 +208,16 @@ def ptSeqDistSq(x1, y1, x2, y2, px, py):
 class ScaledBitmap:
     def __init__(self, img):
         self.img = img
-        self.scaled = img
+        self.unscaled, mask = self.img.render_pixmap_and_mask()
+        self.scaled = None
         self.scale = 1
-    def __getitem__(self, scale):
+    def __getitem__(self, scale = 1):
+        if scale == 1:
+            return self.unscaled
         if scale != self.scale:
-            width = int(self.img.width * scale * 64 + .5)
+            width = int(self.img.width * scale + .5)
             width += width == 0
-            height = int(self.img.height * scale * 64 + .5)
+            height = int(self.img.height * scale + .5)
             height += height == 0
             scaled = self.img.scale_simple(width, height,
                                                 gdkpixbuf.INTERP_BILINEAR)
@@ -221,6 +225,7 @@ class ScaledBitmap:
             self.scale = scale
         return self.scaled
 
+import os
 import weakref
 class ScaledBitmapStore:
     def __init__(self):
@@ -229,7 +234,12 @@ class ScaledBitmapStore:
     def __getitem__(self, filename):
         bm = self.store.get(filename)
         if bm is None:
-            img = gdkpixbuf.new_from_file(PIXMAP_PATH + filename)
+            for path in PIXMAP_PATH:
+                if os.path.exists(path + filename):
+                    img = gdkpixbuf.new_from_file(path + filename)
+                    break
+            else:
+                raise "Image file not found"
             bm = ScaledBitmap(img)
             self.store[filename] = bm
         return bm

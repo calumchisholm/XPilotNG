@@ -39,14 +39,14 @@ class MapObject:
             return
         r = self.getBounds()
         tx = di.tx
-        pixmap = self.img[di.scale]
+        pixmap = self.img[di.scale * 64]
         p = Point(r.x, r.y)
         p = tx(p)
         gtk.draw_pixmap(di.area, di.gc, pixmap, 0, 0, p.x, p.y - pixmap.height,
                             pixmap.width, pixmap.height)
 
     def checkEvent(self, canvas, me):
-        if self.contains(canvas, me.getPoint()):
+        if self.contains(canvas, me.point):
             if me.button == 1:
                 if canvas.isErase():
                     canvas.getModel().removeObject(self)
@@ -78,22 +78,21 @@ class CreateHandler:
         self.toBeRemoved = None
 
     def mouseMoved(self, evt):
-        c = evt.getSource()
+        c = evt.canvas
         gc = c.previewgc
         ob = self.object.getBounds()
         if self.toBeRemoved is not None:
             c.drawShape(self.toBeRemoved, gc)
         s = self.preview.copy()
-        s.transform(AffineTransform(evt.getX() - self.offset.x - ob.x,
-                                    evt.getY() - self.offset.y - ob.y))
+        s.transform(AffineTransform(evt.x - self.offset.x - ob.x,
+                                    evt.y - self.offset.y - ob.y))
         c.drawShape(s)
         self.toBeRemoved = s
 
     def mousePressed(self, evt):
-        c = evt.getSource()
+        c = evt.canvas
         c.getModel().addToFront(self.object)
-        self.object.moveTo(evt.getX() - self.offset.x,
-                           evt.getY() - self.offset.y)
+        self.object.moveTo(evt.x - self.offset.x, evt.y - self.offset.y)
         c.setCanvasEventHandler(None)
         c.repaint()
 
@@ -101,24 +100,24 @@ class MoveHandler(MouseEventHandler):
     def __init__(self, obj, evt):
         self.obj = obj
         ob = obj.getBounds()
-        self.offset = Point(evt.getX() - ob.x, evt.getY() - ob.y)
+        self.offset = Point(evt.x - ob.x, evt.y - ob.y)
         self.preview = obj.getPreviewShape()
         self.toBeRemoved = None
 
     def mouseMoved(self, evt):
         ob = self.obj.getBounds()
-        c = evt.getSource()
+        c = evt.canvas
         if self.toBeRemoved is not None:
             c.drawShape(self.toBeRemoved)
         s = self.preview.copy()
-        s.transform(AffineTransform(evt.getX() - self.offset.x - ob.x,
-                                    evt.getY() - self.offset.y - ob.y))
+        s.transform(AffineTransform(evt.x - self.offset.x - ob.x,
+                                    evt.y - self.offset.y - ob.y))
         c.drawShape(s)
         self.toBeRemoved = s
 
     def mouseReleased(self, evt):
-        c = evt.getSource()
-        self.obj.moveTo(evt.getX() - self.offset.x,
-                           evt.getY() - self.offset.y)
+        c = evt.canvas
+        self.obj.moveTo(evt.x - self.offset.x,
+                           evt.y - self.offset.y)
         c.setCanvasEventHandler(None)
         c.repaint()

@@ -4,23 +4,13 @@ import GDK
 from javastuff import *
 
 class MouseEvent:
-    def __init__(self, point, button, area, orig = None):
-        self.p = point
+    def __init__(self, point, button, canvas, orig = None):
+        self.point = point
+        self.x = point.x
+        self.y = point.y
         self.button = button
-        self.area = area
+        self.canvas = canvas
         self.orig = orig
-
-    def getX(self):
-        return self.p.x
-
-    def getY(self):
-        return self.p.y
-
-    def getPoint(self):
-        return self.p
-
-    def getSource(self):
-        return self.area
 
 class DrawInfo:
     pass
@@ -34,6 +24,9 @@ class MapCanvas:
         self.posy = 0
         self.area = area
         self.erase = 0
+        self.showPoints = 0
+        self.filled = 1
+        self.textured = 1
         gc = area.get_window().new_gc()
         gc.function = GDK.XOR
         gc.foreground = area.get_colormap().alloc(65535, 65535, 65535)
@@ -156,6 +149,7 @@ class MapCanvas:
         di.scale = self.scale
         di.colormap = colormap
         di.canvas = self
+        di.white_gc = area.get_style().white_gc
         tx2 = self.getTransform()
         for o in os:
             for wrap in self.wrapOffsets(view, o.getBounds()):
@@ -174,7 +168,7 @@ class MapCanvas:
             if event.type == GDK.BUTTON_PRESS:
                 evt = MouseEvent(self.it(Point(event.x, event.y)),
                                  event.button, self, event)
-                print 'press', evt.p.x, evt.p.y
+                print 'press', evt.point.x, evt.point.y
                 self.eventHandler.mousePressed(evt)
             elif event.type == GDK.BUTTON_RELEASE:
                 evt = MouseEvent(self.it(Point(event.x, event.y)),
@@ -191,7 +185,7 @@ class MapCanvas:
         elif event.type == GDK.BUTTON_PRESS:
             evt = MouseEvent(self.it(Point(event.x, event.y)), event.button,
                              self, event)
-            print 'press', evt.p.x, evt.p.y
+            print 'press', evt.point.x, evt.point.y
             for o in self.model.objects:
                 if o.checkEvent(self, evt):
                     return

@@ -37,7 +37,7 @@ class PolygonPropertyEditor(gtk.GtkVBox):
             hbox.show()
             return hbox
         ps = canvas.model.polyStyles
-        _ = [(style.getId(), style) for style in ps]
+        _ = [(style.id, style) for style in ps]
         self.pack_start(makeoptmenu("style", _, ps.index(polygon.style)))
         def check_team(widget = None, data = None):
             teammenu.set_sensitive(self.values["type"].has_team)

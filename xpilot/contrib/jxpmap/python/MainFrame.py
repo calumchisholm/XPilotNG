@@ -105,13 +105,20 @@ class MainFrame:
              ["New base", MapBase]]
         l = [[a, self.newObject, b] for a, b in l]
         l.extend([["Erase", self.toggleEraseMode, None],
-            ["Zoom in", self.zoom, 1], ["Zoom out", self.zoom, -1]])
+                  ["Toggle points", self.canvasToggle, 'showPoints'],
+                  ["Toggle filled", self.canvasToggle, 'filled'],
+                  ["Toggle textured", self.canvasToggle, 'textured'],
+                  ["Zoom in", self.zoom, 1], ["Zoom out", self.zoom, -1]
+                  ])
 
         for name, callback, data in l:
             button = gtk.GtkButton(name)
             button.connect("clicked", callback, data)
             box.pack_start(button, gtk.FALSE, gtk.FALSE, 0)
             button.show()
+        self.zoomlabel = gtk.GtkLabel("1.00")
+        self.zoomlabel.show()
+        box.pack_start(self.zoomlabel, gtk.FALSE, gtk.FALSE, 0)
         self.box1.pack_start(box, gtk.FALSE, gtk.FALSE, 0)
         box.show()
 
@@ -124,17 +131,24 @@ class MainFrame:
         self.zoom += value
         if self.zoom > 20:
             self.zoom = 20
-        elif self.zoom < -20:
-            self.zoom = -20
+            return
+        elif self.zoom < -15:
+            self.zoom = -15
+            return
         self.updateScale()
+
+    def canvasToggle(self, widget, data):
+        setattr(self.canvas, data, not getattr(self.canvas, data))
+        self.canvas.repaint()
 
     def toggleEraseMode(self, widget, data):
         self.canvas.setCanvasEventHandler(None)
         self.canvas.setErase(not self.canvas.isErase())
 
     def updateScale(self):
-        df = self.canvas.getModel().getDefaultScale()
-        z = df * 1.3**self.zoom
+        z = 1.3**self.zoom
+        self.zoomlabel.set_text("%.2f" % z)
+        z *= self.canvas.getModel().getDefaultScale()
         self.canvas.setScale(z)
         self.canvas.repaint()
 

@@ -7,6 +7,7 @@ from MapPolygon import MapPolygon
 from MapBase import MapBase
 from MapFuel import MapFuel
 from MapCheckPoint import MapCheckPoint
+from Pixmap import Pixmap
 from javastuff import *
 import xml.sax
 
@@ -41,17 +42,16 @@ class MapModel:
         self.options = MapOptions()
         self.bmstore = ScaledBitmapStore()
 
-        ls = LineStyle("internal", 0, 0, LineStyle.STYLE_HIDDEN)
+        ls = LineStyle("internal", 0, 0xFFFF, LineStyle.STYLE_INTERNAL)
         self.edgeStyles.append(ls)
         ls = LineStyle("default", 0, 0xFF, LineStyle.STYLE_SOLID)
         self.edgeStyles.append(ls)
         self.defEdgeStyleIndex = 1
         ps = PolygonStyle()
-        ps.setId("default")
-        ps.setVisible(1)
-        ps.setVisibleInRadar(1)
-        ps.setFillStyle(PolygonStyle.FILL_NONE)
-        ps.setDefaultEdgeStyle(ls)
+        ps.id = "default"
+        ps.visible = ps.visibleInRadar= 1
+        ps.filled = ps.textured = 0
+        ps.defaultEdgeStyle = ls
         self.polyStyles.append(ps)
         self.defPolygonStyleIndex = 1
 
@@ -71,7 +71,7 @@ class MapModel:
 
     def load(self, file):
         self.edgeStyles = []
-        ls = LineStyle("internal", 0, 0, LineStyle.STYLE_HIDDEN)
+        ls = LineStyle("internal", 0, 0xFFFF, LineStyle.STYLE_INTERNAL)
         self.edgeStyles.append(ls)
         self.polyStyles = []
 
@@ -112,6 +112,9 @@ class MapModel:
 
     def removeObject(self, mo):
         self.objects.remove(mo)
+
+class MapParseError(Exception):
+    pass
 
 class MapDocumentHandler(xml.sax.ContentHandler):
     def __init__(self, model):
@@ -160,7 +163,7 @@ class MapDocumentHandler(xml.sax.ContentHandler):
             width = getint("width")
             style = getint("style")
             if width == -1:
-                width = 1
+                width = 0
                 style = LineStyle.STYLE_HIDDEN
             ls = LineStyle(id, width, color, style)
             self.estyles[id] = ls
@@ -172,19 +175,17 @@ class MapDocumentHandler(xml.sax.ContentHandler):
                 col = int(cstr, 16)
             else:
                 col = None
-            flags = 1
-            flagstr = atts.get('flags')
-            if flagstr is not None:
-                flags = int(flagstr)
+            flagstr = atts.get('flags', '1')
+            flags = int(flagstr)
             self.pstyles[id] = PolyStyle(id, col, atts.get("texture"),
                                          atts["defedge"], flags)
         elif name == 'bmpstyle':
             id = atts["id"]
             fileName = atts["filename"]
             flags = getint("flags")
-            pm = Pixmap()
-            pm.setFileName(fileName)
-            pm.setScalable(flags != 0)
+            pm = Pixmap(self.model.bmstore, fileName)
+            pm.fileName = fileName
+            pm.scalable = flags != 0
             self.bstyles[id] = pm
             self.model.pixmaps.append(pm)
         elif name == 'option':
@@ -216,7 +217,7 @@ class MapDocumentHandler(xml.sax.ContentHandler):
             pass
         else:
             print "Tag: ", name
-            raise "Unknown tag"
+            raise MapParseError("Unknown tag")
 
     def endElement(self, name):
         name = name.lower()
@@ -233,25 +234,24 @@ class MapDocumentHandler(xml.sax.ContentHandler):
         self.model.options = MapOptions(self.opMap)
         for ps in self.pstyles.values():
             style = PolygonStyle()
-            style.setId(ps.id)
-            style.setVisible(1)
-            style.setVisibleInRadar(1)
-            if ps.textureId is not None:
-                style.setTexture(self.bstyles[ps.textureId])
-                style.setFillStyle(style.FILL_TEXTURED)
-            elif ps.color is not None:
-                style.setColor(ps.color)
-                style.setFillStyle(style.FILL_COLOR)
+            style.id = ps.id
+            style.setFromFlags(ps.flags)
+            if style.textured:
+                if ps.textureId is None:
+                    raise MapParseError("Textured polygon, no texture name")
+                style.texture = self.bstyles[ps.textureId]
+            if ps.color is None:
+                style.color = 0xFFFFFF
             else:
-                style.setFillStyle(style.FILL_NONE)
+                style.color = ps.color
             ls = self.estyles[ps.defEdgeId]
-            style.setDefaultEdgeStyle(ls)
+            style.defaultEdgeStyle = ls
             self.model.polyStyles.append(style)
             ps.ref = style
         for p in self.polys:
             ps = self.pstyles[p.style]
             style = ps.ref
-            defls = style.getDefaultEdgeStyle()
+            defls = style.defaultEdgeStyle
             if p.hasSpecialEdges:
                 edges = []
             else:
@@ -265,6 +265,7 @@ class MapDocumentHandler(xml.sax.ContentHandler):
                 x += pnt.x
                 y += pnt.y
                 awtp.addPoint(x, y)
+            cls = None
             if edges != None:
                 for pnt in p.points[1:]:
                     if pnt.style != None:
@@ -273,6 +274,6 @@ class MapDocumentHandler(xml.sax.ContentHandler):
                             cls = None
                     edges.append(cls)
             mp = MapPolygon(awtp, style, edges)
-            mp.setType(p.type)
-            mp.setTeam(p.team)
+            mp.type = p.type
+            mp.team = p.team
             self.model.addToFront(mp)

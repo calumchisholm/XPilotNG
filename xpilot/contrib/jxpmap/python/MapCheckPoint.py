@@ -8,5 +8,5 @@ class MapCheckPoint(MapObject):
 
     def printXml(self, file):
         b = self.getBounds()
-        file.write('<Check x="%d" y="%d"/>' % (b.x + b.width / 2,
+        file.write('<Check x="%d" y="%d"/>\n' % (b.x + b.width / 2,
                                                b.y + b.height / 2))

@@ -21,15 +21,6 @@ class MapPolygon(MapObject):
     def getCreateHandler(self):
         return CreateHandler(self)
 
-    def setType(self, type):
-        self.type = type
-
-    def getType(self):
-        return self.type
-
-    def setTeam(self, team):
-        self.team = team
-
     def getBounds(self):
         return self.polygon.getBounds()
 
@@ -55,31 +46,78 @@ class MapPolygon(MapObject):
         tx = di.tx
 
         trans = [tx(p) for p in self.polygon.points]
+
+        bounds = self.polygon.getBounds()
+        if max(bounds.width, bounds.height) * di.canvas.scale > 30000:
+            # gtk doesn't like getting coordinates bigger than 32767.
+            # Those cause an illogical error message
+            # "TypeError: sequence member not a 2-tuple"
+            for p in trans:
+                if p.x > 30000:
+                    p.x = 30000
+                elif p.x < -30000:
+                    p.x = -30000
+                if p.y > 30000:
+                    p.y = 30000
+                elif p.y < -30000:
+                    p.y = -30000
+
         points = [(t.x, t.y) for t in trans]
 
-        if self.style.getFillStyle() == PolygonStyle.FILL_COLOR:
-            gc.foreground = colormap.alloc(*gcolor(self.style.getColor()))
+        nofill = 1
+        if self.style.textured and di.canvas.textured:
+            if self.style.texture.scalable:
+                gc.tile = self.style.texture.image[di.scale * 64]
+            else:
+                gc.tile = self.style.texture.image[1]
+            # !@# Should align the texture
+            gc.fill = GDK.TILED
+            nofill = 0
+        elif self.style.filled and di.canvas.filled:
+            gc.foreground = colormap.alloc(*gcolor(self.style.color))
+            nofill = 0
+        if not nofill:
             gtk.draw_polygon(di.area, gc, gtk.TRUE, points)
-        elif self.style.getFillStyle() == PolygonStyle.FILL_TEXTURED:
-            raise "unimplemented"
+            gc.fill = GDK.SOLID
 
         if self.edgeStyles is None:
-            df = self.style.getDefaultEdgeStyle()
-            if df.getStyle() != LineStyle.STYLE_HIDDEN:
-                gc.foreground = colormap.alloc(*gcolor(df.getColor()))
+            df = self.style.defaultEdgeStyle
+            if df.style != LineStyle.STYLE_HIDDEN or nofill:
+                gc.foreground = colormap.alloc(*gcolor(df.color))
                 gtk.draw_polygon(di.area, gc, gtk.FALSE, points)
                 # !@# dashed lines, width missing here
         else:
-            raise "unimplemented"
+            si = 0
+            cs = self.edgeStyles[0]
+            for i in range(1, len(points)):
+                if self.edgeStyles[i] == cs:
+                    continue
+                lstyle = cs or self.style.defaultEdgeStyle
+                if lstyle.style != LineStyle.STYLE_HIDDEN or nofill:
+                    gc.foreground = colormap.alloc(*gcolor(style.color))
+                    gtk.draw_lines(di.area, gc, points[si:i+1])
+                si = i
+                cs = self.edgeStyles[i]
+            points2 = points[si:]
+            points2.append(points[0])
+            lstyle = cs or self.style.defaultEdgeStyle
+            if lstyle.style != LineStyle.STYLE_HIDDEN or nofill:
+                gc.foreground = colormap.alloc(*gcolor(style.color))
+                gtk.draw_lines(di.area, gc, points2)
+
+        if di.canvas.showPoints:
+            for p in points:
+                gtk.draw_rectangle(di.area, di.white_gc, gtk.FALSE,
+                                   p[0] - 1, p[1] - 1, 2, 2)
 
     def getPropertyEditor(self, canvas):
         return PolygonPropertyEditor(canvas, self)
 
     def checkEvent(self, canvas, me):
         b = self.getBounds()
-        p = me.getPoint()
+        p = me.point
         pl = self.polygon
-        THRESHOLD = 25 / canvas.scale**2
+        THRESHOLD = 9 / canvas.scale**2
 
         larger = Rectangle(b.x - 20 * 64, b.y - 20 * 64,
                            b.width + 40 * 64, b.height + 40 * 64)
@@ -144,11 +182,11 @@ class MapPolygon(MapObject):
         if self.polygon.npoints < 3:
             raise "Invalid polygon with less than 3 points"
 
-        if self.getType() == self.TYPE_BALLAREA:
+        if self.type == self.TYPE_BALLAREA:
             file.write('<BallArea>\n')
-        elif self.getType() == self.TYPE_BALLTARGET:
+        elif self.type == self.TYPE_BALLTARGET:
             file.write('<BallTarget team="%d">\n' % self.team)
-        elif self.getType() == self.TYPE_DECORATION:
+        elif self.type == self.TYPE_DECORATION:
             file.write('<Decor>\n')
 
         points = self.polygon.points[:]
@@ -157,7 +195,7 @@ class MapPolygon(MapObject):
         if es is None:
             es = [None] * len(points)
         file.write('<Polygon x="%d" y="%d" style="%s">\n' % (
-                   points[0].x, points[0].y, self.style.getId()))
+                   points[0].x, points[0].y, self.style.id))
 
         if not self.isCounterClockwise():
             points.reverse()
@@ -171,19 +209,19 @@ class MapPolygon(MapObject):
             file.write('<Offset x="%d" y="%d"' % (p.x - pp.x, p.y - pp.y))
             if e is not cls:
                 if e is None:
-                    id = self.style.getDefaultEdgeStyle().getId()
+                    id = self.style.defaultEdgeStyle.id
                 else:
-                    id = e.getId()
+                    id = e.id
                 file.write(' style="%s"' % e)
             file.write('/>\n')
             pp = p
         file.write('</Polygon>\n')
 
-        if self.getType() == self.TYPE_BALLAREA:
+        if self.type == self.TYPE_BALLAREA:
             file.write('</BallArea>\n')
-        elif self.getType() == self.TYPE_BALLTARGET:
+        elif self.type == self.TYPE_BALLTARGET:
             file.write('</BallTarget>\n')
-        elif self.getType() == self.TYPE_DECORATION:
+        elif self.type == self.TYPE_DECORATION:
             file.write('</Decor>\n')
 
 
@@ -195,19 +233,19 @@ class CreateHandler(MouseEventHandler):
         self.remove = 0
 
     def mousePressed(self, me):
-        c = me.getSource()
+        c = me.canvas
         gc = c.previewgc
         if self.poly is None:
             self.poly = Polygon()
-            first = me.getPoint()
+            first = me.point
             self.poly.addPoint(first.x, first.y)
             self.poly.addPoint(first.x, first.y)
             return
-        c = me.getSource()
+        c = me.canvas
         if self.remove:
             c.drawShape(self.poly, gc)
             self.remove = 0
-        latest = me.getPoint()
+        latest = me.point
         self.poly.points[self.poly.npoints - 1] = latest
         if me.button == 3:
             self.poly.recalculate_bounds()
@@ -222,13 +260,13 @@ class CreateHandler(MouseEventHandler):
         self.remove = 1
 
     def mouseMoved(self, me):
-        c = me.getSource()
+        c = me.canvas
         if self.poly is None:
             return
         if self.remove:
             c.drawShape(self.poly)
             self.remove = 0
-        self.poly.points[self.poly.npoints - 1] = me.getPoint()
+        self.poly.points[self.poly.npoints - 1] = me.point
         # Bounds not recalculated here so might not be 100% correct
         c.drawShape(self.poly)
         self.remove = 1
@@ -246,24 +284,24 @@ class PolygonPointMoveHandler(MouseEventHandler):
         self.l2 = Line(next, next)
 
     def mouseMoved(self, evt):
-        c = evt.getSource()
+        c = evt.canvas
         if not self.virgin:
             self.drawPreview(c)
         else:
             self.virgin = 0
-        p = evt.getPoint()
+        p = evt.point
         p.x += self.wrap[0]
         p.y += self.wrap[1]
-        self.l1.p2 = self.l2.p2 = evt.getPoint()
+        self.l1.p2 = self.l2.p2 = evt.point
         # Bounds not recalculated...
         self.drawPreview(c)
 
     def mouseReleased(self, evt):
-        c = evt.getSource()
-        p = evt.getPoint()
+        c = evt.canvas
+        p = evt.point
         p.x += self.wrap[0]
         p.y += self.wrap[1]
-        self.obj.polygon.points[self.index] = evt.getPoint()
+        self.obj.polygon.points[self.index] = evt.point
         self.obj.polygon.recalculate_bounds()
         c.setCanvasEventHandler(None)
         c.repaint()

@@ -18,15 +18,7 @@ class MapBase(MapObject):
         else:
             imgname = 'base_left.gif'
         MapObject.__init__(self, x, y, 35 * 64, 35 * 64, bmstore[imgname])
-        self.setDir(dir)
-        self.setTeam(team)
-
-    def setDir(self, dir):
         self.dir = dir
-
-    def setTeam(self, team):
-        if team < 1 or team > 10:
-            raise ValueError("illegal team %d" % team)
         self.team = team
 
     def printXml(self, file):

@@ -5,21 +5,13 @@ class LineStyle:
     STYLE_ONOFFDASH = 1
     STYLE_DOUBLEDASH = 2
     STYLE_HIDDEN = 3
+    STYLE_INTERNAL = 4
 
     def __init__(self, id = None, width = 1, color = 0, style = STYLE_SOLID):
         self.id = id
         self.width = width
         self.color = color
         self.style = style
-
-    def getStyle(self):
-        return self.style
-
-    def getColor(self):
-        return self.color
-
-    def getId(self):
-        return self.id
 
     def printXml(self, file):
         if self.id == 'internal':
