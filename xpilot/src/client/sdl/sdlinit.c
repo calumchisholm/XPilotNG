@@ -26,8 +26,6 @@ SDL_Surface  *MainSDLSurface = NULL;
 
 int Init_playing_windows(void)
 {
-  
-   
     /*
     sdl_init_colors();
     Init_spark_colors();
@@ -50,7 +48,7 @@ int Init_playing_windows(void)
 
 
 int Init_window(void)
-{  
+{
   char defaultfont[] = CONF_FONTDIR "defaultfont.bmp"; /* TODO make bmp fonts work */
   char testfont[] = CONF_FONTDIR "Test.ttf";
   int gamefontsize = 12;
@@ -65,7 +63,7 @@ int Init_window(void)
     return -1;
   }
   xpprintf("SDL_ttf initialized\n");
-  
+
  Conf_print();
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -77,8 +75,7 @@ int Init_window(void)
 
     /* Fetch the video info */
     videoInfo = SDL_GetVideoInfo( );
-    
-    
+
     num_spark_colors=8;
 
     /* the flags to pass to SDL_SetVideoMode */
@@ -100,18 +97,18 @@ int Init_window(void)
     /* This checks if hardware blits can be done */
     if ( videoInfo->blit_hw )
         videoFlags |= SDL_HWACCEL;
-   
+
     draw_depth =  videoInfo->vfmt->BitsPerPixel;
-    
+
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    if ((MainSDLSurface = SDL_SetVideoMode(draw_width, 
-			 draw_height, 
-			 draw_depth, 
+    if ((MainSDLSurface = SDL_SetVideoMode(draw_width,
+			 draw_height,
+			 draw_depth,
 			 videoFlags )) == NULL) {
       error("Could not find a valid GLX visual for your display");
     }
-        
+
     SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
     printf("RGB bpp %d/", value);
     SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE,&value);
@@ -128,7 +125,7 @@ int Init_window(void)
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     /* Set title for window */
     SDL_WM_SetCaption(TITLE, NULL);
 
@@ -147,9 +144,10 @@ int Init_window(void)
 	if (fontinit(&mapfont,defaultfont,mapfontsize))
 	    error("Default font failed! messagefont not available!");
     }
+    return 0;
 }
 
-void Quit(void) 
+void Quit(void)
 {
     Close_WidgetTree(&MainWidget);
     Gui_cleanup();
