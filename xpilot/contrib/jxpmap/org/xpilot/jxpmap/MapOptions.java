@@ -105,7 +105,9 @@ public class MapOptions {
     }
     
     public String get(String name) {
-        return (String)options.get(name);
+        Option o = (Option)options.get(name);
+        if (o == null) return null;
+        return o.value;
     }
     
     public Dimension getSize() {

@@ -507,16 +507,15 @@ bevelBorder() {
         alert("First select a polygon");
         return;
     }
-    var mp = editor.selectedObjects.get(0);
-    if (!(mp instanceof MapPolygon)) {
-        alert("First selected object is not a polygon");
-        return;
-    }
     var value = prompt("Enter border height in pixels", "10");
     if (value == null) return;
     var height = Integer.parseInt(value) * 64;
-    var bb = makeBevelBorder(mp, height, vec(1,-1), true);
-    editor.addMapObject(bb);
+    for(o:editor.selectedObjects) {
+        if (isWall(o)) {
+            var bb = makeBevelBorder(o, height, vec(1,-1), true); 
+            editor.addMapObject(bb);
+        }
+    }
     editor.repaint();
 }
 
@@ -525,16 +524,16 @@ depthDecor() {
         alert("First select a polygon");
         return;
     }
-    var mp = editor.selectedObjects.get(0);
-    if (!(mp instanceof MapPolygon)) {
-        alert("First selected object is not a polygon");
-        return;
-    }
     var value = prompt("Enter depth in pixels", "10");
     if (value == null) return;
     var height = Integer.parseInt(value) * 64;
-    var db = makeDepthBorder(mp, height, vec(-1,2), vec(1,-1), true, false);
-    editor.model.addToBack(db);
+    for(o:editor.selectedObjects) {
+        if (isWall(o)) {
+            var db = makeDepthBorder(o, height, 
+                vec(-1,2), vec(1,-1), true, false);
+            editor.model.addToBack(db);
+        }
+    }
     editor.repaint();
 }
 
