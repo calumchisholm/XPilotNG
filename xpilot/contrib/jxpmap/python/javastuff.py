@@ -6,9 +6,6 @@ import gdkpixbuf
 # libraries used in the original Java version, and some additional
 # utility stuff.
 
-PIXMAP_PATH = ["/home/uau/reiser/xpilot/contrib/jxpmap/images/",
-               "/home/uau/games/lib/xpilot/textures/rtc/"]
-
 class Rectangle:
     def __init__(self, x, y, w, h):
         self.x = x
@@ -227,6 +224,7 @@ class ScaledBitmap:
 
 import os
 import weakref
+from config import PIXMAP_PATH
 class ScaledBitmapStore:
     def __init__(self):
         self.store = weakref.WeakValueDictionary()
