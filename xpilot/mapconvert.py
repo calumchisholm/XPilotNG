@@ -424,7 +424,7 @@ def convert(options):
                 if curh and not prevh:
 		    sstr = ' style="internal"'
 		elif prevh and not curh:
-                    sstr = ' style="xpbluethin"'
+                    sstr = ' style="xpbluehidden"'
 		for i in range((max(abs(curx), abs(cury)) + MAXLEN - 1) / MAXLEN, 0, -1):
 		    print '<Offset x="%d" y="%d"%s/>' % (curx / i, cury / i, sstr)
                     sstr= ''
