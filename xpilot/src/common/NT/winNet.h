@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -43,17 +42,17 @@ extern "C" {
 
 #define	EWOULDBLOCK		WSAEWOULDBLOCK
 
-extern	long	alarm(long seconds, void(__cdecl*func)(int));
+    extern long alarm(long seconds, void (__cdecl * func) (int));
 
-extern	const char* _GetWSockErrText(int error);
-extern	HWND		notifyWnd;
-extern	BOOL*		hostnameFound;
+    extern const char *_GetWSockErrText(int error);
+    extern HWND notifyWnd;
+    extern BOOL *hostnameFound;
 
 #define	WM_GETHOSTNAME	(WM_APP+100)
 
 #ifdef	__cplusplus
 };
 #endif
-//extern	long	alarm(long seconds, int);
-#endif	/* _WINDOWS */
-#endif	/* _WINNET_H_ */
+//extern        long    alarm(long seconds, int);
+#endif				/* _WINDOWS */
+#endif				/* _WINNET_H_ */

@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -29,25 +28,21 @@
 #include <windows.h>
 #include "../../common/error.h"
 //#include "winServer.h"
-extern	void	_Trace(char* lpszFormat, ...);
+extern void _Trace(char *lpszFormat, ...);
 
-static int		winalarm;
-HWND	alarmWnd;
-HWND	notifyWnd;					/* Our parent's window */
+static int winalarm;
+HWND alarmWnd;
+HWND notifyWnd;			/* Our parent's window */
 
-long	alarm(long seconds, void(__cdecl*func)(int))
+long alarm(long seconds, void (__cdecl * func) (int))
 {
 #if 0
-	if (!seconds)
-	{
-		KillTimer(alarmWnd, winalarm);
-	}
-	else
-	{
-		winalarm = SetTimer(alarmWnd, 0, seconds*1000, (TIMERPROC)func);
-		Trace("Winalarm=%d\n", winalarm);
-	}
+    if (!seconds) {
+	KillTimer(alarmWnd, winalarm);
+    } else {
+	winalarm = SetTimer(alarmWnd, 0, seconds * 1000, (TIMERPROC) func);
+	Trace("Winalarm=%d\n", winalarm);
+    }
 #endif
-	return((long)winalarm);
+    return ((long) winalarm);
 }
-

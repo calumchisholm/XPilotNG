@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -40,40 +39,40 @@
  * Compose sequence status structure, used in calling XLookupString.
  */
 typedef struct _XComposeStatus {
-    XPointer compose_ptr;   /* state table pointer */
-    int chars_matched;      /* match state */
+    XPointer compose_ptr;	/* state table pointer */
+    int chars_matched;		/* match state */
 } XComposeStatus;
 
 /* lifted from keysymdef.h */
-#define XK_BackSpace            0xFF08  /* back space, back char */
+#define XK_BackSpace            0xFF08	/* back space, back char */
 #define XK_Tab                  0xFF09
-#define XK_Linefeed             0xFF0A  /* Linefeed, LF */
+#define XK_Linefeed             0xFF0A	/* Linefeed, LF */
 #define XK_Clear                0xFF0B
-#define XK_Return               0xFF0D  /* Return, enter */
-#define XK_Pause                0xFF13  /* Pause, hold */
+#define XK_Return               0xFF0D	/* Return, enter */
+#define XK_Pause                0xFF13	/* Pause, hold */
 #define XK_Scroll_Lock          0xFF14
 #define XK_Sys_Req              0xFF15
 #define XK_Escape               0xFF1B
-#define XK_Delete               0xFFFF  /* Delete, rubout */
+#define XK_Delete               0xFFFF	/* Delete, rubout */
 
 #define XK_Home                 0xFF50
-#define XK_Left                 0xFF51  /* Move left, left arrow */
-#define XK_Up                   0xFF52  /* Move up, up arrow */
-#define XK_Right                0xFF53  /* Move right, right arrow */
-#define XK_Down                 0xFF54  /* Move down, down arrow */
-#define XK_Prior                0xFF55  /* Prior, previous */
+#define XK_Left                 0xFF51	/* Move left, left arrow */
+#define XK_Up                   0xFF52	/* Move up, up arrow */
+#define XK_Right                0xFF53	/* Move right, right arrow */
+#define XK_Down                 0xFF54	/* Move down, down arrow */
+#define XK_Prior                0xFF55	/* Prior, previous */
 #define XK_Page_Up              0xFF55
-#define XK_Next                 0xFF56  /* Next */
+#define XK_Next                 0xFF56	/* Next */
 #define XK_Page_Down            0xFF56
-#define XK_End                  0xFF57  /* EOL */
-#define XK_Begin                0xFF58  /* BOL */
+#define XK_End                  0xFF57	/* EOL */
+#define XK_Begin                0xFF58	/* BOL */
 
 
 
-#define XK_KP_Space             0xFF80  /* space */
+#define XK_KP_Space             0xFF80	/* space */
 #define XK_KP_Tab               0xFF89
-#define XK_KP_Enter             0xFF8D  /* enter */
-#define XK_KP_F1                0xFF91  /* PF1, KP_A, ... */
+#define XK_KP_Enter             0xFF8D	/* enter */
+#define XK_KP_F1                0xFF91	/* PF1, KP_A, ... */
 #define XK_KP_F2                0xFF92
 #define XK_KP_F3                0xFF93
 #define XK_KP_F4                0xFF94
@@ -90,10 +89,10 @@ typedef struct _XComposeStatus {
 #define XK_KP_Begin             0xFF9D
 #define XK_KP_Insert            0xFF9E
 #define XK_KP_Delete            0xFF9F
-#define XK_KP_Equal             0xFFBD  /* equals */
+#define XK_KP_Equal             0xFFBD	/* equals */
 #define XK_KP_Multiply          0xFFAA
 #define XK_KP_Add               0xFFAB
-#define XK_KP_Separator         0xFFAC  /* separator, often comma */
+#define XK_KP_Separator         0xFFAC	/* separator, often comma */
 #define XK_KP_Subtract          0xFFAD
 #define XK_KP_Decimal           0xFFAE
 #define XK_KP_Divide            0xFFAF
@@ -117,7 +116,7 @@ typedef struct _XComposeStatus {
 #define XK_percent             0x025
 #define XK_ampersand           0x026
 #define XK_apostrophe          0x027
-#define XK_quoteright          0x027    /* deprecated */
+#define XK_quoteright          0x027	/* deprecated */
 #define XK_parenleft           0x028
 #define XK_parenright          0x029
 #define XK_asterisk            0x02a
@@ -175,7 +174,7 @@ typedef struct _XComposeStatus {
 #define XK_asciicircum         0x05e
 #define XK_underscore          0x05f
 #define XK_grave               0x060
-#define XK_quoteleft           0x060    /* deprecated */
+#define XK_quoteleft           0x060	/* deprecated */
 #define XK_a                   0x061
 #define XK_b                   0x062
 #define XK_c                   0x063
@@ -207,11 +206,12 @@ typedef struct _XComposeStatus {
 #define XK_braceright          0x07d
 #define XK_asciitilde          0x07e
 
-extern	XLookupKeysym(XKeyEvent* key_event, int index);
-extern	XLookupString(XKeyEvent* key_event, char* buffer_return, int bytes_buffer,
-					  KeySym* keysym_return, XComposeStatus* status_in_out);
+extern XLookupKeysym(XKeyEvent * key_event, int index);
+extern XLookupString(XKeyEvent * key_event, char *buffer_return,
+		     int bytes_buffer, KeySym * keysym_return,
+		     XComposeStatus * status_in_out);
 
 
-#endif	/* _WINDOWS */
+#endif				/* _WINDOWS */
 
-#endif	/* _WINXKEY_H_ */
+#endif				/* _WINXKEY_H_ */
