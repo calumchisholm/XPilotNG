@@ -1,7 +1,10 @@
 /*
  * XPilotNG/SDL, an SDL/OpenGL XPilot client.
  *
- * Copyright (C) 2003-2004 Juha Lindström <juhal@users.sourceforge.net>
+ * Copyright (C) 2003-2004 by
+ *
+ *      Juha Lindström       <juhal@users.sourceforge.net>
+ *      Darel Cullen         <darelcullen@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,55 +26,6 @@
 #include "sdlwindow.h"
 #include "text.h"
 #include "glwidgets.h"
-
-
-GLWidget *MetaWidget = NULL;
-
-struct Label {
-  const char *label;
-  int commas;
-  int yoff;
-  int height;
-};
-    
-struct Label labels[] = {
-	{"Server", 0, 0, 0},
-	{"IP:Port", 0, 0, 0},
-	{"Version", 0, 0, 0},
-	{"Users", 0, 0, 0},
-	{"Map name", 0, 0, 0},
-	{"Map size", 0, 0, 0},
-	{"Map author", 0, 0, 0},
-	{"Status", 0, 0, 0},
-	{"Bases", 0, 0, 0},
-	{"Teambases", 0, 0, 0},
-	{"Free bases", 0, 0, 0},
-	{"Queued players", 0, 0, 0},
-	{"FPS", 0, 0, 0},
-	{"Sound", 0, 0, 0},
-	{"Timing", 0, 0, 0},
-	{"Playlist", 1, 0, 0}
-    };
-
-/*
- * An array of structures with information to join a local server.
- */
-static Connect_param_t *global_conpar;
-static Connect_param_t *localnet_conpars;
-static server_info_t *global_sip;
-
-static const char player_header[] = "Pl";
-static const char queue_header[] = "Q";
-static const char bases_header[] = "Ba";
-static const char team_header[] = "Tm";
-static const char fps_header[] = "FPS";
-static const char status_header[] = "Stat";
-static const char version_header[] = "Version";
-static const char map_header[] = "Map Name";
-static const char server_header[] = "Server";
-static const char ping_header[] = "Ping";
-static const char stat_header[] = "Status";
-
 
 #define SELECTED_BG 0x009000ff
 #define ROW_FG 0xffff00ff

@@ -1,9 +1,12 @@
 /*
- * XPilotNG/SDL, an SDL/OpenGL XPilot client.
+ * XPilotNG/SDL, an SDL/OpenGL XPilot client. 
  *
- * Copyright (C) 2003-2004 Juha Lindström <juhal@users.sourceforge.net>
+ * Copyright (C) 2003-2004 by 
  *
- * Copyright (C) 1991-2001 by
+ *      Juha Lindström       <juhal@users.sourceforge.net>
+ *      Erik Andersson       <maximan@users.sourceforge.net>
+ *
+ * Copyright (C) 1991-2002 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
  *      Ken Ronny Schouten   <ken@xpilot.org>
