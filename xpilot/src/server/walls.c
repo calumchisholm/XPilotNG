@@ -282,64 +282,6 @@ void Turn_player(int ind)
 }
 
 
-void Cannon_dies(int ind, player *pl)
-{
-    cannon_t		*cannon = &World.cannon[ind];
-    int			cx = cannon->pos.cx;
-    int			cy = cannon->pos.cy;
-    int			killer = -1;
-
-    Cannon_remove_from_map(ind);
-    Cannon_throw_items(ind);
-    Cannon_init(ind);
-    sound_play_sensors(cx, cy, CANNON_EXPLOSION_SOUND);
-    Make_debris(
-	/* pos.cx, pos.cy   */ cx, cy,
-	/* vel.x, vel.y   */ 0.0, 0.0,
-	/* owner id       */ NO_ID,
-	/* owner team	  */ cannon->team,
-	/* kind           */ OBJ_DEBRIS,
-	/* mass           */ 4.5,
-	/* status         */ GRAVITY,
-	/* color          */ RED,
-	/* radius         */ 6,
-	/* num debris     */ 20 + 20 * rfrac(),
-	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
-	/* min,max speed  */ 20, 50,
-	/* min,max life   */ 8 * TIME_FACT, 68 * TIME_FACT
-	);
-    Make_wreckage(
-	/* pos.cx, pos.cy   */ cx, cy,
-	/* vel.x, vel.y   */ 0.0, 0.0,
-	/* owner id       */ NO_ID,
-	/* owner team	  */ cannon->team,
-	/* min,max mass   */ 3.5, 23,
-	/* total mass     */ 28,
-	/* status         */ GRAVITY,
-	/* color          */ WHITE,
-	/* max wreckage   */ 10,
-	/* min,max dir    */ (int)(cannon->dir - (RES * 0.2)), (int)(cannon->dir + (RES * 0.2)),
-	/* min,max speed  */ 10, 25,
-	/* min,max life   */ 8 * TIME_FACT, 68 * TIME_FACT
-	);
-
-    if (pl) {
-	killer = GetInd[pl->id];
-	if (cannonPoints > 0) {
-	    if (BIT(World.rules->mode, TEAM_PLAY)
-		&& teamCannons) {
-		TEAM_SCORE(cannon->team, -cannonPoints);
-	    }
-	    if (pl->score <= cannonMaxScore
-		&& !(BIT(World.rules->mode, TEAM_PLAY)
-		     && pl->team == cannon->team)) {
-		SCORE(killer, cannonPoints, cannon->pos.cx,
-					    cannon->pos.cy, "");
-	    }
-	}
-    }
-}
-
 
 void Object_hits_target(int ind, object *obj, long player_cost)
 {
