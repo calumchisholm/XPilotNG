@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -292,7 +292,7 @@ struct bmpstyle {
 typedef struct {
     int style;
     int group;
-    int *edges;
+    int edges;
     int cx, cy;
     int num_points;
     int estyles_start;
@@ -320,8 +320,8 @@ extern struct edgestyle estyles[256];
 extern struct bmpstyle  bstyles[256];
 extern poly_t *pdata;
 extern int *estyleptr;
+extern int *edgeptr;
 extern struct group groups[];
 extern int num_pstyles, num_estyles, num_bstyles;
 
 #endif
-

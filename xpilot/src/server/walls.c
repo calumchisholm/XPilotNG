@@ -1886,7 +1886,7 @@ int Polys_to_client(unsigned char **start)
 	    STORE2(*edges++);
 	startx = pdata[i].cx;
 	starty = pdata[i].cy;
-	edges = pdata[i].edges;
+	edges = edgeptr + pdata[i].edges;
 	STORE2(j);
 	STORE2(startx >> CLICK_SHIFT);
 	STORE2(starty >> CLICK_SHIFT);
@@ -2300,7 +2300,7 @@ static void Inside_init(void)
 		minx = maxx = bx2;
 		miny = maxy = by2;
 	    }
-	    edges = pdata[poly].edges;
+	    edges = edgeptr + pdata[poly].edges;
 	    closest_line(bx, by, 1e10, 0); /* For polygons within one block */
 	    for (j = 0; j < num_points; j++) {
 		if (((startx >> B_SHIFT) != bx)
@@ -2659,7 +2659,7 @@ static void Poly_to_lines(void)
 	dy = 0;
 	startx = pdata[i].cx;
 	starty = pdata[i].cy;
-	edges = pdata[i].edges;
+	edges = edgeptr + pdata[i].edges;
 	for (j = 0; j < np; j++) {
 	    if (j == *styleptr) {
 		styleptr++;

@@ -60,17 +60,13 @@ char polygon_version[] = VERSION;
 /*static char	*FileName;*/
 
 
-/* kps - if this is too small, the server will probably say
- * "xpilots: Polygon 2501 (4 points) doesn't start and end at the same place"
- */
-static int edg[20000 * 2]; /* !@# change pointers in poly_t when realloc poss.*/
+int num_edges, max_edges;
 extern int num_polys; /* old name polyc */
 extern int num_groups;
 
-int *edges = edg;
+int *edgeptr;
 int *estyleptr;
-int ptscount, ecount;
-char *mapd;
+static int ptscount, ecount;
 
 struct polystyle pstyles[256];
 struct edgestyle estyles[256] =
@@ -95,6 +91,11 @@ static int current_estyle, current_group, is_decor;
 
 void P_edgestyle(char *id, int width, int color, int style)
 {
+    if (num_estyles > 255) {
+	warn("Too many edgestyles");
+	exit(1);
+    }
+
     strlcpy(estyles[num_estyles].id, id, sizeof(estyles[0].id));
     estyles[num_estyles].color = color;
     estyles[num_estyles].width = width;
@@ -105,6 +106,10 @@ void P_edgestyle(char *id, int width, int color, int style)
 void P_polystyle(char *id, int color, int texture_id, int defedge_id,
 		   int flags)
 {
+    if (num_pstyles > 255) {
+	warn("Too many polygon styles");
+	exit(1);
+    }
     /* kps - add sanity checks ??? */
     if (defedge_id == 0) {
 	warn("Polygon default edgestyle cannot be omitted or set "
@@ -123,6 +128,10 @@ void P_polystyle(char *id, int color, int texture_id, int defedge_id,
 
 void P_bmpstyle(char *id, char *filename, int flags)
 {
+    if (num_bstyles > 255) {
+	warn("Too many bitmap styles");
+	exit(1);
+    }
     strlcpy(bstyles[num_bstyles].id, id, sizeof(bstyles[0].id));
     strlcpy(bstyles[num_bstyles].filename, filename,
 	    sizeof(bstyles[0].filename));
@@ -154,7 +163,7 @@ void P_start_polygon(int cx, int cy, int style)
     t.cx = cx;
     t.cy = cy;
     t.group = current_group;
-    t.edges = edges;
+    t.edges = num_edges;
     t.style = style;
     t.estyles_start = ecount;
     t.is_decor = is_decor;
@@ -175,8 +184,8 @@ void P_offset(int offcx, int offcy, int edgestyle)
 	exit(1);
     }
 
-    *edges++ = offcx;
-    *edges++ = offcy;
+    STORE(int, edgeptr, num_edges, max_edges, offcx);
+    STORE(int, edgeptr, num_edges, max_edges, offcy);
     if (edgestyle != -1 && edgestyle != current_estyle) {
 	STORE(int, estyleptr, ecount, max_echanges, ptscount);
 	STORE(int, estyleptr, ecount, max_echanges, edgestyle);
@@ -379,4 +388,3 @@ void P_set_hitmask(int group, int hitmask)
     }
     groups[group].hit_mask = hitmask;
 }
-
