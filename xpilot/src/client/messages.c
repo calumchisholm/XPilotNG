@@ -365,16 +365,11 @@ static void Msg_parse(char *message, size_t len)
     }
 }
 
-/*
- * END of message parser
- */
 
-/* reset scan */
 static bool Msg_scan_for_total_reset(char *message)
 {
     static char total_reset[] = "Total reset";
 
-    /*check for 'Total reset' and clear killratio */
     if (strstr(message, total_reset)) {
 	killratio_kills = 0;
 	killratio_deaths = 0;
@@ -414,8 +409,8 @@ static bool Msg_scan_for_replace_treasure(char *message)
 	 * Ok, at this point we know that it was not someone in our team
 	 * that replaced the treasure.
 	 *
-	 * If there are 2 teams playing only and the ball was replaced and
-	 * it was not our team that replaced the ball, it was the other team.
+	 * If there are only 2 teams playing, and our team did not replace,
+	 * it was the other team.
 	 * In this case, we can clear the cover flag.
 	 */
 	if (num_playing_teams == 2)
