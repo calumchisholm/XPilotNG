@@ -1530,30 +1530,6 @@ static int Send_self_items(connection_t *connp, player_t *pl)
     return 5 + item_count;
 }
 
-#if 0
-static char *status2str(int status)
-{
-    static char buf[256];
-
-    buf[0] = '\0';
-
-    if (status & PLAYING)
-	strlcat(buf, "PLAYING ", sizeof(buf));
-    if (status & PAUSE)
-	strlcat(buf, "PAUSE ", sizeof(buf));
-    if (status & GAME_OVER)
-	strlcat(buf, "GAME_OVER ", sizeof(buf));
-    if (status & WANT_AUDIO)
-	strlcat(buf, "WANT_AUDIO ", sizeof(buf));
-    if (status & THRUSTING)
-	strlcat(buf, "THRUSTING ", sizeof(buf));
-    if (status & KILLED)
-	strlcat(buf, "KILLED ", sizeof(buf));
-
-    return buf;
-}
-#endif
-
 /*
  * Send all frame data related to the player self and his HUD.
  */
@@ -1567,10 +1543,6 @@ int Send_self(connection_t *connp,
 	      char *mods)
 {
     int n;
-
-#if 0
-    warn("status bits = %s", status2str(status));
-#endif
 
     /* assumes connp->version >= 0x4203 */
     n = Packet_printf(&connp->w,
