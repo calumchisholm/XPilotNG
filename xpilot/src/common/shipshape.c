@@ -25,14 +25,12 @@
 
 char shipshape_version[] = VERSION;
 
-int	Get_shape_keyword(char *keyw);
+static int	Get_shape_keyword(char *keyw);
 
 int	debugShapeParsing = 0;
 int	verboseShapeParsing = 0;
 int	shapeLimits;
 extern bool is_server;
-
-extern void	Make_table(void);
 
 /* kps - tmp hack */
 shapepos *Shape_get_points(shape *s, int dir)
@@ -112,29 +110,28 @@ shipobj *Default_ship(void)
 
     if (!sh.num_points) {
 	ipos pos;
+
 	sh.num_points = 3;
+
 	sh.pts[0] = &pts[0][0];
-	/*sh.pts[0][0].x = 15;  sh.pts[0][0].y = 0;*/
 	pos.x = 15;
 	pos.y = 0;
 	Ship_set_point(&sh, 0, pos);
+
 	sh.pts[1] = &pts[1][0];
-	/*sh.pts[1][0].x = -9;  sh.pts[1][0].y = 8;*/
 	pos.x = -9;
 	pos.y = 8;
 	Ship_set_point(&sh, 1, pos);
+
 	sh.pts[2] = &pts[2][0];
-	/*sh.pts[2][0].x = -9;  sh.pts[2][0].y = -8;*/
 	pos.x = -9;
 	pos.y = -8;
 	Ship_set_point(&sh, 2, pos);
 
-	/*sh.engine[0].x = -9;  sh.engine[0].y = 0;*/
 	pos.x = -9;
 	pos.y = 0;
 	Ship_set_engine(&sh, pos);
 
-	/*sh.m_gun[0].x = 15;  sh.m_gun[0].y = 0;*/
 	pos.x = 15;
 	pos.y = 0;
 	Ship_set_m_gun(&sh, pos);
@@ -143,19 +140,16 @@ shipobj *Default_ship(void)
 	sh.l_light[0] = &pts[3][0];
 	pos.x = -9;
 	pos.y = 8;
-	/*sh.l_light[0][0].x = -9;  sh.l_light[0][0].y = 8;*/
 	Ship_set_l_light(&sh, pos);
 
 	sh.num_r_light = 1;
 	sh.r_light[0] = &pts[4][0];
-	/*sh.r_light[0][0].x = -9;  sh.r_light[0][0].y = -8;*/
 	pos.x = -9;
 	pos.y = -8;
 	Ship_set_r_light(&sh, pos);
 
 	sh.num_m_rack = 1;
 	sh.m_rack[0] = &pts[5][0];
-	/*sh.m_rack[0][0].x = 15;  sh.m_rack[0][0].y = 0;*/
 	pos.x = 15;
 	pos.y = 0;
 	Ship_set_m_rack(&sh, pos);
@@ -1333,7 +1327,7 @@ void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 }
 
 
-int Get_shape_keyword(char *keyw)
+static int Get_shape_keyword(char *keyw)
 {
 #define NUM_SHAPE_KEYS	12
 
