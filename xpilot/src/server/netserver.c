@@ -2093,10 +2093,10 @@ int Send_base(connection_t *connp, int id, int num)
 /*
  * Send the amount of fuel in a fuelstation.
  */
-int Send_fuel(connection_t *connp, int num, int fuel)
+int Send_fuel(connection_t *connp, int num, double fuel)
 {
     return Packet_printf(&connp->w, "%c%hu%hu", PKT_FUEL,
-			 num, fuel >> FUEL_SCALE_BITS);
+			 num, (int)(fuel / FUEL_SCALE_FACT));
 }
 
 int Send_score_object(connection_t *connp, double score, int cx, int cy,

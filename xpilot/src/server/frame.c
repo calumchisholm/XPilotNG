@@ -532,7 +532,7 @@ static void Frame_map(connection_t *conn, player *pl)
 		 (view_width << CLICK_SHIFT) + BLOCK_CLICKS) &&
 		(CENTER_YCLICK(fs->pos.cy - pl->pos.cy) <
 		 (view_height << CLICK_SHIFT) + BLOCK_CLICKS)) {
-		Send_fuel(conn, i, (int) fs->fuel);
+		Send_fuel(conn, i, fs->fuel);
 		pl->last_fuel_update = i;
 		bytes_left -= max_packet * fuel_packet_size;
 		if (++packet_count >= max_packet)
