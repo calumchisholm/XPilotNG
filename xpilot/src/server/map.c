@@ -465,55 +465,6 @@ static bool World_alloc(world_t *world)
     return true;
 }
 
-
-
-
-static void Verify_wormhole_consistency(world_t *world)
-{
-    int i;
-    int	worm_in = 0,
-	worm_out = 0,
-	worm_norm = 0;
-
-    /* count wormhole types */
-    for (i = 0; i < world->NumWormholes; i++) {
-	int type = world->wormholes[i].type;
-	if (type == WORM_NORMAL)
-	    worm_norm++;
-	else if (type == WORM_IN)
-	    worm_in++;
-	else if (type == WORM_OUT)
-	    worm_out++;
-    }
-
-    /*
-     * Verify that the wormholes are consistent, i.e. that if
-     * we have no 'out' wormholes, make sure that we don't have
-     * any 'in' wormholes, and (less critical) if we have no 'in'
-     * wormholes, make sure that we don't have any 'out' wormholes.
-     */
-    if ((worm_norm) ? (worm_norm + worm_out < 2)
-	: (worm_in) ? (worm_out < 1)
-	: (worm_out > 0)) {
-
-	xpprintf("Inconsistent use of wormholes, removing them.\n");
-	for (i = 0; i < world->NumWormholes; i++)
-	    World_remove_wormhole(world, Wormhole_by_index(world, i));
-	world->NumWormholes = 0;
-    }
-
-    if (!options.wormholeStableTicks) {
-	for (i = 0; i < world->NumWormholes; i++) {
-	    int j = (int)(rfrac() * world->NumWormholes);
-
-	    while (Wormhole_by_index(world, j)->type == WORM_IN)
-		j = (int)(rfrac() * world->NumWormholes);
-	    Wormhole_by_index(world, i)->lastdest = j;
-	}
-    }
-}
-
-
 /*
  * This function can be called after the map options have been read.
  */
