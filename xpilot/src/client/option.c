@@ -149,6 +149,7 @@ static void Set_bool_option(xp_option_t *opt, bool value)
 {
     assert(opt);
     assert(opt->type == xp_bool_option);
+
     if (opt->bool_setfunc)
 	opt->bool_setfunc(opt, value);
     else
@@ -162,6 +163,7 @@ static void Set_int_option(xp_option_t *opt, int value)
 {
     assert(opt);
     assert(opt->type == xp_int_option);
+
     LIMIT(value, opt->int_minval, opt->int_maxval);
 
     if (opt->int_setfunc)
@@ -176,6 +178,7 @@ static void Set_double_option(xp_option_t *opt, double value)
 {
     assert(opt);
     assert(opt->type == xp_double_option);
+
     LIMIT(value, opt->dbl_minval, opt->dbl_maxval);
 
     if (opt->dbl_setfunc)
@@ -189,8 +192,8 @@ static void Set_double_option(xp_option_t *opt, double value)
 static void Set_string_option(xp_option_t *opt, const char *value)
 {
     assert(opt);
-    assert(opt->type == xp_double_option);
-    
+    assert(opt->type == xp_string_option);
+
     if (opt->str_setfunc)
 	opt->str_setfunc(opt, value);
     else
