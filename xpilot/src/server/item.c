@@ -930,7 +930,7 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
     DFLOAT		closest_mine_range = World.hypotenuse;
     int			i, j;
     DFLOAT		range, perim, damage;
-    player		*p, *owner_pl;
+    player		*p;
     ecm_t		*ecm;
 
     if (NumEcms >= MAX_TOTAL_ECMS)
@@ -971,7 +971,7 @@ void Fire_general_ecm(player *pl, unsigned short team, int cx, int cy)
 	 * team members if team immunity is on.
 	 */
 	if (shot->id != NO_ID) {
-	    owner_pl = Player_by_id(shot->id);
+	    player *owner_pl = Player_by_id(shot->id);
 	    if (pl == owner_pl) {
 		if (shot->type == OBJ_MINE) {
 		    if (BIT(shot->status, OWNERIMMUNE))
