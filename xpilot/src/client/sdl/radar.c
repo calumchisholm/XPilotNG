@@ -416,3 +416,14 @@ static void Radar_paint(widget_list_t *LI)
     Radar_paint_self(xf, yf);
     Radar_paint_border();
 }
+
+/* these 2 are here to allow linking to libxpclient */
+void Paint_sliding_radar(void)
+{
+    return;
+}
+
+void Paint_world_radar(void)
+{
+    return;
+}
