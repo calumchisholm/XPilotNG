@@ -460,7 +460,7 @@ void expandKeyword(const char *keyword);
  * Prototypes for laser.c
  */
 void Laser_pulse_collision(void);
-void Laser_pulse_hits_player(int ind, pulseobject *pulse);
+void Laser_pulse_hits_player(player *pl, pulseobject *pulse);
 
 /*
  * Prototypes for alliance.c

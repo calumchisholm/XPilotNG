@@ -257,17 +257,17 @@ int in_range_partial(double dx, double dy, double dvx, double dvy,
 static char msg[MSG_LEN];
 
 static void PlayerCollision(void);
-static void PlayerObjectCollision(int ind);
+static void PlayerObjectCollision(player *pl);
 static void AsteroidCollision(void);
 static void BallCollision(void);
 static void MineCollision(void);
-static void Player_collides_with_ball(int ind, object *obj, int radius);
-static void Player_collides_with_item(int ind, object *obj);
-static void Player_collides_with_mine(int ind, object *obj);
-static void Player_collides_with_debris(int ind, object *obj);
-static void Player_collides_with_asteroid(int ind, wireobject *obj);
-static void Player_collides_with_killing_shot(int ind, object *obj);
-static void Player_pass_checkpoint(int ind);
+static void Player_collides_with_ball(player *pl, object *obj, int radius);
+static void Player_collides_with_item(player *pl, object *obj);
+static void Player_collides_with_mine(player *pl, object *obj);
+static void Player_collides_with_debris(player *pl, object *obj);
+static void Player_collides_with_asteroid(player *pl, wireobject *obj);
+static void Player_collides_with_killing_shot(player *pl, object *obj);
+static void Player_pass_checkpoint(player *pl);
 
 
 
@@ -581,7 +581,7 @@ static void PlayerCollision(void)
 	    }
 	}
 
-	PlayerObjectCollision(i);
+	PlayerObjectCollision(pl);
 
 	/* Player checkpoint */
 	if (BIT(World.rules->mode, TIMING)
@@ -595,7 +595,7 @@ static void PlayerCollision(void)
 		    < checkpointRadius * BLOCK_CLICKS
 		&& !IS_TANK_PTR(pl)
 		&& !ballrace) {
-		Player_pass_checkpoint(i);
+		Player_pass_checkpoint(pl);
 	    }
 	}
     }
@@ -684,10 +684,9 @@ int CountDefensiveItems(player *pl)
        yet. It's supposed that they move in a straight line from
        prevpos to pos. This can lead to some erroneous hits.
 */
-static void PlayerObjectCollision(int ind)
+static void PlayerObjectCollision(player *pl)
 {
     int		j, range, radius, hit, obj_count;
-    player	*pl = Players(ind);
     object	*obj, **obj_list;
 
 
@@ -859,14 +858,14 @@ static void PlayerObjectCollision(int ind)
 	    if (! hit) {
 		continue;
 	    }
-	    Player_collides_with_ball(ind, obj, radius);
+	    Player_collides_with_ball(pl, obj, radius);
 	    if (BIT(pl->status, KILLED)) {
 		return;
 	    }
 	    continue;
 
 	case OBJ_ITEM:
-	    Player_collides_with_item(ind, obj);
+	    Player_collides_with_item(pl, obj);
 	    /* if life is non-zero then no collision occurred */
 	    if (obj->life != 0) {
 		continue;
@@ -874,12 +873,12 @@ static void PlayerObjectCollision(int ind)
 	    break;
 
 	case OBJ_MINE:
-	    Player_collides_with_mine(ind, obj);
+	    Player_collides_with_mine(pl, obj);
 	    break;
 
 	case OBJ_WRECKAGE:
 	case OBJ_DEBRIS:
-	    Player_collides_with_debris(ind, obj);
+	    Player_collides_with_debris(pl, obj);
 	    if (BIT(pl->status, KILLED)) {
 		return;
 	    }
@@ -887,7 +886,7 @@ static void PlayerObjectCollision(int ind)
 
 	case OBJ_ASTEROID:
 	    if (hit) {
-		Player_collides_with_asteroid(ind, WIRE_PTR(obj));
+		Player_collides_with_asteroid(pl, WIRE_PTR(obj));
 		Delta_mv_elastic((object *)pl, (object *)obj);
 	    }
 	    if (BIT(pl->status, KILLED)) {
@@ -901,7 +900,7 @@ static void PlayerObjectCollision(int ind)
 	    break;
 
 	case OBJ_PULSE:
-	    Laser_pulse_hits_player(ind, PULSE_PTR(obj));
+	    Laser_pulse_hits_player(pl, PULSE_PTR(obj));
 	    if (BIT(pl->status, KILLED)) {
 		return;
 	    }
@@ -914,7 +913,7 @@ static void PlayerObjectCollision(int ind)
 	obj->life = 0;
 
 	if (BIT(obj->type, KILLING_SHOTS)) {
-	    Player_collides_with_killing_shot(ind, obj);
+	    Player_collides_with_killing_shot(pl, obj);
 	    if (BIT(pl->status, KILLED)) {
 		return;
 	    }
@@ -926,9 +925,9 @@ static void PlayerObjectCollision(int ind)
 }
 
 
-static void Player_collides_with_ball(int ind, object *obj, int radius)
+static void Player_collides_with_ball(player *pl, object *obj, int radius)
 {
-    player	*pl = Players(ind), *kp;
+    player	*kp;
     DFLOAT	sc;
     ballobject	*ball = BALL_PTR(obj);
 
@@ -977,7 +976,7 @@ static void Player_collides_with_ball(int ind, object *obj, int radius)
 		       * ballKillScoreMult;
 	    Score_players(kp, sc, pl->name,
 			  pl, -sc, kp->name);
-	    Robot_war(ind, GetInd(kp->id));
+	    Robot_war(GetInd(pl->id), GetInd(kp->id));
 	}
     }
     Set_message(msg);
@@ -985,9 +984,8 @@ static void Player_collides_with_ball(int ind, object *obj, int radius)
 }
 
 
-static void Player_collides_with_item(int ind, object *obj)
+static void Player_collides_with_item(player *pl, object *obj)
 {
-    player	*pl = Players(ind);
     int		old_have;
     enum Item	item_index;
 
@@ -1173,9 +1171,9 @@ static void Player_collides_with_item(int ind, object *obj)
 }
 
 
-static void Player_collides_with_mine(int ind, object *obj)
+static void Player_collides_with_mine(player *pl, object *obj)
 {
-    player	*pl = Players(ind), *kp;
+    player	*kp;
     DFLOAT	sc;
     mineobject	*mine = MINE_PTR(obj);
 
@@ -1233,9 +1231,9 @@ static void Player_collides_with_mine(int ind, object *obj)
 }
 
 
-static void Player_collides_with_debris(int ind, object *obj)
+static void Player_collides_with_debris(player *pl, object *obj)
 {
-    player		*pl = Players(ind), *kp;
+    player		*kp;
     DFLOAT		v = VECTOR_LENGTH(obj->vel);
     long		tmp = (long) (2 * obj->mass * v);
     long		cost = ABS(tmp);
@@ -1285,9 +1283,8 @@ static void Player_collides_with_debris(int ind, object *obj)
 }
 
 
-static void Player_collides_with_asteroid(int ind, wireobject *ast)
+static void Player_collides_with_asteroid(player *pl, wireobject *ast)
 {
-    player	*pl = Players(ind);
     DFLOAT	v = VECTOR_LENGTH(ast->vel);
     long	tmp = (long) (2 * ast->mass * v);
     long	cost = ABS(tmp);
@@ -1335,9 +1332,9 @@ static void Player_collides_with_asteroid(int ind, wireobject *ast)
 }
 
 
-static void Player_collides_with_killing_shot(int ind, object *obj)
+static void Player_collides_with_killing_shot(player *pl, object *obj)
 {
-    player	*pl = Players(ind), *kp = NULL;
+    player	*kp = NULL;
     DFLOAT	sc;
     DFLOAT   	drainfactor;
     long	drain;
@@ -1497,7 +1494,7 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
 	    } else {
 		Score_players(kp, sc, pl->name,
 			      pl, -sc, kp->name);
-		Robot_war(ind, GetInd(kp->id));
+		Robot_war(GetInd(pl->id), GetInd(kp->id));
 	    }
 	    Set_message(msg);
 	    SET_BIT(pl->status, KILLED);
@@ -1509,9 +1506,8 @@ static void Player_collides_with_killing_shot(int ind, object *obj)
     }
 }
 
-static void Player_pass_checkpoint(int ind)
+static void Player_pass_checkpoint(player *pl)
 {
-    player	*pl = Players(ind);
     int		j;
 
     if (pl->check == 0) {
@@ -1807,14 +1803,13 @@ static void BallCollision(void)
 	if (BIT(World.rules->mode, TIMING)
 	    && ballrace
 	    && ball->owner != NO_ID) {
-	    int owner_ind = GetInd(ball->owner);
-	    player *owner = Players(owner_ind);
+	    player *owner = Player_by_id(ball->owner);
 
 	    if (!ballrace_connect || ball->id == owner->id) {
 		if (Wrap_length(ball->pos.cx - World.check[owner->check].cx,
 				ball->pos.cy - World.check[owner->check].cy)
 		    < checkpointRadius * BLOCK_CLICKS) {
-		    Player_pass_checkpoint(owner_ind);
+		    Player_pass_checkpoint(owner);
 		}
 	    }
 	}

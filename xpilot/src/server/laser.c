@@ -56,10 +56,9 @@ char laser_version[] = VERSION;
  * Do what needs to be done when a laser pulse
  * actually hits a player.
  */
-void Laser_pulse_hits_player(int ind, pulseobject *pulse)
+void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 {
     player		*kp;
-    player		*pl = Players(ind);
     int			killer;
     DFLOAT		sc;
     char		msg[MSG_LEN];
@@ -172,7 +171,7 @@ void Laser_pulse_hits_player(int ind, pulseobject *pulse)
 	    Set_message(msg);
 	    if (kp && kp->id != pl->id) {
 		Rank_AddLaserKill(kp);
-		Robot_war(ind, killer);
+		Robot_war(GetInd(pl->id), killer);
 	    }
 	}
 	if (!BIT(pl->used, HAS_SHIELD)
