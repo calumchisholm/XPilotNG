@@ -769,39 +769,34 @@ static void Do_repair(player *pl)
     }
 }
 
+/*
+ * Player is warping.
+ */
 static void Do_warping(player *pl)
 {
     clpos dest;
-    int j, wcx, wcy, nearestFront, nearestRear;
+    int wh_dest, wcx, wcy, nearestFront, nearestRear;
     double proximity, proxFront, proxRear;
 
-#if 0
-    if (pl->wormHoleHit >= World.NumWormholes) {
-	/* could happen if the player hit a temporary wormhole
-	   that was removed while the player was warping */
-	CLR_BIT(pl->status, WARPING);
-	return;
-    }
-#endif
     if (pl->wormHoleHit != -1) {
 	wormhole_t *wh_hit = Wormholes(pl->wormHoleHit);
 
 	if (wh_hit->countdown > 0)
-	    j = wh_hit->lastdest;
+	    wh_dest = wh_hit->lastdest;
 	else if (rfrac() < 0.1) {
 	    do
-		j = (int)(rfrac() * World.NumWormholes);
-	    while (World.wormholes[j].type == WORM_IN
-		   || pl->wormHoleHit == j
-		   || World.wormholes[j].temporary);
+		wh_dest = (int)(rfrac() * World.NumWormholes);
+	    while (World.wormholes[wh_dest].type == WORM_IN
+		   || pl->wormHoleHit == wh_dest
+		   || World.wormholes[wh_dest].temporary);
 	} else {
 	    nearestFront = nearestRear = -1;
 	    proxFront = proxRear = 1e20;
 
-	    for (j = 0; j < World.NumWormholes; j++) {
-		wormhole_t *wh = Wormholes(j);
+	    for (wh_dest = 0; wh_dest < World.NumWormholes; wh_dest++) {
+		wormhole_t *wh = Wormholes(wh_dest);
 
-		if (j == pl->wormHoleHit
+		if (wh_dest == pl->wormHoleHit
 		    || wh->type == WORM_IN
 		    || wh->temporary)
 		    continue;
@@ -814,11 +809,11 @@ static void Do_warping(player *pl)
 
 		if (pl->vel.x * wcx + pl->vel.y * wcy < 0) {
 		    if (proximity < proxRear) {
-			nearestRear = j;
+			nearestRear = wh_dest;
 			proxRear = proximity;
 		    }
 		} else if (proximity < proxFront) {
-		    nearestFront = j;
+		    nearestFront = wh_dest;
 		    proxFront = proximity;
 		}
 	    }
@@ -826,21 +821,21 @@ static void Do_warping(player *pl)
 #define RANDOM_REAR_WORM 1
 
 	    if (! RANDOM_REAR_WORM)
-		j = nearestFront < 0 ? nearestRear : nearestFront;
+		wh_dest = nearestFront < 0 ? nearestRear : nearestFront;
 	    else {
 		if (nearestFront >= 0)
-		    j = nearestFront;
+		    wh_dest = nearestFront;
 		else {
 		    do
-			j = (int)(rfrac() * World.NumWormholes);
-		    while (World.wormholes[j].type == WORM_IN
-			   || j == pl->wormHoleHit);
+			wh_dest = (int)(rfrac() * World.NumWormholes);
+		    while (World.wormholes[wh_dest].type == WORM_IN
+			   || wh_dest == pl->wormHoleHit);
 		}
 	    }
 	}
 
 	sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
-	dest = World.wormholes[j].pos;
+	dest = World.wormholes[wh_dest].pos;
 
     } else { /* wormHoleHit == -1 */
 	int counter;
@@ -875,7 +870,8 @@ static void Do_warping(player *pl)
 			       CLICK_TO_BLOCK(dest.cx),
 			       CLICK_TO_BLOCK(dest.cy));
 #endif
-	j = -2;
+	/* hack */
+	wh_dest = -2;
 	sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
     }
 
@@ -917,15 +913,15 @@ static void Do_warping(player *pl)
 	}
     }
 
-    pl->wormHoleDest = j;
+    pl->wormHoleDest = wh_dest;
     Player_position_init_clicks(pl, dest.cx, dest.cy);
     pl->vel.x *= WORM_BRAKE_FACTOR;
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
 
-    if ((j != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
-	World.wormholes[pl->wormHoleHit].lastdest = j;
-	if (!World.wormholes[j].temporary)
+    if ((wh_dest != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
+	World.wormholes[pl->wormHoleHit].lastdest = wh_dest;
+	if (!World.wormholes[wh_dest].temporary)
 	    World.wormholes[pl->wormHoleHit].countdown
 		= (wormTime ? wormTime : WORMCOUNT);
     }
