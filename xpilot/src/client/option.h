@@ -68,6 +68,7 @@ struct xp_option {
     const char *name;
     unsigned hash;		/* hash of name */
     xp_option_flags_t flags;
+    xp_option_origin_t origin;
 
     const char *help;
     void *private_data;		/* currently only used for string options */
@@ -200,6 +201,12 @@ static inline xp_option_flags_t Option_get_flags(xp_option_t *opt)
     return opt->flags;
 }
 
+static inline xp_option_origin_t Option_get_origin(xp_option_t *opt)
+{
+    assert(opt);
+    return opt->origin;
+}
+
 static inline keys_t Option_get_key(xp_option_t *opt)
 {
     assert(opt);
@@ -227,7 +234,7 @@ static inline xp_option_t *Option_by_index(int ind)
 { \
     xp_noarg_option,\
 	name, 0,\
-	flags,\
+	flags, xp_option_origin_default,\
 	help,\
 	NULL,\
 	valptr,\
@@ -242,7 +249,7 @@ static inline xp_option_t *Option_by_index(int ind)
 { \
     xp_bool_option,\
 	name, 0,\
-	flags,\
+	flags, xp_option_origin_default,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -259,7 +266,7 @@ static inline xp_option_t *Option_by_index(int ind)
 { \
     xp_int_option,\
 	name, 0,\
-	flags,\
+	flags, xp_option_origin_default,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -285,7 +292,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, XP_OPTFLAG_CONFIG_
 { \
     xp_double_option,\
 	name, 0,\
-	flags,\
+	flags, xp_option_origin_default,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -304,7 +311,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, XP_OPTFLAG_CONFIG_
 { \
     xp_string_option,\
 	name, 0,\
-	flags,\
+	flags, xp_option_origin_default,\
 	help,\
 	private_data,\
 	XP_NOARG_OPTION_DUMMY,\
@@ -323,7 +330,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, setfunc, XP_OPTFLAG_CONFIG_
 { \
     xp_key_option,\
 	name, 0,\
-	XP_OPTFLAG_DEFAULT,\
+	XP_OPTFLAG_DEFAULT, xp_option_origin_default,\
 	help,\
 	NULL,\
 	XP_NOARG_OPTION_DUMMY,\

@@ -171,16 +171,13 @@ static void Version(void)
 
 bool Set_noarg_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 {
-    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->type == xp_noarg_option);
     assert(opt->noarg_ptr);
 
     *opt->noarg_ptr = value;
-    /*
-     * printf("Value of option %s is now %s.\n", opt->name, opt->noarg_ptr 
-     * ? "true" : "false");
-     */
+    opt->origin = origin;
+
     return true;
 }
 
@@ -189,7 +186,6 @@ bool Set_bool_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 {
     bool retval = true;
 
-    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->type == xp_bool_option);
     assert(opt->bool_ptr);
@@ -198,10 +194,10 @@ bool Set_bool_option(xp_option_t *opt, bool value, xp_option_origin_t origin)
 	retval = opt->bool_setfunc(opt, value);
     else
 	*opt->bool_ptr = value;
-    /*
-     * printf("Value of option %s is now %s.\n", opt->name, opt->bool_ptr
-     * ? "true" : "false");
-     */
+
+    if (retval)
+	opt->origin = origin;
+
     return retval;
 }
 
@@ -243,10 +239,10 @@ bool Set_int_option(xp_option_t *opt, int value, xp_option_origin_t origin)
 	retval = opt->int_setfunc(opt, value);
     else
 	*opt->int_ptr = value;
-    /*
-     * printf("Value of option %s is now %d.\n", opt->name,
-     * *opt->int_ptr); 
-     */
+
+    if (retval)
+	opt->origin = origin;
+
     return retval;
 }
 
@@ -290,10 +286,9 @@ bool Set_double_option(xp_option_t *opt, double value,
     else
 	*opt->dbl_ptr = value;
 
-    /*
-     * printf("Value of option %s is now %.3f.\n", opt->name,
-     * *opt->dbl_ptr); 
-     */
+    if (retval)
+	opt->origin = origin;
+
     return retval;
 }
 
@@ -302,7 +297,6 @@ bool Set_string_option(xp_option_t *opt, const char *value,
 {
     bool retval = true;
 
-    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->type == xp_string_option);
     assert(opt->str_ptr || (opt->str_setfunc && opt->str_getfunc));
@@ -317,11 +311,9 @@ bool Set_string_option(xp_option_t *opt, const char *value,
     else
 	strlcpy(opt->str_ptr, value, opt->str_size);
 
-    /*
-     * if (opt->str_ptr) printf("Value of option %s is now \"%s\".\n",
-     * opt->name, opt->str_ptr); else printf("Value of option %s is now
-     * \"%s\".\n", opt->name, opt->str_getfunc(opt)); 
-     */
+    if (retval)
+	opt->origin = origin;
+
     return retval;
 }
 
@@ -430,7 +422,6 @@ static bool Set_key_option(xp_option_t *opt, const char *value,
     /*bool retval = true;*/
     char *str, *valcpy;
 
-    UNUSED_PARAM(origin);
     assert(opt);
     assert(opt->name);
     assert(opt->type == xp_key_option);
@@ -473,6 +464,8 @@ static bool Set_key_option(xp_option_t *opt, const char *value,
 	Store_keydef(ks, opt->key);
     }
 
+    /* in fact if we only get invalid keysyms we should return false */
+    opt->origin = origin;
     xp_free(valcpy);
     return true;
 }
@@ -1040,7 +1033,23 @@ int Xpilotrc_write(const char *path)
 	error("Xpilotrc_write: Failed to open file \"%s\"", path);
 	return -2;
     }
-    
+
+#if 0
+    /* make sure all options are in the xpilotrc */
+    for (i = 0; i < num_options; i++) {
+	xp_option_t *opt = Option_by_index(i);
+	xp_option_origin_t origin;
+
+	/* Let's not save these */
+	if (Option_get_type(opt) == xp_noarg_option)
+	    continue;
+
+	origin = Option_get_origin(opt);
+	
+	
+    }
+
+#else
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
 
@@ -1052,6 +1061,7 @@ int Xpilotrc_write(const char *path)
 				Option_get_name(opt),
 				Option_value_to_string(opt));
     }
+#endif
 
     fclose(fp);
 
