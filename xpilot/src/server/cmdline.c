@@ -133,7 +133,7 @@ static option_desc opts[] = {
     {
 	"gravity",
 	"gravity",
-	"-0.14",
+	"0.0",
 	&options.gravity,
 	valReal,
 	Compute_gravity,
@@ -1868,7 +1868,7 @@ static option_desc opts[] = {
     {
 	"missilesOnRadar",
 	"missilesRadar",
-	"True",
+	"False",
 	&options.missilesOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1888,7 +1888,7 @@ static option_desc opts[] = {
     {
 	"nukesOnRadar",
 	"nukesRadar",
-	"True",
+	"False",
 	&options.nukesOnRadar,
 	valBool,
 	tuner_dummy,
