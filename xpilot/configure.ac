@@ -314,9 +314,10 @@ AC_CONFIG_FILES([ \
 	README \
 	doc/Makefile \
 	doc/man/Makefile \
-	doc/man/xpilot.man \
-	doc/man/xp-replay.man \
-	doc/man/xpilots.man \
+	doc/man/xpilot-ng-sdl.man \
+	doc/man/xpilot-ng-x11.man \
+	doc/man/xpilot-ng-server.man \
+	doc/man/xpilot-ng-replay.man \
 	lib/Makefile \
 	lib/fonts/Makefile \
 	lib/maps/Makefile \

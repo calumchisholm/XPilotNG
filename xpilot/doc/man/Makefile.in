@@ -36,15 +36,18 @@ POST_UNINSTALL = :
 host_triplet = @host@
 subdir = doc/man
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/xp-replay.man.in $(srcdir)/xpilot.man.in \
-	$(srcdir)/xpilots.man.in
+	$(srcdir)/xpilot-ng-replay.man.in \
+	$(srcdir)/xpilot-ng-sdl.man.in \
+	$(srcdir)/xpilot-ng-server.man.in \
+	$(srcdir)/xpilot-ng-x11.man.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = xpilot.man xp-replay.man xpilots.man
+CONFIG_CLEAN_FILES = xpilot-ng-sdl.man xpilot-ng-x11.man \
+	xpilot-ng-server.man xpilot-ng-replay.man
 SOURCES =
 DIST_SOURCES =
 man6dir = $(mandir)/man6
@@ -157,7 +160,12 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-man6_MANS = xp-replay.man xpilot.man xpilots.man
+man6_MANS = \
+	xpilot-ng-sdl.man.in \
+	xpilot-ng-x11.man.in \
+	xpilot-ng-server.man.in \
+	xpilot-ng-replay.man.in
+
 EXTRA_DIST = $(man6_MANS)
 all: all-am
 
@@ -191,11 +199,13 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-xpilot.man: $(top_builddir)/config.status $(srcdir)/xpilot.man.in
+xpilot-ng-sdl.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-sdl.man.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-xp-replay.man: $(top_builddir)/config.status $(srcdir)/xp-replay.man.in
+xpilot-ng-x11.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-x11.man.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-xpilots.man: $(top_builddir)/config.status $(srcdir)/xpilots.man.in
+xpilot-ng-server.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-server.man.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+xpilot-ng-replay.man: $(top_builddir)/config.status $(srcdir)/xpilot-ng-replay.man.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 uninstall-info-am:
 install-man6: $(man6_MANS) $(man_MANS)
