@@ -1491,6 +1491,12 @@ int Receive_self(void)
      */
     server_display.view_width = sViewWidth;
     server_display.view_height = sViewHeight;
+    LIMIT(server_display.view_width, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
+    if (sViewWidth != server_display.view_width)
+	warn("unsupported view width from server");
+    LIMIT(server_display.view_height, MIN_VIEW_SIZE, MAX_VIEW_SIZE);
+    if (sViewHeight != server_display.view_height)
+	warn("unsupported view height from server");
     server_display.num_spark_colors = sNumSparkColors;
 
     Handle_self(x, y, vx, vy, sHeading,
