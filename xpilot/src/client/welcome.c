@@ -1683,8 +1683,8 @@ static int Welcome_show_server_list(Connect_param_t * conpar)
       
       Widget_create_label(subform_widget,
 			  fps_offset, yoff,
-			  fps_width, label_height, border, true,
-			  fps_header);
+			  fps_width, label_height, true,
+			  border, fps_header);
             
       Widget_create_label(subform_widget,
 			  status_offset, yoff,
