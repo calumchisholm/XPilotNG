@@ -210,6 +210,7 @@ char            *password;              /* password for operator status */
 int             numberOfRounds;         /* how many rounds to play */
 int             playerLimit;            /* allow less players than bases */
 int             recordMode;             /* 0=off, 1=record, 2=playback */
+int		recordFlushInterval;	/* Max seconds between storing data */
 int             constantScoring;        /* Fixed points for kills etc? */
 int             eliminationRace;        /* Last player drops each lap? */
 int		clientPortStart;	/* First UDP port for clients */
@@ -2363,6 +2364,20 @@ static optionDesc options[] = {
 	"viewpoint. Can be set to 0 in the middle of a game to stop"
 	"recording.\n",
 	OPT_CMDLINE
+    },
+    {
+	"recordFlushInterval",
+	"recordWait",
+	"0",
+	&recordFlushInterval,
+	valInt,
+	tuner_dummy,
+	"If set to a nonzero value x, the server will flush all recording\n"
+	"data in memory to the record file at least once every x seconds.\n"
+	"This is useful if you want to replay the game on another server\n"
+	"while it is still being played. There is a small overhead\n"
+	"(some dozens of bytes extra recording file size) for each flush.\n",
+	OPT_ANY
     },
     {
 	"constantScoring",

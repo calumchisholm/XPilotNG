@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <time.h>
 
 /* Hopefully htons etc are in one of these. */
 #include <arpa/inet.h>
@@ -171,6 +172,8 @@ static void Dump_data(void)
 	fwrite(bufs[i].start, 1, len, recf1);
 	*bufs[i].curp = bufs[i].start;
     }
+    if (recordFlushInterval)
+	fflush(recf1);
 #ifdef RECSTAT
     printf("\n");
 #endif
@@ -289,12 +292,28 @@ void Init_recording(void)
 void Handle_recording_buffers(void)
 {
     int i;
+    static time_t t;
+    time_t tt;
 
     if (recordMode != 1)
 	return;
 
+    tt = time(NULL);
+    if (recordFlushInterval) {
+	if (tt > t + recordFlushInterval) {
+	    if (t == 0)
+		t = tt;
+	    else {
+		t = tt;
+		Dump_data();
+		return;
+	    }
+	}
+    }
+
     for (i = 0; i < num_types; i++)
 	if ((char*)*bufs[i].curp - (char*)bufs[i].start > bufs[i].threshold) {
+	    t = tt;
 	    Dump_data();
 	    break;
 	}

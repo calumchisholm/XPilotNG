@@ -236,6 +236,7 @@ extern char             *password;
 extern int              numberOfRounds;
 extern int              playerLimit;
 extern int              recordMode;
+extern int		recordFlushInterval;
 extern int              constantScoring;
 extern int              eliminationRace;
 extern char             *dataURL;
