@@ -258,7 +258,7 @@ void Expose_about_window(void)
 	"\n"
 	"This an EXPERIMENTAL version of XPilot.\n"
 	"Look for more info at http://xpilot.sourceforge.net/\n"
-	"You can report any bug you find to <ksoderbl@cc.hut.fi>.\n"
+	"You can report any bug you find to <kps@users.sourceforge.net>.\n"
 	"\n\n"
 	"Good luck as a future xpilot,\n"
 	"Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers & Dick Balaska",
@@ -324,8 +324,8 @@ static void About_create_window(void)
     /*
      * Create 'buttons' in the window.
      */
-    textWidth = XTextWidth(buttonFont, "NEXT", 4);
-    about_next_b
+    textWidth = XTextWidth(buttonFont, "PREV", 4);
+    about_prev_b
 	= XCreateSimpleWindow(dpy, aboutWindow,
 			      (int)(windowWidth / 2
 				    - BTN_BORDER - textWidth / 2),
@@ -334,8 +334,9 @@ static void About_create_window(void)
 			      2*BTN_BORDER + textWidth, buttonWindowHeight,
 			      0, 0,
 			      colors[buttonColor].pixel);
-    textWidth = XTextWidth(buttonFont, "PREV", 4);
-    about_prev_b
+
+    textWidth = XTextWidth(buttonFont, "NEXT", 4);
+    about_next_b
 	= XCreateSimpleWindow(dpy, aboutWindow,
 			      (int)(windowWidth - BORDER
 				    - 2*BTN_BORDER - textWidth),
@@ -382,15 +383,15 @@ void Expose_button_window(int color, Window w)
 			 BTN_BORDER, buttonFont->ascent + BTN_BORDER,
 			 "CLOSE",
 			 colors[WHITE].pixel, colors[BLACK].pixel);
-    if (w == about_next_b)
-	ShadowDrawString(dpy, w, buttonGC,
-			 BTN_BORDER, buttonFont->ascent + BTN_BORDER,
-			 "NEXT",
-			 colors[WHITE].pixel, colors[BLACK].pixel);
     if (w == about_prev_b)
 	ShadowDrawString(dpy, w, buttonGC,
 			 BTN_BORDER, buttonFont->ascent + BTN_BORDER,
 			 "PREV",
+			 colors[WHITE].pixel, colors[BLACK].pixel);
+    if (w == about_next_b)
+	ShadowDrawString(dpy, w, buttonGC,
+			 BTN_BORDER, buttonFont->ascent + BTN_BORDER,
+			 "NEXT",
 			 colors[WHITE].pixel, colors[BLACK].pixel);
 }
 
