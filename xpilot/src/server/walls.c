@@ -255,7 +255,7 @@ static void Object_hits_target(object *obj, target_t *targ, double player_cost)
     if (targ->damage > 0.0)
 	return;
 
-    Target_remove_from_map(targ);
+    World_remove_target(world, targ);
 
     Make_debris(
 	/* pos.cx, pos.cy   */ targ->pos,

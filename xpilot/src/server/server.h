@@ -601,13 +601,13 @@ bool Balltarget_hitfunc(group_t *groupptr, move_t *move);
 
 hitmask_t Cannon_hitmask(cannon_t *cannon);
 bool Cannon_hitfunc(group_t *groupptr, move_t *move);
-void Cannon_restore_on_map(cannon_t *cannon);
-void Cannon_remove_from_map(cannon_t *cannon);
+void World_restore_cannon(world_t *world, cannon_t *cannon);
+void World_remove_cannon(world_t *world, cannon_t *cannon);
 
 hitmask_t Target_hitmask(target_t *targ);
 void Target_init(void);
-void Target_restore_on_map(target_t *targ);
-void Target_remove_from_map(target_t *targ);
+void World_restore_target(world_t *world, target_t *targ);
+void World_remove_target(world_t *world, target_t *targ);
 
 hitmask_t Wormhole_hitmask(wormhole_t *wormhole);
 bool Wormhole_hitfunc(group_t *groupptr, move_t *move);

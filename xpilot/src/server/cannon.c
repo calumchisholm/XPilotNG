@@ -58,7 +58,7 @@ void Cannon_update(bool do_less_frequent_update)
 
 	if (c->dead_time > 0) {
 	    if ((c->dead_time -= timeStep) <= 0)
-		Cannon_restore_on_map(c);
+		World_restore_cannon(world, c);
 	    continue;
 	} else {
 	    /* don't check too often, because this gets quite expensive
@@ -741,7 +741,7 @@ void Cannon_dies(cannon_t *c, player *pl)
     world_t *world = &World;
     vector	zero_vel = { 0.0, 0.0 };
 
-    Cannon_remove_from_map(c);
+    World_remove_cannon(world, c);
     Cannon_throw_items(c);
     Cannon_init(c);
     sound_play_sensors(c->pos, CANNON_EXPLOSION_SOUND);

@@ -772,7 +772,7 @@ void Reset_all_players(void)
 		target_t *targ = Targets(world, i);
 
 		if (targ->damage != TARGET_DAMAGE || targ->dead_time > 0)
-		    Target_restore_on_map(targ);
+		    World_restore_target(world, targ);
 	    }
 	}
     }

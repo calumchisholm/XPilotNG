@@ -459,10 +459,9 @@ static void Cannon_set_hitmask(int group, cannon_t *cannon)
 }
 
 
-void Cannon_restore_on_map(cannon_t *cannon)
+void World_restore_cannon(world_t *world, cannon_t *cannon)
 {
     blpos blk = Clpos_to_blpos(cannon->pos);
-    world_t *world = &World;
 
     World_set_block(world, blk, CANNON);
 
@@ -473,10 +472,9 @@ void Cannon_restore_on_map(cannon_t *cannon)
     P_set_hitmask(cannon->group, Cannon_hitmask(cannon));
 }
 
-void Cannon_remove_from_map(cannon_t *cannon)
+void World_remove_cannon(world_t *world, cannon_t *cannon)
 {
     blpos blk = Clpos_to_blpos(cannon->pos);
-    world_t *world = &World;
 
     cannon->dead_time = cannonDeadTime;
     cannon->conn_mask = 0;
@@ -571,10 +569,9 @@ void Target_init(void)
 #endif
 }
 
-void Target_restore_on_map(target_t *targ)
+void World_restore_target(world_t *world, target_t *targ)
 {
     blpos blk = Clpos_to_blpos(targ->pos);
-    world_t *world = &World;
 
     World_set_block(world, blk, TARGET);
 
@@ -587,10 +584,9 @@ void Target_restore_on_map(target_t *targ)
     P_set_hitmask(targ->group, Target_hitmask(targ));
 }
 
-void Target_remove_from_map(target_t *targ)
+void World_remove_target(world_t *world, target_t *targ)
 {
     blpos blk = Clpos_to_blpos(targ->pos);
-    world_t *world = &World;
 
     targ->update_mask = (unsigned) -1;
     /* is this necessary? (done also in Target_restore_on_map() ) */

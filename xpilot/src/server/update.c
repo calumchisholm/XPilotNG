@@ -522,13 +522,13 @@ static void Target_update(void)
 
 	if (targ->dead_time > 0) {
 	    if ((targ->dead_time -= timeStep) <= 0) {
-		Target_restore_on_map(targ);
+		World_restore_target(world, targ);
 
 		if (targetSync) {
 		    for (j = 0; j < world->NumTargets; j++) {
 			target_t *t = Targets(world, j);
 			if (t->team == targ->team)
-			    Target_restore_on_map(t);
+			    World_restore_target(world, t);
 		    }
 		}
 	    }
