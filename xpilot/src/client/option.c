@@ -730,11 +730,6 @@ void Store_option(xp_option_t *opt)
 
 }
 
-/*
-<SynrG> kps: would be nice if not only it saved options known to other clients, but also comments in the original
-*/
-
-
 typedef struct xpilotrc_line {
     xp_option_t *opt;
     const char *comment;
@@ -744,6 +739,31 @@ static xpilotrc_line_t	*xpilotrc_lines = NULL;
 static int num_xpilotrc_lines = 0, max_xpilotrc_lines = 0;
 static int num_ok_options = 0;
 
+/*
+ * Function to parse an xpilotrc line if it is of the right form, otherwise
+ * it is treated as a comment.
+ *
+ * Line must have this form to be valid:
+ * 1. string "xpilot", checked for case insensitively
+ * 2. "." or "*"
+ * 3. option name of option recognised by Find_option().
+ * 4. optional whitespace
+ * 5. ":"
+ * 6. optional whitespace
+ * 7. optional value (if it doesn't exist, set option to value "")
+ * 8. optional ";" followed by comments
+ *
+ * Here is some sort of pseudo regular expression:
+ * xpilot{.*}option[whitespace]:[whitespace][value][; comment]
+ */
+#if 0
+static void Parse_xpilotrc_line(const char *line)
+{
+    
+
+}
+
+#else
 static void Parse_xpilotrc_line(const char *line)
 {
     char *l = xp_safe_strdup(line);
@@ -881,7 +901,7 @@ static void Parse_xpilotrc_line(const char *line)
 	  xpilotrc_lines, num_xpilotrc_lines, max_xpilotrc_lines, t);
     xp_free(l);
 }
-
+#endif
 
 static inline bool is_noarg_option(const char *name)
 {
