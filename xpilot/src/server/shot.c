@@ -1075,7 +1075,7 @@ void Delete_shot(int ind)
     object		*shot = Obj[ind];	/* Used when swapping places */
     ballobject		*ball;
     player		*pl;
-    int			addMine = 0, addHeat = 0, addBall = 0;
+    bool		addMine = false, addHeat = false, addBall = false;
     modifiers		mods;
     long		status;
     int			i;
@@ -1117,7 +1117,7 @@ void Delete_shot(int ind)
 	    SET_BIT(ball->status, RECREATE);
 	}
 	if (BIT(ball->status, RECREATE)) {
-	    addBall = 1;
+	    addBall = true;
 	    if (BIT(ball->status, NOEXPLOSION))
 		break;
 	    sound_play_sensors(ball->pos, EXPLODE_BALL_SOUND);
@@ -1280,7 +1280,7 @@ void Delete_shot(int ind)
 		    return;
 		}
 		if (rfrac() < rogueHeatProb)
-		    addHeat = 1;
+		    addHeat = true;
 	    }
 	    break;
 
@@ -1293,7 +1293,7 @@ void Delete_shot(int ind)
 		    return;
 		}
 		if (rfrac() < rogueMineProb)
-		    addMine = 1;
+		    addMine = true;
 	    }
 	    break;
 
@@ -1318,7 +1318,7 @@ void Delete_shot(int ind)
 
     Object_free_ind(ind);
 
-    if (addMine | addHeat) {
+    if (addMine || addHeat) {
 	CLEAR_MODS(mods);
 	if (BIT(World.rules->mode, ALLOW_CLUSTERS) && (rfrac() <= 0.333f))
 	    SET_BIT(mods.warhead, CLUSTER);
