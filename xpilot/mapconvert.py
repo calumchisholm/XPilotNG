@@ -6,6 +6,8 @@ removedopts = ['extraborder', 'edgebounce', "maxshieldedplayerwallbounceangle",
 'oneplayeronly', "maxrobots", "robots", "minrobots", "robotfile", "robotstalk",
 "robotsleave", "robotleavelife", "robotleavescore", "robotleaveratio",
 "robotteam", "restrictrobots", "reserverobotteam", "ecmsreprogramrobots"]
+# 'mapdata' has been removed too, but isn't ignored by this script.
+
 
 def removeopts(options):
     for opt in options.keys():
@@ -313,28 +315,19 @@ def convert(options):
 	reslist.append(res)
     polys2 = reslist
 		    
-    # This part just for Bloods
-    from math import sin
-    for p in polys2:
-	for l in p:
-	    pass
-	    l[0] = int(l[0] + sin(1. * l[0] * l[1] / 2786) * (2240 / 3)) % mxc
-	    l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
+    # Turn this on if you want to randomize the map edges
+    if 0:
+	from math import sin
+	for p in polys2:
+	    for l in p:
+		l[0] = int(l[0] + sin(1. * l[0] * l[1] / 2786) * (2240 / 3)) % mxc
+		l[1] = int(l[1] + sin(1. * l[0] * l[1] / 1523) * (2240 / 3)) % myc
 
     print "<XPilotMap>"
 
     print '<Featurecount bases="%d" balls="%d"/>' % (len(bases), len(balls))
     mapd = options['mapdata']
     del options['mapdata']
-    md = '<Mapdata x="%d" y="%d"' % (width, height)
-    tofind = '*_0123456789'
-    attribnum = 65
-    for pos in range(len(mapd)):
-	if mapd[pos] in tofind:
-	    md += ' foo%s="%s%d"' % (chr(attribnum), mapd[pos], pos)
-	    attribnum += 1
-    md += '/>'
-    print md
     print '<GeneralOptions>'
     for name, value in options.items():
 	print '<Option name="%s" value="%s"/>' % (name, encode(value))
