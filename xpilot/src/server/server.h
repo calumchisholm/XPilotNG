@@ -107,10 +107,21 @@ static inline vector_t World_gravity(world_t *world, clpos_t pos)
     return world->gravity[CLICK_TO_BLOCK(pos.cx)][CLICK_TO_BLOCK(pos.cy)];
 }
 
+static inline double SHOT_MULT(object_t *obj)
+{
+    if (Get_nuclear_modifier(obj->mods) && Get_cluster_modifier(obj->mods))
+	return options.nukeClusterDamage;
+    return 1.0;
+}
+
+
 enum TeamPickType {
     PickForHuman	= 1,
     PickForRobot	= 2
 };
+
+
+
 
 #ifndef	_WINDOWS
 #define	APPNAME	"xpilot-ng-server"

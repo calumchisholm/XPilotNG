@@ -57,13 +57,13 @@ am_xpilot_ng_server_OBJECTS = alliance.$(OBJEXT) asteroid.$(OBJEXT) \
 	collision.$(OBJEXT) command.$(OBJEXT) contact.$(OBJEXT) \
 	event.$(OBJEXT) fileparser.$(OBJEXT) frame.$(OBJEXT) \
 	id.$(OBJEXT) item.$(OBJEXT) laser.$(OBJEXT) map.$(OBJEXT) \
-	metaserver.$(OBJEXT) netserver.$(OBJEXT) object.$(OBJEXT) \
-	objpos.$(OBJEXT) option.$(OBJEXT) parser.$(OBJEXT) \
-	play.$(OBJEXT) player.$(OBJEXT) polygon.$(OBJEXT) \
-	race.$(OBJEXT) rank.$(OBJEXT) recwrap.$(OBJEXT) \
-	robot.$(OBJEXT) robotdef.$(OBJEXT) rules.$(OBJEXT) \
-	saudio.$(OBJEXT) sched.$(OBJEXT) score.$(OBJEXT) \
-	server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
+	metaserver.$(OBJEXT) modifiers.$(OBJEXT) netserver.$(OBJEXT) \
+	object.$(OBJEXT) objpos.$(OBJEXT) option.$(OBJEXT) \
+	parser.$(OBJEXT) play.$(OBJEXT) player.$(OBJEXT) \
+	polygon.$(OBJEXT) race.$(OBJEXT) rank.$(OBJEXT) \
+	recwrap.$(OBJEXT) robot.$(OBJEXT) robotdef.$(OBJEXT) \
+	rules.$(OBJEXT) saudio.$(OBJEXT) sched.$(OBJEXT) \
+	score.$(OBJEXT) server.$(OBJEXT) ship.$(OBJEXT) shot.$(OBJEXT) \
 	showtime.$(OBJEXT) srecord.$(OBJEXT) target.$(OBJEXT) \
 	teamcup.$(OBJEXT) tuner.$(OBJEXT) treasure.$(OBJEXT) \
 	update.$(OBJEXT) walls.$(OBJEXT) wormhole.$(OBJEXT) \
@@ -215,7 +215,7 @@ xpilot_ng_server_SOURCES = \
 	fileparser.c frame.c \
 	id.c item.c \
 	laser.c \
-	map.c map.h metaserver.c \
+	map.c map.h metaserver.c modifiers.c modifiers.h \
 	netserver.c netserver.h \
 	object.c object.h objpos.c objpos.h option.c option.h \
 	parser.c play.c player.c player.h polygon.c \
@@ -312,6 +312,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/laser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metaserver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modifiers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netserver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objpos.Po@am__quote@

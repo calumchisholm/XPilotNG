@@ -641,21 +641,7 @@ static bool Check_robot_evade(player_t *pl, int mine_i, int ship_i)
 
 static void Robot_check_new_modifiers(player_t *pl, modifiers_t mods)
 {
-    world_t *world = pl->world;
-
-    if (!BIT(world->rules->mode, ALLOW_NUKES))
-	mods.nuclear = 0;
-    if (!BIT(world->rules->mode, ALLOW_CLUSTERS))
-	CLR_BIT(mods.warhead, CLUSTER);
-    if (!BIT(world->rules->mode, ALLOW_MODIFIERS)) {
-	mods.velocity =
-	mods.mini =
-	mods.spread =
-	mods.power = 0;
-	CLR_BIT(mods.warhead, IMPLOSION);
-    }
-    if (!BIT(world->rules->mode, ALLOW_LASER_MODIFIERS))
-	mods.laser = 0;
+    filter_mods(pl->world, &mods);
     pl->mods = mods;
 }
 
@@ -664,6 +650,7 @@ static void Choose_weapon_modifier(player_t *pl, int weapon_type)
     int stock, min;
     modifiers_t mods;
     robot_default_data_t *my_data = Robot_default_get_data(pl);
+    int laser, velocity, mini, spread, power;
 
     CLEAR_MODS(mods);
 
@@ -676,8 +663,10 @@ static void Choose_weapon_modifier(player_t *pl, int weapon_type)
 	/*
 	 * Robots choose non-damage laser settings occasionally.
 	 */
-	if ((my_data->robot_count % 4) == 0)
-	    mods.laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
+	if ((my_data->robot_count % 4) == 0) {
+	    laser = (int)(rfrac() * (MODS_LASER_MAX + 1));
+	    Set_laser_modifier(&mods, laser);
+	}
 	Robot_check_new_modifiers(pl, mods);
 	return;
 
@@ -686,9 +675,11 @@ static void Choose_weapon_modifier(player_t *pl, int weapon_type)
 	 * Robots usually use wide beam shots, however they may narrow
 	 * the beam occasionally.
 	 */
-	mods.spread = 0;
-	if ((my_data->robot_count % 4) == 0)
-	    mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
+	spread = 0;
+	if ((my_data->robot_count % 4) == 0) {
+	    spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
+	    Set_spread_modifier(&mods, spread);
+	}
 	Robot_check_new_modifiers(pl, mods);
 	return;
 
@@ -702,8 +693,10 @@ static void Choose_weapon_modifier(player_t *pl, int weapon_type)
     case OBJ_TORPEDO:
 	stock = pl->item[ITEM_MISSILE];
 	min = options.nukeMinSmarts;
-	if ((my_data->robot_count % 4) == 0)
-	    mods.power = (int)(rfrac() * (MODS_POWER_MAX + 1));
+	if ((my_data->robot_count % 4) == 0) {
+	    power = (int)(rfrac() * (MODS_POWER_MAX + 1));
+	    Set_power_modifier(&mods, power);
+	}
 	break;
 
     default:
@@ -716,29 +709,33 @@ static void Choose_weapon_modifier(player_t *pl, int weapon_type)
 	 * means you can safely approach wimpy robots... perhaps.
 	 */
 	if ((my_data->robot_count % 100) <= my_data->attack) {
-	    SET_BIT(mods.nuclear, NUCLEAR);
+	    Set_nuclear_modifier(&mods, MODS_NUCLEAR);
 	    if (stock > min && (stock < (2 * min)
 				|| (my_data->robot_count % 2) == 0))
-		    SET_BIT(mods.nuclear, FULLNUCLEAR);
+		Set_nuclear_modifier(&mods, MODS_NUCLEAR|MODS_FULLNUCLEAR);
 	}
     }
 
     if (pl->fuel.sum > my_data->fuel_l3) {
 	if ((my_data->robot_count % 2) == 0) {
-	    if ((my_data->robot_count % 8) == 0)
-		mods.velocity = (int)(rfrac() * MODS_VELOCITY_MAX) + 1;
-	    SET_BIT(mods.warhead, CLUSTER);
+	    if ((my_data->robot_count % 8) == 0) {
+		velocity = (int)(rfrac() * MODS_VELOCITY_MAX) + 1;
+		Set_velocity_modifier(&mods, velocity);
+	    }
+	    Set_cluster_modifier(&mods, 1);
 	}
     }
     else if ((my_data->robot_count % 3) == 0)
-	SET_BIT(mods.warhead, IMPLOSION);
+	Set_implosion_modifier(&mods, 1);
 
     /*
      * Robot may change to use mini device setting occasionally.
      */
     if ((my_data->robot_count % 10) == 0) {
-	mods.mini = (int)(rfrac() * (MODS_MINI_MAX + 1));
-	mods.spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
+	mini = (int)(rfrac() * (MODS_MINI_MAX + 1));
+	spread = (int)(rfrac() * (MODS_SPREAD_MAX + 1));
+	Set_mini_modifier(&mods, mini);
+	Set_spread_modifier(&mods, spread);
     }
 
     Robot_check_new_modifiers(pl, mods);

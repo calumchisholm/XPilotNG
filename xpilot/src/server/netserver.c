@@ -2763,7 +2763,7 @@ static int Receive_modifier_bank(connection_t *connp)
     unsigned char bank, ch;
     char str[MAX_CHARS], *cp;
     modifiers_t mods;
-    int n;
+    int n, mini, velocity, spread, power;
     world_t *world = &World;
 
     if ((n = Packet_scanf(&connp->r, "%c%c%s", &ch, &bank, str)) <= 0) {
@@ -2781,35 +2781,45 @@ static int Receive_modifier_bank(connection_t *connp)
 		    if (!BIT(world->rules->mode, ALLOW_NUKES))
 			break;
 		    if (*(cp+1) == 'N' || *(cp+1) == 'n')
-			SET_BIT(mods.nuclear, FULLNUCLEAR);
+			Set_nuclear_modifier(&mods,
+					     MODS_NUCLEAR|MODS_FULLNUCLEAR);
 		    break;
 		case 'N': case 'n':
 		    if (!BIT(world->rules->mode, ALLOW_NUKES))
 			break;
-		    SET_BIT(mods.nuclear, NUCLEAR);
+		    if (Get_nuclear_modifier(mods) == 0)
+			Set_nuclear_modifier(&mods, MODS_NUCLEAR);
 		    break;
 		case 'C': case 'c':
 		    if (!BIT(world->rules->mode, ALLOW_CLUSTERS))
 			break;
-		    SET_BIT(mods.warhead, CLUSTER);
+		    Set_cluster_modifier(&mods, 1);
 		    break;
 		case 'I': case 'i':
-		    SET_BIT(mods.warhead, IMPLOSION);
+		    Set_implosion_modifier(&mods, 1);
 		    break;
 		case 'V': case 'v':
-		    cp++; mods.velocity = str2num (&cp, 0, MODS_VELOCITY_MAX);
+		    cp++;
+		    velocity = str2num (&cp, 0, MODS_VELOCITY_MAX);
+		    Set_velocity_modifier(&mods, velocity);
 		    cp--;
 		    break;
 		case 'X': case 'x':
-		    cp++; mods.mini = str2num (&cp, 1, MODS_MINI_MAX+1) - 1;
+		    cp++;
+		    mini = str2num (&cp, 1, MODS_MINI_MAX+1) - 1;
+		    Set_mini_modifier(&mods, mini);
 		    cp--;
 		    break;
 		case 'Z': case 'z':
-		    cp++; mods.spread = str2num (&cp, 0, MODS_SPREAD_MAX);
+		    cp++;
+		    spread = str2num (&cp, 0, MODS_SPREAD_MAX);
+		    Set_spread_modifier(&mods, spread);
 		    cp--;
 		    break;
 		case 'B': case 'b':
-		    cp++; mods.power = str2num (&cp, 0, MODS_POWER_MAX);
+		    cp++;
+		    power = str2num (&cp, 0, MODS_POWER_MAX);
+		    Set_power_modifier(&mods, power);
 		    cp--;
 		    break;
 		case 'L': case 'l':
@@ -2817,9 +2827,9 @@ static int Receive_modifier_bank(connection_t *connp)
 		    if (!BIT(world->rules->mode, ALLOW_LASER_MODIFIERS))
 			break;
 		    if (*cp == 'S' || *cp == 's')
-			SET_BIT(mods.laser, STUN);
+			Set_laser_modifier(&mods, MODS_LASER_STUN);
 		    if (*cp == 'B' || *cp == 'b')
-			SET_BIT(mods.laser, BLIND);
+			Set_laser_modifier(&mods, MODS_LASER_BLIND);
 		    break;
 		default:
 		    /* Ignore unknown modifiers. */

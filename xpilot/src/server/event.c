@@ -668,77 +668,95 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_TOGGLE_NUCLEAR:
 		if (BIT(world->rules->mode, ALLOW_NUKES)) {
-		    switch (pl->mods.nuclear) {
-		    case NUCLEAR:
-			pl->mods.nuclear |= FULLNUCLEAR;
+		    switch (Get_nuclear_modifier(pl->mods)) {
+		    case MODS_NUCLEAR:
+			Set_nuclear_modifier(&pl->mods,
+					     MODS_NUCLEAR|MODS_FULLNUCLEAR);
 			break;
 		    case 0:
-			pl->mods.nuclear = NUCLEAR;
+			Set_nuclear_modifier(&pl->mods,
+					     MODS_NUCLEAR);
 			break;
 		    default:
-			pl->mods.nuclear = 0;
+			Set_nuclear_modifier(&pl->mods, 0);
 			break;
 		    }
 		}
 		break;
 
 	    case KEY_TOGGLE_CLUSTER:
-		if (BIT(world->rules->mode, ALLOW_CLUSTERS))
-		    TOGGLE_BIT(pl->mods.warhead, CLUSTER);
+		if (BIT(world->rules->mode, ALLOW_CLUSTERS)) {
+		    int cluster = Get_cluster_modifier(pl->mods);
+
+		    Set_cluster_modifier(&pl->mods, !cluster);
+		}
 		break;
 
 	    case KEY_TOGGLE_IMPLOSION:
-		if (BIT(world->rules->mode, ALLOW_MODIFIERS))
-		    TOGGLE_BIT(pl->mods.warhead, IMPLOSION);
+		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
+		    int implosion = Get_implosion_modifier(pl->mods);
+
+		    Set_implosion_modifier(&pl->mods, !implosion);
+		}
 		break;
 
 	    case KEY_TOGGLE_VELOCITY:
 		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
-		    /* NB. These may be bit fields, dont modify this code */
-		    if (pl->mods.velocity == MODS_VELOCITY_MAX)
-			pl->mods.velocity = 0;
+		    int velocity = Get_velocity_modifier(pl->mods);
+
+		    if (velocity == MODS_VELOCITY_MAX)
+			velocity = 0;
 		    else
-			pl->mods.velocity++;
+			velocity++;
+		    Set_velocity_modifier(&pl->mods, velocity);
 		}
 		break;
 
 	    case KEY_TOGGLE_MINI:
 		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
-		    /* NB. These may be bit fields, dont modify this code */
-		    if (pl->mods.mini == MODS_MINI_MAX)
-			pl->mods.mini = 0;
+		    int mini = Get_mini_modifier(pl->mods);
+
+		    if (mini == MODS_MINI_MAX)
+			mini = 0;
 		    else
-			pl->mods.mini++;
+			mini++;
+		    Set_mini_modifier(&pl->mods, mini);
 		}
 		break;
 
 	    case KEY_TOGGLE_SPREAD:
 		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
-		    /* NB. These may be bit fields, dont modify this code */
-		    if (pl->mods.spread == MODS_SPREAD_MAX)
-			pl->mods.spread = 0;
+		    int spread = Get_spread_modifier(pl->mods);
+
+		    if (spread == MODS_SPREAD_MAX)
+			spread = 0;
 		    else
-			pl->mods.spread++;
+			spread++;
+		    Set_spread_modifier(&pl->mods, spread);
 		}
 		break;
 
 	    case KEY_TOGGLE_LASER:
 		if (BIT(world->rules->mode, ALLOW_LASER_MODIFIERS)) {
-		    /* NB. These may be bit fields, dont modify this code */
-		    if (pl->mods.laser == MODS_LASER_MAX)
-			pl->mods.laser = 0;
+		    int laser = Get_laser_modifier(pl->mods);
+
+		    if (laser == MODS_LASER_MAX)
+			laser = 0;
 		    else
-			pl->mods.laser++;
+			laser++;
+		    Set_laser_modifier(&pl->mods, laser);
 		}
 		break;
 
 	    case KEY_TOGGLE_POWER:
 		if (BIT(world->rules->mode, ALLOW_MODIFIERS)) {
-		    /* NB. These may be bit fields, dont modify this code */
-		    if (pl->mods.power == MODS_POWER_MAX)
-			pl->mods.power = 0;
+		    int power = Get_power_modifier(pl->mods);
+
+		    if (power == MODS_POWER_MAX)
+			power = 0;
 		    else
-			pl->mods.power++;
+			power++;
+		    Set_power_modifier(&pl->mods, power);
 		}
 		break;
 
@@ -1100,19 +1118,19 @@ int Handle_keyboard(player_t *pl)
 void filter_mods(world_t *world, modifiers_t * mods)
 {
     if (!BIT(world->rules->mode, ALLOW_NUKES))
-	mods->nuclear = 0;
+	Set_nuclear_modifier(mods, 0);
 
     if (!BIT(world->rules->mode, ALLOW_CLUSTERS))
-	CLR_BIT(mods->warhead, CLUSTER);
+	Set_cluster_modifier(mods, 0);
 
     if (!BIT(world->rules->mode, ALLOW_MODIFIERS)) {
-	CLR_BIT(mods->warhead, IMPLOSION);
-	mods->velocity = 0;
-	mods->mini = 0;
-	mods->spread = 0;
-	mods->power = 0;
+	Set_implosion_modifier(mods, 0);
+	Set_velocity_modifier(mods, 0);
+	Set_mini_modifier(mods, 0);
+	Set_spread_modifier(mods, 0);
+	Set_power_modifier(mods, 0);
     }
 
     if (!BIT(world->rules->mode, ALLOW_LASER_MODIFIERS))
-	mods->laser = 0;
+	Set_laser_modifier(mods, 0);
 }

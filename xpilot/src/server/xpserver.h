@@ -54,6 +54,7 @@
 #include "connection.h"
 #include "defaults.h"
 #include "map.h"
+#include "modifiers.h"
 #include "netserver.h"
 #include "objpos.h"
 #include "option.h"

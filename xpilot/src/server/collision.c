@@ -670,8 +670,8 @@ static void PlayerObjectCollision(player_t *pl)
 	    continue;
 
 	case OBJ_CANNON_SHOT:
-	    /* don't explode cannon flak if it hits directly*/
-	    CLR_BIT(obj->mods.warhead, CLUSTER);
+	    /* don't explode cannon flak if it hits directly */
+	    Set_cluster_modifier(&obj->mods, 0);
 	    break;
 
 	case OBJ_PULSE:
@@ -1089,6 +1089,13 @@ static void Player_collides_with_asteroid(player_t *pl, wireobject_t *ast)
 }
 
 
+static inline double Missile_hit_drain(missileobject_t *missile)
+{
+    return (ED_SMART_SHOT_HIT /
+	    ((Get_mini_modifier(missile->mods) + 1)
+	     * (Get_power_modifier(missile->mods) + 1)));
+}
+
 static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 {
     player_t *kp = NULL;
@@ -1110,7 +1117,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
     if (BIT(pl->used, HAS_SHIELD)
 	|| BIT(pl->have, HAS_ARMOR)
 	|| (obj->type == OBJ_TORPEDO
-	    && BIT(obj->mods.nuclear, NUCLEAR)
+	    && Get_nuclear_modifier(obj->mods)
 	    && (rfrac() >= 0.25))) {
 	switch (obj->type) {
 	case OBJ_TORPEDO:
@@ -1141,8 +1148,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 					    obj->mods, 1),
 			      kp->name);
 	    }
-	    drain = (ED_SMART_SHOT_HIT /
-		((obj->mods.mini + 1) * (obj->mods.power + 1)));
+	    drain = Missile_hit_drain(MISSILE_PTR(obj));
 	    if (!Player_used_emergency_shield(pl))
 		Player_add_fuel(pl, drain);
 	    pl->forceVisible += 2;
@@ -1230,7 +1236,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 
 	    switch (obj->type) {
 	    case OBJ_SHOT:
-		if (BIT(obj->mods.warhead, CLUSTER))
+		if (Get_cluster_modifier(obj->mods))
 		    factor = options.clusterKillScoreMult;
 		else
 		    factor = options.shotKillScoreMult;
@@ -1397,8 +1403,7 @@ static void AsteroidCollision(world_t *world)
 	    case OBJ_HEAT_SHOT:
 		obj->life = 0.0;
 		Delta_mv(ast, obj);
-		damage = ED_SMART_SHOT_HIT
-			 / ((obj->mods.mini + 1) * (obj->mods.power + 1));
+		damage = Missile_hit_drain(MISSILE_PTR(obj));
 		sound = true;
 		break;
 	    case OBJ_PULSE:

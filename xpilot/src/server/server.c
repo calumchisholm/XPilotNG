@@ -795,6 +795,7 @@ extern char laser_version[];
 extern char map_version[];
 extern char math_version[];
 extern char metaserver_version[];
+extern char modifiers_version[];
 extern char net_version[];
 extern char netserver_version[];
 extern char objpos_version[];
@@ -850,6 +851,7 @@ static void Check_server_versions(void)
 	{ "map", map_version },
 	{ "math", math_version },
 	{ "metaserver", metaserver_version },
+	{ "modifiers", modifiers_version },
 	{ "net", net_version },
 	{ "netserver", netserver_version },
 	{ "objpos", objpos_version },

@@ -162,7 +162,7 @@ void Make_debris(world_t  *world,
     CLEAR_MODS(mods);
 
     if (type == OBJ_SHOT) {
-	SET_BIT(mods.warhead, CLUSTER);
+	Set_cluster_modifier(&mods, 1);
 	if (!options.shotsGravity)
 	    CLR_BIT(status, GRAVITY);
     }

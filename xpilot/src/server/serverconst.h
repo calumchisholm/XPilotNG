@@ -166,11 +166,6 @@
 #define ECM_DISTANCE		(VISIBILITY_DISTANCE*0.4)
 #define TRANSPORTER_DISTANCE	(VISIBILITY_DISTANCE*0.2)
 
-/*#define SHOT_DEFAULT_LIFE	60.0*/
-#define SHOT_MULT(o) \
-	((BIT((o)->mods.nuclear, NUCLEAR) && BIT((o)->mods.warhead, CLUSTER)) \
-	 ? options.nukeClusterDamage : 1.0)
-
 #define MINE_RADIUS		8
 #define MINE_RANGE	 	(VISIBILITY_DISTANCE*0.1)
 #define MINE_SENSE_BASE_RANGE   (MINE_RANGE*1.3)
