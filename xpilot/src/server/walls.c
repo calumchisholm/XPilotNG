@@ -876,7 +876,6 @@ static void Bounce_player(player *pl, move_t *move, int line, int point)
 	    return;
 	}
 	/* !@# I didn't implement wall direction calculation yet. */
-	/* kps - neither did I */
 	if (cost) {
 #if 0
 	    int intensity = (int)(cost * wallBounceExplosionMult);
@@ -1734,8 +1733,7 @@ int Polys_to_client(unsigned char **start)
 	    STORE1(world->bases[i].team);
 	STORE2(world->bases[i].pos.cx >> CLICK_SHIFT);
 	STORE2(world->bases[i].pos.cy >> CLICK_SHIFT);
-	/* Send the direction like RES was 128. */
-	STORE1(128 * world->bases[i].dir / RES);
+	STORE1(world->bases[i].dir);
     }
     STORE2(world->NumFuels);
     for (i = 0; i < world->NumFuels; i++) {
@@ -2535,9 +2533,6 @@ void Walls_init(void)
      * arbitrary point on the map is inside something. */
     Inside_init();
 
-    /* kps - remove some time */
-    assert(groups[0].type == FILLED);
-
     /* Precalculate the .c and .s values used when calculating a bounce
      * from the line. */
     for (i = 0; i < num_lines; i++) {
@@ -2631,7 +2626,6 @@ static void Move_ball(object *obj)
 }
 
 
-/* kps- collision.c has a move_object call in ng */
 void Move_object(object *obj)
 {
     int t;

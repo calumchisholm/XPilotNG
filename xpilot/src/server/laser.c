@@ -43,9 +43,6 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
     pl->forceVisible += 1;
     if (BIT(pl->have, HAS_MIRROR)
 	&& (rfrac() * (2 * pl->item[ITEM_MIRROR])) >= 1) {
-	/*pulse->pos.cx = cx - tcos(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;
-	  pulse->pos.cy = cy - tsin(pulse->dir) * 0.5 * PULSE_SAMPLE_DISTANCE;*/
-	/* is this ok ? */
 	pulse->dir = (int)(Wrap_cfindDir(pl->pos.cx - pulse->pos.cx,
 					 pl->pos.cy - pulse->pos.cy)
 			   * 2 - RES / 2 - pulse->dir);
@@ -57,23 +54,14 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 	pulse->life += pl->item[ITEM_MIRROR];
 	pulse->len = 0 /*PULSE_LENGTH*/;
 	pulse->refl = true;
-	/**refl = true;*/
 	return;
     }
 
     sound_play_sensors(pl->pos, PLAYER_EAT_LASER_SOUND);
     if (Player_used_emergency_shield(pl))
 	return;
-    if (pulse->type != OBJ_PULSE) {
-	/* kps -remove */
-	warn("Player_collides_with_laser_pulse: "
-	     "(pulse->type != OBJ_PULSE)\n");
-	return;
-    }
-#if 0
-    if (!BIT(pulse->type, KILLING_SHOTS))
-	return;
-#endif
+    assert(pulse->type == OBJ_PULSE);
+
     /* kps - do we need some hack so that the laser pulse is
      * not removed in the same frame that its life ends ?? */
     pulse->life = 0;
@@ -88,11 +76,11 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 			pl->name, kp->name);
 		if (pl->id == kp->id)
 		    strcat(msg, " How strange!");
-	    } else {
+	    } else
 		sprintf(msg,
 			"%s got paralysed by a stun laser.",
 			pl->name);
-	    }
+
 	    Set_message(msg);
 	    CLR_BIT(pl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
@@ -142,8 +130,7 @@ void Laser_pulse_hits_player(player *pl, pulseobject *pulse)
 	    }
 	}
 	if (!BIT(pl->used, HAS_SHIELD)
-	    && BIT(pl->have, HAS_ARMOR)) {
+	    && BIT(pl->have, HAS_ARMOR))
 	    Player_hit_armor(pl);
-	}
     }
 }

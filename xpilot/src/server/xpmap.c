@@ -295,10 +295,6 @@ setup_t *Xpmap_init_setup(world_t *world)
 		case DIR_LEFT:  *mapptr = SETUP_BASE_LEFT + team; break;
 		default:
 		    warn("Bad base at (%d,%d), (dir = %d).", x, y, dir);
-		    /*
-		     * kps - this could be improved, that is send some dir
-		     * that is closer to the original dir
-		     */
 		    *mapptr = SETUP_BASE_UP + team;
 		    break;
 		}
@@ -318,7 +314,6 @@ setup_t *Xpmap_init_setup(world_t *world)
 		case DIR_LEFT:	*mapptr = SETUP_CANNON_LEFT; break;
 		default:
 		    warn("Bad cannon at (%d,%d), (dir = %d).", x, y, dir);
-		    /* kps - this could be improved */
 		    *mapptr = SETUP_CANNON_UP;
 		    break;
 		}
@@ -359,7 +354,7 @@ setup_t *Xpmap_init_setup(world_t *world)
 	    free(mapdata);
 	    return NULL;
 	}
-	if ((mapdata = (unsigned char *)realloc(mapdata, size)) == NULL) {
+	if ((mapdata = realloc(mapdata, size)) == NULL) {
 	    error("Cannot reallocate mapdata");
 	    return NULL;
 	}
@@ -1163,9 +1158,6 @@ static void Xpmap_wall_poly(int bx, int by,
 	return;
 
     /* first assume we have a rectangle */
-    /* kps - use -1 if you don't wan't the polygon corners to
-     * overlap other polygons
-     */
     pos[0].cx = bx * BLOCK_CLICKS;
     pos[0].cy = (by + 1) * BLOCK_CLICKS - 1;
     pos[1].cx = bx * BLOCK_CLICKS;
@@ -1308,8 +1300,7 @@ static void Xpmap_walls_to_polygons(world_t *world)
 	    }
 
 	    /*
-	     * We don't want the polygon to have offsets
-	     * that is too big
+	     * We don't want the polygon to have offsets that are too big.
 	     */
 	    if (inside && numblocks == maxblocks) {
 		Xpmap_wall_poly(x0, y, startblock, endblock,

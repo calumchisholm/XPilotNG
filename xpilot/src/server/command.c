@@ -1271,8 +1271,8 @@ static int Cmd_set(char *arg, player *pl, int oper, char *msg)
 	return CMD_RESULT_NOT_OPERATOR;
 
     /*
-     * kps - changed second argument of second strtok from " " to "",
-     * this allows setting string options to values that contain spaces.
+     * Second argument of second strtok is " " instead of ""
+     * which allows setting string options to values that contain spaces.
      */
     if (!arg
 	|| !(option = strtok(arg, " "))

@@ -511,10 +511,6 @@ int CountDefensiveItems(player *pl)
     return count;
 }
 
-/*
- * kps - there's might still be places in the code where cost
- * values might be 256 times too big.
- */
 static inline double collision_cost(double mass, double speed)
 {
     /*

@@ -451,8 +451,7 @@ bool Grok_map(world_t *world)
 	Xpmap_find_map_object_teams(world);
     }
 
-    Verify_wormhole_consistency(world
-);
+    Verify_wormhole_consistency(world);
 
     if (BIT(world->rules->mode, TIMING) && world->NumChecks == 0) {
 	xpprintf("No checkpoints found while race mode (timing) was set.\n");
@@ -550,7 +549,6 @@ void Find_base_direction(world_t *world)
  * Determine the order in which players are placed
  * on starting positions after race mode reset.
  */
-/* kps - ng does not want this */
 static void Find_base_order(world_t *world)
 {
     int			i, j, k, n;

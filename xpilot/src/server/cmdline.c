@@ -326,7 +326,7 @@ bool		ignoreMaxFPS;		/* Temporary hack */
 bool		baselessPausing;
 double		pauseTax;		/* Tax for pausers */
 bool		maraTurnqueue;		/* Mara's "turnqueue" hack */
-bool		ngControls;		/* Kps improved steering and shooting */
+bool		ngControls;		/* Improved steering and shooting */
 int		pausedFPS;		/* Limited FPS for pausers */
 int		waitingFPS;		/* Limited FPS for waiters */
 
@@ -426,7 +426,7 @@ static option_desc options[] = {
     {
 	"minItemMass",
 	"minItemMass",
-	"0.0",		/* kps - 4.5.5beta has default of 1.0 */
+	"0.0",		/* 4.5.5beta has default of 1.0 */
 	&minItemMass,
 	valReal,
 	tuner_dummy,
@@ -497,7 +497,7 @@ static option_desc options[] = {
     {
 	"pulseLife",
 	"pulseLife",
-	"6.0", /* kps - should be PULSE_LIFE(lasers) */
+	"6.0",
 	&pulseLife,
 	valReal,
 	Timing_setup,
@@ -1701,7 +1701,7 @@ static option_desc options[] = {
 	"Wrap around edges.\n",
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
-    { /* kps - ng does not want edgebounce and extraborder */
+    {
 	"edgeBounce",
 	"edgeBounce",
 	"yes",

@@ -1404,8 +1404,6 @@ void Fire_general_laser(player *pl, int team, clpos pos,
     if (pl) {
 	Player_add_fuel(pl, ED_LASER);
 	sound_play_sensors(pos, FIRE_LASER_SOUND);
-	/* kps - hmm ??? */
-	/*life = (int)PULSE_LIFE(pl->item[ITEM_LASER]);*/
 	life = pulseLife;
 	/*Rank_FireLaser(pl);*/
     } else

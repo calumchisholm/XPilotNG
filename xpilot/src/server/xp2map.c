@@ -215,7 +215,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    if (!strcasecmp(*attr, "y"))
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "dir"))
-		dir = (RES * atoi(*(attr + 1))) / 128;
+		dir = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	if (team < 0 || team >= MAX_TEAMS) {
@@ -255,7 +255,7 @@ static void tagstart(void *data, const char *el, const char **attr)
 	    else if (!strcasecmp(*attr, "y"))
 		pos.cy = atoi(*(attr + 1)) * scale;
 	    else if (!strcasecmp(*attr, "dir"))
-		dir = (RES * atoi(*(attr + 1))) / 128;
+		dir = atoi(*(attr + 1));
 	    attr += 2;
 	}
 	cannon_ind = World_place_cannon(world, pos, dir, team);
@@ -456,7 +456,7 @@ static void tagend(void *data, const char *el)
     return;
 }
 
-/* kps - ugly hack */
+
 bool isXp2MapFile(int fd)
 {
     char start[] = "<XPilotMap";
@@ -487,7 +487,6 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin)
     (void)opt_origin;
     if (!p) {
 	warn("Creating Expat instance for map parsing failed.\n");
-	/*exit(1);*/
 	return false;
     }
     XML_SetElementHandler(p, tagstart, tagend);
@@ -501,7 +500,6 @@ bool parseXp2MapFile(int fd, optOrigin opt_origin)
 	    warn("Parse error reading map at line %d:\n%s\n",
 		  XML_GetCurrentLineNumber(p),
 		  XML_ErrorString(XML_GetErrorCode(p)));
-	    /*exit(1);*/
 	    return false;
 	}
     } while (len);

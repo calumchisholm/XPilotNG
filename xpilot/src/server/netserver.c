@@ -510,7 +510,6 @@ static void Create_client_socket(sock_t *sock, int *port)
 
 
 #if 0
-/* kps - this needs to be fixed */
 /*
  * Banning of players
  */
@@ -1088,12 +1087,11 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
     }
     pl->rectype = connp->rectype;
 
-    /*strlcpy(pl->rawname, connp->nick, MAX_CHARS);*/
     strlcpy(pl->name, connp->nick, MAX_CHARS);
     /*strlcpy(pl->auth_nick, old_nick, MAX_CHARS);*/
     strlcpy(pl->username, connp->real, MAX_CHARS);
     strlcpy(pl->hostname, connp->host, MAX_CHARS);
-    /* kps - what about auth_nick ? */
+
     LegalizeName(pl->name, true);
     LegalizeName(pl->username, false);
     LegalizeHost(pl->hostname);
@@ -1411,7 +1409,7 @@ static void Handle_input(int fd, void *arg)
     else if (record) {
 	if (Sockbuf_read(&connp->r) == -1) {
 	    Destroy_connection(connp, "input error");
-	    *playback_shorts++ = (short)0xffff; /* kps - added cast */
+	    *playback_shorts++ = (short)0xffff;
 	    return;
 	}
 	*playback_shorts++ = connp->r.len;
@@ -1641,11 +1639,11 @@ int Send_self(connection_t *connp,
 		      PKT_SELF,
 		      CLICK_TO_PIXEL(pl->pos.cx), CLICK_TO_PIXEL(pl->pos.cy),
 		      (int) pl->vel.x, (int) pl->vel.y,
-		      128 * pl->dir / RES,
+		      pl->dir,
 		      (int) (pl->power + 0.5),
 		      (int) (pl->turnspeed + 0.5),
 		      (int) (pl->turnresistance * 255.0 + 0.5),
-		      lock_id, lock_dist, 128 * lock_dir / RES,
+		      lock_id, lock_dist, lock_dir,
 		      pl->check,
 
 		      pl->fuel.current,
@@ -1698,7 +1696,8 @@ int Send_war(connection_t *connp, int robot_id, int killer_id)
 /*
  * Somebody is programming a robot to seek some player.
  */
-int Send_seek(connection_t *connp, int programmer_id, int robot_id, int sought_id)
+int Send_seek(connection_t *connp, int programmer_id, int robot_id,
+	      int sought_id)
 {
     if (!BIT(connp->state, CONN_PLAYING | CONN_READY)) {
 	warn("Connection not ready for seek declaration (%d,%d)",
@@ -2069,7 +2068,7 @@ int Send_ship(connection_t *connp, clpos pos, int id, int dir,
 			 "%c%hd%hd%hd" "%c" "%c",
 			 PKT_SHIP,
 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), id,
-			 128 * dir / RES,
+			 dir,
 			 (shield != 0)
 			 | ((cloak != 0) << 1)
 			 | ((emergency_shield != 0) << 2)

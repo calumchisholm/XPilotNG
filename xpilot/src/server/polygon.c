@@ -43,14 +43,6 @@ int num_pstyles, num_bstyles, num_estyles = 1; /* "Internal" edgestyle */
 int max_bases, max_balls, max_polys,max_echanges; /* !@# make static after testing done */
 static int current_estyle, current_group, is_decor;
 
-static void Check_groupcount(void)
-{
-    if (current_group == 1000) {
-	warn("Server didn't allocate enough space for groups");
-	exit(1);
-    }
-}
-
 static int Create_group(int type, int team, hitmask_t hitmask,
 			bool (*hitfunc)(group_t *gp, move_t *move),
 			int mapobj_ind)
@@ -364,9 +356,6 @@ int P_get_poly_id(const char *s)
 /*
  * Call given function f with group map object pointer as argument for
  * all groups of grouptype 'type'.
- *
- * kps - which group numbers are ok ???
- * Is it 1 to num_groups ???
  */
 #if 0
 void P_grouphack(int type, void (*f)(int, void *))

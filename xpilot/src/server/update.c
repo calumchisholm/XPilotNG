@@ -610,7 +610,7 @@ static void Players_turn(void)
 	    pl->turnvel *= pl->turnresistance;
 
 	new_float_dir = pl->float_dir;
-	new_float_dir += RES * pl->turnvel / 128.0;
+	new_float_dir += pl->turnvel;
 
 	while (new_float_dir < 0)
 	    new_float_dir += RES;
