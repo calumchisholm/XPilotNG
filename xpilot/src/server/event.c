@@ -207,31 +207,40 @@ static void Player_change_home(player_t *pl)
 			       "[*Server notice*]");
 	return;
     }
-	
+
+    /* Maybe the base is our own base? */
     if (base2 == pl->home_base)
 	return;
 
-    pl->home_base = base2;
-
-    /* Make sure two teammates don't have the same base. */
+    /* Let's see if someone else in our has this base. */
     for (i = 0; i < NumPlayers; i++) {
 	player_t *pl_i = Player_by_index(i);
 
 	if (pl_i->id != pl->id
 	    && !Player_is_tank(pl_i)
-	    && pl->home_base == pl_i->home_base) {
-	    Pick_startpos(pl_i);
+	    && base2 == pl_i->home_base) {
 	    pl2 = pl_i;
 	    break;
 	}
     }
 
+    if (pl2 != NULL
+	&& Players_are_teammates(pl, pl2)
+	&& Get_Score(pl) <= Get_Score(pl2)) {
+	Set_player_message(pl, "You must have a higher score than your "
+			   "teammate to take over their base. "
+			   "[*Server notice*]");
+	return;
+    }
+
+    pl->home_base = base2;
     sound_play_all(CHANGE_HOME_SOUND);
 
-    if (pl2)
+    if (pl2 != NULL) {
+	Pick_startpos(pl2);
 	Set_message_f("%s has taken over %s's home base.",
 		      pl->name, pl2->name);
-    else
+    } else
 	Set_message_f("%s has changed home base.", pl->name);
 
     /*
