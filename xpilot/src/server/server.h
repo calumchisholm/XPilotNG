@@ -371,6 +371,7 @@ extern struct options {
     int		clientPortEnd;
 
     int		maxPauseTime;
+    int		maxIdleTime;
     int		maxClientsPerIP;
 
     int		playerLimit;

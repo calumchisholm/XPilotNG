@@ -1048,13 +1048,14 @@ static void Update_players(void)
 	} else if ( pl->flooding >= 0 )
 	    pl->flooding--;
 
-#define IDLETHRESHOLD (FPS * 60)
+#define IDLETHRESHOLD (FPS * options.maxIdleTime)
 
 	if (Player_is_human(pl)) {
 	    pl->rank->score = pl->score;
-	    if ( pl->mychar == ' ' ) {
-		if ( pl->idleCount++ == IDLETHRESHOLD ) {
-		    if ( NumPlayers - 1 > NumPseudoPlayers + NumRobots ) {
+	    if (pl->mychar == ' ') {
+		if (options.maxIdleTime > 0
+		    && pl->idleCount++ == IDLETHRESHOLD) {
+		    if (NumPlayers - 1 > NumPseudoPlayers + NumRobots) {
 			/* Kill player, he/she will be paused when returned
 			   to base, unless he/she wakes up. */
 			Kill_player(pl, false);
@@ -1075,11 +1076,9 @@ static void Update_players(void)
 	    } else {
 		pl->count = -1;
 		if (!BIT(pl->status, PLAYING)) {
-		    /*
-		     * kps - another idle check comes later in this file.
-		     * Are both needed ?
-		     */
-		    if (pl->idleCount >= IDLETHRESHOLD) { /* idle */
+
+		    if (options.maxIdleTime
+			&& pl->idleCount >= IDLETHRESHOLD) {
 			Pause_player(pl, true);
 			sprintf(msg, "%s was paused for idling.", pl->name);
 			Set_message(msg);
@@ -1324,7 +1323,8 @@ void Update_objects(void)
 	    Kill_player(pl, true);
 
 	    if (Player_is_human(pl)) {
-		if (frame_loops - pl->frame_last_busy > 60 * FPS) {
+		if (options.maxIdleTime > 0
+		    && frame_loops - pl->frame_last_busy > IDLETHRESHOLD) {
 		    if ((NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
 			Pause_player(pl, true);
 			sprintf(msg, "%s was paused for idling.", pl->name);

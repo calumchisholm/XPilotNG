@@ -3280,6 +3280,18 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
+	"maxIdleTime",
+	"maxIdleTime",
+	"60",		/* can idle 1 minute by default */
+	&options.maxIdleTime,
+	valInt,
+	tuner_dummy,
+	"The maximum time a player can stay idle, in seconds.\n"
+	"After having idled this long, the player will be paused.\n"
+	"Setting this option to 0 disables the feature.\n",
+	OPT_ORIGIN_ANY | OPT_VISIBLE
+    },
+    {
 	"maxClientsPerIP",
 	"maxPerIP",
 	"4",		/* if more try to join they get "game locked" */
