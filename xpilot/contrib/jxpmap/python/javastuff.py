@@ -1,6 +1,7 @@
 import gtk
 import GDK
 import gdkpixbuf
+import copy
 
 # This contains classes/functions giving functionality of some Java
 # libraries used in the original Java version, and some additional
@@ -17,7 +18,7 @@ class Rectangle:
         return self
 
     def paint(self, di):
-        c = self.copy().transform(di.tx)
+        c = copy.copy(self).transform(di.tx)
         gtk.draw_rectangle(di.area, di.gc, gtk.FALSE, c.x, c.y,
                            c.width, c.height)
 
@@ -34,9 +35,6 @@ class Rectangle:
             self.y += self.height
             self.height *= -1
         return self
-
-    def copy(self):
-        return Rectangle(self.x, self.y, self.width, self.height)
 
     def contains(self, p):
         return self.x <= p.x <= self.x + self.width and\
@@ -93,11 +91,11 @@ class Polygon:
         self.points = [tx(p) for p in self.points]
         self.recalculate_bounds()
 
-    def copy(self):
+    def __copy__(self):
         c = Polygon()
         c.points = self.points[:] # Should be just numbers, no deepcopy
         c.npoints = self.npoints
-        c.bounds = self.bounds.copy()
+        c.bounds = copy.copy(self.bounds)
         return c
 
     def contains(self, p):
@@ -166,11 +164,6 @@ class AffineTransform:
         result.y = -self.y / self.yscale
         return result
 
-    def copy(self):
-        r = AffineTransform()
-        r.x, r.y, r.xscale, r.yscale = self.x, self.y, self.xscale, self.yscale
-        return r
-
 class Dimension:
     pass
 
@@ -208,6 +201,8 @@ class ScaledBitmap:
         self.unscaled, mask = self.img.render_pixmap_and_mask()
         self.scaled = None
         self.scale = 1
+    def __deepcopy__(self, memo):
+        return self
     def __getitem__(self, scale = 1):
         if scale == 1:
             return self.unscaled

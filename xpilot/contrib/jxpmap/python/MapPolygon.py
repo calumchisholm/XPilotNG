@@ -133,6 +133,7 @@ class MapPolygon(MapObject):
                         if self.polygon.npoints > 3:
                             self.removePoint(i)
                             canvas.repaint()
+                            self.canvas.saveUndo()
                     else:
                         canvas.setCanvasEventHandler(PolygonPointMoveHandler(
                             self, me, i, canvas.wrap(p, point)))
@@ -271,6 +272,7 @@ class CreateHandler(MouseEventHandler):
                 c.getModel().addToFront(self.object)
             c.setCanvasEventHandler(None)
             c.repaint()
+            c.saveUndo()
             return
         self.poly.addPoint(latest.x, latest.y)
         c.drawShape(self.poly, gc)
@@ -324,6 +326,7 @@ class PolygonPointMoveHandler(MouseEventHandler):
             self.obj.checkWrapping(c.model.options.size)
         c.setCanvasEventHandler(None)
         c.repaint()
+        c.saveUndo()
 
     def drawPreview(self, c):
         c.drawShape(self.l1)

@@ -40,7 +40,6 @@ class MapModel:
         self.polyStyles = []
         self.edgeStyles = []
         self.options = MapOptions()
-        self.bmstore = ScaledBitmapStore()
 
         ls = LineStyle("internal", 0, 0xFFFF, LineStyle.STYLE_INTERNAL)
         self.edgeStyles.append(ls)
@@ -69,13 +68,13 @@ class MapModel:
     def setDefaultPolygonStyle(self, index):
         self.defPolygonStyleIndex = index
 
-    def load(self, file):
+    def load(self, file, bmstore):
         self.edgeStyles = []
         ls = LineStyle("internal", 0, 0xFFFF, LineStyle.STYLE_INTERNAL)
         self.edgeStyles.append(ls)
         self.polyStyles = []
 
-        xml.sax.parse(file, MapDocumentHandler(self))
+        xml.sax.parse(file, MapDocumentHandler(self, bmstore))
         self.defEdgeStyleIndex = len(self.edgeStyles) - 1
         self.defPolygonStyleIndex = len(self.polyStyles) - 1
 
@@ -117,8 +116,9 @@ class MapParseError(Exception):
     pass
 
 class MapDocumentHandler(xml.sax.ContentHandler):
-    def __init__(self, model):
+    def __init__(self, model, bmstore):
         self.model = model
+        self.bmstore = bmstore
         self.polys = []
         self.estyles = {}
         self.estyles["internal"] = model.edgeStyles[0]
@@ -130,7 +130,7 @@ class MapDocumentHandler(xml.sax.ContentHandler):
         self.decor = 0
 
     def startElement(self, name, atts):
-        bm = self.model.bmstore
+        bm = self.bmstore
         name = name.lower()
         def getxy():
             return int(atts["x"]), int(atts["y"])
@@ -181,7 +181,7 @@ class MapDocumentHandler(xml.sax.ContentHandler):
             id = atts["id"]
             fileName = atts["filename"]
             flags = getint("flags")
-            pm = Pixmap(self.model.bmstore, fileName)
+            pm = Pixmap(self.bmstore, fileName)
             pm.fileName = fileName
             pm.scalable = flags != 0
             self.bstyles[id] = pm

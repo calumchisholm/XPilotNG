@@ -1,7 +1,9 @@
 import gtk
 import GDK
+import copy
 
 from javastuff import *
+from config import UNDO_LEVELS
 
 class MouseEvent:
     def __init__(self, point, button, canvas, orig = None):
@@ -18,6 +20,7 @@ class DrawInfo:
 class MapCanvas:
     def __init__(self, area):
         self.eventHandler = None
+        self.bmstore = ScaledBitmapStore()
         self.it = None
         self.at = None
         self.posx = 0
@@ -42,6 +45,7 @@ class MapCanvas:
         self.scale = m.getDefaultScale()
         self.it = None
         self.at = None
+        self.initUndo()
         self.repaint()
 
     def getScale(self):
@@ -113,6 +117,39 @@ class MapCanvas:
         return [(x * map.width, y * map.height) for x in range(nx, xx)\
                 for y in range(ny, xy)]
 
+    def initUndo(self):
+        if UNDO_LEVELS > 0:
+            self.undos = [None] * (UNDO_LEVELS + 1)
+            self.undoIndex = -1
+            self.saveUndo()
+        else:
+            self.undos = None
+
+    def saveUndo(self):
+        if not self.undos:
+            return
+        # The deepcopy can take a visible amount of time, and the X buffer
+        # doesn't seem to get completely flushed while in callback from gtk.
+        # So explicitly show the results of the user's action so far before
+        # doing the copy. There might be a better way to do this (this
+        # call apparently actually waits until the drawing is completed by X,
+        # which is unnecessary), but I don't know gtk well yet.
+        gtk.gdk_flush()
+        self.undoIndex += 1
+        self.undos[self.undoIndex] = copy.deepcopy(self.model)
+
+    def undo(self, dir = -1):
+        if not self.undos:
+            return
+        self.undoIndex = max(self.undoIndex + dir, 0)
+        model = self.undos[self.undoIndex]
+        if model is None:
+            self.undoIndex -= 1
+        else:
+            # Make a copy of the undo state so can return to it again later
+            self.model = copy.deepcopy(model)
+            self.repaint()
+
     def repaint(self):
         self.paint(None)
 
@@ -153,7 +190,7 @@ class MapCanvas:
         tx2 = self.getTransform()
         for o in os:
             for wrap in self.wrapOffsets(view, o.getBounds()):
-                tx = tx2.copy()
+                tx = copy.copy(tx2)
                 tx.translate(*wrap)
                 di.tx = tx
                 o.paint(di)
@@ -207,6 +244,6 @@ class MapCanvas:
         max = Point()
         mapSize = self.model.options.size
         for wrap in self.wrapOffsets(self.view, shape.getBounds()):
-            di.tx = tx.copy()
+            di.tx = copy.copy(tx)
             di.tx.translate(*wrap)
             shape.paint(di)

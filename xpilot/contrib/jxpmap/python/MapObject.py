@@ -6,6 +6,7 @@ import gtk
 from javastuff import *
 from MapObjectPopup import MapObjectPopup
 import EditorDialog
+import copy
 
 class MapObject:
     def __init__(self, x, y, width, height, img):
@@ -55,6 +56,7 @@ class MapObject:
                 if canvas.isErase():
                     canvas.getModel().removeObject(self)
                     canvas.repaint()
+                    canvas.saveUndo()
                 else:
                     canvas.setCanvasEventHandler(MoveHandler(self, me))
                 return 1
@@ -73,7 +75,7 @@ class MapObject:
         return editor
 
 
-class CreateHandler:
+class CreateHandler(MouseEventHandler):
     def __init__(self, object):
         self.object = object
         self.preview = object.getPreviewShape()
@@ -84,7 +86,7 @@ class CreateHandler:
         gc = c.previewgc
         if self.toBeRemoved is not None:
             c.drawShape(self.toBeRemoved, gc)
-        s = self.preview.copy()
+        s = copy.copy(self.preview)
         s.transform(AffineTransform(evt.x - self.object.x,
                                     evt.y - self.object.y))
         c.drawShape(s)
@@ -94,9 +96,10 @@ class CreateHandler:
         c = evt.canvas
         c.getModel().addToFront(self.object)
         mapsize = c.model.options.size
-        self.object.moveTo(evt.x % mapsize.width, evt.y % size.mapheight)
+        self.object.moveTo(evt.x % mapsize.width, evt.y % mapsize.height)
         c.setCanvasEventHandler(None)
         c.repaint()
+        c.saveUndo()
 
 class MoveHandler(MouseEventHandler):
     def __init__(self, obj, evt):
@@ -109,7 +112,7 @@ class MoveHandler(MouseEventHandler):
         c = evt.canvas
         if self.toBeRemoved is not None:
             c.drawShape(self.toBeRemoved)
-        s = self.preview.copy()
+        s = copy.copy(self.preview)
         s.transform(AffineTransform(evt.x - self.offset.x - self.object.x,
                                     evt.y - self.offset.y - self.object.y))
         c.drawShape(s)
@@ -122,3 +125,4 @@ class MoveHandler(MouseEventHandler):
                            (evt.y - self.offset.y) % mapsize.height)
         c.setCanvasEventHandler(None)
         c.repaint()
+        c.saveUndo()

@@ -108,6 +108,7 @@ class MainFrame:
                   ["Toggle points", self.canvasToggle, 'showPoints'],
                   ["Toggle filled", self.canvasToggle, 'filled'],
                   ["Toggle textured", self.canvasToggle, 'textured'],
+                  ["Undo", self.undo, -1], ["Redo", self.undo, 1],
                   ["Zoom in", self.zoom, 1], ["Zoom out", self.zoom, -1]
                   ])
 
@@ -122,10 +123,13 @@ class MainFrame:
         self.box1.pack_start(box, gtk.FALSE, gtk.FALSE, 0)
         box.show()
 
+    def undo(self, widget, value):
+        self.canvas.undo(value)
+
     def newObject(self, widget, Type):
         self.canvas.setErase(0)
-        self.canvas.setCanvasEventHandler(Type(bmstore = self.canvas.model.
-                                               bmstore).getCreateHandler())
+        self.canvas.setCanvasEventHandler(Type(bmstore = self.canvas.bmstore).
+                                          getCreateHandler())
 
     def zoom(self, widget, value):
         self.zoom += value
@@ -178,6 +182,6 @@ if __name__ == '__main__':
     else:
         model = MapModel()
         file = open(sys.argv[1])
-        model.load(file)
+        model.load(file, mf.canvas.bmstore)
         mf.setModel(model)
     mf.main()

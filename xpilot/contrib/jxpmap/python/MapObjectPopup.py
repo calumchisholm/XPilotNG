@@ -25,15 +25,18 @@ class MapObjectPopup:
         self.canvas.getModel().removeObject(self.object)
         self.canvas.getModel().addToFront(self.object)
         self.canvas.repaint()
+        self.canvas.saveUndo()
 
     def toBack(self, data, menuitem):
         self.canvas.getModel().removeObject(self.object)
         self.canvas.getModel().addToBack(self.object)
         self.canvas.repaint()
+        self.canvas.saveUndo()
 
     def remove(self, data, menuitem):
         self.canvas.getModel().removeObject(self.object)
         self.canvas.repaint()
+        self.canvas.saveUndo()
 
     def properties(self, data, menuitem):
         EditorDialog(self.canvas, self.object)
