@@ -2952,17 +2952,11 @@ void Turn_player(player_t *pl, bool push)
 		power = AFTER_BURN_POWER(power, a);
 	    }
 
-    	    /*v = ( power / inert ) * options.turnPush;
-
-	    v *= relturn * l / (SHIP_SZ * CLICK);
-    	    velon = ABS(v * (pdc * (-sl) + pds * cl));
-
-	    fact = tanh((power / inert) / (velon) );
-	    velon *= fact;*/
-	    
      	    velon = (power / inert)*(1 + options.constantSpeed);
     	    	    
     	    if ((pl->vel.x*cln + pl->vel.y*sln) < 0) {
+	    	move.delta.cx = 0;
+	    	move.delta.cy = 0;
     	    	if (ans.line != -1)
     	    	    Bounce_player(pl, &move, ans.line, 0);
 		else
