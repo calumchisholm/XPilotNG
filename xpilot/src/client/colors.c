@@ -1290,7 +1290,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 
     COLOR_INDEX_OPTION(
 	"fuelColor",
-	3,
+	5,
 	&fuelColor,
 	"Which color number to use for drawing fuel stations.\n"),
 
@@ -1346,7 +1346,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 
     COLOR_INDEX_OPTION(
 	"hudRadarEnemyColor",
-	1,
+	4,
 	&hudRadarEnemyColor,
 	"Which color number to use for drawing hudradar dots\n"
 	"that represent enemy ships.\n"),
@@ -1421,7 +1421,7 @@ XP_INT_OPTION(name, defval, 0, MAX_COLORS-1, valptr, NULL, help)
 
     COLOR_INDEX_OPTION(
 	"buttonColor",
-	3,
+	5,
 	&buttonColor,
 	"Which color number to use for drawing buttons.\n"),
 
