@@ -103,16 +103,30 @@ static int (**config_creator)(int widget_desc, int *height);
 
 static int config_widget_ids[CONFIG_MAX_WIDGET_IDS];
 
+static int config_what = CONFIG_NONE;
+
 /* this must be updated if new config menu items are added */
 static int Nelem_config_creator(void)
 {
+    return num_options; /* TODO */
+#if 0
     if (config_creator == config_creator_colors)
 	return NELEM(config_creator_colors);
     if (config_creator == config_creator_default)
 	return NELEM(config_creator_default);
     return 0;
+#endif
 }
- 
+
+int my_callback(int i, void *p, int *ip);
+int my_callback(int i, void *p, int *ip)
+{
+    warn("my_callback: i = %d, p = %p, ip = %p", i, p, ip);
+    return 0;
+}
+
+static int config_creator_new(xp_option_t *opt, int widget_desc, int *height);
+
 
 static void Create_config(void)
 {
@@ -178,6 +192,8 @@ static void Create_config(void)
     num = -1;
     full = true;
     for (i = 0; i < Nelem_config_creator(); i++) {
+	xp_option_t *opt = Option_by_index(i);
+
 	if (full == true) {
 	    full = false;
 	    num++;
@@ -228,6 +244,7 @@ static void Create_config(void)
 
 	    height = config_space;
 	}
+#if 0
 	if ((config_widget_ids[i] =
 	     (*config_creator[i])(config_widget_desc[num], &height)) == 0) {
 	    i--;
@@ -236,6 +253,16 @@ static void Create_config(void)
 		break;
 	    continue;
 	}
+#else
+	if ((config_widget_ids[i] =
+	     config_creator_new(opt, config_widget_desc[num], &height)) == 0) {
+	    i--;
+	    full = true;
+	    if (height == config_space)
+		break;
+	    continue;
+	}
+#endif
     }
     if (i < Nelem_config_creator()) {
 	for (; num >= 0; num--) {
@@ -531,6 +558,24 @@ static int Config_create_save(int widget_desc, int *height)
     *height += config_entry_height + config_space + space;
 
     return 1;
+}
+
+
+static int config_creator_new(xp_option_t *opt, int widget_desc, int *height)
+{
+    switch (Option_get_type(opt)) {
+    case xp_int_option:
+	return Config_create_int(widget_desc, height,
+				 Option_get_name(opt),
+				 opt->int_ptr, opt->int_minval,
+				 opt->int_maxval,
+				 my_callback, opt);
+    default:
+	return Config_create_bool(widget_desc, height,
+				  Option_get_name(opt),
+				  true, NULL, NULL);
+	return 0;
+    }
 }
 
 /* General purpose update callback for booleans.
@@ -866,6 +911,8 @@ int Config(bool doit, int what)
 	config_creator = config_creator_default;
     else if (what == CONFIG_COLORS)
 	config_creator = config_creator_colors;
+
+    config_what = what;
 
     Create_config();
     if (config_created == false)
