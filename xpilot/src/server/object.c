@@ -101,7 +101,7 @@ void Alloc_shots(int number)
     anyobject		*x;
     int			i;
 
-    x = (anyobject *) calloc(number, sizeof(anyobject));
+    x = (anyobject *) calloc((size_t)number, sizeof(anyobject));
     if (!x) {
 	error("Not enough memory for shots.");
 	exit(1);

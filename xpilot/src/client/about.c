@@ -448,13 +448,13 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
     int		i, len, maxkeylen = 0;
 
     for (i = 0; i < num_keydefs; i++) {
-	if ((str = XKeysymToString(keydefs[i].keysym)) != NULL
+	if ((str = XKeysymToString((KeySym)keydefs[i].keysym)) != NULL
 	    && (len = strlen(str)) > maxkeylen) {
 	    maxkeylen = len;
 	}
     }
     for (i = 0; i < num_keydefs; i++) {
-	if (!(str = XKeysymToString(keydefs[i].keysym))
+	if (!(str = XKeysymToString((KeySym)keydefs[i].keysym))
 	    || !(help = Get_keyHelpString(keydefs[i].key)))
 	    continue;
 

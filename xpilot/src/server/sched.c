@@ -92,6 +92,7 @@ static void catch_timer(int signum)
 {
     static unsigned int		timer_count = 0;
 
+    (void)signum;
     timer_count += FPS;
     if (timer_count >= (unsigned)timerResolution) {
 	timer_count -= timerResolution;
