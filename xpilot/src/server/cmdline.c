@@ -3293,18 +3293,6 @@ static option_desc opts[] = {
 	OPT_ORIGIN_ANY | OPT_VISIBLE
     }, 
     {
-	"timerResolution",
-	"timerResolution",
-	"0",
-	&options.timerResolution,
-	valInt,
-	Timing_setup,
-	"If set to nonzero xpilots will requests signals from the OS at\n"
-	"1/timerResolution second intervals.  The server will then compute\n"
-	"a new frame FPS times out of every timerResolution signals.\n",
-	OPT_COMMAND | OPT_DEFAULTS | OPT_VISIBLE
-    },
-    {
 	"password",
 	"password",
 	NULL,
@@ -3757,7 +3745,6 @@ static void Check_baseless(world_t *world)
 void Timing_setup(world_t *world)
 {
     LIMIT(FPS, 1, MAX_SERVER_FPS);
-    LIMIT(options.timerResolution, 0, 100);
     LIMIT(options.gameSpeed, 0.0, FPS);
     if (options.gameSpeed == 0.0)
 	options.gameSpeed = FPS;
@@ -3825,7 +3812,5 @@ void Timing_setup(world_t *world)
     if (options.robotTicksPerSecond == 0)
 	options.robotTicksPerSecond = FPS;
     LIMIT(options.robotTicksPerSecond, 1, FPS);
-
-    install_timer_tick(NULL, options.timerResolution ? options.timerResolution
-		       : FPS);
+    install_timer_tick(NULL, FPS);
 }

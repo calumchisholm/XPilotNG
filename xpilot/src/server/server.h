@@ -353,7 +353,6 @@ extern struct options {
     int		maxVisibleObject;
     bool	pLockServer;
     bool	sound;
-    int		timerResolution;
 
     int		maxRoundTime;
     int		roundsToPlay;
