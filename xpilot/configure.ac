@@ -10,9 +10,9 @@ AM_CONFIG_HEADER(config.h)
 dnl AC_CANONICAL_HOST
 
 dnl  Copyright & stuff.
-AC_SUBST([XP_AUTHORS],["BjÅ¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
+AC_SUBST([XP_AUTHORS],["Bj¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
 AC_SUBST([XP_COPYRIGHTDATE],["1991-2003"])
-AC_SUBST([XP_COPYRIGHT],["Copyright Å© 1991-2003 by BjÅ¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
+AC_SUBST([XP_COPYRIGHT],["Copyright © 1991-2003 by Bj¯rn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska & Uoti Urpala"])
 AC_SUBST([XP_RELEASEDATE],["Sep 4, 2003"])
 AC_SUBST([XP_INSTLIBDIR],$prefix/lib)
 AC_SUBST([XP_TITLE],["XPilot 4.5.4X2"])
