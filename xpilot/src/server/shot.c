@@ -1244,7 +1244,7 @@ void Delete_shot(int ind)
 	max_life = (intensity >> 1) * life_modv;
 
 	/* Hack - make sure nuke debris don't get insanely long life time. */
-	if (BIT(shot->mods.nuclear, NUCLEAR))
+	if (BIT(shot->mods.nuclear, NUCLEAR) && max_life > 120.0)
 	    max_life = 120.0;
 
 #if 0
