@@ -778,7 +778,9 @@ static void Do_repair(player *pl)
     }
 }
 
-
+/*
+ * Warp balls connected to warped player.
+ */
 static void Warp_balls(player *pl, clpos dest)
 {
     world_t *world = &World;
@@ -822,6 +824,9 @@ static void Warp_balls(player *pl, clpos dest)
     }
 }
 
+/*
+ * Move player trough wormhole.
+ */
 static void Traverse_wormhole(player *pl)
 {
     clpos dest;
@@ -898,7 +903,9 @@ static void Traverse_wormhole(player *pl)
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
 
-    if ((wh_dest != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
+    assert(pl->wormHoleHit != -1);
+
+    if (wh_dest != pl->wormHoleHit) {
 	world->wormholes[pl->wormHoleHit].lastdest = wh_dest;
 	if (!world->wormholes[wh_dest].temporary)
 	    world->wormholes[pl->wormHoleHit].countdown
@@ -911,11 +918,12 @@ static void Traverse_wormhole(player *pl)
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 }
 
-
+/*
+ * Hyperjump player after usage of hyperjump.
+ */
 static void Hyperjump(player *pl)
 {
     clpos dest;
-    int wh_dest;
     world_t *world = &World;
     int counter;
     hitmask_t hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
@@ -931,36 +939,35 @@ static void Hyperjump(player *pl)
     }
 
     /* We can't find an empty space, hyperjump failed. */
-    if (!counter)
-	dest = pl->pos;
+    if (!counter) {
+	/* need to do something else here ? */
+	Set_player_message(pl, "Could not hyperjump. [*Server notice*]");
+	CLR_BIT(pl->status, WARPING);
+	sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
+	return;
+    }
 
     if (counter && options.wormTime)
 	World_add_temporary_wormholes(world, pl->pos, dest);
 
-    /* hack */
-    wh_dest = -2;
     sound_play_sensors(pl->pos, HYPERJUMP_SOUND);
 
     Warp_balls(pl, dest);
 
-    pl->wormHoleDest = wh_dest;
     Player_position_init_clpos(pl, dest);
+    /* kps - do we want these for hyperjumps ? */
     pl->vel.x *= WORM_BRAKE_FACTOR;
     pl->vel.y *= WORM_BRAKE_FACTOR;
     pl->forceVisible += 15;
 
-    if ((wh_dest != pl->wormHoleHit) && (pl->wormHoleHit != -1)) {
-	world->wormholes[pl->wormHoleHit].lastdest = wh_dest;
-	if (!world->wormholes[wh_dest].temporary)
-	    world->wormholes[pl->wormHoleHit].countdown
-		= (options.wormTime ? options.wormTime : WORMCOUNT);
-    }
-
     CLR_BIT(pl->status, WARPING);
     SET_BIT(pl->status, WARPED);
 
+    /* kps - why play both wormhole and hyperjump sounds ? */
     sound_play_sensors(pl->pos, WORM_HOLE_SOUND);
 }
+
+
 
 /* kps - UPDATE_RATE should depend on gamespeed */
 #define UPDATE_RATE 100
@@ -1317,12 +1324,20 @@ void Update_objects(void)
 	}
     }
 
+#if 0
+    warn("1. NumObjs = %d", NumObjs);
+#endif
+
     /*
      * Kill shots that ought to be dead.
      */
     for (i = NumObjs - 1; i >= 0; i--)
 	if ((Obj[i]->life -= timeStep) <= 0)
 	    Delete_shot(i);
+
+#if 0
+    warn("2. NumObjs = %d", NumObjs);
+#endif
 
      /*
       * In tag games, check if anyone is tagged. otherwise, tag someone.
