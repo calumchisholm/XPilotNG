@@ -35,18 +35,22 @@ char rank_version[] = VERSION;
 "<a href=\"previous_ranks.html\">Previous rankings</a> " \
 "<a href=\"rank_explanation.html\">How does the ranking work?</a><hr>\n"
 
+static bool Rank_parse_scorefile(FILE *file);
 
 /* Score data */
 static const char *xpilotscorefile = NULL;
-static rankhead_t rank_head;
 static rankinfo_t scores[MAX_SCORES];
 
 static int rankedplayer[MAX_SCORES];
-static double rankedscore[MAX_SCORES];
+static double ratio[MAX_SCORES];
 static double sc_table[MAX_SCORES];
 static double kr_table[MAX_SCORES];
 static double kd_table[MAX_SCORES];
 static double hf_table[MAX_SCORES];
+
+static bool playerstag = false;
+static int num_players = 0;
+static int rank_entries = 0;
 
 static inline void swap2(int *i1, int *i2, double *d1, double *d2)
 {
@@ -99,25 +103,25 @@ static void SortRankings(void)
 	rankinfo_t *score = &scores[k];
 	double attenuation, kills, sc, kd, kr, hf;
 
-	if (score->entry.nick[0] == '\0')
+	if (score->name[0] == '\0')
 	    continue;
 
 	/* The attenuation affects players with less than 300 rounds. */
-	attenuation = (score->entry.rounds < 300) ?
-	    ((double) score->entry.rounds / 300.0) : 1.0;
+	attenuation = (score->rounds < 300) ?
+	    ((double) score->rounds / 300.0) : 1.0;
 
-	kills = score->entry.kills;
+	kills = score->kills;
 	sc = (double) score->score * attenuation;
-	kd = ((score->entry.deaths != 0) ?
-	      (kills / (double) score->entry.deaths) :
+	kd = ((score->deaths != 0) ?
+	      (kills / (double) score->deaths) :
 	      (kills)) * attenuation;
-	kr = ((score->entry.rounds != 0) ?
-	      (kills / (double) score->entry.rounds) :
+	kr = ((score->rounds != 0) ?
+	      (kills / (double) score->rounds) :
 	      (kills)) * attenuation;
-	hf = ((score->entry.ballsLost != 0) ?
-	      ((double) score->entry.ballsCashed /
-	       (double) score->entry.ballsLost) :
-	      (double) score->entry.ballsCashed) * attenuation;
+	hf = ((score->ballsLost != 0) ?
+	      ((double) score->ballsCashed /
+	       (double) score->ballsLost) :
+	      (double) score->ballsCashed) * attenuation;
 
 	sc_table[k] = sc;
 	kd_table[k] = kd;
@@ -172,8 +176,8 @@ static void SortRankings(void)
 	    double sc, kd, kr, hf, rsc, rkd, rkr, rhf, rank;
 
 	    rankedplayer[i] = i;
-	    if (score->entry.nick[0] == '\0') {
-		rankedscore[i] = -1;
+	    if (score->name[0] == '\0') {
+		ratio[i] = -1;
 		continue;
 	    }
 	    ranked_players++;
@@ -189,17 +193,17 @@ static void SortRankings(void)
 	    rhf = (hf - lowHF) * factorHF;
 
 	    rank = 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
-	    rankedscore[i] = rank;
+	    ratio[i] = rank;
 	}
-	rank_head.entries = ranked_players;
+	rank_entries = ranked_players;
 
 	/* And finally we sort the ranks, using some lame N^2 sort.. wheee! */
 	for (i = 0; i < ranked_players; i++) {
 	    int j;
 	    for (j = i + 1; j < ranked_players; j++) {
-		if (rankedscore[i] < rankedscore[j])
+		if (ratio[i] < ratio[j])
 		    swap2(&rankedplayer[i], &rankedplayer[j],
-			  &rankedscore[i], &rankedscore[j]);
+			  &ratio[i], &ratio[j]);
 	    }
 	}
     }
@@ -251,7 +255,7 @@ void Rank_write_webpage(void)
 		const int j = rankedplayer[i];
 		const rankinfo_t *score = &scores[j];
 
-		if (score->entry.nick[0] != '\0') {
+		if (score->name[0] != '\0') {
 		    fprintf(file,
 			    "<tr><td align=left><tt>%d</tt>"
 			    "<td align=left><b>%s</b>"
@@ -260,24 +264,28 @@ void Rank_write_webpage(void)
 			    "<td align=right>%u"
 			    "<td align=right>%u"
 			    "<td align=right>%u"
-			    "<td align=center>%u/%u/%u/%u/%u"
+			    "<td align=center>%u/%u/%u/%u/%.2f"
 			    "<td align=right>%.1f"
 			    "<td align=right>%s"
 			    "<td align=left>%s"
 			    "<td align=center>%s\n"
 			    "</tr>\n",
 			    i + 1,
-			    score->entry.nick,
+			    score->name,
 			    score->score,
-			    score->entry.kills,
-			    score->entry.deaths,
-			    score->entry.rounds,
-			    score->entry.shots,
-			    score->entry.ballsCashed,
-			    score->entry.ballsSaved, score->entry.ballsWon,
-			    score->entry.ballsLost, score->entry.bestball,
-			    rankedscore[i], score->entry.real,
-			    score->entry.host, score->entry.logout);
+			    score->kills,
+			    score->deaths,
+			    score->rounds,
+			    score->shots,
+			    score->ballsCashed,
+			    score->ballsSaved,
+			    score->ballsWon,
+			    score->ballsLost,
+			    score->bestball,
+			    ratio[i],
+			    score->user,
+			    score->host,
+			    score->logout);
 		}
 	    }
 	    fprintf(file, footer, rank_showtime());
@@ -292,12 +300,17 @@ void Rank_get_stats(player_t * pl, char *buf)
 {
     rankinfo_t *score = pl->rank;
 
-    sprintf(buf, "%-15s  %4d/%4d, R: %3d, S: %5d, %2d/%2d/%2d/%2d (%d)",
-	    pl->name, score->entry.kills, score->entry.deaths,
-	    score->entry.rounds, score->entry.shots,
-	    score->entry.ballsCashed, score->entry.ballsSaved,
-	    score->entry.ballsWon, score->entry.ballsLost,
-	    score->entry.bestball);
+    sprintf(buf, "%-15s  %4d/%4d, R: %3d, S: %5d, %d/%d/%d/%d/%.2f",
+	    pl->name,
+	    score->kills,
+	    score->deaths,
+	    score->rounds,
+	    score->shots,
+	    score->ballsCashed,
+	    score->ballsSaved,
+	    score->ballsWon,
+	    score->ballsLost,
+	    score->bestball);
 }
 
 
@@ -313,7 +326,7 @@ void Rank_show_ranks(void)
 	if (score->pl != NULL) {
 	    char msg[MSG_LEN];
 
-	    sprintf(msg, "%s [%d], ", score->entry.nick, i + 1);
+	    sprintf(msg, "%s [%d], ", score->name, i + 1);
 	    strcat(buf, msg);
 	}
     }
@@ -323,25 +336,13 @@ void Rank_show_ranks(void)
 }
 
 
-static void Init_scorenode(rankinfo_t * node,
-			   const char nick[], const char real[],
-			   const char host[])
+static void Init_scorenode(rankinfo_t *node,
+			   char *name, char *user, char *host)
 {
-    strlcpy(node->entry.nick, nick, MAX_CHARS);
-    strlcpy(node->entry.real, real, MAX_CHARS);
-    strlcpy(node->entry.host, host, MAX_CHARS);
-    strcpy(node->entry.logout, "");
-    node->score = 0;
-    node->entry.kills = 0;
-    node->entry.deaths = 0;
-    node->entry.rounds = 0;
-    node->entry.shots = 0;
-    node->entry.ballsSaved = 0;
-    node->entry.ballsLost = 0;
-    node->entry.ballsCashed = 0;
-    node->entry.ballsWon = 0;
-    node->entry.bestball = 65535;
-    node->pl = NULL;
+    memset(node, 0, sizeof(rankinfo_t));
+    strlcpy(node->name, name, sizeof(node->name));
+    strlcpy(node->user, user, sizeof(node->user));
+    strlcpy(node->host, host, sizeof(node->host));
 }
 
 
@@ -352,7 +353,7 @@ rankinfo_t *Rank_get_by_name(char *name)
 
     for (i = 0; i < MAX_SCORES; i++) {
 	score = &scores[i];
-	if (!strcasecmp(name, score->entry.nick))
+	if (!strcasecmp(name, score->name))
 	    return score;
     }
 
@@ -363,7 +364,7 @@ rankinfo_t *Rank_get_by_name(char *name)
 void Rank_nuke_score(rankinfo_t * node)
 {
     Init_scorenode(node, "", "", "");
-    node->entry.timestamp = 0;
+    node->timestamp = 0;
 }
 
 
@@ -371,76 +372,29 @@ void Rank_nuke_score(rankinfo_t * node)
    Call this on startup. */
 void Rank_init_saved_scores(void)
 {
-    int i = 0;
+    int i;
+    FILE *file;
+
+    for (i = 0; i < MAX_SCORES; i++) {
+	rankinfo_t *rank = &scores[i];
+
+	memset(rank, 0, sizeof(rankinfo_t));
+    }
 
     xpilotscorefile = getenv(XPILOTSCOREFILE);
+    if (!xpilotscorefile)
+	return;
 
-    if (getenv("XPILOTRANKINGPAGE") != NULL)
-	warn("Support for Javascript ranking pages has been removed.");
+    file = fopen(xpilotscorefile, "r");
+    if (!file)
+	return;
 
-    if (xpilotscorefile != NULL) {
-	FILE *file = fopen(xpilotscorefile, "r");
-	if (file != NULL) {
-	    int actual;
+    Rank_parse_scorefile(file);
 
-	    actual = fread(&rank_head, sizeof(rankhead_t), 1, file);
-	    if (actual != 1) {
-		error("Error when reading score file!\n");
-		goto init_tail;
-	    }
-	    if (memcmp(rank_head.magic, RANK_MAGIC, 4) != 0) {
-		warn("Rank file format is too old.\n");
-		goto init_tail;
-	    }
-	    rank_head.version = ntohl(rank_head.version);
-	    rank_head.entries = ntohl(rank_head.entries);
-	    switch (RANK_VER_MAJ(rank_head.version)) {
-	    case 2:
-		/* Current version. */
-		xpprintf("%s Rank file with %d entries opened successfully.\n",
-			 showtime(), rank_head.entries);
-		break;
-	    default:
-		error("Unknown version of score file!\n");
-		goto init_tail;
-	    }
+    fclose(file);
 
-	    for (i = 0; i < (int)rank_head.entries; i++) {
-		rankinfo_t *node = &scores[i];
-
-		actual = fread(&node->entry, sizeof(node->entry), 1, file);
-		if (actual != 1) {
-		    error("Error when reading score file!\n");
-		    break;
-		}
-		node->entry.shots = ntohl(node->entry.shots);
-		node->entry.timestamp = ntohl(node->entry.timestamp);
-		node->entry.kills = ntohs(node->entry.kills);
-		node->entry.deaths = ntohs(node->entry.deaths);
-		node->entry.rounds = ntohs(node->entry.rounds);
-		node->entry.ballsSaved = ntohs(node->entry.ballsSaved);
-		node->entry.ballsLost = ntohs(node->entry.ballsLost);
-		node->entry.ballsWon = ntohs(node->entry.ballsWon);
-		node->entry.ballsCashed = ntohs(node->entry.ballsCashed);
-		node->entry.bestball = ntohs(node->entry.bestball);
-		node->score =
-		    (double) ((int32_t) ntohl(node->entry.disk_score))
-		    / 65536.0;
-		/* Fix buggy first implementation... */
-		if (node->score >= 65000)
-		    node->score -= 65536;
-		node->pl = NULL;
-	    }
-	    fclose(file);
-	}
-    }
-
-  init_tail:
-    while (i < MAX_SCORES) {
-	Init_scorenode(&scores[i], "", "", "");
-	scores[i].entry.timestamp = 0;
-	i++;
-    }
+    xpprintf("%s Rank file with %d entries opened successfully.\n",
+	     showtime(), num_players);
 }
 
 /*
@@ -456,7 +410,7 @@ void Rank_get_saved_score(player_t * pl)
 
     for (i = 0; i < MAX_SCORES; i++) {
 	score = &scores[i];
-	if (!strcasecmp(pl->name, score->entry.nick)) {
+	if (!strcasecmp(pl->name, score->name)) {
 	    if (score->pl == NULL) {
 		/* Ok, found it. */
 		score->pl = pl;
@@ -471,7 +425,7 @@ void Rank_get_saved_score(player_t * pl)
 		return;
 
 	    }
-	} else if (score->entry.timestamp < scores[oldest].entry.timestamp)
+	} else if (score->timestamp < scores[oldest].timestamp)
 	    oldest = i;
     }
 
@@ -480,7 +434,7 @@ void Rank_get_saved_score(player_t * pl)
 
     Init_scorenode(score, pl->name, pl->username, pl->hostname);
     score->pl = pl;
-    score->entry.timestamp = time(NULL);
+    score->timestamp = time(NULL);
     pl->score = 0;
     pl->rank = score;
     Rank_set_logout_message(pl, "playing");
@@ -494,67 +448,259 @@ void Rank_save_score(player_t * pl)
     rank->score = pl->score;
     Rank_set_logout_message(pl, rank_showtime());
     rank->pl = NULL;
-    rank->entry.timestamp = time(NULL);
+    rank->timestamp = time(NULL);
 }
 
 /* Save the scores to disk (not the webpage). */
 void Rank_write_score_file(void)
 {
     FILE *file = NULL;
-    char tmp_file[4096];
-    rankhead_t head;
-    int actual;
+    char tmp_file[PATH_MAX];
     int i;
 
     if (!xpilotscorefile)
 	return;
 
-    actual = snprintf(tmp_file, sizeof(tmp_file), "%s-new", xpilotscorefile);
-    if (actual < (int)strlen(xpilotscorefile)
-	|| actual > (int)sizeof(tmp_file))
-	/* Use a shorter path-name and be happy... */
-	return;
+    snprintf(tmp_file, sizeof(tmp_file), "%s-new", xpilotscorefile);
 
     file = fopen(tmp_file, "w");
-    if (file == NULL)
-	return;
-
-    memcpy(head.magic, RANK_MAGIC, 4);
-    head.version = htonl(RANK_VER_CURRENT);
-    head.entries = htonl(rank_head.entries);
-    actual = fwrite(&head, sizeof(head), 1, file);
-    if (actual != 1) {
-	error("Error when writing score file head!\n");
-	fclose(file);
-	remove(tmp_file);
-	return;
+    if (file == NULL) {
+	error("Open temporary file \"%s\"", tmp_file);
+	goto failed;
     }
-    for (i = 0; i < (int)rank_head.entries; i++) {
-	rankentry_t entry;
+
+    if (fprintf(file,
+		"<?xml version=\"1.0\"?>\n"
+		"<XPilotNGRank version=\"0.0\">\n"
+		"<Players>\n") < 0)
+	goto writefailed;
+    
+
+    for (i = 0; i < rank_entries; i++) {
 	int idx = rankedplayer[i];
+	rankinfo_t *rank = &scores[idx];
 
-	memcpy(&entry, &scores[idx].entry, sizeof(entry));
-	entry.disk_score = htonl(((uint32_t) (int32_t)
-				  (scores[idx].score * 65536)));
-	entry.shots = htonl(entry.shots);
-	entry.timestamp = htonl(entry.timestamp);
-	entry.kills = htons(entry.kills);
-	entry.deaths = htons(entry.deaths);
-	entry.rounds = htons(entry.rounds);
-	entry.ballsSaved = htons(entry.ballsSaved);
-	entry.ballsLost = htons(entry.ballsLost);
-	entry.ballsWon = htons(entry.ballsWon);
-	entry.ballsCashed = htons(entry.ballsCashed);
-	entry.bestball = htons(entry.bestball);
-	actual = fwrite(&entry, sizeof(entry), 1, file);
-	if (actual != 1) {
-	    error("Error when writing score file!\n");
-	    break;
-	}
+	if (rank->name[0] == '\0')
+	    continue;
+
+	if (fprintf(file,
+		    "<Player "
+		    "name=\"%s\" user=\"%s\" host=\"%s\" ",
+		    rank->name, rank->user, rank->host) < 0)
+	    goto writefailed;
+
+	if (rank->score != 0.0
+	    && fprintf(file, "score=\"%.2f\" ", rank->score) < 0)
+	    goto writefailed;
+
+	if (rank->kills > 0
+	    && fprintf(file, "kills=\"%d\" ", rank->kills) < 0)
+	    goto writefailed;
+
+	if (rank->deaths > 0
+	    && fprintf(file, "deaths=\"%d\" ", rank->deaths) < 0)
+	    goto writefailed;
+
+	if (rank->rounds > 0
+	    && fprintf(file, "rounds=\"%d\" ", rank->rounds) < 0)
+	    goto writefailed;
+
+	if (rank->shots > 0
+	    && fprintf(file, "shots=\"%d\" ", rank->shots) < 0)
+	    goto writefailed;
+
+	if (rank->ballsCashed > 0
+	    && fprintf(file, "ballscashed=\"%d\" ", rank->ballsCashed) < 0)
+	    goto writefailed;
+
+	if (rank->ballsSaved > 0
+	    && fprintf(file, "ballssaved=\"%d\" ", rank->ballsSaved) < 0)
+	    goto writefailed;
+
+	if (rank->ballsWon > 0
+	    && fprintf(file, "ballswon=\"%d\" ", rank->ballsWon) < 0)
+	    goto writefailed;
+
+	if (rank->ballsLost > 0
+	    && fprintf(file, "ballslost=\"%d\" ", rank->ballsLost) < 0)
+	    goto writefailed;
+
+	if (rank->bestball > 0
+	    && fprintf(file, "bestball=\"%.2f\" ", rank->bestball) < 0)
+	    goto writefailed;
+
+	if (fprintf(file, "timestamp=\"%u\" ", (unsigned)rank->timestamp) < 0)
+	    goto writefailed;
+	
+	if (fprintf(file, "/>\n") < 0)
+	    goto writefailed;
     }
-    fclose(file);
+    
+    if (fprintf(file,
+		"</Players>\n"
+		"</XPilotNGRank>\n") < 0)
+	goto writefailed;
+    
+
+    if (fclose(file) != 0) {
+	error("Close temporary file \"%s\"", tmp_file);
+	goto failed;
+    }
+    file = NULL;
 
     /* Overwrite old score file. */
-    rename(tmp_file, xpilotscorefile);
+    if (rename(tmp_file, xpilotscorefile) < 0) {
+	error("Rename \"%s\" to \"%s\"", tmp_file, xpilotscorefile);	
+	goto failed;
+    }
+
     remove(tmp_file);
+
+    /*xpprintf("%s Rank file with %d entries written successfully.\n",
+      showtime(), rank_entries);*/
+
+    return;
+
+ writefailed:
+    error("Write temporary file \"%s\"", tmp_file);
+
+ failed:
+
+    if (file) {
+	fclose(file);
+	remove(tmp_file);
+    }
+    warn("Couldn't save ranking data to file \"%s\".", xpilotscorefile);
+
+    return;
+}
+
+
+static void tagstart(void *data, const char *el, const char **attr)
+{
+    static bool xptag = false;
+
+    UNUSED_PARAM(data);
+
+    if (!strcasecmp(el, "XPilotNGRank")) {
+	double version = -1;
+
+	while (*attr) {
+	    if (!strcasecmp(*attr, "version"))
+		version = atof(*(attr + 1));
+	    attr += 2;
+	}
+	if (version == 0.0)
+	    warn("Score file version is 0.0.");
+	else if (version > 0.0) {
+	    warn("Score file has newer version than this server recognizes.");
+	    warn("The score file might use unsupported features.");
+	}
+	xptag = true;
+	return;
+    }
+
+    if (!xptag) {
+	fatal("This doesn't look like a score file "
+	      " (XPilotNGRank must be first tag).");
+	return; /* not reached */
+    }
+
+    if (!strcasecmp(el, "Player")) {
+	rankinfo_t *node;
+
+	if (!playerstag)
+	    fatal("Player tag in rank file without Players.");
+
+	node = &scores[num_players++];
+	memset(node, 0, sizeof(rankinfo_t));
+
+	while (*attr) {
+	    if (!strcasecmp(*attr, "name"))
+		strlcpy(node->name, *(attr + 1), sizeof(node->name));
+	    if (!strcasecmp(*attr, "user"))
+		strlcpy(node->user, *(attr + 1), sizeof(node->user));
+	    if (!strcasecmp(*attr, "host"))
+		strlcpy(node->host, *(attr + 1), sizeof(node->host));
+	    if (!strcasecmp(*attr, "score"))
+		node->score = atof(*(attr + 1));
+	    if (!strcasecmp(*attr, "kills"))
+		node->kills = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "deaths"))
+		node->deaths = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "rounds"))
+		node->rounds = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "shots"))
+		node->shots = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "ballssaved"))
+		node->ballsSaved = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "ballslost"))
+		node->ballsLost = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "ballswon"))
+		node->ballsWon = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "ballscashed"))
+		node->ballsCashed = atoi(*(attr + 1));
+	    if (!strcasecmp(*attr, "bestball"))
+		node->bestball = atof(*(attr + 1));
+	    if (!strcasecmp(*attr, "timestamp"))
+		node->timestamp = atoi(*(attr + 1));
+
+	    attr += 2;
+	}
+
+	return;
+    }
+
+    if (!strcasecmp(el, "Players")) {
+	playerstag = true;
+	return;
+    }
+
+    warn("Unknown tag in score file: \"%s\"", el);
+    return;
+}
+
+
+static void tagend(void *data, const char *el)
+{
+    UNUSED_PARAM(data);
+
+    if (!strcasecmp(el, "Players"))
+	playerstag = false;
+
+    return;
+}
+
+
+
+
+static bool Rank_parse_scorefile(FILE *file)
+{
+    char buff[8192];
+    int len, fd;
+    XML_Parser p = XML_ParserCreate(NULL);
+
+    fd = fileno(file);
+    if (fd == -1)
+	return false;
+
+    if (!p) {
+	warn("Creating Expat instance for ranking file parsing failed.\n");
+	return false;
+    }
+    XML_SetElementHandler(p, tagstart, tagend);
+    do {
+	len = read(fd, buff, 8192);
+	if (len < 0) {
+	    error("Error reading rank scorefile!");
+	    return false;
+	}
+	if (!XML_Parse(p, buff, len, !len)) {
+	    warn("Parse error reading rank scorefile at line %d:\n%s\n",
+		  XML_GetCurrentLineNumber(p),
+		  XML_ErrorString(XML_GetErrorCode(p)));
+	    return false;
+	}
+    } while (len);
+    return true;
 }

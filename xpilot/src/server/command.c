@@ -890,9 +890,11 @@ static int Cmd_nuke(char *arg, player_t *pl, int oper, char *msg)
     if (pl2)
 	pl2->score = 0;
 
-    sprintf(msg, "Nuked %s.", rank->entry.nick);
+    sprintf(msg, "Nuked %s.", rank->name);
 
     Rank_nuke_score(rank);
+
+    updateScores = true;
 
     return CMD_RESULT_SUCCESS;
 }

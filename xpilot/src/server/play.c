@@ -330,7 +330,7 @@ void Ball_is_destroyed(ballobject_t *ball)
     sprintf(msg," < The ball was loose for %d frames / "
 	    "%.2f ticks (best %.2f) / %.2fs >",
 	    frames, ticks, Rank_get_best_ballrun(pl), seconds);
-    Rank_ballrun(pl, (int)(ticks + 0.5));
+    Rank_ballrun(pl, ticks);
     Set_message(msg);
 }
 
