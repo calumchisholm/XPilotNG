@@ -134,7 +134,7 @@ static void Selection_send(const XSelectionRequestEvent *rq)
     else if (rq->target == XA_STRING) {
 	XChangeProperty(dpy, rq->requestor, rq->property,
 			rq->target, 8, PropModeReplace,
-			(unsigned char *) selection.txt, selection.len);
+			(unsigned char *) selection.txt, (int)selection.len);
 	ev.xselection.property = rq->property;
     }
     XSendEvent(dpy, rq->requestor, False, 0, &ev);
@@ -155,6 +155,7 @@ void SelectionRequest_event(XEvent *event)
 
 void MapNotify_event(XEvent *event)
 {
+    (void)event;
     if (ignoreWindowManager == 1) {
         XSetInputFocus(dpy, topWindow, RevertToParent, CurrentTime);
         ignoreWindowManager = 2;
@@ -190,6 +191,7 @@ int ClientMessage_event(XEvent *event)
 
 void FocusIn_event(XEvent *event)
 {
+    (void)event;
 #ifdef DEVELOPMENT
     if (!gotFocus)
         time(&back_in_play_since);
@@ -204,6 +206,7 @@ void FocusIn_event(XEvent *event)
 
 void UnmapNotify_event(XEvent *event)
 {
+    (void)event;
     if (pointerControl) {
         initialPointerControl = true;
         Pointer_control_set_state(false);
@@ -218,7 +221,7 @@ void ConfigureNotify_event(XEvent *event)
 
     conf = &(event->xconfigure);
     if (conf->window == topWindow)
-	Resize(conf->window, conf->width, conf->height);
+	Resize(conf->window, (unsigned)conf->width, (unsigned)conf->height);
     else
         Widget_event(event);
 }
