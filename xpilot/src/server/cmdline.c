@@ -1875,7 +1875,7 @@ static option_desc opts[] = {
     {
 	"missilesOnRadar",
 	"missilesRadar",
-	"false",
+	"true",
 	&options.missilesOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1895,7 +1895,7 @@ static option_desc opts[] = {
     {
 	"nukesOnRadar",
 	"nukesRadar",
-	"false",
+	"true",
 	&options.nukesOnRadar,
 	valBool,
 	tuner_dummy,
