@@ -2093,7 +2093,7 @@ static void Robot_default_play(player *pl)
 	for (j = 0; j < NumPlayers; j++) {
 	    ship = Players(j);
 	    if (j == GetInd(pl->id)
-		|| BIT(ship->status, PLAYING|GAME_OVER|PAUSE) != PLAYING
+		|| !Player_is_active(ship)
 		|| Team_immune(pl->id, ship->id))
 		continue;
 
@@ -2167,11 +2167,10 @@ static void Robot_default_play(player *pl)
 	delta_dir = (int)(pl->dir - Wrap_cfindDir(ship->pos.cx - pl->pos.cx,
 						  ship->pos.cy - pl->pos.cy));
 	delta_dir = MOD2(delta_dir, RES);
-	if (BIT(ship->status, PLAYING|PAUSE|GAME_OVER) != PLAYING
+	if (!Player_is_active(ship)
 	    || (BIT(my_data->robot_lock, LOCK_PLAYER)
 		&& my_data->robot_lock_id != pl->lock.pl_id
-		&& BIT(Player_by_id(my_data->robot_lock_id)->status,
-		       PLAYING|PAUSE|GAME_OVER) == PLAYING)
+		&& Player_is_active(Player_by_id(my_data->robot_lock_id)))
 	    || !Detect_hunt(pl, ship)
 	    || (pl->fuel.sum <= pl->fuel.l3
 		&& !BIT(World.rules->mode, TIMING))
