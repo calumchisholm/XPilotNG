@@ -104,17 +104,20 @@ static int Compress_map(unsigned char *map, size_t size)
 
 static void Create_blockmap_from_polygons(world_t *world)
 {
-    int i, j, h;
+    int i, h, type;
     blkpos_t blk;
     clpos_t pos;
-    shape_t r_wire, u_wire, l_wire, d_wire;
-    shapepos_t r_coords[3], u_coords[3], l_coords[3], d_coords[3];
+    shape_t f_wire, r_wire, u_wire, l_wire, d_wire;
+    shapepos_t f_coords[4], r_coords[3], u_coords[3], l_coords[3], d_coords[3];
 
+    f_wire.num_points = 4;
     r_wire.num_points = 3;
     u_wire.num_points = 3;
     l_wire.num_points = 3;
     d_wire.num_points = 3;
 
+    for (i = 0; i < 4; i++)
+	f_wire.pts[i] = &f_coords[i];
     for (i = 0; i < 3; i++)
 	r_wire.pts[i] = &r_coords[i];
     for (i = 0; i < 3; i++)
@@ -139,6 +142,17 @@ static void Create_blockmap_from_polygons(world_t *world)
 
     h = BLOCK_CLICKS / 2;
 
+    /* whole (filled) block */
+    f_coords[0].clk.cx = -h;
+    f_coords[0].clk.cy = -h;
+    f_coords[1].clk.cx = h - 1;
+    f_coords[1].clk.cy = -h;
+    f_coords[2].clk.cx = h - 1;
+    f_coords[2].clk.cy = h - 1;
+    f_coords[3].clk.cx = -h;
+    f_coords[3].clk.cy = h - 1;
+
+    /* right part of block */
     r_coords[0].clk.cx = 0;
     r_coords[0].clk.cy = 0; /* this is the R position in the block */
     r_coords[1].clk.cx = h - 1; 
@@ -146,6 +160,7 @@ static void Create_blockmap_from_polygons(world_t *world)
     r_coords[2].clk.cx = h - 1;
     r_coords[2].clk.cy = h - 1;
 
+    /* up part of block */
     u_coords[0].clk.cx = -1;
     u_coords[0].clk.cy = 0;
     u_coords[1].clk.cx = h - 2;
@@ -153,6 +168,7 @@ static void Create_blockmap_from_polygons(world_t *world)
     u_coords[2].clk.cx = -h;
     u_coords[2].clk.cy = h - 1;
 
+    /* left part of block */
     l_coords[0].clk.cx = -1;
     l_coords[0].clk.cy = -1;
     l_coords[1].clk.cx = -h;
@@ -160,13 +176,13 @@ static void Create_blockmap_from_polygons(world_t *world)
     l_coords[2].clk.cx = -h;
     l_coords[2].clk.cy = -h;
 
+    /* down part of block */
     d_coords[0].clk.cx = 0;
     d_coords[0].clk.cy = -1;
     d_coords[1].clk.cx = 1 - h;
     d_coords[1].clk.cy = -h;
     d_coords[2].clk.cx = h - 1;
     d_coords[2].clk.cy = -h;
-
 
     /*
      * Create blocks out of polygons.
@@ -229,59 +245,12 @@ static void Create_blockmap_from_polygons(world_t *world)
 		if (d_inside)
 		    World_set_block(world, blk, REC_RD);
 	    }
-
 	}
     }
-
-#if 0
-    for (blk.by = 0; blk.by < world->y; blk.by++) {
-	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
-	    int num_inside = 0;
-	    bool r_inside = false, u_inside = false;
-	    bool l_inside = false, d_inside = false;
-
-	    pos = Block_get_center_clpos(blk);
-
-	    if (is_inside(pos.cx + BLOCK_CLICKS/3, pos.cy, 0, NULL) == 0) {
-		r_inside = true;
-		num_inside++;
-	    }
-
-	    if (is_inside(pos.cx, pos.cy + BLOCK_CLICKS/3, 0, NULL) == 0) {
-		u_inside = true;
-		num_inside++;
-	    }
-
-	    if (is_inside(pos.cx - BLOCK_CLICKS/3, pos.cy, 0, NULL) == 0) {
-		l_inside = true;
-		num_inside++;
-	    }
-
-	    if (is_inside(pos.cx, pos.cy - BLOCK_CLICKS/3, 0, NULL) == 0) {
-		d_inside = true;
-		num_inside++;
-	    }
-
-	    if (num_inside > 2)
-		World_set_block(world, blk, FILLED);
-
-	    if (num_inside == 2) {
-		if (r_inside && u_inside)
-		    World_set_block(world, blk, REC_RU);
-		if (u_inside && l_inside)
-		    World_set_block(world, blk, REC_LU);
-		if (l_inside && d_inside)
-		    World_set_block(world, blk, REC_LD);
-		if (d_inside && r_inside)
-		    World_set_block(world, blk, REC_RD);
-	    }
-	}
-    }
-#endif
 
     /*
      * Create blocks out of map objects. Note that some of these
-     * may be in the same block, which might be an error.
+     * may be in the same block, which might cause a client error.
      */
     for (i = 0; i < world->NumFuels; i++) {
 	fuel_t *fs = Fuel_by_index(world, i);
@@ -290,45 +259,96 @@ static void Create_blockmap_from_polygons(world_t *world)
 	World_set_block(world, blk, FUEL);
     }
 
-    for (i = 0; i < world->NumBases; i++) {
-	base_t *base = Base_by_index(world, i);
-
-	blk = Clpos_to_blkpos(base->pos);
-	World_set_block(world, blk, BASE);
-    }
-
-    /* find balltargets, only looks at middle point of block */
+    /* find balltargets */
     for (blk.by = 0; blk.by < world->y; blk.by++) {
 	for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
 	    int group;
 	    group_t *gp;
-	    bool found;
 
 	    pos = Block_get_center_clpos(blk);
-	    found = false;
-
-	    /* check 9 points per block for a balltarget */
-	    for (j = -1; j <= 1; j++) {
-		for (i = -1; i <= 1; i++) {
-		    clpos_t pos2;
-			
-		    pos2.cx = pos.cx + i * (BLOCK_CLICKS / 3);
-		    pos2.cy = pos.cy + j * (BLOCK_CLICKS / 3);
-
-		    group = is_inside(pos2.cx, pos2.cy, BALL_BIT, NULL);
-		    if (group == NO_GROUP || group == 0)
-			continue;
-		    gp = groupptr_by_id(group);
-		    if (gp == NULL)
-			continue;
-		    if (gp->type == TREASURE && gp->hitmask == NONBALL_BIT)
-			found = true;
-		}
-	    }
-
-	    if (found)
+	    group = shape_is_inside(pos.cx, pos.cy,
+				    BALL_BIT, NULL, &f_wire, 0);
+	    if (group == NO_GROUP || group == 0)
+		continue;
+	    gp = groupptr_by_id(group);
+	    if (gp == NULL)
+		continue;
+	    if (gp->type == TREASURE && gp->hitmask == NONBALL_BIT)
 		World_set_block(world, blk, TREASURE);
 	}
+    }
+
+    /*
+     * Handle bases. Note that on polygon maps there can be several
+     * bases on the area of a block. To handle this so that old clients
+     * won't get "Bad homebase index" error, we put excess bases somewhere
+     * else than on the same block.
+     */
+
+    /*
+     * First mark all blocks having a base.
+     * We use a base attractor for this.
+     */
+    for (i = 0; i < world->NumBases; i++) {
+	base_t *base = Base_by_index(world, i);
+
+	blk = Clpos_to_blkpos(base->pos);
+	type = World_get_block(world, blk);
+
+	/* don't put the base on top of a fuel or treasure */
+	if (type == FUEL || type == TREASURE)
+	    continue;
+	World_set_block(world, blk, BASE_ATTRACTOR);
+    }
+
+    /*
+     * Put bases where there are base attractors or somewhere else
+     * if the block already has some other important type.
+     */
+    for (i = 0; i < world->NumBases; i++) {
+	base_t *base = Base_by_index(world, i);
+	bool done;
+
+	blk = Clpos_to_blkpos(base->pos);
+	type = World_get_block(world, blk);
+	done = false;
+
+	if (type == FUEL || type == TREASURE || type == BASE) {
+	    /*
+	     * The block where the base should be put already has some
+	     * important type. We need to put this base somewhere else.
+	     * Let's just line up excess bases close to the origin of the map.
+	     */
+	    for (blk.by = 0; blk.by < world->y; blk.by++) {
+		for (blk.bx = 0; blk.bx < world->x; blk.bx++) {
+		    type = World_get_block(world, blk);
+		    /* 
+		     * Check for base attractor here too because we might
+		     * have marked this block in the earlier loop over all
+		     * bases.
+		     */
+		    if (type == FUEL || type == TREASURE
+			|| type == BASE || type == BASE_ATTRACTOR)
+			continue;
+		    /* put base attractor here so that assert is happy */
+		    type = BASE_ATTRACTOR;
+		    World_set_block(world, blk, type);
+		    done = true;
+		    break;
+		}
+		if (done)
+		    break;
+	    }
+
+	    /* this probably doesn't happen very often */
+	    if (!done)
+		fatal("Create_blockmap_from_polygons:\n"
+		      "Couldn't find any place on map to put base on "
+		      "(%d, %d).", base->pos.cx, base->pos.cy);
+	}
+
+	assert(type == BASE_ATTRACTOR);
+	World_set_block(world, blk, BASE);
     }
 }
 
