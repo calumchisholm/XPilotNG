@@ -2408,16 +2408,9 @@ static void Move_asteroid(object_t *obj)
     mv.start.cx = obj->pos.cx;
     mv.start.cy = obj->pos.cy;
     while (mv.delta.cx || mv.delta.cy) {
-	shape_t *shape;
+	shape_t *shape = Asteroid_get_shape_by_size(asteroid->size);
 
-	switch (asteroid->size) {
-	case 1: shape = &asteroid_wire1; break;
-	case 2: shape = &asteroid_wire2; break;
-	case 3: shape = &asteroid_wire3; break;
-	case 4: shape = &asteroid_wire4; break;
-	default: assert(0); break;
-	}
-
+	assert(shape);
 	Shape_move(&mv, shape, 0, &ans);
 	mv.start.cx = WRAP_XCLICK(mv.start.cx + ans.moved.cx);
 	mv.start.cy = WRAP_YCLICK(mv.start.cy + ans.moved.cy);

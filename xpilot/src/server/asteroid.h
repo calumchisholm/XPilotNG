@@ -54,4 +54,25 @@
 /* radius of asteroid size n */
 #define ASTEROID_RADIUS(size)	((0.8 * SHIP_SZ * (size)) * CLICK)
 
+extern shape_t asteroid_wire1;
+extern shape_t asteroid_wire2;
+extern shape_t asteroid_wire3;
+extern shape_t asteroid_wire4;
+
+static inline shape_t *Asteroid_get_shape_by_size(int size)
+{
+    switch (size) {
+    case 1:
+	return &asteroid_wire1;
+    case 2:
+	return &asteroid_wire2;
+    case 3:
+	return &asteroid_wire3;
+    case 4:
+	return &asteroid_wire4;
+    default:
+	return NULL;
+    }
+}
+
 #endif
