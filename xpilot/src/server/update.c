@@ -119,7 +119,8 @@ void Phasing(player *pl, int on)
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_OFF_SOUND);
 	/* kps - ok to have this check here ? */
 	if (shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
-			    (object *)pl, (shape *)pl->ship, pl->dir) != NO_GROUP) {
+			    (object *)pl, (shape *)pl->ship, pl->dir)
+	    != NO_GROUP) {
 	    struct move mv;
 	    Player_crash(pl, &mv, CrashWall, NO_ID, 0);
 	}
@@ -200,12 +201,14 @@ void Emergency_thrust(player *pl, int on)
 	}
 	if (!BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	    SET_BIT(pl->used, HAS_EMERGENCY_THRUST);
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, EMERGENCY_THRUST_ON_SOUND);
+	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
+			       EMERGENCY_THRUST_ON_SOUND);
 	}
     } else {
 	if (BIT(pl->used, HAS_EMERGENCY_THRUST)) {
 	    CLR_BIT(pl->used, HAS_EMERGENCY_THRUST);
-	    sound_play_sensors(pl->pos.cx, pl->pos.cy, EMERGENCY_THRUST_OFF_SOUND);
+	    sound_play_sensors(pl->pos.cx, pl->pos.cy,
+			       EMERGENCY_THRUST_OFF_SOUND);
 	}
 	if (pl->emergency_thrust_left <= 0) {
 	    if (pl->item[ITEM_EMERGENCY_THRUST] <= 0)
@@ -628,6 +631,35 @@ static void Target_update(void)
     }
 }
 
+static void Ecm_update(void)
+{
+    int i;
+
+    for (i = 0; i < NumEcms; i++) {
+	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
+	    if (Ecms[i]->id != NO_ID)
+		Player_by_id(Ecms[i]->id)->ecmcount--;
+	    free(Ecms[i]);
+	    --NumEcms;
+	    Ecms[i] = Ecms[NumEcms];
+	    i--;
+	}
+    }
+}
+
+static void Transporter_update(void)
+{
+    int i;
+
+    for (i = 0; i < NumTransporters; i++) {
+	if ((Transporters[i]->count -= timeStep) <= 0) {
+	    free(Transporters[i]);
+	    --NumTransporters;
+	    Transporters[i] = Transporters[NumTransporters];
+	    i--;
+	}
+    }
+}
 
 static void Player_turns(void)
 {
@@ -813,33 +845,8 @@ void Update_objects(void)
     Fuel_update();
     Misc_object_update();
     Asteroid_update();
-
-    /*
-     * Update ECM blasts
-     */
-    for (i = 0; i < NumEcms; i++) {
-	if ((Ecms[i]->size *= ecmSizeFactor) < 1.0) {
-	    if (Ecms[i]->id != NO_ID)
-		Player_by_id(Ecms[i]->id)->ecmcount--;
-	    free(Ecms[i]);
-	    --NumEcms;
-	    Ecms[i] = Ecms[NumEcms];
-	    i--;
-	}
-    }
-
-    /*
-     * Update transporters
-     */
-    for (i = 0; i < NumTransporters; i++) {
-	if ((Transporters[i]->count -= timeStep) <= 0) {
-	    free(Transporters[i]);
-	    --NumTransporters;
-	    Transporters[i] = Transporters[NumTransporters];
-	    i--;
-	}
-    }
-
+    Ecm_update();
+    Transporter_update();
     Cannon_update();
     Target_update();
 
@@ -1213,6 +1220,10 @@ void Update_objects(void)
 			    b->life = 0;
 			    continue;
 			}
+			/*
+			 * kps - use shape is inside here to check if ball
+			 * is inside wall
+			 */
 			Object_position_set_clicks(b, ballpos.cx, ballpos.cy);
 			Object_position_remember(b);
 			b->vel.x *= WORM_BRAKE_FACTOR;
