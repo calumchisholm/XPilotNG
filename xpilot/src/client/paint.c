@@ -123,6 +123,15 @@ int	oneLifeColor;		/* Color to associate with 1 life */
 int	twoLivesColor;		/* Color to associate with 2 lives */
 int	manyLivesColor;		/* Color to associate with >2 lives */
 
+int	wallColor;		/* Color index for wall drawing */
+int	fuelColor;		/* Color index for fuel station drawing */
+int	decorColor;		/* Color index for decoration drawing */
+int	backgroundPointColor;	/* Color index for background point drawing */
+int	visibilityBorderColor;	/* Color index for visibility border drawing */
+char	*wallTextureFile;	/* Filename of wall texture */
+char	*decorTextureFile;	/* Filename of decor texture */
+
+
 static void Paint_clock(bool redraw);
 
 int Paint_init(void)

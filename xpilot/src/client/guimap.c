@@ -95,6 +95,50 @@ void Gui_paint_walls(int x, int y, int type)
 }
 
 
+void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y)
+{
+    static Pixmap wallTile = None;
+    static bool   wallTileTried = false;
+
+    XPoint        points[5];
+    bool          texturing = false;
+
+
+    if (BIT(instruments, SHOW_TEXTURED_WALLS)) {
+	if (wallTile == None) {
+	    wallTile = Texture_wall();
+	    wallTileTried = true;
+	}
+	if (wallTile != None) {
+	    XSetTile(dpy, gameGC, wallTile);
+	    XSetTSOrigin(dpy, gameGC, -WINSCALE(realWorld.x),
+                         WINSCALE(realWorld.y));
+	    XSetFillStyle(dpy, gameGC, FillTiled);
+	    texturing = true;
+	} else {
+	    SET_FG(colors[wallColor].pixel);
+	}
+    } else {
+	SET_FG(colors[wallColor].pixel);
+    }
+
+    points[0].x = WINSCALE(X(bl));
+    points[0].y = WINSCALE(Y(y));
+    points[1].x = WINSCALE(X(tl));
+    points[1].y = WINSCALE(Y(y + BLOCK_SZ));
+    points[2].x = WINSCALE(X(tr));
+    points[2].y = WINSCALE(Y(y + BLOCK_SZ));
+    points[3].x = WINSCALE(X(br));
+    points[3].y = WINSCALE(Y(y));
+    points[4] = points[0];
+    rd.fillPolygon(dpy, drawPixmap, gameGC,
+		   points, 5,
+		   Convex, CoordModeOrigin);
+
+    if (texturing) XSetFillStyle(dpy, gameGC, FillSolid);
+}
+
+
 void Gui_paint_cannon(int x, int y, int type)
 {
     if (!texturedObjects) {
@@ -670,7 +714,7 @@ void Gui_paint_border(int x, int y, int xi, int yi)
 }
 
 
-void Gui_paint_visible_border(int x, int y, int xi, int yi, int color)
+static void Gui_paint_rectangle(int x, int y, int xi, int yi, int color)
 {
     Segment_add(color,
 		X(x), Y(y),
@@ -687,6 +731,17 @@ void Gui_paint_visible_border(int x, int y, int xi, int yi, int color)
     Segment_add(color,
 		X(x), Y(yi),
 		X(xi), Y(yi));
+}
+
+
+void Gui_paint_visible_border(int x, int y, int xi, int yi) {
+    if (visibilityBorderColor)
+	Gui_paint_rectangle(x, y, xi, yi, visibilityBorderColor);
+}
+
+
+void Gui_paint_hudradar_limit(int x, int y, int xi, int yi) {
+    Gui_paint_rectangle(x, y, xi, yi, BLUE);
 }
 
 

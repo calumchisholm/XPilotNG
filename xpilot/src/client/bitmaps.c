@@ -103,15 +103,15 @@ int Bitmaps_init(void)
 	STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
     }
 
-    pixmap.filename = "rock4.xpm";
+    pixmap.filename = wallTextureFile != NULL ? wallTextureFile : "rock4.ppm";
     pixmap.count = 1;
     pixmap.scalable = false;
     pixmap.state = BMS_UNINITIALIZED;
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
     /* this is for decor */
     STORE(xp_pixmap_t, pixmaps, num_pixmaps, max_pixmaps, pixmap);
-
-    pixmap.filename = "ball.xpm";
+    /* this is not used anymore */
+    pixmap.filename = "ball.ppm";
     pixmap.count = 1;
     pixmap.scalable = false;
     pixmap.state = BMS_UNINITIALIZED;

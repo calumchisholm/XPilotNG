@@ -26,8 +26,6 @@
 
 char gfx2d_version[] = VERSION;
 
-/* kps hack */
-/* extern int xpm_picture_from_file(xp_picture_t *pic, char *filename); */
 char	*texturePath = NULL;		/* Path list of texture directories */
 
 
@@ -192,18 +190,6 @@ int Picture_load(xp_picture_t *picture, const char *filename)
 	error("Cannot find picture file \"%s\"", filename);
 	return -1;
     }
-
-#if 0
-#ifndef _WINDOWS
-    if (strcmp("xpm", filename + strlen(filename) - 3) == 0) {
-	if (!xpm_picture_from_file(picture, path)) {
-	    error("Failed to load XPM bitmap \"%s\"", path);
-	    return -1;
-	}
-	return 0;
-    }
-#endif
-#endif
 
     if ((f = fopen(path, "rb")) == NULL) {
 	error("Cannot open \"%s\"", path);

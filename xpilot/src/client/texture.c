@@ -28,8 +28,6 @@ char texture_version[] = VERSION;
 Pixmap Texture_wall(void)
 {
     xp_bitmap_t *bmp;
-    if (!texturedObjects)
-	return None;
     if ((bmp = Bitmap_get(topWindow, BM_WALL_TEXTURE, 0)) == NULL)
 	return None;
     return bmp->bitmap;
@@ -38,8 +36,6 @@ Pixmap Texture_wall(void)
 Pixmap Texture_decor(void)
 {
     xp_bitmap_t *bmp;
-    if (!texturedObjects)
-	return None;
     if ((bmp = Bitmap_get(topWindow, BM_DECOR_TEXTURE, 0)) == NULL)
 	return None;
     return bmp->bitmap;
