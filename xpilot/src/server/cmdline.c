@@ -216,6 +216,7 @@ int             eliminationRace;        /* Last player drops each lap? */
 int		clientPortStart;	/* First UDP port for clients */
 int             clientPortEnd;          /* Last one (these are for firewalls)*/
 char		*recordFileName;
+int		FPSMultiplier;		/* Slow everything by this factor */
 
 
 extern char	conf_default_map_string[];	/* from common/config.c */
@@ -291,7 +292,7 @@ static optionDesc options[] = {
 	"0.1",
 	&ShotsMass,
 	valReal,
-	tuner_none,
+	tuner_dummy,
 	"Mass of bullets.\n",
 	OPT_ANY
     },
@@ -301,7 +302,7 @@ static optionDesc options[] = {
 	"21.0",
 	&ShotsSpeed,
 	valReal,
-	tuner_none,
+	tuner_dummy,
 	"Maximum speed of bullets.\n",
 	OPT_ANY
     },
@@ -311,7 +312,7 @@ static optionDesc options[] = {
 	"60",
 	&ShotsLife,
 	valInt,
-	tuner_none,
+	tuner_dummy,
 	"Life of bullets in ticks.\n",
 	OPT_ANY
     },
@@ -331,7 +332,7 @@ static optionDesc options[] = {
 	"256",
 	&ShotsMax,
 	valInt,
-	tuner_none,
+	tuner_dummy,
 	"Maximum allowed bullets per player.\n",
 	OPT_ANY
     },
@@ -828,7 +829,7 @@ static optionDesc options[] = {
 	"no",
 	&keepShots,
 	valBool,
-	tuner_none,
+	tuner_dummy,
 	"Do shots, mines and missiles remain after their owner leaves?\n",
 	OPT_ANY
     },
@@ -2438,6 +2439,17 @@ static optionDesc options[] = {
 	tuner_none,
 	"Name of the file where server recordings are saved.\n",
 	OPT_CMDLINE
+    },
+    {
+	"FPSMultiplier",
+	"FPSMultiplier",
+	"1",
+	&FPSMultiplier,
+	valInt,
+	tuner_dummy,
+	"Everything is slowed by this (integer) factor. Allows using higher\n"
+	"FPS without making the game too fast.\n",
+	OPT_ANY
     }
 };
 

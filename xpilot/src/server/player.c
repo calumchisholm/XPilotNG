@@ -399,12 +399,8 @@ int Init_player(int ind, wireobj *ship)
     pl->shots		= 0;
     pl->missile_rack	= 0;
     pl->forceVisible	= 0;
-    pl->shot_speed	= ShotsSpeed;
     Compute_sensor_range(pl);
-    pl->max_speed	= SPEED_LIMIT - pl->shot_speed;
-    pl->shot_max	= ShotsMax;
-    pl->shot_life	= ShotsLife;
-    pl->shot_mass	= ShotsMass;
+    pl->max_speed	= SPEED_LIMIT - ShotsSpeed;
     pl->shot_time	= 0;
     pl->color		= WHITE;
     pl->score		= 0;
@@ -1887,10 +1883,10 @@ static void Player_death_reset(int ind)
     }
 
     pl->forceVisible	= 0;
-    pl->shot_speed	= ShotsSpeed;
+/*    pl->shot_speed	= ShotsSpeed;
     pl->shot_max	= ShotsMax;
     pl->shot_life	= ShotsLife;
-    pl->shot_mass	= ShotsMass;
+    pl->shot_mass	= ShotsMass;*/
     pl->count		= RECOVERY_DELAY;
     pl->ecmcount	= 0;
     pl->emergency_thrust_left = 0;

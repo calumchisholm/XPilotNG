@@ -50,13 +50,13 @@ char update_version[] = VERSION;
 
 #define update_object_speed(o_)						\
     if (BIT((o_)->status, GRAVITY)) {					\
-	(o_)->vel.x += (o_)->acc.x					\
-		    + World.gravity[(o_)->pos.bx][(o_)->pos.by].x;	\
-	(o_)->vel.y += (o_)->acc.y					\
-		    + World.gravity[(o_)->pos.bx][(o_)->pos.by].y;	\
+	(o_)->vel.x += ((o_)->acc.x					\
+    + World.gravity[(o_)->pos.bx][(o_)->pos.by].x) / FPSMultiplier;	\
+	(o_)->vel.y += ((o_)->acc.y					\
+    + World.gravity[(o_)->pos.bx][(o_)->pos.by].y) / FPSMultiplier;	\
     } else {								\
-	(o_)->vel.x += (o_)->acc.x;					\
-	(o_)->vel.y += (o_)->acc.y;					\
+	(o_)->vel.x += (o_)->acc.x / FPSMultiplier;			\
+	(o_)->vel.y += (o_)->acc.y / FPSMultiplier;			\
     }
 
 int	rdelay = 0;		/* delay until start of next round */

@@ -3427,12 +3427,14 @@ static void Move_ball(int ind)
     struct move move;
     struct collans ans;
 
-    obj->extpos.x = obj->pos.cx + FLOAT_TO_CLICK(obj->vel.x);
+    move.delta.x = FLOAT_TO_CLICK(obj->vel.x) / FPSMultiplier;
+    move.delta.y = FLOAT_TO_CLICK(obj->vel.y) / FPSMultiplier;
+    obj->extpos.x = obj->pos.cx + move.delta.x;
     while (obj->extpos.x >= World.cwidth)
 	obj->extpos.x -= World.cwidth;
     while (obj->extpos.x <= 0)
 	obj->extpos.x += World.cwidth;
-    obj->extpos.y = obj->pos.cy + FLOAT_TO_CLICK(obj->vel.y);
+    obj->extpos.y = obj->pos.cy + move.delta.y;
     while (obj->extpos.y >= World.cheight)
 	obj->extpos.y -= World.cheight;
     while (obj->extpos.y <0)
@@ -3448,8 +3450,6 @@ static void Move_ball(int ind)
 	move.hit_mask = BALL_BIT | 1 << Players[GetInd[obj->owner]]->team;
     move.start.x = obj->pos.cx;
     move.start.y = obj->pos.cy;
-    move.delta.x = FLOAT_TO_CLICK(obj->vel.x);
-    move.delta.y = FLOAT_TO_CLICK(obj->vel.y);
     while (move.delta.x || move.delta.y) {
 	Shape_move(&move, &ball_wire, 0, &ans);
 	move.start.x = WRAP_XCLICK(move.start.x + ans.moved.x);
@@ -3522,13 +3522,13 @@ void Move_object(int ind)
 	move.hit_mask |= NOTEAM_BIT;
     else
 	move.hit_mask |= 1 << team;
-    obj->extpos.x = WRAP_XCLICK(obj->pos.cx + FLOAT_TO_CLICK(obj->vel.x));
-    obj->extpos.y = WRAP_YCLICK(obj->pos.cy + FLOAT_TO_CLICK(obj->vel.y));
 
     move.start.x = obj->pos.cx;
     move.start.y = obj->pos.cy;
-    move.delta.x = FLOAT_TO_CLICK(obj->vel.x);
-    move.delta.y = FLOAT_TO_CLICK(obj->vel.y);
+    move.delta.x = FLOAT_TO_CLICK(obj->vel.x) / FPSMultiplier;
+    move.delta.y = FLOAT_TO_CLICK(obj->vel.y) / FPSMultiplier;
+    obj->extpos.x = WRAP_XCLICK(obj->pos.cx + move.delta.x);
+    obj->extpos.y = WRAP_YCLICK(obj->pos.cy + move.delta.y);
     while (move.delta.x || move.delta.y) {
 	if (!trycount--) {
 	    sprintf(msg, "COULDN'T MOVE OBJECT!!!! Type = %d, x = %d, y = %d. Object was DELETED. [*DEBUG*]", obj->type, move.start.x, move.start.y);
@@ -3590,12 +3590,14 @@ void Move_player(int ind)
 
     pl->collmode = 1;
 
-    pl->extpos.x = pl->pos.cx + FLOAT_TO_CLICK(pl->vel.x);
+    move.delta.x = FLOAT_TO_CLICK(pl->vel.x) / FPSMultiplier;
+    move.delta.y = FLOAT_TO_CLICK(pl->vel.y) / FPSMultiplier;
+    pl->extpos.x = pl->pos.cx + move.delta.x;
     while (pl->extpos.x >= World.cwidth)
 	pl->extpos.x -= World.cwidth;
     while (pl->extpos.x <= 0)
 	pl->extpos.x += World.cwidth;
-    pl->extpos.y = pl->pos.cy + FLOAT_TO_CLICK(pl->vel.y);
+    pl->extpos.y = pl->pos.cy + move.delta.y;
     while (pl->extpos.y >= World.cheight)
 	pl->extpos.y -= World.cheight;
     while (pl->extpos.y <0)
@@ -3610,8 +3612,6 @@ void Move_player(int ind)
 	    move.hit_mask = NONBALL_BIT | NOTEAM_BIT;
 	move.start.x = pl->pos.cx;
 	move.start.y = pl->pos.cy;
-	move.delta.x = FLOAT_TO_CLICK(pl->vel.x);
-	move.delta.y = FLOAT_TO_CLICK(pl->vel.y);
 	while (move.delta.x || move.delta.y) {
 	    Shape_move(&move, pl->ship, pl->dir, &ans);
 	    move.start.x = WRAP_XCLICK(move.start.x + ans.moved.x);

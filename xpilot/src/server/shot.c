@@ -419,25 +419,25 @@ void Fire_main_shot(int ind, int type, int dir)
     player *pl = Players[ind];
     int x, y;
 
-    if (pl->shots >= pl->shot_max || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
+    if (pl->shots >= ShotsMax || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
 	return;
 
     x = pl->pos.cx + pl->ship->m_gun[pl->dir].x;
     y = pl->pos.cy + pl->ship->m_gun[pl->dir].y;
 
     Fire_general_shot(ind, pl->team, 0, x, y, type, dir,
-		      pl->shot_speed, pl->mods, -1);
+		      ShotsSpeed, pl->mods, -1);
 }
 
 void Fire_shot(int ind, int type, int dir)
 {
     player *pl = Players[ind];
 
-    if (pl->shots >= pl->shot_max || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
+    if (pl->shots >= ShotsMax || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
 	return;
 
     Fire_general_shot(ind, pl->team, 0, pl->pos.cx, pl->pos.cy,
-		      type, dir, pl->shot_speed, pl->mods, -1);
+		      type, dir, ShotsSpeed, pl->mods, -1);
 }
 
 void Fire_left_shot(int ind, int type, int dir, int gun)
@@ -445,14 +445,14 @@ void Fire_left_shot(int ind, int type, int dir, int gun)
     player *pl = Players[ind];
     int x, y;
 
-    if (pl->shots >= pl->shot_max || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
+    if (pl->shots >= ShotsMax || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
 	return;
 
     x = pl->pos.cx + pl->ship->l_gun[gun][pl->dir].x;
     y = pl->pos.cy + pl->ship->l_gun[gun][pl->dir].y;
 
     Fire_general_shot(ind, pl->team, 0, x, y, type, dir,
-		      pl->shot_speed, pl->mods, -1);
+		      ShotsSpeed, pl->mods, -1);
 
 }
 
@@ -461,14 +461,14 @@ void Fire_right_shot(int ind, int type, int dir, int gun)
     player *pl = Players[ind];
     int x, y;
 
-    if (pl->shots >= pl->shot_max || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
+    if (pl->shots >= ShotsMax || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
 	return;
 
     x = pl->pos.cx + pl->ship->r_gun[gun][pl->dir].x;
     y = pl->pos.cy + pl->ship->r_gun[gun][pl->dir].y;
 
     Fire_general_shot(ind, pl->team, 0, x, y, type, dir,
-		      pl->shot_speed, pl->mods, -1);
+		      ShotsSpeed, pl->mods, -1);
 
 }
 
@@ -477,14 +477,14 @@ void Fire_left_rshot(int ind, int type, int dir, int gun)
     player *pl = Players[ind];
     int x, y;
 
-    if (pl->shots >= pl->shot_max || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
+    if (pl->shots >= ShotsMax || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
 	return;
 
     x = pl->pos.cx + pl->ship->l_rgun[gun][pl->dir].x;
     y = pl->pos.cy + pl->ship->l_rgun[gun][pl->dir].y;
 
     Fire_general_shot(ind, pl->team, 0, x, y, type, dir,
-		      pl->shot_speed, pl->mods, -1);
+		      ShotsSpeed, pl->mods, -1);
 
 }
 
@@ -493,14 +493,14 @@ void Fire_right_rshot(int ind, int type, int dir, int gun)
     player *pl = Players[ind];
     int x, y;
 
-    if (pl->shots >= pl->shot_max || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
+    if (pl->shots >= ShotsMax || BIT(pl->used, OBJ_SHIELD|OBJ_PHASING_DEVICE))
 	return;
 
     x = pl->pos.cx + pl->ship->r_rgun[gun][pl->dir].x;
     y = pl->pos.cy + pl->ship->r_rgun[gun][pl->dir].y;
 
     Fire_general_shot(ind, pl->team, 0, x, y, type, dir,
-		      pl->shot_speed, pl->mods, -1);
+		      ShotsSpeed, pl->mods, -1);
 
 }
 
@@ -539,18 +539,13 @@ void Fire_general_shot(int ind, u_short team, bool cannon, int x, int y,
     if (!mods.mini)
 	mods.spread = 0;
 
-    if (pl) {
-	mass = pl->shot_mass;
-	life = pl->shot_life;
+    if (cannon) {
+	mass = CANNON_SHOT_MASS;
+	life = CANNON_SHOT_LIFE;
+	SET_BIT(status, FROMCANNON);
     } else {
-	if (cannon) {
-	    mass = CANNON_SHOT_MASS;
-	    life = CANNON_SHOT_LIFE;
-	    SET_BIT(status, FROMCANNON);
-	} else {
-	    mass = ShotsMass;
-	    life = ShotsLife;
-	}
+	mass = ShotsMass;
+	life = ShotsLife;
     }
 
     switch (type) {
@@ -1192,7 +1187,7 @@ void Delete_shot(int ind)
 	    if (shot->id != -1) {
 		player *pl = Players[GetInd[shot->id]];
 		color = pl->color;
-		mass = pl->shot_mass;
+		mass = ShotsMass;
 	    }
 	    else {
 		color = WHITE;
@@ -1462,7 +1457,7 @@ void Connector_force(int ind)
     object		*ball = Obj[ind];
     player		*pl = Players[ GetInd[ball->id] ];
     vector		D;
-    DFLOAT		length, force, ratio, accell, cosine, pl_damping, ball_damping;
+    DFLOAT		length, force, ratio, accell, damping;
     const DFLOAT		k = 1500.0, b = 2.0;
     const DFLOAT		max_spring_ratio = 0.30;
 
@@ -1489,23 +1484,18 @@ void Connector_force(int ind)
 	return;
     }
 
-    /* compute damping for player */
-    cosine = (pl->vel.x * D.x) + (pl->vel.y * D.y);
-    pl_damping = -b * cosine;
+    damping = -b * ((pl->vel.x - ball->vel.x) * D.x +
+	(pl->vel.y - ball->vel.y) * D.y);
 
-    /* compute damping for ball */
-    cosine = (ball->vel.x * -D.x) + (ball->vel.y * -D.y);
-    ball_damping = -b * cosine;
+    /* compute acceleration for player, assume t = 1 */
+    accell = (force + damping) / pl->mass;
+    pl->vel.x += D.x * accell / FPSMultiplier;
+    pl->vel.y += D.y * accell / FPSMultiplier;
 
-    /* compute accelleration for player, assume t = 1 */
-    accell = (force + pl_damping + ball_damping) / pl->mass;
-    pl->vel.x += D.x * accell;
-    pl->vel.y += D.y * accell;
-
-    /* compute accelleration for ball, assume t = 1 */
-    accell = (force + ball_damping + pl_damping) / ball->mass;
-    ball->vel.x += -D.x * accell;
-    ball->vel.y += -D.y * accell;
+    /* compute acceleration for ball, assume t = 1 */
+    accell = (force + damping) / ball->mass;
+    ball->vel.x += -D.x * accell / FPSMultiplier;
+    ball->vel.y += -D.y * accell / FPSMultiplier;
 }
 
 

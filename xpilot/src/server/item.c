@@ -401,7 +401,7 @@ void Detonate_items(int ind)
 	if (rfrac() < detonateItemOnKillProb) {
 	    int	type;
 
-	    if (pl->shots >= pl->shot_max)
+	    if (pl->shots >= ShotsMax)
 		break;
 
 	    /*
@@ -424,7 +424,7 @@ void Detonate_items(int ind)
 	    }
 	    Fire_general_shot(ind, 0, pl->team, pl->pos.cx, pl->pos.cy,
 			      type, (int)(rfrac() * RES),
-			      pl->shot_speed, mods, -1);
+			      ShotsSpeed, mods, -1);
 	}
     }
 }

@@ -366,10 +366,6 @@ struct player {
     DFLOAT	auto_turnresistance_s;	/* when autopilot turned off */
     modifiers	modbank[NUM_MODBANKS];	/* useful modifier settings */
     bool	tractor_is_pressor;	/* on if tractor is pressor */
-    int		shot_max;		/* Maximum number of shots active */
-    int		shot_life;		/* Number of ticks shot will live */
-    DFLOAT	shot_speed;		/* Speed of shots fired by player */
-    DFLOAT	shot_mass;		/* Mass of shots fired by player */
     long	shot_time;		/* Time of last shot fired by player */
     int		repair_target;		/* Repairing this target */
     int		fs;			/* Connected to fuel station fs */
