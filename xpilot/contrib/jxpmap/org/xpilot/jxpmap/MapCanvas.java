@@ -10,7 +10,6 @@ public class MapCanvas extends JComponent {
 
     private MapModel model;
     private float scale;
-    private float realScale;
     private Dimension prefSize;
     private AffineTransform at, it;
     private CanvasEventHandler eventHandler;
@@ -19,8 +18,6 @@ public class MapCanvas extends JComponent {
 
     public MapCanvas () {
 
-        this.scale = 1.0f;
-        this.realScale = scale / 64; // clicks
         setOpaque(true);
         prefSize = new Dimension(0, 0);
 
@@ -47,6 +44,7 @@ public class MapCanvas extends JComponent {
 
     public void setModel (MapModel  m) {
         this.model = m;
+        this.scale = m.getDefaultScale();
         prefSize = null;
         this.at = null;
         this.it = null;
@@ -62,7 +60,6 @@ public class MapCanvas extends JComponent {
     
     public void setScale (float  s) {
         this.scale = s;
-        this.realScale = s / 64;
         this.prefSize = null;
         this.at = null;
         this.it = null;
@@ -88,8 +85,8 @@ public class MapCanvas extends JComponent {
                 Dimension d = model.options.size;
                 int ew = model.options.edgeWrap ? 2 : 1;
                 prefSize = new Dimension
-                ((int)(ew * d.width * realScale), 
-                 (int)(ew * d.height * realScale));
+                ((int)(ew * d.width * scale), 
+                 (int)(ew * d.height * scale));
             } else {
                 prefSize = new Dimension(0, 0);
             }
@@ -132,7 +129,7 @@ public class MapCanvas extends JComponent {
                     AffineTransform tx = new AffineTransform(rootTx);
                     tx.translate(xoff * mapSize.width, yoff * mapSize.height);
                     g.setTransform(tx);
-                    o.paint(g);
+                    o.paint(g, scale);
                 }
             }
         }
@@ -199,8 +196,8 @@ public class MapCanvas extends JComponent {
     private AffineTransform getTransform () {
         if (at == null) {
             at = new AffineTransform();
-            at.translate(0, realScale * model.options.size.height);
-            at.scale(realScale, -realScale);
+            at.translate(0, scale * model.options.size.height);
+            at.scale(scale, -scale);
         }
         return at;
     }

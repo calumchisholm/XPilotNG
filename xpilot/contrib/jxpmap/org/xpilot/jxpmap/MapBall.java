@@ -44,16 +44,17 @@ public class MapBall extends MapObject {
     }
 
 
-    public PropertyEditor getPropertyEditor (MapCanvas canvas) {
+    public EditorPanel getPropertyEditor (MapCanvas canvas) {
         return new BallPropertyEditor();
     }
 
 
-    private class BallPropertyEditor extends PropertyEditor {
+    private class BallPropertyEditor extends EditorPanel {
 
         private JComboBox cmbTeam;
 
         public BallPropertyEditor () {
+            setTitle("Ball Properties");
             setLayout(new java.awt.GridLayout(1, 2));
             cmbTeam = new JComboBox();
             for (int i = 0; i < 10; i++) 

@@ -10,8 +10,8 @@ public class PolygonStyle {
     public static final int FILL_COLOR = 1;
     public static final int FILL_TEXTURED = 2;
 
-    private boolean visible;
-    private boolean visibleInRadar;
+    private boolean visible = true;
+    private boolean visibleInRadar = true;
     private Color color;
     private Pixmap texture;
     private int fillStyle;
@@ -97,6 +97,9 @@ public class PolygonStyle {
         if (fillStyle == FILL_COLOR && color != null) {
             out.print("\" color=\"");
             out.print(color.getRGB());
+        } else if (fillStyle == FILL_TEXTURED && texture != null) {
+            out.print("\" texture=\"");
+            out.print(texture.getFileName());
         }
         out.print("\" defedge=\"");
         out.print(defEdgeStyle.getId());

@@ -89,19 +89,6 @@ public class MapPolygon extends MapObject {
         polygon.translate(x - r.x, y - r.y);
     }
 
-
-    public boolean isCounterClockwise () {
-
-        long area = 0;
-        int i, j;
-
-        for (i = polygon.npoints - 1, j = 0; j < polygon.npoints; i = j, j++)
-            area += polygon.xpoints[i] * polygon.ypoints[j] -
-                polygon.xpoints[j] * polygon.ypoints[i];
-
-        return (area > 0);
-    }
-
     
     public void printXml (PrintWriter out) throws IOException {
 
@@ -125,26 +112,13 @@ public class MapPolygon extends MapObject {
         out.print(getStyle().getId());
         out.println("\">");
 
-        if (isCounterClockwise()) {
-            System.out.println("counter clockwise");
-            for (int i = 1; i < polygon.npoints; i++) {
-                out.print("<Offset x=\"");
-                out.print(polygon.xpoints[i] - polygon.xpoints[i - 1]);
-                out.print("\" y=\"");
-                out.print(polygon.ypoints[i] - polygon.ypoints[i - 1]);
-                out.println("\"/>");
-            }
-        } else {
-            System.out.println("clockwise");
-            for (int i = polygon.npoints - 1; i > 0; i--) {
-                out.print("<Offset x=\"");
-                out.print(polygon.xpoints[i - 1] - polygon.xpoints[i]);
-                out.print("\" y=\"");
-                out.print(polygon.ypoints[i - 1] - polygon.ypoints[i]);
-                out.println("\"/>");
-            }
+        for (int i = 1; i < polygon.npoints; i++) {
+            out.print("<Offset x=\"");
+            out.print(polygon.xpoints[i] - polygon.xpoints[i - 1]);
+            out.print("\" y=\"");
+            out.print(polygon.ypoints[i] - polygon.ypoints[i - 1]);
+            out.println("\"/>");
         }
-
 
         out.println("</Polygon>");
 
@@ -156,7 +130,7 @@ public class MapPolygon extends MapObject {
     }
     
 
-    public void paint (Graphics2D g) {
+    public void paint (Graphics2D g, float scale) {
 
         if (!style.isVisible()) return;
 
@@ -170,7 +144,7 @@ public class MapPolygon extends MapObject {
             BufferedImage img = style.getTexture().getImage();
             Rectangle b = polygon.getBounds();
             g.setPaint(new TexturePaint(img, new Rectangle
-                (b.x, b.y, img.getWidth(), img.getHeight())));
+                (b.x, b.y, img.getWidth() * 64, -img.getHeight() * 64)));
             g.fill(p);
         }
 
@@ -178,7 +152,7 @@ public class MapPolygon extends MapObject {
             LineStyle def = style.getDefaultEdgeStyle();
             if (def.getStyle() != LineStyle.STYLE_HIDDEN) {
                 g.setColor(def.getColor());
-                g.setStroke(def.getStroke());
+                g.setStroke(def.getStroke(scale));
                 g.draw(p);
             }
         } else {
@@ -193,7 +167,7 @@ public class MapPolygon extends MapObject {
                 
                 if (ls.getStyle() != LineStyle.STYLE_HIDDEN) {
                     g.setColor(ls.getColor());
-                    g.setStroke(ls.getStroke());
+                    g.setStroke(ls.getStroke(scale));
                     
                     int nump = i + 1 - begin;
                     int[] xp = new int[nump];
@@ -216,7 +190,7 @@ public class MapPolygon extends MapObject {
     }
 
 
-    public PropertyEditor getPropertyEditor (MapCanvas canvas) {
+    public EditorPanel getPropertyEditor (MapCanvas canvas) {
         return new PolygonPropertyEditor(canvas, this);
     }
 
@@ -329,7 +303,6 @@ public class MapPolygon extends MapObject {
 
         public CreateHandler (Runnable cmd) {
             this.cmd = cmd;
-            stroke = getPreviewStroke();
         }
 
         
@@ -347,6 +320,7 @@ public class MapPolygon extends MapObject {
             Graphics2D g = (Graphics2D)c.getGraphics();
             g.setXORMode(Color.black);
             g.setColor(Color.white);
+            if (stroke == null) stroke = getPreviewStroke(c.getScale());
             g.setStroke(stroke);
 
             if (remove) {
@@ -386,6 +360,7 @@ public class MapPolygon extends MapObject {
             Graphics2D g = (Graphics2D)c.getGraphics();
             g.setXORMode(Color.black);
             g.setColor(Color.white);
+            if (stroke == null) stroke = getPreviewStroke(c.getScale());
             g.setStroke(stroke);
             if (remove) c.drawShape(g, poly);
             

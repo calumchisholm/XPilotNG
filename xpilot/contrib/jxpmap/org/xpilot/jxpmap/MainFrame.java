@@ -29,7 +29,7 @@ public class MainFrame extends JFrame implements ActionListener {
         buildMenuBar();
         buildToolBar();
         setSize(500, 400);
-        zoom = 5;
+        zoom = 0;
     }
 
 
@@ -178,17 +178,23 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
     private void zoomIn () {
-        if (zoom == 1) return;
-        zoom--;
-        canvas.setScale((float)(5.0 / zoom));
-        canvas.repaint();
+        zoom++;
+        updateScale();
     }
 
 
     private void zoomOut () {
-        if (zoom == 50) return;
-        zoom++;
-        canvas.setScale((float)(5.0 / zoom));
+        zoom--;
+        updateScale();
+    }
+
+
+    private void updateScale () {
+        float df = canvas.getModel().getDefaultScale();
+        canvas.setScale
+            ((zoom >= 0) ?
+             (df * (zoom + 1)) :
+             (df / (-zoom + 1)));
         canvas.repaint();
     }
 
@@ -347,8 +353,26 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
     private void showOptions () {
-        PropertyDialog.show
+        EditorDialog.show
             (this, new MapOptionEditor(canvas.getModel().options), false);
+    }
+
+
+    private void showImages () {
+        EditorDialog.show
+            (this, new ImageListEditor(canvas.getModel().pixmaps), false);
+    }
+
+
+    private void showPolygonStyles () {
+        EditorDialog.show
+            (this, new PolygonStyleManager(canvas), false);
+    }
+
+
+    private void showEdgeStyles () {
+        EditorDialog.show
+            (this, new EdgeStyleManager(canvas), false);
     }
 
 

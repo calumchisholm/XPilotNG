@@ -20,9 +20,11 @@ public class MapModel {
     MapOptions options;
     PolygonStyle defPolyStyle;
     LineStyle defLineStyle;
+    float defaultScale;
 
     
     public MapModel () {
+        defaultScale = 1f / 64;
         objects = new ArrayList();
         polyStyles = new ArrayList();
         pixmaps = new ArrayList();
@@ -51,6 +53,16 @@ public class MapModel {
     
     public LineStyle getDefaultEdgeStyle () {
         return defLineStyle;
+    }
+
+
+    public float getDefaultScale () {
+        return defaultScale;
+    }
+
+
+    public void setDefaultScale (float def) {
+        this.defaultScale = def;
     }
 
 
@@ -117,6 +129,11 @@ public class MapModel {
             out.println("\"/>");
 
             options.printXml(out);
+
+            for (Iterator iter = pixmaps.iterator(); iter.hasNext();) {
+                Pixmap p = (Pixmap)iter.next();
+                p.printXml(out);
+            }
 
             for (Iterator iter = edgeStyles.iterator(); iter.hasNext();) {
                 LineStyle s = (LineStyle)iter.next();
@@ -201,6 +218,10 @@ public class MapModel {
                         new Color(Integer.parseInt(atts.getValue("color")));
                     int width = Integer.parseInt(atts.getValue("width"));
                     int style = Integer.parseInt(atts.getValue("style"));
+                    if (width == -1) {
+                        width = 1;
+                        style = LineStyle.STYLE_HIDDEN;
+                    }
                     
                     LineStyle ls = new LineStyle(id, width, color, style);
                     estyles.put(id, ls);
@@ -346,6 +367,7 @@ public class MapModel {
                         style.setDefaultEdgeStyle
                             ((LineStyle)estyles.get(ps.defEdgeId));
                     }
+                    polyStyles.add(style);
 
                     ps.ref = style;
                 }

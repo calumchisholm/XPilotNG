@@ -6,12 +6,13 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 
-public class MapOptionEditor extends PropertyEditor {
+public class MapOptionEditor extends EditorPanel {
 
     private DefaultTableModel tableModel;
     private MapOptions options;
 
     public MapOptionEditor (MapOptions options) {
+        setTitle("Option Manager");
         this.options = options;
         tableModel = createTableModel(options);
         JTable table = new JTable(tableModel);

@@ -73,14 +73,14 @@ public abstract class MapObject {
     }
 
 
-    protected Stroke getPreviewStroke () {
+    protected Stroke getPreviewStroke (float scale) {
         if (previewStroke == null) {
-            float dash[] = { 10.0f };
+            float dash[] = { 10 / scale };
             previewStroke = 
                 new BasicStroke
                     (1, BasicStroke.CAP_BUTT, 
                      BasicStroke.JOIN_MITER, 
-                     10.0f, dash, 0.0f);
+                     10 / scale, dash, 0.0f);
         }
         return previewStroke;
     }
@@ -91,8 +91,8 @@ public abstract class MapObject {
     }
 
 
-    public PropertyEditor getPropertyEditor (MapCanvas canvas) {
-        PropertyEditor editor = new PropertyEditor();
+    public EditorPanel getPropertyEditor (MapCanvas canvas) {
+        EditorPanel editor = new EditorPanel();
         editor.add(new javax.swing.JLabel("No editable properties"));
         return editor;
     }
@@ -120,7 +120,7 @@ public abstract class MapObject {
             
             if (contains(me.getPoint())) {
                 if ((me.getModifiers() & InputEvent.BUTTON1_MASK) == 0) {
-                    PropertyDialog.show(canvas, this);
+                    EditorDialog.show(canvas, this);
                     canvas.repaint();
                     return true;
                 }
@@ -136,7 +136,7 @@ public abstract class MapObject {
     }
     
 
-    public void paint (Graphics2D g) {
+    public void paint (Graphics2D g, float scale) {
 
         if (img != null) {
             Rectangle r = getBounds();
@@ -171,7 +171,6 @@ public abstract class MapObject {
             Rectangle ob = MapObject.this.getBounds();
             offset = new Point(ob.width / 2, ob.height / 2);
             preview = getPreviewShape();
-            stroke = getPreviewStroke();
         }
 
 
@@ -183,6 +182,7 @@ public abstract class MapObject {
             Graphics2D g = (Graphics2D)c.getGraphics();
             g.setXORMode(Color.black);
             g.setColor(Color.white);
+            if (stroke == null) stroke = getPreviewStroke(c.getScale());
             g.setStroke(stroke);
             
             if (toBeRemoved != null) c.drawShape(g, toBeRemoved);
@@ -220,7 +220,6 @@ public abstract class MapObject {
             Rectangle ob = MapObject.this.getBounds();
             offset = new Point(evt.getX() - ob.x, evt.getY() - ob.y);
             preview = getPreviewShape();
-            stroke = getPreviewStroke();
         }
 
 
@@ -232,6 +231,7 @@ public abstract class MapObject {
             Graphics2D g = (Graphics2D)c.getGraphics();
             g.setXORMode(Color.black);
             g.setColor(Color.white);
+            if (stroke == null) stroke = getPreviewStroke(c.getScale());
             g.setStroke(stroke);
 
             if (toBeRemoved != null) c.drawShape(g, toBeRemoved);

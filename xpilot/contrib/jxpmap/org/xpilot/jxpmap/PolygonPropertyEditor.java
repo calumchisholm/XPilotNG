@@ -4,7 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.util.Iterator;
 
-public class PolygonPropertyEditor extends PropertyEditor {
+public class PolygonPropertyEditor extends EditorPanel {
 
     private JComboBox cmbStyle;
     private JComboBox cmbType;
@@ -19,6 +19,7 @@ public class PolygonPropertyEditor extends PropertyEditor {
         this.polygon = poly;
         this.model = canvas.getModel();
 
+        setTitle("Polygon Properties");
         setLayout(new GridLayout(3, 2));
 
         add(new JLabel("Style:"));

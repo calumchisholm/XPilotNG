@@ -71,7 +71,7 @@ public class MapBase extends MapObject {
     }
 
     
-    public PropertyEditor getPropertyEditor (MapCanvas c) {
+    public EditorPanel getPropertyEditor (MapCanvas c) {
         return new BasePropertyEditor();
     }
 
@@ -85,13 +85,15 @@ public class MapBase extends MapObject {
     }
 
 
-    private class BasePropertyEditor extends PropertyEditor {
+    private class BasePropertyEditor extends EditorPanel {
 
         private JComboBox cmbTeam;
         private JComboBox cmbDir;
 
 
         public BasePropertyEditor () {
+
+            setTitle("Base Properties");
 
             cmbTeam = new JComboBox();
             for (int i = 0; i < 10; i++) 

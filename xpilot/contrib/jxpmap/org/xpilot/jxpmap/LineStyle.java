@@ -16,22 +16,20 @@ public class LineStyle {
     private int style;
     private String id;    
     private int width;
+    private float cscale;
+
+    
+    public LineStyle () {
+        color = Color.black;
+        width = 1;
+    }
+
 
     public LineStyle (String id, int width, Color color, int style) {
         this.id = id;
         this.color = color;
         this.width = width;
-        if (style == STYLE_SOLID) {
-            stroke = new BasicStroke((float)width, 
-                                     BasicStroke.CAP_BUTT, 
-                                     BasicStroke.JOIN_MITER);
-        } else if (style != STYLE_HIDDEN) {
-            float dash[] = { 10.0f };
-            stroke = new BasicStroke((float)width, 
-                                     BasicStroke.CAP_BUTT, 
-                                     BasicStroke.JOIN_MITER, 
-                                     10.0f, dash, 0.0f);
-        }            
+        this.style = style;
     }
 
 
@@ -39,14 +37,39 @@ public class LineStyle {
         return style;
     }
 
+    
+    public void setStyle (int style) {
+        this.style = style;
+        stroke = null;
+    }
 
-    public Stroke getStroke() {
+
+    public Stroke getStroke (float scale) {
+        if (stroke == null || cscale != scale) {
+            if (style == STYLE_SOLID) {
+                stroke = new BasicStroke(width / scale,
+                                         BasicStroke.CAP_BUTT, 
+                                         BasicStroke.JOIN_MITER);
+            } else if (style != STYLE_HIDDEN) {
+                float dash[] = { 10 / scale };
+                stroke = new BasicStroke(width / scale,
+                                         BasicStroke.CAP_BUTT, 
+                                         BasicStroke.JOIN_MITER, 
+                                         10 / scale, dash, 0.0f);
+            }
+            cscale = scale;
+        }
         return stroke;
     }
 
 
     public Color getColor () {
         return color;
+    }
+
+
+    public void setColor (Color c) {
+        this.color = c;
     }
 
     
@@ -57,18 +80,31 @@ public class LineStyle {
     
     public void setId (String id) {
         this.id = id;
-    }    
+    }
+
+
+    public int getWidth () {
+        return width;
+    }
+
+
+    public void setWidth (int width) {
+        this.width = width;
+        stroke = null;
+    }
 
 
     public void printXml (PrintWriter out) throws IOException {
         out.print("<EdgeStyle id=\"");
         out.print(id);
         out.print("\" width=\"");
-        out.print(width);
+        if (style == STYLE_HIDDEN) out.print(-1);
+        else out.print(width);
         out.print("\" color=\"");
         out.print(color.getRGB());
         out.print("\" style=\"");
-        out.print(style);
+        if (style == STYLE_HIDDEN) out.print(STYLE_SOLID);
+        else out.print(style);
         out.println("\"/>");
 
     }

@@ -8,12 +8,10 @@ public class Pixmap {
     private String fileName;
     private boolean scalable;
     private BufferedImage image;
-    private BufferedImage scaledImage;
-    private float currentScale;
 
     
     public Pixmap () {
-        this.currentScale = 1.0f;
+        this.scalable = true;
     }
 
     
@@ -35,20 +33,24 @@ public class Pixmap {
     
     
     public BufferedImage getImage () {
-        return scaledImage;
+        return image;
     }
     
     
     public void load () throws IOException {
-        scaledImage = image = 
+        image = 
             new PPMDecoder().decode
                 (new BufferedInputStream
                     (new FileInputStream(fileName)));
     }
 
 
-    public void scale (float scaleFactor) {
-        if (currentScale == scaleFactor) return;
-        // TODO: implement properly if needed anymore
+    public void printXml (PrintWriter out) throws IOException {
+        
+        out.print("<BmpStyle id=\"");
+        out.print(getFileName());
+        out.print("\" filename=\"");
+        out.print(getFileName());
+        out.println("\" flags=\"1\"/>");
     }
 }
