@@ -471,25 +471,25 @@ void Ping_servers(void)
 	timeout.tv_usec = (interval - (ms % interval)) * 1000;
 	readmask = input_mask;
 	if (select(sock.fd + 1, &readmask, 0, 0, &timeout) == -1
-	    && errno != EINTR) {
+	    && errno != EINTR)
 	    break;
-	}
+
 	gettimeofday(&end, NULL);
 	ms = (end.tv_sec - start.tv_sec) * 1000 +
 	    (end.tv_usec - start.tv_usec) / 1000;
 
 	Sockbuf_clear(&rbuf);
-	if ((rbuf.len = sock_receive_any(&sock, rbuf.buf, rbuf.size)) < 4) {
+	if ((rbuf.len = sock_receive_any(&sock, rbuf.buf, rbuf.size)) < 4)
 	    continue;
-	}
-	if (outstanding > 0) {
+
+	if (outstanding > 0)
 	    --outstanding;
-	}
+
 	if (Packet_scanf(&rbuf, "%u%c%c",
 			 &reply_magic, &reply_serial,
-			 &reply_status) <= 0) {
+			 &reply_status) <= 0)
 	    continue;
-	}
+
 	reply_ip = sock_get_last_addr(&sock);
 	reply_port = sock_get_last_port(&sock);
 	for (that = List_begin(server_list);
@@ -499,16 +499,21 @@ void Ping_servers(void)
 		&& reply_port == it_sip->port) {
 		int n;
 
-		if (reply_serial != it_sip->serial) {
+		if (reply_serial != it_sip->serial)
 		    /* replied to an old ping, alive but
 		     * slower than `interval' at least
 		     */
 		    it_sip->pingtime = MIN(it_sip->pingtime, PING_SLOW);
-		} else {
-		    n = (end.tv_sec -
-			 it_sip->start.tv_sec) * 1000 +
+		else {
+		    n = (end.tv_sec - it_sip->start.tv_sec) * 1000 +
 			(end.tv_usec - it_sip->start.tv_usec) / 1000;
+
+		    /* kps - current value is more useful than minimum value */
+#if 0
 		    it_sip->pingtime = MIN(it_sip->pingtime, n);
+#else
+		    it_sip->pingtime = n;
+#endif
 		}
 		break;
 	    }
