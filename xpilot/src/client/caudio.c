@@ -108,17 +108,11 @@ void audioInit(char *display)
 void audioCleanup(void)
 {
     /* release malloc'ed memory here */
-    int			i;
+    int i;
 
     for (i = 0; i < MAX_SOUNDS; i++) {
-	if (table[i].filenames) {
-	    free(table[i].filenames);
-	    table[i].filenames = NULL;
-	}
-	if (table[i].private) {
-	    free(table[i].private);
-	    table[i].private = NULL;
-	}
+	XFREE(table[i].filenames);
+	XFREE(table[i].private);
     }
 }
 
@@ -151,7 +145,7 @@ int Handle_audio(int type, int volume)
 	    if (i != type
 		&& table[i].filenames
 		&& table[i].private[pick]
-		&& strcmp(table[type].filenames[0], table[i].filenames[0]) == 0)
+		&& !strcmp(table[type].filenames[0], table[i].filenames[0]))
 	    {
 		table[type].private[0] = table[i].private[0];
 		break;
