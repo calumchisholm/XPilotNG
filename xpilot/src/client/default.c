@@ -160,7 +160,6 @@ static bool Set_texturePath(xp_option_t *opt, const char *value)
 	xp_free(texturePath);
 
     texturePath = xp_safe_strdup(value);
-    warn("texturePath is now %s", texturePath);
     return true;
 }
 static const char *Get_texturePath(xp_option_t *opt)
