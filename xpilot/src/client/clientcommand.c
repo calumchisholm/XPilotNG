@@ -210,9 +210,13 @@ void executeCommand(char *talk_str)
     case 7:			/* h */
 	print_help(argument);
 	break;
-    case 8:			/* help */
-    case 9:			/* h */
+    case 8:			/* set */
+    case 9:			/* s */
+#ifdef OPTIONHACK
 	Set_command(argument);
+#else
+	Add_message("Not implemented. [*Client reply*]");
+#endif
 	break;
     default:
 	warn("BUG: bad command num in executeCommand()");

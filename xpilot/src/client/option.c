@@ -327,6 +327,33 @@ void Set_option(const char *name, const char *value)
     }
 }
 
+
+/*
+ * \set client command
+ */
+void Set_command(const char *args)
+{
+    char *name, *value, *valcpy;
+
+    if (!args) {
+	warn("foobar");
+	return;
+    }
+
+    valcpy = xp_safe_strdup(args);
+
+    name = strtok(valcpy, " \t\r\n");
+    value = strtok(NULL, "");
+
+    if (name && value) {
+	warn("Calling Set_option(\"%s\", \"%s\")", name, value);
+	Set_option(name, value);
+    }
+
+    xp_free(valcpy);
+}
+
+
 /*
  * NOTE: Store option assumes the passed pointers will remain valid.
  */
@@ -526,36 +553,3 @@ void Get_xpilotrc_file(char *path, unsigned size)
 #endif /* _WINDOWS */
 
 #endif
-
-#ifndef OPTIONHACK
-void Set_option(const char *name, const char *value)
-{
-    (void)name; (void)value;
-    Add_message("Not implemented. [*Client reply*]");
-}
-#endif
-
-/*
- * \set client command
- */
-void Set_command(const char *args)
-{
-    char *name, *value, *valcpy;
-
-    if (!args) {
-	warn("foobar");
-	return;
-    }
-
-    valcpy = xp_safe_strdup(args);
-
-    name = strtok(valcpy, " \t\r\n");
-    value = strtok(NULL, "");
-
-    if (name && value) {
-	warn("Calling Set_option(\"%s\", \"%s\")", name, value);
-	Set_option(name, value);
-    }
-
-    xp_free(valcpy);
-}
