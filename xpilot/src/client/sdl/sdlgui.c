@@ -169,7 +169,7 @@ static void tessellate_polygon(GLUtriangulatorObj *tess, int i)
 {
     int j;
     int x,y;
-    
+
     xp_polygon_t polygon;
     polygon_style_t p_style;
     image_t *texture = NULL;
@@ -552,43 +552,12 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
     glPushMatrix();
     glLoadIdentity();
 
-#if 1
-    /* This ugly mess appears to stop most of the walls' wobbling...*/
-    /* TODO: sort this mess out */
-    int xtrim = 0;
-    if (scale != 1.0)
-    	if (ABS(world.x-polygon.points[0].x)<(Setup->width/2))
-    	    xtrim = ceil(scale)*(world.x<(polygon.points[0].x+1));
-    	else
-    	    xtrim = 1;
-	
-    int ytrim = 0;
-    if (scale != 1.0)
-    	if (ABS(world.y-polygon.points[0].y)<(Setup->height/2))
-    	    ytrim = -(world.y>(polygon.points[0].y));
-    	else
-    	    ytrim = -(int)scale;
-    	
-    glTranslatef((int)(( xoff * Setup->width + polygon.points[0].x + ((int)((-world.x)*scale)/scale) + xtrim ) * scale),
-		 (int)(( yoff * Setup->height + polygon.points[0].y + ((int)((-world.y)*scale)/scale) + ytrim ) * scale),
-	0);
+    glTranslatef((int)(xoff * Setup->width + polygon.points[0].x) -
+		 (int)(world.x * scale),
+		 (int)(yoff * Setup->height + polygon.points[0].y) -
+		 (int)(world.y * scale), 0);
     glScalef(scale, scale, 0);
-#elif 0
-    /* This makes the textures flicker */
-    glScalef(scale, scale, 0);
-    glTranslatef(xoff * Setup->width + polygon.points[0].x - world.x,
-		 yoff * Setup->height + polygon.points[0].y - world.y,
-		 0);
-#else
-    /* This makes the walls wobble */
-    glTranslatef((int)((xoff * Setup->width + polygon.points[0].x
-			- world.x) * scale),
-		 (int)((yoff * Setup->height + polygon.points[0].y
-			- world.y) * scale),
-	0);
-    glScalef(scale, scale, 0);
-#endif
-    
+
     if ((instruments.showTexturedWalls || instruments.showFilledWorld) &&
 	    BIT(p_style.flags, STYLE_TEXTURED | STYLE_FILLED)) {
 	if (BIT(p_style.flags, STYLE_TEXTURED)
@@ -602,7 +571,7 @@ void Gui_paint_polygon(int i, int xoff, int yoff)
 	}
     }
 /* might be useful when trying to fix wall-wobbling */
-#if 0    
+#if 0
     mapprint(&mapfont,whiteRGBA,LEFT,DOWN,0,0,"%i %i %i %i %i",i,polygon.points[0].x,world.x,polygon.points[0].y,world.y);
 #endif
     set_alphacolor((e_style.rgb << 8) | 0xff);
@@ -987,7 +956,7 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
 
     ship = Ship_by_id(id);
     if (!(other = Other_by_id(id))) return;
-    
+
     if (shield) {
 	Image_paint(IMG_SHIELD, x - 27, y - 27, 0, blueRGBA - 128);
     }
@@ -1156,7 +1125,7 @@ void Paint_meters(void)
     int spacing = (20>gamefont.h)?20:gamefont.h;
     int y = spacing, color;
     static bool setup_texs = true;
-    
+
     if (setup_texs) {
     	render_text(&gamefont,"Fuel"	    	, &meter_texs[0]);
     	render_text(&gamefont,"Power"	    	, &meter_texs[1]);
@@ -1172,8 +1141,7 @@ void Paint_meters(void)
     	render_text(&gamefont,"SHUTDOWN"    	, &meter_texs[11]);
 	setup_texs = false;
     }
-    
-    
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     if (fuelMeterColorRGBA)
@@ -1318,7 +1286,7 @@ void Paint_HUD(void)
     static char		autopilot[] = "Autopilot";
     int tempx,tempy,tempw,temph;
     static hud_text_t 	hud_texts[MAX_HUD_TEXS+MAX_SCORE_OBJECTS];
-    
+
 bool newcode = true;
 
     fontbounds dummy;
@@ -1426,7 +1394,7 @@ bool newcode = true;
 	tex_index=0;
 	if (strcmp(str,hud_texts[tex_index])!=0) {
     	    if (HUD_texs[tex_index].texture)
-	    	free_string_texture(&HUD_texs[tex_index]);    	    
+	    	free_string_texture(&HUD_texs[tex_index]);
 	    strlcpy(hud_texts[tex_index],str,50);
 	}
 	if (!HUD_texs[tex_index].texture)
@@ -1435,7 +1403,7 @@ bool newcode = true;
 	    	    ,hud_pos_x + hudSize-HUD_OFFSET+BORDER
 		    ,hud_pos_y - (hudSize-HUD_OFFSET+BORDER)
 		    ,true   );
-	} else 
+	} else
 	    HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
 	    	hud_pos_x + hudSize-HUD_OFFSET+BORDER,
 		hud_pos_y - (hudSize-HUD_OFFSET+BORDER),
@@ -1446,12 +1414,12 @@ bool newcode = true;
 		strcpy(str,"M ");
 	    else
 		sprintf(str, "T%d", fuelCurrent);
-	    
+
 	    if (newcode) {
 	    tex_index=1;
 	    if (strcmp(str,hud_texts[tex_index])!=0) {
     	    	if (HUD_texs[tex_index].texture)
-		    free_string_texture(&HUD_texs[tex_index]);    	    
+		    free_string_texture(&HUD_texs[tex_index]);
     	    	strlcpy(hud_texts[tex_index],str,50);
 	    }
 	    if (!HUD_texs[tex_index].texture)
@@ -1460,7 +1428,7 @@ bool newcode = true;
 	    	    ,hud_pos_x + hudSize-HUD_OFFSET + BORDER
 		    ,hud_pos_y - hudSize-HUD_OFFSET + BORDER
 		    ,true   );
-	    
+
 	    /* TODO fix this */
 	    } else
 	    	HUDprint(&gamefont,hudColorRGBA,LEFT,DOWN,
@@ -1485,17 +1453,17 @@ bool newcode = true;
 		    sobj->hud_msg_width > 2*hudSize-HUD_OFFSET*2 &&
 		    (did_fuel || hudVLineColorRGBA))
 		    ++j;
-	    	
+
 	    	if (newcode) {
 		tex_index=MAX_HUD_TEXS+i;
 		if (strcmp(sobj->hud_msg,hud_texts[tex_index])!=0) {
     	    	    if (HUD_texs[tex_index].texture)
-		    	free_string_texture(&HUD_texs[tex_index]);    	    
+		    	free_string_texture(&HUD_texs[tex_index]);
     	    	    strlcpy(hud_texts[tex_index],sobj->hud_msg,50);
 	    	}
 	    	if (!HUD_texs[tex_index].texture)
 	    	    render_text(&gamefont, sobj->hud_msg, &HUD_texs[tex_index]);
-	    	
+
 		disp_text(  &HUD_texs[tex_index],hudColorRGBA,CENTER,DOWN
 	    	    ,hud_pos_x
 		    ,hud_pos_y - (hudSize-HUD_OFFSET + BORDER + j * HUD_texs[tex_index].height)
@@ -1515,7 +1483,7 @@ bool newcode = true;
 	    tex_index=3;
 	    if (strcmp(str,hud_texts[tex_index])!=0) {
     	    	if (HUD_texs[tex_index].texture)
-		    free_string_texture(&HUD_texs[tex_index]);    	    
+		    free_string_texture(&HUD_texs[tex_index]);
     	    	strlcpy(hud_texts[tex_index],str,50);
 	    }
 	    if (!HUD_texs[tex_index].texture)
@@ -1538,7 +1506,7 @@ bool newcode = true;
 	tex_index=4;
 	if (strcmp(mods,hud_texts[tex_index])!=0) {
     	    if (HUD_texs[tex_index].texture)
-	    	free_string_texture(&HUD_texs[tex_index]);		
+	    	free_string_texture(&HUD_texs[tex_index]);
     	    strlcpy(hud_texts[tex_index],mods,50);
 	}
 	if (!HUD_texs[tex_index].texture)
@@ -1558,7 +1526,7 @@ bool newcode = true;
 	    tex_index=5;
 	    if (strcmp(autopilot,hud_texts[tex_index])!=0) {
     	    	if (HUD_texs[tex_index].texture)
-		    free_string_texture(&HUD_texs[tex_index]);    	    
+		    free_string_texture(&HUD_texs[tex_index]);
     	    	strlcpy(hud_texts[tex_index],autopilot,50);
 	    }
 	    if (!HUD_texs[tex_index].texture)
@@ -1635,10 +1603,10 @@ void Paint_messages(void)
     static msg_txt_t talk_texts[MAX_MSGS];
     static msg_txt_t game_texts[MAX_MSGS];
     static bool first_time = true;
-    int offset;    
+    int offset;
 
 bool newcode = true;
-    
+
     if (first_time) {
     	for (j = 0 ; j < MAX_MSGS ; ++j) {
 	    strlcpy(talk_texts[i],"\0",MSG_LEN);
@@ -1646,14 +1614,14 @@ bool newcode = true;
     	}
     	first_time = false;
     }
-    
+
 
 /* TODO: find a nicer solution for this, its a bit of a hack ;)
  * couldn't think of one that didn't include changing client.h
  * and messages.c
  */
 if (newcode) {
-    
+
     offset = 0;
     for (j = maxMessages-1 ; j >= 0 ; --j) {
     	if (!strlen(TalkMsg[j]->txt)) {
@@ -1665,7 +1633,7 @@ if (newcode) {
 	    for (i = offset; i <= j; ++i) {
 		if ( (found_it = (strcmp(TalkMsg[j]->txt,talk_texts[j-i])==0))) {
 		    if (!i) break;
-		    if (j + i >= maxMessages)	
+		    if (j + i >= maxMessages)
 			if (message_texs[j].texture)
 	    	    	    free_string_texture(&message_texs[j]);
 		    strlcpy(talk_texts[j],talk_texts[j-i],MSG_LEN);
@@ -1673,16 +1641,16 @@ if (newcode) {
 		    break;
 		}
 	    }
-		
+
     	    offset = i;
-	    
+
     	    if (!found_it) {
 	    	strlcpy(talk_texts[j],TalkMsg[j]->txt,MSG_LEN);
 	    	message_texs[j].texture=0;
 	    }
-	}	
+	}
     }
-    
+
     offset = 0;
     for (j = maxMessages-1 ; j >= 0 ; --j) {
     	if (!strlen(GameMsg[j]->txt)) {
@@ -1694,7 +1662,7 @@ if (newcode) {
 	    for (i = offset; i <= j; ++i) {
 		if ( (found_it = (strcmp(GameMsg[j]->txt,game_texts[j-i])==0))) {
 		    if (!i) break;
-		    if (j + i >= maxMessages)	
+		    if (j + i >= maxMessages)
 			if (message_texs[j+MAX_MSGS].texture)
 	    	    	    free_string_texture(&message_texs[j+MAX_MSGS]);
 		    strlcpy(game_texts[j],game_texts[j-i],MSG_LEN);
@@ -1702,17 +1670,17 @@ if (newcode) {
 		    break;
 		}
 	    }
-		
+
     	    offset = i;
-	    
+
     	    if (!found_it) {
 	    	strlcpy(game_texts[j],GameMsg[j]->txt,MSG_LEN);
 	    	message_texs[j+MAX_MSGS].texture=0;
 	    }
-	}	
+	}
     }
-}
-    	
+ }
+
     top_y = draw_height - messagefont.linespacing;
     bot_y = messagefont.linespacing;
 
@@ -1784,9 +1752,9 @@ if (newcode) {
 	}
 
 	i_2=(i<maxMessages)?i:(MAX_MSGS+i-maxMessages);
-	
+
 	len = (int)(charsPerSecond * (MSG_LIFE_TIME - msg->lifeTime));
-	
+
 	/* TODO: make sure this works! */
 	/* new message? */
 	len = MIN(msg->len, len);
