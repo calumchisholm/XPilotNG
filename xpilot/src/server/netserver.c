@@ -1355,8 +1355,8 @@ static int Handle_login(connection_t *connp, char *errmsg, size_t errsize)
 	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
-	Set_message("Player entered. Delaying 0 seconds until next %s.",
-		    (BIT(world->rules->mode, TIMING) ? "race" : "round"));
+	Set_message_f("Player entered. Delaying 0 seconds until next %s.",
+		      (BIT(world->rules->mode, TIMING) ? "race" : "round"));
     }
 
     /* kps - is this correct ? */

@@ -794,8 +794,8 @@ static void Update_players(world_t *world)
 	    pl->damaged = 0;
 
 	if (pl->flooding > FPS + 2) {
-	    Set_message("%s was kicked out because of flooding. "
-			"[*Server notice*]", pl->name);
+	    Set_message_f("%s was kicked out because of flooding. "
+			  "[*Server notice*]", pl->name);
 	    Destroy_connection(pl->conn, "flooding");
 	    i--;
 	    continue;
@@ -848,7 +848,7 @@ static void Update_players(world_t *world)
 		    Score(pl, -sc, pl->pos, "Self-Destruct");
 		}
 		SET_BIT(pl->status, KILLED);
-		Set_message("%s has committed suicide.", pl->name);
+		Set_message_f("%s has committed suicide.", pl->name);
 		Throw_items(pl);
 		Kill_player(pl, true);
 		updateScores = true;
@@ -1071,8 +1071,8 @@ void Update_objects(world_t *world)
 	    if (Player_is_human(pl)
 		&& options.maxPauseTime > 0
 		&& pl->pauseTime > options.maxPauseTime) {
-		Set_message("%s was auto-kicked for pausing too long. "
-			    "[*Server notice*]", pl->name);
+		Set_message_f("%s was auto-kicked for pausing too long. "
+			      "[*Server notice*]", pl->name);
 		Destroy_connection(pl->conn, "auto-kicked: paused too long");
 	    }
 	}
@@ -1085,8 +1085,8 @@ void Update_objects(world_t *world)
 		&& options.maxIdleTime > 0
 		&& pl->idleTime > options.maxIdleTime
 		&& (NumPlayers - NumRobots - NumPseudoPlayers) > 1) {
-		Set_message("%s was paused for idling. "
-			    "[*Server notice*]", pl->name);
+		Set_message_f("%s was paused for idling. "
+			      "[*Server notice*]", pl->name);
 		Pause_player(pl, true);
 	    }
 	}
@@ -1115,8 +1115,8 @@ void Update_objects(world_t *world)
 
 	Check_tag();
 	if (tagItPlayerId != oldtag && tagItPlayerId != NO_ID)
-	    Set_message(" < %s is 'it' now. >",
-			Player_by_id(tagItPlayerId)->name);
+	    Set_message_f(" < %s is 'it' now. >",
+			  Player_by_id(tagItPlayerId)->name);
     }
 
     /*

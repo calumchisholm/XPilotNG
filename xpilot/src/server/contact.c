@@ -160,12 +160,12 @@ static int do_kick(int team, int nonlast)
 	    && (!nonlast || !(pl_i->privs & PRIV_AUTOKICKLAST))) {
 
 	    if (team == TEAM_NOT_SET) {
-		Set_message("The paused \"%s\" was kicked because the "
-			    "game is full.", pl_i->name);
+		Set_message_f("The paused \"%s\" was kicked because the "
+			      "game is full.", pl_i->name);
 		Destroy_connection(pl_i->conn, "no pause with full game");
 	    } else {
-		Set_message("The paused \"%s\" was kicked because team %d "
-			    "is full.", pl_i->name, team);
+		Set_message_f("The paused \"%s\" was kicked because team %d "
+			      "is full.", pl_i->name, team);
 		Destroy_connection(pl_i->conn, "no pause with full team");
 	    }
 	    num_unpaused++;
@@ -425,7 +425,7 @@ void Contact(int fd, void *arg)
 	if (Packet_scanf(&ibuf, "%s", str) <= 0)
 	    status = E_INVAL;
 	else
-	    Set_message("%s [%s SPEAKING FROM ABOVE]", str, user_name);
+	    Set_message_f("%s [%s SPEAKING FROM ABOVE]", str, user_name);
 
 	Sockbuf_clear(&ibuf);
 	Packet_printf(&ibuf, "%u%c%c", my_magic, reply_to, status);
@@ -468,9 +468,9 @@ void Contact(int fd, void *arg)
 	if (Packet_scanf(&ibuf, "%d%s", &delay, ShutdownReason) <= 0)
 	    status = E_INVAL;
 	else {
-	    Set_message("|*******| %s (%s) |*******| \"%s\"",
-			(delay > 0) ? "SHUTTING DOWN" : "SHUTDOWN STOPPED",
-			user_name, ShutdownReason);
+	    Set_message_f("|*******| %s (%s) |*******| \"%s\"",
+			  (delay > 0) ? "SHUTTING DOWN" : "SHUTDOWN STOPPED",
+			  user_name, ShutdownReason);
 	    if (delay > 0) {
 		/* delay is in seconds */;
 		ShutdownServer = delay * FPS;
@@ -512,8 +512,8 @@ void Contact(int fd, void *arg)
 	    else {
 		player_t *pl_found = Players(found);
 
-		Set_message("\"%s\" upset the gods and was kicked out "
-			    "of the game.", pl_found->name);
+		Set_message_f("\"%s\" upset the gods and was kicked out "
+			      "of the game.", pl_found->name);
 		if (pl_found->conn == NULL)
 		    Delete_player(pl_found);
 		else
@@ -551,8 +551,8 @@ void Contact(int fd, void *arg)
 		    char value[MAX_CHARS];
 
 		    Get_option_value(opt, value, sizeof(value));
-		    Set_message(" < Option %s set to %s by %s FROM ABOVE. >",
-				opt, value, user_name);
+		    Set_message_f(" < Option %s set to %s by %s FROM ABOVE. >",
+				  opt, value, user_name);
 		}
 	    }
 	    else if (i == 0)

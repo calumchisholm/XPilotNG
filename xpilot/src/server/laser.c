@@ -72,11 +72,11 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	if (BIT(pl->used, HAS_SHIELD|HAS_LASER|HAS_SHOT)
 	    || BIT(pl->status, THRUSTING)) {
 	    if (kp)
-		Set_message("%s got paralysed by %s's stun laser.%s",
-			    pl->name, kp->name,
-			    pl->id == kp->id ? " How strange!" : "");
+		Set_message_f("%s got paralysed by %s's stun laser.%s",
+			      pl->name, kp->name,
+			      pl->id == kp->id ? " How strange!" : "");
 	    else
-		Set_message("%s got paralysed by a stun laser.", pl->name);
+		Set_message_f("%s got paralysed by a stun laser.", pl->name);
 
 	    CLR_BIT(pl->used,
 		    HAS_SHIELD|HAS_LASER|OBJ_SHOT);
@@ -94,9 +94,9 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 	    && !BIT(pl->have, HAS_ARMOR)) {
 	    SET_BIT(pl->status, KILLED);
 	    if (kp) {
-		Set_message("%s got roasted alive by %s's laser.%s",
-			    pl->name, kp->name,
-			    pl->id == kp->id ? " How strange!" : "");
+		Set_message_f("%s got roasted alive by %s's laser.%s",
+			      pl->name, kp->name,
+			      pl->id == kp->id ? " How strange!" : "");
 		if (pl->id == kp->id) {
 		    sc = Rate(0.0, kp->score)
 			* options.laserKillScoreMult
@@ -113,7 +113,7 @@ void Laser_pulse_hits_player(player_t *pl, pulseobject_t *pulse)
 		if (BIT(world->rules->mode, TEAM_PLAY)
 		    && pl->team != pulse->team)
 		    Team_score(world, pulse->team, sc);
-		Set_message("%s got roasted alive by cannonfire.", pl->name);
+		Set_message_f("%s got roasted alive by cannonfire.", pl->name);
 	    }
 	    sound_play_sensors(pl->pos, PLAYER_ROASTED_SOUND);
 	    if (kp && kp->id != pl->id) {

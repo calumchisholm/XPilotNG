@@ -86,8 +86,8 @@ void Ball_is_replaced(ballobject_t *ball)
     SET_BIT(ball->status, (NOEXPLOSION|RECREATE));
 
     Score(pl, 5.0, ball->pos, "Treasure: ");
-    Set_message(" < %s (team %d) has replaced the treasure >",
-		pl->name, pl->team);
+    Set_message_f(" < %s (team %d) has replaced the treasure >",
+		  pl->name, pl->team);
     Rank_saved_ball(pl);
 }
 
@@ -103,9 +103,9 @@ void Ball_is_destroyed(ballobject_t *ball)
     int frames = ticks / timeStep + .5;
     double seconds = ticks / options.gameSpeed;
 
-    Set_message(" < The ball was loose for %d frames / "
-		"%.2f ticks (best %.2f) / %.2fs >",
-		frames, ticks, Rank_get_best_ballrun(pl), seconds);
+    Set_message_f(" < The ball was loose for %d frames / "
+		  "%.2f ticks (best %.2f) / %.2fs >",
+		  frames, ticks, Rank_get_best_ballrun(pl), seconds);
     Rank_ballrun(pl, ticks);
 }
 
@@ -143,8 +143,8 @@ static int Punish_team(player_t *pl, treasure_t *td, clpos_t pos)
     }
 
     sound_play_all(DESTROY_BALL_SOUND);
-    Set_message(" < %s's (%d) team has destroyed team %d treasure >",
-		pl->name, pl->team, td->team);
+    Set_message_f(" < %s's (%d) team has destroyed team %d treasure >",
+		  pl->name, pl->team, td->team);
 
     if (!somebody_flag) {
 	Score(pl, Rate(pl->score, CANNON_SCORE)/2, pos, "Treasure:");

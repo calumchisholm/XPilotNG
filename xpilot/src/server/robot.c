@@ -671,9 +671,9 @@ static void Robot_talks(enum robot_talk_t says_what,
 
     i = next_msg % n;
     if (two == 2)
-	Set_message(msgsp[i], other_name, robot_name);
+	Set_message_f(msgsp[i], other_name, robot_name);
     else
-	Set_message(msgsp[i], robot_name);
+	Set_message_f(msgsp[i], robot_name);
 }
 
 
@@ -802,8 +802,8 @@ static void Robot_create(world_t *world)
 	    roundtime = options.maxRoundTime * FPS;
 	else
 	    roundtime = -1;
-	Set_message("Player entered. Delaying 0 seconds until next %s.",
-		    (BIT(world->rules->mode, TIMING) ? "race" : "round"));
+	Set_message_f("Player entered. Delaying 0 seconds until next %s.",
+		      (BIT(world->rules->mode, TIMING) ? "race" : "round"));
     }
 
     updateScores = true;
@@ -844,8 +844,8 @@ void Robot_delete(player_t *pl, bool kicked)
 
     if (pl) {
 	if (kicked)
-	    Set_message("%s upset the gods and was kicked out of the game.",
-			pl->name);
+	    Set_message_f("%s upset the gods and was kicked out of the game.",
+			  pl->name);
 	Delete_player(pl);
     }
 }
@@ -1002,17 +1002,17 @@ static int Robot_check_leave(player_t *pl)
 
 	if (options.robotLeaveLife > 0
 	    && pl->life >= options.robotLeaveLife) {
-	    Set_message("%s retired.", pl->name);
+	    Set_message_f("%s retired.", pl->name);
 	    leave = true;
 	}
 	else if (options.robotLeaveScore != 0
 		 && pl->score < options.robotLeaveScore) {
-	    Set_message("%s left out of disappointment.", pl->name);
+	    Set_message_f("%s left out of disappointment.", pl->name);
 	    leave = true;
 	}
 	else if (options.robotLeaveRatio != 0
 		 && pl->score / (pl->life + 1) < options.robotLeaveRatio) {
-	    Set_message("%s played too badly.", pl->name);
+	    Set_message_f("%s played too badly.", pl->name);
 	    leave = true;
 	}
 

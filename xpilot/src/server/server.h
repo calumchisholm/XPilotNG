@@ -887,8 +887,10 @@ void Meta_update(int change);
  * Prototypes for frame.c
  */
 void Frame_update(void);
-void Set_message(const char *format, ...);
-void Set_player_message(player_t *pl, const char *format, ...);
+void Set_message(const char *message);
+void Set_player_message(player_t *pl, const char *message);
+void Set_message_f(const char *format, ...);
+void Set_player_message_f(player_t *pl, const char *format, ...);
 
 /*
  * Prototypes for update.c
