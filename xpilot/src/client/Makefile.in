@@ -139,7 +139,7 @@ xpilot_SOURCES = \
 	paintmap.c paintobjects.c paintradar.c protoclient.h \
 	query.c \
 	record.c record.h recordfmt.h \
-	talk.c talk.h talkmacros.c textinterface.c texture.c texture.h \
+	talk.c talk.h talkmacros.c textinterface.c \
 	usleep.c \
 	welcome.c widget.c widget.h \
 	xevent.c xevent.h xeventhandlers.c xeventhandlers.h \
@@ -168,9 +168,9 @@ am_xpilot_OBJECTS = about.$(OBJEXT) bitmaps.$(OBJEXT) caudio.$(OBJEXT) \
 	painthud.$(OBJEXT) paintmap.$(OBJEXT) paintobjects.$(OBJEXT) \
 	paintradar.$(OBJEXT) query.$(OBJEXT) record.$(OBJEXT) \
 	talk.$(OBJEXT) talkmacros.$(OBJEXT) textinterface.$(OBJEXT) \
-	texture.$(OBJEXT) usleep.$(OBJEXT) welcome.$(OBJEXT) \
-	widget.$(OBJEXT) xevent.$(OBJEXT) xeventhandlers.$(OBJEXT) \
-	xinit.$(OBJEXT) xpaint.$(OBJEXT) xpilot.$(OBJEXT)
+	usleep.$(OBJEXT) welcome.$(OBJEXT) widget.$(OBJEXT) \
+	xevent.$(OBJEXT) xeventhandlers.$(OBJEXT) xinit.$(OBJEXT) \
+	xpaint.$(OBJEXT) xpilot.$(OBJEXT)
 xpilot_OBJECTS = $(am_xpilot_OBJECTS)
 xpilot_DEPENDENCIES = $(top_builddir)/src/common/libxpcommon.a
 xpilot_LDFLAGS =
@@ -194,11 +194,11 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/paintradar.Po ./$(DEPDIR)/query.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/record.Po ./$(DEPDIR)/talk.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/talkmacros.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/textinterface.Po ./$(DEPDIR)/texture.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/usleep.Po ./$(DEPDIR)/welcome.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/widget.Po ./$(DEPDIR)/xevent.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xeventhandlers.Po ./$(DEPDIR)/xinit.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xpaint.Po ./$(DEPDIR)/xpilot.Po
+@AMDEP_TRUE@	./$(DEPDIR)/textinterface.Po ./$(DEPDIR)/usleep.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/welcome.Po ./$(DEPDIR)/widget.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/xevent.Po ./$(DEPDIR)/xeventhandlers.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/xinit.Po ./$(DEPDIR)/xpaint.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/xpilot.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -287,7 +287,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/talk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/talkmacros.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/textinterface.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texture.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/usleep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/welcome.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget.Po@am__quote@

@@ -57,7 +57,6 @@
 #include "default.h"
 #include "paintdata.h"
 #include "record.h"
-#include "texture.h"
 #include "widget.h"
 #include "xevent.h"
 #include "xeventhandlers.h"

@@ -19,7 +19,7 @@ xpilot_SOURCES = \
 	paintmap.c paintobjects.c paintradar.c protoclient.h \
 	query.c \
 	record.c record.h recordfmt.h \
-	talk.c talk.h talkmacros.c textinterface.c texture.c texture.h \
+	talk.c talk.h talkmacros.c textinterface.c \
 	usleep.c \
 	welcome.c widget.c widget.h \
 	xevent.c xevent.h xeventhandlers.c xeventhandlers.h \

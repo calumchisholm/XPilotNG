@@ -218,7 +218,6 @@ extern char socklib_version[];
 extern char talk_version[];
 extern char talkmacros_version[];
 extern char textinterface_version[];
-extern char texture_version[];
 extern char welcome_version[];
 extern char widget_version[];
 extern char xevent_version[];
@@ -273,7 +272,6 @@ static void Check_client_versions(void)
 	{ "talk", talk_version },
 	{ "talkmacros", talkmacros_version },
 	{ "textinterface", textinterface_version },
-	{ "texture", texture_version },
 	{ "welcome", welcome_version },
 	{ "widget", widget_version },
 	{ "xevent", xevent_version },

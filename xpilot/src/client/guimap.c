@@ -97,30 +97,9 @@ void Gui_paint_walls(int x, int y, int type)
 
 void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y)
 {
-    static Pixmap wallTile = None;
-    static bool   wallTileTried = false;
-
     XPoint        points[5];
-    bool          texturing = false;
 
-
-    if (BIT(instruments, SHOW_TEXTURED_WALLS)) {
-	if (wallTile == None) {
-	    wallTile = Texture_wall();
-	    wallTileTried = true;
-	}
-	if (wallTile != None) {
-	    XSetTile(dpy, gameGC, wallTile);
-	    XSetTSOrigin(dpy, gameGC, -WINSCALE(realWorld.x),
-                         WINSCALE(realWorld.y));
-	    XSetFillStyle(dpy, gameGC, FillTiled);
-	    texturing = true;
-	} else {
-	    SET_FG(colors[wallColor].pixel);
-	}
-    } else {
-	SET_FG(colors[wallColor].pixel);
-    }
+    SET_FG(colors[wallColor].pixel);
 
     points[0].x = WINSCALE(X(bl));
     points[0].y = WINSCALE(Y(y));
@@ -131,11 +110,8 @@ void Gui_paint_filled_slice(int bl, int tl, int tr, int br, int y)
     points[3].x = WINSCALE(X(br));
     points[3].y = WINSCALE(Y(y));
     points[4] = points[0];
-    rd.fillPolygon(dpy, drawPixmap, gameGC,
-		   points, 5,
-		   Convex, CoordModeOrigin);
-
-    if (texturing) XSetFillStyle(dpy, gameGC, FillSolid);
+    rd.fillPolygon(dpy, drawPixmap, gameGC, points, 5, Convex,
+		   CoordModeOrigin);
 }
 
 
@@ -491,9 +467,6 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 			    fill_top_right = -1,
 			    fill_bottom_left = -1,
 			    fill_bottom_right = -1;
-    static int		    decorTileReady = 0;
-    static Pixmap	    decorTile = None;
-    int			    decorTileDoit = false;
     static unsigned char    decor[256];
     static int		    decorReady = 0;
 
@@ -509,20 +482,6 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 	decor[SETUP_DECOR_LU] = DECOR_UP | DECOR_LEFT | DECOR_OPEN;
 	decor[SETUP_DECOR_LD]
 	    = DECOR_LEFT | DECOR_DOWN | DECOR_CLOSED | DECOR_BELOW;
-    }
-
-    if (BIT(instruments, SHOW_TEXTURED_DECOR)) {
-	if (!decorTileReady) {
-	    decorTile = Texture_decor();
-	    decorTileReady = (decorTile == None) ? -1 : 1;
-	}
-	if (decorTileReady == 1) {
-	    decorTileDoit = true;
-	    XSetTile(dpy, gameGC, decorTile);
-	    XSetTSOrigin(dpy, gameGC,
-			 -WINSCALE(realWorld.x), WINSCALE(realWorld.y));
-	    XSetFillStyle(dpy, gameGC, FillTiled);
-	}
     }
 
     mask = decor[type];
@@ -647,8 +606,6 @@ void Gui_paint_decor(int x, int y, int xi, int yi, int type,
 	    fill_bottom_left = fill_bottom_right = -1;
 	}
     }
-    if (decorTileDoit && last)
-        XSetFillStyle(dpy, gameGC, FillSolid);
 }
 
 
