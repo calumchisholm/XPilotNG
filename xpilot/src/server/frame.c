@@ -791,7 +791,12 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	    Send_missile(conn, pos, len, shot->missile_dir);
 	    break;
 	case OBJ_BALL:
-	    Send_ball(conn, pos, shot->id);
+	    {
+		ballobject_t *ball = BALL_PTR(shot);
+
+		Send_ball(conn, pos, ball->id, ball->style);
+		break;
+	    }
 	    break;
 	case OBJ_MINE:
 	    {

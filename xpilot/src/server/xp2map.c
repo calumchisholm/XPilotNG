@@ -229,7 +229,8 @@ static void tagstart(void *data, const char *el, const char **attr)
 
     if (!strcasecmp(el, "Ball")) {
 	int team = TEAM_NOT_SET;
-	 clpos_t pos = DEFAULT_POS;
+	clpos_t pos = DEFAULT_POS;
+	int style = 0xff; /* default - client draws ball however it wants */
 
 	while (*attr) {
 	    if (!strcasecmp(*attr, "team"))
@@ -238,9 +239,11 @@ static void tagstart(void *data, const char *el, const char **attr)
 		pos.cx = atoi(*(attr + 1)) * scale;
 	    if (!strcasecmp(*attr, "y"))
 		pos.cy = atoi(*(attr + 1)) * scale;
+	    if (!strcasecmp(*attr, "style"))
+		style = P_get_poly_id(*(attr + 1));
 	    attr += 2;
 	}
-	World_place_treasure(world, pos, team, false);
+	World_place_treasure(world, pos, team, false, style);
 	return;
     }
 

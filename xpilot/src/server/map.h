@@ -190,6 +190,7 @@ typedef struct treasure {
     int		team;		/* team of this treasure */
     int 	destroyed;	/* how often this treasure destroyed */
     bool	empty;		/* true if this treasure never had a ball */
+    int		ball_style;	/* polystyle to use for color */
 } treasure_t;
 
 typedef struct target {

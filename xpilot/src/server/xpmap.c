@@ -530,7 +530,8 @@ static void Xpmap_place_treasure(world_t *world, blkpos_t blk, bool empty,
 {
     World_set_block(world, blk, TREASURE);
     if (create)
-	World_place_treasure(world, Xpmap_get_clpos(blk), TEAM_NOT_SET, empty);
+	World_place_treasure(world, Xpmap_get_clpos(blk), TEAM_NOT_SET, empty,
+			     0xff);
 }
 
 static void Xpmap_place_wormhole(world_t *world, blkpos_t blk, wormType type,

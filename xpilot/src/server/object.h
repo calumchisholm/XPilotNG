@@ -334,6 +334,7 @@ struct xp_ballobject {
 
     int 		owner;		/* Who's object is this ? */
     treasure_t		*treasure;	/* treasure for ball */
+    int 		style;		/* What polystyle to use */
 
 #ifdef __cplusplus
 			_ballobject() {}

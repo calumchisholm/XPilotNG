@@ -479,7 +479,8 @@ int World_place_check(world_t *world, clpos_t pos, int ind);
 int World_place_fuel(world_t *world, clpos_t pos, int team);
 int World_place_grav(world_t *world, clpos_t pos, double force, int type);
 int World_place_target(world_t *world, clpos_t pos, int team);
-int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty);
+int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty,
+			 int ball_style);
 int World_place_wormhole(world_t *world, clpos_t pos, wormType type);
 int World_place_item_concentrator(world_t *world, clpos_t pos);
 int World_place_asteroid_concentrator(world_t *world, clpos_t pos);

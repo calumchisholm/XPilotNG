@@ -318,6 +318,7 @@ void Make_treasure_ball(treasure_t *t)
     CLEAR_MODS(ball->mods);
     ball->status = RECREATE;
     ball->treasure = t;
+    ball->style = t->ball_style;
     Cell_add_object(OBJ_PTR(ball));
 
     t->have = true;

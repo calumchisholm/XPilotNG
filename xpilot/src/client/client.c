@@ -1817,13 +1817,14 @@ int Handle_missile(int x, int y, int len, int dir)
     return 0;
 }
 
-int Handle_ball(int x, int y, int id)
+int Handle_ball(int x, int y, int id, int style)
 {
     ball_t	t;
 
     t.x = x;
     t.y = y;
     t.id = id;
+    t.style = style;
     STORE(ball_t, ball_ptr, num_ball, max_ball, t);
     return 0;
 }

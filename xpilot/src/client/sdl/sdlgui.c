@@ -688,9 +688,14 @@ void Gui_paint_item_object(int type, int x, int y)
     glEnd();
 }
 
-void Gui_paint_ball(int x, int y)
+void Gui_paint_ball(int x, int y, int style)
 {
-    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0, ballColorRGBA);
+    int rgba = ballColorRGBA;
+
+    if (style >= 0 && style < num_polygon_styles)
+	rgba = (polygon_styles[style].rgb << 8) | 0xff;
+
+    Image_paint(IMG_BALL, x - BALL_RADIUS, y - BALL_RADIUS, 0, rgba);
 }
 
 void Gui_paint_ball_connector(int x_1, int y_1, int x_2, int y_2)

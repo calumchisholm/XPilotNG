@@ -68,7 +68,7 @@ int Send_wreckage(connection_t *connp, clpos_t pos, int wrtype, int size, int ro
 int Send_asteroid(connection_t *connp, clpos_t pos, int type, int size, int rot);
 int Send_fastshot(connection_t *connp, int type, unsigned char *p, unsigned n);
 int Send_missile(connection_t *connp, clpos_t pos, int len, int dir);
-int Send_ball(connection_t *connp, clpos_t pos, int id);
+int Send_ball(connection_t *connp, clpos_t pos, int id, int style);
 int Send_mine(connection_t *connp, clpos_t pos, int teammine, int id);
 int Send_target(connection_t *connp, int num, int dead_time, double damage);
 int Send_wormhole(connection_t *connp, clpos_t pos);
@@ -112,5 +112,6 @@ int Check_max_clients_per_IP(char *host_addr);
 #define F_SHOW_APPEARING	(1 << 8)
 #define F_SENDTEAM		F_SHOW_APPEARING
 #define F_CUMULATIVETURN	(1 << 9)
+#define F_BALLSTYLE		(1 << 10)
 
 #endif

@@ -91,7 +91,7 @@ static void Paint_items(void)
 
 static void Paint_balls(void)
 {
-    int		i, j, id, x, y, xs, ys;
+    int		i, j, id, style, x, y, xs, ys;
 
     if (num_ball > 0) {
 
@@ -99,9 +99,10 @@ static void Paint_balls(void)
 	    x = ball_ptr[i].x;
 	    y = ball_ptr[i].y;
 	    id = ball_ptr[i].id;
+	    style = ball_ptr[i].style;
 
 	    if (wrap(&x, &y)) {
-		Gui_paint_ball(x, y);
+		Gui_paint_ball(x, y, style);
 
 		if (id == -1)
 		    continue;

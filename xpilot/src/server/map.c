@@ -134,7 +134,8 @@ int World_place_base(world_t *world, clpos_t pos, int dir, int team)
     return ind;
 }
 
-int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty)
+int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty,
+			 int ball_style)
 {
     treasure_t t;
     int ind = world->NumTreasures;
@@ -144,6 +145,7 @@ int World_place_treasure(world_t *world, clpos_t pos, int team, bool empty)
     t.destroyed = 0;
     t.team = team;
     t.empty = empty;
+    t.ball_style = ball_style;
     if (team != TEAM_NOT_SET) {
 	world->teams[team].NumTreasures++;
 	world->teams[team].TreasuresLeft++;

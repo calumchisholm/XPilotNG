@@ -109,15 +109,29 @@ void Gui_paint_item_object(int type, int x, int y)
     Gui_paint_item(type, drawPixmap, gameGC, WINSCALE(X(x)), WINSCALE(Y(y)));
 }
 
-void Gui_paint_ball(int x, int y)
+void Gui_paint_ball(int x, int y, int style)
 {
+    unsigned long rgb = 0;
+
     x = X(x);
     y = Y(y);
 
-    if (!texturedObjects)
-	Arc_add(ballColor, x - BALL_RADIUS, y - BALL_RADIUS,
-		2 * BALL_RADIUS, 2 * BALL_RADIUS, 0, 64 * 360);
-    else
+    /*
+     * kps - currently style 0xff means no style.
+     * This code assumes num_polygon_styles < 256.
+     */
+    if (style >= 0 && style < num_polygon_styles)
+	rgb = polygon_styles[style].rgb;
+
+    if (!texturedObjects) {
+	/* hack */
+	if (rgb == 0)
+	    Arc_add(ballColor, x - BALL_RADIUS, y - BALL_RADIUS,
+		    2 * BALL_RADIUS, 2 * BALL_RADIUS, 0, 64 * 360);
+	else
+	    Arc_add_rgb(rgb, ballColor, x - BALL_RADIUS, y - BALL_RADIUS,
+			2 * BALL_RADIUS, 2 * BALL_RADIUS, 0, 64 * 360);
+    } else
 	Bitmap_paint(drawPixmap, BM_BALL, WINSCALE(x - BALL_RADIUS),
 		     WINSCALE(y - BALL_RADIUS), 0);
 }

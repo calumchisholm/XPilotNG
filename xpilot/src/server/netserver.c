@@ -174,6 +174,8 @@ static void Feature_init(connection_t *connp)
 	}
 	if (v >= 0x4F13)
 	    SET_BIT(features, F_CUMULATIVETURN);
+	if (v >= 0x4F14)
+	    SET_BIT(features, F_BALLSTYLE);
     }
     connp->features = features;
     return;
@@ -1992,10 +1994,15 @@ int Send_missile(connection_t *connp, clpos_t pos, int len, int dir)
 			 len, dir);
 }
 
-int Send_ball(connection_t *connp, clpos_t pos, int id)
+int Send_ball(connection_t *connp, clpos_t pos, int id, int style)
 {
-    return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_BALL,
-			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), id);
+    if (FEATURE(connp, F_BALLSTYLE))
+	return Packet_printf(&connp->w, "%c%hd%hd%hd%c", PKT_BALL,
+			     CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy),
+			     id, style);
+
+     return Packet_printf(&connp->w, "%c%hd%hd%hd", PKT_BALL,
+ 			 CLICK_TO_PIXEL(pos.cx), CLICK_TO_PIXEL(pos.cy), id);
 }
 
 int Send_mine(connection_t *connp, clpos_t pos, int teammine, int id)

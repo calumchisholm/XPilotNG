@@ -290,6 +290,7 @@ typedef struct {
 
 typedef struct {
     short		x, y, id;
+    u_byte		style;
 } ball_t;
 
 typedef struct {
@@ -732,7 +733,7 @@ int Handle_refuel(int x_0, int y_0, int x_1, int y_1);
 int Handle_connector(int x_0, int y_0, int x_1, int y_1, int tractor);
 int Handle_laser(int color, int x, int y, int len, int dir);
 int Handle_missile(int x, int y, int dir, int len);
-int Handle_ball(int x, int y, int id);
+int Handle_ball(int x, int y, int id, int style);
 int Handle_ship(int x, int y, int id, int dir, int shield, int cloak,
 		int eshield, int phased, int deflector);
 int Handle_mine(int x, int y, int teammine, int id);
