@@ -131,15 +131,14 @@ static bool Player_lock_allowed(player *pl, player *lock_pl)
     return false;
 }
 
-int Player_lock_closest(player *pl, int next)
+int Player_lock_closest(player *pl, bool next)
 {
     int i;
     DFLOAT dist = 0.0, best, l;
     player *lock_pl = NULL, *new_pl = NULL;
 
-    if (!next) {
+    if (!next)
 	CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
-    }
 
     if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
 	lock_pl = Player_by_id(pl->lock.pl_id);
@@ -154,9 +153,9 @@ int Player_lock_closest(player *pl, int next)
 	    || !Player_lock_allowed(pl, pl_i)
 	    || OWNS_TANK(pl, pl_i)
 	    || TEAM(pl, pl_i)
-	    || ALLIANCE(pl, pl_i)) {
+	    || ALLIANCE(pl, pl_i))
 	    continue;
-	}
+
 	l = Wrap_length(pl_i->pos.cx - pl->pos.cx,
 			pl_i->pos.cy - pl->pos.cy);
 	if (l >= dist && l < best) {
@@ -223,10 +222,10 @@ void Pause_player(player *pl, bool on)
 	    pl->idleCount = 0;
 	    CLR_BIT(pl->status, PAUSE);
 	    updateScores = true;
-	    if (BIT(World.rules->mode, LIMITED_LIVES)) {
+	    if (BIT(World.rules->mode, LIMITED_LIVES))
 		/* Its always too late */
 		toolate = true;
-	    }
+
 	    strcpy(pl->rank->entry.logout, "playing");
 	    if (toolate) {
 		pl->life = 0;
@@ -265,13 +264,12 @@ int Handle_keyboard(player *pl)
 	}
 	while (BITV_ISSET(pl->last_keyv, key)
 	       == BITV_ISSET(pl->prev_keyv, key)) {
-	    if (++key >= NUM_KEYS) {
+	    if (++key >= NUM_KEYS)
 		break;
-	    }
 	}
-	if (key >= NUM_KEYS) {
+	if (key >= NUM_KEYS)
 	    break;
-	}
+
 	pressed = BITV_ISSET(pl->last_keyv, key) != 0;
 	BITV_TOGGLE(pl->prev_keyv, key);
 	if (key != KEY_SHIELD)	/* would interfere with auto-idle-pause.. */
@@ -457,9 +455,8 @@ int Handle_keyboard(player *pl)
 		if (!BIT(pl->have, HAS_COMPASS))
 		    break;
 		TOGGLE_BIT(pl->used, HAS_COMPASS);
-		if (BIT(pl->used, HAS_COMPASS) == 0) {
+		if (BIT(pl->used, HAS_COMPASS) == 0)
 		    break;
-		}
 		/*
 		 * Verify if the lock has ever been initialized at all
 		 * and if the lock is still valid.
@@ -470,30 +467,27 @@ int Handle_keyboard(player *pl)
 		    && (i = GetInd(k)) > 0
 		    && i < NumPlayers
 		    && Players(i)->id == k
-		    && i != ind) {
+		    && i != ind)
 		    break;
-		}
-		Player_lock_closest(pl, 0);
+
+		Player_lock_closest(pl, false);
 		break;
 
 	    case KEY_LOCK_NEXT_CLOSE:
-		if (!Player_lock_closest(pl, 1)) {
-		    Player_lock_closest(pl, 0);
-		}
+		if (!Player_lock_closest(pl, true))
+		    Player_lock_closest(pl, false);
 		break;
 
 	    case KEY_LOCK_CLOSE:
-		Player_lock_closest(pl, 0);
+		Player_lock_closest(pl, false);
 		break;
 
 	    case KEY_CHANGE_HOME:
-		cx = pl->pos.cx;
-		cy = pl->pos.cy;
 		msg[0] = '\0';
 		for (i = 0; i < World.NumBases; i++) {
 		    base_t *base = Bases(i);
-		    dx = ABS(CENTER_XCLICK(base->pos.cx - cx));
-		    dy = ABS(CENTER_YCLICK(base->pos.cy - cy));
+		    dx = ABS(CENTER_XCLICK(base->pos.cx - pl->pos.cx));
+		    dy = ABS(CENTER_YCLICK(base->pos.cy - pl->pos.cy));
 		    if (dx < BLOCK_CLICKS / 2 && dy < BLOCK_CLICKS / 2) {
 			if (base == pl->home_base)
 			    break;
@@ -568,9 +562,8 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_FIRE_LASER:
-		if (pl->item[ITEM_LASER] > 0 && BIT(pl->used, HAS_SHIELD) == 0) {
+		if (pl->item[ITEM_LASER] > 0 && BIT(pl->used, HAS_SHIELD) == 0)
 		    SET_BIT(pl->used, HAS_LASER);
-		}
 		break;
 
 	    case KEY_TOGGLE_NUCLEAR:
@@ -590,15 +583,13 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_TOGGLE_CLUSTER:
-		if (BIT(World.rules->mode, ALLOW_CLUSTERS)) {
+		if (BIT(World.rules->mode, ALLOW_CLUSTERS))
 		    TOGGLE_BIT(pl->mods.warhead, CLUSTER);
-		}
 		break;
 
 	    case KEY_TOGGLE_IMPLOSION:
-		if (BIT(World.rules->mode, ALLOW_MODIFIERS)) {
+		if (BIT(World.rules->mode, ALLOW_MODIFIERS))
 		    TOGGLE_BIT(pl->mods.warhead, IMPLOSION);
-		}
 		break;
 
 	    case KEY_TOGGLE_VELOCITY:
@@ -665,9 +656,8 @@ int Handle_keyboard(player *pl)
 	    case KEY_LOAD_MODIFIERS_4: {
 		modifiers *m = &(pl->modbank[key - KEY_LOAD_MODIFIERS_1]);
 
-		if (BIT(pl->status, REPROGRAM)) {
+		if (BIT(pl->status, REPROGRAM))
 		    *m = pl->mods;
-		}
 		else {
 		    pl->mods = *m;
 		    filter_mods(&pl->mods);
@@ -682,9 +672,8 @@ int Handle_keyboard(player *pl)
 		int *l = &(pl->lockbank[key - KEY_LOAD_LOCK_1]);
 
 		if (BIT(pl->status, REPROGRAM)) {
-		    if (BIT(pl->lock.tagged, LOCK_PLAYER)) {
+		    if (BIT(pl->lock.tagged, LOCK_PLAYER))
 			*l = pl->lock.pl_id;
-		    }
 		} else {
 		    if (*l != -1
 			    && Player_lock_allowed(pl, Player_by_id(*l))) {
@@ -727,19 +716,17 @@ int Handle_keyboard(player *pl)
 	    case KEY_TURN_LEFT:
 	    case KEY_TURN_RIGHT:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(pl, 0);
+		    Autopilot(pl, false);
 		pl->turnacc = 0;
 #if 0
 		if (frame_loops % 50 == 0)
 		    Set_player_message(pl, "You should use the mouse to turn."
 				       " [*Server notice*]");
 #endif
-		if (BITV_ISSET(pl->last_keyv, KEY_TURN_LEFT)) {
+		if (BITV_ISSET(pl->last_keyv, KEY_TURN_LEFT))
 		    pl->turnacc += pl->turnspeed;
-		}
-		if (BITV_ISSET(pl->last_keyv, KEY_TURN_RIGHT)) {
+		if (BITV_ISSET(pl->last_keyv, KEY_TURN_RIGHT))
 		    pl->turnacc -= pl->turnspeed;
-		}
 		break;
 
 	    case KEY_SELF_DESTRUCT:
@@ -752,12 +739,10 @@ int Handle_keyboard(player *pl)
 		xi = OBJ_X_IN_BLOCKS(pl);
 		yi = OBJ_Y_IN_BLOCKS(pl);
 
-		if (BIT(pl->status, PAUSE)) {
+		if (BIT(pl->status, PAUSE))
 		    i = PAUSE;
-		}
-		else if (BIT(pl->status, HOVERPAUSE)) {
+		else if (BIT(pl->status, HOVERPAUSE))
 		    i = HOVERPAUSE;
-		}
 		else {
 		    cx = pl->home_base->pos.cx;
 		    cy = pl->home_base->pos.cy;
@@ -789,7 +774,7 @@ int Handle_keyboard(player *pl)
 			break;
 
 		    if (BIT(pl->used, HAS_AUTOPILOT))
-			Autopilot(pl, 0);
+			Autopilot(pl, false);
 
 		    Pause_player(pl, !BIT(pl->status, PAUSE));
 
@@ -834,11 +819,10 @@ int Handle_keyboard(player *pl)
 			if (BIT(pl->have, HAS_SHIELD))
 			    SET_BIT(pl->used, HAS_SHIELD);
 		    } else if (pl->count <= 0) {
-			Autopilot(pl, 0);
+			Autopilot(pl, false);
 			CLR_BIT(pl->status, HOVERPAUSE);
-			if (!BIT(pl->have, HAS_SHIELD)) {
+			if (!BIT(pl->have, HAS_SHIELD))
 			    CLR_BIT(pl->used, HAS_SHIELD);
-			}
 		    }
 		    break;
 		}
@@ -884,14 +868,13 @@ int Handle_keyboard(player *pl)
 
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(pl, 0);
+		    Autopilot(pl, false);
 		SET_BIT(pl->status, THRUSTING);
 		break;
 
 	    case KEY_CLOAK:
-		if (pl->item[ITEM_CLOAK] > 0) {
+		if (pl->item[ITEM_CLOAK] > 0)
 		    Cloak(pl, !BIT(pl->used, HAS_CLOAKING_DEVICE));
-		}
 		break;
 
 	    case KEY_ECM:
@@ -903,13 +886,13 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_DEFLECTOR:
-		if (pl->item[ITEM_DEFLECTOR] > 0) {
+		if (pl->item[ITEM_DEFLECTOR] > 0)
 		    Deflector(pl, !BIT(pl->used, HAS_DEFLECTOR));
-		}
 		break;
 
 	    case KEY_HYPERJUMP:
-		if (pl->item[ITEM_HYPERJUMP] > 0 && pl->fuel.sum > -ED_HYPERJUMP) {
+		if (pl->item[ITEM_HYPERJUMP] > 0
+		    && pl->fuel.sum > -ED_HYPERJUMP) {
 		    pl->item[ITEM_HYPERJUMP]--;
 		    Add_fuel(&(pl->fuel), ED_HYPERJUMP);
 		    do_hyperjump(pl);
@@ -917,22 +900,21 @@ int Handle_keyboard(player *pl)
 		break;
 
 	    case KEY_PHASING:
-		if (BIT(pl->have, HAS_PHASING_DEVICE)) {
+		if (BIT(pl->have, HAS_PHASING_DEVICE))
 		    Phasing(pl, !BIT(pl->used, HAS_PHASING_DEVICE));
-		}
 		break;
 
 	    case KEY_SELECT_ITEM:
 		for (i = 0; i < NUM_ITEMS; i++) {
-		    if (++pl->lose_item >= NUM_ITEMS) {
+		    if (++pl->lose_item >= NUM_ITEMS)
 			pl->lose_item = 0;
-		    }
-		    if (BIT(1U << pl->lose_item, ITEM_BIT_FUEL | ITEM_BIT_TANK)) {
+		    if (BIT(1U << pl->lose_item,
+			    ITEM_BIT_FUEL | ITEM_BIT_TANK))
 			/* can't lose fuel or tanks. */
 			continue;
-		    }
 		    if (pl->item[pl->lose_item] > 0) {
-			pl->lose_item_state = 2;	/* 2: key down; 1: key up */
+			/* 2: key down; 1: key up */
+			pl->lose_item_state = 2;
 			break;
 		    }
 		}
@@ -951,14 +933,12 @@ int Handle_keyboard(player *pl)
 	    case KEY_TURN_LEFT:
 	    case KEY_TURN_RIGHT:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(pl, 0);
+		    Autopilot(pl, false);
 		pl->turnacc = 0;
-		if (BITV_ISSET(pl->last_keyv, KEY_TURN_LEFT)) {
+		if (BITV_ISSET(pl->last_keyv, KEY_TURN_LEFT))
 		    pl->turnacc += pl->turnspeed;
-		}
-		if (BITV_ISSET(pl->last_keyv, KEY_TURN_RIGHT)) {
+		if (BITV_ISSET(pl->last_keyv, KEY_TURN_RIGHT))
 		    pl->turnacc -= pl->turnspeed;
-		}
 		break;
 
 	    case KEY_REFUEL:
@@ -1001,7 +981,7 @@ int Handle_keyboard(player *pl)
 
 	    case KEY_THRUST:
 		if (BIT(pl->used, HAS_AUTOPILOT))
-		    Autopilot(pl, 0);
+		    Autopilot(pl, false);
 		CLR_BIT(pl->status, THRUSTING);
 		break;
 

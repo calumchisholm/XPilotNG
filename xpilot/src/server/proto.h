@@ -93,7 +93,7 @@ void Object_crash(object *obj, struct move *move, int crashtype,
  */
 int Handle_keyboard(player *pl);
 void Pause_player(player *pl, bool on);
-int Player_lock_closest(player *pl, int next);
+int Player_lock_closest(player *pl, bool next);
 bool team_dead(int team);
 void filter_mods(modifiers *mods);
 

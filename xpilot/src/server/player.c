@@ -2002,7 +2002,7 @@ void Player_death_reset(player *pl, bool add_rank_death)
 		SET_BIT(pl->status, GAME_OVER);
 		if (pl->mychar != 'W')
 		    pl->mychar = 'D';
-		Player_lock_closest(pl, 0);
+		Player_lock_closest(pl, false);
 	    }
 	}
 	else
