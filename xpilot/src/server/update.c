@@ -842,7 +842,7 @@ static void Update_players(world_t *world)
         if (Player_is_alive(pl)
 	    && !BIT(pl->used, HAS_SHIELD)) {
 	    if (options.survivalScore != 0.0) {
-		pl->score += pl->survival_time*options.survivalScore/FPS;
+	        Player_add_score(pl, pl->survival_time*options.survivalScore/FPS);
 		updateScores = true;
 	    }
 	    pl->survival_time+= timePerFrame;
