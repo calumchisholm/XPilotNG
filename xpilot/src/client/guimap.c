@@ -336,7 +336,7 @@ void Gui_paint_base(int x, int y, int id, int team, int type)
 	for (i = 0; i < num_bases; i++) {
 	    if (bases[i].id == id &&
 		bases[i].deathtime > loops - baseWarningFrames) {
-		if ((loopsSlow % 2) == 1) {
+		if (loopsSlow & 1) {
 		    baseColor = WHITE;
 		    /*Paint_baseInfoOnHudRadar(x,y); */
 		} else
