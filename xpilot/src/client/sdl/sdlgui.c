@@ -1803,7 +1803,10 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 
 	if (num >= 0) {
 
-    	    Image_paint(IMG_ALL_ITEMS, horiz_pos - ITEM_SIZE, vert_pos, (u_byte)i, hudItemsColorRGBA | 0xffffff00);
+    	    Image_paint(IMG_HUD_ITEMS, 
+			horiz_pos - ITEM_SIZE, 
+			vert_pos, (u_byte)i, 
+			hudItemsColorRGBA);
 
 	    if (i == lose_item) {
 		if (lose_item_active != 0) {

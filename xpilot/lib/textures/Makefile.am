@@ -28,6 +28,7 @@ xpilottextures_DATA = \
 	fuelcell.ppm \
 	holder1.ppm \
 	holder2.ppm \
+	huditems.ppm \
 	logo.ppm \
 	metabtndown.png \
 	metabtnup.png \

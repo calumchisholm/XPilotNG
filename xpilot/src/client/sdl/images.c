@@ -207,8 +207,8 @@ int Images_init(void)
     DEF_IMG("holder1.ppm", 1);
     DEF_IMG("holder2.ppm", 1);
     DEF_IMG("ball_gray.ppm", 1);
-    DEF_IMG("ship_friend.ppm", 64); /* 128 does not work in some OpenGL implementations. */
-    DEF_IMG("ship_friend.ppm", 64); /* My guess is that the texture gets too wide (4096) */
+    DEF_IMG("ship_friend.ppm", 64); /* 128 fails in some OpenGL drivers */
+    DEF_IMG("ship_friend.ppm", 64); /* I guess texture gets too wide (4096) */
     DEF_IMG("ship_enemy.ppm", 64);
     DEF_IMG("bullet.ppm", -16);
     DEF_IMG("bullet_blue.ppm", -16);
@@ -241,6 +241,7 @@ int Images_init(void)
     DEF_IMG("missile.ppm", 32);
     DEF_IMG("asteroid.ppm", 1);
     DEF_IMG("target.ppm", 1);
+    DEF_IMG("huditems.ppm", -30);
 
     first_texture = num_images;
 
