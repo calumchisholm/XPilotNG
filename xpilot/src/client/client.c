@@ -2378,3 +2378,85 @@ void Client_exit(int status)
     Platform_specific_cleanup();
     exit(status);
 }
+
+#ifdef HAVE_XF86MISC
+#include <X11/Xlib.h>
+#include <X11/extensions/xf86misc.h>
+#endif
+
+void Disable_emulate3buttons(bool disable, Display *dpy)
+{
+#ifdef HAVE_XF86MISC
+/*#define XF86DEBUG*/
+    static bool orig_emulate;
+    static bool first_run = true;
+    static bool working = true;
+    bool wanted_emulate;
+        
+    if (!working) return;
+    
+    XF86MiscMouseSettings m;
+    Status status = XF86MiscGetMouseSettings(dpy, &m);
+    #ifdef XF86DEBUG
+	warn("--- 1st get ---");
+	warn("status          : %d", status);
+	warn("path to device  : %s", m.device);
+	warn("type            : %d", m.type);
+	warn("baudrate        : %d", m.baudrate);
+	warn("samplerate      : %d", m.samplerate);
+	warn("resolution      : %d", m.resolution);
+	warn("buttons         : %d", m.buttons);
+	warn("emulate3buttons : %d", m.emulate3buttons);
+	warn("emulate3timeout : %d", m.emulate3timeout);
+	warn("chordmiddle     : %d", m.chordmiddle);
+	warn("flags           : 0x%x", m.flags);
+    #endif
+
+    if (first_run && m.emulate3buttons) {
+	warn("*** Warning: Emulate3Buttons is enabled.");
+    }
+    
+    if (first_run) {
+	orig_emulate = m.emulate3buttons;
+    }
+    
+    if (disable) {
+        wanted_emulate = false;
+    } else {
+        wanted_emulate = orig_emulate;
+    }
+    
+    m.emulate3buttons = wanted_emulate;
+    status = XF86MiscSetMouseSettings(dpy, &m);
+
+    #ifdef XF86DEBUG
+	warn("--- set ---");
+	warn("wanted          : %d", wanted_emulate);
+	warn("status          : %d", status);
+    #endif
+    
+    XF86MiscGetMouseSettings(dpy, &m);
+    #ifdef XF86DEBUG
+	warn("--- 2nd get ---");
+	warn("status          : %d", status);
+	warn("path to device  : %s", m.device);
+	warn("type            : %d", m.type);
+	warn("baudrate        : %d", m.baudrate);
+	warn("samplerate      : %d", m.samplerate);
+	warn("resolution      : %d", m.resolution);
+	warn("buttons         : %d", m.buttons);
+	warn("emulate3buttons : %d", m.emulate3buttons);
+	warn("emulate3timeout : %d", m.emulate3timeout);
+	warn("chordmiddle     : %d", m.chordmiddle);
+	warn("flags           : 0x%x", m.flags);
+    #endif
+    
+    if (m.emulate3buttons != wanted_emulate) {
+	working = false;
+	warn("*** Warning: Failed to disable Emulate3Buttons.");
+    }
+    
+    first_run = false;
+    
+#endif
+}

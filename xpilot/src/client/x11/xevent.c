@@ -88,6 +88,7 @@ void Pointer_control_set_state(bool on)
 	XSelectInput(dpy, drawWindow, ButtonPressMask | ButtonReleaseMask);
 	XFlush(dpy);
     }
+    Disable_emulate3buttons(on, dpy);
 }
 
 void Talk_set_state(bool on)

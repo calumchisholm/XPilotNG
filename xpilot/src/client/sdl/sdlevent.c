@@ -71,6 +71,13 @@ bool Key_press_pointer_control(void)
 	SDL_WM_GrabInput(SDL_GRAB_OFF);
 	SDL_ShowCursor(SDL_ENABLE);
     }
+    
+#ifdef HAVE_XF86MISC
+    SDL_SysWMinfo info;
+    SDL_GetWMInfo(&info);
+    Disable_emulate3buttons(pointerControl, info.info.x11.display);
+#endif    
+    
     return false;	/* server doesn't need to know */
 }
 

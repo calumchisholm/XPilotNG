@@ -10,7 +10,7 @@ xpilot_ng_sdl_SOURCES = \
 	sdlevent.c sdlgui.c sdlinit.c sdlkeys.c sdlkeys.h sdlpaint.c \
 	sdlpaint.h sdlwindow.c sdlwindow.h text.c text.h todo.c \
 	sdlmeta.h sdlmeta.c sdlinit.h xpclient_sdl.h
-xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ @SOUND_LIBS@ @W32_LIBS@
+xpilot_ng_sdl_LDADD = $(top_builddir)/src/client/libxpclient.a  $(top_builddir)/src/common/libxpcommon.a @GL_LIBS@ @SDL_EXTRA_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTENSIONS_LIB@ @X_EXTRA_LIBS@ @SOUND_LIBS@ @W32_LIBS@
 
 if COND_SDL_GAMELOOP
   xpilot_ng_sdl_SOURCES += gameloop.c

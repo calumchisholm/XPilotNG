@@ -186,6 +186,23 @@ if test x$need_x = xyes; then
 	else
 		X_EXTENSIONS_LIB=
 	fi
+
+	AC_MSG_CHECKING(for xf86misc extensions)
+	AC_COMPILE_IFELSE([
+	 #include <X11/X.h>
+	 #include <X11/Xlib.h>
+	 #include <X11/extensions/xf86misc.h>
+	 int main(int argc, char** argv) { return 0; }
+	],[
+	have_xf86misc=yes
+	],[
+	have_xf86misc=no])
+	AC_MSG_RESULT($have_xf86misc)
+	
+	if test x$have_xf86misc = xyes; then
+		X_EXTENSIONS_LIB="$X_EXTENTIONS_LIB -lXxf86misc"
+		AC_DEFINE([HAVE_XF86MISC], 1, [Define to 1 if you have the Xf86Misc library])
+	fi
 	AC_SUBST(X_EXTENSIONS_LIB)
 fi
 
@@ -368,7 +385,6 @@ AC_CHECK_HEADERS([ \
 
 dnl 	X11/extensions/Xdbe.h
 dnl	X11/extensions/multibuf.h
-
 
 dnl  Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
