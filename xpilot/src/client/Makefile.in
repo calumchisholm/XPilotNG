@@ -120,7 +120,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = . items sdl
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -133,6 +133,8 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+COND_NO_SDL_FALSE = @COND_NO_SDL_FALSE@
+COND_NO_SDL_TRUE = @COND_NO_SDL_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -264,10 +266,16 @@ libxpclient_a_SOURCES = \
 
 #xpilot_CFLAGS = @X_CFLAGS@
 xpilot_LDADD = $(top_builddir)/src/common/libxpcommon.a @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ -lX11
+@COND_NO_SDL_FALSE@MAYBE_SDL = sdl
 #EXTRA_xpilot_SOURCES = rplayaudio.c debugaudio.c
+
+# From section Conditional subdirectories with AM_CONDITIONAL
+# in GNU automake manual.
+@COND_NO_SDL_TRUE@MAYBE_SDL = 
+
 # kps - . in SUBDIRS is needed to make sure libxpclient.a is compiled before
 # SDL client
-SUBDIRS = . items sdl
+SUBDIRS = . items $(MAYBE_SDL)
 all: all-recursive
 
 .SUFFIXES:
@@ -544,7 +552,7 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(SUBDIRS)'; for subdir in $$list; do \
+	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d "$(distdir)/$$subdir" \
 	    || mkdir "$(distdir)/$$subdir" \

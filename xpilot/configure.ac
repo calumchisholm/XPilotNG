@@ -13,7 +13,6 @@ AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(config.h)
 
-
 dnl  Copyright & stuff.
 AC_SUBST([XP_AUTHORS],["Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
 AC_SUBST([XP_COPYRIGHTDATE],["1991-2003"])
@@ -111,42 +110,53 @@ AM_PATH_SDL($SDL_VERSION,
 )
 CFLAGS="$CFLAGS $SDL_CFLAGS"
 
-dnl Check for OpenGL
-AC_MSG_CHECKING(for OpenGL support)
-have_opengl=no
-AC_TRY_COMPILE([
- #include <GL/gl.h>
- #include <GL/glu.h>
-],[
-],[
-have_opengl=yes
-])
-AC_MSG_RESULT($have_opengl)
-if test x$have_opengl = xyes; then
-    GL_LIBS="$SDL_LIBS $SYS_GL_LIBS"
-else
-    AC_MSG_WARN(Unable to find OpenGL headers and libraries)
+if test x$no_sdl = xyes; then
+    AC_MSG_WARN(SDL client will not be built.)
 fi
-AC_SUBST(GL_LIBS)
+AM_CONDITIONAL([COND_NO_SDL], [test "$no_sdl" = yes])
+
+dnl check for SDL_ttf and OpenGL only if SDL client is built.
+if test x$no_sdl != xyes; then
+
+	dnl kps - hack to check for SDL_ttf
+	AC_MSG_CHECKING(for SDL_ttf)
+	have_libsdl_ttf=no
+	AC_TRY_COMPILE([
+	 #include "SDL.h"
+	 #include "SDL/SDL_ttf.h"
+	],[
+	],[
+	have_libsdl_ttf=yes
+	])
+	AC_MSG_RESULT($have_libsdl_ttf)
+	if test x$have_libsdl_ttf = xyes; then
+	    SDL_EXTRA_LIBS="-lSDL_ttf"
+	else
+	    AC_MSG_ERROR(Unable to find SDL_ttf headers and libraries)
+	fi
+	AC_SUBST(SDL_EXTRA_LIBS)
 
 
-dnl kps - hack to check for libsdl-ttf
-AC_MSG_CHECKING(for libsdl-ttf)
-have_libsdl_ttf=no
-AC_TRY_COMPILE([
- #include "SDL.h"
- #include "SDL/SDL_ttf.h"
-],[
-],[
-have_libsdl_ttf=yes
-])
-AC_MSG_RESULT($have_libsdl_ttf)
-if test x$have_libsdl_ttf = xyes; then
-    SDL_EXTRA_LIBS="-lSDL_ttf"
-else
-    AC_MSG_WARN(Unable to find libsdl-ttf headers and libraries)
+	dnl Check for OpenGL
+	AC_MSG_CHECKING(for OpenGL support)
+	have_opengl=no
+	AC_TRY_COMPILE([
+	 #include <GL/gl.h>
+	 #include <GL/glu.h>
+	],[
+	],[
+	have_opengl=yes
+	])
+	AC_MSG_RESULT($have_opengl)
+	if test x$have_opengl = xyes; then
+	    GL_LIBS="$SDL_LIBS $SYS_GL_LIBS"
+	else
+	    AC_MSG_ERROR(Unable to find OpenGL headers and libraries)
+	fi
+	AC_SUBST(GL_LIBS)
 fi
-AC_SUBST(SDL_EXTRA_LIBS)
+
+
 
 
 
