@@ -142,19 +142,35 @@ int Check_view_dimensions(void)
 
 void setupPaint_stationary(void)
 {
+    if (paintSetupMode & STATIONARY_MODE) return;
+    paintSetupMode = STATIONARY_MODE;
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef((int)(-world.x * scale), (int)(-world.y * scale), 0);
     glScalef(scale, scale, scale);
 }
+
 void setupPaint_moving(void)
 {
+    if (paintSetupMode & MOVING_MODE) return;
+    paintSetupMode = MOVING_MODE;
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(-world.x * scale, -world.y * scale, 0);
     glScalef(scale, scale, scale);
 }
 
+void setupPaint_HUD(void)
+{
+    if (paintSetupMode & HUD_MODE) return;
+    paintSetupMode = HUD_MODE;
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, draw_width, draw_height, 0);
+}
 
 void Paint_frame(void)
 {
@@ -234,12 +250,7 @@ void Paint_frame(void)
 
     	glDisable(GL_BLEND);
 	
-	glMatrixMode(GL_MODELVIEW);/*do we need this?*/
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D(0, draw_width, draw_height, 0);
+	setupPaint_HUD();
 
     	Paint_meters();
     	Paint_HUD();

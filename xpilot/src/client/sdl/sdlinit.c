@@ -49,14 +49,14 @@ int Init_playing_windows(void)
     SDL_WM_SetCaption(TITLE, NULL);
     
     if (fontinit(&gamefont,testfont,16,16)) {
-    	error("fontinit failed with %s, reverting to default font %s\n",testfont,defaultfont);
+    	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
 	if (fontinit(&gamefont,defaultfont,16,16))
-	    error("Default font failed! gamefont not available!\n");
+	    error("Default font failed! gamefont not available!");
     }
     if (fontinit(&messagefont,testfont,16,16)) {
-    	error("fontinit failed with %s, reverting to default font %s\n",testfont,defaultfont);
+    	error("fontinit failed with %s, reverting to default font %s",testfont,defaultfont);
 	if (fontinit(&gamefont,defaultfont,16,16))
-	    error("Default font failed! messagefont not available!\n");
+	    error("Default font failed! messagefont not available!");
     }
         
     /*

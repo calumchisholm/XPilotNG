@@ -23,8 +23,14 @@ extern double           scale;              /* The opengl scale factor */
 /* code to set the viewport size */
 int Resize_Window( int width, int height );
 
+
+#define STATIONARY_MODE 1
+#define MOVING_MODE 	2
+#define HUD_MODE    	4
+int paintSetupMode;
 void setupPaint_stationary(void);
 void setupPaint_moving(void);
+void setupPaint_HUD(void);
 
 /* helper function in sdlgui.c, some may be removed soon */
 extern int GL_X(int x);

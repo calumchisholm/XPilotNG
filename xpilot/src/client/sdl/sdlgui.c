@@ -51,6 +51,9 @@ int msgScanPopColor   	    = 0x0000ff88;
 int hudSize 	    	= 250;
 static int meterWidth	= 60;
 static int meterHeight	= 10;
+double hudRadarScale = 2.0;
+float hudRadarMapScale;
+int hudRadarDotSize = 6;
 int meterBorderColor   	    = 0x0000ffff;
 int fuelMeterColor   	    = 0x0000ffff;
 int powerMeterColor   	    = 0x0000ffff;
@@ -80,6 +83,9 @@ int team7Color   	    = 0x00000000;
 int team8Color   	    = 0x00000000;
 int team9Color   	    = 0x00000000;
 
+int hudRadarEnemyColor	    = 0xff0000ff;
+int hudRadarOtherColor	    = 0x00ff00ff;
+
 
 /*static void set_color(int color)
 {
@@ -107,7 +113,7 @@ int GL_Y(int y) {
 void Segment_add(int color, int x_1, int y_1, int x_2, int y_2)
 {
     set_alphacolor(color);
-    glBegin( GL_LINE );
+    glBegin( GL_LINES );
     	glVertex2i(x_1,y_1);
 	glVertex2i(x_2,y_2);
     glEnd();
@@ -117,13 +123,12 @@ void Circle(int color,
 	    int x, int y,
 	    int radius)
 {
-    int resolution = 64;
-    float i;
+    float i,resolution = 64;
     set_alphacolor(color);
     glBegin( GL_LINE_LOOP );
     	/* Silly resolution */
-    	for (i = 0.0; i < resolution; i=i+TABLE_SIZE/resolution)
-    	    glVertex2i(x + tcos((int)i)*radius,y + tsin((int)i)*radius);
+    	for (i = 0.0f; i < TABLE_SIZE; i=i+((float)TABLE_SIZE)/resolution)
+    	    glVertex2f((int)(x + tcos((int)i)*radius),(int)(y + tsin((int)i)*radius));
     glEnd();
 }
 
@@ -225,6 +230,7 @@ void Gui_paint_border(int x, int y, int xi, int yi)
 
 void Gui_paint_visible_border(int x, int y, int xi, int yi)
 {
+    setupPaint_moving();
     set_alphacolor(hudColor);
     glBegin(GL_LINE_LOOP);
     	glVertex2i(x, y);
@@ -232,6 +238,7 @@ void Gui_paint_visible_border(int x, int y, int xi, int yi)
     	glVertex2i(xi, yi);
     	glVertex2i(xi, y);
     glEnd();
+    setupPaint_stationary();
 }
 
 void Gui_paint_hudradar_limit(int x, int y, int xi, int yi)
@@ -443,7 +450,7 @@ void Gui_paint_fastshot(int color, int x, int y)
     /* not sure why i need that 7 to make it right */
     /* that 2 seems to be the size/2 of the bullet */
     Image_paint(IMG_BULLET, 
-		x + world.x - 1, 
+		x + world.x - 2, 
 		world.y - 7 + ext_view_height - y, 
 		3);
 }
@@ -451,7 +458,7 @@ void Gui_paint_fastshot(int color, int x, int y)
 void Gui_paint_teamshot(int x, int y)
 {
     Image_paint(IMG_BULLET_OWN, 
-		x + world.x - 1, 
+		x + world.x - 2, 
 		world.y - 7 + ext_view_height - y, 
 		3);
 }
@@ -879,6 +886,43 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 
 static void Paint_hudradar(double hrscale, double xlimit, double ylimit, int sz)
 {
+    int i, x, y;
+    int hrw = hrscale * 256;
+    int hrh = hrscale * RadarHeight;
+    double xf = (double) hrw / (double) Setup->width;
+    double yf = (double) hrh / (double) Setup->height;
+
+    for (i = 0; i < num_radar; i++) {
+	x = radar_ptr[i].x * hrscale
+	    - (world.x + ext_view_width / 2) * xf;
+	y = radar_ptr[i].y * hrscale
+	    - (world.y + ext_view_height / 2) * yf;
+
+	if (x < -hrw / 2)
+	    x += hrw;
+	else if (x > hrw / 2)
+	    x -= hrw;
+
+	if (y < -hrh / 2)
+	    y += hrh;
+	else if (y > hrh / 2)
+	    y -= hrh;
+
+	if (!((x <= xlimit) && (x >= -xlimit)
+	      && (y <= ylimit) && (y >= -ylimit))) {
+
+ 	    x = x + draw_width / 2;
+ 	    y = -y + draw_height / 2;
+	    
+	    if (radar_ptr[i].type == normal) {
+		if (hudRadarEnemyColor)
+		    Circle(hudRadarEnemyColor, x, y, sz);
+	    } else {
+		if (hudRadarOtherColor)
+		    Circle(hudRadarOtherColor, x, y, sz);
+	    }
+	}
+    }
 }
 
 static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
@@ -895,7 +939,8 @@ void Paint_HUD(void)
     static char		autopilot[] = "Autopilot";
     int tempx,tempy,tempw,temph;
     fontbounds dummy;
-
+    hudRadarLimit = 0.050;
+    
     /*
      * Show speed pointer
      */
@@ -903,10 +948,10 @@ void Paint_HUD(void)
 	&& selfVisible
 	&& (FOOvel.x != 0 || FOOvel.y != 0))
 	Segment_add(hudColor,
-		    ext_view_width / 2,
-		    ext_view_height / 2,
-		    (int)(ext_view_width / 2 - ptr_move_fact * FOOvel.x),
-		    (int)(ext_view_height / 2 + ptr_move_fact * FOOvel.y));
+		    draw_width / 2,
+		    draw_height / 2,
+		    (int)(draw_width / 2 - ptr_move_fact * FOOvel.x),
+		    (int)(draw_height / 2 + ptr_move_fact * FOOvel.y));
 
     if (selfVisible && dirPtrColor) {
 	Segment_add(dirPtrColor,
@@ -920,24 +965,24 @@ void Paint_HUD(void)
     
     /* TODO */
     /* This should be done in a nicer way now (using radar.c maybe) */
-    /*
+    
     if (hudRadarEnemyColor || hudRadarOtherColor) {
 	hudRadarMapScale = (double) Setup->width / (double) 256;
 	Paint_hudradar(
 	    hudRadarScale,
-	    (int)(hudRadarLimit * (active_view_width / 2)
+	    (int)(hudRadarLimit * (ext_view_width / 2)
 		  * hudRadarScale / hudRadarMapScale),
-	    (int)(hudRadarLimit * (active_view_width / 2)
+	    (int)(hudRadarLimit * (ext_view_height / 2)
 		  * hudRadarScale / hudRadarMapScale),
 	    hudRadarDotSize);
 
-	if (BIT(instruments, MAP_RADAR))
-	    Paint_hudradar(hudRadarMapScale,
-			   active_view_width / 2,
-			   active_view_height / 2,
+	/*if (BIT(instruments, MAP_RADAR))*/
+	    Paint_hudradar(hudRadarMapScale*scale,
+    	    	    	   (active_view_width / 2)*scale,
+			   (active_view_height / 2)*scale,
 			   SHIP_SZ);
     }
-    */
+    
 
     /* message scan hack by mara*/
     if (BIT(instruments, BALL_MSG_SCAN)) {

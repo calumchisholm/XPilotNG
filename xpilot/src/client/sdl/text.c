@@ -16,7 +16,7 @@
 
 #define NUM_TEXTURES 2
 
-GLuint  texture[NUM_TEXTURES]; /* Storage For Our Font Texture             */
+/*GLuint  texture[NUM_TEXTURES]; *//* Storage For Our Font Texture             */
 int LoadBMP(font_data *ft_font, const char * fname);
 void pushScreenCoordinateMatrix(void);
 void pop_projection_matrix(void);
@@ -47,20 +47,16 @@ int LoadBMP(font_data *ft_font, const char * fname)
 	    Status = 1;
 
 	    /* Create The Texture */
-	    glGenTextures( NUM_TEXTURES, &texture[0] );
+	    glGenTextures( NUM_TEXTURES, ft_font->textures );
 
 	    /* Load in texture 1 */
 	    /* Typical Texture Generation Using Data From The Bitmap */
-	    glBindTexture( GL_TEXTURE_2D, texture[0] );
+	    glBindTexture( GL_TEXTURE_2D, *ft_font->textures );
 
 	    /* Generate The Texture */
-	    glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage->w,
-			  TextureImage->h, 0, GL_BGR,
+	    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, TextureImage->w,
+			  TextureImage->h, 0, GL_LUMINANCE_ALPHA,
 			  GL_UNSIGNED_BYTE, TextureImage->pixels );
-	    
-	    /* Nearest Filtering */
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         }
 
     /* Free up any memory we may have used */
@@ -296,11 +292,12 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int w/*this is mos
     if(!LoadBMP(ft_font,fname))
     	return 1;
     
+    ft_font->textures = (GLuint *) malloc(128 * sizeof(GLuint));
     /* Creating 256 Display List */
     ft_font->list_base  = glGenLists( 128 );
     ft_font->char_width = (GLuint *) malloc(128 * sizeof(GLuint));
     /* Select Our Font Texture */
-    glBindTexture( GL_TEXTURE_2D, texture[0] );
+    glBindTexture( GL_TEXTURE_2D, *ft_font->textures );
 
     /* Loop Through All 256 Lists */
     for ( loop = 0; loop < 128; loop++ )
@@ -332,7 +329,7 @@ int fontinit(font_data *ft_font, const char * fname, unsigned int w/*this is mos
 	    cy = 1 - ( float )( loop / 16 ) / 16.0f;
 
             /* Start Building A List */
-	    glNewList( ft_font->list_base + ( 255 - loop ), GL_COMPILE );
+	    glNewList( ft_font->list_base + ( 128 - loop ), GL_COMPILE );
 	      /* Use A Quad For Each Character */
 	      glBegin( GL_QUADS );
 	        /* Texture Coord (Bottom Left) */
