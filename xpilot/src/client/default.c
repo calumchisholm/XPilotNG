@@ -581,7 +581,7 @@ option options[] = {
     {
 	"charsPerSecond",
 	NULL,
-	"50",
+	"100",
 	KEY_DUMMY,
 	"Speed in which messages appear on screen in characters per second.\n",
 	0
@@ -1453,7 +1453,7 @@ option options[] = {
     {
 	"baseWarningType",
 	NULL,
-	"2",
+	"3",
 	KEY_DUMMY,
 	"Which type of base warning you prefer.\n"
 	"A value of 0 disables base warning.\n"
