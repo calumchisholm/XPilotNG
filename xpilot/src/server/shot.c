@@ -164,7 +164,7 @@ void Place_general_mine(world_t *world, int id, int team, int status,
 		if (pl_i->home_base == NULL)
 		    continue;
 		if (pl_i->id != pl->id
-		    && !Team_immune(pl_i->id, pl->id)
+		    && !Team_immune(world, pl_i->id, pl->id)
 		    && !Player_is_tank(pl_i)) {
 		    if (Wrap_length(pos.cx - pl_i->home_base->pos.cx,
 				    pos.cy - pl_i->home_base->pos.cy)

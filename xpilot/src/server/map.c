@@ -121,6 +121,7 @@ int World_place_cannon(world_t *world, clpos_t pos, int dir, int team)
     t.group = NO_GROUP;
     t.score = CANNON_SCORE;
     t.id = ind + MIN_CANNON_ID;
+    assert(Is_cannon_id(t.id));
     if (t.id > MAX_CANNON_ID) {
 	warn("The server supports only %d cannons per map.", NUM_CANNON_IDS);
 	exit(1);

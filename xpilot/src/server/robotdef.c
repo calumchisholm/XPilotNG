@@ -1699,7 +1699,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 	}
 
 	/* Any shot of team members excluding self are passive. */
-	if (Team_immune(shot->id, pl->id))
+	if (Team_immune(world, shot->id, pl->id))
 	    continue;
 
 	/* Self shots may be passive too... */
@@ -1973,7 +1973,7 @@ static void Robot_default_play(player_t *pl)
 	    ship = Player_by_index(j);
 	    if (j == GetInd(pl->id)
 		|| !Player_is_active(ship)
-		|| Team_immune(pl->id, ship->id))
+		|| Team_immune(world, pl->id, ship->id))
 		continue;
 
 	    if (!Detect_ship(pl, ship))
@@ -2046,7 +2046,7 @@ static void Robot_default_play(player_t *pl)
 		&& !BIT(world->rules->mode, TIMING))
 	    || (BIT(world->rules->mode, TIMING)
 		&& (delta_dir < 3 * RES / 4 || delta_dir > RES / 4))
-	    || Team_immune(pl->id, ship->id)) {
+	    || Team_immune(world, pl->id, ship->id)) {
 	    /* unset the player lock */
 	    CLR_BIT(pl->lock.tagged, LOCK_PLAYER);
 	    pl->lock.pl_id = 1;

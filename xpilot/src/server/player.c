@@ -489,6 +489,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
 
     pl->id		= peek_ID();
     GetIndArray[pl->id]	= ind;
+    assert(Is_player_id(pl->id));
 
     for (i = 0; i < MAX_RECORDED_SHOVES; i++)
 	pl->shove_record[i].pusher_id = NO_ID;
@@ -1569,7 +1570,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
 }
 
 /* determines if two players are immune to eachother */
-bool Team_immune(int id1, int id2)
+bool Team_immune(world_t *world, int id1, int id2)
 {
     player_t *pl1, *pl2;
 

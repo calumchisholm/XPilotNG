@@ -536,6 +536,20 @@ static inline bool Player_is_active(player_t *pl)
     return false;
 }
 
+/* kps - add id.h ? */
+static inline bool Is_player_id(int id)
+{
+    if (id >= 0 && id < NUM_IDS)
+	return true;
+    return false;
+}
+
+static inline bool Is_cannon_id(int id)
+{
+    if (id >= MIN_CANNON_ID && id <= MAX_CANNON_ID)
+	return true;
+    return false;
+}
 
 /*
  * Prototypes for player.c
@@ -565,7 +579,7 @@ void Player_death_reset(player_t *pl, bool add_rank_death);
 void Count_rounds(void);
 void Team_game_over(world_t *world, int winning_team, const char *reason);
 void Individual_game_over(world_t *world, int winner);
-bool Team_immune(int id1, int id2);
+bool Team_immune(world_t *world, int id1, int id2);
 
 static inline void Player_set_float_dir(player_t *pl, double new_float_dir)
 {

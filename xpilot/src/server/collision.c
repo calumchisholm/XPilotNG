@@ -237,7 +237,7 @@ static void PlayerCollision(world_t *world)
 		 * The choosing of the first line may not be easy however.
 		 */
 
-		if (Team_immune(pl->id, pl_j->id) || PSEUDO_TEAM(pl, pl_j))
+		if (Team_immune(world, pl->id, pl_j->id) || PSEUDO_TEAM(pl, pl_j))
 		    continue;
 
 		sound_play_sensors(pl->pos, PLAYER_HIT_PLAYER_SOUND);
@@ -566,7 +566,7 @@ static void PlayerObjectCollision(player_t *pl)
 		       Player_is_tank(pl) &&
 		       (pl->lock.pl_id == obj->id))
 		continue;
-	    else if (Team_immune(obj->id, pl->id))
+	    else if (Team_immune(world, obj->id, pl->id))
 		continue;
 	    else if (Player_is_paused(Player_by_id(obj->id)))
 		continue;

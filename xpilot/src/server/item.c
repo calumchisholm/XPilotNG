@@ -535,7 +535,7 @@ void Do_deflector(player_t *pl)
 		|| options.selfImmunity)
 		continue;
 	} else {
-	    if (Team_immune(obj->id, pl->id))
+	    if (Team_immune(pl->world, obj->id, pl->id))
 		continue;
 	}
 
@@ -592,7 +592,7 @@ void Do_transporter(player_t *pl)
 
 	if (pl_i == pl
 	    || !Player_is_active(pl_i)
-	    || Team_immune(pl->id, pl_i->id)
+	    || Team_immune(pl->world, pl->id, pl_i->id)
 	    || Player_is_tank(pl_i)
 	    || BIT(pl_i->used, HAS_PHASING_DEVICE))
 	    continue;
@@ -971,7 +971,7 @@ void Fire_general_ecm(world_t *world, int id, int team, clpos_t pos)
 		    if (smart->smart_lock_id != owner_pl->id)
 			continue;
 		}
-	    } else if ((pl && Team_immune(pl->id, owner_pl->id))
+	    } else if ((pl && Team_immune(world, pl->id, owner_pl->id))
 		       || (BIT(world->rules->mode, TEAM_PLAY)
 			   && team == shot->team))
 		continue;

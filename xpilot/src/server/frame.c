@@ -740,7 +740,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 
 	case OBJ_SHOT:
 	case OBJ_CANNON_SHOT:
-	    if (Team_immune(shot->id, pl->id)
+	    if (Team_immune(world, shot->id, pl->id)
 		|| (shot->id != NO_ID
 		    && Player_is_paused(Player_by_id(shot->id)))
 		|| (shot->id == NO_ID
@@ -808,7 +808,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		    && Player_is_paused(Player_by_id(mine->id))) {
 		    laid_by_team = 1;
 		} else {
-		    laid_by_team = (Team_immune(mine->id, pl->id)
+		    laid_by_team = (Team_immune(world, mine->id, pl->id)
 				    || (BIT(mine->obj_status, OWNERIMMUNE)
 					&& mine->mine_owner == pl->id));
 		    if (confused) {
@@ -836,7 +836,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 	    {
 		pulseobject_t *pulse = PULSE_PTR(shot);
 
-		if (Team_immune(pulse->id, pl->id))
+		if (Team_immune(world, pulse->id, pl->id))
 		    color = BLUE;
 		else if (pulse->id == pl->id && options.selfImmunity)
 		    color = BLUE;
