@@ -113,7 +113,7 @@ typedef struct {
 
 /* XXX need comment about purpose of this structure. */
 typedef struct {
-    char		*filename;
+    const char		*filename;
     int			count;
     int			width, height;
 
