@@ -27,6 +27,10 @@
 #include "text.h"
 #include "glwidgets.h"
 
+#ifdef HAVE_SDL_IMAGE
+#include "SDL_image.h"
+#endif
+
 #define SELECTED_BG 0x009000ff
 #define ROW_FG 0xffff00ff
 #define ROW_BG1 0x0000a0ff
@@ -46,8 +50,8 @@
 #define ROW_HEIGHT 20
 #define VERSION_WIDTH 100
 #define COUNT_WIDTH 20
-#define META_WIDTH 800
-#define META_HEIGHT (30 * ROW_HEIGHT + 3*10 + 30)
+#define META_WIDTH 837
+#define META_HEIGHT 768
 
 #define METAWIDGET        100
 #define METATABLEWIDGET   101
@@ -59,9 +63,11 @@
 static int status_column_widths[] = { 100, 0, 100, 70 };
 
 typedef struct {
-    GLWidget *table;
-    GLWidget *status;
-    GLWidget *players;
+    GLWidget   *table;
+    GLWidget   *status;
+    GLWidget   *players;
+    GLuint     texture;
+    texcoord_t txc;
 } MetaWidget;
 
 typedef struct {
@@ -70,6 +76,7 @@ typedef struct {
     GLWidget	          *scrollbar;
     GLWidget              *header;
     struct _MetaRowWidget *selected;
+    struct _MetaRowWidget *first_row;
 } MetaTableWidget;
 
 typedef struct _MetaRowWidget {
@@ -145,7 +152,7 @@ static void SetBounds_PlayerListWidget(GLWidget *widget, SDL_Rect *b)
 
     widget->bounds = *b;
     info = (PlayerListWidget*)widget->wid_info;
-    list_height = List_size(info->players) * ROW_HEIGHT;
+    list_height = List_size(info->players) * ROW_HEIGHT + ROW_HEIGHT;
 
     if (info->scrollbar != NULL) {
 	DelGLWidgetListItem(&(widget->children), info->scrollbar);
@@ -435,9 +442,9 @@ static void SelectRow_MetaWidget(GLWidget *widget, MetaRowWidget *row)
 	Close_Widget(&(meta->status));
 	meta->status = NULL;
     }
-    status_bounds.x = widget->bounds.x;
-    status_bounds.y = widget->bounds.y + meta->table->bounds.h + 10;
-    status_bounds.w = widget->bounds.w * 3 / 5;
+    status_bounds.x = widget->bounds.x + 21;
+    status_bounds.y = widget->bounds.y + 594;
+    status_bounds.w = 794 * 3 / 5;
     status_bounds.h = ROW_HEIGHT * STATUS_ROWS;
     if ((meta->status = Init_StatusWidget(row->sip))) {
 	SetBounds_GLWidget(meta->status, &status_bounds);
@@ -450,10 +457,10 @@ static void SelectRow_MetaWidget(GLWidget *widget, MetaRowWidget *row)
 	Close_Widget(&(meta->players));
 	meta->players = NULL;
     }
-    plist_bounds.x = status_bounds.x + status_bounds.w + 5;
+    plist_bounds.x = status_bounds.x + status_bounds.w;
     plist_bounds.y = status_bounds.y;
     plist_bounds.h = status_bounds.h;
-    plist_bounds.w = widget->bounds.w - status_bounds.w - 5;
+    plist_bounds.w = 794 - status_bounds.w;
     if ((meta->players = Init_PlayerListWidget(row->sip))) {
 	SetBounds_GLWidget(meta->players, &plist_bounds);
 	AppendGLWidgetList(&(widget->children), meta->players);
@@ -765,6 +772,7 @@ static GLWidget *Init_MetaTableWidget(GLWidget *meta, list_t servers)
     info->scrollbar     = NULL;
     info->header        = NULL;
     info->selected      = NULL;
+    info->first_row     = NULL;
 
     tmp->wid_info       = info;
     tmp->WIDGET     	= METATABLEWIDGET;
@@ -776,6 +784,8 @@ static GLWidget *Init_MetaTableWidget(GLWidget *meta, list_t servers)
 	sip = SI_DATA(iter);
 	row = Init_MetaRowWidget(sip, info, false, bg ? ROW_BG1 : ROW_BG2);
 	if (!row) break;
+	if (info->first_row == NULL) 
+	    info->first_row = (MetaRowWidget*)row->wid_info;
 	AppendGLWidgetList(&(tmp->children), row);
 	bg = !bg;
     }
@@ -788,11 +798,43 @@ static GLWidget *Init_MetaTableWidget(GLWidget *meta, list_t servers)
     return tmp;
 }
 
+static void Paint_MetaWidget(GLWidget *widget)
+{
+    MetaWidget *info;
+    
+    if (widget->WIDGET != METAWIDGET) {
+	error("expected METAWIDGET got [%d]", widget->WIDGET);
+	return;
+    }
+    info = (MetaWidget*)widget->wid_info;
+    if (info->texture == 0) return;
+    
+    SDL_Rect *b = &(widget->bounds);
+    glColor4ub(255, 255, 255, 255);
+    glBindTexture(GL_TEXTURE_2D, info->texture);
+    glEnable(GL_TEXTURE_2D);
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(info->txc.MinX, info->txc.MinY); 
+    glVertex2i(b->x, b->y);
+    glTexCoord2f(info->txc.MaxX, info->txc.MinY); 
+    glVertex2i(b->x + b->w , b->y);
+    glTexCoord2f(info->txc.MaxX, info->txc.MaxY); 
+    glVertex2i(b->x + b->w , b->y + b->h);
+    glTexCoord2f(info->txc.MinY, info->txc.MaxY); 
+    glVertex2i(b->x, b->y + b->h);
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+}
+
 static GLWidget *Init_MetaWidget(list_t servers)
 {
     GLWidget *tmp;
     MetaWidget *info;
+    MetaTableWidget *table;
     SDL_Rect table_bounds;
+    SDL_Surface *surface;
 
     if (!(tmp = Init_EmptyBaseGLWidget())) {
         error("Widget init failed");
@@ -806,23 +848,37 @@ static GLWidget *Init_MetaWidget(list_t servers)
     info->table         = NULL;
     info->status        = NULL;
     info->players       = NULL;
+    info->texture       = 0;
     tmp->WIDGET     	= METAWIDGET;
     tmp->bounds.x   	= (draw_width - META_WIDTH) / 2;
     tmp->bounds.y   	= (draw_height - META_HEIGHT) / 2;
     tmp->bounds.w       = META_WIDTH;
     tmp->bounds.h       = META_HEIGHT;
     tmp->wid_info       = info;
+    tmp->Draw           = Paint_MetaWidget;
 
     if (!(info->table = Init_MetaTableWidget(tmp, servers))) {
 	free(tmp);
 	return NULL;
     }
-    table_bounds.x = tmp->bounds.x;
-    table_bounds.y = tmp->bounds.y;
-    table_bounds.w = tmp->bounds.w;
-    table_bounds.h = tmp->bounds.h - (10 + ROW_HEIGHT * STATUS_ROWS);
+    table = (MetaTableWidget*)info->table->wid_info;
+    table_bounds.x = tmp->bounds.x + 20;
+    table_bounds.y = tmp->bounds.y + 64;
+    table_bounds.w = 796;
+    table_bounds.h = 514;
     SetBounds_GLWidget(info->table, &table_bounds);
     AppendGLWidgetList(&(tmp->children), info->table);
+
+#ifdef HAVE_SDL_IMAGE
+    surface = IMG_Load(CONF_TEXTUREDIR "sdlmetabg.png");
+    if (surface) {
+	info->texture = SDL_GL_LoadTexture(surface, &(info->txc));
+	SDL_FreeSurface(surface);
+    }
+#endif
+
+    if (table->first_row != NULL)
+	SelectRow_MetaWidget(tmp, table->first_row);
 
     return tmp;
 }
