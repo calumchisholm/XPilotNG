@@ -1617,8 +1617,8 @@ static void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 {
     const int		BORDER = 3;
     char		str[50];
-    int			vert_pos, horiz_pos, minx, miny, maxx, maxy;
-    int			i, maxWidth = -1,
+    int     	    	vert_pos, horiz_pos, minx, miny, maxx, maxy;
+    int     	    	i, maxWidth = -1,
 			rect_x, rect_y, rect_width = 0, rect_height = 0;
     static int		vertSpacing = -1;
     static fontbounds	fb;
