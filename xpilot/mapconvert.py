@@ -144,17 +144,21 @@ def dist2(x1, y1, x2, y2, width, height):
 
 # Only for polygons converted from blocks and going in the right direction.
 def inside(x, y, poly, width, height):
-    lastdir = 0
+    lastdir = poly[-1][2]
+    mindir1 = None
     mindist = width
-    mindir = -1
-    count = 0
     for p in poly:
 	if p[1] == y and (p[0] - x) % width < mindist:
-	    mindir = lastdir
+	    mindir1 = lastdir
+	    mindir2 = p[2]
 	    mindist = (p[0] - x) % width
-	lastdir = p[2][1] or lastdir
-    mindir = mindir or lastdir
-    return mindir > 0
+	lastdir = p[2]
+    if not mindir1:
+	return 0
+    elif mindir1[0] + mindir2[0] <= 0:
+	return mindir2[1] > 0
+    else:
+	return mindir1[1] > 0
 
 def closestteam(loc, bases):
     maxd = 30000 * 30000
