@@ -58,14 +58,26 @@ SDL_Event *CON_Events(SDL_Event * event)
     if (event->type == SDL_KEYDOWN) {
 	if (event->key.keysym.mod & KMOD_CTRL) {
 	    /* CTRL pressed */
+	    /* kps - please modify this to work like in talk.c */
 	    switch (event->key.keysym.sym) {
 	    case SDLK_a:
 		Cursor_Home(Topmost);
 		break;
+	    case SDLK_b:
+		Cursor_Left(Topmost);
+		break;
+	    case SDLK_f:
+		Cursor_Right(Topmost);
+		break;
 	    case SDLK_e:
 		Cursor_End(Topmost);
 		break;
-	    case SDLK_c:
+		/*
+		 * kps - Ctrl-k should really just clear from current
+		 * cursor position to end of line.
+		 */
+	    case SDLK_k:
+	    case SDLK_u:
 		Clear_Command(Topmost);
 		break;
 	    case SDLK_l:
