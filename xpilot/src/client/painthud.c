@@ -322,7 +322,11 @@ static void Paint_lock(int hud_pos_x, int hud_pos_y)
 	return;
 
     if (hudColor) {
-	SET_FG(colors[hudColor].pixel);
+	int color = Life_color(target);
+
+	if (!color)
+	    color = hudColor;
+	SET_FG(colors[color].pixel);
 
 	FIND_NAME_WIDTH(target);
 	rd.drawString(dpy, p_draw, gc,
