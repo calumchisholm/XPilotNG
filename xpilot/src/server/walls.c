@@ -1702,7 +1702,7 @@ static void Distance_init(void)
 	    k = bx + mapx * by;
 	    blockline[k].distance = dis[base + 0] - B_CLICKS / 2;
 	    blockline[k].lines = lptr;
-	    for (j = 1; j < 30 && lineno[base + j] != 65535; j++)
+	    for (j = 1; j < LINSIZE && lineno[base + j] != 65535; j++)
 		*lptr++ = lineno[base + j];
 	    *lptr++ = 65535;
 	}
