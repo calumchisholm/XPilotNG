@@ -1,3 +1,3 @@
-SUBDIRS = maps textures
+SUBDIRS = fonts maps textures
 pkglib_DATA = defaults password robots sounds
 EXTRA_DIST = $(pkglib_DATA)

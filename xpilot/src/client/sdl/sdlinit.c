@@ -26,8 +26,8 @@ SDL_Surface  *MainSDLSurface = NULL;
 
 int Init_playing_windows(void)
 {
-    char defaultfont[] = "defaultfont.bmp"; /* TODO make bmp fonts work */
-    char testfont[] = "Test.ttf";
+    char defaultfont[] = CONF_FONTDIR "defaultfont.bmp"; /* TODO make bmp fonts work */
+    char testfont[] = CONF_FONTDIR "Test.ttf";
     int gamefontsize = 12;
     int messagefontsize = 16;
     int mapfontsize = 12;

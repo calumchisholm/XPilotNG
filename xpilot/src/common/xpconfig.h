@@ -52,6 +52,10 @@
 #  define CONF_SOUNDDIR			CONF_LIBDIR "sound/"
 #endif
 
+#ifndef CONF_FONTDIR
+#  define CONF_FONTDIR			CONF_LIBDIR "fonts/"
+#endif
+
 #ifndef _WINDOWS
 #  ifndef CONF_DEFAULTS_FILE_NAME
 #    define CONF_DEFAULTS_FILE_NAME	CONF_LIBDIR "defaults"

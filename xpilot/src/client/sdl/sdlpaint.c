@@ -46,7 +46,7 @@ double	        hudRadarLimit;		/* Limit for hudradar drawing */
 
 static double       time_counter = 0.0;
 static TTF_Font     *scoreListFont;
-static char         *scoreListFontName = "VeraMoBd.ttf";
+static char         *scoreListFontName = CONF_FONTDIR "VeraMoBd.ttf";
 static sdl_window_t scoreListWin;
 static SDL_Rect     scoreEntryRect; /* Bounds for the last painted score entry */
 static bool         scoreListMoving;

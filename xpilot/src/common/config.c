@@ -63,6 +63,13 @@ char *Conf_mapdir(void)
     return conf;
 }
 
+char *Conf_fontdir(void)
+{
+    static char conf[] = CONF_FONTDIR;
+
+    return conf;
+}
+
 static char conf_default_map_string[] = CONF_DEFAULT_MAP;
 
 char *Conf_default_map(void)

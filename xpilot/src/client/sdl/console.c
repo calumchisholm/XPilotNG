@@ -33,7 +33,7 @@ int Console_init(void)
 	return -1;
     }
     
-    console = CON_Init("ConsoleFont.bmp", console_window.surface, 100, cr);
+    console = CON_Init(CONF_FONTDIR "ConsoleFont.bmp", console_window.surface, 100, cr);
     if (console == NULL) {
 	error("failed to init SDL_console");
 	sdl_window_destroy(&console_window);

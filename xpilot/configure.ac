@@ -4,10 +4,15 @@ AC_PREREQ(2.57)
 AC_INIT(XPilot, 4.5.4X2, kps@users.sourceforge.net, xpilot)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/client/xpilot.c)
+
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(config.h)
-dnl AC_CANONICAL_HOST
+
 
 dnl  Copyright & stuff.
 AC_SUBST([XP_AUTHORS],["Bjørn Stabell, Ken Ronny Schouten, Bert Gijsbers, Dick Balaska, Uoti Urpala, Juha Lindström, Kristian Söderblom and Erik Andersson"])
@@ -74,6 +79,76 @@ AC_CHECK_LIB(z, gzopen)
 AC_CHECK_LIB(expat, XML_ParserCreate)
 AC_PATH_X
 AC_PATH_XTRA
+
+
+dnl Figure out which math library to use
+dnl (borrowed from from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz)
+case "$target" in
+    *-*-mingw32*)
+        MATHLIB=""
+        SYS_GL_LIBS="-lopengl32 -lglu32"
+        ;;
+    *-*-beos*)
+        MATHLIB=""
+        SYS_GL_LIBS="-lGL"
+        ;;
+    *-*-linux*)
+        MATHLIB="-lm"
+        SYS_GL_LIBS="-L/usr/X11R6/lib -lGL -lGLU"
+        ;;
+    *)
+        MATHLIB="-lm"
+        SYS_GL_LIBS="-lGL -LGLU"
+        ;;
+esac
+
+
+dnl Check for SDL, from http://www.libsdl.org/opengl/SDLgears-1.0.2.tar.gz
+SDL_VERSION=1.2.0
+AM_PATH_SDL($SDL_VERSION,
+            :,
+            AC_MSG_WARN([*** SDL version $SDL_VERSION not found!])
+)
+CFLAGS="$CFLAGS $SDL_CFLAGS"
+
+dnl Check for OpenGL
+AC_MSG_CHECKING(for OpenGL support)
+have_opengl=no
+AC_TRY_COMPILE([
+ #include <GL/gl.h>
+ #include <GL/glu.h>
+],[
+],[
+have_opengl=yes
+])
+AC_MSG_RESULT($have_opengl)
+if test x$have_opengl = xyes; then
+    GL_LIBS="$SDL_LIBS $SYS_GL_LIBS"
+else
+    AC_MSG_WARN(Unable to find OpenGL headers and libraries)
+fi
+AC_SUBST(GL_LIBS)
+
+
+dnl kps - hack to check for libsdl-ttf
+AC_MSG_CHECKING(for libsdl-ttf)
+have_libsdl_ttf=no
+AC_TRY_COMPILE([
+ #include "SDL.h"
+ #include "SDL/SDL_ttf.h"
+],[
+],[
+have_libsdl_ttf=yes
+])
+AC_MSG_RESULT($have_libsdl_ttf)
+if test x$have_libsdl_ttf = xyes; then
+    SDL_EXTRA_LIBS="$SDL_LIBS -lSDL_ttf"
+else
+    AC_MSG_WARN(Unable to find libsdl-ttf headers and libraries)
+fi
+AC_SUBST(SDL_EXTRA_LIBS)
+
+
 
 dnl  Checks for header files.
 dnl AC_HEADER_STDC
@@ -212,6 +287,7 @@ AC_CONFIG_FILES([ \
 	doc/man/xp-mapedit.man \
 	doc/man/xpilots.man \
 	lib/Makefile \
+	lib/fonts/Makefile \
 	lib/maps/Makefile \
 	lib/textures/Makefile \
 	src/Makefile \
@@ -224,6 +300,7 @@ AC_CONFIG_FILES([ \
 	src/common/NT/bindist/ServerMOTD.txt \
 	src/client/Makefile \
 	src/client/items/Makefile \
+	src/client/sdl/Makefile \
 	src/server/Makefile \
 	src/replay/Makefile \
 	src/replay/tools/Makefile \
