@@ -42,7 +42,6 @@ static double sc_table[MAX_SCORES];
 static double kr_table[MAX_SCORES];
 static double kd_table[MAX_SCORES];
 static double hf_table[MAX_SCORES];
-static double dr_table[MAX_SCORES];
 
 static bool playerstag = false;
 static int num_players = 0;
@@ -123,7 +122,6 @@ static void SortRankings(void)
     double lowKD = 0.0, highKD = 0.0;
     double lowKR = 0.0, highKR = 0.0;
     double lowHF = 0.0, highHF = 0.0;
-    double lowDR = 0.0, highDR = 0.0;
     bool foundFirst = false;
     int k;
 
@@ -134,7 +132,7 @@ static void SortRankings(void)
        rank. */
     for (k = 0; k < MAX_SCORES; k++) {
 	ranknode_t *rank = &ranknodes[k];
-	double attenuation, kills, sc, kd, kr, hf, dr;
+	double attenuation, kills, sc, kd, kr, hf;
 
 	if (strlen(rank->name) == 0)
 	    continue;
@@ -155,20 +153,17 @@ static void SortRankings(void)
 	      ((double) rank->ballsCashed /
 	       (double) rank->ballsLost) :
 	      (double) rank->ballsCashed) * attenuation;
-    	dr = (double) rank->deadliest * attenuation;
 
 	sc_table[k] = sc;
 	kd_table[k] = kd;
 	kr_table[k] = kr;
 	hf_table[k] = hf;
-	dr_table[k] = dr;
 
 	if (!foundFirst) {
 	    lowSC = highSC = sc;
 	    lowKD = highKD = kd;
 	    lowKR = highKR = kr;
 	    lowHF = highHF = hf;
-	    lowDR = highDR = hf;
 	    foundFirst = true;
 	} else {
 	    if (sc > highSC)
@@ -190,11 +185,6 @@ static void SortRankings(void)
 		highHF = hf;
 	    else if (hf < lowHF)
 		lowHF = hf;
-	    
-	    if (dr > highDR)
-		highDR = dr;
-	    else if (hf < lowDR)
-		lowDR = dr;
 	}
     }
 
@@ -203,7 +193,6 @@ static void SortRankings(void)
     highKD -= lowKD;
     highKR -= lowKR;
     highHF -= lowHF;
-    highDR -= lowDR;
 
 
     {
@@ -211,13 +200,12 @@ static void SortRankings(void)
 	const double factorKD = (highKD != 0.0) ? (100.0 / highKD) : 0.0;
 	const double factorKR = (highKR != 0.0) ? (100.0 / highKR) : 0.0;
 	const double factorHF = (highHF != 0.0) ? (100.0 / highHF) : 0.0;
-	const double factorDR = (highDR != 0.0) ? (100.0 / highDR) : 0.0;
 	int i;
 
 	rank_entries = 0;
 	for (i = 0; i < MAX_SCORES; i++) {
 	    ranknode_t *rank = &ranknodes[i];
-	    double sc, kd, kr, hf, dr, rsc, rkd, rkr, rhf, rdr;
+	    double sc, kd, kr, hf, dr, rsc, rkd, rkr, rhf;
 
 	    rank_base[i].ind = i;
 	    if (strlen(rank->name) == 0) {
@@ -230,16 +218,13 @@ static void SortRankings(void)
 	    kd = kd_table[i];
 	    kr = kr_table[i];
 	    hf = hf_table[i];
-	    dr = dr_table[i];
 
 	    rsc = (sc - lowSC) * factorSC;
 	    rkd = (kd - lowKD) * factorKD;
 	    rkr = (kr - lowKR) * factorKR;
 	    rhf = (hf - lowHF) * factorHF;
-	    rdr = (dr - lowDR) * factorDR;
 
-	    rank_base[i].ratio
-		= 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf + 0.20 * rdr;
+	    rank_base[i].ratio = 0.20 * rsc + 0.30 * rkd + 0.30 * rkr + 0.20 * rhf;
 
 	    /* KHS: maximum survived time serves as factor */
 	    if(options.survivalScore != 0.0){

@@ -384,8 +384,7 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
  		    }
  		}
 
-		Score(pusher, sc, pl->pos, pl->name);
-		/*if (options.zeroSumScoring);*//* TODO */
+		if (!options.zeroSumScoring) Score(pusher, sc, pl->pos, pl->name);
 		if (i >= num_pushers - 1)
 		    Rank_add_shove_kill(pusher);
 	    }
@@ -400,7 +399,6 @@ void Player_crash(player_t *pl, int crashtype, int mapobj_ind, int pt)
  	    }
 
 	    if (!options.zeroSumScoring || num_pushers >=1 ) Score(pl, -sc, pl->pos, "[Shove]");
-	    /*if (options.zeroSumScoring);*//* TODO */
 
 	    strcpy(msg_ptr, ".");
 	    Set_message(msg);
