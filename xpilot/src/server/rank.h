@@ -70,9 +70,7 @@ typedef struct RankInfo {
 #define Rank_SetLogoutMessage(rank,msg) \
 	do { strcpy((rank)->entry.logout, (msg)); } while(0)
 
-void Rank_get_saved_score(struct player *pl);
-void Rank_save_score(const struct player * pl);
-void Rank_get_stats(struct player *pl, char *buf);
+void Rank_get_stats(player *pl, char *buf);
 bool Rank_IsLegalNameUserHost(const char string[]);
 RankInfo *Rank_get_by_name(char *name);
 void Rank_nuke_score(RankInfo *rank);
