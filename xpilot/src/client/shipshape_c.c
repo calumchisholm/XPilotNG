@@ -1,5 +1,4 @@
 /* 
- *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
  *      Bjørn Stabell        <bjoern@xpilot.org>
@@ -49,9 +48,9 @@ char shipshape_c_version[] = VERSION;
 
 
 
-static int	debugShapeParsing = 0;
-static int	verboseShapeParsing;
-static int	shapeLimits;
+extern int	debugShapeParsing;
+extern int	verboseShapeParsing;
+extern int	shapeLimits;
 
 extern int	Get_shape_keyword(char *keyw);
 extern void	Make_table(void);
@@ -1085,7 +1084,7 @@ static int shape2wire(char *ship_shape_str, shipobj *w)
     return 0;
 }
 
-static shipobj *do_parse_shape(char *str)
+shipobj *do_parse_shape(char *str)
 {
     shipobj		*w;
 
@@ -1130,31 +1129,6 @@ void Free_ship_shape(shipobj *w)
 #endif
 	free(w);
     }
-}
-
-shipobj *Parse_shape_str(char *str)
-{
-    verboseShapeParsing = debugShapeParsing;
-    shapeLimits = 1;
-    return do_parse_shape(str);
-}
-
-shipobj *Convert_shape_str(char *str)
-{
-    verboseShapeParsing = debugShapeParsing;
-    shapeLimits = debugShapeParsing;
-    return do_parse_shape(str);
-}
-
-int Validate_shape_str(char *str)
-{
-    shipobj		*w;
-
-    verboseShapeParsing = 1;
-    shapeLimits = 1;
-    w = do_parse_shape(str);
-    Free_ship_shape(w);
-    return (w && w != Default_ship());
 }
 
 void Convert_ship_2_string(shipobj *w, char *buf, char *ext,

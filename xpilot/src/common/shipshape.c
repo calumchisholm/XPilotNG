@@ -48,13 +48,13 @@ char shipshape_version[] = VERSION;
 
 int	Get_shape_keyword(char *keyw);
 
-#if 0
-
-static int	debugShapeParsing = 0;
-static int	verboseShapeParsing;
-static int	shapeLimits;
+int	debugShapeParsing = 0;
+int	verboseShapeParsing = 0;
+int	shapeLimits;
 
 extern void	Make_table(void);
+
+#if 0
 
 void Rotate_point(position pt[RES])
 {
@@ -1132,6 +1132,8 @@ void Free_ship_shape(shipobj *w)
     }
 }
 
+#endif
+
 shipobj *Parse_shape_str(char *str)
 {
     verboseShapeParsing = debugShapeParsing;
@@ -1157,6 +1159,7 @@ int Validate_shape_str(char *str)
     return (w && w != Default_ship());
 }
 
+#if 0
 void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 			   unsigned shape_version)
 {

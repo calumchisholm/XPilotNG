@@ -104,14 +104,8 @@
 #define MAX_LIGHT_PTS	    3
 #define MAX_RACK_PTS	    4
 
-#ifdef SERVER
+/* kps - fix this somehow */
 #include "../server/click.h"
-#else
-typedef int click_t;
-typedef struct {
-    click_t		cx, cy;
-} clpos;
-#endif
 
 typedef struct {
     clpos clk;
@@ -157,6 +151,7 @@ extern void Convert_ship_2_string(shipobj *w, char *buf, char *ext,
 extern void Rotate_point(shapepos pt[RES]);
 extern void Rotate_position(position pt[RES]);
 extern shapepos ipos2shapepos(ipos pos);
+extern shipobj *do_parse_shape(char *str);
 
 #if 0
 #define Ship_get_point_clpos(ship, i, dir)       ((ship)->pts[i][dir])
