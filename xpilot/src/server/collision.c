@@ -708,6 +708,7 @@ static void PlayerObjectCollision(player_t *pl)
 static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 {
     double sc;
+    world_t *world = pl->world;
 
     /*
      * The ball is special, usually players bounce off of it with
@@ -717,8 +718,12 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
     Delta_mv(OBJ_PTR(pl), OBJ_PTR(ball));
     if (!Player_uses_emergency_shield(pl)) {
 	Player_add_fuel(pl, ED_BALL_HIT);
-	if (options.treasureCollisionDestroys)
+	if (options.treasureCollisionDestroys) {
+	    if (BIT(world->rules->mode, TEAM_PLAY)
+	    	&& pl->team == ball->ball_treasure->team)
+		Rank_saved_ball(pl);
 	    ball->life = 0;
+	}
     }
     if (pl->fuel.sum > 0) {
 	if (!options.treasureCollisionMayKill
@@ -748,7 +753,6 @@ static void Player_collides_with_ball(player_t *pl, ballobject_t *ball)
 		   * options.ballKillScoreMult
 		   * options.selfKillScoreMult;
 	    if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, kp->name);
-	    /*if (options.zeroSumScoring);*//* TODO */
 	} else {
 	    Rank_add_ball_kill(kp);
 	    sc = Rate(kp->score, pl->score) * options.ballKillScoreMult;
@@ -1260,11 +1264,11 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 	    }
 
 	    sc *= factor;
-	    if (BIT(obj->obj_status, FROMCANNON))
+	    if (BIT(obj->obj_status, FROMCANNON)) {
 		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, "Cannon");
-	    else if (obj->id == NO_ID || kp->id == pl->id)
+	    } else if (obj->id == NO_ID || kp->id == pl->id) {
 		if (!options.zeroSumScoring) Score(pl, -sc, pl->pos, (obj->id == NO_ID ? "" : pl->name));
-	    else {
+	    } else {
 		Score_players(kp, sc, pl->name, pl, -sc, kp->name, true);
 		Robot_war(pl, kp);
 	    }
