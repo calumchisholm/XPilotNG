@@ -5,6 +5,33 @@ these tasks, ask that developer first, so you can agree on how to proceed.
 TASKS FOR XPILOT NG 4.7.0
 -------------------------
 
+Task: Include circle cannon dodgers map in distro
+Developer: throat
+
+Task: Related to cannon dodgers: scoring by survival time.
+Developer: throat / kps
+
+Task: Related to cannon dodgers: add working ranking for maps where
+surivial time
+Developer: throat / kps
+
+Task: Rename turnpush related options to longer names.
+Developer: throat / kps
+
+Task: Add option for the TTL of cannon shots
+Developer: throat / kps
+
+Task: Make cannons fire if a player is "anywhere near" and not paused
+       (this could be a bit harder without breaking old behavior.)
+Developer: throat / kps
+
+Task: Add support for cannons having individual id, score, smartness etc.
+Developer: kps
+
+Task: Remove X client radar bug (this appears e.g. on polygon version of
+newdarkhell).
+Developer: ?
+
 Task: Grab mouse pointer in X client when pressing mouse button.
 Developer: kps
 
