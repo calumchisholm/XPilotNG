@@ -613,13 +613,13 @@ void Destroy_connection(int ind, const char *reason)
 	    player *pl;
 
 	    NumObservers--;
-	    pl = Players[World.NumBases + NumObservers]; /* Swap leaver last */
-	    Players[World.NumBases + NumObservers] = Players[ind];
+	    pl = Players[observerStart + NumObservers]; /* Swap leaver last */
+	    Players[observerStart + NumObservers] = Players[ind];
 	    Players[ind] = pl;
-	    pl = Players[World.NumBases + NumObservers];
+	    pl = Players[observerStart + NumObservers];
 
 	    GetInd[Players[ind]->id] = ind;
-	    GetInd[pl->id] = World.NumBases + NumObservers;
+	    GetInd[pl->id] = observerStart + NumObservers;
 
 	    Free_ship_shape(pl->ship);
 	    for (i = NumObservers - 1; i >= 0; i--)
@@ -1061,9 +1061,9 @@ static int Handle_login(int ind)
 	pl = Players[NumPlayers];
     }
     else {
-	if (!Init_player(World.NumBases + NumObservers, connp->ship))
+	if (!Init_player(observerStart + NumObservers, connp->ship))
 	    return -1;
-	pl = Players[World.NumBases + NumObservers];
+	pl = Players[observerStart + NumObservers];
     }
     pl->rectype = connp->rectype;
     strcpy(pl->name, connp->nick);
@@ -1086,8 +1086,8 @@ static int Handle_login(int ind)
 	request_ID();
     }
     else {
-	pl->id = NUM_IDS + 1 + ind - World.NumBases;
-	GetInd[pl->id] = World.NumBases + NumObservers;
+	pl->id = NUM_IDS + 1 + ind - observerStart;
+	GetInd[pl->id] = observerStart + NumObservers;
 	pl->score = -6666;
 	pl->mychar = 'S';
 	NumObservers++;
@@ -1118,14 +1118,14 @@ static int Handle_login(int ind)
     /*
      * And tell him about all the others.
      */
-    for (i = 0; i < World.NumBases + NumObservers - 1; i++) {
-	if (i == NumPlayers -1 && pl->rectype != 2)
+    for (i = 0; i < observerStart + NumObservers - 1; i++) {
+	if (i == NumPlayers - 1 && pl->rectype != 2)
 	    break;
 	if (i == NumPlayers) {
 	    if (NumObservers == 1)
 		break;
 	    else
-		i = World.NumBases;
+		i = observerStart;
 	}
 	Send_player(pl->conn, Players[i]->id);
 	Send_score(pl->conn, Players[i]->id,
@@ -1137,12 +1137,12 @@ static int Handle_login(int ind)
     /*
      * And tell all the others about him.
      */
-    for (i = 0; i < World.NumBases + NumObservers - 1; i++) {
+    for (i = 0; i < observerStart + NumObservers - 1; i++) {
 	if (i == NumPlayers - 1)
 	    if (!NumObservers)
 		break;
 	else
-	    i = World.NumBases;
+	    i = observerStart;
 	if (Players[i]->rectype == 1 && pl->rectype == 2)
 	    continue;
 	if (Players[i]->conn != NOT_CONNECTED) {
@@ -2618,12 +2618,12 @@ static void Send_all_info(player *pl)
 {
   int i;
 
-  for (i=0; i < World.NumBases + NumObservers; i++) {
+  for (i=0; i < observerStart + NumObservers; i++) {
       if (i == NumPlayers)
 	  if (!NumObservers)
 	      break;
 	  else
-	      i = World.NumBases;
+	      i = observerStart;
     if (Players[i]->conn != NOT_CONNECTED) {
 	Send_player(Players[i]->conn, pl->id);
 	Send_score(Players[i]->conn, pl->id, pl->score, pl->life,
@@ -2893,7 +2893,7 @@ static void Handle_command(int ind, char *cmd)   /* no leading / */
 	i = NO_CMD;
 	sprintf(msg, "Unknown command %s", cmd);
     }
-    else if (!pl->isoperator && commands[i].operOnly) {
+    else if (!pl->isoperator && (commands[i].operOnly || rplayback && !playback && commands[i].number != PASSWORD_CMD)) {
 	i = NO_CMD;
 	sprintf(msg, "You need operator status to use this command.");
     }

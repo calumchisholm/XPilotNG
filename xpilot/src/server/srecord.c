@@ -59,7 +59,7 @@ static void Write_data(int type)
     }
     len = curc - startc;
     putc(type, f);
-    fwrite(&len, 4, 1, f);
+    fwrite(&len, sizeof(int), 1, f);
     fwrite(startc, 1, len, f);
     *curb[type] = *startb[type];
 }
@@ -109,14 +109,14 @@ void Init_recording(void)
 		i = getc(recf1);
 		if (i == NOMORE)
 		    break;
-		fread(&j, 4, 1, recf1);
+		fread(&j, sizeof(int), 1, recf1);
 		Read_data(i, j);
 	    }
 	    fclose(recf1);
 	    recf1 = fopen("/tmp/serverrec2", "rb");
 	    next_type = getc(recf1);
 	    if (next_type != NOMORE)
-		fread(&next_len, 4, 1, recf1);
+		fread(&next_len, sizeof(int), 1, recf1);
 	    return;
 	} else if (recordMode == 0)
 	    return;
@@ -167,7 +167,7 @@ void Handle_recording_buffers(void)
 		Read_data(next_type, next_len);
 		next_type = getc(recf1);
 		if (next_type != NOMORE) {
-		    fread(&next_len, 4, 1, recf1);
+		    fread(&next_len, sizeof(int), 1, recf1);
 		    continue;
 		}
 	    }

@@ -580,7 +580,7 @@ int Handle_keyboard(int ind)
 			}
 		    }
 		    for (i = 0; i < NumObservers; i++)
-			Send_base(Players[i + World.NumBases]->conn,
+			Send_base(Players[i + observerStart]->conn,
 				  pl->id, pl->home_base);
 		}
 		break;

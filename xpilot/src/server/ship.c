@@ -482,8 +482,8 @@ void Tank_handle_detach(player *pl)
 	}
     }
     for (i = 0; i < NumObservers - 1; i++) {
-	Send_player(Players[i + World.NumBases]->conn, dummy->id);
-	Send_score(Players[i + World.NumBases]->conn, dummy->id, dummy->score,
+	Send_player(Players[i + observerStart]->conn, dummy->id);
+	Send_score(Players[i + observerStart]->conn, dummy->id, dummy->score,
 		   dummy->life, dummy->mychar);
     }
 }

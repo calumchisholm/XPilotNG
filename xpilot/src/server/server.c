@@ -88,12 +88,13 @@ int			NumObjs = 0;
 int			NumPulses = 0;
 int			NumEcms = 0;
 int			NumTransporters = 0;
+int                     observerStart;
 player			**Players;
 object			*Obj[MAX_TOTAL_SHOTS];
 pulse_t			*Pulses[MAX_TOTAL_PULSES];
 ecm_t			*Ecms[MAX_TOTAL_ECMS];
 trans_t			*Transporters[MAX_TOTAL_TRANSPORTERS];
-int			GetInd[NUM_IDS+1+MAX_OBSERVERS];
+int			GetInd[NUM_IDS + 1 + MAX_OBSERVERS];
 server			Server;
 int			ShutdownServer = -1;
 int			ShutdownDelay = 1000;
@@ -156,7 +157,8 @@ int main(int argc, char **argv)
     Walls_init();
 
     /* Allocate memory for players, shots and messages */
-    Alloc_players(World.NumBases + MAX_PSEUDO_PLAYERS);
+    Alloc_players(World.NumBases + MAX_PSEUDO_PLAYERS + MAX_OBSERVERS);
+    observerStart = World.NumBases + MAX_PSEUDO_PLAYERS;
     Alloc_shots(MAX_TOTAL_SHOTS);
     Alloc_cells();
 
@@ -317,6 +319,8 @@ void End_game(void)
     player		*pl;
     char		msg[MSG_LEN];
 
+    record = rrecord;
+    playback = rplayback; /* Could be called from signal handler */
     if (ShutdownServer == 0) {
 	errno = 0;
 	error("Shutting down...");
@@ -333,6 +337,14 @@ void End_game(void)
 	    Destroy_connection(pl->conn, msg);
 	}
     }
+
+    record = playback = 0;
+    while (NumObservers > 0) {
+	pl = Players[observerStart + NumObservers - 1];
+	Destroy_connection(pl->conn, msg);
+    }
+    record = rrecord;
+    playback = rplayback;
 
     /* Tell meta server that we are gone. */
     Meta_gone();

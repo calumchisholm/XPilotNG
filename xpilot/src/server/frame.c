@@ -1007,9 +1007,9 @@ void Frame_update(void)
 	}
     }
 
-    for (i = 0; i < World.NumBases + MAX_OBSERVERS; i++) {
-	if (i >= World.NumBases + NumObservers ||
-	    i >= NumPlayers && i < World.NumBases)
+    for (i = 0; i < observerStart + MAX_OBSERVERS - 1; i++) {
+	if (i >= observerStart + NumObservers ||
+	    i >= NumPlayers && i < observerStart)
 	    continue;
 	pl = Players[i];
 	conn = pl->conn;
@@ -1143,7 +1143,7 @@ void Set_message(const char *message)
 	    }
 	}
     for (i = 0; i < NumObservers; i++) {
-	pl = Players[i + World.NumBases];
+	pl = Players[i + observerStart];
 	Send_message(pl->conn, msg);
     }
 }

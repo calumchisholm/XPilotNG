@@ -134,10 +134,10 @@ void Pick_startpos(int ind)
 	pl->home_base = BIT(World.rules->mode, TIMING) ?
 	                World.baseorder[i].base_idx : i;
 	if (ind < NumPlayers) {
-	    for (i = 0; i < World.NumBases + NumObservers; i++) {
+	    for (i = 0; i < observerStart + NumObservers; i++) {
 		if (i == NumPlayers) {
 		    if (NumObservers)
-			i = World.NumBases;
+			i = observerStart;
 		    else
 			break;
 		}
@@ -575,7 +575,7 @@ void Update_score_table(void)
 		}
 	    }
 	    for (i = 0; i < NumObservers; i++) {
-		Send_score(Players[i + World.NumBases]->conn, pl->id,
+		Send_score(Players[i + observerStart]->conn, pl->id,
 			   pl->score, pl->life, pl->mychar);
 	    }
 	}
@@ -1714,7 +1714,7 @@ void Delete_player(int ind)
     }
 
     for (i = NumObservers - 1; i >= 0; i--)
-	Send_leave(Players[i + World.NumBases]->conn, id);
+	Send_leave(Players[i + observerStart]->conn, id);
 
     release_ID(id);
 }
