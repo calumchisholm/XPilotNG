@@ -339,8 +339,8 @@ int Net_setup(void)
 		}
 		size = sizeof(setup_t) + Setup->x * Setup->y;
 		if (Setup->map_order == SETUP_MAP_XY_WITH_LINES)
-		    if (Setup->map_data_len > size)
-			size = Setup->map_data_len;
+		    if (Setup->map_data_len + sizeof(setup_t) > size)
+			size = sizeof(setup_t) + Setup->map_data_len;
 		if ((Setup = (setup_t *) realloc(ptr, size)) == NULL) {
 		    error("No memory for setup and map");
 		    return -1;
@@ -427,7 +427,6 @@ int Net_setup(void)
 
 	oldServer = 0;
 	ptr = Setup->map_data;
-	Setup->map_data_len -= 20000;
 	Setup->map_order = SETUP_MAP_UNCOMPRESSED;
 
 	polyc = (unsigned char)*ptr++ << 8;
