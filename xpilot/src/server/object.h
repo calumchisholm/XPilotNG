@@ -64,23 +64,39 @@
 /*
  * Different types of objects, including player.
  * Robots and tanks are players but have an additional type_ext field.
- * Smart missile, heatseeker and torpedoe can be merged into missile.
- * ECM doesn't really need an object type.
+ * Smart missile, heatseeker and torpedo can be merged into missile.
  */
-#define OBJ_PLAYER		(1U<<0)
-#define OBJ_DEBRIS		(1U<<1)
-#define OBJ_SPARK		(1U<<2)
-#define OBJ_BALL		(1U<<3)
-#define OBJ_SHOT		(1U<<4)
-#define OBJ_SMART_SHOT		(1U<<5)
-#define OBJ_MINE		(1U<<6)
-#define OBJ_TORPEDO		(1U<<7)
-#define OBJ_HEAT_SHOT		(1U<<8)
-#define OBJ_PULSE		(1U<<9)
-#define OBJ_ITEM		(1U<<10)
-#define OBJ_WRECKAGE		(1U<<11)
-#define OBJ_ASTEROID		(1U<<12)
-#define	OBJ_CANNON_SHOT		(1U<<13)
+#define OBJ_TYPEBIT(type)	(1U<<(type))
+
+#define OBJ_PLAYER		0
+#define OBJ_DEBRIS		1
+#define OBJ_SPARK		2
+#define OBJ_BALL		3
+#define OBJ_SHOT		4
+#define OBJ_SMART_SHOT		5
+#define OBJ_MINE		6
+#define OBJ_TORPEDO		7
+#define OBJ_HEAT_SHOT		8
+#define OBJ_PULSE		9
+#define OBJ_ITEM		10
+#define OBJ_WRECKAGE		11
+#define OBJ_ASTEROID		12
+#define OBJ_CANNON_SHOT		13
+
+#define OBJ_PLAYER_BIT		OBJ_TYPEBIT(OBJ_PLAYER)
+#define OBJ_DEBRIS_BIT		OBJ_TYPEBIT(OBJ_DEBRIS)
+#define OBJ_SPARK_BIT		OBJ_TYPEBIT(OBJ_SPARK)
+#define OBJ_BALL_BIT		OBJ_TYPEBIT(OBJ_BALL)
+#define OBJ_SHOT_BIT		OBJ_TYPEBIT(OBJ_SHOT)
+#define OBJ_SMART_SHOT_BIT	OBJ_TYPEBIT(OBJ_SMART_SHOT)
+#define OBJ_MINE_BIT		OBJ_TYPEBIT(OBJ_MINE)
+#define OBJ_TORPEDO_BIT		OBJ_TYPEBIT(OBJ_TORPEDO)
+#define OBJ_HEAT_SHOT_BIT	OBJ_TYPEBIT(OBJ_HEAT_SHOT)
+#define OBJ_PULSE_BIT		OBJ_TYPEBIT(OBJ_PULSE)
+#define OBJ_ITEM_BIT		OBJ_TYPEBIT(OBJ_ITEM)
+#define OBJ_WRECKAGE_BIT	OBJ_TYPEBIT(OBJ_WRECKAGE)
+#define OBJ_ASTEROID_BIT	OBJ_TYPEBIT(OBJ_ASTEROID)
+#define OBJ_CANNON_SHOT_BIT	OBJ_TYPEBIT(OBJ_CANNON_SHOT)
 
 /*
  * Some object types are overloaded.
@@ -189,7 +205,7 @@ struct cell_node {
 /* Item pack count is kept in the 'count' field, float now, change !@# */ \
     float		count;		/* Misc timings */		\
     modifiers_t		mods;		/* Modifiers to this object */	\
-    int			type;		/* one bit of OBJ_XXX */	\
+    u_byte		type;		/* one of OBJ_XXX */		\
     u_byte		color;		/* Color of object */		\
     u_byte		missile_dir;	/* missile direction */		\
     u_byte		collmode;	/* collision checking mode */	\

@@ -986,21 +986,22 @@ static void Frame_radar(connection_t *conn, player_t *pl)
 
 #ifndef NO_SMART_MIS_RADAR
     if (options.nukesOnRadar)
-	mask = OBJ_SMART_SHOT|OBJ_TORPEDO|OBJ_HEAT_SHOT|OBJ_MINE;
+	mask = OBJ_SMART_SHOT_BIT|OBJ_TORPEDO_BIT|OBJ_HEAT_SHOT_BIT
+	    |OBJ_MINE_BIT;
     else {
 	mask = (options.missilesOnRadar ?
-		(OBJ_SMART_SHOT|OBJ_TORPEDO|OBJ_HEAT_SHOT) : 0);
-	mask |= (options.minesOnRadar) ? OBJ_MINE : 0;
+		(OBJ_SMART_SHOT_BIT|OBJ_TORPEDO_BIT|OBJ_HEAT_SHOT_BIT) : 0);
+	mask |= (options.minesOnRadar) ? OBJ_MINE_BIT : 0;
     }
     if (options.treasuresOnRadar)
-	mask |= OBJ_BALL;
+	mask |= OBJ_BALL_BIT;
     if (options.asteroidsOnRadar)
-	mask |= OBJ_ASTEROID;
+	mask |= OBJ_ASTEROID_BIT;
 
     if (mask) {
 	for (i = 0; i < NumObjs; i++) {
 	    shot = Obj[i];
-	    if (! BIT(shot->type, mask))
+	    if (!BIT(OBJ_TYPEBIT(shot->type), mask))
 		continue;
 
 	    shownuke = (options.nukesOnRadar && (shot)->mods.nuclear);

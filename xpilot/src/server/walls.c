@@ -145,31 +145,32 @@ void Move_init(world_t *world)
 
     mp.obj_bounce_mask = 0;
     if (options.sparksWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_SPARK);
+	SET_BIT(mp.obj_bounce_mask, OBJ_SPARK_BIT);
     if (options.debrisWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_DEBRIS);
+	SET_BIT(mp.obj_bounce_mask, OBJ_DEBRIS_BIT);
     if (options.shotsWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_SHOT|OBJ_CANNON_SHOT);
+	SET_BIT(mp.obj_bounce_mask, OBJ_SHOT_BIT|OBJ_CANNON_SHOT_BIT);
     if (options.itemsWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_ITEM);
+	SET_BIT(mp.obj_bounce_mask, OBJ_ITEM_BIT);
     if (options.missilesWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_SMART_SHOT|OBJ_TORPEDO|OBJ_HEAT_SHOT);
+	SET_BIT(mp.obj_bounce_mask,
+		OBJ_SMART_SHOT_BIT|OBJ_TORPEDO_BIT|OBJ_HEAT_SHOT_BIT);
     if (options.minesWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_MINE);
+	SET_BIT(mp.obj_bounce_mask, OBJ_MINE_BIT);
     if (options.ballsWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_BALL);
+	SET_BIT(mp.obj_bounce_mask, OBJ_BALL_BIT);
     if (options.asteroidsWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_ASTEROID);
+	SET_BIT(mp.obj_bounce_mask, OBJ_ASTEROID_BIT);
     if (options.pulsesWallBounce)
-	SET_BIT(mp.obj_bounce_mask, OBJ_PULSE);
+	SET_BIT(mp.obj_bounce_mask, OBJ_PULSE_BIT);
 
-    mp.obj_cannon_mask = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT | OBJ_PULSE |
-			OBJ_SMART_SHOT | OBJ_TORPEDO | OBJ_HEAT_SHOT |
-			OBJ_ASTEROID;
+    mp.obj_cannon_mask = (KILLING_SHOTS) | OBJ_MINE_BIT | OBJ_SHOT_BIT
+	| OBJ_PULSE_BIT | OBJ_SMART_SHOT_BIT | OBJ_TORPEDO_BIT
+	| OBJ_HEAT_SHOT_BIT | OBJ_ASTEROID_BIT;
     if (options.cannonsUseItems)
-	mp.obj_cannon_mask |= OBJ_ITEM;
-    mp.obj_target_mask = mp.obj_cannon_mask | OBJ_BALL | OBJ_SPARK;
-    mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL | OBJ_PULSE;
+	mp.obj_cannon_mask |= OBJ_ITEM_BIT;
+    mp.obj_target_mask = mp.obj_cannon_mask | OBJ_BALL_BIT | OBJ_SPARK_BIT;
+    mp.obj_treasure_mask = mp.obj_bounce_mask | OBJ_BALL_BIT | OBJ_PULSE_BIT;
 }
 
 
@@ -531,7 +532,7 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 	return 0;
     }
 
-    if (!BIT(mp.obj_bounce_mask, obj->type)) {
+    if (!BIT(mp.obj_bounce_mask, OBJ_TYPEBIT(obj->type))) {
 	obj->life = 0;
 	return 0;
     }
@@ -567,7 +568,8 @@ static int Bounce_object(object_t *obj, move_t *move, int line, int point)
 	return 0;
     }
     
-    if (!BIT(obj->status, FROMBOUNCE) && obj->type == OBJ_SPARK)
+    if (!BIT(obj->status, FROMBOUNCE)
+	&& obj->type == OBJ_SPARK)
 	CLR_BIT(obj->status, OWNERIMMUNE);
 
 

@@ -1623,11 +1623,11 @@ static void Robot_default_play_check_objects(player_t *pl,
 
     killing_shots = KILLING_SHOTS;
     if (options.treasureCollisionMayKill)
-	killing_shots |= OBJ_BALL;
+	killing_shots |= OBJ_BALL_BIT;
     if (options.wreckageCollisionMayKill)
-	killing_shots |= OBJ_WRECKAGE;
+	killing_shots |= OBJ_WRECKAGE_BIT;
     if (options.asteroidCollisionMayKill)
-	killing_shots |= OBJ_ASTEROID;
+	killing_shots |= OBJ_ASTEROID_BIT;
 
     Cell_get_objects(world, pl->pos, (int)(Visibility_distance / BLOCK_SZ),
 		     max_objs, &obj_list, &obj_count);
@@ -1665,7 +1665,7 @@ static void Robot_default_play_check_objects(player_t *pl,
 	 * The only thing left to do regarding objects is to check if
 	 * this robot needs to put up shields to protect against objects.
 	 */
-	if (!BIT(shot->type, killing_shots)) {
+	if (!BIT(OBJ_TYPEBIT(shot->type), killing_shots)) {
 
 	    /* Find closest item */
 	    if (shot->type == OBJ_ITEM) {

@@ -681,7 +681,7 @@ static void PlayerObjectCollision(player_t *pl)
 
 	obj->life = 0;
 
-	if (BIT(obj->type, KILLING_SHOTS)) {
+	if (BIT(OBJ_TYPEBIT(obj->type), KILLING_SHOTS)) {
 	    Player_collides_with_killing_shot(pl, obj);
 	    if (BIT(pl->status, KILLED))
 		return;
@@ -1440,7 +1440,7 @@ static void BallCollision(world_t *world)
 
 	    obj = obj_list[j];
 
-	    if (BIT(obj->type, ignored_object_types))
+	    if (BIT(OBJ_TYPEBIT(obj->type), ignored_object_types))
 		continue;
 
 	    /* have we already done this ball pair? */

@@ -94,7 +94,7 @@ extern sock_t		contactSocket;
 extern time_t		serverStartTime;
 extern server_t		Server;
 extern char		*serverAddr;
-extern long		DEF_BITS, KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
+extern uint32_t		KILL_BITS, DEF_HAVE, DEF_USED, USED_KILL;
 extern int		ShutdownServer, ShutdownDelay;
 extern long		main_loops;
 extern int		mapRule;
@@ -108,12 +108,10 @@ extern time_t		gameOverTime;
 extern double		friction;
 extern int		roundtime;
 extern int		roundsPlayed;
-extern long		KILLING_SHOTS;
+extern uint32_t		KILLING_SHOTS;
 extern double		timeStep;
 extern double		timePerFrame;
 extern double		ecmSizeFactor;
-extern char		*playerPasswordsFileName;
-extern int		playerPasswordsFileSizeLimit;
 extern double		coriolisCosine, coriolisSine;
 
 extern struct options {

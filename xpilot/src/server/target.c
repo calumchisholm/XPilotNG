@@ -67,24 +67,19 @@ void Target_update(world_t *world)
 
 void Object_hits_target(object_t *obj, target_t *targ, double player_cost)
 {
-    int			j;
-    player_t		*kp;
-    double		sc, por,
-			win_score = 0.0,
-			lose_score = 0.0;
-    int			win_team_members = 0,
-			lose_team_members = 0,
-			somebody_flag = 0,
-			targets_remaining = 0,
-			targets_total = 0;
-    double 		drainfactor;
-    vector_t 		zero_vel = {0.0, 0.0};
+    int j;
+    player_t *kp;
+    double sc, por, win_score = 0.0, lose_score = 0.0, drainfactor;
+    int win_team_members = 0, lose_team_members = 0, somebody_flag = 0,
+	targets_remaining = 0, targets_total = 0;
+    vector_t zero_vel = {0.0, 0.0};
     world_t *world = &World;
 
     /* a normal shot or a direct mine hit work, cannons don't */
     /* KK: should shots/mines by cannons of opposing teams work? */
     /* also players suiciding on target will cause damage */
-    if (!BIT(obj->type, KILLING_SHOTS|OBJ_MINE|OBJ_PULSE|OBJ_PLAYER))
+    if (!BIT(OBJ_TYPEBIT(obj->type),
+	     KILLING_SHOTS|OBJ_MINE_BIT|OBJ_PULSE_BIT|OBJ_PLAYER_BIT))
 	return;
 
     if (obj->id == NO_ID)

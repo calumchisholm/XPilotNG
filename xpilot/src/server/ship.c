@@ -410,7 +410,7 @@ void Tank_handle_detach(player_t *pl)
     sound_play_sensors(pl->pos, TANK_DETACH_SOUND);
 
     /* The tank uses shield and thrust */
-    tank->status = (DEF_BITS & ~KILL_BITS) | PLAYING | GRAVITY | THRUSTING;
+    tank->status = PLAYING | GRAVITY | THRUSTING;
     tank->have = DEF_HAVE;
     tank->used = (DEF_USED & ~USED_KILL & pl->have) | HAS_SHIELD;
 

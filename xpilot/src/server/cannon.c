@@ -271,9 +271,9 @@ static int Cannon_in_danger(cannon_t *c)
 {
     world_t *world = c->world;
     const int range = 4 * BLOCK_SZ;
-    const long kill_shots = (KILLING_SHOTS) | OBJ_MINE | OBJ_SHOT
-	    			| OBJ_PULSE | OBJ_SMART_SHOT | OBJ_HEAT_SHOT
-				| OBJ_TORPEDO | OBJ_ASTEROID;
+    const uint32_t kill_shots = (KILLING_SHOTS) | OBJ_MINE_BIT | OBJ_SHOT_BIT
+	| OBJ_PULSE_BIT | OBJ_SMART_SHOT_BIT | OBJ_HEAT_SHOT_BIT
+	| OBJ_TORPEDO_BIT | OBJ_ASTEROID_BIT;
     object_t *shot, **obj_list;
     const int max_objs = 100;
     int obj_count, i, danger = false;
@@ -291,7 +291,7 @@ static int Cannon_in_danger(cannon_t *c)
 
 	if (shot->life <= 0)
 	    continue;
-	if (!BIT(shot->type, kill_shots))
+	if (!BIT(OBJ_TYPEBIT(shot->type), kill_shots))
 	    continue;
 	if (BIT(shot->status, FROMCANNON))
 	    continue;
@@ -348,22 +348,22 @@ static void Cannon_defend(cannon_t *c, int defense)
 static int Cannon_select_weapon(cannon_t *c)
 {
     if (c->item[ITEM_MINE]
-	&& rfrac() < 0.5f)
+	&& rfrac() < 0.5)
 	return CW_MINE;
     if (c->item[ITEM_MISSILE]
-	&& rfrac() < 0.5f)
+	&& rfrac() < 0.5)
 	return CW_MISSILE;
     if (c->item[ITEM_LASER]
 	&& (int)(rfrac() * (c->item[ITEM_LASER] + 1)))
 	return CW_LASER;
     if (c->item[ITEM_ECM]
-	&& rfrac() < 0.333f)
+	&& rfrac() < 0.333)
 	return CW_ECM;
     if (c->item[ITEM_TRACTOR_BEAM]
-	&& rfrac() < 0.5f)
+	&& rfrac() < 0.5)
 	return CW_TRACTORBEAM;
     if (c->item[ITEM_TRANSPORTER]
-	&& rfrac() < 0.333f)
+	&& rfrac() < 0.333)
 	return CW_TRANSPORTER;
     if ((c->item[ITEM_AFTERBURNER]
 	 || c->item[ITEM_EMERGENCY_THRUST])
@@ -880,8 +880,8 @@ bool Cannon_hitfunc(group_t *gp, move_t *move)
     if (obj == NULL)
 	return true;
 
-    cannon_mask = mp.obj_cannon_mask | OBJ_PLAYER;
-    if (!BIT(cannon_mask, obj->type))
+    cannon_mask = mp.obj_cannon_mask | OBJ_PLAYER_BIT;
+    if (!BIT(cannon_mask, OBJ_TYPEBIT(obj->type)))
 	return false;
 
     /*

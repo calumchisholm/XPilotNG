@@ -422,7 +422,7 @@ int Init_player(world_t *world, int ind, shipshape_t *ship)
     Compute_sensor_range(pl);
 
     pl->color = WHITE;
-    pl->status = PLAYING | GRAVITY | DEF_BITS;
+    pl->status = PLAYING | GRAVITY;
     pl->have = DEF_HAVE;
     pl->used = DEF_USED;
 
@@ -689,12 +689,14 @@ void Reset_all_players(world_t *world)
 	for (i = 0; i < NumObjs; i++) {
 	    object_t *obj = Obj[i];
 
-	    if (BIT(obj->type, OBJ_SHOT|OBJ_MINE|OBJ_DEBRIS|OBJ_SPARK
-			       |OBJ_CANNON_SHOT|OBJ_TORPEDO|OBJ_SMART_SHOT
-			       |OBJ_HEAT_SHOT|OBJ_PULSE|OBJ_ITEM)) {
+	    if (BIT(OBJ_TYPEBIT(obj->type),
+		    OBJ_SHOT_BIT|OBJ_MINE_BIT|OBJ_DEBRIS_BIT|OBJ_SPARK_BIT
+		    |OBJ_CANNON_SHOT_BIT|OBJ_TORPEDO_BIT|OBJ_SMART_SHOT_BIT
+		    |OBJ_HEAT_SHOT_BIT|OBJ_PULSE_BIT|OBJ_ITEM_BIT)) {
 		obj->life = 0;
-		if (BIT(obj->type, OBJ_TORPEDO|OBJ_SMART_SHOT|OBJ_HEAT_SHOT
-				   |OBJ_CANNON_SHOT|OBJ_MINE))
+		if (BIT(OBJ_TYPEBIT(obj->type),
+			OBJ_TORPEDO_BIT|OBJ_SMART_SHOT_BIT|OBJ_HEAT_SHOT_BIT
+			|OBJ_CANNON_SHOT_BIT|OBJ_MINE_BIT))
 		    /* Take care that no new explosions are made. */
 		    obj->mass = 0;
 	    }
@@ -1307,9 +1309,9 @@ void Delete_player(player_t *pl)
 	    else {
 		if (!options.keepShots) {
 		    obj->life = 0;
-		    if (BIT(obj->type,
-			    OBJ_CANNON_SHOT|OBJ_MINE|OBJ_SMART_SHOT
-			    |OBJ_HEAT_SHOT|OBJ_TORPEDO))
+		    if (BIT(OBJ_TYPEBIT(obj->type),
+			    OBJ_CANNON_SHOT_BIT|OBJ_MINE_BIT|OBJ_SMART_SHOT_BIT
+			    |OBJ_HEAT_SHOT_BIT|OBJ_TORPEDO_BIT))
 			obj->mass = 0;
 		}
 	        obj->id = NO_ID;
@@ -1516,7 +1518,6 @@ void Player_death_reset(player_t *pl, bool add_rank_death)
     pl->vel.x		= pl->vel.y	= 0.0;
     pl->acc.x		= pl->acc.y	= 0.0;
     pl->emptymass	= pl->mass	= options.shipMass;
-    pl->status		|= DEF_BITS;
     pl->status		&= ~(KILL_BITS);
 
     if (!BIT(pl->status, PAUSE)) {
@@ -1606,7 +1607,6 @@ void Player_pause_reset(player_t *pl)
     pl->vel.x		= pl->vel.y	= 0.0;
     pl->acc.x		= pl->acc.y	= 0.0;
 
-    pl->status		|= DEF_BITS;
     pl->status		&= ~(KILL_BITS);
 
 #if 0
