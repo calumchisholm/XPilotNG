@@ -323,7 +323,7 @@ extern int		round_delay_send;
 extern int		maxRoundTime;
 extern int		roundtime;
 extern int		roundsToPlay;
-/*extern int		roundsPlayed;*/
+extern int		roundsPlayed;
 
 extern bool		useWreckage;
 extern bool		ignore20MaxFPS;

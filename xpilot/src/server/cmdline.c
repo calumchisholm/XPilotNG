@@ -295,9 +295,8 @@ int		maxDefensiveItems;	/* items can player carry */
 
 int		roundDelaySeconds;	/* delay before start of each round */
 int		maxRoundTime;		/* max. duration of each round */
-#if 0
 int		roundsPlayed;		/* # of rounds played sofar. */
-#endif
+
 int		maxVisibleObject;	/* how many objects a player can see */
 bool		pLockServer;		/* Is server swappable out of memory?  */
 bool		ignore20MaxFPS;		/* ignore client maxFPS request if 20 */

@@ -1101,8 +1101,6 @@ static int Cmd_queue(char *arg, player *pl, int oper, char *msg)
 }
 
 
-extern int roundCounter;
-
 static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 {
     int			i;
@@ -1119,7 +1117,7 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
 	Reset_all_players();
 	if (gameDuration == -1)
 	    gameDuration = 0;
-	roundCounter = 1;
+	roundsPlayed = 0;
 
 	sprintf(msg, " < Total reset by %s! >", pl->name);
 	Set_message(msg);
@@ -1127,11 +1125,9 @@ static int Cmd_reset(char *arg, player *pl, int oper, char *msg)
     }
     else {
 	Reset_all_players();
-	if (gameDuration == -1) {
+	if (gameDuration == -1)
 	    gameDuration = 0;
-	}
-	if (roundCounter == roundsToPlay + 1)
-	    roundsToPlay = 0;
+
 	sprintf(msg, " < Round reset by %s! >", pl->name);
 	Set_message(msg);
 	strcpy(msg, "");

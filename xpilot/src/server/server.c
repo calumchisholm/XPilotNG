@@ -97,7 +97,6 @@ int			ShutdownDelay = 1000;
 char			ShutdownReason[MAX_CHARS];
 int 			framesPerSecond = 18;
 long			main_loops = 0;		/* needed in events.c */
-int 			roundCounter = 1;
 
 #ifdef LOG
 static bool		Log = true;

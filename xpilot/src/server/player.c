@@ -956,23 +956,21 @@ static void Give_individual_bonus(int ind, DFLOAT average_score)
 }
 
 
-extern int roundCounter;
-
 static void Count_rounds(void)
 {
     char		msg[MSG_LEN];
 
-    if (!roundsToPlay) {
+    if (!roundsToPlay)
 	return;
-    }
+
+    ++roundsPlayed;
 
     sprintf(msg, " < Round %d out of %d completed. >",
-	    roundCounter, roundsToPlay);
+	    roundsPlayed, roundsToPlay);
     Set_message(msg);
-    if (roundCounter == roundsToPlay) {
+    /* only do the game over once */
+    if (roundsPlayed == roundsToPlay)
 	Game_Over();
-    }
-    roundCounter++;
 }
 
 
