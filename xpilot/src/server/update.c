@@ -47,6 +47,7 @@
 #include "click.h"
 #include "commonproto.h"
 #include "netserver.h"
+#include "walls.h"
 
 char update_version[] = VERSION;
 
@@ -136,6 +137,8 @@ void Phasing(int ind, int on)
 	CLR_BIT(pl->status, GRAVITY);
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_ON_SOUND);
     } else {
+	int hitmask = NONBALL_BIT | HITMASK(pl->team); /* kps - ok ? */
+
 	CLR_BIT(pl->used, HAS_PHASING_DEVICE);
 	if (pl->phasing_left <= 0) {
 	    if (pl->item[ITEM_PHASING] <= 0)
@@ -143,6 +146,12 @@ void Phasing(int ind, int on)
 	}
 	SET_BIT(pl->status, GRAVITY);
 	sound_play_sensors(pl->pos.cx, pl->pos.cy, PHASING_OFF_SOUND);
+	/* kps - ok to have this check here ? */
+	if (shape_is_inside(pl->pos.cx, pl->pos.cy, hitmask,
+			    (object *)pl, pl->ship, pl->dir) != NO_GROUP) {
+	    struct move mv;
+	    Player_crash(pl, &mv, CrashWall, NO_ID, 0);
+	}
     }
 }
 
@@ -1191,7 +1200,8 @@ void Update_objects(void)
 		    }
 #else
 		    if (shape_is_inside(dest.cx, dest.cy, hitmask,
-					NULL, pl->ship, pl->dir) == NO_GROUP)
+					(object *)pl, pl->ship, pl->dir)
+			== NO_GROUP)
 			break;
 #endif
 		}
