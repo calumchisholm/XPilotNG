@@ -997,25 +997,6 @@ static void Config_save_keys(FILE *fp)
 #endif
 
 #define TABSIZE 8
-static void Xpilotrc_write_resource(FILE *fp,
-				    const char *resource, const char *value)
-{
-    char		buf[256];
-    int			len, numtabs, i;
- 
-    sprintf(buf, "xpilot.%s:", resource);
-    len = (int) strlen(buf);
-
-    /* assume tabs are max size of TABSIZE */
-    numtabs = ((5 * TABSIZE - 1) - len) / TABSIZE;
-    for (i = 0; i < numtabs; i++)
-	strcat(buf, "\t");
-    fprintf(fp, "%s", buf);
-    fprintf(fp, "%s\n", value);
-}
-#undef TABSIZE
-
-#define TABSIZE 8
 static void Xpilotrc_write_line(FILE *fp, xpilotrc_line_t *lp)
 {
     char buf[4096];
@@ -1062,7 +1043,6 @@ int Xpilotrc_write(const char *path)
 	return -2;
     }
 
-#if 1
     /* make sure all options are in the xpilotrc */
     for (i = 0; i < num_options; i++) {
 	xp_option_t *opt = Option_by_index(i);
@@ -1099,20 +1079,6 @@ int Xpilotrc_write(const char *path)
 
 	Xpilotrc_write_line(fp, lp);
     }
-
-#else
-    for (i = 0; i < num_options; i++) {
-	xp_option_t *opt = Option_by_index(i);
-
-	/* Let's not save these */
-	if (Option_get_type(opt) == xp_noarg_option)
-	    continue;
-
-	Xpilotrc_write_resource(fp,
-				Option_get_name(opt),
-				Option_value_to_string(opt));
-    }
-#endif
 
     fclose(fp);
 
