@@ -363,9 +363,10 @@ int Init_player(int ind, shipshape_t *ship)
 
     /*memset(pl, 0, sizeof(player));*/
 
-    pl->vel.x	= pl->vel.y	= 0.0;
-    pl->acc.x	= pl->acc.y	= 0.0;
-    pl->float_dir = pl->dir	= DIR_UP;
+    pl->vel.x = pl->vel.y = 0.0;
+    pl->acc.x = pl->acc.y = 0.0;
+    pl->float_dir = pl->dir = DIR_UP;
+
     pl->turnvel		= 0.0;
     pl->oldturnvel	= 0.0;
     pl->turnacc		= 0.0;
@@ -377,7 +378,7 @@ int Init_player(int ind, shipshape_t *ship)
 	    pl->item[i] = World.items[i].initial;
     }
 
-    pl->fuel.sum        = World.items[ITEM_FUEL].initial << FUEL_SCALE_BITS;
+    pl->fuel.sum = World.items[ITEM_FUEL].initial << FUEL_SCALE_BITS;
     Player_init_fuel(pl, pl->fuel.sum);
 
     /*
