@@ -854,8 +854,6 @@ static void Player_collides_with_item(player_t *pl, itemobject_t *item)
     case ITEM_CLOAK:
 	pl->item[item_index] += item->item_count;
 	LIMIT(pl->item[item_index], 0, world->items[item_index].limit);
-	if (pl->item[item_index] > 0)
-	    SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
 	sound_play_sensors(pl->pos, CLOAKING_DEVICE_PICKUP_SOUND);
 	break;

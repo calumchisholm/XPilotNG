@@ -35,11 +35,8 @@ char item_version[] = VERSION;
 
 static void Item_update_flags(player_t *pl)
 {
-    if (pl->item[ITEM_CLOAK] <= 0
-	&& BIT(pl->have, HAS_CLOAKING_DEVICE)) {
-	CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
+    if (pl->item[ITEM_CLOAK] <= 0)
 	pl->updateVisibility = true;
-    }
     if (pl->item[ITEM_EMERGENCY_THRUST] <= 0
 	&& !BIT(pl->used, HAS_EMERGENCY_THRUST)
 	&& pl->emergency_thrust_left <= 0)
@@ -793,7 +790,6 @@ void Do_general_transporter(world_t *world, int id, clpos_t pos,
 	LIMIT(pl->item[item], 0, MAX_AFTERBURNER);
 	break;
     case ITEM_CLOAK:
-	SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
 	pl->updateVisibility = true;
 	break;
     case ITEM_SENSOR:

@@ -1091,7 +1091,7 @@ static bool Check_robot_target(player_t *pl, clpos_t item_pos, int new_mode)
 		Place_mine(pl);
 	    } else /*if (pl->fuel.sum < my_data->fuel_l2)*/ {
 		Place_mine(pl);
-		CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
+		CLR_BIT(pl->used, USES_CLOAKING_DEVICE);
 	    }
 	    my_data->last_dropped_mine=my_data->robot_count;
 	}
@@ -1834,7 +1834,7 @@ static void Robot_default_play(player_t *pl)
 
     my_data->robot_count--;
 
-    CLR_BIT(pl->used, HAS_SHOT | HAS_SHIELD | HAS_CLOAKING_DEVICE | HAS_LASER);
+    CLR_BIT(pl->used, HAS_SHOT | HAS_SHIELD | USES_CLOAKING_DEVICE | HAS_LASER);
     if (BIT(pl->have, HAS_EMERGENCY_SHIELD)
 	&& !BIT(pl->used, HAS_EMERGENCY_SHIELD))
 	Emergency_shield(pl, true);
@@ -1849,8 +1849,9 @@ static void Robot_default_play(player_t *pl)
     item_dist = Visibility_distance;
     item_imp = ROBOT_IGNORE_ITEM;
 
-    if (BIT(pl->have, HAS_CLOAKING_DEVICE) && pl->fuel.sum > my_data->fuel_l2)
-	SET_BIT(pl->used, HAS_CLOAKING_DEVICE);
+    if (pl->item[ITEM_CLOAK] > 0
+	&& pl->fuel.sum > my_data->fuel_l2)
+	SET_BIT(pl->used, USES_CLOAKING_DEVICE);
 
     if (BIT(pl->have, HAS_EMERGENCY_THRUST)
 	&& !BIT(pl->used, HAS_EMERGENCY_THRUST))

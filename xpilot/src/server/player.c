@@ -525,9 +525,6 @@ int Init_player(world_t *world, int ind, shipshape_t *ship, int type)
     pl->have = DEF_HAVE;
     pl->used = DEF_USED;
 
-    if (pl->item[ITEM_CLOAK] > 0)
-	SET_BIT(pl->have, HAS_CLOAKING_DEVICE);
-
     Mods_clear(&pl->mods);
     for (i = 0; i < NUM_MODBANKS; i++)
 	Mods_clear(&pl->modbank[i]);

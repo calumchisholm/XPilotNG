@@ -989,7 +989,7 @@ int Handle_keyboard(player_t *pl)
 
 	    case KEY_CLOAK:
 		if (pl->item[ITEM_CLOAK] > 0)
-		    Cloak(pl, !BIT(pl->used, HAS_CLOAKING_DEVICE));
+		    Cloak(pl, !Player_is_cloaked(pl));
 		break;
 
 	    case KEY_ECM:

@@ -875,7 +875,7 @@ static void Frame_ships(connection_t *conn, player_t *pl)
 		      pl_i->id,
 		      pl_i->dir,
 		      BIT(pl_i->used, HAS_SHIELD) != 0,
-		      BIT(pl_i->used, HAS_CLOAKING_DEVICE) != 0,
+		      Player_is_cloaked(pl_i) ? 1 : 0,
 		      BIT(pl_i->used, HAS_EMERGENCY_SHIELD) != 0,
 		      Player_is_phasing(pl_i) ? 1 : 0,
 		      BIT(pl_i->used, USES_DEFLECTOR) != 0

@@ -134,19 +134,18 @@ void Phasing(player_t *pl, bool on)
 void Cloak(player_t *pl, bool on)
 {
     if (on) {
-	if (!BIT(pl->used, HAS_CLOAKING_DEVICE) && pl->item[ITEM_CLOAK] > 0) {
+	if (!Player_is_cloaked(pl)
+	    && pl->item[ITEM_CLOAK] > 0) {
 	    sound_play_player(pl, CLOAK_SOUND);
 	    pl->updateVisibility = true;
-	    SET_BIT(pl->used, HAS_CLOAKING_DEVICE);
+	    SET_BIT(pl->used, USES_CLOAKING_DEVICE);
 	}
     } else {
-	if (BIT(pl->used, HAS_CLOAKING_DEVICE)) {
+	if (Player_is_cloaked(pl)) {
 	    sound_play_player(pl, CLOAK_SOUND);
 	    pl->updateVisibility = true;
-	    CLR_BIT(pl->used, HAS_CLOAKING_DEVICE);
+	    CLR_BIT(pl->used, USES_CLOAKING_DEVICE);
 	}
-	if (!pl->item[ITEM_CLOAK])
-	    CLR_BIT(pl->have, HAS_CLOAKING_DEVICE);
     }
 }
 
@@ -683,7 +682,7 @@ static void Use_items(player_t *pl)
 	if (Player_is_phasing(pl))
 	    Player_add_fuel(pl, ED_PHASING_DEVICE);
 
-	if (BIT(pl->used, HAS_CLOAKING_DEVICE))
+	if (Player_is_cloaked(pl))
 	    Player_add_fuel(pl, ED_CLOAKING_DEVICE);
 
 	if (BIT(pl->used, USES_DEFLECTOR))
@@ -788,7 +787,7 @@ static inline void Update_visibility(player_t *pl, int ind)
 	if (pl->forceVisible > 0)
 	    pl_j->visibility[ind].canSee = true;
 
-	if (ind == j || !BIT(pl_j->used, HAS_CLOAKING_DEVICE))
+	if (ind == j || !Player_is_cloaked(pl_j))
 	    pl->visibility[j].canSee = true;
 	else if (pl->updateVisibility
 		 || pl_j->updateVisibility
@@ -928,7 +927,7 @@ static void Update_players(world_t *world)
 	    Do_repair(pl);
 
 	if (pl->fuel.sum <= 0) {
-	    CLR_BIT(pl->used, HAS_SHIELD|HAS_CLOAKING_DEVICE|USES_DEFLECTOR);
+	    CLR_BIT(pl->used, HAS_SHIELD|USES_CLOAKING_DEVICE|USES_DEFLECTOR);
 	    Player_thrust(pl, false);
 	}
 	if (pl->fuel.sum > (pl->fuel.max - REFUEL_RATE * timeStep))
@@ -1093,7 +1092,8 @@ static void Update_players(world_t *world)
 	    }
 	}
 
-	if ((!BIT(pl->used, HAS_CLOAKING_DEVICE) || options.cloakedExhaust)
+	if ((!Player_is_cloaked(pl)
+	     || options.cloakedExhaust)
 	    && !Player_is_phasing(pl)) {
 	    if (Player_is_thrusting(pl))
   		Make_thrust_sparks(pl);

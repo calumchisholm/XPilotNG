@@ -91,7 +91,7 @@ extern bool		updateScores;
 #define HAS_AUTOPILOT		(1U<<29)
 #define USES_TRACTOR_BEAM	(1U<<28)
 #define HAS_LASER		(1U<<27)
-#define HAS_CLOAKING_DEVICE	(1U<<26)
+#define USES_CLOAKING_DEVICE	(1U<<26)
 #define HAS_SHIELD		(1U<<25)
 #define HAS_REFUEL		(1U<<24)
 #define HAS_REPAIR		(1U<<23)
@@ -527,6 +527,13 @@ static inline bool Player_uses_emergency_shield(player_t *pl)
 static inline bool Player_is_phasing(player_t *pl)
 {
     if (BIT(pl->used, USES_PHASING_DEVICE))
+	return true;
+    return false;
+}
+
+static inline bool Player_is_cloaked(player_t *pl)
+{
+    if (BIT(pl->used, USES_CLOAKING_DEVICE))
 	return true;
     return false;
 }

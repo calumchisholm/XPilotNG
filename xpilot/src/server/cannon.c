@@ -481,7 +481,7 @@ static void Cannon_aim(cannon_t *c, int weapon, player_t **pl_p, int *dir)
 	    || (BIT(world->rules->mode, TEAM_PLAY)
 		&& pl->team == c->team)
 	    || ((pl->forceVisible <= 0)
-		&& BIT(pl->used, HAS_CLOAKING_DEVICE)
+		&& Player_is_cloaked(pl)
 		&& (int)(rfrac() * (pl->item[ITEM_CLOAK] + 1))
 		   > (int)(rfrac() * (c->item[ITEM_SENSOR] + 1)))
 	    || (smartness > 2
