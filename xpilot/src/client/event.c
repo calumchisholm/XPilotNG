@@ -903,7 +903,7 @@ xp_option_t key_options[] = {
 
     XP_KEY_OPTION(
 	"keyLockClose",
-	"Select Up",
+	"Up",
 	KEY_LOCK_CLOSE,
 	"Lock on closest player.\n"),
 
