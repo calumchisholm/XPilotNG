@@ -1289,7 +1289,7 @@ void Update_objects(world_t *world)
     /*
      * Checking for collision, updating score etc. (see collision.c)
      */
-    Check_collision();
+    Check_collision(world);
 
     /*
      * Update tanks, Kill players that ought to be killed.

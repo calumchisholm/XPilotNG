@@ -105,11 +105,10 @@ void Item_damage(player_t *pl, double prob)
     }
 }
 
-int Choose_random_item(void)
+int Choose_random_item(world_t *world)
 {
-    int		i;
-    double	item_prob_sum = 0;
-    world_t *world = &World;
+    int i;
+    double item_prob_sum = 0;
 
     for (i = 0; i < NUM_ITEMS; i++)
 	item_prob_sum += world->items[i].prob;
@@ -136,7 +135,7 @@ void Place_item(player_t *pl, int item)
     clpos_t pos;
     vector_t vel;
     item_concentrator_t	*con;
-    world_t *world = &World;
+    world_t *world = pl ? pl->world : &World;
 
     if (NumObjs >= MAX_TOTAL_SHOTS) {
 	if (pl && !BIT(pl->status, KILLED))
@@ -290,15 +289,14 @@ void Place_item(player_t *pl, int item)
 	}
     }
 
-    Make_item(pos, vel, item, num_per_pack, grav | rand_item);
+    Make_item(world, pos, vel, item, num_per_pack, grav | rand_item);
 }
 
-void Make_item(clpos_t pos, vector_t vel,
+void Make_item(world_t *world, clpos_t pos, vector_t vel,
 	       int item, int num_per_pack,
 	       long status)
 {
     object_t *obj;
-    world_t *world = &World;
 
     if (!World_contains_clpos(world, pos))
 	return;
@@ -331,8 +329,8 @@ void Make_item(clpos_t pos, vector_t vel,
 
 void Throw_items(player_t *pl)
 {
-    int			num_items_to_throw, remain, item;
-    world_t *world = &World;
+    int num_items_to_throw, remain, item;
+    world_t *world = pl->world;
 
     if (!options.dropItemOnKillProb || !pl)
 	return;
@@ -363,7 +361,7 @@ void Detonate_items(player_t *pl)
     player_t *owner_pl;
     int i;
     modifiers_t mods;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (!BIT(pl->status, KILLED))
 	return;
@@ -608,12 +606,11 @@ void Do_transporter(player_t *pl)
 void Do_general_transporter(player_t *pl, clpos_t pos, player_t *victim,
 			    int *itemp, double *amountp)
 {
-    char		msg[MSG_LEN];
-    const char		*what = NULL;
-    int			i;
-    int			item = ITEM_FUEL;
-    double		amount;
-    world_t *world = &World;
+    char msg[MSG_LEN];
+    const char *what = NULL;
+    int i, item = ITEM_FUEL;
+    double amount;
+    world_t *world = pl ? pl->world : &World;
 
     /* choose item type to steal */
     for (i = 0; i < 50; i++) {
@@ -901,7 +898,7 @@ void Fire_general_ecm(player_t *pl, int team, clpos_t pos)
     mineobject_t	*closest_mine = NULL;
     smartobject_t	*smart;
     mineobject_t	*mine;
-    world_t *world = &World;
+    world_t		*world = pl ? pl->world : &World;
     double		closest_mine_range = world->hypotenuse;
     int			i, j;
     double		range, perim, damage;

@@ -165,12 +165,12 @@ static bool in_range(object_t *obj1, object_t *obj2, double range)
  */
 static char msg[MSG_LEN];
 
-static void PlayerCollision(void);
+static void PlayerCollision(world_t *world);
 static void PlayerObjectCollision(player_t *pl);
 static void PlayerCheckpointCollision(player_t *pl);
-static void AsteroidCollision(void);
-static void BallCollision(void);
-static void MineCollision(void);
+static void AsteroidCollision(world_t *world);
+static void BallCollision(world_t *world);
+static void MineCollision(world_t *world);
 static void Player_collides_with_ball(player_t *pl, object_t *obj);
 static void Player_collides_with_item(player_t *pl, object_t *obj);
 static void Player_collides_with_mine(player_t *pl, object_t *obj);
@@ -180,24 +180,23 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj);
 static void Player_pass_checkpoint(player_t *pl);
 
 
-void Check_collision(void)
+void Check_collision(world_t *world)
 {
-    BallCollision();
-    MineCollision();
+    BallCollision(world);
+    MineCollision(world);
 
     if (round_delay == 0)
-	PlayerCollision();
+	PlayerCollision(world);
 
-    AsteroidCollision();
+    AsteroidCollision(world);
 }
 
 
-static void PlayerCollision(void)
+static void PlayerCollision(world_t *world)
 {
     int i, j;
     double sc, sc2;
     player_t *pl;
-    world_t *world = &World;
 
     /* Player - player, checkpoint, treasure, object and wall */
     for (i = 0; i < NumPlayers; i++) {
@@ -545,7 +544,7 @@ static void PlayerObjectCollision(player_t *pl)
     int j, obj_count;
     double range, radius;
     object_t *obj, **obj_list;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     /*
      * Collision between a player and an object.
@@ -761,7 +760,7 @@ static void Player_collides_with_item(player_t *pl, object_t *obj)
 {
     int old_have;
     enum Item item_index;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (IsOffensiveItem((enum Item) obj->info)) {
 	int off_items = CountOffensiveItems(pl);
@@ -1094,7 +1093,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 {
     player_t *kp = NULL;
     double sc, drainfactor, drain;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     /*
      * Player got hit by a potentially deadly object.
@@ -1256,7 +1255,7 @@ static void Player_collides_with_killing_shot(player_t *pl, object_t *obj)
 static void Player_pass_checkpoint(player_t *pl)
 {
     int j;
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (pl->check == 0) {
 	pl->round++;
@@ -1318,7 +1317,7 @@ static void Player_pass_checkpoint(player_t *pl)
 
 static void PlayerCheckpointCollision(player_t *pl)
 {
-    world_t *world = &World;
+    world_t *world = pl->world;
 
     if (BIT(world->rules->mode, TIMING)
 	&& BIT(pl->status, PAUSE|GAME_OVER) == 0) {
@@ -1334,7 +1333,7 @@ static void PlayerCheckpointCollision(player_t *pl)
     }
 }
 
-static void AsteroidCollision(void)
+static void AsteroidCollision(world_t *world)
 {
     int j, radius, obj_count;
     object_t *ast;
@@ -1343,7 +1342,6 @@ static void AsteroidCollision(void)
     list_iter_t iter;
     double damage = 0.0;
     bool sound = false;
-    world_t *world = &World;
 
     list = Asteroid_get_list();
     if (!list)
@@ -1478,14 +1476,13 @@ static void AsteroidCollision(void)
 
 
 /* do ball - object and ball - checkpoint collisions */
-static void BallCollision(void)
+static void BallCollision(world_t *world)
 {
     int i, j, obj_count;
     int	ignored_object_types;
     object_t **obj_list;
     object_t *obj;
     ballobject_t *ball;
-    world_t *world = &World;
 
     /*
      * These object types ignored;
@@ -1594,7 +1591,7 @@ static void BallCollision(void)
 
 
 /* do mine - object collisions */
-static void MineCollision(void)
+static void MineCollision(world_t *world)
 {
     int i, j, obj_count;
     object_t **obj_list;

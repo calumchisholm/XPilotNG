@@ -200,7 +200,7 @@ void Break_asteroid(wireobject_t *asteroid)
 	long	status;
 
 	for (i = 0; i < nitems; i++) {
-	    item = Choose_random_item();
+	    item = Choose_random_item(world);
 	    item_dir = (int)(rfrac() * RES);
 	    item_speed = rfrac() * 10;
 	    vel.x = asteroid->vel.x + item_speed * tcos(item_dir);
@@ -216,7 +216,7 @@ void Break_asteroid(wireobject_t *asteroid)
 		    + (int)(rfrac() * (1 + world->items[item].max_per_pack
 				       - world->items[item].min_per_pack));
 
-	    Make_item(asteroid->pos, vel,
+	    Make_item(world, asteroid->pos, vel,
 		      item, num_per_pack,
 		      status);
 	}

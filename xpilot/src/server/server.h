@@ -436,7 +436,7 @@ void Cell_get_objects(clpos_t pos, int r, int max, object_t ***list, int *count)
 /*
  * Prototypes for collision.c
  */
-void Check_collision(void);
+void Check_collision(world_t *world);
 int IsOffensiveItem(enum Item i);
 int IsDefensiveItem(enum Item i);
 int CountOffensiveItems(player_t *pl);
@@ -549,7 +549,7 @@ void Tank_handle_detach(player_t *pl);
 void Add_fuel(pl_fuel_t *, double);
 void Update_tanks(pl_fuel_t *);
 void Place_item(player_t *pl, int type);
-int Choose_random_item(void);
+int Choose_random_item(world_t *world);
 void Tractor_beam(player_t *pl);
 void General_tractor_beam(player_t *pl, clpos_t pos,
 			  int items, player_t *victim, bool pressor);
@@ -641,7 +641,7 @@ void Make_wreckage(world_t  *world,
 		   int      min_dir,    int    max_dir,
 		   double   min_speed,  double max_speed,
 		   double   min_life,   double max_life);
-void Make_item(clpos_t pos,
+void Make_item(world_t *world, clpos_t pos,
 	       vector_t vel,
 	       int item, int num_per_pack,
 	       long status);

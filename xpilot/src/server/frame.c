@@ -656,15 +656,11 @@ static void Frame_shuffle(void)
 
 static void Frame_shots(connection_t *conn, player_t *pl)
 {
-    clpos_t			pos;
-    int				ldir = 0;
-    int				i, k, color;
-    int				fuzz = 0, teamshot, len;
-    int				obj_count;
-    object_t			*shot;
-    object_t			**obj_list;
-    int				hori_blocks, vert_blocks;
-    world_t *world = &World;
+    clpos_t pos;
+    int ldir = 0, i, k, color, fuzz = 0, teamshot, len, obj_count;
+    object_t *shot, **obj_list;
+    int hori_blocks, vert_blocks;
+    world_t *world = pl->world;
 
     hori_blocks = (view_width + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
     vert_blocks = (view_height + (BLOCK_SZ - 1)) / (2 * BLOCK_SZ);
@@ -846,7 +842,7 @@ static void Frame_shots(connection_t *conn, player_t *pl)
 		int item_type = shot->info;
 
 		if (BIT(shot->status, RANDOM_ITEM))
-		    item_type = Choose_random_item();
+		    item_type = Choose_random_item(world);
 
 		Send_item(conn, pos, item_type);
 	    }
