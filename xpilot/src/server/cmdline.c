@@ -1,4 +1,4 @@
-/* 
+/*
  *
  * XPilot, a multiplayer gravity war game.  Copyright (C) 1991-2001 by
  *
@@ -937,7 +937,7 @@ static option_desc options[] = {
 	valBool,
 	tuner_dummy,
 	"Can balls be blown around by exhaust? (Needs ballCollisions too)\n",
-	OPT_ORIGIN_ANY | OPT_VISIBLE	
+	OPT_ORIGIN_ANY | OPT_VISIBLE
     },
     {
 	"minesWallBounce",
@@ -3755,7 +3755,7 @@ void Timing_setup(void)
 
     /* If friction < 0, the result is silly - allow such settings but
      * don't bother making it "FPSMultiplier independent" */
-    if (friction > 0)
+    if (friction < 1)
 	friction = 1. - pow(1. - friction, 1. / FPSMultiplier);
 
 #if 0
@@ -3768,5 +3768,3 @@ void Timing_setup(void)
     xpprintf(__FILE__ ": friction          = %f\n", friction);
 #endif
 }
-
-
