@@ -253,7 +253,7 @@ struct xp_mineobject {
 #define MISSILE_EXTEND		\
     float		max_speed;	/* speed limitation */		\
     float		turnspeed;	/* how fast to turn */
-    float		fusetime;	/* time until deadly to owner */
+
 /* up to here all missiles types are the same. */
 
 /*
