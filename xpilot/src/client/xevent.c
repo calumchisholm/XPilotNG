@@ -715,7 +715,7 @@ bool Key_release(keys_t key)
 	if (lose_item_active == 2) {
 	    lose_item_active = 1;
 	} else {
-	    lose_item_active = -FPS;
+	    lose_item_active = -clientFPS;
 	}
         break;
 
@@ -819,8 +819,9 @@ void xevent_keyboard(int queued)
 #endif
 
     if (talk_key_repeat_count > 0) {
-	if (++talk_key_repeat_count >= FPS
-	    && (talk_key_repeat_count - FPS) % ((FPS + 2) / 3) == 0) {
+	if (++talk_key_repeat_count >= clientFPS
+	    && (((talk_key_repeat_count - clientFPS) % ((clientFPS + 2) / 3))
+		== 0)) {
 	    Talk_event(&talk_key_repeat_event);
 	    if (!talk_mapped)
 		talk_key_repeat_count = 0;

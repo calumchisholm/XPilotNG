@@ -1630,10 +1630,13 @@ int Net_input(void)
      * and we haven't updated it in the (previous) current time frame
      * or if we haven't sent anything for a while (keepalive)
      * then we send our current keyboard state.
+     *
+     * kps - Setup->frames_per_second was used here previously,
+     * insead of clientFPS.
      */
     if ((last_keyboard_ack != last_keyboard_change
 	    && last_keyboard_update /*+ 1*/ < last_loops)
-	|| last_loops - last_send_anything > 5 * Setup->frames_per_second) {
+	|| last_loops - last_send_anything > 5 * clientFPS) {
 	Key_update();
 	last_send_anything = last_loops;
     } else {

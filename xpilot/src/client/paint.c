@@ -163,7 +163,7 @@ other_t	*self;			/* player info */
 long		loops = 0;
 
 unsigned long	loopsSlow = 0;	/* Proceeds slower than loops */
-int		clientFPS = 0;	/* How many fps we actually paint */
+int		clientFPS = 1;	/* How many fps we actually paint */
 static time_t	old_time = 0;	/* Previous value of time */
 time_t		currentTime;	/* Current value of time() */
 static int	frame_count = 0;/* Used to estimate paint fps */
@@ -228,8 +228,18 @@ void Paint_frame(void)
 	old_time = currentTime;
 	clientFPS = frame_count;
 	frame_count = 0;
-	if (clientFPS != 0)
-	    timePerFrame = 1.0 / clientFPS;
+	/*
+	 * I've changed some places that used FPS (from setup) in client
+	 * to use clientFPS, to allow client to adapt to server changing
+	 * FPS dynamically ("/set fps 100" command on server).
+	 *
+	 * NOTE: we must force clientFPS to be > 0 always, for example in
+	 * xevent_keyboard() clientFPS == 0 would result in calculating
+	 * something % 0, which is bad.
+	 */
+	if (clientFPS <= 0)
+	    clientFPS = 1;
+	timePerFrame = 1.0 / clientFPS;
 
 	/* kps hack - check once per second if we are playing */
 	if (self && !strchr("PTW", self->mychar))

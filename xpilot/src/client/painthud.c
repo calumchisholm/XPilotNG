@@ -506,6 +506,7 @@ void Paint_HUD_items(int hud_pos_x, int hud_pos_y)
 	    continue;
 
 	if (num != lastNumItems[i]) {
+	    /* kps - change */
 	    numItemsTime[i] = (int)(showItemsTime * (float)FPS);
 	    lastNumItems[i] = num;
 	}
