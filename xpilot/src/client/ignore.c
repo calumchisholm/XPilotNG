@@ -31,12 +31,7 @@ const char c_commands[NUMCOMMANDS][16] = {
     "help", "h"
 };
 
-extern other_t *Others;
-extern int num_others;
-
-void Add_message(char *message);
-
-void print_ignorelist(void)
+static void print_ignorelist(void)
 {
     char buffer[MAX_CHARS] = "";
     int i;
@@ -71,9 +66,8 @@ void print_ignorelist(void)
     if (check) {
 	strcat(buffer, "[*Client reply*]");
 	Add_message(buffer);
-    } else {
+    } else
 	Add_message("Ignorelist is empty [*Client reply*]");
-    }
 }
 
 void print_help(char *arg)
@@ -100,25 +94,26 @@ void print_help(char *arg)
 	switch (i) {
 	case 0:		/* ignore */
 	case 1:		/* i */
-	    Add_message
-		("'\\ignore <player>' ignores <player> by changing text to ***'s. [*Client reply*]");
-	    Add_message
-		("Just '\\ignore' shows list of ignored players [*Client reply*]");
+	    Add_message("'\\ignore <player>' ignores <player> by changing "
+			"text to ***'s. [*Client reply*]");
+	    Add_message("Just '\\ignore' shows list of ignored players "
+			"[*Client reply*]");
 	    break;
 	case 2:		/* ignore! */
 	case 3:		/* i! */
-	    Add_message
-		("'\\ignore! <player>' ignores <player> completely. [*Client reply*]");
+	    Add_message("'\\ignore! <player>' ignores <player> completely. "
+			"[*Client reply*]");
 	    break;
 	case 4:		/* unignore */
 	case 5:		/* u */
-	    Add_message
-		("'\\unignore <player>' allows messages from <player> again. [*Client reply*]");
+	    Add_message("'\\unignore <player>' allows messages from <player> "
+			"again. [*Client reply*]");
 	    break;
 	case 6:		/* help */
 	case 7:		/* h */
-	    Add_message
-		("'\\help <command>' shows help about <command>. Just '\\help' show avaiable commands [*Client reply *]");
+	    Add_message("'\\help <command>' shows help about <command>. "
+			"Just '\\help' show avaiable commands "
+			"[*Client reply *]");
 	    break;
 	default:
 	    Add_message("No such command [*Client reply*]");
@@ -129,74 +124,33 @@ void print_help(char *arg)
 
 void ignorePlayer(char *name, short level)
 {
-    int i, count = 0;
-    other_t *other;
+    other_t *other = Other_by_name(name);
+    char buf[64 + MAX_NAME_LEN];
 
-    other = Other_by_name(name);
-    if (other == NULL) {
-	for (i = 0; i < num_others; i++) {
-	    if (!strncasecmp(Others[i].name, name, strlen(name))) {
-		other = &Others[i];
-		count++;
-	    }
+    if (other != NULL) {
+	if (level == 1) {
+	    snprintf(buf, sizeof(buf),
+		     "Ignoring %s (textmask). [*Client reply*]", other->name);
+	    Add_message(buf);
+	} else {
+	    snprintf(buf, sizeof(buf),
+		     "Ignoring %s (completely). [*Client reply*]",
+		     other->name);
+	    Add_message(buf);
 	}
-
-	switch (count) {
-	case 0:
-	    Add_message("No such player. [*Client reply*]");
-	    return;
-	    break;
-	case 1:
-	    if (level == 1)
-		Add_message
-		    ("Ignoring player (textmask). [*Client reply*]");
-	    else
-		Add_message
-		    ("Ignoring player (completely). [*Client reply*]");
-	    other->ignorelevel = level;
-	    return;
-	    break;
-	default:
-	    Add_message("Ambigious. [*Client reply*]");
-	    return;
-	    break;
-	}
-    } else {
 	other->ignorelevel = level;
     }
 }
 
 void unignorePlayer(char *name)
 {
-    int i, count = 0;
-    other_t *other;
+    other_t *other = Other_by_name(name);
+    char buf[64 + MAX_NAME_LEN];
 
-    other = Other_by_name(name);
-    if (other == NULL) {
-	for (i = 0; i < num_others; i++) {
-	    if (!strncasecmp(Others[i].name, name, strlen(name))
-		&& Others[i].ignorelevel) {
-		other = &Others[i];
-		count++;
-	    }
-	}
-
-	switch (count) {
-	case 0:
-	    Add_message("No such player. [*Client reply*]");
-	    return;
-	    break;
-	case 1:
-	    Add_message("Stopped ignoring player. [*Client reply*]");
-	    other->ignorelevel = 0;
-	    return;
-	    break;
-	default:
-	    Add_message("Ambigious. [*Client reply*]");
-	    return;
-	    break;
-	}
-    } else {
+    if (other != NULL) {
+	snprintf(buf, sizeof(buf),
+		 "Stopped ignoring %s. [*Client reply*]", other->name);
+	Add_message(buf);
 	other->ignorelevel = 0;
     }
 }
@@ -216,9 +170,8 @@ void executeCommand(char *talk_str)
 
     command[i] = '\0';
 
-    if (i + 2 < strlen(talk_str)) {
+    if (i + 2 < strlen(talk_str))
 	strcpy(argument, &talk_str[i + 2]);
-    }
 
     for (i = 0; i < NUMCOMMANDS; i++) {
 	if (!strcmp(command, c_commands[i]))
@@ -236,11 +189,10 @@ void executeCommand(char *talk_str)
     case 1:			/* i */
     case 2:			/* ignore! */
     case 3:			/* i! */
-	if (argument[0] == '\0') {	/* empty */
+	if (argument[0] == '\0')	/* empty */
 	    print_ignorelist();
-	} else {
+	else
 	    ignorePlayer(argument, (short) (command_num / 2 + 1));
-	}
 	break;
     case 4:			/* unignore */
     case 5:			/* u */
@@ -255,9 +207,7 @@ void executeCommand(char *talk_str)
 
 void crippleTalk(char *msg)
 {
-    int i, j;
-    int msgEnd;
-    unsigned short ballFound = 0;
+    int i, msgEnd;
 
     for (i = strlen(msg) - 1; i > 0; i--) {
 	if (msg[i - 1] == ' ' && msg[i] == '[')
@@ -270,32 +220,7 @@ void crippleTalk(char *msg)
     msgEnd = i - 1;
 
     for (i = 0; i < msgEnd; i++) {
-	if (!strncasecmp(&msg[i], "ball", 4)) {
-	    ballFound = 1;
-	    break;
-	}
-    }
-
-    for (i = 0; i < msgEnd; i++) {
-	if (!strncasecmp(&msg[i], "ball", 4)
-	    || !strncasecmp(&msg[i], "safe", 4)) {
-	    i += 3;
-	} else if (ballFound) {
-	    for (j = 0; j < num_others; j++) {
-		if (!strncasecmp
-		    (&msg[i], Others[j].name, strlen(Others[j].name))) {
-		    i += strlen(Others[j].name) - 1;
-		    break;
-		}
-	    }
-
-	    if (j == num_others && (isalpha(msg[i]) || isdigit(msg[i])))
-		msg[i] = '*';
-
-	} else {
-	    if (isalpha(msg[i]) || isdigit(msg[i])) {
-		msg[i] = '*';
-	    }
-	}
+	if (isalpha(msg[i]) || isdigit(msg[i]))
+	    msg[i] = '*';
     }
 }

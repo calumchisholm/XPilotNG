@@ -26,12 +26,12 @@
 char client_version[] = VERSION;
 
 
-bool			is_server = false;	/* used in common code */
+bool	is_server = false;	/* used in common code */
 char	*talk_fast_msgs[TALK_FAST_NR_OF_MSGS];	/* talk macros */
 
-int			scoresChanged = 0;
-int			RadarHeight = 0;
-int			RadarWidth = 256;	/* must always be 256! */
+int	scoresChanged = 0;
+int	RadarHeight = 0;
+int	RadarWidth = 256;	/* must always be 256! */
 
 int     oldServer;
 ipos	pos;
@@ -66,27 +66,29 @@ short	shieldtimemax;
 short	phasingtime;
 short	phasingtimemax;
 
-int		roundDelay;			/* != 0 means we're in a delay */
-int		roundDelayMax;		/* (not yet) used for graph of time remaining in delay */
+int	roundDelay;		/* != 0 means we're in a delay */
+int	roundDelayMax;		/* (not yet) used for graph of time
+				   remaining in delay */
 
 int	map_point_distance;	/* spacing of navigation points */
 int	map_point_size;		/* size of navigation points */
 int	spark_size;		/* size of debris and spark */
 int	shot_size;		/* size of shot */
 int	teamshot_size;		/* size of team shot */
-bool	showNastyShots = false;		/* show original flavor shots or the new "nasty shots" */
+bool	showNastyShots = false;	/* show original flavor shots or the new 
+				   "nasty shots" */
 DFLOAT	controlTime;		/* Display control for how long? */
 u_byte	spark_rand;		/* Sparkling effect */
 u_byte	old_spark_rand;		/* previous value of spark_rand */
 
-long	fuelSum;			/* Sum of fuel in all tanks */
-long	fuelMax;			/* How much fuel can you take? */
-short	fuelCurrent;			/* Number of currently used tank */
-short	numTanks;			/* Number of tanks */
-DFLOAT	fuelTime;			/* Display fuel for how long? */
-int	fuelLevel1;			/* Fuel critical level */
-int	fuelLevel2;			/* Fuel warning level */
-int	fuelLevel3;			/* Fuel notify level */
+long	fuelSum;		/* Sum of fuel in all tanks */
+long	fuelMax;		/* How much fuel can you take? */
+short	fuelCurrent;		/* Number of currently used tank */
+short	numTanks;		/* Number of tanks */
+DFLOAT	fuelTime;		/* Display fuel for how long? */
+int	fuelLevel1;		/* Fuel critical level */
+int	fuelLevel2;		/* Fuel warning level */
+int	fuelLevel3;		/* Fuel notify level */
 
 char	*shipShape;		/* Shape of player's ship */
 DFLOAT	power;			/* Force of thrust */
@@ -132,8 +134,8 @@ int	clientPortEnd = 0;	/* Last one (these are for firewalls) */
 byte	lose_item;		/* index for dropping owned item */
 int	lose_item_active;	/* one of the lose keys is pressed */
 
-DFLOAT scaleFactor;
-DFLOAT scaleFactor_s;
+DFLOAT	scaleFactor;
+DFLOAT	scaleFactor_s;
 
 #ifdef SOUND
 char 	sounds[MAX_CHARS];	/* audio mappings */
@@ -141,9 +143,9 @@ char 	audioServer[MAX_CHARS];	/* audio server */
 int 	maxVolume;		/* maximum volume (in percent) */
 #endif /* SOUND */
 
-other_t		*Others = 0;
-int		num_others = 0,
-		max_others = 0;
+other_t	*Others = 0;
+int	num_others = 0,
+	max_others = 0;
 
 static DFLOAT		teamscores[MAX_TEAMS];
 
@@ -171,8 +173,6 @@ static int		num_cannons = 0;
 static target_t		*targets = 0;
 static int		num_targets = 0;
 
-/*static checkpoint_t	checks[MAX_CHECKPOINT];*/
-
 score_object_t		score_objects[MAX_SCORE_OBJECTS];
 int			score_object = 0;
 
@@ -196,17 +196,14 @@ static fuelstation_t *Fuelstation_by_pos(int x, int y)
     pos = x * Setup->y + y;
     while (lo < hi) {
 	i = (lo + hi) >> 1;
-	if (pos > fuels[i].pos) {
+	if (pos > fuels[i].pos)
 	    lo = i + 1;
-	} else {
+	else
 	    hi = i;
-	}
     }
-    if (lo == hi && pos == fuels[lo].pos) {
+    if (lo == hi && pos == fuels[lo].pos)
 	return &fuels[lo];
-    }
-    errno = 0;
-    error("No fuelstation at (%d,%d)", x, y);
+    warn("No fuelstation at (%d,%d)", x, y);
     return NULL;
 }
 
@@ -214,17 +211,15 @@ int Fuel_by_pos(int x, int y)
 {
     fuelstation_t	*fuelp;
 
-    if ((fuelp = Fuelstation_by_pos(x, y)) == NULL) {
+    if ((fuelp = Fuelstation_by_pos(x, y)) == NULL)
 	return 0;
-    }
     return fuelp->fuel;
 }
 
 int Target_by_index(int ind, int *xp, int *yp, int *dead_time, int *damage)
 {
-    if (ind < 0 || ind >= num_targets) {
+    if (ind < 0 || ind >= num_targets)
 	return -1;
-    }
     *xp = targets[ind].pos / Setup->y;
     *yp = targets[ind].pos % Setup->y;
     *dead_time = targets[ind].dead_time;
@@ -241,26 +236,23 @@ int Target_alive(int x, int y, int *damage)
     pos = x * Setup->y + y;
     while (lo < hi) {
 	i = (lo + hi) >> 1;
-	if (pos > targets[i].pos) {
+	if (pos > targets[i].pos)
 	    lo = i + 1;
-	} else {
+	else
 	    hi = i;
-	}
     }
     if (lo == hi && pos == targets[lo].pos) {
 	*damage = targets[lo].damage;
 	return targets[lo].dead_time;
     }
-    errno = 0;
-    error("No targets at (%d,%d)", x, y);
+    warn("No targets at (%d,%d)", x, y);
     return -1;
 }
 
 int Handle_fuel(int ind, int fuel)
 {
     if (ind < 0 || ind >= num_fuels) {
-	errno = 0;
-	error("Bad fuelstation index (%d)", ind);
+	warn("Bad fuelstation index (%d)", ind);
 	return -1;
     }
     fuels[ind].fuel = fuel;
@@ -276,17 +268,14 @@ static cannontime_t *Cannon_by_pos(int x, int y)
     pos = x * Setup->y + y;
     while (lo < hi) {
 	i = (lo + hi) >> 1;
-	if (pos > cannons[i].pos) {
+	if (pos > cannons[i].pos)
 	    lo = i + 1;
-	} else {
+	else
 	    hi = i;
-	}
     }
-    if (lo == hi && pos == cannons[lo].pos) {
+    if (lo == hi && pos == cannons[lo].pos)
 	return &cannons[lo];
-    }
-    errno = 0;
-    error("No cannon at (%d,%d)", x, y);
+    warn("No cannon at (%d,%d)", x, y);
     return NULL;
 }
 
@@ -294,9 +283,8 @@ int Cannon_dead_time_by_pos(int x, int y, int *dot)
 {
     cannontime_t	*cannonp;
 
-    if ((cannonp = Cannon_by_pos(x, y)) == NULL) {
+    if ((cannonp = Cannon_by_pos(x, y)) == NULL)
 	return -1;
-    }
     *dot = cannonp->dot;
     return cannonp->dead_time;
 }
@@ -304,8 +292,7 @@ int Cannon_dead_time_by_pos(int x, int y, int *dot)
 int Handle_cannon(int ind, int dead_time)
 {
     if (ind < 0 || ind >= num_cannons) {
-	errno = 0;
-	error("Bad cannon index (%d)", ind);
+	warn("Bad cannon index (%d)", ind);
 	return 0;
     }
     cannons[ind].dead_time = dead_time;
@@ -315,8 +302,7 @@ int Handle_cannon(int ind, int dead_time)
 int Handle_target(int num, int dead_time, int damage)
 {
     if (num < 0 || num >= num_targets) {
-	errno = 0;
-	error("Bad target index (%d)", num);
+	warn("Bad target index (%d)", num);
 	return 0;
     }
     if (dead_time == 0
@@ -348,17 +334,14 @@ static homebase_t *Homebase_by_pos(int x, int y)
     pos = x * Setup->y + y;
     while (lo < hi) {
 	i = (lo + hi) >> 1;
-	if (pos > bases[i].pos) {
+	if (pos > bases[i].pos)
 	    lo = i + 1;
-	} else {
+	else
 	    hi = i;
-	}
     }
-    if (lo == hi && pos == bases[lo].pos) {
+    if (lo == hi && pos == bases[lo].pos)
 	return &bases[lo];
-    }
-    errno = 0;
-    error("No homebase at (%d,%d)", x, y);
+    warn("No homebase at (%d,%d)", x, y);
     return NULL;
 }
 
@@ -366,9 +349,8 @@ int Base_info_by_pos(int x, int y, int *idp, int *teamp)
 {
     homebase_t	*basep;
 
-    if ((basep = Homebase_by_pos(x, y)) == NULL) {
+    if ((basep = Homebase_by_pos(x, y)) == NULL)
 	return -1;
-    }
     *idp = basep->id;
     *teamp = basep->team;
     return 0;
@@ -379,8 +361,7 @@ int Handle_base(int id, int ind)
     int		i;
 
     if (ind < 0 || ind >= num_bases) {
-	errno = 0;
-	error("Bad homebase index (%d)", ind);
+	warn("Bad homebase index (%d)", ind);
 	return -1;
     }
     for (i = 0; i < num_bases; i++) {
@@ -395,8 +376,7 @@ int Handle_base(int id, int ind)
 int Check_pos_by_index(int ind, int *xp, int *yp)
 {
     if (ind < 0 || ind >= num_checks) {
-	errno = 0;
-	error("Bad checkpoint index (%d)", ind);
+	warn("Bad checkpoint index (%d)", ind);
 	*xp = 0;
 	*yp = 0;
 	return -1;
@@ -412,12 +392,10 @@ int Check_index_by_pos(int x, int y)
 
     pos = x * Setup->y + y;
     for (i = 0; i < num_checks; i++) {
-	if (pos == checks[i].pos) {
+	if (pos == checks[i].pos)
 	    return i;
-	}
     }
-    errno = 0;
-    error("Can't find checkpoint (%d,%d)", x, y);
+    warn("Can't find checkpoint (%d,%d)", x, y);
     return 0;
 }
 
@@ -426,24 +404,18 @@ int Check_index_by_pos(int x, int y)
  */
 static void Map_make_dot(unsigned char *data)
 {
-    if (*data == SETUP_SPACE) {
+    if (*data == SETUP_SPACE)
 	*data = SETUP_SPACE_DOT;
-    }
-    else if (*data == SETUP_DECOR_FILLED) {
+    else if (*data == SETUP_DECOR_FILLED)
 	*data = SETUP_DECOR_DOT_FILLED;
-    }
-    else if (*data == SETUP_DECOR_RU) {
+    else if (*data == SETUP_DECOR_RU)
 	*data = SETUP_DECOR_DOT_RU;
-    }
-    else if (*data == SETUP_DECOR_RD) {
+    else if (*data == SETUP_DECOR_RD)
 	*data = SETUP_DECOR_DOT_RD;
-    }
-    else if (*data == SETUP_DECOR_LU) {
+    else if (*data == SETUP_DECOR_LU)
 	*data = SETUP_DECOR_DOT_LU;
-    }
-    else if (*data == SETUP_DECOR_LD) {
+    else if (*data == SETUP_DECOR_LD)
 	*data = SETUP_DECOR_DOT_LD;
-    }
 }
 
 /*
@@ -474,24 +446,18 @@ void Map_dots(void)
      */
     for (i = Setup->x * Setup->y; i-- > 0; ) {
 	if (dot[Setup->map_data[i]]) {
-	    if (Setup->map_data[i] == SETUP_SPACE_DOT) {
+	    if (Setup->map_data[i] == SETUP_SPACE_DOT)
 		Setup->map_data[i] = SETUP_SPACE;
-	    }
-	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_FILLED) {
+	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_FILLED)
 		Setup->map_data[i] = SETUP_DECOR_FILLED;
-	    }
-	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_RU) {
+	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_RU)
 		Setup->map_data[i] = SETUP_DECOR_RU;
-	    }
-	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_RD) {
+	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_RD)
 		Setup->map_data[i] = SETUP_DECOR_RD;
-	    }
-	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_LU) {
+	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_LU)
 		Setup->map_data[i] = SETUP_DECOR_LU;
-	    }
-	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_LD) {
+	    else if (Setup->map_data[i] == SETUP_DECOR_DOT_LD)
 		Setup->map_data[i] = SETUP_DECOR_LD;
-	    }
 	}
     }
 
@@ -514,41 +480,36 @@ void Map_dots(void)
     if (map_point_size > 0) {
 	if (BIT(Setup->mode, WRAP_PLAY)) {
 	    for (x = 0; x < Setup->x; x++) {
-		if (dot[Setup->map_data[x * Setup->y]]) {
+		if (dot[Setup->map_data[x * Setup->y]])
 		    Map_make_dot(&Setup->map_data[x * Setup->y]);
-		}
 	    }
 	    for (y = 0; y < Setup->y; y++) {
-		if (dot[Setup->map_data[y]]) {
+		if (dot[Setup->map_data[y]])
 		    Map_make_dot(&Setup->map_data[y]);
-		}
 	    }
 	    start = map_point_distance;
-	} else {
+	} else
 	    start = 0;
-	}
+
 	if (map_point_distance > 0) {
 	    for (x = start; x < Setup->x; x += map_point_distance) {
 		for (y = start; y < Setup->y; y += map_point_distance) {
-		    if (dot[Setup->map_data[x * Setup->y + y]]) {
+		    if (dot[Setup->map_data[x * Setup->y + y]])
 			Map_make_dot(&Setup->map_data[x * Setup->y + y]);
-		    }
 		}
 	    }
 	}
 	for (i = 0; i < num_cannons; i++) {
 	    x = cannons[i].pos / Setup->y;
 	    y = cannons[i].pos % Setup->y;
-	    if ((x == 0 || y == 0) && BIT(Setup->mode, WRAP_PLAY)) {
+	    if ((x == 0 || y == 0) && BIT(Setup->mode, WRAP_PLAY))
 		cannons[i].dot = 1;
-	    }
 	    else if (map_point_distance > 0
 		&& x % map_point_distance == 0
-		&& y % map_point_distance == 0) {
+		&& y % map_point_distance == 0)
 		cannons[i].dot = 1;
-	    } else {
+	    else
 		cannons[i].dot = 0;
-	    }
 	}
     }
 }
@@ -569,49 +530,41 @@ void Map_restore(int startx, int starty, int width, int height)
      */
     x = startx;
     for (i = 0; i < width; i++, x++) {
-	if (x < 0) {
+	if (x < 0)
 	    x += Setup->x;
-	}
-	else if (x >= Setup->x) {
+	else if (x >= Setup->x)
 	    x -= Setup->x;
-	}
 
 	y = starty;
 	for (j = 0; j < height; j++, y++) {
-	    if (y < 0) {
+	    if (y < 0)
 		y += Setup->y;
-	    }
-	    else if (y >= Setup->y) {
+	    else if (y >= Setup->y)
 		y -= Setup->y;
-	    }
 
 	    map_index = x * Setup->y + y;
 
 	    type = Setup->map_data[map_index];
 	    if ((type & BLUE_BIT) == 0) {
-		if (type == SETUP_FILLED_NO_DRAW) {
+		if (type == SETUP_FILLED_NO_DRAW)
 		    Setup->map_data[map_index] = SETUP_FILLED;
-		}
 	    }
-	    else if ((type & BLUE_FUEL) == BLUE_FUEL) {
+	    else if ((type & BLUE_FUEL) == BLUE_FUEL)
 		Setup->map_data[map_index] = SETUP_FUEL;
-	    }
+
 	    else if (type & BLUE_OPEN) {
-		if (type & BLUE_BELOW) {
+		if (type & BLUE_BELOW)
 		    Setup->map_data[map_index] = SETUP_REC_RD;
-		} else {
+		else
 		    Setup->map_data[map_index] = SETUP_REC_LU;
-		}
 	    }
 	    else if (type & BLUE_CLOSED) {
-		if (type & BLUE_BELOW) {
+		if (type & BLUE_BELOW)
 		    Setup->map_data[map_index] = SETUP_REC_LD;
-		} else {
+		else
 		    Setup->map_data[map_index] = SETUP_REC_RU;
-		}
-	    } else {
+	    } else
 		Setup->map_data[map_index] = SETUP_FILLED;
-	    }
 	}
     }
 }
@@ -661,28 +614,23 @@ void Map_blue(int startx, int starty, int width, int height)
 	blue[SETUP_REC_LD];
     for (i = BLUE_BIT; i < sizeof blue; i++) {
 	if ((i & BLUE_FUEL) == BLUE_FUEL
-	    || (i & (BLUE_OPEN|BLUE_CLOSED)) == 0) {
+	    || (i & (BLUE_OPEN|BLUE_CLOSED)) == 0)
 	    blue[i] = blue[SETUP_FILLED];
-	}
     }
 
     x = startx;
     for (i = 0; i < width; i++, x++) {
-	if (x < 0) {
+	if (x < 0)
 	    x += Setup->x;
-	}
-	else if (x >= Setup->x) {
+	else if (x >= Setup->x)
 	    x -= Setup->x;
-	}
 
 	y = starty;
 	for (j = 0; j < height; j++, y++) {
-	    if (y < 0) {
+	    if (y < 0)
 		y += Setup->y;
-	    }
-	    else if (y >= Setup->y) {
+	    else if (y >= Setup->y)
 		y -= Setup->y;
-	    }
 
 	    map_index = x * Setup->y + y;
 
@@ -808,9 +756,8 @@ void Map_blue(int startx, int starty, int width, int height)
 		continue;
 	    }
 	    if (newtype != 0) {
-		if (newtype == BLUE_BIT) {
+		if (newtype == BLUE_BIT)
 		    newtype = SETUP_FILLED_NO_DRAW;
-		}
 		Setup->map_data[map_index] = newtype;
 	    }
 	}
@@ -838,12 +785,10 @@ static int Map_init(void)
     types[SETUP_CANNON_RIGHT] = 2;
     types[SETUP_CANNON_DOWN] = 2;
     types[SETUP_CANNON_LEFT] = 2;
-    for (i = SETUP_TARGET; i < SETUP_TARGET + 10; i++) {
+    for (i = SETUP_TARGET; i < SETUP_TARGET + 10; i++)
 	types[i] = 3;
-    }
-    for (i = SETUP_BASE_LOWEST; i <= SETUP_BASE_HIGHEST; i++) {
+    for (i = SETUP_BASE_LOWEST; i <= SETUP_BASE_HIGHEST; i++)
 	types[i] = 4;
-    }
     max = Setup->x * Setup->y;
     for (i = 0; i < max; i++) {
 	switch (types[Setup->map_data[i]]) {
@@ -885,9 +830,9 @@ static int Map_init(void)
 	}
 	num_cannons = 0;
     }
-    for (i = 0; i < num_checks; i++) {
+    for (i = 0; i < num_checks; i++)
 	types[SETUP_CHECK + i] = 5;
-    }
+
     for (i = 0; i < max; i++) {
 	type = Setup->map_data[i];
 	switch (types[type]) {
@@ -955,7 +900,7 @@ static int Map_cleanup(void)
 	    cannons = NULL;
 	}
 	num_cannons = 0;
-	}
+    }
     return 0;
 }
 
@@ -972,7 +917,68 @@ other_t *Other_by_id(int id)
     return NULL;
 }
 
-/* Only used by message scan hack */
+other_t *Other_by_name(char *name)
+{
+    int i;
+    other_t *found_other = NULL, *other;
+    size_t len;
+
+    if (name == NULL || (len = strlen(name)) == 0)
+	goto match_none;
+
+    /* Look for an exact match on player nickname. */
+    for (i = 0; i < num_others; i++) {
+	other = &Others[i];
+	if (!strcasecmp(other->name, name))
+	    return other;
+    }
+
+    /* Look if 'name' matches beginning of only one nick. */
+    for (i = 0; i < num_others; i++) {
+	other = &Others[i];
+
+	if (!strncasecmp(other->name, name, len)) {
+	    if (found_other)
+		goto match_several;
+	    found_other = other;
+	    continue;
+	}
+    }
+    if (found_other)
+	return found_other;
+
+    /*
+     * Check what players' name 'name' is a substring of (case insensitively).
+     */
+    for (i = 0; i < num_others; i++) {
+	int j;
+	other = &Others[i];
+
+	for (j = 0; j < 1 + (int)strlen(other->name) - (int)len; j++) {
+	    if (!strncasecmp(other->name + j, name, len)) {
+		if (found_other)
+		    goto match_several;
+		found_other = other;
+		break;
+	    }
+	}
+    }
+    if (found_other)
+	return found_other;
+
+ match_none:
+    {
+	Add_message("Name does not match any player. [*Client reply*]");
+	return NULL;
+    }
+ match_several:
+    {
+	Add_message("Name matches several players. [*Client reply*]");
+	return NULL;
+    }
+}
+
+#if 0
 other_t *Other_by_name(char *name)
 {
     int i;
@@ -986,6 +992,7 @@ other_t *Other_by_name(char *name)
     }
     return NULL;
 }
+#endif
 
 shipobj *Ship_by_id(int id)
 {
@@ -1039,8 +1046,8 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 {
     other_t		*other;
 
-    if (BIT(Setup->mode, TEAM_PLAY) && (player_team < 0
-					|| player_team >= MAX_TEAMS)) {
+    if (BIT(Setup->mode, TEAM_PLAY)
+	&& (player_team < 0 || player_team >= MAX_TEAMS)) {
 	warn("Illegal team %d for received player, setting to 0", player_team);
 	player_team = 0;
     }
@@ -1053,21 +1060,16 @@ int Handle_player(int id, int player_team, int mychar, char *player_name,
 		Others = realloc(Others, max_others * sizeof(other_t));
 	    if (Others == NULL)
 		fatal("Not enough memory for player info");
-	    if (self != NULL) {
-		/*
-		 * We've made `self' the first member of Others[].
-		 */
+	    if (self != NULL)
+		/* We've made `self' the first member of Others[]. */
 		self = &Others[0];
-	    }
 	}
 	other = &Others[num_others++];
     }
     if (self == NULL
 	&& (myself || (version < 0x4F10 && strcmp(name, player_name) == 0))) {
 	if (other != &Others[0]) {
-	    /*
-	     * Make `self' the first member of Others[].
-	     */
+	    /* Make `self' the first member of Others[]. */
 	    *other = Others[0];
 	    other = &Others[0];
 	}
@@ -1125,8 +1127,7 @@ int Handle_war(int robot_id, int killer_id)
     char		msg[MSG_LEN];
 
     if ((robot = Other_by_id(robot_id)) == NULL) {
-	errno = 0;
-	error("Can't update war for non-existing player (%d,%d)",
+	warn("Can't update war for non-existing player (%d,%d)",
 	      robot_id, killer_id);
 	return 0;
     }
@@ -1138,8 +1139,7 @@ int Handle_war(int robot_id, int killer_id)
 	return 0;
     }
     if ((killer = Other_by_id(killer_id)) == NULL) {
-	errno = 0;
-	error("Can't update war against non-existing player (%d,%d)",
+	warn("Can't update war against non-existing player (%d,%d)",
 	      robot_id, killer_id);
 	return 0;
     }
@@ -1161,8 +1161,7 @@ int Handle_seek(int programmer_id, int robot_id, int sought_id)
     if ((programmer = Other_by_id(programmer_id)) == NULL
 	|| (robot = Other_by_id(robot_id)) == NULL
 	|| (sought = Other_by_id(sought_id)) == NULL) {
-	errno = 0;
-	error("Bad player seek (%d,%d,%d)",
+	warn("Bad player seek (%d,%d,%d)",
 	      programmer_id, robot_id, sought_id);
 	return 0;
     }
@@ -1181,11 +1180,8 @@ int Handle_score(int id, DFLOAT score, int life, int mychar, int alliance)
     other_t		*other;
 
     if ((other = Other_by_id(id)) == NULL) {
-#ifndef _WINDOWS
-	errno = 0;
-	error("Can't update score for non-existing player %d,%.2f,%d",
+	warn("Can't update score for non-existing player %d,%.2f,%d",
 	      id, score, life);
-#endif
 	return 0;
     }
     else if (other->score != score
@@ -1217,8 +1213,8 @@ int Handle_timing(int id, int check, int round)
     other_t		*other;
 
     if ((other = Other_by_id(id)) == NULL) {
-	errno = 0;
-	error("Can't update timing for non-existing player %d,%d,%d", id, check, round);
+	warn("Can't update timing for non-existing player %d,%d,%d",
+	      id, check, round);
 	return 0;
     }
     else if (other->check != check
@@ -1244,11 +1240,10 @@ int Handle_score_object(DFLOAT score, int x, int y, char *msg)
 
     /* Initialize sobj->hud_msg (is shown on the HUD) */
     if (msg[0] != '\0') {
-	if (Using_score_decimals()) {
+	if (Using_score_decimals())
 	    sprintf(sobj->hud_msg, "%s %.*f", msg, showScoreDecimals, score);
-	} else {
+	else
 	    sprintf(sobj->hud_msg, "%s %d", msg, (int) rint(score));
-	}
 	sobj->hud_msg_len = strlen(sobj->hud_msg);
 	sobj->hud_msg_width = XTextWidth(gameFont,
 					 sobj->hud_msg, sobj->hud_msg_len);
@@ -1256,11 +1251,10 @@ int Handle_score_object(DFLOAT score, int x, int y, char *msg)
 	sobj->hud_msg_len = 0;
 
     /* Initialize sobj->msg data (is shown on game area) */
-    if (Using_score_decimals()) {
+    if (Using_score_decimals())
 	sprintf(sobj->msg, "%.*f", showScoreDecimals, score);
-    } else {
+    else
 	sprintf(sobj->msg, "%d", (int) rint(score));
-    }
     sobj->msg_len = strlen(sobj->msg);
     sobj->msg_width = XTextWidth(gameFont, sobj->msg, sobj->msg_len);
 
@@ -1372,9 +1366,8 @@ static void Determine_team_order(struct team_score *team_order[],
 			&& ((BIT(Setup->mode, LIMITED_LIVES))
 			    ? (team[i].life > team_order[j]->life)
 			    : (team[i].life < team_order[j]->life)))) {
-		    for (k = i; k > j; k--) {
+		    for (k = i; k > j; k--)
 			team_order[k] = team_order[k - 1];
-		    }
 		    break;
 		}
 	    }
@@ -1439,10 +1432,6 @@ static void Determine_order(other_t **order, struct team_score team[])
 		team[other->team].score += other->score;
 		break;
 	    }
-	    /*if (version >= 0x4500) {
-	      team[other->team].score = teamscores[other->team];
-	      }*/
-
 	}
     }
     return;
@@ -1632,21 +1621,17 @@ int Client_init(char *server, unsigned server_version)
     Make_table();
     Init_scale_array();
 
-    if ( Init_wreckage() == -1 ) {
+    if (Init_wreckage() == -1)
 	return -1;
-    }
 
-    if (Init_asteroids() == -1) {
+    if (Init_asteroids() == -1)
 	return -1;
-    }
 
-    if (Bitmap_add_std_objects() == -1) {
+    if (Bitmap_add_std_objects() == -1)
 	return -1;
-    }
 
-    if (Bitmap_add_std_textures() == -1) {
+    if (Bitmap_add_std_textures() == -1)
 	return -1;
-    }
 
     strlcpy(servername, server, sizeof(servername));
 
@@ -1656,9 +1641,8 @@ int Client_init(char *server, unsigned server_version)
 int Client_setup(void)
 {
     if (oldServer) {
-	if (Map_init() == -1) {
+	if (Map_init() == -1)
 	    return -1;
-	}
 	Map_dots();
 	Map_restore(0, 0, Setup->x, Setup->y);
 	Map_blue(0, 0, Setup->x, Setup->y);
@@ -1671,19 +1655,16 @@ int Client_setup(void)
 	CLR_BIT(instruments, SHOW_TEXTURED_WALLS);
     }
 
-    /* kps - the above one is used in the standard code  */
-    /*RadarHeight = (RadarWidth * Setup->y) / Setup->x;*/
     RadarHeight = (RadarWidth * Setup->height) / Setup->width;
 
-    if (Init_playing_windows() == -1) {
+    if (Init_playing_windows() == -1)
 	return -1;
-    }
-    if (Alloc_msgs() == -1) {
+
+    if (Alloc_msgs() == -1)
 	return -1;
-    }
-    if (Alloc_history() == -1) {
+
+    if (Alloc_history() == -1)
 	return -1;
-    }
 
     /* Old servers can't deal with 0.0 turnresistance, so swap to
      * the alternate bank, and hope there's something better there. */
@@ -1727,9 +1708,8 @@ int Client_power(void)
 	return -1;
     }
     for (i = 0; i < NUM_MODBANKS; i++) {
-	if (Send_modifier_bank(i) == -1) {
+	if (Send_modifier_bank(i) == -1)
 	    return -1;
-	}
     }
 
     return 0;
