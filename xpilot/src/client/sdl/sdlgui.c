@@ -1257,7 +1257,8 @@ void Gui_paint_ship(int x, int y, int dir, int id, int cloak, int phased,
     	    } else {
 			img = IMG_SHIP_SELF;
     	    }
-    	    Image_paint(img, x - 16, y - 16, dir>>1, color);
+    	    if (cloak || phased ) Image_paint(img, x - 16, y - 16, dir>>1, (color & 0xffffff00) + ((color & 0x000000ff)/2));
+	    else Image_paint(img, x - 16, y - 16, dir>>1, color);
 	} else {
     	    glEnable(GL_BLEND);
     	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
