@@ -442,7 +442,7 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
 {
     (void)widget_desc; (void)data; (void)unused;
     if (keys_created == false) {
-	unsigned	bufsize = (maxKeyDefs * 64);
+	unsigned	bufsize = (num_keydefs * 64);
 	char		*buf = calloc(bufsize, 1),
 			*end = buf,
 			*help,
@@ -451,15 +451,15 @@ int Keys_callback(int widget_desc, void *data, const char **unused)
 			len,
 			maxkeylen = 0;
 
-	for (i = 0; i < maxKeyDefs; i++) {
-	    if ((str = XKeysymToString(keyDefs[i].keysym)) != NULL
+	for (i = 0; i < num_keydefs; i++) {
+	    if ((str = XKeysymToString(keydefs[i].keysym)) != NULL
 		&& (len = strlen(str)) > maxkeylen) {
 		maxkeylen = len;
 	    }
 	}
-	for (i = 0; i < maxKeyDefs; i++) {
-	    if (!(str = XKeysymToString(keyDefs[i].keysym))
-		|| !(help = Get_keyHelpString(keyDefs[i].key))) {
+	for (i = 0; i < num_keydefs; i++) {
+	    if (!(str = XKeysymToString(keydefs[i].keysym))
+		|| !(help = Get_keyHelpString(keydefs[i].key))) {
 		continue;
 	    }
 	    if ((end - buf) + (maxkeylen + strlen(help) + 4) >= bufsize) {

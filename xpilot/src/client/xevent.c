@@ -30,6 +30,9 @@ bool		initialPointerControl = false;
 bool		pointerControl = false;
 extern Cursor	pointerControlCursor;
 
+int num_keydefs = 0;
+int max_keydefs = 0;
+keydefs_t *keydefs = NULL;
 
 keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 {
@@ -38,26 +41,26 @@ keys_t Lookup_key(XEvent *event, KeySym ks, bool reset)
 
     (void)event;
     if (reset) {
-	/* binary search since keyDefs is sorted on keysym. */
-	int lo = 0, hi = maxKeyDefs - 1;
+	/* binary search since keydefs is sorted on keysym. */
+	int lo = 0, hi = num_keydefs - 1;
 	while (lo < hi) {
 	    i = (lo + hi) >> 1;
-	    if (ks > keyDefs[i].keysym)
+	    if (ks > keydefs[i].keysym)
 		lo = i + 1;
 	    else
 		hi = i;
 	}
-	if (lo == hi && ks == keyDefs[lo].keysym) {
-	    while (lo > 0 && ks == keyDefs[lo - 1].keysym)
+	if (lo == hi && ks == keydefs[lo].keysym) {
+	    while (lo > 0 && ks == keydefs[lo - 1].keysym)
 		lo--;
 	    i = lo;
-	    ret = keyDefs[i].key;
+	    ret = keydefs[i].key;
 	    i++;
 	}
     }
     else {
-	if (i < maxKeyDefs && ks == keyDefs[i].keysym) {
-	    ret = keyDefs[i].key;
+	if (i < num_keydefs && ks == keydefs[i].keysym) {
+	    ret = keydefs[i].key;
 	    i++;
 	}
     }
@@ -283,10 +286,6 @@ void Talk_event(XEvent *event)
     if (!Talk_do_event(event))
 	Talk_set_state(false);
 }
-
-static int num_keydefs = 0;
-static int max_keydefs = 0;
-static keydefs_t *keydefs = NULL;
 
 /*
  * The option code calls this callback when key options are processed.

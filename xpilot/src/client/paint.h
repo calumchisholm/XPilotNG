@@ -148,7 +148,6 @@ extern char	sparkColors[MSG_LEN];
 extern int	spark_color[MAX_COLORS];
 extern int	num_spark_colors;
 
-extern int	maxKeyDefs;
 extern long	loops;
 extern long	loopsSlow;
 extern double	timePerFrame;

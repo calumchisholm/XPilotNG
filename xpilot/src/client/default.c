@@ -3614,8 +3614,8 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
     /*
      * Key bindings
      */
-    maxKeyDefs = 2 * NUM_KEYS;
-    if (!(keyDefs = (keydefs_t *)malloc(maxKeyDefs * sizeof(keydefs_t)))) {
+    max_keydefs = 2 * NUM_KEYS;
+    if (!(keydefs = malloc(max_keydefs * sizeof(keydefs_t)))) {
 	error("No memory for key bindings");
 	exit(1);
     }
@@ -3636,16 +3636,16 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	    }
 
 	    for (j = firstKeyDef; j < num; j++) {
-		if (keyDefs[j].keysym == ks
-		    && keyDefs[j].key == key)
+		if (keydefs[j].keysym == ks
+		    && keydefs[j].key == key)
 		    break;
 	    }
 	    if (j < num)
 		continue;
-	    if (num >= maxKeyDefs) {
-		maxKeyDefs += NUM_KEYS;
-		if (!(keyDefs = (keydefs_t *)
-			realloc(keyDefs, maxKeyDefs * sizeof(keydefs_t)))) {
+	    if (num >= max_keydefs) {
+		max_keydefs += NUM_KEYS;
+		if (!(keydefs = realloc(keydefs,
+					max_keydefs * sizeof(keydefs_t)))) {
 		    error("No memory for key bindings");
 		    exit(1);
 		}
@@ -3653,12 +3653,12 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 
 	    /* insertion sort. */
 	    for (j = num; j > 0; j--) {
-		if (ks >= keyDefs[j - 1].keysym)
+		if (ks >= keydefs[j - 1].keysym)
 		    break;
-		keyDefs[j] = keyDefs[j - 1];
+		keydefs[j] = keydefs[j - 1];
 	    }
-	    keyDefs[j].keysym = ks;
-	    keyDefs[j].key = key;
+	    keydefs[j].keysym = ks;
+	    keydefs[j].key = key;
 	    num++;
 	    if (!key) {
 		printf("bug key 0\n");
@@ -3666,14 +3666,14 @@ void Parse_options(int *argcp, char **argvp, char *realName, int *port,
 	    }
 	}
     }
-    if (num < maxKeyDefs) {
-	maxKeyDefs = num;
-	if (!(keyDefs = (keydefs_t *)
-		realloc(keyDefs, maxKeyDefs * sizeof(keydefs_t)))) {
+    if (num < max_keydefs) {
+	max_keydefs = num;
+	if (!(keydefs = realloc(keydefs, max_keydefs * sizeof(keydefs_t)))) {
 	    error("No memory for key bindings");
 	    exit(1);
 	}
     }
+    num_keydefs = max_keydefs;
 
     /*
      * Pointer button bindings
@@ -3724,9 +3724,9 @@ void	defaultCleanup(void)
 {
     IFWINDOWS( Get_xpilotini_file(-1) );
 
-    if (keyDefs) {
-	free(keyDefs);
-	keyDefs = NULL;
+    if (keydefs) {
+	free(keydefs);
+	keydefs = NULL;
     }
     if (texturePath) {
 	free(texturePath);

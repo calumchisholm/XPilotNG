@@ -29,7 +29,9 @@ typedef struct {
     keys_t	key;
 } keydefs_t;
 
-extern keydefs_t	*keyDefs;
+extern keydefs_t	*keydefs;
+extern int		num_keydefs;
+extern int		max_keydefs;
 
 extern char* Get_keyHelpString(keys_t key);
 extern const char *Get_keyResourceString(keys_t key);

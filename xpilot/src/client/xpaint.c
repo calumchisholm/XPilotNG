@@ -88,9 +88,6 @@ bool	gotFocus;
 bool	players_exposed;
 int	shieldDrawMode = -1;	/* Either LineOnOffDash or LineSolid */
 
-int		maxKeyDefs;
-keydefs_t	*keyDefs = NULL;
-
 static double   time_counter = 0.0;
 
 static void Paint_clock(bool redraw);
