@@ -304,32 +304,38 @@ void Paint_meters(void)
 	Paint_meter(-10, y += 20, "Lag", MIN(packet_lag, 1 * FPS), 1 * FPS,
 		    packetLagMeterColor);
 
-    if (thrusttime >= 0 && thrusttimemax > 0)
-	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3,
-		    "Thrust Left",
-		    (thrusttime >= thrusttimemax ? thrusttimemax : thrusttime),
-		    thrusttimemax, temporaryMeterColor);
-
-    if (shieldtime >= 0 && shieldtimemax > 0)
-	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 20,
-		    "Shields Left",
-		    (shieldtime >= shieldtimemax ? shieldtimemax : shieldtime),
-		    shieldtimemax, temporaryMeterColor);
-
-    if (phasingtime >= 0 && phasingtimemax > 0)
-	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 40,
-		    "Phasing left",
-		    (phasingtime >= phasingtimemax ? phasingtimemax : phasingtime),
-		    phasingtimemax, temporaryMeterColor);
-
-    if (destruct > 0)
-	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 60,
-		   "Self destructing", destruct, 150, temporaryMeterColor);
-
-    if (shutdown_count >= 0)
-	Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 80,
-		   "SHUTDOWN", shutdown_count, shutdown_delay,
-		    temporaryMeterColor);
+    if (temporaryMeterColor) {
+	if (thrusttime >= 0 && thrusttimemax > 0)
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3,
+			"Thrust Left",
+			(thrusttime >= thrusttimemax
+			 ? thrusttimemax : thrusttime),
+			thrusttimemax, temporaryMeterColor);
+	
+	if (shieldtime >= 0 && shieldtimemax > 0)
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 20,
+			"Shields Left",
+			(shieldtime >= shieldtimemax
+			 ? shieldtimemax : shieldtime),
+			shieldtimemax, temporaryMeterColor);
+	
+	if (phasingtime >= 0 && phasingtimemax > 0)
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 40,
+			"Phasing left",
+			(phasingtime >= phasingtimemax
+			 ? phasingtimemax : phasingtime),
+			phasingtimemax, temporaryMeterColor);
+	
+	if (destruct > 0)
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 60,
+			"Self destructing", destruct, 150,
+			temporaryMeterColor);
+	
+	if (shutdown_count >= 0)
+	    Paint_meter((ext_view_width-300)/2 -32, 2*ext_view_height/3 + 80,
+			"SHUTDOWN", shutdown_count, shutdown_delay,
+			temporaryMeterColor);
+    }
 }
 
 
