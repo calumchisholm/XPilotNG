@@ -1778,7 +1778,7 @@ static option_desc opts[] = {
     {
 	"allowSmartMissiles",
 	"allowSmarts",
-	"True",
+	"true",
 	&options.allowSmartMissiles,
 	valBool,
 	tuner_dummy,
@@ -1788,7 +1788,7 @@ static option_desc opts[] = {
     {
 	"allowHeatSeekers",
 	"allowHeats",
-	"True",
+	"true",
 	&options.allowHeatSeekers,
 	valBool,
 	tuner_dummy,
@@ -1798,7 +1798,7 @@ static option_desc opts[] = {
     {
 	"allowTorpedoes",
 	"allowTorps",
-	"True",
+	"true",
 	&options.allowTorpedoes,
 	valBool,
 	tuner_dummy,
@@ -1808,7 +1808,7 @@ static option_desc opts[] = {
     {
 	"allowNukes",
 	"nukes",
-	"False",
+	"false",
 	&options.allowNukes,
 	valBool,
 	tuner_modifiers,
@@ -1818,7 +1818,7 @@ static option_desc opts[] = {
     {
 	"allowClusters",
 	"clusters",
-	"False",
+	"false",
 	&options.allowClusters,
 	valBool,
 	tuner_modifiers,
@@ -1828,7 +1828,7 @@ static option_desc opts[] = {
     {
 	"allowModifiers",
 	"modifiers",
-	"False",
+	"false",
 	&options.allowModifiers,
 	valBool,
 	tuner_modifiers,
@@ -1838,7 +1838,7 @@ static option_desc opts[] = {
     {
 	"allowLaserModifiers",
 	"lasermodifiers",
-	"False",
+	"false",
 	&options.allowLaserModifiers,
 	valBool,
 	tuner_modifiers,
@@ -1848,7 +1848,7 @@ static option_desc opts[] = {
     {
 	"allowShipShapes",
 	"ShipShapes",
-	"True",
+	"true",
 	&options.allowShipShapes,
 	valBool,
 	tuner_dummy,
@@ -1858,7 +1858,7 @@ static option_desc opts[] = {
     {
 	"playersOnRadar",
 	"playersRadar",
-	"True",
+	"true",
 	&options.playersOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1868,7 +1868,7 @@ static option_desc opts[] = {
     {
 	"missilesOnRadar",
 	"missilesRadar",
-	"False",
+	"false",
 	&options.missilesOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1878,7 +1878,7 @@ static option_desc opts[] = {
     {
 	"minesOnRadar",
 	"minesRadar",
-	"False",
+	"false",
 	&options.minesOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1888,7 +1888,7 @@ static option_desc opts[] = {
     {
 	"nukesOnRadar",
 	"nukesRadar",
-	"False",
+	"false",
 	&options.nukesOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1898,7 +1898,7 @@ static option_desc opts[] = {
     {
 	"treasuresOnRadar",
 	"treasuresRadar",
-	"False",
+	"false",
 	&options.treasuresOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1908,7 +1908,7 @@ static option_desc opts[] = {
     {
 	"asteroidsOnRadar",
 	"asteroidsRadar",
-	"False",
+	"false",
 	&options.asteroidsOnRadar,
 	valBool,
 	tuner_dummy,
@@ -1918,7 +1918,7 @@ static option_desc opts[] = {
     {
 	"distinguishMissiles",
 	"distinguishMissiles",
-	"True",
+	"true",
 	&options.distinguishMissiles,
 	valBool,
 	tuner_dummy,
@@ -1948,7 +1948,7 @@ static option_desc opts[] = {
     {
 	"identifyMines",
 	"identifyMines",
-	"True",
+	"true",
 	&options.identifyMines,
 	valBool,
 	tuner_dummy,
@@ -1958,7 +1958,7 @@ static option_desc opts[] = {
     {
 	"shieldedItemPickup",
 	"shieldItem",
-	"False",
+	"false",
 	&options.shieldedItemPickup,
 	valBool,
 	tuner_dummy,
@@ -1968,7 +1968,7 @@ static option_desc opts[] = {
     {
 	"shieldedMining",
 	"shieldMine",
-	"False",
+	"false",
 	&options.shieldedMining,
 	valBool,
 	tuner_dummy,
@@ -1978,7 +1978,7 @@ static option_desc opts[] = {
     {
 	"laserIsStunGun",
 	"stunGun",
-	"False",
+	"false",
 	&options.laserIsStunGun,
 	valBool,
 	tuner_dummy,
